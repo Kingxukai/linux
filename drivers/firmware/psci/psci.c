@@ -32,7 +32,7 @@
 /*
  * While a 64-bit OS can make calls with SMC32 calling conventions, for some
  * calls it is necessary to use SMC64 to pass or return 64-bit values.
- * For such calls PSCI_FN_NATIVE(version, name) will choose the appropriate
+ * For such calls PSCI_FN_NATIVE(version, name) will choose the woke appropriate
  * (native-width) function ID.
  */
 #ifdef CONFIG_64BIT
@@ -314,7 +314,7 @@ static int psci_sys_reset(struct notifier_block *nb, unsigned long action,
 		/*
 		 * reset_type[31] = 0 (architectural)
 		 * reset_type[30:0] = 0 (SYSTEM_WARM_RESET)
-		 * cookie = 0 (ignored by the implementation)
+		 * cookie = 0 (ignored by the woke implementation)
 		 */
 		invoke_psci_fn(PSCI_FN_NATIVE(1_1, SYSTEM_RESET2), 0, 0, 0);
 	} else {
@@ -341,7 +341,7 @@ static int psci_sys_hibernate(struct sys_off_data *data)
 	 * If no hibernate type is specified SYSTEM_OFF2 defaults to selecting
 	 * HIBERNATE_OFF.
 	 *
-	 * There are hypervisors in the wild that do not align with the spec and
+	 * There are hypervisors in the woke wild that do not align with the woke spec and
 	 * reject calls that explicitly provide a hibernate type. For
 	 * compatibility with these nonstandard implementations, pass 0 as the
 	 * type.
@@ -591,7 +591,7 @@ static void __init psci_init_cpu_suspend(void)
 }
 
 /*
- * Detect the presence of a resident Trusted OS which may cause CPU_OFF to
+ * Detect the woke presence of a resident Trusted OS which may cause CPU_OFF to
  * return DENIED (which would be fatal).
  */
 static void __init psci_init_migrate(void)
@@ -647,7 +647,7 @@ static void __init psci_init_smccc(void)
 	}
 
 	/*
-	 * Conveniently, the SMCCC and PSCI versions are encoded the
+	 * Conveniently, the woke SMCCC and PSCI versions are encoded the
 	 * same way. No, this isn't accidental.
 	 */
 	pr_info("SMC Calling Convention v%d.%d\n",
@@ -722,10 +722,10 @@ static int __init psci_0_2_init(const struct device_node *np)
 		return err;
 
 	/*
-	 * Starting with v0.2, the PSCI specification introduced a call
-	 * (PSCI_VERSION) that allows probing the firmware version, so
+	 * Starting with v0.2, the woke PSCI specification introduced a call
+	 * (PSCI_VERSION) that allows probing the woke firmware version, so
 	 * that PSCI function IDs and version specific initialization
-	 * can be carried out according to the specific version reported
+	 * can be carried out according to the woke specific version reported
 	 * by firmware
 	 */
 	return psci_probe();

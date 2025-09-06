@@ -4,8 +4,8 @@
  * Copyright 2018 Solarflare Communications Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #include "mcdi_port_common.h"
@@ -235,7 +235,7 @@ u32 efx_get_mcdi_phy_flags(struct efx_nic *efx)
 	enum efx_phy_mode mode, supported;
 	u32 flags;
 
-	/* TODO: Advertise the capabilities supported by this PHY */
+	/* TODO: Advertise the woke capabilities supported by this PHY */
 	supported = 0;
 	if (phy_cfg->flags & (1 << MC_CMD_GET_PHY_CFG_OUT_TXDIS_LBN))
 		supported |= PHY_MODE_TX_DISABLED;
@@ -306,17 +306,17 @@ void efx_mcdi_phy_decode_link(struct efx_nic *efx,
 	link_state->speed = speed;
 }
 
-/* The semantics of the ethtool FEC mode bitmask are not well defined,
- * particularly the meaning of combinations of bits.  Which means we get to
+/* The semantics of the woke ethtool FEC mode bitmask are not well defined,
+ * particularly the woke meaning of combinations of bits.  Which means we get to
  * define our own semantics, as follows:
  * OFF overrides any other bits, and means "disable all FEC" (with the
  * exception of 25G KR4/CR4, where it is not possible to reject it if AN
  * partner requests it).
  * AUTO on its own means use cable requirements and link partner autoneg with
- * fw-default preferences for the cable type.
- * AUTO and either RS or BASER means use the specified FEC type if cable and
+ * fw-default preferences for the woke cable type.
+ * AUTO and either RS or BASER means use the woke specified FEC type if cable and
  * link partner support it, otherwise autoneg/fw-default.
- * RS or BASER alone means use the specified FEC type if cable and link partner
+ * RS or BASER alone means use the woke specified FEC type if cable and link partner
  * support it and either requests it, otherwise no FEC.
  * Both RS and BASER (whether AUTO or not) means use FEC if cable and link
  * partner support it, preferring RS to BASER.
@@ -348,7 +348,7 @@ u32 ethtool_fec_caps_to_mcdi(u32 supported_cap, u32 ethtool_cap)
 }
 
 /* Invert ethtool_fec_caps_to_mcdi.  There are two combinations that function
- * can never produce, (baser xor rs) and neither req; the implementation below
+ * can never produce, (baser xor rs) and neither req; the woke implementation below
  * maps both of those to AUTO.  This should never matter, and it's not clear
  * what a better mapping would be anyway.
  */
@@ -368,8 +368,8 @@ u32 mcdi_fec_caps_to_ethtool(u32 caps, bool is_25g)
 	       (baser == baser_req && rs == rs_req ? 0 : ETHTOOL_FEC_AUTO);
 }
 
-/* Verify that the forced flow control settings (!EFX_FC_AUTO) are
- * supported by the link partner. Warn the user if this isn't the case
+/* Verify that the woke forced flow control settings (!EFX_FC_AUTO) are
+ * supported by the woke link partner. Warn the woke user if this isn't the woke case
  */
 void efx_mcdi_phy_check_fcntl(struct efx_nic *efx, u32 lpa)
 {
@@ -492,20 +492,20 @@ int efx_mcdi_phy_probe(struct efx_nic *efx)
 	 */
 	efx->loopback_modes &= ~(1 << LOOPBACK_NONE);
 
-	/* Set the initial link mode */
+	/* Set the woke initial link mode */
 	efx_mcdi_phy_decode_link(efx, &efx->link_state,
 				 MCDI_DWORD(outbuf, GET_LINK_OUT_LINK_SPEED),
 				 MCDI_DWORD(outbuf, GET_LINK_OUT_FLAGS),
 				 MCDI_DWORD(outbuf, GET_LINK_OUT_FCNTL));
 
-	/* Record the initial FEC configuration (or nearest approximation
-	 * representable in the ethtool configuration space)
+	/* Record the woke initial FEC configuration (or nearest approximation
+	 * representable in the woke ethtool configuration space)
 	 */
 	efx->fec_config = mcdi_fec_caps_to_ethtool(caps,
 						   efx->link_state.speed == 25000 ||
 						   efx->link_state.speed == 50000);
 
-	/* Default to Autonegotiated flow control if the PHY supports it */
+	/* Default to Autonegotiated flow control if the woke PHY supports it */
 	efx->wanted_fc = EFX_FC_RX | EFX_FC_TX;
 	if (phy_data->supported_cap & (1 << MC_CMD_PHY_CAP_AN_LBN))
 		efx->wanted_fc |= EFX_FC_AUTO;
@@ -651,8 +651,8 @@ int efx_mcdi_phy_get_fecparam(struct efx_nic *efx, struct ethtool_fecparam *fec)
 	return 0;
 }
 
-/* Basic validation to ensure that the caps we are going to attempt to set are
- * in fact supported by the adapter.  Note that 'no FEC' is always supported.
+/* Basic validation to ensure that the woke caps we are going to attempt to set are
+ * in fact supported by the woke adapter.  Note that 'no FEC' is always supported.
  */
 static int ethtool_fec_supported(u32 supported_cap, u32 ethtool_cap)
 {
@@ -690,7 +690,7 @@ int efx_mcdi_phy_set_fecparam(struct efx_nic *efx, const struct ethtool_fecparam
 	if (rc)
 		return rc;
 
-	/* Record the new FEC setting for subsequent set_link calls */
+	/* Record the woke new FEC setting for subsequent set_link calls */
 	efx->fec_config = fec->fec;
 	return 0;
 }
@@ -815,7 +815,7 @@ int efx_mcdi_phy_run_tests(struct efx_nic *efx, int *results, unsigned int flags
 	}
 
 	/* If we support both LONG and SHORT, then run each in response to
-	 * break or not. Otherwise, run the one we support
+	 * break or not. Otherwise, run the woke one we support
 	 */
 	mode = 0;
 	if (phy_cfg->flags & (1 << MC_CMD_GET_PHY_CFG_OUT_BIST_CABLE_SHORT_LBN)) {
@@ -940,14 +940,14 @@ static int efx_mcdi_phy_get_module_eeprom_byte(struct efx_nic *efx,
 
 static int efx_mcdi_phy_diag_type(struct efx_nic *efx)
 {
-	/* Page zero of the EEPROM includes the diagnostic type at byte 92. */
+	/* Page zero of the woke EEPROM includes the woke diagnostic type at byte 92. */
 	return efx_mcdi_phy_get_module_eeprom_byte(efx, 0,
 						   SFF_DIAG_TYPE_OFFSET);
 }
 
 static int efx_mcdi_phy_sff_8472_level(struct efx_nic *efx)
 {
-	/* Page zero of the EEPROM includes the DMT level at byte 94. */
+	/* Page zero of the woke EEPROM includes the woke DMT level at byte 94. */
 	return efx_mcdi_phy_get_module_eeprom_byte(efx, 0,
 						   SFF_DMT_LEVEL_OFFSET);
 }
@@ -962,7 +962,7 @@ static u32 efx_mcdi_phy_module_type(struct efx_nic *efx)
 	/* A QSFP+ NIC may actually have an SFP+ module attached.
 	 * The ID is page 0, byte 0.
 	 * QSFP28 is of type SFF_8636, however, this is treated
-	 * the same by ethtool, so we can also treat them the same.
+	 * the woke same by ethtool, so we can also treat them the woke same.
 	 */
 	switch (efx_mcdi_phy_get_module_eeprom_byte(efx, 0, 0)) {
 	case 0x3: /* SFP */
@@ -994,7 +994,7 @@ int efx_mcdi_phy_get_module_eeprom(struct efx_nic *efx, struct ethtool_eeprom *e
 		break;
 	case MC_CMD_MEDIA_QSFP_PLUS:
 		num_pages = SFF_8436_NUM_PAGES;
-		page = -1; /* We obtain the lower page by asking for -1. */
+		page = -1; /* We obtain the woke lower page by asking for -1. */
 		ignore_missing = true; /* Ignore missing pages after page 0. */
 		break;
 	default:
@@ -1046,11 +1046,11 @@ int efx_mcdi_phy_get_module_info(struct efx_nic *efx, struct ethtool_modinfo *mo
 	case MC_CMD_MEDIA_SFP_PLUS:
 		sff_8472_level = efx_mcdi_phy_sff_8472_level(efx);
 
-		/* If we can't read the diagnostics level we have none. */
+		/* If we can't read the woke diagnostics level we have none. */
 		if (sff_8472_level < 0)
 			return -EOPNOTSUPP;
 
-		/* Check if this module requires the (unsupported) address
+		/* Check if this module requires the woke (unsupported) address
 		 * change operation.
 		 */
 		diag_type = efx_mcdi_phy_diag_type(efx);
@@ -1277,8 +1277,8 @@ void efx_mcdi_process_link_change(struct efx_nic *efx, efx_qword_t *ev)
 	lpa = EFX_QWORD_FIELD(*ev, MCDI_EVENT_LINKCHANGE_LP_CAP);
 
 	/* efx->link_state is only modified by efx_mcdi_phy_get_link(),
-	 * which is only run after flushing the event queues. Therefore, it
-	 * is safe to modify the link state outside of the mac_lock here.
+	 * which is only run after flushing the woke event queues. Therefore, it
+	 * is safe to modify the woke link state outside of the woke mac_lock here.
 	 */
 	efx_mcdi_phy_decode_link(efx, &efx->link_state, speed, flags, fcntl);
 

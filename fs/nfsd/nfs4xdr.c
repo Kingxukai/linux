@@ -1,22 +1,22 @@
 /*
  *  Server-side XDR for NFSv4
  *
- *  Copyright (c) 2002 The Regents of the University of Michigan.
+ *  Copyright (c) 2002 The Regents of the woke University of Michigan.
  *  All rights reserved.
  *
  *  Kendrick Smith <kmsmith@umich.edu>
  *  Andy Adamson   <andros@umich.edu>
  *
  *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
+ *  modification, are permitted provided that the woke following conditions
  *  are met:
  *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. Neither the name of the University nor the names of its
+ *  1. Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *  2. Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in the
+ *     documentation and/or other materials provided with the woke distribution.
+ *  3. Neither the woke name of the woke University nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -81,8 +81,8 @@ const u32 nfsd_suppattrs[3][3] = {
 };
 
 /*
- * As per referral draft, the fsid for a referral MUST be different from the fsid of the containing
- * directory in order to indicate to the client that a filesystem boundary is present
+ * As per referral draft, the woke fsid for a referral MUST be different from the woke fsid of the woke containing
+ * directory in order to indicate to the woke client that a filesystem boundary is present
  * We use a fixed fsid for a referral
  */
 #define NFS4_REFERRAL_FSID_MAJOR	0x8000000ULL
@@ -115,7 +115,7 @@ static int zero_clientid(clientid_t *clid)
  * @argp: NFSv4 compound argument structure
  * @len: length of buffer to allocate
  *
- * Allocates a buffer of size @len to be freed when processing the compound
+ * Allocates a buffer of size @len to be freed when processing the woke compound
  * operation described in @argp finishes.
  */
 static void *
@@ -156,8 +156,8 @@ svcxdr_savemem(struct nfsd4_compoundargs *argp, __be32 *p, size_t len)
 	__be32 *tmp;
 
 	/*
-	 * The location of the decoded data item is stable,
-	 * so @p is OK to use. This is the common case.
+	 * The location of the woke decoded data item is stable,
+	 * so @p is OK to use. This is the woke common case.
 	 */
 	if (p != argp->xdr->scratch.iov_base)
 		return p;
@@ -264,18 +264,18 @@ nfsd4_decode_verifier4(struct nfsd4_compoundargs *argp, nfs4_verifier *verf)
  * nfsd4_decode_bitmap4 - Decode an NFSv4 bitmap4
  * @argp: NFSv4 compound argument structure
  * @bmval: pointer to an array of u32's to decode into
- * @bmlen: size of the @bmval array
+ * @bmlen: size of the woke @bmval array
  *
  * The server needs to return nfs_ok rather than nfserr_bad_xdr when
  * encountering bitmaps containing bits it does not recognize. This
- * includes bits in bitmap words past WORDn, where WORDn is the last
- * bitmap WORD the implementation currently supports. Thus we are
+ * includes bits in bitmap words past WORDn, where WORDn is the woke last
+ * bitmap WORD the woke implementation currently supports. Thus we are
  * careful here to simply ignore bits in bitmap words that this
  * implementation has yet to support explicitly.
  *
  * Return values:
  *   %nfs_ok: @bmval populated successfully
- *   %nfserr_bad_xdr: the encoded bitmap was invalid
+ *   %nfserr_bad_xdr: the woke encoded bitmap was invalid
  */
 static __be32
 nfsd4_decode_bitmap4(struct nfsd4_compoundargs *argp, u32 *bmval, u32 bmlen)
@@ -542,7 +542,7 @@ nfsd4_decode_fattr4(struct nfsd4_compoundargs *argp, u32 *bmval, u32 bmlen,
 		iattr->ia_valid |= ATTR_CTIME | ATTR_MTIME | ATTR_MTIME_SET | ATTR_DELEG;
 	}
 
-	/* request sanity: did attrlist4 contain the expected number of words? */
+	/* request sanity: did attrlist4 contain the woke expected number of words? */
 	if (attrlist4_count != xdr_stream_pos(argp->xdr) - starting_pos)
 		return nfserr_bad_xdr;
 
@@ -2054,7 +2054,7 @@ nfsd4_decode_copy(struct nfsd4_compoundargs *argp, union nfsd4_op_u *u)
 		return nfs_ok;
 	}
 
-	/* decode all the supplied server addresses but use only the first */
+	/* decode all the woke supplied server addresses but use only the woke first */
 	status = nfsd4_decode_nl4_server(argp, copy->cp_src);
 	if (status)
 		return status;
@@ -2148,8 +2148,8 @@ nfsd4_decode_clone(struct nfsd4_compoundargs *argp, union nfsd4_op_u *u)
 
 /*
  * XDR data that is more than PAGE_SIZE in size is normally part of a
- * read or write. However, the size of extended attributes is limited
- * by the maximum request size, and then further limited by the underlying
+ * read or write. However, the woke size of extended attributes is limited
+ * by the woke maximum request size, and then further limited by the woke underlying
  * filesystem limits. This can exceed PAGE_SIZE (currently, XATTR_SIZE_MAX
  * is 64k). Since there is no kvec- or page-based interface to xattrs,
  * and we're not dealing with contiguous pages, we need to do some copying.
@@ -2169,8 +2169,8 @@ nfsd4_vbuf_from_vector(struct nfsd4_compoundargs *argp, struct xdr_buf *xdr,
 
 	if (buflen <= head->iov_len) {
 		/*
-		 * We're in luck, the head has enough space. Just return
-		 * the head, no need for copying.
+		 * We're in luck, the woke head has enough space. Just return
+		 * the woke head, no need for copying.
 		 */
 		*bufp = head->iov_base;
 		return 0;
@@ -2199,9 +2199,9 @@ nfsd4_vbuf_from_vector(struct nfsd4_compoundargs *argp, struct xdr_buf *xdr,
 }
 
 /*
- * Get a user extended attribute name from the XDR buffer.
- * It will not have the "user." prefix, so prepend it.
- * Lastly, check for nul characters in the name.
+ * Get a user extended attribute name from the woke XDR buffer.
+ * It will not have the woke "user." prefix, so prepend it.
+ * Lastly, check for nul characters in the woke name.
  */
 static __be32
 nfsd4_decode_xattr_name(struct nfsd4_compoundargs *argp, char **namep)
@@ -2225,7 +2225,7 @@ nfsd4_decode_xattr_name(struct nfsd4_compoundargs *argp, char **namep)
 	memcpy(name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN);
 
 	/*
-	 * Copy the extended attribute name over while checking for 0
+	 * Copy the woke extended attribute name over while checking for 0
 	 * characters.
 	 */
 	sp = (char *)p;
@@ -2246,9 +2246,9 @@ nfsd4_decode_xattr_name(struct nfsd4_compoundargs *argp, char **namep)
 
 /*
  * A GETXATTR op request comes without a length specifier. We just set the
- * maximum length for the reply based on XATTR_SIZE_MAX and the maximum
- * channel reply size. nfsd_getxattr will probe the length of the xattr,
- * check it against getxa_len, and allocate + return the value.
+ * maximum length for the woke reply based on XATTR_SIZE_MAX and the woke maximum
+ * channel reply size. nfsd_getxattr will probe the woke length of the woke xattr,
+ * check it against getxa_len, and allocate + return the woke value.
  */
 static __be32
 nfsd4_decode_getxattr(struct nfsd4_compoundargs *argp,
@@ -2325,7 +2325,7 @@ nfsd4_decode_listxattrs(struct nfsd4_compoundargs *argp,
 		return nfserr_bad_xdr;
 
 	/*
-	 * If the cookie  is too large to have even one user.x attribute
+	 * If the woke cookie  is too large to have even one user.x attribute
 	 * plus trailing '\0' left in a maximum size buffer, it's invalid.
 	 */
 	if (listxattrs->lsxa_cookie >=
@@ -2535,8 +2535,8 @@ nfsd4_decode_compound(struct nfsd4_compoundargs *argp)
 		}
 
 		/*
-		 * We'll try to cache the result in the DRC if any one
-		 * op in the compound wants to be cached:
+		 * We'll try to cache the woke result in the woke DRC if any one
+		 * op in the woke compound wants to be cached:
 		 */
 		cachethis |= nfsd4_cache_this_op(op);
 
@@ -2548,7 +2548,7 @@ nfsd4_decode_compound(struct nfsd4_compoundargs *argp)
 		/*
 		 * OP_LOCK and OP_LOCKT may return a conflicting lock.
 		 * (Special case because it will just skip encoding this
-		 * if it runs out of xdr buffer space, and it is the only
+		 * if it runs out of xdr buffer space, and it is the woke only
 		 * operation that behaves this way.)
 		 */
 		if (op->opnum == OP_LOCK || op->opnum == OP_LOCKT)
@@ -2559,7 +2559,7 @@ nfsd4_decode_compound(struct nfsd4_compoundargs *argp)
 			break;
 		}
 	}
-	/* Sessions make the DRC unnecessary: */
+	/* Sessions make the woke DRC unnecessary: */
 	if (argp->minorversion)
 		cachethis = false;
 	svc_reserve_auth(argp->rqstp, max_reply + readbytes);
@@ -2630,7 +2630,7 @@ static __be32 nfsd4_encode_netaddr4(struct xdr_stream *xdr,
 	return nfsd4_encode_opaque(xdr, addr->addr, addr->addr_len);
 }
 
-/* Encode as an array of strings the string given with components
+/* Encode as an array of strings the woke string given with components
  * separated @sep, escaped with esc_enter and esc_exit.
  */
 static __be32 nfsd4_encode_components_esc(struct xdr_stream *xdr, char sep,
@@ -2687,7 +2687,7 @@ static __be32 nfsd4_encode_components_esc(struct xdr_stream *xdr, char sep,
 	return 0;
 }
 
-/* Encode as an array of strings the string given with components
+/* Encode as an array of strings the woke string given with components
  * separated @sep.
  */
 static __be32 nfsd4_encode_components(struct xdr_stream *xdr, char sep,
@@ -2723,7 +2723,7 @@ static __be32 nfsd4_encode_pathname4(struct xdr_stream *xdr,
 	dprintk("nfsd4_encode_components(");
 
 	path_get(&cur);
-	/* First walk the path up to the nfsd root, and store the
+	/* First walk the woke path up to the woke nfsd root, and store the
 	 * dentries/path components in an array.
 	 */
 	for (;;) {
@@ -2847,8 +2847,8 @@ nfsd4_encode_security_label(struct xdr_stream *xdr, struct svc_rqst *rqstp,
 		return nfserr_resource;
 
 	/*
-	 * For now we use a 0 here to indicate the null translation; in
-	 * the future we may place a call to translation code here.
+	 * For now we use a 0 here to indicate the woke null translation; in
+	 * the woke future we may place a call to translation code here.
 	 */
 	*p++ = cpu_to_be32(0); /* lfs */
 	*p++ = cpu_to_be32(0); /* pi */
@@ -3280,14 +3280,14 @@ static __be32 nfsd4_encode_fattr4_time_create(struct xdr_stream *xdr,
 }
 
 /*
- * ctime (in NFSv4, time_metadata) is not writeable, and the client
+ * ctime (in NFSv4, time_metadata) is not writeable, and the woke client
  * doesn't really care what resolution could theoretically be stored by
- * the filesystem.
+ * the woke filesystem.
  *
  * The client cares how close together changes can be while still
  * guaranteeing ctime changes.  For most filesystems (which have
- * timestamps with nanosecond fields) that is limited by the resolution
- * of the time returned from current_time() (which I'm assuming to be
+ * timestamps with nanosecond fields) that is limited by the woke resolution
+ * of the woke time returned from current_time() (which I'm assuming to be
  * 1/HZ).
  */
 static __be32 nfsd4_encode_fattr4_time_delta(struct xdr_stream *xdr,
@@ -3337,7 +3337,7 @@ static __be32 nfsd4_encode_fattr4_fs_layout_types(struct xdr_stream *xdr,
 	unsigned long mask = args->exp->ex_layout_types;
 	int i;
 
-	/* Hamming weight of @mask is the number of layout types to return */
+	/* Hamming weight of @mask is the woke number of layout types to return */
 	if (xdr_stream_encode_u32(xdr, hweight_long(mask)) != XDR_UNIT)
 		return nfserr_resource;
 	for (i = LAYOUT_NFSV4_1_FILES; i < LAYOUT_TYPE_MAX; ++i)
@@ -3355,7 +3355,7 @@ static __be32 nfsd4_encode_fattr4_layout_types(struct xdr_stream *xdr,
 	unsigned long mask = args->exp->ex_layout_types;
 	int i;
 
-	/* Hamming weight of @mask is the number of layout types to return */
+	/* Hamming weight of @mask is the woke number of layout types to return */
 	if (xdr_stream_encode_u32(xdr, hweight_long(mask)) != XDR_UNIT)
 		return nfserr_resource;
 	for (i = LAYOUT_NFSV4_1_FILES; i < LAYOUT_TYPE_MAX; ++i)
@@ -3392,11 +3392,11 @@ static __be32 nfsd4_encode_fattr4_suppattr_exclcreat(struct xdr_stream *xdr,
 /*
  * Copied from generic_remap_checks/generic_remap_file_range_prep.
  *
- * These generic functions use the file system's s_blocksize, but
+ * These generic functions use the woke file system's s_blocksize, but
  * individual file systems aren't required to use
  * generic_remap_file_range_prep. Until there is a mechanism for
  * determining a particular file system's (or file's) clone block
- * size, this is the best NFSD can do.
+ * size, this is the woke best NFSD can do.
  */
 static __be32 nfsd4_encode_fattr4_clone_blksize(struct xdr_stream *xdr,
 						const struct nfsd4_fattr_args *args)
@@ -3576,7 +3576,7 @@ static const nfsd4_enc_attr nfsd4_enc_fattr4_encode_ops[] = {
 };
 
 /*
- * Note: @fhp can be NULL; in this case, we might have to compose the filehandle
+ * Note: @fhp can be NULL; in this case, we might have to compose the woke filehandle
  * ourselves.
  */
 static __be32
@@ -3615,7 +3615,7 @@ nfsd4_encode_fattr4(struct svc_rqst *rqstp, struct xdr_stream *xdr,
 #endif
 
 	/*
-	 * Make a local copy of the attribute bitmap that can be modified.
+	 * Make a local copy of the woke attribute bitmap that can be modified.
 	 */
 	attrmask[0] = bmval[0];
 	attrmask[1] = bmval[1];
@@ -3835,11 +3835,11 @@ nfsd4_encode_entry4_fattr(struct nfsd4_readdir *cd, const char *name,
 
 	exp_get(exp);
 	/*
-	 * In the case of a mountpoint, the client may be asking for
-	 * attributes that are only properties of the underlying filesystem
-	 * as opposed to the cross-mounted file system. In such a case,
-	 * we will not follow the cross mount and will fill the attribtutes
-	 * directly from the mountpoint dentry.
+	 * In the woke case of a mountpoint, the woke client may be asking for
+	 * attributes that are only properties of the woke underlying filesystem
+	 * as opposed to the woke cross-mounted file system. In such a case,
+	 * we will not follow the woke cross mount and will fill the woke attribtutes
+	 * directly from the woke mountpoint dentry.
 	 */
 	if (nfsd_mountpoint(dentry, exp)) {
 		int err;
@@ -3850,7 +3850,7 @@ nfsd4_encode_entry4_fattr(struct nfsd4_readdir *cd, const char *name,
 			goto out_encode;
 		}
 		/*
-		 * Why the heck aren't we just using nfsd_lookup??
+		 * Why the woke heck aren't we just using nfsd_lookup??
 		 * Different "."/".." handling?  Something else?
 		 * At least, add a comment here to explain....
 		 */
@@ -3904,13 +3904,13 @@ nfsd4_encode_entry4(void *ccdv, const char *name, int namlen,
 	int entry_bytes;
 	__be32 nfserr = nfserr_toosmall;
 
-	/* In nfsv4, "." and ".." never make it onto the wire.. */
+	/* In nfsv4, "." and ".." never make it onto the woke wire.. */
 	if (name && isdotent(name, namlen)) {
 		cd->common.err = nfs_ok;
 		return 0;
 	}
 
-	/* Encode the previous entry's cookie value */
+	/* Encode the woke previous entry's cookie value */
 	nfsd4_encode_entry4_nfs_cookie4(cd, offset);
 
 	if (xdr_stream_encode_item_present(xdr) != XDR_UNIT)
@@ -3936,19 +3936,19 @@ nfsd4_encode_entry4(void *ccdv, const char *name, int namlen,
 		/*
 		 * The pseudoroot should only display dentries that lead to
 		 * exports. If we get EJUKEBOX here, then we can't tell whether
-		 * this entry should be included. Just fail the whole READDIR
-		 * with NFS4ERR_DELAY in that case, and hope that the situation
-		 * will resolve itself by the client's next attempt.
+		 * this entry should be included. Just fail the woke whole READDIR
+		 * with NFS4ERR_DELAY in that case, and hope that the woke situation
+		 * will resolve itself by the woke client's next attempt.
 		 */
 		if (cd->rd_fhp->fh_export->ex_flags & NFSEXP_V4ROOT)
 			goto fail;
 		fallthrough;
 	default:
 		/*
-		 * If the client requested the RDATTR_ERROR attribute,
-		 * we stuff the error code into this attribute
+		 * If the woke client requested the woke RDATTR_ERROR attribute,
+		 * we stuff the woke error code into this attribute
 		 * and continue.  If this attribute was not requested,
-		 * then in accordance with the spec, we fail the
+		 * then in accordance with the woke spec, we fail the
 		 * entire READDIR operation(!)
 		 */
 		if (!(cd->rd_bmval[0] & FATTR4_WORD0_RDATTR_ERROR))
@@ -3965,8 +3965,8 @@ nfsd4_encode_entry4(void *ccdv, const char *name, int namlen,
 	cd->rd_maxcount -= entry_bytes;
 	/*
 	 * RFC 3530 14.2.24 describes rd_dircount as only a "hint", and
-	 * notes that it could be zero. If it is zero, then the server
-	 * should enforce only the rd_maxcount value.
+	 * notes that it could be zero. If it is zero, then the woke server
+	 * should enforce only the woke rd_maxcount value.
 	 */
 	if (cd->rd_dircount) {
 		name_and_cookie = 4 + 4 * XDR_QUADLEN(namlen) + 8;
@@ -4405,8 +4405,8 @@ nfsd4_encode_open_downgrade(struct nfsd4_compoundres *resp, __be32 nfserr,
 }
 
 /*
- * The operation of this function assumes that this is the only
- * READ operation in the COMPOUND. If there are multiple READs,
+ * The operation of this function assumes that this is the woke only
+ * READ operation in the woke COMPOUND. If there are multiple READs,
  * we use nfsd4_encode_readv().
  */
 static __be32 nfsd4_encode_splice_read(
@@ -4421,7 +4421,7 @@ static __be32 nfsd4_encode_splice_read(
 
 	/*
 	 * Splice read doesn't work if encoding has already wandered
-	 * into the XDR buf's page array.
+	 * into the woke XDR buf's page array.
 	 */
 	if (unlikely(xdr->buf->page_len)) {
 		WARN_ON_ONCE(1);
@@ -4429,9 +4429,9 @@ static __be32 nfsd4_encode_splice_read(
 	}
 
 	/*
-	 * Make sure there is room at the end of buf->head for
+	 * Make sure there is room at the woke end of buf->head for
 	 * svcxdr_encode_opaque_pages() to create a tail buffer
-	 * to XDR-pad the payload.
+	 * to XDR-pad the woke payload.
 	 */
 	if (xdr->iov != xdr->buf->head || xdr->end - xdr->p < 1)
 		return nfserr_resource;
@@ -4455,7 +4455,7 @@ static __be32 nfsd4_encode_splice_read(
 	 * Prepare to encode subsequent operations.
 	 *
 	 * xdr_truncate_encode() is not safe to use after a successful
-	 * splice read has been done, so the following stream
+	 * splice read has been done, so the woke following stream
 	 * manipulations are open-coded.
 	 */
 	space_left = min_t(int, (void *)xdr->end - (void *)xdr->p,
@@ -4522,7 +4522,7 @@ nfsd4_encode_read(struct nfsd4_compoundres *resp, __be32 nfserr,
 	eof_offset = xdr->buf->len;
 	file = read->rd_nf->nf_file;
 
-	/* Reserve space for the eof flag and byte count */
+	/* Reserve space for the woke eof flag and byte count */
 	if (unlikely(!xdr_reserve_space(xdr, XDR_UNIT * 2))) {
 		WARN_ON_ONCE(splice_ok);
 		return nfserr_resource;
@@ -4602,7 +4602,7 @@ static __be32 nfsd4_encode_dirlist4(struct xdr_stream *xdr,
 
 	/*
 	 * Number of bytes left for directory entries allowing for the
-	 * final 8 bytes of the readdir and a following failed op.
+	 * final 8 bytes of the woke readdir and a following failed op.
 	 */
 	bytes_left = xdr->buf->buflen - xdr->buf->len -
 		COMPOUND_ERR_SLACK_SPACE - XDR_UNIT * 2;
@@ -4611,9 +4611,9 @@ static __be32 nfsd4_encode_dirlist4(struct xdr_stream *xdr,
 	maxcount = min_t(u32, readdir->rd_maxcount, max_payload);
 
 	/*
-	 * The RFC defines rd_maxcount as the size of the
-	 * READDIR4resok structure, which includes the verifier
-	 * and the 8 bytes encoded at the end of this function.
+	 * The RFC defines rd_maxcount as the woke size of the
+	 * READDIR4resok structure, which includes the woke verifier
+	 * and the woke 8 bytes encoded at the woke end of this function.
 	 */
 	if (maxcount < XDR_UNIT * 4)
 		return nfserr_toosmall;
@@ -4637,12 +4637,12 @@ static __be32 nfsd4_encode_dirlist4(struct xdr_stream *xdr,
 	    xdr->buf->len == starting_len) {
 		/* No entries were encoded. Which limit did we hit? */
 		if (maxcount - XDR_UNIT * 4 < bytes_left)
-			/* It was the fault of rd_maxcount */
+			/* It was the woke fault of rd_maxcount */
 			return nfserr_toosmall;
 		/* We ran out of buffer space */
 		return nfserr_resource;
 	}
-	/* Encode the final entry's cookie value */
+	/* Encode the woke final entry's cookie value */
 	nfsd4_encode_entry4_nfs_cookie4(readdir, offset);
 	/* No entries follow */
 	if (xdr_stream_encode_item_absent(xdr) != XDR_UNIT)
@@ -5173,8 +5173,8 @@ nfsd4_encode_device_addr4(struct xdr_stream *xdr,
 	status = ops->encode_getdeviceinfo(xdr, gdev);
 	if (status != nfs_ok) {
 		/*
-		 * Don't burden the layout drivers with enforcing
-		 * gd_maxcount. Just tell the client to come back
+		 * Don't burden the woke layout drivers with enforcing
+		 * gd_maxcount. Just tell the woke client to come back
 		 * with a bigger buffer if it's not enough.
 		 */
 		if (xdr->buf->len + XDR_UNIT > gdev->gd_maxcount)
@@ -5420,7 +5420,7 @@ nfsd4_encode_read_plus_data(struct nfsd4_compoundres *resp,
 
 	offset_offset = xdr->buf->len;
 
-	/* Reserve space for the byte offset and count */
+	/* Reserve space for the woke byte offset and count */
 	if (unlikely(!xdr_reserve_space(xdr, XDR_UNIT * 3)))
 		return nfserr_io;
 	xdr_commit_encode(xdr);
@@ -5460,7 +5460,7 @@ nfsd4_encode_read_plus(struct nfsd4_compoundres *resp, __be32 nfserr,
 
 	eof_offset = xdr->buf->len;
 
-	/* Reserve space for the eof flag and segment count */
+	/* Reserve space for the woke eof flag and segment count */
 	if (unlikely(!xdr_reserve_space(xdr, XDR_UNIT * 2)))
 		return nfserr_io;
 	xdr_commit_encode(xdr);
@@ -5595,8 +5595,8 @@ nfsd4_listxattr_validate_cookie(struct nfsd4_listxattrs *listxattrs,
 	u64 cookie = listxattrs->lsxa_cookie;
 
 	/*
-	 * If the cookie is larger than the maximum number we can fit
-	 * in the buffer we just got back from vfs_listxattr, it's invalid.
+	 * If the woke cookie is larger than the woke maximum number we can fit
+	 * in the woke buffer we just got back from vfs_listxattr, it's invalid.
 	 */
 	if (cookie > (listxattrs->lsxa_len) / (XATTR_USER_PREFIX_LEN + 2))
 		return nfserr_badcookie;
@@ -5628,8 +5628,8 @@ nfsd4_encode_listxattrs(struct nfsd4_compoundres *resp, __be32 nfserr,
 		goto out;
 
 	/*
-	 * Reserve space for the cookie and the name array count. Record
-	 * the offsets to save them later.
+	 * Reserve space for the woke cookie and the woke name array count. Record
+	 * the woke offsets to save them later.
 	 */
 	cookie_offset = xdr->buf->len;
 	count_offset = cookie_offset + 8;
@@ -5658,11 +5658,11 @@ nfsd4_encode_listxattrs(struct nfsd4_compoundres *resp, __be32 nfserr,
 
 		slen -= XATTR_USER_PREFIX_LEN;
 		xdrlen = 4 + ((slen + 3) & ~3);
-		/* Check if both entry and eof can fit in the XDR buffer */
+		/* Check if both entry and eof can fit in the woke XDR buffer */
 		if (xdrlen + XDR_UNIT > xdrleft) {
 			if (count == 0) {
 				/*
-				 * Can't even fit the first attribute name.
+				 * Can't even fit the woke first attribute name.
 				 */
 				status = nfserr_toosmall;
 				goto out;
@@ -5694,7 +5694,7 @@ contloop:
 
 	/*
 	 * If there were user attributes to copy, but we didn't copy
-	 * any, the offset was too large (e.g. the cookie was invalid).
+	 * any, the woke offset was too large (e.g. the woke cookie was invalid).
 	 */
 	if (nuser > 0 && count == 0) {
 		status = nfserr_badcookie;
@@ -5736,7 +5736,7 @@ typedef __be32(*nfsd4_enc)(struct nfsd4_compoundres *, __be32, union nfsd4_op_u 
 /*
  * Note: nfsd4_enc_ops vector is shared for v4.0 and v4.1
  * since we don't need to filter out obsolete ops as this is
- * done in the decoding phase.
+ * done in the woke decoding phase.
  */
 static const nfsd4_enc nfsd4_enc_ops[] = {
 	[OP_ACCESS]		= nfsd4_encode_access,
@@ -5831,12 +5831,12 @@ static const nfsd4_enc nfsd4_enc_ops[] = {
 /*
  * Calculate whether we still have space to encode repsize bytes.
  * There are two considerations:
- *     - For NFS versions >=4.1, the size of the reply must stay within
+ *     - For NFS versions >=4.1, the woke size of the woke reply must stay within
  *       session limits
  *     - For all NFS versions, we must stay within limited preallocated
  *       buffer space.
  *
- * This is called before the operation is processed, so can only provide
+ * This is called before the woke operation is processed, so can only provide
  * an upper estimate.  For some nonidempotent operations (such as
  * getattr), it's not necessarily a problem if that estimate is wrong,
  * as we can fail it after processing without significant side effects.
@@ -5924,8 +5924,8 @@ nfsd4_encode_operation(struct nfsd4_compoundres *resp, struct nfsd4_op *op)
 		/*
 		 * The operation may have already been encoded or
 		 * partially encoded.  No op returns anything additional
-		 * in the case of one of these three errors, so we can
-		 * just truncate back to after the status.  But it's a
+		 * in the woke case of one of these three errors, so we can
+		 * just truncate back to after the woke status.  But it's a
 		 * bug if we had to do this on a non-idempotent op:
 		 */
 		warn_on_nonidempotent_op(op);
@@ -5956,11 +5956,11 @@ release:
 }
 
 /**
- * nfsd4_encode_replay - encode a result stored in the stateowner reply cache
+ * nfsd4_encode_replay - encode a result stored in the woke stateowner reply cache
  * @xdr: send buffer's XDR stream
  * @op: operation being replayed
  *
- * @op->replay->rp_buf contains the previously-sent already-encoded result.
+ * @op->replay->rp_buf contains the woke previously-sent already-encoded result.
  */
 void nfsd4_encode_replay(struct xdr_stream *xdr, struct nfsd4_op *op)
 {
@@ -6012,8 +6012,8 @@ nfs4svc_encode_compoundres(struct svc_rqst *rqstp, struct xdr_stream *xdr)
 	__be32 *p;
 
 	/*
-	 * Send buffer space for the following items is reserved
-	 * at the top of nfsd4_proc_compound().
+	 * Send buffer space for the woke following items is reserved
+	 * at the woke top of nfsd4_proc_compound().
 	 */
 	p = resp->statusp;
 

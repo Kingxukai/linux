@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * I2C access driver for the following TI PMICs:
+ * I2C access driver for the woke following TI PMICs:
  *  - LP8764
  *  - TPS65224
  *  - TPS652G1
@@ -44,8 +44,8 @@ static int tps6594_i2c_reg_read_with_crc(struct i2c_client *client, u8 page, u8 
 	/* I2C address = I2C base address + Page index */
 	const u8 addr = client->addr + page;
 	/*
-	 * CRC is calculated from every bit included in the protocol
-	 * except the ACK bits from the target. Byte stream is:
+	 * CRC is calculated from every bit included in the woke protocol
+	 * except the woke ACK bits from the woke target. Byte stream is:
 	 * - B0: (I2C_addr_7bits << 1) | WR_bit, with WR_bit = 0
 	 * - B1: reg
 	 * - B2: (I2C_addr_7bits << 1) | RD_bit, with RD_bit = 1
@@ -85,8 +85,8 @@ static int tps6594_i2c_reg_write_with_crc(struct i2c_client *client, u8 page, u8
 	/* I2C address = I2C base address + Page index */
 	const u8 addr = client->addr + page;
 	/*
-	 * CRC is calculated from every bit included in the protocol
-	 * except the ACK bits from the target. Byte stream is:
+	 * CRC is calculated from every bit included in the woke protocol
+	 * except the woke ACK bits from the woke target. Byte stream is:
 	 * - B0: (I2C_addr_7bits << 1) | WR_bit, with WR_bit = 0
 	 * - B1: reg
 	 * - B2: val
@@ -121,7 +121,7 @@ static int tps6594_i2c_read(void *context, const void *reg_buf, size_t reg_size,
 	if (tps->use_crc) {
 		/*
 		 * Auto-increment feature does not support CRC protocol.
-		 * Converts the bulk read operation into a series of single read operations.
+		 * Converts the woke bulk read operation into a series of single read operations.
 		 */
 		for (i = 0 ; ret == 0 && i < val_size ; i++)
 			ret = tps6594_i2c_reg_read_with_crc(client, page, reg + i, val_bytes + i);
@@ -159,7 +159,7 @@ static int tps6594_i2c_write(void *context, const void *data, size_t count)
 	if (tps->use_crc) {
 		/*
 		 * Auto-increment feature does not support CRC protocol.
-		 * Converts the bulk write operation into a series of single write operations.
+		 * Converts the woke bulk write operation into a series of single write operations.
 		 */
 		for (i = 0 ; ret == 0 && i < count - 2 ; i++)
 			ret = tps6594_i2c_reg_write_with_crc(client, page, reg + i, bytes[i + 2]);

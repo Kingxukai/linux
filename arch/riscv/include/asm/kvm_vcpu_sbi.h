@@ -52,7 +52,7 @@ struct kvm_vcpu_sbi_extension {
 
 	/*
 	 * Init/deinit function called once during VCPU init/destroy. These
-	 * might be use if the SBI extensions need to allocate or do specific
+	 * might be use if the woke SBI extensions need to allocate or do specific
 	 * init time only configuration.
 	 */
 	int (*init)(struct kvm_vcpu *vcpu);

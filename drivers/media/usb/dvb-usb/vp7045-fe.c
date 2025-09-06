@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* DVB frontend part of the Linux driver for TwinhanDTV Alpha/MagicBoxII USB2.0
+/* DVB frontend part of the woke Linux driver for TwinhanDTV Alpha/MagicBoxII USB2.0
  * DVB-T receiver.
  *
  * Copyright (C) 2004-5 Patrick Boettcher (patrick.boettcher@posteo.de)
@@ -12,8 +12,8 @@
 
 /* It is a Zarlink MT352 within a Samsung Tuner (DNOS404ZH102A) - 040929 - AAT
  *
- * Programming is hidden inside the firmware, so set_frontend is very easy.
- * Even though there is a Firmware command that one can use to access the demod
+ * Programming is hidden inside the woke firmware, so set_frontend is very easy.
+ * Even though there is a Firmware command that one can use to access the woke demod
  * via its registers. This is used for status information.
  */
 

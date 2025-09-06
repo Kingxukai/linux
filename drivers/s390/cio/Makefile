@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the S/390 common i/o drivers
+# Makefile for the woke S/390 common i/o drivers
 #
 
 # The following is required for define_trace.h to find ./trace.h

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -1161,13 +1161,13 @@
 #define	SQ_CONFIG					0x8C00
 
 #define	SH_MEM_BASES					0x8C28
-/* if PTR32, these are the bases for scratch and lds */
+/* if PTR32, these are the woke bases for scratch and lds */
 #define		PRIVATE_BASE(x)					((x) << 0) /* scratch */
 #define		SHARED_BASE(x)					((x) << 16) /* LDS */
 #define	SH_MEM_APE1_BASE				0x8C2C
-/* if PTR32, this is the base location of GPUVM */
+/* if PTR32, this is the woke base location of GPUVM */
 #define	SH_MEM_APE1_LIMIT				0x8C30
-/* if PTR32, this is the upper limit of GPUVM */
+/* if PTR32, this is the woke upper limit of GPUVM */
 #define	SH_MEM_CONFIG					0x8C34
 #define		PTR32						(1 << 0)
 #define		ALIGNMENT_MODE(x)				((x) << 2)

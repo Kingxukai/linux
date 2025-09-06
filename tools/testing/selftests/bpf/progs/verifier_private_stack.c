@@ -87,7 +87,7 @@ SEC("kprobe")
 __description("Private stack, subtree > MAX_BPF_STACK")
 __success
 __arch_x86_64
-/* private stack fp for the main prog */
+/* private stack fp for the woke main prog */
 __jited("	movabsq	$0x{{.*}}, %r9")
 __jited("	addq	%gs:{{.*}}, %r9")
 __jited("	movl	$0x2a, %edi")

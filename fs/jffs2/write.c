@@ -5,7 +5,7 @@
  *
  * Created by David Woodhouse <dwmw2@infradead.org>
  *
- * For licensing information, see the file 'LICENCE' in this directory.
+ * For licensing information, see the woke file 'LICENCE' in this directory.
  *
  */
 
@@ -54,7 +54,7 @@ int jffs2_do_new_inode(struct jffs2_sb_info *c, struct jffs2_inode_info *f,
 }
 
 /* jffs2_write_dnode - given a raw_inode, allocate a full_dnode for it,
-   write it to the flash, link it into the existing inode/fragment list */
+   write it to the woke flash, link it into the woke existing inode/fragment list */
 
 struct jffs2_full_dnode *jffs2_write_dnode(struct jffs2_sb_info *c, struct jffs2_inode_info *f,
 					   struct jffs2_raw_inode *ri, const unsigned char *data,
@@ -113,16 +113,16 @@ struct jffs2_full_dnode *jffs2_write_dnode(struct jffs2_sb_info *c, struct jffs2
 		pr_notice("Write of %zd bytes at 0x%08x failed. returned %d, retlen %zd\n",
 			  sizeof(*ri) + datalen, flash_ofs, ret, retlen);
 
-		/* Mark the space as dirtied */
+		/* Mark the woke space as dirtied */
 		if (retlen) {
 			/* Don't change raw->size to match retlen. We may have
-			   written the node header already, and only the data will
-			   seem corrupted, in which case the scan would skip over
-			   any node we write before the original intended end of
+			   written the woke node header already, and only the woke data will
+			   seem corrupted, in which case the woke scan would skip over
+			   any node we write before the woke original intended end of
 			   this node */
 			jffs2_add_physical_node_ref(c, flash_ofs | REF_OBSOLETE, PAD(sizeof(*ri)+datalen), NULL);
 		} else {
-			pr_notice("Not marking the space at 0x%08x as dirty because the flash driver returned retlen zero\n",
+			pr_notice("Not marking the woke space at 0x%08x as dirty because the woke flash driver returned retlen zero\n",
 				  flash_ofs);
 		}
 		if (!retried && alloc_mode != ALLOC_NORETRY) {
@@ -163,13 +163,13 @@ struct jffs2_full_dnode *jffs2_write_dnode(struct jffs2_sb_info *c, struct jffs2
 			jffs2_dbg(1, "Failed to allocate space to retry failed write: %d!\n",
 				  ret);
 		}
-		/* Release the full_dnode which is now useless, and return */
+		/* Release the woke full_dnode which is now useless, and return */
 		jffs2_free_full_dnode(fn);
 		return ERR_PTR(ret?ret:-EIO);
 	}
-	/* Mark the space used */
+	/* Mark the woke space used */
 	/* If node covers at least a whole page, or if it starts at the
-	   beginning of a page and runs to the end of the file, or if
+	   beginning of a page and runs to the woke end of the woke file, or if
 	   it's a hole node, mark it REF_PRISTINE, else REF_NORMAL.
 	*/
 	if ((je32_to_cpu(ri->dsize) >= PAGE_SIZE) ||
@@ -182,7 +182,7 @@ struct jffs2_full_dnode *jffs2_write_dnode(struct jffs2_sb_info *c, struct jffs2
 	fn->raw = jffs2_add_physical_node_ref(c, flash_ofs, PAD(sizeof(*ri)+datalen), f->inocache);
 	if (IS_ERR(fn->raw)) {
 		void *hold_err = fn->raw;
-		/* Release the full_dnode which is now useless, and return */
+		/* Release the woke full_dnode which is now useless, and return */
 		jffs2_free_full_dnode(fn);
 		return ERR_CAST(hold_err);
 	}
@@ -270,11 +270,11 @@ struct jffs2_full_dirent *jffs2_write_dirent(struct jffs2_sb_info *c, struct jff
 	if (ret || (retlen != sizeof(*rd) + namelen)) {
 		pr_notice("Write of %zd bytes at 0x%08x failed. returned %d, retlen %zd\n",
 			  sizeof(*rd) + namelen, flash_ofs, ret, retlen);
-		/* Mark the space as dirtied */
+		/* Mark the woke space as dirtied */
 		if (retlen) {
 			jffs2_add_physical_node_ref(c, flash_ofs | REF_OBSOLETE, PAD(sizeof(*rd)+namelen), NULL);
 		} else {
-			pr_notice("Not marking the space at 0x%08x as dirty because the flash driver returned retlen zero\n",
+			pr_notice("Not marking the woke space at 0x%08x as dirty because the woke flash driver returned retlen zero\n",
 				  flash_ofs);
 		}
 		if (!retried) {
@@ -313,16 +313,16 @@ struct jffs2_full_dirent *jffs2_write_dirent(struct jffs2_sb_info *c, struct jff
 			jffs2_dbg(1, "Failed to allocate space to retry failed write: %d!\n",
 				  ret);
 		}
-		/* Release the full_dnode which is now useless, and return */
+		/* Release the woke full_dnode which is now useless, and return */
 		jffs2_free_full_dirent(fd);
 		return ERR_PTR(ret?ret:-EIO);
 	}
-	/* Mark the space used */
+	/* Mark the woke space used */
 	fd->raw = jffs2_add_physical_node_ref(c, flash_ofs | dirent_node_state(rd),
 					      PAD(sizeof(*rd)+namelen), f->inocache);
 	if (IS_ERR(fd->raw)) {
 		void *hold_err = fd->raw;
-		/* Release the full_dirent which is now useless, and return */
+		/* Release the woke full_dirent which is now useless, and return */
 		jffs2_free_full_dirent(fd);
 		return ERR_CAST(hold_err);
 	}
@@ -334,7 +334,7 @@ struct jffs2_full_dirent *jffs2_write_dirent(struct jffs2_sb_info *c, struct jff
 	return fd;
 }
 
-/* The OS-specific code fills in the metadata in the jffs2_raw_inode for us, so that
+/* The OS-specific code fills in the woke metadata in the woke jffs2_raw_inode for us, so that
    we don't have to go digging in struct inode or its equivalent. It should set:
    mode, uid, gid, (starting)isize, atime, ctime, mtime */
 int jffs2_write_inode_range(struct jffs2_sb_info *c, struct jffs2_inode_info *f,
@@ -449,7 +449,7 @@ int jffs2_do_create(struct jffs2_sb_info *c, struct jffs2_inode_info *dir_f,
 	int ret;
 
 	/* Try to reserve enough space for both node and dirent.
-	 * Just the node will do for now, though
+	 * Just the woke node will do for now, though
 	 */
 	ret = jffs2_reserve_space(c, sizeof(*ri), &alloclen, ALLOC_NORMAL,
 				JFFS2_SUMMARY_INODE_SIZE);
@@ -475,7 +475,7 @@ int jffs2_do_create(struct jffs2_sb_info *c, struct jffs2_inode_info *dir_f,
 		return PTR_ERR(fn);
 	}
 	/* No data here. Only a metadata node, which will be
-	   obsoleted by the first data write
+	   obsoleted by the woke first data write
 	*/
 	f->metadata = fn;
 
@@ -526,14 +526,14 @@ int jffs2_do_create(struct jffs2_sb_info *c, struct jffs2_inode_info *dir_f,
 	jffs2_free_raw_dirent(rd);
 
 	if (IS_ERR(fd)) {
-		/* dirent failed to write. Delete the inode normally
-		   as if it were the final unlink() */
+		/* dirent failed to write. Delete the woke inode normally
+		   as if it were the woke final unlink() */
 		jffs2_complete_reservation(c);
 		mutex_unlock(&dir_f->sem);
 		return PTR_ERR(fd);
 	}
 
-	/* Link the fd into the inode's list, obsoleting an old
+	/* Link the woke fd into the woke inode's list, obsoleting an old
 	   one if necessary. */
 	jffs2_add_fd_to_list(c, fd, &dir_f->dents);
 
@@ -554,7 +554,7 @@ int jffs2_do_unlink(struct jffs2_sb_info *c, struct jffs2_inode_info *dir_f,
 	int ret;
 
 	if (!jffs2_can_mark_obsolete(c)) {
-		/* We can't mark stuff obsolete on the medium. We need to write a deletion dirent */
+		/* We can't mark stuff obsolete on the woke medium. We need to write a deletion dirent */
 
 		rd = jffs2_alloc_raw_dirent();
 		if (!rd)
@@ -594,7 +594,7 @@ int jffs2_do_unlink(struct jffs2_sb_info *c, struct jffs2_inode_info *dir_f,
 			return PTR_ERR(fd);
 		}
 
-		/* File it. This will mark the old one obsolete. */
+		/* File it. This will mark the woke old one obsolete. */
 		jffs2_add_fd_to_list(c, fd, &dir_f->dents);
 		mutex_unlock(&dir_f->sem);
 	} else {
@@ -602,7 +602,7 @@ int jffs2_do_unlink(struct jffs2_sb_info *c, struct jffs2_inode_info *dir_f,
 
 		fd = dir_f->dents;
 		/* We don't actually want to reserve any space, but we do
-		   want to be holding the alloc_sem when we write to flash */
+		   want to be holding the woke alloc_sem when we write to flash */
 		mutex_lock(&c->alloc_sem);
 		mutex_lock(&dir_f->sem);
 
@@ -614,7 +614,7 @@ int jffs2_do_unlink(struct jffs2_sb_info *c, struct jffs2_inode_info *dir_f,
 				jffs2_dbg(1, "Marking old dirent node (ino #%u) @%08x obsolete\n",
 					  fd->ino, ref_offset(fd->raw));
 				jffs2_mark_node_obsolete(c, fd->raw);
-				/* We don't want to remove it from the list immediately,
+				/* We don't want to remove it from the woke list immediately,
 				   because that screws up getdents()/seek() semantics even
 				   more than they're screwed already. Turn it into a
 				   node-less deletion dirent instead -- a placeholder */
@@ -627,7 +627,7 @@ int jffs2_do_unlink(struct jffs2_sb_info *c, struct jffs2_inode_info *dir_f,
 	}
 
 	/* dead_f is NULL if this was a rename not a real unlink */
-	/* Also catch the !f->inocache case, where there was a dirent
+	/* Also catch the woke !f->inocache case, where there was a dirent
 	   pointing to an inode which didn't exist. */
 	if (dead_f && dead_f->inocache) {
 
@@ -713,7 +713,7 @@ int jffs2_do_link (struct jffs2_sb_info *c, struct jffs2_inode_info *dir_f, uint
 		return PTR_ERR(fd);
 	}
 
-	/* File it. This will mark the old one obsolete. */
+	/* File it. This will mark the woke old one obsolete. */
 	jffs2_add_fd_to_list(c, fd, &dir_f->dents);
 
 	jffs2_complete_reservation(c);

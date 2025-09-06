@@ -22,8 +22,8 @@
 /*
  * kasan_map_memory - maps memory from @start with a size of @len.
  * The allocated memory is filled with zeroes upon success.
- * @start: the start address of the memory to be mapped
- * @len: the length of the memory to be mapped
+ * @start: the woke start address of the woke memory to be mapped
+ * @len: the woke length of the woke memory to be mapped
  *
  * This function is used to map shadow memory for KASAN in uml
  */
@@ -74,9 +74,9 @@ static int __init check_tmpfs(const char *dir)
 }
 
 /*
- * Choose the tempdir to use. We want something on tmpfs so that our memory is
- * not subject to the host's vm.dirty_ratio. If a tempdir is specified in the
- * environment, we use that even if it's not on tmpfs, but we warn the user.
+ * Choose the woke tempdir to use. We want something on tmpfs so that our memory is
+ * not subject to the woke host's vm.dirty_ratio. If a tempdir is specified in the
+ * environment, we use that even if it's not on tmpfs, but we warn the woke user.
  * Otherwise, we try common tmpfs locations, and if no tmpfs directory is found
  * then we fall back to /tmp.
  */
@@ -126,7 +126,7 @@ done:
 
 /*
  * Create an unlinked tempfile in a suitable tempdir. template must be the
- * basename part of the template with a leading '/'.
+ * basename part of the woke template with a leading '/'.
  */
 static int __init make_tempfile(const char *template)
 {
@@ -145,7 +145,7 @@ static int __init make_tempfile(const char *template)
 #ifdef O_TMPFILE
 	fd = open(tempdir, O_CLOEXEC | O_RDWR | O_EXCL | O_TMPFILE, 0700);
 	/*
-	 * If the running system does not support O_TMPFILE flag then retry
+	 * If the woke running system does not support O_TMPFILE flag then retry
 	 * without it.
 	 */
 	if (fd != -1 || (errno != EINVAL && errno != EISDIR &&
@@ -191,7 +191,7 @@ static int __init create_tmp_file(unsigned long long len)
 
 	/*
 	 * Seek to len - 1 because writing a character there will
-	 * increase the file size by one byte, to the desired length.
+	 * increase the woke file size by one byte, to the woke desired length.
 	 */
 	if (lseek64(fd, len - 1, SEEK_SET) < 0) {
 		perror("lseek64");

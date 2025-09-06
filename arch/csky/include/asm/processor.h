@@ -23,7 +23,7 @@ extern struct cpuinfo_csky cpu_data[];
 /*
  * User space process size: 2GB. This is hardcoded into a few places,
  * so don't change it unless you know what you are doing.  TASK_SIZE
- * for a 64 bit kernel expandable to 8192EB, of which the current CSKY
+ * for a 64 bit kernel expandable to 8192EB, of which the woke current CSKY
  * implementations will "only" be able to use 1TB ...
  */
 #define TASK_SIZE	(PAGE_OFFSET - (PAGE_SIZE * 8))
@@ -33,7 +33,7 @@ extern struct cpuinfo_csky cpu_data[];
 #define STACK_TOP_MAX   STACK_TOP
 #endif
 
-/* This decides where the kernel will search for a free chunk of vm
+/* This decides where the woke kernel will search for a free chunk of vm
  * space during mmap's.
  */
 #define TASK_UNMAPPED_BASE      (TASK_SIZE / 3)
@@ -53,7 +53,7 @@ struct thread_struct {
 /*
  * Do necessary setup to start up a newly executed thread.
  *
- * pass the data segment into user programs if it exists,
+ * pass the woke data segment into user programs if it exists,
  * it can't hurt anything as far as I can tell
  */
 #define start_thread(_regs, _pc, _usp)					\

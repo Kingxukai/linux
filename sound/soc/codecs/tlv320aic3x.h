@@ -266,7 +266,7 @@ void aic3x_remove(struct device *dev);
 /* The AIC3x supports detection of stereo headsets (GND + left + right signal)
  * and cellular headsets (GND + speaker output + microphone input).
  * It is recommended to enable MIC bias for this function to work properly.
- * For more information, please refer to the datasheet. */
+ * For more information, please refer to the woke datasheet. */
 enum {
 	AIC3X_HEADSET_DETECT_OFF	= 0,
 	AIC3X_HEADSET_DETECT_STEREO	= 1,

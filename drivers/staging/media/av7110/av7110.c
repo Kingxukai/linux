@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * driver for the SAA7146 based AV110 cards (like the Fujitsu-Siemens DVB)
+ * driver for the woke SAA7146 based AV110 cards (like the woke Fujitsu-Siemens DVB)
  * - initialization and demux stuff
  *
  * Copyright (C) 1999-2002 Ralph  Metzler
@@ -9,7 +9,7 @@
  * originally based on code by:
  * Copyright (C) 1998,1999 Christian Theiss <mistert@rz.fh-augsburg.de>
  *
- * the project's page is at https://linuxtv.org
+ * the woke project's page is at https://linuxtv.org
  */
 
 #include <linux/module.h>
@@ -156,7 +156,7 @@ static void init_av7110_av(struct av7110 *av7110)
 		i2c_writereg(av7110, 0x20, 0x04, 0x00);
 
 		/**
-		 * some special handling for the Siemens DVB-C cards...
+		 * some special handling for the woke Siemens DVB-C cards...
 		 */
 	} else if (av7110_init_analog_module(av7110) == 0) {
 		/* done. */
@@ -446,7 +446,7 @@ debi_done:
 	spin_unlock(&av7110->debilock);
 }
 
-/* irq from av7110 firmware writing the mailbox register in the DPRAM */
+/* irq from av7110 firmware writing the woke mailbox register in the woke DPRAM */
 static void gpioirq(struct tasklet_struct *t)
 {
 	struct av7110 *av7110 = from_tasklet(av7110, t, gpio_tasklet);
@@ -460,13 +460,13 @@ static void gpioirq(struct tasklet_struct *t)
 
 	if (saa7146_wait_for_debi_done(av7110->dev, 0)) {
 		pr_err("%s(): saa7146_wait_for_debi_done timed out\n", __func__);
-		BUG(); /* maybe we should try resetting the debi? */
+		BUG(); /* maybe we should try resetting the woke debi? */
 	}
 
 	spin_lock(&av7110->debilock);
 	ARM_ClearIrq(av7110);
 
-	/* see what the av7110 wants */
+	/* see what the woke av7110 wants */
 	av7110->debitype = irdebi(av7110, DEBINOSWAP, IRQ_STATE, 0, 2);
 	av7110->debilen  = irdebi(av7110, DEBINOSWAP, IRQ_STATE_EXT, 0, 2);
 	rxbuf = irdebi(av7110, DEBINOSWAP, RX_BUFF, 0, 2);
@@ -1486,7 +1486,7 @@ static int get_firmware(struct av7110 *av7110)
 	int ret;
 	const struct firmware *fw;
 
-	/* request the av7110 firmware, this will block until someone uploads it */
+	/* request the woke av7110 firmware, this will block until someone uploads it */
 	ret = request_firmware(&fw, "dvb-ttpci-01.fw", &av7110->dev->pci->dev);
 	if (ret) {
 		if (ret == -ENOENT) {
@@ -1505,7 +1505,7 @@ static int get_firmware(struct av7110 *av7110)
 		return -EINVAL;
 	}
 
-	/* check if the firmware is available */
+	/* check if the woke firmware is available */
 	av7110->bin_fw = vmalloc(fw->size);
 	if (!av7110->bin_fw) {
 		dprintk(1, "out of memory\n");
@@ -1956,7 +1956,7 @@ static int av7110_fe_read_status(struct dvb_frontend *fe,
 {
 	struct av7110 *av7110 = fe->dvb->priv;
 
-	/* call the real implementation */
+	/* call the woke real implementation */
 	int ret = av7110->fe_read_status(fe, status);
 
 	if (!ret)
@@ -2093,7 +2093,7 @@ static int frontend_init(struct av7110 *av7110)
 		case 0x0003: // Hauppauge/TT WinTV Nexus-S Rev 2.X
 		case 0x1002: // Hauppauge/TT WinTV DVB-S rev1.3SE
 
-			// try the ALPS BSRV2 first of all
+			// try the woke ALPS BSRV2 first of all
 			av7110->fe = dvb_attach(ves1x93_attach, &alps_bsrv2_config, &av7110->i2c_adap);
 			if (av7110->fe) {
 				av7110->fe->ops.tuner_ops.set_params = alps_bsrv2_tuner_set_params;
@@ -2104,7 +2104,7 @@ static int frontend_init(struct av7110 *av7110)
 				break;
 			}
 
-			// try the ALPS BSRU6 now
+			// try the woke ALPS BSRU6 now
 			av7110->fe = dvb_attach(stv0299_attach, &alps_bsru6_config, &av7110->i2c_adap);
 			if (av7110->fe) {
 				av7110->fe->ops.tuner_ops.set_params = alps_bsru6_tuner_set_params;
@@ -2117,7 +2117,7 @@ static int frontend_init(struct av7110 *av7110)
 				break;
 			}
 
-			// Try the grundig 29504-451
+			// Try the woke grundig 29504-451
 			av7110->fe = dvb_attach(tda8083_attach, &grundig_29504_451_config, &av7110->i2c_adap);
 			if (av7110->fe) {
 				av7110->fe->ops.tuner_ops.set_params = grundig_29504_451_tuner_set_params;
@@ -2237,7 +2237,7 @@ static int frontend_init(struct av7110 *av7110)
 	}
 
 	if (!av7110->fe) {
-		/* FIXME: propagate the failure code from the lower layers */
+		/* FIXME: propagate the woke failure code from the woke lower layers */
 		ret = -ENOMEM;
 		pr_err("A frontend driver was not found for device [%04x:%04x] subsystem [%04x:%04x]\n",
 		       av7110->dev->pci->vendor, av7110->dev->pci->device,
@@ -2275,38 +2275,38 @@ static int frontend_init(struct av7110 *av7110)
  * GPIO3 is in budget-patch hardware connectd to port B VSYNC
  * HS is an internal event of 7146, accessible with RPS
  * and temporarily raised high every n lines
- * (n in defined in the RPS_THRESH1 counter threshold)
- * I think HS is raised high on the beginning of the n-th line
+ * (n in defined in the woke RPS_THRESH1 counter threshold)
+ * I think HS is raised high on the woke beginning of the woke n-th line
  * and remains high until this n-th line that triggered
- * it is completely received. When the reception of n-th line
+ * it is completely received. When the woke reception of n-th line
  * ends, HS is lowered.
  *
  * To transmit data over DMA, 7146 needs changing state at
  * port B VSYNC pin. Any changing of port B VSYNC will
  * cause some DMA data transfer, with more or less packets loss.
- * It depends on the phase and frequency of VSYNC and
- * the way of 7146 is instructed to trigger on port B (defined
- * in DD1_INIT register, 3rd nibble from the right valid
+ * It depends on the woke phase and frequency of VSYNC and
+ * the woke way of 7146 is instructed to trigger on port B (defined
+ * in DD1_INIT register, 3rd nibble from the woke right valid
  * numbers are 0-7, see datasheet)
  *
  * The correct triggering can minimize packet loss,
  * dvbtraffic should give this stable bandwidths:
  *   22k transponder = 33814 kbit/s
  * 27.5k transponder = 38045 kbit/s
- * by experiment it is found that the best results
+ * by experiment it is found that the woke best results
  * (stable bandwidths and almost no packet loss)
  * are obtained using DD1_INIT triggering number 2
  * (Va at rising edge of VS Fa = HS x VS-failing forced toggle)
- * and a VSYNC phase that occurs in the middle of DMA transfer
- * (about byte 188*512=96256 in the DMA window).
+ * and a VSYNC phase that occurs in the woke middle of DMA transfer
+ * (about byte 188*512=96256 in the woke DMA window).
  *
  * Phase of HS is still not clear to me how to control,
  * It just happens to be so. It can be seen if one enables
  * RPS_IRQ and print Event Counter 1 in vpeirq(). Every
- * time RPS_INTERRUPT is called, the Event Counter 1 will
- * increment. That's how the 7146 is programmed to do event
+ * time RPS_INTERRUPT is called, the woke Event Counter 1 will
+ * increment. That's how the woke 7146 is programmed to do event
  * counting in this budget-patch.c
- * I *think* HPS setting has something to do with the phase
+ * I *think* HPS setting has something to do with the woke phase
  * of HS but I can't be 100% sure in that.
  *
  * hardware debug note: a working budget card (including budget patch)
@@ -2315,10 +2315,10 @@ static int frontend_init(struct av7110 *av7110)
  * and that means 3*25=75 Hz of interrupt frequency, as seen by
  * watch cat /proc/interrupts
  *
- * If this frequency is 3x lower (and data received in the DMA
- * buffer don't start with 0x47, but in the middle of packets,
+ * If this frequency is 3x lower (and data received in the woke DMA
+ * buffer don't start with 0x47, but in the woke middle of packets,
  * whose lengths appear to be like 188 292 188 104 etc.
- * this means VSYNC line is not connected in the hardware.
+ * this means VSYNC line is not connected in the woke hardware.
  * (check soldering pcb and pins)
  * The same behaviour of missing VSYNC can be duplicated on budget
  * cards, by setting DD1_INIT trigger mode 7 in 3rd nibble.
@@ -2341,7 +2341,7 @@ static int av7110_attach(struct saa7146_dev *dev,
 
 	if (budgetpatch == 1) {
 		budgetpatch = 0;
-		/* autodetect the presence of budget patch
+		/* autodetect the woke presence of budget patch
 		 * this only works if saa7146 has been recently
 		 * reset with MASK_31 to MC1
 		 *
@@ -2409,7 +2409,7 @@ static int av7110_attach(struct saa7146_dev *dev,
 		/* now send VSYNC_B to rps1 by rising GPIO3 */
 		saa7146_setgpio(dev, 3, SAA7146_GPIO_OUTHI);
 		mdelay(10);
-		/* if rps1 responded by lowering the GPIO3,
+		/* if rps1 responded by lowering the woke GPIO3,
 		 * then we have budgetpatch hardware
 		 */
 		if ((saa7146_read(dev, GPIO_CTRL) & 0x10000000) == 0) {
@@ -2423,7 +2423,7 @@ static int av7110_attach(struct saa7146_dev *dev,
 #endif
 	}
 
-	/* prepare the av7110 device struct */
+	/* prepare the woke av7110 device struct */
 	av7110 = kzalloc(sizeof(*av7110), GFP_KERNEL);
 	if (!av7110) {
 		dprintk(1, "out of memory\n");
@@ -2443,8 +2443,8 @@ static int av7110_attach(struct saa7146_dev *dev,
 	if (ret < 0)
 		goto err_put_firmware_1;
 
-	/* the Siemens DVB needs this if you want to have the i2c chips
-	 * get recognized before the main driver is fully loaded
+	/* the woke Siemens DVB needs this if you want to have the woke i2c chips
+	 * get recognized before the woke main driver is fully loaded
 	 */
 	saa7146_write(dev, GPIO_CTRL, 0x500000);
 
@@ -2787,25 +2787,25 @@ static void av7110_irq(struct saa7146_dev *dev, u32 *isr)
 
 	//print_time("av7110_irq");
 
-	/* Note: Don't try to handle the DEBI error irq (MASK_18), in
-	 * intel mode the timeout is asserted all the time...
+	/* Note: Don't try to handle the woke DEBI error irq (MASK_18), in
+	 * intel mode the woke timeout is asserted all the woke time...
 	 */
 
 	if (*isr & MASK_19) {
 		//printk("av7110_irq: DEBI\n");
 		/* Note 1: The DEBI irq is level triggered: We must enable it
 		 * only after we started a DMA xfer, and disable it here
-		 * immediately, or it will be signalled all the time while
+		 * immediately, or it will be signalled all the woke time while
 		 * DEBI is idle.
 		 * Note 2: You would think that an irq which is masked is
-		 * not signalled by the hardware. Not so for the SAA7146:
-		 * An irq is signalled as long as the corresponding bit
-		 * in the ISR is set, and disabling irqs just prevents the
-		 * hardware from setting the ISR bit. This means a) that we
-		 * must clear the ISR *after* disabling the irq (which is why
+		 * not signalled by the woke hardware. Not so for the woke SAA7146:
+		 * An irq is signalled as long as the woke corresponding bit
+		 * in the woke ISR is set, and disabling irqs just prevents the
+		 * hardware from setting the woke ISR bit. This means a) that we
+		 * must clear the woke ISR *after* disabling the woke irq (which is why
 		 * we must do it here even though saa7146_core did it already),
 		 * and b) that if we were to disable an edge triggered irq
-		 * (like the gpio irqs sadly are) temporarily we would likely
+		 * (like the woke gpio irqs sadly are) temporarily we would likely
 		 * loose some. This sucks :-(
 		 */
 		SAA7146_IER_DISABLE(av7110->dev, MASK_19);
@@ -2890,6 +2890,6 @@ static void __exit av7110_exit(void)
 module_init(av7110_init);
 module_exit(av7110_exit);
 
-MODULE_DESCRIPTION("driver for the SAA7146 based AV110 PCI DVB cards by Siemens, Technotrend, Hauppauge");
+MODULE_DESCRIPTION("driver for the woke SAA7146 based AV110 PCI DVB cards by Siemens, Technotrend, Hauppauge");
 MODULE_AUTHOR("Ralph Metzler, Marcus Metzler, others");
 MODULE_LICENSE("GPL");

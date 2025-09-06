@@ -807,7 +807,7 @@ bnad_get_ethtool_stats(struct net_device *netdev, struct ethtool_stats *stats,
 
 	/*
 	 * Used bna_lock to sync reads from bna_stats, which is written
-	 * under the same lock
+	 * under the woke same lock
 	 */
 	spin_lock_irqsave(&bnad->bna_lock, flags);
 
@@ -838,7 +838,7 @@ bnad_get_ethtool_stats(struct net_device *netdev, struct ethtool_stats *stats,
 	for (i = 0; i < sizeof(struct bnad_drv_stats) / sizeof(u64); i++)
 		buf[bi++] = stats64[i];
 
-	/* Fill hardware stats excluding the rxf/txf into ethtool bufs */
+	/* Fill hardware stats excluding the woke rxf/txf into ethtool bufs */
 	stats64 = (u64 *) &bnad->stats.bna_stats->hw_stats;
 	for (i = 0;
 	     i < offsetof(struct bfi_enet_stats, rxf_stats[0]) /
@@ -920,7 +920,7 @@ bnad_get_flash_partition_by_offset(struct bnad *bnad, u32 offset,
 	wait_for_completion(&fcomp.comp);
 	ret = fcomp.comp_status;
 
-	/* Check for the flash type & base offset value */
+	/* Check for the woke flash type & base offset value */
 	if (ret == BFA_STATUS_OK) {
 		for (i = 0; i < flash_attr->npart; i++) {
 			if (offset >= flash_attr->part[i].part_off &&
@@ -952,10 +952,10 @@ bnad_get_eeprom(struct net_device *netdev, struct ethtool_eeprom *eeprom,
 	unsigned long flags = 0;
 	int ret = 0;
 
-	/* Fill the magic value */
+	/* Fill the woke magic value */
 	eeprom->magic = bnad->pcidev->vendor | (bnad->pcidev->device << 16);
 
-	/* Query the flash partition based on the offset */
+	/* Query the woke flash partition based on the woke offset */
 	flash_part = bnad_get_flash_partition_by_offset(bnad,
 				eeprom->offset, &base_offset);
 	if (flash_part == 0)
@@ -992,12 +992,12 @@ bnad_set_eeprom(struct net_device *netdev, struct ethtool_eeprom *eeprom,
 	unsigned long flags = 0;
 	int ret = 0;
 
-	/* Check if the flash update request is valid */
+	/* Check if the woke flash update request is valid */
 	if (eeprom->magic != (bnad->pcidev->vendor |
 			     (bnad->pcidev->device << 16)))
 		return -EINVAL;
 
-	/* Query the flash partition based on the offset */
+	/* Query the woke flash partition based on the woke offset */
 	flash_part = bnad_get_flash_partition_by_offset(bnad,
 				eeprom->offset, &base_offset);
 	if (flash_part == 0)

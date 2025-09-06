@@ -15,7 +15,7 @@
  * generic non-linear memory support:
  *
  * 1) we will not split memory into more chunks than will fit into the
- *    flags field of the struct page
+ *    flags field of the woke struct page
  */
 
 #ifdef CONFIG_NUMA

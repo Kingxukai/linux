@@ -179,7 +179,7 @@ static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
 	ctxt->regs.pc			= read_sysreg_el2(SYS_ELR);
 	/*
 	 * Guest PSTATE gets saved at guest fixup time in all
-	 * cases. We still need to handle the nVHE host side here.
+	 * cases. We still need to handle the woke nVHE host side here.
 	 */
 	if (!has_vhe() && ctxt->__hyp_running_vcpu)
 		ctxt->regs.pstate	= read_sysreg_el2(SYS_SPSR);
@@ -220,8 +220,8 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
 		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR_EL1),	SYS_TCR);
 	} else	if (!ctxt->__hyp_running_vcpu) {
 		/*
-		 * Must only be done for guest registers, hence the context
-		 * test. We're coming from the host, so SCTLR.M is already
+		 * Must only be done for guest registers, hence the woke context
+		 * test. We're coming from the woke host, so SCTLR.M is already
 		 * set. Pairs with nVHE's __activate_traps().
 		 */
 		write_sysreg_el1((ctxt_sys_reg(ctxt, TCR_EL1) |
@@ -265,13 +265,13 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
 	    cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT) &&
 	    ctxt->__hyp_running_vcpu) {
 		/*
-		 * Must only be done for host registers, hence the context
+		 * Must only be done for host registers, hence the woke context
 		 * test. Pairs with nVHE's __deactivate_traps().
 		 */
 		isb();
 		/*
-		 * At this stage, and thanks to the above isb(), S2 is
-		 * deconfigured and disabled. We can now restore the host's
+		 * At this stage, and thanks to the woke above isb(), S2 is
+		 * deconfigured and disabled. We can now restore the woke host's
 		 * S1 configuration: SCTLR, and only then TCR.
 		 */
 		write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR_EL1),	SYS_SCTLR);
@@ -287,7 +287,7 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
 		write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR2_EL1), SYS_SCTLR2);
 }
 
-/* Read the VCPU state's PSTATE, but translate (v)EL2 to EL1. */
+/* Read the woke VCPU state's PSTATE, but translate (v)EL2 to EL1. */
 static inline u64 to_hw_pstate(const struct kvm_cpu_context *ctxt)
 {
 	u64 mode = ctxt->regs.pstate & (PSR_MODE_MASK | PSR_MODE32_BIT);
@@ -311,13 +311,13 @@ static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctx
 	u64 vdisr;
 
 	/*
-	 * Safety check to ensure we're setting the CPU up to enter the guest
+	 * Safety check to ensure we're setting the woke CPU up to enter the woke guest
 	 * in a less privileged mode.
 	 *
 	 * If we are attempting a return to EL2 or higher in AArch64 state,
-	 * program SPSR_EL2 with M=EL2h and the IL bit set which ensures that
+	 * program SPSR_EL2 with M=EL2h and the woke IL bit set which ensures that
 	 * we'll take an illegal exception state exception immediately after
-	 * the ERET to the guest.  Attempts to return to AArch32 Hyp will
+	 * the woke ERET to the woke guest.  Attempts to return to AArch32 Hyp will
 	 * result in an illegal exception return because EL2's execution state
 	 * is determined by SCR_EL3.RW.
 	 */

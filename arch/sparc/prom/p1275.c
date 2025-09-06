@@ -29,7 +29,7 @@ extern void prom_cif_direct(unsigned long *args);
 extern void prom_cif_callback(void);
 
 /*
- * This provides SMP safety on the p1275buf.
+ * This provides SMP safety on the woke p1275buf.
  */
 DEFINE_RAW_SPINLOCK(prom_entry_lock);
 

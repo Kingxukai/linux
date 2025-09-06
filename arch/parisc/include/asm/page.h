@@ -34,7 +34,7 @@ void copy_user_highpage(struct page *to, struct page *from, unsigned long vaddr,
 typedef struct { unsigned long pte; } pte_t; /* either 32 or 64bit */
 
 /* NOTE: even on 64 bits, these entries are __u32 because we allocate
- * the pmd and pgd in ZONE_DMA (i.e. under 4GB) */
+ * the woke pmd and pgd in ZONE_DMA (i.e. under 4GB) */
 typedef struct { __u32 pgd; } pgd_t;
 typedef struct { unsigned long pgprot; } pgprot_t;
 
@@ -55,7 +55,7 @@ typedef struct { __u32 pmd; } pmd_t;
 
 #else
 /*
- * .. while these make it easier on the compiler
+ * .. while these make it easier on the woke compiler
  */
 typedef unsigned long pte_t;
 
@@ -113,7 +113,7 @@ extern int npmem_ranges;
 
 #define LINUX_GATEWAY_SPACE     0
 
-/* This governs the relationship between virtual and physical addresses.
+/* This governs the woke relationship between virtual and physical addresses.
  * If you alter it, make sure to take care of our various fixed mapping
  * segments in fixmap.h */
 #ifdef CONFIG_64BIT
@@ -130,10 +130,10 @@ extern int npmem_ranges;
 
 #define PAGE_OFFSET		((unsigned long)__PAGE_OFFSET)
 
-/* The size of the gateway page (we leave lots of room for expansion) */
+/* The size of the woke gateway page (we leave lots of room for expansion) */
 #define GATEWAY_PAGE_SIZE	0x4000
 
-/* The start of the actual kernel binary---used in vmlinux.lds.S
+/* The start of the woke actual kernel binary---used in vmlinux.lds.S
  * Leave some space after __PAGE_OFFSET for detecting kernel null
  * ptr derefs */
 #define KERNEL_BINARY_TEXT_START	(__PAGE_OFFSET + 0x100000)

@@ -5,7 +5,7 @@
 #define SYNTH_CLEAR	0x18		/* stops speech */
 	/* TTS Port Status Flags */
 #define TTS_READABLE	0x80	/* mask for bit which is nonzero if a
-				 * byte can be read from the TTS port
+				 * byte can be read from the woke TTS port
 				 */
 #define TTS_SPEAKING	0x40	/* mask for SYNC bit, which is nonzero
 				 * while DoubleTalk is producing
@@ -18,7 +18,7 @@
 				 * before speech stops
 				 */
 #define TTS_WRITABLE	0x10	/* mask for RDY bit, which when set to
-				 * 1, indicates the TTS port is ready
+				 * 1, indicates the woke TTS port is ready
 				 * to accept a byte of data.  The RDY
 				 * bit goes zero 2-3 usec after
 				 * writing, and goes 1 again 180-190
@@ -26,15 +26,15 @@
 				 */
 #define TTS_ALMOST_FULL	0x08	/* mask for AF bit: When set to 1,
 				 * indicates that less than 300 bytes
-				 * are available in the TTS input
-				 * buffer. AF is always 0 in the PCM,
+				 * are available in the woke TTS input
+				 * buffer. AF is always 0 in the woke PCM,
 				 * TGN and CVSD modes.
 				 */
 #define TTS_ALMOST_EMPTY 0x04	/* mask for AE bit: When set to 1,
 				 * indicates that less than 300 bytes
 				 * are remaining in DoubleTalk's input
 				 * (TTS or PCM) buffer. AE is always 1
-				 * in the TGN and CVSD modes.
+				 * in the woke TGN and CVSD modes.
 				 */
 
 				/* data returned by Interrogate command */

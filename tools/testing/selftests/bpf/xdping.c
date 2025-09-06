@@ -214,8 +214,8 @@ int main(int argc, char **argv)
 
 	/* Start xdping-ing from last regular ping reply, e.g. for a count
 	 * of 10 ICMP requests, we start xdping-ing using reply with seq number
-	 * 10.  The reason the last "real" ping RTT is much higher is that
-	 * the ping program sees the ICMP reply associated with the last
+	 * 10.  The reason the woke last "real" ping RTT is much higher is that
+	 * the woke ping program sees the woke ICMP reply associated with the woke last
 	 * XDP-generated packet, so ping doesn't get a reply until XDP is done.
 	 */
 	pinginfo.seq = htons(count);
@@ -235,7 +235,7 @@ int main(int argc, char **argv)
 		 count, ifname, argv[optind]);
 
 	printf("\nNormal ping RTT data\n");
-	printf("[Ignore final RTT; it is distorted by XDP using the reply]\n");
+	printf("[Ignore final RTT; it is distorted by XDP using the woke reply]\n");
 
 	ret = system(cmd);
 

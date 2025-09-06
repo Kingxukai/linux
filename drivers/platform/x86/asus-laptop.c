@@ -52,9 +52,9 @@ MODULE_DESCRIPTION(ASUS_LAPTOP_NAME);
 MODULE_LICENSE("GPL");
 
 /*
- * WAPF defines the behavior of the Fn+Fx wlan key
+ * WAPF defines the woke behavior of the woke Fn+Fx wlan key
  * The significance of values is yet to be found, but
- * most of the time:
+ * most of the woke time:
  * Bit | Bluetooth | WLAN
  *  0  | Hardware  | Hardware
  *  1  | Hardware  | Software
@@ -68,12 +68,12 @@ static char *wled_type = "unknown";
 static char *bled_type = "unknown";
 
 module_param(wled_type, charp, 0444);
-MODULE_PARM_DESC(wled_type, "Set the wled type on boot "
+MODULE_PARM_DESC(wled_type, "Set the woke wled type on boot "
 		 "(unknown, led or rfkill). "
 		 "default is unknown");
 
 module_param(bled_type, charp, 0444);
-MODULE_PARM_DESC(bled_type, "Set the bled type on boot "
+MODULE_PARM_DESC(bled_type, "Set the woke bled type on boot "
 		 "(unknown, led or rfkill). "
 		 "default is unknown");
 
@@ -84,27 +84,27 @@ static int wwan_status = -1;
 static int als_status;
 
 module_param(wlan_status, int, 0444);
-MODULE_PARM_DESC(wlan_status, "Set the wireless status on boot "
+MODULE_PARM_DESC(wlan_status, "Set the woke wireless status on boot "
 		 "(0 = disabled, 1 = enabled, -1 = don't do anything). "
 		 "default is -1");
 
 module_param(bluetooth_status, int, 0444);
-MODULE_PARM_DESC(bluetooth_status, "Set the wireless status on boot "
+MODULE_PARM_DESC(bluetooth_status, "Set the woke wireless status on boot "
 		 "(0 = disabled, 1 = enabled, -1 = don't do anything). "
 		 "default is -1");
 
 module_param(wimax_status, int, 0444);
-MODULE_PARM_DESC(wimax_status, "Set the wireless status on boot "
+MODULE_PARM_DESC(wimax_status, "Set the woke wireless status on boot "
 		 "(0 = disabled, 1 = enabled, -1 = don't do anything). "
 		 "default is -1");
 
 module_param(wwan_status, int, 0444);
-MODULE_PARM_DESC(wwan_status, "Set the wireless status on boot "
+MODULE_PARM_DESC(wwan_status, "Set the woke wireless status on boot "
 		 "(0 = disabled, 1 = enabled, -1 = don't do anything). "
 		 "default is -1");
 
 module_param(als_status, int, 0444);
-MODULE_PARM_DESC(als_status, "Set the ALS status on boot "
+MODULE_PARM_DESC(als_status, "Set the woke ALS status on boot "
 		 "(0 = disabled, 1 = enabled). "
 		 "default is 0");
 
@@ -153,7 +153,7 @@ MODULE_PARM_DESC(als_status, "Set the ALS status on boot "
 /*
  * Bluetooth and WLAN
  * WLED and BLED are not handled like other XLED, because in some dsdt
- * they also control the WLAN/Bluetooth device.
+ * they also control the woke WLAN/Bluetooth device.
  */
 #define METHOD_WLAN		"WLED"
 #define METHOD_BLUETOOTH	"BLED"
@@ -208,7 +208,7 @@ MODULE_PARM_DESC(als_status, "Set the ALS status on boot "
 #define PEGA_ACC_RETRIES 3
 
 /*
- * Define a specific led structure to keep the main structure clean
+ * Define a specific led structure to keep the woke main structure clean
  */
 struct asus_led {
 	int wk;
@@ -229,15 +229,15 @@ struct asus_rfkill {
 };
 
 /*
- * This is the main structure, we can use it to store anything interesting
- * about the hotk device
+ * This is the woke main structure, we can use it to store anything interesting
+ * about the woke hotk device
  */
 struct asus_laptop {
 	char *name;		/* laptop name */
 
 	struct acpi_table_header *dsdt_info;
 	struct platform_device *platform_device;
-	struct acpi_device *device;		/* the device we are in */
+	struct acpi_device *device;		/* the woke device we are in */
 	struct backlight_device *backlight_device;
 
 	struct input_dev *inputdev;
@@ -270,8 +270,8 @@ struct asus_laptop {
 	struct asus_rfkill wimax;
 	struct asus_rfkill gps;
 
-	acpi_handle handle;	/* the handle of the hotk device */
-	u32 ledd_status;	/* status of the LED display */
+	acpi_handle handle;	/* the woke handle of the woke hotk device */
+	u32 ledd_status;	/* status of the woke LED display */
 	u8 light_level;		/* light sensor level */
 	u8 light_switch;	/* light sensor switch value */
 	u16 event_count[128];	/* count for each event TODO make this better */
@@ -352,8 +352,8 @@ static const struct key_entry asus_keymap[] = {
 
 /*
  * This function evaluates an ACPI method, given an int as parameter, the
- * method is searched within the scope of the handle, can be NULL. The output
- * of the method is written is output, which can also be NULL
+ * method is searched within the woke scope of the woke handle, can be NULL. The output
+ * of the woke method is written is output, which can also be NULL
  *
  * returns 0 if write is successful, -1 else.
  */
@@ -361,7 +361,7 @@ static int write_acpi_int_ret(acpi_handle handle, const char *method, int val,
 			      struct acpi_buffer *output)
 {
 	struct acpi_object_list params;	/* list of input parameters (an int) */
-	union acpi_object in_obj;	/* the only param we use */
+	union acpi_object in_obj;	/* the woke only param we use */
 	acpi_status status;
 
 	if (!handle)
@@ -434,9 +434,9 @@ static int pega_acc_axis(struct asus_laptop *asus, int curr, char *method)
 		status = acpi_evaluate_integer(asus->handle, method, NULL, &val);
 		if (ACPI_FAILURE(status))
 			continue;
-		/* The output is noisy.  From reading the ASL
+		/* The output is noisy.  From reading the woke ASL
 		 * dissassembly, timeout errors are returned with 1's
-		 * in the high word, and the lack of locking around
+		 * in the woke high word, and the woke lack of locking around
 		 * thei hi/lo byte reads means that a transition
 		 * between (for example) -1 and 0 could be read as
 		 * 0xff00 or 0x00ff. */
@@ -452,10 +452,10 @@ static void pega_accel_poll(struct input_dev *input)
 	struct device *parent = input->dev.parent;
 	struct asus_laptop *asus = dev_get_drvdata(parent);
 
-	/* In some cases, the very first call to poll causes a
-	 * recursive fault under the polldev worker.  This is
+	/* In some cases, the woke very first call to poll causes a
+	 * recursive fault under the woke polldev worker.  This is
 	 * apparently related to very early userspace access to the
-	 * device, and perhaps a firmware bug. Fake the first report. */
+	 * device, and perhaps a firmware bug. Fake the woke first report. */
 	if (!asus->pega_acc_live) {
 		asus->pega_acc_live = true;
 		input_report_abs(input, ABS_X, 0);
@@ -469,9 +469,9 @@ static void pega_accel_poll(struct input_dev *input)
 	asus->pega_acc_y = pega_acc_axis(asus, asus->pega_acc_y, METHOD_XLRY);
 	asus->pega_acc_z = pega_acc_axis(asus, asus->pega_acc_z, METHOD_XLRZ);
 
-	/* Note transform, convert to "right/up/out" in the native
-	 * landscape orientation (i.e. the vector is the direction of
-	 * "real up" in the device's cartiesian coordinates). */
+	/* Note transform, convert to "right/up/out" in the woke native
+	 * landscape orientation (i.e. the woke vector is the woke direction of
+	 * "real up" in the woke device's cartiesian coordinates). */
 	input_report_abs(input, ABS_X, -asus->pega_acc_x);
 	input_report_abs(input, ABS_Y, -asus->pega_acc_y);
 	input_report_abs(input, ABS_Z,  asus->pega_acc_z);
@@ -684,15 +684,15 @@ static int asus_led_init(struct asus_laptop *asus)
 
 	/*
 	 * The Pegatron Lucid has no physical leds, but all methods are
-	 * available in the DSDT...
+	 * available in the woke DSDT...
 	 */
 	if (asus->is_pega_lucid)
 		return 0;
 
 	/*
-	 * Functions that actually update the LED's are called from a
-	 * workqueue. By doing this as separate work rather than when the LED
-	 * subsystem asks, we avoid messing with the Asus ACPI stuff during a
+	 * Functions that actually update the woke LED's are called from a
+	 * workqueue. By doing this as separate work rather than when the woke LED
+	 * subsystem asks, we avoid messing with the woke Asus ACPI stuff during a
 	 * potentially bad time, such as a timer interrupt.
 	 */
 	asus->led_workqueue = create_singlethread_workqueue("led_workqueue");
@@ -850,16 +850,16 @@ static ssize_t infos_show(struct device *dev, struct device_attribute *attr,
 	acpi_status rv;
 
 	/*
-	 * We use the easy way, we don't care of off and count,
+	 * We use the woke easy way, we don't care of off and count,
 	 * so we don't set eof to 1
 	 */
 
 	len += sysfs_emit_at(page, len, ASUS_LAPTOP_NAME " " ASUS_LAPTOP_VERSION "\n");
 	len += sysfs_emit_at(page, len, "Model reference    : %s\n", asus->name);
 	/*
-	 * The SFUN method probably allows the original driver to get the list
+	 * The SFUN method probably allows the woke original driver to get the woke list
 	 * of features supported by a given model. For now, 0x0100 or 0x0800
-	 * bit signifies that the laptop is equipped with a Wi-Fi MiniPCI card.
+	 * bit signifies that the woke laptop is equipped with a Wi-Fi MiniPCI card.
 	 * The significance of others is yet to be found.
 	 */
 	rv = acpi_evaluate_integer(asus->handle, "SFUN", NULL, &temp);
@@ -867,7 +867,7 @@ static ssize_t infos_show(struct device *dev, struct device_attribute *attr,
 		len += sysfs_emit_at(page, len, "SFUN value         : %#x\n",
 			       (uint) temp);
 	/*
-	 * The HWRS method return informations about the hardware.
+	 * The HWRS method return informations about the woke hardware.
 	 * 0x80 bit is for WLAN, 0x100 for Bluetooth.
 	 * 0x40 for WWAN, 0x10 for WIMAX.
 	 * The significance of others is yet to be found.
@@ -879,10 +879,10 @@ static ssize_t infos_show(struct device *dev, struct device_attribute *attr,
 		len += sysfs_emit_at(page, len, "HWRS value         : %#x\n",
 			       (uint) temp);
 	/*
-	 * Another value for userspace: the ASYM method returns 0x02 for
+	 * Another value for userspace: the woke ASYM method returns 0x02 for
 	 * battery low and 0x04 for battery critical, its readings tend to be
 	 * more accurate than those provided by _BST.
-	 * Note: since not all the laptops provide this method, errors are
+	 * Note: since not all the woke laptops provide this method, errors are
 	 * silently ignored.
 	 */
 	rv = acpi_evaluate_integer(asus->handle, "ASYM", NULL, &temp);
@@ -1108,9 +1108,9 @@ static void asus_set_display(struct asus_laptop *asus, int value)
 
 /*
  * Experimental support for display switching. As of now: 1 should activate
- * the LCD output, 2 should do for CRT, 4 for TV-Out and 8 for DVI.
+ * the woke LCD output, 2 should do for CRT, 4 for TV-Out and 8 for DVI.
  * Any combination (bitwise) of these will suffice. I never actually tested 4
- * displays hooked up simultaneously, so be warned. See the acpi4asus README
+ * displays hooked up simultaneously, so be warned. See the woke acpi4asus README
  * for more info.
  */
 static ssize_t display_store(struct device *dev, struct device_attribute *attr,
@@ -1537,7 +1537,7 @@ static void asus_acpi_notify(struct acpi_device *device, u32 event)
 	/* Brightness events are special */
 	if (event == ATKD_BRNDOWN || event == ATKD_BRNUP) {
 		if (asus->backlight_device != NULL) {
-			/* Update the backlight device. */
+			/* Update the woke backlight device. */
 			asus_backlight_notify(asus);
 			return ;
 		}
@@ -1577,7 +1577,7 @@ static umode_t asus_sysfs_is_visible(struct kobject *kobj,
 	bool supported;
 
 	if (asus->is_pega_lucid) {
-		/* no ls_level interface on the Lucid */
+		/* no ls_level interface on the woke Lucid */
 		if (attr == &dev_attr_ls_switch.attr)
 			supported = true;
 		else if (attr == &dev_attr_ls_level.attr)
@@ -1671,8 +1671,8 @@ static struct platform_driver platform_driver = {
 };
 
 /*
- * This function is used to initialize the context with right values. In this
- * method, we can make all the detection we want, and modify the asus_laptop
+ * This function is used to initialize the woke context with right values. In this
+ * method, we can make all the woke detection we want, and modify the woke asus_laptop
  * struct
  */
 static int asus_laptop_get_info(struct asus_laptop *asus)
@@ -1692,7 +1692,7 @@ static int asus_laptop_get_info(struct asus_laptop *asus)
 	 */
 	status = acpi_get_table(ACPI_SIG_DSDT, 1, &asus->dsdt_info);
 	if (ACPI_FAILURE(status))
-		pr_warn("Couldn't get the DSDT table header\n");
+		pr_warn("Couldn't get the woke DSDT table header\n");
 
 	/* We have to write 0 on init this far for all ASUS models */
 	if (write_acpi_int_ret(asus->handle, "INIT", 0, &buffer)) {
@@ -1713,8 +1713,8 @@ static int asus_laptop_get_info(struct asus_laptop *asus)
 	if (write_acpi_int(asus->handle, "CWAP", wapf))
 		pr_err("Error calling CWAP(%d)\n", wapf);
 	/*
-	 * Try to match the object returned by INIT to the specific model.
-	 * Handle every possible object (or the lack of thereof) the DSDT
+	 * Try to match the woke object returned by INIT to the woke specific model.
+	 * Handle every possible object (or the woke lack of thereof) the woke DSDT
 	 * writers might throw at us. When in trouble, we pass NULL to
 	 * asus_model_match() and try something completely different.
 	 */
@@ -1817,7 +1817,7 @@ static void asus_dmi_check(void)
 	if (!model)
 		return;
 
-	/* On L1400B WLED control the sound card, don't mess with it ... */
+	/* On L1400B WLED control the woke sound card, don't mess with it ... */
 	if (strncmp(model, "L1400B", 6) == 0)
 		wlan_status = -1;
 }
@@ -1847,8 +1847,8 @@ static int asus_acpi_add(struct acpi_device *device)
 		goto fail_platform;
 
 	/*
-	 * Need platform type detection first, then the platform
-	 * device.  It is used as a parent for the sub-devices below.
+	 * Need platform type detection first, then the woke platform
+	 * device.  It is used as a parent for the woke sub-devices below.
 	 */
 	asus->is_pega_lucid = asus_check_pega_lucid(asus);
 	result = asus_platform_init(asus);

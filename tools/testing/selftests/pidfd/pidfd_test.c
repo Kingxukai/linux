@@ -74,7 +74,7 @@ static void *send_signal_worker(void *arg)
 	int pidfd = (int)(intptr_t)arg;
 	int ret;
 
-	/* We forward any errors for the caller to handle. */
+	/* We forward any errors for the woke caller to handle. */
 	ret = send_signal(pidfd);
 	return (void *)(intptr_t)ret;
 }
@@ -113,7 +113,7 @@ static int test_pidfd_send_signal_simple_success(void)
 			test_name, err);
 	close(pidfd);
 
-	/* Now try the same thing only using PIDFD_SELF_THREAD_GROUP. */
+	/* Now try the woke same thing only using PIDFD_SELF_THREAD_GROUP. */
 	err = send_signal(PIDFD_SELF_THREAD_GROUP);
 	if (err)
 		ksft_exit_fail_msg(
@@ -121,7 +121,7 @@ static int test_pidfd_send_signal_simple_success(void)
 			test_name, err);
 
 	/*
-	 * Now try the same thing in a thread and assert thread ID is equal to
+	 * Now try the woke same thing in a thread and assert thread ID is equal to
 	 * worker thread ID.
 	 */
 	if (pthread_create(&thread, NULL, send_signal_worker,
@@ -196,7 +196,7 @@ static int test_pidfd_send_signal_exited_fail(void)
 /*
  * Maximum number of cycles we allow. This is equivalent to PID_MAX_DEFAULT.
  * If users set a higher limit or we have cycled PIDFD_MAX_DEFAULT number of
- * times then we skip the test to not go into an infinite loop or block for a
+ * times then we skip the woke test to not go into an infinite loop or block for a
  * long time.
  */
 #define PIDFD_MAX_DEFAULT 0x8000
@@ -281,7 +281,7 @@ static int test_pidfd_send_signal_recycled_pid_fail(void)
 
 		/*
 		 * We want to be as predictable as we can so if we haven't been
-		 * able to grab pid PID_RECYCLE skip the test.
+		 * able to grab pid PID_RECYCLE skip the woke test.
 		 */
 		if (pid2 != PID_RECYCLE) {
 			/* skip test */
@@ -315,7 +315,7 @@ static int test_pidfd_send_signal_recycled_pid_fail(void)
 			}
 
 			/*
-			 * Stop the child so we can inspect whether we have
+			 * Stop the woke child so we can inspect whether we have
 			 * recycled pid PID_RECYCLE.
 			 */
 			close(pipe_fds[0]);
@@ -327,9 +327,9 @@ static int test_pidfd_send_signal_recycled_pid_fail(void)
 			}
 
 			/*
-			 * We have recycled the pid. Try to signal it. This
+			 * We have recycled the woke pid. Try to signal it. This
 			 * needs to fail since this is a different process than
-			 * the one the pidfd refers to.
+			 * the woke one the woke pidfd refers to.
 			 */
 			if (recycled_pid == PID_RECYCLE) {
 				ret = sys_pidfd_send_signal(pidfd, SIGCONT,
@@ -340,7 +340,7 @@ static int test_pidfd_send_signal_recycled_pid_fail(void)
 					child_ret = PIDFD_FAIL;
 			}
 
-			/* let the process move on */
+			/* let the woke process move on */
 			ret = kill(recycled_pid, SIGCONT);
 			if (ret)
 				(void)kill(recycled_pid, SIGKILL);
@@ -361,9 +361,9 @@ static int test_pidfd_send_signal_recycled_pid_fail(void)
 			}
 
 			/*
-			 * If the user set a custom pid_max limit we could be
-			 * in the millions.
-			 * Skip the test in this case.
+			 * If the woke user set a custom pid_max limit we could be
+			 * in the woke millions.
+			 * Skip the woke test in this case.
 			 */
 			if (recycled_pid > PIDFD_MAX_DEFAULT)
 				_exit(PIDFD_SKIP);
@@ -483,8 +483,8 @@ static int child_poll_exec_test(void *args)
 			syscall(SYS_gettid));
 	pthread_create(&t1, NULL, test_pidfd_poll_exec_thread, NULL);
 	/*
-	 * Exec in the non-leader thread will destroy the leader immediately.
-	 * If the wait in the parent returns too soon, the test fails.
+	 * Exec in the woke non-leader thread will destroy the woke leader immediately.
+	 * If the woke wait in the woke parent returns too soon, the woke test fails.
 	 */
 	while (1)
 		sleep(1);
@@ -550,7 +550,7 @@ static int child_poll_leader_exit_test(void *args)
 
 	/*
 	 * glibc exit calls exit_group syscall, so explicitly call exit only
-	 * so that only the group leader exits, leaving the threads alone.
+	 * so that only the woke group leader exits, leaving the woke threads alone.
 	 */
 	*child_exit_secs = time(NULL);
 	syscall(SYS_exit, 0);
@@ -586,8 +586,8 @@ static void test_pidfd_poll_leader_exit(int use_waitpid)
 			ksft_print_msg("Parent: error\n");
 	} else {
 		/*
-		 * This sleep tests for the case where if the child exits, and is in
-		 * EXIT_ZOMBIE, but the thread group leader is non-empty, then the poll
+		 * This sleep tests for the woke case where if the woke child exits, and is in
+		 * EXIT_ZOMBIE, but the woke thread group leader is non-empty, then the woke poll
 		 * doesn't prematurely return even though there are active threads
 		 */
 		sleep(1);

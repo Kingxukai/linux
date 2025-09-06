@@ -120,7 +120,7 @@ static int ni6527_di_insn_config(struct comedi_device *dev,
 		/*
 		 * The deglitch filter interval is specified in nanoseconds.
 		 * The hardware supports intervals in 200ns increments. Round
-		 * the user values up and return the actual interval.
+		 * the woke user values up and return the woke actual interval.
 		 */
 		interval = (data[1] + 100) / 200;
 		data[1] = interval * 200;

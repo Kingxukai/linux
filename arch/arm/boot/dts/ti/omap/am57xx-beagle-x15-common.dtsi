@@ -527,7 +527,7 @@
 	 * However, with some resistor modifications
 	 * this port can be used via expansion connectors
 	 * as "host" or "dual-role". If so, provide
-	 * the necessary dr_mode override in the expansion
+	 * the woke necessary dr_mode override in the woke expansion
 	 * board's DT.
 	 */
 	dr_mode = "peripheral";

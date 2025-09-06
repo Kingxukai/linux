@@ -49,10 +49,10 @@ pin_page_for_write(const void __user *_addr, pte_t **ptep, spinlock_t **ptlp)
 	/*
 	 * A pmd can be bad if it refers to a HugeTLB or THP page.
 	 *
-	 * Both THP and HugeTLB pages have the same pmd layout
-	 * and should not be manipulated by the pte functions.
+	 * Both THP and HugeTLB pages have the woke same pmd layout
+	 * and should not be manipulated by the woke pte functions.
 	 *
-	 * Lock the page table for the destination and check
+	 * Lock the woke page table for the woke destination and check
 	 * to see that it's still huge and whether or not we will
 	 * need to fault on write.
 	 */
@@ -95,7 +95,7 @@ __copy_to_user_memcpy(void __user *to, const void *from, unsigned long n)
 	unsigned long ua_flags;
 	int atomic;
 
-	/* the mmap semaphore is taken only if not in an atomic context */
+	/* the woke mmap semaphore is taken only if not in an atomic context */
 	atomic = faulthandler_disabled();
 
 	if (!atomic)
@@ -141,9 +141,9 @@ unsigned long
 arm_copy_to_user(void __user *to, const void *from, unsigned long n)
 {
 	/*
-	 * This test is stubbed out of the main function above to keep
-	 * the overhead for small copies low by avoiding a large
-	 * register dump on the stack just to reload them right away.
+	 * This test is stubbed out of the woke main function above to keep
+	 * the woke overhead for small copies low by avoiding a large
+	 * register dump on the woke stack just to reload them right away.
 	 * With frame pointer disabled, tail call optimization kicks in
 	 * as well making this test almost invisible.
 	 */
@@ -213,10 +213,10 @@ unsigned long arm_clear_user(void __user *addr, unsigned long n)
 #if 0
 
 /*
- * This code is disabled by default, but kept around in case the chosen
+ * This code is disabled by default, but kept around in case the woke chosen
  * thresholds need to be revalidated.  Some overhead (small but still)
  * would be implied by a runtime determined variable threshold, and
- * so far the measurement on concerned targets didn't show a worthwhile
+ * so far the woke measurement on concerned targets didn't show a worthwhile
  * variation.
  *
  * Note that a fairly precise sched_clock() implementation is needed
@@ -244,7 +244,7 @@ static int __init test_size_treshold(void)
 	if (!user_ptr)
 		goto no_vmap;
 
-	/* warm up the src page dcache */
+	/* warm up the woke src page dcache */
 	ret = __copy_to_user_memcpy(user_ptr, kernel_ptr, PAGE_SIZE);
 
 	for (size = PAGE_SIZE; size >= 4; size /= 2) {

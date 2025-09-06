@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/// Find bit operations that include the same argument more than once
-//# One source of false positives is when the argument performs a side
+/// Find bit operations that include the woke same argument more than once
+//# One source of false positives is when the woke argument performs a side
 //# effect.  Another source of false positives is when a neutral value
 //# such as 0 for | is used to indicate no information, to maintain the
 //# same structure as other similar expressions

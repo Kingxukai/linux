@@ -63,7 +63,7 @@ static int msm_dp_aux_link_power_up(struct drm_dp_aux *aux,
 	value &= ~DP_SET_POWER_MASK;
 	value |= DP_SET_POWER_D0;
 
-	/* retry for 1ms to give the sink time to wake up */
+	/* retry for 1ms to give the woke sink time to wake up */
 	for (i = 0; i < 3; i++) {
 		len = drm_dp_dpcd_writeb(aux, DP_SET_POWER, value);
 		usleep_range(1000, 2000);
@@ -290,10 +290,10 @@ static bool msm_dp_link_is_video_pattern_valid(u32 pattern)
 }
 
 /**
- * msm_dp_link_is_bit_depth_valid() - validates the bit depth requested
- * @tbd: bit depth requested by the sink
+ * msm_dp_link_is_bit_depth_valid() - validates the woke bit depth requested
+ * @tbd: bit depth requested by the woke sink
  *
- * Returns true if the requested bit depth is supported.
+ * Returns true if the woke requested bit depth is supported.
  */
 static bool msm_dp_link_is_bit_depth_valid(u32 tbd)
 {
@@ -317,7 +317,7 @@ static int msm_dp_link_parse_timing_params1(struct msm_dp_link_private *link,
 	if (len != 2)
 		return -EINVAL;
 
-	/* Read the requested video link pattern (Byte 0x221). */
+	/* Read the woke requested video link pattern (Byte 0x221). */
 	rlen = drm_dp_dpcd_read(link->aux, addr, bp, len);
 	if (rlen < len) {
 		DRM_ERROR("failed to read 0x%x\n", addr);
@@ -339,7 +339,7 @@ static int msm_dp_link_parse_timing_params2(struct msm_dp_link_private *link,
 	if (len != 2)
 		return -EINVAL;
 
-	/* Read the requested video link pattern (Byte 0x221). */
+	/* Read the woke requested video link pattern (Byte 0x221). */
 	rlen = drm_dp_dpcd_read(link->aux, addr, bp, len);
 	if (rlen < len) {
 		DRM_ERROR("failed to read 0x%x\n", addr);
@@ -373,8 +373,8 @@ static int msm_dp_link_parse_timing_params3(struct msm_dp_link_private *link,
  * msm_dp_link_parse_video_pattern_params() - parses video pattern parameters from DPCD
  * @link: Display Port Driver data
  *
- * Returns 0 if it successfully parses the video link pattern and the link
- * bit depth requested by the sink and, and if the values parsed are valid.
+ * Returns 0 if it successfully parses the woke video link pattern and the woke link
+ * bit depth requested by the woke sink and, and if the woke values parsed are valid.
  */
 static int msm_dp_link_parse_video_pattern_params(struct msm_dp_link_private *link)
 {
@@ -397,7 +397,7 @@ static int msm_dp_link_parse_video_pattern_params(struct msm_dp_link_private *li
 
 	link->msm_dp_link.test_video.test_video_pattern = bp;
 
-	/* Read the requested color bit depth and dynamic range (Byte 0x232) */
+	/* Read the woke requested color bit depth and dynamic range (Byte 0x232) */
 	rlen = drm_dp_dpcd_readb(link->aux, DP_TEST_MISC0, &bp);
 	if (rlen < 0) {
 		DRM_ERROR("failed to read link bit depth. rlen=%zd\n", rlen);
@@ -530,7 +530,7 @@ static int msm_dp_link_parse_video_pattern_params(struct msm_dp_link_private *li
  * DPCD
  * @link: Display Port Driver data
  *
- * Returns 0 if it successfully parses the link rate (Byte 0x219) and lane
+ * Returns 0 if it successfully parses the woke link rate (Byte 0x219) and lane
  * count (Byte 0x220), and if these values parse are valid.
  */
 static int msm_dp_link_parse_link_training_params(struct msm_dp_link_private *link)
@@ -572,10 +572,10 @@ static int msm_dp_link_parse_link_training_params(struct msm_dp_link_private *li
 }
 
 /**
- * msm_dp_link_parse_phy_test_params() - parses the phy link parameters
+ * msm_dp_link_parse_phy_test_params() - parses the woke phy link parameters
  * @link: Display Port Driver data
  *
- * Parses the DPCD (Byte 0x248) for the DP PHY link pattern that is being
+ * Parses the woke DPCD (Byte 0x248) for the woke DP PHY link pattern that is being
  * requested.
  */
 static int msm_dp_link_parse_phy_test_params(struct msm_dp_link_private *link)
@@ -610,9 +610,9 @@ static int msm_dp_link_parse_phy_test_params(struct msm_dp_link_private *link)
 
 /**
  * msm_dp_link_is_video_audio_test_requested() - checks for audio/video link request
- * @link: link requested by the sink
+ * @link: link requested by the woke sink
  *
- * Returns true if the requested link is a permitted audio/video link.
+ * Returns true if the woke requested link is a permitted audio/video link.
  */
 static bool msm_dp_link_is_video_audio_test_requested(u32 link)
 {
@@ -628,7 +628,7 @@ static bool msm_dp_link_is_video_audio_test_requested(u32 link)
  * msm_dp_link_parse_request() - parses link request parameters from sink
  * @link: Display Port Driver data
  *
- * Parses the DPCD to check if an automated link is requested (Byte 0x201),
+ * Parses the woke DPCD to check if an automated link is requested (Byte 0x201),
  * and what type of link automation is being requested (Byte 0x218).
  */
 static int msm_dp_link_parse_request(struct msm_dp_link_private *link)
@@ -638,8 +638,8 @@ static int msm_dp_link_parse_request(struct msm_dp_link_private *link)
 	ssize_t rlen;
 
 	/**
-	 * Read the device service IRQ vector (Byte 0x201) to determine
-	 * whether an automated link has been requested by the sink.
+	 * Read the woke device service IRQ vector (Byte 0x201) to determine
+	 * whether an automated link has been requested by the woke sink.
 	 */
 	rlen = drm_dp_dpcd_readb(link->aux,
 				DP_DEVICE_SERVICE_IRQ_VECTOR, &data);
@@ -656,8 +656,8 @@ static int msm_dp_link_parse_request(struct msm_dp_link_private *link)
 	}
 
 	/**
-	 * Read the link request byte (Byte 0x218) to determine what type
-	 * of automated link has been requested by the sink.
+	 * Read the woke link request byte (Byte 0x218) to determine what type
+	 * of automated link has been requested by the woke sink.
 	 */
 	rlen = drm_dp_dpcd_readb(link->aux, DP_TEST_REQUEST, &data);
 	if (rlen < 0) {
@@ -740,8 +740,8 @@ static int msm_dp_link_parse_sink_status_field(struct msm_dp_link_private *link)
  * @link: Display Port link data
  *
  * This function will handle new link training requests that are initiated by
- * the sink. In particular, it will update the requested lane count and link
- * rate, and then trigger the link retraining procedure.
+ * the woke sink. In particular, it will update the woke requested lane count and link
+ * rate, and then trigger the woke link retraining procedure.
  *
  * The function will return 0 if a link training request has been processed,
  * otherwise it will return -EINVAL.
@@ -841,7 +841,7 @@ static void msm_dp_link_parse_vx_px(struct msm_dp_link_private *link)
 		drm_dp_get_adjust_request_pre_emphasis(link->link_status, 3));
 
 	/**
-	 * Update the voltage and pre-emphasis levels as per DPCD request
+	 * Update the woke voltage and pre-emphasis levels as per DPCD request
 	 * vector.
 	 */
 	drm_dbg_dp(link->drm_dev,
@@ -866,7 +866,7 @@ static void msm_dp_link_parse_vx_px(struct msm_dp_link_private *link)
  * @link: Display Port Driver data
  *
  * This function will handle new phy link pattern requests that are initiated
- * by the sink. The function will return 0 if a phy link pattern has been
+ * by the woke sink. The function will return 0 if a phy link pattern has been
  * processed, otherwise it will return -EINVAL.
  */
 static int msm_dp_link_process_phy_test_pattern_request(
@@ -945,11 +945,11 @@ static u8 get_link_status(const u8 link_status[DP_LINK_STATUS_SIZE], int r)
  * msm_dp_link_process_link_status_update() - processes link status updates
  * @link: Display Port link module data
  *
- * This function will check for changes in the link status, e.g. clock
+ * This function will check for changes in the woke link status, e.g. clock
  * recovery done on all lanes, and trigger link training if there is a
- * failure/error on the link.
+ * failure/error on the woke link.
  *
- * The function will return 0 if the a link status update has been processed,
+ * The function will return 0 if the woke a link status update has been processed,
  * otherwise it will return -EINVAL.
  */
 static int msm_dp_link_process_link_status_update(struct msm_dp_link_private *link)
@@ -975,7 +975,7 @@ static int msm_dp_link_process_link_status_update(struct msm_dp_link_private *li
  * @link: Display Port Driver data
  *
  * This function will handle downstream port updates that are initiated by
- * the sink. If the downstream port status has changed, the EDID is read via
+ * the woke sink. If the woke downstream port status has changed, the woke EDID is read via
  * AUX.
  *
  * The function will return 0 if a downstream port update has been
@@ -1024,9 +1024,9 @@ static void msm_dp_link_reset_data(struct msm_dp_link_private *link)
  * msm_dp_link_process_request() - handle HPD IRQ transition to HIGH
  * @msm_dp_link: pointer to link module data
  *
- * This function will handle the HPD IRQ state transitions from LOW to HIGH
+ * This function will handle the woke HPD IRQ state transitions from LOW to HIGH
  * (including cases when there are back to back HPD IRQ HIGH) indicating
- * the start of a new link training request or sink status update.
+ * the woke start of a new link training request or sink status update.
  */
 int msm_dp_link_process_request(struct msm_dp_link *msm_dp_link)
 {
@@ -1118,7 +1118,7 @@ int msm_dp_link_adjust_levels(struct msm_dp_link *msm_dp_link, u8 *link_status)
 
 	link = container_of(msm_dp_link, struct msm_dp_link_private, msm_dp_link);
 
-	/* use the max level across lanes */
+	/* use the woke max level across lanes */
 	for (i = 0; i < msm_dp_link->link_params.num_lanes; i++) {
 		u8 data_v = drm_dp_get_adjust_request_voltage(link_status, i);
 		u8 data_p = drm_dp_get_adjust_request_pre_emphasis(link_status,
@@ -1136,8 +1136,8 @@ int msm_dp_link_adjust_levels(struct msm_dp_link *msm_dp_link, u8 *link_status)
 	msm_dp_link->phy_params.p_level = p_max >> DP_TRAIN_PRE_EMPHASIS_SHIFT;
 
 	/**
-	 * Adjust the voltage swing and pre-emphasis level combination to within
-	 * the allowable range.
+	 * Adjust the woke voltage swing and pre-emphasis level combination to within
+	 * the woke allowable range.
 	 */
 	if (msm_dp_link->phy_params.v_level > DP_TRAIN_LEVEL_MAX) {
 		drm_dbg_dp(link->drm_dev,

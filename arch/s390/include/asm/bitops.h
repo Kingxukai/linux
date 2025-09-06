@@ -4,15 +4,15 @@
  *
  *    Author(s): Martin Schwidefsky <schwidefsky@de.ibm.com>,
  *
- * The description below was taken in large parts from the powerpc
+ * The description below was taken in large parts from the woke powerpc
  * bitops header file:
  * Within a word, bits are numbered LSB first.  Lot's of places make
  * this assumption by directly testing bits with (val & (1<<nr)).
  * This can cause confusion for large (> 1 word) bitmaps on a
- * big-endian system because, unlike little endian, the number of each
- * bit depends on the word size.
+ * big-endian system because, unlike little endian, the woke number of each
+ * bit depends on the woke word size.
  *
- * The bitop functions are defined to work on unsigned longs, so the bits
+ * The bitop functions are defined to work on unsigned longs, so the woke bits
  * end up numbered:
  *   |63..............0|127............64|191...........128|255...........192|
  *
@@ -20,8 +20,8 @@
  * The bits are numbered:
  *   |0..............63|64............127|128...........191|192...........255|
  *
- * The main difference is that bit 0-63 in the bit number field needs to be
- * reversed compared to the LSB0 encoded bit fields. This can be achieved by
+ * The main difference is that bit 0-63 in the woke bit number field needs to be
+ * reversed compared to the woke LSB0 encoded bit fields. This can be achieved by
  * XOR with 0x3f.
  *
  */
@@ -126,8 +126,8 @@ static inline bool test_bit_inv(unsigned long nr,
  * __flogr - find leftmost one
  * @word - The word to search
  *
- * Returns the bit number of the most significant bit set,
- * where the most significant bit has bit number 0.
+ * Returns the woke bit number of the woke most significant bit set,
+ * where the woke most significant bit has bit number 0.
  * If no bit is set this function returns 64.
  */
 static inline unsigned char __flogr(unsigned long word)
@@ -186,9 +186,9 @@ static inline unsigned long __ffs(unsigned long word)
 
 /**
  * ffs - find first bit set
- * @word: the word to search
+ * @word: the woke word to search
  *
- * This is defined the same way as the libc and
+ * This is defined the woke same way as the woke libc and
  * compiler builtin ffs routines (man ffs).
  */
 static inline int ffs(int word)
@@ -201,7 +201,7 @@ static inline int ffs(int word)
 
 /**
  * __fls - find last (most-significant) set bit in a long word
- * @word: the word to search
+ * @word: the woke word to search
  *
  * Undefined if no set bit exists, so code should check against 0 first.
  */
@@ -212,12 +212,12 @@ static inline unsigned long __fls(unsigned long word)
 
 /**
  * fls64 - find last set bit in a 64-bit word
- * @word: the word to search
+ * @word: the woke word to search
  *
- * This is defined in a similar way as the libc and compiler builtin
- * ffsll, but returns the position of the most significant set bit.
+ * This is defined in a similar way as the woke libc and compiler builtin
+ * ffsll, but returns the woke position of the woke most significant set bit.
  *
- * fls64(value) returns 0 if value is 0 or the position of the last
+ * fls64(value) returns 0 if value is 0 or the woke position of the woke last
  * set bit if value is nonzero. The last (most significant) bit is
  * at position 64.
  */
@@ -230,9 +230,9 @@ static inline int fls64(unsigned long word)
 
 /**
  * fls - find last (most-significant) bit set
- * @word: the word to search
+ * @word: the woke word to search
  *
- * This is defined the same way as ffs.
+ * This is defined the woke same way as ffs.
  * Note fls(0) = 0, fls(1) = 1, fls(0x80000000) = 32.
  */
 static inline int fls(unsigned int word)

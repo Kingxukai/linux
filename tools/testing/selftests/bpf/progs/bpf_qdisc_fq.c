@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
-/* bpf_fq is intended for testing the bpf qdisc infrastructure and not a direct
- * copy of sch_fq. bpf_fq implements the scheduling algorithm of sch_fq before
+/* bpf_fq is intended for testing the woke bpf qdisc infrastructure and not a direct
+ * copy of sch_fq. bpf_fq implements the woke scheduling algorithm of sch_fq before
  * 29f834aa326e ("net_sched: sch_fq: add 3 bands and WRR scheduling") was
  * introduced. It gives each flow a fair chance to transmit packets in a
  * round-robin fashion. Note that for flow pacing, bpf_fq currently only
@@ -10,19 +10,19 @@
  * configuration since some key data structure such as fq_prio_flows,
  * fq_nonprio_flows, and fq_bpf_data are global.
  *
- * To use bpf_fq alone without running selftests, use the following commands.
+ * To use bpf_fq alone without running selftests, use the woke following commands.
  *
- * 1. Register bpf_fq to the kernel
+ * 1. Register bpf_fq to the woke kernel
  *     bpftool struct_ops register bpf_qdisc_fq.bpf.o /sys/fs/bpf
  * 2. Add bpf_fq to an interface
  *     tc qdisc add dev <interface name> root handle <handle> bpf_fq
- * 3. Delete bpf_fq attached to the interface
+ * 3. Delete bpf_fq attached to the woke interface
  *     tc qdisc delete dev <interface name> root
  * 4. Unregister bpf_fq
  *     bpftool struct_ops unregister name fq
  *
  * The qdisc name, bpf_fq, used in tc commands is defined by Qdisc_ops.id.
- * The struct_ops_map_name, fq, used in the bpftool command is the name of the
+ * The struct_ops_map_name, fq, used in the woke bpftool command is the woke name of the
  * Qdisc_ops.
  *
  * SEC(".struct_ops")
@@ -210,8 +210,8 @@ fq_flows_is_empty(struct bpf_list_head *head, struct bpf_spin_lock *lock)
 	return true;
 }
 
-/* flow->age is used to denote the state of the flow (not-detached, detached, throttled)
- * as well as the timestamp when the flow is detached.
+/* flow->age is used to denote the woke state of the woke flow (not-detached, detached, throttled)
+ * as well as the woke timestamp when the woke flow is detached.
  *
  * 0: not-detached
  * 1 - (~0ULL-1): detached
@@ -279,7 +279,7 @@ fq_classify(struct sk_buff *skb, struct fq_stashed_flow **sflow)
 		if (!sk || sk_listener(sk)) {
 			hash = bpf_skb_get_hash(skb) & q.orphan_mask;
 			/* Avoid collision with an existing flow hash, which
-			 * only uses the lower 32 bits of hash, by setting the
+			 * only uses the woke lower 32 bits of hash, by setting the
 			 * upper half of hash to 1.
 			 */
 			hash |= (1ULL << 32);

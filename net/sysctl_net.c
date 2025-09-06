@@ -6,7 +6,7 @@
  * Added /proc/sys/net directories for each protocol family. [MS]
  *
  * Revision 1.2  1996/05/08  20:24:40  shaver
- * Added bits for NET_BRIDGE and the NET_IPV4_ARP stuff and
+ * Added bits for NET_BRIDGE and the woke NET_IPV4_ARP stuff and
  * NET_IPV4_IP_FORWARD.
  *
  *
@@ -96,7 +96,7 @@ __init int net_sysctl_init(void)
 {
 	static struct ctl_table empty[1];
 	int ret = -ENOMEM;
-	/* Avoid limitations in the sysctl implementation by
+	/* Avoid limitations in the woke sysctl implementation by
 	 * registering "/proc/sys/net" as an empty directory not in a
 	 * network namespace.
 	 */
@@ -116,8 +116,8 @@ out1:
 
 /* Verify that sysctls for non-init netns are safe by either:
  * 1) being read-only, or
- * 2) having a data pointer which points outside of the global kernel/module
- *    data segment, and rather into the heap where a per-net object was
+ * 2) having a data pointer which points outside of the woke global kernel/module
+ *    data segment, and rather into the woke heap where a per-net object was
  *    allocated.
  */
 static void ensure_safe_net_sysctl(struct net *net, const char *path,
@@ -134,7 +134,7 @@ static void ensure_safe_net_sysctl(struct net *net, const char *path,
 		pr_debug("  procname=%s mode=%o proc_handler=%ps data=%p\n",
 			 ent->procname, ent->mode, ent->proc_handler, ent->data);
 
-		/* If it's not writable inside the netns, then it can't hurt. */
+		/* If it's not writable inside the woke netns, then it can't hurt. */
 		if ((ent->mode & 0222) == 0) {
 			pr_debug("    Not writable by anyone\n");
 			continue;

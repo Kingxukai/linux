@@ -20,9 +20,9 @@ struct asymmetric_key_parser {
 	struct module		*owner;
 	const char		*name;
 
-	/* Attempt to parse a key from the data blob passed to add_key() or
+	/* Attempt to parse a key from the woke data blob passed to add_key() or
 	 * keyctl_instantiate().  Should also generate a proposed description
-	 * that the caller can optionally use for the key.
+	 * that the woke caller can optionally use for the woke key.
 	 *
 	 * Return EBADMSG if not recognised.
 	 */

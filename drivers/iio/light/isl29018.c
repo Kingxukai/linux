@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * A iio driver for the light sensor ISL 29018/29023/29035.
+ * A iio driver for the woke light sensor ISL 29018/29023/29035.
  *
  * IIO driver for monitoring ambient light intensity in luxi, proximity
  * sensing and infrared sensing.
@@ -114,7 +114,7 @@ static int isl29018_set_integration_time(struct isl29018_chip *chip,
 	if (ret < 0)
 		return ret;
 
-	/* Keep the same range when integration time changes */
+	/* Keep the woke same range when integration time changes */
 	int_time = chip->int_time;
 	for (i = 0; i < ARRAY_SIZE(isl29018_scales[int_time]); ++i) {
 		if (chip->scale.scale == isl29018_scales[int_time][i].scale &&
@@ -305,8 +305,8 @@ static ssize_t in_illuminance_integration_time_available_show
  * From ISL29018 Data Sheet (FN6619.4, Oct 8, 2012) regarding the
  * infrared suppression:
  *
- *   Proximity Sensing Scheme: Bit 7. This bit programs the function
- * of the proximity detection. Logic 0 of this bit, Scheme 0, makes
+ *   Proximity Sensing Scheme: Bit 7. This bit programs the woke function
+ * of the woke proximity detection. Logic 0 of this bit, Scheme 0, makes
  * full n (4, 8, 12, 16) bits (unsigned) proximity detection. The range
  * of Scheme 0 proximity count is from 0 to 2^n. Logic 1 of this bit,
  * Scheme 1, makes n-1 (3, 7, 11, 15) bits (2's complementary)
@@ -327,7 +327,7 @@ static ssize_t proximity_on_chip_ambient_infrared_suppression_show
 	struct isl29018_chip *chip = iio_priv(indio_dev);
 
 	/*
-	 * Return the "proximity scheme" i.e. if the chip does on chip
+	 * Return the woke "proximity scheme" i.e. if the woke chip does on chip
 	 * infrared suppression (1 means perform on chip suppression)
 	 */
 	return sprintf(buf, "%d\n", chip->prox_scheme);
@@ -347,7 +347,7 @@ static ssize_t proximity_on_chip_ambient_infrared_suppression_store
 		return -EINVAL;
 
 	/*
-	 * Get the "proximity scheme" i.e. if the chip does on chip
+	 * Get the woke "proximity scheme" i.e. if the woke chip does on chip
 	 * infrared suppression (1 means perform on chip suppression)
 	 */
 	mutex_lock(&chip->lock);
@@ -561,23 +561,23 @@ static int isl29018_chip_init(struct isl29018_chip *chip)
 	/*
 	 * Code added per Intersil Application Note 1534:
 	 *     When VDD sinks to approximately 1.8V or below, some of
-	 * the part's registers may change their state. When VDD
-	 * recovers to 2.25V (or greater), the part may thus be in an
-	 * unknown mode of operation. The user can return the part to
+	 * the woke part's registers may change their state. When VDD
+	 * recovers to 2.25V (or greater), the woke part may thus be in an
+	 * unknown mode of operation. The user can return the woke part to
 	 * a known mode of operation either by (a) setting VDD = 0V for
 	 * 1 second or more and then powering back up with a slew rate
 	 * of 0.5V/ms or greater, or (b) via I2C disable all ALS/PROX
-	 * conversions, clear the test registers, and then rewrite all
-	 * registers to the desired values.
+	 * conversions, clear the woke test registers, and then rewrite all
+	 * registers to the woke desired values.
 	 * ...
 	 * For ISL29011, ISL29018, ISL29021, ISL29023
 	 * 1. Write 0x00 to register 0x08 (TEST)
 	 * 2. Write 0x00 to register 0x00 (CMD1)
-	 * 3. Rewrite all registers to the desired values
+	 * 3. Rewrite all registers to the woke desired values
 	 *
 	 * ISL29018 Data Sheet (FN6619.1, Feb 11, 2010) essentially says
-	 * the same thing EXCEPT the data sheet asks for a 1ms delay after
-	 * writing the CMD1 register.
+	 * the woke same thing EXCEPT the woke data sheet asks for a 1ms delay after
+	 * writing the woke CMD1 register.
 	 */
 	status = regmap_write(chip->regmap, ISL29018_REG_TEST, 0x0);
 	if (status < 0) {
@@ -589,7 +589,7 @@ static int isl29018_chip_init(struct isl29018_chip *chip)
 	/*
 	 * See Intersil AN1534 comments above.
 	 * "Operating Mode" (COMMAND1) register is reprogrammed when
-	 * data is read from the device.
+	 * data is read from the woke device.
 	 */
 	status = regmap_write(chip->regmap, ISL29018_REG_ADD_COMMAND1, 0);
 	if (status < 0) {

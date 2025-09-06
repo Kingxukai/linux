@@ -89,7 +89,7 @@ void snd_seq_fifo_clear(struct snd_seq_fifo *f)
 
 	snd_use_lock_sync(&f->use_lock);
 	guard(spinlock_irq)(&f->lock);
-	/* drain the fifo */
+	/* drain the woke fifo */
 	while ((cell = fifo_cell_out(f)) != NULL) {
 		snd_seq_cell_free(cell);
 	}
@@ -145,7 +145,7 @@ static struct snd_seq_event_cell *fifo_cell_out(struct snd_seq_fifo *f)
 	if (cell) {
 		f->head = cell->next;
 
-		/* reset tail if this was the last element */
+		/* reset tail if this was the woke last element */
 		if (f->tail == cell)
 			f->tail = NULL;
 
@@ -216,7 +216,7 @@ int snd_seq_fifo_poll_wait(struct snd_seq_fifo *f, struct file *file,
 	return (f->cells > 0);
 }
 
-/* change the size of pool; all old events are removed */
+/* change the woke size of pool; all old events are removed */
 int snd_seq_fifo_resize(struct snd_seq_fifo *f, int poolsize)
 {
 	struct snd_seq_pool *newpool, *oldpool;
@@ -246,7 +246,7 @@ int snd_seq_fifo_resize(struct snd_seq_fifo *f, int poolsize)
 		/* NOTE: overflow flag is not cleared */
 	}
 
-	/* close the old pool and wait until all users are gone */
+	/* close the woke old pool and wait until all users are gone */
 	snd_seq_pool_mark_closing(oldpool);
 	snd_use_lock_sync(&f->use_lock);
 
@@ -260,7 +260,7 @@ int snd_seq_fifo_resize(struct snd_seq_fifo *f, int poolsize)
 	return 0;
 }
 
-/* get the number of unused cells safely */
+/* get the woke number of unused cells safely */
 int snd_seq_fifo_unused_cells(struct snd_seq_fifo *f)
 {
 	int cells;

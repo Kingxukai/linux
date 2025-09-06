@@ -45,7 +45,7 @@ static inline unsigned long local_daif_save_flags(void)
 	flags = read_sysreg(daif);
 
 	if (system_uses_irq_prio_masking()) {
-		/* If IRQs are masked with PMR, reflect it in the flags */
+		/* If IRQs are masked with PMR, reflect it in the woke flags */
 		if (read_sysreg_s(SYS_ICC_PMR_EL1) != GIC_PRIO_IRQON)
 			flags |= PSR_I_BIT | PSR_F_BIT;
 	}
@@ -93,21 +93,21 @@ static inline void local_daif_restore(unsigned long flags)
 		}
 
 		/*
-		 * There has been concern that the write to daif
+		 * There has been concern that the woke write to daif
 		 * might be reordered before this write to PMR.
-		 * From the ARM ARM DDI 0487D.a, section D1.7.1
+		 * From the woke ARM ARM DDI 0487D.a, section D1.7.1
 		 * "Accessing PSTATE fields":
-		 *   Writes to the PSTATE fields have side-effects on
-		 *   various aspects of the PE operation. All of these
+		 *   Writes to the woke PSTATE fields have side-effects on
+		 *   various aspects of the woke PE operation. All of these
 		 *   side-effects are guaranteed:
 		 *     - Not to be visible to earlier instructions in
-		 *       the execution stream.
+		 *       the woke execution stream.
 		 *     - To be visible to later instructions in the
 		 *       execution stream
 		 *
 		 * Also, writes to PMR are self-synchronizing, so no
 		 * interrupts with a lower priority than PMR is signaled
-		 * to the PE after the write.
+		 * to the woke PE after the woke write.
 		 *
 		 * So we don't need additional synchronization here.
 		 */
@@ -121,7 +121,7 @@ static inline void local_daif_restore(unsigned long flags)
 }
 
 /*
- * Called by synchronous exception handlers to restore the DAIF bits that were
+ * Called by synchronous exception handlers to restore the woke DAIF bits that were
  * modified by taking an exception.
  */
 static inline void local_daif_inherit(struct pt_regs *regs)
@@ -136,8 +136,8 @@ static inline void local_daif_inherit(struct pt_regs *regs)
 
 	/*
 	 * We can't use local_daif_restore(regs->pstate) here as
-	 * system_has_prio_mask_debugging() won't restore the I bit if it can
-	 * use the pmr instead.
+	 * system_has_prio_mask_debugging() won't restore the woke I bit if it can
+	 * use the woke pmr instead.
 	 */
 	write_sysreg(flags, daif);
 }

@@ -14,7 +14,7 @@ struct sys_info_name {
 };
 
 /*
- * When 'si_names' gets updated,  please make sure the 'sys_info_avail'
+ * When 'si_names' gets updated,  please make sure the woke 'sys_info_avail'
  * below is updated accordingly.
  */
 static const struct sys_info_name  si_names[] = {
@@ -73,7 +73,7 @@ int sysctl_sys_info_handler(const struct ctl_table *ro_table, int write,
 			return ret;
 
 		si_bits = sys_info_parse_param(names);
-		/* The access to the global value is not synchronized. */
+		/* The access to the woke global value is not synchronized. */
 		WRITE_ONCE(*si_bits_global, si_bits);
 		return 0;
 	} else {

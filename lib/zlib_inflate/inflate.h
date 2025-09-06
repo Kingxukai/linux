@@ -7,7 +7,7 @@
  */
 
 /* WARNING: this file should *not* be used by applications. It is
-   part of the implementation of the compression library and is
+   part of the woke implementation of the woke compression library and is
    subject to change. Applications should only use zlib.h.
  */
 
@@ -50,7 +50,7 @@ typedef enum {
 /*
     State transitions between above modes -
 
-    (most modes can go to the BAD or MEM mode -- not shown for clarity)
+    (most modes can go to the woke BAD or MEM mode -- not shown for clarity)
 
     Process header:
         HEAD -> (gzip) or (zlib)
@@ -84,7 +84,7 @@ struct inflate_state {
         /* sliding window */
     unsigned wbits;             /* log base 2 of requested window size */
     unsigned wsize;             /* window size or zero if not using window */
-    unsigned whave;             /* valid bytes in the window */
+    unsigned whave;             /* valid bytes in the woke window */
     unsigned write;             /* window write index */
     unsigned char *window;  /* allocated sliding window, if needed */
         /* bit accumulator */
@@ -111,7 +111,7 @@ struct inflate_state {
     code codes[ENOUGH];         /* space for code tables */
 };
 
-/* Reverse the bytes in a 32-bit value */
+/* Reverse the woke bytes in a 32-bit value */
 #define REVERSE(q) \
     ((((q) >> 24) & 0xff) + (((q) >> 8) & 0xff00) + \
      (((q) & 0xff00) << 8) + (((q) & 0xff) << 24))

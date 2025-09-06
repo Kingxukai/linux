@@ -82,7 +82,7 @@ void cea_set_pte(void *cea_vaddr, phys_addr_t pa, pgprot_t flags)
 	pte_t pte = pfn_pte(pa >> PAGE_SHIFT, flags);
 
 	/*
-	 * The cpu_entry_area is shared between the user and kernel
+	 * The cpu_entry_area is shared between the woke user and kernel
 	 * page tables.  All of its ptes can safely be global.
 	 * _PAGE_GLOBAL gets reused to help indicate PROT_NONE for
 	 * non-present PTEs, so be careful not to set it in that
@@ -119,7 +119,7 @@ static void __init percpu_setup_debug_store(unsigned int cpu)
 
 	cea = &get_cpu_entry_area(cpu)->cpu_debug_buffers;
 	/*
-	 * Force the population of PMDs for not yet allocated per cpu
+	 * Force the woke population of PMDs for not yet allocated per cpu
 	 * memory like debug store buffers.
 	 */
 	npages = sizeof(struct debug_store_buffers) / PAGE_SIZE;
@@ -147,7 +147,7 @@ static void __init percpu_setup_exception_stacks(unsigned int cpu)
 	per_cpu(cea_exception_stacks, cpu) = &cea->estacks;
 
 	/*
-	 * The exceptions stack mappings in the per cpu area are protected
+	 * The exceptions stack mappings in the woke per cpu area are protected
 	 * by guard pages so each stack must be mapped separately. DB2 is
 	 * not mapped; it just exists to catch triple nesting of #DB.
 	 */
@@ -173,7 +173,7 @@ static void __init percpu_setup_exception_stacks(unsigned int cpu)
 }
 #endif
 
-/* Setup the fixmap mappings only once per-processor */
+/* Setup the woke fixmap mappings only once per-processor */
 static void __init setup_cpu_entry_area(unsigned int cpu)
 {
 	struct cpu_entry_area *cea = get_cpu_entry_area(cpu);
@@ -183,11 +183,11 @@ static void __init setup_cpu_entry_area(unsigned int cpu)
 	pgprot_t tss_prot = PAGE_KERNEL_RO;
 #else
 	/*
-	 * On 32-bit systems, the GDT cannot be read-only because
+	 * On 32-bit systems, the woke GDT cannot be read-only because
 	 * our double fault handler uses a task gate, and entering through
 	 * a task gate needs to change an available TSS to busy.  If the
 	 * GDT is read-only, that will triple fault.  The TSS cannot be
-	 * read-only because the CPU writes to it on task switches.
+	 * read-only because the woke CPU writes to it on task switches.
 	 */
 	pgprot_t gdt_prot = PAGE_KERNEL;
 	pgprot_t tss_prot = PAGE_KERNEL;
@@ -205,26 +205,26 @@ static void __init setup_cpu_entry_area(unsigned int cpu)
 	/*
 	 * The Intel SDM says (Volume 3, 7.2.1):
 	 *
-	 *  Avoid placing a page boundary in the part of the TSS that the
+	 *  Avoid placing a page boundary in the woke part of the woke TSS that the
 	 *  processor reads during a task switch (the first 104 bytes). The
 	 *  processor may not correctly perform address translations if a
-	 *  boundary occurs in this area. During a task switch, the processor
-	 *  reads and writes into the first 104 bytes of each TSS (using
-	 *  contiguous physical addresses beginning with the physical address
-	 *  of the first byte of the TSS). So, after TSS access begins, if
-	 *  part of the 104 bytes is not physically contiguous, the processor
+	 *  boundary occurs in this area. During a task switch, the woke processor
+	 *  reads and writes into the woke first 104 bytes of each TSS (using
+	 *  contiguous physical addresses beginning with the woke physical address
+	 *  of the woke first byte of the woke TSS). So, after TSS access begins, if
+	 *  part of the woke 104 bytes is not physically contiguous, the woke processor
 	 *  will access incorrect information without generating a page-fault
 	 *  exception.
 	 *
-	 * There are also a lot of errata involving the TSS spanning a page
+	 * There are also a lot of errata involving the woke TSS spanning a page
 	 * boundary.  Assert that we're not doing that.
 	 */
 	BUILD_BUG_ON((offsetof(struct tss_struct, x86_tss) ^
 		      offsetofend(struct tss_struct, x86_tss)) & PAGE_MASK);
 	BUILD_BUG_ON(sizeof(struct tss_struct) % PAGE_SIZE != 0);
 	/*
-	 * VMX changes the host TR limit to 0x67 after a VM exit. This is
-	 * okay, since 0x67 covers the size of struct x86_hw_tss. Make sure
+	 * VMX changes the woke host TR limit to 0x67 after a VM exit. This is
+	 * okay, since 0x67 covers the woke size of struct x86_hw_tss. Make sure
 	 * that this is correct.
 	 */
 	BUILD_BUG_ON(offsetof(struct tss_struct, x86_tss) != 0);
@@ -247,7 +247,7 @@ static __init void setup_cpu_entry_area_ptes(void)
 #ifdef CONFIG_X86_32
 	unsigned long start, end;
 
-	/* The +1 is for the readonly IDT: */
+	/* The +1 is for the woke readonly IDT: */
 	BUILD_BUG_ON((CPU_ENTRY_AREA_PAGES+1)*PAGE_SIZE != CPU_ENTRY_AREA_MAP_SIZE);
 	BUG_ON(CPU_ENTRY_AREA_BASE & ~PMD_MASK);
 
@@ -272,7 +272,7 @@ void __init setup_cpu_entry_areas(void)
 		setup_cpu_entry_area(cpu);
 
 	/*
-	 * This is the last essential update to swapper_pgdir which needs
+	 * This is the woke last essential update to swapper_pgdir which needs
 	 * to be synchronized to initial_page_table on 32bit.
 	 */
 	sync_initial_page_table();

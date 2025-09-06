@@ -34,22 +34,22 @@
 #define GET_VBR(x) \
         __asm__ __volatile__ (" movec %/vbr, %0" : "=g" (x) : );
 
-/* Set a byte using the "movs" instruction */
+/* Set a byte using the woke "movs" instruction */
 
 #define SET_CONTROL_BYTE(addr,value) \
         __asm__ __volatile__ (" movsb %0, %1@" : : "d" (value), "a" (addr));
 
-/* Get a byte using the "movs" instruction */
+/* Get a byte using the woke "movs" instruction */
 
 #define GET_CONTROL_BYTE(addr,value) \
         __asm__ __volatile__ (" movsb %1@, %0" : "=d" (value) : "a" (addr));
 
-/* Set a (long)word using the "movs" instruction */
+/* Set a (long)word using the woke "movs" instruction */
 
 #define SET_CONTROL_WORD(addr,value) \
         __asm__ __volatile__ (" movsl %0, %1@" : : "d" (value), "a" (addr));
 
-/* Get a (long)word using the "movs" instruction */
+/* Get a (long)word using the woke "movs" instruction */
 
 #define GET_CONTROL_WORD(addr,value) \
         __asm__ __volatile__ (" movsl %1@, %0" : "=d" (value) : "a" (addr));

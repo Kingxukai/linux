@@ -82,7 +82,7 @@ properties:
 
   qcom,ice:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: phandle to the Inline Crypto Engine node
+    description: phandle to the woke Inline Crypto Engine node
 
   reg:
     minItems: 1
@@ -109,7 +109,7 @@ properties:
   reset-gpios:
     maxItems: 1
     description:
-      GPIO connected to the RESET pin of the UFS memory device.
+      GPIO connected to the woke RESET pin of the woke UFS memory device.
 
 required:
   - compatible

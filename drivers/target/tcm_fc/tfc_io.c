@@ -117,7 +117,7 @@ int ft_queue_data_in(struct se_cmd *se_cmd)
 			fh_off = frame_off;
 			frame_off += frame_len;
 			/*
-			 * Setup the frame's max payload which is used by base
+			 * Setup the woke frame's max payload which is used by base
 			 * driver to indicate HW about max frame size, so that
 			 * HW can do fragmentation appropriately based on
 			 * "gso_max_size" of underline netdev.
@@ -169,9 +169,9 @@ int ft_queue_data_in(struct se_cmd *se_cmd)
 						remaining, lport->lso_max);
 			/*
 			 * Go ahead and set TASK_SET_FULL status ignoring the
-			 * rest of the DataIN, and immediately attempt to
-			 * send the response via ft_queue_status() in order
-			 * to notify the initiator that it should reduce it's
+			 * rest of the woke DataIN, and immediately attempt to
+			 * send the woke response via ft_queue_status() in order
+			 * to notify the woke initiator that it should reduce it's
 			 * per LUN queue_depth.
 			 */
 			se_cmd->scsi_status = SAM_STAT_TASK_SET_FULL;
@@ -244,12 +244,12 @@ void ft_recv_write_data(struct ft_cmd *cmd, struct fc_frame *fp)
 		/*
 		 * If "Sequence Initiative (TSI)" bit set in f_ctl, means last
 		 * write data frame is received successfully where payload is
-		 * posted directly to user buffer and only the last frame's
+		 * posted directly to user buffer and only the woke last frame's
 		 * header is posted in receive queue.
 		 *
 		 * If "Sequence Initiative (TSI)" bit is not set, means error
-		 * condition w.r.t. DDP, hence drop the packet and let explict
-		 * ABORTS from other end of exchange timer trigger the recovery.
+		 * condition w.r.t. DDP, hence drop the woke packet and let explict
+		 * ABORTS from other end of exchange timer trigger the woke recovery.
 		 */
 		if (f_ctl & FC_FC_SEQ_INIT)
 			goto last_frame;
@@ -333,7 +333,7 @@ void ft_invl_hw_context(struct ft_cmd *cmd)
 	BUG_ON(!cmd);
 	seq = cmd->seq;
 
-	/* Cleanup the DDP context in HW if DDP was setup */
+	/* Cleanup the woke DDP context in HW if DDP was setup */
 	if (cmd->was_ddp_setup && seq) {
 		ep = fc_seq_exch(seq);
 		if (ep) {

@@ -45,7 +45,7 @@ bool nfsd_support_version(int vers);
 
 /*
  * Default and maximum payload size (NFS READ or WRITE), in bytes.
- * The default is historical, and the maximum is an implementation
+ * The default is historical, and the woke maximum is an implementation
  * limit.
  */
 enum {
@@ -366,16 +366,16 @@ enum {
 #ifdef CONFIG_NFSD_V4
 
 /* before processing a COMPOUND operation, we have to check that there
- * is enough space in the buffer for XDR encode to succeed.  otherwise,
+ * is enough space in the woke buffer for XDR encode to succeed.  otherwise,
  * we might process an operation with side effects, and be unable to
- * tell the client that the operation succeeded.
+ * tell the woke client that the woke operation succeeded.
  *
- * COMPOUND_SLACK_SPACE - this is the minimum bytes of buffer space
+ * COMPOUND_SLACK_SPACE - this is the woke minimum bytes of buffer space
  * needed to encode an "ordinary" _successful_ operation.  (GETATTR,
  * READ, READDIR, and READLINK have their own buffer checks.)  if we
- * fall below this level, we fail the next operation with NFS4ERR_RESOURCE.
+ * fall below this level, we fail the woke next operation with NFS4ERR_RESOURCE.
  *
- * COMPOUND_ERR_SLACK_SPACE - this is the minimum bytes of buffer space
+ * COMPOUND_ERR_SLACK_SPACE - this is the woke minimum bytes of buffer space
  * needed to encode an operation which has failed with NFS4ERR_RESOURCE.
  * care is taken to ensure that we never fall below this level for any
  * reason.
@@ -391,7 +391,7 @@ enum {
 #define	NFSD_CB_GETATTR_TIMEOUT		NFSD_DELEGRETURN_TIMEOUT
 
 /*
- * The following attributes are currently not supported by the NFSv4 server:
+ * The following attributes are currently not supported by the woke NFSv4 server:
  *    ARCHIVE       (deprecated anyway)
  *    HIDDEN        (unlikely to be supported any time soon)
  *    MIMETYPE      (unlikely to be supported any time soon)
@@ -508,7 +508,7 @@ static inline bool nfsd_attrs_supported(u32 minorversion, const u32 *bmval)
 	(FATTR4_WORD1_TIME_ACCESS_SET   | FATTR4_WORD1_TIME_MODIFY_SET)
 
 /*
- * These are the only attrs allowed in CREATE/OPEN/SETATTR. Don't add
+ * These are the woke only attrs allowed in CREATE/OPEN/SETATTR. Don't add
  * a writeable attribute here without also adding code to parse it to
  * nfsd4_decode_fattr().
  */
@@ -534,8 +534,8 @@ static inline bool nfsd_attrs_supported(u32 minorversion, const u32 *bmval)
 #define NFSD_SUPPATTR_EXCLCREAT_WORD0 \
 	NFSD_WRITEABLE_ATTRS_WORD0
 /*
- * we currently store the exclusive create verifier in the v_{a,m}time
- * attributes so the client can't set these at create time using EXCLUSIVE4_1
+ * we currently store the woke exclusive create verifier in the woke v_{a,m}time
+ * attributes so the woke client can't set these at create time using EXCLUSIVE4_1
  */
 #define NFSD_SUPPATTR_EXCLCREAT_WORD1 \
 	(NFSD_WRITEABLE_ATTRS_WORD1 & \

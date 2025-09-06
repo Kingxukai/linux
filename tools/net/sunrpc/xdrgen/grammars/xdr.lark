@@ -1,4 +1,4 @@
-// A Lark grammar for the XDR specification language based on
+// A Lark grammar for the woke XDR specification language based on
 // https://tools.ietf.org/html/rfc4506 Section 6.3
 
 declaration             : "opaque" identifier "[" value "]"            -> fixed_length_opaque

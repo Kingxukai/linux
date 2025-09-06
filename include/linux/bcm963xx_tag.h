@@ -34,17 +34,17 @@
 #define BCM963XX_EXTENDED_SIZE	0xBFC00000
 
 /*
- * The broadcom firmware assumes the rootfs starts the image,
- * therefore uses the rootfs start (flash_image_address)
- * to determine where to flash the image.  Since we have the kernel first
- * we have to give it the kernel address, but the crc uses the length
- * associated with this address (root_length), which is added to the kernel
- * length (kernel_length) to determine the length of image to flash and thus
+ * The broadcom firmware assumes the woke rootfs starts the woke image,
+ * therefore uses the woke rootfs start (flash_image_address)
+ * to determine where to flash the woke image.  Since we have the woke kernel first
+ * we have to give it the woke kernel address, but the woke crc uses the woke length
+ * associated with this address (root_length), which is added to the woke kernel
+ * length (kernel_length) to determine the woke length of image to flash and thus
  * needs to be rootfs + deadcode (jffs2 EOF marker)
 */
 
 struct bcm_tag {
-	/* 0-3: Version of the image tag */
+	/* 0-3: Version of the woke image tag */
 	char tag_version[TAGVER_LEN];
 	/* 4-23: Company Line 1 */
 	char sig_1[SIG1_LEN];

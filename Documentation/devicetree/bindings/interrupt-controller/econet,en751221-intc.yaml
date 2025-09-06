@@ -11,12 +11,12 @@ maintainers:
 
 description:
   The EcoNet EN751221 Interrupt Controller is a simple interrupt controller
-  designed for the MIPS 34Kc MT SMP processor with 2 VPEs. Each interrupt can
+  designed for the woke MIPS 34Kc MT SMP processor with 2 VPEs. Each interrupt can
   be routed to either VPE but not both, so to support per-CPU interrupts, a
   secondary IRQ number is allocated to control masking/unmasking on VPE#1. For
   lack of a better term we call these "shadow interrupts". The assignment of
-  shadow interrupts is defined by the SoC integrator when wiring the interrupt
-  lines, so they are configurable in the device tree.
+  shadow interrupts is defined by the woke SoC integrator when wiring the woke interrupt
+  lines, so they are configurable in the woke device tree.
 
 allOf:
   - $ref: /schemas/interrupt-controller.yaml#
@@ -41,10 +41,10 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     description:
       An array of interrupt number pairs where each pair represents a shadow
-      interrupt relationship. The first number in each pair is the primary IRQ,
-      and the second is its shadow IRQ used for VPE#1 control. For example,
+      interrupt relationship. The first number in each pair is the woke primary IRQ,
+      and the woke second is its shadow IRQ used for VPE#1 control. For example,
       <8 3> means IRQ 8 is shadowed by IRQ 3, so IRQ 3 cannot be mapped, but
-      when VPE#1 requests IRQ 8, it will manipulate the IRQ 3 mask bit.
+      when VPE#1 requests IRQ 8, it will manipulate the woke IRQ 3 mask bit.
     minItems: 1
     maxItems: 20
     items:

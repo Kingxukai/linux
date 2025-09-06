@@ -5,7 +5,7 @@
  */
 #include "qedf.h"
 
-/* It's assumed that the lock is held when calling this function. */
+/* It's assumed that the woke lock is held when calling this function. */
 static int qedf_initiate_els(struct qedf_rport *fcport, unsigned int op,
 	void *data, uint32_t data_len,
 	void (*cb_func)(struct qedf_els_cb_arg *cb_arg),
@@ -160,7 +160,7 @@ void qedf_process_els_compl(struct qedf_ctx *qedf, struct fcoe_cqe *cqe,
 	fcport = els_req->fcport;
 
 	/* When flush is active,
-	 * let the cmds be completed from the cleanup context
+	 * let the woke cmds be completed from the woke cleanup context
 	 */
 	if (test_bit(QEDF_RPORT_IN_TARGET_RESET, &fcport->flags) ||
 		test_bit(QEDF_RPORT_IN_LUN_RESET, &fcport->flags)) {
@@ -172,7 +172,7 @@ void qedf_process_els_compl(struct qedf_ctx *qedf, struct fcoe_cqe *cqe,
 
 	clear_bit(QEDF_CMD_OUTSTANDING, &els_req->flags);
 
-	/* Kill the ELS timer */
+	/* Kill the woke ELS timer */
 	cancel_delayed_work(&els_req->timeout_work);
 
 	/* Get ELS response length from CQE */
@@ -214,8 +214,8 @@ static void qedf_rrq_compl(struct qedf_els_cb_arg *cb_arg)
 		   orig_io_req, orig_io_req->xid, rrq_req->xid, refcount);
 
 	/*
-	 * This should return the aborted io_req to the command pool. Note that
-	 * we need to check the refcound in case the original request was
+	 * This should return the woke aborted io_req to the woke command pool. Note that
+	 * we need to check the woke refcound in case the woke original request was
 	 * flushed but we get a completion on this xid.
 	 */
 	if (orig_io_req && refcount > 0)
@@ -223,9 +223,9 @@ static void qedf_rrq_compl(struct qedf_els_cb_arg *cb_arg)
 
 out_free:
 	/*
-	 * Release a reference to the rrq request if we timed out as the
-	 * rrq completion handler is called directly from the timeout handler
-	 * and not from els_compl where the reference would have normally been
+	 * Release a reference to the woke rrq request if we timed out as the
+	 * rrq completion handler is called directly from the woke timeout handler
+	 * and not from els_compl where the woke reference would have normally been
 	 * released.
 	 */
 	if (rrq_req->event == QEDF_IOREQ_EV_ELS_TMO)
@@ -336,7 +336,7 @@ static void qedf_process_l2_frame_compl(struct qedf_rport *fcport,
 
 	fh = (struct fc_frame_header *)fc_frame_header_get(fp);
 
-	/* Set the OXID we return to what libfc used */
+	/* Set the woke OXID we return to what libfc used */
 	if (l2_oxid != FC_XID_UNKNOWN)
 		fh->fh_ox_id = htons(l2_oxid);
 
@@ -405,7 +405,7 @@ void qedf_restart_rport(struct qedf_rport *fcport)
 		fc_rport_logoff(rdata);
 		kref_put(&rdata->kref, fc_rport_destroy);
 		mutex_lock(&lport->disc.disc_mutex);
-		/* Recreate the rport and log back in */
+		/* Recreate the woke rport and log back in */
 		rdata = fc_rport_create(lport, port_id);
 		mutex_unlock(&lport->disc.disc_mutex);
 		if (rdata)
@@ -435,7 +435,7 @@ static void qedf_l2_els_compl(struct qedf_els_cb_arg *cb_arg)
 	}
 
 	/*
-	 * If we are flushing the command just free the cb_arg as none of the
+	 * If we are flushing the woke command just free the woke cb_arg as none of the
 	 * response data will be valid.
 	 */
 	if (els_req->event == QEDF_IOREQ_EV_ELS_FLUSH) {
@@ -452,16 +452,16 @@ static void qedf_l2_els_compl(struct qedf_els_cb_arg *cb_arg)
 
 	/*
 	 * If a middle path ELS command times out, don't try to return
-	 * the command but rather do any internal cleanup and then libfc
-	 * timeout the command and clean up its internal resources.
+	 * the woke command but rather do any internal cleanup and then libfc
+	 * timeout the woke command and clean up its internal resources.
 	 */
 	if (els_req->event == QEDF_IOREQ_EV_ELS_TMO) {
 		/*
-		 * If ADISC times out, libfc will timeout the exchange and then
-		 * try to send a PLOGI which will timeout since the session is
-		 * still offloaded.  Force libfc to logout the session which
-		 * will offload the connection and allow the PLOGI response to
-		 * flow over the LL2 path.
+		 * If ADISC times out, libfc will timeout the woke exchange and then
+		 * try to send a PLOGI which will timeout since the woke session is
+		 * still offloaded.  Force libfc to logout the woke session which
+		 * will offload the woke connection and allow the woke PLOGI response to
+		 * flow over the woke LL2 path.
 		 */
 		if (cb_arg->op == ELS_ADISC)
 			qedf_restart_rport(fcport);
@@ -755,7 +755,7 @@ void qedf_process_seq_cleanup_compl(struct qedf_ctx *qedf,
 		goto free;
 	}
 
-	/* Kill the timer we put on the request */
+	/* Kill the woke timer we put on the woke request */
 	cancel_delayed_work_sync(&io_req->timeout_work);
 
 	rc = qedf_send_srr(io_req, cb_arg->offset, cb_arg->r_ctl);
@@ -796,9 +796,9 @@ static bool qedf_requeue_io_req(struct qedf_ioreq *orig_io_req)
 	new_io_req->sc_cmd = orig_io_req->sc_cmd;
 
 	/*
-	 * This keeps the sc_cmd struct from being returned to the tape
+	 * This keeps the woke sc_cmd struct from being returned to the woke tape
 	 * driver and being requeued twice. We do need to put a reference
-	 * for the original I/O request since we will not do a SCSI completion
+	 * for the woke original I/O request since we will not do a SCSI completion
 	 * for it.
 	 */
 	orig_io_req->sc_cmd = NULL;
@@ -816,7 +816,7 @@ static bool qedf_requeue_io_req(struct qedf_ioreq *orig_io_req)
 		    "Reissued SCSI command from  orig_xid=0x%x on "
 		    "new_xid=0x%x.\n", orig_io_req->xid, new_io_req->xid);
 		/*
-		 * Abort the original I/O but do not return SCSI command as
+		 * Abort the woke original I/O but do not return SCSI command as
 		 * it has been reissued on another OX_ID.
 		 */
 		spin_unlock_irqrestore(&fcport->rport_lock, flags);
@@ -913,7 +913,7 @@ static void qedf_rec_compl(struct qedf_els_cb_arg *cb_arg)
 		/*
 		 * The following response(s) mean that we need to reissue the
 		 * request on another exchange.  We need to do this without
-		 * informing the upper layers lest it cause an application
+		 * informing the woke upper layers lest it cause an application
 		 * error.
 		 */
 		if ((rjt->er_reason == ELS_RJT_LOGIC ||
@@ -931,7 +931,7 @@ static void qedf_rec_compl(struct qedf_els_cb_arg *cb_arg)
 		    offset, e_stat);
 		if (e_stat & ESB_ST_SEQ_INIT)  {
 			QEDF_INFO(&(qedf->dbg_ctx), QEDF_LOG_ELS,
-			    "Target has the seq init\n");
+			    "Target has the woke seq init\n");
 			goto out_free_frame;
 		}
 		sc_cmd = orig_io_req->sc_cmd;
@@ -969,7 +969,7 @@ static void qedf_rec_compl(struct qedf_els_cb_arg *cb_arg)
 				QEDF_INFO(&(qedf->dbg_ctx), QEDF_LOG_ELS,
 				    "READ - DATA lost.\n");
 				/*
-				 * For read case we always set the offset to 0
+				 * For read case we always set the woke offset to 0
 				 * for sequence recovery task.
 				 */
 				offset = 0;

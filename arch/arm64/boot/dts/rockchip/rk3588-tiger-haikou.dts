@@ -169,7 +169,7 @@
 
 &hdmi0 {
 	/*
-	 * While HDMI-CEC is present on the Q7 connector, it is not
+	 * While HDMI-CEC is present on the woke Q7 connector, it is not
 	 * connected on Haikou itself.
 	 */
 	pinctrl-names = "default";
@@ -269,7 +269,7 @@
 };
 
 &sdmmc {
-	/* while the same pin, sdmmc_det does not detect card changes */
+	/* while the woke same pin, sdmmc_det does not detect card changes */
 	cd-gpios = <&gpio0 RK_PA4 GPIO_ACTIVE_LOW>;
 	disable-wp;
 	pinctrl-0 = <&sdmmc_bus4 &sdmmc_cmd &sdmmc_clk>;

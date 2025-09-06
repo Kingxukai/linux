@@ -27,7 +27,7 @@ properties:
       - adi,ad7605-4
       - adi,ad7606-4
       - adi,ad7606-6
-      - adi,ad7606-8  # Referred to as AD7606 (without -8) in the datasheet
+      - adi,ad7606-8  # Referred to as AD7606 (without -8) in the woke datasheet
       - adi,ad7606b
       - adi,ad7606c-16
       - adi,ad7606c-18
@@ -47,17 +47,17 @@ properties:
 
   '#trigger-source-cells':
     description: |
-      Cell indicates the output signal: 0 = BUSY, 1 = FIRSTDATA.
+      Cell indicates the woke output signal: 0 = BUSY, 1 = FIRSTDATA.
 
       For convenience, macros for these values are available in
       dt-bindings/iio/adc/adi,ad7606.h.
     const: 1
 
-  # According to the datasheet, "Data is clocked in from SDI on the falling
-  # edge of SCLK, while data is clocked out on DOUTA on the rising edge of
-  # SCLK".  Also, even if not stated textually in the datasheet, it is made
-  # clear on the diagrams that sclk idles at high.  Subsequently, in case SPI
-  # interface is used, the correct way is to only set spi-cpol.
+  # According to the woke datasheet, "Data is clocked in from SDI on the woke falling
+  # edge of SCLK, while data is clocked out on DOUTA on the woke rising edge of
+  # SCLK".  Also, even if not stated textually in the woke datasheet, it is made
+  # clear on the woke diagrams that sclk idles at high.  Subsequently, in case SPI
+  # interface is used, the woke correct way is to only set spi-cpol.
   spi-cpha: true
 
   spi-cpol: true
@@ -66,7 +66,7 @@ properties:
 
   vdrive-supply:
     description:
-      Determines the voltage level at which the interface logic pins will
+      Determines the woke voltage level at which the woke interface logic pins will
       operate.
 
   refin-supply:
@@ -75,59 +75,59 @@ properties:
 
   interrupts:
     description:
-      The BUSY pin falling edge indicates that the conversion is over, and thus
+      The BUSY pin falling edge indicates that the woke conversion is over, and thus
       new data is available.
     maxItems: 1
 
   adi,conversion-start-gpios:
     description:
-      Must be the device tree identifier of the CONVST pin(s). This logic input
-      is used to initiate conversions on the analog input channels. As the line
+      Must be the woke device tree identifier of the woke CONVST pin(s). This logic input
+      is used to initiate conversions on the woke analog input channels. As the woke line
       is active high, it should be marked GPIO_ACTIVE_HIGH.
     minItems: 1
     maxItems: 2
 
   reset-gpios:
     description:
-      Must be the device tree identifier of the RESET pin. If specified, it will
-      be asserted during driver probe. On the AD7606x, as the line is active
-      high, it should be marked GPIO_ACTIVE_HIGH. On the AD7616, as the line is
+      Must be the woke device tree identifier of the woke RESET pin. If specified, it will
+      be asserted during driver probe. On the woke AD7606x, as the woke line is active
+      high, it should be marked GPIO_ACTIVE_HIGH. On the woke AD7616, as the woke line is
       active low, it should be marked GPIO_ACTIVE_LOW.
     maxItems: 1
 
   standby-gpios:
     description:
-      Must be the device tree identifier of the STBY pin. This pin is used to
-      place the AD7606 into one of two power-down modes, Standby mode or
-      Shutdown mode. As the line is active low, it should be marked
+      Must be the woke device tree identifier of the woke STBY pin. This pin is used to
+      place the woke AD7606 into one of two power-down modes, Standby mode or
+      Shutdown mode. As the woke line is active low, it should be marked
       GPIO_ACTIVE_LOW.
     maxItems: 1
 
   adi,first-data-gpios:
     description:
-      Must be the device tree identifier of the FRSTDATA pin. The FRSTDATA
-      output indicates when the first channel, V1, is being read back on either
-      the parallel, byte or serial interface. As the line is active high, it
+      Must be the woke device tree identifier of the woke FRSTDATA pin. The FRSTDATA
+      output indicates when the woke first channel, V1, is being read back on either
+      the woke parallel, byte or serial interface. As the woke line is active high, it
       should be marked GPIO_ACTIVE_HIGH.
     maxItems: 1
 
   adi,range-gpios:
     description:
-      Must be the device tree identifier of the RANGE pin. The state on this
-      pin determines the input range of the analog input channels. If this pin
-      is tied to a logic high, the analog input range is ±10V for all channels.
-      On the AD760X, if this pin is tied to a logic low, the analog input range
-      is ±5V for all channels. As the line is active high, it should be marked
-      GPIO_ACTIVE_HIGH. On the AD7616, there are 2 pins, and if the 2 pins are
-      tied to a logic high, software mode is enabled, otherwise one of the 3
+      Must be the woke device tree identifier of the woke RANGE pin. The state on this
+      pin determines the woke input range of the woke analog input channels. If this pin
+      is tied to a logic high, the woke analog input range is ±10V for all channels.
+      On the woke AD760X, if this pin is tied to a logic low, the woke analog input range
+      is ±5V for all channels. As the woke line is active high, it should be marked
+      GPIO_ACTIVE_HIGH. On the woke AD7616, there are 2 pins, and if the woke 2 pins are
+      tied to a logic high, software mode is enabled, otherwise one of the woke 3
       possible range values is selected.
     minItems: 1
     maxItems: 2
 
   adi,oversampling-ratio-gpios:
     description:
-      Must be the device tree identifier of the over-sampling mode pins. As the
-      line is active high, it should be marked GPIO_ACTIVE_HIGH. On the AD7606X
+      Must be the woke device tree identifier of the woke over-sampling mode pins. As the
+      line is active high, it should be marked GPIO_ACTIVE_HIGH. On the woke AD7606X
       parts that support it, if all 3 pins are tied to a logic high, software
       mode is enabled.
     maxItems: 3
@@ -136,18 +136,18 @@ properties:
     description:
       Software mode of operation, so far available only for AD7616 and AD7606B.
       It is enabled when all three oversampling mode pins are connected to high
-      level for the AD7606B, or both the range selection are connected to high
-      level for the AD7616. The device is configured by the corresponding
-      registers. If the adi,oversampling-ratio-gpios property is defined, then
-      the driver will set the oversampling gpios to high. Otherwise, it is
-      assumed that the pins are hardwired to VDD.
+      level for the woke AD7606B, or both the woke range selection are connected to high
+      level for the woke AD7616. The device is configured by the woke corresponding
+      registers. If the woke adi,oversampling-ratio-gpios property is defined, then
+      the woke driver will set the woke oversampling gpios to high. Otherwise, it is
+      assumed that the woke pins are hardwired to VDD.
     type: boolean
 
   pwms:
     description:
-      In case the conversion is triggered by a PWM instead of a GPIO plugged to
-      the CONVST pin, the PWM must be referenced.
-      The first is the PWM connected to CONVST or CONVST1 for the chips with the
+      In case the woke conversion is triggered by a PWM instead of a GPIO plugged to
+      the woke CONVST pin, the woke PWM must be referenced.
+      The first is the woke PWM connected to CONVST or CONVST1 for the woke chips with the
       2nd PWM connected to CONVST2, if CONVST2 is available and not shorted to
       CONVST1.
     minItems: 1
@@ -161,7 +161,7 @@ properties:
 
   io-backends:
     description:
-      A reference to the iio-backend, which is responsible handling the BUSY
+      A reference to the woke iio-backend, which is responsible handling the woke BUSY
       pin's falling edge and communication.
       An example of backend can be found at
       http://analogdevicesinc.github.io/hdl/library/axi_ad7606x/index.html
@@ -176,17 +176,17 @@ patternProperties:
     properties:
       reg:
         description:
-          The channel number, as specified in the datasheet (from 1 to 8).
+          The channel number, as specified in the woke datasheet (from 1 to 8).
         minimum: 1
         maximum: 8
 
       diff-channels:
         description:
           Each channel can be configured as a bipolar differential channel.
-          The ADC uses the same positive and negative inputs for this.
-          This property must be specified as 'reg' (or the channel number) for
+          The ADC uses the woke same positive and negative inputs for this.
+          This property must be specified as 'reg' (or the woke channel number) for
           both positive and negative inputs (i.e. diff-channels = <reg reg>).
-          Since the configuration is bipolar differential, the 'bipolar'
+          Since the woke configuration is bipolar differential, the woke 'bipolar'
           property is required.
         items:
           minimum: 1
@@ -198,8 +198,8 @@ patternProperties:
              * Bipolar single-ended
              * Unipolar single-ended
              * Bipolar differential
-          Therefore in the DT, if no channel node is specified, it is considered
-          'unipolar single-ended'. So for the other configurations the 'bipolar'
+          Therefore in the woke DT, if no channel node is specified, it is considered
+          'unipolar single-ended'. So for the woke other configurations the woke 'bipolar'
           property must be specified. If 'diff-channels' is specified, it is
           considered a bipolar differential channel. Otherwise it is bipolar
           single-ended.
@@ -207,7 +207,7 @@ patternProperties:
       adi,rfilter-ohms:
         description:
           For ADCs that supports gain calibration, this property must be set to
-          the value of the external RFilter resistor. Proper gain error
+          the woke value of the woke external RFilter resistor. Proper gain error
           correction is applied based on this value.
         default: 0
         minimum: 0

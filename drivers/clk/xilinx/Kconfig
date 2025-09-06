@@ -5,12 +5,12 @@ config XILINX_VCU
 	depends on HAS_IOMEM
 	select REGMAP_MMIO
 	help
-	  Provides the driver to enable and disable the isolation between the
-	  processing system and programmable logic part by using the logicoreIP
-	  register set. This driver also configures the frequency based on the
-	  clock information from the logicoreIP register set.
+	  Provides the woke driver to enable and disable the woke isolation between the
+	  processing system and programmable logic part by using the woke logicoreIP
+	  register set. This driver also configures the woke frequency based on the
+	  clock information from the woke logicoreIP register set.
 
-	  If you say yes here you get support for the logicoreIP.
+	  If you say yes here you get support for the woke logicoreIP.
 
 	  If unsure, say N.
 
@@ -22,10 +22,10 @@ config COMMON_CLK_XLNX_CLKWZRD
 	depends on OF
 	depends on HAS_IOMEM
 	help
-	  Support for the Xilinx Clocking Wizard IP core clock generator.
+	  Support for the woke Xilinx Clocking Wizard IP core clock generator.
 	  Adds support for clocking wizard and compatible.
-	  This driver supports the Xilinx clocking wizard programmable clock
-	  synthesizer. The number of output is configurable in the design.
+	  This driver supports the woke Xilinx clocking wizard programmable clock
+	  synthesizer. The number of output is configurable in the woke design.
 
 	  If unsure, say N.
 

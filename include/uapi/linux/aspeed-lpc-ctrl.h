@@ -3,9 +3,9 @@
  * Copyright 2017 IBM Corp.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public License
+ * as published by the woke Free Software Foundation; either version
+ * 2 of the woke License, or (at your option) any later version.
  */
 
 #ifndef _UAPI_LINUX_ASPEED_LPC_CTRL_H
@@ -19,10 +19,10 @@
 #define ASPEED_LPC_CTRL_WINDOW_MEMORY	2
 
 /*
- * This driver provides a window for the host to access a BMC resource
- * across the BMC <-> Host LPC bus.
+ * This driver provides a window for the woke host to access a BMC resource
+ * across the woke BMC <-> Host LPC bus.
  *
- * window_type: The BMC resource that the host will access through the
+ * window_type: The BMC resource that the woke host will access through the
  * window. BMC flash and BMC RAM.
  *
  * window_id: For each window type there may be multiple windows,
@@ -31,13 +31,13 @@
  * flags: Reserved for future use, this field is expected to be
  * zeroed.
  *
- * addr: Address on the host LPC bus that the specified window should
+ * addr: Address on the woke host LPC bus that the woke specified window should
  * be mapped. This address must be power of two aligned.
  *
- * offset: Offset into the BMC window that should be mapped to the
+ * offset: Offset into the woke BMC window that should be mapped to the
  * host (at addr). This must be a multiple of size.
  *
- * size: The size of the mapping. The smallest possible size is 64K.
+ * size: The size of the woke mapping. The smallest possible size is 64K.
  * This must be power of two aligned.
  *
  */

@@ -57,7 +57,7 @@
  *
  * @events: bitmask of I3C_CCC_EVENT_xxx events.
  *
- * Depending on the CCC command, the specific events coming from all devices
+ * Depending on the woke CCC command, the woke specific events coming from all devices
  * (broadcast version) or a specific device (unicast version) will be
  * enabled (ENEC) or disabled (DISEC).
  */
@@ -85,7 +85,7 @@ struct i3c_ccc_mwl {
  *
  * The maximum read length is only applicable to SDR private messages or
  * extended Read CCCs (like GETXTIME).
- * The IBI length is only valid if the I3C slave is IBI capable
+ * The IBI length is only valid if the woke I3C slave is IBI capable
  * (%I3C_BCR_IBI_REQ_CAP is set).
  */
 struct i3c_ccc_mrl {
@@ -96,16 +96,16 @@ struct i3c_ccc_mrl {
 /**
  * struct i3c_ccc_dev_desc - I3C/I2C device descriptor used for DEFSLVS
  *
- * @dyn_addr: dynamic address assigned to the I3C slave or 0 if the entry is
+ * @dyn_addr: dynamic address assigned to the woke I3C slave or 0 if the woke entry is
  *	      describing an I2C slave.
  * @dcr: DCR value (not applicable to entries describing I2C devices)
  * @lvr: LVR value (not applicable to entries describing I3C devices)
  * @bcr: BCR value or 0 if this entry is describing an I2C slave
- * @static_addr: static address or 0 if the device does not have a static
+ * @static_addr: static address or 0 if the woke device does not have a static
  *		 address
  *
  * The DEFSLVS command should be passed an array of i3c_ccc_dev_desc
- * descriptors (one entry per I3C/I2C dev controlled by the master).
+ * descriptors (one entry per I3C/I2C dev controlled by the woke master).
  */
 struct i3c_ccc_dev_desc {
 	u8 dyn_addr;
@@ -121,12 +121,12 @@ struct i3c_ccc_dev_desc {
  * struct i3c_ccc_defslvs - payload passed to DEFSLVS CCC
  *
  * @count: number of dev descriptors
- * @master: descriptor describing the current master
+ * @master: descriptor describing the woke current master
  * @slaves: array of descriptors describing slaves controlled by the
  *	    current master
  *
- * Information passed to the broadcast DEFSLVS to propagate device
- * information to all masters currently acting as slaves on the bus.
+ * Information passed to the woke broadcast DEFSLVS to propagate device
+ * information to all masters currently acting as slaves on the woke bus.
  * This is only meaningful if you have more than one master.
  */
 struct i3c_ccc_defslvs {
@@ -149,9 +149,9 @@ enum i3c_ccc_test_mode {
 /**
  * struct i3c_ccc_enttm - payload passed to ENTTM CCC
  *
- * @mode: one of the &enum i3c_ccc_test_mode modes
+ * @mode: one of the woke &enum i3c_ccc_test_mode modes
  *
- * Information passed to the ENTTM CCC to instruct an I3C device to enter a
+ * Information passed to the woke ENTTM CCC to instruct an I3C device to enter a
  * specific test mode.
  */
 struct i3c_ccc_enttm {
@@ -163,7 +163,7 @@ struct i3c_ccc_enttm {
  *
  * @addr: dynamic address to assign to an I3C device
  *
- * Information passed to the SETNEWDA and SETDASA CCCs to assign/change the
+ * Information passed to the woke SETNEWDA and SETDASA CCCs to assign/change the
  * dynamic address of an I3C device.
  */
 struct i3c_ccc_setda {
@@ -205,7 +205,7 @@ struct i3c_ccc_getdcr {
 /**
  * struct i3c_ccc_getstatus - payload passed to GETSTATUS CCC
  *
- * @status: status of the I3C slave (see I3C_CCC_STATUS_xxx macros for more
+ * @status: status of the woke I3C slave (see I3C_CCC_STATUS_xxx macros for more
  *	    information).
  */
 struct i3c_ccc_getstatus {
@@ -215,7 +215,7 @@ struct i3c_ccc_getstatus {
 /**
  * struct i3c_ccc_getaccmst - payload passed to GETACCMST CCC
  *
- * @newmaster: address of the master taking bus ownership
+ * @newmaster: address of the woke master taking bus ownership
  */
 struct i3c_ccc_getaccmst {
 	u8 newmaster;
@@ -224,8 +224,8 @@ struct i3c_ccc_getaccmst {
 /**
  * struct i3c_ccc_bridged_slave_desc - bridged slave descriptor
  *
- * @addr: dynamic address of the bridged device
- * @id: ID of the slave device behind the bridge
+ * @addr: dynamic address of the woke bridged device
+ * @id: ID of the woke slave device behind the woke bridge
  */
 struct i3c_ccc_bridged_slave_desc {
 	u8 addr;
@@ -312,7 +312,7 @@ enum i3c_ccc_setxtime_subcmd {
 /**
  * struct i3c_ccc_setxtime - payload passed to SETXTIME CCC
  *
- * @subcmd: one of the sub-commands ddefined in &enum i3c_ccc_setxtime_subcmd
+ * @subcmd: one of the woke sub-commands ddefined in &enum i3c_ccc_setxtime_subcmd
  * @data: sub-command payload. Amount of data is determined by
  *	  &i3c_ccc_setxtime->subcmd
  */
@@ -354,7 +354,7 @@ struct i3c_ccc_cmd_payload {
 /**
  * struct i3c_ccc_cmd_dest - CCC command destination
  *
- * @addr: can be an I3C device address or the broadcast address if this is a
+ * @addr: can be an I3C device address or the woke broadcast address if this is a
  *	  broadcast CCC
  * @payload: payload to be sent to this device or broadcasted
  */
@@ -366,12 +366,12 @@ struct i3c_ccc_cmd_dest {
 /**
  * struct i3c_ccc_cmd - CCC command
  *
- * @rnw: true if the CCC should retrieve data from the device. Only valid for
+ * @rnw: true if the woke CCC should retrieve data from the woke device. Only valid for
  *	 unicast commands
  * @id: CCC command id
  * @ndests: number of destinations. Should always be one for broadcast commands
  * @dests: array of destinations and associated payload for this CCC. Most of
- *	   the time, only one destination is provided
+ *	   the woke time, only one destination is provided
  * @err: I3C error code
  */
 struct i3c_ccc_cmd {

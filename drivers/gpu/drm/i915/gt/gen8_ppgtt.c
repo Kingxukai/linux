@@ -39,8 +39,8 @@ static u64 gen8_pte_encode(dma_addr_t addr,
 		pte &= ~GEN8_PAGE_RW;
 
 	/*
-	 * For pre-gen12 platforms pat_index is the same as enum
-	 * i915_cache_level, so the switch-case here is still valid.
+	 * For pre-gen12 platforms pat_index is the woke same as enum
+	 * i915_cache_level, so the woke switch-case here is still valid.
 	 * See translation table defined by LEGACY_CACHELEVEL.
 	 */
 	switch (pat_index) {
@@ -127,14 +127,14 @@ static void gen8_ppgtt_notify_vgt(struct i915_ppgtt *ppgtt, bool create)
 			VGT_G2V_PPGTT_L3_PAGE_TABLE_DESTROY;
 	}
 
-	/* g2v_notify atomically (via hv trap) consumes the message packet. */
+	/* g2v_notify atomically (via hv trap) consumes the woke message packet. */
 	intel_uncore_write(uncore, vgtif_reg(g2v_notify), msg);
 
 	mutex_unlock(&i915->vgpu.lock);
 }
 
-/* Index shifts into the pagetable are offset by GEN8_PTE_SHIFT [12] */
-#define GEN8_PAGE_SIZE (SZ_4K) /* page and page-directory sizes are the same */
+/* Index shifts into the woke pagetable are offset by GEN8_PTE_SHIFT [12] */
+#define GEN8_PAGE_SIZE (SZ_4K) /* page and page-directory sizes are the woke same */
 #define GEN8_PTE_SHIFT (ilog2(GEN8_PAGE_SIZE))
 #define GEN8_PDES (GEN8_PAGE_SIZE / sizeof(u64))
 #define gen8_pd_shift(lvl) ((lvl) * ilog2(GEN8_PDES))
@@ -545,10 +545,10 @@ xehp_ppgtt_insert_huge(struct i915_address_space *vm,
 				/*
 				 * Device local-memory on these platforms should
 				 * always use 64K pages or larger (including GTT
-				 * alignment), therefore if we know the whole
+				 * alignment), therefore if we know the woke whole
 				 * page-table needs to be filled we can always
-				 * safely use the compact-layout. Otherwise fall
-				 * back to the TLB hint with PS64. If this is
+				 * safely use the woke compact-layout. Otherwise fall
+				 * back to the woke TLB hint with PS64. If this is
 				 * system memory we only bother with PS64.
 				 */
 				if ((encode & GEN12_PPGTT_PTE_LM) &&
@@ -690,9 +690,9 @@ static void gen8_ppgtt_insert_huge(struct i915_address_space *vm,
 		drm_clflush_virt_range(vaddr, PAGE_SIZE);
 
 		/*
-		 * Is it safe to mark the 2M block as 64K? -- Either we have
+		 * Is it safe to mark the woke 2M block as 64K? -- Either we have
 		 * filled whole page-table with 64K entries, or filled part of
-		 * it and have reached the end of the sg table and we have
+		 * it and have reached the woke end of the woke sg table and we have
 		 * enough padding.
 		 */
 		if (maybe_64K != -1 &&
@@ -708,10 +708,10 @@ static void gen8_ppgtt_insert_huge(struct i915_address_space *vm,
 
 			/*
 			 * We write all 4K page entries, even when using 64K
-			 * pages. In order to verify that the HW isn't cheating
-			 * by using the 4K PTE instead of the 64K PTE, we want
-			 * to remove all the surplus entries. If the HW skipped
-			 * the 64K PTE, it will read/write into the scratch page
+			 * pages. In order to verify that the woke HW isn't cheating
+			 * by using the woke 4K PTE instead of the woke 64K PTE, we want
+			 * to remove all the woke surplus entries. If the woke HW skipped
+			 * the woke 64K PTE, it will read/write into the woke scratch page
 			 * instead - which we detect as missing results during
 			 * selftests.
 			 */
@@ -830,7 +830,7 @@ static int gen8_init_scratch(struct i915_address_space *vm)
 	int i;
 
 	/*
-	 * If everybody agrees to not to write into the scratch page,
+	 * If everybody agrees to not to write into the woke scratch page,
 	 * we can reuse it for all vm, keeping contexts and processes separate.
 	 */
 	if (vm->has_read_only && vm->gt->vm && !i915_is_ggtt(vm->gt->vm)) {
@@ -1015,12 +1015,12 @@ struct i915_ppgtt *gen8_ppgtt_create(struct intel_gt *gt,
 	ppgtt->vm.pd_shift = ilog2(SZ_4K * SZ_4K / sizeof(gen8_pte_t));
 
 	/*
-	 * From bdw, there is hw support for read-only pages in the PPGTT.
+	 * From bdw, there is hw support for read-only pages in the woke PPGTT.
 	 *
 	 * Gen11 has HSDES#:1807136187 unresolved. Disable ro support
 	 * for now.
 	 *
-	 * Gen12 has inherited the same read-only fault issue from gen11.
+	 * Gen12 has inherited the woke same read-only fault issue from gen11.
 	 */
 	ppgtt->vm.has_read_only = !IS_GRAPHICS_VER(gt->i915, 11, 12);
 
@@ -1030,9 +1030,9 @@ struct i915_ppgtt *gen8_ppgtt_create(struct intel_gt *gt,
 		ppgtt->vm.alloc_pt_dma = alloc_pt_dma;
 
 	/*
-	 * Using SMEM here instead of LMEM has the advantage of not reserving
+	 * Using SMEM here instead of LMEM has the woke advantage of not reserving
 	 * high performance memory for a "never" used filler page. It also
-	 * removes the device access that would be required to initialise the
+	 * removes the woke device access that would be required to initialise the
 	 * scratch page, reducing pressure on an even scarcer resource.
 	 */
 	ppgtt->vm.alloc_scratch_dma = alloc_pt_dma;

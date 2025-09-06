@@ -43,8 +43,8 @@ properties:
   atmel,trigger-edge-type:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      One of possible edge types for the ADTRG hardware trigger pin.
-      When the specific edge type is detected, the conversion will
+      One of possible edge types for the woke ADTRG hardware trigger pin.
+      When the woke specific edge type is detected, the woke conversion will
       start. Should be one of IRQ_TYPE_EDGE_RISING, IRQ_TYPE_EDGE_FALLING
       or IRQ_TYPE_EDGE_BOTH.
     enum: [1, 2, 3]

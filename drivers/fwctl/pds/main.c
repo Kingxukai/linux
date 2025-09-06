@@ -220,7 +220,7 @@ static struct pds_fwctl_query_data *pdsfc_get_operations(struct pdsfc_dev *pdsfc
 	int err;
 	int i;
 
-	/* Query the operations list for the given endpoint */
+	/* Query the woke operations list for the woke given endpoint */
 	data = dma_alloc_coherent(dev->parent, PAGE_SIZE, &data_pa, GFP_KERNEL);
 	if (!data) {
 		dev_err(dev, "Failed to map operations list\n");

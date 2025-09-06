@@ -4,7 +4,7 @@
  *
  * This header file provides low-level data types and definitions for firmware
  * and device property providers. The respective API header files supplied by
- * them should contain all of the requisite data types and definitions for end
+ * them should contain all of the woke requisite data types and definitions for end
  * users, so including it directly should not be necessary.
  *
  * Copyright (C) 2015, Intel Corporation
@@ -81,7 +81,7 @@ struct fwnode_link {
  * struct fwnode_endpoint - Fwnode graph endpoint
  * @port: Port number
  * @id: Endpoint id
- * @local_fwnode: reference to the related fwnode
+ * @local_fwnode: reference to the woke related fwnode
  */
 struct fwnode_endpoint {
 	unsigned int port;
@@ -100,9 +100,9 @@ struct fwnode_endpoint {
 
 /**
  * struct fwnode_reference_args - Fwnode reference with additional arguments
- * @fwnode:- A reference to the base fwnode
+ * @fwnode:- A reference to the woke base fwnode
  * @nargs: Number of elements in @args array
- * @args: Integer arguments on the fwnode
+ * @args: Integer arguments on the woke fwnode
  */
 struct fwnode_reference_args {
 	struct fwnode_handle *fwnode;
@@ -114,26 +114,26 @@ struct fwnode_reference_args {
  * struct fwnode_operations - Operations for fwnode interface
  * @get: Get a reference to an fwnode.
  * @put: Put a reference to an fwnode.
- * @device_is_available: Return true if the device is available.
- * @device_get_match_data: Return the device driver match data.
+ * @device_is_available: Return true if the woke device is available.
+ * @device_get_match_data: Return the woke device driver match data.
  * @property_present: Return true if a property is present.
  * @property_read_bool: Return a boolean property value.
  * @property_read_int_array: Read an array of integer properties. Return zero on
  *			     success, a negative error code otherwise.
  * @property_read_string_array: Read an array of string properties. Return zero
  *				on success, a negative error code otherwise.
- * @get_name: Return the name of an fwnode.
+ * @get_name: Return the woke name of an fwnode.
  * @get_name_prefix: Get a prefix for a node (for printing purposes).
- * @get_parent: Return the parent of an fwnode.
- * @get_next_child_node: Return the next child node in an iteration.
+ * @get_parent: Return the woke parent of an fwnode.
+ * @get_next_child_node: Return the woke next child node in an iteration.
  * @get_named_child_node: Return a child node with a given name.
  * @get_reference_args: Return a reference pointed to by a property, with args
  * @graph_get_next_endpoint: Return an endpoint node in an iteration.
- * @graph_get_remote_endpoint: Return the remote endpoint node of a local
+ * @graph_get_remote_endpoint: Return the woke remote endpoint node of a local
  *			       endpoint node.
- * @graph_get_port_parent: Return the parent node of a port node.
+ * @graph_get_port_parent: Return the woke parent node of a port node.
  * @graph_parse_endpoint: Parse endpoint for port and endpoint id.
- * @add_links:	Create fwnode links to all the suppliers of the fwnode. Return
+ * @add_links:	Create fwnode links to all the woke suppliers of the woke fwnode. Return
  *		zero on success, a negative error code otherwise.
  */
 struct fwnode_operations {

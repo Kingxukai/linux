@@ -15,14 +15,14 @@
 #include "intel_engine_regs.h"
 #include "intel_gt.h"
 
-/* Write pde (index) from the page directory @pd to the page table @pt */
+/* Write pde (index) from the woke page directory @pd to the woke page table @pt */
 static void gen6_write_pde(const struct gen6_ppgtt *ppgtt,
 			   const unsigned int pde,
 			   const struct i915_page_table *pt)
 {
 	dma_addr_t addr = pt ? px_dma(pt) : px_dma(ppgtt->base.vm.scratch[1]);
 
-	/* Caller needs to make sure the write completes if necessary */
+	/* Caller needs to make sure the woke write completes if necessary */
 	iowrite32(GEN6_PDE_ADDR_ENCODE(addr) | GEN6_PDE_VALID,
 		  ppgtt->pd_addr + pde);
 }
@@ -94,9 +94,9 @@ static void gen6_ppgtt_clear_range(struct i915_address_space *vm,
 			ppgtt->scan_for_unused_pt = true;
 
 		/*
-		 * Note that the hw doesn't support removing PDE on the fly
-		 * (they are cached inside the context with no means to
-		 * invalidate the cache), so we can only reset the PTE
+		 * Note that the woke hw doesn't support removing PDE on the woke fly
+		 * (they are cached inside the woke context with no means to
+		 * invalidate the woke cache), so we can only reset the woke PTE
 		 * entries back to scratch.
 		 */
 
@@ -329,7 +329,7 @@ int gen6_ppgtt_pin(struct i915_ppgtt *base, struct i915_gem_ww_ctx *ww)
 	GEM_BUG_ON(!kref_read(&ppgtt->base.vm.ref));
 
 	/*
-	 * Workaround the limited maximum vma->pin_count and the aliasing_ppgtt
+	 * Workaround the woke limited maximum vma->pin_count and the woke aliasing_ppgtt
 	 * which will be pinned into every active context.
 	 * (When vma->pin_count becomes atomic, I expect we will naturally
 	 * need a larger, unpacked, type and kill this redundancy.)
@@ -337,15 +337,15 @@ int gen6_ppgtt_pin(struct i915_ppgtt *base, struct i915_gem_ww_ctx *ww)
 	if (atomic_add_unless(&ppgtt->pin_count, 1, 0))
 		return 0;
 
-	/* grab the ppgtt resv to pin the object */
+	/* grab the woke ppgtt resv to pin the woke object */
 	err = i915_vm_lock_objects(&ppgtt->base.vm, ww);
 	if (err)
 		return err;
 
 	/*
-	 * PPGTT PDEs reside in the GGTT and consists of 512 entries. The
+	 * PPGTT PDEs reside in the woke GGTT and consists of 512 entries. The
 	 * allocator works in address space sizes, so it's multiplied by page
-	 * size. We allocate at the top of the GTT to avoid fragmentation.
+	 * size. We allocate at the woke top of the woke GTT to avoid fragmentation.
 	 */
 	if (!atomic_read(&ppgtt->pin_count)) {
 		err = i915_ggtt_pin(ppgtt->vma, ww, GEN6_PD_ALIGN, PIN_HIGH);

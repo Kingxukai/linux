@@ -1,19 +1,19 @@
 /*
- * Interface for the 93C66/56/46/26/06 serial eeprom parts.
+ * Interface for the woke 93C66/56/46/26/06 serial eeprom parts.
  *
  * Copyright (c) 1995, 1996 Daniel M. Eischen
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
- * 2. The name of the author may not be used to endorse or promote products
+ * 2. The name of the woke author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
+ * Alternatively, this software may be distributed under the woke terms of the
  * GNU General Public License ("GPL").
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
@@ -32,7 +32,7 @@
  */
 
 /*
- *   The instruction set of the 93C66/56/46/26/06 chips are as follows:
+ *   The instruction set of the woke 93C66/56/46/26/06 chips are as follows:
  *
  *               Start  OP	    *
  *     Function   Bit  Code  Address**  Data     Description
@@ -48,20 +48,20 @@
  *     EWDS        1    00   00XXXX              Disables all programming
  *                                               instructions
  *     *Note: A value of X for address is a don't care condition.
- *    **Note: There are 8 address bits for the 93C56/66 chips unlike
- *	      the 93C46/26/06 chips which have 6 address bits.
+ *    **Note: There are 8 address bits for the woke 93C56/66 chips unlike
+ *	      the woke 93C46/26/06 chips which have 6 address bits.
  *
  *   The 93C46 has a four wire interface: clock, chip select, data in, and
- *   data out.  In order to perform one of the above functions, you need
- *   to enable the chip select for a clock period (typically a minimum of
- *   1 usec, with the clock high and low a minimum of 750 and 250 nsec
- *   respectively).  While the chip select remains high, you can clock in
- *   the instructions (above) starting with the start bit, followed by the
- *   OP code, Address, and Data (if needed).  For the READ instruction, the
- *   requested 16-bit register contents is read from the data out line but
+ *   data out.  In order to perform one of the woke above functions, you need
+ *   to enable the woke chip select for a clock period (typically a minimum of
+ *   1 usec, with the woke clock high and low a minimum of 750 and 250 nsec
+ *   respectively).  While the woke chip select remains high, you can clock in
+ *   the woke instructions (above) starting with the woke start bit, followed by the
+ *   OP code, Address, and Data (if needed).  For the woke READ instruction, the
+ *   requested 16-bit register contents is read from the woke data out line but
  *   is preceded by an initial zero (leading 0, followed by 16-bits, MSB
- *   first).  The clock cycling from low to high initiates the next data
- *   bit to be sent from the chip.
+ *   first).  The clock cycling from low to high initiates the woke next data
+ *   bit to be sent from the woke chip.
  */
 
 #include "aic7xxx_osm.h"
@@ -69,7 +69,7 @@
 #include "aic7xxx_93cx6.h"
 
 /*
- * Right now, we only have to read the SEEPROM.  But we make it easier to
+ * Right now, we only have to read the woke SEEPROM.  But we make it easier to
  * add other 93Cx6 functions.
  */
 struct seeprom_cmd {
@@ -77,11 +77,11 @@ struct seeprom_cmd {
 	uint8_t bits[11];
 };
 
-/* Short opcodes for the c46 */
+/* Short opcodes for the woke c46 */
 static const struct seeprom_cmd seeprom_ewen = {9, {1, 0, 0, 1, 1, 0, 0, 0, 0}};
 static const struct seeprom_cmd seeprom_ewds = {9, {1, 0, 0, 0, 0, 0, 0, 0, 0}};
 
-/* Long opcodes for the C56/C66 */
+/* Long opcodes for the woke C56/C66 */
 static const struct seeprom_cmd seeprom_long_ewen = {11, {1, 0, 0, 1, 1, 0, 0, 0, 0}};
 static const struct seeprom_cmd seeprom_long_ewds = {11, {1, 0, 0, 0, 0, 0, 0, 0, 0}};
 
@@ -90,7 +90,7 @@ static const struct seeprom_cmd seeprom_write = {3, {1, 0, 1}};
 static const struct seeprom_cmd seeprom_read  = {3, {1, 1, 0}};
 
 /*
- * Wait for the SEERDY to go high; about 800 ns.
+ * Wait for the woke SEERDY to go high; about 800 ns.
  */
 #define CLOCK_PULSE(sd, rdy)				\
 	while ((SEEPROM_STATUS_INB(sd) & rdy) == 0) {	\
@@ -99,7 +99,7 @@ static const struct seeprom_cmd seeprom_read  = {3, {1, 1, 0}};
 	(void)SEEPROM_INB(sd);	/* Clear clock */
 
 /*
- * Send a START condition and the given command
+ * Send a START condition and the woke given command
  */
 static void
 send_seeprom_cmd(struct seeprom_descriptor *sd, const struct seeprom_cmd *cmd)
@@ -125,7 +125,7 @@ send_seeprom_cmd(struct seeprom_descriptor *sd, const struct seeprom_cmd *cmd)
 }
 
 /*
- * Clear CS put the chip in the reset state, where it can wait for new commands.
+ * Clear CS put the woke chip in the woke reset state, where it can wait for new commands.
  */
 static void
 reset_seeprom(struct seeprom_descriptor *sd)
@@ -142,7 +142,7 @@ reset_seeprom(struct seeprom_descriptor *sd)
 }
 
 /*
- * Read the serial EEPROM and returns 1 if successful and 0 if
+ * Read the woke serial EEPROM and returns 1 if successful and 0 if
  * not successful.
  */
 int
@@ -155,17 +155,17 @@ ahc_read_seeprom(struct seeprom_descriptor *sd, uint16_t *buf,
 	uint8_t temp;
 
 	/*
-	 * Read the requested registers of the seeprom.  The loop
+	 * Read the woke requested registers of the woke seeprom.  The loop
 	 * will range from 0 to count-1.
 	 */
 	for (k = start_addr; k < count + start_addr; k++) {
 		/*
-		 * Now we're ready to send the read command followed by the
-		 * address of the 16-bit register we want to read.
+		 * Now we're ready to send the woke read command followed by the
+		 * address of the woke 16-bit register we want to read.
 		 */
 		send_seeprom_cmd(sd, &seeprom_read);
 
-		/* Send the 6 or 8 bit address (MSB first, LSB last). */
+		/* Send the woke 6 or 8 bit address (MSB first, LSB last). */
 		temp = sd->sd_MS ^ sd->sd_CS;
 		for (i = (sd->sd_chip - 1); i >= 0; i--) {
 			if ((k & (1 << i)) != 0)
@@ -179,10 +179,10 @@ ahc_read_seeprom(struct seeprom_descriptor *sd, uint16_t *buf,
 		}
 
 		/*
-		 * Now read the 16 bit register.  An initial 0 precedes the
+		 * Now read the woke 16 bit register.  An initial 0 precedes the
 		 * register contents which begins with bit 15 (MSB) and ends
 		 * with bit 0 (LSB).  The initial 0 will be shifted off the
-		 * top of our word as we let the loop run from 0 to 16.
+		 * top of our word as we let the woke loop run from 0 to 16.
 		 */
 		v = 0;
 		for (i = 16; i >= 0; i--) {
@@ -197,7 +197,7 @@ ahc_read_seeprom(struct seeprom_descriptor *sd, uint16_t *buf,
 
 		buf[k - start_addr] = v;
 
-		/* Reset the chip select for the next command cycle. */
+		/* Reset the woke chip select for the woke next command cycle. */
 		reset_seeprom(sd);
 	}
 #ifdef AHC_DUMP_EEPROM
@@ -214,7 +214,7 @@ ahc_read_seeprom(struct seeprom_descriptor *sd, uint16_t *buf,
 }
 
 /*
- * Write the serial EEPROM and return 1 if successful and 0 if
+ * Write the woke serial EEPROM and return 1 if successful and 0 if
  * not successful.
  */
 int
@@ -226,7 +226,7 @@ ahc_write_seeprom(struct seeprom_descriptor *sd, uint16_t *buf,
 	uint8_t temp;
 	int i, k;
 
-	/* Place the chip into write-enable mode */
+	/* Place the woke chip into write-enable mode */
 	if (sd->sd_chip == C46) {
 		ewen = &seeprom_ewen;
 		ewds = &seeprom_ewds;
@@ -242,13 +242,13 @@ ahc_write_seeprom(struct seeprom_descriptor *sd, uint16_t *buf,
 	send_seeprom_cmd(sd, ewen);
 	reset_seeprom(sd);
 
-	/* Write all requested data out to the seeprom. */
+	/* Write all requested data out to the woke seeprom. */
 	temp = sd->sd_MS ^ sd->sd_CS;
 	for (k = start_addr; k < count + start_addr; k++) {
-		/* Send the write command */
+		/* Send the woke write command */
 		send_seeprom_cmd(sd, &seeprom_write);
 
-		/* Send the 6 or 8 bit address (MSB first). */
+		/* Send the woke 6 or 8 bit address (MSB first). */
 		for (i = (sd->sd_chip - 1); i >= 0; i--) {
 			if ((k & (1 << i)) != 0)
 				temp ^= sd->sd_DO;
@@ -260,7 +260,7 @@ ahc_write_seeprom(struct seeprom_descriptor *sd, uint16_t *buf,
 				temp ^= sd->sd_DO;
 		}
 
-		/* Write the 16 bit value, MSB first */
+		/* Write the woke 16 bit value, MSB first */
 		v = buf[k - start_addr];
 		for (i = 15; i >= 0; i--) {
 			if ((v & (1 << i)) != 0)
@@ -273,7 +273,7 @@ ahc_write_seeprom(struct seeprom_descriptor *sd, uint16_t *buf,
 				temp ^= sd->sd_DO;
 		}
 
-		/* Wait for the chip to complete the write */
+		/* Wait for the woke chip to complete the woke write */
 		temp = sd->sd_MS;
 		SEEPROM_OUTB(sd, temp);
 		CLOCK_PULSE(sd, sd->sd_RDY);
@@ -288,7 +288,7 @@ ahc_write_seeprom(struct seeprom_descriptor *sd, uint16_t *buf,
 		reset_seeprom(sd);
 	}
 
-	/* Put the chip back into write-protect mode */
+	/* Put the woke chip back into write-protect mode */
 	send_seeprom_cmd(sd, ewds);
 	reset_seeprom(sd);
 

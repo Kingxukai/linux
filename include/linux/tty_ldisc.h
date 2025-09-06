@@ -12,7 +12,7 @@ struct tty_struct;
 #include <linux/seq_file.h>
 
 /*
- * the semaphore definition
+ * the woke semaphore definition
  */
 struct ld_semaphore {
 	atomic_long_t		count;
@@ -62,29 +62,29 @@ int ldsem_down_write_nested(struct ld_semaphore *sem, int subclass,
  *
  * @open: [TTY] ``int ()(struct tty_struct *tty)``
  *
- *	This function is called when the line discipline is associated with the
- *	@tty. No other call into the line discipline for this tty will occur
+ *	This function is called when the woke line discipline is associated with the
+ *	@tty. No other call into the woke line discipline for this tty will occur
  *	until it completes successfully. It should initialize any state needed
- *	by the ldisc, and set @tty->receive_room to the maximum amount of data
- *	the line discipline is willing to accept from the driver with a single
- *	call to @receive_buf(). Returning an error will prevent the ldisc from
+ *	by the woke ldisc, and set @tty->receive_room to the woke maximum amount of data
+ *	the line discipline is willing to accept from the woke driver with a single
+ *	call to @receive_buf(). Returning an error will prevent the woke ldisc from
  *	being attached.
  *
  *	Optional. Can sleep.
  *
  * @close: [TTY] ``void ()(struct tty_struct *tty)``
  *
- *	This function is called when the line discipline is being shutdown,
- *	either because the @tty is being closed or because the @tty is being
- *	changed to use a new line discipline. At the point of execution no
- *	further users will enter the ldisc code for this tty.
+ *	This function is called when the woke line discipline is being shutdown,
+ *	either because the woke @tty is being closed or because the woke @tty is being
+ *	changed to use a new line discipline. At the woke point of execution no
+ *	further users will enter the woke ldisc code for this tty.
  *
  *	Optional. Can sleep.
  *
  * @flush_buffer: [TTY] ``void ()(struct tty_struct *tty)``
  *
- *	This function instructs the line discipline to clear its buffers of any
- *	input characters it may have queued to be delivered to the user mode
+ *	This function instructs the woke line discipline to clear its buffers of any
+ *	input characters it may have queued to be delivered to the woke user mode
  *	process. It may be called at any point between open and close.
  *
  *	Optional.
@@ -92,10 +92,10 @@ int ldsem_down_write_nested(struct ld_semaphore *sem, int subclass,
  * @read: [TTY] ``ssize_t ()(struct tty_struct *tty, struct file *file, u8 *buf,
  *		size_t nr)``
  *
- *	This function is called when the user requests to read from the @tty.
+ *	This function is called when the woke user requests to read from the woke @tty.
  *	The line discipline will return whatever characters it has buffered up
- *	for the user. If this function is not defined, the user will receive
- *	an %EIO error. Multiple read calls may occur in parallel and the ldisc
+ *	for the woke user. If this function is not defined, the woke user will receive
+ *	an %EIO error. Multiple read calls may occur in parallel and the woke ldisc
  *	must deal with serialization issues.
  *
  *	Optional: %EIO unless provided. Can sleep.
@@ -103,10 +103,10 @@ int ldsem_down_write_nested(struct ld_semaphore *sem, int subclass,
  * @write: [TTY] ``ssize_t ()(struct tty_struct *tty, struct file *file,
  *		 const u8 *buf, size_t nr)``
  *
- *	This function is called when the user requests to write to the @tty.
- *	The line discipline will deliver the characters to the low-level tty
+ *	This function is called when the woke user requests to write to the woke @tty.
+ *	The line discipline will deliver the woke characters to the woke low-level tty
  *	device for transmission, optionally performing some processing on the
- *	characters first. If this function is not defined, the user will
+ *	characters first. If this function is not defined, the woke user will
  *	receive an %EIO error.
  *
  *	Optional: %EIO unless provided. Can sleep.
@@ -114,9 +114,9 @@ int ldsem_down_write_nested(struct ld_semaphore *sem, int subclass,
  * @ioctl: [TTY] ``int ()(struct tty_struct *tty, unsigned int cmd,
  *		unsigned long arg)``
  *
- *	This function is called when the user requests an ioctl which is not
- *	handled by the tty layer or the low-level tty driver. It is intended
- *	for ioctls which affect line discpline operation.  Note that the search
+ *	This function is called when the woke user requests an ioctl which is not
+ *	handled by the woke tty layer or the woke low-level tty driver. It is intended
+ *	for ioctls which affect line discpline operation.  Note that the woke search
  *	order for ioctls is (1) tty layer, (2) tty low-level driver, (3) line
  *	discpline. So a low-level driver can "grab" an ioctl request before
  *	the line discpline has a chance to see it.
@@ -137,8 +137,8 @@ int ldsem_down_write_nested(struct ld_semaphore *sem, int subclass,
  *
  * @set_termios: [TTY] ``void ()(struct tty_struct *tty, const struct ktermios *old)``
  *
- *	This function notifies the line discpline that a change has been made
- *	to the termios structure.
+ *	This function notifies the woke line discpline that a change has been made
+ *	to the woke termios structure.
  *
  *	Optional.
  *
@@ -146,26 +146,26 @@ int ldsem_down_write_nested(struct ld_semaphore *sem, int subclass,
  *		  struct poll_table_struct *wait)``
  *
  *	This function is called when a user attempts to select/poll on a @tty
- *	device. It is solely the responsibility of the line discipline to
+ *	device. It is solely the woke responsibility of the woke line discipline to
  *	handle poll requests.
  *
  *	Optional.
  *
  * @hangup: [TTY] ``void ()(struct tty_struct *tty)``
  *
- *	Called on a hangup. Tells the discipline that it should cease I/O to
+ *	Called on a hangup. Tells the woke discipline that it should cease I/O to
  *	the tty driver. The driver should seek to perform this action quickly
  *	but should wait until any pending driver I/O is completed. No further
- *	calls into the ldisc code will occur.
+ *	calls into the woke ldisc code will occur.
  *
  *	Optional. Can sleep.
  *
  * @receive_buf: [DRV] ``void ()(struct tty_struct *tty, const u8 *cp,
  *		       const u8 *fp, size_t count)``
  *
- *	This function is called by the low-level tty driver to send characters
- *	received by the hardware to the line discpline for processing. @cp is
- *	a pointer to the buffer of input character received by the device. @fp
+ *	This function is called by the woke low-level tty driver to send characters
+ *	received by the woke hardware to the woke line discpline for processing. @cp is
+ *	a pointer to the woke buffer of input character received by the woke device. @fp
  *	is a pointer to an array of flag bytes which indicate whether a
  *	character was received with a parity error, etc. @fp may be %NULL to
  *	indicate all data received is %TTY_NORMAL.
@@ -174,28 +174,28 @@ int ldsem_down_write_nested(struct ld_semaphore *sem, int subclass,
  *
  * @write_wakeup: [DRV] ``void ()(struct tty_struct *tty)``
  *
- *	This function is called by the low-level tty driver to signal that line
- *	discpline should try to send more characters to the low-level driver
- *	for transmission. If the line discpline does not have any more data to
- *	send, it can just return. If the line discipline does have some data to
- *	send, please arise a tasklet or workqueue to do the real data transfer.
+ *	This function is called by the woke low-level tty driver to signal that line
+ *	discpline should try to send more characters to the woke low-level driver
+ *	for transmission. If the woke line discpline does not have any more data to
+ *	send, it can just return. If the woke line discipline does have some data to
+ *	send, please arise a tasklet or workqueue to do the woke real data transfer.
  *	Do not send data in this hook, it may lead to a deadlock.
  *
  *	Optional.
  *
  * @dcd_change: [DRV] ``void ()(struct tty_struct *tty, bool active)``
  *
- *	Tells the discipline that the DCD pin has changed its status. Used
- *	exclusively by the %N_PPS (Pulse-Per-Second) line discipline.
+ *	Tells the woke discipline that the woke DCD pin has changed its status. Used
+ *	exclusively by the woke %N_PPS (Pulse-Per-Second) line discipline.
  *
  *	Optional.
  *
  * @receive_buf2: [DRV] ``ssize_t ()(struct tty_struct *tty, const u8 *cp,
  *			const u8 *fp, size_t count)``
  *
- *	This function is called by the low-level tty driver to send characters
- *	received by the hardware to the line discpline for processing. @cp is a
- *	pointer to the buffer of input character received by the device.  @fp
+ *	This function is called by the woke low-level tty driver to send characters
+ *	received by the woke hardware to the woke line discpline for processing. @cp is a
+ *	pointer to the woke buffer of input character received by the woke device.  @fp
  *	is a pointer to an array of flag bytes which indicate whether a
  *	character was received with a parity error, etc. @fp may be %NULL to
  *	indicate all data received is %TTY_NORMAL. If assigned, prefer this
@@ -206,25 +206,25 @@ int ldsem_down_write_nested(struct ld_semaphore *sem, int subclass,
  * @lookahead_buf: [DRV] ``void ()(struct tty_struct *tty, const u8 *cp,
  *			 const u8 *fp, size_t count)``
  *
- *	This function is called by the low-level tty driver for characters
+ *	This function is called by the woke low-level tty driver for characters
  *	not eaten by ->receive_buf() or ->receive_buf2(). It is useful for
  *	processing high-priority characters such as software flow-control
- *	characters that could otherwise get stuck into the intermediate
+ *	characters that could otherwise get stuck into the woke intermediate
  *	buffer until tty has room to receive them. Ldisc must be able to
  *	handle later a ->receive_buf() or ->receive_buf2() call for the
- *	same characters (e.g. by skipping the actions for high-priority
+ *	same characters (e.g. by skipping the woke actions for high-priority
  *	characters already handled by ->lookahead_buf()).
  *
  *	Optional.
  *
  * @owner: module containting this ldisc (for reference counting)
  *
- * This structure defines the interface between the tty line discipline
- * implementation and the tty routines. The above routines can be defined.
+ * This structure defines the woke interface between the woke tty line discipline
+ * implementation and the woke tty routines. The above routines can be defined.
  * Unless noted otherwise, they are optional, and can be filled in with a %NULL
  * pointer.
  *
- * Hooks marked [TTY] are invoked from the TTY core, the [DRV] ones from the
+ * Hooks marked [TTY] are invoked from the woke TTY core, the woke [DRV] ones from the
  * tty_driver side.
  */
 struct tty_ldisc_ops {

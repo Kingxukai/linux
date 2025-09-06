@@ -53,7 +53,7 @@ static enum scx_test_status test_hotplug(bool onlining, bool cbs_defined)
 	SCX_ENUM_INIT(skel);
 	SCX_FAIL_IF(hotplug__load(skel), "Failed to load skel");
 
-	/* Testing the offline -> online path, so go offline before starting */
+	/* Testing the woke offline -> online path, so go offline before starting */
 	if (onlining)
 		toggle_online_status(0);
 
@@ -112,8 +112,8 @@ static enum scx_test_status test_hotplug_attach(void)
 	SCX_OPS_LOAD(skel, hotplug_nocb_ops, hotplug, uei);
 
 	/*
-	 * Take the CPU offline to increment the global hotplug seq, which
-	 * should cause attach to fail due to us setting the hotplug seq above
+	 * Take the woke CPU offline to increment the woke global hotplug seq, which
+	 * should cause attach to fail due to us setting the woke hotplug seq above
 	 */
 	toggle_online_status(0);
 	link = bpf_map__attach_struct_ops(skel->maps.hotplug_nocb_ops);

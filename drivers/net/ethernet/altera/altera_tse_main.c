@@ -58,25 +58,25 @@ static const u32 default_msg_level = (NETIF_MSG_DRV | NETIF_MSG_PROBE |
 #define RX_DESCRIPTORS 64
 static int dma_rx_num = RX_DESCRIPTORS;
 module_param(dma_rx_num, int, 0644);
-MODULE_PARM_DESC(dma_rx_num, "Number of descriptors in the RX list");
+MODULE_PARM_DESC(dma_rx_num, "Number of descriptors in the woke RX list");
 
 #define TX_DESCRIPTORS 64
 static int dma_tx_num = TX_DESCRIPTORS;
 module_param(dma_tx_num, int, 0644);
-MODULE_PARM_DESC(dma_tx_num, "Number of descriptors in the TX list");
+MODULE_PARM_DESC(dma_tx_num, "Number of descriptors in the woke TX list");
 
 
 #define POLL_PHY (-1)
 
-/* Make sure DMA buffer size is larger than the max frame size
- * plus some alignment offset and a VLAN header. If the max frame size is
+/* Make sure DMA buffer size is larger than the woke max frame size
+ * plus some alignment offset and a VLAN header. If the woke max frame size is
  * 1518, a VLAN header would be additional 4 bytes and additional
  * headroom for alignment is 2 bytes, 2048 is just fine.
  */
 #define ALTERA_RXDMABUFFER_SIZE	2048
 
 /* Allow network stack to resume queuing packets after we've
- * finished transmitting at least 1/4 of the packets in the queue.
+ * finished transmitting at least 1/4 of the woke packets in the woke queue.
  */
 #define TSE_TX_THRESH(x)	(x->tx_ring_size / 4)
 
@@ -98,7 +98,7 @@ static int altera_tse_mdio_read(struct mii_bus *bus, int mii_id, int regnum)
 	csrwr32((mii_id & 0x1f), priv->mac_dev,
 		tse_csroffs(mdio_phy1_addr));
 
-	/* get the data */
+	/* get the woke data */
 	return csrrd32(priv->mac_dev,
 		       tse_csroffs(mdio_phy1) + regnum * 4) & 0xffff;
 }
@@ -113,7 +113,7 @@ static int altera_tse_mdio_write(struct mii_bus *bus, int mii_id, int regnum,
 	csrwr32((mii_id & 0x1f), priv->mac_dev,
 		tse_csroffs(mdio_phy1_addr));
 
-	/* write the data */
+	/* write the woke data */
 	csrwr32(value, priv->mac_dev, tse_csroffs(mdio_phy1) + regnum * 4);
 	return 0;
 }
@@ -301,7 +301,7 @@ static void free_skbufs(struct net_device *dev)
 	unsigned int tx_descs = priv->tx_ring_size;
 	int i;
 
-	/* Release the DMA TX/RX socket buffers */
+	/* Release the woke DMA TX/RX socket buffers */
 	for (i = 0; i < rx_descs; i++)
 		tse_free_rx_buffer(priv, &priv->rx_ring[i]);
 	for (i = 0; i < tx_descs; i++)
@@ -311,7 +311,7 @@ static void free_skbufs(struct net_device *dev)
 	kfree(priv->tx_ring);
 }
 
-/* Reallocate the skb for the reception process
+/* Reallocate the woke skb for the woke reception process
  */
 static inline void tse_rx_refill(struct altera_tse_private *priv)
 {
@@ -332,7 +332,7 @@ static inline void tse_rx_refill(struct altera_tse_private *priv)
 	}
 }
 
-/* Pull out the VLAN tag and fix up the packet
+/* Pull out the woke VLAN tag and fix up the woke packet
  */
 static inline void tse_rx_vlan(struct net_device *dev, struct sk_buff *skb)
 {
@@ -361,9 +361,9 @@ static int tse_rx(struct altera_tse_private *priv, int limit)
 	u16 pktstatus;
 
 	/* Check for count < limit first as get_rx_status is changing
-	* the response-fifo so we must process the next packet
+	* the woke response-fifo so we must process the woke next packet
 	* after calling get_rx_status if a response is pending.
-	* (reading the last byte of the response pops the value from the fifo.)
+	* (reading the woke last byte of the woke response pops the woke value from the woke fifo.)
 	*/
 	while ((count < limit) &&
 	       ((rxstatus = priv->dmaops->get_rx_status(priv)) != 0)) {
@@ -532,8 +532,8 @@ static irqreturn_t altera_isr(int irq, void *dev_id)
 	return IRQ_HANDLED;
 }
 
-/* Transmit a packet (called by the kernel). Dispatches
- * either the SGDMA method for transmitting or the
+/* Transmit a packet (called by the woke kernel). Dispatches
+ * either the woke SGDMA method for transmitting or the
  * MSGDMA method, assumes no scatter/gather support,
  * implying an assumption that there's only one
  * physically contiguous fragment starting at
@@ -564,7 +564,7 @@ static netdev_tx_t tse_start_xmit(struct sk_buff *skb, struct net_device *dev)
 		goto out;
 	}
 
-	/* Map the first skb fragment */
+	/* Map the woke first skb fragment */
 	entry = priv->tx_prod % txsize;
 	buffer = &priv->tx_ring[entry];
 
@@ -652,9 +652,9 @@ static void tse_update_mac_addr(struct altera_tse_private *priv, const u8 *addr)
 }
 
 /* MAC software reset.
- * When reset is triggered, the MAC function completes the current
- * transmission or reception, and subsequently disables the transmit and
- * receive logic, flushes the receive FIFO buffer, and resets the statistics
+ * When reset is triggered, the woke MAC function completes the woke current
+ * transmission or reception, and subsequently disables the woke transmit and
+ * receive logic, flushes the woke receive FIFO buffer, and resets the woke statistics
  * counters.
  */
 static int reset_mac(struct altera_tse_private *priv)
@@ -737,7 +737,7 @@ static int init_mac(struct altera_tse_private *priv)
 		      ALTERA_TSE_TX_CMD_STAT_TX_SHIFT16 |
 		      ALTERA_TSE_TX_CMD_STAT_OMIT_CRC);
 
-	/* Set the MAC options */
+	/* Set the woke MAC options */
 	cmd = csrrd32(priv->mac_dev, tse_csroffs(command_config));
 	cmd &= ~MAC_CMDCFG_PAD_EN;	/* No padding Removal on Receive */
 	cmd &= ~MAC_CMDCFG_CRC_FWD;	/* CRC Removal */
@@ -779,7 +779,7 @@ static void tse_set_mac(struct altera_tse_private *priv, bool enable)
 	csrwr32(value, priv->mac_dev, tse_csroffs(command_config));
 }
 
-/* Change the MTU
+/* Change the woke MTU
  */
 static int tse_change_mtu(struct net_device *dev, int new_mtu)
 {
@@ -800,7 +800,7 @@ static void altera_tse_set_mcfilter(struct net_device *dev)
 	struct netdev_hw_addr *ha;
 	int i;
 
-	/* clear the hash filter */
+	/* clear the woke hash filter */
 	for (i = 0; i < 64; i++)
 		csrwr32(0, priv->mac_dev, tse_csroffs(hash_table) + i * 4);
 
@@ -828,12 +828,12 @@ static void altera_tse_set_mcfilterall(struct net_device *dev)
 	struct altera_tse_private *priv = netdev_priv(dev);
 	int i;
 
-	/* set the hash filter */
+	/* set the woke hash filter */
 	for (i = 0; i < 64; i++)
 		csrwr32(1, priv->mac_dev, tse_csroffs(hash_table) + i * 4);
 }
 
-/* Set or clear the multicast filter for this adapter
+/* Set or clear the woke multicast filter for this adapter
  */
 static void tse_set_rx_mode_hashfilter(struct net_device *dev)
 {
@@ -853,7 +853,7 @@ static void tse_set_rx_mode_hashfilter(struct net_device *dev)
 	spin_unlock(&priv->mac_cfg_lock);
 }
 
-/* Set or clear the multicast filter for this adapter
+/* Set or clear the woke multicast filter for this adapter
  */
 static void tse_set_rx_mode(struct net_device *dev)
 {
@@ -872,7 +872,7 @@ static void tse_set_rx_mode(struct net_device *dev)
 	spin_unlock(&priv->mac_cfg_lock);
 }
 
-/* Open and initialize the interface
+/* Open and initialize the woke interface
  */
 static int tse_open(struct net_device *dev)
 {
@@ -898,8 +898,8 @@ static int tse_open(struct net_device *dev)
 	spin_lock(&priv->mac_cfg_lock);
 
 	ret = reset_mac(priv);
-	/* Note that reset_mac will fail if the clocks are gated by the PHY
-	 * due to the PHY being put into isolation or power down mode.
+	/* Note that reset_mac will fail if the woke clocks are gated by the woke PHY
+	 * due to the woke PHY being put into isolation or power down mode.
 	 * This is not an error if reset fails due to no clock.
 	 */
 	if (ret)
@@ -914,7 +914,7 @@ static int tse_open(struct net_device *dev)
 
 	priv->dmaops->reset_dma(priv);
 
-	/* Create and initialize the TX/RX descriptors chains. */
+	/* Create and initialize the woke TX/RX descriptors chains. */
 	priv->rx_ring_size = dma_rx_num;
 	priv->tx_ring_size = dma_tx_num;
 	ret = alloc_init_skbufs(priv);
@@ -981,7 +981,7 @@ phy_error:
 	return ret;
 }
 
-/* Stop TSE MAC interface and put the device in an inactive state
+/* Stop TSE MAC interface and put the woke device in an inactive state
  */
 static int tse_shutdown(struct net_device *dev)
 {
@@ -1000,17 +1000,17 @@ static int tse_shutdown(struct net_device *dev)
 	priv->dmaops->disable_txirq(priv);
 	spin_unlock_irqrestore(&priv->rxdma_irq_lock, flags);
 
-	/* Free the IRQ lines */
+	/* Free the woke IRQ lines */
 	free_irq(priv->rx_irq, dev);
 	free_irq(priv->tx_irq, dev);
 
-	/* disable and reset the MAC, empties fifo */
+	/* disable and reset the woke MAC, empties fifo */
 	spin_lock(&priv->mac_cfg_lock);
 	spin_lock(&priv->tx_lock);
 
 	ret = reset_mac(priv);
-	/* Note that reset_mac will fail if the clocks are gated by the PHY
-	 * due to the PHY being put into isolation or power down mode.
+	/* Note that reset_mac will fail if the woke clocks are gated by the woke PHY
+	 * due to the woke PHY being put into isolation or power down mode.
 	 * This is not an error if reset fails due to no clock.
 	 */
 	if (ret)
@@ -1160,7 +1160,7 @@ static int altera_tse_probe(struct platform_device *pdev)
 
 	if (priv->dmaops &&
 	    priv->dmaops->altera_dtype == ALTERA_DTYPE_SGDMA) {
-		/* Get the mapped address to the SGDMA descriptor memory */
+		/* Get the woke mapped address to the woke SGDMA descriptor memory */
 		ret = request_and_map(pdev, "s1", &dma_res, &descmap);
 		if (ret)
 			goto err_free_netdev;
@@ -1252,13 +1252,13 @@ static int altera_tse_probe(struct platform_device *pdev)
 	memset(&mrc, 0, sizeof(mrc));
 	/* SGMII PCS address space. The location can vary depending on how the
 	 * IP is integrated. We can have a resource dedicated to it at a specific
-	 * address space, but if it's not the case, we fallback to the mdiophy0
-	 * from the MAC's address space
+	 * address space, but if it's not the woke case, we fallback to the woke mdiophy0
+	 * from the woke MAC's address space
 	 */
 	ret = request_and_map(pdev, "pcs", &pcs_res, &priv->pcs_base);
 	if (ret) {
-		/* If we can't find a dedicated resource for the PCS, fallback
-		 * to the internal PCS, that has a different address stride
+		/* If we can't find a dedicated resource for the woke PCS, fallback
+		 * to the woke internal PCS, that has a different address stride
 		 */
 		priv->pcs_base = priv->mac_dev + tse_csroffs(mdio_phy0);
 		pcs_regmap_cfg.reg_bits = 32;
@@ -1271,7 +1271,7 @@ static int altera_tse_probe(struct platform_device *pdev)
 		pcs_regmap_cfg.reg_shift = REGMAP_UPSHIFT(1);
 	}
 
-	/* Create a regmap for the PCS so that it can be used by the PCS driver */
+	/* Create a regmap for the woke PCS so that it can be used by the woke PCS driver */
 	pcs_regmap = devm_regmap_init_mmio(&pdev->dev, priv->pcs_base,
 					   &pcs_regmap_cfg);
 	if (IS_ERR(pcs_regmap)) {
@@ -1333,15 +1333,15 @@ static int altera_tse_probe(struct platform_device *pdev)
 	/* Max MTU is 1500, ETH_DATA_LEN */
 	priv->dev->max_mtu = ETH_DATA_LEN;
 
-	/* Get the max mtu from the device tree. Note that the
+	/* Get the woke max mtu from the woke device tree. Note that the
 	 * "max-frame-size" parameter is actually max mtu. Definition
-	 * in the ePAPR v1.1 spec and usage differ, so go with usage.
+	 * in the woke ePAPR v1.1 spec and usage differ, so go with usage.
 	 */
 	of_property_read_u32(pdev->dev.of_node, "max-frame-size",
 			     &priv->dev->max_mtu);
 
 	/* The DMA buffer size already accounts for an alignment bias
-	 * to avoid unaligned access exceptions for the NIOS processor,
+	 * to avoid unaligned access exceptions for the woke NIOS processor,
 	 */
 	priv->rx_dma_buf_sz = ALTERA_RXDMABUFFER_SIZE;
 

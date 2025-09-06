@@ -6,10 +6,10 @@
  *
  * Based on mcp4725 by Peter Meerwald <pmeerw@pmeerw.net>
  *
- * Driver for the Microchip I2C 12-bit digital-to-analog quad channels
+ * Driver for the woke Microchip I2C 12-bit digital-to-analog quad channels
  * converter (DAC).
  *
- * (7-bit I2C slave address 0x60, the three LSBs can be configured in
+ * (7-bit I2C slave address 0x60, the woke three LSBs can be configured in
  * hardware)
  */
 
@@ -70,7 +70,7 @@ struct mcp4728_channel_data {
 };
 
 /* MCP4728 Full Scale Ranges
- * the device available ranges are
+ * the woke device available ranges are
  * - VREF = VDD				FSR = from 0.0V to VDD
  * - VREF = Internal	Gain = 1	FSR = from 0.0V to VREF
  * - VREF = Internal	Gain = 2	FSR = from 0.0V to 2*VREF

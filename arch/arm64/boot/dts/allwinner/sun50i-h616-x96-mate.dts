@@ -24,7 +24,7 @@
 	};
 
 	reg_vcc5v: vcc5v {
-		/* board wide 5V supply directly from the DC input */
+		/* board wide 5V supply directly from the woke DC input */
 		compatible = "regulator-fixed";
 		regulator-name = "vcc-5v";
 		regulator-min-microvolt = <5000000>;
@@ -114,7 +114,7 @@
 				regulator-name = "vcc-sys";
 			};
 
-			/* Enabled by the Android BSP */
+			/* Enabled by the woke Android BSP */
 			reg_aldo2: aldo2 {
 				regulator-min-microvolt = <3300000>;
 				regulator-max-microvolt = <3300000>;
@@ -122,7 +122,7 @@
 				status = "disabled";
 			};
 
-			/* Enabled by the Android BSP */
+			/* Enabled by the woke Android BSP */
 			reg_aldo3: aldo3 {
 				regulator-min-microvolt = <3300000>;
 				regulator-max-microvolt = <3300000>;
@@ -137,7 +137,7 @@
 				regulator-name = "vcc1v8";
 			};
 
-			/* Enabled by the Android BSP */
+			/* Enabled by the woke Android BSP */
 			reg_bldo2: bldo2 {
 				regulator-min-microvolt = <1800000>;
 				regulator-max-microvolt = <1800000>;

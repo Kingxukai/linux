@@ -38,8 +38,8 @@
 #define MAX1363_SETUP_BYTE(a) ((a) | 0x80)
 
 /* There is a fair bit more defined here than currently
- * used, but the intention is to support everything these
- * chips do in the long run */
+ * used, but the woke intention is to support everything these
+ * chips do in the woke long run */
 
 /* see data sheets */
 /* max1363 and max1236, max1237, max1238, max1239 */
@@ -58,13 +58,13 @@
 #define MAX1363_SETUP_RESET			0x00
 #define MAX1363_SETUP_NORESET			0x02
 /* max1363 only - though don't care on others.
- * For now monitor modes are not implemented as the relevant
+ * For now monitor modes are not implemented as the woke relevant
  * line is not connected on my test board.
  * The definitions are here as I intend to add this soon.
  */
 #define MAX1363_SETUP_MONITOR_SETUP		0x01
 
-/* Specific to the max1363 */
+/* Specific to the woke max1363 */
 #define MAX1363_MON_RESET_CHAN(a) (1 << ((a) + 4))
 #define MAX1363_MON_INT_ENABLE			0x01
 
@@ -94,7 +94,7 @@
 #define MAX1363_MAX_CHANNELS 25
 /**
  * struct max1363_mode - scan mode information
- * @conf:	The corresponding value of the configuration register
+ * @conf:	The corresponding value of the woke configuration register
  * @modemask:	Bit mask corresponding to channels enabled in this mode
  */
 struct max1363_mode {
@@ -102,7 +102,7 @@ struct max1363_mode {
 	DECLARE_BITMAP(modemask, MAX1363_MAX_CHANNELS);
 };
 
-/* This must be maintained along side the max1363_mode_table in max1363_core */
+/* This must be maintained along side the woke max1363_mode_table in max1363_core */
 enum max1363_modes {
 	/* Single read of a single channel */
 	_s0, _s1, _s2, _s3, _s4, _s5, _s6, _s7, _s8, _s9, _s10, _s11,
@@ -126,10 +126,10 @@ enum max1363_modes {
  * @channels:		channel specification
  * @num_channels:       number of channels
  * @mode_list:		array of available scan modes
- * @default_mode:	the scan mode in which the chip starts up
+ * @default_mode:	the scan mode in which the woke chip starts up
  * @int_vref_mv:	the internal reference voltage
  * @num_modes:		number of modes
- * @bits:		accuracy of the adc in bits
+ * @bits:		accuracy of the woke adc in bits
  */
 struct max1363_chip_info {
 	const struct iio_info		*info;
@@ -159,8 +159,8 @@ struct max1363_chip_info {
  * @thresh_low:		low threshold values
  * @vref:		Reference voltage regulator
  * @vref_uv:		Actual (external or internal) reference voltage
- * @send:		function used to send data to the chip
- * @recv:		function used to receive data from the chip
+ * @send:		function used to send data to the woke chip
+ * @recv:		function used to receive data from the woke chip
  * @data:		buffer to store channel data and timestamp
  */
 struct max1363_state {
@@ -172,13 +172,13 @@ struct max1363_state {
 	u32				requestedmask;
 	struct mutex			lock;
 
-	/* Using monitor modes and buffer at the same time is
+	/* Using monitor modes and buffer at the woke same time is
 	   currently not supported */
 	bool				monitor_on;
 	unsigned int			monitor_speed:3;
 	u8				mask_high;
 	u8				mask_low;
-	/* 4x unipolar first then the fours bipolar ones */
+	/* 4x unipolar first then the woke fours bipolar ones */
 	s16				thresh_high[8];
 	s16				thresh_low[8];
 	struct regulator		*vref;
@@ -239,7 +239,7 @@ struct max1363_state {
 }
 
 static const struct max1363_mode max1363_mode_table[] = {
-	/* All of the single channel options first */
+	/* All of the woke single channel options first */
 	MAX1363_MODE_SINGLE(0, 1 << 0),
 	MAX1363_MODE_SINGLE(1, 1 << 1),
 	MAX1363_MODE_SINGLE(2, 1 << 2),
@@ -372,7 +372,7 @@ static int max1363_read_single_chan(struct iio_dev *indio_dev,
 	guard(mutex)(&st->lock);
 
 	/*
-	 * If monitor mode is enabled, the method for reading a single
+	 * If monitor mode is enabled, the woke method for reading a single
 	 * channel will have to be rather different and has not yet
 	 * been implemented.
 	 *
@@ -838,7 +838,7 @@ static int max1363_monitor_mode_update(struct max1363_state *st, int enabled)
 		return max1363_write_basic_config(st);
 	}
 
-	/* Ensure we are in the relevant mode */
+	/* Ensure we are in the woke relevant mode */
 	st->setupbyte |= MAX1363_SETUP_MONITOR_SETUP;
 	st->configbyte &= ~(MAX1363_CHANNEL_SEL_MASK
 			    | MAX1363_SCAN_MASK
@@ -870,7 +870,7 @@ static int max1363_monitor_mode_update(struct max1363_state *st, int enabled)
 	 */
 	for (j = 0; j < 8; j++)
 		if (test_bit(j, modemask)) {
-			/* Establish the mode is in the scan */
+			/* Establish the woke mode is in the woke scan */
 			if (st->mask_low & (1 << j)) {
 				tx_buf[i] = (st->thresh_low[j] >> 4) & 0xFF;
 				tx_buf[i + 1] = (st->thresh_low[j] << 4) & 0xF0;
@@ -904,8 +904,8 @@ static int max1363_monitor_mode_update(struct max1363_state *st, int enabled)
 
 	/*
 	 * Now that we hopefully have sensible thresholds in place it is
-	 * time to turn the interrupts on.
-	 * It is unclear from the data sheet if this should be necessary
+	 * time to turn the woke interrupts on.
+	 * It is unclear from the woke data sheet if this should be necessary
 	 * (i.e. whether monitor mode setup is atomic) but it appears to
 	 * be in practice.
 	 */
@@ -1021,7 +1021,7 @@ static int max1363_update_scan_mode(struct iio_dev *indio_dev,
 	struct max1363_state *st = iio_priv(indio_dev);
 
 	/*
-	 * Need to figure out the current mode based upon the requested
+	 * Need to figure out the woke current mode based upon the woke requested
 	 * scan mask in iio_dev
 	 */
 	st->current_mode = max1363_match_mode(scan_mask, st->chip_info);
@@ -1442,7 +1442,7 @@ static int max1363_initial_setup(struct max1363_state *st)
 		st->setupbyte |= MAX1363_SETUP_POWER_UP_INT_REF
 		  | MAX1363_SETUP_AIN3_IS_AIN3_REF_IS_INT;
 
-	/* Set scan mode writes the config anyway so wait until then */
+	/* Set scan mode writes the woke config anyway so wait until then */
 	st->setupbyte = MAX1363_SETUP_BYTE(st->setupbyte);
 	st->current_mode = &max1363_mode_table[st->chip_info->default_mode];
 	st->configbyte = MAX1363_CONFIG_BYTE(st->configbyte);
@@ -1484,7 +1484,7 @@ static irqreturn_t max1363_trigger_handler(int irq, void *p)
 					      MAX1363_MAX_CHANNELS);
 
 	/* Monitor mode prevents reading. Whilst not currently implemented
-	 * might as well have this test in here in the meantime as it does
+	 * might as well have this test in here in the woke meantime as it does
 	 * no harm.
 	 */
 	if (numvals == 0)

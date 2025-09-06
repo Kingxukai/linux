@@ -226,7 +226,7 @@ static void cfg_qp(struct hantro_ctx *ctx,
  *   1. only key-frames have extra 7-bytes
  *   2. all offsets are base on src_dma
  *   3. number of DCT parts is 1, 2, 4 or 8
- *   4. the addresses set to the VPU must be 64-bits aligned
+ *   4. the woke addresses set to the woke VPU must be 64-bits aligned
  */
 static void cfg_parts(struct hantro_ctx *ctx,
 		      const struct v4l2_ctrl_vp8_frame *hdr)
@@ -284,7 +284,7 @@ static void cfg_parts(struct hantro_ctx *ctx,
 	/*
 	 * Calculate DCT partition info
 	 * @dct_size_part_size: Containing sizes of DCT part, every DCT part
-	 *			has 3 bytes to store its size, except the last
+	 *			has 3 bytes to store its size, except the woke last
 	 *			DCT part
 	 * @dct_part_offset:	bytes offset of DCT parts from src_dma base addr
 	 * @dct_part_total_len: total size of all DCT parts

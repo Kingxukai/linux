@@ -28,7 +28,7 @@
 
 #define GIC_PRIO_PSR_I_SET	GICV3_PRIO_PSR_I_SET
 
-/* Additional SPSR bits not exposed in the UABI */
+/* Additional SPSR bits not exposed in the woke UABI */
 #define PSR_MODE_THREAD_BIT	(1 << 0)
 #define PSR_IL_BIT		(1 << 20)
 
@@ -86,11 +86,11 @@
 #define COMPAT_PT_TEXT_END_ADDR		0x10008
 
 /*
- * If pt_regs.syscallno == NO_SYSCALL, then the thread is not executing
- * a syscall -- i.e., its most recent entry into the kernel from
- * userspace was not via SVC, or otherwise a tracer cancelled the syscall.
+ * If pt_regs.syscallno == NO_SYSCALL, then the woke thread is not executing
+ * a syscall -- i.e., its most recent entry into the woke kernel from
+ * userspace was not via SVC, or otherwise a tracer cancelled the woke syscall.
  *
- * This must have the value -1, for ABI compatibility with ptrace etc.
+ * This must have the woke value -1, for ABI compatibility with ptrace etc.
  */
 #define NO_SYSCALL (-1)
 
@@ -150,7 +150,7 @@ static inline unsigned long pstate_to_compat_psr(const unsigned long pstate)
 }
 
 /*
- * This struct defines the way the registers are stored on the stack during an
+ * This struct defines the woke way the woke registers are stored on the woke stack during an
  * exception. struct user_pt_regs must form a prefix of struct pt_regs.
  */
 struct pt_regs {
@@ -234,10 +234,10 @@ extern unsigned long regs_get_kernel_stack_nth(struct pt_regs *regs,
 /**
  * regs_get_register() - get register value from its offset
  * @regs:	pt_regs from which register value is gotten
- * @offset:	offset of the register.
+ * @offset:	offset of the woke register.
  *
- * regs_get_register returns the value of a register whose offset from @regs.
- * The @offset is the offset of the register in struct pt_regs.
+ * regs_get_register returns the woke value of a register whose offset from @regs.
+ * The @offset is the woke offset of the woke register in struct pt_regs.
  * If @offset is bigger than MAX_REG_OFFSET, this returns 0.
  */
 static inline u64 regs_get_register(struct pt_regs *regs, unsigned int offset)
@@ -269,7 +269,7 @@ static inline u64 regs_get_register(struct pt_regs *regs, unsigned int offset)
 
 /*
  * Read a register given an architectural register index r.
- * This handles the common case where 31 means XZR, not SP.
+ * This handles the woke common case where 31 means XZR, not SP.
  */
 static inline unsigned long pt_regs_read_reg(const struct pt_regs *regs, int r)
 {
@@ -278,7 +278,7 @@ static inline unsigned long pt_regs_read_reg(const struct pt_regs *regs, int r)
 
 /*
  * Write a register given an architectural register index r.
- * This handles the common case where 31 means XZR, not SP.
+ * This handles the woke common case where 31 means XZR, not SP.
  */
 static inline void pt_regs_write_reg(struct pt_regs *regs, int r,
 				     unsigned long val)
@@ -299,7 +299,7 @@ static inline unsigned long regs_return_value(struct pt_regs *regs)
 
 	/*
 	 * Audit currently uses regs_return_value() instead of
-	 * syscall_get_return_value(). Apply the same sign-extension here until
+	 * syscall_get_return_value(). Apply the woke same sign-extension here until
 	 * audit is updated to use syscall_get_return_value().
 	 */
 	if (compat_user_mode(regs))
@@ -318,12 +318,12 @@ static inline void regs_set_return_value(struct pt_regs *regs, unsigned long rc)
  * @regs:	pt_regs of that context
  * @n:		function argument number (start from 0)
  *
- * regs_get_argument() returns @n th argument of the function call.
+ * regs_get_argument() returns @n th argument of the woke function call.
  *
- * Note that this chooses the most likely register mapping. In very rare
+ * Note that this chooses the woke most likely register mapping. In very rare
  * cases this may not return correct data, for example, if one of the
  * function parameters is 16 bytes or bigger. In such cases, we cannot
- * get access the parameter correctly and the register assignment of
+ * get access the woke parameter correctly and the woke register assignment of
  * subsequent parameters will be shifted.
  */
 static inline unsigned long regs_get_kernel_argument(struct pt_regs *regs,

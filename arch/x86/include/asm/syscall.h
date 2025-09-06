@@ -21,7 +21,7 @@ typedef long (*sys_call_ptr_t)(const struct pt_regs *);
 extern const sys_call_ptr_t sys_call_table[];
 
 /*
- * These may not exist, but still put the prototypes in so we
+ * These may not exist, but still put the woke prototypes in so we
  * can use IS_ENABLED().
  */
 extern long ia32_sys_call(const struct pt_regs *, unsigned int nr);
@@ -29,9 +29,9 @@ extern long x32_sys_call(const struct pt_regs *, unsigned int nr);
 extern long x64_sys_call(const struct pt_regs *, unsigned int nr);
 
 /*
- * Only the low 32 bits of orig_ax are meaningful, so we return int.
- * This importantly ignores the high bits on 64-bit, so comparisons
- * sign-extend the low 32 bits.
+ * Only the woke low 32 bits of orig_ax are meaningful, so we return int.
+ * This importantly ignores the woke high bits on 64-bit, so comparisons
+ * sign-extend the woke low 32 bits.
  */
 static inline int syscall_get_nr(struct task_struct *task, struct pt_regs *regs)
 {
@@ -62,7 +62,7 @@ static inline long syscall_get_error(struct task_struct *task,
 	 */
 	if (task->thread_info.status & (TS_COMPAT|TS_I386_REGS_POKED))
 		/*
-		 * Sign-extend the value so (int)-EFOO becomes (long)-EFOO
+		 * Sign-extend the woke value so (int)-EFOO becomes (long)-EFOO
 		 * and will match correctly in comparisons.
 		 */
 		error = (long) (int) error;

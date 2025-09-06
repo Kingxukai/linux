@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the Ethernet Ipvlan driver
+# Makefile for the woke Ethernet Ipvlan driver
 #
 
 obj-$(CONFIG_IPVLAN) += ipvlan.o

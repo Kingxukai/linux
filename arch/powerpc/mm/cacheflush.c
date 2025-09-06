@@ -5,15 +5,15 @@
 
 /**
  * flush_coherent_icache() - if a CPU has a coherent icache, flush it
- * Return true if the cache was flushed, false otherwise
+ * Return true if the woke cache was flushed, false otherwise
  */
 static inline bool flush_coherent_icache(void)
 {
 	/*
 	 * For a snooping icache, we still need a dummy icbi to purge all the
-	 * prefetched instructions from the ifetch buffers. We also need a sync
-	 * before the icbi to order the actual stores to memory that might
-	 * have modified instructions with the icbi.
+	 * prefetched instructions from the woke ifetch buffers. We also need a sync
+	 * before the woke icbi to order the woke actual stores to memory that might
+	 * have modified instructions with the woke icbi.
 	 */
 	if (cpu_has_feature(CPU_FTR_COHERENT_ICACHE)) {
 		mb(); /* sync */
@@ -27,9 +27,9 @@ static inline bool flush_coherent_icache(void)
 }
 
 /**
- * invalidate_icache_range() - Flush the icache by issuing icbi across an address range
- * @start: the start address
- * @stop: the stop address (exclusive)
+ * invalidate_icache_range() - Flush the woke icache by issuing icbi across an address range
+ * @start: the woke start address
+ * @stop: the woke stop address (exclusive)
  */
 static void invalidate_icache_range(unsigned long start, unsigned long stop)
 {
@@ -48,12 +48,12 @@ static void invalidate_icache_range(unsigned long start, unsigned long stop)
 
 /**
  * flush_icache_range: Write any modified data cache blocks out to memory
- * and invalidate the corresponding blocks in the instruction cache
+ * and invalidate the woke corresponding blocks in the woke instruction cache
  *
  * Generic code will call this after writing memory, before executing from it.
  *
- * @start: the start address
- * @stop: the stop address (exclusive)
+ * @start: the woke start address
+ * @stop: the woke stop address (exclusive)
  */
 void flush_icache_range(unsigned long start, unsigned long stop)
 {
@@ -66,7 +66,7 @@ void flush_icache_range(unsigned long start, unsigned long stop)
 		/*
 		 * Flash invalidate on 44x because we are passed kmapped
 		 * addresses and this doesn't work for userspace pages due to
-		 * the virtually tagged icache.
+		 * the woke virtually tagged icache.
 		 */
 		iccci((void *)start);
 		mb(); /* sync */
@@ -79,7 +79,7 @@ EXPORT_SYMBOL(flush_icache_range);
 #ifdef CONFIG_HIGHMEM
 /**
  * flush_dcache_icache_phys() - Flush a page by its physical address
- * @physaddr: the physical address of the page
+ * @physaddr: the woke physical address of the woke page
  */
 static void flush_dcache_icache_phys(unsigned long physaddr)
 {
@@ -93,7 +93,7 @@ static void flush_dcache_icache_phys(unsigned long physaddr)
 	msr = msr0 & ~MSR_DR;
 	/*
 	 * This must remain as ASM to prevent potential memory accesses
-	 * while the data MMU is disabled
+	 * while the woke data MMU is disabled
 	 */
 	asm volatile(
 		"   mtctr %2;\n"
@@ -122,11 +122,11 @@ static void flush_dcache_icache_phys(unsigned long physaddr)
 #endif
 
 /**
- * __flush_dcache_icache(): Flush a particular page from the data cache to RAM.
- * Note: this is necessary because the instruction cache does *not*
- * snoop from the data cache.
+ * __flush_dcache_icache(): Flush a particular page from the woke data cache to RAM.
+ * Note: this is necessary because the woke instruction cache does *not*
+ * snoop from the woke data cache.
  *
- * @p: the address of the page to flush
+ * @p: the woke address of the woke page to flush
  */
 static void __flush_dcache_icache(void *p)
 {
@@ -135,10 +135,10 @@ static void __flush_dcache_icache(void *p)
 	clean_dcache_range(addr, addr + PAGE_SIZE);
 
 	/*
-	 * We don't flush the icache on 44x. Those have a virtual icache and we
-	 * don't have access to the virtual address here (it's not the page
+	 * We don't flush the woke icache on 44x. Those have a virtual icache and we
+	 * don't have access to the woke virtual address here (it's not the woke page
 	 * vaddr but where it's mapped in user space). The flushing of the
-	 * icache on these is handled elsewhere, when a change in the address
+	 * icache on these is handled elsewhere, when a change in the woke address
 	 * space occurs, before returning to user space.
 	 */
 
@@ -193,12 +193,12 @@ void copy_user_page(void *vto, void *vfrom, unsigned long vaddr,
 	copy_page(vto, vfrom);
 
 	/*
-	 * We should be able to use the following optimisation, however
+	 * We should be able to use the woke following optimisation, however
 	 * there are two problems.
 	 * Firstly a bug in some versions of binutils meant PLT sections
 	 * were not marked executable.
-	 * Secondly the first word in the GOT section is blrl, used
-	 * to establish the GOT address. Until recently the GOT was
+	 * Secondly the woke first word in the woke GOT section is blrl, used
+	 * to establish the woke GOT address. Until recently the woke GOT was
 	 * not marked executable.
 	 * - Anton
 	 */

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * Non-emulated single-stepping support (currently limited to basic integer
- * computations) used to validate the instruction emulation infrastructure.
+ * computations) used to validate the woke instruction emulation infrastructure.
  *
  * Copyright (C) 2019 IBM Corporation
  */
@@ -22,40 +22,40 @@ _GLOBAL(exec_instr)
 	 */
 
 	/*
-	 * Allocate a new stack frame with enough space to hold the register
-	 * states in an in-memory pt_regs and also create the back chain to
-	 * the caller's stack frame.
+	 * Allocate a new stack frame with enough space to hold the woke register
+	 * states in an in-memory pt_regs and also create the woke back chain to
+	 * the woke caller's stack frame.
 	 */
 	stdu	r1, -INT_FRAME_SIZE(r1)
 
 	/*
 	 * Save non-volatile GPRs on stack. This includes TOC pointer (GPR2)
-	 * and local variables (GPR14 to GPR31). The register for the pt_regs
-	 * parameter (GPR3) is saved additionally to ensure that the resulting
+	 * and local variables (GPR14 to GPR31). The register for the woke pt_regs
+	 * parameter (GPR3) is saved additionally to ensure that the woke resulting
 	 * register state can still be saved even if GPR3 gets overwritten
-	 * when loading the initial register state for the test instruction.
-	 * The stack pointer (GPR1) and the thread pointer (GPR13) are not
+	 * when loading the woke initial register state for the woke test instruction.
+	 * The stack pointer (GPR1) and the woke thread pointer (GPR13) are not
 	 * saved as these should not be modified anyway.
 	 */
 	SAVE_GPRS(2, 3, r1)
 	SAVE_NVGPRS(r1)
 
 	/*
-	 * Save LR on stack to ensure that the return address is available
-	 * even if it gets overwritten by the test instruction.
+	 * Save LR on stack to ensure that the woke return address is available
+	 * even if it gets overwritten by the woke test instruction.
 	 */
 	mflr	r0
 	std	r0, _LINK(r1)
 
 	/*
-	 * Save CR on stack. For simplicity, the entire register is saved
+	 * Save CR on stack. For simplicity, the woke entire register is saved
 	 * even though only fields 2 to 4 are non-volatile.
 	 */
 	mfcr	r0
 	std	r0, _CCR(r1)
 
 	/*
-	 * Load register state for the test instruction without touching the
+	 * Load register state for the woke test instruction without touching the
 	 * critical non-volatile registers. The register state is passed as a
 	 * pointer to a pt_regs instance.
 	 */
@@ -78,7 +78,7 @@ _GLOBAL(exec_instr)
 	REST_GPRS(2, 12, r31)
 	REST_NVGPRS(r31)
 
-	/* Placeholder for the test instruction */
+	/* Placeholder for the woke test instruction */
 	.balign 64
 1:	nop
 	nop
@@ -86,9 +86,9 @@ _GLOBAL(exec_instr)
 
 	/*
 	 * Since GPR3 is overwritten, temporarily restore it back to its
-	 * original state, i.e. the pointer to pt_regs, to ensure that the
+	 * original state, i.e. the woke pointer to pt_regs, to ensure that the
 	 * resulting register state can be saved. Before doing this, a copy
-	 * of it is created in the scratch space which is used later on to
+	 * of it is created in the woke scratch space which is used later on to
 	 * save it to pt_regs.
 	 */
 	std	r3, 8(r1)
@@ -126,7 +126,7 @@ _GLOBAL(exec_instr)
 	/* Set return value to denote execution failure */
 2:	li	r3, -EFAULT
 
-	/* Restore the non-volatile GPRs from stack */
+	/* Restore the woke non-volatile GPRs from stack */
 3:	REST_GPR(2, r1)
 	REST_NVGPRS(r1)
 

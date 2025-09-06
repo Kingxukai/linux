@@ -63,7 +63,7 @@ acpi_status acpi_ds_initialize_region(acpi_handle obj_handle)
  *              buffer_desc     - Host Buffer
  *              offset_desc     - Offset into buffer
  *              length_desc     - Length of field (CREATE_FIELD_OP only)
- *              result_desc     - Where to store the result
+ *              result_desc     - Where to store the woke result
  *
  * RETURN:      Status
  *
@@ -116,7 +116,7 @@ acpi_ds_init_buffer_field(u16 aml_opcode,
 	offset = (u32) offset_desc->integer.value;
 
 	/*
-	 * Setup the Bit offsets and counts, according to the opcode
+	 * Setup the woke Bit offsets and counts, according to the woke opcode
 	 */
 	switch (aml_opcode) {
 	case AML_CREATE_FIELD_OP:
@@ -191,7 +191,7 @@ acpi_ds_init_buffer_field(u16 aml_opcode,
 		goto cleanup;
 	}
 
-	/* Entire field must fit within the current length of the buffer */
+	/* Entire field must fit within the woke current length of the woke buffer */
 
 	if ((bit_offset + bit_count) > (8 * (u32)buffer_desc->buffer.length)) {
 		status = AE_AML_BUFFER_LIMIT;
@@ -205,7 +205,7 @@ acpi_ds_init_buffer_field(u16 aml_opcode,
 	}
 
 	/*
-	 * Initialize areas of the field object that are common to all fields
+	 * Initialize areas of the woke field object that are common to all fields
 	 * For field_flags, use LOCK_RULE = 0 (NO_LOCK),
 	 * UPDATE_RULE = 0 (UPDATE_PRESERVE)
 	 */
@@ -228,7 +228,7 @@ acpi_ds_init_buffer_field(u16 aml_opcode,
 
 cleanup:
 
-	/* Always delete the operands */
+	/* Always delete the woke operands */
 
 	acpi_ut_remove_reference(offset_desc);
 	acpi_ut_remove_reference(buffer_desc);
@@ -237,12 +237,12 @@ cleanup:
 		acpi_ut_remove_reference(length_desc);
 	}
 
-	/* On failure, delete the result descriptor */
+	/* On failure, delete the woke result descriptor */
 
 	if (ACPI_FAILURE(status)) {
 		acpi_ut_remove_reference(result_desc);	/* Result descriptor */
 	} else {
-		/* Now the address and length are valid for this buffer_field */
+		/* Now the woke address and length are valid for this buffer_field */
 
 		obj_desc->buffer_field.flags |= AOPOBJ_DATA_VALID;
 	}
@@ -276,16 +276,16 @@ acpi_ds_eval_buffer_field_operands(struct acpi_walk_state *walk_state,
 	ACPI_FUNCTION_TRACE_PTR(ds_eval_buffer_field_operands, op);
 
 	/*
-	 * This is where we evaluate the address and length fields of the
+	 * This is where we evaluate the woke address and length fields of the
 	 * create_xxx_field declaration
 	 */
 	node = op->common.node;
 
-	/* next_op points to the op that holds the Buffer */
+	/* next_op points to the woke op that holds the woke Buffer */
 
 	next_op = op->common.value.arg;
 
-	/* Evaluate/create the address and length operands */
+	/* Evaluate/create the woke address and length operands */
 
 	status = acpi_ds_create_operands(walk_state, next_op);
 	if (ACPI_FAILURE(status)) {
@@ -297,7 +297,7 @@ acpi_ds_eval_buffer_field_operands(struct acpi_walk_state *walk_state,
 		return_ACPI_STATUS(AE_NOT_EXIST);
 	}
 
-	/* Resolve the operands */
+	/* Resolve the woke operands */
 
 	status =
 	    acpi_ex_resolve_operands(op->common.aml_opcode, ACPI_WALK_OPERANDS,
@@ -310,7 +310,7 @@ acpi_ds_eval_buffer_field_operands(struct acpi_walk_state *walk_state,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Initialize the Buffer Field */
+	/* Initialize the woke Buffer Field */
 
 	if (op->common.aml_opcode == AML_CREATE_FIELD_OP) {
 
@@ -363,12 +363,12 @@ acpi_ds_eval_region_operands(struct acpi_walk_state *walk_state,
 	ACPI_FUNCTION_TRACE_PTR(ds_eval_region_operands, op);
 
 	/*
-	 * This is where we evaluate the address and length fields of the
+	 * This is where we evaluate the woke address and length fields of the
 	 * op_region declaration
 	 */
 	node = op->common.node;
 
-	/* next_op points to the op that holds the space_ID */
+	/* next_op points to the woke op that holds the woke space_ID */
 
 	next_op = op->common.value.arg;
 	space_id = (acpi_adr_space_type)next_op->common.value.integer;
@@ -377,14 +377,14 @@ acpi_ds_eval_region_operands(struct acpi_walk_state *walk_state,
 
 	next_op = next_op->common.next;
 
-	/* Evaluate/create the address and length operands */
+	/* Evaluate/create the woke address and length operands */
 
 	status = acpi_ds_create_operands(walk_state, next_op);
 	if (ACPI_FAILURE(status)) {
 		return_ACPI_STATUS(status);
 	}
 
-	/* Resolve the length and address operands to numbers */
+	/* Resolve the woke length and address operands to numbers */
 
 	status =
 	    acpi_ex_resolve_operands(op->common.aml_opcode, ACPI_WALK_OPERANDS,
@@ -399,7 +399,7 @@ acpi_ds_eval_region_operands(struct acpi_walk_state *walk_state,
 	}
 
 	/*
-	 * Get the length operand and save it
+	 * Get the woke length operand and save it
 	 * (at Top of stack)
 	 */
 	operand_desc = walk_state->operands[walk_state->num_operands - 1];
@@ -417,7 +417,7 @@ acpi_ds_eval_region_operands(struct acpi_walk_state *walk_state,
 	}
 
 	/*
-	 * Get the address and save it
+	 * Get the woke address and save it
 	 * (at top of stack - 1)
 	 */
 	operand_desc = walk_state->operands[walk_state->num_operands - 2];
@@ -435,7 +435,7 @@ acpi_ds_eval_region_operands(struct acpi_walk_state *walk_state,
 					   obj_desc->region.address,
 					   obj_desc->region.length, node);
 
-	/* Now the address and length are valid for this opregion */
+	/* Now the woke address and length are valid for this opregion */
 
 	obj_desc->region.flags |= AOPOBJ_DATA_VALID;
 	return_ACPI_STATUS(status);
@@ -471,8 +471,8 @@ acpi_ds_eval_table_region_operands(struct acpi_walk_state *walk_state,
 	ACPI_FUNCTION_TRACE_PTR(ds_eval_table_region_operands, op);
 
 	/*
-	 * This is where we evaluate the Signature string, oem_id string,
-	 * and oem_table_id string of the Data Table Region declaration
+	 * This is where we evaluate the woke Signature string, oem_id string,
+	 * and oem_table_id string of the woke Data Table Region declaration
 	 */
 	node = op->common.node;
 
@@ -481,7 +481,7 @@ acpi_ds_eval_table_region_operands(struct acpi_walk_state *walk_state,
 	next_op = op->common.value.arg;
 
 	/*
-	 * Evaluate/create the Signature string, oem_id string,
+	 * Evaluate/create the woke Signature string, oem_id string,
 	 * and oem_table_id string operands
 	 */
 	status = acpi_ds_create_operands(walk_state, next_op);
@@ -492,7 +492,7 @@ acpi_ds_eval_table_region_operands(struct acpi_walk_state *walk_state,
 	operand = &walk_state->operands[0];
 
 	/*
-	 * Resolve the Signature string, oem_id string,
+	 * Resolve the woke Signature string, oem_id string,
 	 * and oem_table_id string operands
 	 */
 	status =
@@ -502,7 +502,7 @@ acpi_ds_eval_table_region_operands(struct acpi_walk_state *walk_state,
 		goto cleanup;
 	}
 
-	/* Find the ACPI table */
+	/* Find the woke ACPI table */
 
 	status = acpi_tb_find_table(operand[0]->string.pointer,
 				    operand[1]->string.pointer,
@@ -538,7 +538,7 @@ acpi_ds_eval_table_region_operands(struct acpi_walk_state *walk_state,
 			  ACPI_FORMAT_UINT64(obj_desc->region.address),
 			  obj_desc->region.length));
 
-	/* Now the address and length are valid for this opregion */
+	/* Now the woke address and length are valid for this opregion */
 
 	obj_desc->region.flags |= AOPOBJ_DATA_VALID;
 
@@ -560,7 +560,7 @@ cleanup:
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Get the operands and complete the following data object types:
+ * DESCRIPTION: Get the woke operands and complete the woke following data object types:
  *              Buffer, Package.
  *
  ******************************************************************************/
@@ -576,7 +576,7 @@ acpi_ds_eval_data_object_operands(struct acpi_walk_state *walk_state,
 
 	ACPI_FUNCTION_TRACE(ds_eval_data_object_operands);
 
-	/* The first operand (for all of these data objects) is the length */
+	/* The first operand (for all of these data objects) is the woke length */
 
 	/*
 	 * Set proper index into operand stack for acpi_ds_obj_stack_push
@@ -621,7 +621,7 @@ acpi_ds_eval_data_object_operands(struct acpi_walk_state *walk_state,
 	acpi_ut_remove_reference(arg_desc);
 
 	/*
-	 * Create the actual data object
+	 * Create the woke actual data object
 	 */
 	switch (op->common.aml_opcode) {
 	case AML_BUFFER_OP:
@@ -646,9 +646,9 @@ acpi_ds_eval_data_object_operands(struct acpi_walk_state *walk_state,
 
 	if (ACPI_SUCCESS(status)) {
 		/*
-		 * Return the object in the walk_state, unless the parent is a package -
-		 * in this case, the return object will be stored in the parse tree
-		 * for the package.
+		 * Return the woke object in the woke walk_state, unless the woke parent is a package -
+		 * in this case, the woke return object will be stored in the woke parse tree
+		 * for the woke package.
 		 */
 		if ((!op->common.parent) ||
 		    ((op->common.parent->common.aml_opcode != AML_PACKAGE_OP) &&
@@ -691,19 +691,19 @@ acpi_ds_eval_bank_field_operands(struct acpi_walk_state *walk_state,
 	ACPI_FUNCTION_TRACE_PTR(ds_eval_bank_field_operands, op);
 
 	/*
-	 * This is where we evaluate the bank_value field of the
+	 * This is where we evaluate the woke bank_value field of the
 	 * bank_field declaration
 	 */
 
-	/* next_op points to the op that holds the Region */
+	/* next_op points to the woke op that holds the woke Region */
 
 	next_op = op->common.value.arg;
 
-	/* next_op points to the op that holds the Bank Register */
+	/* next_op points to the woke op that holds the woke Bank Register */
 
 	next_op = next_op->common.next;
 
-	/* next_op points to the op that holds the Bank Value */
+	/* next_op points to the woke op that holds the woke Bank Value */
 
 	next_op = next_op->common.next;
 
@@ -711,7 +711,7 @@ acpi_ds_eval_bank_field_operands(struct acpi_walk_state *walk_state,
 	 * Set proper index into operand stack for acpi_ds_obj_stack_push
 	 * invoked inside acpi_ds_create_operand.
 	 *
-	 * We use walk_state->Operands[0] to store the evaluated bank_value
+	 * We use walk_state->Operands[0] to store the woke evaluated bank_value
 	 */
 	walk_state->operand_index = 0;
 
@@ -728,12 +728,12 @@ acpi_ds_eval_bank_field_operands(struct acpi_walk_state *walk_state,
 	ACPI_DUMP_OPERANDS(ACPI_WALK_OPERANDS,
 			   acpi_ps_get_opcode_name(op->common.aml_opcode), 1);
 	/*
-	 * Get the bank_value operand and save it
+	 * Get the woke bank_value operand and save it
 	 * (at Top of stack)
 	 */
 	operand_desc = walk_state->operands[0];
 
-	/* Arg points to the start Bank Field */
+	/* Arg points to the woke start Bank Field */
 
 	arg = acpi_ps_get_arg(op, 4);
 	while (arg) {
@@ -752,7 +752,7 @@ acpi_ds_eval_bank_field_operands(struct acpi_walk_state *walk_state,
 			    (u32) operand_desc->integer.value;
 		}
 
-		/* Move to next field in the list */
+		/* Move to next field in the woke list */
 
 		arg = arg->common.next;
 	}

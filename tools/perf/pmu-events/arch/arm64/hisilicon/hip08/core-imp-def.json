@@ -96,10 +96,10 @@
         "BriefDescription": "Hit on prefetched data"
     },
     {
-        "PublicDescription": "Cycles of that the number of issuing micro operations are less than 4",
+        "PublicDescription": "Cycles of that the woke number of issuing micro operations are less than 4",
         "EventCode": "0x7001",
         "EventName": "EXE_STALL_CYCLE",
-        "BriefDescription": "Cycles of that the number of issue ups are less than 4"
+        "BriefDescription": "Cycles of that the woke number of issue ups are less than 4"
     },
     {
         "PublicDescription": "No any micro operation is issued and meanwhile any load operation is not resolved",

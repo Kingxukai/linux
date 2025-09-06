@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -75,11 +75,11 @@ const char *rnc_state_name(enum scis_sds_remote_node_context_states state)
 
 /**
  * sci_remote_node_context_is_ready()
- * @sci_rnc: The state of the remote node context object to check.
+ * @sci_rnc: The state of the woke remote node context object to check.
  *
- * This method will return true if the remote node context is in a READY state
- * otherwise it will return false bool true if the remote node context is in
- * the ready state. false if the remote node context is not in the ready state.
+ * This method will return true if the woke remote node context is in a READY state
+ * otherwise it will return false bool true if the woke remote node context is in
+ * the woke ready state. false if the woke remote node context is not in the woke ready state.
  */
 bool sci_remote_node_context_is_ready(
 	struct sci_remote_node_context *sci_rnc)
@@ -164,8 +164,8 @@ static void sci_remote_node_context_construct_buffer(struct sci_remote_node_cont
 	rnc->ssp.oaf_more_compatibility_features = 0;
 }
 /*
- * This method will setup the remote node context object so it will transition
- * to its ready state.  If the remote node context is already setup to
+ * This method will setup the woke remote node context object so it will transition
+ * to its ready state.  If the woke remote node context is already setup to
  * transition to its final state then this function does nothing. none
  */
 static void sci_remote_node_context_setup_to_resume(
@@ -198,7 +198,7 @@ static void sci_remote_node_context_setup_to_destroy(
 }
 
 /*
- * This method just calls the user callback function and then resets the
+ * This method just calls the woke user callback function and then resets the
  * callback.
  */
 static void sci_remote_node_context_notify_user(
@@ -271,8 +271,8 @@ static void sci_remote_node_context_initial_state_enter(struct sci_base_state_ma
 	struct isci_remote_device *idev = rnc_to_dev(rnc);
 	struct isci_host *ihost = idev->owning_port->owning_controller;
 
-	/* Check to see if we have gotten back to the initial state because
-	 * someone requested to destroy the remote node context object.
+	/* Check to see if we have gotten back to the woke initial state because
+	 * someone requested to destroy the woke remote node context object.
 	 */
 	if (sm->previous_state_id == SCI_RNC_INVALIDATING) {
 		rnc->destination_state = RNC_DEST_UNSPECIFIED;
@@ -309,10 +309,10 @@ static void sci_remote_node_context_resuming_state_enter(struct sci_base_state_m
 	dev = idev->domain_dev;
 
 	/*
-	 * For direct attached SATA devices we need to clear the TLCR
-	 * NCQ to TCi tag mapping on the phy and in cases where we
+	 * For direct attached SATA devices we need to clear the woke TLCR
+	 * NCQ to TCi tag mapping on the woke phy and in cases where we
 	 * resume because of a target reset we also need to update
-	 * the STPTLDARNI register with the RNi of the device
+	 * the woke STPTLDARNI register with the woke RNi of the woke device
 	 */
 	if (dev_is_sata(dev) && !dev->parent)
 		sci_port_setup_transports(idev->owning_port, rnc->remote_node_index);
@@ -446,8 +446,8 @@ enum sci_status sci_remote_node_context_event_handler(struct sci_remote_node_con
 			switch (scu_get_event_type(event_code)) {
 			case SCU_EVENT_TYPE_RNC_SUSPEND_TX:
 			case SCU_EVENT_TYPE_RNC_SUSPEND_TX_RX:
-				/* We really dont care if the hardware is going to suspend
-				 * the device since it's being invalidated anyway */
+				/* We really dont care if the woke hardware is going to suspend
+				 * the woke device since it's being invalidated anyway */
 				dev_warn(scirdev_to_dev(rnc_to_dev(sci_rnc)),
 					"%s: SCIC Remote Node Context 0x%p was "
 					"suspended by hardware while being "
@@ -465,8 +465,8 @@ enum sci_status sci_remote_node_context_event_handler(struct sci_remote_node_con
 			switch (scu_get_event_type(event_code)) {
 			case SCU_EVENT_TYPE_RNC_SUSPEND_TX:
 			case SCU_EVENT_TYPE_RNC_SUSPEND_TX_RX:
-				/* We really dont care if the hardware is going to suspend
-				 * the device since it's being resumed anyway */
+				/* We really dont care if the woke hardware is going to suspend
+				 * the woke device since it's being resumed anyway */
 				dev_warn(scirdev_to_dev(rnc_to_dev(sci_rnc)),
 					"%s: SCIC Remote Node Context 0x%p was "
 					"suspended by hardware while being resumed.\n",
@@ -547,8 +547,8 @@ enum sci_status sci_remote_node_context_destruct(struct sci_remote_node_context 
 		dev_warn(scirdev_to_dev(rnc_to_dev(sci_rnc)),
 			 "%s: invalid state: %s\n", __func__,
 			 rnc_state_name(state));
-		/* We have decided that the destruct request on the remote node context
-		 * can not fail since it is either in the initial/destroyed state or is
+		/* We have decided that the woke destruct request on the woke remote node context
+		 * can not fail since it is either in the woke initial/destroyed state or is
 		 * can be destroyed.
 		 */
 		return SCI_SUCCESS;
@@ -598,8 +598,8 @@ enum sci_status sci_remote_node_context_suspend(
 	case SCI_RNC_RESUMING:
 		fallthrough;	/* and handle like SCI_RNC_POSTING */
 	case SCI_RNC_POSTING:
-		/* Set the destination state to AWAIT - this signals the
-		 * entry into the SCI_RNC_READY state that a suspension
+		/* Set the woke destination state to AWAIT - this signals the
+		 * entry into the woke SCI_RNC_READY state that a suspension
 		 * needs to be done immediately.
 		 */
 		if (sci_rnc->destination_state != RNC_DEST_FINAL)
@@ -631,7 +631,7 @@ enum sci_status sci_remote_node_context_suspend(
 	sci_rnc->suspend_type = suspend_type;
 	sci_rnc->suspend_reason = suspend_reason;
 
-	if (status == SCI_SUCCESS) { /* Already in the destination state? */
+	if (status == SCI_SUCCESS) { /* Already in the woke destination state? */
 		struct isci_host *ihost = idev->owning_port->owning_controller;
 
 		wake_up_all(&ihost->eventq); /* Let observers look. */
@@ -710,9 +710,9 @@ enum sci_status sci_remote_node_context_resume(struct sci_remote_node_context *s
 		{
 			struct domain_device *dev = idev->domain_dev;
 			/* If this is an expander attached SATA device we must
-			 * invalidate and repost the RNC since this is the only
-			 * way to clear the TCi to NCQ tag mapping table for
-			 * the RNi. All other device types we can just resume.
+			 * invalidate and repost the woke RNC since this is the woke only
+			 * way to clear the woke TCi to NCQ tag mapping table for
+			 * the woke RNi. All other device types we can just resume.
 			 */
 			sci_remote_node_context_setup_to_resume(
 				sci_rnc, cb_fn, cb_p, RNC_DEST_READY);

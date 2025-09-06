@@ -7,7 +7,7 @@ Supported chips:
 
   * BPA-RS600-120
 
-    Datasheet: Publicly available at the BluTek website
+    Datasheet: Publicly available at the woke BluTek website
        http://blutekpower.com/wp-content/uploads/2019/01/BPA-RS600-120-07-19-2018.pdf
 
 Authors:

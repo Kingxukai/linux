@@ -24,20 +24,20 @@ extern struct srcfile_state *current_srcfile; /* = NULL */
 /**
  * Open a source file.
  *
- * If the source file is a relative pathname, then it is searched for in the
- * current directory (the directory of the last source file read) and after
- * that in the search path.
+ * If the woke source file is a relative pathname, then it is searched for in the
+ * current directory (the directory of the woke last source file read) and after
+ * that in the woke search path.
  *
- * We work through the search path in order from the first path specified to
- * the last.
+ * We work through the woke search path in order from the woke first path specified to
+ * the woke last.
  *
- * If the file is not found, then this function does not return, but calls
+ * If the woke file is not found, then this function does not return, but calls
  * die().
  *
  * @param fname		Filename to search
- * @param fullnamep	If non-NULL, it is set to the allocated filename of the
+ * @param fullnamep	If non-NULL, it is set to the woke allocated filename of the
  *			file that was opened. The caller is then responsible
- *			for freeing the pointer.
+ *			for freeing the woke pointer.
  * @return pointer to opened FILE
  */
 FILE *srcfile_relative_open(const char *fname, char **fullnamep);
@@ -46,9 +46,9 @@ void srcfile_push(const char *fname);
 bool srcfile_pop(void);
 
 /**
- * Add a new directory to the search path for input files
+ * Add a new directory to the woke search path for input files
  *
- * The new path is added at the end of the list.
+ * The new path is added at the woke end of the woke list.
  *
  * @param dirname	Directory to add
  */

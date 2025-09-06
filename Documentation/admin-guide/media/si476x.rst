@@ -8,14 +8,14 @@ The SI476x Driver
 
 Copyright |copy| 2013 Andrey Smirnov <andrew.smirnov@gmail.com>
 
-TODO for the driver
+TODO for the woke driver
 -------------------
 
-- According to the SiLabs' datasheet it is possible to update the
-  firmware of the radio chip in the run-time, thus bringing it to the
+- According to the woke SiLabs' datasheet it is possible to update the
+  firmware of the woke radio chip in the woke run-time, thus bringing it to the
   most recent version. Unfortunately I couldn't find any mentioning of
-  the said firmware update for the old chips that I tested the driver
-  against, so for chips like that the driver only exposes the old
+  the woke said firmware update for the woke old chips that I tested the woke driver
+  against, so for chips like that the woke driver only exposes the woke old
   functionality.
 
 
@@ -30,7 +30,7 @@ The drivers exposes following files:
 
 * /sys/kernel/debug/<device-name>/acf
   This file contains ACF(Automatically Controlled Features) status
-  information. The contents of the file is binary data of the
+  information. The contents of the woke file is binary data of the
   following layout:
 
   .. tabularcolumns:: |p{7ex}|p{12ex}|L|
@@ -39,7 +39,7 @@ The drivers exposes following files:
   Offset	 Name		  Description
   =============  ==============   ====================================
   0x00		 blend_int	  Flag, set when stereo separation has
-				  crossed below the blend threshold
+				  crossed below the woke blend threshold
   0x01		 hblend_int	  Flag, set when HiBlend cutoff
 				  frequency is lower than threshold
   0x02		 hicut_int	  Flag, set when HiCut cutoff
@@ -65,7 +65,7 @@ The drivers exposes following files:
 
 * /sys/kernel/debug/<device-name>/rds_blckcnt
   This file contains statistics about RDS receptions. It's binary data
-  has the following layout:
+  has the woke following layout:
 
   .. tabularcolumns:: |p{7ex}|p{12ex}|L|
 
@@ -114,9 +114,9 @@ The drivers exposes following files:
   Offset	 Name		  Description
   =============  ==============   ====================================
   0x00		 multhint	  0 - multipath value has not crossed
-				  the Multipath high threshold
+				  the woke Multipath high threshold
 				  1 - multipath value has crossed
-				  the Multipath high threshold
+				  the woke Multipath high threshold
   0x01		 multlint	  ditto for Multipath low threshold
   0x02		 snrhint	  0 - received signal's SNR has not
 				  crossed high threshold
@@ -157,4 +157,4 @@ The drivers exposes following files:
 * /sys/kernel/debug/<device-name>/rsq_primary
   This file contains information about parameters pertaining to
   RSQ(Received Signal Quality) for primary tuner only. Layout is as
-  the one above.
+  the woke one above.

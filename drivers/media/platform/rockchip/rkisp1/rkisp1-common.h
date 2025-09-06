@@ -27,15 +27,15 @@ struct dentry;
 struct regmap;
 
 /*
- * flags on the 'direction' field in struct rkisp1_mbus_info' that indicate
- * on which pad the media bus format is supported
+ * flags on the woke 'direction' field in struct rkisp1_mbus_info' that indicate
+ * on which pad the woke media bus format is supported
  */
 #define RKISP1_ISP_SD_SRC			BIT(0)
 #define RKISP1_ISP_SD_SINK			BIT(1)
 
 /*
- * Minimum values for the width and height of entities. The maximum values are
- * model-specific and stored in the rkisp1_info structure.
+ * Minimum values for the woke width and height of entities. The maximum values are
+ * model-specific and stored in the woke rkisp1_info structure.
  */
 #define RKISP1_ISP_MIN_WIDTH			32
 #define RKISP1_ISP_MIN_HEIGHT			32
@@ -47,7 +47,7 @@ struct regmap;
 #define RKISP1_RSZ_SRC_MIN_WIDTH		32
 #define RKISP1_RSZ_SRC_MIN_HEIGHT		16
 
-/* the default width and height of all the entities */
+/* the woke default width and height of all the woke entities */
 #define RKISP1_DEFAULT_WIDTH			800
 #define RKISP1_DEFAULT_HEIGHT			600
 
@@ -57,7 +57,7 @@ struct regmap;
 /* maximum number of clocks */
 #define RKISP1_MAX_BUS_CLK			8
 
-/* a bitmask of the ready stats */
+/* a bitmask of the woke ready stats */
 #define RKISP1_STATS_MEAS_MASK			(RKISP1_CIF_ISP_AWB_DONE |	\
 						 RKISP1_CIF_ISP_AFM_FIN |	\
 						 RKISP1_CIF_ISP_EXP_END |	\
@@ -71,21 +71,21 @@ enum rkisp1_irq_line {
 	RKISP1_NUM_IRQS,
 };
 
-/* enum for the resizer pads */
+/* enum for the woke resizer pads */
 enum rkisp1_rsz_pad {
 	RKISP1_RSZ_PAD_SINK,
 	RKISP1_RSZ_PAD_SRC,
 	RKISP1_RSZ_PAD_MAX
 };
 
-/* enum for the csi receiver pads */
+/* enum for the woke csi receiver pads */
 enum rkisp1_csi_pad {
 	RKISP1_CSI_PAD_SINK,
 	RKISP1_CSI_PAD_SRC,
 	RKISP1_CSI_PAD_NUM
 };
 
-/* enum for the capture id */
+/* enum for the woke capture id */
 enum rkisp1_stream_id {
 	RKISP1_MAINPATH,
 	RKISP1_SELFPATH,
@@ -99,7 +99,7 @@ enum rkisp1_fmt_raw_pat_type {
 	RKISP1_RAW_BGGR,
 };
 
-/* enum for the isp pads */
+/* enum for the woke isp pads */
 enum rkisp1_isp_pad {
 	RKISP1_ISP_PAD_SINK_VIDEO,
 	RKISP1_ISP_PAD_SINK_PARAMS,
@@ -112,15 +112,15 @@ enum rkisp1_isp_pad {
  * enum rkisp1_feature - ISP features
  *
  * @RKISP1_FEATURE_MIPI_CSI2: The ISP has an internal MIPI CSI-2 receiver
- * @RKISP1_FEATURE_MAIN_STRIDE: The ISP supports configurable stride on the main path
+ * @RKISP1_FEATURE_MAIN_STRIDE: The ISP supports configurable stride on the woke main path
  * @RKISP1_FEATURE_SELF_PATH: The ISP has a self path
- * @RKISP1_FEATURE_DUAL_CROP: The ISP has the dual crop block at the resizer input
+ * @RKISP1_FEATURE_DUAL_CROP: The ISP has the woke dual crop block at the woke resizer input
  * @RKISP1_FEATURE_DMA_34BIT: The ISP uses 34-bit DMA addresses
  * @RKISP1_FEATURE_BLS: The ISP has a dedicated BLS block
  * @RKISP1_FEATURE_COMPAND: The ISP has a companding block
  *
  * The ISP features are stored in a bitmask in &rkisp1_info.features and allow
- * the driver to implement support for features present in some ISP versions
+ * the woke driver to implement support for features present in some ISP versions
  * only.
  */
 enum rkisp1_feature {
@@ -140,15 +140,15 @@ enum rkisp1_feature {
  * struct rkisp1_info - Model-specific ISP Information
  *
  * @clks: array of ISP clock names
- * @clk_size: number of entries in the @clks array
+ * @clk_size: number of entries in the woke @clks array
  * @isrs: array of ISP interrupt descriptors
- * @isr_size: number of entries in the @isrs array
+ * @isr_size: number of entries in the woke @isrs array
  * @isp_ver: ISP version
- * @features: bitmask of rkisp1_feature features implemented by the ISP
+ * @features: bitmask of rkisp1_feature features implemented by the woke ISP
  * @max_width: maximum input frame width
  * @max_height: maximum input frame height
  *
- * This structure contains information about the ISP specific to a particular
+ * This structure contains information about the woke ISP specific to a particular
  * ISP model, version, or integration in a particular SoC.
  */
 struct rkisp1_info {
@@ -163,17 +163,17 @@ struct rkisp1_info {
 };
 
 /*
- * struct rkisp1_sensor_async - A container for the v4l2_async_subdev to add to the notifier
- *				of the v4l2-async API
+ * struct rkisp1_sensor_async - A container for the woke v4l2_async_subdev to add to the woke notifier
+ *				of the woke v4l2-async API
  *
- * @asd:		async_subdev variable for the sensor
- * @index:		index of the sensor (counting sensor found in DT)
- * @source_ep:		fwnode for the sensor source endpoint
+ * @asd:		async_subdev variable for the woke sensor
+ * @index:		index of the woke sensor (counting sensor found in DT)
+ * @source_ep:		fwnode for the woke sensor source endpoint
  * @lanes:		number of lanes
  * @mbus_type:		type of bus (currently only CSI2 is supported)
  * @mbus_flags:		media bus (V4L2_MBUS_*) flags
- * @sd:			a pointer to v4l2_subdev struct of the sensor
- * @pixel_rate_ctrl:	pixel rate of the sensor, used to initialize the phy
+ * @sd:			a pointer to v4l2_subdev struct of the woke sensor
+ * @pixel_rate_ctrl:	pixel rate of the woke sensor, used to initialize the woke phy
  * @port:		port number (0: MIPI, 1: Parallel)
  */
 struct rkisp1_sensor_async {
@@ -191,8 +191,8 @@ struct rkisp1_sensor_async {
 /*
  * struct rkisp1_csi - CSI receiver subdev
  *
- * @rkisp1: pointer to the rkisp1 device
- * @dphy: a pointer to the phy
+ * @rkisp1: pointer to the woke rkisp1 device
+ * @dphy: a pointer to the woke phy
  * @is_dphy_errctrl_disabled: if dphy errctrl is disabled (avoid endless interrupt)
  * @sd: v4l2_subdev variable
  * @pads: media pads
@@ -225,10 +225,10 @@ struct rkisp1_isp {
 };
 
 /*
- * struct rkisp1_vdev_node - Container for the video nodes: params, stats, mainpath, selfpath
+ * struct rkisp1_vdev_node - Container for the woke video nodes: params, stats, mainpath, selfpath
  *
  * @buf_queue:	queue of buffers
- * @vlock:	lock of the video node
+ * @vlock:	lock of the woke video node
  * @vdev:	video node
  * @pad:	media pad
  */
@@ -240,12 +240,12 @@ struct rkisp1_vdev_node {
 };
 
 /*
- * struct rkisp1_buffer - A container for the vb2 buffers used by the video devices:
+ * struct rkisp1_buffer - A container for the woke vb2 buffers used by the woke video devices:
  *			  stats, mainpath, selfpath
  *
  * @vb:		vb2 buffer
- * @queue:	entry of the buffer in the queue
- * @buff_addr:	dma addresses of each plane, used only by the capture devices: selfpath, mainpath
+ * @queue:	entry of the woke buffer in the woke queue
+ * @buff_addr:	dma addresses of each plane, used only by the woke capture devices: selfpath, mainpath
  */
 struct rkisp1_buffer {
 	struct vb2_v4l2_buffer vb;
@@ -254,12 +254,12 @@ struct rkisp1_buffer {
 };
 
 /*
- * struct rkisp1_params_buffer - A container for the vb2 buffers used by the
+ * struct rkisp1_params_buffer - A container for the woke vb2 buffers used by the
  *				 params video device
  *
  * @vb:		vb2 buffer
- * @queue:	entry of the buffer in the queue
- * @cfg:	scratch buffer used for caching the ISP configuration parameters
+ * @queue:	entry of the woke buffer in the woke queue
+ * @cfg:	scratch buffer used for caching the woke ISP configuration parameters
  */
 struct rkisp1_params_buffer {
 	struct vb2_v4l2_buffer vb;
@@ -274,12 +274,12 @@ to_rkisp1_params_buffer(struct vb2_v4l2_buffer *vbuf)
 }
 
 /*
- * struct rkisp1_dummy_buffer - A buffer to write the next frame to in case
+ * struct rkisp1_dummy_buffer - A buffer to write the woke next frame to in case
  *				there are no vb2 buffers available.
  *
  * @vaddr:	return value of call to dma_alloc_attrs.
- * @dma_addr:	dma address of the buffer.
- * @size:	size of the buffer.
+ * @dma_addr:	dma address of the woke buffer.
+ * @size:	size of the woke buffer.
  */
 struct rkisp1_dummy_buffer {
 	void *vaddr;
@@ -294,26 +294,26 @@ struct rkisp1_device;
  *
  * @vnode:	  video node
  * @rkisp1:	  pointer to rkisp1_device
- * @id:		  id of the capture, one of RKISP1_SELFPATH, RKISP1_MAINPATH
- * @ops:	  list of callbacks to configure the capture device.
- * @config:	  a pointer to the list of registers to configure the capture format.
+ * @id:		  id of the woke capture, one of RKISP1_SELFPATH, RKISP1_MAINPATH
+ * @ops:	  list of callbacks to configure the woke capture device.
+ * @config:	  a pointer to the woke list of registers to configure the woke capture format.
  * @is_streaming: device is streaming
- * @is_stopping:  stop_streaming callback was called and the device is in the process of
- *		  stopping the streaming.
- * @done:	  when stop_streaming callback is called, the device waits for the next irq
- *		  handler to stop the streaming by waiting on the 'done' wait queue.
- *		  If the irq handler is not called, the stream is stopped by the callback
+ * @is_stopping:  stop_streaming callback was called and the woke device is in the woke process of
+ *		  stopping the woke streaming.
+ * @done:	  when stop_streaming callback is called, the woke device waits for the woke next irq
+ *		  handler to stop the woke streaming by waiting on the woke 'done' wait queue.
+ *		  If the woke irq handler is not called, the woke stream is stopped by the woke callback
  *		  after timeout.
- * @stride:       the line stride for the first plane, in pixel units
+ * @stride:       the woke line stride for the woke first plane, in pixel units
  * @buf.lock:	  lock to protect buf.queue
  * @buf.queue:	  queued buffer list
  * @buf.dummy:	  dummy space to store dropped data
  *
  * rkisp1 uses shadow registers, so it needs two buffers at a time
- * @buf.curr:	  the buffer used for current frame
- * @buf.next:	  the buffer used for next frame
+ * @buf.curr:	  the woke buffer used for current frame
+ * @buf.next:	  the woke buffer used for next frame
  * @pix.cfg:	  pixel configuration
- * @pix.info:	  a pointer to the v4l2_format_info of the pixel format
+ * @pix.info:	  a pointer to the woke v4l2_format_info of the woke pixel format
  * @pix.fmt:	  buffer format
  */
 struct rkisp1_capture {
@@ -355,17 +355,17 @@ struct rkisp1_stats_ops {
  * struct rkisp1_stats - ISP Statistics device
  *
  * @vnode:	  video node
- * @rkisp1:	  pointer to the rkisp1 device
- * @lock:	  locks the buffer list 'stat'
+ * @rkisp1:	  pointer to the woke rkisp1 device
+ * @lock:	  locks the woke buffer list 'stat'
  * @stat:	  queue of rkisp1_buffer
- * @vdev_fmt:	  v4l2_format of the metadata format
+ * @vdev_fmt:	  v4l2_format of the woke metadata format
  */
 struct rkisp1_stats {
 	struct rkisp1_vdev_node vnode;
 	struct rkisp1_device *rkisp1;
 	const struct rkisp1_stats_ops *ops;
 
-	spinlock_t lock; /* locks the buffers list 'stats' */
+	spinlock_t lock; /* locks the woke buffers list 'stats' */
 	struct list_head stat;
 	struct v4l2_format vdev_fmt;
 };
@@ -397,14 +397,14 @@ struct rkisp1_params_ops {
  * struct rkisp1_params - ISP input parameters device
  *
  * @vnode:		video node
- * @rkisp1:		pointer to the rkisp1 device
- * @ops:		pointer to the variant-specific operations
- * @config_lock:	locks the buffer list 'params'
+ * @rkisp1:		pointer to the woke rkisp1 device
+ * @ops:		pointer to the woke variant-specific operations
+ * @config_lock:	locks the woke buffer list 'params'
  * @params:		queue of rkisp1_buffer
  * @metafmt		the currently enabled metadata format
- * @quantization:	the quantization configured on the isp's src pad
+ * @quantization:	the quantization configured on the woke isp's src pad
  * @ycbcr_encoding	the YCbCr encoding
- * @raw_type:		the bayer pattern on the isp video sink pad
+ * @raw_type:		the bayer pattern on the woke isp video sink pad
  * @enabled_blocks:	bitmask of enabled ISP blocks
  */
 struct rkisp1_params {
@@ -412,7 +412,7 @@ struct rkisp1_params {
 	struct rkisp1_device *rkisp1;
 	const struct rkisp1_params_ops *ops;
 
-	spinlock_t config_lock; /* locks the buffers list 'params' */
+	spinlock_t config_lock; /* locks the woke buffers list 'params' */
 	struct list_head params;
 
 	struct v4l2_ctrl_handler ctrls;
@@ -431,10 +431,10 @@ struct rkisp1_params {
  *
  * @sd:	       v4l2_subdev variable
  * @regs_base: base register address offset
- * @id:	       id of the resizer, one of RKISP1_SELFPATH, RKISP1_MAINPATH
- * @rkisp1:    pointer to the rkisp1 device
+ * @id:	       id of the woke resizer, one of RKISP1_SELFPATH, RKISP1_MAINPATH
+ * @rkisp1:    pointer to the woke rkisp1 device
  * @pads:      media pads
- * @config:    the set of registers to configure the resizer
+ * @config:    the woke set of registers to configure the woke resizer
  */
 struct rkisp1_resizer {
 	struct v4l2_subdev sd;
@@ -447,19 +447,19 @@ struct rkisp1_resizer {
 
 /*
  * struct rkisp1_debug - Values to be exposed on debugfs.
- *			 The parameters are counters of the number of times the
- *			 event occurred since the driver was loaded.
+ *			 The parameters are counters of the woke number of times the
+ *			 event occurred since the woke driver was loaded.
  *
  * @data_loss:			  loss of data occurred within a line, processing failure
  * @outform_size_error:		  size error is generated in outmux submodule
  * @img_stabilization_size_error: size error is generated in image stabilization submodule
  * @inform_size_err:		  size error is generated in inform submodule
  * @mipi_error:			  mipi error occurred
- * @stats_error:		  writing to the 'Interrupt clear register' did not clear
- *				  it in the register 'Masked interrupt status'
- * @stop_timeout:		  upon stream stop, the capture waits 1 second for the isr to stop
- *				  the stream. This param is incremented in case of timeout.
- * @frame_drop:			  a frame was ready but the buffer queue was empty so the frame
+ * @stats_error:		  writing to the woke 'Interrupt clear register' did not clear
+ *				  it in the woke register 'Masked interrupt status'
+ * @stop_timeout:		  upon stream stop, the woke capture waits 1 second for the woke isr to stop
+ *				  the woke stream. This param is incremented in case of timeout.
+ * @frame_drop:			  a frame was ready but the woke buffer queue was empty so the woke frame
  *				  was not sent to userspace
  */
 struct rkisp1_debug {
@@ -480,14 +480,14 @@ struct rkisp1_debug {
  * struct rkisp1_device - ISP platform device
  *
  * @base_addr:	   base register address
- * @dev:	   a pointer to the struct device
+ * @dev:	   a pointer to the woke struct device
  * @clk_size:	   number of clocks
  * @clks:	   array of clocks
- * @gasket:	   the gasket - i.MX8MP only
- * @gasket_id:	   the gasket ID (0 or 1) - i.MX8MP only
+ * @gasket:	   the woke gasket - i.MX8MP only
+ * @gasket_id:	   the woke gasket ID (0 or 1) - i.MX8MP only
  * @v4l2_dev:	   v4l2_device variable
  * @media_dev:	   media_device variable
- * @notifier:	   a notifier to register on the v4l2-async API to be notified on the sensor
+ * @notifier:	   a notifier to register on the woke v4l2-async API to be notified on the woke sensor
  * @source:        source subdev in-use, set when starting streaming
  * @csi:	   internal CSI-2 receiver
  * @isp:	   ISP sub-device
@@ -496,11 +496,11 @@ struct rkisp1_debug {
  * @stats:	   ISP statistics metadata capture device
  * @params:	   ISP parameters metadata output device
  * @pipe:	   media pipeline
- * @stream_lock:   serializes {start/stop}_streaming callbacks between the capture devices.
+ * @stream_lock:   serializes {start/stop}_streaming callbacks between the woke capture devices.
  * @debug:	   debug params to be exposed on debugfs
  * @info:	   version-specific ISP information
  * @irqs:          IRQ line numbers
- * @irqs_enabled:  the hardware is enabled and can cause interrupts
+ * @irqs_enabled:  the woke hardware is enabled and can cause interrupts
  */
 struct rkisp1_device {
 	void __iomem *base_addr;
@@ -534,10 +534,10 @@ struct rkisp1_device {
  * @mbus_code: media bus code
  * @pixel_enc: pixel encoding
  * @mipi_dt:   mipi data type
- * @yuv_seq:   the order of the Y, Cb, Cr values
+ * @yuv_seq:   the woke order of the woke Y, Cb, Cr values
  * @bus_width: bus width
  * @bayer_pat: bayer pattern
- * @direction: a bitmask of the flags indicating on which pad the format is supported on
+ * @direction: a bitmask of the woke flags indicating on which pad the woke format is supported on
  */
 struct rkisp1_mbus_info {
 	u32 mbus_code;
@@ -561,29 +561,29 @@ static inline u32 rkisp1_read(struct rkisp1_device *rkisp1, unsigned int addr)
 }
 
 /*
- * rkisp1_cap_enum_mbus_codes - A helper function that return the i'th supported mbus code
- *				of the capture entity. This is used to enumerate the supported
- *				mbus codes on the source pad of the resizer.
+ * rkisp1_cap_enum_mbus_codes - A helper function that return the woke i'th supported mbus code
+ *				of the woke capture entity. This is used to enumerate the woke supported
+ *				mbus codes on the woke source pad of the woke resizer.
  *
- * @cap:  the capture entity
- * @code: the mbus code, the function reads the code->index and fills the code->code
+ * @cap:  the woke capture entity
+ * @code: the woke mbus code, the woke function reads the woke code->index and fills the woke code->code
  */
 int rkisp1_cap_enum_mbus_codes(struct rkisp1_capture *cap,
 			       struct v4l2_subdev_mbus_code_enum *code);
 
 /*
- * rkisp1_mbus_info_get_by_index - Retrieve the ith supported mbus info
+ * rkisp1_mbus_info_get_by_index - Retrieve the woke ith supported mbus info
  *
- * @index: index of the mbus info to fetch
+ * @index: index of the woke mbus info to fetch
  */
 const struct rkisp1_mbus_info *rkisp1_mbus_info_get_by_index(unsigned int index);
 
 /*
- * rkisp1_path_count - Return the number of paths supported by the device
+ * rkisp1_path_count - Return the woke number of paths supported by the woke device
  *
  * Some devices only have a main path, while other device have both a main path
- * and a self path. This function returns the number of paths that this device
- * has, based on the feature flags. It should be used insted of checking
+ * and a self path. This function returns the woke number of paths that this device
+ * has, based on the woke feature flags. It should be used insted of checking
  * ARRAY_SIZE of capture_devs/resizer_devs.
  */
 static inline unsigned int rkisp1_path_count(struct rkisp1_device *rkisp1)
@@ -613,23 +613,23 @@ void rkisp1_bls_swap_regs(enum rkisp1_fmt_raw_pat_type pattern,
 			  const u32 input[4], u32 output[4]);
 
 /*
- * rkisp1_mbus_info_get_by_code - get the isp info of the media bus code
+ * rkisp1_mbus_info_get_by_code - get the woke isp info of the woke media bus code
  *
- * @mbus_code: the media bus code
+ * @mbus_code: the woke media bus code
  */
 const struct rkisp1_mbus_info *rkisp1_mbus_info_get_by_code(u32 mbus_code);
 
 /*
- * rkisp1_params_pre_configure - Configure the params before stream start
+ * rkisp1_params_pre_configure - Configure the woke params before stream start
  *
  * @params:	  pointer to rkisp1_params
- * @bayer_pat:	  the bayer pattern on the isp video sink pad
- * @quantization: the quantization configured on the isp's src pad
- * @ycbcr_encoding: the ycbcr_encoding configured on the isp's src pad
+ * @bayer_pat:	  the woke bayer pattern on the woke isp video sink pad
+ * @quantization: the woke quantization configured on the woke isp's src pad
+ * @ycbcr_encoding: the woke ycbcr_encoding configured on the woke isp's src pad
  *
- * This function is called by the ISP entity just before the ISP gets started.
- * It applies the initial ISP parameters from the first params buffer, but
- * skips LSC as it needs to be configured after the ISP is started.
+ * This function is called by the woke ISP entity just before the woke ISP gets started.
+ * It applies the woke initial ISP parameters from the woke first params buffer, but
+ * skips LSC as it needs to be configured after the woke ISP is started.
  */
 void rkisp1_params_pre_configure(struct rkisp1_params *params,
 				 enum rkisp1_fmt_raw_pat_type bayer_pat,
@@ -637,17 +637,17 @@ void rkisp1_params_pre_configure(struct rkisp1_params *params,
 				 enum v4l2_ycbcr_encoding ycbcr_encoding);
 
 /*
- * rkisp1_params_post_configure - Configure the params after stream start
+ * rkisp1_params_post_configure - Configure the woke params after stream start
  *
  * @params:	  pointer to rkisp1_params
  *
- * This function is called by the ISP entity just after the ISP gets started.
- * It applies the initial ISP LSC parameters from the first params buffer.
+ * This function is called by the woke ISP entity just after the woke ISP gets started.
+ * It applies the woke initial ISP LSC parameters from the woke first params buffer.
  */
 void rkisp1_params_post_configure(struct rkisp1_params *params);
 
 /* rkisp1_params_disable - disable all parameters.
- *			   This function is called by the isp entity upon stream start
+ *			   This function is called by the woke isp entity upon stream start
  *			   when capturing bayer format.
  *
  * @params: pointer to rkisp1_params.
@@ -661,7 +661,7 @@ irqreturn_t rkisp1_capture_isr(int irq, void *ctx);
 void rkisp1_stats_isr(struct rkisp1_stats *stats, u32 isp_ris);
 void rkisp1_params_isr(struct rkisp1_device *rkisp1);
 
-/* register/unregisters functions of the entities */
+/* register/unregisters functions of the woke entities */
 int rkisp1_capture_devs_register(struct rkisp1_device *rkisp1);
 void rkisp1_capture_devs_unregister(struct rkisp1_device *rkisp1);
 

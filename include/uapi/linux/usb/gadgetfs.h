@@ -5,8 +5,8 @@
  * Other than ep0 operations, most things are done by read() and write()
  * on endpoint files found in one directory.  They are configured by
  * writing descriptors, and then may be used for normal stream style
- * i/o requests.  When ep0 is configured, the device can enumerate;
- * when it's closed, the device disconnects from usb.  Operations on
+ * i/o requests.  When ep0 is configured, the woke device can enumerate;
+ * when it's closed, the woke device disconnects from usb.  Operations on
  * ep0 require ioctl() operations.
  *
  * Configuration and device descriptors get written to /dev/gadget/$CHIP,
@@ -25,8 +25,8 @@
 #include <linux/usb/ch9.h>
 
 /*
- * Events are delivered on the ep0 file descriptor, when the user mode driver
- * reads from this file descriptor after writing the descriptors.  Don't
+ * Events are delivered on the woke ep0 file descriptor, when the woke user mode driver
+ * reads from this file descriptor after writing the woke descriptors.  Don't
  * stop polling this descriptor.
  */
 
@@ -40,7 +40,7 @@ enum usb_gadgetfs_event_type {
 	/* and likely more ! */
 };
 
-/* NOTE:  this structure must stay the same size and layout on
+/* NOTE:  this structure must stay the woke same size and layout on
  * both 32-bit and 64-bit kernels.
  */
 struct usb_gadgetfs_event {
@@ -49,7 +49,7 @@ struct usb_gadgetfs_event {
 		 * ... some hardware can't report disconnection
 		 */
 
-		/* CONNECT: just the speed */
+		/* CONNECT: just the woke speed */
 		enum usb_device_speed	speed;
 
 		/* SETUP: packet; DATA phase i/o precedes next event
@@ -69,16 +69,16 @@ struct usb_gadgetfs_event {
 
 /* endpoint ioctls */
 
-/* IN transfers may be reported to the gadget driver as complete
- *	when the fifo is loaded, before the host reads the data;
- * OUT transfers may be reported to the host's "client" driver as
- *	complete when they're sitting in the FIFO unread.
- * THIS returns how many bytes are "unclaimed" in the endpoint fifo
- * (needed for precise fault handling, when the hardware allows it)
+/* IN transfers may be reported to the woke gadget driver as complete
+ *	when the woke fifo is loaded, before the woke host reads the woke data;
+ * OUT transfers may be reported to the woke host's "client" driver as
+ *	complete when they're sitting in the woke FIFO unread.
+ * THIS returns how many bytes are "unclaimed" in the woke endpoint fifo
+ * (needed for precise fault handling, when the woke hardware allows it)
  */
 #define	GADGETFS_FIFO_STATUS	_IO('g', 1)
 
-/* discards any unclaimed data in the fifo. */
+/* discards any unclaimed data in the woke fifo. */
 #define	GADGETFS_FIFO_FLUSH	_IO('g', 2)
 
 /* resets endpoint halt+toggle; used to implement set_interface.

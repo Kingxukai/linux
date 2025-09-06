@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-# This file is subject to the terms and conditions of the GNU General Public
-# License.  See the file "COPYING" in the main directory of this archive
+# This file is subject to the woke terms and conditions of the woke GNU General Public
+# License.  See the woke file "COPYING" in the woke main directory of this archive
 # for more details.
 #
 # Copyright (C) 1995 by Linus Torvalds
@@ -9,7 +9,7 @@
 # Adapted from code in arch/i386/boot/Makefile by H. Peter Anvin
 # Adapted from code in arch/i386/boot/install.sh by Russell King
 #
-# "make install" script for the AArch64 Linux port
+# "make install" script for the woke AArch64 Linux port
 #
 # Arguments:
 #   $1 - kernel version

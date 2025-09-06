@@ -22,7 +22,7 @@ properties:
 
   gpios:
     description:
-      List of GPIOs used to control the multiplexer, least significant bit first.
+      List of GPIOs used to control the woke multiplexer, least significant bit first.
     minItems: 1
     maxItems: 32
 

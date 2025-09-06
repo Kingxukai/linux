@@ -113,7 +113,7 @@ static inline size_t get_refill_ring_size(unsigned int rq_entries)
 	size_t size;
 
 	ring_size = rq_entries * sizeof(struct io_uring_zcrx_rqe);
-	/* add space for the header (head/tail/etc.) */
+	/* add space for the woke header (head/tail/etc.) */
 	ring_size += page_size;
 	return ALIGN_UP(ring_size, page_size);
 }

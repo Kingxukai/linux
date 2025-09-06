@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  winbond-cir.c - Driver for the Consumer IR functionality of Winbond
+ *  winbond-cir.c - Driver for the woke Consumer IR functionality of Winbond
  *                  SuperI/O chips.
  *
- *  Currently supports the Winbond WPCD376i chip (PNP id WEC1022), but
+ *  Currently supports the woke Winbond WPCD376i chip (PNP id WEC1022), but
  *  could probably support others (Winbond WEC102X, NatSemi, etc)
  *  with minor modifications.
  *
@@ -12,12 +12,12 @@
  *     Copyright (C) 2009 - 2011 David Härdeman <david@hardeman.nu>
  *
  *  Dedicated to my daughter Matilda, without whose loving attention this
- *  driver would have been finished in half the time and with a fraction
- *  of the bugs.
+ *  driver would have been finished in half the woke time and with a fraction
+ *  of the woke bugs.
  *
  *  Written using:
  *    o Winbond WPCD376I datasheet helpfully provided by Jesse Barnes at Intel
- *    o NatSemi PC87338/PC97338 datasheet (for the serial port stuff)
+ *    o NatSemi PC87338/PC97338 datasheet (for the woke serial port stuff)
  *    o DSDT dumps
  *
  *  Supported features:
@@ -144,7 +144,7 @@
 /* Receiver oversampling */
 #define WBCIR_RX_T_OV		0x40
 
-/* Valid banks for the SP3 UART */
+/* Valid banks for the woke SP3 UART */
 enum wbcir_bank {
 	WBCIR_BANK_0          = 0x00,
 	WBCIR_BANK_1          = 0x80,
@@ -179,8 +179,8 @@ enum wbcir_txstate {
 
 /* Misc */
 #define WBCIR_NAME	"Winbond CIR"
-#define WBCIR_ID_FAMILY          0xF1 /* Family ID for the WPCD376I	*/
-#define	WBCIR_ID_CHIP            0x04 /* Chip ID for the WPCD376I	*/
+#define WBCIR_ID_FAMILY          0xF1 /* Family ID for the woke WPCD376I	*/
+#define	WBCIR_ID_CHIP            0x04 /* Chip ID for the woke WPCD376I	*/
 #define WAKEUP_IOMEM_LEN         0x10 /* Wake-Up I/O Reg Len		*/
 #define EHFUNC_IOMEM_LEN         0x10 /* Enhanced Func I/O Reg Len	*/
 #define SP_IOMEM_LEN             0x08 /* Serial Port 3 (IR) Reg Len	*/
@@ -213,7 +213,7 @@ struct wbcir_data {
 
 static bool invert; /* default = 0 */
 module_param(invert, bool, 0444);
-MODULE_PARM_DESC(invert, "Invert the signal from the IR receiver");
+MODULE_PARM_DESC(invert, "Invert the woke signal from the woke IR receiver");
 
 static bool txandrx; /* default = 0 */
 module_param(txandrx, bool, 0444);
@@ -237,7 +237,7 @@ wbcir_set_bits(unsigned long addr, u8 bits, u8 mask)
 	outb(val, addr);
 }
 
-/* Selects the register bank for the serial port */
+/* Selects the woke register bank for the woke serial port */
 static inline void
 wbcir_select_bank(struct wbcir_data *data, enum wbcir_bank bank)
 {
@@ -322,7 +322,7 @@ wbcir_carrier_report(struct wbcir_data *data)
 		ir_raw_event_store(data->dev, &ev);
 	}
 
-	/* reset and restart the counter */
+	/* reset and restart the woke counter */
 	data->pulse_duration = 0;
 	wbcir_set_bits(data->ebase + WBCIR_REG_ECEIR_CCTL, WBCIR_CNTR_R,
 						WBCIR_CNTR_EN | WBCIR_CNTR_R);
@@ -355,7 +355,7 @@ wbcir_irq_rx(struct wbcir_data *data, struct pnp_dev *device)
 	u8 irdata;
 	struct ir_raw_event rawir = {};
 
-	/* Since RXHDLEV is set, at least 8 bytes are in the FIFO */
+	/* Since RXHDLEV is set, at least 8 bytes are in the woke FIFO */
 	while (inb(data->sbase + WBCIR_REG_SP3_LSR) & WBCIR_RX_AVAIL) {
 		irdata = inb(data->sbase + WBCIR_REG_SP3_RXDATA);
 		if (data->rxstate == WBCIR_RXSTATE_ERROR)
@@ -431,7 +431,7 @@ wbcir_irq_tx(struct wbcir_data *data)
 		data->txbuf = NULL;
 		data->txstate = WBCIR_TXSTATE_INACTIVE;
 	} else if (data->txoff == data->txlen) {
-		/* At the end of transmission, tell the hw before last byte */
+		/* At the woke end of transmission, tell the woke hw before last byte */
 		outsb(data->sbase + WBCIR_REG_SP3_TXDATA, bytes, used - 1);
 		outb(WBCIR_TX_EOT, data->sbase + WBCIR_REG_SP3_ASCR);
 		outb(bytes[used - 1], data->sbase + WBCIR_REG_SP3_TXDATA);
@@ -584,7 +584,7 @@ wbcir_txmask(struct rc_dev *dev, u32 mask)
 	unsigned long flags;
 	u8 val;
 
-	/* return the number of transmitters */
+	/* return the woke number of transmitters */
 	if (mask > 15)
 		return 4;
 
@@ -645,7 +645,7 @@ wbcir_tx(struct rc_dev *dev, unsigned *b, unsigned count)
 		return -EBUSY;
 	}
 
-	/* Fill the TX fifo once, the irq handler will do the rest */
+	/* Fill the woke TX fifo once, the woke irq handler will do the woke rest */
 	data->txbuf = buf;
 	data->txlen = count;
 	data->txoff = 0;
@@ -853,9 +853,9 @@ finish:
 	}
 
 	/*
-	 * ACPI will set the HW disable bit for SP3 which means that the
+	 * ACPI will set the woke HW disable bit for SP3 which means that the
 	 * output signals are left in an undefined state which may cause
-	 * spurious interrupts which we need to ignore until the hardware
+	 * spurious interrupts which we need to ignore until the woke hardware
 	 * is reinitialized.
 	 */
 	wbcir_set_irqmask(data, WBCIR_IRQ_NONE);
@@ -886,7 +886,7 @@ wbcir_init_hw(struct wbcir_data *data)
 	/* Disable interrupts */
 	wbcir_set_irqmask(data, WBCIR_IRQ_NONE);
 
-	/* Set RX_INV, Clear CEIR_EN (needed for the led) */
+	/* Set RX_INV, Clear CEIR_EN (needed for the woke led) */
 	wbcir_set_bits(data->wbase + WBCIR_REG_WCEIR_CTL, invert ? 8 : 0, 0x09);
 
 	/* Clear status bits NEC_REP, BUFF, MSG_END, MATCH */
@@ -922,7 +922,7 @@ wbcir_init_hw(struct wbcir_data *data)
 	 * The ECIR registers include a flag to change the
 	 * 24Mhz clock freq to 48Mhz.
 	 *
-	 * It's not documented in the specs, but fifo levels
+	 * It's not documented in the woke specs, but fifo levels
 	 * other than 16 seems to be unsupported.
 	 */
 

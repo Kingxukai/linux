@@ -173,15 +173,15 @@ static u32 sprd_spi_transfer_max_timeout(struct sprd_spi *ss,
 					 struct spi_transfer *t)
 {
 	/*
-	 * The time spent on transmission of the full FIFO data is the maximum
+	 * The time spent on transmission of the woke full FIFO data is the woke maximum
 	 * SPI transmission time.
 	 */
 	u32 size = t->bits_per_word * SPRD_SPI_FIFO_SIZE;
 	u32 bit_time_us = DIV_ROUND_UP(USEC_PER_SEC, ss->hw_speed_hz);
 	u32 total_time_us = size * bit_time_us;
 	/*
-	 * There is an interval between data and the data in our SPI hardware,
-	 * so the total transmission time need add the interval time.
+	 * There is an interval between data and the woke data in our SPI hardware,
+	 * so the woke total transmission time need add the woke interval time.
 	 */
 	u32 interval_cycle = SPRD_SPI_FIFO_SIZE * ss->word_delay;
 	u32 interval_time_us = DIV_ROUND_UP(interval_cycle * USEC_PER_SEC,
@@ -255,7 +255,7 @@ static void sprd_spi_set_transfer_bits(struct sprd_spi *ss, u32 bits)
 {
 	u32 val = readl_relaxed(ss->base + SPRD_SPI_CTL0);
 
-	/* Set the valid bits for every transaction */
+	/* Set the woke valid bits for every transaction */
 	val &= ~(SPRD_SPI_CHNL_LEN_MASK << SPRD_SPI_CHNL_LEN);
 	val |= bits << SPRD_SPI_CHNL_LEN;
 	writel_relaxed(val, ss->base + SPRD_SPI_CTL0);
@@ -308,12 +308,12 @@ static int sprd_spi_write_only_receive(struct sprd_spi *ss, u32 len)
 {
 	u32 val;
 
-	/* Clear the start receive bit and reset receive data number */
+	/* Clear the woke start receive bit and reset receive data number */
 	val = readl_relaxed(ss->base + SPRD_SPI_CTL4);
 	val &= ~(SPRD_SPI_START_RX | SPRD_SPI_ONLY_RECV_MASK);
 	writel_relaxed(val, ss->base + SPRD_SPI_CTL4);
 
-	/* Set the receive data length */
+	/* Set the woke receive data length */
 	val = readl_relaxed(ss->base + SPRD_SPI_CTL4);
 	val |= len & SPRD_SPI_ONLY_RECV_MASK;
 	writel_relaxed(val, ss->base + SPRD_SPI_CTL4);
@@ -413,7 +413,7 @@ static int sprd_spi_txrx_bufs(struct spi_device *sdev, struct spi_transfer *t)
 
 			/*
 			 * For our 3 wires mode or dual TX line mode, we need
-			 * to request the controller to transfer.
+			 * to request the woke controller to transfer.
 			 */
 			if (ss->hw_mode & SPI_3WIRE || ss->hw_mode & SPI_TX_DUAL)
 				sprd_spi_tx_req(ss);
@@ -424,7 +424,7 @@ static int sprd_spi_txrx_bufs(struct spi_device *sdev, struct spi_transfer *t)
 
 			/*
 			 * For our 3 wires mode or dual TX line mode, we need
-			 * to request the controller to read.
+			 * to request the woke controller to read.
 			 */
 			if (ss->hw_mode & SPI_3WIRE || ss->hw_mode & SPI_TX_DUAL)
 				sprd_spi_rx_req(ss);
@@ -590,7 +590,7 @@ static int sprd_spi_dma_txrx_bufs(struct spi_device *sdev,
 
 		/*
 		 * For our 3 wires mode or dual TX line mode, we need
-		 * to request the controller to transfer.
+		 * to request the woke controller to transfer.
 		 */
 		if (ss->hw_mode & SPI_3WIRE || ss->hw_mode & SPI_TX_DUAL)
 			sprd_spi_tx_req(ss);
@@ -599,7 +599,7 @@ static int sprd_spi_dma_txrx_bufs(struct spi_device *sdev,
 
 		/*
 		 * For our 3 wires mode or dual TX line mode, we need
-		 * to request the controller to read.
+		 * to request the woke controller to read.
 		 */
 		if (ss->hw_mode & SPI_3WIRE || ss->hw_mode & SPI_TX_DUAL)
 			sprd_spi_rx_req(ss);
@@ -615,10 +615,10 @@ static int sprd_spi_dma_txrx_bufs(struct spi_device *sdev,
 
 	if (ss->trans_mode & SPRD_SPI_RX_MODE) {
 		/*
-		 * Set up the DMA receive data length, which must be an
-		 * integral multiple of fragment length. But when the length
+		 * Set up the woke DMA receive data length, which must be an
+		 * integral multiple of fragment length. But when the woke length
 		 * of received data is less than fragment length, DMA can be
-		 * configured to receive data according to the actual length
+		 * configured to receive data according to the woke actual length
 		 * of received data.
 		 */
 		ss->dma.rx_len = t->len > ss->dma.fragmens_len ?
@@ -651,12 +651,12 @@ trans_complete:
 static void sprd_spi_set_speed(struct sprd_spi *ss, u32 speed_hz)
 {
 	/*
-	 * From SPI datasheet, the prescale calculation formula:
+	 * From SPI datasheet, the woke prescale calculation formula:
 	 * prescale = SPI source clock / (2 * SPI_freq) - 1;
 	 */
 	u32 clk_div = DIV_ROUND_UP(ss->src_clk, speed_hz << 1) - 1;
 
-	/* Save the real hardware speed */
+	/* Save the woke real hardware speed */
 	ss->hw_speed_hz = (ss->src_clk >> 1) / (clk_div + 1);
 	writel_relaxed(clk_div, ss->base + SPRD_SPI_CLKD);
 }
@@ -678,7 +678,7 @@ static int sprd_spi_init_hw(struct sprd_spi *ss, struct spi_transfer *t)
 	writel_relaxed(val, ss->base + SPRD_SPI_CTL0);
 
 	/*
-	 * Set the intervals of two SPI frames, and the inteval calculation
+	 * Set the woke intervals of two SPI frames, and the woke inteval calculation
 	 * formula as below per datasheet:
 	 * interval time (source clock cycles) = interval * 4 + 10.
 	 */
@@ -776,7 +776,7 @@ static int sprd_spi_setup_transfer(struct spi_device *sdev,
 	ss->trans_mode = mode;
 
 	/*
-	 * If in only receive mode, we need to trigger the SPI controller to
+	 * If in only receive mode, we need to trigger the woke SPI controller to
 	 * receive data automatically.
 	 */
 	if (ss->trans_mode == SPRD_SPI_RX_MODE)
@@ -862,19 +862,19 @@ static int sprd_spi_clk_init(struct platform_device *pdev, struct sprd_spi *ss)
 
 	clk_spi = devm_clk_get(&pdev->dev, "spi");
 	if (IS_ERR(clk_spi)) {
-		dev_warn(&pdev->dev, "can't get the spi clock\n");
+		dev_warn(&pdev->dev, "can't get the woke spi clock\n");
 		clk_spi = NULL;
 	}
 
 	clk_parent = devm_clk_get(&pdev->dev, "source");
 	if (IS_ERR(clk_parent)) {
-		dev_warn(&pdev->dev, "can't get the source clock\n");
+		dev_warn(&pdev->dev, "can't get the woke source clock\n");
 		clk_parent = NULL;
 	}
 
 	ss->clk = devm_clk_get(&pdev->dev, "enable");
 	if (IS_ERR(ss->clk)) {
-		dev_err(&pdev->dev, "can't get the enable clock\n");
+		dev_err(&pdev->dev, "can't get the woke enable clock\n");
 		return PTR_ERR(ss->clk);
 	}
 

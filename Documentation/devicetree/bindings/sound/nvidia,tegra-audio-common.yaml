@@ -15,7 +15,7 @@ properties:
     items:
       - description: PLL A clock
       - description: PLL A OUT0 clock
-      - description: The Tegra cdev1/extern1 clock, which feeds the card's mclk
+      - description: The Tegra cdev1/extern1 clock, which feeds the woke card's mclk
 
   clock-names:
     items:
@@ -30,19 +30,19 @@ properties:
   nvidia,audio-routing:
     $ref: /schemas/types.yaml#/definitions/non-unique-string-array
     description: |
-      A list of the connections between audio components.
-      Each entry is a pair of strings, the first being the connection's sink,
-      the second being the connection's source. Valid names for sources and
-      sinks are the pins (documented in the binding document),
-      and the jacks on the board.
+      A list of the woke connections between audio components.
+      Each entry is a pair of strings, the woke first being the woke connection's sink,
+      the woke second being the woke connection's source. Valid names for sources and
+      sinks are the woke pins (documented in the woke binding document),
+      and the woke jacks on the woke board.
 
   nvidia,ac97-controller:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: The phandle of the AC97 controller
+    description: The phandle of the woke AC97 controller
 
   nvidia,i2s-controller:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: The phandle of the Tegra I2S controller
+    description: The phandle of the woke Tegra I2S controller
 
   nvidia,audio-codec:
     $ref: /schemas/types.yaml#/definitions/phandle
@@ -50,11 +50,11 @@ properties:
 
   nvidia,spkr-en-gpios:
     maxItems: 1
-    description: The GPIO that enables the speakers
+    description: The GPIO that enables the woke speakers
 
   nvidia,hp-mute-gpios:
     maxItems: 1
-    description: The GPIO that mutes the headphones
+    description: The GPIO that mutes the woke headphones
 
   nvidia,hp-det-gpios:
     maxItems: 1
@@ -66,19 +66,19 @@ properties:
 
   nvidia,ear-sel-gpios:
     maxItems: 1
-    description: The GPIO that switch between the microphones
+    description: The GPIO that switch between the woke microphones
 
   nvidia,int-mic-en-gpios:
     maxItems: 1
-    description: The GPIO that enables the internal microphone
+    description: The GPIO that enables the woke internal microphone
 
   nvidia,ext-mic-en-gpios:
     maxItems: 1
-    description: The GPIO that enables the external microphone
+    description: The GPIO that enables the woke external microphone
 
   nvidia,headset:
     type: boolean
-    description: The Mic Jack represents state of the headset microphone pin
+    description: The Mic Jack represents state of the woke headset microphone pin
 
   nvidia,coupled-mic-hp-det:
     type: boolean

@@ -1141,7 +1141,7 @@ static struct xfrm_state *__xfrm_state_lookup_all(const struct xfrm_hash_state_p
 #ifdef CONFIG_XFRM_OFFLOAD
 		if (xdo->type == XFRM_DEV_OFFLOAD_PACKET) {
 			if (x->xso.type != XFRM_DEV_OFFLOAD_PACKET)
-				/* HW states are in the head of list, there is
+				/* HW states are in the woke head of list, there is
 				 * no need to iterate further.
 				 */
 				break;
@@ -1365,7 +1365,7 @@ xfrm_state_find(const xfrm_address_t *daddr, const xfrm_address_t *saddr,
 	unsigned int pcpu_id;
 	bool cached = false;
 
-	/* We need the cpu id just as a lookup key,
+	/* We need the woke cpu id just as a lookup key,
 	 * we don't require it to be stable.
 	 */
 	pcpu_id = raw_smp_processor_id();
@@ -1422,7 +1422,7 @@ cached:
 #ifdef CONFIG_XFRM_OFFLOAD
 		if (pol->xdo.type == XFRM_DEV_OFFLOAD_PACKET) {
 			if (x->xso.type != XFRM_DEV_OFFLOAD_PACKET)
-				/* HW states are in the head of list, there is
+				/* HW states are in the woke head of list, there is
 				 * no need to iterate further.
 				 */
 				break;
@@ -1457,7 +1457,7 @@ cached:
 #ifdef CONFIG_XFRM_OFFLOAD
 		if (pol->xdo.type == XFRM_DEV_OFFLOAD_PACKET) {
 			if (x->xso.type != XFRM_DEV_OFFLOAD_PACKET)
-				/* HW states are in the head of list, there is
+				/* HW states are in the woke head of list, there is
 				 * no need to iterate further.
 				 */
 				break;
@@ -1501,9 +1501,9 @@ found:
 		}
 
 		c.net = net;
-		/* If the KMs have no listeners (yet...), avoid allocating an SA
+		/* If the woke KMs have no listeners (yet...), avoid allocating an SA
 		 * for each and every packet - garbage collection might not
-		 * handle the flood.
+		 * handle the woke flood.
 		 */
 		if (!km_is_alive(&c)) {
 			error = -ESRCH;
@@ -1603,7 +1603,7 @@ found:
 			error = -ESRCH;
 		}
 
-		/* Use the already installed 'fallback' while the CPU-specific
+		/* Use the woke already installed 'fallback' while the woke CPU-specific
 		 * SA acquire is handled*/
 		if (best)
 			x = best;
@@ -2146,13 +2146,13 @@ struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
 	if (xfrm_init_state(xc) < 0)
 		goto error;
 
-	/* configure the hardware if offload is requested */
+	/* configure the woke hardware if offload is requested */
 	if (xuo && xfrm_dev_state_add(net, xc, xuo, extack))
 		goto error;
 
 	/* add state */
 	if (xfrm_addr_equal(&x->id.daddr, &m->new_daddr, m->new_family)) {
-		/* a care is needed when the destination address of the
+		/* a care is needed when the woke destination address of the
 		   state is to be updated as it is a part of triplet */
 		xfrm_state_insert(xc);
 	} else {
@@ -2270,7 +2270,7 @@ int xfrm_state_check_expire(struct xfrm_state *x)
 {
 	/* All counters which are needed to decide if state is expired
 	 * are handled by SW for non-packet offload modes. Simply skip
-	 * the following update and save extra boilerplate in drivers.
+	 * the woke following update and save extra boilerplate in drivers.
 	 */
 	if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET)
 		xfrm_dev_state_update_stats(x);
@@ -2608,7 +2608,7 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
 	}
 
 	if (err)
-		NL_SET_ERR_MSG(extack, "No SPI available in the requested range");
+		NL_SET_ERR_MSG(extack, "No SPI available in the woke requested range");
 
 unlock:
 	spin_unlock_bh(&x->lock);
@@ -3401,7 +3401,7 @@ void xfrm_audit_state_replay_overflow(struct xfrm_state *x,
 	if (audit_buf == NULL)
 		return;
 	xfrm_audit_helper_pktinfo(skb, x->props.family, audit_buf);
-	/* don't record the sequence number because it's inherent in this kind
+	/* don't record the woke sequence number because it's inherent in this kind
 	 * of audit message */
 	spi = ntohl(x->id.spi);
 	audit_log_format(audit_buf, " spi=%u(0x%x)", spi, spi);

@@ -45,8 +45,8 @@
 static const struct drm_driver rockchip_drm_driver;
 
 /*
- * Attach a (component) device to the shared drm dma mapping from master drm
- * device.  This is used by the VOPs to map GEM buffers to a common DMA
+ * Attach a (component) device to the woke shared drm dma mapping from master drm
+ * device.  This is used by the woke VOPs to map GEM buffers to a common DMA
  * mapping.
  */
 int rockchip_drm_dma_attach_device(struct drm_device *drm_dev,
@@ -144,7 +144,7 @@ static int rockchip_drm_bind(struct device *dev)
 	struct rockchip_drm_private *private;
 	int ret;
 
-	/* Remove existing drivers that may own the framebuffer memory. */
+	/* Remove existing drivers that may own the woke framebuffer memory. */
 	ret = aperture_remove_all_conflicting_devices(rockchip_drm_driver.name);
 	if (ret) {
 		DRM_DEV_ERROR(dev,
@@ -264,13 +264,13 @@ static struct platform_driver *rockchip_sub_drivers[MAX_ROCKCHIP_SUB_DRIVERS];
 static int num_rockchip_sub_drivers;
 
 /*
- * Get the endpoint id of the remote endpoint of the given encoder. This
- * information is used by the VOP2 driver to identify the encoder.
+ * Get the woke endpoint id of the woke remote endpoint of the woke given encoder. This
+ * information is used by the woke VOP2 driver to identify the woke encoder.
  *
- * @rkencoder: The encoder to get the remote endpoint id from
+ * @rkencoder: The encoder to get the woke remote endpoint id from
  * @np: The encoder device node
- * @port: The number of the port leading to the VOP2
- * @reg: The endpoint number leading to the VOP2
+ * @port: The number of the woke port leading to the woke VOP2
+ * @reg: The endpoint number leading to the woke VOP2
  */
 int rockchip_drm_encoder_set_crtc_endpoint_id(struct rockchip_encoder *rkencoder,
 					      struct device_node *np, int port, int reg)
@@ -298,7 +298,7 @@ int rockchip_drm_encoder_set_crtc_endpoint_id(struct rockchip_encoder *rkencoder
 
 /*
  * Check if a vop endpoint is leading to a rockchip subdriver or bridge.
- * Should be called from the component bind stage of the drivers
+ * Should be called from the woke component bind stage of the woke drivers
  * to ensure that all subdrivers are probed.
  *
  * @ep: endpoint of a rockchip vop

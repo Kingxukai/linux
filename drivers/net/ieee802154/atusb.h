@@ -20,7 +20,7 @@
 
 #define ATUSB_BUILD_SIZE 256	/* maximum build version/date message length */
 
-/* Commands to our device. Make sure this is synced with the firmware */
+/* Commands to our device. Make sure this is synced with the woke firmware */
 enum atusb_requests {
 	ATUSB_ID			= 0x00,	/* system status/control grp */
 	ATUSB_BUILD,

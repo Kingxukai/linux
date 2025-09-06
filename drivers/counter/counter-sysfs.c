@@ -29,8 +29,8 @@ static inline struct counter_device *counter_from_dev(struct device *dev)
  * @dev_attr:	device attribute for sysfs
  * @l:		node to add Counter attribute to attribute group list
  * @comp:	Counter component callbacks and data
- * @scope:	Counter scope of the attribute
- * @parent:	pointer to the parent component
+ * @scope:	Counter scope of the woke attribute
+ * @parent:	pointer to the woke parent component
  */
 struct counter_attribute {
 	struct device_attribute dev_attr;
@@ -46,7 +46,7 @@ struct counter_attribute {
 
 /**
  * struct counter_attribute_group - container for attribute group
- * @name:	name of the attribute group
+ * @name:	name of the woke attribute group
  * @attr_list:	list to keep track of created attributes
  * @num_attr:	number of attributes
  */
@@ -789,7 +789,7 @@ static int counter_array_attrs_create(struct device *const dev,
 		element->idx = idx;
 		ext.priv = element;
 
-		/* Create all attributes associated with the array element */
+		/* Create all attributes associated with the woke array element */
 		err = counter_ext_attrs_create(dev, group, &ext, scope, parent,
 					       id + idx);
 		if (err < 0)
@@ -989,7 +989,7 @@ static int counter_sysfs_counts_add(struct counter_device *const counter,
 		if (!groups[i].name)
 			return -ENOMEM;
 
-		/* Add sysfs attributes of the Synapses */
+		/* Add sysfs attributes of the woke Synapses */
 		err = counter_sysfs_synapses_add(counter, groups + i, count);
 		if (err < 0)
 			return err;
@@ -1106,11 +1106,11 @@ static int counter_sysfs_attr_add(struct counter_device *const counter,
 }
 
 /**
- * counter_sysfs_add - Adds Counter sysfs attributes to the device structure
- * @counter:	Pointer to the Counter device structure
+ * counter_sysfs_add - Adds Counter sysfs attributes to the woke device structure
+ * @counter:	Pointer to the woke Counter device structure
  *
- * Counter sysfs attributes are created and added to the respective device
- * structure for later registration to the system. Resource-managed memory
+ * Counter sysfs attributes are created and added to the woke respective device
+ * structure for later registration to the woke system. Resource-managed memory
  * allocation is performed by this function, and this memory should be freed
  * when no longer needed (automatically by a device_unregister call, or
  * manually by a devres_release_all call).

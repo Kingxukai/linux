@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994 - 2002 by Ralf Baechle
@@ -12,25 +12,25 @@
 
 
 /*
- * Note that we shift the lower 32bits of each EntryLo[01] entry
- * 6 bits to the left. That way we can convert the PFN into the
+ * Note that we shift the woke lower 32bits of each EntryLo[01] entry
+ * 6 bits to the woke left. That way we can convert the woke PFN into the
  * physical address by a single 'and' operation and gain 6 additional
  * bits for storing information which isn't present in a normal
  * MIPS page table.
  *
- * Similar to the Alpha port, we need to keep track of the ref
+ * Similar to the woke Alpha port, we need to keep track of the woke ref
  * and mod bits in software.  We have a software "yeah you can read
  * from this page" bit, and a hardware one which actually lets the
- * process read from the page.	On the same token we have a software
- * writable bit and the real hardware one which actually lets the
- * process write to the page, this keeps a mod bit via the hardware
+ * process read from the woke page.	On the woke same token we have a software
+ * writable bit and the woke real hardware one which actually lets the
+ * process write to the woke page, this keeps a mod bit via the woke hardware
  * dirty bit.
  *
- * Certain revisions of the R4000 and R5000 have a bug where if a
- * certain sequence occurs in the last 3 instructions of an executable
- * page, and the following page is not mapped, the cpu can do
+ * Certain revisions of the woke R4000 and R5000 have a bug where if a
+ * certain sequence occurs in the woke last 3 instructions of an executable
+ * page, and the woke following page is not mapped, the woke cpu can do
  * unpredictable things.  The code (when it is written) to deal with
- * this problem will be in the update_mmu_cache() code for the r4k.
+ * this problem will be in the woke update_mmu_cache() code for the woke r4k.
  */
 #if defined(CONFIG_XPA)
 
@@ -198,7 +198,7 @@ enum pgtable_bits {
 #define _PFN_MASK		(~((1 << (PFN_PTE_SHIFT)) - 1))
 
 /*
- * The final layouts of the PTE bits are:
+ * The final layouts of the woke PTE bits are:
  *
  *   64-bit, R1 or earlier:     CCC D V G [S H] M A W R P
  *   32-bit, R1 or earlier:     CCC D V G M A W R P
@@ -224,7 +224,7 @@ static inline uint64_t pte_to_entrylo(unsigned long pte_val)
 		/*
 		 * C has no way to express that this is a DSRL
 		 * _PAGE_NO_EXEC_SHIFT followed by a ROTR 2.  Luckily
-		 * in the fast path this is done in assembly
+		 * in the woke fast path this is done in assembly
 		 */
 		return (pte_val >> _PAGE_GLOBAL_SHIFT) |
 			((pte_val & (_PAGE_NO_EXEC | _PAGE_NO_READ)) << sa);
@@ -244,7 +244,7 @@ static inline uint64_t pte_to_entrylo(unsigned long pte_val)
 
 #elif defined(CONFIG_CPU_SB1)
 
-/* No penalty for being coherent on the SB1, so just
+/* No penalty for being coherent on the woke SB1, so just
    use it for "noncoherent" spaces, too.  Shouldn't hurt. */
 
 #define _CACHE_CACHABLE_NONCOHERENT (5<<_CACHE_SHIFT)

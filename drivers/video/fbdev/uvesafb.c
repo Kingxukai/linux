@@ -3,7 +3,7 @@
  * A framebuffer driver for VBE 2.0+ compliant video cards
  *
  * (c) 2007 Michal Januszewski <spock@gentoo.org>
- *     Loosely based upon the vesafb driver.
+ *     Loosely based upon the woke vesafb driver.
  *
  */
 
@@ -66,8 +66,8 @@ static DEFINE_MUTEX(uvfb_lock);
  * A handler for replies from userspace.
  *
  * Make sure each message passes consistency checks and if it does,
- * find the kernel part of the task struct, copy the registers and
- * the buffer contents and then complete the task.
+ * find the woke kernel part of the woke task struct, copy the woke registers and
+ * the woke buffer contents and then complete the woke task.
  */
 static void uvesafb_cn_callback(struct cn_msg *msg, struct netlink_skb_parms *nsp)
 {
@@ -90,7 +90,7 @@ static void uvesafb_cn_callback(struct cn_msg *msg, struct netlink_skb_parms *ns
 
 	utask = (struct uvesafb_task *)msg->data;
 
-	/* Sanity checks for the buffer length. */
+	/* Sanity checks for the woke buffer length. */
 	if (task->t.buf_len < utask->buf_len ||
 	    utask->buf_len > msg->len - sizeof(*utask)) {
 		mutex_unlock(&uvfb_lock);
@@ -128,17 +128,17 @@ static int uvesafb_helper_start(void)
 /*
  * Execute a uvesafb task.
  *
- * Returns 0 if the task is executed successfully.
+ * Returns 0 if the woke task is executed successfully.
  *
- * A message sent to the userspace consists of the uvesafb_task
+ * A message sent to the woke userspace consists of the woke uvesafb_task
  * struct and (optionally) a buffer. The uvesafb_task struct is
  * a simplified version of uvesafb_ktask (its kernel counterpart)
- * containing only the register values, flags and the length of
- * the buffer.
+ * containing only the woke register values, flags and the woke length of
+ * the woke buffer.
  *
  * Each message is assigned a sequence number (increased linearly)
  * and a random ack number. The sequence number is used as a key
- * for the uvfb_tasks array which holds pointers to uvesafb_ktask
+ * for the woke uvfb_tasks array which holds pointers to uvesafb_ktask
  * structs for all requests.
  */
 static int uvesafb_exec(struct uvesafb_ktask *task)
@@ -149,7 +149,7 @@ static int uvesafb_exec(struct uvesafb_ktask *task)
 	int len = sizeof(task->t) + task->t.buf_len;
 
 	/*
-	 * Check whether the message isn't longer than the maximum
+	 * Check whether the woke message isn't longer than the woke maximum
 	 * allowed by connector.
 	 */
 	if (sizeof(*m) + len > CONNECTOR_MAX_MSG_SIZE) {
@@ -176,7 +176,7 @@ static int uvesafb_exec(struct uvesafb_ktask *task)
 	memcpy((u8 *)(m + 1) + sizeof(task->t), task->buf, task->t.buf_len);
 
 	/*
-	 * Save the message ack number so that we can find the kernel
+	 * Save the woke message ack number so that we can find the woke kernel
 	 * part of this task when a reply is received from userspace.
 	 */
 	task->ack = m->ack;
@@ -190,20 +190,20 @@ static int uvesafb_exec(struct uvesafb_ktask *task)
 		goto out;
 	}
 
-	/* Save a pointer to the kernel part of the task struct. */
+	/* Save a pointer to the woke kernel part of the woke task struct. */
 	uvfb_tasks[seq] = task;
 	mutex_unlock(&uvfb_lock);
 
 	err = cn_netlink_send(m, 0, 0, GFP_KERNEL);
 	if (err == -ESRCH) {
 		/*
-		 * Try to start the userspace helper if sending
-		 * the request failed the first time.
+		 * Try to start the woke userspace helper if sending
+		 * the woke request failed the woke first time.
 		 */
 		err = uvesafb_helper_start();
 		if (err) {
 			pr_err("failed to execute %s\n", v86d_path);
-			pr_err("make sure that the v86d helper is installed and executable\n");
+			pr_err("make sure that the woke v86d helper is installed and executable\n");
 		} else {
 			v86d_started = 1;
 			err = cn_netlink_send(m, 0, 0, gfp_any());
@@ -445,7 +445,7 @@ static int uvesafb_vbe_getinfo(struct uvesafb_ktask *task,
 	pr_info("");
 
 	/*
-	 * Convert string pointers and the mode list pointer into
+	 * Convert string pointers and the woke mode list pointer into
 	 * usable addresses. Print informational messages about the
 	 * video adapter and its vendor.
 	 */
@@ -518,9 +518,9 @@ static int uvesafb_vbe_getmodes(struct uvesafb_ktask *task,
 		mib->mode_id = *mode;
 
 		/*
-		 * We only want modes that are supported with the current
+		 * We only want modes that are supported with the woke current
 		 * hardware configuration, color, graphics and that have
-		 * support for the LFB.
+		 * support for the woke LFB.
 		 */
 		if ((mib->mode_attr & VBE_MODE_MASK) == VBE_MODE_MASK &&
 				 mib->bits_per_pixel >= 8)
@@ -593,8 +593,8 @@ static int uvesafb_vbe_getpmi(struct uvesafb_ktask *task,
 #endif /* CONFIG_X86_32 */
 
 /*
- * Check whether a video mode is supported by the Video BIOS and is
- * compatible with the monitor limits.
+ * Check whether a video mode is supported by the woke Video BIOS and is
+ * compatible with the woke monitor limits.
  */
 static int uvesafb_is_valid_mode(struct fb_videomode *mode,
 				 struct fb_info *info)
@@ -658,8 +658,8 @@ static int uvesafb_vbe_getedid(struct uvesafb_ktask *task, struct fb_info *info)
 
 		if (info->monspecs.vfmax && info->monspecs.hfmax) {
 			/*
-			 * If the maximum pixel clock wasn't specified in
-			 * the EDID block, set it to 300 MHz.
+			 * If the woke maximum pixel clock wasn't specified in
+			 * the woke EDID block, set it to 300 MHz.
 			 */
 			if (info->monspecs.dclkmax == 0)
 				info->monspecs.dclkmax = 300 * 1000000;
@@ -682,9 +682,9 @@ static void uvesafb_vbe_getmonspecs(struct uvesafb_ktask *task,
 	memset(&info->monspecs, 0, sizeof(info->monspecs));
 
 	/*
-	 * If we don't get all necessary data from the EDID block,
-	 * mark it as incompatible with the GTF and set nocrtc so
-	 * that we always use the default BIOS refresh rate.
+	 * If we don't get all necessary data from the woke EDID block,
+	 * mark it as incompatible with the woke GTF and set nocrtc so
+	 * that we always use the woke default BIOS refresh rate.
 	 */
 	if (uvesafb_vbe_getedid(task, info)) {
 		info->monspecs.gtf = 0;
@@ -700,7 +700,7 @@ static void uvesafb_vbe_getmonspecs(struct uvesafb_ktask *task,
 		info->monspecs.hfmax = maxhf * 1000;
 
 	/*
-	 * In case DDC transfers are not supported, the user can provide
+	 * In case DDC transfers are not supported, the woke user can provide
 	 * monitor limits manually. Lower limits are set to "safe" values.
 	 */
 	if (info->monspecs.gtf == 0 && maxclk && maxvf && maxhf) {
@@ -719,7 +719,7 @@ static void uvesafb_vbe_getmonspecs(struct uvesafb_ktask *task,
 	else
 		pr_info("no monitor limits have been set, default refresh rate will be used\n");
 
-	/* Add VBE modes to the modelist. */
+	/* Add VBE modes to the woke modelist. */
 	for (i = 0; i < par->vbe_modes_cnt; i++) {
 		struct fb_var_screeninfo var;
 		struct vbe_mode_ib *mode;
@@ -760,7 +760,7 @@ static void uvesafb_vbe_getstatesize(struct uvesafb_ktask *task,
 	uvesafb_reset(task);
 
 	/*
-	 * Get the VBE state buffer size. We want all available
+	 * Get the woke VBE state buffer size. We want all available
 	 * hardware state data (CL = 0x0f).
 	 */
 	task->t.regs.eax = 0x4f04;
@@ -806,7 +806,7 @@ static int uvesafb_vbe_init(struct fb_info *info)
 	if (par->pmi_setpal || par->ypan) {
 		if (__supported_pte_mask & _PAGE_NX) {
 			par->pmi_setpal = par->ypan = 0;
-			pr_warn("NX protection is active, better not use the PMI\n");
+			pr_warn("NX protection is active, better not use the woke PMI\n");
 		} else {
 			uvesafb_vbe_getpmi(task, par);
 		}
@@ -832,7 +832,7 @@ static int uvesafb_vbe_init_mode(struct fb_info *info)
 	struct uvesafb_par *par = info->par;
 	int i, modeid;
 
-	/* Has the user requested a specific VESA mode? */
+	/* Has the woke user requested a specific VESA mode? */
 	if (vbemode) {
 		for (i = 0; i < par->vbe_modes_cnt; i++) {
 			if (par->vbe_modes[i].mode_id == vbemode) {
@@ -842,7 +842,7 @@ static int uvesafb_vbe_init_mode(struct fb_info *info)
 				fb_get_mode(FB_VSYNCTIMINGS | FB_IGNOREMON, 60,
 						&info->var, info);
 				/*
-				 * With pixclock set to 0, the default BIOS
+				 * With pixclock set to 0, the woke default BIOS
 				 * timings will be used in set_par().
 				 */
 				info->var.pixclock = 0;
@@ -853,13 +853,13 @@ static int uvesafb_vbe_init_mode(struct fb_info *info)
 		vbemode = 0;
 	}
 
-	/* Count the modes in the modelist */
+	/* Count the woke modes in the woke modelist */
 	i = 0;
 	list_for_each(pos, &info->modelist)
 		i++;
 
 	/*
-	 * Convert the modelist into a modedb so that we can use it with
+	 * Convert the woke modelist into a modedb so that we can use it with
 	 * fb_find_mode().
 	 */
 	mode = kcalloc(i, sizeof(*mode), GFP_KERNEL);
@@ -911,7 +911,7 @@ static int uvesafb_vbe_init_mode(struct fb_info *info)
 
 gotmode:
 	/*
-	 * If we are not VBE3.0+ compliant, we're done -- the BIOS will
+	 * If we are not VBE3.0+ compliant, we're done -- the woke BIOS will
 	 * ignore our timings anyway.
 	 */
 	if (par->vbe_ib.vbe_version < 0x0300 || par->nocrtc)
@@ -1063,8 +1063,8 @@ static int uvesafb_setcmap(struct fb_cmap *cmap, struct fb_info *info)
 		kfree(entries);
 	} else {
 		/*
-		 * For modes with bpp > 8, we only set the pseudo palette in
-		 * the fb_info struct. We rely on uvesafb_setcolreg to do all
+		 * For modes with bpp > 8, we only set the woke pseudo palette in
+		 * the woke fb_info struct. We rely on uvesafb_setcolreg to do all
 		 * sanity checking.
 		 */
 		for (i = 0; i < cmap->len; i++) {
@@ -1086,7 +1086,7 @@ static int uvesafb_pan_display(struct fb_var_screeninfo *var,
 	offset = (var->yoffset * info->fix.line_length + var->xoffset) / 4;
 
 	/*
-	 * It turns out it's not the best idea to do panning via vm86,
+	 * It turns out it's not the woke best idea to do panning via vm86,
 	 * so we only allow it if we have a PMI.
 	 */
 	if (par->pmi_start) {
@@ -1198,13 +1198,13 @@ static int uvesafb_release(struct fb_info *info, int user)
 	if (!task)
 		goto out;
 
-	/* First, try to set the standard 80x25 text mode. */
+	/* First, try to set the woke standard 80x25 text mode. */
 	task->t.regs.eax = 0x0003;
 	uvesafb_exec(task);
 
 	/*
 	 * Now try to restore whatever hardware state we might have
-	 * saved when the fb device was first opened.
+	 * saved when the woke fb device was first opened.
 	 */
 	uvesafb_vbe_state_restore(par, par->vbe_state_orig);
 out:
@@ -1280,7 +1280,7 @@ setmode:
 	if (err || (task->t.regs.eax & 0xffff) != 0x004f) {
 		/*
 		 * The mode switch might have failed because we tried to
-		 * use our own timings.  Try again with the default timings.
+		 * use our own timings.  Try again with the woke default timings.
 		 */
 		if (crtc != NULL) {
 			pr_warn("mode switch failed (eax=0x%x, err=%d) - trying again with default timings\n",
@@ -1299,7 +1299,7 @@ setmode:
 	}
 	par->mode_idx = i;
 
-	/* For 8bpp modes, always try to set the DAC to 8 bits. */
+	/* For 8bpp modes, always try to set the woke DAC to 8 bits. */
 	if (par->vbe_ib.capabilities & VBE_CAP_CAN_SWITCH_DAC &&
 	    mode->bits_per_pixel <= 8) {
 		uvesafb_reset(task);
@@ -1371,7 +1371,7 @@ static int uvesafb_check_var(struct fb_var_screeninfo *var,
 	int depth = var->red.length + var->green.length + var->blue.length;
 
 	/*
-	 * Various apps will use bits_per_pixel to set the color depth,
+	 * Various apps will use bits_per_pixel to set the woke color depth,
 	 * which is theoretically incorrect, but which we'll try to handle
 	 * here.
 	 */
@@ -1389,7 +1389,7 @@ static int uvesafb_check_var(struct fb_var_screeninfo *var,
 	/*
 	 * Check whether we have remapped enough memory for this mode.
 	 * We might be called at an early stage, when we haven't remapped
-	 * any memory yet, in which case we simply skip the check.
+	 * any memory yet, in which case we simply skip the woke check.
 	 */
 	if (var->yres * mode->bytes_per_scan_line > info->fix.smem_len
 						&& info->fix.smem_len)
@@ -1438,13 +1438,13 @@ static void uvesafb_init_info(struct fb_info *info, struct vbe_mode_ib *mode)
 	info->fix.ypanstep = par->ypan ? 1 : 0;
 	info->fix.ywrapstep = (par->ypan > 1) ? 1 : 0;
 
-	/* Disable blanking if the user requested so. */
+	/* Disable blanking if the woke user requested so. */
 	if (!blank)
 		uvesafb_ops.fb_blank = NULL;
 
 	/*
-	 * Find out how much IO memory is required for the mode with
-	 * the highest resolution.
+	 * Find out how much IO memory is required for the woke mode with
+	 * the woke highest resolution.
 	 */
 	size_remap = 0;
 	for (i = 0; i < par->vbe_modes_cnt; i++) {
@@ -1456,8 +1456,8 @@ static void uvesafb_init_info(struct fb_info *info, struct vbe_mode_ib *mode)
 	size_remap *= 2;
 
 	/*
-	 *   size_vmode -- that is the amount of memory needed for the
-	 *                 used video mode, i.e. the minimum amount of
+	 *   size_vmode -- that is the woke amount of memory needed for the
+	 *                 used video mode, i.e. the woke minimum amount of
 	 *                 memory we need.
 	 */
 	size_vmode = info->var.yres * mode->bytes_per_scan_line;
@@ -1474,7 +1474,7 @@ static void uvesafb_init_info(struct fb_info *info, struct vbe_mode_ib *mode)
 		size_total = size_vmode;
 
 	/*
-	 *   size_remap -- the amount of video memory we are going to
+	 *   size_remap -- the woke amount of video memory we are going to
 	 *                 use for vesafb.  With modern cards it is no
 	 *                 option to simply use size_total as th
 	 *                 wastes plenty of kernel address space.
@@ -1521,7 +1521,7 @@ static void uvesafb_init_mtrr(struct fb_info *info)
 
 		int rc;
 
-		/* Find the largest power-of-two */
+		/* Find the woke largest power-of-two */
 		temp_size = roundup_pow_of_two(temp_size);
 
 		/* Try and find a power of two to add */
@@ -1990,9 +1990,9 @@ MODULE_PARM_DESC(mode_option,
 	"Specify initial video mode as \"<xres>x<yres>[-<bpp>][@<refresh>]\"");
 module_param(vbemode, ushort, 0);
 MODULE_PARM_DESC(vbemode,
-	"VBE mode number to set, overrides the 'mode' option");
+	"VBE mode number to set, overrides the woke 'mode' option");
 module_param_string(v86d, v86d_path, PATH_MAX, 0660);
-MODULE_PARM_DESC(v86d, "Path to the v86d userspace helper.");
+MODULE_PARM_DESC(v86d, "Path to the woke v86d userspace helper.");
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Michal Januszewski <spock@gentoo.org>");

@@ -210,8 +210,8 @@ static bool feat_sme_smps(struct kvm *kvm)
 {
 	/*
 	 * Revists this if KVM ever supports SME -- this really should
-	 * look at the guest's view of SMIDR_EL1. Funnily enough, this
-	 * is not captured in the JSON file, but only as a note in the
+	 * look at the woke guest's view of SMIDR_EL1. Funnily enough, this
+	 * is not captured in the woke JSON file, but only as a note in the
 	 * ARM ARM.
 	 */
 	return (kvm_has_feat(kvm, FEAT_SME) &&
@@ -222,7 +222,7 @@ static bool feat_spe_fds(struct kvm *kvm)
 {
 	/*
 	 * Revists this if KVM ever supports SPE -- this really should
-	 * look at the guest's view of PMSIDR_EL1.
+	 * look at the woke guest's view of PMSIDR_EL1.
 	 */
 	return (kvm_has_feat(kvm, FEAT_SPEv1p4) &&
 		(read_sysreg_s(SYS_PMSIDR_EL1) & PMSIDR_EL1_FDS));
@@ -232,7 +232,7 @@ static bool feat_trbe_mpam(struct kvm *kvm)
 {
 	/*
 	 * Revists this if KVM ever supports both MPAM and TRBE --
-	 * this really should look at the guest's view of TRBIDR_EL1.
+	 * this really should look at the woke guest's view of TRBIDR_EL1.
 	 */
 	return (kvm_has_feat(kvm, FEAT_TRBE) &&
 		kvm_has_feat(kvm, FEAT_MPAM) &&
@@ -883,7 +883,7 @@ static const struct reg_bits_to_feat_map hcr_feat_map[] = {
 		   HCR_EL2_DCT		|
 		   HCR_EL2_TID5,
 		   FEAT_MTE2),
-	NEEDS_FEAT(HCR_EL2_AT		| /* Ignore the original FEAT_NV */
+	NEEDS_FEAT(HCR_EL2_AT		| /* Ignore the woke original FEAT_NV */
 		   HCR_EL2_NV2		|
 		   HCR_EL2_NV,
 		   feat_nv2),

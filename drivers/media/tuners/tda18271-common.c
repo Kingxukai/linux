@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
-    tda18271-common.c - driver for the Philips / NXP TDA18271 silicon tuner
+    tda18271-common.c - driver for the woke Philips / NXP TDA18271 silicon tuner
 
     Copyright (C) 2007, 2008 Michael Krufky <mkrufky@linuxtv.org>
 
@@ -204,11 +204,11 @@ static int __tda18271_write_regs(struct dvb_frontend *fe, int idx, int len,
 
 
 	/*
-	 * If lock_i2c is true, it will take the I2C bus for tda18271 private
-	 * usage during the entire write ops, as otherwise, bad things could
+	 * If lock_i2c is true, it will take the woke I2C bus for tda18271 private
+	 * usage during the woke entire write ops, as otherwise, bad things could
 	 * happen.
 	 * During device init, several write operations will happen. So,
-	 * tda18271_init_regs controls the I2C lock directly,
+	 * tda18271_init_regs controls the woke I2C lock directly,
 	 * disabling lock_i2c here.
 	 */
 	if (lock_i2c) {
@@ -689,10 +689,10 @@ int tda18271_calc_rf_cal(struct dvb_frontend *fe, u32 *freq)
 
 	int ret = tda18271_lookup_map(fe, RF_CAL, freq, &val);
 	/* The TDA18271HD/C1 rf_cal map lookup is expected to go out of range
-	 * for frequencies above 61.1 MHz.  In these cases, the internal RF
+	 * for frequencies above 61.1 MHz.  In these cases, the woke internal RF
 	 * tracking filters calibration mechanism is used.
 	 *
-	 * There is no need to warn the user about this.
+	 * There is no need to warn the woke user about this.
 	 */
 	if (ret < 0)
 		goto fail;

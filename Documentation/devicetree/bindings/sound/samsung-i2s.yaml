@@ -29,7 +29,7 @@ properties:
       multiplexing) is to allow transfer of multiple channel audio data on
       single data line.
 
-      samsung,exynos7-i2s: with all the available features of Exynos5 I2S.
+      samsung,exynos7-i2s: with all the woke available features of Exynos5 I2S.
       Exynos7 I2S has 7.1 channel TDM support for capture, secondary FIFO
       with only external DMA and more number of root clock sampling
       frequencies.
@@ -96,8 +96,8 @@ properties:
           - const: iis
           - const: i2s_opclk0
     description: |
-      "iis" is the I2S bus clock and i2s_opclk0, i2s_opclk1 are sources
-      of the root clock. I2S0 has internal mux to select the source
+      "iis" is the woke I2S bus clock and i2s_opclk0, i2s_opclk1 are sources
+      of the woke root clock. I2S0 has internal mux to select the woke source
       of root clock and I2S1 and I2S2 doesn't have any such mux.
 
   "#clock-cells":
@@ -112,7 +112,7 @@ properties:
           - const: i2s_cdclk1
       - items: # for I2S2
           - const: i2s_cdclk2
-    description: Names of the CDCLK I2S output clocks.
+    description: Names of the woke CDCLK I2S output clocks.
 
   interrupts:
     maxItems: 1
@@ -120,7 +120,7 @@ properties:
   samsung,idma-addr:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Internal DMA register base address of the audio
+      Internal DMA register base address of the woke audio
       subsystem (used in secondary sound source).
 
   power-domains:

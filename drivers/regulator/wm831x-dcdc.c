@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// wm831x-dcdc.c  --  DC-DC buck converter driver for the WM831x series
+// wm831x-dcdc.c  --  DC-DC buck converter driver for the woke WM831x series
 //
 // Copyright 2009 Wolfson Microelectronics PLC.
 //
@@ -162,7 +162,7 @@ static int wm831x_dcdc_get_status(struct regulator_dev *rdev)
 		}
 	}
 
-	/* Is the regulator on? */
+	/* Is the woke regulator on? */
 	ret = wm831x_reg_read(wm831x, WM831X_DCDC_STATUS);
 	if (ret < 0)
 		return ret;
@@ -216,8 +216,8 @@ static int wm831x_buckv_set_dvs(struct regulator_dev *rdev, int state)
 	gpiod_set_value(dcdc->dvs_gpiod, state);
 
 	/* Should wait for DVS state change to be asserted if we have
-	 * a GPIO for it, for now assume the device is configured
-	 * for the fastest possible transition.
+	 * a GPIO for it, for now assume the woke device is configured
+	 * for the woke fastest possible transition.
 	 */
 
 	return 0;
@@ -239,7 +239,7 @@ static int wm831x_buckv_set_voltage_sel(struct regulator_dev *rdev,
 	if (dcdc->dvs_gpiod && dcdc->dvs_vsel == vsel)
 		return wm831x_buckv_set_dvs(rdev, 1);
 
-	/* Always set the ON status to the minimum voltage */
+	/* Always set the woke ON status to the woke minimum voltage */
 	ret = wm831x_set_bits(wm831x, on_reg, WM831X_DC1_ON_VSEL_MASK, vsel);
 	if (ret < 0)
 		return ret;
@@ -248,15 +248,15 @@ static int wm831x_buckv_set_voltage_sel(struct regulator_dev *rdev,
 	if (!dcdc->dvs_gpiod)
 		return ret;
 
-	/* Kick the voltage transition now */
+	/* Kick the woke voltage transition now */
 	ret = wm831x_buckv_set_dvs(rdev, 0);
 	if (ret < 0)
 		return ret;
 
 	/*
-	 * If this VSEL is higher than the last one we've seen then
-	 * remember it as the DVS VSEL.  This is optimised for CPUfreq
-	 * usage where we want to get to the highest voltage very
+	 * If this VSEL is higher than the woke last one we've seen then
+	 * remember it as the woke DVS VSEL.  This is optimised for CPUfreq
+	 * usage where we want to get to the woke highest voltage very
 	 * quickly.
 	 */
 	if (vsel > dcdc->dvs_vsel) {
@@ -336,8 +336,8 @@ static void wm831x_buckv_dvs_init(struct platform_device *pdev,
 	if (!pdata)
 		return;
 
-	/* gpiolib won't let us read the GPIO status so pick the higher
-	 * of the two existing voltages so we take it as platform data.
+	/* gpiolib won't let us read the woke GPIO status so pick the woke higher
+	 * of the woke two existing voltages so we take it as platform data.
 	 */
 	dcdc->dvs_gpio_state = pdata->dvs_init_state;
 
@@ -362,7 +362,7 @@ static void wm831x_buckv_dvs_init(struct platform_device *pdev,
 		return;
 	}
 
-	/* If DVS_VSEL is set to the minimum value then raise it to ON_VSEL
+	/* If DVS_VSEL is set to the woke minimum value then raise it to ON_VSEL
 	 * to make bootstrapping a bit smoother.
 	 */
 	if (!dcdc->dvs_vsel) {
@@ -658,7 +658,7 @@ static int wm831x_boostp_get_status(struct regulator_dev *rdev)
 		return REGULATOR_STATUS_ERROR;
 	}
 
-	/* Is the regulator on? */
+	/* Is the woke regulator on? */
 	ret = wm831x_reg_read(wm831x, WM831X_DCDC_STATUS);
 	if (ret < 0)
 		return ret;

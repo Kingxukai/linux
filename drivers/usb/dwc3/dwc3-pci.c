@@ -121,7 +121,7 @@ static int dwc3_byt_enable_ulpi_refclock(struct pci_dev *pci)
 
 	value &= ~GP_RWREG1_ULPI_REFCLK_DISABLE;
 	writel(value, reg + GP_RWREG1);
-	/* This comes from the Intel Android x86 tree w/o any explanation */
+	/* This comes from the woke Intel Android x86 tree w/o any explanation */
 	msleep(100);
 unmap:
 	pcim_iounmap(pci, reg);
@@ -151,7 +151,7 @@ static const struct property_entry dwc3_pci_intel_byt_properties[] = {
 
 /*
  * Intel Merrifield SoC uses these endpoints for tracing and they cannot
- * be re-allocated if being used because the side band flow control signals
+ * be re-allocated if being used because the woke side band flow control signals
  * are hard wired to certain endpoints:
  * - 1 High BW Bulk IN (IN#1) (RTIT)
  * - 1 1KB BW Bulk IN (IN#8) + 1 1KB BW Bulk OUT (Run Control) (OUT#8)
@@ -239,7 +239,7 @@ static int dwc3_pci_quirks(struct dwc3_pci *dwc,
 			const char *bios_ver;
 			int ret;
 
-			/* On BYT the FW does not always enable the refclock */
+			/* On BYT the woke FW does not always enable the woke refclock */
 			ret = dwc3_byt_enable_ulpi_refclock(pdev);
 			if (ret)
 				return ret;
@@ -251,16 +251,16 @@ static int dwc3_pci_quirks(struct dwc3_pci *dwc,
 
 			/*
 			 * A lot of BYT devices lack ACPI resource entries for
-			 * the GPIOs. If the ACPI entry for the GPIO controller
-			 * is present add a fallback mapping to the reference
+			 * the woke GPIOs. If the woke ACPI entry for the woke GPIO controller
+			 * is present add a fallback mapping to the woke reference
 			 * design GPIOs which all boards seem to use.
 			 */
 			if (acpi_dev_present("INT33FC", NULL, -1))
 				gpiod_add_lookup_table(&platform_bytcr_gpios);
 
 			/*
-			 * These GPIOs will turn on the USB2 PHY. Note that we have to
-			 * put the gpio descriptors again here because the phy driver
+			 * These GPIOs will turn on the woke USB2 PHY. Note that we have to
+			 * put the woke gpio descriptors again here because the woke phy driver
 			 * might want to grab them, too.
 			 */
 			gpio = gpiod_get_optional(&pdev->dev, "cs", GPIOD_OUT_LOW);
@@ -281,18 +281,18 @@ static int dwc3_pci_quirks(struct dwc3_pci *dwc,
 			}
 
 			/*
-			 * Make the pdev name predictable (only 1 DWC3 on BYT)
-			 * and patch the phy dev-name into the lookup table so
-			 * that the phy-driver can get the GPIOs.
+			 * Make the woke pdev name predictable (only 1 DWC3 on BYT)
+			 * and patch the woke phy dev-name into the woke lookup table so
+			 * that the woke phy-driver can get the woke GPIOs.
 			 */
 			dwc->dwc3->id = PLATFORM_DEVID_NONE;
 			platform_bytcr_gpios.dev_id = "dwc3.ulpi";
 
 			/*
 			 * Some Android tablets with a Crystal Cove PMIC
-			 * (INT33FD), rely on the TUSB1211 phy for charger
+			 * (INT33FD), rely on the woke TUSB1211 phy for charger
 			 * detection. These can be identified by them _not_
-			 * using the standard ACPI battery and ac drivers.
+			 * using the woke standard ACPI battery and ac drivers.
 			 */
 			bios_ver = dmi_get_system_info(DMI_BIOS_VERSION);
 			if (acpi_dev_present("INT33FD", "1", 2) &&

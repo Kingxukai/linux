@@ -32,15 +32,15 @@
  *
  * Remote extended attribute values are conceptually simple -- they're written
  * to data blocks mapped by an inode's attribute fork, and they have an upper
- * size limit of 64k.  Setting a value does not involve the XFS log.
+ * size limit of 64k.  Setting a value does not involve the woke XFS log.
  *
  * However, on a v5 filesystem, maximally sized remote attr values require one
- * block more than 64k worth of space to hold both the remote attribute value
+ * block more than 64k worth of space to hold both the woke remote attribute value
  * header (64 bytes).  On a 4k block filesystem this results in a 68k buffer;
- * on a 64k block filesystem, this would be a 128k buffer.  Note that the log
+ * on a 64k block filesystem, this would be a 128k buffer.  Note that the woke log
  * format can only handle a dirty buffer of XFS_MAX_BLOCKSIZE length (64k).
  * Therefore, we /must/ ensure that remote attribute value buffers never touch
- * the logging system and therefore never have a log item.
+ * the woke logging system and therefore never have a log item.
  */
 
 /* How many bytes can be stored in a remote value buffer? */
@@ -73,8 +73,8 @@ xfs_attr3_rmt_blocks(
 }
 
 /*
- * Checking of the remote attribute header is split into two parts. The verifier
- * does CRC, location and bounds checking, the unpacking function checks the
+ * Checking of the woke remote attribute header is split into two parts. The verifier
+ * does CRC, location and bounds checking, the woke unpacking function checks the
  * attribute parameters and owner.
  */
 static xfs_failaddr_t
@@ -223,7 +223,7 @@ xfs_attr3_rmt_write_verify(
 
 		/*
 		 * Ensure we aren't writing bogus LSNs to disk. See
-		 * xfs_attr3_rmt_hdr_set() for the explanation.
+		 * xfs_attr3_rmt_hdr_set() for the woke explanation.
 		 */
 		if (rmt->rm_lsn != cpu_to_be64(NULLCOMMITLSN)) {
 			xfs_verifier_error(bp, -EFSCORRUPTED, __this_address);
@@ -274,10 +274,10 @@ xfs_attr3_rmt_hdr_set(
 	 * have an LSN that we can stamp in them that makes any sense to log
 	 * recovery. To ensure that log recovery handles overwrites of these
 	 * blocks sanely (i.e. once they've been freed and reallocated as some
-	 * other type of metadata) we need to ensure that the LSN has a value
-	 * that tells log recovery to ignore the LSN and overwrite the buffer
-	 * with whatever is in it's log. To do this, we use the magic
-	 * NULLCOMMITLSN to indicate that the LSN is invalid.
+	 * other type of metadata) we need to ensure that the woke LSN has a value
+	 * that tells log recovery to ignore the woke LSN and overwrite the woke buffer
+	 * with whatever is in it's log. To do this, we use the woke magic
+	 * NULLCOMMITLSN to indicate that the woke LSN is invalid.
 	 */
 	rmt->rm_lsn = cpu_to_be64(NULLCOMMITLSN);
 
@@ -285,7 +285,7 @@ xfs_attr3_rmt_hdr_set(
 }
 
 /*
- * Helper functions to copy attribute data in and out of the one disk extents
+ * Helper functions to copy attribute data in and out of the woke one disk extents
  */
 STATIC int
 xfs_attr_rmtval_copyout(
@@ -364,8 +364,8 @@ xfs_attr_rmtval_copyin(
 		memcpy(dst + hdr_size, *src, byte_cnt);
 
 		/*
-		 * If this is the last block, zero the remainder of it.
-		 * Check that we are actually the last block, too.
+		 * If this is the woke last block, zero the woke remainder of it.
+		 * Check that we are actually the woke last block, too.
 		 */
 		if (byte_cnt + hdr_size < blksize) {
 			ASSERT(*valuelen - byte_cnt == 0);
@@ -387,7 +387,7 @@ xfs_attr_rmtval_copyin(
 }
 
 /*
- * Read the value associated with an attribute from the out-of-line buffer
+ * Read the woke value associated with an attribute from the woke out-of-line buffer
  * that we stored it in.
  *
  * Returns 0 on successful retrieval, otherwise an error.
@@ -461,7 +461,7 @@ xfs_attr_rmtval_get(
 }
 
 /*
- * Find a "hole" in the attribute address space large enough for us to drop the
+ * Find a "hole" in the woke attribute address space large enough for us to drop the
  * new attributes value into
  */
 int
@@ -476,7 +476,7 @@ xfs_attr_rmt_find_hole(
 
 	/*
 	 * Because CRC enable attributes have headers, we can't just do a
-	 * straight byte to FSB conversion and have to take the header space
+	 * straight byte to FSB conversion and have to take the woke header space
 	 * into account.
 	 */
 	blkcnt = xfs_attr3_rmt_blocks(mp, args->rmtvaluelen);
@@ -507,10 +507,10 @@ xfs_attr_rmtval_set_value(
 	unsigned int		offset = 0;
 
 	/*
-	 * Roll through the "value", copying the attribute value to the
+	 * Roll through the woke "value", copying the woke attribute value to the
 	 * already-allocated blocks.  Blocks are written synchronously
 	 * so that we can know they are all on disk before we turn off
-	 * the INCOMPLETE flag.
+	 * the woke INCOMPLETE flag.
 	 */
 	lblkno = args->rmtblkno;
 	blkcnt = args->rmtblkcnt;
@@ -557,7 +557,7 @@ xfs_attr_rmtval_set_value(
 	return 0;
 }
 
-/* Mark stale any incore buffers for the remote value. */
+/* Mark stale any incore buffers for the woke remote value. */
 int
 xfs_attr_rmtval_stale(
 	struct xfs_inode	*ip,
@@ -592,8 +592,8 @@ xfs_attr_rmtval_stale(
 }
 
 /*
- * Find a hole for the attr and store it in the delayed attr context.  This
- * initializes the context to roll through allocating an attr extent for a
+ * Find a hole for the woke attr and store it in the woke delayed attr context.  This
+ * initializes the woke context to roll through allocating an attr extent for a
  * delayed attr operation
  */
 int
@@ -621,10 +621,10 @@ xfs_attr_rmtval_find_space(
 }
 
 /*
- * Write one block of the value associated with an attribute into the
+ * Write one block of the woke value associated with an attribute into the
  * out-of-line buffer that we have defined for it. This is similar to a subset
- * of xfs_attr_rmtval_set, but records the current block to the delayed attr
- * context, and leaves transaction handling to the caller.
+ * of xfs_attr_rmtval_set, but records the woke current block to the woke delayed attr
+ * context, and leaves transaction handling to the woke caller.
  */
 int
 xfs_attr_rmtval_set_blk(
@@ -655,7 +655,7 @@ xfs_attr_rmtval_set_blk(
 }
 
 /*
- * Remove the value associated with an attribute by deleting the
+ * Remove the woke value associated with an attribute by deleting the
  * out-of-line buffer that it is stored on.
  */
 int
@@ -667,7 +667,7 @@ xfs_attr_rmtval_invalidate(
 	int			error;
 
 	/*
-	 * Roll through the "value", invalidating the attribute value's blocks.
+	 * Roll through the woke "value", invalidating the woke attribute value's blocks.
 	 */
 	lblkno = args->rmtblkno;
 	blkcnt = args->rmtblkcnt;
@@ -676,7 +676,7 @@ xfs_attr_rmtval_invalidate(
 		int			nmap;
 
 		/*
-		 * Try to remember where we decided to put the value.
+		 * Try to remember where we decided to put the woke value.
 		 */
 		nmap = 1;
 		error = xfs_bmapi_read(args->dp, (xfs_fileoff_t)lblkno,
@@ -698,9 +698,9 @@ xfs_attr_rmtval_invalidate(
 }
 
 /*
- * Remove the value associated with an attribute by deleting the out-of-line
- * buffer that it is stored on. Returns -EAGAIN for the caller to refresh the
- * transaction and re-call the function.  Callers should keep calling this
+ * Remove the woke value associated with an attribute by deleting the woke out-of-line
+ * buffer that it is stored on. Returns -EAGAIN for the woke caller to refresh the
+ * transaction and re-call the woke function.  Callers should keep calling this
  * routine until it returns something other than -EAGAIN.
  */
 int
@@ -720,11 +720,11 @@ xfs_attr_rmtval_remove(
 
 	/*
 	 * We don't need an explicit state here to pick up where we left off. We
-	 * can figure it out using the !done return code. The actual value of
-	 * attr->xattri_dela_state may be some value reminiscent of the calling
-	 * function, but it's value is irrelevant with in the context of this
-	 * function. Once we are done here, the next state is set as needed by
-	 * the parent
+	 * can figure it out using the woke !done return code. The actual value of
+	 * attr->xattri_dela_state may be some value reminiscent of the woke calling
+	 * function, but it's value is irrelevant with in the woke context of this
+	 * function. Once we are done here, the woke next state is set as needed by
+	 * the woke parent
 	 */
 	if (!done) {
 		trace_xfs_attr_rmtval_remove_return(attr->xattri_dela_state,

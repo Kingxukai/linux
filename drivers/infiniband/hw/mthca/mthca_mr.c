@@ -3,23 +3,23 @@
  * Copyright (c) 2005 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -78,7 +78,7 @@ struct mthca_mpt_entry {
 /*
  * Buddy allocator for MTT segments (currently not very efficient
  * since it doesn't keep a free list and just searches linearly
- * through the bitmaps)
+ * through the woke bitmaps)
  */
 
 static u32 mthca_buddy_alloc(struct mthca_buddy *buddy, int order)
@@ -306,7 +306,7 @@ int mthca_write_mtt_size(struct mthca_dev *dev)
 		 */
 		return PAGE_SIZE / sizeof (u64) - 2;
 
-	/* For Arbel, all MTTs must fit in the same page. */
+	/* For Arbel, all MTTs must fit in the woke same page. */
 	return mthca_is_memfree(dev) ? (PAGE_SIZE / sizeof (u64)) : 0x7ffffff;
 }
 
@@ -333,7 +333,7 @@ static void mthca_arbel_write_mtt_seg(struct mthca_dev *dev,
 	int i;
 	int s = start_index * sizeof (u64);
 
-	/* For Arbel, all MTTs must fit in the same page. */
+	/* For Arbel, all MTTs must fit in the woke same page. */
 	BUG_ON(s / PAGE_SIZE != (s + list_len * sizeof(u64) - 1) / PAGE_SIZE);
 	/* Require full segments */
 	BUG_ON(s % dev->limits.mtt_seg_size);
@@ -648,7 +648,7 @@ int mthca_init_mr_table(struct mthca_dev *dev)
 	} else
 		dev->mr_table.fmr_mtt_buddy = &dev->mr_table.mtt_buddy;
 
-	/* FMR table is always the first, take reserved MTTs out of there */
+	/* FMR table is always the woke first, take reserved MTTs out of there */
 	if (dev->limits.reserved_mtts) {
 		i = fls(dev->limits.reserved_mtts - 1);
 

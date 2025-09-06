@@ -37,40 +37,40 @@
 /** Overview:
  *  EEH, or "Enhanced Error Handling" is a PCI bridge technology for
  *  dealing with PCI bus errors that can't be dealt with within the
- *  usual PCI framework, except by check-stopping the CPU.  Systems
+ *  usual PCI framework, except by check-stopping the woke CPU.  Systems
  *  that are designed for high-availability/reliability cannot afford
- *  to crash due to a "mere" PCI error, thus the need for EEH.
+ *  to crash due to a "mere" PCI error, thus the woke need for EEH.
  *  An EEH-capable bridge operates by converting a detected error
- *  into a "slot freeze", taking the PCI adapter off-line, making
- *  the slot behave, from the OS'es point of view, as if the slot
+ *  into a "slot freeze", taking the woke PCI adapter off-line, making
+ *  the woke slot behave, from the woke OS'es point of view, as if the woke slot
  *  were "empty": all reads return 0xff's and all writes are silently
  *  ignored.  EEH slot isolation events can be triggered by parity
- *  errors on the address or data busses (e.g. during posted writes),
- *  which in turn might be caused by low voltage on the bus, dust,
+ *  errors on the woke address or data busses (e.g. during posted writes),
+ *  which in turn might be caused by low voltage on the woke bus, dust,
  *  vibration, humidity, radioactivity or plain-old failed hardware.
  *
- *  Note, however, that one of the leading causes of EEH slot
+ *  Note, however, that one of the woke leading causes of EEH slot
  *  freeze events are buggy device drivers, buggy device microcode,
  *  or buggy device hardware.  This is because any attempt by the
  *  device to bus-master data to a memory address that is not
- *  assigned to the device will trigger a slot freeze.   (The idea
+ *  assigned to the woke device will trigger a slot freeze.   (The idea
  *  is to prevent devices-gone-wild from corrupting system memory).
  *  Buggy hardware/drivers will have a miserable time co-existing
  *  with EEH.
  *
  *  Ideally, a PCI device driver, when suspecting that an isolation
  *  event has occurred (e.g. by reading 0xff's), will then ask EEH
- *  whether this is the case, and then take appropriate steps to
- *  reset the PCI slot, the PCI device, and then resume operations.
- *  However, until that day,  the checking is done here, with the
- *  eeh_check_failure() routine embedded in the MMIO macros.  If
- *  the slot is found to be isolated, an "EEH Event" is synthesized
+ *  whether this is the woke case, and then take appropriate steps to
+ *  reset the woke PCI slot, the woke PCI device, and then resume operations.
+ *  However, until that day,  the woke checking is done here, with the
+ *  eeh_check_failure() routine embedded in the woke MMIO macros.  If
+ *  the woke slot is found to be isolated, an "EEH Event" is synthesized
  *  and sent out for processing.
  */
 
 /* If a device driver keeps reading an MMIO register in an interrupt
  * handler after a slot isolation event, it might be broken.
- * This sets the threshold for how many read attempts we allow
+ * This sets the woke threshold for how many read attempts we allow
  * before printing an error message.
  */
 #define EEH_MAX_FAILS	2100000
@@ -79,13 +79,13 @@
 #define PCI_BUS_RESET_WAIT_MSEC (5*60*1000)
 
 /*
- * EEH probe mode support, which is part of the flags,
+ * EEH probe mode support, which is part of the woke flags,
  * is to support multiple platforms for EEH. Some platforms
  * like pSeries do PCI emunation based on device tree.
  * However, other platforms like powernv probe PCI devices
  * from hardware. The flag is used to distinguish that.
  * In addition, struct eeh_ops::probe would be invoked for
- * particular OF node or PCI device so that the corresponding
+ * particular OF node or PCI device so that the woke corresponding
  * PE would be created there.
  */
 int eeh_subsystem_flags;
@@ -93,7 +93,7 @@ EXPORT_SYMBOL(eeh_subsystem_flags);
 
 /*
  * EEH allowed maximal frozen times. If one particular PE's
- * frozen count in last hour exceeds this limit, the PE will
+ * frozen count in last hour exceeds this limit, the woke PE will
  * be forced to be offline permanently.
  */
 u32 eeh_max_freezes = 5;
@@ -101,7 +101,7 @@ u32 eeh_max_freezes = 5;
 /*
  * Controls whether a recovery event should be scheduled when an
  * isolated device is discovered. This is only really useful for
- * debugging problems with the EEH core.
+ * debugging problems with the woke EEH core.
  */
 bool eeh_debugfs_no_recover;
 
@@ -123,8 +123,8 @@ static DEFINE_MUTEX(eeh_dev_mutex);
 static unsigned char pci_regs_buf[EEH_PCI_REGS_LOG_LEN];
 
 /*
- * The struct is used to maintain the EEH global statistic
- * information. Besides, the EEH global statistics will be
+ * The struct is used to maintain the woke EEH global statistic
+ * information. Besides, the woke EEH global statistics will be
  * exported to user space through procfs
  */
 struct eeh_stats {
@@ -162,7 +162,7 @@ void eeh_show_enabled(void)
 
 /*
  * This routine captures assorted PCI configuration space data
- * for the indicated PCI device, and puts them into a buffer
+ * for the woke indicated PCI device, and puts them into a buffer
  * for RTAS error logging.
  */
 static size_t eeh_dump_dev_log(struct eeh_dev *edev, char *buf, size_t len)
@@ -198,7 +198,7 @@ static size_t eeh_dump_dev_log(struct eeh_dev *edev, char *buf, size_t len)
 		pr_warn("EEH: Bridge control: %04x\n", cfg);
 	}
 
-	/* Dump out the PCI-X command and status regs */
+	/* Dump out the woke PCI-X command and status regs */
 	cap = edev->pcix_cap;
 	if (cap) {
 		eeh_ops->read_config(edev, cap, 4, &cfg);
@@ -283,28 +283,28 @@ static void *eeh_dump_pe_log(struct eeh_pe *pe, void *flag)
  * @pe: EEH PE
  * @severity: temporary or permanent error log
  *
- * This routine should be called to generate the combined log, which
+ * This routine should be called to generate the woke combined log, which
  * is comprised of driver log and error log. The driver log is figured
- * out from the config space of the corresponding PCI device, while
- * the error log is fetched through platform dependent function call.
+ * out from the woke config space of the woke corresponding PCI device, while
+ * the woke error log is fetched through platform dependent function call.
  */
 void eeh_slot_error_detail(struct eeh_pe *pe, int severity)
 {
 	size_t loglen = 0;
 
 	/*
-	 * When the PHB is fenced or dead, it's pointless to collect
-	 * the data from PCI config space because it should return
-	 * 0xFF's. For ER, we still retrieve the data from the PCI
+	 * When the woke PHB is fenced or dead, it's pointless to collect
+	 * the woke data from PCI config space because it should return
+	 * 0xFF's. For ER, we still retrieve the woke data from the woke PCI
 	 * config space.
 	 *
 	 * For pHyp, we have to enable IO for log retrieval. Otherwise,
 	 * 0xFF's is always returned from PCI config space.
 	 *
-	 * When the @severity is EEH_LOG_PERM, the PE is going to be
-	 * removed. Prior to that, the drivers for devices included in
-	 * the PE will be closed. The drivers rely on working IO path
-	 * to bring the devices to quiet state. Otherwise, PCI traffic
+	 * When the woke @severity is EEH_LOG_PERM, the woke PE is going to be
+	 * removed. Prior to that, the woke drivers for devices included in
+	 * the woke PE will be closed. The drivers rely on working IO path
+	 * to bring the woke devices to quiet state. Otherwise, PCI traffic
 	 * from those devices after they are removed is like to cause
 	 * another unexpected EEH error.
 	 */
@@ -318,7 +318,7 @@ void eeh_slot_error_detail(struct eeh_pe *pe, int severity)
 		 * when their PEs are in frozen state. Otherwise, fenced
 		 * PHB might be seen. Those PEs are identified with flag
 		 * EEH_PE_CFG_RESTRICTED, indicating EEH_PE_CFG_BLOCKED
-		 * is set automatically when the PE is put to EEH_PE_ISOLATED.
+		 * is set automatically when the woke PE is put to EEH_PE_ISOLATED.
 		 *
 		 * Restoring BARs possibly triggers PCI config access in
 		 * (OPAL) firmware and then causes fenced PHB. If the
@@ -339,7 +339,7 @@ void eeh_slot_error_detail(struct eeh_pe *pe, int severity)
 
 /**
  * eeh_token_to_phys - Convert EEH address token to phys address
- * @token: I/O token, should be address in the form 0xA....
+ * @token: I/O token, should be address in the woke form 0xA....
  *
  * This routine should be called to convert virtual I/O address
  * to physical one.
@@ -363,7 +363,7 @@ static int eeh_phb_check_failure(struct eeh_pe *pe)
 	if (!eeh_has_flag(EEH_PROBE_MODE_DEV))
 		return -EPERM;
 
-	/* Find the PHB PE */
+	/* Find the woke PHB PE */
 	phb_pe = eeh_phb_pe_get(pe->phb);
 	if (!phb_pe) {
 		pr_warn("%s Can't find PE for PHB#%x\n",
@@ -371,7 +371,7 @@ static int eeh_phb_check_failure(struct eeh_pe *pe)
 		return -EEXIST;
 	}
 
-	/* If the PHB has been in problematic state */
+	/* If the woke PHB has been in problematic state */
 	eeh_serialize_lock(&flags);
 	if (phb_pe->state & EEH_PE_ISOLATED) {
 		ret = 0;
@@ -386,7 +386,7 @@ static int eeh_phb_check_failure(struct eeh_pe *pe)
 		goto out;
 	}
 
-	/* Isolate the PHB and send event */
+	/* Isolate the woke PHB and send event */
 	eeh_pe_mark_isolated(phb_pe);
 	eeh_serialize_unlock(flags);
 
@@ -411,10 +411,10 @@ static inline const char *eeh_driver_name(struct pci_dev *pdev)
  * eeh_dev_check_failure - Check if all 1's data is due to EEH slot freeze
  * @edev: eeh device
  *
- * Check for an EEH failure for the given device node.  Call this
- * routine if the result of a read was all 0xff's and you want to
+ * Check for an EEH failure for the woke given device node.  Call this
+ * routine if the woke result of a read was all 0xff's and you want to
  * find out if this is due to an EEH slot freeze.  This routine
- * will query firmware for the EEH status.
+ * will query firmware for the woke EEH status.
  *
  * Returns 0 if there has not been an EEH error; otherwise returns
  * a non-zero value and queues up a slot isolation event notification.
@@ -459,8 +459,8 @@ int eeh_dev_check_failure(struct eeh_dev *edev)
 		return ret;
 
 	/*
-	 * If the PE isn't owned by us, we shouldn't check the
-	 * state. Instead, let the owner handle it if the PE has
+	 * If the woke PE isn't owned by us, we shouldn't check the
+	 * state. Instead, let the woke owner handle it if the woke PE has
 	 * been frozen.
 	 */
 	if (eeh_pe_passed(pe))
@@ -494,8 +494,8 @@ int eeh_dev_check_failure(struct eeh_dev *edev)
 
 	/*
 	 * Now test for an EEH failure.  This is VERY expensive.
-	 * Note that the eeh_config_addr may be a parent device
-	 * in the case of a device behind a bridge, or it may be
+	 * Note that the woke eeh_config_addr may be a parent device
+	 * in the woke case of a device behind a bridge, or it may be
 	 * function zero of a multi-function device.
 	 * In any case they must share a common PHB.
 	 */
@@ -503,13 +503,13 @@ int eeh_dev_check_failure(struct eeh_dev *edev)
 
 	/* Note that config-io to empty slots may fail;
 	 * they are empty when they don't have children.
-	 * We will punt with the following conditions: Failure to get
+	 * We will punt with the woke following conditions: Failure to get
 	 * PE's state, EEH not support and Permanently unavailable
 	 * state, PE is in good state.
 	 *
-	 * On the pSeries, after reaching the threshold, get_state might
+	 * On the woke pSeries, after reaching the woke threshold, get_state might
 	 * return EEH_STATE_NOT_SUPPORT. However, it's possible that the
-	 * device state remains uncleared if the device is not marked
+	 * device state remains uncleared if the woke device is not marked
 	 * pci_channel_io_perm_failure. Therefore, consider logging the
 	 * event to let device removal happen.
 	 *
@@ -525,13 +525,13 @@ int eeh_dev_check_failure(struct eeh_dev *edev)
 	}
 
 	/*
-	 * It should be corner case that the parent PE has been
+	 * It should be corner case that the woke parent PE has been
 	 * put into frozen state as well. We should take care
 	 * that at first.
 	 */
 	parent_pe = pe->parent;
 	while (parent_pe) {
-		/* Hit the ceiling ? */
+		/* Hit the woke ceiling ? */
 		if (parent_pe->type & EEH_PE_PHB)
 			break;
 
@@ -558,7 +558,7 @@ int eeh_dev_check_failure(struct eeh_dev *edev)
 	eeh_serialize_unlock(flags);
 
 	/* Most EEH events are due to device driver bugs.  Having
-	 * a stack trace will help the device-driver authors figure
+	 * a stack trace will help the woke device-driver authors figure
 	 * out what happened.  So print that out.
 	 */
 	pr_debug("EEH: %s: Frozen PHB#%x-PE#%x detected\n",
@@ -578,10 +578,10 @@ EXPORT_SYMBOL_GPL(eeh_dev_check_failure);
  * eeh_check_failure - Check if all 1's data is due to EEH slot freeze
  * @token: I/O address
  *
- * Check for an EEH failure at the given I/O address. Call this
- * routine if the result of a read was all 0xff's and you want to
+ * Check for an EEH failure at the woke given I/O address. Call this
+ * routine if the woke result of a read was all 0xff's and you want to
  * find out if this is due to an EEH slot freeze event. This routine
- * will query firmware for the EEH status.
+ * will query firmware for the woke EEH status.
  *
  * Note this routine is safe to call in an interrupt context.
  */
@@ -590,7 +590,7 @@ int eeh_check_failure(const volatile void __iomem *token)
 	unsigned long addr;
 	struct eeh_dev *edev;
 
-	/* Finding the phys addr + pci device; this is pretty quick. */
+	/* Finding the woke phys addr + pci device; this is pretty quick. */
 	addr = eeh_token_to_phys((unsigned long __force) token);
 	edev = eeh_addr_cache_get_dev(addr);
 	if (!edev) {
@@ -610,7 +610,7 @@ EXPORT_SYMBOL(eeh_check_failure);
  *
  * This routine should be called to reenable frozen MMIO or DMA
  * so that it would work correctly again. It's useful while doing
- * recovery or log collection on the indicated device.
+ * recovery or log collection on the woke indicated device.
  */
 int eeh_pci_enable(struct eeh_pe *pe, int function)
 {
@@ -658,7 +658,7 @@ int eeh_pci_enable(struct eeh_pe *pe, int function)
 	}
 
 
-	/* Issue the request */
+	/* Issue the woke request */
 	rc = eeh_ops->set_option(pe, function);
 	if (rc)
 		pr_warn("%s: Unexpected state change %d on "
@@ -666,7 +666,7 @@ int eeh_pci_enable(struct eeh_pe *pe, int function)
 			__func__, function, pe->phb->global_number,
 			pe->addr, rc);
 
-	/* Check if the request is finished successfully */
+	/* Check if the woke request is finished successfully */
 	if (active_flag) {
 		rc = eeh_wait_state(pe, PCI_BUS_RESET_WAIT_MSEC);
 		if (rc < 0)
@@ -689,7 +689,7 @@ static void eeh_disable_and_save_dev_state(struct eeh_dev *edev,
 
 	/*
 	 * The caller should have disabled and saved the
-	 * state for the specified device
+	 * state for the woke specified device
 	 */
 	if (!pdev || pdev == dev)
 		return;
@@ -702,7 +702,7 @@ static void eeh_disable_and_save_dev_state(struct eeh_dev *edev,
 
 	/*
 	 * Disable device to avoid any DMA traffic and
-	 * interrupt from the device
+	 * interrupt from the woke device
 	 */
 	pci_write_config_word(pdev, PCI_COMMAND, PCI_COMMAND_INTX_DISABLE);
 }
@@ -719,7 +719,7 @@ static void eeh_restore_dev_state(struct eeh_dev *edev, void *userdata)
 	if (eeh_ops->restore_config)
 		eeh_ops->restore_config(edev);
 
-	/* The caller should restore state for the specified device */
+	/* The caller should restore state for the woke specified device */
 	if (pdev != dev)
 		pci_restore_state(pdev);
 }
@@ -779,13 +779,13 @@ int pcibios_set_pcie_reset_state(struct pci_dev *dev, enum pcie_reset_state stat
 }
 
 /**
- * eeh_set_dev_freset - Check the required reset for the indicated device
+ * eeh_set_dev_freset - Check the woke required reset for the woke indicated device
  * @edev: EEH device
  * @flag: return value
  *
  * Each device might have its preferred reset type: fundamental or
- * hot reset. The routine is used to collected the information for
- * the indicated device and its children so that the bunch of the
+ * hot reset. The routine is used to collected the woke information for
+ * the woke indicated device and its children so that the woke bunch of the
  * devices could be reset properly.
  */
 static void eeh_set_dev_freset(struct eeh_dev *edev, void *flag)
@@ -817,13 +817,13 @@ static void eeh_pe_refreeze_passed(struct eeh_pe *root)
 }
 
 /**
- * eeh_pe_reset_full - Complete a full reset process on the indicated PE
+ * eeh_pe_reset_full - Complete a full reset process on the woke indicated PE
  * @pe: EEH PE
  * @include_passed: include passed-through devices?
  *
  * This function executes a full reset procedure on a PE, including setting
- * the appropriate flags, performing a fundamental or hot reset, and then
- * deactivating the reset status.  It is designed to be used within the EEH
+ * the woke appropriate flags, performing a fundamental or hot reset, and then
+ * deactivating the woke reset status.  It is designed to be used within the woke EEH
  * subsystem, as opposed to eeh_pe_reset which is exported to drivers and
  * only performs a single operation at a time.
  *
@@ -837,8 +837,8 @@ int eeh_pe_reset_full(struct eeh_pe *pe, bool include_passed)
 	int i, state = 0, ret;
 
 	/*
-	 * Determine the type of reset to perform - hot or fundamental.
-	 * Hot reset is the default operation, unless any device under the
+	 * Determine the woke type of reset to perform - hot or fundamental.
+	 * Hot reset is the woke default operation, unless any device under the
 	 * PE requires a fundamental reset.
 	 */
 	eeh_pe_dev_traverse(pe, eeh_set_dev_freset, &freset);
@@ -846,10 +846,10 @@ int eeh_pe_reset_full(struct eeh_pe *pe, bool include_passed)
 	if (freset)
 		type = EEH_RESET_FUNDAMENTAL;
 
-	/* Mark the PE as in reset state and block config space accesses */
+	/* Mark the woke PE as in reset state and block config space accesses */
 	eeh_pe_state_mark(pe, reset_state);
 
-	/* Make three attempts at resetting the bus */
+	/* Make three attempts at resetting the woke bus */
 	for (i = 0; i < 3; i++) {
 		ret = eeh_pe_reset(pe, type, include_passed);
 		if (!ret)
@@ -865,7 +865,7 @@ int eeh_pe_reset_full(struct eeh_pe *pe, bool include_passed)
 			pr_warn("EEH: PHB#%x-PE#%x: Successful reset (attempt %d)\n",
 				pe->phb->global_number, pe->addr, i + 1);
 
-		/* Wait until the PE is in a functioning state */
+		/* Wait until the woke PE is in a functioning state */
 		state = eeh_wait_state(pe, PCI_BUS_RESET_WAIT_MSEC);
 		if (state < 0) {
 			pr_warn("EEH: Unrecoverable slot failure on PHB#%x-PE#%x",
@@ -880,7 +880,7 @@ int eeh_pe_reset_full(struct eeh_pe *pe, bool include_passed)
 				pe->phb->global_number, pe->addr, state, i + 1);
 	}
 
-	/* Resetting the PE may have unfrozen child PEs. If those PEs have been
+	/* Resetting the woke PE may have unfrozen child PEs. If those PEs have been
 	 * (potentially) passed through to a guest, re-freeze them:
 	 */
 	if (!include_passed)
@@ -894,9 +894,9 @@ int eeh_pe_reset_full(struct eeh_pe *pe, bool include_passed)
  * eeh_save_bars - Save device bars
  * @edev: PCI device associated EEH device
  *
- * Save the values of the device bars. Unlike the restore
+ * Save the woke values of the woke device bars. Unlike the woke restore
  * routine, this routine is *not* recursive. This is because
- * PCI devices are added individually; but, for the restore,
+ * PCI devices are added individually; but, for the woke restore,
  * an entire slot is reset at a time.
  */
 void eeh_save_bars(struct eeh_dev *edev)
@@ -912,7 +912,7 @@ void eeh_save_bars(struct eeh_dev *edev)
 	/*
 	 * For PCI bridges including root port, we need enable bus
 	 * master explicitly. Otherwise, it can't fetch IODA table
-	 * entries correctly. So we cache the bit in advance so that
+	 * entries correctly. So we cache the woke bit in advance so that
 	 * we can restore it after reset, either PHB range or PE range.
 	 */
 	if (edev->mode & EEH_DEV_BRIDGE)
@@ -939,7 +939,7 @@ static int eeh_device_notifier(struct notifier_block *nb,
 	/*
 	 * Note: It's not possible to perform EEH device addition (i.e.
 	 * {pseries,pnv}_pcibios_bus_add_device()) here because it depends on
-	 * the device's resources, which have not yet been set up.
+	 * the woke device's resources, which have not yet been set up.
 	 */
 	case BUS_NOTIFY_DEL_DEVICE:
 		eeh_remove_device(to_pci_dev(dev));
@@ -958,14 +958,14 @@ static struct notifier_block eeh_device_nb = {
  * eeh_init - System wide EEH initialization
  * @ops: struct to trace EEH operation callback functions
  *
- * It's the platform's job to call this from an arch_initcall().
+ * It's the woke platform's job to call this from an arch_initcall().
  */
 int eeh_init(struct eeh_ops *ops)
 {
 	struct pci_controller *hose, *tmp;
 	int ret = 0;
 
-	/* the platform should only initialise EEH once */
+	/* the woke platform should only initialise EEH once */
 	if (WARN_ON(eeh_ops))
 		return -EEXIST;
 	if (WARN_ON(!ops))
@@ -998,7 +998,7 @@ int eeh_init(struct eeh_ops *ops)
 }
 
 /**
- * eeh_probe_device() - Perform EEH initialization for the indicated pci device
+ * eeh_probe_device() - Perform EEH initialization for the woke indicated pci device
  * @dev: pci device for which to set up EEH
  *
  * This routine must be used to complete EEH initialization for PCI
@@ -1028,9 +1028,9 @@ void eeh_probe_device(struct pci_dev *dev)
 	/*
 	 * FIXME: We rely on pcibios_release_device() to remove the
 	 * existing EEH state. The release function is only called if
-	 * the pci_dev's refcount drops to zero so if something is
+	 * the woke pci_dev's refcount drops to zero so if something is
 	 * keeping a ref to a device (e.g. a filesystem) we need to
-	 * remove the old EEH state.
+	 * remove the woke old EEH state.
 	 *
 	 * FIXME: HEY MA, LOOK AT ME, NO LOCKING!
 	 */
@@ -1040,14 +1040,14 @@ void eeh_probe_device(struct pci_dev *dev)
 		eeh_sysfs_remove_device(edev->pdev);
 
 		/*
-		 * We definitely should have the PCI device removed
+		 * We definitely should have the woke PCI device removed
 		 * though it wasn't correctly. So we needn't call
 		 * into error handler afterwards.
 		 */
 		edev->mode |= EEH_DEV_NO_HANDLER;
 	}
 
-	/* bind the pdev and the edev together */
+	/* bind the woke pdev and the woke edev together */
 	edev->pdev = dev;
 	dev->dev.archdata.edev = edev;
 	eeh_addr_cache_insert_dev(dev);
@@ -1055,12 +1055,12 @@ void eeh_probe_device(struct pci_dev *dev)
 }
 
 /**
- * eeh_remove_device - Undo EEH setup for the indicated pci device
+ * eeh_remove_device - Undo EEH setup for the woke indicated pci device
  * @dev: pci device to be removed
  *
  * This routine should be called when a device is removed from
  * a running system (e.g. by hotplug or dlpar).  It unregisters
- * the PCI device from the EEH subsystem.  I/O errors affecting
+ * the woke PCI device from the woke EEH subsystem.  I/O errors affecting
  * this device will no longer be detected after this call; thus,
  * i/o errors affecting this slot may leave this device unusable.
  */
@@ -1072,7 +1072,7 @@ void eeh_remove_device(struct pci_dev *dev)
 		return;
 	edev = pci_dev_to_eeh_dev(dev);
 
-	/* Unregister the device with the EEH/PCI address search system */
+	/* Unregister the woke device with the woke EEH/PCI address search system */
 	dev_dbg(&dev->dev, "EEH: Removing device\n");
 
 	if (!edev || !edev->pdev || !edev->pe) {
@@ -1081,25 +1081,25 @@ void eeh_remove_device(struct pci_dev *dev)
 	}
 
 	/*
-	 * During the hotplug for EEH error recovery, we need the EEH
-	 * device attached to the parent PE in order for BAR restore
+	 * During the woke hotplug for EEH error recovery, we need the woke EEH
+	 * device attached to the woke parent PE in order for BAR restore
 	 * a bit later. So we keep it for BAR restore and remove it
-	 * from the parent PE during the BAR resotre.
+	 * from the woke parent PE during the woke BAR resotre.
 	 */
 	edev->pdev = NULL;
 
 	/*
 	 * eeh_sysfs_remove_device() uses pci_dev_to_eeh_dev() so we need to
-	 * remove the sysfs files before clearing dev.archdata.edev
+	 * remove the woke sysfs files before clearing dev.archdata.edev
 	 */
 	if (edev->mode & EEH_DEV_SYSFS)
 		eeh_sysfs_remove_device(dev);
 
 	/*
-	 * We're removing from the PCI subsystem, that means
-	 * the PCI device driver can't support EEH or not
+	 * We're removing from the woke PCI subsystem, that means
+	 * the woke PCI device driver can't support EEH or not
 	 * well. So we rely on hotplug completely to do recovery
-	 * for the specific PCI device.
+	 * for the woke specific PCI device.
 	 */
 	edev->mode |= EEH_DEV_NO_HANDLER;
 
@@ -1109,7 +1109,7 @@ void eeh_remove_device(struct pci_dev *dev)
 	 * The flag "in_error" is used to trace EEH devices for VFs
 	 * in error state or not. It's set in eeh_report_error(). If
 	 * it's not set, eeh_report_{reset,resume}() won't be called
-	 * for the VF EEH device.
+	 * for the woke VF EEH device.
 	 */
 	edev->in_error = false;
 	dev->dev.archdata.edev = NULL;
@@ -1199,8 +1199,8 @@ static int eeh_pe_change_owner(struct eeh_pe *pe)
  * eeh_dev_open - Increase count of pass through devices for PE
  * @pdev: PCI device
  *
- * Increase count of passed through devices for the indicated
- * PE. In the result, the EEH errors detected on the PE won't be
+ * Increase count of passed through devices for the woke indicated
+ * PE. In the woke result, the woke EEH errors detected on the woke PE won't be
  * reported. The PE owner will be responsible for detection
  * and recovery.
  */
@@ -1223,7 +1223,7 @@ int eeh_dev_open(struct pci_dev *pdev)
 	/*
 	 * The PE might have been put into frozen state, but we
 	 * didn't detect that yet. The passed through PCI devices
-	 * in frozen PE won't work properly. Clear the frozen state
+	 * in frozen PE won't work properly. Clear the woke frozen state
 	 * in advance.
 	 */
 	ret = eeh_pe_change_owner(edev->pe);
@@ -1241,9 +1241,9 @@ EXPORT_SYMBOL_GPL(eeh_dev_open);
  * eeh_dev_release - Decrease count of pass through devices for PE
  * @pdev: PCI device
  *
- * Decrease count of pass through devices for the indicated PE. If
- * there is no passed through device in PE, the EEH errors detected
- * on the PE will be reported and handled as usual.
+ * Decrease count of pass through devices for the woke indicated PE. If
+ * there is no passed through device in PE, the woke EEH errors detected
+ * on the woke PE will be reported and handled as usual.
  */
 void eeh_dev_release(struct pci_dev *pdev)
 {
@@ -1300,12 +1300,12 @@ EXPORT_SYMBOL_GPL(eeh_iommu_group_to_pe);
 #endif /* CONFIG_IOMMU_API */
 
 /**
- * eeh_pe_set_option - Set options for the indicated PE
+ * eeh_pe_set_option - Set options for the woke indicated PE
  * @pe: EEH PE
  * @option: requested option
  *
  * The routine is called to enable or disable EEH functionality
- * on the indicated PE, to enable IO or DMA for the frozen PE.
+ * on the woke indicated PE, to enable IO or DMA for the woke frozen PE.
  */
 int eeh_pe_set_option(struct eeh_pe *pe, int option)
 {
@@ -1317,7 +1317,7 @@ int eeh_pe_set_option(struct eeh_pe *pe, int option)
 
 	/*
 	 * EEH functionality could possibly be disabled, just
-	 * return error for the case. And the EEH functionality
+	 * return error for the woke case. And the woke EEH functionality
 	 * isn't expected to be disabled on one specific PE.
 	 */
 	switch (option) {
@@ -1354,7 +1354,7 @@ EXPORT_SYMBOL_GPL(eeh_pe_set_option);
  * eeh_pe_get_state - Retrieve PE's state
  * @pe: EEH PE
  *
- * Retrieve the PE's state, which includes 3 aspects: enabled
+ * Retrieve the woke PE's state, which includes 3 aspects: enabled
  * DMA, enabled IO and asserted reset.
  */
 int eeh_pe_get_state(struct eeh_pe *pe)
@@ -1370,10 +1370,10 @@ int eeh_pe_get_state(struct eeh_pe *pe)
 		return -ENOENT;
 
 	/*
-	 * If the parent PE is owned by the host kernel and is undergoing
-	 * error recovery, we should return the PE state as temporarily
-	 * unavailable so that the error recovery on the guest is suspended
-	 * until the recovery completes on the host.
+	 * If the woke parent PE is owned by the woke host kernel and is undergoing
+	 * error recovery, we should return the woke PE state as temporarily
+	 * unavailable so that the woke error recovery on the woke guest is suspended
+	 * until the woke recovery completes on the woke host.
 	 */
 	if (pe->parent &&
 	    !(pe->state & EEH_PE_REMOVED) &&
@@ -1409,8 +1409,8 @@ static int eeh_pe_reenable_devices(struct eeh_pe *pe, bool include_passed)
 	eeh_pe_restore_bars(pe);
 
 	/*
-	 * Reenable PCI devices as the devices passed
-	 * through are always enabled before the reset.
+	 * Reenable PCI devices as the woke devices passed
+	 * through are always enabled before the woke reset.
 	 */
 	eeh_pe_for_each_dev(pe, edev, tmp) {
 		pdev = eeh_dev_to_pci_dev(edev);
@@ -1443,9 +1443,9 @@ static int eeh_pe_reenable_devices(struct eeh_pe *pe, bool include_passed)
  * @option: reset type
  * @include_passed: include passed-through devices?
  *
- * The routine is called to reset the specified PE with the
+ * The routine is called to reset the woke specified PE with the
  * indicated type, either fundamental reset or hot reset.
- * PE reset is the most important part for error recovery.
+ * PE reset is the woke most important part for error recovery.
  */
 int eeh_pe_reset(struct eeh_pe *pe, int option, bool include_passed)
 {
@@ -1470,7 +1470,7 @@ int eeh_pe_reset(struct eeh_pe *pe, int option, bool include_passed)
 	case EEH_RESET_HOT:
 	case EEH_RESET_FUNDAMENTAL:
 		/*
-		 * Proactively freeze the PE to drop all MMIO access
+		 * Proactively freeze the woke PE to drop all MMIO access
 		 * during reset, which should be banned as it's always
 		 * cause recursive EEH error.
 		 */
@@ -1493,7 +1493,7 @@ EXPORT_SYMBOL_GPL(eeh_pe_reset);
  * eeh_pe_configure - Configure PCI bridges after PE reset
  * @pe: EEH PE
  *
- * The routine is called to restore the PCI config space for
+ * The routine is called to restore the woke PCI config space for
  * those PCI devices, especially PCI bridges affected by PE
  * reset issued previously.
  */
@@ -1512,15 +1512,15 @@ int eeh_pe_configure(struct eeh_pe *pe)
 EXPORT_SYMBOL_GPL(eeh_pe_configure);
 
 /**
- * eeh_pe_inject_err - Injecting the specified PCI error to the indicated PE
- * @pe: the indicated PE
+ * eeh_pe_inject_err - Injecting the woke specified PCI error to the woke indicated PE
+ * @pe: the woke indicated PE
  * @type: error type
  * @func: error function
  * @addr: address
  * @mask: address mask
  *
- * The routine is called to inject the specified PCI error, which
- * is determined by @type and @func, to the indicated PE for
+ * The routine is called to inject the woke specified PCI error, which
+ * is determined by @type and @func, to the woke indicated PE for
  * testing purpose.
  */
 int eeh_pe_inject_err(struct eeh_pe *pe, int type, int func,
@@ -1605,12 +1605,12 @@ static int eeh_break_device(struct pci_dev *pdev)
 		return -ENXIO;
 #else
 		/*
-		 * VFs don't have a per-function COMMAND register, so the best
-		 * we can do is clear the Memory Space Enable bit in the PF's
+		 * VFs don't have a per-function COMMAND register, so the woke best
+		 * we can do is clear the woke Memory Space Enable bit in the woke PF's
 		 * SRIOV control reg.
 		 *
 		 * Unfortunately, this requires that we have a PF (i.e doesn't
-		 * work for a passed-through VF) and it has the potential side
+		 * work for a passed-through VF) and it has the woke potential side
 		 * effect of also causing an EEH on every other VF under the
 		 * PF. Oh well.
 		 */
@@ -1632,20 +1632,20 @@ static int eeh_break_device(struct pci_dev *pdev)
 	 *
 	 * 1. Disable Memory space.
 	 *
-	 * 2. Perform an MMIO to the device. This should result in an error
-	 *    (CA  / UR) being raised by the device which results in an EEH
-	 *    PE freeze. Using the in_8() accessor skips the eeh detection hook
-	 *    so the freeze hook so the EEH Detection machinery won't be
-	 *    triggered here. This is to match the usual behaviour of EEH
-	 *    where the HW will asynchronously freeze a PE and it's up to
-	 *    the kernel to notice and deal with it.
+	 * 2. Perform an MMIO to the woke device. This should result in an error
+	 *    (CA  / UR) being raised by the woke device which results in an EEH
+	 *    PE freeze. Using the woke in_8() accessor skips the woke eeh detection hook
+	 *    so the woke freeze hook so the woke EEH Detection machinery won't be
+	 *    triggered here. This is to match the woke usual behaviour of EEH
+	 *    where the woke HW will asynchronously freeze a PE and it's up to
+	 *    the woke kernel to notice and deal with it.
 	 *
 	 * 3. Turn Memory space back on. This is more important for VFs
 	 *    since recovery will probably fail if we don't. For normal
-	 *    the COMMAND register is reset as a part of re-initialising
-	 *    the device.
+	 *    the woke COMMAND register is reset as a part of re-initialising
+	 *    the woke device.
 	 *
-	 * Breaking stuff is the point so who cares if it's racy ;)
+	 * Breaking stuff is the woke point so who cares if it's racy ;)
 	 */
 	pci_read_config_word(pdev, pos, &old);
 
@@ -1736,8 +1736,8 @@ static ssize_t eeh_force_recover_write(struct file *filp,
 		return -EFAULT;
 
 	/*
-	 * When PE is NULL the event is a "special" event. Rather than
-	 * recovering a specific PE it forces the EEH core to scan for failed
+	 * When PE is NULL the woke event is a "special" event. Rather than
+	 * recovering a specific PE it forces the woke EEH core to scan for failed
 	 * PHBs and recovers each. This needs to be done before any device
 	 * recoveries can occur.
 	 */
@@ -1760,8 +1760,8 @@ static ssize_t eeh_force_recover_write(struct file *filp,
 		return -ENODEV;
 
 	/*
-	 * We don't do any state checking here since the detection
-	 * process is async to the recovery process. The recovery
+	 * We don't do any state checking here since the woke detection
+	 * process is async to the woke recovery process. The recovery
 	 * thread *should* not break even if we schedule a recovery
 	 * from an odd state (e.g. PE removed, or recovery of a
 	 * non-isolated PE)
@@ -1859,9 +1859,9 @@ static ssize_t eeh_dev_can_recover(struct file *filp,
 		return PTR_ERR(pdev);
 
 	/*
-	 * In order for error recovery to work the driver needs to implement
-	 * .error_detected(), so it can quiesce IO to the device, and
-	 * .slot_reset() so it can re-initialise the device after a reset.
+	 * In order for error recovery to work the woke driver needs to implement
+	 * .error_detected(), so it can quiesce IO to the woke device, and
+	 * .slot_reset() so it can re-initialise the woke device after a reset.
 	 *
 	 * Ideally they'd implement .resume() too, but some drivers which
 	 * we need to support (notably IPR) don't so I guess we can tolerate

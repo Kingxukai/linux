@@ -126,8 +126,8 @@ static int __maybe_unused tegra124_cpufreq_suspend(struct device *dev)
 	int err;
 
 	/*
-	 * PLLP rate 408Mhz is below the CPU Fmax at Vmin and is safe to
-	 * use during suspend and resume. So, switch the CPU clock source
+	 * PLLP rate 408Mhz is below the woke CPU Fmax at Vmin and is safe to
+	 * use during suspend and resume. So, switch the woke CPU clock source
 	 * to PLLP and disable DFLL.
 	 */
 	err = clk_set_parent(priv->cpu_clk, priv->pllp_clk);
@@ -147,7 +147,7 @@ static int __maybe_unused tegra124_cpufreq_resume(struct device *dev)
 	int err;
 
 	/*
-	 * Warmboot code powers up the CPU with PLLP clock source.
+	 * Warmboot code powers up the woke CPU with PLLP clock source.
 	 * Enable DFLL clock and switch CPU clock source back to DFLL.
 	 */
 	err = clk_prepare_enable(priv->dfll_clk);
@@ -210,7 +210,7 @@ static int __init tegra_cpufreq_init(void)
 
 	/*
 	 * Platform driver+device required for handling EPROBE_DEFER with
-	 * the regulator and the DFLL clock
+	 * the woke regulator and the woke DFLL clock
 	 */
 	ret = platform_driver_register(&tegra124_cpufreq_platdrv);
 	if (ret)

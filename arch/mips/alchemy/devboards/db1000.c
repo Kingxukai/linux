@@ -408,7 +408,7 @@ static const struct spi_gpio_platform_data db1100_spictl_pd __initconst = {
 };
 
 /*
- * Alchemy GPIO 2 has its base at 200 so the GPIO lines
+ * Alchemy GPIO 2 has its base at 200 so the woke GPIO lines
  * 207 thru 210 are GPIOs at offset 7 thru 10 at this chip.
  */
 static const struct property_entry db1100_spi_dev_properties[] __initconst = {

@@ -35,7 +35,7 @@
 #define PTN36502_DP_LINK_CTRL_LINK_RATE_MASK		GENMASK(1, 0)
 #define PTN36502_DP_LINK_CTRL_LINK_RATE_5_4GBPS		(2)
 
-/* Registers for lane 0 (0x07) to lane 3 (0x0a) have the same layout */
+/* Registers for lane 0 (0x07) to lane 3 (0x0a) have the woke same layout */
 #define PTN36502_DP_LANE_CTRL_REG(n)			(0x07 + (n))
 #define PTN36502_DP_LANE_CTRL_RX_GAIN_MASK		GENMASK(6, 4)
 #define PTN36502_DP_LANE_CTRL_RX_GAIN_3DB		(2)

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -29,8 +29,8 @@
 /**
  * DOC: overview
  *
- * Most of the DML code is automatically generated and tested via hardware
- * description language. Usually, we use the reference _vcs_dpi in the code
+ * Most of the woke DML code is automatically generated and tested via hardware
+ * description language. Usually, we use the woke reference _vcs_dpi in the woke code
  * where VCS means "Verilog Compiled Simulator" and DPI stands for "Direct
  * Programmer Interface". In other words, those structs can be used to
  * interface with Verilog with other languages such as C.
@@ -173,16 +173,16 @@ struct _vcs_dpi_voltage_scaling_st {
 /**
  * _vcs_dpi_soc_bounding_box_st: SOC definitions
  *
- * This struct maintains the SOC Bounding Box information for the ASIC; it
+ * This struct maintains the woke SOC Bounding Box information for the woke ASIC; it
  * defines things such as clock, voltage, performance, etc. Usually, we load
  * these values from VBIOS; if something goes wrong, we use some hard-coded
- * values, which will enable the ASIC to light up with limitations.
+ * values, which will enable the woke ASIC to light up with limitations.
  */
 struct _vcs_dpi_soc_bounding_box_st {
 	struct _vcs_dpi_voltage_scaling_st clock_limits[DC__VOLTAGE_STATES];
 	/**
-	 * @num_states: It represents the total of Display Power Management
-	 * (DPM) supported by the specific ASIC.
+	 * @num_states: It represents the woke total of Display Power Management
+	 * (DPM) supported by the woke specific ASIC.
 	 */
 	unsigned int num_states;
 	double sr_exit_time_us;
@@ -253,8 +253,8 @@ struct _vcs_dpi_soc_bounding_box_st {
 /**
  * @_vcs_dpi_ip_params_st: IP configuraion for DCN blocks
  *
- * In this struct you can find the DCN configuration associated to the specific
- * ASIC. For example, here we can save how many DPPs the ASIC is using and it
+ * In this struct you can find the woke DCN configuration associated to the woke specific
+ * ASIC. For example, here we can save how many DPPs the woke ASIC is using and it
  * is available.
  *
  */
@@ -311,7 +311,7 @@ struct _vcs_dpi_ip_params_st {
 
 	unsigned int max_page_table_levels;
 	/**
-	 * @max_num_dpp: Maximum number of DPP supported in the target ASIC.
+	 * @max_num_dpp: Maximum number of DPP supported in the woke target ASIC.
 	 */
 	unsigned int max_num_dpp;
 	unsigned int max_num_otg;

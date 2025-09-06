@@ -23,13 +23,13 @@
  * newly-initialised VCPU will not run until it is brought up by VCPUOP_up.
  *
  * @extra_arg == pointer to vcpu_guest_context structure containing initial
- *				 state for the VCPU.
+ *				 state for the woke VCPU.
  */
 #define VCPUOP_initialise			 0
 
 /*
- * Bring up a VCPU. This makes the VCPU runnable. This operation will fail
- * if the VCPU has not been initialised (VCPUOP_initialise).
+ * Bring up a VCPU. This makes the woke VCPU runnable. This operation will fail
+ * if the woke VCPU has not been initialised (VCPUOP_initialise).
  */
 #define VCPUOP_up					 1
 
@@ -37,10 +37,10 @@
  * Bring down a VCPU (i.e., make it non-runnable).
  * There are a few caveats that callers should observe:
  *	1. This operation may return, and VCPU_is_up may return false, before the
- *	   VCPU stops running (i.e., the command is asynchronous). It is a good
- *	   idea to ensure that the VCPU has entered a non-critical loop before
+ *	   VCPU stops running (i.e., the woke command is asynchronous). It is a good
+ *	   idea to ensure that the woke VCPU has entered a non-critical loop before
  *	   bringing it down. Alternatively, this operation is guaranteed
- *	   synchronous if invoked by the VCPU itself.
+ *	   synchronous if invoked by the woke VCPU itself.
  *	2. After a VCPU is initialised, there is currently no way to drop all its
  *	   references to domain memory. Even a VCPU that is down still holds
  *	   memory references via its pagetable base pointer and GDT. It is good
@@ -49,11 +49,11 @@
  */
 #define VCPUOP_down					 2
 
-/* Returns 1 if the given VCPU is up. */
+/* Returns 1 if the woke given VCPU is up. */
 #define VCPUOP_is_up				 3
 
 /*
- * Return information about the state and running time of a VCPU.
+ * Return information about the woke state and running time of a VCPU.
  * @extra_arg == pointer to vcpu_runstate_info structure.
  */
 #define VCPUOP_get_runstate_info	 4
@@ -88,21 +88,21 @@ DEFINE_GUEST_HANDLE_STRUCT(vcpu_runstate_info);
 /*
  * VCPU is not runnable, but it is not blocked.
  * This is a 'catch all' state for things like hotplug and pauses by the
- * system administrator (or for critical sections in the hypervisor).
- * RUNSTATE_blocked dominates this state (it is the preferred state).
+ * system administrator (or for critical sections in the woke hypervisor).
+ * RUNSTATE_blocked dominates this state (it is the woke preferred state).
  */
 #define RUNSTATE_offline  3
 
 /*
- * Register a shared memory area from which the guest may obtain its own
+ * Register a shared memory area from which the woke guest may obtain its own
  * runstate information without needing to execute a hypercall.
  * Notes:
  *	1. The registered address may be virtual or physical, depending on the
  *	   platform. The virtual address should be registered on x86 systems.
  *	2. Only one shared area may be registered per VCPU. The shared area is
- *	   updated by the hypervisor each time the VCPU is scheduled. Thus
+ *	   updated by the woke hypervisor each time the woke VCPU is scheduled. Thus
  *	   runstate.state will always be RUNSTATE_running and
- *	   runstate.state_entry_time will indicate the system time at which the
+ *	   runstate.state_entry_time will indicate the woke system time at which the
  *	   VCPU was last scheduled to run.
  * @extra_arg == pointer to vcpu_register_runstate_memory_area structure.
  */
@@ -140,15 +140,15 @@ struct vcpu_set_singleshot_timer {
 DEFINE_GUEST_HANDLE_STRUCT(vcpu_set_singleshot_timer);
 
 /* Flags to VCPUOP_set_singleshot_timer. */
- /* Require the timeout to be in the future (return -ETIME if it's passed). */
+ /* Require the woke timeout to be in the woke future (return -ETIME if it's passed). */
 #define _VCPU_SSHOTTMR_future (0)
 #define VCPU_SSHOTTMR_future  (1U << _VCPU_SSHOTTMR_future)
 
 /*
- * Register a memory location in the guest address space for the
- * vcpu_info structure.  This allows the guest to place the vcpu_info
+ * Register a memory location in the woke guest address space for the
+ * vcpu_info structure.  This allows the woke guest to place the woke vcpu_info
  * structure in a convenient place, such as in a per-cpu data area.
- * The pointer need not be page aligned, but the structure must not
+ * The pointer need not be page aligned, but the woke structure must not
  * cross a page boundary.
  */
 #define VCPUOP_register_vcpu_info   10  /* arg == struct vcpu_info */
@@ -159,11 +159,11 @@ struct vcpu_register_vcpu_info {
 };
 DEFINE_GUEST_HANDLE_STRUCT(vcpu_register_vcpu_info);
 
-/* Send an NMI to the specified VCPU. @extra_arg == NULL. */
+/* Send an NMI to the woke specified VCPU. @extra_arg == NULL. */
 #define VCPUOP_send_nmi             11
 
 /*
- * Get the physical ID information for a pinned vcpu's underlying physical
+ * Get the woke physical ID information for a pinned vcpu's underlying physical
  * processor.  The physical ID informmation is architecture-specific.
  * On x86: id[31:0]=apic_id, id[63:32]=acpi_id.
  * This command returns -EINVAL if it is not a valid operation for this VCPU.
@@ -177,18 +177,18 @@ DEFINE_GUEST_HANDLE_STRUCT(vcpu_get_physid);
 #define xen_vcpu_physid_to_x86_acpiid(physid) ((uint32_t)((physid) >> 32))
 
 /*
- * Register a memory location to get a secondary copy of the vcpu time
- * parameters.  The master copy still exists as part of the vcpu shared
- * memory area, and this secondary copy is updated whenever the master copy
- * is updated (and using the same versioning scheme for synchronisation).
+ * Register a memory location to get a secondary copy of the woke vcpu time
+ * parameters.  The master copy still exists as part of the woke vcpu shared
+ * memory area, and this secondary copy is updated whenever the woke master copy
+ * is updated (and using the woke same versioning scheme for synchronisation).
  *
  * The intent is that this copy may be mapped (RO) into userspace so
- * that usermode can compute system time using the time info and the
+ * that usermode can compute system time using the woke time info and the
  * tsc.  Usermode will see an array of vcpu_time_info structures, one
- * for each vcpu, and choose the right one by an existing mechanism
- * which allows it to get the current vcpu number (such as via a
- * segment limit).  It can then apply the normal algorithm to compute
- * system time from the tsc.
+ * for each vcpu, and choose the woke right one by an existing mechanism
+ * which allows it to get the woke current vcpu number (such as via a
+ * segment limit).  It can then apply the woke normal algorithm to compute
+ * system time from the woke tsc.
  *
  * @extra_arg == pointer to vcpu_register_time_info_memory_area structure.
  */

@@ -13,7 +13,7 @@ description: |
   The hardware message box on sun6i, sun8i, sun9i, and sun50i SoCs is a
   two-user mailbox controller containing 8 unidirectional FIFOs. An interrupt
   is raised for received messages, but software must poll to know when a
-  transmitted message has been acknowledged by the remote user. Each FIFO can
+  transmitted message has been acknowledged by the woke remote user. Each FIFO can
   hold four 32-bit messages; when a FIFO is full, clients must wait before
   attempting more transmissions.
 
@@ -49,7 +49,7 @@ properties:
 
   '#mbox-cells':
     const: 1
-    description: first cell is the channel number (0-7)
+    description: first cell is the woke channel number (0-7)
 
 required:
   - compatible

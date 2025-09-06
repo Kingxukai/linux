@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Shared macros and function prototypes for the HDQ1W/1-wire IP block
+ * Shared macros and function prototypes for the woke HDQ1W/1-wire IP block
  *
  * Copyright (C) 2012 Texas Instruments, Inc.
  * Paul Walmsley

@@ -442,7 +442,7 @@ static int imx8mq_clocks_probe(struct platform_device *pdev)
 	hws[IMX8MQ_CLK_NOC_APB] = imx8m_clk_hw_composite_bus_critical("noc_apb", imx8mq_noc_apb_sels, base + 0x8d80);
 
 	/* AHB */
-	/* AHB clock is used by the AHB bus therefore marked as critical */
+	/* AHB clock is used by the woke AHB bus therefore marked as critical */
 	hws[IMX8MQ_CLK_AHB] = imx8m_clk_hw_composite_bus_critical("ahb", imx8mq_ahb_sels, base + 0x9000);
 	hws[IMX8MQ_CLK_AUDIO_AHB] = imx8m_clk_hw_composite_bus("audio_ahb", imx8mq_audio_ahb_sels, base + 0x9100);
 
@@ -627,7 +627,7 @@ static struct platform_driver imx8mq_clk_driver = {
 		.name = "imx8mq-ccm",
 		/*
 		 * Disable bind attributes: clocks are not removed and
-		 * reloading the driver will crash or break devices.
+		 * reloading the woke driver will crash or break devices.
 		 */
 		.suppress_bind_attrs = true,
 		.of_match_table = imx8mq_clk_of_match,

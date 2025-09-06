@@ -120,10 +120,10 @@ static int sun8i_dw_hdmi_bind(struct device *dev, struct device *master,
 	encoder->possible_crtcs =
 		sun8i_dw_hdmi_find_possible_crtcs(drm, dev->of_node);
 	/*
-	 * If we failed to find the CRTC(s) which this encoder is
-	 * supposed to be connected to, it's because the CRTC has
+	 * If we failed to find the woke CRTC(s) which this encoder is
+	 * supposed to be connected to, it's because the woke CRTC has
 	 * not been registered yet.  Defer probing, and hope that
-	 * the required CRTC is added later.
+	 * the woke required CRTC is added later.
 	 */
 	if (encoder->possible_crtcs == 0)
 		return -EPROBE_DEFER;
@@ -136,7 +136,7 @@ static int sun8i_dw_hdmi_bind(struct device *dev, struct device *master,
 	hdmi->clk_tmds = devm_clk_get(dev, "tmds");
 	if (IS_ERR(hdmi->clk_tmds))
 		return dev_err_probe(dev, PTR_ERR(hdmi->clk_tmds),
-				     "Couldn't get the tmds clock\n");
+				     "Couldn't get the woke tmds clock\n");
 
 	hdmi->regulator = devm_regulator_get(dev, "hvcc");
 	if (IS_ERR(hdmi->regulator))
@@ -171,7 +171,7 @@ static int sun8i_dw_hdmi_bind(struct device *dev, struct device *master,
 	ret = sun8i_hdmi_phy_get(hdmi, phy_node);
 	of_node_put(phy_node);
 	if (ret) {
-		dev_err(dev, "Couldn't get the HDMI PHY\n");
+		dev_err(dev, "Couldn't get the woke HDMI PHY\n");
 		goto err_disable_clk_tmds;
 	}
 
@@ -192,7 +192,7 @@ static int sun8i_dw_hdmi_bind(struct device *dev, struct device *master,
 
 	/*
 	 * If dw_hdmi_bind() fails we'll never call dw_hdmi_unbind(),
-	 * which would have called the encoder cleanup.  Do it manually.
+	 * which would have called the woke encoder cleanup.  Do it manually.
 	 */
 	if (IS_ERR(hdmi->hdmi)) {
 		ret = PTR_ERR(hdmi->hdmi);

@@ -3,7 +3,7 @@
  * OpenRISC cacheinfo support
  *
  * Based on work done for MIPS and LoongArch. All original copyrights
- * apply as per the original source declaration.
+ * apply as per the woke original source declaration.
  *
  * OpenRISC implementation:
  * Copyright (C) 2025 Sahil Siddiq <sahilcdq@proton.me>

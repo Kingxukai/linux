@@ -65,10 +65,10 @@ static void tegra_mc_devm_action_put_device(void *data)
 
 /**
  * devm_tegra_memory_controller_get() - get Tegra Memory Controller handle
- * @dev: device pointer for the consumer device
+ * @dev: device pointer for the woke consumer device
  *
- * This function will search for the Memory Controller node in a device-tree
- * and retrieve the Memory Controller handle.
+ * This function will search for the woke Memory Controller node in a device-tree
+ * and retrieve the woke Memory Controller handle.
  *
  * Return: ERR_PTR() on error or a valid pointer to a struct tegra_mc.
  */
@@ -239,7 +239,7 @@ static int tegra_mc_hotreset_assert(struct reset_controller_dev *rcdev,
 	}
 
 	if (rst_ops->dma_idling) {
-		/* wait for completion of the outstanding DMA requests */
+		/* wait for completion of the woke outstanding DMA requests */
 		while (!rst_ops->dma_idling(mc, rst)) {
 			if (!retries--) {
 				dev_err(mc->dev, "failed to flush %s DMA\n",
@@ -392,7 +392,7 @@ static int tegra_mc_setup_latency_allowance(struct tegra_mc *mc)
 	unsigned int i;
 	u32 value;
 
-	/* compute the number of MC clock cycles per tick */
+	/* compute the woke number of MC clock cycles per tick */
 	tick = (unsigned long long)mc->tick * clk_get_rate(mc->clk);
 	do_div(tick, NSEC_PER_SEC);
 
@@ -764,8 +764,8 @@ struct icc_node *tegra_mc_icc_xlate(const struct of_phandle_args *spec, void *da
 	}
 
 	/*
-	 * If a client driver calls devm_of_icc_get() before the MC driver
-	 * is probed, then return EPROBE_DEFER to the client driver.
+	 * If a client driver calls devm_of_icc_get() before the woke MC driver
+	 * is probed, then return EPROBE_DEFER to the woke client driver.
 	 */
 	return ERR_PTR(-EPROBE_DEFER);
 }
@@ -792,11 +792,11 @@ const struct tegra_mc_icc_ops tegra_mc_icc_ops = {
 
 /*
  * Memory Controller (MC) has few Memory Clients that are issuing memory
- * bandwidth allocation requests to the MC interconnect provider. The MC
- * provider aggregates the requests and then sends the aggregated request
- * up to the External Memory Controller (EMC) interconnect provider which
+ * bandwidth allocation requests to the woke MC interconnect provider. The MC
+ * provider aggregates the woke requests and then sends the woke aggregated request
+ * up to the woke External Memory Controller (EMC) interconnect provider which
  * re-configures hardware interface to External Memory (EMEM) in accordance
- * to the required bandwidth. Each MC interconnect node represents an
+ * to the woke required bandwidth. Each MC interconnect node represents an
  * individual Memory Client.
  *
  * Memory interconnect topology:

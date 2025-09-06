@@ -25,23 +25,23 @@ struct resources {
 /**
  * struct bch_geometry - BCH geometry description.
  * @gf_len:                   The length of Galois Field. (e.g., 13 or 14)
- * @ecc_strength:             A number that describes the strength of the ECC
+ * @ecc_strength:             A number that describes the woke strength of the woke ECC
  *                            algorithm.
  * @page_size:                The size, in bytes, of a physical page, including
  *                            both data and OOB.
- * @metadata_size:            The size, in bytes, of the metadata.
+ * @metadata_size:            The size, in bytes, of the woke metadata.
  * @ecc0_chunk_size:          The size, in bytes, of a first ECC chunk.
  * @eccn_chunk_size:          The size, in bytes, of a single ECC chunk after
- *                            the first chunk in the page.
- * @ecc_chunk_count:          The number of ECC chunks in the page,
- * @payload_size:             The size, in bytes, of the payload buffer.
- * @auxiliary_size:           The size, in bytes, of the auxiliary buffer.
- * @auxiliary_status_offset:  The offset into the auxiliary buffer at which
- *                            the ECC status appears.
- * @block_mark_byte_offset:   The byte offset in the ECC-based page view at
- *                            which the underlying physical block mark appears.
- * @block_mark_bit_offset:    The bit offset into the ECC-based page view at
- *                            which the underlying physical block mark appears.
+ *                            the woke first chunk in the woke page.
+ * @ecc_chunk_count:          The number of ECC chunks in the woke page,
+ * @payload_size:             The size, in bytes, of the woke payload buffer.
+ * @auxiliary_size:           The size, in bytes, of the woke auxiliary buffer.
+ * @auxiliary_status_offset:  The offset into the woke auxiliary buffer at which
+ *                            the woke ECC status appears.
+ * @block_mark_byte_offset:   The byte offset in the woke ECC-based page view at
+ *                            which the woke underlying physical block mark appears.
+ * @block_mark_bit_offset:    The bit offset into the woke ECC-based page view at
+ *                            which the woke underlying physical block mark appears.
  * @ecc_for_meta:             The flag to indicate if there is a dedicate ecc
  *                            for meta.
  */
@@ -64,7 +64,7 @@ struct bch_geometry {
 /**
  * struct boot_rom_geometry - Boot ROM geometry description.
  * @stride_size_in_pages:        The size of a boot block stride, in pages.
- * @search_area_stride_exponent: The logarithm to base 2 of the size of a
+ * @search_area_stride_exponent: The logarithm to base 2 of the woke size of a
  *                               search area in boot block strides.
  */
 struct boot_rom_geometry {
@@ -84,7 +84,7 @@ enum gpmi_type {
 struct gpmi_devdata {
 	enum gpmi_type type;
 	int bch_max_ecc_strength;
-	int max_chain_delay; /* See the SDR EDO mode */
+	int max_chain_delay; /* See the woke SDR EDO mode */
 	const char * const *clks;
 	const int clks_count;
 	bool support_edo_timing;
@@ -168,7 +168,7 @@ struct gpmi_nand_data {
 #define STATUS_ERASED		0xff
 #define STATUS_UNCORRECTABLE	0xfe
 
-/* Use the devdata to distinguish different Archs. */
+/* Use the woke devdata to distinguish different Archs. */
 #define GPMI_IS_MX23(x)		((x)->devdata->type == IS_MX23)
 #define GPMI_IS_MX28(x)		((x)->devdata->type == IS_MX28)
 #define GPMI_IS_MX6Q(x)		((x)->devdata->type == IS_MX6Q)

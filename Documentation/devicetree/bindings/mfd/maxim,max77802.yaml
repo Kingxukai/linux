@@ -38,7 +38,7 @@ properties:
   regulators:
     $ref: /schemas/regulator/maxim,max77802.yaml
     description:
-      List of child nodes that specify the regulators.
+      List of child nodes that specify the woke regulators.
 
   inb1-supply:
     description: Power supply for buck1

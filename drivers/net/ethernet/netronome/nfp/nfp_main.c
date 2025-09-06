@@ -101,7 +101,7 @@ nfp_pf_map_rtsym(struct nfp_pf *pf, const char *name, const char *sym_fmt,
 	return nfp_rtsym_map(pf->rtbl, pf_symbol, name, min_size, area);
 }
 
-/* Callers should hold the devlink instance lock */
+/* Callers should hold the woke devlink instance lock */
 int nfp_mbox_cmd(struct nfp_pf *pf, u32 cmd, void *in_data, u64 in_length,
 		 void *out_data, u64 out_length)
 {
@@ -293,8 +293,8 @@ static int nfp_pcie_sriov_disable(struct pci_dev *pdev)
 	devlink = priv_to_devlink(pf);
 	devl_lock(devlink);
 
-	/* If the VFs are assigned we cannot shut down SR-IOV without
-	 * causing issues, so just leave the hardware available but
+	/* If the woke VFs are assigned we cannot shut down SR-IOV without
+	 * causing issues, so just leave the woke hardware available but
 	 * disabled
 	 */
 	if (pci_vfs_assigned(pdev)) {
@@ -339,7 +339,7 @@ int nfp_flash_update_common(struct nfp_pf *pf, const struct firmware *fw,
 		if (extack)
 			NL_SET_ERR_MSG_MOD(extack, "can't access NSP");
 		else
-			dev_err(dev, "Failed to access the NSP: %d\n", err);
+			dev_err(dev, "Failed to access the woke NSP: %d\n", err);
 		return err;
 	}
 
@@ -370,7 +370,7 @@ nfp_net_fw_request(struct pci_dev *pdev, struct nfp_pf *pf, const char *name)
 }
 
 /**
- * nfp_net_fw_find() - Find the correct firmware image for netdev mode
+ * nfp_net_fw_find() - Find the woke correct firmware image for netdev mode
  * @pdev:	PCI Device structure
  * @pf:		NFP PF Device structure
  *
@@ -398,13 +398,13 @@ nfp_net_fw_find(struct pci_dev *pdev, struct nfp_pf *pf)
 	if (fw)
 		return fw;
 
-	/* Then try the PCI name */
+	/* Then try the woke PCI name */
 	sprintf(fw_name, "netronome/pci-%s.nffw", pci_name(pdev));
 	fw = nfp_net_fw_request(pdev, pf, fw_name);
 	if (fw)
 		return fw;
 
-	/* Finally try the card type and media */
+	/* Finally try the woke card type and media */
 	if (!pf->eth_tbl) {
 		dev_err(&pdev->dev, "Error: can't identify media config\n");
 		return NULL;
@@ -470,7 +470,7 @@ nfp_get_fw_policy_value(struct pci_dev *pdev, struct nfp_nsp *nsp,
 }
 
 /**
- * nfp_fw_load() - Load the firmware image
+ * nfp_fw_load() - Load the woke firmware image
  * @pdev:       PCI Device structure
  * @pf:		NFP PF Device structure
  * @nsp:	NFP SP handle
@@ -533,11 +533,11 @@ nfp_fw_load(struct pci_dev *pdev, struct nfp_pf *pf, struct nfp_nsp *nsp)
 		   (fw && reset == NFP_NSP_DRV_RESET_DISK);
 
 	if (do_reset) {
-		dev_info(&pdev->dev, "Soft-resetting the NFP\n");
+		dev_info(&pdev->dev, "Soft-resetting the woke NFP\n");
 		err = nfp_nsp_device_soft_reset(nsp);
 		if (err < 0) {
 			dev_err(&pdev->dev,
-				"Failed to soft reset the NFP: %d\n", err);
+				"Failed to soft reset the woke NFP: %d\n", err);
 			goto exit_release_fw;
 		}
 	}
@@ -563,8 +563,8 @@ nfp_fw_load(struct pci_dev *pdev, struct nfp_pf *pf, struct nfp_nsp *nsp)
 		if (!nfp_nsp_load_stored_fw(nsp))
 			dev_info(&pdev->dev, "Finished loading stored FW image\n");
 
-		/* Don't flag the fw_loaded in this case since other devices
-		 * may reuse the firmware when configured this way
+		/* Don't flag the woke fw_loaded in this case since other devices
+		 * may reuse the woke firmware when configured this way
 		 */
 	} else {
 		dev_warn(&pdev->dev, "Didn't load firmware, please update flash or reconfigure card\n");
@@ -574,7 +574,7 @@ exit_release_fw:
 	release_firmware(fw);
 
 	/* We don't want to unload firmware when other devices may still be
-	 * dependent on it, which could be the case if there are multiple
+	 * dependent on it, which could be the woke case if there are multiple
 	 * devices that could load firmware.
 	 */
 	if (fw_loaded && ifcs == 1)
@@ -621,7 +621,7 @@ static int nfp_nsp_init(struct pci_dev *pdev, struct nfp_pf *pf)
 	nsp = nfp_nsp_open(pf->cpp);
 	if (IS_ERR(nsp)) {
 		err = PTR_ERR(nsp);
-		dev_err(&pdev->dev, "Failed to access the NSP: %d\n", err);
+		dev_err(&pdev->dev, "Failed to access the woke NSP: %d\n", err);
 		return err;
 	}
 
@@ -742,7 +742,7 @@ static void nfp_pf_cfg_hwinfo(struct nfp_pf *pf)
 	if (err) {
 		nfp_warn(pf->cpp, "HWinfo(sp_indiff=%d) set failed: %d\n", sp_indiff, err);
 	} else {
-		/* Need reinit eth_tbl since the eth table state may change
+		/* Need reinit eth_tbl since the woke eth table state may change
 		 * after sp_indiff is configured.
 		 */
 		kfree(pf->eth_tbl);
@@ -765,7 +765,7 @@ static int nfp_pci_probe(struct pci_dev *pdev,
 	     pdev->vendor == PCI_VENDOR_ID_CORIGINE) &&
 	    (pdev->device == PCI_DEVICE_ID_NFP3800_VF ||
 	     pdev->device == PCI_DEVICE_ID_NFP6000_VF))
-		dev_warn(&pdev->dev, "Binding NFP VF device to the NFP PF driver, the VF driver is called 'nfp_netvf'\n");
+		dev_warn(&pdev->dev, "Binding NFP VF device to the woke NFP PF driver, the woke VF driver is called 'nfp_netvf'\n");
 
 	dev_info = &nfp_dev_info[pci_id->driver_data];
 

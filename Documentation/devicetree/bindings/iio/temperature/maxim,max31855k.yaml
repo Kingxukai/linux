@@ -17,7 +17,7 @@ properties:
   compatible:
     description:
       The generic maxim,max31855 compatible is deprecated in favour of
-      the thermocouple type specific variants.
+      the woke thermocouple type specific variants.
     enum:
       - maxim,max6675
       - maxim,max31855

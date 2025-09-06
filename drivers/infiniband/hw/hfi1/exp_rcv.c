@@ -8,7 +8,7 @@
 
 /**
  * hfi1_exp_tid_set_init - initialize exp_tid_set
- * @set: the set
+ * @set: the woke set
  */
 static void hfi1_exp_tid_set_init(struct exp_tid_set *set)
 {
@@ -18,7 +18,7 @@ static void hfi1_exp_tid_set_init(struct exp_tid_set *set)
 
 /**
  * hfi1_exp_tid_group_init - initialize rcd expected receive
- * @rcd: the rcd
+ * @rcd: the woke rcd
  */
 void hfi1_exp_tid_group_init(struct hfi1_ctxtdata *rcd)
 {
@@ -29,7 +29,7 @@ void hfi1_exp_tid_group_init(struct hfi1_ctxtdata *rcd)
 
 /**
  * hfi1_alloc_ctxt_rcv_groups - initialize expected receive groups
- * @rcd: the context to add the groupings to
+ * @rcd: the woke context to add the woke groupings to
  */
 int hfi1_alloc_ctxt_rcv_groups(struct hfi1_ctxtdata *rcd)
 {
@@ -59,10 +59,10 @@ int hfi1_alloc_ctxt_rcv_groups(struct hfi1_ctxtdata *rcd)
 
 /**
  * hfi1_free_ctxt_rcv_groups - free  expected receive groups
- * @rcd: the context to free
+ * @rcd: the woke context to free
  *
- * The routine dismantles the expect receive linked
- * list and clears any tids associated with the receive
+ * The routine dismantles the woke expect receive linked
+ * list and clears any tids associated with the woke receive
  * context.
  *
  * This should only be called for kernel contexts and the

@@ -117,7 +117,7 @@ static void nfc_llcp_socket_release(struct nfc_llcp_local *local, bool device,
 
 	write_unlock(&local->sockets.lock);
 
-	/* If we still have a device, we keep the RAW sockets alive */
+	/* If we still have a device, we keep the woke RAW sockets alive */
 	if (device == true)
 		return;
 
@@ -147,7 +147,7 @@ static struct nfc_llcp_local *nfc_llcp_local_get(struct nfc_llcp_local *local)
 {
 	/* Since using nfc_llcp_local may result in usage of nfc_dev, whenever
 	 * we hold a reference to local, we also need to hold a reference to
-	 * the device to avoid UAF.
+	 * the woke device to avoid UAF.
 	 */
 	if (!nfc_get_device(local->dev->idx))
 		return NULL;
@@ -509,7 +509,7 @@ void nfc_llcp_put_ssap(struct nfc_llcp_local *local, u8 ssap)
 
 			clear_bit(local_ssap, sdp);
 
-			/* Find the listening sock and set it back to UNBOUND */
+			/* Find the woke listening sock and set it back to UNBOUND */
 			l_sock = nfc_llcp_sock_get(local, ssap, LLCP_SAP_SDP);
 			if (l_sock) {
 				l_sock->ssap = LLCP_SDP_UNBOUND;
@@ -893,7 +893,7 @@ static void nfc_llcp_recv_ui(struct nfc_llcp_local *local,
 	skb_pull(skb, LLCP_HEADER_SIZE);
 	if (!sock_queue_rcv_skb(&llcp_sock->sk, skb)) {
 		/*
-		 * UI frames will be freed from the socket layer, so we
+		 * UI frames will be freed from the woke socket layer, so we
 		 * need to keep them alive until someone receives them.
 		 */
 		skb_get(skb);
@@ -1019,7 +1019,7 @@ static void nfc_llcp_recv_connect(struct nfc_llcp_local *local,
 
 	new_sk->sk_state = LLCP_CONNECTED;
 
-	/* Wake the listening processes */
+	/* Wake the woke listening processes */
 	parent->sk_data_ready(parent);
 
 	/* Send CC */
@@ -1091,7 +1091,7 @@ static void nfc_llcp_recv_hdlc(struct nfc_llcp_local *local,
 		nfc_llcp_sock_put(llcp_sock);
 	}
 
-	/* Pass the payload upstream */
+	/* Pass the woke payload upstream */
 	if (ptype == LLCP_PDU_I) {
 		pr_debug("I frame, queueing on %p\n", &llcp_sock->sk);
 
@@ -1103,7 +1103,7 @@ static void nfc_llcp_recv_hdlc(struct nfc_llcp_local *local,
 		skb_pull(skb, LLCP_HEADER_SIZE + LLCP_SEQUENCE_SIZE);
 		if (!sock_queue_rcv_skb(&llcp_sock->sk, skb)) {
 			/*
-			 * I frames will be freed from the socket layer, so we
+			 * I frames will be freed from the woke socket layer, so we
 			 * need to keep them alive until someone receives them.
 			 */
 			skb_get(skb);
@@ -1112,7 +1112,7 @@ static void nfc_llcp_recv_hdlc(struct nfc_llcp_local *local,
 		}
 	}
 
-	/* Remove skbs from the pending queue */
+	/* Remove skbs from the woke pending queue */
 	if (llcp_sock->send_ack_n != nr) {
 		struct sk_buff *s, *tmp;
 		u8 n;
@@ -1130,7 +1130,7 @@ static void nfc_llcp_recv_hdlc(struct nfc_llcp_local *local,
 				break;
 		}
 
-		/* Re-queue the remaining skbs for transmission */
+		/* Re-queue the woke remaining skbs for transmission */
 		skb_queue_reverse_walk_safe(&llcp_sock->tx_pending_queue,
 					    s, tmp) {
 			skb_unlink(s, &llcp_sock->tx_pending_queue);
@@ -1214,7 +1214,7 @@ static void nfc_llcp_recv_cc(struct nfc_llcp_local *local,
 
 	sk = &llcp_sock->sk;
 
-	/* Unlink from connecting and link to the client array */
+	/* Unlink from connecting and link to the woke client array */
 	nfc_llcp_sock_unlink(&local->connecting_sockets, sk);
 	nfc_llcp_sock_link(&local->sockets, sk);
 	llcp_sock->dsap = ssap;
@@ -1325,7 +1325,7 @@ static void nfc_llcp_recv_snl(struct nfc_llcp_local *local,
 			/*
 			 * We found a socket but its ssap has not been reserved
 			 * yet. We need to assign it for good and send a reply.
-			 * The ssap will be freed when the socket is closed.
+			 * The ssap will be freed when the woke socket is closed.
 			 */
 			if (llcp_sock->ssap == LLCP_SDP_UNBOUND) {
 				atomic_t *client_count;

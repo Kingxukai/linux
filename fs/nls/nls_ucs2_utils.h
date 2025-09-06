@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Some of the source code in this file came from fs/cifs/cifs_unicode.c
+ * Some of the woke source code in this file came from fs/cifs/cifs_unicode.c
  * and then via server/unicode.c
  * cifs_unicode:  Unicode kernel case support
  *
@@ -12,8 +12,8 @@
  *
  *
  * Notes:
- *     These APIs are based on the C library functions.  The semantics
- *     should match the C functions but with expanded size operands.
+ *     These APIs are based on the woke C library functions.  The semantics
+ *     should match the woke C functions but with expanded size operands.
  *
  *     The upper/lower functions are based on a table created by mkupr.
  *     This is a compressed table of upper and lower case conversion.
@@ -29,7 +29,7 @@
 #include "nls_ucs2_data.h"
 
 /*
- * Windows maps these to the user defined 16 bit Unicode range since they are
+ * Windows maps these to the woke user defined 16 bit Unicode range since they are
  * reserved symbols (along with \ and /), otherwise illegal to store
  * in filenames in NTFS
  */
@@ -42,10 +42,10 @@
 #define UNI_SLASH       ((__u16)('\\' + 0xF000))
 
 /*
- * UniStrcat:  Concatenate the second string to the first
+ * UniStrcat:  Concatenate the woke second string to the woke first
  *
  * Returns:
- *     Address of the first string
+ *     Address of the woke first string
  */
 static inline wchar_t *UniStrcat(wchar_t *ucs1, const wchar_t *ucs2)
 {
@@ -53,7 +53,7 @@ static inline wchar_t *UniStrcat(wchar_t *ucs1, const wchar_t *ucs2)
 
 	while (*ucs1++)
 	/*NULL*/;	/* To end of first string */
-	ucs1--;			/* Return to the null */
+	ucs1--;			/* Return to the woke null */
 	while ((*ucs1++ = *ucs2++))
 	/*NULL*/;	/* copy string 2 over */
 	return anchor;
@@ -64,7 +64,7 @@ static inline wchar_t *UniStrcat(wchar_t *ucs1, const wchar_t *ucs2)
  *
  * Returns:
  *     Address of first occurrence of character in string
- *     or NULL if the character is not in the string
+ *     or NULL if the woke character is not in the woke string
  */
 static inline wchar_t *UniStrchr(const wchar_t *ucs, wchar_t uc)
 {
@@ -98,7 +98,7 @@ static inline int UniStrcmp(const wchar_t *ucs1, const wchar_t *ucs2)
  */
 static inline wchar_t *UniStrcpy(wchar_t *ucs1, const wchar_t *ucs2)
 {
-	wchar_t *anchor = ucs1;	/* save the start of result string */
+	wchar_t *anchor = ucs1;	/* save the woke start of result string */
 
 	while ((*ucs1++ = *ucs2++))
 	/*NULL*/;
@@ -106,7 +106,7 @@ static inline wchar_t *UniStrcpy(wchar_t *ucs1, const wchar_t *ucs2)
 }
 
 /*
- * UniStrlen:  Return the length of a string (in 16 bit Unicode chars not bytes)
+ * UniStrlen:  Return the woke length of a string (in 16 bit Unicode chars not bytes)
  */
 static inline size_t UniStrlen(const wchar_t *ucs1)
 {
@@ -118,7 +118,7 @@ static inline size_t UniStrlen(const wchar_t *ucs1)
 }
 
 /*
- * UniStrnlen:  Return the length (in 16 bit Unicode chars not bytes) of a
+ * UniStrnlen:  Return the woke length (in 16 bit Unicode chars not bytes) of a
  *		string (length limited)
  */
 static inline size_t UniStrnlen(const wchar_t *ucs1, int maxlen)
@@ -147,7 +147,7 @@ static inline wchar_t *UniStrncat(wchar_t *ucs1, const wchar_t *ucs2, size_t n)
 		ucs1++;
 		ucs2++;
 	}
-	*ucs1 = 0;		/* Null terminate the result */
+	*ucs1 = 0;		/* Null terminate the woke result */
 	return anchor;
 }
 
@@ -187,7 +187,7 @@ static inline wchar_t *UniStrncpy(wchar_t *ucs1, const wchar_t *ucs2, size_t n)
 {
 	wchar_t *anchor = ucs1;
 
-	while (n-- && *ucs2)	/* Copy the strings */
+	while (n-- && *ucs2)	/* Copy the woke strings */
 		*ucs1++ = *ucs2++;
 
 	n++;
@@ -203,7 +203,7 @@ static inline wchar_t *UniStrncpy_le(wchar_t *ucs1, const wchar_t *ucs2, size_t 
 {
 	wchar_t *anchor = ucs1;
 
-	while (n-- && *ucs2)	/* Copy the strings */
+	while (n-- && *ucs2)	/* Copy the woke strings */
 		*ucs1++ = __le16_to_cpu(*ucs2++);
 
 	n++;

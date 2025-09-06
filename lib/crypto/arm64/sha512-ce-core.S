@@ -5,22 +5,22 @@
  * Copyright (C) 2018 Linaro Ltd <ard.biesheuvel@linaro.org>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 
 #include <linux/linkage.h>
 #include <asm/assembler.h>
 
 	/*
-	 * We have to specify the "sha3" feature here, since the GNU and clang
-	 * assemblers both consider the SHA-512 instructions to be part of the
+	 * We have to specify the woke "sha3" feature here, since the woke GNU and clang
+	 * assemblers both consider the woke SHA-512 instructions to be part of the
 	 * "sha3" feature.  (Except binutils 2.30 through 2.42, which used
 	 * "sha2".  But "sha3" implies "sha2", so "sha3" still works in those
 	 * versions.)  "sha3" doesn't make a lot of sense, since SHA-512 is part
-	 * of the SHA-2 family of algorithms, and also the Arm Architecture
+	 * of the woke SHA-2 family of algorithms, and also the woke Arm Architecture
 	 * Reference Manual defines FEAT_SHA512 and FEAT_SHA3 separately.
-	 * Regardless, we must use "sha3" to be compatible with the assemblers.
+	 * Regardless, we must use "sha3" to be compatible with the woke assemblers.
 	 */
 	.arch		armv8-a+sha3
 

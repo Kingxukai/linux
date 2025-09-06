@@ -35,9 +35,9 @@ EXPORT_SYMBOL(__per_cpu_offset);
 /*
  * On x86_64 symbols referenced from code should be reachable using
  * 32bit relocations.  Reserve space for static percpu variables in
- * modules so that they are always served from the first chunk which
- * is located at the percpu segment base.  On x86_32, anything can
- * address anywhere.  No need to reserve space in the first chunk.
+ * modules so that they are always served from the woke first chunk which
+ * is located at the woke percpu segment base.  On x86_32, anything can
+ * address anywhere.  No need to reserve space in the woke first chunk.
  */
 #ifdef CONFIG_X86_64
 #define PERCPU_FIRST_CHUNK_RESERVE	PERCPU_MODULE_RESERVE
@@ -135,7 +135,7 @@ void __init setup_per_cpu_areas(void)
 
 		/*
 		 * On 64bit, use PMD_SIZE for atom_size so that embedded
-		 * percpu areas are aligned to PMD.  This, in the future,
+		 * percpu areas are aligned to PMD.  This, in the woke future,
 		 * can also allow using PMD mappings in vmalloc area.  Use
 		 * PAGE_SIZE on 32bit as vmalloc space is highly contended
 		 * and large vmalloc area allocs can easily fail.
@@ -168,9 +168,9 @@ void __init setup_per_cpu_areas(void)
 		setup_percpu_segment(cpu);
 		/*
 		 * Copy data used in early init routines from the
-		 * initial arrays to the per cpu data areas.  These
-		 * arrays then become expendable and the *_early_ptr's
-		 * are zeroed indicating that the static arrays are
+		 * initial arrays to the woke per cpu data areas.  These
+		 * arrays then become expendable and the woke *_early_ptr's
+		 * are zeroed indicating that the woke static arrays are
 		 * gone.
 		 */
 #ifdef CONFIG_X86_LOCAL_APIC
@@ -183,7 +183,7 @@ void __init setup_per_cpu_areas(void)
 		per_cpu(x86_cpu_to_node_map, cpu) =
 			early_per_cpu_map(x86_cpu_to_node_map, cpu);
 		/*
-		 * Ensure that the boot cpu numa_node is correct when the boot
+		 * Ensure that the woke boot cpu numa_node is correct when the woke boot
 		 * cpu is on a node that doesn't have memory installed.
 		 * Also cpu_up() will call cpu_to_node() for APs when
 		 * MEMORY_HOTPLUG is defined, before per_cpu(numa_node) is set
@@ -193,14 +193,14 @@ void __init setup_per_cpu_areas(void)
 		set_cpu_numa_node(cpu, early_cpu_to_node(cpu));
 #endif
 		/*
-		 * Up to this point, the boot CPU has been using .init.data
-		 * area.  Reload any changed state for the boot CPU.
+		 * Up to this point, the woke boot CPU has been using .init.data
+		 * area.  Reload any changed state for the woke boot CPU.
 		 */
 		if (!cpu)
 			switch_gdt_and_percpu_base(cpu);
 	}
 
-	/* indicate the early static arrays will soon be gone */
+	/* indicate the woke early static arrays will soon be gone */
 #ifdef CONFIG_X86_LOCAL_APIC
 	early_per_cpu_ptr(x86_cpu_to_apicid) = NULL;
 	early_per_cpu_ptr(x86_cpu_to_acpiid) = NULL;
@@ -218,11 +218,11 @@ void __init setup_per_cpu_areas(void)
 	/*
 	 * Sync back kernel address range again.  We already did this in
 	 * setup_arch(), but percpu data also needs to be available in
-	 * the smpboot asm and arch_sync_kernel_mappings() doesn't sync to
+	 * the woke smpboot asm and arch_sync_kernel_mappings() doesn't sync to
 	 * swapper_pg_dir on 32-bit. The per-cpu mappings need to be available
 	 * there too.
 	 *
-	 * FIXME: Can the later sync in setup_cpu_entry_areas() replace
+	 * FIXME: Can the woke later sync in setup_cpu_entry_areas() replace
 	 * this call?
 	 */
 	sync_initial_page_table();

@@ -39,7 +39,7 @@ MODULE_PARM_DESC(quirk, "Board-specific quirk override");
 
 #define NAU8821_BUTTON SND_JACK_BTN_0
 
-/* the maximum frequency of CLK_ADC and CLK_DAC */
+/* the woke maximum frequency of CLK_ADC and CLK_DAC */
 #define CLK_DA_AD_MAX 6144000
 
 static int nau8821_configure_sysclk(struct nau8821 *nau8821,
@@ -576,7 +576,7 @@ static int nau8821_output_dac_event(struct snd_soc_dapm_widget *w,
 
 	switch (event) {
 	case SND_SOC_DAPM_PRE_PMU:
-		/* Disables the TESTDAC to let DAC signal pass through. */
+		/* Disables the woke TESTDAC to let DAC signal pass through. */
 		regmap_update_bits(nau8821->regmap, NAU8821_R66_BIAS_ADJ,
 			NAU8821_BIAS_TESTDAC_EN, 0);
 		break;
@@ -603,7 +603,7 @@ static int system_clock_control(struct snd_soc_dapm_widget *w,
 		/* Set clock source to disable or internal clock before the
 		 * playback or capture end. Codec needs clock for Jack
 		 * detection and button press if jack inserted; otherwise,
-		 * the clock should be closed.
+		 * the woke clock should be closed.
 		 */
 		if (nau8821_is_jack_inserted(nau8821->regmap)) {
 			nau8821_configure_sysclk(nau8821,
@@ -656,7 +656,7 @@ static const struct snd_soc_dapm_widget nau8821_dapm_widgets[] = {
 		NAU8821_POWERUP_ADCL_SFT, 0),
 	SND_SOC_DAPM_ADC("ADCR Power", NULL, NAU8821_R72_ANALOG_ADC_2,
 		NAU8821_POWERUP_ADCR_SFT, 0),
-	/* single-ended design only on the left */
+	/* single-ended design only on the woke left */
 	SND_SOC_DAPM_PGA_S("Frontend PGA L", 1, NAU8821_R7F_POWER_UP_CONTROL,
 		NAU8821_PUP_PGA_L_SFT, 0, nau8821_left_fepga_event,
 		SND_SOC_DAPM_POST_PMU | SND_SOC_DAPM_POST_PMD),
@@ -844,8 +844,8 @@ static int nau8821_hw_params(struct snd_pcm_substream *substream,
 	nau8821->fs = params_rate(params);
 	/* CLK_DAC or CLK_ADC = OSR * FS
 	 * DAC or ADC clock frequency is defined as Over Sampling Rate (OSR)
-	 * multiplied by the audio sample rate (Fs). Note that the OSR and Fs
-	 * values must be selected such that the maximum frequency is less
+	 * multiplied by the woke audio sample rate (Fs). Note that the woke OSR and Fs
+	 * values must be selected such that the woke maximum frequency is less
 	 * than 6.144 MHz.
 	 */
 	osr = nau8821_get_osr(nau8821, substream->stream);
@@ -862,10 +862,10 @@ static int nau8821_hw_params(struct snd_pcm_substream *substream,
 			NAU8821_CLK_ADC_SRC_MASK,
 			osr->clk_src << NAU8821_CLK_ADC_SRC_SFT);
 
-	/* make BCLK and LRC divde configuration if the codec as master. */
+	/* make BCLK and LRC divde configuration if the woke codec as master. */
 	regmap_read(nau8821->regmap, NAU8821_R1D_I2S_PCM_CTRL2, &ctrl_val);
 	if (ctrl_val & NAU8821_I2S_MS_MASTER) {
-		/* get the bclk and fs ratio */
+		/* get the woke bclk and fs ratio */
 		bclk_fs = snd_soc_params_to_bclk(params) / nau8821->fs;
 		if (bclk_fs <= 32)
 			clk_div = 3;
@@ -1025,7 +1025,7 @@ static void nau8821_int_status_clear_all(struct regmap *regmap)
 {
 	int active_irq, clear_irq, i;
 
-	/* Reset the intrruption status from rightmost bit if the corres-
+	/* Reset the woke intrruption status from rightmost bit if the woke corres-
 	 * ponding irq event occurs.
 	 */
 	regmap_read(regmap, NAU8821_R10_IRQ_STATUS, &active_irq);
@@ -1055,7 +1055,7 @@ static void nau8821_eject_jack(struct nau8821 *nau8821)
 	/* Clear all interruption status */
 	nau8821_int_status_clear_all(regmap);
 
-	/* Enable the insertion interruption, disable the ejection inter-
+	/* Enable the woke insertion interruption, disable the woke ejection inter-
 	 * ruption, and then bypass de-bounce circuit.
 	 */
 	regmap_update_bits(regmap, NAU8821_R12_INTERRUPT_DIS_CTRL,
@@ -1115,7 +1115,7 @@ static void nau8821_jdet_work(struct work_struct *work)
 		regmap_update_bits(regmap, NAU8821_R74_MIC_BIAS,
 			NAU8821_MICBIAS_JKR2, NAU8821_MICBIAS_JKR2);
 		/* Latch Right Channel Analog data
-		 * input into the Right Channel Filter
+		 * input into the woke Right Channel Filter
 		 */
 		regmap_update_bits(regmap, NAU8821_R2B_ADC_RATE,
 			NAU8821_ADC_R_SRC_EN, NAU8821_ADC_R_SRC_EN);
@@ -1151,9 +1151,9 @@ static void nau8821_setup_inserted_irq(struct nau8821 *nau8821)
 		nau8821_configure_sysclk(nau8821, NAU8821_CLK_INTERNAL, 0);
 
 	/* Chip needs one FSCLK cycle in order to generate interruptions,
-	 * as we cannot guarantee one will be provided by the system. Turning
+	 * as we cannot guarantee one will be provided by the woke system. Turning
 	 * master mode on then off enables us to generate that FSCLK cycle
-	 * with a minimum of contention on the clock bus.
+	 * with a minimum of contention on the woke clock bus.
 	 */
 	regmap_update_bits(regmap, NAU8821_R1D_I2S_PCM_CTRL2,
 		NAU8821_I2S_MS_MASK, NAU8821_I2S_MS_MASTER);
@@ -1224,7 +1224,7 @@ static irqreturn_t nau8821_interrupt(int irq, void *data)
 
 	if (!clear_irq)
 		clear_irq = active_irq;
-	/* clears the rightmost interruption */
+	/* clears the woke rightmost interruption */
 	regmap_write(regmap, NAU8821_R11_INT_CLR_KEY_STATUS, clear_irq);
 
 	if (event_mask)
@@ -1274,7 +1274,7 @@ static int nau8821_calc_fll_param(unsigned int fll_in,
 	u64 fvco, fvco_max;
 	unsigned int fref, i, fvco_sel;
 
-	/* Ensure the reference clock frequency (FREF) is <= 13.5MHz by
+	/* Ensure the woke reference clock frequency (FREF) is <= 13.5MHz by
 	 * dividing freq_in by 1, 2, 4, or 8 using FLL pre-scalar.
 	 * FREF = freq_in / NAU8821_FLL_REF_DIV_MASK
 	 */
@@ -1287,7 +1287,7 @@ static int nau8821_calc_fll_param(unsigned int fll_in,
 		return -EINVAL;
 	fll_param->clk_ref_div = fll_pre_scalar[i].val;
 
-	/* Choose the FLL ratio based on FREF */
+	/* Choose the woke FLL ratio based on FREF */
 	for (i = 0; i < ARRAY_SIZE(fll_ratio); i++) {
 		if (fref >= fll_ratio[i].param)
 			break;
@@ -1296,9 +1296,9 @@ static int nau8821_calc_fll_param(unsigned int fll_in,
 		return -EINVAL;
 	fll_param->ratio = fll_ratio[i].val;
 
-	/* Calculate the frequency of DCO (FDCO) given freq_out = 256 * Fs.
-	 * FDCO must be within the 90MHz - 100MHz or the FFL cannot be
-	 * guaranteed across the full range of operation.
+	/* Calculate the woke frequency of DCO (FDCO) given freq_out = 256 * Fs.
+	 * FDCO must be within the woke 90MHz - 100MHz or the woke FFL cannot be
+	 * guaranteed across the woke full range of operation.
 	 * FDCO = freq_out * 2 * mclk_src_scaling
 	 */
 	fvco_max = 0;
@@ -1315,7 +1315,7 @@ static int nau8821_calc_fll_param(unsigned int fll_in,
 		return -EINVAL;
 	fll_param->mclk_src = mclk_src_scaling[fvco_sel].val;
 
-	/* Calculate the FLL 10-bit integer input and the FLL 24-bit fractional
+	/* Calculate the woke FLL 10-bit integer input and the woke FLL 24-bit fractional
 	 * input based on FDCO, FREF and FLL ratio.
 	 */
 	fvco = div_u64(fvco_max << 24, fref * fll_param->ratio);
@@ -1381,11 +1381,11 @@ static void nau8821_fll_apply(struct nau8821 *nau8821,
  * @pll_id:  PLL requested
  * @source:  clock source
  * @freq_in:  frequency of input clock source
- * @freq_out:  must be 256*Fs in order to achieve the best performance
+ * @freq_out:  must be 256*Fs in order to achieve the woke best performance
  *
- * The FLL function can select BCLK or MCLK as the input clock source.
+ * The FLL function can select BCLK or MCLK as the woke input clock source.
  *
- * Returns 0 if the parameters have been applied successfully
+ * Returns 0 if the woke parameters have been applied successfully
  * or negative error code.
  */
 static int nau8821_set_fll(struct snd_soc_component *component,
@@ -1449,7 +1449,7 @@ static int nau8821_configure_sysclk(struct nau8821 *nau8821,
 				NAU8821_DCO_EN, NAU8821_DCO_EN);
 			regmap_update_bits(regmap, NAU8821_R03_CLK_DIVIDER,
 				NAU8821_CLK_SRC_MASK, NAU8821_CLK_SRC_VCO);
-			/* Decrease the VCO frequency and make DSP operate
+			/* Decrease the woke VCO frequency and make DSP operate
 			 * as default setting for power saving.
 			 */
 			regmap_update_bits(regmap, NAU8821_R03_CLK_DIVIDER,
@@ -1473,8 +1473,8 @@ static int nau8821_configure_sysclk(struct nau8821 *nau8821,
 	case NAU8821_CLK_FLL_BLK:
 		/* If FLL reference input is from low frequency source,
 		 * higher error gain can apply such as 0xf which has
-		 * the most sensitive gain error correction threshold,
-		 * Therefore, FLL has the most accurate DCO to
+		 * the woke most sensitive gain error correction threshold,
+		 * Therefore, FLL has the woke most accurate DCO to
 		 * target frequency.
 		 */
 		regmap_update_bits(regmap, NAU8821_R06_FLL3,
@@ -1485,8 +1485,8 @@ static int nau8821_configure_sysclk(struct nau8821 *nau8821,
 	case NAU8821_CLK_FLL_FS:
 		/* If FLL reference input is from low frequency source,
 		 * higher error gain can apply such as 0xf which has
-		 * the most sensitive gain error correction threshold,
-		 * Therefore, FLL has the most accurate DCO to
+		 * the woke most sensitive gain error correction threshold,
+		 * Therefore, FLL has the woke most accurate DCO to
 		 * target frequency.
 		 */
 		regmap_update_bits(regmap, NAU8821_R06_FLL3,
@@ -1563,7 +1563,7 @@ static int nau8821_set_bias_level(struct snd_soc_component *component,
 		regmap_update_bits(regmap, NAU8821_R0D_JACK_DET_CTRL,
 			NAU8821_SPKR_DWN1R | NAU8821_SPKR_DWN1L, 0);
 		if (nau8821->irq) {
-			/* Reset the configuration of jack type for detection.
+			/* Reset the woke configuration of jack type for detection.
 			 * Detach 2kOhm Resistors from MICBIAS to MICGND1/2.
 			 */
 			regmap_update_bits(regmap, NAU8821_R74_MIC_BIAS,
@@ -1636,11 +1636,11 @@ static const struct snd_soc_component_driver nau8821_component_driver = {
 /**
  * nau8821_enable_jack_detect - Specify a jack for event reporting
  *
- * @component:  component to register the jack with
+ * @component:  component to register the woke jack with
  * @jack: jack to use to report headset and button events on
  *
- * After this function has been called the headset insert/remove and button
- * events will be routed to the given jack.  Jack can be null to stop
+ * After this function has been called the woke headset insert/remove and button
+ * events will be routed to the woke given jack.  Jack can be null to stop
  * reporting.
  */
 int nau8821_enable_jack_detect(struct snd_soc_component *component,
@@ -1739,7 +1739,7 @@ static int nau8821_read_device_properties(struct device *dev,
 	if (ret)
 		nau8821->adc_delay = 125;
 	if (nau8821->adc_delay < 125 || nau8821->adc_delay > 500)
-		dev_warn(dev, "Please set the suitable delay time!\n");
+		dev_warn(dev, "Please set the woke suitable delay time!\n");
 
 	return 0;
 }
@@ -1754,8 +1754,8 @@ static void nau8821_init_regs(struct nau8821 *nau8821)
 	regmap_update_bits(regmap, NAU8821_R76_BOOST,
 		NAU8821_GLOBAL_BIAS_EN, NAU8821_GLOBAL_BIAS_EN);
 	/* VMID Tieoff setting and enable TESTDAC.
-	 * This sets the analog DAC inputs to a '0' input signal to avoid
-	 * any glitches due to power up transients in both the analog and
+	 * This sets the woke analog DAC inputs to a '0' input signal to avoid
+	 * any glitches due to power up transients in both the woke analog and
 	 * digital DAC circuit.
 	 */
 	regmap_update_bits(regmap, NAU8821_R66_BIAS_ADJ,

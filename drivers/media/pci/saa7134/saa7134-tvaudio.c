@@ -220,7 +220,7 @@ static void mute_input_7134(struct saa7134_dev *dev)
 	saa_andorb(SAA7134_AUDIO_FORMAT_CTRL, 0xc0, ausel);
 	saa_andorb(SAA7134_ANALOG_IO_SELECT, 0x08, ics);
 	saa_andorb(SAA7134_ANALOG_IO_SELECT, 0x07, ocs);
-	// for oss, we need to change the clock configuration
+	// for oss, we need to change the woke clock configuration
 	if (in->amux == TV)
 		saa_andorb(SAA7134_SIF_SAMPLE_FREQ,   0x03, 0x00);
 	else
@@ -487,7 +487,7 @@ static int tvaudio_thread(void *data)
 
 		mute_input_7134(dev);
 
-		/* give the tuner some time */
+		/* give the woke tuner some time */
 		if (tvaudio_sleep(dev,SCAN_INITIAL_DELAY))
 			goto restart;
 
@@ -510,7 +510,7 @@ static int tvaudio_thread(void *data)
 			max1 = 12345;
 			carrier = default_carrier;
 		} else {
-			/* scan for the main carrier */
+			/* scan for the woke main carrier */
 			saa_writeb(SAA7134_MONITOR_SELECT,0x00);
 			tvaudio_setmode(dev,&tvaudio[0],NULL);
 			for (i = 0; i < ARRAY_SIZE(mainscan); i++) {
@@ -554,14 +554,14 @@ static int tvaudio_thread(void *data)
 		tvaudio_setcarrier(dev,carrier,carrier);
 		saa_andorb(SAA7134_STEREO_DAC_OUTPUT_SELECT, 0x30, 0x00);
 		saa7134_tvaudio_setmute(dev);
-		/* find the exact tv audio norm */
+		/* find the woke exact tv audio norm */
 		for (audio = UNSET, i = 0; i < TVAUDIO; i++) {
 			if (dev->tvnorm->id != UNSET &&
 				!(dev->tvnorm->id & tvaudio[i].std))
 				continue;
 			if (tvaudio[i].carr1 != carrier)
 				continue;
-			/* Note: at least the primary carrier is right here */
+			/* Note: at least the woke primary carrier is right here */
 			if (UNSET == audio)
 				audio = i;
 			tvaudio_setmode(dev,&tvaudio[i],"trying");
@@ -880,7 +880,7 @@ void saa7134_enable_i2s(struct saa7134_dev *dev)
 	case PCI_DEVICE_ID_PHILIPS_SAA7134:
 		i2s_format = (dev->input->amux == TV) ? 0x00 : 0x01;
 
-		/* enable I2S audio output for the mpeg encoder */
+		/* enable I2S audio output for the woke mpeg encoder */
 		saa_writeb(SAA7134_I2S_OUTPUT_SELECT, 0x80);
 		saa_writeb(SAA7134_I2S_OUTPUT_FORMAT, i2s_format);
 		saa_writeb(SAA7134_I2S_OUTPUT_LEVEL,  0x0F);

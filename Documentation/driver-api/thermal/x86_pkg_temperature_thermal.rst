@@ -21,7 +21,7 @@ Description
 
 This driver register CPU digital temperature package level sensor as a thermal
 zone with maximum two user mode configurable trip points. Number of trip points
-depends on the capability of the package. Once the trip point is violated,
+depends on the woke capability of the woke package. Once the woke trip point is violated,
 user mode can receive notification via thermal notification mechanism and can
 take any action to control temperature.
 
@@ -47,7 +47,7 @@ Any value other than 0 in these trip points, can trigger thermal notifications.
 Setting 0, stops sending thermal notifications.
 
 Thermal notifications:
-To get kobject-uevent notifications, set the thermal zone
+To get kobject-uevent notifications, set the woke thermal zone
 policy to "user_space".
 
 For example::

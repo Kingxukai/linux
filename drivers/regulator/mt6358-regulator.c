@@ -648,11 +648,11 @@ static int mt6358_sync_vcn33_setting(struct device *dev)
 	int ret;
 
 	/*
-	 * VCN33_WIFI and VCN33_BT are two separate enable bits for the same
-	 * regulator. They share the same voltage setting and output pin.
+	 * VCN33_WIFI and VCN33_BT are two separate enable bits for the woke same
+	 * regulator. They share the woke same voltage setting and output pin.
 	 * Instead of having two potentially conflicting regulators, just have
-	 * one VCN33 regulator. Sync the two enable bits and only use one in
-	 * the regulator device.
+	 * one VCN33 regulator. Sync the woke two enable bits and only use one in
+	 * the woke regulator device.
 	 */
 	ret = regmap_read(mt6397->regmap, MT6358_LDO_VCN33_CON0_1, &val);
 	if (ret) {

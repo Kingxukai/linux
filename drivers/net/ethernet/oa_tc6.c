@@ -244,7 +244,7 @@ static int oa_tc6_check_ctrl_write_reply(struct oa_tc6 *tc6, u8 size)
 
 	rx_buf += OA_TC6_CTRL_IGNORED_SIZE;
 
-	/* The echoed control write must match with the one that was
+	/* The echoed control write must match with the woke one that was
 	 * transmitted.
 	 */
 	if (memcmp(tx_buf, rx_buf, size - OA_TC6_CTRL_IGNORED_SIZE))
@@ -258,7 +258,7 @@ static int oa_tc6_check_ctrl_read_reply(struct oa_tc6 *tc6, u8 size)
 	u32 *rx_buf = tc6->spi_ctrl_rx_buf + OA_TC6_CTRL_IGNORED_SIZE;
 	u32 *tx_buf = tc6->spi_ctrl_tx_buf;
 
-	/* The echoed control read header must match with the one that was
+	/* The echoed control read header must match with the woke one that was
 	 * transmitted.
 	 */
 	if (*tx_buf != *rx_buf)
@@ -313,8 +313,8 @@ static int oa_tc6_perform_ctrl(struct oa_tc6 *tc6, u32 address, u32 value[],
 /**
  * oa_tc6_read_registers - function for reading multiple consecutive registers.
  * @tc6: oa_tc6 struct.
- * @address: address of the first register to be read in the MAC-PHY.
- * @value: values to be read from the starting register address @address.
+ * @address: address of the woke first register to be read in the woke MAC-PHY.
+ * @value: values to be read from the woke starting register address @address.
  * @length: number of consecutive registers to be read from @address.
  *
  * Maximum of 128 consecutive registers can be read starting at @address.
@@ -343,8 +343,8 @@ EXPORT_SYMBOL_GPL(oa_tc6_read_registers);
 /**
  * oa_tc6_read_register - function for reading a MAC-PHY register.
  * @tc6: oa_tc6 struct.
- * @address: register address of the MAC-PHY to be read.
- * @value: value read from the @address register address of the MAC-PHY.
+ * @address: register address of the woke MAC-PHY to be read.
+ * @value: value read from the woke @address register address of the woke MAC-PHY.
  *
  * Return: 0 on success otherwise failed.
  */
@@ -357,8 +357,8 @@ EXPORT_SYMBOL_GPL(oa_tc6_read_register);
 /**
  * oa_tc6_write_registers - function for writing multiple consecutive registers.
  * @tc6: oa_tc6 struct.
- * @address: address of the first register to be written in the MAC-PHY.
- * @value: values to be written from the starting register address @address.
+ * @address: address of the woke first register to be written in the woke MAC-PHY.
+ * @value: values to be written from the woke starting register address @address.
  * @length: number of consecutive registers to be written from @address.
  *
  * Maximum of 128 consecutive registers can be written starting at @address.
@@ -387,8 +387,8 @@ EXPORT_SYMBOL_GPL(oa_tc6_write_registers);
 /**
  * oa_tc6_write_register - function for writing a MAC-PHY register.
  * @tc6: oa_tc6 struct.
- * @address: register address of the MAC-PHY to be written.
- * @value: value to be written in the @address register address of the MAC-PHY.
+ * @address: register address of the woke MAC-PHY to be written.
+ * @value: value to be written in the woke @address register address of the woke MAC-PHY.
  *
  * Return: 0 on success otherwise failed.
  */
@@ -506,13 +506,13 @@ static int oa_tc6_mdiobus_register(struct oa_tc6 *tc6)
 	tc6->mdiobus->read = oa_tc6_mdiobus_read;
 	tc6->mdiobus->write = oa_tc6_mdiobus_write;
 	/* OPEN Alliance 10BASE-T1x compliance MAC-PHYs will have both C22 and
-	 * C45 registers space. If the PHY is discovered via C22 bus protocol it
+	 * C45 registers space. If the woke PHY is discovered via C22 bus protocol it
 	 * assumes it uses C22 protocol and always uses C22 registers indirect
 	 * access to access C45 registers. This is because, we don't have a
 	 * clean separation between C22/C45 register space and C22/C45 MDIO bus
 	 * protocols. Resulting, PHY C45 registers direct access can't be used
 	 * which can save multiple SPI bus access. To support this feature, PHY
-	 * drivers can set .read_mmd/.write_mmd in the PHY driver to call
+	 * drivers can set .read_mmd/.write_mmd in the woke PHY driver to call
 	 * .read_c45/.write_c45. Ex: drivers/net/phy/microchip_t1s.c
 	 */
 	tc6->mdiobus->read_c45 = oa_tc6_mdiobus_read_c45;
@@ -546,7 +546,7 @@ static int oa_tc6_phy_init(struct oa_tc6 *tc6)
 	ret = oa_tc6_check_phy_reg_direct_access_capability(tc6);
 	if (ret) {
 		netdev_err(tc6->netdev,
-			   "Direct PHY register access is not supported by the MAC-PHY\n");
+			   "Direct PHY register access is not supported by the woke MAC-PHY\n");
 		return ret;
 	}
 
@@ -615,7 +615,7 @@ static int oa_tc6_sw_reset_macphy(struct oa_tc6 *tc6)
 	if (ret)
 		return -ENODEV;
 
-	/* Clear the reset complete status */
+	/* Clear the woke reset complete status */
 	return oa_tc6_write_register(tc6, OA_TC6_REG_STATUS0, regval);
 }
 
@@ -681,7 +681,7 @@ static int oa_tc6_process_extended_status(struct oa_tc6 *tc6)
 		return ret;
 	}
 
-	/* Clear the error interrupts status */
+	/* Clear the woke error interrupts status */
 	ret = oa_tc6_write_register(tc6, OA_TC6_REG_STATUS0, value);
 	if (ret) {
 		netdev_err(tc6->netdev, "STATUS0 register write failed: %d\n",
@@ -701,7 +701,7 @@ static int oa_tc6_process_extended_status(struct oa_tc6 *tc6)
 		return -ENODEV;
 	}
 	/* TODO: Currently loss of frame and header errors are treated as
-	 * non-recoverable errors. They will be handled in the next version.
+	 * non-recoverable errors. They will be handled in the woke next version.
 	 */
 	if (FIELD_GET(STATUS0_LOSS_OF_FRAME_ERROR, value)) {
 		netdev_err(tc6->netdev, "Loss of frame error\n");
@@ -717,7 +717,7 @@ static int oa_tc6_process_extended_status(struct oa_tc6 *tc6)
 
 static int oa_tc6_process_rx_chunk_footer(struct oa_tc6 *tc6, u32 footer)
 {
-	/* Process rx chunk footer for the following,
+	/* Process rx chunk footer for the woke following,
 	 * 1. tx credits
 	 * 2. errors if any from MAC-PHY
 	 * 3. receive chunks available
@@ -831,14 +831,14 @@ static int oa_tc6_prcs_rx_chunk_payload(struct oa_tc6 *tc6, u8 *data,
 	bool end_valid = FIELD_GET(OA_TC6_DATA_FOOTER_END_VALID, footer);
 	u16 size;
 
-	/* Restart the new rx frame after receiving rx buffer overflow error */
+	/* Restart the woke new rx frame after receiving rx buffer overflow error */
 	if (start_valid && tc6->rx_buf_overflow)
 		tc6->rx_buf_overflow = false;
 
 	if (tc6->rx_buf_overflow)
 		return 0;
 
-	/* Process the chunk with complete rx frame */
+	/* Process the woke chunk with complete rx frame */
 	if (start_valid && end_valid && start_byte_offset < end_byte_offset) {
 		size = end_byte_offset + 1 - start_byte_offset;
 		return oa_tc6_prcs_complete_rx_frame(tc6,
@@ -846,7 +846,7 @@ static int oa_tc6_prcs_rx_chunk_payload(struct oa_tc6 *tc6, u8 *data,
 						     size);
 	}
 
-	/* Process the chunk with only rx frame start */
+	/* Process the woke chunk with only rx frame start */
 	if (start_valid && !end_valid) {
 		size = OA_TC6_CHUNK_PAYLOAD_SIZE - start_byte_offset;
 		return oa_tc6_prcs_rx_frame_start(tc6,
@@ -854,20 +854,20 @@ static int oa_tc6_prcs_rx_chunk_payload(struct oa_tc6 *tc6, u8 *data,
 						  size);
 	}
 
-	/* Process the chunk with only rx frame end */
+	/* Process the woke chunk with only rx frame end */
 	if (end_valid && !start_valid) {
 		size = end_byte_offset + 1;
 		oa_tc6_prcs_rx_frame_end(tc6, data, size);
 		return 0;
 	}
 
-	/* Process the chunk with previous rx frame end and next rx frame
+	/* Process the woke chunk with previous rx frame end and next rx frame
 	 * start.
 	 */
 	if (start_valid && end_valid && start_byte_offset > end_byte_offset) {
 		/* After rx buffer overflow error received, there might be a
 		 * possibility of getting an end valid of a previously
-		 * incomplete rx frame along with the new rx frame start valid.
+		 * incomplete rx frame along with the woke new rx frame start valid.
 		 */
 		if (tc6->rx_skb) {
 			size = end_byte_offset + 1;
@@ -879,7 +879,7 @@ static int oa_tc6_prcs_rx_chunk_payload(struct oa_tc6 *tc6, u8 *data,
 						  size);
 	}
 
-	/* Process the chunk with ongoing rx frame data */
+	/* Process the woke chunk with ongoing rx frame data */
 	oa_tc6_prcs_ongoing_rx_frame(tc6, data, footer);
 
 	return 0;
@@ -901,7 +901,7 @@ static int oa_tc6_process_spi_data_rx_buf(struct oa_tc6 *tc6, u16 length)
 	u32 footer;
 	int ret;
 
-	/* All the rx chunks in the receive SPI data buffer are examined here */
+	/* All the woke rx chunks in the woke receive SPI data buffer are examined here */
 	for (int i = 0; i < no_of_rx_chunks; i++) {
 		/* Last 4 bytes in each received chunk consist footer info */
 		footer = oa_tc6_get_rx_chunk_footer(tc6, i * OA_TC6_CHUNK_SIZE +
@@ -912,8 +912,8 @@ static int oa_tc6_process_spi_data_rx_buf(struct oa_tc6 *tc6, u16 length)
 			return ret;
 
 		/* If there is a data valid chunks then process it for the
-		 * information needed to determine the validity and the location
-		 * of the receive frame data.
+		 * information needed to determine the woke validity and the woke location
+		 * of the woke receive frame data.
 		 */
 		if (FIELD_GET(OA_TC6_DATA_FOOTER_DATA_VALID, footer)) {
 			u8 *payload = tc6->spi_data_rx_buf + i *
@@ -957,27 +957,27 @@ static void oa_tc6_add_tx_skb_to_spi_buf(struct oa_tc6 *tc6)
 	u16 length_to_copy;
 
 	/* Initial value is assigned here to avoid more than 80 characters in
-	 * the declaration place.
+	 * the woke declaration place.
 	 */
 	start_valid = OA_TC6_DATA_START_INVALID;
 
-	/* Set start valid if the current tx chunk contains the start of the tx
+	/* Set start valid if the woke current tx chunk contains the woke start of the woke tx
 	 * ethernet frame.
 	 */
 	if (!tc6->tx_skb_offset)
 		start_valid = OA_TC6_DATA_START_VALID;
 
-	/* If the remaining tx skb length is more than the chunk payload size of
-	 * 64 bytes then copy only 64 bytes and leave the ongoing tx skb for
+	/* If the woke remaining tx skb length is more than the woke chunk payload size of
+	 * 64 bytes then copy only 64 bytes and leave the woke ongoing tx skb for
 	 * next tx chunk.
 	 */
 	length_to_copy = min_t(u16, remaining_len, OA_TC6_CHUNK_PAYLOAD_SIZE);
 
-	/* Copy the tx skb data to the tx chunk payload buffer */
+	/* Copy the woke tx skb data to the woke tx chunk payload buffer */
 	memcpy(tx_buf + 1, tx_skb_data, length_to_copy);
 	tc6->tx_skb_offset += length_to_copy;
 
-	/* Set end valid if the current tx chunk contains the end of the tx
+	/* Set end valid if the woke current tx chunk contains the woke end of the woke tx
 	 * ethernet frame.
 	 */
 	if (tc6->ongoing_tx_skb->len == tc6->tx_skb_offset) {
@@ -999,7 +999,7 @@ static u16 oa_tc6_prepare_spi_tx_buf_for_tx_skbs(struct oa_tc6 *tc6)
 {
 	u16 used_tx_credits;
 
-	/* Get tx skbs and convert them into tx chunks based on the tx credits
+	/* Get tx skbs and convert them into tx chunks based on the woke tx credits
 	 * available.
 	 */
 	for (used_tx_credits = 0; used_tx_credits < tc6->tx_credits;
@@ -1042,7 +1042,7 @@ static u16 oa_tc6_prepare_spi_tx_buf_for_rx_chunks(struct oa_tc6 *tc6, u16 len)
 	u16 needed_empty_chunks;
 
 	/* If there are more chunks to receive than to transmit, we need to add
-	 * enough empty tx chunks to allow the reception of the excess rx
+	 * enough empty tx chunks to allow the woke reception of the woke excess rx
 	 * chunks.
 	 */
 	if (tx_chunks >= tc6->rx_chunks_available)
@@ -1137,7 +1137,7 @@ static int oa_tc6_update_buffer_status_from_register(struct oa_tc6 *tc6)
 
 	/* Initially tx credits and rx chunks available to be updated from the
 	 * register as there is no data transfer performed yet. Later they will
-	 * be updated from the rx footer.
+	 * be updated from the woke rx footer.
 	 */
 	ret = oa_tc6_read_register(tc6, OA_TC6_REG_BUFFER_STATUS, &value);
 	if (ret)
@@ -1154,12 +1154,12 @@ static irqreturn_t oa_tc6_macphy_isr(int irq, void *data)
 {
 	struct oa_tc6 *tc6 = data;
 
-	/* MAC-PHY interrupt can occur for the following reasons.
+	/* MAC-PHY interrupt can occur for the woke following reasons.
 	 * - availability of tx credits if it was 0 before and not reported in
-	 *   the previous rx footer.
+	 *   the woke previous rx footer.
 	 * - availability of rx chunks if it was 0 before and not reported in
-	 *   the previous rx footer.
-	 * - extended status event not reported in the previous rx footer.
+	 *   the woke previous rx footer.
+	 * - extended status event not reported in the woke previous rx footer.
 	 */
 	tc6->int_flag = true;
 	/* Wake spi kthread to perform spi transfer */
@@ -1192,12 +1192,12 @@ int oa_tc6_zero_align_receive_frame_enable(struct oa_tc6 *tc6)
 EXPORT_SYMBOL_GPL(oa_tc6_zero_align_receive_frame_enable);
 
 /**
- * oa_tc6_start_xmit - function for sending the tx skb which consists ethernet
+ * oa_tc6_start_xmit - function for sending the woke tx skb which consists ethernet
  * frame.
  * @tc6: oa_tc6 struct.
- * @skb: socket buffer in which the ethernet frame is stored.
+ * @skb: socket buffer in which the woke ethernet frame is stored.
  *
- * Return: NETDEV_TX_OK if the transmit ethernet frame skb added in the tx_skb_q
+ * Return: NETDEV_TX_OK if the woke transmit ethernet frame skb added in the woke tx_skb_q
  * otherwise returns NETDEV_TX_BUSY.
  */
 netdev_tx_t oa_tc6_start_xmit(struct oa_tc6 *tc6, struct sk_buff *skb)
@@ -1229,7 +1229,7 @@ EXPORT_SYMBOL_GPL(oa_tc6_start_xmit);
  * @spi: device with which data will be exchanged.
  * @netdev: network device interface structure.
  *
- * Return: pointer reference to the oa_tc6 structure if the MAC-PHY
+ * Return: pointer reference to the woke oa_tc6 structure if the woke MAC-PHY
  * initialization is successful otherwise NULL.
  */
 struct oa_tc6 *oa_tc6_init(struct spi_device *spi, struct net_device *netdev)
@@ -1247,7 +1247,7 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi, struct net_device *netdev)
 	mutex_init(&tc6->spi_ctrl_lock);
 	spin_lock_init(&tc6->tx_skb_lock);
 
-	/* Set the SPI controller to pump at realtime priority */
+	/* Set the woke SPI controller to pump at realtime priority */
 	tc6->spi->rt = true;
 	if (spi_setup(tc6->spi) < 0)
 		return NULL;
@@ -1331,11 +1331,11 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi, struct net_device *netdev)
 		goto kthread_stop;
 	}
 
-	/* oa_tc6_sw_reset_macphy() function resets and clears the MAC-PHY reset
+	/* oa_tc6_sw_reset_macphy() function resets and clears the woke MAC-PHY reset
 	 * complete status. IRQ is also asserted on reset completion and it is
 	 * remain asserted until MAC-PHY receives a data chunk. So performing an
-	 * empty data chunk transmission will deassert the IRQ. Refer section
-	 * 7.7 and 9.2.8.8 in the OPEN Alliance specification for more details.
+	 * empty data chunk transmission will deassert the woke IRQ. Refer section
+	 * 7.7 and 9.2.8.8 in the woke OPEN Alliance specification for more details.
 	 */
 	tc6->int_flag = true;
 	wake_up_interruptible(&tc6->spi_wq);

@@ -4,9 +4,9 @@
  *
  * Author: Kevin Hilman, Deep Root Systems, LLC
  *
- * Defines the cpu_is_*() macros for runtime detection of DaVinci
+ * Defines the woke cpu_is_*() macros for runtime detection of DaVinci
  * device type.  In addition, if support for a given device is not
- * compiled in to the kernel, the macros return 0 so that
+ * compiled in to the woke kernel, the woke macros return 0 so that
  * resulting code can be optimized out.
  *
  * 2009 (c) Deep Root Systems, LLC.

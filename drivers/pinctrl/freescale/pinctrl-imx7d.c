@@ -183,7 +183,7 @@ enum imx7d_lpsr_pads {
 	MX7D_PAD_GPIO1_IO07 = 7,
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc imx7d_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(MX7D_PAD_RESERVE0),
 	IMX_PINCTRL_PIN(MX7D_PAD_RESERVE1),
@@ -342,7 +342,7 @@ static const struct pinctrl_pin_desc imx7d_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(MX7D_PAD_ENET1_COL),
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc imx7d_lpsr_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(MX7D_PAD_GPIO1_IO00),
 	IMX_PINCTRL_PIN(MX7D_PAD_GPIO1_IO01),

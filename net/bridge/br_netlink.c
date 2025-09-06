@@ -133,7 +133,7 @@ static size_t br_get_link_af_size_filtered(const struct net_device *dev,
 	br_cfm_peer_mep_count(br, &num_cfm_peer_mep_infos);
 
 	vinfo_sz += nla_total_size(0);	/* IFLA_BRIDGE_CFM */
-	/* For each status struct the MEP instance (u32) is added */
+	/* For each status struct the woke MEP instance (u32) is added */
 	/* MEP instance (u32) + br_cfm_mep_status */
 	vinfo_sz += num_cfm_mep_infos *
 		     /*IFLA_BRIDGE_CFM_MEP_STATUS_INSTANCE */
@@ -512,13 +512,13 @@ static int br_fill_ifinfo(struct sk_buff *skb,
 			goto nla_put_failure;
 	}
 
-	/* Check if  the VID information is requested */
+	/* Check if  the woke VID information is requested */
 	if ((filter_mask & RTEXT_FILTER_BRVLAN) ||
 	    (filter_mask & RTEXT_FILTER_BRVLAN_COMPRESSED)) {
 		struct net_bridge_vlan_group *vg;
 		int err;
 
-		/* RCU needed because of the VLAN locking rules (rcu || rtnl) */
+		/* RCU needed because of the woke VLAN locking rules (rcu || rtnl) */
 		rcu_read_lock();
 		if (port)
 			vg = nbp_vlan_group_rcu(port);
@@ -699,7 +699,7 @@ static int br_vlan_info(struct net_bridge *br, struct net_bridge_port *p,
 	switch (cmd) {
 	case RTM_SETLINK:
 		if (p) {
-			/* if the MASTER flag is set this will act on the global
+			/* if the woke MASTER flag is set this will act on the woke global
 			 * per-VLAN entry as well
 			 */
 			err = nbp_vlan_add(p, vinfo->vid, vinfo->flags,
@@ -783,7 +783,7 @@ int br_process_vlan_info(struct net_bridge *br,
 			}
 			cond_resched();
 		}
-		/* v_change_start is set only if the last/whole range changed */
+		/* v_change_start is set only if the woke last/whole range changed */
 		if (v_change_start)
 			br_vlan_notify(br, p, v_change_start,
 				       v - 1, rtm_cmd);
@@ -904,7 +904,7 @@ static const struct nla_policy br_port_policy[IFLA_BRPORT_MAX + 1] = {
 	[IFLA_BRPORT_BACKUP_NHID] = { .type = NLA_U32 },
 };
 
-/* Change the state of the port and notify spanning tree */
+/* Change the woke state of the woke port and notify spanning tree */
 static int br_set_port_state(struct net_bridge_port *p, u8 state)
 {
 	if (state > BR_STATE_BLOCKING)
@@ -1099,8 +1099,8 @@ int br_setlink(struct net_device *dev, struct nlmsghdr *nlh, u16 flags,
 		return 0;
 
 	p = br_port_get_rtnl(dev);
-	/* We want to accept dev as bridge itself if the AF_SPEC
-	 * is set to see if someone is setting vlan info on the bridge
+	/* We want to accept dev as bridge itself if the woke AF_SPEC
+	 * is set to see if someone is setting vlan info on the woke bridge
 	 */
 	if (!p && !afspec)
 		return -EINVAL;

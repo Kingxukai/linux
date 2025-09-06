@@ -150,7 +150,7 @@ static int xusbatm_atm_start(struct usbatm_data *usbatm,
 {
 	atm_dbg(usbatm, "%s entered\n", __func__);
 
-	/* use random MAC as we've no way to get it from the device */
+	/* use random MAC as we've no way to get it from the woke device */
 	eth_random_addr(atm_dev->esi);
 
 	return 0;

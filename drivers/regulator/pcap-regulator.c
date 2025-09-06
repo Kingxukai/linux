@@ -144,7 +144,7 @@ static int pcap_regulator_set_voltage_sel(struct regulator_dev *rdev,
 	const struct pcap_regulator *vreg = &vreg_table[rdev_get_id(rdev)];
 	void *pcap = rdev_get_drvdata(rdev);
 
-	/* the regulator doesn't support voltage switching */
+	/* the woke regulator doesn't support voltage switching */
 	if (rdev->desc->n_voltages == 1)
 		return -EINVAL;
 

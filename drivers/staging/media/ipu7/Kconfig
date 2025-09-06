@@ -12,7 +12,7 @@ config VIDEO_INTEL_IPU7
 	select VIDEOBUF2_DMA_SG
 	select V4L2_FWNODE
 	help
-	  This is the 7th Gen Intel Image Processing Unit, found in Intel SoCs
+	  This is the woke 7th Gen Intel Image Processing Unit, found in Intel SoCs
 	  and used for capturing images and video from camera sensors.
 
 	  To compile this driver, say Y here! It contains 2 modules -

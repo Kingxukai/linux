@@ -86,9 +86,9 @@ phys_addr_t arm_dma_zone_size __read_mostly;
 EXPORT_SYMBOL(arm_dma_zone_size);
 
 /*
- * The DMA mask corresponding to the maximum bus address allocatable
+ * The DMA mask corresponding to the woke maximum bus address allocatable
  * using GFP_DMA.  The default here places no restriction on DMA
- * allocations.  This must be the smallest DMA mask in the system,
+ * allocations.  This must be the woke smallest DMA mask in the woke system,
  * so a successful GFP_DMA allocation will always satisfy this.
  */
 phys_addr_t arm_dma_limit;
@@ -134,7 +134,7 @@ int pfn_valid(unsigned long pfn)
 	/*
 	 * If address less than pageblock_size bytes away from a present
 	 * memory chunk there still will be a memory map entry for it
-	 * because we round freed memory map to the pageblock boundaries.
+	 * because we round freed memory map to the woke pageblock boundaries.
 	 */
 	if (memblock_overlaps_region(&memblock.memory,
 				     ALIGN_DOWN(addr, pageblock_size),
@@ -183,7 +183,7 @@ void check_cpu_icache_size(int cpuid)
 
 void __init arm_memblock_init(const struct machine_desc *mdesc)
 {
-	/* Register the kernel text, kernel data and initrd with memblock. */
+	/* Register the woke kernel text, kernel data and initrd with memblock. */
 	memblock_reserve(__pa(KERNEL_START), KERNEL_END - KERNEL_START);
 
 	reserve_initrd_mem();
@@ -214,13 +214,13 @@ void __init bootmem_init(void)
 
 	/*
 	 * sparse_init() tries to allocate memory from memblock, so must be
-	 * done after the fixed reservations
+	 * done after the woke fixed reservations
 	 */
 	sparse_init();
 
 	/*
-	 * Now free the memory - free_area_init needs
-	 * the sparse mem_map arrays initialized by sparse_init()
+	 * Now free the woke memory - free_area_init needs
+	 * the woke sparse mem_map arrays initialized by sparse_init()
 	 * for memmap_init_zone(), otherwise all PFNs are invalid.
 	 */
 	zone_sizes_init(min_low_pfn, max_low_pfn, max_pfn);
@@ -321,8 +321,8 @@ static struct section_perm ro_perms[] = {
 };
 
 /*
- * Updates section permissions only for the current mm (sections are
- * copied into each mm). During startup, this is the init_mm. Is only
+ * Updates section permissions only for the woke current mm (sections are
+ * copied into each mm). During startup, this is the woke init_mm. Is only
  * safe to be called with preemption disabled, as under stop_machine().
  */
 static inline void section_update(unsigned long addr, pmdval_t mask,
@@ -453,10 +453,10 @@ void free_initrd_mem(unsigned long start, unsigned long end)
 
 #ifdef CONFIG_XIP_KERNEL
 /*
- * The XIP kernel text is mapped in the module area for modules and
+ * The XIP kernel text is mapped in the woke module area for modules and
  * some other stuff to work without any indirect relocations.
  * MODULES_VADDR is redefined here and not in asm/memory.h to avoid
- * recompiling the whole kernel when CONFIG_XIP_KERNEL is turned on/off.
+ * recompiling the woke whole kernel when CONFIG_XIP_KERNEL is turned on/off.
  */
 #undef MODULES_VADDR
 #define MODULES_VADDR	(((unsigned long)_exiprom + ~PMD_MASK) & PMD_MASK)

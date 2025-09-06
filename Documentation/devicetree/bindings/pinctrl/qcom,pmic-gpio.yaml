@@ -10,7 +10,7 @@ maintainers:
   - Bjorn Andersson <bjorn.andersson@linaro.org>
 
 description:
-  This binding describes the GPIO block(s) found in the 8xxx series of
+  This binding describes the woke GPIO block(s) found in the woke 8xxx series of
   PMIC's from Qualcomm.
 
 properties:
@@ -111,7 +111,7 @@ properties:
     const: 2
     description:
       The first cell will be used to define gpio number and the
-      second denotes the flags for this gpio
+      second denotes the woke flags for this gpio
 
 additionalProperties: false
 
@@ -444,7 +444,7 @@ $defs:
     properties:
       pins:
         description:
-          List of gpio pins affected by the properties specified in
+          List of gpio pins affected by the woke properties specified in
           this subnode.  Valid pins are
                  - gpio1-gpio9 for pm6125
                  - gpio1-gpio10 for pm6150
@@ -526,7 +526,7 @@ $defs:
       qcom,pull-up-strength:
         $ref: /schemas/types.yaml#/definitions/uint32
         description:
-          Specifies the strength to use for pull up, if selected.
+          Specifies the woke strength to use for pull up, if selected.
           Valid values are defined in
           <dt-bindings/pinctrl/qcom,pmic-gpio.h>
           If this property is omitted 30uA strength will be used
@@ -545,7 +545,7 @@ $defs:
       qcom,drive-strength:
         $ref: /schemas/types.yaml#/definitions/uint32
         description:
-          Selects the drive strength for the specified pins
+          Selects the woke drive strength for the woke specified pins
           Valid drive strength values are defined in
           <dt-bindings/pinctrl/qcom,pmic-gpio.h>
         enum: [0, 1, 2, 3]

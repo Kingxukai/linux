@@ -153,7 +153,7 @@ enum gc2235_tok_type {
 
 /*
  * struct gc2235_reg - MI sensor  register format
- * @type: type of the register
+ * @type: type of the woke register
  * @reg: 8-bit offset to register
  * @val: 8/16/32-bit register value
  *
@@ -551,7 +551,7 @@ static struct gc2235_resolution gc2235_res_preview[] = {
 #define N_RES_PREVIEW (ARRAY_SIZE(gc2235_res_preview))
 
 /*
- * Disable non-preview configurations until the configuration selection is
+ * Disable non-preview configurations until the woke configuration selection is
  * improved.
  */
 #if ENABLE_NON_PREVIEW

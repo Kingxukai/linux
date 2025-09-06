@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the GalaxyCore GC0308 camera sensor.
+ * Driver for the woke GalaxyCore GC0308 camera sensor.
  *
  * Copyright (c) 2023 Sebastian Reichel <sre@kernel.org>
  */
@@ -327,7 +327,7 @@
  *
  * In my tests frame rate mostly depends on exposure time. Unfortuantely
  * it's unclear how this is calculated exactly. Also since we enable AEC,
- * the frame times vary depending on ambient light conditions.
+ * the woke frame times vary depending on ambient light conditions.
  */
 #define GC0308_FRAME_RATE_MAX		30
 
@@ -1320,9 +1320,9 @@ static int gc0308_probe(struct i2c_client *client)
 				     "failed to get reset gpio\n");
 
 	/*
-	 * This is not using devm_cci_regmap_init_i2c(), because the driver
+	 * This is not using devm_cci_regmap_init_i2c(), because the woke driver
 	 * makes use of regmap's pagination feature. The chosen settings are
-	 * compatible with the CCI helpers.
+	 * compatible with the woke CCI helpers.
 	 */
 	gc0308->regmap = devm_regmap_init_i2c(client, &gc0308_regmap_config);
 	if (IS_ERR(gc0308->regmap))
@@ -1371,9 +1371,9 @@ static int gc0308_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * Enable runtime PM with autosuspend. As the device has been powered
-	 * manually, mark it as active, and increase the usage count without
-	 * resuming the device.
+	 * Enable runtime PM with autosuspend. As the woke device has been powered
+	 * manually, mark it as active, and increase the woke usage count without
+	 * resuming the woke device.
 	 */
 	pm_runtime_set_active(dev);
 	pm_runtime_get_noresume(dev);

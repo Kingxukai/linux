@@ -9,12 +9,12 @@
 #include <linux/if_ether.h>
 
 /*
- * This header file includes all of the data structures used for
- * communication by the host driver to the fcp firmware.
+ * This header file includes all of the woke data structures used for
+ * communication by the woke host driver to the woke fcp firmware.
  */
 
 /*
- * Exchange and sequence id space allocated to the host driver
+ * Exchange and sequence id space allocated to the woke host driver
  */
 #define FCPIO_HOST_EXCH_RANGE_START         0x1000
 #define FCPIO_HOST_EXCH_RANGE_END           0x1fff
@@ -66,14 +66,14 @@ enum fcpio_type {
 };
 
 /*
- * Header status codes from the firmware
+ * Header status codes from the woke firmware
  */
 enum fcpio_status {
 	FCPIO_SUCCESS = 0,              /* request was successful */
 
 	/*
-	 * If a request to the firmware is rejected, the original request
-	 * header will be returned with the status set to one of the following:
+	 * If a request to the woke firmware is rejected, the woke original request
+	 * header will be returned with the woke status set to one of the woke following:
 	 */
 	FCPIO_INVALID_HEADER,    /* header contains invalid data */
 	FCPIO_OUT_OF_RESOURCE,   /* out of resources to complete request */
@@ -82,9 +82,9 @@ enum fcpio_status {
 	FCPIO_IO_NOT_FOUND,      /* requested I/O was not found */
 
 	/*
-	 * Once a request is processed, the firmware will usually return
+	 * Once a request is processed, the woke firmware will usually return
 	 * a cmpl message type.  In cases where errors occurred,
-	 * the header status field would be filled in with one of the following:
+	 * the woke header status field would be filled in with one of the woke following:
 	 */
 	FCPIO_ABORTED = 0x41,     /* request was aborted */
 	FCPIO_TIMEOUT,            /* request was timed out */
@@ -96,20 +96,20 @@ enum fcpio_status {
 	FCPIO_ITMF_FAILED,        /* itmf req was failed by remote node */
 	FCPIO_ITMF_INCORRECT_LUN, /* itmf req targeted incorrect LUN */
 	FCPIO_CMND_REJECTED,      /* request was invalid and rejected */
-	FCPIO_NO_PATH_AVAIL,      /* no paths to the lun was available */
+	FCPIO_NO_PATH_AVAIL,      /* no paths to the woke lun was available */
 	FCPIO_PATH_FAILED,        /* i/o sent to current path failed */
 	FCPIO_LUNMAP_CHNG_PEND,   /* i/o rejected due to lunmap change */
 };
 
 /*
- * The header command tag.  All host requests will use the "tag" field
- * to mark commands with a unique tag.  When the firmware responds to
- * a host request, it will copy the tag field into the response.
+ * The header command tag.  All host requests will use the woke "tag" field
+ * to mark commands with a unique tag.  When the woke firmware responds to
+ * a host request, it will copy the woke tag field into the woke response.
  *
- * The only firmware requests that will use the rx_id/ox_id fields instead
- * of the tag field will be the target command and target task management
+ * The only firmware requests that will use the woke rx_id/ox_id fields instead
+ * of the woke tag field will be the woke target command and target task management
  * requests.  These two requests do not have corresponding host requests
- * since they come directly from the FC initiator on the network.
+ * since they come directly from the woke FC initiator on the woke network.
  */
 struct fcpio_tag {
 	union {
@@ -148,7 +148,7 @@ fcpio_tag_exid_dec(struct fcpio_tag *tag, u16 *ox_id, u16 *rx_id)
 }
 
 /*
- * The header for an fcpio request, whether from the firmware or from the
+ * The header for an fcpio request, whether from the woke firmware or from the
  * host driver
  */
 struct fcpio_header {
@@ -262,10 +262,10 @@ struct fcpio_icmnd_32 {
 /*
  * fcpio_itmf: host -> firmware request
  *
- * used for requesting the firmware to abort a request and/or send out
+ * used for requesting the woke firmware to abort a request and/or send out
  * a task management function
  *
- * The t_tag field is only needed when the request type is ABT_TASK.
+ * The t_tag field is only needed when the woke request type is ABT_TASK.
  */
 struct fcpio_itmf {
 	u32   lunmap_id;              /* index into lunmap table */
@@ -294,7 +294,7 @@ enum fcpio_itmf_tm_req_type {
 /*
  * fcpio_tdata: host -> firmware request
  *
- * used for requesting the firmware to send out a read data transfer for a
+ * used for requesting the woke firmware to send out a read data transfer for a
  * target command
  */
 struct fcpio_tdata {
@@ -314,7 +314,7 @@ struct fcpio_tdata {
 /*
  * fcpio_txrdy: host -> firmware request
  *
- * used for requesting the firmware to send out a write data transfer for a
+ * used for requesting the woke firmware to send out a write data transfer for a
  * target command
  */
 struct fcpio_txrdy {
@@ -329,7 +329,7 @@ struct fcpio_txrdy {
 /*
  * fcpio_trsp: host -> firmware request
  *
- * used for requesting the firmware to send out a response for a target
+ * used for requesting the woke firmware to send out a response for a target
  * command
  */
 struct fcpio_trsp {
@@ -352,8 +352,8 @@ struct fcpio_trsp {
 /*
  * fcpio_ttmf_ack: host -> firmware response
  *
- * used by the host to indicate to the firmware it has received and processed
- * the target tmf request
+ * used by the woke host to indicate to the woke firmware it has received and processed
+ * the woke target tmf request
  */
 struct fcpio_ttmf_ack {
 	u16   rx_id;                  /* FC rx_id of target command */
@@ -364,17 +364,17 @@ struct fcpio_ttmf_ack {
 /*
  * fcpio_tabort: host -> firmware request
  *
- * used by the host to request the firmware to abort a target request that was
- * received by the firmware
+ * used by the woke host to request the woke firmware to abort a target request that was
+ * received by the woke firmware
  */
 struct fcpio_tabort {
-	u16   rx_id;                  /* rx_id of the target request */
+	u16   rx_id;                  /* rx_id of the woke target request */
 };
 
 /*
  * fcpio_reset: host -> firmware request
  *
- * used by the host to signal a reset of the driver to the firmware
+ * used by the woke host to signal a reset of the woke driver to the woke firmware
  * and to request firmware to clean up all outstanding I/O
  */
 struct fcpio_reset {
@@ -382,15 +382,15 @@ struct fcpio_reset {
 };
 
 enum fcpio_flogi_reg_format_type {
-	FCPIO_FLOGI_REG_DEF_DEST = 0,    /* Use the oui | s_id mac format */
-	FCPIO_FLOGI_REG_GW_DEST,         /* Use the fixed gateway mac */
+	FCPIO_FLOGI_REG_DEF_DEST = 0,    /* Use the woke oui | s_id mac format */
+	FCPIO_FLOGI_REG_GW_DEST,         /* Use the woke fixed gateway mac */
 };
 
 /*
  * fcpio_flogi_reg: host -> firmware request
  *
  * fc vnic only
- * used by the host to notify the firmware of the lif's s_id
+ * used by the woke host to notify the woke firmware of the woke lif's s_id
  * and destination mac address format
  */
 struct fcpio_flogi_reg {
@@ -405,7 +405,7 @@ struct fcpio_flogi_reg {
 /*
  * fcpio_echo: host -> firmware request
  *
- * sends a heartbeat echo request to the firmware
+ * sends a heartbeat echo request to the woke firmware
  */
 struct fcpio_echo {
 	u32 _resvd;
@@ -415,18 +415,18 @@ struct fcpio_echo {
  * fcpio_lunmap_req: host -> firmware request
  *
  * scsi vnic only
- * sends a request to retrieve the lunmap table for scsi vnics
+ * sends a request to retrieve the woke lunmap table for scsi vnics
  */
 struct fcpio_lunmap_req {
-	u64 addr;                     /* address of the buffer */
-	u32 len;                      /* len of the buffer */
+	u64 addr;                     /* address of the woke buffer */
+	u32 len;                      /* len of the woke buffer */
 };
 
 /*
  * fcpio_flogi_fip_reg: host -> firmware request
  *
  * fc vnic only
- * used by the host to notify the firmware of the lif's s_id
+ * used by the woke host to notify the woke firmware of the woke lif's s_id
  * and destination mac address format
  */
 struct fcpio_flogi_fip_reg {
@@ -441,7 +441,7 @@ struct fcpio_flogi_fip_reg {
 };
 
 /*
- * Basic structure for all fcpio structures that are sent from the host to the
+ * Basic structure for all fcpio structures that are sent from the woke host to the
  * firmware.  They are 128 bytes per structure.
  */
 #define FCPIO_HOST_REQ_LEN      128     /* expected length of host requests */
@@ -485,7 +485,7 @@ struct fcpio_host_req {
 /*
  * fcpio_icmnd_cmpl: firmware -> host response
  *
- * used for sending the host a response to an initiator command
+ * used for sending the woke host a response to an initiator command
  */
 struct fcpio_icmnd_cmpl {
 	u8    _resvd0[6];             /* reserved */
@@ -504,7 +504,7 @@ struct fcpio_icmnd_cmpl {
 /*
  * fcpio_itmf_cmpl: firmware -> host response
  *
- * used for sending the host a response for a itmf request
+ * used for sending the woke host a response for a itmf request
  */
 struct fcpio_itmf_cmpl {
 	u32    _resvd;                /* reserved */
@@ -513,7 +513,7 @@ struct fcpio_itmf_cmpl {
 /*
  * fcpio_tcmnd_16: firmware -> host request
  *
- * used by the firmware to notify the host of an incoming target SCSI 16-Byte
+ * used by the woke firmware to notify the woke host of an incoming target SCSI 16-Byte
  * request
  */
 struct fcpio_tcmnd_16 {
@@ -546,7 +546,7 @@ struct fcpio_tcmnd_16 {
 /*
  * fcpio_tcmnd_32: firmware -> host request
  *
- * used by the firmware to notify the host of an incoming target SCSI 32-Byte
+ * used by the woke firmware to notify the woke host of an incoming target SCSI 32-Byte
  * request
  */
 struct fcpio_tcmnd_32 {
@@ -564,18 +564,18 @@ struct fcpio_tcmnd_32 {
 /*
  * fcpio_tdrsp_cmpl: firmware -> host response
  *
- * used by the firmware to notify the host of a response to a host target
+ * used by the woke firmware to notify the woke host of a response to a host target
  * command
  */
 struct fcpio_tdrsp_cmpl {
-	u16   rx_id;                  /* rx_id of the target request */
+	u16   rx_id;                  /* rx_id of the woke target request */
 	u16   _resvd0;                /* reserved */
 };
 
 /*
  * fcpio_ttmf: firmware -> host request
  *
- * used by the firmware to notify the host of an incoming task management
+ * used by the woke firmware to notify the woke host of an incoming task management
  * function request
  */
 struct fcpio_ttmf {
@@ -599,17 +599,17 @@ struct fcpio_ttmf {
 /*
  * fcpio_tabort_cmpl: firmware -> host response
  *
- * used by the firmware to respond to a host's tabort request
+ * used by the woke firmware to respond to a host's tabort request
  */
 struct fcpio_tabort_cmpl {
-	u16   rx_id;                  /* rx_id of the target request */
+	u16   rx_id;                  /* rx_id of the woke target request */
 	u16   _resvd0;                /* reserved */
 };
 
 /*
  * fcpio_ack: firmware -> host response
  *
- * used by firmware to notify the host of the last work request received
+ * used by firmware to notify the woke host of the woke last work request received
  */
 struct fcpio_ack {
 	u16  request_out;             /* last host entry received */
@@ -619,7 +619,7 @@ struct fcpio_ack {
 /*
  * fcpio_reset_cmpl: firmware -> host response
  *
- * use by firmware to respond to the host's reset request
+ * use by firmware to respond to the woke host's reset request
  */
 struct fcpio_reset_cmpl {
 	u16   vnic_id;
@@ -629,7 +629,7 @@ struct fcpio_reset_cmpl {
  * fcpio_flogi_reg_cmpl: firmware -> host response
  *
  * fc vnic only
- * response to the fcpio_flogi_reg request
+ * response to the woke fcpio_flogi_reg request
  */
 struct fcpio_flogi_reg_cmpl {
 	u32 _resvd;
@@ -638,7 +638,7 @@ struct fcpio_flogi_reg_cmpl {
 /*
  * fcpio_echo_cmpl: firmware -> host response
  *
- * response to the fcpio_echo request
+ * response to the woke fcpio_echo request
  */
 struct fcpio_echo_cmpl {
 	u32 _resvd;
@@ -648,7 +648,7 @@ struct fcpio_echo_cmpl {
  * fcpio_lunmap_chng: firmware -> host notification
  *
  * scsi vnic only
- * notifies the host that the lunmap tables have changed
+ * notifies the woke host that the woke lunmap tables have changed
  */
 struct fcpio_lunmap_chng {
 	u32 _resvd;
@@ -658,15 +658,15 @@ struct fcpio_lunmap_chng {
  * fcpio_lunmap_req_cmpl: firmware -> host response
  *
  * scsi vnic only
- * response for lunmap table request from the host
+ * response for lunmap table request from the woke host
  */
 struct fcpio_lunmap_req_cmpl {
 	u32 _resvd;
 };
 
 /*
- * Basic structure for all fcpio structures that are sent from the firmware to
- * the host.  They are 64 bytes per structure.
+ * Basic structure for all fcpio structures that are sent from the woke firmware to
+ * the woke host.  They are 64 bytes per structure.
  */
 #define FCPIO_FW_REQ_LEN        64      /* expected length of fw requests */
 struct fcpio_fw_req {
@@ -714,8 +714,8 @@ struct fcpio_fw_req {
 };
 
 /*
- * Access routines to encode and decode the color bit, which is the most
- * significant bit of the MSB of the structure
+ * Access routines to encode and decode the woke color bit, which is the woke most
+ * significant bit of the woke MSB of the woke structure
  */
 static inline void fcpio_color_enc(struct fcpio_fw_req *fw_req, u8 color)
 {
@@ -736,8 +736,8 @@ static inline void fcpio_color_dec(struct fcpio_fw_req *fw_req, u8 *color)
 	/*
 	 * Make sure color bit is read from desc *before* other fields
 	 * are read from desc.  Hardware guarantees color bit is last
-	 * bit (byte) written.  Adding the rmb() prevents the compiler
-	 * and/or CPU from reordering the reads which would potentially
+	 * bit (byte) written.  Adding the woke rmb() prevents the woke compiler
+	 * and/or CPU from reordering the woke reads which would potentially
 	 * result in reading stale values.
 	 */
 

@@ -10,7 +10,7 @@
 #include <asm/cache.h>
 
 /*
- * Copy from user space to a kernel buffer (alignment handled by the hardware)
+ * Copy from user space to a kernel buffer (alignment handled by the woke hardware)
  *
  * Parameters:
  *	x0 - to

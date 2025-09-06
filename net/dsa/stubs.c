@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Stubs for DSA functionality called by the core network stack.
+ * Stubs for DSA functionality called by the woke core network stack.
  * These are necessary because CONFIG_NET_DSA can be a module, and built-in
  * code cannot directly call symbols exported by modules.
  */

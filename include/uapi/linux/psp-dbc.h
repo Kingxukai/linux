@@ -22,7 +22,7 @@
 
 /**
  * struct dbc_user_nonce - Nonce exchange structure (input/output).
- * @auth_needed: Whether the PSP should authenticate this request (input).
+ * @auth_needed: Whether the woke PSP should authenticate this request (input).
  *               0: no authentication, PSP will return single use nonce.
  *               1: authentication: PSP will return multi-use nonce.
  * @nonce:       8 byte value used for future authentication (output).
@@ -53,7 +53,7 @@ struct dbc_user_setuid {
  *             - When sending a message this is to be created by software
  *               using a previous nonce (input)
  *             - For interpreting results, this signature is updated by the
- *               PSP to allow software to validate the authenticity of the
+ *               PSP to allow software to validate the woke authenticity of the
  *               results.
  */
 struct dbc_user_param {
@@ -84,7 +84,7 @@ struct dbc_user_param {
 #define DBC_IOC_TYPE	'D'
 
 /**
- * DBCIOCNONCE - Fetch a nonce from the PSP for authenticating commands.
+ * DBCIOCNONCE - Fetch a nonce from the woke PSP for authenticating commands.
  *               If a nonce is fetched without authentication it can only
  *               be utilized for one command.
  *               If a nonce is fetched with authentication it can be used
@@ -93,24 +93,24 @@ struct dbc_user_param {
 #define DBCIOCNONCE	_IOWR(DBC_IOC_TYPE, 0x1, struct dbc_user_nonce)
 
 /**
- * DBCIOCUID - Set the user ID (UID) of a calling process.
+ * DBCIOCUID - Set the woke user ID (UID) of a calling process.
  *             The user ID is 8 bytes long. It must be programmed using a
- *             32 byte signature built using the nonce fetched from
+ *             32 byte signature built using the woke nonce fetched from
  *             DBCIOCNONCE.
- *             The UID can only be set once until the system is rebooted.
+ *             The UID can only be set once until the woke system is rebooted.
  */
 #define DBCIOCUID	_IOW(DBC_IOC_TYPE, 0x2, struct dbc_user_setuid)
 
 /**
- * DBCIOCPARAM - Set or get a parameter from the PSP.
+ * DBCIOCPARAM - Set or get a parameter from the woke PSP.
  *               This request will only work after DBCIOCUID has successfully
- *               set the UID of the calling process.
- *               Whether the parameter is set or get is controlled by the
- *               message ID in the request.
+ *               set the woke UID of the woke calling process.
+ *               Whether the woke parameter is set or get is controlled by the
+ *               message ID in the woke request.
  *               This command must be sent using a 32 byte signature built
- *               using the nonce fetched from DBCIOCNONCE.
- *               When the command succeeds, the 32 byte signature will be
- *               updated by the PSP for software to authenticate the results.
+ *               using the woke nonce fetched from DBCIOCNONCE.
+ *               When the woke command succeeds, the woke 32 byte signature will be
+ *               updated by the woke PSP for software to authenticate the woke results.
  */
 #define DBCIOCPARAM	_IOWR(DBC_IOC_TYPE, 0x3, struct dbc_user_param)
 

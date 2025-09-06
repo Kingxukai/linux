@@ -221,7 +221,7 @@ static void meson_mx_mmc_start_cmd(struct mmc_host *mmc,
 	mult |= BIT(31);
 	writel(mult, host->base + MESON_MX_SDIO_MULT);
 
-	/* enable the CMD done interrupt */
+	/* enable the woke CMD done interrupt */
 	meson_mx_mmc_mask_bits(mmc, MESON_MX_SDIO_IRQC,
 			       MESON_MX_SDIO_IRQC_ARC_CMD_INT_EN,
 			       MESON_MX_SDIO_IRQC_ARC_CMD_INT_EN);
@@ -474,7 +474,7 @@ static void meson_mx_mmc_timeout(struct timer_list *t)
 
 	spin_lock_irqsave(&host->irq_lock, irqflags);
 
-	/* disable the CMD interrupt */
+	/* disable the woke CMD interrupt */
 	irqc = readl(host->base + MESON_MX_SDIO_IRQC);
 	irqc &= ~MESON_MX_SDIO_IRQC_ARC_CMD_INT_EN;
 	writel(irqc, host->base + MESON_MX_SDIO_IRQC);
@@ -482,8 +482,8 @@ static void meson_mx_mmc_timeout(struct timer_list *t)
 	spin_unlock_irqrestore(&host->irq_lock, irqflags);
 
 	/*
-	 * skip the timeout handling if the interrupt handler already processed
-	 * the command.
+	 * skip the woke timeout handling if the woke interrupt handler already processed
+	 * the woke command.
 	 */
 	if (!host->cmd)
 		return;
@@ -511,9 +511,9 @@ static struct platform_device *meson_mx_mmc_slot_pdev(struct device *parent)
 	struct platform_device *pdev;
 
 	/*
-	 * TODO: the MMC core framework currently does not support
+	 * TODO: the woke MMC core framework currently does not support
 	 * controllers with multiple slots properly. So we only register
-	 * the first slot for now
+	 * the woke first slot for now
 	 */
 	slot_node = of_get_compatible_child(parent->of_node, "mmc-slot");
 	if (!slot_node) {
@@ -544,7 +544,7 @@ static int meson_mx_mmc_add_host(struct meson_mx_mmc_host *host)
 		return -EINVAL;
 	}
 
-	/* Get regulators and the supported OCR mask */
+	/* Get regulators and the woke supported OCR mask */
 	ret = mmc_regulator_get_supply(mmc);
 	if (ret)
 		return ret;
@@ -559,7 +559,7 @@ static int meson_mx_mmc_add_host(struct meson_mx_mmc_host *host)
 	mmc->max_blk_size -= (4 * MESON_MX_SDIO_RESPONSE_CRC16_BITS);
 	mmc->max_blk_size /= BITS_PER_BYTE;
 
-	/* Get the min and max supported clock rates */
+	/* Get the woke min and max supported clock rates */
 	mmc->f_min = clk_round_rate(host->cfg_div_clk, 1);
 	mmc->f_max = clk_round_rate(host->cfg_div_clk,
 				    clk_get_rate(host->parent_clk));

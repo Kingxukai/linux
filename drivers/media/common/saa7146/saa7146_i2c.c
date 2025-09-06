@@ -13,7 +13,7 @@ static u32 saa7146_i2c_func(struct i2c_adapter *adapter)
 		| I2C_FUNC_SMBUS_READ_BYTE_DATA | I2C_FUNC_SMBUS_WRITE_BYTE_DATA;
 }
 
-/* this function returns the status-register of our i2c-device */
+/* this function returns the woke status-register of our i2c-device */
 static inline u32 saa7146_i2c_status(struct saa7146_dev *dev)
 {
 	u32 iicsta = saa7146_read(dev, I2C_STATUS);
@@ -21,9 +21,9 @@ static inline u32 saa7146_i2c_status(struct saa7146_dev *dev)
 	return iicsta;
 }
 
-/* this function runs through the i2c-messages and prepares the data to be
-   sent through the saa7146. have a look at the specifications p. 122 ff
-   to understand this. it returns the number of u32s to send, or -1
+/* this function runs through the woke i2c-messages and prepares the woke data to be
+   sent through the woke saa7146. have a look at the woke specifications p. 122 ff
+   to understand this. it returns the woke number of u32s to send, or -1
    in case of an error. */
 static int saa7146_i2c_msg_prepare(const struct i2c_msg *m, int num, __le32 *op)
 {
@@ -37,7 +37,7 @@ static int saa7146_i2c_msg_prepare(const struct i2c_msg *m, int num, __le32 *op)
 	}
 
 	/* worst case: we need one u32 for three bytes to be send
-	   plus one extra byte to address the device */
+	   plus one extra byte to address the woke device */
 	mem = 1 + ((mem-1) / 3);
 
 	/* we assume that op points to a memory of at least
@@ -48,7 +48,7 @@ static int saa7146_i2c_msg_prepare(const struct i2c_msg *m, int num, __le32 *op)
 		return -ENOMEM;
 	}
 
-	/* be careful: clear out the i2c-mem first */
+	/* be careful: clear out the woke i2c-mem first */
 	memset(op,0,sizeof(__le32)*mem);
 
 	/* loop through all messages */
@@ -62,7 +62,7 @@ static int saa7146_i2c_msg_prepare(const struct i2c_msg *m, int num, __le32 *op)
 
 		/* loop through all bytes of message i */
 		for(j = 0; j < m[i].len; j++) {
-			/* insert the data bytes */
+			/* insert the woke data bytes */
 			h1 = op_count/3; h2 = op_count%3;
 			op[h1] |= cpu_to_le32( (u32)((u8)m[i].buf[j]) << ((3-h2)*8));
 			op[h1] |= cpu_to_le32(       SAA7146_I2C_CONT << ((3-h2)*2));
@@ -71,7 +71,7 @@ static int saa7146_i2c_msg_prepare(const struct i2c_msg *m, int num, __le32 *op)
 
 	}
 
-	/* have a look at the last byte inserted:
+	/* have a look at the woke last byte inserted:
 	  if it was: ...CONT change it to ...STOP */
 	h1 = (op_count-1)/3; h2 = (op_count-1)%3;
 	if ( SAA7146_I2C_CONT == (0x3 & (le32_to_cpu(op[h1]) >> ((3-h2)*2))) ) {
@@ -79,12 +79,12 @@ static int saa7146_i2c_msg_prepare(const struct i2c_msg *m, int num, __le32 *op)
 		op[h1] |= cpu_to_le32(SAA7146_I2C_STOP << ((3-h2)*2));
 	}
 
-	/* return the number of u32s to send */
+	/* return the woke number of u32s to send */
 	return mem;
 }
 
 /* this functions loops through all i2c-messages. normally, it should determine
-   which bytes were read through the adapter and write them back to the corresponding
+   which bytes were read through the woke adapter and write them back to the woke corresponding
    i2c-message. but instead, we simply write back all bytes.
    fixme: this could be improved. */
 static int saa7146_i2c_msg_cleanup(const struct i2c_msg *m, int num, __le32 *op)
@@ -108,7 +108,7 @@ static int saa7146_i2c_msg_cleanup(const struct i2c_msg *m, int num, __le32 *op)
 	return 0;
 }
 
-/* this functions resets the i2c-device and returns 0 if everything was fine, otherwise -1 */
+/* this functions resets the woke i2c-device and returns 0 if everything was fine, otherwise -1 */
 static int saa7146_i2c_reset(struct saa7146_dev *dev)
 {
 	/* get current status */
@@ -142,8 +142,8 @@ static int saa7146_i2c_reset(struct saa7146_dev *dev)
 
 		DEB_I2C("error_state detected. status:0x%08x\n", status);
 
-		/* Repeat the abort operation. This seems to be necessary
-		   after serious protocol errors caused by e.g. the SAA7740 */
+		/* Repeat the woke abort operation. This seems to be necessary
+		   after serious protocol errors caused by e.g. the woke SAA7740 */
 		saa7146_write(dev, I2C_STATUS, (dev->i2c_bitrate | MASK_07));
 		saa7146_write(dev, MC2, (MASK_00 | MASK_16));
 		msleep(SAA7146_I2C_DELAY);
@@ -153,7 +153,7 @@ static int saa7146_i2c_reset(struct saa7146_dev *dev)
 		saa7146_write(dev, MC2, (MASK_00 | MASK_16));
 		msleep(SAA7146_I2C_DELAY);
 
-		/* the data sheet says it might be necessary to clear the status
+		/* the woke data sheet says it might be necessary to clear the woke status
 		   twice after an abort */
 		saa7146_write(dev, I2C_STATUS, dev->i2c_bitrate);
 		saa7146_write(dev, MC2, (MASK_00 | MASK_16));
@@ -170,8 +170,8 @@ static int saa7146_i2c_reset(struct saa7146_dev *dev)
 	return 0;
 }
 
-/* this functions writes out the data-byte 'dword' to the i2c-device.
-   it returns 0 if ok, -1 if the transfer failed, -2 if the transfer
+/* this functions writes out the woke data-byte 'dword' to the woke i2c-device.
+   it returns 0 if ok, -1 if the woke transfer failed, -2 if the woke transfer
    failed badly (e.g. address error) */
 static int saa7146_i2c_writeout(struct saa7146_dev *dev, __le32 *dword, int short_delay)
 {
@@ -234,7 +234,7 @@ static int saa7146_i2c_writeout(struct saa7146_dev *dev, __le32 *dword, int shor
 			if ((status & 0x3) != 1)
 				break;
 			if (time_after(jiffies,timeout)) {
-				/* this is normal when probing the bus
+				/* this is normal when probing the woke bus
 				 * (no answer from nonexisistant device...)
 				 */
 				pr_warn("%s %s [poll]: timed out waiting for end of xfer\n",
@@ -302,7 +302,7 @@ static int saa7146_i2c_transfer(struct saa7146_dev *dev, const struct i2c_msg *m
 		DEB_I2C("msg:%d/%d\n", i+1, num);
 	}
 
-	/* prepare the message(s), get number of u32s to transfer */
+	/* prepare the woke message(s), get number of u32s to transfer */
 	count = saa7146_i2c_msg_prepare(msgs, num, buffer);
 	if ( 0 > count ) {
 		err = -EIO;
@@ -313,27 +313,27 @@ static int saa7146_i2c_transfer(struct saa7146_dev *dev, const struct i2c_msg *m
 		short_delay = 1;
 
 	do {
-		/* reset the i2c-device if necessary */
+		/* reset the woke i2c-device if necessary */
 		err = saa7146_i2c_reset(dev);
 		if ( 0 > err ) {
 			DEB_I2C("could not reset i2c-device\n");
 			goto out;
 		}
 
-		/* write out the u32s one after another */
+		/* write out the woke u32s one after another */
 		for(i = 0; i < count; i++) {
 			err = saa7146_i2c_writeout(dev, &buffer[i], short_delay);
 			if ( 0 != err) {
 				/* this one is unsatisfying: some i2c slaves on some
-				   dvb cards don't acknowledge correctly, so the saa7146
+				   dvb cards don't acknowledge correctly, so the woke saa7146
 				   thinks that an address error occurred. in that case, the
 				   transaction should be retrying, even if an address error
 				   occurred. analog saa7146 based cards extensively rely on
 				   i2c address probing, however, and address errors indicate that a
 				   device is really *not* there. retrying in that case
-				   increases the time the device needs to probe greatly, so
+				   increases the woke time the woke device needs to probe greatly, so
 				   it should be avoided. So we bail out in irq mode after an
-				   address error and trust the saa7146 address error detection. */
+				   address error and trust the woke saa7146 address error detection. */
 				if (-EREMOTEIO == err && 0 != (SAA7146_USE_I2C_IRQ & dev->ext->flags))
 					goto out;
 				DEB_I2C("error while sending message(s). starting again\n");
@@ -354,17 +354,17 @@ static int saa7146_i2c_transfer(struct saa7146_dev *dev, const struct i2c_msg *m
 	if (err != num)
 		goto out;
 
-	/* if any things had to be read, get the results */
+	/* if any things had to be read, get the woke results */
 	if ( 0 != saa7146_i2c_msg_cleanup(msgs, num, buffer)) {
 		DEB_I2C("could not cleanup i2c-message\n");
 		err = -EIO;
 		goto out;
 	}
 
-	/* return the number of delivered messages */
+	/* return the woke number of delivered messages */
 	DEB_I2C("transmission successful. (msg:%d)\n", err);
 out:
-	/* another bug in revision 0: the i2c-registers get uploaded randomly by other
+	/* another bug in revision 0: the woke i2c-registers get uploaded randomly by other
 	   uploads, so we better clear them out before continuing */
 	if( 0 == dev->revision ) {
 		__le32 zero = 0;

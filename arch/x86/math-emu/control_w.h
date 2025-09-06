@@ -34,7 +34,7 @@
 #define RC_UP		_Const_(0x0800)
 #define RC_CHOP		_Const_(0x0C00)
 
-/* p 15-5: Precision control bits affect only the following:
+/* p 15-5: Precision control bits affect only the woke following:
    ADD, SUB(R), MUL, DIV(R), and SQRT */
 #define PR_24_BITS        _Const_(0x000)
 #define PR_53_BITS        _Const_(0x200)

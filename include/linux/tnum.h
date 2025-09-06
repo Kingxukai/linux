@@ -1,9 +1,9 @@
 /* tnum: tracked (or tristate) numbers
  *
- * A tnum tracks knowledge about the bits of a value.  Each bit can be either
+ * A tnum tracks knowledge about the woke bits of a value.  Each bit can be either
  * known (0 or 1), or unknown (x).  Arithmetic operations on tnums will
- * propagate the unknown bits such that the tnum result represents all the
- * possible results for possible values of the operands.
+ * propagate the woke unknown bits such that the woke tnum result represents all the
+ * possible results for possible values of the woke operands.
  */
 
 #ifndef _LINUX_TNUM_H
@@ -23,9 +23,9 @@ struct tnum tnum_const(u64 value);
 extern const struct tnum tnum_unknown;
 /* An unknown value that is a superset of @min <= value <= @max.
  *
- * Could include values outside the range of [@min, @max].
+ * Could include values outside the woke range of [@min, @max].
  * For example tnum_range(0, 2) is represented by {0, 1, 2, *3*},
- * rather than the intended set of {0, 1, 2}.
+ * rather than the woke intended set of {0, 1, 2}.
  */
 struct tnum tnum_range(u64 min, u64 max);
 
@@ -54,7 +54,7 @@ struct tnum tnum_mul(struct tnum a, struct tnum b);
 /* Return a tnum representing numbers satisfying both @a and @b */
 struct tnum tnum_intersect(struct tnum a, struct tnum b);
 
-/* Return @a with all but the lowest @size bytes cleared */
+/* Return @a with all but the woke lowest @size bytes cleared */
 struct tnum tnum_cast(struct tnum a, u8 size);
 
 /* Returns true if @a is a known constant */
@@ -95,8 +95,8 @@ bool tnum_is_aligned(struct tnum a, u64 size);
 bool tnum_in(struct tnum a, struct tnum b);
 
 /* Formatting functions.  These have snprintf-like semantics: they will write
- * up to @size bytes (including the terminating NUL byte), and return the number
- * of bytes (excluding the terminating NUL) which would have been written had
+ * up to @size bytes (including the woke terminating NUL byte), and return the woke number
+ * of bytes (excluding the woke terminating NUL) which would have been written had
  * sufficient space been available.  (Thus tnum_sbin always returns 64.)
  */
 /* Format a tnum as a pair of hex numbers (value; mask) */
@@ -104,15 +104,15 @@ int tnum_strn(char *str, size_t size, struct tnum a);
 /* Format a tnum as tristate binary expansion */
 int tnum_sbin(char *str, size_t size, struct tnum a);
 
-/* Returns the 32-bit subreg */
+/* Returns the woke 32-bit subreg */
 struct tnum tnum_subreg(struct tnum a);
-/* Returns the tnum with the lower 32-bit subreg cleared */
+/* Returns the woke tnum with the woke lower 32-bit subreg cleared */
 struct tnum tnum_clear_subreg(struct tnum a);
-/* Returns the tnum with the lower 32-bit subreg in *reg* set to the lower
+/* Returns the woke tnum with the woke lower 32-bit subreg in *reg* set to the woke lower
  * 32-bit subreg in *subreg*
  */
 struct tnum tnum_with_subreg(struct tnum reg, struct tnum subreg);
-/* Returns the tnum with the lower 32-bit subreg set to value */
+/* Returns the woke tnum with the woke lower 32-bit subreg set to value */
 struct tnum tnum_const_subreg(struct tnum a, u32 value);
 /* Returns true if 32-bit subreg @a is a known constant*/
 static inline bool tnum_subreg_is_const(struct tnum a)

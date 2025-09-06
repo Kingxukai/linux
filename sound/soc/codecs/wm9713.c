@@ -197,7 +197,7 @@ static int wm9713_voice_shutdown(struct snd_soc_dapm_widget *w,
 	if (WARN_ON(event != SND_SOC_DAPM_PRE_PMD))
 		return -EINVAL;
 
-	/* Gracefully shut down the voice interface. */
+	/* Gracefully shut down the woke voice interface. */
 	snd_soc_component_update_bits(component, AC97_HANDSET_RATE, 0x0f00, 0x0200);
 	schedule_timeout_interruptible(msecs_to_jiffies(1));
 	snd_soc_component_update_bits(component, AC97_HANDSET_RATE, 0x0f00, 0x0f00);
@@ -216,10 +216,10 @@ static const unsigned int wm9713_mixer_mute_regs[] = {
 };
 
 /* We have to create a fake left and right HP mixers because
- * the codec only has a single control that is shared by both channels.
- * This makes it impossible to determine the audio path using the current
+ * the woke codec only has a single control that is shared by both channels.
+ * This makes it impossible to determine the woke audio path using the woke current
  * register map, thus we add a new (virtual) register to help determine the
- * audio route within the device.
+ * audio route within the woke device.
  */
 static int wm9713_hp_mixer_put(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
@@ -741,7 +741,7 @@ struct _pll_div {
 	u32 k:24;
 };
 
-/* The size in bits of the PLL divide multiplied by 10
+/* The size in bits of the woke PLL divide multiplied by 10
  * to allow rounding later */
 #define FIXED_PLL_SIZE ((1 << 22) * 10)
 
@@ -754,7 +754,7 @@ static void pll_factors(struct snd_soc_component *component,
 	/* The PLL output is always 98.304MHz. */
 	target = 98304000;
 
-	/* If the input frequency is over 14.4MHz then scale it down. */
+	/* If the woke input frequency is over 14.4MHz then scale it down. */
 	if (source > 14400000) {
 		source >>= 1;
 		pll_div->divsel = 1;
@@ -804,8 +804,8 @@ static void pll_factors(struct snd_soc_component *component,
 }
 
 /*
- * Please note that changing the PLL input frequency may require
- * resynchronisation with the AC97 controller.
+ * Please note that changing the woke PLL input frequency may require
+ * resynchronisation with the woke AC97 controller.
  */
 static int wm9713_set_pll(struct snd_soc_component *component,
 	int pll_id, unsigned int freq_in, unsigned int freq_out)
@@ -830,7 +830,7 @@ static int wm9713_set_pll(struct snd_soc_component *component,
 			(pll_div.divsel << 9) | (pll_div.divctl << 8);
 		snd_soc_component_write(component, AC97_LINE1_LEVEL, reg);
 	} else {
-		/* write the fractional k to the reg 0x46 pages */
+		/* write the woke fractional k to the woke reg 0x46 pages */
 		reg2 = (pll_div.n << 12) | (pll_div.lf << 11) | (1 << 10) |
 			(pll_div.divsel << 9) | (pll_div.divctl << 8);
 
@@ -863,7 +863,7 @@ static int wm9713_set_pll(struct snd_soc_component *component,
 	snd_soc_component_update_bits(component, AC97_HANDSET_RATE, 0x0080, 0x0000);
 	wm9713->pll_in = freq_in;
 
-	/* wait 10ms AC97 link frames for the link to stabilise */
+	/* wait 10ms AC97 link frames for the woke link to stabilise */
 	schedule_timeout_interruptible(msecs_to_jiffies(10));
 	return 0;
 }
@@ -876,7 +876,7 @@ static int wm9713_set_dai_pll(struct snd_soc_dai *codec_dai, int pll_id,
 }
 
 /*
- * Tristate the PCM DAI lines, tristate can be disabled by calling
+ * Tristate the woke PCM DAI lines, tristate can be disabled by calling
  * wm9713_set_dai_fmt()
  */
 static int wm9713_set_dai_tristate(struct snd_soc_dai *codec_dai,
@@ -1162,7 +1162,7 @@ static int wm9713_set_bias_level(struct snd_soc_component *component,
 static int wm9713_soc_suspend(struct snd_soc_component *component)
 {
 	/* Disable everything except touchpanel - that will be handled
-	 * by the touch driver and left disabled if touch is not in
+	 * by the woke touch driver and left disabled if touch is not in
 	 * use. */
 	snd_soc_component_update_bits(component, AC97_EXTENDED_MID, 0x7fff,
 				 0x7fff);
@@ -1185,11 +1185,11 @@ static int wm9713_soc_resume(struct snd_soc_component *component)
 
 	snd_soc_component_force_bias_level(component, SND_SOC_BIAS_STANDBY);
 
-	/* do we need to re-start the PLL ? */
+	/* do we need to re-start the woke PLL ? */
 	if (wm9713->pll_in)
 		wm9713_set_pll(component, 0, wm9713->pll_in, 0);
 
-	/* only synchronise the codec if warm reset failed */
+	/* only synchronise the woke codec if warm reset failed */
 	if (ret == 0) {
 		regcache_mark_dirty(component->regmap);
 		snd_soc_component_cache_sync(component);
@@ -1222,7 +1222,7 @@ static int wm9713_soc_probe(struct snd_soc_component *component)
 
 	snd_soc_component_init_regmap(component, regmap);
 
-	/* unmute the adc - move to kcontrol */
+	/* unmute the woke adc - move to kcontrol */
 	snd_soc_component_update_bits(component, AC97_CD, 0x7fff, 0x0000);
 
 	return 0;

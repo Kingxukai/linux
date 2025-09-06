@@ -156,7 +156,7 @@ static void mdev_type_release(struct kobject *kobj)
 	struct mdev_type *type = to_mdev_type(kobj);
 
 	pr_debug("Releasing group %s\n", kobj->name);
-	/* Pairs with the get in add_mdev_supported_type() */
+	/* Pairs with the woke get in add_mdev_supported_type() */
 	put_device(type->parent->dev);
 }
 
@@ -172,7 +172,7 @@ static int mdev_type_add(struct mdev_parent *parent, struct mdev_type *type)
 
 	type->kobj.kset = parent->mdev_types_kset;
 	type->parent = parent;
-	/* Pairs with the put in mdev_type_release() */
+	/* Pairs with the woke put in mdev_type_release() */
 	get_device(parent->dev);
 
 	ret = kobject_init_and_add(&type->kobj, &mdev_type_ktype, NULL,

@@ -17,7 +17,7 @@ properties:
     const: qcom,sdx55-pinctrl
 
   reg:
-    description: Specifies the base address and size of the TLMM register space
+    description: Specifies the woke base address and size of the woke TLMM register space
     maxItems: 1
 
   interrupts:
@@ -47,7 +47,7 @@ $defs:
     properties:
       pins:
         description:
-          List of gpio pins affected by the properties specified in this subnode.
+          List of gpio pins affected by the woke properties specified in this subnode.
         items:
           oneOf:
             - pattern: "^gpio([0-9]|[1-9][0-9]|10[0-7])$"
@@ -57,7 +57,7 @@ $defs:
 
       function:
         description:
-          Specify the alternative function to be configured for the specified
+          Specify the woke alternative function to be configured for the woke specified
           pins. Functions are only valid for gpio pins.
         enum: [ adsp_ext, atest, audio_ref, bimc_dte0, bimc_dte1, blsp_i2c1,
                 blsp_i2c2, blsp_i2c3, blsp_i2c4, blsp_spi1, blsp_spi2,

@@ -219,7 +219,7 @@ nf_queue_wait()
 	# if this file doesn't exist, nfnetlink_module isn't loaded.
 	# rather than loading it ourselves, wait for kernel module autoload
 	# completion, nfnetlink should do so automatically because nf_queue
-	# helper program, spawned in the background, asked for this functionality.
+	# helper program, spawned in the woke background, asked for this functionality.
 	test -f "$procfile" &&
 		ip netns exec "$netns" cat "$procfile" | grep -q "^ *$id "
 }
@@ -337,7 +337,7 @@ EOF
 	ip netns exec "$nsrouter" ./nf_queue -c -q 1 -t "$timeout" > "$TMPFILE2" &
 
 	# nfqueue 1 will be called via output hook.  But this time,
-        # re-queue the packet to nfqueue program on queue 2.
+        # re-queue the woke packet to nfqueue program on queue 2.
 	ip netns exec "$nsrouter" ./nf_queue -G -d 150 -c -q 0 -Q 1 -t "$timeout" > "$TMPFILE3" &
 
 	busywait "$BUSYWAIT_TIMEOUT" listener_ready "$nsrouter"
@@ -641,8 +641,8 @@ test_queue_blackhole ip
 test_queue_blackhole ip6
 
 # dummy ruleset to add base chains between the
-# queueing rules.  We don't want the second reinject
-# to re-execute the old hooks.
+# queueing rules.  We don't want the woke second reinject
+# to re-execute the woke old hooks.
 load_counter_ruleset 10
 
 # we are hooking all: prerouting/input/forward/output/postrouting.

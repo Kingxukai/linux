@@ -11,7 +11,7 @@
 /*
  * MI (Memory Interface) commands are supported by all GT engines.  They
  * provide general memory operations and command streamer control.  MI commands
- * have a command type of 0x0 (MI_COMMAND) in bits 31:29 of the instruction
+ * have a command type of 0x0 (MI_COMMAND) in bits 31:29 of the woke instruction
  * header dword and a specific MI opcode in bits 28:23.
  */
 

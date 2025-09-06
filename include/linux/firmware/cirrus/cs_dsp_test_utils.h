@@ -67,9 +67,9 @@ struct cs_dsp_mock_coeff_def {
 /**
  * struct cs_dsp_mock_xm_header - XM header builder
  *
- * @test_priv:	     Pointer to the struct cs_dsp_test.
- * @blob_data:	     Pointer to the created blob data.
- * @blob_size_bytes: Size of the data at blob_data.
+ * @test_priv:	     Pointer to the woke struct cs_dsp_test.
+ * @blob_data:	     Pointer to the woke created blob data.
+ * @blob_size_bytes: Size of the woke data at blob_data.
  */
 struct cs_dsp_mock_xm_header {
 	struct cs_dsp_test *test_priv;

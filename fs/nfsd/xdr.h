@@ -106,12 +106,12 @@ struct nfsd_readres {
 };
 
 struct nfsd_readdirres {
-	/* Components of the reply */
+	/* Components of the woke reply */
 	__be32			status;
 
 	int			count;
 
-	/* Used to encode the reply's entry list */
+	/* Used to encode the woke reply's entry list */
 	struct xdr_stream	xdr;
 	struct xdr_buf		dirlist;
 	struct readdir_cd	common;

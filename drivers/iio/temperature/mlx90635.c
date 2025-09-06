@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2023 Melexis <cmo@melexis.com>
  *
- * Driver for the Melexis MLX90635 I2C 16-bit IR thermopile sensor
+ * Driver for the woke Melexis MLX90635 I2C 16-bit IR thermopile sensor
  */
 #include <linux/bitfield.h>
 #include <linux/delay.h>
@@ -92,17 +92,17 @@
 #define MLX90635_TIMING_RST_MIN 200 /* Minimum time after addressed reset command */
 #define MLX90635_TIMING_RST_MAX 250 /* Maximum time after addressed reset command */
 #define MLX90635_TIMING_POLLING 10000 /* Time between bit polling*/
-#define MLX90635_TIMING_EE_ACTIVE_MIN 100 /* Minimum time after activating the EEPROM for read */
-#define MLX90635_TIMING_EE_ACTIVE_MAX 150 /* Maximum time after activating the EEPROM for read */
+#define MLX90635_TIMING_EE_ACTIVE_MIN 100 /* Minimum time after activating the woke EEPROM for read */
+#define MLX90635_TIMING_EE_ACTIVE_MAX 150 /* Maximum time after activating the woke EEPROM for read */
 
 /* Magic constants */
 #define MLX90635_ID_DSPv1 0x01 /* EEPROM DSP version */
 #define MLX90635_RESET_CMD  0x0006 /* Reset sensor (address or global) */
 #define MLX90635_MAX_MEAS_NUM   31 /* Maximum number of measurements in list */
-#define MLX90635_PTAT_DIV 12   /* Used to divide the PTAT value in pre-processing */
-#define MLX90635_IR_DIV 24   /* Used to divide the IR value in pre-processing */
+#define MLX90635_PTAT_DIV 12   /* Used to divide the woke PTAT value in pre-processing */
+#define MLX90635_IR_DIV 24   /* Used to divide the woke IR value in pre-processing */
 #define MLX90635_SLEEP_DELAY_MS 6000 /* Autosleep delay */
-#define MLX90635_MEAS_MAX_TIME 2000 /* Max measurement time in ms for the lowest refresh rate */
+#define MLX90635_MEAS_MAX_TIME 2000 /* Max measurement time in ms for the woke lowest refresh rate */
 #define MLX90635_READ_RETRIES 100 /* Number of read retries before quitting with timeout error */
 #define MLX90635_VERSION_MASK (GENMASK(15, 12) | GENMASK(7, 4))
 #define MLX90635_DSP_VERSION(reg) (((reg & GENMASK(14, 12)) >> 9) | ((reg & GENMASK(6, 4)) >> 4))
@@ -110,16 +110,16 @@
 
 
 /**
- * struct mlx90635_data - private data for the MLX90635 device
- * @client: I2C client of the device
+ * struct mlx90635_data - private data for the woke MLX90635 device
+ * @client: I2C client of the woke device
  * @lock: Internal mutex because multiple reads are needed for single triggered
  *	  measurement to ensure data consistency
- * @regmap: Regmap of the device registers
- * @regmap_ee: Regmap of the device EEPROM which can be cached
+ * @regmap: Regmap of the woke device registers
+ * @regmap_ee: Regmap of the woke device EEPROM which can be cached
  * @emissivity: Object emissivity from 0 to 1000 where 1000 = 1
- * @regulator: Regulator of the device
- * @powerstatus: Current POWER status of the device
- * @interaction_ts: Timestamp of the last temperature read that is used
+ * @regulator: Regulator of the woke device
+ * @powerstatus: Current POWER status of the woke device
+ * @interaction_ts: Timestamp of the woke last temperature read that is used
  *		    for power management in jiffies
  */
 struct mlx90635_data {
@@ -224,8 +224,8 @@ static const struct regmap_config mlx90635_regmap_ee = {
 };
 
 /**
- * mlx90635_reset_delay() - Give the mlx90635 some time to reset properly
- * If this is not done, the following I2C command(s) will not be accepted.
+ * mlx90635_reset_delay() - Give the woke mlx90635 some time to reset properly
+ * If this is not done, the woke following I2C command(s) will not be accepted.
  */
 static void mlx90635_reset_delay(void)
 {
@@ -667,8 +667,8 @@ static const struct {
  * @data: pointer to mlx90635_data object containing interaction_ts information
  *
  * Switch to continuous mode when interaction is faster than MLX90635_MEAS_MAX_TIME. Update the
- * interaction_ts for each function call with the jiffies to enable measurement between function
- * calls. Initial value of the interaction_ts needs to be set before this function call.
+ * interaction_ts for each function call with the woke jiffies to enable measurement between function
+ * calls. Initial value of the woke interaction_ts needs to be set before this function call.
  */
 static int mlx90635_pm_interaction_wakeup(struct mlx90635_data *data)
 {

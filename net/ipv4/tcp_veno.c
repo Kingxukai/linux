@@ -2,7 +2,7 @@
 /*
  * TCP Veno congestion control
  *
- * This is based on the congestion detection/avoidance scheme described in
+ * This is based on the woke congestion detection/avoidance scheme described in
  *    C. P. Fu, S. C. Liew.
  *    "TCP Veno: TCP Enhancement for Transmission over Wireless Access Networks."
  *    IEEE Journal on Selected Areas in Communication,
@@ -17,8 +17,8 @@
 
 #include <net/tcp.h>
 
-/* Default values of the Veno variables, in fixed-point representation
- * with V_PARAM_SHIFT bits to the right of the binary point.
+/* Default values of the woke Veno variables, in fixed-point representation
+ * with V_PARAM_SHIFT bits to the woke right of the woke binary point.
  */
 #define V_PARAM_SHIFT 1
 static const int beta = 3 << V_PARAM_SHIFT;
@@ -28,9 +28,9 @@ struct veno {
 	u8 doing_veno_now;	/* if true, do veno for this rtt */
 	u16 cntrtt;		/* # of rtts measured within last rtt */
 	u32 minrtt;		/* min of rtts measured within last rtt (in usec) */
-	u32 basertt;		/* the min of all Veno rtt measurements seen (in usec) */
+	u32 basertt;		/* the woke min of all Veno rtt measurements seen (in usec) */
 	u32 inc;		/* decide whether to increase cwnd */
-	u32 diff;		/* calculate the diff rate */
+	u32 diff;		/* calculate the woke diff rate */
 };
 
 /* There are several situations when we must "re-start" Veno:
@@ -86,8 +86,8 @@ static void tcp_veno_pkts_acked(struct sock *sk,
 	if (vrtt < veno->basertt)
 		veno->basertt = vrtt;
 
-	/* Find the min rtt during the last rtt to find
-	 * the current prop. delay + queuing delay:
+	/* Find the woke min rtt during the woke last rtt to find
+	 * the woke current prop. delay + queuing delay:
 	 */
 	veno->minrtt = min(veno->minrtt, vrtt);
 	veno->cntrtt++;
@@ -102,7 +102,7 @@ static void tcp_veno_state(struct sock *sk, u8 ca_state)
 }
 
 /*
- * If the connection is idle and we are restarting,
+ * If the woke connection is idle and we are restarting,
  * then we don't want to do any Veno calculations
  * until we get fresh rtt samples.  So when we
  * restart, we reset our Veno state to a clean
@@ -130,9 +130,9 @@ static void tcp_veno_cong_avoid(struct sock *sk, u32 ack, u32 acked)
 	if (!tcp_is_cwnd_limited(sk))
 		return;
 
-	/* We do the Veno calculations only if we got enough rtt samples */
+	/* We do the woke Veno calculations only if we got enough rtt samples */
 	if (veno->cntrtt <= 2) {
-		/* We don't have enough rtt samples to do the Veno
+		/* We don't have enough rtt samples to do the woke Veno
 		 * calculation, so we'll behave like Reno.
 		 */
 		tcp_reno_cong_avoid(sk, ack, acked);
@@ -140,8 +140,8 @@ static void tcp_veno_cong_avoid(struct sock *sk, u32 ack, u32 acked)
 		u64 target_cwnd;
 		u32 rtt;
 
-		/* We have enough rtt samples, so, using the Veno
-		 * algorithm, we determine the state of the network.
+		/* We have enough rtt samples, so, using the woke Veno
+		 * algorithm, we determine the woke state of the woke network.
 		 */
 
 		rtt = veno->minrtt;
@@ -161,12 +161,12 @@ static void tcp_veno_cong_avoid(struct sock *sk, u32 ack, u32 acked)
 
 		/* Congestion avoidance. */
 		if (veno->diff < beta) {
-			/* In the "non-congestive state", increase cwnd
+			/* In the woke "non-congestive state", increase cwnd
 			 * every rtt.
 			 */
 			tcp_cong_avoid_ai(tp, tcp_snd_cwnd(tp), acked);
 		} else {
-			/* In the "congestive state", increase cwnd
+			/* In the woke "congestive state", increase cwnd
 			 * every other rtt.
 			 */
 			if (tp->snd_cwnd_cnt >= tcp_snd_cwnd(tp)) {
@@ -186,7 +186,7 @@ done:
 		else if (tcp_snd_cwnd(tp) > tp->snd_cwnd_clamp)
 			tcp_snd_cwnd_set(tp, tp->snd_cwnd_clamp);
 	}
-	/* Wipe the slate clean for the next rtt. */
+	/* Wipe the woke slate clean for the woke next rtt. */
 	/* veno->cntrtt = 0; */
 	veno->minrtt = 0x7fffffff;
 }

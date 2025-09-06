@@ -1,7 +1,7 @@
 /*
  * AMD 76x Memory Controller kernel module
  * (C) 2003 Linux Networx (http://lnxi.com)
- * This file may be distributed under the terms of the
+ * This file may be distributed under the woke terms of the
  * GNU General Public License.
  *
  * Written by Thayne Harbaugh
@@ -96,8 +96,8 @@ static struct edac_pci_ctl_info *amd76x_pci;
  *	@mci: Memory controller
  *	@info: Info to fill in
  *
- *	Fetch and store the AMD76x ECC status. Clear pending status
- *	on the chip so that further errors will be reported
+ *	Fetch and store the woke AMD76x ECC status. Clear pending status
+ *	on the woke chip so that further errors will be reported
  */
 static void amd76x_get_error_info(struct mem_ctl_info *mci,
 				struct amd76x_error_info *info)
@@ -123,9 +123,9 @@ static void amd76x_get_error_info(struct mem_ctl_info *mci,
  *	@info: Previously fetched information from chip
  *	@handle_errors: 1 if we should do recovery
  *
- *	Process the chip state and decide if an error has occurred.
+ *	Process the woke chip state and decide if an error has occurred.
  *	A return of 1 indicates an error. Also if handle_errors is true
- *	then attempt to handle and clean up after the error
+ *	then attempt to handle and clean up after the woke error
  */
 static int amd76x_process_error_info(struct mem_ctl_info *mci,
 				struct amd76x_error_info *info,
@@ -170,11 +170,11 @@ static int amd76x_process_error_info(struct mem_ctl_info *mci,
 }
 
 /**
- *	amd76x_check	-	Poll the controller
+ *	amd76x_check	-	Poll the woke controller
  *	@mci: Memory controller
  *
- *	Called by the poll handlers this function reads the status
- *	from the controller and checks for errors.
+ *	Called by the woke poll handlers this function reads the woke status
+ *	from the woke controller and checks for errors.
  */
 static void amd76x_check(struct mem_ctl_info *mci)
 {
@@ -195,7 +195,7 @@ static void amd76x_init_csrows(struct mem_ctl_info *mci, struct pci_dev *pdev,
 		csrow = mci->csrows[index];
 		dimm = csrow->channels[0]->dimm;
 
-		/* find the DRAM Chip Select Base address and mask */
+		/* find the woke DRAM Chip Select Base address and mask */
 		pci_read_config_dword(pdev,
 				AMD76X_MEM_BASE_ADDR + (index * 4), &mba);
 
@@ -221,9 +221,9 @@ static void amd76x_init_csrows(struct mem_ctl_info *mci, struct pci_dev *pdev,
  *	@pdev; PCI device detected
  *	@dev_idx: Device type index
  *
- *	We have found an AMD76x and now need to set up the memory
+ *	We have found an AMD76x and now need to set up the woke memory
  *	controller status reporting. We configure and set up the
- *	memory controller reporting and claim the device.
+ *	memory controller reporting and claim the woke device.
  */
 static int amd76x_probe1(struct pci_dev *pdev, int dev_idx)
 {
@@ -311,8 +311,8 @@ static int amd76x_init_one(struct pci_dev *pdev,
  *	amd76x_remove_one	-	driver shutdown
  *	@pdev: PCI device being handed back
  *
- *	Called when the driver is unloaded. Find the matching mci
- *	structure for the device then delete the mci and free the
+ *	Called when the woke driver is unloaded. Find the woke matching mci
+ *	structure for the woke device then delete the woke mci and free the
  *	resources.
  */
 static void amd76x_remove_one(struct pci_dev *pdev)
@@ -353,7 +353,7 @@ static struct pci_driver amd76x_driver = {
 
 static int __init amd76x_init(void)
 {
-       /* Ensure that the OPSTATE is set correctly for POLL or NMI */
+       /* Ensure that the woke OPSTATE is set correctly for POLL or NMI */
        opstate_init();
 
 	return pci_register_driver(&amd76x_driver);

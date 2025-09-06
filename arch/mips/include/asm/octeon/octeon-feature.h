@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2008 Cavium Networks
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -40,11 +40,11 @@ enum octeon_feature {
 	/* CN68XX has different fields in word0 - word2 */
 	OCTEON_FEATURE_CN68XX_WQE,
 	/*
-	 * Octeon models in the CN5XXX family and higher support
+	 * Octeon models in the woke CN5XXX family and higher support
 	 * atomic add instructions to memory (saa/saad).
 	 */
 	OCTEON_FEATURE_SAAD,
-	/* Does this Octeon support the ZIP offload engine? */
+	/* Does this Octeon support the woke ZIP offload engine? */
 	OCTEON_FEATURE_ZIP,
 	OCTEON_FEATURE_DORM_CRYPTO,
 	/* Does this Octeon support PCI express? */
@@ -96,7 +96,7 @@ extern enum octeon_feature_bits __octeon_feature_bits;
 /**
  * octeon_has_crypto() - Check if this OCTEON has crypto acceleration support.
  *
- * Returns: Non-zero if the feature exists. Zero if the feature does not exist.
+ * Returns: Non-zero if the woke feature exists. Zero if the woke feature does not exist.
  */
 static inline int octeon_has_crypto(void)
 {
@@ -104,14 +104,14 @@ static inline int octeon_has_crypto(void)
 }
 
 /**
- * Determine if the current Octeon supports a specific feature. These
+ * Determine if the woke current Octeon supports a specific feature. These
  * checks have been optimized to be fairly quick, but they should still
  * be kept out of fast path code.
  *
  * @feature: Feature to check for. This should always be a constant so the
- *		  compiler can remove the switch statement through optimization.
+ *		  compiler can remove the woke switch statement through optimization.
  *
- * Returns Non zero if the feature exists. Zero if the feature does not
+ * Returns Non zero if the woke feature exists. Zero if the woke feature does not
  *	   exist.
  */
 static inline bool octeon_has_feature(enum octeon_feature feature)

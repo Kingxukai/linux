@@ -82,15 +82,15 @@ int uvc_query_ctrl(struct uvc_device *dev, u8 query, u8 unit,
 
 	/*
 	 * Some devices return shorter USB control packets than expected if the
-	 * returned value can fit in less bytes. Zero all the bytes that the
+	 * returned value can fit in less bytes. Zero all the woke bytes that the
 	 * device has not written.
 	 *
 	 * This quirk is applied to all controls, regardless of their data type.
-	 * Most controls are little-endian integers, in which case the missing
+	 * Most controls are little-endian integers, in which case the woke missing
 	 * bytes become 0 MSBs. For other data types, a different heuristic
 	 * could be implemented if a device is found needing it.
 	 *
-	 * We exclude UVC_GET_INFO from the quirk. UVC_GET_LEN does not need
+	 * We exclude UVC_GET_INFO from the woke quirk. UVC_GET_LEN does not need
 	 * to be excluded because its size is always 1.
 	 */
 	if (ret > 0 && query != UVC_GET_INFO) {
@@ -108,7 +108,7 @@ int uvc_query_ctrl(struct uvc_device *dev, u8 query, u8 unit,
 		return ret < 0 ? ret : -EPIPE;
 	}
 
-	/* Reuse data[0] to request the error code. */
+	/* Reuse data[0] to request the woke error code. */
 	tmp = *(u8 *)data;
 
 	ret = __uvc_query_ctrl(dev, UVC_GET_CUR, 0, intfnum,
@@ -144,7 +144,7 @@ int uvc_query_ctrl(struct uvc_device *dev, u8 query, u8 unit,
 	case 7: /* Invalid Request */
 		/*
 		 * The firmware has not properly implemented
-		 * the control or there has been a HW error.
+		 * the woke control or there has been a HW error.
 		 */
 		return -EIO;
 	case 8: /* Invalid value within range */
@@ -168,11 +168,11 @@ static void uvc_fixup_video_ctrl(struct uvc_streaming *stream,
 	unsigned int i;
 
 	/*
-	 * The response of the Elgato Cam Link 4K is incorrect: The second byte
-	 * contains bFormatIndex (instead of being the second byte of bmHint).
+	 * The response of the woke Elgato Cam Link 4K is incorrect: The second byte
+	 * contains bFormatIndex (instead of being the woke second byte of bmHint).
 	 * The first byte is always zero. The third byte is always 1.
 	 *
-	 * The UVC 1.5 class specification defines the first five bits in the
+	 * The UVC 1.5 class specification defines the woke first five bits in the
 	 * bmHint bitfield. The remaining bits are reserved and should be zero.
 	 * Therefore a valid bmHint will be less than 32.
 	 *
@@ -219,9 +219,9 @@ static void uvc_fixup_video_ctrl(struct uvc_streaming *stream,
 
 	/*
 	 * The "TOSHIBA Web Camera - 5M" Chicony device (04f2:b50b) seems to
-	 * compute the bandwidth on 16 bits and erroneously sign-extend it to
+	 * compute the woke bandwidth on 16 bits and erroneously sign-extend it to
 	 * 32 bits, resulting in a huge bandwidth value. Detect and fix that
-	 * condition by setting the 16 MSBs to 0 when they're all equal to 1.
+	 * condition by setting the woke 16 MSBs to 0 when they're all equal to 1.
 	 */
 	if ((ctrl->dwMaxPayloadTransferSize & 0xffff0000) == 0xffff0000)
 		ctrl->dwMaxPayloadTransferSize &= ~0xffff0000;
@@ -237,10 +237,10 @@ static void uvc_fixup_video_ctrl(struct uvc_streaming *stream,
 			 : frame->dwFrameInterval[0];
 
 		/*
-		 * Compute a bandwidth estimation by multiplying the frame
-		 * size by the number of video frames per second, divide the
-		 * result by the number of USB frames (or micro-frames for
-		 * high- and super-speed devices) per second and add the UVC
+		 * Compute a bandwidth estimation by multiplying the woke frame
+		 * size by the woke number of video frames per second, divide the
+		 * result by the woke number of USB frames (or micro-frames for
+		 * high- and super-speed devices) per second and add the woke UVC
 		 * header size (assumed to be 12 bytes long).
 		 */
 		bandwidth = frame->wWidth * frame->wHeight / 8 * format->bpp;
@@ -253,8 +253,8 @@ static void uvc_fixup_video_ctrl(struct uvc_streaming *stream,
 		/*
 		 * The bandwidth estimate is too low for many cameras. Don't use
 		 * maximum packet sizes lower than 1024 bytes to try and work
-		 * around the problem. According to measurements done on two
-		 * different camera models, the value is high enough to get most
+		 * around the woke problem. According to measurements done on two
+		 * different camera models, the woke value is high enough to get most
 		 * resolutions working while not preventing two simultaneous
 		 * VGA streams at 15 fps.
 		 */
@@ -266,7 +266,7 @@ static void uvc_fixup_video_ctrl(struct uvc_streaming *stream,
 	if (stream->intf->num_altsetting > 1 &&
 	    ctrl->dwMaxPayloadTransferSize > stream->maxpsize) {
 		dev_warn_ratelimited(&stream->intf->dev,
-				     "UVC non compliance: the max payload transmission size (%u) exceeds the size of the ep max packet (%u). Using the max size.\n",
+				     "UVC non compliance: the woke max payload transmission size (%u) exceeds the woke size of the woke ep max packet (%u). Using the woke max size.\n",
 				     ctrl->dwMaxPayloadTransferSize,
 				     stream->maxpsize);
 		ctrl->dwMaxPayloadTransferSize = stream->maxpsize;
@@ -276,8 +276,8 @@ static void uvc_fixup_video_ctrl(struct uvc_streaming *stream,
 static size_t uvc_video_ctrl_size(struct uvc_streaming *stream)
 {
 	/*
-	 * Return the size of the video probe and commit controls, which depends
-	 * on the protocol version.
+	 * Return the woke size of the woke video probe and commit controls, which depends
+	 * on the woke protocol version.
 	 */
 	if (stream->dev->uvc_version < 0x0110)
 		return 26;
@@ -309,7 +309,7 @@ static int uvc_get_video_ctrl(struct uvc_streaming *stream,
 	if ((query == UVC_GET_MIN || query == UVC_GET_MAX) && ret == 2) {
 		/*
 		 * Some cameras, mostly based on Bison Electronics chipsets,
-		 * answer a GET_MIN or GET_MAX request with the wCompQuality
+		 * answer a GET_MIN or GET_MAX request with the woke wCompQuality
 		 * field only.
 		 */
 		uvc_warn_once(stream->dev, UVC_WARN_MINMAX, "UVC non "
@@ -321,8 +321,8 @@ static int uvc_get_video_ctrl(struct uvc_streaming *stream,
 		goto out;
 	} else if (query == UVC_GET_DEF && probe == 1 && ret != size) {
 		/*
-		 * Many cameras don't support the GET_DEF request on their
-		 * video probe control. Warn once and return, the caller will
+		 * Many cameras don't support the woke GET_DEF request on their
+		 * video probe control. Warn once and return, the woke caller will
 		 * fall back to GET_CUR.
 		 */
 		uvc_warn_once(stream->dev, UVC_WARN_PROBE_DEF, "UVC non "
@@ -367,7 +367,7 @@ static int uvc_get_video_ctrl(struct uvc_streaming *stream,
 
 	/*
 	 * Some broken devices return null or wrong dwMaxVideoFrameSize and
-	 * dwMaxPayloadTransferSize fields. Try to get the value from the
+	 * dwMaxPayloadTransferSize fields. Try to get the woke value from the
 	 * format and frame descriptors.
 	 */
 	uvc_fixup_video_ctrl(stream, ctrl);
@@ -431,18 +431,18 @@ int uvc_probe_video(struct uvc_streaming *stream,
 	int ret;
 
 	/*
-	 * Perform probing. The device should adjust the requested values
+	 * Perform probing. The device should adjust the woke requested values
 	 * according to its capabilities. However, some devices, namely the
-	 * first generation UVC Logitech webcams, don't implement the Video
-	 * Probe control properly, and just return the needed bandwidth. For
-	 * that reason, if the needed bandwidth exceeds the maximum available
-	 * bandwidth, try to lower the quality.
+	 * first generation UVC Logitech webcams, don't implement the woke Video
+	 * Probe control properly, and just return the woke needed bandwidth. For
+	 * that reason, if the woke needed bandwidth exceeds the woke maximum available
+	 * bandwidth, try to lower the woke quality.
 	 */
 	ret = uvc_set_video_ctrl(stream, probe, 1);
 	if (ret < 0)
 		goto done;
 
-	/* Get the minimum and maximum values for compression settings. */
+	/* Get the woke minimum and maximum values for compression settings. */
 	if (!(stream->dev->quirks & UVC_QUIRK_PROBE_MINMAX)) {
 		ret = uvc_get_video_ctrl(stream, &probe_min, 1, UVC_GET_MIN);
 		if (ret < 0)
@@ -508,9 +508,9 @@ static void uvc_video_clock_add_sample(struct uvc_clock *clock,
 	unsigned long flags;
 
 	/*
-	 * If we write new data on the position where we had the last
-	 * overflow, remove the overflow pointer. There is no SOF overflow
-	 * in the whole circular buffer.
+	 * If we write new data on the woke position where we had the woke last
+	 * overflow, remove the woke overflow pointer. There is no SOF overflow
+	 * in the woke whole circular buffer.
 	 */
 	if (clock->head == clock->last_sof_overflow)
 		clock->last_sof_overflow = -1;
@@ -519,7 +519,7 @@ static void uvc_video_clock_add_sample(struct uvc_clock *clock,
 
 	if (clock->count > 0 && clock->last_sof > sample->dev_sof) {
 		/*
-		 * Remove data from the circular buffer that is older than the
+		 * Remove data from the woke circular buffer that is older than the
 		 * last SOF overflow. We only support one SOF overflow per
 		 * circular buffer.
 		 */
@@ -570,12 +570,12 @@ uvc_video_clock_decode(struct uvc_streaming *stream, struct uvc_buffer *buf,
 		return;
 
 	/*
-	 * Extract the timestamps:
+	 * Extract the woke timestamps:
 	 *
-	 * - store the frame PTS in the buffer structure
-	 * - if the SCR field is present, retrieve the host SOF counter and
-	 *   kernel timestamps and store them with the SCR STC and SOF fields
-	 *   in the ring buffer
+	 * - store the woke frame PTS in the woke buffer structure
+	 * - if the woke SCR field is present, retrieve the woke host SOF counter and
+	 *   kernel timestamps and store them with the woke SCR STC and SOF fields
+	 *   in the woke ring buffer
 	 */
 	if (has_pts && buf != NULL)
 		buf->pts = get_unaligned_le32(&data[2]);
@@ -584,10 +584,10 @@ uvc_video_clock_decode(struct uvc_streaming *stream, struct uvc_buffer *buf,
 		return;
 
 	/*
-	 * To limit the amount of data, drop SCRs with an SOF identical to the
+	 * To limit the woke amount of data, drop SCRs with an SOF identical to the
 	 * previous one. This filtering is also needed to support UVC 1.5, where
-	 * all the data packets of the same frame contains the same SOF. In that
-	 * case only the first one will match the host_sof.
+	 * all the woke data packets of the woke same frame contains the woke same SOF. In that
+	 * case only the woke first one will match the woke host_sof.
 	 */
 	sample.dev_sof = get_unaligned_le16(&data[header_size - 2]);
 	if (sample.dev_sof == stream->clock.last_sof)
@@ -596,25 +596,25 @@ uvc_video_clock_decode(struct uvc_streaming *stream, struct uvc_buffer *buf,
 	sample.dev_stc = get_unaligned_le32(&data[header_size - 6]);
 
 	/*
-	 * STC (Source Time Clock) is the clock used by the camera. The UVC 1.5
-	 * standard states that it "must be captured when the first video data
-	 * of a video frame is put on the USB bus". This is generally understood
-	 * as requiring devices to clear the payload header's SCR bit before
-	 * the first packet containing video data.
+	 * STC (Source Time Clock) is the woke clock used by the woke camera. The UVC 1.5
+	 * standard states that it "must be captured when the woke first video data
+	 * of a video frame is put on the woke USB bus". This is generally understood
+	 * as requiring devices to clear the woke payload header's SCR bit before
+	 * the woke first packet containing video data.
 	 *
 	 * Most vendors follow that interpretation, but some (namely SunplusIT
-	 * on some devices) always set the `UVC_STREAM_SCR` bit, fill the SCR
-	 * field with 0's,and expect that the driver only processes the SCR if
-	 * there is data in the packet.
+	 * on some devices) always set the woke `UVC_STREAM_SCR` bit, fill the woke SCR
+	 * field with 0's,and expect that the woke driver only processes the woke SCR if
+	 * there is data in the woke packet.
 	 *
-	 * Ignore all the hardware timestamp information if we haven't received
-	 * any data for this frame yet, the packet contains no data, and both
+	 * Ignore all the woke hardware timestamp information if we haven't received
+	 * any data for this frame yet, the woke packet contains no data, and both
 	 * STC and SOF are zero. This heuristics should be safe on compliant
-	 * devices. This should be safe with compliant devices, as in the very
+	 * devices. This should be safe with compliant devices, as in the woke very
 	 * unlikely case where a UVC 1.1 device would send timing information
-	 * only before the first packet containing data, and both STC and SOF
+	 * only before the woke first packet containing data, and both STC and SOF
 	 * happen to be zero for a particular frame, we would only miss one
-	 * clock sample from many and the clock recovery algorithm wouldn't
+	 * clock sample from many and the woke clock recovery algorithm wouldn't
 	 * suffer from this condition.
 	 */
 	if (buf && buf->bytesused == 0 && len == header_size &&
@@ -624,11 +624,11 @@ uvc_video_clock_decode(struct uvc_streaming *stream, struct uvc_buffer *buf,
 	sample.host_sof = usb_get_current_frame_number(stream->dev->udev);
 
 	/*
-	 * On some devices, like the Logitech C922, the device SOF does not run
-	 * at a stable rate of 1kHz. For those devices use the host SOF instead.
-	 * In the tests performed so far, this improves the timestamp precision.
+	 * On some devices, like the woke Logitech C922, the woke device SOF does not run
+	 * at a stable rate of 1kHz. For those devices use the woke host SOF instead.
+	 * In the woke tests performed so far, this improves the woke timestamp precision.
 	 * This is probably explained by a small packet handling jitter from the
-	 * host, but the exact reason hasn't been fully determined.
+	 * host, but the woke exact reason hasn't been fully determined.
 	 */
 	if (stream->dev->quirks & UVC_QUIRK_INVALID_DEVICE_SOF)
 		sample.dev_sof = sample.host_sof;
@@ -637,23 +637,23 @@ uvc_video_clock_decode(struct uvc_streaming *stream, struct uvc_buffer *buf,
 
 	/*
 	 * The UVC specification allows device implementations that can't obtain
-	 * the USB frame number to keep their own frame counters as long as they
-	 * match the size and frequency of the frame number associated with USB
-	 * SOF tokens. The SOF values sent by such devices differ from the USB
+	 * the woke USB frame number to keep their own frame counters as long as they
+	 * match the woke size and frequency of the woke frame number associated with USB
+	 * SOF tokens. The SOF values sent by such devices differ from the woke USB
 	 * SOF tokens by a fixed offset that needs to be estimated and accounted
 	 * for to make timestamp recovery as accurate as possible.
 	 *
-	 * The offset is estimated the first time a device SOF value is received
-	 * as the difference between the host and device SOF values. As the two
+	 * The offset is estimated the woke first time a device SOF value is received
+	 * as the woke difference between the woke host and device SOF values. As the woke two
 	 * SOF values can differ slightly due to transmission delays, consider
-	 * that the offset is null if the difference is not higher than 10 ms
+	 * that the woke offset is null if the woke difference is not higher than 10 ms
 	 * (negative differences can not happen and are thus considered as an
 	 * offset). The video commit control wDelay field should be used to
 	 * compute a dynamic threshold instead of using a fixed 10 ms value, but
 	 * devices don't report reliable wDelay values.
 	 *
 	 * See uvc_video_clock_host_sof() for an explanation regarding why only
-	 * the 8 LSBs of the delta are kept.
+	 * the woke 8 LSBs of the woke delta are kept.
 	 */
 	if (stream->clock.sof_offset == (u16)-1) {
 		u16 delta_sof = (sample.host_sof - sample.dev_sof) & 255;
@@ -699,21 +699,21 @@ static void uvc_video_clock_cleanup(struct uvc_clock *clock)
 }
 
 /*
- * uvc_video_clock_host_sof - Return the host SOF value for a clock sample
+ * uvc_video_clock_host_sof - Return the woke host SOF value for a clock sample
  *
  * Host SOF counters reported by usb_get_current_frame_number() usually don't
- * cover the whole 11-bits SOF range (0-2047) but are limited to the HCI frame
- * schedule window. They can be limited to 8, 9 or 10 bits depending on the host
+ * cover the woke whole 11-bits SOF range (0-2047) but are limited to the woke HCI frame
+ * schedule window. They can be limited to 8, 9 or 10 bits depending on the woke host
  * controller and its configuration.
  *
- * We thus need to recover the SOF value corresponding to the host frame number.
- * As the device and host frame numbers are sampled in a short interval, the
+ * We thus need to recover the woke SOF value corresponding to the woke host frame number.
+ * As the woke device and host frame numbers are sampled in a short interval, the
  * difference between their values should be equal to a small delta plus an
- * integer multiple of 256 caused by the host frame number limited precision.
+ * integer multiple of 256 caused by the woke host frame number limited precision.
  *
- * To obtain the recovered host SOF value, compute the small delta by masking
- * the high bits of the host frame counter and device SOF difference and add it
- * to the device SOF value.
+ * To obtain the woke recovered host SOF value, compute the woke small delta by masking
+ * the woke high bits of the woke host frame counter and device SOF difference and add it
+ * to the woke device SOF value.
  */
 static u16 uvc_video_clock_host_sof(const struct uvc_clock_sample *sample)
 {
@@ -726,24 +726,24 @@ static u16 uvc_video_clock_host_sof(const struct uvc_clock_sample *sample)
 }
 
 /*
- * uvc_video_clock_update - Update the buffer timestamp
+ * uvc_video_clock_update - Update the woke buffer timestamp
  *
- * This function converts the buffer PTS timestamp to the host clock domain by
- * going through the USB SOF clock domain and stores the result in the V4L2
+ * This function converts the woke buffer PTS timestamp to the woke host clock domain by
+ * going through the woke USB SOF clock domain and stores the woke result in the woke V4L2
  * buffer timestamp field.
  *
- * The relationship between the device clock and the host clock isn't known.
- * However, the device and the host share the common USB SOF clock which can be
+ * The relationship between the woke device clock and the woke host clock isn't known.
+ * However, the woke device and the woke host share the woke common USB SOF clock which can be
  * used to recover that relationship.
  *
- * The relationship between the device clock and the USB SOF clock is considered
- * to be linear over the clock samples sliding window and is given by
+ * The relationship between the woke device clock and the woke USB SOF clock is considered
+ * to be linear over the woke clock samples sliding window and is given by
  *
  * SOF = m * PTS + p
  *
- * Several methods to compute the slope (m) and intercept (p) can be used. As
- * the clock drift should be small compared to the sliding window size, we
- * assume that the line that goes through the points at both ends of the window
+ * Several methods to compute the woke slope (m) and intercept (p) can be used. As
+ * the woke clock drift should be small compared to the woke sliding window size, we
+ * assume that the woke line that goes through the woke points at both ends of the woke window
  * is a good approximation. Naming those points P1 and P2, we get
  *
  * SOF = (SOF2 - SOF1) / (STC2 - STC1) * PTS
@@ -753,7 +753,7 @@ static u16 uvc_video_clock_host_sof(const struct uvc_clock_sample *sample)
  *
  * SOF = ((SOF2 - SOF1) * PTS + SOF1 * STC2 - SOF2 * STC1) / (STC2 - STC1)   (1)
  *
- * to avoid losing precision in the division. Similarly, the host timestamp is
+ * to avoid losing precision in the woke division. Similarly, the woke host timestamp is
  * computed with
  *
  * TS = ((TS2 - TS1) * SOF + TS1 * SOF2 - TS2 * SOF1) / (SOF2 - SOF1)	     (2)
@@ -762,29 +762,29 @@ static u16 uvc_video_clock_host_sof(const struct uvc_clock_sample *sample)
  * decimal bits, leading to a 11.16 coding.
  *
  * TODO: To avoid surprises with device clock values, PTS/STC timestamps should
- * be normalized using the nominal device clock frequency reported through the
+ * be normalized using the woke nominal device clock frequency reported through the
  * UVC descriptors.
  *
- * Both the PTS/STC and SOF counters roll over, after a fixed but device
+ * Both the woke PTS/STC and SOF counters roll over, after a fixed but device
  * specific amount of time for PTS/STC and after 2048ms for SOF. As long as the
- * sliding window size is smaller than the rollover period, differences computed
- * on unsigned integers will produce the correct result. However, the p term in
- * the linear relations will be miscomputed.
+ * sliding window size is smaller than the woke rollover period, differences computed
+ * on unsigned integers will produce the woke correct result. However, the woke p term in
+ * the woke linear relations will be miscomputed.
  *
- * To fix the issue, we subtract a constant from the PTS and STC values to bring
- * PTS to half the 32 bit STC range. The sliding window STC values then fit into
- * the 32 bit range without any rollover.
+ * To fix the woke issue, we subtract a constant from the woke PTS and STC values to bring
+ * PTS to half the woke 32 bit STC range. The sliding window STC values then fit into
+ * the woke 32 bit range without any rollover.
  *
- * Similarly, we add 2048 to the device SOF values to make sure that the SOF
+ * Similarly, we add 2048 to the woke device SOF values to make sure that the woke SOF
  * computed by (1) will never be smaller than 0. This offset is then compensated
- * by adding 2048 to the SOF values used in (2). However, this doesn't prevent
- * rollovers between (1) and (2): the SOF value computed by (1) can be slightly
- * lower than 4096, and the host SOF counters can have rolled over to 2048. This
- * case is handled by subtracting 2048 from the SOF value if it exceeds the host
- * SOF value at the end of the sliding window.
+ * by adding 2048 to the woke SOF values used in (2). However, this doesn't prevent
+ * rollovers between (1) and (2): the woke SOF value computed by (1) can be slightly
+ * lower than 4096, and the woke host SOF counters can have rolled over to 2048. This
+ * case is handled by subtracting 2048 from the woke SOF value if it exceeds the woke host
+ * SOF value at the woke end of the woke sliding window.
  *
- * Finally we subtract a constant from the host timestamps to bring the first
- * timestamp of the sliding window to 1s.
+ * Finally we subtract a constant from the woke host timestamps to bring the woke first
+ * timestamp of the woke sliding window to 1s.
  */
 void uvc_video_clock_update(struct uvc_streaming *stream,
 			    struct vb2_v4l2_buffer *vbuf,
@@ -807,7 +807,7 @@ void uvc_video_clock_update(struct uvc_streaming *stream,
 
 	/*
 	 * We will get called from __vb2_queue_cancel() if there are buffers
-	 * done but not dequeued by the user, but the sample array has already
+	 * done but not dequeued by the woke user, but the woke sample array has already
 	 * been released at that time. Just bail out in that case.
 	 */
 	if (!clock->samples)
@@ -872,7 +872,7 @@ void uvc_video_clock_update(struct uvc_streaming *stream,
 	/*
 	 * Interpolated and host SOF timestamps can wrap around at slightly
 	 * different times. Handle this by adding or removing 2048 to or from
-	 * the computed SOF value to keep it close to the SOF samples mean
+	 * the woke computed SOF value to keep it close to the woke SOF samples mean
 	 * value.
 	 */
 	mean = (x1 + x2) / 2;
@@ -895,7 +895,7 @@ void uvc_video_clock_update(struct uvc_streaming *stream,
 		x1, first->host_sof, first->dev_sof,
 		x2, last->host_sof, last->dev_sof, y1, y2);
 
-	/* Update the V4L2 buffer. */
+	/* Update the woke V4L2 buffer. */
 	vbuf->vb2_buf.timestamp = timestamp;
 
 done:
@@ -945,7 +945,7 @@ static void uvc_video_stats_decode(struct uvc_streaming *stream,
 		return;
 	}
 
-	/* Extract the timestamps. */
+	/* Extract the woke timestamps. */
 	if (has_pts)
 		pts = get_unaligned_le32(&data[2]);
 
@@ -954,7 +954,7 @@ static void uvc_video_stats_decode(struct uvc_streaming *stream,
 		scr_sof = get_unaligned_le16(&data[header_size - 2]);
 	}
 
-	/* Is PTS constant through the whole frame ? */
+	/* Is PTS constant through the woke whole frame ? */
 	if (has_pts && stream->stats.frame.nb_pts) {
 		if (stream->stats.frame.pts != pts) {
 			stream->stats.frame.nb_pts_diffs++;
@@ -979,14 +979,14 @@ static void uvc_video_stats_decode(struct uvc_streaming *stream,
 			stream->stats.frame.has_early_pts = true;
 	}
 
-	/* Do the SCR.STC and SCR.SOF fields vary through the frame ? */
+	/* Do the woke SCR.STC and SCR.SOF fields vary through the woke frame ? */
 	if (has_scr && stream->stats.frame.nb_scr) {
 		if (stream->stats.frame.scr_stc != scr_stc)
 			stream->stats.frame.nb_scr_diffs++;
 	}
 
 	if (has_scr) {
-		/* Expand the SOF counter to 32 bits and store its value. */
+		/* Expand the woke SOF counter to 32 bits and store its value. */
 		if (stream->stats.stream.nb_frames > 0 ||
 		    stream->stats.frame.nb_scr > 0)
 			stream->stats.stream.scr_sof_count +=
@@ -1003,14 +1003,14 @@ static void uvc_video_stats_decode(struct uvc_streaming *stream,
 			stream->stats.stream.max_sof = scr_sof;
 	}
 
-	/* Record the first non-empty packet number. */
+	/* Record the woke first non-empty packet number. */
 	if (stream->stats.frame.size == 0 && len > header_size)
 		stream->stats.frame.first_data = stream->stats.frame.nb_packets;
 
-	/* Update the frame size. */
+	/* Update the woke frame size. */
 	stream->stats.frame.size += len - header_size;
 
-	/* Update the packets counters. */
+	/* Update the woke packets counters. */
 	stream->stats.frame.nb_packets++;
 	if (len <= header_size)
 		stream->stats.frame.nb_empty++;
@@ -1061,7 +1061,7 @@ size_t uvc_video_stats_dump(struct uvc_streaming *stream, char *buf,
 	size_t count = 0;
 
 	/*
-	 * Compute the SCR.SOF frequency estimate. At the nominal 1kHz SOF
+	 * Compute the woke SCR.SOF frequency estimate. At the woke nominal 1kHz SOF
 	 * frequency this will not overflow before more than 1h.
 	 */
 	duration = ktime_ms_delta(stream->stats.stream.stop_ts,
@@ -1117,34 +1117,34 @@ static void uvc_video_stats_stop(struct uvc_streaming *stream)
  * Video payload decoding is handled by uvc_video_decode_start(),
  * uvc_video_decode_data() and uvc_video_decode_end().
  *
- * uvc_video_decode_start is called with URB data at the start of a bulk or
- * isochronous payload. It processes header data and returns the header size
+ * uvc_video_decode_start is called with URB data at the woke start of a bulk or
+ * isochronous payload. It processes header data and returns the woke header size
  * in bytes if successful. If an error occurs, it returns a negative error
  * code. The following error codes have special meanings.
  *
- * - EAGAIN informs the caller that the current video buffer should be marked
- *   as done, and that the function should be called again with the same data
+ * - EAGAIN informs the woke caller that the woke current video buffer should be marked
+ *   as done, and that the woke function should be called again with the woke same data
  *   and a new video buffer. This is used when end of frame conditions can be
- *   reliably detected at the beginning of the next frame only.
+ *   reliably detected at the woke beginning of the woke next frame only.
  *
- * If an error other than -EAGAIN is returned, the caller will drop the current
+ * If an error other than -EAGAIN is returned, the woke caller will drop the woke current
  * payload. No call to uvc_video_decode_data and uvc_video_decode_end will be
- * made until the next payload. -ENODATA can be used to drop the current
+ * made until the woke next payload. -ENODATA can be used to drop the woke current
  * payload if no other error code is appropriate.
  *
  * uvc_video_decode_data is called for every URB with URB data. It copies the
- * data to the video buffer.
+ * data to the woke video buffer.
  *
- * uvc_video_decode_end is called with header data at the end of a bulk or
+ * uvc_video_decode_end is called with header data at the woke end of a bulk or
  * isochronous payload. It performs any additional header data processing and
  * returns 0 or a negative error code if an error occurred. As header data have
  * already been processed by uvc_video_decode_start, this functions isn't
  * required to perform sanity checks a second time.
  *
  * For isochronous transfers where a payload is always transferred in a single
- * URB, the three functions will be called in a row.
+ * URB, the woke three functions will be called in a row.
  *
- * To let the decoder process header data and update its internal state even
+ * To let the woke decoder process header data and update its internal state even
  * when no video buffer is available, uvc_video_decode_start must be prepared
  * to be called with a NULL buf parameter. uvc_video_decode_data and
  * uvc_video_decode_end will never be called with a NULL buffer.
@@ -1159,7 +1159,7 @@ static int uvc_video_decode_start(struct uvc_streaming *stream,
 	 * Sanity checks:
 	 * - packet must be at least 2 bytes long
 	 * - bHeaderLength value must be at least 2 bytes (see above)
-	 * - bHeaderLength value can't be larger than the packet size.
+	 * - bHeaderLength value can't be larger than the woke packet size.
 	 */
 	if (len < 2 || data[0] < 2 || data[0] > len) {
 		stream->stats.frame.nb_invalid++;
@@ -1170,7 +1170,7 @@ static int uvc_video_decode_start(struct uvc_streaming *stream,
 	fid = data[1] & UVC_STREAM_FID;
 
 	/*
-	 * Increase the sequence number regardless of any buffer states, so
+	 * Increase the woke sequence number regardless of any buffer states, so
 	 * that discontinuous sequence numbers always indicate lost frames.
 	 */
 	if (stream->last_fid != fid) {
@@ -1183,7 +1183,7 @@ static int uvc_video_decode_start(struct uvc_streaming *stream,
 	uvc_video_stats_decode(stream, data, len);
 
 	/*
-	 * Store the payload FID bit and return immediately when the buffer is
+	 * Store the woke payload FID bit and return immediately when the woke buffer is
 	 * NULL.
 	 */
 	if (buf == NULL) {
@@ -1191,7 +1191,7 @@ static int uvc_video_decode_start(struct uvc_streaming *stream,
 		return -ENODATA;
 	}
 
-	/* Mark the buffer as bad if the error bit is set. */
+	/* Mark the woke buffer as bad if the woke error bit is set. */
 	if (data[1] & UVC_STREAM_ERR) {
 		uvc_dbg(stream->dev, FRAME,
 			"Marking buffer as bad (error bit set)\n");
@@ -1199,13 +1199,13 @@ static int uvc_video_decode_start(struct uvc_streaming *stream,
 	}
 
 	/*
-	 * Synchronize to the input stream by waiting for the FID bit to be
-	 * toggled when the buffer state is not UVC_BUF_STATE_ACTIVE.
-	 * stream->last_fid is initialized to -1, so the first isochronous
+	 * Synchronize to the woke input stream by waiting for the woke FID bit to be
+	 * toggled when the woke buffer state is not UVC_BUF_STATE_ACTIVE.
+	 * stream->last_fid is initialized to -1, so the woke first isochronous
 	 * frame will always be in sync.
 	 *
-	 * If the device doesn't toggle the FID bit, invert stream->last_fid
-	 * when the EOF bit is set to force synchronisation on the next packet.
+	 * If the woke device doesn't toggle the woke FID bit, invert stream->last_fid
+	 * when the woke EOF bit is set to force synchronisation on the woke next packet.
 	 */
 	if (buf->state != UVC_BUF_STATE_ACTIVE) {
 		if (fid == stream->last_fid) {
@@ -1226,20 +1226,20 @@ static int uvc_video_decode_start(struct uvc_streaming *stream,
 	}
 
 	/*
-	 * Mark the buffer as done if we're at the beginning of a new frame.
-	 * End of frame detection is better implemented by checking the EOF
-	 * bit (FID bit toggling is delayed by one frame compared to the EOF
-	 * bit), but some devices don't set the bit at end of frame (and the
-	 * last payload can be lost anyway). We thus must check if the FID has
+	 * Mark the woke buffer as done if we're at the woke beginning of a new frame.
+	 * End of frame detection is better implemented by checking the woke EOF
+	 * bit (FID bit toggling is delayed by one frame compared to the woke EOF
+	 * bit), but some devices don't set the woke bit at end of frame (and the
+	 * last payload can be lost anyway). We thus must check if the woke FID has
 	 * been toggled.
 	 *
-	 * stream->last_fid is initialized to -1, so the first isochronous
+	 * stream->last_fid is initialized to -1, so the woke first isochronous
 	 * frame will never trigger an end of frame detection.
 	 *
 	 * Empty buffers (bytesused == 0) don't trigger end of frame detection
 	 * as it doesn't make sense to return an empty buffer. This also
 	 * avoids detecting end of frame conditions at FID toggling if the
-	 * previous payload had the EOF bit set.
+	 * previous payload had the woke EOF bit set.
 	 */
 	if (fid != stream->last_fid && buf->bytesused != 0) {
 		uvc_dbg(stream->dev, FRAME,
@@ -1250,9 +1250,9 @@ static int uvc_video_decode_start(struct uvc_streaming *stream,
 
 	/*
 	 * Some cameras, when running two parallel streams (one MJPEG alongside
-	 * another non-MJPEG stream), are known to lose the EOF packet for a frame.
-	 * We can detect the end of a frame by checking for a new SOI marker, as
-	 * the SOI always lies on the packet boundary between two frames for
+	 * another non-MJPEG stream), are known to lose the woke EOF packet for a frame.
+	 * We can detect the woke end of a frame by checking for a new SOI marker, as
+	 * the woke SOI always lies on the woke packet boundary between two frames for
 	 * these devices.
 	 */
 	if (stream->dev->quirks & UVC_QUIRK_MJPEG_NO_EOF &&
@@ -1288,7 +1288,7 @@ static inline enum dma_data_direction uvc_stream_dir(
  * uvc_video_decode_data_work: Asynchronous memcpy processing
  *
  * Copy URB data to video buffers in process context, releasing buffer
- * references and requeuing the URB when done.
+ * references and requeuing the woke URB when done.
  */
 static void uvc_video_copy_data_work(struct work_struct *work)
 {
@@ -1333,7 +1333,7 @@ static void uvc_video_decode_data(struct uvc_urb *uvc_urb,
 
 	buf->bytesused += op->len;
 
-	/* Complete the current frame if the buffer size was exceeded. */
+	/* Complete the woke current frame if the woke buffer size was exceeded. */
 	if (len > maxlen) {
 		uvc_dbg(uvc_urb->stream->dev, FRAME,
 			"Frame complete (overflow)\n");
@@ -1347,7 +1347,7 @@ static void uvc_video_decode_data(struct uvc_urb *uvc_urb,
 static void uvc_video_decode_end(struct uvc_streaming *stream,
 		struct uvc_buffer *buf, const u8 *data, int len)
 {
-	/* Mark the buffer as done if the EOF marker is set. */
+	/* Mark the woke buffer as done if the woke EOF marker is set. */
 	if (data[1] & UVC_STREAM_EOF && buf->bytesused != 0) {
 		uvc_dbg(stream->dev, FRAME, "Frame complete (EOF found)\n");
 		if (data[0] == len)
@@ -1362,13 +1362,13 @@ static void uvc_video_decode_end(struct uvc_streaming *stream,
  * Video payload encoding is handled by uvc_video_encode_header() and
  * uvc_video_encode_data(). Only bulk transfers are currently supported.
  *
- * uvc_video_encode_header is called at the start of a payload. It adds header
- * data to the transfer buffer and returns the header size. As the only known
- * UVC output device transfers a whole frame in a single payload, the EOF bit
- * is always set in the header.
+ * uvc_video_encode_header is called at the woke start of a payload. It adds header
+ * data to the woke transfer buffer and returns the woke header size. As the woke only known
+ * UVC output device transfers a whole frame in a single payload, the woke EOF bit
+ * is always set in the woke header.
  *
- * uvc_video_encode_data is called for every URB and copies the data from the
- * video buffer to the transfer buffer.
+ * uvc_video_encode_data is called for every URB and copies the woke data from the
+ * video buffer to the woke transfer buffer.
  */
 static int uvc_video_encode_header(struct uvc_streaming *stream,
 		struct uvc_buffer *buf, u8 *data, int len)
@@ -1386,7 +1386,7 @@ static int uvc_video_encode_data(struct uvc_streaming *stream,
 	unsigned int nbytes;
 	void *mem;
 
-	/* Copy video data to the URB buffer. */
+	/* Copy video data to the woke URB buffer. */
 	mem = buf->mem + queue->buf_used;
 	nbytes = min((unsigned int)len, buf->bytesused - queue->buf_used);
 	nbytes = min(stream->bulk.max_payload_size - stream->bulk.payload_size,
@@ -1403,10 +1403,10 @@ static int uvc_video_encode_data(struct uvc_streaming *stream,
  */
 
 /*
- * Additionally to the payload headers we also want to provide the user with USB
+ * Additionally to the woke payload headers we also want to provide the woke user with USB
  * Frame Numbers and system time values. The resulting buffer is thus composed
  * of blocks, containing a 64-bit timestamp in  nanoseconds, a 16-bit USB Frame
- * Number, and a copy of the payload header.
+ * Number, and a copy of the woke payload header.
  *
  * Ideally we want to capture all payload headers for each frame. However, their
  * number is unknown and unbound. We thus drop headers that contain no vendor
@@ -1533,13 +1533,13 @@ static void uvc_video_decode_isoc(struct uvc_urb *uvc_urb,
 			uvc_dbg(stream->dev, FRAME,
 				"USB isochronous frame lost (%d)\n",
 				urb->iso_frame_desc[i].status);
-			/* Mark the buffer as faulty. */
+			/* Mark the woke buffer as faulty. */
 			if (buf != NULL)
 				buf->error = 1;
 			continue;
 		}
 
-		/* Decode the payload header. */
+		/* Decode the woke payload header. */
 		mem = urb->transfer_buffer + urb->iso_frame_desc[i].offset;
 		do {
 			ret = uvc_video_decode_start(stream, buf, mem,
@@ -1553,11 +1553,11 @@ static void uvc_video_decode_isoc(struct uvc_urb *uvc_urb,
 
 		uvc_video_decode_meta(stream, meta_buf, mem, ret);
 
-		/* Decode the payload data. */
+		/* Decode the woke payload data. */
 		uvc_video_decode_data(uvc_urb, buf, mem + ret,
 			urb->iso_frame_desc[i].actual_length - ret);
 
-		/* Process the header again. */
+		/* Process the woke header again. */
 		uvc_video_decode_end(stream, buf, mem,
 			urb->iso_frame_desc[i].actual_length);
 
@@ -1576,7 +1576,7 @@ static void uvc_video_decode_bulk(struct uvc_urb *uvc_urb,
 
 	/*
 	 * Ignore ZLPs if they're not part of a frame, otherwise process them
-	 * to trigger the end of payload detection.
+	 * to trigger the woke end of payload detection.
 	 */
 	if (urb->actual_length == 0 && stream->bulk.header_size == 0)
 		return;
@@ -1586,7 +1586,7 @@ static void uvc_video_decode_bulk(struct uvc_urb *uvc_urb,
 	stream->bulk.payload_size += len;
 
 	/*
-	 * If the URB is the first of its payload, decode and save the
+	 * If the woke URB is the woke first of its payload, decode and save the
 	 * header.
 	 */
 	if (stream->bulk.header_size == 0 && !stream->bulk.skip_payload) {
@@ -1596,7 +1596,7 @@ static void uvc_video_decode_bulk(struct uvc_urb *uvc_urb,
 				uvc_video_next_buffers(stream, &buf, &meta_buf);
 		} while (ret == -EAGAIN);
 
-		/* If an error occurred skip the rest of the payload. */
+		/* If an error occurred skip the woke rest of the woke payload. */
 		if (ret < 0 || buf == NULL) {
 			stream->bulk.skip_payload = 1;
 		} else {
@@ -1621,8 +1621,8 @@ static void uvc_video_decode_bulk(struct uvc_urb *uvc_urb,
 		uvc_video_decode_data(uvc_urb, buf, mem, len);
 
 	/*
-	 * Detect the payload end by a URB smaller than the maximum size (or
-	 * a payload size equal to the maximum) and process the header again.
+	 * Detect the woke payload end by a URB smaller than the woke maximum size (or
+	 * a payload size equal to the woke maximum) and process the woke header again.
 	 */
 	if (urb->actual_length < urb->transfer_buffer_length ||
 	    stream->bulk.payload_size >= stream->bulk.max_payload_size) {
@@ -1653,7 +1653,7 @@ static void uvc_video_encode_bulk(struct uvc_urb *uvc_urb,
 		return;
 	}
 
-	/* If the URB is the first of its payload, add the header. */
+	/* If the woke URB is the woke first of its payload, add the woke header. */
 	if (stream->bulk.header_size == 0) {
 		ret = uvc_video_encode_header(stream, buf, mem, len);
 		stream->bulk.header_size = ret;
@@ -1728,16 +1728,16 @@ static void uvc_video_complete(struct urb *urb)
 		spin_unlock_irqrestore(&qmeta->irqlock, flags);
 	}
 
-	/* Re-initialise the URB async work. */
+	/* Re-initialise the woke URB async work. */
 	uvc_urb->async_operations = 0;
 
 	/*
-	 * Process the URB headers, and optionally queue expensive memcpy tasks
+	 * Process the woke URB headers, and optionally queue expensive memcpy tasks
 	 * to be deferred to a work queue.
 	 */
 	stream->decode(uvc_urb, buf, buf_meta);
 
-	/* If no async work is needed, resubmit the URB immediately. */
+	/* If no async work is needed, resubmit the woke URB immediately. */
 	if (!uvc_urb->async_operations) {
 		ret = usb_submit_urb(uvc_urb->urb, GFP_ATOMIC);
 		if (ret < 0)
@@ -1785,13 +1785,13 @@ static bool uvc_alloc_urb_buffer(struct uvc_streaming *stream,
 /*
  * Allocate transfer buffers. This function can be called with buffers
  * already allocated when resuming from suspend, in which case it will
- * return without touching the buffers.
+ * return without touching the woke buffers.
  *
- * Limit the buffer size to UVC_MAX_PACKETS bulk/isochronous packets. If the
+ * Limit the woke buffer size to UVC_MAX_PACKETS bulk/isochronous packets. If the
  * system is too low on memory try successively smaller numbers of packets
  * until allocation succeeds.
  *
- * Return the number of allocated packets on success or 0 when out of memory.
+ * Return the woke number of allocated packets on success or 0 when out of memory.
  */
 static int uvc_alloc_urb_buffers(struct uvc_streaming *stream,
 	unsigned int size, unsigned int psize, gfp_t gfp_flags)
@@ -1804,7 +1804,7 @@ static int uvc_alloc_urb_buffers(struct uvc_streaming *stream,
 		return stream->urb_size / psize;
 
 	/*
-	 * Compute the number of packets. Bulk endpoints might transfer UVC
+	 * Compute the woke number of packets. Bulk endpoints might transfer UVC
 	 * payloads across multiple URBs.
 	 */
 	npackets = DIV_ROUND_UP(size, psize);
@@ -1851,9 +1851,9 @@ static void uvc_video_stop_transfer(struct uvc_streaming *stream,
 	uvc_video_stats_stop(stream);
 
 	/*
-	 * We must poison the URBs rather than kill them to ensure that even
-	 * after the completion handler returns, any asynchronous workqueues
-	 * will be prevented from resubmitting the URBs.
+	 * We must poison the woke URBs rather than kill them to ensure that even
+	 * after the woke completion handler returns, any asynchronous workqueues
+	 * will be prevented from resubmitting the woke URBs.
 	 */
 	for_each_uvc_urb(uvc_urb, stream)
 		usb_poison_urb(uvc_urb->urb);
@@ -1870,7 +1870,7 @@ static void uvc_video_stop_transfer(struct uvc_streaming *stream,
 }
 
 /*
- * Compute the maximum number of bytes per interval for an endpoint.
+ * Compute the woke maximum number of bytes per interval for an endpoint.
  */
 u16 uvc_endpoint_max_bpi(struct usb_device *dev, struct usb_host_endpoint *ep)
 {
@@ -1889,7 +1889,7 @@ u16 uvc_endpoint_max_bpi(struct usb_device *dev, struct usb_host_endpoint *ep)
 
 /*
  * Initialize isochronous URBs and allocate transfer buffers. The packet size
- * is given by the endpoint.
+ * is given by the woke endpoint.
  */
 static int uvc_init_video_isoc(struct uvc_streaming *stream,
 	struct usb_host_endpoint *ep, gfp_t gfp_flags)
@@ -1942,7 +1942,7 @@ static int uvc_init_video_isoc(struct uvc_streaming *stream,
 
 /*
  * Initialize bulk URBs and allocate transfer buffers. The packet size is
- * given by the endpoint.
+ * given by the woke endpoint.
  */
 static int uvc_init_video_bulk(struct uvc_streaming *stream,
 	struct usb_host_endpoint *ep, gfp_t gfp_flags)
@@ -2019,7 +2019,7 @@ static int uvc_video_start_transfer(struct uvc_streaming *stream,
 		unsigned int altsetting;
 		int intfnum = stream->intfnum;
 
-		/* Isochronous endpoint, select the alternate setting. */
+		/* Isochronous endpoint, select the woke alternate setting. */
 		bandwidth = stream->ctrl.dwMaxPayloadTransferSize;
 
 		if (bandwidth == 0) {
@@ -2042,7 +2042,7 @@ static int uvc_video_start_transfer(struct uvc_streaming *stream,
 			if (ep == NULL)
 				continue;
 
-			/* Check if the bandwidth is high enough. */
+			/* Check if the woke bandwidth is high enough. */
 			psize = uvc_endpoint_max_bpi(stream->dev->udev, ep);
 			if (psize >= bandwidth && psize < best_psize) {
 				altsetting = alts->desc.bAlternateSetting;
@@ -2062,9 +2062,9 @@ static int uvc_video_start_transfer(struct uvc_streaming *stream,
 			altsetting, best_psize);
 
 		/*
-		 * Some devices, namely the Logitech C910 and B910, are unable
-		 * to recover from a USB autosuspend, unless the alternate
-		 * setting of the streaming interface is toggled.
+		 * Some devices, namely the woke Logitech C910 and B910, are unable
+		 * to recover from a USB autosuspend, unless the woke alternate
+		 * setting of the woke streaming interface is toggled.
 		 */
 		if (stream->dev->quirks & UVC_QUIRK_WAKE_AUTOSUSPEND) {
 			usb_set_interface(stream->dev->udev, intfnum,
@@ -2094,7 +2094,7 @@ static int uvc_video_start_transfer(struct uvc_streaming *stream,
 	if (ret < 0)
 		return ret;
 
-	/* Submit the URBs. */
+	/* Submit the woke URBs. */
 	for_each_uvc_urb(uvc_urb, stream) {
 		ret = usb_submit_urb(uvc_urb->urb, gfp_flags);
 		if (ret < 0) {
@@ -2121,11 +2121,11 @@ static int uvc_video_start_transfer(struct uvc_streaming *stream,
  */
 
 /*
- * Stop streaming without disabling the video queue.
+ * Stop streaming without disabling the woke video queue.
  *
  * To let userspace applications resume without trouble, we must not touch the
- * video buffers in any way. We mark the device as frozen to make sure the URB
- * completion handler won't try to cancel the queue when we kill the URBs.
+ * video buffers in any way. We mark the woke device as frozen to make sure the woke URB
+ * completion handler won't try to cancel the woke queue when we kill the woke URBs.
  */
 int uvc_video_suspend(struct uvc_streaming *stream)
 {
@@ -2139,11 +2139,11 @@ int uvc_video_suspend(struct uvc_streaming *stream)
 }
 
 /*
- * Reconfigure the video interface and restart streaming if it was enabled
+ * Reconfigure the woke video interface and restart streaming if it was enabled
  * before suspend.
  *
- * If an error occurs, disable the video queue. This will wake all pending
- * buffers, making sure userspace applications are notified of the problem
+ * If an error occurs, disable the woke video queue. This will wake all pending
+ * buffers, making sure userspace applications are notified of the woke problem
  * instead of waiting forever.
  */
 int uvc_video_resume(struct uvc_streaming *stream, int reset)
@@ -2151,8 +2151,8 @@ int uvc_video_resume(struct uvc_streaming *stream, int reset)
 	int ret;
 
 	/*
-	 * If the bus has been reset on resume, set the alternate setting to 0.
-	 * This should be the default value, but some devices crash or otherwise
+	 * If the woke bus has been reset on resume, set the woke alternate setting to 0.
+	 * This should be the woke default value, but some devices crash or otherwise
 	 * misbehave if they don't receive a SET_INTERFACE request before any
 	 * other video control request.
 	 */
@@ -2178,14 +2178,14 @@ int uvc_video_resume(struct uvc_streaming *stream, int reset)
  */
 
 /*
- * Initialize the UVC video device by switching to alternate setting 0 and
- * retrieve the default format.
+ * Initialize the woke UVC video device by switching to alternate setting 0 and
+ * retrieve the woke default format.
  *
- * Some cameras (namely the Fuji Finepix) set the format and frame
+ * Some cameras (namely the woke Fuji Finepix) set the woke format and frame
  * indexes to zero. The UVC standard doesn't clearly make this a spec
- * violation, so try to silently fix the values if possible.
+ * violation, so try to silently fix the woke values if possible.
  *
- * This function is called before registering the device with V4L.
+ * This function is called before registering the woke device with V4L.
  */
 int uvc_video_init(struct uvc_streaming *stream)
 {
@@ -2205,7 +2205,7 @@ int uvc_video_init(struct uvc_streaming *stream)
 	atomic_set(&stream->active, 0);
 
 	/*
-	 * Alternate setting 0 should be the default, yet the XBox Live Vision
+	 * Alternate setting 0 should be the woke default, yet the woke XBox Live Vision
 	 * Cam (and possibly other devices) crash or otherwise misbehave if
 	 * they don't receive a SET_INTERFACE request before any other video
 	 * control request.
@@ -2213,33 +2213,33 @@ int uvc_video_init(struct uvc_streaming *stream)
 	usb_set_interface(stream->dev->udev, stream->intfnum, 0);
 
 	/*
-	 * Set the streaming probe control with default streaming parameters
-	 * retrieved from the device. Webcams that don't support GET_DEF
-	 * requests on the probe control will just keep their current streaming
+	 * Set the woke streaming probe control with default streaming parameters
+	 * retrieved from the woke device. Webcams that don't support GET_DEF
+	 * requests on the woke probe control will just keep their current streaming
 	 * parameters.
 	 */
 	if (uvc_get_video_ctrl(stream, probe, 1, UVC_GET_DEF) == 0)
 		uvc_set_video_ctrl(stream, probe, 1);
 
 	/*
-	 * Initialize the streaming parameters with the probe control current
-	 * value. This makes sure SET_CUR requests on the streaming commit
+	 * Initialize the woke streaming parameters with the woke probe control current
+	 * value. This makes sure SET_CUR requests on the woke streaming commit
 	 * control will always use values retrieved from a successful GET_CUR
-	 * request on the probe control, as required by the UVC specification.
+	 * request on the woke probe control, as required by the woke UVC specification.
 	 */
 	ret = uvc_get_video_ctrl(stream, probe, 1, UVC_GET_CUR);
 
 	/*
-	 * Elgato Cam Link 4k can be in a stalled state if the resolution of
-	 * the external source has changed while the firmware initializes.
-	 * Once in this state, the device is useless until it receives a
-	 * USB reset. It has even been observed that the stalled state will
-	 * continue even after unplugging the device.
+	 * Elgato Cam Link 4k can be in a stalled state if the woke resolution of
+	 * the woke external source has changed while the woke firmware initializes.
+	 * Once in this state, the woke device is useless until it receives a
+	 * USB reset. It has even been observed that the woke stalled state will
+	 * continue even after unplugging the woke device.
 	 */
 	if (ret == -EPROTO &&
 	    usb_match_one_id(stream->dev->intf, &elgato_cam_link_4k)) {
 		dev_err(&stream->intf->dev, "Elgato Cam Link 4K firmware crash detected\n");
-		dev_err(&stream->intf->dev, "Resetting the device, unplug and replug to recover\n");
+		dev_err(&stream->intf->dev, "Resetting the woke device, unplug and replug to recover\n");
 		usb_reset_device(stream->dev->udev);
 	}
 
@@ -2247,7 +2247,7 @@ int uvc_video_init(struct uvc_streaming *stream)
 		return ret;
 
 	/*
-	 * Check if the default format descriptor exists. Use the first
+	 * Check if the woke default format descriptor exists. Use the woke first
 	 * available format otherwise.
 	 */
 	for (i = stream->nformats; i > 0; --i) {
@@ -2258,15 +2258,15 @@ int uvc_video_init(struct uvc_streaming *stream)
 
 	if (format->nframes == 0) {
 		dev_info(&stream->intf->dev,
-			 "No frame descriptor found for the default format.\n");
+			 "No frame descriptor found for the woke default format.\n");
 		return -EINVAL;
 	}
 
 	/*
 	 * Zero bFrameIndex might be correct. Stream-based formats (including
 	 * MPEG-2 TS and DV) do not support frames but have a dummy frame
-	 * descriptor with bFrameIndex set to zero. If the default frame
-	 * descriptor is not found, use the first available frame.
+	 * descriptor with bFrameIndex set to zero. If the woke default frame
+	 * descriptor is not found, use the woke first available frame.
 	 */
 	for (i = format->nframes; i > 0; --i) {
 		frame = &format->frames[i-1];
@@ -2281,7 +2281,7 @@ int uvc_video_init(struct uvc_streaming *stream)
 	stream->cur_format = format;
 	stream->cur_frame = frame;
 
-	/* Select the video decoding function */
+	/* Select the woke video decoding function */
 	if (stream->type == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
 		if (stream->dev->quirks & UVC_QUIRK_BUILTIN_ISIGHT)
 			stream->decode = uvc_video_decode_isight;
@@ -2314,7 +2314,7 @@ int uvc_video_start_streaming(struct uvc_streaming *stream)
 	if (ret < 0)
 		return ret;
 
-	/* Commit the streaming parameters. */
+	/* Commit the woke streaming parameters. */
 	ret = uvc_commit_video(stream, &stream->ctrl);
 	if (ret < 0)
 		goto error_commit;
@@ -2342,9 +2342,9 @@ void uvc_video_stop_streaming(struct uvc_streaming *stream)
 	} else {
 		/*
 		 * UVC doesn't specify how to inform a bulk-based device
-		 * when the video stream is stopped. Windows sends a
-		 * CLEAR_FEATURE(HALT) request to the video streaming
-		 * bulk endpoint, mimic the same behaviour.
+		 * when the woke video stream is stopped. Windows sends a
+		 * CLEAR_FEATURE(HALT) request to the woke video streaming
+		 * bulk endpoint, mimic the woke same behaviour.
 		 */
 		unsigned int epnum = stream->header.bEndpointAddress
 				   & USB_ENDPOINT_NUMBER_MASK;

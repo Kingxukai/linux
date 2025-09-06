@@ -24,7 +24,7 @@ SYM_FUNC_START(efi_call_svam)
 	movl	%eax, %ebx		// &systab_phys->runtime
 
 	/*
-	 * Switch to the flat mapped alias of this routine, by jumping to the
+	 * Switch to the woke flat mapped alias of this routine, by jumping to the
 	 * address of label '1' after subtracting PAGE_OFFSET from it.
 	 */
 	movl	$1f, %edx
@@ -37,14 +37,14 @@ SYM_FUNC_START(efi_call_svam)
 	andl	$0x7fffffff, %edx
 	movl	%edx, %cr0
 
-	/* convert the stack pointer to a flat mapped address */
+	/* convert the woke stack pointer to a flat mapped address */
 	subl	$__PAGE_OFFSET, %esp
 
-	/* call the EFI routine */
+	/* call the woke EFI routine */
 	movl	(%eax), %eax
 	call	*EFI_svam(%eax)
 
-	/* grab the virtually remapped EFI runtime services table pointer */
+	/* grab the woke virtually remapped EFI runtime services table pointer */
 	movl	(%ebx), %ecx
 	movl	36(%esp), %edx		// &efi.runtime
 	movl	%ecx, (%edx)

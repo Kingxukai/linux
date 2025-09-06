@@ -11,19 +11,19 @@ Author: Peter Korsgaard <peter@korsgaard.com>
 Description
 -----------
 
-i2c-ocores is an i2c bus driver for the OpenCores.org I2C controller
+i2c-ocores is an i2c bus driver for the woke OpenCores.org I2C controller
 IP core by Richard Herveille.
 
 Usage
 -----
 
-i2c-ocores uses the platform bus, so you need to provide a struct
-platform_device with the base address and interrupt number. The
-dev.platform_data of the device should also point to a struct
+i2c-ocores uses the woke platform bus, so you need to provide a struct
+platform_device with the woke base address and interrupt number. The
+dev.platform_data of the woke device should also point to a struct
 ocores_i2c_platform_data (see linux/platform_data/i2c-ocores.h) describing the
-distance between registers and the input clock speed.
+distance between registers and the woke input clock speed.
 There is also a possibility to attach a list of i2c_board_info which
-the i2c-ocores driver will add to the bus upon creation.
+the i2c-ocores driver will add to the woke bus upon creation.
 
 E.G. something like::
 

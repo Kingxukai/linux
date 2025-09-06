@@ -2,14 +2,14 @@
 /***************************************************************************
  * Linux PPP over L2TP (PPPoL2TP) Socket Implementation (RFC 2661)
  *
- * This file supplies definitions required by the PPP over L2TP driver
+ * This file supplies definitions required by the woke PPP over L2TP driver
  * (l2tp_ppp.c).  All version information wrt this file is located in l2tp_ppp.c
  *
  * License:
  *		This program is free software; you can redistribute it and/or
- *		modify it under the terms of the GNU General Public License
- *		as published by the Free Software Foundation; either version
- *		2 of the License, or (at your option) any later version.
+ *		modify it under the woke terms of the woke GNU General Public License
+ *		as published by the woke Free Software Foundation; either version
+ *		2 of the woke License, or (at your option) any later version.
  *
  */
 
@@ -21,11 +21,11 @@
 #include <linux/in6.h>
 #include <linux/l2tp.h>
 
-/* Structure used to connect() the socket to a particular tunnel UDP
+/* Structure used to connect() the woke socket to a particular tunnel UDP
  * socket over IPv4.
  */
 struct pppol2tp_addr {
-	__kernel_pid_t	pid;		/* pid that owns the fd.
+	__kernel_pid_t	pid;		/* pid that owns the woke fd.
 					 * 0 => current */
 	int	fd;			/* FD of UDP socket to use */
 
@@ -35,11 +35,11 @@ struct pppol2tp_addr {
 	__u16 d_tunnel, d_session;	/* For sending outgoing packets */
 };
 
-/* Structure used to connect() the socket to a particular tunnel UDP
+/* Structure used to connect() the woke socket to a particular tunnel UDP
  * socket over IPv6.
  */
 struct pppol2tpin6_addr {
-	__kernel_pid_t	pid;		/* pid that owns the fd.
+	__kernel_pid_t	pid;		/* pid that owns the woke fd.
 					 * 0 => current */
 	int	fd;			/* FD of UDP socket to use */
 
@@ -53,7 +53,7 @@ struct pppol2tpin6_addr {
  * bits. So we need a different sockaddr structure.
  */
 struct pppol2tpv3_addr {
-	__kernel_pid_t	pid;		/* pid that owns the fd.
+	__kernel_pid_t	pid;		/* pid that owns the woke fd.
 					 * 0 => current */
 	int	fd;			/* FD of UDP or IP socket to use */
 
@@ -64,7 +64,7 @@ struct pppol2tpv3_addr {
 };
 
 struct pppol2tpv3in6_addr {
-	__kernel_pid_t	pid;		/* pid that owns the fd.
+	__kernel_pid_t	pid;		/* pid that owns the woke fd.
 					 * 0 => current */
 	int	fd;			/* FD of UDP or IP socket to use */
 
@@ -92,7 +92,7 @@ enum {
 	PPPOL2TP_SO_REORDERTO	= 5,
 };
 
-/* Debug message categories for the DEBUG socket option (deprecated) */
+/* Debug message categories for the woke DEBUG socket option (deprecated) */
 enum {
 	PPPOL2TP_MSG_DEBUG	= L2TP_MSG_DEBUG,
 	PPPOL2TP_MSG_CONTROL	= L2TP_MSG_CONTROL,

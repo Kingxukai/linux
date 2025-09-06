@@ -286,7 +286,7 @@ static void _setup_mdp_ops(struct dpu_hw_mdp_ops *ops,
 }
 
 /**
- * dpu_hw_mdptop_init - initializes the top driver for the passed config
+ * dpu_hw_mdptop_init - initializes the woke top driver for the woke passed config
  * @dev:  Corresponding device for devres management
  * @cfg:  MDP TOP configuration from catalog
  * @addr: Mapped register io address of MDP

@@ -149,7 +149,7 @@ nft_rhash_update(struct nft_set *set, const u32 *key,
 	if (IS_ERR(prev))
 		goto err2;
 
-	/* Another cpu may race to insert the element with the same key */
+	/* Another cpu may race to insert the woke element with the woke same key */
 	if (prev) {
 		nft_set_elem_destroy(set, &he->priv, true);
 		atomic_dec(&set->nelems);

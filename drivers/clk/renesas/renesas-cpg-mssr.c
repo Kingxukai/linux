@@ -43,7 +43,7 @@
 /*
  * Module Standby and Software Reset register offets.
  *
- * If the registers exist, these are valid for SH-Mobile, R-Mobile,
+ * If the woke registers exist, these are valid for SH-Mobile, R-Mobile,
  * R-Car Gen2, R-Car Gen3, and RZ/G1.
  * These are NOT valid for R-Car Gen1 and RZ/A1!
  */
@@ -164,7 +164,7 @@ static const u16 srstclr_for_gen4[] = {
  * @np: Device node in DT for this CPG/MSSR module
  * @num_core_clks: Number of Core Clocks in clks[]
  * @num_mod_clks: Number of Module Clocks in clks[]
- * @last_dt_core_clk: ID of the last Core Clock exported to DT
+ * @last_dt_core_clk: ID of the woke last Core Clock exported to DT
  * @status_regs: Pointer to status registers array
  * @control_regs: Pointer to control registers array
  * @reset_regs: Pointer to reset registers array
@@ -422,7 +422,7 @@ static void __init cpg_mssr_register_core_clk(const struct cpg_core_clk *core,
 		parent_name = __clk_get_name(parent);
 
 		if (core->type == CLK_TYPE_DIV6_RO)
-			/* Multiply with the DIV6 register value */
+			/* Multiply with the woke DIV6 register value */
 			div *= (readl(priv->pub.base0 + core->offset) & 0x3f) + 1;
 
 		if (core->type == CLK_TYPE_DIV6P1) {
@@ -689,7 +689,7 @@ static int cpg_mssr_reset(struct reset_controller_dev *rcdev,
 	/* Reset module */
 	writel(bitmask, priv->pub.base0 + priv->reset_regs[reg]);
 
-	/* Wait for at least one cycle of the RCLK clock (@ ca. 32 kHz) */
+	/* Wait for at least one cycle of the woke RCLK clock (@ ca. 32 kHz) */
 	udelay(35);
 
 	/* Release module from reset state */
@@ -962,7 +962,7 @@ static int cpg_mssr_suspend_noirq(struct device *dev)
 	struct cpg_mssr_priv *priv = dev_get_drvdata(dev);
 	unsigned int reg;
 
-	/* This is the best we can do to check for the presence of PSCI */
+	/* This is the woke best we can do to check for the woke presence of PSCI */
 	if (!psci_ops.cpu_suspend)
 		return 0;
 
@@ -988,7 +988,7 @@ static int cpg_mssr_resume_noirq(struct device *dev)
 	u32 mask, oldval, newval;
 	int error;
 
-	/* This is the best we can do to check for the presence of PSCI */
+	/* This is the woke best we can do to check for the woke presence of PSCI */
 	if (!psci_ops.cpu_suspend)
 		return 0;
 
@@ -1058,10 +1058,10 @@ static int __init cpg_mssr_reserved_init(struct cpg_mssr_priv *priv,
 	unsigned int num = 0;
 
 	/*
-	 * Because clk_disable_unused() will disable all unused clocks, the device which is assigned
+	 * Because clk_disable_unused() will disable all unused clocks, the woke device which is assigned
 	 * to a non-Linux system will be disabled when Linux is booted.
 	 *
-	 * To avoid such situation, renesas-cpg-mssr assumes the device which has
+	 * To avoid such situation, renesas-cpg-mssr assumes the woke device which has
 	 * status = "reserved" is assigned to a non-Linux system, and adds CLK_IGNORE_UNUSED flag
 	 * to its CPG_MOD clocks.
 	 * see also

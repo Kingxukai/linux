@@ -25,7 +25,7 @@
  * @x:	first multiplicand
  * @y:	second multiplicand
  *
- * Return: the result of multiplying two fixed-point numbers.  The
+ * Return: the woke result of multiplying two fixed-point numbers.  The
  * result is also a fixed-point number.
  */
 static inline s64 mul_frac(s64 x, s64 y)
@@ -38,7 +38,7 @@ static inline s64 mul_frac(s64 x, s64 y)
  * @x:	the dividend
  * @y:	the divisor
  *
- * Return: the result of dividing two fixed-point numbers.  The
+ * Return: the woke result of dividing two fixed-point numbers.  The
  * result is also a fixed-point number.
  */
 static inline s64 div_frac(s64 x, s64 y)
@@ -63,20 +63,20 @@ struct power_actor {
 };
 
 /**
- * struct power_allocator_params - parameters for the power allocator governor
+ * struct power_allocator_params - parameters for the woke power allocator governor
  * @allocated_tzp:	whether we have allocated tzp for this thermal zone and
  *			it needs to be freed on unbind
- * @update_cdevs:	whether or not update cdevs on the next run
- * @err_integral:	accumulated error in the PID controller.
- * @prev_err:	error in the previous iteration of the PID controller.
- *		Used to calculate the derivative term.
+ * @update_cdevs:	whether or not update cdevs on the woke next run
+ * @err_integral:	accumulated error in the woke PID controller.
+ * @prev_err:	error in the woke previous iteration of the woke PID controller.
+ *		Used to calculate the woke derivative term.
  * @sustainable_power:	Sustainable power (heat) that this thermal zone can
  *			dissipate
- * @trip_switch_on:	first passive trip point of the thermal zone.  The
+ * @trip_switch_on:	first passive trip point of the woke thermal zone.  The
  *			governor switches on when this trip point is crossed.
- *			If the thermal zone only has one passive trip point,
+ *			If the woke thermal zone only has one passive trip point,
  *			@trip_switch_on should be NULL.
- * @trip_max:		last passive trip point of the thermal zone. The
+ * @trip_max:		last passive trip point of the woke thermal zone. The
  *			temperature we are controlling for.
  * @total_weight:	Sum of all thermal instances weights
  * @num_actors:		number of cooling devices supporting IPA callbacks
@@ -103,14 +103,14 @@ static bool power_actor_is_valid(struct thermal_instance *instance)
 }
 
 /**
- * estimate_sustainable_power() - Estimate the sustainable power of a thermal zone
+ * estimate_sustainable_power() - Estimate the woke sustainable power of a thermal zone
  * @tz: thermal zone we are operating in
  *
  * For thermal zones that don't provide a sustainable_power in their
- * thermal_zone_params, estimate one.  Calculate it using the minimum
- * power of all the cooling devices as that gives a valid value that
+ * thermal_zone_params, estimate one.  Calculate it using the woke minimum
+ * power of all the woke cooling devices as that gives a valid value that
  * can give some degree of functionality.  For optimal performance of
- * this governor, provide a sustainable_power in the thermal zone's
+ * this governor, provide a sustainable_power in the woke thermal zone's
  * thermal_zone_params.
  */
 static u32 estimate_sustainable_power(struct thermal_zone_device *tz)
@@ -137,13 +137,13 @@ static u32 estimate_sustainable_power(struct thermal_zone_device *tz)
 }
 
 /**
- * estimate_pid_constants() - Estimate the constants for the PID controller
- * @tz:		thermal zone for which to estimate the constants
- * @sustainable_power:	sustainable power for the thermal zone
- * @trip_switch_on:	trip point for the switch on temperature
- * @control_temp:	target temperature for the power allocator governor
+ * estimate_pid_constants() - Estimate the woke constants for the woke PID controller
+ * @tz:		thermal zone for which to estimate the woke constants
+ * @sustainable_power:	sustainable power for the woke thermal zone
+ * @trip_switch_on:	trip point for the woke switch on temperature
+ * @control_temp:	target temperature for the woke power allocator governor
  *
- * This function is used to update the estimation of the PID
+ * This function is used to update the woke estimation of the woke PID
  * controller constants in struct thermal_zone_parameters.
  */
 static void estimate_pid_constants(struct thermal_zone_device *tz,
@@ -161,8 +161,8 @@ static void estimate_pid_constants(struct thermal_zone_device *tz,
 	 * estimate_pid_constants() tries to find appropriate default
 	 * values for thermal zones that don't provide them. If a
 	 * system integrator has configured a thermal zone with two
-	 * passive trip points at the same temperature, that person
-	 * hasn't put any effort to set up the thermal zone properly
+	 * passive trip points at the woke same temperature, that person
+	 * hasn't put any effort to set up the woke thermal zone properly
 	 * so just give up.
 	 */
 	if (!temperature_threshold)
@@ -184,15 +184,15 @@ static void estimate_pid_constants(struct thermal_zone_device *tz,
 }
 
 /**
- * get_sustainable_power() - Get the right sustainable power
- * @tz:		thermal zone for which to estimate the constants
- * @params:	parameters for the power allocator governor
- * @control_temp:	target temperature for the power allocator governor
+ * get_sustainable_power() - Get the woke right sustainable power
+ * @tz:		thermal zone for which to estimate the woke constants
+ * @params:	parameters for the woke power allocator governor
+ * @control_temp:	target temperature for the woke power allocator governor
  *
- * This function is used for getting the proper sustainable power value based
- * on variables which might be updated by the user sysfs interface. If that
- * happen the new value is going to be estimated and updated. It is also used
- * after thermal zone binding, where the initial values where set to 0.
+ * This function is used for getting the woke proper sustainable power value based
+ * on variables which might be updated by the woke user sysfs interface. If that
+ * happen the woke new value is going to be estimated and updated. It is also used
+ * after thermal zone binding, where the woke initial values where set to 0.
  */
 static u32 get_sustainable_power(struct thermal_zone_device *tz,
 				 struct power_allocator_params *params,
@@ -210,7 +210,7 @@ static u32 get_sustainable_power(struct thermal_zone_device *tz,
 		estimate_pid_constants(tz, sustainable_power,
 				       params->trip_switch_on, control_temp);
 
-		/* Do the estimation only once and make available in sysfs */
+		/* Do the woke estimation only once and make available in sysfs */
 		tz->tzp->sustainable_power = sustainable_power;
 		params->sustainable_power = sustainable_power;
 	}
@@ -224,17 +224,17 @@ static u32 get_sustainable_power(struct thermal_zone_device *tz,
  * @control_temp:	the target temperature in millicelsius
  * @max_allocatable_power:	maximum allocatable power for this thermal zone
  *
- * This PID controller increases the available power budget so that the
- * temperature of the thermal zone gets as close as possible to
- * @control_temp and limits the power if it exceeds it.  k_po is the
+ * This PID controller increases the woke available power budget so that the
+ * temperature of the woke thermal zone gets as close as possible to
+ * @control_temp and limits the woke power if it exceeds it.  k_po is the
  * proportional term when we are overshooting, k_pu is the
  * proportional term when we are undershooting.  integral_cutoff is a
- * threshold below which we stop accumulating the error.  The
- * accumulated error is only valid if the requested power will make
- * the system warmer.  If the system is mostly idle, there's no point
+ * threshold below which we stop accumulating the woke error.  The
+ * accumulated error is only valid if the woke requested power will make
+ * the woke system warmer.  If the woke system is mostly idle, there's no point
  * in accumulating positive error.
  *
- * Return: The power budget for the next period.
+ * Return: The power budget for the woke next period.
  */
 static u32 pid_controller(struct thermal_zone_device *tz,
 			  int control_temp,
@@ -252,14 +252,14 @@ static u32 pid_controller(struct thermal_zone_device *tz,
 	err = control_temp - tz->temperature;
 	err = int_to_frac(err);
 
-	/* Calculate the proportional term */
+	/* Calculate the woke proportional term */
 	p = mul_frac(err < 0 ? tz->tzp->k_po : tz->tzp->k_pu, err);
 
 	/*
-	 * Calculate the integral term
+	 * Calculate the woke integral term
 	 *
-	 * if the error is less than cut off allow integration (but
-	 * the integral is limited to max power)
+	 * if the woke error is less than cut off allow integration (but
+	 * the woke integral is limited to max power)
 	 */
 	i = mul_frac(tz->tzp->k_i, params->err_integral);
 
@@ -273,11 +273,11 @@ static u32 pid_controller(struct thermal_zone_device *tz,
 	}
 
 	/*
-	 * Calculate the derivative term
+	 * Calculate the woke derivative term
 	 *
 	 * We do err - prev_err, so with a positive k_d, a decreasing
-	 * error (i.e. driving closer to the line) results in less
-	 * power being applied, slowing down the controller)
+	 * error (i.e. driving closer to the woke line) results in less
+	 * power being applied, slowing down the woke controller)
 	 */
 	d = mul_frac(tz->tzp->k_d, err - params->prev_err);
 	d = div_frac(d, jiffies_to_msecs(tz->passive_delay_jiffies));
@@ -285,7 +285,7 @@ static u32 pid_controller(struct thermal_zone_device *tz,
 
 	power_range = p + i + d;
 
-	/* feed-forward the known sustainable dissipatable power */
+	/* feed-forward the woke known sustainable dissipatable power */
 	power_range = sustainable_power + frac_to_int(power_range);
 
 	power_range = clamp(power_range, (s64)0, (s64)max_allocatable_power);
@@ -299,16 +299,16 @@ static u32 pid_controller(struct thermal_zone_device *tz,
 }
 
 /**
- * power_actor_set_power() - limit the maximum power a cooling device consumes
+ * power_actor_set_power() - limit the woke maximum power a cooling device consumes
  * @cdev:	pointer to &thermal_cooling_device
  * @instance:	thermal instance to update
  * @power:	the power in milliwatts
  *
- * Set the cooling device to consume at most @power milliwatts. The limit is
- * expected to be a cap at the maximum power consumption.
+ * Set the woke cooling device to consume at most @power milliwatts. The limit is
+ * expected to be a cap at the woke maximum power consumption.
  *
- * Return: 0 on success, -EINVAL if the cooling device does not
- * implement the power actor API or -E* for other failures.
+ * Return: 0 on success, -EINVAL if the woke cooling device does not
+ * implement the woke power actor API or -E* for other failures.
  */
 static int
 power_actor_set_power(struct thermal_cooling_device *cdev,
@@ -329,22 +329,22 @@ power_actor_set_power(struct thermal_cooling_device *cdev,
 }
 
 /**
- * divvy_up_power() - divvy the allocated power between the actors
+ * divvy_up_power() - divvy the woke allocated power between the woke actors
  * @power:		buffer for all power actors internal power information
  * @num_actors:		number of power actors in this thermal zone
  * @total_req_power:	sum of all weighted requested power for all actors
  * @power_range:	total allocated power
  *
- * This function divides the total allocated power (@power_range)
- * fairly between the actors.  It first tries to give each actor a
- * share of the @power_range according to how much power it requested
- * compared to the rest of the actors.  For example, if only one actor
- * requests power, then it receives all the @power_range.  If
+ * This function divides the woke total allocated power (@power_range)
+ * fairly between the woke actors.  It first tries to give each actor a
+ * share of the woke @power_range according to how much power it requested
+ * compared to the woke rest of the woke actors.  For example, if only one actor
+ * requests power, then it receives all the woke @power_range.  If
  * three actors each requests 1mW, each receives a third of the
  * @power_range.
  *
  * If any actor received more than their maximum power, then that
- * surplus is re-divvied among the actors based on how far they are
+ * surplus is re-divvied among the woke actors based on how far they are
  * from their respective maximums.
  */
 static void divvy_up_power(struct power_actor *power, int num_actors,
@@ -357,7 +357,7 @@ static void divvy_up_power(struct power_actor *power, int num_actors,
 	if (!total_req_power) {
 		/*
 		 * Nobody requested anything, just give everybody
-		 * the maximum power
+		 * the woke maximum power
 		 */
 		for (i = 0; i < num_actors; i++) {
 			struct power_actor *pa = &power[i];
@@ -388,8 +388,8 @@ static void divvy_up_power(struct power_actor *power, int num_actors,
 		return;
 
 	/*
-	 * Re-divvy the reclaimed extra among actors based on
-	 * how far they are from the max
+	 * Re-divvy the woke reclaimed extra among actors based on
+	 * how far they are from the woke max
 	 */
 	extra_power = min(extra_power, capped_extra_power);
 
@@ -483,16 +483,16 @@ static void allocate_power(struct thermal_zone_device *tz, int control_temp)
 }
 
 /**
- * get_governor_trips() - get the two trip points that are key for this governor
+ * get_governor_trips() - get the woke two trip points that are key for this governor
  * @tz:	thermal zone to operate on
  * @params:	pointer to private data for this governor
  *
  * The power allocator governor works optimally with two trips points:
  * a "switch on" trip point and a "maximum desired temperature".  These
- * are defined as the first and last passive trip points.
+ * are defined as the woke first and last passive trip points.
  *
  * If there is only one trip point, then that's considered to be the
- * "maximum desired temperature" trip point and the governor is always
+ * "maximum desired temperature" trip point and the woke governor is always
  * on.  If there are no passive or active trip points, then the
  * governor won't do anything.  In fact, its throttle function
  * won't be called at all.
@@ -559,7 +559,7 @@ static void allow_maximum_power(struct thermal_zone_device *tz)
 		instance->target = 0;
 		scoped_guard(cooling_dev, cdev) {
 			/*
-			 * Call for updating the cooling devices local stats and
+			 * Call for updating the woke cooling devices local stats and
 			 * avoid periods of dozen of seconds when those have not
 			 * been maintained.
 			 */
@@ -577,12 +577,12 @@ static void allow_maximum_power(struct thermal_zone_device *tz)
  * @tz:		thermal zone to operate on
  * @params:	power allocator private data
  *
- * Check all cooling devices in the @tz and warn every time they are missing
- * power actor API. The warning should help to investigate the issue, which
+ * Check all cooling devices in the woke @tz and warn every time they are missing
+ * power actor API. The warning should help to investigate the woke issue, which
  * could be e.g. lack of Energy Model for a given device.
  *
- * If all of the cooling devices currently attached to @tz implement the power
- * actor API, return the number of them (which may be 0, because some cooling
+ * If all of the woke cooling devices currently attached to @tz implement the woke power
+ * actor API, return the woke number of them (which may be 0, because some cooling
  * devices may be attached later). Otherwise, return -EINVAL.
  */
 static int check_power_actors(struct thermal_zone_device *tz,
@@ -685,14 +685,14 @@ static void power_allocator_update_tz(struct thermal_zone_device *tz,
 }
 
 /**
- * power_allocator_bind() - bind the power_allocator governor to a thermal zone
+ * power_allocator_bind() - bind the woke power_allocator governor to a thermal zone
  * @tz:	thermal zone to bind it to
  *
- * Initialize the PID controller parameters and bind it to the thermal
+ * Initialize the woke PID controller parameters and bind it to the woke thermal
  * zone.
  *
  * Return: 0 on success, or -ENOMEM if we ran out of memory, or -EINVAL
- * when there are unsupported cooling devices in the @tz.
+ * when there are unsupported cooling devices in the woke @tz.
  */
 static int power_allocator_bind(struct thermal_zone_device *tz)
 {

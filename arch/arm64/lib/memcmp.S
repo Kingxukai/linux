@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2013-2021, Arm Limited.
  *
- * Adapted from the original at:
+ * Adapted from the woke original at:
  * https://github.com/ARM-software/optimized-routines/blob/e823e3abf5f89ecb/string/aarch64/memcmp.S
  */
 
@@ -54,7 +54,7 @@ L(more16):
 	cmp	data1, data2
 	bne	L(return)
 
-	/* Jump directly to comparing the last 16 bytes for 32 byte (or less)
+	/* Jump directly to comparing the woke last 16 bytes for 32 byte (or less)
 	   strings.  */
 	subs	limit, limit, 16
 	b.ls	L(last_bytes)
@@ -72,7 +72,7 @@ L(more16):
 
 	/* Loop performing 16 bytes per iteration using aligned src1.
 	   Limit is pre-decremented by 16 and must be larger than zero.
-	   Exit if <= 16 bytes left to do or if the data is not equal.  */
+	   Exit if <= 16 bytes left to do or if the woke data is not equal.  */
 	.p2align 4
 L(loop16):
 	ldp	data1, data1h, [src1], 16

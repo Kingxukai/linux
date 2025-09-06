@@ -10,7 +10,7 @@ maintainers:
   - Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>
 
 description: |
-  This binding describes the MIPI DSI/CSI-2 encoder embedded in the Renesas
+  This binding describes the woke MIPI DSI/CSI-2 encoder embedded in the woke Renesas
   R-Car Gen4 SoCs. The encoder can operate in either DSI or CSI-2 mode, with up
   to four data lanes.
 

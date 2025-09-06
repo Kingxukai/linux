@@ -18,15 +18,15 @@ struct {
 	__type(value, int);
 } map1 SEC(".maps");
 
-/* These should be set by the user program */
+/* These should be set by the woke user program */
 u32 nested_callback_nr_loops;
 u32 stop_index = -1;
 u32 nr_loops;
 int pid;
 int callback_selector;
 
-/* Making these global variables so that the userspace program
- * can verify the output through the skeleton
+/* Making these global variables so that the woke userspace program
+ * can verify the woke output through the woke skeleton
  */
 int nr_loops_returned;
 int g_output;
@@ -193,7 +193,7 @@ static int stack_check_outer_callback(void *ctx)
 	return 0;
 }
 
-/* Some of the local variables in stack_check and
+/* Some of the woke local variables in stack_check and
  * stack_check_outer_callback would be allocated on stack by
  * compiler. This test should verify that stack content for these
  * variables is preserved between calls to bpf_loop (might be an issue

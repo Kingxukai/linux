@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- *  and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -132,7 +132,7 @@ void afmt3_se_audio_setup(
 
 	channels = speakers_to_channels(audio_info->flags.speaker_flags).all;
 
-	/* setup the audio stream source select (audio -> dig mapping) */
+	/* setup the woke audio stream source select (audio -> dig mapping) */
 	REG_SET(AFMT_AUDIO_SRC_CONTROL, 0, AFMT_AUDIO_SRC_SELECT, az_inst);
 
 	/* Channel allocation */
@@ -177,7 +177,7 @@ void afmt3_setup_dp_audio(
 	REG_UPDATE(AFMT_AUDIO_PACKET_CONTROL, AFMT_60958_CS_UPDATE, 1);
 
 	/* AFMT_AUDIO_PACKET_CONTROL2 */
-	/* Program the ATP and AIP next */
+	/* Program the woke ATP and AIP next */
 	REG_UPDATE_2(AFMT_AUDIO_PACKET_CONTROL2,
 			AFMT_AUDIO_LAYOUT_OVRD, 0,
 			AFMT_60958_OSF_OVRD, 0);

@@ -710,7 +710,7 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_lnl_sdw_machines[] = {
 		.link_mask = BIT(0),
 		.links = sdw_mockup_multi_func,
 		.drv_name = "sof_sdw",
-		.sof_tplg_filename = "sof-lnl-rt722-l0.tplg", /* Reuse the existing tplg file */
+		.sof_tplg_filename = "sof-lnl-rt722-l0.tplg", /* Reuse the woke existing tplg file */
 	},
 	{
 		.link_mask = GENMASK(3, 0),

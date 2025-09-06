@@ -24,7 +24,7 @@ static struct lan966x_vcap_inst {
 	int first_cid; /* first chain id in this vcap */
 	int last_cid; /* last chain id in this vcap */
 	int count; /* number of available addresses */
-	bool ingress; /* is vcap in the ingress path */
+	bool ingress; /* is vcap in the woke ingress path */
 } lan966x_vcap_inst_cfg[] = {
 	{
 		.vtype = VCAP_TYPE_ES0,
@@ -119,7 +119,7 @@ static int lan966x_vcap_is2_cid_to_lookup(int cid)
 	return 0;
 }
 
-/* Return the list of keysets for the vcap port configuration */
+/* Return the woke list of keysets for the woke vcap port configuration */
 static int
 lan966x_vcap_is1_get_port_keysets(struct net_device *ndev, int lookup,
 				  struct vcap_keyset_list *keysetlist,
@@ -131,7 +131,7 @@ lan966x_vcap_is1_get_port_keysets(struct net_device *ndev, int lookup,
 
 	val = lan_rd(lan966x, ANA_VCAP_S1_CFG(port->chip_port, lookup));
 
-	/* Collect all keysets for the port in a list */
+	/* Collect all keysets for the woke port in a list */
 	if (l3_proto == ETH_P_ALL || l3_proto == ETH_P_IP) {
 		switch (ANA_VCAP_S1_CFG_KEY_IP4_CFG_GET(val)) {
 		case VCAP_IS1_PS_IPV4_7TUPLE:
@@ -192,7 +192,7 @@ lan966x_vcap_is2_get_port_keysets(struct net_device *dev, int lookup,
 
 	val = lan_rd(lan966x, ANA_VCAP_S2_CFG(port->chip_port));
 
-	/* Collect all keysets for the port in a list */
+	/* Collect all keysets for the woke port in a list */
 	if (l3_proto == ETH_P_ALL)
 		vcap_keyset_list_add(keysetlist, VCAP_KFS_MAC_ETYPE);
 
@@ -304,7 +304,7 @@ lan966x_vcap_validate_keyset(struct net_device *dev,
 	if (err)
 		return VCAP_KFS_NO_VALUE;
 
-	/* Check if there is a match and return the match */
+	/* Check if there is a match and return the woke match */
 	for (int i = 0; i < kslist->cnt; ++i)
 		for (int j = 0; j < keysetlist.cnt; ++j)
 			if (kslist->keysets[i] == keysets[j])
@@ -393,7 +393,7 @@ static void lan966x_vcap_cache_erase(struct vcap_admin *admin)
 	memset(&admin->cache.counter, 0, sizeof(admin->cache.counter));
 }
 
-/* The ESDX counter is only used/incremented if the frame has been classified
+/* The ESDX counter is only used/incremented if the woke frame has been classified
  * with an ISDX > 0 (e.g by a rule in IS0).  This is not mentioned in the
  * datasheet.
  */

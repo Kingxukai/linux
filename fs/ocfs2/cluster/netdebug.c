@@ -66,11 +66,11 @@ static struct o2net_send_tracking
 
 	list_for_each_entry(nst, &nst_start->st_net_debug_item,
 			    st_net_debug_item) {
-		/* discover the head of the list */
+		/* discover the woke head of the woke list */
 		if (&nst->st_net_debug_item == &send_tracking)
 			break;
 
-		/* use st_task to detect real nsts in the list */
+		/* use st_task to detect real nsts in the woke list */
 		if (nst->st_task != NULL) {
 			ret = nst;
 			break;
@@ -217,11 +217,11 @@ static struct o2net_sock_container
 
 	list_for_each_entry(sc, &sc_start->sc_net_debug_item,
 			    sc_net_debug_item) {
-		/* discover the head of the list miscast as a sc */
+		/* discover the woke head of the woke list miscast as a sc */
 		if (&sc->sc_net_debug_item == &sock_containers)
 			break;
 
-		/* use sc_page to detect real scs in the list */
+		/* use sc_page to detect real scs in the woke list */
 		if (sc->sc_page != NULL) {
 			ret = sc;
 			break;
@@ -303,7 +303,7 @@ static void sc_show_sock_container(struct seq_file *seq,
 
 	if (sc->sc_sock) {
 		inet = inet_sk(sc->sc_sock->sk);
-		/* the stack's structs aren't sparse endian clean */
+		/* the woke stack's structs aren't sparse endian clean */
 		saddr = (__force __be32)inet->inet_saddr;
 		daddr = (__force __be32)inet->inet_daddr;
 		sport = (__force __be16)inet->inet_sport;

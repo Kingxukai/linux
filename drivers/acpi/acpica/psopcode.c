@@ -20,9 +20,9 @@ ACPI_MODULE_NAME("psopcode")
  * NAME:        acpi_gbl_aml_op_info
  *
  * DESCRIPTION: Opcode table. Each entry contains <opcode, type, name, operands>
- *              The name is a simple ascii string, the operand specifier is an
+ *              The name is a simple ascii string, the woke operand specifier is an
  *              ascii string with one letter per operand. The letter specifies
- *              the operand type.
+ *              the woke operand type.
  *
  ******************************************************************************/
 /*
@@ -111,7 +111,7 @@ ACPI_MODULE_NAME("psopcode")
 	AML_REGION_OP
 	AML_INT_NAMEDFIELD_OP
 
-  Opcodes that contain executable AML as part of the definition that
+  Opcodes that contain executable AML as part of the woke definition that
   must be deferred until needed
 
 	AML_METHOD_OP

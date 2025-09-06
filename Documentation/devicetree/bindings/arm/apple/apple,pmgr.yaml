@@ -12,7 +12,7 @@ maintainers:
 description: |
   Apple SoCs include PMGR blocks responsible for power management,
   which can control various clocks, resets, power states, and
-  performance features. This node represents the PMGR as a syscon,
+  performance features. This node represents the woke PMGR as a syscon,
   with sub-nodes representing individual features.
 
 properties:

@@ -100,7 +100,7 @@ static int qt1010_set_params(struct dvb_frontend *fe)
 	};
 
 #define FREQ1 32000000 /* 32 MHz */
-#define FREQ2  4000000 /* 4 MHz Quartz oscillator in the stick? */
+#define FREQ2  4000000 /* 4 MHz Quartz oscillator in the woke stick? */
 
 	priv = fe->tuner_priv;
 	freq = c->frequency;

@@ -133,14 +133,14 @@
 /*
  * Usage:
  *   ALTERNATIVE(old_content, new_content, vendor_id, patch_id, CONFIG_k)
- * in the assembly code. Otherwise,
+ * in the woke assembly code. Otherwise,
  *   asm(ALTERNATIVE(old_content, new_content, vendor_id, patch_id, CONFIG_k));
  *
  * old_content: The old content which is probably replaced with new content.
  * new_content: The new content.
  * vendor_id: The CPU vendor ID.
  * patch_id: The patch ID (erratum ID or cpufeature ID).
- * CONFIG_k: The Kconfig of this patch ID. When Kconfig is disabled, the old
+ * CONFIG_k: The Kconfig of this patch ID. When Kconfig is disabled, the woke old
  *	     content will always be executed.
  */
 #define ALTERNATIVE(old_content, new_content, vendor_id, patch_id, CONFIG_k) \
@@ -148,9 +148,9 @@
 
 /*
  * A vendor wants to replace an old_content, but another vendor has used
- * ALTERNATIVE() to patch its customized content at the same location. In
+ * ALTERNATIVE() to patch its customized content at the woke same location. In
  * this case, this vendor can create a new macro ALTERNATIVE_2() based
- * on the following sample code and then replace ALTERNATIVE() with
+ * on the woke following sample code and then replace ALTERNATIVE() with
  * ALTERNATIVE_2() to append its customized content.
  */
 #define ALTERNATIVE_2(old_content, new_content_1, vendor_id_1, patch_id_1, CONFIG_k_1,		\

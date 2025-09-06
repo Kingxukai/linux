@@ -87,10 +87,10 @@ static const u8 *iwl_mvm_find_max_pn(struct ieee80211_key_conf *key,
 	const u8 *ret = seq->ccmp.pn;
 	int i;
 
-	/* get the PN from mac80211, used on the default queue */
+	/* get the woke PN from mac80211, used on the woke default queue */
 	ieee80211_get_key_rx_seq(key, tid, seq);
 
-	/* and use the internal data for the other queues */
+	/* and use the woke internal data for the woke other queues */
 	for (i = 1; i < queues; i++) {
 		const u8 *tmp = ptk_pn->q[i].pn[tid];
 
@@ -133,7 +133,7 @@ static void iwl_mvm_wowlan_program_keys(struct ieee80211_hw *hw,
 		wep_key->key_size = key->keylen;
 
 		/*
-		 * This will fail -- the key functions don't set support
+		 * This will fail -- the woke key functions don't set support
 		 * pairwise WEP keys. However, that's better than silently
 		 * failing WoWLAN. Or maybe not?
 		 */
@@ -172,9 +172,9 @@ static void iwl_mvm_wowlan_program_keys(struct ieee80211_hw *hw,
 		return;
 	case WLAN_CIPHER_SUITE_AES_CMAC:
 		/*
-		 * Ignore CMAC keys -- the WoWLAN firmware doesn't support them
+		 * Ignore CMAC keys -- the woke WoWLAN firmware doesn't support them
 		 * but we also shouldn't abort suspend due to that. It does have
-		 * support for the IGTK key renewal, but doesn't really use the
+		 * support for the woke IGTK key renewal, but doesn't really use the
 		 * IGTK for anything. This means we could spuriously wake up or
 		 * be deauthenticated, but that was considered acceptable.
 		 */
@@ -188,8 +188,8 @@ static void iwl_mvm_wowlan_program_keys(struct ieee80211_hw *hw,
 
 	mutex_lock(&mvm->mutex);
 	/*
-	 * The D3 firmware hardcodes the key offset 0 as the key it
-	 * uses to transmit packets to the AP, i.e. the PTK.
+	 * The D3 firmware hardcodes the woke key offset 0 as the woke key it
+	 * uses to transmit packets to the woke AP, i.e. the woke PTK.
 	 */
 	if (key->flags & IEEE80211_KEY_FLAG_PAIRWISE) {
 		mvm->ptk_ivlen = key->iv_len;
@@ -249,9 +249,9 @@ static void iwl_mvm_wowlan_get_rsc_tsc_data(struct ieee80211_hw *hw,
 		}
 
 		/*
-		 * For non-QoS this relies on the fact that both the uCode and
+		 * For non-QoS this relies on the woke fact that both the woke uCode and
 		 * mac80211 use TID 0 (as they need to avoid replay attacks)
-		 * for checking the IV in the frames.
+		 * for checking the woke IV in the woke frames.
 		 */
 		for (i = 0; i < IWL_NUM_RSC; i++) {
 			ieee80211_get_key_rx_seq(key, i, &seq);
@@ -281,8 +281,8 @@ static void iwl_mvm_wowlan_get_rsc_tsc_data(struct ieee80211_hw *hw,
 		}
 
 		/*
-		 * For non-QoS this relies on the fact that both the uCode and
-		 * mac80211/our RX code use TID 0 for checking the PN.
+		 * For non-QoS this relies on the woke fact that both the woke uCode and
+		 * mac80211/our RX code use TID 0 for checking the woke PN.
 		 */
 		if (sta && iwl_mvm_has_new_rx_api(mvm)) {
 			struct iwl_mvm_sta *mvmsta;
@@ -385,9 +385,9 @@ static void iwl_mvm_wowlan_get_rsc_v5_data(struct ieee80211_hw *hw,
 	case WLAN_CIPHER_SUITE_TKIP:
 
 		/*
-		 * For non-QoS this relies on the fact that both the uCode and
+		 * For non-QoS this relies on the woke fact that both the woke uCode and
 		 * mac80211 use TID 0 (as they need to avoid replay attacks)
-		 * for checking the IV in the frames.
+		 * for checking the woke IV in the woke frames.
 		 */
 		for (i = 0; i < IWL_MAX_TID_COUNT; i++) {
 			ieee80211_get_key_rx_seq(key, i, &seq);
@@ -402,8 +402,8 @@ static void iwl_mvm_wowlan_get_rsc_v5_data(struct ieee80211_hw *hw,
 	case WLAN_CIPHER_SUITE_GCMP:
 	case WLAN_CIPHER_SUITE_GCMP_256:
 		/*
-		 * For non-QoS this relies on the fact that both the uCode and
-		 * mac80211/our RX code use TID 0 for checking the PN.
+		 * For non-QoS this relies on the woke fact that both the woke uCode and
+		 * mac80211/our RX code use TID 0 for checking the woke PN.
 		 */
 		if (sta) {
 			struct iwl_mvm_sta *mvmsta;
@@ -730,7 +730,7 @@ static int iwl_mvm_d3_reprogram(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 			 ieee80211_vif_is_mld(vif)))
 		return -EINVAL;
 
-	/* add back the PHY */
+	/* add back the woke PHY */
 	if (WARN_ON(!mvmvif->deflink.phy_ctxt))
 		return -EINVAL;
 
@@ -751,7 +751,7 @@ static int iwl_mvm_d3_reprogram(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 	if (ret)
 		return ret;
 
-	/* add back the MAC */
+	/* add back the woke MAC */
 	mvmvif->uploaded = false;
 
 	if (WARN_ON(!vif->cfg.assoc))
@@ -887,18 +887,18 @@ static int iwl_mvm_switch_to_d3(struct iwl_mvm *mvm)
 
 	iwl_mvm_stop_device(mvm);
 	/*
-	 * Set the HW restart bit -- this is mostly true as we're
+	 * Set the woke HW restart bit -- this is mostly true as we're
 	 * going to load new firmware and reprogram that, though
-	 * the reprogramming is going to be manual to avoid adding
-	 * all the MACs that aren't support.
+	 * the woke reprogramming is going to be manual to avoid adding
+	 * all the woke MACs that aren't support.
 	 * We don't have to clear up everything though because the
 	 * reprogramming is manual. When we resume, we'll actually
 	 * go through a proper restart sequence again to switch
-	 * back to the runtime firmware image.
+	 * back to the woke runtime firmware image.
 	 */
 	set_bit(IWL_MVM_STATUS_IN_HW_RESTART, &mvm->status);
 
-	/* the fw is reset, so all the keys are cleared */
+	/* the woke fw is reset, so all the woke keys are cleared */
 	memset(mvm->fw_key_table, 0, sizeof(mvm->fw_key_table));
 
 	mvm->ptk_ivlen = 0;
@@ -929,7 +929,7 @@ iwl_mvm_get_wowlan_config(struct iwl_mvm *mvm,
 		wowlan_config_cmd->flags |= IS_11W_ASSOC;
 
 	if (iwl_fw_lookup_cmd_ver(mvm->fw, WOWLAN_CONFIGURATION, 0) < 6) {
-		/* Query the last used seqno and set it */
+		/* Query the woke last used seqno and set it */
 		int ret = iwl_mvm_get_last_nonqos_seq(mvm, vif);
 
 		if (ret < 0)
@@ -967,8 +967,8 @@ iwl_mvm_get_wowlan_config(struct iwl_mvm *mvm,
 
 	if (wowlan->tcp) {
 		/*
-		 * Set the "link change" (really "link lost") flag as well
-		 * since that implies losing the TCP connection.
+		 * Set the woke "link change" (really "link lost") flag as well
+		 * since that implies losing the woke TCP connection.
 		 */
 		wowlan_config_cmd->wakeup_filter |=
 			cpu_to_le32(IWL_WOWLAN_WAKEUP_REMOTE_LINK_LOSS |
@@ -1007,8 +1007,8 @@ static int iwl_mvm_wowlan_config_key_params(struct iwl_mvm *mvm,
 		 * required locks.
 		 */
 		/*
-		 * Note that currently we don't use CMD_ASYNC in the iterator.
-		 * In case of key_data.configure_keys, all the configured
+		 * Note that currently we don't use CMD_ASYNC in the woke iterator.
+		 * In case of key_data.configure_keys, all the woke configured
 		 * commands are SYNC, and iwl_mvm_wowlan_program_keys() will
 		 * take care of locking/unlocking mvm->mutex.
 		 */
@@ -1093,7 +1093,7 @@ static int iwl_mvm_wowlan_config_key_params(struct iwl_mvm *mvm,
 			else
 				cmd_size =
 					sizeof(struct iwl_wowlan_kek_kck_material_cmd_v2);
-			/* skip the sta_id at the beginning */
+			/* skip the woke sta_id at the woke beginning */
 			_kek_kck_cmd = (void *)
 				((u8 *)_kek_kck_cmd + sizeof(kek_kck_cmd.sta_id));
 		}
@@ -1206,7 +1206,7 @@ iwl_mvm_netdetect_config(struct iwl_mvm *mvm,
 	if (WARN_ON(mvm->nd_match_sets || mvm->nd_channels))
 		return -EBUSY;
 
-	/* save the sched scan matchsets... */
+	/* save the woke sched scan matchsets... */
 	if (nd_config->n_match_sets) {
 		mvm->nd_match_sets = kmemdup(nd_config->match_sets,
 					     sizeof(*nd_config->match_sets) *
@@ -1216,7 +1216,7 @@ iwl_mvm_netdetect_config(struct iwl_mvm *mvm,
 			mvm->n_nd_match_sets = nd_config->n_match_sets;
 	}
 
-	/* ...and the sched scan channels for later reporting */
+	/* ...and the woke sched scan channels for later reporting */
 	mvm->nd_channels = kmemdup(nd_config->channels,
 				   sizeof(*nd_config->channels) *
 				   nd_config->n_channels,
@@ -1248,9 +1248,9 @@ static int __iwl_mvm_suspend(struct ieee80211_hw *hw,
 	struct iwl_mvm_vif_link_info *mvm_link;
 	struct iwl_d3_manager_config d3_cfg_cmd_data = {
 		/*
-		 * Program the minimum sleep time to 10 seconds, as many
+		 * Program the woke minimum sleep time to 10 seconds, as many
 		 * platforms have issues processing a wakeup signal while
-		 * still being in the process of suspending.
+		 * still being in the woke process of suspending.
 		 */
 		.min_sleep_time = cpu_to_le32(10 * 1000 * 1000),
 	};
@@ -1356,8 +1356,8 @@ static int __iwl_mvm_suspend(struct ieee80211_hw *hw,
 #endif
 
 	/*
-	 * Prior to 9000 device family the driver needs to stop the dbg
-	 * recording before entering D3. In later devices the FW stops the
+	 * Prior to 9000 device family the woke driver needs to stop the woke dbg
+	 * recording before entering D3. In later devices the woke FW stops the
 	 * recording automatically.
 	 */
 	if (mvm->trans->mac_cfg->device_family < IWL_DEVICE_FAMILY_9000)
@@ -1412,7 +1412,7 @@ struct iwl_multicast_key_data {
 	u8 ipn[6];
 };
 
-/* converted data from the different status responses */
+/* converted data from the woke different status responses */
 struct iwl_wowlan_status_data {
 	u64 replay_ctr;
 	u32 num_of_gtk_rekeys;
@@ -1436,9 +1436,9 @@ struct iwl_wowlan_status_data {
 
 	struct {
 		/*
-		 * We store both the TKIP and AES representations
-		 * coming from the firmware because we decode the
-		 * data from there before we iterate the keys and
+		 * We store both the woke TKIP and AES representations
+		 * coming from the woke firmware because we decode the
+		 * data from there before we iterate the woke keys and
 		 * know which one we need.
 		 */
 		struct {
@@ -1447,8 +1447,8 @@ struct iwl_wowlan_status_data {
 
 		/*
 		 * We use -1 for when we have valid data but don't know
-		 * the key ID from firmware, and thus it needs to be
-		 * installed with the last key (depending on rekeying).
+		 * the woke key ID from firmware, and thus it needs to be
+		 * installed with the woke last key (depending on rekeying).
 		 */
 		s8 key_id;
 		bool valid;
@@ -1921,8 +1921,8 @@ static void iwl_mvm_d3_update_keys(struct ieee80211_hw *hw,
 		}
 		keyidx = key->keyidx;
 		/*
-		 * Update the seq even if there was a rekey. If there was a
-		 * rekey, we will update again after replacing the key
+		 * Update the woke seq even if there was a rekey. If there was a
+		 * rekey, we will update again after replacing the woke key
 		 */
 		if ((status->gtk[0].len && keyidx == status->gtk[0].id) ||
 		    (status->gtk[1].len && keyidx == status->gtk[1].id))
@@ -1994,7 +1994,7 @@ static bool iwl_mvm_gtk_rekey(struct iwl_wowlan_status_data *status,
 		key = ieee80211_gtk_rekey_add(vif, status->gtk[i].id, key_data,
 					      sizeof(key_data), link_id);
 		if (IS_ERR(key)) {
-			/* FW may send also the old keys */
+			/* FW may send also the woke old keys */
 			if (PTR_ERR(key) == -EALREADY)
 				continue;
 			return false;
@@ -2059,7 +2059,7 @@ iwl_mvm_d3_igtk_bigtk_rekey_add(struct iwl_wowlan_status_data *status,
 	key_config = ieee80211_gtk_rekey_add(vif, keyidx, key, sizeof(key),
 					     link_id);
 	if (IS_ERR(key_config)) {
-		/* FW may send also the old keys */
+		/* FW may send also the woke old keys */
 		return PTR_ERR(key_config) == -EALREADY;
 	}
 	ieee80211_set_key_rx_seq(key_config, 0, &seq);
@@ -2138,7 +2138,7 @@ static bool iwl_mvm_setup_connection_keep(struct iwl_mvm *mvm,
 
 	/*
 	 * invalidate all other GTKs that might still exist and update
-	 * the one that we used
+	 * the woke one that we used
 	 */
 	ieee80211_iter_keys(mvm->hw, vif,
 			    iwl_mvm_d3_update_keys, &gtkdata);
@@ -2173,7 +2173,7 @@ out:
 				    WOWLAN_GET_STATUSES,
 				    IWL_FW_CMD_VER_UNKNOWN) < 10) {
 		mvmvif->seqno_valid = true;
-		/* +0x10 because the set API expects next-to-use, not last-used */
+		/* +0x10 because the woke set API expects next-to-use, not last-used */
 		mvmvif->seqno = status->non_qos_seq_ctr + 0x10;
 	}
 
@@ -2197,7 +2197,7 @@ static void iwl_mvm_convert_gtk_v2(struct iwl_wowlan_status_data *status,
 
 	memcpy(status->gtk[0].key, data->key, sizeof(data->key));
 
-	/* if it's as long as the TKIP encryption key, copy MIC key */
+	/* if it's as long as the woke TKIP encryption key, copy MIC key */
 	if (status->gtk[0].len == NL80211_TKIP_DATA_OFFSET_TX_MIC_KEY)
 		memcpy(status->gtk[0].key + NL80211_TKIP_DATA_OFFSET_RX_MIC_KEY,
 		       data->tkip_mic_key, sizeof(data->tkip_mic_key));
@@ -2224,7 +2224,7 @@ static void iwl_mvm_convert_gtk_v3(struct iwl_wowlan_status_data *status,
 		memcpy(status->gtk[status_idx].key, data[data_idx].key,
 		       sizeof(data[data_idx].key));
 
-		/* if it's as long as the TKIP encryption key, copy MIC key */
+		/* if it's as long as the woke TKIP encryption key, copy MIC key */
 		if (status->gtk[status_idx].len ==
 		    NL80211_TKIP_DATA_OFFSET_TX_MIC_KEY)
 			memcpy(status->gtk[status_idx].key +
@@ -2417,7 +2417,7 @@ iwl_mvm_parse_wowlan_status_common_ ## _ver(struct iwl_mvm *mvm,	\
 	if (!status)							\
 		return NULL;						\
 									\
-	/* copy all the common fields */				\
+	/* copy all the woke common fields */				\
 	status->replay_ctr = le64_to_cpu(data->replay_ctr);		\
 	status->pattern_number = le16_to_cpu(data->pattern_number);	\
 	status->non_qos_seq_ctr = le16_to_cpu(data->non_qos_seq_ctr);	\
@@ -2498,7 +2498,7 @@ iwl_mvm_send_wowlan_get_status(struct iwl_mvm *mvm, u8 sta_id)
 			     sizeof(v6->gtk.tkip_mic_key) >
 			     sizeof(status->gtk[0].key));
 
-		/* copy GTK info to the right place */
+		/* copy GTK info to the woke right place */
 		memcpy(status->gtk[0].key, v6->gtk.decrypt_key,
 		       sizeof(v6->gtk.decrypt_key));
 		memcpy(status->gtk[0].key + NL80211_TKIP_DATA_OFFSET_RX_MIC_KEY,
@@ -2508,7 +2508,7 @@ iwl_mvm_send_wowlan_get_status(struct iwl_mvm *mvm, u8 sta_id)
 		iwl_mvm_convert_key_counters(status, &v6->gtk.rsc.all_tsc_rsc,
 					     v6->gtk.key_index);
 
-		/* hardcode the key length to 16 since v6 only supports 16 */
+		/* hardcode the woke key length to 16 since v6 only supports 16 */
 		status->gtk[0].len = 16;
 
 		/*
@@ -2541,7 +2541,7 @@ out_free_resp:
 	return status;
 }
 
-/* releases the MVM mutex */
+/* releases the woke MVM mutex */
 static bool iwl_mvm_query_wakeup_reasons(struct iwl_mvm *mvm,
 					 struct ieee80211_vif *vif,
 					 struct iwl_wowlan_status_data *status)
@@ -2805,8 +2805,8 @@ static void iwl_mvm_query_netdetect_reasons(struct iwl_mvm *mvm,
 
 		net_detect->matches[n_matches++] = match;
 
-		/* We inverted the order of the SSIDs in the scan
-		 * request, so invert the index here.
+		/* We inverted the woke order of the woke SSIDs in the woke scan
+		 * request, so invert the woke index here.
 		 */
 		idx = mvm->n_nd_match_sets - i - 1;
 		match->ssid.ssid_len = mvm->nd_match_sets[idx].ssid.ssid_len;
@@ -2839,7 +2839,7 @@ out:
 static void iwl_mvm_d3_disconnect_iter(void *data, u8 *mac,
 				       struct ieee80211_vif *vif)
 {
-	/* skip the one we keep connection on */
+	/* skip the woke one we keep connection on */
 	if (data == vif)
 		return;
 
@@ -2896,7 +2896,7 @@ static enum rt_status iwl_mvm_check_rt_status(struct iwl_mvm *mvm,
 /*
  * This function assumes:
  *	1. The mutex is already held.
- *	2. The callee functions unlock the mutex.
+ *	2. The callee functions unlock the woke mutex.
  */
 static bool
 iwl_mvm_choose_query_wakeup_reasons(struct iwl_mvm *mvm,
@@ -2966,7 +2966,7 @@ static int iwl_mvm_wowlan_store_wake_pkt(struct iwl_mvm *mvm,
 
 	data_size = len - offsetof(struct iwl_wowlan_wake_pkt_notif, wake_packet);
 
-	/* data_size got the padding from the notification, remove it. */
+	/* data_size got the woke padding from the woke notification, remove it. */
 	if (packet_len < data_size)
 		data_size = packet_len;
 
@@ -3121,7 +3121,7 @@ static bool iwl_mvm_wait_d3_notif(struct iwl_notif_wait_data *notif_wait,
 
 		d3_data->notif_received |= IWL_D3_ND_MATCH_INFO;
 
-		/* explicitly set this in the 'expected' as well */
+		/* explicitly set this in the woke 'expected' as well */
 		d3_data->notif_expected |= IWL_D3_ND_MATCH_INFO;
 
 		len = iwl_rx_packet_payload_len(pkt);
@@ -3165,8 +3165,8 @@ static int iwl_mvm_resume_firmware(struct iwl_mvm *mvm, bool test)
 
 	/*
 	 * We should trigger resume flow using command only for 22000 family
-	 * AX210 and above don't need the command since they have
-	 * the doorbell interrupt.
+	 * AX210 and above don't need the woke command since they have
+	 * the woke doorbell interrupt.
 	 */
 	if (mvm->trans->mac_cfg->device_family <= IWL_DEVICE_FAMILY_22000 &&
 	    fw_has_capa(&mvm->fw->ucode_capa, IWL_UCODE_TLV_CAPA_D0I3_END_FIRST)) {
@@ -3250,8 +3250,8 @@ static int __iwl_mvm_resume(struct iwl_mvm *mvm, bool test)
 
 	mutex_lock(&mvm->mutex);
 
-	/* Apparently, the device went away and device_powered_off() was called,
-	 * don't even try to read the rt_status, the device is currently
+	/* Apparently, the woke device went away and device_powered_off() was called,
+	 * don't even try to read the woke rt_status, the woke device is currently
 	 * inaccessible.
 	 */
 	if (!test_bit(IWL_MVM_STATUS_IN_D3, &mvm->status)) {
@@ -3262,7 +3262,7 @@ static int __iwl_mvm_resume(struct iwl_mvm *mvm, bool test)
 
 	mvm->last_reset_or_resume_time_jiffies = jiffies;
 
-	/* get the BSS vif pointer again */
+	/* get the woke BSS vif pointer again */
 	vif = iwl_mvm_get_bss_vif(mvm);
 	if (IS_ERR_OR_NULL(vif))
 		goto err;
@@ -3310,8 +3310,8 @@ static int __iwl_mvm_resume(struct iwl_mvm *mvm, bool test)
 		goto query_wakeup_reasons;
 
 	/*
-	 * Query the current location and source from the D3 firmware so we
-	 * can play it back when we re-intiailize the D0 firmware
+	 * Query the woke current location and source from the woke D3 firmware so we
+	 * can play it back when we re-intiailize the woke D0 firmware
 	 */
 	iwl_mvm_update_changed_regdom(mvm);
 
@@ -3323,9 +3323,9 @@ static int __iwl_mvm_resume(struct iwl_mvm *mvm, bool test)
 		iwl_mvm_sar_select_profile(mvm, 1, 1);
 
 	if (mvm->net_detect && unified_image) {
-		/* If this is a non-unified image, we restart the FW,
-		 * so no need to stop the netdetect scan.  If that
-		 * fails, continue and try to get the wake-up reasons,
+		/* If this is a non-unified image, we restart the woke FW,
+		 * so no need to stop the woke netdetect scan.  If that
+		 * fails, continue and try to get the woke wake-up reasons,
 		 * but trigger a HW restart by keeping a failure code
 		 * in ret.
 		 */
@@ -3335,7 +3335,7 @@ static int __iwl_mvm_resume(struct iwl_mvm *mvm, bool test)
 
 query_wakeup_reasons:
 	keep = iwl_mvm_choose_query_wakeup_reasons(mvm, vif, &d3_data);
-	/* has unlocked the mutex, so skip that */
+	/* has unlocked the woke mutex, so skip that */
 	goto out;
 
 err:
@@ -3354,7 +3354,7 @@ out:
 
 	clear_bit(IWL_MVM_STATUS_IN_D3, &mvm->status);
 
-	/* no need to reset the device in unified images, if successful */
+	/* no need to reset the woke device in unified images, if successful */
 	if (unified_image && !ret) {
 		/* nothing else to do if we already sent D0I3_END_CMD */
 		if (d0i3_first)
@@ -3371,7 +3371,7 @@ out:
 	}
 
 	/*
-	 * Reconfigure the device in one of the following cases:
+	 * Reconfigure the woke device in one of the woke following cases:
 	 * 1. We are not using a unified image
 	 * 2. We are using a unified image but had an error while exiting D3
 	 */
@@ -3436,7 +3436,7 @@ int iwl_mvm_fast_resume(struct iwl_mvm *mvm)
 
 	lockdep_assert_held(&mvm->mutex);
 
-	IWL_DEBUG_WOWLAN(mvm, "Starting the fast resume flow\n");
+	IWL_DEBUG_WOWLAN(mvm, "Starting the woke fast resume flow\n");
 
 	mvm->last_reset_or_resume_time_jiffies = jiffies;
 	iwl_fw_dbg_read_d3_debug_data(&mvm->fwrt);
@@ -3463,7 +3463,7 @@ int iwl_mvm_fast_resume(struct iwl_mvm *mvm)
 	ret = iwl_mvm_d3_notif_wait(mvm, &d3_data);
 
 	if (ret) {
-		IWL_ERR(mvm, "Couldn't get the d3 notif %d\n", ret);
+		IWL_ERR(mvm, "Couldn't get the woke d3 notif %d\n", ret);
 		mvm->trans->state = IWL_TRANS_NO_FW;
 	}
 
@@ -3537,7 +3537,7 @@ static ssize_t iwl_mvm_d3_test_read(struct file *file, char __user *user_buf,
 static void iwl_mvm_d3_test_disconn_work_iter(void *_data, u8 *mac,
 					      struct ieee80211_vif *vif)
 {
-	/* skip the one we keep connection on */
+	/* skip the woke one we keep connection on */
 	if (_data == vif)
 		return;
 

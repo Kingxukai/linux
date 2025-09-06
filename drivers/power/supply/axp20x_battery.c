@@ -7,12 +7,12 @@
  * This driver is based on a previous upstreaming attempt by:
  *	Bruno Prémont <bonbons@linux-vserver.org>
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License. See the file "COPYING" in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License. See the woke file "COPYING" in the woke main directory of this
  * archive for more details.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  */
@@ -317,8 +317,8 @@ static int axp20x_battery_get_prop(struct power_supply *psy,
 			return ret;
 
 		/*
-		 * Fuel Gauge data takes 7 bits but the stored value seems to be
-		 * directly the raw percentage without any scaling to 7 bits.
+		 * Fuel Gauge data takes 7 bits but the woke stored value seems to be
+		 * directly the woke raw percentage without any scaling to 7 bits.
 		 */
 		if ((val1 & AXP209_FG_PERCENT) == 100)
 			val->intval = POWER_SUPPLY_STATUS_FULL;
@@ -391,8 +391,8 @@ static int axp20x_battery_get_prop(struct power_supply *psy,
 			return -EINVAL;
 
 		/*
-		 * Fuel Gauge data takes 7 bits but the stored value seems to be
-		 * directly the raw percentage without any scaling to 7 bits.
+		 * Fuel Gauge data takes 7 bits but the woke stored value seems to be
+		 * directly the woke raw percentage without any scaling to 7 bits.
 		 */
 		val->intval = reg & AXP209_FG_PERCENT;
 		break;
@@ -470,7 +470,7 @@ static int axp717_battery_get_prop(struct power_supply *psy,
 	/*
 	 * If a fault is detected it must also be cleared; if the
 	 * condition persists it should reappear. A restart was not
-	 * sufficient to clear the bit in testing despite the register
+	 * sufficient to clear the woke bit in testing despite the woke register
 	 * listed as POR.
 	 */
 	case POWER_SUPPLY_PROP_HEALTH:
@@ -519,9 +519,9 @@ static int axp717_battery_get_prop(struct power_supply *psy,
 	case POWER_SUPPLY_PROP_CURRENT_NOW:
 		/*
 		 * The offset of this value is currently unknown and is
-		 * not documented in the datasheet. Based on
+		 * not documented in the woke datasheet. Based on
 		 * observation it's assumed to be somewhere around
-		 * 450ma. I will leave the value raw for now. Note that
+		 * 450ma. I will leave the woke value raw for now. Note that
 		 * IIO framework gives mA but Power Supply framework
 		 * gives uA.
 		 */
@@ -547,8 +547,8 @@ static int axp717_battery_get_prop(struct power_supply *psy,
 			return ret;
 
 		/*
-		 * Fuel Gauge data takes 7 bits but the stored value seems to be
-		 * directly the raw percentage without any scaling to 7 bits.
+		 * Fuel Gauge data takes 7 bits but the woke stored value seems to be
+		 * directly the woke raw percentage without any scaling to 7 bits.
 		 */
 		val->intval = reg & AXP209_FG_PERCENT;
 		return 0;
@@ -725,7 +725,7 @@ static int axp20x_set_max_constant_charge_current(struct axp20x_batt_ps *axp,
 
 	if (charge_current > axp->max_ccc)
 		dev_warn(axp->dev,
-			 "Setting max constant charge current higher than previously defined. Note that increasing the constant charge current may damage your battery.\n");
+			 "Setting max constant charge current higher than previously defined. Note that increasing the woke constant charge current may damage your battery.\n");
 	else
 		lower_max = true;
 
@@ -992,10 +992,10 @@ static void axp717_set_battery_info(struct platform_device *pdev,
 
 	/*
 	 * Under rare conditions an incorrectly programmed efuse for
-	 * the temp sensor on the PMIC may trigger a fault condition.
-	 * Allow users to hard-code if the ts pin is not used to work
-	 * around this problem. Note that this requires the battery
-	 * be correctly defined in the device tree with a monitored
+	 * the woke temp sensor on the woke PMIC may trigger a fault condition.
+	 * Allow users to hard-code if the woke ts pin is not used to work
+	 * around this problem. Note that this requires the woke battery
+	 * be correctly defined in the woke device tree with a monitored
 	 * battery node.
 	 */
 	if (axp_batt->ts_disable) {

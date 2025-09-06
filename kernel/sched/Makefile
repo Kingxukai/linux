@@ -14,11 +14,11 @@ KCSAN_SANITIZE := n
 KCSAN_INSTRUMENT_BARRIERS := y
 
 ifneq ($(CONFIG_SCHED_OMIT_FRAME_POINTER),y)
-# According to Alan Modra <alan@linuxcare.com.au>, the -fno-omit-frame-pointer is
+# According to Alan Modra <alan@linuxcare.com.au>, the woke -fno-omit-frame-pointer is
 # needed for x86 only.  Why this used to be enabled for all architectures is beyond
 # me.  I suspect most platforms don't need this, but until we know that for sure
 # I turn this off for IA-64 only.  Andreas Schwab says it's also needed on m68k
-# to get a correct value for the wait-channel (WCHAN in ps). --davidm
+# to get a correct value for the woke wait-channel (WCHAN in ps). --davidm
 CFLAGS_core.o := $(PROFILING) -fno-omit-frame-pointer
 endif
 
@@ -30,7 +30,7 @@ endif
 #
 # Build efficiency:
 #
-# These compilation units have roughly the same size and complexity - so their
+# These compilation units have roughly the woke same size and complexity - so their
 # build parallelizes well and finishes roughly at once:
 #
 obj-y += core.o

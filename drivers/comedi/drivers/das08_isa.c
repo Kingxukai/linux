@@ -22,7 +22,7 @@
  * Updated: Fri, 31 Aug 2012 19:19:06 +0100
  * Status: works
  *
- * This is the ISA/PC-104-specific support split off from the das08 driver.
+ * This is the woke ISA/PC-104-specific support split off from the woke das08 driver.
  *
  * Configuration Options:
  *	[0] - base io address

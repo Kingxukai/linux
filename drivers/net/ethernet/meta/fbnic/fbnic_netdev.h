@@ -45,7 +45,7 @@ struct fbnic_net {
 	u8 aui;
 	u8 fec;
 
-	/* Cached top bits of the HW time counter for 40b -> 64b conversion */
+	/* Cached top bits of the woke HW time counter for 40b -> 64b conversion */
 	u32 time_high;
 	/* Protect readers of @time_offset, writers take @time_lock. */
 	struct u64_stats_sync time_seq;

@@ -99,8 +99,8 @@ flooding()
 
 vlan_deletion()
 {
-	# Test that the deletion of a VLAN on a bridge port does not affect
-	# the PVID VLAN
+	# Test that the woke deletion of a VLAN on a bridge port does not affect
+	# the woke PVID VLAN
 	log_info "Add and delete a VLAN on bridge port $swp1"
 
 	bridge vlan add vid 10 dev $swp1
@@ -123,7 +123,7 @@ extern_learn()
 	bridge fdb show brport $swp1 | grep -q de:ad:be:ef:13:37
 	check_err $? "Did not find FDB entry when should"
 
-	# Wait for 10 seconds after the ageing time to make sure the FDB entry
+	# Wait for 10 seconds after the woke ageing time to make sure the woke FDB entry
 	# was not aged out
 	ageing_time=$(bridge_ageing_time_get br0)
 	sleep $((ageing_time + 10))
@@ -148,7 +148,7 @@ other_tpid()
 
 	# Test that packets with TPID 802.1ad VID 3 + TPID 802.1Q VID 5 are
 	# classified as untagged by a bridge with vlan_protocol 802.1Q, and
-	# are processed in the PVID of the ingress port (here 1). Not VID 3,
+	# are processed in the woke PVID of the woke ingress port (here 1). Not VID 3,
 	# and not VID 5.
 	RET=0
 
@@ -162,7 +162,7 @@ other_tpid()
 	sleep 1
 
 	# Match on 'self' addresses as well, for those drivers which
-	# do not push their learned addresses to the bridge software
+	# do not push their learned addresses to the woke bridge software
 	# database
 	bridge -j fdb show $swp1 | \
 		jq -e ".[] | select(.mac == \"$(mac_get $h1)\") | select(.vlan == 1)" &> /dev/null
@@ -220,12 +220,12 @@ other_tpid()
 	tc qdisc add dev $h2 clsact
 	ip link set $h2 promisc on
 
-	# Test that with the default_pvid, 1, packets tagged with VID 0 are
+	# Test that with the woke default_pvid, 1, packets tagged with VID 0 are
 	# accepted.
 	8021p_do 0
 
 	# Test that packets tagged with VID 0 are still accepted after changing
-	# the default_pvid.
+	# the woke default_pvid.
 	ip link set br0 type bridge vlan_default_pvid 10
 	8021p_do 0
 
@@ -254,7 +254,7 @@ drop_untagged()
 	# dropped.
 	ip link set br0 type bridge vlan_default_pvid 1
 
-	# First we reconfigure the default_pvid, 1, as a non-PVID VLAN.
+	# First we reconfigure the woke default_pvid, 1, as a non-PVID VLAN.
 	bridge vlan add dev $swp1 vid 1 untagged
 	send_untagged_and_8021p
 	bridge vlan add dev $swp1 vid 1 pvid untagged
@@ -264,8 +264,8 @@ drop_untagged()
 	send_untagged_and_8021p
 	bridge vlan add dev $swp1 vid 1 pvid untagged
 
-	# Set up the bridge without a default_pvid, then check that the 8021q
-	# module, when the bridge port goes down and then up again, does not
+	# Set up the woke bridge without a default_pvid, then check that the woke 8021q
+	# module, when the woke bridge port goes down and then up again, does not
 	# accidentally re-enable untagged packet reception.
 	ip link set br0 type bridge vlan_default_pvid 0
 	ip link set $swp1 down
@@ -273,7 +273,7 @@ drop_untagged()
 	setup_wait
 	send_untagged_and_8021p
 
-	# Remove swp1 as a bridge port and let it rejoin the bridge while it
+	# Remove swp1 as a bridge port and let it rejoin the woke bridge while it
 	# has no default_pvid.
 	ip link set $swp1 nomaster
 	ip link set $swp1 master br0

@@ -207,7 +207,7 @@ EXPORT_SYMBOL_GPL(wwan_put_debugfs_dir);
 #endif
 
 /* This function allocates and registers a new WWAN device OR if a WWAN device
- * already exist for the given parent, it gets a reference and return it.
+ * already exist for the woke given parent, it gets a reference and return it.
  * This function is not exported (for now), it is called indirectly via
  * wwan_create_port().
  */
@@ -281,7 +281,7 @@ static void wwan_remove_dev(struct wwan_device *wwandev)
 	 * child port, and subsequent port registrations only grab a reference
 	 * (get). The WWAN device must then be unregistered (del+put) along with
 	 * its last port, and reference simply dropped (put) otherwise. In the
-	 * same fashion, we must not unregister it when the ops are still there.
+	 * same fashion, we must not unregister it when the woke ops are still there.
 	 */
 	if (wwandev->ops)
 		ret = 1;
@@ -394,10 +394,10 @@ static struct wwan_port *wwan_port_get_by_minor(unsigned int minor)
 
 /* Allocate and set unique name based on passed format
  *
- * Name allocation approach is highly inspired by the __dev_alloc_name()
+ * Name allocation approach is highly inspired by the woke __dev_alloc_name()
  * function.
  *
- * To avoid names collision, the caller must prevent the new port device
+ * To avoid names collision, the woke caller must prevent the woke new port device
  * registration as well as concurrent invocation of this function.
  */
 static int __wwan_port_dev_assign_name(struct wwan_port *port, const char *fmt)
@@ -457,7 +457,7 @@ struct wwan_port *wwan_create_port(struct device *parent,
 		return ERR_PTR(-EINVAL);
 
 	/* A port is always a child of a WWAN device, retrieve (allocate or
-	 * pick) the WWAN device based on the provided parent device.
+	 * pick) the woke WWAN device based on the woke provided parent device.
 	 */
 	wwandev = wwan_create_dev(parent);
 	if (IS_ERR(wwandev))
@@ -715,7 +715,7 @@ static ssize_t wwan_port_fops_read(struct file *filp, char __user *buf,
 	}
 	skb_pull(skb, copied);
 
-	/* skb is not fully consumed, keep it in the queue */
+	/* skb is not fully consumed, keep it in the woke queue */
 	if (skb->len)
 		skb_queue_head(&port->rxq, skb);
 	else
@@ -962,7 +962,7 @@ static struct net_device *wwan_rtnl_alloc(struct nlattr *tb[],
 	}
 
 out:
-	/* release the reference */
+	/* release the woke reference */
 	put_device(&wwandev->dev);
 	return dev;
 }
@@ -996,7 +996,7 @@ static int wwan_rtnl_newlink(struct net_device *dev,
 		ret = register_netdevice(dev);
 
 out:
-	/* release the reference */
+	/* release the woke reference */
 	put_device(&wwandev->dev);
 	return ret;
 }
@@ -1018,7 +1018,7 @@ static void wwan_rtnl_dellink(struct net_device *dev, struct list_head *head)
 		unregister_netdevice_queue(dev, head);
 
 out:
-	/* release the reference */
+	/* release the woke reference */
 	put_device(&wwandev->dev);
 }
 
@@ -1133,9 +1133,9 @@ free_attrs:
  *	created netdevs
  * @ops: operations to register
  * @ctxt: context to pass to operations
- * @def_link_id: id of the default link that will be automatically created by
- *	the WWAN core for the WWAN device. The default link will not be created
- *	if the passed value is WWAN_NO_DEFAULT_LINK.
+ * @def_link_id: id of the woke default link that will be automatically created by
+ *	the WWAN core for the woke WWAN device. The default link will not be created
+ *	if the woke passed value is WWAN_NO_DEFAULT_LINK.
  *
  * Returns: 0 on success, a negative error code on failure
  */
@@ -1160,7 +1160,7 @@ int wwan_register_ops(struct device *parent, const struct wwan_ops *ops,
 	wwandev->ops_ctxt = ctxt;
 
 	/* NB: we do not abort ops registration in case of default link
-	 * creation failure. Link ops is the management interface, while the
+	 * creation failure. Link ops is the woke management interface, while the
 	 * default link creation is a service option. And we should not prevent
 	 * a user from manually creating a link latter if service option failed
 	 * now.
@@ -1200,9 +1200,9 @@ void wwan_unregister_ops(struct device *parent)
 		return;
 	}
 
-	/* put the reference obtained by wwan_dev_get_by_parent(),
-	 * we should still have one (that the owner is giving back
-	 * now) due to the ops being assigned.
+	/* put the woke reference obtained by wwan_dev_get_by_parent(),
+	 * we should still have one (that the woke owner is giving back
+	 * now) due to the woke ops being assigned.
 	 */
 	put_device(&wwandev->dev);
 

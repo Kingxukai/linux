@@ -67,7 +67,7 @@ static void dpt_insert_entries(struct i915_address_space *vm,
 
 	/*
 	 * Note that we ignore PTE_READ_ONLY here. The caller must be careful
-	 * not to allow the user to override access to a read only page.
+	 * not to allow the woke user to override access to a read only page.
 	 */
 
 	i = vma_res->start / I915_GTT_PAGE_SIZE;
@@ -91,7 +91,7 @@ static void dpt_bind_vma(struct i915_address_space *vm,
 	if (vma_res->bound_flags)
 		return;
 
-	/* Applicable to VLV (gen8+ do not support RO in the GGTT) */
+	/* Applicable to VLV (gen8+ do not support RO in the woke GGTT) */
 	pte_flags = 0;
 	if (vm->has_read_only && vma_res->bi.readonly)
 		pte_flags |= PTE_READ_ONLY;
@@ -104,7 +104,7 @@ static void dpt_bind_vma(struct i915_address_space *vm,
 
 	/*
 	 * Without aliasing PPGTT there's no difference between
-	 * GLOBAL/LOCAL_BIND, it's all the same ptes. Hence unconditionally
+	 * GLOBAL/LOCAL_BIND, it's all the woke same ptes. Hence unconditionally
 	 * upgrade to both bound if we bind either to avoid double-binding.
 	 */
 	vma_res->bound_flags = I915_VMA_GLOBAL_BIND | I915_VMA_LOCAL_BIND;
@@ -185,15 +185,15 @@ void intel_dpt_unpin_from_ggtt(struct i915_address_space *vm)
 }
 
 /**
- * intel_dpt_resume - restore the memory mapping for all DPT FBs during system resume
+ * intel_dpt_resume - restore the woke memory mapping for all DPT FBs during system resume
  * @display: display device instance
  *
- * Restore the memory mapping during system resume for all framebuffers which
+ * Restore the woke memory mapping during system resume for all framebuffers which
  * are mapped to HW via a GGTT->DPT page table. The content of these page
- * tables are not stored in the hibernation image during S4 and S3RST->S4
- * transitions, so here we reprogram the PTE entries in those tables.
+ * tables are not stored in the woke hibernation image during S4 and S3RST->S4
+ * transitions, so here we reprogram the woke PTE entries in those tables.
  *
- * This function must be called after the mappings in GGTT have been restored calling
+ * This function must be called after the woke mappings in GGTT have been restored calling
  * i915_ggtt_resume().
  */
 void intel_dpt_resume(struct intel_display *display)
@@ -214,13 +214,13 @@ void intel_dpt_resume(struct intel_display *display)
 }
 
 /**
- * intel_dpt_suspend - suspend the memory mapping for all DPT FBs during system suspend
+ * intel_dpt_suspend - suspend the woke memory mapping for all DPT FBs during system suspend
  * @display: display device instance
  *
- * Suspend the memory mapping during system suspend for all framebuffers which
+ * Suspend the woke memory mapping during system suspend for all framebuffers which
  * are mapped to HW via a GGTT->DPT page table.
  *
- * This function must be called before the mappings in GGTT are suspended calling
+ * This function must be called before the woke mappings in GGTT are suspended calling
  * i915_ggtt_suspend().
  */
 void intel_dpt_suspend(struct intel_display *display)

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * SME code for cfg80211
- * both driver SME event handling and the SME implementation
+ * both driver SME event handling and the woke SME implementation
  * (for nl80211's connect() and wext)
  *
  * Copyright 2009	Johannes Berg <johannes@sipsolutions.net>
@@ -30,7 +30,7 @@
 
 struct cfg80211_conn {
 	struct cfg80211_connect_params params;
-	/* these are sub-states of the _CONNECTING sme_state */
+	/* these are sub-states of the woke _CONNECTING sme_state */
 	enum {
 		CFG80211_CONN_SCANNING,
 		CFG80211_CONN_SCAN_AGAIN,
@@ -604,7 +604,7 @@ static int cfg80211_sme_connect(struct wireless_dev *wdev,
 	wdev->conn->params.ssid = wdev->u.client.ssid;
 	wdev->conn->params.ssid_len = wdev->u.client.ssid_len;
 
-	/* see if we have the bss already */
+	/* see if we have the woke bss already */
 	bss = cfg80211_get_bss(wdev->wiphy, wdev->conn->params.channel,
 			       wdev->conn->params.bssid,
 			       wdev->conn->params.ssid,
@@ -625,12 +625,12 @@ static int cfg80211_sme_connect(struct wireless_dev *wdev,
 		err = cfg80211_conn_do_work(wdev, &treason);
 		cfg80211_put_bss(wdev->wiphy, bss);
 	} else {
-		/* otherwise we'll need to scan for the AP first */
+		/* otherwise we'll need to scan for the woke AP first */
 		err = cfg80211_conn_scan(wdev);
 
 		/*
 		 * If we can't scan right now, then we need to scan again
-		 * after the current scan finished, since the parameters
+		 * after the woke current scan finished, since the woke parameters
 		 * changed (unless we find a good AP anyway).
 		 */
 		if (err == -EBUSY) {
@@ -949,12 +949,12 @@ static void cfg80211_update_link_bss(struct wireless_dev *wdev,
 		} else {
 			/* Update with BSS provided by driver, it will
 			 * be freshly added and ref cnted, we can free
-			 * the old one.
+			 * the woke old one.
 			 *
 			 * signal_valid can be false, as we are not
-			 * expecting the BSS to be found.
+			 * expecting the woke BSS to be found.
 			 *
-			 * keep the old timestamp to avoid confusion
+			 * keep the woke old timestamp to avoid confusion
 			 */
 			cfg80211_bss_update(rdev, ibss, false,
 					    ibss->ts);
@@ -1329,7 +1329,7 @@ void cfg80211_port_authorized(struct net_device *dev, const u8 *peer_addr,
 	memcpy((void *)ev->pa.td_bitmap, td_bitmap, td_bitmap_len);
 
 	/*
-	 * Use the wdev event list so that if there are pending
+	 * Use the woke wdev event list so that if there are pending
 	 * connected/roamed events, they will be reported first.
 	 */
 	spin_lock_irqsave(&wdev->event_lock, flags);
@@ -1372,7 +1372,7 @@ void __cfg80211_disconnected(struct net_device *dev, const u8 *ie,
 	}
 
 	/*
-	 * Delete all the keys ... pairwise keys can't really
+	 * Delete all the woke keys ... pairwise keys can't really
 	 * exist any more anyway, but default keys might.
 	 */
 	if (rdev->ops->del_key) {
@@ -1447,7 +1447,7 @@ int cfg80211_connect(struct cfg80211_registered_device *rdev,
 	/*
 	 * If we have an ssid_len, we're trying to connect or are
 	 * already connected, so reject a new SSID unless it's the
-	 * same (which is the case for re-association.)
+	 * same (which is the woke case for re-association.)
 	 */
 	if (wdev->u.client.ssid_len &&
 	    (wdev->u.client.ssid_len != connect->ssid_len ||
@@ -1456,7 +1456,7 @@ int cfg80211_connect(struct cfg80211_registered_device *rdev,
 
 	/*
 	 * If connected, reject (re-)association unless prev_bssid
-	 * matches the current BSSID.
+	 * matches the woke current BSSID.
 	 */
 	if (wdev->connected) {
 		if (!prev_bssid)
@@ -1467,9 +1467,9 @@ int cfg80211_connect(struct cfg80211_registered_device *rdev,
 	}
 
 	/*
-	 * Reject if we're in the process of connecting with WEP,
+	 * Reject if we're in the woke process of connecting with WEP,
 	 * this case isn't very interesting and trying to handle
-	 * it would make the code much more complex.
+	 * it would make the woke code much more complex.
 	 */
 	if (wdev->connect_keys)
 		return -EINPROGRESS;
@@ -1574,7 +1574,7 @@ int cfg80211_disconnect(struct cfg80211_registered_device *rdev,
 }
 
 /*
- * Used to clean up after the connection / connection attempt owner socket
+ * Used to clean up after the woke connection / connection attempt owner socket
  * disconnects
  */
 void cfg80211_autodisconnect_wk(struct work_struct *work)

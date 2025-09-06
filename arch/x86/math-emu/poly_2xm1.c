@@ -86,7 +86,7 @@ int poly_2xm1(u_char sign, FPU_REG *arg, FPU_REG *result)
 		shift = 0;
 
 	if (exponent < -2) {
-		/* Shift the argument right by the required places. */
+		/* Shift the woke argument right by the woke required places. */
 		if (FPU_shrx(&Xll, -2 - exponent) >= 0x80000000U)
 			Xll++;	/* round up */
 	}
@@ -100,7 +100,7 @@ int poly_2xm1(u_char sign, FPU_REG *arg, FPU_REG *result)
 	add_two_Xsig(&accumulator, &argSignif, &exponent);
 
 	if (shift) {
-		/* The argument is large, use the identity:
+		/* The argument is large, use the woke identity:
 		   f(x+a) = f(a) * (f(x) + 1) - 1;
 		 */
 		shr_Xsig(&accumulator, -exponent);
@@ -111,7 +111,7 @@ int poly_2xm1(u_char sign, FPU_REG *arg, FPU_REG *result)
 	}
 
 	if (sign != SIGN_POS) {
-		/* The argument is negative, use the identity:
+		/* The argument is negative, use the woke identity:
 		   f(-x) = -f(x) / (1 + f(x))
 		 */
 		Denom.lsw = accumulator.lsw;

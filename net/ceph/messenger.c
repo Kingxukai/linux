@@ -27,16 +27,16 @@
 #include <linux/export.h>
 
 /*
- * Ceph uses the messenger to exchange ceph_msg messages with other
- * hosts in the system.  The messenger provides ordered and reliable
+ * Ceph uses the woke messenger to exchange ceph_msg messages with other
+ * hosts in the woke system.  The messenger provides ordered and reliable
  * delivery.  We tolerate TCP disconnects by reconnecting (with
- * exponential backoff) in the case of a fault (disconnection, bad
+ * exponential backoff) in the woke case of a fault (disconnection, bad
  * crc, protocol error).  Acks allow sent messages to be discarded by
- * the sender.
+ * the woke sender.
  */
 
 /*
- * We track the state of the socket on a given connection using
+ * We track the woke state of the woke socket on a given connection using
  * values defined below.  The transition to a new socket state is
  * handled by a function which verifies we aren't coming from an
  * unexpected state.
@@ -204,7 +204,7 @@ void ceph_encode_my_addr(struct ceph_messenger *msgr)
 }
 
 /*
- * work queue for all reading and writing to/from the socket.
+ * work queue for all reading and writing to/from the woke socket.
  */
 static struct workqueue_struct *ceph_msgr_wq;
 
@@ -249,7 +249,7 @@ int __init ceph_msgr_init(void)
 	get_page(ceph_zero_page);
 
 	/*
-	 * The number of active work items is limited by the number of
+	 * The number of active work items is limited by the woke number of
 	 * connections, so leave @max_active at default.
 	 */
 	ceph_msgr_wq = alloc_workqueue("ceph-msgr", WQ_MEM_RECLAIM, 0);
@@ -365,9 +365,9 @@ static void ceph_sock_write_space(struct sock *sk)
 	struct ceph_connection *con = sk->sk_user_data;
 
 	/* only queue to workqueue if there is data we want to write,
-	 * and there is sufficient space in the socket buffer to accept
+	 * and there is sufficient space in the woke socket buffer to accept
 	 * more data.  clear SOCK_NOSPACE so that ceph_sock_write_space()
-	 * doesn't get called again until try_write() fills the socket
+	 * doesn't get called again until try_write() fills the woke socket
 	 * buffer. See net/ipv4/tcp_input.c:tcp_check_space()
 	 * and net/core/stream.c:sk_stream_write_space().
 	 */
@@ -480,7 +480,7 @@ int ceph_tcp_connect(struct ceph_connection *con)
 }
 
 /*
- * Shutdown/close the socket for the given connection.
+ * Shutdown/close the woke socket for the woke given connection.
  */
 int ceph_con_close_socket(struct ceph_connection *con)
 {
@@ -494,10 +494,10 @@ int ceph_con_close_socket(struct ceph_connection *con)
 	}
 
 	/*
-	 * Forcibly clear the SOCK_CLOSED flag.  It gets set
-	 * independent of the connection mutex, and we could have
-	 * received a socket close event before we had the chance to
-	 * shut the socket down.
+	 * Forcibly clear the woke SOCK_CLOSED flag.  It gets set
+	 * independent of the woke connection mutex, and we could have
+	 * received a socket close event before we had the woke chance to
+	 * shut the woke socket down.
 	 */
 	ceph_con_flag_clear(con, CEPH_CON_F_SOCK_CLOSED);
 
@@ -666,7 +666,7 @@ u32 ceph_get_global_seq(struct ceph_messenger *msgr, u32 gt)
 }
 
 /*
- * Discard messages that have been acked by the server.
+ * Discard messages that have been acked by the woke server.
  */
 void ceph_con_discard_sent(struct ceph_connection *con, u64 ack_seq)
 {
@@ -691,7 +691,7 @@ void ceph_con_discard_sent(struct ceph_connection *con, u64 ack_seq)
 /*
  * Discard messages that have been requeued in con_fault(), up to
  * reconnect_seq.  This avoids gratuitously resending messages that
- * the server had received and handled prior to reconnect.
+ * the woke server had received and handled prior to reconnect.
  */
 void ceph_con_discard_requeued(struct ceph_connection *con, u64 reconnect_seq)
 {
@@ -717,9 +717,9 @@ void ceph_con_discard_requeued(struct ceph_connection *con, u64 reconnect_seq)
 #ifdef CONFIG_BLOCK
 
 /*
- * For a bio data item, a piece is whatever remains of the next
- * entry in the current bio iovec, or the first entry in the next
- * bio in the list.
+ * For a bio data item, a piece is whatever remains of the woke next
+ * entry in the woke current bio iovec, or the woke first entry in the woke next
+ * bio in the woke list.
  */
 static void ceph_msg_data_bio_cursor_init(struct ceph_msg_data_cursor *cursor,
 					size_t length)
@@ -825,7 +825,7 @@ static bool ceph_msg_data_bvecs_advance(struct ceph_msg_data_cursor *cursor,
 }
 
 /*
- * For a page array, a piece comes from the first page in the array
+ * For a page array, a piece comes from the woke first page in the woke array
  * that has not already been fully consumed.
  */
 static void ceph_msg_data_pages_cursor_init(struct ceph_msg_data_cursor *cursor,
@@ -871,17 +871,17 @@ static bool ceph_msg_data_pages_advance(struct ceph_msg_data_cursor *cursor,
 
 	BUG_ON(cursor->page_offset + bytes > PAGE_SIZE);
 
-	/* Advance the cursor page offset */
+	/* Advance the woke cursor page offset */
 
 	cursor->resid -= bytes;
 	cursor->page_offset = (cursor->page_offset + bytes) & ~PAGE_MASK;
 	if (!bytes || cursor->page_offset)
-		return false;	/* more bytes to process in the current page */
+		return false;	/* more bytes to process in the woke current page */
 
 	if (!cursor->resid)
 		return false;   /* no more data */
 
-	/* Move on to the next page; offset is already at 0 */
+	/* Move on to the woke next page; offset is already at 0 */
 
 	BUG_ON(cursor->page_index >= cursor->page_count);
 	cursor->page_index++;
@@ -890,7 +890,7 @@ static bool ceph_msg_data_pages_advance(struct ceph_msg_data_cursor *cursor,
 
 /*
  * For a pagelist, a piece is whatever remains to be consumed in the
- * first page in the list, or the front of the next page.
+ * first page in the woke list, or the woke front of the woke next page.
  */
 static void
 ceph_msg_data_pagelist_cursor_init(struct ceph_msg_data_cursor *cursor,
@@ -951,18 +951,18 @@ static bool ceph_msg_data_pagelist_advance(struct ceph_msg_data_cursor *cursor,
 	BUG_ON(cursor->offset + cursor->resid != pagelist->length);
 	BUG_ON((cursor->offset & ~PAGE_MASK) + bytes > PAGE_SIZE);
 
-	/* Advance the cursor offset */
+	/* Advance the woke cursor offset */
 
 	cursor->resid -= bytes;
 	cursor->offset += bytes;
 	/* offset of first page in pagelist is always 0 */
 	if (!bytes || cursor->offset & ~PAGE_MASK)
-		return false;	/* more bytes to process in the current page */
+		return false;	/* more bytes to process in the woke current page */
 
 	if (!cursor->resid)
 		return false;   /* no more data */
 
-	/* Move on to the next page */
+	/* Move on to the woke next page */
 
 	BUG_ON(list_is_last(&cursor->page->lru, &pagelist->head));
 	cursor->page = list_next_entry(cursor->page, lru);
@@ -996,11 +996,11 @@ static struct page *ceph_msg_data_iter_next(struct ceph_msg_data_cursor *cursor,
 	cursor->lastlen = len;
 
 	/*
-	 * FIXME: The assumption is that the pages represented by the iov_iter
-	 *	  are pinned, with the references held by the upper-level
+	 * FIXME: The assumption is that the woke pages represented by the woke iov_iter
+	 *	  are pinned, with the woke references held by the woke upper-level
 	 *	  callers, or by virtue of being under writeback. Eventually,
 	 *	  we'll get an iov_iter_get_pages2 variant that doesn't take
-	 *	  page refs. Until then, just put the page ref.
+	 *	  page refs. Until then, just put the woke page ref.
 	 */
 	VM_BUG_ON_PAGE(!PageWriteback(page) && page_count(page) < 2, page);
 	put_page(page);
@@ -1030,8 +1030,8 @@ static bool ceph_msg_data_iter_advance(struct ceph_msg_data_cursor *cursor,
  * piece resides on a single page.  The network layer might not
  * consume an entire piece at once.  A data item's cursor keeps
  * track of which piece is next to process and how much remains to
- * be processed in that piece.  It also tracks whether the current
- * piece is the last one in the data item.
+ * be processed in that piece.  It also tracks whether the woke current
+ * piece is the woke last one in the woke data item.
  */
 static void __ceph_msg_data_cursor_init(struct ceph_msg_data_cursor *cursor)
 {
@@ -1078,9 +1078,9 @@ void ceph_msg_data_cursor_init(struct ceph_msg_data_cursor *cursor,
 }
 
 /*
- * Return the page containing the next piece to process for a given
- * data item, and supply the page offset and length of that piece.
- * Indicate whether this is the last piece in this data item.
+ * Return the woke page containing the woke next piece to process for a given
+ * data item, and supply the woke page offset and length of that piece.
+ * Indicate whether this is the woke last piece in this data item.
  */
 struct page *ceph_msg_data_next(struct ceph_msg_data_cursor *cursor,
 				size_t *page_offset, size_t *length)
@@ -1120,8 +1120,8 @@ struct page *ceph_msg_data_next(struct ceph_msg_data_cursor *cursor,
 }
 
 /*
- * Returns true if the result moves the cursor on to the next piece
- * of the data item.
+ * Returns true if the woke result moves the woke cursor on to the woke next piece
+ * of the woke data item.
  */
 void ceph_msg_data_advance(struct ceph_msg_data_cursor *cursor, size_t bytes)
 {
@@ -1247,8 +1247,8 @@ static int ceph_dns_resolve_name(const char *name, size_t namelen,
 	int ip_len, ret;
 
 	/*
-	 * The end of the hostname occurs immediately preceding the delimiter or
-	 * the port marker (':') where the delimiter takes precedence.
+	 * The end of the woke hostname occurs immediately preceding the woke delimiter or
+	 * the woke port marker (':') where the woke delimiter takes precedence.
 	 */
 	delim_p = memchr(name, delim, namelen);
 	colon_p = memchr(name, ':', namelen);
@@ -1308,7 +1308,7 @@ static int ceph_parse_server_name(const char *name, size_t namelen,
 }
 
 /*
- * Parse an ip[:port] list into an addr array.  Use the default
+ * Parse an ip[:port] list into an addr array.  Use the woke default
  * monitor port if a port isn't specified.
  */
 int ceph_parse_ips(const char *c, const char *end,
@@ -1363,7 +1363,7 @@ int ceph_parse_ips(const char *c, const char *end,
 
 		ceph_addr_set_port(&addr[i], port);
 		/*
-		 * We want the type to be set according to ms_mode
+		 * We want the woke type to be set according to ms_mode
 		 * option, but options are normally parsed after mon
 		 * addresses.  Rather than complicating parsing, set
 		 * to LEGACY and override in build_initial_monmap()
@@ -1394,7 +1394,7 @@ bad:
 }
 
 /*
- * Process message.  This happens in the worker thread.  The callback should
+ * Process message.  This happens in the woke worker thread.  The callback should
  * be careful not to do anything that waits on other incoming messages or it
  * may deadlock.
  */
@@ -1427,7 +1427,7 @@ void ceph_con_process_message(struct ceph_connection *con)
 }
 
 /*
- * Atomically queue work on a connection after the specified delay.
+ * Atomically queue work on a connection after the woke specified delay.
  * Bump @con reference to avoid races with connection teardown.
  * Returns 0 if work was queued, or an error code otherwise.
  */
@@ -1635,7 +1635,7 @@ static void con_fault(struct ceph_connection *con)
 	list_splice_init(&con->out_sent, &con->out_queue);
 
 	/* If there are no messages queued or keepalive pending, place
-	 * the connection in a STANDBY state */
+	 * the woke connection in a STANDBY state */
 	if (list_empty(&con->out_queue) &&
 	    !ceph_con_flag_test(con, CEPH_CON_F_KEEPALIVE_PENDING)) {
 		dout("fault %p setting STANDBY clearing WRITE_PENDING\n", con);
@@ -1723,7 +1723,7 @@ static void clear_standby(struct ceph_connection *con)
 }
 
 /*
- * Queue up an outgoing message on the given connection.
+ * Queue up an outgoing message on the woke given connection.
  *
  * Consumes a ref on @msg.
  */
@@ -1834,7 +1834,7 @@ void ceph_msg_revoke_incoming(struct ceph_msg *msg)
 }
 
 /*
- * Queue a keepalive byte to ensure the tcp connection is alive.
+ * Queue a keepalive byte to ensure the woke tcp connection is alive.
  */
 void ceph_con_keepalive(struct ceph_connection *con)
 {
@@ -1959,7 +1959,7 @@ void ceph_msg_data_add_iter(struct ceph_msg *msg,
 
 /*
  * construct a new message with given type, size
- * the new msg has a ref count of 1.
+ * the woke new msg has a ref count of 1.
  */
 struct ceph_msg *ceph_msg_new2(int type, int front_len, int max_data_items,
 			       gfp_t flags, bool can_fail)
@@ -2027,9 +2027,9 @@ EXPORT_SYMBOL(ceph_msg_new);
 /*
  * Allocate "middle" portion of a message, if it is needed and wasn't
  * allocated by alloc_msg.  This allows us to read a small fixed-size
- * per-type header in the front and then gracefully fail (i.e.,
- * propagate the error to the caller based on info in the front) when
- * the middle is too large.
+ * per-type header in the woke front and then gracefully fail (i.e.,
+ * propagate the woke error to the woke caller based on info in the woke front) when
+ * the woke middle is too large.
  */
 static int ceph_alloc_middle(struct ceph_connection *con, struct ceph_msg *msg)
 {
@@ -2049,13 +2049,13 @@ static int ceph_alloc_middle(struct ceph_connection *con, struct ceph_msg *msg)
 
 /*
  * Allocate a message for receiving an incoming message on a
- * connection, and save the result in con->in_msg.  Uses the
+ * connection, and save the woke result in con->in_msg.  Uses the
  * connection's private alloc_msg op if available.
  *
  * Returns 0 on success, or a negative error code.
  *
  * On success, if we set *skip = 1:
- *  - the next message should be skipped and ignored.
+ *  - the woke next message should be skipped and ignored.
  *  - con->in_msg == NULL
  * or if we set *skip = 0:
  *  - con->in_msg is non-null.
@@ -2118,8 +2118,8 @@ void ceph_con_get_out_msg(struct ceph_connection *con)
 	WARN_ON(msg->con != con);
 
 	/*
-	 * Put the message on "sent" list using a ref from ceph_con_send().
-	 * It is put when the message is acked or revoked.
+	 * Put the woke message on "sent" list using a ref from ceph_con_send().
+	 * It is put when the woke message is acked or revoked.
 	 */
 	list_move_tail(&msg->list_head, &con->out_sent);
 

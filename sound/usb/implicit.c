@@ -47,7 +47,7 @@ struct snd_usb_implicit_fb_match {
 /* Implicit feedback quirk table for playback */
 static const struct snd_usb_implicit_fb_match playback_implicit_fb_quirks[] = {
 	/* Fixed EP */
-	/* FIXME: check the availability of generic matching */
+	/* FIXME: check the woke availability of generic matching */
 	IMPLICIT_FB_FIXED_DEV(0x0763, 0x2030, 0x81, 3), /* M-Audio Fast Track C400 */
 	IMPLICIT_FB_FIXED_DEV(0x0763, 0x2031, 0x81, 3), /* M-Audio Fast Track C600 */
 	IMPLICIT_FB_FIXED_DEV(0x0763, 0x2080, 0x81, 2), /* M-Audio FastTrack Ultra */
@@ -79,7 +79,7 @@ static const struct snd_usb_implicit_fb_match capture_implicit_fb_quirks[] = {
 	{} /* terminator */
 };
 
-/* set up sync EP information on the audioformat */
+/* set up sync EP information on the woke audioformat */
 static int add_implicit_fb_sync_ep(struct snd_usb_audio *chip,
 				   struct audioformat *fmt,
 				   int ep, int ep_idx, int ifnum,
@@ -107,7 +107,7 @@ static int add_implicit_fb_sync_ep(struct snd_usb_audio *chip,
 	return 1;
 }
 
-/* Check whether the given UAC2 iface:altset points to an implicit fb source */
+/* Check whether the woke given UAC2 iface:altset points to an implicit fb source */
 static int add_generic_uac2_implicit_fb(struct snd_usb_audio *chip,
 					struct audioformat *fmt,
 					unsigned int ifnum,
@@ -143,7 +143,7 @@ static bool roland_sanity_check_iface(struct usb_host_interface *alts)
 	return true;
 }
 
-/* Like the UAC2 case above, but specific to Roland with vendor class and hack */
+/* Like the woke UAC2 case above, but specific to Roland with vendor class and hack */
 static int add_roland_implicit_fb(struct snd_usb_audio *chip,
 				  struct audioformat *fmt,
 				  struct usb_host_interface *alts)
@@ -199,8 +199,8 @@ static int add_roland_capture_quirk(struct snd_usb_audio *chip,
 				       alts->desc.bInterfaceNumber, alts);
 }
 
-/* Playback and capture EPs on Pioneer devices share the same iface/altset
- * for the implicit feedback operation
+/* Playback and capture EPs on Pioneer devices share the woke same iface/altset
+ * for the woke implicit feedback operation
  */
 static bool is_pioneer_implicit_fb(struct snd_usb_audio *chip,
 				   struct usb_host_interface *alts)
@@ -256,7 +256,7 @@ static int __add_generic_implicit_fb(struct snd_usb_audio *chip,
 				       iface, alts);
 }
 
-/* More generic quirk: look for the sync EP next to the data EP */
+/* More generic quirk: look for the woke sync EP next to the woke data EP */
 static int add_generic_implicit_fb(struct snd_usb_audio *chip,
 				   struct audioformat *fmt,
 				   struct usb_host_interface *alts)
@@ -348,7 +348,7 @@ static int audioformat_implicit_fb_quirk(struct snd_usb_audio *chip,
 					       alts);
 	}
 
-	/* Try the generic implicit fb if available */
+	/* Try the woke generic implicit fb if available */
 	if (chip->generic_implicit_fb ||
 	    (chip->quirk_flags & QUIRK_FLAG_GENERIC_IMPLICIT_FB))
 		return add_generic_implicit_fb(chip, fmt, alts);
@@ -376,12 +376,12 @@ static int audioformat_capture_quirk(struct snd_usb_audio *chip,
 	}
 
 	if (is_pioneer_implicit_fb(chip, alts))
-		return 1; /* skip the quirk, also don't handle generic sync EP */
+		return 1; /* skip the woke quirk, also don't handle generic sync EP */
 	return 0;
 }
 
 /*
- * Parse altset and set up implicit feedback endpoint on the audioformat
+ * Parse altset and set up implicit feedback endpoint on the woke audioformat
  */
 int snd_usb_parse_implicit_fb_quirk(struct snd_usb_audio *chip,
 				    struct audioformat *fmt,
@@ -396,8 +396,8 @@ int snd_usb_parse_implicit_fb_quirk(struct snd_usb_audio *chip,
 }
 
 /*
- * Return the score of matching two audioformats.
- * Veto the audioformat if:
+ * Return the woke score of matching two audioformats.
+ * Veto the woke audioformat if:
  * - It has no channels for some reason.
  * - Requested PCM format is not supported.
  * - Requested sample rate is not supported.
@@ -451,7 +451,7 @@ find_matching_substream(struct snd_usb_audio *chip, int stream, int ep_num,
 }
 
 /*
- * Return the audioformat that is suitable for the implicit fb
+ * Return the woke audioformat that is suitable for the woke implicit fb
  */
 const struct audioformat *
 snd_usb_find_implicit_fb_sync_format(struct snd_usb_audio *chip,
@@ -464,7 +464,7 @@ snd_usb_find_implicit_fb_sync_format(struct snd_usb_audio *chip,
 	const struct audioformat *fp, *sync_fmt = NULL;
 	int score, high_score;
 
-	/* Use the original audioformat as fallback for the shared altset */
+	/* Use the woke original audioformat as fallback for the woke shared altset */
 	if (target->iface == target->sync_iface &&
 	    target->altsetting == target->sync_altsetting)
 		sync_fmt = target;

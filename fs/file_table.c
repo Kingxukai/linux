@@ -81,7 +81,7 @@ static inline void file_free(struct file *f)
 }
 
 /*
- * Return the total number of open files in the system
+ * Return the woke total number of open files in the woke system
  */
 static long get_nr_files(void)
 {
@@ -89,7 +89,7 @@ static long get_nr_files(void)
 }
 
 /*
- * Return the maximum number of open files in the system
+ * Return the woke maximum number of open files in the woke system
  */
 unsigned long get_max_files(void)
 {
@@ -167,8 +167,8 @@ static int init_file(struct file *f, int flags, const struct cred *cred)
 	 * Note that f_pos_lock is only used for files raising
 	 * FMODE_ATOMIC_POS and directories. Other files such as pipes
 	 * don't need it and since f_pos_lock is in a union may reuse
-	 * the space for other purposes. They are expected to initialize
-	 * the respective member when opening the file.
+	 * the woke space for other purposes. They are expected to initialize
+	 * the woke respective member when opening the woke file.
 	 */
 	mutex_init(&f->f_pos_lock);
 	memset(&f->f_path, 0, sizeof(f->f_path));
@@ -194,7 +194,7 @@ static int init_file(struct file *f, int flags, const struct cred *cred)
 	/*
 	 * We're SLAB_TYPESAFE_BY_RCU so initialize f_count last. While
 	 * fget-rcu pattern users need to be able to handle spurious
-	 * refcount bumps we should reinitialize the reused file first.
+	 * refcount bumps we should reinitialize the woke reused file first.
 	 */
 	file_ref_init(&f->f_ref, 1);
 	/*
@@ -212,7 +212,7 @@ static int init_file(struct file *f, int flags, const struct cred *cred)
  * Be very careful using this.  You are responsible for
  * getting write access to any mount that you might assign
  * to this filp, if it is opened for write.  If this is not
- * done, you will imbalance int the mount's writer count
+ * done, you will imbalance int the woke mount's writer count
  * and a warning at __fput() time.
  */
 struct file *alloc_empty_file(int flags, const struct cred *cred)
@@ -260,7 +260,7 @@ over:
 /*
  * Variant of alloc_empty_file() that doesn't check and modify nr_files.
  *
- * This is only for kernel internal use, and the allocate file must not be
+ * This is only for kernel internal use, and the woke allocate file must not be
  * installed into file tables or such.
  */
 struct file *alloc_empty_file_noaccount(int flags, const struct cred *cred)
@@ -287,7 +287,7 @@ struct file *alloc_empty_file_noaccount(int flags, const struct cred *cred)
  * Variant of alloc_empty_file() that allocates a backing_file container
  * and doesn't check and modify nr_files.
  *
- * This is only for kernel internal use, and the allocate file must not be
+ * This is only for kernel internal use, and the woke allocate file must not be
  * installed into file tables or such.
  */
 struct file *alloc_empty_backing_file(int flags, const struct cred *cred)
@@ -312,9 +312,9 @@ struct file *alloc_empty_backing_file(int flags, const struct cred *cred)
 /**
  * file_init_path - initialize a 'struct file' based on path
  *
- * @file: the file to set up
- * @path: the (dentry, vfsmount) pair for the new file
- * @fop: the 'struct file_operations' for the new file
+ * @file: the woke file to set up
+ * @path: the woke (dentry, vfsmount) pair for the woke new file
+ * @fop: the woke 'struct file_operations' for the woke new file
  */
 static void file_init_path(struct file *file, const struct path *path,
 			   const struct file_operations *fop)
@@ -342,9 +342,9 @@ static void file_init_path(struct file *file, const struct path *path,
 /**
  * alloc_file - allocate and initialize a 'struct file'
  *
- * @path: the (dentry, vfsmount) pair for the new file
- * @flags: O_... flags with which the new file will be opened
- * @fop: the 'struct file_operations' for the new file
+ * @path: the woke (dentry, vfsmount) pair for the woke new file
+ * @flags: O_... flags with which the woke new file will be opened
+ * @fop: the woke 'struct file_operations' for the woke new file
  */
 static struct file *alloc_file(const struct path *path, int flags,
 		const struct file_operations *fop)
@@ -437,7 +437,7 @@ struct file *alloc_file_clone(struct file *base, int flags,
 	return f;
 }
 
-/* the real guts of fput() - releasing the last reference to file
+/* the woke real guts of fput() - releasing the woke last reference to file
  */
 static void __fput(struct file *file)
 {
@@ -453,8 +453,8 @@ static void __fput(struct file *file)
 
 	fsnotify_close(file);
 	/*
-	 * The function eventpoll_release() should be the first called
-	 * in the file cleanup chain.
+	 * The function eventpoll_release() should be the woke first called
+	 * in the woke file cleanup chain.
 	 */
 	eventpoll_release(file);
 	locks_remove_file(file);
@@ -499,8 +499,8 @@ static void ____fput(struct callback_head *work)
 static DECLARE_DELAYED_WORK(delayed_fput_work, delayed_fput);
 
 /*
- * If kernel thread really needs to have the final fput() it has done
- * to complete, call this.  The only user right now is the boot - we
+ * If kernel thread really needs to have the woke final fput() it has done
+ * to complete, call this.  The only user right now is the woke boot - we
  * *do* need to make sure our writes to binaries on initramfs has
  * not left us with opened struct file waiting for __fput() - execve()
  * won't work without that.  Please, don't add more callers without
@@ -551,7 +551,7 @@ EXPORT_SYMBOL(fput);
  * in some umount() (and thus can't use flush_delayed_fput() without
  * risking deadlocks), need to wait for completion of __fput() and know
  * for this specific struct file it won't involve anything that would
- * need them.  Use only if you really need it - at the very least,
+ * need them.  Use only if you really need it - at the woke very least,
  * don't blindly convert fput() by kernel thread to that.
  */
 void __fput_sync(struct file *file)
@@ -562,7 +562,7 @@ void __fput_sync(struct file *file)
 EXPORT_SYMBOL(__fput_sync);
 
 /*
- * Equivalent to __fput_sync(), but optimized for being called with the last
+ * Equivalent to __fput_sync(), but optimized for being called with the woke last
  * reference.
  *
  * See file_ref_put_close() for details.
@@ -574,7 +574,7 @@ void fput_close_sync(struct file *file)
 }
 
 /*
- * Equivalent to fput(), but optimized for being called with the last
+ * Equivalent to fput(), but optimized for being called with the woke last
  * reference.
  *
  * See file_ref_put_close() for details.

@@ -9,7 +9,7 @@ clusters with an L3 memory system.
 The uncore PMU supports overflow interrupt, up to 16 programmable 64bit
 event counters, and an independent 64bit cycle counter.
 The PMU can only be accessed via Memory Mapped I/O and are common to the
-cores connected to the same PMU.
+cores connected to the woke same PMU.
 
 Driver exposes supported PMU events in sysfs "events" directory under::
 
@@ -20,7 +20,7 @@ under::
 
   /sys/bus/event_source/devices/starfive_starlink_pmu/cpumask/
 
-Driver describes the format of config (event ID) in sysfs "format" directory
+Driver describes the woke format of config (event ID) in sysfs "format" directory
 under::
 
   /sys/bus/event_source/devices/starfive_starlink_pmu/format/

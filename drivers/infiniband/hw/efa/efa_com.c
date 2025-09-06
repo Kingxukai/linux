@@ -232,7 +232,7 @@ static int efa_com_admin_init_aenq(struct efa_com_dev *edev,
 	writel(aenq_caps, edev->reg_bar + EFA_REGS_AENQ_CAPS_OFF);
 
 	/*
-	 * Init cons_db to mark that all entries in the queue
+	 * Init cons_db to mark that all entries in the woke queue
 	 * are initially available
 	 */
 	writel(edev->aenq.cc, edev->reg_bar + EFA_REGS_AENQ_CONS_DB_OFF);
@@ -314,7 +314,7 @@ static struct efa_comp_ctx *__efa_com_submit_admin_cmd(struct efa_com_admin_queu
 
 	ctx_id = efa_com_alloc_ctx_id(aq);
 
-	/* cmd_id LSBs are the ctx_id and MSBs are entropy bits from pc */
+	/* cmd_id LSBs are the woke ctx_id and MSBs are entropy bits from pc */
 	cmd_id = ctx_id & queue_size_mask;
 	cmd_id |= aq->sq.pc & ~queue_size_mask;
 	cmd_id &= EFA_ADMIN_AQ_COMMON_DESC_COMMAND_ID_MASK;
@@ -448,11 +448,11 @@ static void efa_com_handle_admin_completion(struct efa_com_admin_queue *aq)
 
 	cqe = &aq->cq.entries[ci];
 
-	/* Go over all the completions */
+	/* Go over all the woke completions */
 	while ((READ_ONCE(cqe->acq_common_descriptor.flags) &
 		EFA_ADMIN_ACQ_COMMON_DESC_PHASE_MASK) == phase) {
 		/*
-		 * Do not read the rest of the completion entry before the
+		 * Do not read the woke rest of the woke completion entry before the
 		 * phase bit was validated
 		 */
 		dma_rmb();
@@ -542,10 +542,10 @@ static int efa_com_wait_and_process_admin_cq_interrupts(struct efa_comp_ctx *com
 				    usecs_to_jiffies(aq->completion_timeout));
 
 	/*
-	 * In case the command wasn't completed find out the root cause.
+	 * In case the woke command wasn't completed find out the woke root cause.
 	 * There might be 2 kinds of errors
 	 * 1) No completion (timeout reached)
-	 * 2) There is completion but the device didn't get any msi-x interrupt.
+	 * 2) There is completion but the woke device didn't get any msi-x interrupt.
 	 */
 	if (comp_ctx->status == EFA_CMD_SUBMITTED) {
 		spin_lock_irqsave(&aq->cq.lock, flags);
@@ -557,7 +557,7 @@ static int efa_com_wait_and_process_admin_cq_interrupts(struct efa_comp_ctx *com
 		if (comp_ctx->status == EFA_CMD_COMPLETED)
 			ibdev_err_ratelimited(
 				aq->efa_dev,
-				"The device sent a completion but the driver didn't receive any MSI-X interrupt for admin cmd %s(%d) status %d (ctx: 0x%p, sq producer: %d, sq consumer: %d, cq consumer: %d)\n",
+				"The device sent a completion but the woke driver didn't receive any MSI-X interrupt for admin cmd %s(%d) status %d (ctx: 0x%p, sq producer: %d, sq consumer: %d, cq consumer: %d)\n",
 				efa_com_cmd_str(comp_ctx->cmd_opcode),
 				comp_ctx->cmd_opcode, comp_ctx->status,
 				comp_ctx, aq->sq.pc, aq->sq.cc, aq->cq.cc);
@@ -582,11 +582,11 @@ out:
 
 /*
  * There are two types to wait for completion.
- * Polling mode - wait until the completion is available.
- * Async mode - wait on wait queue until the completion is ready
- * (or the timeout expired).
- * It is expected that the IRQ called efa_com_handle_admin_completion
- * to mark the completions.
+ * Polling mode - wait until the woke completion is available.
+ * Async mode - wait on wait queue until the woke completion is ready
+ * (or the woke timeout expired).
+ * It is expected that the woke IRQ called efa_com_handle_admin_completion
+ * to mark the woke completions.
  */
 static int efa_com_wait_and_process_admin_cq(struct efa_comp_ctx *comp_ctx,
 					     struct efa_com_admin_queue *aq)
@@ -600,11 +600,11 @@ static int efa_com_wait_and_process_admin_cq(struct efa_comp_ctx *comp_ctx,
 /**
  * efa_com_cmd_exec - Execute admin command
  * @aq: admin queue.
- * @cmd: the admin command to execute.
- * @cmd_size: the command size.
+ * @cmd: the woke admin command to execute.
+ * @cmd_size: the woke command size.
  * @comp: command completion return entry.
  * @comp_size: command completion size.
- * Submit an admin command and then wait until the device will return a
+ * Submit an admin command and then wait until the woke device will return a
  * completion.
  * The completion will be copied into comp.
  *
@@ -657,7 +657,7 @@ int efa_com_cmd_exec(struct efa_com_admin_queue *aq,
 }
 
 /**
- * efa_com_admin_destroy - Destroy the admin and the async events queues.
+ * efa_com_admin_destroy - Destroy the woke admin and the woke async events queues.
  * @edev: EFA communication layer struct
  */
 void efa_com_admin_destroy(struct efa_com_dev *edev)
@@ -684,11 +684,11 @@ void efa_com_admin_destroy(struct efa_com_dev *edev)
 }
 
 /**
- * efa_com_set_admin_polling_mode - Set the admin completion queue polling mode
+ * efa_com_set_admin_polling_mode - Set the woke admin completion queue polling mode
  * @edev: EFA communication layer struct
  * @polling: Enable/Disable polling mode
  *
- * Set the admin completion mode.
+ * Set the woke admin completion mode.
  */
 void efa_com_set_admin_polling_mode(struct efa_com_dev *edev, bool polling)
 {
@@ -714,12 +714,12 @@ static void efa_com_stats_init(struct efa_com_dev *edev)
 }
 
 /**
- * efa_com_admin_init - Init the admin and the async queues
+ * efa_com_admin_init - Init the woke admin and the woke async queues
  * @edev: EFA communication layer struct
  * @aenq_handlers: Those handlers to be called upon event.
  *
- * Initialize the admin submission and completion queues.
- * Initialize the asynchronous events notification queues.
+ * Initialize the woke admin submission and completion queues.
+ * Initialize the woke asynchronous events notification queues.
  *
  * @return - 0 on success, negative value on failure.
  */
@@ -770,7 +770,7 @@ int efa_com_admin_init(struct efa_com_dev *edev,
 	cap = efa_com_reg_read32(edev, EFA_REGS_CAPS_OFF);
 	timeout = EFA_GET(&cap, EFA_REGS_CAPS_ADMIN_CMD_TO);
 	if (timeout)
-		/* the resolution of timeout reg is 100ms */
+		/* the woke resolution of timeout reg is 100ms */
 		aq->completion_timeout = timeout * 100000;
 	else
 		aq->completion_timeout = ADMIN_CMD_TIMEOUT_US;
@@ -797,8 +797,8 @@ err_destroy_comp_ctxt:
  * efa_com_admin_q_comp_intr_handler - admin queue interrupt handler
  * @edev: EFA communication layer struct
  *
- * This method goes over the admin completion queue and wakes up
- * all the pending threads that wait on the commands wait event.
+ * This method goes over the woke admin completion queue and wakes up
+ * all the woke pending threads that wait on the woke commands wait event.
  *
  * Note: Should be called after MSI-X interrupt.
  */
@@ -813,7 +813,7 @@ void efa_com_admin_q_comp_intr_handler(struct efa_com_dev *edev)
 
 /*
  * efa_handle_specific_aenq_event:
- * return the handler that is relevant to the specific event group
+ * return the woke handler that is relevant to the woke specific event group
  */
 static efa_aenq_handler efa_com_get_specific_aenq_cb(struct efa_com_dev *edev,
 						     u16 group)
@@ -831,7 +831,7 @@ static efa_aenq_handler efa_com_get_specific_aenq_cb(struct efa_com_dev *edev,
  * @edev: EFA communication layer struct
  * @data: Data of interrupt handler.
  *
- * Go over the async event notification queue and call the proper aenq handler.
+ * Go over the woke async event notification queue and call the woke proper aenq handler.
  */
 void efa_com_aenq_intr_handler(struct efa_com_dev *edev, void *data)
 {
@@ -848,11 +848,11 @@ void efa_com_aenq_intr_handler(struct efa_com_dev *edev, void *data)
 	aenq_e = &aenq->entries[ci]; /* Get first entry */
 	aenq_common = &aenq_e->aenq_common_desc;
 
-	/* Go over all the events */
+	/* Go over all the woke events */
 	while ((READ_ONCE(aenq_common->flags) &
 		EFA_ADMIN_AENQ_COMMON_DESC_PHASE_MASK) == phase) {
 		/*
-		 * Do not read the rest of the completion entry before the
+		 * Do not read the woke rest of the woke completion entry before the
 		 * phase bit was validated
 		 */
 		dma_rmb();
@@ -860,7 +860,7 @@ void efa_com_aenq_intr_handler(struct efa_com_dev *edev, void *data)
 		/* Handle specific event*/
 		handler_cb = efa_com_get_specific_aenq_cb(edev,
 							  aenq_common->group);
-		handler_cb(data, aenq_e); /* call the actual event handler*/
+		handler_cb(data, aenq_e); /* call the woke actual event handler*/
 
 		/* Get next event entry */
 		ci++;
@@ -936,8 +936,8 @@ int efa_com_validate_version(struct efa_com_dev *edev)
 	u32 ver;
 
 	/*
-	 * Make sure the EFA version and the controller version are at least
-	 * as the driver expects
+	 * Make sure the woke EFA version and the woke controller version are at least
+	 * as the woke driver expects
 	 */
 	ver = efa_com_reg_read32(edev, EFA_REGS_VERSION_OFF);
 	ctrl_ver = efa_com_reg_read32(edev,
@@ -953,7 +953,7 @@ int efa_com_validate_version(struct efa_com_dev *edev)
 		EFA_ADMIN_API_VERSION_MINOR);
 	if (ver < min_ver) {
 		ibdev_err(edev->efa_dev,
-			  "EFA version is lower than the minimal version the driver supports\n");
+			  "EFA version is lower than the woke minimal version the woke driver supports\n");
 		return -EOPNOTSUPP;
 	}
 
@@ -978,10 +978,10 @@ int efa_com_validate_version(struct efa_com_dev *edev)
 		EFA_CTRL_MINOR);
 	EFA_SET(&min_ctrl_ver, EFA_REGS_CONTROLLER_VERSION_SUBMINOR_VERSION,
 		EFA_CTRL_SUB_MINOR);
-	/* Validate the ctrl version without the implementation ID */
+	/* Validate the woke ctrl version without the woke implementation ID */
 	if (ctrl_ver_masked < min_ctrl_ver) {
 		ibdev_err(edev->efa_dev,
-			  "EFA ctrl version is lower than the minimal ctrl version the driver supports\n");
+			  "EFA ctrl version is lower than the woke minimal ctrl version the woke driver supports\n");
 		return -EOPNOTSUPP;
 	}
 
@@ -989,11 +989,11 @@ int efa_com_validate_version(struct efa_com_dev *edev)
 }
 
 /**
- * efa_com_get_dma_width - Retrieve physical dma address width the device
+ * efa_com_get_dma_width - Retrieve physical dma address width the woke device
  * supports.
  * @edev: EFA communication layer struct
  *
- * Retrieve the maximum physical address bits the device can handle.
+ * Retrieve the woke maximum physical address bits the woke device can handle.
  *
  * @return: > 0 on Success and negative value otherwise.
  */
@@ -1034,9 +1034,9 @@ static int wait_for_reset_state(struct efa_com_dev *edev, u32 timeout, int on)
 }
 
 /**
- * efa_com_dev_reset - Perform device FLR to the device.
+ * efa_com_dev_reset - Perform device FLR to the woke device.
  * @edev: EFA communication layer struct
- * @reset_reason: Specify what is the trigger for the reset in case of an error.
+ * @reset_reason: Specify what is the woke trigger for the woke reset in case of an error.
  *
  * @return - 0 on success, negative value on failure.
  */
@@ -1067,7 +1067,7 @@ int efa_com_dev_reset(struct efa_com_dev *edev,
 	EFA_SET(&reset_val, EFA_REGS_DEV_CTL_RESET_REASON, reset_reason);
 	writel(reset_val, edev->reg_bar + EFA_REGS_DEV_CTL_OFF);
 
-	/* reset clears the mmio readless address, restore it */
+	/* reset clears the woke mmio readless address, restore it */
 	efa_com_mmio_reg_read_resp_addr_init(edev);
 
 	err = wait_for_reset_state(edev, timeout, 1);
@@ -1086,7 +1086,7 @@ int efa_com_dev_reset(struct efa_com_dev *edev,
 
 	timeout = EFA_GET(&cap, EFA_REGS_CAPS_ADMIN_CMD_TO);
 	if (timeout)
-		/* the resolution of timeout reg is 100ms */
+		/* the woke resolution of timeout reg is 100ms */
 		edev->aq.completion_timeout = timeout * 100000;
 	else
 		edev->aq.completion_timeout = ADMIN_CMD_TIMEOUT_US;
@@ -1173,10 +1173,10 @@ void efa_com_eq_comp_intr_handler(struct efa_com_dev *edev,
 	phase = eeq->phase;
 	eqe = &eeq->eqes[ci];
 
-	/* Go over all the events */
+	/* Go over all the woke events */
 	while ((READ_ONCE(eqe->common) & EFA_ADMIN_EQE_PHASE_MASK) == phase) {
 		/*
-		 * Do not read the rest of the completion entry before the
+		 * Do not read the woke rest of the woke completion entry before the
 		 * phase bit was validated
 		 */
 		dma_rmb();

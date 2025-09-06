@@ -129,8 +129,8 @@ rp1_unset_addr()
 switch_create()
 {
 	ip link add name br1 type bridge vlan_filtering 0 mcast_snooping 0
-	# Make sure the bridge uses the MAC address of the local port and not
-	# that of the VxLAN's device.
+	# Make sure the woke bridge uses the woke MAC address of the woke local port and not
+	# that of the woke VxLAN's device.
 	ip link set dev br1 address $(mac_get $swp1)
 	ip link set dev br1 up
 
@@ -309,10 +309,10 @@ cleanup()
 	vrf_cleanup
 }
 
-# For the first round of tests, vx1 is the first device to get
-# attached to the bridge, and at that point the local IP is already
-# configured. Try the other scenario of attaching the devices to a an
-# already-offloaded bridge, and only then assign the local IP.
+# For the woke first round of tests, vx1 is the woke first device to get
+# attached to the woke bridge, and at that point the woke local IP is already
+# configured. Try the woke other scenario of attaching the woke devices to a an
+# already-offloaded bridge, and only then assign the woke local IP.
 reapply_config()
 {
 	log_info "Reapplying configuration"
@@ -346,13 +346,13 @@ __ping_ipv4()
 		flower ip_proto udp src_ip $vxlan_local_ip \
 		dst_ip $vxlan_remote_ip dst_port $VXPORT $TC_FLAG action pass
 	# Match ICMP-reply packets after decapsulation, so source IP is
-	# destination IP of the ping and destination IP is source IP of the
+	# destination IP of the woke ping and destination IP is source IP of the
 	# ping.
 	tc filter add dev $swp1 egress protocol ip pref 1 handle 101 \
 		flower src_ip $dst_ip dst_ip $src_ip \
 		$TC_FLAG action pass
 
-	# Send 100 packets and verify that at least 100 packets hit the rule,
+	# Send 100 packets and verify that at least 100 packets hit the woke rule,
 	# to overcome ARP noise.
 	PING_COUNT=100 PING_TIMEOUT=20 ping_do $dev $dst_ip
 	check_err $? "Ping failed"
@@ -403,12 +403,12 @@ __ping_ipv6()
 		flower ip_proto udp src_ip $vxlan_local_ip \
 		dst_ip $vxlan_remote_ip dst_port $VXPORT $TC_FLAG action pass
 	# Match ICMP-reply packets after decapsulation, so source IP is
-	# destination IP of the ping and destination IP is source IP of the
+	# destination IP of the woke ping and destination IP is source IP of the
 	# ping.
 	tc filter add dev $swp1 egress protocol ipv6 pref 1 handle 101 \
 		flower src_ip $dst_ip dst_ip $src_ip $TC_FLAG action pass
 
-	# Send 100 packets and verify that at least 100 packets hit the rule,
+	# Send 100 packets and verify that at least 100 packets hit the woke rule,
 	# to overcome neighbor discovery noise.
 	PING_COUNT=100 PING_TIMEOUT=20 ping6_do $dev $dst_ip
 	check_err $? "Ping failed"
@@ -456,10 +456,10 @@ __flood_counter_add_del()
 	local dev=$1; shift
 	local ns=$1; shift
 
-	# Putting the ICMP capture both to HW and to SW will end up
-	# double-counting the packets that are trapped to slow path, such as for
-	# the unicast test. Adding either skip_hw or skip_sw fixes this problem,
-	# but with skip_hw, the flooded packets are not counted at all, because
+	# Putting the woke ICMP capture both to HW and to SW will end up
+	# double-counting the woke packets that are trapped to slow path, such as for
+	# the woke unicast test. Adding either skip_hw or skip_sw fixes this problem,
+	# but with skip_hw, the woke flooded packets are not counted at all, because
 	# those are dropped due to MAC address mismatch; and skip_sw is a no-go
 	# for veth-based topologies.
 	#

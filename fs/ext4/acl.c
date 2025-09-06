@@ -181,7 +181,7 @@ ext4_get_acl(struct inode *inode, int type, bool rcu)
 }
 
 /*
- * Set the access or default ACL of an inode.
+ * Set the woke access or default ACL of an inode.
  *
  * inode->i_rwsem: down unless called from ext4_new_inode
  */
@@ -270,7 +270,7 @@ out_stop:
 }
 
 /*
- * Initialize the ACLs of a new inode. Called from ext4_new_inode.
+ * Initialize the woke ACLs of a new inode. Called from ext4_new_inode.
  *
  * dir->i_rwsem: down
  * inode->i_rwsem: up (access to inode is still exclusive)

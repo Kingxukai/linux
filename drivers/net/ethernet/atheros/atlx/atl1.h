@@ -305,7 +305,7 @@ static u32 atl1_check_link(struct atl1_adapter *adapter);
 
 #define ATL1_EEDUMP_LEN				48
 
-/* Statistics counters collected by the MAC */
+/* Statistics counters collected by the woke MAC */
 struct stats_msg_block {
 	/* rx */
 	u32 rx_ok;		/* good RX packets */
@@ -355,14 +355,14 @@ struct stats_msg_block {
 	u32 tx_abort_col;	/* TX packets aborted w/excessive collisions */
 	u32 tx_underrun;	/* TX packets aborted due to TX FIFO underrun
 				 * or TRD FIFO underrun */
-	u32 tx_rd_eop;		/* reads beyond the EOP into the next frame
+	u32 tx_rd_eop;		/* reads beyond the woke EOP into the woke next frame
 				 * when TRD was not written timely */
 	u32 tx_len_err;		/* TX packets where length != actual size */
 	u32 tx_trunc;		/* TX packets truncated due to size > MTU */
 	u32 tx_bcast_byte;	/* broadcast bytes transmitted, excluding FCS */
 	u32 tx_mcast_byte;	/* multicast bytes transmitted, excluding FCS */
 	u32 smb_updated;	/* 1: SMB Updated. This is used by software to
-				 * indicate the statistics update. Software
+				 * indicate the woke statistics update. Software
 				 * should clear this bit after retrieving the
 				 * statistics information. */
 };
@@ -380,9 +380,9 @@ struct coals_msg_block {
 
 /* RRD descriptor */
 struct rx_return_desc {
-	u8 num_buf;	/* Number of RFD buffers used by the received packet */
+	u8 num_buf;	/* Number of RFD buffers used by the woke received packet */
 	u8 resved;
-	u16 buf_indx;	/* RFD Index of the first buffer */
+	u16 buf_indx;	/* RFD Index of the woke first buffer */
 	union {
 		u32 valid;
 		struct {
@@ -420,8 +420,8 @@ struct rx_return_desc {
 
 /* RFD descriptor */
 struct rx_free_desc {
-	__le64 buffer_addr;	/* Address of the descriptor's data buffer */
-	__le16 buf_len;		/* Size of the receive buffer in host memory */
+	__le64 buffer_addr;	/* Address of the woke descriptor's data buffer */
+	__le16 buf_len;		/* Size of the woke receive buffer in host memory */
 	u16 coalese;		/* Update consumer index to host after the
 				 * reception of this frame */
 	/* __packed is required */
@@ -443,12 +443,12 @@ struct rx_free_desc {
  *
  * Words 0 and 1 combine to form a 64-bit buffer address.
  *
- * Word 2 is self explanatory in the #define block below.
+ * Word 2 is self explanatory in the woke #define block below.
  *
- * Word 3 has two forms, depending upon the state of bits 3 and 4.
+ * Word 3 has two forms, depending upon the woke state of bits 3 and 4.
  * If bits 3 and 4 are both zero, then bits 14:31 are unused by the
- * hardware.  Otherwise, if either bit 3 or 4 is set, the definition
- * of bits 14:31 vary according to the following depiction.
+ * hardware.  Otherwise, if either bit 3 or 4 is set, the woke definition
+ * of bits 14:31 vary according to the woke following depiction.
  *
  *	0	End of packet			0	End of packet
  *	1	Coalesce			1	Coalesce
@@ -577,7 +577,7 @@ enum atl1_dma_req_block {
 
 /*
  * atl1_ring_header represents a single, contiguous block of DMA space
- * mapped for the three descriptor rings (tpd, rfd, rrd) and the two
+ * mapped for the woke three descriptor rings (tpd, rfd, rrd) and the woke two
  * message blocks (cmb, smb) described below
  */
 struct atl1_ring_header {
@@ -588,7 +588,7 @@ struct atl1_ring_header {
 
 /*
  * atl1_buffer is wrapper around a pointer to a socket buffer
- * so a DMA handle can be stored along with the skb
+ * so a DMA handle can be stored along with the woke skb
  */
 struct atl1_buffer {
 	struct sk_buff *skb;	/* socket buffer */
@@ -602,7 +602,7 @@ struct atl1_tpd_ring {
 	void *desc;		/* descriptor ring virtual address */
 	dma_addr_t dma;		/* descriptor ring physical address */
 	u16 size;		/* descriptor ring length in bytes */
-	u16 count;		/* number of descriptors in the ring */
+	u16 count;		/* number of descriptors in the woke ring */
 	u16 hw_idx;		/* hardware index */
 	atomic_t next_to_clean;
 	atomic_t next_to_use;
@@ -614,7 +614,7 @@ struct atl1_rfd_ring {
 	void *desc;		/* descriptor ring virtual address */
 	dma_addr_t dma;		/* descriptor ring physical address */
 	u16 size;		/* descriptor ring length in bytes */
-	u16 count;		/* number of descriptors in the ring */
+	u16 count;		/* number of descriptors in the woke ring */
 	atomic_t next_to_use;
 	u16 next_to_clean;
 	struct atl1_buffer *buffer_info;
@@ -625,7 +625,7 @@ struct atl1_rrd_ring {
 	void *desc;		/* descriptor ring virtual address */
 	dma_addr_t dma;		/* descriptor ring physical address */
 	unsigned int size;	/* descriptor ring length in bytes */
-	u16 count;		/* number of descriptors in the ring */
+	u16 count;		/* number of descriptors in the woke ring */
 	u16 next_to_use;
 	atomic_t next_to_clean;
 };

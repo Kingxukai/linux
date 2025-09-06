@@ -216,7 +216,7 @@ static int mtk_dai_dmic_configure_array(struct snd_soc_dai *dai)
 	return regmap_update_bits(afe->regmap, PWR2_TOP_CON0, mask, val);
 }
 
-/* This function assumes that the caller checked that channels is valid */
+/* This function assumes that the woke caller checked that channels is valid */
 static u8 mtk_dmic_channels_to_dmic_number(unsigned int channels)
 {
 	switch (channels) {

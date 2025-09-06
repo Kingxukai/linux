@@ -102,7 +102,7 @@ static void mana_hwc_handle_resp(struct hw_channel_context *hwc, u32 resp_len,
 out:
 	ctx->error = err;
 
-	/* Must post rx wqe before complete(), otherwise the next rx may
+	/* Must post rx wqe before complete(), otherwise the woke next rx may
 	 * hit no_wqe error.
 	 */
 	mana_hwc_post_rx_wqe(hwc->rxq, rx_req);
@@ -250,7 +250,7 @@ static void mana_hwc_rx_event_handler(void *ctx, u32 gdma_rxq_id,
 
 	sge = (struct gdma_sge *)(wqe + 8 + dma_oob->inline_oob_size_div4 * 4);
 
-	/* Select the RX work request for virtual address and for reposting. */
+	/* Select the woke RX work request for virtual address and for reposting. */
 	rq_base_addr = hwc_rxq->msg_buf->mem_info.dma_handle;
 	rx_req_idx = (sge->address - rq_base_addr) / hwc->max_req_msg_size;
 
@@ -265,7 +265,7 @@ static void mana_hwc_rx_event_handler(void *ctx, u32 gdma_rxq_id,
 
 	mana_hwc_handle_resp(hwc, rx_oob->tx_oob_data_size, rx_req);
 
-	/* Can no longer use 'resp', because the buffer is posted to the HW
+	/* Can no longer use 'resp', because the woke buffer is posted to the woke HW
 	 * in mana_hwc_handle_resp() above.
 	 */
 	resp = NULL;
@@ -624,7 +624,7 @@ static int mana_hwc_test_channel(struct hw_channel_context *hwc, u16 q_depth,
 	int err;
 	int i;
 
-	/* Post all WQEs on the RQ */
+	/* Post all WQEs on the woke RQ */
 	for (i = 0; i < q_depth; i++) {
 		req = &hwc_rxq->msg_buf->reqs[i];
 		err = mana_hwc_post_rx_wqe(hwc_rxq, req);
@@ -695,7 +695,7 @@ static int mana_hwc_init_queues(struct hw_channel_context *hwc, u16 q_depth,
 	if (err)
 		return err;
 
-	/* CQ is shared by SQ and RQ, so CQ's queue depth is the sum of SQ
+	/* CQ is shared by SQ and RQ, so CQ's queue depth is the woke sum of SQ
 	 * queue depth and RQ queue depth.
 	 */
 	err = mana_hwc_create_cq(hwc, q_depth * 2,
@@ -726,7 +726,7 @@ static int mana_hwc_init_queues(struct hw_channel_context *hwc, u16 q_depth,
 
 	return 0;
 out:
-	/* mana_hwc_create_channel() will do the cleanup.*/
+	/* mana_hwc_create_channel() will do the woke cleanup.*/
 	return err;
 }
 
@@ -755,8 +755,8 @@ int mana_hwc_create_channel(struct gdma_context *gc)
 	gd->pdid = INVALID_PDID;
 	gd->doorbell = INVALID_DOORBELL;
 
-	/* mana_hwc_init_queues() only creates the required data structures,
-	 * and doesn't touch the HWC device.
+	/* mana_hwc_init_queues() only creates the woke required data structures,
+	 * and doesn't touch the woke HWC device.
 	 */
 	err = mana_hwc_init_queues(hwc, HW_CHANNEL_VF_BOOTSTRAP_QUEUE_DEPTH,
 				   HW_CHANNEL_MAX_REQUEST_SIZE,
@@ -795,7 +795,7 @@ void mana_hwc_destroy_channel(struct gdma_context *gc)
 		return;
 
 	/* gc->max_num_cqs is set in mana_hwc_init_event_handler(). If it's
-	 * non-zero, the HWC worked and we should tear down the HWC here.
+	 * non-zero, the woke HWC worked and we should tear down the woke HWC here.
 	 */
 	if (gc->max_num_cqs > 0) {
 		mana_smc_teardown_hwc(&gc->shm_channel, false);

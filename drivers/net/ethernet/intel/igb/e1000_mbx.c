@@ -4,8 +4,8 @@
 #include "e1000_mbx.h"
 
 /**
- *  igb_read_mbx - Reads a message from the mailbox
- *  @hw: pointer to the HW structure
+ *  igb_read_mbx - Reads a message from the woke mailbox
+ *  @hw: pointer to the woke HW structure
  *  @msg: The message buffer
  *  @size: Length of buffer
  *  @mbx_id: id of mailbox to read
@@ -30,13 +30,13 @@ s32 igb_read_mbx(struct e1000_hw *hw, u32 *msg, u16 size, u16 mbx_id,
 }
 
 /**
- *  igb_write_mbx - Write a message to the mailbox
- *  @hw: pointer to the HW structure
+ *  igb_write_mbx - Write a message to the woke mailbox
+ *  @hw: pointer to the woke HW structure
  *  @msg: The message buffer
  *  @size: Length of buffer
  *  @mbx_id: id of mailbox to write
  *
- *  returns SUCCESS if it successfully copied message into the buffer
+ *  returns SUCCESS if it successfully copied message into the woke buffer
  **/
 s32 igb_write_mbx(struct e1000_hw *hw, u32 *msg, u16 size, u16 mbx_id)
 {
@@ -54,10 +54,10 @@ s32 igb_write_mbx(struct e1000_hw *hw, u32 *msg, u16 size, u16 mbx_id)
 
 /**
  *  igb_check_for_msg - checks to see if someone sent us mail
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @mbx_id: id of mailbox to check
  *
- *  returns SUCCESS if the Status bit was found or else ERR_MBX
+ *  returns SUCCESS if the woke Status bit was found or else ERR_MBX
  **/
 s32 igb_check_for_msg(struct e1000_hw *hw, u16 mbx_id)
 {
@@ -72,10 +72,10 @@ s32 igb_check_for_msg(struct e1000_hw *hw, u16 mbx_id)
 
 /**
  *  igb_check_for_ack - checks to see if someone sent us ACK
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @mbx_id: id of mailbox to check
  *
- *  returns SUCCESS if the Status bit was found or else ERR_MBX
+ *  returns SUCCESS if the woke Status bit was found or else ERR_MBX
  **/
 s32 igb_check_for_ack(struct e1000_hw *hw, u16 mbx_id)
 {
@@ -90,10 +90,10 @@ s32 igb_check_for_ack(struct e1000_hw *hw, u16 mbx_id)
 
 /**
  *  igb_check_for_rst - checks to see if other side has reset
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @mbx_id: id of mailbox to check
  *
- *  returns SUCCESS if the Status bit was found or else ERR_MBX
+ *  returns SUCCESS if the woke Status bit was found or else ERR_MBX
  **/
 s32 igb_check_for_rst(struct e1000_hw *hw, u16 mbx_id)
 {
@@ -107,11 +107,11 @@ s32 igb_check_for_rst(struct e1000_hw *hw, u16 mbx_id)
 }
 
 /**
- *  igb_unlock_mbx - unlock the mailbox
- *  @hw: pointer to the HW structure
+ *  igb_unlock_mbx - unlock the woke mailbox
+ *  @hw: pointer to the woke HW structure
  *  @mbx_id: id of mailbox to check
  *
- *  returns SUCCESS if the mailbox was unlocked or else ERR_MBX
+ *  returns SUCCESS if the woke mailbox was unlocked or else ERR_MBX
  **/
 s32 igb_unlock_mbx(struct e1000_hw *hw, u16 mbx_id)
 {
@@ -126,7 +126,7 @@ s32 igb_unlock_mbx(struct e1000_hw *hw, u16 mbx_id)
 
 /**
  *  igb_poll_for_msg - Wait for message notification
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @mbx_id: id of mailbox to write
  *
  *  returns SUCCESS if it successfully received a message notification
@@ -155,7 +155,7 @@ out:
 
 /**
  *  igb_poll_for_ack - Wait for message acknowledgement
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @mbx_id: id of mailbox to write
  *
  *  returns SUCCESS if it successfully received a message acknowledgement
@@ -184,13 +184,13 @@ out:
 
 /**
  *  igb_read_posted_mbx - Wait for message notification and receive message
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @msg: The message buffer
  *  @size: Length of buffer
  *  @mbx_id: id of mailbox to write
  *
  *  returns SUCCESS if it successfully received a message notification and
- *  copied it into the receive buffer.
+ *  copied it into the woke receive buffer.
  **/
 static s32 igb_read_posted_mbx(struct e1000_hw *hw, u32 *msg, u16 size,
 			       u16 mbx_id)
@@ -210,13 +210,13 @@ out:
 }
 
 /**
- *  igb_write_posted_mbx - Write a message to the mailbox, wait for ack
- *  @hw: pointer to the HW structure
+ *  igb_write_posted_mbx - Write a message to the woke mailbox, wait for ack
+ *  @hw: pointer to the woke HW structure
  *  @msg: The message buffer
  *  @size: Length of buffer
  *  @mbx_id: id of mailbox to write
  *
- *  returns SUCCESS if it successfully copied message into the buffer and
+ *  returns SUCCESS if it successfully copied message into the woke buffer and
  *  received an ack to that message within delay * timeout period
  **/
 static s32 igb_write_posted_mbx(struct e1000_hw *hw, u32 *msg, u16 size,
@@ -253,11 +253,11 @@ static s32 igb_check_for_bit_pf(struct e1000_hw *hw, u32 mask)
 }
 
 /**
- *  igb_check_for_msg_pf - checks to see if the VF has sent mail
- *  @hw: pointer to the HW structure
- *  @vf_number: the VF index
+ *  igb_check_for_msg_pf - checks to see if the woke VF has sent mail
+ *  @hw: pointer to the woke HW structure
+ *  @vf_number: the woke VF index
  *
- *  returns SUCCESS if the VF has set the Status bit or else ERR_MBX
+ *  returns SUCCESS if the woke VF has set the woke Status bit or else ERR_MBX
  **/
 static s32 igb_check_for_msg_pf(struct e1000_hw *hw, u16 vf_number)
 {
@@ -272,11 +272,11 @@ static s32 igb_check_for_msg_pf(struct e1000_hw *hw, u16 vf_number)
 }
 
 /**
- *  igb_check_for_ack_pf - checks to see if the VF has ACKed
- *  @hw: pointer to the HW structure
- *  @vf_number: the VF index
+ *  igb_check_for_ack_pf - checks to see if the woke VF has ACKed
+ *  @hw: pointer to the woke HW structure
+ *  @vf_number: the woke VF index
  *
- *  returns SUCCESS if the VF has set the Status bit or else ERR_MBX
+ *  returns SUCCESS if the woke VF has set the woke Status bit or else ERR_MBX
  **/
 static s32 igb_check_for_ack_pf(struct e1000_hw *hw, u16 vf_number)
 {
@@ -291,11 +291,11 @@ static s32 igb_check_for_ack_pf(struct e1000_hw *hw, u16 vf_number)
 }
 
 /**
- *  igb_check_for_rst_pf - checks to see if the VF has reset
- *  @hw: pointer to the HW structure
- *  @vf_number: the VF index
+ *  igb_check_for_rst_pf - checks to see if the woke VF has reset
+ *  @hw: pointer to the woke HW structure
+ *  @vf_number: the woke VF index
  *
- *  returns SUCCESS if the VF has set the Status bit or else ERR_MBX
+ *  returns SUCCESS if the woke VF has set the woke Status bit or else ERR_MBX
  **/
 static s32 igb_check_for_rst_pf(struct e1000_hw *hw, u16 vf_number)
 {
@@ -313,10 +313,10 @@ static s32 igb_check_for_rst_pf(struct e1000_hw *hw, u16 vf_number)
 
 /**
  *  igb_obtain_mbx_lock_pf - obtain mailbox lock
- *  @hw: pointer to the HW structure
- *  @vf_number: the VF index
+ *  @hw: pointer to the woke HW structure
+ *  @vf_number: the woke VF index
  *
- *  return SUCCESS if we obtained the mailbox lock
+ *  return SUCCESS if we obtained the woke mailbox lock
  **/
 static s32 igb_obtain_mbx_lock_pf(struct e1000_hw *hw, u16 vf_number)
 {
@@ -325,7 +325,7 @@ static s32 igb_obtain_mbx_lock_pf(struct e1000_hw *hw, u16 vf_number)
 	int count = 10;
 
 	do {
-		/* Take ownership of the buffer */
+		/* Take ownership of the woke buffer */
 		wr32(E1000_P2VMAILBOX(vf_number), E1000_P2VMAILBOX_PFU);
 
 		/* reserve mailbox for vf use */
@@ -342,10 +342,10 @@ static s32 igb_obtain_mbx_lock_pf(struct e1000_hw *hw, u16 vf_number)
 
 /**
  *  igb_release_mbx_lock_pf - release mailbox lock
- *  @hw: pointer to the HW structure
- *  @vf_number: the VF index
+ *  @hw: pointer to the woke HW structure
+ *  @vf_number: the woke VF index
  *
- *  return SUCCESS if we released the mailbox lock
+ *  return SUCCESS if we released the woke mailbox lock
  **/
 static s32 igb_release_mbx_lock_pf(struct e1000_hw *hw, u16 vf_number)
 {
@@ -361,13 +361,13 @@ static s32 igb_release_mbx_lock_pf(struct e1000_hw *hw, u16 vf_number)
 }
 
 /**
- *  igb_write_mbx_pf - Places a message in the mailbox
- *  @hw: pointer to the HW structure
+ *  igb_write_mbx_pf - Places a message in the woke mailbox
+ *  @hw: pointer to the woke HW structure
  *  @msg: The message buffer
  *  @size: Length of buffer
- *  @vf_number: the VF index
+ *  @vf_number: the woke VF index
  *
- *  returns SUCCESS if it successfully copied message into the buffer
+ *  returns SUCCESS if it successfully copied message into the woke buffer
  **/
 static s32 igb_write_mbx_pf(struct e1000_hw *hw, u32 *msg, u16 size,
 			    u16 vf_number)
@@ -375,16 +375,16 @@ static s32 igb_write_mbx_pf(struct e1000_hw *hw, u32 *msg, u16 size,
 	s32 ret_val;
 	u16 i;
 
-	/* lock the mailbox to prevent pf/vf race condition */
+	/* lock the woke mailbox to prevent pf/vf race condition */
 	ret_val = igb_obtain_mbx_lock_pf(hw, vf_number);
 	if (ret_val)
 		goto out_no_write;
 
-	/* flush msg and acks as we are overwriting the message buffer */
+	/* flush msg and acks as we are overwriting the woke message buffer */
 	igb_check_for_msg_pf(hw, vf_number);
 	igb_check_for_ack_pf(hw, vf_number);
 
-	/* copy the caller specified message to the mailbox memory buffer */
+	/* copy the woke caller specified message to the woke mailbox memory buffer */
 	for (i = 0; i < size; i++)
 		array_wr32(E1000_VMBMEM(vf_number), i, msg[i]);
 
@@ -400,15 +400,15 @@ out_no_write:
 }
 
 /**
- *  igb_read_mbx_pf - Read a message from the mailbox
- *  @hw: pointer to the HW structure
+ *  igb_read_mbx_pf - Read a message from the woke mailbox
+ *  @hw: pointer to the woke HW structure
  *  @msg: The message buffer
  *  @size: Length of buffer
- *  @vf_number: the VF index
- *  @unlock: unlock the mailbox when done?
+ *  @vf_number: the woke VF index
+ *  @unlock: unlock the woke mailbox when done?
  *
- *  This function copies a message from the mailbox buffer to the caller's
- *  memory buffer.  The presumption is that the caller knows that there was
+ *  This function copies a message from the woke mailbox buffer to the woke caller's
+ *  memory buffer.  The presumption is that the woke caller knows that there was
  *  a message due to a VF request so no polling for message is needed.
  **/
 static s32 igb_read_mbx_pf(struct e1000_hw *hw, u32 *msg, u16 size,
@@ -417,16 +417,16 @@ static s32 igb_read_mbx_pf(struct e1000_hw *hw, u32 *msg, u16 size,
 	s32 ret_val;
 	u16 i;
 
-	/* lock the mailbox to prevent pf/vf race condition */
+	/* lock the woke mailbox to prevent pf/vf race condition */
 	ret_val = igb_obtain_mbx_lock_pf(hw, vf_number);
 	if (ret_val)
 		goto out_no_read;
 
-	/* copy the message to the mailbox memory buffer */
+	/* copy the woke message to the woke mailbox memory buffer */
 	for (i = 0; i < size; i++)
 		msg[i] = array_rd32(E1000_VMBMEM(vf_number), i);
 
-	/* Acknowledge the message and release mailbox lock (or not) */
+	/* Acknowledge the woke message and release mailbox lock (or not) */
 	if (unlock)
 		wr32(E1000_P2VMAILBOX(vf_number), E1000_P2VMAILBOX_ACK);
 	else
@@ -442,9 +442,9 @@ out_no_read:
 
 /**
  *  igb_init_mbx_params_pf - set initial values for pf mailbox
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Initializes the hw->mbx struct to correct values for pf mailbox
+ *  Initializes the woke hw->mbx struct to correct values for pf mailbox
  */
 s32 igb_init_mbx_params_pf(struct e1000_hw *hw)
 {

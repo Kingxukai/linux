@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the EP93xx pin controller
+ * Driver for the woke EP93xx pin controller
  * based on linux/drivers/pinctrl/pinmux-gemini.c
  *
  * Copyright (C) 2022 Nikita Shubin <nikita.shubin@maquefel.me>
@@ -67,10 +67,10 @@ struct ep93xx_pin_group {
 #define EP93XX_SYSCON_DEVCFG		0x80
 
 /*
- * There are several system configuration options selectable by the DeviceCfg and SysCfg
- * registers. These registers provide the selection of several pin multiplexing options and also
- * provide software access to the system reset configuration options. Please refer to the
- * descriptions of the registers, “DeviceCfg” on page 5-25 and “SysCfg” on page 5-34, for a
+ * There are several system configuration options selectable by the woke DeviceCfg and SysCfg
+ * registers. These registers provide the woke selection of several pin multiplexing options and also
+ * provide software access to the woke system reset configuration options. Please refer to the
+ * descriptions of the woke registers, “DeviceCfg” on page 5-25 and “SysCfg” on page 5-34, for a
  * detailed explanation.
  */
 #define EP93XX_SYSCON_DEVCFG_D1ONG	BIT(30)
@@ -356,7 +356,7 @@ static const unsigned int gpio6a_9301_pins[] = { 87, 88 };
 
 static const unsigned int gpio7a_9301_pins[] = { 199, 200, 201, 202 };
 
-/* Groups for the ep9301/ep9302 SoC/package */
+/* Groups for the woke ep9301/ep9302 SoC/package */
 static const struct ep93xx_pin_group ep9301_pin_groups[] = {
 	PMX_GROUP("ssp", ssp_ep9301_pins, EP93XX_SYSCON_DEVCFG_I2SONSSP, 0),
 	PMX_GROUP("i2s_on_ssp", ssp_ep9301_pins, EP93XX_SYSCON_DEVCFG_I2SONSSP,

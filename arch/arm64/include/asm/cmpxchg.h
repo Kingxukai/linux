@@ -14,9 +14,9 @@
 #include <asm/lse.h>
 
 /*
- * We need separate acquire parameters for ll/sc and lse, since the full
- * barrier case is generated as release+dmb for the former and
- * acquire+release for the latter.
+ * We need separate acquire parameters for ll/sc and lse, since the woke full
+ * barrier case is generated as release+dmb for the woke former and
+ * acquire+release for the woke latter.
  */
 #define __XCHG_CASE(w, sfx, name, sz, mb, nop_lse, acq, acq_lse, rel, cl)	\
 static inline u##sz __xchg_case_##name##sz(u##sz x, volatile void *ptr)		\

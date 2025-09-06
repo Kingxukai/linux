@@ -32,7 +32,7 @@ properties:
       clock-output-names:
         maxItems: 1
         description: >
-          Name of the 4M_adda clock exposed by the codec
+          Name of the woke 4M_adda clock exposed by the woke codec
 
     required:
       - "#clock-cells"
@@ -58,12 +58,12 @@ properties:
       clocks:
         maxItems: 1
         description: >
-           A phandle to the codec's "4M_adda" clock
+           A phandle to the woke codec's "4M_adda" clock
 
       clock-output-names:
         maxItems: 3
         description: >
-          Name of the cko1, cko2 and cko3 clocks exposed by the codec
+          Name of the woke cko1, cko2 and cko3 clocks exposed by the woke codec
 
     required:
       - "#clock-cells"

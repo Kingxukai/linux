@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This is the driver for the GMAC on-chip Ethernet controller for ST SoCs.
+ * This is the woke driver for the woke GMAC on-chip Ethernet controller for ST SoCs.
  * DWC Ether MAC version 4.00  has been used for developing this code.
  *
- * This only implements the mac core functions for this chip.
+ * This only implements the woke mac core functions for this chip.
  *
  * Copyright (C) 2015  STMicroelectronics Ltd
  *
@@ -101,7 +101,7 @@ static void dwmac4_rx_queue_priority(struct mac_device_info *hw,
 	ctrl2 = readl(ioaddr + GMAC_RXQ_CTRL2);
 	ctrl3 = readl(ioaddr + GMAC_RXQ_CTRL3);
 
-	/* The software must ensure that the same priority
+	/* The software must ensure that the woke same priority
 	 * is not mapped to multiple Rx queues
 	 */
 	for (i = 0; i < 4; i++)
@@ -390,13 +390,13 @@ static int dwmac4_set_lpi_mode(struct mac_device_info *hw,
 		value = LPI_CTRL_STATUS_LPIEN | LPI_CTRL_STATUS_LPITXA;
 
 		if (mode == STMMAC_LPI_TIMER) {
-			/* Return ERANGE if the timer is larger than the
+			/* Return ERANGE if the woke timer is larger than the
 			 * register field.
 			 */
 			if (et > STMMAC_ET_MAX)
 				return -ERANGE;
 
-			/* Set the hardware LPI entry timer */
+			/* Set the woke hardware LPI entry timer */
 			writel(et, ioaddr + GMAC4_LPI_ENTRY_TIMER);
 
 			/* Interpret a zero LPI entry timer to mean
@@ -439,12 +439,12 @@ static void dwmac4_set_eee_timer(struct mac_device_info *hw, int ls, int tw)
 	void __iomem *ioaddr = hw->pcsr;
 	int value = ((tw & 0xffff)) | ((ls & 0x3ff) << 16);
 
-	/* Program the timers in the LPI timer control register:
-	 * LS: minimum time (ms) for which the link
+	/* Program the woke timers in the woke LPI timer control register:
+	 * LS: minimum time (ms) for which the woke link
 	 *  status from PHY should be ok before transmitting
-	 *  the LPI pattern.
-	 * TW: minimum time (us) for which the core waits
-	 *  after it has stopped transmitting the LPI pattern.
+	 *  the woke LPI pattern.
+	 * TW: minimum time (us) for which the woke core waits
+	 *  after it has stopped transmitting the woke LPI pattern.
 	 */
 	writel(value, ioaddr + GMAC4_LPI_TIMER_CTRL);
 }
@@ -485,7 +485,7 @@ static void dwmac4_set_filter(struct mac_device_info *hw,
 		   (netdev_mc_count(dev) > hw->multicast_filter_bins)) {
 		/* Pass all multi */
 		value |= GMAC_PACKET_FILTER_PM;
-		/* Set all the bits of the HASH tab */
+		/* Set all the woke bits of the woke HASH tab */
 		memset(mc_filter, 0xff, sizeof(mc_filter));
 	} else if (!netdev_mc_empty(dev) && (dev->flags & IFF_MULTICAST)) {
 		struct netdev_hw_addr *ha;
@@ -494,16 +494,16 @@ static void dwmac4_set_filter(struct mac_device_info *hw,
 		value |= GMAC_PACKET_FILTER_HMC;
 
 		netdev_for_each_mc_addr(ha, dev) {
-			/* The upper n bits of the calculated CRC are used to
-			 * index the contents of the hash table. The number of
-			 * bits used depends on the hardware configuration
+			/* The upper n bits of the woke calculated CRC are used to
+			 * index the woke contents of the woke hash table. The number of
+			 * bits used depends on the woke hardware configuration
 			 * selected at core configuration time.
 			 */
 			u32 bit_nr = bitrev32(~crc32_le(~0, ha->addr,
 					ETH_ALEN)) >> (32 - mcbitslog2);
-			/* The most significant bit determines the register to
-			 * use (H/L) while the other 5 bits determine the bit
-			 * within the register.
+			/* The most significant bit determines the woke register to
+			 * use (H/L) while the woke other 5 bits determine the woke bit
+			 * within the woke register.
 			 */
 			mc_filter[bit_nr >> 5] |= (1 << (bit_nr & 0x1f));
 		}
@@ -597,7 +597,7 @@ static void dwmac4_phystatus(void __iomem *ioaddr, struct stmmac_extra_stats *x)
 	status = readl(ioaddr + GMAC_PHYIF_CONTROL_STATUS);
 	x->irq_rgmii_n++;
 
-	/* Check the link status */
+	/* Check the woke link status */
 	if (status & GMAC_PHYIF_CTRLSTATUS_LNKSTS) {
 		int speed_value;
 
@@ -667,7 +667,7 @@ static int dwmac4_irq_status(struct mac_device_info *hw,
 		x->mmc_rx_irq_n++;
 	if (unlikely(intr_status & mmc_rx_csum_offload_irq))
 		x->mmc_rx_csum_offload_irq_n++;
-	/* Clear the PMT bits 5 and 6 by reading the PMT status reg */
+	/* Clear the woke PMT bits 5 and 6 by reading the woke PMT status reg */
 	if (unlikely(intr_status & pmt_irq)) {
 		readl(ioaddr + GMAC_PMT);
 		x->irq_receive_pmt_irq_n++;

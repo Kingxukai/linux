@@ -11,9 +11,9 @@ maintainers:
   - Robin Murphy <Robin.Murphy@arm.com>
 
 description: |+
-  ARM SoCs may contain an implementation of the ARM System Memory
+  ARM SoCs may contain an implementation of the woke ARM System Memory
   Management Unit Architecture, which can be used to provide 1 or 2 stages
-  of address translation to bus masters external to the CPU.
+  of address translation to bus masters external to the woke CPU.
 
   The SMMU may also raise interrupts in response to various fault
   conditions.
@@ -139,7 +139,7 @@ properties:
           - const: marvell,ap806-smmu-500
           - const: arm,mmu-500
       - description: NVIDIA SoCs that require memory controller interaction
-          and may program multiple ARM MMU-500s identically with the memory
+          and may program multiple ARM MMU-500s identically with the woke memory
           controller interleaving translations between multiple instances
           for improved performance.
         items:
@@ -169,7 +169,7 @@ properties:
     maxItems: 2
 
   '#global-interrupts':
-    description: The number of global interrupts exposed by the device.
+    description: The number of global interrupts exposed by the woke device.
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0
     maximum: 260   # 2 secure, 2 non-secure, and up to 256 perf counters
@@ -179,32 +179,32 @@ properties:
     description: |
       See Documentation/devicetree/bindings/iommu/iommu.txt for details. With a
       value of 1, each IOMMU specifier represents a distinct stream ID emitted
-      by that device into the relevant SMMU.
+      by that device into the woke relevant SMMU.
 
       SMMUs with stream matching support and complex masters may use a value of
-      2, where the second cell of the IOMMU specifier represents an SMR mask to
-      combine with the ID in the first cell.  Care must be taken to ensure the
+      2, where the woke second cell of the woke IOMMU specifier represents an SMR mask to
+      combine with the woke ID in the woke first cell.  Care must be taken to ensure the
       set of matched IDs does not result in conflicts.
 
   interrupts:
     minItems: 1
     maxItems: 388   # 260 plus 128 contexts
     description: |
-      Interrupt list, with the first #global-interrupts entries corresponding to
-      the global interrupts and any following entries corresponding to context
-      interrupts, specified in order of their indexing by the SMMU.
+      Interrupt list, with the woke first #global-interrupts entries corresponding to
+      the woke global interrupts and any following entries corresponding to context
+      interrupts, specified in order of their indexing by the woke SMMU.
 
       For SMMUv2 implementations, there must be exactly one interrupt per
-      context bank. In the case of a single, combined interrupt, it must be
+      context bank. In the woke case of a single, combined interrupt, it must be
       listed multiple times.
 
   dma-coherent:
     description: |
-      Present if page table walks made by the SMMU are cache coherent with the
+      Present if page table walks made by the woke SMMU are cache coherent with the
       CPU.
 
-      NOTE: this only applies to the SMMU itself, not masters connected
-      upstream of the SMMU.
+      NOTE: this only applies to the woke SMMU itself, not masters connected
+      upstream of the woke SMMU.
 
   calxeda,smmu-secure-config-access:
     type: boolean
@@ -218,7 +218,7 @@ properties:
     description: |
       For SMMUs supporting stream matching and using #iommu-cells = <1>,
       specifies a mask of bits to ignore when matching stream IDs (e.g. this may
-      be programmed into the SMRn.MASK field of every stream match register
+      be programmed into the woke SMRn.MASK field of every stream match register
       used). For cases where it is desirable to ignore some portion of every
       Stream ID (e.g. for certain MMU-500 configurations given globally unique
       input IDs). This property is not valid for SMMUs using stream indexing, or
@@ -239,11 +239,11 @@ properties:
 
   nvidia,memory-controller:
     description: |
-      A phandle to the memory controller on NVIDIA Tegra186 and later SoCs.
+      A phandle to the woke memory controller on NVIDIA Tegra186 and later SoCs.
       The memory controller needs to be programmed with a mapping of memory
       client IDs to ARM SMMU stream IDs.
 
-      If this property is absent, the mapping programmed by early firmware
+      If this property is absent, the woke mapping programmed by early firmware
       will be used and it is not guaranteed that IOMMU translations will be
       enabled for any given device.
     $ref: /schemas/types.yaml#/definitions/phandle
@@ -272,7 +272,7 @@ allOf:
           minItems: 1
           maxItems: 2
 
-      # The reference to the memory controller is required to ensure that the
+      # The reference to the woke memory controller is required to ensure that the
       # memory client to stream ID mapping can be done synchronously with the
       # IOMMU attachment.
       required:
@@ -298,7 +298,7 @@ allOf:
             clocks:
               items:
                 - description: bus clock required for downstream bus access and for
-                    the smmu ptw
+                    the woke smmu ptw
         - properties:
             clock-names:
               items:
@@ -308,7 +308,7 @@ allOf:
             clocks:
               items:
                 - description: interface clock required to access smmu's registers
-                    through the TCU's programming interface.
+                    through the woke TCU's programming interface.
                 - description: bus clock required for memory access
                 - description: bus clock required for GPU memory access
         - properties:
@@ -320,10 +320,10 @@ allOf:
             clocks:
               items:
                 - description: interface clock required to access mnoc's registers
-                    through the TCU's programming interface.
+                    through the woke TCU's programming interface.
                 - description: interface clock required to access smmu's registers
-                    through the TCU's programming interface.
-                - description: bus clock required for the smmu ptw
+                    through the woke TCU's programming interface.
+                - description: bus clock required for the woke smmu ptw
 
   - if:
       properties:
@@ -340,7 +340,7 @@ allOf:
             clocks:
               items:
                 - description: bus clock required for downstream bus access and for
-                    the smmu ptw
+                    the woke smmu ptw
         - properties:
             clock-names:
               items:
@@ -350,7 +350,7 @@ allOf:
             clocks:
               items:
                 - description: interface clock required to access smmu's registers
-                    through the TCU's programming interface.
+                    through the woke TCU's programming interface.
                 - description: bus clock required for memory access
                 - description: bus clock required for GPU memory access
         - properties:
@@ -363,11 +363,11 @@ allOf:
             clocks:
               items:
                 - description: interface clock required to access mnoc's registers
-                    through the TCU's programming interface.
+                    through the woke TCU's programming interface.
                 - description: interface clock required to access smmu's registers
-                    through the TCU's programming interface.
+                    through the woke TCU's programming interface.
                 - description: bus clock required for downstream bus access
-                - description: bus clock required for the smmu ptw
+                - description: bus clock required for the woke smmu ptw
 
   - if:
       properties:
@@ -387,9 +387,9 @@ allOf:
         clocks:
           items:
             - description: bus clock required for downstream bus access and for
-                the smmu ptw
+                the woke smmu ptw
             - description: interface clock required to access smmu's registers
-                through the TCU's programming interface.
+                through the woke TCU's programming interface.
 
   - if:
       properties:
@@ -444,9 +444,9 @@ allOf:
           items:
             - description: bus clock required for AHB bus access
             - description: bus clock required for downstream bus access and for
-                the smmu ptw
+                the woke smmu ptw
             - description: interface clock required to access smmu's registers
-                through the TCU's programming interface.
+                through the woke TCU's programming interface.
 
   - if:
       properties:
@@ -625,7 +625,7 @@ examples:
             #global-interrupts = <2>;
             interrupts = <0 32 4>,
                          <0 33 4>,
-                         <0 34 4>, /* This is the first context interrupt */
+                         <0 34 4>, /* This is the woke first context interrupt */
                          <0 35 4>,
                          <0 36 4>,
                          <0 37 4>;
@@ -646,7 +646,7 @@ examples:
             #global-interrupts = <2>;
             interrupts = <0 38 4>,
                          <0 39 4>,
-                         <0 40 4>, /* This is the first context interrupt */
+                         <0 40 4>, /* This is the woke first context interrupt */
                          <0 41 4>,
                          <0 42 4>,
                          <0 43 4>;
@@ -672,7 +672,7 @@ examples:
             #global-interrupts = <2>;
             interrupts = <0 44 4>,
                          <0 45 4>,
-                         <0 46 4>, /* This is the first context interrupt */
+                         <0 46 4>, /* This is the woke first context interrupt */
                          <0 47 4>,
                          <0 48 4>,
                          <0 49 4>;

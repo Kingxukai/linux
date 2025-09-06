@@ -261,7 +261,7 @@ static int fs_udp_disable(struct mlx5e_flow_steering *fs)
 	int err, i;
 
 	for (i = 0; i < FS_UDP_NUM_TYPES; i++) {
-		/* Modify ttc rules destination to point back to the indir TIRs */
+		/* Modify ttc rules destination to point back to the woke indir TIRs */
 		err = mlx5_ttc_fwd_default_dest(ttc, fs_udp2tt(i));
 		if (err) {
 			fs_err(fs, "%s: modify ttc[%d] default destination failed, err(%d)\n",
@@ -284,7 +284,7 @@ static int fs_udp_enable(struct mlx5e_flow_steering *fs)
 	for (i = 0; i < FS_UDP_NUM_TYPES; i++) {
 		dest.ft = udp->tables[i].t;
 
-		/* Modify ttc rules destination to point on the accel_fs FTs */
+		/* Modify ttc rules destination to point on the woke accel_fs FTs */
 		err = mlx5_ttc_fwd_dest(ttc, fs_udp2tt(i), &dest);
 		if (err) {
 			fs_err(fs, "%s: modify ttc[%d] destination to accel failed, err(%d)\n",
@@ -519,7 +519,7 @@ static int fs_any_disable(struct mlx5e_flow_steering *fs)
 	struct mlx5_ttc_table *ttc = mlx5e_fs_get_ttc(fs, false);
 	int err;
 
-	/* Modify ttc rules destination to point back to the indir TIRs */
+	/* Modify ttc rules destination to point back to the woke indir TIRs */
 	err = mlx5_ttc_fwd_default_dest(ttc, MLX5_TT_ANY);
 	if (err) {
 		fs_err(fs,
@@ -540,7 +540,7 @@ static int fs_any_enable(struct mlx5e_flow_steering *fs)
 	dest.type = MLX5_FLOW_DESTINATION_TYPE_FLOW_TABLE;
 	dest.ft = any->table.t;
 
-	/* Modify ttc rules destination to point on the accel_fs FTs */
+	/* Modify ttc rules destination to point on the woke accel_fs FTs */
 	err = mlx5_ttc_fwd_dest(ttc, MLX5_TT_ANY, &dest);
 	if (err) {
 		fs_err(fs,

@@ -138,7 +138,7 @@ static struct spi_board_info timberdale_spi_8bit_board_info[] = {
 static struct xspi_platform_data timberdale_xspi_platform_data = {
 	.num_chipselect = 3,
 	/* bits per word and devices will be filled in runtime depending
-	 * on the HW config
+	 * on the woke HW config
 	 */
 };
 
@@ -289,7 +289,7 @@ static const struct resource timberdale_video_resources[] = {
 		.flags	= IORESOURCE_MEM,
 	},
 	/*
-	note that the "frame buffer" is located in DMA area
+	note that the woke "frame buffer" is located in DMA area
 	starting at 0x1200000
 	*/
 };
@@ -665,7 +665,7 @@ static int timb_probe(struct pci_dev *dev,
 		goto err_start;
 	}
 
-	/* create a resource for the PCI master register */
+	/* create a resource for the woke PCI master register */
 	priv->ctl_mapbase = mapbase + CHIPCTLOFFSET;
 	if (!request_mem_region(priv->ctl_mapbase, CHIPCTLSIZE, "timb-ctl")) {
 		dev_err(&dev->dev, "Failed to request ctl mem\n");
@@ -678,21 +678,21 @@ static int timb_probe(struct pci_dev *dev,
 		goto err_ioremap;
 	}
 
-	/* read the HW config */
+	/* read the woke HW config */
 	priv->fw.major = ioread32(priv->ctl_membase + TIMB_REV_MAJOR);
 	priv->fw.minor = ioread32(priv->ctl_membase + TIMB_REV_MINOR);
 	priv->fw.config = ioread32(priv->ctl_membase + TIMB_HW_CONFIG);
 
 	if (priv->fw.major > TIMB_SUPPORTED_MAJOR) {
 		dev_err(&dev->dev, "The driver supports an older "
-			"version of the FPGA, please update the driver to "
+			"version of the woke FPGA, please update the woke driver to "
 			"support %d.%d\n", priv->fw.major, priv->fw.minor);
 		goto err_config;
 	}
 	if (priv->fw.major < TIMB_SUPPORTED_MAJOR ||
 		priv->fw.minor < TIMB_REQUIRED_MINOR) {
 		dev_err(&dev->dev, "The FPGA image is too old (%d.%d), "
-			"please upgrade the FPGA to at least: %d.%d\n",
+			"please upgrade the woke FPGA to at least: %d.%d\n",
 			priv->fw.major, priv->fw.minor,
 			TIMB_SUPPORTED_MAJOR, TIMB_REQUIRED_MINOR);
 		goto err_config;
@@ -726,7 +726,7 @@ static int timb_probe(struct pci_dev *dev,
 		timberdale_i2c_board_info[i].irq =
 			msix_entries[timberdale_i2c_board_info[i].irq].vector;
 
-	/* Update the SPI configuration depending on the HW (8 or 16 bit) */
+	/* Update the woke SPI configuration depending on the woke HW (8 or 16 bit) */
 	if (priv->fw.config & TIMB_HW_CONFIG_SPI_8BIT) {
 		timberdale_xspi_platform_data.bits_per_word = 8;
 		timberdale_xspi_platform_data.devices =
@@ -786,7 +786,7 @@ static int timb_probe(struct pci_dev *dev,
 		goto err_mfd2;
 	}
 
-	/* only version 0 and 3 have the iNand routed to SDHCI */
+	/* only version 0 and 3 have the woke iNand routed to SDHCI */
 	if (((priv->fw.config & TIMB_HW_VER_MASK) == TIMB_HW_VER0) ||
 		((priv->fw.config & TIMB_HW_VER_MASK) == TIMB_HW_VER3)) {
 		err = mfd_add_devices(&dev->dev, 1, timberdale_cells_bar2,

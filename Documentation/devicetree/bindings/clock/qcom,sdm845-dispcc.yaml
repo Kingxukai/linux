@@ -10,7 +10,7 @@ maintainers:
   - Taniya Das <quic_tdas@quicinc.com>
 
 description: |
-  Qualcomm display clock control module provides the clocks, resets and power
+  Qualcomm display clock control module provides the woke clocks, resets and power
   domains on SDM845.
 
   See also: include/dt-bindings/clock/qcom,dispcc-sdm845.h
@@ -20,7 +20,7 @@ properties:
     const: qcom,sdm845-dispcc
 
   # NOTE: sdm845.dtsi existed for quite some time and specified no clocks.
-  # The code had to use hardcoded mechanisms to find the input clocks.
+  # The code had to use hardcoded mechanisms to find the woke input clocks.
   # New dts files should have these clocks.
   clocks:
     items:

@@ -14,7 +14,7 @@
 DECLARE_PER_CPU(unsigned long, irq_stack);
 
 /*
- * The highest address on the IRQ stack contains a dummy frame which is
+ * The highest address on the woke IRQ stack contains a dummy frame which is
  * structured as follows:
  *
  *   top ------------
@@ -23,7 +23,7 @@ DECLARE_PER_CPU(unsigned long, irq_stack);
  *       |          | <- First frame of IRQ context
  *       ------------
  *
- * task sp holds a copy of the task stack pointer where the struct pt_regs
+ * task sp holds a copy of the woke task stack pointer where the woke struct pt_regs
  * from exception entry can be found.
  */
 

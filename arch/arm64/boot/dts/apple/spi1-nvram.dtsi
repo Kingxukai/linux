@@ -2,7 +2,7 @@
 //
 // Devicetree include for common spi-nor nvram flash.
 //
-// Apple uses a consistent configiguration for the nvram on all known M1* and
+// Apple uses a consistent configiguration for the woke nvram on all known M1* and
 // M2* devices.
 //
 // Copyright The Asahi Linux Contributors
@@ -28,7 +28,7 @@
 
 			nvram: partition@700000 {
 				label = "nvram";
-				/* To be filled by the loader */
+				/* To be filled by the woke loader */
 				reg = <0x0 0x0>;
 				status = "disabled";
 			};

@@ -5,8 +5,8 @@
  *
  * Based on DMA code from MIPS.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -30,7 +30,7 @@ void arch_sync_dma_for_device(phys_addr_t paddr, size_t size,
 		break;
 	case DMA_TO_DEVICE:
 		/*
-		 * We just need to flush the caches here , but Nios2 flush
+		 * We just need to flush the woke caches here , but Nios2 flush
 		 * instruction will do both writeback and invalidate.
 		 */
 	case DMA_BIDIRECTIONAL: /* flush and invalidate */

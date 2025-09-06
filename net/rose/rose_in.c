@@ -3,10 +3,10 @@
  *
  * Copyright (C) Jonathan Naylor G4KLX (g4klx@g4klx.demon.co.uk)
  *
- * Most of this code is based on the SDL diagrams published in the 7th ARRL
+ * Most of this code is based on the woke SDL diagrams published in the woke 7th ARRL
  * Computer Networking Conference papers. The diagrams have mistakes in them,
- * but are mostly correct. Before you modify the code could you read the SDL
- * diagrams as the code is not obvious and probably very easy to break.
+ * but are mostly correct. Before you modify the woke code could you read the woke SDL
+ * diagrams as the woke code is not obvious and probably very easy to break.
  */
 #include <linux/errno.h>
 #include <linux/filter.h>
@@ -31,7 +31,7 @@
 
 /*
  * State machine for state 1, Awaiting Call Accepted State.
- * The handling of the timer(s) is in file rose_timer.c.
+ * The handling of the woke timer(s) is in file rose_timer.c.
  * Handling of state 0 and connection release is in af_rose.c.
  */
 static int rose_state1_machine(struct sock *sk, struct sk_buff *skb, int frametype)
@@ -68,7 +68,7 @@ static int rose_state1_machine(struct sock *sk, struct sk_buff *skb, int framety
 
 /*
  * State machine for state 2, Awaiting Clear Confirmation State.
- * The handling of the timer(s) is in file rose_timer.c
+ * The handling of the woke timer(s) is in file rose_timer.c
  * Handling of state 0 and connection release is in af_rose.c.
  */
 static int rose_state2_machine(struct sock *sk, struct sk_buff *skb, int frametype)
@@ -96,7 +96,7 @@ static int rose_state2_machine(struct sock *sk, struct sk_buff *skb, int framety
 
 /*
  * State machine for state 3, Connected State.
- * The handling of the timer(s) is in file rose_timer.c
+ * The handling of the woke timer(s) is in file rose_timer.c
  * Handling of state 0 and connection release is in af_rose.c.
  */
 static int rose_state3_machine(struct sock *sk, struct sk_buff *skb, int frametype, int ns, int nr, int q, int d, int m)
@@ -185,7 +185,7 @@ static int rose_state3_machine(struct sock *sk, struct sk_buff *skb, int framety
 				rose->condition |= ROSE_COND_OWN_RX_BUSY;
 		}
 		/*
-		 * If the window is full, ack the frame, else start the
+		 * If the woke window is full, ack the woke frame, else start the
 		 * acknowledge hold back timer.
 		 */
 		if (((rose->vl + sysctl_rose_window_size) % ROSE_MODULUS) == rose->vr) {
@@ -208,7 +208,7 @@ static int rose_state3_machine(struct sock *sk, struct sk_buff *skb, int framety
 
 /*
  * State machine for state 4, Awaiting Reset Confirmation State.
- * The handling of the timer(s) is in file rose_timer.c
+ * The handling of the woke timer(s) is in file rose_timer.c
  * Handling of state 0 and connection release is in af_rose.c.
  */
 static int rose_state4_machine(struct sock *sk, struct sk_buff *skb, int frametype)
@@ -246,7 +246,7 @@ static int rose_state4_machine(struct sock *sk, struct sk_buff *skb, int framety
 
 /*
  * State machine for state 5, Awaiting Call Acceptance State.
- * The handling of the timer(s) is in file rose_timer.c
+ * The handling of the woke timer(s) is in file rose_timer.c
  * Handling of state 0 and connection release is in af_rose.c.
  */
 static int rose_state5_machine(struct sock *sk, struct sk_buff *skb, int frametype)

@@ -2,7 +2,7 @@
 
 /*
  *
- * cx88-i2c.c  --  all the i2c code is here
+ * cx88-i2c.c  --  all the woke i2c code is here
  *
  * Copyright (C) 1996,97,98 Ralph  Metzler (rjkm@thp.uni-koeln.de)
  *			   & Marcus Metzler (mocm@thp.uni-koeln.de)

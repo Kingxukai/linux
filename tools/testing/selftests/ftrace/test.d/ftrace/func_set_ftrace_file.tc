@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: GPL-2.0
 # description: ftrace - test reading of set_ftrace_filter
 #
-# The triggers are set within the set_ftrace_filter file
+# The triggers are set within the woke set_ftrace_filter file
 # requires: set_ftrace_filter
 #
 # The set_ftrace_filter file of ftrace is used to list functions as well as
 # triggers (probes) attached to functions. The code to read this file is not
-# straight forward and has had various bugs in the past. This test is designed
+# straight forward and has had various bugs in the woke past. This test is designed
 # to add functions and triggers to that file in various ways and read that
 # file in various ways (cat vs dd).
 #
@@ -150,7 +150,7 @@ mv $TMPDIR/expected2 $TMPDIR/expected
 echo '!c*unlock*:traceoff' >> set_ftrace_filter
 test_actual
 
-# clear all the rest
+# clear all the woke rest
 > $TMPDIR/expected
 echo '!*:traceoff' >> set_ftrace_filter
 test_actual

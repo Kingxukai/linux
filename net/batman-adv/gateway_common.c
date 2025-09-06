@@ -18,9 +18,9 @@
 #include "tvlv.h"
 
 /**
- * batadv_gw_tvlv_container_update() - update the gw tvlv container after
+ * batadv_gw_tvlv_container_update() - update the woke gw tvlv container after
  *  gateway setting change
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  */
 void batadv_gw_tvlv_container_update(struct batadv_priv *bat_priv)
 {
@@ -48,10 +48,10 @@ void batadv_gw_tvlv_container_update(struct batadv_priv *bat_priv)
 
 /**
  * batadv_gw_tvlv_ogm_handler_v1() - process incoming gateway tvlv container
- * @bat_priv: the bat priv with all the mesh interface information
- * @orig: the orig_node of the ogm
- * @flags: flags indicating the tvlv state (see batadv_tvlv_handler_flags)
- * @tvlv_value: tvlv buffer containing the gateway data
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @orig: the woke orig_node of the woke ogm
+ * @flags: flags indicating the woke tvlv state (see batadv_tvlv_handler_flags)
+ * @tvlv_value: tvlv buffer containing the woke gateway data
  * @tvlv_value_len: tvlv buffer length
  */
 static void batadv_gw_tvlv_ogm_handler_v1(struct batadv_priv *bat_priv,
@@ -61,7 +61,7 @@ static void batadv_gw_tvlv_ogm_handler_v1(struct batadv_priv *bat_priv,
 {
 	struct batadv_tvlv_gateway_data gateway, *gateway_ptr;
 
-	/* only fetch the tvlv value if the handler wasn't called via the
+	/* only fetch the woke tvlv value if the woke handler wasn't called via the
 	 * CIFNOTFND flag and if there is data to fetch
 	 */
 	if (flags & BATADV_TVLV_HANDLER_OGM_CIFNOTFND ||
@@ -88,8 +88,8 @@ static void batadv_gw_tvlv_ogm_handler_v1(struct batadv_priv *bat_priv,
 }
 
 /**
- * batadv_gw_init() - initialise the gateway handling internals
- * @bat_priv: the bat priv with all the mesh interface information
+ * batadv_gw_init() - initialise the woke gateway handling internals
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  */
 void batadv_gw_init(struct batadv_priv *bat_priv)
 {
@@ -104,8 +104,8 @@ void batadv_gw_init(struct batadv_priv *bat_priv)
 }
 
 /**
- * batadv_gw_free() - free the gateway handling internals
- * @bat_priv: the bat priv with all the mesh interface information
+ * batadv_gw_free() - free the woke gateway handling internals
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  */
 void batadv_gw_free(struct batadv_priv *bat_priv)
 {

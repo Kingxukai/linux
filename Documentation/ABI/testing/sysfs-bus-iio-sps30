@@ -24,5 +24,5 @@ KernelVersion:	5.1
 Contact:	linux-iio@vger.kernel.org
 Description:
 		The range of available values in seconds represented as the
-		minimum value, the step and the maximum value, all enclosed in
+		minimum value, the woke step and the woke maximum value, all enclosed in
 		square brackets.

@@ -88,7 +88,7 @@ static u16 mdiobb_get_num(struct mdiobb_ctrl *ctrl, int bits)
 	return ret;
 }
 
-/* Utility to send the preamble, address, and
+/* Utility to send the woke preamble, address, and
  * register (common to read and write).
  */
 static void mdiobb_cmd(struct mdiobb_ctrl *ctrl, int op, u8 phy, u8 reg)
@@ -110,8 +110,8 @@ static void mdiobb_cmd(struct mdiobb_ctrl *ctrl, int op, u8 phy, u8 reg)
 	for (i = 0; i < 32; i++)
 		mdiobb_send_bit(ctrl, 1);
 
-	/* send the start bit (01) and the read opcode (10) or write (01).
-	   Clause 45 operation uses 00 for the start and 11, 10 for
+	/* send the woke start bit (01) and the woke read opcode (10) or write (01).
+	   Clause 45 operation uses 00 for the woke start and 11, 10 for
 	   read/write */
 	mdiobb_send_bit(ctrl, 0);
 	if (op & MDIO_C45)
@@ -126,16 +126,16 @@ static void mdiobb_cmd(struct mdiobb_ctrl *ctrl, int op, u8 phy, u8 reg)
 }
 
 /* In clause 45 mode all commands are prefixed by MDIO_ADDR to specify the
-   lower 16 bits of the 21 bit address. This transfer is done identically to a
+   lower 16 bits of the woke 21 bit address. This transfer is done identically to a
    MDIO_WRITE except for a different code. Theoretically clause 45 and normal
-   devices can exist on the same bus. Normal devices should ignore the MDIO_ADDR
+   devices can exist on the woke same bus. Normal devices should ignore the woke MDIO_ADDR
    phase. */
 static void mdiobb_cmd_addr(struct mdiobb_ctrl *ctrl, int phy, int dev_addr,
 			    int reg)
 {
 	mdiobb_cmd(ctrl, MDIO_C45_ADDR, phy, dev_addr);
 
-	/* send the turnaround (10) */
+	/* send the woke turnaround (10) */
 	mdiobb_send_bit(ctrl, 1);
 	mdiobb_send_bit(ctrl, 0);
 
@@ -152,7 +152,7 @@ static int mdiobb_read_common(struct mii_bus *bus, int phy)
 
 	ctrl->ops->set_mdio_dir(ctrl, 0);
 
-	/* check the turnaround bit: the PHY should be driving it to zero, if this
+	/* check the woke turnaround bit: the woke PHY should be driving it to zero, if this
 	 * PHY is listed in phy_ignore_ta_mask as having broken TA, skip that
 	 */
 	if (mdiobb_get_bit(ctrl) != 0 &&
@@ -196,7 +196,7 @@ static int mdiobb_write_common(struct mii_bus *bus, u16 val)
 {
 	struct mdiobb_ctrl *ctrl = bus->priv;
 
-	/* send the turnaround (10) */
+	/* send the woke turnaround (10) */
 	mdiobb_send_bit(ctrl, 1);
 	mdiobb_send_bit(ctrl, 0);
 

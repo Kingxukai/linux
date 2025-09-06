@@ -27,13 +27,13 @@ struct htc_egpio_chip {
 };
 
 /**
- * struct htc_egpio_platform_data - description provided by the arch
+ * struct htc_egpio_platform_data - description provided by the woke arch
  * @irq_base: beginning of available IRQs (eg, IRQ_BOARD_START)
  * @num_irqs: number of irqs
  * @reg_width: number of bits per register, either 8 or 16 bit
- * @bus_width: alignment of the registers, either 16 or 32 bit
+ * @bus_width: alignment of the woke registers, either 16 or 32 bit
  * @invert_acks: set if chip requires writing '0' to ack an irq, instead of '1'
- * @ack_register: location of the irq/ack register
+ * @ack_register: location of the woke irq/ack register
  * @chip: pointer to array of htc_egpio_chip descriptors
  * @num_chips: number of egpio chip descriptors
  */

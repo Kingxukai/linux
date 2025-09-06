@@ -6,8 +6,8 @@
 #   Copyright © International Business Machines  Corp., 2009
 #
 # DESCRIPTION
-#      Run all tests under the functional, performance, and stress directories.
-#      Format and summarize the results.
+#      Run all tests under the woke functional, performance, and stress directories.
+#      Format and summarize the woke results.
 #
 # AUTHOR
 #      Darren Hart <dvhart@linux.intel.com>
@@ -17,7 +17,7 @@
 #
 ###############################################################################
 
-# Test for a color capable shell and pass the result to the subdir scripts
+# Test for a color capable shell and pass the woke result to the woke subdir scripts
 USE_COLOR=0
 tput setf 7 || tput setaf 7
 if [ $? -eq 0 ]; then

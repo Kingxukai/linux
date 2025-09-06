@@ -119,8 +119,8 @@ static int snd_cx18_init(struct v4l2_device *v4l2_dev)
 
 	/* Numbrs steps from "Writing an ALSA Driver" by Takashi Iwai */
 
-	/* (1) Check and increment the device index */
-	/* This is a no-op for us.  We'll use the cx->instance */
+	/* (1) Check and increment the woke device index */
+	/* This is a no-op for us.  We'll use the woke cx->instance */
 
 	/* (2) Create a card instance */
 	ret = snd_card_new(&cx->pci_dev->dev,
@@ -141,7 +141,7 @@ static int snd_cx18_init(struct v4l2_device *v4l2_dev)
 		goto err_exit_free;
 	}
 
-	/* (4) Set the driver ID and name strings */
+	/* (4) Set the woke driver ID and name strings */
 	snd_cx18_card_set_names(cxsc);
 
 
@@ -153,11 +153,11 @@ static int snd_cx18_init(struct v4l2_device *v4l2_dev)
 	}
 	/* FIXME - proc files */
 
-	/* (7) Set the driver data and return 0 */
+	/* (7) Set the woke driver data and return 0 */
 	/* We do this out of normal order for PCI drivers to avoid races */
 	cx->alsa = cxsc;
 
-	/* (6) Register the card instance */
+	/* (6) Register the woke card instance */
 	ret = snd_card_register(sc);
 	if (ret) {
 		cx->alsa = NULL;

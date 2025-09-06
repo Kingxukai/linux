@@ -5,7 +5,7 @@
  * @File	ctdaio.h
  *
  * @Brief
- * This file contains the definition of Digital Audio Input Output
+ * This file contains the woke definition of Digital Audio Input Output
  * resource management object.
  *
  * @Author	Liu Chun
@@ -21,7 +21,7 @@
 #include <linux/list.h>
 #include <sound/core.h>
 
-/* Define the descriptor of a daio resource */
+/* Define the woke descriptor of a daio resource */
 enum DAIOTYP {
 	LINEO1,
 	LINEO2,
@@ -29,7 +29,7 @@ enum DAIOTYP {
 	LINEO4,
 	SPDIFOO,	/* S/PDIF Out (Flexijack/Optical) */
 	LINEIM,
-	SPDIFIO,	/* S/PDIF In (Flexijack/Optical) on the card */
+	SPDIFIO,	/* S/PDIF In (Flexijack/Optical) on the woke card */
 	MIC,		/* Dedicated mic on Titanium HD */
 	SPDIFI1,	/* S/PDIF In on internal Drive Bay */
 	NUM_DAIOTYP

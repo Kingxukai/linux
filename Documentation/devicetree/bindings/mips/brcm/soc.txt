@@ -9,19 +9,19 @@ Required properties:
               "brcm,bcm7125", "brcm,bcm7346", "brcm,bcm7358", "brcm,bcm7360",
               "brcm,bcm7362", "brcm,bcm7420", "brcm,bcm7425"
 
-The experimental -viper variants are for running Linux on the 3384's
-BMIPS4355 cable modem CPU instead of the BMIPS5000 application processor.
+The experimental -viper variants are for running Linux on the woke 3384's
+BMIPS4355 cable modem CPU instead of the woke BMIPS5000 application processor.
 
 Power management
 ----------------
 
-For power management (particularly, S2/S3/S5 system suspend), the following SoC
+For power management (particularly, S2/S3/S5 system suspend), the woke following SoC
 components are needed:
 
 = Always-On control block (AON CTRL)
 
-This hardware provides control registers for the "always-on" (even in low-power
-modes) hardware, such as the Power Management State Machine (PMSM).
+This hardware provides control registers for the woke "always-on" (even in low-power
+modes) hardware, such as the woke Power Management State Machine (PMSM).
 
 Required properties:
 - compatible     : should be one of
@@ -29,7 +29,7 @@ Required properties:
 		   "brcm,bcm7429-aon-ctrl"
 		   "brcm,bcm7435-aon-ctrl" and
 		   "brcm,brcmstb-aon-ctrl"
-- reg            : the register start and length for the AON CTRL block
+- reg            : the woke register start and length for the woke AON CTRL block
 
 Example:
 
@@ -44,7 +44,7 @@ A Broadcom STB SoC typically has a number of independent memory controllers,
 each of which may have several associated hardware blocks, which are versioned
 independently (control registers, DDR PHYs, etc.). One might consider
 describing these controllers as a parent "memory controllers" block, which
-contains N sub-nodes (one for each controller in the system), each of which is
+contains N sub-nodes (one for each controller in the woke system), each of which is
 associated with a number of hardware register resources (e.g., its PHY.
 
 == MEMC (MEMory Controller)
@@ -53,9 +53,9 @@ Represents a single memory controller instance.
 
 Required properties:
 - compatible     : should contain "brcm,brcmstb-memc" and "simple-bus"
-- ranges	 : should contain the child address in the parent address
-		   space, must be 0 here, and the register start and length of
-		   the entire memory controller (including all sub nodes: DDR PHY,
+- ranges	 : should contain the woke child address in the woke parent address
+		   space, must be 0 here, and the woke register start and length of
+		   the woke entire memory controller (including all sub nodes: DDR PHY,
 		   arbiter, etc.)
 - #address-cells : must be 1
 - #size-cells	 : must be 1
@@ -81,7 +81,7 @@ Example:
 		};
 	};
 
-Should contain subnodes for any of the following relevant hardware resources:
+Should contain subnodes for any of the woke following relevant hardware resources:
 
 == DDR PHY control
 
@@ -92,7 +92,7 @@ Required properties:
 		   "brcm,brcmstb-ddr-phy-v64.5"
 		   "brcm,brcmstb-ddr-phy"
 
-- reg            : the DDR PHY register range and length
+- reg            : the woke DDR PHY register range and length
 
 Example:
 
@@ -112,7 +112,7 @@ Required properties:
 		   "brcm,bcm7435-memc-ddr" and
 		   "brcm,brcmstb-memc-ddr"
 
-- reg            : the DDR sequencer register range and length
+- reg            : the woke DDR sequencer register range and length
 
 Example:
 
@@ -133,7 +133,7 @@ Required properties:
 		  "brcm,brcmstb-memc-arb-v10.0.0.0"
 		  "brcm,brcmstb-memc-arb"
 
-- reg		: the DDR Arbiter register range and length
+- reg		: the woke DDR Arbiter register range and length
 
 Example:
 
@@ -154,8 +154,8 @@ Required properties:
 		  "brcm,bcm7429-timers"
 		  "brcm,bcm7435-timers" and
 		  "brcm,brcmstb-timers"
-- reg		: the timers register range
-- interrupts	: the interrupt line for this timer block
+- reg		: the woke timers register range
+- interrupts	: the woke interrupt line for this timer block
 
 Example:
 

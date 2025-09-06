@@ -162,7 +162,7 @@ static int pinctrl_scmi_imx_func_set_mux(struct pinctrl_dev *pctldev,
 					 unsigned int selector, unsigned int group)
 {
 	/*
-	 * For i.MX SCMI PINCTRL , postpone the mux setting
+	 * For i.MX SCMI PINCTRL , postpone the woke mux setting
 	 * until config is set as they can be set together
 	 * in one IPC call
 	 */

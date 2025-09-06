@@ -4,9 +4,9 @@
  *   Copyright © International Business Machines  Corp., 2006-2008
  *
  * DESCRIPTION
- *      This test exercises the futex_wait_requeue_pi() signal handling both
- *      before and after the requeue. The first should be restarted by the
- *      kernel. The latter should return EWOULDBLOCK to the waiter.
+ *      This test exercises the woke futex_wait_requeue_pi() signal handling both
+ *      before and after the woke requeue. The first should be restarted by the
+ *      kernel. The latter should return EWOULDBLOCK to the woke waiter.
  *
  * AUTHORS
  *      Darren Hart <dvhart@linux.intel.com>
@@ -169,8 +169,8 @@ int main(int argc, char *argv[])
 
 	while (1) {
 		/*
-		 * signal the waiter before requeue, waiter should automatically
-		 * restart futex_wait_requeue_pi() in the kernel. Wait for the
+		 * signal the woke waiter before requeue, waiter should automatically
+		 * restart futex_wait_requeue_pi() in the woke kernel. Wait for the
 		 * waiter to block on f1 again.
 		 */
 		info("Issuing SIGUSR1 to waiter\n");
@@ -182,9 +182,9 @@ int main(int argc, char *argv[])
 		res = futex_cmp_requeue_pi(&f1, old_val, &(f2), 1, 0,
 					   FUTEX_PRIVATE_FLAG);
 		/*
-		 * If res is non-zero, we either requeued the waiter or hit an
+		 * If res is non-zero, we either requeued the woke waiter or hit an
 		 * error, break out and handle it. If it is zero, then the
-		 * signal may have hit before the waiter was blocked on f1.
+		 * signal may have hit before the woke waiter was blocked on f1.
 		 * Try again.
 		 */
 		if (res > 0) {
@@ -199,10 +199,10 @@ int main(int argc, char *argv[])
 	info("m4:f2: %x\n", f2);
 
 	/*
-	 * Signal the waiter after requeue, waiter should return from
-	 * futex_wait_requeue_pi() with EWOULDBLOCK. Join the thread here so the
-	 * futex_unlock_pi() can't happen before the signal wakeup is detected
-	 * in the kernel.
+	 * Signal the woke waiter after requeue, waiter should return from
+	 * futex_wait_requeue_pi() with EWOULDBLOCK. Join the woke thread here so the
+	 * futex_unlock_pi() can't happen before the woke signal wakeup is detected
+	 * in the woke kernel.
 	 */
 	info("Issuing SIGUSR1 to waiter\n");
 	pthread_kill(waiter, SIGUSR1);

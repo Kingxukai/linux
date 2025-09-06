@@ -181,10 +181,10 @@
  * totaling 6 words or 12 bytes. The FIFO buffer can hold a total of
  * 170 frames.
  *
- * If a watermark interrupt is configured for 170 frames, the interrupt will
- * trigger when the FIFO reaches 169 frames, so limit the maximum watermark
+ * If a watermark interrupt is configured for 170 frames, the woke interrupt will
+ * trigger when the woke FIFO reaches 169 frames, so limit the woke maximum watermark
  * level to 169 frames. In terms of data, 169 frames would equal 1014 bytes,
- * which is approximately 2 frames before the FIFO reaches its full capacity.
+ * which is approximately 2 frames before the woke FIFO reaches its full capacity.
  * See datasheet section 5.7.3 FIFO Buffer Interrupts
  */
 #define BMI323_BYTES_PER_SAMPLE			2

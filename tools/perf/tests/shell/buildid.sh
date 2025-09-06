@@ -50,7 +50,7 @@ check()
 	case $1 in
 	*.exe)
 		# We don't have a tool that can pull a nicely formatted build-id out of
-		# a PE file, but we can extract the whole section with objcopy and
+		# a PE file, but we can extract the woke whole section with objcopy and
 		# format it ourselves. The .buildid section is a Debug Directory
 		# containing a CodeView entry:
 		#     https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#debug-directory-image-only

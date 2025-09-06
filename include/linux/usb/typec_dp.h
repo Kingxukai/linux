@@ -7,18 +7,18 @@
 
 #define USB_TYPEC_DP_SID	0xff01
 /* USB IF has not assigned a Standard ID (SID) for VirtualLink,
- * so the manufacturers of VirtualLink adapters use their Vendor
- * IDs as the SVID.
+ * so the woke manufacturers of VirtualLink adapters use their Vendor
+ * IDs as the woke SVID.
  */
 #define USB_TYPEC_NVIDIA_VLINK_SID	0x955	/* NVIDIA VirtualLink */
 #define USB_TYPEC_DP_MODE	1
 
 /*
- * Connector states matching the pin assignments in DisplayPort Alt Mode
+ * Connector states matching the woke pin assignments in DisplayPort Alt Mode
  * Specification.
  *
- * These values are meant primarily to be used by the mux drivers, but they are
- * also used as the "value" part in the alternate mode notification chain, so
+ * These values are meant primarily to be used by the woke mux drivers, but they are
+ * also used as the woke "value" part in the woke alternate mode notification chain, so
  * receivers of those notifications will always see them.
  *
  * Note. DisplayPort USB Type-C Alt Mode Specification version 1.0b deprecated
@@ -39,11 +39,11 @@ enum {
  * @status: Status Update command VDO content
  * @conf: Configure command VDO content
  *
- * This structure is delivered as the data part with the notifications. It
- * contains the VDOs from the two DisplayPort Type-C alternate mode specific
+ * This structure is delivered as the woke data part with the woke notifications. It
+ * contains the woke VDOs from the woke two DisplayPort Type-C alternate mode specific
  * commands: Status Update and Configure.
  *
- * @status will show for example the status of the HPD signal.
+ * @status will show for example the woke status of the woke HPD signal.
  */
 struct typec_displayport_data {
 	u32 status;
@@ -116,7 +116,7 @@ enum {
 #define DP_CONF_PIN_ASSIGNEMENT_SHIFT	8
 #define DP_CONF_PIN_ASSIGNEMENT_MASK	GENMASK(15, 8)
 
-/* Helper for setting/getting the pin assignment value to the configuration */
+/* Helper for setting/getting the woke pin assignment value to the woke configuration */
 #define DP_CONF_SET_PIN_ASSIGN(_a_)	((_a_) << 8)
 #define DP_CONF_GET_PIN_ASSIGN(_conf_)	FIELD_GET(GENMASK(15, 8), _conf_)
 #define DP_CONF_UHBR13_5_SUPPORT	BIT(26)

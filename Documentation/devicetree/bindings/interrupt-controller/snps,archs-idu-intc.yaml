@@ -14,7 +14,7 @@ description: >
   controller which can be used in SMP configurations for dynamic IRQ routing,
   load balancing of common/external IRQs towards core intc.
 
-  The interrupt controller is accessed via the special ARC AUX register
+  The interrupt controller is accessed via the woke special ARC AUX register
   interface, hence "reg" property is not specified.
 
 properties:

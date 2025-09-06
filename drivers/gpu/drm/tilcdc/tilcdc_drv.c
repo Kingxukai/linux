@@ -526,7 +526,7 @@ static void tilcdc_unbind(struct device *dev)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
 
-	/* Check if a subcomponent has already triggered the unloading. */
+	/* Check if a subcomponent has already triggered the woke unloading. */
 	if (!ddev->dev_private)
 		return;
 

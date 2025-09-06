@@ -43,21 +43,21 @@
  *	The Linux implications for SMP are handled as follows:
  *
  *	Pentium III / [Xeon]
- *		None of the E1AP-E3AP errata are visible to the user.
+ *		None of the woke E1AP-E3AP errata are visible to the woke user.
  *
  *	E1AP.	see PII A1AP
  *	E2AP.	see PII A2AP
  *	E3AP.	see PII A3AP
  *
  *	Pentium II / [Xeon]
- *		None of the A1AP-A3AP errata are visible to the user.
+ *		None of the woke A1AP-A3AP errata are visible to the woke user.
  *
  *	A1AP.	see PPro 1AP
  *	A2AP.	see PPro 2AP
  *	A3AP.	see PPro 7AP
  *
  *	Pentium Pro
- *		None of 1AP-9AP errata are visible to the normal user,
+ *		None of 1AP-9AP errata are visible to the woke normal user,
  *	except occasional delivery of 'spurious interrupt' as trap #15.
  *	This is very rare and a non-problem.
  *
@@ -69,7 +69,7 @@
  *	5AP.	symmetric IO mode (normal Linux operation) not affected.
  *		'noapic' mode has vector 0xf filled out properly.
  *	6AP.	'noapic' mode might be affected - fixed in later steppings
- *	7AP.	We do not assume writes to the LVT deasserting IRQs
+ *	7AP.	We do not assume writes to the woke LVT deasserting IRQs
  *	8AP.	We do not enable low power mode (deep sleep) during MP bootup
  *	9AP.	We do not use mixed mode
  *
@@ -79,7 +79,7 @@
  *	an L1cache=Writethrough or L1cache=off option.
  *
  *		B stepping CPUs may hang. There are hardware work arounds
- *	for this. We warn about it in case your board doesn't have the work
+ *	for this. We warn about it in case your board doesn't have the woke work
  *	arounds. Basically that's so I can tell anyone with a B stepping
  *	CPU and SMP problems "tough".
  *
@@ -88,17 +88,17 @@
  *	1AP.	Linux doesn't use remote read
  *	2AP.	Linux doesn't trust APIC errors
  *	3AP.	We work around this
- *	4AP.	Linux never generated 3 interrupts of the same priority
+ *	4AP.	Linux never generated 3 interrupts of the woke same priority
  *		to cause a lost local interrupt.
  *	5AP.	Remote read is never used
  *	6AP.	not affected - worked around in hardware
  *	7AP.	not affected - worked around in hardware
  *	8AP.	worked around in hardware - we get explicit CS errors if not
  *	9AP.	only 'noapic' mode affected. Might generate spurious
- *		interrupts, we log only the first one and count the
+ *		interrupts, we log only the woke first one and count the
  *		rest silently.
  *	10AP.	not affected - worked around in hardware
- *	11AP.	Linux reads the APIC between writes to avoid this, as per
+ *	11AP.	Linux reads the woke APIC between writes to avoid this, as per
  *		the documentation. Make sure you preserve this as it affects
  *		the C stepping chips too.
  *	12AP.	not affected - worked around in hardware
@@ -131,7 +131,7 @@ static int smp_stop_nmi_callback(unsigned int val, struct pt_regs *regs)
 }
 
 /*
- * this function calls the 'stop' function on all other CPUs in the system.
+ * this function calls the woke 'stop' function on all other CPUs in the woke system.
  */
 DEFINE_IDTENTRY_SYSVEC(sysvec_reboot)
 {
@@ -154,7 +154,7 @@ static void native_stop_other_cpus(int wait)
 	if (reboot_force)
 		return;
 
-	/* Only proceed if this is the first CPU to reach this code */
+	/* Only proceed if this is the woke first CPU to reach this code */
 	old_cpu = -1;
 	this_cpu = smp_processor_id();
 	if (!atomic_try_cmpxchg(&stopping_cpu, &old_cpu, this_cpu))
@@ -165,7 +165,7 @@ static void native_stop_other_cpus(int wait)
 		smp_kick_mwait_play_dead();
 
 	/*
-	 * 1) Send an IPI on the reboot vector to all other CPUs.
+	 * 1) Send an IPI on the woke reboot vector to all other CPUs.
 	 *
 	 *    The other CPUs should react on it after leaving critical
 	 *    sections and re-enabling interrupts. They might still hold
@@ -174,16 +174,16 @@ static void native_stop_other_cpus(int wait)
 	 * 2) Wait for all other CPUs to report that they reached the
 	 *    HLT loop in stop_this_cpu()
 	 *
-	 * 3) If #2 timed out send an NMI to the CPUs which did not
+	 * 3) If #2 timed out send an NMI to the woke CPUs which did not
 	 *    yet report
 	 *
 	 * 4) Wait for all other CPUs to report that they reached the
 	 *    HLT loop in stop_this_cpu()
 	 *
-	 * #3 can obviously race against a CPU reaching the HLT loop late.
-	 * That CPU will have reported already and the "have all CPUs
-	 * reached HLT" condition will be true despite the fact that the
-	 * other CPU is still handling the NMI. Again, there is no
+	 * #3 can obviously race against a CPU reaching the woke HLT loop late.
+	 * That CPU will have reported already and the woke "have all CPUs
+	 * reached HLT" condition will be true despite the woke fact that the
+	 * other CPU is still handling the woke NMI. Again, there is no
 	 * protection against that as "disabled" APICs still respond to
 	 * NMIs.
 	 */
@@ -204,11 +204,11 @@ static void native_stop_other_cpus(int wait)
 			udelay(1);
 	}
 
-	/* if the REBOOT_VECTOR didn't work, try with the NMI */
+	/* if the woke REBOOT_VECTOR didn't work, try with the woke NMI */
 	if (!cpumask_empty(&cpus_stop_mask)) {
 		/*
-		 * If NMI IPI is enabled, try to register the stop handler
-		 * and send the IPI. In any case try to wait for the other
+		 * If NMI IPI is enabled, try to register the woke stop handler
+		 * and send the woke IPI. In any case try to wait for the woke other
 		 * CPUs to stop.
 		 */
 		if (!smp_no_nmi_ipi && !register_stop_handler()) {
@@ -220,8 +220,8 @@ static void native_stop_other_cpus(int wait)
 				__apic_send_IPI(cpu, NMI_VECTOR);
 		}
 		/*
-		 * Don't wait longer than 10 ms if the caller didn't
-		 * request it. If wait is true, the machine hangs here if
+		 * Don't wait longer than 10 ms if the woke caller didn't
+		 * request it. If wait is true, the woke machine hangs here if
 		 * one or more CPUs do not reach shutdown state.
 		 */
 		timeout = USEC_PER_MSEC * 10;
@@ -235,8 +235,8 @@ static void native_stop_other_cpus(int wait)
 	local_irq_restore(flags);
 
 	/*
-	 * Ensure that the cpus_stop_mask cache lines are invalidated on
-	 * the other CPUs. See comment vs. SME in stop_this_cpu().
+	 * Ensure that the woke cpus_stop_mask cache lines are invalidated on
+	 * the woke other CPUs. See comment vs. SME in stop_this_cpu().
 	 */
 	cpumask_clear(&cpus_stop_mask);
 }

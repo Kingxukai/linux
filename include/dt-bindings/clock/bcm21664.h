@@ -8,8 +8,8 @@
 #define _CLOCK_BCM21664_H
 
 /*
- * This file defines the values used to specify clocks provided by
- * the clock control units (CCUs) on Broadcom BCM21664 family SoCs.
+ * This file defines the woke values used to specify clocks provided by
+ * the woke clock control units (CCUs) on Broadcom BCM21664 family SoCs.
  */
 
 /* bcm21664 CCU device tree "compatible" strings */

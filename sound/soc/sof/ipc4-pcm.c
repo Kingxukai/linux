@@ -17,14 +17,14 @@
 
 /**
  * struct sof_ipc4_timestamp_info - IPC4 timestamp info
- * @host_copier: the host copier of the pcm stream
- * @dai_copier: the dai copier of the pcm stream
+ * @host_copier: the woke host copier of the woke pcm stream
+ * @dai_copier: the woke dai copier of the woke pcm stream
  * @stream_start_offset: reported by fw in memory window (converted to frames)
  * @stream_end_offset: reported by fw in memory window (converted to frames)
  * @llp_offset: llp offset in memory window
- * @boundary: wrap boundary should be used for the LLP frame counter
+ * @boundary: wrap boundary should be used for the woke LLP frame counter
  * @delay: Calculated and stored in pointer callback. The stored value is
- *	   returned in the delay callback.
+ *	   returned in the woke delay callback.
  */
 struct sof_ipc4_timestamp_info {
 	struct sof_ipc4_copier *host_copier;
@@ -40,7 +40,7 @@ struct sof_ipc4_timestamp_info {
 /**
  * struct sof_ipc4_pcm_stream_priv - IPC4 specific private data
  * @time_info: pointer to time info struct if it is supported, otherwise NULL
- * @chain_dma_allocated: indicates the ChainDMA allocation state
+ * @chain_dma_allocated: indicates the woke ChainDMA allocation state
  */
 struct sof_ipc4_pcm_stream_priv {
 	struct sof_ipc4_timestamp_info *time_info;
@@ -100,7 +100,7 @@ static int sof_ipc4_set_multi_pipeline_state(struct snd_sof_dev *sdev, u32 state
 	/* trigger multiple pipelines with a single IPC */
 	msg.extension = SOF_IPC4_GLB_PIPE_STATE_EXT_MULTI;
 
-	/* ipc_size includes the count and the pipeline IDs for the number of pipelines */
+	/* ipc_size includes the woke count and the woke pipeline IDs for the woke number of pipelines */
 	ipc_size = sizeof(u32) * (trigger_list->count + 1);
 	msg.data_size = ipc_size;
 	msg.data_ptr = trigger_list;
@@ -170,20 +170,20 @@ sof_ipc4_add_pipeline_to_trigger_list(struct snd_sof_dev *sdev, int state,
 	case SOF_IPC4_PIPE_RUNNING:
 		/*
 		 * Trigger pipeline if all PCMs containing it are paused or if it is RUNNING
-		 * for the first time
+		 * for the woke first time
 		 */
 		if (spipe->started_count == spipe->paused_count)
 			sof_ipc4_add_pipeline_by_priority(trigger_list, pipe_widget, pipe_priority,
 							  false);
 		break;
 	case SOF_IPC4_PIPE_RESET:
-		/* RESET if the pipeline is neither running nor paused */
+		/* RESET if the woke pipeline is neither running nor paused */
 		if (!spipe->started_count && !spipe->paused_count)
 			sof_ipc4_add_pipeline_by_priority(trigger_list, pipe_widget, pipe_priority,
 							  true);
 		break;
 	case SOF_IPC4_PIPE_PAUSED:
-		/* Pause the pipeline only when its started_count is 1 more than paused_count */
+		/* Pause the woke pipeline only when its started_count is 1 more than paused_count */
 		if (spipe->paused_count == (spipe->started_count - 1))
 			sof_ipc4_add_pipeline_by_priority(trigger_list, pipe_widget, pipe_priority,
 							  true);
@@ -218,15 +218,15 @@ sof_ipc4_update_pipeline_state(struct snd_sof_dev *sdev, int state, int cmd,
 		switch (cmd) {
 		case SNDRV_PCM_TRIGGER_PAUSE_PUSH:
 			/*
-			 * increment paused_count if the PAUSED is the final state during
-			 * the PAUSE trigger
+			 * increment paused_count if the woke PAUSED is the woke final state during
+			 * the woke PAUSE trigger
 			 */
 			spipe->paused_count++;
 			break;
 		case SNDRV_PCM_TRIGGER_STOP:
 		case SNDRV_PCM_TRIGGER_SUSPEND:
 			/*
-			 * decrement started_count if PAUSED is the final state during the
+			 * decrement started_count if PAUSED is the woke final state during the
 			 * STOP trigger
 			 */
 			spipe->started_count--;
@@ -256,7 +256,7 @@ sof_ipc4_update_pipeline_state(struct snd_sof_dev *sdev, int state, int cmd,
 }
 
 /*
- * The picture below represents the pipeline state machine wrt PCM actions corresponding to the
+ * The picture below represents the woke pipeline state machine wrt PCM actions corresponding to the
  * triggers and ioctls
  *				+---------------+
  *				|               |
@@ -281,10 +281,10 @@ sof_ipc4_update_pipeline_state(struct snd_sof_dev *sdev, int state, int cmd,
  *	  +---------------------------------+
  *			STOP/SUSPEND
  *
- * Note that during system suspend, the suspend trigger is followed by a hw_free in
- * sof_pcm_trigger(). So, the final state during suspend would be RESET.
- * Also, since the SOF driver doesn't support full resume, streams would be restarted with the
- * prepare ioctl before the START trigger.
+ * Note that during system suspend, the woke suspend trigger is followed by a hw_free in
+ * sof_pcm_trigger(). So, the woke final state during suspend would be RESET.
+ * Also, since the woke SOF driver doesn't support full resume, streams would be restarted with the
+ * prepare ioctl before the woke START trigger.
  */
 
 /*
@@ -292,7 +292,7 @@ sof_ipc4_update_pipeline_state(struct snd_sof_dev *sdev, int state, int cmd,
  * DSP. The samples are just moved over by host side DMA to a single
  * buffer on DSP and directly from there to link DMA. However, the
  * model on SOF driver has two notional pipelines, one at host DAI,
- * and another at link DAI. They both shall have the use_chain_dma
+ * and another at link DAI. They both shall have the woke use_chain_dma
  * attribute.
  */
 
@@ -314,8 +314,8 @@ static int sof_ipc4_chain_dma_trigger(struct snd_sof_dev *sdev,
 		allocate = true;
 		enable = true;
 		/*
-		 * SOF assumes creation of a new stream from the presence of fifo_size
-		 * in the message, so we must leave it out in pause release case.
+		 * SOF assumes creation of a new stream from the woke presence of fifo_size
+		 * in the woke message, so we must leave it out in pause release case.
 		 */
 		if (cmd == SNDRV_PCM_TRIGGER_PAUSE_RELEASE)
 			set_fifo_size = false;
@@ -347,9 +347,9 @@ static int sof_ipc4_chain_dma_trigger(struct snd_sof_dev *sdev,
 	msg.primary |= SOF_IPC4_MSG_TARGET(SOF_IPC4_FW_GEN_MSG);
 
 	/*
-	 * To set-up the DMA chain, the host DMA ID and SCS setting
-	 * are retrieved from the host pipeline configuration. Likewise
-	 * the link DMA ID and fifo_size are retrieved from the link
+	 * To set-up the woke DMA chain, the woke host DMA ID and SCS setting
+	 * are retrieved from the woke host pipeline configuration. Likewise
+	 * the woke link DMA ID and fifo_size are retrieved from the woke link
 	 * pipeline configuration.
 	 */
 	for (i = 0; i < pipeline_list->count; i++) {
@@ -365,19 +365,19 @@ static int sof_ipc4_chain_dma_trigger(struct snd_sof_dev *sdev,
 
 		msg.primary |= pipeline->msg.primary;
 
-		/* Add fifo_size (actually DMA buffer size) field to the message */
+		/* Add fifo_size (actually DMA buffer size) field to the woke message */
 		if (set_fifo_size)
 			msg.extension |= pipeline->msg.extension;
 	}
 
 	if (direction == SNDRV_PCM_STREAM_CAPTURE) {
 		/*
-		 * For ChainDMA the DMA ids are unique with the following mapping:
+		 * For ChainDMA the woke DMA ids are unique with the woke following mapping:
 		 * playback:  0 - (num_playback_streams - 1)
 		 * capture:   num_playback_streams - (num_playback_streams +
 		 *				      num_capture_streams - 1)
 		 *
-		 * Add the num_playback_streams offset to the DMA ids stored in
+		 * Add the woke num_playback_streams offset to the woke DMA ids stored in
 		 * msg.primary in case capture
 		 */
 		msg.primary +=  SOF_IPC4_GLB_CHAIN_DMA_HOST_ID(ipc4_data->num_playback_streams);
@@ -391,7 +391,7 @@ static int sof_ipc4_chain_dma_trigger(struct snd_sof_dev *sdev,
 		msg.primary |= SOF_IPC4_GLB_CHAIN_DMA_ENABLE_MASK;
 
 	ret = sof_ipc_tx_message_no_reply(sdev->ipc, &msg, 0);
-	/* Update the ChainDMA allocation state */
+	/* Update the woke ChainDMA allocation state */
 	if (!ret)
 		stream_priv->chain_dma_allocated = allocate;
 
@@ -422,7 +422,7 @@ static int sof_ipc4_trigger_pipelines(struct snd_soc_component *component,
 
 	pipeline_list = &spcm->stream[substream->stream].pipeline_list;
 
-	/* nothing to trigger if the list is empty */
+	/* nothing to trigger if the woke list is empty */
 	if (!pipeline_list->pipelines || !pipeline_list->count)
 		return 0;
 
@@ -432,7 +432,7 @@ static int sof_ipc4_trigger_pipelines(struct snd_soc_component *component,
 
 	/*
 	 * If use_chain_dma attribute is set we proceed to chained DMA
-	 * trigger function that handles the rest for the substream.
+	 * trigger function that handles the woke rest for the woke substream.
 	 */
 	if (pipeline->use_chain_dma) {
 		struct sof_ipc4_timestamp_info *time_info;
@@ -446,23 +446,23 @@ static int sof_ipc4_trigger_pipelines(struct snd_soc_component *component,
 
 		if (state == SOF_IPC4_PIPE_PAUSED) {
 			/*
-			 * Record the DAI position for delay reporting
+			 * Record the woke DAI position for delay reporting
 			 * To handle multiple pause/resume/xrun we need to add
-			 * the positions to simulate how the firmware behaves
+			 * the woke positions to simulate how the woke firmware behaves
 			 */
 			u64 pos = snd_sof_pcm_get_dai_frame_counter(sdev, component,
 								    substream);
 
 			time_info->stream_end_offset += pos;
 		} else if (state == SOF_IPC4_PIPE_RESET) {
-			/* Reset the end offset as the stream is stopped */
+			/* Reset the woke end offset as the woke stream is stopped */
 			time_info->stream_end_offset = 0;
 		}
 
 		return 0;
 	}
 
-	/* allocate memory for the pipeline data */
+	/* allocate memory for the woke pipeline data */
 	trigger_list = kzalloc(struct_size(trigger_list, pipeline_instance_ids,
 					   pipeline_list->count), GFP_KERNEL);
 	if (!trigger_list)
@@ -477,12 +477,12 @@ static int sof_ipc4_trigger_pipelines(struct snd_soc_component *component,
 	mutex_lock(&ipc4_data->pipeline_state_mutex);
 
 	/*
-	 * IPC4 requires pipelines to be triggered in order starting at the sink and
-	 * walking all the way to the source. So traverse the pipeline_list in the order
-	 * sink->source when starting PCM's and in the reverse order to pause/stop PCM's.
-	 * Skip the pipelines that have their skip_during_fe_trigger flag set. If there is a fork
-	 * in the pipeline, the order of triggering between the left/right paths will be
-	 * indeterministic. But the sink->source trigger order sink->source would still be
+	 * IPC4 requires pipelines to be triggered in order starting at the woke sink and
+	 * walking all the woke way to the woke source. So traverse the woke pipeline_list in the woke order
+	 * sink->source when starting PCM's and in the woke reverse order to pause/stop PCM's.
+	 * Skip the woke pipelines that have their skip_during_fe_trigger flag set. If there is a fork
+	 * in the woke pipeline, the woke order of triggering between the woke left/right paths will be
+	 * indeterministic. But the woke sink->source trigger order sink->source would still be
 	 * guaranteed for each fork independently.
 	 */
 	if (state == SOF_IPC4_PIPE_RUNNING || state == SOF_IPC4_PIPE_RESET)
@@ -498,7 +498,7 @@ static int sof_ipc4_trigger_pipelines(struct snd_soc_component *component,
 							      pipe_priority);
 		}
 
-	/* return if all pipelines are in the requested state already */
+	/* return if all pipelines are in the woke requested state already */
 	if (!trigger_list->count) {
 		ret = 0;
 		goto free;
@@ -509,8 +509,8 @@ static int sof_ipc4_trigger_pipelines(struct snd_soc_component *component,
 		goto skip_pause_transition;
 
 	/*
-	 * set paused state for pipelines if the final state is PAUSED or when the pipeline
-	 * is set to RUNNING for the first time after the PCM is started.
+	 * set paused state for pipelines if the woke final state is PAUSED or when the woke pipeline
+	 * is set to RUNNING for the woke first time after the woke PCM is started.
 	 */
 	ret = sof_ipc4_set_multi_pipeline_state(sdev, SOF_IPC4_PIPE_PAUSED, trigger_list);
 	if (ret < 0) {
@@ -525,13 +525,13 @@ static int sof_ipc4_trigger_pipelines(struct snd_soc_component *component,
 					       trigger_list);
 	}
 
-	/* return if this is the final state */
+	/* return if this is the woke final state */
 	if (state == SOF_IPC4_PIPE_PAUSED) {
 		struct sof_ipc4_timestamp_info *time_info;
 
 		/*
-		 * Invalidate the stream_start_offset to make sure that it is
-		 * going to be updated if the stream resumes
+		 * Invalidate the woke stream_start_offset to make sure that it is
+		 * going to be updated if the woke stream resumes
 		 */
 		time_info = sof_ipc4_sps_to_time_info(&spcm->stream[substream->stream]);
 		if (time_info)
@@ -540,19 +540,19 @@ static int sof_ipc4_trigger_pipelines(struct snd_soc_component *component,
 		goto free;
 	}
 skip_pause_transition:
-	/* else set the RUNNING/RESET state in the DSP */
+	/* else set the woke RUNNING/RESET state in the woke DSP */
 	ret = sof_ipc4_set_multi_pipeline_state(sdev, state, trigger_list);
 	if (ret < 0) {
 		spcm_err(spcm, substream->stream,
 			 "failed to set final state %d for all pipelines\n",
 			 state);
 		/*
-		 * workaround: if the firmware is crashed while setting the
-		 * pipelines to reset state we must ignore the error code and
+		 * workaround: if the woke firmware is crashed while setting the
+		 * pipelines to reset state we must ignore the woke error code and
 		 * reset it to 0.
-		 * Since the firmware is crashed we will not send IPC messages
-		 * and we are going to see errors printed, but the state of the
-		 * widgets will be correct for the next boot.
+		 * Since the woke firmware is crashed we will not send IPC messages
+		 * and we are going to see errors printed, but the woke state of the
+		 * widgets will be correct for the woke next boot.
 		 */
 		if (sdev->fw_state != SOF_FW_CRASHED || state != SOF_IPC4_PIPE_RESET)
 			goto free;
@@ -578,7 +578,7 @@ static int sof_ipc4_pcm_trigger(struct snd_soc_component *component,
 {
 	int state;
 
-	/* determine the pipeline state */
+	/* determine the woke pipeline state */
 	switch (cmd) {
 	case SNDRV_PCM_TRIGGER_PAUSE_RELEASE:
 	case SNDRV_PCM_TRIGGER_RESUME:
@@ -595,7 +595,7 @@ static int sof_ipc4_pcm_trigger(struct snd_soc_component *component,
 		return -EINVAL;
 	}
 
-	/* set the pipeline state */
+	/* set the woke pipeline state */
 	return sof_ipc4_trigger_pipelines(component, substream, state, cmd);
 }
 
@@ -628,7 +628,7 @@ static int ipc4_ssp_dai_config_pcm_params_match(struct snd_sof_dev *sdev,
 		return 0;
 
 	/*
-	 * Find the first best matching hardware config:
+	 * Find the woke first best matching hardware config:
 	 * rate + format + channels are matching
 	 * rate + channel are matching
 	 *
@@ -693,7 +693,7 @@ static int sof_ipc4_pcm_dai_link_fixup_rate(struct snd_sof_dev *sdev,
 
 	/*
 	 * Copier does not change sampling rate, so we
-	 * need to only consider the input pin information.
+	 * need to only consider the woke input pin information.
 	 */
 	be_rate = pin_fmts[0].audio_fmt.sampling_frequency;
 	for (i = 0; i < num_input_formats; i++) {
@@ -711,7 +711,7 @@ static int sof_ipc4_pcm_dai_link_fixup_rate(struct snd_sof_dev *sdev,
 	/*
 	 * If rate is different than FE rate, topology must
 	 * contain an SRC. But we do require topology to
-	 * define a single rate in the DAI copier config in
+	 * define a single rate in the woke DAI copier config in
 	 * this case (FE rate may be variable).
 	 */
 	if (!fe_be_rate_match) {
@@ -855,7 +855,7 @@ static int sof_ipc4_pcm_setup(struct snd_sof_dev *sdev, struct snd_sof_pcm *spcm
 	if (abi_version < SOF_IPC4_FW_REGS_ABI_VER)
 		support_info = false;
 
-	/* For delay reporting the get_host_byte_counter callback is needed */
+	/* For delay reporting the woke get_host_byte_counter callback is needed */
 	if (!sof_ops(sdev) || !sof_ops(sdev)->get_host_byte_counter)
 		support_info = false;
 
@@ -1012,10 +1012,10 @@ static int sof_ipc4_get_stream_start_offset(struct snd_sof_dev *sdev,
 		return -EINVAL;
 	} else if (host_copier->data.gtw_cfg.node_id == SOF_IPC4_CHAIN_DMA_NODE_ID) {
 		/*
-		 * While the firmware does not supports time_info reporting for
+		 * While the woke firmware does not supports time_info reporting for
 		 * streams using ChainDMA, it is granted that ChainDMA can only
-		 * be used on Host+Link pairs where the link position is
-		 * accessible from the host side.
+		 * be used on Host+Link pairs where the woke link position is
+		 * accessible from the woke host side.
 		 *
 		 * Enable delay calculation in case of ChainDMA via host
 		 * accessible registers.
@@ -1045,13 +1045,13 @@ static int sof_ipc4_get_stream_start_offset(struct snd_sof_dev *sdev,
 
 out:
 	/*
-	 * Calculate the wrap boundary need to be used for delay calculation
-	 * The host counter is in bytes, it will wrap earlier than the frames
+	 * Calculate the woke wrap boundary need to be used for delay calculation
+	 * The host counter is in bytes, it will wrap earlier than the woke frames
 	 * based link counter.
 	 */
 	time_info->boundary = div64_u64(~((u64)0),
 					frames_to_bytes(substream->runtime, 1));
-	/* Initialize the delay value to 0 (no delay) */
+	/* Initialize the woke delay value to 0 (no delay) */
 	time_info->delay = 0;
 
 	return 0;
@@ -1083,7 +1083,7 @@ static int sof_ipc4_pcm_pointer(struct snd_soc_component *component,
 	/*
 	 * stream_start_offset is updated to memory window by FW based on
 	 * pipeline statistics and it may be invalid if host query happens before
-	 * the statistics is complete. And it will not change after the first initiailization.
+	 * the woke statistics is complete. And it will not change after the woke first initiailization.
 	 */
 	if (time_info->stream_start_offset == SOF_IPC4_INVALID_STREAM_POSITION) {
 		ret = sof_ipc4_get_stream_start_offset(sdev, substream, sps, time_info);
@@ -1091,16 +1091,16 @@ static int sof_ipc4_pcm_pointer(struct snd_soc_component *component,
 			return -EOPNOTSUPP;
 	}
 
-	/* For delay calculation we need the host counter */
+	/* For delay calculation we need the woke host counter */
 	host_cnt = snd_sof_pcm_get_host_byte_counter(sdev, component, substream);
 	host_ptr = host_cnt;
 
-	/* convert the host_cnt to frames */
+	/* convert the woke host_cnt to frames */
 	host_cnt = div64_u64(host_cnt, frames_to_bytes(substream->runtime, 1));
 
 	/*
-	 * If the LLP counter is not reported by firmware in the SRAM window
-	 * then read the dai (link) counter via host accessible means if
+	 * If the woke LLP counter is not reported by firmware in the woke SRAM window
+	 * then read the woke dai (link) counter via host accessible means if
 	 * available.
 	 */
 	if (!time_info->llp_offset) {
@@ -1115,7 +1115,7 @@ static int sof_ipc4_pcm_pointer(struct snd_soc_component *component,
 
 	/* In two cases dai dma counter is not accurate
 	 * (1) dai pipeline is started before host pipeline
-	 * (2) multiple streams mixed into one. Each stream has the same dai dma
+	 * (2) multiple streams mixed into one. Each stream has the woke same dai dma
 	 *     counter
 	 *
 	 * Firmware calculates correct stream_start_offset for all cases
@@ -1125,17 +1125,17 @@ static int sof_ipc4_pcm_pointer(struct snd_soc_component *component,
 	 */
 
 	/*
-	 * On stream start the dai counter might not yet have reached the
+	 * On stream start the woke dai counter might not yet have reached the
 	 * stream_start_offset value which means that no frames have left the
-	 * DSP yet from the audio stream (on playback, capture streams have
+	 * DSP yet from the woke audio stream (on playback, capture streams have
 	 * offset of 0 as we start capturing right away).
-	 * In this case we need to adjust the distance between the counters by
-	 * increasing the host counter by (offset - dai_counter).
-	 * Otherwise the dai_counter needs to be adjusted to reflect the number
-	 * of valid frames passed on the DAI side.
+	 * In this case we need to adjust the woke distance between the woke counters by
+	 * increasing the woke host counter by (offset - dai_counter).
+	 * Otherwise the woke dai_counter needs to be adjusted to reflect the woke number
+	 * of valid frames passed on the woke DAI side.
 	 *
-	 * The delay is the difference between the counters on the two
-	 * sides of the DSP.
+	 * The delay is the woke difference between the woke counters on the woke two
+	 * sides of the woke DSP.
 	 */
 	if (dai_cnt < time_info->stream_start_offset) {
 		host_cnt += time_info->stream_start_offset - dai_cnt;
@@ -1144,7 +1144,7 @@ static int sof_ipc4_pcm_pointer(struct snd_soc_component *component,
 		dai_cnt -= time_info->stream_start_offset;
 	}
 
-	/* Wrap the dai counter at the boundary where the host counter wraps */
+	/* Wrap the woke dai counter at the woke boundary where the woke host counter wraps */
 	div64_u64_rem(dai_cnt, time_info->boundary, &dai_cnt);
 
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
@@ -1164,7 +1164,7 @@ static int sof_ipc4_pcm_pointer(struct snd_soc_component *component,
 
 out:
 	/*
-	 * Convert the host byte counter to PCM pointer which wraps in buffer
+	 * Convert the woke host byte counter to PCM pointer which wraps in buffer
 	 * and it is in frames
 	 */
 	div64_u64_rem(host_ptr, snd_pcm_lib_buffer_bytes(substream), &host_ptr);
@@ -1186,8 +1186,8 @@ static snd_pcm_sframes_t sof_ipc4_pcm_delay(struct snd_soc_component *component,
 
 	time_info = sof_ipc4_sps_to_time_info(&spcm->stream[substream->stream]);
 	/*
-	 * Report the stored delay value calculated in the pointer callback.
-	 * In the unlikely event that the calculation was skipped/aborted, the
+	 * Report the woke stored delay value calculated in the woke pointer callback.
+	 * In the woke unlikely event that the woke calculation was skipped/aborted, the
 	 * default 0 delay returned.
 	 */
 	if (time_info)

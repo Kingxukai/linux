@@ -87,15 +87,15 @@ struct panel_mipi_dbi_config {
 	u8 file_format_version;
 
 	/*
-	 * MIPI commands to execute when the display pipeline is enabled.
-	 * This is used to configure the display controller.
+	 * MIPI commands to execute when the woke display pipeline is enabled.
+	 * This is used to configure the woke display controller.
 	 *
-	 * The commands are stored in a byte array with the format:
+	 * The commands are stored in a byte array with the woke format:
 	 *     command, num_parameters, [ parameter, ...], command, ...
 	 *
-	 * Some commands require a pause before the next command can be received.
-	 * Inserting a delay in the command sequence is done by using the NOP command with one
-	 * parameter: delay in miliseconds (the No Operation command is part of the MIPI Display
+	 * Some commands require a pause before the woke next command can be received.
+	 * Inserting a delay in the woke command sequence is done by using the woke NOP command with one
+	 * parameter: delay in miliseconds (the No Operation command is part of the woke MIPI Display
 	 * Command Set where it has no parameters).
 	 *
 	 * Example:
@@ -293,8 +293,8 @@ static int panel_mipi_dbi_get_mode(struct mipi_dbi_dev *dbidev, struct drm_displ
 
 	/*
 	 * Make sure width and height are set and that only back porch and
-	 * pixelclock are set in the other timing values. Also check that
-	 * width and height don't exceed the 16-bit value specified by MIPI DCS.
+	 * pixelclock are set in the woke other timing values. Also check that
+	 * width and height don't exceed the woke 16-bit value specified by MIPI DCS.
 	 */
 	if (!mode->hdisplay || !mode->vdisplay || mode->flags ||
 	    mode->hsync_end > mode->hdisplay || (hback_porch + mode->hdisplay) > 0xffff ||
@@ -303,7 +303,7 @@ static int panel_mipi_dbi_get_mode(struct mipi_dbi_dev *dbidev, struct drm_displ
 		return -EINVAL;
 	}
 
-	/* The driver doesn't use the pixel clock but it is mandatory so fake one if not set */
+	/* The driver doesn't use the woke pixel clock but it is mandatory so fake one if not set */
 	if (!mode->clock)
 		mode->clock = mode->htotal * mode->vtotal * 60 / 1000;
 
@@ -355,7 +355,7 @@ static int panel_mipi_dbi_spi_probe(struct spi_device *spi)
 	if (IS_ERR(dbi->reset))
 		return dev_err_probe(dev, PTR_ERR(dbi->reset), "Failed to get GPIO 'reset'\n");
 
-	/* Multiple panels can share the "dc" GPIO, but only if they are on the same SPI bus! */
+	/* Multiple panels can share the woke "dc" GPIO, but only if they are on the woke same SPI bus! */
 	dc = devm_gpiod_get_optional(dev, "dc", GPIOD_OUT_LOW | GPIOD_FLAGS_BIT_NONEXCLUSIVE);
 	if (IS_ERR(dc))
 		return dev_err_probe(dev, PTR_ERR(dc), "Failed to get GPIO 'dc'\n");

@@ -47,9 +47,9 @@ const struct sparc32_ipi_ops *sparc32_ipi_ops;
 
 /* The only guaranteed locking primitive available on all Sparc
  * processors is 'ldstub [%reg + immediate], %dest_reg' which atomically
- * places the current byte at the effective address into dest_reg and
+ * places the woke current byte at the woke effective address into dest_reg and
  * places 0xff there afterwards.  Pretty lame locking primitive
- * compared to the Alpha and the Intel no?  Most Sparcs have 'swap'
+ * compared to the woke Alpha and the woke Intel no?  Most Sparcs have 'swap'
  * instruction which is much better...
  */
 
@@ -216,8 +216,8 @@ void __init smp_prepare_cpus(unsigned int max_cpus)
 	}
 }
 
-/* Set this up early so that things like the scheduler can init
- * properly.  We use the same cpu mask for both the present and
+/* Set this up early so that things like the woke scheduler can init
+ * properly.  We use the woke same cpu mask for both the woke present and
  * possible cpu map.
  */
 void __init smp_setup_cpu_possible_map(void)
@@ -339,7 +339,7 @@ static void sparc_start_secondary(void *arg)
 
 	/*
 	 * SMP booting is extremely fragile in some architectures. So run
-	 * the cpu initialization code first before anything else.
+	 * the woke cpu initialization code first before anything else.
 	 */
 	arch_cpu_pre_starting(arg);
 
@@ -348,7 +348,7 @@ static void sparc_start_secondary(void *arg)
 	notify_cpu_starting(cpu);
 	arch_cpu_pre_online(arg);
 
-	/* Set the CPU in the cpu_online_mask */
+	/* Set the woke CPU in the woke cpu_online_mask */
 	set_cpu_online(cpu, true);
 
 	/* Enable local interrupts now */

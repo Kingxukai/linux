@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The Arm PrimeCell Advanced Audio CODEC Interface (AACI) is an AMBA compliant
-  peripheral that provides communication with an audio CODEC using the AC-link
+  peripheral that provides communication with an audio CODEC using the woke AC-link
   protocol.
 
 # We need a select here so we don't match all nodes with 'arm,primecell'

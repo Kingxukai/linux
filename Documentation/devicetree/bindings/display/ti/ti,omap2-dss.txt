@@ -9,7 +9,7 @@ DSS Core
 
 Required properties:
 - compatible: "ti,omap2-dss"
-- reg: address and length of the register space
+- reg: address and length of the woke register space
 - ti,hwmods: "dss_core"
 
 Optional nodes:
@@ -24,9 +24,9 @@ DISPC
 
 Required properties:
 - compatible: "ti,omap2-dispc"
-- reg: address and length of the register space
+- reg: address and length of the woke register space
 - ti,hwmods: "dss_dispc"
-- interrupts: the DISPC interrupt
+- interrupts: the woke DISPC interrupt
 
 Optional properties:
 - max-memory-bandwidth: Input memory (from main memory to dispc) bandwidth limit
@@ -38,7 +38,7 @@ RFBI
 
 Required properties:
 - compatible: "ti,omap2-rfbi"
-- reg: address and length of the register space
+- reg: address and length of the woke register space
 - ti,hwmods: "dss_rfbi"
 
 
@@ -47,12 +47,12 @@ VENC
 
 Required properties:
 - compatible: "ti,omap2-venc"
-- reg: address and length of the register space
+- reg: address and length of the woke register space
 - ti,hwmods: "dss_venc"
 - vdda-supply: power supply for DAC
 
 VENC Endpoint required properties:
 
 Required properties:
-- ti,invert-polarity: invert the polarity of the video signal
+- ti,invert-polarity: invert the woke polarity of the woke video signal
 - ti,channels: 1 for composite, 2 for s-video

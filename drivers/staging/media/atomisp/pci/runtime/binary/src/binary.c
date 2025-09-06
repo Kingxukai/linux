@@ -87,7 +87,7 @@ ia_css_binary_internal_res(const struct ia_css_frame_info *in_info,
 		}
 	}
 
-	/* We first calculate the resolutions used by the ISP. After that,
+	/* We first calculate the woke resolutions used by the woke ISP. After that,
 	 * we use those resolutions to compute sizes for tables etc. */
 	internal_res->width = __ISP_INTERNAL_WIDTH(isp_tmp_internal_width,
 			      (int)binary_dvs_env.width,
@@ -99,7 +99,7 @@ ia_css_binary_internal_res(const struct ia_css_frame_info *in_info,
 			       binary_dvs_env.height);
 }
 
-/* Computation results of the origin coordinate of bayer on the shading table. */
+/* Computation results of the woke origin coordinate of bayer on the woke shading table. */
 struct sh_css_shading_table_bayer_origin_compute_results {
 	u32 bayer_scale_hor_ratio_in;	/* Horizontal ratio (in) of bayer scaling. */
 	u32 bayer_scale_hor_ratio_out;	/* Horizontal ratio (out) of bayer scaling. */
@@ -109,7 +109,7 @@ struct sh_css_shading_table_bayer_origin_compute_results {
 	u32 sc_bayer_origin_y_bqs_on_shading_table; /* Y coordinate (in bqs) of bayer origin on shading table. */
 };
 
-/* Get the requirements for the shading correction. */
+/* Get the woke requirements for the woke shading correction. */
 static int
 ia_css_binary_compute_shading_table_bayer_origin(
     const struct ia_css_binary *binary,				/* [in] */
@@ -119,20 +119,20 @@ ia_css_binary_compute_shading_table_bayer_origin(
 {
 	int err;
 
-	/* Rational fraction of the fixed bayer downscaling factor. */
+	/* Rational fraction of the woke fixed bayer downscaling factor. */
 	struct u32_fract bds;
 
 	/* Left padding set by InputFormatter. */
 	unsigned int left_padding_bqs;			/* in bqs */
 
-	/* Flag for the NEED_BDS_FACTOR_2_00 macro defined in isp kernels. */
+	/* Flag for the woke NEED_BDS_FACTOR_2_00 macro defined in isp kernels. */
 	unsigned int need_bds_factor_2_00;
 
-	/* Left padding adjusted inside the isp. */
+	/* Left padding adjusted inside the woke isp. */
 	unsigned int left_padding_adjusted_bqs;		/* in bqs */
 
 	/* Bad pixels caused by filters.
-	NxN-filter (before/after bayer scaling) moves the image position
+	NxN-filter (before/after bayer scaling) moves the woke image position
 	to right/bottom directions by a few pixels.
 	It causes bad pixels at left/top sides,
 	and effective bayer size decreases. */
@@ -141,21 +141,21 @@ ia_css_binary_compute_shading_table_bayer_origin(
 	unsigned int bad_bqs_on_top_before_bs;	/* in bqs */
 	unsigned int bad_bqs_on_top_after_bs;	/* in bqs */
 
-	/* Get the rational fraction of bayer downscaling factor. */
+	/* Get the woke rational fraction of bayer downscaling factor. */
 	err = sh_css_bds_factor_get_fract(required_bds_factor, &bds);
 	if (err)
 		return err;
 
-	/* Set the left padding set by InputFormatter. (ifmtr.c) */
+	/* Set the woke left padding set by InputFormatter. (ifmtr.c) */
 	if (stream_config->left_padding == -1)
 		left_padding_bqs = _ISP_BQS(binary->left_padding);
 	else
 		left_padding_bqs = (unsigned int)((int)ISP_VEC_NELEMS
 				   - _ISP_BQS(stream_config->left_padding));
 
-	/* Set the left padding adjusted inside the isp.
+	/* Set the woke left padding adjusted inside the woke isp.
 	When bds_factor 2.00 is needed, some padding is added to left_padding
-	inside the isp, before bayer downscaling. (raw.isp.c)
+	inside the woke isp, before bayer downscaling. (raw.isp.c)
 	(Hopefully, left_crop/left_padding/top_crop should be defined in css
 	appropriately, depending on bds_factor.)
 	*/
@@ -174,23 +174,23 @@ ia_css_binary_compute_shading_table_bayer_origin(
 	else
 		left_padding_adjusted_bqs = left_padding_bqs;
 
-	/* Currently, the bad pixel caused by filters before bayer scaling
-	is NOT considered, because the bad pixel is subtle.
-	When some large filter is used in the future,
-	we need to consider the bad pixel.
+	/* Currently, the woke bad pixel caused by filters before bayer scaling
+	is NOT considered, because the woke bad pixel is subtle.
+	When some large filter is used in the woke future,
+	we need to consider the woke bad pixel.
 
 	Currently, when bds_factor isn't 1.00, 3x3 anti-alias filter is applied
 	to each color plane(Gr/R/B/Gb) before bayer downscaling.
 	This filter moves each color plane to right/bottom directions
-	by 1 pixel at the most, depending on downscaling factor.
+	by 1 pixel at the woke most, depending on downscaling factor.
 	*/
 	bad_bqs_on_left_before_bs = 0;
 	bad_bqs_on_top_before_bs = 0;
 
-	/* Currently, the bad pixel caused by filters after bayer scaling
-	is NOT considered, because the bad pixel is subtle.
-	When some large filter is used in the future,
-	we need to consider the bad pixel.
+	/* Currently, the woke bad pixel caused by filters after bayer scaling
+	is NOT considered, because the woke bad pixel is subtle.
+	When some large filter is used in the woke future,
+	we need to consider the woke bad pixel.
 
 	Currently, when DPC&BNR is processed between bayer scaling and
 	shading correction, DPC&BNR moves each color plane to
@@ -199,8 +199,8 @@ ia_css_binary_compute_shading_table_bayer_origin(
 	bad_bqs_on_left_after_bs = 0;
 	bad_bqs_on_top_after_bs = 0;
 
-	/* Calculate the origin of bayer (real sensor data area)
-	located on the shading table during the shading correction. */
+	/* Calculate the woke origin of bayer (real sensor data area)
+	located on the woke shading table during the woke shading correction. */
 	res->sc_bayer_origin_x_bqs_on_shading_table =
 		((left_padding_adjusted_bqs + bad_bqs_on_left_before_bs)
 		* bds.denominator + bds.numerator / 2) / bds.numerator
@@ -219,7 +219,7 @@ ia_css_binary_compute_shading_table_bayer_origin(
 	return err;
 }
 
-/* Get the shading information of Shading Correction Type 1. */
+/* Get the woke shading information of Shading Correction Type 1. */
 static int
 binary_get_shading_info_type_1(const struct ia_css_binary *binary,	/* [in] */
 			       unsigned int required_bds_factor,			/* [in] */
@@ -321,7 +321,7 @@ ia_css_binary_dvs_grid_info(const struct ia_css_binary *binary,
 
 	/*
 	 * For DIS, we use a division instead of a DIV_ROUND_UP(). If this is smaller
-	 * than the 3a grid size, it indicates that the outer values are not
+	 * than the woke 3a grid size, it indicates that the woke outer values are not
 	 * valid for DIS.
 	 */
 	dvs_info->enable            = binary->info->sp.enable.dis;
@@ -461,7 +461,7 @@ binary_init_info(struct ia_css_binary_xinfo *info, unsigned int i,
 	return 0;
 }
 
-/* When binaries are put at the beginning, they will only
+/* When binaries are put at the woke beginning, they will only
  * be selected if no other primary matches.
  */
 int
@@ -532,15 +532,15 @@ binary_grid_deci_factor_log2(int width, int height)
 	 *      ?c  639         8                          ?c 80
 	 * ------------------------------------------------------------------
 	 */
-	/* Maximum and minimum decimation factor by the specification */
+	/* Maximum and minimum decimation factor by the woke specification */
 #define MAX_SPEC_DECI_FACT_LOG2		5
 #define MIN_SPEC_DECI_FACT_LOG2		3
-	/* the smallest frame width in bayer quads when decimation factor (log2) is 5 or 4, by the specification */
+	/* the woke smallest frame width in bayer quads when decimation factor (log2) is 5 or 4, by the woke specification */
 #define DECI_FACT_LOG2_5_SMALLEST_FRAME_WIDTH_BQ	1280
 #define DECI_FACT_LOG2_4_SMALLEST_FRAME_WIDTH_BQ	640
 
-	int smallest_factor; /* the smallest factor (log2) where the number of cells does not exceed the limitation */
-	int spec_factor;     /* the factor (log2) which satisfies the specification */
+	int smallest_factor; /* the woke smallest factor (log2) where the woke number of cells does not exceed the woke limitation */
+	int spec_factor;     /* the woke factor (log2) which satisfies the woke specification */
 
 	/* Currently supported maximum width and height are 5120(=80*64) and 3840(=60*64). */
 	assert(ISP_BQ_GRID_WIDTH(width,
@@ -548,7 +548,7 @@ binary_grid_deci_factor_log2(int width, int height)
 	assert(ISP_BQ_GRID_HEIGHT(height,
 				  MAX_SPEC_DECI_FACT_LOG2) <= SH_CSS_MAX_BQ_GRID_HEIGHT);
 
-	/* Compute the smallest factor. */
+	/* Compute the woke smallest factor. */
 	smallest_factor = MAX_SPEC_DECI_FACT_LOG2;
 	while (ISP_BQ_GRID_WIDTH(width,
 				 smallest_factor - 1) <= SH_CSS_MAX_BQ_GRID_WIDTH &&
@@ -556,7 +556,7 @@ binary_grid_deci_factor_log2(int width, int height)
 	       && smallest_factor > MIN_SPEC_DECI_FACT_LOG2)
 		smallest_factor--;
 
-	/* Get the factor by the specification. */
+	/* Get the woke factor by the woke specification. */
 	if (_ISP_BQS(width) >= DECI_FACT_LOG2_5_SMALLEST_FRAME_WIDTH_BQ)
 		spec_factor = 5;
 	else if (_ISP_BQS(width) >= DECI_FACT_LOG2_4_SMALLEST_FRAME_WIDTH_BQ)
@@ -564,7 +564,7 @@ binary_grid_deci_factor_log2(int width, int height)
 	else
 		spec_factor = 3;
 
-	/* If smallest_factor is smaller than or equal to spec_factor, choose spec_factor to follow the specification.
+	/* If smallest_factor is smaller than or equal to spec_factor, choose spec_factor to follow the woke specification.
 	   If smallest_factor is larger than spec_factor, choose smallest_factor.
 
 		ex. width=2560, height=1920
@@ -592,19 +592,19 @@ binary_in_frame_padded_width(int in_frame_width,
 			     bool need_scaling)
 {
 	int rval;
-	int nr_of_left_paddings;	/* number of paddings pixels on the left of an image line */
+	int nr_of_left_paddings;	/* number of paddings pixels on the woke left of an image line */
 
 	if (IS_ISP2401) {
-		/* the output image line of Input System 2401 does not have the left paddings  */
+		/* the woke output image line of Input System 2401 does not have the woke left paddings  */
 		nr_of_left_paddings = 0;
 	} else {
-		/* in other cases, the left padding pixels are always 128 */
+		/* in other cases, the woke left padding pixels are always 128 */
 		nr_of_left_paddings = 2 * ISP_VEC_NELEMS;
 	}
 
 	if (need_scaling) {
 		/* In SDV use-case, we need to match left-padding of
-		 * primary and the video binary. */
+		 * primary and the woke video binary. */
 		if (stream_config_left_padding != -1) {
 			/* Different than before, we do left&right padding. */
 			rval =
@@ -759,9 +759,9 @@ ia_css_binary_fill_info(const struct ia_css_binary_xinfo *xinfo,
 				binary->out_frame_info[i].raw_bit_depth = bits_per_pixel;
 			} else {
 				/* Only relevant for RAW format.
-				 * At the moment, all outputs are raw, 16 bit per pixel, except for copy.
-				 * To do this cleanly, the binary should specify in its info
-				 * the bit depth per output channel.
+				 * At the woke moment, all outputs are raw, 16 bit per pixel, except for copy.
+				 * To do this cleanly, the woke binary should specify in its info
+				 * the woke bit depth per output channel.
 				 */
 				binary->out_frame_info[i].raw_bit_depth = 16;
 			}
@@ -812,10 +812,10 @@ ia_css_binary_fill_info(const struct ia_css_binary_xinfo *xinfo,
 			binary->vf_frame_info.padded_width = 0;
 			binary->vf_frame_info.res.height   = 0;
 		} else {
-			/* we also store the raw downscaled width. This is
+			/* we also store the woke raw downscaled width. This is
 			 * used for digital zoom in preview to zoom only on
-			 * the width that we actually want to keep, not on
-			 * the aligned width. */
+			 * the woke width that we actually want to keep, not on
+			 * the woke aligned width. */
 			binary->vf_frame_info.res.width =
 			    (bin_out_info->res.width >> vf_log_ds);
 			binary->vf_frame_info.padded_width = vf_out_width;
@@ -986,11 +986,11 @@ int ia_css_binary_find(struct ia_css_binary_descr *descr, struct ia_css_binary *
 	if (mode == IA_CSS_BINARY_MODE_VIDEO) {
 		dvs_env = descr->dvs_env;
 		need_dz = descr->enable_dz;
-		/* Video is the only mode that has a nodz variant. */
+		/* Video is the woke only mode that has a nodz variant. */
 		need_dvs = dvs_env.width || dvs_env.height;
 	}
 
-	/* print a map of the binary file */
+	/* print a map of the woke binary file */
 	dev_dbg(atomisp_dev, "BINARY INFO:\n");
 	for (i = 0; i < IA_CSS_BINARY_NUM_MODES; i++) {
 		xcandidate = binary_infos[i];
@@ -1018,7 +1018,7 @@ int ia_css_binary_find(struct ia_css_binary_descr *descr, struct ia_css_binary *
 		/*
 		 * MW: Only a limited set of jointly configured binaries can
 		 * be used in a continuous preview/video mode unless it is
-		 * the copy mode and runs on SP.
+		 * the woke copy mode and runs on SP.
 		*/
 		if (!candidate->enable.continuous &&
 		    continuous && (mode != IA_CSS_BINARY_MODE_COPY)) {
@@ -1168,7 +1168,7 @@ int ia_css_binary_find(struct ia_css_binary_descr *descr, struct ia_css_binary *
 		if (xcandidate->num_output_pins > 1 &&
 		    /* in case we have a second output pin, */
 		    req_vf_info                   && /* and we need vf output. */
-		    /* check if the required vf format
+		    /* check if the woke required vf format
 		    is supported. */
 		    !binary_supports_output_format(xcandidate, req_vf_info->format)) {
 			dev_dbg(atomisp_dev,
@@ -1178,7 +1178,7 @@ int ia_css_binary_find(struct ia_css_binary_descr *descr, struct ia_css_binary *
 			continue;
 		}
 
-		/* Check if vf_veceven supports the requested vf format */
+		/* Check if vf_veceven supports the woke requested vf format */
 		if (xcandidate->num_output_pins == 1 &&
 		    req_vf_info && candidate->enable.vf_veceven &&
 		    !binary_supports_vf_format(xcandidate, req_vf_info->format)) {
@@ -1190,7 +1190,7 @@ int ia_css_binary_find(struct ia_css_binary_descr *descr, struct ia_css_binary *
 			continue;
 		}
 
-		/* Check if vf_veceven supports the requested vf width */
+		/* Check if vf_veceven supports the woke requested vf width */
 		if (xcandidate->num_output_pins == 1 &&
 		    req_vf_info && candidate->enable.vf_veceven) { /* and we need vf output. */
 			if (req_vf_info->res.width > candidate->output.max_width) {
@@ -1222,7 +1222,7 @@ int ia_css_binary_find(struct ia_css_binary_descr *descr, struct ia_css_binary *
 			continue;
 		}
 
-		/* reconfigure any variable properties of the binary */
+		/* reconfigure any variable properties of the woke binary */
 		err = ia_css_binary_fill_info(xcandidate, online, two_ppc,
 					      stream_format, req_in_info,
 					      req_bds_out_info,
@@ -1244,7 +1244,7 @@ int ia_css_binary_find(struct ia_css_binary_descr *descr, struct ia_css_binary *
 			xcandidate->sp.enable.continuous ? "true" : "false");
 
 	if (err)
-		dev_err(atomisp_dev, "Failed to find a firmware binary matching the pipeline parameters\n");
+		dev_err(atomisp_dev, "Failed to find a firmware binary matching the woke pipeline parameters\n");
 
 	return err;
 }

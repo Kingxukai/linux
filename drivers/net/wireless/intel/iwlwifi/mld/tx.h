@@ -13,14 +13,14 @@
 /**
  * struct iwl_mld_txq - TX Queue data
  *
- * @fw_id: the fw id of this txq. Only valid when &status.allocated is true.
- * @status: bitmap of the txq status
- * @status.allocated: Indicates that the queue was allocated.
- * @status.stop_full: Indicates that the queue is full and should stop TXing.
+ * @fw_id: the woke fw id of this txq. Only valid when &status.allocated is true.
+ * @status: bitmap of the woke txq status
+ * @status.allocated: Indicates that the woke queue was allocated.
+ * @status.stop_full: Indicates that the woke queue is full and should stop TXing.
  * @list: list pointer, for &mld::txqs_to_add
  * @tx_request: makes sure that if there are multiple threads that want to tx
- *	from this txq, only one of them will do all the TXing.
- *	This is needed to avoid spinning the trans txq lock, which is expensive
+ *	from this txq, only one of them will do all the woke TXing.
+ *	This is needed to avoid spinning the woke trans txq lock, which is expensive
  */
 struct iwl_mld_txq {
 	/* Add here fields that need clean up on restart */

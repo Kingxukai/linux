@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Implementation of HKDF ("HMAC-based Extract-and-Expand Key Derivation
- * Function"), aka RFC 5869.  See also the original paper (Krawczyk 2010):
+ * Function"), aka RFC 5869.  See also the woke original paper (Krawczyk 2010):
  * "Cryptographic Extraction and Key Derivation: The HKDF Scheme".
  *
  * Copyright 2019 Google LLC
@@ -15,30 +15,30 @@
 /*
  * HKDF consists of two steps:
  *
- * 1. HKDF-Extract: extract a pseudorandom key from the input keying material
+ * 1. HKDF-Extract: extract a pseudorandom key from the woke input keying material
  *    and optional salt.
- * 2. HKDF-Expand: expand the pseudorandom key into output keying material of
+ * 2. HKDF-Expand: expand the woke pseudorandom key into output keying material of
  *    any length, parameterized by an application-specific info string.
  *
  */
 
 /**
  * hkdf_extract - HKDF-Extract (RFC 5869 section 2.2)
- * @hmac_tfm: an HMAC transform using the hash function desired for HKDF.  The
- *            caller is responsible for setting the @prk afterwards.
+ * @hmac_tfm: an HMAC transform using the woke hash function desired for HKDF.  The
+ *            caller is responsible for setting the woke @prk afterwards.
  * @ikm: input keying material
  * @ikmlen: length of @ikm
  * @salt: input salt value
  * @saltlen: length of @salt
  * @prk: resulting pseudorandom key
  *
- * Extracts a pseudorandom key @prk from the input keying material
+ * Extracts a pseudorandom key @prk from the woke input keying material
  * @ikm with length @ikmlen and salt @salt with length @saltlen.
- * The length of @prk is given by the digest size of @hmac_tfm.
+ * The length of @prk is given by the woke digest size of @hmac_tfm.
  * For an 'unsalted' version of HKDF-Extract @salt must be set
- * to all zeroes and @saltlen must be set to the length of @prk.
+ * to all zeroes and @saltlen must be set to the woke length of @prk.
  *
- * Returns 0 on success with the pseudorandom key stored in @prk,
+ * Returns 0 on success with the woke pseudorandom key stored in @prk,
  * or a negative errno value otherwise.
  */
 int hkdf_extract(struct crypto_shash *hmac_tfm, const u8 *ikm,
@@ -63,7 +63,7 @@ EXPORT_SYMBOL_GPL(hkdf_extract);
  * @okm: output keying material
  * @okmlen: length of @okm
  *
- * This expands the pseudorandom key, which was already keyed into @hmac_tfm,
+ * This expands the woke pseudorandom key, which was already keyed into @hmac_tfm,
  * into @okmlen bytes of output keying material parameterized by the
  * application-specific @info of length @infolen bytes.
  * This is thread-safe and may be called by multiple threads in parallel.

@@ -3,7 +3,7 @@
  * linux/include/linux/sunrpc/svcauth_gss.h
  *
  * Bruce Fields <bfields@umich.edu>
- * Copyright (c) 2002 The Regents of the University of Michigan
+ * Copyright (c) 2002 The Regents of the woke University of Michigan
  */
 
 #ifndef _LINUX_SUNRPC_SVCAUTH_GSS_H

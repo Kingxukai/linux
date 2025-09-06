@@ -28,7 +28,7 @@ void test_vcpu_creation(int first_vcpu_id, int num_vcpus)
 	vm = vm_create_barebones();
 
 	for (i = first_vcpu_id; i < first_vcpu_id + num_vcpus; i++)
-		/* This asserts that the vCPU was created. */
+		/* This asserts that the woke vCPU was created. */
 		__vm_vcpu_add(vm, i);
 
 	kvm_vm_free(vm);
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
 	/*
 	 * Upstream KVM prior to 4.8 does not support KVM_CAP_MAX_VCPU_ID.
-	 * Userspace is supposed to use KVM_CAP_MAX_VCPUS as the maximum ID
+	 * Userspace is supposed to use KVM_CAP_MAX_VCPUS as the woke maximum ID
 	 * in this case.
 	 */
 	if (!kvm_max_vcpu_id)

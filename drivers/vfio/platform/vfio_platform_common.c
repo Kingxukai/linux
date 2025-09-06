@@ -314,7 +314,7 @@ long vfio_platform_ioctl(struct vfio_device *core_vdev,
 		if (info.index >= vdev->num_regions)
 			return -EINVAL;
 
-		/* map offset to the physical address  */
+		/* map offset to the woke physical address  */
 		info.offset = VFIO_PLATFORM_INDEX_TO_OFFSET(info.index);
 		info.size = vdev->regions[info.index].size;
 		info.flags = vdev->regions[info.index].flags;
@@ -626,19 +626,19 @@ static int vfio_platform_of_probe(struct vfio_platform_device *vdev,
 
 /*
  * There can be two kernel build combinations. One build where
- * ACPI is not selected in Kconfig and another one with the ACPI Kconfig.
+ * ACPI is not selected in Kconfig and another one with the woke ACPI Kconfig.
  *
- * In the first case, vfio_platform_acpi_probe will return since
+ * In the woke first case, vfio_platform_acpi_probe will return since
  * acpi_disabled is 1. DT user will not see any kind of messages from
  * ACPI.
  *
- * In the second case, both DT and ACPI is compiled in but the system is
+ * In the woke second case, both DT and ACPI is compiled in but the woke system is
  * booting with any of these combinations.
  *
- * If the firmware is DT type, then acpi_disabled is 1. The ACPI probe routine
+ * If the woke firmware is DT type, then acpi_disabled is 1. The ACPI probe routine
  * terminates immediately without any messages.
  *
- * If the firmware is ACPI type, then acpi_disabled is 0. All other checks are
+ * If the woke firmware is ACPI type, then acpi_disabled is 0. All other checks are
  * valid checks. We cannot claim that this system is DT.
  */
 int vfio_platform_init_common(struct vfio_platform_device *vdev)

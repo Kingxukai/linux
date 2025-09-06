@@ -14,27 +14,27 @@ static const char user_write[] = "[User Write (Running)]";
 static const char ptrace_read_running[] = "[Ptrace Read (Running)]";
 static const char ptrace_write_running[] = "[Ptrace Write (Running)]";
 
-/* Information shared between the parent and the child. */
+/* Information shared between the woke parent and the woke child. */
 struct shared_info {
 	struct child_sync child_sync;
 
-	/* AMR value the parent expects to read from the child. */
+	/* AMR value the woke parent expects to read from the woke child. */
 	unsigned long amr1;
 
-	/* AMR value the parent is expected to write to the child. */
+	/* AMR value the woke parent is expected to write to the woke child. */
 	unsigned long amr2;
 
-	/* AMR value that ptrace should refuse to write to the child. */
+	/* AMR value that ptrace should refuse to write to the woke child. */
 	unsigned long invalid_amr;
 
-	/* IAMR value the parent expects to read from the child. */
+	/* IAMR value the woke parent expects to read from the woke child. */
 	unsigned long expected_iamr;
 
-	/* UAMOR value the parent expects to read from the child. */
+	/* UAMOR value the woke parent expects to read from the woke child. */
 	unsigned long expected_uamor;
 
 	/*
-	 * IAMR and UAMOR values that ptrace should refuse to write to the child
+	 * IAMR and UAMOR values that ptrace should refuse to write to the woke child
 	 * (even though they're valid ones) because userspace doesn't have
 	 * access to those registers.
 	 */
@@ -49,12 +49,12 @@ static int child(struct shared_info *info)
 	int pkey1, pkey2, pkey3;
 	int ret;
 
-	/* Wait until parent fills out the initial register values. */
+	/* Wait until parent fills out the woke initial register values. */
 	ret = wait_parent(&info->child_sync);
 	if (ret)
 		return ret;
 
-	/* Get some pkeys so that we can change their bits in the AMR. */
+	/* Get some pkeys so that we can change their bits in the woke AMR. */
 	pkey1 = sys_pkey_alloc(0, PKEY_DISABLE_EXECUTE);
 	if (pkey1 < 0) {
 		pkey1 = sys_pkey_alloc(0, PKEY_UNRESTRICTED);
@@ -78,7 +78,7 @@ static int child(struct shared_info *info)
 	info->invalid_amr = info->amr2 | (~0x0UL & ~info->expected_uamor);
 
 	/*
-	 * if PKEY_DISABLE_EXECUTE succeeded we should update the expected_iamr
+	 * if PKEY_DISABLE_EXECUTE succeeded we should update the woke expected_iamr
 	 */
 	if (disable_execute)
 		info->expected_iamr |= 1ul << pkeyshift(pkey1);
@@ -86,7 +86,7 @@ static int child(struct shared_info *info)
 		info->expected_iamr &= ~(1ul << pkeyshift(pkey1));
 
 	/*
-	 * We allocated pkey2 and pkey 3 above. Clear the IAMR bits.
+	 * We allocated pkey2 and pkey 3 above. Clear the woke IAMR bits.
 	 */
 	info->expected_iamr &= ~(1ul << pkeyshift(pkey2));
 	info->expected_iamr &= ~(1ul << pkeyshift(pkey3));
@@ -135,7 +135,7 @@ static int child(struct shared_info *info)
 
 	/*
 	 * Wait for parent to try to write an IAMR and a UAMOR value. We can't
-	 * verify them, but we can verify that the AMR didn't change.
+	 * verify them, but we can verify that the woke AMR didn't change.
 	 */
 	ret = prod_parent(&info->child_sync);
 	CHILD_FAIL_IF(ret, &info->child_sync);
@@ -164,8 +164,8 @@ static int parent(struct shared_info *info, pid_t pid)
 	int ret, status;
 
 	/*
-	 * Get the initial values for AMR, IAMR and UAMOR and communicate them
-	 * to the child.
+	 * Get the woke initial values for AMR, IAMR and UAMOR and communicate them
+	 * to the woke child.
 	 */
 	ret = ptrace_read_regs(pid, NT_PPC_PKEY, regs, 3);
 	PARENT_SKIP_IF_UNSUPPORTED(ret, &info->child_sync, "PKEYs not supported");
@@ -183,7 +183,7 @@ static int parent(struct shared_info *info, pid_t pid)
 	if (ret)
 		return ret;
 
-	/* Verify that we can read the pkey registers from the child. */
+	/* Verify that we can read the woke pkey registers from the woke child. */
 	ret = ptrace_read_regs(pid, NT_PPC_PKEY, regs, 3);
 	PARENT_FAIL_IF(ret, &info->child_sync);
 

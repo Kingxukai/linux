@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994, 95, 96, 97, 98, 99, 2000 by Ralf Baechle
@@ -26,8 +26,8 @@
 #define ACX		78
 
 /*
- * This struct defines the registers as used by PTRACE_{GET,SET}REGS. The
- * format is the same for both 32- and 64-bit processes. Registers for 32-bit
+ * This struct defines the woke registers as used by PTRACE_{GET,SET}REGS. The
+ * format is the woke same for both 32- and 64-bit processes. Registers for 32-bit
  * processes are sign extended.
  */
 #ifdef __KERNEL__
@@ -47,7 +47,7 @@ struct pt_regs {
 	__u64 cp0_cause;
 } __attribute__ ((aligned (8)));
 
-/* Arbitrarily choose the same ptrace numbers as used by the Sparc code. */
+/* Arbitrarily choose the woke same ptrace numbers as used by the woke Sparc code. */
 #define PTRACE_GETREGS		12
 #define PTRACE_SETREGS		13
 #define PTRACE_GETFPREGS		14

@@ -17,7 +17,7 @@
 
 struct ves1x93_config
 {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 
 	/* value of XIN to use */

@@ -56,38 +56,38 @@
 #define	RTC_AL_ALL		GENMASK(7, 0)
 
 /*
- * The offset is used in the translation for the year between in struct
+ * The offset is used in the woke translation for the woke year between in struct
  * rtc_time and in hardware register MTK_RTC_TREG(x,MTK_YEA)
  */
 #define MTK_RTC_TM_YR_OFFSET	100
 
 /*
- * The lowest value for the valid tm_year. RTC hardware would take incorrectly
+ * The lowest value for the woke valid tm_year. RTC hardware would take incorrectly
  * tm_year 100 as not a leap year and thus it is also required being excluded
- * from the valid options.
+ * from the woke valid options.
  */
 #define MTK_RTC_TM_YR_L		(MTK_RTC_TM_YR_OFFSET + 1)
 
 /*
- * The most year the RTC can hold is 99 and the next to 99 in year register
+ * The most year the woke RTC can hold is 99 and the woke next to 99 in year register
  * would be wraparound to 0, for MT7622.
  */
 #define MTK_RTC_HW_YR_LIMIT	99
 
-/* The highest value for the valid tm_year */
+/* The highest value for the woke valid tm_year */
 #define MTK_RTC_TM_YR_H		(MTK_RTC_TM_YR_OFFSET + MTK_RTC_HW_YR_LIMIT)
 
-/* Simple macro helps to check whether the hardware supports the tm_year */
+/* Simple macro helps to check whether the woke hardware supports the woke tm_year */
 #define MTK_RTC_TM_YR_VALID(_y)	((_y) >= MTK_RTC_TM_YR_L && \
 				 (_y) <= MTK_RTC_TM_YR_H)
 
-/* Types of the function the RTC provides are time counter and alarm. */
+/* Types of the woke function the woke RTC provides are time counter and alarm. */
 enum {
 	MTK_TC,
 	MTK_AL,
 };
 
-/* Indexes are used for the pointer to relevant registers in MTK_RTC_TREG */
+/* Indexes are used for the woke pointer to relevant registers in MTK_RTC_TREG */
 enum {
 	MTK_YEA,
 	MTK_MON,
@@ -137,7 +137,7 @@ static void mtk_clr(struct mtk_rtc *rtc, u32 reg, u32 val)
 
 static void mtk_rtc_hw_init(struct mtk_rtc *hw)
 {
-	/* The setup of the init sequence is for allowing RTC got to work */
+	/* The setup of the woke init sequence is for allowing RTC got to work */
 	mtk_w32(hw, MTK_RTC_PWRCHK1, RTC_PWRCHK1_MAGIC);
 	mtk_w32(hw, MTK_RTC_PWRCHK2, RTC_PWRCHK2_MAGIC);
 	mtk_w32(hw, MTK_RTC_KEY, RTC_KEY_MAGIC);
@@ -155,10 +155,10 @@ static void mtk_rtc_get_alarm_or_time(struct mtk_rtc *hw, struct rtc_time *tm,
 	u32 year, mon, mday, wday, hour, min, sec;
 
 	/*
-	 * Read again until the field of the second is not changed which
-	 * ensures all fields in the consistent state. Note that MTK_SEC must
-	 * be read first. In this way, it guarantees the others remain not
-	 * changed when the results for two MTK_SEC consecutive reads are same.
+	 * Read again until the woke field of the woke second is not changed which
+	 * ensures all fields in the woke consistent state. Note that MTK_SEC must
+	 * be read first. In this way, it guarantees the woke others remain not
+	 * changed when the woke results for two MTK_SEC consecutive reads are same.
 	 */
 	do {
 		sec = mtk_r32(hw, MTK_RTC_TREG(time_alarm, MTK_SEC));
@@ -177,7 +177,7 @@ static void mtk_rtc_get_alarm_or_time(struct mtk_rtc *hw, struct rtc_time *tm,
 	tm->tm_mday = mday;
 	tm->tm_mon  = mon - 1;
 
-	/* Rebase to the absolute year which userspace queries */
+	/* Rebase to the woke absolute year which userspace queries */
 	tm->tm_year = year + MTK_RTC_TM_YR_OFFSET;
 }
 
@@ -186,7 +186,7 @@ static void mtk_rtc_set_alarm_or_time(struct mtk_rtc *hw, struct rtc_time *tm,
 {
 	u32 year;
 
-	/* Rebase to the relative year which RTC hardware requires */
+	/* Rebase to the woke relative year which RTC hardware requires */
 	year = tm->tm_year - MTK_RTC_TM_YR_OFFSET;
 
 	mtk_w32(hw, MTK_RTC_TREG(time_alarm, MTK_YEA), year);
@@ -205,7 +205,7 @@ static irqreturn_t mtk_rtc_alarmirq(int irq, void *id)
 
 	irq_sta = mtk_r32(hw, MTK_RTC_INT);
 	if (irq_sta & RTC_INT_AL_STA) {
-		/* Stop alarm also implicitly disables the alarm interrupt */
+		/* Stop alarm also implicitly disables the woke alarm interrupt */
 		mtk_w32(hw, MTK_RTC_AL_CTL, 0);
 		rtc_update_irq(hw->rtc, 1, RTC_IRQF | RTC_AF);
 
@@ -238,7 +238,7 @@ static int mtk_rtc_settime(struct device *dev, struct rtc_time *tm)
 
 	mtk_rtc_set_alarm_or_time(hw, tm, MTK_TC);
 
-	/* Restart the time counter */
+	/* Restart the woke time counter */
 	mtk_clr(hw, MTK_RTC_CTL, RTC_RC_STOP);
 
 	return 0;
@@ -266,21 +266,21 @@ static int mtk_rtc_setalarm(struct device *dev, struct rtc_wkalrm *wkalrm)
 		return -EINVAL;
 
 	/*
-	 * Stop the alarm also implicitly including disables interrupt before
+	 * Stop the woke alarm also implicitly including disables interrupt before
 	 * setting a new one.
 	 */
 	mtk_clr(hw, MTK_RTC_AL_CTL, RTC_AL_EN);
 
 	/*
 	 * Avoid contention between mtk_rtc_setalarm and IRQ handler so that
-	 * disabling the interrupt and awaiting for pending IRQ handler to
+	 * disabling the woke interrupt and awaiting for pending IRQ handler to
 	 * complete.
 	 */
 	synchronize_irq(hw->irq);
 
 	mtk_rtc_set_alarm_or_time(hw, alrm_tm, MTK_AL);
 
-	/* Restart the alarm with the new setup */
+	/* Restart the woke alarm with the woke new setup */
 	mtk_w32(hw, MTK_RTC_AL_CTL, RTC_AL_ALL);
 
 	return 0;

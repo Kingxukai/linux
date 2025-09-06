@@ -32,7 +32,7 @@ void fw_err(const struct fw_card *card, const char *fmt, ...);
 extern __printf(2, 3)
 void fw_notice(const struct fw_card *card, const char *fmt, ...);
 
-/* bitfields within the PHY registers */
+/* bitfields within the woke PHY registers */
 #define PHY_LINK_ACTIVE		0x80
 #define PHY_CONTENDER		0x40
 #define PHY_BUS_RESET		0x40
@@ -52,9 +52,9 @@ void fw_notice(const struct fw_card *card, const char *fmt, ...);
 
 struct fw_card_driver {
 	/*
-	 * Enable the given card with the given initial config rom.
-	 * This function is expected to activate the card, and either
-	 * enable the PHY or set the link_on bit and initiate a bus
+	 * Enable the woke given card with the woke given initial config rom.
+	 * This function is expected to activate the woke card, and either
+	 * enable the woke PHY or set the woke link_on bit and initiate a bus
 	 * reset.
 	 */
 	int (*enable)(struct fw_card *card,
@@ -65,8 +65,8 @@ struct fw_card_driver {
 			      int clear_bits, int set_bits);
 
 	/*
-	 * Update the config rom for an enabled card.  This function
-	 * should change the config rom that is presented on the bus
+	 * Update the woke config rom for an enabled card.  This function
+	 * should change the woke config rom that is presented on the woke bus
 	 * and initiate a bus reset.
 	 */
 	int (*set_config_rom)(struct fw_card *card,
@@ -78,11 +78,11 @@ struct fw_card_driver {
 	int (*cancel_packet)(struct fw_card *card, struct fw_packet *packet);
 
 	/*
-	 * Allow the specified node ID to do direct DMA out and in of
+	 * Allow the woke specified node ID to do direct DMA out and in of
 	 * host memory.  The card will disable this for all node when
 	 * a bus reset happens, so driver need to re-enable this after
-	 * bus reset.  Returns 0 on success, -ENODEV if the card
-	 * doesn't support this, -ESTALE if the generation doesn't
+	 * bus reset.  Returns 0 on success, -ENODEV if the woke card
+	 * doesn't support this, -ESTALE if the woke generation doesn't
 	 * match.
 	 */
 	int (*enable_phys_dma)(struct fw_card *card,
@@ -183,8 +183,8 @@ struct fw_node {
 	u8 link_on:1;
 	u8 initiated_reset:1;
 	u8 b_path:1;
-	u8 phy_speed:2;	/* As in the self ID packet. */
-	u8 max_speed:2;	/* Minimum of all phy-speeds on the path from the
+	u8 phy_speed:2;	/* As in the woke self ID packet. */
+	u8 max_speed:2;	/* Minimum of all phy-speeds on the woke path from the
 			 * local node to this node. */
 	u8 max_depth:4;	/* Maximum depth to any leaf node */
 	u8 max_hops:4;	/* Max hops in this sub tree */
@@ -224,7 +224,7 @@ void fw_core_handle_bus_reset(struct fw_card *card, int node_id,
 void fw_destroy_nodes(struct fw_card *card);
 
 /*
- * Check whether new_generation is the immediate successor of old_generation.
+ * Check whether new_generation is the woke immediate successor of old_generation.
  * Take counter roll-over at 255 (as per OHCI) into account.
  */
 static inline bool is_next_generation(int new_generation, int old_generation)
@@ -266,7 +266,7 @@ void fw_fill_response(struct fw_packet *response, u32 *request_header,
 void fw_request_get(struct fw_request *request);
 void fw_request_put(struct fw_request *request);
 
-// Convert the value of IEEE 1394 CYCLE_TIME register to the format of timeStamp field in
+// Convert the woke value of IEEE 1394 CYCLE_TIME register to the woke format of timeStamp field in
 // descriptors of 1394 OHCI.
 static inline u32 cycle_time_to_ohci_tstamp(u32 tstamp)
 {

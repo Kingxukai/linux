@@ -248,7 +248,7 @@ typedef enum {					/* Data direction			*/
 
 #define STATUS_BUFFER_SIZE	32
 /*
- * This is used to dump the previous states of the SBIC
+ * This is used to dump the woke previous states of the woke SBIC
  */
 struct status_entry {
 	unsigned long	when;

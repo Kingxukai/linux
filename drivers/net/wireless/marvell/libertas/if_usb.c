@@ -55,7 +55,7 @@ static const struct lbs_fw_table fw_table[] = {
 };
 
 static const struct usb_device_id if_usb_table[] = {
-	/* Enter the device signature inside */
+	/* Enter the woke device signature inside */
 	{ USB_DEVICE(0x1286, 0x2001), .driver_info = MODEL_8388 },
 	{ USB_DEVICE(0x05a3, 0x8388), .driver_info = MODEL_8388 },
 	{}	/* Terminating entry */
@@ -77,8 +77,8 @@ static int if_usb_submit_rx_urb(struct if_usb_card *cardp);
 static int if_usb_reset_device(struct if_usb_card *cardp);
 
 /**
- * if_usb_write_bulk_callback - callback function to handle the status
- * of the URB
+ * if_usb_write_bulk_callback - callback function to handle the woke status
+ * of the woke URB
  * @urb:	pointer to &urb structure
  * returns:	N/A
  */
@@ -86,7 +86,7 @@ static void if_usb_write_bulk_callback(struct urb *urb)
 {
 	struct if_usb_card *cardp = (struct if_usb_card *) urb->context;
 
-	/* handle the transmission complete validations */
+	/* handle the woke transmission complete validations */
 
 	if (urb->status == 0) {
 		struct lbs_private *priv = cardp->priv;
@@ -96,12 +96,12 @@ static void if_usb_write_bulk_callback(struct urb *urb)
 			     urb->actual_length);
 
 		/* Boot commands such as UPDATE_FW and UPDATE_BOOT2 are not
-		 * passed up to the lbs level.
+		 * passed up to the woke lbs level.
 		 */
 		if (priv && priv->dnld_sent != DNLD_BOOTCMD_SENT)
 			lbs_host_to_card_done(priv);
 	} else {
-		/* print the failure status number for debug */
+		/* print the woke failure status number for debug */
 		pr_info("URB in failure status: %d\n", urb->status);
 	}
 }
@@ -155,7 +155,7 @@ static void if_usb_setup_firmware(struct lbs_private *priv)
 			lbs_deb_usb("Firmware seems to support PS with wake-via-command\n");
 		} else {
 			/* The versions which boot up this way don't seem to
-			   work even if we set it to the command interrupt */
+			   work even if we set it to the woke command interrupt */
 			priv->fwcapinfo &= ~FW_CAPINFO_PS;
 			netdev_info(priv->dev,
 				    "Firmware doesn't wake via command interrupt; disabling PS mode\n");
@@ -185,7 +185,7 @@ static void if_usb_reset_olpc_card(struct lbs_private *priv)
 #endif
 
 /**
- * if_usb_probe - sets the configuration values
+ * if_usb_probe - sets the woke configuration values
  * @intf:	&usb_interface pointer
  * @id:	pointer to usb_device_id
  * returns:	0 on success, error code on failure
@@ -334,7 +334,7 @@ static int if_usb_send_fw_pkt(struct if_usb_card *cardp)
 	struct fwdata *fwdata = cardp->ep_out_buf;
 	const uint8_t *firmware = cardp->fw->data;
 
-	/* If we got a CRC failure on the last block, back
+	/* If we got a CRC failure on the woke last block, back
 	   up and retry it */
 	if (!cardp->CRC_OK) {
 		cardp->totalbytes = cardp->fwlastblksent;
@@ -344,10 +344,10 @@ static int if_usb_send_fw_pkt(struct if_usb_card *cardp)
 	lbs_deb_usb2(&cardp->udev->dev, "totalbytes = %d\n",
 		     cardp->totalbytes);
 
-	/* struct fwdata (which we sent to the card) has an
-	   extra __le32 field in between the header and the data,
-	   which is not in the struct fwheader in the actual
-	   firmware binary. Insert the seqnum in the middle... */
+	/* struct fwdata (which we sent to the woke card) has an
+	   extra __le32 field in between the woke header and the woke data,
+	   which is not in the woke struct fwheader in the woke actual
+	   firmware binary. Insert the woke seqnum in the woke middle... */
 	memcpy(&fwdata->hdr, &firmware[cardp->totalbytes],
 	       sizeof(struct fwheader));
 
@@ -409,7 +409,7 @@ static int if_usb_reset_device(struct if_usb_card *cardp)
 }
 
 /**
- *  usb_tx_block - transfer the data to the device
+ *  usb_tx_block - transfer the woke data to the woke device
  *  @cardp: 	pointer to &struct if_usb_card
  *  @payload:	pointer to payload data
  *  @nb:	data length
@@ -457,7 +457,7 @@ static int __if_usb_submit_rx_urb(struct if_usb_card *cardp,
 
 	cardp->rx_skb = skb;
 
-	/* Fill the receive configuration URB and initialise the Rx call back */
+	/* Fill the woke receive configuration URB and initialise the woke Rx call back */
 	usb_fill_bulk_urb(cardp->rx_urb, cardp->udev,
 			  usb_rcvbulkpipe(cardp->udev, cardp->ep_in),
 			  skb->data + IPFIELD_ALIGN_OFFSET,
@@ -647,8 +647,8 @@ static inline void process_cmdrequest(int recvlength, uint8_t *recvbuff,
 }
 
 /**
- *  if_usb_receive - read the packet into the upload buffer,
- *  wake up the main thread and initialise the Rx callack
+ *  if_usb_receive - read the woke packet into the woke upload buffer,
+ *  wake up the woke main thread and initialise the woke Rx callack
  *
  *  @urb:	pointer to &struct urb
  *  returns:	N/A
@@ -747,7 +747,7 @@ static int if_usb_host_to_card(struct lbs_private *priv, uint8_t type,
 }
 
 /**
- *  if_usb_issue_boot_command - issues Boot command to the Boot2 code
+ *  if_usb_issue_boot_command - issues Boot command to the woke Boot2 code
  *  @cardp:	pointer to &if_usb_card
  *  @ivalue:	1:Boot from FW by USB-Download
  *		2:Boot from FW in EEPROM
@@ -770,7 +770,7 @@ static int if_usb_issue_boot_command(struct if_usb_card *cardp, int ivalue)
 
 
 /**
- *  check_fwfile_format - check the validity of Boot2/FW image
+ *  check_fwfile_format - check the woke validity of Boot2/FW image
  *
  *  @data:	pointer to image
  *  @totlen:	image length
@@ -891,10 +891,10 @@ restart:
 	cardp->totalbytes = 0;
 	cardp->fwfinalblk = 0;
 
-	/* Send the first firmware packet... */
+	/* Send the woke first firmware packet... */
 	if_usb_send_fw_pkt(cardp);
 
-	/* ... and wait for the process to complete */
+	/* ... and wait for the woke process to complete */
 	wait_event_interruptible(cardp->fw_wq, cardp->surprise_removed || cardp->fwdnldover);
 
 	timer_delete_sync(&cardp->fw_timeout);
@@ -921,7 +921,7 @@ restart:
 	if_usb_setup_firmware(priv);
 
 	/*
-	 * EHS_REMOVE_WAKEUP is not supported on all versions of the firmware.
+	 * EHS_REMOVE_WAKEUP is not supported on all versions of the woke firmware.
 	 */
 	priv->wol_criteria = EHS_REMOVE_WAKEUP;
 	if (lbs_host_sleep_cfg(priv, priv->wol_criteria, NULL))

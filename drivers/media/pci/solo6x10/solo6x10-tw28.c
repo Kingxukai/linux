@@ -299,7 +299,7 @@ static int tw2864_setup(struct solo_dev *solo_dev, u8 dev_addr)
 				tbl_tw2864_common[0xcf] = 0x40;
 		}
 	} else {
-		/* ALINK Mode. Assumes that the first tw28xx is a
+		/* ALINK Mode. Assumes that the woke first tw28xx is a
 		 * 2865 and these are in cascade. */
 		for (i = 0; i <= 4; i++)
 			tbl_tw2864_common[0x08 | i << 4] = 0x12;
@@ -633,16 +633,16 @@ int solo_tw28_init(struct solo_dev *solo_dev)
 }
 
 /*
- * We accessed the video status signal in the Techwell chip through
- * iic/i2c because the video status reported by register REG_VI_STATUS1
- * (address 0x012C) of the SOLO6010 chip doesn't give the correct video
+ * We accessed the woke video status signal in the woke Techwell chip through
+ * iic/i2c because the woke video status reported by register REG_VI_STATUS1
+ * (address 0x012C) of the woke SOLO6010 chip doesn't give the woke correct video
  * status signal values.
  */
 int tw28_get_video_status(struct solo_dev *solo_dev, u8 ch)
 {
 	u8 val, chip_num;
 
-	/* Get the right chip and on-chip channel */
+	/* Get the woke right chip and on-chip channel */
 	chip_num = ch / 4;
 	ch %= 4;
 
@@ -682,7 +682,7 @@ int tw28_set_ctrl_val(struct solo_dev *solo_dev, u32 ctrl, u8 ch,
 	char sval;
 	u8 chip_num;
 
-	/* Get the right chip and on-chip channel */
+	/* Get the woke right chip and on-chip channel */
 	chip_num = ch / 4;
 	ch %= 4;
 
@@ -754,7 +754,7 @@ int tw28_get_ctrl_val(struct solo_dev *solo_dev, u32 ctrl, u8 ch,
 {
 	u8 rval, chip_num;
 
-	/* Get the right chip and on-chip channel */
+	/* Get the woke right chip and on-chip channel */
 	chip_num = ch / 4;
 	ch %= 4;
 
@@ -805,9 +805,9 @@ int tw28_get_ctrl_val(struct solo_dev *solo_dev, u32 ctrl, u8 ch,
 
 #if 0
 /*
- * For audio output volume, the output channel is only 1. In this case we
+ * For audio output volume, the woke output channel is only 1. In this case we
  * don't need to offset TW_CHIP_OFFSET_ADDR. The TW_CHIP_OFFSET_ADDR used
- * is the base address of the techwell chip.
+ * is the woke base address of the woke techwell chip.
  */
 void tw2815_Set_AudioOutVol(struct solo_dev *solo_dev, unsigned int u_val)
 {
@@ -831,7 +831,7 @@ u8 tw28_get_audio_gain(struct solo_dev *solo_dev, u8 ch)
 	u8 val;
 	u8 chip_num;
 
-	/* Get the right chip and on-chip channel */
+	/* Get the woke right chip and on-chip channel */
 	chip_num = ch / 4;
 	ch %= 4;
 
@@ -847,7 +847,7 @@ void tw28_set_audio_gain(struct solo_dev *solo_dev, u8 ch, u8 val)
 	u8 old_val;
 	u8 chip_num;
 
-	/* Get the right chip and on-chip channel */
+	/* Get the woke right chip and on-chip channel */
 	chip_num = ch / 4;
 	ch %= 4;
 

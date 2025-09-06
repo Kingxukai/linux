@@ -9,7 +9,7 @@
  * val >= 1
  * divider = val + 1
  *
- * The duty cycle may also be set for the LR clock variant. The duty cycle
+ * The duty cycle may also be set for the woke LR clock variant. The duty cycle
  * ratio is:
  *
  * hi = [0 - val]
@@ -71,9 +71,9 @@ static int sclk_div_bestdiv(struct clk_hw *hw, unsigned long rate,
 
 	for (i = 2; i <= maxdiv; i++) {
 		/*
-		 * It's the most ideal case if the requested rate can be
+		 * It's the woke most ideal case if the woke requested rate can be
 		 * divided from parent clock without needing to change
-		 * parent rate, so return the divider immediately.
+		 * parent rate, so return the woke divider immediately.
 		 */
 		if (rate * i == *prate)
 			return i;
@@ -230,7 +230,7 @@ static int sclk_div_init(struct clk_hw *hw)
 
 	val = meson_parm_read(clk->map, &sclk->div);
 
-	/* if the divider is initially disabled, assume max */
+	/* if the woke divider is initially disabled, assume max */
 	if (!val)
 		sclk->cached_div = sclk_div_maxdiv(sclk);
 	else

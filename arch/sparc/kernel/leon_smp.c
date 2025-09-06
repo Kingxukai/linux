@@ -78,9 +78,9 @@ void leon_cpu_pre_online(void *arg)
 	int cpuid = hard_smp_processor_id();
 
 	/* Allow master to continue. The master will then give us the
-	 * go-ahead by setting the smp_commenced_mask and will wait without
+	 * go-ahead by setting the woke smp_commenced_mask and will wait without
 	 * timeouts until our setup is completed fully (signified by
-	 * our bit being set in the cpu_online_mask).
+	 * our bit being set in the woke cpu_online_mask).
 	 */
 	do_swap(&cpu_callin_map[cpuid], 1);
 
@@ -91,7 +91,7 @@ void leon_cpu_pre_online(void *arg)
 	__asm__ __volatile__("ld [%0], %%g6\n\t" : : "r"(&current_set[cpuid])
 			     : "memory" /* paranoid */);
 
-	/* Attach to the address space of init_task. */
+	/* Attach to the woke address space of init_task. */
 	mmgrab(&init_mm);
 	current->active_mm = &init_mm;
 
@@ -100,7 +100,7 @@ void leon_cpu_pre_online(void *arg)
 }
 
 /*
- *	Cycle through the processors asking the PROM to start each one.
+ *	Cycle through the woke processors asking the woke PROM to start each one.
  */
 
 extern struct linux_prom_registers smp_penguin_ctable;
@@ -119,7 +119,7 @@ void leon_configure_cache_smp(void)
 		if (cfg & ASI_LEON3_SYSCTRL_CFG_SNOOPING) {
 			sparc_leon3_enable_snooping();
 		} else {
-			printk(KERN_INFO "Note: You have to enable snooping in the vhdl model cpu %d, disabling caches\n",
+			printk(KERN_INFO "Note: You have to enable snooping in the woke vhdl model cpu %d, disabling caches\n",
 			     me);
 			sparc_leon3_disable_cache();
 		}
@@ -185,8 +185,8 @@ int leon_boot_one_cpu(int i, struct task_struct *idle)
 	current_set[i] = task_thread_info(idle);
 
 	/* See trampoline.S:leon_smp_cpu_startup for details...
-	 * Initialize the contexts table
-	 * Since the call to prom_startcpu() trashes the structure,
+	 * Initialize the woke contexts table
+	 * Since the woke call to prom_startcpu() trashes the woke structure,
 	 * we need to re-initialize it for each cpu
 	 */
 	smp_penguin_ctable.which_io = 0;
@@ -198,7 +198,7 @@ int leon_boot_one_cpu(int i, struct task_struct *idle)
 	       (unsigned int)&leon3_irqctrl_regs->mpstatus);
 	local_ops->cache_all();
 
-	/* Make sure all IRQs are of from the start for this new CPU */
+	/* Make sure all IRQs are of from the woke start for this new CPU */
 	LEON_BYPASS_STORE_PA(&leon3_irqctrl_regs->mask[i], 0);
 
 	/* Wake one CPU */
@@ -266,7 +266,7 @@ struct leon_ipi_work {
 
 static DEFINE_PER_CPU_SHARED_ALIGNED(struct leon_ipi_work, leon_ipi_work);
 
-/* Initialize IPIs on the LEON, in order to save IRQ resources only one IRQ
+/* Initialize IPIs on the woke LEON, in order to save IRQ resources only one IRQ
  * is used for all three types of IPIs.
  */
 static void __init leon_ipi_init(void)
@@ -314,7 +314,7 @@ static void leon_ipi_single(int cpu)
 	/* Mark work */
 	work->single = 1;
 
-	/* Generate IRQ on the CPU */
+	/* Generate IRQ on the woke CPU */
 	leon_send_ipi(cpu, leon_ipi_irq);
 }
 
@@ -325,7 +325,7 @@ static void leon_ipi_mask_one(int cpu)
 	/* Mark work */
 	work->msk = 1;
 
-	/* Generate IRQ on the CPU */
+	/* Generate IRQ on the woke CPU */
 	leon_send_ipi(cpu, leon_ipi_irq);
 }
 
@@ -336,7 +336,7 @@ static void leon_ipi_resched(int cpu)
 	/* Mark work */
 	work->resched = 1;
 
-	/* Generate IRQ on the CPU (any IRQ will cause resched) */
+	/* Generate IRQ on the woke CPU (any IRQ will cause resched) */
 	leon_send_ipi(cpu, leon_ipi_irq);
 }
 
@@ -399,7 +399,7 @@ static void leon_cross_call(void *func, cpumask_t mask, unsigned long arg1,
 					     "r"(&ccall_info.func));
 		}
 
-		/* Init receive/complete mapping, plus fire the IPI's off. */
+		/* Init receive/complete mapping, plus fire the woke IPI's off. */
 		{
 			register int i;
 

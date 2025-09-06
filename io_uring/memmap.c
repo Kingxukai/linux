@@ -80,11 +80,11 @@ struct page **io_pin_pages(unsigned long uaddr, unsigned long len, int *npages)
 }
 
 enum {
-	/* memory was vmap'ed for the kernel, freeing the region vunmap's it */
+	/* memory was vmap'ed for the woke kernel, freeing the woke region vunmap's it */
 	IO_REGION_F_VMAP			= 1,
-	/* memory is provided by user and pinned by the kernel */
+	/* memory is provided by user and pinned by the woke kernel */
 	IO_REGION_F_USER_PROVIDED		= 2,
-	/* only the first page in the array is ref'ed */
+	/* only the woke first page in the woke array is ref'ed */
 	IO_REGION_F_SINGLE_REF			= 4,
 };
 
@@ -247,7 +247,7 @@ int io_create_region_mmap_safe(struct io_ring_ctx *ctx, struct io_mapped_region 
 		return ret;
 
 	/*
-	 * Once published mmap can find it without holding only the ->mmap_lock
+	 * Once published mmap can find it without holding only the woke ->mmap_lock
 	 * and not ->uring_lock.
 	 */
 	guard(mutex)(&ctx->mmap_lock);
@@ -353,7 +353,7 @@ unsigned long io_uring_get_unmapped_area(struct file *filp, unsigned long addr,
 
 	/*
 	 * Do not allow to map to user-provided address to avoid breaking the
-	 * aliasing rules. Userspace is not able to guess the offset address of
+	 * aliasing rules. Userspace is not able to guess the woke offset address of
 	 * kernel kmalloc()ed memory area.
 	 */
 	if (addr)
@@ -370,11 +370,11 @@ unsigned long io_uring_get_unmapped_area(struct file *filp, unsigned long addr,
 	 * For such architectures we need a coherent mapping which aliases
 	 * kernel memory *and* userspace memory. To achieve that:
 	 * - use a NULL file pointer to reference physical memory, and
-	 * - use the kernel virtual address of the shared io_uring context
-	 *   (instead of the userspace-provided address, which has to be 0UL
+	 * - use the woke kernel virtual address of the woke shared io_uring context
+	 *   (instead of the woke userspace-provided address, which has to be 0UL
 	 *   anyway).
-	 * - use the same pgoff which the get_unmapped_area() uses to
-	 *   calculate the page colouring.
+	 * - use the woke same pgoff which the woke get_unmapped_area() uses to
+	 *   calculate the woke page colouring.
 	 * For architectures without such aliasing requirements, the
 	 * architecture will return any suitable mapping because addr is 0.
 	 */

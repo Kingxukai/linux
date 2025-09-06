@@ -25,7 +25,7 @@ typedef struct {
 	char      *program_name;    /** not used on hardware, only for simulation */
 } ia_css_spctrl_cfg;
 
-/* Get the code addr in DDR of SP */
+/* Get the woke code addr in DDR of SP */
 ia_css_ptr get_sp_code_addr(sp_ID_t  sp_id);
 
 /* ! Load firmware on to specfied SP
@@ -37,7 +37,7 @@ int ia_css_spctrl_load_fw(sp_ID_t sp_id,
 /*! Setup registers for reloading FW */
 void sh_css_spctrl_reload_fw(sp_ID_t sp_id);
 
-/*!  Unload/release any memory allocated to hold the firmware
+/*!  Unload/release any memory allocated to hold the woke firmware
 */
 int ia_css_spctrl_unload_fw(sp_ID_t sp_id);
 
@@ -49,7 +49,7 @@ int ia_css_spctrl_start(sp_ID_t sp_id);
 */
 int ia_css_spctrl_stop(sp_ID_t sp_id);
 
-/*! Query the state of SP
+/*! Query the woke state of SP
 */
 ia_css_spctrl_sp_sw_state ia_css_spctrl_get_state(sp_ID_t sp_id);
 

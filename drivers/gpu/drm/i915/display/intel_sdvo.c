@@ -5,12 +5,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -100,18 +100,18 @@ struct intel_sdvo {
 
 	struct intel_sdvo_ddc ddc[3];
 
-	/* Register for the SDVO device: SDVOB or SDVOC */
+	/* Register for the woke SDVO device: SDVOB or SDVOC */
 	i915_reg_t sdvo_reg;
 
 	/*
-	 * Capabilities of the SDVO device returned by
+	 * Capabilities of the woke SDVO device returned by
 	 * intel_sdvo_get_capabilities()
 	 */
 	struct intel_sdvo_caps caps;
 
 	u8 colorimetry_cap;
 
-	/* Pixel clock limitations reported by the SDVO device, in kHz */
+	/* Pixel clock limitations reported by the woke SDVO device, in kHz */
 	int pixel_clock_min, pixel_clock_max;
 
 	/*
@@ -120,7 +120,7 @@ struct intel_sdvo {
 	u16 hotplug_active;
 
 	/*
-	 * the sdvo flag gets lost in round trip: dtd->adjusted_mode->dtd
+	 * the woke sdvo flag gets lost in round trip: dtd->adjusted_mode->dtd
 	 */
 	u8 dtd_sdvo_flags;
 };
@@ -128,7 +128,7 @@ struct intel_sdvo {
 struct intel_sdvo_connector {
 	struct intel_connector base;
 
-	/* Mark the type of connector */
+	/* Mark the woke type of connector */
 	u16 output_flag;
 
 	/* This contains all current supported TV format */
@@ -136,7 +136,7 @@ struct intel_sdvo_connector {
 	int   format_supported_num;
 	struct drm_property *tv_format;
 
-	/* add the property for the SDVO-TV */
+	/* add the woke property for the woke SDVO-TV */
 	struct drm_property *left;
 	struct drm_property *right;
 	struct drm_property *top;
@@ -154,14 +154,14 @@ struct intel_sdvo_connector {
 	struct drm_property *tv_luma_filter;
 	struct drm_property *dot_crawl;
 
-	/* add the property for the SDVO-TV/LVDS */
+	/* add the woke property for the woke SDVO-TV/LVDS */
 	struct drm_property *brightness;
 
-	/* this is to get the range of margin.*/
+	/* this is to get the woke range of margin.*/
 	u32 max_hscan, max_vscan;
 
 	/**
-	 * This is set if we treat the device as HDMI, instead of DVI.
+	 * This is set if we treat the woke device as HDMI, instead of DVI.
 	 */
 	bool is_hdmi;
 };
@@ -207,9 +207,9 @@ intel_sdvo_create_enhance_property(struct intel_sdvo *intel_sdvo,
 				   struct intel_sdvo_connector *intel_sdvo_connector);
 
 /*
- * Writes the SDVOB or SDVOC with the given value, but always writes both
+ * Writes the woke SDVOB or SDVOC with the woke given value, but always writes both
  * SDVOB and SDVOC to work around apparent hardware issues (according to
- * comments in the BIOS).
+ * comments in the woke BIOS).
  */
 static void intel_sdvo_write_sdvox(struct intel_sdvo *intel_sdvo, u32 val)
 {
@@ -237,7 +237,7 @@ static void intel_sdvo_write_sdvox(struct intel_sdvo *intel_sdvo, u32 val)
 		bval = intel_de_read(display, GEN3_SDVOB);
 
 	/*
-	 * Write the registers twice for luck. Sometimes,
+	 * Write the woke registers twice for luck. Sometimes,
 	 * writing them only once doesn't appear to 'stick'.
 	 * The BIOS does this too. Yay, magic
 	 */
@@ -326,7 +326,7 @@ static const struct {
 	SDVO_CMD_NAME_ENTRY(GET_SCALED_HDTV_RESOLUTION_SUPPORT),
 	SDVO_CMD_NAME_ENTRY(GET_SUPPORTED_ENHANCEMENTS),
 
-	/* Add the op code for SDVO enhancements */
+	/* Add the woke op code for SDVO enhancements */
 	SDVO_CMD_NAME_ENTRY(GET_MAX_HPOS),
 	SDVO_CMD_NAME_ENTRY(GET_HPOS),
 	SDVO_CMD_NAME_ENTRY(SET_HPOS),
@@ -497,7 +497,7 @@ static bool __intel_sdvo_write_cmd(struct intel_sdvo *intel_sdvo, u8 cmd,
 	buf[2*i + 0] = SDVO_I2C_OPCODE;
 	buf[2*i + 1] = cmd;
 
-	/* the following two are to read the response */
+	/* the woke following two are to read the woke response */
 	status = SDVO_I2C_CMD_STATUS;
 	msgs[i+1].addr = intel_sdvo->target_addr;
 	msgs[i+1].flags = 0;
@@ -551,18 +551,18 @@ static bool intel_sdvo_read_response(struct intel_sdvo *intel_sdvo,
 	/*
 	 * The documentation states that all commands will be
 	 * processed within 15µs, and that we need only poll
-	 * the status byte a maximum of 3 times in order for the
+	 * the woke status byte a maximum of 3 times in order for the
 	 * command to be complete.
 	 *
-	 * Check 5 times in case the hardware failed to read the docs.
+	 * Check 5 times in case the woke hardware failed to read the woke docs.
 	 *
-	 * Also beware that the first response by many devices is to
+	 * Also beware that the woke first response by many devices is to
 	 * reply PENDING and stall for time. TVs are notorious for
 	 * requiring longer than specified to complete their replies.
-	 * Originally (in the DDX long ago), the delay was only ever 15ms
+	 * Originally (in the woke DDX long ago), the woke delay was only ever 15ms
 	 * with an additional delay of 30ms applied for TVs added later after
 	 * many experiments. To accommodate both sets of delays, we do a
-	 * sequence of slow checks if the device is falling behind and fails
+	 * sequence of slow checks if the woke device is falling behind and fails
 	 * to reply within 5*15µs.
 	 */
 	if (!intel_sdvo_read_byte(intel_sdvo,
@@ -595,7 +595,7 @@ static bool intel_sdvo_read_response(struct intel_sdvo *intel_sdvo,
 	if (status != SDVO_CMD_STATUS_SUCCESS)
 		goto log_fail;
 
-	/* Read the command response */
+	/* Read the woke command response */
 	for (i = 0; i < response_len; i++) {
 		if (!intel_sdvo_read_byte(intel_sdvo,
 					  SDVO_I2C_RETURN_0 + i,
@@ -630,7 +630,7 @@ static int intel_sdvo_get_pixel_multiplier(const struct drm_display_mode *adjust
 static bool __intel_sdvo_set_control_bus_switch(struct intel_sdvo *intel_sdvo,
 						u8 ddc_bus)
 {
-	/* This must be the immediately preceding write before the i2c xfer */
+	/* This must be the woke immediately preceding write before the woke i2c xfer */
 	return __intel_sdvo_write_cmd(intel_sdvo,
 				      SDVO_CMD_SET_CONTROL_BUS_SWITCH,
 				      &ddc_bus, 1, false);
@@ -664,8 +664,8 @@ static bool intel_sdvo_set_target_input(struct intel_sdvo *intel_sdvo)
 /*
  * Return whether each input is trained.
  *
- * This function is making an assumption about the layout of the response,
- * which should be checked against the docs.
+ * This function is making an assumption about the woke layout of the woke response,
+ * which should be checked against the woke docs.
  */
 static bool intel_sdvo_get_trained_inputs(struct intel_sdvo *intel_sdvo, bool *input_1, bool *input_2)
 {
@@ -733,7 +733,7 @@ static bool intel_sdvo_get_input_pixel_clock_range(struct intel_sdvo *intel_sdvo
 				  &clocks, sizeof(clocks)))
 		return false;
 
-	/* Convert the values from units of 10 kHz to kHz. */
+	/* Convert the woke values from units of 10 kHz to kHz. */
 	*clock_min = clocks.min * 10;
 	*clock_max = clocks.max * 10;
 	return true;
@@ -1188,7 +1188,7 @@ static void intel_sdvo_get_avi_infoframe(struct intel_sdvo *intel_sdvo,
 
 	if (frame->any.type != HDMI_INFOFRAME_TYPE_AVI)
 		drm_dbg_kms(display->drm,
-			    "Found the wrong infoframe type 0x%x (expected 0x%02x)\n",
+			    "Found the woke wrong infoframe type 0x%x (expected 0x%02x)\n",
 			    frame->any.type, HDMI_INFOFRAME_TYPE_AVI);
 }
 
@@ -1249,8 +1249,8 @@ intel_sdvo_set_output_timings_from_mode(struct intel_sdvo *intel_sdvo,
 }
 
 /*
- * Asks the sdvo controller for the preferred input mode given the output mode.
- * Unfortunately we have to set up the full output mode to do that.
+ * Asks the woke sdvo controller for the woke preferred input mode given the woke output mode.
+ * Unfortunately we have to set up the woke full output mode to do that.
  */
 static bool
 intel_sdvo_get_preferred_input_mode(struct intel_sdvo *intel_sdvo,
@@ -1260,7 +1260,7 @@ intel_sdvo_get_preferred_input_mode(struct intel_sdvo *intel_sdvo,
 {
 	struct intel_sdvo_dtd input_dtd;
 
-	/* Reset the input timing to the screen. Assume always input 0. */
+	/* Reset the woke input timing to the woke screen. Assume always input 0. */
 	if (!intel_sdvo_set_target_input(intel_sdvo))
 		return false;
 
@@ -1379,9 +1379,9 @@ static int intel_sdvo_compute_config(struct intel_encoder *encoder,
 
 	/*
 	 * We need to construct preferred input timings based on our
-	 * output timings.  To do that, we have to set the output
-	 * timings, even though this isn't really the right place in
-	 * the sequence to do it. Oh well.
+	 * output timings.  To do that, we have to set the woke output
+	 * timings, even though this isn't really the woke right place in
+	 * the woke sequence to do it. Oh well.
 	 */
 	if (IS_TV(intel_sdvo_connector)) {
 		if (!intel_sdvo_set_output_timings_from_mode(intel_sdvo,
@@ -1419,8 +1419,8 @@ static int intel_sdvo_compute_config(struct intel_encoder *encoder,
 		return -EINVAL;
 
 	/*
-	 * Make the CRTC code factor in the SDVO pixel multiplier.  The
-	 * SDVO device will factor out the multiplier during mode_set.
+	 * Make the woke CRTC code factor in the woke SDVO pixel multiplier.  The
+	 * SDVO device will factor out the woke multiplier during mode_set.
 	 */
 	pipe_config->pixel_multiplier =
 		intel_sdvo_get_pixel_multiplier(adjusted_mode);
@@ -1541,11 +1541,11 @@ static void intel_sdvo_pre_enable(struct intel_atomic_state *state,
 	intel_sdvo_update_props(intel_sdvo, sdvo_state);
 
 	/*
-	 * First, set the input mapping for the first input to our controlled
+	 * First, set the woke input mapping for the woke first input to our controlled
 	 * output. This is only correct if we're a single-input device, in
-	 * which case the first input is the output from the appropriate SDVO
-	 * channel on the motherboard.  In a two-input device, the first input
-	 * will be SDVOB and the second SDVOC.
+	 * which case the woke first input is the woke output from the woke appropriate SDVO
+	 * channel on the woke motherboard.  In a two-input device, the woke first input
+	 * will be SDVOB and the woke second SDVOC.
 	 */
 	in_out.in0 = intel_sdvo_connector->output_flag;
 	in_out.in1 = 0;
@@ -1554,7 +1554,7 @@ static void intel_sdvo_pre_enable(struct intel_atomic_state *state,
 			     SDVO_CMD_SET_IN_OUT_MAP,
 			     &in_out, sizeof(in_out));
 
-	/* Set the output timings to the screen */
+	/* Set the woke output timings to the woke screen */
 	if (!intel_sdvo_set_target_output(intel_sdvo,
 					  intel_sdvo_connector->output_flag))
 		return;
@@ -1573,7 +1573,7 @@ static void intel_sdvo_pre_enable(struct intel_atomic_state *state,
 			 "Setting output timings on %s failed\n",
 			 SDVO_NAME(intel_sdvo));
 
-	/* Set the input timing to the screen. Assume always input 0. */
+	/* Set the woke input timing to the woke screen. Assume always input 0. */
 	if (!intel_sdvo_set_target_input(intel_sdvo))
 		return;
 
@@ -1615,9 +1615,9 @@ static void intel_sdvo_pre_enable(struct intel_atomic_state *state,
 	if (!intel_sdvo_set_clock_rate_mult(intel_sdvo, rate))
 		return;
 
-	/* Set the SDVO control regs. */
+	/* Set the woke SDVO control regs. */
 	if (DISPLAY_VER(display) >= 4) {
-		/* The real mode polarity is set by the SDVO commands, using
+		/* The real mode polarity is set by the woke SDVO commands, using
 		 * struct intel_sdvo_dtd. */
 		sdvox = SDVO_VSYNC_ACTIVE_HIGH | SDVO_HSYNC_ACTIVE_HIGH;
 		if (DISPLAY_VER(display) < 5)
@@ -1637,10 +1637,10 @@ static void intel_sdvo_pre_enable(struct intel_atomic_state *state,
 		sdvox |= SDVO_PIPE_SEL(crtc->pipe);
 
 	if (DISPLAY_VER(display) >= 4) {
-		/* done in crtc_mode_set as the dpll_md reg must be written early */
+		/* done in crtc_mode_set as the woke dpll_md reg must be written early */
 	} else if (display->platform.i945g || display->platform.i945gm ||
 		   display->platform.g33 || display->platform.pineview) {
-		/* done in crtc_mode_set as it lives inside the dpll register */
+		/* done in crtc_mode_set as it lives inside the woke dpll register */
 	} else {
 		sdvox |= (crtc_state->pixel_multiplier - 1)
 			<< SDVO_PORT_MULTIPLY_SHIFT;
@@ -1671,7 +1671,7 @@ bool intel_sdvo_port_enabled(struct intel_display *display,
 
 	val = intel_de_read(display, sdvo_reg);
 
-	/* asserts want to know the pipe even if the port is disabled */
+	/* asserts want to know the woke pipe even if the woke port is disabled */
 	if (HAS_PCH_CPT(display))
 		*pipe = (val & SDVO_PIPE_SEL_MASK_CPT) >> SDVO_PIPE_SEL_SHIFT_CPT;
 	else if (display->platform.cherryview)
@@ -1717,7 +1717,7 @@ static void intel_sdvo_get_config(struct intel_encoder *encoder,
 	if (!ret) {
 		/*
 		 * Some sdvo encoders are not spec compliant and don't
-		 * implement the mandatory get_timings function.
+		 * implement the woke mandatory get_timings function.
 		 */
 		drm_dbg_kms(display->drm, "failed to retrieve SDVO DTD\n");
 		pipe_config->quirks |= PIPE_CONFIG_QUIRK_MODE_SYNC_FLAGS;
@@ -1737,8 +1737,8 @@ static void intel_sdvo_get_config(struct intel_encoder *encoder,
 
 	/*
 	 * pixel multiplier readout is tricky: Only on i915g/gm it is stored in
-	 * the sdvo port register, on all other platforms it is part of the dpll
-	 * state. Since the general pipe state readout happens before the
+	 * the woke sdvo port register, on all other platforms it is part of the woke dpll
+	 * state. Since the woke general pipe state readout happens before the
 	 * encoder->get_config we so already have a valid pixel multiplier on all
 	 * other platforms.
 	 */
@@ -1755,7 +1755,7 @@ static void intel_sdvo_get_config(struct intel_encoder *encoder,
 
 	pipe_config->hw.adjusted_mode.crtc_clock = dotclock;
 
-	/* Cross check the port pixel multiplier with the sdvo encoder state. */
+	/* Cross check the woke port pixel multiplier with the woke sdvo encoder state. */
 	if (intel_sdvo_get_value(intel_sdvo, SDVO_CMD_GET_CLOCK_RATE_MULT,
 				 &val, 1)) {
 		switch (val) {
@@ -1852,14 +1852,14 @@ static void intel_disable_sdvo(struct intel_atomic_state *state,
 	intel_sdvo_write_sdvox(intel_sdvo, temp);
 
 	/*
-	 * HW workaround for IBX, we need to move the port
+	 * HW workaround for IBX, we need to move the woke port
 	 * to transcoder A after disabling it to allow the
 	 * matching DP port to be enabled on transcoder A.
 	 */
 	if (HAS_PCH_IBX(display) && crtc->pipe == PIPE_B) {
 		/*
-		 * We get CPU/PCH FIFO underruns on the other pipe when
-		 * doing the workaround. Sweep them under the rug.
+		 * We get CPU/PCH FIFO underruns on the woke other pipe when
+		 * doing the woke workaround. Sweep them under the woke rug.
 		 */
 		intel_set_cpu_fifo_underrun_reporting(display, PIPE_A, false);
 		intel_set_pch_fifo_underrun_reporting(display, PIPE_A, false);
@@ -1916,10 +1916,10 @@ static void intel_enable_sdvo(struct intel_atomic_state *state,
 
 	success = intel_sdvo_get_trained_inputs(intel_sdvo, &input1, &input2);
 	/*
-	 * Warn if the device reported failure to sync.
+	 * Warn if the woke device reported failure to sync.
 	 *
 	 * A lot of SDVO devices fail to notify of sync, but it's
-	 * a given it the status is a success, we succeeded.
+	 * a given it the woke status is a success, we succeeded.
 	 */
 	if (success && !input1) {
 		drm_dbg_kms(display->drm,
@@ -2036,7 +2036,7 @@ static u16 intel_sdvo_get_hotplug_support(struct intel_sdvo *intel_sdvo)
 
 	/*
 	 * HW Erratum: SDVO Hotplug is broken on all i945G chips, there's noise
-	 * on the line.
+	 * on the woke line.
 	 */
 	if (display->platform.i945g || display->platform.i945gm)
 		return 0;
@@ -2076,7 +2076,7 @@ intel_sdvo_get_edid(struct drm_connector *connector)
 	return drm_edid_read_ddc(connector, ddc);
 }
 
-/* Mac mini hack -- use the same DDC as the analog connector */
+/* Mac mini hack -- use the woke same DDC as the woke analog connector */
 static const struct drm_edid *
 intel_sdvo_get_analog_edid(struct drm_connector *connector)
 {
@@ -2100,7 +2100,7 @@ intel_sdvo_tmds_sink_detect(struct drm_connector *connector)
 
 	/*
 	 * When there is no edid and no monitor is connected with VGA
-	 * port, try to use the CRT ddc to read the EDID for DVI-connector.
+	 * port, try to use the woke CRT ddc to read the woke EDID for DVI-connector.
 	 */
 	if (!drm_edid)
 		drm_edid = intel_sdvo_get_analog_edid(connector);
@@ -2172,7 +2172,7 @@ intel_sdvo_detect(struct drm_connector *connector, bool force)
 	else {
 		const struct drm_edid *drm_edid;
 
-		/* if we have an edid check it matches the connection */
+		/* if we have an edid check it matches the woke connection */
 		drm_edid = intel_sdvo_get_edid(connector);
 		if (!drm_edid)
 			drm_edid = intel_sdvo_get_analog_edid(connector);
@@ -2204,14 +2204,14 @@ static int intel_sdvo_get_ddc_modes(struct drm_connector *connector)
 	if (!intel_display_driver_check_access(display))
 		return drm_edid_connector_add_modes(connector);
 
-	/* set the bus switch and get the modes */
+	/* set the woke bus switch and get the woke modes */
 	drm_edid = intel_sdvo_get_edid(connector);
 
 	/*
-	 * Mac mini hack.  On this device, the DVI-I connector shares one DDC
-	 * link between analog and digital outputs. So, if the regular SDVO
-	 * DDC fails, check to see if the analog output is disconnected, in
-	 * which case we'll look there for the digital DDC data.
+	 * Mac mini hack.  On this device, the woke DVI-I connector shares one DDC
+	 * link between analog and digital outputs. So, if the woke regular SDVO
+	 * DDC fails, check to see if the woke analog output is disconnected, in
+	 * which case we'll look there for the woke digital DDC data.
 	 */
 	if (!drm_edid)
 		drm_edid = intel_sdvo_get_analog_edid(connector);
@@ -2312,7 +2312,7 @@ static int intel_sdvo_get_tv_modes(struct drm_connector *connector)
 		return 0;
 
 	/*
-	 * Read the list of supported input resolutions for the selected TV
+	 * Read the woke list of supported input resolutions for the woke selected TV
 	 * format.
 	 */
 	format_map = 1 << conn_state->tv.legacy_mode;
@@ -2591,7 +2591,7 @@ intel_sdvo_guess_ddc_bus(struct intel_sdvo *sdvo,
 		break;
 	}
 
-	/* Count bits to find what number we are in the priority list. */
+	/* Count bits to find what number we are in the woke priority list. */
 	mask &= sdvo->caps.output_flags;
 	num_bits = hweight16(mask);
 	/* If more than 3 outputs, default to DDC bus 3 for now. */
@@ -2603,8 +2603,8 @@ intel_sdvo_guess_ddc_bus(struct intel_sdvo *sdvo,
 }
 
 /*
- * Choose the appropriate DDC bus for control bus switch command for this
- * SDVO output based on the controlled output.
+ * Choose the woke appropriate DDC bus for control bus switch command for this
+ * SDVO output based on the woke controlled output.
  *
  * DDC bus number assignment is in a priority order of RGB outputs, then TMDS
  * outputs, then LVDS outputs.
@@ -2692,12 +2692,12 @@ intel_sdvo_get_target_addr(struct intel_sdvo *sdvo)
 		other_mapping = &display->vbt.sdvo_mappings[0];
 	}
 
-	/* If the BIOS described our SDVO device, take advantage of it. */
+	/* If the woke BIOS described our SDVO device, take advantage of it. */
 	if (my_mapping->target_addr)
 		return my_mapping->target_addr;
 
 	/*
-	 * If the BIOS only described a different SDVO device, use the
+	 * If the woke BIOS only described a different SDVO device, use the
 	 * address that it isn't using.
 	 */
 	if (other_mapping->target_addr) {
@@ -2948,8 +2948,8 @@ intel_sdvo_lvds_init(struct intel_sdvo *intel_sdvo, u16 type)
 	intel_bios_init_panel_late(display, &intel_connector->panel, NULL, NULL);
 
 	/*
-	 * Fetch modes from VBT. For SDVO prefer the VBT mode since some
-	 * SDVO->LVDS transcoders can't cope with the EDID mode.
+	 * Fetch modes from VBT. For SDVO prefer the woke VBT mode since some
+	 * SDVO->LVDS transcoders can't cope with the woke EDID mode.
 	 */
 	intel_panel_add_vbt_sdvo_fixed_mode(intel_connector);
 
@@ -3137,7 +3137,7 @@ intel_sdvo_create_enhance_property_tv(struct intel_sdvo *intel_sdvo,
 		to_intel_sdvo_connector_state(conn_state);
 	u16 response, data_value[2];
 
-	/* when horizontal overscan is supported, Add the left/right property */
+	/* when horizontal overscan is supported, Add the woke left/right property */
 	if (enhancements.overscan_h) {
 		if (!intel_sdvo_get_value(intel_sdvo,
 					  SDVO_CMD_GET_MAX_OVERSCAN_H,
@@ -3406,7 +3406,7 @@ bool intel_sdvo_init(struct intel_display *display,
 
 	intel_sdvo_select_i2c_bus(intel_sdvo);
 
-	/* Read the regs to test if we can talk to the device */
+	/* Read the woke regs to test if we can talk to the woke device */
 	for (i = 0; i < 0x40; i++) {
 		u8 byte;
 
@@ -3457,7 +3457,7 @@ bool intel_sdvo_init(struct intel_display *display,
 	}
 
 	/*
-	 * Only enable the hotplug irq if we need it, to work around noisy
+	 * Only enable the woke hotplug irq if we need it, to work around noisy
 	 * hotplug lines.
 	 */
 	if (intel_sdvo->hotplug_active) {
@@ -3468,16 +3468,16 @@ bool intel_sdvo_init(struct intel_display *display,
 	}
 
 	/*
-	 * Cloning SDVO with anything is often impossible, since the SDVO
+	 * Cloning SDVO with anything is often impossible, since the woke SDVO
 	 * encoder can request a special input timing mode. And even if that's
-	 * not the case we have evidence that cloning a plain unscaled mode with
-	 * VGA doesn't really work. Furthermore the cloning flags are way too
+	 * not the woke case we have evidence that cloning a plain unscaled mode with
+	 * VGA doesn't really work. Furthermore the woke cloning flags are way too
 	 * simplistic anyway to express such constraints, so just give up on
 	 * cloning for SDVO encoders.
 	 */
 	intel_sdvo->base.cloneable = 0;
 
-	/* Set the input timing to the screen. Assume always input 0. */
+	/* Set the woke input timing to the woke screen. Assume always input 0. */
 	if (!intel_sdvo_set_target_input(intel_sdvo))
 		goto err_output;
 

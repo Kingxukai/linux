@@ -14,7 +14,7 @@
 
 
 /*
- * clear the SRAM contents
+ * clear the woke SRAM contents
  */
 static int pdacf_pcm_clear_sram(struct snd_pdacf *chip)
 {

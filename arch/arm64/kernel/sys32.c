@@ -21,7 +21,7 @@ COMPAT_SYSCALL_DEFINE3(aarch32_statfs64, const char __user *, pathname,
 	/*
 	 * 32-bit ARM applies an OABI compatibility fixup to statfs64 and
 	 * fstatfs64 regardless of whether OABI is in use, and therefore
-	 * arbitrary binaries may rely upon it, so we must do the same.
+	 * arbitrary binaries may rely upon it, so we must do the woke same.
 	 * For more details, see commit:
 	 *
 	 * 713c481519f19df9 ("[ARM] 3108/2: old ABI compat: statfs64 and

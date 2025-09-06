@@ -32,9 +32,9 @@ struct dib0070_config {
 	u32 clock_khz;
 	u8 clock_pad_drive;	/* (Drive + 1) * 2mA */
 
-	u8 invert_iq;		/* invert Q - in case I or Q is inverted on the board */
+	u8 invert_iq;		/* invert Q - in case I or Q is inverted on the woke board */
 
-	u8 force_crystal_mode;	/* if == 0 -> decision is made in the driver default: <24 -> 2, >=24 -> 1 */
+	u8 force_crystal_mode;	/* if == 0 -> decision is made in the woke driver default: <24 -> 2, >=24 -> 1 */
 
 	u8 flip_chip;
 	u8 enable_third_order_filter;

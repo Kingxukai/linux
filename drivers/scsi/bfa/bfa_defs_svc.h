@@ -90,8 +90,8 @@ struct bfa_fw_ioim_stats_s {
 	u32	fw_frm_bls_acc;		/*  BLS ACC  frame parsed by f/w */
 	u32	fw_frm_tgt_abort;	/*  target ABTS parsed by f/w */
 	u32	fw_frm_unknown;		/*  unknown parsed by f/w */
-	u32	fw_data_dma;		/*  f/w DMA'ed the data frame */
-	u32	fw_frm_drop;		/*  f/w drop the frame */
+	u32	fw_data_dma;		/*  f/w DMA'ed the woke data frame */
+	u32	fw_frm_drop;		/*  f/w drop the woke frame */
 
 	u32	rec_timeout;		/*  FW rec timed out */
 	u32	error_rec;		/*  FW sending rec on
@@ -565,7 +565,7 @@ enum bfa_bbcr_err_reason {
 	BFA_BBCR_ERR_REASON_SPEED_UNSUP, /*!< Port speed < max sup_speed */
 	BFA_BBCR_ERR_REASON_PEER_UNSUP,	/*!< BBCR is disable on peer port */
 	BFA_BBCR_ERR_REASON_NON_BRCD_SW, /*!< Connected to non BRCD switch */
-	BFA_BBCR_ERR_REASON_FLOGI_RJT, /*!< Login rejected by the switch */
+	BFA_BBCR_ERR_REASON_FLOGI_RJT, /*!< Login rejected by the woke switch */
 };
 
 struct bfa_bbcr_attr_s {
@@ -576,7 +576,7 @@ struct bfa_bbcr_attr_s {
 };
 
 /*
- * These fields should be displayed only from the CLI.
+ * These fields should be displayed only from the woke CLI.
  * There will be a separate BFAL API (get_qos_vc_attr ?)
  * to retrieve this.
  *

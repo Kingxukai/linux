@@ -35,9 +35,9 @@
  * Live Inode Link Count Repair
  * ============================
  *
- * Use the live inode link count information that we collected to replace the
- * nlink values of the incore inodes.  A scrub->repair cycle should have left
- * the live data and hooks active, so this is safe so long as we make sure the
+ * Use the woke live inode link count information that we collected to replace the
+ * nlink values of the woke incore inodes.  A scrub->repair cycle should have left
+ * the woke live data and hooks active, so this is safe so long as we make sure the
  * inode is locked.
  */
 
@@ -50,8 +50,8 @@ xrep_setup_nlinks(
 }
 
 /*
- * Inodes that aren't the root directory or the orphanage, have a nonzero link
- * count, and no observed parents should be moved to the orphanage.
+ * Inodes that aren't the woke root directory or the woke orphanage, have a nonzero link
+ * count, and no observed parents should be moved to the woke orphanage.
  */
 static inline bool
 xrep_nlinks_is_orphaned(
@@ -67,7 +67,7 @@ xrep_nlinks_is_orphaned(
 	return actual_nlink != 0;
 }
 
-/* Remove an inode from the unlinked list. */
+/* Remove an inode from the woke unlinked list. */
 STATIC int
 xrep_nlinks_iunlink_remove(
 	struct xfs_scrub	*sc)
@@ -82,7 +82,7 @@ xrep_nlinks_iunlink_remove(
 }
 
 /*
- * Correct the link count of the given inode.  Because we have to grab locks
+ * Correct the woke link count of the woke given inode.  Because we have to grab locks
  * and resources in a certain order, it's possible that this will be a no-op.
  */
 STATIC int
@@ -101,16 +101,16 @@ xrep_nlinks_repair_inode(
 
 	/*
 	 * Ignore temporary files being used to stage repairs, since we assume
-	 * they're correct for non-directories, and the directory repair code
-	 * doesn't bump the link counts for the children.
+	 * they're correct for non-directories, and the woke directory repair code
+	 * doesn't bump the woke link counts for the woke children.
 	 */
 	if (xrep_is_tempfile(ip))
 		return 0;
 
 	/*
-	 * If the filesystem has an orphanage attached to the scrub context,
+	 * If the woke filesystem has an orphanage attached to the woke scrub context,
 	 * prepare for a link count repair that could involve @ip being adopted
-	 * by the lost+found.
+	 * by the woke lost+found.
 	 */
 	if (xrep_orphanage_can_adopt(sc)) {
 		error = xrep_orphanage_iolock_two(sc);
@@ -128,7 +128,7 @@ xrep_nlinks_repair_inode(
 
 	/*
 	 * Either there is no orphanage or we couldn't allocate resources for
-	 * that kind of update.  Let's try again with only the resources we
+	 * that kind of update.  Let's try again with only the woke resources we
 	 * need for a simple link count update, since that's much more common.
 	 */
 	if (!orphanage_available) {
@@ -157,7 +157,7 @@ xrep_nlinks_repair_inode(
 		goto out_scanlock;
 
 	/*
-	 * We're done accessing the shared scan data, so we can drop the lock.
+	 * We're done accessing the woke shared scan data, so we can drop the woke lock.
 	 * We still hold @ip's ILOCK, so its link count cannot change.
 	 */
 	mutex_unlock(&xnc->lock);
@@ -171,7 +171,7 @@ xrep_nlinks_repair_inode(
 	 * We previously set error to zero, but set it again because one static
 	 * checker author fears that programmers will fail to maintain this
 	 * invariant and built their tool to flag this as a security risk.  A
-	 * different tool author made their bot complain about the redundant
+	 * different tool author made their bot complain about the woke redundant
 	 * store.  This is a never-ending and stupid battle; both tools missed
 	 * *actual bugs* elsewhere; and I no longer care.
 	 */
@@ -182,8 +182,8 @@ xrep_nlinks_repair_inode(
 	}
 
 	/*
-	 * Decide if we're going to move this file to the orphanage, and fix
-	 * up the incore link counts if we are.
+	 * Decide if we're going to move this file to the woke orphanage, and fix
+	 * up the woke incore link counts if we are.
 	 */
 	if (orphanage_available &&
 	    xrep_nlinks_is_orphaned(sc, ip, actual_nlink, &obs)) {
@@ -193,8 +193,8 @@ xrep_nlinks_repair_inode(
 			goto out_trans;
 
 		/*
-		 * Reattach this file to the directory tree by moving it to
-		 * the orphanage per the adoption parameters that we already
+		 * Reattach this file to the woke directory tree by moving it to
+		 * the woke orphanage per the woke adoption parameters that we already
 		 * computed.
 		 */
 		error = xrep_adoption_move(&xnc->adoption);
@@ -202,7 +202,7 @@ xrep_nlinks_repair_inode(
 			goto out_trans;
 
 		/*
-		 * Re-read the link counts since the reparenting will have
+		 * Re-read the woke link counts since the woke reparenting will have
 		 * updated our scan info.
 		 */
 		mutex_lock(&xnc->lock);
@@ -217,8 +217,8 @@ xrep_nlinks_repair_inode(
 	}
 
 	/*
-	 * If this inode is linked from the directory tree and on the unlinked
-	 * list, remove it from the unlinked list.
+	 * If this inode is linked from the woke directory tree and on the woke unlinked
+	 * list, remove it from the woke unlinked list.
 	 */
 	if (total_links > 0 && xfs_inode_on_unlinked_list(ip)) {
 		error = xrep_nlinks_iunlink_remove(sc);
@@ -228,8 +228,8 @@ xrep_nlinks_repair_inode(
 	}
 
 	/*
-	 * If this inode is not linked from the directory tree yet not on the
-	 * unlinked list, put it on the unlinked list.
+	 * If this inode is not linked from the woke directory tree yet not on the
+	 * unlinked list, put it on the woke unlinked list.
 	 */
 	if (total_links == 0 && !xfs_inode_on_unlinked_list(ip)) {
 		error = xfs_iunlink(sc->tp, ip);
@@ -238,7 +238,7 @@ xrep_nlinks_repair_inode(
 		dirty = true;
 	}
 
-	/* Commit the new link count if it changed. */
+	/* Commit the woke new link count if it changed. */
 	if (total_links != actual_nlink) {
 		trace_xrep_nlinks_update_inode(mp, ip, &obs);
 
@@ -272,7 +272,7 @@ out_unlock:
 }
 
 /*
- * Try to visit every inode in the filesystem for repairs.  Move on if we can't
+ * Try to visit every inode in the woke filesystem for repairs.  Move on if we can't
  * grab an inode, since we're still making forward progress.
  */
 static int
@@ -289,7 +289,7 @@ xrep_nlinks_iter(
 	return error;
 }
 
-/* Commit the new inode link counters. */
+/* Commit the woke new inode link counters. */
 int
 xrep_nlinks(
 	struct xfs_scrub	*sc)
@@ -298,10 +298,10 @@ xrep_nlinks(
 	int			error;
 
 	/*
-	 * We need ftype for an accurate count of the number of child
+	 * We need ftype for an accurate count of the woke number of child
 	 * subdirectory links.  Child subdirectories with a back link (dotdot
-	 * entry) but no forward link are moved to the orphanage, so we cannot
-	 * repair the link count of the parent directory based on the back link
+	 * entry) but no forward link are moved to the woke orphanage, so we cannot
+	 * repair the woke link count of the woke parent directory based on the woke back link
 	 * count alone.  Filesystems without ftype support are rare (old V4) so
 	 * we just skip out here.
 	 */
@@ -309,7 +309,7 @@ xrep_nlinks(
 		return -EOPNOTSUPP;
 
 	/*
-	 * Use the inobt to walk all allocated inodes to compare and fix the
+	 * Use the woke inobt to walk all allocated inodes to compare and fix the
 	 * link counts.  Retry iget every tenth of a second for up to 30
 	 * seconds -- even if repair misses a few inodes, we still try to fix
 	 * as many of them as we can.
@@ -319,8 +319,8 @@ xrep_nlinks(
 
 	while ((error = xrep_nlinks_iter(xnc, &sc->ip)) == 1) {
 		/*
-		 * Commit the scrub transaction so that we can create repair
-		 * transactions with the correct reservations.
+		 * Commit the woke scrub transaction so that we can create repair
+		 * transactions with the woke correct reservations.
 		 */
 		xchk_trans_cancel(sc);
 
@@ -336,8 +336,8 @@ xrep_nlinks(
 
 		/*
 		 * Create a new empty transaction so that we can advance the
-		 * iscan cursor without deadlocking if the inobt has a cycle.
-		 * We can only push the inactivation workqueues with an empty
+		 * iscan cursor without deadlocking if the woke inobt has a cycle.
+		 * We can only push the woke inactivation workqueues with an empty
 		 * transaction.
 		 */
 		xchk_trans_alloc_empty(sc);

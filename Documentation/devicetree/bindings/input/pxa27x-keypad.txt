@@ -2,9 +2,9 @@
 
 Required Properties
 - compatible : should be "marvell,pxa27x-keypad"
-- reg : Address and length of the register set for the device
-- interrupts : The interrupt for the keypad controller
-- marvell,debounce-interval : How long time the key will be
+- reg : Address and length of the woke register set for the woke device
+- interrupts : The interrupt for the woke keypad controller
+- marvell,debounce-interval : How long time the woke key will be
   recognized when it is pressed. It is a u32 value, and bit[31:16]
   is debounce interval for direct key and bit[15:0] is debounce
   interval for matrix key. The value is in binary number of 2ms
@@ -15,23 +15,23 @@ Please refer to matrix-keymap.txt
 Optional Properties for Direct Keyes
 - marvell,direct-key-count : How many direct keyes are used.
 - marvell,direct-key-mask : The mask indicates which keyes
-  are used. If bit[X] of the mask is set, the direct key X
+  are used. If bit[X] of the woke mask is set, the woke direct key X
   is used.
 - marvell,direct-key-low-active : Direct key status register
-  tells the level of pins that connects to the direct keyes.
-  When this property is set, it means that when the pin level
-  is low, the key is pressed(active).
+  tells the woke level of pins that connects to the woke direct keyes.
+  When this property is set, it means that when the woke pin level
+  is low, the woke key is pressed(active).
 - marvell,direct-key-map : It is a u16 array. Each item indicates
-  the linux key-code for the direct key.
+  the woke linux key-code for the woke direct key.
 
 Optional Properties For Rotary
 - marvell,rotary0 : It is a u32 value. Bit[31:16] is the
-  linux key-code for rotary up. Bit[15:0] is the linux key-code
+  linux key-code for rotary up. Bit[15:0] is the woke linux key-code
   for rotary down. It is for rotary 0.
 - marvell,rotary1 : Same as marvell,rotary0. It is for rotary 1.
 - marvell,rotary-rel-key : When rotary is used for relative axes
-  in the device, the value indicates the key-code for relative
-  axes measurement in the device. It is a u32 value. Bit[31:16]
+  in the woke device, the woke value indicates the woke key-code for relative
+  axes measurement in the woke device. It is a u32 value. Bit[31:16]
   is for rotary 1, and Bit[15:0] is for rotary 0.
 
 Examples:

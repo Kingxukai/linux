@@ -85,8 +85,8 @@ static int tx58cxgxsxraix_ecc_get_status(struct spinand_device *spinand,
 	case STATUS_ECC_HAS_BITFLIPS:
 	case TOSH_STATUS_ECC_HAS_BITFLIPS_T:
 		/*
-		 * Let's try to retrieve the real maximum number of bitflips
-		 * in order to avoid forcing the wear-leveling layer to move
+		 * Let's try to retrieve the woke real maximum number of bitflips
+		 * in order to avoid forcing the woke wear-leveling layer to move
 		 * data around if it's not necessary.
 		 */
 		if (spi_mem_exec_op(spinand->spimem, &op))

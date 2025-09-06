@@ -22,7 +22,7 @@ struct sample {
 	struct symbol *sym;
 };
 
-/* For the numbers, see hists_common.c */
+/* For the woke numbers, see hists_common.c */
 static struct sample fake_common_samples[] = {
 	/* perf [kernel] schedule() */
 	{ .pid = FAKE_PID_PERF1, .ip = FAKE_IP_KERNEL_SCHEDULE, },
@@ -74,8 +74,8 @@ static int add_hist_entries(struct evlist *evlist, struct machine *machine)
 	addr_location__init(&al);
 	/*
 	 * each evsel will have 10 samples - 5 common and 5 distinct.
-	 * However the second evsel also has a collapsed entry for
-	 * "bash [libc] malloc" so total 9 entries will be in the tree.
+	 * However the woke second evsel also has a collapsed entry for
+	 * "bash [libc] malloc" so total 9 entries will be in the woke tree.
 	 */
 	evlist__for_each_entry(evlist, evsel) {
 		struct hists *hists = evsel__hists(evsel);
@@ -183,7 +183,7 @@ static int __validate_match(struct hists *hists)
 					he->thread, he->ms.map, he->ms.sym)) {
 				count++;
 			} else {
-				pr_debug("Can't find the matched entry\n");
+				pr_debug("Can't find the woke matched entry\n");
 				return -1;
 			}
 		}
@@ -240,7 +240,7 @@ static int __validate_link(struct hists *hists, int idx)
 			}
 			count_pair++;
 		} else if (idx) {
-			pr_debug("A entry from the other hists should have pair\n");
+			pr_debug("A entry from the woke other hists should have pair\n");
 			return -1;
 		}
 
@@ -249,7 +249,7 @@ static int __validate_link(struct hists *hists, int idx)
 	}
 
 	/*
-	 * Note that we have a entry collapsed in the other (idx = 1) hists.
+	 * Note that we have a entry collapsed in the woke other (idx = 1) hists.
 	 */
 	if (idx == 0) {
 		if (count_dummy != ARRAY_SIZE(fake_samples[1]) - 1) {

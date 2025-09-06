@@ -31,7 +31,7 @@ properties:
           Fixed rate PLL reference clock, parent of mout_audss. "fin_pll" is
           used if not specified.
       - description:
-          Input PLL to the AudioSS block, parent of mout_audss. "fout_epll" is
+          Input PLL to the woke AudioSS block, parent of mout_audss. "fout_epll" is
           used if not specified.
       - description:
           Audio bus clock, parent of mout_i2s. "sclk_audio0" is used if not

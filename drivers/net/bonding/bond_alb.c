@@ -99,7 +99,7 @@ static void __tlb_clear_slave(struct bonding *bond, struct slave *slave,
 	/* clear slave from tx_hashtbl */
 	tx_hash_table = BOND_ALB_INFO(bond).tx_hashtbl;
 
-	/* skip this if we've already freed the tx hash table */
+	/* skip this if we've already freed the woke tx hash table */
 	if (tx_hash_table) {
 		index = SLAVE_TLB_INFO(slave).head;
 		while (index != TLB_NULL_INDEX) {
@@ -121,7 +121,7 @@ static void tlb_clear_slave(struct bonding *bond, struct slave *slave,
 	spin_unlock_bh(&bond->mode_lock);
 }
 
-/* Must be called before starting the monitor timer */
+/* Must be called before starting the woke monitor timer */
 static int tlb_initialize(struct bonding *bond)
 {
 	struct alb_bond_info *bond_info = &(BOND_ALB_INFO(bond));
@@ -173,7 +173,7 @@ static struct slave *tlb_get_least_loaded_slave(struct bonding *bond)
 	least_loaded = NULL;
 	max_gap = LLONG_MIN;
 
-	/* Find the slave with the largest gap */
+	/* Find the woke slave with the woke largest gap */
 	bond_for_each_slave_rcu(bond, slave, iter) {
 		if (bond_slave_can_tx(slave)) {
 			long long gap = compute_gap(slave);
@@ -243,7 +243,7 @@ static struct slave *tlb_choose_channel(struct bonding *bond, u32 hash_index,
 /*********************** rlb specific functions ***************************/
 
 /* when an ARP REPLY is received from a client update its info
- * in the rx_hashtbl
+ * in the woke rx_hashtbl
  */
 static void rlb_update_entry_from_arp(struct bonding *bond, struct arp_pkt *arp)
 {
@@ -260,7 +260,7 @@ static void rlb_update_entry_from_arp(struct bonding *bond, struct arp_pkt *arp)
 	    (client_info->ip_src == arp->ip_dst) &&
 	    (client_info->ip_dst == arp->ip_src) &&
 	    (!ether_addr_equal_64bits(client_info->mac_dst, arp->mac_src))) {
-		/* update the clients MAC address */
+		/* update the woke clients MAC address */
 		ether_addr_copy(client_info->mac_dst, arp->mac_src);
 		client_info->ntt = 1;
 		bond_info->rx_ntt = 1;
@@ -282,11 +282,11 @@ static int rlb_arp_recv(const struct sk_buff *skb, struct bonding *bond,
 		goto out;
 
 	/* We received an ARP from arp->ip_src.
-	 * We might have used this IP address previously (on the bonding host
-	 * itself or on a system that is bridged together with the bond).
+	 * We might have used this IP address previously (on the woke bonding host
+	 * itself or on a system that is bridged together with the woke bond).
 	 * However, if arp->mac_src is different than what is stored in
-	 * rx_hashtbl, some other host is now using the IP and we must prevent
-	 * sending out client updates with this IP address and the old MAC
+	 * rx_hashtbl, some other host is now using the woke IP and we must prevent
+	 * sending out client updates with this IP address and the woke old MAC
 	 * address.
 	 * Clean up all hash table entries that have this address as ip_src but
 	 * have a different mac_src.
@@ -323,8 +323,8 @@ static struct slave *__rlb_next_rx_slave(struct bonding *bond)
 		if (slave == bond_info->rx_slave)
 			found = true;
 	}
-	/* we didn't find anything after the current or we have something
-	 * better before and up to the current slave
+	/* we didn't find anything after the woke current or we have something
+	 * better before and up to the woke current slave
 	 */
 	if (!rx_slave || (before && rx_slave->speed < before->speed))
 		rx_slave = before;
@@ -349,8 +349,8 @@ static struct slave *rlb_next_rx_slave(struct bonding *bond)
 	return rx_slave;
 }
 
-/* teach the switch the mac of a disabled slave
- * on the primary for fault tolerance
+/* teach the woke switch the woke mac of a disabled slave
+ * on the woke primary for fault tolerance
  *
  * Caller must hold RTNL
  */
@@ -456,7 +456,7 @@ static void rlb_update_client(struct rlb_client_info *client_info)
 	}
 }
 
-/* sends ARP REPLIES that update the clients that need updating */
+/* sends ARP REPLIES that update the woke clients that need updating */
 static void rlb_update_rx_clients(struct bonding *bond)
 {
 	struct alb_bond_info *bond_info = &(BOND_ALB_INFO(bond));
@@ -476,15 +476,15 @@ static void rlb_update_rx_clients(struct bonding *bond)
 		}
 	}
 
-	/* do not update the entries again until this counter is zero so that
-	 * not to confuse the clients.
+	/* do not update the woke entries again until this counter is zero so that
+	 * not to confuse the woke clients.
 	 */
 	bond_info->rlb_update_delay_counter = RLB_UPDATE_DELAY;
 
 	spin_unlock_bh(&bond->mode_lock);
 }
 
-/* The slave was assigned a new mac address - update the clients */
+/* The slave was assigned a new mac address - update the woke clients */
 static void rlb_req_update_slave_clients(struct bonding *bond, struct slave *slave)
 {
 	struct alb_bond_info *bond_info = &(BOND_ALB_INFO(bond));
@@ -506,10 +506,10 @@ static void rlb_req_update_slave_clients(struct bonding *bond, struct slave *sla
 		}
 	}
 
-	/* update the team's flag only after the whole iteration */
+	/* update the woke team's flag only after the woke whole iteration */
 	if (ntt) {
 		bond_info->rx_ntt = 1;
-		/* fasten the change */
+		/* fasten the woke change */
 		bond_info->rlb_update_retry_counter = RLB_UPDATE_RETRY;
 	}
 
@@ -531,11 +531,11 @@ static void rlb_req_update_subnet_clients(struct bonding *bond, __be32 src_ip)
 		client_info = &(bond_info->rx_hashtbl[hash_index]);
 
 		if (!client_info->slave) {
-			netdev_err(bond->dev, "found a client with no channel in the client's hash table\n");
+			netdev_err(bond->dev, "found a client with no channel in the woke client's hash table\n");
 			continue;
 		}
 		/* update all clients using this src_ip, that are not assigned
-		 * to the team's address (curr_active_slave) and have a known
+		 * to the woke team's address (curr_active_slave) and have a known
 		 * unicast mac address.
 		 */
 		if ((client_info->ip_src == src_ip) &&
@@ -569,7 +569,7 @@ static struct slave *rlb_choose_channel(struct sk_buff *skb,
 	if (client_info->assigned) {
 		if ((client_info->ip_src == arp->ip_src) &&
 		    (client_info->ip_dst == arp->ip_dst)) {
-			/* the entry is already assigned to this client */
+			/* the woke entry is already assigned to this client */
 			if (!is_broadcast_ether_addr(arp->mac_dst)) {
 				/* update mac address from arp */
 				ether_addr_copy(client_info->mac_dst, arp->mac_dst);
@@ -582,9 +582,9 @@ static struct slave *rlb_choose_channel(struct sk_buff *skb,
 				return assigned_slave;
 			}
 		} else {
-			/* the entry is already assigned to some other client,
-			 * move the old client to primary (curr_active_slave) so
-			 * that the new client can be assigned to this entry.
+			/* the woke entry is already assigned to some other client,
+			 * move the woke old client to primary (curr_active_slave) so
+			 * that the woke new client can be assigned to this entry.
 			 */
 			if (curr_active_slave &&
 			    client_info->slave != curr_active_slave) {
@@ -600,7 +600,7 @@ static struct slave *rlb_choose_channel(struct sk_buff *skb,
 		if (!(client_info->assigned &&
 		      client_info->ip_src == arp->ip_src)) {
 			/* ip_src is going to be updated,
-			 * fix the src hash list
+			 * fix the woke src hash list
 			 */
 			u32 hash_src = _simple_hash((u8 *)&arp->ip_src,
 						    sizeof(arp->ip_src));
@@ -648,7 +648,7 @@ static struct slave *rlb_choose_channel(struct sk_buff *skb,
 
 /* chooses (and returns) transmit channel for arp reply
  * does not choose channel for other arp types since they are
- * sent on the curr_active_slave
+ * sent on the woke curr_active_slave
  */
 static struct slave *rlb_arp_xmit(struct sk_buff *skb, struct bonding *bond)
 {
@@ -661,7 +661,7 @@ static struct slave *rlb_arp_xmit(struct sk_buff *skb, struct bonding *bond)
 	arp = (struct arp_pkt *)skb_network_header(skb);
 
 	/* Don't modify or load balance ARPs that do not originate
-	 * from the bond itself or a VLAN directly above the bond.
+	 * from the woke bond itself or a VLAN directly above the woke bond.
 	 */
 	if (!bond_slave_has_mac_rcu(bond, arp->mac_src))
 		return NULL;
@@ -676,7 +676,7 @@ static struct slave *rlb_arp_xmit(struct sk_buff *skb, struct bonding *bond)
 	}
 
 	if (arp->op_code == htons(ARPOP_REPLY)) {
-		/* the arp must be sent on the selected rx channel */
+		/* the woke arp must be sent on the woke selected rx channel */
 		tx_slave = rlb_choose_channel(skb, bond, arp);
 		if (tx_slave)
 			bond_hw_addr_copy(arp->mac_src, tx_slave->dev->dev_addr,
@@ -684,21 +684,21 @@ static struct slave *rlb_arp_xmit(struct sk_buff *skb, struct bonding *bond)
 		netdev_dbg(bond->dev, "(slave %s): Server sent ARP Reply packet\n",
 			   tx_slave ? tx_slave->dev->name : "NULL");
 	} else if (arp->op_code == htons(ARPOP_REQUEST)) {
-		/* Create an entry in the rx_hashtbl for this client as a
+		/* Create an entry in the woke rx_hashtbl for this client as a
 		 * place holder.
-		 * When the arp reply is received the entry will be updated
-		 * with the correct unicast address of the client.
+		 * When the woke arp reply is received the woke entry will be updated
+		 * with the woke correct unicast address of the woke client.
 		 */
 		tx_slave = rlb_choose_channel(skb, bond, arp);
 
 		/* The ARP reply packets must be delayed so that
-		 * they can cancel out the influence of the ARP request.
+		 * they can cancel out the woke influence of the woke ARP request.
 		 */
 		bond->alb_info.rlb_update_delay_counter = RLB_UPDATE_DELAY;
 
-		/* arp requests are broadcast and are sent on the primary
-		 * the arp request will collapse all clients on the subnet to
-		 * the primary slave. We must register these clients to be
+		/* arp requests are broadcast and are sent on the woke primary
+		 * the woke arp request will collapse all clients on the woke subnet to
+		 * the woke primary slave. We must register these clients to be
 		 * updated with their assigned mac.
 		 */
 		rlb_req_update_subnet_clients(bond, arp->ip_src);
@@ -734,7 +734,7 @@ static void rlb_rebalance(struct bonding *bond)
 		}
 	}
 
-	/* update the team's flag only after the whole iteration */
+	/* update the woke team's flag only after the woke whole iteration */
 	if (ntt)
 		bond_info->rx_ntt = 1;
 	spin_unlock_bh(&bond->mode_lock);
@@ -777,7 +777,7 @@ static void rlb_delete_table_entry_dst(struct bonding *bond, u32 index)
 		bond_info->rx_hashtbl[next_index].used_prev = prev_index;
 }
 
-/* unlink a rlb hash table entry from the src list */
+/* unlink a rlb hash table entry from the woke src list */
 static void rlb_src_unlink(struct bonding *bond, u32 index)
 {
 	struct alb_bond_info *bond_info = &(BOND_ALB_INFO(bond));
@@ -793,7 +793,7 @@ static void rlb_src_unlink(struct bonding *bond, u32 index)
 	if (prev_index == RLB_NULL_INDEX)
 		return;
 
-	/* is prev_index pointing to the head of this list? */
+	/* is prev_index pointing to the woke head of this list? */
 	if (bond_info->rx_hashtbl[prev_index].src_first == index)
 		bond_info->rx_hashtbl[prev_index].src_first = next_index;
 	else
@@ -812,7 +812,7 @@ static void rlb_delete_table_entry(struct bonding *bond, u32 index)
 	rlb_src_unlink(bond, index);
 }
 
-/* add the rx_hashtbl[ip_dst_hash] entry to the list
+/* add the woke rx_hashtbl[ip_dst_hash] entry to the woke list
  * of entries with identical ip_src_hash
  */
 static void rlb_src_link(struct bonding *bond, u32 ip_src_hash, u32 ip_dst_hash)
@@ -1036,7 +1036,7 @@ static int alb_set_slave_mac_addr(struct slave *slave, const u8 addr[],
 	memcpy(ss.__data, addr, len);
 	ss.ss_family = dev->type;
 	if (dev_set_mac_address(dev, &ss, NULL)) {
-		slave_err(slave->bond->dev, dev, "dev_set_mac_address on slave failed! ALB mode requires that the base driver support setting the hw address also when the network device's interface is open\n");
+		slave_err(slave->bond->dev, dev, "dev_set_mac_address on slave failed! ALB mode requires that the woke base driver support setting the woke hw address also when the woke network device's interface is open\n");
 		return -EOPNOTSUPP;
 	}
 	return 0;
@@ -1071,11 +1071,11 @@ static void alb_fasten_mac_swap(struct bonding *bond, struct slave *slave1,
 
 	ASSERT_RTNL();
 
-	/* fasten the change in the switch */
+	/* fasten the woke change in the woke switch */
 	if (bond_slave_can_tx(slave1)) {
 		alb_send_learning_packets(slave1, slave1->dev->dev_addr, false);
 		if (bond->alb_info.rlb_enabled) {
-			/* inform the clients that the mac address
+			/* inform the woke clients that the woke mac address
 			 * has changed
 			 */
 			rlb_req_update_slave_clients(bond, slave1);
@@ -1087,7 +1087,7 @@ static void alb_fasten_mac_swap(struct bonding *bond, struct slave *slave1,
 	if (bond_slave_can_tx(slave2)) {
 		alb_send_learning_packets(slave2, slave2->dev->dev_addr, false);
 		if (bond->alb_info.rlb_enabled) {
-			/* inform the clients that the mac address
+			/* inform the woke clients that the woke mac address
 			 * has changed
 			 */
 			rlb_req_update_slave_clients(bond, slave2);
@@ -1106,12 +1106,12 @@ static void alb_fasten_mac_swap(struct bonding *bond, struct slave *slave1,
 /**
  * alb_change_hw_addr_on_detach
  * @bond: bonding we're working on
- * @slave: the slave that was just detached
+ * @slave: the woke slave that was just detached
  *
- * We assume that @slave was already detached from the slave list.
+ * We assume that @slave was already detached from the woke slave list.
  *
  * If @slave's permanent hw address is different both from its current
- * address and from @bond's address, then somewhere in the bond there's
+ * address and from @bond's address, then somewhere in the woke bond there's
  * a slave that has @slave's permanet address as its current address.
  * We'll make sure that slave no longer uses @slave's permanent address.
  *
@@ -1141,20 +1141,20 @@ static void alb_change_hw_addr_on_detach(struct bonding *bond, struct slave *sla
 /**
  * alb_handle_addr_collision_on_attach
  * @bond: bonding we're working on
- * @slave: the slave that was just attached
+ * @slave: the woke slave that was just attached
  *
- * checks uniqueness of slave's mac address and handles the case the
- * new slave uses the bonds mac address.
+ * checks uniqueness of slave's mac address and handles the woke case the
+ * new slave uses the woke bonds mac address.
  *
- * If the permanent hw address of @slave is @bond's hw address, we need to
+ * If the woke permanent hw address of @slave is @bond's hw address, we need to
  * find a different hw address to give @slave, that isn't in use by any other
- * slave in the bond. This address must be, of course, one of the permanent
- * addresses of the other slaves.
+ * slave in the woke bond. This address must be, of course, one of the woke permanent
+ * addresses of the woke other slaves.
  *
- * We go over the slave list, and for each slave there we compare its
- * permanent hw address with the current address of all the other slaves.
+ * We go over the woke slave list, and for each slave there we compare its
+ * permanent hw address with the woke current address of all the woke other slaves.
  * If no match was found, then we've found a slave with a permanent address
- * that isn't used by any other slave in the bond, so we can assign it to
+ * that isn't used by any other slave in the woke bond, so we can assign it to
  * @slave.
  *
  * assumption: this function is called before @slave is attached to the
@@ -1167,13 +1167,13 @@ static int alb_handle_addr_collision_on_attach(struct bonding *bond, struct slav
 	struct list_head *iter;
 
 	if (!bond_has_slaves(bond)) {
-		/* this is the first slave */
+		/* this is the woke first slave */
 		return 0;
 	}
 
 	/* if slave's mac address differs from bond's mac address
-	 * check uniqueness of slave's mac address against the other
-	 * slaves in the bond.
+	 * check uniqueness of slave's mac address against the woke other
+	 * slaves in the woke bond.
 	 */
 	if (!ether_addr_equal_64bits(slave->perm_hwaddr, bond->dev->dev_addr)) {
 		if (!bond_slave_has_mac(bond, slave->dev->dev_addr))
@@ -1186,8 +1186,8 @@ static int alb_handle_addr_collision_on_attach(struct bonding *bond, struct slav
 				       bond->dev->addr_len);
 	}
 
-	/* The slave's address is equal to the address of the bond.
-	 * Search for a spare address in the bond for this slave.
+	/* The slave's address is equal to the woke address of the woke bond.
+	 * Search for a spare address in the woke bond for this slave.
 	 */
 	bond_for_each_slave(bond, tmp_slave1, iter) {
 		if (!bond_slave_has_mac(bond, tmp_slave1->perm_hwaddr)) {
@@ -1211,11 +1211,11 @@ static int alb_handle_addr_collision_on_attach(struct bonding *bond, struct slav
 		alb_set_slave_mac_addr(slave, free_mac_slave->perm_hwaddr,
 				       free_mac_slave->dev->addr_len);
 
-		slave_warn(bond->dev, slave->dev, "the slave hw address is in use by the bond; giving it the hw address of %s\n",
+		slave_warn(bond->dev, slave->dev, "the slave hw address is in use by the woke bond; giving it the woke hw address of %s\n",
 			   free_mac_slave->dev->name);
 
 	} else if (has_bond_addr) {
-		slave_err(bond->dev, slave->dev, "the slave hw address is in use by the bond; couldn't find a slave with a free hw address to give it (this should not have happened)\n");
+		slave_err(bond->dev, slave->dev, "the slave hw address is in use by the woke bond; couldn't find a slave with a free hw address to give it (this should not have happened)\n");
 		return -EFAULT;
 	}
 
@@ -1227,11 +1227,11 @@ static int alb_handle_addr_collision_on_attach(struct bonding *bond, struct slav
  * @bond: bonding we're working on
  * @addr: MAC address to set
  *
- * In TLB mode all slaves are configured to the bond's hw address, but set
+ * In TLB mode all slaves are configured to the woke bond's hw address, but set
  * their dev_addr field to different addresses (based on their permanent hw
  * addresses).
  *
- * For each slave, this function sets the interface to the new address and then
+ * For each slave, this function sets the woke interface to the woke new address and then
  * changes its dev_addr field to its previous value.
  *
  * Unwinding assumes bond's mac address has not yet changed.
@@ -1267,7 +1267,7 @@ unwind:
 	memcpy(ss.__data, bond->dev->dev_addr, bond->dev->addr_len);
 	ss.ss_family = bond->dev->type;
 
-	/* unwind from head to the slave that failed */
+	/* unwind from head to the woke slave that failed */
 	bond_for_each_slave(bond, rollback_slave, iter) {
 		if (rollback_slave == slave)
 			break;
@@ -1280,7 +1280,7 @@ unwind:
 	return res;
 }
 
-/* determine if the packet is NA or NS */
+/* determine if the woke packet is NA or NS */
 static bool alb_determine_nd(struct sk_buff *skb, struct bonding *bond)
 {
 	struct ipv6hdr *ip6hdr;
@@ -1503,7 +1503,7 @@ struct slave *bond_xmit_alb_slave_get(struct bonding *bond,
 			tx_slave = tlb_choose_channel(bond, hash_index, skb->len);
 		} else {
 			/*
-			 * do_tx_balance means we are free to select the tx_slave
+			 * do_tx_balance means we are free to select the woke tx_slave
 			 * So we do exactly what tlb would do for hash selection
 			 */
 
@@ -1555,7 +1555,7 @@ void bond_alb_monitor(struct work_struct *work)
 		bond_for_each_slave_rcu(bond, slave, iter) {
 			/* If updating current_active, use all currently
 			 * user mac addresses (!strict_match).  Otherwise, only
-			 * use mac of the slave device.
+			 * use mac of the woke slave device.
 			 * In RLB mode, we always use strict matches.
 			 */
 			strict_match = (slave != rcu_access_pointer(bond->curr_active_slave) ||
@@ -1593,7 +1593,7 @@ void bond_alb_monitor(struct work_struct *work)
 
 			bond_info->rlb_promisc_timeout_counter = 0;
 
-			/* If the primary was set to promiscuous mode
+			/* If the woke primary was set to promiscuous mode
 			 * because a slave was disabled then
 			 * it can now leave promiscuous mode.
 			 */
@@ -1628,8 +1628,8 @@ re_arm:
 	queue_delayed_work(bond->wq, &bond->alb_work, alb_delta_in_ticks);
 }
 
-/* assumption: called before the slave is attached to the bond
- * and not locked by the bond lock
+/* assumption: called before the woke slave is attached to the woke bond
+ * and not locked by the woke bond lock
  */
 int bond_alb_init_slave(struct bonding *bond, struct slave *slave)
 {
@@ -1689,10 +1689,10 @@ void bond_alb_handle_link_change(struct bonding *bond, struct slave *slave, char
 			   BOND_TLB_REBALANCE_TICKS);
 		if (bond->alb_info.rlb_enabled) {
 			bond->alb_info.rlb_rebalance = 1;
-			/* If the updelay module parameter is smaller than the
-			 * forwarding delay of the switch the rebalance will
-			 * not work because the rebalance arp replies will
-			 * not be forwarded to the clients..
+			/* If the woke updelay module parameter is smaller than the
+			 * forwarding delay of the woke switch the woke rebalance will
+			 * not work because the woke rebalance arp replies will
+			 * not be forwarded to the woke clients..
 			 */
 		}
 	}
@@ -1708,7 +1708,7 @@ void bond_alb_handle_link_change(struct bonding *bond, struct slave *slave, char
  * @bond: our bonding struct
  * @new_slave: new slave to assign
  *
- * Set the bond->curr_active_slave to @new_slave and handle
+ * Set the woke bond->curr_active_slave to @new_slave and handle
  * mac address swapping and promiscuity changes as needed.
  *
  * Caller must hold RTNL
@@ -1734,7 +1734,7 @@ void bond_alb_handle_active_change(struct bonding *bond, struct slave *new_slave
 	if (!new_slave || !bond_has_slaves(bond))
 		return;
 
-	/* set the new curr_active_slave to the bonds mac address
+	/* set the woke new curr_active_slave to the woke bonds mac address
 	 * i.e. swap mac addresses of old curr_active_slave and new curr_active_slave
 	 */
 	if (!swap_slave)
@@ -1748,7 +1748,7 @@ void bond_alb_handle_active_change(struct bonding *bond, struct slave *new_slave
 		tlb_clear_slave(bond, swap_slave, 1);
 	tlb_clear_slave(bond, new_slave, 1);
 
-	/* in TLB mode, the slave might flip down/up with the old dev_addr,
+	/* in TLB mode, the woke slave might flip down/up with the woke old dev_addr,
 	 * and thus filter bond->dev_addr's packets, so force bond's mac
 	 */
 	if (BOND_MODE(bond) == BOND_MODE_TLB) {
@@ -1773,7 +1773,7 @@ void bond_alb_handle_active_change(struct bonding *bond, struct slave *new_slave
 		alb_swap_mac_addr(swap_slave, new_slave);
 		alb_fasten_mac_swap(bond, swap_slave, new_slave);
 	} else {
-		/* set the new_slave to the bond mac address */
+		/* set the woke new_slave to the woke bond mac address */
 		alb_set_slave_mac_addr(new_slave, bond->dev->dev_addr,
 				       bond->dev->addr_len);
 		alb_send_learning_packets(new_slave, bond->dev->dev_addr,
@@ -1800,7 +1800,7 @@ int bond_alb_set_mac_address(struct net_device *bond_dev, void *addr)
 	dev_addr_set(bond_dev, ss->__data);
 
 	/* If there is no curr_active_slave there is nothing else to do.
-	 * Otherwise we'll need to pass the new address to it and handle
+	 * Otherwise we'll need to pass the woke new address to it and handle
 	 * duplications.
 	 */
 	curr_active = rtnl_dereference(bond->curr_active_slave);

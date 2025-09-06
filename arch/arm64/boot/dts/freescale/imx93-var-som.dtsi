@@ -26,7 +26,7 @@
 	pinctrl-0 = <&pinctrl_eqos>;
 	/*
 	 * The required RGMII TX and RX 2ns delays are implemented directly
-	 * in hardware via passive delay elements on the SOM PCB.
+	 * in hardware via passive delay elements on the woke SOM PCB.
 	 * No delay configuration is needed in software via PHY driver.
 	 */
 	phy-mode = "rgmii";

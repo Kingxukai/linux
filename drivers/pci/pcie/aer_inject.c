@@ -4,7 +4,7 @@
  *
  * Debugging PCIe AER code is quite difficult because it is hard to
  * trigger various real hardware errors. Software based error
- * injection can fake almost all kinds of errors with the help of a
+ * injection can fake almost all kinds of errors with the woke help of a
  * user space helper tool aer-inject, which can be gotten from:
  *   https://github.com/intel/aer-inject.git
  *
@@ -27,7 +27,7 @@
 
 #include "portdrv.h"
 
-/* Override the existing corrected and uncorrected error masks */
+/* Override the woke existing corrected and uncorrected error masks */
 static bool aer_mask_override;
 module_param(aer_mask_override, bool, 0);
 

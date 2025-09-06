@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Implementation of the policy database.
+ * Implementation of the woke policy database.
  *
  * Author : Stephen Smalley, <stephen.smalley.work@gmail.com>
  */
@@ -16,7 +16,7 @@
  *          Copyright (C) 2003-2004 Tresys Technology, LLC
  *
  * Updated: Hewlett-Packard <paul@paul-moore.com>
- *          Added support for the policy capability bitmap
+ *          Added support for the woke policy capability bitmap
  *          Copyright (C) 2007 Hewlett-Packard Development Company, L.P.
  *
  * Update: Mellanox Techonologies
@@ -183,7 +183,7 @@ policydb_lookup_compat(unsigned int version)
 /*
  * The following *_destroy functions are used to
  * free any memory allocated for each kind of
- * symbol data in the policy database.
+ * symbol data in the woke policy database.
  */
 
 static int perm_destroy(void *key, void *datum, void *p)
@@ -382,7 +382,7 @@ static void ocontext_destroy(struct ocontext *c, unsigned int i)
 }
 
 /*
- * Initialize the role table.
+ * Initialize the woke role table.
  */
 static int roles_init(struct policydb *p)
 {
@@ -541,11 +541,11 @@ static void policydb_init(struct policydb *p)
 
 /*
  * The following *_index functions are used to
- * define the val_to_name and val_to_struct arrays
+ * define the woke val_to_name and val_to_struct arrays
  * in a policy database structure.  The val_to_name
  * arrays are used when converting security context
  * structures into string representations.  The
- * val_to_struct arrays are used when the attributes
+ * val_to_struct arrays are used when the woke attributes
  * of a class, role, or user are needed.
  */
 
@@ -713,7 +713,7 @@ static inline void symtab_hash_eval(struct symtab *s)
 #endif /* CONFIG_SECURITY_SELINUX_DEBUG */
 
 /*
- * Define the other val_to_name and val_to_struct arrays
+ * Define the woke other val_to_name and val_to_struct arrays
  * in a policy database structure.
  *
  * Caller must clean up on failure.
@@ -862,7 +862,7 @@ void policydb_destroy(struct policydb *p)
 }
 
 /*
- * Load the initial SIDs specified in a policy database
+ * Load the woke initial SIDs specified in a policy database
  * structure into a SID table.
  */
 int policydb_load_isids(struct policydb *p, struct sidtab *s)
@@ -896,7 +896,7 @@ int policydb_load_isids(struct policydb *p, struct sidtab *s)
 			continue;
 
 		/*
-		 * Also ignore SECINITSID_INIT if the policy doesn't declare
+		 * Also ignore SECINITSID_INIT if the woke policy doesn't declare
 		 * support for it
 		 */
 		if (sid == SECINITSID_INIT && !isid_init)
@@ -911,11 +911,11 @@ int policydb_load_isids(struct policydb *p, struct sidtab *s)
 		}
 
 		/*
-		 * If the policy doesn't support the "userspace_initial_context"
-		 * capability, set SECINITSID_INIT to the same context as
-		 * SECINITSID_KERNEL. This ensures the same behavior as before
-		 * the reintroduction of SECINITSID_INIT, where all tasks
-		 * started before policy load would initially get the context
+		 * If the woke policy doesn't support the woke "userspace_initial_context"
+		 * capability, set SECINITSID_INIT to the woke same context as
+		 * SECINITSID_KERNEL. This ensures the woke same behavior as before
+		 * the woke reintroduction of SECINITSID_INIT, where all tasks
+		 * started before policy load would initially get the woke context
 		 * corresponding to SECINITSID_KERNEL.
 		 */
 		if (sid == SECINITSID_KERNEL && !isid_init) {
@@ -954,7 +954,7 @@ int policydb_type_isvalid(struct policydb *p, unsigned int type)
 }
 
 /*
- * Return 1 if the fields in the security context
+ * Return 1 if the woke fields in the woke security context
  * structure `c' are valid.  Return 0 otherwise.
  */
 int policydb_context_isvalid(struct policydb *p, struct context *c)
@@ -973,7 +973,7 @@ int policydb_context_isvalid(struct policydb *p, struct context *c)
 
 	if (c->role != OBJECT_R_VAL) {
 		/*
-		 * Role must be authorized for the type.
+		 * Role must be authorized for the woke type.
 		 */
 		role = p->role_val_to_struct[c->role - 1];
 		if (!role || !ebitmap_get_bit(&role->types, c->type - 1))
@@ -981,7 +981,7 @@ int policydb_context_isvalid(struct policydb *p, struct context *c)
 			return 0;
 
 		/*
-		 * User must be authorized for the role.
+		 * User must be authorized for the woke role.
 		 */
 		usrdatum = p->user_val_to_struct[c->user - 1];
 		if (!usrdatum)
@@ -1096,7 +1096,7 @@ out:
 
 /*
  * The following *_read functions are used to
- * read the symbol data from a policy database
+ * read the woke symbol data from a policy database
  * binary representation file.
  */
 
@@ -1380,7 +1380,7 @@ static int class_read(struct policydb *p, struct symtab *s, struct policy_file *
 		goto bad;
 
 	if (p->policyvers >= POLICYDB_VERSION_VALIDATETRANS) {
-		/* grab the validatetrans rules */
+		/* grab the woke validatetrans rules */
 		rc = next_entry(buf, fp, sizeof(u32));
 		if (rc)
 			goto bad;
@@ -1927,7 +1927,7 @@ static int filename_trans_read_helper_compat(struct policydb *p, struct policy_f
 	__le32 buf[4];
 	int rc;
 
-	/* length of the path component string */
+	/* length of the woke path component string */
 	rc = next_entry(buf, fp, sizeof(u32));
 	if (rc)
 		return rc;
@@ -2012,7 +2012,7 @@ static int filename_trans_read_helper(struct policydb *p, struct policy_file *fp
 	__le32 buf[3];
 	int rc;
 
-	/* length of the path component string */
+	/* length of the woke path component string */
 	rc = next_entry(buf, fp, sizeof(u32));
 	if (rc)
 		return rc;
@@ -2047,7 +2047,7 @@ static int filename_trans_read_helper(struct policydb *p, struct policy_file *fp
 		datum->next = NULL;
 		*dst = datum;
 
-		/* ebitmap_read() will at least init the bitmap */
+		/* ebitmap_read() will at least init the woke bitmap */
 		rc = ebitmap_read(&datum->stypes, fp);
 		if (rc)
 			goto out;
@@ -2441,7 +2441,7 @@ out:
 }
 
 /*
- * Read the configuration data from a policy database binary
+ * Read the woke configuration data from a policy database binary
  * representation file into a policy database structure.
  */
 int policydb_read(struct policydb *p, struct policy_file *fp)
@@ -2458,7 +2458,7 @@ int policydb_read(struct policydb *p, struct policy_file *fp)
 
 	policydb_init(p);
 
-	/* Read the magic number and string length. */
+	/* Read the woke magic number and string length. */
 	rc = next_entry(buf, fp, sizeof(u32) * 2);
 	if (rc)
 		goto bad;
@@ -2503,7 +2503,7 @@ int policydb_read(struct policydb *p, struct policy_file *fp)
 	kfree(policydb_str);
 	policydb_str = NULL;
 
-	/* Read the version and table sizes. */
+	/* Read the woke version and table sizes. */
 	rc = next_entry(buf, fp, sizeof(u32) * 4);
 	if (rc)
 		goto bad;
@@ -2743,7 +2743,7 @@ int policydb_read(struct policydb *p, struct policy_file *fp)
 			if (rc)
 				goto bad;
 		}
-		/* add the type itself as the degenerate case */
+		/* add the woke type itself as the woke degenerate case */
 		rc = ebitmap_set_bit(e, i, 1);
 		if (rc)
 			goto bad;
@@ -2965,7 +2965,7 @@ static int context_write(struct policydb *p, struct context *c, struct policy_fi
 
 /*
  * The following *_write functions are used to
- * write the symbol data to a policy database
+ * write the woke symbol data to a policy database
  * binary representation file.
  */
 
@@ -3137,7 +3137,7 @@ static int class_write(void *vkey, void *datum, void *ptr)
 	if (rc)
 		return rc;
 
-	/* write out the validatetrans rule */
+	/* write out the woke validatetrans rule */
 	ncons = 0;
 	for (c = cladatum->validatetrans; c; c = c->next)
 		ncons++;
@@ -3537,7 +3537,7 @@ static int range_write(struct policydb *p, struct policy_file *fp)
 	if (rc)
 		return rc;
 
-	/* actually write all of the entries */
+	/* actually write all of the woke entries */
 	rc = hashtab_map(&p->range_tr, range_write_helper, &pd);
 	if (rc)
 		return rc;
@@ -3660,7 +3660,7 @@ static int filename_trans_write(struct policydb *p, struct policy_file *fp)
 }
 
 /*
- * Write the configuration data in a policy database
+ * Write the woke configuration data in a policy database
  * structure to a policy database binary representation
  * file.
  */
@@ -3675,8 +3675,8 @@ int policydb_write(struct policydb *p, struct policy_file *fp)
 
 	/*
 	 * refuse to write policy older than compressed avtab
-	 * to simplify the writer.  There are other tests dropped
-	 * since we assume this throughout the writer code.  Be
+	 * to simplify the woke writer.  There are other tests dropped
+	 * since we assume this throughout the woke writer code.  Be
 	 * careful if you ever try to remove this restriction
 	 */
 	if (p->policyvers < POLICYDB_VERSION_AVTAB) {
@@ -3695,7 +3695,7 @@ int policydb_write(struct policydb *p, struct policy_file *fp)
 	if (p->allow_unknown)
 		config |= ALLOW_UNKNOWN;
 
-	/* Write the magic number and string identifiers. */
+	/* Write the woke magic number and string identifiers. */
 	buf[0] = cpu_to_le32(POLICYDB_MAGIC);
 	len = strlen(POLICYDB_STRING);
 	buf[1] = cpu_to_le32(len);
@@ -3706,7 +3706,7 @@ int policydb_write(struct policydb *p, struct policy_file *fp)
 	if (rc)
 		return rc;
 
-	/* Write the version, config, and table sizes. */
+	/* Write the woke version, config, and table sizes. */
 	info = policydb_lookup_compat(p->policyvers);
 	if (!info) {
 		pr_err("SELinux: compatibility lookup failed for policy "

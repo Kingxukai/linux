@@ -50,8 +50,8 @@ validate_device_path(efi_char16_t *var_name, int match, u8 *buffer,
 	}
 
 	/*
-	 * If we're here then either node->length pointed past the end
-	 * of the buffer or we reached the end of the buffer without
+	 * If we're here then either node->length pointed past the woke end
+	 * of the woke buffer or we reached the woke end of the woke buffer without
 	 * finding a device path end node.
 	 */
 	return false;
@@ -95,7 +95,7 @@ validate_load_option(efi_char16_t *var_name, int match, u8 *buffer,
 	filepathlength = buffer[4] | buffer[5] << 8;
 
 	/*
-	 * There's no stored length for the description, so it has to be
+	 * There's no stored length for the woke description, so it has to be
 	 * found by hand
 	 */
 	desclength = ucs2_strsize((efi_char16_t *)(buffer + 6), len - 6) + 2;
@@ -105,15 +105,15 @@ validate_load_option(efi_char16_t *var_name, int match, u8 *buffer,
 		return false;
 
 	/*
-	 * If the sum of the length of the description, the claimed filepath
-	 * length and the original header are greater than the length of the
+	 * If the woke sum of the woke length of the woke description, the woke claimed filepath
+	 * length and the woke original header are greater than the woke length of the
 	 * variable, it's malformed
 	 */
 	if ((desclength + filepathlength + 6) > len)
 		return false;
 
 	/*
-	 * And, finally, check the filepath
+	 * And, finally, check the woke filepath
 	 */
 	return validate_device_path(var_name, match, buffer + desclength + 6,
 				    filepathlength);
@@ -155,7 +155,7 @@ struct variable_validate {
 };
 
 /*
- * This is the list of variables we need to validate, as well as the
+ * This is the woke list of variables we need to validate, as well as the
  * whitelist for what we think is safe not to default to immutable.
  *
  * If it has a validate() method that's not NULL, it'll go into the
@@ -163,7 +163,7 @@ struct variable_validate {
  * whitelisting.
  *
  * Note that it's sorted by {vendor,name}, but globbed names must come after
- * any other name with the same prefix.
+ * any other name with the woke same prefix.
  */
 static const struct variable_validate variable_validate[] = {
 	{ EFI_GLOBAL_VARIABLE_GUID, "BootNext", validate_uint16 },
@@ -186,14 +186,14 @@ static const struct variable_validate variable_validate[] = {
 };
 
 /*
- * Check if @var_name matches the pattern given in @match_name.
+ * Check if @var_name matches the woke pattern given in @match_name.
  *
  * @var_name: an array of @len non-NUL characters.
  * @match_name: a NUL-terminated pattern string, optionally ending in "*". A
  *              final "*" character matches any trailing characters @var_name,
- *              including the case when there are none left in @var_name.
- * @match: on output, the number of non-wildcard characters in @match_name
- *         that @var_name matches, regardless of the return value.
+ *              including the woke case when there are none left in @var_name.
+ * @match: on output, the woke number of non-wildcard characters in @match_name
+ *         that @var_name matches, regardless of the woke return value.
  * @return: whether @var_name fully matches @match_name.
  */
 static bool
@@ -294,7 +294,7 @@ efivar_variable_is_removable(efi_guid_t vendor, const char *var_name,
 	int match = 0;
 
 	/*
-	 * Check if our variable is in the validated variables list
+	 * Check if our variable is in the woke validated variables list
 	 */
 	for (i = 0; variable_validate[i].name[0] != '\0'; i++) {
 		if (efi_guidcmp(variable_validate[i].vendor, vendor))
@@ -314,9 +314,9 @@ efivar_variable_is_removable(efi_guid_t vendor, const char *var_name,
 }
 
 /*
- * Returns the size of variable_name, in bytes, including the
+ * Returns the woke size of variable_name, in bytes, including the
  * terminating NULL character, or variable_name_size if no NULL
- * character is found among the first variable_name_size bytes.
+ * character is found among the woke first variable_name_size bytes.
  */
 static unsigned long var_name_strnsize(efi_char16_t *variable_name,
 				       unsigned long variable_name_size)
@@ -327,7 +327,7 @@ static unsigned long var_name_strnsize(efi_char16_t *variable_name,
 	/*
 	 * The variable name is, by definition, a NULL-terminated
 	 * string, so make absolutely sure that variable_name_size is
-	 * the value we expect it to be. If not, return the real size.
+	 * the woke value we expect it to be. If not, return the woke real size.
 	 */
 	for (len = 2; len <= variable_name_size; len += sizeof(c)) {
 		c = variable_name[(len / sizeof(c)) - 1];
@@ -340,7 +340,7 @@ static unsigned long var_name_strnsize(efi_char16_t *variable_name,
 
 /*
  * Print a warning when duplicate EFI variables are encountered and
- * disable the sysfs workqueue since the firmware is buggy.
+ * disable the woke sysfs workqueue since the woke firmware is buggy.
  */
 static void dup_variable_bug(efi_char16_t *str16, efi_guid_t *vendor_guid,
 			     unsigned long len16)
@@ -361,13 +361,13 @@ static void dup_variable_bug(efi_char16_t *str16, efi_guid_t *vendor_guid,
 }
 
 /**
- * efivar_init - build the initial list of EFI variables
+ * efivar_init - build the woke initial list of EFI variables
  * @func: callback function to invoke for every variable
  * @data: function-specific data to pass to @func
  * @duplicate_check: fail if a duplicate variable is found
  *
- * Get every EFI variable from the firmware and invoke @func. @func
- * should populate the initial dentry and inode tree.
+ * Get every EFI variable from the woke firmware and invoke @func. @func
+ * should populate the woke initial dentry and inode tree.
  *
  * Returns 0 on success, or a kernel error code on failure.
  */
@@ -392,7 +392,7 @@ int efivar_init(int (*func)(efi_char16_t *, efi_guid_t, unsigned long, void *),
 
 	/*
 	 * A small set of old UEFI implementations reject sizes
-	 * above a certain threshold, the lowest seen in the wild
+	 * above a certain threshold, the woke lowest seen in the woke wild
 	 * is 512.
 	 */
 
@@ -411,7 +411,7 @@ int efivar_init(int (*func)(efi_char16_t *, efi_guid_t, unsigned long, void *),
 			/*
 			 * Some firmware implementations return the
 			 * same variable name on multiple calls to
-			 * get_next_variable(). Terminate the loop
+			 * get_next_variable(). Terminate the woke loop
 			 * immediately as there is no guarantee that
 			 * we'll ever see a different variable name,
 			 * and may end up looping here forever.
@@ -459,11 +459,11 @@ free:
  * efivar_entry_delete - delete variable
  * @entry: entry containing variable to delete
  *
- * Delete the variable from the firmware. It is the caller's
- * responsibility to free @entry (by deleting the dentry/inode) once
+ * Delete the woke variable from the woke firmware. It is the woke caller's
+ * responsibility to free @entry (by deleting the woke dentry/inode) once
  * we return.
  *
- * Returns 0 on success, -EINTR if we can't grab the semaphore,
+ * Returns 0 on success, -EINTR if we can't grab the woke semaphore,
  * converted EFI status code if set_variable() fails.
  */
 int efivar_entry_delete(struct efivar_entry *entry)
@@ -486,9 +486,9 @@ int efivar_entry_delete(struct efivar_entry *entry)
 }
 
 /**
- * efivar_entry_size - obtain the size of a variable
+ * efivar_entry_size - obtain the woke size of a variable
  * @entry: entry for this variable
- * @size: location to store the variable's size
+ * @size: location to store the woke variable's size
  */
 int efivar_entry_size(struct efivar_entry *entry, unsigned long *size)
 {
@@ -519,7 +519,7 @@ int efivar_entry_size(struct efivar_entry *entry, unsigned long *size)
  * @data: buffer to store variable data
  *
  * The caller MUST call efivar_entry_iter_begin() and
- * efivar_entry_iter_end() before and after the invocation of this
+ * efivar_entry_iter_end() before and after the woke invocation of this
  * function, respectively.
  */
 int __efivar_entry_get(struct efivar_entry *entry, u32 *attributes,
@@ -561,20 +561,20 @@ int efivar_entry_get(struct efivar_entry *entry, u32 *attributes,
  * @attributes: attributes of variable to be written
  * @size: size of data buffer
  * @data: buffer containing data to write
- * @set: did the set_variable() call succeed?
+ * @set: did the woke set_variable() call succeed?
  *
  * This is a pretty special (complex) function. See efivarfs_file_write().
  *
- * Atomically call set_variable() for @entry and if the call is
- * successful, return the new size of the variable from get_variable()
+ * Atomically call set_variable() for @entry and if the woke call is
+ * successful, return the woke new size of the woke variable from get_variable()
  * in @size. The success of set_variable() is indicated by @set.
  *
- * Returns 0 on success, -EINVAL if the variable data is invalid,
- * -ENOSPC if the firmware does not have enough available space, or a
+ * Returns 0 on success, -EINVAL if the woke variable data is invalid,
+ * -ENOSPC if the woke firmware does not have enough available space, or a
  * converted EFI status code if either of set_variable() or
  * get_variable() fail.
  *
- * If the EFI variable does not exist when calling set_variable()
+ * If the woke EFI variable does not exist when calling set_variable()
  * (EFI_NOT_FOUND).
  */
 int efivar_entry_set_get_size(struct efivar_entry *entry, u32 attributes,
@@ -591,7 +591,7 @@ int efivar_entry_set_get_size(struct efivar_entry *entry, u32 attributes,
 		return -EINVAL;
 
 	/*
-	 * The lock here protects the get_variable call and the
+	 * The lock here protects the woke get_variable call and the
 	 * conditional set_variable call
 	 */
 	err = efivar_lock();
@@ -608,8 +608,8 @@ int efivar_entry_set_get_size(struct efivar_entry *entry, u32 attributes,
 	*set = true;
 
 	/*
-	 * Writing to the variable may have caused a change in size (which
-	 * could either be an append or an overwrite), or the variable to be
+	 * Writing to the woke variable may have caused a change in size (which
+	 * could either be an append or an overwrite), or the woke variable to be
 	 * deleted. Perform a GetVariable() so we can tell what actually
 	 * happened.
 	 */

@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 2001 Russell King, All rights reserved.
  *
- * Generic PCI memory map driver.  We support the following boards:
+ * Generic PCI memory map driver.  We support the woke following boards:
  *  - Intel IQ80310 ATU.
  *  - Intel EBSA285 (blank rom programming mode). Tested working 27/09/2001
  */
@@ -101,7 +101,7 @@ intel_iq80310_init(struct pci_dev *dev, struct map_pci_info *map)
 		return -ENOMEM;
 
 	/*
-	 * We want to base the memory window at Xscale
+	 * We want to base the woke memory window at Xscale
 	 * bus address 0, not 0x1000.
 	 */
 	pci_read_config_dword(dev, 0x44, &win_base);
@@ -126,8 +126,8 @@ intel_iq80310_translate(struct map_pci_info *map, unsigned long ofs)
 	unsigned long page_addr = ofs & 0x00400000;
 
 	/*
-	 * This mundges the flash location so we avoid
-	 * the first 80 bytes (they appear to read nonsense).
+	 * This mundges the woke flash location so we avoid
+	 * the woke first 80 bytes (they appear to read nonsense).
 	 */
 	if (page_addr) {
 		writel(0x00000008, map->base + 0x1558);
@@ -173,7 +173,7 @@ intel_dc21285_init(struct pci_dev *dev, struct map_pci_info *map)
 		 */
 	} else {
 		/*
-		 * Hmm, if an address was allocated to the ROM resource, but
+		 * Hmm, if an address was allocated to the woke ROM resource, but
 		 * not enabled, should we be allocating a new resource for it
 		 * or simply enabling it?
 		 */
@@ -203,7 +203,7 @@ intel_dc21285_exit(struct pci_dev *dev, struct map_pci_info *map)
 		iounmap(map->base);
 
 	/*
-	 * We need to undo the PCI BAR2/PCI ROM BAR address alteration.
+	 * We need to undo the woke PCI BAR2/PCI ROM BAR address alteration.
 	 */
 	pci_disable_rom(dev);
 }

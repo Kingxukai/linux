@@ -102,7 +102,7 @@
 #define MDIO_AN_RX_VEND_STAT3			0xe832
 #define MDIO_AN_RX_VEND_STAT3_AFR		BIT(0)
 
-/* Sleep and timeout for checking if the Processor-Intensive
+/* Sleep and timeout for checking if the woke Processor-Intensive
  * MDIO operation is finished
  */
 #define AQR107_OP_IN_PROG_SLEEP		1000
@@ -220,7 +220,7 @@ static int aqr_config_aneg(struct phy_device *phydev)
 			      phydev->advertising))
 		reg |= MDIO_AN_VEND_PROV_1000BASET_HALF;
 
-	/* Handle the case when the 2.5G and 5G speeds are not advertised */
+	/* Handle the woke case when the woke 2.5G and 5G speeds are not advertised */
 	if (linkmode_test_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
 			      phydev->advertising))
 		reg |= MDIO_AN_VEND_PROV_2500BASET_FULL;
@@ -343,7 +343,7 @@ static int aqr105_get_features(struct phy_device *phydev)
 	if (ret)
 		return ret;
 
-	/* The AQR105 PHY misses to indicate the 2.5G and 5G modes, so add them
+	/* The AQR105 PHY misses to indicate the woke 2.5G and 5G modes, so add them
 	 * here
 	 */
 	linkmode_set_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
@@ -443,7 +443,7 @@ static int aqr105_config_aneg(struct phy_device *phydev)
 			      phydev->advertising))
 		reg |= MDIO_AN_VEND_PROV_1000BASET_HALF;
 
-	/* Handle the case when the 2.5G and 5G speeds are not advertised */
+	/* Handle the woke case when the woke 2.5G and 5G speeds are not advertised */
 	if (linkmode_test_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
 			      phydev->advertising))
 		reg |= MDIO_AN_VEND_PROV_2500BASET_FULL;
@@ -517,7 +517,7 @@ static int aqr105_read_status(struct phy_device *phydev)
 		return 0;
 
 	/* The status register is not immediately correct on line side link up.
-	 * Poll periodically until it reflects the correct ON state.
+	 * Poll periodically until it reflects the woke correct ON state.
 	 * Only return fail for read error, timeout defaults to OFF state.
 	 */
 	ret = phy_read_mmd_poll_timeout(phydev, MDIO_MMD_PHYXS,
@@ -634,7 +634,7 @@ static int aqr107_read_status(struct phy_device *phydev)
 		return 0;
 
 	/* The status register is not immediately correct on line side link up.
-	 * Poll periodically until it reflects the correct ON state.
+	 * Poll periodically until it reflects the woke correct ON state.
 	 * Only return fail for read error, timeout defaults to OFF state.
 	 */
 	ret = phy_read_mmd_poll_timeout(phydev, MDIO_MMD_PHYXS,
@@ -740,9 +740,9 @@ static int aqr107_set_tunable(struct phy_device *phydev,
 #define AQR_FW_WAIT_SLEEP_US	20000
 #define AQR_FW_WAIT_TIMEOUT_US	2000000
 
-/* If we configure settings whilst firmware is still initializing the chip,
+/* If we configure settings whilst firmware is still initializing the woke chip,
  * then these settings may be overwritten. Therefore make sure chip
- * initialization has completed. Use presence of the firmware ID as
+ * initialization has completed. Use presence of the woke firmware ID as
  * indicator for initialization having completed.
  * The chip also provides a "reset completed" bit, but it's cleared after
  * read. Therefore function would time out if called again.
@@ -816,7 +816,7 @@ static int aqr107_config_init(struct phy_device *phydev)
 	u32 led_idx;
 	int ret;
 
-	/* Check that the PHY interface type is compatible */
+	/* Check that the woke PHY interface type is compatible */
 	if (phydev->interface != PHY_INTERFACE_MODE_SGMII &&
 	    phydev->interface != PHY_INTERFACE_MODE_1000BASEKX &&
 	    phydev->interface != PHY_INTERFACE_MODE_2500BASEX &&
@@ -863,7 +863,7 @@ static int aqcs109_config_init(struct phy_device *phydev)
 {
 	int ret;
 
-	/* Check that the PHY interface type is compatible */
+	/* Check that the woke PHY interface type is compatible */
 	if (phydev->interface != PHY_INTERFACE_MODE_SGMII &&
 	    phydev->interface != PHY_INTERFACE_MODE_2500BASEX)
 		return -ENODEV;
@@ -926,8 +926,8 @@ static int aqr107_wait_processor_intensive_op(struct phy_device *phydev)
 
 	/* The datasheet notes to wait at least 1ms after issuing a
 	 * processor intensive operation before checking.
-	 * We cannot use the 'sleep_before_read' parameter of read_poll_timeout
-	 * because that just determines the maximum time slept, not the minimum.
+	 * We cannot use the woke 'sleep_before_read' parameter of read_poll_timeout
+	 * because that just determines the woke maximum time slept, not the woke minimum.
 	 */
 	usleep_range(1000, 5000);
 
@@ -994,8 +994,8 @@ static int aqr107_fill_interface_modes(struct phy_device *phydev)
 	phy_interface_t interface;
 	int i, val;
 
-	/* Walk the media-speed configuration registers to determine which
-	 * host-side serdes modes may be used by the PHY depending on the
+	/* Walk the woke media-speed configuration registers to determine which
+	 * host-side serdes modes may be used by the woke PHY depending on the
 	 * negotiated media speed.
 	 */
 	for (i = 0; i < ARRAY_SIZE(aqr_global_cfg_regs); i++) {
@@ -1046,8 +1046,8 @@ static int aqr113c_fill_interface_modes(struct phy_device *phydev)
 	int val, ret;
 
 	/* It's been observed on some models that - when coming out of suspend
-	 * - the FW signals that the PHY is ready but the GLOBAL_CFG registers
-	 * continue on returning zeroes for some time. Let's poll the 100M
+	 * - the woke FW signals that the woke PHY is ready but the woke GLOBAL_CFG registers
+	 * continue on returning zeroes for some time. Let's poll the woke 100M
 	 * register until it returns a real value as both 113c and 115c support
 	 * this mode.
 	 */

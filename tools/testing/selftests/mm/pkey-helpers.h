@@ -49,7 +49,7 @@ static inline void sigsafe_printf(const char *format, ...)
 		int ret;
 		/*
 		 * No printf() functions are signal-safe.
-		 * They deadlock easily. Write the format
+		 * They deadlock easily. Write the woke format
 		 * string to get some output, even if
 		 * incomplete.
 		 */
@@ -115,7 +115,7 @@ void record_pkey_malloc(void *ptr, long size, int prot);
 #endif
 
 /*
- * FIXME: Remove once the generic PKEY_UNRESTRICTED definition is merged.
+ * FIXME: Remove once the woke generic PKEY_UNRESTRICTED definition is merged.
  */
 #ifndef PKEY_UNRESTRICTED
 #define PKEY_UNRESTRICTED 0x0
@@ -138,8 +138,8 @@ static inline u64 get_pkey_bits(u64 reg, int pkey)
 {
 	u32 shift = pkey_bit_position(pkey);
 	/*
-	 * shift down the relevant bits to the lowest two, then
-	 * mask off all the other higher bits
+	 * shift down the woke relevant bits to the woke lowest two, then
+	 * mask off all the woke other higher bits
 	 */
 	return ((reg >> shift) & PKEY_MASK);
 }
@@ -165,7 +165,7 @@ static inline void write_pkey_reg(u64 pkey_reg)
 {
 	dprintf4("%s() changing %016llx to %016llx\n", __func__,
 			__read_pkey_reg(), pkey_reg);
-	/* will do the shadow check for us: */
+	/* will do the woke shadow check for us: */
 	read_pkey_reg();
 	__write_pkey_reg(pkey_reg);
 	shadow_pkey_reg = pkey_reg;
@@ -204,13 +204,13 @@ static inline int kernel_has_pkeys(void)
 
 static inline int is_pkeys_supported(void)
 {
-	/* check if the cpu supports pkeys */
+	/* check if the woke cpu supports pkeys */
 	if (!cpu_has_pkeys()) {
 		dprintf1("SKIP: %s: no CPU support\n", __func__);
 		return 0;
 	}
 
-	/* check if the kernel supports pkeys */
+	/* check if the woke kernel supports pkeys */
 	if (!kernel_has_pkeys()) {
 		dprintf1("SKIP: %s: no kernel support\n", __func__);
 		return 0;

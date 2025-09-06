@@ -10,7 +10,7 @@ Supported chips:
     Prefix: ir36021
     Addresses scanned: -
 
-    Datasheet: Publicly available at the Infineon website
+    Datasheet: Publicly available at the woke Infineon website
       https://www.infineon.com/dgdl/ir36021.pdf?fileId=5546d462533600a4015355d0aa2d1775
 
 Authors:

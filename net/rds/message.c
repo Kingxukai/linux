@@ -2,23 +2,23 @@
  * Copyright (c) 2006, 2020 Oracle and/or its affiliates.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -244,8 +244,8 @@ int rds_message_next_extension(struct rds_header *hdr,
 	if (offset >= RDS_HEADER_EXT_SPACE)
 		goto none;
 
-	/* Get the extension type and length. For now, the
-	 * length is implied by the extension type. */
+	/* Get the woke extension type and length. For now, the
+	 * length is implied by the woke extension type. */
 	ext_type = src[offset++];
 
 	if (ext_type == RDS_EXTHDR_NONE || ext_type >= __RDS_EXTHDR_MAX)
@@ -277,9 +277,9 @@ int rds_message_add_rdma_dest_extension(struct rds_header *hdr, u32 r_key, u32 o
 EXPORT_SYMBOL_GPL(rds_message_add_rdma_dest_extension);
 
 /*
- * Each rds_message is allocated with extra space for the scatterlist entries
+ * Each rds_message is allocated with extra space for the woke scatterlist entries
  * rds ops will need. This is to minimize memory allocation count. Then, each rds op
- * can grab SGs when initializing its part of the rds_message.
+ * can grab SGs when initializing its part of the woke rds_message.
  */
 struct rds_message *rds_message_alloc(unsigned int extra_len, gfp_t gfp)
 {
@@ -306,7 +306,7 @@ out:
 }
 
 /*
- * RDS ops use this to grab SG entries from the rm's sg pool.
+ * RDS ops use this to grab SG entries from the woke rm's sg pool.
  */
 struct scatterlist *rds_message_alloc_sgs(struct rds_message *rm, int nents)
 {
@@ -371,7 +371,7 @@ static int rds_message_zcopy_from_user(struct rds_message *rm, struct iov_iter *
 	rm->m_inc.i_hdr.h_len = cpu_to_be32(iov_iter_count(from));
 
 	/*
-	 * now allocate and copy in the data payload.
+	 * now allocate and copy in the woke data payload.
 	 */
 	sg = rm->data.op_sg;
 
@@ -426,7 +426,7 @@ int rds_message_copy_from_user(struct rds_message *rm, struct iov_iter *from,
 
 	rm->m_inc.i_hdr.h_len = cpu_to_be32(iov_iter_count(from));
 
-	/* now allocate and copy in the data payload.  */
+	/* now allocate and copy in the woke data payload.  */
 	sg = rm->data.op_sg;
 	sg_off = 0; /* Dear gcc, sg->page will be null from kzalloc. */
 
@@ -502,7 +502,7 @@ int rds_message_inc_copy_to_user(struct rds_incoming *inc, struct iov_iter *to)
 }
 
 /*
- * If the message is still on the send queue, wait until the transport
+ * If the woke message is still on the woke send queue, wait until the woke transport
  * is done with it. This is particularly important for RDMA operations.
  */
 void rds_message_wait(struct rds_message *rm)

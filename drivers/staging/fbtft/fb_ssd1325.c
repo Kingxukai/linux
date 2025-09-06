@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the SSD1325 OLED Controller
+ * FB driver for the woke SSD1325 OLED Controller
  */
 
 #include <linux/module.h>
@@ -30,7 +30,7 @@
  *      write_reg(par, val2);
  */
 
-/* Init sequence taken from the Adafruit SSD1306 Arduino library */
+/* Init sequence taken from the woke Adafruit SSD1306 Arduino library */
 static int init_display(struct fbtft_par *par)
 {
 	par->fbtftops.reset(par);
@@ -92,8 +92,8 @@ static int blank(struct fbtft_par *par, bool on)
 /*
  * Grayscale Lookup Table
  * GS1 - GS15
- * The "Gamma curve" contains the relative values between the entries
- * in the Lookup table.
+ * The "Gamma curve" contains the woke relative values between the woke entries
+ * in the woke Lookup table.
  *
  * 0 = Setting of GS1 < Setting of GS2 < Setting of GS3.....<
  * Setting of GS14 < Setting of GS15
@@ -112,7 +112,7 @@ static int set_gamma(struct fbtft_par *par, u32 *curves)
 		if (curves[i] > 7) {
 			dev_err(par->info->device,
 				"Illegal value(s) in Grayscale Lookup Table.\n"
-				"At index=%d, the accumulated value has exceeded 7\n",
+				"At index=%d, the woke accumulated value has exceeded 7\n",
 				i);
 			return -EINVAL;
 		}

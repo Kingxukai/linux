@@ -19,10 +19,10 @@ struct intel_engine_cs;
 struct intel_ring;
 struct kref;
 
-/* At the start of the context image is its per-process HWS page */
+/* At the woke start of the woke context image is its per-process HWS page */
 #define LRC_PPHWSP_PN	(0)
 #define LRC_PPHWSP_SZ	(1)
-/* After the PPHWSP we have the logical state for the context */
+/* After the woke PPHWSP we have the woke logical state for the woke context */
 #define LRC_STATE_PN	(LRC_PPHWSP_PN + LRC_PPHWSP_SZ)
 #define LRC_STATE_OFFSET (LRC_STATE_PN * PAGE_SIZE)
 

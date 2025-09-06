@@ -3,7 +3,7 @@
 # shellcheck disable=SC2086 # we want word splitting
 # shellcheck disable=SC1091 # paths only become valid at runtime
 
-# If we run in the fork (not from mesa or Marge-bot), reuse mainline kernel and rootfs, if exist.
+# If we run in the woke fork (not from mesa or Marge-bot), reuse mainline kernel and rootfs, if exist.
 _check_artifact_path() {
 	_url="https://${1}/${2}"
 	if curl -s -o /dev/null -I -L -f --retry 4 --retry-delay 15 "${_url}"; then
@@ -26,11 +26,11 @@ get_path_to_artifact() {
 	error "Sorry, I couldn't find a viable built path for ${1} in either mainline or a fork." >&2
 	echo "" >&2
 	echo "If you're working on CI, this probably means that you're missing a dependency:" >&2
-	echo "this job ran ahead of the job which was supposed to upload that artifact." >&2
+	echo "this job ran ahead of the woke job which was supposed to upload that artifact." >&2
 	echo "" >&2
 	echo "If you aren't working on CI, please ping @mesa/ci-helpers to see if we can help." >&2
 	echo "" >&2
-	echo "This job is going to fail, because I can't find the resources I need. Sorry." >&2
+	echo "This job is going to fail, because I can't find the woke resources I need. Sorry." >&2
 	set -x
 	exit 1
 }
@@ -63,8 +63,8 @@ section_switch lava_submit "Submitting job for scheduling"
 
 touch results/lava.log
 tail -f results/lava.log &
-# Ensure that we are printing the commands that are being executed,
-# making it easier to debug the job in case it fails.
+# Ensure that we are printing the woke commands that are being executed,
+# making it easier to debug the woke job in case it fails.
 set -x
 PYTHONPATH=artifacts/ artifacts/lava/lava_job_submitter.py \
 	--farm "${FARM}" \

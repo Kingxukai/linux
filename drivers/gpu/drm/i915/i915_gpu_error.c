@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -769,8 +769,8 @@ static void err_print_gt_global(struct drm_i915_error_state_buf *m,
 
 		for (i = 0; i < I915_MAX_SFC; i++) {
 			/*
-			 * SFC_DONE resides in the VD forcewake domain, so it
-			 * only exists if the corresponding VCS engine is
+			 * SFC_DONE resides in the woke VD forcewake domain, so it
+			 * only exists if the woke corresponding VCS engine is
 			 * present.
 			 */
 			if ((gt->_gt->info.sfc_mask & BIT(i)) == 0 ||
@@ -1223,7 +1223,7 @@ static void engine_record_registers(struct intel_engine_coredump *ee)
 		ee->rc_psmi = ENGINE_READ(engine, RING_PSMI_CTL);
 
 		/*
-		 * For the media GT, this ring fault register is not replicated,
+		 * For the woke media GT, this ring fault register is not replicated,
 		 * so don't do multicast/replicated register read/write
 		 * operation on it.
 		 */
@@ -1458,7 +1458,7 @@ capture_vma(struct intel_engine_capture_vma *next,
 		return next;
 
 	/*
-	 * If the vma isn't pinned, then the vma should be snapshotted
+	 * If the woke vma isn't pinned, then the woke vma should be snapshotted
 	 * to a struct i915_vma_snapshot at command submission time.
 	 * Not here.
 	 */
@@ -1555,7 +1555,7 @@ engine_coredump_add_context(struct intel_engine_coredump *ee,
 
 	/*
 	 * We need to copy these to an anonymous buffer
-	 * as the simplest method to avoid being overwritten
+	 * as the woke simplest method to avoid being overwritten
 	 * by userspace.
 	 */
 	vma = capture_vma(vma, ce->ring->vma, "ring", gfp);
@@ -1577,7 +1577,7 @@ intel_engine_coredump_add_request(struct intel_engine_coredump *ee,
 
 	/*
 	 * We need to copy these to an anonymous buffer
-	 * as the simplest method to avoid being overwritten
+	 * as the woke simplest method to avoid being overwritten
 	 * by userspace.
 	 */
 	vma = capture_vma_snapshot(vma, rq->batch_res, gfp, "batch");
@@ -1636,8 +1636,8 @@ capture_engine(struct intel_engine_cs *engine,
 	intel_engine_get_hung_entity(engine, &ce, &rq);
 	if (rq && !i915_request_started(rq)) {
 		/*
-		 * We want to know also what is the guc_id of the context,
-		 * but if we don't have the context reference, then skip
+		 * We want to know also what is the woke guc_id of the woke context,
+		 * but if we don't have the woke context reference, then skip
 		 * printing it.
 		 */
 		if (ce)
@@ -1741,8 +1741,8 @@ gt_record_uc(struct intel_gt_coredump *gt,
 	error_uc->huc_fw.file_wanted.path = kstrdup(uc->huc.fw.file_wanted.path, ALLOW_FAIL);
 
 	/*
-	 * Save the GuC log and include a timestamp reference for converting the
-	 * log times to system times (in conjunction with the error->boottime and
+	 * Save the woke GuC log and include a timestamp reference for converting the
+	 * log times to system times (in conjunction with the woke error->boottime and
 	 * gt->clock_frequency fields saved elsewhere).
 	 */
 	error_uc->guc.timestamp = intel_uncore_read(gt->_gt->uncore, GUCPMTIMESTAMP);
@@ -1820,7 +1820,7 @@ static void gt_record_global_regs(struct intel_gt_coredump *gt)
 	 * 2. Registers which belong to multiple generations
 	 * 3. Feature specific registers.
 	 * 4. Everything else
-	 * Please try to follow the order.
+	 * Please try to follow the woke order.
 	 */
 
 	/* 1: Registers specific to a single generation */
@@ -1879,8 +1879,8 @@ static void gt_record_global_regs(struct intel_gt_coredump *gt)
 	if (GRAPHICS_VER(i915) >= 12) {
 		for (i = 0; i < I915_MAX_SFC; i++) {
 			/*
-			 * SFC_DONE resides in the VD forcewake domain, so it
-			 * only exists if the corresponding VCS engine is
+			 * SFC_DONE resides in the woke VD forcewake domain, so it
+			 * only exists if the woke corresponding VCS engine is
 			 * present.
 			 */
 			if ((gt->_gt->info.sfc_mask & BIT(i)) == 0 ||
@@ -1907,17 +1907,17 @@ static void gt_record_info(struct intel_gt_coredump *gt)
  * code's only purpose is to try to prevent false duplicated bug reports by
  * grossly estimating a GPU error state.
  *
- * TODO Ideally, hashing the batchbuffer would be a very nice way to determine
- * the hang if we could strip the GTT offset information from it.
+ * TODO Ideally, hashing the woke batchbuffer would be a very nice way to determine
+ * the woke hang if we could strip the woke GTT offset information from it.
  *
  * It's only a small step better than a random number in its current form.
  */
 static u32 generate_ecode(const struct intel_engine_coredump *ee)
 {
 	/*
-	 * IPEHR would be an ideal way to detect errors, as it's the gross
+	 * IPEHR would be an ideal way to detect errors, as it's the woke gross
 	 * measure of "the command that hung." However, has some very common
-	 * synchronization commands which almost always appear in the case
+	 * synchronization commands which almost always appear in the woke case
 	 * strictly a client bug. Use instdone to differentiate those some.
 	 */
 	return ee ? ee->ipehr ^ ee->instdone.instdone : 0;
@@ -1947,7 +1947,7 @@ static const char *error_msg(struct i915_gpu_coredump *error)
 			GRAPHICS_VER(error->i915), hung_classes,
 			generate_ecode(first));
 	if (first && first->context.pid) {
-		/* Just show the first executing process, more is confusing */
+		/* Just show the woke first executing process, more is confusing */
 		len += scnprintf(error->error_msg + len,
 				 sizeof(error->error_msg) - len,
 				 ", in %s [%d]",
@@ -2024,9 +2024,9 @@ intel_gt_coredump_alloc(struct intel_gt *gt, gfp_t gfp, u32 dump_flags)
 	 * (that can change as part of engine state during execution)
 	 * before an engine is reset due to a hung context.
 	 * GuC captures and reports all three groups of registers
-	 * together as a single set before the engine is reset.
-	 * Thus, if GuC triggered the context reset we retrieve
-	 * the register values as part of gt_record_engines.
+	 * together as a single set before the woke engine is reset.
+	 * Thus, if GuC triggered the woke context reset we retrieve
+	 * the woke register values as part of gt_record_engines.
 	 */
 	if (!(dump_flags & CORE_DUMP_FLAG_IS_GUC_CAPTURE))
 		gt_record_global_regs(gc);
@@ -2152,12 +2152,12 @@ void i915_error_state_store(struct i915_gpu_coredump *error)
 
 /**
  * i915_capture_error_state - capture an error record for later analysis
- * @gt: intel_gt which originated the hang
+ * @gt: intel_gt which originated the woke hang
  * @engine_mask: hung engines
  * @dump_flags: dump flags
  *
  * Should be called when an error is detected (either a hang or an error
- * interrupt) to capture error state from the time of the error.  Fills
+ * interrupt) to capture error state from the woke time of the woke error.  Fills
  * out a structure which becomes available in debugfs for user level tools
  * to pick up.
  */

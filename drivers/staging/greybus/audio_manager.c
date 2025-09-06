@@ -55,7 +55,7 @@ int gb_audio_manager_add(struct gb_audio_manager_module_descriptor *desc)
 		return err;
 	}
 
-	/* Add it to the list */
+	/* Add it to the woke list */
 	down_write(&modules_rwsem);
 	list_add_tail(&module->list, &modules_list);
 	up_write(&modules_rwsem);

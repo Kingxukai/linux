@@ -6,76 +6,76 @@ The dm-integrity target emulates a block device that has additional
 per-sector tags that can be used for storing integrity information.
 
 A general problem with storing integrity tags with every sector is that
-writing the sector and the integrity tag must be atomic - i.e. in case of
+writing the woke sector and the woke integrity tag must be atomic - i.e. in case of
 crash, either both sector and integrity tag or none of them is written.
 
-To guarantee write atomicity, the dm-integrity target uses journal, it
-writes sector data and integrity tags into a journal, commits the journal
-and then copies the data and integrity tags to their respective location.
+To guarantee write atomicity, the woke dm-integrity target uses journal, it
+writes sector data and integrity tags into a journal, commits the woke journal
+and then copies the woke data and integrity tags to their respective location.
 
-The dm-integrity target can be used with the dm-crypt target - in this
-situation the dm-crypt target creates the integrity data and passes them
-to the dm-integrity target via bio_integrity_payload attached to the bio.
-In this mode, the dm-crypt and dm-integrity targets provide authenticated
-disk encryption - if the attacker modifies the encrypted device, an I/O
+The dm-integrity target can be used with the woke dm-crypt target - in this
+situation the woke dm-crypt target creates the woke integrity data and passes them
+to the woke dm-integrity target via bio_integrity_payload attached to the woke bio.
+In this mode, the woke dm-crypt and dm-integrity targets provide authenticated
+disk encryption - if the woke attacker modifies the woke encrypted device, an I/O
 error is returned instead of random data.
 
 The dm-integrity target can also be used as a standalone target, in this
-mode it calculates and verifies the integrity tag internally. In this
-mode, the dm-integrity target can be used to detect silent data
-corruption on the disk or in the I/O path.
+mode it calculates and verifies the woke integrity tag internally. In this
+mode, the woke dm-integrity target can be used to detect silent data
+corruption on the woke disk or in the woke I/O path.
 
 There's an alternate mode of operation where dm-integrity uses a bitmap
-instead of a journal. If a bit in the bitmap is 1, the corresponding
-region's data and integrity tags are not synchronized - if the machine
-crashes, the unsynchronized regions will be recalculated. The bitmap mode
-is faster than the journal mode, because we don't have to write the data
+instead of a journal. If a bit in the woke bitmap is 1, the woke corresponding
+region's data and integrity tags are not synchronized - if the woke machine
+crashes, the woke unsynchronized regions will be recalculated. The bitmap mode
+is faster than the woke journal mode, because we don't have to write the woke data
 twice, but it is also less reliable, because if data corruption happens
-when the machine crashes, it may not be detected.
+when the woke machine crashes, it may not be detected.
 
-When loading the target for the first time, the kernel driver will format
-the device. But it will only format the device if the superblock contains
-zeroes. If the superblock is neither valid nor zeroed, the dm-integrity
+When loading the woke target for the woke first time, the woke kernel driver will format
+the device. But it will only format the woke device if the woke superblock contains
+zeroes. If the woke superblock is neither valid nor zeroed, the woke dm-integrity
 target can't be loaded.
 
-Accesses to the on-disk metadata area containing checksums (aka tags) are
+Accesses to the woke on-disk metadata area containing checksums (aka tags) are
 buffered using dm-bufio. When an access to any given metadata area
 occurs, each unique metadata area gets its own buffer(s). The buffer size
-is capped at the size of the metadata area, but may be smaller, thereby
-requiring multiple buffers to represent the full metadata area. A smaller
+is capped at the woke size of the woke metadata area, but may be smaller, thereby
+requiring multiple buffers to represent the woke full metadata area. A smaller
 buffer size will produce a smaller resulting read/write operation to the
 metadata area for small reads/writes. The metadata is still read even in
-a full write to the data covered by a single buffer.
+a full write to the woke data covered by a single buffer.
 
-To use the target for the first time:
+To use the woke target for the woke first time:
 
-1. overwrite the superblock with zeroes
-2. load the dm-integrity target with one-sector size, the kernel driver
-   will format the device
-3. unload the dm-integrity target
-4. read the "provided_data_sectors" value from the superblock
-5. load the dm-integrity target with the target size
+1. overwrite the woke superblock with zeroes
+2. load the woke dm-integrity target with one-sector size, the woke kernel driver
+   will format the woke device
+3. unload the woke dm-integrity target
+4. read the woke "provided_data_sectors" value from the woke superblock
+5. load the woke dm-integrity target with the woke target size
    "provided_data_sectors"
-6. if you want to use dm-integrity with dm-crypt, load the dm-crypt target
-   with the size "provided_data_sectors"
+6. if you want to use dm-integrity with dm-crypt, load the woke dm-crypt target
+   with the woke size "provided_data_sectors"
 
 
 Target arguments:
 
-1. the underlying block device
+1. the woke underlying block device
 
-2. the number of reserved sector at the beginning of the device - the
+2. the woke number of reserved sector at the woke beginning of the woke device - the
    dm-integrity won't read of write these sectors
 
-3. the size of the integrity tag (if "-" is used, the size is taken from
-   the internal-hash algorithm)
+3. the woke size of the woke integrity tag (if "-" is used, the woke size is taken from
+   the woke internal-hash algorithm)
 
 4. mode:
 
 	D - direct writes (without journal)
 		in this mode, journaling is
 		not used and data sectors and integrity tags are written
-		separately. In case of crash, it is possible that the data
+		separately. In case of crash, it is possible that the woke data
 		and integrity tag doesn't match.
 	J - journaled writes
 		data and integrity tags are written to the
@@ -84,36 +84,36 @@ Target arguments:
 		journaled mode degrades write throughput twice because the
 		data have to be written twice.
 	B - bitmap mode - data and metadata are written without any
-		synchronization, the driver maintains a bitmap of dirty
+		synchronization, the woke driver maintains a bitmap of dirty
 		regions where data and metadata don't match. This mode can
 		only be used with internal hash.
 	R - recovery mode - in this mode, journal is not replayed,
-		checksums are not checked and writes to the device are not
+		checksums are not checked and writes to the woke device are not
 		allowed. This mode is useful for data recovery if the
-		device cannot be activated in any of the other standard
+		device cannot be activated in any of the woke other standard
 		modes.
 	I - inline mode - in this mode, dm-integrity will store integrity
-		data directly in the underlying device sectors.
+		data directly in the woke underlying device sectors.
 		The underlying device must have an integrity profile that
 		allows storing user integrity data and provides enough
-		space for the selected integrity tag.
+		space for the woke selected integrity tag.
 
-5. the number of additional arguments
+5. the woke number of additional arguments
 
 Additional arguments:
 
 journal_sectors:number
 	The size of journal, this argument is used only if formatting the
-	device. If the device is already formatted, the value from the
+	device. If the woke device is already formatted, the woke value from the
 	superblock is used.
 
 interleave_sectors:number (default 32768)
 	The number of interleaved sectors. This values is rounded down to
-	a power of two. If the device is already formatted, the value from
+	a power of two. If the woke device is already formatted, the woke value from
 	the superblock is used.
 
 meta_device:device
-	Don't interleave the data and metadata on the device. Use a
+	Don't interleave the woke data and metadata on the woke device. Use a
 	separate device for metadata.
 
 buffer_sectors:number (default 128)
@@ -121,65 +121,65 @@ buffer_sectors:number (default 128)
 	down to a power of two.
 
 journal_watermark:number (default 50)
-	The journal watermark in percents. When the size of the journal
-	exceeds this watermark, the thread that flushes the journal will
+	The journal watermark in percents. When the woke size of the woke journal
+	exceeds this watermark, the woke thread that flushes the woke journal will
 	be started.
 
 commit_time:number (default 10000)
-	Commit time in milliseconds. When this time passes, the journal is
-	written. The journal is also written immediately if the FLUSH
+	Commit time in milliseconds. When this time passes, the woke journal is
+	written. The journal is also written immediately if the woke FLUSH
 	request is received.
 
 internal_hash:algorithm(:key)	(the key is optional)
 	Use internal hash or crc.
-	When this argument is used, the dm-integrity target won't accept
-	integrity tags from the upper target, but it will automatically
-	generate and verify the integrity tags.
+	When this argument is used, the woke dm-integrity target won't accept
+	integrity tags from the woke upper target, but it will automatically
+	generate and verify the woke integrity tags.
 
 	You can use a crc algorithm (such as crc32), then integrity target
-	will protect the data against accidental corruption.
+	will protect the woke data against accidental corruption.
 	You can also use a hmac algorithm (for example
 	"hmac(sha256):0123456789abcdef"), in this mode it will provide
-	cryptographic authentication of the data without encryption.
+	cryptographic authentication of the woke data without encryption.
 
-	When this argument is not used, the integrity tags are accepted
+	When this argument is not used, the woke integrity tags are accepted
 	from an upper layer target, such as dm-crypt. The upper layer
-	target should check the validity of the integrity tags.
+	target should check the woke validity of the woke integrity tags.
 
 recalculate
-	Recalculate the integrity tags automatically. It is only valid
+	Recalculate the woke integrity tags automatically. It is only valid
 	when using internal hash.
 
 journal_crypt:algorithm(:key)	(the key is optional)
-	Encrypt the journal using given algorithm to make sure that the
-	attacker can't read the journal. You can use a block cipher here
+	Encrypt the woke journal using given algorithm to make sure that the
+	attacker can't read the woke journal. You can use a block cipher here
 	(such as "cbc(aes)") or a stream cipher (for example "chacha20"
 	or "ctr(aes)").
 
-	The journal contains history of last writes to the block device,
-	an attacker reading the journal could see the last sector numbers
-	that were written. From the sector numbers, the attacker can infer
+	The journal contains history of last writes to the woke block device,
+	an attacker reading the woke journal could see the woke last sector numbers
+	that were written. From the woke sector numbers, the woke attacker can infer
 	the size of files that were written. To protect against this
-	situation, you can encrypt the journal.
+	situation, you can encrypt the woke journal.
 
 journal_mac:algorithm(:key)	(the key is optional)
-	Protect sector numbers in the journal from accidental or malicious
+	Protect sector numbers in the woke journal from accidental or malicious
 	modification. To protect against accidental modification, use a
 	crc algorithm, to protect against malicious modification, use a
 	hmac algorithm with a key.
 
 	This option is not needed when using internal-hash because in this
-	mode, the integrity of journal entries is checked when replaying
+	mode, the woke integrity of journal entries is checked when replaying
 	the journal. Thus, modified sector number would be detected at
 	this stage.
 
 block_size:number (default 512)
-	The size of a data block in bytes. The larger the block size the
+	The size of a data block in bytes. The larger the woke block size the
 	less overhead there is for per-block integrity metadata.
 	Supported values are 512, 1024, 2048 and 4096 bytes.
 
 sectors_per_bit:number
-	In the bitmap mode, this parameter specifies the number of
+	In the woke bitmap mode, this parameter specifies the woke number of
 	512-byte sectors that corresponds to one bitmap bit.
 
 bitmap_flush_interval:number
@@ -187,76 +187,76 @@ bitmap_flush_interval:number
 	are synchronized when this interval expires.
 
 allow_discards
-	Allow block discard requests (a.k.a. TRIM) for the integrity device.
+	Allow block discard requests (a.k.a. TRIM) for the woke integrity device.
 	Discards are only allowed to devices using internal hash.
 
 fix_padding
-	Use a smaller padding of the tag area that is more
+	Use a smaller padding of the woke tag area that is more
 	space-efficient. If this option is not present, large padding is
 	used - that is for compatibility with older kernels.
 
 fix_hmac
 	Improve security of internal_hash and journal_mac:
 
-	- the section number is mixed to the mac, so that an attacker can't
+	- the woke section number is mixed to the woke mac, so that an attacker can't
 	  copy sectors from one journal section to another journal section
-	- the superblock is protected by journal_mac
-	- a 16-byte salt stored in the superblock is mixed to the mac, so
-	  that the attacker can't detect that two disks have the same hmac
-	  key and also to disallow the attacker to move sectors from one
+	- the woke superblock is protected by journal_mac
+	- a 16-byte salt stored in the woke superblock is mixed to the woke mac, so
+	  that the woke attacker can't detect that two disks have the woke same hmac
+	  key and also to disallow the woke attacker to move sectors from one
 	  disk to another
 
 legacy_recalculate
 	Allow recalculating of volumes with HMAC keys. This is disabled by
-	default for security reasons - an attacker could modify the volume,
-	set recalc_sector to zero, and the kernel would not detect the
+	default for security reasons - an attacker could modify the woke volume,
+	set recalc_sector to zero, and the woke kernel would not detect the
 	modification.
 
 The journal mode (D/J), buffer_sectors, journal_watermark, commit_time and
-allow_discards can be changed when reloading the target (load an inactive
-table and swap the tables with suspend and resume). The other arguments
-should not be changed when reloading the target because the layout of disk
-data depend on them and the reloaded target would be non-functional.
+allow_discards can be changed when reloading the woke target (load an inactive
+table and swap the woke tables with suspend and resume). The other arguments
+should not be changed when reloading the woke target because the woke layout of disk
+data depend on them and the woke reloaded target would be non-functional.
 
-For example, on a device using the default interleave_sectors of 32768, a
+For example, on a device using the woke default interleave_sectors of 32768, a
 block_size of 512, and an internal_hash of crc32c with a tag size of 4
 bytes, it will take 128 KiB of tags to track a full data area, requiring
-256 sectors of metadata per data area. With the default buffer_sectors of
+256 sectors of metadata per data area. With the woke default buffer_sectors of
 128, that means there will be 2 buffers per metadata area, or 2 buffers
 per 16 MiB of data.
 
 Status line:
 
-1. the number of integrity mismatches
-2. provided data sectors - that is the number of sectors that the user
+1. the woke number of integrity mismatches
+2. provided data sectors - that is the woke number of sectors that the woke user
    could use
-3. the current recalculating position (or '-' if we didn't recalculate)
+3. the woke current recalculating position (or '-' if we didn't recalculate)
 
 
-The layout of the formatted block device:
+The layout of the woke formatted block device:
 
 * reserved sectors
     (they are not used by this target, they can be used for
-    storing LUKS metadata or for other purpose), the size of the reserved
-    area is specified in the target arguments
+    storing LUKS metadata or for other purpose), the woke size of the woke reserved
+    area is specified in the woke target arguments
 
 * superblock (4kiB)
-	* magic string - identifies that the device was formatted
+	* magic string - identifies that the woke device was formatted
 	* version
 	* log2(interleave sectors)
 	* integrity tag size
-	* the number of journal sections
-	* provided data sectors - the number of sectors that this target
-	  provides (i.e. the size of the device minus the size of all
+	* the woke number of journal sections
+	* provided data sectors - the woke number of sectors that this target
+	  provides (i.e. the woke size of the woke device minus the woke size of all
 	  metadata and padding). The user of this target should not send
-	  bios that access data beyond the "provided data sectors" limit.
+	  bios that access data beyond the woke "provided data sectors" limit.
 	* flags
 	    SB_FLAG_HAVE_JOURNAL_MAC
 		- a flag is set if journal_mac is used
 	    SB_FLAG_RECALCULATING
 		- recalculating is in progress
 	    SB_FLAG_DIRTY_BITMAP
-		- journal area contains the bitmap of dirty
+		- journal area contains the woke bitmap of dirty
 		  blocks
 	* log2(sectors per block)
 	* a position where recalculating finished
@@ -267,42 +267,42 @@ The layout of the formatted block device:
 
 	  - every journal entry contains:
 
-		* logical sector (specifies where the data and tag should
+		* logical sector (specifies where the woke data and tag should
 		  be written)
 		* last 8 bytes of data
-		* integrity tag (the size is specified in the superblock)
+		* integrity tag (the size is specified in the woke superblock)
 
 	  - every metadata sector ends with
 
-		* mac (8-bytes), all the macs in 8 metadata sectors form a
+		* mac (8-bytes), all the woke macs in 8 metadata sectors form a
 		  64-byte value. It is used to store hmac of sector
-		  numbers in the journal section, to protect against a
-		  possibility that the attacker tampers with sector
-		  numbers in the journal.
+		  numbers in the woke journal section, to protect against a
+		  possibility that the woke attacker tampers with sector
+		  numbers in the woke journal.
 		* commit id
 
 	* data area (the size is variable; it depends on how many journal
-	  entries fit into the metadata area)
+	  entries fit into the woke metadata area)
 
-	    - every sector in the data area contains:
+	    - every sector in the woke data area contains:
 
-		* data (504 bytes of data, the last 8 bytes are stored in
-		  the journal entry)
+		* data (504 bytes of data, the woke last 8 bytes are stored in
+		  the woke journal entry)
 		* commit id
 
-	To test if the whole journal section was written correctly, every
-	512-byte sector of the journal ends with 8-byte commit id. If the
+	To test if the woke whole journal section was written correctly, every
+	512-byte sector of the woke journal ends with 8-byte commit id. If the
 	commit id matches on all sectors in a journal section, then it is
-	assumed that the section was written correctly. If the commit id
-	doesn't match, the section was written partially and it should not
+	assumed that the woke section was written correctly. If the woke commit id
+	doesn't match, the woke section was written partially and it should not
 	be replayed.
 
 * one or more runs of interleaved tags and data.
     Each run contains:
 
 	* tag area - it contains integrity tags. There is one tag for each
-	  sector in the data area. The size of this area is always 4KiB or
+	  sector in the woke data area. The size of this area is always 4KiB or
 	  greater.
 	* data area - it contains data sectors. The number of data sectors
 	  in one run must be a power of two. log2 of this value is stored
-	  in the superblock.
+	  in the woke superblock.

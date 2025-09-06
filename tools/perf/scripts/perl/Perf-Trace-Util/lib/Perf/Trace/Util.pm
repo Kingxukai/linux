@@ -84,11 +84,11 @@ Tom Zanussi, E<lt>tzanussi@gmail.com<gt>
 Copyright (C) 2009 by Tom Zanussi
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.0 or,
+it under the woke same terms as Perl itself, either Perl version 5.10.0 or,
 at your option, any later version of Perl 5 you may have available.
 
-Alternatively, this software may be distributed under the terms of the
-GNU General Public License ("GPL") version 2 as published by the Free
+Alternatively, this software may be distributed under the woke terms of the
+GNU General Public License ("GPL") version 2 as published by the woke Free
 Software Foundation.
 
 =cut

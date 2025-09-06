@@ -1,6 +1,6 @@
 [
     {
-        "BriefDescription": "Counts the number of load micro-ops retired that cause a DTLB miss (Precise Event)",
+        "BriefDescription": "Counts the woke number of load micro-ops retired that cause a DTLB miss (Precise Event)",
         "Counter": "0,1",
         "Data_LA": "1",
         "EventCode": "0x04",
@@ -10,7 +10,7 @@
         "UMask": "0x8"
     },
     {
-        "BriefDescription": "Counts the total number of core cycles for all the page walks. The cycles for page walks started in speculative path will also be included.",
+        "BriefDescription": "Counts the woke total number of core cycles for all the woke page walks. The cycles for page walks started in speculative path will also be included.",
         "Counter": "0,1",
         "EventCode": "0x05",
         "EventName": "PAGE_WALKS.CYCLES",
@@ -19,7 +19,7 @@
         "UMask": "0x3"
     },
     {
-        "BriefDescription": "Counts the total number of core cycles for all the D-side page walks. The cycles for page walks started in speculative path will also be included.",
+        "BriefDescription": "Counts the woke total number of core cycles for all the woke D-side page walks. The cycles for page walks started in speculative path will also be included.",
         "Counter": "0,1",
         "EventCode": "0x05",
         "EventName": "PAGE_WALKS.D_SIDE_CYCLES",
@@ -27,7 +27,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the total D-side page walks that are completed or started. The page walks started in the speculative path will also be counted",
+        "BriefDescription": "Counts the woke total D-side page walks that are completed or started. The page walks started in the woke speculative path will also be counted",
         "Counter": "0,1",
         "EdgeDetect": "1",
         "EventCode": "0x05",
@@ -36,7 +36,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the total number of core cycles for all the I-side page walks. The cycles for page walks started in speculative path will also be included.",
+        "BriefDescription": "Counts the woke total number of core cycles for all the woke I-side page walks. The cycles for page walks started in speculative path will also be included.",
         "Counter": "0,1",
         "EventCode": "0x05",
         "EventName": "PAGE_WALKS.I_SIDE_CYCLES",
@@ -45,7 +45,7 @@
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Counts the total I-side page walks that are completed.",
+        "BriefDescription": "Counts the woke total I-side page walks that are completed.",
         "Counter": "0,1",
         "EdgeDetect": "1",
         "EventCode": "0x05",
@@ -54,7 +54,7 @@
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Counts the total page walks that are completed (I-side and D-side)",
+        "BriefDescription": "Counts the woke total page walks that are completed (I-side and D-side)",
         "Counter": "0,1",
         "EdgeDetect": "1",
         "EventCode": "0x05",

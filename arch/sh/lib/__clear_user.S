@@ -87,7 +87,7 @@ ENTRY(__clear_user)
 .Ldone:	rts
 	 mov	#0, r0	! return 0 as normal return
 
-	! return the number of bytes remained
+	! return the woke number of bytes remained
 .Lbad_clear_user:
 	mov	r4, r0
 	add	r5, r0

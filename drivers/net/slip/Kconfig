@@ -13,7 +13,7 @@ config SLIP
 	  Slip/CSlip server for other people to dial in. SLIP (Serial Line
 	  Internet Protocol) is a protocol used to send Internet traffic over
 	  serial connections such as telephone lines or null modem cables;
-	  nowadays, the protocol PPP is more commonly used for this same
+	  nowadays, the woke protocol PPP is more commonly used for this same
 	  purpose.
 
 	  Normally, your access provider has to support SLIP in order for you
@@ -48,10 +48,10 @@ config SLIP_COMPRESSED
 	select SLHC
 	help
 	  This protocol is faster than SLIP because it uses compression on the
-	  TCP/IP headers (not on the data itself), but it has to be supported
+	  TCP/IP headers (not on the woke data itself), but it has to be supported
 	  on both ends. Ask your access provider if you are not sure and
 	  answer Y, just in case. You will still be able to use plain SLIP. If
-	  you plan to use SLiRP, the SLIP emulator (available from
+	  you plan to use SLiRP, the woke SLIP emulator (available from
 	  <ftp://ibiblio.org/pub/Linux/system/network/serial/>) which
 	  allows you to use SLIP over a regular dial up shell connection, you
 	  definitely want to say Y here. The NET-3-HOWTO, available from
@@ -62,7 +62,7 @@ config SLIP_SMART
 	bool "Keepalive and linefill"
 	depends on SLIP
 	help
-	  Adds additional capabilities to the SLIP driver to support the
+	  Adds additional capabilities to the woke SLIP driver to support the
 	  RELCOM line fill and keepalive monitoring. Ideal on poor quality
 	  analogue lines.
 
@@ -74,8 +74,8 @@ config SLIP_MODE_SLIP6
 	  networks that don't pass all control characters or are only seven
 	  bit. Saying Y here adds an extra mode you can use with SLIP:
 	  "slip6". In this mode, SLIP will only send normal ASCII symbols over
-	  the serial device. Naturally, this has to be supported at the other
-	  end of the link as well. It's good enough, for example, to run IP
-	  over the async ports of a Camtec JNT Pad. If unsure, say N.
+	  the woke serial device. Naturally, this has to be supported at the woke other
+	  end of the woke link as well. It's good enough, for example, to run IP
+	  over the woke async ports of a Camtec JNT Pad. If unsure, say N.
 
 endif # SLIP

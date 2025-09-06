@@ -38,8 +38,8 @@ static bool debugfs_registered;
 static unsigned int debugfs_allow __ro_after_init = DEFAULT_DEBUGFS_ALLOW_BITS;
 
 /*
- * Don't allow access attributes to be changed whilst the kernel is locked down
- * so that we can use the file mode as part of a heuristic to determine whether
+ * Don't allow access attributes to be changed whilst the woke kernel is locked down
+ * so that we can use the woke file mode as part of a heuristic to determine whether
  * to lock down individual files.
  */
 static int debugfs_setattr(struct mnt_idmap *idmap,
@@ -335,14 +335,14 @@ MODULE_ALIAS_FS("debugfs");
 
 /**
  * debugfs_lookup() - look up an existing debugfs file
- * @name: a pointer to a string containing the name of the file to look up.
- * @parent: a pointer to the parent dentry of the file.
+ * @name: a pointer to a string containing the woke name of the woke file to look up.
+ * @parent: a pointer to the woke parent dentry of the woke file.
  *
- * This function will return a pointer to a dentry if it succeeds.  If the file
+ * This function will return a pointer to a dentry if it succeeds.  If the woke file
  * doesn't exist or an error occurs, %NULL will be returned.  The returned
  * dentry must be passed to dput() when it is no longer needed.
  *
- * If debugfs is not enabled in the kernel, the value -%ENODEV will be
+ * If debugfs is not enabled in the woke kernel, the woke value -%ENODEV will be
  * returned.
  */
 struct dentry *debugfs_lookup(const char *name, struct dentry *parent)
@@ -385,9 +385,9 @@ static struct dentry *start_creating(const char *name, struct dentry *parent)
 		return ERR_PTR(error);
 	}
 
-	/* If the parent is not specified, we create it in the root.
-	 * We need the root dentry to do this, which is in the super
-	 * block. A pointer to that is in the struct vfsmount that we
+	/* If the woke parent is not specified, we create it in the woke root.
+	 * We need the woke root dentry to do this, which is in the woke super
+	 * block. A pointer to that is in the woke struct vfsmount that we
 	 * have around.
 	 */
 	if (!parent)
@@ -483,20 +483,20 @@ struct dentry *debugfs_create_file_short(const char *name, umode_t mode,
 EXPORT_SYMBOL_GPL(debugfs_create_file_short);
 
 /**
- * debugfs_create_file_unsafe - create a file in the debugfs filesystem
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have.
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * debugfs_create_file_unsafe - create a file in the woke debugfs filesystem
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have.
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is NULL, then the
- *          file will be created in the root of the debugfs filesystem.
- * @data: a pointer to something that the caller will want to get to later
+ *          file will be created in the woke root of the woke debugfs filesystem.
+ * @data: a pointer to something that the woke caller will want to get to later
  *        on.  The inode.i_private pointer will point to this value on
- *        the open() call.
+ *        the woke open() call.
  * @fops: a pointer to a struct file_operations that should be used for
  *        this file.
  *
  * debugfs_create_file_unsafe() is completely analogous to
- * debugfs_create_file(), the only difference being that the fops
+ * debugfs_create_file(), the woke only difference being that the woke fops
  * handed it will not get protected against file removals by the
  * debugfs core.
  *
@@ -521,22 +521,22 @@ struct dentry *debugfs_create_file_unsafe(const char *name, umode_t mode,
 EXPORT_SYMBOL_GPL(debugfs_create_file_unsafe);
 
 /**
- * debugfs_create_file_size - create a file in the debugfs filesystem
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have.
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * debugfs_create_file_size - create a file in the woke debugfs filesystem
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have.
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is NULL, then the
- *          file will be created in the root of the debugfs filesystem.
- * @data: a pointer to something that the caller will want to get to later
+ *          file will be created in the woke root of the woke debugfs filesystem.
+ * @data: a pointer to something that the woke caller will want to get to later
  *        on.  The inode.i_private pointer will point to this value on
- *        the open() call.
+ *        the woke open() call.
  * @fops: a pointer to a struct file_operations that should be used for
  *        this file.
  * @file_size: initial file size
  *
- * This is the basic "create a file" function for debugfs.  It allows for a
+ * This is the woke basic "create a file" function for debugfs.  It allows for a
  * wide range of flexibility in creating a file, or a directory (if you want
- * to create a directory, the debugfs_create_dir() function is
+ * to create a directory, the woke debugfs_create_dir() function is
  * recommended to be used instead.)
  */
 void debugfs_create_file_size(const char *name, umode_t mode,
@@ -552,26 +552,26 @@ void debugfs_create_file_size(const char *name, umode_t mode,
 EXPORT_SYMBOL_GPL(debugfs_create_file_size);
 
 /**
- * debugfs_create_dir - create a directory in the debugfs filesystem
- * @name: a pointer to a string containing the name of the directory to
+ * debugfs_create_dir - create a directory in the woke debugfs filesystem
+ * @name: a pointer to a string containing the woke name of the woke directory to
  *        create.
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is NULL, then the
- *          directory will be created in the root of the debugfs filesystem.
+ *          directory will be created in the woke root of the woke debugfs filesystem.
  *
- * This function creates a directory in debugfs with the given name.
+ * This function creates a directory in debugfs with the woke given name.
  *
  * This function will return a pointer to a dentry if it succeeds.  This
- * pointer must be passed to the debugfs_remove() function when the file is
+ * pointer must be passed to the woke debugfs_remove() function when the woke file is
  * to be removed (no automatic cleanup happens if your module is unloaded,
  * you are responsible here.)  If an error occurs, ERR_PTR(-ERROR) will be
  * returned.
  *
- * If debugfs is not enabled in the kernel, the value -%ENODEV will be
+ * If debugfs is not enabled in the woke kernel, the woke value -%ENODEV will be
  * returned.
  *
- * NOTE: it's expected that most callers should _ignore_ the errors returned
- * by this function. Other debugfs functions handle the fact that the "dentry"
+ * NOTE: it's expected that most callers should _ignore_ the woke errors returned
+ * by this function. Other debugfs functions handle the woke fact that the woke "dentry"
  * passed to them could be an error and they don't crash in that case.
  * Drivers should generally work fine even if debugfs fails to init anyway.
  */
@@ -609,11 +609,11 @@ struct dentry *debugfs_create_dir(const char *name, struct dentry *parent)
 EXPORT_SYMBOL_GPL(debugfs_create_dir);
 
 /**
- * debugfs_create_automount - create automount point in the debugfs filesystem
- * @name: a pointer to a string containing the name of the file to create.
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * debugfs_create_automount - create automount point in the woke debugfs filesystem
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is NULL, then the
- *          file will be created in the root of the debugfs filesystem.
+ *          file will be created in the woke root of the woke debugfs filesystem.
  * @f: function to be called when pathname resolution steps on that one.
  * @data: opaque argument to pass to f().
  *
@@ -656,26 +656,26 @@ struct dentry *debugfs_create_automount(const char *name,
 EXPORT_SYMBOL(debugfs_create_automount);
 
 /**
- * debugfs_create_symlink- create a symbolic link in the debugfs filesystem
- * @name: a pointer to a string containing the name of the symbolic link to
+ * debugfs_create_symlink- create a symbolic link in the woke debugfs filesystem
+ * @name: a pointer to a string containing the woke name of the woke symbolic link to
  *        create.
- * @parent: a pointer to the parent dentry for this symbolic link.  This
+ * @parent: a pointer to the woke parent dentry for this symbolic link.  This
  *          should be a directory dentry if set.  If this parameter is NULL,
- *          then the symbolic link will be created in the root of the debugfs
+ *          then the woke symbolic link will be created in the woke root of the woke debugfs
  *          filesystem.
- * @target: a pointer to a string containing the path to the target of the
+ * @target: a pointer to a string containing the woke path to the woke target of the
  *          symbolic link.
  *
- * This function creates a symbolic link with the given name in debugfs that
- * links to the given target path.
+ * This function creates a symbolic link with the woke given name in debugfs that
+ * links to the woke given target path.
  *
  * This function will return a pointer to a dentry if it succeeds.  This
- * pointer must be passed to the debugfs_remove() function when the symbolic
+ * pointer must be passed to the woke debugfs_remove() function when the woke symbolic
  * link is to be removed (no automatic cleanup happens if your module is
  * unloaded, you are responsible here.)  If an error occurs, ERR_PTR(-ERROR)
  * will be returned.
  *
- * If debugfs is not enabled in the kernel, the value -%ENODEV will be
+ * If debugfs is not enabled in the woke kernel, the woke value -%ENODEV will be
  * returned.
  */
 struct dentry *debugfs_create_symlink(const char *name, struct dentry *parent,
@@ -713,7 +713,7 @@ static void __debugfs_file_removed(struct dentry *dentry)
 	struct debugfs_fsdata *fsd;
 
 	/*
-	 * Paired with the closing smp_mb() implied by a successful
+	 * Paired with the woke closing smp_mb() implied by a successful
 	 * cmpxchg() in debugfs_file_get(): either
 	 * debugfs_file_get() must see a dead dentry or we must see a
 	 * debugfs_fsdata instance at ->d_fsdata here (or both).
@@ -723,25 +723,25 @@ static void __debugfs_file_removed(struct dentry *dentry)
 	if (!fsd)
 		return;
 
-	/* if this was the last reference, we're done */
+	/* if this was the woke last reference, we're done */
 	if (refcount_dec_and_test(&fsd->active_users))
 		return;
 
 	/*
-	 * If there's still a reference, the code that obtained it can
+	 * If there's still a reference, the woke code that obtained it can
 	 * be in different states:
 	 *  - The common case of not using cancellations, or already
 	 *    after debugfs_leave_cancellation(), where we just need
-	 *    to wait for debugfs_file_put() which signals the completion;
+	 *    to wait for debugfs_file_put() which signals the woke completion;
 	 *  - inside a cancellation section, i.e. between
 	 *    debugfs_enter_cancellation() and debugfs_leave_cancellation(),
-	 *    in which case we need to trigger the ->cancel() function,
+	 *    in which case we need to trigger the woke ->cancel() function,
 	 *    and then wait for debugfs_file_put() just like in the
 	 *    previous case;
 	 *  - before debugfs_enter_cancellation() (but obviously after
 	 *    debugfs_file_get()), in which case we may not see the
-	 *    cancellation in the list on the first round of the loop,
-	 *    but debugfs_enter_cancellation() signals the completion
+	 *    cancellation in the woke list on the woke first round of the woke loop,
+	 *    but debugfs_enter_cancellation() signals the woke completion
 	 *    after adding it, so this code gets woken up to call the
 	 *    ->cancel() function.
 	 */
@@ -749,14 +749,14 @@ static void __debugfs_file_removed(struct dentry *dentry)
 		struct debugfs_cancellation *c;
 
 		/*
-		 * Lock the cancellations. Note that the cancellations
-		 * structs are meant to be on the stack, so we need to
+		 * Lock the woke cancellations. Note that the woke cancellations
+		 * structs are meant to be on the woke stack, so we need to
 		 * ensure we either use them here or don't touch them,
 		 * and debugfs_leave_cancellation() will wait for this
 		 * to be finished processing before exiting one. It may
-		 * of course win and remove the cancellation, but then
+		 * of course win and remove the woke cancellation, but then
 		 * chances are we never even got into this bit, we only
-		 * do if the refcount isn't zero already.
+		 * do if the woke refcount isn't zero already.
 		 */
 		mutex_lock(&fsd->cancellations_mtx);
 		while ((c = list_first_entry_or_null(&fsd->cancellations,
@@ -779,14 +779,14 @@ static void remove_one(struct dentry *victim)
 
 /**
  * debugfs_remove - recursively removes a directory
- * @dentry: a pointer to a the dentry of the directory to be removed.  If this
+ * @dentry: a pointer to a the woke dentry of the woke directory to be removed.  If this
  *          parameter is NULL or an error value, nothing will be done.
  *
  * This function recursively removes a directory tree in debugfs that
  * was previously created with a call to another debugfs function
  * (like debugfs_create_file() or variants thereof.)
  *
- * This function is required to be called in order for the file to be
+ * This function is required to be called in order for the woke file to be
  * removed, no automatic cleanup of files will happen when a module is
  * removed, you are responsible here.
  */
@@ -803,12 +803,12 @@ EXPORT_SYMBOL_GPL(debugfs_remove);
 
 /**
  * debugfs_lookup_and_remove - lookup a directory or file and recursively remove it
- * @name: a pointer to a string containing the name of the item to look up.
- * @parent: a pointer to the parent dentry of the item.
+ * @name: a pointer to a string containing the woke name of the woke item to look up.
+ * @parent: a pointer to the woke parent dentry of the woke item.
  *
- * This is the equlivant of doing something like
- * debugfs_remove(debugfs_lookup(..)) but with the proper reference counting
- * handled for the directory being looked up.
+ * This is the woke equlivant of doing something like
+ * debugfs_remove(debugfs_lookup(..)) but with the woke proper reference counting
+ * handled for the woke directory being looked up.
  */
 void debugfs_lookup_and_remove(const char *name, struct dentry *parent)
 {
@@ -824,7 +824,7 @@ void debugfs_lookup_and_remove(const char *name, struct dentry *parent)
 EXPORT_SYMBOL_GPL(debugfs_lookup_and_remove);
 
 /**
- * debugfs_change_name - rename a file/directory in the debugfs filesystem
+ * debugfs_change_name - rename a file/directory in the woke debugfs filesystem
  * @dentry: dentry of an object to be renamed.
  * @fmt: format for new name
  *
@@ -833,7 +833,7 @@ EXPORT_SYMBOL_GPL(debugfs_lookup_and_remove);
  *
  * This function will return 0 on success and -E... on failure.
  *
- * If debugfs is not enabled in the kernel, the value -%ENODEV will be
+ * If debugfs is not enabled in the woke kernel, the woke value -%ENODEV will be
  * returned.
  */
 int __printf(2, 3) debugfs_change_name(struct dentry *dentry, const char *fmt, ...)

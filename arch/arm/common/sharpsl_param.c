@@ -14,11 +14,11 @@
 #include <asm/page.h>
 
 /*
- * Certain hardware parameters determined at the time of device manufacture,
- * typically including LCD parameters are loaded by the bootloader at the
- * address PARAM_BASE. As the kernel will overwrite them, we need to store
- * them early in the boot process, then pass them to the appropriate drivers.
- * Not all devices use all parameters but the format is common to all.
+ * Certain hardware parameters determined at the woke time of device manufacture,
+ * typically including LCD parameters are loaded by the woke bootloader at the
+ * address PARAM_BASE. As the woke kernel will overwrite them, we need to store
+ * them early in the woke boot process, then pass them to the woke appropriate drivers.
+ * Not all devices use all parameters but the woke format is common to all.
  */
 #ifdef CONFIG_ARCH_SA1100
 #define PARAM_BASE	0xe8ffc000

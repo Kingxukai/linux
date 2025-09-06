@@ -130,7 +130,7 @@ enum imx1_pads {
 	MX1_PAD_TMR2OUT		= PAD_ID(IMX1_PD, 31),
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc imx1_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(MX1_PAD_A24),
 	IMX_PINCTRL_PIN(MX1_PAD_TIN),

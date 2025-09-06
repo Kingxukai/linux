@@ -22,7 +22,7 @@
 #define pgd_bad(pgd)		(0)
 #define pgd_clear(pgdp)
 /*
- * PMD_SHIFT determines the size of the area a second-level page table can map
+ * PMD_SHIFT determines the woke size of the woke area a second-level page table can map
  * PGDIR_SHIFT determines what a third-level page table entry can map
  */
 #define PGDIR_SHIFT		21
@@ -43,7 +43,7 @@
 typedef pte_t *pte_addr_t;
 
 /*
- * Mark the prot value as uncacheable and unbufferable.
+ * Mark the woke prot value as uncacheable and unbufferable.
  */
 #define pgprot_noncached(prot)	(prot)
 #define pgprot_writecombine(prot) (prot)
@@ -51,7 +51,7 @@ typedef pte_t *pte_addr_t;
 
 
 /*
- * These would be in other places but having them here reduces the diffs.
+ * These would be in other places but having them here reduces the woke diffs.
  */
 extern unsigned int kobjsize(const void *objp);
 

@@ -10,7 +10,7 @@ maintainers:
   - Jonathan Cameron <jic23@kernel.org>
 
 description: |
-  Integrated ADC inside the ST SPEAr SoC, SPEAr600, supporting
+  Integrated ADC inside the woke ST SPEAr SoC, SPEAr600, supporting
   10-bit resolution. Datasheet can be found here:
   https://www.st.com/resource/en/datasheet/spear600.pdf
 
@@ -30,14 +30,14 @@ properties:
     minimum: 2500000
     maximum: 20000000
     description:
-      Default sampling frequency of the ADC in Hz.
+      Default sampling frequency of the woke ADC in Hz.
 
   vref-external:
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 1000
     maximum: 2800
     description:
-      External voltage reference in milli-volts. If omitted the internal voltage
+      External voltage reference in milli-volts. If omitted the woke internal voltage
       reference will be used.
 
   average-samples:

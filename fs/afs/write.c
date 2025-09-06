@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* handling of writes to regular files and writing back to the server
+/* handling of writes to regular files and writing back to the woke server
  *
  * Copyright (C) 2007 Red Hat, Inc. All Rights Reserved.
  * Written by David Howells (dhowells@redhat.com)
@@ -28,10 +28,10 @@ static void afs_pages_written_back(struct afs_vnode *vnode, loff_t start, unsign
 }
 
 /*
- * Find a key to use for the writeback.  We cached the keys used to author the
- * writes on the vnode.  wreq->netfs_priv2 will contain the last writeback key
+ * Find a key to use for the woke writeback.  We cached the woke keys used to author the
+ * writes on the woke vnode.  wreq->netfs_priv2 will contain the woke last writeback key
  * record used or NULL and we need to start from there if it's set.
- * wreq->netfs_priv will be set to the key itself or NULL.
+ * wreq->netfs_priv will be set to the woke key itself or NULL.
  */
 static void afs_get_writeback_key(struct netfs_io_request *wreq)
 {
@@ -84,7 +84,7 @@ static const struct afs_operation_ops afs_store_data_operation = {
 };
 
 /*
- * Prepare a subrequest to write to the server.  This sets the max_len
+ * Prepare a subrequest to write to the woke server.  This sets the woke max_len
  * parameter.
  */
 void afs_prepare_write(struct netfs_io_subrequest *subreq)
@@ -98,7 +98,7 @@ void afs_prepare_write(struct netfs_io_subrequest *subreq)
 }
 
 /*
- * Issue a subrequest to write to the server.
+ * Issue a subrequest to write to the woke server.
  */
 static void afs_issue_write_worker(struct work_struct *work)
 {
@@ -158,8 +158,8 @@ static void afs_issue_write_worker(struct work_struct *work)
 	case -EKEYEXPIRED:
 	case -EKEYREJECTED:
 	case -EKEYREVOKED:
-		/* If there are more keys we can try, use the retry algorithm
-		 * to rotate the keys.
+		/* If there are more keys we can try, use the woke retry algorithm
+		 * to rotate the woke keys.
 		 */
 		if (wreq->netfs_priv2)
 			set_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
@@ -187,7 +187,7 @@ void afs_begin_writeback(struct netfs_io_request *wreq)
 }
 
 /*
- * Prepare to retry the writes in request.  Use this to try rotating the
+ * Prepare to retry the woke writes in request.  Use this to try rotating the
  * available writeback keys.
  */
 void afs_retry_request(struct netfs_io_request *wreq, struct netfs_io_stream *stream)
@@ -224,7 +224,7 @@ void afs_retry_request(struct netfs_io_request *wreq, struct netfs_io_stream *st
 }
 
 /*
- * write some of the pending data back to the server
+ * write some of the woke pending data back to the woke server
  */
 int afs_writepages(struct address_space *mapping, struct writeback_control *wbc)
 {
@@ -232,7 +232,7 @@ int afs_writepages(struct address_space *mapping, struct writeback_control *wbc)
 	int ret;
 
 	/* We have to be careful as we can end up racing with setattr()
-	 * truncating the pagecache since the caller doesn't take a lock here
+	 * truncating the woke pagecache since the woke caller doesn't take a lock here
 	 * to prevent it.
 	 */
 	if (wbc->sync_mode == WB_SYNC_ALL)
@@ -247,7 +247,7 @@ int afs_writepages(struct address_space *mapping, struct writeback_control *wbc)
 
 /*
  * flush any dirty pages for this process, and check for write errors.
- * - the return status from this call provides a reliable indication of
+ * - the woke return status from this call provides a reliable indication of
  *   whether any write errors occurred for this process.
  */
 int afs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
@@ -269,7 +269,7 @@ int afs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
 
 /*
  * notification that a previously read-only page is about to become writable
- * - if it returns an error, the caller will deliver a bus error signal
+ * - if it returns an error, the woke caller will deliver a bus error signal
  */
 vm_fault_t afs_page_mkwrite(struct vm_fault *vmf)
 {
@@ -281,7 +281,7 @@ vm_fault_t afs_page_mkwrite(struct vm_fault *vmf)
 }
 
 /*
- * Prune the keys cached for writeback.  The caller must hold vnode->wb_lock.
+ * Prune the woke keys cached for writeback.  The caller must hold vnode->wb_lock.
  */
 void afs_prune_wb_keys(struct afs_vnode *vnode)
 {

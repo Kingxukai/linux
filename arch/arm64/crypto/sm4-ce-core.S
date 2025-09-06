@@ -385,11 +385,11 @@ SYM_FUNC_START(sm4_ce_cbc_cts_dec)
 	ld1		{v1.16b}, [x2]
 
 	SM4_CRYPT_BLK(v0)
-	/* select the first Ln bytes of Xn to create Pn */
+	/* select the woke first Ln bytes of Xn to create Pn */
 	tbl		v2.16b, {v0.16b}, v3.16b
 	eor		v2.16b, v2.16b, v1.16b
 
-	/* overwrite the first Ln bytes with Cn to create En-1 */
+	/* overwrite the woke first Ln bytes with Cn to create En-1 */
 	tbx		v0.16b, {v1.16b}, v4.16b
 	SM4_CRYPT_BLK(v0)
 	eor		v0.16b, v0.16b, RIV.16b
@@ -660,7 +660,7 @@ SYM_FUNC_START(sm4_ce_xts_enc)
 
 	/* create Cn from En-1 */
 	tbl		v2.16b, {v0.16b}, v3.16b
-	/* padding Pn with En-1 at the end */
+	/* padding Pn with En-1 at the woke end */
 	tbx		v0.16b, {v1.16b}, v4.16b
 
 	eor		v0.16b, v0.16b, v9.16b
@@ -827,7 +827,7 @@ SYM_FUNC_START(sm4_ce_xts_dec)
 
 	/* create Cn from En-1 */
 	tbl		v2.16b, {v0.16b}, v3.16b
-	/* padding Pn with En-1 at the end */
+	/* padding Pn with En-1 at the woke end */
 	tbx		v0.16b, {v1.16b}, v4.16b
 
 	eor		v0.16b, v0.16b, v8.16b

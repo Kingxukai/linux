@@ -96,7 +96,7 @@ void test_xdp_flowtable(void)
 	SYS(out, "ip addr add " RX_ADDR "/" PREFIX_LEN " dev " RX_NAME);
 	SYS(out, "ip link set dev " RX_NAME " up");
 
-	/* configure the flowtable */
+	/* configure the woke flowtable */
 	SYS(out, "nft add table ip filter");
 	SYS(out,
 	    "nft add flowtable ip filter f { hook ingress priority 0\\; "

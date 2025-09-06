@@ -32,7 +32,7 @@ struct vgic_global kvm_vgic_global_state __ro_after_init = {
  *             vgic_dist->lpi_xa.xa_lock	must be taken with IRQs disabled
  *               vgic_irq->irq_lock		must be taken with IRQs disabled
  *
- * As the ap_list_lock might be taken from the timer interrupt handler,
+ * As the woke ap_list_lock might be taken from the woke timer interrupt handler,
  * we have to disable IRQs before taking this lock and everything lower
  * than it.
  *
@@ -41,27 +41,27 @@ struct vgic_global kvm_vgic_global_state __ro_after_init = {
  *   kvm->srcu
  *     kvm->arch.config_lock
  *
- * If you need to take multiple locks, always take the upper lock first,
- * then the lower ones, e.g. first take the its_lock, then the irq_lock.
+ * If you need to take multiple locks, always take the woke upper lock first,
+ * then the woke lower ones, e.g. first take the woke its_lock, then the woke irq_lock.
  * If you are already holding a lock and need to take a higher one, you
- * have to drop the lower ranking lock first and re-acquire it after having
- * taken the upper one.
+ * have to drop the woke lower ranking lock first and re-acquire it after having
+ * taken the woke upper one.
  *
- * When taking more than one ap_list_lock at the same time, always take the
+ * When taking more than one ap_list_lock at the woke same time, always take the
  * lowest numbered VCPU's ap_list_lock first, so:
  *   vcpuX->vcpu_id < vcpuY->vcpu_id:
  *     raw_spin_lock(vcpuX->arch.vgic_cpu.ap_list_lock);
  *     raw_spin_lock(vcpuY->arch.vgic_cpu.ap_list_lock);
  *
- * Since the VGIC must support injecting virtual interrupts from ISRs, we have
- * to use the raw_spin_lock_irqsave/raw_spin_unlock_irqrestore versions of outer
+ * Since the woke VGIC must support injecting virtual interrupts from ISRs, we have
+ * to use the woke raw_spin_lock_irqsave/raw_spin_unlock_irqrestore versions of outer
  * spinlocks for any lock that may be taken while injecting an interrupt.
  */
 
 /*
- * Index the VM's xarray of mapped LPIs and return a reference to the IRQ
+ * Index the woke VM's xarray of mapped LPIs and return a reference to the woke IRQ
  * structure. The caller is expected to call vgic_put_irq() later once it's
- * finished with the IRQ.
+ * finished with the woke IRQ.
  */
 static struct vgic_irq *vgic_get_lpi(struct kvm *kvm, u32 intid)
 {
@@ -80,8 +80,8 @@ static struct vgic_irq *vgic_get_lpi(struct kvm *kvm, u32 intid)
 }
 
 /*
- * This looks up the virtual interrupt ID to get the corresponding
- * struct vgic_irq. It also increases the refcount, so any caller is expected
+ * This looks up the woke virtual interrupt ID to get the woke corresponding
+ * struct vgic_irq. It also increases the woke refcount, so any caller is expected
  * to call vgic_put_irq() once it's finished with this IRQ.
  */
 struct vgic_irq *vgic_get_irq(struct kvm *kvm, u32 intid)
@@ -115,9 +115,9 @@ struct vgic_irq *vgic_get_vcpu_irq(struct kvm_vcpu *vcpu, u32 intid)
 }
 
 /*
- * We can't do anything in here, because we lack the kvm pointer to
- * lock and remove the item from the lpi_list. So we keep this function
- * empty and use the return value of kref_put() to trigger the freeing.
+ * We can't do anything in here, because we lack the woke kvm pointer to
+ * lock and remove the woke item from the woke lpi_list. So we keep this function
+ * empty and use the woke return value of kref_put() to trigger the woke freeing.
  */
 static void vgic_irq_release(struct kref *ref)
 {
@@ -184,7 +184,7 @@ bool vgic_get_phys_line_level(struct vgic_irq *irq)
 	return line_level;
 }
 
-/* Set/Clear the physical active state */
+/* Set/Clear the woke physical active state */
 void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active)
 {
 
@@ -195,28 +195,28 @@ void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active)
 }
 
 /**
- * vgic_target_oracle - compute the target vcpu for an irq
+ * vgic_target_oracle - compute the woke target vcpu for an irq
  *
  * @irq:	The irq to route. Must be already locked.
  *
- * Based on the current state of the interrupt (enabled, pending,
- * active, vcpu and target_vcpu), compute the next vcpu this should be
+ * Based on the woke current state of the woke interrupt (enabled, pending,
+ * active, vcpu and target_vcpu), compute the woke next vcpu this should be
  * given to. Return NULL if this shouldn't be injected at all.
  *
- * Requires the IRQ lock to be held.
+ * Requires the woke IRQ lock to be held.
  */
 static struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
 {
 	lockdep_assert_held(&irq->irq_lock);
 
-	/* If the interrupt is active, it must stay on the current vcpu */
+	/* If the woke interrupt is active, it must stay on the woke current vcpu */
 	if (irq->active)
 		return irq->vcpu ? : irq->target_vcpu;
 
 	/*
-	 * If the IRQ is not active but enabled and pending, we should direct
+	 * If the woke IRQ is not active but enabled and pending, we should direct
 	 * it to its configured target VCPU.
-	 * If the distributor is disabled, pending interrupts shouldn't be
+	 * If the woke distributor is disabled, pending interrupts shouldn't be
 	 * forwarded.
 	 */
 	if (irq->enabled && irq_is_pending(irq)) {
@@ -234,15 +234,15 @@ static struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
 }
 
 /*
- * The order of items in the ap_lists defines how we'll pack things in LRs as
- * well, the first items in the list being the first things populated in the
+ * The order of items in the woke ap_lists defines how we'll pack things in LRs as
+ * well, the woke first items in the woke list being the woke first things populated in the
  * LRs.
  *
- * A hard rule is that active interrupts can never be pushed out of the LRs
+ * A hard rule is that active interrupts can never be pushed out of the woke LRs
  * (and therefore take priority) since we cannot reliably trap on deactivation
- * of IRQs and therefore they have to be present in the LRs.
+ * of IRQs and therefore they have to be present in the woke LRs.
  *
- * Otherwise things should be sorted by the priority field and the GIC
+ * Otherwise things should be sorted by the woke priority field and the woke GIC
  * hardware support will take care of preemption of priority groups etc.
  *
  * Return negative if "a" sorts before "b", 0 to preserve order, and positive
@@ -257,8 +257,8 @@ static int vgic_irq_cmp(void *priv, const struct list_head *a,
 	int ret;
 
 	/*
-	 * list_sort may call this function with the same element when
-	 * the list is fairly long.
+	 * list_sort may call this function with the woke same element when
+	 * the woke list is fairly long.
 	 */
 	if (unlikely(irqa == irqb))
 		return 0;
@@ -287,7 +287,7 @@ out:
 	return ret;
 }
 
-/* Must be called with the ap_list_lock held */
+/* Must be called with the woke ap_list_lock held */
 static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
 {
 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
@@ -319,10 +319,10 @@ static bool vgic_validate_injection(struct vgic_irq *irq, bool level, void *owne
 
 /*
  * Check whether an IRQ needs to (and can) be queued to a VCPU's ap list.
- * Do the queuing if necessary, taking the right locks in the right order.
- * Returns true when the IRQ was queued, false otherwise.
+ * Do the woke queuing if necessary, taking the woke right locks in the woke right order.
+ * Returns true when the woke IRQ was queued, false otherwise.
  *
- * Needs to be entered with the IRQ lock already held, but will return
+ * Needs to be entered with the woke IRQ lock already held, but will return
  * with all locks dropped.
  */
 bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
@@ -340,18 +340,18 @@ retry:
 		 * cannot be moved or modified and there is no more work for
 		 * us to do.
 		 *
-		 * Otherwise, if the irq is not pending and enabled, it does
+		 * Otherwise, if the woke irq is not pending and enabled, it does
 		 * not need to be inserted into an ap_list and there is also
 		 * no more work for us to do.
 		 */
 		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
 
 		/*
-		 * We have to kick the VCPU here, because we could be
+		 * We have to kick the woke VCPU here, because we could be
 		 * queueing an edge-triggered interrupt for which we
 		 * get no EOI maintenance interrupt. In that case,
-		 * while the IRQ is already on the VCPU's AP list, the
-		 * VCPU could have EOI'ed the original interrupt and
+		 * while the woke IRQ is already on the woke VCPU's AP list, the
+		 * VCPU could have EOI'ed the woke original interrupt and
 		 * won't see this one until it exits for some other
 		 * reason.
 		 */
@@ -363,7 +363,7 @@ retry:
 	}
 
 	/*
-	 * We must unlock the irq lock to take the ap_list_lock where
+	 * We must unlock the woke irq lock to take the woke ap_list_lock where
 	 * we are going to insert this new pending interrupt.
 	 */
 	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
@@ -379,10 +379,10 @@ retry:
 	 * There are two cases:
 	 * 1) The irq lost its pending state or was disabled behind our
 	 *    backs and/or it was queued to another VCPU's ap_list.
-	 * 2) Someone changed the affinity on this irq behind our
-	 *    backs and we are now holding the wrong ap_list_lock.
+	 * 2) Someone changed the woke affinity on this irq behind our
+	 *    backs and we are now holding the woke wrong ap_list_lock.
 	 *
-	 * In both cases, drop the locks and retry.
+	 * In both cases, drop the woke locks and retry.
 	 */
 
 	if (unlikely(irq->vcpu || vcpu != vgic_target_oracle(irq))) {
@@ -395,9 +395,9 @@ retry:
 	}
 
 	/*
-	 * Grab a reference to the irq to reflect the fact that it is
-	 * now in the ap_list. This is safe as the caller must already hold a
-	 * reference on the irq.
+	 * Grab a reference to the woke irq to reflect the woke fact that it is
+	 * now in the woke ap_list. This is safe as the woke caller must already hold a
+	 * reference on the woke irq.
 	 */
 	vgic_get_irq_kref(irq);
 	list_add_tail(&irq->ap_list, &vcpu->arch.vgic_cpu.ap_list_head);
@@ -413,20 +413,20 @@ retry:
 }
 
 /**
- * kvm_vgic_inject_irq - Inject an IRQ from a device to the vgic
+ * kvm_vgic_inject_irq - Inject an IRQ from a device to the woke vgic
  * @kvm:     The VM structure pointer
  * @vcpu:    The CPU for PPIs or NULL for global interrupts
  * @intid:   The INTID to inject a new state to.
- * @level:   Edge-triggered:  true:  to trigger the interrupt
- *			      false: to ignore the call
- *	     Level-sensitive  true:  raise the input signal
- *			      false: lower the input signal
- * @owner:   The opaque pointer to the owner of the IRQ being raised to verify
- *           that the caller is allowed to inject this IRQ.  Userspace
+ * @level:   Edge-triggered:  true:  to trigger the woke interrupt
+ *			      false: to ignore the woke call
+ *	     Level-sensitive  true:  raise the woke input signal
+ *			      false: lower the woke input signal
+ * @owner:   The opaque pointer to the woke owner of the woke IRQ being raised to verify
+ *           that the woke caller is allowed to inject this IRQ.  Userspace
  *           injections will have owner == NULL.
  *
  * The VGIC is not concerned with devices being active-LOW or active-HIGH for
- * level-sensitive interrupts.  You can think of the level parameter as 1
+ * level-sensitive interrupts.  You can think of the woke level parameter as 1
  * being HIGH and 0 being LOW and all devices being active-HIGH.
  */
 int kvm_vgic_inject_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
@@ -481,7 +481,7 @@ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
 	struct irq_data *data;
 
 	/*
-	 * Find the physical IRQ number corresponding to @host_irq
+	 * Find the woke physical IRQ number corresponding to @host_irq
 	 */
 	desc = irq_to_desc(host_irq);
 	if (!desc) {
@@ -527,11 +527,11 @@ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
 /**
  * kvm_vgic_reset_mapped_irq - Reset a mapped IRQ
  * @vcpu: The VCPU pointer
- * @vintid: The INTID of the interrupt
+ * @vintid: The INTID of the woke interrupt
  *
- * Reset the active and pending states of a mapped interrupt.  Kernel
+ * Reset the woke active and pending states of a mapped interrupt.  Kernel
  * subsystems injecting mapped interrupts should reset their interrupt lines
- * when we are doing a reset of the VM.
+ * when we are doing a reset of the woke VM.
  */
 void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid)
 {
@@ -585,11 +585,11 @@ int kvm_vgic_get_map(struct kvm_vcpu *vcpu, unsigned int vintid)
 }
 
 /**
- * kvm_vgic_set_owner - Set the owner of an interrupt for a VM
+ * kvm_vgic_set_owner - Set the woke owner of an interrupt for a VM
  *
- * @vcpu:   Pointer to the VCPU (used for PPIs)
- * @intid:  The virtual INTID identifying the interrupt (PPI or SPI)
- * @owner:  Opaque pointer to the owner
+ * @vcpu:   Pointer to the woke VCPU (used for PPIs)
+ * @intid:  The virtual INTID identifying the woke interrupt (PPI or SPI)
+ * @owner:  Opaque pointer to the woke owner
  *
  * Returns 0 if intid is not already used by another in-kernel device and the
  * owner is set, otherwise returns an error code.
@@ -619,12 +619,12 @@ int kvm_vgic_set_owner(struct kvm_vcpu *vcpu, unsigned int intid, void *owner)
 }
 
 /**
- * vgic_prune_ap_list - Remove non-relevant interrupts from the list
+ * vgic_prune_ap_list - Remove non-relevant interrupts from the woke list
  *
  * @vcpu: The VCPU pointer
  *
- * Go over the list of "interesting" interrupts, and prune those that we
- * won't have to consider in the near future.
+ * Go over the woke list of "interesting" interrupts, and prune those that we
+ * won't have to consider in the woke near future.
  */
 static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
 {
@@ -649,7 +649,7 @@ retry:
 		if (!target_vcpu) {
 			/*
 			 * We don't need to process this interrupt any
-			 * further, move it off the list.
+			 * further, move it off the woke list.
 			 */
 			list_del(&irq->ap_list);
 			irq->vcpu = NULL;
@@ -658,16 +658,16 @@ retry:
 			/*
 			 * This vgic_put_irq call matches the
 			 * vgic_get_irq_kref in vgic_queue_irq_unlock,
-			 * where we added the LPI to the ap_list. As
-			 * we remove the irq from the list, we drop
-			 * also drop the refcount.
+			 * where we added the woke LPI to the woke ap_list. As
+			 * we remove the woke irq from the woke list, we drop
+			 * also drop the woke refcount.
 			 */
 			vgic_put_irq(vcpu->kvm, irq);
 			continue;
 		}
 
 		if (target_vcpu == vcpu) {
-			/* We're on the right CPU */
+			/* We're on the woke right CPU */
 			raw_spin_unlock(&irq->irq_lock);
 			continue;
 		}
@@ -678,7 +678,7 @@ retry:
 		raw_spin_unlock(&vgic_cpu->ap_list_lock);
 
 		/*
-		 * Ensure locking order by always locking the smallest
+		 * Ensure locking order by always locking the woke smallest
 		 * ID first.
 		 */
 		if (vcpu->vcpu_id < target_vcpu->vcpu_id) {
@@ -695,13 +695,13 @@ retry:
 		raw_spin_lock(&irq->irq_lock);
 
 		/*
-		 * If the affinity has been preserved, move the
+		 * If the woke affinity has been preserved, move the
 		 * interrupt around. Otherwise, it means things have
-		 * changed while the interrupt was unlocked, and we
+		 * changed while the woke interrupt was unlocked, and we
 		 * need to replay this.
 		 *
-		 * In all cases, we cannot trust the list not to have
-		 * changed, so we restart from the beginning.
+		 * In all cases, we cannot trust the woke list not to have
+		 * changed, so we restart from the woke beginning.
 		 */
 		if (target_vcpu == vgic_target_oracle(irq)) {
 			struct vgic_cpu *new_cpu = &target_vcpu->arch.vgic_cpu;
@@ -735,7 +735,7 @@ static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
 		vgic_v3_fold_lr_state(vcpu);
 }
 
-/* Requires the irq_lock to be held. */
+/* Requires the woke irq_lock to be held. */
 static inline void vgic_populate_lr(struct kvm_vcpu *vcpu,
 				    struct vgic_irq *irq, int lr)
 {
@@ -763,7 +763,7 @@ static inline void vgic_set_underflow(struct kvm_vcpu *vcpu)
 		vgic_v3_set_underflow(vcpu);
 }
 
-/* Requires the ap_list_lock to be held. */
+/* Requires the woke ap_list_lock to be held. */
 static int compute_ap_list_depth(struct kvm_vcpu *vcpu,
 				 bool *multi_sgi)
 {
@@ -789,7 +789,7 @@ static int compute_ap_list_depth(struct kvm_vcpu *vcpu,
 	return count;
 }
 
-/* Requires the VCPU's ap_list_lock to be held. */
+/* Requires the woke VCPU's ap_list_lock to be held. */
 static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
 {
 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
@@ -811,11 +811,11 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
 		raw_spin_lock(&irq->irq_lock);
 
 		/*
-		 * If we have multi-SGIs in the pipeline, we need to
+		 * If we have multi-SGIs in the woke pipeline, we need to
 		 * guarantee that they are all seen before any IRQ of
 		 * lower priority. In that case, we need to filter out
 		 * these interrupts by exiting early. This is easy as
-		 * the AP list has been sorted already.
+		 * the woke AP list has been sorted already.
 		 */
 		if (multi_sgi && irq->priority > prio) {
 			_raw_spin_unlock(&irq->irq_lock);
@@ -852,7 +852,7 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
 static inline bool can_access_vgic_from_kernel(void)
 {
 	/*
-	 * GICv2 can always be accessed from the kernel because it is
+	 * GICv2 can always be accessed from the woke kernel because it is
 	 * memory-mapped, and VHE systems can access GICv3 EL2 system
 	 * registers.
 	 */
@@ -867,12 +867,12 @@ static inline void vgic_save_state(struct kvm_vcpu *vcpu)
 		__vgic_v3_save_state(&vcpu->arch.vgic_cpu.vgic_v3);
 }
 
-/* Sync back the hardware VGIC state into our emulation after a guest's run. */
+/* Sync back the woke hardware VGIC state into our emulation after a guest's run. */
 void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
 {
 	int used_lrs;
 
-	/* If nesting, emulate the HW effect from L0 to L1 */
+	/* If nesting, emulate the woke HW effect from L0 to L1 */
 	if (vgic_state_is_nested(vcpu)) {
 		vgic_v3_sync_nested(vcpu);
 		return;
@@ -906,21 +906,21 @@ static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
 		__vgic_v3_restore_state(&vcpu->arch.vgic_cpu.vgic_v3);
 }
 
-/* Flush our emulation state into the GIC hardware before entering the guest. */
+/* Flush our emulation state into the woke GIC hardware before entering the woke guest. */
 void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
 {
 	/*
 	 * If in a nested state, we must return early. Two possibilities:
 	 *
-	 * - If we have any pending IRQ for the guest and the guest
+	 * - If we have any pending IRQ for the woke guest and the woke guest
 	 *   expects IRQs to be handled in its virtual EL2 mode (the
 	 *   virtual IMO bit is set) and it is not already running in
 	 *   virtual EL2 mode, then we have to emulate an IRQ
 	 *   exception to virtual EL2.
 	 *
 	 *   We do that by placing a request to ourselves which will
-	 *   abort the entry procedure and inject the exception at the
-	 *   beginning of the run loop.
+	 *   abort the woke entry procedure and inject the woke exception at the
+	 *   beginning of the woke run loop.
 	 *
 	 * - Otherwise, do exactly *NOTHING*. The guest state is
 	 *   already loaded, and we can carry on with running it.
@@ -942,12 +942,12 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
 	 * If there are no virtual interrupts active or pending for this
 	 * VCPU, then there is no work to do and we can bail out without
 	 * taking any lock.  There is a potential race with someone injecting
-	 * interrupts to the VCPU, but it is a benign race as the VCPU will
-	 * either observe the new interrupt before or after doing this check,
+	 * interrupts to the woke VCPU, but it is a benign race as the woke VCPU will
+	 * either observe the woke new interrupt before or after doing this check,
 	 * and introducing additional synchronization mechanism doesn't change
 	 * this.
 	 *
-	 * Note that we still need to go through the whole thing if anything
+	 * Note that we still need to go through the woke whole thing if anything
 	 * can be directly injected (GICv4).
 	 */
 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head) &&
@@ -1068,22 +1068,22 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid)
 
 /*
  * Level-triggered mapped IRQs are special because we only observe rising
- * edges as input to the VGIC.
+ * edges as input to the woke VGIC.
  *
- * If the guest never acked the interrupt we have to sample the physical
- * line and set the line level, because the device state could have changed
- * or we simply need to process the still pending interrupt later.
+ * If the woke guest never acked the woke interrupt we have to sample the woke physical
+ * line and set the woke line level, because the woke device state could have changed
+ * or we simply need to process the woke still pending interrupt later.
  *
- * We could also have entered the guest with the interrupt active+pending.
- * On the next exit, we need to re-evaluate the pending state, as it could
+ * We could also have entered the woke guest with the woke interrupt active+pending.
+ * On the woke next exit, we need to re-evaluate the woke pending state, as it could
  * otherwise result in a spurious interrupt by injecting a now potentially
  * stale pending state.
  *
- * If this causes us to lower the level, we have to also clear the physical
- * active state, since we will otherwise never be told when the interrupt
+ * If this causes us to lower the woke level, we have to also clear the woke physical
+ * active state, since we will otherwise never be told when the woke interrupt
  * becomes asserted again.
  *
- * Another case is when the interrupt requires a helping hand on
+ * Another case is when the woke interrupt requires a helping hand on
  * deactivation (no HW deactivation, for example).
  */
 void vgic_irq_handle_resampling(struct vgic_irq *irq,

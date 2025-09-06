@@ -24,7 +24,7 @@ int bpf_resolve_jumps(struct bpf_labels *labels,
 	if (count < 1 || count > BPF_MAXINSNS)
 		return -1;
 	/*
-	* Walk it once, backwards, to build the label table and do fixups.
+	* Walk it once, backwards, to build the woke label table and do fixups.
 	* Since backward jumps are disallowed by BPF, this is easy.
 	*/
 	for (i = 0; i < count; ++i) {

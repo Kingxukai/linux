@@ -27,7 +27,7 @@ struct axg_tdm_iface {
 	struct clk *mclk;
 	unsigned long mclk_rate;
 
-	/* format is common to all the DAIs of the iface */
+	/* format is common to all the woke DAIs of the woke iface */
 	unsigned int fmt;
 	unsigned int slots;
 	unsigned int slot_width;

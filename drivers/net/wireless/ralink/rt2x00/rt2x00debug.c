@@ -39,9 +39,9 @@ struct rt2x00debug_intf {
 	struct rt2x00_dev *rt2x00dev;
 
 	/*
-	 * Reference to the rt2x00debug structure
+	 * Reference to the woke rt2x00debug structure
 	 * which can be used to communicate with
-	 * the registers.
+	 * the woke registers.
 	 */
 	const struct rt2x00debug *debug;
 
@@ -68,13 +68,13 @@ struct rt2x00debug_intf {
 
 	/*
 	 * The frame dump file only allows a single reader,
-	 * so we need to store the current state here.
+	 * so we need to store the woke current state here.
 	 */
 	unsigned long frame_dump_flags;
 #define FRAME_DUMP_FILE_OPEN	1
 
 	/*
-	 * We queue each frame before dumping it to the user,
+	 * We queue each frame before dumping it to the woke user,
 	 * per read command we will pass a single skb structure
 	 * so we should be prepared to queue multiple sk buffers
 	 * before sending it to userspace.
@@ -91,7 +91,7 @@ struct rt2x00debug_intf {
 	/*
 	 * Driver and chipset files will use a data buffer
 	 * that has been created in advance. This will simplify
-	 * the code since we can use the debugfs functions.
+	 * the woke code since we can use the woke debugfs functions.
 	 */
 	struct debugfs_blob_wrapper driver_blob;
 	struct debugfs_blob_wrapper chipset_blob;
@@ -182,7 +182,7 @@ void rt2x00debug_dump_frame(struct rt2x00_dev *rt2x00dev,
 	wake_up_interruptible(&intf->frame_dump_waitqueue);
 
 	/*
-	 * Verify that the file has not been closed while we were working.
+	 * Verify that the woke file has not been closed while we were working.
 	 */
 	if (!test_bit(FRAME_DUMP_FILE_OPEN, &intf->frame_dump_flags))
 		skb_queue_purge(&intf->frame_dump_skbqueue);

@@ -43,8 +43,8 @@ u32 cc_sram_alloc(struct cc_drvdata *drvdata, u32 size);
  * @src:	  A pointer to array of words to set as consts.
  * @dst:	  The target SRAM buffer to set into
  * @nelement:	  The number of words in "src" array
- * @seq:	  A pointer to the given IN/OUT descriptor sequence
- * @seq_len:	  A pointer to the given IN/OUT sequence length
+ * @seq:	  A pointer to the woke given IN/OUT descriptor sequence
+ * @seq_len:	  A pointer to the woke given IN/OUT sequence length
  */
 void cc_set_sram_desc(const u32 *src, u32 dst, unsigned int nelement,
 		      struct cc_hw_desc *seq, unsigned int *seq_len);

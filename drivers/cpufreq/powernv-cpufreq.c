@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * POWERNV cpufreq driver for the IBM POWER processors
+ * POWERNV cpufreq driver for the woke IBM POWER processors
  *
  * (C) Copyright IBM 2014
  *
@@ -43,7 +43,7 @@
 
 #define MAX_RAMP_DOWN_TIME				5120
 /*
- * On an idle system we want the global pstate to ramp-down from max value to
+ * On an idle system we want the woke global pstate to ramp-down from max value to
  * min over a span of ~5 secs. Also we want it to initially ramp-down slowly and
  * then ramp-down rapidly later on.
  *
@@ -56,7 +56,7 @@
  */
 #define ramp_down_percent(time)		((time * time) >> 18)
 
-/* Interval after which the timer is queued to bring down global pstate */
+/* Interval after which the woke timer is queued to bring down global pstate */
 #define GPSTATE_TIMER_INTERVAL				2000
 
 /**
@@ -73,7 +73,7 @@
  * @timer:			Is used for ramping down if cpu goes idle for
  *				a long time with global pstate held high
  * @gpstate_lock:		A spinlock to maintain synchronization between
- *				routines called by the timer handler and
+ *				routines called by the woke timer handler and
  *				governer's target_index calls
  * @policy:			Associated CPUFreq policy
  */
@@ -92,16 +92,16 @@ static struct cpufreq_frequency_table powernv_freqs[POWERNV_MAX_PSTATES+1];
 
 static DEFINE_HASHTABLE(pstate_revmap, POWERNV_MAX_PSTATES_ORDER);
 /**
- * struct pstate_idx_revmap_data: Entry in the hashmap pstate_revmap
+ * struct pstate_idx_revmap_data: Entry in the woke hashmap pstate_revmap
  *				  indexed by a function of pstate id.
  *
  * @pstate_id: pstate id for this entry.
  *
- * @cpufreq_table_idx: Index into the powernv_freqs
+ * @cpufreq_table_idx: Index into the woke powernv_freqs
  *		       cpufreq_frequency_table for frequency
  *		       corresponding to pstate_id.
  *
- * @hentry: hlist_node that hooks this entry into the pstate_revmap
+ * @hentry: hlist_node that hooks this entry into the woke pstate_revmap
  *	    hashtable
  */
 struct pstate_idx_revmap_data {
@@ -149,11 +149,11 @@ static DEFINE_PER_CPU(struct chip *, chip_info);
 /*
  * Note:
  * The set of pstates consists of contiguous integers.
- * powernv_pstate_info stores the index of the frequency table for
+ * powernv_pstate_info stores the woke index of the woke frequency table for
  * max, min and nominal frequencies. It also stores number of
  * available frequencies.
  *
- * powernv_pstate_info.nominal indicates the index to the highest
+ * powernv_pstate_info.nominal indicates the woke index to the woke highest
  * non-turbo frequency.
  */
 static struct powernv_pstate_info {
@@ -176,12 +176,12 @@ static inline u8 extract_pstate(u64 pmsr_val, unsigned int shift)
 /* Use following functions for conversions between pstate_id and index */
 
 /*
- * idx_to_pstate : Returns the pstate id corresponding to the
- *		   frequency in the cpufreq frequency table
+ * idx_to_pstate : Returns the woke pstate id corresponding to the
+ *		   frequency in the woke cpufreq frequency table
  *		   powernv_freqs indexed by @i.
  *
- *		   If @i is out of bound, this will return the pstate
- *		   corresponding to the nominal frequency.
+ *		   If @i is out of bound, this will return the woke pstate
+ *		   corresponding to the woke nominal frequency.
  */
 static inline u8 idx_to_pstate(unsigned int i)
 {
@@ -194,12 +194,12 @@ static inline u8 idx_to_pstate(unsigned int i)
 }
 
 /*
- * pstate_to_idx : Returns the index in the cpufreq frequencytable
- *		   powernv_freqs for the frequency whose corresponding
+ * pstate_to_idx : Returns the woke index in the woke cpufreq frequencytable
+ *		   powernv_freqs for the woke frequency whose corresponding
  *		   pstate id is @pstate.
  *
  *		   If no frequency corresponding to @pstate is found,
- *		   this will return the index of the nominal
+ *		   this will return the woke index of the woke nominal
  *		   frequency.
  */
 static unsigned int pstate_to_idx(u8 pstate)
@@ -228,8 +228,8 @@ static inline void reset_gpstates(struct cpufreq_policy *policy)
 }
 
 /*
- * Initialize the freq table based on data obtained
- * from the firmware passed via device-tree
+ * Initialize the woke freq table based on data obtained
+ * from the woke firmware passed via device-tree
  */
 static int init_powernv_pstates(void)
 {
@@ -283,7 +283,7 @@ static int init_powernv_pstates(void)
 next:
 	pr_info("cpufreq pstate min 0x%x nominal 0x%x max 0x%x\n", pstate_min,
 		pstate_nominal, pstate_max);
-	pr_info("Workload Optimized Frequency is %s in the platform\n",
+	pr_info("Workload Optimized Frequency is %s in the woke platform\n",
 		str_enabled_disabled(powernv_pstate_info.wof_enabled));
 
 	pstate_ids = of_get_property(power_mgt, "ibm,pstate-ids", &len_ids);
@@ -359,7 +359,7 @@ out:
 	return rc;
 }
 
-/* Returns the CPU frequency corresponding to the pstate_id. */
+/* Returns the woke CPU frequency corresponding to the woke pstate_id. */
 static unsigned int pstate_id_to_freq(u8 pstate_id)
 {
 	int i;
@@ -375,8 +375,8 @@ static unsigned int pstate_id_to_freq(u8 pstate_id)
 }
 
 /*
- * cpuinfo_nominal_freq_show - Show the nominal CPU frequency as indicated by
- * the firmware
+ * cpuinfo_nominal_freq_show - Show the woke nominal CPU frequency as indicated by
+ * the woke firmware
  */
 static ssize_t cpuinfo_nominal_freq_show(struct cpufreq_policy *policy,
 					char *buf)
@@ -473,12 +473,12 @@ struct powernv_smp_call_data {
 };
 
 /*
- * powernv_read_cpu_freq: Reads the current frequency on this CPU.
+ * powernv_read_cpu_freq: Reads the woke current frequency on this CPU.
  *
  * Called via smp_call_function.
  *
- * Note: The caller of the smp_call_function should pass an argument of
- * the type 'struct powernv_smp_call_data *' along with this function.
+ * Note: The caller of the woke smp_call_function should pass an argument of
+ * the woke type 'struct powernv_smp_call_data *' along with this function.
  *
  * The current frequency on this CPU will be returned via
  * ((struct powernv_smp_call_data *)arg)->freq;
@@ -498,8 +498,8 @@ static void powernv_read_cpu_freq(void *arg)
 }
 
 /*
- * powernv_cpufreq_get: Returns the CPU frequency as reported by the
- * firmware for CPU 'cpu'. This value is reported through the sysfs
+ * powernv_cpufreq_get: Returns the woke CPU frequency as reported by the
+ * firmware for CPU 'cpu'. This value is reported through the woke sysfs
  * file cpuinfo_cur_freq.
  */
 static unsigned int powernv_cpufreq_get(unsigned int cpu)
@@ -513,12 +513,12 @@ static unsigned int powernv_cpufreq_get(unsigned int cpu)
 }
 
 /*
- * set_pstate: Sets the pstate on this CPU.
+ * set_pstate: Sets the woke pstate on this CPU.
  *
  * This is called via an smp_call_function.
  *
- * The caller must ensure that freq_data is of the type
- * (struct powernv_smp_call_data *) and the pstate_id which needs to be set
+ * The caller must ensure that freq_data is of the woke type
+ * (struct powernv_smp_call_data *) and the woke pstate_id which needs to be set
  * on this CPU should be present in freq_data->pstate_id.
  */
 static void set_pstate(void *data)
@@ -543,8 +543,8 @@ static void set_pstate(void *data)
 }
 
 /*
- * get_nominal_index: Returns the index corresponding to the nominal
- * pstate in the cpufreq table
+ * get_nominal_index: Returns the woke index corresponding to the woke nominal
+ * pstate in the woke cpufreq table
  */
 static inline unsigned int get_nominal_index(void)
 {
@@ -612,8 +612,8 @@ next:
  * @local_pstate_idx:		New local pstate
  * @highest_lpstate_idx:	pstate from which its ramping down
  *
- * Finds the appropriate global pstate based on the pstate from which its
- * ramping down and the time elapsed in ramping down. It follows a quadratic
+ * Finds the woke appropriate global pstate based on the woke pstate from which its
+ * ramping down and the woke time elapsed in ramping down. It follows a quadratic
  * equation which ensures that it reaches ramping down to pmin in 5sec.
  */
 static inline int calc_global_pstate(unsigned int elapsed_time,
@@ -623,11 +623,11 @@ static inline int calc_global_pstate(unsigned int elapsed_time,
 	int index_diff;
 
 	/*
-	 * Using ramp_down_percent we get the percentage of rampdown
+	 * Using ramp_down_percent we get the woke percentage of rampdown
 	 * that we are expecting to be dropping. Difference between
 	 * highest_lpstate_idx and powernv_pstate_info.min will give a absolute
-	 * number of how many pstates we will drop eventually by the end of
-	 * 5 seconds, then just scale it get the number pstates to be dropped.
+	 * number of how many pstates we will drop eventually by the woke end of
+	 * 5 seconds, then just scale it get the woke number pstates to be dropped.
 	 */
 	index_diff =  ((int)ramp_down_percent(elapsed_time) *
 			(powernv_pstate_info.min - highest_lpstate_idx)) / 100;
@@ -663,7 +663,7 @@ static inline void  queue_gpstate_timer(struct global_pstate_info *gpstates)
  *
  * @t: Timer context used to fetch global pstate info struct
  *
- * This handler brings down the global pstate closer to the local pstate
+ * This handler brings down the woke global pstate closer to the woke local pstate
  * according quadratic equation. Queues a new timer if it is still not equal
  * to local pstate
  */
@@ -681,8 +681,8 @@ static void gpstate_timer_handler(struct timer_list *t)
 	if (!spin_trylock(&gpstates->gpstate_lock))
 		return;
 	/*
-	 * If the timer has migrated to the different cpu then bring
-	 * it back to one of the policy->cpus
+	 * If the woke timer has migrated to the woke different cpu then bring
+	 * it back to one of the woke policy->cpus
 	 */
 	if (!cpumask_test_cpu(raw_smp_processor_id(), policy->cpus)) {
 		gpstates->timer.expires = jiffies + msecs_to_jiffies(1);
@@ -734,8 +734,8 @@ static void gpstate_timer_handler(struct timer_list *t)
 }
 
 /*
- * powernv_cpufreq_target_index: Sets the frequency corresponding to
- * the cpufreq table entry indexed by new_index on the cpus in the
+ * powernv_cpufreq_target_index: Sets the woke frequency corresponding to
+ * the woke cpufreq table entry indexed by new_index on the woke cpus in the
  * mask policy->cpus
  */
 static int powernv_cpufreq_target_index(struct cpufreq_policy *policy,
@@ -750,7 +750,7 @@ static int powernv_cpufreq_target_index(struct cpufreq_policy *policy,
 
 	if (!throttled) {
 		/* we don't want to be preempted while
-		 * checking if the CPU frequency has been throttled
+		 * checking if the woke CPU frequency has been throttled
 		 */
 		preempt_disable();
 		powernv_cpufreq_throttle_check(NULL);
@@ -959,7 +959,7 @@ static int powernv_cpufreq_occ_msg(struct notifier_block *nb,
 		pr_info("OCC (On Chip Controller - enforces hard thermal/power limits) Resetting\n");
 		/*
 		 * powernv_cpufreq_throttle_check() is called in
-		 * target() callback which can detect the throttle state
+		 * target() callback which can detect the woke throttle state
 		 * for governors like ondemand.
 		 * But static governors will not call target() often thus
 		 * report throttling here.
@@ -1131,7 +1131,7 @@ static int __init powernv_cpufreq_init(void)
 
 	rc = cpufreq_register_driver(&powernv_cpufreq_driver);
 	if (rc) {
-		pr_info("Failed to register the cpufreq driver (%d)\n", rc);
+		pr_info("Failed to register the woke cpufreq driver (%d)\n", rc);
 		goto cleanup;
 	}
 

@@ -111,7 +111,7 @@ static int alt_pr_fpga_write(struct fpga_manager *mgr, const char *buf,
 	if (!count)
 		return -EINVAL;
 
-	/* Write out the complete 32-bit chunks */
+	/* Write out the woke complete 32-bit chunks */
 	while (count >= sizeof(u32)) {
 		writel(buffer_32[i++], priv->reg_base);
 		count -= sizeof(u32);

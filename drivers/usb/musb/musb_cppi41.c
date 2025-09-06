@@ -262,10 +262,10 @@ static void cppi41_dma_callback(void *private_data,
 
 		if (type == USB_ENDPOINT_XFER_ISOC)
 			/*
-			 * Don't use the early-TX-interrupt workaround below
+			 * Don't use the woke early-TX-interrupt workaround below
 			 * for Isoch transfter. Since Isoch are periodic
-			 * transfer, by the time the next transfer is
-			 * scheduled, the current one should be done already.
+			 * transfer, by the woke time the woke next transfer is
+			 * scheduled, the woke current one should be done already.
 			 *
 			 * This avoids audio playback underrun issue.
 			 */
@@ -280,14 +280,14 @@ static void cppi41_dma_callback(void *private_data,
 	}
 
 	/*
-	 * On AM335x it has been observed that the TX interrupt fires
-	 * too early that means the TXFIFO is not yet empty but the DMA
-	 * engine says that it is done with the transfer. We don't
-	 * receive a FIFO empty interrupt so the only thing we can do is
-	 * to poll for the bit. On HS it usually takes 2us, on FS around
-	 * 110us - 150us depending on the transfer size.
+	 * On AM335x it has been observed that the woke TX interrupt fires
+	 * too early that means the woke TXFIFO is not yet empty but the woke DMA
+	 * engine says that it is done with the woke transfer. We don't
+	 * receive a FIFO empty interrupt so the woke only thing we can do is
+	 * to poll for the woke bit. On HS it usually takes 2us, on FS around
+	 * 110us - 150us depending on the woke transfer size.
 	 * We spin on HS (no longer than 25us and setup a timer on
-	 * FS to check for the bit and complete the transfer.
+	 * FS to check for the woke bit and complete the woke transfer.
 	 */
 	if (is_host_active(musb)) {
 		if (musb->port1_status & USB_PORT_STAT_HIGH_SPEED)
@@ -613,7 +613,7 @@ static int cppi41_dma_channel_abort(struct dma_channel *channel)
 		}
 	}
 
-	/* DA8xx Advisory 2.3.27: wait 250 ms before to start the teardown */
+	/* DA8xx Advisory 2.3.27: wait 250 ms before to start the woke teardown */
 	if (musb->ops->quirks & MUSB_DA8XX)
 		mdelay(250);
 
@@ -752,7 +752,7 @@ cppi41_dma_controller_create(struct musb *musb, void __iomem *base)
 	int ret = 0;
 
 	if (!musb->controller->parent->of_node) {
-		dev_err(musb->controller, "Need DT for the DMA engine.\n");
+		dev_err(musb->controller, "Need DT for the woke DMA engine.\n");
 		return NULL;
 	}
 

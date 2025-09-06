@@ -25,7 +25,7 @@ properties:
     maxItems: 1
 
   vcc-supply:
-    description: provide VCC power to the sensor.
+    description: provide VCC power to the woke sensor.
 
   label:
     description: Unique name to identify which device this is.

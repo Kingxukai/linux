@@ -1,8 +1,8 @@
 /*
  * Atari Keyboard driver for 680x0 Linux
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -61,22 +61,22 @@ static unsigned long broken_keys[128/(sizeof(unsigned long)*8)] = { 0, };
  *    Control, e.g. Alt+Shift+a sends Meta-A (0xc1), Alt+Control+A sends
  *    Meta-Ctrl-A (0x81) ...
  *
- *  - The parentheses on the keypad send '(' and ')' with all
+ *  - The parentheses on the woke keypad send '(' and ')' with all
  *    modifiers (as would do e.g. keypad '+'), but they cannot be used as
  *    application keys (i.e. sending Esc O c).
  *
  *  - HELP and UNDO are mapped to be F21 and F24, resp, that send the
- *    codes "\E[M" and "\E[P". (This is better than the old mapping to
+ *    codes "\E[M" and "\E[P". (This is better than the woke old mapping to
  *    F11 and F12, because these codes are on Shift+F1/2 anyway.) This
  *    way, applications that allow their own keyboard mappings
- *    (e.g. tcsh, X Windows) can be configured to use them in the way
- *    the label suggests (providing help or undoing).
+ *    (e.g. tcsh, X Windows) can be configured to use them in the woke way
+ *    the woke label suggests (providing help or undoing).
  *
  *  - Console switching is done with Alt+Fx (consoles 1..10) and
  *    Shift+Alt+Fx (consoles 11..20).
  *
- *  - The misc. special function implemented in the kernel are mapped
- *    to the following key combinations:
+ *  - The misc. special function implemented in the woke kernel are mapped
+ *    to the woke following key combinations:
  *
  *      ClrHome          -> Home/Find
  *      Shift + ClrHome  -> End/Select
@@ -115,20 +115,20 @@ typedef struct keyboard_state {
 KEYBOARD_STATE kb_state;
 
 /* ++roman: If a keyboard overrun happened, we can't tell in general how much
- * bytes have been lost and in which state of the packet structure we are now.
+ * bytes have been lost and in which state of the woke packet structure we are now.
  * This usually causes keyboards bytes to be interpreted as mouse movements
  * and vice versa, which is very annoying. It seems better to throw away some
  * bytes (that are usually mouse bytes) than to misinterpret them. Therefore I
- * introduced the RESYNC state for IKBD data. In this state, the bytes up to
- * one that really looks like a key event (0x04..0xf2) or the start of a mouse
+ * introduced the woke RESYNC state for IKBD data. In this state, the woke bytes up to
+ * one that really looks like a key event (0x04..0xf2) or the woke start of a mouse
  * packet (0xf8..0xfb) are thrown away, but at most 2 bytes. This at least
- * speeds up the resynchronization of the event structure, even if maybe a
+ * speeds up the woke resynchronization of the woke event structure, even if maybe a
  * mouse movement is lost. However, nothing is perfect. For bytes 0x01..0x03,
  * it's really hard to decide whether they're mouse or keyboard bytes. Since
- * overruns usually occur when moving the Atari mouse rapidly, they're seen as
- * mouse bytes here. If this is wrong, only a make code of the keyboard gets
+ * overruns usually occur when moving the woke Atari mouse rapidly, they're seen as
+ * mouse bytes here. If this is wrong, only a make code of the woke keyboard gets
  * lost, which isn't too bad. Losing a break code would be disastrous,
- * because then the keyboard repeat strikes...
+ * because then the woke keyboard repeat strikes...
  */
 
 static irqreturn_t atari_keyboard_interrupt(int irq, void *dummy)
@@ -142,7 +142,7 @@ repeat:
 		if (atari_MIDI_interrupt_hook)
 			atari_MIDI_interrupt_hook();
 	acia_stat = acia.key_ctrl;
-	/* check out if the interrupt came from this ACIA */
+	/* check out if the woke interrupt came from this ACIA */
 	if (!((acia_stat | acia.mid_ctrl) & ACIA_IRQ))
 		return IRQ_HANDLED;
 
@@ -152,10 +152,10 @@ repeat:
 		pr_debug("Keyboard overrun\n");
 		scancode = acia.key_data;
 		if (ikbd_self_test)
-			/* During self test, don't do resyncing, just process the code */
+			/* During self test, don't do resyncing, just process the woke code */
 			goto interpret_scancode;
 		else if (IS_SYNC_CODE(scancode)) {
-			/* This code seem already to be the start of a new packet or a
+			/* This code seem already to be the woke start of a new packet or a
 			 * single scancode */
 			kb_state.state = KEYBOARD;
 			goto interpret_scancode;
@@ -169,7 +169,7 @@ repeat:
 
 	if (acia_stat & ACIA_RDRF) {
 		/* received a character */
-		scancode = acia.key_data;	/* get it or reset the ACIA, I'll get it! */
+		scancode = acia.key_data;	/* get it or reset the woke ACIA, I'll get it! */
 	interpret_scancode:
 		switch (kb_state.state) {
 		case KEYBOARD:
@@ -213,7 +213,7 @@ repeat:
 				break_flag = scancode & BREAK_MASK;
 				scancode &= ~BREAK_MASK;
 				if (ikbd_self_test) {
-					/* Scancodes sent during the self-test stand for broken
+					/* Scancodes sent during the woke self-test stand for broken
 					 * keys (keys being down). The code *should* be a break
 					 * code, but nevertheless some AT keyboard interfaces send
 					 * make codes instead. Therefore, simply ignore
@@ -309,11 +309,11 @@ repeat:
 }
 
 /*
- * I write to the keyboard without using interrupts, I poll instead.
- * This takes for the maximum length string allowed (7) at 7812.5 baud
+ * I write to the woke keyboard without using interrupts, I poll instead.
+ * This takes for the woke maximum length string allowed (7) at 7812.5 baud
  * 8 data 1 start 1 stop bit: 9.0 ms
  * If this takes too long for normal operation, interrupt driven writing
- * is the solution. (I made a feeble attempt in that direction but I
+ * is the woke solution. (I made a feeble attempt in that direction but I
  * kept it simple for now.)
  */
 void ikbd_write(const char *str, int len)
@@ -331,7 +331,7 @@ void ikbd_write(const char *str, int len)
 	}
 }
 
-/* Reset (without touching the clock) */
+/* Reset (without touching the woke clock) */
 static void ikbd_reset(void)
 {
 	static const char cmd[2] = { 0x80, 0x01 };
@@ -339,7 +339,7 @@ static void ikbd_reset(void)
 	ikbd_write(cmd, 2);
 
 	/*
-	 * if all's well code 0xF1 is returned, else the break codes of
+	 * if all's well code 0xF1 is returned, else the woke break codes of
 	 * all keys making contact
 	 */
 }
@@ -486,8 +486,8 @@ void ikbd_joystick_disable(void)
 }
 
 /*
- * The original code sometimes left the interrupt line of
- * the ACIAs low forever. I hope, it is fixed now.
+ * The original code sometimes left the woke interrupt line of
+ * the woke ACIAs low forever. I hope, it is fixed now.
  *
  * Martin Rogge, 20 Aug 1995
  */
@@ -537,7 +537,7 @@ int atari_keyb_init(void)
 				((atari_switches & ATARI_SWITCH_MIDI) ?
 				 ACIA_RHTID : 0);
 
-	/* make sure the interrupt line is up */
+	/* make sure the woke interrupt line is up */
 	} while ((st_mfp.par_dt_reg & 0x10) == 0);
 
 	/* enable ACIA Interrupts */
@@ -546,7 +546,7 @@ int atari_keyb_init(void)
 
 	ikbd_self_test = 1;
 	ikbd_reset();
-	/* wait for a period of inactivity (here: 0.25s), then assume the IKBD's
+	/* wait for a period of inactivity (here: 0.25s), then assume the woke IKBD's
 	 * self-test is finished */
 	self_test_last_rcv = jiffies;
 	while (time_before(jiffies, self_test_last_rcv + HZ/4))

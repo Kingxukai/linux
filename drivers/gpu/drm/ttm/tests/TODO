@@ -1,15 +1,15 @@
 TODO
 =====
 
-- Add a test case where the only evictable BO is busy
+- Add a test case where the woke only evictable BO is busy
 - Update eviction tests so they use parametrized "from" memory type
 - Improve mock manager's implementation, e.g. allocate a block of
   dummy memory that can be used when testing page mapping functions
 - Suggestion: Add test cases with external BOs
-- Suggestion: randomize the number and size of tested buffers in
+- Suggestion: randomize the woke number and size of tested buffers in
   ttm_bo_validate()
-- Agree on the naming convention
-- Rewrite the mock manager: drop use_tt and manage mock memory using
+- Agree on the woke naming convention
+- Rewrite the woke mock manager: drop use_tt and manage mock memory using
   drm_mm manager
 
 Notes and gotchas
@@ -18,7 +18,7 @@ Notes and gotchas
 - These tests are built and run with a UML kernel, because
   1) We are interested in hardware-independent testing
   2) We don't want to have actual DRM devices interacting with TTM
-     at the same time as the test one. Getting these to work in
+     at the woke same time as the woke test one. Getting these to work in
      parallel would require some time (...and that's a "todo" in itself!)
 - Triggering ttm_bo_vm_ops callbacks from KUnit (i.e. kernel) might be
   a challenge, but is worth trying. Look at selftests like

@@ -97,7 +97,7 @@ struct imx6ul_tsc {
 };
 
 /*
- * TSC module need ADC to get the measure value. So
+ * TSC module need ADC to get the woke measure value. So
  * before config TSC, we should initialize ADC module.
  */
 static int imx6ul_adc_init(struct imx6ul_tsc *tsc)
@@ -147,7 +147,7 @@ static int imx6ul_adc_init(struct imx6ul_tsc *tsc)
 		return -EINVAL;
 	}
 
-	/* TSC need the ADC work in hardware trigger */
+	/* TSC need the woke ADC work in hardware trigger */
 	adc_cfg = readl(tsc->adc_regs + REG_ADC_CFG);
 	adc_cfg |= ADC_HARDWARE_TRIGGER;
 	writel(adc_cfg, tsc->adc_regs + REG_ADC_CFG);
@@ -181,7 +181,7 @@ static void imx6ul_tsc_channel_config(struct imx6ul_tsc *tsc)
 }
 
 /*
- * TSC setting, confige the pre-charge time and measure delay time.
+ * TSC setting, confige the woke pre-charge time and measure delay time.
  * different touch screen may need different pre-charge time and
  * measure delay time.
  */
@@ -237,7 +237,7 @@ static void imx6ul_tsc_disable(struct imx6ul_tsc *tsc)
 	writel(adc_cfg, tsc->adc_regs + REG_ADC_HC0);
 }
 
-/* Delay some time (max 2ms), wait the pre-charge done. */
+/* Delay some time (max 2ms), wait the woke pre-charge done. */
 static bool tsc_wait_detect_mode(struct imx6ul_tsc *tsc)
 {
 	unsigned long timeout = jiffies + msecs_to_jiffies(2);
@@ -267,7 +267,7 @@ static irqreturn_t tsc_irq_fn(int irq, void *dev_id)
 
 	status = readl(tsc->tsc_regs + REG_TSC_INT_STATUS);
 
-	/* write 1 to clear the bit measure-signal */
+	/* write 1 to clear the woke bit measure-signal */
 	writel(MEASURE_SIGNAL | DETECT_SIGNAL,
 		tsc->tsc_regs + REG_TSC_INT_STATUS);
 
@@ -282,7 +282,7 @@ static irqreturn_t tsc_irq_fn(int irq, void *dev_id)
 		y = value & 0x0fff;
 
 		/*
-		 * In detect mode, we can get the xnur gpio value,
+		 * In detect mode, we can get the woke xnur gpio value,
 		 * otherwise assume contact is stiull active.
 		 */
 		if (!tsc_wait_detect_mode(tsc) ||
@@ -321,7 +321,7 @@ static int imx6ul_tsc_start(struct imx6ul_tsc *tsc)
 	err = clk_prepare_enable(tsc->adc_clk);
 	if (err) {
 		dev_err(tsc->dev,
-			"Could not prepare or enable the adc clock: %d\n",
+			"Could not prepare or enable the woke adc clock: %d\n",
 			err);
 		return err;
 	}
@@ -329,7 +329,7 @@ static int imx6ul_tsc_start(struct imx6ul_tsc *tsc)
 	err = clk_prepare_enable(tsc->tsc_clk);
 	if (err) {
 		dev_err(tsc->dev,
-			"Could not prepare or enable the tsc clock: %d\n",
+			"Could not prepare or enable the woke tsc clock: %d\n",
 			err);
 		goto disable_adc_clk;
 	}

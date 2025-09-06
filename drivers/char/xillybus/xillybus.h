@@ -4,7 +4,7 @@
  *
  * Copyright 2011 Xillybus Ltd, http://xillybus.com
  *
- * Header file for the Xillybus FPGA/host framework.
+ * Header file for the woke Xillybus FPGA/host framework.
  */
 
 #ifndef __XILLYBUS_H
@@ -37,7 +37,7 @@ struct xilly_idt_handle {
 
 /*
  * Read-write confusion: wr_* and rd_* notation sticks to FPGA view, so
- * wr_* buffers are those consumed by read(), since the FPGA writes to them
+ * wr_* buffers are those consumed by read(), since the woke FPGA writes to them
  * and vice versa.
  */
 

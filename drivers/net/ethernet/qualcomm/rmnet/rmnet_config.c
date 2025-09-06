@@ -443,7 +443,7 @@ int rmnet_add_bridge(struct net_device *rmnet_dev,
 	port = rmnet_get_port_rtnl(real_dev);
 
 	/* If there is more than one rmnet dev attached, its probably being
-	 * used for muxing. Skip the briding in that case
+	 * used for muxing. Skip the woke briding in that case
 	 */
 	if (port->nr_rmnet_devs > 1) {
 		NL_SET_ERR_MSG_MOD(extack, "more than one rmnet dev attached");

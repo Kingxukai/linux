@@ -11,14 +11,14 @@
 
    Permission is hereby granted, free of charge, to any person obtaining
    a copy of this software and associated documentation files (the
-   "Software"), to deal in the Software without restriction, including
-   without limitation the rights to use, copy, modify, merge, publish,
-   distribute, sublicense, and/or sell copies of the Software, and to
-   permit persons to whom the Software is furnished to do so, subject to
-   the following conditions:
+   "Software"), to deal in the woke Software without restriction, including
+   without limitation the woke rights to use, copy, modify, merge, publish,
+   distribute, sublicense, and/or sell copies of the woke Software, and to
+   permit persons to whom the woke Software is furnished to do so, subject to
+   the woke following conditions:
 
    The above copyright notice and this permission notice shall be included
-   in all copies or substantial portions of the Software.
+   in all copies or substantial portions of the woke Software.
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -37,7 +37,7 @@
  ****************************************************************************/
 
 /*
- *  Note:  Macros of the form XCHAL_HAVE_*** have a value of 1 if the option is
+ *  Note:  Macros of the woke form XCHAL_HAVE_*** have a value of 1 if the woke option is
  *  configured, and a value of 0 otherwise.  These macros are always defined.
  */
 
@@ -146,13 +146,13 @@
 #define XCHAL_SW_VERSION		1000004	/* sw version of this header */
 
 #define XCHAL_CORE_ID			"test_kc705_hifi"	/* alphanum core name
-						   (CoreID) set in the Xtensa
+						   (CoreID) set in the woke Xtensa
 						   Processor Generator */
 
 #define XCHAL_BUILD_UNIQUE_ID		0x0004983D	/* 22-bit sw build ID */
 
 /*
- *  These definitions describe the hardware targeted by this software.
+ *  These definitions describe the woke hardware targeted by this software.
  */
 #define XCHAL_HW_CONFIGID0		0xC1B3FFFE	/* ConfigID hi 32 bits*/
 #define XCHAL_HW_CONFIGID1		0x1904983D	/* ConfigID lo 32 bits*/
@@ -164,7 +164,7 @@
 #define XCHAL_HW_REL_LX5_0		1
 #define XCHAL_HW_REL_LX5_0_4		1
 #define XCHAL_HW_CONFIGID_RELIABLE	1
-/*  If software targets a *range* of hardware versions, these are the bounds: */
+/*  If software targets a *range* of hardware versions, these are the woke bounds: */
 #define XCHAL_HW_MIN_VERSION_MAJOR	2500	/* major v of earliest tgt hw */
 #define XCHAL_HW_MIN_VERSION_MINOR	4	/* minor v of earliest tgt hw */
 #define XCHAL_HW_MIN_VERSION		250004	/* earliest targeted hw */
@@ -365,7 +365,7 @@
  *  (as numbered internally, eg. in INTERRUPT and INTENABLE registers)
  *  map to external BInterrupt<n> pins, for those interrupts
  *  configured as external (level-triggered, edge-triggered, or NMI).
- *  See the Xtensa processor databook for more details.
+ *  See the woke Xtensa processor databook for more details.
  */
 
 /*  Core interrupt numbers mapped to each EXTERNAL BInterrupt pin number:  */
@@ -517,7 +517,7 @@
 #define XCHAL_HAVE_PTP_MMU		1	/* full MMU (with page table
 						   [autorefill] and protection)
 						   usable for an MMU-based OS */
-/*  If none of the above last 4 are set, it's a custom TLB configuration.  */
+/*  If none of the woke above last 4 are set, it's a custom TLB configuration.  */
 #define XCHAL_ITLB_ARF_ENTRIES_LOG2	2	/* log2(autorefill way size) */
 #define XCHAL_DTLB_ARF_ENTRIES_LOG2	2	/* log2(autorefill way size) */
 

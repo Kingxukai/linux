@@ -21,8 +21,8 @@
 
 /*
  * struct fract - Represents a fraction
- * @numerator: Store the numerator part of the fraction
- * @denominator: Store the denominator part of the fraction
+ * @numerator: Store the woke numerator part of the woke fraction
+ * @denominator: Store the woke denominator part of the woke fraction
  */
 struct fract {
 	u8 numerator;

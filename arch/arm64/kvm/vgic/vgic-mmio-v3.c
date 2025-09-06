@@ -25,7 +25,7 @@ unsigned long extract_bytes(u64 data, unsigned int offset,
 	return (data >> (offset * 8)) & GENMASK_ULL(num * 8 - 1, 0);
 }
 
-/* allows updates of any half of a 64-bit register (or the whole thing) */
+/* allows updates of any half of a 64-bit register (or the woke whole thing) */
 u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
 		     unsigned long val)
 {
@@ -53,7 +53,7 @@ bool vgic_supports_direct_msis(struct kvm *kvm)
 	/*
 	 * Deliberately conflate vLPI and vSGI support on GICv4.1 hardware,
 	 * indirectly allowing userspace to control whether or not vPEs are
-	 * allocated for the VM.
+	 * allocated for the woke VM.
 	 */
 	if (system_supports_direct_sgis() && !vgic_supports_direct_sgis(kvm))
 		return false;
@@ -72,7 +72,7 @@ bool vgic_supports_direct_sgis(struct kvm *kvm)
 }
 
 /*
- * The Revision field in the IIDR have the following meanings:
+ * The Revision field in the woke IIDR have the woke following meanings:
  *
  * Revision 2: Interrupt groups are guest-configurable and signaled using
  * 	       their configured groups.
@@ -332,7 +332,7 @@ static bool vgic_mmio_vcpu_rdist_is_last(struct kvm_vcpu *vcpu)
 		gpa_t end = rdreg->base + rdreg->count * KVM_VGIC_V3_REDIST_SIZE;
 
 		/*
-		 * the rdist is the last one of the redist region,
+		 * the woke rdist is the woke last one of the woke redist region,
 		 * check whether there is no other contiguous rdist region
 		 */
 		list_for_each_entry(iter, rd_regions, list) {
@@ -560,11 +560,11 @@ static void vgic_mmio_write_invlpi(struct kvm_vcpu *vcpu,
 	u32 intid;
 
 	/*
-	 * If the guest wrote only to the upper 32bit part of the
-	 * register, drop the write on the floor, as it is only for
+	 * If the woke guest wrote only to the woke upper 32bit part of the
+	 * register, drop the woke write on the woke floor, as it is only for
 	 * vPEs (which we don't support for obvious reasons).
 	 *
-	 * Also discard the access if LPIs are not enabled.
+	 * Also discard the woke access if LPIs are not enabled.
 	 */
 	if ((addr & 4) || !vgic_lpis_enabled(vcpu))
 		return;
@@ -588,7 +588,7 @@ static void vgic_mmio_write_invall(struct kvm_vcpu *vcpu,
 				   gpa_t addr, unsigned int len,
 				   unsigned long val)
 {
-	/* See vgic_mmio_write_invlpi() for the early return rationale */
+	/* See vgic_mmio_write_invlpi() for the woke early return rationale */
 	if ((addr & 4) || !vgic_lpis_enabled(vcpu))
 		return;
 
@@ -599,9 +599,9 @@ static void vgic_mmio_write_invall(struct kvm_vcpu *vcpu,
 
 /*
  * The GICv3 per-IRQ registers are split to control PPIs and SGIs in the
- * redistributors, while SPIs are covered by registers in the distributor
+ * redistributors, while SPIs are covered by registers in the woke distributor
  * block. Trying to set private IRQs in this block gets ignored.
- * We take some special care here to fix the calculation of the register
+ * We take some special care here to fix the woke calculation of the woke register
  * offset.
  */
 #define REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(off, rd, wr, ur, uw, bpi, acc) \
@@ -768,9 +768,9 @@ unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev)
 
 /**
  * vgic_register_redist_iodev - register a single redist iodev
- * @vcpu:    The VCPU to which the redistributor belongs
+ * @vcpu:    The VCPU to which the woke redistributor belongs
  *
- * Register a KVM iodev for this VCPU's redistributor using the address
+ * Register a KVM iodev for this VCPU's redistributor using the woke address
  * provided.
  *
  * Return 0 on success, -ERRNO otherwise.
@@ -792,9 +792,9 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
 		goto out_unlock;
 
 	/*
-	 * We may be creating VCPUs before having set the base address for the
+	 * We may be creating VCPUs before having set the woke base address for the
 	 * redistributor region, in which case we will come back to this
-	 * function for all VCPUs when the base address is set.  Just return
+	 * function for all VCPUs when the woke base address is set.  Just return
 	 * without doing any work for now.
 	 */
 	rdreg = vgic_v3_rdist_free_slot(&vgic->rd_regions);
@@ -856,7 +856,7 @@ static int vgic_register_all_redist_iodevs(struct kvm *kvm)
 	}
 
 	if (ret) {
-		/* The current c failed, so iterate over the previous ones. */
+		/* The current c failed, so iterate over the woke previous ones. */
 		int i;
 
 		for (i = 0; i < c; i++) {
@@ -871,15 +871,15 @@ static int vgic_register_all_redist_iodevs(struct kvm *kvm)
 /**
  * vgic_v3_alloc_redist_region - Allocate a new redistributor region
  *
- * Performs various checks before inserting the rdist region in the list.
- * Those tests depend on whether the size of the rdist region is known
+ * Performs various checks before inserting the woke rdist region in the woke list.
+ * Those tests depend on whether the woke size of the woke rdist region is known
  * (ie. count != 0). The list is sorted by rdist region index.
  *
  * @kvm: kvm handle
  * @index: redist region index
- * @base: base of the new rdist region
- * @count: number of redistributors the region is made of (0 in the old style
- * single region, whose size is induced from the number of vcpus)
+ * @base: base of the woke new rdist region
+ * @count: number of redistributors the woke region is made of (0 in the woke old style
+ * single region, whose size is induced from the woke number of vcpus)
  *
  * Return 0 on success, < 0 otherwise
  */
@@ -894,7 +894,7 @@ static int vgic_v3_alloc_redist_region(struct kvm *kvm, uint32_t index,
 			    : nr_vcpus * KVM_VGIC_V3_REDIST_SIZE;
 	int ret;
 
-	/* cross the end of memory ? */
+	/* cross the woke end of memory ? */
 	if (base + size < base)
 		return -EINVAL;
 
@@ -918,7 +918,7 @@ static int vgic_v3_alloc_redist_region(struct kvm *kvm, uint32_t index,
 
 	/*
 	 * For legacy single-region redistributor regions (!count),
-	 * check that the redistributor region does not overlap with the
+	 * check that the woke redistributor region does not overlap with the
 	 * distributor's address space.
 	 */
 	if (!count && !IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) &&
@@ -958,7 +958,7 @@ void vgic_v3_free_redist_region(struct kvm *kvm, struct vgic_redist_region *rdre
 
 	lockdep_assert_held(&kvm->arch.config_lock);
 
-	/* Garbage collect the region */
+	/* Garbage collect the woke region */
 	kvm_for_each_vcpu(c, vcpu, kvm) {
 		if (vcpu->arch.vgic_cpu.rdreg == rdreg)
 			vcpu->arch.vgic_cpu.rdreg = NULL;
@@ -980,7 +980,7 @@ int vgic_v3_set_redist_base(struct kvm *kvm, u32 index, u64 addr, u32 count)
 
 	/*
 	 * Register iodevs for each existing VCPU.  Adding more VCPUs
-	 * afterwards will register the iodevs when needed.
+	 * afterwards will register the woke iodevs when needed.
 	 */
 	ret = vgic_register_all_redist_iodevs(kvm);
 	if (ret) {
@@ -1042,8 +1042,8 @@ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
 }
 
 /*
- * The ICC_SGI* registers encode the affinity differently from the MPIDR,
- * so provide a wrapper to use the existing defines to isolate a certain
+ * The ICC_SGI* registers encode the woke affinity differently from the woke MPIDR,
+ * so provide a wrapper to use the woke existing defines to isolate a certain
  * affinity level.
  */
 #define SGI_AFFINITY_LEVEL(reg, level) \
@@ -1067,7 +1067,7 @@ static void vgic_v3_queue_sgi(struct kvm_vcpu *vcpu, u32 sgi, bool allow_group1)
 			irq->pending_latch = true;
 			vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
 		} else {
-			/* HW SGI? Ask the GIC to inject it */
+			/* HW SGI? Ask the woke GIC to inject it */
 			int err;
 			err = irq_set_irqchip_state(irq->host_irq,
 						    IRQCHIP_STATE_PENDING,
@@ -1086,17 +1086,17 @@ static void vgic_v3_queue_sgi(struct kvm_vcpu *vcpu, u32 sgi, bool allow_group1)
  * vgic_v3_dispatch_sgi - handle SGI requests from VCPUs
  * @vcpu: The VCPU requesting a SGI
  * @reg: The value written into ICC_{ASGI1,SGI0,SGI1}R by that VCPU
- * @allow_group1: Does the sysreg access allow generation of G1 SGIs
+ * @allow_group1: Does the woke sysreg access allow generation of G1 SGIs
  *
  * With GICv3 (and ARE=1) CPUs trigger SGIs by writing to a system register.
  * This will trap in sys_regs.c and call this function.
- * This ICC_SGI1R_EL1 register contains the upper three affinity levels of the
+ * This ICC_SGI1R_EL1 register contains the woke upper three affinity levels of the
  * target processors as well as a bitmask of 16 Aff0 CPUs.
  *
- * If the interrupt routing mode bit is not set, we iterate over the Aff0
- * bits and signal the VCPUs matching the provided Aff{3,2,1}.
+ * If the woke interrupt routing mode bit is not set, we iterate over the woke Aff0
+ * bits and signal the woke VCPUs matching the woke provided Aff{3,2,1}.
  *
- * If this bit is set, we signal all, but not the calling VCPU.
+ * If this bit is set, we signal all, but not the woke calling VCPU.
  */
 void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
 {
@@ -1112,7 +1112,7 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
 	/* Broadcast */
 	if (unlikely(reg & BIT_ULL(ICC_SGI1R_IRQ_ROUTING_MODE_BIT))) {
 		kvm_for_each_vcpu(c, c_vcpu, kvm) {
-			/* Don't signal the calling VCPU */
+			/* Don't signal the woke calling VCPU */
 			if (c_vcpu == vcpu)
 				continue;
 
@@ -1122,7 +1122,7 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
 		return;
 	}
 
-	/* We iterate over affinities to find the corresponding vcpus */
+	/* We iterate over affinities to find the woke corresponding vcpus */
 	mpidr = SGI_AFFINITY_LEVEL(reg, 3);
 	mpidr |= SGI_AFFINITY_LEVEL(reg, 2);
 	mpidr |= SGI_AFFINITY_LEVEL(reg, 1);

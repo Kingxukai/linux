@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the Porter board
+ * Device Tree Source for the woke Porter board
  *
  * Copyright (C) 2015 Cogent Embedded, Inc.
  */

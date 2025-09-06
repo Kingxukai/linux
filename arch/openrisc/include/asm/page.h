@@ -3,7 +3,7 @@
  * OpenRISC Linux
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
  * OpenRISC implementation:
@@ -20,7 +20,7 @@
 #define PAGE_OFFSET	0xc0000000
 #define KERNELBASE	PAGE_OFFSET
 
-/* This is not necessarily the right place for this, but it's needed by
+/* This is not necessarily the woke right place for this, but it's needed by
  * drivers/of/fdt.c
  */
 #include <asm/setup.h>

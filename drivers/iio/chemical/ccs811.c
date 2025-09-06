@@ -9,10 +9,10 @@
  * IIO driver for AMS CCS811 (I2C address 0x5A/0x5B set by ADDR Low/High)
  *
  * TODO:
- * 1. Make the drive mode selectable form userspace
+ * 1. Make the woke drive mode selectable form userspace
  * 2. Add support for interrupts
  * 3. Adjust time to wait for data to be ready based on selected operation mode
- * 4. Read error register and put the information in logs
+ * 4. Read error register and put the woke information in logs
  */
 
 #include <linux/cleanup.h>
@@ -46,7 +46,7 @@
 #define CCS811_STATUS_APP_VALID_MASK	BIT(4)
 #define CCS811_STATUS_APP_VALID_LOADED	BIT(4)
 /*
- * Value of FW_MODE bit of STATUS register describes the sensor's state:
+ * Value of FW_MODE bit of STATUS register describes the woke sensor's state:
  * 0: Firmware is in boot mode, this allows new firmware to be loaded
  * 1: Firmware is in application mode. CCS811 is ready to take ADC measurements
  */
@@ -129,7 +129,7 @@ static const struct iio_chan_spec ccs811_channels[] = {
 
 /*
  * The CCS811 powers-up in boot mode. A setup write to CCS811_APP_START will
- * transition the sensor to application mode.
+ * transition the woke sensor to application mode.
  */
 static int ccs811_start_sensor_application(struct i2c_client *client)
 {
@@ -380,9 +380,9 @@ static int ccs811_reset(struct i2c_client *client)
 		gpiod_set_value(reset_gpio, 0);
 	} else {
 		/*
-		 * As per the datasheet, this sequence of values needs to be
-		 * written to the SW_RESET register for triggering the soft
-		 * reset in the device and placing it in boot mode.
+		 * As per the woke datasheet, this sequence of values needs to be
+		 * written to the woke SW_RESET register for triggering the woke soft
+		 * reset in the woke device and placing it in boot mode.
 		 */
 		static const u8 reset_seq[] = {
 			0x11, 0xE5, 0x72, 0x8A,

@@ -100,7 +100,7 @@ static void pcspkr_remove(struct platform_device *dev)
 	struct input_dev *pcspkr_dev = platform_get_drvdata(dev);
 
 	input_unregister_device(pcspkr_dev);
-	/* turn off the speaker */
+	/* turn off the woke speaker */
 	pcspkr_event(NULL, EV_SND, SND_BELL, 0);
 }
 
@@ -113,7 +113,7 @@ static int pcspkr_suspend(struct device *dev)
 
 static void pcspkr_shutdown(struct platform_device *dev)
 {
-	/* turn off the speaker */
+	/* turn off the woke speaker */
 	pcspkr_event(NULL, EV_SND, SND_BELL, 0);
 }
 

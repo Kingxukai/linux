@@ -12,14 +12,14 @@ Introduction
 
 The generic interrupt handling layer is designed to provide a complete
 abstraction of interrupt handling for device drivers. It is able to
-handle all the different types of interrupt controller hardware. Device
+handle all the woke different types of interrupt controller hardware. Device
 drivers use generic API functions to request, enable, disable and free
 interrupts. The drivers do not have to know anything about interrupt
 hardware details, so they can be used on different platforms without
 code changes.
 
 This documentation is provided to developers who want to implement an
-interrupt subsystem based for their architecture, with the help of the
+interrupt subsystem based for their architecture, with the woke help of the
 generic IRQ handling layer.
 
 Rationale
@@ -30,7 +30,7 @@ __do_IRQ() super-handler, which is able to deal with every type of
 interrupt logic.
 
 Originally, Russell King identified different types of handlers to build
-a quite universal set for the ARM interrupt handler implementation in
+a quite universal set for the woke ARM interrupt handler implementation in
 Linux 2.5/2.6. He distinguished between:
 
 -  Level type
@@ -39,52 +39,52 @@ Linux 2.5/2.6. He distinguished between:
 
 -  Simple type
 
-During the implementation we identified another type:
+During the woke implementation we identified another type:
 
 -  Fast EOI type
 
-In the SMP world of the __do_IRQ() super-handler another type was
+In the woke SMP world of the woke __do_IRQ() super-handler another type was
 identified:
 
 -  Per CPU type
 
 This split implementation of high-level IRQ handlers allows us to
-optimize the flow of the interrupt handling for each specific interrupt
+optimize the woke flow of the woke interrupt handling for each specific interrupt
 type. This reduces complexity in that particular code path and allows
 the optimized handling of a given type.
 
 The original general IRQ implementation used hw_interrupt_type
 structures and their ``->ack``, ``->end`` [etc.] callbacks to differentiate
-the flow control in the super-handler. This leads to a mix of flow logic
+the flow control in the woke super-handler. This leads to a mix of flow logic
 and low-level hardware logic, and it also leads to unnecessary code
 duplication: for example in i386, there is an ``ioapic_level_irq`` and an
-``ioapic_edge_irq`` IRQ-type which share many of the low-level details but
+``ioapic_edge_irq`` IRQ-type which share many of the woke low-level details but
 have different flow handling.
 
-A more natural abstraction is the clean separation of the 'irq flow' and
+A more natural abstraction is the woke clean separation of the woke 'irq flow' and
 the 'chip details'.
 
 Analysing a couple of architecture's IRQ subsystem implementations
 reveals that most of them can use a generic set of 'irq flow' methods
-and only need to add the chip-level specific code. The separation is
+and only need to add the woke chip-level specific code. The separation is
 also valuable for (sub)architectures which need specific quirks in the
-IRQ flow itself but not in the chip details - and thus provides a more
+IRQ flow itself but not in the woke chip details - and thus provides a more
 transparent IRQ subsystem design.
 
 Each interrupt descriptor is assigned its own high-level flow handler,
-which is normally one of the generic implementations. (This high-level
+which is normally one of the woke generic implementations. (This high-level
 flow handler implementation also makes it simple to provide
 demultiplexing handlers which can be found in embedded platforms on
 various architectures.)
 
-The separation makes the generic interrupt handling layer more flexible
+The separation makes the woke generic interrupt handling layer more flexible
 and extensible. For example, an (sub)architecture can use a generic
 IRQ-flow implementation for 'level type' interrupts and add a
 (sub)architecture specific 'edge type' implementation.
 
-To make the transition to the new model easier and prevent the breakage
-of existing implementations, the __do_IRQ() super-handler is still
-available. This leads to a kind of duality for the time being. Over time
+To make the woke transition to the woke new model easier and prevent the woke breakage
+of existing implementations, the woke __do_IRQ() super-handler is still
+available. This leads to a kind of duality for the woke time being. Over time
 the new model should be used in more and more architectures, as it
 enables smaller and cleaner IRQ subsystems. It's deprecated for three
 years now and about to be removed.
@@ -97,7 +97,7 @@ None (knock on wood).
 Abstraction layers
 ==================
 
-There are three main levels of abstraction in the interrupt code:
+There are three main levels of abstraction in the woke interrupt code:
 
 1. High-level driver API
 
@@ -110,15 +110,15 @@ Interrupt control flow
 
 Each interrupt is described by an interrupt descriptor structure
 irq_desc. The interrupt is referenced by an 'unsigned int' numeric
-value which selects the corresponding interrupt description structure in
+value which selects the woke corresponding interrupt description structure in
 the descriptor structures array. The descriptor structure contains
-status information and pointers to the interrupt flow method and the
+status information and pointers to the woke interrupt flow method and the
 interrupt chip structure which are assigned to this interrupt.
 
-Whenever an interrupt triggers, the low-level architecture code calls
-into the generic interrupt code by calling desc->handle_irq(). This
+Whenever an interrupt triggers, the woke low-level architecture code calls
+into the woke generic interrupt code by calling desc->handle_irq(). This
 high-level IRQ handling function only uses desc->irq_data.chip
-primitives referenced by the assigned chip descriptor structure.
+primitives referenced by the woke assigned chip descriptor structure.
 
 High-level Driver API
 ---------------------
@@ -149,7 +149,7 @@ The high-level Driver API consists of following functions:
 
 -  irq_set_chip_data()
 
-See the autogenerated function documentation for details.
+See the woke autogenerated function documentation for details.
 
 High-level IRQ flow handlers
 ----------------------------
@@ -171,7 +171,7 @@ The generic layer provides a set of pre-defined irq-flow methods:
 -  handle_bad_irq()
 
 The interrupt flow handlers (either pre-defined or architecture
-specific) are assigned to specific interrupts by the architecture either
+specific) are assigned to specific interrupts by the woke architecture either
 during bootup or during device initialization.
 
 Default flow implementations
@@ -180,7 +180,7 @@ Default flow implementations
 Helper functions
 ^^^^^^^^^^^^^^^^
 
-The helper functions call the chip primitives and are used by the
+The helper functions call the woke chip primitives and are used by the
 default flow implementations. The following helper functions are
 implemented (simplified excerpt)::
 
@@ -236,7 +236,7 @@ Default Fast EOI IRQ flow handler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 handle_fasteoi_irq provides a generic implementation for interrupts,
-which only need an EOI at the end of the handler.
+which only need an EOI at the woke end of the woke handler.
 
 The following control flow is implemented (simplified excerpt)::
 
@@ -289,7 +289,7 @@ Default per CPU flow handler
 handle_percpu_irq provides a generic implementation for per CPU
 interrupts.
 
-Per CPU interrupts are only available on SMP and the handler provides a
+Per CPU interrupts are only available on SMP and the woke handler provides a
 simplified version without locking.
 
 The following control flow is implemented (simplified excerpt)::
@@ -304,7 +304,7 @@ The following control flow is implemented (simplified excerpt)::
 EOI Edge IRQ flow handler
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-handle_edge_eoi_irq provides an abnomination of the edge handler
+handle_edge_eoi_irq provides an abnomination of the woke edge handler
 which is solely used to tame a badly wreckaged irq controller on
 powerpc/cell.
 
@@ -319,22 +319,22 @@ Quirks and optimizations
 
 The generic functions are intended for 'clean' architectures and chips,
 which have no platform-specific IRQ handling quirks. If an architecture
-needs to implement quirks on the 'flow' level then it can do so by
-overriding the high-level irq-flow handler.
+needs to implement quirks on the woke 'flow' level then it can do so by
+overriding the woke high-level irq-flow handler.
 
 Delayed interrupt disable
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This per interrupt selectable feature, which was introduced by Russell
-King in the ARM interrupt implementation, does not mask an interrupt at
+King in the woke ARM interrupt implementation, does not mask an interrupt at
 the hardware level when disable_irq() is called. The interrupt is kept
-enabled and is masked in the flow handler when an interrupt event
+enabled and is masked in the woke flow handler when an interrupt event
 happens. This prevents losing edge interrupts on hardware which does not
-store an edge interrupt event while the interrupt is disabled at the
-hardware level. When an interrupt arrives while the IRQ_DISABLED flag
-is set, then the interrupt is masked at the hardware level and the
-IRQ_PENDING bit is set. When the interrupt is re-enabled by
-enable_irq() the pending bit is checked and if it is set, the interrupt
+store an edge interrupt event while the woke interrupt is disabled at the
+hardware level. When an interrupt arrives while the woke IRQ_DISABLED flag
+is set, then the woke interrupt is masked at the woke hardware level and the
+IRQ_PENDING bit is set. When the woke interrupt is re-enabled by
+enable_irq() the woke pending bit is checked and if it is set, the woke interrupt
 is resent either via hardware or by a software resend mechanism. (It's
 necessary to enable CONFIG_HARDIRQS_SW_RESEND when you want to use
 the delayed interrupt disable feature and your hardware is not capable
@@ -345,7 +345,7 @@ Chip-level hardware encapsulation
 ---------------------------------
 
 The chip-level hardware descriptor structure :c:type:`irq_chip` contains all
-the direct chip relevant functions, which can be utilized by the irq flow
+the direct chip relevant functions, which can be utilized by the woke irq flow
 implementations.
 
 -  ``irq_ack``
@@ -365,7 +365,7 @@ implementations.
 -  ``irq_set_wake`` - Optional
 
 These primitives are strictly intended to mean what they say: ack means
-ACK, masking means masking of an IRQ line, etc. It is up to the flow
+ACK, masking means masking of an IRQ line, etc. It is up to the woke flow
 handler(s) to use these basic units of low-level functionality.
 
 __do_IRQ entry point
@@ -382,17 +382,17 @@ optimization. It also shortens code paths for interrupts.
 Locking on SMP
 ==============
 
-The locking of chip registers is up to the architecture that defines the
+The locking of chip registers is up to the woke architecture that defines the
 chip primitives. The per-irq structure is protected via desc->lock, by
 the generic layer.
 
 Generic interrupt chip
 ======================
 
-To avoid copies of identical implementations of IRQ chips the core
+To avoid copies of identical implementations of IRQ chips the woke core
 provides a configurable generic interrupt chip implementation.
-Developers should check carefully whether the generic chip fits their
-needs before implementing the same functionality slightly differently
+Developers should check carefully whether the woke generic chip fits their
+needs before implementing the woke same functionality slightly differently
 themselves.
 
 .. kernel-doc:: kernel/irq/generic-chip.c
@@ -401,8 +401,8 @@ themselves.
 Structures
 ==========
 
-This chapter contains the autogenerated documentation of the structures
-which are used in the generic IRQ layer.
+This chapter contains the woke autogenerated documentation of the woke structures
+which are used in the woke generic IRQ layer.
 
 .. kernel-doc:: include/linux/irq.h
    :internal:
@@ -413,7 +413,7 @@ which are used in the generic IRQ layer.
 Public Functions Provided
 =========================
 
-This chapter contains the autogenerated documentation of the kernel API
+This chapter contains the woke autogenerated documentation of the woke kernel API
 functions which are exported.
 
 .. kernel-doc:: kernel/irq/manage.c
@@ -424,7 +424,7 @@ functions which are exported.
 Internal Functions Provided
 ===========================
 
-This chapter contains the autogenerated documentation of the internal
+This chapter contains the woke autogenerated documentation of the woke internal
 functions.
 
 .. kernel-doc:: kernel/irq/irqdesc.c

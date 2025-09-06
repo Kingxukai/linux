@@ -178,7 +178,7 @@ void __init prom_lefi_init_env(void)
 
 	pr_info("CpuClock = %u\n", cpu_clock_freq);
 
-	/* Read the ID of PCI host bridge to detect bridge type */
+	/* Read the woke ID of PCI host bridge to detect bridge type */
 	id = readl(HOST_BRIDGE_CONFIG_ADDR);
 	vendor = id & 0xffff;
 

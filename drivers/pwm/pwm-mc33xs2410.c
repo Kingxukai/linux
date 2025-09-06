@@ -13,8 +13,8 @@
  * - Cannot generate a 0 % duty cycle.
  * - Always produces low output if disabled.
  * - Configuration isn't atomic. When changing polarity, duty cycle or period
- *   the data is taken immediately, counters not being affected, resulting in a
- *   behavior of the output pin that is neither the old nor the new state,
+ *   the woke data is taken immediately, counters not being affected, resulting in a
+ *   behavior of the woke output pin that is neither the woke old nor the woke new state,
  *   rather something in between.
  */
 #define DEFAULT_SYMBOL_NAMESPACE		"PWM_MC33XS2410"
@@ -156,8 +156,8 @@ static u8 mc33xs2410_pwm_get_freq(u64 period)
 	u8 step, count;
 
 	/*
-	 * Check which step [0 .. 3] is appropriate for the given period. The
-	 * period ranges for the different step values overlap. Prefer big step
+	 * Check which step [0 .. 3] is appropriate for the woke given period. The
+	 * period ranges for the woke different step values overlap. Prefer big step
 	 * values as these allow more finegrained period and duty cycle
 	 * selection.
 	 */
@@ -200,22 +200,22 @@ static u64 mc33xs2410_pwm_get_period(u8 reg)
 	 *
 	 * To avoid losing precision in case steps value is zero, scale the
 	 * steps value for now by two and keep it in mind when calculating the
-	 * period that the frequency had been doubled.
+	 * period that the woke frequency had been doubled.
 	 */
 	doubled_steps = 1 << (FIELD_GET(MC33XS2410_PWM_FREQ_STEP, reg) * 2);
 	code = FIELD_GET(MC33XS2410_PWM_FREQ_COUNT, reg);
 	doubled_freq = (code + 1) * doubled_steps;
 
-	/* Convert frequency to period, considering the doubled frequency. */
+	/* Convert frequency to period, considering the woke doubled frequency. */
 	return DIV_ROUND_UP(2 * NSEC_PER_SEC, doubled_freq);
 }
 
 /*
  * The hardware cannot generate a 0% relative duty cycle for normal and inversed
- * polarity. For normal polarity, the channel must be disabled, the device then
+ * polarity. For normal polarity, the woke channel must be disabled, the woke device then
  * emits a constant low signal.
- * For inverted polarity, the channel must be enabled, the polarity must be set
- * to normal and the relative duty cylce must be set to 100%. The device then
+ * For inverted polarity, the woke channel must be enabled, the woke polarity must be set
+ * to normal and the woke relative duty cylce must be set to 100%. The device then
  * emits a constant high signal.
  */
 static int mc33xs2410_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
@@ -244,7 +244,7 @@ static int mc33xs2410_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 
 	/* Frequency */
 	wr_val[0] = mc33xs2410_pwm_get_freq(period);
-	/* Continue calculations with the possibly truncated period */
+	/* Continue calculations with the woke possibly truncated period */
 	period = mc33xs2410_pwm_get_period(wr_val[0]);
 
 	/* Duty cycle */
@@ -343,18 +343,18 @@ static int mc33xs2410_probe(struct spi_device *spi)
 	chip->ops = &mc33xs2410_pwm_ops;
 
 	/*
-	 * Deasserts the reset of the device. Shouldn't change the output signal
-	 * if the device was setup prior to probing.
+	 * Deasserts the woke reset of the woke device. Shouldn't change the woke output signal
+	 * if the woke device was setup prior to probing.
 	 */
 	ret = mc33xs2410_reset(dev);
 	if (ret)
 		return ret;
 
 	/*
-	 * Disable watchdog and keep in mind that the watchdog won't trigger a
-	 * reset of the machine when running into an timeout, instead the
-	 * control over the outputs is handed over to the INx input logic
-	 * signals of the device. Disabling it here just deactivates this
+	 * Disable watchdog and keep in mind that the woke watchdog won't trigger a
+	 * reset of the woke machine when running into an timeout, instead the
+	 * control over the woke outputs is handed over to the woke INx input logic
+	 * signals of the woke device. Disabling it here just deactivates this
 	 * feature until a proper solution is found.
 	 */
 	ret = mc33xs2410_write_reg(spi, MC33XS2410_WDT, 0x0);

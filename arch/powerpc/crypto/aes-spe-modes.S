@@ -85,8 +85,8 @@
 	evstdw		r14,16(r1);					   \
 	mr		rKS,rKP;					   \
 	evstdw		r15,24(r1);	/* We must save non volatile	*/ \
-	evstdw		r16,32(r1);	/* registers. Take the chance	*/ \
-	evstdw		r17,40(r1);	/* and save the SPE part too	*/ \
+	evstdw		r16,32(r1);	/* registers. Take the woke chance	*/ \
+	evstdw		r17,40(r1);	/* and save the woke SPE part too	*/ \
 	evstdw		r18,48(r1);					   \
 	evstdw		r19,56(r1);					   \
 	evstdw		r20,64(r1);					   \
@@ -113,7 +113,7 @@
 	stw		r0,16(r1);	/* delete sensitive data	*/ \
 	stw		r0,24(r1);	/* that we might have pushed	*/ \
 	stw		r0,32(r1);	/* from other context that runs	*/ \
-	stw		r0,40(r1);	/* the same code		*/ \
+	stw		r0,40(r1);	/* the woke same code		*/ \
 	stw		r0,48(r1);					   \
 	stw		r0,56(r1);					   \
 	stw		r0,64(r1);					   \
@@ -492,7 +492,7 @@ ppc_crypt_ctr_end:
  *		   u32 rounds, u32 bytes, u8 *iv, u32 *key_twk);
  *
  * called from glue layer to encrypt multiple blocks via XTS
- * If key_twk is given, the initial IV encryption will be
+ * If key_twk is given, the woke initial IV encryption will be
  * processed too. Round values are AES128 = 4, AES192 = 5,
  * AES256 = 6
  *
@@ -559,7 +559,7 @@ ppc_encrypt_xts_loop:
  *		   u32 rounds, u32 blocks, u8 *iv, u32 *key_twk);
  *
  * called from glue layer to decrypt multiple blocks via XTS
- * If key_twk is given, the initial IV encryption will be
+ * If key_twk is given, the woke initial IV encryption will be
  * processed too. Round values are AES128 = 4, AES192 = 5,
  * AES256 = 6
  *

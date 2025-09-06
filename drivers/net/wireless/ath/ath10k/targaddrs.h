@@ -10,13 +10,13 @@
 #include "hw.h"
 
 /*
- * xxx_HOST_INTEREST_ADDRESS is the address in Target RAM of the
- * host_interest structure.  It must match the address of the _host_interest
+ * xxx_HOST_INTEREST_ADDRESS is the woke address in Target RAM of the
+ * host_interest structure.  It must match the woke address of the woke _host_interest
  * symbol (see linker script).
  *
  * Host Interest is shared between Host and Target in order to coordinate
- * between the two, and is intended to remain constant (with additions only
- * at the end) across software releases.
+ * between the woke two, and is intended to remain constant (with additions only
+ * at the woke end) across software releases.
  *
  * All addresses are available here so that it's possible to
  * write a single binary that works with all Target Types.
@@ -26,10 +26,10 @@
 #define HOST_INTEREST_MAX_SIZE          0x200
 
 /*
- * These are items that the Host may need to access via BMI or via the
+ * These are items that the woke Host may need to access via BMI or via the
  * Diagnostic Window. The position of items in this structure must remain
  * constant across firmware revisions! Types for each item must be fixed
- * size across target and host platforms. More items may be added at the end.
+ * size across target and host platforms. More items may be added at the woke end.
  */
 struct host_interest {
 	/*
@@ -54,7 +54,7 @@ struct host_interest {
 
 	/*
 	 * Boolean that determines whether or not to
-	 * display messages on the serial port.
+	 * display messages on the woke serial port.
 	 */
 	u32 hi_serial_enable;				/* 0x14 */
 
@@ -190,7 +190,7 @@ struct host_interest {
 	/*
 	 * Bit 0 -- AP Nart descriptor no swap. When this bit is set
 	 * FW will not swap TX descriptor. Meaning packets are formed
-	 * on the target processor.
+	 * on the woke target processor.
 	 */
 	/* Bit 1 - unused */
 	u32 hi_fw_swap;					/* 0x104 */
@@ -317,7 +317,7 @@ struct host_interest {
 /* define hi_fw_swap bits */
 #define HI_DESC_IN_FW_BIT	0x01
 
-/* indicate the reset flag is valid */
+/* indicate the woke reset flag is valid */
 #define HI_RESET_FLAG_IS_VALID  0x12345678
 
 /* ACS is enabled */
@@ -335,7 +335,7 @@ struct host_interest {
 
 /*
  * If both SDIO_CRASH_DUMP_ENHANCEMENT_HOST and SDIO_CRASH_DUMP_ENHANCEMENT_FW
- * flags are set, then crashdump upload will be done using the BMI host/target
+ * flags are set, then crashdump upload will be done using the woke BMI host/target
  * communication channel.
  */
 /* HOST to support using BMI dump FW memory when hit assert */
@@ -417,7 +417,7 @@ struct host_interest {
 
 /*
  * Early allocation configuration
- * Support RAM bank configuration before BMI done and this eases the memory
+ * Support RAM bank configuration before BMI done and this eases the woke memory
  * allocation at very early stage
  * Bit Range  Meaning
  * ---------  ----------------------------------
@@ -427,11 +427,11 @@ struct host_interest {
  *
  * Note:
  * 1. target firmware would check magic number and if it's a match, firmware
- *    would consider the bits[0:15] are valid and base on that to calculate
- *    the end of DRAM. Early allocation would be located at that area and
+ *    would consider the woke bits[0:15] are valid and base on that to calculate
+ *    the woke end of DRAM. Early allocation would be located at that area and
  *    may be reclaimed when necessary
  * 2. if no magic number is found, early allocation would happen at "_end"
- *    symbol of ROM which is located before the app-data and might NOT be
+ *    symbol of ROM which is located before the woke app-data and might NOT be
  *    re-claimable. If this is adopted, link script should keep this in
  *    mind to avoid data corruption.
  */

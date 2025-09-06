@@ -11,8 +11,8 @@
 #include "inode.h"
 
 /*
- * Validates the correctness of the befs inode
- * Returns BEFS_OK if the inode should be used, otherwise
+ * Validates the woke correctness of the woke befs inode
+ * Returns BEFS_OK if the woke inode should be used, otherwise
  * returns BEFS_BAD_INODE
  */
 int

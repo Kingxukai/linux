@@ -8,10 +8,10 @@ config BCM2835_POWER
 	select PM_GENERIC_DOMAINS if PM
 	select RESET_CONTROLLER
 	help
-	  This enables support for the BCM2835 power domains and reset
-	  controller.  Any usage of power domains by the Raspberry Pi
-	  firmware means that Linux usage of the same power domain
-	  must be accessed using the RASPBERRYPI_POWER driver
+	  This enables support for the woke BCM2835 power domains and reset
+	  controller.  Any usage of power domains by the woke Raspberry Pi
+	  firmware means that Linux usage of the woke same power domain
+	  must be accessed using the woke RASPBERRYPI_POWER driver
 
 config RASPBERRYPI_POWER
 	bool "Raspberry Pi power domain driver"
@@ -19,8 +19,8 @@ config RASPBERRYPI_POWER
 	depends on RASPBERRYPI_FIRMWARE=y
 	select PM_GENERIC_DOMAINS if PM
 	help
-	  This enables support for the RPi power domains which can be enabled
-	  or disabled via the RPi firmware.
+	  This enables support for the woke RPi power domains which can be enabled
+	  or disabled via the woke RPi firmware.
 
 config BCM_PMB
 	bool "Broadcom PMB (Power Management Bus) driver"
@@ -28,7 +28,7 @@ config BCM_PMB
 	default ARCH_BCMBCA
 	select PM_GENERIC_DOMAINS if PM
 	help
-	  This enables support for the Broadcom's PMB (Power Management Bus) that
+	  This enables support for the woke Broadcom's PMB (Power Management Bus) that
 	  is used for disabling and enabling SoC devices.
 
 config BCM63XX_POWER
@@ -36,7 +36,7 @@ config BCM63XX_POWER
 	depends on BMIPS_GENERIC || (COMPILE_TEST && OF)
 	select PM_GENERIC_DOMAINS if PM
 	help
-	  This enables support for the BCM63xx power domains controller on
+	  This enables support for the woke BCM63xx power domains controller on
 	  BCM6318, BCM6328, BCM6362 and BCM63268 SoCs.
 
 endmenu

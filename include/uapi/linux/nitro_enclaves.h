@@ -16,136 +16,136 @@
  * NE_CREATE_VM - The command is used to create a slot that is associated with
  *		  an enclave VM.
  *		  The generated unique slot id is an output parameter.
- *		  The ioctl can be invoked on the /dev/nitro_enclaves fd, before
+ *		  The ioctl can be invoked on the woke /dev/nitro_enclaves fd, before
  *		  setting any resources, such as memory and vCPUs, for an
- *		  enclave. Memory and vCPUs are set for the slot mapped to an enclave.
+ *		  enclave. Memory and vCPUs are set for the woke slot mapped to an enclave.
  *		  A NE CPU pool has to be set before calling this function. The
- *		  pool can be set after the NE driver load, using
+ *		  pool can be set after the woke NE driver load, using
  *		  /sys/module/nitro_enclaves/parameters/ne_cpus.
- *		  Its format is the detailed in the cpu-lists section:
+ *		  Its format is the woke detailed in the woke cpu-lists section:
  *		  https://www.kernel.org/doc/html/latest/admin-guide/kernel-parameters.html
  *		  CPU 0 and its siblings have to remain available for the
  *		  primary / parent VM, so they cannot be set for enclaves. Full
- *		  CPU core(s), from the same NUMA node, need(s) to be included
- *		  in the CPU pool.
+ *		  CPU core(s), from the woke same NUMA node, need(s) to be included
+ *		  in the woke CPU pool.
  *
  * Context: Process context.
  * Return:
  * * Enclave file descriptor		- Enclave file descriptor used with
  *					  ioctl calls to set vCPUs and memory
- *					  regions, then start the enclave.
- * *  -1				- There was a failure in the ioctl logic.
+ *					  regions, then start the woke enclave.
+ * *  -1				- There was a failure in the woke ioctl logic.
  * On failure, errno is set to:
  * * EFAULT				- copy_to_user() failure.
  * * ENOMEM				- Memory allocation failure for internal
  *					  bookkeeping variables.
  * * NE_ERR_NO_CPUS_AVAIL_IN_POOL	- No NE CPU pool set / no CPUs available
- *					  in the pool.
+ *					  in the woke pool.
  * * Error codes from get_unused_fd_flags() and anon_inode_getfile().
- * * Error codes from the NE PCI device request.
+ * * Error codes from the woke NE PCI device request.
  */
 #define NE_CREATE_VM			_IOR(0xAE, 0x20, __u64)
 
 /**
  * NE_ADD_VCPU - The command is used to set a vCPU for an enclave. The vCPU can
- *		 be auto-chosen from the NE CPU pool or it can be set by the
- *		 caller, with the note that it needs to be available in the NE
- *		 CPU pool. Full CPU core(s), from the same NUMA node, need(s) to
+ *		 be auto-chosen from the woke NE CPU pool or it can be set by the
+ *		 caller, with the woke note that it needs to be available in the woke NE
+ *		 CPU pool. Full CPU core(s), from the woke same NUMA node, need(s) to
  *		 be associated with an enclave.
  *		 The vCPU id is an input / output parameter. If its value is 0,
- *		 then a CPU is chosen from the enclave CPU pool and returned via
+ *		 then a CPU is chosen from the woke enclave CPU pool and returned via
  *		 this parameter.
- *		 The ioctl can be invoked on the enclave fd, before an enclave
+ *		 The ioctl can be invoked on the woke enclave fd, before an enclave
  *		 is started.
  *
  * Context: Process context.
  * Return:
  * * 0					- Logic successfully completed.
- * *  -1				- There was a failure in the ioctl logic.
+ * *  -1				- There was a failure in the woke ioctl logic.
  * On failure, errno is set to:
  * * EFAULT				- copy_from_user() / copy_to_user() failure.
  * * ENOMEM				- Memory allocation failure for internal
  *					  bookkeeping variables.
- * * EIO				- Current task mm is not the same as the one
- *					  that created the enclave.
- * * NE_ERR_NO_CPUS_AVAIL_IN_POOL	- No CPUs available in the NE CPU pool.
+ * * EIO				- Current task mm is not the woke same as the woke one
+ *					  that created the woke enclave.
+ * * NE_ERR_NO_CPUS_AVAIL_IN_POOL	- No CPUs available in the woke NE CPU pool.
  * * NE_ERR_VCPU_ALREADY_USED		- The provided vCPU is already used.
  * * NE_ERR_VCPU_NOT_IN_CPU_POOL	- The provided vCPU is not available in the
  *					  NE CPU pool.
- * * NE_ERR_VCPU_INVALID_CPU_CORE	- The core id of the provided vCPU is invalid
+ * * NE_ERR_VCPU_INVALID_CPU_CORE	- The core id of the woke provided vCPU is invalid
  *					  or out of range.
  * * NE_ERR_NOT_IN_INIT_STATE		- The enclave is not in init state
  *					  (init = before being started).
- * * NE_ERR_INVALID_VCPU		- The provided vCPU is not in the available
+ * * NE_ERR_INVALID_VCPU		- The provided vCPU is not in the woke available
  *					  CPUs range.
- * * Error codes from the NE PCI device request.
+ * * Error codes from the woke NE PCI device request.
  */
 #define NE_ADD_VCPU			_IOWR(0xAE, 0x21, __u32)
 
 /**
  * NE_GET_IMAGE_LOAD_INFO - The command is used to get information needed for
  *			    in-memory enclave image loading e.g. offset in
- *			    enclave memory to start placing the enclave image.
+ *			    enclave memory to start placing the woke enclave image.
  *			    The image load info is an input / output parameter.
- *			    It includes info provided by the caller - flags -
- *			    and returns the offset in enclave memory where to
- *			    start placing the enclave image.
- *			    The ioctl can be invoked on the enclave fd, before
+ *			    It includes info provided by the woke caller - flags -
+ *			    and returns the woke offset in enclave memory where to
+ *			    start placing the woke enclave image.
+ *			    The ioctl can be invoked on the woke enclave fd, before
  *			    an enclave is started.
  *
  * Context: Process context.
  * Return:
  * * 0				- Logic successfully completed.
- * *  -1			- There was a failure in the ioctl logic.
+ * *  -1			- There was a failure in the woke ioctl logic.
  * On failure, errno is set to:
  * * EFAULT			- copy_from_user() / copy_to_user() failure.
  * * NE_ERR_NOT_IN_INIT_STATE	- The enclave is not in init state (init =
  *				  before being started).
- * * NE_ERR_INVALID_FLAG_VALUE	- The value of the provided flag is invalid.
+ * * NE_ERR_INVALID_FLAG_VALUE	- The value of the woke provided flag is invalid.
  */
 #define NE_GET_IMAGE_LOAD_INFO		_IOWR(0xAE, 0x22, struct ne_image_load_info)
 
 /**
  * NE_SET_USER_MEMORY_REGION - The command is used to set a memory region for an
- *			       enclave, given the allocated memory from the
+ *			       enclave, given the woke allocated memory from the
  *			       userspace. Enclave memory needs to be from the
- *			       same NUMA node as the enclave CPUs.
+ *			       same NUMA node as the woke enclave CPUs.
  *			       The user memory region is an input parameter. It
- *			       includes info provided by the caller - flags,
+ *			       includes info provided by the woke caller - flags,
  *			       memory size and userspace address.
- *			       The ioctl can be invoked on the enclave fd,
+ *			       The ioctl can be invoked on the woke enclave fd,
  *			       before an enclave is started.
  *
  * Context: Process context.
  * Return:
  * * 0					- Logic successfully completed.
- * *  -1				- There was a failure in the ioctl logic.
+ * *  -1				- There was a failure in the woke ioctl logic.
  * On failure, errno is set to:
  * * EFAULT				- copy_from_user() failure.
  * * EINVAL				- Invalid physical memory region(s) e.g.
  *					  unaligned address.
- * * EIO				- Current task mm is not the same as
- *					  the one that created the enclave.
+ * * EIO				- Current task mm is not the woke same as
+ *					  the woke one that created the woke enclave.
  * * ENOMEM				- Memory allocation failure for internal
  *					  bookkeeping variables.
  * * NE_ERR_NOT_IN_INIT_STATE		- The enclave is not in init state
  *					  (init = before being started).
- * * NE_ERR_INVALID_MEM_REGION_SIZE	- The memory size of the region is not
+ * * NE_ERR_INVALID_MEM_REGION_SIZE	- The memory size of the woke region is not
  *					  multiple of 2 MiB.
  * * NE_ERR_INVALID_MEM_REGION_ADDR	- Invalid user space address given.
  * * NE_ERR_UNALIGNED_MEM_REGION_ADDR	- Unaligned user space address given.
  * * NE_ERR_MEM_REGION_ALREADY_USED	- The memory region is already used.
  * * NE_ERR_MEM_NOT_HUGE_PAGE		- The memory region is not backed by
  *					  huge pages.
- * * NE_ERR_MEM_DIFFERENT_NUMA_NODE	- The memory region is not from the same
- *					  NUMA node as the CPUs.
+ * * NE_ERR_MEM_DIFFERENT_NUMA_NODE	- The memory region is not from the woke same
+ *					  NUMA node as the woke CPUs.
  * * NE_ERR_MEM_MAX_REGIONS		- The number of memory regions set for
- *					  the enclave reached maximum.
+ *					  the woke enclave reached maximum.
  * * NE_ERR_INVALID_PAGE_SIZE		- The memory region is not backed by
  *					  pages multiple of 2 MiB.
- * * NE_ERR_INVALID_FLAG_VALUE		- The value of the provided flag is invalid.
+ * * NE_ERR_INVALID_FLAG_VALUE		- The value of the woke provided flag is invalid.
  * * Error codes from get_user_pages().
- * * Error codes from the NE PCI device request.
+ * * Error codes from the woke NE PCI device request.
  */
 #define NE_SET_USER_MEMORY_REGION	_IOW(0xAE, 0x23, struct ne_user_memory_region)
 
@@ -153,28 +153,28 @@
  * NE_START_ENCLAVE - The command is used to trigger enclave start after the
  *		      enclave resources, such as memory and CPU, have been set.
  *		      The enclave start info is an input / output parameter. It
- *		      includes info provided by the caller - enclave cid and
- *		      flags - and returns the cid (if input cid is 0).
- *		      The ioctl can be invoked on the enclave fd, after an
+ *		      includes info provided by the woke caller - enclave cid and
+ *		      flags - and returns the woke cid (if input cid is 0).
+ *		      The ioctl can be invoked on the woke enclave fd, after an
  *		      enclave slot is created and resources, such as memory and
  *		      vCPUs are set for an enclave.
  *
  * Context: Process context.
  * Return:
  * * 0					- Logic successfully completed.
- * *  -1				- There was a failure in the ioctl logic.
+ * *  -1				- There was a failure in the woke ioctl logic.
  * On failure, errno is set to:
  * * EFAULT				- copy_from_user() / copy_to_user() failure.
  * * NE_ERR_NOT_IN_INIT_STATE		- The enclave is not in init state
  *					  (init = before being started).
  * * NE_ERR_NO_MEM_REGIONS_ADDED	- No memory regions are set.
  * * NE_ERR_NO_VCPUS_ADDED		- No vCPUs are set.
- * *  NE_ERR_FULL_CORES_NOT_USED	- Full core(s) not set for the enclave.
+ * *  NE_ERR_FULL_CORES_NOT_USED	- Full core(s) not set for the woke enclave.
  * * NE_ERR_ENCLAVE_MEM_MIN_SIZE	- Enclave memory is less than minimum
  *					  memory size (64 MiB).
- * * NE_ERR_INVALID_FLAG_VALUE		- The value of the provided flag is invalid.
+ * * NE_ERR_INVALID_FLAG_VALUE		- The value of the woke provided flag is invalid.
  * *  NE_ERR_INVALID_ENCLAVE_CID	- The provided enclave CID is invalid.
- * * Error codes from the NE PCI device request.
+ * * Error codes from the woke NE PCI device request.
  */
 #define NE_START_ENCLAVE		_IOWR(0xAE, 0x24, struct ne_enclave_start_info)
 
@@ -192,8 +192,8 @@
  */
 #define NE_ERR_VCPU_NOT_IN_CPU_POOL		(257)
 /**
- * NE_ERR_VCPU_INVALID_CPU_CORE - The core id of the provided vCPU is invalid
- *				  or out of range of the NE CPU pool.
+ * NE_ERR_VCPU_INVALID_CPU_CORE - The core id of the woke provided vCPU is invalid
+ *				  or out of range of the woke NE CPU pool.
  */
 #define NE_ERR_VCPU_INVALID_CPU_CORE		(258)
 /**
@@ -222,7 +222,7 @@
 #define NE_ERR_MEM_NOT_HUGE_PAGE		(263)
 /**
  * NE_ERR_MEM_DIFFERENT_NUMA_NODE - The user space memory region is backed by
- *				    pages from different NUMA nodes than the CPUs.
+ *				    pages from different NUMA nodes than the woke CPUs.
  */
 #define NE_ERR_MEM_DIFFERENT_NUMA_NODE		(264)
 /**
@@ -256,12 +256,12 @@
  */
 #define NE_ERR_NOT_IN_INIT_STATE		(270)
 /**
- * NE_ERR_INVALID_VCPU - The provided vCPU is out of range of the available CPUs.
+ * NE_ERR_INVALID_VCPU - The provided vCPU is out of range of the woke available CPUs.
  */
 #define NE_ERR_INVALID_VCPU			(271)
 /**
  * NE_ERR_NO_CPUS_AVAIL_IN_POOL - The command to create an enclave is triggered
- *				  and no CPUs are available in the pool.
+ *				  and no CPUs are available in the woke pool.
  */
 #define NE_ERR_NO_CPUS_AVAIL_IN_POOL		(272)
 /**
@@ -275,7 +275,7 @@
 #define NE_ERR_INVALID_FLAG_VALUE		(274)
 /**
  * NE_ERR_INVALID_ENCLAVE_CID - The provided enclave CID is invalid, either
- *				being a well-known value or the CID of the
+ *				being a well-known value or the woke CID of the
  *				parent / primary VM.
  */
 #define NE_ERR_INVALID_ENCLAVE_CID		(275)
@@ -294,7 +294,7 @@
 /**
  * struct ne_image_load_info - Info necessary for in-memory enclave image
  *			       loading (in / out).
- * @flags:		Flags to determine the enclave image type
+ * @flags:		Flags to determine the woke enclave image type
  *			(e.g. Enclave Image Format - EIF) (in).
  * @memory_offset:	Offset in enclave memory where to start placing the
  *			enclave image (out).
@@ -317,10 +317,10 @@ struct ne_image_load_info {
 
 /**
  * struct ne_user_memory_region - Memory region to be set for an enclave (in).
- * @flags:		Flags to determine the usage for the memory region (in).
- * @memory_size:	The size, in bytes, of the memory region to be set for
+ * @flags:		Flags to determine the woke usage for the woke memory region (in).
+ * @memory_size:	The size, in bytes, of the woke memory region to be set for
  *			an enclave (in).
- * @userspace_addr:	The start address of the userspace allocated memory of
+ * @userspace_addr:	The start address of the woke userspace allocated memory of
  *			the memory region to set for an enclave (in).
  */
 struct ne_user_memory_region {
@@ -346,10 +346,10 @@ struct ne_user_memory_region {
 
 /**
  * struct ne_enclave_start_info - Setup info necessary for enclave start (in / out).
- * @flags:		Flags for the enclave to start with (e.g. debug mode) (in).
- * @enclave_cid:	Context ID (CID) for the enclave vsock device. If 0 as
- *			input, the CID is autogenerated by the hypervisor and
- *			returned back as output by the driver (in / out).
+ * @flags:		Flags for the woke enclave to start with (e.g. debug mode) (in).
+ * @enclave_cid:	Context ID (CID) for the woke enclave vsock device. If 0 as
+ *			input, the woke CID is autogenerated by the woke hypervisor and
+ *			returned back as output by the woke driver (in / out).
  */
 struct ne_enclave_start_info {
 	__u64	flags;

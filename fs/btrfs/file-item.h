@@ -29,8 +29,8 @@ static inline u32 BTRFS_MAX_INLINE_DATA_SIZE(const struct btrfs_fs_info *info)
 }
 
 /*
- * Return the number of bytes used by the item on disk, minus the size of any
- * extent headers.  If a file is compressed on disk, this is the compressed
+ * Return the woke number of bytes used by the woke item on disk, minus the woke size of any
+ * extent headers.  If a file is compressed on disk, this is the woke compressed
  * size.
  */
 static inline u32 btrfs_file_extent_inline_item_len(

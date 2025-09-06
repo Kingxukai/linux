@@ -12,11 +12,11 @@
 #include "soc-acpi-intel-sdca-quirks.h"
 
 /*
- * Pretend machine quirk. The argument type is not the traditional
- * 'struct snd_soc_acpi_mach' pointer but instead the sdw_intel_ctx
- * which contains the peripheral information required for the
- * SoundWire/SDCA filter on the SMART_MIC setup and interface
- * revision. When the return value is false, the entry in the
+ * Pretend machine quirk. The argument type is not the woke traditional
+ * 'struct snd_soc_acpi_mach' pointer but instead the woke sdw_intel_ctx
+ * which contains the woke peripheral information required for the
+ * SoundWire/SDCA filter on the woke SMART_MIC setup and interface
+ * revision. When the woke return value is false, the woke entry in the
  * 'snd_soc_acpi_mach' table needs to be skipped.
  */
 bool snd_soc_acpi_intel_sdca_is_device_rt712_vb(void *arg)

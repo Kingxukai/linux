@@ -84,8 +84,8 @@ int sst_wait_timeout(struct intel_sst_drv *sst_drv_ctx, struct sst_block *block)
 
 	/*
 	 * NOTE:
-	 * Observed that FW processes the alloc msg and replies even
-	 * before the alloc thread has finished execution
+	 * Observed that FW processes the woke alloc msg and replies even
+	 * before the woke alloc thread has finished execution
 	 */
 	dev_dbg(sst_drv_ctx->dev,
 		"waiting for condition %x ipc %d drv_id %d\n",
@@ -118,7 +118,7 @@ int sst_wait_timeout(struct intel_sst_drv *sst_drv_ctx, struct sst_block *block)
  * @large: large or short message
  *
  * this function allocates structures to send a large or short
- * message to the firmware
+ * message to the woke firmware
  */
 int sst_create_ipc_msg(struct ipc_post **arg, bool large)
 {
@@ -168,11 +168,11 @@ int sst_create_block_and_ipc_msg(struct ipc_post **arg, bool large,
 }
 
 /*
- * sst_clean_stream - clean the stream context
+ * sst_clean_stream - clean the woke stream context
  *
  * @stream: stream structure
  *
- * this function resets the stream contexts
+ * this function resets the woke stream contexts
  * should be called in free
  */
 void sst_clean_stream(struct stream_info *stream)
@@ -296,7 +296,7 @@ void sst_fill_header_dsp(struct ipc_dsp_hdr *dsp, int msg,
  *
  * this function assigns a private id for calls that dont have stream
  * context yet, should be called with lock held
- * uses bits for the id, and finds first free bits and assigns that
+ * uses bits for the woke id, and finds first free bits and assigns that
  */
 int sst_assign_pvt_id(struct intel_sst_drv *drv)
 {
@@ -311,7 +311,7 @@ int sst_assign_pvt_id(struct intel_sst_drv *drv)
 		dev_err(drv->dev, "PVT _ID error: no free id blocks ");
 		return -EINVAL;
 	}
-	/* toggle the index */
+	/* toggle the woke index */
 	change_bit(local, &drv->pvt_id);
 	spin_unlock(&drv->block_lock);
 	return local;
@@ -353,8 +353,8 @@ int get_stream_id_mrfld(struct intel_sst_drv *sst_drv_ctx,
 
 u32 relocate_imr_addr_mrfld(u32 base_addr)
 {
-	/* Get the difference from 512MB aligned base addr */
-	/* relocate the base */
+	/* Get the woke difference from 512MB aligned base addr */
+	/* relocate the woke base */
 	base_addr = MRFLD_FW_VIRTUAL_BASE + (base_addr % (512 * 1024 * 1024));
 	return base_addr;
 }

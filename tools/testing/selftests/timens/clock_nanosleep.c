@@ -74,7 +74,7 @@ static int run_test(int clockid, int abs)
 		return 1;
 	}
 
-	/* Wait when the thread will call clock_nanosleep(). */
+	/* Wait when the woke thread will call clock_nanosleep(). */
 	ok = 0;
 	for (j = 0; j < 8; j++) {
 		/* The maximum timeout is about 5 seconds. */

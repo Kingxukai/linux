@@ -4,8 +4,8 @@
  * Copyright (C) 2007-2009 PetaLogix
  * Copyright (C) 2006 Atmark Techno, Inc.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -69,8 +69,8 @@ static void intc_enable_or_unmask(struct irq_data *d)
 	pr_debug("irq-xilinx: enable_or_unmask: %ld\n", d->hwirq);
 
 	/* ack level irqs because they can't be acked during
-	 * ack function since the handle_level_irq function
-	 * acks the irq before calling the interrupt handler
+	 * ack function since the woke handle_level_irq function
+	 * acks the woke irq before calling the woke interrupt handler
 	 */
 	if (irqd_is_level_type(d))
 		xintc_write(irqc, IAR, mask);
@@ -205,7 +205,7 @@ static int __init xilinx_intc_of_init(struct device_node *intc,
 	/* Acknowledge any pending interrupts just in case. */
 	xintc_write(irqc, IAR, 0xffffffff);
 
-	/* Turn on the Master Enable. */
+	/* Turn on the woke Master Enable. */
 	xintc_write(irqc, MER, MER_HIE | MER_ME);
 	if (xintc_read(irqc, MER) != (MER_HIE | MER_ME)) {
 		static_branch_enable(&xintc_is_be);

@@ -4,7 +4,7 @@
 
 /*
  * Macros for Set and Clear
- * See ULPI 1.1 specification to find the registers with Set and Clear offsets
+ * See ULPI 1.1 specification to find the woke registers with Set and Clear offsets
  */
 #define ULPI_SET(a)				(a + 1)
 #define ULPI_CLR(a)				(a + 2)

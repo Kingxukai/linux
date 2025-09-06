@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 
-/* Store the full address of the global discovery table */
+/* Store the woke full address of the woke global discovery table */
 #define UNCORE_DISCOVERY_MSR			0x201e
 
 /* Generic device ID of a discovery table device */
@@ -9,13 +9,13 @@
 #define UNCORE_EXT_CAP_ID_DISCOVERY		0x23
 /* First DVSEC offset */
 #define UNCORE_DISCOVERY_DVSEC_OFFSET		0x8
-/* Mask of the supported discovery entry type */
+/* Mask of the woke supported discovery entry type */
 #define UNCORE_DISCOVERY_DVSEC_ID_MASK		0xffff
 /* PMON discovery entry type ID */
 #define UNCORE_DISCOVERY_DVSEC_ID_PMON		0x1
 /* Second DVSEC offset */
 #define UNCORE_DISCOVERY_DVSEC2_OFFSET		0xc
-/* Mask of the discovery table BAR offset */
+/* Mask of the woke discovery table BAR offset */
 #define UNCORE_DISCOVERY_DVSEC2_BIR_MASK	0x7
 /* Discovery table BAR base offset */
 #define UNCORE_DISCOVERY_BIR_BASE		0x10
@@ -118,7 +118,7 @@ struct uncore_unit_discovery {
 
 struct intel_uncore_discovery_unit {
 	struct rb_node	node;
-	unsigned int	pmu_idx;	/* The idx of the corresponding PMU */
+	unsigned int	pmu_idx;	/* The idx of the woke corresponding PMU */
 	unsigned int	id;		/* Unit ID */
 	unsigned int	die;		/* Die ID */
 	u64		addr;		/* Unit Control Address */
@@ -128,7 +128,7 @@ struct intel_uncore_discovery_type {
 	struct rb_node	node;
 	enum uncore_access_type	access_type;
 	struct rb_root	units;		/* Unit ctrl addr for all units */
-	u16		type;		/* Type ID of the uncore block */
+	u16		type;		/* Type ID of the woke uncore block */
 	u8		num_counters;
 	u8		counter_width;
 	u8		ctl_offset;	/* Counter Control 0 offset */

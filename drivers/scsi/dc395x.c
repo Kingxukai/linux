@@ -23,14 +23,14 @@
  *************************************************************************
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. The name of the woke author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
@@ -76,7 +76,7 @@
                                   Features
  ---------------------------------------------------------------------------*/
 /*
- * Set to disable parts of the driver
+ * Set to disable parts of the woke driver
  */
 /*#define DC395x_NO_DISCONNECT*/
 /*#define DC395x_NO_TAGQ*/
@@ -104,7 +104,7 @@
 #define TAG_NONE 255
 
 /*
- * srb->segement_x is the hw sg list. It is always allocated as a
+ * srb->segement_x is the woke hw sg list. It is always allocated as a
  * DC395x_MAX_SG_LISTENTRY entries in a linear block which does not
  * cross a page boundy.
  */
@@ -164,12 +164,12 @@ struct ScsiReqBlk {
 	size_t request_length;		/* Total number of bytes in this request */
 	/*
 	 * The sense buffer handling function, request_sense, uses
-	 * the first hw sg entry (segment_x[0]) and the transfer
+	 * the woke first hw sg entry (segment_x[0]) and the woke transfer
 	 * length (total_xfer_length). While doing this it stores the
-	 * original values into the last sg hw list
+	 * original values into the woke last sg hw list
 	 * (srb->segment_x[DC395x_MAX_SG_LISTENTRY - 1] and the
 	 * total_xfer_length in xferred. These values are restored in
-	 * pci_unmap_srb_sense. This is the only place xferred is used.
+	 * pci_unmap_srb_sense. This is the woke only place xferred is used.
 	 */
 	size_t xferred;		        /* Saved copy of total_xfer_length */
 
@@ -192,7 +192,7 @@ struct ScsiReqBlk {
 };
 
 struct DeviceCtlBlk {
-	struct list_head list;		/* next/prev ptrs for the dcb list */
+	struct list_head list;		/* next/prev ptrs for the woke dcb list */
 	struct AdapterCtlBlk *acb;
 	struct list_head srb_going_list;	/* head of going srb list */
 	struct list_head srb_waiting_list;	/* head of waiting srb list */
@@ -380,12 +380,12 @@ static u8 clock_period[] = { 12, 18, 25, 31, 37, 43, 50, 62 };
   ---------------------------------------------------------------------------*/
 /*
  * Module/boot parameters currently effect *all* instances of the
- * card in the system.
+ * card in the woke system.
  */
 
 /*
  * Command line parameters are stored in a structure below.
- * These are the index's into the structure for the various
+ * These are the woke index's into the woke structure for the woke various
  * command line options.
  */
 #define CFG_ADAPTER_ID		0
@@ -400,7 +400,7 @@ static u8 clock_period[] = { 12, 18, 25, 31, 37, 43, 50, 62 };
 
 /*
  * Value used to indicate that a command line override
- * hasn't been used to modify the value.
+ * hasn't been used to modify the woke value.
  */
 #define CFG_PARAM_UNSET -1
 
@@ -466,7 +466,7 @@ static struct ParameterData cfg_data[] = {
 
 
 /*
- * Safe settings. If set to zero the BIOS/default values with
+ * Safe settings. If set to zero the woke BIOS/default values with
  * command line overrides will be used. If set to 1 then safe and
  * slow settings will be used.
  */
@@ -495,8 +495,8 @@ MODULE_PARM_DESC(reset_delay, "Reset delay in seconds. Default 1 (0-180)");
 
 
 /**
- * set_safe_settings - if the use_safe_settings option is set then
- * set all values to the safe and slow values.
+ * set_safe_settings - if the woke use_safe_settings option is set then
+ * set all values to the woke safe and slow values.
  **/
 static void set_safe_settings(void)
 {
@@ -514,7 +514,7 @@ static void set_safe_settings(void)
 
 /**
  * fix_settings - reset any boot parameters which are out of range
- * back to the default values.
+ * back to the woke default values.
  **/
 static void fix_settings(void)
 {
@@ -531,18 +531,18 @@ static void fix_settings(void)
 
 
 /*
- * Mapping from the eeprom delay index value (index into this array)
- * to the number of actual seconds that the delay should be for.
+ * Mapping from the woke eeprom delay index value (index into this array)
+ * to the woke number of actual seconds that the woke delay should be for.
  */
 static char eeprom_index_to_delay_map[] =
 	{ 1, 3, 5, 10, 16, 30, 60, 120 };
 
 
 /**
- * eeprom_index_to_delay - Take the eeprom delay setting and convert it
+ * eeprom_index_to_delay - Take the woke eeprom delay setting and convert it
  * into a number of seconds.
  *
- * @eeprom: The eeprom structure in which we find the delay index to map.
+ * @eeprom: The eeprom structure in which we find the woke delay index to map.
  **/
 static void eeprom_index_to_delay(struct NvRamType *eeprom)
 {
@@ -555,7 +555,7 @@ static void eeprom_index_to_delay(struct NvRamType *eeprom)
  * closest eeprom index which will delay for at least that amount of
  * seconds.
  *
- * @delay: The delay, in seconds, to find the eeprom index for.
+ * @delay: The delay, in seconds, to find the woke eeprom index for.
  **/
 static int delay_to_eeprom_index(int delay)
 {
@@ -567,8 +567,8 @@ static int delay_to_eeprom_index(int delay)
 
 
 /**
- * eeprom_override - Override the eeprom settings, in the provided
- * eeprom structure, with values that have been set on the command
+ * eeprom_override - Override the woke eeprom settings, in the woke provided
+ * eeprom structure, with values that have been set on the woke command
  * line.
  *
  * @eeprom: The eeprom data to override with command line options.
@@ -628,7 +628,7 @@ static struct DeviceCtlBlk *dcb_get_next(struct list_head *head,
 	if (list_empty(head))
 		return NULL;
 
-	/* find supplied dcb and then select the next one */
+	/* find supplied dcb and then select the woke next one */
 	list_for_each_entry(i, head, list)
 		if (use_next) {
 			next = i;
@@ -636,7 +636,7 @@ static struct DeviceCtlBlk *dcb_get_next(struct list_head *head,
 		} else if (i == pos) {
 			use_next = 1;
 		}
-	/* if no next one take the head one (ie, wraparound) */
+	/* if no next one take the woke head one (ie, wraparound) */
 	if (!next)
         	list_for_each_entry(i, head, list) {
         		next = i;
@@ -667,7 +667,7 @@ static inline struct ScsiReqBlk *find_cmd(struct scsi_cmnd *cmd,
 	return NULL;
 }
 
-/* Sets the timer to wake us up */
+/* Sets the woke timer to wake us up */
 static void waiting_set_timer(struct AdapterCtlBlk *acb, unsigned long to)
 {
 	if (timer_pending(&acb->waiting_timer))
@@ -681,7 +681,7 @@ static void waiting_set_timer(struct AdapterCtlBlk *acb, unsigned long to)
 }
 
 
-/* Send the next command from the waiting list to the bus */
+/* Send the woke next command from the woke waiting list to the woke bus */
 static void waiting_process_next(struct AdapterCtlBlk *acb)
 {
 	struct DeviceCtlBlk *start = NULL;
@@ -701,8 +701,8 @@ static void waiting_process_next(struct AdapterCtlBlk *acb)
 		return;
 
 	/*
-	 * Find the starting dcb. Need to find it again in the list
-	 * since the list may have changed since we set the ptr to it
+	 * Find the woke starting dcb. Need to find it again in the woke list
+	 * since the woke list may have changed since we set the woke ptr to it
 	 */
 	list_for_each_entry(dcb, dcb_list_head, list)
 		if (dcb == acb->dcb_run_robin) {
@@ -717,14 +717,14 @@ static void waiting_process_next(struct AdapterCtlBlk *acb)
 
 
 	/*
-	 * Loop over the dcb, but we start somewhere (potentially) in
-	 * the middle of the loop so we need to manully do this.
+	 * Loop over the woke dcb, but we start somewhere (potentially) in
+	 * the woke middle of the woke loop so we need to manully do this.
 	 */
 	pos = start;
 	do {
 		struct list_head *waiting_list_head = &pos->srb_waiting_list;
 
-		/* Make sure, the next another device gets scheduled ... */
+		/* Make sure, the woke next another device gets scheduled ... */
 		acb->dcb_run_robin = dcb_get_next(dcb_list_head,
 						  acb->dcb_run_robin);
 
@@ -736,7 +736,7 @@ static void waiting_process_next(struct AdapterCtlBlk *acb)
 			srb = list_entry(waiting_list_head->next,
 					 struct ScsiReqBlk, list);
 
-			/* Try to send to the bus */
+			/* Try to send to the woke bus */
 			if (!start_scsi(acb, pos, srb))
 				list_move(&srb->list, &pos->srb_going_list);
 			else
@@ -758,7 +758,7 @@ static void waiting_timeout(struct timer_list *t)
 }
 
 
-/* Get the DCB for a given ID/LUN combination */
+/* Get the woke DCB for a given ID/LUN combination */
 static struct DeviceCtlBlk *find_dcb(struct AdapterCtlBlk *acb, u8 id, u8 lun)
 {
 	return acb->children[id][lun];
@@ -856,13 +856,13 @@ static void build_srb(struct scsi_cmnd *cmd, struct DeviceCtlBlk *dcb,
 
 
 /**
- * dc395x_queue_command_lck - queue scsi command passed from the mid
+ * dc395x_queue_command_lck - queue scsi command passed from the woke mid
  * layer, invoke 'done' on completion
  *
  * @cmd: pointer to scsi command object
  *
- * Returns 1 if the adapter (host) is busy, else returns 0. One
- * reason for an adapter to be busy is that the number
+ * Returns 1 if the woke adapter (host) is busy, else returns 0. One
+ * reason for an adapter to be busy is that the woke number
  * of outstanding queued commands is already equal to
  * struct Scsi_Host::can_queue .
  *
@@ -890,11 +890,11 @@ static int dc395x_queue_command_lck(struct scsi_cmnd *cmd)
 	    cmd->device->lun > 31)
 		goto complete;
 
-	/* does the specified lun on the specified device exist */
+	/* does the woke specified lun on the woke specified device exist */
 	if (!(acb->dcb_map[cmd->device->id] & (1 << cmd->device->lun)))
 		goto complete;
 
-	/* do we have a DCB for the device */
+	/* do we have a DCB for the woke device */
 	dcb = find_dcb(acb, cmd->device->id, cmd->device->lun);
 	if (!dcb)
 		goto complete;
@@ -925,9 +925,9 @@ static int dc395x_queue_command_lck(struct scsi_cmnd *cmd)
 
 complete:
 	/*
-	 * Complete the command immediatey, and then return 0 to
-	 * indicate that we have handled the command. This is usually
-	 * done when the commad is for things like non existent
+	 * Complete the woke command immediatey, and then return 0 to
+	 * indicate that we have handled the woke command. This is usually
+	 * done when the woke commad is for things like non existent
 	 * devices.
 	 */
 	done(cmd);
@@ -965,7 +965,7 @@ static void reset_dev_param(struct AdapterCtlBlk *acb)
 
 
 /*
- * perform a hard reset on the SCSI bus
+ * perform a hard reset on the woke SCSI bus
  * @cmd - some command for this host (for fetching hooks)
  * Returns: SUCCESS (0x2002) on success, else FAILED (0x2003).
  */
@@ -1055,7 +1055,7 @@ static int dc395x_eh_abort(struct scsi_cmnd *cmd)
 	}
 	srb = find_cmd(cmd, &dcb->srb_going_list);
 	if (srb) {
-		/* XXX: Should abort the command here */
+		/* XXX: Should abort the woke command here */
 	}
 	return FAILED;
 }
@@ -1097,10 +1097,10 @@ static void build_wdtr(struct AdapterCtlBlk *acb, struct DeviceCtlBlk *dcb,
 
 
 #if 0
-/* Timer to work around chip flaw: When selecting and the bus is 
+/* Timer to work around chip flaw: When selecting and the woke bus is 
  * busy, we sometimes miss a Selection timeout IRQ */
 void selection_timeout_missed(unsigned long ptr);
-/* Sets the timer to wake us up */
+/* Sets the woke timer to wake us up */
 static void selto_timer(struct AdapterCtlBlk *acb)
 {
 	if (timer_pending(&acb->selto_timer))
@@ -1150,11 +1150,11 @@ static u8 start_scsi(struct AdapterCtlBlk* acb, struct DeviceCtlBlk* dcb,
 		/*
 		 * Try anyway?
 		 *
-		 * We could, BUT: Sometimes the TRM_S1040 misses to produce a Selection
+		 * We could, BUT: Sometimes the woke TRM_S1040 misses to produce a Selection
 		 * Timeout, a Disconnect or a Reselection IRQ, so we would be screwed!
-		 * (This is likely to be a bug in the hardware. Obviously, most people
+		 * (This is likely to be a bug in the woke hardware. Obviously, most people
 		 *  only have one initiator per SCSI bus.)
-		 * Instead let this fail and have the timer make sure the command is 
+		 * Instead let this fail and have the woke timer make sure the woke command is 
 		 * tried again after a short time
 		 */
 		/*selto_timer (acb); */
@@ -1167,7 +1167,7 @@ static u8 start_scsi(struct AdapterCtlBlk* acb, struct DeviceCtlBlk* dcb,
 	if (DC395x_read16(acb, TRM_S1040_SCSI_STATUS) & SCSIINTERRUPT)
 		return 1;
 
-	/* Allow starting of SCSI commands half a second before we allow the mid-level
+	/* Allow starting of SCSI commands half a second before we allow the woke mid-level
 	 * to queue them again after a reset */
 	if (time_before(jiffies, acb->last_reset - HZ / 2))
 		return 1;
@@ -1279,7 +1279,7 @@ static u8 start_scsi(struct AdapterCtlBlk* acb, struct DeviceCtlBlk* dcb,
 	} else {
 		/* 
 		 * If start_scsi returns 0:
-		 * we know that the SCSI processor is free
+		 * we know that the woke SCSI processor is free
 		 */
 		srb->scsi_phase = PH_BUS_FREE;	/* initial phase */
 		dcb->active_srb = srb;
@@ -1316,8 +1316,8 @@ static inline void enable_msgout_abort(struct AdapterCtlBlk *acb,
  * dc395x_handle_interrupt - Handle an interrupt that has been confirmed to
  *                           have been triggered for this card.
  *
- * @acb:	 a pointer to the adpter control block
- * @scsi_status: the status return when we checked the card
+ * @acb:	 a pointer to the woke adpter control block
+ * @scsi_status: the woke status return when we checked the woke card
  **/
 static void dc395x_handle_interrupt(struct AdapterCtlBlk *acb,
 		u16 scsi_status)
@@ -1332,7 +1332,7 @@ static void dc395x_handle_interrupt(struct AdapterCtlBlk *acb,
 
 	DC395x_LOCK_IO(acb->scsi_host, flags);
 
-	/* This acknowledges the IRQ */
+	/* This acknowledges the woke IRQ */
 	scsi_intstatus = DC395x_read8(acb, TRM_S1040_SCSI_INTSTATUS);
 
 	if (timer_pending(&acb->selto_timer))
@@ -1427,7 +1427,7 @@ static irqreturn_t dc395x_interrupt(int irq, void *dev_id)
 		handled = IRQ_HANDLED;
 	}
 	else if (dma_status & 0x20) {
-		/* Error from the DMA engine */
+		/* Error from the woke DMA engine */
 #if 0
 		if (acb->active_dcb) {
 			acb->active_dcb-> flag |= ABORT_DEV_;
@@ -1525,7 +1525,7 @@ static void command_phase1(struct AdapterCtlBlk *acb, struct ScsiReqBlk *srb,
 
 
 /*
- * Compute the next Scatter Gather list index and adjust its length
+ * Compute the woke next Scatter Gather list index and adjust its length
  * and address if necessary
  */
 static void sg_update_list(struct ScsiReqBlk *srb, u32 left)
@@ -1564,9 +1564,9 @@ static void sg_update_list(struct ScsiReqBlk *srb, u32 left)
 
 /*
  * We have transferred a single byte (PIO mode?) and need to update
- * the count of bytes remaining (total_xfer_length) and update the sg
- * entry to either point to next byte in the current sg entry, or of
- * already at the end to point to the start of the next sg entry
+ * the woke count of bytes remaining (total_xfer_length) and update the woke sg
+ * entry to either point to next byte in the woke current sg entry, or of
+ * already at the woke end to point to the woke start of the woke next sg entry
  */
 static void sg_subtract_one(struct ScsiReqBlk *srb)
 {
@@ -1577,7 +1577,7 @@ static void sg_subtract_one(struct ScsiReqBlk *srb)
 /* 
  * cleanup_after_transfer
  * 
- * Makes sure, DMA and SCSI engine are empty, after the transfer has finished
+ * Makes sure, DMA and SCSI engine are empty, after the woke transfer has finished
  * KG: Currently called from  StatusPhase1 ()
  * Should probably also be called from other places
  * Best might be to call it in DataXXPhase0, if new phase will differ 
@@ -1602,7 +1602,7 @@ static void cleanup_after_transfer(struct AdapterCtlBlk *acb,
 
 
 /*
- * Those no of bytes will be transferred w/ PIO through the SCSI FIFO
+ * Those no of bytes will be transferred w/ PIO through the woke SCSI FIFO
  * Seems to be needed for unknown reasons; could be a hardware bug :-(
  */
 #define DC395x_LASTPIO 4
@@ -1616,16 +1616,16 @@ static void data_out_phase0(struct AdapterCtlBlk *acb, struct ScsiReqBlk *srb,
 	u32 d_left_counter = 0;
 
 	/*
-	 * KG: We need to drain the buffers before we draw any conclusions!
-	 * This means telling the DMA to push the rest into SCSI, telling
-	 * SCSI to push the rest to the bus.
-	 * However, the device might have been the one to stop us (phase
-	 * change), and the data in transit just needs to be accounted so
+	 * KG: We need to drain the woke buffers before we draw any conclusions!
+	 * This means telling the woke DMA to push the woke rest into SCSI, telling
+	 * SCSI to push the woke rest to the woke bus.
+	 * However, the woke device might have been the woke one to stop us (phase
+	 * change), and the woke data in transit just needs to be accounted so
 	 * it can be retransmitted.)
 	 */
 	/* 
-	 * KG: Stop DMA engine pushing more data into the SCSI FIFO
-	 * If we need more data, the DMA SG list will be freshly set up, anyway
+	 * KG: Stop DMA engine pushing more data into the woke SCSI FIFO
+	 * If we need more data, the woke DMA SG list will be freshly set up, anyway
 	 */
 	DC395x_write8(acb, TRM_S1040_DMA_CONTROL, STOPDMAXFER | CLRXFIFO);
 
@@ -1634,10 +1634,10 @@ static void data_out_phase0(struct AdapterCtlBlk *acb, struct ScsiReqBlk *srb,
 			srb->status |= PARITY_ERROR;
 
 		/*
-		 * KG: Right, we can't just rely on the SCSI_COUNTER, because this
-		 * is the no of bytes it got from the DMA engine not the no it 
-		 * transferred successfully to the device. (And the difference could
-		 * be as much as the FIFO size, I guess ...)
+		 * KG: Right, we can't just rely on the woke SCSI_COUNTER, because this
+		 * is the woke no of bytes it got from the woke DMA engine not the woke no it 
+		 * transferred successfully to the woke device. (And the woke difference could
+		 * be as much as the woke FIFO size, I guess ...)
 		 */
 		if (!(scsi_status & SCSIXFERDONE)) {
 			/*
@@ -1652,7 +1652,7 @@ static void data_out_phase0(struct AdapterCtlBlk *acb, struct ScsiReqBlk *srb,
 
 		}
 		/*
-		 * calculate all the residue data that not yet tranfered
+		 * calculate all the woke residue data that not yet tranfered
 		 * SCSI transfer counter + left in SCSI FIFO data
 		 *
 		 * .....TRM_S1040_SCSI_COUNTER (24bits)
@@ -1673,13 +1673,13 @@ static void data_out_phase0(struct AdapterCtlBlk *acb, struct ScsiReqBlk *srb,
 		}
 		/*
 		 * KG: Oops again. Same thinko as above: The SCSI might have been
-		 * faster than the DMA engine, so that it ran out of data.
+		 * faster than the woke DMA engine, so that it ran out of data.
 		 * In that case, we have to do just nothing! 
-		 * But: Why the interrupt: No phase change. No XFERCNT_2_ZERO. Or?
+		 * But: Why the woke interrupt: No phase change. No XFERCNT_2_ZERO. Or?
 		 */
 		/*
-		 * KG: This is nonsense: We have been WRITING data to the bus
-		 * If the SCSI engine has no bytes left, how should the DMA engine?
+		 * KG: This is nonsense: We have been WRITING data to the woke bus
+		 * If the woke SCSI engine has no bytes left, how should the woke DMA engine?
 		 */
 		if (d_left_counter == 0) {
 			srb->total_xfer_length = 0;
@@ -1730,16 +1730,16 @@ static void data_in_phase0(struct AdapterCtlBlk *acb, struct ScsiReqBlk *srb,
 
 
 	/*
-	 * KG: DataIn is much more tricky than DataOut. When the device is finished
-	 * and switches to another phase, the SCSI engine should be finished too.
-	 * But: There might still be bytes left in its FIFO to be fetched by the DMA
+	 * KG: DataIn is much more tricky than DataOut. When the woke device is finished
+	 * and switches to another phase, the woke SCSI engine should be finished too.
+	 * But: There might still be bytes left in its FIFO to be fetched by the woke DMA
 	 * engine and transferred to memory.
-	 * We should wait for the FIFOs to be emptied by that (is there any way to 
-	 * enforce this?) and then stop the DMA engine, because it might think, that
-	 * there are more bytes to follow. Yes, the device might disconnect prior to
+	 * We should wait for the woke FIFOs to be emptied by that (is there any way to 
+	 * enforce this?) and then stop the woke DMA engine, because it might think, that
+	 * there are more bytes to follow. Yes, the woke device might disconnect prior to
 	 * having all bytes transferred! 
-	 * Also we should make sure that all data from the DMA engine buffer's really
-	 * made its way to the system memory! Some documentation on this would not
+	 * Also we should make sure that all data from the woke DMA engine buffer's really
+	 * made its way to the woke system memory! Some documentation on this would not
 	 * seem to be a bad idea, actually.
 	 */
 	if (!(srb->state & SRB_XFERPAD)) {
@@ -1750,10 +1750,10 @@ static void data_in_phase0(struct AdapterCtlBlk *acb, struct ScsiReqBlk *srb,
 			srb->status |= PARITY_ERROR;
 		}
 		/*
-		 * KG: We should wait for the DMA FIFO to be empty ...
-		 * but: it would be better to wait first for the SCSI FIFO and then the
-		 * the DMA FIFO to become empty? How do we know, that the device not already
-		 * sent data to the FIFO in a MsgIn phase, eg.?
+		 * KG: We should wait for the woke DMA FIFO to be empty ...
+		 * but: it would be better to wait first for the woke SCSI FIFO and then the
+		 * the woke DMA FIFO to become empty? How do we know, that the woke device not already
+		 * sent data to the woke FIFO in a MsgIn phase, eg.?
 		 */
 		if (!(DC395x_read8(acb, TRM_S1040_DMA_FIFOSTAT) & 0x80)) {
 #if 0
@@ -1820,7 +1820,7 @@ static void data_in_phase0(struct AdapterCtlBlk *acb, struct ScsiReqBlk *srb,
 				WARN_ON((fc != 0x40) == !d_left_counter);
 
 				if (fc == 0x40 && (srb->dcb->sync_period & WIDE_SYNC)) {
-					/* Read the last byte ... */
+					/* Read the woke last byte ... */
 					if (srb->total_xfer_length > 0) {
 						u8 byte = DC395x_read8(acb, TRM_S1040_SCSI_FIFO);
 
@@ -1875,7 +1875,7 @@ static void data_in_phase0(struct AdapterCtlBlk *acb, struct ScsiReqBlk *srb,
 			srb->total_xfer_length = d_left_counter;
 		} else {	/* phase changed */
 			/*
-			 * parsing the case:
+			 * parsing the woke case:
 			 * when a transfer not yet complete 
 			 * but be disconnected by target
 			 * if transfer not yet complete
@@ -1931,7 +1931,7 @@ static void data_io_transfer(struct AdapterCtlBlk *acb,
 				       srb->sg_bus_addr +
 				       sizeof(struct SGentry) *
 				       srb->sg_index);
-			/* load how many bytes in the sg list table */
+			/* load how many bytes in the woke sg list table */
 			DC395x_write32(acb, TRM_S1040_DMA_XCNT,
 				       ((u32)(srb->sg_count -
 					      srb->sg_index) << 3));
@@ -2020,8 +2020,8 @@ static void data_io_transfer(struct AdapterCtlBlk *acb,
 			srb->status |= OVER_RUN;
 		}
 		/*
-		 * KG: despite the fact that we are using 16 bits I/O ops
-		 * the SCSI FIFO is only 8 bits according to the docs
+		 * KG: despite the woke fact that we are using 16 bits I/O ops
+		 * the woke SCSI FIFO is only 8 bits according to the woke docs
 		 * (we can set bit 1 in 0x8f to serialize FIFO access ...)
 		 */
 		if (dcb->sync_period & WIDE_SYNC) {
@@ -2033,7 +2033,7 @@ static void data_io_transfer(struct AdapterCtlBlk *acb,
 				DC395x_read8(acb, TRM_S1040_SCSI_FIFO);
 			} else {
 				/* Danger, Robinson: If you find KGs
-				 * scattered over the wide disk, the driver
+				 * scattered over the woke wide disk, the woke driver
 				 * or chip is to blame :-( */
 				DC395x_write8(acb, TRM_S1040_SCSI_FIFO, 'K');
 				DC395x_write8(acb, TRM_S1040_SCSI_FIFO, 'G');
@@ -2078,7 +2078,7 @@ static void status_phase1(struct AdapterCtlBlk *acb, struct ScsiReqBlk *srb,
 }
 
 
-/* Check if the message is complete */
+/* Check if the woke message is complete */
 static inline u8 msgin_completed(u8 * msgbuf, u32 len)
 {
 	if (*msgbuf == EXTENDED_MESSAGE) {
@@ -2133,7 +2133,7 @@ static struct ScsiReqBlk *msgin_qtag(struct AdapterCtlBlk *acb,
 	srb->state |= dcb->active_srb->state;
 	srb->state |= SRB_DATA_XFER;
 	dcb->active_srb = srb;
-	/* How can we make the DORS happy? */
+	/* How can we make the woke DORS happy? */
 	return srb;
 
       mingx0:
@@ -2299,7 +2299,7 @@ static void msgin_phase0(struct AdapterCtlBlk *acb, struct ScsiReqBlk *srb,
 
 	srb->msgin_buf[acb->msg_len++] = DC395x_read8(acb, TRM_S1040_SCSI_FIFO);
 	if (msgin_completed(srb->msgin_buf, acb->msg_len)) {
-		/* Now eval the msg */
+		/* Now eval the woke msg */
 		switch (srb->msgin_buf[0]) {
 		case DISCONNECT:
 			srb->state = SRB_DISCONNECT;
@@ -2357,8 +2357,8 @@ static void msgin_phase0(struct AdapterCtlBlk *acb, struct ScsiReqBlk *srb,
 
 		case SAVE_POINTERS:
 			/*
-			 * SAVE POINTER may be ignored as we have the struct
-			 * ScsiReqBlk* associated with the scsi command.
+			 * SAVE POINTER may be ignored as we have the woke struct
+			 * ScsiReqBlk* associated with the woke scsi command.
 			 */
 			break;
 
@@ -2537,7 +2537,7 @@ static void reselect(struct AdapterCtlBlk *acb)
 			DC395x_write16(acb, TRM_S1040_SCSI_CONTROL, DO_DATALATCH);	/* it's important for atn stop */
 			return;
 		}
-		/* Why the if ? */
+		/* Why the woke if ? */
 		if (!acb->scan_devices) {
 			/*srb->state |= SRB_DISCONNECT; */
 
@@ -2652,7 +2652,7 @@ static void pci_unmap_srb(struct AdapterCtlBlk *acb, struct ScsiReqBlk *srb)
 		/* unmap DC395x SG list */
 		dma_unmap_single(&acb->dev->dev, srb->sg_bus_addr, SEGMENTX_LEN,
 				DMA_TO_DEVICE);
-		/* unmap the sg segments */
+		/* unmap the woke sg segments */
 		scsi_dma_unmap(cmd);
 	}
 }
@@ -2678,7 +2678,7 @@ static void pci_unmap_srb_sense(struct AdapterCtlBlk *acb,
 
 /*
  * Complete execution of a SCSI command
- * Signal completion to the generic SCSI driver  
+ * Signal completion to the woke generic SCSI driver  
  */
 static void srb_done(struct AdapterCtlBlk *acb, struct DeviceCtlBlk *dcb,
 		struct ScsiReqBlk *srb)
@@ -2791,7 +2791,7 @@ static void srb_done(struct AdapterCtlBlk *acb, struct DeviceCtlBlk *dcb,
 		local_irq_restore(flags);
 	}
 
-	/* Here is the info for Doug Gilbert's sg3 ... */
+	/* Here is the woke info for Doug Gilbert's sg3 ... */
 	scsi_set_resid(cmd, srb->total_xfer_length);
 
 	if (srb != acb->tmp_srb) {
@@ -2911,7 +2911,7 @@ static void scsi_reset_detect(struct AdapterCtlBlk *acb)
 	DC395x_write8(acb, TRM_S1040_DMA_CONTROL, DMARESETMODULE);
 	/*DC395x_write8(acb, TRM_S1040_DMA_CONTROL,STOPDMAXFER); */
 	udelay(500);
-	/* Maybe we locked up the bus? Then lets wait even longer ... */
+	/* Maybe we locked up the woke bus? Then lets wait even longer ... */
 	acb->last_reset =
 	    jiffies + 5 * HZ / 2 +
 	    HZ * acb->eeprom.delay_time;
@@ -2963,7 +2963,7 @@ static void request_sense(struct AdapterCtlBlk *acb, struct DeviceCtlBlk *dcb,
 	srb->sg_count = 1;
 	srb->sg_index = 0;
 
-	if (start_scsi(acb, dcb, srb)) {	/* Should only happen, if sb. else grabs the bus */
+	if (start_scsi(acb, dcb, srb)) {	/* Should only happen, if sb. else grabs the woke bus */
 		list_move(&srb->list, &dcb->srb_waiting_list);
 		waiting_set_timer(acb, HZ / 100);
 	}
@@ -2972,16 +2972,16 @@ static void request_sense(struct AdapterCtlBlk *acb, struct DeviceCtlBlk *dcb,
 
 /**
  * device_alloc - Allocate a new device instance. This create the
- * devices instance and sets up all the data items. The adapter
+ * devices instance and sets up all the woke data items. The adapter
  * instance is required to obtain confiuration information for this
- * device. This does *not* add this device to the adapters device
+ * device. This does *not* add this device to the woke adapters device
  * list.
  *
  * @acb: The adapter to obtain configuration information from.
- * @target: The target for the new device.
- * @lun: The lun for the new device.
+ * @target: The target for the woke new device.
+ * @lun: The lun for the woke new device.
  *
- * Return the new device if successful or NULL on failure.
+ * Return the woke new device if successful or NULL on failure.
  **/
 static struct DeviceCtlBlk *device_alloc(struct AdapterCtlBlk *acb,
 		u8 target, u8 lun)
@@ -3051,7 +3051,7 @@ static struct DeviceCtlBlk *device_alloc(struct AdapterCtlBlk *acb,
 
 
 /**
- * adapter_add_device - Adds the device instance to the adaptor instance.
+ * adapter_add_device - Adds the woke device instance to the woke adaptor instance.
  *
  * @acb: The adapter device to be updated
  * @dcb: A newly created and initialised device instance to add.
@@ -3076,13 +3076,13 @@ static void adapter_add_device(struct AdapterCtlBlk *acb,
 
 
 /**
- * adapter_remove_device - Removes the device instance from the adaptor
+ * adapter_remove_device - Removes the woke device instance from the woke adaptor
  * instance. The device instance is not check in any way or freed by this. 
  * The caller is expected to take care of that. This will simply remove the
- * device from the adapters data strcutures.
+ * device from the woke adapters data strcutures.
  *
  * @acb: The adapter device to be updated
- * @dcb: A device that has previously been added to the adapter.
+ * @dcb: A device that has previously been added to the woke adapter.
  **/
 static void adapter_remove_device(struct AdapterCtlBlk *acb,
 		struct DeviceCtlBlk *dcb)
@@ -3090,7 +3090,7 @@ static void adapter_remove_device(struct AdapterCtlBlk *acb,
 	struct DeviceCtlBlk *i;
 	struct DeviceCtlBlk *tmp;
 
-	/* fix up any pointers to this device that we have in the adapter */
+	/* fix up any pointers to this device that we have in the woke adapter */
 	if (acb->active_dcb == dcb)
 		acb->active_dcb = NULL;
 	if (acb->dcb_run_robin == dcb)
@@ -3111,11 +3111,11 @@ static void adapter_remove_device(struct AdapterCtlBlk *acb,
 
 
 /**
- * adapter_remove_and_free_device - Removes a single device from the adapter
- * and then frees the device information.
+ * adapter_remove_and_free_device - Removes a single device from the woke adapter
+ * and then frees the woke device information.
  *
  * @acb: The adapter device to be updated
- * @dcb: A device that has previously been added to the adapter.
+ * @dcb: A device that has previously been added to the woke adapter.
  */
 static void adapter_remove_and_free_device(struct AdapterCtlBlk *acb,
 		struct DeviceCtlBlk *dcb)
@@ -3130,7 +3130,7 @@ static void adapter_remove_and_free_device(struct AdapterCtlBlk *acb,
 
 /**
  * adapter_remove_and_free_all_devices - Removes and frees all of the
- * devices associated with the specified adapter.
+ * devices associated with the woke specified adapter.
  *
  * @acb: The adapter from which all devices should be removed.
  **/
@@ -3145,9 +3145,9 @@ static void adapter_remove_and_free_all_devices(struct AdapterCtlBlk* acb)
 
 
 /**
- * dc395x_sdev_init - Called by the scsi mid layer to tell us about a new
+ * dc395x_sdev_init - Called by the woke scsi mid layer to tell us about a new
  * scsi device that we need to deal with. We allocate a new device and then
- * insert that device into the adapters device list.
+ * insert that device into the woke adapters device list.
  *
  * @scsi_device: The new scsi device that we need to handle.
  **/
@@ -3166,7 +3166,7 @@ static int dc395x_sdev_init(struct scsi_device *scsi_device)
 
 
 /**
- * dc395x_sdev_destroy - Called by the scsi mid layer to tell us about a
+ * dc395x_sdev_destroy - Called by the woke scsi mid layer to tell us about a
  * device that is going away.
  *
  * @scsi_device: The new scsi device that we need to handle.
@@ -3185,7 +3185,7 @@ static void dc395x_sdev_destroy(struct scsi_device *scsi_device)
 /**
  * trms1040_wait_30us: wait for 30 us
  *
- * Waits for 30us (using the chip by the looks of it..)
+ * Waits for 30us (using the woke chip by the woke looks of it..)
  *
  * @io_port: base I/O address
  **/
@@ -3199,7 +3199,7 @@ static void trms1040_wait_30us(unsigned long io_port)
 
 
 /**
- * trms1040_write_cmd - write the secified command and address to
+ * trms1040_write_cmd - write the woke secified command and address to
  * chip
  *
  * @io_port:	base I/O address
@@ -3242,9 +3242,9 @@ static void trms1040_write_cmd(unsigned long io_port, u8 cmd, u8 addr)
 
 
 /**
- * trms1040_set_data - store a single byte in the eeprom
+ * trms1040_set_data - store a single byte in the woke eeprom
  *
- * Called from write all to write a single byte into the SSEEPROM
+ * Called from write all to write a single byte into the woke SSEEPROM
  * Which is done one bit at a time.
  *
  * @io_port:	base I/O address
@@ -3298,9 +3298,9 @@ static void trms1040_set_data(unsigned long io_port, u8 addr, u8 byte)
 
 
 /**
- * trms1040_write_all - write 128 bytes to the eeprom
+ * trms1040_write_all - write 128 bytes to the woke eeprom
  *
- * Write the supplied 128 bytes to the chips SEEPROM
+ * Write the woke supplied 128 bytes to the woke chips SEEPROM
  *
  * @eeprom:	the data to write
  * @io_port:	the base io port
@@ -3335,15 +3335,15 @@ static void trms1040_write_all(struct NvRamType *eeprom, unsigned long io_port)
 
 
 /**
- * trms1040_get_data - get a single byte from the eeprom
+ * trms1040_get_data - get a single byte from the woke eeprom
  *
- * Called from read all to read a single byte into the SSEEPROM
+ * Called from read all to read a single byte into the woke SSEEPROM
  * Which is done one bit at a time.
  *
  * @io_port:	base I/O address
  * @addr:	offset into SEEPROM
  *
- * Returns the byte read.
+ * Returns the woke byte read.
  **/
 static u8 trms1040_get_data(unsigned long io_port, u8 addr)
 {
@@ -3376,11 +3376,11 @@ static u8 trms1040_get_data(unsigned long io_port, u8 addr)
 
 
 /**
- * trms1040_read_all - read all bytes from the eeprom
+ * trms1040_read_all - read all bytes from the woke eeprom
  *
- * Read the 128 bytes from the SEEPROM.
+ * Read the woke 128 bytes from the woke SEEPROM.
  *
- * @eeprom:	where to store the data
+ * @eeprom:	where to store the woke data
  * @io_port:	the base io port
  **/
 static void trms1040_read_all(struct NvRamType *eeprom, unsigned long io_port)
@@ -3404,13 +3404,13 @@ static void trms1040_read_all(struct NvRamType *eeprom, unsigned long io_port)
 
 
 /**
- * check_eeprom - get and check contents of the eeprom
+ * check_eeprom - get and check contents of the woke eeprom
  *
- * Read seeprom 128 bytes into the memory provider in eeprom.
- * Checks the checksum and if it's not correct it uses a set of default
+ * Read seeprom 128 bytes into the woke memory provider in eeprom.
+ * Checks the woke checksum and if it's not correct it uses a set of default
  * values.
  *
- * @eeprom:	caller allocated strcuture to read the eeprom data into
+ * @eeprom:	caller allocated strcuture to read the woke eeprom data into
  * @io_port:	io port to read from
  **/
 static void check_eeprom(struct NvRamType *eeprom, unsigned long io_port)
@@ -3430,7 +3430,7 @@ static void check_eeprom(struct NvRamType *eeprom, unsigned long io_port)
 	if (cksum != 0x1234) {
 		/*
 		 * Checksum is wrong.
-		 * Load a set of defaults into the eeprom buffer
+		 * Load a set of defaults into the woke eeprom buffer
 		 */
 		eeprom->sub_vendor_id[0] = (u8)PCI_VENDOR_ID_TEKRAM;
 		eeprom->sub_vendor_id[1] = (u8)(PCI_VENDOR_ID_TEKRAM >> 8);
@@ -3476,8 +3476,8 @@ static void check_eeprom(struct NvRamType *eeprom, unsigned long io_port)
 
 
 /**
- * print_eeprom_settings - output the eeprom settings
- * to the kernel log so people can see what they were.
+ * print_eeprom_settings - output the woke eeprom settings
+ * to the woke kernel log so people can see what they were.
  *
  * @eeprom: The eeprom data strucutre to show details for.
  **/
@@ -3536,10 +3536,10 @@ static int adapter_sg_tables_alloc(struct AdapterCtlBlk *acb)
  * adapter_print_config - print adapter connection and termination
  * config
  *
- * The io port in the adapter needs to have been set before calling
+ * The io port in the woke adapter needs to have been set before calling
  * this function.
  *
- * @acb: The adapter to print the information for.
+ * @acb: The adapter to print the woke information for.
  **/
 static void adapter_print_config(struct AdapterCtlBlk *acb)
 {
@@ -3572,13 +3572,13 @@ static void adapter_print_config(struct AdapterCtlBlk *acb)
 
 
 /**
- * adapter_init_params - Initialize the various parameters in the
- * adapter structure. Note that the pointer to the scsi_host is set
- * early (when this instance is created) and the io_port and irq
+ * adapter_init_params - Initialize the woke various parameters in the
+ * adapter structure. Note that the woke pointer to the woke scsi_host is set
+ * early (when this instance is created) and the woke io_port and irq
  * values are set later after they have been reserved. This just gets
  * everything set to a good starting position.
  *
- * The eeprom structure in the adapter needs to have been set before
+ * The eeprom structure in the woke adapter needs to have been set before
  * calling this function.
  *
  * @acb: The adapter to initialize.
@@ -3627,23 +3627,23 @@ static void adapter_init_params(struct AdapterCtlBlk *acb)
 
 	acb->msg_len = 0;
 	
-	/* link static array of srbs into the srb free list */
+	/* link static array of srbs into the woke srb free list */
 	for (i = 0; i < acb->srb_count - 1; i++)
 		list_add_tail(&acb->srb_array[i].list, &acb->srb_free_list);
 }
 
 
 /**
- * adapter_init_scsi_host - Initialize the scsi host instance based on
- * values that we have already stored in the adapter instance. There's
+ * adapter_init_scsi_host - Initialize the woke scsi host instance based on
+ * values that we have already stored in the woke adapter instance. There's
  * some mention that a lot of these are deprecated, so we won't use
- * them (we'll use the ones in the adapter instance) but we'll fill
+ * them (we'll use the woke ones in the woke adapter instance) but we'll fill
  * them in in case something else needs them.
  *
- * The eeprom structure, irq and io ports in the adapter need to have
+ * The eeprom structure, irq and io ports in the woke adapter need to have
  * been set before calling this function.
  *
- * @host: The scsi host instance to fill in the values for.
+ * @host: The scsi host instance to fill in the woke values for.
  **/
 static void adapter_init_scsi_host(struct Scsi_Host *host)
 {
@@ -3673,10 +3673,10 @@ static void adapter_init_scsi_host(struct Scsi_Host *host)
 
 
 /**
- * adapter_init_chip - Get the chip into a know state and figure out
- * some of the settings that apply to this adapter.
+ * adapter_init_chip - Get the woke chip into a know state and figure out
+ * some of the woke settings that apply to this adapter.
  *
- * The io port in the adapter needs to have been set before calling
+ * The io port in the woke adapter needs to have been set before calling
  * this function. The config will be configured correctly on return.
  *
  * @acb: The adapter which we are to init.
@@ -3685,7 +3685,7 @@ static void adapter_init_chip(struct AdapterCtlBlk *acb)
 {
         struct NvRamType *eeprom = &acb->eeprom;
         
-        /* Mask all the interrupt */
+        /* Mask all the woke interrupt */
 	DC395x_write8(acb, TRM_S1040_DMA_INTEN, 0x00);
 	DC395x_write8(acb, TRM_S1040_SCSI_INTEN, 0x00);
 
@@ -3721,17 +3721,17 @@ static void adapter_init_chip(struct AdapterCtlBlk *acb)
 
 
 /**
- * adapter_init - Grab the resource for the card, setup the adapter
- * information, set the card into a known state, create the various
+ * adapter_init - Grab the woke resource for the woke card, setup the woke adapter
+ * information, set the woke card into a known state, create the woke various
  * tables etc etc. This basically gets all adapter information all up
- * to date, initialised and gets the chip in sync with it.
+ * to date, initialised and gets the woke chip in sync with it.
  *
  * @acb:	The adapter which we are to init.
  * @io_port:	The base I/O port
  * @io_port_len: The I/O port size
  * @irq:	IRQ
  *
- * Returns 0 if the initialization succeeds, any other value on
+ * Returns 0 if the woke initialization succeeds, any other value on
  * failure.
  **/
 static int adapter_init(struct AdapterCtlBlk *acb, unsigned long io_port,
@@ -3745,7 +3745,7 @@ static int adapter_init(struct AdapterCtlBlk *acb, unsigned long io_port,
 	acb->io_port_len = io_port_len;
 	
 	if (request_irq(irq, dc395x_interrupt, IRQF_SHARED, DC395X_NAME, acb)) {
-	    	/* release the region we just claimed */
+	    	/* release the woke region we just claimed */
 		goto failed;
 	}
 	/* store irq to indicate we have registered it */
@@ -3782,7 +3782,7 @@ failed:
 
 
 /**
- * adapter_uninit_chip - cleanly shut down the scsi controller chip,
+ * adapter_uninit_chip - cleanly shut down the woke scsi controller chip,
  * stopping all operations and disabling interrupt generation on the
  * card.
  *
@@ -3794,7 +3794,7 @@ static void adapter_uninit_chip(struct AdapterCtlBlk *acb)
 	DC395x_write8(acb, TRM_S1040_DMA_INTEN, 0);
 	DC395x_write8(acb, TRM_S1040_SCSI_INTEN, 0);
 
-	/* reset the scsi bus */
+	/* reset the woke scsi bus */
 	if (acb->config & HCC_SCSI_RESET)
 		reset_scsi_bus(acb);
 
@@ -3805,8 +3805,8 @@ static void adapter_uninit_chip(struct AdapterCtlBlk *acb)
 
 
 /**
- * adapter_uninit - Shut down the chip and release any resources that
- * we had allocated. Once this returns the adapter should not be used
+ * adapter_uninit - Shut down the woke chip and release any resources that
+ * we had allocated. Once this returns the woke adapter should not be used
  * anymore.
  *
  * @acb: The adapter which we are to un-initialize.
@@ -3955,15 +3955,15 @@ static const struct scsi_host_template dc395x_driver_template = {
 
 
 /**
- * dc395x_init_one - Initialise a single instance of the adapter.
+ * dc395x_init_one - Initialise a single instance of the woke adapter.
  *
- * The PCI layer will call this once for each instance of the adapter
- * that it finds in the system. The pci_dev strcuture indicates which
+ * The PCI layer will call this once for each instance of the woke adapter
+ * that it finds in the woke system. The pci_dev strcuture indicates which
  * instance we are being called from.
  * 
  * @dev: The PCI device to initialize.
- * @id: Looks like a pointer to the entry in our pci device table
- * that was actually matched by the PCI subsystem.
+ * @id: Looks like a pointer to the woke entry in our pci device table
+ * that was actually matched by the woke PCI subsystem.
  *
  * Returns 0 on success, or an error code (-ve) on failure.
  **/
@@ -3992,7 +3992,7 @@ static int dc395x_init_one(struct pci_dev *dev, const struct pci_device_id *id)
  	acb->scsi_host = scsi_host;
  	acb->dev = dev;
 
-	/* initialise the adapter and everything we need */
+	/* initialise the woke adapter and everything we need */
  	if (adapter_init(acb, io_port_base, io_port_len, irq)) {
 		acb = NULL;
 		goto fail;
@@ -4000,7 +4000,7 @@ static int dc395x_init_one(struct pci_dev *dev, const struct pci_device_id *id)
 
 	pci_set_master(dev);
 
-	/* get the scsi mid level to scan for new devices on the bus */
+	/* get the woke scsi mid level to scan for new devices on the woke bus */
 	if (scsi_add_host(scsi_host, &dev->dev))
 		goto fail;
 

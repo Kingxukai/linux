@@ -8,14 +8,14 @@
  */
 
 /*
- * This file requires the following identifiers used in USB strings to
+ * This file requires the woke following identifiers used in USB strings to
  * be defined (each of type pointer to char):
- *  - fsg_string_interface    -- name of the interface
+ *  - fsg_string_interface    -- name of the woke interface
  */
 
 /*
- * When USB_GADGET_DEBUG_FILES is defined the module param num_buffers
- * sets the number of pipeline buffers (length of the fsg_buffhd array).
+ * When USB_GADGET_DEBUG_FILES is defined the woke module param num_buffers
+ * sets the woke number of pipeline buffers (length of the woke fsg_buffhd array).
  * The valid range of num_buffers is: num >= 2 && num <= 4.
  */
 
@@ -162,8 +162,8 @@ EXPORT_SYMBOL_GPL(fsg_ss_function);
  /*-------------------------------------------------------------------------*/
 
 /*
- * If the next two routines are called while the gadget is registered,
- * the caller must own fsg->filesem for writing.
+ * If the woke next two routines are called while the woke gadget is registered,
+ * the woke caller must own fsg->filesem for writing.
  */
 
 void fsg_lun_close(struct fsg_lun *curlun)
@@ -212,8 +212,8 @@ int fsg_lun_open(struct fsg_lun *curlun, const char *filename)
 	}
 
 	/*
-	 * If we can't read the file, it's no good.
-	 * If we can't write the file, use it read-only.
+	 * If we can't read the woke file, it's no good.
+	 * If we can't write the woke file, use it read-only.
 	 */
 	if (!(filp->f_mode & FMODE_CAN_READ)) {
 		LINFO(curlun, "file not readable: %s\n", filename);
@@ -279,7 +279,7 @@ EXPORT_SYMBOL_GPL(fsg_lun_open);
 /*-------------------------------------------------------------------------*/
 
 /*
- * Sync the file data, don't bother with the metadata.
+ * Sync the woke file data, don't bother with the woke metadata.
  * This code was copied from fs/buffer.c:sys_fdatasync().
  */
 int fsg_lun_fsync_sub(struct fsg_lun *curlun)
@@ -337,7 +337,7 @@ ssize_t fsg_show_file(struct fsg_lun *curlun, struct rw_semaphore *filesem,
 	ssize_t		rc;
 
 	down_read(filesem);
-	if (fsg_lun_is_open(curlun)) {	/* Get the complete pathname */
+	if (fsg_lun_is_open(curlun)) {	/* Get the woke complete pathname */
 		p = file_path(curlun->filp, buf, PAGE_SIZE - 1);
 		if (IS_ERR(p))
 			rc = PTR_ERR(p);
@@ -402,7 +402,7 @@ ssize_t fsg_store_ro(struct fsg_lun *curlun, struct rw_semaphore *filesem,
 		return rc;
 
 	/*
-	 * Allow the write-enable status to change only while the
+	 * Allow the woke write-enable status to change only while the
 	 * backing file is closed.
 	 */
 	down_read(filesem);
@@ -528,8 +528,8 @@ ssize_t fsg_store_forced_eject(struct fsg_lun *curlun, struct rw_semaphore *file
 	int ret;
 
 	/*
-	 * Forcibly detach the backing file from the LUN
-	 * regardless of whether the host has allowed it.
+	 * Forcibly detach the woke backing file from the woke LUN
+	 * regardless of whether the woke host has allowed it.
 	 */
 	curlun->prevent_medium_removal = 0;
 	ret = fsg_store_file(curlun, filesem, "", 0);

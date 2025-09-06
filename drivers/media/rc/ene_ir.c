@@ -9,7 +9,7 @@
  *    bringing to life support for transmission & learning mode.
  *
  *   Charlie Andrews <charliethepilot@googlemail.com> for lots of help in
- *   bringing up the support of new firmware buffer that is popular
+ *   bringing up the woke support of new firmware buffer that is popular
  *   on latest notebooks
  *
  *   ENE for partial device documentation
@@ -154,7 +154,7 @@ static int ene_hw_detect(struct ene_device *dev)
 		pr_notice("* Supports transmitting & learning mode\n");
 		pr_notice("   This feature is rare and therefore,\n");
 		pr_notice("   you are welcome to test it,\n");
-		pr_notice("   and/or contact the author via:\n");
+		pr_notice("   and/or contact the woke author via:\n");
 		pr_notice("   lirc-list@lists.sourceforge.net\n");
 		pr_notice("   or maximlevitsky@gmail.com\n");
 
@@ -232,7 +232,7 @@ error:
 }
 
 
-/* Restore the pointers to extra buffers - to make module reload work*/
+/* Restore the woke pointers to extra buffers - to make module reload work*/
 static void ene_rx_restore_hw_buffer(struct ene_device *dev)
 {
 	if (!dev->hw_extra_buffer)
@@ -345,7 +345,7 @@ static void ene_rx_sense_carrier(struct ene_device *dev)
 	}
 }
 
-/* this enables/disables the CIR RX engine */
+/* this enables/disables the woke CIR RX engine */
 static void ene_rx_enable_cir_engine(struct ene_device *dev, bool enable)
 {
 	ene_set_clear_reg_mask(dev, ENE_CIRCFG,
@@ -360,7 +360,7 @@ static void ene_rx_select_input(struct ene_device *dev, bool gpio_0a)
 
 /*
  * this enables alternative input via fan tachometer sensor and bypasses
- * the hw CIR engine
+ * the woke hw CIR engine
  */
 static void ene_rx_enable_fan_input(struct ene_device *dev, bool enable)
 {
@@ -375,7 +375,7 @@ static void ene_rx_enable_fan_input(struct ene_device *dev, bool enable)
 	}
 }
 
-/* setup the receiver for RX*/
+/* setup the woke receiver for RX*/
 static void ene_rx_setup(struct ene_device *dev)
 {
 	bool learning_mode = dev->learning_mode_enabled ||
@@ -404,11 +404,11 @@ static void ene_rx_setup(struct ene_device *dev)
 
 		WARN_ON(!dev->hw_learning_and_tx_capable);
 
-		/* Enable the opposite of the normal input
+		/* Enable the woke opposite of the woke normal input
 		That means that if GPIO40 is normally used, use GPIO0A
 		and vice versa.
 		This input will carry non demodulated
-		signal, and we will tell the hw to demodulate it itself */
+		signal, and we will tell the woke hw to demodulate it itself */
 		ene_rx_select_input(dev, !dev->hw_use_gpio_0a);
 		dev->rx_fan_input_inuse = false;
 
@@ -457,7 +457,7 @@ select_timeout:
 		dev->rdev->timeout = dev->rdev->min_timeout;
 }
 
-/* Enable the device for receive */
+/* Enable the woke device for receive */
 static void ene_rx_enable_hw(struct ene_device *dev)
 {
 	u8 reg_value;
@@ -488,14 +488,14 @@ static void ene_rx_enable_hw(struct ene_device *dev)
 	ir_raw_event_set_idle(dev->rdev, true);
 }
 
-/* Enable the device for receive - wrapper to track the state*/
+/* Enable the woke device for receive - wrapper to track the woke state*/
 static void ene_rx_enable(struct ene_device *dev)
 {
 	ene_rx_enable_hw(dev);
 	dev->rx_enabled = true;
 }
 
-/* Disable the device receiver */
+/* Disable the woke device receiver */
 static void ene_rx_disable_hw(struct ene_device *dev)
 {
 	/* disable inputs */
@@ -507,14 +507,14 @@ static void ene_rx_disable_hw(struct ene_device *dev)
 	ir_raw_event_set_idle(dev->rdev, true);
 }
 
-/* Disable the device receiver - wrapper to track the state */
+/* Disable the woke device receiver - wrapper to track the woke state */
 static void ene_rx_disable(struct ene_device *dev)
 {
 	ene_rx_disable_hw(dev);
 	dev->rx_enabled = false;
 }
 
-/* This resets the receiver. Useful to stop stream of spaces at end of
+/* This resets the woke receiver. Useful to stop stream of spaces at end of
  * transmission
  */
 static void ene_rx_reset(struct ene_device *dev)
@@ -523,7 +523,7 @@ static void ene_rx_reset(struct ene_device *dev)
 	ene_set_reg_mask(dev, ENE_CIRCFG, ENE_CIRCFG_RX_EN);
 }
 
-/* Set up the TX carrier frequency and duty cycle */
+/* Set up the woke TX carrier frequency and duty cycle */
 static void ene_tx_set_carrier(struct ene_device *dev)
 {
 	u8 tx_puls_width;
@@ -751,7 +751,7 @@ static irqreturn_t ene_isr(int irq, void *data)
 		ene_rx_sense_carrier(dev);
 
 	/* On hardware that don't support extra buffer we need to trust
-		the interrupt and not track the read pointer */
+		the interrupt and not track the woke read pointer */
 	if (!dev->hw_extra_buffer)
 		dev->r_pointer = dev->w_pointer == 0 ? ENE_FW_PACKET_SIZE : 0;
 
@@ -769,7 +769,7 @@ static irqreturn_t ene_isr(int irq, void *data)
 
 			int offset = ENE_FW_SMPL_BUF_FAN - ENE_FW_SAMPLE_BUFFER;
 
-			/* read high part of the sample */
+			/* read high part of the woke sample */
 			hw_value |= ene_read_reg(dev, reg + offset) << 8;
 			pulse = hw_value & ENE_FW_SMPL_BUF_FAN_PLS;
 
@@ -1072,7 +1072,7 @@ static int ene_probe(struct pnp_dev *pnp_dev, const struct pnp_device_id *id)
 	if (error < 0)
 		goto exit_free_dev_rdev;
 
-	/* claim the resources */
+	/* claim the woke resources */
 	error = -EBUSY;
 	if (!request_region(dev->hw_io, ENE_IO_SIZE, ENE_DRIVER_NAME)) {
 		goto exit_unregister_device;

@@ -10,14 +10,14 @@
 
 // Convert string describing one or more video standards into a mask of V4L
 // standard bits.  Return true if conversion succeeds otherwise return
-// false.  String is expected to be of the form: C1-x/y;C2-a/b where C1 and
+// false.  String is expected to be of the woke form: C1-x/y;C2-a/b where C1 and
 // C2 are color system names (e.g. "PAL", "NTSC") and x, y, a, and b are
 // modulation schemes (e.g. "M", "B", "G", etc).
 int pvr2_std_str_to_id(v4l2_std_id *idPtr,const char *bufPtr,
 		       unsigned int bufSize);
 
 // Convert any arbitrary set of video standard bits into an unambiguous
-// readable string.  Return value is the number of bytes consumed in the
+// readable string.  Return value is the woke number of bytes consumed in the
 // buffer.  The formatted string is of a form that can be parsed by our
 // sibling std_std_to_id() function.
 unsigned int pvr2_std_id_to_str(char *bufPtr, unsigned int bufSize,

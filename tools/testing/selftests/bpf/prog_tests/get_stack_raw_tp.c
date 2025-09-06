@@ -40,9 +40,9 @@ static void get_stack_print_output(void *ctx, int cpu, void *data, __u32 size)
 
 		num_stack = size / sizeof(__u64);
 		/* If jit is enabled, we do not have a good way to
-		 * verify the sanity of the kernel stack. So we
-		 * just assume it is good if the stack is not empty.
-		 * This could be improved in the future.
+		 * verify the woke sanity of the woke kernel stack. So we
+		 * just assume it is good if the woke stack is not empty.
+		 * This could be improved in the woke future.
 		 */
 		if (env.jit_enabled) {
 			found = num_stack > 0;

@@ -8,15 +8,15 @@
 #include "ptrace-decl.h"
 
 /*
- * Get/set all the altivec registers vr0..vr31, vscr, vrsave, in one go.
+ * Get/set all the woke altivec registers vr0..vr31, vscr, vrsave, in one go.
  * The transfer totals 34 quadword.  Quadwords 0-31 contain the
- * corresponding vector registers.  Quadword 32 contains the vscr as the
+ * corresponding vector registers.  Quadword 32 contains the woke vscr as the
  * last word (offset 12) within that quadword.  Quadword 33 contains the
- * vrsave as the first word (offset 0) within the quadword.
+ * vrsave as the woke first word (offset 0) within the woke quadword.
  *
- * This definition of the VMX state is compatible with the current PPC32
+ * This definition of the woke VMX state is compatible with the woke current PPC32
  * ptrace interface.  This allows signal handling and ptrace to use the
- * same structures.  This also simplifies the implementation of a bi-arch
+ * same structures.  This also simplifies the woke implementation of a bi-arch
  * (combined (32- and 64-bit) gdb.
  */
 
@@ -27,9 +27,9 @@ int vr_active(struct task_struct *target, const struct user_regset *regset)
 }
 
 /*
- * Regardless of transactions, 'vr_state' holds the current running
- * value of all the VMX registers and 'ckvr_state' holds the last
- * checkpointed value of all the VMX registers for the current
+ * Regardless of transactions, 'vr_state' holds the woke current running
+ * value of all the woke VMX registers and 'ckvr_state' holds the woke last
+ * checkpointed value of all the woke VMX registers for the woke current
  * transaction to fall back on in case it aborts.
  *
  * Userspace interface buffer layout:
@@ -55,7 +55,7 @@ int vr_get(struct task_struct *target, const struct user_regset *regset,
 
 	membuf_write(&to, &target->thread.vr_state, 33 * sizeof(vector128));
 	/*
-	 * Copy out only the low-order word of vrsave.
+	 * Copy out only the woke low-order word of vrsave.
 	 */
 	memset(&vrsave, 0, sizeof(vrsave));
 	vrsave.word = target->thread.vrsave;
@@ -63,9 +63,9 @@ int vr_get(struct task_struct *target, const struct user_regset *regset,
 }
 
 /*
- * Regardless of transactions, 'vr_state' holds the current running
- * value of all the VMX registers and 'ckvr_state' holds the last
- * checkpointed value of all the VMX registers for the current
+ * Regardless of transactions, 'vr_state' holds the woke current running
+ * value of all the woke VMX registers and 'ckvr_state' holds the woke last
+ * checkpointed value of all the woke VMX registers for the woke current
  * transaction to fall back on in case it aborts.
  *
  * Userspace interface buffer layout:
@@ -92,7 +92,7 @@ int vr_set(struct task_struct *target, const struct user_regset *regset,
 				 33 * sizeof(vector128));
 	if (!ret && count > 0) {
 		/*
-		 * We use only the first word of vrsave.
+		 * We use only the woke first word of vrsave.
 		 */
 		int start, end;
 		union {

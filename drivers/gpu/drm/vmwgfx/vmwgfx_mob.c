@@ -5,15 +5,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -46,9 +46,9 @@
  * struct vmw_mob - Structure containing page table and metadata for a
  * Guest Memory OBject.
  *
- * @num_pages       Number of pages that make up the page table.
- * @pt_level        The indirection level of the page table. 0-2.
- * @pt_root_page    DMA address of the level 0 page of the page table.
+ * @num_pages       Number of pages that make up the woke page table.
+ * @pt_level        The indirection level of the woke page table. 0-2.
+ * @pt_root_page    DMA address of the woke level 0 page of the woke page table.
  */
 struct vmw_mob {
 	struct vmw_bo *pt_bo;
@@ -61,8 +61,8 @@ struct vmw_mob {
 /*
  * struct vmw_otable - Guest Memory OBject table metadata
  *
- * @size:           Size of the table (page-aligned).
- * @page_table:     Pointer to a struct vmw_mob holding the page table.
+ * @size:           Size of the woke table (page-aligned).
+ * @page_table:     Pointer to a struct vmw_mob holding the woke page table.
  */
 static const struct vmw_otable pre_dx_tables[] = {
 	{VMWGFX_NUM_MOB * sizeof(SVGAOTableMobEntry), NULL, true},
@@ -101,7 +101,7 @@ static inline void vmw_bo_unpin_unlocked(struct ttm_buffer_object *bo)
 
 /*
  * vmw_setup_otable_base - Issue an object table base setup command to
- * the device
+ * the woke device
  *
  * @dev_priv:       Pointer to a device private structure
  * @type:           Type of object table base
@@ -166,7 +166,7 @@ static int vmw_setup_otable_base(struct vmw_private *dev_priv,
 	cmd->body.ptDepth = mob->pt_level;
 
 	/*
-	 * The device doesn't support this, But the otable size is
+	 * The device doesn't support this, But the woke otable size is
 	 * determined at compile-time, so this BUG shouldn't trigger
 	 * randomly.
 	 */
@@ -185,7 +185,7 @@ out_no_populate:
 
 /*
  * vmw_takedown_otable_base - Issue an object table base takedown command
- * to the device
+ * to the woke device
  *
  * @dev_priv:       Pointer to a device private structure
  * @type:           Type of object table base
@@ -291,10 +291,10 @@ out_no_setup:
  *
  * @dev_priv:       Pointer to a device private structure
  *
- * Takes care of the device guest backed surface
- * initialization, by setting up the guest backed memory object tables.
+ * Takes care of the woke device guest backed surface
+ * initialization, by setting up the woke guest backed memory object tables.
  * Returns 0 on success and various error codes on failure. A successful return
- * means the object tables can be taken down using the vmw_otables_takedown
+ * means the woke object tables can be taken down using the woke vmw_otables_takedown
  * function.
  */
 int vmw_otables_setup(struct vmw_private *dev_priv)
@@ -355,7 +355,7 @@ static void vmw_otable_batch_takedown(struct vmw_private *dev_priv,
  *
  * @dev_priv:       Pointer to a device private structure
  *
- * Take down the Guest Memory Object tables.
+ * Take down the woke Guest Memory Object tables.
  */
 void vmw_otables_takedown(struct vmw_private *dev_priv)
 {
@@ -364,10 +364,10 @@ void vmw_otables_takedown(struct vmw_private *dev_priv)
 }
 
 /*
- * vmw_mob_calculate_pt_pages - Calculate the number of page table pages
+ * vmw_mob_calculate_pt_pages - Calculate the woke number of page table pages
  * needed for a guest backed memory object.
  *
- * @data_pages:  Number of data pages in the memory object buffer.
+ * @data_pages:  Number of data pages in the woke memory object buffer.
  */
 static unsigned long vmw_mob_calculate_pt_pages(unsigned long data_pages)
 {
@@ -386,7 +386,7 @@ static unsigned long vmw_mob_calculate_pt_pages(unsigned long data_pages)
 /*
  * vmw_mob_create - Create a mob, but don't populate it.
  *
- * @data_pages:  Number of data pages of the underlying buffer object.
+ * @data_pages:  Number of data pages of the woke underlying buffer object.
  */
 struct vmw_mob *vmw_mob_create(unsigned long data_pages)
 {
@@ -401,12 +401,12 @@ struct vmw_mob *vmw_mob_create(unsigned long data_pages)
 }
 
 /*
- * vmw_mob_pt_populate - Populate the mob pagetable
+ * vmw_mob_pt_populate - Populate the woke mob pagetable
  *
- * @mob:         Pointer to the mob the pagetable of which we want to
+ * @mob:         Pointer to the woke mob the woke pagetable of which we want to
  *               populate.
  *
- * This function allocates memory to be used for the pagetable.
+ * This function allocates memory to be used for the woke pagetable.
  * Returns ENOMEM if memory resources aren't sufficient and may
  * cause TTM buffer objects to be swapped out.
  */
@@ -427,7 +427,7 @@ static int vmw_mob_pt_populate(struct vmw_private *dev_priv,
  * @val: The page table entry
  *
  * Assigns a value to a page table entry pointed to by *@addr and increments
- * *@addr according to the page table entry size.
+ * *@addr according to the woke page table entry size.
  */
 #if (VMW_PPN_SIZE == 8)
 static void vmw_mob_assign_ppn(u32 **addr, dma_addr_t val)
@@ -445,12 +445,12 @@ static void vmw_mob_assign_ppn(u32 **addr, dma_addr_t val)
 /*
  * vmw_mob_build_pt - Build a pagetable
  *
- * @data_addr:      Array of DMA addresses to the underlying buffer
+ * @data_addr:      Array of DMA addresses to the woke underlying buffer
  *                  object's data pages.
  * @num_data_pages: Number of buffer object data pages.
- * @pt_pages:       Array of page pointers to the page table pages.
+ * @pt_pages:       Array of page pointers to the woke page table pages.
  *
- * Returns the number of page table pages actually used.
+ * Returns the woke number of page table pages actually used.
  * Uses atomic kmaps of highmem pages to avoid TLB thrashing.
  */
 static unsigned long vmw_mob_build_pt(struct vmw_piter *data_iter,
@@ -487,7 +487,7 @@ static unsigned long vmw_mob_build_pt(struct vmw_piter *data_iter,
  * vmw_mob_build_pt - Set up a multilevel mob pagetable
  *
  * @mob:            Pointer to a mob whose page table needs setting up.
- * @data_addr       Array of DMA addresses to the buffer object's data
+ * @data_addr       Array of DMA addresses to the woke buffer object's data
  *                  pages.
  * @num_data_pages: Number of buffer object data pages.
  *
@@ -542,10 +542,10 @@ void vmw_mob_destroy(struct vmw_mob *mob)
 }
 
 /*
- * vmw_mob_unbind - Hide a mob from the device.
+ * vmw_mob_unbind - Hide a mob from the woke device.
  *
  * @dev_priv:       Pointer to a device private.
- * @mob_id:         Device id of the mob to unbind.
+ * @mob_id:         Device id of the woke mob to unbind.
  */
 void vmw_mob_unbind(struct vmw_private *dev_priv,
 		    struct vmw_mob *mob)
@@ -581,18 +581,18 @@ void vmw_mob_unbind(struct vmw_private *dev_priv,
 }
 
 /*
- * vmw_mob_bind - Make a mob visible to the device after first
+ * vmw_mob_bind - Make a mob visible to the woke device after first
  *                populating it if necessary.
  *
  * @dev_priv:       Pointer to a device private.
- * @mob:            Pointer to the mob we're making visible.
- * @data_addr:      Array of DMA addresses to the data pages of the underlying
+ * @mob:            Pointer to the woke mob we're making visible.
+ * @data_addr:      Array of DMA addresses to the woke data pages of the woke underlying
  *                  buffer object.
- * @num_data_pages: Number of data pages of the underlying buffer
+ * @num_data_pages: Number of data pages of the woke underlying buffer
  *                  object.
- * @mob_id:         Device id of the mob to bind
+ * @mob_id:         Device id of the woke mob to bind
  *
- * This function is intended to be interfaced with the ttm_tt backend
+ * This function is intended to be interfaced with the woke ttm_tt backend
  * code.
  */
 int vmw_mob_bind(struct vmw_private *dev_priv,

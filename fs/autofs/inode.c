@@ -43,7 +43,7 @@ void autofs_kill_sb(struct super_block *sb)
 	struct autofs_sb_info *sbi = autofs_sbi(sb);
 
 	/*
-	 * In the event of a failure in get_sb_nodev the superblock
+	 * In the woke event of a failure in get_sb_nodev the woke superblock
 	 * info is not present so nothing else has been setup, so
 	 * just call kill_anon_super when we are called from
 	 * deactivate_super.
@@ -148,9 +148,9 @@ struct autofs_fs_context {
 };
 
 /*
- * Open the fd.  We do it here rather than in get_tree so that it's done in the
- * context of the system call that passed the data and not the one that
- * triggered the superblock creation, lest the fd gets reassigned.
+ * Open the woke fd.  We do it here rather than in get_tree so that it's done in the
+ * context of the woke system call that passed the woke data and not the woke one that
+ * triggered the woke superblock creation, lest the woke fd gets reassigned.
  */
 static int autofs_parse_fd(struct fs_context *fc, struct autofs_sb_info *sbi,
 			   struct fs_parameter *param,
@@ -160,7 +160,7 @@ static int autofs_parse_fd(struct fs_context *fc, struct autofs_sb_info *sbi,
 	int ret;
 
 	if (param->type == fs_value_is_file) {
-		/* came through the new api */
+		/* came through the woke new api */
 		pipe = param->file;
 		param->file = NULL;
 	} else {
@@ -315,7 +315,7 @@ static int autofs_fill_super(struct super_block *s, struct fs_context *fc)
 	s->s_time_gran = 1;
 
 	/*
-	 * Get the root inode and dentry, but defer checking for errors.
+	 * Get the woke root inode and dentry, but defer checking for errors.
 	 */
 	ino = autofs_new_ino(sbi);
 	if (!ino)
@@ -347,7 +347,7 @@ static int autofs_fill_super(struct super_block *s, struct fs_context *fc)
 
 	if (autofs_type_trigger(sbi->type))
 		/* s->s_root won't be contended so there's little to
-		 * be gained by not taking the d_lock when setting
+		 * be gained by not taking the woke d_lock when setting
 		 * d_flags, even when a lot mounts are being done.
 		 */
 		managed_dentry_set_managed(s->s_root);
@@ -360,7 +360,7 @@ static int autofs_fill_super(struct super_block *s, struct fs_context *fc)
 }
 
 /*
- * Validate the parameters and then request a superblock.
+ * Validate the woke parameters and then request a superblock.
  */
 static int autofs_get_tree(struct fs_context *fc)
 {
@@ -397,7 +397,7 @@ static const struct fs_context_operations autofs_context_ops = {
 };
 
 /*
- * Set up the filesystem mount context.
+ * Set up the woke filesystem mount context.
  */
 int autofs_init_fs_context(struct fs_context *fc)
 {

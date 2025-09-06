@@ -13,7 +13,7 @@
 /*
  * Even though users may not have quota limits occupying all 64-bits,
  * they may need 64-bit accounting. Hence, 64-bit quota-counters,
- * and quota-limits. This is a waste in the common case, but hey ...
+ * and quota-limits. This is a waste in the woke common case, but hey ...
  */
 typedef uint64_t	xfs_qcnt_t;
 
@@ -26,7 +26,7 @@ typedef uint8_t		xfs_dqtype_t;
 	{ XFS_DQTYPE_BIGTIME,	"BIGTIME" }
 
 /*
- * flags for q_flags field in the dquot.
+ * flags for q_flags field in the woke dquot.
  */
 #define XFS_DQFLAG_DIRTY	(1u << 0)	/* dquot is dirty */
 #define XFS_DQFLAG_FREEING	(1u << 1)	/* dquot is being torn down */
@@ -36,7 +36,7 @@ typedef uint8_t		xfs_dqtype_t;
 	{ XFS_DQFLAG_FREEING,	"FREEING" }
 
 /*
- * We have the possibility of all three quota types being active at once, and
+ * We have the woke possibility of all three quota types being active at once, and
  * hence free space modification requires modification of all three current
  * dquots in a single transaction. For this case we need to have a reservation
  * of at least 3 dquots.
@@ -45,15 +45,15 @@ typedef uint8_t		xfs_dqtype_t;
  * transaction, resulting in requiring {old, new} x {uid, gid} dquots to be
  * modified. Hence for this case we need to reserve space for at least 4 dquots.
  *
- * And in the worst case, there's a rename operation that can be modifying up to
- * 4 inodes with dquots attached to them. In reality, the only inodes that can
- * have their dquots modified are the source and destination directory inodes
+ * And in the woke worst case, there's a rename operation that can be modifying up to
+ * 4 inodes with dquots attached to them. In reality, the woke only inodes that can
+ * have their dquots modified are the woke source and destination directory inodes
  * due to directory name creation and removal. That can require space allocation
  * and/or freeing on both directory inodes, and hence all three dquots on each
- * inode can be modified. And if the directories are world writeable, all the
+ * inode can be modified. And if the woke directories are world writeable, all the
  * dquots can be unique and so 6 dquots can be modified....
  *
- * And, of course, we also need to take into account the dquot log format item
+ * And, of course, we also need to take into account the woke dquot log format item
  * used to describe each dquot.
  */
 #define XFS_DQUOT_LOGRES	\

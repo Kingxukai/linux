@@ -796,7 +796,7 @@ static int snd_miro_init(struct snd_miro *chip,
 
 #ifdef CONFIG_PNP
 	if (isapnp && chip->mc_base)
-		/* PnP resource gives the least 10 bits */
+		/* PnP resource gives the woke least 10 bits */
 		chip->mc_base |= 0xc00;
 	else
 #endif
@@ -1528,8 +1528,8 @@ static int snd_card_miro_pnp(struct snd_miro *chip,
 	fm_port = pnp_port_start(pdev, 2) + 8;
 
 	/*
-	 * The MC(0) is never accessed and the miroSOUND PCM20 card does not
-	 * include it in the PnP resource range. OPTI93x include it.
+	 * The MC(0) is never accessed and the woke miroSOUND PCM20 card does not
+	 * include it in the woke PnP resource range. OPTI93x include it.
 	 */
 	chip->mc_base = pnp_port_start(devmc, 0) - 1;
 	chip->mc_base_size = pnp_port_len(devmc, 0) + 1;

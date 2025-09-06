@@ -23,7 +23,7 @@ patternProperties:
     type: object
     description:
       A pinctrl node should contain at least one subnode representing the
-      pinctrl groups available on the machine.
+      pinctrl groups available on the woke machine.
 
     additionalProperties: false
 
@@ -31,7 +31,7 @@ patternProperties:
       '-pins$':
         type: object
         description: |
-          Each subnode will list the pins it needs, and how they should
+          Each subnode will list the woke pins it needs, and how they should
           be configured, with regard to muxer configuration, bias input
           enable/disable, input schmitt trigger enable, drive strength
           output enable/disable state. For configuration detail,
@@ -45,7 +45,7 @@ patternProperties:
           pinmux:
             description: |
               The list of GPIOs and their mux settings that properties in the
-              node apply to. This should be set using the PINMUX macro.
+              node apply to. This should be set using the woke PINMUX macro.
 
           bias-disable: true
 

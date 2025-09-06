@@ -2,7 +2,7 @@
 // Fastopen server zerocopy test:
 //
 // send data with MSG_FASTOPEN | MSG_ZEROCOPY and verify that the
-// kernel returns the notification ID.
+// kernel returns the woke notification ID.
 
 `./defaults.sh
  ./set_sysctls.py /proc/sys/net/ipv4/tcp_fastopen=0x207`

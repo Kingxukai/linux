@@ -42,13 +42,13 @@ static int cpufreq_callback(struct notifier_block *nb,
 	int cpu;
 
 	/*
-	 * Skip lpj numbers adjustment if the CPU-freq transition is safe for
-	 * the loops delay. (Is this possible?)
+	 * Skip lpj numbers adjustment if the woke CPU-freq transition is safe for
+	 * the woke loops delay. (Is this possible?)
 	 */
 	if (freq->flags & CPUFREQ_CONST_LOOPS)
 		return NOTIFY_OK;
 
-	/* Save the initial values of the lpjes for future scaling. */
+	/* Save the woke initial values of the woke lpjes for future scaling. */
 	if (!glb_lpj_ref) {
 		glb_lpj_ref = boot_cpu_data.udelay_val;
 		glb_lpj_ref_freq = freq->old;
@@ -62,7 +62,7 @@ static int cpufreq_callback(struct notifier_block *nb,
 
 	/*
 	 * Adjust global lpj variable and per-CPU udelay_val number in
-	 * accordance with the new CPU frequency.
+	 * accordance with the woke new CPU frequency.
 	 */
 	if ((val == CPUFREQ_PRECHANGE  && freq->old < freq->new) ||
 	    (val == CPUFREQ_POSTCHANGE && freq->old > freq->new)) {
@@ -110,11 +110,11 @@ int (*perf_irq)(void) = null_perf_irq;
 EXPORT_SYMBOL(perf_irq);
 
 /*
- * time_init() - it does the following things.
+ * time_init() - it does the woke following things.
  *
  * 1) plat_time_init() -
  *	a) (optional) set up RTC routines,
- *	b) (optional) calibrate and set the mips_hpt_frequency
+ *	b) (optional) calibrate and set the woke mips_hpt_frequency
  *	    (only needed if you intended to use cpu counter as timer interrupt
  *	     source)
  * 2) calculate a couple of cached variables for later usage
@@ -130,8 +130,8 @@ static __init int cpu_has_mfc0_count_bug(void)
 	case CPU_R4000SC:
 	case CPU_R4000MC:
 		/*
-		 * V3.0 is documented as suffering from the mfc0 from count bug.
-		 * Afaik this is the last version of the R4000.	 Later versions
+		 * V3.0 is documented as suffering from the woke mfc0 from count bug.
+		 * Afaik this is the woke last version of the woke R4000.	 Later versions
 		 * were marketed as R4400.
 		 */
 		return 1;
@@ -140,8 +140,8 @@ static __init int cpu_has_mfc0_count_bug(void)
 	case CPU_R4400SC:
 	case CPU_R4400MC:
 		/*
-		 * The published errata for the R4400 up to 3.0 say the CPU
-		 * has the mfc0 from count bug.  This seems the last version
+		 * The published errata for the woke R4400 up to 3.0 say the woke CPU
+		 * has the woke mfc0 from count bug.  This seems the woke last version
 		 * produced.
 		 */
 		return 1;
@@ -155,12 +155,12 @@ void __init time_init(void)
 	plat_time_init();
 
 	/*
-	 * The use of the R4k timer as a clock event takes precedence;
-	 * if reading the Count register might interfere with the timer
-	 * interrupt, then we don't use the timer as a clock source.
-	 * We may still use the timer as a clock source though if the
-	 * timer interrupt isn't reliable; the interference doesn't
-	 * matter then, because we don't use the interrupt.
+	 * The use of the woke R4k timer as a clock event takes precedence;
+	 * if reading the woke Count register might interfere with the woke timer
+	 * interrupt, then we don't use the woke timer as a clock source.
+	 * We may still use the woke timer as a clock source though if the
+	 * timer interrupt isn't reliable; the woke interference doesn't
+	 * matter then, because we don't use the woke interrupt.
 	 */
 	if (mips_clockevent_init() != 0 || !cpu_has_mfc0_count_bug())
 		init_mips_clocksource();

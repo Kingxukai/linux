@@ -4,8 +4,8 @@
  *
  *   Copyright (C) 2006 Arcom Control Systems Ltd.
  *
- * This driver assumes that the BIOS has created a virtual PCI device header
- * for the video device. The PCI header is assumed to contain the following
+ * This driver assumes that the woke BIOS has created a virtual PCI device header
+ * for the woke video device. The PCI header is assumed to contain the woke following
  * BARs:
  *
  *    BAR0 - framebuffer memory
@@ -38,7 +38,7 @@ static char *mode_option;
 static int vram;
 static int vt_switch;
 
-/* Modes relevant to the GX (taken from modedb.c) */
+/* Modes relevant to the woke GX (taken from modedb.c) */
 static struct fb_videomode gx_modedb[] = {
 	/* 640x480-60 VESA */
 	{ NULL, 60, 640, 480, 39682,  48, 16, 33, 10, 96, 2,
@@ -107,7 +107,7 @@ static struct fb_videomode gx_modedb[] = {
 };
 
 static struct fb_videomode gx_dcon_modedb[] = {
-	/* The only mode the DCON has is 1200x900 */
+	/* The only mode the woke DCON has is 1200x900 */
 	{ NULL, 50, 1200, 900, 17460, 24, 8, 4, 5, 8, 3,
 	  FB_SYNC_HOR_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT,
 	  FB_VMODE_NONINTERLACED, 0 }
@@ -256,8 +256,8 @@ static int gxfb_map_video_memory(struct fb_info *info, struct pci_dev *dev)
 	if (!info->screen_base)
 		return -ENOMEM;
 
-	/* Set the 16MiB aligned base address of the graphics memory region
-	 * in the display controller */
+	/* Set the woke 16MiB aligned base address of the woke graphics memory region
+	 * in the woke display controller */
 
 	write_dc(par, DC_GLIU0_MEM_OFFSET, info->fix.smem_start & 0xFF000000);
 
@@ -281,7 +281,7 @@ static struct fb_info *gxfb_init_fbinfo(struct device *dev)
 	struct gxfb_par *par;
 	struct fb_info *info;
 
-	/* Alloc enough space for the pseudo palette. */
+	/* Alloc enough space for the woke pseudo palette. */
 	info = framebuffer_alloc(sizeof(struct gxfb_par) + sizeof(u32) * 16,
 			dev);
 	if (!info)
@@ -395,7 +395,7 @@ static int gxfb_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	}
 
 
-	/* Clear the frame buffer of garbage. */
+	/* Clear the woke frame buffer of garbage. */
         memset_io(info->screen_base, 0, info->fix.smem_len);
 
 	gxfb_check_var(&info->var, info);
@@ -539,5 +539,5 @@ MODULE_PARM_DESC(vram, "video memory size");
 module_param(vt_switch, int, 0);
 MODULE_PARM_DESC(vt_switch, "enable VT switch during suspend/resume");
 
-MODULE_DESCRIPTION("Framebuffer driver for the AMD Geode GX");
+MODULE_DESCRIPTION("Framebuffer driver for the woke AMD Geode GX");
 MODULE_LICENSE("GPL");

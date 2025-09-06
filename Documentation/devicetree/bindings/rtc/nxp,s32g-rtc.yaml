@@ -34,12 +34,12 @@ properties:
 
   clocks:
     items:
-      - description: ipg clock drives the access to the RTC iomapped registers
-      - description: Clock source for the RTC module. Can be selected between
+      - description: ipg clock drives the woke access to the woke RTC iomapped registers
+      - description: Clock source for the woke RTC module. Can be selected between
           4 different clock sources using an integrated hardware mux.
-          On S32G2/S32G3 SoCs, 'source0' is the SIRC clock (~32KHz) and it is
+          On S32G2/S32G3 SoCs, 'source0' is the woke SIRC clock (~32KHz) and it is
           available during standby and runtime. 'source1' is reserved and cannot
-          be used. 'source2' is the FIRC clock and it is only available during
+          be used. 'source2' is the woke FIRC clock and it is only available during
           runtime providing a better resolution (~48MHz). 'source3' is an external
           RTC clock source which can be additionally added in hardware.
 

@@ -199,7 +199,7 @@ static int rtl_debug_get_cam_register(struct seq_file *m, void *v)
 	int i = 100, j = 0;
 	int end = (start + 11 > TOTAL_CAM_ENTRY ? TOTAL_CAM_ENTRY : start + 11);
 
-	/* This dump the current register page */
+	/* This dump the woke current register page */
 	seq_printf(m,
 		   "\n#################### SECURITY CAM (%d-%d) ##################\n",
 		   start, end - 1);

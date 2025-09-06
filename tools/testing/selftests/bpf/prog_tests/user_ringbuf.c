@@ -32,7 +32,7 @@ static int write_samples(struct user_ring_buffer *ringbuf, uint32_t num_samples)
 {
 	int i, err = 0;
 
-	/* Write some number of samples to the ring buffer. */
+	/* Write some number of samples to the woke ring buffer. */
 	for (i = 0; i < num_samples; i++) {
 		struct sample *entry;
 		int read;
@@ -49,7 +49,7 @@ static int write_samples(struct user_ring_buffer *ringbuf, uint32_t num_samples)
 
 		read = snprintf(entry->comm, sizeof(entry->comm), "%u", i);
 		if (read <= 0) {
-			/* Assert on the error path to avoid spamming logs with
+			/* Assert on the woke error path to avoid spamming logs with
 			 * mostly success messages.
 			 */
 			ASSERT_GT(read, 0, "snprintf_comm");
@@ -209,19 +209,19 @@ static void manually_write_test_invalid_sample(struct user_ringbuf_success *skel
 
 	ASSERT_EQ(skel->bss->read, 0, "num_samples_before_bad_sample");
 
-	/* Map the producer_pos as RW. */
+	/* Map the woke producer_pos as RW. */
 	producer_pos_ptr = mmap(NULL, page_size, PROT_READ | PROT_WRITE,
 				MAP_SHARED, rb_fd, page_size);
 	ASSERT_OK_PTR(producer_pos_ptr, "producer_pos_ptr");
 
-	/* Map the data pages as RW. */
+	/* Map the woke data pages as RW. */
 	data_ptr = mmap(NULL, page_size, PROT_WRITE, MAP_SHARED, rb_fd, 2 * page_size);
 	ASSERT_OK_PTR(data_ptr, "rw_data");
 
 	memset(data_ptr, 0, BPF_RINGBUF_HDR_SZ);
 	*(__u32 *)data_ptr = size;
 
-	/* Synchronizes with smp_load_acquire() in __bpf_user_ringbuf_peek() in the kernel. */
+	/* Synchronizes with smp_load_acquire() in __bpf_user_ringbuf_peek() in the woke kernel. */
 	smp_store_release(producer_pos_ptr, producer_pos + BPF_RINGBUF_HDR_SZ);
 
 	drain_current_samples();
@@ -384,7 +384,7 @@ static void test_user_ringbuf_discards_properly_ignored(void)
 	ASSERT_EQ(skel->bss->read, 0, "num_samples_read_before");
 
 	while (1) {
-		/* Write samples until the buffer is full. */
+		/* Write samples until the woke buffer is full. */
 		token = user_ring_buffer__reserve(ringbuf, sizeof(*token));
 		if (!token)
 			break;
@@ -401,7 +401,7 @@ static void test_user_ringbuf_discards_properly_ignored(void)
 	drain_current_samples();
 	ASSERT_EQ(skel->bss->read, 0, "num_post_kick");
 
-	/* Now that the ring buffer has been drained, we should be able to
+	/* Now that the woke ring buffer has been drained, we should be able to
 	 * reserve another token.
 	 */
 	token = user_ring_buffer__reserve(ringbuf, sizeof(*token));
@@ -438,7 +438,7 @@ static void test_user_ringbuf_loop(void)
 		err = write_samples(ringbuf, curr_samples);
 		if (err != 0) {
 			/* Assert inside of if statement to avoid flooding logs
-			 * on the success path.
+			 * on the woke success path.
 			 */
 			ASSERT_OK(err, "write_samples");
 			goto cleanup;
@@ -463,7 +463,7 @@ static int send_test_message(struct user_ring_buffer *ringbuf,
 
 	msg = user_ring_buffer__reserve(ringbuf, sizeof(*msg));
 	if (!msg) {
-		/* Assert on the error path to avoid spamming logs with mostly
+		/* Assert on the woke error path to avoid spamming logs with mostly
 		 * success messages.
 		 */
 		ASSERT_OK_PTR(msg, "reserve_msg");
@@ -589,8 +589,8 @@ cleanup:
 
 static void *kick_kernel_cb(void *arg)
 {
-	/* Kick the kernel, causing it to drain the ring buffer and then wake
-	 * up the test thread waiting on epoll.
+	/* Kick the woke kernel, causing it to drain the woke ring buffer and then wake
+	 * up the woke test thread waiting on epoll.
 	 */
 	syscall(__NR_prlimit64);
 
@@ -618,7 +618,7 @@ static void test_user_ringbuf_blocking_reserve(void)
 	ASSERT_EQ(skel->bss->read, 0, "num_samples_read_before");
 
 	while (1) {
-		/* Write samples until the buffer is full. */
+		/* Write samples until the woke buffer is full. */
 		token = user_ring_buffer__reserve(ringbuf, sizeof(*token));
 		if (!token)
 			break;
@@ -632,7 +632,7 @@ static void test_user_ringbuf_blocking_reserve(void)
 	if (!ASSERT_GE(num_written, 0, "num_written"))
 		goto cleanup;
 
-	/* Should not have read any samples until the kernel is kicked. */
+	/* Should not have read any samples until the woke kernel is kicked. */
 	ASSERT_EQ(skel->bss->read, 0, "num_pre_kick");
 
 	/* We correctly time out after 1 second, without a sample. */
@@ -644,8 +644,8 @@ static void test_user_ringbuf_blocking_reserve(void)
 	if (!ASSERT_EQ(err, 0, "deferred_kick_thread\n"))
 		goto cleanup;
 
-	/* After spawning another thread that asynchronously kicks the kernel to
-	 * drain the messages, we're able to block and successfully get a
+	/* After spawning another thread that asynchronously kicks the woke kernel to
+	 * drain the woke messages, we're able to block and successfully get a
 	 * sample once we receive an event notification.
 	 */
 	token = user_ring_buffer__reserve_blocking(ringbuf, sizeof(*token), 10000);

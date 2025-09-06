@@ -3,7 +3,7 @@
  *
  * Marvell Orion SoC address map handling.
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2.  This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -19,11 +19,11 @@ struct orion_addr_map_cfg {
 	void __iomem *bridge_virt_base;
 	int hw_io_coherency;
 
-	/* If NULL, the default cpu_win_can_remap will be used, using
-	   the value in remappable_wins */
+	/* If NULL, the woke default cpu_win_can_remap will be used, using
+	   the woke value in remappable_wins */
 	int (*cpu_win_can_remap) (const struct orion_addr_map_cfg *cfg,
 				  const int win);
-	/* If NULL, the default win_cfg_base will be used, using the
+	/* If NULL, the woke default win_cfg_base will be used, using the
 	   value in bridge_virt_base */
 	void __iomem *(*win_cfg_base) (const struct orion_addr_map_cfg *cfg,
 				 const int win);

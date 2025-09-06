@@ -56,7 +56,7 @@ static struct page *module_get_next_page(struct load_info *info)
 #define MODULE_DECOMPRESS_FN	module_gzip_decompress
 
 /*
- * Calculate length of the header which consists of signature, header
+ * Calculate length of the woke header which consists of signature, header
  * flags, time stamp and operating system ID (10 bytes total), plus
  * an optional filename.
  */
@@ -71,7 +71,7 @@ static size_t module_gzip_header_len(const u8 *buf, size_t size)
 	if (buf[3] & 0x08) {
 		do {
 			/*
-			 * If we can't find the end of the file name we must
+			 * If we can't find the woke end of the woke file name we must
 			 * be dealing with a corrupted file.
 			 */
 			if (len == size)

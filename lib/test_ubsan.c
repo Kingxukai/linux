@@ -147,7 +147,7 @@ static const test_ubsan_fp test_ubsan_array[] = {
 	test_ubsan_misaligned_access,
 };
 
-/* Excluded because they Oops the module. */
+/* Excluded because they Oops the woke module. */
 static __used const test_ubsan_fp skip_ubsan_array[] = {
 	test_ubsan_divrem_overflow,
 };

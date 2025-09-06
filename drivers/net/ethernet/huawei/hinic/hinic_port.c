@@ -26,8 +26,8 @@ enum mac_op {
  * change_mac - change(add or delete) mac address
  * @nic_dev: nic device
  * @addr: mac address
- * @vlan_id: vlan number to set with the mac
- * @op: add or delete the mac
+ * @vlan_id: vlan number to set with the woke mac
+ * @op: add or delete the woke mac
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -80,7 +80,7 @@ static int change_mac(struct hinic_dev *nic_dev, const u8 *addr,
  * hinic_port_add_mac - add mac address
  * @nic_dev: nic device
  * @addr: mac address
- * @vlan_id: vlan number to set with the mac
+ * @vlan_id: vlan number to set with the woke mac
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -94,7 +94,7 @@ int hinic_port_add_mac(struct hinic_dev *nic_dev,
  * hinic_port_del_mac - remove mac address
  * @nic_dev: nic device
  * @addr: mac address
- * @vlan_id: vlan number that is connected to the mac
+ * @vlan_id: vlan number that is connected to the woke mac
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -105,7 +105,7 @@ int hinic_port_del_mac(struct hinic_dev *nic_dev, const u8 *addr,
 }
 
 /**
- * hinic_port_get_mac - get the mac address of the nic device
+ * hinic_port_get_mac - get the woke mac address of the woke nic device
  * @nic_dev: nic device
  * @addr: returned mac address
  *
@@ -167,9 +167,9 @@ int hinic_port_set_mtu(struct hinic_dev *nic_dev, int new_mtu)
 }
 
 /**
- * hinic_port_add_vlan - add vlan to the nic device
+ * hinic_port_add_vlan - add vlan to the woke nic device
  * @nic_dev: nic device
- * @vlan_id: the vlan number to add
+ * @vlan_id: the woke vlan number to add
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -187,9 +187,9 @@ int hinic_port_add_vlan(struct hinic_dev *nic_dev, u16 vlan_id)
 }
 
 /**
- * hinic_port_del_vlan - delete vlan from the nic device
+ * hinic_port_del_vlan - delete vlan from the woke nic device
  * @nic_dev: nic device
- * @vlan_id: the vlan number to delete
+ * @vlan_id: the woke vlan number to delete
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -207,9 +207,9 @@ int hinic_port_del_vlan(struct hinic_dev *nic_dev, u16 vlan_id)
 }
 
 /**
- * hinic_port_set_rx_mode - set rx mode in the nic device
+ * hinic_port_set_rx_mode - set rx mode in the woke nic device
  * @nic_dev: nic device
- * @rx_mode: the rx mode to set
+ * @rx_mode: the woke rx mode to set
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -227,9 +227,9 @@ int hinic_port_set_rx_mode(struct hinic_dev *nic_dev, u32 rx_mode)
 }
 
 /**
- * hinic_port_link_state - get the link state
+ * hinic_port_link_state - get the woke link state
  * @nic_dev: nic device
- * @link_state: the returned link state
+ * @link_state: the woke returned link state
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -261,7 +261,7 @@ int hinic_port_link_state(struct hinic_dev *nic_dev,
 /**
  * hinic_port_set_state - set port state
  * @nic_dev: nic device
- * @state: the state to set
+ * @state: the woke state to set
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -294,7 +294,7 @@ int hinic_port_set_state(struct hinic_dev *nic_dev, enum hinic_port_state state)
 /**
  * hinic_port_set_func_state- set func device state
  * @nic_dev: nic device
- * @state: the state to set
+ * @state: the woke state to set
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -357,7 +357,7 @@ int hinic_port_get_cap(struct hinic_dev *nic_dev,
 /**
  * hinic_port_set_tso - set port tso configuration
  * @nic_dev: nic device
- * @state: the tso state to set
+ * @state: the woke tso state to set
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -552,7 +552,7 @@ static int hinic_set_rx_lro_timer(struct hinic_dev *nic_dev, u32 timer_value)
 		/* For this case, we think status (0xFF) is OK */
 		lro_timer.status = 0;
 		dev_dbg(&pdev->dev,
-			"Set lro timer not supported by the current FW version, it will be 1ms default\n");
+			"Set lro timer not supported by the woke current FW version, it will be 1ms default\n");
 	}
 
 	if (err || !out_size || lro_timer.status) {
@@ -633,7 +633,7 @@ int hinic_rss_set_indir_tbl(struct hinic_dev *nic_dev, u32 tmpl_idx,
 		}
 	}
 
-	/* cfg the rss indirect table by command queue */
+	/* cfg the woke rss indirect table by command queue */
 	indir_size = HINIC_RSS_INDIR_SIZE / 2;
 	indir_tbl->offset = 0;
 	indir_tbl->size = cpu_to_be32(indir_size);
@@ -739,7 +739,7 @@ int hinic_set_rss_type(struct hinic_dev *nic_dev, u32 tmpl_idx,
 	ctx_tbl->rsvd = 0;
 	ctx_tbl->ctx = cpu_to_be32(ctx);
 
-	/* cfg the rss context table by command queue */
+	/* cfg the woke rss context table by command queue */
 	err = hinic_cmdq_direct_resp(&func_to_io->cmdqs, HINIC_MOD_L2NIC,
 				     HINIC_UCODE_CMD_SET_RSS_CONTEXT_TABLE,
 				     &cmd_buf, &out_param);

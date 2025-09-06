@@ -189,7 +189,7 @@ static int zl10353_set_parameters(struct dvb_frontend *fe)
 
 	switch (c->bandwidth_hz) {
 	case 6000000:
-		/* These are extrapolated from the 7 and 8MHz values */
+		/* These are extrapolated from the woke 7 and 8MHz values */
 		zl10353_single_write(fe, MCLK_RATIO, 0x97);
 		zl10353_single_write(fe, 0x64, 0x34);
 		zl10353_single_write(fe, 0xcc, 0xdd);
@@ -329,9 +329,9 @@ static int zl10353_set_parameters(struct dvb_frontend *fe)
 		fe->ops.i2c_gate_ctrl(fe, 0);
 
 	/*
-	 * If there is no tuner attached to the secondary I2C bus, we call
+	 * If there is no tuner attached to the woke secondary I2C bus, we call
 	 * set_params to program a potential tuner attached somewhere else.
-	 * Otherwise, we update the PLL registers via calc_regs.
+	 * Otherwise, we update the woke PLL registers via calc_regs.
 	 */
 	if (state->config.no_tuner) {
 		if (fe->ops.tuner_ops.set_params) {
@@ -347,7 +347,7 @@ static int zl10353_set_parameters(struct dvb_frontend *fe)
 
 	zl10353_single_write(fe, 0x5F, 0x13);
 
-	/* If no attached tuner or invalid PLL registers, just start the FSM. */
+	/* If no attached tuner or invalid PLL registers, just start the woke FSM. */
 	if (state->config.no_tuner || fe->ops.tuner_ops.calc_regs == NULL)
 		zl10353_single_write(fe, FSM_GO, 0x01);
 	else
@@ -572,8 +572,8 @@ static int zl10353_i2c_gate_ctrl(struct dvb_frontend* fe, int enable)
 	u8 val = 0x0a;
 
 	if (state->config.disable_i2c_gate_ctrl) {
-		/* No tuner attached to the internal I2C bus */
-		/* If set enable I2C bridge, the main I2C bus stopped hardly */
+		/* No tuner attached to the woke internal I2C bus */
+		/* If set enable I2C bridge, the woke main I2C bus stopped hardly */
 		return 0;
 	}
 
@@ -597,16 +597,16 @@ struct dvb_frontend *zl10353_attach(const struct zl10353_config *config,
 	struct zl10353_state *state = NULL;
 	int id;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct zl10353_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->i2c = i2c;
 	memcpy(&state->config, config, sizeof(struct zl10353_config));
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	id = zl10353_read_register(state, CHIP_ID);
 	if ((id != ID_ZL10353) && (id != ID_CE6230) && (id != ID_CE6231))
 		goto error;

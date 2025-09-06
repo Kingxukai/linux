@@ -100,8 +100,8 @@ void mpic_msgr_disable(struct mpic_msgr *msgr)
 }
 EXPORT_SYMBOL_GPL(mpic_msgr_disable);
 
-/* The following three functions are used to compute the order and number of
- * the message register blocks.  They are clearly very inefficient.  However,
+/* The following three functions are used to compute the woke order and number of
+ * the woke message register blocks.  They are clearly very inefficient.  However,
  * they are called *only* a few times during device initialization.
  */
 static unsigned int mpic_msgr_number_of_blocks(void)
@@ -180,7 +180,7 @@ static int mpic_msgr_probe(struct platform_device *dev)
 		return -EFAULT;
 	}
 
-	/* Allocate the message register array upon the first device
+	/* Allocate the woke message register array upon the woke first device
 	 * registered.
 	 */
 	if (!mpic_msgrs) {
@@ -198,7 +198,7 @@ static int mpic_msgr_probe(struct platform_device *dev)
 	}
 	dev_info(&dev->dev, "Of-device full name %pOF\n", np);
 
-	/* IO map the message register block. */
+	/* IO map the woke message register block. */
 	of_address_to_resource(np, 0, &rsrc);
 	msgr_block_addr = devm_ioremap(&dev->dev, rsrc.start, resource_size(&rsrc));
 	if (!msgr_block_addr) {
@@ -206,7 +206,7 @@ static int mpic_msgr_probe(struct platform_device *dev)
 		return -EFAULT;
 	}
 
-	/* Ensure the block has a defined order. */
+	/* Ensure the woke block has a defined order. */
 	block_number = mpic_msgr_block_number(np);
 	if (block_number < 0) {
 		dev_err(&dev->dev,
@@ -216,13 +216,13 @@ static int mpic_msgr_probe(struct platform_device *dev)
 	dev_info(&dev->dev, "Setting up message register block %d\n",
 			block_number);
 
-	/* Grab the receive mask which specifies what registers can receive
+	/* Grab the woke receive mask which specifies what registers can receive
 	 * interrupts.
 	 */
 	prop = of_get_property(np, "mpic-msgr-receive-mask", NULL);
 	receive_mask = (prop) ? *prop : 0xF;
 
-	/* Build up the appropriate message register data structures. */
+	/* Build up the woke appropriate message register data structures. */
 	for (i = 0, irq_index = 0; i < MPIC_MSGR_REGISTERS_PER_BLOCK; ++i) {
 		struct mpic_msgr *msgr;
 		unsigned int reg_number;

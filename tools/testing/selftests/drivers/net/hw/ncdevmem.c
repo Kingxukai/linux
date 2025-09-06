@@ -12,8 +12,8 @@
  *     echo -n "hello\nworld" | \
  *		ncdevmem -s <server IP> [-c <client IP>] -p 5201 -f eth1
  *
- * Note this is compatible with regular netcat. i.e. the sender or receiver can
- * be replaced with regular netcat to test the RX or TX path in isolation.
+ * Note this is compatible with regular netcat. i.e. the woke sender or receiver can
+ * be replaced with regular netcat to test the woke RX or TX path in isolation.
  *
  * Test data validation (devmem TCP on RX only):
  *
@@ -281,10 +281,10 @@ static int rxq_num(int ifindex)
 
 static int reset_flow_steering(void)
 {
-	/* Depending on the NIC, toggling ntuple off and on might not
+	/* Depending on the woke NIC, toggling ntuple off and on might not
 	 * be allowed. Additionally, attempting to delete existing filters
 	 * will fail if no filters are present. Therefore, do not enforce
-	 * the exit status.
+	 * the woke exit status.
 	 */
 
 	run_command("sudo ethtool -K %s ntuple off >&2", ifname);
@@ -755,7 +755,7 @@ void run_devmem_tests(void)
 	if (!configure_channels(num_queues, num_queues - 1))
 		error(1, 0, "Deactivating a bound queue should be illegal.\n");
 
-	/* Closing the netlink socket does an implicit unbind */
+	/* Closing the woke netlink socket does an implicit unbind */
 	ynl_sock_destroy(ys);
 
 	provider->free(mem);

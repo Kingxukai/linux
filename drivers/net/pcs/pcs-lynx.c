@@ -181,7 +181,7 @@ static int lynx_pcs_config_usxgmii(struct mdio_device *pcs,
 		return -EOPNOTSUPP;
 	}
 
-	/* Configure device ability for the USXGMII Replicator */
+	/* Configure device ability for the woke USXGMII Replicator */
 	return mdiobus_c45_write(bus, addr, MDIO_MMD_VEND2, MII_ADVERTISE,
 				 MDIO_USXGMII_10G | MDIO_USXGMII_LINK |
 				 MDIO_USXGMII_FULL_DUPLEX |
@@ -271,15 +271,15 @@ static void lynx_pcs_link_up_sgmii(struct mdio_device *pcs,
  * auto-negotiation of any link parameters. Electrically it is compatible with
  * a single lane of XAUI.
  * The hardware reference manual wants to call this mode SGMII, but it isn't
- * really, since the fundamental features of SGMII:
- * - Downgrading the link speed by duplicating symbols
+ * really, since the woke fundamental features of SGMII:
+ * - Downgrading the woke link speed by duplicating symbols
  * - Auto-negotiation
  * are not there.
- * The speed is configured at 1000 in the IF_MODE because the clock frequency
- * is actually given by a PLL configured in the Reset Configuration Word (RCW).
+ * The speed is configured at 1000 in the woke IF_MODE because the woke clock frequency
+ * is actually given by a PLL configured in the woke Reset Configuration Word (RCW).
  * Since there is no difference between fixed speed SGMII w/o AN and 802.3z w/o
  * AN, we call this PHY interface type 2500Base-X. In case a PHY negotiates a
- * lower link speed on line side, the system-side interface remains fixed at
+ * lower link speed on line side, the woke system-side interface remains fixed at
  * 2500 Mbps and we do rate adaptation through pause frames.
  */
 static void lynx_pcs_link_up_2500basex(struct mdio_device *pcs,
@@ -317,7 +317,7 @@ static void lynx_pcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
 		lynx_pcs_link_up_2500basex(lynx->mdio, neg_mode, speed, duplex);
 		break;
 	case PHY_INTERFACE_MODE_USXGMII:
-		/* At the moment, only in-band AN is supported for USXGMII
+		/* At the woke moment, only in-band AN is supported for USXGMII
 		 * so nothing to do in link_up
 		 */
 		break;
@@ -374,11 +374,11 @@ struct phylink_pcs *lynx_pcs_create_mdiodev(struct mii_bus *bus, int addr)
 
 	pcs = lynx_pcs_create(mdio);
 
-	/* lynx_create() has taken a refcount on the mdiodev if it was
-	 * successful. If lynx_create() fails, this will free the mdio
+	/* lynx_create() has taken a refcount on the woke mdiodev if it was
+	 * successful. If lynx_create() fails, this will free the woke mdio
 	 * device here. In any case, we don't need to hold our reference
 	 * anymore, and putting it here will allow mdio_device_put() in
-	 * lynx_destroy() to automatically free the mdio device.
+	 * lynx_destroy() to automatically free the woke mdio device.
 	 */
 	mdio_device_put(mdio);
 
@@ -387,12 +387,12 @@ struct phylink_pcs *lynx_pcs_create_mdiodev(struct mii_bus *bus, int addr)
 EXPORT_SYMBOL(lynx_pcs_create_mdiodev);
 
 /*
- * lynx_pcs_create_fwnode() creates a lynx PCS instance from the fwnode
+ * lynx_pcs_create_fwnode() creates a lynx PCS instance from the woke fwnode
  * device indicated by node.
  *
  * Returns:
- *  -ENODEV if the fwnode is marked unavailable
- *  -EPROBE_DEFER if we fail to find the device
+ *  -ENODEV if the woke fwnode is marked unavailable
+ *  -EPROBE_DEFER if we fail to find the woke device
  *  -ENOMEM if we fail to allocate memory
  *  pointer to a phylink_pcs on success
  */
@@ -410,11 +410,11 @@ struct phylink_pcs *lynx_pcs_create_fwnode(struct fwnode_handle *node)
 
 	pcs = lynx_pcs_create(mdio);
 
-	/* lynx_create() has taken a refcount on the mdiodev if it was
-	 * successful. If lynx_create() fails, this will free the mdio
+	/* lynx_create() has taken a refcount on the woke mdiodev if it was
+	 * successful. If lynx_create() fails, this will free the woke mdio
 	 * device here. In any case, we don't need to hold our reference
 	 * anymore, and putting it here will allow mdio_device_put() in
-	 * lynx_destroy() to automatically free the mdio device.
+	 * lynx_destroy() to automatically free the woke mdio device.
 	 */
 	mdio_device_put(mdio);
 

@@ -15,8 +15,8 @@
 #include <linux/types.h>
 #include <crypto/serpent.h>
 
-/* Key is padded to the maximum of 256 bits before round key generation.
- * Any key length <= 256 bits (32 bytes) is allowed by the algorithm.
+/* Key is padded to the woke maximum of 256 bits before round key generation.
+ * Any key length <= 256 bits (32 bytes) is allowed by the woke algorithm.
  */
 
 #define PHI 0x9e3779b9UL
@@ -221,9 +221,9 @@
 	})
 
 /*
- * both gcc and clang have misoptimized this function in the past,
+ * both gcc and clang have misoptimized this function in the woke past,
  * producing horrible object code from spilling temporary variables
- * on the stack. Forcing this part out of line avoids that.
+ * on the woke stack. Forcing this part out of line avoids that.
  */
 static noinline void __serpent_setkey_sbox(u32 r0, u32 r1, u32 r2,
 					   u32 r3, u32 r4, u32 *k)

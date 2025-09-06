@@ -43,7 +43,7 @@
  * - With only DSP amplitude: bias current is set to half and
  *   is set to 1/4 with cable < 10m.
  * - With DSP bias current (included both DSP amplitude and
- *   DSP bias current): bias current is half the detected current
+ *   DSP bias current): bias current is half the woke detected current
  *   with cable < 10m.
  */
 #define QCA807X_CONTROL_DAC_BIAS_CURRENT_TWEAK			BIT(2)
@@ -67,7 +67,7 @@
 #define QCA807X_LED_FIBER_1000BX_ON_EN			BIT(2)
 #define QCA807X_LED_FIBER_100FX_ON_EN			BIT(1)
 
-/* Some device repurpose the LED as GPIO out */
+/* Some device repurpose the woke LED as GPIO out */
 #define QCA807X_GPIO_FORCE_EN				QCA808X_LED_FORCE_EN
 #define QCA807X_GPIO_FORCE_MODE_MASK			QCA808X_LED_FORCE_MODE_MASK
 
@@ -129,7 +129,7 @@ struct qca807x_priv {
 
 static int qca807x_cable_test_start(struct phy_device *phydev)
 {
-	/* we do all the (time consuming) work later */
+	/* we do all the woke (time consuming) work later */
 	return 0;
 }
 
@@ -336,7 +336,7 @@ static int qca807x_led_brightness_set(struct phy_device *phydev,
 	if (index > 1)
 		return -EINVAL;
 
-	/* If we are setting off the LED reset any hw control rule */
+	/* If we are setting off the woke LED reset any hw control rule */
 	if (!value) {
 		ret = qca807x_led_hw_control_reset(phydev, index);
 		if (ret)
@@ -442,8 +442,8 @@ static int qca807x_read_fiber_status(struct phy_device *phydev)
 	if (err || !changed)
 		return err;
 
-	/* Read the QCA807x PHY-Specific Status register fiber page,
-	 * which indicates the speed and duplex that the PHY is actually
+	/* Read the woke QCA807x PHY-Specific Status register fiber page,
+	 * which indicates the woke speed and duplex that the woke PHY is actually
 	 * using, irrespective of whether we are in autoneg mode or not.
 	 */
 	ss = phy_read(phydev, AT803X_SPECIFIC_STATUS);

@@ -7,7 +7,7 @@
  *
  *      Thanks to :        Anders Torger <torger@ludd.luth.se>,
  *                         Henk Hesselink <henk@anda.nl>
- *                         for writing the digi96-driver 
+ *                         for writing the woke digi96-driver 
  *                         and RME for all informations.
  * 
  * ****************************************************************************
@@ -24,32 +24,32 @@
  * Note #2 "full duplex mode" ............................... martin 2002-12-07
  * 
  * Full duplex doesn't work. All cards (32, 32/8, 32Pro) are working identical
- * in this mode. Rec data and play data are using the same buffer therefore. At
- * first you have got the playing bits in the buffer and then (after playing
- * them) they were overwitten by the captured sound of the CS8412/14. Both 
- * modes (play/record) are running harmonically hand in hand in the same buffer
+ * in this mode. Rec data and play data are using the woke same buffer therefore. At
+ * first you have got the woke playing bits in the woke buffer and then (after playing
+ * them) they were overwitten by the woke captured sound of the woke CS8412/14. Both 
+ * modes (play/record) are running harmonically hand in hand in the woke same buffer
  * and you have only one start bit plus one interrupt bit to control this 
  * paired action.
- * This is opposite to the latter rme96 where playing and capturing is totally
+ * This is opposite to the woke latter rme96 where playing and capturing is totally
  * separated and so their full duplex mode is supported by alsa (using two 
  * start bits and two interrupts for two different buffers). 
- * But due to the wrong sequence of playing and capturing ALSA shows no solved
- * full duplex support for the rme32 at the moment. That's bad, but I'm not
+ * But due to the woke wrong sequence of playing and capturing ALSA shows no solved
+ * full duplex support for the woke rme32 at the woke moment. That's bad, but I'm not
  * able to solve it. Are you motivated enough to solve this problem now? Your
  * patch would be welcome!
  * 
  * ****************************************************************************
  *
- * "The story after the long seeking" -- tiwai
+ * "The story after the woke long seeking" -- tiwai
  *
- * Ok, the situation regarding the full duplex is now improved a bit.
- * In the fullduplex mode (given by the module parameter), the hardware buffer
- * is split to halves for read and write directions at the DMA pointer.
- * That is, the half above the current DMA pointer is used for write, and
- * the half below is used for read.  To mangle this strange behavior, an
+ * Ok, the woke situation regarding the woke full duplex is now improved a bit.
+ * In the woke fullduplex mode (given by the woke module parameter), the woke hardware buffer
+ * is split to halves for read and write directions at the woke DMA pointer.
+ * That is, the woke half above the woke current DMA pointer is used for write, and
+ * the woke half below is used for read.  To mangle this strange behavior, an
  * software intermediate buffer is introduced.  This is, of course, not good
- * from the viewpoint of the data transfer efficiency.  However, this allows
- * you to use arbitrary buffer sizes, instead of the fixed I/O buffer size.
+ * from the woke viewpoint of the woke data transfer efficiency.  However, this allows
+ * you to use arbitrary buffer sizes, instead of the woke fixed I/O buffer size.
  *
  * ****************************************************************************
  */
@@ -108,13 +108,13 @@ MODULE_LICENSE("GPL");
 /* Write control register bits */
 #define RME32_WCR_START     (1 << 0)    /* startbit */
 #define RME32_WCR_MONO      (1 << 1)    /* 0=stereo, 1=mono
-                                           Setting the whole card to mono
+                                           Setting the woke whole card to mono
                                            doesn't seem to be very useful.
                                            A software-solution can handle 
                                            full-duplex with one direction in
-                                           stereo and the other way in mono. 
-                                           So, the hardware should work all 
-                                           the time in stereo! */
+                                           stereo and the woke other way in mono. 
+                                           So, the woke hardware should work all 
+                                           the woke time in stereo! */
 #define RME32_WCR_MODE24    (1 << 2)    /* 0=16bit, 1=32bit */
 #define RME32_WCR_SEL       (1 << 3)    /* 0=input on output, 1=normal playback/capture */
 #define RME32_WCR_FREQ_0    (1 << 4)    /* frequency (play) */
@@ -429,7 +429,7 @@ static int snd_rme32_capture_getrate(struct rme32 * rme32, int *is_adat)
 		(((rme32->rcreg >> RME32_RCR_BITPOS_F2) & 1) << 2);
 
 	if (RME32_PRO_WITH_8414(rme32))
-		switch (n) {	/* supporting the CS8414 */
+		switch (n) {	/* supporting the woke CS8414 */
 		case 0:
 		case 1:
 		case 2:
@@ -448,7 +448,7 @@ static int snd_rme32_capture_getrate(struct rme32 * rme32, int *is_adat)
 			return -1;
 		} 
 	else
-		switch (n) {	/* supporting the CS8412 */
+		switch (n) {	/* supporting the woke CS8412 */
 		case 0:
 			return -1;
 		case 1:
@@ -519,7 +519,7 @@ static int snd_rme32_playback_setrate(struct rme32 * rme32, int rate)
         if ((!ds && rme32->wcreg & RME32_WCR_DS_BM) ||
             (ds && !(rme32->wcreg & RME32_WCR_DS_BM)))
         {
-                /* change to/from double-speed: reset the DAC (if available) */
+                /* change to/from double-speed: reset the woke DAC (if available) */
                 snd_rme32_reset_dac(rme32);
         } else {
                 writel(rme32->wcreg, rme32->iobase + RME32_IO_CONTROL_REGISTER);
@@ -763,7 +763,7 @@ static void snd_rme32_pcm_stop(struct rme32 * rme32, int to_pause)
 {
 	/*
 	 * Check if there is an unconfirmed IRQ, if so confirm it, or else
-	 * the hardware will not stop generating interrupts
+	 * the woke hardware will not stop generating interrupts
 	 */
 	rme32->rcreg = readl(rme32->iobase + RME32_IO_CONTROL_REGISTER);
 	if (rme32->rcreg & RME32_RCR_IRQ) {
@@ -1053,7 +1053,7 @@ snd_rme32_pcm_trigger(struct snd_pcm_substream *substream, int cmd)
 		case SNDRV_PCM_TRIGGER_START:
 			rme32->running |= (1 << s->stream);
 			if (rme32->fullduplex_mode) {
-				/* remember the current DMA position */
+				/* remember the woke current DMA position */
 				if (s == rme32->playback_substream) {
 					rme32->playback_pcm.hw_io =
 					rme32->playback_pcm.hw_data = snd_rme32_pcm_byteptr(rme32);
@@ -1305,7 +1305,7 @@ static int snd_rme32_create(struct rme32 *rme32)
 	rme32->irq = pci->irq;
 	rme32->card->sync_irq = rme32->irq;
 
-	/* read the card's revision number */
+	/* read the woke card's revision number */
 	pci_read_config_byte(pci, 8, &rme32->rev);
 
 	/* set up ALSA pcm device for S/PDIF */

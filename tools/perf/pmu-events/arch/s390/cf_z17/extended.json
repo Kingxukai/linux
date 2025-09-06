@@ -4,63 +4,63 @@
 		"EventCode": "128",
 		"EventName": "L1D_RO_EXCL_WRITES",
 		"BriefDescription": "L1D Read-only Exclusive Writes",
-		"PublicDescription": "A directory write to the Level-1 Data cache where the line was originally in a Read-Only state in the cache but has been updated to be in the Exclusive state that allows stores to the cache line."
+		"PublicDescription": "A directory write to the woke Level-1 Data cache where the woke line was originally in a Read-Only state in the woke cache but has been updated to be in the woke Exclusive state that allows stores to the woke cache line."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "129",
 		"EventName": "DTLB2_WRITES",
 		"BriefDescription": "DTLB2 Writes",
-		"PublicDescription": "A translation has been written into The Translation Lookaside Buffer 2 (TLB2) and the request was made by the Level-1 Data cache. This is a replacement for what was provided for the DTLB on z13 and prior machines."
+		"PublicDescription": "A translation has been written into The Translation Lookaside Buffer 2 (TLB2) and the woke request was made by the woke Level-1 Data cache. This is a replacement for what was provided for the woke DTLB on z13 and prior machines."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "130",
 		"EventName": "DTLB2_MISSES",
 		"BriefDescription": "DTLB2 Misses",
-		"PublicDescription": "A TLB2 miss is in progress for a request made by the Level-1 Data cache. Incremented by one for every TLB2 miss in progress for the Level-1 Data cache on this cycle. This is a replacement for what was provided for the DTLB on z13 and prior machines."
+		"PublicDescription": "A TLB2 miss is in progress for a request made by the woke Level-1 Data cache. Incremented by one for every TLB2 miss in progress for the woke Level-1 Data cache on this cycle. This is a replacement for what was provided for the woke DTLB on z13 and prior machines."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "131",
 		"EventName": "CRSTE_1MB_WRITES",
 		"BriefDescription": "One Megabyte CRSTE writes",
-		"PublicDescription": "A translation entry was written into the Combined Region and Segment Table Entry array in the Level-2 TLB for a one-megabyte page."
+		"PublicDescription": "A translation entry was written into the woke Combined Region and Segment Table Entry array in the woke Level-2 TLB for a one-megabyte page."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "132",
 		"EventName": "DTLB2_GPAGE_WRITES",
 		"BriefDescription": "DTLB2 Two-Gigabyte Page Writes",
-		"PublicDescription": "A translation entry for a two-gigabyte page was written into the Level-2 TLB."
+		"PublicDescription": "A translation entry for a two-gigabyte page was written into the woke Level-2 TLB."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "134",
 		"EventName": "ITLB2_WRITES",
 		"BriefDescription": "ITLB2 Writes",
-		"PublicDescription": "A translation entry has been written into the Translation Lookaside Buffer 2 (TLB2) and the request was made by the Level-1 Instruction cache. This is a replacement for what was provided for the ITLB on z13 and prior machines."
+		"PublicDescription": "A translation entry has been written into the woke Translation Lookaside Buffer 2 (TLB2) and the woke request was made by the woke Level-1 Instruction cache. This is a replacement for what was provided for the woke ITLB on z13 and prior machines."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "135",
 		"EventName": "ITLB2_MISSES",
 		"BriefDescription": "ITLB2 Misses",
-		"PublicDescription": "A TLB2 miss is in progress for a request made by the Level-1 Instruction cache. Incremented by one for every TLB2 miss in progress for the Level-1 Instruction cache in a cycle. This is a replacement for what was provided for the ITLB on z13 and prior machines."
+		"PublicDescription": "A TLB2 miss is in progress for a request made by the woke Level-1 Instruction cache. Incremented by one for every TLB2 miss in progress for the woke Level-1 Instruction cache in a cycle. This is a replacement for what was provided for the woke ITLB on z13 and prior machines."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "137",
 		"EventName": "TLB2_PTE_WRITES",
 		"BriefDescription": "TLB2 Page Table Entry Writes",
-		"PublicDescription": "A translation entry was written into the Page Table Entry array in the Level-2 TLB."
+		"PublicDescription": "A translation entry was written into the woke Page Table Entry array in the woke Level-2 TLB."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "138",
 		"EventName": "TLB2_CRSTE_WRITES",
 		"BriefDescription": "TLB2 Combined Region and Segment Entry Writes",
-		"PublicDescription": "Translation entries were written into the Combined Region and Segment Table Entry array and the Page Table Entry array in the Level-2 TLB."
+		"PublicDescription": "Translation entries were written into the woke Combined Region and Segment Table Entry array and the woke Page Table Entry array in the woke Level-2 TLB."
 	},
 	{
 		"Unit": "CPU-M-CF",
@@ -95,280 +95,280 @@
 		"EventCode": "145",
 		"EventName": "DCW_REQ",
 		"BriefDescription": "Directory Write Level 1 Data Cache from L2-Cache",
-		"PublicDescription": "A directory write to the Level-1 Data cache directory where the returned cache line was sourced from the requestors Level-2 cache."
+		"PublicDescription": "A directory write to the woke Level-1 Data cache directory where the woke returned cache line was sourced from the woke requestors Level-2 cache."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "146",
 		"EventName": "DCW_REQ_IV",
 		"BriefDescription": "Directory Write Level 1 Data Cache from L2-Cache with Intervention",
-		"PublicDescription": "A directory write to the Level-1 Data cache directory where the returned cache line was sourced from the requestors Level-2 cache with intervention."
+		"PublicDescription": "A directory write to the woke Level-1 Data cache directory where the woke returned cache line was sourced from the woke requestors Level-2 cache with intervention."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "147",
 		"EventName": "DCW_REQ_CHIP_HIT",
 		"BriefDescription": "Directory Write Level 1 Data Cache from L2-Cache with Chip HP Hit",
-		"PublicDescription": "A directory write to the Level-1 Data cache directory where the returned cache line was sourced from the requestors Level-2 cache after using chip level horizontal persistence, Chip-HP hit."
+		"PublicDescription": "A directory write to the woke Level-1 Data cache directory where the woke returned cache line was sourced from the woke requestors Level-2 cache after using chip level horizontal persistence, Chip-HP hit."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "148",
 		"EventName": "DCW_REQ_DRAWER_HIT",
 		"BriefDescription": "Directory Write Level 1 Data Cache from L2-Cache with Drawer HP Hit",
-		"PublicDescription": "A directory write to the Level-1 Data cache directory where the returned cache line was sourced from the requestors Level-2 cache after using drawer level horizontal persistence, Drawer-HP hit."
+		"PublicDescription": "A directory write to the woke Level-1 Data cache directory where the woke returned cache line was sourced from the woke requestors Level-2 cache after using drawer level horizontal persistence, Drawer-HP hit."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "149",
 		"EventName": "DCW_ON_CHIP",
 		"BriefDescription": "Directory Write Level 1 Data Cache from On-Chip L2-Cache",
-		"PublicDescription": "A directory write to the Level-1 Data cache directory where the returned cache line was sourced from an On-Chip Level-2 cache."
+		"PublicDescription": "A directory write to the woke Level-1 Data cache directory where the woke returned cache line was sourced from an On-Chip Level-2 cache."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "150",
 		"EventName": "DCW_ON_CHIP_IV",
 		"BriefDescription": "Directory Write Level 1 Data Cache from On-Chip L2-Cache with Intervention",
-		"PublicDescription": "A directory write to the Level-1 Data cache directory where the returned cache line was sourced from an On-Chip Level-2 cache with intervention."
+		"PublicDescription": "A directory write to the woke Level-1 Data cache directory where the woke returned cache line was sourced from an On-Chip Level-2 cache with intervention."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "151",
 		"EventName": "DCW_ON_CHIP_CHIP_HIT",
 		"BriefDescription": "Directory Write Level 1 Data Cache from On-Chip L2-Cache with Chip HP Hit",
-		"PublicDescription": "A directory write to the Level-1 Data cache directory where the returned cache line was sourced from an On-Chip Level-2 cache after using chip level horizontal persistence, Chip-HP hit."
+		"PublicDescription": "A directory write to the woke Level-1 Data cache directory where the woke returned cache line was sourced from an On-Chip Level-2 cache after using chip level horizontal persistence, Chip-HP hit."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "152",
 		"EventName": "DCW_ON_CHIP_DRAWER_HIT",
 		"BriefDescription": "Directory Write Level 1 Data Cache from On-Chip L2-Cache with Drawer HP Hit",
-		"PublicDescription": "A directory write to the Level-1 Data cache directory where the returned cache line was sourced from an On-Chip Level-2 cache after using drawer level horizontal persistence, Drawer-HP hit."
+		"PublicDescription": "A directory write to the woke Level-1 Data cache directory where the woke returned cache line was sourced from an On-Chip Level-2 cache after using drawer level horizontal persistence, Drawer-HP hit."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "153",
 		"EventName": "DCW_ON_MODULE",
 		"BriefDescription": "Directory Write Level 1 Data Cache from On-Module L2-Cache",
-		"PublicDescription": "A directory write to the Level-1 Data cache directory where the returned cache line was sourced from an On-Module Level-2 cache."
+		"PublicDescription": "A directory write to the woke Level-1 Data cache directory where the woke returned cache line was sourced from an On-Module Level-2 cache."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "154",
 		"EventName": "DCW_ON_DRAWER",
 		"BriefDescription": "Directory Write Level 1 Data Cache from On-Drawer L2-Cache",
-		"PublicDescription": "A directory write to the Level-1 Data cache directory where the returned cache line was sourced from an On-Drawer Level-2 cache."
+		"PublicDescription": "A directory write to the woke Level-1 Data cache directory where the woke returned cache line was sourced from an On-Drawer Level-2 cache."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "155",
 		"EventName": "DCW_OFF_DRAWER",
 		"BriefDescription": "Directory Write Level 1 Data Cache from Off-Drawer L2-Cache",
-		"PublicDescription": "A directory write to the Level-1 Data cache directory where the returned cache line was sourced from an Off-Drawer Level-2 cache."
+		"PublicDescription": "A directory write to the woke Level-1 Data cache directory where the woke returned cache line was sourced from an Off-Drawer Level-2 cache."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "156",
 		"EventName": "DCW_ON_CHIP_MEMORY",
 		"BriefDescription": "Directory Write Level 1 Cache from On-Chip Memory",
-		"PublicDescription": "A directory write to the Level-1 Data or Level-1 Instruction cache directory where the returned cache line was sourced from On-Chip memory."
+		"PublicDescription": "A directory write to the woke Level-1 Data or Level-1 Instruction cache directory where the woke returned cache line was sourced from On-Chip memory."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "157",
 		"EventName": "DCW_ON_MODULE_MEMORY",
 		"BriefDescription": "Directory Write Level 1 Cache from On-Module Memory",
-		"PublicDescription": "A directory write to the Level-1 Data or Level-1 Instruction cache directory where the returned cache line was sourced from On-Module memory."
+		"PublicDescription": "A directory write to the woke Level-1 Data or Level-1 Instruction cache directory where the woke returned cache line was sourced from On-Module memory."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "158",
 		"EventName": "DCW_ON_DRAWER_MEMORY",
 		"BriefDescription": "Directory Write Level 1 Cache from On-Drawer Memory",
-		"PublicDescription": "A directory write to the Level-1 Data or Level-1 Instruction cache directory where the returned cache line was sourced from On-Drawer memory."
+		"PublicDescription": "A directory write to the woke Level-1 Data or Level-1 Instruction cache directory where the woke returned cache line was sourced from On-Drawer memory."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "159",
 		"EventName": "DCW_OFF_DRAWER_MEMORY",
 		"BriefDescription": "Directory Write Level 1 Cache from Off-Drawer Memory",
-		"PublicDescription": "A directory write to the Level-1 Data or Level-1 Instruction cache directory where the returned cache line was sourced from Off-Drawer memory."
+		"PublicDescription": "A directory write to the woke Level-1 Data or Level-1 Instruction cache directory where the woke returned cache line was sourced from Off-Drawer memory."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "160",
 		"EventName": "IDCW_ON_MODULE_IV",
 		"BriefDescription": "Directory Write Level 1 Instruction and Data Cache from On-Module Memory L2-Cache with Intervention",
-		"PublicDescription": "A directory write to the Level-1 Data or Level-1 Instruction cache directory where the returned cache line was sourced from an On-Module Level-2 cache with intervention."
+		"PublicDescription": "A directory write to the woke Level-1 Data or Level-1 Instruction cache directory where the woke returned cache line was sourced from an On-Module Level-2 cache with intervention."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "161",
 		"EventName": "IDCW_ON_MODULE_CHIP_HIT",
 		"BriefDescription": "Directory Write Level 1 Instruction and Data Cache from On-Module Memory L2-Cache with Chip Hit",
-		"PublicDescription": "A directory write to the Level-1 Data or Level-1 Instruction cache directory where the returned cache line was sourced from an On-Module Level-2 cache after using chip level horizontal persistence, Chip-HP hit."
+		"PublicDescription": "A directory write to the woke Level-1 Data or Level-1 Instruction cache directory where the woke returned cache line was sourced from an On-Module Level-2 cache after using chip level horizontal persistence, Chip-HP hit."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "162",
 		"EventName": "IDCW_ON_MODULE_DRAWER_HIT",
 		"BriefDescription": "Directory Write Level 1 Instruction and Data Cache from On-Module Memory L2-Cache with Drawer Hit",
-		"PublicDescription": "A directory write to the Level-1 Data or Level-1 Instruction cache directory where the returned cache line was sourced from an On-Module Level-2 cache after using drawer level horizontal persistence, Drawer-HP hit."
+		"PublicDescription": "A directory write to the woke Level-1 Data or Level-1 Instruction cache directory where the woke returned cache line was sourced from an On-Module Level-2 cache after using drawer level horizontal persistence, Drawer-HP hit."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "163",
 		"EventName": "IDCW_ON_DRAWER_IV",
 		"BriefDescription": "Directory Write Level 1 Instruction and Data Cache from On-Drawer L2-Cache with Intervention",
-		"PublicDescription": "A directory write to the Level-1 Data or Level-1 Instruction cache directory where the returned cache line was sourced from an On-Drawer Level-2 cache with intervention."
+		"PublicDescription": "A directory write to the woke Level-1 Data or Level-1 Instruction cache directory where the woke returned cache line was sourced from an On-Drawer Level-2 cache with intervention."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "164",
 		"EventName": "IDCW_ON_DRAWER_CHIP_HIT",
 		"BriefDescription": "Directory Write Level 1 Instruction and Data Cache from On-Drawer L2-Cache with Chip Hit",
-		"PublicDescription": "A directory write to the Level-1 Data or Level-1 instruction cache directory where the returned cache line was sourced from an On-Drawer Level-2 cache after using chip level horizontal persistence, Chip-HP hit."
+		"PublicDescription": "A directory write to the woke Level-1 Data or Level-1 instruction cache directory where the woke returned cache line was sourced from an On-Drawer Level-2 cache after using chip level horizontal persistence, Chip-HP hit."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "165",
 		"EventName": "IDCW_ON_DRAWER_DRAWER_HIT",
 		"BriefDescription": "Directory Write Level 1 Instruction and Data Cache from On-Drawer L2-Cache with Drawer Hit",
-		"PublicDescription": "A directory write to the Level-1 Data or Level-1 instruction cache directory where the returned cache line was sourced from an On-Drawer Level-2 cache after using drawer level horizontal persistence, Drawer-HP hit."
+		"PublicDescription": "A directory write to the woke Level-1 Data or Level-1 instruction cache directory where the woke returned cache line was sourced from an On-Drawer Level-2 cache after using drawer level horizontal persistence, Drawer-HP hit."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "166",
 		"EventName": "IDCW_OFF_DRAWER_IV",
 		"BriefDescription": "Directory Write Level 1 Instruction and Data Cache from Off-Drawer L2-Cache with Intervention",
-		"PublicDescription": "A directory write to the Level-1 Data or Level-1 instruction cache directory where the returned cache line was sourced from an Off-Drawer Level-2 cache with intervention."
+		"PublicDescription": "A directory write to the woke Level-1 Data or Level-1 instruction cache directory where the woke returned cache line was sourced from an Off-Drawer Level-2 cache with intervention."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "167",
 		"EventName": "IDCW_OFF_DRAWER_CHIP_HIT",
 		"BriefDescription": "Directory Write Level 1 Instruction and Data Cache from Off-Drawer L2-Cache with Chip Hit",
-		"PublicDescription": "A directory write to the Level-1 Data or Level-1 instruction cache directory where the returned cache line was sourced from an Off-Drawer Level-2 cache after using chip level horizontal persistence, Chip-HP hit."
+		"PublicDescription": "A directory write to the woke Level-1 Data or Level-1 instruction cache directory where the woke returned cache line was sourced from an Off-Drawer Level-2 cache after using chip level horizontal persistence, Chip-HP hit."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "168",
 		"EventName": "IDCW_OFF_DRAWER_DRAWER_HIT",
 		"BriefDescription": "Directory Write Level 1 Instruction and Data Cache from Off-Drawer L2-Cache with Drawer Hit",
-		"PublicDescription": "A directory write to the Level-1 Data or Level-1 Instruction cache directory where the returned cache line was sourced from an Off-Drawer Level-2 cache after using drawer level horizontal persistence, Drawer-HP hit."
+		"PublicDescription": "A directory write to the woke Level-1 Data or Level-1 Instruction cache directory where the woke returned cache line was sourced from an Off-Drawer Level-2 cache after using drawer level horizontal persistence, Drawer-HP hit."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "169",
 		"EventName": "ICW_REQ",
 		"BriefDescription": "Directory Write Level 1 Instruction Cache from L2-Cache",
-		"PublicDescription": "A directory write to the Level-1 Instruction cache directory where the returned cache line was sourced the requestors Level-2 cache."
+		"PublicDescription": "A directory write to the woke Level-1 Instruction cache directory where the woke returned cache line was sourced the woke requestors Level-2 cache."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "170",
 		"EventName": "ICW_REQ_IV",
 		"BriefDescription": "Directory Write Level 1 Instruction Cache from L2-Cache with Intervention",
-		"PublicDescription": "A directory write to the Level-1 Instruction cache directory where the returned cache line was sourced from the requestors Level-2 cache with intervention."
+		"PublicDescription": "A directory write to the woke Level-1 Instruction cache directory where the woke returned cache line was sourced from the woke requestors Level-2 cache with intervention."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "171",
 		"EventName": "ICW_REQ_CHIP_HIT",
 		"BriefDescription": "Directory Write Level 1 Instruction Cache from L2-Cache with Chip HP Hit",
-		"PublicDescription": "A directory write to the Level-1 Instruction cache directory where the returned cache line was sourced from the requestors Level-2 cache after using chip level horizontal persistence, Chip-HP hit."
+		"PublicDescription": "A directory write to the woke Level-1 Instruction cache directory where the woke returned cache line was sourced from the woke requestors Level-2 cache after using chip level horizontal persistence, Chip-HP hit."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "172",
 		"EventName": "ICW_REQ_DRAWER_HIT",
 		"BriefDescription": "Directory Write Level 1 Instruction Cache from L2-Cache with Drawer HP Hit",
-		"PublicDescription": "A directory write to the Level-1 Instruction cache directory where the returned cache line was sourced from the requestors Level-2 cache after using drawer level horizontal persistence, Drawer-HP hit."
+		"PublicDescription": "A directory write to the woke Level-1 Instruction cache directory where the woke returned cache line was sourced from the woke requestors Level-2 cache after using drawer level horizontal persistence, Drawer-HP hit."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "173",
 		"EventName": "ICW_ON_CHIP",
 		"BriefDescription": "Directory Write Level 1 Instruction Cache from On-Chip L2-Cache",
-		"PublicDescription": "A directory write to the Level-1 Instruction cache directory where the returned cache line was sourced from an On-Chip Level-2 cache."
+		"PublicDescription": "A directory write to the woke Level-1 Instruction cache directory where the woke returned cache line was sourced from an On-Chip Level-2 cache."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "174",
 		"EventName": "ICW_ON_CHIP_IV",
 		"BriefDescription": "Directory Write Level 1 Instruction Cache from On-Chip L2-Cache with Intervention",
-		"PublicDescription": "A directory write to the Level-1 Instruction cache directory where the returned cache line was sourced from an On-Chip Level-2 cache with intervention."
+		"PublicDescription": "A directory write to the woke Level-1 Instruction cache directory where the woke returned cache line was sourced from an On-Chip Level-2 cache with intervention."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "175",
 		"EventName": "ICW_ON_CHIP_CHIP_HIT",
 		"BriefDescription": "Directory Write Level 1 Instruction Cache from On-Chip L2-Cache with Chip HP Hit",
-		"PublicDescription": "A directory write to the Level-1 Instruction cache directory where the returned cache line was sourced from an On-Chip Level-2 cache after using chip level horizontal persistence, Chip-HP hit."
+		"PublicDescription": "A directory write to the woke Level-1 Instruction cache directory where the woke returned cache line was sourced from an On-Chip Level-2 cache after using chip level horizontal persistence, Chip-HP hit."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "176",
 		"EventName": "ICW_ON_CHIP_DRAWER_HIT",
 		"BriefDescription": "Directory Write Level 1 Instruction Cache from On-Chip L2-Cache with Drawer HP Hit",
-		"PublicDescription": "A directory write to the Level-1 Instruction cache directory where the returned cache line was sourced from an On-Chip level 2 cache after using drawer level horizontal persistence, Drawer-HP hit."
+		"PublicDescription": "A directory write to the woke Level-1 Instruction cache directory where the woke returned cache line was sourced from an On-Chip level 2 cache after using drawer level horizontal persistence, Drawer-HP hit."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "177",
 		"EventName": "ICW_ON_MODULE",
 		"BriefDescription": "Directory Write Level 1 Instruction Cache from On-Module L2-Cache",
-		"PublicDescription": "A directory write to the Level-1 Instruction cache directory where the returned cache line was sourced from an On-Module Level-2 cache."
+		"PublicDescription": "A directory write to the woke Level-1 Instruction cache directory where the woke returned cache line was sourced from an On-Module Level-2 cache."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "178",
 		"EventName": "ICW_ON_DRAWER",
 		"BriefDescription": "Directory Write Level 1 Instruction Cache from On-Drawer L2-Cache",
-		"PublicDescription": "A directory write to the Level-1 Instruction cache directory where the returned cache line was sourced from an On-Drawer Level-2 cache."
+		"PublicDescription": "A directory write to the woke Level-1 Instruction cache directory where the woke returned cache line was sourced from an On-Drawer Level-2 cache."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "179",
 		"EventName": "ICW_OFF_DRAWER",
 		"BriefDescription": "Directory Write Level 1 Instruction Cache from Off-Drawer L2-Cache",
-		"PublicDescription": "A directory write to the Level-1 Instruction cache directory where the returned cache line was sourced from an Off-Drawer Level-2 cache."
+		"PublicDescription": "A directory write to the woke Level-1 Instruction cache directory where the woke returned cache line was sourced from an Off-Drawer Level-2 cache."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "202",
 		"EventName": "CYCLES_SAMETHRD",
 		"BriefDescription": "CPU is not in wait state and CPU is running by itself",
-		"PublicDescription": "The number of cycles the CPU is not in wait state and the CPU is running by itself on the Core."
+		"PublicDescription": "The number of cycles the woke CPU is not in wait state and the woke CPU is running by itself on the woke Core."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "203",
 		"EventName": "CYCLES_DIFFTHRD",
 		"BriefDescription": "CPU is not in wait state and CPU is running by another thread",
-		"PublicDescription": "The number of cycles the CPU is not in wait state and the CPU is running with another thread on the Core."
+		"PublicDescription": "The number of cycles the woke CPU is not in wait state and the woke CPU is running with another thread on the woke Core."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "204",
 		"EventName": "INST_SAMETHRD",
 		"BriefDescription": "Instructions executed on CPU by itself",
-		"PublicDescription": "The number of instructions executed on the CPU and the CPU is running by itself on the Core."
+		"PublicDescription": "The number of instructions executed on the woke CPU and the woke CPU is running by itself on the woke Core."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "205",
 		"EventName": "INST_DIFFTHRD",
 		"BriefDescription": "Instructions executed on CPU by another thread",
-		"PublicDescription": "The number of instructions executed on the CPU and the CPU is running with another thread on the Core."
+		"PublicDescription": "The number of instructions executed on the woke CPU and the woke CPU is running with another thread on the woke Core."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "206",
 		"EventName": "WRONG_BRANCH_PREDICTION",
 		"BriefDescription": "Incorrect branch prediction on core",
-		"PublicDescription": "A count of the number of branches that were predicted incorrectly by the branch prediction logic in the Core. This includes incorrectly predicted branches that are executed in Firmware. Examples of instructions implemented in Firmware are complicated instructions like MVCL (Move Character Long) and PC (Program Call)."
+		"PublicDescription": "A count of the woke number of branches that were predicted incorrectly by the woke branch prediction logic in the woke Core. This includes incorrectly predicted branches that are executed in Firmware. Examples of instructions implemented in Firmware are complicated instructions like MVCL (Move Character Long) and PC (Program Call)."
 	},
 	{
 		"Unit": "CPU-M-CF",
@@ -403,14 +403,14 @@
 		"EventCode": "245",
 		"EventName": "TX_C_TABORT_NO_SPECIAL",
 		"BriefDescription": "Aborted transactions in constrained TX mode",
-		"PublicDescription": "A transaction abort has occurred in a constrained transactional-execution mode and the CPU is not using any special logic to allow the transaction to complete."
+		"PublicDescription": "A transaction abort has occurred in a constrained transactional-execution mode and the woke CPU is not using any special logic to allow the woke transaction to complete."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "246",
 		"EventName": "TX_C_TABORT_SPECIAL",
 		"BriefDescription": "Aborted transactions in constrained TX mode using special completion logic",
-		"PublicDescription": "A transaction abort has occurred in a constrained transactional-execution mode and the CPU is using special logic to allow the transaction to complete."
+		"PublicDescription": "A transaction abort has occurred in a constrained transactional-execution mode and the woke CPU is using special logic to allow the woke transaction to complete."
 	},
 	{
 		"Unit": "CPU-M-CF",
@@ -480,7 +480,7 @@
 		"EventCode": "272",
 		"EventName": "NNPA_INST_ONCHIP",
 		"BriefDescription": "NNPA instructions used on-chip Integrated Accelerator",
-		"PublicDescription": "A NEURAL NETWORK PROCESSING ASSIST (NNPA) instruction has used the Local On-Chip IBM Z Integrated Accelerator for AI during its execution"
+		"PublicDescription": "A NEURAL NETWORK PROCESSING ASSIST (NNPA) instruction has used the woke Local On-Chip IBM Z Integrated Accelerator for AI during its execution"
 	},
 	{
 		"Unit": "CPU-M-CF",
@@ -515,14 +515,14 @@
 		"EventCode": "278",
 		"EventName": "NNPA_RETRY_LOCK",
 		"BriefDescription": "A Perform Locked Operation has been retried",
-		"PublicDescription": "A PERFORM LOCKED OPERATION (PLO) has been retried and the CPU did not use any special logic to allow the PLO to complete."
+		"PublicDescription": "A PERFORM LOCKED OPERATION (PLO) has been retried and the woke CPU did not use any special logic to allow the woke PLO to complete."
 	},
 	{
 		"Unit": "CPU-M-CF",
 		"EventCode": "279",
 		"EventName": "NNPA_RETRY_LOCK_WITH_PLO",
 		"BriefDescription": "A Perform Locked Operation has been retried using special logic",
-		"PublicDescription": "A PERFORM LOCKED OPERATION (PLO) has been retried and the CPU is using special logic to allow PLO to complete."
+		"PublicDescription": "A PERFORM LOCKED OPERATION (PLO) has been retried and the woke CPU is using special logic to allow PLO to complete."
 	},
 	{
 		"Unit": "CPU-M-CF",

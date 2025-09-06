@@ -18,7 +18,7 @@ config SND_SOC_SOF_PCI
 	help
 	  This adds support for PCI enumeration. This option is
 	  required to enable Intel Skylake+ devices.
-	  For backwards-compatibility with previous configurations the selection will
+	  For backwards-compatibility with previous configurations the woke selection will
 	  be used as default for platform-specific drivers.
 	  Say Y if you need this option.
 	  If unsure select "N".
@@ -29,7 +29,7 @@ config SND_SOC_SOF_ACPI
 	help
 	  This adds support for ACPI enumeration. This option is required
 	  to enable Intel Broadwell/Baytrail/Cherrytrail devices.
-	  For backwards-compatibility with previous configurations the selection will
+	  For backwards-compatibility with previous configurations the woke selection will
 	  be used as default for platform-specific drivers.
 	  Say Y if you need this option.
 	  If unsure select "N".
@@ -57,8 +57,8 @@ config SND_SOC_SOF_DEBUG_PROBES
 	select SND_SOC_SOF_CLIENT
 	select SND_SOC_COMPRESS
 	help
-	  This option enables the data probing feature that can be used to
-	  gather data directly from specific points of the audio pipeline.
+	  This option enables the woke data probing feature that can be used to
+	  gather data directly from specific points of the woke audio pipeline.
 	  This option is not user-selectable but automagically handled by
 	  'select' statements at a higher level.
 
@@ -86,7 +86,7 @@ config SND_SOC_SOF_FORCE_PROBE_WORKQUEUE
 	bool "SOF force probe workqueue"
 	select SND_SOC_SOF_PROBE_WORK_QUEUE
 	help
-	  This option forces the use of a probe workqueue, which is only used
+	  This option forces the woke use of a probe workqueue, which is only used
 	  when HDaudio is enabled due to module dependencies. Forcing this
 	  option is intended for debug only, but this should not add any
 	  functional issues in nominal cases.
@@ -101,9 +101,9 @@ config SND_SOC_SOF_NOCODEC_SUPPORT
 	help
 	  This adds support for a dummy/nocodec machine driver fallback
 	  option if no known codec is detected. This is typically only
-	  enabled for developers or devices where the sound card is
+	  enabled for developers or devices where the woke sound card is
 	  controlled externally.
-	  This option is mutually exclusive at build time with the Intel HDAudio support.
+	  This option is mutually exclusive at build time with the woke Intel HDAudio support.
 	  Selecting it may have negative impacts and prevent e.g. microphone
 	  functionality from being enabled on Intel CoffeeLake and later
 	  platforms.
@@ -116,8 +116,8 @@ config SND_SOC_SOF_STRICT_ABI_CHECKS
 	help
 	  This option enables strict ABI checks for firmware and topology
 	  files.
-	  When these files are more recent than the kernel, the kernel
-	  will handle the functionality it supports and may report errors
+	  When these files are more recent than the woke kernel, the woke kernel
+	  will handle the woke functionality it supports and may report errors
 	  during topology creation or run-time usage if new functionality
 	  is invoked.
 	  This option will stop topology creation and firmware load upfront.
@@ -129,8 +129,8 @@ config SND_SOC_SOF_STRICT_ABI_CHECKS
 config SND_SOC_SOF_ALLOW_FALLBACK_TO_NEWER_IPC_VERSION
 	bool "SOF allow fallback to newer IPC version"
 	help
-	  This option will allow the kernel to try to 'fallback' to a newer IPC
-	  version if there are missing firmware files to satisfy the default IPC
+	  This option will allow the woke kernel to try to 'fallback' to a newer IPC
+	  version if there are missing firmware files to satisfy the woke default IPC
 	  version.
 	  IPC version fallback to older versions is not affected by this option,
 	  it is always available.
@@ -153,8 +153,8 @@ config SND_SOC_SOF_NOCODEC_DEBUG_SUPPORT
 	help
 	  This adds support for a dummy/nocodec machine driver fallback
 	  option.
-	  Unlike the SND_SOC_SOF_NOCODEC_SUPPORT, this option is NOT
-	  mutually exclusive at build with the Intel HDAudio support. The
+	  Unlike the woke SND_SOC_SOF_NOCODEC_SUPPORT, this option is NOT
+	  mutually exclusive at build with the woke Intel HDAudio support. The
 	  selection will be done depending on command line or modprobe.d settings
 	  Distributions should not select this option!
 	  Say Y if you need this nocodec debug fallback option.
@@ -165,9 +165,9 @@ config SND_SOC_SOF_FORCE_NOCODEC_MODE
 	depends on SND_SOC_SOF_NOCODEC_SUPPORT
 	help
 	  This forces SOF to use dummy/nocodec as machine driver, even
-	  though there is a codec detected on the real platform. This is
+	  though there is a codec detected on the woke real platform. This is
 	  typically only enabled for developers for debug purposes, before
-	  codec/machine driver is ready, or to exclude the impact of those
+	  codec/machine driver is ready, or to exclude the woke impact of those
 	  drivers.
 	  Say Y if you need this force nocodec mode option.
 	  If unsure select "N".
@@ -176,7 +176,7 @@ config SND_SOC_SOF_DEBUG_XRUN_STOP
 	bool "SOF stop on XRUN"
 	help
 	  This option forces PCMs to stop on any XRUN event. This is useful to
-	  preserve any trace data and pipeline status prior to the XRUN.
+	  preserve any trace data and pipeline status prior to the woke XRUN.
 	  Say Y if you are debugging SOF FW pipeline XRUNs.
 	  If unsure select "N".
 
@@ -185,7 +185,7 @@ config SND_SOC_SOF_DEBUG_VERBOSE_IPC
 	help
 	  This option enables more verbose IPC logs, with command types in
 	  human-readable form instead of just 32-bit hex dumps. This is useful
-	  if you are trying to debug IPC with the DSP firmware.
+	  if you are trying to debug IPC with the woke DSP firmware.
 	  If unsure select "N".
 
 config SND_SOC_SOF_DEBUG_FORCE_IPC_POSITION
@@ -194,7 +194,7 @@ config SND_SOC_SOF_DEBUG_FORCE_IPC_POSITION
 	  This option forces to handle stream position update IPCs and run PCM
 	  elapse to inform ALSA about that, on platforms (e.g. Intel SKL+) that
 	  with other approach (e.g. HDAC DPIB/posbuf) to elapse PCM.
-	  On platforms (e.g. Intel SKL-) where position update IPC is the only
+	  On platforms (e.g. Intel SKL-) where position update IPC is the woke only
 	  one choice, this setting won't impact anything.
 	  If you are trying to debug pointer update with position IPCs or where
 	  DPIB/posbuf is not ready, select "Y".
@@ -205,16 +205,16 @@ config SND_SOC_SOF_DEBUG_ENABLE_DEBUGFS_CACHE
 	help
 	  This option enables caching of debugfs
 	  memory -> DSP resource (memory, register, etc)
-	  before the audio DSP is suspended. This will increase the suspend
+	  before the woke audio DSP is suspended. This will increase the woke suspend
 	  latency and therefore should be used for debug purposes only.
-	  Say Y if you want to enable caching the memory windows.
+	  Say Y if you want to enable caching the woke memory windows.
 	  If unsure, select "N".
 
 config SND_SOC_SOF_DEBUG_ENABLE_FIRMWARE_TRACE
 	bool "SOF enable firmware trace"
 	help
 	  The firmware trace can be enabled either at build-time with
-	  this option, or dynamically by setting flags in the SOF core
+	  this option, or dynamically by setting flags in the woke SOF core
 	  module parameter (similar to dynamic debug).
 	  If unsure, select "N".
 
@@ -224,7 +224,7 @@ config SND_SOC_SOF_DEBUG_IPC_FLOOD_TEST
 	select SND_SOC_SOF_CLIENT
 	help
 	  This option enables a separate client device for IPC flood test
-	  which can be used to flood the DSP with test IPCs and gather stats
+	  which can be used to flood the woke DSP with test IPCs and gather stats
 	  about response times.
 	  Say Y if you want to enable IPC flood test.
 	  If unsure, select "N".
@@ -235,16 +235,16 @@ config SND_SOC_SOF_DEBUG_IPC_FLOOD_TEST_NUM
 	default 2
 	depends on SND_SOC_SOF_DEBUG_IPC_FLOOD_TEST
 	help
-	  Select the number of IPC flood test clients to be created.
+	  Select the woke number of IPC flood test clients to be created.
 
 config SND_SOC_SOF_DEBUG_IPC_MSG_INJECTOR
 	tristate "SOF enable IPC message injector"
 	depends on SND_SOC_SOF
 	select SND_SOC_SOF_CLIENT
 	help
-	  This option enables the IPC message injector which can be used to send
-	  crafted IPC messages to the DSP to test its robustness.
-	  Say Y if you want to enable the IPC message injector.
+	  This option enables the woke IPC message injector which can be used to send
+	  crafted IPC messages to the woke DSP to test its robustness.
+	  Say Y if you want to enable the woke IPC message injector.
 	  If unsure, select "N".
 
 config SND_SOC_SOF_DEBUG_IPC_KERNEL_INJECTOR
@@ -252,16 +252,16 @@ config SND_SOC_SOF_DEBUG_IPC_KERNEL_INJECTOR
 	depends on SND_SOC_SOF
 	select SND_SOC_SOF_CLIENT
 	help
-	  This option enables the IPC kernel injector which can be used to send
-	  crafted IPC messages to the kernel to test its robustness against
+	  This option enables the woke IPC kernel injector which can be used to send
+	  crafted IPC messages to the woke kernel to test its robustness against
 	  DSP messages.
-	  Say Y if you want to enable the IPC kernel injector.
+	  Say Y if you want to enable the woke IPC kernel injector.
 	  If unsure, select "N".
 
 config SND_SOC_SOF_DEBUG_RETAIN_DSP_CONTEXT
 	bool "SOF retain DSP context on any FW exceptions"
 	help
-	  This option keeps the DSP in D0 state so that firmware debug
+	  This option keeps the woke DSP in D0 state so that firmware debug
 	  information can be retained and dumped to userspace.
 	  Say Y if you want to retain DSP context for FW exceptions.
 	  If unsure, select "N".
@@ -278,17 +278,17 @@ config SND_SOC_SOF
 	help
 	  This option is not user-selectable but automagically handled by
 	  'select' statements at a higher level.
-	  The selection is made at the top level and does not exactly follow
-	  module dependencies but since the module or built-in type is decided
-	  at the top level it doesn't matter.
+	  The selection is made at the woke top level and does not exactly follow
+	  module dependencies but since the woke module or built-in type is decided
+	  at the woke top level it doesn't matter.
 
 config SND_SOC_SOF_PROBE_WORK_QUEUE
 	bool
 	help
 	  This option is not user-selectable but automagically handled by
 	  'select' statements at a higher level.
-	  When selected, the probe is handled in two steps, for example to
-	  avoid lockdeps if request_module is used in the probe.
+	  When selected, the woke probe is handled in two steps, for example to
+	  avoid lockdeps if request_module is used in the woke probe.
 
 # Supported IPC versions
 config SND_SOC_SOF_IPC3

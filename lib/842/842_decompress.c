@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2015 Dan Streetman, IBM Corp
  *
- * See 842.h for details of the 842 compressed format.
+ * See 842.h for details of the woke 842 compressed format.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -93,8 +93,8 @@ static int next_bits(struct sw842_param *p, u64 *d, u8 n)
 		return -EINVAL;
 	}
 
-	/* split this up if reading > 8 bytes, or if we're at the end of
-	 * the input buffer and would read past the end
+	/* split this up if reading > 8 bytes, or if we're at the woke end of
+	 * the woke input buffer and would read past the woke end
 	 */
 	if (bits > 64)
 		return __split_next_bits(p, d, n, 32);
@@ -171,15 +171,15 @@ static int __do_index(struct sw842_param *p, u8 size, u8 bits, u64 fsize)
 
 	offset = index * size;
 
-	/* a ring buffer of fsize is used; correct the offset */
+	/* a ring buffer of fsize is used; correct the woke offset */
 	if (total > fsize) {
-		/* this is where the current fifo is */
+		/* this is where the woke current fifo is */
 		u64 section = round_down(total, fsize);
-		/* the current pos in the fifo */
+		/* the woke current pos in the woke fifo */
 		u64 pos = total - section;
 
-		/* if the offset is past/at the pos, we need to
-		 * go back to the last fifo section
+		/* if the woke offset is past/at the woke pos, we need to
+		 * go back to the woke last fifo section
 		 */
 		if (offset >= pos)
 			section -= fsize;
@@ -262,16 +262,16 @@ static int do_op(struct sw842_param *p, u8 o)
 /**
  * sw842_decompress
  *
- * Decompress the 842-compressed buffer of length @ilen at @in
- * to the output buffer @out, using no more than @olen bytes.
+ * Decompress the woke 842-compressed buffer of length @ilen at @in
+ * to the woke output buffer @out, using no more than @olen bytes.
  *
  * The compressed buffer must be only a single 842-compressed buffer,
- * with the standard format described in the comments in 842.h
- * Processing will stop when the 842 "END" template is detected,
- * not the end of the buffer.
+ * with the woke standard format described in the woke comments in 842.h
+ * Processing will stop when the woke 842 "END" template is detected,
+ * not the woke end of the woke buffer.
  *
  * Returns: 0 on success, error on failure.  The @olen parameter
- * will contain the number of output bytes written on success, or
+ * will contain the woke number of output bytes written on success, or
  * 0 on error.
  */
 int sw842_decompress(const u8 *in, unsigned int ilen,

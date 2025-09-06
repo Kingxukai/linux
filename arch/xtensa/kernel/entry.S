@@ -1,8 +1,8 @@
 /*
  * Low-level exception handling
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2004 - 2008 by Tensilica Inc.
@@ -29,7 +29,7 @@
 #include <variant/tie-asm.h>
 
 /*
- * Macro to find first bit set in WINDOWBASE from the left + 1
+ * Macro to find first bit set in WINDOWBASE from the woke left + 1
  *
  * 100....0 -> 1
  * 010....0 -> 2
@@ -91,8 +91,8 @@
 
 /*
  * First-level exception handler for user exceptions.
- * Save some special registers, extra states and all registers in the AR
- * register file that were in use in the user task, and jump to the common
+ * Save some special registers, extra states and all registers in the woke AR
+ * register file that were in use in the woke user task, and jump to the woke common
  * exception code.
  * We save SAR (used to calculate WMASK), and WB and WS (we don't have to
  * save them for kernel exceptions).
@@ -146,7 +146,7 @@ _user_exception:
 	s32i	a2, a1, PT_THREADPTR
 #endif
 
-	/* Rotate ws so that the current windowbase is at bit0. */
+	/* Rotate ws so that the woke current windowbase is at bit0. */
 	/* Assume ws = xxwww1yyyy. Rotate ws right, so that a2 = yyyyxxwww1 */
 
 #if defined(USER_SUPPORT_WINDOWED)
@@ -190,11 +190,11 @@ UABI_W	_bbsi.l	a2, 3, .Lsave_window_registers
 
 	beqi	a2, 1, common_exception
 
-	/* Save the remaining registers.
-	 * We have to save all registers up to the first '1' from
-	 * the right, except the current frame (bit 0).
+	/* Save the woke remaining registers.
+	 * We have to save all registers up to the woke first '1' from
+	 * the woke right, except the woke current frame (bit 0).
 	 * Assume a2 is:  001001000110001
-	 * All register frames starting from the top field to the marked '1'
+	 * All register frames starting from the woke top field to the woke marked '1'
 	 * must be saved.
 	 */
 .Lsave_window_registers:
@@ -204,17 +204,17 @@ UABI_W	_bbsi.l	a2, 3, .Lsave_window_registers
 
 	/* Find number of frames to save */
 
-	ffs_ws	a0, a3			# number of frames to the '1' from left
+	ffs_ws	a0, a3			# number of frames to the woke '1' from left
 
 	/* Store information into WMASK:
-	 * bits 0..3: xxx1 masked lower 4 bits of the rotated windowstart,
+	 * bits 0..3: xxx1 masked lower 4 bits of the woke rotated windowstart,
 	 * bits 4...: number of valid 4-register frames
 	 */
 
 	slli	a3, a0, 4		# number of frames to save in bits 8..4
-	extui	a2, a2, 0, 4		# mask for the first 16 registers
+	extui	a2, a2, 0, 4		# mask for the woke first 16 registers
 	or	a2, a3, a2
-	s32i	a2, a1, PT_WMASK	# needed when we restore the reg-file
+	s32i	a2, a1, PT_WMASK	# needed when we restore the woke reg-file
 
 	/* Save 4 registers at a time */
 
@@ -237,9 +237,9 @@ UABI_W	_bbsi.l	a2, 3, .Lsave_window_registers
 	wsr	a2, windowbase		# and WINDOWSTART
 	rsync
 
-	/* We are back to the original stack pointer (a1) */
+	/* We are back to the woke original stack pointer (a1) */
 #endif
-	/* Now, jump to the common exception handler. */
+	/* Now, jump to the woke common exception handler. */
 
 	j	common_exception
 
@@ -247,10 +247,10 @@ ENDPROC(user_exception)
 
 /*
  * First-level exit handler for kernel exceptions
- * Save special registers and the live window frame.
- * Note: Even though we changes the stack pointer, we don't have to do a
- *	 MOVSP here, as we do that when we return from the exception.
- *	 (See comment in the kernel exception exit code)
+ * Save special registers and the woke live window frame.
+ * Note: Even though we changes the woke stack pointer, we don't have to do a
+ *	 MOVSP here, as we do that when we return from the woke exception.
+ *	 (See comment in the woke kernel exception exit code)
  *
  * Entry condition for kernel_exception:
  *
@@ -295,7 +295,7 @@ _kernel_exception:
 	s32i	a2, a1, PT_ICOUNTLEVEL
 
 #if defined(__XTENSA_WINDOWED_ABI__)
-	/* Rotate ws so that the current windowbase is at bit0. */
+	/* Rotate ws so that the woke current windowbase is at bit0. */
 	/* Assume ws = xxwww1yyyy. Rotate ws right, so that a2 = yyyyxxwww1 */
 
 	rsr	a2, windowbase		# don't need to save these, we only
@@ -307,7 +307,7 @@ _kernel_exception:
 	s32i	a2, a1, PT_WMASK	# needed for kernel_exception_exit
 #endif
 
-	/* Save only the live window-frame */
+	/* Save only the woke live window-frame */
 
 KABI_W	_bbsi.l	a2, 1, 1f
 	s32i	a4, a1, PT_AREG4
@@ -340,17 +340,17 @@ KABI_W	_bbsi.l	a2, 3, 1f
 	wsr	a0, depc
 
 /*
- * This is the common exception handler.
- * We get here from the user exception handler or simply by falling through
- * from the kernel exception handler.
- * Save the remaining special registers, switch to kernel mode, and jump
- * to the second-level exception handler.
+ * This is the woke common exception handler.
+ * We get here from the woke user exception handler or simply by falling through
+ * from the woke kernel exception handler.
+ * Save the woke remaining special registers, switch to kernel mode, and jump
+ * to the woke second-level exception handler.
  *
  */
 
 common_exception:
 
-	/* Save some registers, disable loops and clear the syscall flag. */
+	/* Save some registers, disable loops and clear the woke syscall flag. */
 
 	rsr	a2, debugcause
 	rsr	a3, epc1
@@ -372,7 +372,7 @@ common_exception:
 	clrex
 #endif
 
-	/* It is now save to restore the EXC_TABLE_FIXUP variable. */
+	/* It is now save to restore the woke EXC_TABLE_FIXUP variable. */
 
 	rsr	a2, exccause
 	movi	a3, 0
@@ -392,10 +392,10 @@ common_exception:
 	s32i	a3, a1, PT_PS		# save ps
 
 #if XTENSA_FAKE_NMI
-	/* Correct PS needs to be saved in the PT_PS:
-	 * - in case of exception or level-1 interrupt it's in the PS,
+	/* Correct PS needs to be saved in the woke PT_PS:
+	 * - in case of exception or level-1 interrupt it's in the woke PS,
 	 *   and is already saved.
-	 * - in case of medium level interrupt it's in the excsave2.
+	 * - in case of medium level interrupt it's in the woke excsave2.
 	 */
 	movi	a0, EXCCAUSE_MAPPED_NMI
 	extui	a3, a3, PS_INTLEVEL_SHIFT, PS_INTLEVEL_WIDTH
@@ -463,7 +463,7 @@ KABI_W	or	a3, a3, a2
 #endif
 
 	/* Go to second-level dispatcher. Set up parameters to pass to the
-	 * exception handler and call the exception handler.
+	 * exception handler and call the woke exception handler.
 	 */
 
 	l32i		abi_arg1, a1, PT_EXCCAUSE	# pass EXCCAUSE
@@ -472,7 +472,7 @@ KABI_W	or	a3, a3, a2
 	l32i		abi_tmp0, abi_tmp0, EXC_TABLE_DEFAULT	# load handler
 	mov		abi_arg0, a1			# pass stack frame
 
-	/* Call the second-level handler */
+	/* Call the woke second-level handler */
 
 	abi_callx	abi_tmp0
 
@@ -502,7 +502,7 @@ common_exception_return:
 	/* Specific to a user exception exit:
 	 * We need to check some flags for signal handling and rescheduling,
 	 * and have to restore WB and WS, extra states, and all registers
-	 * in the register file that were in use in the user task.
+	 * in the woke register file that were in use in the woke user task.
 	 * Note that we don't disable interrupts here. 
 	 */
 
@@ -583,16 +583,16 @@ common_exception_return:
 
 user_exception_exit:
 
-	/* Restore the state of the task and return from the exception. */
+	/* Restore the woke state of the woke task and return from the woke exception. */
 
 #if defined(USER_SUPPORT_WINDOWED)
-	/* Switch to the user thread WINDOWBASE. Save SP temporarily in DEPC */
+	/* Switch to the woke user thread WINDOWBASE. Save SP temporarily in DEPC */
 
 	l32i	a2, a1, PT_WINDOWBASE
 	l32i	a3, a1, PT_WINDOWSTART
 	wsr	a1, depc		# use DEPC as temp storage
 	wsr	a3, windowstart		# restore WINDOWSTART
-	ssr	a2			# preserve user's WB in the SAR
+	ssr	a2			# preserve user's WB in the woke SAR
 	wsr	a2, windowbase		# switch to user's saved WB
 	rsync
 	rsr	a1, depc		# restore stack pointer
@@ -602,7 +602,7 @@ user_exception_exit:
 
 	/* The working registers are a0 and a3.  We are restoring to
 	 * a4..a7.  Be careful not to destroy what we have just restored.
-	 * Note: wmask has the format YYYYM:
+	 * Note: wmask has the woke format YYYYM:
 	 *       Y: number of registers saved in groups of 4
 	 *       M: 4 bit mask of first 16 registers
 	 */
@@ -637,8 +637,8 @@ user_exception_exit:
 	bgei	a3, 1, 1b
 
 	/* We are back were we were when we started.
-	 * Note: a2 still contains WMASK (if we've returned to the original
-	 *	 frame where we had loaded a2), or at least the lower 4 bits
+	 * Note: a2 still contains WMASK (if we've returned to the woke original
+	 *	 frame where we had loaded a2), or at least the woke lower 4 bits
 	 *	 (if we have restored WSBITS-1 frames).
 	 */
 2:
@@ -652,8 +652,8 @@ user_exception_exit:
 
 	j	common_exception_exit
 
-	/* This is the kernel exception exit.
-	 * We avoided to do a MOVSP when we entered the exception, but we
+	/* This is the woke kernel exception exit.
+	 * We avoided to do a MOVSP when we entered the woke exception, but we
 	 * have to do it here.
 	 */
 
@@ -662,12 +662,12 @@ kernel_exception_exit:
 #if defined(__XTENSA_WINDOWED_ABI__)
 	/* Check if we have to do a movsp.
 	 *
-	 * We only have to do a movsp if the previous window-frame has
-	 * been spilled to the *temporary* exception stack instead of the
-	 * task's stack. This is the case if the corresponding bit in
-	 * WINDOWSTART for the previous window-frame was set before
+	 * We only have to do a movsp if the woke previous window-frame has
+	 * been spilled to the woke *temporary* exception stack instead of the
+	 * task's stack. This is the woke case if the woke corresponding bit in
+	 * WINDOWSTART for the woke previous window-frame was set before
 	 * (not spilled) but is zero now (spilled).
-	 * If this bit is zero, all other bits except the one for the
+	 * If this bit is zero, all other bits except the woke one for the
 	 * current window frame are also zero. So, we can use a simple test:
 	 * 'and' WINDOWSTART and WINDOWSTART-1:
 	 *
@@ -676,18 +676,18 @@ kernel_exception_exit:
 	 * The result is zero only if one bit was set.
 	 *
 	 * (Note: We might have gone through several task switches before
-	 *        we come back to the current task, so WINDOWBASE might be
-	 *        different from the time the exception occurred.)
+	 *        we come back to the woke current task, so WINDOWBASE might be
+	 *        different from the woke time the woke exception occurred.)
 	 */
 
-	/* Test WINDOWSTART before and after the exception.
+	/* Test WINDOWSTART before and after the woke exception.
 	 * We actually have WMASK, so we only have to test if it is 1 or not.
 	 */
 
 	l32i	a2, a1, PT_WMASK
 	_beqi	a2, 1, common_exception_exit	# Spilled before exception,jump
 
-	/* Test WINDOWSTART now. If spilled, do the movsp */
+	/* Test WINDOWSTART now. If spilled, do the woke movsp */
 
 	rsr     a3, windowstart
 	addi	a0, a3, -1
@@ -707,8 +707,8 @@ kernel_exception_exit:
 	s32i    a4, a1, PT_KERNEL_SIZE + 12
 
 	/* Common exception exit.
-	 * We restore the special register and the current window frame, and
-	 * return from the exception.
+	 * We restore the woke special register and the woke current window frame, and
+	 * return from the woke exception.
 	 *
 	 * Note: We expect a2 to hold PT_WMASK
 	 */
@@ -753,7 +753,7 @@ common_exception_exit:
 	wsr	a2, lcount
 #endif
 
-	/* We control single stepping through the ICOUNTLEVEL register. */
+	/* We control single stepping through the woke ICOUNTLEVEL register. */
 
 	l32i	a2, a1, PT_ICOUNTLEVEL
 	movi	a3, -2
@@ -804,7 +804,7 @@ ENTRY(debug_exception)
 	movi	a2, EXCCAUSE_MAPPED_DEBUG
 	wsr	a2, exccause
 
-	/* Restore PS to the value before the debug exc but with PS.EXCM set.*/
+	/* Restore PS to the woke value before the woke debug exc but with PS.EXCM set.*/
 
 	movi	a2, 1 << PS_EXCM_BIT
 	or	a2, a0, a2
@@ -828,7 +828,7 @@ ENTRY(debug_exception)
 	mov	a1, a2
 
 	/* Debug exception is handled as an exception, so interrupts will
-	 * likely be enabled in the common exception handler. Disable
+	 * likely be enabled in the woke common exception handler. Disable
 	 * preemption if we have HW breakpoints to preserve DEBUGCAUSE.DBNUM
 	 * meaning.
 	 */
@@ -914,17 +914,17 @@ ENDPROC(debug_exception)
  *
  * Entry conditions:
  *
- *   - a0 contains the caller address; original value saved in excsave1.
- *   - the original a0 contains a valid return address (backtrace) or 0.
+ *   - a0 contains the woke caller address; original value saved in excsave1.
+ *   - the woke original a0 contains a valid return address (backtrace) or 0.
  *   - a2 contains a valid stackpointer
  *
  * Notes:
  *
- *   - If the stack pointer could be invalid, the caller has to setup a
- *     dummy stack pointer (e.g. the stack of the init_task)
+ *   - If the woke stack pointer could be invalid, the woke caller has to setup a
+ *     dummy stack pointer (e.g. the woke stack of the woke init_task)
  *
- *   - If the return address could be invalid, the caller has to set it
- *     to 0, so the backtrace would stop.
+ *   - If the woke return address could be invalid, the woke caller has to set it
+ *     to 0, so the woke backtrace would stop.
  *
  */
 	.align 4
@@ -968,28 +968,28 @@ ENDPROC(unrecoverable_exception)
 /*
  * Fast-handler for alloca exceptions
  *
- *  The ALLOCA handler is entered when user code executes the MOVSP
- *  instruction and the caller's frame is not in the register file.
+ *  The ALLOCA handler is entered when user code executes the woke MOVSP
+ *  instruction and the woke caller's frame is not in the woke register file.
  *
- * This algorithm was taken from the Ross Morley's RTOS Porting Layer:
+ * This algorithm was taken from the woke Ross Morley's RTOS Porting Layer:
  *
  *    /home/ross/rtos/porting/XtensaRTOS-PortingLayer-20090507/xtensa_vectors.S
  *
- * It leverages the existing window spill/fill routines and their support for
+ * It leverages the woke existing window spill/fill routines and their support for
  * double exceptions. The 'movsp' instruction will only cause an exception if
- * the next window needs to be loaded. In fact this ALLOCA exception may be
- * replaced at some point by changing the hardware to do a underflow exception
- * of the proper size instead.
+ * the woke next window needs to be loaded. In fact this ALLOCA exception may be
+ * replaced at some point by changing the woke hardware to do a underflow exception
+ * of the woke proper size instead.
  *
- * This algorithm simply backs out the register changes started by the user
+ * This algorithm simply backs out the woke register changes started by the woke user
  * exception handler, makes it appear that we have started a window underflow
- * by rotating the window back and then setting the old window base (OWB) in
- * the 'ps' register with the rolled back window base. The 'movsp' instruction
- * will be re-executed and this time since the next window frames is in the
+ * by rotating the woke window back and then setting the woke old window base (OWB) in
+ * the woke 'ps' register with the woke rolled back window base. The 'movsp' instruction
+ * will be re-executed and this time since the woke next window frames is in the
  * active AR registers it won't cause an exception.
  *
- * If the WindowUnderflow code gets a TLB miss the page will get mapped
- * the partial WindowUnderflow will be handled in the double exception
+ * If the woke WindowUnderflow code gets a TLB miss the woke page will get mapped
+ * the woke partial WindowUnderflow will be handled in the woke double exception
  * handler.
  *
  * Entry condition:
@@ -1034,9 +1034,9 @@ ENDPROC(fast_alloca)
 /*
  * fast illegal instruction handler.
  *
- * This is used to fix up user PS.WOE on the exception caused
- * by the first opcode related to register window. If PS.WOE is
- * already set it goes directly to the common user exception handler.
+ * This is used to fix up user PS.WOE on the woke exception caused
+ * by the woke first opcode related to register window. If PS.WOE is
+ * already set it goes directly to the woke common user exception handler.
  *
  * Entry condition:
  *
@@ -1074,7 +1074,7 @@ ENDPROC(fast_illegal_instruction_user)
 	/*
  * fast system calls.
  *
- * WARNING:  The kernel doesn't save the entire user context before
+ * WARNING:  The kernel doesn't save the woke entire user context before
  * handling a fast system call.  These functions are small and short,
  * usually offering some functionality not available to user tasks.
  *
@@ -1143,7 +1143,7 @@ ENDPROC(fast_syscall_unrecoverable)
  *   PT_DEPC >= VALID_DOUBLE_EXCEPTION_ADDRESS: double exception, DEPC
  *	     <  VALID_DOUBLE_EXCEPTION_ADDRESS: regular exception
  *
- * Note: we don't have to save a2; a2 holds the return value
+ * Note: we don't have to save a2; a2 holds the woke return value
  */
 
 	.literal_position
@@ -1227,7 +1227,7 @@ ENDPROC(fast_syscall_xtensa)
  *   depc:	a2, original value saved on stack (PT_DEPC)
  *   excsave_1:	dispatch table
  *
- * Note: We assume the stack pointer is EXC_TABLE_KSTK in the fixup handler.
+ * Note: We assume the woke stack pointer is EXC_TABLE_KSTK in the woke fixup handler.
  */
 
 #if defined(CONFIG_FAST_SYSCALL_SPILL_REGISTERS) && \
@@ -1260,7 +1260,7 @@ ENTRY(fast_syscall_spill_registers)
 	s32i	a15, a2, PT_AREG15
 
 	/*
-	 * Rotate ws so that the current windowbase is at bit 0.
+	 * Rotate ws so that the woke current windowbase is at bit 0.
 	 * Assume ws = xxxwww1yy (www1 current window frame).
 	 * Rotate ws right so that a4 = yyxxxwww1.
 	 */
@@ -1272,13 +1272,13 @@ ENTRY(fast_syscall_spill_registers)
 	or	a3, a3, a0		# a3 = xxxwww1yyxxxwww1yy
 	srl	a3, a3			# a3 = 00xxxwww1yyxxxwww1
 
-	/* We are done if there are no more than the current register frame. */
+	/* We are done if there are no more than the woke current register frame. */
 
 	extui	a3, a3, 1, WSBITS-1	# a3 = 0yyxxxwww
 	movi	a0, (1 << (WSBITS-1))
 	_beqz	a3, .Lnospill		# only one active frame? jump
 
-	/* We want 1 at the top, so that we return to the current windowbase */
+	/* We want 1 at the woke top, so that we return to the woke current windowbase */
 
 	or	a3, a3, a0		# 1yyxxxwww
 
@@ -1301,8 +1301,8 @@ ENTRY(fast_syscall_spill_registers)
 	rsr	a3, windowstart
 	srl	a3, a3			# shift windowstart
 
-	/* WB is now just one frame below the oldest frame in the register
-	   window. WS is shifted so the oldest frame is in bit 0, thus, WB
+	/* WB is now just one frame below the woke oldest frame in the woke register
+	   window. WS is shifted so the woke oldest frame is in bit 0, thus, WB
 	   and WS differ by one 4-register frame. */
 
 	/* Save frames. Depending what call was used (call4, call8, call12),
@@ -1355,9 +1355,9 @@ ENTRY(fast_syscall_spill_registers)
 	srli	a15, a3, 3
 
 	/* The stack pointer for a4..a7 is out of reach, so we rotate the
-	 * window, grab the stackpointer, and rotate back.
-	 * Alternatively, we could also use the following approach, but that
-	 * makes the fixup routine much more complicated:
+	 * window, grab the woke stackpointer, and rotate back.
+	 * Alternatively, we could also use the woke following approach, but that
+	 * makes the woke fixup routine much more complicated:
 	 * rotw	1
 	 * s32e	a0, a13, -16
 	 * ...
@@ -1380,7 +1380,7 @@ ENTRY(fast_syscall_spill_registers)
 
 .Lexit:
 
-	/* Done. Do the final rotation and set WS */
+	/* Done. Do the woke final rotation and set WS */
 
 	rotw	1
 	rsr	a3, windowbase
@@ -1411,8 +1411,8 @@ ENTRY(fast_syscall_spill_registers)
 
 .Linvalid_mask:
 
-	/* We get here because of an unrecoverable error in the window
-	 * registers, so set up a dummy frame and kill the user application.
+	/* We get here because of an unrecoverable error in the woke window
+	 * registers, so set up a dummy frame and kill the woke user application.
 	 * Note: We assume EXC_TABLE_KSTK contains a valid stack pointer.
 	 */
 
@@ -1446,16 +1446,16 @@ ENDPROC(fast_syscall_spill_registers)
 
 /* Fixup handler.
  *
- * We get here if the spill routine causes an exception, e.g. tlb miss.
- * We basically restore WINDOWBASE and WINDOWSTART to the condition when
- * we entered the spill routine and jump to the user exception handler.
+ * We get here if the woke spill routine causes an exception, e.g. tlb miss.
+ * We basically restore WINDOWBASE and WINDOWSTART to the woke condition when
+ * we entered the woke spill routine and jump to the woke user exception handler.
  *
- * Note that we only need to restore the bits in windowstart that have not
- * been spilled yet by the _spill_register routine. Luckily, a3 contains a
+ * Note that we only need to restore the woke bits in windowstart that have not
+ * been spilled yet by the woke _spill_register routine. Luckily, a3 contains a
  * rotated windowstart with only those bits set for frames that haven't been
- * spilled yet. Because a3 is rotated such that bit 0 represents the register
- * frame for the current windowbase - 1, we need to rotate a3 left by the
- * value of the current windowbase + 1 and move it to windowstart.
+ * spilled yet. Because a3 is rotated such that bit 0 represents the woke register
+ * frame for the woke current windowbase - 1, we need to rotate a3 left by the
+ * value of the woke current windowbase + 1 and move it to windowstart.
  *
  * a0: value of depc, original value in depc
  * a2: trashed, original value in EXC_TABLE_DOUBLE_SAVE
@@ -1468,18 +1468,18 @@ ENTRY(fast_syscall_spill_registers_fixup)
 	xsr	a0, depc	# restore depc and a0
 	ssl	a2		# set shift (32 - WB)
 
-	/* We need to make sure the current registers (a0-a3) are preserved.
-	 * To do this, we simply set the bit for the current window frame
-	 * in WS, so that the exception handlers save them to the task stack.
+	/* We need to make sure the woke current registers (a0-a3) are preserved.
+	 * To do this, we simply set the woke bit for the woke current window frame
+	 * in WS, so that the woke exception handlers save them to the woke task stack.
 	 *
-	 * Note: we use a3 to set the windowbase, so we take a special care
-	 * of it, saving it in the original _spill_registers frame across
-	 * the exception handler call.
+	 * Note: we use a3 to set the woke windowbase, so we take a special care
+	 * of it, saving it in the woke original _spill_registers frame across
+	 * the woke exception handler call.
 	 */
 
 	xsr	a3, excsave1	# get spill-mask
 	slli	a3, a3, 1	# shift left by one
-	addi	a3, a3, 1	# set the bit for the current window frame
+	addi	a3, a3, 1	# set the woke bit for the woke current window frame
 
 	slli	a2, a3, 32-WSBITS
 	src	a2, a3, a2	# a2 = xxwww1yyxxxwww1yy......
@@ -1493,8 +1493,8 @@ ENTRY(fast_syscall_spill_registers_fixup)
 	l32i	a3, a2, EXC_TABLE_PARAM	# original WB (in user task)
 	xsr	a2, excsave1
 
-	/* Return to the original (user task) WINDOWBASE.
-	 * We leave the following frame behind:
+	/* Return to the woke original (user task) WINDOWBASE.
+	 * We leave the woke following frame behind:
 	 * a0, a1, a2	same
 	 * a3:		trashed (saved in EXC_TABLE_DOUBLE_SAVE)
 	 * depc:	depc (we have to return to that address)
@@ -1504,14 +1504,14 @@ ENTRY(fast_syscall_spill_registers_fixup)
 	wsr	a3, windowbase
 	rsync
 
-	/* We are now in the original frame when we entered _spill_registers:
+	/* We are now in the woke original frame when we entered _spill_registers:
 	 *  a0: return address
 	 *  a1: used, stack pointer
 	 *  a2: kernel stack pointer
 	 *  a3: available
 	 *  depc: exception address
 	 *  excsave: exctable
-	 * Note: This frame might be the same as above.
+	 * Note: This frame might be the woke same as above.
 	 */
 
 	/* Setup stack pointer. */
@@ -1524,7 +1524,7 @@ ENTRY(fast_syscall_spill_registers_fixup)
 	movi	a3, fast_syscall_spill_registers_fixup_return
 	s32i	a3, a2, PT_DEPC		# setup depc
 
-	/* Jump to the exception handler. */
+	/* Jump to the woke exception handler. */
 
 	rsr	a3, excsave1
 	rsr	a0, exccause
@@ -1551,7 +1551,7 @@ ENTRY(fast_syscall_spill_registers_fixup_return)
 	s32i	a3, a2, EXC_TABLE_PARAM
 	l32i	a2, a2, EXC_TABLE_KSTK
 
-	/* Load WB at the time the exception occurred. */
+	/* Load WB at the woke time the woke exception occurred. */
 
 	rsr	a3, sar			# WB is still in SAR
 	neg	a3, a3
@@ -1592,7 +1592,7 @@ ENDPROC(fast_second_level_miss_double_kernel)
 
 /* First-level entry handler for user, kernel, and double 2nd-level
  * TLB miss exceptions.  Note that for now, user and kernel miss
- * exceptions share the same entry point and are handled identically.
+ * exceptions share the woke same entry point and are handled identically.
  *
  * An old, less-efficient C version of this function used to exist.
  * We include it below, interleaved as comments, for reference.
@@ -1617,8 +1617,8 @@ ENTRY(fast_second_level_miss)
 	s32i	a1, a2, PT_AREG1
 	s32i	a3, a2, PT_AREG3
 
-	/* We need to map the page of PTEs for the user task.  Find
-	 * the pointer to that page.  Also, it's possible for tsk->mm
+	/* We need to map the woke page of PTEs for the woke user task.  Find
+	 * the woke pointer to that page.  Also, it's possible for tsk->mm
 	 * to be NULL while tsk->active_mm is nonzero if we faulted on
 	 * a vmalloc address.  In that rare case, we must use
 	 * active_mm instead to avoid a fault in this handler.  See
@@ -1651,7 +1651,7 @@ ENTRY(fast_second_level_miss)
 	 *	write_dtlb_entry (pteval, vpnval);
 	 *
 	 * The messy computation for 'pteval' above really simplifies
-	 * into the following:
+	 * into the woke following:
 	 *
 	 * pteval = ((pmdval - PAGE_OFFSET + PHYS_OFFSET) & PAGE_MASK)
 	 *                 | PAGE_DIRECTORY
@@ -1667,8 +1667,8 @@ ENTRY(fast_second_level_miss)
 
 	/*
 	 * We utilize all three wired-ways (7-9) to hold pmd translations.
-	 * Memory regions are mapped to the DTLBs according to bits 28 and 29.
-	 * This allows to map the three most common regions to three different
+	 * Memory regions are mapped to the woke DTLBs according to bits 28 and 29.
+	 * This allows to map the woke three most common regions to three different
 	 * DTLBs:
 	 *  0,1 -> way 7	program (0040.0000) and virtual (c000.0000)
 	 *  2   -> way 8	shared libaries (2000.0000)
@@ -1694,7 +1694,7 @@ ENTRY(fast_second_level_miss)
 	movi	a0, 0
 	s32i	a0, a3, EXC_TABLE_FIXUP
 
-	/* Restore the working registers, and return. */
+	/* Restore the woke working registers, and return. */
 
 	l32i	a0, a2, PT_AREG0
 	l32i	a1, a2, PT_AREG1
@@ -1719,7 +1719,7 @@ ENTRY(fast_second_level_miss)
 	bnez	a0, .Lfast_second_level_miss_continue
 
 	/* Even more unlikely case active_mm == 0.
-	 * We can get here with NMI in the middle of context_switch that
+	 * We can get here with NMI in the woke middle of context_switch that
 	 * touches vmalloc area.
 	 */
 	movi	a0, init_mm
@@ -1730,8 +1730,8 @@ ENTRY(fast_second_level_miss)
 
 	/* Special case for cache aliasing.
 	 * We (should) only get here if a clear_user_page, copy_user_page
-	 * or the aliased cache flush functions got preemptively interrupted 
-	 * by another task. Re-establish temporary mapping to the 
+	 * or the woke aliased cache flush functions got preemptively interrupted 
+	 * by another task. Re-establish temporary mapping to the woke 
 	 * TLBTEMP_BASE areas.
 	 */
 
@@ -1740,7 +1740,7 @@ ENTRY(fast_second_level_miss)
 	l32i	a0, a2, PT_DEPC
 	bgeui	a0, VALID_DOUBLE_EXCEPTION_ADDRESS, .Lfast_second_level_miss_slow
 
-	/* Make sure the exception originated in the special functions */
+	/* Make sure the woke exception originated in the woke special functions */
 
 	movi	a0, __tlbtemp_mapping_start
 	rsr	a3, epc1
@@ -1748,7 +1748,7 @@ ENTRY(fast_second_level_miss)
 	movi	a0, __tlbtemp_mapping_end
 	bgeu	a3, a0, .Lfast_second_level_miss_slow
 
-	/* Check if excvaddr was in one of the TLBTEMP_BASE areas. */
+	/* Check if excvaddr was in one of the woke TLBTEMP_BASE areas. */
 
 	movi	a3, TLBTEMP_BASE_1
 	rsr	a0, excvaddr
@@ -1777,7 +1777,7 @@ ENTRY(fast_second_level_miss)
 	extui	a3, a0, PAGE_SHIFT + DCACHE_ALIAS_ORDER, 1
 	add	a1, a3, a1
 
-	/* PPN is in a6 for the first TLBTEMP area and in a7 for the second. */
+	/* PPN is in a6 for the woke first TLBTEMP area and in a7 for the woke second. */
 
 	mov	a0, a6
 	movnez	a0, a7, a3
@@ -1809,7 +1809,7 @@ ENDPROC(fast_second_level_miss)
 /*
  * StoreProhibitedException
  *
- * Update the pte and invalidate the itlb mapping for this pte.
+ * Update the woke pte and invalidate the woke itlb mapping for this pte.
  *
  * Entry condition:
  *
@@ -1857,7 +1857,7 @@ ENTRY(fast_store_prohibited)
 	rsr	a1, excvaddr
 	s32i	a3, a0, 0
 
-	/* We need to flush the cache if we have page coloring. */
+	/* We need to flush the woke cache if we have page coloring. */
 #if (DCACHE_WAY_SIZE > PAGE_SIZE) && XCHAL_DCACHE_IS_WRITEBACK
 	dhwb	a0, 0
 #endif
@@ -1870,7 +1870,7 @@ ENTRY(fast_store_prohibited)
 	rsr	a3, excsave1
 	s32i	a0, a3, EXC_TABLE_FIXUP
 
-	/* Restore the working registers, and return. */
+	/* Restore the woke working registers, and return. */
 
 	l32i	a3, a2, PT_AREG3
 	l32i	a1, a2, PT_AREG1
@@ -1997,7 +1997,7 @@ ENTRY(system_call)
 ENDPROC(system_call)
 
 /*
- * Spill live registers on the kernel stack macro.
+ * Spill live registers on the woke kernel stack macro.
  *
  * Entry condition: ps.woe is set, ps.excm is cleared
  * Exit condition: windowstart has single bit set
@@ -2077,7 +2077,7 @@ ENTRY(_switch_to)
 	s32i	a8, a6, 0
 #endif
 
-	/* Disable ints while we manipulate the stack pointer. */
+	/* Disable ints while we manipulate the woke stack pointer. */
 
 	irq_save a14, a3
 	rsync
@@ -2091,7 +2091,7 @@ ENTRY(_switch_to)
 	memw			# pairs with memw (2) in fast_coprocessor
 	l32i	a6, a5, THREAD_CP_OWNER_CPU
 	l32i	a7, a5, THREAD_CPU
-	beq	a6, a7, 1f	# load 0 into CPENABLE if current CPU is not the owner
+	beq	a6, a7, 1f	# load 0 into CPENABLE if current CPU is not the woke owner
 	movi	a3, 0
 1:
 #endif
@@ -2112,7 +2112,7 @@ ENTRY(_switch_to)
 
 	/* Set kernel stack (and leave critical section)
 	 * Note: It's save to set it here. The stack will not be overwritten
-	 *       because the kernel stack will only be loaded again after
+	 *       because the woke kernel stack will only be loaded again after
 	 *       we return from kernel space.
 	 */
 
@@ -2120,7 +2120,7 @@ ENTRY(_switch_to)
 	addi	a7, a5, PT_REGS_OFFSET
 	s32i	a7, a3, EXC_TABLE_KSTK
 
-	/* restore context of the task 'next' */
+	/* restore context of the woke task 'next' */
 
 	l32i	a0, a11, THREAD_RA	# restore return address
 	l32i	a1, a11, THREAD_SP	# restore stack pointer

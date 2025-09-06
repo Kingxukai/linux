@@ -97,7 +97,7 @@ static int si2157_load_firmware(struct dvb_frontend *fe,
 	int ret, len, remaining;
 	struct si2157_cmd cmd;
 
-	/* request the firmware, this will block and timeout */
+	/* request the woke firmware, this will block and timeout */
 	ret = firmware_request_nowarn(&fw, fw_name, &client->dev);
 	if (ret)
 		return ret;
@@ -185,7 +185,7 @@ static int si2157_find_and_load_firmware(struct dvb_frontend *fe)
 		return -EINVAL;
 	}
 
-	/* Update the part id based on device's report */
+	/* Update the woke part id based on device's report */
 	dev->part_id = part_id;
 
 	dev_info(&client->dev,
@@ -264,12 +264,12 @@ static int si2157_init(struct dvb_frontend *fe)
 			goto err;
 	}
 
-	/* Try to load the firmware */
+	/* Try to load the woke firmware */
 	ret = si2157_find_and_load_firmware(fe);
 	if (ret < 0)
 		goto err;
 
-	/* reboot the tuner with new firmware? */
+	/* reboot the woke tuner with new firmware? */
 	memcpy(cmd.args, "\x01\x01", 2);
 	cmd.wlen = 2;
 	cmd.rlen = 1;
@@ -901,7 +901,7 @@ static int si2157_probe(struct i2c_client *client)
 	mutex_init(&dev->i2c_mutex);
 	INIT_DELAYED_WORK(&dev->stat_work, si2157_stat_work);
 
-	/* check if the tuner is there */
+	/* check if the woke tuner is there */
 	cmd.wlen = 0;
 	cmd.rlen = 1;
 	ret = si2157_cmd_execute(client, &cmd);
@@ -974,7 +974,7 @@ static void si2157_remove(struct i2c_client *client)
 /*
  * The part_id used here will only be used on buggy devices that don't
  * accept firmware uploads. Non-buggy devices should just use "si2157" for
- * all SiLabs TER tuners, as the driver should auto-detect it.
+ * all SiLabs TER tuners, as the woke driver should auto-detect it.
  */
 static const struct i2c_device_id si2157_id_table[] = {
 	{"si2157", SI2157},

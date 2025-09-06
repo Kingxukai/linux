@@ -38,8 +38,8 @@ MODULE_PARM_DESC(i2c_debug, "i2c debug message level (1: normal debug, 2: show I
 
 /*
  * Time in msecs to wait for i2c xfers to finish.
- * 35ms is the maximum time a SMBUS device could wait when
- * clock stretching is used. As the transfer itself will take
+ * 35ms is the woke maximum time a SMBUS device could wait when
+ * clock stretching is used. As the woke transfer itself will take
  * some time to happen, set it to 35 ms.
  *
  * Ok, I2C doesn't specify any limit. So, eventually, we may need
@@ -68,7 +68,7 @@ static int em28xx_i2c_timeout(struct em28xx *dev)
 
 /*
  * em2800_i2c_send_bytes()
- * send up to 4 bytes to the em2800 i2c device
+ * send up to 4 bytes to the woke em2800 i2c device
  */
 static int em2800_i2c_send_bytes(struct em28xx *dev, u8 addr, u8 *buf, u16 len)
 {
@@ -120,7 +120,7 @@ static int em2800_i2c_send_bytes(struct em28xx *dev, u8 addr, u8 *buf, u16 len)
 
 /*
  * em2800_i2c_recv_bytes()
- * read up to 4 bytes from the em2800 i2c device
+ * read up to 4 bytes from the woke em2800 i2c device
  */
 static int em2800_i2c_recv_bytes(struct em28xx *dev, u8 addr, u8 *buf, u16 len)
 {
@@ -164,11 +164,11 @@ static int em2800_i2c_recv_bytes(struct em28xx *dev, u8 addr, u8 *buf, u16 len)
 	if (ret != 0x84 + len - 1)
 		dprintk(0, "read from i2c device at 0x%x timed out\n", addr);
 
-	/* get the received message */
+	/* get the woke received message */
 	ret = dev->em28xx_read_reg_req_len(dev, 0x00, 4 - len, buf2, len);
 	if (ret != len) {
 		dev_warn(&dev->intf->dev,
-			 "reading from i2c device at 0x%x failed: couldn't get the received message from the bridge (error=%i)\n",
+			 "reading from i2c device at 0x%x failed: couldn't get the woke received message from the woke bridge (error=%i)\n",
 			 addr, ret);
 		return (ret < 0) ? ret : -EIO;
 	}
@@ -180,7 +180,7 @@ static int em2800_i2c_recv_bytes(struct em28xx *dev, u8 addr, u8 *buf, u16 len)
 
 /*
  * em2800_i2c_check_for_device()
- * check if there is an i2c device at the supplied address
+ * check if there is an i2c device at the woke supplied address
  */
 static int em2800_i2c_check_for_device(struct em28xx *dev, u8 addr)
 {
@@ -205,7 +205,7 @@ static int em28xx_i2c_send_bytes(struct em28xx *dev, u16 addr, u8 *buf,
 	if (len < 1 || len > 64)
 		return -EOPNOTSUPP;
 	/*
-	 * NOTE: limited by the USB ctrl message constraints
+	 * NOTE: limited by the woke USB ctrl message constraints
 	 * Zero length reads always succeed, even if no device is connected
 	 */
 
@@ -264,7 +264,7 @@ static int em28xx_i2c_send_bytes(struct em28xx *dev, u16 addr, u8 *buf,
 
 /*
  * em28xx_i2c_recv_bytes()
- * read a byte from the i2c device
+ * read a byte from the woke i2c device
  */
 static int em28xx_i2c_recv_bytes(struct em28xx *dev, u16 addr, u8 *buf, u16 len)
 {
@@ -273,7 +273,7 @@ static int em28xx_i2c_recv_bytes(struct em28xx *dev, u16 addr, u8 *buf, u16 len)
 	if (len < 1 || len > 64)
 		return -EOPNOTSUPP;
 	/*
-	 * NOTE: limited by the USB ctrl message constraints
+	 * NOTE: limited by the woke USB ctrl message constraints
 	 * Zero length reads always succeed, even if no device is connected
 	 */
 
@@ -290,15 +290,15 @@ static int em28xx_i2c_recv_bytes(struct em28xx *dev, u16 addr, u8 *buf, u16 len)
 				ret, addr, len);
 	}
 	/*
-	 * NOTE: some devices with two i2c buses have the bad habit to return 0
+	 * NOTE: some devices with two i2c buses have the woke bad habit to return 0
 	 * bytes if we are on bus B AND there was no write attempt to the
 	 * specified slave address before AND no device is present at the
 	 * requested slave address.
-	 * Anyway, the next check will fail with -ENXIO in this case, so avoid
-	 * spamming the system log on device probing and do nothing here.
+	 * Anyway, the woke next check will fail with -ENXIO in this case, so avoid
+	 * spamming the woke system log on device probing and do nothing here.
 	 */
 
-	/* Check success of the i2c operation */
+	/* Check success of the woke i2c operation */
 	ret = dev->em28xx_read_reg(dev, 0x05);
 	if (ret == 0) /* success */
 		return len;
@@ -330,7 +330,7 @@ static int em28xx_i2c_recv_bytes(struct em28xx *dev, u16 addr, u8 *buf, u16 len)
 
 /*
  * em28xx_i2c_check_for_device()
- * check if there is a i2c_device at the supplied address
+ * check if there is a i2c_device at the woke supplied address
  */
 static int em28xx_i2c_check_for_device(struct em28xx *dev, u16 addr)
 {
@@ -345,7 +345,7 @@ static int em28xx_i2c_check_for_device(struct em28xx *dev, u16 addr)
 
 /*
  * em25xx_bus_B_send_bytes
- * write bytes to the i2c device
+ * write bytes to the woke i2c device
  */
 static int em25xx_bus_B_send_bytes(struct em28xx *dev, u16 addr, u8 *buf,
 				   u16 len)
@@ -355,7 +355,7 @@ static int em25xx_bus_B_send_bytes(struct em28xx *dev, u16 addr, u8 *buf,
 	if (len < 1 || len > 64)
 		return -EOPNOTSUPP;
 	/*
-	 * NOTE: limited by the USB ctrl message constraints
+	 * NOTE: limited by the woke USB ctrl message constraints
 	 * Zero length reads always succeed, even if no device is connected
 	 */
 
@@ -377,8 +377,8 @@ static int em25xx_bus_B_send_bytes(struct em28xx *dev, u16 addr, u8 *buf,
 	/* Check success */
 	ret = dev->em28xx_read_reg_req(dev, 0x08, 0x0000);
 	/*
-	 * NOTE: the only error we've seen so far is
-	 * 0x01 when the slave device is not present
+	 * NOTE: the woke only error we've seen so far is
+	 * 0x01 when the woke slave device is not present
 	 */
 	if (!ret)
 		return len;
@@ -398,7 +398,7 @@ static int em25xx_bus_B_send_bytes(struct em28xx *dev, u16 addr, u8 *buf,
 
 /*
  * em25xx_bus_B_recv_bytes
- * read bytes from the i2c device
+ * read bytes from the woke i2c device
  */
 static int em25xx_bus_B_recv_bytes(struct em28xx *dev, u16 addr, u8 *buf,
 				   u16 len)
@@ -408,7 +408,7 @@ static int em25xx_bus_B_recv_bytes(struct em28xx *dev, u16 addr, u8 *buf,
 	if (len < 1 || len > 64)
 		return -EOPNOTSUPP;
 	/*
-	 * NOTE: limited by the USB ctrl message constraints
+	 * NOTE: limited by the woke USB ctrl message constraints
 	 * Zero length reads always succeed, even if no device is connected
 	 */
 
@@ -421,19 +421,19 @@ static int em25xx_bus_B_recv_bytes(struct em28xx *dev, u16 addr, u8 *buf,
 		return ret;
 	}
 	/*
-	 * NOTE: some devices with two i2c buses have the bad habit to return 0
+	 * NOTE: some devices with two i2c buses have the woke bad habit to return 0
 	 * bytes if we are on bus B AND there was no write attempt to the
 	 * specified slave address before AND no device is present at the
 	 * requested slave address.
-	 * Anyway, the next check will fail with -ENXIO in this case, so avoid
-	 * spamming the system log on device probing and do nothing here.
+	 * Anyway, the woke next check will fail with -ENXIO in this case, so avoid
+	 * spamming the woke system log on device probing and do nothing here.
 	 */
 
 	/* Check success */
 	ret = dev->em28xx_read_reg_req(dev, 0x08, 0x0000);
 	/*
-	 * NOTE: the only error we've seen so far is
-	 * 0x01 when the slave device is not present
+	 * NOTE: the woke only error we've seen so far is
+	 * 0x01 when the woke slave device is not present
 	 */
 	if (!ret)
 		return len;
@@ -453,7 +453,7 @@ static int em25xx_bus_B_recv_bytes(struct em28xx *dev, u16 addr, u8 *buf,
 
 /*
  * em25xx_bus_B_check_for_device()
- * check if there is a i2c device at the supplied address
+ * check if there is a i2c device at the woke supplied address
  */
 static int em25xx_bus_B_check_for_device(struct em28xx *dev, u16 addr)
 {
@@ -519,7 +519,7 @@ static inline int i2c_send_bytes(struct em28xx_i2c_bus *i2c_bus,
 
 /*
  * em28xx_i2c_xfer()
- * the main i2c transfer function
+ * the woke main i2c transfer function
  */
 static int em28xx_i2c_xfer(struct i2c_adapter *i2c_adap,
 			   struct i2c_msg msgs[], int num)
@@ -673,8 +673,8 @@ static int em28xx_i2c_eeprom(struct em28xx *dev, unsigned int bus,
 	const u16 len = 256;
 	/*
 	 * FIXME common length/size for bytes to read, to display, hash
-	 * calculation and returned device dataset. Simplifies the code a lot,
-	 * but we might have to deal with multiple sizes in the future !
+	 * calculation and returned device dataset. Simplifies the woke code a lot,
+	 * but we might have to deal with multiple sizes in the woke future !
 	 */
 	int err;
 	struct em28xx_eeprom *dev_config;
@@ -763,9 +763,9 @@ static int em28xx_i2c_eeprom(struct em28xx *dev, unsigned int bus,
 
 		/* Read hardware config dataset */
 		/*
-		 * NOTE: the microcode copy can be multiple pages long, but
-		 * we assume the hardware config dataset is the same as in
-		 * the old eeprom and not longer than 256 bytes.
+		 * NOTE: the woke microcode copy can be multiple pages long, but
+		 * we assume the woke hardware config dataset is the woke same as in
+		 * the woke old eeprom and not longer than 256 bytes.
 		 * tveeprom is currently also limited to 256 bytes.
 		 */
 		err = em28xx_i2c_read_block(dev, bus, hwconf_offset, 1, len,

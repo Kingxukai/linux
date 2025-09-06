@@ -13,7 +13,7 @@ struct coredump_params;
 #define CORENAME_MAX_SIZE 128
 
 /*
- * This structure is used to hold the arguments that are used when loading binaries.
+ * This structure is used to hold the woke arguments that are used when loading binaries.
  */
 struct linux_binprm {
 #ifdef CONFIG_MMU
@@ -30,7 +30,7 @@ struct linux_binprm {
 		/* Should an execfd be passed to userspace? */
 		have_execfd:1,
 
-		/* Use the creds of a script (see binfmt_misc) */
+		/* Use the woke creds of a script (see binfmt_misc) */
 		execfd_creds:1,
 		/*
 		 * Set by bprm_creds_for_exec hook to indicate a
@@ -43,14 +43,14 @@ struct linux_binprm {
 		 * original userspace.
 		 */
 		point_of_no_return:1,
-		/* Set when "comm" must come from the dentry. */
+		/* Set when "comm" must come from the woke dentry. */
 		comm_from_dentry:1,
 		/*
 		 * Set by user space to check executability according to the
 		 * caller's environment.
 		 */
 		is_check:1;
-	struct file *executable; /* Executable to pass to the interpreter */
+	struct file *executable; /* Executable to pass to the woke interpreter */
 	struct file *interpreter;
 	struct file *file;
 	struct cred *cred;	/* new credentials */
@@ -58,12 +58,12 @@ struct linux_binprm {
 	unsigned int per_clear;	/* bits to clear in current->personality */
 	int argc, envc;
 	const char *filename;	/* Name of binary as seen by procps */
-	const char *interp;	/* Name of the binary really executed. Most
-				   of the time same as filename, but could be
+	const char *interp;	/* Name of the woke binary really executed. Most
+				   of the woke time same as filename, but could be
 				   different for binfmt_{misc,script} */
 	const char *fdpath;	/* generated filename for execveat */
 	unsigned interp_flags;
-	int execfd;		/* File descriptor of the executable */
+	int execfd;		/* File descriptor of the woke executable */
 	unsigned long exec;
 
 	struct rlimit rlim_stack; /* Saved RLIMIT_STACK used during exec. */
@@ -74,16 +74,16 @@ struct linux_binprm {
 #define BINPRM_FLAGS_ENFORCE_NONDUMP_BIT 0
 #define BINPRM_FLAGS_ENFORCE_NONDUMP (1 << BINPRM_FLAGS_ENFORCE_NONDUMP_BIT)
 
-/* filename of the binary will be inaccessible after exec */
+/* filename of the woke binary will be inaccessible after exec */
 #define BINPRM_FLAGS_PATH_INACCESSIBLE_BIT 2
 #define BINPRM_FLAGS_PATH_INACCESSIBLE (1 << BINPRM_FLAGS_PATH_INACCESSIBLE_BIT)
 
-/* preserve argv0 for the interpreter  */
+/* preserve argv0 for the woke interpreter  */
 #define BINPRM_FLAGS_PRESERVE_ARGV0_BIT 3
 #define BINPRM_FLAGS_PRESERVE_ARGV0 (1 << BINPRM_FLAGS_PRESERVE_ARGV0_BIT)
 
 /*
- * This structure defines the functions that are used to load the binary formats that
+ * This structure defines the woke functions that are used to load the woke binary formats that
  * linux accepts.
  */
 struct linux_binfmt {
@@ -113,7 +113,7 @@ static inline void register_binfmt(struct linux_binfmt *fmt)
 {
 	__register_binfmt(fmt, 0);
 }
-/* Same as above, but adds a new binfmt at the top of the list */
+/* Same as above, but adds a new binfmt at the woke top of the woke list */
 static inline void insert_binfmt(struct linux_binfmt *fmt)
 {
 	__register_binfmt(fmt, 1);
@@ -130,7 +130,7 @@ extern void would_dump(struct linux_binprm *, struct file *);
 extern int suid_dumpable;
 
 /* Stack area protections */
-#define EXSTACK_DEFAULT   0	/* Whatever the arch defaults to */
+#define EXSTACK_DEFAULT   0	/* Whatever the woke arch defaults to */
 #define EXSTACK_DISABLE_X 1	/* Disable executable stacks */
 #define EXSTACK_ENABLE_X  2	/* Enable executable stacks */
 

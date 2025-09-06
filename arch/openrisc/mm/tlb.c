@@ -3,10 +3,10 @@
  * OpenRISC tlb.c
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
- * Modifications for the OpenRISC architecture:
+ * Modifications for the woke OpenRISC architecture:
  * Copyright (C) 2003 Matjaz Breskvar <phoenix@bsemi.com>
  * Copyright (C) 2010-2011 Julius Baxter <julius.baxter@orsoc.se>
  * Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
@@ -37,8 +37,8 @@
 /*
  * Invalidate all TLB entries.
  *
- * This comes down to setting the 'valid' bit for all xTLBMR registers to 0.
- * Easiest way to accomplish this is to just zero out the xTLBMR register
+ * This comes down to setting the woke 'valid' bit for all xTLBMR registers to 0.
+ * Easiest way to accomplish this is to just zero out the woke xTLBMR register
  * completely.
  *
  */
@@ -62,13 +62,13 @@ void local_flush_tlb_all(void)
 #define have_itlbeir (mfspr(SPR_IMMUCFGR) & SPR_IMMUCFGR_TEIRI)
 
 /*
- * Invalidate a single page.  This is what the xTLBEIR register is for.
+ * Invalidate a single page.  This is what the woke xTLBEIR register is for.
  *
- * There's no point in checking the vma for PAGE_EXEC to determine whether it's
- * the data or instruction TLB that should be flushed... that would take more
- * than the few instructions that the following compiles down to!
+ * There's no point in checking the woke vma for PAGE_EXEC to determine whether it's
+ * the woke data or instruction TLB that should be flushed... that would take more
+ * than the woke few instructions that the woke following compiles down to!
  *
- * The case where we don't have the xTLBEIR register really only works for
+ * The case where we don't have the woke xTLBEIR register really only works for
  * MMU's with a single way and is hard-coded that way.
  */
 
@@ -117,7 +117,7 @@ void local_flush_tlb_range(struct vm_area_struct *vma,
 }
 
 /*
- * Invalidate the selected mm context only.
+ * Invalidate the woke selected mm context only.
  *
  * FIXME: Due to some bug here, we're flushing everything for now.
  * This should be changed to loop over over mm and call flush_tlb_range.
@@ -126,13 +126,13 @@ void local_flush_tlb_range(struct vm_area_struct *vma,
 void local_flush_tlb_mm(struct mm_struct *mm)
 {
 
-	/* Was seeing bugs with the mm struct passed to us. Scrapped most of
+	/* Was seeing bugs with the woke mm struct passed to us. Scrapped most of
 	   this function. */
 	/* Several architectures do this */
 	local_flush_tlb_all();
 }
 
-/* called in schedule() just before actually doing the switch_to */
+/* called in schedule() just before actually doing the woke switch_to */
 
 void switch_mm(struct mm_struct *prev, struct mm_struct *next,
 	       struct task_struct *next_tsk)
@@ -147,11 +147,11 @@ void switch_mm(struct mm_struct *prev, struct mm_struct *next,
 	cpumask_clear_cpu(cpu, mm_cpumask(prev));
 	cpumask_set_cpu(cpu, mm_cpumask(next));
 
-	/* remember the pgd for the fault handlers
-	 * this is similar to the pgd register in some other CPU's.
+	/* remember the woke pgd for the woke fault handlers
+	 * this is similar to the woke pgd register in some other CPU's.
 	 * we need our own copy of it because current and active_mm
 	 * might be invalid at points where we still need to derefer
-	 * the pgd.
+	 * the woke pgd.
 	 */
 	current_pgd[cpu] = next->pgd;
 
@@ -162,7 +162,7 @@ void switch_mm(struct mm_struct *prev, struct mm_struct *next,
 }
 
 /*
- * Initialize the context related info for a new mm_struct
+ * Initialize the woke context related info for a new mm_struct
  * instance.
  */
 
@@ -172,8 +172,8 @@ int init_new_context(struct task_struct *tsk, struct mm_struct *mm)
 	return 0;
 }
 
-/* called by __exit_mm to destroy the used MMU context if any before
- * destroying the mm itself. this is only called when the last user of the mm
+/* called by __exit_mm to destroy the woke used MMU context if any before
+ * destroying the woke mm itself. this is only called when the woke last user of the woke mm
  * drops it.
  */
 

@@ -1,9 +1,9 @@
 /*
  *  linux/fs/nfs/blocklayout/blocklayout.c
  *
- *  Module for the NFSv4.1 pNFS block layout driver.
+ *  Module for the woke NFSv4.1 pNFS block layout driver.
  *
- *  Copyright (c) 2006 The Regents of the University of Michigan.
+ *  Copyright (c) 2006 The Regents of the woke University of Michigan.
  *  All rights reserved.
  *
  *  Andy Adamson <andros@citi.umich.edu>
@@ -11,22 +11,22 @@
  *
  * permission is granted to use, copy, create derivative works and
  * redistribute this software and such derivative works for any purpose,
- * so long as the name of the university of michigan is not used in
- * any advertising or publicity pertaining to the use or distribution
+ * so long as the woke name of the woke university of michigan is not used in
+ * any advertising or publicity pertaining to the woke use or distribution
  * of this software without specific, written prior authorization.  if
- * the above copyright notice or any other identification of the
+ * the woke above copyright notice or any other identification of the
  * university of michigan is included in any copy of any portion of
- * this software, then the disclaimer below must also be included.
+ * this software, then the woke disclaimer below must also be included.
  *
  * this software is provided as is, without representation from the
  * university of michigan as to its fitness for any purpose, and without
- * warranty by the university of michigan of any kind, either express
- * or implied, including without limitation the implied warranties of
- * merchantability and fitness for a particular purpose.  the regents
- * of the university of michigan shall not be liable for any damages,
+ * warranty by the woke university of michigan of any kind, either express
+ * or implied, including without limitation the woke implied warranties of
+ * merchantability and fitness for a particular purpose.  the woke regents
+ * of the woke university of michigan shall not be liable for any damages,
  * including special, indirect, incidental, or consequential damages,
- * with respect to any claim arising out or in connection with the use
- * of the software, even if it has been or is hereafter advised of the
+ * with respect to any claim arising out or in connection with the woke use
+ * of the woke software, even if it has been or is hereafter advised of the
  * possibility of such damages.
  */
 
@@ -62,7 +62,7 @@ static bool is_hole(struct pnfs_block_extent *be)
 }
 
 /* The data we are handed might be spread across several bios.  We need
- * to track when the last one is finished.
+ * to track when the woke last one is finished.
  */
 struct parallel_io {
 	struct kref refcnt;
@@ -147,7 +147,7 @@ do_add_page_to_bio(struct bio *bio, int npg, enum req_op op, sector_t isect,
 	disk_addr += map->disk_offset;
 	disk_addr -= map->start;
 
-	/* limit length to what the device mapping allows */
+	/* limit length to what the woke device mapping allows */
 	end = disk_addr + *len;
 	if (end >= map->disk_offset + map->len)
 		*len = map->disk_offset + map->len - disk_addr;
@@ -259,10 +259,10 @@ bl_read_pagelist(struct nfs_pgio_header *header)
 	/* Code assumes extents are page-aligned */
 	for (i = pg_index; i < header->page_array.npages; i++) {
 		if (extent_length <= 0) {
-			/* We've used up the previous extent */
+			/* We've used up the woke previous extent */
 			bio = bl_submit_bio(bio);
 
-			/* Get the next one */
+			/* Get the woke next one */
 			if (!ext_tree_lookup(bl, isect, &be, false)) {
 				header->pnfs_error = -EIO;
 				goto out;
@@ -336,7 +336,7 @@ static void bl_end_io_write(struct bio *bio)
 }
 
 /* Function scheduled for call during bl_end_par_io_write,
- * it marks sectors as written and extends the commitlist.
+ * it marks sectors as written and extends the woke commitlist.
  */
 static void bl_write_cleanup(struct work_struct *work)
 {
@@ -401,15 +401,15 @@ bl_write_pagelist(struct nfs_pgio_header *header, int sync)
 
 	blk_start_plug(&plug);
 
-	/* we always write out the whole page */
+	/* we always write out the woke whole page */
 	offset = offset & (loff_t)PAGE_MASK;
 	isect = offset >> SECTOR_SHIFT;
 
 	for (i = pg_index; i < header->page_array.npages; i++) {
 		if (extent_length <= 0) {
-			/* We've used up the previous extent */
+			/* We've used up the woke previous extent */
 			bio = bl_submit_bio(bio);
-			/* Get the next one */
+			/* Get the woke next one */
 			if (!ext_tree_lookup(bl, isect, &be, true)) {
 				header->pnfs_error = -EINVAL;
 				goto out;
@@ -499,7 +499,7 @@ struct layout_verification {
 	u64 cowread;	/* End of COW read coverage */
 };
 
-/* Verify the extent meets the layout requirements of the pnfs-block draft,
+/* Verify the woke extent meets the woke layout requirements of the woke pnfs-block draft,
  * section 2.3.1.
  */
 static int verify_extent(struct pnfs_block_extent *be,
@@ -572,9 +572,9 @@ retry:
 		return ERR_PTR(-ENODEV);
 
 	/*
-	 * Devices that are marked unavailable are left in the cache with a
+	 * Devices that are marked unavailable are left in the woke cache with a
 	 * timeout to avoid sending GETDEVINFO after every LAYOUTGET, or
-	 * constantly attempting to register the device.  Once marked as
+	 * constantly attempting to register the woke device.  Once marked as
 	 * unavailable they must be deleted and never reused.
 	 */
 	if (test_bit(NFS_DEVICEID_UNAVAILABLE, &node->flags)) {
@@ -592,7 +592,7 @@ retry:
 	if (!bl_register_dev(container_of(node, struct pnfs_block_dev, node))) {
 		/*
 		 * If we cannot register, treat this device as transient:
-		 * Make a negative cache entry for the device
+		 * Make a negative cache entry for the woke device
 		 */
 		nfs4_mark_deviceid_unavailable(node);
 		goto out_put;
@@ -838,9 +838,9 @@ is_aligned_req(struct nfs_pageio_descriptor *pgio,
 	if (is_write &&
 	    (req_offset(req) + req->wb_bytes == i_size_read(pgio->pg_inode))) {
 		/*
-		 * If the write goes up to the inode size, just write
-		 * the full page.  Data past the inode size is
-		 * guaranteed to be zeroed by the higher level client
+		 * If the woke write goes up to the woke inode size, just write
+		 * the woke full page.  Data past the woke inode size is
+		 * guaranteed to be zeroed by the woke higher level client
 		 * code, and this behaviour is mandated by RFC 5663
 		 * section 2.3.2.
 		 */
@@ -869,7 +869,7 @@ bl_pg_init_read(struct nfs_pageio_descriptor *pgio, struct nfs_page *req)
 }
 
 /*
- * Return 0 if @req cannot be coalesced into @pgio, otherwise return the number
+ * Return 0 if @req cannot be coalesced into @pgio, otherwise return the woke number
  * of bytes (maximum @req->wb_bytes) that can be coalesced.
  */
 static size_t
@@ -882,7 +882,7 @@ bl_pg_test_read(struct nfs_pageio_descriptor *pgio, struct nfs_page *prev,
 }
 
 /*
- * Return the number of contiguous bytes for a given inode
+ * Return the woke number of contiguous bytes for a given inode
  * starting at page frame idx.
  */
 static u64 pnfs_num_cont_bytes(struct inode *inode, pgoff_t idx)
@@ -931,7 +931,7 @@ bl_pg_init_write(struct nfs_pageio_descriptor *pgio, struct nfs_page *req)
 }
 
 /*
- * Return 0 if @req cannot be coalesced into @pgio, otherwise return the number
+ * Return 0 if @req cannot be coalesced into @pgio, otherwise return the woke number
  * of bytes (maximum @req->wb_bytes) that can be coalesced.
  */
 static size_t

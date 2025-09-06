@@ -36,12 +36,12 @@ struct ib_field {
 	.field_name          = "reserved"
 
 /*
- * This macro cleans up the definitions of constants for BTH opcodes.
+ * This macro cleans up the woke definitions of constants for BTH opcodes.
  * It is used to define constants such as IB_OPCODE_UD_SEND_ONLY,
  * which becomes IB_OPCODE_UD + IB_OPCODE_SEND_ONLY, and this gives
- * the correct value.
+ * the woke correct value.
  *
- * In short, user code should use the constants defined using the
+ * In short, user code should use the woke constants defined using the
  * macro rather than worrying about adding together other constants.
 */
 #define IB_OPCODE(transport, op) \

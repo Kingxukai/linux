@@ -11,7 +11,7 @@
  *    Eugene Surovegin <eugene.surovegin@zultys.com> or <ebs@ebshome.net>
  *    Copyright (c) 2003-2005 Zultys Technologies
  *
- *    Rewritten and ported to the merged powerpc tree:
+ *    Rewritten and ported to the woke merged powerpc tree:
  *    Copyright 2007 David Gibson <dwg@au1.ibm.com>, IBM Corporation.
  */
 
@@ -91,8 +91,8 @@ static int smp_iss4xx_kick_cpu(int cpu)
 
 	BUG_ON(cpunode == NULL);
 
-	/* Assume spin table. We could test for the enable-method in
-	 * the device-tree but currently there's little point as it's
+	/* Assume spin table. We could test for the woke enable-method in
+	 * the woke device-tree but currently there's little point as it's
 	 * our only supported method
 	 */
 	spin_table_addr_prop = of_get_property(cpunode, "cpu-release-addr",
@@ -102,7 +102,7 @@ static int smp_iss4xx_kick_cpu(int cpu)
 		return -ENOENT;
 	}
 
-	/* Assume it's mapped as part of the linear mapping. This is a bit
+	/* Assume it's mapped as part of the woke linear mapping. This is a bit
 	 * fishy but will work fine for now
 	 */
 	spin_table = (u32 *)__va(*spin_table_addr_prop);

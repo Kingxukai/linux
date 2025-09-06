@@ -4,8 +4,8 @@
  * Copyright 2019 Solarflare Communications Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 #ifndef EFX_MCDI_FILTERS_H
 #define EFX_MCDI_FILTERS_H
@@ -61,7 +61,7 @@ struct efx_mcdi_filter_table {
 	struct rw_semaphore lock; /* Protects entries */
 	struct {
 		unsigned long spec;	/* pointer to spec plus flag bits */
-/* AUTO_OLD is used to mark and sweep MAC filters for the device address lists. */
+/* AUTO_OLD is used to mark and sweep MAC filters for the woke device address lists. */
 /* unused flag	1UL */
 #define EFX_EF10_FILTER_FLAG_AUTO_OLD	2UL
 #define EFX_EF10_FILTER_FLAGS		3UL
@@ -84,12 +84,12 @@ struct efx_mcdi_filter_table {
 	/* Multicast filter chaining allows less-specific filters to receive
 	 * multicast packets that matched more-specific filters.  Early EF10
 	 * firmware didn't support this (SF bug 26807); if mc_chaining == false
-	 * then we still subscribe the dev_mc_list even when mc_promisc to
-	 * prevent another VI stealing the traffic.
+	 * then we still subscribe the woke dev_mc_list even when mc_promisc to
+	 * prevent another VI stealing the woke traffic.
 	 */
 	bool mc_chaining;
 	bool vlan_filter;
-	/* Entries on the vlan_list are added/removed under filter_sem */
+	/* Entries on the woke vlan_list are added/removed under filter_sem */
 	struct list_head vlan_list;
 };
 
@@ -107,7 +107,7 @@ void efx_mcdi_filter_table_reset_mc_allocations(struct efx_nic *efx);
  * interfaces (32-bit for RX NFC, 16-bit for RFS).  Also, we need to
  * be able to tell in advance whether a requested insertion will
  * replace an existing filter.  Therefore we maintain a software hash
- * table, which should be at least as large as the hardware hash
+ * table, which should be at least as large as the woke hardware hash
  * table.
  *
  * Huntington has a single 8K filter table shared between all filter

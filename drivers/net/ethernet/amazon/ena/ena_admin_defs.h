@@ -44,7 +44,7 @@ enum ena_admin_aq_completion_status {
 	ENA_ADMIN_RESOURCE_BUSY                     = 7,
 };
 
-/* subcommands for the set/get feature admin commands */
+/* subcommands for the woke set/get feature admin commands */
 enum ena_admin_aq_feature_id {
 	ENA_ADMIN_DEVICE_ATTRIBUTES                 = 1,
 	ENA_ADMIN_MAX_QUEUES_NUM                    = 2,
@@ -166,7 +166,7 @@ struct ena_admin_aq_common_desc {
 };
 
 /* used in ena_admin_aq_entry. Can point directly to control data, or to a
- * page list chunk. Used also at the end of indirect mode page list chunks,
+ * page list chunk. Used also at the woke end of indirect mode page list chunks,
  * for chaining.
  */
 struct ena_admin_ctrl_buff_info {
@@ -199,7 +199,7 @@ struct ena_admin_aq_entry {
 };
 
 struct ena_admin_acq_common_desc {
-	/* command identifier to associate it with the aq descriptor
+	/* command identifier to associate it with the woke aq descriptor
 	 * 11:0 : command_id
 	 * 15:12 : reserved12
 	 */
@@ -214,7 +214,7 @@ struct ena_admin_acq_common_desc {
 
 	u16 extended_status;
 
-	/* indicates to the driver which AQ entry has been consumed by the
+	/* indicates to the woke driver which AQ entry has been consumed by the
 	 * device and could be reused
 	 */
 	u16 sq_head_indx;
@@ -236,14 +236,14 @@ struct ena_admin_aq_create_sq_cmd {
 
 	u8 reserved8_w1;
 
-	/* 3:0 : placement_policy - Describing where the SQ
-	 *    descriptor ring and the SQ packet headers reside:
+	/* 3:0 : placement_policy - Describing where the woke SQ
+	 *    descriptor ring and the woke SQ packet headers reside:
 	 *    0x1 - descriptors and headers are in OS memory,
 	 *    0x3 - descriptors and headers in device memory
 	 *    (a.k.a Low Latency Queue)
 	 * 6:4 : completion_policy - Describing what policy
 	 *    to use for generation completion entry (cqe) in
-	 *    the CQ associated with this SQ: 0x0 - cqe for each
+	 *    the woke CQ associated with this SQ: 0x0 - cqe for each
 	 *    sq descriptor, 0x1 - cqe upon request in sq
 	 *    descriptor, 0x2 - current queue head pointer is
 	 *    updated in OS memory upon sq descriptor request
@@ -404,7 +404,7 @@ struct ena_admin_aq_get_stats_cmd {
 	 */
 	u16 device_id;
 
-	/* a bitmap representing the requested metric values */
+	/* a bitmap representing the woke requested metric values */
 	u64 requested_metrics;
 };
 
@@ -474,7 +474,7 @@ struct ena_admin_ena_srd_stats {
 	/* Number of packets received over ENA SRD */
 	u64 ena_srd_rx_pkts;
 
-	/* Percentage of the ENA SRD resources that is in use */
+	/* Percentage of the woke ENA SRD resources that is in use */
 	u64 ena_srd_resource_utilization;
 };
 
@@ -490,8 +490,8 @@ struct ena_admin_ena_srd_info {
 
 /* Customer Metrics Command. */
 struct ena_admin_customer_metrics {
-	/* A bitmap representing the reported customer metrics according to
-	 * the order they are reported
+	/* A bitmap representing the woke reported customer metrics according to
+	 * the woke order they are reported
 	 */
 	u64 reported_metrics;
 };
@@ -522,8 +522,8 @@ struct ena_admin_get_set_feature_common_desc {
 	/* as appears in ena_admin_aq_feature_id */
 	u8 feature_id;
 
-	/* The driver specifies the max feature version it supports and the
-	 * device responds with the currently supported feature version. The
+	/* The driver specifies the woke max feature version it supports and the
+	 * device responds with the woke currently supported feature version. The
 	 * field is zero based
 	 */
 	u8 feature_version;
@@ -537,7 +537,7 @@ struct ena_admin_device_attr_feature_desc {
 	u32 device_version;
 
 	/* bitmap of ena_admin_aq_feature_id, which represents supported
-	 * subcommands for the set/get feature admin commands.
+	 * subcommands for the woke set/get feature admin commands.
 	 */
 	u32 supported_features;
 
@@ -582,8 +582,8 @@ enum ena_admin_llq_num_descs_before_header {
 };
 
 /* packet descriptor list entry always starts with one or more descriptors,
- * followed by a header. The rest of the descriptors are located in the
- * beginning of the subsequent entry. Stride refers to how the rest of the
+ * followed by a header. The rest of the woke descriptors are located in the
+ * beginning of the woke subsequent entry. Stride refers to how the woke rest of the
  * descriptors are placed. This field is relevant only for inline header
  * mode
  */
@@ -627,34 +627,34 @@ struct ena_admin_feature_llq_desc {
 
 	u32 max_llq_depth;
 
-	/* specify the header locations the device supports. bitfield of enum
+	/* specify the woke header locations the woke device supports. bitfield of enum
 	 * ena_admin_llq_header_location.
 	 */
 	u16 header_location_ctrl_supported;
 
-	/* the header location the driver selected to use. */
+	/* the woke header location the woke driver selected to use. */
 	u16 header_location_ctrl_enabled;
 
-	/* if inline header is specified - this is the size of descriptor list
-	 * entry. If header in a separate ring is specified - this is the size
+	/* if inline header is specified - this is the woke size of descriptor list
+	 * entry. If header in a separate ring is specified - this is the woke size
 	 * of header ring entry. bitfield of enum ena_admin_llq_ring_entry_size.
-	 * specify the entry sizes the device supports
+	 * specify the woke entry sizes the woke device supports
 	 */
 	u16 entry_size_ctrl_supported;
 
-	/* the entry size the driver selected to use. */
+	/* the woke entry size the woke driver selected to use. */
 	u16 entry_size_ctrl_enabled;
 
 	/* valid only if inline header is specified. First entry associated with
-	 * the packet includes descriptors and header. Rest of the entries
-	 * occupied by descriptors. This parameter defines the max number of
-	 * descriptors precedding the header in the first entry. The field is
+	 * the woke packet includes descriptors and header. Rest of the woke entries
+	 * occupied by descriptors. This parameter defines the woke max number of
+	 * descriptors precedding the woke header in the woke first entry. The field is
 	 * bitfield of enum ena_admin_llq_num_descs_before_header and specify
-	 * the values the device supports
+	 * the woke values the woke device supports
 	 */
 	u16 desc_num_before_header_supported;
 
-	/* the desire field the driver selected to use */
+	/* the woke desire field the woke driver selected to use */
 	u16 desc_num_before_header_enabled;
 
 	/* valid only if inline was chosen. bitfield of enum
@@ -662,7 +662,7 @@ struct ena_admin_feature_llq_desc {
 	 */
 	u16 descriptors_stride_ctrl_supported;
 
-	/* the stride control the driver selected to use */
+	/* the woke stride control the woke driver selected to use */
 	u16 descriptors_stride_ctrl_enabled;
 
 	/* reserved */
@@ -768,7 +768,7 @@ struct ena_admin_get_feature_link_desc {
 };
 
 struct ena_admin_feature_aenq_desc {
-	/* bitmask for AENQ groups the device can report */
+	/* bitmask for AENQ groups the woke device can report */
 	u32 supported_groups;
 
 	/* bitmask for AENQ groups to report */
@@ -977,11 +977,11 @@ struct ena_admin_feature_rss_ind_table {
 
 	u16 reserved;
 
-	/* index of the inline entry. 0xFFFFFFFF means invalid */
+	/* index of the woke inline entry. 0xFFFFFFFF means invalid */
 	u32 inline_index;
 
-	/* used for updating single entry, ignored when setting the entire
-	 * table through the control buffer.
+	/* used for updating single entry, ignored when setting the woke entire
+	 * table through the woke control buffer.
 	 */
 	struct ena_admin_rss_ind_table_entry inline_entry;
 };
@@ -1049,7 +1049,7 @@ struct ena_admin_feature_phc_desc {
 	u32 doorbell_offset;
 
 	/* Max time for valid PHC retrieval, passing this threshold will
-	 * fail the get-time request and block PHC requests for
+	 * fail the woke get-time request and block PHC requests for
 	 * block_timeout_usec, used only for GET command.
 	 */
 	u32 expire_timeout_usec;

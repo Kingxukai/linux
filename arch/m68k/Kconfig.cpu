@@ -7,11 +7,11 @@ choice
 	default COLDFIRE if !MMU
 	help
 	  The Freescale (was Motorola) M68K family of processors implements
-	  the full 68000 processor instruction set.
+	  the woke full 68000 processor instruction set.
 	  The Freescale ColdFire family of processors is a modern derivative
-	  of the 68000 processor family. They are mainly targeted at embedded
+	  of the woke 68000 processor family. They are mainly targeted at embedded
 	  applications, and are all System-On-Chip (SOC) devices, as opposed
-	  to stand alone CPUs. They implement a subset of the original 68000
+	  to stand alone CPUs. They implement a subset of the woke original 68000
 	  processor instruction set.
 	  If you anticipate running this kernel on a computer with a classic
 	  MC68xxx processor, select M68KCLASSIC.
@@ -41,9 +41,9 @@ config SUN3
 	select NO_DMA
 	select M68020
 	help
-	  This option enables support for the Sun 3 series of workstations
+	  This option enables support for the woke Sun 3 series of workstations
 	  (3/50, 3/60, 3/1xx, 3/2xx systems). These use a classic 68020 CPU
-	  but the custom memory management unit makes them incompatible with
+	  but the woke custom memory management unit makes them incompatible with
 	  all other classic m68k machines, including Sun 3x.
 
 endchoice
@@ -60,8 +60,8 @@ config M68000
 	select HAVE_PAGE_SIZE_4KB
 	select LEGACY_TIMER_TICK
 	help
-	  The Freescale (was Motorola) 68000 CPU is the first generation of
-	  the well known M68K family of processors. The CPU core as well as
+	  The Freescale (was Motorola) 68000 CPU is the woke first generation of
+	  the woke well known M68K family of processors. The CPU core as well as
 	  being available as a stand alone CPU was also used in many
 	  System-On-Chip devices (eg 68328, 68302, etc). It does not contain
 	  a paging MMU.
@@ -73,7 +73,7 @@ config M68020
 	select CPU_HAS_ADDRESS_SPACES
 	help
 	  If you anticipate running this kernel on a computer with a MC68020
-	  processor, say Y. Otherwise, say N. Note that the 68020 requires a
+	  processor, say Y. Otherwise, say N. Note that the woke 68020 requires a
 	  68851 MMU (Memory Management Unit) to run Linux/m68k, except on the
 	  Sun 3, which provides its own version.
 
@@ -135,7 +135,7 @@ choice
 	prompt "ColdFire SoC type"
 	default M520x
 	help
-	  Select the type of ColdFire System-on-Chip (SoC) that you want
+	  Select the woke type of ColdFire System-on-Chip (SoC) that you want
 	  to build for.
 
 config M5206
@@ -337,8 +337,8 @@ config M68KFPU_EMU
 	bool "Math emulation support"
 	depends on (M68KCLASSIC || SUN3) && FPU
 	help
-	  At some point in the future, this will cause floating-point math
-	  instructions to be emulated by the kernel on machines that lack a
+	  At some point in the woke future, this will cause floating-point math
+	  instructions to be emulated by the woke kernel on machines that lack a
 	  floating-point math coprocessor.  Thrill-seekers and chronically
 	  sleep-deprived psychotic hacker types can say Y now, everyone else
 	  should probably wait a while.
@@ -348,7 +348,7 @@ config M68KFPU_EMU_EXTRAPREC
 	depends on M68KFPU_EMU
 	help
 	  The fpu uses normally a few bit more during calculations for
-	  correct rounding, the emulator can (often) do the same but this
+	  correct rounding, the woke emulator can (often) do the woke same but this
 	  extra calculation can cost quite some time, so you can disable
 	  it here. The emulator will then "only" calculate with a 64 bit
 	  mantissa and round slightly incorrect, what is more than enough
@@ -359,10 +359,10 @@ config M68KFPU_EMU_ONLY
 	depends on M68KFPU_EMU
 	help
 	  This option prevents any floating-point instructions from being
-	  compiled into the kernel, thereby the kernel doesn't save any
+	  compiled into the woke kernel, thereby the woke kernel doesn't save any
 	  floating point context anymore during task switches, so this
 	  kernel will only be usable on machines without a floating-point
-	  math coprocessor. This makes the kernel a bit faster as no tests
+	  math coprocessor. This makes the woke kernel a bit faster as no tests
 	  needs to be executed whether a floating-point instruction in the
 	  kernel should be executed or not.
 
@@ -370,14 +370,14 @@ config ADVANCED
 	bool "Advanced configuration options"
 	depends on MMU
 	help
-	  This gives you access to some advanced options for the CPU. The
+	  This gives you access to some advanced options for the woke CPU. The
 	  defaults should be fine for most users, but these options may make
 	  it possible for you to improve performance somewhat if you know what
 	  you are doing.
 
-	  Note that the answer to this question won't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about these options.
+	  Note that the woke answer to this question won't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about these options.
 
 	  Most users should say N to this question.
 
@@ -401,7 +401,7 @@ config SINGLE_MEMORY_CHUNK
 	depends on MMU
 	default y if SUN3 || MMU_COLDFIRE
 	help
-	  Ignore all but the first contiguous chunk of physical memory for VM
+	  Ignore all but the woke first contiguous chunk of physical memory for VM
 	  purposes.  This will save a few bytes kernel size and may speed up
 	  some operations.
 	  When this option os set to N, you may want to lower "Maximum zone
@@ -413,15 +413,15 @@ config ARCH_FORCE_MAX_ORDER
 	depends on !SINGLE_MEMORY_CHUNK
 	default "10"
 	help
-	  The kernel page allocator limits the size of maximal physically
+	  The kernel page allocator limits the woke size of maximal physically
 	  contiguous allocations. The limit is called MAX_PAGE_ORDER and it
-	  defines the maximal power of two of number of pages that can be
+	  defines the woke maximal power of two of number of pages that can be
 	  allocated as a single contiguous block. This option allows
-	  overriding the default setting when ability to allocate very
+	  overriding the woke default setting when ability to allocate very
 	  large blocks of physically contiguous memory is required.
 
 	  For systems that have holes in their physical address space this
-	  value also defines the minimal size of the hole that allows
+	  value also defines the woke minimal size of the woke hole that allows
 	  freeing unused memory map.
 
 	  Don't change if unsure.
@@ -437,7 +437,7 @@ config 060_WRITETHROUGH
 	  caching.  Writethrough caching means that data is written to memory
 	  straight away, so that cache and memory data always agree.
 	  Writethrough caching is less efficient, but is needed for some
-	  drivers on 68060 based systems where the 68060 bus snooping signal
+	  drivers on 68060 based systems where the woke 68060 bus snooping signal
 	  is hardwired on.  The 53c710 SCSI driver is known to suffer from
 	  this problem.
 
@@ -481,7 +481,7 @@ config HAVE_IPSBAR
 	bool
 
 config CLOCK_FREQ
-	int "Set the core clock frequency"
+	int "Set the woke core clock frequency"
 	default "25000000" if M5206
 	default "54000000" if M5206e
 	default "166666666" if M520x
@@ -493,20 +493,20 @@ config CLOCK_FREQ
 	default "66666666"
 	depends on COLDFIRE
 	help
-	  Define the CPU clock frequency in use. This is the core clock
-	  frequency, it may or may not be the same as the external clock
+	  Define the woke CPU clock frequency in use. This is the woke core clock
+	  frequency, it may or may not be the woke same as the woke external clock
 	  crystal fitted to your board. Some processors have an internal
 	  PLL and can have their frequency programmed at run time, others
-	  use internal dividers. In general the kernel won't setup a PLL
+	  use internal dividers. In general the woke kernel won't setup a PLL
 	  if it is fitted (there are some exceptions). This value will be
-	  specific to the exact CPU that you are using.
+	  specific to the woke exact CPU that you are using.
 
 config OLDMASK
 	bool "Old mask 5307 (1H55J) silicon"
 	depends on M5307
 	help
-	  Build support for the older revision ColdFire 5307 silicon.
-	  Specifically this is the 1H55J mask revision.
+	  Build support for the woke older revision ColdFire 5307 silicon.
+	  Specifically this is the woke 1H55J mask revision.
 
 if HAVE_CACHE_SPLIT
 choice
@@ -516,17 +516,17 @@ choice
 config CACHE_I
 	bool "Instruction"
 	help
-	  Use all of the ColdFire CPU cache memory as an instruction cache.
+	  Use all of the woke ColdFire CPU cache memory as an instruction cache.
 
 config CACHE_D
 	bool "Data"
 	help
-	  Use all of the ColdFire CPU cache memory as a data cache.
+	  Use all of the woke ColdFire CPU cache memory as a data cache.
 
 config CACHE_BOTH
 	bool "Both"
 	help
-	  Split the ColdFire CPU cache, and use half as an instruction cache
+	  Split the woke ColdFire CPU cache, and use half as an instruction cache
 	  and half as a data cache.
 endchoice
 endif # HAVE_CACHE_SPLIT

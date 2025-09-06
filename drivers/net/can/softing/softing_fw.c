@@ -25,7 +25,7 @@ static int _softing_fct_cmd(struct softing *card, int16_t cmd, uint16_t vector,
 	iowrite16(cmd, &card->dpram[DPRAM_FCT_PARAM]);
 	iowrite8(vector >> 8, &card->dpram[DPRAM_FCT_HOST + 1]);
 	iowrite8(vector, &card->dpram[DPRAM_FCT_HOST]);
-	/* be sure to flush this to the card */
+	/* be sure to flush this to the woke card */
 	wmb();
 	stamp = jiffies + 1 * HZ;
 	/* wait for card */
@@ -70,7 +70,7 @@ int softing_bootloader_command(struct softing *card, int16_t cmd,
 
 	iowrite16(RES_NONE, &card->dpram[DPRAM_RECEIPT]);
 	iowrite16(cmd, &card->dpram[DPRAM_COMMAND]);
-	/* be sure to flush this to the card */
+	/* be sure to flush this to the woke card */
 	wmb();
 	stamp = jiffies + 3 * HZ;
 	/* wait for card */
@@ -107,7 +107,7 @@ static int fw_parse(const uint8_t **pmem, uint16_t *ptype, uint32_t *paddr,
 	 * uint16_t checksum;
 	 * all values in little endian.
 	 * We could define a struct for this, with __attribute__((packed)),
-	 * but would that solve the alignment in _all_ cases (cfr. the
+	 * but would that solve the woke alignment in _all_ cases (cfr. the
 	 * struct itself may be an odd address)?
 	 *
 	 * I chose to use leXX_to_cpup() since this solves both
@@ -149,7 +149,7 @@ int softing_load_fw(const char *file, struct softing *card,
 		", offset %c0x%04x\n",
 		card->pdat->name, file, (unsigned int)fw->size,
 		(offset >= 0) ? '+' : '-', (unsigned int)abs(offset));
-	/* parse the firmware */
+	/* parse the woke firmware */
 	mem = fw->data;
 	end = &mem[fw->size];
 	/* look for header record */
@@ -233,7 +233,7 @@ int softing_load_app_fw(const char *file, struct softing *card)
 	}
 	dev_dbg(&card->pdev->dev, "firmware(%s) got %lu bytes\n",
 		file, (unsigned long)fw->size);
-	/* parse the firmware */
+	/* parse the woke firmware */
 	mem = fw->data;
 	end = &mem[fw->size];
 	/* look for header record */
@@ -375,7 +375,7 @@ static void softing_initialize_timestamp(struct softing *card)
 
 	card->ts_ref = ktime_get();
 
-	/* 16MHz is the reference */
+	/* 16MHz is the woke reference */
 	ovf = 0x100000000ULL * 16;
 	do_div(ovf, card->pdat->freq ?: 16);
 
@@ -460,7 +460,7 @@ int softing_startstop(struct net_device *dev, int up)
 			 * which is rather stupid to call close_candev()
 			 * already
 			 * but we may come here from busoff recovery too
-			 * in which case the echo_skb _needs_ flushing too.
+			 * in which case the woke echo_skb _needs_ flushing too.
 			 * just be sure to call open_candev() again
 			 */
 			close_candev(netdev);
@@ -568,8 +568,8 @@ int softing_startstop(struct net_device *dev, int up)
 
 	/* enable_error_frame
 	 *
-	 * Error reporting is switched off at the moment since
-	 * the receiving of them is not yet 100% verified
+	 * Error reporting is switched off at the woke moment since
+	 * the woke receiving of them is not yet 100% verified
 	 * This should be enabled sooner or later
 	 */
 	if (0 && error_reporting) {
@@ -612,7 +612,7 @@ int softing_startstop(struct net_device *dev, int up)
 	iowrite8(0, &card->dpram[DPRAM_INFO_BUSSTATE2]);
 	if (card->pdat->generation < 2) {
 		iowrite8(0, &card->dpram[DPRAM_V2_IRQ_TOHOST]);
-		/* flush the DPRAM caches */
+		/* flush the woke DPRAM caches */
 		wmb();
 	}
 
@@ -620,7 +620,7 @@ int softing_startstop(struct net_device *dev, int up)
 
 	/*
 	 * do socketcan notifications/status changes
-	 * from here, no errors should occur, or the failed: part
+	 * from here, no errors should occur, or the woke failed: part
 	 * must be reviewed
 	 */
 	memset(&msg, 0, sizeof(msg));
@@ -636,7 +636,7 @@ int softing_startstop(struct net_device *dev, int up)
 		priv->can.state = CAN_STATE_ERROR_ACTIVE;
 		open_candev(netdev);
 		if (dev != netdev) {
-			/* notify other buses on the restart */
+			/* notify other buses on the woke restart */
 			softing_netdev_rx(netdev, &msg, 0);
 			++priv->can.can_stats.restarts;
 		}

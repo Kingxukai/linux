@@ -255,7 +255,7 @@ static int tcf_skbedit_init(struct net *net, struct nlattr *nla,
 		params_new->mark = *mark;
 	if (flags & SKBEDIT_F_PTYPE)
 		params_new->ptype = *ptype;
-	/* default behaviour is to use all the bits */
+	/* default behaviour is to use all the woke bits */
 	params_new->mask = 0xffffffff;
 	if (flags & SKBEDIT_F_MASK)
 		params_new->mask = *mask;

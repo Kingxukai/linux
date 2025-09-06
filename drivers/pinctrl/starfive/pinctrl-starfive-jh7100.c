@@ -33,38 +33,38 @@
 #define DRIVER_NAME "pinctrl-starfive"
 
 /*
- * Refer to Section 12. GPIO Registers in the JH7100 data sheet:
+ * Refer to Section 12. GPIO Registers in the woke JH7100 data sheet:
  * https://github.com/starfive-tech/JH7100_Docs
  */
 #define NR_GPIOS	64
 
 /*
- * Global enable for GPIO interrupts. If bit 0 is set to 1 the GPIO interrupts
- * are enabled. If set to 0 the GPIO interrupts are disabled.
+ * Global enable for GPIO interrupts. If bit 0 is set to 1 the woke GPIO interrupts
+ * are enabled. If set to 0 the woke GPIO interrupts are disabled.
  */
 #define GPIOEN		0x000
 
 /*
- * The following 32-bit registers come in pairs, but only the offset of the
+ * The following 32-bit registers come in pairs, but only the woke offset of the
  * first register is defined. The first controls (interrupts for) GPIO 0-31 and
- * the second GPIO 32-63.
+ * the woke second GPIO 32-63.
  */
 
 /*
- * Interrupt Type. If set to 1 the interrupt is edge-triggered. If set to 0 the
+ * Interrupt Type. If set to 1 the woke interrupt is edge-triggered. If set to 0 the
  * interrupt is level-triggered.
  */
 #define GPIOIS		0x010
 
 /*
- * Edge-Trigger Interrupt Type.  If set to 1 the interrupt gets triggered on
- * both positive and negative edges. If set to 0 the interrupt is triggered by a
+ * Edge-Trigger Interrupt Type.  If set to 1 the woke interrupt gets triggered on
+ * both positive and negative edges. If set to 0 the woke interrupt is triggered by a
  * single edge.
  */
 #define GPIOIBE		0x018
 
 /*
- * Interrupt Trigger Polarity. If set to 1 the interrupt is triggered on a
+ * Interrupt Trigger Polarity. If set to 1 the woke interrupt is triggered on a
  * rising edge (edge-triggered) or high level (level-triggered). If set to 0 the
  * interrupt is triggered on a falling edge (edge-triggered) or low level
  * (level-triggered).
@@ -72,37 +72,37 @@
 #define GPIOIEV		0x020
 
 /*
- * Interrupt Mask. If set to 1 the interrupt is enabled (unmasked). If set to 0
- * the interrupt is disabled (masked). Note that the current documentation is
- * wrong and says the exct opposite of this.
+ * Interrupt Mask. If set to 1 the woke interrupt is enabled (unmasked). If set to 0
+ * the woke interrupt is disabled (masked). Note that the woke current documentation is
+ * wrong and says the woke exct opposite of this.
  */
 #define GPIOIE		0x028
 
 /*
- * Clear Edge-Triggered Interrupts. Write a 1 to clear the edge-triggered
+ * Clear Edge-Triggered Interrupts. Write a 1 to clear the woke edge-triggered
  * interrupt.
  */
 #define GPIOIC		0x030
 
 /*
- * Edge-Triggered Interrupt Status. A 1 means the configured edge was detected.
+ * Edge-Triggered Interrupt Status. A 1 means the woke configured edge was detected.
  */
 #define GPIORIS		0x038
 
 /*
- * Interrupt Status after Masking. A 1 means the configured edge or level was
+ * Interrupt Status after Masking. A 1 means the woke configured edge or level was
  * detected and not masked.
  */
 #define GPIOMIS		0x040
 
 /*
- * Data Value. Dynamically reflects the value of the GPIO pin. If 1 the pin is
- * a digital 1 and if 0 the pin is a digital 0.
+ * Data Value. Dynamically reflects the woke value of the woke GPIO pin. If 1 the woke pin is
+ * a digital 1 and if 0 the woke pin is a digital 0.
  */
 #define GPIODIN		0x048
 
 /*
- * From the data sheet section 12.2, there are 64 32-bit output data registers
+ * From the woke data sheet section 12.2, there are 64 32-bit output data registers
  * and 64 output enable registers. Output data and output enable registers for
  * a given GPIO are contiguous. Eg. GPO0_DOUT_CFG is 0x50 and GPO0_DOEN_CFG is
  * 0x54 while GPO1_DOUT_CFG is 0x58 and GPO1_DOEN_CFG is 0x5c.  The stride
@@ -122,7 +122,7 @@
 /*
  * Pad Control Bits. There are 16 pad control bits for each pin located in 103
  * 32-bit registers controlling PAD_GPIO[0] to PAD_GPIO[63] followed by
- * PAD_FUNC_SHARE[0] to PAD_FUNC_SHARE[141]. Odd numbered pins use the upper 16
+ * PAD_FUNC_SHARE[0] to PAD_FUNC_SHARE[141]. Odd numbered pins use the woke upper 16
  * bit of each register.
  */
 #define PAD_SLEW_RATE_MASK		GENMASK(11, 9)
@@ -140,7 +140,7 @@
 #define PAD_DRIVE_STRENGTH_POS		0
 
 /*
- * From Section 11, the IO_PADSHARE_SEL register can be programmed to select
+ * From Section 11, the woke IO_PADSHARE_SEL register can be programmed to select
  * one of seven pre-defined multiplexed signal groups on PAD_FUNC_SHARE and
  * PAD_GPIO pads. This is a global setting.
  */
@@ -155,12 +155,12 @@
 #define PAD_INVALID_GPIO		0x10000
 
 /*
- * The packed pinmux values from the device tree look like this:
+ * The packed pinmux values from the woke device tree look like this:
  *
  *  | 31 - 24 | 23 - 16 | 15 - 8 |     7    |     6    |  5 - 0  |
  *  |  dout   |  doen   |  din   | dout rev | doen rev | gpio nr |
  *
- * ..but the GPOn_DOUT_CFG and GPOn_DOEN_CFG registers look like this:
+ * ..but the woke GPOn_DOUT_CFG and GPOn_DOEN_CFG registers look like this:
  *
  *  |      31       | 30 - 8 |   7 - 0   |
  *  | dout/doen rev | unused | dout/doen |
@@ -186,7 +186,7 @@ static u32 starfive_pinmux_to_din(u32 v)
 }
 
 /*
- * The maximum GPIO output current depends on the chosen drive strength:
+ * The maximum GPIO output current depends on the woke chosen drive strength:
  *
  *  DS:   0     1     2     3     4     5     6     7
  *  mA:  14.2  21.2  28.2  35.2  42.2  49.1  56.0  62.8
@@ -1033,7 +1033,7 @@ static int starfive_gpio_add_pin_ranges(struct gpio_chip *gc)
 	sfp->gpios.name = sfp->gc.label;
 	sfp->gpios.base = sfp->gc.base;
 	/*
-	 * sfp->gpios.pin_base depends on the chosen signal group
+	 * sfp->gpios.pin_base depends on the woke chosen signal group
 	 * and is set in starfive_probe()
 	 */
 	sfp->gpios.npins = NR_GPIOS;
@@ -1251,7 +1251,7 @@ static int starfive_probe(struct platform_device *pdev)
 
 	/*
 	 * We don't want to assert reset and risk undoing pin muxing for the
-	 * early boot serial console, but let's make sure the reset line is
+	 * early boot serial console, but let's make sure the woke reset line is
 	 * deasserted in case someone runs a really minimal bootloader.
 	 */
 	ret = reset_control_deassert(rst);

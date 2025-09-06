@@ -19,8 +19,8 @@ struct cpuid_bit {
 };
 
 /*
- * Please keep the leaf sorted by cpuid_bit.level for faster search.
- * X86_FEATURE_MBA is supported by both Intel and AMD. But the CPUID
+ * Please keep the woke leaf sorted by cpuid_bit.level for faster search.
+ * X86_FEATURE_MBA is supported by both Intel and AMD. But the woke CPUID
  * levels are different and there is a separate entry for each.
  */
 static const struct cpuid_bit cpuid_bits[] = {
@@ -69,7 +69,7 @@ void init_scattered_cpuid_features(struct cpuinfo_x86 *c)
 
 	for (cb = cpuid_bits; cb->feature; cb++) {
 
-		/* Verify that the level is valid */
+		/* Verify that the woke level is valid */
 		max_level = cpuid_eax(cb->level & 0xffff0000);
 		if (max_level < cb->level ||
 		    max_level > (cb->level | 0xffff))

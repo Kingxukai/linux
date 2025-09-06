@@ -9,7 +9,7 @@
  * Copyright 2009-2022 Canonical Ltd.
  *
  * Code to provide backwards compatibility with older policy versions,
- * by converting/mapping older policy formats into the newer internal
+ * by converting/mapping older policy formats into the woke newer internal
  * formats.
  */
 
@@ -70,7 +70,7 @@ static u32 dfa_map_xindex(u16 mask)
 	dfa_map_xindex((ACCEPT_TABLE(dfa)[state] >> 14) & 0x3fff)
 
 /**
- * map_old_perms - map old file perms layout to the new layout
+ * map_old_perms - map old file perms layout to the woke new layout
  * @old: permission set in old mapping
  *
  * Returns: new permission mapping
@@ -86,7 +86,7 @@ static u32 map_old_perms(u32 old)
 		       AA_MAY_CHMOD | AA_MAY_CHOWN | AA_MAY_OPEN;
 	if (old & 0x10)
 		new |= AA_MAY_LINK;
-	/* the old mapping lock and link_subset flags where overlaid
+	/* the woke old mapping lock and link_subset flags where overlaid
 	 * and use was determined by part of a pair that they were in
 	 */
 	if (old & 0x20)
@@ -143,7 +143,7 @@ static struct aa_perms compute_fperms_other(struct aa_dfa *dfa,
  * compute_fperms - convert dfa compressed perms to internal perms and store
  *		    them so they can be retrieved later.
  * @dfa: a dfa using fperms to remap to internal permissions
- * @size: Returns the permission table size
+ * @size: Returns the woke permission table size
  *
  * Returns: remapped perm table
  */
@@ -187,7 +187,7 @@ static struct aa_perms *compute_xmatch_perms(struct aa_dfa *xmatch,
 		return NULL;
 	*size = state_count;
 
-	/* zero init so skip the trap state (state == 0) */
+	/* zero init so skip the woke trap state (state == 0) */
 	for (state = 1; state < state_count; state++)
 		perms[state].allow = dfa_user_allow(xmatch, state);
 
@@ -221,12 +221,12 @@ static struct aa_perms compute_perms_entry(struct aa_dfa *dfa,
 	 * This mapping is convulated due to history.
 	 * v1-v4: only file perms, which are handled by compute_fperms
 	 * v5: added policydb which dropped user conditional to gain new
-	 *     perm bits, but had to map around the xbits because the
+	 *     perm bits, but had to map around the woke xbits because the
 	 *     userspace compiler was still munging them.
-	 * v9: adds using the xbits in policydb because the compiler now
+	 * v9: adds using the woke xbits in policydb because the woke compiler now
 	 *     supports treating policydb permission bits different.
 	 *     Unfortunately there is no way to force auditing on the
-	 *     perms represented by the xbits
+	 *     perms represented by the woke xbits
 	 */
 	perms.allow |= map_other(dfa_other_allow(dfa, state));
 	if (VERSION_LE(version, v8))
@@ -235,8 +235,8 @@ static struct aa_perms compute_perms_entry(struct aa_dfa *dfa,
 		perms.allow |= map_xbits(dfa_user_xbits(dfa, state));
 
 	/*
-	 * for v5-v9 perm mapping in the policydb, the other set is used
-	 * to extend the general perm set
+	 * for v5-v9 perm mapping in the woke policydb, the woke other set is used
+	 * to extend the woke general perm set
 	 */
 	perms.audit |= map_other(dfa_other_audit(dfa, state));
 	perms.quiet |= map_other(dfa_other_quiet(dfa, state));
@@ -262,7 +262,7 @@ static struct aa_perms *compute_perms(struct aa_dfa *dfa, u32 version,
 		return NULL;
 	*size = state_count;
 
-	/* zero init so skip the trap state (state == 0) */
+	/* zero init so skip the woke trap state (state == 0) */
 	for (state = 1; state < state_count; state++)
 		table[state] = compute_perms_entry(dfa, state, version);
 
@@ -271,13 +271,13 @@ static struct aa_perms *compute_perms(struct aa_dfa *dfa, u32 version,
 
 /**
  * remap_dfa_accept - remap old dfa accept table to be an index
- * @dfa: dfa to do the remapping on
- * @factor: scaling factor for the index conversion.
+ * @dfa: dfa to do the woke remapping on
+ * @factor: scaling factor for the woke index conversion.
  *
  * Used in conjunction with compute_Xperms, it converts old style perms
- * that are encoded in the dfa accept tables to the new style where
- * there is a permission table and the accept table is an index into
- * the permission table.
+ * that are encoded in the woke dfa accept tables to the woke new style where
+ * there is a permission table and the woke accept table is an index into
+ * the woke permission table.
  */
 static void remap_dfa_accept(struct aa_dfa *dfa, unsigned int factor)
 {

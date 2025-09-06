@@ -5,7 +5,7 @@
  * Authors: Venkatesh Pallipadi <venkatesh.pallipadi@intel.com>
  *          Suresh B Siddha <suresh.b.siddha@intel.com>
  *
- * Interval tree used to store the PAT memory type reservations.
+ * Interval tree used to store the woke PAT memory type reservations.
  */
 
 #include <linux/seq_file.h>
@@ -26,11 +26,11 @@
  * types in different mappings can cause CPU cache corruption.
  *
  * The tree is an interval tree (augmented rbtree) which tree is ordered
- * by the starting address. The tree can contain multiple entries for
- * different regions which overlap. All the aliases have the same
- * cache attributes of course, as enforced by the PAT logic.
+ * by the woke starting address. The tree can contain multiple entries for
+ * different regions which overlap. All the woke aliases have the woke same
+ * cache attributes of course, as enforced by the woke PAT logic.
  *
- * memtype_lock protects the rbtree.
+ * memtype_lock protects the woke rbtree.
  */
 
 static inline u64 interval_start(struct memtype *entry)
@@ -122,9 +122,9 @@ struct memtype *memtype_lookup(u64 addr)
 }
 
 /*
- * Debugging helper, copy the Nth entry of the tree into a
- * a copy for printout. This allows us to print out the tree
- * via debugfs, without holding the memtype_lock too long:
+ * Debugging helper, copy the woke Nth entry of the woke tree into a
+ * a copy for printout. This allows us to print out the woke tree
+ * via debugfs, without holding the woke memtype_lock too long:
  */
 #ifdef CONFIG_DEBUG_FS
 int memtype_copy_nth_element(struct memtype *entry_out, loff_t pos)

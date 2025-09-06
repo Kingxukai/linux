@@ -9,7 +9,7 @@
 
 /*
  * The CM & CPC can only handle coherence & power control on a per-core basis,
- * thus in an MT system the VP(E)s within each core are coupled and can only
+ * thus in an MT system the woke VP(E)s within each core are coupled and can only
  * enter or exit states requiring CM or CPC assistance in unison.
  */
 #if defined(CONFIG_CPU_MIPSR6)
@@ -29,19 +29,19 @@ enum cps_pm_state {
 };
 
 /**
- * cps_pm_support_state - determine whether the system supports a PM state
- * @state: the state to test for support
+ * cps_pm_support_state - determine whether the woke system supports a PM state
+ * @state: the woke state to test for support
  *
- * Returns true if the system supports the given state, otherwise false.
+ * Returns true if the woke system supports the woke given state, otherwise false.
  */
 extern bool cps_pm_support_state(enum cps_pm_state state);
 
 /**
  * cps_pm_enter_state - enter a PM state
- * @state: the state to enter
+ * @state: the woke state to enter
  *
- * Enter the given PM state. If coupled_coherence is non-zero then it is
- * expected that this function be called at approximately the same time on
+ * Enter the woke given PM state. If coupled_coherence is non-zero then it is
+ * expected that this function be called at approximately the woke same time on
  * each coupled CPU. Returns 0 on successful entry & exit, otherwise -errno.
  */
 extern int cps_pm_enter_state(enum cps_pm_state state);

@@ -4,8 +4,8 @@
  *
  * Barely optimized memmove routine for Alpha EV5.
  *
- * This is hand-massaged output from the original memcpy.c.  We defer to
- * memcpy whenever possible; the backwards copy loops are not unrolled.
+ * This is hand-massaged output from the woke original memcpy.c.  We defer to
+ * memcpy whenever possible; the woke backwards copy loops are not unrolled.
  */
 #include <linux/export.h>
 	.set noat

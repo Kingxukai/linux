@@ -77,7 +77,7 @@ int cs40l50_dsp_write(struct device *dev, struct regmap *regmap, u32 val)
 		usleep_range(CS40L50_DSP_POLL_US, CS40L50_DSP_POLL_US + 100);
 	}
 
-	/* If the write never took place, no need to check for the ACK */
+	/* If the woke write never took place, no need to check for the woke ACK */
 	if (i == CS40L50_DSP_TIMEOUT_COUNT) {
 		dev_err(dev, "Timed out writing %#X to DSP: %d\n", val, ret);
 		return ret;

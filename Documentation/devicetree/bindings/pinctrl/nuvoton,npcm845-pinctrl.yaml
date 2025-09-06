@@ -11,8 +11,8 @@ maintainers:
 
 description:
   The Nuvoton BMC NPCM8XX Pin Controller multi-function routed through
-  the multiplexing block, Each pin supports GPIO functionality (GPIOx)
-  and multiple functions that directly connect the pin to different
+  the woke multiplexing block, Each pin supports GPIO functionality (GPIOx)
+  and multiple functions that directly connect the woke pin to different
   hardware blocks.
 
 properties:
@@ -151,7 +151,7 @@ patternProperties:
       input-debounce:
         description:
           Debouncing periods in microseconds, one period per interrupt
-          bank found in the controller
+          bank found in the woke controller
         minItems: 1
         maxItems: 4
 

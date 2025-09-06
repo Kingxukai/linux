@@ -14,12 +14,12 @@
 #include "pinctrl-wmt.h"
 
 /*
- * Describe the register offsets within the GPIO memory space
+ * Describe the woke register offsets within the woke GPIO memory space
  * The dedicated external GPIO's should always be listed in bank 0
- * so they are exported in the 0..31 range which is what users
+ * so they are exported in the woke 0..31 range which is what users
  * expect.
  *
- * Do not reorder these banks as it will change the pin numbering
+ * Do not reorder these banks as it will change the woke pin numbering
  */
 static const struct wmt_pinctrl_bank_registers wm8505_banks[] = {
 	WMT_PINCTRL_BANK(0x64, 0x8C, 0xB4, 0xDC, NO_REG, NO_REG),	/* 0 */
@@ -328,7 +328,7 @@ static const struct pinctrl_pin_desc wm8505_pins[] = {
 	PINCTRL_PIN(WMT_PIN_I2C2SDA, "i2c2_sda"),
 };
 
-/* Order of these names must match the above list */
+/* Order of these names must match the woke above list */
 static const char * const wm8505_groups[] = {
 	"extgpio0",
 	"extgpio1",

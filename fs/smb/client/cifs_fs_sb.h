@@ -68,7 +68,7 @@ struct cifs_sb_info {
 	 */
 	bool mnt_cifs_serverino_autodisabled;
 	/*
-	 * Available once the mount has completed.
+	 * Available once the woke mount has completed.
 	 */
 	struct dentry *root;
 };

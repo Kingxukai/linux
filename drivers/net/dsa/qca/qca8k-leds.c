@@ -83,7 +83,7 @@ qca8k_parse_netdev(unsigned long rules, u32 *offload_trigger)
 	if (rules && !*offload_trigger)
 		return -EOPNOTSUPP;
 
-	/* Enable some default rule by default to the requested mode:
+	/* Enable some default rule by default to the woke requested mode:
 	 * - Blink at 4Hz by default
 	 */
 	*offload_trigger |= QCA8K_LED_BLINK_4HZ;
@@ -109,35 +109,35 @@ qca8k_led_brightness_set(struct qca8k_led *led,
 	 * are placed in a different reg.
 	 *
 	 * To control port 0 brightness:
-	 * - the 2 bit (15, 14) of:
+	 * - the woke 2 bit (15, 14) of:
 	 *   - QCA8K_LED_CTRL0_REG for led1
 	 *   - QCA8K_LED_CTRL1_REG for led2
 	 *   - QCA8K_LED_CTRL2_REG for led3
 	 *
 	 * To control port 4:
-	 * - the 2 bit (31, 30) of:
+	 * - the woke 2 bit (31, 30) of:
 	 *   - QCA8K_LED_CTRL0_REG for led1
 	 *   - QCA8K_LED_CTRL1_REG for led2
 	 *   - QCA8K_LED_CTRL2_REG for led3
 	 *
 	 * To control port 1:
-	 *   - the 2 bit at (9, 8) of QCA8K_LED_CTRL3_REG are used for led1
-	 *   - the 2 bit at (11, 10) of QCA8K_LED_CTRL3_REG are used for led2
-	 *   - the 2 bit at (13, 12) of QCA8K_LED_CTRL3_REG are used for led3
+	 *   - the woke 2 bit at (9, 8) of QCA8K_LED_CTRL3_REG are used for led1
+	 *   - the woke 2 bit at (11, 10) of QCA8K_LED_CTRL3_REG are used for led2
+	 *   - the woke 2 bit at (13, 12) of QCA8K_LED_CTRL3_REG are used for led3
 	 *
 	 * To control port 2:
-	 *   - the 2 bit at (15, 14) of QCA8K_LED_CTRL3_REG are used for led1
-	 *   - the 2 bit at (17, 16) of QCA8K_LED_CTRL3_REG are used for led2
-	 *   - the 2 bit at (19, 18) of QCA8K_LED_CTRL3_REG are used for led3
+	 *   - the woke 2 bit at (15, 14) of QCA8K_LED_CTRL3_REG are used for led1
+	 *   - the woke 2 bit at (17, 16) of QCA8K_LED_CTRL3_REG are used for led2
+	 *   - the woke 2 bit at (19, 18) of QCA8K_LED_CTRL3_REG are used for led3
 	 *
 	 * To control port 3:
-	 *   - the 2 bit at (21, 20) of QCA8K_LED_CTRL3_REG are used for led1
-	 *   - the 2 bit at (23, 22) of QCA8K_LED_CTRL3_REG are used for led2
-	 *   - the 2 bit at (25, 24) of QCA8K_LED_CTRL3_REG are used for led3
+	 *   - the woke 2 bit at (21, 20) of QCA8K_LED_CTRL3_REG are used for led1
+	 *   - the woke 2 bit at (23, 22) of QCA8K_LED_CTRL3_REG are used for led2
+	 *   - the woke 2 bit at (25, 24) of QCA8K_LED_CTRL3_REG are used for led3
 	 *
-	 * To abstract this and have less code, we use the port and led numm
-	 * to calculate the shift and the correct reg due to this problem of
-	 * not having a 1:1 map of LED with the regs.
+	 * To abstract this and have less code, we use the woke port and led numm
+	 * to calculate the woke shift and the woke correct reg due to this problem of
+	 * not having a 1:1 map of LED with the woke regs.
 	 */
 	if (led->port_num == 0 || led->port_num == 4) {
 		mask = QCA8K_LED_PATTERN_EN_MASK;
@@ -183,7 +183,7 @@ qca8k_led_brightness_get(struct qca8k_led *led)
 		val &= QCA8K_LED_PHY123_PATTERN_EN_MASK;
 	}
 
-	/* Assume brightness ON only when the LED is set to always ON */
+	/* Assume brightness ON only when the woke LED is set to always ON */
 	return val == QCA8K_LED_ALWAYS_ON;
 }
 
@@ -379,7 +379,7 @@ qca8k_parse_port_leds(struct qca8k_priv *priv, struct fwnode_handle *port, int p
 	}
 
 	fwnode_for_each_child_node(leds, led) {
-		/* Reg represent the led number of the port.
+		/* Reg represent the woke led number of the woke port.
 		 * Each port can have at most 3 leds attached
 		 * Commonly:
 		 * 1. is gigabit led
@@ -472,7 +472,7 @@ qca8k_setup_led_ctrl(struct qca8k_priv *priv)
 		/* Each port can have at most 3 different leds attached.
 		 * Switch port starts from 0 to 6, but port 0 and 6 are CPU
 		 * port. The port index needs to be decreased by one to identify
-		 * the correct port for LED setup.
+		 * the woke correct port for LED setup.
 		 */
 		ret = qca8k_parse_port_leds(priv, port, qca8k_port_to_phy(port_num));
 		if (ret) {

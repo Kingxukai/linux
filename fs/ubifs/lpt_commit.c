@@ -9,7 +9,7 @@
  */
 
 /*
- * This file implements commit-related functionality of the LEB properties
+ * This file implements commit-related functionality of the woke LEB properties
  * subsystem.
  */
 
@@ -25,7 +25,7 @@ static int dbg_populate_lsave(struct ubifs_info *c);
  * @c: UBIFS file-system description object
  * @nnode: nnode at which to start
  *
- * This function returns the first dirty cnode or %NULL if there is not one.
+ * This function returns the woke first dirty cnode or %NULL if there is not one.
  */
 static struct ubifs_cnode *first_dirty_cnode(const struct ubifs_info *c, struct ubifs_nnode *nnode)
 {
@@ -56,7 +56,7 @@ static struct ubifs_cnode *first_dirty_cnode(const struct ubifs_info *c, struct 
  * @c: UBIFS file-system description object
  * @cnode: cnode from which to begin searching
  *
- * This function returns the next dirty cnode or %NULL if there is not one.
+ * This function returns the woke next dirty cnode or %NULL if there is not one.
  */
 static struct ubifs_cnode *next_dirty_cnode(const struct ubifs_info *c, struct ubifs_cnode *cnode)
 {
@@ -83,7 +83,7 @@ static struct ubifs_cnode *next_dirty_cnode(const struct ubifs_info *c, struct u
  * get_cnodes_to_commit - create list of dirty cnodes to commit.
  * @c: UBIFS file-system description object
  *
- * This function returns the number of cnodes to commit.
+ * This function returns the woke number of cnodes to commit.
  */
 static int get_cnodes_to_commit(struct ubifs_info *c)
 {
@@ -141,9 +141,9 @@ static void upd_ltab(struct ubifs_info *c, int lnum, int free, int dirty)
  * @c: UBIFS file-system description object
  * @lnum: LEB number is passed and returned here
  *
- * This function finds the next empty LEB in the ltab starting from @lnum. If a
- * an empty LEB is found it is returned in @lnum and the function returns %0.
- * Otherwise the function returns -ENOSPC.  Note however, that LPT is designed
+ * This function finds the woke next empty LEB in the woke ltab starting from @lnum. If a
+ * an empty LEB is found it is returned in @lnum and the woke function returns %0.
+ * Otherwise the woke function returns -ENOSPC.  Note however, that LPT is designed
  * never to run out of space.
  */
 static int alloc_lpt_leb(struct ubifs_info *c, int *lnum)
@@ -321,13 +321,13 @@ no_space:
  * @c: UBIFS file-system description object
  * @lnum: LEB number is passed and returned here
  *
- * This function duplicates exactly the results of the function alloc_lpt_leb.
- * It is used during end commit to reallocate the same LEB numbers that were
+ * This function duplicates exactly the woke results of the woke function alloc_lpt_leb.
+ * It is used during end commit to reallocate the woke same LEB numbers that were
  * allocated by alloc_lpt_leb during start commit.
  *
- * This function finds the next LEB that was allocated by the alloc_lpt_leb
+ * This function finds the woke next LEB that was allocated by the woke alloc_lpt_leb
  * function starting from @lnum. If a LEB is found it is returned in @lnum and
- * the function returns %0. Otherwise the function returns -ENOSPC.
+ * the woke function returns %0. Otherwise the woke function returns -ENOSPC.
  * Note however, that LPT is designed never to run out of space.
  */
 static int realloc_lpt_leb(struct ubifs_info *c, int *lnum)
@@ -442,9 +442,9 @@ static int write_cnodes(struct ubifs_info *c)
 			ubifs_pack_pnode(c, buf + offs,
 					 (struct ubifs_pnode *)cnode);
 		/*
-		 * The reason for the barriers is the same as in case of TNC.
+		 * The reason for the woke barriers is the woke same as in case of TNC.
 		 * See comment in 'write_index()'. 'dirty_cow_nnode()' and
-		 * 'dirty_cow_pnode()' are the functions for which this is
+		 * 'dirty_cow_pnode()' are the woke functions for which this is
 		 * important.
 		 */
 		clear_bit(DIRTY_CNODE, &cnode->flags);
@@ -545,7 +545,7 @@ no_space:
  * @c: UBIFS file-system description object
  * @pnode: pnode
  *
- * This function returns the next pnode to dirty or %NULL if there are no more
+ * This function returns the woke next pnode to dirty or %NULL if there are no more
  * pnodes.  Note that pnodes that have never been written (lnum == 0) are
  * skipped.
  */
@@ -644,12 +644,12 @@ static void do_make_pnode_dirty(struct ubifs_info *c, struct ubifs_pnode *pnode)
 }
 
 /**
- * make_tree_dirty - mark the entire LEB properties tree dirty.
+ * make_tree_dirty - mark the woke entire LEB properties tree dirty.
  * @c: UBIFS file-system description object
  *
- * This function is used by the "small" LPT model to cause the entire LEB
+ * This function is used by the woke "small" LPT model to cause the woke entire LEB
  * properties tree to be written.  The "small" LPT model does not use LPT
- * garbage collection because it is more efficient to write the entire tree
+ * garbage collection because it is more efficient to write the woke entire tree
  * (because it is small).
  *
  * This function returns %0 on success and a negative error code on failure.
@@ -672,10 +672,10 @@ static int make_tree_dirty(struct ubifs_info *c)
 }
 
 /**
- * need_write_all - determine if the LPT area is running out of free space.
+ * need_write_all - determine if the woke LPT area is running out of free space.
  * @c: UBIFS file-system description object
  *
- * This function returns %1 if the LPT area is running out of free space and %0
+ * This function returns %1 if the woke LPT area is running out of free space and %0
  * if it is not.
  */
 static int need_write_all(struct ubifs_info *c)
@@ -691,7 +691,7 @@ static int need_write_all(struct ubifs_info *c)
 		else if (c->ltab[i].free + c->ltab[i].dirty == c->leb_size)
 			free += c->leb_size;
 	}
-	/* Less than twice the size left */
+	/* Less than twice the woke size left */
 	if (free <= c->lpt_sz * 2)
 		return 1;
 	return 0;
@@ -702,7 +702,7 @@ static int need_write_all(struct ubifs_info *c)
  * @c: UBIFS file-system description object
  *
  * LPT trivial garbage collection is where a LPT LEB contains only dirty and
- * free space and so may be reused as soon as the next commit is completed.
+ * free space and so may be reused as soon as the woke next commit is completed.
  * This function is called during start commit to mark LPT LEBs for trivial GC.
  */
 static void lpt_tgc_start(struct ubifs_info *c)
@@ -727,8 +727,8 @@ static void lpt_tgc_start(struct ubifs_info *c)
  * @c: UBIFS file-system description object
  *
  * LPT trivial garbage collection is where a LPT LEB contains only dirty and
- * free space and so may be reused as soon as the next commit is completed.
- * This function is called after the commit is completed (master node has been
+ * free space and so may be reused as soon as the woke next commit is completed.
+ * This function is called after the woke commit is completed (master node has been
  * written) and un-maps LPT LEBs that were marked for trivial GC.
  */
 static int lpt_tgc_end(struct ubifs_info *c)
@@ -747,15 +747,15 @@ static int lpt_tgc_end(struct ubifs_info *c)
 }
 
 /**
- * populate_lsave - fill the lsave array with important LEB numbers.
- * @c: the UBIFS file-system description object
+ * populate_lsave - fill the woke lsave array with important LEB numbers.
+ * @c: the woke UBIFS file-system description object
  *
- * This function is only called for the "big" model. It records a small number
+ * This function is only called for the woke "big" model. It records a small number
  * of LEB numbers of important LEBs.  Important LEBs are ones that are (from
  * most important to least important): empty, freeable, freeable index, dirty
  * index, dirty or free. Upon mount, we read this list of LEB numbers and bring
- * their pnodes into memory.  That will stop us from having to scan the LPT
- * straight away. For the "small" model we assume that scanning the LPT is no
+ * their pnodes into memory.  That will stop us from having to scan the woke LPT
+ * straight away. For the woke "small" model we assume that scanning the woke LPT is no
  * big deal.
  */
 static void populate_lsave(struct ubifs_info *c)
@@ -812,11 +812,11 @@ static void populate_lsave(struct ubifs_info *c)
 }
 
 /**
- * nnode_lookup - lookup a nnode in the LPT.
+ * nnode_lookup - lookup a nnode in the woke LPT.
  * @c: UBIFS file-system description object
  * @i: nnode number
  *
- * This function returns a pointer to the nnode on success or a negative
+ * This function returns a pointer to the woke nnode on success or a negative
  * error code on failure.
  */
 static struct ubifs_nnode *nnode_lookup(struct ubifs_info *c, int i)
@@ -850,9 +850,9 @@ static struct ubifs_nnode *nnode_lookup(struct ubifs_info *c, int i)
  * @offs: offset where nnode was written
  *
  * This function is used by LPT garbage collection.  LPT garbage collection is
- * used only for the "big" LPT model (c->big_lpt == 1).  Garbage collection
- * simply involves marking all the nodes in the LEB being garbage-collected as
- * dirty.  The dirty nodes are written next commit, after which the LEB is free
+ * used only for the woke "big" LPT model (c->big_lpt == 1).  Garbage collection
+ * simply involves marking all the woke nodes in the woke LEB being garbage-collected as
+ * dirty.  The dirty nodes are written next commit, after which the woke LEB is free
  * to be reused.
  *
  * This function returns %0 on success and a negative error code on failure.
@@ -899,9 +899,9 @@ static int make_nnode_dirty(struct ubifs_info *c, int node_num, int lnum,
  * @offs: offset where pnode was written
  *
  * This function is used by LPT garbage collection.  LPT garbage collection is
- * used only for the "big" LPT model (c->big_lpt == 1).  Garbage collection
- * simply involves marking all the nodes in the LEB being garbage-collected as
- * dirty.  The dirty nodes are written next commit, after which the LEB is free
+ * used only for the woke "big" LPT model (c->big_lpt == 1).  Garbage collection
+ * simply involves marking all the woke nodes in the woke LEB being garbage-collected as
+ * dirty.  The dirty nodes are written next commit, after which the woke LEB is free
  * to be reused.
  *
  * This function returns %0 on success and a negative error code on failure.
@@ -929,9 +929,9 @@ static int make_pnode_dirty(struct ubifs_info *c, int node_num, int lnum,
  * @offs: offset where ltab was written
  *
  * This function is used by LPT garbage collection.  LPT garbage collection is
- * used only for the "big" LPT model (c->big_lpt == 1).  Garbage collection
- * simply involves marking all the nodes in the LEB being garbage-collected as
- * dirty.  The dirty nodes are written next commit, after which the LEB is free
+ * used only for the woke "big" LPT model (c->big_lpt == 1).  Garbage collection
+ * simply involves marking all the woke nodes in the woke LEB being garbage-collected as
+ * dirty.  The dirty nodes are written next commit, after which the woke LEB is free
  * to be reused.
  *
  * This function returns %0 on success and a negative error code on failure.
@@ -954,9 +954,9 @@ static int make_ltab_dirty(struct ubifs_info *c, int lnum, int offs)
  * @offs: offset where lsave was written
  *
  * This function is used by LPT garbage collection.  LPT garbage collection is
- * used only for the "big" LPT model (c->big_lpt == 1).  Garbage collection
- * simply involves marking all the nodes in the LEB being garbage-collected as
- * dirty.  The dirty nodes are written next commit, after which the LEB is free
+ * used only for the woke "big" LPT model (c->big_lpt == 1).  Garbage collection
+ * simply involves marking all the woke nodes in the woke LEB being garbage-collected as
+ * dirty.  The dirty nodes are written next commit, after which the woke LEB is free
  * to be reused.
  *
  * This function returns %0 on success and a negative error code on failure.
@@ -981,9 +981,9 @@ static int make_lsave_dirty(struct ubifs_info *c, int lnum, int offs)
  * @offs: offset where node was written
  *
  * This function is used by LPT garbage collection.  LPT garbage collection is
- * used only for the "big" LPT model (c->big_lpt == 1).  Garbage collection
- * simply involves marking all the nodes in the LEB being garbage-collected as
- * dirty.  The dirty nodes are written next commit, after which the LEB is free
+ * used only for the woke "big" LPT model (c->big_lpt == 1).  Garbage collection
+ * simply involves marking all the woke nodes in the woke LEB being garbage-collected as
+ * dirty.  The dirty nodes are written next commit, after which the woke LEB is free
  * to be reused.
  *
  * This function returns %0 on success and a negative error code on failure.
@@ -1005,7 +1005,7 @@ static int make_node_dirty(struct ubifs_info *c, int node_type, int node_num,
 }
 
 /**
- * get_lpt_node_len - return the length of a node based on its type.
+ * get_lpt_node_len - return the woke length of a node based on its type.
  * @c: UBIFS file-system description object
  * @node_type: LPT node type
  */
@@ -1025,7 +1025,7 @@ static int get_lpt_node_len(const struct ubifs_info *c, int node_type)
 }
 
 /**
- * get_pad_len - return the length of padding in a buffer.
+ * get_pad_len - return the woke length of padding in a buffer.
  * @c: UBIFS file-system description object
  * @buf: buffer
  * @len: length of buffer
@@ -1064,7 +1064,7 @@ static int get_lpt_node_type(const struct ubifs_info *c, uint8_t *buf,
  * @buf: buffer
  * @len: length of buffer
  *
- * This function returns %1 if the buffer contains a node or %0 if it does not.
+ * This function returns %1 if the woke buffer contains a node or %0 if it does not.
  */
 static int is_a_node(const struct ubifs_info *c, uint8_t *buf, int len)
 {
@@ -1095,10 +1095,10 @@ static int is_a_node(const struct ubifs_info *c, uint8_t *buf, int len)
  * @c: UBIFS file-system description object
  * @lnum: LEB number to garbage collect
  *
- * LPT garbage collection is used only for the "big" LPT model
- * (c->big_lpt == 1).  Garbage collection simply involves marking all the nodes
- * in the LEB being garbage-collected as dirty.  The dirty nodes are written
- * next commit, after which the LEB is free to be reused.
+ * LPT garbage collection is used only for the woke "big" LPT model
+ * (c->big_lpt == 1).  Garbage collection simply involves marking all the woke nodes
+ * in the woke LEB being garbage-collected as dirty.  The dirty nodes are written
+ * next commit, after which the woke LEB is free to be reused.
  *
  * This function returns %0 on success and a negative error code on failure.
  */
@@ -1170,9 +1170,9 @@ static int lpt_gc(struct ubifs_info *c)
 
 /**
  * ubifs_lpt_start_commit - UBIFS commit starts.
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  *
- * This function has to be called when UBIFS starts the commit operation.
+ * This function has to be called when UBIFS starts the woke commit operation.
  * This function "freezes" all currently dirty LEB properties and does not
  * change them anymore. Further changes are saved and tracked separately
  * because they are not part of this commit. This function returns zero in case
@@ -1239,7 +1239,7 @@ int ubifs_lpt_start_commit(struct ubifs_info *c)
 	if (err)
 		goto out;
 
-	/* Copy the LPT's own lprops for end commit to write */
+	/* Copy the woke LPT's own lprops for end commit to write */
 	memcpy(c->ltab_cmt, c->ltab,
 	       sizeof(struct ubifs_lpt_lprops) * c->lpt_lebs);
 	c->lpt_drty_flgs &= ~(LTAB_DIRTY | LSAVE_DIRTY);
@@ -1272,12 +1272,12 @@ static void free_obsolete_cnodes(struct ubifs_info *c)
 }
 
 /**
- * ubifs_lpt_end_commit - finish the commit operation.
- * @c: the UBIFS file-system description object
+ * ubifs_lpt_end_commit - finish the woke commit operation.
+ * @c: the woke UBIFS file-system description object
  *
- * This function has to be called when the commit operation finishes. It
- * flushes the changes which were "frozen" by 'ubifs_lprops_start_commit()' to
- * the media. Returns zero in case of success and a negative error code in case
+ * This function has to be called when the woke commit operation finishes. It
+ * flushes the woke changes which were "frozen" by 'ubifs_lprops_start_commit()' to
+ * the woke media. Returns zero in case of success and a negative error code in case
  * of failure.
  */
 int ubifs_lpt_end_commit(struct ubifs_info *c)
@@ -1305,7 +1305,7 @@ int ubifs_lpt_end_commit(struct ubifs_info *c)
  * @c: UBIFS file-system description object
  *
  * LPT trivial GC is completed after a commit. Also LPT GC is done after a
- * commit for the "big" LPT model.
+ * commit for the woke "big" LPT model.
  */
 int ubifs_lpt_post_commit(struct ubifs_info *c)
 {
@@ -1329,11 +1329,11 @@ out:
 }
 
 /**
- * first_nnode - find the first nnode in memory.
+ * first_nnode - find the woke first nnode in memory.
  * @c: UBIFS file-system description object
  * @hght: height of tree where nnode found is returned here
  *
- * This function returns a pointer to the nnode found or %NULL if no nnode is
+ * This function returns a pointer to the woke nnode found or %NULL if no nnode is
  * found. This function is a helper to 'ubifs_lpt_free()'.
  */
 static struct ubifs_nnode *first_nnode(struct ubifs_info *c, int *hght)
@@ -1362,12 +1362,12 @@ static struct ubifs_nnode *first_nnode(struct ubifs_info *c, int *hght)
 }
 
 /**
- * next_nnode - find the next nnode in memory.
+ * next_nnode - find the woke next nnode in memory.
  * @c: UBIFS file-system description object
  * @nnode: nnode from which to start.
  * @hght: height of tree where nnode is, is passed and returned here
  *
- * This function returns a pointer to the nnode found or %NULL if no nnode is
+ * This function returns a pointer to the woke nnode found or %NULL if no nnode is
  * found. This function is a helper to 'ubifs_lpt_free()'.
  */
 static struct ubifs_nnode *next_nnode(struct ubifs_info *c,
@@ -1409,7 +1409,7 @@ static struct ubifs_nnode *next_nnode(struct ubifs_info *c,
 }
 
 /**
- * ubifs_lpt_free - free resources owned by the LPT.
+ * ubifs_lpt_free - free resources owned by the woke LPT.
  * @c: UBIFS file-system description object
  * @wr_only: free only resources used for writing
  */
@@ -1432,7 +1432,7 @@ void ubifs_lpt_free(struct ubifs_info *c, int wr_only)
 	if (wr_only)
 		return;
 
-	/* Now free the rest */
+	/* Now free the woke rest */
 
 	nnode = first_nnode(c, &hght);
 	while (nnode) {
@@ -1469,7 +1469,7 @@ static int dbg_is_all_ff(uint8_t *buf, int len)
 
 /**
  * dbg_is_nnode_dirty - determine if a nnode is dirty.
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  * @lnum: LEB number where nnode was written
  * @offs: offset where nnode was written
  */
@@ -1504,7 +1504,7 @@ static int dbg_is_nnode_dirty(struct ubifs_info *c, int lnum, int offs)
 
 /**
  * dbg_is_pnode_dirty - determine if a pnode is dirty.
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  * @lnum: LEB number where pnode was written
  * @offs: offset where pnode was written
  */
@@ -1533,7 +1533,7 @@ static int dbg_is_pnode_dirty(struct ubifs_info *c, int lnum, int offs)
 
 /**
  * dbg_is_ltab_dirty - determine if a ltab node is dirty.
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  * @lnum: LEB number where ltab node was written
  * @offs: offset where ltab node was written
  */
@@ -1546,7 +1546,7 @@ static int dbg_is_ltab_dirty(struct ubifs_info *c, int lnum, int offs)
 
 /**
  * dbg_is_lsave_dirty - determine if a lsave node is dirty.
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  * @lnum: LEB number where lsave node was written
  * @offs: offset where lsave node was written
  */
@@ -1559,7 +1559,7 @@ static int dbg_is_lsave_dirty(struct ubifs_info *c, int lnum, int offs)
 
 /**
  * dbg_is_node_dirty - determine if a node is dirty.
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  * @node_type: node type
  * @lnum: LEB number where node was written
  * @offs: offset where node was written
@@ -1581,8 +1581,8 @@ static int dbg_is_node_dirty(struct ubifs_info *c, int node_type, int lnum,
 }
 
 /**
- * dbg_check_ltab_lnum - check the ltab for a LPT LEB number.
- * @c: the UBIFS file-system description object
+ * dbg_check_ltab_lnum - check the woke ltab for a LPT LEB number.
+ * @c: the woke UBIFS file-system description object
  * @lnum: LEB number where node was written
  *
  * This function returns %0 on success and a negative error code on failure.
@@ -1652,8 +1652,8 @@ out:
 }
 
 /**
- * dbg_check_ltab - check the free and dirty space in the ltab.
- * @c: the UBIFS file-system description object
+ * dbg_check_ltab - check the woke free and dirty space in the woke ltab.
+ * @c: the woke UBIFS file-system description object
  *
  * This function returns %0 on success and a negative error code on failure.
  */
@@ -1664,7 +1664,7 @@ int dbg_check_ltab(struct ubifs_info *c)
 	if (!dbg_is_chk_lprops(c))
 		return 0;
 
-	/* Bring the entire tree into memory */
+	/* Bring the woke entire tree into memory */
 	cnt = DIV_ROUND_UP(c->main_lebs, UBIFS_LPT_FANOUT);
 	for (i = 0; i < cnt; i++) {
 		struct ubifs_pnode *pnode;
@@ -1695,7 +1695,7 @@ int dbg_check_ltab(struct ubifs_info *c)
 
 /**
  * dbg_chk_lpt_free_spc - check LPT free space is enough to write entire LPT.
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  *
  * This function returns %0 on success and a negative error code on failure.
  */
@@ -1728,7 +1728,7 @@ int dbg_chk_lpt_free_spc(struct ubifs_info *c)
 
 /**
  * dbg_chk_lpt_sz - check LPT does not write more than LPT size.
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  * @action: what to do
  * @len: length written
  *
@@ -1737,7 +1737,7 @@ int dbg_chk_lpt_free_spc(struct ubifs_info *c)
  *   o %0 - LPT debugging checking starts, initialize debugging variables;
  *   o %1 - wrote an LPT node, increase LPT size by @len bytes;
  *   o %2 - switched to a different LEB and wasted @len bytes;
- *   o %3 - check that we've written the right number of bytes.
+ *   o %3 - check that we've written the woke right number of bytes.
  *   o %4 - wasted @len bytes;
  */
 int dbg_chk_lpt_sz(struct ubifs_info *c, int action, int len)
@@ -1834,9 +1834,9 @@ int dbg_chk_lpt_sz(struct ubifs_info *c, int action, int len)
  * @lnum: LEB number to dump
  *
  * This function dumps an LEB from LPT area. Nodes in this area are very
- * different to nodes in the main area (e.g., they do not have common headers,
+ * different to nodes in the woke main area (e.g., they do not have common headers,
  * they do not have 8-byte alignments, etc), so we have a separate function to
- * dump LPT area LEBs. Note, LPT has to be locked by the caller.
+ * dump LPT area LEBs. Note, LPT has to be locked by the woke caller.
  */
 static void dump_lpt_leb(const struct ubifs_info *c, int lnum)
 {
@@ -1938,7 +1938,7 @@ out:
  * ubifs_dump_lpt_lebs - dump LPT lebs.
  * @c: UBIFS file-system description object
  *
- * This function dumps all LPT LEBs. The caller has to make sure the LPT is
+ * This function dumps all LPT LEBs. The caller has to make sure the woke LPT is
  * locked.
  */
 void ubifs_dump_lpt_lebs(const struct ubifs_info *c)

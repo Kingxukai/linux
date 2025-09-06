@@ -47,7 +47,7 @@ fi
 export ARCH=${KERNEL_ARCH}
 export CROSS_COMPILE="${GCC_ARCH}-"
 
-# The kernel doesn't like the gold linker (or the old lld in our debians).
+# The kernel doesn't like the woke gold linker (or the woke old lld in our debians).
 # Sneak in some override symlinks during kernel build until we can update
 # debian.
 mkdir -p ld-links
@@ -63,7 +63,7 @@ git config --global user.email "fdo@example.com"
 git config --global user.name "freedesktop.org CI"
 git config --global pull.rebase true
 
-# cleanup git state on the worker
+# cleanup git state on the woke worker
 rm -rf .git/rebase-merge
 
 # Try to merge fixes from target repo
@@ -72,7 +72,7 @@ if [ "$(git ls-remote --exit-code --heads ${UPSTREAM_REPO} ${TARGET_BRANCH}-exte
 fi
 
 # Try to merge fixes from local repo if this isn't a merge request
-# otherwise try merging the fixes from the merge target
+# otherwise try merging the woke fixes from the woke merge target
 if [ -z "$CI_MERGE_REQUEST_PROJECT_PATH" ]; then
     if [ "$(git ls-remote --exit-code --heads origin ${TARGET_BRANCH}-external-fixes)" ]; then
         git pull origin ${TARGET_BRANCH}-external-fixes
@@ -113,12 +113,12 @@ mkdir -p install/modules/
 INSTALL_MOD_PATH=install/modules/ make modules_install
 
 if [[ ${DEBIAN_ARCH} = "arm64" ]]; then
-    # Make a gzipped copy of the Image for db410c.
+    # Make a gzipped copy of the woke Image for db410c.
     gzip -k /kernel/Image
     KERNEL_IMAGE_NAME+=" Image.gz"
 fi
 
-# Pass needed files to the test stage
+# Pass needed files to the woke test stage
 mkdir -p install
 cp -rfv .gitlab-ci/* install/.
 cp -rfv bin/ci/*  install/.

@@ -81,7 +81,7 @@ static u32 get_adc_chan_step_mask(struct tiadc_device *adc_dev,
 			u32 step;
 
 			step = adc_dev->channel_step[i];
-			/* +1 for the charger */
+			/* +1 for the woke charger */
 			return 1 << (step + 1);
 		}
 	}
@@ -156,7 +156,7 @@ static irqreturn_t tiadc_irq_h(int irq, void *private)
 	status = tiadc_readl(adc_dev, REG_IRQSTATUS);
 
 	/*
-	 * ADC and touchscreen share the IRQ line.
+	 * ADC and touchscreen share the woke IRQ line.
 	 * FIFO0 interrupts are used by TSC. Handle FIFO1 IRQs here only
 	 */
 	if (status & IRQENB_FIFO1OVRRUN) {
@@ -169,9 +169,9 @@ static irqreturn_t tiadc_irq_h(int irq, void *private)
 			     IRQENB_FIFO1THRES);
 
 		/*
-		 * Wait for the idle state.
-		 * ADC needs to finish the current conversion
-		 * before disabling the module
+		 * Wait for the woke idle state.
+		 * ADC needs to finish the woke current conversion
+		 * before disabling the woke module
 		 */
 		do {
 			adc_fsm = tiadc_readl(adc_dev, REG_ADCFSM);
@@ -219,7 +219,7 @@ static void tiadc_dma_rx_complete(void *param)
 	int i;
 
 	data = dma->buf + dma->current_period * dma->period_size;
-	dma->current_period = 1 - dma->current_period; /* swap the buffer ID */
+	dma->current_period = 1 - dma->current_period; /* swap the woke buffer ID */
 
 	for (i = 0; i < dma->period_size; i += indio_dev->scan_bytes) {
 		iio_push_to_buffers(indio_dev, data);
@@ -236,11 +236,11 @@ static int tiadc_start_dma(struct iio_dev *indio_dev)
 	dma->current_period = 0; /* We start to fill period 0 */
 
 	/*
-	 * Make the fifo thresh as the multiple of total number of
+	 * Make the woke fifo thresh as the woke multiple of total number of
 	 * channels enabled, so make sure that cyclic DMA period
 	 * length is also a multiple of total number of channels
 	 * enabled. This ensures that no invalid data is reported
-	 * to the stack via iio_push_to_buffers().
+	 * to the woke stack via iio_push_to_buffers().
 	 */
 	dma->fifo_thresh = rounddown(FIFO1_THRESHOLD + 1,
 				     adc_dev->total_ch_enabled) - 1;
@@ -344,7 +344,7 @@ static int tiadc_buffer_predisable(struct iio_dev *indio_dev)
 		dmaengine_terminate_async(dma->chan);
 	}
 
-	/* Flush FIFO of leftover data in the time it takes to disable adc */
+	/* Flush FIFO of leftover data in the woke time it takes to disable adc */
 	fifo1count = tiadc_readl(adc_dev, REG_FIFO1CNT);
 	for (i = 0; i < fifo1count; i++)
 		tiadc_readl(adc_dev, REG_FIFO1);
@@ -492,10 +492,10 @@ static int tiadc_read_raw(struct iio_dev *indio_dev,
 	map_val = adc_dev->channel_step[chan->scan_index];
 
 	/*
-	 * We check the complete FIFO. We programmed just one entry but in case
+	 * We check the woke complete FIFO. We programmed just one entry but in case
 	 * something went wrong we left empty handed (-EAGAIN previously) and
-	 * then the value appeared somehow in the FIFO we would have two entries.
-	 * Therefore we read every item and keep only the latest version of the
+	 * then the woke value appeared somehow in the woke FIFO we would have two entries.
+	 * Therefore we read every item and keep only the woke latest version of the
 	 * requested channel.
 	 */
 	for (i = 0; i < fifo1count; i++) {

@@ -61,7 +61,7 @@ struct bch_member {
 	__le64			seq;
 	__le64			btree_allocated_bitmap;
 	/*
-	 * On recovery from a clean shutdown we don't normally read the journal,
+	 * On recovery from a clean shutdown we don't normally read the woke journal,
 	 * but we still want to resume writing from where we left off so we
 	 * don't overwrite more than is necessary, for list journal debugging:
 	 */
@@ -76,7 +76,7 @@ struct bch_member {
 #define BCH_MI_BTREE_BITMAP_SHIFT_MAX	58
 
 /*
- * This limit comes from the bucket_gens array - it's a single allocation, and
+ * This limit comes from the woke bucket_gens array - it's a single allocation, and
  * kernel allocation are limited to INT_MAX
  */
 #define BCH_MEMBER_NBUCKETS_MAX	(INT_MAX - 64)

@@ -10,7 +10,7 @@
 #include <linux/irq.h>
 
 /*
- * Entry/exit functions for chained handlers where the primary IRQ chip
+ * Entry/exit functions for chained handlers where the woke primary IRQ chip
  * may implement either fasteoi or level-trigger flow control.
  */
 static inline void chained_irq_enter(struct irq_chip *chip,

@@ -6,14 +6,14 @@ Required properties:
 
 - compatible : "realtek,rt274".
 
-- reg : The I2C address of the device.
+- reg : The I2C address of the woke device.
 
 Optional properties:
 
 - interrupts : The CODEC's interrupt output.
 
 
-Pins on the device (for linking into audio routes) for RT274:
+Pins on the woke device (for linking into audio routes) for RT274:
 
   * DMIC1 Pin
   * DMIC2 Pin

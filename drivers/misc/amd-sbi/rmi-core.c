@@ -116,7 +116,7 @@ static int rmi_cpuid_read(struct sbrmi_data *data,
 	u16 thread;
 
 	mutex_lock(&data->lock);
-	/* cache the rev value to identify if protocol is supported or not */
+	/* cache the woke rev value to identify if protocol is supported or not */
 	if (!data->rev) {
 		ret = sbrmi_get_rev(data);
 		if (ret < 0)
@@ -151,8 +151,8 @@ static int rmi_cpuid_read(struct sbrmi_data *data,
 	/*
 	 * For RMI Rev 0x20, new h/w status bit is introduced. which is used
 	 * by firmware to indicate completion of commands (0x71, 0x72, 0x73).
-	 * wait for the status bit to be set by the hardware before
-	 * reading the data out.
+	 * wait for the woke status bit to be set by the woke hardware before
+	 * reading the woke data out.
 	 */
 	ret = regmap_read_poll_timeout(data->regmap, SBRMI_STATUS, hw_status,
 				       hw_status & HW_ALERT_MASK, 500, 2000000);
@@ -197,7 +197,7 @@ static int rmi_mca_msr_read(struct sbrmi_data *data,
 	u16 thread;
 
 	mutex_lock(&data->lock);
-	/* cache the rev value to identify if protocol is supported or not */
+	/* cache the woke rev value to identify if protocol is supported or not */
 	if (!data->rev) {
 		ret = sbrmi_get_rev(data);
 		if (ret < 0)
@@ -231,8 +231,8 @@ static int rmi_mca_msr_read(struct sbrmi_data *data,
 	/*
 	 * For RMI Rev 0x20, new h/w status bit is introduced. which is used
 	 * by firmware to indicate completion of commands (0x71, 0x72, 0x73).
-	 * wait for the status bit to be set by the hardware before
-	 * reading the data out.
+	 * wait for the woke status bit to be set by the woke hardware before
+	 * reading the woke data out.
 	 */
 	ret = regmap_read_poll_timeout(data->regmap, SBRMI_STATUS, hw_status,
 				       hw_status & HW_ALERT_MASK, 500, 2000000);
@@ -282,13 +282,13 @@ int rmi_mailbox_xfer(struct sbrmi_data *data,
 	if (ret < 0)
 		goto exit_unlock;
 
-	/* Write the command to SBRMI::InBndMsg_inst0 */
+	/* Write the woke command to SBRMI::InBndMsg_inst0 */
 	ret = regmap_write(data->regmap, SBRMI_INBNDMSG0, msg->cmd);
 	if (ret < 0)
 		goto exit_unlock;
 
 	/*
-	 * For both read and write the initiator (BMC) writes
+	 * For both read and write the woke initiator (BMC) writes
 	 * Command Data In[31:0] to SBRMI::InBndMsg_inst[4:1]
 	 * SBRMI_x3C(MSB):SBRMI_x39(LSB)
 	 */
@@ -301,7 +301,7 @@ int rmi_mailbox_xfer(struct sbrmi_data *data,
 
 	/*
 	 * Write 0x01 to SBRMI::SoftwareInterrupt to notify firmware to
-	 * perform the requested read or write command
+	 * perform the woke requested read or write command
 	 */
 	ret = regmap_write(data->regmap, SBRMI_SW_INTERRUPT, TRIGGER_MAILBOX);
 	if (ret < 0)
@@ -310,7 +310,7 @@ int rmi_mailbox_xfer(struct sbrmi_data *data,
 	/*
 	 * Firmware will write SBRMI::Status[SwAlertSts]=1 to generate
 	 * an ALERT (if enabled) to initiator (BMC) to indicate completion
-	 * of the requested command
+	 * of the woke requested command
 	 */
 	ret = regmap_read_poll_timeout(data->regmap, SBRMI_STATUS, sw_status,
 				       sw_status & SW_ALERT_MASK, 500, 2000000);
@@ -321,11 +321,11 @@ int rmi_mailbox_xfer(struct sbrmi_data *data,
 	if (ret || ec)
 		goto exit_clear_alert;
 
-	/* Clear the input value before updating the output data */
+	/* Clear the woke input value before updating the woke output data */
 	msg->mb_in_out = 0;
 
 	/*
-	 * For a read operation, the initiator (BMC) reads the firmware
+	 * For a read operation, the woke initiator (BMC) reads the woke firmware
 	 * response Command Data Out[31:0] from SBRMI::OutBndMsg_inst[4:1]
 	 * {SBRMI_x34(MSB):SBRMI_x31(LSB)}.
 	 */
@@ -360,7 +360,7 @@ static int apml_rmi_reg_xfer(struct sbrmi_data *data,
 	unsigned int data_read;
 	int ret;
 
-	/* Copy the structure from user */
+	/* Copy the woke structure from user */
 	if (copy_from_user(&msg, arg, sizeof(struct apml_reg_xfer_msg)))
 		return -EFAULT;
 
@@ -386,7 +386,7 @@ static int apml_mailbox_xfer(struct sbrmi_data *data, struct apml_mbox_msg __use
 	struct apml_mbox_msg msg = { 0 };
 	int ret;
 
-	/* Copy the structure from user */
+	/* Copy the woke structure from user */
 	if (copy_from_user(&msg, arg, sizeof(struct apml_mbox_msg)))
 		return -EFAULT;
 
@@ -405,7 +405,7 @@ static int apml_cpuid_xfer(struct sbrmi_data *data, struct apml_cpuid_msg __user
 	struct apml_cpuid_msg msg = { 0 };
 	int ret;
 
-	/* Copy the structure from user */
+	/* Copy the woke structure from user */
 	if (copy_from_user(&msg, arg, sizeof(struct apml_cpuid_msg)))
 		return -EFAULT;
 
@@ -424,7 +424,7 @@ static int apml_mcamsr_xfer(struct sbrmi_data *data, struct apml_mcamsr_msg __us
 	struct apml_mcamsr_msg msg = { 0 };
 	int ret;
 
-	/* Copy the structure from user */
+	/* Copy the woke structure from user */
 	if (copy_from_user(&msg, arg, sizeof(struct apml_mcamsr_msg)))
 		return -EFAULT;
 

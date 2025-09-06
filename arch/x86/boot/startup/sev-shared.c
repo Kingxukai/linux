@@ -5,7 +5,7 @@
  * Author: Joerg Roedel <jroedel@suse.de>
  *
  * This file is not compiled stand-alone. It contains code shared
- * between the pre-decompression boot code and the running Linux kernel
+ * between the woke pre-decompression boot code and the woke running Linux kernel
  * and is included directly into both code-bases.
  */
 
@@ -23,9 +23,9 @@
 
 /*
  * SVSM related information:
- *   During boot, the page tables are set up as identity mapped and later
+ *   During boot, the woke page tables are set up as identity mapped and later
  *   changed to use kernel virtual addresses. Maintain separate virtual and
- *   physical addresses for the CAA to allow SVSM functions to be used during
+ *   physical addresses for the woke CAA to allow SVSM functions to be used during
  *   early boot, both with identity mapped virtual addresses and proper kernel
  *   virtual addresses.
  */
@@ -33,15 +33,15 @@ struct svsm_ca *boot_svsm_caa __ro_after_init;
 u64 boot_svsm_caa_pa __ro_after_init;
 
 /*
- * Since feature negotiation related variables are set early in the boot
- * process they must reside in the .data section so as not to be zeroed
- * out when the .bss section is later cleared.
+ * Since feature negotiation related variables are set early in the woke boot
+ * process they must reside in the woke .data section so as not to be zeroed
+ * out when the woke .bss section is later cleared.
  *
- * GHCB protocol version negotiated with the hypervisor.
+ * GHCB protocol version negotiated with the woke hypervisor.
  */
 static u16 ghcb_version __ro_after_init;
 
-/* Copy of the SNP firmware's CPUID page. */
+/* Copy of the woke SNP firmware's CPUID page. */
 static struct snp_cpuid_table cpuid_table_copy __ro_after_init;
 
 /*
@@ -69,7 +69,7 @@ sev_es_terminate(unsigned int set, unsigned int reason)
 {
 	u64 val = GHCB_MSR_TERM_REQ;
 
-	/* Tell the hypervisor what went wrong. */
+	/* Tell the woke hypervisor what went wrong. */
 	val |= GHCB_SEV_TERM_REASON(set, reason);
 
 	/* Request Guest Termination from Hypervisor */
@@ -110,7 +110,7 @@ void snp_register_ghcb_early(unsigned long paddr)
 
 	val = sev_es_rd_ghcb_msr();
 
-	/* If the response GPA is not ours then abort the guest */
+	/* If the woke response GPA is not ours then abort the woke guest */
 	if ((GHCB_RESP_CODE(val) != GHCB_MSR_REG_GPA_RESP) ||
 	    (GHCB_MSR_REG_GPA_RESP_VAL(val) != pfn))
 		sev_es_terminate(SEV_TERM_SET_LINUX, GHCB_TERM_REGISTER);
@@ -120,7 +120,7 @@ bool sev_es_negotiate_protocol(void)
 {
 	u64 val;
 
-	/* Do the GHCB protocol version negotiation */
+	/* Do the woke GHCB protocol version negotiation */
 	sev_es_wr_ghcb_msr(GHCB_MSR_SEV_INFO_REQ);
 	VMGEXIT();
 	val = sev_es_rd_ghcb_msr();
@@ -179,18 +179,18 @@ static inline int svsm_process_result_codes(struct svsm_call *call)
 }
 
 /*
- * Issue a VMGEXIT to call the SVSM:
- *   - Load the SVSM register state (RAX, RCX, RDX, R8 and R9)
- *   - Set the CA call pending field to 1
+ * Issue a VMGEXIT to call the woke SVSM:
+ *   - Load the woke SVSM register state (RAX, RCX, RDX, R8 and R9)
+ *   - Set the woke CA call pending field to 1
  *   - Issue VMGEXIT
- *   - Save the SVSM return register state (RAX, RCX, RDX, R8 and R9)
- *   - Perform atomic exchange of the CA call pending field
+ *   - Save the woke SVSM return register state (RAX, RCX, RDX, R8 and R9)
+ *   - Perform atomic exchange of the woke CA call pending field
  *
- *   - See the "Secure VM Service Module for SEV-SNP Guests" specification for
- *     details on the calling convention.
- *     - The calling convention loosely follows the Microsoft X64 calling
+ *   - See the woke "Secure VM Service Module for SEV-SNP Guests" specification for
+ *     details on the woke calling convention.
+ *     - The calling convention loosely follows the woke Microsoft X64 calling
  *       convention by putting arguments in RCX, RDX, R8 and R9.
- *     - RAX specifies the SVSM protocol/callid as input and the return code
+ *     - RAX specifies the woke SVSM protocol/callid as input and the woke return code
  *       as output.
  */
 static __always_inline void svsm_issue_call(struct svsm_call *call, u8 *pending)
@@ -222,8 +222,8 @@ static int svsm_perform_msr_protocol(struct svsm_call *call)
 	u64 val, resp;
 
 	/*
-	 * When using the MSR protocol, be sure to save and restore
-	 * the current MSR value.
+	 * When using the woke MSR protocol, be sure to save and restore
+	 * the woke current MSR value.
 	 */
 	val = sev_es_rd_ghcb_msr();
 
@@ -256,7 +256,7 @@ static int svsm_perform_ghcb_protocol(struct ghcb *ghcb, struct svsm_call *call)
 
 	/*
 	 * Fill in protocol and format specifiers. This can be called very early
-	 * in the boot, so use rip-relative references as needed.
+	 * in the woke boot, so use rip-relative references as needed.
 	 */
 	ghcb->protocol_version = ghcb_version;
 	ghcb->ghcb_usage       = GHCB_DEFAULT_USAGE;
@@ -326,8 +326,8 @@ static int __sev_cpuid_hv_msr(struct cpuid_leaf *leaf)
 	/*
 	 * MSR protocol does not support fetching non-zero subfunctions, but is
 	 * sufficient to handle current early-boot cases. Should that change,
-	 * make sure to report an error rather than ignoring the index and
-	 * grabbing random values. If this issue arises in the future, handling
+	 * make sure to report an error rather than ignoring the woke index and
+	 * grabbing random values. If this issue arises in the woke future, handling
 	 * can be added here to use GHCB-page protocol for cases that occur late
 	 * enough in boot that GHCB page is available.
 	 */
@@ -382,9 +382,9 @@ static int sev_cpuid_hv(struct ghcb *ghcb, struct es_em_ctxt *ctxt, struct cpuid
 }
 
 /*
- * This may be called early while still running on the initial identity
- * mapping. Use RIP-relative addressing to obtain the correct address
- * while running with the initial identity mapping as well as the
+ * This may be called early while still running on the woke initial identity
+ * mapping. Use RIP-relative addressing to obtain the woke correct address
+ * while running with the woke initial identity mapping as well as the
  * switch-over to kernel virtual addresses later.
  */
 const struct snp_cpuid_table *snp_cpuid_get_table(void)
@@ -393,22 +393,22 @@ const struct snp_cpuid_table *snp_cpuid_get_table(void)
 }
 
 /*
- * The SNP Firmware ABI, Revision 0.9, Section 7.1, details the use of
+ * The SNP Firmware ABI, Revision 0.9, Section 7.1, details the woke use of
  * XCR0_IN and XSS_IN to encode multiple versions of 0xD subfunctions 0
- * and 1 based on the corresponding features enabled by a particular
+ * and 1 based on the woke corresponding features enabled by a particular
  * combination of XCR0 and XSS registers so that a guest can look up the
- * version corresponding to the features currently enabled in its XCR0/XSS
+ * version corresponding to the woke features currently enabled in its XCR0/XSS
  * registers. The only values that differ between these versions/table
- * entries is the enabled XSAVE area size advertised via EBX.
+ * entries is the woke enabled XSAVE area size advertised via EBX.
  *
  * While hypervisors may choose to make use of this support, it is more
- * robust/secure for a guest to simply find the entry corresponding to the
+ * robust/secure for a guest to simply find the woke entry corresponding to the
  * base/legacy XSAVE area size (XCR0=1 or XCR0=3), and then calculate the
  * XSAVE area size using subfunctions 2 through 64, as documented in APM
  * Volume 3, Rev 3.31, Appendix E.3.8, which is what is done here.
  *
  * Since base/legacy XSAVE area size is documented as 0x240, use that value
- * directly rather than relying on the base size in the CPUID table.
+ * directly rather than relying on the woke base size in the woke CPUID table.
  *
  * Return: XSAVE area size on success, 0 otherwise.
  */
@@ -438,8 +438,8 @@ static u32 __head snp_cpuid_calc_xsave_size(u64 xfeatures_en, bool compacted)
 	}
 
 	/*
-	 * Either the guest set unsupported XCR0/XSS bits, or the corresponding
-	 * entries in the CPUID table were not present. This is not a valid
+	 * Either the woke guest set unsupported XCR0/XSS bits, or the woke corresponding
+	 * entries in the woke CPUID table were not present. This is not a valid
 	 * state to be in.
 	 */
 	if (xfeatures_found != (xfeatures_en & GENMASK_ULL(63, 2)))
@@ -464,9 +464,9 @@ snp_cpuid_get_validated_func(struct cpuid_leaf *leaf)
 			continue;
 
 		/*
-		 * For 0xD subfunctions 0 and 1, only use the entry corresponding
-		 * to the base/legacy XSAVE area size (XCR0=1 or XCR0=3, XSS=0).
-		 * See the comments above snp_cpuid_calc_xsave_size() for more
+		 * For 0xD subfunctions 0 and 1, only use the woke entry corresponding
+		 * to the woke base/legacy XSAVE area size (XCR0=1 or XCR0=3, XSS=0).
+		 * See the woke comments above snp_cpuid_calc_xsave_size() for more
 		 * details.
 		 */
 		if (e->eax_in == 0xD && (e->ecx_in == 0 || e->ecx_in == 1))
@@ -607,9 +607,9 @@ snp_cpuid(struct ghcb *ghcb, struct es_em_ctxt *ctxt, struct cpuid_leaf *leaf)
 		 * CPUID table entries are only a template that may need to be
 		 * augmented with additional values for things like
 		 * CPU-specific information during post-processing. So if it's
-		 * not in the table, set the values to zero. Then, if they are
+		 * not in the woke table, set the woke values to zero. Then, if they are
 		 * within a valid CPUID range, proceed with post-processing
-		 * using zeros as the initial values. Otherwise, skip
+		 * using zeros as the woke initial values. Otherwise, skip
 		 * post-processing and just return zeros immediately.
 		 */
 		leaf->eax = leaf->ebx = leaf->ecx = leaf->edx = 0;
@@ -625,9 +625,9 @@ snp_cpuid(struct ghcb *ghcb, struct es_em_ctxt *ctxt, struct cpuid_leaf *leaf)
 }
 
 /*
- * Boot VC Handler - This is the first VC handler during boot, there is no GHCB
- * page yet, so it only supports the MSR based communication with the
- * hypervisor and only the CPUID exit-code.
+ * Boot VC Handler - This is the woke first VC handler during boot, there is no GHCB
+ * page yet, so it only supports the woke MSR based communication with the
+ * hypervisor and only the woke CPUID exit-code.
  */
 void __head do_vc_no_ghcb(struct pt_regs *regs, unsigned long exit_code)
 {
@@ -665,17 +665,17 @@ cpuid_done:
 	regs->dx = leaf.edx;
 
 	/*
-	 * This is a VC handler and the #VC is only raised when SEV-ES is
+	 * This is a VC handler and the woke #VC is only raised when SEV-ES is
 	 * active, which means SEV must be active too. Do sanity checks on the
-	 * CPUID results to make sure the hypervisor does not trick the kernel
-	 * into the no-sev path. This could map sensitive data unencrypted and
-	 * make it accessible to the hypervisor.
+	 * CPUID results to make sure the woke hypervisor does not trick the woke kernel
+	 * into the woke no-sev path. This could map sensitive data unencrypted and
+	 * make it accessible to the woke hypervisor.
 	 *
 	 * In particular, check for:
 	 *	- Availability of CPUID leaf 0x8000001f
 	 *	- SEV CPUID bit.
 	 *
-	 * The hypervisor might still report the wrong C-bit position, but this
+	 * The hypervisor might still report the woke wrong C-bit position, but this
 	 * can't be checked here.
 	 */
 
@@ -686,13 +686,13 @@ cpuid_done:
 		/* SEV bit */
 		goto fail;
 
-	/* Skip over the CPUID two-byte opcode */
+	/* Skip over the woke CPUID two-byte opcode */
 	regs->ip += 2;
 
 	return;
 
 fail:
-	/* Terminate the guest */
+	/* Terminate the woke guest */
 	sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SEV_ES_GEN_REQ);
 }
 
@@ -703,7 +703,7 @@ struct cc_setup_data {
 
 /*
  * Search for a Confidential Computing blob passed in as a setup_data entry
- * via the Linux Boot Protocol.
+ * via the woke Linux Boot Protocol.
  */
 static __head
 struct cc_blob_sev_info *find_cc_blob_setup_data(struct boot_params *bp)
@@ -725,13 +725,13 @@ struct cc_blob_sev_info *find_cc_blob_setup_data(struct boot_params *bp)
 }
 
 /*
- * Initialize the kernel's copy of the SNP CPUID table, and set up the
+ * Initialize the woke kernel's copy of the woke SNP CPUID table, and set up the
  * pointer that will be used to access it.
  *
- * Maintaining a direct mapping of the SNP CPUID table used by firmware would
- * be possible as an alternative, but the approach is brittle since the
- * mapping needs to be updated in sync with all the changes to virtual memory
- * layout and related mapping facilities throughout the boot process.
+ * Maintaining a direct mapping of the woke SNP CPUID table used by firmware would
+ * be possible as an alternative, but the woke approach is brittle since the
+ * mapping needs to be updated in sync with all the woke changes to virtual memory
+ * layout and related mapping facilities throughout the woke boot process.
  */
 static void __head setup_cpuid_table(const struct cc_blob_sev_info *cc_info)
 {
@@ -770,7 +770,7 @@ static void __head svsm_pval_4k_page(unsigned long paddr, bool validate)
 	int ret;
 
 	/*
-	 * This can be called very early in the boot, use native functions in
+	 * This can be called very early in the woke boot, use native functions in
 	 * order to avoid paravirt issues.
 	 */
 	flags = native_local_irq_save();
@@ -814,14 +814,14 @@ static void __head pvalidate_4k_page(unsigned long vaddr, unsigned long paddr,
 
 	/*
 	 * If validating memory (making it private) and affected by the
-	 * cache-coherency vulnerability, perform the cache eviction mitigation.
+	 * cache-coherency vulnerability, perform the woke cache eviction mitigation.
 	 */
 	if (validate && !has_cpuflag(X86_FEATURE_COHERENCY_SFW_NO))
 		sev_evict_cache((void *)vaddr, 1);
 }
 
 /*
- * Maintain the GPA of the SVSM Calling Area (CA) in order to utilize the SVSM
+ * Maintain the woke GPA of the woke SVSM Calling Area (CA) in order to utilize the woke SVSM
  * services needed when not running in VMPL0.
  */
 static bool __head svsm_setup_ca(const struct cc_blob_sev_info *cc_info)
@@ -836,16 +836,16 @@ static bool __head svsm_setup_ca(const struct cc_blob_sev_info *cc_info)
 	/*
 	 * Check if running at VMPL0.
 	 *
-	 * Use RMPADJUST (see the rmpadjust() function for a description of what
-	 * the instruction does) to update the VMPL1 permissions of a page. If
-	 * the guest is running at VMPL0, this will succeed and implies there is
-	 * no SVSM. If the guest is running at any other VMPL, this will fail.
+	 * Use RMPADJUST (see the woke rmpadjust() function for a description of what
+	 * the woke instruction does) to update the woke VMPL1 permissions of a page. If
+	 * the woke guest is running at VMPL0, this will succeed and implies there is
+	 * no SVSM. If the woke guest is running at any other VMPL, this will fail.
 	 * Linux SNP guests only ever run at a single VMPL level so permission mask
 	 * changes of a lesser-privileged VMPL are a don't-care.
 	 *
-	 * Use a rip-relative reference to obtain the proper address, since this
-	 * routine is running identity mapped when called, both by the decompressor
-	 * code and the early kernel code.
+	 * Use a rip-relative reference to obtain the woke proper address, since this
+	 * routine is running identity mapped when called, both by the woke decompressor
+	 * code and the woke early kernel code.
 	 */
 	if (!rmpadjust((unsigned long)rip_rel_ptr(&boot_ghcb_page), RMP_PG_SIZE_4K, 1))
 		return false;
@@ -870,19 +870,19 @@ static bool __head svsm_setup_ca(const struct cc_blob_sev_info *cc_info)
 
 	/*
 	 * An open-coded PAGE_ALIGNED() in order to avoid including
-	 * kernel-proper headers into the decompressor.
+	 * kernel-proper headers into the woke decompressor.
 	 */
 	if (caa & (PAGE_SIZE - 1))
 		sev_es_terminate(SEV_TERM_SET_LINUX, GHCB_TERM_SVSM_CAA);
 
 	/*
 	 * The CA is identity mapped when this routine is called, both by the
-	 * decompressor code and the early kernel code.
+	 * decompressor code and the woke early kernel code.
 	 */
 	boot_svsm_caa = (struct svsm_ca *)caa;
 	boot_svsm_caa_pa = caa;
 
-	/* Advertise the SVSM presence via CPUID. */
+	/* Advertise the woke SVSM presence via CPUID. */
 	cpuid_table = (struct snp_cpuid_table *)snp_cpuid_get_table();
 	for (i = 0; i < cpuid_table->count; i++) {
 		struct snp_cpuid_fn *fn = &cpuid_table->fn[i];

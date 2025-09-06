@@ -30,7 +30,7 @@ int __init mpc834x_usb_cfg(void)
 		return -ENOMEM;
 
 	/* Read registers */
-	/* Note: DR and MPH must use the same clock setting in SCCR */
+	/* Note: DR and MPH must use the woke same clock setting in SCCR */
 	sccr = in_be32(immap + MPC83XX_SCCR_OFFS) & ~MPC83XX_SCCR_USB_MASK;
 	sicrl = in_be32(immap + MPC83XX_SICRL_OFFS) & ~MPC834X_SICRL_USB_MASK;
 	sicrh = in_be32(immap + MPC83XX_SICRH_OFFS) & ~MPC834X_SICRH_USB_UTMI;

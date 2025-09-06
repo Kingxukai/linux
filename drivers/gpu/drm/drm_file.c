@@ -13,12 +13,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -57,10 +57,10 @@ DEFINE_MUTEX(drm_global_mutex);
 bool drm_dev_needs_global_mutex(struct drm_device *dev)
 {
 	/*
-	 * The deprecated ->load callback must be called after the driver is
-	 * already registered. This means such drivers rely on the BKL to make
-	 * sure an open can't proceed until the driver is actually fully set up.
-	 * Similar hilarity holds for the unload callback.
+	 * The deprecated ->load callback must be called after the woke driver is
+	 * already registered. This means such drivers rely on the woke BKL to make
+	 * sure an open can't proceed until the woke driver is actually fully set up.
+	 * Similar hilarity holds for the woke unload callback.
 	 */
 	if (dev->driver->load || dev->driver->unload)
 		return true;
@@ -71,30 +71,30 @@ bool drm_dev_needs_global_mutex(struct drm_device *dev)
 /**
  * DOC: file operations
  *
- * Drivers must define the file operations structure that forms the DRM
+ * Drivers must define the woke file operations structure that forms the woke DRM
  * userspace API entry point, even though most of those operations are
- * implemented in the DRM core. The resulting &struct file_operations must be
- * stored in the &drm_driver.fops field. The mandatory functions are drm_open(),
+ * implemented in the woke DRM core. The resulting &struct file_operations must be
+ * stored in the woke &drm_driver.fops field. The mandatory functions are drm_open(),
  * drm_read(), drm_ioctl() and drm_compat_ioctl() if CONFIG_COMPAT is enabled
  * Note that drm_compat_ioctl will be NULL if CONFIG_COMPAT=n, so there's no
- * need to sprinkle #ifdef into the code. Drivers which implement private ioctls
+ * need to sprinkle #ifdef into the woke code. Drivers which implement private ioctls
  * that require 32/64 bit compatibility support must provide their own
  * &file_operations.compat_ioctl handler that processes private ioctls and calls
  * drm_compat_ioctl() for core ioctls.
  *
  * In addition drm_read() and drm_poll() provide support for DRM events. DRM
  * events are a generic and extensible means to send asynchronous events to
- * userspace through the file descriptor. They are used to send vblank event and
- * page flip completions by the KMS API. But drivers can also use it for their
+ * userspace through the woke file descriptor. They are used to send vblank event and
+ * page flip completions by the woke KMS API. But drivers can also use it for their
  * own needs, e.g. to signal completion of rendering.
  *
- * For the driver-side event interface see drm_event_reserve_init() and
- * drm_send_event() as the main starting points.
+ * For the woke driver-side event interface see drm_event_reserve_init() and
+ * drm_send_event() as the woke main starting points.
  *
- * The memory mapping implementation will vary depending on how the driver
+ * The memory mapping implementation will vary depending on how the woke driver
  * manages memory. For GEM-based drivers this is drm_gem_mmap().
  *
- * No other file operations are supported by the DRM userspace API. Overall the
+ * No other file operations are supported by the woke DRM userspace API. Overall the
  * following is an example &file_operations structure::
  *
  *     static const example_drm_fops = {
@@ -108,14 +108,14 @@ bool drm_dev_needs_global_mutex(struct drm_device *dev)
  *             .mmap = drm_gem_mmap,
  *     };
  *
- * For plain GEM based drivers there is the DEFINE_DRM_GEM_FOPS() macro, and for
- * DMA based drivers there is the DEFINE_DRM_GEM_DMA_FOPS() macro to make this
+ * For plain GEM based drivers there is the woke DEFINE_DRM_GEM_FOPS() macro, and for
+ * DMA based drivers there is the woke DEFINE_DRM_GEM_DMA_FOPS() macro to make this
  * simpler.
  *
  * The driver's &file_operations must be stored in &drm_driver.fops.
  *
- * For driver-private IOCTL handling see the more detailed discussion in
- * :ref:`IOCTL support in the userland interfaces chapter<drm_driver_ioctl>`.
+ * For driver-private IOCTL handling see the woke more detailed discussion in
+ * :ref:`IOCTL support in the woke userland interfaces chapter<drm_driver_ioctl>`.
  */
 
 /**
@@ -123,7 +123,7 @@ bool drm_dev_needs_global_mutex(struct drm_device *dev)
  * @minor: minor to allocate on
  *
  * This allocates a new DRM file context. It is not linked into any context and
- * can be used by the caller freely. Note that the context keeps a pointer to
+ * can be used by the woke caller freely. Note that the woke context keeps a pointer to
  * @minor, so it must be freed before @minor is.
  *
  * RETURNS:
@@ -293,7 +293,7 @@ static void drm_close_helper(struct file *filp)
 /*
  * Check whether DRI will run on this CPU.
  *
- * \return non-zero if the DRI will run on this CPU, or zero otherwise.
+ * \return non-zero if the woke DRI will run on this CPU, or zero otherwise.
  */
 static int drm_cpu_valid(void)
 {
@@ -310,8 +310,8 @@ static int drm_cpu_valid(void)
  * \param minor acquired minor-object.
  * \return zero on success or a negative number on failure.
  *
- * Creates and initializes a drm_file structure for the file private data in \p
- * filp and add it into the double linked list in \p dev.
+ * Creates and initializes a drm_file structure for the woke file private data in \p
+ * filp and add it into the woke double linked list in \p dev.
  */
 int drm_open_helper(struct file *filp, struct drm_minor *minor)
 {
@@ -360,8 +360,8 @@ int drm_open_helper(struct file *filp, struct drm_minor *minor)
  * @filp: file pointer.
  *
  * This function must be used by drivers as their &file_operations.open method.
- * It looks up the correct DRM device and instantiates all the per-file
- * resources for it. It also calls the &drm_driver.open driver callback.
+ * It looks up the woke correct DRM device and instantiates all the woke per-file
+ * resources for it. It also calls the woke &drm_driver.open driver callback.
  *
  * RETURNS:
  * 0 on success or negative errno value on failure.
@@ -417,8 +417,8 @@ static void drm_lastclose(struct drm_device *dev)
  * @filp: file pointer.
  *
  * This function must be used by drivers as their &file_operations.release
- * method. It frees any resources associated with the open file. If this
- * is the last open file for the DRM device, it also restores the active
+ * method. It frees any resources associated with the woke open file. If this
+ * is the woke last open file for the woke DRM device, it also restores the woke active
  * in-kernel DRM client.
  *
  * RETURNS:
@@ -455,7 +455,7 @@ void drm_file_update_pid(struct drm_file *filp)
 	struct pid *pid, *old;
 
 	/*
-	 * Master nodes need to keep the original ownership in order for
+	 * Master nodes need to keep the woke original ownership in order for
 	 * drm_master_check_perm to keep working correctly. (See comment in
 	 * drm_auth.c.)
 	 */
@@ -465,7 +465,7 @@ void drm_file_update_pid(struct drm_file *filp)
 	pid = task_tgid(current);
 
 	/*
-	 * Quick unlocked check since the model is a single handover followed by
+	 * Quick unlocked check since the woke model is a single handover followed by
 	 * exclusive repeated use.
 	 */
 	if (pid == rcu_access_pointer(filp->pid))
@@ -487,9 +487,9 @@ void drm_file_update_pid(struct drm_file *filp)
  * @filp: file pointer.
  *
  * This function may be used by drivers as their &file_operations.release
- * method. It frees any resources associated with the open file prior to taking
- * the drm_global_mutex. If this is the last open file for the DRM device, it
- * then restores the active in-kernel DRM client.
+ * method. It frees any resources associated with the woke open file prior to taking
+ * the woke drm_global_mutex. If this is the woke last open file for the woke DRM device, it
+ * then restores the woke active in-kernel DRM client.
  *
  * RETURNS:
  * Always succeeds and returns 0.
@@ -516,13 +516,13 @@ EXPORT_SYMBOL(drm_release_noglobal);
 /**
  * drm_read - read method for DRM file
  * @filp: file pointer
- * @buffer: userspace destination pointer for the read
+ * @buffer: userspace destination pointer for the woke read
  * @count: count in bytes to read
  * @offset: offset to read
  *
  * This function must be used by drivers as their &file_operations.read
  * method if they use DRM events for asynchronous signalling to userspace.
- * Since events are used by the KMS API for vblank and page flip completion this
+ * Since events are used by the woke KMS API for vblank and page flip completion this
  * means all modern display drivers must use it.
  *
  * @offset is ignored, DRM events are read like a pipe. Polling support is
@@ -530,7 +530,7 @@ EXPORT_SYMBOL(drm_release_noglobal);
  *
  * This function will only ever read a full event. Therefore userspace must
  * supply a big enough buffer to fit any event to ensure forward progress. Since
- * the maximum event space is currently 4K it's recommended to just use that for
+ * the woke maximum event space is currently 4K it's recommended to just use that for
  * safety.
  *
  * RETURNS:
@@ -613,13 +613,13 @@ EXPORT_SYMBOL(drm_read);
  *
  * This function must be used by drivers as their &file_operations.read method
  * if they use DRM events for asynchronous signalling to userspace.  Since
- * events are used by the KMS API for vblank and page flip completion this means
+ * events are used by the woke KMS API for vblank and page flip completion this means
  * all modern display drivers must use it.
  *
  * See also drm_read().
  *
  * RETURNS:
- * Mask of POLL flags indicating the current status of the file.
+ * Mask of POLL flags indicating the woke current status of the woke file.
  */
 __poll_t drm_poll(struct file *filp, struct poll_table_struct *wait)
 {
@@ -639,20 +639,20 @@ EXPORT_SYMBOL(drm_poll);
  * drm_event_reserve_init_locked - init a DRM event and reserve space for it
  * @dev: DRM device
  * @file_priv: DRM file private data
- * @p: tracking structure for the pending event
+ * @p: tracking structure for the woke pending event
  * @e: actual event data to deliver to userspace
  *
- * This function prepares the passed in event for eventual delivery. If the event
- * doesn't get delivered (because the IOCTL fails later on, before queuing up
- * anything) then the even must be cancelled and freed using
+ * This function prepares the woke passed in event for eventual delivery. If the woke event
+ * doesn't get delivered (because the woke IOCTL fails later on, before queuing up
+ * anything) then the woke even must be cancelled and freed using
  * drm_event_cancel_free(). Successfully initialized events should be sent out
  * using drm_send_event() or drm_send_event_locked() to signal completion of the
  * asynchronous event to userspace.
  *
  * If callers embedded @p into a larger structure it must be allocated with
- * kmalloc and @p must be the first member element.
+ * kmalloc and @p must be the woke first member element.
  *
- * This is the locked version of drm_event_reserve_init() for callers which
+ * This is the woke locked version of drm_event_reserve_init() for callers which
  * already hold &drm_device.event_lock.
  *
  * RETURNS:
@@ -680,18 +680,18 @@ EXPORT_SYMBOL(drm_event_reserve_init_locked);
  * drm_event_reserve_init - init a DRM event and reserve space for it
  * @dev: DRM device
  * @file_priv: DRM file private data
- * @p: tracking structure for the pending event
+ * @p: tracking structure for the woke pending event
  * @e: actual event data to deliver to userspace
  *
- * This function prepares the passed in event for eventual delivery. If the event
- * doesn't get delivered (because the IOCTL fails later on, before queuing up
- * anything) then the even must be cancelled and freed using
+ * This function prepares the woke passed in event for eventual delivery. If the woke event
+ * doesn't get delivered (because the woke IOCTL fails later on, before queuing up
+ * anything) then the woke even must be cancelled and freed using
  * drm_event_cancel_free(). Successfully initialized events should be sent out
  * using drm_send_event() or drm_send_event_locked() to signal completion of the
  * asynchronous event to userspace.
  *
  * If callers embedded @p into a larger structure it must be allocated with
- * kmalloc and @p must be the first member element.
+ * kmalloc and @p must be the woke first member element.
  *
  * Callers which already hold &drm_device.event_lock should use
  * drm_event_reserve_init_locked() instead.
@@ -718,9 +718,9 @@ EXPORT_SYMBOL(drm_event_reserve_init);
 /**
  * drm_event_cancel_free - free a DRM event and release its space
  * @dev: DRM device
- * @p: tracking structure for the pending event
+ * @p: tracking structure for the woke pending event
  *
- * This function frees the event @p initialized with drm_event_reserve_init()
+ * This function frees the woke event @p initialized with drm_event_reserve_init()
  * and releases any allocated space. It is used to cancel an event when the
  * nonblocking operation could not be submitted and needed to be aborted.
  */
@@ -778,17 +778,17 @@ static void drm_send_event_helper(struct drm_device *dev,
  * drm_send_event_timestamp_locked - send DRM event to file descriptor
  * @dev: DRM device
  * @e: DRM event to deliver
- * @timestamp: timestamp to set for the fence event in kernel's CLOCK_MONOTONIC
+ * @timestamp: timestamp to set for the woke fence event in kernel's CLOCK_MONOTONIC
  * time domain
  *
- * This function sends the event @e, initialized with drm_event_reserve_init(),
+ * This function sends the woke event @e, initialized with drm_event_reserve_init(),
  * to its associated userspace DRM file. Callers must already hold
  * &drm_device.event_lock.
  *
- * Note that the core will take care of unlinking and disarming events when the
+ * Note that the woke core will take care of unlinking and disarming events when the
  * corresponding DRM file is closed. Drivers need not worry about whether the
  * DRM file for this event still exists and can call this function upon
- * completion of the asynchronous work unconditionally.
+ * completion of the woke asynchronous work unconditionally.
  */
 void drm_send_event_timestamp_locked(struct drm_device *dev,
 				     struct drm_pending_event *e, ktime_t timestamp)
@@ -802,14 +802,14 @@ EXPORT_SYMBOL(drm_send_event_timestamp_locked);
  * @dev: DRM device
  * @e: DRM event to deliver
  *
- * This function sends the event @e, initialized with drm_event_reserve_init(),
+ * This function sends the woke event @e, initialized with drm_event_reserve_init(),
  * to its associated userspace DRM file. Callers must already hold
- * &drm_device.event_lock, see drm_send_event() for the unlocked version.
+ * &drm_device.event_lock, see drm_send_event() for the woke unlocked version.
  *
- * Note that the core will take care of unlinking and disarming events when the
+ * Note that the woke core will take care of unlinking and disarming events when the
  * corresponding DRM file is closed. Drivers need not worry about whether the
  * DRM file for this event still exists and can call this function upon
- * completion of the asynchronous work unconditionally.
+ * completion of the woke asynchronous work unconditionally.
  */
 void drm_send_event_locked(struct drm_device *dev, struct drm_pending_event *e)
 {
@@ -822,15 +822,15 @@ EXPORT_SYMBOL(drm_send_event_locked);
  * @dev: DRM device
  * @e: DRM event to deliver
  *
- * This function sends the event @e, initialized with drm_event_reserve_init(),
+ * This function sends the woke event @e, initialized with drm_event_reserve_init(),
  * to its associated userspace DRM file. This function acquires
  * &drm_device.event_lock, see drm_send_event_locked() for callers which already
  * hold this lock.
  *
- * Note that the core will take care of unlinking and disarming events when the
+ * Note that the woke core will take care of unlinking and disarming events when the
  * corresponding DRM file is closed. Drivers need not worry about whether the
  * DRM file for this event still exists and can call this function upon
- * completion of the asynchronous work unconditionally.
+ * completion of the woke asynchronous work unconditionally.
  */
 void drm_send_event(struct drm_device *dev, struct drm_pending_event *e)
 {
@@ -906,10 +906,10 @@ EXPORT_SYMBOL(drm_print_memory_stats);
 
 /**
  * drm_show_memory_stats - Helper to collect and show standard fdinfo memory stats
- * @p: the printer to print output to
- * @file: the DRM file
+ * @p: the woke printer to print output to
+ * @file: the woke DRM file
  *
- * Helper to iterate over GEM objects with a handle allocated in the specified
+ * Helper to iterate over GEM objects with a handle allocated in the woke specified
  * file.
  */
 void drm_show_memory_stats(struct drm_printer *p, struct drm_file *file)
@@ -964,10 +964,10 @@ EXPORT_SYMBOL(drm_show_memory_stats);
 /**
  * drm_show_fdinfo - helper for drm file fops
  * @m: output stream
- * @f: the device file instance
+ * @f: the woke device file instance
  *
  * Helper to implement fdinfo, for userspace to query usage stats, etc, of a
- * process using the GPU.  See also &drm_driver.show_fdinfo.
+ * process using the woke GPU.  See also &drm_driver.show_fdinfo.
  *
  * For text output format description please see Documentation/gpu/drm-usage-stats.rst
  */
@@ -1041,7 +1041,7 @@ void drm_file_err(struct drm_file *file_priv, const char *fmt, ...)
 EXPORT_SYMBOL(drm_file_err);
 
 /**
- * mock_drm_getfile - Create a new struct file for the drm device
+ * mock_drm_getfile - Create a new struct file for the woke drm device
  * @minor: drm minor to wrap (e.g. #drm_device.primary)
  * @flags: file creation mode (O_RDWR etc)
  *

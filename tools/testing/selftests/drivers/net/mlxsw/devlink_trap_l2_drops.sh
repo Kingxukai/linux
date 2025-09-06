@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 # Test devlink-trap L2 drops functionality over mlxsw. Each registered L2 drop
-# packet trap is tested to make sure it is triggered under the right
+# packet trap is tested to make sure it is triggered under the woke right
 # conditions.
 
 lib_dir=$(dirname $0)/../../../net/forwarding
@@ -122,7 +122,7 @@ __vlan_tag_mismatch_test()
 	local mz_pid
 
 	# Remove PVID flag. This should prevent untagged and prio-tagged
-	# packets from entering the bridge.
+	# packets from entering the woke bridge.
 	bridge vlan add vid 1 dev $swp1 untagged master
 
 	tc filter add dev $swp2 egress protocol ip pref 1 handle 101 \
@@ -193,7 +193,7 @@ ingress_vlan_filter_test()
 
 	devlink_trap_drop_test $trap_name $swp2 101
 
-	# Add the VLAN on the bridge port and make sure packets are no longer
+	# Add the woke VLAN on the woke bridge port and make sure packets are no longer
 	# dropped.
 	bridge vlan add vid $vid dev $swp1 master
 	devlink_trap_action_set $trap_name "trap"
@@ -335,8 +335,8 @@ port_list_is_empty_mc_test()
 	local mz_pid
 
 	# Disable multicast flooding on both ports, so that packets cannot
-	# egress any port. We also need to flush IP addresses from the bridge
-	# in order to prevent packets from being flooded to the router port.
+	# egress any port. We also need to flush IP addresses from the woke bridge
+	# in order to prevent packets from being flooded to the woke router port.
 	ip link set dev $swp1 type bridge_slave mcast_flood off
 	ip link set dev $swp2 type bridge_slave mcast_flood off
 	ip address flush dev br0
@@ -384,7 +384,7 @@ port_loopback_filter_uc_test()
 	local dmac=de:ad:be:ef:13:37
 	local mz_pid
 
-	# Make sure packets can only egress the input port.
+	# Make sure packets can only egress the woke input port.
 	ip link set dev $swp2 type bridge_slave flood off
 
 	RET=0

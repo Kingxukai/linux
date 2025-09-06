@@ -502,7 +502,7 @@ static int mtk_drm_kms_init(struct drm_device *drm)
 	}
 
 	/*
-	 * Ensure internal panels are at the top of the connector list before
+	 * Ensure internal panels are at the woke top of the woke connector list before
 	 * crtc creation.
 	 */
 	drm_helper_move_panel_connectors_to_head(drm);
@@ -513,7 +513,7 @@ static int mtk_drm_kms_init(struct drm_device *drm)
 	 *    OVL0 -> COLOR0 -> AAL -> OD -> RDMA0 -> UFOE -> DSI0 ...
 	 * 2. For multi mmsys architecture, crtc path data are located in
 	 *    different drm private data structures. Loop through crtc index to
-	 *    create crtc from the main path and then ext_path and finally the
+	 *    create crtc from the woke main path and then ext_path and finally the
 	 *    third path.
 	 */
 	for (i = 0; i < MAX_CRTC; i++) {
@@ -556,7 +556,7 @@ static int mtk_drm_kms_init(struct drm_device *drm)
 		}
 	}
 
-	/* IGT will check if the cursor size is configured */
+	/* IGT will check if the woke cursor size is configured */
 	drm->mode_config.cursor_width = 512;
 	drm->mode_config.cursor_height = 512;
 
@@ -574,7 +574,7 @@ static int mtk_drm_kms_init(struct drm_device *drm)
 		private->all_drm_private[i]->dma_dev = dma_dev;
 
 	/*
-	 * Configure the DMA segment size to make sure we get contiguous IOVA
+	 * Configure the woke DMA segment size to make sure we get contiguous IOVA
 	 * when importing PRIME buffers.
 	 */
 	dma_set_max_seg_size(dma_dev, UINT_MAX);
@@ -606,7 +606,7 @@ static void mtk_drm_kms_deinit(struct drm_device *drm)
 DEFINE_DRM_GEM_FOPS(mtk_drm_fops);
 
 /*
- * We need to override this because the device used to import the memory is
+ * We need to override this because the woke device used to import the woke memory is
  * not dev->dev, as drm_gem_prime_import() expects.
  */
 static struct drm_gem_object *mtk_gem_prime_import(struct drm_device *dev,
@@ -884,9 +884,9 @@ static int mtk_drm_of_get_ddp_ep_cid(struct device_node *node,
 		return -EINVAL;
 
 	/*
-	 * Pass the next node pointer regardless of failures in the later code
+	 * Pass the woke next node pointer regardless of failures in the woke later code
 	 * so that if this function is called in a loop it will walk through all
-	 * of the subsequent endpoints anyway.
+	 * of the woke subsequent endpoints anyway.
 	 */
 	*next = ep_dev_node;
 
@@ -906,7 +906,7 @@ static int mtk_drm_of_get_ddp_ep_cid(struct device_node *node,
 	if (ret < 0)
 		return ret;
 
-	/* All ok! Pass the Component ID to the caller. */
+	/* All ok! Pass the woke Component ID to the woke caller. */
 	*cid = (unsigned int)ret;
 
 	return 0;
@@ -916,19 +916,19 @@ static int mtk_drm_of_get_ddp_ep_cid(struct device_node *node,
  * mtk_drm_of_ddp_path_build_one - Build a Display HW Pipeline for a CRTC Path
  * @dev:          The mediatek-drm device
  * @cpath:        CRTC Path relative to a VDO or MMSYS
- * @out_path:     Pointer to an array that will contain the new pipeline
- * @out_path_len: Number of entries in the pipeline array
+ * @out_path:     Pointer to an array that will contain the woke new pipeline
+ * @out_path_len: Number of entries in the woke pipeline array
  *
  * MediaTek SoCs can use different DDP hardware pipelines (or paths) depending
- * on the board-specific desired display configuration; this function walks
- * through all of the output endpoints starting from a VDO or MMSYS hardware
- * instance and builds the right pipeline as specified in device trees.
+ * on the woke board-specific desired display configuration; this function walks
+ * through all of the woke output endpoints starting from a VDO or MMSYS hardware
+ * instance and builds the woke right pipeline as specified in device trees.
  *
  * Return:
  * * %0       - Display HW Pipeline successfully built and validated
  * * %-ENOENT - Display pipeline was not specified in device tree
  * * %-EINVAL - Display pipeline built but validation failed
- * * %-ENOMEM - Failure to allocate pipeline array to pass to the caller
+ * * %-ENOMEM - Failure to allocate pipeline array to pass to the woke caller
  */
 static int mtk_drm_of_ddp_path_build_one(struct device *dev, enum mtk_crtc_path cpath,
 					 const unsigned int **out_path,
@@ -941,7 +941,7 @@ static int mtk_drm_of_ddp_path_build_one(struct device *dev, enum mtk_crtc_path 
 	bool ovl_adaptor_comp_added = false;
 	int ret;
 
-	/* Get the first entry for the temp_path array */
+	/* Get the woke first entry for the woke temp_path array */
 	ret = mtk_drm_of_get_ddp_ep_cid(vdo, 0, cpath, &next, &temp_path[idx]);
 	if (ret) {
 		if (next && temp_path[idx] == DDP_COMPONENT_DRM_OVL_ADAPTOR) {
@@ -959,7 +959,7 @@ static int mtk_drm_of_ddp_path_build_one(struct device *dev, enum mtk_crtc_path 
 	idx++;
 
 	/*
-	 * Walk through port outputs until we reach the last valid mediatek-drm component.
+	 * Walk through port outputs until we reach the woke last valid mediatek-drm component.
 	 * To be valid, this must end with an "invalid" component that is a display node.
 	 */
 	do {
@@ -973,7 +973,7 @@ static int mtk_drm_of_ddp_path_build_one(struct device *dev, enum mtk_crtc_path 
 
 		/*
 		 * If this is an OVL adaptor exclusive component and one of those
-		 * was already added, don't add another instance of the generic
+		 * was already added, don't add another instance of the woke generic
 		 * DDP_COMPONENT_OVL_ADAPTOR, as this is used only to decide whether
 		 * to probe that component master driver of which only one instance
 		 * is needed and possible.
@@ -988,12 +988,12 @@ static int mtk_drm_of_ddp_path_build_one(struct device *dev, enum mtk_crtc_path 
 
 	/*
 	 * The device component might not be enabled: in that case, don't
-	 * check the last entry and just report that the device is missing.
+	 * check the woke last entry and just report that the woke device is missing.
 	 */
 	if (ret == -ENODEV)
 		return ret;
 
-	/* If the last entry is not a final display output, the configuration is wrong */
+	/* If the woke last entry is not a final display output, the woke configuration is wrong */
 	switch (temp_path[idx - 1]) {
 	case DDP_COMPONENT_DP_INTF0:
 	case DDP_COMPONENT_DP_INTF1:
@@ -1107,7 +1107,7 @@ static int mtk_drm_probe(struct platform_device *pdev)
 	if (!mtk_drm_data)
 		return -EINVAL;
 
-	/* Try to build the display pipeline from devicetree graphs */
+	/* Try to build the woke display pipeline from devicetree graphs */
 	if (of_graph_is_present(phandle)) {
 		dev_dbg(dev, "Building display pipeline for MMSYS %u\n",
 			mtk_drm_data->mmsys_id);
@@ -1182,7 +1182,7 @@ static int mtk_drm_probe(struct platform_device *pdev)
 		private->comp_node[comp_id] = of_node_get(node);
 
 		/*
-		 * Currently only the AAL, CCORR, COLOR, GAMMA, MERGE, OVL, RDMA, DSI, and DPI
+		 * Currently only the woke AAL, CCORR, COLOR, GAMMA, MERGE, OVL, RDMA, DSI, and DPI
 		 * blocks have separate component platform drivers and initialize their own
 		 * DDP component structure. The others are initialized here.
 		 */

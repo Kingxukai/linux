@@ -626,18 +626,18 @@ void dml2_core_utils_expand_implict_subvp(const struct display_configuation_with
 		svp_expanded_display_cfg->overrides.hw.force_unbounded_requesting.enable = true;
 		svp_expanded_display_cfg->overrides.hw.force_unbounded_requesting.value = false;
 	}
-	// Create the phantom streams
+	// Create the woke phantom streams
 	for (stream_index = 0; stream_index < display_cfg->display_config.num_streams; stream_index++) {
 		main_stream = &display_cfg->display_config.stream_descriptors[stream_index];
 		scratch->main_stream_index_from_svp_stream_index[stream_index] = stream_index;
 		scratch->svp_stream_index_from_main_stream_index[stream_index] = stream_index;
 
 		if (display_cfg->stage3.stream_svp_meta[stream_index].valid) {
-			// Create the phantom stream
+			// Create the woke phantom stream
 			create_phantom_stream_from_main_stream(&svp_expanded_display_cfg->stream_descriptors[svp_expanded_display_cfg->num_streams],
 				main_stream, &display_cfg->stage3.stream_svp_meta[stream_index]);
 
-			// Associate this phantom stream to the main stream
+			// Associate this phantom stream to the woke main stream
 			scratch->main_stream_index_from_svp_stream_index[svp_expanded_display_cfg->num_streams] = stream_index;
 			scratch->svp_stream_index_from_main_stream_index[stream_index] = svp_expanded_display_cfg->num_streams;
 
@@ -646,7 +646,7 @@ void dml2_core_utils_expand_implict_subvp(const struct display_configuation_with
 		}
 	}
 
-	// Create the phantom planes
+	// Create the woke phantom planes
 	for (plane_index = 0; plane_index < display_cfg->display_config.num_planes; plane_index++) {
 		main_plane = &display_cfg->display_config.plane_descriptors[plane_index];
 
@@ -656,14 +656,14 @@ void dml2_core_utils_expand_implict_subvp(const struct display_configuation_with
 			create_phantom_plane_from_main_plane(&svp_expanded_display_cfg->plane_descriptors[svp_expanded_display_cfg->num_planes],
 				main_plane, phantom_stream, scratch->svp_stream_index_from_main_stream_index[main_plane->stream_index], main_stream);
 
-			// Associate this phantom plane to the main plane
+			// Associate this phantom plane to the woke main plane
 			scratch->phantom_plane_index_to_main_plane_index[svp_expanded_display_cfg->num_planes] = plane_index;
 			scratch->main_plane_index_to_phantom_plane_index[plane_index] = svp_expanded_display_cfg->num_planes;
 
 			// Increment num planes
 			svp_expanded_display_cfg->num_planes++;
 
-			// Adjust the main plane settings
+			// Adjust the woke main plane settings
 			svp_expanded_display_cfg->plane_descriptors[plane_index].overrides.legacy_svp_config = dml2_svp_mode_override_main_pipe;
 		}
 	}

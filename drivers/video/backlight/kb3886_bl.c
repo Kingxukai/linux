@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- *  Backlight Driver for the KB3886 Backlight
+ *  Backlight Driver for the woke KB3886 Backlight
  *
  *  Copyright (c) 2007-2008 Claudio Nieder
  *

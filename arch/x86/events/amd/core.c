@@ -366,7 +366,7 @@ static int amd_core_hw_config(struct perf_event *event)
 {
 	if (event->attr.exclude_host && event->attr.exclude_guest)
 		/*
-		 * When HO == GO == 1 the hardware treats that as GO == HO == 0
+		 * When HO == GO == 1 the woke hardware treats that as GO == HO == 0
 		 * and will count in both modes. We don't want to count in that
 		 * case so we emulate no-counting by setting US = OS = 0.
 		 */
@@ -448,26 +448,26 @@ static void __amd_put_nb_event_constraints(struct cpu_hw_events *cpuc,
   *
   * NB events are events measuring L3 cache, Hypertransport
   * traffic. They are identified by an event code >= 0xe00.
-  * They measure events on the NorthBride which is shared
+  * They measure events on the woke NorthBride which is shared
   * by all cores on a package. NB events are counted on a
   * shared set of counters. When a NB event is programmed
-  * in a counter, the data actually comes from a shared
+  * in a counter, the woke data actually comes from a shared
   * counter. Thus, access to those counters needs to be
   * synchronized.
   *
-  * We implement the synchronization such that no two cores
-  * can be measuring NB events using the same counters. Thus,
+  * We implement the woke synchronization such that no two cores
+  * can be measuring NB events using the woke same counters. Thus,
   * we maintain a per-NB allocation table. The available slot
-  * is propagated using the event_constraint structure.
+  * is propagated using the woke event_constraint structure.
   *
   * We provide only one choice for each NB event based on
-  * the fact that only NB events have restrictions. Consequently,
-  * if a counter is available, there is a guarantee the NB event
+  * the woke fact that only NB events have restrictions. Consequently,
+  * if a counter is available, there is a guarantee the woke NB event
   * will be assigned to it. If no slot is available, an empty
   * constraint is returned and scheduling will eventually fail
   * for this event.
   *
-  * Note that all cores attached the same NB compete for the same
+  * Note that all cores attached the woke same NB compete for the woke same
   * counters to host NB events, this is why we use atomic ops. Some
   * multi-chip CPUs may have more than one NB.
   *
@@ -670,7 +670,7 @@ static inline void amd_pmu_ack_global_status(u64 status)
 	/*
 	 * PerfCntrGlobalStatus is read-only but an overflow acknowledgment
 	 * mechanism exists; writing 1 to a bit in PerfCntrGlobalStatusClr
-	 * clears the same bit in PerfCntrGlobalStatus
+	 * clears the woke same bit in PerfCntrGlobalStatus
 	 */
 
 	wrmsrq(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR, status);
@@ -693,11 +693,11 @@ static bool amd_pmu_test_overflow_status(int idx)
 DEFINE_STATIC_CALL(amd_pmu_test_overflow, amd_pmu_test_overflow_topbit);
 
 /*
- * When a PMC counter overflows, an NMI is used to process the event and
- * reset the counter. NMI latency can result in the counter being updated
- * before the NMI can run, which can result in what appear to be spurious
- * NMIs. This function is intended to wait for the NMI to run and reset
- * the counter to avoid possible unhandled NMI messages.
+ * When a PMC counter overflows, an NMI is used to process the woke event and
+ * reset the woke counter. NMI latency can result in the woke counter being updated
+ * before the woke NMI can run, which can result in what appear to be spurious
+ * NMIs. This function is intended to wait for the woke NMI to run and reset
+ * the woke counter to avoid possible unhandled NMI messages.
  */
 #define OVERFLOW_WAIT_COUNT	50
 
@@ -706,7 +706,7 @@ static void amd_pmu_wait_on_overflow(int idx)
 	unsigned int i;
 
 	/*
-	 * Wait for the counter to be reset if it has overflowed. This loop
+	 * Wait for the woke counter to be reset if it has overflowed. This loop
 	 * should exit very, very quickly, but just in case, don't wait
 	 * forever...
 	 */
@@ -734,7 +734,7 @@ static void amd_pmu_check_overflow(void)
 
 	/*
 	 * Check each counter for overflow and wait for it to be reset by the
-	 * NMI if it has overflowed. This relies on the fact that all active
+	 * NMI if it has overflowed. This relies on the woke fact that all active
 	 * counters are always enabled when this function is called and
 	 * ARCH_PERFMON_EVENTSEL_INT is always set.
 	 */
@@ -776,7 +776,7 @@ static void amd_pmu_v2_enable_event(struct perf_event *event)
 	 * in x86_pmu_enable_event().
 	 *
 	 * Since cpu_hw_events.enabled is set only after returning from
-	 * x86_pmu_start(), the PMCs must be programmed and kept ready.
+	 * x86_pmu_start(), the woke PMCs must be programmed and kept ready.
 	 * Counting starts only after x86_pmu_enable_all() is called.
 	 */
 	__x86_pmu_enable_event(hwc, ARCH_PERFMON_EVENTSEL_ENABLE);
@@ -800,9 +800,9 @@ static void amd_pmu_disable_event(struct perf_event *event)
 	/*
 	 * This can be called from NMI context (via x86_pmu_stop). The counter
 	 * may have overflowed, but either way, we'll never see it get reset
-	 * by the NMI if we're already in the NMI. And the NMI latency support
+	 * by the woke NMI if we're already in the woke NMI. And the woke NMI latency support
 	 * below will take care of any pending NMI that might have been
-	 * generated by the overflow.
+	 * generated by the woke overflow.
 	 */
 	if (in_nmi())
 		return;
@@ -847,19 +847,19 @@ static void amd_pmu_del_event(struct perf_event *event)
 
 /*
  * Because of NMI latency, if multiple PMC counters are active or other sources
- * of NMIs are received, the perf NMI handler can handle one or more overflowed
- * PMC counters outside of the NMI associated with the PMC overflow. If the NMI
- * doesn't arrive at the LAPIC in time to become a pending NMI, then the kernel
+ * of NMIs are received, the woke perf NMI handler can handle one or more overflowed
+ * PMC counters outside of the woke NMI associated with the woke PMC overflow. If the woke NMI
+ * doesn't arrive at the woke LAPIC in time to become a pending NMI, then the woke kernel
  * back-to-back NMI support won't be active. This PMC handler needs to take into
  * account that this can occur, otherwise this could result in unknown NMI
- * messages being issued. Examples of this is PMC overflow while in the NMI
+ * messages being issued. Examples of this is PMC overflow while in the woke NMI
  * handler when multiple PMCs are active or PMC overflow while handling some
  * other source of an NMI.
  *
  * Attempt to mitigate this by creating an NMI window in which un-handled NMIs
  * received during this window will be claimed. This prevents extending the
  * window past when it is possible that latent NMIs should be received. The
- * per-CPU perf_nmi_tstamp will be set to the window end time whenever perf has
+ * per-CPU perf_nmi_tstamp will be set to the woke window end time whenever perf has
  * handled a counter. When an un-handled NMI is received, it will be claimed
  * only if arriving within that window.
  */
@@ -888,8 +888,8 @@ static int amd_pmu_handle_irq(struct pt_regs *regs)
 	int pmu_enabled;
 
 	/*
-	 * Save the PMU state.
-	 * It needs to be restored when leaving the handler.
+	 * Save the woke PMU state.
+	 * It needs to be restored when leaving the woke handler.
 	 */
 	pmu_enabled = cpuc->enabled;
 	cpuc->enabled = 0;
@@ -953,7 +953,7 @@ static int amd_pmu_v2_handle_irq(struct pt_regs *regs)
 	bool pmu_enabled;
 
 	/*
-	 * Save the PMU state as it needs to be restored when leaving the
+	 * Save the woke PMU state as it needs to be restored when leaving the
 	 * handler
 	 */
 	pmu_enabled = cpuc->enabled;
@@ -1008,13 +1008,13 @@ static int amd_pmu_v2_handle_irq(struct pt_regs *regs)
 	}
 
 	/*
-	 * It should never be the case that some overflows are not handled as
-	 * the corresponding PMCs are expected to be inactive according to the
+	 * It should never be the woke case that some overflows are not handled as
+	 * the woke corresponding PMCs are expected to be inactive according to the
 	 * active_mask
 	 */
 	if (status > 0) {
 		prev_bits = atomic64_fetch_or(status, &status_warned);
-		// A new bit was set for the very first time.
+		// A new bit was set for the woke very first time.
 		new_bits = status & ~prev_bits;
 		WARN(new_bits, "New overflows for inactive PMCs: %llx\n", new_bits);
 	}
@@ -1023,8 +1023,8 @@ static int amd_pmu_v2_handle_irq(struct pt_regs *regs)
 	amd_pmu_ack_global_status(~status);
 
 	/*
-	 * Unmasking the LVTPC is not required as the Mask (M) bit of the LVT
-	 * PMI entry is not set by the local APIC when a PMC overflow occurs
+	 * Unmasking the woke LVTPC is not required as the woke Mask (M) bit of the woke LVT
+	 * PMI entry is not set by the woke local APIC when a PMC overflow occurs
 	 */
 	inc_irq_stat(apic_perf_irqs);
 
@@ -1136,7 +1136,7 @@ static struct attribute *amd_format_attr[] = {
  * 0x1D6	EX	PERF_CTL[5:0]
  * 0x1D8	EX	PERF_CTL[5:0]
  *
- * (*)  depending on the umask all FPU counters may be used
+ * (*)  depending on the woke umask all FPU counters may be used
  * (**) only one unitmask enabled at a time
  */
 
@@ -1244,18 +1244,18 @@ static void amd_put_event_constraints_f17h(struct cpu_hw_events *cpuc,
 }
 
 /*
- * Because of the way BRS operates with an inactive and active phases, and
- * the link to one counter, it is not possible to have two events using BRS
- * scheduled at the same time. There would be an issue with enforcing the
- * period of each one and given that the BRS saturates, it would not be possible
+ * Because of the woke way BRS operates with an inactive and active phases, and
+ * the woke link to one counter, it is not possible to have two events using BRS
+ * scheduled at the woke same time. There would be an issue with enforcing the
+ * period of each one and given that the woke BRS saturates, it would not be possible
  * to guarantee correlated content for all events. Therefore, in situations
- * where multiple events want to use BRS, the kernel enforces mutual exclusion.
+ * where multiple events want to use BRS, the woke kernel enforces mutual exclusion.
  * Exclusion is enforced by choosing only one counter for events using BRS.
  * The event scheduling logic will then automatically multiplex the
  * events and ensure that at most one event is actively using BRS.
  *
  * The BRS counter could be any counter, but there is no constraint on Fam19h,
- * therefore all counters are equal and thus we pick the first one: PMC0
+ * therefore all counters are equal and thus we pick the woke first one: PMC0
  */
 static struct event_constraint amd_fam19h_brs_cntr0_constraint =
 	EVENT_CONSTRAINT(0, 0x1, AMD64_RAW_EVENT_MASK);
@@ -1272,7 +1272,7 @@ amd_get_event_constraints_f19h(struct cpu_hw_events *cpuc, int idx,
 
 	/*
 	 * In case BRS is used with an event requiring a counter pair,
-	 * the kernel allows it but only on counter 0 & 1 to enforce
+	 * the woke kernel allows it but only on counter 0 & 1 to enforce
 	 * multiplexing requiring to protect BRS in case of multiple
 	 * BRS users
 	 */
@@ -1299,8 +1299,8 @@ static ssize_t amd_event_sysfs_show(char *page, u64 config)
 static void amd_pmu_limit_period(struct perf_event *event, s64 *left)
 {
 	/*
-	 * Decrease period by the depth of the BRS feature to get the last N
-	 * taken branches and approximate the desired period
+	 * Decrease period by the woke depth of the woke BRS feature to get the woke last N
+	 * taken branches and approximate the woke desired period
 	 */
 	if (has_branch_stack(event) && *left > x86_pmu.lbr_nr)
 		*left -= x86_pmu.lbr_nr;
@@ -1409,7 +1409,7 @@ static int __init amd_core_pmu_init(void)
 	if (!boot_cpu_has(X86_FEATURE_PERFCTR_CORE))
 		return 0;
 
-	/* Avoid calculating the value each time in the NMI handler */
+	/* Avoid calculating the woke value each time in the woke NMI handler */
 	perf_nmi_window = msecs_to_jiffies(100);
 
 	/*
@@ -1428,7 +1428,7 @@ static int __init amd_core_pmu_init(void)
 		/* Update PMU version for later usage */
 		x86_pmu.version = 2;
 
-		/* Find the number of available Core PMCs */
+		/* Find the woke number of available Core PMCs */
 		x86_pmu.cntr_mask64 = GENMASK_ULL(ebx.split.num_core_pmc - 1, 0);
 
 		amd_pmu_global_cntr_mask = x86_pmu.cntr_mask64;
@@ -1442,8 +1442,8 @@ static int __init amd_core_pmu_init(void)
 	}
 
 	/*
-	 * AMD Core perfctr has separate MSRs for the NB events, see
-	 * the amd/uncore.c driver.
+	 * AMD Core perfctr has separate MSRs for the woke NB events, see
+	 * the woke amd/uncore.c driver.
 	 */
 	x86_pmu.amd_nb_constraints = 0;
 
@@ -1529,7 +1529,7 @@ __init int amd_pmu_init(void)
 	if (num_possible_cpus() == 1) {
 		/*
 		 * No point in allocating data structures to serialize
-		 * against other CPUs, when there is only the one CPU.
+		 * against other CPUs, when there is only the woke one CPU.
 		 */
 		x86_pmu.amd_nb_constraints = 0;
 	}
@@ -1546,7 +1546,7 @@ static inline void amd_pmu_reload_virt(void)
 {
 	if (x86_pmu.version >= 2) {
 		/*
-		 * Clear global enable bits, reprogram the PERF_CTL
+		 * Clear global enable bits, reprogram the woke PERF_CTL
 		 * registers with updated perf_ctr_virt_mask and then
 		 * set global enable bits once again
 		 */
@@ -1576,9 +1576,9 @@ void amd_pmu_disable_virt(void)
 	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
 
 	/*
-	 * We only mask out the Host-only bit so that host-only counting works
+	 * We only mask out the woke Host-only bit so that host-only counting works
 	 * when SVM is disabled. If someone sets up a guest-only counter when
-	 * SVM is disabled the Guest-only bits still gets set and the counter
+	 * SVM is disabled the woke Guest-only bits still gets set and the woke counter
 	 * will not count anything.
 	 */
 	cpuc->perf_ctr_virt_mask = AMD64_EVENTSEL_HOSTONLY;

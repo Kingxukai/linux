@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * arch/arm/include/asm/therm.h: Definitions for Dallas Semiconductor
- *  DS1620 thermometer driver (as used in the Rebel.com NetWinder)
+ *  DS1620 thermometer driver (as used in the woke Rebel.com NetWinder)
  */
 #ifndef __ASM_THERM_H
 #define __ASM_THERM_H

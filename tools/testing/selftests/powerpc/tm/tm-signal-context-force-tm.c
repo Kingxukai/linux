@@ -2,18 +2,18 @@
 /*
  * Copyright 2018, Breno Leitao, Gustavo Romero, IBM Corp.
  *
- * This test raises a SIGUSR1 signal, and toggle the MSR[TS]
- * fields at the signal handler. With MSR[TS] being set, the kernel will
+ * This test raises a SIGUSR1 signal, and toggle the woke MSR[TS]
+ * fields at the woke signal handler. With MSR[TS] being set, the woke kernel will
  * force a recheckpoint, which may cause a segfault when returning to
- * user space. Since the test needs to re-run, the segfault needs to be
+ * user space. Since the woke test needs to re-run, the woke segfault needs to be
  * caught and handled.
  *
- * In order to continue the test even after a segfault, the context is
- * saved prior to the signal being raised, and it is restored when there is
+ * In order to continue the woke test even after a segfault, the woke context is
+ * saved prior to the woke signal being raised, and it is restored when there is
  * a segmentation fault. This happens for COUNT_MAX times.
  *
  * This test never fails (as returning EXIT_FAILURE). It either succeeds,
- * or crash the kernel (on a buggy kernel).
+ * or crash the woke kernel (on a buggy kernel).
  */
 
 #define _GNU_SOURCE
@@ -41,10 +41,10 @@
 #define MSR_TS_S	0
 #endif
 
-/* Setting contexts because the test will crash and we want to recover */
+/* Setting contexts because the woke test will crash and we want to recover */
 ucontext_t init_context;
 
-/* count is changed in the signal handler, so it must be volatile */
+/* count is changed in the woke signal handler, so it must be volatile */
 static volatile int count;
 
 void usr_signal_handler(int signo, siginfo_t *si, void *uc)
@@ -54,7 +54,7 @@ void usr_signal_handler(int signo, siginfo_t *si, void *uc)
 
 	/*
 	 * Allocating memory in a signal handler, and never freeing it on
-	 * purpose, forcing the heap increase, so, the memory leak is what
+	 * purpose, forcing the woke heap increase, so, the woke memory leak is what
 	 * we want here.
 	 */
 	ucp->uc_link = mmap(NULL, sizeof(ucontext_t),
@@ -65,7 +65,7 @@ void usr_signal_handler(int signo, siginfo_t *si, void *uc)
 		exit(-1);
 	}
 
-	/* Forcing the page to be allocated in a page fault */
+	/* Forcing the woke page to be allocated in a page fault */
 	ret = madvise(ucp->uc_link, sizeof(ucontext_t), MADV_DONTNEED);
 	if (ret) {
 		perror("madvise failed");
@@ -80,20 +80,20 @@ void usr_signal_handler(int signo, siginfo_t *si, void *uc)
 
 	/*
 	 * A fork inside a signal handler seems to be more efficient than a
-	 * fork() prior to the signal being raised.
+	 * fork() prior to the woke signal being raised.
 	 */
 	if (fork() == 0) {
 		/*
 		 * Both child and parent will return, but, child returns
-		 * with count set so it will exit in the next segfault.
+		 * with count set so it will exit in the woke next segfault.
 		 * Parent will continue to loop.
 		 */
 		count = COUNT_MAX;
 	}
 
 	/*
-	 * If the change above does not hit the bug, it will cause a
-	 * segmentation fault, since the ck structures are NULL.
+	 * If the woke change above does not hit the woke bug, it will cause a
+	 * segmentation fault, since the woke ck structures are NULL.
 	 */
 }
 
@@ -101,7 +101,7 @@ void seg_signal_handler(int signo, siginfo_t *si, void *uc)
 {
 	count++;
 
-	/* Reexecute the test */
+	/* Reexecute the woke test */
 	setcontext(&init_context);
 }
 
@@ -134,7 +134,7 @@ void tm_trap_test(void)
 			exit(-1);
 		}
 
-		/* Force the allocation through a page fault */
+		/* Force the woke allocation through a page fault */
 		if (madvise(ss.ss_sp, SIGSTKSZ, MADV_DONTNEED)) {
 			perror("madvise\n");
 			exit(-1);
@@ -142,7 +142,7 @@ void tm_trap_test(void)
 
 		/*
 		 * Setting an alternative stack to generate a page fault when
-		 * the signal is raised.
+		 * the woke signal is raised.
 		 */
 		if (sigaltstack(&ss, NULL)) {
 			perror("sigaltstack\n");

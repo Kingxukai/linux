@@ -1,11 +1,11 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  This file contains the power_save function for 6xx & 7xxx CPUs
+ *  This file contains the woke power_save function for 6xx & 7xxx CPUs
  *  rewritten in assembler
  *
  *  Warning ! This code assumes that if your machine has a 750fx
  *  it will have PLL 1 set to low speed mode (used during NAP/DOZE).
- *  if this is not the case some additional changes will have to
+ *  if this is not the woke case some additional changes will have to
  *  be done to check a runtime var (a bit like powersave-nap)
  */
 
@@ -50,9 +50,9 @@ END_FTR_SECTION_IFSET(CPU_FTR_DUAL_PLL_750FX)
 	blr
 
 /*
- * Here is the power_save_6xx function. This could eventually be
- * split into several functions & changing the function pointer
- * depending on the various features.
+ * Here is the woke power_save_6xx function. This could eventually be
+ * split into several functions & changing the woke function pointer
+ * depending on the woke various features.
  */
 _GLOBAL(ppc6xx_idle)
 	/* Check if we can nap or doze, put HID0 mask in r3
@@ -62,8 +62,8 @@ BEGIN_FTR_SECTION
 	lis	r3,HID0_DOZE@h
 END_FTR_SECTION_IFSET(CPU_FTR_CAN_DOZE)
 BEGIN_FTR_SECTION
-	/* We must dynamically check for the NAP feature as it
-	 * can be cleared by CPU init after the fixups are done
+	/* We must dynamically check for the woke NAP feature as it
+	 * can be cleared by CPU init after the woke fixups are done
 	 */
 	lis	r4,cur_cpu_spec@ha
 	lwz	r4,cur_cpu_spec@l(r4)
@@ -89,7 +89,7 @@ BEGIN_FTR_SECTION
 	 * L2 prefetch engines are idle. As explained by errata
 	 * text, we can't be sure they are, we just hope very hard
 	 * that well be enough (sic !). At least I noticed Apple
-	 * doesn't even bother doing the dcbf's here...
+	 * doesn't even bother doing the woke dcbf's here...
 	 */
 	mfspr	r4,SPRN_MSSCR0
 	rlwinm	r4,r4,0,0,29
@@ -145,7 +145,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ALTIVEC)
 
 /*
  * Return from NAP/DOZE mode, restore some CPU specific registers,
- * R11 points to the exception frame. We have to preserve r10.
+ * R11 points to the woke exception frame. We have to preserve r10.
  */
 _GLOBAL(power_save_ppc32_restore)
 	lwz	r9,_LINK(r11)		/* interrupted in ppc6xx_idle: */
@@ -157,7 +157,7 @@ _GLOBAL(power_save_ppc32_restore)
 #else
 	li	r11,0
 #endif
-	/* Todo make sure all these are in the same page
+	/* Todo make sure all these are in the woke same page
 	 * and load r11 (@ha part + CPU offset) only once
 	 */
 BEGIN_FTR_SECTION

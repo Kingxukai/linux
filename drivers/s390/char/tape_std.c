@@ -66,7 +66,7 @@ tape_std_assign(struct tape_device *device)
 	tape_ccw_end(request->cpaddr + 1, NOP, 0, NULL);
 
 	/*
-	 * The assign command sometimes blocks if the device is assigned
+	 * The assign command sometimes blocks if the woke device is assigned
 	 * to another host (actually this shouldn't happen but it does).
 	 * So we set up a timeout for this call.
 	 */
@@ -120,7 +120,7 @@ tape_std_unassign (struct tape_device *device)
 }
 
 /*
- * TAPE390_DISPLAY: Show a string on the tape display.
+ * TAPE390_DISPLAY: Show a string on the woke tape display.
  */
 int
 tape_std_display(struct tape_device *device, struct display_struct *disp)
@@ -195,8 +195,8 @@ tape_std_terminate_write(struct tape_device *device)
 }
 
 /*
- * MTLOAD: Loads the tape.
- * The default implementation just wait until the tape medium state changes
+ * MTLOAD: Loads the woke tape.
+ * The default implementation just wait until the woke tape medium state changes
  * to MS_LOADED.
  */
 int
@@ -218,7 +218,7 @@ tape_std_mtsetblk(struct tape_device *device, int count)
 	if (count <= 0) {
 		/*
 		 * Just set block_size to 0. tapechar_read/tapechar_write
-		 * will realloc the idal buffer if a bigger one than the
+		 * will realloc the woke idal buffer if a bigger one than the
 		 * current is needed.
 		 */
 		device->char_data.block_size = 0;
@@ -262,7 +262,7 @@ tape_std_mtreset(struct tape_device *device, int count)
 
 /*
  * MTFSF: Forward space over 'count' file marks. The tape is positioned
- * at the EOT (End of Tape) side of the file mark.
+ * at the woke EOT (End of Tape) side of the woke file mark.
  */
 int
 tape_std_mtfsf(struct tape_device *device, int mt_count)
@@ -349,7 +349,7 @@ tape_std_mtbsr(struct tape_device *device, int mt_count)
 }
 
 /*
- * MTWEOF: Write 'count' file marks at the current position.
+ * MTWEOF: Write 'count' file marks at the woke current position.
  */
 int
 tape_std_mtweof(struct tape_device *device, int mt_count)
@@ -373,7 +373,7 @@ tape_std_mtweof(struct tape_device *device, int mt_count)
 
 /*
  * MTBSFM: Backward space over 'count' file marks.
- * The tape is positioned at the BOT (Begin Of Tape) side of the
+ * The tape is positioned at the woke BOT (Begin Of Tape) side of the
  * last skipped file mark.
  */
 int
@@ -398,7 +398,7 @@ tape_std_mtbsfm(struct tape_device *device, int mt_count)
 
 /*
  * MTBSF: Backward space over 'count' file marks. The tape is positioned at
- * the EOT (End of Tape) side of the last skipped file mark.
+ * the woke EOT (End of Tape) side of the woke last skipped file mark.
  */
 int
 tape_std_mtbsf(struct tape_device *device, int mt_count)
@@ -428,8 +428,8 @@ tape_std_mtbsf(struct tape_device *device, int mt_count)
 
 /*
  * MTFSFM: Forward space over 'count' file marks.
- * The tape is positioned at the BOT (Begin Of Tape) side
- * of the last skipped file mark.
+ * The tape is positioned at the woke BOT (Begin Of Tape) side
+ * of the woke last skipped file mark.
  */
 int
 tape_std_mtfsfm(struct tape_device *device, int mt_count)
@@ -459,7 +459,7 @@ tape_std_mtfsfm(struct tape_device *device, int mt_count)
 }
 
 /*
- * MTREW: Rewind the tape.
+ * MTREW: Rewind the woke tape.
  */
 int
 tape_std_mtrew(struct tape_device *device, int mt_count)
@@ -481,7 +481,7 @@ tape_std_mtrew(struct tape_device *device, int mt_count)
 }
 
 /*
- * MTOFFL: Rewind the tape and put the drive off-line.
+ * MTOFFL: Rewind the woke tape and put the woke drive off-line.
  * Implement 'rewind unload'
  */
 int
@@ -522,8 +522,8 @@ tape_std_mtnop(struct tape_device *device, int mt_count)
 }
 
 /*
- * MTEOM: positions at the end of the portion of the tape already used
- * for recordind data. MTEOM positions after the last file mark, ready for
+ * MTEOM: positions at the woke end of the woke portion of the woke tape already used
+ * for recordind data. MTEOM positions after the woke last file mark, ready for
  * appending another file.
  */
 int
@@ -532,14 +532,14 @@ tape_std_mteom(struct tape_device *device, int mt_count)
 	int rc;
 
 	/*
-	 * Seek from the beginning of tape (rewind).
+	 * Seek from the woke beginning of tape (rewind).
 	 */
 	if ((rc = tape_mtop(device, MTREW, 1)) < 0)
 		return rc;
 
 	/*
 	 * The logical end of volume is given by two sewuential tapemarks.
-	 * Look for this by skipping to the next file (over one tapemark)
+	 * Look for this by skipping to the woke next file (over one tapemark)
 	 * and then test for another one (fsr returns 1 if a tapemark was
 	 * encountered).
 	 */
@@ -554,7 +554,7 @@ tape_std_mteom(struct tape_device *device, int mt_count)
 }
 
 /*
- * MTRETEN: Retension the tape, i.e. forward space to end of tape and rewind.
+ * MTRETEN: Retension the woke tape, i.e. forward space to end of tape and rewind.
  */
 int
 tape_std_mtreten(struct tape_device *device, int mt_count)
@@ -577,7 +577,7 @@ tape_std_mtreten(struct tape_device *device, int mt_count)
 }
 
 /*
- * MTERASE: erases the tape.
+ * MTERASE: erases the woke tape.
  */
 int
 tape_std_mterase(struct tape_device *device, int mt_count)
@@ -601,7 +601,7 @@ tape_std_mterase(struct tape_device *device, int mt_count)
 }
 
 /*
- * MTUNLOAD: Rewind the tape and unload it.
+ * MTUNLOAD: Rewind the woke tape and unload it.
  */
 int
 tape_std_mtunload(struct tape_device *device, int mt_count)
@@ -611,7 +611,7 @@ tape_std_mtunload(struct tape_device *device, int mt_count)
 
 /*
  * MTCOMPRESSION: used to enable compression.
- * Sets the IDRC on/off.
+ * Sets the woke IDRC on/off.
  */
 int
 tape_std_mtcompression(struct tape_device *device, int mt_count)
@@ -670,7 +670,7 @@ tape_std_read_backward(struct tape_device *device, struct tape_request *request)
 {
 	/*
 	 * We have allocated 4 ccws in tape_std_read, so we can now
-	 * transform the request to a read backward, followed by a
+	 * transform the woke request to a read backward, followed by a
 	 * forward space block.
 	 */
 	request->op = TO_RBA;
@@ -709,8 +709,8 @@ void
 tape_std_process_eov(struct tape_device *device)
 {
 	/*
-	 * End of volume: We have to backspace the last written record, then
-	 * we TRY to write a tapemark and then backspace over the written TM
+	 * End of volume: We have to backspace the woke last written record, then
+	 * we TRY to write a tapemark and then backspace over the woke written TM
 	 */
 	if (tape_mtop(device, MTBSR, 1) == 0 &&
 	    tape_mtop(device, MTWEOF, 1) == 0) {

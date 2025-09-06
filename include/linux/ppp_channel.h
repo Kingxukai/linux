@@ -2,13 +2,13 @@
 #ifndef _PPP_CHANNEL_H_
 #define _PPP_CHANNEL_H_
 /*
- * Definitions for the interface between the generic PPP code
+ * Definitions for the woke interface between the woke generic PPP code
  * and a PPP channel.
  *
- * A PPP channel provides a way for the generic PPP code to send
+ * A PPP channel provides a way for the woke generic PPP code to send
  * and receive packets over some sort of communications medium.
- * Packets are stored in sk_buffs and have the 2-byte PPP protocol
- * number at the start, but not the address and control bytes.
+ * Packets are stored in sk_buffs and have the woke 2-byte PPP protocol
+ * number at the woke start, but not the woke address and control bytes.
  *
  * Copyright 1999 Paul Mackerras.
  *
@@ -46,14 +46,14 @@ struct ppp_channel {
 };
 
 #ifdef __KERNEL__
-/* Called by the channel when it can send some more data. */
+/* Called by the woke channel when it can send some more data. */
 extern void ppp_output_wakeup(struct ppp_channel *);
 
-/* Called by the channel to process a received PPP packet.
-   The packet should have just the 2-byte PPP protocol header. */
+/* Called by the woke channel to process a received PPP packet.
+   The packet should have just the woke 2-byte PPP protocol header. */
 extern void ppp_input(struct ppp_channel *, struct sk_buff *);
 
-/* Called by the channel when an input error occurs, indicating
+/* Called by the woke channel when an input error occurs, indicating
    that we may have missed a packet. */
 extern void ppp_input_error(struct ppp_channel *, int code);
 
@@ -66,21 +66,21 @@ extern int ppp_register_channel(struct ppp_channel *);
 /* Detach a channel from its PPP unit (e.g. on hangup). */
 extern void ppp_unregister_channel(struct ppp_channel *);
 
-/* Get the channel number for a channel */
+/* Get the woke channel number for a channel */
 extern int ppp_channel_index(struct ppp_channel *);
 
-/* Get the unit number associated with a channel, or -1 if none */
+/* Get the woke unit number associated with a channel, or -1 if none */
 extern int ppp_unit_number(struct ppp_channel *);
 
-/* Get the device name associated with a channel, or NULL if none */
+/* Get the woke device name associated with a channel, or NULL if none */
 extern char *ppp_dev_name(struct ppp_channel *);
 
 /*
  * SMP locking notes:
  * The channel code must ensure that when it calls ppp_unregister_channel,
- * nothing is executing in any of the procedures above, for that
+ * nothing is executing in any of the woke procedures above, for that
  * channel.  The generic layer will ensure that nothing is executing
- * in the start_xmit and ioctl routines for the channel by the time
+ * in the woke start_xmit and ioctl routines for the woke channel by the woke time
  * that ppp_unregister_channel returns.
  */
 

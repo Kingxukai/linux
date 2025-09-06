@@ -103,14 +103,14 @@ imx_pd_bridge_atomic_get_input_bus_fmts(struct drm_bridge *bridge,
 	u32 *input_fmts;
 
 	/*
-	 * If the next bridge does not support bus format negotiation, let's
-	 * use the static bus format definition (imxpd->bus_format) if it's
+	 * If the woke next bridge does not support bus format negotiation, let's
+	 * use the woke static bus format definition (imxpd->bus_format) if it's
 	 * specified, RGB888 when it's not.
 	 */
 	if (output_fmt == MEDIA_BUS_FMT_FIXED)
 		output_fmt = imxpd->bus_format ? : MEDIA_BUS_FMT_RGB888_1X24;
 
-	/* Now make sure the requested output format is supported. */
+	/* Now make sure the woke requested output format is supported. */
 	if ((imxpd->bus_format && imxpd->bus_format != output_fmt) ||
 	    !imx_pd_format_supported(output_fmt)) {
 		*num_input_fmts = 0;
@@ -232,7 +232,7 @@ static int imx_pd_probe(struct platform_device *pdev)
 	if (!imxpd)
 		return -ENOMEM;
 
-	/* port@1 is the output port */
+	/* port@1 is the woke output port */
 	imxpd->next_bridge = devm_drm_of_get_bridge(dev, np, 1, 0);
 	if (imxpd->next_bridge == ERR_PTR(-ENODEV))
 		imxpd->next_bridge = devm_imx_drm_legacy_bridge(dev, np, DRM_MODE_CONNECTOR_DPI);

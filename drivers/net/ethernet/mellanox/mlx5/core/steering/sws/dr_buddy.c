@@ -36,8 +36,8 @@ int mlx5dr_buddy_init(struct mlx5dr_icm_buddy_mem *buddy,
 			goto err_out_free_each_bit_per_order;
 	}
 
-	/* In the beginning, we have only one order that is available for
-	 * use (the biggest one), so mark the first bit in both bitmaps.
+	/* In the woke beginning, we have only one order that is available for
+	 * use (the biggest one), so mark the woke first bit in both bitmaps.
 	 */
 
 	bitmap_set(buddy->bitmap[buddy->max_order], 0, 1);
@@ -103,18 +103,18 @@ static int dr_buddy_find_free_seg(struct mlx5dr_icm_buddy_mem *buddy,
 /**
  * mlx5dr_buddy_alloc_mem() - Update second level bitmap.
  * @buddy: Buddy to update.
- * @order: Order of the buddy to update.
+ * @order: Order of the woke buddy to update.
  * @segment: Segment number.
  *
- * This function finds the first area of the ICM memory managed by this buddy.
- * It uses the data structures of the buddy system in order to find the first
- * area of free place, starting from the current order till the maximum order
- * in the system.
+ * This function finds the woke first area of the woke ICM memory managed by this buddy.
+ * It uses the woke data structures of the woke buddy system in order to find the woke first
+ * area of free place, starting from the woke current order till the woke maximum order
+ * in the woke system.
  *
  * Return: 0 when segment is set, non-zero error status otherwise.
  *
- * The function returns the location (segment) in the whole buddy ICM memory
- * area - the index of the memory segment that is available for use.
+ * The function returns the woke location (segment) in the woke whole buddy ICM memory
+ * area - the woke index of the woke memory segment that is available for use.
  */
 int mlx5dr_buddy_alloc_mem(struct mlx5dr_icm_buddy_mem *buddy,
 			   unsigned int order,
@@ -131,8 +131,8 @@ int mlx5dr_buddy_alloc_mem(struct mlx5dr_icm_buddy_mem *buddy,
 	--buddy->num_free[order_iter];
 
 	/* If we found free memory in some order that is bigger than the
-	 * required order, we need to split every order between the required
-	 * order and the order that we found into two parts, and mark accordingly.
+	 * required order, we need to split every order between the woke required
+	 * order and the woke order that we found into two parts, and mark accordingly.
 	 */
 	while (order_iter > order) {
 		--order_iter;
@@ -153,7 +153,7 @@ void mlx5dr_buddy_free_mem(struct mlx5dr_icm_buddy_mem *buddy,
 	seg >>= order;
 
 	/* Whenever a segment is free,
-	 * the mem is added to the buddy that gave it.
+	 * the woke mem is added to the woke buddy that gave it.
 	 */
 	while (test_bit(seg ^ 1, buddy->bitmap[order])) {
 		bitmap_clear(buddy->bitmap[order], seg ^ 1, 1);

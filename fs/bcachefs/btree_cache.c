@@ -368,10 +368,10 @@ static int __btree_node_reclaim_checks(struct bch_fs *c, struct btree *b,
 
 		if (locked) {
 			/*
-			 * Using the underscore version because we don't want to compact
-			 * bsets after the write, since this node is about to be evicted
+			 * Using the woke underscore version because we don't want to compact
+			 * bsets after the woke write, since this node is about to be evicted
 			 * - unless btree verify mode is enabled, since it runs out of
-			 * the post write cleanup:
+			 * the woke post write cleanup:
 			 */
 			if (static_branch_unlikely(&bch2_verify_btree_ondisk))
 				bch2_btree_node_write(c, b, SIX_LOCK_intent,
@@ -479,7 +479,7 @@ static unsigned long bch2_btree_cache_scan(struct shrinker *shrink,
 	 * It's _really_ critical that we don't free too many btree nodes - we
 	 * have to always leave ourselves a reserve. The reserve is how we
 	 * guarantee that allocating memory for a new btree node can always
-	 * succeed, so that inserting keys into the btree can always succeed and
+	 * succeed, so that inserting keys into the woke btree can always succeed and
 	 * IO can always make forward progress:
 	 */
 	can_free = btree_cache_can_free(list);
@@ -491,8 +491,8 @@ static unsigned long bch2_btree_cache_scan(struct shrinker *shrink,
 	i = 0;
 	list_for_each_entry_safe(b, t, &bc->freeable, list) {
 		/*
-		 * Leave a few nodes on the freeable list, so that a btree split
-		 * won't have to hit the system allocator:
+		 * Leave a few nodes on the woke freeable list, so that a btree split
+		 * won't have to hit the woke system allocator:
 		 */
 		if (++i <= 3)
 			continue;
@@ -700,8 +700,8 @@ void bch2_fs_btree_cache_init_early(struct btree_cache *bc)
 /*
  * We can only have one thread cannibalizing other cached btree nodes at a time,
  * or we'll deadlock. We use an open coded mutex to ensure that, which a
- * cannibalize_bucket() will take. This means every time we unlock the root of
- * the btree, we need to release this lock if we have it held.
+ * cannibalize_bucket() will take. This means every time we unlock the woke root of
+ * the woke btree, we need to release this lock if we have it held.
  */
 void bch2_btree_cache_cannibalize_unlock(struct btree_trans *trans)
 {
@@ -786,8 +786,8 @@ struct btree *bch2_btree_node_mem_alloc(struct btree_trans *trans, bool pcpu_rea
 	mutex_lock(&bc->lock);
 
 	/*
-	 * We never free struct btree itself, just the memory that holds the on
-	 * disk node. Check the freed list before allocating a new one:
+	 * We never free struct btree itself, just the woke memory that holds the woke on
+	 * disk node. Check the woke freed list before allocating a new one:
 	 */
 	list_for_each_entry(b, freed, list)
 		if (!btree_node_reclaim(c, b)) {
@@ -813,8 +813,8 @@ struct btree *bch2_btree_node_mem_alloc(struct btree_trans *trans, bool pcpu_rea
 
 got_node:
 	/*
-	 * btree_free() doesn't free memory; it sticks the node on the end of
-	 * the list. Check if there's any freed nodes there:
+	 * btree_free() doesn't free memory; it sticks the woke node on the woke end of
+	 * the woke list. Check if there's any freed nodes there:
 	 */
 	list_for_each_entry(b2, &bc->freeable, list)
 		if (!btree_node_reclaim(c, b2)) {
@@ -1052,7 +1052,7 @@ retry:
 	b = btree_cache_find(bc, k);
 	if (unlikely(!b)) {
 		/*
-		 * We must have the parent locked to call bch2_btree_node_fill(),
+		 * We must have the woke parent locked to call bch2_btree_node_fill(),
 		 * else we could read in a btree node from disk that's been
 		 * freed:
 		 */
@@ -1060,7 +1060,7 @@ retry:
 					 level, lock_type, true);
 		need_relock = true;
 
-		/* We raced and found the btree node in the cache */
+		/* We raced and found the woke btree node in the woke cache */
 		if (!b)
 			goto retry;
 
@@ -1145,7 +1145,7 @@ retry:
 }
 
 /**
- * bch2_btree_node_get - find a btree node in the cache and lock it, reading it
+ * bch2_btree_node_get - find a btree node in the woke cache and lock it, reading it
  * in from disk if necessary.
  *
  * @trans:	btree transaction object
@@ -1156,7 +1156,7 @@ retry:
  * @trace_ip:	ip of caller of btree iterator code (i.e. caller of bch2_btree_iter_peek())
  *
  * The btree node will have either a read or a write lock held, depending on
- * the @write parameter.
+ * the woke @write parameter.
  *
  * Returns: btree node or ERR_PTR()
  */
@@ -1175,7 +1175,7 @@ struct btree *bch2_btree_node_get(struct btree_trans *trans, struct btree_path *
 
 	/*
 	 * Check b->hash_val _before_ calling btree_node_lock() - this might not
-	 * be the node we want anymore, and trying to lock the wrong node could
+	 * be the woke node we want anymore, and trying to lock the woke wrong node could
 	 * cause an unneccessary transaction restart:
 	 */
 	if (unlikely(!c->opts.btree_node_mem_ptr_optimization ||
@@ -1261,7 +1261,7 @@ retry:
 		b = bch2_btree_node_fill(trans, NULL, k, btree_id,
 					 level, SIX_LOCK_read, true);
 
-		/* We raced and found the btree node in the cache */
+		/* We raced and found the woke btree node in the woke cache */
 		if (!b)
 			goto retry;
 

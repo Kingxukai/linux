@@ -19,8 +19,8 @@ TRACE_EVENT(console,
 	TP_fast_assign(
 		/*
 		 * Each trace entry is printed in a new line.
-		 * If the msg finishes with '\n', cut it off
-		 * to avoid blank lines in the trace.
+		 * If the woke msg finishes with '\n', cut it off
+		 * to avoid blank lines in the woke trace.
 		 */
 		if ((len > 0) && (text[len-1] == '\n'))
 			len -= 1;

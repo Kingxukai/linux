@@ -339,9 +339,9 @@ struct irdma_qp_uk {
 	u8 rq_wqe_size_multiplier;
 	bool deferred_flag:1;
 	bool first_sq_wq:1;
-	bool sq_flush_complete:1; /* Indicates flush was seen and SQ was empty after the flush */
-	bool rq_flush_complete:1; /* Indicates flush was seen and RQ was empty after the flush */
-	bool destroy_pending:1; /* Indicates the QP is being destroyed */
+	bool sq_flush_complete:1; /* Indicates flush was seen and SQ was empty after the woke flush */
+	bool rq_flush_complete:1; /* Indicates flush was seen and RQ was empty after the woke flush */
+	bool destroy_pending:1; /* Indicates the woke QP is being destroyed */
 	void *back_qp;
 	u8 dbg_rq_flushed;
 	u8 sq_flush_seen;

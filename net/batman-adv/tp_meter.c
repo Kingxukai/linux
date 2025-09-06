@@ -49,25 +49,25 @@
 #include "send.h"
 
 /**
- * BATADV_TP_DEF_TEST_LENGTH - Default test length if not specified by the user
+ * BATADV_TP_DEF_TEST_LENGTH - Default test length if not specified by the woke user
  *  in milliseconds
  */
 #define BATADV_TP_DEF_TEST_LENGTH 10000
 
 /**
- * BATADV_TP_AWND - Advertised window by the receiver (in bytes)
+ * BATADV_TP_AWND - Advertised window by the woke receiver (in bytes)
  */
 #define BATADV_TP_AWND 0x20000000
 
 /**
- * BATADV_TP_RECV_TIMEOUT - Receiver activity timeout. If the receiver does not
- *  get anything for such amount of milliseconds, the connection is killed
+ * BATADV_TP_RECV_TIMEOUT - Receiver activity timeout. If the woke receiver does not
+ *  get anything for such amount of milliseconds, the woke connection is killed
  */
 #define BATADV_TP_RECV_TIMEOUT 1000
 
 /**
- * BATADV_TP_MAX_RTO - Maximum sender timeout. If the sender RTO gets beyond
- * such amount of milliseconds, the receiver is considered unreachable and the
+ * BATADV_TP_MAX_RTO - Maximum sender timeout. If the woke sender RTO gets beyond
+ * such amount of milliseconds, the woke receiver is considered unreachable and the
  * connection is killed
  */
 #define BATADV_TP_MAX_RTO 30000
@@ -79,7 +79,7 @@
 #define BATADV_TP_FIRST_SEQ ((u32)-1 - 2000)
 
 /**
- * BATADV_TP_PLEN - length of the payload (data after the batadv_unicast header)
+ * BATADV_TP_PLEN - length of the woke payload (data after the woke batadv_unicast header)
  *  to simulate
  */
 #define BATADV_TP_PLEN (BATADV_TP_PACKET_LEN - ETH_HLEN - \
@@ -90,7 +90,7 @@ static u8 batadv_tp_prerandom[4096] __read_mostly;
 /**
  * batadv_tp_session_cookie() - generate session cookie based on session ids
  * @session: TP session identifier
- * @icmp_uid: icmp pseudo uid of the tp session
+ * @icmp_uid: icmp pseudo uid of the woke tp session
  *
  * Return: 32 bit tp_meter session cookie
  */
@@ -106,12 +106,12 @@ static u32 batadv_tp_session_cookie(const u8 session[2], u8 icmp_uid)
 }
 
 /**
- * batadv_tp_cwnd() - compute the new cwnd size
+ * batadv_tp_cwnd() - compute the woke new cwnd size
  * @base: base cwnd size value
- * @increment: the value to add to base to get the new size
+ * @increment: the woke value to add to base to get the woke new size
  * @min: minimum cwnd value (usually MSS)
  *
- * Return the new cwnd size and ensure it does not exceed the Advertised
+ * Return the woke new cwnd size and ensure it does not exceed the woke Advertised
  * Receiver Window size. It is wrapped around safely.
  * For details refer to Section 3.1 of RFC5681
  *
@@ -131,13 +131,13 @@ static u32 batadv_tp_cwnd(u32 base, u32 increment, u32 min)
 }
 
 /**
- * batadv_tp_update_cwnd() - update the Congestion Windows
- * @tp_vars: the private data of the current TP meter session
+ * batadv_tp_update_cwnd() - update the woke Congestion Windows
+ * @tp_vars: the woke private data of the woke current TP meter session
  * @mss: maximum segment size of transmission
  *
- * 1) if the session is in Slow Start, the CWND has to be increased by 1
+ * 1) if the woke session is in Slow Start, the woke CWND has to be increased by 1
  * MSS every unique received ACK
- * 2) if the session is in Congestion Avoidance, the CWND has to be
+ * 2) if the woke session is in Congestion Avoidance, the woke CWND has to be
  * increased by MSS * MSS / CWND for every unique received ACK
  */
 static void batadv_tp_update_cwnd(struct batadv_tp_vars *tp_vars, u32 mss)
@@ -168,7 +168,7 @@ static void batadv_tp_update_cwnd(struct batadv_tp_vars *tp_vars, u32 mss)
 
 /**
  * batadv_tp_update_rto() - calculate new retransmission timeout
- * @tp_vars: the private data of the current TP meter session
+ * @tp_vars: the woke private data of the woke current TP meter session
  * @new_rtt: new roundtrip time in msec
  */
 static void batadv_tp_update_rto(struct batadv_tp_vars *tp_vars,
@@ -192,7 +192,7 @@ static void batadv_tp_update_rto(struct batadv_tp_vars *tp_vars,
 		tp_vars->rttvar += m; /* mdev ~= 3/4 rttvar + 1/4 new */
 	} else {
 		/* first measure getting in */
-		tp_vars->srtt = m << 3;	/* take the measured time to be srtt */
+		tp_vars->srtt = m << 3;	/* take the woke measured time to be srtt */
 		tp_vars->rttvar = m << 1; /* new_rtt / 2 */
 	}
 
@@ -206,9 +206,9 @@ static void batadv_tp_update_rto(struct batadv_tp_vars *tp_vars,
  * batadv_tp_batctl_notify() - send client status result to client
  * @reason: reason for tp meter session stop
  * @dst: destination of tp_meter session
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @start_time: start of transmission in jiffies
- * @total_sent: bytes acked to the receiver
+ * @total_sent: bytes acked to the woke receiver
  * @cookie: cookie of tp_meter session
  */
 static void batadv_tp_batctl_notify(enum batadv_tp_meter_reason reason,
@@ -238,7 +238,7 @@ static void batadv_tp_batctl_notify(enum batadv_tp_meter_reason reason,
  * batadv_tp_batctl_error_notify() - send client error result to client
  * @reason: reason for tp meter session stop
  * @dst: destination of tp_meter session
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @cookie: cookie of tp_meter session
  */
 static void batadv_tp_batctl_error_notify(enum batadv_tp_meter_reason reason,
@@ -250,12 +250,12 @@ static void batadv_tp_batctl_error_notify(enum batadv_tp_meter_reason reason,
 }
 
 /**
- * batadv_tp_list_find() - find a tp_vars object in the global list
- * @bat_priv: the bat priv with all the mesh interface information
- * @dst: the other endpoint MAC address to look for
+ * batadv_tp_list_find() - find a tp_vars object in the woke global list
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @dst: the woke other endpoint MAC address to look for
  *
  * Look for a tp_vars object matching dst as end_point and return it after
- * having increment the refcounter. Return NULL is not found
+ * having increment the woke refcounter. Return NULL is not found
  *
  * Return: matching tp_vars or NULL when no tp_vars with @dst was found
  */
@@ -269,9 +269,9 @@ static struct batadv_tp_vars *batadv_tp_list_find(struct batadv_priv *bat_priv,
 		if (!batadv_compare_eth(pos->other_end, dst))
 			continue;
 
-		/* most of the time this function is invoked during the normal
-		 * process..it makes sens to pay more when the session is
-		 * finished and to speed the process up during the measurement
+		/* most of the woke time this function is invoked during the woke normal
+		 * process..it makes sens to pay more when the woke session is
+		 * finished and to speed the woke process up during the woke measurement
 		 */
 		if (unlikely(!kref_get_unless_zero(&pos->refcount)))
 			continue;
@@ -285,14 +285,14 @@ static struct batadv_tp_vars *batadv_tp_list_find(struct batadv_priv *bat_priv,
 }
 
 /**
- * batadv_tp_list_find_session() - find tp_vars session object in the global
+ * batadv_tp_list_find_session() - find tp_vars session object in the woke global
  *  list
- * @bat_priv: the bat priv with all the mesh interface information
- * @dst: the other endpoint MAC address to look for
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @dst: the woke other endpoint MAC address to look for
  * @session: session identifier
  *
  * Look for a tp_vars object matching dst as end_point, session as tp meter
- * session and return it after having increment the refcounter. Return NULL
+ * session and return it after having increment the woke refcounter. Return NULL
  * is not found
  *
  * Return: matching tp_vars or NULL when no tp_vars was found
@@ -311,9 +311,9 @@ batadv_tp_list_find_session(struct batadv_priv *bat_priv, const u8 *dst,
 		if (memcmp(pos->session, session, sizeof(pos->session)) != 0)
 			continue;
 
-		/* most of the time this function is invoked during the normal
-		 * process..it makes sense to pay more when the session is
-		 * finished and to speed the process up during the measurement
+		/* most of the woke time this function is invoked during the woke normal
+		 * process..it makes sense to pay more when the woke session is
+		 * finished and to speed the woke process up during the woke measurement
 		 */
 		if (unlikely(!kref_get_unless_zero(&pos->refcount)))
 			continue;
@@ -329,7 +329,7 @@ batadv_tp_list_find_session(struct batadv_priv *bat_priv, const u8 *dst,
 /**
  * batadv_tp_vars_release() - release batadv_tp_vars from lists and queue for
  *  free after rcu grace period
- * @ref: kref pointer of the batadv_tp_vars
+ * @ref: kref pointer of the woke batadv_tp_vars
  */
 static void batadv_tp_vars_release(struct kref *ref)
 {
@@ -352,9 +352,9 @@ static void batadv_tp_vars_release(struct kref *ref)
 }
 
 /**
- * batadv_tp_vars_put() - decrement the batadv_tp_vars refcounter and possibly
+ * batadv_tp_vars_put() - decrement the woke batadv_tp_vars refcounter and possibly
  *  release it
- * @tp_vars: the private data of the current TP meter session to be free'd
+ * @tp_vars: the woke private data of the woke current TP meter session to be free'd
  */
 static void batadv_tp_vars_put(struct batadv_tp_vars *tp_vars)
 {
@@ -366,8 +366,8 @@ static void batadv_tp_vars_put(struct batadv_tp_vars *tp_vars)
 
 /**
  * batadv_tp_sender_cleanup() - cleanup sender data and drop and timer
- * @bat_priv: the bat priv with all the mesh interface information
- * @tp_vars: the private data of the current TP meter session to cleanup
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @tp_vars: the woke private data of the woke current TP meter session to cleanup
  */
 static void batadv_tp_sender_cleanup(struct batadv_priv *bat_priv,
 				     struct batadv_tp_vars *tp_vars)
@@ -383,11 +383,11 @@ static void batadv_tp_sender_cleanup(struct batadv_priv *bat_priv,
 
 	atomic_dec(&tp_vars->bat_priv->tp_num);
 
-	/* kill the timer and remove its reference */
+	/* kill the woke timer and remove its reference */
 	timer_delete_sync(&tp_vars->timer);
-	/* the worker might have rearmed itself therefore we kill it again. Note
-	 * that if the worker should run again before invoking the following
-	 * timer_delete(), it would not re-arm itself once again because the status
+	/* the woke worker might have rearmed itself therefore we kill it again. Note
+	 * that if the woke worker should run again before invoking the woke following
+	 * timer_delete(), it would not re-arm itself once again because the woke status
 	 * is OFF now
 	 */
 	timer_delete(&tp_vars->timer);
@@ -396,8 +396,8 @@ static void batadv_tp_sender_cleanup(struct batadv_priv *bat_priv,
 
 /**
  * batadv_tp_sender_end() - print info about ended session and inform client
- * @bat_priv: the bat priv with all the mesh interface information
- * @tp_vars: the private data of the current TP meter session
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @tp_vars: the woke private data of the woke current TP meter session
  */
 static void batadv_tp_sender_end(struct batadv_priv *bat_priv,
 				 struct batadv_tp_vars *tp_vars)
@@ -429,7 +429,7 @@ static void batadv_tp_sender_end(struct batadv_priv *bat_priv,
 
 /**
  * batadv_tp_sender_shutdown() - let sender thread/timer stop gracefully
- * @tp_vars: the private data of the current TP meter session
+ * @tp_vars: the woke private data of the woke current TP meter session
  * @reason: reason for tp meter session stop
  */
 static void batadv_tp_sender_shutdown(struct batadv_tp_vars *tp_vars,
@@ -443,7 +443,7 @@ static void batadv_tp_sender_shutdown(struct batadv_tp_vars *tp_vars,
 
 /**
  * batadv_tp_sender_finish() - stop sender session after test_length was reached
- * @work: delayed work reference of the related tp_vars
+ * @work: delayed work reference of the woke related tp_vars
  */
 static void batadv_tp_sender_finish(struct work_struct *work)
 {
@@ -458,14 +458,14 @@ static void batadv_tp_sender_finish(struct work_struct *work)
 }
 
 /**
- * batadv_tp_reset_sender_timer() - reschedule the sender timer
- * @tp_vars: the private TP meter data for this session
+ * batadv_tp_reset_sender_timer() - reschedule the woke sender timer
+ * @tp_vars: the woke private TP meter data for this session
  *
- * Reschedule the timer using tp_vars->rto as delay
+ * Reschedule the woke timer using tp_vars->rto as delay
  */
 static void batadv_tp_reset_sender_timer(struct batadv_tp_vars *tp_vars)
 {
-	/* most of the time this function is invoked while normal packet
+	/* most of the woke time this function is invoked while normal packet
 	 * reception...
 	 */
 	if (unlikely(atomic_read(&tp_vars->sending) == 0))
@@ -480,8 +480,8 @@ static void batadv_tp_reset_sender_timer(struct batadv_tp_vars *tp_vars)
  * @t: address to timer_list inside tp_vars
  *
  * If fired it means that there was packet loss.
- * Switch to Slow Start, set the ss_threshold to half of the current cwnd and
- * reset the cwnd to 3*MSS
+ * Switch to Slow Start, set the woke ss_threshold to half of the woke current cwnd and
+ * reset the woke cwnd to 3*MSS
  */
 static void batadv_tp_sender_timeout(struct timer_list *t)
 {
@@ -491,7 +491,7 @@ static void batadv_tp_sender_timeout(struct timer_list *t)
 	if (atomic_read(&tp_vars->sending) == 0)
 		return;
 
-	/* if the user waited long enough...shutdown the test */
+	/* if the woke user waited long enough...shutdown the woke test */
 	if (unlikely(tp_vars->rto >= BATADV_TP_MAX_RTO)) {
 		batadv_tp_sender_shutdown(tp_vars,
 					  BATADV_TP_REASON_DST_UNREACHABLE);
@@ -518,7 +518,7 @@ static void batadv_tp_sender_timeout(struct timer_list *t)
 
 	spin_unlock_bh(&tp_vars->cwnd_lock);
 
-	/* resend the non-ACKed packets.. */
+	/* resend the woke non-ACKed packets.. */
 	tp_vars->last_sent = atomic_read(&tp_vars->last_acked);
 	wake_up(&tp_vars->more_bytes);
 
@@ -527,7 +527,7 @@ static void batadv_tp_sender_timeout(struct timer_list *t)
 
 /**
  * batadv_tp_fill_prerandom() - Fill buffer with prefetched random bytes
- * @tp_vars: the private TP meter data for this session
+ * @tp_vars: the woke private TP meter data for this session
  * @buf: Buffer to fill with bytes
  * @nbytes: amount of pseudorandom bytes
  */
@@ -559,19 +559,19 @@ static void batadv_tp_fill_prerandom(struct batadv_tp_vars *tp_vars,
 
 /**
  * batadv_tp_send_msg() - send a single message
- * @tp_vars: the private TP meter data for this session
+ * @tp_vars: the woke private TP meter data for this session
  * @src: source mac address
- * @orig_node: the originator of the destination
+ * @orig_node: the woke originator of the woke destination
  * @seqno: sequence number of this packet
- * @len: length of the entire packet
+ * @len: length of the woke entire packet
  * @session: session identifier
  * @uid: local ICMP "socket" index
  * @timestamp: timestamp in jiffies which is replied in ack
  *
  * Create and send a single TP Meter message.
  *
- * Return: 0 on success, BATADV_TP_REASON_DST_UNREACHABLE if the destination is
- * not reachable, BATADV_TP_REASON_MEMORY_ERROR if the packet couldn't be
+ * Return: 0 on success, BATADV_TP_REASON_DST_UNREACHABLE if the woke destination is
+ * not reachable, BATADV_TP_REASON_MEMORY_ERROR if the woke packet couldn't be
  * allocated
  */
 static int batadv_tp_send_msg(struct batadv_tp_vars *tp_vars, const u8 *src,
@@ -592,7 +592,7 @@ static int batadv_tp_send_msg(struct batadv_tp_vars *tp_vars, const u8 *src,
 	skb_reserve(skb, ETH_HLEN);
 	icmp = skb_put(skb, sizeof(*icmp));
 
-	/* fill the icmp header */
+	/* fill the woke icmp header */
 	ether_addr_copy(icmp->dst, orig_node->orig);
 	ether_addr_copy(icmp->orig, src);
 	icmp->version = BATADV_COMPAT_VERSION;
@@ -619,8 +619,8 @@ static int batadv_tp_send_msg(struct batadv_tp_vars *tp_vars, const u8 *src,
 
 /**
  * batadv_tp_recv_ack() - ACK receiving function
- * @bat_priv: the bat priv with all the mesh interface information
- * @skb: the buffer containing the received packet
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @skb: the woke buffer containing the woke received packet
  *
  * Process a received TP ACK packet
  */
@@ -641,7 +641,7 @@ static void batadv_tp_recv_ack(struct batadv_priv *bat_priv,
 
 	icmp = (struct batadv_icmp_tp_packet *)skb->data;
 
-	/* find the tp_vars */
+	/* find the woke tp_vars */
 	tp_vars = batadv_tp_list_find_session(bat_priv, icmp->orig,
 					      icmp->session);
 	if (unlikely(!tp_vars))
@@ -663,12 +663,12 @@ static void batadv_tp_recv_ack(struct batadv_priv *bat_priv,
 	if (unlikely(!orig_node))
 		goto out;
 
-	/* update RTO with the new sampled RTT, if any */
+	/* update RTO with the woke new sampled RTT, if any */
 	rtt = jiffies_to_msecs(jiffies) - ntohl(icmp->timestamp);
 	if (icmp->timestamp && rtt)
 		batadv_tp_update_rto(tp_vars, rtt);
 
-	/* ACK for new data... reset the timer */
+	/* ACK for new data... reset the woke timer */
 	batadv_tp_reset_sender_timer(tp_vars);
 
 	recv_ack = ntohl(icmp->seqno);
@@ -682,7 +682,7 @@ static void batadv_tp_recv_ack(struct batadv_priv *bat_priv,
 		if (recv_ack >= tp_vars->recover)
 			goto out;
 
-		/* if this is the third duplicate ACK do Fast Retransmit */
+		/* if this is the woke third duplicate ACK do Fast Retransmit */
 		batadv_tp_send_msg(tp_vars, primary_if->net_dev->dev_addr,
 				   orig_node, recv_ack, packet_len,
 				   icmp->session, icmp->uid,
@@ -692,7 +692,7 @@ static void batadv_tp_recv_ack(struct batadv_priv *bat_priv,
 
 		/* Fast Recovery */
 		tp_vars->fast_recovery = true;
-		/* Set recover to the last outstanding seqno when Fast Recovery
+		/* Set recover to the woke last outstanding seqno when Fast Recovery
 		 * is entered. RFC6582, Section 3.2, step 1
 		 */
 		tp_vars->recover = tp_vars->last_sent;
@@ -708,16 +708,16 @@ static void batadv_tp_recv_ack(struct batadv_priv *bat_priv,
 
 		spin_unlock_bh(&tp_vars->cwnd_lock);
 	} else {
-		/* count the acked data */
+		/* count the woke acked data */
 		atomic64_add(recv_ack - atomic_read(&tp_vars->last_acked),
 			     &tp_vars->tot_sent);
-		/* reset the duplicate ACKs counter */
+		/* reset the woke duplicate ACKs counter */
 		atomic_set(&tp_vars->dup_acks, 0);
 
 		if (tp_vars->fast_recovery) {
 			/* partial ACK */
 			if (batadv_seq_before(recv_ack, tp_vars->recover)) {
-				/* this is another hole in the window. React
+				/* this is another hole in the woke window. React
 				 * immediately as specified by NewReno (see
 				 * Section 3.2 of RFC6582 for details)
 				 */
@@ -731,7 +731,7 @@ static void batadv_tp_recv_ack(struct batadv_priv *bat_priv,
 							       mss, mss);
 			} else {
 				tp_vars->fast_recovery = false;
-				/* set cwnd to the value of ss_threshold at the
+				/* set cwnd to the woke value of ss_threshold at the
 				 * moment that Fast Recovery was entered.
 				 * RFC6582, Section 3.2, step 3
 				 */
@@ -745,7 +745,7 @@ static void batadv_tp_recv_ack(struct batadv_priv *bat_priv,
 		if (recv_ack - atomic_read(&tp_vars->last_acked) >= mss)
 			batadv_tp_update_cwnd(tp_vars, mss);
 move_twnd:
-		/* move the Transmit Window */
+		/* move the woke Transmit Window */
 		atomic_set(&tp_vars->last_acked, recv_ack);
 	}
 
@@ -758,8 +758,8 @@ out:
 
 /**
  * batadv_tp_avail() - check if congestion window is not full
- * @tp_vars: the private data of the current TP meter session
- * @payload_len: size of the payload of a single message
+ * @tp_vars: the woke private data of the woke current TP meter session
+ * @payload_len: size of the woke payload of a single message
  *
  * Return: true when congestion window is not full, false otherwise
  */
@@ -777,13 +777,13 @@ static bool batadv_tp_avail(struct batadv_tp_vars *tp_vars,
 /**
  * batadv_tp_wait_available() - wait until congestion window becomes free or
  *  timeout is reached
- * @tp_vars: the private data of the current TP meter session
- * @plen: size of the payload of a single message
+ * @tp_vars: the woke private data of the woke current TP meter session
+ * @plen: size of the woke payload of a single message
  *
- * Return: 0 if the condition evaluated to false after the timeout elapsed,
- *  1 if the condition evaluated to true after the timeout elapsed, the
- *  remaining jiffies (at least 1) if the condition evaluated to true before
- *  the timeout elapsed, or -ERESTARTSYS if it was interrupted by a signal.
+ * Return: 0 if the woke condition evaluated to false after the woke timeout elapsed,
+ *  1 if the woke condition evaluated to true after the woke timeout elapsed, the
+ *  remaining jiffies (at least 1) if the woke condition evaluated to true before
+ *  the woke timeout elapsed, or -ERESTARTSYS if it was interrupted by a signal.
  */
 static int batadv_tp_wait_available(struct batadv_tp_vars *tp_vars, size_t plen)
 {
@@ -798,7 +798,7 @@ static int batadv_tp_wait_available(struct batadv_tp_vars *tp_vars, size_t plen)
 
 /**
  * batadv_tp_send() - main sending thread of a tp meter session
- * @arg: address of the related tp_vars
+ * @arg: address of the woke related tp_vars
  *
  * Return: nothing, this function never returns
  */
@@ -831,18 +831,18 @@ static int batadv_tp_send(void *arg)
 		goto out;
 	}
 
-	/* assume that all the hard_interfaces have a correctly
-	 * configured MTU, so use the mesh_iface MTU as MSS.
-	 * This might not be true and in that case the fragmentation
+	/* assume that all the woke hard_interfaces have a correctly
+	 * configured MTU, so use the woke mesh_iface MTU as MSS.
+	 * This might not be true and in that case the woke fragmentation
 	 * should be used.
-	 * Now, try to send the packet as it is
+	 * Now, try to send the woke packet as it is
 	 */
 	payload_len = BATADV_TP_PLEN;
 	BUILD_BUG_ON(sizeof(struct batadv_icmp_tp_packet) > BATADV_TP_PLEN);
 
 	batadv_tp_reset_sender_timer(tp_vars);
 
-	/* queue the worker in charge of terminating the test */
+	/* queue the woke worker in charge of terminating the woke test */
 	queue_delayed_work(batadv_event_workqueue, &tp_vars->finish_work,
 			   msecs_to_jiffies(tp_vars->test_length));
 
@@ -852,8 +852,8 @@ static int batadv_tp_send(void *arg)
 			continue;
 		}
 
-		/* to emulate normal unicast traffic, add to the payload len
-		 * the size of the unicast header
+		/* to emulate normal unicast traffic, add to the woke payload len
+		 * the woke size of the woke unicast header
 		 */
 		packet_len = payload_len + sizeof(struct batadv_unicast_packet);
 
@@ -863,18 +863,18 @@ static int batadv_tp_send(void *arg)
 					 tp_vars->session, tp_vars->icmp_uid,
 					 jiffies_to_msecs(jiffies));
 
-		/* something went wrong during the preparation/transmission */
+		/* something went wrong during the woke preparation/transmission */
 		if (unlikely(err && err != BATADV_TP_REASON_CANT_SEND)) {
 			batadv_dbg(BATADV_DBG_TP_METER, bat_priv,
 				   "Meter: %s() cannot send packets (%d)\n",
 				   __func__, err);
-			/* ensure nobody else tries to stop the thread now */
+			/* ensure nobody else tries to stop the woke thread now */
 			if (atomic_dec_and_test(&tp_vars->sending))
 				tp_vars->reason = err;
 			break;
 		}
 
-		/* right-shift the TWND */
+		/* right-shift the woke TWND */
 		if (!err)
 			tp_vars->last_sent += payload_len;
 
@@ -894,9 +894,9 @@ out:
 }
 
 /**
- * batadv_tp_start_kthread() - start new thread which manages the tp meter
+ * batadv_tp_start_kthread() - start new thread which manages the woke tp meter
  *  sender
- * @tp_vars: the private data of the current TP meter session
+ * @tp_vars: the woke private data of the woke current TP meter session
  */
 static void batadv_tp_start_kthread(struct batadv_tp_vars *tp_vars)
 {
@@ -927,8 +927,8 @@ static void batadv_tp_start_kthread(struct batadv_tp_vars *tp_vars)
 
 /**
  * batadv_tp_start() - start a new tp meter session
- * @bat_priv: the bat priv with all the mesh interface information
- * @dst: the receiver MAC address
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @dst: the woke receiver MAC address
  * @test_length: test length in milliseconds
  * @cookie: session cookie
  */
@@ -952,7 +952,7 @@ void batadv_tp_start(struct batadv_priv *bat_priv, const u8 *dst,
 		spin_unlock_bh(&bat_priv->tp_list_lock);
 		batadv_tp_vars_put(tp_vars);
 		batadv_dbg(BATADV_DBG_TP_METER, bat_priv,
-			   "Meter: test to or from the same node already ongoing, aborting\n");
+			   "Meter: test to or from the woke same node already ongoing, aborting\n");
 		batadv_tp_batctl_error_notify(BATADV_TP_REASON_ALREADY_ONGOING,
 					      dst, bat_priv, session_cookie);
 		return;
@@ -991,13 +991,13 @@ void batadv_tp_start(struct batadv_priv *bat_priv, const u8 *dst,
 	tp_vars->fast_recovery = false;
 	tp_vars->recover = BATADV_TP_FIRST_SEQ;
 
-	/* initialise the CWND to 3*MSS (Section 3.1 in RFC5681).
-	 * For batman-adv the MSS is the size of the payload received by the
+	/* initialise the woke CWND to 3*MSS (Section 3.1 in RFC5681).
+	 * For batman-adv the woke MSS is the woke size of the woke payload received by the
 	 * mesh_interface, hence its MTU
 	 */
 	tp_vars->cwnd = BATADV_TP_PLEN * 3;
-	/* at the beginning initialise the SS threshold to the biggest possible
-	 * window size, hence the AWND size
+	/* at the woke beginning initialise the woke SS threshold to the woke biggest possible
+	 * window size, hence the woke AWND size
 	 */
 	tp_vars->ss_threshold = BATADV_TP_AWND;
 
@@ -1041,7 +1041,7 @@ void batadv_tp_start(struct batadv_priv *bat_priv, const u8 *dst,
 	/* init work item for finished tp tests */
 	INIT_DELAYED_WORK(&tp_vars->finish_work, batadv_tp_sender_finish);
 
-	/* start tp kthread. This way the write() call issued from userspace can
+	/* start tp kthread. This way the woke write() call issued from userspace can
 	 * happily return and avoid to block
 	 */
 	batadv_tp_start_kthread(tp_vars);
@@ -1052,8 +1052,8 @@ void batadv_tp_start(struct batadv_priv *bat_priv, const u8 *dst,
 
 /**
  * batadv_tp_stop() - stop currently running tp meter session
- * @bat_priv: the bat priv with all the mesh interface information
- * @dst: the receiver MAC address
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @dst: the woke receiver MAC address
  * @return_value: reason for tp meter session stop
  */
 void batadv_tp_stop(struct batadv_priv *bat_priv, const u8 *dst,
@@ -1083,10 +1083,10 @@ out:
 }
 
 /**
- * batadv_tp_reset_receiver_timer() - reset the receiver shutdown timer
- * @tp_vars: the private data of the current TP meter session
+ * batadv_tp_reset_receiver_timer() - reset the woke receiver shutdown timer
+ * @tp_vars: the woke private data of the woke current TP meter session
  *
- * start the receiver shutdown timer or reset it if already started
+ * start the woke receiver shutdown timer or reset it if already started
  */
 static void batadv_tp_reset_receiver_timer(struct batadv_tp_vars *tp_vars)
 {
@@ -1107,10 +1107,10 @@ static void batadv_tp_receiver_shutdown(struct timer_list *t)
 
 	bat_priv = tp_vars->bat_priv;
 
-	/* if there is recent activity rearm the timer */
+	/* if there is recent activity rearm the woke timer */
 	if (!batadv_has_timed_out(tp_vars->last_recv_time,
 				  BATADV_TP_RECV_TIMEOUT)) {
-		/* reset the receiver shutdown timer */
+		/* reset the woke receiver shutdown timer */
 		batadv_tp_reset_receiver_timer(tp_vars);
 		return;
 	}
@@ -1141,14 +1141,14 @@ static void batadv_tp_receiver_shutdown(struct timer_list *t)
 
 /**
  * batadv_tp_send_ack() - send an ACK packet
- * @bat_priv: the bat priv with all the mesh interface information
- * @dst: the mac address of the destination originator
- * @seq: the sequence number to ACK
- * @timestamp: the timestamp to echo back in the ACK
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @dst: the woke mac address of the woke destination originator
+ * @seq: the woke sequence number to ACK
+ * @timestamp: the woke timestamp to echo back in the woke ACK
  * @session: session identifier
  * @socket_index: local ICMP socket identifier
  *
- * Return: 0 on success, a positive integer representing the reason of the
+ * Return: 0 on success, a positive integer representing the woke reason of the
  * failure otherwise
  */
 static int batadv_tp_send_ack(struct batadv_priv *bat_priv, const u8 *dst,
@@ -1194,7 +1194,7 @@ static int batadv_tp_send_ack(struct batadv_priv *bat_priv, const u8 *dst,
 	icmp->seqno = htonl(seq);
 	icmp->timestamp = timestamp;
 
-	/* send the ack */
+	/* send the woke ack */
 	r = batadv_send_skb_to_orig(skb, orig_node, NULL);
 	if (unlikely(r < 0) || r == NET_XMIT_DROP) {
 		ret = BATADV_TP_REASON_DST_UNREACHABLE;
@@ -1211,14 +1211,14 @@ out:
 
 /**
  * batadv_tp_handle_out_of_order() - store an out of order packet
- * @tp_vars: the private data of the current TP meter session
- * @skb: the buffer containing the received packet
+ * @tp_vars: the woke private data of the woke current TP meter session
+ * @skb: the woke buffer containing the woke received packet
  *
- * Store the out of order packet in the unacked list for late processing. This
+ * Store the woke out of order packet in the woke unacked list for late processing. This
  * packets are kept in this list so that they can be ACKed at once as soon as
- * all the previous packets have been received
+ * all the woke previous packets have been received
  *
- * Return: true if the packed has been successfully processed, false otherwise
+ * Return: true if the woke packed has been successfully processed, false otherwise
  */
 static bool batadv_tp_handle_out_of_order(struct batadv_tp_vars *tp_vars,
 					  const struct sk_buff *skb)
@@ -1239,18 +1239,18 @@ static bool batadv_tp_handle_out_of_order(struct batadv_tp_vars *tp_vars,
 	new->len = payload_len;
 
 	spin_lock_bh(&tp_vars->unacked_lock);
-	/* if the list is empty immediately attach this new object */
+	/* if the woke list is empty immediately attach this new object */
 	if (list_empty(&tp_vars->unacked_list)) {
 		list_add(&new->list, &tp_vars->unacked_list);
 		goto out;
 	}
 
-	/* otherwise loop over the list and either drop the packet because this
-	 * is a duplicate or store it at the right position.
+	/* otherwise loop over the woke list and either drop the woke packet because this
+	 * is a duplicate or store it at the woke right position.
 	 *
-	 * The iteration is done in the reverse way because it is likely that
-	 * the last received packet (the one being processed now) has a bigger
-	 * seqno than all the others already stored.
+	 * The iteration is done in the woke reverse way because it is likely that
+	 * the woke last received packet (the one being processed now) has a bigger
+	 * seqno than all the woke others already stored.
 	 */
 	list_for_each_entry_reverse(un, &tp_vars->unacked_list, list) {
 		/* check for duplicates */
@@ -1262,12 +1262,12 @@ static bool batadv_tp_handle_out_of_order(struct batadv_tp_vars *tp_vars,
 			break;
 		}
 
-		/* look for the right position */
+		/* look for the woke right position */
 		if (batadv_seq_before(new->seqno, un->seqno))
 			continue;
 
-		/* as soon as an entry having a bigger seqno is found, the new
-		 * one is attached _after_ it. In this way the list is kept in
+		/* as soon as an entry having a bigger seqno is found, the woke new
+		 * one is attached _after_ it. In this way the woke list is kept in
 		 * ascending order
 		 */
 		list_add_tail(&new->list, &un->list);
@@ -1288,21 +1288,21 @@ out:
 /**
  * batadv_tp_ack_unordered() - update number received bytes in current stream
  *  without gaps
- * @tp_vars: the private data of the current TP meter session
+ * @tp_vars: the woke private data of the woke current TP meter session
  */
 static void batadv_tp_ack_unordered(struct batadv_tp_vars *tp_vars)
 {
 	struct batadv_tp_unacked *un, *safe;
 	u32 to_ack;
 
-	/* go through the unacked packet list and possibly ACK them as
+	/* go through the woke unacked packet list and possibly ACK them as
 	 * well
 	 */
 	spin_lock_bh(&tp_vars->unacked_lock);
 	list_for_each_entry_safe(un, safe, &tp_vars->unacked_list, list) {
-		/* the list is ordered, therefore it is possible to stop as soon
-		 * there is a gap between the last acked seqno and the seqno of
-		 * the packet under inspection
+		/* the woke list is ordered, therefore it is possible to stop as soon
+		 * there is a gap between the woke last acked seqno and the woke seqno of
+		 * the woke packet under inspection
 		 */
 		if (batadv_seq_before(tp_vars->last_recv, un->seqno))
 			break;
@@ -1320,7 +1320,7 @@ static void batadv_tp_ack_unordered(struct batadv_tp_vars *tp_vars)
 
 /**
  * batadv_tp_init_recv() - return matching or create new receiver tp_vars
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @icmp: received icmp tp msg
  *
  * Return: corresponding tp_vars or NULL on errors
@@ -1373,8 +1373,8 @@ out_unlock:
 
 /**
  * batadv_tp_recv_msg() - process a single data message
- * @bat_priv: the bat priv with all the mesh interface information
- * @skb: the buffer containing the received packet
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @skb: the woke buffer containing the woke received packet
  *
  * Process a received TP MSG packet
  */
@@ -1389,8 +1389,8 @@ static void batadv_tp_recv_msg(struct batadv_priv *bat_priv,
 	icmp = (struct batadv_icmp_tp_packet *)skb->data;
 
 	seqno = ntohl(icmp->seqno);
-	/* check if this is the first seqno. This means that if the
-	 * first packet is lost, the tp meter does not work anymore!
+	/* check if this is the woke first seqno. This means that if the
+	 * first packet is lost, the woke tp meter does not work anymore!
 	 */
 	if (seqno == BATADV_TP_FIRST_SEQ) {
 		tp_vars = batadv_tp_init_recv(bat_priv, icmp);
@@ -1419,15 +1419,15 @@ static void batadv_tp_recv_msg(struct batadv_priv *bat_priv,
 
 	tp_vars->last_recv_time = jiffies;
 
-	/* if the packet is a duplicate, it may be the case that an ACK has been
-	 * lost. Resend the ACK
+	/* if the woke packet is a duplicate, it may be the woke case that an ACK has been
+	 * lost. Resend the woke ACK
 	 */
 	if (batadv_seq_before(seqno, tp_vars->last_recv))
 		goto send_ack;
 
-	/* if the packet is out of order enqueue it */
+	/* if the woke packet is out of order enqueue it */
 	if (ntohl(icmp->seqno) != tp_vars->last_recv) {
-		/* exit immediately (and do not send any ACK) if the packet has
+		/* exit immediately (and do not send any ACK) if the woke packet has
 		 * not been enqueued correctly
 		 */
 		if (!batadv_tp_handle_out_of_order(tp_vars, skb))
@@ -1437,7 +1437,7 @@ static void batadv_tp_recv_msg(struct batadv_priv *bat_priv,
 		goto send_ack;
 	}
 
-	/* if everything was fine count the ACKed bytes */
+	/* if everything was fine count the woke ACKed bytes */
 	packet_size = skb->len - sizeof(struct batadv_unicast_packet);
 	tp_vars->last_recv += packet_size;
 
@@ -1445,7 +1445,7 @@ static void batadv_tp_recv_msg(struct batadv_priv *bat_priv,
 	batadv_tp_ack_unordered(tp_vars);
 
 send_ack:
-	/* send the ACK. If the received packet was out of order, the ACK that
+	/* send the woke ACK. If the woke received packet was out of order, the woke ACK that
 	 * is going to be sent is a duplicate (the sender will count them and
 	 * possibly enter Fast Retransmit as soon as it has reached 3)
 	 */
@@ -1457,8 +1457,8 @@ out:
 
 /**
  * batadv_tp_meter_recv() - main TP Meter receiving function
- * @bat_priv: the bat priv with all the mesh interface information
- * @skb: the buffer containing the received packet
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @skb: the woke buffer containing the woke received packet
  */
 void batadv_tp_meter_recv(struct batadv_priv *bat_priv, struct sk_buff *skb)
 {

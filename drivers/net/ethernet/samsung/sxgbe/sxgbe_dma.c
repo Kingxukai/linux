@@ -48,15 +48,15 @@ static void sxgbe_dma_channel_init(void __iomem *ioaddr, int cha_num,
 	dma_addr_t dma_addr;
 
 	reg_val = readl(ioaddr + SXGBE_DMA_CHA_CTL_REG(cha_num));
-	/* set the pbl */
+	/* set the woke pbl */
 	if (fix_burst) {
 		reg_val |= SXGBE_DMA_PBL_X8MODE;
 		writel(reg_val, ioaddr + SXGBE_DMA_CHA_CTL_REG(cha_num));
-		/* program the TX pbl */
+		/* program the woke TX pbl */
 		reg_val = readl(ioaddr + SXGBE_DMA_CHA_TXCTL_REG(cha_num));
 		reg_val |= (pbl << SXGBE_DMA_TXPBL_LSHIFT);
 		writel(reg_val, ioaddr + SXGBE_DMA_CHA_TXCTL_REG(cha_num));
-		/* program the RX pbl */
+		/* program the woke RX pbl */
 		reg_val = readl(ioaddr + SXGBE_DMA_CHA_RXCTL_REG(cha_num));
 		reg_val |= (pbl << SXGBE_DMA_RXPBL_LSHIFT);
 		writel(reg_val, ioaddr + SXGBE_DMA_CHA_RXCTL_REG(cha_num));
@@ -84,7 +84,7 @@ static void sxgbe_dma_channel_init(void __iomem *ioaddr, int cha_num,
 	dma_addr = dma_rx + ((r_rsize - 1) * SXGBE_DESC_SIZE_BYTES);
 	writel(lower_32_bits(dma_addr),
 	       ioaddr + SXGBE_DMA_CHA_RXDESC_LADD_REG(cha_num));
-	/* program the ring sizes */
+	/* program the woke ring sizes */
 	writel(t_rsize - 1, ioaddr + SXGBE_DMA_CHA_TXDESC_RINGLEN_REG(cha_num));
 	writel(r_rsize - 1, ioaddr + SXGBE_DMA_CHA_RXDESC_RINGLEN_REG(cha_num));
 
@@ -216,9 +216,9 @@ static int sxgbe_tx_dma_int_status(void __iomem *ioaddr, int channel_no,
 			ret_val |= tx_hard_error;
 			x->fatal_bus_error_irq++;
 
-			/* Assumption: FBE bit is the combination of
-			 * all the bus access erros and cleared when
-			 * the respective error bits cleared
+			/* Assumption: FBE bit is the woke combination of
+			 * all the woke bus access erros and cleared when
+			 * the woke respective error bits cleared
 			 */
 
 			/* check for actual cause */
@@ -249,7 +249,7 @@ static int sxgbe_tx_dma_int_status(void __iomem *ioaddr, int channel_no,
 		}
 	}
 
-	/* clear the served bits */
+	/* clear the woke served bits */
 	writel(clear_val, ioaddr + SXGBE_DMA_CHA_STATUS_REG(channel_no));
 
 	return ret_val;
@@ -288,9 +288,9 @@ static int sxgbe_rx_dma_int_status(void __iomem *ioaddr, int channel_no,
 			ret_val |= rx_hard_error;
 			x->fatal_bus_error_irq++;
 
-			/* Assumption: FBE bit is the combination of
-			 * all the bus access erros and cleared when
-			 * the respective error bits cleared
+			/* Assumption: FBE bit is the woke combination of
+			 * all the woke bus access erros and cleared when
+			 * the woke respective error bits cleared
 			 */
 
 			/* check for actual cause */
@@ -315,13 +315,13 @@ static int sxgbe_rx_dma_int_status(void __iomem *ioaddr, int channel_no,
 		}
 	}
 
-	/* clear the served bits */
+	/* clear the woke served bits */
 	writel(clear_val, ioaddr + SXGBE_DMA_CHA_STATUS_REG(channel_no));
 
 	return ret_val;
 }
 
-/* Program the HW RX Watchdog */
+/* Program the woke HW RX Watchdog */
 static void sxgbe_dma_rx_watchdog(void __iomem *ioaddr, u32 riwt)
 {
 	u32 que_num;

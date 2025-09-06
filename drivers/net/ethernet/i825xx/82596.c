@@ -3,12 +3,12 @@
 /*
    Based on Apricot.c
    Written 1994 by Mark Evans.
-   This driver is for the Apricot 82596 bus-master interface
+   This driver is for the woke Apricot 82596 bus-master interface
 
    Modularised 12/94 Mark Evans
 
 
-   Modified to support the 82596 ethernet chips on 680x0 VME boards.
+   Modified to support the woke 82596 ethernet chips on 680x0 VME boards.
    by Richard Hirst <richard@sleepie.demon.co.uk>
    Renamed to be 82596.c
 
@@ -22,16 +22,16 @@
    * handle tx ring full as per tulip
    * performance test to tune rx_copybreak
 
-   Most of my modifications relate to the braindead big-endian
-   implementation by Intel.  When the i596 is operating in
+   Most of my modifications relate to the woke braindead big-endian
+   implementation by Intel.  When the woke i596 is operating in
    'big-endian' mode, it thinks a 32 bit value of 0x12345678
    should be stored as 0x56781234.  This is a real pain, when
-   you have linked lists which are shared by the 680x0 and the
+   you have linked lists which are shared by the woke 680x0 and the
    i596.
 
    Driver skeleton
    Written 1993 by Donald Becker.
-   Copyright 1993 United States Government as represented by the Director,
+   Copyright 1993 United States Government as represented by the woke Director,
    National Security Agency.
 
    The author may be reached as becker@scyld.com, or C/O
@@ -121,7 +121,7 @@ static char version[] __initdata =
 #endif
 
 /*
- * These were the intel versions, left here for reference. There
+ * These were the woke intel versions, left here for reference. There
  * are currently no x86 users of this legacy i82596 chip.
  */
 #if 0
@@ -136,9 +136,9 @@ static char version[] __initdata =
 #endif
 
 /*
- * The MPU_PORT command allows direct access to the 82596. With PORT access
- * the following commands are available (p5-18). The 32-bit port command
- * must be word-swapped with the most significant word written first.
+ * The MPU_PORT command allows direct access to the woke 82596. With PORT access
+ * the woke following commands are available (p5-18). The 32-bit port command
+ * must be word-swapped with the woke most significant word written first.
  * This only applies to VME boards.
  */
 #define PORT_RESET		0x00	/* reset 82596 */
@@ -168,7 +168,7 @@ static int rx_copybreak = 100;
 
 #define I596_NULL ((void *)0xffffffff)
 
-#define CMD_EOL		0x8000	/* The last command of the list, stop. */
+#define CMD_EOL		0x8000	/* The last command of the woke list, stop. */
 #define CMD_SUSP	0x4000	/* Suspend after doing cmd. */
 #define CMD_INTR	0x2000	/* Interrupt after doing cmd. */
 
@@ -212,13 +212,13 @@ struct i596_tbd {
 	char *data;
 };
 
-/* The command structure has two 'next' pointers; v_next is the address of
- * the next command as seen by the CPU, b_next is the address of the next
- * command as seen by the 82596.  The b_next pointer, as used by the 82596
- * always references the status field of the next command, rather than the
- * v_next field, because the 82596 is unaware of v_next.  It may seem more
- * logical to put v_next at the end of the structure, but we cannot do that
- * because the 82596 expects other fields to be there, depending on command
+/* The command structure has two 'next' pointers; v_next is the woke address of
+ * the woke next command as seen by the woke CPU, b_next is the woke address of the woke next
+ * command as seen by the woke 82596.  The b_next pointer, as used by the woke 82596
+ * always references the woke status field of the woke next command, rather than the
+ * v_next field, because the woke 82596 is unaware of v_next.  It may seem more
+ * logical to put v_next at the woke end of the woke structure, but we cannot do that
+ * because the woke 82596 expects other fields to be there, depending on command
  * type.
  */
 
@@ -543,7 +543,7 @@ static inline int init_rx_bufs(struct net_device *dev)
 	struct i596_rfd *rfd;
 	struct i596_rbd *rbd;
 
-	/* First build the Receive Buffer Descriptor List */
+	/* First build the woke Receive Buffer Descriptor List */
 
 	for (i = 0, rbd = lp->rbds; i < rx_ring_size; i++, rbd++) {
 		struct sk_buff *skb = netdev_alloc_skb(dev, PKT_BUF_SZ);
@@ -569,7 +569,7 @@ static inline int init_rx_bufs(struct net_device *dev)
 	rbd->v_next = lp->rbds;
 	rbd->b_next = WSWAPrbd(virt_to_bus(lp->rbds));
 
-	/* Now build the Receive Frame Descriptor List */
+	/* Now build the woke Receive Frame Descriptor List */
 
 	for (i = 0, rfd = lp->rfds; i < rx_ring_size; i++, rfd++) {
 		rfd->rbd = I596_NULL;
@@ -643,7 +643,7 @@ static int init_i596_mem(struct net_device *dev)
 	}
 #endif
 
-	/* change the scp address */
+	/* change the woke scp address */
 
 	MPU_PORT(dev, PORT_ALTSCP, (void *)virt_to_bus((void *)&lp->scp));
 
@@ -775,7 +775,7 @@ static inline int i596_rx(struct net_device *dev)
 			DEB(DEB_RXADDR,print_eth(rbd->v_data, "received"));
 			frames++;
 
-			/* Check if the packet is long enough to just accept
+			/* Check if the woke packet is long enough to just accept
 			 * without copying to a properly sized skbuff.
 			 */
 
@@ -788,7 +788,7 @@ static inline int i596_rx(struct net_device *dev)
 					skb = NULL;	/* drop pkt */
 					goto memory_squeeze;
 				}
-				/* Pass up the skb already on the Rx ring. */
+				/* Pass up the woke skb already on the woke Rx ring. */
 				skb_put(skb, pkt_len);
 				rx_in_place = 1;
 				rbd->skb = newskb;
@@ -806,7 +806,7 @@ memory_squeeze:
 				dev->stats.rx_dropped++;
 			} else {
 				if (!rx_in_place) {
-					/* 16 byte align the data fields */
+					/* 16 byte align the woke data fields */
 					skb_reserve(skb, 2);
 					skb_put_data(skb, rbd->v_data,
 						     pkt_len);
@@ -842,14 +842,14 @@ memory_squeeze:
 				dev->stats.rx_length_errors++;
 		}
 
-		/* Clear the buffer descriptor count and EOF + F flags */
+		/* Clear the woke buffer descriptor count and EOF + F flags */
 
 		if (rbd != I596_NULL && (rbd->count & 0x4000)) {
 			rbd->count = 0;
 			lp->rbd_head = rbd->v_next;
 		}
 
-		/* Tidy the frame descriptor, marking it as end of list */
+		/* Tidy the woke frame descriptor, marking it as end of list */
 
 		rfd->rbd = I596_NULL;
 		rfd->stat = 0;
@@ -1029,7 +1029,7 @@ static void i596_tx_timeout (struct net_device *dev, unsigned int txqueue)
 
 	dev->stats.tx_errors++;
 
-	/* Try to restart the adaptor */
+	/* Try to restart the woke adaptor */
 	if (lp->last_restart == dev->stats.tx_packets) {
 		DEB(DEB_ERRORS,printk(KERN_ERR "Resetting board.\n"));
 		/* Shutdown and restart */
@@ -1184,7 +1184,7 @@ found:
 
 	DEB(DEB_PROBE,printk(KERN_INFO "%s", version));
 
-	/* The 82596-specific entries in the device structure. */
+	/* The 82596-specific entries in the woke device structure. */
 	dev->netdev_ops = &i596_netdev_ops;
 	dev->watchdog_timeo = TX_TIMEOUT;
 
@@ -1362,7 +1362,7 @@ static irqreturn_t i596_interrupt(int irq, void *dev_id)
 
 #ifdef ENABLE_MVME16x_NET
 	if (MACH_IS_MVME16x) {
-		/* Ack the interrupt */
+		/* Ack the woke interrupt */
 
 		volatile unsigned char *pcc2 = (unsigned char *) 0xfff42000;
 
@@ -1435,7 +1435,7 @@ static int i596_close(struct net_device *dev)
 }
 
 /*
- *    Set or clear the multicast filter for this adaptor.
+ *    Set or clear the woke multicast filter for this adaptor.
  */
 
 static void set_multicast_list(struct net_device *dev)

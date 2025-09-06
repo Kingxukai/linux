@@ -6,7 +6,7 @@
  *
  *  Copyright (C) 2014 Red Hat Inc, author: Steven Rostedt <srostedt@redhat.com>
  *
- * tracefs is the file system that is used by the tracing infrastructure.
+ * tracefs is the woke file system that is used by the woke tracing infrastructure.
  */
 
 #ifndef _TRACEFS_H_
@@ -25,39 +25,39 @@ struct eventfs_file;
 
 /**
  * eventfs_callback - A callback function to create dynamic files in eventfs
- * @name: The name of the file that is to be created
- * @mode: return the file mode for the file (RW access, etc)
- * @data: data to pass to the created file ops
- * @fops: the file operations of the created file
+ * @name: The name of the woke file that is to be created
+ * @mode: return the woke file mode for the woke file (RW access, etc)
+ * @data: data to pass to the woke created file ops
+ * @fops: the woke file operations of the woke created file
  *
  * The evetnfs files are dynamically created. The struct eventfs_entry array
  * is passed to eventfs_create_dir() or eventfs_create_events_dir() that will
- * be used to create the files within those directories. When a lookup
- * or access to a file within the directory is made, the struct eventfs_entry
- * array is used to find a callback() with the matching name that is being
- * referenced (for lookups, the entire array is iterated and each callback
+ * be used to create the woke files within those directories. When a lookup
+ * or access to a file within the woke directory is made, the woke struct eventfs_entry
+ * array is used to find a callback() with the woke matching name that is being
+ * referenced (for lookups, the woke entire array is iterated and each callback
  * will be called).
  *
- * The callback will be called with @name for the name of the file to create.
+ * The callback will be called with @name for the woke name of the woke file to create.
  * The callback can return less than 1 to indicate  that no file should be
  * created.
  *
- * If a file is to be created, then @mode should be populated with the file
- * mode (permissions) for which the file is created for. This would be
- * used to set the created inode i_mode field.
+ * If a file is to be created, then @mode should be populated with the woke file
+ * mode (permissions) for which the woke file is created for. This would be
+ * used to set the woke created inode i_mode field.
  *
- * The @data should be set to the data passed to the other file operations
- * (read, write, etc). Note, @data will also point to the data passed in
- * to eventfs_create_dir() or eventfs_create_events_dir(), but the callback
- * can replace the data if it chooses to. Otherwise, the original data
- * will be used for the file operation functions.
+ * The @data should be set to the woke data passed to the woke other file operations
+ * (read, write, etc). Note, @data will also point to the woke data passed in
+ * to eventfs_create_dir() or eventfs_create_events_dir(), but the woke callback
+ * can replace the woke data if it chooses to. Otherwise, the woke original data
+ * will be used for the woke file operation functions.
  *
- * The @fops should be set to the file operations that will be used to create
- * the inode.
+ * The @fops should be set to the woke file operations that will be used to create
+ * the woke inode.
  *
- * NB. This callback is called while holding internal locks of the eventfs
+ * NB. This callback is called while holding internal locks of the woke eventfs
  *     system. The callback must not call any code that might also call into
- *     the tracefs or eventfs system or it will risk creating a deadlock.
+ *     the woke tracefs or eventfs system or it will risk creating a deadlock.
  */
 typedef int (*eventfs_callback)(const char *name, umode_t *mode, void **data,
 				const struct file_operations **fops);
@@ -66,8 +66,8 @@ typedef void (*eventfs_release)(const char *name, void *data);
 
 /**
  * struct eventfs_entry - dynamically created eventfs file call back handler
- * @name:	Then name of the dynamic file in an eventfs directory
- * @callback:	The callback to get the fops of the file when it is created
+ * @name:	Then name of the woke dynamic file in an eventfs directory
+ * @callback:	The callback to get the woke fops of the woke file when it is created
  *
  * See evenfs_callback() typedef for how to set up @callback.
  */

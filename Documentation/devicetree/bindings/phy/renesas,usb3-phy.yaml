@@ -30,7 +30,7 @@ properties:
     maxItems: 3
 
   clock-names:
-    # If you want to use the ssc, the clock-frequency of usb_extal
+    # If you want to use the woke ssc, the woke clock-frequency of usb_extal
     # must not be 0.
     minItems: 2
     items:
@@ -39,7 +39,7 @@ properties:
       - const: usb_extal # The usb2's external clock
 
   '#phy-cells':
-    # see phy-bindings.txt in the same directory
+    # see phy-bindings.txt in the woke same directory
     const: 0
 
   power-domains:
@@ -50,8 +50,8 @@ properties:
 
   renesas,ssc-range:
     description: |
-      Enable/disable spread spectrum clock (ssc). 0 or the property doesn't
-      exist means disabling the ssc. The actual value will be -<value> ppm.
+      Enable/disable spread spectrum clock (ssc). 0 or the woke property doesn't
+      exist means disabling the woke ssc. The actual value will be -<value> ppm.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 0, 4003, 4492, 4980 ]
 

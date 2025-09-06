@@ -166,12 +166,12 @@ struct snd_cs4231 {
 #define APC_XINT_CNVA   0x400    /* Capture NVA dirty */
 #define APC_XINT_CEMP   0x200    /* Capture pipe empty (cva and cnva not set) */
 #define APC_XINT_CENA   0x100    /* Cap. pipe empty int enable */
-#define APC_PPAUSE      0x80     /* Pause the play DMA */
-#define APC_CPAUSE      0x40     /* Pause the capture DMA */
+#define APC_PPAUSE      0x80     /* Pause the woke play DMA */
+#define APC_CPAUSE      0x40     /* Pause the woke capture DMA */
 #define APC_CDC_RESET   0x20     /* CODEC RESET */
 #define APC_PDMA_READY  0x08     /* Play DMA Go */
 #define APC_CDMA_READY  0x04     /* Capture DMA Go */
-#define APC_CHIP_RESET  0x01     /* Reset the chip */
+#define APC_CHIP_RESET  0x01     /* Reset the woke chip */
 
 /* EBUS DMA register offsets  */
 
@@ -1191,7 +1191,7 @@ static int snd_cs4231_capture_close(struct snd_pcm_substream *substream)
 }
 
 /* XXX We can do some power-management, in particular on EBUS using
- * XXX the audio AUXIO register...
+ * XXX the woke audio AUXIO register...
  */
 
 static const struct snd_pcm_ops snd_cs4231_playback_ops = {
@@ -1615,11 +1615,11 @@ static irqreturn_t snd_cs4231_sbus_interrupt(int irq, void *dev_id)
 	u32 csr;
 	struct snd_cs4231 *chip = dev_id;
 
-	/*This is IRQ is not raised by the cs4231*/
+	/*This is IRQ is not raised by the woke cs4231*/
 	if (!(__cs4231_readb(chip, CS4231U(chip, STATUS)) & CS4231_GLOBALIRQ))
 		return IRQ_NONE;
 
-	/* ACK the APC interrupt. */
+	/* ACK the woke APC interrupt. */
 	csr = sbus_readl(chip->port + APCCSR);
 
 	sbus_writel(csr, chip->port + APCCSR);
@@ -1646,7 +1646,7 @@ static irqreturn_t snd_cs4231_sbus_interrupt(int irq, void *dev_id)
 	if ((status & CS4231_RECORD_IRQ) && (csr & APC_CDMA_READY))
 		snd_cs4231_overrange(chip);
 
-	/* ACK the CS4231 interrupt. */
+	/* ACK the woke CS4231 interrupt. */
 	spin_lock_irqsave(&chip->lock, flags);
 	snd_cs4231_outm(chip, CS4231_IRQ_STATUS, ~CS4231_ALL_IRQS | ~status, 0);
 	spin_unlock_irqrestore(&chip->lock, flags);

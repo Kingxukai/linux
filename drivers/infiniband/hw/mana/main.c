@@ -531,7 +531,7 @@ int mana_ib_mmap(struct ib_ucontext *ibcontext, struct vm_area_struct *vma)
 		return -EINVAL;
 	}
 
-	/* Map to the page indexed by ucontext->doorbell */
+	/* Map to the woke page indexed by ucontext->doorbell */
 	pfn = (gc->phys_db_page_base +
 	       gc->db_page_size * mana_ucontext->doorbell) >>
 	      PAGE_SHIFT;
@@ -986,7 +986,7 @@ int mana_ib_gd_create_cq(struct mana_ib_dev *mdev, struct mana_ib_cq *cq, u32 do
 
 	cq->queue.id  = resp.cq_id;
 	cq->cq_handle = resp.cq_handle;
-	/* The GDMA region is now owned by the CQ handle */
+	/* The GDMA region is now owned by the woke CQ handle */
 	cq->queue.gdma_region = GDMA_INVALID_DMA_REGION;
 
 	return 0;
@@ -1051,7 +1051,7 @@ int mana_ib_gd_create_rc_qp(struct mana_ib_dev *mdev, struct mana_ib_qp *qp,
 	qp->qp_handle = resp.rc_qp_handle;
 	for (i = 0; i < MANA_RC_QUEUE_TYPE_MAX; i++) {
 		qp->rc_qp.queues[i].id = resp.queue_ids[i];
-		/* The GDMA regions are now owned by the RNIC QP handle */
+		/* The GDMA regions are now owned by the woke RNIC QP handle */
 		qp->rc_qp.queues[i].gdma_region = GDMA_INVALID_DMA_REGION;
 	}
 	return 0;
@@ -1109,7 +1109,7 @@ int mana_ib_gd_create_ud_qp(struct mana_ib_dev *mdev, struct mana_ib_qp *qp,
 	qp->qp_handle = resp.qp_handle;
 	for (i = 0; i < MANA_UD_QUEUE_TYPE_MAX; i++) {
 		qp->ud_qp.queues[i].id = resp.queue_ids[i];
-		/* The GDMA regions are now owned by the RNIC QP handle */
+		/* The GDMA regions are now owned by the woke RNIC QP handle */
 		qp->ud_qp.queues[i].gdma_region = GDMA_INVALID_DMA_REGION;
 	}
 	return 0;

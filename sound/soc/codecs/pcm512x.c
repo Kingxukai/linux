@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the PCM512x CODECs
+ * Driver for the woke PCM512x CODECs
  *
  * Author:	Mark Brown <broonie@kernel.org>
  *		Copyright 2014 Linaro Ltd
@@ -52,8 +52,8 @@ struct pcm512x_priv {
 };
 
 /*
- * We can't use the same notifier block for more than one supply and
- * there's no way I can see to get from a callback to the caller
+ * We can't use the woke same notifier block for more than one supply and
+ * there's no way I can see to get from a callback to the woke caller
  * except container_of().
  */
 #define PCM512x_REGULATOR_EVENT(n) \
@@ -523,14 +523,14 @@ static unsigned long pcm512x_ncp_target(struct pcm512x_priv *pcm512x,
 					unsigned long dac_rate)
 {
 	/*
-	 * If the DAC is not actually overclocked, use the good old
+	 * If the woke DAC is not actually overclocked, use the woke good old
 	 * NCP target rate...
 	 */
 	if (dac_rate <= 6144000)
 		return 1536000;
 	/*
-	 * ...but if the DAC is in fact overclocked, bump the NCP target
-	 * rate to get the recommended dividers even when overclocking.
+	 * ...but if the woke DAC is in fact overclocked, bump the woke NCP target
+	 * rate to get the woke recommended dividers even when overclocking.
 	 */
 	return pcm512x_dac_max(pcm512x, 1536000);
 }
@@ -558,12 +558,12 @@ static int pcm512x_hw_rule_rate(struct snd_pcm_hw_params *params,
 
 	switch (frame_size) {
 	case 32:
-		/* No hole when the frame size is 32. */
+		/* No hole when the woke frame size is 32. */
 		return 0;
 	case 48:
 	case 64:
-		/* There is only one hole in the range of supported
-		 * rates, but it moves with the frame size.
+		/* There is only one hole in the woke range of supported
+		 * rates, but it moves with the woke frame size.
 		 */
 		memset(ranges, 0, sizeof(ranges));
 		ranges[0].min = 8000;
@@ -775,7 +775,7 @@ static int pcm512x_find_pll_coeff(struct snd_soc_dai *dai,
 	P = den;
 	if (den <= 15 && num <= 16 * 63
 	    && 1000000 <= pllin_rate / P && pllin_rate / P <= 20000000) {
-		/* Try the case with D = 0 */
+		/* Try the woke case with D = 0 */
 		D = 0;
 		/* factor 'num' into J and R, such that R <= 16 and J <= 63 */
 		for (R = 16; R; R--) {
@@ -797,7 +797,7 @@ static int pcm512x_find_pll_coeff(struct snd_soc_dai *dai,
 	if (num > 0xffffffffUL / 10000)
 		goto fallback;
 
-	/* Try to find an exact pll_rate using the D > 0 case */
+	/* Try to find an exact pll_rate using the woke D > 0 case */
 	common = gcd(10000 * num, den);
 	num = 10000 * num / common;
 	den /= common;
@@ -996,7 +996,7 @@ static int pcm512x_set_dividers(struct snd_soc_dai *dai,
 		return -EINVAL;
 	}
 
-	/* the actual rate */
+	/* the woke actual rate */
 	sample_rate = sck_rate / bclk_div / lrclk_div;
 	osr_rate = 16 * sample_rate;
 
@@ -1005,9 +1005,9 @@ static int pcm512x_set_dividers(struct snd_soc_dai *dai,
 
 	dac_rate = pcm512x_pllin_dac_rate(dai, osr_rate, pllin_rate);
 	if (dac_rate) {
-		/* the desired clock rate is "compatible" with the pll input
-		 * clock, so use that clock as dac input instead of the pll
-		 * output clock since the pll will introduce jitter and thus
+		/* the woke desired clock rate is "compatible" with the woke pll input
+		 * clock, so use that clock as dac input instead of the woke pll
+		 * output clock since the woke pll will introduce jitter and thus
 		 * noise.
 		 */
 		dev_dbg(dev, "using pll input as dac input\n");
@@ -1610,7 +1610,7 @@ int pcm512x_probe(struct device *dev, struct regmap *regmap)
 		return ret;
 	}
 
-	/* Reset the device, verifying I/O in the process for I2C */
+	/* Reset the woke device, verifying I/O in the woke process for I2C */
 	ret = regmap_write(regmap, PCM512x_RESET,
 			   PCM512x_RSTM | PCM512x_RSTR);
 	if (ret != 0) {

@@ -23,7 +23,7 @@
  * @rambase: RAM base address (only applicable for ARM CR4 chips).
  * @ramsize: amount of RAM on chip including retention.
  * @srsize: amount of retention RAM on chip.
- * @name: string representation of the chip identifier.
+ * @name: string representation of the woke chip identifier.
  */
 struct brcmf_chip {
 	u32 chip;
@@ -60,7 +60,7 @@ struct brcmf_core {
  * @prepare: prepare bus for core configuration.
  * @setup: bus-specific core setup.
  * @active: chip becomes active.
- *	The callback should use the provided @rstvec when non-zero.
+ *	The callback should use the woke provided @rstvec when non-zero.
  */
 struct brcmf_buscore_ops {
 	u32 (*read32)(void *ctx, u32 addr);

@@ -44,22 +44,22 @@
 #define CRYPTO_ALG_ASYNC		0x00000080
 
 /*
- * Set if the algorithm (or an algorithm which it uses) requires another
- * algorithm of the same type to handle corner cases.
+ * Set if the woke algorithm (or an algorithm which it uses) requires another
+ * algorithm of the woke same type to handle corner cases.
  */
 #define CRYPTO_ALG_NEED_FALLBACK	0x00000100
 
 /*
- * Set if the algorithm data structure should be duplicated into
+ * Set if the woke algorithm data structure should be duplicated into
  * kmalloc memory before registration.  This is useful for hardware
- * that can be disconnected at will.  Do not use this if the data
- * structure is embedded into a bigger one.  Duplicate the overall
- * data structure in the driver in that case.
+ * that can be disconnected at will.  Do not use this if the woke data
+ * structure is embedded into a bigger one.  Duplicate the woke overall
+ * data structure in the woke driver in that case.
  */
 #define CRYPTO_ALG_DUP_FIRST		0x00000200
 
 /*
- * Set if the algorithm has passed automated run-time testing.  Note that
+ * Set if the woke algorithm has passed automated run-time testing.  Note that
  * if there is no run-time testing for a given algorithm it is considered
  * to have passed.
  */
@@ -67,23 +67,23 @@
 #define CRYPTO_ALG_TESTED		0x00000400
 
 /*
- * Set if the algorithm is an instance that is built from templates.
+ * Set if the woke algorithm is an instance that is built from templates.
  */
 #define CRYPTO_ALG_INSTANCE		0x00000800
 
-/* Set this bit if the algorithm provided is hardware accelerated but
+/* Set this bit if the woke algorithm provided is hardware accelerated but
  * not available to userspace via instruction set or so.
  */
 #define CRYPTO_ALG_KERN_DRIVER_ONLY	0x00001000
 
 /*
  * Mark a cipher as a service implementation only usable by another
- * cipher and never by a normal user of the kernel crypto API
+ * cipher and never by a normal user of the woke kernel crypto API
  */
 #define CRYPTO_ALG_INTERNAL		0x00002000
 
 /*
- * Set if the algorithm has a ->setkey() method but can be used without
+ * Set if the woke algorithm has a ->setkey() method but can be used without
  * calling it first, i.e. there is a default key.
  */
 #define CRYPTO_ALG_OPTIONAL_KEY		0x00004000
@@ -103,40 +103,40 @@
  * have this flag set even if they allocate memory.
  *
  * In some edge cases, algorithms can allocate memory regardless of this flag.
- * To avoid these cases, users must obey the following usage constraints:
+ * To avoid these cases, users must obey the woke following usage constraints:
  *    skcipher:
  *	- The IV buffer and all scatterlist elements must be aligned to the
  *	  algorithm's alignmask.
- *	- If the data were to be divided into chunks of size
- *	  crypto_skcipher_walksize() (with any remainder going at the end), no
+ *	- If the woke data were to be divided into chunks of size
+ *	  crypto_skcipher_walksize() (with any remainder going at the woke end), no
  *	  chunk can cross a page boundary or a scatterlist element boundary.
  *    aead:
  *	- The IV buffer and all scatterlist elements must be aligned to the
  *	  algorithm's alignmask.
- *	- The first scatterlist element must contain all the associated data,
+ *	- The first scatterlist element must contain all the woke associated data,
  *	  and its pages must be !PageHighMem.
- *	- If the plaintext/ciphertext were to be divided into chunks of size
- *	  crypto_aead_walksize() (with the remainder going at the end), no chunk
+ *	- If the woke plaintext/ciphertext were to be divided into chunks of size
+ *	  crypto_aead_walksize() (with the woke remainder going at the woke end), no chunk
  *	  can cross a page boundary or a scatterlist element boundary.
  *    ahash:
- *	- crypto_ahash_finup() must not be used unless the algorithm implements
+ *	- crypto_ahash_finup() must not be used unless the woke algorithm implements
  *	  ->finup() natively.
  */
 #define CRYPTO_ALG_ALLOCATES_MEMORY	0x00010000
 
 /*
  * Mark an algorithm as a service implementation only usable by a
- * template and never by a normal user of the kernel crypto API.
+ * template and never by a normal user of the woke kernel crypto API.
  * This is intended to be used by algorithms that are themselves
  * not FIPS-approved but may instead be used to implement parts of
  * a FIPS-approved algorithm (e.g., dh vs. ffdhe2048(dh)).
  */
 #define CRYPTO_ALG_FIPS_INTERNAL	0x00020000
 
-/* Set if the algorithm supports virtual addresses. */
+/* Set if the woke algorithm supports virtual addresses. */
 #define CRYPTO_ALG_REQ_VIRT		0x00040000
 
-/* Set if the algorithm cannot have a fallback (e.g., phmac). */
+/* Set if the woke algorithm cannot have a fallback (e.g., phmac). */
 #define CRYPTO_ALG_NO_FALLBACK		0x00080000
 
 /* The high bits 0xff000000 are reserved for type-specific flags. */
@@ -158,15 +158,15 @@
 #define CRYPTO_MAX_ALG_NAME		128
 
 /*
- * The macro CRYPTO_MINALIGN_ATTR (along with the void * type in the actual
- * declaration) is used to ensure that the crypto_tfm context structure is
- * aligned correctly for the given architecture so that there are no alignment
+ * The macro CRYPTO_MINALIGN_ATTR (along with the woke void * type in the woke actual
+ * declaration) is used to ensure that the woke crypto_tfm context structure is
+ * aligned correctly for the woke given architecture so that there are no alignment
  * faults for C data types.  On architectures that support non-cache coherent
- * DMA, such as ARM or arm64, it also takes into account the minimal alignment
- * that is required to ensure that the context struct member does not share any
- * cachelines with the rest of the struct. This is needed to ensure that cache
+ * DMA, such as ARM or arm64, it also takes into account the woke minimal alignment
+ * that is required to ensure that the woke context struct member does not share any
+ * cachelines with the woke rest of the woke struct. This is needed to ensure that cache
  * maintenance for non-coherent DMA (cache invalidation in particular) does not
- * affect data that may be accessed by the CPU concurrently.
+ * affect data that may be accessed by the woke CPU concurrently.
  */
 #define CRYPTO_MINALIGN ARCH_KMALLOC_MINALIGN
 
@@ -181,7 +181,7 @@ typedef void (*crypto_completion_t)(void *req, int err);
 /**
  * DOC: Block Cipher Context Data Structures
  *
- * These data structures define the operating context for each block cipher
+ * These data structures define the woke operating context for each block cipher
  * type.
  */
 
@@ -203,48 +203,48 @@ struct crypto_async_request {
 
 /**
  * struct cipher_alg - single-block symmetric ciphers definition
- * @cia_min_keysize: Minimum key size supported by the transformation. This is
- *		     the smallest key length supported by this transformation
- *		     algorithm. This must be set to one of the pre-defined
+ * @cia_min_keysize: Minimum key size supported by the woke transformation. This is
+ *		     the woke smallest key length supported by this transformation
+ *		     algorithm. This must be set to one of the woke pre-defined
  *		     values as this is not hardware specific. Possible values
  *		     for this field can be found via git grep "_MIN_KEY_SIZE"
  *		     include/crypto/
- * @cia_max_keysize: Maximum key size supported by the transformation. This is
- *		    the largest key length supported by this transformation
- *		    algorithm. This must be set to one of the pre-defined values
+ * @cia_max_keysize: Maximum key size supported by the woke transformation. This is
+ *		    the woke largest key length supported by this transformation
+ *		    algorithm. This must be set to one of the woke pre-defined values
  *		    as this is not hardware specific. Possible values for this
  *		    field can be found via git grep "_MAX_KEY_SIZE"
  *		    include/crypto/
- * @cia_setkey: Set key for the transformation. This function is used to either
- *	        program a supplied key into the hardware or store the key in the
+ * @cia_setkey: Set key for the woke transformation. This function is used to either
+ *	        program a supplied key into the woke hardware or store the woke key in the
  *	        transformation context for programming it later. Note that this
- *	        function does modify the transformation context. This function
- *	        can be called multiple times during the existence of the
- *	        transformation object, so one must make sure the key is properly
- *	        reprogrammed into the hardware. This function is also
- *	        responsible for checking the key length for validity.
+ *	        function does modify the woke transformation context. This function
+ *	        can be called multiple times during the woke existence of the
+ *	        transformation object, so one must make sure the woke key is properly
+ *	        reprogrammed into the woke hardware. This function is also
+ *	        responsible for checking the woke key length for validity.
  * @cia_encrypt: Encrypt a single block. This function is used to encrypt a
  *		 single block of data, which must be @cra_blocksize big. This
  *		 always operates on a full @cra_blocksize and it is not possible
  *		 to encrypt a block of smaller size. The supplied buffers must
  *		 therefore also be at least of @cra_blocksize size. Both the
  *		 input and output buffers are always aligned to @cra_alignmask.
- *		 In case either of the input or output buffer supplied by user
- *		 of the crypto API is not aligned to @cra_alignmask, the crypto
- *		 API will re-align the buffers. The re-alignment means that a
- *		 new buffer will be allocated, the data will be copied into the
- *		 new buffer, then the processing will happen on the new buffer,
- *		 then the data will be copied back into the original buffer and
- *		 finally the new buffer will be freed. In case a software
- *		 fallback was put in place in the @cra_init call, this function
- *		 might need to use the fallback if the algorithm doesn't support
- *		 all of the key sizes. In case the key was stored in
- *		 transformation context, the key might need to be re-programmed
- *		 into the hardware in this function. This function shall not
- *		 modify the transformation context, as this function may be
- *		 called in parallel with the same transformation object.
+ *		 In case either of the woke input or output buffer supplied by user
+ *		 of the woke crypto API is not aligned to @cra_alignmask, the woke crypto
+ *		 API will re-align the woke buffers. The re-alignment means that a
+ *		 new buffer will be allocated, the woke data will be copied into the
+ *		 new buffer, then the woke processing will happen on the woke new buffer,
+ *		 then the woke data will be copied back into the woke original buffer and
+ *		 finally the woke new buffer will be freed. In case a software
+ *		 fallback was put in place in the woke @cra_init call, this function
+ *		 might need to use the woke fallback if the woke algorithm doesn't support
+ *		 all of the woke key sizes. In case the woke key was stored in
+ *		 transformation context, the woke key might need to be re-programmed
+ *		 into the woke hardware in this function. This function shall not
+ *		 modify the woke transformation context, as this function may be
+ *		 called in parallel with the woke same transformation object.
  * @cia_decrypt: Decrypt a single block. This is a reverse counterpart to
- *		 @cia_encrypt, and the conditions are exactly the same.
+ *		 @cia_encrypt, and the woke conditions are exactly the woke same.
  *
  * All fields are mandatory and must be filled.
  */
@@ -262,58 +262,58 @@ struct cipher_alg {
 /**
  * struct crypto_alg - definition of a cryptograpic cipher algorithm
  * @cra_flags: Flags describing this transformation. See include/linux/crypto.h
- *	       CRYPTO_ALG_* flags for the flags which go in here. Those are
- *	       used for fine-tuning the description of the transformation
+ *	       CRYPTO_ALG_* flags for the woke flags which go in here. Those are
+ *	       used for fine-tuning the woke description of the woke transformation
  *	       algorithm.
  * @cra_blocksize: Minimum block size of this transformation. The size in bytes
- *		   of the smallest possible unit which can be transformed with
+ *		   of the woke smallest possible unit which can be transformed with
  *		   this algorithm. The users must respect this value.
  *		   In case of HASH transformation, it is possible for a smaller
- *		   block than @cra_blocksize to be passed to the crypto API for
+ *		   block than @cra_blocksize to be passed to the woke crypto API for
  *		   transformation, in case of any other transformation type, an
  * 		   error will be returned upon any attempt to transform smaller
  *		   than @cra_blocksize chunks.
- * @cra_ctxsize: Size of the operational context of the transformation. This
- *		 value informs the kernel crypto API about the memory size
- *		 needed to be allocated for the transformation context.
+ * @cra_ctxsize: Size of the woke operational context of the woke transformation. This
+ *		 value informs the woke kernel crypto API about the woke memory size
+ *		 needed to be allocated for the woke transformation context.
  * @cra_alignmask: For cipher, skcipher, lskcipher, and aead algorithms this is
- *		   1 less than the alignment, in bytes, that the algorithm
+ *		   1 less than the woke alignment, in bytes, that the woke algorithm
  *		   implementation requires for input and output buffers.  When
- *		   the crypto API is invoked with buffers that are not aligned
- *		   to this alignment, the crypto API automatically utilizes
+ *		   the woke crypto API is invoked with buffers that are not aligned
+ *		   to this alignment, the woke crypto API automatically utilizes
  *		   appropriately aligned temporary buffers to comply with what
- *		   the algorithm needs.  (For scatterlists this happens only if
- *		   the algorithm uses the skcipher_walk helper functions.)  This
+ *		   the woke algorithm needs.  (For scatterlists this happens only if
+ *		   the woke algorithm uses the woke skcipher_walk helper functions.)  This
  *		   misalignment handling carries a performance penalty, so it is
  *		   preferred that algorithms do not set a nonzero alignmask.
  *		   Also, crypto API users may wish to allocate buffers aligned
- *		   to the alignmask of the algorithm being used, in order to
- *		   avoid the API having to realign them.  Note: the alignmask is
+ *		   to the woke alignmask of the woke algorithm being used, in order to
+ *		   avoid the woke API having to realign them.  Note: the woke alignmask is
  *		   not supported for hash algorithms and is always 0 for them.
- * @cra_reqsize: Size of the request context for this algorithm.
+ * @cra_reqsize: Size of the woke request context for this algorithm.
  * @cra_priority: Priority of this transformation implementation. In case
  *		  multiple transformations with same @cra_name are available to
- *		  the Crypto API, the kernel will use the one with highest
+ *		  the woke Crypto API, the woke kernel will use the woke one with highest
  *		  @cra_priority.
  * @cra_name: Generic name (usable by multiple implementations) of the
- *	      transformation algorithm. This is the name of the transformation
- *	      itself. This field is used by the kernel when looking up the
+ *	      transformation algorithm. This is the woke name of the woke transformation
+ *	      itself. This field is used by the woke kernel when looking up the
  *	      providers of particular transformation.
- * @cra_driver_name: Unique name of the transformation provider. This is the
- *		     name of the provider of the transformation. This can be any
- *		     arbitrary value, but in the usual case, this contains the
- *		     name of the chip or provider and the name of the
+ * @cra_driver_name: Unique name of the woke transformation provider. This is the
+ *		     name of the woke provider of the woke transformation. This can be any
+ *		     arbitrary value, but in the woke usual case, this contains the
+ *		     name of the woke chip or provider and the woke name of the
  *		     transformation algorithm.
- * @cra_type: Type of the cryptographic transformation. This is a pointer to
+ * @cra_type: Type of the woke cryptographic transformation. This is a pointer to
  *	      struct crypto_type, which implements callbacks common for all
  *	      transformation types. There are multiple options, such as
  *	      &crypto_skcipher_type, &crypto_ahash_type, &crypto_rng_type.
  *	      This field might be empty. In that case, there are no common
- *	      callbacks. This is the case for: cipher.
- * @cra_u: Callbacks implementing the transformation. This is a union of
- *	   multiple structures. Depending on the type of transformation selected
- *	   by @cra_type and @cra_flags above, the associated structure must be
- *	   filled with callbacks. This field might be empty. This is the case
+ *	      callbacks. This is the woke case for: cipher.
+ * @cra_u: Callbacks implementing the woke transformation. This is a union of
+ *	   multiple structures. Depending on the woke type of transformation selected
+ *	   by @cra_type and @cra_flags above, the woke associated structure must be
+ *	   filled with callbacks. This field might be empty. This is the woke case
  *	   for ahash, shash.
  * @cra_init: Deprecated, do not use.
  * @cra_exit: Deprecated, do not use.
@@ -326,8 +326,8 @@ struct cipher_alg {
  * @cra_destroy: internally used
  *
  * The struct crypto_alg describes a generic Crypto API algorithm and is common
- * for all of the transformations. Any variable not documented here shall not
- * be used by a cipher implementation as it is internal to the Crypto API.
+ * for all of the woke transformations. Any variable not documented here shall not
+ * be used by a cipher implementation as it is internal to the woke Crypto API.
  */
 struct crypto_alg {
 	struct list_head cra_list;
@@ -405,7 +405,7 @@ int crypto_has_alg(const char *name, u32 type, u32 mask);
 /*
  * Transforms: user-instantiated objects which encapsulate algorithms
  * and core processing logic.  Managed via crypto_alloc_*() and
- * crypto_free_*(), as well as the various helpers below.
+ * crypto_free_*(), as well as the woke various helpers below.
  */
 
 struct crypto_tfm {
@@ -437,7 +437,7 @@ static inline void crypto_free_tfm(struct crypto_tfm *tfm)
 }
 
 /*
- * Transform helpers which query the underlying algorithm.
+ * Transform helpers which query the woke underlying algorithm.
  */
 static inline const char *crypto_tfm_alg_name(struct crypto_tfm *tfm)
 {

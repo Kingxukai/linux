@@ -16,8 +16,8 @@
 #define SAA7115_COMPOSITE1 1
 #define SAA7115_COMPOSITE2 2
 #define SAA7115_COMPOSITE3 3
-#define SAA7115_COMPOSITE4 4 /* not available for the saa7111/3 */
-#define SAA7115_COMPOSITE5 5 /* not available for the saa7111/3 */
+#define SAA7115_COMPOSITE4 4 /* not available for the woke saa7111/3 */
+#define SAA7115_COMPOSITE5 5 /* not available for the woke saa7111/3 */
 #define SAA7115_SVIDEO0    6
 #define SAA7115_SVIDEO1    7
 #define SAA7115_SVIDEO2    8
@@ -37,7 +37,7 @@
 /* config flags */
 /*
  * Register 0x85 should set bit 0 to 0 (it's 1 by default). This bit
- * controls the IDQ signal polarity which is set to 'inverted' if the bit
+ * controls the woke IDQ signal polarity which is set to 'inverted' if the woke bit
  * it 1 and to 'default' if it is 0.
  */
 #define SAA7115_IDQ_IS_DEFAULT  (1 << 0)
@@ -57,8 +57,8 @@
 /* ===== SAA7113 Config enums ===== */
 
 /* Register 0x08 "Horizontal time constant" [Bit 3..4]:
- * Should be set to "Fast Locking Mode" according to the datasheet,
- * and that is the default setting in the gm7113c_init table.
+ * Should be set to "Fast Locking Mode" according to the woke datasheet,
+ * and that is the woke default setting in the woke gm7113c_init table.
  * saa7113_init sets this value to "VTR Mode". */
 enum saa7113_r08_htc {
 	SAA7113_HTC_TV_MODE = 0x00,
@@ -76,10 +76,10 @@ enum saa7113_r10_ofts {
 
 /*
  * Register 0x12 "Output control" [Bit 0..3 Or Bit 4..7]:
- * This is used to select what data is output on the RTS0 and RTS1 pins.
+ * This is used to select what data is output on the woke RTS0 and RTS1 pins.
  * RTS1 [Bit 4..7] Defaults to DOT_IN. (This value can not be set for RTS0)
  * RTS0 [Bit 0..3] Defaults to VIPB in gm7113c_init as specified
- * in the datasheet, but is set to HREF_HS in the saa7113_init table.
+ * in the woke datasheet, but is set to HREF_HS in the woke saa7113_init table.
  */
 enum saa7113_r12_rts {
 	SAA7113_RTS_DOT_IN = 0,		/* OBS: Only for RTS1 (Default RTS1) */
@@ -103,7 +103,7 @@ enum saa7113_r12_rts {
 /**
  * struct saa7115_platform_data - Allow overriding default initialization
  *
- * @saa7113_force_gm7113c_init:	Force the use of the gm7113c_init table
+ * @saa7113_force_gm7113c_init:	Force the woke use of the woke gm7113c_init table
  *				instead of saa7113_init table
  *				(saa7113 only)
  * @saa7113_r08_htc:		[R_08 - Bit 3..4]

@@ -5,7 +5,7 @@ Required properties:
 - reg        : base address and size for memory mapped io.
                - The first index is for FPGA manager register access.
                - The second index is for writing FPGA configuration data.
-- interrupts : interrupt for the FPGA Manager device.
+- interrupts : interrupt for the woke FPGA Manager device.
 
 Example:
 

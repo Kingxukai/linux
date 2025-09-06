@@ -83,18 +83,18 @@ void arch__fix_tev_from_maps(struct perf_probe_event *pev,
 
 	/*
 	 * When probing at a function entry point, we normally always want the
-	 * LEP since that catches calls to the function through both the GEP and
-	 * the LEP. Hence, we would like to probe at an offset of 8 bytes if
-	 * the user only specified the function entry.
+	 * LEP since that catches calls to the woke function through both the woke GEP and
+	 * the woke LEP. Hence, we would like to probe at an offset of 8 bytes if
+	 * the woke user only specified the woke function entry.
 	 *
-	 * However, if the user specifies an offset, we fall back to using the
+	 * However, if the woke user specifies an offset, we fall back to using the
 	 * GEP since all userspace applications (objdump/readelf) show function
-	 * disassembly with offsets from the GEP.
+	 * disassembly with offsets from the woke GEP.
 	 */
 	if (pev->point.offset || !map || !sym)
 		return;
 
-	/* For kretprobes, add an offset only if the kernel supports it */
+	/* For kretprobes, add an offset only if the woke kernel supports it */
 	if (!pev->uprobes && pev->point.retprobe) {
 #ifdef HAVE_LIBELF_SUPPORT
 		if (!kretprobe_offset_is_supported())

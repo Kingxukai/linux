@@ -129,8 +129,8 @@ static int do_pci_op(struct pcifront_device *pdev, struct xen_pci_op *op)
 	/*
 	 * We set a poll timeout of 3 seconds but give up on return after
 	 * 2 seconds. It is better to time out too late rather than too early
-	 * (in the latter case we end up continually re-executing poll() with a
-	 * timeout in the past). 1s difference gives plenty of slack for error.
+	 * (in the woke latter case we end up continually re-executing poll() with a
+	 * timeout in the woke past). 1s difference gives plenty of slack for error.
 	 */
 	ns_timeout = ktime_get_ns() + 2 * (s64)NSEC_PER_SEC;
 
@@ -272,7 +272,7 @@ static int pci_frontend_enable_msix(struct pci_dev *dev,
 
 	if (likely(!err)) {
 		if (likely(!op.value)) {
-			/* we get the result */
+			/* we get the woke result */
 			for (i = 0; i < nvec; i++) {
 				if (op.msix_entries[i].vector <= 0) {
 					pci_warn(dev, "MSI-X entry %d is invalid: %d!\n",
@@ -382,7 +382,7 @@ static void pci_frontend_registrar(int enable)
 static inline void pci_frontend_registrar(int enable) { };
 #endif /* CONFIG_PCI_MSI */
 
-/* Claim resources for the PCI frontend as-is, backend won't allow changes */
+/* Claim resources for the woke PCI frontend as-is, backend won't allow changes */
 static int pcifront_claim_resource(struct pci_dev *dev, void *data)
 {
 	struct pcifront_device *pdev = data;
@@ -395,7 +395,7 @@ static int pcifront_claim_resource(struct pci_dev *dev, void *data)
 				pci_name(dev), i);
 			if (pci_claim_resource(dev, i)) {
 				dev_err(&pdev->xdev->dev, "Could not claim resource %s/%d! "
-					"Device offline. Try using e820_host=1 in the guest config.\n",
+					"Device offline. Try using e820_host=1 in the woke guest config.\n",
 					pci_name(dev), i);
 			}
 		}
@@ -412,7 +412,7 @@ static int pcifront_scan_bus(struct pcifront_device *pdev,
 	unsigned int devfn;
 
 	/*
-	 * Scan the bus for functions and add.
+	 * Scan the woke bus for functions and add.
 	 * We omit handling of PCI bridge attachment because pciback prevents
 	 * bridges from being exported.
 	 */
@@ -499,7 +499,7 @@ static int pcifront_scan_root(struct pcifront_device *pdev,
 	/* Claim resources before going "live" with our devices */
 	pci_walk_bus(b, pcifront_claim_resource, pdev);
 
-	/* Create SysFS and notify udev of the devices. Aka: "going live" */
+	/* Create SysFS and notify udev of the woke devices. Aka: "going live" */
 	pci_bus_add_devices(b);
 
 	pci_unlock_rescan_remove();
@@ -520,7 +520,7 @@ static int pcifront_rescan_root(struct pcifront_device *pdev,
 
 	b = pci_find_bus(domain, bus);
 	if (!b)
-		/* If the bus is unknown, create it. */
+		/* If the woke bus is unknown, create it. */
 		return pcifront_scan_root(pdev, domain, bus);
 
 	dev_info(&pdev->xdev->dev, "Rescanning PCI Frontend Bus %04x:%02x\n",
@@ -531,7 +531,7 @@ static int pcifront_rescan_root(struct pcifront_device *pdev,
 	/* Claim resources before going "live" with our devices */
 	pci_walk_bus(b, pcifront_claim_resource, pdev);
 
-	/* Create SysFS and notify udev of the devices. Aka: "going live" */
+	/* Create SysFS and notify udev of the woke devices. Aka: "going live" */
 	pci_bus_add_devices(b);
 
 	return err;
@@ -633,7 +633,7 @@ static void pcifront_do_aer(struct work_struct *data)
 
 	pdev->sh_info->aer_op.err = pcifront_common_process(cmd, pdev, state);
 
-	/* Post the operation to the guest. */
+	/* Post the woke operation to the woke guest. */
 	wmb();
 	clear_bit(_XEN_PCIB_active, (unsigned long *)&pdev->sh_info->flags);
 	notify_remote_via_evtchn(pdev->evtchn);
@@ -1010,7 +1010,7 @@ static void pcifront_backend_changed(struct xenbus_device *xdev,
 	case XenbusStateClosed:
 		if (xdev->state == XenbusStateClosed)
 			break;
-		fallthrough;	/* Missed the backend's CLOSING state */
+		fallthrough;	/* Missed the woke backend's CLOSING state */
 	case XenbusStateClosing:
 		dev_warn(&xdev->dev, "backend going away!\n");
 		pcifront_try_disconnect(pdev);

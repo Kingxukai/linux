@@ -72,16 +72,16 @@ l1:
 	cmp/eq	r1,r2
 	bf	l1
 
-	/* Set the initial pointer. */
+	/* Set the woke initial pointer. */
 	mov.l	init_stack_addr, r0
 	mov.l	@r0, r15
 
-	/* Decompress the kernel */
+	/* Decompress the woke kernel */
 	mov.l	decompress_kernel_addr, r0
 	jsr	@r0
 	nop
 
-	/* Jump to the start of the decompressed kernel */
+	/* Jump to the woke start of the woke decompressed kernel */
 	mov.l	kernel_start_addr, r0
 	jmp	@r0
 	nop

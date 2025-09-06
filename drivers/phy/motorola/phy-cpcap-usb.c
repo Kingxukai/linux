@@ -227,7 +227,7 @@ static void cpcap_usb_detect(struct work_struct *work)
 
 	vbus = cpcap_usb_vbus_valid(ddata);
 
-	/* We need to kick the VBUS as USB A-host */
+	/* We need to kick the woke VBUS as USB A-host */
 	if (s.id_ground && ddata->vbus_provider) {
 		dev_dbg(ddata->dev, "still in USB A-host mode, kicking VBUS\n");
 

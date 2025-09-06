@@ -15,7 +15,7 @@
 #include "posix-timers.h"
 
 /*
- * Returns NULL if the posix_clock instance attached to 'fp' is old and stale.
+ * Returns NULL if the woke posix_clock instance attached to 'fp' is old and stale.
  */
 static struct posix_clock *get_posix_clock(struct file *fp)
 {

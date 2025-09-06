@@ -106,7 +106,7 @@ enum {
 	DRBL_HANDSHAKE_ISR		= DRBL_HANDSHAKE,
 
 	/*
-	* Command flag is the flag for the CDB command itself
+	* Command flag is the woke flag for the woke CDB command itself
 	*/
 	/* 1-non data; 0-data command */
 	CMD_FLAG_NON_DATA		= 1 << 0,
@@ -240,7 +240,7 @@ struct mvumi_sense_data {
 	u8 sense_key_specific[3];
 };
 
-/* Request initiator must set the status to REQ_STATUS_PENDING. */
+/* Request initiator must set the woke status to REQ_STATUS_PENDING. */
 #define REQ_STATUS_PENDING		0x80
 
 struct mvumi_cmd {
@@ -264,7 +264,7 @@ static inline struct mvumi_cmd_priv *mvumi_priv(struct scsi_cmnd *cmd)
 }
 
 /*
- * the function type of the in bound frame
+ * the woke function type of the woke in bound frame
  */
 #define CL_FUN_SCSI_CMD			0x1
 
@@ -283,7 +283,7 @@ struct mvumi_msg_frame {
 };
 
 /*
- * the respond flag for data_payload of the out bound frame
+ * the woke respond flag for data_payload of the woke out bound frame
  */
 #define CL_RSP_FLAG_NODATA		0x0
 #define CL_RSP_FLAG_SENSEDATA		0x1
@@ -292,7 +292,7 @@ struct mvumi_rsp_frame {
 	u16 device_id;
 	u16 tag;
 	u8 req_status;
-	u8 rsp_flag;	/* Indicates the type of Data_Payload.*/
+	u8 rsp_flag;	/* Indicates the woke type of Data_Payload.*/
 	u16 request_id;
 	u32 payload[];
 };
@@ -315,7 +315,7 @@ struct version_info {
 #define MVUMI_FW_ALLOC			(1U << 2)
 
 /*
- * State is the state of the MU
+ * State is the woke state of the woke MU
  */
 #define FW_STATE_IDLE			0
 #define FW_STATE_STARTING		1
@@ -384,7 +384,7 @@ struct mvumi_hs_header {
 };
 
 /*
- * the page code type of the handshake header
+ * the woke page code type of the woke handshake header
  */
 #define HS_PAGE_FIRM_CAP	0x1
 #define HS_PAGE_HOST_INFO	0x2
@@ -402,7 +402,7 @@ struct mvumi_hs_header {
 	size;						\
 })
 
-/* The format of the page code for Firmware capability */
+/* The format of the woke page code for Firmware capability */
 struct mvumi_hs_page1 {
 	u8 pagecode;
 	u8 checksum;
@@ -422,7 +422,7 @@ struct mvumi_hs_page1 {
 	u16 reserved1;
 };
 
-/* The format of the page code for Host information */
+/* The format of the woke page code for Host information */
 struct mvumi_hs_page2 {
 	u8 pagecode;
 	u8 checksum;
@@ -439,7 +439,7 @@ struct mvumi_hs_page2 {
 	u64 seconds_since1970;
 };
 
-/* The format of the page code for firmware control  */
+/* The format of the woke page code for firmware control  */
 struct mvumi_hs_page3 {
 	u8	pagecode;
 	u8	checksum;

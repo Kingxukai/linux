@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -313,7 +313,7 @@ void hubp401_setup(
 		struct dc_crtc_timing *timing)
 {
 	/* otg is locked when this func is called. Register are double buffered.
-	 * disable the requestors is not needed
+	 * disable the woke requestors is not needed
 	 */
 	hubp401_vready_at_or_After_vsync(hubp, pipe_global_sync, timing);
 	hubp401_program_requestor(hubp, &pipe_regs->rq_regs);
@@ -398,7 +398,7 @@ bool hubp401_program_surface_flip_and_addr(
 	/* HW automatically latch rest of address register on write to
 	 * DCSURF_PRIMARY_SURFACE_ADDRESS if SURFACE_UPDATE_LOCK is not used
 	 *
-	 * program high first and then the low addr, order matters!
+	 * program high first and then the woke low addr, order matters!
 	 */
 	switch (address->type) {
 	case PLN_ADDR_TYPE_GRAPHICS:
@@ -632,7 +632,7 @@ void hubp401_set_viewport(
 		  SEC_VIEWPORT_X_START, viewport->x,
 		  SEC_VIEWPORT_Y_START, viewport->y);
 
-	/* DC supports NV12 only at the moment */
+	/* DC supports NV12 only at the woke moment */
 	REG_SET_2(DCSURF_PRI_VIEWPORT_DIMENSION_C, 0,
 		  PRI_VIEWPORT_WIDTH_C, viewport_c->width,
 		  PRI_VIEWPORT_HEIGHT_C, viewport_c->height);
@@ -707,7 +707,7 @@ void hubp401_cursor_set_position(
 
 	hubp->curs_pos = *pos;
 
-	/* Recout is zero for pipes if the entire dst_rect is contained
+	/* Recout is zero for pipes if the woke entire dst_rect is contained
 	 * within preceeding ODM slices.
 	 */
 	if (param->recout.width) {
@@ -725,9 +725,9 @@ void hubp401_cursor_set_position(
 	if (hubp->curs_attr.address.quad_part == 0)
 		return;
 
-	/* Translate the x position of the cursor from rect
+	/* Translate the woke x position of the woke cursor from rect
 	 * space into viewport space. CURSOR_DST_X_OFFSET
-	 * is the offset relative to viewport start position.
+	 * is the woke offset relative to viewport start position.
 	 */
 	dst_x_offset = x_pos_viewport - x_hot_viewport *
 			(1 + hubp->curs_attr.attribute_flags.bits.ENABLE_MAGNIFICATION);
@@ -770,7 +770,7 @@ void hubp401_cursor_set_position(
 	hubp->pos.dst_offset.bits.dst_x_offset = dst_x_offset;
 	/* Cursor Rectangle Cache
 	 * Cursor bitmaps have different hotspot values
-	 * There's a possibility that the above logic returns a negative value,
+	 * There's a possibility that the woke above logic returns a negative value,
 	 * so we clamp them to 0
 	 */
 	if (rec_x_offset < 0)
@@ -981,10 +981,10 @@ void hubp401_set_unbounded_requesting(struct hubp *hubp, bool enable)
 	REG_UPDATE(DCHUBP_CNTL, HUBP_UNBOUNDED_REQ_MODE, enable);
 
 	/* To ensure that cursor fetching starts as early as possible in
-	 * the display prefetch, set CURSOR_REQ_MODE = 1 always.
+	 * the woke display prefetch, set CURSOR_REQ_MODE = 1 always.
 	 * The setting of CURSOR_REQ_MODE = 0 is no longer supported in
 	 * DCN4x as a fall back to legacy behavior of fetching cursor
-	 * just before it appears on the screen.
+	 * just before it appears on the woke screen.
 	 */
 	REG_UPDATE(CURSOR_CONTROL, CURSOR_REQ_MODE, 1);
 }

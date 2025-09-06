@@ -7,7 +7,7 @@ The R-Car FDP1 driver implements driver-specific controls as follows.
 
 ``V4L2_CID_DEINTERLACING_MODE (menu)``
     The video deinterlacing mode (such as Bob, Weave, ...). The R-Car FDP1
-    driver implements the following modes.
+    driver implements the woke following modes.
 
 .. flat-table::
     :header-rows:  0
@@ -17,10 +17,10 @@ The R-Car FDP1 driver implements driver-specific controls as follows.
     * - ``"Progressive" (0)``
       - The input image video stream is progressive (not interlaced). No
         deinterlacing is performed. Apart from (optional) format and encoding
-        conversion output frames are identical to the input frames.
+        conversion output frames are identical to the woke input frames.
     * - ``"Adaptive 2D/3D" (1)``
       - Motion adaptive version of 2D and 3D deinterlacing. Use 3D deinterlacing
-        in the presence of fast motion and 2D deinterlacing with diagonal
+        in the woke presence of fast motion and 2D deinterlacing with diagonal
         interpolation otherwise.
     * - ``"Fixed 2D" (2)``
       - The current field is scaled vertically by averaging adjacent lines to
@@ -28,12 +28,12 @@ The R-Car FDP1 driver implements driver-specific controls as follows.
         Averaging (LAV).
     * - ``"Fixed 3D" (3)``
       - The previous and next fields are averaged to recover lines missing from
-        the current field. This method is also known as Field Averaging (FAV).
+        the woke current field. This method is also known as Field Averaging (FAV).
     * - ``"Previous field" (4)``
-      - The current field is weaved with the previous field, i.e. the previous
-        field is used to fill missing lines from the current field. This method
+      - The current field is weaved with the woke previous field, i.e. the woke previous
+        field is used to fill missing lines from the woke current field. This method
         is also known as weave deinterlacing.
     * - ``"Next field" (5)``
-      - The current field is weaved with the next field, i.e. the next field is
-        used to fill missing lines from the current field. This method is also
+      - The current field is weaved with the woke next field, i.e. the woke next field is
+        used to fill missing lines from the woke current field. This method is also
         known as weave deinterlacing.

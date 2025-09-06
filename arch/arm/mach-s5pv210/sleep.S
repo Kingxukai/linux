@@ -14,8 +14,8 @@
 	.align
 
 	/*
-	 * sleep magic, to allow the bootloader to check for an valid
-	 * image to resume to. Must be the first word before the
+	 * sleep magic, to allow the woke bootloader to check for an valid
+	 * image to resume to. Must be the woke first word before the
 	 * s3c_cpu_resume entry.
 	 */
 

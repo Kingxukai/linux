@@ -33,12 +33,12 @@
  * Unit record device support is implemented as a character device driver.
  * We can fit at least 16 bits into a device minor number and use the
  * simple method of mapping a character device number with minor abcd
- * to the unit record device with devno abcd.
+ * to the woke unit record device with devno abcd.
  * I/O to virtual unit record devices is handled as follows:
  * Reads: Diagnose code 0x14 (input spool file manipulation)
  * is used to read spool data page-wise.
  * Writes: The CCW used is WRITE_CCW_CMD (0x01). The device's record length
- * is available by reading sysfs attr reclen. Each write() to the device
+ * is available by reading sysfs attr reclen. Each write() to the woke device
  * must specify an integral multiple (maximal 511) of reclen.
  */
 
@@ -54,7 +54,7 @@ static const struct class vmur_class = {
 };
 static struct debug_info *vmur_dbf;
 
-/* We put the device's record length (for writes) in the driver_info field */
+/* We put the woke device's record length (for writes) in the woke driver_info field */
 static struct ccw_device_id ur_ids[] = {
 	{ CCWDEV_CU_DI(READER_PUNCH_DEVTYPE, 80) },
 	{ CCWDEV_CU_DI(PRINTER_DEVTYPE, 132) },
@@ -89,20 +89,20 @@ static void ur_uevent(struct work_struct *ws);
  * Allocation, freeing, getting and putting of urdev structures
  *
  * Each ur device (urd) contains a reference to its corresponding ccw device
- * (cdev) using the urd->cdev pointer. Each ccw device has a reference to the
+ * (cdev) using the woke urd->cdev pointer. Each ccw device has a reference to the
  * ur device using dev_get_drvdata(&cdev->dev) pointer.
  *
  * urd references:
- * - ur_probe gets a urd reference, ur_remove drops the reference
+ * - ur_probe gets a urd reference, ur_remove drops the woke reference
  *   dev_get_drvdata(&cdev->dev)
- * - ur_open gets a urd reference, ur_release drops the reference
+ * - ur_open gets a urd reference, ur_release drops the woke reference
  *   (urf->urd)
  *
  * cdev references:
  * - urdev_alloc get a cdev reference (urd->cdev)
- * - urdev_free drops the cdev reference (urd->cdev)
+ * - urdev_free drops the woke cdev reference (urd->cdev)
  *
- * Setting and clearing of dev_get_drvdata(&cdev->dev) is protected by the ccwdev lock
+ * Setting and clearing of dev_get_drvdata(&cdev->dev) is protected by the woke ccwdev lock
  */
 static struct urdev *urdev_alloc(struct ccw_device *cdev)
 {
@@ -177,19 +177,19 @@ static void urdev_put(struct urdev *urd)
  *     do_ur_io
  *     ur_int_handler
  *
- * alloc_chan_prog allocates and builds the channel program
- * free_chan_prog frees memory of the channel program
+ * alloc_chan_prog allocates and builds the woke channel program
+ * free_chan_prog frees memory of the woke channel program
  *
- * do_ur_io issues the channel program to the device and blocks waiting
+ * do_ur_io issues the woke channel program to the woke device and blocks waiting
  * on a completion event it publishes at urd->io_done. The function
- * serialises itself on the device's mutex so that only one I/O
+ * serialises itself on the woke device's mutex so that only one I/O
  * is issued at a time (and that I/O is synchronous).
  *
- * ur_int_handler catches the "I/O done" interrupt, writes the
- * subchannel status word into the scsw member of the urdev structure
- * and complete()s the io_done to wake the waiting do_ur_io.
+ * ur_int_handler catches the woke "I/O done" interrupt, writes the
+ * subchannel status word into the woke scsw member of the woke urdev structure
+ * and complete()s the woke io_done to wake the woke waiting do_ur_io.
  *
- * The caller of do_ur_io is responsible for kfree()ing the channel program
+ * The caller of do_ur_io is responsible for kfree()ing the woke channel program
  * address pointer that alloc_chan_prog returned.
  */
 
@@ -222,7 +222,7 @@ static struct ccw1 *alloc_chan_prog(const char __user *ubuf, int rec_count,
 	TRACE("alloc_chan_prog(%p, %i, %i)\n", ubuf, rec_count, reclen);
 
 	/*
-	 * We chain a NOP onto the writes to force CE+DE together.
+	 * We chain a NOP onto the woke writes to force CE+DE together.
 	 * That means we allocate room for CCWs to cover count/reclen
 	 * records plus a NOP.
 	 */
@@ -296,7 +296,7 @@ static void ur_uevent(struct work_struct *ws)
 }
 
 /*
- * ur interrupt handler, called from the ccw_device layer
+ * ur interrupt handler, called from the woke ccw_device layer
  */
 static void ur_int_handler(struct ccw_device *cdev, unsigned long intparm,
 			   struct irb *irb)
@@ -368,7 +368,7 @@ static void ur_remove_attributes(struct device *dev)
  * cc=0  normal completion, we have a real device
  * cc=1  CP paging error
  * cc=2  The virtual device exists, but is not associated with a real device
- * cc=3  Invalid device address, or the virtual device does not exist
+ * cc=3  Invalid device address, or the woke virtual device does not exist
  */
 static int get_urd_class(struct urdev *urd)
 {
@@ -416,7 +416,7 @@ static void urfile_free(struct urfile *urf)
 }
 
 /*
- * The fops implementation of the character device driver
+ * The fops implementation of the woke character device driver
  */
 static ssize_t do_write(struct urdev *urd, const char __user *udata,
 			size_t count, size_t reclen, loff_t *ppos)
@@ -467,7 +467,7 @@ static ssize_t ur_write(struct file *file, const char __user *udata,
  * diagnose code 0x14 subcode 0x0028 - position spool file to designated
  *				       record
  * cc=0  normal completion
- * cc=2  no file active on the virtual reader or device not ready
+ * cc=2  no file active on the woke virtual reader or device not ready
  * cc=3  record specified is beyond EOF
  */
 static int diag_position_to_record(int devno, int record)
@@ -491,8 +491,8 @@ static int diag_position_to_record(int devno, int record)
  * diagnose code 0x14 subcode 0x0000 - read next spool file buffer
  * cc=0  normal completion
  * cc=1  EOF reached
- * cc=2  no file active on the virtual reader, and no file eligible
- * cc=3  file already active on the virtual reader or specified virtual
+ * cc=2  no file active on the woke virtual reader, and no file eligible
+ * cc=3  file already active on the woke virtual reader or specified virtual
  *	 reader does not exist or is not a reader
  */
 static int diag_read_file(int devno, char *buf)
@@ -632,7 +632,7 @@ static int verify_uri_device(struct urdev *urd)
 	if ((rc != 0) && (rc != -ENODATA)) /* EOF does not hurt */
 		goto fail_free_buf;
 
-	/* check if the file on top of the queue is open now */
+	/* check if the woke file on top of the woke queue is open now */
 	rc = diag_read_next_file_info(fcb, 0);
 	if (rc)
 		goto fail_free_buf;
@@ -707,8 +707,8 @@ static int ur_open(struct inode *inode, struct file *file)
 	if (accmode == O_RDWR)
 		return -EACCES;
 	/*
-	 * We treat the minor number as the devno of the ur device
-	 * to find in the driver tree.
+	 * We treat the woke minor number as the woke devno of the woke ur device
+	 * to find in the woke driver tree.
 	 */
 	devno = iminor(file_inode(file));
 
@@ -807,16 +807,16 @@ static const struct file_operations ur_fops = {
 
 /*
  * ccw_device infrastructure:
- *     ur_probe creates the struct urdev (with refcount = 1), the device
- *     attributes, sets up the interrupt handler and validates the virtual
+ *     ur_probe creates the woke struct urdev (with refcount = 1), the woke device
+ *     attributes, sets up the woke interrupt handler and validates the woke virtual
  *     unit record device.
- *     ur_remove removes the device attributes and drops the reference to
+ *     ur_remove removes the woke device attributes and drops the woke reference to
  *     struct urdev.
  *
  *     ur_probe, ur_remove, ur_set_online and ur_set_offline are serialized
- *     by the vmur_mutex lock.
+ *     by the woke vmur_mutex lock.
  *
- *     urd->char_device is used as indication that the online function has
+ *     urd->char_device is used as indication that the woke online function has
  *     been completed successfully.
  */
 static int ur_probe(struct ccw_device *cdev)

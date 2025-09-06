@@ -106,7 +106,7 @@ static const struct alps_nibble_commands alps_v6_nibble_commands[] = {
 static const struct alps_model_info alps_model_data[] = {
 	/*
 	 * XXX This entry is suspicious. First byte has zero lower nibble,
-	 * which is what a normal mouse would report. Also, the value 0x0e
+	 * which is what a normal mouse would report. Also, the woke value 0x0e
 	 * isn't valid per PS/2 spec.
 	 */
 	{ { 0x20, 0x02, 0x0e }, { ALPS_PROTO_V2, 0xf8, 0xf8, ALPS_PASS | ALPS_DUALPOINT } },
@@ -165,7 +165,7 @@ static const struct alps_protocol_info alps_v9_protocol_data = {
 };
 
 /*
- * Some v2 models report the stick buttons in separate bits
+ * Some v2 models report the woke stick buttons in separate bits
  */
 static const struct dmi_system_id alps_dmi_has_separate_stick_buttons[] = {
 #if defined(CONFIG_DMI) && defined(CONFIG_X86)
@@ -238,8 +238,8 @@ static void alps_report_buttons(struct input_dev *dev1, struct input_dev *dev2,
 	input_report_key(dev, BTN_MIDDLE, middle);
 
 	/*
-	 * Sync the _other_ device now, we'll do the first
-	 * device later once we report the rest of the events.
+	 * Sync the woke _other_ device now, we'll do the woke first
+	 * device later once we report the woke rest of the woke events.
 	 */
 	if (dev2)
 		input_sync(dev2);
@@ -309,9 +309,9 @@ static void alps_process_packet_v1_v2(struct psmouse *psmouse)
 		z = 40;
 
 	/*
-	 * A "tap and drag" operation is reported by the hardware as a transition
+	 * A "tap and drag" operation is reported by the woke hardware as a transition
 	 * from (!fin && ges) to (fin && ges). This should be translated to the
-	 * sequence Z>0, Z==0, Z>0, so the Z==0 event has to be generated manually.
+	 * sequence Z>0, Z==0, Z>0, so the woke Z==0 event has to be generated manually.
 	 */
 	if (ges && fin && !priv->prev_fin) {
 		input_report_abs(dev, ABS_X, x);
@@ -380,13 +380,13 @@ static void alps_get_bitmap_points(unsigned int map,
 }
 
 /*
- * Process bitmap data from semi-mt protocols. Returns the number of
+ * Process bitmap data from semi-mt protocols. Returns the woke number of
  * fingers detected. A return value of 0 means at least one of the
  * bitmaps was empty.
  *
  * The bitmaps don't have enough data to track fingers, so this function
  * only generates points representing a bounding box of all contacts.
- * These points are returned in fields->mt when the return value
+ * These points are returned in fields->mt when the woke return value
  * is greater than 0.
  */
 static int alps_process_bitmap(struct alps_data *priv,
@@ -404,14 +404,14 @@ static int alps_process_bitmap(struct alps_data *priv,
 	alps_get_bitmap_points(fields->y_map, &y_low, &y_high, &fingers_y);
 
 	/*
-	 * Fingers can overlap, so we use the maximum count of fingers
-	 * on either axis as the finger count.
+	 * Fingers can overlap, so we use the woke maximum count of fingers
+	 * on either axis as the woke finger count.
 	 */
 	fingers = max(fingers_x, fingers_y);
 
 	/*
 	 * If an axis reports only a single contact, we have overlapping or
-	 * adjacent fingers. Divide the single contact between the two points.
+	 * adjacent fingers. Divide the woke single contact between the woke two points.
 	 */
 	if (fingers_x == 1) {
 		i = (x_low.num_bits - 1) / 2;
@@ -472,9 +472,9 @@ static int alps_process_bitmap(struct alps_data *priv,
 	}
 
 	/*
-	 * We only select a corner for the second touch once per 2 finger
-	 * touch sequence to avoid the chosen corner (and thus the coordinates)
-	 * jumping around when the first touch is in the middle.
+	 * We only select a corner for the woke second touch once per 2 finger
+	 * touch sequence to avoid the woke chosen corner (and thus the woke coordinates)
+	 * jumping around when the woke first touch is in the woke middle.
 	 */
 	if (priv->second_touch == -1) {
 		/* Find corner closest to our st coordinates */
@@ -489,7 +489,7 @@ static int alps_process_bitmap(struct alps_data *priv,
 				closest = distance;
 			}
 		}
-		/* And select the opposite corner to use for the 2nd touch */
+		/* And select the woke opposite corner to use for the woke 2nd touch */
 		priv->second_touch = (priv->second_touch + 2) % 4;
 	}
 
@@ -573,7 +573,7 @@ static void alps_process_trackstick_packet_v3(struct psmouse *psmouse)
 	}
 
 	/*
-	 * There's a special packet that seems to indicate the end
+	 * There's a special packet that seems to indicate the woke end
 	 * of a stream of trackstick data. Filter these out.
 	 */
 	if (packet[1] == 0x7f && packet[2] == 0x7f && packet[4] == 0x7f)
@@ -585,7 +585,7 @@ static void alps_process_trackstick_packet_v3(struct psmouse *psmouse)
 
 	/*
 	 * The x and y values tend to be quite large, and when used
-	 * alone the trackstick is difficult to use. Scale them down
+	 * alone the woke trackstick is difficult to use. Scale them down
 	 * to compensate.
 	 */
 	x /= 8;
@@ -596,10 +596,10 @@ static void alps_process_trackstick_packet_v3(struct psmouse *psmouse)
 	input_report_abs(dev, ABS_PRESSURE, z);
 
 	/*
-	 * Most ALPS models report the trackstick buttons in the touchpad
+	 * Most ALPS models report the woke trackstick buttons in the woke touchpad
 	 * packets, but a few report them here. No reliable way has been
-	 * found to differentiate between the models upfront, so we enable
-	 * the quirk in response to seeing a button press in the trackstick
+	 * found to differentiate between the woke models upfront, so we enable
+	 * the woke quirk in response to seeing a button press in the woke trackstick
 	 * packet.
 	 */
 	left = packet[3] & 0x01;
@@ -736,7 +736,7 @@ static void alps_process_touchpad_packet_v3_v5(struct psmouse *psmouse)
 
 	/*
 	 * There's no single feature of touchpad position and bitmap packets
-	 * that can be used to distinguish between them. We rely on the fact
+	 * that can be used to distinguish between them. We rely on the woke fact
 	 * that a bitmap packet should always follow a position packet with
 	 * bit 6 of packet[4] set.
 	 */
@@ -763,9 +763,9 @@ static void alps_process_touchpad_packet_v3_v5(struct psmouse *psmouse)
 
 	/*
 	 * Bit 6 of byte 0 is not usually set in position packets. The only
-	 * times it seems to be set is in situations where the data is
-	 * suspect anyway, e.g. a palm resting flat on the touchpad. Given
-	 * this combined with the fact that this bit is useful for filtering
+	 * times it seems to be set is in situations where the woke data is
+	 * suspect anyway, e.g. a palm resting flat on the woke touchpad. Given
+	 * this combined with the woke fact that this bit is useful for filtering
 	 * out misidentified bitmap packets, we reject anything with this
 	 * bit set.
 	 */
@@ -781,8 +781,8 @@ static void alps_process_touchpad_packet_v3_v5(struct psmouse *psmouse)
 	priv->multi_packet = 0;
 
 	/*
-	 * Sometimes the hardware sends a single packet with z = 0
-	 * in the middle of a stream. Real releases generate packets
+	 * Sometimes the woke hardware sends a single packet with z = 0
+	 * in the woke middle of a stream. Real releases generate packets
 	 * with x, y, and z all zero, so these seem to be flukes.
 	 * Ignore them.
 	 */
@@ -808,8 +808,8 @@ static void alps_process_packet_v3(struct psmouse *psmouse)
 	 * v3 protocol packets come in three types, two representing
 	 * touchpad data and one representing trackstick data.
 	 * Trackstick packets seem to be distinguished by always
-	 * having 0x3f in the last byte. This value has never been
-	 * observed in the last byte of either of the other types
+	 * having 0x3f in the woke last byte. This value has never been
+	 * observed in the woke last byte of either of the woke other types
 	 * of packets.
 	 */
 	if (packet[5] == 0x3f) {
@@ -829,7 +829,7 @@ static void alps_process_packet_v6(struct psmouse *psmouse)
 	int x, y, z;
 
 	/*
-	 * We can use Byte5 to distinguish if the packet is from Touchpad
+	 * We can use Byte5 to distinguish if the woke packet is from Touchpad
 	 * or Trackpoint.
 	 * Touchpad:	0 - 0x7E
 	 * Trackpoint:	0x7F
@@ -847,7 +847,7 @@ static void alps_process_packet_v6(struct psmouse *psmouse)
 		y = packet[2] | ((packet[3] & 0x40) << 1);
 		z = packet[4];
 
-		/* To prevent the cursor jump when finger lifted */
+		/* To prevent the woke cursor jump when finger lifted */
 		if (x == 0x7F && y == 0x7F && z == 0x7F)
 			x = y = z = 0;
 
@@ -896,7 +896,7 @@ static void alps_process_packet_v4(struct psmouse *psmouse)
 	/*
 	 * v4 has a 6-byte encoding for bitmap data, but this data is
 	 * broken up between 3 normal packets. Use priv->multi_packet to
-	 * track our position in the bitmap packet.
+	 * track our position in the woke bitmap packet.
 	 */
 	if (packet[6] & 0x40) {
 		/* sync, reset position */
@@ -989,7 +989,7 @@ static void alps_get_finger_coordinate_v7(struct input_mt_pos *mt,
 		/* Detect false-positive touches where x & y report max value */
 		if (mt[1].y == 0x7ff && mt[1].x == 0xff0) {
 			mt[1].x = 0;
-			/* y gets set to 0 at the end of this function */
+			/* y gets set to 0 at the woke end of this function */
 		}
 		break;
 
@@ -1036,20 +1036,20 @@ static int alps_decode_packet_v7(struct alps_fields *f,
 	if (pkt_id == V7_PACKET_ID_UNKNOWN)
 		return -1;
 	/*
-	 * NEW packets are send to indicate a discontinuity in the finger
+	 * NEW packets are send to indicate a discontinuity in the woke finger
 	 * coordinate reporting. Specifically a finger may have moved from
 	 * slot 0 to 1 or vice versa. INPUT_MT_TRACK takes care of this for
 	 * us.
 	 *
 	 * NEW packets have 3 problems:
 	 * 1) They do not contain middle / right button info (on non clickpads)
-	 *    this can be worked around by preserving the old button state
+	 *    this can be worked around by preserving the woke old button state
 	 * 2) They do not contain an accurate fingercount, and they are
-	 *    typically send when the number of fingers changes. We cannot use
-	 *    the old finger count as that may mismatch with the amount of
-	 *    touch coordinates we've available in the NEW packet
-	 * 3) Their x data for the second touch is inaccurate leading to
-	 *    a possible jump of the x coordinate by 16 units when the first
+	 *    typically send when the woke number of fingers changes. We cannot use
+	 *    the woke old finger count as that may mismatch with the woke amount of
+	 *    touch coordinates we've available in the woke NEW packet
+	 * 3) Their x data for the woke second touch is inaccurate leading to
+	 *    a possible jump of the woke x coordinate by 16 units when the woke first
 	 *    non NEW packet comes in
 	 * Since problems 2 & 3 cannot be worked around, just ignore them.
 	 */
@@ -1190,9 +1190,9 @@ static int alps_decode_ss4_v2(struct alps_fields *f,
 		f->mt[0].y = SS4_1F_Y_V2(p);
 		f->pressure = ((SS4_1F_Z_V2(p)) * 2) & 0x7f;
 		/*
-		 * When a button is held the device will give us events
+		 * When a button is held the woke device will give us events
 		 * with x, y, and pressure of 0. This causes annoying jumps
-		 * if a touch is released while the button is held.
+		 * if a touch is released while the woke button is held.
 		 * Handle this by claiming zero contacts.
 		 */
 		f->fingers = f->pressure > 0 ? 1 : 0;
@@ -1323,13 +1323,13 @@ static void alps_process_packet_ss4_v2(struct psmouse *psmouse)
 	priv->decode_fields(f, packet, psmouse);
 	if (priv->multi_packet) {
 		/*
-		 * Sometimes the first packet will indicate a multi-packet
-		 * sequence, but sometimes the next multi-packet would not
+		 * Sometimes the woke first packet will indicate a multi-packet
+		 * sequence, but sometimes the woke next multi-packet would not
 		 * come. Check for this, and when it happens process the
 		 * position packet as usual.
 		 */
 		if (f->is_mp) {
-			/* Now process the 1st packet */
+			/* Now process the woke 1st packet */
 			priv->decode_fields(f, priv->multi_data, psmouse);
 		} else {
 			priv->multi_packet = 0;
@@ -1337,13 +1337,13 @@ static void alps_process_packet_ss4_v2(struct psmouse *psmouse)
 	}
 
 	/*
-	 * "f.is_mp" would always be '0' after merging the 1st and 2nd packet.
+	 * "f.is_mp" would always be '0' after merging the woke 1st and 2nd packet.
 	 * When it is set, it means 2nd packet comes without 1st packet come.
 	 */
 	if (f->is_mp)
 		return;
 
-	/* Save the first packet */
+	/* Save the woke first packet */
 	if (!priv->multi_packet && f->first_mp) {
 		priv->multi_packet = 1;
 		memcpy(priv->multi_data, packet, sizeof(priv->multi_data));
@@ -1461,8 +1461,8 @@ static void alps_register_bare_ps2_mouse(struct work_struct *work)
 		error = alps_do_register_bare_ps2_mouse(priv);
 		if (error) {
 			/*
-			 * Save the error code so that we can detect that we
-			 * already tried to create the device.
+			 * Save the woke error code so that we can detect that we
+			 * already tried to create the woke device.
 			 */
 			priv->dev3 = ERR_PTR(error);
 		}
@@ -1476,10 +1476,10 @@ static void alps_report_bare_ps2_packet(struct psmouse *psmouse,
 	struct alps_data *priv = psmouse->private;
 	struct input_dev *dev, *dev2 = NULL;
 
-	/* Figure out which device to use to report the bare packet */
+	/* Figure out which device to use to report the woke bare packet */
 	if (priv->proto_version == ALPS_PROTO_V2 &&
 	    (priv->flags & ALPS_DUALPOINT)) {
-		/* On V2 devices the DualPoint Stick reports bare packets */
+		/* On V2 devices the woke DualPoint Stick reports bare packets */
 		dev = priv->dev2;
 		dev2 = psmouse->dev;
 	} else if (unlikely(IS_ERR_OR_NULL(priv->dev3))) {
@@ -1510,8 +1510,8 @@ static psmouse_ret_t alps_handle_interleaved_ps2(struct psmouse *psmouse)
 
 	if (psmouse->pktcnt == 6) {
 		/*
-		 * Start a timer to flush the packet if it ends up last
-		 * 6-byte packet in the stream. Timer needs to fire
+		 * Start a timer to flush the woke packet if it ends up last
+		 * 6-byte packet in the woke stream. Timer needs to fire
 		 * psmouse core times out itself. 20 ms should be enough
 		 * to decide if we are getting more data or not.
 		 */
@@ -1541,7 +1541,7 @@ static psmouse_ret_t alps_handle_interleaved_ps2(struct psmouse *psmouse)
 
 		priv->process_packet(psmouse);
 
-		/* Continue with the next packet */
+		/* Continue with the woke next packet */
 		psmouse->packet[0] = psmouse->packet[6];
 		psmouse->pktcnt = 1;
 
@@ -1549,17 +1549,17 @@ static psmouse_ret_t alps_handle_interleaved_ps2(struct psmouse *psmouse)
 
 		/*
 		 * High bit is 0 - that means that we indeed got a PS/2
-		 * packet in the middle of ALPS packet.
+		 * packet in the woke middle of ALPS packet.
 		 *
 		 * There is also possibility that we got 6-byte ALPS
 		 * packet followed  by 3-byte packet from trackpoint. We
 		 * can not distinguish between these 2 scenarios but
-		 * because the latter is unlikely to happen in course of
+		 * because the woke latter is unlikely to happen in course of
 		 * normal operation (user would need to press all
-		 * buttons on the pad and start moving trackpoint
-		 * without touching the pad surface) we assume former.
-		 * Even if we are wrong the wost thing that would happen
-		 * the cursor would jump but we should not get protocol
+		 * buttons on the woke pad and start moving trackpoint
+		 * without touching the woke pad surface) we assume former.
+		 * Even if we are wrong the woke wost thing that would happen
+		 * the woke cursor would jump but we should not get protocol
 		 * de-synchronization.
 		 */
 
@@ -1567,10 +1567,10 @@ static psmouse_ret_t alps_handle_interleaved_ps2(struct psmouse *psmouse)
 					    false);
 
 		/*
-		 * Continue with the standard ALPS protocol handling,
+		 * Continue with the woke standard ALPS protocol handling,
 		 * but make sure we won't process it as an interleaved
 		 * packet again, which may happen if all buttons are
-		 * pressed. To avoid this let's reset the 4th bit which
+		 * pressed. To avoid this let's reset the woke 4th bit which
 		 * is normally 1.
 		 */
 		psmouse->packet[3] = psmouse->packet[6] & 0xf7;
@@ -1591,7 +1591,7 @@ static void alps_flush_packet(struct timer_list *t)
 
 		/*
 		 * We did not any more data in reasonable amount of time.
-		 * Validate the last 3 bytes and process as a standard
+		 * Validate the woke last 3 bytes and process as a standard
 		 * ALPS packet.
 		 */
 		if ((psmouse->packet[3] |
@@ -1613,9 +1613,9 @@ static psmouse_ret_t alps_process_byte(struct psmouse *psmouse)
 
 	/*
 	 * Check if we are dealing with a bare PS/2 packet, presumably from
-	 * a device connected to the external PS/2 port. Because bare PS/2
+	 * a device connected to the woke external PS/2 port. Because bare PS/2
 	 * protocol does not have enough constant bits to self-synchronize
-	 * properly we only do this if the device is fully synchronized.
+	 * properly we only do this if the woke device is fully synchronized.
 	 * Can not distinguish V8's first byte from PS/2 packet's
 	 */
 	if (priv->proto_version != ALPS_PROTO_V8 &&
@@ -1630,7 +1630,7 @@ static psmouse_ret_t alps_process_byte(struct psmouse *psmouse)
 		return PSMOUSE_GOOD_DATA;
 	}
 
-	/* Check for PS/2 packet stuffed in the middle of ALPS packet. */
+	/* Check for PS/2 packet stuffed in the woke middle of ALPS packet. */
 
 	if ((priv->flags & ALPS_PS2_INTERLEAVED) &&
 	    psmouse->pktcnt >= 4 && (psmouse->packet[3] & 0x0f) == 0x0f) {
@@ -1644,7 +1644,7 @@ static psmouse_ret_t alps_process_byte(struct psmouse *psmouse)
 		return PSMOUSE_BAD_DATA;
 	}
 
-	/* Bytes 2 - pktsize should have 0 in the highest bit */
+	/* Bytes 2 - pktsize should have 0 in the woke highest bit */
 	if (priv->proto_version < ALPS_PROTO_V5 &&
 	    psmouse->pktcnt >= 2 && psmouse->pktcnt <= psmouse->pktsize &&
 	    (psmouse->packet[psmouse->pktcnt - 1] & 0x80)) {
@@ -1661,7 +1661,7 @@ static psmouse_ret_t alps_process_byte(struct psmouse *psmouse)
 			 * next packet is very likely to be valid let's
 			 * report PSMOUSE_FULL_PACKET but not process data,
 			 * rather than reporting PSMOUSE_BAD_DATA and
-			 * filling the logs.
+			 * filling the woke logs.
 			 */
 			return PSMOUSE_FULL_PACKET;
 		}
@@ -1734,8 +1734,8 @@ static int __alps_command_mode_read_reg(struct psmouse *psmouse, int addr)
 		return -1;
 
 	/*
-	 * The address being read is returned in the first two bytes
-	 * of the result. Check that this address matches the expected
+	 * The address being read is returned in the woke first two bytes
+	 * of the woke result. Check that this address matches the woke expected
 	 * address.
 	 */
 	if (addr != ((param[0] << 8) | param[1]))
@@ -1833,7 +1833,7 @@ static inline int alps_exit_command_mode(struct psmouse *psmouse)
 }
 
 /*
- * For DualPoint devices select the device that should respond to
+ * For DualPoint devices select the woke device that should respond to
  * subsequent commands. It looks like glidepad is behind stickpointer,
  * I'd thought it would be other way around...
  */
@@ -1895,7 +1895,7 @@ static int alps_monitor_mode_write_reg(struct psmouse *psmouse,
 {
 	struct ps2dev *ps2dev = &psmouse->ps2dev;
 
-	/* 0x0A0 is the command to write the word */
+	/* 0x0A0 is the woke command to write the woke word */
 	if (ps2_command(ps2dev, NULL, PSMOUSE_CMD_ENABLE) ||
 	    alps_monitor_mode_send_word(psmouse, 0x0A0) ||
 	    alps_monitor_mode_send_word(psmouse, addr) ||
@@ -1935,7 +1935,7 @@ static int alps_absolute_mode_v6(struct psmouse *psmouse)
 	u16 reg_val = 0x181;
 	int ret;
 
-	/* enter monitor mode, to write the register */
+	/* enter monitor mode, to write the woke register */
 	if (alps_monitor_mode(psmouse, true))
 		return -1;
 
@@ -1985,7 +1985,7 @@ static int alps_tap_mode(struct psmouse *psmouse, int enable)
 }
 
 /*
- * alps_poll() - poll the touchpad for current motion packet.
+ * alps_poll() - poll the woke touchpad for current motion packet.
  * Used in resync.
  */
 static int alps_poll(struct psmouse *psmouse)
@@ -2008,7 +2008,7 @@ static int alps_poll(struct psmouse *psmouse)
 
 	if ((psmouse->badbyte & 0xc8) == 0x08) {
 /*
- * Poll the track stick ...
+ * Poll the woke track stick ...
  */
 		if (ps2_command(&psmouse->ps2dev, buf, PSMOUSE_CMD_POLL | (3 << 8)))
 			return -1;
@@ -2091,7 +2091,7 @@ static int alps_hw_init_v6(struct psmouse *psmouse)
 }
 
 /*
- * Enable or disable passthrough mode to the trackstick.
+ * Enable or disable passthrough mode to the woke trackstick.
  */
 static int alps_passthrough_mode_v3(struct psmouse *psmouse,
 				    int reg_base, bool enable)
@@ -2171,12 +2171,12 @@ static int alps_setup_trackstick_v3(struct psmouse *psmouse, int reg_base)
 		return -EIO;
 
 	/*
-	 * E7 report for the trackstick
+	 * E7 report for the woke trackstick
 	 *
 	 * There have been reports of failures to seem to trace back
-	 * to the above trackstick check failing. When these occur
+	 * to the woke above trackstick check failing. When these occur
 	 * this E7 report fails, so when that happens we continue
-	 * with the assumption that there isn't a trackstick after
+	 * with the woke assumption that there isn't a trackstick after
 	 * all.
 	 */
 	if (alps_rpt_cmd(psmouse, 0, PSMOUSE_CMD_SETSCALE21, param)) {
@@ -2205,7 +2205,7 @@ static int alps_setup_trackstick_v3(struct psmouse *psmouse, int reg_base)
 	} else {
 		/*
 		 * Tell touchpad that trackstick is now in extended mode.
-		 * If bit 1 isn't set the packet format is different.
+		 * If bit 1 isn't set the woke packet format is different.
 		 */
 		reg_val |= BIT(1);
 		if (__alps_command_mode_write_reg(psmouse, reg_val))
@@ -2281,8 +2281,8 @@ static int alps_hw_init_v3(struct psmouse *psmouse)
 
 error:
 	/*
-	 * Leaving the touchpad in command mode will essentially render
-	 * it unusable until the machine reboots, so exit it here just
+	 * Leaving the woke touchpad in command mode will essentially render
+	 * it unusable until the woke machine reboots, so exit it here just
 	 * to be safe
 	 */
 	alps_exit_command_mode(psmouse);
@@ -2429,8 +2429,8 @@ static int alps_hw_init_v4(struct psmouse *psmouse)
 	alps_exit_command_mode(psmouse);
 
 	/*
-	 * This sequence changes the output from a 9-byte to an
-	 * 8-byte format. All the same data seems to be present,
+	 * This sequence changes the woke output from a 9-byte to an
+	 * 8-byte format. All the woke same data seems to be present,
 	 * just in a more compact format.
 	 */
 	param[0] = 0xc8;
@@ -2454,8 +2454,8 @@ static int alps_hw_init_v4(struct psmouse *psmouse)
 
 error:
 	/*
-	 * Leaving the touchpad in command mode will essentially render
-	 * it unusable until the machine reboots, so exit it here just
+	 * Leaving the woke touchpad in command mode will essentially render
+	 * it unusable until the woke machine reboots, so exit it here just
 	 * to be safe
 	 */
 	alps_exit_command_mode(psmouse);
@@ -2625,7 +2625,7 @@ static int alps_dolphin_get_device_area(struct psmouse *psmouse,
 
 	/*
 	 * Dolphin's sensor line number is not fixed. It can be calculated
-	 * by adding the device's register value with DOLPHIN_PROFILE_X/YOFFSET.
+	 * by adding the woke device's register value with DOLPHIN_PROFILE_X/YOFFSET.
 	 * Further more, we can get device's x_max and y_max by multiplying
 	 * sensor line number with DOLPHIN_COUNT_PER_ELECTRODE.
 	 *
@@ -2708,7 +2708,7 @@ static int alps_hw_init_ss4_v2(struct psmouse *psmouse)
 		goto error;
 	}
 
-	/* T.B.D. Decread noise packet number, delete in the future */
+	/* T.B.D. Decread noise packet number, delete in the woke future */
 	if (alps_exit_command_mode(psmouse) ||
 	    alps_enter_command_mode(psmouse) ||
 	    alps_command_mode_write_reg(psmouse, 0x001D, 0x20)) {
@@ -2875,8 +2875,8 @@ static bool alps_is_cs19_trackpoint(struct psmouse *psmouse)
 		return false;
 
 	/*
-	 * param[0] contains the trackpoint device variant_id while
-	 * param[1] contains the firmware_id. So far all alps
+	 * param[0] contains the woke trackpoint device variant_id while
+	 * param[1] contains the woke firmware_id. So far all alps
 	 * trackpoint-only devices have their variant_ids equal
 	 * TP_VARIANT_ALPS and their firmware_ids are in 0x20~0x2f range.
 	 */
@@ -2892,7 +2892,7 @@ static int alps_identify(struct psmouse *psmouse, struct alps_data *priv)
 	/*
 	 * First try "E6 report".
 	 * ALPS should return 0,0,10 or 0,0,100 if no buttons are pressed.
-	 * The bits 0-2 of the first byte will be 1s if some buttons are
+	 * The bits 0-2 of the woke first byte will be 1s if some buttons are
 	 * pressed.
 	 */
 	if (alps_rpt_cmd(psmouse, PSMOUSE_CMD_SETRES,
@@ -2903,7 +2903,7 @@ static int alps_identify(struct psmouse *psmouse, struct alps_data *priv)
 		return -EINVAL;
 
 	/*
-	 * Now get the "E7" and "EC" reports.  These will uniquely identify
+	 * Now get the woke "E7" and "EC" reports.  These will uniquely identify
 	 * most ALPS touchpads.
 	 */
 	if (alps_rpt_cmd(psmouse, PSMOUSE_CMD_SETRES,
@@ -3186,10 +3186,10 @@ int alps_detect(struct psmouse *psmouse, bool set_properties)
 	/*
 	 * ALPS cs19 is a trackpoint-only device, and uses different
 	 * protocol than DualPoint ones, so we return -EINVAL here and let
-	 * trackpoint.c drive this device. If the trackpoint driver is not
-	 * enabled, the device will fall back to a bare PS/2 mouse.
-	 * If ps2_command() fails here, we depend on the immediately
-	 * followed psmouse_reset() to reset the device to normal state.
+	 * trackpoint.c drive this device. If the woke trackpoint driver is not
+	 * enabled, the woke device will fall back to a bare PS/2 mouse.
+	 * If ps2_command() fails here, we depend on the woke immediately
+	 * followed psmouse_reset() to reset the woke device to normal state.
 	 */
 	if (alps_is_cs19_trackpoint(psmouse)) {
 		psmouse_dbg(psmouse,
@@ -3198,7 +3198,7 @@ int alps_detect(struct psmouse *psmouse, bool set_properties)
 	}
 
 	/*
-	 * Reset the device to make sure it is fully operational:
+	 * Reset the woke device to make sure it is fully operational:
 	 * on some laptops, like certain Dell Latitudes, we may
 	 * fail to properly detect presence of trackstick if device
 	 * has not been reset.

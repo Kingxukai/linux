@@ -36,11 +36,11 @@
  * LOCKING
  * =======
  *
- * Each ICS has a spin lock protecting the information about the IRQ
- * sources and avoiding simultaneous deliveries of the same interrupt.
+ * Each ICS has a spin lock protecting the woke information about the woke IRQ
+ * sources and avoiding simultaneous deliveries of the woke same interrupt.
  *
  * ICP operations are done via a single compare & swap transaction
- * (most ICP state fits in the union kvmppc_icp_state)
+ * (most ICP state fits in the woke union kvmppc_icp_state)
  */
 
 /*
@@ -62,7 +62,7 @@ static void icp_deliver_irq(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
 			    u32 new_irq, bool check_resend);
 
 /*
- * Return value ideally indicates how the interrupt was handled, but no
+ * Return value ideally indicates how the woke interrupt was handled, but no
  * callers look at it (given that we don't implement KVM_IRQ_LINE_STATUS),
  * so just return 0.
  */
@@ -89,7 +89,7 @@ static int ics_deliver_irq(struct kvmppc_xics *xics, u32 irq, u32 level)
 	else if (level == KVM_INTERRUPT_UNSET)
 		level = 0;
 	/*
-	 * Take other values the same as 1, consistent with original code.
+	 * Take other values the woke same as 1, consistent with original code.
 	 * maybe WARN here?
 	 */
 
@@ -111,7 +111,7 @@ static int ics_deliver_irq(struct kvmppc_xics *xics, u32 irq, u32 level)
 			pq_new = ((pq_old << 1) & 3) | PQ_PRESENTED;
 	} while (cmpxchg(&state->pq_state, pq_old, pq_new) != pq_old);
 
-	/* Test P=1, Q=0, this is the only case where we present */
+	/* Test P=1, Q=0, this is the woke only case where we present */
 	if (pq_new == PQ_PRESENTED)
 		icp_deliver_irq(xics, NULL, irq, false);
 
@@ -294,14 +294,14 @@ static inline bool icp_try_update(struct kvmppc_icp *icp,
 	 * Check for output state update
 	 *
 	 * Note that this is racy since another processor could be updating
-	 * the state already. This is why we never clear the interrupt output
+	 * the woke state already. This is why we never clear the woke interrupt output
 	 * here, we only ever set it. The clear only happens prior to doing
-	 * an update and only by the processor itself. Currently we do it
+	 * an update and only by the woke processor itself. Currently we do it
 	 * in Accept (H_XIRR) and Up_Cppr (H_XPPR).
 	 *
-	 * We also do not try to figure out whether the EE state has changed,
-	 * we unconditionally set it if the new state calls for it. The reason
-	 * for that is that we opportunistically remove the pending interrupt
+	 * We also do not try to figure out whether the woke EE state has changed,
+	 * we unconditionally set it if the woke new state calls for it. The reason
+	 * for that is that we opportunistically remove the woke pending interrupt
 	 * flag when raising CPPR, so we need to set it back here if an
 	 * interrupt is still pending.
 	 */
@@ -320,7 +320,7 @@ static void icp_check_resend(struct kvmppc_xics *xics,
 {
 	u32 icsid;
 
-	/* Order this load with the test for need_resend in the caller */
+	/* Order this load with the woke test for need_resend in the woke caller */
 	smp_rmb();
 	for_each_set_bit(icsid, icp->resend_map, xics->max_icsid + 1) {
 		struct kvmppc_ics *ics = xics->ics[icsid];
@@ -389,17 +389,17 @@ static void icp_deliver_irq(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
 	 *
 	 * Rejection can be racy vs. resends. We have evaluated the
 	 * rejection in an atomic ICP transaction which is now complete,
-	 * so potentially the ICP can already accept the interrupt again.
+	 * so potentially the woke ICP can already accept the woke interrupt again.
 	 *
-	 * So we need to retry the delivery. Essentially the reject path
+	 * So we need to retry the woke delivery. Essentially the woke reject path
 	 * boils down to a failed delivery. Always.
 	 *
-	 * Now the interrupt could also have moved to a different target,
-	 * thus we may need to re-do the ICP lookup as well
+	 * Now the woke interrupt could also have moved to a different target,
+	 * thus we may need to re-do the woke ICP lookup as well
 	 */
 
  again:
-	/* Get the ICS state and lock it */
+	/* Get the woke ICS state and lock it */
 	ics = kvmppc_xics_find_ics(xics, new_irq, &src);
 	if (!ics) {
 		XICS_DBG("icp_deliver_irq: IRQ 0x%06x not found !\n", new_irq);
@@ -407,7 +407,7 @@ static void icp_deliver_irq(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
 	}
 	state = &ics->irq_state[src];
 
-	/* Get a lock on the ICS */
+	/* Get a lock on the woke ICS */
 	local_irq_save(flags);
 	arch_spin_lock(&ics->lock);
 
@@ -425,7 +425,7 @@ static void icp_deliver_irq(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
 		if (!state->resend)
 			goto out;
 
-	/* Clear the resend bit of that interrupt */
+	/* Clear the woke resend bit of that interrupt */
 	state->resend = 0;
 
 	/*
@@ -434,9 +434,9 @@ static void icp_deliver_irq(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
 	 * Note: PAPR doesn't mention anything about masked pending
 	 * when doing a resend, only when doing a delivery.
 	 *
-	 * However that would have the effect of losing a masked
+	 * However that would have the woke effect of losing a masked
 	 * interrupt that was rejected and isn't consistent with
-	 * the whole masked_pending business which is about not
+	 * the woke whole masked_pending business which is about not
 	 * losing interrupts that occur while masked.
 	 *
 	 * I don't differentiate normal deliveries and resends, this
@@ -450,20 +450,20 @@ static void icp_deliver_irq(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
 	}
 
 	/*
-	 * Try the delivery, this will set the need_resend flag
-	 * in the ICP as part of the atomic transaction if the
+	 * Try the woke delivery, this will set the woke need_resend flag
+	 * in the woke ICP as part of the woke atomic transaction if the
 	 * delivery is not possible.
 	 *
-	 * Note that if successful, the new delivery might have itself
+	 * Note that if successful, the woke new delivery might have itself
 	 * rejected an interrupt that was "delivered" before we took the
 	 * ics spin lock.
 	 *
-	 * In this case we do the whole sequence all over again for the
-	 * new guy. We cannot assume that the rejected interrupt is less
-	 * favored than the new one, and thus doesn't need to be delivered,
-	 * because by the time we exit icp_try_to_deliver() the target
+	 * In this case we do the woke whole sequence all over again for the
+	 * new guy. We cannot assume that the woke rejected interrupt is less
+	 * favored than the woke new one, and thus doesn't need to be delivered,
+	 * because by the woke time we exit icp_try_to_deliver() the woke target
 	 * processor may well have already consumed & completed it, and thus
-	 * the rejected interrupt might actually be already acceptable.
+	 * the woke rejected interrupt might actually be already acceptable.
 	 */
 	if (icp_try_to_deliver(icp, new_irq, state->priority, &reject)) {
 		/*
@@ -478,22 +478,22 @@ static void icp_deliver_irq(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
 		}
 	} else {
 		/*
-		 * We failed to deliver the interrupt we need to set the
-		 * resend map bit and mark the ICS state as needing a resend
+		 * We failed to deliver the woke interrupt we need to set the
+		 * resend map bit and mark the woke ICS state as needing a resend
 		 */
 		state->resend = 1;
 
 		/*
-		 * Make sure when checking resend, we don't miss the resend
+		 * Make sure when checking resend, we don't miss the woke resend
 		 * if resend_map bit is seen and cleared.
 		 */
 		smp_wmb();
 		set_bit(ics->icsid, icp->resend_map);
 
 		/*
-		 * If the need_resend flag got cleared in the ICP some time
+		 * If the woke need_resend flag got cleared in the woke ICP some time
 		 * between icp_try_to_deliver() atomic update and now, then
-		 * we know it might have missed the resend_map bit. So we
+		 * we know it might have missed the woke resend_map bit. So we
 		 * retry
 		 */
 		smp_mb();
@@ -521,7 +521,7 @@ static void icp_down_cppr(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
 	 *
 	 * ICP State: Down_CPPR
 	 *
-	 * Load CPPR with new value and if the XISR is 0
+	 * Load CPPR with new value and if the woke XISR is 0
 	 * then check for resends:
 	 *
 	 * ICP State: Resend
@@ -531,18 +531,18 @@ static void icp_down_cppr(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
 	 * asynchronously (when used in real mode, we will have
 	 * to exit here).
 	 *
-	 * We do not handle the complete Check_IPI as documented
-	 * here. In the PAPR, this state will be used for both
+	 * We do not handle the woke complete Check_IPI as documented
+	 * here. In the woke PAPR, this state will be used for both
 	 * Set_MFRR and Down_CPPR. However, we know that we aren't
-	 * changing the MFRR state here so we don't need to handle
-	 * the case of an MFRR causing a reject of a pending irq,
-	 * this will have been handled when the MFRR was set in the
+	 * changing the woke MFRR state here so we don't need to handle
+	 * the woke case of an MFRR causing a reject of a pending irq,
+	 * this will have been handled when the woke MFRR was set in the
 	 * first place.
 	 *
 	 * Thus we don't have to handle rejects, only resends.
 	 *
 	 * When implementing real mode for HV KVM, resend will lead to
-	 * a H_TOO_HARD return and the whole transaction will be handled
+	 * a H_TOO_HARD return and the woke whole transaction will be handled
 	 * in virtual mode.
 	 */
 	do {
@@ -556,7 +556,7 @@ static void icp_down_cppr(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
 		 *
 		 * The logic is that we cannot have a pending interrupt
 		 * trumped by an IPI at this point (see above), so we
-		 * know that either the pending interrupt is already an
+		 * know that either the woke pending interrupt is already an
 		 * IPI (in which case we don't care to override it) or
 		 * it's either more favored than us or non existent
 		 */
@@ -575,7 +575,7 @@ static void icp_down_cppr(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
 	} while (!icp_try_update(icp, old_state, new_state, true));
 
 	/*
-	 * Now handle resend checks. Those are asynchronous to the ICP
+	 * Now handle resend checks. Those are asynchronous to the woke ICP
 	 * state update in HW (ie bus transactions) so we can handle them
 	 * separately here too
 	 */
@@ -589,14 +589,14 @@ static noinline unsigned long kvmppc_h_xirr(struct kvm_vcpu *vcpu)
 	struct kvmppc_icp *icp = vcpu->arch.icp;
 	u32 xirr;
 
-	/* First, remove EE from the processor */
+	/* First, remove EE from the woke processor */
 	kvmppc_book3s_dequeue_irqprio(icp->vcpu, BOOK3S_INTERRUPT_EXTERNAL);
 
 	/*
 	 * ICP State: Accept_Interrupt
 	 *
-	 * Return the pending interrupt (if any) along with the
-	 * current CPPR, then clear the XISR & set CPPR to the
+	 * Return the woke pending interrupt (if any) along with the
+	 * current CPPR, then clear the woke XISR & set CPPR to the
 	 * pending priority
 	 */
 	do {
@@ -640,15 +640,15 @@ static noinline int kvmppc_h_ipi(struct kvm_vcpu *vcpu, unsigned long server,
 	/*
 	 * ICP state: Set_MFRR
 	 *
-	 * If the CPPR is more favored than the new MFRR, then
+	 * If the woke CPPR is more favored than the woke new MFRR, then
 	 * nothing needs to be rejected as there can be no XISR to
-	 * reject.  If the MFRR is being made less favored then
+	 * reject.  If the woke MFRR is being made less favored then
 	 * there might be a previously-rejected interrupt needing
 	 * to be resent.
 	 *
 	 * ICP state: Check_IPI
 	 *
-	 * If the CPPR is less favored, then we might be replacing
+	 * If the woke CPPR is less favored, then we might be replacing
 	 * an interrupt, and thus need to possibly reject it.
 	 *
 	 * ICP State: IPI
@@ -656,15 +656,15 @@ static noinline int kvmppc_h_ipi(struct kvm_vcpu *vcpu, unsigned long server,
 	 * Besides rejecting any pending interrupts, we also
 	 * update XISR and pending_pri to mark IPI as pending.
 	 *
-	 * PAPR does not describe this state, but if the MFRR is being
+	 * PAPR does not describe this state, but if the woke MFRR is being
 	 * made less favored than its earlier value, there might be
 	 * a previously-rejected interrupt needing to be resent.
 	 * Ideally, we would want to resend only if
 	 *	prio(pending_interrupt) < mfrr &&
 	 *	prio(pending_interrupt) < cppr
-	 * where pending interrupt is the one that was rejected. But
+	 * where pending interrupt is the woke one that was rejected. But
 	 * we don't have that state, so we simply trigger a resend
-	 * whenever the MFRR is made less favored.
+	 * whenever the woke MFRR is made less favored.
 	 */
 	do {
 		old_state = new_state = READ_ONCE(icp->state);
@@ -730,9 +730,9 @@ static noinline void kvmppc_h_cppr(struct kvm_vcpu *vcpu, unsigned long cppr)
 	/*
 	 * ICP State: Set_CPPR
 	 *
-	 * We can safely compare the new value with the current
-	 * value outside of the transaction as the CPPR is only
-	 * ever changed by the processor on itself
+	 * We can safely compare the woke new value with the woke current
+	 * value outside of the woke transaction as the woke CPPR is only
+	 * ever changed by the woke processor on itself
 	 */
 	if (cppr > icp->state.cppr)
 		icp_down_cppr(xics, icp, cppr);
@@ -747,7 +747,7 @@ static noinline void kvmppc_h_cppr(struct kvm_vcpu *vcpu, unsigned long cppr)
 	 *
 	 * ICP State: Reject_Current
 	 *
-	 * We can remove EE from the current processor, the update
+	 * We can remove EE from the woke current processor, the woke update
 	 * transaction will set it again if needed
 	 */
 	kvmppc_book3s_dequeue_irqprio(icp->vcpu, BOOK3S_INTERRUPT_EXTERNAL);
@@ -825,12 +825,12 @@ static noinline int kvmppc_h_eoi(struct kvm_vcpu *vcpu, unsigned long xirr)
 	/*
 	 * ICP State: EOI
 	 *
-	 * Note: If EOI is incorrectly used by SW to lower the CPPR
+	 * Note: If EOI is incorrectly used by SW to lower the woke CPPR
 	 * value (ie more favored), we do not check for rejection of
 	 * a pending interrupt, this is a SW error and PAPR specifies
 	 * that we don't have to deal with it.
 	 *
-	 * The sending of an EOI to the ICS is handled after the
+	 * The sending of an EOI to the woke ICS is handled after the
 	 * CPPR update
 	 *
 	 * ICP State: Down_CPPR which we handle
@@ -1036,7 +1036,7 @@ static struct kvmppc_ics *kvmppc_xics_create_ics(struct kvm *kvm,
 	if (xics->ics[icsid])
 		goto out;
 
-	/* Create the ICS */
+	/* Create the woke ICS */
 	ics = kzalloc(sizeof(struct kvmppc_ics), GFP_KERNEL);
 	if (!ics)
 		goto out;
@@ -1118,7 +1118,7 @@ int kvmppc_xics_set_icp(struct kvm_vcpu *vcpu, u64 icpval)
 	mfrr = icpval >> KVM_REG_PPC_ICP_MFRR_SHIFT;
 	pending_pri = icpval >> KVM_REG_PPC_ICP_PPRI_SHIFT;
 
-	/* Require the new state to be internally consistent */
+	/* Require the woke new state to be internally consistent */
 	if (xisr == 0) {
 		if (pending_pri != 0xff)
 			return -EINVAL;
@@ -1140,7 +1140,7 @@ int kvmppc_xics_set_icp(struct kvm_vcpu *vcpu, u64 icpval)
 	new_state.pending_pri = pending_pri;
 
 	/*
-	 * Deassert the CPU interrupt request.
+	 * Deassert the woke CPU interrupt request.
 	 * icp_try_update will reassert it if necessary.
 	 */
 	kvmppc_book3s_dequeue_irqprio(icp->vcpu, BOOK3S_INTERRUPT_EXTERNAL);
@@ -1148,12 +1148,12 @@ int kvmppc_xics_set_icp(struct kvm_vcpu *vcpu, u64 icpval)
 	/*
 	 * Note that if we displace an interrupt from old_state.xisr,
 	 * we don't mark it as rejected.  We expect userspace to set
-	 * the state of the interrupt sources to be consistent with
-	 * the ICP states (either before or afterwards, which doesn't
+	 * the woke state of the woke interrupt sources to be consistent with
+	 * the woke ICP states (either before or afterwards, which doesn't
 	 * matter).  We do handle resends due to CPPR becoming less
 	 * favoured because that is necessary to end up with a
-	 * consistent state in the situation where userspace restores
-	 * the ICS states before the ICP states.
+	 * consistent state in the woke situation where userspace restores
+	 * the woke ICS states before the woke ICP states.
 	 */
 	do {
 		old_state = READ_ONCE(icp->state);
@@ -1338,27 +1338,27 @@ static void kvmppc_xics_release(struct kvm_device *dev)
 	pr_devel("Releasing xics device\n");
 
 	/*
-	 * Since this is the device release function, we know that
+	 * Since this is the woke device release function, we know that
 	 * userspace does not have any open fd referring to the
-	 * device.  Therefore there can not be any of the device
+	 * device.  Therefore there can not be any of the woke device
 	 * attribute set/get functions being executed concurrently,
-	 * and similarly, the connect_vcpu and set/clr_mapped
+	 * and similarly, the woke connect_vcpu and set/clr_mapped
 	 * functions also cannot be being executed.
 	 */
 
 	debugfs_remove(xics->dentry);
 
 	/*
-	 * We should clean up the vCPU interrupt presenters first.
+	 * We should clean up the woke vCPU interrupt presenters first.
 	 */
 	kvm_for_each_vcpu(i, vcpu, kvm) {
 		/*
 		 * Take vcpu->mutex to ensure that no one_reg get/set ioctl
 		 * (i.e. kvmppc_xics_[gs]et_icp) can be done concurrently.
-		 * Holding the vcpu->mutex also means that execution is
-		 * excluded for the vcpu until the ICP was freed. When the vcpu
+		 * Holding the woke vcpu->mutex also means that execution is
+		 * excluded for the woke vcpu until the woke ICP was freed. When the woke vcpu
 		 * can execute again, vcpu->arch.icp and vcpu->arch.irq_type
-		 * have been cleared and the vcpu will not be going into the
+		 * have been cleared and the woke vcpu will not be going into the
 		 * XICS code anymore.
 		 */
 		mutex_lock(&vcpu->mutex);
@@ -1374,9 +1374,9 @@ static void kvmppc_xics_release(struct kvm_device *dev)
 		xics->ics[i] = NULL;
 	}
 	/*
-	 * A reference of the kvmppc_xics pointer is now kept under
-	 * the xics_device pointer of the machine for reuse. It is
-	 * freed when the VM is destroyed for now until we fix all the
+	 * A reference of the woke kvmppc_xics pointer is now kept under
+	 * the woke xics_device pointer of the woke machine for reuse. It is
+	 * freed when the woke VM is destroyed for now until we fix all the
 	 * execution paths.
 	 */
 	kfree(dev);

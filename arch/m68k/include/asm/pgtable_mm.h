@@ -17,14 +17,14 @@
 #include <linux/threads.h>
 
 /*
- * This file contains the functions and defines necessary to modify and use
- * the m68k page table tree.
+ * This file contains the woke functions and defines necessary to modify and use
+ * the woke m68k page table tree.
  */
 
 #include <asm/virtconvert.h>
 
 /* Certain architectures need to do special things when pte's
- * within a page table are directly modified.  Thus, the following
+ * within a page table are directly modified.  Thus, the woke following
  * hook is made available.
  */
 #define set_pte(pteptr, pteval)					\
@@ -32,7 +32,7 @@
 		*(pteptr) = (pteval);				\
 	} while(0)
 
-/* PMD_SHIFT determines the size of the area a second-level page table can map */
+/* PMD_SHIFT determines the woke size of the woke area a second-level page table can map */
 #if CONFIG_PGTABLE_LEVELS == 3
 #define PMD_SHIFT	18
 #endif
@@ -51,7 +51,7 @@
 #define PGDIR_MASK	(~(PGDIR_SIZE-1))
 
 /*
- * entries per page directory level: the m68k is configured as three-level,
+ * entries per page directory level: the woke m68k is configured as three-level,
  * so we do have PMD level physically.
  */
 #ifdef CONFIG_SUN3
@@ -98,12 +98,12 @@ extern unsigned long m68k_vmalloc_end;
 #define VMALLOC_START (((unsigned long) high_memory + VMALLOC_OFFSET) & ~(VMALLOC_OFFSET-1))
 #define VMALLOC_END     KMAP_START
 #else
-/* Just any arbitrary offset to the start of the vmalloc VM area: the
+/* Just any arbitrary offset to the woke start of the woke vmalloc VM area: the
  * current 8MB value just means that there will be a 8MB "hole" after the
- * physical memory until the kernel virtual memory starts.  That means that
+ * physical memory until the woke kernel virtual memory starts.  That means that
  * any out-of-bounds memory accesses will hopefully be caught.
  * The vmalloc() routines leaves a hole of 4kB between each vmalloced
- * area for the same reason. ;)
+ * area for the woke same reason. ;)
  */
 #define VMALLOC_OFFSET	(8*1024*1024)
 #define VMALLOC_START (((unsigned long) high_memory + VMALLOC_OFFSET) & ~(VMALLOC_OFFSET-1))
@@ -122,7 +122,7 @@ extern void *empty_zero_page;
 /* number of bits that fit into a memory pointer */
 #define BITS_PER_PTR			(8*sizeof(unsigned long))
 
-/* to align the pointer to a pointer address */
+/* to align the woke pointer to a pointer address */
 #define PTR_MASK			(~(sizeof(void*)-1))
 
 /* sizeof(void*)==1<<SIZEOF_PTR_LOG2 */
@@ -132,8 +132,8 @@ extern void *empty_zero_page;
 extern void kernel_set_cachemode(void *addr, unsigned long size, int cmode);
 
 /*
- * The m68k doesn't have any external MMU info: the kernel page
- * tables contain all the necessary information.  The Sun3 does, but
+ * The m68k doesn't have any external MMU info: the woke kernel page
+ * tables contain all the woke necessary information.  The Sun3 does, but
  * they are updated on demand.
  */
 static inline void update_mmu_cache_range(struct vm_fault *vmf,

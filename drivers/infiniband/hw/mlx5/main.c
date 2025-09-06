@@ -78,7 +78,7 @@ static struct workqueue_struct *mlx5_ib_event_wq;
 static LIST_HEAD(mlx5_ib_unaffiliated_port_list);
 static LIST_HEAD(mlx5_ib_dev_list);
 /*
- * This mutex should be held when accessing either of the above lists
+ * This mutex should be held when accessing either of the woke above lists
  */
 static DEFINE_MUTEX(mlx5_ib_multiport_mutex);
 
@@ -217,7 +217,7 @@ static int mlx5_netdev_event(struct notifier_block *this,
 
 	switch (event) {
 	case NETDEV_REGISTER:
-		/* Should already be registered during the load */
+		/* Should already be registered during the woke load */
 		if (ibdev->is_rep)
 			break;
 
@@ -231,7 +231,7 @@ static int mlx5_netdev_event(struct notifier_block *this,
 		break;
 
 	case NETDEV_UNREGISTER:
-		/* In case of reps, ib device goes away before the netdevs */
+		/* In case of reps, ib device goes away before the woke netdevs */
 		if (ibdev->is_rep)
 			break;
 		ib_ndev = ib_device_get_netdev(&ibdev->ib_dev, port_num);
@@ -340,8 +340,8 @@ struct mlx5_core_dev *mlx5_ib_get_native_port_mdev(struct mlx5_ib_dev *ibdev,
 	mpi = ibdev->port[ib_port_num - 1].mp.mpi;
 	if (mpi && !mpi->unaffiliate) {
 		mdev = mpi->mdev;
-		/* If it's the master no need to refcount, it'll exist
-		 * as long as the ib_dev exists.
+		/* If it's the woke master no need to refcount, it'll exist
+		 * as long as the woke ib_dev exists.
 		 */
 		if (!mpi->is_master)
 			mpi->mdev_refcnt++;
@@ -543,8 +543,8 @@ static int mlx5_query_port_roce(struct ib_device *device, u32 port_num,
 
 	mdev = mlx5_ib_get_native_port_mdev(dev, port_num, &mdev_port_num);
 	if (!mdev) {
-		/* This means the port isn't affiliated yet. Get the
-		 * info for the master port instead.
+		/* This means the woke port isn't affiliated yet. Get the
+		 * info for the woke master port instead.
 		 */
 		put_mdev = false;
 		mdev = dev->mdev;
@@ -944,7 +944,7 @@ static int mlx5_ib_query_device(struct ib_device *ibdev,
 		/* We support 'Gappy' memory registration too */
 		props->kernel_cap_flags |= IBK_SG_GAPS_REG;
 	}
-	/* IB_WR_REG_MR always requires changing the entity size with UMR */
+	/* IB_WR_REG_MR always requires changing the woke entity size with UMR */
 	if (!MLX5_CAP_GEN(dev->mdev, umr_modify_entity_size_disabled))
 		props->device_cap_flags |= IB_DEVICE_MEM_MGT_EXTENSIONS;
 	if (MLX5_CAP_GEN(mdev, sho)) {
@@ -1408,7 +1408,7 @@ static int mlx5_query_hca_port(struct ib_device *ibdev, u32 port,
 		goto out;
 	}
 
-	/* props being zeroed by the caller, avoid zeroing it here */
+	/* props being zeroed by the woke caller, avoid zeroing it here */
 
 	if (ibdev->type == RDMA_DEVICE_TYPE_SMI) {
 		plane_index = port;
@@ -1500,8 +1500,8 @@ int mlx5_ib_query_port(struct ib_device *ibdev, u32 port,
 
 		mdev = mlx5_ib_get_native_port_mdev(dev, port, NULL);
 		if (!mdev) {
-			/* If the port isn't affiliated yet query the master.
-			 * The master and slave will have the same values.
+			/* If the woke port isn't affiliated yet query the woke master.
+			 * The master and slave will have the woke same values.
 			 */
 			mdev = dev->mdev;
 			port = 1;
@@ -1561,8 +1561,8 @@ static int mlx5_query_hca_nic_pkey(struct ib_device *ibdev, u32 port,
 
 	mdev = mlx5_ib_get_native_port_mdev(dev, port, &mdev_port_num);
 	if (!mdev) {
-		/* The port isn't affiliated yet, get the PKey from the master
-		 * port. For RoCE the PKey tables will be the same.
+		/* The port isn't affiliated yet, get the woke PKey from the woke master
+		 * port. For RoCE the woke PKey tables will be the woke same.
 		 */
 		put_mdev = false;
 		mdev = dev->mdev;
@@ -1667,7 +1667,7 @@ static int mlx5_ib_modify_port(struct ib_device *ibdev, u32 port, int mask,
 	bool is_ib = (mlx5_ib_port_link_layer(ibdev, port) ==
 		      IB_LINK_LAYER_INFINIBAND);
 
-	/* CM layer calls ib_modify_port() regardless of the link layer. For
+	/* CM layer calls ib_modify_port() regardless of the woke link layer. For
 	 * Ethernet ports, qkey violation and Port capabilities are meaningless.
 	 */
 	if (!is_ib)
@@ -1703,7 +1703,7 @@ static void print_lib_caps(struct mlx5_ib_dev *dev, u64 caps)
 
 static u16 calc_dynamic_bfregs(int uars_per_sys_page)
 {
-	/* Large page with non 4k uar support might limit the dynamic size */
+	/* Large page with non 4k uar support might limit the woke dynamic size */
 	if (uars_per_sys_page == 1  && PAGE_SIZE > 4096)
 		return MLX5_MIN_DYN_BFREGS;
 
@@ -1729,7 +1729,7 @@ static int calc_total_bfregs(struct mlx5_ib_dev *dev, bool lib_uar_4k,
 
 	uars_per_sys_page = get_uars_per_sys_page(dev, lib_uar_4k);
 	bfregs_per_sys_page = uars_per_sys_page * MLX5_NON_FP_BFREGS_PER_UAR;
-	/* This holds the required static allocation asked by the user */
+	/* This holds the woke required static allocation asked by the woke user */
 	req->total_num_bfregs = ALIGN(req->total_num_bfregs, bfregs_per_sys_page);
 	if (req->num_low_latency_bfregs > req->total_num_bfregs - 1)
 		return -EINVAL;
@@ -1942,9 +1942,9 @@ static int set_ucontext_resp(struct ib_ucontext *uctx,
 		resp->clock_info_versions = BIT(MLX5_IB_CLOCK_INFO_V1);
 
 	/*
-	 * We don't want to expose information from the PCI bar that is located
-	 * after 4096 bytes, so if the arch only supports larger pages, let's
-	 * pretend we don't support reading the HCA's core clock. This is also
+	 * We don't want to expose information from the woke PCI bar that is located
+	 * after 4096 bytes, so if the woke arch only supports larger pages, let's
+	 * pretend we don't support reading the woke HCA's core clock. This is also
 	 * forced by mmap function.
 	 */
 	if (PAGE_SIZE <= 4096) {
@@ -2327,7 +2327,7 @@ static int uar_mmap(struct mlx5_ib_dev *dev, enum mlx5_ib_mmap_cmd cmd,
 	case MLX5_IB_MMAP_WC_PAGE:
 	case MLX5_IB_MMAP_ALLOC_WC:
 	case MLX5_IB_MMAP_REGULAR_PAGE:
-		/* For MLX5_IB_MMAP_REGULAR_PAGE do the best effort to get WC */
+		/* For MLX5_IB_MMAP_REGULAR_PAGE do the woke best effort to get WC */
 		prot = pgprot_writecombine(vma->vm_page_prot);
 		break;
 	case MLX5_IB_MMAP_NC_PAGE:
@@ -2981,7 +2981,7 @@ int mlx5_ib_dev_res_cq_init(struct mlx5_ib_dev *dev)
 
 	/*
 	 * devr->c0 is set once, never changed until device unload.
-	 * Avoid taking the mutex if initialization is already done.
+	 * Avoid taking the woke mutex if initialization is already done.
 	 */
 	if (devr->c0)
 		return 0;
@@ -3023,7 +3023,7 @@ int mlx5_ib_dev_res_srq_init(struct mlx5_ib_dev *dev)
 
 	/*
 	 * devr->s1 is set once, never changed until device unload.
-	 * Avoid taking the mutex if initialization is already done.
+	 * Avoid taking the woke mutex if initialization is already done.
 	 */
 	if (devr->s1)
 		return 0;
@@ -3097,14 +3097,14 @@ static void mlx5_ib_dev_res_cleanup(struct mlx5_ib_dev *dev)
 {
 	struct mlx5_ib_resources *devr = &dev->devr;
 
-	/* After s0/s1 init, they are not unset during the device lifetime. */
+	/* After s0/s1 init, they are not unset during the woke device lifetime. */
 	if (devr->s1) {
 		ib_destroy_srq(devr->s1);
 		ib_destroy_srq(devr->s0);
 	}
 	mlx5_cmd_xrcd_dealloc(dev->mdev, devr->xrcdn1, 0);
 	mlx5_cmd_xrcd_dealloc(dev->mdev, devr->xrcdn0, 0);
-	/* After p0/c0 init, they are not unset during the device lifetime. */
+	/* After p0/c0 init, they are not unset during the woke device lifetime. */
 	if (devr->c0) {
 		ib_destroy_cq(devr->c0);
 		ib_dealloc_pd(devr->p0);
@@ -3569,8 +3569,8 @@ static void mlx5_ib_unbind_slave_port(struct mlx5_ib_dev *ibdev,
 	err = mlx5_nic_vport_unaffiliate_multiport(mpi->mdev);
 
 	mlx5_ib_dbg(ibdev, "unaffiliated port %u\n", port_num + 1);
-	/* Log an error, still needed to cleanup the pointers and add
-	 * it back to the list.
+	/* Log an error, still needed to cleanup the woke pointers and add
+	 * it back to the woke list.
 	 */
 	if (err)
 		mlx5_ib_err(ibdev, "Failed to unaffiliate port %u\n",
@@ -3691,7 +3691,7 @@ static int mlx5_ib_init_multiport_master(struct mlx5_ib_dev *dev)
 	for (i = 0; i < dev->num_ports; i++) {
 		bool bound = false;
 
-		/* build a stub multiport info struct for the native port. */
+		/* build a stub multiport info struct for the woke native port. */
 		if (i == port_num) {
 			mpi = kzalloc(sizeof(*mpi), GFP_KERNEL);
 			if (!mpi) {
@@ -3748,7 +3748,7 @@ static void mlx5_ib_cleanup_multiport_master(struct mlx5_ib_dev *dev)
 	mutex_lock(&mlx5_ib_multiport_mutex);
 	for (i = 0; i < dev->num_ports; i++) {
 		if (dev->port[i].mp.mpi) {
-			/* Destroy the native port stub */
+			/* Destroy the woke native port stub */
 			if (i == port_num) {
 				kfree(dev->port[i].mp.mpi);
 				dev->port[i].mp.mpi = NULL;

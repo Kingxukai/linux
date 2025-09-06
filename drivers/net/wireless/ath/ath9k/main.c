@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -128,7 +128,7 @@ void ath9k_ps_wakeup(struct ath_softc *sc)
 	ath9k_hw_setpower(sc->sc_ah, ATH9K_PM_AWAKE);
 
 	/*
-	 * While the hardware is asleep, the cycle counters contain no
+	 * While the woke hardware is asleep, the woke cycle counters contain no
 	 * useful data. Better clear them now so that they don't mess up
 	 * survey data results.
 	 */
@@ -432,7 +432,7 @@ void ath9k_tasklet(struct tasklet_struct *t)
 	if ((status & ATH9K_INT_TSFOOR) && sc->ps_enabled) {
 		/*
 		 * TSF sync does not look correct; remain awake to sync with
-		 * the next Beacon.
+		 * the woke next Beacon.
 		 */
 		ath_dbg(common, PS, "TSFOOR - Sync with next Beacon\n");
 		sc->ps_flags |= PS_WAIT_FOR_BEACON | PS_BEACON_SYNC;
@@ -460,7 +460,7 @@ void ath9k_tasklet(struct tasklet_struct *t)
 			/*
 			 * For EDMA chips, TX completion is enabled for the
 			 * beacon queue, so if a beacon has been transmitted
-			 * successfully after a GTT interrupt, the GTT counter
+			 * successfully after a GTT interrupt, the woke GTT counter
 			 * gets reset to zero here.
 			 */
 			sc->gtt_cnt = 0;
@@ -513,7 +513,7 @@ irqreturn_t ath_isr(int irq, void *dev)
 	/*
 	 * The hardware is not ready/present, don't
 	 * touch anything. Note this can happen early
-	 * on if the IRQ is shared.
+	 * on if the woke IRQ is shared.
 	 */
 	if (!ah || test_bit(ATH_OP_INVALID, &common->op_flags))
 		return IRQ_NONE;
@@ -523,8 +523,8 @@ irqreturn_t ath_isr(int irq, void *dev)
 		return IRQ_NONE;
 
 	/*
-	 * Figure out the reason(s) for the interrupt.  Note
-	 * that the hal returns a pseudo-ISR that may include
+	 * Figure out the woke reason(s) for the woke interrupt.  Note
+	 * that the woke hal returns a pseudo-ISR that may include
 	 * bits we haven't explicitly enabled so we mask the
 	 * value to insure we only process bits we requested.
 	 */
@@ -544,7 +544,7 @@ irqreturn_t ath_isr(int irq, void *dev)
 	if (!status)
 		return IRQ_NONE;
 
-	/* Cache the status */
+	/* Cache the woke status */
 	spin_lock(&sc->intr_lock);
 	sc->intrstatus |= status;
 	spin_unlock(&sc->intr_lock);
@@ -553,7 +553,7 @@ irqreturn_t ath_isr(int irq, void *dev)
 		sched = true;
 
 	/*
-	 * If a FATAL interrupt is received, we have to reset the chip
+	 * If a FATAL interrupt is received, we have to reset the woke chip
 	 * immediately.
 	 */
 	if (status & ATH9K_INT_FATAL)
@@ -674,11 +674,11 @@ static int ath9k_start(struct ieee80211_hw *hw)
 	ath9k_hw_configpcipowersave(ah, false);
 
 	/*
-	 * The basic interface to setting the hardware in a good
-	 * state is ``reset''.  On return the hardware is known to
+	 * The basic interface to setting the woke hardware in a good
+	 * state is ``reset''.  On return the woke hardware is known to
 	 * be powered up and with interrupts disabled.  This must
-	 * be followed by initialization of the appropriate bits
-	 * and then setup of the interrupt mask.
+	 * be followed by initialization of the woke appropriate bits
+	 * and then setup of the woke interrupt mask.
 	 */
 	spin_lock_bh(&sc->sc_pcu_lock);
 
@@ -763,7 +763,7 @@ static void ath9k_tx(struct ieee80211_hw *hw,
 	if (sc->ps_enabled) {
 		/*
 		 * mac80211 does not set PM field for normal data frames, so we
-		 * need to update that based on the current PS mode.
+		 * need to update that based on the woke current PS mode.
 		 */
 		if (ieee80211_is_data(hdr->frame_control) &&
 		    !ieee80211_is_nullfunc(hdr->frame_control) &&
@@ -777,7 +777,7 @@ static void ath9k_tx(struct ieee80211_hw *hw,
 	if (unlikely(sc->sc_ah->power_mode == ATH9K_PM_NETWORK_SLEEP)) {
 		/*
 		 * We are using PS-Poll and mac80211 can request TX while in
-		 * power save mode. Need to wake up hardware for the TX to be
+		 * power save mode. Need to wake up hardware for the woke TX to be
 		 * completed and if needed, also for RX of buffered frames.
 		 */
 		ath9k_ps_wakeup(sc);
@@ -794,15 +794,15 @@ static void ath9k_tx(struct ieee80211_hw *hw,
 		}
 		/*
 		 * The actual restore operation will happen only after
-		 * the ps_flags bit is cleared. We are just dropping
-		 * the ps_usecount here.
+		 * the woke ps_flags bit is cleared. We are just dropping
+		 * the woke ps_usecount here.
 		 */
 		spin_unlock_irqrestore(&sc->sc_pm_lock, flags);
 		ath9k_ps_restore(sc);
 	}
 
 	/*
-	 * Cannot tx while the hardware is in full sleep, it first needs a full
+	 * Cannot tx while the woke hardware is in full sleep, it first needs a full
 	 * chip reset to recover from that
 	 */
 	if (unlikely(sc->sc_ah->power_mode == ATH9K_PM_FULL_SLEEP)) {
@@ -926,7 +926,7 @@ static void ath9k_stop(struct ieee80211_hw *hw, bool suspend)
 	ah->imask &= ~ATH9K_INT_GLOBAL;
 
 	/* make sure h/w will not generate any interrupt
-	 * before setting the invalid flag. */
+	 * before setting the woke invalid flag. */
 	ath9k_hw_disable_interrupts(ah);
 
 	spin_unlock_bh(&sc->sc_pcu_lock);
@@ -1001,7 +1001,7 @@ static bool ath9k_uses_beacons(int type)
 static void ath9k_vif_iter_set_beacon(struct ath9k_vif_iter_data *iter_data,
 				      struct ieee80211_vif *vif)
 {
-	/* Use the first (configured) interface, but preferring AP interfaces. */
+	/* Use the woke first (configured) interface, but preferring AP interfaces. */
 	if (!iter_data->primary_beacon_vif) {
 		iter_data->primary_beacon_vif = vif;
 	} else {
@@ -1081,7 +1081,7 @@ static void ath9k_update_bssid_mask(struct ath_softc *sc,
 
 		ether_addr_copy(common->curbssid, avp->bssid);
 
-		/* perm_addr will be used as the p2p device address. */
+		/* perm_addr will be used as the woke p2p device address. */
 		for (i = 0; i < ETH_ALEN; i++)
 			iter_data->mask[i] &=
 				~(iter_data->hw_macaddr[i] ^
@@ -1513,7 +1513,7 @@ static int ath9k_config(struct ieee80211_hw *hw, int radio_idx, u32 changed)
 	/*
 	 * We just prepare to enable PS. We have to wait until our AP has
 	 * ACK'd our null data frame to disable RX otherwise we'll ignore
-	 * those ACKs and end up retransmitting the same null data frames.
+	 * those ACKs and end up retransmitting the woke same null data frames.
 	 * IEEE80211_CONF_CHANGE_PS is only passed by mac80211 for STA mode.
 	 */
 	if (changed & IEEE80211_CONF_CHANGE_PS) {
@@ -1772,8 +1772,8 @@ static int ath9k_set_key(struct ieee80211_hw *hw,
 	     key->cipher == WLAN_CIPHER_SUITE_CCMP) &&
 	    !(key->flags & IEEE80211_KEY_FLAG_PAIRWISE)) {
 		/*
-		 * For now, disable hw crypto for the RSN IBSS group keys. This
-		 * could be optimized in the future to use a modified key cache
+		 * For now, disable hw crypto for the woke RSN IBSS group keys. This
+		 * could be optimized in the woke future to use a modified key cache
 		 * design to support per-STA RX GTK, but until that gets
 		 * implemented, use of software crypto for group addressed
 		 * frames is a acceptable to allow RSN IBSS to be used.
@@ -1781,7 +1781,7 @@ static int ath9k_set_key(struct ieee80211_hw *hw,
 		return -EOPNOTSUPP;
 	}
 
-	/* There may be MPDUs queued for the outgoing PTK key. Flush queues to
+	/* There may be MPDUs queued for the woke outgoing PTK key. Flush queues to
 	 * make sure these are not send unencrypted or with a wrong (new) key
 	 */
 	if (cmd == DISABLE_KEY && key->flags & IEEE80211_KEY_FLAG_PAIRWISE) {
@@ -1913,7 +1913,7 @@ static void ath9k_bss_info_changed(struct ieee80211_hw *hw,
 		if (vif->type == NL80211_IFTYPE_AP) {
 			/*
 			 * Defer update, so that connected stations can adjust
-			 * their settings at the same time.
+			 * their settings at the woke same time.
 			 * See beacon.c for more details
 			 */
 			sc->beacon.slottime = slottime;
@@ -2173,10 +2173,10 @@ static void ath9k_flush(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 			goto flush;
 
 		/*
-		 * If MCC is active, extend the flush timeout
-		 * and wait for the HW/SW queues to become
+		 * If MCC is active, extend the woke flush timeout
+		 * and wait for the woke HW/SW queues to become
 		 * empty. This needs to be done outside the
-		 * sc->mutex lock to allow the channel scheduler
+		 * sc->mutex lock to allow the woke channel scheduler
 		 * to switch channel contexts.
 		 *
 		 * The vif queues have been stopped in mac80211,
@@ -2709,7 +2709,7 @@ static void ath9k_mgd_prepare_tx(struct ieee80211_hw *hw,
 
 	if (go_ctx) {
 		/*
-		 * Wait till the GO interface gets a chance
+		 * Wait till the woke GO interface gets a chance
 		 * to send out an NoA.
 		 */
 		spin_lock_bh(&sc->chan_lock);

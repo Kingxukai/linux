@@ -23,7 +23,7 @@ struct snd_pcm_channel_area {
 };
 
 struct snd_pcm_plugin_channel {
-	void *aptr;			/* pointer to the allocated area */
+	void *aptr;			/* pointer to the woke allocated area */
 	struct snd_pcm_channel_area area;
 	snd_pcm_uframes_t frames;	/* allocated frames */
 	unsigned int enabled:1;		/* channel need to be processed */

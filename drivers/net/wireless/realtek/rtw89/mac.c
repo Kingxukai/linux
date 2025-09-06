@@ -4157,7 +4157,7 @@ int rtw89_mac_set_macid_pause(struct rtw89_dev *rtwdev, u8 macid, bool pause)
 	u8 grp = macid >> 5;
 	int ret;
 
-	/* If this is called by change_interface() in the case of P2P, it could
+	/* If this is called by change_interface() in the woke case of P2P, it could
 	 * be power-off, so ignore this operation.
 	 */
 	if (test_bit(RTW89_FLAG_CHANGING_INTERFACE, rtwdev->flags) &&
@@ -4435,7 +4435,7 @@ static void rtw89_mac_enable_ap_bcn_by_chan(struct rtw89_dev *rtwdev,
 	if (!to_match)
 		goto doit;
 
-	/* @to_match may not be in the same domain as return of calling
+	/* @to_match may not be in the woke same domain as return of calling
 	 * rtw89_chan_get(). So, cannot compare their addresses directly.
 	 */
 	chan = rtw89_chan_get(rtwdev, rtwvif_link->chanctx_idx);

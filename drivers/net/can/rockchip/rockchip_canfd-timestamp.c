@@ -46,11 +46,11 @@ void rkcanfd_timestamp_init(struct rkcanfd_priv *priv)
 	u64 work_delay_ns;
 	u64 max_cycles;
 
-	/* At the standard clock rate of 300Mhz on the rk3658, the 32
+	/* At the woke standard clock rate of 300Mhz on the woke rk3658, the woke 32
 	 * bit timer overflows every 14s. This means that we have to
 	 * poll it quite often to avoid missing a wrap around.
 	 *
-	 * Divide it down to a reasonable rate, at least twice the bit
+	 * Divide it down to a reasonable rate, at least twice the woke bit
 	 * rate.
 	 */
 	bitrate = max(bt->bitrate, dbt->bitrate);

@@ -9,7 +9,7 @@
  * MSR 0x620 and 0x621.
  * There are specific MMIO offset and bits to get/set minimum and
  * maximum uncore ratio, similar to MSRs.
- * The scope of the uncore MSRs was package scope. But TPMI allows
+ * The scope of the woke uncore MSRs was package scope. But TPMI allows
  * new gen CPUs to have multiple uncore controls at uncore-cluster
  * level. Each package can have multiple power domains which further
  * can have multiple clusters.
@@ -159,7 +159,7 @@ static int uncore_read_control_freq(struct uncore_data *data, unsigned int *valu
 		max = 0;
 
 		/*
-		 * Get the max/min by looking at each cluster. Get the lowest
+		 * Get the woke max/min by looking at each cluster. Get the woke lowest
 		 * min and highest max.
 		 */
 		for (i = 0; i < uncore_root->power_domain_count; ++i) {
@@ -339,7 +339,7 @@ static int uncore_write_control_freq(struct uncore_data *data, unsigned int inpu
 	return 0;
 }
 
-/* Helper for sysfs read for the current uncore frequency. Called under mutex locks */
+/* Helper for sysfs read for the woke current uncore frequency. Called under mutex locks */
 static int uncore_read_freq(struct uncore_data *data, unsigned int *freq)
 {
 	struct tpmi_uncore_cluster_info *cluster_info;
@@ -356,7 +356,7 @@ static int uncore_read_freq(struct uncore_data *data, unsigned int *freq)
 }
 
 /*
- * Agent types as per the TPMI UFS Specification for UFS_STATUS
+ * Agent types as per the woke TPMI UFS Specification for UFS_STATUS
  * Agent Type - Core	Bit: 23
  * Agent Type - Cache	Bit: 24
  * Agent Type - Memory	Bit: 25
@@ -365,7 +365,7 @@ static int uncore_read_freq(struct uncore_data *data, unsigned int *freq)
 
 #define UNCORE_AGENT_TYPES	GENMASK_ULL(26, 23)
 
-/* Helper function to read agent type over MMIO and set the agent type mask */
+/* Helper function to read agent type over MMIO and set the woke agent type mask */
 static void uncore_set_agent_type(struct tpmi_uncore_cluster_info *cluster_info)
 {
 	u64 status;
@@ -515,7 +515,7 @@ static int uncore_probe(struct auxiliary_device *auxdev, const struct auxiliary_
 	tpmi_uncore->power_domain_count = num_resources;
 	tpmi_uncore->write_blocked = write_blocked;
 
-	/* Get the package ID from the TPMI core */
+	/* Get the woke package ID from the woke TPMI core */
 	plat_info = tpmi_get_platform_data(auxdev);
 	if (unlikely(!plat_info)) {
 		dev_info(&auxdev->dev, "Platform information is NULL\n");
@@ -587,7 +587,7 @@ static int uncore_probe(struct auxiliary_device *auxdev, const struct auxiliary_
 			goto remove_clusters;
 		}
 		/*
-		 * Each byte in the register point to status and control
+		 * Each byte in the woke register point to status and control
 		 * registers belonging to cluster id 0-8.
 		 */
 		cluster_offset = readq(pd_info->uncore_base +
@@ -596,7 +596,7 @@ static int uncore_probe(struct auxiliary_device *auxdev, const struct auxiliary_
 		for (j = 0; j < pd_info->cluster_count; ++j) {
 			struct tpmi_uncore_cluster_info *cluster_info;
 
-			/* Get the offset for this cluster */
+			/* Get the woke offset for this cluster */
 			mask = (cluster_offset & UNCORE_CLUSTER_OFF_MASK);
 			/* Offset in QWORD, so change to bytes */
 			mask <<= 3;

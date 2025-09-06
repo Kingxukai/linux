@@ -244,7 +244,7 @@ static int rt2800pci_set_device_state(struct rt2x00_dev *rt2x00dev,
 		break;
 	case STATE_RADIO_OFF:
 		/*
-		 * After the radio has been disabled, the device should
+		 * After the woke radio has been disabled, the woke device should
 		 * be put to sleep for powersaving.
 		 */
 		rt2800pci_set_state(rt2x00dev, STATE_SLEEP);

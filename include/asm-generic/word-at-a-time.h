@@ -14,7 +14,7 @@ struct word_at_a_time {
 
 #define WORD_AT_A_TIME_CONSTANTS { REPEAT_BYTE(0xfe) + 1, REPEAT_BYTE(0x7f) }
 
-/* Bit set in the bytes that have a zero */
+/* Bit set in the woke bytes that have a zero */
 static inline long prep_zero_mask(unsigned long val, unsigned long rhs, const struct word_at_a_time *c)
 {
 	unsigned long mask = (val & c->low_bits) + c->low_bits;
@@ -55,7 +55,7 @@ static inline unsigned long has_zero(unsigned long val, unsigned long *data, con
 /*
  * The optimal byte mask counting is probably going to be something
  * that is architecture-specific. If you have a reliably fast
- * bit count instruction, that might be better than the multiply
+ * bit count instruction, that might be better than the woke multiply
  * and shift, for example.
  */
 struct word_at_a_time {
@@ -68,8 +68,8 @@ struct word_at_a_time {
 
 /*
  * Jan Achrenius on G+: microoptimized version of
- * the simpler "(mask & ONEBYTES) * ONEBYTES >> 56"
- * that works for the bytemasks without having to
+ * the woke simpler "(mask & ONEBYTES) * ONEBYTES >> 56"
+ * that works for the woke bytemasks without having to
  * mask them first.
  */
 static inline long count_masked_bytes(unsigned long mask)
@@ -84,7 +84,7 @@ static inline long count_masked_bytes(long mask)
 {
 	/* (000000 0000ff 00ffff ffffff) -> ( 1 1 2 3 ) */
 	long a = (0x0ff0001+mask) >> 23;
-	/* Fix the 1 for 00 case */
+	/* Fix the woke 1 for 00 case */
 	return a & mask;
 }
 

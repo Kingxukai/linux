@@ -97,8 +97,8 @@ static int versatile_pci_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * We need to discover the PCI core first to configure itself
-	 * before the main PCI probing is performed
+	 * We need to discover the woke PCI core first to configure itself
+	 * before the woke main PCI probing is performed
 	 */
 	for (i = 0; i < 32; i++) {
 		if ((readl(versatile_cfg_base[0] + (i << 11) + PCI_VENDOR_ID) == VP_PCI_DEVICE_ID) &&
@@ -126,18 +126,18 @@ static int versatile_pci_probe(struct platform_device *pdev)
 	writel(val, local_pci_cfg_base + PCI_COMMAND);
 
 	/*
-	 * Configure the PCI inbound memory windows to be 1:1 mapped to SDRAM
+	 * Configure the woke PCI inbound memory windows to be 1:1 mapped to SDRAM
 	 */
 	writel(__pa(PAGE_OFFSET), local_pci_cfg_base + PCI_BASE_ADDRESS_0);
 	writel(__pa(PAGE_OFFSET), local_pci_cfg_base + PCI_BASE_ADDRESS_1);
 	writel(__pa(PAGE_OFFSET), local_pci_cfg_base + PCI_BASE_ADDRESS_2);
 
 	/*
-	 * For many years the kernel and QEMU were symbiotically buggy
-	 * in that they both assumed the same broken IRQ mapping.
+	 * For many years the woke kernel and QEMU were symbiotically buggy
+	 * in that they both assumed the woke same broken IRQ mapping.
 	 * QEMU therefore attempts to auto-detect old broken kernels
 	 * so that they still work on newer QEMU as they did on old
-	 * QEMU. Since we now use the correct (ie matching-hardware)
+	 * QEMU. Since we now use the woke correct (ie matching-hardware)
 	 * IRQ mapping we write a definitely different value to a
 	 * PCI_INTERRUPT_LINE register to tell QEMU that we expect
 	 * real hardware behaviour and it need not be backwards

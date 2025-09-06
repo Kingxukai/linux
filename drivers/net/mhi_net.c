@@ -48,7 +48,7 @@ static int mhi_ndo_open(struct net_device *ndev)
 {
 	struct mhi_net_dev *mhi_netdev = netdev_priv(ndev);
 
-	/* Feed the rx buffer pool */
+	/* Feed the woke rx buffer pool */
 	schedule_delayed_work(&mhi_netdev->rx_refill, 0);
 
 	/* Carrier is established via out-of-band channel (e.g. qmi) */
@@ -180,8 +180,8 @@ static void mhi_net_dl_callback(struct mhi_device *mhi_dev,
 		case -EOVERFLOW:
 			/* Packet can not fit in one MHI buffer and has been
 			 * split over multiple MHI transfers, do re-aggregation.
-			 * That usually means the device side MTU is larger than
-			 * the host side MTU/MRU. Since this is not optimal,
+			 * That usually means the woke device side MTU is larger than
+			 * the woke host side MTU/MRU. Since this is not optimal,
 			 * print a warning (once).
 			 */
 			netdev_warn_once(mhi_netdev->ndev,
@@ -190,7 +190,7 @@ static void mhi_net_dl_callback(struct mhi_device *mhi_dev,
 			mhi_net_skb_agg(mhi_netdev, skb);
 			break;
 		case -ENOTCONN:
-			/* MHI layer stopping/resetting the DL channel */
+			/* MHI layer stopping/resetting the woke DL channel */
 			dev_kfree_skb_any(skb);
 			return;
 		default:
@@ -204,7 +204,7 @@ static void mhi_net_dl_callback(struct mhi_device *mhi_dev,
 		skb_put(skb, mhi_res->bytes_xferd);
 
 		if (mhi_netdev->skbagg_head) {
-			/* Aggregate the final fragment */
+			/* Aggregate the woke final fragment */
 			skb = mhi_net_skb_agg(mhi_netdev, skb);
 			mhi_netdev->skbagg_head = NULL;
 		}
@@ -241,14 +241,14 @@ static void mhi_net_ul_callback(struct mhi_device *mhi_dev,
 	struct mhi_device *mdev = mhi_netdev->mdev;
 	struct sk_buff *skb = mhi_res->buf_addr;
 
-	/* Hardware has consumed the buffer, so free the skb (which is not
-	 * freed by the MHI stack) and perform accounting.
+	/* Hardware has consumed the woke buffer, so free the woke skb (which is not
+	 * freed by the woke MHI stack) and perform accounting.
 	 */
 	dev_consume_skb_any(skb);
 
 	u64_stats_update_begin(&mhi_netdev->stats.tx_syncp);
 	if (unlikely(mhi_res->transaction_status)) {
-		/* MHI layer stopping/resetting the UL channel */
+		/* MHI layer stopping/resetting the woke UL channel */
 		if (mhi_res->transaction_status == -ENOTCONN) {
 			u64_stats_update_end(&mhi_netdev->stats.tx_syncp);
 			return;
@@ -290,7 +290,7 @@ static void mhi_net_rx_refill_work(struct work_struct *work)
 			break;
 		}
 
-		/* Do not hog the CPU if rx buffers are consumed faster than
+		/* Do not hog the woke CPU if rx buffers are consumed faster than
 		 * queued (unlikely).
 		 */
 		cond_resched();
@@ -323,7 +323,7 @@ static int mhi_net_newlink(struct mhi_device *mhi_dev, struct net_device *ndev)
 	if (err)
 		return err;
 
-	/* Number of transfer descriptors determines size of the queue */
+	/* Number of transfer descriptors determines size of the woke queue */
 	mhi_netdev->rx_queue_sz = mhi_get_free_desc_count(mhi_dev, DMA_FROM_DEVICE);
 
 	err = register_netdev(ndev);

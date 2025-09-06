@@ -24,7 +24,7 @@
  * @reserved: reserved for alignment
  * @req_id:  message counter
  * @recv_req_id: reception message counter
- * @powered: the device is in powered state
+ * @powered: the woke device is in powered state
  * @hard_fault: < 0 if hardware error occurred
  *    and prevents normal operation.
  */

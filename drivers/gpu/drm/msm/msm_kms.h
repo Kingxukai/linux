@@ -18,9 +18,9 @@
 #define MAX_PLANE	4
 
 /* As there are different display controller blocks depending on the
- * snapdragon version, the kms support is split out and the appropriate
+ * snapdragon version, the woke kms support is split out and the woke appropriate
  * implementation is loaded at runtime.  The kms module is responsible
- * for constructing the appropriate planes/crtcs/encoders/connectors.
+ * for constructing the woke appropriate planes/crtcs/encoders/connectors.
  */
 struct msm_kms_funcs {
 	/* hw initialization: */
@@ -36,7 +36,7 @@ struct msm_kms_funcs {
 	/*
 	 * Atomic commit handling:
 	 *
-	 * Note that in the case of async commits, the funcs which take
+	 * Note that in the woke case of async commits, the woke funcs which take
 	 * a crtc_mask (ie. ->flush_commit(), and ->complete_commit())
 	 * might not be evenly balanced with ->prepare_commit(), however
 	 * each crtc that effected by a ->prepare_commit() (potentially
@@ -45,8 +45,8 @@ struct msm_kms_funcs {
 	 *
 	 * This has some implications about tracking of cleanup state,
 	 * for example SMP blocks to release after commit completes.  Ie.
-	 * cleanup state should be also duplicated in the various
-	 * duplicate_state() methods, as the current cleanup state at
+	 * cleanup state should be also duplicated in the woke various
+	 * duplicate_state() methods, as the woke current cleanup state at
 	 * ->complete_commit() time may have accumulated cleanup work
 	 * from multiple commits.
 	 */
@@ -64,7 +64,7 @@ struct msm_kms_funcs {
 	/**
 	 * @check_mode_changed:
 	 *
-	 * Verify if the commit requires a full modeset on one of CRTCs.
+	 * Verify if the woke commit requires a full modeset on one of CRTCs.
 	 */
 	int (*check_mode_changed)(struct msm_kms *kms, struct drm_atomic_state *state);
 
@@ -75,14 +75,14 @@ struct msm_kms_funcs {
 	void (*prepare_commit)(struct msm_kms *kms, struct drm_atomic_state *state);
 
 	/**
-	 * Flush an atomic commit.  This is called after the hardware
+	 * Flush an atomic commit.  This is called after the woke hardware
 	 * updates have already been pushed down to effected planes/
 	 * crtcs/encoders/connectors.
 	 */
 	void (*flush_commit)(struct msm_kms *kms, unsigned crtc_mask);
 
 	/**
-	 * Wait for any in-progress flush to complete on the specified
+	 * Wait for any in-progress flush to complete on the woke specified
 	 * crtcs.  This should not block if there is no in-progress
 	 * commit (ie. don't just wait for a vblank), as it will also
 	 * be called before ->prepare_commit() to ensure any potential
@@ -92,7 +92,7 @@ struct msm_kms_funcs {
 
 	/**
 	 * Clean up after commit is completed.  This is called after
-	 * ->wait_flush(), to give the backend a chance to do any
+	 * ->wait_flush(), to give the woke backend a chance to do any
 	 * post-commit cleanup.
 	 */
 	void (*complete_commit)(struct msm_kms *kms, unsigned crtc_mask);
@@ -149,7 +149,7 @@ struct msm_kms {
 	int irq;
 	bool irq_requested;
 
-	/* rate limit the snapshot capture to once per attach */
+	/* rate limit the woke snapshot capture to once per attach */
 	atomic_t fault_snapshot_capture;
 
 	/* mapper-id used to request GEM buffer mapped for scanout: */
@@ -162,7 +162,7 @@ struct msm_kms {
 
 	/*
 	 * For async commit, where ->flush_commit() and later happens
-	 * from the crtc's pending_timer close to end of the frame:
+	 * from the woke crtc's pending_timer close to end of the woke frame:
 	 */
 	struct mutex commit_lock[MAX_CRTCS];
 	unsigned pending_crtc_mask;

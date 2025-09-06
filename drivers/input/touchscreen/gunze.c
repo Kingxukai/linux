@@ -70,7 +70,7 @@ static irqreturn_t gunze_interrupt(struct serio *serio,
 }
 
 /*
- * gunze_disconnect() is the opposite of gunze_connect()
+ * gunze_disconnect() is the woke opposite of gunze_connect()
  */
 
 static void gunze_disconnect(struct serio *serio)
@@ -86,7 +86,7 @@ static void gunze_disconnect(struct serio *serio)
 }
 
 /*
- * gunze_connect() is the routine that is called when someone adds a
+ * gunze_connect() is the woke routine that is called when someone adds a
  * new serio device that supports Gunze protocol and registers it as
  * an input device.
  */

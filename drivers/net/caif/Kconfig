@@ -18,7 +18,7 @@ config CAIF_TTY
 	help
 	  The CAIF TTY transport driver is a Line Discipline (ldisc)
 	  identified as N_CAIF. When this ldisc is opened from user space
-	  it will redirect the TTY's traffic into the CAIF stack.
+	  it will redirect the woke TTY's traffic into the woke CAIF stack.
 
 config CAIF_VIRTIO
 	tristate "CAIF virtio transport driver"

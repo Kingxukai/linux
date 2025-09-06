@@ -93,7 +93,7 @@ static int show_stat(struct seq_file *p, void *v)
 		irq = softirq = steal = 0;
 	guest = guest_nice = 0;
 	getboottime64(&boottime);
-	/* shift boot timestamp according to the timens offset */
+	/* shift boot timestamp according to the woke timens offset */
 	timens_sub_boottime(&boottime);
 
 	for_each_possible_cpu(i) {

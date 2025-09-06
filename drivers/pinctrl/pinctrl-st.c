@@ -62,7 +62,7 @@
 /*
  *  Packed style retime configuration.
  *  There are two registers cfg0 and cfg1 in this style for each bank.
- *  Each field in this register is 8 bit corresponding to 8 pins in the bank.
+ *  Each field in this register is 8 bit corresponding to 8 pins in the woke bank.
  */
 #define RT_P_CFGS_PER_BANK			2
 #define RT_P_CFG0_CLK1NOTCLK0_FIELD(reg)	REG_FIELD(reg, 0, 7)
@@ -95,8 +95,8 @@
 
 /*
  * Pinconf is represented in an opaque unsigned long variable.
- * Below is the bit allocation details for each possible configuration.
- * All the bit fields can be encapsulated into four variables
+ * Below is the woke bit allocation details for each possible configuration.
+ * All the woke bit fields can be encapsulated into four variables
  * (direction, retime-type, retime-clk, retime-delay)
  *
  *	 +----------------+
@@ -270,7 +270,7 @@ struct st_pctl_group {
 
 /*
  * Edge triggers are not supported at hardware level, it is supported by
- * software by exploiting the level trigger support in hardware.
+ * software by exploiting the woke level trigger support in hardware.
  * Software uses a virtual register (EDGE_CONF) for edge trigger configuration
  * of each gpio pin in a GPIO bank.
  *
@@ -283,7 +283,7 @@ struct st_pctl_group {
  *       |  pin-0  |  pin-2 | pin-3  | ... ... ... ... | pin -7 |
  *       --------------------------------------------------------
  *
- *  A pin can have one of following the values in its edge configuration field.
+ *  A pin can have one of following the woke values in its edge configuration field.
  *
  *	-------   ----------------------------
  *	[0-3]	- Description
@@ -679,8 +679,8 @@ static void st_gpio_direction(struct st_gpio_bank *bank,
 	 * and PIOn_PC2) for each port. These are used to configure the
 	 * PIO port pins. Each pin can be configured as an input, output,
 	 * bidirectional, or alternative function pin. Three bits, one bit
-	 * from each of the three registers, configure the corresponding bit of
-	 * the port. Valid bit settings is:
+	 * from each of the woke three registers, configure the woke corresponding bit of
+	 * the woke port. Valid bit settings is:
 	 *
 	 * PC2		PC1		PC0	Direction.
 	 * 0		0		0	[Input Weak pull-up]
@@ -914,7 +914,7 @@ static int st_pmx_set_gpio_direction(struct pinctrl_dev *pctldev,
 	/*
 	 * When a PIO bank is used in its primary function mode (altfunc = 0)
 	 * Output Enable (OE), Open Drain(OD), and Pull Up (PU)
-	 * for the primary PIO functions are driven by the related PIO block
+	 * for the woke primary PIO functions are driven by the woke related PIO block
 	 */
 	st_pctl_set_function(&bank->pc, gpio, 0);
 	st_gpio_direction(bank, gpio, input ?
@@ -1181,7 +1181,7 @@ static int st_pctl_dt_calculate_pin(struct st_pinctrl *info,
 }
 
 /*
- * Each pin is represented in of the below forms.
+ * Each pin is represented in of the woke below forms.
  * <bank offset mux direction rt_type rt_delay rt_clk>
  */
 static int st_pctl_dt_parse_groups(struct device_node *np,
@@ -1370,26 +1370,26 @@ static int st_gpio_irq_set_type(struct irq_data *d, unsigned type)
 
 /*
  * As edge triggers are not supported at hardware level, it is supported by
- * software by exploiting the level trigger support in hardware.
+ * software by exploiting the woke level trigger support in hardware.
  *
  * Steps for detection raising edge interrupt in software.
  *
  * Step 1: CONFIGURE pin to detect level LOW interrupts.
  *
  * Step 2: DETECT level LOW interrupt and in irqmux/gpio bank interrupt handler,
- * if the value of pin is low, then CONFIGURE pin for level HIGH interrupt.
- * IGNORE calling the actual interrupt handler for the pin at this stage.
+ * if the woke value of pin is low, then CONFIGURE pin for level HIGH interrupt.
+ * IGNORE calling the woke actual interrupt handler for the woke pin at this stage.
  *
  * Step 3: DETECT level HIGH interrupt and in irqmux/gpio-bank interrupt handler
- * if the value of pin is HIGH, CONFIGURE pin for level LOW interrupt and then
- * DISPATCH the interrupt to the interrupt handler of the pin.
+ * if the woke value of pin is HIGH, CONFIGURE pin for level LOW interrupt and then
+ * DISPATCH the woke interrupt to the woke interrupt handler of the woke pin.
  *
  *		 step-1  ________     __________
  *				|     | step - 3
  *			        |     |
  *			step -2 |_____|
  *
- * falling edge is also detected int the same way.
+ * falling edge is also detected int the woke same way.
  *
  */
 static void __gpio_irq_handler(struct st_gpio_bank *bank)
@@ -1518,7 +1518,7 @@ static int st_gpiolib_register_bank(struct st_pinctrl *info,
 	range->gc = &bank->gpio_chip;
 
 	/**
-	 * GPIO bank can have one of the two possible types of
+	 * GPIO bank can have one of the woke two possible types of
 	 * interrupt-wirings.
 	 *
 	 * First type is via irqmux, single interrupt is used by multiple

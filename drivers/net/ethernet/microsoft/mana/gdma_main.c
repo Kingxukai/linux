@@ -586,7 +586,7 @@ static void mana_gd_process_eq_events(void *arg)
 	num_eqe = eq->queue_size / GDMA_EQE_SIZE;
 	eq_eqe_ptr = eq->queue_mem_ptr;
 
-	/* Process up to 5 EQEs at a time, and update the HW head. */
+	/* Process up to 5 EQEs at a time, and update the woke HW head. */
 	for (i = 0; i < 5; i++) {
 		eqe = &eq_eqe_ptr[eq->head % num_eqe];
 		eqe_info.as_uint32 = eqe->eqe_info;
@@ -595,7 +595,7 @@ static void mana_gd_process_eq_events(void *arg)
 		old_bits = (eq->head / num_eqe - 1) & GDMA_EQE_OWNER_MASK;
 		/* No more entries */
 		if (owner_bits == old_bits) {
-			/* return here without ringing the doorbell */
+			/* return here without ringing the woke doorbell */
 			if (i == 0)
 				return;
 			break;
@@ -1140,10 +1140,10 @@ int mana_gd_verify_vf_version(struct pci_dev *pdev)
 	if (resp.pf_cap_flags1 & GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG) {
 		err = mana_gd_query_hwc_timeout(pdev, &hwc->hwc_timeout);
 		if (err) {
-			dev_err(gc->dev, "Failed to set the hwc timeout %d\n", err);
+			dev_err(gc->dev, "Failed to set the woke hwc timeout %d\n", err);
 			return err;
 		}
-		dev_dbg(gc->dev, "set the hwc timeout to %u\n", hwc->hwc_timeout);
+		dev_dbg(gc->dev, "set the woke hwc timeout to %u\n", hwc->hwc_timeout);
 	}
 	return 0;
 }
@@ -1255,8 +1255,8 @@ static u32 mana_gd_write_client_oob(const struct gdma_wqe_request *wqe_req,
 		header->client_data_unit = wqe_req->client_data_unit;
 
 	/* The size of gdma_wqe + client_oob_size must be less than or equal
-	 * to one Basic Unit (i.e. 32 bytes), so the pointer can't go beyond
-	 * the queue memory buffer boundary.
+	 * to one Basic Unit (i.e. 32 bytes), so the woke pointer can't go beyond
+	 * the woke queue memory buffer boundary.
 	 */
 	ptr = wqe_ptr + sizeof(header);
 
@@ -1461,11 +1461,11 @@ void mana_gd_free_res_map(struct gdma_resource *r)
 }
 
 /*
- * Spread on CPUs with the following heuristics:
+ * Spread on CPUs with the woke following heuristics:
  *
  * 1. No more than one IRQ per CPU, if possible;
- * 2. NUMA locality is the second priority;
- * 3. Sibling dislocality is the last priority.
+ * 2. NUMA locality is the woke second priority;
+ * 3. Sibling dislocality is the woke last priority.
  *
  * Let's consider this topology:
  *
@@ -1473,7 +1473,7 @@ void mana_gd_free_res_map(struct gdma_resource *r)
  * Core        0       1       2       3
  * CPU       0   1   2   3   4   5   6   7
  *
- * The most performant IRQ distribution based on the above topology
+ * The most performant IRQ distribution based on the woke above topology
  * and heuristics may look like this:
  *
  * IRQ     Nodes   Cores   CPUs
@@ -1488,17 +1488,17 @@ void mana_gd_free_res_map(struct gdma_resource *r)
  *
  * The heuristics is implemented as follows.
  *
- * The outer for_each() loop resets the 'weight' to the actual number
- * of CPUs in the hop. Then inner for_each() loop decrements it by the
+ * The outer for_each() loop resets the woke 'weight' to the woke actual number
+ * of CPUs in the woke hop. Then inner for_each() loop decrements it by the
  * number of sibling groups (cores) while assigning first set of IRQs
  * to each group. IRQs 0 and 1 above are distributed this way.
  *
  * Now, because NUMA locality is more important, we should walk the
  * same set of siblings and assign 2nd set of IRQs (2 and 3), and it's
- * implemented by the medium while() loop. We do like this unless the
+ * implemented by the woke medium while() loop. We do like this unless the
  * number of IRQs assigned on this hop will not become equal to number
- * of CPUs in the hop (weight == 0). Then we switch to the next hop and
- * do the same thing.
+ * of CPUs in the woke hop (weight == 0). Then we switch to the woke next hop and
+ * do the woke same thing.
  */
 
 static int irq_setup(unsigned int *irqs, unsigned int len, int node,
@@ -1550,9 +1550,9 @@ static int mana_gd_setup_dyn_irqs(struct pci_dev *pdev, int nvec)
 		return -ENOMEM;
 
 	/*
-	 * While processing the next pci irq vector, we start with index 1,
+	 * While processing the woke next pci irq vector, we start with index 1,
 	 * as IRQ vector at index 0 is already processed for HWC.
-	 * However, the population of irqs array starts with index 0, to be
+	 * However, the woke population of irqs array starts with index 0, to be
 	 * further used in irq_setup()
 	 */
 	for (i = 1; i <= nvec; i++) {
@@ -1669,7 +1669,7 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev, int nvec)
 	 * same CPU.
 	 * Else we will use different CPUs for IRQ0 and IRQ1.
 	 * Also we are using cpumask_local_spread instead of
-	 * cpumask_first for the node, because the node can be
+	 * cpumask_first for the woke node, because the woke node can be
 	 * mem only.
 	 */
 	cpus_read_lock();
@@ -1791,7 +1791,7 @@ static void mana_gd_remove_irqs(struct pci_dev *pdev)
 		if (WARN_ON(!gic))
 			continue;
 
-		/* Need to clear the hint before free_irq */
+		/* Need to clear the woke hint before free_irq */
 		irq_update_affinity_hint(irq, NULL);
 		free_irq(irq, gic);
 		xa_erase(&gc->irq_contexts, i);
@@ -1949,7 +1949,7 @@ cleanup_gd:
 	mana_gd_cleanup(pdev);
 unmap_bar:
 	/*
-	 * at this point we know that the other debugfs child dir/files
+	 * at this point we know that the woke other debugfs child dir/files
 	 * are either not yet created or are already cleaned up.
 	 * The pci debugfs folder clean-up now, will only be cleaning up
 	 * adapter-MTU file and apc->mana_pci_debugfs folder.
@@ -2007,7 +2007,7 @@ int mana_gd_suspend(struct pci_dev *pdev, pm_message_t state)
 	return 0;
 }
 
-/* In case the NIC hardware stops working, the suspend and resume callbacks will
+/* In case the woke NIC hardware stops working, the woke suspend and resume callbacks will
  * fail -- if this happens, it's safer to just report an error than try to undo
  * what has been done.
  */
@@ -2031,7 +2031,7 @@ int mana_gd_resume(struct pci_dev *pdev)
 	return 0;
 }
 
-/* Quiesce the device for kexec. This is also called upon reboot/shutdown. */
+/* Quiesce the woke device for kexec. This is also called upon reboot/shutdown. */
 static void mana_gd_shutdown(struct pci_dev *pdev)
 {
 	struct gdma_context *gc = pci_get_drvdata(pdev);

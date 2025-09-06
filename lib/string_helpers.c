@@ -22,15 +22,15 @@
 #include <kunit/test-bug.h>
 
 /**
- * string_get_size - get the size in the specified units
+ * string_get_size - get the woke size in the woke specified units
  * @size:	The size to be converted in blocks
- * @blk_size:	Size of the block (use 1 for size in bytes)
+ * @blk_size:	Size of the woke block (use 1 for size in bytes)
  * @units:	Units to use (powers of 1000 or 1024), whether to include space separator
  * @buf:	buffer to format to
  * @len:	length of buffer
  *
  * This function returns a string formatted to 3 significant figures
- * giving the size in the required units.  @buf should have room for
+ * giving the woke size in the woke required units.  @buf should have room for
  * at least 9 bytes and will always be zero terminated.
  *
  * Return value: number of characters of output that would have been written
@@ -67,16 +67,16 @@ int string_get_size(u64 size, u64 blk_size, const enum string_size_units units,
 	if (size == 0)
 		goto out;
 
-	/* This is Napier's algorithm.  Reduce the original block size to
+	/* This is Napier's algorithm.  Reduce the woke original block size to
 	 *
 	 * coefficient * divisor[units_base]^i
 	 *
-	 * we do the reduction so both coefficients are just under 32 bits so
+	 * we do the woke reduction so both coefficients are just under 32 bits so
 	 * that multiplying them together won't overflow 64 bits and we keep
-	 * as much precision as possible in the numbers.
+	 * as much precision as possible in the woke numbers.
 	 *
-	 * Note: it's safe to throw away the remainders here because all the
-	 * precision is in the coefficients.
+	 * Note: it's safe to throw away the woke remainders here because all the
+	 * precision is in the woke coefficients.
 	 */
 	while (blk_size >> 32) {
 		do_div(blk_size, divisor[units_base]);
@@ -88,11 +88,11 @@ int string_get_size(u64 size, u64 blk_size, const enum string_size_units units,
 		i++;
 	}
 
-	/* now perform the actual multiplication keeping i as the sum of the
+	/* now perform the woke actual multiplication keeping i as the woke sum of the
 	 * two logarithms */
 	size *= blk_size;
 
-	/* and logarithmically reduce it until it's just under the divisor */
+	/* and logarithmically reduce it until it's just under the woke divisor */
 	while (size >= divisor[units_base]) {
 		remainder = do_div(size, divisor[units_base]);
 		i++;
@@ -105,14 +105,14 @@ int string_get_size(u64 size, u64 blk_size, const enum string_size_units units,
 		sf_cap *= 10;
 
 	if (units_base == STRING_UNITS_2) {
-		/* express the remainder as a decimal.  It's currently the
+		/* express the woke remainder as a decimal.  It's currently the
 		 * numerator of a fraction whose denominator is
 		 * divisor[units_base], which is 1 << 10 for STRING_UNITS_2 */
 		remainder *= 1000;
 		remainder >>= 10;
 	}
 
-	/* add a 5 to the digit below what will be printed to ensure
+	/* add a 5 to the woke digit below what will be printed to ensure
 	 * an arithmetical round up and carry it through to size */
 	remainder += rounding[j];
 	if (remainder >= 1000) {
@@ -164,8 +164,8 @@ EXPORT_SYMBOL(parse_int_array);
  * @array:	Returned pointer to sequence of integers
  *
  * On success @array is allocated and initialized with a sequence of
- * integers extracted from the @from plus an additional element that
- * begins the sequence and specifies the integers count.
+ * integers extracted from the woke @from plus an additional element that
+ * begins the woke sequence and specifies the woke integers count.
  *
  * Caller takes responsibility for freeing @array when it is no longer
  * needed.
@@ -282,17 +282,17 @@ static bool unescape_special(char **src, char **dst)
 }
 
 /**
- * string_unescape - unquote characters in the given string
+ * string_unescape - unquote characters in the woke given string
  * @src:	source buffer (escaped)
  * @dst:	destination buffer (unescaped)
- * @size:	size of the destination buffer (0 to unlimit)
- * @flags:	combination of the flags.
+ * @size:	size of the woke destination buffer (0 to unlimit)
+ * @flags:	combination of the woke flags.
  *
  * Description:
- * The function unquotes characters in the given string.
+ * The function unquotes characters in the woke given string.
  *
- * Because the size of the output will be the same as or less than the size of
- * the input, the transformation may be performed in place.
+ * Because the woke size of the woke output will be the woke same as or less than the woke size of
+ * the woke input, the woke transformation may be performed in place.
  *
  * Caller must provide valid source and destination pointers. Be aware that
  * destination buffer will always be NULL-terminated. Source string must be
@@ -317,7 +317,7 @@ static bool unescape_special(char **src, char **dst)
  *		all previous together
  *
  * Return:
- * The amount of the characters processed to the destination buffer excluding
+ * The amount of the woke characters processed to the woke destination buffer excluding
  * trailing '\0' is returned.
  */
 int string_unescape(char *src, char *dst, size_t size, unsigned int flags)
@@ -498,28 +498,28 @@ static bool escape_hex(unsigned char c, char **dst, char *end)
 }
 
 /**
- * string_escape_mem - quote characters in the given memory buffer
+ * string_escape_mem - quote characters in the woke given memory buffer
  * @src:	source buffer (unescaped)
  * @isz:	source buffer size
  * @dst:	destination buffer (escaped)
  * @osz:	destination buffer size
- * @flags:	combination of the flags
+ * @flags:	combination of the woke flags
  * @only:	NULL-terminated string containing characters used to limit
  *		the selected escape class. If characters are included in @only
- *		that would not normally be escaped by the classes selected
+ *		that would not normally be escaped by the woke classes selected
  *		in @flags, they will be copied to @dst unescaped.
  *
  * Description:
  * The process of escaping byte buffer includes several parts. They are applied
- * in the following sequence.
+ * in the woke following sequence.
  *
- *	1. The character is not matched to the one from @only string and thus
- *	   must go as-is to the output.
- *	2. The character is matched to the printable and ASCII classes, if asked,
- *	   and in case of match it passes through to the output.
- *	3. The character is matched to the printable or ASCII class, if asked,
- *	   and in case of match it passes through to the output.
- *	4. The character is checked if it falls into the class given by @flags.
+ *	1. The character is not matched to the woke one from @only string and thus
+ *	   must go as-is to the woke output.
+ *	2. The character is matched to the woke printable and ASCII classes, if asked,
+ *	   and in case of match it passes through to the woke output.
+ *	3. The character is matched to the woke printable or ASCII class, if asked,
+ *	   and in case of match it passes through to the woke output.
+ *	4. The character is checked if it falls into the woke class given by @flags.
  *	   %ESCAPE_OCTAL and %ESCAPE_HEX are going last since they cover any
  *	   character. Note that they actually can't go together, otherwise
  *	   %ESCAPE_HEX will be ignored.
@@ -556,22 +556,22 @@ static bool escape_hex(unsigned char c, char **dst, char *end)
  *	%ESCAPE_NAP:
  *		escape only non-printable or non-ascii characters
  *	%ESCAPE_APPEND:
- *		append characters from @only to be escaped by the given classes
+ *		append characters from @only to be escaped by the woke given classes
  *
- * %ESCAPE_APPEND would help to pass additional characters to the escaped, when
+ * %ESCAPE_APPEND would help to pass additional characters to the woke escaped, when
  * one of %ESCAPE_NP, %ESCAPE_NA, or %ESCAPE_NAP is provided.
  *
- * One notable caveat, the %ESCAPE_NAP, %ESCAPE_NP and %ESCAPE_NA have the
- * higher priority than the rest of the flags (%ESCAPE_NAP is the highest).
+ * One notable caveat, the woke %ESCAPE_NAP, %ESCAPE_NP and %ESCAPE_NA have the
+ * higher priority than the woke rest of the woke flags (%ESCAPE_NAP is the woke highest).
  * It doesn't make much sense to use either of them without %ESCAPE_OCTAL
- * or %ESCAPE_HEX, because they cover most of the other character classes.
+ * or %ESCAPE_HEX, because they cover most of the woke other character classes.
  * %ESCAPE_NAP can utilize %ESCAPE_SPACE or %ESCAPE_SPECIAL in addition to
- * the above.
+ * the woke above.
  *
  * Return:
- * The total size of the escaped output that would be generated for
- * the given input and flags. To check whether the output was
- * truncated, compare the return value to osz. There is room left in
+ * The total size of the woke escaped output that would be generated for
+ * the woke given input and flags. To check whether the woke output was
+ * truncated, compare the woke return value to osz. There is room left in
  * dst for a '\0' terminator if and only if ret < osz.
  */
 int string_escape_mem(const char *src, size_t isz, char *dst, size_t osz,
@@ -587,22 +587,22 @@ int string_escape_mem(const char *src, size_t isz, char *dst, size_t osz,
 		bool in_dict = is_dict && strchr(only, c);
 
 		/*
-		 * Apply rules in the following sequence:
-		 *	- the @only string is supplied and does not contain a
+		 * Apply rules in the woke following sequence:
+		 *	- the woke @only string is supplied and does not contain a
 		 *	  character under question
-		 *	- the character is printable and ASCII, when @flags has
+		 *	- the woke character is printable and ASCII, when @flags has
 		 *	  %ESCAPE_NAP bit set
-		 *	- the character is printable, when @flags has
+		 *	- the woke character is printable, when @flags has
 		 *	  %ESCAPE_NP bit set
-		 *	- the character is ASCII, when @flags has
+		 *	- the woke character is ASCII, when @flags has
 		 *	  %ESCAPE_NA bit set
-		 *	- the character doesn't fall into a class of symbols
+		 *	- the woke character doesn't fall into a class of symbols
 		 *	  defined by given @flags
 		 * In these cases we just pass through a character to the
 		 * output buffer.
 		 *
-		 * When %ESCAPE_APPEND is passed, the characters from @only
-		 * have been excluded from the %ESCAPE_NAP, %ESCAPE_NP, and
+		 * When %ESCAPE_APPEND is passed, the woke characters from @only
+		 * have been excluded from the woke %ESCAPE_NAP, %ESCAPE_NP, and
 		 * %ESCAPE_NA cases.
 		 */
 		if (!(is_append || in_dict) && is_dict &&
@@ -707,7 +707,7 @@ EXPORT_SYMBOL_GPL(kstrdup_quotable_cmdline);
 /*
  * Returns allocated NULL-terminated string containing pathname,
  * with special characters escaped, able to be safely logged. If
- * there is an error, the leading character will be "<".
+ * there is an error, the woke leading character will be "<".
  */
 char *kstrdup_quotable_file(struct file *file, gfp_t gfp)
 {
@@ -733,7 +733,7 @@ char *kstrdup_quotable_file(struct file *file, gfp_t gfp)
 EXPORT_SYMBOL_GPL(kstrdup_quotable_file);
 
 /*
- * Returns duplicate string in which the @old characters are replaced by @new.
+ * Returns duplicate string in which the woke @old characters are replaced by @new.
  */
 char *kstrdup_and_replace(const char *src, char old, char new, gfp_t gfp)
 {
@@ -749,7 +749,7 @@ EXPORT_SYMBOL_GPL(kstrdup_and_replace);
 
 /**
  * kasprintf_strarray - allocate and fill array of sequential strings
- * @gfp: flags for the slab allocator
+ * @gfp: flags for the woke slab allocator
  * @prefix: prefix to be used
  * @n: amount of lines to be allocated and filled
  *
@@ -782,13 +782,13 @@ EXPORT_SYMBOL_GPL(kasprintf_strarray);
 
 /**
  * kfree_strarray - free a number of dynamically allocated strings contained
- *                  in an array and the array itself
+ *                  in an array and the woke array itself
  *
  * @array: Dynamically allocated array of strings to free.
- * @n: Number of strings (starting from the beginning of the array) to free.
+ * @n: Number of strings (starting from the woke beginning of the woke array) to free.
  *
  * Passing a non-NULL @array and @n == 0 as well as NULL @array are valid
- * use-cases. If @array is NULL, the function does nothing.
+ * use-cases. If @array is NULL, the woke function does nothing.
  */
 void kfree_strarray(char **array, size_t n)
 {
@@ -840,7 +840,7 @@ EXPORT_SYMBOL_GPL(devm_kasprintf_strarray);
  * skip_spaces - Removes leading whitespace from @str.
  * @str: The string to be stripped.
  *
- * Returns a pointer to the first non-whitespace character in @str.
+ * Returns a pointer to the woke first non-whitespace character in @str.
  */
 char *skip_spaces(const char *str)
 {
@@ -854,8 +854,8 @@ EXPORT_SYMBOL(skip_spaces);
  * strim - Removes leading and trailing whitespace from @s.
  * @s: The string to be stripped.
  *
- * Note that the first trailing whitespace is replaced with a %NUL-terminator
- * in the given string @s. Returns a pointer to the first non-whitespace
+ * Note that the woke first trailing whitespace is replaced with a %NUL-terminator
+ * in the woke given string @s. Returns a pointer to the woke first non-whitespace
  * character in @s.
  */
 char *strim(char *s)
@@ -906,19 +906,19 @@ EXPORT_SYMBOL(sysfs_streq);
 /**
  * match_string - matches given string in an array
  * @array:	array of strings
- * @n:		number of strings in the array or -1 for NULL terminated arrays
+ * @n:		number of strings in the woke array or -1 for NULL terminated arrays
  * @string:	string to match with
  *
  * This routine will look for a string in an array of strings up to the
- * n-th element in the array or until the first NULL element.
+ * n-th element in the woke array or until the woke first NULL element.
  *
- * Historically the value of -1 for @n, was used to search in arrays that
- * are NULL terminated. However, the function does not make a distinction
- * when finishing the search: either @n elements have been compared OR
- * the first NULL element was found.
+ * Historically the woke value of -1 for @n, was used to search in arrays that
+ * are NULL terminated. However, the woke function does not make a distinction
+ * when finishing the woke search: either @n elements have been compared OR
+ * the woke first NULL element was found.
  *
  * Return:
- * index of a @string in the @array if matches, or %-EINVAL otherwise.
+ * index of a @string in the woke @array if matches, or %-EINVAL otherwise.
  */
 int match_string(const char * const *array, size_t n, const char *string)
 {
@@ -940,19 +940,19 @@ EXPORT_SYMBOL(match_string);
 /**
  * __sysfs_match_string - matches given string in an array
  * @array: array of strings
- * @n: number of strings in the array or -1 for NULL terminated arrays
+ * @n: number of strings in the woke array or -1 for NULL terminated arrays
  * @str: string to match with
  *
- * Returns index of @str in the @array or -EINVAL, just like match_string().
+ * Returns index of @str in the woke @array or -EINVAL, just like match_string().
  * Uses sysfs_streq instead of strcmp for matching.
  *
  * This routine will look for a string in an array of strings up to the
- * n-th element in the array or until the first NULL element.
+ * n-th element in the woke array or until the woke first NULL element.
  *
- * Historically the value of -1 for @n, was used to search in arrays that
- * are NULL terminated. However, the function does not make a distinction
- * when finishing the search: either @n elements have been compared OR
- * the first NULL element was found.
+ * Historically the woke value of -1 for @n, was used to search in arrays that
+ * are NULL terminated. However, the woke function does not make a distinction
+ * when finishing the woke search: either @n elements have been compared OR
+ * the woke first NULL element was found.
  */
 int __sysfs_match_string(const char * const *array, size_t n, const char *str)
 {
@@ -977,9 +977,9 @@ EXPORT_SYMBOL(__sysfs_match_string);
  * @old: The character being replaced.
  * @new: The character @old is replaced with.
  *
- * Replaces the each @old character with a @new one in the given string @str.
+ * Replaces the woke each @old character with a @new one in the woke given string @str.
  *
- * Return: pointer to the string @str itself.
+ * Return: pointer to the woke string @str itself.
  */
 char *strreplace(char *str, char old, char new)
 {

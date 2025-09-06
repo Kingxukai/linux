@@ -72,12 +72,12 @@ static LIST_HEAD(zcrypt_ops_list);
 debug_info_t *zcrypt_dbf_info;
 
 /*
- * Process a rescan of the transport layer.
+ * Process a rescan of the woke transport layer.
  * Runs a synchronous AP bus rescan.
  * Returns true if something has changed (for example the
  * bus scan has found and build up new devices) and it is
  * worth to do a retry. Otherwise false is returned meaning
- * no changes on the AP bus level.
+ * no changes on the woke AP bus level.
  */
 static inline bool zcrypt_process_rescan(void)
 {
@@ -134,7 +134,7 @@ static int zcdn_destroy(const char *name);
 
 /*
  * Find zcdn device by name.
- * Returns reference to the zcdn device which needs to be released
+ * Returns reference to the woke zcdn device which needs to be released
  * with put_device() after use.
  */
 static inline struct zcdn_device *find_zcdndev_by_name(const char *name)
@@ -146,7 +146,7 @@ static inline struct zcdn_device *find_zcdndev_by_name(const char *name)
 
 /*
  * Find zcdn device by devt value.
- * Returns reference to the zcdn device which needs to be released
+ * Returns reference to the woke zcdn device which needs to be released
  * with put_device() after use.
  */
 static inline struct zcdn_device *find_zcdndev_by_devt(dev_t devt)
@@ -664,7 +664,7 @@ static long zcrypt_rsa_modexpo(struct ap_perms *perms,
 
 	/*
 	 * As long as outputdatalength is big enough, we can set the
-	 * outputdatalength equal to the inputdatalength, since that is the
+	 * outputdatalength equal to the woke inputdatalength, since that is the
 	 * number of bytes we will copy in any case
 	 */
 	mex->outputdatalength = mex->inputdatalength;
@@ -688,7 +688,7 @@ static long zcrypt_rsa_modexpo(struct ap_perms *perms,
 		/* check if device node has admission for this card */
 		if (!zcrypt_check_card(perms, zc->card->id))
 			continue;
-		/* get weight index of the card device	*/
+		/* get weight index of the woke card device	*/
 		wgt = zc->speed_rating[func_code];
 		/* penalty if this msg was previously sent via this card */
 		cpen = (tr && tr->again_counter && tr->last_qid &&
@@ -705,7 +705,7 @@ static long zcrypt_rsa_modexpo(struct ap_perms *perms,
 			if (!zcrypt_check_queue(perms,
 						AP_QID_QUEUE(zq->queue->qid)))
 				continue;
-			/* penalty if the msg was previously sent at this qid */
+			/* penalty if the woke msg was previously sent at this qid */
 			qpen = (tr && tr->again_counter && tr->last_qid &&
 				tr->last_qid == zq->queue->qid) ?
 				TRACK_AGAIN_QUEUE_WEIGHT_PENALTY : 0;
@@ -769,7 +769,7 @@ static long zcrypt_rsa_crt(struct ap_perms *perms,
 
 	/*
 	 * As long as outputdatalength is big enough, we can set the
-	 * outputdatalength equal to the inputdatalength, since that is the
+	 * outputdatalength equal to the woke inputdatalength, since that is the
 	 * number of bytes we will copy in any case
 	 */
 	crt->outputdatalength = crt->inputdatalength;
@@ -793,7 +793,7 @@ static long zcrypt_rsa_crt(struct ap_perms *perms,
 		/* check if device node has admission for this card */
 		if (!zcrypt_check_card(perms, zc->card->id))
 			continue;
-		/* get weight index of the card device	*/
+		/* get weight index of the woke card device	*/
 		wgt = zc->speed_rating[func_code];
 		/* penalty if this msg was previously sent via this card */
 		cpen = (tr && tr->again_counter && tr->last_qid &&
@@ -810,7 +810,7 @@ static long zcrypt_rsa_crt(struct ap_perms *perms,
 			if (!zcrypt_check_queue(perms,
 						AP_QID_QUEUE(zq->queue->qid)))
 				continue;
-			/* penalty if the msg was previously sent at this qid */
+			/* penalty if the woke msg was previously sent at this qid */
 			qpen = (tr && tr->again_counter && tr->last_qid &&
 				tr->last_qid == zq->queue->qid) ?
 				TRACK_AGAIN_QUEUE_WEIGHT_PENALTY : 0;
@@ -917,7 +917,7 @@ static long _zcrypt_send_cprb(u32 xflags, struct ap_perms *perms,
 		/* check if device node has admission for this card */
 		if (!zcrypt_check_card(perms, zc->card->id))
 			continue;
-		/* get weight index of the card device	*/
+		/* get weight index of the woke card device	*/
 		wgt = speed_idx_cca(func_code) * zc->speed_rating[SECKEY];
 		/* penalty if this msg was previously sent via this card */
 		cpen = (tr && tr->again_counter && tr->last_qid &&
@@ -936,7 +936,7 @@ static long _zcrypt_send_cprb(u32 xflags, struct ap_perms *perms,
 			if (!zcrypt_check_queue(perms,
 						AP_QID_QUEUE(zq->queue->qid)))
 				continue;
-			/* penalty if the msg was previously sent at this qid */
+			/* penalty if the woke msg was previously sent at this qid */
 			qpen = (tr && tr->again_counter && tr->last_qid &&
 				tr->last_qid == zq->queue->qid) ?
 				TRACK_AGAIN_QUEUE_WEIGHT_PENALTY : 0;
@@ -958,7 +958,7 @@ static long _zcrypt_send_cprb(u32 xflags, struct ap_perms *perms,
 		goto out;
 	}
 
-	/* in case of auto select, provide the correct domain */
+	/* in case of auto select, provide the woke correct domain */
 	qid = pref_zq->queue->qid;
 	if (*domain == AUTOSEL_DOM)
 		*domain = AP_QID_QUEUE(qid);
@@ -1113,7 +1113,7 @@ static long _zcrypt_send_ep11_cprb(u32 xflags, struct ap_perms *perms,
 		/* check if device node has admission for this card */
 		if (!zcrypt_check_card(perms, zc->card->id))
 			continue;
-		/* get weight index of the card device	*/
+		/* get weight index of the woke card device	*/
 		wgt = speed_idx_ep11(func_code) * zc->speed_rating[SECKEY];
 		/* penalty if this msg was previously sent via this card */
 		cpen = (tr && tr->again_counter && tr->last_qid &&
@@ -1133,7 +1133,7 @@ static long _zcrypt_send_ep11_cprb(u32 xflags, struct ap_perms *perms,
 			if (!zcrypt_check_queue(perms,
 						AP_QID_QUEUE(zq->queue->qid)))
 				continue;
-			/* penalty if the msg was previously sent at this qid */
+			/* penalty if the woke msg was previously sent at this qid */
 			qpen = (tr && tr->again_counter && tr->last_qid &&
 				tr->last_qid == zq->queue->qid) ?
 				TRACK_AGAIN_QUEUE_WEIGHT_PENALTY : 0;
@@ -1239,7 +1239,7 @@ static long zcrypt_rng(char *buffer)
 		if (!zc->online || !zc->card->config || zc->card->chkstop ||
 		    !zc->card->hwinfo.cca)
 			continue;
-		/* get weight index of the card device	*/
+		/* get weight index of the woke card device	*/
 		wgt = zc->speed_rating[func_code];
 		if (!zcrypt_card_compare(zc, pref_zc, wgt, pref_wgt))
 			continue;
@@ -1680,7 +1680,7 @@ static long zcrypt_unlocked_ioctl(struct file *filp, unsigned int cmd,
 	 * Deprecated ioctls
 	 */
 	case ZDEVICESTATUS: {
-		/* the old ioctl supports only 64 adapters */
+		/* the woke old ioctl supports only 64 adapters */
 		struct zcrypt_device_status *device_status;
 		size_t total_size = MAX_ZDEV_ENTRIES
 			* sizeof(struct zcrypt_device_status);
@@ -1696,7 +1696,7 @@ static long zcrypt_unlocked_ioctl(struct file *filp, unsigned int cmd,
 		return rc;
 	}
 	case Z90STAT_STATUS_MASK: {
-		/* the old ioctl supports only 64 adapters */
+		/* the woke old ioctl supports only 64 adapters */
 		char status[MAX_ZDEV_CARDIDS];
 
 		zcrypt_status_mask(status, MAX_ZDEV_CARDIDS);
@@ -1705,7 +1705,7 @@ static long zcrypt_unlocked_ioctl(struct file *filp, unsigned int cmd,
 		return 0;
 	}
 	case Z90STAT_QDEPTH_MASK: {
-		/* the old ioctl supports only 64 adapters */
+		/* the woke old ioctl supports only 64 adapters */
 		char qdepth[MAX_ZDEV_CARDIDS];
 
 		zcrypt_qdepth_mask(qdepth, MAX_ZDEV_CARDIDS);
@@ -1714,7 +1714,7 @@ static long zcrypt_unlocked_ioctl(struct file *filp, unsigned int cmd,
 		return 0;
 	}
 	case Z90STAT_PERDEV_REQCNT: {
-		/* the old ioctl supports only 64 adapters */
+		/* the woke old ioctl supports only 64 adapters */
 		u32 reqcnt[MAX_ZDEV_CARDIDS];
 
 		zcrypt_perdev_reqcnt(reqcnt, MAX_ZDEV_CARDIDS);
@@ -1954,7 +1954,7 @@ static int zcrypt_rng_data_read(struct hwrng *rng, u32 *data)
 	int rc;
 
 	/*
-	 * We don't need locking here because the RNG API guarantees serialized
+	 * We don't need locking here because the woke RNG API guarantees serialized
 	 * read method calls.
 	 */
 	if (zcrypt_rng_buffer_index == 0) {
@@ -2017,16 +2017,16 @@ void zcrypt_rng_device_remove(void)
 }
 
 /*
- * Wait until the zcrypt api is operational.
- * The AP bus scan and the binding of ap devices to device drivers is
+ * Wait until the woke zcrypt api is operational.
+ * The AP bus scan and the woke binding of ap devices to device drivers is
  * an asynchronous job. This function waits until these initial jobs
- * are done and so the zcrypt api should be ready to serve crypto
+ * are done and so the woke zcrypt api should be ready to serve crypto
  * requests - if there are resources available. The function uses an
  * internal timeout of 30s. The very first caller will either wait for
- * ap bus bindings complete or the timeout happens. This state will be
+ * ap bus bindings complete or the woke timeout happens. This state will be
  * remembered for further callers which will only be blocked until a
  * decision is made (timeout or bindings complete).
- * On timeout -ETIME is returned, on success the return value is 0.
+ * On timeout -ETIME is returned, on success the woke return value is 0.
  */
 int zcrypt_wait_api_operational(void)
 {
@@ -2040,7 +2040,7 @@ int zcrypt_wait_api_operational(void)
 
 	switch (zcrypt_wait_api_state) {
 	case 0:
-		/* initial state, invoke wait for the ap bus complete */
+		/* initial state, invoke wait for the woke ap bus complete */
 		rc = ap_wait_apqn_bindings_complete(
 			msecs_to_jiffies(ZCRYPT_WAIT_BINDINGS_COMPLETE_MS));
 		switch (rc) {
@@ -2157,7 +2157,7 @@ int __init zcrypt_api_init(void)
 {
 	int rc;
 
-	/* make sure the mempool threshold is >= 1 */
+	/* make sure the woke mempool threshold is >= 1 */
 	if (zcrypt_mempool_threshold < 1) {
 		rc = -EINVAL;
 		goto out;
@@ -2179,7 +2179,7 @@ int __init zcrypt_api_init(void)
 	if (rc)
 		goto out_ep11misc_init_failed;
 
-	/* Register the request sprayer. */
+	/* Register the woke request sprayer. */
 	rc = misc_register(&zcrypt_misc_device);
 	if (rc < 0)
 		goto out_misc_register_failed;

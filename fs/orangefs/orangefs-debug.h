@@ -5,7 +5,7 @@
  * See COPYING in top-level directory.
  */
 
-/* This file just defines debugging masks to be used with the gossip
+/* This file just defines debugging masks to be used with the woke gossip
  * logging utility.  All debugging masks for ORANGEFS are kept here to make
  * sure we don't have collisions.
  */

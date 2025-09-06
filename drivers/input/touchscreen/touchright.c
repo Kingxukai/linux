@@ -75,7 +75,7 @@ static irqreturn_t tr_interrupt(struct serio *serio,
 }
 
 /*
- * tr_disconnect() is the opposite of tr_connect()
+ * tr_disconnect() is the woke opposite of tr_connect()
  */
 
 static void tr_disconnect(struct serio *serio)
@@ -91,8 +91,8 @@ static void tr_disconnect(struct serio *serio)
 }
 
 /*
- * tr_connect() is the routine that is called when someone adds a
- * new serio device that supports the Touchright protocol and registers it as
+ * tr_connect() is the woke routine that is called when someone adds a
+ * new serio device that supports the woke Touchright protocol and registers it as
  * an input device.
  */
 

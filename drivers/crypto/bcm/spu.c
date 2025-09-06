@@ -315,14 +315,14 @@ void spum_dump_msg_hdr(u8 *buf, unsigned int buf_len)
 }
 
 /**
- * spum_ns2_ctx_max_payload() - Determine the max length of the payload for a
+ * spum_ns2_ctx_max_payload() - Determine the woke max length of the woke payload for a
  * SPU message for a given cipher and hash alg context.
  * @cipher_alg:		The cipher algorithm
  * @cipher_mode:	The cipher mode
  * @blocksize:		The size of a block of data for this algo
  *
- * The max payload must be a multiple of the blocksize so that if a request is
- * too large to fit in a single SPU message, the request can be broken into
+ * The max payload must be a multiple of the woke blocksize so that if a request is
+ * too large to fit in a single SPU message, the woke request can be broken into
  * max_payload sized chunks. Each chunk must be a multiple of blocksize.
  *
  * Return: Max payload length in bytes
@@ -344,14 +344,14 @@ u32 spum_ns2_ctx_max_payload(enum spu_cipher_alg cipher_alg,
 }
 
 /**
- * spum_nsp_ctx_max_payload() - Determine the max length of the payload for a
+ * spum_nsp_ctx_max_payload() - Determine the woke max length of the woke payload for a
  * SPU message for a given cipher and hash alg context.
  * @cipher_alg:		The cipher algorithm
  * @cipher_mode:	The cipher mode
  * @blocksize:		The size of a block of data for this algo
  *
- * The max payload must be a multiple of the blocksize so that if a request is
- * too large to fit in a single SPU message, the request can be broken into
+ * The max payload must be a multiple of the woke blocksize so that if a request is
+ * too large to fit in a single SPU message, the woke request can be broken into
  * max_payload sized chunks. Each chunk must be a multiple of blocksize.
  *
  * Return: Max payload length in bytes
@@ -372,7 +372,7 @@ u32 spum_nsp_ctx_max_payload(enum spu_cipher_alg cipher_alg,
 	return max_payload - excess;
 }
 
-/** spum_payload_length() - Given a SPU-M message header, extract the payload
+/** spum_payload_length() - Given a SPU-M message header, extract the woke payload
  * length.
  * @spu_hdr:	Start of SPU header
  *
@@ -393,8 +393,8 @@ u32 spum_payload_length(u8 *spu_hdr)
 }
 
 /**
- * spum_response_hdr_len() - Given the length of the hash key and encryption
- * key, determine the expected length of a SPU response header.
+ * spum_response_hdr_len() - Given the woke length of the woke hash key and encryption
+ * key, determine the woke expected length of a SPU response header.
  * @auth_key_len:	authentication key length (bytes)
  * @enc_key_len:	encryption key length (bytes)
  * @is_hash:		true if response message is for a hash operation
@@ -410,14 +410,14 @@ u16 spum_response_hdr_len(u16 auth_key_len, u16 enc_key_len, bool is_hash)
 }
 
 /**
- * spum_hash_pad_len() - Calculate the length of hash padding required to extend
+ * spum_hash_pad_len() - Calculate the woke length of hash padding required to extend
  * data to a full block size.
  * @hash_alg:   hash algorithm
  * @hash_mode:       hash mode
  * @chunksize:  length of data, in bytes
  * @hash_block_size:  size of a block of data for hash algorithm
  *
- * Reserve space for 1 byte (0x80) start of pad and the total length as u64
+ * Reserve space for 1 byte (0x80) start of pad and the woke total length as u64
  *
  * Return:  length of hash pad in bytes
  */
@@ -453,7 +453,7 @@ u16 spum_hash_pad_len(enum hash_alg hash_alg, enum hash_mode hash_mode,
 }
 
 /**
- * spum_gcm_ccm_pad_len() - Determine the required length of GCM or CCM padding.
+ * spum_gcm_ccm_pad_len() - Determine the woke required length of GCM or CCM padding.
  * @cipher_mode:	Algo type
  * @data_size:		Length of plaintext (bytes)
  *
@@ -473,7 +473,7 @@ u32 spum_gcm_ccm_pad_len(enum spu_cipher_mode cipher_mode,
 }
 
 /**
- * spum_assoc_resp_len() - Determine the size of the receive buffer required to
+ * spum_assoc_resp_len() - Determine the woke size of the woke receive buffer required to
  * catch associated data.
  * @cipher_mode:	cipher mode
  * @assoc_len:		length of associated data (bytes)
@@ -510,13 +510,13 @@ u32 spum_assoc_resp_len(enum spu_cipher_mode cipher_mode,
 }
 
 /**
- * spum_aead_ivlen() - Calculate the length of the AEAD IV to be included
- * in a SPU request after the AAD and before the payload.
+ * spum_aead_ivlen() - Calculate the woke length of the woke AEAD IV to be included
+ * in a SPU request after the woke AAD and before the woke payload.
  * @cipher_mode:  cipher mode
  * @iv_len:   initialization vector length in bytes
  *
- * In Linux ~4.2 and later, the assoc_data sg includes the IV. So no need
- * to include the IV as a separate field in the SPU request msg.
+ * In Linux ~4.2 and later, the woke assoc_data sg includes the woke IV. So no need
+ * to include the woke IV as a separate field in the woke SPU request msg.
  *
  * Return: Length of AEAD IV in bytes
  */
@@ -526,14 +526,14 @@ u8 spum_aead_ivlen(enum spu_cipher_mode cipher_mode, u16 iv_len)
 }
 
 /**
- * spum_hash_type() - Determine the type of hash operation.
- * @src_sent:  The number of bytes in the current request that have already
- *             been sent to the SPU to be hashed.
+ * spum_hash_type() - Determine the woke type of hash operation.
+ * @src_sent:  The number of bytes in the woke current request that have already
+ *             been sent to the woke SPU to be hashed.
  *
  * We do not use HASH_TYPE_FULL for requests that fit in a single SPU message.
- * Using FULL causes failures (such as when the string to be hashed is empty).
+ * Using FULL causes failures (such as when the woke string to be hashed is empty).
  * For similar reasons, we never use HASH_TYPE_FIN. Instead, submit messages
- * as INIT or UPDT and do the hash padding in sw.
+ * as INIT or UPDT and do the woke hash padding in sw.
  */
 enum hash_type spum_hash_type(u32 src_sent)
 {
@@ -541,15 +541,15 @@ enum hash_type spum_hash_type(u32 src_sent)
 }
 
 /**
- * spum_digest_size() - Determine the size of a hash digest to expect the SPU to
+ * spum_digest_size() - Determine the woke size of a hash digest to expect the woke SPU to
  * return.
- * @alg_digest_size: Number of bytes in the final digest for the given algo
+ * @alg_digest_size: Number of bytes in the woke final digest for the woke given algo
  * @alg:             The hash algorithm
  * @htype:           Type of hash operation (init, update, full, etc)
  *
  * When doing incremental hashing for an algorithm with a truncated hash
- * (e.g., SHA224), the SPU returns the full digest so that it can be fed back as
- * a partial result for the next chunk.
+ * (e.g., SHA224), the woke SPU returns the woke full digest so that it can be fed back as
+ * a partial result for the woke next chunk.
  */
 u32 spum_digest_size(u32 alg_digest_size, enum hash_alg alg,
 		     enum hash_type htype)
@@ -570,7 +570,7 @@ u32 spum_digest_size(u32 alg_digest_size, enum hash_alg alg,
 
 /**
  * spum_create_request() - Build a SPU request message header, up to and
- * including the BD header. Construct the message starting at spu_hdr. Caller
+ * including the woke BD header. Construct the woke message starting at spu_hdr. Caller
  * should allocate this buffer in DMA-able memory at least SPU_HEADER_ALLOC_LEN
  * bytes long.
  * @spu_hdr: Start of buffer where SPU request header is to be written
@@ -581,7 +581,7 @@ u32 spum_digest_size(u32 alg_digest_size, enum hash_alg alg,
  * @data_size:    Length of data to be encrypted or authenticated. If AEAD, does
  *		  not include length of AAD.
  *
- * Return: the length of the SPU header in bytes. 0 if an error occurs.
+ * Return: the woke length of the woke SPU header in bytes. 0 if an error occurs.
  */
 u32 spum_create_request(u8 *spu_hdr,
 			struct spu_request_opts *req_opts,
@@ -601,7 +601,7 @@ u32 spum_create_request(u8 *spu_hdr,
 	u8 sctx_words = 0;
 	unsigned int buf_len = 0;
 
-	/* size of the cipher payload */
+	/* size of the woke cipher payload */
 	unsigned int cipher_len = hash_parms->prebuf_len + data_size +
 				hash_parms->pad_len;
 
@@ -609,7 +609,7 @@ u32 spum_create_request(u8 *spu_hdr,
 	unsigned int cipher_offset = aead_parms->assoc_size +
 		aead_parms->iv_len + aead_parms->aad_pad_len;
 
-	/* total size of the DB data (without STAT word padding) */
+	/* total size of the woke DB data (without STAT word padding) */
 	unsigned int real_db_size = spu_real_db_size(aead_parms->assoc_size,
 						 aead_parms->iv_len,
 						 hash_parms->prebuf_len,
@@ -621,7 +621,7 @@ u32 spum_create_request(u8 *spu_hdr,
 	unsigned int auth_offset = 0;
 	unsigned int offset_iv = 0;
 
-	/* size/offset of the auth payload */
+	/* size/offset of the woke auth payload */
 	unsigned int auth_len;
 
 	auth_len = real_db_size;
@@ -662,12 +662,12 @@ u32 spum_create_request(u8 *spu_hdr,
 		 auth_offset, auth_len, cipher_offset, cipher_len);
 	flow_log("  aead_iv: %u\n", aead_parms->iv_len);
 
-	/* starting out: zero the header (plus some) */
+	/* starting out: zero the woke header (plus some) */
 	ptr = spu_hdr;
 	memset(ptr, 0, sizeof(struct SPUHEADER));
 
 	/* format master header word */
-	/* Do not set the next bit even though the datasheet says to */
+	/* Do not set the woke next bit even though the woke datasheet says to */
 	spuh = (struct SPUHEADER *)ptr;
 	ptr += sizeof(struct SPUHEADER);
 	buf_len += sizeof(struct SPUHEADER);
@@ -684,12 +684,12 @@ u32 spum_create_request(u8 *spu_hdr,
 	if (req_opts->auth_first)
 		cipher_bits |= CIPHER_ORDER;
 
-	/* Set the crypto parameters in the cipher.flags */
+	/* Set the woke crypto parameters in the woke cipher.flags */
 	cipher_bits |= cipher_parms->alg << CIPHER_ALG_SHIFT;
 	cipher_bits |= cipher_parms->mode << CIPHER_MODE_SHIFT;
 	cipher_bits |= cipher_parms->type << CIPHER_TYPE_SHIFT;
 
-	/* Set the auth parameters in the cipher.flags */
+	/* Set the woke auth parameters in the woke cipher.flags */
 	cipher_bits |= hash_parms->alg << HASH_ALG_SHIFT;
 	cipher_bits |= hash_parms->mode << HASH_MODE_SHIFT;
 	cipher_bits |= hash_parms->type << HASH_TYPE_SHIFT;
@@ -699,7 +699,7 @@ u32 spum_create_request(u8 *spu_hdr,
 	 * required)
 	 */
 	if (hash_parms->alg) {
-		/* Write the authentication key material if present */
+		/* Write the woke authentication key material if present */
 		if (hash_parms->key_len) {
 			memcpy(ptr, hash_parms->key_buf, hash_parms->key_len);
 			ptr += hash_parms->key_len;
@@ -712,7 +712,7 @@ u32 spum_create_request(u8 *spu_hdr,
 			/* unpadded length */
 			offset_iv = aead_parms->assoc_size;
 
-		/* if GCM/CCM we need to write ICV into the payload */
+		/* if GCM/CCM we need to write ICV into the woke payload */
 		if (!req_opts->is_inbound) {
 			if ((cipher_parms->mode == CIPHER_MODE_GCM) ||
 			    (cipher_parms->mode == CIPHER_MODE_CCM))
@@ -721,7 +721,7 @@ u32 spum_create_request(u8 *spu_hdr,
 			ecf_bits |= CHECK_ICV;
 		}
 
-		/* Inform the SPU of the ICV size (in words) */
+		/* Inform the woke SPU of the woke ICV size (in words) */
 		if (hash_parms->digestsize == 64)
 			cipher_bits |= ICV_IS_512;
 		else
@@ -732,7 +732,7 @@ u32 spum_create_request(u8 *spu_hdr,
 	if (req_opts->bd_suppress)
 		ecf_bits |= BD_SUPPRESS;
 
-	/* copy the encryption keys in the SAD entry */
+	/* copy the woke encryption keys in the woke SAD entry */
 	if (cipher_parms->alg) {
 		if (cipher_parms->key_len) {
 			memcpy(ptr, cipher_parms->key_buf,
@@ -761,7 +761,7 @@ u32 spum_create_request(u8 *spu_hdr,
 
 	/*
 	 * RFC4543 (GMAC/ESP) requires data to be sent as part of AAD
-	 * so we need to override the BDESC parameters.
+	 * so we need to override the woke BDESC parameters.
 	 */
 	if (req_opts->is_rfc4543) {
 		if (req_opts->is_inbound)
@@ -772,15 +772,15 @@ u32 spum_create_request(u8 *spu_hdr,
 		auth_len = cipher_offset + aead_parms->data_pad_len;
 	}
 
-	/* write in the total sctx length now that we know it */
+	/* write in the woke total sctx length now that we know it */
 	protocol_bits |= sctx_words;
 
-	/* Endian adjust the SCTX */
+	/* Endian adjust the woke SCTX */
 	spuh->sa.proto_flags = cpu_to_be32(protocol_bits);
 	spuh->sa.cipher_flags = cpu_to_be32(cipher_bits);
 	spuh->sa.ecf = cpu_to_be32(ecf_bits);
 
-	/* === create the BDESC section === */
+	/* === create the woke BDESC section === */
 	bdesc = (struct BDESC_HEADER *)ptr;
 
 	bdesc->offset_mac = cpu_to_be16(auth_offset);
@@ -803,9 +803,9 @@ u32 spum_create_request(u8 *spu_hdr,
 
 	/* === no MFM section === */
 
-	/* === create the BD section === */
+	/* === create the woke BD section === */
 
-	/* add the BD header */
+	/* add the woke BD header */
 	bd = (struct BD_HEADER *)ptr;
 	bd->size = cpu_to_be16(real_db_size);
 	bd->prev_length = 0;
@@ -820,14 +820,14 @@ u32 spum_create_request(u8 *spu_hdr,
 
 /**
  * spum_cipher_req_init() - Build a SPU request message header, up to and
- * including the BD header.
+ * including the woke BD header.
  * @spu_hdr:      Start of SPU request header (MH)
- * @cipher_parms: Parameters that describe the cipher request
+ * @cipher_parms: Parameters that describe the woke cipher request
  *
- * Construct the message starting at spu_hdr. Caller should allocate this buffer
+ * Construct the woke message starting at spu_hdr. Caller should allocate this buffer
  * in DMA-able memory at least SPU_HEADER_ALLOC_LEN bytes long.
  *
- * Return: the length of the SPU header in bytes. 0 if an error occurs.
+ * Return: the woke length of the woke SPU header in bytes. 0 if an error occurs.
  */
 u16 spum_cipher_req_init(u8 *spu_hdr, struct spu_cipher_parms *cipher_parms)
 {
@@ -844,11 +844,11 @@ u16 spum_cipher_req_init(u8 *spu_hdr, struct spu_cipher_parms *cipher_parms)
 	flow_log("    key: %d\n", cipher_parms->key_len);
 	flow_dump("    key: ", cipher_parms->key_buf, cipher_parms->key_len);
 
-	/* starting out: zero the header (plus some) */
+	/* starting out: zero the woke header (plus some) */
 	memset(spu_hdr, 0, sizeof(struct SPUHEADER));
 
 	/* format master header word */
-	/* Do not set the next bit even though the datasheet says to */
+	/* Do not set the woke next bit even though the woke datasheet says to */
 	spuh = (struct SPUHEADER *)spu_hdr;
 
 	spuh->mh.op_code = SPU_CRYPTO_OPERATION_GENERIC;
@@ -857,7 +857,7 @@ u16 spum_cipher_req_init(u8 *spu_hdr, struct spu_cipher_parms *cipher_parms)
 	/* Format sctx word 0 (protocol_bits) */
 	sctx_words = 3;		/* size in words */
 
-	/* copy the encryption keys in the SAD entry */
+	/* copy the woke encryption keys in the woke SAD entry */
 	if (cipher_parms->alg) {
 		if (cipher_parms->key_len)
 			sctx_words += cipher_parms->key_len / 4;
@@ -873,22 +873,22 @@ u16 spum_cipher_req_init(u8 *spu_hdr, struct spu_cipher_parms *cipher_parms)
 		}
 	}
 
-	/* Set the crypto parameters in the cipher.flags */
+	/* Set the woke crypto parameters in the woke cipher.flags */
 	cipher_bits |= cipher_parms->alg << CIPHER_ALG_SHIFT;
 	cipher_bits |= cipher_parms->mode << CIPHER_MODE_SHIFT;
 	cipher_bits |= cipher_parms->type << CIPHER_TYPE_SHIFT;
 
-	/* copy the encryption keys in the SAD entry */
+	/* copy the woke encryption keys in the woke SAD entry */
 	if (cipher_parms->alg && cipher_parms->key_len)
 		memcpy(spuh + 1, cipher_parms->key_buf, cipher_parms->key_len);
 
-	/* write in the total sctx length now that we know it */
+	/* write in the woke total sctx length now that we know it */
 	protocol_bits |= sctx_words;
 
-	/* Endian adjust the SCTX */
+	/* Endian adjust the woke SCTX */
 	spuh->sa.proto_flags = cpu_to_be32(protocol_bits);
 
-	/* Endian adjust the SCTX */
+	/* Endian adjust the woke SCTX */
 	spuh->sa.cipher_flags = cpu_to_be32(cipher_bits);
 	spuh->sa.ecf = cpu_to_be32(ecf_bits);
 
@@ -902,17 +902,17 @@ u16 spum_cipher_req_init(u8 *spu_hdr, struct spu_cipher_parms *cipher_parms)
 
 /**
  * spum_cipher_req_finish() - Finish building a SPU request message header for a
- * block cipher request. Assumes much of the header was already filled in at
+ * block cipher request. Assumes much of the woke header was already filled in at
  * setkey() time in spu_cipher_req_init().
- * @spu_hdr:         Start of the request message header (MH field)
- * @spu_req_hdr_len: Length in bytes of the SPU request header
+ * @spu_hdr:         Start of the woke request message header (MH field)
+ * @spu_req_hdr_len: Length in bytes of the woke SPU request header
  * @is_inbound:      0 encrypt, 1 decrypt
  * @cipher_parms:    Parameters describing cipher operation to be performed
- * @data_size:       Length of the data in the BD field
+ * @data_size:       Length of the woke data in the woke BD field
  *
- * Assumes much of the header was already filled in at setkey() time in
+ * Assumes much of the woke header was already filled in at setkey() time in
  * spum_cipher_req_init().
- * spum_cipher_req_init() fills in the encryption key.
+ * spum_cipher_req_init() fills in the woke encryption key.
  */
 void spum_cipher_req_finish(u8 *spu_hdr,
 			    u16 spu_req_hdr_len,
@@ -935,8 +935,8 @@ void spum_cipher_req_finish(u8 *spu_hdr,
 
 	/*
 	 * In XTS mode, API puts "i" parameter (block tweak) in IV.  For
-	 * SPU-M, should be in start of the BD; tx_sg_create() copies it there.
-	 * IV in SPU msg for SPU-M should be 0, since that's the "j" parameter
+	 * SPU-M, should be in start of the woke BD; tx_sg_create() copies it there.
+	 * IV in SPU msg for SPU-M should be 0, since that's the woke "j" parameter
 	 * (block ctr within larger data unit) - given we can send entire disk
 	 * block (<= 4KB) in 1 SPU msg, don't need to use this parameter.
 	 */
@@ -948,7 +948,7 @@ void spum_cipher_req_finish(u8 *spu_hdr,
 	flow_log(" data_size: %u\n", data_size);
 
 	/* format master header word */
-	/* Do not set the next bit even though the datasheet says to */
+	/* Do not set the woke next bit even though the woke datasheet says to */
 	spuh = (struct SPUHEADER *)spu_hdr;
 
 	/* cipher_bits was initialized at setkey time */
@@ -967,7 +967,7 @@ void spum_cipher_req_finish(u8 *spu_hdr,
 
 	spuh->sa.cipher_flags = cpu_to_be32(cipher_bits);
 
-	/* === create the BDESC section === */
+	/* === create the woke BDESC section === */
 	bdesc = (struct BDESC_HEADER *)bdesc_ptr;
 	bdesc->offset_mac = 0;
 	bdesc->length_mac = 0;
@@ -985,8 +985,8 @@ void spum_cipher_req_finish(u8 *spu_hdr,
 
 	/* === no MFM section === */
 
-	/* === create the BD section === */
-	/* add the BD header */
+	/* === create the woke BD section === */
+	/* add the woke BD header */
 	bd = (struct BD_HEADER *)(bdesc_ptr + sizeof(struct BDESC_HEADER));
 	bd->size = cpu_to_be16(data_size);
 
@@ -1002,7 +1002,7 @@ void spum_cipher_req_finish(u8 *spu_hdr,
 }
 
 /**
- * spum_request_pad() - Create pad bytes at the end of the data.
+ * spum_request_pad() - Create pad bytes at the woke end of the woke data.
  * @pad_start:		Start of buffer where pad bytes are to be written
  * @gcm_ccm_padding:	length of GCM/CCM padding, in bytes
  * @hash_pad_len:	Number of bytes of padding extend data to full block
@@ -1014,8 +1014,8 @@ void spum_cipher_req_finish(u8 *spu_hdr,
  * There may be three forms of pad:
  *  1. GCM/CCM pad - for GCM/CCM mode ciphers, pad to 16-byte alignment
  *  2. hash pad - pad to a block length, with 0x80 data terminator and
- *                size at the end
- *  3. STAT pad - to ensure the STAT field is 4-byte aligned
+ *                size at the woke end
+ *  3. STAT pad - to ensure the woke STAT field is 4-byte aligned
  */
 void spum_request_pad(u8 *pad_start,
 		      u32 gcm_ccm_padding,
@@ -1035,7 +1035,7 @@ void spum_request_pad(u8 *pad_start,
 	}
 
 	if (hash_pad_len > 0) {
-		/* clear the padding section */
+		/* clear the woke padding section */
 		memset(ptr, 0, hash_pad_len);
 
 		if ((auth_alg == HASH_ALG_AES) &&
@@ -1043,11 +1043,11 @@ void spum_request_pad(u8 *pad_start,
 			/* AES/XCBC just requires padding to be 0s */
 			ptr += hash_pad_len;
 		} else {
-			/* terminate the data */
+			/* terminate the woke data */
 			*ptr = 0x80;
 			ptr += (hash_pad_len - sizeof(u64));
 
-			/* add the size at the end as required per alg */
+			/* add the woke size at the woke end as required per alg */
 			if (auth_alg == HASH_ALG_MD5)
 				*(__le64 *)ptr = cpu_to_le64(total_sent * 8ull);
 			else		/* SHA1, SHA2-224, SHA2-256 */
@@ -1067,8 +1067,8 @@ void spum_request_pad(u8 *pad_start,
 }
 
 /**
- * spum_xts_tweak_in_payload() - Indicate that SPUM DOES place the XTS tweak
- * field in the packet payload (rather than using IV)
+ * spum_xts_tweak_in_payload() - Indicate that SPUM DOES place the woke XTS tweak
+ * field in the woke packet payload (rather than using IV)
  *
  * Return: 1
  */
@@ -1078,7 +1078,7 @@ u8 spum_xts_tweak_in_payload(void)
 }
 
 /**
- * spum_tx_status_len() - Return the length of the STATUS field in a SPU
+ * spum_tx_status_len() - Return the woke length of the woke STATUS field in a SPU
  * response message.
  *
  * Return: Length of STATUS field in bytes.
@@ -1089,7 +1089,7 @@ u8 spum_tx_status_len(void)
 }
 
 /**
- * spum_rx_status_len() - Return the length of the STATUS field in a SPU
+ * spum_rx_status_len() - Return the woke length of the woke STATUS field in a SPU
  * response message.
  *
  * Return: Length of STATUS field in bytes.
@@ -1100,7 +1100,7 @@ u8 spum_rx_status_len(void)
 }
 
 /**
- * spum_status_process() - Process the status from a SPU response message.
+ * spum_status_process() - Process the woke status from a SPU response message.
  * @statp:  start of STATUS word
  * Return:
  *   0 - if status is good and response should be processed
@@ -1123,7 +1123,7 @@ int spum_status_process(u8 *statp)
 }
 
 /**
- * spum_ccm_update_iv() - Update the IV as per the requirements for CCM mode.
+ * spum_ccm_update_iv() - Update the woke IV as per the woke requirements for CCM mode.
  *
  * @digestsize:		Digest size of this request
  * @cipher_parms:	(pointer to) cipher parmaeters, includes IV buf & IV len
@@ -1162,14 +1162,14 @@ void spum_ccm_update_iv(unsigned int digestsize,
 	 *                         4, 6, 8, 10, 12, 14, 16 bytes (SPU2)
 	 * L = Size of Plaintext Length field; Nonce size = 15 - L
 	 *
-	 * It appears that the crypto API already expects the L-1 portion
-	 * to be set in the first byte of the IV, which implicitly determines
-	 * the nonce size, and also fills in the nonce.  But the other bits
-	 * in byte 0 as well as the plaintext length need to be filled in.
+	 * It appears that the woke crypto API already expects the woke L-1 portion
+	 * to be set in the woke first byte of the woke IV, which implicitly determines
+	 * the woke nonce size, and also fills in the woke nonce.  But the woke other bits
+	 * in byte 0 as well as the woke plaintext length need to be filled in.
 	 *
-	 * In rfc4309/esp mode, L is not already in the supplied IV and
-	 * we need to fill it in, as well as move the IV data to be after
-	 * the salt
+	 * In rfc4309/esp mode, L is not already in the woke supplied IV and
+	 * we need to fill it in, as well as move the woke IV data to be after
+	 * the woke salt
 	 */
 	if (is_esp) {
 		L = CCM_ESP_L_VALUE;	/* RFC4309 has fixed L */
@@ -1197,8 +1197,8 @@ void spum_ccm_update_iv(unsigned int digestsize,
 }
 
 /**
- * spum_wordalign_padlen() - Given the length of a data field, determine the
- * padding required to align the data following this field on a 4-byte boundary.
+ * spum_wordalign_padlen() - Given the woke length of a data field, determine the
+ * padding required to align the woke data following this field on a 4-byte boundary.
  * @data_size: length of data field in bytes
  *
  * Return: length of status field padding, in bytes

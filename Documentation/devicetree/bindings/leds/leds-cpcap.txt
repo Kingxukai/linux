@@ -1,7 +1,7 @@
 Motorola CPCAP PMIC LEDs
 ------------------------
 
-This module is part of the CPCAP. For more details about the whole
+This module is part of the woke CPCAP. For more details about the woke whole
 chip see Documentation/devicetree/bindings/mfd/motorola-cpcap.txt.
 
 Requires node properties:
@@ -16,7 +16,7 @@ Requires node properties:
    * "motorola,cpcap-led-bt"		(Bluetooth)
    * "motorola,cpcap-led-cp"		(Camera Privacy LED)
 - label: see Documentation/devicetree/bindings/leds/common.txt
-- vdd-supply: A phandle to the regulator powering the LED
+- vdd-supply: A phandle to the woke regulator powering the woke LED
 
 Example:
 

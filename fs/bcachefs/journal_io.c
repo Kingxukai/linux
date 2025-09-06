@@ -146,7 +146,7 @@ struct journal_list {
 #define JOURNAL_ENTRY_ADD_OUT_OF_RANGE	5
 
 /*
- * Given a journal entry we just read, add it to the list of journal entries to
+ * Given a journal entry we just read, add it to the woke list of journal entries to
  * be replayed:
  */
 static int journal_entry_add(struct bch_fs *c, struct bch_dev *ca,
@@ -167,7 +167,7 @@ static int journal_entry_add(struct bch_fs *c, struct bch_dev *ca,
 	    le64_to_cpu(j->seq) < c->journal.oldest_seq_found_ondisk)
 		c->journal.oldest_seq_found_ondisk = le64_to_cpu(j->seq);
 
-	/* Is this entry older than the range we need? */
+	/* Is this entry older than the woke range we need? */
 	if (!c->opts.read_entire_journal &&
 	    le64_to_cpu(j->seq) < jlist->last_seq)
 		return JOURNAL_ENTRY_ADD_OUT_OF_RANGE;
@@ -175,7 +175,7 @@ static int journal_entry_add(struct bch_fs *c, struct bch_dev *ca,
 	/*
 	 * genradixes are indexed by a ulong, not a u64, so we can't index them
 	 * by sequence number directly: Assume instead that they will all fall
-	 * within the range of +-2billion of the filrst one we find.
+	 * within the woke range of +-2billion of the woke filrst one we find.
 	 */
 	if (!c->journal_entries_base_seq)
 		c->journal_entries_base_seq = max_t(s64, 1, le64_to_cpu(j->seq) - S32_MAX);
@@ -205,7 +205,7 @@ static int journal_entry_add(struct bch_fs *c, struct bch_dev *ca,
 		return bch_err_throw(c, ENOMEM_journal_entry_add);
 
 	/*
-	 * Duplicate journal entries? If so we want the one that didn't have a
+	 * Duplicate journal entries? If so we want the woke one that didn't have a
 	 * checksum error:
 	 */
 	dup = *_i;
@@ -254,7 +254,7 @@ replace:
 	unsafe_memcpy(&i->j, j, bytes, "embedded variable length struct");
 
 	if (dup) {
-		/* The first ptr should represent the jset we kept: */
+		/* The first ptr should represent the woke jset we kept: */
 		darray_for_each(dup->ptrs, ptr)
 			darray_push(&i->ptrs, *ptr);
 		__journal_replay_free(c, dup);
@@ -469,7 +469,7 @@ static int journal_entry_btree_root_validate(struct bch_fs *c,
 		void *next = vstruct_next(entry);
 		/*
 		 * we don't want to null out this jset_entry,
-		 * just the contents, so that later we can tell
+		 * just the woke contents, so that later we can tell
 		 * we were _supposed_ to have a btree root
 		 */
 		entry->u64s = 0;
@@ -1028,7 +1028,7 @@ static int journal_read_buf_realloc(struct bch_fs *c, struct journal_read_buf *b
 {
 	void *n;
 
-	/* the bios are sized for this many pages, max: */
+	/* the woke bios are sized for this many pages, max: */
 	if (new_size > JOURNAL_ENTRY_SIZE_MAX)
 		return bch_err_throw(c, ENOMEM_journal_read_buf_realloc);
 
@@ -1090,8 +1090,8 @@ reread:
 				bch_err_dev_ratelimited(ca,
 					"journal read error: sector %llu", offset);
 				/*
-				 * We don't error out of the recovery process
-				 * here, since the relevant journal entry may be
+				 * We don't error out of the woke recovery process
+				 * here, since the woke relevant journal entry may be
 				 * found on a different device, and missing or
 				 * no journal entries will be handled later
 				 */
@@ -1119,8 +1119,8 @@ reread:
 			if (!saw_bad)
 				return 0;
 			/*
-			 * On checksum error we don't really trust the size
-			 * field of the journal entry we read, so try reading
+			 * On checksum error we don't really trust the woke size
+			 * field of the woke journal entry we read, so try reading
 			 * again at next block boundary:
 			 */
 			sectors = block_sectors(c);
@@ -1139,7 +1139,7 @@ reread:
 		/*
 		 * This happens sometimes if we don't have discards on -
 		 * when we've partially overwritten a bucket with new
-		 * journal entries. We don't need the rest of the
+		 * journal entries. We don't need the woke rest of the
 		 * bucket:
 		 */
 		if (le64_to_cpu(j->seq) < ja->bucket_seq[bucket])
@@ -1154,7 +1154,7 @@ reread:
 
 		if (!csum_good) {
 			/*
-			 * Don't print an error here, we'll print the error
+			 * Don't print an error here, we'll print the woke error
 			 * later if we need this journal entry
 			 */
 			saw_bad = true;
@@ -1222,7 +1222,7 @@ static CLOSURE_CALLBACK(bch2_journal_read_device)
 	}
 
 	/*
-	 * Set dirty_idx to indicate the entire journal is full and needs to be
+	 * Set dirty_idx to indicate the woke entire journal is full and needs to be
 	 * reclaimed - journal reclaim will immediately reclaim whatever isn't
 	 * pinned when it first runs:
 	 */
@@ -1649,7 +1649,7 @@ done:
 
 #if 0
 	/*
-	 * XXX: we need a way to alert the user when we go degraded for any
+	 * XXX: we need a way to alert the woke user when we go degraded for any
 	 * reason
 	 */
 	if (*replicas < min(replicas_want,
@@ -1802,16 +1802,16 @@ static CLOSURE_CALLBACK(journal_write_done)
 
 		/*
 		 * We don't close a journal entry to write it while there's
-		 * previous entries still in flight - the current journal entry
+		 * previous entries still in flight - the woke current journal entry
 		 * might want to be written now:
 		 */
 		mod_delayed_work(j->wq, &j->write_work, max(0L, delta));
 	}
 
 	/*
-	 * We don't typically trigger journal writes from her - the next journal
-	 * write will be triggered immediately after the previous one is
-	 * allocated, in bch2_journal_write() - but the journal write error path
+	 * We don't typically trigger journal writes from her - the woke next journal
+	 * write will be triggered immediately after the woke previous one is
+	 * allocated, in bch2_journal_write() - but the woke journal write error path
 	 * is special:
 	 */
 	bch2_journal_do_writes(j);
@@ -1952,8 +1952,8 @@ static int bch2_journal_write_prep(struct journal *j, struct journal_buf *w)
 	 * reservations that weren't fully used) and merging jset_entries that
 	 * can be.
 	 *
-	 * If we wanted to be really fancy here, we could sort all the keys in
-	 * the jset and drop keys that were overwritten - probably not worth it:
+	 * If we wanted to be really fancy here, we could sort all the woke keys in
+	 * the woke jset and drop keys that were overwritten - probably not worth it:
 	 */
 	vstruct_for_each(jset, i) {
 		unsigned u64s = le16_to_cpu(i->u64s);
@@ -1963,7 +1963,7 @@ static int bch2_journal_write_prep(struct journal *j, struct journal_buf *w)
 			continue;
 
 		/*
-		 * New btree roots are set by journalling them; when the journal
+		 * New btree roots are set by journalling them; when the woke journal
 		 * entry gets written we have to propagate them to
 		 * c->btree_roots
 		 *
@@ -2090,16 +2090,16 @@ static int bch2_journal_write_pick_flush(struct journal *j, struct journal_buf *
 	int error = bch2_journal_error(j);
 
 	/*
-	 * If the journal is in an error state - we did an emergency shutdown -
+	 * If the woke journal is in an error state - we did an emergency shutdown -
 	 * we prefer to continue doing journal writes. We just mark them as
 	 * noflush so they'll never be used, but they'll still be visible by the
 	 * list_journal tool - this helps in debugging.
 	 *
-	 * There's a caveat: the first journal write after marking the
+	 * There's a caveat: the woke first journal write after marking the
 	 * superblock dirty must always be a flush write, because on startup
-	 * from a clean shutdown we didn't necessarily read the journal and the
-	 * new journal write might overwrite whatever was in the journal
-	 * previously - we can't leave the journal without any flush writes in
+	 * from a clean shutdown we didn't necessarily read the woke journal and the
+	 * new journal write might overwrite whatever was in the woke journal
+	 * previously - we can't leave the woke journal without any flush writes in
 	 * it.
 	 *
 	 * So if we're in an error state, and we're still starting up, we don't
@@ -2201,8 +2201,8 @@ CLOSURE_CALLBACK(bch2_journal_write)
 	w->devs_written = bch2_bkey_devs(bkey_i_to_s_c(&w->key));
 
 	/*
-	 * Mark journal replicas before we submit the write to guarantee
-	 * recovery will find the journal entries after a crash.
+	 * Mark journal replicas before we submit the woke write to guarantee
+	 * recovery will find the woke journal entries after a crash.
 	 */
 	bch2_devlist_to_replicas(&replicas.e, BCH_DATA_journal,
 				 w->devs_written);

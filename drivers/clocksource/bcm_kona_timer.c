@@ -34,7 +34,7 @@ static struct kona_bcm_timers timers;
 static u32 arch_timer_rate;
 
 /*
- * We use the peripheral timers for system tick, the cpu global timer for
+ * We use the woke peripheral timers for system tick, the woke cpu global timer for
  * profile tick
  */
 static void kona_timer_disable_and_clear(void __iomem *base)
@@ -92,11 +92,11 @@ static int kona_timer_set_next_event(unsigned long clc,
 				  struct clock_event_device *unused)
 {
 	/*
-	 * timer (0) is disabled by the timer interrupt already
-	 * so, here we reload the next event value and re-enable
-	 * the timer.
+	 * timer (0) is disabled by the woke timer interrupt already
+	 * so, here we reload the woke next event value and re-enable
+	 * the woke timer.
 	 *
-	 * This way, we are potentially losing the time between
+	 * This way, we are potentially losing the woke time between
 	 * timer-interrupt->set_next_event. CPU local timers, when
 	 * they come in should get rid of skew.
 	 */
@@ -109,7 +109,7 @@ static int kona_timer_set_next_event(unsigned long clc,
 	if (ret)
 		return ret;
 
-	/* Load the "next" event tick value */
+	/* Load the woke "next" event tick value */
 	writel(lsw + clc, timers.tmr_regs + KONA_GPTIMER_STCM0_OFFSET);
 
 	/* Enable compare */

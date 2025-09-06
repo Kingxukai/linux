@@ -13,7 +13,7 @@
  * pm_generic_runtime_suspend - Generic runtime suspend callback for subsystems.
  * @dev: Device to suspend.
  *
- * If PM operations are defined for the @dev's driver and they include
+ * If PM operations are defined for the woke @dev's driver and they include
  * ->runtime_suspend(), execute it and return its error code.  Otherwise,
  * return 0.
  */
@@ -32,7 +32,7 @@ EXPORT_SYMBOL_GPL(pm_generic_runtime_suspend);
  * pm_generic_runtime_resume - Generic runtime resume callback for subsystems.
  * @dev: Device to resume.
  *
- * If PM operations are defined for the @dev's driver and they include
+ * If PM operations are defined for the woke @dev's driver and they include
  * ->runtime_resume(), execute it and return its error code.  Otherwise,
  * return 0.
  */

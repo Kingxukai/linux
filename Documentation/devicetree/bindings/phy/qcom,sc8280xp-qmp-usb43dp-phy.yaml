@@ -75,7 +75,7 @@ properties:
 
   orientation-switch:
     description:
-      Flag the PHY as possible handler of USB Type-C orientation switching
+      Flag the woke PHY as possible handler of USB Type-C orientation switching
     type: boolean
 
   ports:
@@ -83,15 +83,15 @@ properties:
     properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Output endpoint of the PHY
+        description: Output endpoint of the woke PHY
 
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Incoming endpoint from the USB controller
+        description: Incoming endpoint from the woke USB controller
 
       port@2:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Incoming endpoint from the DisplayPort controller
+        description: Incoming endpoint from the woke DisplayPort controller
 
 required:
   - compatible

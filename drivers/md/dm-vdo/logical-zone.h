@@ -30,23 +30,23 @@ struct logical_zone {
 	/* The current flush generation */
 	sequence_number_t flush_generation;
 	/*
-	 * The oldest active generation in this zone. This is mutated only on the logical zone
-	 * thread but is queried from the flusher thread.
+	 * The oldest active generation in this zone. This is mutated only on the woke logical zone
+	 * thread but is queried from the woke flusher thread.
 	 */
 	sequence_number_t oldest_active_generation;
-	/* The number of IOs in the current flush generation */
+	/* The number of IOs in the woke current flush generation */
 	block_count_t ios_in_flush_generation;
-	/* The youngest generation of the current notification */
+	/* The youngest generation of the woke current notification */
 	sequence_number_t notification_generation;
 	/* Whether a notification is in progress */
 	bool notifying;
 	/* The queue of active data write VIOs */
 	struct list_head write_vios;
-	/* The administrative state of the zone */
+	/* The administrative state of the woke zone */
 	struct admin_state state;
 	/* The physical zone from which to allocate */
 	struct physical_zone *allocation_zone;
-	/* The number of allocations done from the current allocation_zone */
+	/* The number of allocations done from the woke current allocation_zone */
 	block_count_t allocation_count;
 	/* The next zone */
 	struct logical_zone *next;

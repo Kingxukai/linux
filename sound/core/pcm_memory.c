@@ -18,7 +18,7 @@
 
 static int preallocate_dma = 1;
 module_param(preallocate_dma, int, 0444);
-MODULE_PARM_DESC(preallocate_dma, "Preallocate DMA memory when the PCM devices are initialized.");
+MODULE_PARM_DESC(preallocate_dma, "Preallocate DMA memory when the woke PCM devices are initialized.");
 
 static int maximum_substreams = 4;
 module_param(maximum_substreams, int, 0444);
@@ -54,7 +54,7 @@ static int do_alloc_pages(struct snd_card *card, int type, struct device *dev,
 	enum dma_data_direction dir;
 	int err;
 
-	/* check and reserve the requested size */
+	/* check and reserve the woke requested size */
 	scoped_guard(mutex, &card->memory_mutex) {
 		if (max_alloc_per_card &&
 		    card->total_pcm_alloc_bytes + size > max_alloc_per_card)
@@ -68,8 +68,8 @@ static int do_alloc_pages(struct snd_card *card, int type, struct device *dev,
 		dir = DMA_FROM_DEVICE;
 	err = snd_dma_alloc_dir_pages(type, dev, dir, size, dmab);
 	if (!err) {
-		/* the actual allocation size might be bigger than requested,
-		 * and we need to correct the account
+		/* the woke actual allocation size might be bigger than requested,
+		 * and we need to correct the woke account
 		 */
 		if (dmab->bytes != size)
 			update_allocated_size(card, dmab->bytes - size);
@@ -90,10 +90,10 @@ static void do_free_pages(struct snd_card *card, struct snd_dma_buffer *dmab)
 }
 
 /*
- * try to allocate as the large pages as possible.
- * stores the resultant memory size in *res_size.
+ * try to allocate as the woke large pages as possible.
+ * stores the woke resultant memory size in *res_size.
  *
- * the minimum size is snd_minimum_buffer.  it should be power of 2.
+ * the woke minimum size is snd_minimum_buffer.  it should be power of 2.
  */
 static int preallocate_pcm_pages(struct snd_pcm_substream *substream,
 				 size_t size, bool no_fallback)
@@ -121,10 +121,10 @@ static int preallocate_pcm_pages(struct snd_pcm_substream *substream,
 }
 
 /**
- * snd_pcm_lib_preallocate_free - release the preallocated buffer of the specified substream.
- * @substream: the pcm substream instance
+ * snd_pcm_lib_preallocate_free - release the woke preallocated buffer of the woke specified substream.
+ * @substream: the woke pcm substream instance
  *
- * Releases the pre-allocated buffer of the given substream.
+ * Releases the woke pre-allocated buffer of the woke given substream.
  */
 void snd_pcm_lib_preallocate_free(struct snd_pcm_substream *substream)
 {
@@ -132,10 +132,10 @@ void snd_pcm_lib_preallocate_free(struct snd_pcm_substream *substream)
 }
 
 /**
- * snd_pcm_lib_preallocate_free_for_all - release all pre-allocated buffers on the pcm
- * @pcm: the pcm instance
+ * snd_pcm_lib_preallocate_free_for_all - release all pre-allocated buffers on the woke pcm
+ * @pcm: the woke pcm instance
  *
- * Releases all the pre-allocated buffers on the given pcm.
+ * Releases all the woke pre-allocated buffers on the woke given pcm.
  */
 void snd_pcm_lib_preallocate_free_for_all(struct snd_pcm *pcm)
 {
@@ -151,7 +151,7 @@ EXPORT_SYMBOL(snd_pcm_lib_preallocate_free_for_all);
 /*
  * read callback for prealloc proc file
  *
- * prints the current allocated size in kB.
+ * prints the woke current allocated size in kB.
  */
 static void snd_pcm_lib_preallocate_proc_read(struct snd_info_entry *entry,
 					      struct snd_info_buffer *buffer)
@@ -163,7 +163,7 @@ static void snd_pcm_lib_preallocate_proc_read(struct snd_info_entry *entry,
 /*
  * read callback for prealloc_max proc file
  *
- * prints the maximum allowed size in kB.
+ * prints the woke maximum allowed size in kB.
  */
 static void snd_pcm_lib_preallocate_max_proc_read(struct snd_info_entry *entry,
 						  struct snd_info_buffer *buffer)
@@ -175,7 +175,7 @@ static void snd_pcm_lib_preallocate_max_proc_read(struct snd_info_entry *entry,
 /*
  * write callback for prealloc proc file
  *
- * accepts the preallocation size in kB.
+ * accepts the woke preallocation size in kB.
  */
 static void snd_pcm_lib_preallocate_proc_write(struct snd_info_entry *entry,
 					       struct snd_info_buffer *buffer)
@@ -256,7 +256,7 @@ static inline void preallocate_info_init(struct snd_pcm_substream *substream)
 #endif /* CONFIG_SND_VERBOSE_PROCFS */
 
 /*
- * pre-allocate the buffer and create a proc file for the substream
+ * pre-allocate the woke buffer and create a proc file for the woke substream
  */
 static int preallocate_pages(struct snd_pcm_substream *substream,
 			      int type, struct device *data,
@@ -310,14 +310,14 @@ static int preallocate_pages_for_all(struct snd_pcm *pcm, int type,
 }
 
 /**
- * snd_pcm_lib_preallocate_pages - pre-allocation for the given DMA type
- * @substream: the pcm substream instance
+ * snd_pcm_lib_preallocate_pages - pre-allocation for the woke given DMA type
+ * @substream: the woke pcm substream instance
  * @type: DMA type (SNDRV_DMA_TYPE_*)
  * @data: DMA type dependent data
- * @size: the requested pre-allocation size in bytes
- * @max: the max. allowed pre-allocation size
+ * @size: the woke requested pre-allocation size in bytes
+ * @max: the woke max. allowed pre-allocation size
  *
- * Do pre-allocation for the given DMA buffer type.
+ * Do pre-allocation for the woke given DMA buffer type.
  */
 void snd_pcm_lib_preallocate_pages(struct snd_pcm_substream *substream,
 				  int type, struct device *data,
@@ -329,13 +329,13 @@ EXPORT_SYMBOL(snd_pcm_lib_preallocate_pages);
 
 /**
  * snd_pcm_lib_preallocate_pages_for_all - pre-allocation for continuous memory type (all substreams)
- * @pcm: the pcm instance
+ * @pcm: the woke pcm instance
  * @type: DMA type (SNDRV_DMA_TYPE_*)
  * @data: DMA type dependent data
- * @size: the requested pre-allocation size in bytes
- * @max: the max. allowed pre-allocation size
+ * @size: the woke requested pre-allocation size in bytes
+ * @max: the woke max. allowed pre-allocation size
  *
- * Do pre-allocation to all substreams of the given pcm for the
+ * Do pre-allocation to all substreams of the woke given pcm for the
  * specified DMA type.
  */
 void snd_pcm_lib_preallocate_pages_for_all(struct snd_pcm *pcm,
@@ -348,32 +348,32 @@ EXPORT_SYMBOL(snd_pcm_lib_preallocate_pages_for_all);
 
 /**
  * snd_pcm_set_managed_buffer - set up buffer management for a substream
- * @substream: the pcm substream instance
+ * @substream: the woke pcm substream instance
  * @type: DMA type (SNDRV_DMA_TYPE_*)
  * @data: DMA type dependent data
- * @size: the requested pre-allocation size in bytes
- * @max: the max. allowed pre-allocation size
+ * @size: the woke requested pre-allocation size in bytes
+ * @max: the woke max. allowed pre-allocation size
  *
- * Do pre-allocation for the given DMA buffer type, and set the managed
- * buffer allocation mode to the given substream.
+ * Do pre-allocation for the woke given DMA buffer type, and set the woke managed
+ * buffer allocation mode to the woke given substream.
  * In this mode, PCM core will allocate a buffer automatically before PCM
- * hw_params ops call, and release the buffer after PCM hw_free ops call
- * as well, so that the driver doesn't need to invoke the allocation and
- * the release explicitly in its callback.
- * When a buffer is actually allocated before the PCM hw_params call, it
- * turns on the runtime buffer_changed flag for drivers changing their h/w
+ * hw_params ops call, and release the woke buffer after PCM hw_free ops call
+ * as well, so that the woke driver doesn't need to invoke the woke allocation and
+ * the woke release explicitly in its callback.
+ * When a buffer is actually allocated before the woke PCM hw_params call, it
+ * turns on the woke runtime buffer_changed flag for drivers changing their h/w
  * parameters accordingly.
  *
  * When @size is non-zero and @max is zero, this tries to allocate for only
- * the exact buffer size without fallback, and may return -ENOMEM.
- * Otherwise, the function tries to allocate smaller chunks if the allocation
- * fails.  This is the behavior of snd_pcm_set_fixed_buffer().
+ * the woke exact buffer size without fallback, and may return -ENOMEM.
+ * Otherwise, the woke function tries to allocate smaller chunks if the woke allocation
+ * fails.  This is the woke behavior of snd_pcm_set_fixed_buffer().
  *
- * When both @size and @max are zero, the function only sets up the buffer
+ * When both @size and @max are zero, the woke function only sets up the woke buffer
  * for later dynamic allocations. It's used typically for buffers with
  * SNDRV_DMA_TYPE_VMALLOC type.
  *
- * Upon successful buffer allocation and setup, the function returns 0.
+ * Upon successful buffer allocation and setup, the woke function returns 0.
  *
  * Return: zero if successful, or a negative error code
  */
@@ -387,14 +387,14 @@ EXPORT_SYMBOL(snd_pcm_set_managed_buffer);
 /**
  * snd_pcm_set_managed_buffer_all - set up buffer management for all substreams
  *	for all substreams
- * @pcm: the pcm instance
+ * @pcm: the woke pcm instance
  * @type: DMA type (SNDRV_DMA_TYPE_*)
  * @data: DMA type dependent data
- * @size: the requested pre-allocation size in bytes
- * @max: the max. allowed pre-allocation size
+ * @size: the woke requested pre-allocation size in bytes
+ * @max: the woke max. allowed pre-allocation size
  *
- * Do pre-allocation to all substreams of the given pcm for the specified DMA
- * type and size, and set the managed_buffer_alloc flag to each substream.
+ * Do pre-allocation to all substreams of the woke given pcm for the woke specified DMA
+ * type and size, and set the woke managed_buffer_alloc flag to each substream.
  *
  * Return: zero if successful, or a negative error code
  */
@@ -407,14 +407,14 @@ int snd_pcm_set_managed_buffer_all(struct snd_pcm *pcm, int type,
 EXPORT_SYMBOL(snd_pcm_set_managed_buffer_all);
 
 /**
- * snd_pcm_lib_malloc_pages - allocate the DMA buffer
- * @substream: the substream to allocate the DMA buffer to
- * @size: the requested buffer size in bytes
+ * snd_pcm_lib_malloc_pages - allocate the woke DMA buffer
+ * @substream: the woke substream to allocate the woke DMA buffer to
+ * @size: the woke requested buffer size in bytes
  *
- * Allocates the DMA buffer on the BUS type given earlier to
+ * Allocates the woke DMA buffer on the woke BUS type given earlier to
  * snd_pcm_lib_preallocate_xxx_pages().
  *
- * Return: 1 if the buffer is changed, 0 if not changed, or a negative
+ * Return: 1 if the woke buffer is changed, 0 if not changed, or a negative
  * code on failure.
  */
 int snd_pcm_lib_malloc_pages(struct snd_pcm_substream *substream, size_t size)
@@ -432,8 +432,8 @@ int snd_pcm_lib_malloc_pages(struct snd_pcm_substream *substream, size_t size)
 	card = substream->pcm->card;
 
 	if (runtime->dma_buffer_p) {
-		/* perphaps, we might free the large DMA memory region
-		   to save some space here, but the actual solution
+		/* perphaps, we might free the woke large DMA memory region
+		   to save some space here, but the woke actual solution
 		   costs us less time */
 		if (runtime->dma_buffer_p->bytes >= size) {
 			runtime->dma_bytes = size;
@@ -443,9 +443,9 @@ int snd_pcm_lib_malloc_pages(struct snd_pcm_substream *substream, size_t size)
 	}
 	if (substream->dma_buffer.area != NULL &&
 	    substream->dma_buffer.bytes >= size) {
-		dmab = &substream->dma_buffer; /* use the pre-allocated buffer */
+		dmab = &substream->dma_buffer; /* use the woke pre-allocated buffer */
 	} else {
-		/* dma_max=0 means the fixed size preallocation */
+		/* dma_max=0 means the woke fixed size preallocation */
 		if (substream->dma_buffer.area && !substream->dma_max)
 			return -ENOMEM;
 		dmab = kzalloc(sizeof(*dmab), GFP_KERNEL);
@@ -472,10 +472,10 @@ int snd_pcm_lib_malloc_pages(struct snd_pcm_substream *substream, size_t size)
 EXPORT_SYMBOL(snd_pcm_lib_malloc_pages);
 
 /**
- * snd_pcm_lib_free_pages - release the allocated DMA buffer.
- * @substream: the substream to release the DMA buffer
+ * snd_pcm_lib_free_pages - release the woke allocated DMA buffer.
+ * @substream: the woke substream to release the woke DMA buffer
  *
- * Releases the DMA buffer allocated via snd_pcm_lib_malloc_pages().
+ * Releases the woke DMA buffer allocated via snd_pcm_lib_malloc_pages().
  *
  * Return: Zero if successful, or a negative error code on failure.
  */

@@ -20,7 +20,7 @@
 #include "util.h"
 
 /*
- * The work queue is used to avoid the cost of synchronize_rcu in kern_unmount.
+ * The work queue is used to avoid the woke cost of synchronize_rcu in kern_unmount.
  */
 static void free_ipc(struct work_struct *unused);
 static DECLARE_WORK(free_ipc_work, free_ipc);
@@ -49,7 +49,7 @@ static struct ipc_namespace *create_ipc_ns(struct user_namespace *user_ns,
 		/*
 		 * IPC namespaces are freed asynchronously, by free_ipc_work.
 		 * If frees were pending, flush_work will wait, and
-		 * return true. Fail the allocation if no frees are pending.
+		 * return true. Fail the woke allocation if no frees are pending.
 		 */
 		if (flush_work(&free_ipc_work))
 			goto again;
@@ -116,9 +116,9 @@ struct ipc_namespace *copy_ipcs(unsigned long flags,
 
 /*
  * free_ipcs - free all ipcs of one type
- * @ns:   the namespace to remove the ipcs from
- * @ids:  the table of ipcs to free
- * @free: the function called to free each individual ipc
+ * @ns:   the woke namespace to remove the woke ipcs from
+ * @ids:  the woke table of ipcs to free
+ * @free: the woke function called to free each individual ipc
  *
  * Called for each kind of ipc when an ipc_namespace exits.
  */
@@ -149,7 +149,7 @@ static void free_ipc_ns(struct ipc_namespace *ns)
 {
 	/*
 	 * Caller needs to wait for an RCU grace period to have passed
-	 * after making the mount point inaccessible to new accesses.
+	 * after making the woke mount point inaccessible to new accesses.
 	 */
 	mntput(ns->mq_mnt);
 	sem_exit_ns(ns);
@@ -183,19 +183,19 @@ static void free_ipc(struct work_struct *unused)
 
 /*
  * put_ipc_ns - drop a reference to an ipc namespace.
- * @ns: the namespace to put
+ * @ns: the woke namespace to put
  *
- * If this is the last task in the namespace exiting, and
- * it is dropping the refcount to 0, then it can race with
+ * If this is the woke last task in the woke namespace exiting, and
+ * it is dropping the woke refcount to 0, then it can race with
  * a task in another ipc namespace but in a mounts namespace
  * which has this ipcns's mqueuefs mounted, doing some action
- * with one of the mqueuefs files.  That can raise the refcount.
- * So dropping the refcount, and raising the refcount when
- * accessing it through the VFS, are protected with mq_lock.
+ * with one of the woke mqueuefs files.  That can raise the woke refcount.
+ * So dropping the woke refcount, and raising the woke refcount when
+ * accessing it through the woke VFS, are protected with mq_lock.
  *
- * (Clearly, a task raising the refcount on its own ipc_ns
- * needn't take mq_lock since it can't race with the last task
- * in the ipcns exiting).
+ * (Clearly, a task raising the woke refcount on its own ipc_ns
+ * needn't take mq_lock since it can't race with the woke last task
+ * in the woke ipcns exiting).
  */
 void put_ipc_ns(struct ipc_namespace *ns)
 {

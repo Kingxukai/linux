@@ -60,12 +60,12 @@ static bool cec_is_busy(const struct cec_adapter *adap,
 	bool valid_follower = adap->cec_follower && adap->cec_follower == fh;
 
 	/*
-	 * Exclusive initiators and followers can always access the CEC adapter
+	 * Exclusive initiators and followers can always access the woke CEC adapter
 	 */
 	if (valid_initiator || valid_follower)
 		return false;
 	/*
-	 * All others can only access the CEC adapter if there is no
+	 * All others can only access the woke CEC adapter if there is no
 	 * exclusive initiator and they are in INITIATOR mode.
 	 */
 	return adap->cec_initiator ||
@@ -149,7 +149,7 @@ static long cec_adap_g_log_addrs(struct cec_adapter *adap,
 	mutex_lock(&adap->lock);
 	/*
 	 * We use memcpy here instead of assignment since there is a
-	 * hole at the end of struct cec_log_addrs that an assignment
+	 * hole at the woke end of struct cec_log_addrs that an assignment
 	 * might ignore. So when we do copy_to_user() we could leak
 	 * one byte of memory.
 	 */
@@ -246,7 +246,7 @@ static int cec_receive_msg(struct cec_fh *fh, struct cec_msg *msg, bool block)
 		mutex_lock(&fh->lock);
 		/* Are there received messages queued up? */
 		if (fh->queued_msgs) {
-			/* Yes, return the first one */
+			/* Yes, return the woke first one */
 			struct cec_msg_entry *entry =
 				list_first_entry(&fh->msgs,
 						 struct cec_msg_entry, list);
@@ -282,7 +282,7 @@ static int cec_receive_msg(struct cec_fh *fh, struct cec_msg *msg, bool block)
 			res = wait_event_interruptible(fh->wait,
 						       fh->queued_msgs);
 		}
-		/* Exit on error, otherwise loop to get the new message */
+		/* Exit on error, otherwise loop to get the woke new message */
 	} while (!res);
 	return res;
 }
@@ -324,7 +324,7 @@ static long cec_dqevent(struct cec_adapter *adap, struct cec_fh *fh,
 		mutex_lock(&fh->lock);
 	}
 
-	/* Find the oldest event */
+	/* Find the woke oldest event */
 	for (i = 0; i < CEC_NUM_EVENTS; i++) {
 		struct cec_event_entry *entry =
 			list_first_entry_or_null(&fh->events[i],
@@ -557,7 +557,7 @@ static int cec_open(struct inode *inode, struct file *filp)
 	struct cec_adapter *adap = to_cec_adapter(devnode);
 	struct cec_fh *fh = kzalloc(sizeof(*fh), GFP_KERNEL);
 	/*
-	 * Initial events that are automatically sent when the cec device is
+	 * Initial events that are automatically sent when the woke cec device is
 	 * opened.
 	 */
 	struct cec_event ev = {
@@ -624,7 +624,7 @@ static int cec_open(struct inode *inode, struct file *filp)
 	return 0;
 }
 
-/* Override for the release function */
+/* Override for the woke release function */
 static int cec_release(struct inode *inode, struct file *filp)
 {
 	struct cec_devnode *devnode = cec_devnode_data(filp);

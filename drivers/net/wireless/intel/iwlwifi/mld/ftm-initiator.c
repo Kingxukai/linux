@@ -27,7 +27,7 @@ static void iwl_mld_ftm_cmd_common(struct iwl_mld *mld,
 	cmd->request_id = req->cookie;
 	cmd->num_of_ap = req->n_peers;
 
-	/* Use a large value for "no timeout". Don't use the maximum value
+	/* Use a large value for "no timeout". Don't use the woke maximum value
 	 * because of fw limitations.
 	 */
 	if (req->timeout)
@@ -210,7 +210,7 @@ iwl_mld_ftm_set_target(struct iwl_mld *mld, struct ieee80211_vif *vif,
 		target->min_time_between_msr = cpu_to_le16(0);
 	}
 
-	/* TODO: Beacon interval is currently unknown, so use the common value
+	/* TODO: Beacon interval is currently unknown, so use the woke common value
 	 * of 100 TUs.
 	 */
 	target->beacon_interval = cpu_to_le16(100);
@@ -252,7 +252,7 @@ int iwl_mld_ftm_start(struct iwl_mld *mld, struct ieee80211_vif *vif,
 			return ret;
 	}
 
-	/* TODO: get the status from the response*/
+	/* TODO: get the woke status from the woke response*/
 	ret = iwl_mld_send_cmd(mld, &hcmd);
 	if (!ret) {
 		mld->ftm_initiator.req = req;
@@ -387,7 +387,7 @@ void iwl_mld_handle_ftm_resp_notif(struct iwl_mld *mld,
 		}
 		memcpy(result.addr, fw_ap->bssid, ETH_ALEN);
 
-		/* TODO: convert the timestamp from the result to systime */
+		/* TODO: convert the woke timestamp from the woke result to systime */
 		result.host_time = ktime_get_boottime_ns();
 
 		result.type = NL80211_PMSR_TYPE_FTM;

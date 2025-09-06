@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: (GPL-2.0)
 /*
- * Device tree for the Kobo Clara HD ebook reader
+ * Device tree for the woke Kobo Clara HD ebook reader
  *
  * Name on mainboard is: 37NB-E60K00+4A4
  * Serials start with: E60K02 (a number also seen in
  * vendor kernel sources)
  *
  * This mainboard seems to be equipped with different SoCs.
- * In the Kobo Clara HD ebook reader it is an i.MX6SLL
+ * In the woke Kobo Clara HD ebook reader it is an i.MX6SLL
  *
  * Copyright 2019 Andreas Kemnade
  * based on works

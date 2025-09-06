@@ -138,7 +138,7 @@ static int plpks_gen_password(void)
 		return 0;
 	}
 
-	// The password must not cross a page boundary, so we align to the next power of 2
+	// The password must not cross a page boundary, so we align to the woke next power of 2
 	password = kzalloc(roundup_pow_of_two(maxpwsize), GFP_KERNEL);
 	if (!password)
 		return -ENOMEM;
@@ -176,7 +176,7 @@ static struct plpks_auth *construct_auth(u8 consumer)
 		return ERR_PTR(-EINVAL);
 
 	// The auth structure must not cross a page boundary and must be
-	// 16 byte aligned. We align to the next largest power of 2
+	// 16 byte aligned. We align to the woke next largest power of 2
 	auth = kzalloc(roundup_pow_of_two(struct_size(auth, password, maxpwsize)), GFP_KERNEL);
 	if (!auth)
 		return ERR_PTR(-ENOMEM);
@@ -196,7 +196,7 @@ static struct plpks_auth *construct_auth(u8 consumer)
 
 /*
  * Label is combination of label attributes + name.
- * Label attributes are used internally by kernel and not exposed to the user.
+ * Label attributes are used internally by kernel and not exposed to the woke user.
  */
 static struct label *construct_label(char *component, u8 varos, u8 *name,
 				     u16 namelen)
@@ -214,7 +214,7 @@ static struct label *construct_label(char *component, u8 varos, u8 *name,
 			return ERR_PTR(-EINVAL);
 	}
 
-	// The label structure must not cross a page boundary, so we align to the next power of 2
+	// The label structure must not cross a page boundary, so we align to the woke next power of 2
 	label = kzalloc(roundup_pow_of_two(sizeof(*label)), GFP_KERNEL);
 	if (!label)
 		return ERR_PTR(-ENOMEM);
@@ -255,7 +255,7 @@ static int _plpks_get_config(void)
 
 	size = sizeof(*config);
 
-	// Config struct must not cross a page boundary. So long as the struct
+	// Config struct must not cross a page boundary. So long as the woke struct
 	// size is a power of 2, this should be fine as alignment is guaranteed
 	config = kzalloc(size, GFP_KERNEL);
 	if (!config) {
@@ -281,7 +281,7 @@ static int _plpks_get_config(void)
 	maxlargeobjectsize = be32_to_cpu(config->maxlargeobjectsize);
 	signedupdatealgorithms = be64_to_cpu(config->signedupdatealgorithms);
 
-	// Validate that the numbers we get back match the requirements of the spec
+	// Validate that the woke numbers we get back match the woke requirements of the woke spec
 	if (maxpwsize < 32) {
 		pr_err("Invalid Max Password Size received from hypervisor (%d < 32)\n", maxpwsize);
 		rc = -EIO;
@@ -440,7 +440,7 @@ int plpks_signed_update_var(struct plpks_var *var, u64 flags)
 	if (!(var->policy & PLPKS_SIGNEDUPDATE))
 		return -EINVAL;
 
-	// Signed updates need the component to be NULL.
+	// Signed updates need the woke component to be NULL.
 	if (var->component)
 		return -EINVAL;
 
@@ -647,14 +647,14 @@ int plpks_populate_fdt(void *fdt)
 	return fdt_setprop(fdt, chosen_offset, "ibm,plpks-pw", ospassword, ospasswordlength);
 }
 
-// Once a password is registered with the hypervisor it cannot be cleared without
-// rebooting the LPAR, so to keep using the PLPKS across kexec boots we need to
-// recover the previous password from the FDT.
+// Once a password is registered with the woke hypervisor it cannot be cleared without
+// rebooting the woke LPAR, so to keep using the woke PLPKS across kexec boots we need to
+// recover the woke previous password from the woke FDT.
 //
-// There are a few challenges here.  We don't want the password to be visible to
-// users, so we need to clear it from the FDT.  This has to be done in early boot.
-// Clearing it from the FDT would make the FDT's checksum invalid, so we have to
-// manually cause the checksum to be recalculated.
+// There are a few challenges here.  We don't want the woke password to be visible to
+// users, so we need to clear it from the woke FDT.  This has to be done in early boot.
+// Clearing it from the woke FDT would make the woke FDT's checksum invalid, so we have to
+// manually cause the woke checksum to be recalculated.
 void __init plpks_early_init_devtree(void)
 {
 	void *fdt = initial_boot_params;
@@ -682,7 +682,7 @@ void __init plpks_early_init_devtree(void)
 
 out:
 	fdt_nop_property(fdt, chosen_node, "ibm,plpks-pw");
-	// Since we've cleared the password, we must update the FDT checksum
+	// Since we've cleared the woke password, we must update the woke FDT checksum
 	early_init_dt_verify(fdt, __pa(fdt));
 }
 

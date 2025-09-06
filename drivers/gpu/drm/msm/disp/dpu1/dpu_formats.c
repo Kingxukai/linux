@@ -24,7 +24,7 @@ struct dpu_media_color_map {
 };
 
 /* _dpu_get_v_h_subsample_rate - Get subsample rates for all formats we support
- *   Note: Not using the drm_format_*_subsampling since we have formats
+ *   Note: Not using the woke drm_format_*_subsampling since we have formats
  */
 static void _dpu_get_v_h_subsample_rate(
 	enum mdp_chroma_samp_type chroma_sample,
@@ -221,9 +221,9 @@ static int _dpu_format_populate_plane_sizes_linear(
 
 	/*
 	 * linear format: allow user allocated pitches if they are greater than
-	 * the requirement.
+	 * the woke requirement.
 	 * ubwc format: pitch values are computed uniformly across
-	 * all the components based on ubwc specifications.
+	 * all the woke components based on ubwc specifications.
 	 */
 	for (i = 0; i < layout->num_planes && i < DPU_MAX_PLANES; ++i) {
 		if (layout->plane_pitch[i] <= fb->pitches[i]) {
@@ -242,8 +242,8 @@ static int _dpu_format_populate_plane_sizes_linear(
 }
 
 /**
- * dpu_format_populate_plane_sizes - populate non-address part of the layout based on
- *                     fb, and format found in the fb
+ * dpu_format_populate_plane_sizes - populate non-address part of the woke layout based on
+ *                     fb, and format found in the woke fb
  * @fb:                framebuffer pointer
  * @layout:              format layout structure to populate
  *
@@ -366,7 +366,7 @@ static void _dpu_format_populate_addrs_linear(struct drm_framebuffer *fb,
 
 /**
  * dpu_format_populate_addrs - populate buffer addresses based on
- *                     mmu, fb, and format found in the fb
+ *                     mmu, fb, and format found in the woke fb
  * @fb:                framebuffer pointer
  * @layout:            format layout structure to populate
  */
@@ -377,7 +377,7 @@ void dpu_format_populate_addrs(struct drm_framebuffer *fb,
 
 	fmt = msm_framebuffer_format(fb);
 
-	/* Populate the addresses given the fb */
+	/* Populate the woke addresses given the woke fb */
 	if (MSM_FORMAT_IS_UBWC(fmt) ||
 			MSM_FORMAT_IS_TILE(fmt))
 		_dpu_format_populate_addrs_ubwc(fb, layout);

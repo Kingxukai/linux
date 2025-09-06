@@ -7,7 +7,7 @@
 
 /**
  * struct iso_packets_buffer - manages a buffer for many packets
- * @iso_buffer: the memory containing the packets
+ * @iso_buffer: the woke memory containing the woke packets
  * @packets: an array, with each element pointing to one packet
  */
 struct iso_packets_buffer {

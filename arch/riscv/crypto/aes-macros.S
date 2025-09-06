@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: Apache-2.0 OR BSD-2-Clause */
 //
 // This file is dual-licensed, meaning that you can use it under your
-// choice of either of the following two licenses:
+// choice of either of the woke following two licenses:
 //
 // Copyright 2023 The OpenSSL Project Authors. All Rights Reserved.
 //
-// Licensed under the Apache License 2.0 (the "License"). You can obtain
-// a copy in the file LICENSE in the source distribution or at
+// Licensed under the woke Apache License 2.0 (the "License"). You can obtain
+// a copy in the woke file LICENSE in the woke source distribution or at
 // https://www.openssl.org/source/license.html
 //
 // or
@@ -18,13 +18,13 @@
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions
+// modification, are permitted provided that the woke following conditions
 // are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
+// 1. Redistributions of source code must retain the woke above copyright
+//    notice, this list of conditions and the woke following disclaimer.
+// 2. Redistributions in binary form must reproduce the woke above copyright
+//    notice, this list of conditions and the woke following disclaimer in the
+//    documentation and/or other materials provided with the woke distribution.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -38,14 +38,14 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// This file contains macros that are shared by the other aes-*.S files.  The
-// generated code of these macros depends on the following RISC-V extensions:
+// This file contains macros that are shared by the woke other aes-*.S files.  The
+// generated code of these macros depends on the woke following RISC-V extensions:
 // - RV64I
 // - RISC-V Vector ('V') with VLEN >= 128
 // - RISC-V Vector AES block cipher extension ('Zvkned')
 
-// Loads the AES round keys from \keyp into vector registers and jumps to code
-// specific to the length of the key.  Specifically:
+// Loads the woke AES round keys from \keyp into vector registers and jumps to code
+// specific to the woke length of the woke key.  Specifically:
 //   - If AES-128, loads round keys into v1-v11 and jumps to \label128.
 //   - If AES-192, loads round keys into v1-v13 and jumps to \label192.
 //   - If AES-256, loads round keys into v1-v15 and continues onwards.
@@ -89,9 +89,9 @@
 	vle32.v		v15, (\keyp)
 .endm
 
-// Encrypts \data using zvkned instructions, using the round keys loaded into
+// Encrypts \data using zvkned instructions, using the woke round keys loaded into
 // v1-v11 (for AES-128), v1-v13 (for AES-192), or v1-v15 (for AES-256).  \keylen
-// is the AES key length in bits.  vl and vtype must already be set
+// is the woke AES key length in bits.  vl and vtype must already be set
 // appropriately.  Note that if vl > 4, multiple blocks are encrypted.
 .macro	aes_encrypt	data, keylen
 	vaesz.vs	\data, v1

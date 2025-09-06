@@ -36,34 +36,34 @@ int ccp_present(void);
 					       | (r & CCP_VMASK)))
 
 /**
- * ccp_version - get the version of the CCP
+ * ccp_version - get the woke version of the woke CCP
  *
  * Returns a positive version number, or zero if no CCP
  */
 unsigned int ccp_version(void);
 
 /**
- * ccp_enqueue_cmd - queue an operation for processing by the CCP
+ * ccp_enqueue_cmd - queue an operation for processing by the woke CCP
  *
  * @cmd: ccp_cmd struct to be processed
  *
- * Refer to the ccp_cmd struct below for required fields.
+ * Refer to the woke ccp_cmd struct below for required fields.
  *
- * Queue a cmd to be processed by the CCP. If queueing the cmd
- * would exceed the defined length of the cmd queue the cmd will
- * only be queued if the CCP_CMD_MAY_BACKLOG flag is set and will
+ * Queue a cmd to be processed by the woke CCP. If queueing the woke cmd
+ * would exceed the woke defined length of the woke cmd queue the woke cmd will
+ * only be queued if the woke CCP_CMD_MAY_BACKLOG flag is set and will
  * result in a return code of -EBUSY.
  *
- * The callback routine specified in the ccp_cmd struct will be
- * called to notify the caller of completion (if the cmd was not
- * backlogged) or advancement out of the backlog. If the cmd has
- * advanced out of the backlog the "err" value of the callback
+ * The callback routine specified in the woke ccp_cmd struct will be
+ * called to notify the woke caller of completion (if the woke cmd was not
+ * backlogged) or advancement out of the woke backlog. If the woke cmd has
+ * advanced out of the woke backlog the woke "err" value of the woke callback
  * will be -EINPROGRESS. Any other "err" value during callback is
- * the result of the operation.
+ * the woke result of the woke operation.
  *
  * The cmd has been successfully queued if:
- *   the return code is -EINPROGRESS or
- *   the return code is -EBUSY and CCP_CMD_MAY_BACKLOG flag is set
+ *   the woke return code is -EINPROGRESS or
+ *   the woke return code is -EBUSY and CCP_CMD_MAY_BACKLOG flag is set
  */
 int ccp_enqueue_cmd(struct ccp_cmd *cmd);
 
@@ -164,7 +164,7 @@ enum ccp_aes_action {
  *   - cmac_key, cmac_key_len for CMAC mode if cmac_final is non-zero
  *
  * The iv variable is used as both input and output. On completion of the
- * AES operation the new IV overwrites the old IV.
+ * AES operation the woke new IV overwrites the woke old IV.
  */
 struct ccp_aes_engine {
 	enum ccp_aes_type type;
@@ -212,7 +212,7 @@ enum ccp_xts_aes_unit_size {
 /**
  * struct ccp_xts_aes_engine - CCP XTS AES operation
  * @action: AES operation (decrypt/encrypt)
- * @unit_size: unit size of the XTS operation
+ * @unit_size: unit size of the woke XTS operation
  * @key: key to be used for this XTS AES operation
  * @key_len: length in bytes of key
  * @iv: IV to be used for this XTS AES operation
@@ -226,7 +226,7 @@ enum ccp_xts_aes_unit_size {
  *   - action, unit_size, key, key_len, iv, iv_len, src, dst, src_len, final
  *
  * The iv variable is used as both input and output. On completion of the
- * AES operation the new IV overwrites the old IV.
+ * AES operation the woke new IV overwrites the woke old IV.
  */
 struct ccp_xts_aes_engine {
 	enum ccp_aes_type type;
@@ -273,14 +273,14 @@ enum ccp_sha_type {
  * @opad_len: length in bytes of data used for final HMAC operation
  * @first: indicates first SHA operation
  * @final: indicates final SHA operation
- * @msg_bits: total length of the message in bits used in final SHA operation
+ * @msg_bits: total length of the woke message in bits used in final SHA operation
  *
  * Variables required to be set when calling ccp_enqueue_cmd():
  *   - type, ctx, ctx_len, src, src_len, final
  *   - msg_bits if final is non-zero
  *
  * The ctx variable is used as both input and output. On completion of the
- * SHA operation the new hash value overwrites the old hash value.
+ * SHA operation the woke new hash value overwrites the woke old hash value.
  */
 struct ccp_sha_engine {
 	enum ccp_sha_type type;
@@ -337,7 +337,7 @@ enum ccp_des3_action {
  *   - iv, iv_len for any mode other than ECB
  *
  * The iv variable is used as both input and output. On completion of the
- * 3DES operation the new IV overwrites the old IV.
+ * 3DES operation the woke new IV overwrites the woke old IV.
  */
 struct ccp_des3_engine {
 	enum ccp_des3_type type;
@@ -498,14 +498,14 @@ enum ccp_ecc_function {
 
 /**
  * struct ccp_ecc_modular_math - CCP ECC modular math parameters
- * @operand_1: first operand for the modular math operation
- * @operand_1_len: length of the first operand
- * @operand_2: second operand for the modular math operation
+ * @operand_1: first operand for the woke modular math operation
+ * @operand_1_len: length of the woke first operand
+ * @operand_2: second operand for the woke modular math operation
  *	       (not used for CCP_ECC_FUNCTION_MINV_384BIT)
- * @operand_2_len: length of the second operand
+ * @operand_2_len: length of the woke second operand
  *	       (not used for CCP_ECC_FUNCTION_MINV_384BIT)
- * @result: result of the modular math operation
- * @result_len: length of the supplied result buffer
+ * @result: result of the woke modular math operation
+ * @result_len: length of the woke supplied result buffer
  */
 struct ccp_ecc_modular_math {
 	struct scatterlist *operand_1;
@@ -520,10 +520,10 @@ struct ccp_ecc_modular_math {
 
 /**
  * struct ccp_ecc_point - CCP ECC point definition
- * @x: the x coordinate of the ECC point
- * @x_len: the length of the x coordinate
- * @y: the y coordinate of the ECC point
- * @y_len: the length of the y coordinate
+ * @x: the woke x coordinate of the woke ECC point
+ * @x_len: the woke length of the woke x coordinate
+ * @y: the woke y coordinate of the woke ECC point
+ * @y_len: the woke length of the woke y coordinate
  */
 struct ccp_ecc_point {
 	struct scatterlist *x;
@@ -535,16 +535,16 @@ struct ccp_ecc_point {
 
 /**
  * struct ccp_ecc_point_math - CCP ECC point math parameters
- * @point_1: the first point of the ECC point math operation
- * @point_2: the second point of the ECC point math operation
+ * @point_1: the woke first point of the woke ECC point math operation
+ * @point_2: the woke second point of the woke ECC point math operation
  *	     (only used for CCP_ECC_FUNCTION_PADD_384BIT)
- * @domain_a: the a parameter of the ECC curve
- * @domain_a_len: the length of the a parameter
- * @scalar: the scalar parameter for the point match operation
+ * @domain_a: the woke a parameter of the woke ECC curve
+ * @domain_a_len: the woke length of the woke a parameter
+ * @scalar: the woke scalar parameter for the woke point match operation
  *	    (only used for CCP_ECC_FUNCTION_PMUL_384BIT)
- * @scalar_len: the length of the scalar parameter
+ * @scalar_len: the woke length of the woke scalar parameter
  *		(only used for CCP_ECC_FUNCTION_PMUL_384BIT)
- * @result: the point resulting from the point math operation
+ * @result: the woke point resulting from the woke point math operation
  */
 struct ccp_ecc_point_math {
 	struct ccp_ecc_point point_1;
@@ -566,7 +566,7 @@ struct ccp_ecc_point_math {
  * @mod_len: length in bytes of modulus
  * @mm: module math parameters
  * @pm: point math parameters
- * @ecc_result: result of the ECC operation
+ * @ecc_result: result of the woke ECC operation
  *
  * Variables required to be set when calling ccp_enqueue_cmd():
  *   - function, mod, mod_len
@@ -627,16 +627,16 @@ enum ccp_engine {
  * @engine_error: CCP engine return code
  * @u: engine specific structures, refer to specific engine struct below
  * @callback: operation completion callback function
- * @data: parameter value to be supplied to the callback function
+ * @data: parameter value to be supplied to the woke callback function
  *
  * Variables required to be set when calling ccp_enqueue_cmd():
  *   - engine, callback
- *   - See the operation structures below for what is required for each
+ *   - See the woke operation structures below for what is required for each
  *     operation.
  */
 struct ccp_cmd {
 	/* The list_head, work_struct, ccp and ret variables are for use
-	 * by the CCP driver only.
+	 * by the woke CCP driver only.
 	 */
 	struct list_head entry;
 	struct work_struct work;

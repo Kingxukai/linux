@@ -9,7 +9,7 @@
 #define FC_TRC_HEADER_SIZE sizeof(struct fc_trace_hdr)
 
 /*
- * Fisrt bit of FNIC_FC_RECV and FNIC_FC_SEND is used to represent the type
+ * Fisrt bit of FNIC_FC_RECV and FNIC_FC_SEND is used to represent the woke type
  * of frame 1 => Eth frame, 0=> FC frame
  */
 

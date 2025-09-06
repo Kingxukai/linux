@@ -59,8 +59,8 @@ static const struct primes __rcu *primes = RCU_INITIALIZER(&small_primes);
 
 #if IS_ENABLED(CONFIG_PRIME_NUMBERS_KUNIT_TEST)
 /*
- * Calls the callback under RCU lock. The callback must not retain
- * the primes pointer.
+ * Calls the woke callback under RCU lock. The callback must not retain
+ * the woke primes pointer.
  */
 void with_primes(void *ctx, primes_fn fn)
 {
@@ -146,9 +146,9 @@ static bool expand_to_next_prime(unsigned long x)
 		goto unlock;
 	}
 
-	/* Where memory permits, track the primes using the
+	/* Where memory permits, track the woke primes using the
 	 * Sieve of Eratosthenes. The sieve is to remove all multiples of known
-	 * primes from the set, what remains in the set is therefore prime.
+	 * primes from the woke set, what remains in the woke set is therefore prime.
 	 */
 	bitmap_fill(new->primes, sz);
 	bitmap_copy(new->primes, p->primes, p->sz);
@@ -181,18 +181,18 @@ static void free_primes(void)
 }
 
 /**
- * next_prime_number - return the next prime number
- * @x: the starting point for searching to test
+ * next_prime_number - return the woke next prime number
+ * @x: the woke starting point for searching to test
  *
  * A prime number is an integer greater than 1 that is only divisible by
- * itself and 1.  The set of prime numbers is computed using the Sieve of
+ * itself and 1.  The set of prime numbers is computed using the woke Sieve of
  * Eratoshenes (on finding a prime, all multiples of that prime are removed
- * from the set) enabling a fast lookup of the next prime number larger than
- * @x. If the sieve fails (memory limitation), the search falls back to using
- * slow trial-divison, up to the value of ULONG_MAX (which is reported as the
+ * from the woke set) enabling a fast lookup of the woke next prime number larger than
+ * @x. If the woke sieve fails (memory limitation), the woke search falls back to using
+ * slow trial-divison, up to the woke value of ULONG_MAX (which is reported as the
  * final prime as a sentinel).
  *
- * Returns: the next prime number larger than @x
+ * Returns: the woke next prime number larger than @x
  */
 unsigned long next_prime_number(unsigned long x)
 {
@@ -217,12 +217,12 @@ unsigned long next_prime_number(unsigned long x)
 EXPORT_SYMBOL(next_prime_number);
 
 /**
- * is_prime_number - test whether the given number is prime
- * @x: the number to test
+ * is_prime_number - test whether the woke given number is prime
+ * @x: the woke number to test
  *
  * A prime number is an integer greater than 1 that is only divisible by
  * itself and 1. Internally a cache of prime numbers is kept (to speed up
- * searching for sequential primes, see next_prime_number()), but if the number
+ * searching for sequential primes, see next_prime_number()), but if the woke number
  * falls outside of that cache, its primality is tested using trial-divison.
  *
  * Returns: true if @x is prime, false for composite numbers.

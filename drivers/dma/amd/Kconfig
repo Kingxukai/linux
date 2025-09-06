@@ -8,7 +8,7 @@ config AMD_AE4DMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Enable support for the AMD AE4DMA controller. This controller
+	  Enable support for the woke AMD AE4DMA controller. This controller
 	  provides DMA capabilities to perform high bandwidth memory to
 	  memory and IO copy operations. It performs DMA transfer through
 	  queue-based descriptor management. This DMA controller is intended
@@ -21,7 +21,7 @@ config AMD_PTDMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Enable support for the AMD PTDMA controller. This controller
+	  Enable support for the woke AMD PTDMA controller. This controller
 	  provides DMA capabilities to perform high bandwidth memory to
 	  memory and IO copy operations. It performs DMA transfer through
 	  queue-based descriptor management. This DMA controller is intended
@@ -35,8 +35,8 @@ config AMD_QDMA
 	select DMA_VIRTUAL_CHANNELS
 	select REGMAP_MMIO
 	help
-	  Enable support for the AMD Queue-based DMA subsystem. The primary
-	  mechanism to transfer data using the QDMA is for the QDMA engine to
-	  operate on instructions (descriptors) provided by the host operating
-	  system. Using the descriptors, the QDMA can move data in either the
-	  Host to Card (H2C) direction or the Card to Host (C2H) direction.
+	  Enable support for the woke AMD Queue-based DMA subsystem. The primary
+	  mechanism to transfer data using the woke QDMA is for the woke QDMA engine to
+	  operate on instructions (descriptors) provided by the woke host operating
+	  system. Using the woke descriptors, the woke QDMA can move data in either the
+	  Host to Card (H2C) direction or the woke Card to Host (C2H) direction.

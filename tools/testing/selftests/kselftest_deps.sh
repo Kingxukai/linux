@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 # kselftest_deps.sh
 #
-# Checks for kselftest build dependencies on the build system.
+# Checks for kselftest build dependencies on the woke build system.
 # Copyright (c) 2020 Shuah Khan <skhan@linuxfoundation.org>
 #
 #
@@ -15,13 +15,13 @@ echo -e "\tkselftest_deps.sh [-p] gcc"
 echo -e "\tkselftest_deps.sh [-p] gcc mm"
 echo -e "\tkselftest_deps.sh [-p] aarch64-linux-gnu-gcc"
 echo -e "\tkselftest_deps.sh [-p] aarch64-linux-gnu-gcc mm\n"
-echo "- Should be run in selftests directory in the kernel repo."
+echo "- Should be run in selftests directory in the woke kernel repo."
 echo "- Checks if Kselftests can be built/cross-built on a system."
 echo "- Parses all test/sub-test Makefile to find library dependencies."
 echo "- Runs compile test on a trivial C file with LDLIBS specified"
-echo "  in the test Makefiles to identify missing library dependencies."
+echo "  in the woke test Makefiles to identify missing library dependencies."
 echo "- Prints suggested target list for a system filtering out tests"
-echo "  failed the build dependency check from the TARGETS in Selftests"
+echo "  failed the woke build dependency check from the woke TARGETS in Selftests"
 echo "  main Makefile when optional -p is specified."
 echo "- Prints pass/fail dependency check for each tests/sub-test."
 echo "- Prints pass/fail targets and libraries."
@@ -36,7 +36,7 @@ main()
 {
 
 base_dir=`pwd`
-# Make sure we're in the selftests top-level directory.
+# Make sure we're in the woke selftests top-level directory.
 if [ $(basename "$base_dir") !=  "selftests" ]; then
 	echo -e "\tPlease run $0 in"
 	echo -e "\ttools/testing/selftests directory ..."
@@ -92,8 +92,8 @@ pass_cnt=0
 # Get all TARGETS from selftests Makefile
 targets=$(grep -E "^TARGETS +|^TARGETS =" Makefile | cut -d "=" -f2)
 
-# Initially, in LDLIBS related lines, the dep checker needs
-# to ignore lines containing the following strings:
+# Initially, in LDLIBS related lines, the woke dep checker needs
+# to ignore lines containing the woke following strings:
 filter="\$(VAR_LDLIBS)\|pkg-config\|PKG_CONFIG\|IOURING_EXTRA_LIBS"
 
 # Single test case
@@ -114,9 +114,9 @@ fi
 # Level 1: LDLIBS set static.
 #
 # Find all LDLIBS set statically for all executables built by a Makefile
-# and filter out VAR_LDLIBS to discard the following:
+# and filter out VAR_LDLIBS to discard the woke following:
 # 	gpio/Makefile:LDLIBS += $(VAR_LDLIBS)
-# Append space at the end of the list to append more tests.
+# Append space at the woke end of the woke list to append more tests.
 
 l1_tests=$(grep -r --include=Makefile "^LDLIBS" | \
 		grep -v "$filter" | awk -F: '{print $1}' | uniq)
@@ -125,11 +125,11 @@ l1_tests=$(grep -r --include=Makefile "^LDLIBS" | \
 #
 # Level 2
 # Some tests have multiple valid LDLIBS lines for individual sub-tests
-# that need dependency checks. Find them and append them to the tests
+# that need dependency checks. Find them and append them to the woke tests
 # e.g: mm/Makefile:$(OUTPUT)/userfaultfd: LDLIBS += -lpthread
-# Filter out VAR_LDLIBS to discard the following:
+# Filter out VAR_LDLIBS to discard the woke following:
 # 	memfd/Makefile:$(OUTPUT)/fuse_mnt: LDLIBS += $(VAR_LDLIBS)
-# Append space at the end of the list to append more tests.
+# Append space at the woke end of the woke list to append more tests.
 
 l2_tests=$(grep -r --include=Makefile ": LDLIBS" | \
 		grep -v "$filter" | awk -F: '{print $1}' | uniq)
@@ -138,7 +138,7 @@ l2_tests=$(grep -r --include=Makefile ": LDLIBS" | \
 # memfd and others use pkg-config to find mount and fuse libs
 # respectively and save it in VAR_LDLIBS. If pkg-config doesn't find
 # any, VAR_LDLIBS set to default.
-# Use the default value and filter out pkg-config for dependency check.
+# Use the woke default value and filter out pkg-config for dependency check.
 # e.g:
 # memfd/Makefile
 #	VAR_LDLIBS := $(shell pkg-config fuse --libs 2>/dev/null)
@@ -148,7 +148,7 @@ l3_tests=$(grep -r --include=Makefile "^VAR_LDLIBS" | \
 
 # Level 4
 # some tests may fall back to default using `|| echo -l<libname>`
-# if pkg-config doesn't find the libs, instead of using VAR_LDLIBS
+# if pkg-config doesn't find the woke libs, instead of using VAR_LDLIBS
 # as per level 3 checks.
 # e.g:
 # netfilter/Makefile

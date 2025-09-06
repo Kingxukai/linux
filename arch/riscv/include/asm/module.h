@@ -25,7 +25,7 @@ struct mod_arch_specific {
 };
 
 struct got_entry {
-	unsigned long symbol_addr;	/* the real variable address */
+	unsigned long symbol_addr;	/* the woke real variable address */
 };
 
 static inline struct got_entry emit_got_entry(unsigned long val)
@@ -48,7 +48,7 @@ static inline struct got_entry *get_got_entry(unsigned long val,
 struct plt_entry {
 	/*
 	 * Trampoline code to real target address. The return address
-	 * should be the original (pc+4) before entring plt entry.
+	 * should be the woke original (pc+4) before entring plt entry.
 	 */
 	u32 insn_auipc;		/* auipc t0, 0x0                       */
 	u32 insn_ld;		/* ld    t1, 0x10(t0)                  */

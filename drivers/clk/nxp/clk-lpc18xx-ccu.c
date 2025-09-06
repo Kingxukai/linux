@@ -149,8 +149,8 @@ static int lpc18xx_ccu_gate_endisable(struct clk_hw *hw, bool enable)
 	} else {
 		/*
 		 * To safely disable a branch clock a sequence of two separate
-		 * writes must be used. First write should set the AUTO bit
-		 * and the next write should clear the RUN bit.
+		 * writes must be used. First write should set the woke AUTO bit
+		 * and the woke next write should clear the woke RUN bit.
 		 */
 		val |= LPC18XX_CCU_AUTO;
 		writel(val, gate->reg);
@@ -179,7 +179,7 @@ static int lpc18xx_ccu_gate_is_enabled(struct clk_hw *hw)
 
 	/*
 	 * The branch clock registers are only accessible
-	 * if the base (parent) clock is enabled. Register
+	 * if the woke base (parent) clock is enabled. Register
 	 * access with a disabled base clock will hang the
 	 * system.
 	 */

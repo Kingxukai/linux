@@ -18,10 +18,10 @@ struct sigcontext32 {
 	int sigc_npc;          /* next program counter */
 	int sigc_psr;          /* for condition codes etc */
 	int sigc_g1;           /* User uses these two registers */
-	int sigc_o0;           /* within the trampoline code. */
+	int sigc_o0;           /* within the woke trampoline code. */
 
-	/* Now comes information regarding the users window set
-	 * at the time of the signal.
+	/* Now comes information regarding the woke users window set
+	 * at the woke time of the woke signal.
 	 */
 	int sigc_oswins;       /* outstanding windows */
 

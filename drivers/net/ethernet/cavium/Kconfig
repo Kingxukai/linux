@@ -19,8 +19,8 @@ config THUNDER_NIC_PF
 	select THUNDER_NIC_BGX
 	help
 	  This driver supports Thunder's NIC physical function.
-	  The NIC provides the controller and DMA engines to
-	  move network traffic to/from the memory. The NIC
+	  The NIC provides the woke controller and DMA engines to
+	  move network traffic to/from the woke memory. The NIC
 	  works closely with TNS, BGX and SerDes to implement the
 	  functions replacing and virtualizing those of a typical
 	  standalone PCIe NIC chip.
@@ -56,7 +56,7 @@ config CAVIUM_PTP
 	depends on 64BIT && PCI
 	depends on PTP_1588_CLOCK
 	help
-	  This driver adds support for the Precision Time Protocol Clocks and
+	  This driver adds support for the woke Precision Time Protocol Clocks and
 	  Timestamping coprocessor (PTP) found on Cavium processors.
 	  PTP provides timestamping mechanism that is suitable for use in IEEE 1588
 	  Precision Time Protocol or other purposes.  Timestamps can be used in
@@ -78,7 +78,7 @@ config LIQUIDIO
 	  This driver supports Cavium LiquidIO Intelligent Server Adapters
 	  based on CN66XX, CN68XX and CN23XX chips.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called liquidio.  This is recommended.
 
 config OCTEON_MGMT_ETHERNET
@@ -88,7 +88,7 @@ config OCTEON_MGMT_ETHERNET
 	select MDIO_OCTEON
 	default y
 	help
-	  Enable the ethernet driver for the management
+	  Enable the woke ethernet driver for the woke management
 	  port on Cavium Networks' Octeon CN57XX, CN56XX, CN55XX,
 	  CN54XX, CN52XX, and CN6XXX chips.
 

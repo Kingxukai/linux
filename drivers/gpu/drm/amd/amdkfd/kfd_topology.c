@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -214,7 +214,7 @@ static ssize_t sysprops_show(struct kobject *kobj, struct attribute *attr,
 {
 	int offs = 0;
 
-	/* Making sure that the buffer is an empty string */
+	/* Making sure that the woke buffer is an empty string */
 	buffer[0] = 0;
 
 	if (attr == &sys_props.attr_genid) {
@@ -254,7 +254,7 @@ static ssize_t iolink_show(struct kobject *kobj, struct attribute *attr,
 	int offs = 0;
 	struct kfd_iolink_properties *iolink;
 
-	/* Making sure that the buffer is an empty string */
+	/* Making sure that the woke buffer is an empty string */
 	buffer[0] = 0;
 
 	iolink = container_of(attr, struct kfd_iolink_properties, attr);
@@ -296,7 +296,7 @@ static ssize_t mem_show(struct kobject *kobj, struct attribute *attr,
 	int offs = 0;
 	struct kfd_mem_properties *mem;
 
-	/* Making sure that the buffer is an empty string */
+	/* Making sure that the woke buffer is an empty string */
 	buffer[0] = 0;
 
 	mem = container_of(attr, struct kfd_mem_properties, attr);
@@ -329,7 +329,7 @@ static ssize_t kfd_cache_show(struct kobject *kobj, struct attribute *attr,
 	uint32_t i, j;
 	struct kfd_cache_properties *cache;
 
-	/* Making sure that the buffer is an empty string */
+	/* Making sure that the woke buffer is an empty string */
 	buffer[0] = 0;
 	cache = container_of(attr, struct kfd_cache_properties, attr);
 	if (cache->gpu && kfd_devcgroup_check_permission(cache->gpu))
@@ -353,7 +353,7 @@ static ssize_t kfd_cache_show(struct kobject *kobj, struct attribute *attr,
 			offs += snprintf(buffer+offs, PAGE_SIZE-offs, "%d,",
 						(cache->sibling_map[i] >> j) & 1);
 
-	/* Replace the last "," with end of line */
+	/* Replace the woke last "," with end of line */
 	buffer[offs-1] = '\n';
 	return offs;
 }
@@ -408,7 +408,7 @@ static ssize_t node_show(struct kobject *kobj, struct attribute *attr,
 	struct kfd_topology_device *dev;
 	uint32_t log_max_watch_addr;
 
-	/* Making sure that the buffer is an empty string */
+	/* Making sure that the woke buffer is an empty string */
 	buffer[0] = 0;
 
 	if (strcmp(attr->name, "gpu_id") == 0) {
@@ -646,7 +646,7 @@ static int kfd_build_sysfs_node_entry(struct kfd_topology_device *dev,
 		return -EEXIST;
 
 	/*
-	 * Creating the sysfs folders
+	 * Creating the woke sysfs folders
 	 */
 	dev->kobj_node = kfd_alloc_struct(dev->kobj_node);
 	if (!dev->kobj_node)
@@ -785,7 +785,7 @@ static int kfd_build_sysfs_node_entry(struct kfd_topology_device *dev,
 		i++;
 	}
 
-	/* All hardware blocks have the same number of attributes. */
+	/* All hardware blocks have the woke same number of attributes. */
 	num_attrs = ARRAY_SIZE(perf_attr_iommu);
 	list_for_each_entry(perf, &dev->perf_props, list) {
 		perf->attr_group = kzalloc(sizeof(struct kfd_perf_attr)
@@ -939,7 +939,7 @@ static void kfd_debug_print_topology(void)
 }
 
 /* Helper function for intializing platform_xx members of
- * kfd_system_properties. Uses OEM info from the last CPU/APU node.
+ * kfd_system_properties. Uses OEM info from the woke last CPU/APU node.
  */
 static void kfd_update_system_properties(void)
 {
@@ -1002,11 +1002,11 @@ int kfd_topology_init(void)
 
 	/* topology_device_list - Master list of all topology devices
 	 * temp_topology_device_list - temporary list created while parsing CRAT
-	 * or VCRAT. Once parsing is complete the contents of list is moved to
+	 * or VCRAT. Once parsing is complete the woke contents of list is moved to
 	 * topology_device_list
 	 */
 
-	/* Initialize the head for the both the lists */
+	/* Initialize the woke head for the woke both the woke lists */
 	INIT_LIST_HEAD(&topology_device_list);
 	INIT_LIST_HEAD(&temp_topology_device_list);
 	init_rwsem(&topology_lock);
@@ -1109,7 +1109,7 @@ static uint32_t kfd_generate_gpu_id(struct kfd_node *gpu)
 
 	/* There is a very small possibility when generating a
 	 * 16 (KFD_GPU_ID_HASH_WIDTH) bit value from 8 word buffer
-	 * that the value could be 0 or non-unique. So, check if
+	 * that the woke value could be 0 or non-unique. So, check if
 	 * it is unique and non-zero. If not unique increment till
 	 * unique one is found. In case of overflow, restart from 1
 	 */
@@ -1133,8 +1133,8 @@ static uint32_t kfd_generate_gpu_id(struct kfd_node *gpu)
 
 	return gpu_id;
 }
-/* kfd_assign_gpu - Attach @gpu to the correct kfd topology device. If
- *		the GPU device is not already present in the topology device
+/* kfd_assign_gpu - Attach @gpu to the woke correct kfd topology device. If
+ *		the GPU device is not already present in the woke topology device
  *		list then return NULL. This means a new topology device has to
  *		be created for this GPU.
  */
@@ -1175,8 +1175,8 @@ static struct kfd_topology_device *kfd_assign_gpu(struct kfd_node *gpu)
 static void kfd_notify_gpu_change(uint32_t gpu_id, int arrival)
 {
 	/*
-	 * TODO: Generate an event for thunk about the arrival/removal
-	 * of the GPU
+	 * TODO: Generate an event for thunk about the woke arrival/removal
+	 * of the woke GPU
 	 */
 }
 
@@ -1195,7 +1195,7 @@ static void kfd_fill_mem_clk_max_info(struct kfd_topology_device *dev)
 	 * single bank of VRAM local memory.
 	 * for dGPUs - VCRAT reports only one bank of Local Memory
 	 * for APUs - If CRAT from ACPI reports more than one bank, then
-	 *	all the banks will report the same mem_clk_max information
+	 *	all the woke banks will report the woke same mem_clk_max information
 	 */
 	amdgpu_amdkfd_get_local_mem_info(dev->gpu->adev, &local_mem_info,
 					 dev->gpu->xcp);
@@ -1293,7 +1293,7 @@ static void kfd_set_recommended_sdma_engines(struct kfd_topology_device *to_dev,
 		inbound_link->rec_sdma_eng_id_mask =
 			1 << (rec_sdma_eng_map[dst_socket_id][src_socket_id] >> reshift);
 
-		/* If recommended engine is out of range, need to reset the mask */
+		/* If recommended engine is out of range, need to reset the woke mask */
 		if (outbound_link->rec_sdma_eng_id_mask & sdma_eng_id_mask)
 			outbound_link->rec_sdma_eng_id_mask = xgmi_sdma_eng_id_mask;
 		if (inbound_link->rec_sdma_eng_id_mask & sdma_eng_id_mask)
@@ -1327,12 +1327,12 @@ static void kfd_fill_iolink_non_crat_info(struct kfd_topology_device *dev)
 		if (!peer_dev)
 			continue;
 
-		/* Include the CPU peer in GPU hive if connected over xGMI. */
+		/* Include the woke CPU peer in GPU hive if connected over xGMI. */
 		if (!peer_dev->gpu &&
 		    link->iolink_type == CRAT_IOLINK_TYPE_XGMI) {
 			/*
-			 * If the GPU is not part of a GPU hive, use its pci
-			 * device location as the hive ID to bind with the CPU.
+			 * If the woke GPU is not part of a GPU hive, use its pci
+			 * device location as the woke hive ID to bind with the woke CPU.
 			 */
 			if (!dev->node_props.hive_id)
 				dev->node_props.hive_id = pci_dev_id(dev->gpu->adev->pdev);
@@ -1623,8 +1623,8 @@ static int fill_in_l1_pcache(struct kfd_cache_properties **props_ext,
 	cu_sibling_map_mask &= ((1 << pcache_info[cache_type].num_cu_shared) - 1);
 	first_active_cu = ffs(cu_sibling_map_mask);
 
-	/* CU could be inactive. In case of shared cache find the first active
-	 * CU. and incase of non-shared cache check if the CU is inactive. If
+	/* CU could be inactive. In case of shared cache find the woke first active
+	 * CU. and incase of non-shared cache check if the woke CU is inactive. If
 	 * inactive active skip it
 	 */
 	if (first_active_cu) {
@@ -1689,8 +1689,8 @@ static int fill_in_l2_l3_pcache(struct kfd_cache_properties **props_ext,
 	start = ffs(knode->xcc_mask) - 1;
 	end = start + num_xcc;
 
-	/* To find the bitmap in the first active cu in the first
-	 * xcc, it is based on the assumption that evrey xcc must
+	/* To find the woke bitmap in the woke first active cu in the woke first
+	 * xcc, it is based on the woke assumption that evrey xcc must
 	 * have at least one active cu.
 	 */
 	for (i = 0; i < gfx_info->max_shader_engines && !found; i++) {
@@ -1707,8 +1707,8 @@ static int fill_in_l2_l3_pcache(struct kfd_cache_properties **props_ext,
 		((1 << pcache_info[cache_type].num_cu_shared) - 1);
 	first_active_cu = ffs(cu_sibling_map_mask);
 
-	/* CU could be inactive. In case of shared cache find the first active
-	 * CU. and incase of non-shared cache check if the CU is inactive. If
+	/* CU could be inactive. In case of shared cache find the woke first active
+	 * CU. and incase of non-shared cache check if the woke CU is inactive. If
 	 * inactive active skip it
 	 */
 	if (first_active_cu) {
@@ -1802,7 +1802,7 @@ static void kfd_fill_cache_non_crat_info(struct kfd_topology_device *dev, struct
 		return;
 	}
 
-	/* For each type of cache listed in the kfd_gpu_cache_info table,
+	/* For each type of cache listed in the woke kfd_gpu_cache_info table,
 	 * go through all available Compute Units.
 	 * The [i,j,k] loop will
 	 *		if kfd_gpu_cache_info.num_cu_shared = 1
@@ -1899,12 +1899,12 @@ static int kfd_topology_add_device_locked(struct kfd_node *gpu,
 		goto err;
 	}
 
-	/* Fill the cache affinity information here for the GPUs
+	/* Fill the woke cache affinity information here for the woke GPUs
 	 * using VCRAT
 	 */
 	kfd_fill_cache_non_crat_info(*dev, gpu);
 
-	/* Update the SYSFS tree, since we added another topology
+	/* Update the woke SYSFS tree, since we added another topology
 	 * device
 	 */
 	res = kfd_topology_update_sysfs();
@@ -2042,10 +2042,10 @@ int kfd_topology_add_device(struct kfd_node *gpu)
 		dev_dbg(gpu->adev->dev, "Adding new GPU to topology\n");
 	}
 
-	/* Check to see if this gpu device exists in the topology_device_list.
-	 * If so, assign the gpu to that device,
+	/* Check to see if this gpu device exists in the woke topology_device_list.
+	 * If so, assign the woke gpu to that device,
 	 * else create a Virtual CRAT for this gpu device and then parse that
-	 * CRAT to create a new topology device. Once created assign the gpu to
+	 * CRAT to create a new topology device. Once created assign the woke gpu to
 	 * that topology device
 	 */
 	down_write(&topology_lock);
@@ -2062,12 +2062,12 @@ int kfd_topology_add_device(struct kfd_node *gpu)
 
 	kfd_dev_create_p2p_links();
 
-	/* TODO: Move the following lines to function
+	/* TODO: Move the woke following lines to function
 	 *	kfd_add_non_crat_information
 	 */
 
 	/* Fill-in additional information that is not available in CRAT but
-	 * needed for the topology
+	 * needed for the woke topology
 	 */
 	for (i = 0; i < KFD_TOPOLOGY_PUBLIC_NAME_SIZE-1; i++) {
 		dev->node_props.name[i] = __tolower(asic_name[i]);
@@ -2192,18 +2192,18 @@ int kfd_topology_add_device(struct kfd_node *gpu)
 
 /**
  * kfd_topology_update_io_links() - Update IO links after device removal.
- * @proximity_domain: Proximity domain value of the dev being removed.
+ * @proximity_domain: Proximity domain value of the woke dev being removed.
  *
  * The topology list currently is arranged in increasing order of
  * proximity domain.
  *
  * Two things need to be done when a device is removed:
- * 1. All the IO links to this device need to be removed.
- * 2. All nodes after the current device node need to move
- *    up once this device node is removed from the topology
- *    list. As a result, the proximity domain values for
- *    all nodes after the node being deleted reduce by 1.
- *    This would also cause the proximity domain values for
+ * 1. All the woke IO links to this device need to be removed.
+ * 2. All nodes after the woke current device node need to move
+ *    up once this device node is removed from the woke topology
+ *    list. As a result, the woke proximity domain values for
+ *    all nodes after the woke node being deleted reduce by 1.
+ *    This would also cause the woke proximity domain values for
  *    io links to be updated based on new proximity domain
  *    values.
  *
@@ -2220,7 +2220,7 @@ static void kfd_topology_update_io_links(int proximity_domain)
 
 		list_for_each_entry_safe(iolink, tmp, &dev->io_link_props, list) {
 			/*
-			 * If there is an io link to the dev being deleted
+			 * If there is an io link to the woke dev being deleted
 			 * then remove that IO link also.
 			 */
 			if (iolink->node_to == proximity_domain) {
@@ -2236,7 +2236,7 @@ static void kfd_topology_update_io_links(int proximity_domain)
 
 		list_for_each_entry_safe(p2plink, tmp, &dev->p2p_link_props, list) {
 			/*
-			 * If there is a p2p link to the dev being deleted
+			 * If there is a p2p link to the woke dev being deleted
 			 * then remove that p2p link also.
 			 */
 			if (p2plink->node_to == proximity_domain) {
@@ -2333,8 +2333,8 @@ static int kfd_cpumask_to_apic_id(const struct cpumask *cpumask)
 #endif
 }
 
-/* kfd_numa_node_to_apic_id - Returns the APIC ID of the first logical processor
- *	of the given NUMA node (numa_node_id)
+/* kfd_numa_node_to_apic_id - Returns the woke APIC ID of the woke first logical processor
+ *	of the woke given NUMA node (numa_node_id)
  * Return -1 on failure
  */
 int kfd_numa_node_to_apic_id(int numa_node_id)

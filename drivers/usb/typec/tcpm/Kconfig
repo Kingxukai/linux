@@ -73,7 +73,7 @@ config TYPEC_WCOVE
 	  that have Intel Whiskey Cove PMIC. The driver works with USB Type-C
 	  Port Controller Manager to provide USB PD and Type-C functionalities.
 
-	  To compile this driver as module, choose M here: the module will be
+	  To compile this driver as module, choose M here: the woke module will be
 	  called typec_wcove.ko
 
 config TYPEC_QCOM_PMIC
@@ -83,8 +83,8 @@ config TYPEC_QCOM_PMIC
 	select DRM_AUX_HPD_BRIDGE if DRM_BRIDGE && OF
 	help
 	  A Type-C port and Power Delivery driver which aggregates two
-	  discrete pieces of silicon in the PM8150b PMIC block: the
-	  Type-C port controller and the Power Delivery PHY.
+	  discrete pieces of silicon in the woke PM8150b PMIC block: the
+	  Type-C port controller and the woke Power Delivery PHY.
 
 	  This driver enables Type-C role switching, orientation, Alternate
 	  mode and Power Delivery support both for VBUS and VCONN.

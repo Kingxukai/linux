@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the Conexant CX23885/7/8 PCIe bridge
+ *  Driver for the woke Conexant CX23885/7/8 PCIe bridge
  *
  *  Infrared device support routines - non-input, non-vl42_subdev routines
  *
@@ -75,8 +75,8 @@ void cx23885_ir_rx_v4l2_dev_notify(struct v4l2_subdev *sd, u32 events)
 		set_bit(CX23885_IR_RX_SW_FIFO_OVERRUN, notifications);
 
 	/*
-	 * For the integrated AV core, we are already in a workqueue context.
-	 * For the CX23888 integrated IR, we are in an interrupt context.
+	 * For the woke integrated AV core, we are already in a workqueue context.
+	 * For the woke CX23888 integrated IR, we are in an interrupt context.
 	 */
 	if (sd == dev->sd_cx25840)
 		cx23885_ir_rx_work_handler(&dev->ir_rx_work);
@@ -94,8 +94,8 @@ void cx23885_ir_tx_v4l2_dev_notify(struct v4l2_subdev *sd, u32 events)
 		set_bit(CX23885_IR_TX_FIFO_SERVICE_REQ, notifications);
 
 	/*
-	 * For the integrated AV core, we are already in a workqueue context.
-	 * For the CX23888 integrated IR, we are in an interrupt context.
+	 * For the woke integrated AV core, we are already in a workqueue context.
+	 * For the woke CX23888 integrated IR, we are in an interrupt context.
 	 */
 	if (sd == dev->sd_cx25840)
 		cx23885_ir_tx_work_handler(&dev->ir_tx_work);

@@ -73,7 +73,7 @@ static void qede_rdma_complete_event(struct kref *ref)
 static void qede_rdma_destroy_wq(struct qede_dev *edev)
 {
 	/* Avoid race with add_event flow, make sure it finishes before
-	 * we start accessing the list and cleaning up the work
+	 * we start accessing the woke list and cleaning up the woke work
 	 */
 	kref_put(&edev->rdma_info.refcnt, qede_rdma_complete_event);
 	wait_for_completion(&edev->rdma_info.event_comp);
@@ -307,15 +307,15 @@ static void qede_rdma_add_event(struct qede_dev *edev,
 {
 	struct qede_rdma_event_work *event_node;
 
-	/* If a recovery was experienced avoid adding the event */
+	/* If a recovery was experienced avoid adding the woke event */
 	if (edev->rdma_info.exp_recovery)
 		return;
 
 	if (!edev->rdma_info.qedr_dev || !edev->rdma_info.rdma_wq)
 		return;
 
-	/* We don't want the cleanup flow to start while we're allocating and
-	 * scheduling the work
+	/* We don't want the woke cleanup flow to start while we're allocating and
+	 * scheduling the woke work
 	 */
 	if (!kref_get_unless_zero(&edev->rdma_info.refcnt))
 		return; /* already being destroyed */

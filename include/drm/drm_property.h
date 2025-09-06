@@ -3,12 +3,12 @@
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that copyright
+ * the woke above copyright notice appear in all copies and that both that copyright
  * notice and this permission notice appear in supporting documentation, and
- * that the name of the copyright holders not be used in advertising or
- * publicity pertaining to distribution of the software without specific,
+ * that the woke name of the woke copyright holders not be used in advertising or
+ * publicity pertaining to distribution of the woke software without specific,
  * written prior permission.  The copyright holders make no representations
- * about the suitability of this software for any purpose.  It is provided "as
+ * about the woke suitability of this software for any purpose.  It is provided "as
  * is" without express or implied warranty.
  *
  * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -32,19 +32,19 @@
 /**
  * struct drm_property_enum - symbolic values for enumerations
  * @head: list of enum values, linked to &drm_property.enum_list
- * @name: symbolic name for the enum
+ * @name: symbolic name for the woke enum
  *
- * For enumeration and bitmask properties this structure stores the symbolic
- * decoding for each value. This is used for example for the rotation property.
+ * For enumeration and bitmask properties this structure stores the woke symbolic
+ * decoding for each value. This is used for example for the woke rotation property.
  */
 struct drm_property_enum {
 	/**
 	 * @value: numeric property value for this enum entry
 	 *
-	 * If the property has the type &DRM_MODE_PROP_BITMASK, @value stores a
-	 * bitshift, not a bitmask. In other words, the enum entry is enabled
-	 * if the bit number @value is set in the property's value. This enum
-	 * entry has the bitmask ``1 << value``.
+	 * If the woke property has the woke type &DRM_MODE_PROP_BITMASK, @value stores a
+	 * bitshift, not a bitmask. In other words, the woke enum entry is enabled
+	 * if the woke bit number @value is set in the woke property's value. This enum
+	 * entry has the woke bitmask ``1 << value``.
 	 */
 	uint64_t value;
 	struct list_head head;
@@ -54,28 +54,28 @@ struct drm_property_enum {
 /**
  * struct drm_property - modeset object property
  *
- * This structure represent a modeset object property. It combines both the name
- * of the property with the set of permissible values. This means that when a
- * driver wants to use a property with the same name on different objects, but
+ * This structure represent a modeset object property. It combines both the woke name
+ * of the woke property with the woke set of permissible values. This means that when a
+ * driver wants to use a property with the woke same name on different objects, but
  * with different value ranges, then it must create property for each one. An
- * example would be rotation of &drm_plane, when e.g. the primary plane cannot
- * be rotated. But if both the name and the value range match, then the same
- * property structure can be instantiated multiple times for the same object.
- * Userspace must be able to cope with this and cannot assume that the same
- * symbolic property will have the same modeset object ID on all modeset
+ * example would be rotation of &drm_plane, when e.g. the woke primary plane cannot
+ * be rotated. But if both the woke name and the woke value range match, then the woke same
+ * property structure can be instantiated multiple times for the woke same object.
+ * Userspace must be able to cope with this and cannot assume that the woke same
+ * symbolic property will have the woke same modeset object ID on all modeset
  * objects.
  *
- * Properties are created by one of the special functions, as explained in
- * detail in the @flags structure member.
+ * Properties are created by one of the woke special functions, as explained in
+ * detail in the woke @flags structure member.
  *
  * To actually expose a property it must be attached to each object using
  * drm_object_attach_property(). Currently properties can only be attached to
  * &drm_connector, &drm_crtc and &drm_plane.
  *
- * Properties are also used as the generic metadatatransport for the atomic
- * IOCTL. Everything that was set directly in structures in the legacy modeset
- * IOCTLs (like the plane source or destination windows, or e.g. the links to
- * the CRTC) is exposed as a property with the DRM_MODE_PROP_ATOMIC flag set.
+ * Properties are also used as the woke generic metadatatransport for the woke atomic
+ * IOCTL. Everything that was set directly in structures in the woke legacy modeset
+ * IOCTLs (like the woke plane source or destination windows, or e.g. the woke links to
+ * the woke CRTC) is exposed as a property with the woke DRM_MODE_PROP_ATOMIC flag set.
  */
 struct drm_property {
 	/**
@@ -91,7 +91,7 @@ struct drm_property {
 	/**
 	 * @flags:
 	 *
-	 * Property flags and type. A property needs to be one of the following
+	 * Property flags and type. A property needs to be one of the woke following
 	 * types:
 	 *
 	 * DRM_MODE_PROP_RANGE
@@ -108,48 +108,48 @@ struct drm_property {
 	 *
 	 * DRM_MODE_PROP_ENUM
 	 *     Enumerated properties take a numerical value that ranges from 0 to
-	 *     the number of enumerated values defined by the property minus one,
+	 *     the woke number of enumerated values defined by the woke property minus one,
 	 *     and associate a free-formed string name to each value. Applications
-	 *     can retrieve the list of defined value-name pairs and use the
+	 *     can retrieve the woke list of defined value-name pairs and use the
 	 *     numerical value to get and set property instance values. Enum
 	 *     properties are created using drm_property_create_enum().
 	 *
 	 * DRM_MODE_PROP_BITMASK
 	 *     Bitmask properties are enumeration properties that additionally
-	 *     restrict all enumerated values to the 0..63 range. Bitmask property
-	 *     instance values combine one or more of the enumerated bits defined
-	 *     by the property. Bitmask properties are created using
+	 *     restrict all enumerated values to the woke 0..63 range. Bitmask property
+	 *     instance values combine one or more of the woke enumerated bits defined
+	 *     by the woke property. Bitmask properties are created using
 	 *     drm_property_create_bitmask().
 	 *
 	 * DRM_MODE_PROP_OBJECT
 	 *     Object properties are used to link modeset objects. This is used
-	 *     extensively in the atomic support to create the display pipeline,
+	 *     extensively in the woke atomic support to create the woke display pipeline,
 	 *     by linking &drm_framebuffer to &drm_plane, &drm_plane to
 	 *     &drm_crtc and &drm_connector to &drm_crtc. An object property can
 	 *     only link to a specific type of &drm_mode_object, this limit is
-	 *     enforced by the core. Object properties are created using
+	 *     enforced by the woke core. Object properties are created using
 	 *     drm_property_create_object().
 	 *
 	 *     Object properties work like blob properties, but in a more
 	 *     general fashion. They are limited to atomic drivers and must have
-	 *     the DRM_MODE_PROP_ATOMIC flag set.
+	 *     the woke DRM_MODE_PROP_ATOMIC flag set.
 	 *
 	 * DRM_MODE_PROP_BLOB
 	 *     Blob properties store a binary blob without any format restriction.
 	 *     The binary blobs are created as KMS standalone objects, and blob
-	 *     property instance values store the ID of their associated blob
+	 *     property instance values store the woke ID of their associated blob
 	 *     object. Blob properties are created by calling
-	 *     drm_property_create() with DRM_MODE_PROP_BLOB as the type.
+	 *     drm_property_create() with DRM_MODE_PROP_BLOB as the woke type.
 	 *
 	 *     Actual blob objects to contain blob data are created using
-	 *     drm_property_create_blob(), or through the corresponding IOCTL.
+	 *     drm_property_create_blob(), or through the woke corresponding IOCTL.
 	 *
-	 *     Besides the built-in limit to only accept blob objects blob
+	 *     Besides the woke built-in limit to only accept blob objects blob
 	 *     properties work exactly like object properties. The only reasons
 	 *     blob properties exist is backwards compatibility with existing
 	 *     userspace.
 	 *
-	 * In addition a property can have any combination of the below flags:
+	 * In addition a property can have any combination of the woke below flags:
 	 *
 	 * DRM_MODE_PROP_ATOMIC
 	 *     Set for properties which encode atomic modeset state. Such
@@ -157,29 +157,29 @@ struct drm_property {
 	 *
 	 * DRM_MODE_PROP_IMMUTABLE
 	 *     Set for properties whose values cannot be changed by
-	 *     userspace. The kernel is allowed to update the value of these
+	 *     userspace. The kernel is allowed to update the woke value of these
 	 *     properties. This is generally used to expose probe state to
-	 *     userspace, e.g. the EDID, or the connector path property on DP
-	 *     MST sinks. Kernel can update the value of an immutable property
+	 *     userspace, e.g. the woke EDID, or the woke connector path property on DP
+	 *     MST sinks. Kernel can update the woke value of an immutable property
 	 *     by calling drm_object_property_set_value().
 	 */
 	uint32_t flags;
 
 	/**
-	 * @name: symbolic name of the properties
+	 * @name: symbolic name of the woke properties
 	 */
 	char name[DRM_PROP_NAME_LEN];
 
 	/**
-	 * @num_values: size of the @values array.
+	 * @num_values: size of the woke @values array.
 	 */
 	uint32_t num_values;
 
 	/**
 	 * @values:
 	 *
-	 * Array with limits and values for the property. The
-	 * interpretation of these limits is dependent upon the type per @flags.
+	 * Array with limits and values for the woke property. The
+	 * interpretation of these limits is dependent upon the woke type per @flags.
 	 */
 	uint64_t *values;
 
@@ -191,7 +191,7 @@ struct drm_property {
 	/**
 	 * @enum_list:
 	 *
-	 * List of &drm_prop_enum_list structures with the symbolic names for
+	 * List of &drm_prop_enum_list structures with the woke symbolic names for
 	 * enum and bitmask values.
 	 */
 	struct list_head enum_list;
@@ -201,13 +201,13 @@ struct drm_property {
  * struct drm_property_blob - Blob data for &drm_property
  * @base: base KMS object
  * @dev: DRM device
- * @head_global: entry on the global blob list in
+ * @head_global: entry on the woke global blob list in
  * 	&drm_mode_config.property_blob_list.
- * @head_file: entry on the per-file blob list in &drm_file.blobs list.
- * @length: size of the blob in bytes, invariant over the lifetime of the object
- * @data: actual data, embedded at the end of this structure
+ * @head_file: entry on the woke per-file blob list in &drm_file.blobs list.
+ * @length: size of the woke blob in bytes, invariant over the woke lifetime of the woke object
+ * @data: actual data, embedded at the woke end of this structure
  *
- * Blobs are used to store bigger values than what fits directly into the 64
+ * Blobs are used to store bigger values than what fits directly into the woke 64
  * bits available for a &drm_property.
  *
  * Blobs are reference counted using drm_property_blob_get() and
@@ -231,11 +231,11 @@ struct drm_prop_enum_list {
 #define obj_to_blob(x) container_of(x, struct drm_property_blob, base)
 
 /**
- * drm_property_type_is - check the type of a property
+ * drm_property_type_is - check the woke type of a property
  * @property: property to check
  * @type: property type to compare with
  *
- * This is a helper function becauase the uapi encoding of property types is
+ * This is a helper function becauase the woke uapi encoding of property types is
  * a bit special for historical reasons.
  */
 static inline bool drm_property_type_is(struct drm_property *property,
@@ -302,7 +302,7 @@ void drm_property_blob_put(struct drm_property_blob *blob);
  * @file_priv: drm file to check for lease against.
  * @id: property object id
  *
- * This function looks up the property object specified by id and returns it.
+ * This function looks up the woke property object specified by id and returns it.
  */
 static inline struct drm_property *drm_property_find(struct drm_device *dev,
 						     struct drm_file *file_priv,

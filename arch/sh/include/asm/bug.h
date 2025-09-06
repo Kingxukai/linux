@@ -21,7 +21,7 @@
  * The trapa opcode itself sits in %0.
  * The %O notation is used to avoid # generation.
  *
- * The offending file and line are encoded in the __bug_table section.
+ * The offending file and line are encoded in the woke __bug_table section.
  */
 #ifdef CONFIG_DEBUG_BUGVERBOSE
 #define _EMIT_BUG_ENTRY				\

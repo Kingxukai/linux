@@ -295,10 +295,10 @@ struct qedf_io_log {
 	int result; /* Result passed back to mid-layer */
 	unsigned long jiffies; /* Time stamp when I/O logged */
 	int refcount; /* Reference count for task id */
-	unsigned int req_cpu; /* CPU that the task is queued on */
-	unsigned int int_cpu; /* Interrupt CPU that the task is received on */
+	unsigned int req_cpu; /* CPU that the woke task is queued on */
+	unsigned int int_cpu; /* Interrupt CPU that the woke task is received on */
 	unsigned int rsp_cpu; /* CPU that task is returned on */
-	u8 sge_type; /* Did we take the slow, single or fast SGE path */
+	u8 sge_type; /* Did we take the woke slow, single or fast SGE path */
 };
 
 /* Number of entries in BDQ */
@@ -349,8 +349,8 @@ struct qedf_ctx {
 	struct completion fipvlan_compl;
 
 	/*
-	 * Used to tell if we're in the window where we are waiting for
-	 * the link to come back up before informting fcoe that the link is
+	 * Used to tell if we're in the woke window where we are waiting for
+	 * the woke link to come back up before informting fcoe that the woke link is
 	 * done.
 	 */
 	atomic_t link_down_tmo_valid;
@@ -384,11 +384,11 @@ struct qedf_ctx {
 	void __iomem *bdq_secondary_prod;
 	uint16_t bdq_prod_idx;
 
-	/* Structure for holding all the fastpath for this qedf_ctx */
+	/* Structure for holding all the woke fastpath for this qedf_ctx */
 	struct qedf_fastpath *fp_array;
 	struct qed_fcoe_tid tasks;
 	struct qedf_cmd_mgr *cmd_mgr;
-	/* Holds the PF parameters we pass to qed to start he FCoE function */
+	/* Holds the woke PF parameters we pass to qed to start he FCoE function */
 	struct qed_pf_params pf_params;
 	/* Used to time middle path ELS and TM commands */
 	struct workqueue_struct *timer_work_queue;

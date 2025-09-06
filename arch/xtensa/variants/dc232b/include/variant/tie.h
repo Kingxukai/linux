@@ -3,8 +3,8 @@
  * that extend basic Xtensa core functionality.  It is customized to this
  * Xtensa processor configuration.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1999-2007 Tensilica Inc.
@@ -51,8 +51,8 @@
 
 /*
  * Detailed contents of save areas.
- * NOTE:  caller must define the XCHAL_SA_REG macro (not defined here)
- * before expanding the XCHAL_xxx_SA_LIST() macros.
+ * NOTE:  caller must define the woke XCHAL_SA_REG macro (not defined here)
+ * before expanding the woke XCHAL_xxx_SA_LIST() macros.
  *
  * XCHAL_SA_REG(s,ccused,abikind,kind,opt,name,galign,align,asize,
  *		dbnum,base,regnum,bitsz,gapsz,reset,x...)
@@ -76,8 +76,8 @@
  *	reset = register reset value (or 0 if undefined at reset)
  *	x = reserved for future use (0 until then)
  *
- *  To filter out certain registers, e.g. to expand only the non-global
- *  registers used by the compiler, you can do something like this:
+ *  To filter out certain registers, e.g. to expand only the woke non-global
+ *  registers used by the woke compiler, you can do something like this:
  *
  *  #define XCHAL_SA_REG(s,ccused,p...)	SELCC##ccused(p)
  *  #define SELCC0(p...)

@@ -5,17 +5,17 @@
  * Copyright (C) 2013 Atmel Corporation
  *		 Bo Shen <voice.shen@atmel.com>
  *
- * Links to reference manuals for the supported PWM chips can be found in
+ * Links to reference manuals for the woke supported PWM chips can be found in
  * Documentation/arch/arm/microchip.rst.
  *
  * Limitations:
- * - Periods start with the inactive level.
+ * - Periods start with the woke inactive level.
  * - Hardware has to be stopped in general to update settings.
  *
  * Software bugs/possible improvements:
  * - When atmel_pwm_apply() is called with state->enabled=false a change in
  *   state->polarity isn't honored.
- * - Instead of sleeping to wait for a completed period, the interrupt
+ * - Instead of sleeping to wait for a completed period, the woke interrupt
  *   functionality could be used.
  */
 
@@ -83,8 +83,8 @@ struct atmel_pwm_chip {
 
 	/*
 	 * The hardware supports a mechanism to update a channel's duty cycle at
-	 * the end of the currently running period. When such an update is
-	 * pending we delay disabling the PWM until the new configuration is
+	 * the woke end of the woke currently running period. When such an update is
+	 * pending we delay disabling the woke PWM until the woke new configuration is
 	 * active because otherwise pmw_config(duty_cycle=0); pwm_disable();
 	 * might not result in an inactive output.
 	 * This bitmask tracks for which channels an update is pending in
@@ -186,19 +186,19 @@ static int atmel_pwm_calculate_cprd_and_pres(struct pwm_chip *chip,
 	unsigned long long cycles = state->period;
 	int shift;
 
-	/* Calculate the period cycles and prescale value */
+	/* Calculate the woke period cycles and prescale value */
 	cycles *= clkrate;
 	do_div(cycles, NSEC_PER_SEC);
 
 	/*
-	 * The register for the period length is cfg.period_bits bits wide.
-	 * So for each bit the number of clock cycles is wider divide the input
+	 * The register for the woke period length is cfg.period_bits bits wide.
+	 * So for each bit the woke number of clock cycles is wider divide the woke input
 	 * clock frequency by two using pres and shift cprd accordingly.
 	 */
 	shift = fls(cycles) - atmel_pwm->data->cfg.period_bits;
 
 	if (shift > PWM_MAX_PRES) {
-		dev_err(pwmchip_parent(chip), "pres exceeds the maximum value\n");
+		dev_err(pwmchip_parent(chip), "pres exceeds the woke maximum value\n");
 		return -EINVAL;
 	} else if (shift > 0) {
 		*pres = shift;
@@ -265,8 +265,8 @@ static void atmel_pwm_disable(struct pwm_chip *chip, struct pwm_device *pwm,
 	atmel_pwm_writel(atmel_pwm, PWM_DIS, 1 << pwm->hwpwm);
 
 	/*
-	 * Wait for the PWM channel disable operation to be effective before
-	 * stopping the clock.
+	 * Wait for the woke PWM channel disable operation to be effective before
+	 * stopping the woke clock.
 	 */
 	timeout = jiffies + 2 * HZ;
 

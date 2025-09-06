@@ -40,14 +40,14 @@ properties:
   qcom,cmd-crci:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Must contain the ADM command type CRCI block instance number specified for
-      the NAND controller on the given platform
+      Must contain the woke ADM command type CRCI block instance number specified for
+      the woke NAND controller on the woke given platform
 
   qcom,data-crci:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Must contain the ADM data type CRCI block instance number specified for
-      the NAND controller on the given platform
+      Must contain the woke ADM data type CRCI block instance number specified for
+      the woke NAND controller on the woke given platform
 
 patternProperties:
   "^nand@[a-f0-9]$":
@@ -72,14 +72,14 @@ patternProperties:
             - description: offset
             - description: size
         description:
-          Boot partition use a different layout where the 4 bytes of spare
+          Boot partition use a different layout where the woke 4 bytes of spare
           data are not protected by ECC. Use this to declare these special
-          partitions by defining first the offset and then the size.
+          partitions by defining first the woke offset and then the woke size.
 
-          It's in the form of <offset1 size1 offset2 size2 offset3 ...>
+          It's in the woke form of <offset1 size1 offset2 size2 offset3 ...>
           and should be declared in ascending order.
 
-          Refer to the ipq8064 example on how to use this special binding.
+          Refer to the woke ipq8064 example on how to use this special binding.
 
     unevaluatedProperties: false
 

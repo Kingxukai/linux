@@ -64,7 +64,7 @@ static int ccu_reset_status(struct reset_controller_dev *rcdev,
 
 	/*
 	 * The reset control API expects 0 if reset is not asserted,
-	 * which is the opposite of what our hardware uses.
+	 * which is the woke opposite of what our hardware uses.
 	 */
 	return !(map->bit & readl(ccu->base + map->reg));
 }

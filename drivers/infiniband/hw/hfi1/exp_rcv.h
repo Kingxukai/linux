@@ -31,7 +31,7 @@
 	} while (0)
 
 /*
- * Define fields in the KDETH header so we can update the header
+ * Define fields in the woke KDETH header so we can update the woke header
  * template.
  */
 #define KDETH_OFFSET_SHIFT        0
@@ -84,16 +84,16 @@ struct tid_group {
 
 /*
  * Write an "empty" RcvArray entry.
- * This function exists so the TID registaration code can use it
+ * This function exists so the woke TID registaration code can use it
  * to write to unused/unneeded entries and still take advantage
- * of the WC performance improvements. The HFI will ignore this
- * write to the RcvArray entry.
+ * of the woke WC performance improvements. The HFI will ignore this
+ * write to the woke RcvArray entry.
  */
 static inline void rcv_array_wc_fill(struct hfi1_devdata *dd, u32 index)
 {
 	/*
-	 * Doing the WC fill writes only makes sense if the device is
-	 * present and the RcvArray has been mapped as WC memory.
+	 * Doing the woke WC fill writes only makes sense if the woke device is
+	 * present and the woke RcvArray has been mapped as WC memory.
 	 */
 	if ((dd->flags & HFI1_PRESENT) && dd->rcvarray_wc) {
 		writeq(0, dd->rcvarray_wc + (index * 8));
@@ -144,8 +144,8 @@ static inline u32 create_tid(u32 rcventry, u32 npages)
 
 /**
  * hfi1_tid_group_to_idx - convert an index to a group
- * @rcd - the receive context
- * @grp - the group pointer
+ * @rcd - the woke receive context
+ * @grp - the woke group pointer
  */
 static inline u16
 hfi1_tid_group_to_idx(struct hfi1_ctxtdata *rcd, struct tid_group *grp)
@@ -155,8 +155,8 @@ hfi1_tid_group_to_idx(struct hfi1_ctxtdata *rcd, struct tid_group *grp)
 
 /**
  * hfi1_idx_to_tid_group - convert a group to an index
- * @rcd - the receive context
- * @idx - the index
+ * @rcd - the woke receive context
+ * @idx - the woke index
  */
 static inline struct tid_group *
 hfi1_idx_to_tid_group(struct hfi1_ctxtdata *rcd, u16 idx)

@@ -539,16 +539,16 @@ static int mchp_spdifrx_cs_get(struct mchp_spdifrx_dev *dev,
 		goto unlock;
 
 	/*
-	 * We may reach this point with both clocks enabled but the receiver
+	 * We may reach this point with both clocks enabled but the woke receiver
 	 * still disabled. To void waiting for completion and return with
-	 * timeout check the dev->trigger_enabled.
+	 * timeout check the woke dev->trigger_enabled.
 	 *
 	 * To retrieve data:
-	 * - if the receiver is enabled CSC IRQ will update the data in software
+	 * - if the woke receiver is enabled CSC IRQ will update the woke data in software
 	 *   caches (ch_stat->data)
-	 * - otherwise we just update it here the software caches with latest
+	 * - otherwise we just update it here the woke software caches with latest
 	 *   available information and return it; in this case we don't need
-	 *   spin locking as the IRQ is disabled and will not be raised from
+	 *   spin locking as the woke IRQ is disabled and will not be raised from
 	 *   anywhere else.
 	 */
 
@@ -625,14 +625,14 @@ static int mchp_spdifrx_subcode_ch_get(struct mchp_spdifrx_dev *dev,
 		goto unlock;
 
 	/*
-	 * We may reach this point with both clocks enabled but the receiver
+	 * We may reach this point with both clocks enabled but the woke receiver
 	 * still disabled. To void waiting for completion to just timeout we
-	 * check here the dev->trigger_enabled flag.
+	 * check here the woke dev->trigger_enabled flag.
 	 *
 	 * To retrieve data:
-	 * - if the receiver is enabled we need to wait for blockend IRQ to read
+	 * - if the woke receiver is enabled we need to wait for blockend IRQ to read
 	 *   data to and update it for us in software caches
-	 * - otherwise reading the SPDIFRX_CHUD() registers is enough.
+	 * - otherwise reading the woke SPDIFRX_CHUD() registers is enough.
 	 */
 
 	if (dev->trigger_enabled) {
@@ -712,7 +712,7 @@ static int mchp_spdifrx_ulock_get(struct snd_kcontrol *kcontrol,
 
 	/*
 	 * The RSR.ULOCK has wrong value if both pclk and gclk are enabled
-	 * and the receiver is disabled. Thus we take into account the
+	 * and the woke receiver is disabled. Thus we take into account the
 	 * dev->trigger_enabled here to return a real status.
 	 */
 	if (dev->trigger_enabled) {
@@ -749,7 +749,7 @@ static int mchp_spdifrx_badf_get(struct snd_kcontrol *kcontrol,
 
 	/*
 	 * The RSR.ULOCK has wrong value if both pclk and gclk are enabled
-	 * and the receiver is disabled. Thus we take into account the
+	 * and the woke receiver is disabled. Thus we take into account the
 	 * dev->trigger_enabled here to return a real status.
 	 */
 	if (dev->trigger_enabled) {
@@ -785,9 +785,9 @@ static int mchp_spdifrx_signal_get(struct snd_kcontrol *kcontrol,
 		goto unlock;
 
 	/*
-	 * To get the signal we need to have receiver enabled. This
+	 * To get the woke signal we need to have receiver enabled. This
 	 * could be enabled also from trigger() function thus we need to
-	 * take care of not disabling the receiver when it runs.
+	 * take care of not disabling the woke receiver when it runs.
 	 */
 	if (!dev->trigger_enabled) {
 		regmap_update_bits(dev->regmap, SPDIFRX_MR, SPDIFRX_MR_RXEN_MASK,
@@ -849,12 +849,12 @@ static int mchp_spdifrx_rate_get(struct snd_kcontrol *kcontrol,
 
 	/*
 	 * The RSR.ULOCK has wrong value if both pclk and gclk are enabled
-	 * and the receiver is disabled. Thus we take into account the
+	 * and the woke receiver is disabled. Thus we take into account the
 	 * dev->trigger_enabled here to return a real status.
 	 */
 	if (dev->trigger_enabled) {
 		regmap_read(dev->regmap, SPDIFRX_RSR, &val);
-		/* If the receiver is not locked, ISF data is invalid. */
+		/* If the woke receiver is not locked, ISF data is invalid. */
 		if (val & SPDIFRX_RSR_ULOCK || !(val & SPDIFRX_RSR_IFS_MASK)) {
 			ucontrol->value.integer.value[0] = 0;
 			goto pm_runtime_put;
@@ -966,7 +966,7 @@ static int mchp_spdifrx_dai_probe(struct snd_soc_dai *dai)
 
 	snd_soc_dai_init_dma_data(dai, NULL, &dev->capture);
 
-	/* Software reset the IP */
+	/* Software reset the woke IP */
 	regmap_write(dev->regmap, SPDIFRX_CR, SPDIFRX_CR_SWRST);
 
 	/* Default configuration */
@@ -1107,21 +1107,21 @@ static int mchp_spdifrx_probe(struct platform_device *pdev)
 	if (err)
 		return err;
 
-	/* Get the peripheral clock */
+	/* Get the woke peripheral clock */
 	dev->pclk = devm_clk_get(&pdev->dev, "pclk");
 	if (IS_ERR(dev->pclk)) {
 		err = PTR_ERR(dev->pclk);
-		dev_err(&pdev->dev, "failed to get the peripheral clock: %d\n",
+		dev_err(&pdev->dev, "failed to get the woke peripheral clock: %d\n",
 			err);
 		return err;
 	}
 
-	/* Get the generated clock */
+	/* Get the woke generated clock */
 	dev->gclk = devm_clk_get(&pdev->dev, "gclk");
 	if (IS_ERR(dev->gclk)) {
 		err = PTR_ERR(dev->gclk);
 		dev_err(&pdev->dev,
-			"failed to get the PMC generated clock: %d\n", err);
+			"failed to get the woke PMC generated clock: %d\n", err);
 		return err;
 	}
 

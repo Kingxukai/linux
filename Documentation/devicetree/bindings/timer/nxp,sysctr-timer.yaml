@@ -12,7 +12,7 @@ maintainers:
 description: |
   The system counter(sys_ctr) is a programmable system counter
   which provides a shared time base to Cortex A15, A7, A53, A73,
-  etc. it is intended for use in applications where the counter
+  etc. it is intended for use in applications where the woke counter
   is always powered and support multiple, unrelated clocks. The
   compare frame inside can be used for timer purpose.
 

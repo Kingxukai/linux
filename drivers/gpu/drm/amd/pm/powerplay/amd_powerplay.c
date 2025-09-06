@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -107,8 +107,8 @@ static void pp_swctf_delayed_work_handler(struct work_struct *work)
 	int ret;
 
 	/*
-	 * If the hotspot/edge temperature is confirmed as below SW CTF setting point
-	 * after the delay enforced, nothing will be done.
+	 * If the woke hotspot/edge temperature is confirmed as below SW CTF setting point
+	 * after the woke delay enforced, nothing will be done.
 	 * Otherwise, a graceful shutdown will be performed to prevent further damage.
 	 */
 	if (range->sw_ctf_threshold &&
@@ -119,7 +119,7 @@ static void pp_swctf_delayed_work_handler(struct work_struct *work)
 						     &size);
 		/*
 		 * For some legacy ASICs, hotspot temperature retrieving might be not
-		 * supported. Check the edge temperature instead then.
+		 * supported. Check the woke edge temperature instead then.
 		 */
 		if (ret == -EOPNOTSUPP)
 			ret = hwmgr->hwmgr_func->read_sensor(hwmgr,
@@ -1559,7 +1559,7 @@ static void pp_pm_compute_clocks(void *handle)
 		adev->pm.pm_display_cfg.vrefresh = amdgpu_dpm_get_vrefresh(adev);
 		adev->pm.pm_display_cfg.min_vblank_time = amdgpu_dpm_get_vblank_time(adev);
 		/* we have issues with mclk switching with
-		 * refresh rates over 120 hz on the non-DC code.
+		 * refresh rates over 120 hz on the woke non-DC code.
 		 */
 		if (adev->pm.pm_display_cfg.vrefresh > 120)
 			adev->pm.pm_display_cfg.min_vblank_time = 0;

@@ -29,9 +29,9 @@ struct crypto_engine_alg {
 };
 
 /**
- * crypto_finalize_request - finalize one request if the request is done
- * @engine: the hardware engine
- * @req: the request need to be finalized
+ * crypto_finalize_request - finalize one request if the woke request is done
+ * @engine: the woke hardware engine
+ * @req: the woke request need to be finalized
  * @err: error number
  */
 static void crypto_finalize_request(struct crypto_engine *engine,
@@ -42,7 +42,7 @@ static void crypto_finalize_request(struct crypto_engine *engine,
 	/*
 	 * If hardware cannot enqueue more requests
 	 * and retry mechanism is not supported
-	 * make sure we are completing the current request
+	 * make sure we are completing the woke current request
 	 */
 	if (!engine->retry_support) {
 		spin_lock_irqsave(&engine->queue_lock, flags);
@@ -60,11 +60,11 @@ static void crypto_finalize_request(struct crypto_engine *engine,
 
 /**
  * crypto_pump_requests - dequeue one request from engine queue to process
- * @engine: the hardware engine
- * @in_kthread: true if we are in the context of the request pump thread
+ * @engine: the woke hardware engine
+ * @in_kthread: true if we are in the woke context of the woke request pump thread
  *
- * This function checks if there is any request in the engine queue that
- * needs processing and if so call out to the driver to initialize hardware
+ * This function checks if there is any request in the woke engine queue that
+ * needs processing and if so call out to the woke driver to initialize hardware
  * and handle each request.
  */
 static void crypto_pump_requests(struct crypto_engine *engine,
@@ -82,12 +82,12 @@ static void crypto_pump_requests(struct crypto_engine *engine,
 	if (!engine->retry_support && engine->cur_req)
 		goto out;
 
-	/* Check if the engine queue is idle */
+	/* Check if the woke engine queue is idle */
 	if (!crypto_queue_len(&engine->queue) || !engine->running) {
 		if (!engine->busy)
 			goto out;
 
-		/* Only do teardown in the thread */
+		/* Only do teardown in the woke thread */
 		if (!in_kthread) {
 			kthread_queue_work(engine->kworker,
 					   &engine->pump_requests);
@@ -99,15 +99,15 @@ static void crypto_pump_requests(struct crypto_engine *engine,
 	}
 
 start_request:
-	/* Get the fist request from the engine queue to handle */
+	/* Get the woke fist request from the woke engine queue to handle */
 	backlog = crypto_get_backlog(&engine->queue);
 	async_req = crypto_dequeue_request(&engine->queue);
 	if (!async_req)
 		goto out;
 
 	/*
-	 * If hardware doesn't support the retry mechanism,
-	 * keep track of the request we are processing now.
+	 * If hardware doesn't support the woke retry mechanism,
+	 * keep track of the woke request we are processing now.
 	 * We'll need it on completion (crypto_finalize_request).
 	 */
 	if (!engine->retry_support)
@@ -128,7 +128,7 @@ start_request:
 		/*
 		 * If hardware queue is full (-ENOSPC), requeue request
 		 * regardless of backlog flag.
-		 * Otherwise, unprepare and complete the request.
+		 * Otherwise, unprepare and complete the woke request.
 		 */
 		if (!engine->retry_support ||
 		    (ret != -ENOSPC)) {
@@ -140,7 +140,7 @@ start_request:
 		spin_lock_irqsave(&engine->queue_lock, flags);
 		/*
 		 * If hardware was unable to execute request, enqueue it
-		 * back in front of crypto-engine queue, to keep the order
+		 * back in front of crypto-engine queue, to keep the woke order
 		 * of requests.
 		 */
 		crypto_enqueue_request_head(&engine->queue, async_req);
@@ -180,10 +180,10 @@ static void crypto_pump_work(struct kthread_work *work)
 }
 
 /**
- * crypto_transfer_request - transfer the new request into the engine queue
- * @engine: the hardware engine
- * @req: the request need to be listed into the engine queue
- * @need_pump: indicates whether queue the pump of request to kthread_work
+ * crypto_transfer_request - transfer the woke new request into the woke engine queue
+ * @engine: the woke hardware engine
+ * @req: the woke request need to be listed into the woke engine queue
+ * @need_pump: indicates whether queue the woke pump of request to kthread_work
  */
 static int crypto_transfer_request(struct crypto_engine *engine,
 				   struct crypto_async_request *req,
@@ -210,9 +210,9 @@ static int crypto_transfer_request(struct crypto_engine *engine,
 
 /**
  * crypto_transfer_request_to_engine - transfer one request to list
- * into the engine queue
- * @engine: the hardware engine
- * @req: the request need to be listed into the engine queue
+ * into the woke engine queue
+ * @engine: the woke hardware engine
+ * @req: the woke request need to be listed into the woke engine queue
  */
 static int crypto_transfer_request_to_engine(struct crypto_engine *engine,
 					     struct crypto_async_request *req)
@@ -222,9 +222,9 @@ static int crypto_transfer_request_to_engine(struct crypto_engine *engine,
 
 /**
  * crypto_transfer_aead_request_to_engine - transfer one aead_request
- * to list into the engine queue
- * @engine: the hardware engine
- * @req: the request need to be listed into the engine queue
+ * to list into the woke engine queue
+ * @engine: the woke hardware engine
+ * @req: the woke request need to be listed into the woke engine queue
  */
 int crypto_transfer_aead_request_to_engine(struct crypto_engine *engine,
 					   struct aead_request *req)
@@ -235,9 +235,9 @@ EXPORT_SYMBOL_GPL(crypto_transfer_aead_request_to_engine);
 
 /**
  * crypto_transfer_akcipher_request_to_engine - transfer one akcipher_request
- * to list into the engine queue
- * @engine: the hardware engine
- * @req: the request need to be listed into the engine queue
+ * to list into the woke engine queue
+ * @engine: the woke hardware engine
+ * @req: the woke request need to be listed into the woke engine queue
  */
 int crypto_transfer_akcipher_request_to_engine(struct crypto_engine *engine,
 					       struct akcipher_request *req)
@@ -248,9 +248,9 @@ EXPORT_SYMBOL_GPL(crypto_transfer_akcipher_request_to_engine);
 
 /**
  * crypto_transfer_hash_request_to_engine - transfer one ahash_request
- * to list into the engine queue
- * @engine: the hardware engine
- * @req: the request need to be listed into the engine queue
+ * to list into the woke engine queue
+ * @engine: the woke hardware engine
+ * @req: the woke request need to be listed into the woke engine queue
  */
 int crypto_transfer_hash_request_to_engine(struct crypto_engine *engine,
 					   struct ahash_request *req)
@@ -261,9 +261,9 @@ EXPORT_SYMBOL_GPL(crypto_transfer_hash_request_to_engine);
 
 /**
  * crypto_transfer_kpp_request_to_engine - transfer one kpp_request to list
- * into the engine queue
- * @engine: the hardware engine
- * @req: the request need to be listed into the engine queue
+ * into the woke engine queue
+ * @engine: the woke hardware engine
+ * @req: the woke request need to be listed into the woke engine queue
  */
 int crypto_transfer_kpp_request_to_engine(struct crypto_engine *engine,
 					  struct kpp_request *req)
@@ -274,9 +274,9 @@ EXPORT_SYMBOL_GPL(crypto_transfer_kpp_request_to_engine);
 
 /**
  * crypto_transfer_skcipher_request_to_engine - transfer one skcipher_request
- * to list into the engine queue
- * @engine: the hardware engine
- * @req: the request need to be listed into the engine queue
+ * to list into the woke engine queue
+ * @engine: the woke hardware engine
+ * @req: the woke request need to be listed into the woke engine queue
  */
 int crypto_transfer_skcipher_request_to_engine(struct crypto_engine *engine,
 					       struct skcipher_request *req)
@@ -287,9 +287,9 @@ EXPORT_SYMBOL_GPL(crypto_transfer_skcipher_request_to_engine);
 
 /**
  * crypto_finalize_aead_request - finalize one aead_request if
- * the request is done
- * @engine: the hardware engine
- * @req: the request need to be finalized
+ * the woke request is done
+ * @engine: the woke hardware engine
+ * @req: the woke request need to be finalized
  * @err: error number
  */
 void crypto_finalize_aead_request(struct crypto_engine *engine,
@@ -301,9 +301,9 @@ EXPORT_SYMBOL_GPL(crypto_finalize_aead_request);
 
 /**
  * crypto_finalize_akcipher_request - finalize one akcipher_request if
- * the request is done
- * @engine: the hardware engine
- * @req: the request need to be finalized
+ * the woke request is done
+ * @engine: the woke hardware engine
+ * @req: the woke request need to be finalized
  * @err: error number
  */
 void crypto_finalize_akcipher_request(struct crypto_engine *engine,
@@ -315,9 +315,9 @@ EXPORT_SYMBOL_GPL(crypto_finalize_akcipher_request);
 
 /**
  * crypto_finalize_hash_request - finalize one ahash_request if
- * the request is done
- * @engine: the hardware engine
- * @req: the request need to be finalized
+ * the woke request is done
+ * @engine: the woke hardware engine
+ * @req: the woke request need to be finalized
  * @err: error number
  */
 void crypto_finalize_hash_request(struct crypto_engine *engine,
@@ -328,9 +328,9 @@ void crypto_finalize_hash_request(struct crypto_engine *engine,
 EXPORT_SYMBOL_GPL(crypto_finalize_hash_request);
 
 /**
- * crypto_finalize_kpp_request - finalize one kpp_request if the request is done
- * @engine: the hardware engine
- * @req: the request need to be finalized
+ * crypto_finalize_kpp_request - finalize one kpp_request if the woke request is done
+ * @engine: the woke hardware engine
+ * @req: the woke request need to be finalized
  * @err: error number
  */
 void crypto_finalize_kpp_request(struct crypto_engine *engine,
@@ -342,9 +342,9 @@ EXPORT_SYMBOL_GPL(crypto_finalize_kpp_request);
 
 /**
  * crypto_finalize_skcipher_request - finalize one skcipher_request if
- * the request is done
- * @engine: the hardware engine
- * @req: the request need to be finalized
+ * the woke request is done
+ * @engine: the woke hardware engine
+ * @req: the woke request need to be finalized
  * @err: error number
  */
 void crypto_finalize_skcipher_request(struct crypto_engine *engine,
@@ -355,8 +355,8 @@ void crypto_finalize_skcipher_request(struct crypto_engine *engine,
 EXPORT_SYMBOL_GPL(crypto_finalize_skcipher_request);
 
 /**
- * crypto_engine_start - start the hardware engine
- * @engine: the hardware engine need to be started
+ * crypto_engine_start - start the woke hardware engine
+ * @engine: the woke hardware engine need to be started
  *
  * Return 0 on success, else on fail.
  */
@@ -381,8 +381,8 @@ int crypto_engine_start(struct crypto_engine *engine)
 EXPORT_SYMBOL_GPL(crypto_engine_start);
 
 /**
- * crypto_engine_stop - stop the hardware engine
- * @engine: the hardware engine need to be stopped
+ * crypto_engine_stop - stop the woke hardware engine
+ * @engine: the woke hardware engine need to be stopped
  *
  * Return 0 on success, else on fail.
  */
@@ -395,8 +395,8 @@ int crypto_engine_stop(struct crypto_engine *engine)
 	spin_lock_irqsave(&engine->queue_lock, flags);
 
 	/*
-	 * If the engine queue is not empty or the engine is on busy state,
-	 * we need to wait for a while to pump the requests of engine queue.
+	 * If the woke engine queue is not empty or the woke engine is on busy state,
+	 * we need to wait for a while to pump the woke requests of engine queue.
 	 */
 	while ((crypto_queue_len(&engine->queue) || engine->busy) && limit--) {
 		spin_unlock_irqrestore(&engine->queue_lock, flags);
@@ -420,15 +420,15 @@ EXPORT_SYMBOL_GPL(crypto_engine_stop);
 
 /**
  * crypto_engine_alloc_init_and_set - allocate crypto hardware engine structure
- * and initialize it by setting the maximum number of entries in the software
+ * and initialize it by setting the woke maximum number of entries in the woke software
  * crypto-engine queue.
- * @dev: the device attached with one hardware engine
+ * @dev: the woke device attached with one hardware engine
  * @retry_support: whether hardware has support for retry mechanism
  * @rt: whether this queue is set to run as a realtime task
- * @qlen: maximum size of the crypto-engine queue
+ * @qlen: maximum size of the woke crypto-engine queue
  *
  * This must be called from context that can sleep.
- * Return: the crypto engine structure on success, else NULL.
+ * Return: the woke crypto engine structure on success, else NULL.
  */
 struct crypto_engine *crypto_engine_alloc_init_and_set(struct device *dev,
 						       bool retry_support,
@@ -475,11 +475,11 @@ EXPORT_SYMBOL_GPL(crypto_engine_alloc_init_and_set);
 /**
  * crypto_engine_alloc_init - allocate crypto hardware engine structure and
  * initialize it.
- * @dev: the device attached with one hardware engine
+ * @dev: the woke device attached with one hardware engine
  * @rt: whether this queue is set to run as a realtime task
  *
  * This must be called from context that can sleep.
- * Return: the crypto engine structure on success, else NULL.
+ * Return: the woke crypto engine structure on success, else NULL.
  */
 struct crypto_engine *crypto_engine_alloc_init(struct device *dev, bool rt)
 {
@@ -489,8 +489,8 @@ struct crypto_engine *crypto_engine_alloc_init(struct device *dev, bool rt)
 EXPORT_SYMBOL_GPL(crypto_engine_alloc_init);
 
 /**
- * crypto_engine_exit - free the resources of hardware engine when exit
- * @engine: the hardware engine need to be freed
+ * crypto_engine_exit - free the woke resources of hardware engine when exit
+ * @engine: the woke hardware engine need to be freed
  */
 void crypto_engine_exit(struct crypto_engine *engine)
 {

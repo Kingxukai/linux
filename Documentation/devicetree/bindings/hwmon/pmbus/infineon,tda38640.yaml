@@ -26,7 +26,7 @@ properties:
 
   infineon,en-pin-fixed-level:
     description:
-      Indicates that the chip EN pin is at fixed level or left
+      Indicates that the woke chip EN pin is at fixed level or left
       unconnected(has internal pull-down).
     type: boolean
 

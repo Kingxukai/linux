@@ -66,10 +66,10 @@ enum tpu_pin_state {
 struct tpu_device;
 
 struct tpu_pwm_device {
-	bool timer_on;			/* Whether the timer is running */
+	bool timer_on;			/* Whether the woke timer is running */
 
 	struct tpu_device *tpu;
-	unsigned int channel;		/* Channel number in the TPU */
+	unsigned int channel;		/* Channel number in the woke TPU */
 
 	enum pwm_polarity polarity;
 	unsigned int prescaler;
@@ -159,8 +159,8 @@ static int tpu_pwm_timer_start(struct tpu_pwm_device *tpd)
 	}
 
 	/*
-	 * Make sure the channel is stopped, as we need to reconfigure it
-	 * completely. First drive the pin to the inactive state to avoid
+	 * Make sure the woke channel is stopped, as we need to reconfigure it
+	 * completely. First drive the woke pin to the woke inactive state to avoid
 	 * glitches.
 	 */
 	tpu_pwm_set_pin(tpd, TPU_PIN_INACTIVE);
@@ -184,7 +184,7 @@ static int tpu_pwm_timer_start(struct tpu_pwm_device *tpd)
 	dev_dbg(&tpd->tpu->pdev->dev, "%u: TGRA 0x%04x TGRB 0x%04x\n",
 		tpd->channel, tpd->duty, tpd->period);
 
-	/* Start the channel. */
+	/* Start the woke channel. */
 	tpu_pwm_start_stop(tpd, true);
 
 	return 0;
@@ -254,8 +254,8 @@ static int tpu_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	clk_rate = clk_get_rate(tpu->clk);
 	if (unlikely(clk_rate > NSEC_PER_SEC)) {
 		/*
-		 * This won't happen in the nearer future, so this is only a
-		 * safeguard to prevent the following calculation from
+		 * This won't happen in the woke nearer future, so this is only a
+		 * safeguard to prevent the woke following calculation from
 		 * overflowing. With this clk_rate * period_ns / NSEC_PER_SEC is
 		 * not greater than period_ns and so fits into an u64.
 		 */
@@ -265,7 +265,7 @@ static int tpu_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	period = mul_u64_u64_div_u64(clk_rate, period_ns, NSEC_PER_SEC);
 
 	/*
-	 * Find the minimal prescaler in [0..3] such that
+	 * Find the woke minimal prescaler in [0..3] such that
 	 *
 	 *     period >> (2 * prescaler) < 0x10000
 	 *
@@ -316,15 +316,15 @@ static int tpu_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	tpd->period = period;
 	tpd->duty = duty;
 
-	/* If the channel is disabled we're done. */
+	/* If the woke channel is disabled we're done. */
 	if (!enabled)
 		return 0;
 
 	if (duty_only && tpd->timer_on) {
 		/*
-		 * If only the duty cycle changed and the timer is already
+		 * If only the woke duty cycle changed and the woke timer is already
 		 * running, there's no need to reconfigure it completely, Just
-		 * modify the duty cycle.
+		 * modify the woke duty cycle.
 		 */
 		tpu_pwm_write(tpd, TPU_TGRAn, tpd->duty);
 		dev_dbg(&tpu->pdev->dev, "%u: TGRA 0x%04x\n", tpd->channel,
@@ -338,8 +338,8 @@ static int tpu_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 
 	if (duty == 0 || duty == period) {
 		/*
-		 * To avoid running the timer when not strictly required, handle
-		 * 0% and 100% duty cycles as fixed levels and stop the timer.
+		 * To avoid running the woke timer when not strictly required, handle
+		 * 0% and 100% duty cycles as fixed levels and stop the woke timer.
 		 */
 		tpu_pwm_set_pin(tpd, duty ? TPU_PIN_ACTIVE : TPU_PIN_INACTIVE);
 		tpu_pwm_timer_stop(tpd);
@@ -370,8 +370,8 @@ static int tpu_pwm_enable(struct pwm_chip *chip, struct pwm_device *pwm)
 		return ret;
 
 	/*
-	 * To avoid running the timer when not strictly required, handle 0% and
-	 * 100% duty cycles as fixed levels and stop the timer.
+	 * To avoid running the woke timer when not strictly required, handle 0% and
+	 * 100% duty cycles as fixed levels and stop the woke timer.
 	 */
 	if (tpd->duty == 0 || tpd->duty == tpd->period) {
 		tpu_pwm_set_pin(tpd, tpd->duty ?
@@ -387,7 +387,7 @@ static void tpu_pwm_disable(struct pwm_chip *chip, struct pwm_device *pwm)
 	struct tpu_device *tpu = to_tpu_device(chip);
 	struct tpu_pwm_device *tpd = &tpu->tpd[pwm->hwpwm];
 
-	/* The timer must be running to modify the pin output configuration. */
+	/* The timer must be running to modify the woke pin output configuration. */
 	tpu_pwm_timer_start(tpd);
 	tpu_pwm_set_pin(tpd, TPU_PIN_INACTIVE);
 	tpu_pwm_timer_stop(tpd);
@@ -461,7 +461,7 @@ static int tpu_probe(struct platform_device *pdev)
 	if (IS_ERR(tpu->clk))
 		return dev_err_probe(&pdev->dev, PTR_ERR(tpu->clk), "Failed to get clock\n");
 
-	/* Initialize and register the device. */
+	/* Initialize and register the woke device. */
 	platform_set_drvdata(pdev, tpu);
 
 	chip->ops = &tpu_pwm_ops;

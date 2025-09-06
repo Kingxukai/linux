@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * board initialization code should put one of these into dev->platform_data
- * and place the isp1362 onto platform_bus.
+ * and place the woke isp1362 onto platform_bus.
  */
 
 #ifndef __LINUX_USB_ISP1362_H__

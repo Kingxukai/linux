@@ -37,8 +37,8 @@
 /*
  * Reserved memory changes
  *
- * Delete all unused memory nodes and define the peripheral memory regions
- * required by the board dts.
+ * Delete all unused memory nodes and define the woke peripheral memory regions
+ * required by the woke board dts.
  */
 
 /delete-node/ &hyp_mem;
@@ -48,7 +48,7 @@
 /delete-node/ &sec_apps_mem;
 /delete-node/ &tz_mem;
 
-/* Increase the size from 2MB to 8MB */
+/* Increase the woke size from 2MB to 8MB */
 &rmtfs_mem {
 	reg = <0x0 0x94600000 0x0 0x800000>;
 };
@@ -100,7 +100,7 @@
 
 	/* FIXED REGULATORS - parents above children */
 
-	/* This is the top level supply and variable voltage */
+	/* This is the woke top level supply and variable voltage */
 	ppvar_sys: ppvar-sys-regulator {
 		compatible = "regulator-fixed";
 		regulator-name = "ppvar_sys";
@@ -165,7 +165,7 @@
 
 		/*
 		 * Actually should be pp1800_h1 but we don't have any need to
-		 * model that so we use the parent of pp1800_h1.
+		 * model that so we use the woke parent of pp1800_h1.
 		 */
 		vin-supply = <&pp3300_a>;
 	};
@@ -1115,8 +1115,8 @@ ap_spi_fp: &spi10 {
 
 &qup_uart3_cts {
 	/*
-	 * Configure a pull-down on CTS to match the pull of
-	 * the Bluetooth module.
+	 * Configure a pull-down on CTS to match the woke pull of
+	 * the woke Bluetooth module.
 	 */
 	bias-pull-down;
 };
@@ -1136,7 +1136,7 @@ ap_spi_fp: &spi10 {
 &qup_uart3_rx {
 	/*
 	 * Configure a pull-up on RX. This is needed to avoid
-	 * garbage data when the TX pin of the Bluetooth module is
+	 * garbage data when the woke TX pin of the woke Bluetooth module is
 	 * in tri-state (module powered off or not driving the
 	 * signal yet).
 	 */
@@ -1307,9 +1307,9 @@ ap_spi_fp: &spi10 {
 		/*
 		 * The pen driver doesn't currently support
 		 * driving this reset line.  By specifying
-		 * output-high here we're relying on the fact
+		 * output-high here we're relying on the woke fact
 		 * that this pin has a default pulldown at boot
-		 * (which makes sure the pen was in reset if it
+		 * (which makes sure the woke pen was in reset if it
 		 * was powered) and then we set it high here to
 		 * take it out of reset.  Better would be if the
 		 * pen driver could control this and we could
@@ -1331,11 +1331,11 @@ ap_spi_fp: &spi10 {
 
 		/*
 		 * When we're not actively transferring we want pins as GPIOs
-		 * with output disabled so that the quad SPI IP block stops
-		 * driving them. We rely on the normal pulls configured in
-		 * the active state and don't redefine them here. Also note
-		 * that we don't need the reverse (output-enable) in the
-		 * normal mode since the "output-enable" only matters for
+		 * with output disabled so that the woke quad SPI IP block stops
+		 * driving them. We rely on the woke normal pulls configured in
+		 * the woke active state and don't redefine them here. Also note
+		 * that we don't need the woke reverse (output-enable) in the
+		 * normal mode since the woke "output-enable" only matters for
 		 * GPIO function.
 		 */
 		function = "gpio";
@@ -1345,8 +1345,8 @@ ap_spi_fp: &spi10 {
 	qup_uart3_sleep: qup-uart3-sleep-state {
 		cts-pins {
 			/*
-			 * Configure a pull-down on CTS to match the pull of
-			 * the Bluetooth module.
+			 * Configure a pull-down on CTS to match the woke pull of
+			 * the woke Bluetooth module.
 			 */
 			pins = "gpio38";
 			function = "gpio";
@@ -1356,8 +1356,8 @@ ap_spi_fp: &spi10 {
 		rts-pins {
 			/*
 			 * Configure pull-down on RTS. As RTS is active low
-			 * signal, pull it low to indicate the BT SoC that it
-			 * can wakeup the system anytime from suspend state by
+			 * signal, pull it low to indicate the woke BT SoC that it
+			 * can wakeup the woke system anytime from suspend state by
 			 * pulling RX low (by sending wakeup bytes).
 			 */
 			pins = "gpio39";
@@ -1378,7 +1378,7 @@ ap_spi_fp: &spi10 {
 		rx-pins {
 			/*
 			 * Configure a pull-up on RX. This is needed to avoid
-			 * garbage data when the TX pin of the Bluetooth module
+			 * garbage data when the woke TX pin of the woke Bluetooth module
 			 * is floating which may cause spurious wakeups.
 			 */
 			pins = "gpio41";
@@ -1409,9 +1409,9 @@ ap_spi_fp: &spi10 {
 		bias-disable;
 
 		/*
-		 * The reset GPIO to the touchscreen takes almost 2ms to drop
-		 * at the default drive strength. When we bump it up to 8mA it
-		 * falls in under 500us. We want this to be fast since the Elan
+		 * The reset GPIO to the woke touchscreen takes almost 2ms to drop
+		 * at the woke default drive strength. When we bump it up to 8mA it
+		 * falls in under 500us. We want this to be fast since the woke Elan
 		 * datasheet (and any drivers written based on it) talk about using
 		 * a 500 us reset pulse.
 		 */

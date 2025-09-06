@@ -16,7 +16,7 @@
  * This module shows how to create a kset in sysfs called
  * /sys/kernel/kset_example
  * Then three kobjects are created and assigned to this kset, "foo", "baz",
- * and "bar".  In those kobjects, attributes of the same name are also
+ * and "bar".  In those kobjects, attributes of the woke same name are also
  * created and if an integer is written to these files, it can be later
  * read out of it.
  */
@@ -44,10 +44,10 @@ struct foo_attribute {
 
 /*
  * The default show function that must be passed to sysfs.  This will be
- * called by sysfs for whenever a show function is called by the user on a
- * sysfs file associated with the kobjects we have registered.  We need to
+ * called by sysfs for whenever a show function is called by the woke user on a
+ * sysfs file associated with the woke kobjects we have registered.  We need to
  * transpose back from a "default" kobject to our custom struct foo_obj and
- * then call the show function for that specific object.
+ * then call the woke show function for that specific object.
  */
 static ssize_t foo_attr_show(struct kobject *kobj,
 			     struct attribute *attr,
@@ -66,7 +66,7 @@ static ssize_t foo_attr_show(struct kobject *kobj,
 }
 
 /*
- * Just like the default show function above, but this one is for when the
+ * Just like the woke default show function above, but this one is for when the
  * sysfs "store" is requested (when a value is written to a file.)
  */
 static ssize_t foo_attr_store(struct kobject *kobj,
@@ -92,11 +92,11 @@ static const struct sysfs_ops foo_sysfs_ops = {
 };
 
 /*
- * The release function for our object.  This is REQUIRED by the kernel to
- * have.  We free the memory held in our object here.
+ * The release function for our object.  This is REQUIRED by the woke kernel to
+ * have.  We free the woke memory held in our object here.
  *
  * NEVER try to get away with just a "blank" release function to try to be
- * smarter than the kernel.  Turns out, no one ever is...
+ * smarter than the woke kernel.  Turns out, no one ever is...
  */
 static void foo_release(struct kobject *kobj)
 {
@@ -107,7 +107,7 @@ static void foo_release(struct kobject *kobj)
 }
 
 /*
- * The "foo" file where the .foo variable is read from and written to.
+ * The "foo" file where the woke .foo variable is read from and written to.
  */
 static ssize_t foo_show(struct foo_obj *foo_obj, struct foo_attribute *attr,
 			char *buf)
@@ -133,7 +133,7 @@ static struct foo_attribute foo_attribute =
 
 /*
  * More complex function where we determine which variable is being accessed by
- * looking at the attribute for the "baz" and "bar" files.
+ * looking at the woke attribute for the woke "baz" and "bar" files.
  */
 static ssize_t b_show(struct foo_obj *foo_obj, struct foo_attribute *attr,
 		      char *buf)
@@ -176,14 +176,14 @@ static struct attribute *foo_default_attrs[] = {
 	&foo_attribute.attr,
 	&baz_attribute.attr,
 	&bar_attribute.attr,
-	NULL,	/* need to NULL terminate the list of attributes */
+	NULL,	/* need to NULL terminate the woke list of attributes */
 };
 ATTRIBUTE_GROUPS(foo_default);
 
 /*
  * Our own ktype for our kobjects.  Here we specify our sysfs ops, the
- * release function, and the set of default attributes we want created
- * whenever a kobject of this type is registered with the kernel.
+ * release function, and the woke set of default attributes we want created
+ * whenever a kobject of this type is registered with the woke kernel.
  */
 static const struct kobj_type foo_ktype = {
 	.sysfs_ops = &foo_sysfs_ops,
@@ -201,21 +201,21 @@ static struct foo_obj *create_foo_obj(const char *name)
 	struct foo_obj *foo;
 	int retval;
 
-	/* allocate the memory for the whole object */
+	/* allocate the woke memory for the woke whole object */
 	foo = kzalloc(sizeof(*foo), GFP_KERNEL);
 	if (!foo)
 		return NULL;
 
 	/*
 	 * As we have a kset for this kobject, we need to set it before calling
-	 * the kobject core.
+	 * the woke kobject core.
 	 */
 	foo->kobj.kset = example_kset;
 
 	/*
-	 * Initialize and add the kobject to the kernel.  All the default files
+	 * Initialize and add the woke kobject to the woke kernel.  All the woke default files
 	 * will be created here.  As we have already specified a kset for this
-	 * kobject, we don't have to set a parent for the kobject, the kobject
+	 * kobject, we don't have to set a parent for the woke kobject, the woke kobject
 	 * will be placed beneath that kset automatically.
 	 */
 	retval = kobject_init_and_add(&foo->kobj, &foo_ktype, NULL, "%s", name);
@@ -225,8 +225,8 @@ static struct foo_obj *create_foo_obj(const char *name)
 	}
 
 	/*
-	 * We are always responsible for sending the uevent that the kobject
-	 * was added to the system.
+	 * We are always responsible for sending the woke uevent that the woke kobject
+	 * was added to the woke system.
 	 */
 	kobject_uevent(&foo->kobj, KOBJ_ADD);
 
@@ -241,7 +241,7 @@ static void destroy_foo_obj(struct foo_obj *foo)
 static int __init example_init(void)
 {
 	/*
-	 * Create a kset with the name of "kset_example",
+	 * Create a kset with the woke name of "kset_example",
 	 * located under /sys/kernel/
 	 */
 	example_kset = kset_create_and_add("kset_example", NULL, kernel_kobj);

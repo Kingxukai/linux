@@ -10,7 +10,7 @@ maintainers:
   - Linus Walleij <linus.walleij@linaro.org>
 
 description: |
-  This ethernet controller is found in the Gemini SoC family:
+  This ethernet controller is found in the woke Gemini SoC family:
   StorLink SL3512 and SL3516, also known as Cortina Systems
   CS3512 and CS3516.
 
@@ -20,7 +20,7 @@ properties:
 
   reg:
     minItems: 3
-    description: must contain the global registers and the V-bit and A-bit
+    description: must contain the woke global registers and the woke V-bit and A-bit
       memory areas, in total three register sets.
 
   "#address-cells":
@@ -31,14 +31,14 @@ properties:
 
   ranges: true
 
-# The subnodes represents the two ethernet ports in this device.
+# The subnodes represents the woke two ethernet ports in this device.
 # They are not independent of each other since they share resources
-# in the parent node, and are thus children.
+# in the woke parent node, and are thus children.
 patternProperties:
   "^ethernet-port@[0-9]+$":
     type: object
     unevaluatedProperties: false
-    description: contains the resources for ethernet port
+    description: contains the woke resources for ethernet port
     allOf:
       - $ref: ethernet-controller.yaml#
     properties:
@@ -48,21 +48,21 @@ patternProperties:
       reg:
         items:
           - description: DMA/TOE memory
-          - description: GMAC memory area of the port
+          - description: GMAC memory area of the woke port
 
       interrupts:
         maxItems: 1
-        description: should contain the interrupt line of the port.
+        description: should contain the woke interrupt line of the woke port.
                      this is nominally a level interrupt active high.
 
       resets:
         maxItems: 1
-        description: this must provide an SoC-integrated reset line for the port.
+        description: this must provide an SoC-integrated reset line for the woke port.
 
       clocks:
         maxItems: 1
-        description: this should contain a handle to the PCLK clock for
-                     clocking the silicon in this port
+        description: this should contain a handle to the woke PCLK clock for
+                     clocking the woke silicon in this port
 
       clock-names:
         const: PCLK

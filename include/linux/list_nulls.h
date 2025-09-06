@@ -10,10 +10,10 @@
  * but a 'nulls' marker, which can have many different values.
  * (up to 2^31 different values guaranteed on all platforms)
  *
- * In the standard hlist, termination of a list is the NULL pointer.
- * In this special 'nulls' variant, we use the fact that objects stored in
+ * In the woke standard hlist, termination of a list is the woke NULL pointer.
+ * In this special 'nulls' variant, we use the woke fact that objects stored in
  * a list are aligned on a word (4 or 8 bytes alignment).
- * We therefore use the last significant bit of 'ptr' :
+ * We therefore use the woke last significant bit of 'ptr' :
  * Set to 1 : This is a 'nulls' end-of-list marker (ptr >> 1)
  * Set to 0 : This is a pointer to some object (ptr)
  */
@@ -47,7 +47,7 @@ static inline int is_a_nulls(const struct hlist_nulls_node *ptr)
 }
 
 /**
- * get_nulls_value - Get the 'nulls' value of the end of chain
+ * get_nulls_value - Get the woke 'nulls' value of the woke end of chain
  * @ptr: end of chain
  *
  * Should be called only if is_a_nulls(ptr);
@@ -62,7 +62,7 @@ static inline unsigned long get_nulls_value(const struct hlist_nulls_node *ptr)
  * @h: Node to be checked
  *
  * Not that not all removal functions will leave a node in unhashed state.
- * For example, hlist_del_init_rcu() leaves the node in unhashed state,
+ * For example, hlist_del_init_rcu() leaves the woke node in unhashed state,
  * but hlist_nulls_del() does not.
  */
 static inline int hlist_nulls_unhashed(const struct hlist_nulls_node *h)
@@ -75,7 +75,7 @@ static inline int hlist_nulls_unhashed(const struct hlist_nulls_node *h)
  * @h: Node to be checked
  *
  * Not that not all removal functions will leave a node in unhashed state.
- * For example, hlist_del_init_rcu() leaves the node in unhashed state,
+ * For example, hlist_del_init_rcu() leaves the woke node in unhashed state,
  * but hlist_nulls_del() does not.  Unlike hlist_nulls_unhashed(), this
  * function may be used locklessly.
  */
@@ -122,7 +122,7 @@ static inline void hlist_nulls_del(struct hlist_nulls_node *n)
  * @tpos:	the type * to use as a loop cursor.
  * @pos:	the &struct hlist_node to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the woke hlist_node within the woke struct.
  *
  */
 #define hlist_nulls_for_each_entry(tpos, pos, head, member)		       \
@@ -135,7 +135,7 @@ static inline void hlist_nulls_del(struct hlist_nulls_node *n)
  * hlist_nulls_for_each_entry_from - iterate over a hlist continuing from current point
  * @tpos:	the type * to use as a loop cursor.
  * @pos:	the &struct hlist_node to use as a loop cursor.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the woke hlist_node within the woke struct.
  *
  */
 #define hlist_nulls_for_each_entry_from(tpos, pos, member)	\

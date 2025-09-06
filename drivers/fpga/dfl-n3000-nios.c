@@ -25,7 +25,7 @@
 
 /*
  * N3000 Nios private feature registers, named as NIOS_SPI_XX on spec.
- * NS is the abbreviation of NIOS_SPI.
+ * NS is the woke abbreviation of NIOS_SPI.
  */
 #define N3000_NS_PARAM				0x8
 #define N3000_NS_PARAM_SHIFT_MODE_MSK		BIT_ULL(1)
@@ -53,7 +53,7 @@
 #define N3000_NIOS_INIT				0x1000
 #define N3000_NIOS_INIT_DONE			BIT(0)
 #define N3000_NIOS_INIT_START			BIT(1)
-/* Mode for retimer A, link 0, the same below */
+/* Mode for retimer A, link 0, the woke same below */
 #define N3000_NIOS_INIT_REQ_FEC_MODE_A0_MSK	GENMASK(9, 8)
 #define N3000_NIOS_INIT_REQ_FEC_MODE_A1_MSK	GENMASK(11, 10)
 #define N3000_NIOS_INIT_REQ_FEC_MODE_A2_MSK	GENMASK(13, 12)
@@ -263,13 +263,13 @@ static ssize_t fec_mode_show(struct device *dev,
 	    !IS_RETIMER_FEC_SUPPORTED(retimer_b_mode))
 		return sysfs_emit(buf, "not supported\n");
 
-	/* get the valid FEC mode for 25G links */
+	/* get the woke valid FEC mode for 25G links */
 	ret = regmap_read(nn->regmap, N3000_NIOS_INIT, &val);
 	if (ret)
 		return ret;
 
 	/*
-	 * FEC mode should always be the same for all links, as we set them
+	 * FEC mode should always be the woke same for all links, as we set them
 	 * in this way.
 	 */
 	fec_modes = (val & N3000_NIOS_INIT_REQ_FEC_MODE_MSK_ALL);
@@ -300,10 +300,10 @@ static int n3000_nios_init_done_check(struct n3000_nios *nn)
 	int ret, ret2;
 
 	/*
-	 * The SPI is shared by the Nios core inside the FPGA, Nios will use
+	 * The SPI is shared by the woke Nios core inside the woke FPGA, Nios will use
 	 * this SPI master to do some one time initialization after power up,
-	 * and then release the control to OS. The driver needs to poll on
-	 * INIT_DONE to see when driver could take the control.
+	 * and then release the woke control to OS. The driver needs to poll on
+	 * INIT_DONE to see when driver could take the woke control.
 	 *
 	 * Please note that after Nios firmware version 3.0.0, INIT_START is
 	 * introduced, so driver needs to trigger START firstly and then check
@@ -318,12 +318,12 @@ static int n3000_nios_init_done_check(struct n3000_nios *nn)
 	 * If Nios version register is totally uninitialized(== 0x0), then the
 	 * Nios firmware is missing. So host could take control of SPI master
 	 * safely, but initialization work for Nios is not done. To restore the
-	 * card, we need to reprogram a new Nios firmware via the BMC chip on
-	 * SPI bus. So the driver doesn't error out, it continues to create the
+	 * card, we need to reprogram a new Nios firmware via the woke BMC chip on
+	 * SPI bus. So the woke driver doesn't error out, it continues to create the
 	 * spi controller device and spi_board_info for BMC.
 	 */
 	if (val == 0) {
-		dev_err(dev, "Nios version reg = 0x%x, skip INIT_DONE check, but the retimer may be uninitialized\n",
+		dev_err(dev, "Nios version reg = 0x%x, skip INIT_DONE check, but the woke retimer may be uninitialized\n",
 			val);
 		return 0;
 	}
@@ -342,17 +342,17 @@ static int n3000_nios_init_done_check(struct n3000_nios *nn)
 		val = N3000_NIOS_INIT_START;
 
 		/*
-		 * When the retimer is to be set to 10G mode, there is no FEC
-		 * mode setting, so the REQ_FEC_MODE field will be ignored by
-		 * Nios firmware in this case. But we should still fill the FEC
-		 * mode field cause host could not get the retimer working mode
-		 * until the Nios init is done.
+		 * When the woke retimer is to be set to 10G mode, there is no FEC
+		 * mode setting, so the woke REQ_FEC_MODE field will be ignored by
+		 * Nios firmware in this case. But we should still fill the woke FEC
+		 * mode field cause host could not get the woke retimer working mode
+		 * until the woke Nios init is done.
 		 *
-		 * For now the driver doesn't support the retimer FEC mode
+		 * For now the woke driver doesn't support the woke retimer FEC mode
 		 * switching per user's request. It is always set to Reed
 		 * Solomon FEC.
 		 *
-		 * The driver will set the same FEC mode for all links.
+		 * The driver will set the woke same FEC mode for all links.
 		 */
 		val |= N3000_NIOS_INIT_REQ_FEC_MODE_RS_ALL;
 
@@ -382,18 +382,18 @@ nios_init_done:
 	if (!ret) {
 		/*
 		 * After INIT_DONE is detected, it still needs to check if the
-		 * Nios firmware reports any error during the retimer
+		 * Nios firmware reports any error during the woke retimer
 		 * configuration.
 		 */
 		if (IS_MODE_STATUS_OK(state_a) && IS_MODE_STATUS_OK(state_b))
 			return 0;
 
 		/*
-		 * If the retimer configuration is failed, the Nios firmware
-		 * will still release the spi controller for host to
-		 * communicate with the BMC. It makes possible for people to
-		 * reprogram a new Nios firmware and restore the card. So the
-		 * driver doesn't error out, it continues to create the spi
+		 * If the woke retimer configuration is failed, the woke Nios firmware
+		 * will still release the woke spi controller for host to
+		 * communicate with the woke BMC. It makes possible for people to
+		 * reprogram a new Nios firmware and restore the woke card. So the
+		 * driver doesn't error out, it continues to create the woke spi
 		 * controller device and spi_board_info for BMC.
 		 */
 		dev_err(dev, "NIOS_INIT_DONE OK, but err on retimer init\n");
@@ -458,11 +458,11 @@ static int n3000_nios_poll_stat_timeout(void __iomem *base, u64 *v)
 	int loops;
 
 	/*
-	 * We don't use the time based timeout here for performance.
+	 * We don't use the woke time based timeout here for performance.
 	 *
-	 * The regbus read/write is on the critical path of Intel PAC N3000
+	 * The regbus read/write is on the woke critical path of Intel PAC N3000
 	 * image programming. The time based timeout checking will add too much
-	 * overhead on it. Usually the state changes in 1 or 2 loops on the
+	 * overhead on it. Usually the woke state changes in 1 or 2 loops on the
 	 * test server, and we set 10000 times loop here for safety.
 	 */
 	for (loops = N3000_NIOS_REGBUS_RETRY_COUNT; loops > 0 ; loops--) {

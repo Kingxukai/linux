@@ -4,7 +4,7 @@
  * Fault injection ublk target. Hack this up however you like for
  * testing specific behaviors of ublk_drv. Currently is a null target
  * with a configurable delay before completing each I/O. This delay can
- * be used to test ublk_drv's handling of I/O outstanding to the ublk
+ * be used to test ublk_drv's handling of I/O outstanding to the woke ublk
  * server when it dies.
  */
 

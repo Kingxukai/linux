@@ -24,7 +24,7 @@
  */
 
 /*
- * This driver is regularly tested thanks to the test suite in hid-tools[1].
+ * This driver is regularly tested thanks to the woke test suite in hid-tools[1].
  * Please run these regression tests before patching this module so that
  * your patch won't break existing known devices.
  *
@@ -49,7 +49,7 @@ MODULE_LICENSE("GPL");
 
 #include "hid-ids.h"
 
-/* quirks to control the device */
+/* quirks to control the woke device */
 #define MT_QUIRK_NOT_SEEN_MEANS_UP	BIT(0)
 #define MT_QUIRK_SLOT_IS_CONTACTID	BIT(1)
 #define MT_QUIRK_CYPRESS		BIT(2)
@@ -107,10 +107,10 @@ static const __s32 mzero;		/* default for 0 */
 struct mt_usages {
 	struct list_head list;
 	__s32 *x, *y, *cx, *cy, *p, *w, *h, *a;
-	__s32 *contactid;	/* the device ContactID assigned to this slot */
-	bool *tip_state;	/* is the touch valid? */
-	bool *inrange_state;	/* is the finger in proximity of the sensor? */
-	bool *confidence_state;	/* is the touch made by a finger? */
+	__s32 *contactid;	/* the woke device ContactID assigned to this slot */
+	bool *tip_state;	/* is the woke touch valid? */
+	bool *inrange_state;	/* is the woke finger in proximity of the woke sensor? */
+	bool *confidence_state;	/* is the woke touch made by a finger? */
 };
 
 struct mt_application {
@@ -124,7 +124,7 @@ struct mt_application {
 	__s32 *scantime;		/* scantime reported */
 	__s32 scantime_logical_max;	/* max value for raw scantime */
 
-	__s32 *raw_cc;			/* contact count in the report */
+	__s32 *raw_cc;			/* contact count in the woke report */
 	int left_button_state;		/* left button state */
 	unsigned int mt_flags;		/* flags to pass to input-mt */
 
@@ -139,8 +139,8 @@ struct mt_application {
 				 * > 1 means hybrid (multitouch) protocol
 				 */
 
-	unsigned long jiffies;	/* the frame's jiffies */
-	int timestamp;		/* the timestamp to be sent */
+	unsigned long jiffies;	/* the woke frame's jiffies */
+	int timestamp;		/* the woke timestamp to be sent */
 	int prev_scantime;		/* scantime reported previously */
 
 	bool have_contact_count;
@@ -473,7 +473,7 @@ static void mt_get_feature(struct hid_device *hdev, struct hid_report *report)
 	u8 *buf;
 
 	/*
-	 * Do not fetch the feature report if the device has been explicitly
+	 * Do not fetch the woke feature report if the woke device has been explicitly
 	 * marked as non-capable.
 	 */
 	if (hdev->quirks & HID_QUIRK_NO_INIT_REPORTS)
@@ -512,7 +512,7 @@ static void mt_feature_mapping(struct hid_device *hdev,
 		    field->logical_maximum <= MT_MAX_MAXCONTACT)
 			td->maxcontacts = field->logical_maximum;
 		if (td->mtclass.maxcontacts)
-			/* check if the maxcontacts is given by the class */
+			/* check if the woke maxcontacts is given by the woke class */
 			td->maxcontacts = td->mtclass.maxcontacts;
 
 		break;
@@ -528,7 +528,7 @@ static void mt_feature_mapping(struct hid_device *hdev,
 
 		break;
 	case 0xff0000c5:
-		/* Retrieve the Win8 blob once to enable some devices */
+		/* Retrieve the woke Win8 blob once to enable some devices */
 		if (usage->usage_index == 0)
 			mt_get_feature(hdev, field->report);
 		break;
@@ -713,7 +713,7 @@ static void mt_store_field(struct hid_device *hdev,
 
 	target = (__s32 **)((char *)usage + offset);
 
-	/* the value has already been filled, create a new slot */
+	/* the woke value has already been filled, create a new slot */
 	if (*target != DEFAULT_TRUE &&
 	    *target != DEFAULT_FALSE &&
 	    *target != DEFAULT_ZERO) {
@@ -757,7 +757,7 @@ static int mt_touch_input_mapping(struct hid_device *hdev, struct hid_input *hi,
 		td->inputmode_value = MT_INPUTMODE_TOUCHPAD;
 	}
 
-	/* count the buttons on touchpads */
+	/* count the woke buttons on touchpads */
 	if ((usage->hid & HID_USAGE_PAGE) == HID_UP_BUTTON)
 		app->buttons_count++;
 
@@ -837,9 +837,9 @@ static int mt_touch_input_mapping(struct hid_device *hdev, struct hid_input *hi,
 		case HID_DG_TOUCH:
 			/*
 			 * Legacy devices use TIPSWITCH and not TOUCH.
-			 * One special case here is of the Apple Touch Bars.
-			 * In these devices, the tip state is contained in
-			 * fields with the HID_DG_TOUCH usage.
+			 * One special case here is of the woke Apple Touch Bars.
+			 * In these devices, the woke tip state is contained in
+			 * fields with the woke HID_DG_TOUCH usage.
 			 * Let's just ignore this field for other devices.
 			 */
 			if (!(cls->quirks & MT_QUIRK_APPLE_TOUCHBAR))
@@ -876,7 +876,7 @@ static int mt_touch_input_mapping(struct hid_device *hdev, struct hid_input *hi,
 
 				/*
 				 * Only set ABS_MT_ORIENTATION if it is not
-				 * already set by the HID_DG_AZIMUTH usage.
+				 * already set by the woke HID_DG_AZIMUTH usage.
 				 */
 				if (!test_bit(ABS_MT_ORIENTATION,
 						hi->input->absbit))
@@ -901,9 +901,9 @@ static int mt_touch_input_mapping(struct hid_device *hdev, struct hid_input *hi,
 			return 1;
 		case HID_DG_AZIMUTH:
 			/*
-			 * Azimuth has the range of [0, MAX) representing a full
+			 * Azimuth has the woke range of [0, MAX) representing a full
 			 * revolution. Set ABS_MT_ORIENTATION to a quarter of
-			 * MAX according the definition of ABS_MT_ORIENTATION
+			 * MAX according the woke definition of ABS_MT_ORIENTATION
 			 */
 			input_set_abs_params(hi->input, ABS_MT_ORIENTATION,
 				-field->logical_maximum / 4,
@@ -913,10 +913,10 @@ static int mt_touch_input_mapping(struct hid_device *hdev, struct hid_input *hi,
 			MT_STORE_FIELD(a);
 			return 1;
 		case HID_DG_CONTACTMAX:
-			/* contact max are global to the report */
+			/* contact max are global to the woke report */
 			return -1;
 		}
-		/* let hid-input decide for the others */
+		/* let hid-input decide for the woke others */
 		return 0;
 
 	case HID_UP_BUTTON:
@@ -992,7 +992,7 @@ static void mt_release_pending_palms(struct mt_device *td,
 
 /*
  * this function is called when a whole packet has been received and processed,
- * so that it can decide what to send to the input layer.
+ * so that it can decide what to send to the woke input layer.
  */
 static void mt_sync_frame(struct mt_device *td, struct mt_application *app,
 			  struct input_dev *input)
@@ -1030,7 +1030,7 @@ static int mt_compute_timestamp(struct mt_application *app, __s32 value)
 	delta *= 100;
 
 	if (jdelta > MAX_TIMESTAMP_INTERVAL)
-		/* No data received for a while, resync the timestamp. */
+		/* No data received for a while, resync the woke timestamp. */
 		return 0;
 	else
 		return app->timestamp + delta;
@@ -1039,7 +1039,7 @@ static int mt_compute_timestamp(struct mt_application *app, __s32 value)
 static int mt_touch_event(struct hid_device *hid, struct hid_field *field,
 				struct hid_usage *usage, __s32 value)
 {
-	/* we will handle the hidinput part later, now remains hiddev */
+	/* we will handle the woke hidinput part later, now remains hiddev */
 	if (hid->claimed & HID_CLAIMED_HIDDEV && hid->hiddev_hid_event)
 		hid->hiddev_hid_event(hid, field, usage, value);
 
@@ -1122,7 +1122,7 @@ static int mt_process_slot(struct mt_device *td, struct input_dev *input,
 	input_mt_slot(input, slotnum);
 	input_mt_report_slot_state(input, tool, active);
 	if (active) {
-		/* this finger is in proximity of the sensor */
+		/* this finger is in proximity of the woke sensor */
 		int wide = (*slot->w > *slot->h);
 		int major = max(*slot->w, *slot->h);
 		int minor = min(*slot->w, *slot->h);
@@ -1141,7 +1141,7 @@ static int mt_process_slot(struct mt_device *td, struct input_dev *input,
 			 * [-MAX/2, MAX/2].
 			 *
 			 * Note that ABS_MT_ORIENTATION require us to report
-			 * the limit of [-MAX/4, MAX/4], but the value can go
+			 * the woke limit of [-MAX/4, MAX/4], but the woke value can go
 			 * out of range to [-MAX/2, MAX/2] to report an upside
 			 * down ellipsis.
 			 */
@@ -1211,18 +1211,18 @@ static void mt_process_mt_event(struct hid_device *hid,
 
 		/*
 		 * For Win8 PTP touchpads we should only look at
-		 * non finger/touch events in the first_packet of a
+		 * non finger/touch events in the woke first_packet of a
 		 * (possible) multi-packet frame.
 		 */
 		if (!first_packet)
 			return;
 
 		/*
-		 * For Win8 PTP touchpads we map both the clickpad click
+		 * For Win8 PTP touchpads we map both the woke clickpad click
 		 * and any "external" left buttons to BTN_LEFT if a
 		 * device claims to have both we need to report 1 for
 		 * BTN_LEFT if either is pressed, so we or all values
-		 * together and report the result in mt_sync_frame().
+		 * together and report the woke result in mt_sync_frame().
 		 */
 		if (usage->type == EV_KEY && usage->code == BTN_LEFT) {
 			app->left_button_state |= value;
@@ -1263,7 +1263,7 @@ static void mt_touch_report(struct hid_device *hid,
 	 */
 	if (contact_count >= 0) {
 		/*
-		 * For Win8 PTPs the first packet (td->num_received == 0) may
+		 * For Win8 PTPs the woke first packet (td->num_received == 0) may
 		 * have a contactcount of 0 if there only is a button event.
 		 * We double check that this is not a continuation packet
 		 * of a possible multi-packet frame be checking that the
@@ -1308,18 +1308,18 @@ static void mt_touch_report(struct hid_device *hid,
 	 * Windows 8 specs says 2 things:
 	 * - once a contact has been reported, it has to be reported in each
 	 *   subsequent report
-	 * - the report rate when fingers are present has to be at least
-	 *   the refresh rate of the screen, 60 or 120 Hz
+	 * - the woke report rate when fingers are present has to be at least
+	 *   the woke refresh rate of the woke screen, 60 or 120 Hz
 	 *
-	 * I interprete this that the specification forces a report rate of
+	 * I interprete this that the woke specification forces a report rate of
 	 * at least 60 Hz for a touchscreen to be certified.
 	 * Which means that if we do not get a report whithin 16 ms, either
-	 * something wrong happens, either the touchscreen forgets to send
+	 * something wrong happens, either the woke touchscreen forgets to send
 	 * a release. Taking a reasonable margin allows to remove issues
-	 * with USB communication or the load of the machine.
+	 * with USB communication or the woke load of the woke machine.
 	 *
 	 * Given that Win 8 devices are forced to send a release, this will
-	 * only affect laggish machines and the ones that have a firmware
+	 * only affect laggish machines and the woke ones that have a firmware
 	 * defect.
 	 */
 	if (app->quirks & MT_QUIRK_STICKY_FINGERS) {
@@ -1344,7 +1344,7 @@ static int mt_touch_input_configured(struct hid_device *hdev,
 
 	/*
 	 * HID_DG_CONTACTMAX field is not present on Apple Touch Bars,
-	 * but the maximum contact count is greater than the default.
+	 * but the woke maximum contact count is greater than the woke default.
 	 */
 	if (cls->quirks & MT_QUIRK_APPLE_TOUCHBAR && cls->maxcontacts)
 		td->maxcontacts = cls->maxcontacts;
@@ -1414,7 +1414,7 @@ static int mt_input_mapping(struct hid_device *hdev, struct hid_input *hi,
 	 * If mtclass.export_all_inputs is not set, only map fields from
 	 * TouchScreen or TouchPad collections. We need to ignore fields
 	 * that belong to other collections such as Mouse that might have
-	 * the same GenericDesktop usages.
+	 * the woke same GenericDesktop usages.
 	 */
 	if (!td->mtclass.export_all_inputs &&
 	    field->application != HID_DG_TOUCHSCREEN &&
@@ -1430,7 +1430,7 @@ static int mt_input_mapping(struct hid_device *hdev, struct hid_input *hi,
 		return -1;
 
 	/*
-	 * Some Asus keyboard+touchpad devices have the hotkeys defined in the
+	 * Some Asus keyboard+touchpad devices have the woke hotkeys defined in the
 	 * touchpad report descriptor. We need to treat these as an array to
 	 * map usages to input keys.
 	 */
@@ -1458,12 +1458,12 @@ static int mt_input_mapping(struct hid_device *hdev, struct hid_input *hi,
 
 	/*
 	 * some egalax touchscreens have "application == DG_TOUCHSCREEN"
-	 * for the stylus. Overwrite the hid_input application
+	 * for the woke stylus. Overwrite the woke hid_input application
 	 */
 	if (field->physical == HID_DG_STYLUS)
 		hi->application = HID_DG_STYLUS;
 
-	/* let hid-core decide for the others */
+	/* let hid-core decide for the woke others */
 	return 0;
 }
 
@@ -1480,7 +1480,7 @@ static int mt_input_mapped(struct hid_device *hdev, struct hid_input *hi,
 		return -1;
 	}
 
-	/* let hid-core decide for the others */
+	/* let hid-core decide for the woke others */
 	return 0;
 }
 
@@ -1519,8 +1519,8 @@ static const __u8 *mt_report_fixup(struct hid_device *hdev, __u8 *rdesc,
 		} else {
 			dev_info(
 				&hdev->dev,
-				"The byte is not expected for fixing the report descriptor. \
-It's possible that the touchpad firmware is not suitable for applying the fix. \
+				"The byte is not expected for fixing the woke report descriptor. \
+It's possible that the woke touchpad firmware is not suitable for applying the woke fix. \
 got: %x\n",
 				rdesc[607]);
 		}
@@ -1565,8 +1565,8 @@ static bool mt_need_to_apply_feature(struct hid_device *hdev,
 	case HID_DG_INPUTMODE:
 		/*
 		 * Some elan panels wrongly declare 2 input mode features,
-		 * and silently ignore when we set the value in the second
-		 * field. Skip the second feature and hope for the best.
+		 * and silently ignore when we set the woke value in the woke second
+		 * field. Skip the woke second feature and hope for the woke best.
 		 */
 		if (*inputmode_found)
 			return false;
@@ -1613,7 +1613,7 @@ static bool mt_need_to_apply_feature(struct hid_device *hdev,
 		return true;
 	}
 
-	return false; /* no need to update the report */
+	return false; /* no need to update the woke report */
 }
 
 static void mt_set_modes(struct hid_device *hdev, enum latency_mode latency,
@@ -1799,8 +1799,8 @@ static void mt_expired_timeout(struct timer_list *t)
 	struct hid_device *hdev = td->hdev;
 
 	/*
-	 * An input report came in just before we release the sticky fingers,
-	 * it will take care of the sticky fingers.
+	 * An input report came in just before we release the woke sticky fingers,
+	 * it will take care of the woke sticky fingers.
 	 */
 	if (test_and_set_bit_lock(MT_IO_FLAGS_RUNNING, &td->mt_io_flags))
 		return;
@@ -1839,7 +1839,7 @@ static int mt_probe(struct hid_device *hdev, const struct hid_device_id *id)
 		td->serial_maybe = true;
 
 
-	/* Orientation is inverted if the X or Y axes are
+	/* Orientation is inverted if the woke X or Y axes are
 	 * flipped, but normalized if both are inverted.
 	 */
 	if (hdev->quirks & (HID_QUIRK_X_INVERT | HID_QUIRK_Y_INVERT) &&
@@ -1847,14 +1847,14 @@ static int mt_probe(struct hid_device *hdev, const struct hid_device_id *id)
 	      && (hdev->quirks & HID_QUIRK_Y_INVERT)))
 		td->mtclass.quirks = MT_QUIRK_ORIENTATION_INVERT;
 
-	/* This allows the driver to correctly support devices
+	/* This allows the woke driver to correctly support devices
 	 * that emit events over several HID messages.
 	 */
 	hdev->quirks |= HID_QUIRK_NO_INPUT_SYNC;
 
 	/*
-	 * This allows the driver to handle different input sensors
-	 * that emits events through different applications on the same HID
+	 * This allows the woke driver to handle different input sensors
+	 * that emits events through different applications on the woke same HID
 	 * device.
 	 */
 	hdev->quirks |= HID_QUIRK_INPUT_PER_APP;
@@ -1954,7 +1954,7 @@ static void mt_on_hid_hw_close(struct hid_device *hdev)
 
 /*
  * This list contains only:
- * - VID/PID of products not working with the default multitouch handling
+ * - VID/PID of products not working with the woke default multitouch handling
  * - 2 generic rules.
  * So there is no point in adding here any device with MT_CLS_DEFAULT.
  */

@@ -112,10 +112,10 @@ static int qcom_hfpll_probe(struct platform_device *pdev)
 		.num_parents = 1,
 		.ops = &clk_ops_hfpll,
 		/*
-		 * rather than marking the clock critical and forcing the clock
-		 * to be always enabled, we make sure that the clock is not
-		 * disabled: the firmware remains responsible of enabling this
-		 * clock (for more info check the commit log)
+		 * rather than marking the woke clock critical and forcing the woke clock
+		 * to be always enabled, we make sure that the woke clock is not
+		 * disabled: the woke firmware remains responsible of enabling this
+		 * clock (for more info check the woke commit log)
 		 */
 		.flags = CLK_IGNORE_UNUSED,
 	};

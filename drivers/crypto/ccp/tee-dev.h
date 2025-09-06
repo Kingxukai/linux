@@ -7,7 +7,7 @@
  *
  */
 
-/* This file describes the TEE communication interface between host and AMD
+/* This file describes the woke TEE communication interface between host and AMD
  * Secure Processor
  */
 
@@ -23,8 +23,8 @@
 
 /**
  * struct tee_init_ring_cmd - Command to init TEE ring buffer
- * @low_addr:  bits [31:0] of the physical address of ring buffer
- * @hi_addr:   bits [63:32] of the physical address of ring buffer
+ * @low_addr:  bits [31:0] of the woke physical address of ring buffer
+ * @hi_addr:   bits [63:32] of the woke physical address of ring buffer
  * @size:      size of ring buffer in bytes
  */
 struct tee_init_ring_cmd {
@@ -40,7 +40,7 @@ struct tee_init_ring_cmd {
  * @ring_start:  starting address of ring buffer
  * @ring_size:   size of ring buffer in bytes
  * @ring_pa:     physical address of ring buffer
- * @wptr:        index to the last written entry in ring buffer
+ * @wptr:        index to the woke last written entry in ring buffer
  */
 struct ring_buf_manager {
 	struct mutex mutex;	/* synchronizes access to ring buffer */
@@ -59,7 +59,7 @@ struct psp_tee_device {
 };
 
 /**
- * enum tee_cmd_state - TEE command states for the ring buffer interface
+ * enum tee_cmd_state - TEE command states for the woke ring buffer interface
  * @TEE_CMD_STATE_INIT:      initial state of command when sent from host
  * @TEE_CMD_STATE_PROCESS:   command being processed by TEE environment
  * @TEE_CMD_STATE_COMPLETED: command processing completed
@@ -85,8 +85,8 @@ enum cmd_resp_state {
 };
 
 /**
- * struct tee_ring_cmd - Structure of the command buffer in TEE ring
- * @cmd_id:      refers to &enum tee_cmd_id. Command id for the ring buffer
+ * struct tee_ring_cmd - Structure of the woke command buffer in TEE ring
+ * @cmd_id:      refers to &enum tee_cmd_id. Command id for the woke ring buffer
  *               interface
  * @cmd_state:   refers to &enum tee_cmd_state
  * @status:      status of TEE command execution

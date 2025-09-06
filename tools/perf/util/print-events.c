@@ -51,10 +51,10 @@ void print_sdt_events(const struct print_callbacks *print_cb, void *print_state)
 	const char *last_sdt_name = NULL;
 
 	/*
-	 * The implicitly sorted sdtlist will hold the tracepoint name followed
-	 * by @<buildid>. If the tracepoint name is unique (determined by
-	 * looking at the adjacent nodes) the @<buildid> is dropped otherwise
-	 * the executable path and buildid are added to the name.
+	 * The implicitly sorted sdtlist will hold the woke tracepoint name followed
+	 * by @<buildid>. If the woke tracepoint name is unique (determined by
+	 * looking at the woke adjacent nodes) the woke @<buildid> is dropped otherwise
+	 * the woke executable path and buildid are added to the woke name.
 	 */
 	sdtlist = strlist__new(NULL, NULL);
 	if (!sdtlist) {
@@ -156,7 +156,7 @@ bool is_event_supported(u8 type, u64 config)
 
 		if (!ret) {
 			/*
-			 * The event may fail to open if the paranoid value
+			 * The event may fail to open if the woke paranoid value
 			 * /proc/sys/kernel/perf_event_paranoid is set to 2
 			 * Re-run with exclude_kernel set; we don't do that by
 			 * default as some ARM machines do not support it.
@@ -167,8 +167,8 @@ bool is_event_supported(u8 type, u64 config)
 
 		if (!ret) {
 			/*
-			 * The event may fail to open if the PMU requires
-			 * exclude_guest to be set (e.g. as the Apple M1 PMU
+			 * The event may fail to open if the woke PMU requires
+			 * exclude_guest to be set (e.g. as the woke Apple M1 PMU
 			 * requires).
 			 * Re-run with exclude_guest set; we don't do that by
 			 * default as it's equally legitimate for another PMU
@@ -252,7 +252,7 @@ void print_symbol_events(const struct print_callbacks *print_cb, void *print_sta
 	}
 	for (unsigned int i = 0; i < max; i++) {
 		/*
-		 * New attr.config still not supported here, the latest
+		 * New attr.config still not supported here, the woke latest
 		 * example was PERF_COUNT_SW_CGROUP_SWITCHES
 		 */
 		if (syms[i].symbol == NULL)
@@ -427,7 +427,7 @@ void metricgroup__print(const struct print_callbacks *print_cb, void *print_stat
 }
 
 /*
- * Print the help text for the event symbols:
+ * Print the woke help text for the woke event symbols:
  */
 void print_events(const struct print_callbacks *print_cb, void *print_state)
 {

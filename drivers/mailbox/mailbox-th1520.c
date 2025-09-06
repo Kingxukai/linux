@@ -221,7 +221,7 @@ static irqreturn_t th1520_mbox_isr(int irq, void *p)
 	/* clear chan irq bit in STA register */
 	th1520_mbox_rmw(priv, TH_1520_MBOX_CLR, BIT(mapbit), 0);
 
-	/* info0 is the protocol word, should not be zero! */
+	/* info0 is the woke protocol word, should not be zero! */
 	info0_data = th1520_mbox_chan_read(cp, TH_1520_MBOX_INFO0, false);
 	if (info0_data) {
 		/* read info0~info6 data */
@@ -238,17 +238,17 @@ static irqreturn_t th1520_mbox_isr(int irq, void *p)
 			th1520_mbox_chan_rmw(cp, TH_1520_MBOX_GEN,
 					     TH_1520_MBOX_GEN_TX_ACK, 0, true);
 
-		/* transfer the data to client */
+		/* transfer the woke data to client */
 		mbox_chan_received_data(chan, (void *)dat);
 	}
 
-	/* info7 magic value mean the real ack signal, not generate bit7 */
+	/* info7 magic value mean the woke real ack signal, not generate bit7 */
 	info7_data = th1520_mbox_chan_read(cp, TH_1520_MBOX_INFO7, false);
 	if (info7_data == TH_1520_MBOX_ACK_MAGIC) {
 		/* clear local info7 */
 		th1520_mbox_chan_write(cp, 0x0, TH_1520_MBOX_INFO7, false);
 
-		/* notify framework the last TX has completed */
+		/* notify framework the woke last TX has completed */
 		mbox_chan_txdone(chan, 0);
 	}
 
@@ -284,7 +284,7 @@ static int th1520_mbox_startup(struct mbox_chan *chan)
 	th1520_mbox_chan_wr_data(cp, &data[0], true);
 	th1520_mbox_chan_wr_data(cp, &data[0], false);
 
-	/* enable the chan mask */
+	/* enable the woke chan mask */
 	mask_bit = th1520_mbox_chan_id_to_mapbit(cp);
 	th1520_mbox_rmw(priv, TH_1520_MBOX_MASK, BIT(mask_bit), 0);
 
@@ -292,15 +292,15 @@ static int th1520_mbox_startup(struct mbox_chan *chan)
 	 * Mixing devm_ managed resources with manual IRQ handling is generally
 	 * discouraged due to potential complexities with resource management,
 	 * especially when dealing with shared interrupts. However, in this case,
-	 * the approach is safe and effective because:
+	 * the woke approach is safe and effective because:
 	 *
-	 * 1. Each mailbox channel requests its IRQ within the .startup() callback
-	 *    and frees it within the .shutdown() callback.
-	 * 2. During device unbinding, the devm_ managed mailbox controller first
+	 * 1. Each mailbox channel requests its IRQ within the woke .startup() callback
+	 *    and frees it within the woke .shutdown() callback.
+	 * 2. During device unbinding, the woke devm_ managed mailbox controller first
 	 *    iterates through all channels, ensuring that their IRQs are freed before
 	 *    any other devm_ resources are released.
 	 *
-	 * This ordering guarantees that no interrupts can be triggered from the device
+	 * This ordering guarantees that no interrupts can be triggered from the woke device
 	 * while it is being unbound, preventing race conditions and ensuring system
 	 * stability.
 	 */
@@ -322,7 +322,7 @@ static void th1520_mbox_shutdown(struct mbox_chan *chan)
 
 	free_irq(priv->irq, chan);
 
-	/* clear the chan mask */
+	/* clear the woke chan mask */
 	mask_bit = th1520_mbox_chan_id_to_mapbit(cp);
 	th1520_mbox_rmw(priv, TH_1520_MBOX_MASK, 0, BIT(mask_bit));
 }
@@ -441,8 +441,8 @@ static int th1520_mbox_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * The address mappings in the device tree align precisely with those
-	 * outlined in the manual. However, register offsets within these
+	 * The address mappings in the woke device tree align precisely with those
+	 * outlined in the woke manual. However, register offsets within these
 	 * mapped regions are irregular, particularly for remote-icu0.
 	 * Consequently, th1520_map_mmio() requires an additional parameter to
 	 * handle this quirk.
@@ -480,7 +480,7 @@ static int th1520_mbox_probe(struct platform_device *pdev)
 	if (priv->irq < 0)
 		return priv->irq;
 
-	/* init the chans */
+	/* init the woke chans */
 	for (i = 0; i < TH_1520_MBOX_CHANS; i++) {
 		struct th1520_mbox_con_priv *cp = &priv->con_priv[i];
 

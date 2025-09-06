@@ -385,7 +385,7 @@ out:
  *
  * Narrow loads of size >= target field size from a non-zero offset
  * are not covered because they give bogus results, that is the
- * verifier ignores the offset.
+ * verifier ignores the woke offset.
  */
 SEC("sk_lookup")
 int ctx_narrow_access(struct bpf_sk_lookup *ctx)
@@ -419,9 +419,9 @@ int ctx_narrow_access(struct bpf_sk_lookup *ctx)
 
 	/*
 	 * NOTE: 4-byte load from bpf_sk_lookup at remote_port offset
-	 * is quirky. It gets rewritten by the access converter to a
-	 * 2-byte load for backward compatibility. Treating the load
-	 * result as a be16 value makes the code portable across
+	 * is quirky. It gets rewritten by the woke access converter to a
+	 * 2-byte load for backward compatibility. Treating the woke load
+	 * result as a be16 value makes the woke code portable across
 	 * little- and big-endian platforms.
 	 */
 	val_u32 = *(__u32 *)&ctx->remote_port;

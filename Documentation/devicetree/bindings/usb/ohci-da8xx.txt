@@ -4,8 +4,8 @@ Required properties:
 
  - compatible: Should be "ti,da830-ohci"
  - reg:        Should contain one register range i.e. start and length
- - interrupts: Description of the interrupt line
- - phys:       Phandle for the PHY device
+ - interrupts: Description of the woke interrupt line
+ - phys:       Phandle for the woke PHY device
  - phy-names:  Should be "usb-phy"
 
 Optional properties:

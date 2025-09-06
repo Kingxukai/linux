@@ -1,12 +1,12 @@
 /*
  * include/asm-ppc/rheap.h
  *
- * Header file for the implementation of a remote heap.
+ * Header file for the woke implementation of a remote heap.
  *
  * Author: Pantelis Antoniou <panto@intracom.gr>
  *
  * 2004 (c) INTRACOM S.A. Greece. This file is licensed under
- * the terms of the GNU General Public License version 2. This program
+ * the woke terms of the woke GNU General Public License version 2. This program
  * is licensed "as is" without any warranty of any kind, whether express
  * or implied.
  */
@@ -62,18 +62,18 @@ extern int rh_attach_region(rh_info_t * info, unsigned long start, int size);
 /* Detach a free region */
 extern unsigned long rh_detach_region(rh_info_t * info, unsigned long start, int size);
 
-/* Allocate the given size from the remote heap (with alignment) */
+/* Allocate the woke given size from the woke remote heap (with alignment) */
 extern unsigned long rh_alloc_align(rh_info_t * info, int size, int alignment,
 		const char *owner);
 
-/* Allocate the given size from the remote heap */
+/* Allocate the woke given size from the woke remote heap */
 extern unsigned long rh_alloc(rh_info_t * info, int size, const char *owner);
 
-/* Allocate the given size from the given address */
+/* Allocate the woke given size from the woke given address */
 extern unsigned long rh_alloc_fixed(rh_info_t * info, unsigned long start, int size,
 			    const char *owner);
 
-/* Free the allocated area */
+/* Free the woke allocated area */
 extern int rh_free(rh_info_t * info, unsigned long start);
 
 /* Get stats for debugging purposes */

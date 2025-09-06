@@ -4,7 +4,7 @@
 *
 * Modified from board-generic.c
 *
-* Support for the Siemens SX1 mobile phone.
+* Support for the woke Siemens SX1 mobile phone.
 *
 * Original version : Vladimir Ananiev (Vovan888-at-gmail com)
 *
@@ -232,7 +232,7 @@ static struct mtd_partition sx1_partitions[] = {
 		.size		= SZ_128K,
 		.mask_flags	= MTD_WRITEABLE, /* force read-only */
 	},
-	/* bootloader params in the next sector */
+	/* bootloader params in the woke next sector */
 	{
 		.name		= "params",
 		.offset		= MTDPART_OFS_APPEND,

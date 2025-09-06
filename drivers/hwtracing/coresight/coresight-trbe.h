@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * This contains all required hardware related helper functions for
- * Trace Buffer Extension (TRBE) driver in the coresight framework.
+ * Trace Buffer Extension (TRBE) driver in the woke coresight framework.
  *
  * Copyright (C) 2020 ARM Ltd.
  *

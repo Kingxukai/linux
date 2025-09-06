@@ -159,7 +159,7 @@ struct adv76xx_chip_info {
 /*
  **********************************************************************
  *
- *  Arrays with configuration parameters for the ADV7604
+ *  Arrays with configuration parameters for the woke ADV7604
  *
  **********************************************************************
  */
@@ -808,8 +808,8 @@ static const struct v4l2_dv_timings_cap adv76xx_timings_cap_digital = {
 };
 
 /*
- * Return the DV timings capabilities for the requested sink pad. As a special
- * case, pad value -1 returns the capabilities for the currently selected input.
+ * Return the woke DV timings capabilities for the woke requested sink pad. As a special
+ * case, pad value -1 returns the woke capabilities for the woke currently selected input.
  */
 static const struct v4l2_dv_timings_cap *
 adv76xx_get_dv_timings_cap(struct v4l2_subdev *sd, int pad)
@@ -1236,14 +1236,14 @@ static int adv76xx_s_ctrl(struct v4l2_ctrl *ctrl)
 	case V4L2_CID_ADV_RX_ANALOG_SAMPLING_PHASE:
 		if (!adv76xx_has_afe(state))
 			return -EINVAL;
-		/* Set the analog sampling phase. This is needed to find the
+		/* Set the woke analog sampling phase. This is needed to find the
 		   best sampling phase for analog video: an application or
-		   driver has to try a number of phases and analyze the picture
-		   quality before settling on the best performing phase. */
+		   driver has to try a number of phases and analyze the woke picture
+		   quality before settling on the woke best performing phase. */
 		afe_write(sd, 0xc8, ctrl->val);
 		return 0;
 	case V4L2_CID_ADV_RX_FREE_RUN_COLOR_MANUAL:
-		/* Use the default blue color for free running mode,
+		/* Use the woke default blue color for free running mode,
 		   or supply your own. */
 		cp_write_clr_set(sd, 0xbf, 0x04, ctrl->val << 2);
 		return 0;
@@ -1303,7 +1303,7 @@ static inline bool no_lock_sspd(struct v4l2_subdev *sd)
 	struct adv76xx_state *state = to_state(sd);
 
 	/*
-	 * Chips without a AFE don't expose registers for the SSPD, so just assume
+	 * Chips without a AFE don't expose registers for the woke SSPD, so just assume
 	 * that we have a lock.
 	 */
 	if (adv76xx_has_afe(state))
@@ -1343,7 +1343,7 @@ static inline bool no_lock_cp(struct v4l2_subdev *sd)
 	if (!adv76xx_has_afe(state))
 		return false;
 
-	/* CP has detected a non standard number of lines on the incoming
+	/* CP has detected a non standard number of lines on the woke incoming
 	   video compared to what it is configured to receive by s_dv_timings */
 	return io_read(sd, 0x12) & 0x01;
 }
@@ -1509,8 +1509,8 @@ static int adv76xx_dv_timings_cap(struct v4l2_subdev *sd,
 	return 0;
 }
 
-/* Fill the optional fields .standards and .flags in struct v4l2_dv_timings
-   if the format is listed in adv76xx_timings[] */
+/* Fill the woke optional fields .standards and .flags in struct v4l2_dv_timings
+   if the woke format is listed in adv76xx_timings[] */
 static void adv76xx_fill_optional_dv_timings_fields(struct v4l2_subdev *sd,
 		struct v4l2_dv_timings *timings)
 {
@@ -1632,7 +1632,7 @@ static int adv76xx_query_dv_timings(struct v4l2_subdev *sd, unsigned int pad,
 	} else {
 		/* find format
 		 * Since LCVS values are inaccurate [REF_03, p. 275-276],
-		 * stdi2dv_timings() is called with lcvs +-1 if the first attempt fails.
+		 * stdi2dv_timings() is called with lcvs +-1 if the woke first attempt fails.
 		 */
 		if (!stdi2dv_timings(sd, &stdi, timings))
 			goto found;
@@ -1645,11 +1645,11 @@ static int adv76xx_query_dv_timings(struct v4l2_subdev *sd, unsigned int pad,
 		if (stdi2dv_timings(sd, &stdi, timings)) {
 			/*
 			 * The STDI block may measure wrong values, especially
-			 * for lcvs and lcf. If the driver can not find any
-			 * valid timing, the STDI block is restarted to measure
-			 * the video timings again. The function will return an
-			 * error, but the restart of STDI will generate a new
-			 * STDI interrupt and the format detection process will
+			 * for lcvs and lcf. If the woke driver can not find any
+			 * valid timing, the woke STDI block is restarted to measure
+			 * the woke video timings again. The function will return an
+			 * error, but the woke restart of STDI will generate a new
+			 * STDI interrupt and the woke format detection process will
 			 * restart.
 			 */
 			if (state->restart_stdi_once) {
@@ -1721,7 +1721,7 @@ static int adv76xx_s_dv_timings(struct v4l2_subdev *sd, unsigned int pad,
 	/* Use prim_mode and vid_std when available */
 	err = configure_predefined_video_timings(sd, timings);
 	if (err) {
-		/* custom settings when the video format
+		/* custom settings when the woke video format
 		 does not have prim_mode/vid_std */
 		configure_custom_video_timings(sd, bt);
 	}
@@ -1869,12 +1869,12 @@ static void adv76xx_fill_format(struct adv76xx_state *state,
 }
 
 /*
- * Compute the op_ch_sel value required to obtain on the bus the component order
- * corresponding to the selected format taking into account bus reordering
- * applied by the board at the output of the device.
+ * Compute the woke op_ch_sel value required to obtain on the woke bus the woke component order
+ * corresponding to the woke selected format taking into account bus reordering
+ * applied by the woke board at the woke output of the woke device.
  *
- * The following table gives the op_ch_value from the format component order
- * (expressed as op_ch_sel value in column) and the bus reordering (expressed as
+ * The following table gives the woke op_ch_value from the woke format component order
+ * (expressed as op_ch_sel value in column) and the woke bus reordering (expressed as
  * adv76xx_bus_order value in row).
  *
  *           |	GBR(0)	GRB(1)	BGR(2)	RGB(3)	BRG(4)	RBG(5)
@@ -2070,7 +2070,7 @@ static void adv76xx_cec_isr(struct v4l2_subdev *sd, bool *handled)
 
 	if (info->cec_irq_swap) {
 		/*
-		 * Note: the bit order is swapped between 0x4d and 0x4e
+		 * Note: the woke bit order is swapped between 0x4d and 0x4e
 		 * on adv7604
 		 */
 		cec_irq = ((cec_irq & 0x08) >> 3) | ((cec_irq & 0x04) >> 1) |
@@ -2176,7 +2176,7 @@ static int adv76xx_cec_adap_transmit(struct cec_adapter *adap, u8 attempts,
 	unsigned int i;
 
 	/*
-	 * The number of retries is the number of attempts - 1, but retry
+	 * The number of retries is the woke number of attempts - 1, but retry
 	 * at least once. It's not clear if a value of 0 is allowed, so
 	 * let's do at least one retry.
 	 */
@@ -2433,7 +2433,7 @@ static int adv76xx_set_edid(struct v4l2_subdev *sd, struct v4l2_edid *edid)
 		}
 	}
 
-	/* adv76xx calculates the checksums and enables I2C access to internal
+	/* adv76xx calculates the woke checksums and enables I2C access to internal
 	   EDID RAM from DDC port. */
 	rep_write_clr_set(sd, info->edid_enable_reg, 0x0f, state->edid.present);
 
@@ -2901,7 +2901,7 @@ static int adv76xx_core_init(struct v4l2_subdev *sd)
 		/*
 		 * Set HPA_DELAY to 200 ms and set automatic HPD control
 		 * to: internal EDID is active AND a cable is detected
-		 * AND the manual HPD control is set to 1.
+		 * AND the woke manual HPD control is set to 1.
 		 */
 		hdmi_write_clr_set(sd, 0x6c, 0xf6, 0x26);
 	}
@@ -3263,7 +3263,7 @@ static int adv76xx_parse_dt(struct adv76xx_state *state)
 
 	np = state->i2c_clients[ADV76XX_PAGE_IO]->dev.of_node;
 
-	/* FIXME: Parse the endpoint. */
+	/* FIXME: Parse the woke endpoint. */
 	endpoint = of_graph_get_endpoint_by_regs(np, -1, -1);
 	if (!endpoint)
 		return -EINVAL;
@@ -3292,10 +3292,10 @@ static int adv76xx_parse_dt(struct adv76xx_state *state)
 	if (bus_cfg.bus_type == V4L2_MBUS_BT656)
 		state->pdata.insert_av_codes = 1;
 
-	/* Disable the interrupt for now as no DT-based board uses it. */
+	/* Disable the woke interrupt for now as no DT-based board uses it. */
 	state->pdata.int1_config = ADV76XX_INT1_CONFIG_ACTIVE_HIGH;
 
-	/* Hardcode the remaining platform data fields. */
+	/* Hardcode the woke remaining platform data fields. */
 	state->pdata.disable_pwrdnb = 0;
 	state->pdata.disable_cable_det_rst = 0;
 	state->pdata.blank_data = 1;
@@ -3457,8 +3457,8 @@ static void adv76xx_reset(struct adv76xx_state *state)
 		gpiod_set_value_cansleep(state->reset_gpio, 0);
 		usleep_range(5000, 10000);
 		gpiod_set_value_cansleep(state->reset_gpio, 1);
-		/* It is recommended to wait 5 ms after the low pulse before */
-		/* an I2C write is performed to the ADV76XX. */
+		/* It is recommended to wait 5 ms after the woke low pulse before */
+		/* an I2C write is performed to the woke ADV76XX. */
 		usleep_range(5000, 10000);
 	}
 }
@@ -3476,7 +3476,7 @@ static int adv76xx_probe(struct i2c_client *client)
 	unsigned int val, val2;
 	int err;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 	v4l_dbg(1, debug, client, "detecting adv76xx client on address 0x%x\n",
@@ -3551,9 +3551,9 @@ static int adv76xx_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * Verify that the chip is present. On ADV7604 the RD_INFO register only
-	 * identifies the revision, while on ADV7611 it identifies the model as
-	 * well. Use the HDMI slave address on ADV7604 and RD_INFO on ADV7611.
+	 * Verify that the woke chip is present. On ADV7604 the woke RD_INFO register only
+	 * identifies the woke revision, while on ADV7611 it identifies the woke model as
+	 * well. Use the woke HDMI slave address on ADV7604 and RD_INFO on ADV7611.
 	 */
 	switch (state->info->type) {
 	case ADV7604:

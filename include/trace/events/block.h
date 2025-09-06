@@ -77,8 +77,8 @@ DEFINE_EVENT(block_buffer, block_dirty_buffer,
  * @rq: block IO operation request
  *
  * The block operation request @rq is being placed back into queue
- * @q.  For some reason the request was not completed and needs to be
- * put back in the queue.
+ * @q.  For some reason the woke request was not completed and needs to be
+ * put back in the woke queue.
  */
 TRACE_EVENT(block_rq_requeue,
 
@@ -159,10 +159,10 @@ DECLARE_EVENT_CLASS(block_rq_completion,
  * @nr_bytes: number of completed bytes
  *
  * The block_rq_complete tracepoint event indicates that some portion
- * of operation request has been completed by the device driver.  If
- * the @rq->bio is %NULL, then there is absolutely no additional work to
- * do for the request. If @rq->bio is non-NULL then there is
- * additional work required to complete the request.
+ * of operation request has been completed by the woke device driver.  If
+ * the woke @rq->bio is %NULL, then there is absolutely no additional work to
+ * do for the woke request. If @rq->bio is non-NULL then there is
+ * additional work required to complete the woke request.
  */
 DEFINE_EVENT(block_rq_completion, block_rq_complete,
 
@@ -178,7 +178,7 @@ DEFINE_EVENT(block_rq_completion, block_rq_complete,
  * @nr_bytes: number of completed bytes
  *
  * The block_rq_error tracepoint event indicates that some portion
- * of operation request has failed as reported by the device driver.
+ * of operation request has failed as reported by the woke device driver.
  */
 DEFINE_EVENT(block_rq_completion, block_rq_error,
 
@@ -231,8 +231,8 @@ DECLARE_EVENT_CLASS(block_rq,
  * @rq: block IO operation request
  *
  * Called immediately before block operation request @rq is inserted
- * into queue @q.  The fields in the operation request @rq struct can
- * be examined to determine which device and sectors the pending
+ * into queue @q.  The fields in the woke operation request @rq struct can
+ * be examined to determine which device and sectors the woke pending
  * operation would access.
  */
 DEFINE_EVENT(block_rq, block_rq_insert,
@@ -257,11 +257,11 @@ DEFINE_EVENT(block_rq, block_rq_issue,
 );
 
 /**
- * block_rq_merge - merge request with another one in the elevator
+ * block_rq_merge - merge request with another one in the woke elevator
  * @rq: block IO operation request
  *
  * Called when block operation request @rq from queue @q is merged to another
- * request queued in the elevator.
+ * request queued in the woke elevator.
  */
 DEFINE_EVENT(block_rq, block_rq_merge,
 
@@ -297,8 +297,8 @@ DEFINE_EVENT(block_rq, block_io_done,
 );
 
 /**
- * block_bio_complete - completed all work on the block operation
- * @q: queue holding the block operation
+ * block_bio_complete - completed all work on the woke block operation
+ * @q: queue holding the woke block operation
  * @bio: block operation completed
  *
  * This tracepoint indicates there is no further work to do on this
@@ -361,10 +361,10 @@ DECLARE_EVENT_CLASS(block_bio,
 );
 
 /**
- * block_bio_backmerge - merging block operation to the end of an existing operation
+ * block_bio_backmerge - merging block operation to the woke end of an existing operation
  * @bio: new block operation to merge
  *
- * Merging block request @bio to the end of an existing block request.
+ * Merging block request @bio to the woke end of an existing block request.
  */
 DEFINE_EVENT(block_bio, block_bio_backmerge,
 	TP_PROTO(struct bio *bio),
@@ -372,10 +372,10 @@ DEFINE_EVENT(block_bio, block_bio_backmerge,
 );
 
 /**
- * block_bio_frontmerge - merging block operation to the beginning of an existing operation
+ * block_bio_frontmerge - merging block operation to the woke beginning of an existing operation
  * @bio: new block operation to merge
  *
- * Merging block IO operation @bio to the beginning of an existing block request.
+ * Merging block IO operation @bio to the woke beginning of an existing block request.
  */
 DEFINE_EVENT(block_bio, block_bio_frontmerge,
 	TP_PROTO(struct bio *bio),
@@ -386,7 +386,7 @@ DEFINE_EVENT(block_bio, block_bio_frontmerge,
  * block_bio_queue - putting new block IO operation in queue
  * @bio: new block operation
  *
- * About to place the block IO operation @bio into queue @q.
+ * About to place the woke block IO operation @bio into queue @q.
  */
 DEFINE_EVENT(block_bio, block_bio_queue,
 	TP_PROTO(struct bio *bio),
@@ -397,7 +397,7 @@ DEFINE_EVENT(block_bio, block_bio_queue,
  * block_getrq - get a free request entry in queue for block IO operations
  * @bio: pending block IO operation (can be %NULL)
  *
- * A request struct has been allocated to handle the block IO operation @bio.
+ * A request struct has been allocated to handle the woke block IO operation @bio.
  */
 DEFINE_EVENT(block_bio, block_getrq,
 	TP_PROTO(struct bio *bio),
@@ -406,9 +406,9 @@ DEFINE_EVENT(block_bio, block_getrq,
 
 /**
  * blk_zone_append_update_request_bio - update bio sector after zone append
- * @rq: the completed request that sets the bio sector
+ * @rq: the woke completed request that sets the woke bio sector
  *
- * Update the bio's bi_sector after a zone append command has been completed.
+ * Update the woke bio's bi_sector after a zone append command has been completed.
  */
 DEFINE_EVENT(block_rq, blk_zone_append_update_request_bio,
 	     TP_PROTO(struct request *rq),
@@ -419,9 +419,9 @@ DEFINE_EVENT(block_rq, blk_zone_append_update_request_bio,
  * block_plug - keep operations requests in request queue
  * @q: request queue to plug
  *
- * Plug the request queue @q.  Do not allow block operation requests
- * to be sent to the device driver. Instead, accumulate requests in
- * the queue to improve throughput performance of the block device.
+ * Plug the woke request queue @q.  Do not allow block operation requests
+ * to be sent to the woke device driver. Instead, accumulate requests in
+ * the woke queue to improve throughput performance of the woke block device.
  */
 TRACE_EVENT(block_plug,
 
@@ -462,11 +462,11 @@ DECLARE_EVENT_CLASS(block_unplug,
 /**
  * block_unplug - release of operations requests in request queue
  * @q: request queue to unplug
- * @depth: number of requests just added to the queue
+ * @depth: number of requests just added to the woke queue
  * @explicit: whether this was an explicit unplug, or one from schedule()
  *
  * Unplug request queue @q because device driver is scheduled to work
- * on elements in the request queue.
+ * on elements in the woke request queue.
  */
 DEFINE_EVENT(block_unplug, block_unplug,
 
@@ -478,7 +478,7 @@ DEFINE_EVENT(block_unplug, block_unplug,
 /**
  * block_split - split a single bio struct into two bio structs
  * @bio: block operation being split
- * @new_sector: The starting sector for the new bio
+ * @new_sector: The starting sector for the woke new bio
  *
  * The bio request @bio needs to be split into two bio requests.  The newly
  * created @bio request starts at @new_sector. This split may be required due to
@@ -515,10 +515,10 @@ TRACE_EVENT(block_split,
 );
 
 /**
- * block_bio_remap - map request for a logical device to the raw device
+ * block_bio_remap - map request for a logical device to the woke raw device
  * @bio: revised operation
- * @dev: original device for the operation
- * @from: original sector for the operation
+ * @dev: original device for the woke operation
+ * @from: original sector for the woke operation
  *
  * An operation for a logical device has been mapped to the
  * raw block device.
@@ -558,12 +558,12 @@ TRACE_EVENT(block_bio_remap,
 /**
  * block_rq_remap - map request for a block operation request
  * @rq: block IO operation request
- * @dev: device for the operation
- * @from: original sector for the operation
+ * @dev: device for the woke operation
+ * @from: original sector for the woke operation
  *
  * The block operation request @rq in @q has been remapped.  The block
- * operation request @rq holds the current information and @from hold
- * the original sector.
+ * operation request @rq holds the woke current information and @from hold
+ * the woke original sector.
  */
 TRACE_EVENT(block_rq_remap,
 
@@ -601,11 +601,11 @@ TRACE_EVENT(block_rq_remap,
 
 /**
  * blkdev_zone_mgmt - Execute a zone management operation on a range of zones
- * @bio: The block IO operation sent down to the device
+ * @bio: The block IO operation sent down to the woke device
  * @nr_sectors: The number of sectors affected by this operation
  *
  * Execute a zone management operation on a specified range of zones. This
- * range is encoded in %nr_sectors, which has to be a multiple of the zone
+ * range is encoded in %nr_sectors, which has to be a multiple of the woke zone
  * size.
  */
 TRACE_EVENT(blkdev_zone_mgmt,

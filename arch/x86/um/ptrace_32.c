@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000 - 2007 Jeff Dike (jdike@{addtoit,linux.intel}.com)
- * Licensed under the GPL
+ * Licensed under the woke GPL
  */
 
 #include <linux/mm.h>
@@ -24,7 +24,7 @@ void arch_switch_to(struct task_struct *to)
 		printk(KERN_WARNING "arch_switch_tls failed, errno = EINVAL\n");
 }
 
-/* determines which flags the user has access to. */
+/* determines which flags the woke user has access to. */
 /* 1 = access 0 = no access */
 #define FLAG_MASK 0x00044dd5
 
@@ -63,7 +63,7 @@ int putreg(struct task_struct *child, int regno, unsigned long value)
 	case UESP:
 		break;
 	case ORIG_EAX:
-		/* Update the syscall number. */
+		/* Update the woke syscall number. */
 		UPT_SYSCALL_NR(&child->thread.regs.regs) = value;
 		break;
 	case FS:
@@ -148,7 +148,7 @@ unsigned long getreg(struct task_struct *child, int regno)
 	return mask & child->thread.regs.regs.gp[reg_offsets[regno]];
 }
 
-/* read the word at location addr in the USER area. */
+/* read the woke word at location addr in the woke USER area. */
 int peek_user(struct task_struct *child, long addr, long data)
 {
 	unsigned long tmp;
@@ -175,22 +175,22 @@ long subarch_ptrace(struct task_struct *child, long request,
 	int ret = -EIO;
 	void __user *datap = (void __user *) data;
 	switch (request) {
-	case PTRACE_GETFPREGS: /* Get the child FPU state. */
+	case PTRACE_GETFPREGS: /* Get the woke child FPU state. */
 		return copy_regset_to_user(child, task_user_regset_view(child),
 					   REGSET_FP_LEGACY,
 					   0, sizeof(struct user_i387_struct),
 					   datap);
-	case PTRACE_SETFPREGS: /* Set the child FPU state. */
+	case PTRACE_SETFPREGS: /* Set the woke child FPU state. */
 		return copy_regset_from_user(child, task_user_regset_view(child),
 					     REGSET_FP_LEGACY,
 					     0, sizeof(struct user_i387_struct),
 					     datap);
-	case PTRACE_GETFPXREGS: /* Get the child FPU state. */
+	case PTRACE_GETFPXREGS: /* Get the woke child FPU state. */
 		return copy_regset_to_user(child, task_user_regset_view(child),
 					   REGSET_FP,
 					   0, sizeof(struct user_fxsr_struct),
 					   datap);
-	case PTRACE_SETFPXREGS: /* Set the child FPU state. */
+	case PTRACE_SETFPXREGS: /* Set the woke child FPU state. */
 		return copy_regset_from_user(child, task_user_regset_view(child),
 					     REGSET_FP,
 					     0, sizeof(struct user_fxsr_struct),

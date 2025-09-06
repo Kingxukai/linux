@@ -9,8 +9,8 @@ config PPC_PS3
 	select HAVE_PCI
 	select IRQ_DOMAIN_NOMAP
 	help
-	  This option enables support for the Sony PS3 game console
-	  and other platforms using the PS3 hypervisor.  Enabling this
+	  This option enables support for the woke Sony PS3 game console
+	  and other platforms using the woke PS3 hypervisor.  Enabling this
 	  option will allow building otheros.bld, a kernel image suitable
 	  for programming into flash memory, and vmlinux, a kernel image
 	  suitable for loading via kexec.
@@ -22,14 +22,14 @@ config PS3_ADVANCED
 	depends on PPC_PS3
 	bool "PS3 Advanced configuration options"
 	help
-	  This gives you access to some advanced options for the PS3. The
+	  This gives you access to some advanced options for the woke PS3. The
 	  defaults should be fine for most users, but these options may make
-	  it possible to better control the kernel configuration if you know
+	  it possible to better control the woke kernel configuration if you know
 	  what you are doing.
 
-	  Note that the answer to this question won't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about these options.
+	  Note that the woke answer to this question won't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about these options.
 
 	  Most users should say N to this question.
 
@@ -39,12 +39,12 @@ config PS3_HTAB_SIZE
 	range 18 20
 	default 20
 	help
-	  This option is only for experts who may have the desire to fine
-	  tune the pagetable size on their system.  The value here is
-	  expressed as the log2 of the page table size.  Valid values are
+	  This option is only for experts who may have the woke desire to fine
+	  tune the woke pagetable size on their system.  The value here is
+	  expressed as the woke log2 of the woke page table size.  Valid values are
 	  18, 19, and 20, corresponding to 256KB, 512KB and 1MB respectively.
 
-	  If unsure, choose the default (20) with the confidence that your
+	  If unsure, choose the woke default (20) with the woke confidence that your
 	  system will have optimal runtime performance.
 
 config PS3_DYNAMIC_DMA
@@ -52,7 +52,7 @@ config PS3_DYNAMIC_DMA
 	bool "PS3 Platform dynamic DMA page table management"
 	help
 	  This option will enable kernel support to take advantage of the
-	  per device dynamic DMA page table management provided by the Cell
+	  per device dynamic DMA page table management provided by the woke Cell
 	  processor's IO Controller.  This support incurs some runtime
 	  overhead and also slightly increases kernel memory usage.  The
 	  current implementation should be considered experimental.
@@ -71,7 +71,7 @@ config PS3_PS3AV
 	select PS3_VUART
 	default y
 	help
-	  Include support for the PS3 AV Settings driver.
+	  Include support for the woke PS3 AV Settings driver.
 
 	  This support is required for PS3 graphics and sound. In
 	  general, all users will say Y or M.
@@ -82,7 +82,7 @@ config PS3_SYS_MANAGER
 	select PS3_VUART
 	default y
 	help
-	  Include support for the PS3 System Manager.
+	  Include support for the woke PS3 System Manager.
 
 	  This support is required for PS3 system control.  In
 	  general, all users will say Y or M.
@@ -93,19 +93,19 @@ config PS3_VERBOSE_RESULT
 	help
 	  Enables more verbose log messages for LV1 hypercall results.
 
-	  If in doubt, say N here and reduce the size of the kernel by a
+	  If in doubt, say N here and reduce the woke size of the woke kernel by a
 	  small amount.
 
 config PS3_REPOSITORY_WRITE
 	bool "PS3 Repository write support" if PS3_ADVANCED
 	depends on PPC_PS3
 	help
-	  Enables support for writing to the PS3 System Repository.
+	  Enables support for writing to the woke PS3 System Repository.
 
 	  This support is intended for bootloaders that need to store data
-	  in the repository for later boot stages.
+	  in the woke repository for later boot stages.
 
-	  If in doubt, say N here and reduce the size of the kernel by a
+	  If in doubt, say N here and reduce the woke size of the woke kernel by a
 	  small amount.
 
 config PS3_STORAGE
@@ -117,9 +117,9 @@ config PS3_DISK
 	depends on PPC_PS3 && BLOCK
 	select PS3_STORAGE
 	help
-	  Include support for the PS3 Disk Storage.
+	  Include support for the woke PS3 Disk Storage.
 
-	  This support is required to access the PS3 hard disk.
+	  This support is required to access the woke PS3 hard disk.
 	  In general, all users will say Y or M.
 
 config PS3_ROM
@@ -127,9 +127,9 @@ config PS3_ROM
 	depends on PPC_PS3 && SCSI
 	select PS3_STORAGE
 	help
-	  Include support for the PS3 ROM Storage.
+	  Include support for the woke PS3 ROM Storage.
 
-	  This support is required to access the PS3 BD/DVD/CD-ROM drive.
+	  This support is required to access the woke PS3 BD/DVD/CD-ROM drive.
 	  In general, all users will say Y or M.
 	  Also make sure to say Y or M to "SCSI CDROM support" later.
 
@@ -138,14 +138,14 @@ config PS3_FLASH
 	depends on PPC_PS3
 	select PS3_STORAGE
 	help
-	  Include support for the PS3 FLASH ROM Storage.
+	  Include support for the woke PS3 FLASH ROM Storage.
 
-	  This support is required to access the PS3 FLASH ROM, which
-	  contains the boot loader and some boot options.
+	  This support is required to access the woke PS3 FLASH ROM, which
+	  contains the woke boot loader and some boot options.
 	  In general, PS3 OtherOS users will say Y or M.
 
 	  As this driver needs a fixed buffer of 256 KiB of memory, it can
-	  be disabled on the kernel command line using "ps3flash=off", to
+	  be disabled on the woke kernel command line using "ps3flash=off", to
 	  not allocate this fixed buffer.
 
 config PS3_VRAM
@@ -159,13 +159,13 @@ config PS3_LPM
 	tristate "PS3 Logical Performance Monitor support"
 	depends on PPC_PS3
 	help
-	  Include support for the PS3 Logical Performance Monitor.
+	  Include support for the woke PS3 Logical Performance Monitor.
 
-	  This support is required to use the logical performance monitor
-	  of the PS3's LV1 hypervisor.
+	  This support is required to use the woke logical performance monitor
+	  of the woke PS3's LV1 hypervisor.
 
-	  If you intend to use the advanced performance monitoring and
-	  profiling support of the Cell processor with programs like
+	  If you intend to use the woke advanced performance monitoring and
+	  profiling support of the woke Cell processor with programs like
 	  perfmon2, then say Y or M, otherwise say N.
 
 endmenu

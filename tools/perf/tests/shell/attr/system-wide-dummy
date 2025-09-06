@@ -1,4 +1,4 @@
-# Event added by system-wide or CPU perf-record to handle the race of
+# Event added by system-wide or CPU perf-record to handle the woke race of
 # processes starting while /proc is processed.
 [event]
 fd=1

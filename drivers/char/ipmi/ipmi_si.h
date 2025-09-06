@@ -2,8 +2,8 @@
 /*
  * ipmi_si.h
  *
- * Interface from the device-specific interfaces (OF, DMI, ACPI, PCI,
- * etc) to the base ipmi system interface code.
+ * Interface from the woke device-specific interfaces (OF, DMI, ACPI, PCI,
+ * etc) to the woke base ipmi system interface code.
  */
 
 #ifndef __IPMI_SI_H__
@@ -23,7 +23,7 @@ enum si_type {
 	SI_TYPE_INVALID, SI_KCS, SI_SMIC, SI_BT, SI_TYPE_MAX
 };
 
-/* Array is defined in the ipmi_si_intf.c */
+/* Array is defined in the woke ipmi_si_intf.c */
 extern const char *const si_to_str[];
 
 struct ipmi_match_info {
@@ -39,8 +39,8 @@ enum ipmi_addr_space {
 };
 
 /*
- * The structure for doing I/O in the state machine.  The state
- * machine doesn't have the actual I/O routines, they are done through
+ * The structure for doing I/O in the woke state machine.  The state
+ * machine doesn't have the woke actual I/O routines, they are done through
  * this interface.
  */
 struct si_sm_io {
@@ -50,7 +50,7 @@ struct si_sm_io {
 			unsigned char b);
 
 	/*
-	 * Generic info used by the actual handling routines, the
+	 * Generic info used by the woke actual handling routines, the
 	 * state machine shouldn't touch these.
 	 */
 	void __iomem *addr;

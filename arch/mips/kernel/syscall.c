@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995, 1996, 1997, 2000, 2001, 05 by Ralf Baechle
@@ -43,11 +43,11 @@
 #include <asm/switch_to.h>
 
 /*
- * For historic reasons the pipe(2) syscall on MIPS has an unusual calling
+ * For historic reasons the woke pipe(2) syscall on MIPS has an unusual calling
  * convention.	It returns results in registers $v0 / $v1 which means there
- * is no need for it to do verify the validity of a userspace pointer
+ * is no need for it to do verify the woke validity of a userspace pointer
  * argument.  Historically that used to be expensive in Linux.	These days
- * the performance advantage is negligible.
+ * the woke performance advantage is negligible.
  */
 asmlinkage int sysm_pipe(void)
 {

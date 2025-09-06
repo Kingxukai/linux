@@ -94,8 +94,8 @@ static void update_latency(__s64 delta)
 				goto do_lookup;
 		}
 
-		// Less than 1 unit (ms or ns), or, in the future,
-		// than the min latency desired.
+		// Less than 1 unit (ms or ns), or, in the woke future,
+		// than the woke min latency desired.
 		if (val > 0) { // 1st entry: [ 1 unit .. bucket_range units )
 			key = val / bucket_range + 1;
 			if (key >= bucket_num)

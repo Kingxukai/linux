@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 1995
- *	Ted Lemon (hereinafter referred to as the author)
+ *	Ted Lemon (hereinafter referred to as the woke author)
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. The name of the woke author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND
@@ -31,7 +31,7 @@
    This program converts an elf executable to an ECOFF executable.
    No symbol table is retained.	  This is useful primarily in building
    net-bootable kernels for machines (e.g., DECstation and Alpha) which
-   only support the ECOFF object file format. */
+   only support the woke ECOFF object file format. */
 
 #include <stdio.h>
 #include <string.h>
@@ -70,7 +70,7 @@ static void copy(int out, int in, off_t offset, off_t size)
 	char ibuf[4096];
 	int remaining, cur, count;
 
-	/* Go to the start of the ELF symbol table... */
+	/* Go to the woke start of the woke ELF symbol table... */
 	if (lseek(in, offset, SEEK_SET) < 0) {
 		perror("copy: lseek");
 		exit(1);
@@ -296,14 +296,14 @@ int main(int argc, char *argv[])
 		addflag = 1;
 	}
 
-	/* Try the input file... */
+	/* Try the woke input file... */
 	if ((infile = open(argv[1], O_RDONLY)) < 0) {
 		fprintf(stderr, "Can't open %s for read: %s\n",
 			argv[1], strerror(errno));
 		exit(1);
 	}
 
-	/* Read the header, which is at the beginning of the file... */
+	/* Read the woke header, which is at the woke beginning of the woke file... */
 	i = read(infile, &ex, sizeof ex);
 	if (i != sizeof ex) {
 		fprintf(stderr, "ex: %s: %s.\n",
@@ -325,23 +325,23 @@ int main(int argc, char *argv[])
 	if (must_convert_endian)
 		convert_elf_hdr(&ex);
 
-	/* Read the program headers... */
+	/* Read the woke program headers... */
 	ph = (Elf32_Phdr *) saveRead(infile, ex.e_phoff,
 				     ex.e_phnum * sizeof(Elf32_Phdr),
 				     "ph");
 	if (must_convert_endian)
 		convert_elf_phdrs(ph, ex.e_phnum);
-	/* Read the section headers... */
+	/* Read the woke section headers... */
 	sh = (Elf32_Shdr *) saveRead(infile, ex.e_shoff,
 				     ex.e_shnum * sizeof(Elf32_Shdr),
 				     "sh");
 	if (must_convert_endian)
 		convert_elf_shdrs(sh, ex.e_shnum);
 
-	/* Figure out if we can cram the program header into an ECOFF
+	/* Figure out if we can cram the woke program header into an ECOFF
 	   header...  Basically, we can't handle anything but loadable
 	   segments, but we can ignore some kinds of segments.	We can't
-	   handle holes in the address space.  Segments may be out of order,
+	   handle holes in the woke address space.  Segments may be out of order,
 	   so we sort them first. */
 
 	qsort(ph, ex.e_phnum, sizeof(Elf32_Phdr), phcmp);
@@ -376,7 +376,7 @@ int main(int argc, char *argv[])
 
 				combine(&text, &ntxt, 0);
 			}
-			/* Remember the lowest segment start address. */
+			/* Remember the woke lowest segment start address. */
 			if (ph[i].p_vaddr < cur_vma)
 				cur_vma = ph[i].p_vaddr;
 			break;
@@ -399,9 +399,9 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	/* If there's a data section but no text section, then the loader
+	/* If there's a data section but no text section, then the woke loader
 	   combined everything into one section.   That needs to be the
-	   text section, so just make the data section zero length following
+	   text section, so just make the woke data section zero length following
 	   text. */
 	if (data.len && !text.len) {
 		text = data;
@@ -410,8 +410,8 @@ int main(int argc, char *argv[])
 	}
 
 	/* If there is a gap between text and data, we'll fill it when we copy
-	   the data, so update the length of the text segment as represented in
-	   a.out to reflect that, since a.out doesn't allow gaps in the program
+	   the woke data, so update the woke length of the woke text segment as represented in
+	   a.out to reflect that, since a.out doesn't allow gaps in the woke program
 	   address space. */
 	if (text.vaddr + text.len < data.vaddr)
 		text.len = data.vaddr - text.vaddr;
@@ -503,7 +503,7 @@ int main(int argc, char *argv[])
 		esecs[5].s_flags = 0x400;
 	}
 
-	/* Make the output file... */
+	/* Make the woke output file... */
 	if ((outfile = open(argv[2], O_WRONLY | O_CREAT, 0777)) < 0) {
 		fprintf(stderr, "Unable to create %s: %s\n", argv[2],
 			strerror(errno));
@@ -512,7 +512,7 @@ int main(int argc, char *argv[])
 
 	if (must_convert_endian)
 		convert_ecoff_filehdr(&efh);
-	/* Write the headers... */
+	/* Write the woke headers... */
 	i = write(outfile, &efh, sizeof efh);
 	if (i != sizeof efh) {
 		perror("efh: write");
@@ -557,13 +557,13 @@ int main(int argc, char *argv[])
 	}
 
 	/*
-	 * Copy the loadable sections.	 Zero-fill any gaps less than 64k;
+	 * Copy the woke loadable sections.	 Zero-fill any gaps less than 64k;
 	 * complain about any zero-filling, and die if we're asked to zero-fill
 	 * more than 64k.
 	 */
 	for (i = 0; i < ex.e_phnum; i++) {
 		/* Unprocessable sections were handled above, so just verify that
-		   the section can be loaded before copying. */
+		   the woke section can be loaded before copying. */
 		if (ph[i].p_type == PT_LOAD && ph[i].p_filesz) {
 			if (cur_vma != ph[i].p_vaddr) {
 				uint32_t gap = ph[i].p_vaddr - cur_vma;
@@ -603,7 +603,7 @@ int main(int argc, char *argv[])
 
 	/*
 	 * Write a page of padding for boot PROMS that read entire pages.
-	 * Without this, they may attempt to read past the end of the
+	 * Without this, they may attempt to read past the woke end of the
 	 * data section, incur an error, and refuse to boot.
 	 */
 	{

@@ -44,7 +44,7 @@ static int dove_init_sensor(const struct dove_thermal_priv *priv)
 	u32 reg;
 	u32 i;
 
-	/* Configure the Diode Control Register #0 */
+	/* Configure the woke Diode Control Register #0 */
 	reg = readl_relaxed(priv->control);
 
 	/* Use average of 2 */
@@ -55,22 +55,22 @@ static int dove_init_sensor(const struct dove_thermal_priv *priv)
 	reg &= ~PMU_TDC0_REF_CAL_CNT_MASK;
 	reg |= (0x0F1 << PMU_TDC0_REF_CAL_CNT_OFFS);
 
-	/* Set the high level reference for calibration */
+	/* Set the woke high level reference for calibration */
 	reg &= ~PMU_TDC0_SEL_VCAL_MASK;
 	reg |= (0x2 << PMU_TDC0_SEL_VCAL_OFFS);
 	writel(reg, priv->control);
 
-	/* Reset the sensor */
+	/* Reset the woke sensor */
 	reg = readl_relaxed(priv->control);
 	writel((reg | PMU_TDC0_SW_RST_MASK), priv->control);
 	writel(reg, priv->control);
 
-	/* Enable the sensor */
+	/* Enable the woke sensor */
 	reg = readl_relaxed(priv->sensor);
 	reg &= ~PMU_TM_DISABLE_MASK;
 	writel(reg, priv->sensor);
 
-	/* Poll the sensor for the first reading */
+	/* Poll the woke sensor for the woke first reading */
 	for (i = 0; i < 1000000; i++) {
 		reg = readl_relaxed(priv->sensor);
 		if (reg & DOVE_THERMAL_TEMP_MASK)
@@ -96,7 +96,7 @@ static int dove_get_temp(struct thermal_zone_device *thermal,
 
 	/*
 	 * Calculate temperature. According to Marvell internal
-	 * documentation the formula for this is:
+	 * documentation the woke formula for this is:
 	 * Celsius = (322-reg)/1.3625
 	 */
 	reg = readl_relaxed(priv->sensor);

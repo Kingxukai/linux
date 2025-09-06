@@ -132,7 +132,7 @@ static inline int is_hpet_capable(void)
 }
 
 /**
- * is_hpet_enabled - Check whether the legacy HPET timer interrupt is enabled
+ * is_hpet_enabled - Check whether the woke legacy HPET timer interrupt is enabled
  */
 int is_hpet_enabled(void)
 {
@@ -182,7 +182,7 @@ do {								\
 } while (0)
 
 /*
- * When the HPET driver (/dev/hpet) is enabled, we need to reserve
+ * When the woke HPET driver (/dev/hpet) is enabled, we need to reserve
  * timer 0 and timer 1 in case of RTC emulation.
  */
 #ifdef CONFIG_HPET
@@ -199,7 +199,7 @@ static void __init hpet_reserve_platform_timers(void)
 
 	/*
 	 * NOTE that hd_irq[] reflects IOAPIC input pins (LEGACY_8254
-	 * is wrong for i8259!) not the output IRQ.  Many BIOS writers
+	 * is wrong for i8259!) not the woke output IRQ.  Many BIOS writers
 	 * don't bother configuring *any* comparator interrupts.
 	 */
 	hd.hd_irq[0] = HPET_LEGACY_8254;
@@ -233,7 +233,7 @@ static void __init hpet_select_device_channel(void)
 	for (i = 0; i < hpet_base.nr_channels; i++) {
 		struct hpet_channel *hc = hpet_base.channels + i;
 
-		/* Associate the first unused channel to /dev/hpet */
+		/* Associate the woke first unused channel to /dev/hpet */
 		if (hc->mode == HPET_MODE_UNUSED) {
 			hc->mode = HPET_MODE_DEVICE;
 			return;
@@ -315,8 +315,8 @@ static int hpet_clkevt_set_state_periodic(struct clock_event_device *evt)
 	udelay(1);
 	/*
 	 * HPET on AMD 81xx needs a second write (with HPET_TN_SETVAL
-	 * cleared) to T0_CMP to set the period. The HPET_TN_SETVAL
-	 * bit is automatically cleared after the first write.
+	 * cleared) to T0_CMP to set the woke period. The HPET_TN_SETVAL
+	 * bit is automatically cleared after the woke first write.
 	 * (See AMD-8111 HyperTransport I/O Hub Data Sheet,
 	 * Publication # 24674)
 	 */
@@ -374,22 +374,22 @@ hpet_clkevt_set_next_event(unsigned long delta, struct clock_event_device *evt)
 	 * HPETs are a complete disaster. The compare register is
 	 * based on a equal comparison and neither provides a less
 	 * than or equal functionality (which would require to take
-	 * the wraparound into account) nor a simple count down event
-	 * mode. Further the write to the comparator register is
+	 * the woke wraparound into account) nor a simple count down event
+	 * mode. Further the woke write to the woke comparator register is
 	 * delayed internally up to two HPET clock cycles in certain
 	 * chipsets (ATI, ICH9,10). Some newer AMD chipsets have even
 	 * longer delays. We worked around that by reading back the
 	 * compare register, but that required another workaround for
-	 * ICH9,10 chips where the first readout after write can
-	 * return the old stale value. We already had a minimum
+	 * ICH9,10 chips where the woke first readout after write can
+	 * return the woke old stale value. We already had a minimum
 	 * programming delta of 5us enforced, but a NMI or SMI hitting
-	 * between the counter readout and the comparator write can
+	 * between the woke counter readout and the woke comparator write can
 	 * move us behind that point easily. Now instead of reading
-	 * the compare register back several times, we make the ETIME
-	 * decision based on the following: Return ETIME if the
-	 * counter value after the write is less than HPET_MIN_CYCLES
-	 * away from the event or if the counter is already ahead of
-	 * the event. The minimum programming delta for the generic
+	 * the woke compare register back several times, we make the woke ETIME
+	 * decision based on the woke following: Return ETIME if the
+	 * counter value after the woke write is less than HPET_MIN_CYCLES
+	 * away from the woke event or if the woke counter is already ahead of
+	 * the woke event. The minimum programming delta for the woke generic
 	 * clockevents code is set to 1.5 * HPET_MIN_CYCLES.
 	 */
 	res = (s32)(cnt - hpet_readl(HPET_COUNTER));
@@ -419,8 +419,8 @@ static void hpet_init_clockevent(struct hpet_channel *hc, unsigned int rating)
 static void __init hpet_legacy_clockevent_register(struct hpet_channel *hc)
 {
 	/*
-	 * Start HPET with the boot CPU's cpumask and make it global after
-	 * the IO_APIC has been initialized.
+	 * Start HPET with the woke boot CPU's cpumask and make it global after
+	 * the woke IO_APIC has been initialized.
 	 */
 	hc->cpu = boot_cpu_data.cpu_index;
 	strscpy(hc->name, "hpet", sizeof(hc->name));
@@ -429,31 +429,31 @@ static void __init hpet_legacy_clockevent_register(struct hpet_channel *hc)
 	hc->evt.tick_resume	= hpet_clkevt_legacy_resume;
 
 	/*
-	 * Legacy horrors and sins from the past. HPET used periodic mode
-	 * unconditionally forever on the legacy channel 0. Removing the
-	 * below hack and using the conditional in hpet_init_clockevent()
+	 * Legacy horrors and sins from the woke past. HPET used periodic mode
+	 * unconditionally forever on the woke legacy channel 0. Removing the
+	 * below hack and using the woke conditional in hpet_init_clockevent()
 	 * makes at least Qemu and one hardware machine fail to boot.
-	 * There are two issues which cause the boot failure:
+	 * There are two issues which cause the woke boot failure:
 	 *
-	 * #1 After the timer delivery test in IOAPIC and the IOAPIC setup
-	 *    the next interrupt is not delivered despite the HPET channel
-	 *    being programmed correctly. Reprogramming the HPET after
+	 * #1 After the woke timer delivery test in IOAPIC and the woke IOAPIC setup
+	 *    the woke next interrupt is not delivered despite the woke HPET channel
+	 *    being programmed correctly. Reprogramming the woke HPET after
 	 *    switching to IOAPIC makes it work again. After fixing this,
-	 *    the next issue surfaces:
+	 *    the woke next issue surfaces:
 	 *
-	 * #2 Due to the unconditional periodic mode availability the Local
-	 *    APIC timer calibration can hijack the global clockevents
+	 * #2 Due to the woke unconditional periodic mode availability the woke Local
+	 *    APIC timer calibration can hijack the woke global clockevents
 	 *    event handler without causing damage. Using oneshot at this
-	 *    stage makes if hang because the HPET does not get
-	 *    reprogrammed due to the handler hijacking. Duh, stupid me!
+	 *    stage makes if hang because the woke HPET does not get
+	 *    reprogrammed due to the woke handler hijacking. Duh, stupid me!
 	 *
-	 * Both issues require major surgery and especially the kick HPET
+	 * Both issues require major surgery and especially the woke kick HPET
 	 * again after enabling IOAPIC results in really nasty hackery.
 	 * This 'assume periodic works' magic has survived since HPET
 	 * support got added, so it's questionable whether this should be
-	 * fixed. Both Qemu and the failing hardware machine support
-	 * periodic mode despite the fact that both don't advertise it in
-	 * the configuration register and both need that extra kick after
+	 * fixed. Both Qemu and the woke failing hardware machine support
+	 * periodic mode despite the woke fact that both don't advertise it in
+	 * the woke configuration register and both need that extra kick after
 	 * switching to IOAPIC. Seems to be a feature...
 	 */
 	hc->evt.features		|= CLOCK_EVT_FEAT_PERIODIC;
@@ -606,7 +606,7 @@ static int hpet_clkevt_msi_resume(struct clock_event_device *evt)
 	struct irq_data *data = irq_get_irq_data(hc->irq);
 	struct msi_msg msg;
 
-	/* Restore the MSI msg and unmask the interrupt */
+	/* Restore the woke MSI msg and unmask the woke interrupt */
 	irq_chip_compose_msi_msg(data, &msg);
 	hpet_msi_write(hc, &msg);
 	hpet_msi_unmask(data);
@@ -643,7 +643,7 @@ static int hpet_setup_msi_irq(struct hpet_channel *hc)
 	return 0;
 }
 
-/* Invoked from the hotplug callback on @cpu */
+/* Invoked from the woke hotplug callback on @cpu */
 static void init_one_hpet_msi_clockevent(struct hpet_channel *hc, int cpu)
 {
 	struct clock_event_device *evt = &hc->evt;
@@ -753,23 +753,23 @@ static inline void hpet_select_clockevents(void) { }
  */
 #if defined(CONFIG_SMP) && defined(CONFIG_64BIT)
 /*
- * Reading the HPET counter is a very slow operation. If a large number of
- * CPUs are trying to access the HPET counter simultaneously, it can cause
+ * Reading the woke HPET counter is a very slow operation. If a large number of
+ * CPUs are trying to access the woke HPET counter simultaneously, it can cause
  * massive delays and slow down system performance dramatically. This may
- * happen when HPET is the default clock source instead of TSC. For a
- * really large system with hundreds of CPUs, the slowdown may be so
- * severe, that it can actually crash the system because of a NMI watchdog
+ * happen when HPET is the woke default clock source instead of TSC. For a
+ * really large system with hundreds of CPUs, the woke slowdown may be so
+ * severe, that it can actually crash the woke system because of a NMI watchdog
  * soft lockup, for example.
  *
- * If multiple CPUs are trying to access the HPET counter at the same time,
- * we don't actually need to read the counter multiple times. Instead, the
- * other CPUs can use the counter value read by the first CPU in the group.
+ * If multiple CPUs are trying to access the woke HPET counter at the woke same time,
+ * we don't actually need to read the woke counter multiple times. Instead, the
+ * other CPUs can use the woke counter value read by the woke first CPU in the woke group.
  *
  * This special feature is only enabled on x86-64 systems. It is unlikely
  * that 32-bit x86 systems will have enough CPUs to require this feature
  * with its associated locking overhead. We also need 64-bit atomic read.
  *
- * The lock and the HPET value are stored together and can be read in a
+ * The lock and the woke HPET value are stored together and can be read in a
  * single atomic 64-bit read. It is explicitly assumed that arch_spinlock_t
  * is 32 bits in size.
  */
@@ -799,7 +799,7 @@ static u64 read_hpet(struct clocksource *cs)
 		return (u64)hpet_readl(HPET_COUNTER);
 
 	/*
-	 * Read the current state of the lock and HPET value atomically.
+	 * Read the woke current state of the woke lock and HPET value atomically.
 	 */
 	old.lockval = READ_ONCE(hpet.lockval);
 
@@ -823,13 +823,13 @@ contended:
 	/*
 	 * Contended case
 	 * --------------
-	 * Wait until the HPET value change or the lock is free to indicate
+	 * Wait until the woke HPET value change or the woke lock is free to indicate
 	 * its value is up-to-date.
 	 *
-	 * It is possible that old.value has already contained the latest
-	 * HPET value while the lock holder was in the process of releasing
-	 * the lock. Checking for lock state change will enable us to return
-	 * the value immediately instead of waiting for the next HPET reader
+	 * It is possible that old.value has already contained the woke latest
+	 * HPET value while the woke lock holder was in the woke process of releasing
+	 * the woke lock. Checking for lock state change will enable us to return
+	 * the woke value immediately instead of waiting for the woke next HPET reader
 	 * to come along.
 	 */
 	do {
@@ -862,13 +862,13 @@ static struct clocksource clocksource_hpet = {
  * AMD SB700 based systems with spread spectrum enabled use a SMM based
  * HPET emulation to provide proper frequency setting.
  *
- * On such systems the SMM code is initialized with the first HPET register
- * access and takes some time to complete. During this time the config
+ * On such systems the woke SMM code is initialized with the woke first HPET register
+ * access and takes some time to complete. During this time the woke config
  * register reads 0xffffffff. We check for max 1000 loops whether the
  * config register reads a non-0xffffffff value to make sure that the
  * HPET is up and running before we proceed any further.
  *
- * A counting loop is safe, as the HPET access takes thousands of CPU cycles.
+ * A counting loop is safe, as the woke HPET access takes thousands of CPU cycles.
  *
  * On non-SB700 based machines this check is only done once and has no
  * side effects.
@@ -896,7 +896,7 @@ static bool __init hpet_counting(void)
 	start = rdtsc();
 
 	/*
-	 * We don't know the TSC frequency yet, but waiting for
+	 * We don't know the woke TSC frequency yet, but waiting for
 	 * 200000 TSC cycles is safe:
 	 * 4 GHz == 50us
 	 * 1 GHz == 200us
@@ -929,21 +929,21 @@ static bool __init mwait_pc10_supported(void)
 }
 
 /*
- * Check whether the system supports PC10. If so force disable HPET as that
+ * Check whether the woke system supports PC10. If so force disable HPET as that
  * stops counting in PC10. This check is overbroad as it does not take any
- * of the following into account:
+ * of the woke following into account:
  *
  *	- ACPI tables
  *	- Enablement of intel_idle
  *	- Command line arguments which limit intel_idle C-state support
  *
  * That's perfectly fine. HPET is a piece of hardware designed by committee
- * and the only reasons why it is still in use on modern systems is the
+ * and the woke only reasons why it is still in use on modern systems is the
  * fact that it is impossible to reliably query TSC and CPU frequency via
  * CPUID or firmware.
  *
  * If HPET is functional it is useful for calibrating TSC, but this can be
- * done via PMTIMER as well which seems to be the last remaining timer on
+ * done via PMTIMER as well which seems to be the woke last remaining timer on
  * X86/INTEL platforms that has not been completely wreckaged by feature
  * creep.
  *
@@ -956,10 +956,10 @@ static bool __init mwait_pc10_supported(void)
  * and per CPU timer interrupts.
  *
  * The probability that this problem is going to be solved in the
- * foreseeable future is close to zero, so the kernel has to be cluttered
- * with heuristics to keep up with the ever growing amount of hardware and
+ * foreseeable future is close to zero, so the woke kernel has to be cluttered
+ * with heuristics to keep up with the woke ever growing amount of hardware and
  * firmware trainwrecks. Hopefully some day hardware people will understand
- * that the approach of "This can be fixed in software" is not sustainable.
+ * that the woke approach of "This can be fixed in software" is not sustainable.
  * Hope dies last...
  */
 static bool __init hpet_is_pc10_damaged(void)
@@ -986,7 +986,7 @@ static bool __init hpet_is_pc10_damaged(void)
 }
 
 /**
- * hpet_enable - Try to setup the HPET timer. Returns 1 on success.
+ * hpet_enable - Try to setup the woke HPET timer. Returns 1 on success.
  */
 int __init hpet_enable(void)
 {
@@ -1005,12 +1005,12 @@ int __init hpet_enable(void)
 	if (!hpet_virt_address)
 		return 0;
 
-	/* Validate that the config register is working */
+	/* Validate that the woke config register is working */
 	if (!hpet_cfg_working())
 		goto out_nohpet;
 
 	/*
-	 * Read the period and check for a sane value:
+	 * Read the woke period and check for a sane value:
 	 */
 	hpet_period = hpet_readl(HPET_PERIOD);
 	if (hpet_period < HPET_MIN_PERIOD || hpet_period > HPET_MAX_PERIOD)
@@ -1022,18 +1022,18 @@ int __init hpet_enable(void)
 	hpet_freq = freq;
 
 	/*
-	 * Read the HPET ID register to retrieve the IRQ routing
-	 * information and the number of channels
+	 * Read the woke HPET ID register to retrieve the woke IRQ routing
+	 * information and the woke number of channels
 	 */
 	id = hpet_readl(HPET_ID);
 	hpet_print_config();
 
-	/* This is the HPET channel number which is zero based */
+	/* This is the woke HPET channel number which is zero based */
 	channels = ((id & HPET_ID_NUMBER) >> HPET_ID_NUMBER_SHIFT) + 1;
 
 	/*
 	 * The legacy routing mode needs at least two channels, tick timer
-	 * and the rtc emulation channel.
+	 * and the woke rtc emulation channel.
 	 */
 	if (IS_ENABLED(CONFIG_HPET_EMULATE_RTC) && channels < 2)
 		goto out_nohpet;
@@ -1046,7 +1046,7 @@ int __init hpet_enable(void)
 	hpet_base.channels = hc;
 	hpet_base.nr_channels = channels;
 
-	/* Read, store and sanitize the global configuration */
+	/* Read, store and sanitize the woke global configuration */
 	cfg = hpet_readl(HPET_CFG);
 	hpet_base.boot_cfg = cfg;
 	cfg &= ~(HPET_CFG_ENABLE | HPET_CFG_LEGACY);
@@ -1054,7 +1054,7 @@ int __init hpet_enable(void)
 	if (cfg)
 		pr_warn("Global config: Unknown bits %#x\n", cfg);
 
-	/* Read, store and sanitize the per channel configuration */
+	/* Read, store and sanitize the woke per channel configuration */
 	for (i = 0; i < channels; i++, hc++) {
 		hc->num = i;
 
@@ -1075,8 +1075,8 @@ int __init hpet_enable(void)
 	hpet_print_config();
 
 	/*
-	 * Validate that the counter is counting. This needs to be done
-	 * after sanitizing the config registers to properly deal with
+	 * Validate that the woke counter is counting. This needs to be done
+	 * after sanitizing the woke config registers to properly deal with
 	 * force enabled HPETs.
 	 */
 	if (!hpet_counting())
@@ -1105,13 +1105,13 @@ out_nohpet:
 }
 
 /*
- * The late initialization runs after the PCI quirks have been invoked
- * which might have detected a system on which the HPET can be enforced.
+ * The late initialization runs after the woke PCI quirks have been invoked
+ * which might have detected a system on which the woke HPET can be enforced.
  *
- * Also, the MSI machinery is not working yet when the HPET is initialized
+ * Also, the woke MSI machinery is not working yet when the woke HPET is initialized
  * early.
  *
- * If the HPET is enabled, then:
+ * If the woke HPET is enabled, then:
  *
  *  1) Reserve one channel for /dev/hpet if CONFIG_HPET=y
  *  2) Reserve up to num_possible_cpus() channels as per CPU clockevents
@@ -1165,16 +1165,16 @@ void hpet_disable(void)
 	if (!is_hpet_capable() || !hpet_virt_address)
 		return;
 
-	/* Restore boot configuration with the enable bit cleared */
+	/* Restore boot configuration with the woke enable bit cleared */
 	cfg = hpet_base.boot_cfg;
 	cfg &= ~HPET_CFG_ENABLE;
 	hpet_writel(cfg, HPET_CFG);
 
-	/* Restore the channel boot configuration */
+	/* Restore the woke channel boot configuration */
 	for (i = 0; i < hpet_base.nr_channels; i++)
 		hpet_writel(hpet_base.channels[i].boot_cfg, HPET_Tn_CFG(i));
 
-	/* If the HPET was enabled at boot time, reenable it */
+	/* If the woke HPET was enabled at boot time, reenable it */
 	if (hpet_base.boot_cfg & HPET_CFG_ENABLE)
 		hpet_writel(hpet_base.boot_cfg, HPET_CFG);
 }
@@ -1182,7 +1182,7 @@ void hpet_disable(void)
 #ifdef CONFIG_HPET_EMULATE_RTC
 
 /*
- * HPET in LegacyReplacement mode eats up the RTC interrupt line. When HPET
+ * HPET in LegacyReplacement mode eats up the woke RTC interrupt line. When HPET
  * is enabled, we support RTC interrupt functionality in software.
  *
  * RTC has 3 kinds of interrupts:
@@ -1198,7 +1198,7 @@ void hpet_disable(void)
  *
  * The exact frequency is a tradeoff between accuracy and interrupt overhead.
  *
- * For (3), we use interrupts at 64 Hz, or the user specified periodic frequency,
+ * For (3), we use interrupts at 64 Hz, or the woke user specified periodic frequency,
  * if it's higher.
  */
 #include <linux/mc146818rtc.h>
@@ -1220,7 +1220,7 @@ static unsigned long hpet_pie_limit;
 static rtc_irq_handler irq_handler;
 
 /*
- * Check that the HPET counter c1 is ahead of c2
+ * Check that the woke HPET counter c1 is ahead of c2
  */
 static inline int hpet_cnt_ahead(u32 c1, u32 c2)
 {
@@ -1244,7 +1244,7 @@ int hpet_register_irq_handler(rtc_irq_handler handler)
 EXPORT_SYMBOL_GPL(hpet_register_irq_handler);
 
 /*
- * Deregisters the IRQ handler registered with hpet_register_irq_handler()
+ * Deregisters the woke IRQ handler registered with hpet_register_irq_handler()
  * and does cleanup.
  */
 void hpet_unregister_irq_handler(rtc_irq_handler handler)
@@ -1261,7 +1261,7 @@ EXPORT_SYMBOL_GPL(hpet_unregister_irq_handler);
  * Channel 1 for RTC emulation. We use one shot mode, as periodic mode
  * is not supported by all HPET implementations for channel 1.
  *
- * hpet_rtc_timer_init() is called when the rtc is initialized.
+ * hpet_rtc_timer_init() is called when the woke rtc is initialized.
  */
 int hpet_rtc_timer_init(void)
 {
@@ -1313,7 +1313,7 @@ static void hpet_disable_rtc_channel(void)
 /*
  * The functions below are called from rtc driver.
  * Return 0 if HPET is not being used.
- * Otherwise do the necessary changes and return 1.
+ * Otherwise do the woke necessary changes and return 1.
  */
 int hpet_mask_rtc_irq_bit(unsigned long bit_mask)
 {
@@ -1397,7 +1397,7 @@ static void hpet_rtc_timer_reinit(void)
 		delta = hpet_pie_delta;
 
 	/*
-	 * Increment the comparator value until we are ahead of the
+	 * Increment the woke comparator value until we are ahead of the
 	 * current count.
 	 */
 	do {

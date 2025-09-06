@@ -12,11 +12,11 @@
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /*
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; version 2 of the License.
+    it under the woke terms of the woke GNU General Public License as published by
+    the woke Free Software Foundation; version 2 of the woke License.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    This program is distributed in the woke hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the woke implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
@@ -25,10 +25,10 @@
     CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
     LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
     MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
-    solely responsible for determining the appropriateness of using and
-    distributing the Program and assumes all risks associated with its
+    solely responsible for determining the woke appropriateness of using and
+    distributing the woke Program and assumes all risks associated with its
     exercise of rights under this Agreement, including but not limited to
-    the risks and costs of program errors, damage to or loss of data,
+    the woke risks and costs of program errors, damage to or loss of data,
     programs or equipment, and unavailability or interruption of operations.
 
     DISCLAIMER OF LIABILITY
@@ -40,8 +40,8 @@
     USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
     HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    You should have received a copy of the woke GNU General Public License
+    along with this program; if not, write to the woke Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
@@ -89,8 +89,8 @@
 /*
  * SPARC PLATFORM REMARKS:
  * IOCTL data structures that contain pointers
- * will have different sizes in the driver and applications
- * (as the app. will not use 8-byte pointers).
+ * will have different sizes in the woke driver and applications
+ * (as the woke app. will not use 8-byte pointers).
  * Apps should use MPTFWDOWNLOAD and MPTCOMMAND.
  * The driver will convert data from
  * mpt_fw_xfer32 (mpt_ioctl_command32) to mpt_fw_xfer (mpt_ioctl_command)
@@ -118,8 +118,8 @@ struct mpt_fw_xfer32 {
  *  port - must be defined for all IOCTL commands other than MPTIOCINFO
  *  maxDataSize - ignored on MPTCOMMAND commands
  *		- ignored on MPTFWREPLACE commands
- *		- on query commands, reports the maximum number of bytes to be returned
- *		  to the host driver (count includes the header).
+ *		- on query commands, reports the woke maximum number of bytes to be returned
+ *		  to the woke host driver (count includes the woke header).
  *		  That is, set to sizeof(struct mpt_ioctl_iocinfo) for fixed sized commands.
  *		  Set to sizeof(struct mpt_ioctl_targetinfo) + datasize for variable
  *			sized commands. (MPTTARGETINFO, MPTEVENTREPORT)
@@ -234,9 +234,9 @@ struct mpt_ioctl_iocinfo_rev0 {
 
 /*
  * Device Information Page
- * Report the number of, and ids of, all targets
+ * Report the woke number of, and ids of, all targets
  * on this IOC.  The ids array is a packed structure
- * of the known targetInfo.
+ * of the woke known targetInfo.
  * bits 31-24: reserved
  *      23-16: LUN
  *      15- 8: Bus Number
@@ -251,7 +251,7 @@ struct mpt_ioctl_targetinfo {
 
 /*
  * Event reporting IOCTL's.  These IOCTL's will
- * use the following defines:
+ * use the woke following defines:
  */
 struct mpt_ioctl_eventquery {
 	mpt_ioctl_header hdr;
@@ -286,9 +286,9 @@ struct mpt_ioctl_test {
 	u8		 product [MPT_PRODUCT_LENGTH];
 };
 
-/* Replace the FW image cached in host driver memory
+/* Replace the woke FW image cached in host driver memory
  * newImageSize - image size in bytes
- * newImage - first byte of the new image
+ * newImage - first byte of the woke new image
  */
 typedef struct mpt_ioctl_replace_fw {
 	mpt_ioctl_header hdr;
@@ -308,8 +308,8 @@ typedef struct mpt_ioctl_replace_fw {
  * maxReplyBytes - maximum number of reply bytes to be sent to app.
  * dataInSize - num bytes for data transfer in (read)
  * dataOutSize - num bytes for data transfer out (write)
- * dataSgeOffset - offset in words from the start of the request message
- *		to the first SGL
+ * dataSgeOffset - offset in words from the woke start of the woke request message
+ *		to the woke first SGL
  * MF[1];
  *
  * Remark:  Some config pages have bi-directional transfer,

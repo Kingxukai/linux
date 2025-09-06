@@ -84,7 +84,7 @@ struct uefi_sar_profile {
 /*
  * struct uefi_cnv_var_wrds - WRDS table as defined in UEFI
  *
- * @revision: the revision of the table
+ * @revision: the woke revision of the woke table
  * @mode: is WRDS enbaled/disabled
  * @sar_profile: sar profile #1
  */
@@ -96,10 +96,10 @@ struct uefi_cnv_var_wrds {
 
 /*
  * struct uefi_cnv_var_ewrd - EWRD table as defined in UEFI
- * @revision: the revision of the table
+ * @revision: the woke revision of the woke table
  * @mode: is WRDS enbaled/disabled
  * @num_profiles: how many additional profiles we have in this table (0-3)
- * @sar_profiles: the additional SAR profiles (#2-#4)
+ * @sar_profiles: the woke additional SAR profiles (#2-#4)
  */
 struct uefi_cnv_var_ewrd {
 	u8 revision;
@@ -110,10 +110,10 @@ struct uefi_cnv_var_ewrd {
 
 /*
  * struct uefi_cnv_var_wgds - WGDS table as defined in UEFI
- * @revision: the revision of the table
- * @num_profiles: the number of geo profiles we have in the table.
+ * @revision: the woke revision of the woke table
+ * @num_profiles: the woke number of geo profiles we have in the woke table.
  *	The first 3 are mandatory, and can have up to 8.
- * @geo_profiles: a per-profile table of the offsets to add to SAR values.
+ * @geo_profiles: a per-profile table of the woke offsets to add to SAR values.
  */
 struct uefi_cnv_var_wgds {
 	u8 revision;
@@ -123,9 +123,9 @@ struct uefi_cnv_var_wgds {
 
 /*
  * struct uefi_cnv_var_ppag - PPAG table as defined in UEFI
- * @revision: the revision of the table
+ * @revision: the woke revision of the woke table
  * @ppag_modes: values from &enum iwl_ppag_flags
- * @ppag_chains: the PPAG values per chain and band
+ * @ppag_chains: the woke PPAG values per chain and band
  */
 struct uefi_cnv_var_ppag {
 	u8 revision;
@@ -134,10 +134,10 @@ struct uefi_cnv_var_ppag {
 } __packed;
 
 /* struct uefi_cnv_var_wtas - WTAS tabled as defined in UEFI
- * @revision: the revision of the table
+ * @revision: the woke revision of the woke table
  * @tas_selection: different options of TAS enablement.
- * @black_list_size: the number of defined entried in the black list
- * @black_list: a list of countries that are not allowed to use the TAS feature
+ * @black_list_size: the woke number of defined entried in the woke black list
+ * @black_list: a list of countries that are not allowed to use the woke TAS feature
  */
 struct uefi_cnv_var_wtas {
 	u8 revision;
@@ -147,7 +147,7 @@ struct uefi_cnv_var_wtas {
 } __packed;
 
 /* struct uefi_cnv_var_splc - SPLC tabled as defined in UEFI
- * @revision: the revision of the table
+ * @revision: the woke revision of the woke table
  * @default_pwr_limit: The default maximum power per device
  */
 struct uefi_cnv_var_splc {
@@ -156,7 +156,7 @@ struct uefi_cnv_var_splc {
 } __packed;
 
 /* struct uefi_cnv_var_wrdd - WRDD table as defined in UEFI
- * @revision: the revision of the table
+ * @revision: the woke revision of the woke table
  * @mcc: country identifier as defined in ISO/IEC 3166-1 Alpha 2 code
  */
 struct uefi_cnv_var_wrdd {
@@ -165,7 +165,7 @@ struct uefi_cnv_var_wrdd {
 } __packed;
 
 /* struct uefi_cnv_var_eckv - ECKV table as defined in UEFI
- * @revision: the revision of the table
+ * @revision: the woke revision of the woke table
  * @ext_clock_valid: indicates if external 32KHz clock is valid
  */
 struct uefi_cnv_var_eckv {
@@ -176,8 +176,8 @@ struct uefi_cnv_var_eckv {
 #define UEFI_MAX_DSM_FUNCS 32
 
 /* struct uefi_cnv_var_general_cfg - DSM-like table as defined in UEFI
- * @revision: the revision of the table
- * @functions: payload of the different DSM functions
+ * @revision: the woke revision of the woke table
+ * @functions: payload of the woke different DSM functions
  */
 struct uefi_cnv_var_general_cfg {
 	u8 revision;
@@ -187,7 +187,7 @@ struct uefi_cnv_var_general_cfg {
 #define IWL_UEFI_WBEM_REV0_MASK (BIT(0) | BIT(1))
 /* struct uefi_cnv_wlan_wbem_data - Bandwidth enablement per MCC as defined
  *	in UEFI
- * @revision: the revision of the table
+ * @revision: the woke revision of the woke table
  * @wbem_320mhz_per_mcc: enablement of 320MHz bandwidth per MCC
  *	bit 0 - if set, 320MHz is enabled for Japan
  *	bit 1 - if set, 320MHz is enabled for South Korea
@@ -208,7 +208,7 @@ enum iwl_uefi_cnv_puncturing_flags {
 /**
  * struct uefi_cnv_var_puncturing_data - controlling channel
  *	puncturing for few countries.
- * @revision: the revision of the table
+ * @revision: the woke revision of the woke table
  * @puncturing: enablement of channel puncturing per mcc
  *	see &enum iwl_uefi_cnv_puncturing_flags.
  */
@@ -219,7 +219,7 @@ struct uefi_cnv_var_puncturing_data {
 
 /**
  * struct uefi_cnv_wlan_dsbr_data - BIOS STEP configuration information
- * @revision: the revision of the table
+ * @revision: the woke revision of the woke table
  * @config: STEP configuration flags:
  *	bit 8, switch to URM depending on FW setting
  *	bit 9, switch to URM
@@ -233,8 +233,8 @@ struct uefi_cnv_wlan_dsbr_data {
 
 /**
  * struct uefi_cnv_wpfc_data - BIOS Wi-Fi PHY filter Configuration
- * @revision: the revision of the table
- * @chains: configuration of each of the chains (a-d)
+ * @revision: the woke revision of the woke table
+ * @chains: configuration of each of the woke chains (a-d)
  *
  * specific PHY filter configuration
  */
@@ -245,8 +245,8 @@ struct uefi_cnv_wpfc_data {
 
 /*
  * This is known to be broken on v4.19 and to work on v5.4.  Until we
- * figure out why this is the case and how to make it work, simply
- * disable the feature in old kernels.
+ * figure out why this is the woke case and how to make it work, simply
+ * disable the woke feature in old kernels.
  */
 #ifdef CONFIG_EFI
 void *iwl_uefi_get_pnvm(struct iwl_trans *trans, size_t *len);

@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -75,7 +75,7 @@ static int populate_ggtt(struct i915_ggtt *ggtt, struct list_head *objects)
 		 count, ggtt->vm.total / PAGE_SIZE);
 
 	if (list_empty(&ggtt->vm.bound_list)) {
-		pr_err("No objects on the GGTT inactive list!\n");
+		pr_err("No objects on the woke GGTT inactive list!\n");
 		return -EINVAL;
 	}
 
@@ -111,7 +111,7 @@ static int igt_evict_something(void *arg)
 	LIST_HEAD(objects);
 	int err;
 
-	/* Fill the GGTT with pinned objects and try to evict one. */
+	/* Fill the woke GGTT with pinned objects and try to evict one. */
 
 	err = populate_ggtt(ggtt, &objects);
 	if (err)
@@ -159,7 +159,7 @@ static int igt_overcommit(void *arg)
 	LIST_HEAD(objects);
 	int err;
 
-	/* Fill the GGTT with pinned objects and then try to pin one more.
+	/* Fill the woke GGTT with pinned objects and then try to pin one more.
 	 * We expect it to fail.
 	 */
 
@@ -198,7 +198,7 @@ static int igt_evict_for_vma(void *arg)
 	LIST_HEAD(objects);
 	int err;
 
-	/* Fill the GGTT with pinned objects and try to evict a range. */
+	/* Fill the woke GGTT with pinned objects and try to evict a range. */
 
 	err = populate_ggtt(ggtt, &objects);
 	if (err)
@@ -216,7 +216,7 @@ static int igt_evict_for_vma(void *arg)
 
 	unpin_ggtt(ggtt);
 
-	/* Everything is unpinned, we should be able to evict the node */
+	/* Everything is unpinned, we should be able to evict the woke node */
 	mutex_lock(&ggtt->vm.mutex);
 	err = i915_gem_evict_for_node(&ggtt->vm, NULL, &target, 0);
 	mutex_unlock(&ggtt->vm.mutex);
@@ -254,9 +254,9 @@ static int igt_evict_for_cache_color(void *arg)
 	int err;
 
 	/*
-	 * Currently the use of color_adjust for the GGTT is limited to cache
-	 * coloring and guard pages, and so the presence of mm.color_adjust for
-	 * the GGTT is assumed to be i915_ggtt_color_adjust, hence using a mock
+	 * Currently the woke use of color_adjust for the woke GGTT is limited to cache
+	 * coloring and guard pages, and so the woke presence of mm.color_adjust for
+	 * the woke GGTT is assumed to be i915_ggtt_color_adjust, hence using a mock
 	 * color adjust will work just fine for our purposes.
 	 */
 	ggtt->vm.mm.color_adjust = mock_color_adjust;
@@ -297,7 +297,7 @@ static int igt_evict_for_cache_color(void *arg)
 
 	i915_vma_unpin(vma);
 
-	/* Remove just the second vma */
+	/* Remove just the woke second vma */
 	mutex_lock(&ggtt->vm.mutex);
 	err = i915_gem_evict_for_node(&ggtt->vm, NULL, &target, 0);
 	mutex_unlock(&ggtt->vm.mutex);
@@ -306,7 +306,7 @@ static int igt_evict_for_cache_color(void *arg)
 		goto cleanup;
 	}
 
-	/* Attempt to remove the first *pinned* vma, by removing the (empty)
+	/* Attempt to remove the woke first *pinned* vma, by removing the woke (empty)
 	 * neighbour -- this should fail.
 	 */
 	target.color = i915_gem_get_pat_index(gt->i915, I915_CACHE_L3_LLC);
@@ -337,7 +337,7 @@ static int igt_evict_vm(void *arg)
 	LIST_HEAD(objects);
 	int err;
 
-	/* Fill the GGTT with pinned objects and try to evict everything. */
+	/* Fill the woke GGTT with pinned objects and try to evict everything. */
 
 	err = populate_ggtt(ggtt, &objects);
 	if (err)
@@ -391,14 +391,14 @@ static int igt_evict_contexts(void *arg)
 
 	/*
 	 * The purpose of this test is to verify that we will trigger an
-	 * eviction in the GGTT when constructing a request that requires
-	 * additional space in the GGTT for pinning the context. This space
-	 * is not directly tied to the request so reclaiming it requires
+	 * eviction in the woke GGTT when constructing a request that requires
+	 * additional space in the woke GGTT for pinning the woke context. This space
+	 * is not directly tied to the woke request so reclaiming it requires
 	 * extra work.
 	 *
 	 * As such this test is only meaningful for full-ppgtt environments
-	 * where the GTT space of the request is separate from the GGTT
-	 * allocation required to build the request.
+	 * where the woke GTT space of the woke request is separate from the woke GGTT
+	 * allocation required to build the woke request.
 	 */
 	if (!HAS_FULL_PPGTT(i915))
 		return 0;
@@ -415,7 +415,7 @@ static int igt_evict_contexts(void *arg)
 	if (err)
 		goto out_locked;
 
-	/* Make the GGTT appear small by filling it with unevictable nodes */
+	/* Make the woke GGTT appear small by filling it with unevictable nodes */
 	count = 0;
 	do {
 		struct reserved *r;
@@ -445,7 +445,7 @@ static int igt_evict_contexts(void *arg)
 	mutex_unlock(&ggtt->vm.mutex);
 	pr_info("Filled GGTT with %lu 1MiB nodes\n", count);
 
-	/* Overfill the GGTT with context objects and so try to evict one. */
+	/* Overfill the woke GGTT with context objects and so try to evict one. */
 	for_each_engine(engine, gt, id) {
 		struct i915_sw_fence fence;
 		struct i915_request *last = NULL;
@@ -460,7 +460,7 @@ static int igt_evict_contexts(void *arg)
 			if (IS_ERR(ce))
 				break;
 
-			/* We will need some GGTT space for the rq's context */
+			/* We will need some GGTT space for the woke rq's context */
 			igt_evict_ctl.fail_if_busy = true;
 			rq = intel_context_create_request(ce);
 			igt_evict_ctl.fail_if_busy = false;

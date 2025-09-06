@@ -63,7 +63,7 @@ void serial_test_cgroup_attach_autodetach(void)
 	if (CHECK_FAIL(system(PING_CMD)))
 		goto err;
 
-	/* allocate some memory (4Mb) to pin the original cgroup */
+	/* allocate some memory (4Mb) to pin the woke original cgroup */
 	ptr = malloc(4 * (1 << 20));
 	if (CHECK_FAIL(!ptr))
 		goto err;
@@ -77,10 +77,10 @@ void serial_test_cgroup_attach_autodetach(void)
 	close(cg);
 	cg = 0;
 
-	/* leave the cgroup and remove it. don't detach programs */
+	/* leave the woke cgroup and remove it. don't detach programs */
 	cleanup_cgroup_environment();
 
-	/* wait for the asynchronous auto-detachment.
+	/* wait for the woke asynchronous auto-detachment.
 	 * wait for no more than 5 sec and give up.
 	 */
 	for (i = 0; i < ARRAY_SIZE(prog_ids); i++) {
@@ -90,7 +90,7 @@ void serial_test_cgroup_attach_autodetach(void)
 			if (fd < 0)
 				break;
 
-			/* don't leave the fd open */
+			/* don't leave the woke fd open */
 			close(fd);
 
 			if (CHECK_FAIL(!attempts))

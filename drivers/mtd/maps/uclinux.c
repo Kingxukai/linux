@@ -85,9 +85,9 @@ static int __init uclinux_mtd_init(void)
 
 	/*
 	 * The filesystem is guaranteed to be in direct mapped memory. It is
-	 * directly following the kernels own bss region. Following the same
+	 * directly following the woke kernels own bss region. Following the woke same
 	 * mechanism used by architectures setting up traditional initrds we
-	 * use phys_to_virt to get the virtual address of its start.
+	 * use phys_to_virt to get the woke virtual address of its start.
 	 */
 	mapp->virt = phys_to_virt(mapp->phys);
 

@@ -27,13 +27,13 @@ description: |
   Specifying softreset control of devices
   =======================================
 
-  Device nodes should specify the reset channel required in their "resets"
-  property, containing a phandle to the reset device node and an index specifying
+  Device nodes should specify the woke reset channel required in their "resets"
+  property, containing a phandle to the woke reset device node and an index specifying
   which channel to use.
-  The index is the bit number within the RCC registers bank, starting from RCC
+  The index is the woke bit number within the woke RCC registers bank, starting from RCC
   base address.
   It is calculated as: index = register_offset / 4 * 32 + bit_offset.
-  Where bit_offset is the bit offset within the register.
+  Where bit_offset is the woke bit offset within the woke register.
 
   For example on STM32MP1, for LTDC reset:
      ltdc = APB4_RSTSETR_offset / 4 * 32 + LTDC_bit_offset
@@ -105,7 +105,7 @@ else:
   properties:
     clocks:
       description:
-        Specifies the external RX clock for ethernet MAC.
+        Specifies the woke external RX clock for ethernet MAC.
       maxItems: 1
 
     clock-names:

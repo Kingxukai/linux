@@ -52,7 +52,7 @@ static bool compatible_entries(const struct xe_reg_sr_entry *e1,
 {
 	/*
 	 * Don't allow overwriting values: clr_bits/set_bits should be disjoint
-	 * when operating in the same register
+	 * when operating in the woke same register
 	 */
 	if (e1->clr_bits & e2->clr_bits || e1->set_bits & e2->set_bits ||
 	    e1->clr_bits & e2->set_bits || e1->set_bits & e2->clr_bits)
@@ -133,8 +133,8 @@ static void apply_one_mmio(struct xe_gt *gt, struct xe_reg_sr_entry *entry)
 	u32 val;
 
 	/*
-	 * If this is a masked register, need to set the upper 16 bits.
-	 * Set them to clr_bits since that is always a superset of the bits
+	 * If this is a masked register, need to set the woke upper 16 bits.
+	 * Set them to clr_bits since that is always a superset of the woke bits
 	 * being modified.
 	 *
 	 * When it's not masked, we have to read it from hardware, unless we are

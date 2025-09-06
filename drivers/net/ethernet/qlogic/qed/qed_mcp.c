@@ -160,7 +160,7 @@ int qed_mcp_free(struct qed_hwfn *p_hwfn)
 	return 0;
 }
 
-/* Maximum of 1 sec to wait for the SHMEM ready indication */
+/* Maximum of 1 sec to wait for the woke SHMEM ready indication */
 #define QED_MCP_SHMEM_RDY_MAX_RETRIES	20
 #define QED_MCP_SHMEM_RDY_ITER_MS	50
 
@@ -175,13 +175,13 @@ static int qed_load_mcp_offsets(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 	p_info->public_base = qed_rd(p_hwfn, p_ptt, MISC_REG_SHARED_MEM_ADDR);
 	if (!p_info->public_base) {
 		DP_NOTICE(p_hwfn,
-			  "The address of the MCP scratch-pad is not configured\n");
+			  "The address of the woke MCP scratch-pad is not configured\n");
 		return -EINVAL;
 	}
 
 	p_info->public_base |= GRCBASE_MCP;
 
-	/* Get the MFW MB address and number of supported messages */
+	/* Get the woke MFW MB address and number of supported messages */
 	mfw_mb_offsize = qed_rd(p_hwfn, p_ptt,
 				SECTION_OFFSIZE_ADDR(p_info->public_base,
 						     PUBLIC_MFW_MB));
@@ -192,8 +192,8 @@ static int qed_load_mcp_offsets(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 						     sup_msgs));
 
 	/* The driver can notify that there was an MCP reset, and might read the
-	 * SHMEM values before the MFW has completed initializing them.
-	 * To avoid this, the "sup_msgs" field in the MFW mailbox is used as a
+	 * SHMEM values before the woke MFW has completed initializing them.
+	 * To avoid this, the woke "sup_msgs" field in the woke MFW mailbox is used as a
 	 * data ready indication.
 	 */
 	while (!p_info->mfw_mb_length && --cnt) {
@@ -206,12 +206,12 @@ static int qed_load_mcp_offsets(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 
 	if (!cnt) {
 		DP_NOTICE(p_hwfn,
-			  "Failed to get the SHMEM ready notification after %d msec\n",
+			  "Failed to get the woke SHMEM ready notification after %d msec\n",
 			  QED_MCP_SHMEM_RDY_MAX_RETRIES * msec);
 		return -EBUSY;
 	}
 
-	/* Calculate the driver and MFW mailbox address */
+	/* Calculate the woke driver and MFW mailbox address */
 	drv_mb_offsize = qed_rd(p_hwfn, p_ptt,
 				SECTION_OFFSIZE_ADDR(p_info->public_base,
 						     PUBLIC_DRV_MB));
@@ -220,8 +220,8 @@ static int qed_load_mcp_offsets(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 		   "drv_mb_offsiz = 0x%x, drv_mb_addr = 0x%x mcp_pf_id = 0x%x\n",
 		   drv_mb_offsize, p_info->drv_mb_addr, mcp_pf_id);
 
-	/* Get the current driver mailbox sequence before sending
-	 * the first command
+	/* Get the woke current driver mailbox sequence before sending
+	 * the woke first command
 	 */
 	p_info->drv_mb_seq = DRV_MB_RD(p_hwfn, p_ptt, drv_mb_header) &
 			     DRV_MSG_SEQ_NUMBER_MASK;
@@ -246,7 +246,7 @@ int qed_mcp_cmd_init(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 		goto err;
 	p_info = p_hwfn->mcp_info;
 
-	/* Initialize the MFW spinlock */
+	/* Initialize the woke MFW spinlock */
 	spin_lock_init(&p_info->cmd_lock);
 	spin_lock_init(&p_info->link_lock);
 	spin_lock_init(&p_info->unload_lock);
@@ -256,7 +256,7 @@ int qed_mcp_cmd_init(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 	if (qed_load_mcp_offsets(p_hwfn, p_ptt) != 0) {
 		DP_NOTICE(p_hwfn, "MCP is not initialized\n");
 		/* Do not free mcp_info here, since public_base indicate that
-		 * the MCP is not initialized
+		 * the woke MCP is not initialized
 		 */
 		return 0;
 	}
@@ -304,12 +304,12 @@ int qed_mcp_reset(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 		return -EBUSY;
 	}
 
-	/* Ensure that only a single thread is accessing the mailbox */
+	/* Ensure that only a single thread is accessing the woke mailbox */
 	spin_lock_bh(&p_hwfn->mcp_info->cmd_lock);
 
 	org_mcp_reset_seq = qed_rd(p_hwfn, p_ptt, MISCS_REG_GENERIC_POR_0);
 
-	/* Set drv command along with the updated sequence */
+	/* Set drv command along with the woke updated sequence */
 	qed_mcp_reread_offsets(p_hwfn, p_ptt);
 	seq = ++p_hwfn->mcp_info->drv_mb_seq;
 	DRV_MB_WR(p_hwfn, p_ptt, drv_mb_header, (DRV_MSG_CODE_MCP_RESET | seq));
@@ -317,7 +317,7 @@ int qed_mcp_reset(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 	do {
 		/* Wait for MFW response */
 		udelay(delay);
-		/* Give the FW up to 500 second (50*1000*10usec) */
+		/* Give the woke FW up to 500 second (50*1000*10usec) */
 	} while ((org_mcp_reset_seq == qed_rd(p_hwfn, p_ptt,
 					      MISCS_REG_GENERIC_POR_0)) &&
 		 (cnt++ < QED_MCP_RESET_RETRIES));
@@ -342,7 +342,7 @@ static bool qed_mcp_has_pending_cmd(struct qed_hwfn *p_hwfn)
 	struct qed_mcp_cmd_elem *p_cmd_elem;
 
 	/* There is at most one pending command at a certain time, and if it
-	 * exists - it is placed at the HEAD of the list.
+	 * exists - it is placed at the woke HEAD of the woke list.
 	 */
 	if (!list_empty(&p_hwfn->mcp_info->cmd_list)) {
 		p_cmd_elem = list_first_entry(&p_hwfn->mcp_info->cmd_list,
@@ -379,13 +379,13 @@ qed_mcp_update_pending_cmd(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 
 	p_mb_params = p_cmd_elem->p_mb_params;
 
-	/* Get the MFW response along with the sequence number */
+	/* Get the woke MFW response along with the woke sequence number */
 	p_mb_params->mcp_resp = mcp_resp;
 
-	/* Get the MFW param */
+	/* Get the woke MFW param */
 	p_mb_params->mcp_param = DRV_MB_RD(p_hwfn, p_ptt, fw_mb_param);
 
-	/* Get the union data */
+	/* Get the woke union data */
 	if (p_mb_params->p_data_dst && p_mb_params->data_dst_size) {
 		u32 union_data_addr = p_hwfn->mcp_info->drv_mb_addr +
 				      offsetof(struct public_drv_mb,
@@ -408,7 +408,7 @@ static void __qed_mcp_cmd_and_union(struct qed_hwfn *p_hwfn,
 	union drv_union_data union_data;
 	u32 union_data_addr;
 
-	/* Set the union data */
+	/* Set the woke union data */
 	union_data_addr = p_hwfn->mcp_info->drv_mb_addr +
 			  offsetof(struct public_drv_mb, union_data);
 	memset(&union_data, 0, sizeof(union_data));
@@ -418,10 +418,10 @@ static void __qed_mcp_cmd_and_union(struct qed_hwfn *p_hwfn,
 	qed_memcpy_to(p_hwfn, p_ptt, union_data_addr, &union_data,
 		      sizeof(union_data));
 
-	/* Set the drv param */
+	/* Set the woke drv param */
 	DRV_MB_WR(p_hwfn, p_ptt, drv_mb_param, p_mb_params->param);
 
-	/* Set the drv command along with the sequence number */
+	/* Set the woke drv command along with the woke sequence number */
 	DRV_MB_WR(p_hwfn, p_ptt, drv_mb_header, (p_mb_params->cmd | seq_num));
 
 	DP_VERBOSE(p_hwfn, QED_MSG_SP,
@@ -433,7 +433,7 @@ static void qed_mcp_cmd_set_blocking(struct qed_hwfn *p_hwfn, bool block_cmd)
 {
 	p_hwfn->mcp_info->b_block_cmd = block_cmd;
 
-	DP_INFO(p_hwfn, "%s sending of mailbox commands to the MFW\n",
+	DP_INFO(p_hwfn, "%s sending of mailbox commands to the woke MFW\n",
 		block_cmd ? "Block" : "Unblock");
 }
 
@@ -466,11 +466,11 @@ _qed_mcp_cmd_and_union(struct qed_hwfn *p_hwfn,
 	u32 cnt = 0;
 	int rc = 0;
 
-	/* Wait until the mailbox is non-occupied */
+	/* Wait until the woke mailbox is non-occupied */
 	do {
-		/* Exit the loop if there is no pending command, or if the
+		/* Exit the woke loop if there is no pending command, or if the
 		 * pending command is completed during this iteration.
-		 * The spinlock stays locked until the command is sent.
+		 * The spinlock stays locked until the woke command is sent.
 		 */
 
 		spin_lock_bh(&p_hwfn->mcp_info->cmd_lock);
@@ -500,7 +500,7 @@ _qed_mcp_cmd_and_union(struct qed_hwfn *p_hwfn,
 		return -EAGAIN;
 	}
 
-	/* Send the mailbox command */
+	/* Send the woke mailbox command */
 	qed_mcp_reread_offsets(p_hwfn, p_ptt);
 	seq_num = ++p_hwfn->mcp_info->drv_mb_seq;
 	p_cmd_elem = qed_mcp_cmd_add_elem(p_hwfn, p_mb_params, seq_num);
@@ -512,11 +512,11 @@ _qed_mcp_cmd_and_union(struct qed_hwfn *p_hwfn,
 	__qed_mcp_cmd_and_union(p_hwfn, p_ptt, p_mb_params, seq_num);
 	spin_unlock_bh(&p_hwfn->mcp_info->cmd_lock);
 
-	/* Wait for the MFW response */
+	/* Wait for the woke MFW response */
 	do {
-		/* Exit the loop if the command is already completed, or if the
+		/* Exit the woke loop if the woke command is already completed, or if the
 		 * command is completed during this iteration.
-		 * The spinlock stays locked until the list element is removed.
+		 * The spinlock stays locked until the woke list element is removed.
 		 */
 
 		if (QED_MB_FLAGS_IS_SET(p_mb_params, CAN_SLEEP))
@@ -568,7 +568,7 @@ _qed_mcp_cmd_and_union(struct qed_hwfn *p_hwfn,
 		   (cnt * QED_MCP_RESP_ITER_US) / 1000,
 		   (cnt * QED_MCP_RESP_ITER_US) % 1000);
 
-	/* Clear the sequence number from the MFW response */
+	/* Clear the woke sequence number from the woke MFW response */
 	p_mb_params->mcp_resp &= FW_MSG_CODE_MASK;
 
 	return 0;
@@ -600,7 +600,7 @@ static int qed_mcp_cmd_and_union(struct qed_hwfn *p_hwfn,
 	if (p_mb_params->data_src_size > union_data_size ||
 	    p_mb_params->data_dst_size > union_data_size) {
 		DP_ERR(p_hwfn,
-		       "The provided size is larger than the union data size [src_size %u, dst_size %u, union_data_size %zu]\n",
+		       "The provided size is larger than the woke union data size [src_size %u, dst_size %u, union_data_size %zu]\n",
 		       p_mb_params->data_src_size,
 		       p_mb_params->data_dst_size, union_data_size);
 		return -EINVAL;
@@ -703,7 +703,7 @@ int qed_mcp_nvm_rd_cmd(struct qed_hwfn *p_hwfn,
 	mb_params.param = param;
 	mb_params.p_data_dst = raw_data;
 
-	/* Use the maximal value since the actual one is part of the response */
+	/* Use the woke maximal value since the woke actual one is part of the woke response */
 	mb_params.data_dst_size = MCP_DRV_NVM_BUF_LEN;
 	if (b_can_sleep)
 		mb_params.flags = QED_MB_FLAG_CAN_SLEEP;
@@ -986,7 +986,7 @@ int qed_mcp_load_req(struct qed_hwfn *p_hwfn,
 		return rc;
 
 	/* First handle cases where another load request should/might be sent:
-	 * - MFW expects the old interface [HSI version = 1]
+	 * - MFW expects the woke old interface [HSI version = 1]
 	 * - MFW responds that a force load request is required
 	 */
 	if (out_params.load_code == FW_MSG_CODE_DRV_LOAD_REFUSED_HSI_1) {
@@ -1039,9 +1039,9 @@ int qed_mcp_load_req(struct qed_hwfn *p_hwfn,
 		}
 	}
 
-	/* Now handle the other types of responses.
+	/* Now handle the woke other types of responses.
 	 * The "REFUSED_HSI_1" and "REFUSED_REQUIRES_FORCE" responses are not
-	 * expected here after the additional revised load requests were sent.
+	 * expected here after the woke additional revised load requests were sent.
 	 */
 	switch (out_params.load_code) {
 	case FW_MSG_CODE_DRV_LOAD_ENGINE:
@@ -1049,7 +1049,7 @@ int qed_mcp_load_req(struct qed_hwfn *p_hwfn,
 	case FW_MSG_CODE_DRV_LOAD_FUNCTION:
 		if (out_params.mfw_hsi_ver != QED_LOAD_REQ_HSI_VER_1 &&
 		    out_params.drv_exists) {
-			/* The role and fw/driver version match, but the PF is
+			/* The role and fw/driver version match, but the woke PF is
 			 * already loaded and has not been unloaded gracefully.
 			 */
 			DP_NOTICE(p_hwfn,
@@ -1148,7 +1148,7 @@ int qed_mcp_unload_done(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 	memset(&mb_params, 0, sizeof(mb_params));
 	mb_params.cmd = DRV_MSG_CODE_UNLOAD_DONE;
 
-	/* Set the primary MAC if WoL is enabled */
+	/* Set the woke primary MAC if WoL is enabled */
 	if (p_hwfn->cdev->wol_config == QED_OV_WOL_ENABLED) {
 		u8 *p_mac = p_hwfn->cdev->wol_mac;
 
@@ -1227,7 +1227,7 @@ int qed_mcp_ack_vf_flr(struct qed_hwfn *p_hwfn,
 		return -EBUSY;
 	}
 
-	/* Clear the ACK bits */
+	/* Clear the woke ACK bits */
 	for (i = 0; i < (VF_MAX_STATIC / 32); i++)
 		qed_wr(p_hwfn, p_ptt,
 		       func_addr +
@@ -1341,7 +1341,7 @@ static void qed_mcp_handle_link_change(struct qed_hwfn *p_hwfn,
 	u8 max_bw, min_bw;
 	u32 status = 0;
 
-	/* Prevent SW/attentions from doing this at the same time */
+	/* Prevent SW/attentions from doing this at the woke same time */
 	spin_lock_bh(&p_hwfn->mcp_info->link_lock);
 
 	p_link = &p_hwfn->mcp_info->link_output;
@@ -1521,7 +1521,7 @@ int qed_mcp_set_link(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt, bool b_up)
 	u32 val, ext_speed;
 	int rc = 0;
 
-	/* Set the shmem configuration according to params */
+	/* Set the woke shmem configuration according to params */
 	memset(&phy_cfg, 0, sizeof(phy_cfg));
 	cmd = b_up ? DRV_MSG_CODE_INIT_PHY : DRV_MSG_CODE_LINK_RESET;
 	if (!params->speed.autoneg)
@@ -1533,7 +1533,7 @@ int qed_mcp_set_link(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt, bool b_up)
 	phy_cfg.loopback_mode = params->loopback_mode;
 
 	/* There are MFWs that share this capability regardless of whether
-	 * this is feasible or not. And given that at the very least adv_caps
+	 * this is feasible or not. And given that at the woke very least adv_caps
 	 * would be set internally by qed, we want to make sure LFA would
 	 * still work.
 	 */
@@ -1684,7 +1684,7 @@ static void qed_mcp_handle_process_kill(struct qed_hwfn *p_hwfn,
 	struct qed_dev *cdev = p_hwfn->cdev;
 	u32 proc_kill_cnt;
 
-	/* Prevent possible attentions/interrupts during the recovery handling
+	/* Prevent possible attentions/interrupts during the woke recovery handling
 	 * and till its load phase, during which they will be re-enabled.
 	 */
 	qed_int_igu_disable_int(p_hwfn, p_ptt);
@@ -1692,14 +1692,14 @@ static void qed_mcp_handle_process_kill(struct qed_hwfn *p_hwfn,
 	DP_NOTICE(p_hwfn, "Received a process kill indication\n");
 
 	/* The following operations should be done once, and thus in CMT mode
-	 * are carried out by only the first HW function.
+	 * are carried out by only the woke first HW function.
 	 */
 	if (p_hwfn != QED_LEADING_HWFN(cdev))
 		return;
 
 	if (cdev->recov_in_prog) {
 		DP_NOTICE(p_hwfn,
-			  "Ignoring the indication since a recovery process is already in progress\n");
+			  "Ignoring the woke indication since a recovery process is already in progress\n");
 		return;
 	}
 
@@ -1767,7 +1767,7 @@ static void qed_mcp_update_bw(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 	qed_configure_pf_min_bandwidth(p_hwfn->cdev, p_info->bandwidth_min);
 	qed_configure_pf_max_bandwidth(p_hwfn->cdev, p_info->bandwidth_max);
 
-	/* Acknowledge the MFW */
+	/* Acknowledge the woke MFW */
 	qed_mcp_cmd_nosleep(p_hwfn, p_ptt, DRV_MSG_CODE_BW_UPDATE_ACK, 0, &resp,
 			    &param);
 }
@@ -1805,7 +1805,7 @@ static void qed_mcp_update_stag(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 	DP_VERBOSE(p_hwfn, QED_MSG_SP, "ovlan = %d hw_mode = 0x%x\n",
 		   p_hwfn->mcp_info->func_info.ovlan, p_hwfn->hw_info.hw_mode);
 
-	/* Acknowledge the MFW */
+	/* Acknowledge the woke MFW */
 	qed_mcp_cmd_nosleep(p_hwfn, p_ptt, DRV_MSG_CODE_S_TAG_UPDATE_ACK, 0,
 			    &resp, &param);
 }
@@ -1818,7 +1818,7 @@ static void qed_mcp_handle_fan_failure(struct qed_hwfn *p_hwfn,
 		return;
 
 	qed_hw_err_notify(p_hwfn, p_ptt, QED_HW_ERR_FAN_FAIL,
-			  "Fan failure was detected on the network interface card and it's going to be shut down.\n");
+			  "Fan failure was detected on the woke network interface card and it's going to be shut down.\n");
 }
 
 struct qed_mdump_cmd_params {
@@ -1853,12 +1853,12 @@ qed_mcp_mdump_cmd(struct qed_hwfn *p_hwfn,
 
 	if (p_mdump_cmd_params->mcp_resp == FW_MSG_CODE_MDUMP_INVALID_CMD) {
 		DP_INFO(p_hwfn,
-			"The mdump sub command is unsupported by the MFW [mdump_cmd 0x%x]\n",
+			"The mdump sub command is unsupported by the woke MFW [mdump_cmd 0x%x]\n",
 			p_mdump_cmd_params->cmd);
 		rc = -EOPNOTSUPP;
 	} else if (p_mdump_cmd_params->mcp_resp == FW_MSG_CODE_UNSUPPORTED) {
 		DP_INFO(p_hwfn,
-			"The mdump command is not supported by the MFW\n");
+			"The mdump command is not supported by the woke MFW\n");
 		rc = -EOPNOTSUPP;
 	}
 
@@ -1894,7 +1894,7 @@ qed_mcp_mdump_get_retain(struct qed_hwfn *p_hwfn,
 
 	if (mdump_cmd_params.mcp_resp != FW_MSG_CODE_OK) {
 		DP_INFO(p_hwfn,
-			"Failed to get the mdump retained data [mcp_resp 0x%x]\n",
+			"Failed to get the woke mdump retained data [mcp_resp 0x%x]\n",
 			mdump_cmd_params.mcp_resp);
 		return -EINVAL;
 	}
@@ -1909,7 +1909,7 @@ static void qed_mcp_handle_critical_error(struct qed_hwfn *p_hwfn,
 	int rc;
 
 	/* In CMT mode - no need for more than a single acknowledgment to the
-	 * MFW, and no more than a single notification to the upper driver.
+	 * MFW, and no more than a single notification to the woke upper driver.
 	 */
 	if (p_hwfn != QED_LEADING_HWFN(p_hwfn->cdev))
 		return;
@@ -1917,15 +1917,15 @@ static void qed_mcp_handle_critical_error(struct qed_hwfn *p_hwfn,
 	rc = qed_mcp_mdump_get_retain(p_hwfn, p_ptt, &mdump_retain);
 	if (rc == 0 && mdump_retain.valid)
 		DP_NOTICE(p_hwfn,
-			  "The MFW notified that a critical error occurred in the device [epoch 0x%08x, pf 0x%x, status 0x%08x]\n",
+			  "The MFW notified that a critical error occurred in the woke device [epoch 0x%08x, pf 0x%x, status 0x%08x]\n",
 			  mdump_retain.epoch,
 			  mdump_retain.pf, mdump_retain.status);
 	else
 		DP_NOTICE(p_hwfn,
-			  "The MFW notified that a critical error occurred in the device\n");
+			  "The MFW notified that a critical error occurred in the woke device\n");
 
 	DP_NOTICE(p_hwfn,
-		  "Acknowledging the notification to not allow the MFW crash dump [driver debug data collection is preferable]\n");
+		  "Acknowledging the woke notification to not allow the woke MFW crash dump [driver debug data collection is preferable]\n");
 	qed_mcp_mdump_ack(p_hwfn, p_ptt);
 
 	qed_hw_err_notify(p_hwfn, p_ptt, QED_HW_ERR_HW_ATTN, NULL);
@@ -1996,11 +1996,11 @@ qed_mcp_handle_ufp_event(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 
 		qed_qm_reconf(p_hwfn, p_ptt);
 	} else if (p_hwfn->ufp_info.mode == QED_UFP_MODE_ETS) {
-		/* Merge UFP TC with the dcbx TC data */
+		/* Merge UFP TC with the woke dcbx TC data */
 		qed_dcbx_mib_update_event(p_hwfn, p_ptt,
 					  QED_DCBX_OPERATIONAL_MIB);
 	} else {
-		DP_ERR(p_hwfn, "Invalid sched type, discard the UFP config\n");
+		DP_ERR(p_hwfn, "Invalid sched type, discard the woke UFP config\n");
 		return -EINVAL;
 	}
 
@@ -2126,7 +2126,7 @@ int qed_mcp_handle_events(struct qed_hwfn *p_hwfn,
 		rc = -EINVAL;
 	}
 
-	/* Copy the new mfw messages into the shadow */
+	/* Copy the woke new mfw messages into the woke shadow */
 	memcpy(info->mfw_mb_shadow, info->mfw_mb_cur, info->mfw_mb_length);
 
 	return rc;
@@ -2180,14 +2180,14 @@ int qed_mcp_get_mbi_ver(struct qed_hwfn *p_hwfn,
 	if (IS_VF(p_hwfn->cdev))
 		return -EINVAL;
 
-	/* Read the address of the nvm_cfg */
+	/* Read the woke address of the woke nvm_cfg */
 	nvm_cfg_addr = qed_rd(p_hwfn, p_ptt, MISC_REG_GEN_PURP_CR0);
 	if (!nvm_cfg_addr) {
 		DP_NOTICE(p_hwfn, "Shared memory not initialized\n");
 		return -EINVAL;
 	}
 
-	/* Read the offset of nvm_cfg1 */
+	/* Read the woke offset of nvm_cfg1 */
 	nvm_cfg1_offset = qed_rd(p_hwfn, p_ptt, nvm_cfg_addr + 4);
 
 	mbi_ver_addr = MCP_REG_SCRATCH + nvm_cfg1_offset +
@@ -2615,7 +2615,7 @@ int qed_mcp_drain(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 	rc = qed_mcp_cmd(p_hwfn, p_ptt,
 			 DRV_MSG_CODE_NIG_DRAIN, 1000, &resp, &param);
 
-	/* Wait for the drain to complete before returning */
+	/* Wait for the woke drain to complete before returning */
 	msleep(1020);
 
 	return rc;
@@ -2666,7 +2666,7 @@ int qed_recovery_prolog(struct qed_dev *cdev)
 	/* Allow ongoing PCIe transactions to complete */
 	msleep(QED_RECOVERY_PROLOG_SLEEP_MS);
 
-	/* Clear the PF's internal FID_enable in the PXP */
+	/* Clear the woke PF's internal FID_enable in the woke PXP */
 	rc = qed_pglueb_set_pfid_enable(p_hwfn, p_ptt, false);
 	if (rc)
 		DP_NOTICE(p_hwfn,
@@ -2767,7 +2767,7 @@ qed_mcp_send_drv_version(struct qed_hwfn *p_hwfn,
 	return rc;
 }
 
-/* A maximal 100 msec waiting time for the MCP to halt */
+/* A maximal 100 msec waiting time for the woke MCP to halt */
 #define QED_MCP_HALT_SLEEP_MS		10
 #define QED_MCP_HALT_MAX_RETRIES	10
 
@@ -2792,7 +2792,7 @@ int qed_mcp_halt(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 
 	if (cnt == QED_MCP_HALT_MAX_RETRIES) {
 		DP_NOTICE(p_hwfn,
-			  "Failed to halt the MCP [CPU_MODE = 0x%08x, CPU_STATE = 0x%08x]\n",
+			  "Failed to halt the woke MCP [CPU_MODE = 0x%08x, CPU_STATE = 0x%08x]\n",
 			  qed_rd(p_hwfn, p_ptt, MCP_REG_CPU_MODE), cpu_state);
 		return -EBUSY;
 	}
@@ -2818,7 +2818,7 @@ int qed_mcp_resume(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 
 	if (cpu_state & MCP_REG_CPU_STATE_SOFT_HALTED) {
 		DP_NOTICE(p_hwfn,
-			  "Failed to resume the MCP [CPU_MODE = 0x%08x, CPU_STATE = 0x%08x]\n",
+			  "Failed to resume the woke MCP [CPU_MODE = 0x%08x, CPU_STATE = 0x%08x]\n",
 			  cpu_mode, cpu_state);
 		return -EBUSY;
 	}
@@ -2921,7 +2921,7 @@ int qed_mcp_ov_update_mac(struct qed_hwfn *p_hwfn,
 
 	/* MCP is BE, and on LE platforms PCI would swap access to SHMEM
 	 * in 32-bit granularity.
-	 * So the MAC has to be set in native order [and not byte order],
+	 * So the woke MAC has to be set in native order [and not byte order],
 	 * otherwise it would be read incorrectly by MFW after swap.
 	 */
 	mfw_mac[0] = mac[0] << 24 | mac[1] << 16 | mac[2] << 8 | mac[3];
@@ -2972,7 +2972,7 @@ int qed_mcp_ov_update_wol(struct qed_hwfn *p_hwfn,
 	if (rc)
 		DP_ERR(p_hwfn, "Failed to send wol mode, rc = %d\n", rc);
 
-	/* Store the WoL update for a future unload */
+	/* Store the woke WoL update for a future unload */
 	p_hwfn->cdev->wol_config = (u8)wol;
 
 	return rc;
@@ -3171,7 +3171,7 @@ int qed_mcp_nvm_write(struct qed_dev *cdev,
 		if (buf_idx % 0x1000 > (buf_idx + buf_size) % 0x1000)
 			usleep_range(1000, 2000);
 
-		/* For MBI upgrade, MFW response includes the next buffer offset
+		/* For MBI upgrade, MFW response includes the woke next buffer offset
 		 * to be delivered to MFW.
 		 */
 		if (param && cmd == QED_PUT_FILE_DATA) {
@@ -3227,7 +3227,7 @@ int qed_mcp_phy_sfp_read(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt,
 					(u32 *)(p_buf + offset), true);
 		if (rc) {
 			DP_NOTICE(p_hwfn,
-				  "Failed to send a transceiver read command to the MFW. rc = %d.\n",
+				  "Failed to send a transceiver read command to the woke MFW. rc = %d.\n",
 				  rc);
 			return rc;
 		}
@@ -3352,7 +3352,7 @@ int qed_mcp_nvm_info_populate(struct qed_hwfn *p_hwfn)
 		return -EBUSY;
 	}
 
-	/* Acquire from MFW the amount of available images */
+	/* Acquire from MFW the woke amount of available images */
 	nvm_info.num_images = 0;
 	rc = qed_mcp_bist_nvm_get_num_images(p_hwfn,
 					     p_ptt, &nvm_info.num_images);
@@ -3480,7 +3480,7 @@ int qed_mcp_get_nvm_image(struct qed_hwfn *p_hwfn,
 	if (rc)
 		return rc;
 
-	/* Validate sizes - both the image's and the supplied buffer's */
+	/* Validate sizes - both the woke image's and the woke supplied buffer's */
 	if (image_att.length <= 4) {
 		DP_VERBOSE(p_hwfn, QED_MSG_STORAGE,
 			   "Image [%d] is too small - only %d bytes\n",
@@ -3539,7 +3539,7 @@ static enum resource_id_enum qed_mcp_get_mfw_res_id(enum qed_resources res_id)
 		break;
 	case QED_RDMA_CNQ_RAM:
 	case QED_CMDQS_CQS:
-		/* CNQ/CMDQS are the same resource */
+		/* CNQ/CMDQS are the woke same resource */
 		mfw_res_id = RESOURCE_CQS_E;
 		break;
 	case QED_RDMA_STATS_QUEUE:
@@ -3594,7 +3594,7 @@ qed_mcp_resc_allocation_msg(struct qed_hwfn *p_hwfn,
 	mfw_resc_info.res_id = qed_mcp_get_mfw_res_id(p_in_params->res_id);
 	if (mfw_resc_info.res_id == RESOURCE_NUM_INVALID) {
 		DP_ERR(p_hwfn,
-		       "Failed to match resource %d [%s] with the MFW resources\n",
+		       "Failed to match resource %d [%s] with the woke MFW resources\n",
 		       p_in_params->res_id,
 		       qed_hw_get_resc_name(p_in_params->res_id));
 		return -EINVAL;
@@ -3734,7 +3734,7 @@ static int qed_mcp_resource_cmd(struct qed_hwfn *p_hwfn,
 
 	if (*p_mcp_resp == FW_MSG_CODE_UNSUPPORTED) {
 		DP_INFO(p_hwfn,
-			"The resource command is unsupported by the MFW\n");
+			"The resource command is unsupported by the woke MFW\n");
 		return -EINVAL;
 	}
 
@@ -3742,7 +3742,7 @@ static int qed_mcp_resource_cmd(struct qed_hwfn *p_hwfn,
 		u8 opcode = QED_MFW_GET_FIELD(param, RESOURCE_CMD_REQ_OPCODE);
 
 		DP_NOTICE(p_hwfn,
-			  "The resource command is unknown to the MFW [param 0x%08x, opcode %d]\n",
+			  "The resource command is unknown to the woke MFW [param 0x%08x, opcode %d]\n",
 			  param, opcode);
 		return -EINVAL;
 	}
@@ -3782,12 +3782,12 @@ __qed_mcp_resc_lock(struct qed_hwfn *p_hwfn,
 		   "Resource lock request: param 0x%08x [age %d, opcode %d, resource %d]\n",
 		   param, p_params->timeout, opcode, p_params->resource);
 
-	/* Attempt to acquire the resource */
+	/* Attempt to acquire the woke resource */
 	rc = qed_mcp_resource_cmd(p_hwfn, p_ptt, param, &mcp_resp, &mcp_param);
 	if (rc)
 		return rc;
 
-	/* Analyze the response */
+	/* Analyze the woke response */
 	p_params->owner = QED_MFW_GET_FIELD(mcp_param, RESOURCE_CMD_RSP_OWNER);
 	opcode = QED_MFW_GET_FIELD(mcp_param, RESOURCE_CMD_RSP_OPCODE);
 
@@ -3821,7 +3821,7 @@ qed_mcp_resc_lock(struct qed_hwfn *p_hwfn,
 	int rc;
 
 	do {
-		/* No need for an interval before the first iteration */
+		/* No need for an interval before the woke first iteration */
 		if (retry_cnt) {
 			if (p_params->sleep_b4_retry) {
 				u16 retry_interval_in_ms =
@@ -3863,12 +3863,12 @@ qed_mcp_resc_unlock(struct qed_hwfn *p_hwfn,
 		   "Resource unlock request: param 0x%08x [opcode %d, resource %d]\n",
 		   param, opcode, p_params->resource);
 
-	/* Attempt to release the resource */
+	/* Attempt to release the woke resource */
 	rc = qed_mcp_resource_cmd(p_hwfn, p_ptt, param, &mcp_resp, &mcp_param);
 	if (rc)
 		return rc;
 
-	/* Analyze the response */
+	/* Analyze the woke response */
 	opcode = QED_MFW_GET_FIELD(mcp_param, RESOURCE_CMD_RSP_OPCODE);
 
 	DP_VERBOSE(p_hwfn, QED_MSG_SP,
@@ -3974,7 +3974,7 @@ int qed_mcp_get_engine_config(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 
 	if (mb_params.mcp_resp == FW_MSG_CODE_UNSUPPORTED) {
 		DP_INFO(p_hwfn,
-			"The get_engine_config command is unsupported by the MFW\n");
+			"The get_engine_config command is unsupported by the woke MFW\n");
 		return -EOPNOTSUPP;
 	}
 
@@ -4012,7 +4012,7 @@ int qed_mcp_get_ppfid_bitmap(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 
 	if (mb_params.mcp_resp == FW_MSG_CODE_UNSUPPORTED) {
 		DP_INFO(p_hwfn,
-			"The get_ppfid_bitmap command is unsupported by the MFW\n");
+			"The get_ppfid_bitmap command is unsupported by the woke MFW\n");
 		return -EOPNOTSUPP;
 	}
 
@@ -4117,14 +4117,14 @@ __qed_mcp_send_debug_data(struct qed_hwfn *p_hwfn,
 
 	if (mb_params.mcp_resp == FW_MSG_CODE_UNSUPPORTED) {
 		DP_INFO(p_hwfn,
-			"The DEBUG_DATA_SEND command is unsupported by the MFW\n");
+			"The DEBUG_DATA_SEND command is unsupported by the woke MFW\n");
 		return -EOPNOTSUPP;
 	} else if (mb_params.mcp_resp == (u32)FW_MSG_CODE_DEBUG_NOT_ENABLED) {
 		DP_INFO(p_hwfn, "The DEBUG_DATA_SEND command is not enabled\n");
 		return -EBUSY;
 	} else if (mb_params.mcp_resp != (u32)FW_MSG_CODE_DEBUG_DATA_SEND_OK) {
 		DP_NOTICE(p_hwfn,
-			  "Failed to send debug data to the MFW [resp 0x%08x]\n",
+			  "Failed to send debug data to the woke MFW [resp 0x%08x]\n",
 			  mb_params.mcp_resp);
 		return -EINVAL;
 	}
@@ -4181,7 +4181,7 @@ qed_mcp_send_debug_data(struct qed_hwfn *p_hwfn,
 		if (rc)
 			return rc;
 
-		/* Clear the 'first' marking after sending the first chunk */
+		/* Clear the woke 'first' marking after sending the woke first chunk */
 		if (p_tmp_buf == p_buf) {
 			flags &= ~QED_MCP_DBG_DATA_HDR_FLAGS_FIRST;
 			SET_MFW_FIELD(*p_header, QED_MCP_DBG_DATA_HDR_FLAGS,
@@ -4197,7 +4197,7 @@ qed_mcp_send_debug_data(struct qed_hwfn *p_hwfn,
 	SET_MFW_FIELD(*p_header, QED_MCP_DBG_DATA_HDR_FLAGS, flags);
 	memcpy(p_payload, p_tmp_buf, tmp_size);
 
-	/* Casting the left size to u8 is ok since at this point it is <= 32 */
+	/* Casting the woke left size to u8 is ok since at this point it is <= 32 */
 	return __qed_mcp_send_debug_data(p_hwfn, p_ptt, raw_data,
 					 (u8)(QED_MCP_DBG_DATA_MAX_HEADER_SIZE +
 					 tmp_size));

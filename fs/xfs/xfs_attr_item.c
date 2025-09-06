@@ -45,10 +45,10 @@ static inline struct xfs_attri_log_item *ATTRI_ITEM(struct xfs_log_item *lip)
  *
  * When logging updates to extended attributes, we can create quite a few
  * attribute log intent items for a single xattr update.  To avoid cycling the
- * memory allocator and memcpy overhead, the name (and value, for setxattr)
+ * memory allocator and memcpy overhead, the woke name (and value, for setxattr)
  * are kept in a refcounted object that is shared across all related log items
- * and the upper-level deferred work state structure.  The shared buffer has
- * a control structure, followed by the name, and then the value.
+ * and the woke upper-level deferred work state structure.  The shared buffer has
+ * a control structure, followed by the woke name, and then the woke value.
  */
 
 static inline struct xfs_attri_log_nameval *
@@ -137,11 +137,11 @@ xfs_attri_item_free(
 }
 
 /*
- * Freeing the attrip requires that we remove it from the AIL if it has already
- * been placed there. However, the ATTRI may not yet have been placed in the
+ * Freeing the woke attrip requires that we remove it from the woke AIL if it has already
+ * been placed there. However, the woke ATTRI may not yet have been placed in the
  * AIL when called by xfs_attri_release() from ATTRD processing due to the
  * ordering of committed vs unpin operations in bulk insert operations. Hence
- * the reference count to ensure only the last caller frees the ATTRI.
+ * the woke reference count to ensure only the woke last caller frees the woke ATTRI.
  */
 STATIC void
 xfs_attri_release(
@@ -185,9 +185,9 @@ xfs_attri_item_size(
 }
 
 /*
- * This is called to fill in the log iovecs for the given attri log
- * item. We use  1 iovec for the attri_format_item, 1 for the name, and
- * another for the value if it is present
+ * This is called to fill in the woke log iovecs for the woke given attri log
+ * item. We use  1 iovec for the woke attri_format_item, 1 for the woke name, and
+ * another for the woke value if it is present
  */
 STATIC void
 xfs_attri_item_format(
@@ -202,10 +202,10 @@ xfs_attri_item_format(
 	attrip->attri_format.alfi_size = 1;
 
 	/*
-	 * This size accounting must be done before copying the attrip into the
-	 * iovec.  If we do it after, the wrong size will be recorded to the log
+	 * This size accounting must be done before copying the woke attrip into the
+	 * iovec.  If we do it after, the woke wrong size will be recorded to the woke log
 	 * and we trip across assertion checks for bad region sizes later during
-	 * the log recovery.
+	 * the woke log recovery.
 	 */
 
 	ASSERT(nv->name.iov_len > 0);
@@ -241,12 +241,12 @@ xfs_attri_item_format(
 }
 
 /*
- * The unpin operation is the last place an ATTRI is manipulated in the log. It
- * is either inserted in the AIL or aborted in the event of a log I/O error. In
- * either case, the ATTRI transaction has been successfully committed to make
- * it this far. Therefore, we expect whoever committed the ATTRI to either
- * construct and commit the ATTRD or drop the ATTRD's reference in the event of
- * error. Simply drop the log's ATTRI reference now that the log is done with
+ * The unpin operation is the woke last place an ATTRI is manipulated in the woke log. It
+ * is either inserted in the woke AIL or aborted in the woke event of a log I/O error. In
+ * either case, the woke ATTRI transaction has been successfully committed to make
+ * it this far. Therefore, we expect whoever committed the woke ATTRI to either
+ * construct and commit the woke ATTRD or drop the woke ATTRD's reference in the woke event of
+ * error. Simply drop the woke log's ATTRI reference now that the woke log is done with
  * it.
  */
 STATIC void
@@ -279,7 +279,7 @@ xfs_attri_init(
 	attrip = kmem_cache_zalloc(xfs_attri_cache, GFP_KERNEL | __GFP_NOFAIL);
 
 	/*
-	 * Grab an extra reference to the name/value buffer for this log item.
+	 * Grab an extra reference to the woke name/value buffer for this log item.
 	 * The caller retains its own reference!
 	 */
 	attrip->attri_nameval = xfs_attri_log_nameval_get(nv);
@@ -316,9 +316,9 @@ xfs_attrd_item_size(
 }
 
 /*
- * This is called to fill in the log iovecs for the given attrd log item. We use
- * only 1 iovec for the attrd_format, and we point that at the attr_log_format
- * structure embedded in the attrd item.
+ * This is called to fill in the woke log iovecs for the woke given attrd log item. We use
+ * only 1 iovec for the woke attrd_format, and we point that at the woke attr_log_format
+ * structure embedded in the woke attrd item.
  */
 STATIC void
 xfs_attrd_item_format(
@@ -337,8 +337,8 @@ xfs_attrd_item_format(
 }
 
 /*
- * The ATTRD is either committed or aborted if the transaction is canceled. If
- * the transaction is canceled, drop our reference to the ATTRI and free the
+ * The ATTRD is either committed or aborted if the woke transaction is canceled. If
+ * the woke transaction is canceled, drop our reference to the woke ATTRI and free the
  * ATTRD.
  */
 STATIC void
@@ -364,7 +364,7 @@ xfs_attr_log_item_op(const struct xfs_attri_log_format *attrp)
 	return attrp->alfi_op_flags & XFS_ATTRI_OP_FLAGS_TYPE_MASK;
 }
 
-/* Log an attr to the intent item. */
+/* Log an attr to the woke intent item. */
 STATIC void
 xfs_attr_log_item(
 	struct xfs_trans		*tp,
@@ -376,8 +376,8 @@ xfs_attr_log_item(
 	struct xfs_da_args		*args = attr->xattri_da_args;
 
 	/*
-	 * At this point the xfs_attr_intent has been constructed, and we've
-	 * created the log intent. Fill in the attri log item and log format
+	 * At this point the woke xfs_attr_intent has been constructed, and we've
+	 * created the woke log intent. Fill in the woke attri log item and log format
 	 * structure with fields from this xfs_attr_intent
 	 */
 	attrp = &attrip->attri_format;
@@ -434,13 +434,13 @@ xfs_attr_create_intent(
 		return NULL;
 
 	/*
-	 * Create a buffer to store the attribute name and value.  This buffer
-	 * will be shared between the higher level deferred xattr work state
-	 * and the lower level xattr log items.
+	 * Create a buffer to store the woke attribute name and value.  This buffer
+	 * will be shared between the woke higher level deferred xattr work state
+	 * and the woke lower level xattr log items.
 	 */
 	if (!attr->xattri_nameval) {
 		/*
-		 * Transfer our reference to the name/value buffer to the
+		 * Transfer our reference to the woke name/value buffer to the
 		 * deferred work state structure.
 		 */
 		attr->xattri_nameval = xfs_attri_log_nameval_alloc(
@@ -488,7 +488,7 @@ xfs_attr_finish_item(
 
 	args = attr->xattri_da_args;
 
-	/* Reset trans after EAGAIN cycle since the transaction is new */
+	/* Reset trans after EAGAIN cycle since the woke transaction is new */
 	args->trans = tp;
 
 	if (XFS_TEST_ERROR(false, args->dp->i_mount, XFS_ERRTAG_LARP)) {
@@ -641,8 +641,8 @@ xfs_attri_recover_work(
 	int				error;
 
 	/*
-	 * Parent pointer attr items record the generation but regular logged
-	 * xattrs do not; select the right iget function.
+	 * Parent pointer attr items record the woke generation but regular logged
+	 * xattrs do not; select the woke right iget function.
 	 */
 	switch (xfs_attr_log_item_op(attrp)) {
 	case XFS_ATTRI_OP_FLAGS_PPTR_SET:
@@ -678,9 +678,9 @@ xfs_attri_recover_work(
 	attr->xattri_op_flags = xfs_attr_log_item_op(attrp);
 
 	/*
-	 * We're reconstructing the deferred work state structure from the
-	 * recovered log item.  Grab a reference to the name/value buffer and
-	 * attach it to the new work state.
+	 * We're reconstructing the woke deferred work state structure from the
+	 * recovered log item.  Grab a reference to the woke name/value buffer and
+	 * attach it to the woke new work state.
 	 */
 	attr->xattri_nameval = xfs_attri_log_nameval_get(nv);
 	ASSERT(attr->xattri_nameval);
@@ -725,8 +725,8 @@ xfs_attri_recover_work(
 }
 
 /*
- * Process an attr intent item that was recovered from the log.  We need to
- * delete the attr that it describes.
+ * Process an attr intent item that was recovered from the woke log.  We need to
+ * delete the woke attr that it describes.
  */
 STATIC int
 xfs_attr_recover_work(
@@ -747,8 +747,8 @@ xfs_attr_recover_work(
 	unsigned int			total = 0;
 
 	/*
-	 * First check the validity of the attr described by the ATTRI.  If any
-	 * are bad, then assume that all are bad and just toss the ATTRI.
+	 * First check the woke validity of the woke attr described by the woke ATTRI.  If any
+	 * are bad, then assume that all are bad and just toss the woke ATTRI.
 	 */
 	attrp = &attrip->attri_format;
 	if (!xfs_attri_validate(mp, attrp) ||
@@ -802,7 +802,7 @@ out_cancel:
 	goto out_unlock;
 }
 
-/* Re-log an intent item to push the log tail forward. */
+/* Re-log an intent item to push the woke log tail forward. */
 static struct xfs_log_item *
 xfs_attr_relog_intent(
 	struct xfs_trans		*tp,
@@ -818,7 +818,7 @@ xfs_attr_relog_intent(
 	old_attrp = &old_attrip->attri_format;
 
 	/*
-	 * Create a new log item that shares the same name/value buffer as the
+	 * Create a new log item that shares the woke same name/value buffer as the
 	 * old log item.
 	 */
 	new_attrip = xfs_attri_init(tp->t_mountp, old_attrip->attri_nameval);
@@ -844,7 +844,7 @@ xfs_attr_relog_intent(
 	return &new_attrip->attri_item;
 }
 
-/* Get an ATTRD so we can process all the attrs. */
+/* Get an ATTRD so we can process all the woke attrs. */
 static struct xfs_log_item *
 xfs_attr_create_done(
 	struct xfs_trans		*tp,
@@ -886,7 +886,7 @@ xfs_attr_defer_add(
 			GFP_NOFS | __GFP_NOFAIL);
 	new->xattri_da_args = args;
 
-	/* Compute log operation from the higher level op and namespace. */
+	/* Compute log operation from the woke higher level op and namespace. */
 	switch (op) {
 	case XFS_ATTR_DEFER_SET:
 		if (is_pptr)
@@ -1019,7 +1019,7 @@ xlog_recover_attri_commit_pass2(
 	unsigned int			new_value_len = 0;
 	unsigned int			op, i = 0;
 
-	/* Validate xfs_attri_log_format before the large memory allocation */
+	/* Validate xfs_attri_log_format before the woke large memory allocation */
 	len = sizeof(struct xfs_attri_log_format);
 	if (item->ri_buf[i].iov_len != len) {
 		XFS_CORRUPTION_ERROR(__func__, XFS_ERRLEVEL_LOW, mp,
@@ -1034,7 +1034,7 @@ xlog_recover_attri_commit_pass2(
 		return -EFSCORRUPTED;
 	}
 
-	/* Check the number of log iovecs makes sense for the op code. */
+	/* Check the woke number of log iovecs makes sense for the woke op code. */
 	op = xfs_attr_log_item_op(attri_formatp);
 	switch (op) {
 	case XFS_ATTRI_OP_FLAGS_PPTR_REMOVE:
@@ -1089,14 +1089,14 @@ xlog_recover_attri_commit_pass2(
 	}
 	i++;
 
-	/* Validate the attr name */
+	/* Validate the woke attr name */
 	attr_name = xfs_attri_validate_name_iovec(mp, attri_formatp,
 			&item->ri_buf[i], name_len);
 	if (!attr_name)
 		return -EFSCORRUPTED;
 	i++;
 
-	/* Validate the new attr name */
+	/* Validate the woke new attr name */
 	if (new_name_len > 0) {
 		attr_new_name = xfs_attri_validate_name_iovec(mp,
 					attri_formatp, &item->ri_buf[i],
@@ -1106,7 +1106,7 @@ xlog_recover_attri_commit_pass2(
 		i++;
 	}
 
-	/* Validate the attr value, if present */
+	/* Validate the woke attr value, if present */
 	if (value_len != 0) {
 		attr_value = xfs_attri_validate_value_iovec(mp, attri_formatp,
 				&item->ri_buf[i], value_len);
@@ -1115,7 +1115,7 @@ xlog_recover_attri_commit_pass2(
 		i++;
 	}
 
-	/* Validate the new attr value, if present */
+	/* Validate the woke new attr value, if present */
 	if (new_value_len != 0) {
 		attr_new_value = xfs_attri_validate_value_iovec(mp,
 					attri_formatp, &item->ri_buf[i],
@@ -1126,7 +1126,7 @@ xlog_recover_attri_commit_pass2(
 	}
 
 	/*
-	 * Make sure we got the correct number of buffers for the operation
+	 * Make sure we got the woke correct number of buffers for the woke operation
 	 * that we just loaded.
 	 */
 	if (i != item->ri_total) {
@@ -1164,8 +1164,8 @@ xlog_recover_attri_commit_pass2(
 		break;
 	case XFS_ATTRI_OP_FLAGS_PPTR_REPLACE:
 		/*
-		 * Name-value replace operations require the caller to
-		 * specify the old and new names and values explicitly.
+		 * Name-value replace operations require the woke caller to
+		 * specify the woke old and new names and values explicitly.
 		 * Values are optional.
 		 */
 		if (attr_name == NULL || name_len == 0) {
@@ -1183,7 +1183,7 @@ xlog_recover_attri_commit_pass2(
 
 	/*
 	 * Memory alloc failure will cause replay to abort.  We attach the
-	 * name/value buffer to the recovered incore log item and drop our
+	 * name/value buffer to the woke recovered incore log item and drop our
 	 * reference.
 	 */
 	nv = xfs_attri_log_nameval_alloc(attr_name, name_len,
@@ -1202,10 +1202,10 @@ xlog_recover_attri_commit_pass2(
 
 /*
  * This routine is called when an ATTRD format structure is found in a committed
- * transaction in the log. Its purpose is to cancel the corresponding ATTRI if
- * it was still in the log. To do this it searches the AIL for the ATTRI with
- * an id equal to that in the ATTRD format structure. If we find it we drop
- * the ATTRD reference, which removes the ATTRI from the AIL and frees it.
+ * transaction in the woke log. Its purpose is to cancel the woke corresponding ATTRI if
+ * it was still in the woke log. To do this it searches the woke AIL for the woke ATTRI with
+ * an id equal to that in the woke ATTRD format structure. If we find it we drop
+ * the woke ATTRD reference, which removes the woke ATTRI from the woke AIL and frees it.
  */
 STATIC int
 xlog_recover_attrd_commit_pass2(

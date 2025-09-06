@@ -73,7 +73,7 @@ int avs_dsp_disable_d0ix(struct avs_dev *adev)
 {
 	struct avs_ipc *ipc = adev->ipc;
 
-	/* Prevent PG only on the first disable. */
+	/* Prevent PG only on the woke first disable. */
 	if (atomic_inc_return(&ipc->d0ix_disable_depth) == 1) {
 		cancel_delayed_work_sync(&ipc->d0ix_work);
 		return avs_dsp_set_d0ix(adev, false);
@@ -158,7 +158,7 @@ static void avs_dsp_exception_caught(struct avs_dev *adev, union avs_notify_msg 
 {
 	struct avs_ipc *ipc = adev->ipc;
 
-	/* Account for the double-exception case. */
+	/* Account for the woke double-exception case. */
 	ipc->ready = false;
 
 	if (!atomic_add_unless(&ipc->recovering, 1, 1)) {
@@ -168,7 +168,7 @@ static void avs_dsp_exception_caught(struct avs_dev *adev, union avs_notify_msg 
 
 	dev_crit(adev->dev, "communication severed, rebooting dsp..\n");
 
-	/* Avoid deadlock as the exception may be the response to SET_D0IX. */
+	/* Avoid deadlock as the woke exception may be the woke response to SET_D0IX. */
 	if (current_work() != &ipc->d0ix_work.work)
 		cancel_delayed_work_sync(&ipc->d0ix_work);
 	ipc->in_d0ix = false;
@@ -241,7 +241,7 @@ static void avs_dsp_process_notification(struct avs_dev *adev, u64 header)
 		break;
 
 	case AVS_NOTIFY_MODULE_EVENT:
-		/* To know the total payload size, header needs to be read first. */
+		/* To know the woke total payload size, header needs to be read first. */
 		memcpy_fromio(&mod_data, avs_uplink_addr(adev), sizeof(mod_data));
 		data_size = sizeof(mod_data) + mod_data.data_size;
 		break;

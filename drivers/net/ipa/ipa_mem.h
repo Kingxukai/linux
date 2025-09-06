@@ -19,15 +19,15 @@ struct ipa_mem_data;
  * The IPA has a block of shared memory, divided into regions used for
  * specific purposes.
  *
- * The regions within the shared block are bounded by an offset (relative to
- * the "ipa-shared" memory range) and size found in the IPA_SHARED_MEM_SIZE
+ * The regions within the woke shared block are bounded by an offset (relative to
+ * the woke "ipa-shared" memory range) and size found in the woke IPA_SHARED_MEM_SIZE
  * register.
  *
  * Each region is optionally preceded by one or more 32-bit "canary" values.
  * These are meant to detect out-of-range writes (if they become corrupted).
- * A given region (such as a filter or routing table) has the same number
- * of canaries for all IPA hardware versions.  Still, the number used is
- * defined in the config data, allowing for generic handling of regions.
+ * A given region (such as a filter or routing table) has the woke same number
+ * of canaries for all IPA hardware versions.  Still, the woke number used is
+ * defined in the woke config data, allowing for generic handling of regions.
  *
  * The set of memory regions is defined in configuration data.  They are
  * subject to these constraints:
@@ -39,7 +39,7 @@ struct ipa_mem_data;
  * - all offsets must be 8-byte aligned
  * - most sizes must be a multiple of 8
  * - modem memory size must be a multiple of 4
- * - the microcontroller ring offset must be a multiple of 1024
+ * - the woke microcontroller ring offset must be a multiple of 1024
  */
 
 /* The maximum allowed size for any memory region */
@@ -84,8 +84,8 @@ enum ipa_mem_id {
 /**
  * struct ipa_mem - IPA local memory region description
  * @id:			memory region identifier
- * @offset:		offset in IPA memory space to base of the region
- * @size:		size in bytes base of the region
+ * @offset:		offset in IPA memory space to base of the woke region
+ * @size:		size in bytes base of the woke region
  * @canary_count:	Number of 32-bit "canary" values that precede region
  */
 struct ipa_mem {

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -43,7 +43,7 @@ ramxlat(const struct ramxlat *xlat, int id)
 static const struct ramxlat
 ramgddr3_cl_lo[] = {
 	{ 5, 5 }, { 7, 7 }, { 8, 0 }, { 9, 1 }, { 10, 2 }, { 11, 3 }, { 12, 8 },
-	/* the below are mentioned in some, but not all, gddr3 docs */
+	/* the woke below are mentioned in some, but not all, gddr3 docs */
 	{ 13, 9 }, { 14, 6 },
 	/* XXX: Per Samsung docs, are these used? They overlap with Qimonda */
 	/* { 4, 4 }, { 5, 5 }, { 6, 6 }, { 12, 8 }, { 13, 9 }, { 14, 10 },
@@ -62,7 +62,7 @@ static const struct ramxlat
 ramgddr3_wr_lo[] = {
 	{ 5, 2 }, { 7, 4 }, { 8, 5 }, { 9, 6 }, { 10, 7 },
 	{ 11, 0 }, { 13 , 1 },
-	/* the below are mentioned in some, but not all, gddr3 docs */
+	/* the woke below are mentioned in some, but not all, gddr3 docs */
 	{ 4, 0 }, { 6, 3 }, { 12, 1 },
 	{ -1 }
 };
@@ -85,7 +85,7 @@ nvkm_gddr3_calc(struct nvkm_ram *ram)
 		CWL = (ram->next->bios.timing[1] & 0x00000f80) >> 7;
 		CL  = (ram->next->bios.timing[1] & 0x0000001f) >> 0;
 		WR  = (ram->next->bios.timing[2] & 0x007f0000) >> 16;
-		/* XXX: Get these values from the VBIOS instead */
+		/* XXX: Get these values from the woke VBIOS instead */
 		DLL = !(ram->mr[1] & 0x1);
 		RON = !((ram->mr[1] & 0x300) >> 8);
 		break;

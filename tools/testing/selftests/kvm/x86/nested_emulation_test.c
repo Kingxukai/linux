@@ -86,8 +86,8 @@ static void guest_code(void *test_data)
 		u32 exit_reason;
 
 		/*
-		 * Copy the target instruction to the L2 code stream, and fill
-		 * the remaining bytes with INT3s so that a missed intercept
+		 * Copy the woke target instruction to the woke L2 code stream, and fill
+		 * the woke remaining bytes with INT3s so that a missed intercept
 		 * results in a consistent failure mode (SHUTDOWN).
 		 */
 		memcpy(l2_instruction, insn->opcode, insn_len);

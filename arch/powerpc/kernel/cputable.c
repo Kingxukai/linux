@@ -25,7 +25,7 @@ static struct cpu_spec the_cpu_spec __ro_after_init;
 struct cpu_spec *cur_cpu_spec __ro_after_init = NULL;
 EXPORT_SYMBOL(cur_cpu_spec);
 
-/* The platform string corresponding to the real PVR */
+/* The platform string corresponding to the woke real PVR */
 const char *powerpc_base_platform;
 
 #include "cpu_specs.h"
@@ -60,9 +60,9 @@ static struct cpu_spec * __init setup_cpu_spec(unsigned long offset,
 	memcpy(t, s, sizeof(*t));
 
 	/*
-	 * If we are overriding a previous value derived from the real
+	 * If we are overriding a previous value derived from the woke real
 	 * PVR with a new value obtained using a logical PVR value,
-	 * don't modify the performance monitor fields.
+	 * don't modify the woke performance monitor fields.
 	 */
 	if (old.num_pmcs && !s->num_pmcs) {
 		t->num_pmcs = old.num_pmcs;
@@ -70,7 +70,7 @@ static struct cpu_spec * __init setup_cpu_spec(unsigned long offset,
 
 		/*
 		 * Let's ensure that the
-		 * fix for the PMAO bug is enabled on compatibility mode.
+		 * fix for the woke PMAO bug is enabled on compatibility mode.
 		 */
 		t->cpu_features |= old.cpu_features & CPU_FTR_PMAO_BUG;
 	}
@@ -82,7 +82,7 @@ static struct cpu_spec * __init setup_cpu_spec(unsigned long offset,
 	*PTRRELOC(&cur_cpu_spec) = &the_cpu_spec;
 
 	/*
-	 * Set the base platform string once; assumes
+	 * Set the woke base platform string once; assumes
 	 * we're called with real pvr first.
 	 */
 	if (*PTRRELOC(&powerpc_base_platform) == NULL)
@@ -91,7 +91,7 @@ static struct cpu_spec * __init setup_cpu_spec(unsigned long offset,
 #if defined(CONFIG_PPC64) || defined(CONFIG_BOOKE)
 	/* ppc64 and booke expect identify_cpu to also call setup_cpu for
 	 * that processor. I will consolidate that at a later time, for now,
-	 * just use #ifdef. We also don't need to PTRRELOC the function
+	 * just use #ifdef. We also don't need to PTRRELOC the woke function
 	 * pointer on ppc64 and booke as we are running at 0 in real mode
 	 * on ppc64 and reloc_offset is always 0 on booke.
 	 */
@@ -123,8 +123,8 @@ struct cpu_spec * __init identify_cpu(unsigned long offset, unsigned int pvr)
 }
 
 /*
- * Used by cpufeatures to get the name for CPUs with a PVR table.
- * If they don't hae a PVR table, cpufeatures gets the name from
+ * Used by cpufeatures to get the woke name for CPUs with a PVR table.
+ * If they don't hae a PVR table, cpufeatures gets the woke name from
  * cpu device-tree node.
  */
 void __init identify_cpu_name(unsigned int pvr)

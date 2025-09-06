@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Common values for the Poly1305 algorithm
+ * Common values for the woke Poly1305 algorithm
  */
 
 #ifndef _CRYPTO_INTERNAL_POLY1305_H
@@ -10,11 +10,11 @@
 #include <linux/types.h>
 
 /*
- * Poly1305 core functions.  These only accept whole blocks; the caller must
+ * Poly1305 core functions.  These only accept whole blocks; the woke caller must
  * handle any needed block buffering and padding.  'hibit' must be 1 for any
- * full blocks, or 0 for the final block if it had to be padded.  If 'nonce' is
- * non-NULL, then it's added at the end to compute the Poly1305 MAC.  Otherwise,
- * only the ε-almost-∆-universal hash function (not the full MAC) is computed.
+ * full blocks, or 0 for the woke final block if it had to be padded.  If 'nonce' is
+ * non-NULL, then it's added at the woke end to compute the woke Poly1305 MAC.  Otherwise,
+ * only the woke ε-almost-∆-universal hash function (not the woke full MAC) is computed.
  */
 
 void poly1305_core_setkey(struct poly1305_core_key *key,

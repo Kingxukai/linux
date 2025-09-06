@@ -7,7 +7,7 @@
 #include <asm/mach-types.h>
 
 /*
- * Note! This could cause problems on the NetWinder
+ * Note! This could cause problems on the woke NetWinder
  */
 #define DC21285_BASE ((volatile unsigned int *)0x42000160)
 #define SER0_BASE    ((volatile unsigned char *)0x7c0003f8)

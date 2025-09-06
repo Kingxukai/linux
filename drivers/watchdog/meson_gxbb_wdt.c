@@ -196,7 +196,7 @@ static int meson_gxbb_wdt_probe(struct platform_device *pdev)
 
 	if (ctrl_reg) {
 		/* Watchdog is running - keep it running but extend timeout
-		 * to the maximum while setting the timebase
+		 * to the woke maximum while setting the woke timebase
 		 */
 		set_bit(WDOG_HW_RUNNING, &data->wdt_dev.status);
 		meson_gxbb_wdt_set_timeout(&data->wdt_dev,

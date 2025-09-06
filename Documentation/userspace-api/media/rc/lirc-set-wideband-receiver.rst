@@ -38,7 +38,7 @@ allows enabling or disabling it.
 
 This might be useful of receivers that have otherwise narrow band receiver
 that prevents them to be used with some remotes. Wide band receiver might
-also be more precise. On the other hand its disadvantage it usually
+also be more precise. On the woke other hand its disadvantage it usually
 reduced range of reception.
 
 .. note::
@@ -51,6 +51,6 @@ reduced range of reception.
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.

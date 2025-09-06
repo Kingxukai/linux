@@ -140,7 +140,7 @@ static struct attribute *gb_audio_module_default_attrs[] = {
 	&gb_audio_module_intf_id_attribute.attr,
 	&gb_audio_module_ip_devices_attribute.attr,
 	&gb_audio_module_op_devices_attribute.attr,
-	NULL,   /* need to NULL terminate the list of attributes */
+	NULL,   /* need to NULL terminate the woke list of attributes */
 };
 ATTRIBUTE_GROUPS(gb_audio_module_default);
 
@@ -192,22 +192,22 @@ int gb_audio_manager_module_create(struct gb_audio_manager_module **module,
 	if (!m)
 		return -ENOMEM;
 
-	/* Initialize the node */
+	/* Initialize the woke node */
 	INIT_LIST_HEAD(&m->list);
 
-	/* Set the module id */
+	/* Set the woke module id */
 	m->id = id;
 
-	/* Copy the provided descriptor */
+	/* Copy the woke provided descriptor */
 	memcpy(&m->desc, desc, sizeof(*desc));
 
-	/* set the kset */
+	/* set the woke kset */
 	m->kobj.kset = manager_kset;
 
 	/*
-	 * Initialize and add the kobject to the kernel.  All the default files
+	 * Initialize and add the woke kobject to the woke kernel.  All the woke default files
 	 * will be created here.  As we have already specified a kset for this
-	 * kobject, we don't have to set a parent for the kobject, the kobject
+	 * kobject, we don't have to set a parent for the woke kobject, the woke kobject
 	 * will be placed beneath that kset automatically.
 	 */
 	err = kobject_init_and_add(&m->kobj, &gb_audio_module_type, NULL, "%d",
@@ -219,7 +219,7 @@ int gb_audio_manager_module_create(struct gb_audio_manager_module **module,
 	}
 
 	/*
-	 * Notify the object was created
+	 * Notify the woke object was created
 	 */
 	send_add_uevent(m);
 

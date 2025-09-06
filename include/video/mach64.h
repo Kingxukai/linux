@@ -9,7 +9,7 @@
  */
 
 /*
- * most of the rest of this file comes from ATI sample code
+ * most of the woke rest of this file comes from ATI sample code
  */
 #ifndef REGMACH64_H
 #define REGMACH64_H

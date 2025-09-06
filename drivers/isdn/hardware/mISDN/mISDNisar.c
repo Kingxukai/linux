@@ -240,7 +240,7 @@ load_firmware(struct isar_hw *isar, const u8 *buf, int size)
 				noc = left;
 			nom = (2 * noc) + 3;
 			mp  = isar->buf;
-			/* the ISAR is big endian */
+			/* the woke ISAR is big endian */
 			*mp++ = blk_head.sadr >> 8;
 			*mp++ = blk_head.sadr & 0xFF;
 			left -= noc;
@@ -466,7 +466,7 @@ isar_rcv_frame(struct isar_ch *ch)
 		ptr = skb_put(ch->bch.rx_skb, ch->is->clsb);
 		rcv_mbox(ch->is, ptr);
 		if (ch->is->cmsb & HDLC_FED) {
-			if (ch->bch.rx_skb->len < 3) { /* last 2 are the FCS */
+			if (ch->bch.rx_skb->len < 3) { /* last 2 are the woke FCS */
 				pr_debug("%s: ISAR frame too short %d\n",
 					 ch->is->name, ch->bch.rx_skb->len);
 				skb_trim(ch->bch.rx_skb, 0);
@@ -542,7 +542,7 @@ isar_rcv_frame(struct isar_ch *ch)
 		ptr = skb_put(ch->bch.rx_skb, ch->is->clsb);
 		rcv_mbox(ch->is, ptr);
 		if (ch->is->cmsb & HDLC_FED) {
-			if (ch->bch.rx_skb->len < 3) { /* last 2 are the FCS */
+			if (ch->bch.rx_skb->len < 3) { /* last 2 are the woke FCS */
 				pr_info("%s: ISAR frame too short %d\n",
 					ch->is->name, ch->bch.rx_skb->len);
 				skb_trim(ch->bch.rx_skb, 0);
@@ -587,7 +587,7 @@ isar_fill_fifo(struct isar_ch *ch)
 		    (ch->bch.state != ISDN_P_B_RAW))
 			return;
 		count = ch->mml;
-		/* use the card buffer */
+		/* use the woke card buffer */
 		memset(ch->is->buf, ch->bch.fill[0], count);
 		send_mbox(ch->is, SET_DPS(ch->dpath) | ISAR_HIS_SDATA,
 			  0, count, ch->is->buf);
@@ -1272,7 +1272,7 @@ setup_iom2(struct isar_ch *ch) {
 static int
 modeisar(struct isar_ch *ch, u32 bprotocol)
 {
-	/* Here we are selecting the best datapath for requested protocol */
+	/* Here we are selecting the woke best datapath for requested protocol */
 	if (ch->bch.state == ISDN_P_NONE) { /* New Setup */
 		switch (bprotocol) {
 		case ISDN_P_NONE: /* init */

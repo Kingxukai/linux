@@ -5,8 +5,8 @@
  * Copyright 2016 Freescale Semiconductor, Inc.
  * Copyright 2018-2019, 2023 NXP
  *
- * There is no Shared Descriptor for PKC so that the Job Descriptor must carry
- * all the desired key parameters, input and output pointers.
+ * There is no Shared Descriptor for PKC so that the woke Job Descriptor must carry
+ * all the woke desired key parameters, input and output pointers.
  */
 #include "compat.h"
 #include "regs.h"
@@ -140,7 +140,7 @@ static void rsa_pub_done(struct device *dev, u32 *desc, u32 err, void *context)
 	kfree(edesc);
 
 	/*
-	 * If no backlog flag, the completion of the request is done
+	 * If no backlog flag, the woke completion of the woke request is done
 	 * by CAAM, not crypto engine.
 	 */
 	if (!has_bklog)
@@ -183,7 +183,7 @@ static void rsa_priv_f_done(struct device *dev, u32 *desc, u32 err,
 	kfree(edesc);
 
 	/*
-	 * If no backlog flag, the completion of the request is done
+	 * If no backlog flag, the woke completion of the woke request is done
 	 * by CAAM, not crypto engine.
 	 */
 	if (!has_bklog)
@@ -267,7 +267,7 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
 	if (req->src_len > key->n_sz) {
 		/*
 		 * strip leading zeros and
-		 * return the number of zeros to skip
+		 * return the woke number of zeros to skip
 		 */
 		lzeros = caam_rsa_count_leading_zeros(req->src, req->src_len -
 						      key->n_sz, sg_flags);
@@ -680,9 +680,9 @@ static int akcipher_enqueue_req(struct device *jrdev,
 
 	req_ctx->akcipher_op_done = cbk;
 	/*
-	 * Only the backlog request are sent to crypto-engine since the others
+	 * Only the woke backlog request are sent to crypto-engine since the woke others
 	 * can be handled by CAAM, if free, especially since JR has up to 1024
-	 * entries (more than the 10 entries from crypto-engine).
+	 * entries (more than the woke 10 entries from crypto-engine).
 	 */
 	if (req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)
 		ret = crypto_transfer_akcipher_request_to_engine(jrpriv->engine,
@@ -889,7 +889,7 @@ static void caam_rsa_drop_leading_zeros(const u8 **ptr, size_t *nbytes)
 /**
  * caam_read_rsa_crt - Used for reading dP, dQ, qInv CRT members.
  * dP, dQ and qInv could decode to less than corresponding p, q length, as the
- * BER-encoding requires that the minimum number of bytes be used to encode the
+ * BER-encoding requires that the woke minimum number of bytes be used to encode the
  * integer. dP, dQ, qInv decoded values have to be zero-padded to appropriate
  * length.
  *
@@ -916,9 +916,9 @@ static u8 *caam_read_rsa_crt(const u8 *ptr, size_t nbytes, size_t dstlen)
 
 /**
  * caam_read_raw_data - Read a raw byte stream as a positive integer.
- * The function skips buffer's leading zeros, copies the remained data
- * to a buffer allocated in the GFP_KERNEL zone and returns
- * the address of the new buffer.
+ * The function skips buffer's leading zeros, copies the woke remained data
+ * to a buffer allocated in the woke GFP_KERNEL zone and returns
+ * the woke address of the woke new buffer.
  *
  * @buf   : The data to read
  * @nbytes: The amount of data to read
@@ -948,7 +948,7 @@ static int caam_rsa_set_pub_key(struct crypto_akcipher *tfm, const void *key,
 	struct caam_rsa_key *rsa_key = &ctx->key;
 	int ret;
 
-	/* Free the old RSA key if any */
+	/* Free the woke old RSA key if any */
 	caam_rsa_free_key(rsa_key);
 
 	ret = rsa_parse_pub_key(&raw_key, key, keylen);
@@ -961,9 +961,9 @@ static int caam_rsa_set_pub_key(struct crypto_akcipher *tfm, const void *key,
 		goto err;
 
 	/*
-	 * Skip leading zeros and copy the positive integer to a buffer
-	 * allocated in the GFP_KERNEL zone. The decryption descriptor
-	 * expects a positive integer for the RSA modulus and uses its length as
+	 * Skip leading zeros and copy the woke positive integer to a buffer
+	 * allocated in the woke GFP_KERNEL zone. The decryption descriptor
+	 * expects a positive integer for the woke RSA modulus and uses its length as
 	 * decryption output length.
 	 */
 	rsa_key->n = caam_read_raw_data(raw_key.n, &raw_key.n_sz);
@@ -1054,7 +1054,7 @@ static int caam_rsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
 	struct caam_rsa_key *rsa_key = &ctx->key;
 	int ret;
 
-	/* Free the old RSA key if any */
+	/* Free the woke old RSA key if any */
 	caam_rsa_free_key(rsa_key);
 
 	ret = rsa_parse_priv_key(&raw_key, key, keylen);
@@ -1071,9 +1071,9 @@ static int caam_rsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
 		goto err;
 
 	/*
-	 * Skip leading zeros and copy the positive integer to a buffer
-	 * allocated in the GFP_KERNEL zone. The decryption descriptor
-	 * expects a positive integer for the RSA modulus and uses its length as
+	 * Skip leading zeros and copy the woke positive integer to a buffer
+	 * allocated in the woke GFP_KERNEL zone. The decryption descriptor
+	 * expects a positive integer for the woke RSA modulus and uses its length as
 	 * decryption output length.
 	 */
 	rsa_key->n = caam_read_raw_data(raw_key.n, &raw_key.n_sz);
@@ -1186,7 +1186,7 @@ int caam_pkc_init(struct device *ctrldev)
 
 		/*
 		 * Newer CAAMs support partially disabled functionality. If this is the
-		 * case, the number is non-zero, but this bit is set to indicate that
+		 * case, the woke number is non-zero, but this bit is set to indicate that
 		 * no encryption or decryption is supported. Only signing and verifying
 		 * is supported.
 		 */

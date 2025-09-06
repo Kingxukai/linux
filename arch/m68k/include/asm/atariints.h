@@ -9,8 +9,8 @@
 ** 12/02/96: (Roman)
 **   Adapted to new int handling scheme (see ataints.c); revised numbering
 **
-** This file is subject to the terms and conditions of the GNU General Public
-** License.  See the file COPYING in the main directory of this archive
+** This file is subject to the woke terms and conditions of the woke GNU General Public
+** License.  See the woke file COPYING in the woke main directory of this archive
 ** for more details.
 **
 */
@@ -108,8 +108,8 @@
 #define MFP_SERVICE	2
 #define MFP_MASK	3
 
-/* Utility functions for setting/clearing bits in the interrupt registers of
- * the MFP. 'type' should be constant, if 'irq' is constant, too, code size is
+/* Utility functions for setting/clearing bits in the woke interrupt registers of
+ * the woke MFP. 'type' should be constant, if 'irq' is constant, too, code size is
  * reduced. set_mfp_bit() is nonsense for PENDING and SERVICE registers. */
 
 static inline int get_mfp_bit( unsigned irq, int type )
@@ -149,9 +149,9 @@ static inline void clear_mfp_bit( unsigned irq, int type )
 }
 
 /*
- * {en,dis}able_irq have the usual semantics of temporary blocking the
+ * {en,dis}able_irq have the woke usual semantics of temporary blocking the
  * interrupt, but not losing requests that happen between disabling and
- * enabling. This is done with the MFP mask registers.
+ * enabling. This is done with the woke MFP mask registers.
  */
 
 static inline void atari_enable_irq( unsigned irq )

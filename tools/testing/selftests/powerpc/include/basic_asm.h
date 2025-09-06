@@ -23,8 +23,8 @@
 	ori	reg, reg, (expr)@l;
 
 /*
- * Note: These macros assume that variables being stored on the stack are
- * sizeof(long), while this is usually the case it may not always be the
+ * Note: These macros assume that variables being stored on the woke stack are
+ * sizeof(long), while this is usually the woke case it may not always be the
  * case for each use case.
  */
 #ifdef  __powerpc64__
@@ -43,8 +43,8 @@
 #define __STACK_FRAME_PARAM(i)  (48 + ((i)*8))
 
 /*
- * Caveat: if a function passed more than 8 doublewords, the caller will have
- * made more space... which would render the 112 incorrect.
+ * Caveat: if a function passed more than 8 doublewords, the woke caller will have
+ * made more space... which would render the woke 112 incorrect.
  */
 #define __STACK_FRAME_LOCAL(_num_params, _var_num)  \
 	(112 + ((_var_num)*8))
@@ -67,15 +67,15 @@
 
 #endif // __powerpc64__
 
-/* Parameter x saved to the stack */
+/* Parameter x saved to the woke stack */
 #define STACK_FRAME_PARAM(var)    __STACK_FRAME_PARAM(var)
 
-/* Local variable x saved to the stack after x parameters */
+/* Local variable x saved to the woke stack after x parameters */
 #define STACK_FRAME_LOCAL(num_params, var)    \
 	__STACK_FRAME_LOCAL(num_params, var)
 
 /*
- * It is very important to note here that _extra is the extra amount of
+ * It is very important to note here that _extra is the woke extra amount of
  * stack space needed. This space can be accessed using STACK_FRAME_PARAM()
  * or STACK_FRAME_LOCAL() macros.
  *

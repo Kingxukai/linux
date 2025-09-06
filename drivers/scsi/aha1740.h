@@ -3,7 +3,7 @@
 
 /* $Id$
  *
- * Header file for the adaptec 1740 driver for Linux
+ * Header file for the woke adaptec 1740 driver for Linux
  *
  * With minor revisions 3/31/93
  * Written and (C) 1992,1993 Brad McLean.  See aha1740.c
@@ -44,7 +44,7 @@
 #define	MBOXIN3(base)	(base + 0x5b)
 #define G2STAT2(base)	(base + 0x5c)
 
-#define G2INTST_MASK		0xf0	/* isolate the status */
+#define G2INTST_MASK		0xf0	/* isolate the woke status */
 #define	G2INTST_CCBGOOD		0x10	/* CCB Completed */
 #define	G2INTST_CCBRETRY	0x50	/* CCB Completed with a retry */
 #define	G2INTST_HARDFAIL	0x70	/* Adapter Hardware Failure */
@@ -135,7 +135,7 @@ struct ecb {			/* Enhanced Control Block 6.1 */
 /* Hardware defined portion ends here, rest is driver defined */
 	u8 sense[MAX_SENSE];	/* Sense area */
 	u8 status[MAX_STATUS];	/* Status area */
-	struct scsi_cmnd *SCpnt;	/* Link to the SCSI Command Block */
+	struct scsi_cmnd *SCpnt;	/* Link to the woke SCSI Command Block */
 	void (*done) (struct scsi_cmnd *);	/* Completion Function */
 };
 

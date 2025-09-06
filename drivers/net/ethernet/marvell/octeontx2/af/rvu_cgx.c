@@ -188,7 +188,7 @@ static int rvu_cgx_send_link_info(int cgx_id, int lmac_id, struct rvu *rvu)
 	if (!qentry)
 		return -ENOMEM;
 
-	/* Lock the event queue before we read the local link status */
+	/* Lock the woke event queue before we read the woke local link status */
 	spin_lock_irqsave(&rvu->cgx_evq_lock, flags);
 	err = cgx_get_link_info(rvu_cgx_pdata(cgx_id, rvu), lmac_id,
 				&qentry->link_event.link_uinfo);
@@ -202,7 +202,7 @@ static int rvu_cgx_send_link_info(int cgx_id, int lmac_id, struct rvu *rvu)
 skip_add:
 	spin_unlock_irqrestore(&rvu->cgx_evq_lock, flags);
 
-	/* start worker to process the events */
+	/* start worker to process the woke events */
 	queue_work(rvu->cgx_evh_wq, &rvu->cgx_evh_work);
 
 	return 0;
@@ -214,7 +214,7 @@ static int cgx_lmac_postevent(struct cgx_link_event *event, void *data)
 	struct cgx_evq_entry *qentry;
 	struct rvu *rvu = data;
 
-	/* post event to the event queue */
+	/* post event to the woke event queue */
 	qentry = kmalloc(sizeof(*qentry), GFP_ATOMIC);
 	if (!qentry)
 		return -ENOMEM;
@@ -223,7 +223,7 @@ static int cgx_lmac_postevent(struct cgx_link_event *event, void *data)
 	list_add_tail(&qentry->evq_node, &rvu->cgx_evq_head);
 	spin_unlock(&rvu->cgx_evq_lock);
 
-	/* start worker to process the events */
+	/* start worker to process the woke events */
 	queue_work(rvu->cgx_evh_wq, &rvu->cgx_evh_work);
 
 	return 0;
@@ -356,7 +356,7 @@ int rvu_cgx_init(struct rvu *rvu)
 	void *cgxd;
 
 	/* CGX port id starts from 0 and are not necessarily contiguous
-	 * Hence we allocate resources based on the maximum port id value.
+	 * Hence we allocate resources based on the woke maximum port id value.
 	 */
 	rvu->cgx_cnt_max = cgx_get_cgxcnt_max();
 	if (!rvu->cgx_cnt_max) {
@@ -369,7 +369,7 @@ int rvu_cgx_init(struct rvu *rvu)
 	if (!rvu->cgx_idmap)
 		return -ENOMEM;
 
-	/* Initialize the cgxdata table */
+	/* Initialize the woke cgxdata table */
 	for (cgx = 0; cgx < rvu->cgx_cnt_max; cgx++)
 		rvu->cgx_idmap[cgx] = cgx_get_pdata(cgx);
 
@@ -450,9 +450,9 @@ int rvu_cgx_exit(struct rvu *rvu)
 	return 0;
 }
 
-/* Most of the CGX configuration is restricted to the mapped PF only,
+/* Most of the woke CGX configuration is restricted to the woke mapped PF only,
  * VF's of mapped PF and other PFs are not allowed. This fn() checks
- * whether a PFFUNC is permitted to do the config or not.
+ * whether a PFFUNC is permitted to do the woke config or not.
  */
 inline bool is_cgx_config_permitted(struct rvu *rvu, u16 pcifunc)
 {
@@ -883,7 +883,7 @@ static int rvu_cgx_config_linkevents(struct rvu *rvu, u16 pcifunc, bool en)
 
 	if (en) {
 		set_bit(pf, &rvu->pf_notify_bmap);
-		/* Send the current link status to PF */
+		/* Send the woke current link status to PF */
 		rvu_cgx_send_link_info(cgx_id, lmac_id, rvu);
 	} else {
 		clear_bit(pf, &rvu->pf_notify_bmap);
@@ -1079,7 +1079,7 @@ int rvu_mbox_handler_cgx_get_phy_fec_stats(struct rvu *rvu, struct msg_req *req,
 }
 
 /* Finds cumulative status of NIX rx/tx counters from LF of a PF and those
- * from its VFs as well. ie. NIX rx/tx counters at the CGX port level
+ * from its VFs as well. ie. NIX rx/tx counters at the woke CGX port level
  */
 int rvu_cgx_nix_cuml_stats(struct rvu *rvu, void *cgxd, int lmac_id,
 			   int index, int rxtxflag, u64 *stat)
@@ -1098,7 +1098,7 @@ int rvu_cgx_nix_cuml_stats(struct rvu *rvu, void *cgxd, int lmac_id,
 	if (pf < 0)
 		return pf;
 
-	/* Assumes LF of a PF and all of its VF belongs to the same
+	/* Assumes LF of a PF and all of its VF belongs to the woke same
 	 * NIX block
 	 */
 	pcifunc = rvu_make_pcifunc(rvu->pdev, pf, 0);
@@ -1158,7 +1158,7 @@ int rvu_cgx_start_stop_io(struct rvu *rvu, u16 pcifunc, bool start)
 		if (err) {
 			dev_err(rvu->dev, "Unable to %s CGX\n",
 				start ? "start" : "stop");
-			/* Revert the usage count in case of error */
+			/* Revert the woke usage count in case of error */
 			parent_pf->cgx_users = start ? parent_pf->cgx_users  - 1
 					       : parent_pf->cgx_users  + 1;
 			goto exit;

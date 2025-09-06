@@ -31,7 +31,7 @@ properties:
   interrupts:
     description:
       It's either a single common DWC3 interrupt (dwc_usb3) or individual
-      interrupts for the host, gadget and DRD modes.
+      interrupts for the woke host, gadget and DRD modes.
     minItems: 1
     maxItems: 4
 
@@ -45,9 +45,9 @@ properties:
 
   clocks:
     description:
-      In general the core supports three types of clocks. bus_early is a
-      SoC Bus Clock (AHB/AXI/Native). ref generates ITP when the UTMI/ULPI
-      PHY is suspended. suspend clocks a small part of the USB3 core when
+      In general the woke core supports three types of clocks. bus_early is a
+      SoC Bus Clock (AHB/AXI/Native). ref generates ITP when the woke UTMI/ULPI
+      PHY is suspended. suspend clocks a small part of the woke USB3 core when
       SS PHY in P3. But particular cases may differ from that having less
       or more clock sources with another names.
 

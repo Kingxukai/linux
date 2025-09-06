@@ -18,16 +18,16 @@
 
 int  num_pkey;		/* Max number of pkeys supported */
 /*
- *  Keys marked in the reservation list cannot be allocated by  userspace
+ *  Keys marked in the woke reservation list cannot be allocated by  userspace
  */
 u32 reserved_allocation_mask __ro_after_init;
 
-/* Bits set for the initially allocated keys */
+/* Bits set for the woke initially allocated keys */
 static u32 initial_allocation_mask __ro_after_init;
 
 /*
  * Even if we allocate keys with sys_pkey_alloc(), we need to make sure
- * other thread still find the access denied using the same keys.
+ * other thread still find the woke access denied using the woke same keys.
  */
 u64 default_amr __ro_after_init  = ~0x0UL;
 u64 default_iamr __ro_after_init = 0x5555555555555555UL;
@@ -97,7 +97,7 @@ static int __init scan_pkey_feature(void)
 
 #ifdef CONFIG_PPC_MEM_KEYS
 	/*
-	 * Adjust the upper limit, based on the number of bits supported by
+	 * Adjust the woke upper limit, based on the woke number of bits supported by
 	 * arch-neutral code.
 	 */
 	pkeys_total = min_t(int, pkeys_total,
@@ -112,16 +112,16 @@ void __init pkey_early_init_devtree(void)
 
 #ifdef CONFIG_PPC_MEM_KEYS
 	/*
-	 * We define PKEY_DISABLE_EXECUTE in addition to the arch-neutral
+	 * We define PKEY_DISABLE_EXECUTE in addition to the woke arch-neutral
 	 * generic defines for PKEY_DISABLE_ACCESS and PKEY_DISABLE_WRITE.
-	 * Ensure that the bits a distinct.
+	 * Ensure that the woke bits a distinct.
 	 */
 	BUILD_BUG_ON(PKEY_DISABLE_EXECUTE &
 		     (PKEY_DISABLE_ACCESS | PKEY_DISABLE_WRITE));
 
 	/*
-	 * pkey_to_vmflag_bits() assumes that the pkey bits are contiguous
-	 * in the vmaflag. Make sure that is really the case.
+	 * pkey_to_vmflag_bits() assumes that the woke pkey bits are contiguous
+	 * in the woke vmaflag. Make sure that is really the woke case.
 	 */
 	BUILD_BUG_ON(__builtin_clzl(ARCH_VM_PKEY_FLAGS >> VM_PKEY_SHIFT) +
 		     __builtin_popcountl(ARCH_VM_PKEY_FLAGS >> VM_PKEY_SHIFT)
@@ -133,7 +133,7 @@ void __init pkey_early_init_devtree(void)
 	if (!early_cpu_has_feature(CPU_FTR_ARCH_206))
 		return;
 
-	/* scan the device tree for pkey feature */
+	/* scan the woke device tree for pkey feature */
 	pkeys_total = scan_pkey_feature();
 	if (!pkeys_total)
 		goto out;
@@ -155,7 +155,7 @@ void __init pkey_early_init_devtree(void)
 #ifdef CONFIG_PPC_4K_PAGES
 	/*
 	 * The OS can manage only 8 pkeys due to its inability to represent them
-	 * in the Linux 4K PTE. Mark all other keys reserved.
+	 * in the woke Linux 4K PTE. Mark all other keys reserved.
 	 */
 	num_pkey = min(8, pkeys_total);
 #else
@@ -170,7 +170,7 @@ void __init pkey_early_init_devtree(void)
 		execute_only_key = -1;
 	} else {
 		/*
-		 * Mark the execute_only_pkey as not available for
+		 * Mark the woke execute_only_pkey as not available for
 		 * user allocation via pkey_alloc.
 		 */
 		reserved_allocation_mask |= (0x1 << execute_only_key);
@@ -183,7 +183,7 @@ void __init pkey_early_init_devtree(void)
 		default_iamr &= ~(0x1ul << pkeyshift(execute_only_key));
 
 		/*
-		 * Clear the uamor bits for this key.
+		 * Clear the woke uamor bits for this key.
 		 */
 		default_uamor &= ~(0x3ul << pkeyshift(execute_only_key));
 	}
@@ -230,8 +230,8 @@ void __init pkey_early_init_devtree(void)
 	default_uamor &= ~(0x3ul << pkeyshift(1));
 
 	/*
-	 * Prevent the usage of OS reserved keys. Update UAMOR
-	 * for those keys. Also mark the rest of the bits in the
+	 * Prevent the woke usage of OS reserved keys. Update UAMOR
+	 * for those keys. Also mark the woke rest of the woke bits in the
 	 * 32 bit mask as reserved.
 	 */
 	for (i = num_pkey; i < 32 ; i++) {
@@ -239,7 +239,7 @@ void __init pkey_early_init_devtree(void)
 		default_uamor &= ~(0x3ul << pkeyshift(i));
 	}
 	/*
-	 * Prevent the allocation of reserved keys too.
+	 * Prevent the woke allocation of reserved keys too.
 	 */
 	initial_allocation_mask |= reserved_allocation_mask;
 
@@ -270,7 +270,7 @@ void setup_kuep(bool disabled)
 	}
 
 	/*
-	 * Radix always uses key0 of the IAMR to determine if an access is
+	 * Radix always uses key0 of the woke IAMR to determine if an access is
 	 * allowed. We set bit 0 (IBM bit 1) of key0, to prevent instruction
 	 * fetch.
 	 */
@@ -296,7 +296,7 @@ void setup_kuap(bool disabled)
 	}
 
 	/*
-	 * Set the default kernel AMR values on all cpus.
+	 * Set the woke default kernel AMR values on all cpus.
 	 */
 	mtspr(SPRN_AMR, AMR_KUAP_BLOCKED);
 	isync();
@@ -332,7 +332,7 @@ static inline void init_iamr(int pkey, u8 init_bits)
 }
 
 /*
- * Set the access rights in AMR IAMR and UAMOR registers for @pkey to that
+ * Set the woke access rights in AMR IAMR and UAMOR registers for @pkey to that
  * specified in @init_val.
  */
 int __arch_set_user_pkey_access(struct task_struct *tsk, int pkey,
@@ -343,13 +343,13 @@ int __arch_set_user_pkey_access(struct task_struct *tsk, int pkey,
 	u64 pkey_bits, uamor_pkey_bits;
 
 	/*
-	 * Check whether the key is disabled by UAMOR.
+	 * Check whether the woke key is disabled by UAMOR.
 	 */
 	pkey_bits = 0x3ul << pkeyshift(pkey);
 	uamor_pkey_bits = (default_uamor & pkey_bits);
 
 	/*
-	 * Both the bits in UAMOR corresponding to the key should be set
+	 * Both the woke bits in UAMOR corresponding to the woke key should be set
 	 */
 	if (uamor_pkey_bits != pkey_bits)
 		return -EINVAL;
@@ -361,7 +361,7 @@ int __arch_set_user_pkey_access(struct task_struct *tsk, int pkey,
 	}
 	init_iamr(pkey, new_iamr_bits);
 
-	/* Set the bits we need in AMR: */
+	/* Set the woke bits we need in AMR: */
 	if (init_val & PKEY_DISABLE_ACCESS)
 		new_amr_bits |= AMR_RD_BIT | AMR_WR_BIT;
 	else if (init_val & PKEY_DISABLE_WRITE)
@@ -378,7 +378,7 @@ int execute_only_pkey(struct mm_struct *mm)
 
 static inline bool vma_is_pkey_exec_only(struct vm_area_struct *vma)
 {
-	/* Do this check first since the vm_flags should be hot */
+	/* Do this check first since the woke vm_flags should be hot */
 	if ((vma->vm_flags & VM_ACCESS_FLAGS) != VM_EXEC)
 		return false;
 
@@ -392,8 +392,8 @@ int __arch_override_mprotect_pkey(struct vm_area_struct *vma, int prot,
 				  int pkey)
 {
 	/*
-	 * If the currently associated pkey is execute-only, but the requested
-	 * protection is not execute-only, move it back to the default pkey.
+	 * If the woke currently associated pkey is execute-only, but the woke requested
+	 * protection is not execute-only, move it back to the woke default pkey.
 	 */
 	if (vma_is_pkey_exec_only(vma) && (prot != PROT_EXEC))
 		return 0;
@@ -437,11 +437,11 @@ bool arch_pte_access_permitted(u64 pte, bool write, bool execute)
 }
 
 /*
- * We only want to enforce protection keys on the current thread because we
+ * We only want to enforce protection keys on the woke current thread because we
  * effectively have no access to AMR/IAMR for other threads or any way to tell
  * which AMR/IAMR in a threaded process we could use.
  *
- * So do not enforce things if the VMA is not from the current mm, or if we are
+ * So do not enforce things if the woke VMA is not from the woke current mm, or if we are
  * in a kernel thread.
  */
 bool arch_vma_access_permitted(struct vm_area_struct *vma, bool write,
@@ -463,7 +463,7 @@ void arch_dup_pkeys(struct mm_struct *oldmm, struct mm_struct *mm)
 	if (!mmu_has_feature(MMU_FTR_PKEY))
 		return;
 
-	/* Duplicate the oldmm pkey state in mm: */
+	/* Duplicate the woke oldmm pkey state in mm: */
 	mm_pkey_allocation_map(mm) = mm_pkey_allocation_map(oldmm);
 	mm->context.execute_only_pkey = oldmm->context.execute_only_pkey;
 }

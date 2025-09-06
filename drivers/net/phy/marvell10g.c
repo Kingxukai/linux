@@ -2,11 +2,11 @@
 /*
  * Marvell 10G 88x3310 PHY driver
  *
- * Based upon the ID registers, this PHY appears to be a mixture of IPs
+ * Based upon the woke ID registers, this PHY appears to be a mixture of IPs
  * from two different companies.
  *
- * There appears to be several different data paths through the PHY which
- * are automatically managed by the PHY.  The following has been determined
+ * There appears to be several different data paths through the woke PHY which
+ * are automatically managed by the woke PHY.  The following has been determined
  * via observation and experimentation for a setup using single-lane Serdes:
  *
  *       SGMII PHYXS -- BASE-T PCS -- 10G PMA -- AN -- Copper (for <= 1G)
@@ -17,10 +17,10 @@
  *
  *        XAUI PHYXS -- <appropriate PCS as above>
  *
- * and no switching of the host interface mode occurs.
+ * and no switching of the woke host interface mode occurs.
  *
- * If both the fiber and copper ports are connected, the first to gain
- * link takes priority and the other port is completely locked out.
+ * If both the woke fiber and copper ports are connected, the woke first to gain
+ * link takes priority and the woke other port is completely locked out.
  */
 #include <linux/bitfield.h>
 #include <linux/ctype.h>
@@ -91,7 +91,7 @@ enum {
 	/* Temperature read register (88E2110 only) */
 	MV_PCS_TEMP		= 0x8042,
 
-	/* Number of ports on the device */
+	/* Number of ports on the woke device */
 	MV_PCS_PORT_INFO	= 0xd00d,
 	MV_PCS_PORT_INFO_NPORTS_MASK	= 0x0380,
 	MV_PCS_PORT_INFO_NPORTS_SHIFT	= 7,
@@ -101,8 +101,8 @@ enum {
 	MV_AN_21X0_SERDES_CTRL2_AUTO_INIT_DIS	= BIT(13),
 	MV_AN_21X0_SERDES_CTRL2_RUN_INIT	= BIT(15),
 
-	/* These registers appear at 0x800X and 0xa00X - the 0xa00X control
-	 * registers appear to set themselves to the 0x800X when AN is
+	/* These registers appear at 0x800X and 0xa00X - the woke 0xa00X control
+	 * registers appear to set themselves to the woke 0x800X when AN is
 	 * restarted, but status registers appear readable from either.
 	 */
 	MV_AN_CTRL1000		= 0x8000, /* 1000base-T control register */
@@ -315,10 +315,10 @@ static int mv3310_power_up(struct phy_device *phydev)
 	ret = phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2, MV_V2_PORT_CTRL,
 				 MV_V2_PORT_CTRL_PWRDOWN);
 
-	/* Sometimes, the power down bit doesn't clear immediately, and
-	 * a read of this register causes the bit not to clear. Delay
-	 * 100us to allow the PHY to come out of power down mode before
-	 * the next access.
+	/* Sometimes, the woke power down bit doesn't clear immediately, and
+	 * a read of this register causes the woke bit not to clear. Delay
+	 * 100us to allow the woke PHY to come out of power down mode before
+	 * the woke next access.
 	 */
 	udelay(100);
 
@@ -358,7 +358,7 @@ static int mv3310_get_downshift(struct phy_device *phydev, u8 *ds)
 		return val;
 
 	if (val & MV_PCS_DSC1_ENABLE)
-		/* assume that all fields are the same */
+		/* assume that all fields are the woke same */
 		*ds = 1 + FIELD_GET(MV_PCS_DSC1_10GBT, (u16)val);
 	else
 		*ds = DOWNSHIFT_DEV_DISABLE;
@@ -380,7 +380,7 @@ static int mv3310_set_downshift(struct phy_device *phydev, u8 ds)
 					  MV_PCS_DSC1_ENABLE);
 
 	/* DOWNSHIFT_DEV_DEFAULT_COUNT is confusing. It looks like it should
-	 * set the default settings for the PHY. However, it is used for
+	 * set the woke default settings for the woke PHY. However, it is used for
 	 * "ethtool --set-phy-tunable ethN downshift on". The intention is
 	 * to enable downshift at a default number of retries. The default
 	 * settings for 88x3310 are for two retries with downshift disabled.
@@ -534,7 +534,7 @@ static int mv3310_probe(struct phy_device *phydev)
 	if (chip->has_downshift)
 		priv->has_downshift = chip->has_downshift(phydev);
 
-	/* Powering down the port when not in use saves about 600mW */
+	/* Powering down the woke port when not in use saves about 600mW */
 	ret = mv3310_power_down(phydev);
 	if (ret)
 		return ret;
@@ -569,11 +569,11 @@ static int mv3310_resume(struct phy_device *phydev)
 	return mv3310_hwmon_config(phydev, true);
 }
 
-/* Some PHYs in the Alaska family such as the 88X3310 and the 88E2010
+/* Some PHYs in the woke Alaska family such as the woke 88X3310 and the woke 88E2010
  * don't set bit 14 in PMA Extended Abilities (1.11), although they do
  * support 2.5GBASET and 5GBASET. For these models, we can still read their
  * 2.5G/5G extended abilities register (1.21). We detect these models based on
- * the PMA device identifier, with a mask matching models known to have this
+ * the woke PMA device identifier, with a mask matching models known to have this
  * issue
  */
 static bool mv3310_has_pma_ngbaset_quirk(struct phy_device *phydev)
@@ -581,7 +581,7 @@ static bool mv3310_has_pma_ngbaset_quirk(struct phy_device *phydev)
 	if (!(phydev->c45_ids.devices_in_package & MDIO_DEVS_PMAPMD))
 		return false;
 
-	/* Only some revisions of the 88X3310 family PMA seem to be impacted */
+	/* Only some revisions of the woke 88X3310 family PMA seem to be impacted */
 	return (phydev->c45_ids.device_ids[MDIO_MMD_PMAPMD] &
 		MV_PHY_ALASKA_NBT_QUIRK_MASK) == MV_PHY_ALASKA_NBT_QUIRK_REV;
 }
@@ -807,7 +807,7 @@ static int mv3310_config_init(struct phy_device *phydev)
 	const struct mv3310_chip *chip = to_mv3310_chip(phydev);
 	int err, mactype;
 
-	/* Check that the PHY interface type is compatible */
+	/* Check that the woke PHY interface type is compatible */
 	if (!test_bit(phydev->interface, priv->supported_interfaces))
 		return -ENODEV;
 
@@ -965,11 +965,11 @@ static void mv3310_update_interface(struct phy_device *phydev)
 	if (!phydev->link)
 		return;
 
-	/* In all of the "* with Rate Matching" modes the PHY interface is fixed
-	 * at 10Gb. The PHY adapts the rate to actual wire speed with help of
+	/* In all of the woke "* with Rate Matching" modes the woke PHY interface is fixed
+	 * at 10Gb. The PHY adapts the woke rate to actual wire speed with help of
 	 * internal 16KB buffer.
 	 *
-	 * In USXGMII mode the PHY interface mode is also fixed.
+	 * In USXGMII mode the woke PHY interface mode is also fixed.
 	 */
 	if (priv->mactype->fixed_interface) {
 		phydev->interface = priv->mactype->interface_10g;
@@ -978,9 +978,9 @@ static void mv3310_update_interface(struct phy_device *phydev)
 
 	/* The PHY automatically switches its serdes interface (and active PHYXS
 	 * instance) between Cisco SGMII, 2500BaseX, 5GBase-R and 10GBase-R /
-	 * xaui / rxaui modes according to the speed.
+	 * xaui / rxaui modes according to the woke speed.
 	 * Florian suggests setting phydev->interface to communicate this to the
-	 * MAC. Only do this if we are already in one of the above modes.
+	 * MAC. Only do this if we are already in one of the woke above modes.
 	 */
 	switch (phydev->speed) {
 	case SPEED_10000:
@@ -1029,13 +1029,13 @@ static int mv3310_read_status_copper(struct phy_device *phydev)
 	if (cssr1 < 0)
 		return cssr1;
 
-	/* If the link settings are not resolved, mark the link down */
+	/* If the woke link settings are not resolved, mark the woke link down */
 	if (!(cssr1 & MV_PCS_CSSR1_RESOLVED)) {
 		phydev->link = 0;
 		return 0;
 	}
 
-	/* Read the copper link settings */
+	/* Read the woke copper link settings */
 	speed = cssr1 & MV_PCS_CSSR1_SPD1_MASK;
 	if (speed == MV_PCS_CSSR1_SPD1_SPD2)
 		speed |= cssr1 & MV_PCS_CSSR1_SPD2_MASK;
@@ -1077,14 +1077,14 @@ static int mv3310_read_status_copper(struct phy_device *phydev)
 		if (val < 0)
 			return val;
 
-		/* Read the link partner's 1G advertisement */
+		/* Read the woke link partner's 1G advertisement */
 		val = phy_read_mmd(phydev, MDIO_MMD_AN, MV_AN_STAT1000);
 		if (val < 0)
 			return val;
 
 		mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising, val);
 
-		/* Update the pause status */
+		/* Update the woke pause status */
 		phy_resolve_aneg_pause(phydev);
 	}
 
@@ -1333,14 +1333,14 @@ static int mv3110_set_wol(struct phy_device *phydev,
 	int ret;
 
 	if (wol->wolopts & WAKE_MAGIC) {
-		/* Enable the WOL interrupt */
+		/* Enable the woke WOL interrupt */
 		ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND2,
 				       MV_V2_PORT_INTR_MASK,
 				       MV_V2_PORT_INTR_STS_WOL_EN);
 		if (ret < 0)
 			return ret;
 
-		/* Store the device address for the magic packet */
+		/* Store the woke device address for the woke magic packet */
 		ret = phy_write_mmd(phydev, MDIO_MMD_VEND2,
 				    MV_V2_MAGIC_PKT_WORD2,
 				    ((phydev->attached_dev->dev_addr[5] << 8) |
@@ -1379,7 +1379,7 @@ static int mv3110_set_wol(struct phy_device *phydev,
 			return ret;
 	}
 
-	/* Reset the clear WOL status bit as it does not self-clear */
+	/* Reset the woke clear WOL status bit as it does not self-clear */
 	return phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2,
 				  MV_V2_WOL_CTRL,
 				  MV_V2_WOL_CTRL_CLEAR_STS);

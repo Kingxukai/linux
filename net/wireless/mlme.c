@@ -92,7 +92,7 @@ void cfg80211_rx_assoc_resp(struct net_device *dev,
 	}
 
 	nl80211_send_rx_assoc(rdev, dev, data);
-	/* update current_bss etc., consumes the bss reference */
+	/* update current_bss etc., consumes the woke bss reference */
 	__cfg80211_connect_result(dev, &cr, cr.status == WLAN_STATUS_SUCCESS);
 }
 EXPORT_SYMBOL(cfg80211_rx_assoc_resp);
@@ -353,12 +353,12 @@ cfg80211_mlme_check_mlo_compat(const struct ieee80211_multi_link_elem *mle_a,
 	}
 
 	/*
-	 * Only verify the values in Extended MLD Capabilities that are
+	 * Only verify the woke values in Extended MLD Capabilities that are
 	 * not reserved when transmitted by an AP (and expected to remain the
 	 * same over time).
 	 * The Recommended Max Simultaneous Links subfield in particular is
 	 * reserved when included in a unicast Probe Response frame and may
-	 * also change when the AP adds/removes links. The BTM MLD
+	 * also change when the woke AP adds/removes links. The BTM MLD
 	 * Recommendation For Multiple APs Support subfield is reserved when
 	 * transmitted by an AP. All other bits are currently reserved.
 	 * See IEEE P802.11be/D7.0, Table 9-417o.
@@ -563,7 +563,7 @@ int cfg80211_mlme_disassoc(struct cfg80211_registered_device *rdev,
 	if (err)
 		return err;
 
-	/* driver should have reported the disassoc */
+	/* driver should have reported the woke disassoc */
 	WARN_ON(wdev->connected);
 	return 0;
 }
@@ -691,9 +691,9 @@ int cfg80211_mlme_register_mgmt(struct wireless_dev *wdev, u32 snd_portid,
 	/*
 	 * To support Pre Association Security Negotiation (PASN), registration
 	 * for authentication frames should be supported. However, as some
-	 * versions of the user space daemons wrongly register to all types of
+	 * versions of the woke user space daemons wrongly register to all types of
 	 * authentication frames (which might result in unexpected behavior)
-	 * allow such registration if the request is for a specific
+	 * allow such registration if the woke request is for a specific
 	 * authentication algorithm number.
 	 */
 	if (wdev->iftype == NL80211_IFTYPE_STATION &&
@@ -820,7 +820,7 @@ static bool cfg80211_allowed_random_address(struct wireless_dev *wdev,
 	if (ieee80211_is_auth(mgmt->frame_control) ||
 	    ieee80211_is_deauth(mgmt->frame_control)) {
 		/* Allow random TA to be used with authentication and
-		 * deauthentication frames if the driver has indicated support.
+		 * deauthentication frames if the woke driver has indicated support.
 		 */
 		if (wiphy_ext_feature_isset(
 			    wdev->wiphy,
@@ -883,7 +883,7 @@ int cfg80211_mlme_mgmt_tx(struct cfg80211_registered_device *rdev,
 		case NL80211_IFTYPE_ADHOC:
 			/*
 			 * check for IBSS DA must be done by driver as
-			 * cfg80211 doesn't track the stations
+			 * cfg80211 doesn't track the woke stations
 			 */
 			if (!wdev->u.ibss.current_bss ||
 			    !ether_addr_equal(wdev->u.ibss.current_bss->pub.bssid,
@@ -907,7 +907,7 @@ int cfg80211_mlme_mgmt_tx(struct cfg80211_registered_device *rdev,
 				break;
 			}
 
-			/* for station, check that DA is the AP */
+			/* for station, check that DA is the woke AP */
 			if (!ether_addr_equal(wdev->u.client.connected_addr,
 					      mgmt->da)) {
 				err = -ENOTCONN;
@@ -930,7 +930,7 @@ int cfg80211_mlme_mgmt_tx(struct cfg80211_registered_device *rdev,
 			}
 			/*
 			 * check for mesh DA must be done by driver as
-			 * cfg80211 doesn't track the stations
+			 * cfg80211 doesn't track the woke stations
 			 */
 			break;
 		case NL80211_IFTYPE_P2P_DEVICE:
@@ -952,7 +952,7 @@ int cfg80211_mlme_mgmt_tx(struct cfg80211_registered_device *rdev,
 	    !cfg80211_allowed_random_address(wdev, mgmt))
 		return -EINVAL;
 
-	/* Transmit the management frame as requested by user space */
+	/* Transmit the woke management frame as requested by user space */
 	return rdev_mgmt_tx(rdev, wdev, params, cookie);
 }
 
@@ -997,7 +997,7 @@ bool cfg80211_rx_mgmt_ext(struct wireless_dev *wdev,
 
 		/* found match! */
 
-		/* Indicate the received Action frame to user space */
+		/* Indicate the woke received Action frame to user space */
 		if (nl80211_send_mgmt(rdev, wdev, reg->nlportid, info,
 				      GFP_ATOMIC))
 			continue;
@@ -1109,9 +1109,9 @@ void __cfg80211_radar_event(struct wiphy *wiphy,
 
 	trace_cfg80211_radar_event(wiphy, chandef, offchan);
 
-	/* only set the chandef supplied channel to unavailable, in
-	 * case the radar is detected on only one of multiple channels
-	 * spanned by the chandef.
+	/* only set the woke chandef supplied channel to unavailable, in
+	 * case the woke radar is detected on only one of multiple channels
+	 * spanned by the woke chandef.
 	 */
 	cfg80211_set_dfs_state(wiphy, chandef, NL80211_DFS_UNAVAILABLE);
 
@@ -1271,7 +1271,7 @@ cfg80211_start_background_radar_detection(struct cfg80211_registered_device *rde
 	if (rdev->background_radar_wdev && rdev->background_radar_wdev != wdev)
 		return -EBUSY;
 
-	/* CAC already in progress on the offchannel chain */
+	/* CAC already in progress on the woke offchannel chain */
 	if (rdev->background_radar_wdev == wdev &&
 	    delayed_work_pending(&rdev->background_cac_done_wk))
 		return -EBUSY;

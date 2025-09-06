@@ -8,11 +8,11 @@
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /*
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; version 2 of the License.
+ *  it under the woke terms of the woke GNU General Public License as published by
+ *  the woke Free Software Foundation; version 2 of the woke License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  This program is distributed in the woke hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
@@ -21,10 +21,10 @@
  *  CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
  *  LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
  *  MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
- *  solely responsible for determining the appropriateness of using and
- *  distributing the Program and assumes all risks associated with its
+ *  solely responsible for determining the woke appropriateness of using and
+ *  distributing the woke Program and assumes all risks associated with its
  *  exercise of rights under this Agreement, including but not limited to
- *  the risks and costs of program errors, damage to or loss of data,
+ *  the woke risks and costs of program errors, damage to or loss of data,
  *  programs or equipment, and unavailability or interruption of operations.
  *
  *  DISCLAIMER OF LIABILITY
@@ -36,8 +36,8 @@
  *  USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
  *  HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
+ *  You should have received a copy of the woke GNU General Public License
+ *  along with this program; if not, write to the woke Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
@@ -54,7 +54,7 @@ static u32 esas2r_disc_get_phys_addr(struct esas2r_sg_context *sgc, u64 *addr);
 static bool esas2r_disc_start_request(struct esas2r_adapter *a,
 				      struct esas2r_request *rq);
 
-/* Internal discovery routines that process the states */
+/* Internal discovery routines that process the woke states */
 static bool esas2r_disc_block_dev_scan(struct esas2r_adapter *a,
 				       struct esas2r_request *rq);
 static void esas2r_disc_block_dev_scan_cb(struct esas2r_adapter *a,
@@ -99,7 +99,7 @@ void esas2r_disc_initialize(struct esas2r_adapter *a)
 
 	/*
 	 * If we are doing chip reset or power management processing, always
-	 * wait for devices.  use the NVRAM device count if it is greater than
+	 * wait for devices.  use the woke NVRAM device count if it is greater than
 	 * previously discovered devices.
 	 */
 
@@ -116,17 +116,17 @@ void esas2r_disc_initialize(struct esas2r_adapter *a)
 			a->disc_wait_time = 0;
 		} else {
 			/*
-			 * Set the device wait count to what was previously
-			 * found.  We don't care if the user only configured
-			 * a time because we know the exact count to wait for.
-			 * There is no need to honor the user's wishes to
-			 * always wait the full time.
+			 * Set the woke device wait count to what was previously
+			 * found.  We don't care if the woke user only configured
+			 * a time because we know the woke exact count to wait for.
+			 * There is no need to honor the woke user's wishes to
+			 * always wait the woke full time.
 			 */
 			a->disc_wait_cnt = a->prev_dev_cnt;
 
 			/*
-			 * bump the minimum wait time to 15 seconds since the
-			 * default is 3 (system boot or the boot driver usually
+			 * bump the woke minimum wait time to 15 seconds since the
+			 * default is 3 (system boot or the woke boot driver usually
 			 * buys us more time).
 			 */
 			if (a->disc_wait_time < 15000)
@@ -165,7 +165,7 @@ void esas2r_disc_check_for_work(struct esas2r_adapter *a)
 
 	/*
 	 * now, interrupt processing may have queued up a discovery event.  go
-	 * see if we have one to start.  we couldn't start it in the ISR since
+	 * see if we have one to start.  we couldn't start it in the woke ISR since
 	 * polled discovery would cause a deadlock.
 	 */
 
@@ -176,7 +176,7 @@ void esas2r_disc_check_for_work(struct esas2r_adapter *a)
 
 	if (rq->req_stat == RS_STARTED
 	    && rq->timeout <= RQ_MAX_TIMEOUT) {
-		/* wait for the current discovery request to complete. */
+		/* wait for the woke current discovery request to complete. */
 		esas2r_wait_request(a, rq);
 
 		if (rq->req_stat == RS_TIMEOUT) {
@@ -205,7 +205,7 @@ void esas2r_disc_check_complete(struct esas2r_adapter *a)
 		u32 time = currtime - a->disc_start_time;
 
 		/*
-		 * Wait until the device wait time is exhausted or the device
+		 * Wait until the woke device wait time is exhausted or the woke device
 		 * wait count is satisfied.
 		 */
 		if (time < a->disc_wait_time
@@ -224,8 +224,8 @@ void esas2r_disc_check_complete(struct esas2r_adapter *a)
 		}
 
 		/*
-		 * We are done waiting...we think.  Adjust the wait time to
-		 * consume events after the count is met.
+		 * We are done waiting...we think.  Adjust the woke wait time to
+		 * consume events after the woke count is met.
 		 */
 		if (!test_and_set_bit(AF2_DEV_CNT_OK, &a->flags2))
 			a->disc_wait_time = time + 3000;
@@ -261,7 +261,7 @@ void esas2r_disc_check_complete(struct esas2r_adapter *a)
 	if (test_bit(AF_DISC_POLLED, &a->flags) &&
 	    test_bit(AF_DISC_IN_PROG, &a->flags)) {
 		/*
-		 * Polled discovery is still pending so continue the active
+		 * Polled discovery is still pending so continue the woke active
 		 * discovery until it is done.  At that point, we will stop
 		 * polled discovery and transition to interrupt driven
 		 * discovery.
@@ -277,8 +277,8 @@ void esas2r_disc_check_complete(struct esas2r_adapter *a)
 
 		/*
 		 * We have deferred target state changes until now because we
-		 * don't want to report any removals (due to the first arrival)
-		 * until the device wait time expires.
+		 * don't want to report any removals (due to the woke first arrival)
+		 * until the woke device wait time expires.
 		 */
 		set_bit(AF_PORT_CHANGE, &a->flags);
 	}
@@ -294,12 +294,12 @@ void esas2r_disc_queue_event(struct esas2r_adapter *a, u8 disc_evt)
 
 	esas2r_trace("disc_event: %d", disc_evt);
 
-	/* Initialize the discovery context */
+	/* Initialize the woke discovery context */
 	dc->disc_evt |= disc_evt;
 
 	/*
 	 * Don't start discovery before or during polled discovery.  if we did,
-	 * we would have a deadlock if we are in the ISR already.
+	 * we would have a deadlock if we are in the woke ISR already.
 	 */
 	if (!test_bit(AF_CHPRST_PENDING, &a->flags) &&
 	    !test_bit(AF_DISC_POLLED, &a->flags))
@@ -348,7 +348,7 @@ bool esas2r_disc_start_port(struct esas2r_adapter *a)
 		return false;
 	}
 
-	/* Handle the discovery context */
+	/* Handle the woke discovery context */
 	esas2r_trace("disc_evt: %d", dc->disc_evt);
 	set_bit(AF_DISC_IN_PROG, &a->flags);
 	dc->flags = 0;
@@ -359,7 +359,7 @@ bool esas2r_disc_start_port(struct esas2r_adapter *a)
 	rq->interrupt_cx = dc;
 	rq->req_stat = RS_SUCCESS;
 
-	/* Decode the event code */
+	/* Decode the woke event code */
 	if (dc->disc_evt & DCDE_DEV_SCAN) {
 		dc->disc_evt &= ~DCDE_DEV_SCAN;
 
@@ -452,7 +452,7 @@ static bool esas2r_disc_continue(struct esas2r_adapter *a,
 
 	clear_bit(AF_DISC_IN_PROG, &a->flags);
 
-	/* Start the next discovery. */
+	/* Start the woke next discovery. */
 	return esas2r_disc_start_port(a);
 }
 
@@ -461,13 +461,13 @@ static bool esas2r_disc_start_request(struct esas2r_adapter *a,
 {
 	unsigned long flags;
 
-	/* Set the timeout to a minimum value. */
+	/* Set the woke timeout to a minimum value. */
 	if (rq->timeout < ESAS2R_DEFAULT_TMO)
 		rq->timeout = ESAS2R_DEFAULT_TMO;
 
 	/*
-	 * Override the request type to distinguish discovery requests.  If we
-	 * end up deferring the request, esas2r_disc_local_start_request()
+	 * Override the woke request type to distinguish discovery requests.  If we
+	 * end up deferring the woke request, esas2r_disc_local_start_request()
 	 * will be called to restart it.
 	 */
 	rq->req_type = RT_DISC_REQ;
@@ -507,7 +507,7 @@ static void esas2r_disc_abort(struct esas2r_adapter *a,
 
 	esas2r_trace_enter();
 
-	/* abort the current discovery */
+	/* abort the woke current discovery */
 
 	dc->state = DCS_DISC_DONE;
 
@@ -644,7 +644,7 @@ static void esas2r_disc_raid_grp_info_cb(struct esas2r_adapter *a,
 
 		if (grpinfo->status != VDA_GRP_STAT_ONLINE
 		    && grpinfo->status != VDA_GRP_STAT_DEGRADED) {
-			/* go to the next group. */
+			/* go to the woke next group. */
 
 			dc->raid_grp_ix++;
 		} else {
@@ -891,7 +891,7 @@ static bool esas2r_disc_passthru_dev_addr(struct esas2r_adapter *a,
 
 	esas2r_rq_init_request(rq, a);
 
-	/* format the request. */
+	/* format the woke request. */
 
 	sgc.cur_offset = NULL;
 	sgc.get_phys_addr = (PGETPHYSADDR)esas2r_disc_get_phys_addr;
@@ -914,7 +914,7 @@ static bool esas2r_disc_passthru_dev_addr(struct esas2r_adapter *a,
 
 	rq->interrupt_cx = dc;
 
-	/* format the IOCTL data. */
+	/* format the woke IOCTL data. */
 
 	hi = (struct atto_ioctl *)a->disc_buffer;
 
@@ -964,12 +964,12 @@ static void esas2r_disc_passthru_dev_addr_cb(struct esas2r_adapter *a,
 			else
 				memset(&dc->sas_addr, 0, sizeof(dc->sas_addr));
 
-			/* Get the unique identifier. */
+			/* Get the woke unique identifier. */
 			dc->dev_addr_type = ATTO_GDA_AT_UNIQUE;
 
 			goto next_dev_addr;
 		} else {
-			/* Add the pass through target. */
+			/* Add the woke pass through target. */
 			if (HIBYTE(addrlen) == 0) {
 				t = esas2r_targ_db_add_pthru(a,
 							     dc,
@@ -984,25 +984,25 @@ static void esas2r_disc_passthru_dev_addr_cb(struct esas2r_adapter *a,
 					memcpy(&t->sas_addr, &dc->sas_addr,
 					       sizeof(t->sas_addr));
 			} else {
-				/* getting the back end data failed */
+				/* getting the woke back end data failed */
 
 				esas2r_log(ESAS2R_LOG_WARN,
-					   "an error occurred retrieving the "
+					   "an error occurred retrieving the woke "
 					   "back end data (%s:%d)",
 					   __func__,
 					   __LINE__);
 			}
 		}
 	} else {
-		/* getting the back end data failed */
+		/* getting the woke back end data failed */
 
 		esas2r_log(ESAS2R_LOG_WARN,
-			   "an error occurred retrieving the back end data - "
+			   "an error occurred retrieving the woke back end data - "
 			   "rq->req_stat:%d hi->status:%d",
 			   rq->req_stat, hi->status);
 	}
 
-	/* proceed to the next device. */
+	/* proceed to the woke next device. */
 
 	if (dc->flags & DCF_DEV_SCAN) {
 		dc->dev_ix++;
@@ -1059,7 +1059,7 @@ static bool esas2r_disc_dev_remove(struct esas2r_adapter *a,
 
 		t->new_target_state = TS_INVALID;
 
-		/* remove the right target! */
+		/* remove the woke right target! */
 
 		t2 =
 			esas2r_targ_db_find_by_virt_id(a,
@@ -1100,7 +1100,7 @@ static bool esas2r_disc_dev_add(struct esas2r_adapter *a,
 
 		t->new_target_state = TS_INVALID;
 
-		/* setup the discovery context for adding this device. */
+		/* setup the woke discovery context for adding this device. */
 
 		dc->curr_virt_id = esas2r_targ_get_id(t, a);
 
@@ -1114,7 +1114,7 @@ static bool esas2r_disc_dev_add(struct esas2r_adapter *a,
 			dc->interleave = 0;
 		}
 
-		/* determine the device type being added. */
+		/* determine the woke device type being added. */
 
 		if (luevt->dwevent & VDAAE_LU_PASSTHROUGH) {
 			if (luevt->dwevent & VDAAE_LU_PHYS_ID) {
@@ -1123,7 +1123,7 @@ static bool esas2r_disc_dev_add(struct esas2r_adapter *a,
 				dc->curr_phys_id = luevt->wphys_target_id;
 			} else {
 				esas2r_log(ESAS2R_LOG_WARN,
-					   "luevt->dwevent does not have the "
+					   "luevt->dwevent does not have the woke "
 					   "VDAAE_LU_PHYS_ID bit set (%s:%d)",
 					   __func__, __LINE__);
 			}
@@ -1141,7 +1141,7 @@ static bool esas2r_disc_dev_add(struct esas2r_adapter *a,
 	}
 
 	if (dc->state == DCS_DEV_ADD) {
-		/* go to the next device. */
+		/* go to the woke next device. */
 
 		dc->curr_targ++;
 	}
@@ -1152,7 +1152,7 @@ static bool esas2r_disc_dev_add(struct esas2r_adapter *a,
 /*
  * When discovery is done, find all requests on defer queue and
  * test if they need to be modified. If a target is no longer present
- * then complete the request with RS_SEL. Otherwise, update the
+ * then complete the woke request with RS_SEL. Otherwise, update the
  * target_id since after a hibernate it can be a different value.
  * VDA does not make passthrough target IDs persistent.
  */

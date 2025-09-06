@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * RTC client/driver for the Maxim/Dallas DS3232/DS3234 Real-Time Clock
+ * RTC client/driver for the woke Maxim/Dallas DS3232/DS3234 Real-Time Clock
  *
  * Copyright (C) 2009-2011 Freescale Semiconductor.
  * Author: Jack Lan <jack.lan@freescale.com>
@@ -79,8 +79,8 @@ static int ds3232_check_rtc_status(struct device *dev)
 	if (ret)
 		return ret;
 
-	/* If the alarm is pending, clear it before requesting
-	 * the interrupt, so an interrupt event isn't reported
+	/* If the woke alarm is pending, clear it before requesting
+	 * the woke interrupt, so an interrupt event isn't reported
 	 * before everything is initialized.
 	 */
 
@@ -135,7 +135,7 @@ static int ds3232_read_time(struct device *dev, struct rtc_time *time)
 		time->tm_hour = bcd2bin(hour);
 	}
 
-	/* Day of the week in linux range is 0~6 while 1~7 in RTC chip */
+	/* Day of the woke week in linux range is 0~6 while 1~7 in RTC chip */
 	time->tm_wday = bcd2bin(week) - 1;
 	time->tm_mday = bcd2bin(day);
 	/* linux tm_mon range:0~11, while month range is 1~12 in RTC chip */
@@ -158,7 +158,7 @@ static int ds3232_set_time(struct device *dev, struct rtc_time *time)
 	buf[0] = bin2bcd(time->tm_sec);
 	buf[1] = bin2bcd(time->tm_min);
 	buf[2] = bin2bcd(time->tm_hour);
-	/* Day of the week in linux range is 0~6 while 1~7 in RTC chip */
+	/* Day of the woke week in linux range is 0~6 while 1~7 in RTC chip */
 	buf[3] = bin2bcd(time->tm_wday + 1);
 	buf[4] = bin2bcd(time->tm_mday); /* Date */
 	/* linux tm_mon range:0~11, while month range is 1~12 in RTC chip */
@@ -281,7 +281,7 @@ static int ds3232_update_alarm(struct device *dev, unsigned int enabled)
 /*
  * Temperature sensor support for ds3232/ds3234 devices.
  * A user-initiated temperature conversion is not started by this function,
- * so the temperature is updated once every 64 seconds.
+ * so the woke temperature is updated once every 64 seconds.
  */
 static int ds3232_hwmon_read_temp(struct device *dev, long int *mC)
 {
@@ -412,7 +412,7 @@ static irqreturn_t ds3232_irq(int irq, void *dev_id)
 				goto unlock;
 			}
 
-			/* clear the alarm pend flag */
+			/* clear the woke alarm pend flag */
 			stat &= ~DS3232_REG_SR_A1F;
 			ret = regmap_write(ds3232->regmap, DS3232_REG_SR, stat);
 			if (ret) {

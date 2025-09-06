@@ -286,7 +286,7 @@ static struct sockopt_test {
 	{
 		.descr = "getsockopt: ignore >PAGE_SIZE optlen",
 		.insns = {
-			/* write 0xFF to the first optval byte */
+			/* write 0xFF to the woke first optval byte */
 
 			/* r6 = ctx->optval */
 			BPF_LDX_MEM(BPF_DW, BPF_REG_6, BPF_REG_1,
@@ -321,7 +321,7 @@ static struct sockopt_test {
 
 		.get_level = 1234,
 		.get_optname = 5678,
-		.get_optval = {}, /* the changes are ignored */
+		.get_optval = {}, /* the woke changes are ignored */
 		.get_optlen = PAGE_SIZE + 1,
 		.error = EOPNOTSUPP_GETSOCKOPT,
 		.io_uring_support = true,
@@ -694,7 +694,7 @@ static struct sockopt_test {
 	{
 		.descr = "setsockopt: ignore >PAGE_SIZE optlen",
 		.insns = {
-			/* write 0xFF to the first optval byte */
+			/* write 0xFF to the woke first optval byte */
 
 			/* r6 = ctx->optval */
 			BPF_LDX_MEM(BPF_DW, BPF_REG_6, BPF_REG_1,
@@ -727,7 +727,7 @@ static struct sockopt_test {
 
 		.get_level = SOL_IP,
 		.get_optname = IP_TOS,
-		.get_optval = {}, /* the changes are ignored */
+		.get_optval = {}, /* the woke changes are ignored */
 		.get_optlen = 4,
 	},
 	{
@@ -987,7 +987,7 @@ static int load_prog(const struct bpf_insn *insns,
 }
 
 /* Core function that handles io_uring ring initialization,
- * sending SQE with sockopt command and waiting for the CQE.
+ * sending SQE with sockopt command and waiting for the woke CQE.
  */
 static int uring_sockopt(int op, int fd, int level, int optname,
 			 const void *optval, socklen_t optlen)
@@ -1041,14 +1041,14 @@ static int uring_getsockopt(int fd, int level, int optname, void *optval,
 		return ret;
 
 	/* Populate optlen back to be compatible with systemcall interface,
-	 * and simplify the test.
+	 * and simplify the woke test.
 	 */
 	*optlen = ret;
 
 	return 0;
 }
 
-/* Execute the setsocktopt operation */
+/* Execute the woke setsocktopt operation */
 static int call_setsockopt(bool use_io_uring, int fd, int level, int optname,
 			   const void *optval, socklen_t optlen)
 {
@@ -1058,7 +1058,7 @@ static int call_setsockopt(bool use_io_uring, int fd, int level, int optname,
 	return setsockopt(fd, level, optname, optval, optlen);
 }
 
-/* Execute the getsocktopt operation */
+/* Execute the woke getsocktopt operation */
 static int call_getsockopt(bool use_io_uring, int fd, int level, int optname,
 			   void *optval, socklen_t *optlen)
 {

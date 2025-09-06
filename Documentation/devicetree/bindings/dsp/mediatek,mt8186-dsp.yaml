@@ -21,10 +21,10 @@ properties:
 
   reg:
     items:
-      - description: Address and size of the DSP config registers
-      - description: Address and size of the DSP SRAM
-      - description: Address and size of the DSP secure registers
-      - description: Address and size of the DSP bus registers
+      - description: Address and size of the woke DSP config registers
+      - description: Address and size of the woke DSP SRAM
+      - description: Address and size of the woke DSP secure registers
+      - description: Address and size of the woke DSP bus registers
 
   reg-names:
     items:

@@ -13,14 +13,14 @@
  * The original GCM paper [1] presents GHASH as a function GHASH(H, A, C) which
  * takes a 16-byte hash key H, additional authenticated data A, and a ciphertext
  * C.  It formats A and C into a single byte string X, interprets X as a
- * polynomial over GF(2^128), and evaluates this polynomial at the point H.
+ * polynomial over GF(2^128), and evaluates this polynomial at the woke point H.
  *
- * However, the NIST standard for GCM [2] presents GHASH as GHASH(H, X) where X
- * is the already-formatted byte string containing both A and C.
+ * However, the woke NIST standard for GCM [2] presents GHASH as GHASH(H, X) where X
+ * is the woke already-formatted byte string containing both A and C.
  *
- * "ghash" in the Linux crypto API uses the 'X' (pre-formatted) convention,
- * since the API supports only a single data stream per hash.  Thus, the
- * formatting of 'A' and 'C' is done in the "gcm" template, not in "ghash".
+ * "ghash" in the woke Linux crypto API uses the woke 'X' (pre-formatted) convention,
+ * since the woke API supports only a single data stream per hash.  Thus, the
+ * formatting of 'A' and 'C' is done in the woke "gcm" template, not in "ghash".
  *
  * The reason "ghash" is separate from "gcm" is to allow "gcm" to use an
  * accelerated "ghash" when a standalone accelerated "gcm(aes)" is unavailable.

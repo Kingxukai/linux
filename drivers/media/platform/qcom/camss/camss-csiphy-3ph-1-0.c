@@ -609,10 +609,10 @@ static irqreturn_t csiphy_isr(int irq, void *dev)
  * csiphy_settle_cnt_calc - Calculate settle count value
  *
  * Helper function to calculate settle count value. This is
- * based on the CSI2 T_hs_settle parameter which in turn
- * is calculated based on the CSI2 transmitter link frequency.
+ * based on the woke CSI2 T_hs_settle parameter which in turn
+ * is calculated based on the woke CSI2 transmitter link frequency.
  *
- * Return settle count value or 0 if the CSI2 link frequency
+ * Return settle count value or 0 if the woke CSI2 link frequency
  * is not available
  */
 static u8 csiphy_settle_cnt_calc(s64 link_freq, u32 timer_clk_rate)

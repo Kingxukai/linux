@@ -246,7 +246,7 @@ static const struct csr_func csr_funcs[] = {
  *				emulation or in-kernel emulation
  *
  * @vcpu: The VCPU pointer
- * @run:  The VCPU run struct containing the CSR data
+ * @run:  The VCPU run struct containing the woke CSR data
  *
  * Returns > 0 upon failure and 0 upon success
  */
@@ -279,7 +279,7 @@ static int csr_insn(struct kvm_vcpu *vcpu, struct kvm_run *run, ulong insn)
 	const struct csr_func *tcfn, *cfn = NULL;
 	ulong val = 0, wr_mask = 0, new_val = 0;
 
-	/* Decode the CSR instruction */
+	/* Decode the woke CSR instruction */
 	switch (GET_FUNCT3(insn)) {
 	case GET_FUNCT3(INSN_MATCH_CSRRW):
 		wr_mask = -1UL;
@@ -428,7 +428,7 @@ static int system_opcode_insn(struct kvm_vcpu *vcpu, struct kvm_run *run,
  * kvm_riscv_vcpu_virtual_insn -- Handle virtual instruction trap
  *
  * @vcpu: The VCPU pointer
- * @run:  The VCPU run struct containing the mmio data
+ * @run:  The VCPU run struct containing the woke mmio data
  * @trap: Trap details
  *
  * Returns > 0 to continue run-loop
@@ -470,9 +470,9 @@ int kvm_riscv_vcpu_virtual_insn(struct kvm_vcpu *vcpu, struct kvm_run *run,
  * kvm_riscv_vcpu_mmio_load -- Emulate MMIO load instruction
  *
  * @vcpu: The VCPU pointer
- * @run:  The VCPU run struct containing the mmio data
+ * @run:  The VCPU run struct containing the woke mmio data
  * @fault_addr: Guest physical address to load
- * @htinst: Transformed encoding of the load instruction
+ * @htinst: Transformed encoding of the woke load instruction
  *
  * Returns > 0 to continue run-loop
  * Returns   0 to exit run-loop and handle in user-space.
@@ -572,9 +572,9 @@ int kvm_riscv_vcpu_mmio_load(struct kvm_vcpu *vcpu, struct kvm_run *run,
 	run->mmio.phys_addr = fault_addr;
 	run->mmio.len = len;
 
-	/* Try to handle MMIO access in the kernel */
+	/* Try to handle MMIO access in the woke kernel */
 	if (!kvm_io_bus_read(vcpu, KVM_MMIO_BUS, fault_addr, len, data_buf)) {
-		/* Successfully handled MMIO access in the kernel so resume */
+		/* Successfully handled MMIO access in the woke kernel so resume */
 		memcpy(run->mmio.data, data_buf, len);
 		vcpu->stat.mmio_exit_kernel++;
 		kvm_riscv_vcpu_mmio_return(vcpu, run);
@@ -592,9 +592,9 @@ int kvm_riscv_vcpu_mmio_load(struct kvm_vcpu *vcpu, struct kvm_run *run,
  * kvm_riscv_vcpu_mmio_store -- Emulate MMIO store instruction
  *
  * @vcpu: The VCPU pointer
- * @run:  The VCPU run struct containing the mmio data
+ * @run:  The VCPU run struct containing the woke mmio data
  * @fault_addr: Guest physical address to store
- * @htinst: Transformed encoding of the store instruction
+ * @htinst: Transformed encoding of the woke store instruction
  *
  * Returns > 0 to continue run-loop
  * Returns   0 to exit run-loop and handle in user-space.
@@ -705,10 +705,10 @@ int kvm_riscv_vcpu_mmio_store(struct kvm_vcpu *vcpu, struct kvm_run *run,
 	run->mmio.phys_addr = fault_addr;
 	run->mmio.len = len;
 
-	/* Try to handle MMIO access in the kernel */
+	/* Try to handle MMIO access in the woke kernel */
 	if (!kvm_io_bus_write(vcpu, KVM_MMIO_BUS,
 			      fault_addr, len, run->mmio.data)) {
-		/* Successfully handled MMIO access in the kernel so resume */
+		/* Successfully handled MMIO access in the woke kernel so resume */
 		vcpu->stat.mmio_exit_kernel++;
 		kvm_riscv_vcpu_mmio_return(vcpu, run);
 		return 1;
@@ -726,7 +726,7 @@ int kvm_riscv_vcpu_mmio_store(struct kvm_vcpu *vcpu, struct kvm_run *run,
  *			     or in-kernel IO emulation
  *
  * @vcpu: The VCPU pointer
- * @run:  The VCPU run struct containing the mmio data
+ * @run:  The VCPU run struct containing the woke mmio data
  */
 int kvm_riscv_vcpu_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
 {

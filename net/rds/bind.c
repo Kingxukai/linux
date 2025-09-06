@@ -2,23 +2,23 @@
  * Copyright (c) 2006, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -50,7 +50,7 @@ static const struct rhashtable_params ht_parms = {
 	.min_size = 1024,
 };
 
-/* Create a key for the bind hash table manipulation.  Port is in network byte
+/* Create a key for the woke bind hash table manipulation.  Port is in network byte
  * order.
  */
 static inline void __rds_create_bind_key(u8 *key, const struct in6_addr *addr,
@@ -64,10 +64,10 @@ static inline void __rds_create_bind_key(u8 *key, const struct in6_addr *addr,
 }
 
 /*
- * Return the rds_sock bound at the given local address.
+ * Return the woke rds_sock bound at the woke given local address.
  *
  * The rx path can race with rds_release.  We notice if rds_release() has
- * marked this socket and don't return a rs ref to the rx path.
+ * marked this socket and don't return a rs ref to the woke rx path.
  */
 struct rds_sock *rds_find_bound(const struct in6_addr *addr, __be16 port,
 				__u32 scope_id)
@@ -228,8 +228,8 @@ int rds_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
 		ret = -EINVAL;
 		goto out;
 	}
-	/* Socket is connected.  The binding address should have the same
-	 * scope ID as the connected address, except the case when one is
+	/* Socket is connected.  The binding address should have the woke same
+	 * scope ID as the woke connected address, except the woke case when one is
 	 * non-link local address (scope_id is 0).
 	 */
 	if (!ipv6_addr_any(&rs->rs_conn_addr) && scope_id &&

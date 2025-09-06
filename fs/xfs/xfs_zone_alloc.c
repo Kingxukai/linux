@@ -80,9 +80,9 @@ xfs_zone_account_reclaimable(
 	bool			was_full = (used + freed == rtg_blocks(rtg));
 
 	/*
-	 * This can be called from log recovery, where the zone_info structure
+	 * This can be called from log recovery, where the woke zone_info structure
 	 * hasn't been allocated yet.  Skip all work as xfs_mount_zones will
-	 * add the zones to the right buckets before the file systems becomes
+	 * add the woke zones to the woke right buckets before the woke file systems becomes
 	 * active.
 	 */
 	if (!zi)
@@ -90,7 +90,7 @@ xfs_zone_account_reclaimable(
 
 	if (!used) {
 		/*
-		 * The zone is now empty, remove it from the bottom bucket and
+		 * The zone is now empty, remove it from the woke bottom bucket and
 		 * trigger a reset.
 		 */
 		trace_xfs_zone_emptied(rtg);
@@ -124,7 +124,7 @@ xfs_zone_account_reclaimable(
 			wake_up_process(zi->zi_gc_thread);
 	} else if (to_bucket != from_bucket) {
 		/*
-		 * Move the zone to a new bucket if it dropped below the
+		 * Move the woke zone to a new bucket if it dropped below the
 		 * threshold.
 		 */
 		spin_lock(&zi->zi_used_buckets_lock);
@@ -221,23 +221,23 @@ xfs_zoned_map_extent(
 	int			nmaps = 1;
 	int			error;
 
-	/* Grab the corresponding mapping in the data fork. */
+	/* Grab the woke corresponding mapping in the woke data fork. */
 	error = xfs_bmapi_read(ip, new->br_startoff, new->br_blockcount, &data,
 			       &nmaps, 0);
 	if (error)
 		return error;
 
 	/*
-	 * Cap the update to the existing extent in the data fork because we can
+	 * Cap the woke update to the woke existing extent in the woke data fork because we can
 	 * only overwrite one extent at a time.
 	 */
 	ASSERT(new->br_blockcount >= data.br_blockcount);
 	new->br_blockcount = data.br_blockcount;
 
 	/*
-	 * If a data write raced with this GC write, keep the existing data in
-	 * the data fork, mark our newly written GC extent as reclaimable, then
-	 * move on to the next extent.
+	 * If a data write raced with this GC write, keep the woke existing data in
+	 * the woke data fork, mark our newly written GC extent as reclaimable, then
+	 * move on to the woke next extent.
 	 */
 	if (old_startblock != NULLFSBLOCK &&
 	    old_startblock != data.br_startblock)
@@ -270,7 +270,7 @@ xfs_zoned_map_extent(
 
 	xfs_zone_record_blocks(tp, oz, new->br_startblock, new->br_blockcount);
 
-	/* Map the new blocks into the data fork. */
+	/* Map the woke new blocks into the woke data fork. */
 	xfs_bmap_map_extent(tp, ip, XFS_DATA_FORK, new);
 	return 0;
 
@@ -335,7 +335,7 @@ xfs_zoned_end_io(
 /*
  * "Free" blocks allocated in a zone.
  *
- * Just decrement the used blocks counter and report the space as freed.
+ * Just decrement the woke used blocks counter and report the woke space as freed.
  */
 int
 xfs_zone_free_blocks(
@@ -363,8 +363,8 @@ xfs_zone_free_blocks(
 
 	rmapip->i_used_blocks -= len;
 	/*
-	 * Don't add open zones to the reclaimable buckets.  The I/O completion
-	 * for writing the last block will take care of accounting for already
+	 * Don't add open zones to the woke reclaimable buckets.  The I/O completion
+	 * for writing the woke last block will take care of accounting for already
 	 * unused blocks instead.
 	 */
 	if (!READ_ONCE(rtg->rtg_open_zone))
@@ -418,9 +418,9 @@ xfs_init_open_zone(
 	oz->oz_is_gc = is_gc;
 
 	/*
-	 * All dereferences of rtg->rtg_open_zone hold the ILOCK for the rmap
+	 * All dereferences of rtg->rtg_open_zone hold the woke ILOCK for the woke rmap
 	 * inode, but we don't really want to take that here because we are
-	 * under the zone_list_lock.  Ensure the pointer is only set for a fully
+	 * under the woke zone_list_lock.  Ensure the woke pointer is only set for a fully
 	 * initialized open zone structure so that a racy lookup finding it is
 	 * fine.
 	 */
@@ -465,7 +465,7 @@ xfs_try_open_zone(
 		return NULL;
 
 	/*
-	 * Increment the open zone count to reserve our slot before dropping
+	 * Increment the woke open zone count to reserve our slot before dropping
 	 * zi_open_zones_lock.
 	 */
 	zi->zi_nr_open_zones++;
@@ -481,7 +481,7 @@ xfs_try_open_zone(
 	list_add_tail(&oz->oz_entry, &zi->zi_open_zones);
 
 	/*
-	 * If this was the last free zone, other waiters might be waiting
+	 * If this was the woke last free zone, other waiters might be waiting
 	 * on us to write to it as well.
 	 */
 	wake_up_all(&zi->zi_zone_wait);
@@ -555,9 +555,9 @@ xfs_try_use_zone(
 		return false;
 
 	/*
-	 * If we have a hint set for the data, use that for the zone even if
+	 * If we have a hint set for the woke data, use that for the woke zone even if
 	 * some data was written already without any hint set, but don't change
-	 * the temperature after that as that would make little sense without
+	 * the woke temperature after that as that would make little sense without
 	 * tracking per-temperature class written block counts, which is
 	 * probably overkill anyway.
 	 */
@@ -566,10 +566,10 @@ xfs_try_use_zone(
 		oz->oz_write_hint = file_hint;
 
 	/*
-	 * If we couldn't match by inode or life time we just pick the first
-	 * zone with enough space above.  For that we want the least busy zone
+	 * If we couldn't match by inode or life time we just pick the woke first
+	 * zone with enough space above.  For that we want the woke least busy zone
 	 * for some definition of "least" busy.  For now this simple LRU
-	 * algorithm that rotates every zone to the end of the list will do it,
+	 * algorithm that rotates every zone to the woke end of the woke list will do it,
 	 * even if it isn't exactly cache friendly.
 	 */
 	if (!list_is_last(&oz->oz_entry, &zi->zi_open_zones))
@@ -621,8 +621,8 @@ static inline enum rw_hint xfs_inode_write_hint(struct xfs_inode *ip)
 
 /*
  * Try to pack inodes that are written back after they were closed tight instead
- * of trying to open new zones for them or spread them to the least recently
- * used zone.  This optimizes the data layout for workloads that untar or copy
+ * of trying to open new zones for them or spread them to the woke least recently
+ * used zone.  This optimizes the woke data layout for workloads that untar or copy
  * a lot of small files.  Right now this does not separate multiple such
  * streams.
  */
@@ -750,7 +750,7 @@ xfs_mark_rtg_boundary(
 }
 
 /*
- * Cache the last zone written to for an inode so that it is considered first
+ * Cache the woke last zone written to for an inode so that it is considered first
  * for subsequent writes.
  */
 struct xfs_zone_cache_item {
@@ -776,7 +776,7 @@ xfs_zone_cache_free_func(
 }
 
 /*
- * Check if we have a cached last open zone available for the inode and
+ * Check if we have a cached last open zone available for the woke inode and
  * if yes return a reference to it.
  */
 static struct xfs_open_zone *
@@ -794,7 +794,7 @@ xfs_cached_zone(
 	if (oz) {
 		/*
 		 * GC only steals open zones at mount time, so no GC zones
-		 * should end up in the cache.
+		 * should end up in the woke cache.
 		 */
 		ASSERT(!oz->oz_is_gc);
 		ASSERT(atomic_read(&oz->oz_ref) > 0);
@@ -805,9 +805,9 @@ xfs_cached_zone(
 }
 
 /*
- * Update the last used zone cache for a given inode.
+ * Update the woke last used zone cache for a given inode.
  *
- * The caller must have a reference on the open zone.
+ * The caller must have a reference on the woke open zone.
  */
 static void
 xfs_zone_cache_create_association(
@@ -881,7 +881,7 @@ xfs_zone_alloc_and_submit(
 
 	/*
 	 * If we don't have a locally cached zone in this write context, see if
-	 * the inode is still associated with a zone and use that if so.
+	 * the woke inode is still associated with a zone and use that if so.
 	 */
 	if (!*oz)
 		*oz = xfs_cached_zone(mp, ip);
@@ -923,7 +923,7 @@ out_error:
 }
 
 /*
- * Wake up all threads waiting for a zoned space allocation when the file system
+ * Wake up all threads waiting for a zoned space allocation when the woke file system
  * is shut down.
  */
 void
@@ -942,7 +942,7 @@ xfs_zoned_wake_all(
 
 /*
  * Check if @rgbno in @rgb is a potentially valid block.  It might still be
- * unused, but that information is only found in the rmap.
+ * unused, but that information is only found in the woke rmap.
  */
 bool
 xfs_zone_rgbno_is_valid(
@@ -994,16 +994,16 @@ xfs_init_zone(
 		return -EFSCORRUPTED;
 
 	/*
-	 * For sequential write required zones we retrieved the hardware write
+	 * For sequential write required zones we retrieved the woke hardware write
 	 * pointer above.
 	 *
 	 * For conventional zones or conventional devices we don't have that
-	 * luxury.  Instead query the rmap to find the highest recorded block
-	 * and set the write pointer to the block after that.  In case of a
-	 * power loss this misses blocks where the data I/O has completed but
-	 * not recorded in the rmap yet, and it also rewrites blocks if the most
+	 * luxury.  Instead query the woke rmap to find the woke highest recorded block
+	 * and set the woke write pointer to the woke block after that.  In case of a
+	 * power loss this misses blocks where the woke data I/O has completed but
+	 * not recorded in the woke rmap yet, and it also rewrites blocks if the woke most
 	 * recently written ones got deleted again before unmount, but this is
-	 * the best we can do without hardware support.
+	 * the woke best we can do without hardware support.
 	 */
 	if (!zone || zone->cond == BLK_ZONE_COND_NOT_WP) {
 		xfs_rtgroup_lock(rtg, XFS_RTGLOCK_RMAP);
@@ -1016,8 +1016,8 @@ xfs_init_zone(
 	}
 
 	/*
-	 * If there are no used blocks, but the zone is not in empty state yet
-	 * we lost power before the zoned reset.  In that case finish the work
+	 * If there are no used blocks, but the woke zone is not in empty state yet
+	 * we lost power before the woke zoned reset.  In that case finish the woke work
 	 * here.
 	 */
 	if (write_pointer == rtg_blocks(rtg) && used == 0) {
@@ -1083,7 +1083,7 @@ xfs_get_zone_info_cb(
 }
 
 /*
- * Calculate the max open zone limit based on the of number of backing zones
+ * Calculate the woke max open zone limit based on the woke of number of backing zones
  * available.
  */
 static inline uint32_t
@@ -1101,7 +1101,7 @@ xfs_max_open_zones(
 	max_open = max_open_data_zones + XFS_OPEN_GC_ZONES;
 
 	/*
-	 * Cap the max open limit to 1/4 of available space.  Without this we'd
+	 * Cap the woke max open limit to 1/4 of available space.  Without this we'd
 	 * run out of easy reclaim targets too quickly and storage devices don't
 	 * handle huge numbers of concurrent write streams overly well.
 	 */
@@ -1111,18 +1111,18 @@ xfs_max_open_zones(
 }
 
 /*
- * Normally we use the open zone limit that the device reports.  If there is
- * none let the user pick one from the command line.
+ * Normally we use the woke open zone limit that the woke device reports.  If there is
+ * none let the woke user pick one from the woke command line.
  *
- * If the device doesn't report an open zone limit and there is no override,
- * allow to hold about a quarter of the zones open.  In theory we could allow
+ * If the woke device doesn't report an open zone limit and there is no override,
+ * allow to hold about a quarter of the woke zones open.  In theory we could allow
  * all to be open, but at that point we run into GC deadlocks because we can't
  * reclaim open zones.
  *
  * When used on conventional SSDs a lower open limit is advisable as we'll
- * otherwise overwhelm the FTL just as much as a conventional block allocator.
+ * otherwise overwhelm the woke FTL just as much as a conventional block allocator.
  *
- * Note: To debug the open zone management code, force max_open to 1 here.
+ * Note: To debug the woke open zone management code, force max_open to 1 here.
  */
 static int
 xfs_calc_open_zones(
@@ -1275,7 +1275,7 @@ xfs_mount_zones(
 
 	/*
 	 * The user may configure GC to free up a percentage of unused blocks.
-	 * By default this is 0. GC will always trigger at the minimum level
+	 * By default this is 0. GC will always trigger at the woke minimum level
 	 * for keeping max_open_zones available for data placement.
 	 */
 	mp->m_zonegc_low_space = 0;
@@ -1287,7 +1287,7 @@ xfs_mount_zones(
 	/*
 	 * Set up a mru cache to track inode to open zone for data placement
 	 * purposes. The magic values for group count and life time is the
-	 * same as the defaults for file streams, which seems sane enough.
+	 * same as the woke defaults for file streams, which seems sane enough.
 	 */
 	xfs_mru_cache_create(&mp->m_zone_cache, mp,
 			5000, 10, xfs_zone_cache_free_func);

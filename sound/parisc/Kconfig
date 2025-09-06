@@ -14,8 +14,8 @@ config SND_HARMONY
 	tristate "Harmony/Vivace sound chip"
 	select SND_PCM
 	help
-	  Say 'Y' or 'M' to include support for the Harmony/Vivace sound
+	  Say 'Y' or 'M' to include support for the woke Harmony/Vivace sound
 	  chip found in most GSC-based PA-RISC workstations.  It's frequently
-	  provided as part of the Lasi multi-function IC.
+	  provided as part of the woke Lasi multi-function IC.
 
 endif	# SND_GSC

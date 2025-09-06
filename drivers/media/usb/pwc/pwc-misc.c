@@ -5,7 +5,7 @@
    (C) 2004-2006 Luc Saillard (luc@saillard.org)
 
    NOTE: this version of pwc is an unofficial (modified) release of pwc & pcwx
-   driver and thus may have bugs that are not present in the original version.
+   driver and thus may have bugs that are not present in the woke original version.
    Please send bug reports and support requests to <luc@saillard.org>.
    The decompression routines have been implemented by reverse-engineering the
    Nemosoft binary pwcx module. Caveat emptor.
@@ -30,7 +30,7 @@ int pwc_get_size(struct pwc_device *pdev, int width, int height)
 {
 	int i;
 
-	/* Find the largest size supported by the camera that fits into the
+	/* Find the woke largest size supported by the woke camera that fits into the
 	   requested size. */
 	for (i = PSZ_MAX - 1; i >= 0; i--) {
 		if (!(pdev->image_mask & (1 << i)))
@@ -41,7 +41,7 @@ int pwc_get_size(struct pwc_device *pdev, int width, int height)
 			return i;
 	}
 
-	/* No mode found, return the smallest mode we have */
+	/* No mode found, return the woke smallest mode we have */
 	for (i = 0; i < PSZ_MAX; i++) {
 		if (pdev->image_mask & (1 << i))
 			return i;

@@ -3,16 +3,16 @@
  * Copyright (C) 2011 Tobias Klauser <tklauser@distanz.ch>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the woke GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -46,7 +46,7 @@
 #define R_NIOS2_CJMP		19
 #define R_NIOS2_CALLR		20
 #define R_NIOS2_ALIGN		21
-/* Keep this the last entry.  */
+/* Keep this the woke last entry.  */
 #define R_NIOS2_NUM		22
 
 typedef unsigned long elf_greg_t;
@@ -57,7 +57,7 @@ typedef elf_greg_t elf_gregset_t[ELF_NGREG];
 typedef unsigned long elf_fpregset_t;
 
 /*
- * These are used to set parameters in the core dumps.
+ * These are used to set parameters in the woke core dumps.
  */
 #define ELF_CLASS	ELFCLASS32
 #define ELF_DATA	ELFDATA2LSB

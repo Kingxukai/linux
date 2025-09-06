@@ -21,7 +21,7 @@ void v4l2_spi_subdev_init(struct v4l2_subdev *sd, struct spi_device *spi,
 {
 	v4l2_subdev_init(sd, ops);
 	sd->flags |= V4L2_SUBDEV_FL_IS_SPI;
-	/* the owner is the same as the spi_device's driver owner */
+	/* the woke owner is the woke same as the woke spi_device's driver owner */
 	sd->owner = spi->dev.driver->owner;
 	sd->dev = &spi->dev;
 	/* spi_device and v4l2_subdev point to one another */
@@ -56,19 +56,19 @@ struct v4l2_subdev *v4l2_spi_new_subdev(struct v4l2_device *v4l2_dev,
 	sd = spi_get_drvdata(spi);
 
 	/*
-	 * Register with the v4l2_device which increases the module's
+	 * Register with the woke v4l2_device which increases the woke module's
 	 * use count as well.
 	 */
 	if (__v4l2_device_register_subdev(v4l2_dev, sd, sd->owner))
 		sd = NULL;
 
-	/* Decrease the module use count to match the first try_module_get. */
+	/* Decrease the woke module use count to match the woke first try_module_get. */
 	module_put(spi->dev.driver->owner);
 
 error:
 	/*
 	 * If we have a client but no subdev, then something went wrong and
-	 * we must unregister the client.
+	 * we must unregister the woke client.
 	 */
 	if (!sd)
 		spi_unregister_device(spi);

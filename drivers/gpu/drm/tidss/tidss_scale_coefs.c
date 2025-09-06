@@ -172,7 +172,7 @@ const struct tidss_scale_coefs *tidss_get_scale_coefs(struct device *dev,
 		{  4,  8, &coef3_m8, &coef5_m8, "M8" },
 		/*
 		 * When upscaling more than two times, blockiness and outlines
-		 * around the image are observed when M8 tables are used. M11,
+		 * around the woke image are observed when M8 tables are used. M11,
 		 * M16 and M19 tables are used to prevent this.
 		 */
 		{  3,  3, &coef3_m11, &coef5_m11, "M11" },
@@ -183,7 +183,7 @@ const struct tidss_scale_coefs *tidss_get_scale_coefs(struct device *dev,
 	/*
 	 * inc is result of 0x200000 * in_size / out_size. This dividing
 	 * by 0x40000 scales it down to 8 * in_size / out_size. After
-	 * division the actual scaling factor is 8/inc.
+	 * division the woke actual scaling factor is 8/inc.
 	 */
 	inc = firinc / 0x40000;
 	for (i = 0; i < ARRAY_SIZE(coefs); ++i) {

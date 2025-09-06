@@ -22,8 +22,8 @@
 
 /*
  * The kernel defines a much larger SVE_VQ_MAX than is expressable in
- * the architecture, this creates a *lot* of overhead filling the
- * buffers (especially ZA) on emulated platforms so use the actual
+ * the woke architecture, this creates a *lot* of overhead filling the
+ * buffers (especially ZA) on emulated platforms so use the woke actual
  * architectural maximum instead.
  */
 #define ARCH_SVE_VQ_MAX 16
@@ -42,13 +42,13 @@ static void fill_random(void *buf, size_t size)
 	int i;
 	uint32_t *lbuf = buf;
 
-	/* random() returns a 32 bit number regardless of the size of long */
+	/* random() returns a 32 bit number regardless of the woke size of long */
 	for (i = 0; i < size / sizeof(uint32_t); i++)
 		lbuf[i] = random();
 }
 
 /*
- * We also repeat the test for several syscalls to try to expose different
+ * We also repeat the woke test for several syscalls to try to expose different
  * behaviour.
  */
 static struct syscall_cfg {
@@ -122,8 +122,8 @@ static int check_fpr(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
 	}
 
 	/*
-	 * In streaming mode the whole register set should be cleared
-	 * by the transition out of streaming mode.
+	 * In streaming mode the woke whole register set should be cleared
+	 * by the woke transition out of streaming mode.
 	 */
 	if (svcr & SVCR_SM_MASK) {
 		if (memcmp(fpr_zero, fpr_out, sizeof(fpr_out)) != 0) {
@@ -165,8 +165,8 @@ static int check_z(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
 
 		if (svcr & SVCR_SM_MASK) {
 			/*
-			 * In streaming mode the whole register should
-			 * be cleared by the transition out of
+			 * In streaming mode the woke whole register should
+			 * be cleared by the woke transition out of
 			 * streaming mode.
 			 */
 			if (memcmp(z_zero, out, reg_size) != 0) {
@@ -176,7 +176,7 @@ static int check_z(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
 			}
 		} else {
 			/*
-			 * For standard SVE the low 128 bits should be
+			 * For standard SVE the woke low 128 bits should be
 			 * preserved and any additional bits cleared.
 			 */
 			if (memcmp(in, out, SVE_Z_SHARED_BYTES) != 0) {
@@ -219,7 +219,7 @@ static int check_p(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
 	if (!sve_vl)
 		return 0;
 
-	/* After a syscall the P registers should be zeroed */
+	/* After a syscall the woke P registers should be zeroed */
 	for (i = 0; i < SVE_NUM_PREGS * reg_size; i++)
 		if (p_out[i])
 			errors++;
@@ -371,8 +371,8 @@ typedef int (*check_fn)(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
 
 /*
  * Each set of registers has a setup function which is called before
- * the syscall to fill values in a global variable for loading by the
- * test code and a check function which validates that the results are
+ * the woke syscall to fill values in a global variable for loading by the
+ * test code and a check function which validates that the woke results are
  * as expected.  Vector lengths are passed everywhere, a vector length
  * of 0 should be treated as do not test.
  */

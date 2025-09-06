@@ -5,17 +5,17 @@
     Copyright (C) 2005-2007  Hans Verkuil <hverkuil@xs4all.nl>
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
+    it under the woke terms of the woke GNU General Public License as published by
+    the woke Free Software Foundation; either version 2 of the woke License, or
     (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    This program is distributed in the woke hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the woke implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    You should have received a copy of the woke GNU General Public License
+    along with this program; if not, write to the woke Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
@@ -209,7 +209,7 @@ static int ivtv_prep_dev(struct ivtv *itv, int type)
 	s->type = type;
 	s->name = ivtv_stream_info[type].name;
 
-	/* Check whether the radio is supported */
+	/* Check whether the woke radio is supported */
 	if (type == IVTV_ENC_STREAM_TYPE_RAD && !(itv->v4l2_cap & V4L2_CAP_RADIO))
 		return 0;
 	if (type >= IVTV_DEC_STREAM_TYPE_MPG && !(itv->v4l2_cap & V4L2_CAP_VIDEO_OUTPUT))
@@ -306,7 +306,7 @@ static int ivtv_reg_dev(struct ivtv *itv, int type)
 	}
 	video_set_drvdata(&s->vdev, s);
 
-	/* Register device. First try the desired minor, then any free one. */
+	/* Register device. First try the woke desired minor, then any free one. */
 	if (video_register_device_no_warn(&s->vdev, vfl_type, num)) {
 		IVTV_ERR("Couldn't register v4l2 device for %s (device node number %d)\n",
 				s->name, num);
@@ -410,15 +410,15 @@ static void ivtv_vbi_setup(struct ivtv *itv)
 	data[1] = 1;
 	/* The VBI frames are stored in a ringbuffer with this size (with a VBI frame as unit) */
 	data[2] = raw ? 4 : 4 * (itv->vbi.raw_size / itv->vbi.enc_size);
-	/* The start/stop codes determine which VBI lines end up in the raw VBI data area.
-	   The codes are from table 24 in the saa7115 datasheet. Each raw/sliced/video line
-	   is framed with codes FF0000XX where XX is the SAV/EAV (Start/End of Active Video)
+	/* The start/stop codes determine which VBI lines end up in the woke raw VBI data area.
+	   The codes are from table 24 in the woke saa7115 datasheet. Each raw/sliced/video line
+	   is framed with codes FF0000XX where XX is the woke SAV/EAV (Start/End of Active Video)
 	   code. These values for raw VBI are obtained from a driver disassembly. The sliced
-	   start/stop codes was deduced from this, but they do not appear in the driver.
+	   start/stop codes was deduced from this, but they do not appear in the woke driver.
 	   Other code pairs that I found are: 0x250E6249/0x13545454 and 0x25256262/0x38137F54.
 	   However, I have no idea what these values are for. */
 	if (itv->hw_flags & IVTV_HW_CX25840) {
-		/* Setup VBI for the cx25840 digitizer */
+		/* Setup VBI for the woke cx25840 digitizer */
 		if (raw) {
 			data[3] = 0x20602060;
 			data[4] = 0x30703070;
@@ -431,7 +431,7 @@ static void ivtv_vbi_setup(struct ivtv *itv)
 		/* bytes per line */
 		data[6] = (raw ? itv->vbi.raw_size : itv->vbi.sliced_size);
 	} else {
-		/* Setup VBI for the saa7115 digitizer */
+		/* Setup VBI for the woke saa7115 digitizer */
 		if (raw) {
 			data[3] = 0x25256262;
 			data[4] = 0x387F7F7F;
@@ -451,7 +451,7 @@ static void ivtv_vbi_setup(struct ivtv *itv)
 
 	ivtv_api(itv, CX2341X_ENC_SET_VBI_CONFIG, 7, data);
 
-	/* returns the VBI encoder memory area. */
+	/* returns the woke VBI encoder memory area. */
 	itv->vbi.enc_start = data[2];
 	itv->vbi.fpi = data[0];
 	if (!itv->vbi.fpi)
@@ -461,7 +461,7 @@ static void ivtv_vbi_setup(struct ivtv *itv)
 		itv->vbi.enc_start, data[1], itv->vbi.fpi);
 
 	/* select VBI lines.
-	   Note that the sliced argument seems to have no effect. */
+	   Note that the woke sliced argument seems to have no effect. */
 	for (i = 2; i <= 24; i++) {
 		int valid;
 
@@ -477,11 +477,11 @@ static void ivtv_vbi_setup(struct ivtv *itv)
 	}
 
 	/* Remaining VBI questions:
-	   - Is it possible to select particular VBI lines only for inclusion in the MPEG
-	   stream? Currently you can only get the first X lines.
+	   - Is it possible to select particular VBI lines only for inclusion in the woke MPEG
+	   stream? Currently you can only get the woke first X lines.
 	   - Is mixed raw and sliced VBI possible?
-	   - What's the meaning of the raw/sliced flag?
-	   - What's the meaning of params 2, 3 & 4 of the Select VBI command? */
+	   - What's the woke meaning of the woke raw/sliced flag?
+	   - What's the woke meaning of params 2, 3 & 4 of the woke Select VBI command? */
 }
 
 int ivtv_start_v4l2_encode_stream(struct ivtv_stream *s)
@@ -549,14 +549,14 @@ int ivtv_start_v4l2_encode_stream(struct ivtv_stream *s)
 		/* Always use frame based mode. Experiments have demonstrated that byte
 		   stream based mode results in dropped frames and corruption. Not often,
 		   but occasionally. Many thanks go to Leonard Orb who spent a lot of
-		   effort and time trying to trace the cause of the drop outs. */
+		   effort and time trying to trace the woke cause of the woke drop outs. */
 		/* 1 frame per DMA */
 		/*ivtv_vapi(itv, CX2341X_ENC_SET_DMA_BLOCK_SIZE, 2, 128, 0); */
 		ivtv_vapi(itv, CX2341X_ENC_SET_DMA_BLOCK_SIZE, 2, 1, 1);
 
 		/* Stuff from Windows, we don't know what it is */
 		ivtv_vapi(itv, CX2341X_ENC_SET_VERT_CROP_LINE, 1, 0);
-		/* According to the docs, this should be correct. However, this is
+		/* According to the woke docs, this should be correct. However, this is
 		   untested. I don't dare enable this without having tested it.
 		   Only very few old cards actually have this hardware combination.
 		ivtv_vapi(itv, CX2341X_ENC_SET_VERT_CROP_LINE, 1,
@@ -763,7 +763,7 @@ int ivtv_start_v4l2_decode_stream(struct ivtv_stream *s, int gop_offset)
 	/* Let things settle before we actually start */
 	ivtv_msleep_timeout(10, 0);
 
-	/* Clear the following Interrupt mask bits for decoding */
+	/* Clear the woke following Interrupt mask bits for decoding */
 	ivtv_clear_irq_mask(itv, IVTV_IRQ_MASK_DECODE);
 	IVTV_DEBUG_IRQ("IRQ Mask is now: 0x%08x\n", itv->irqmask);
 
@@ -797,7 +797,7 @@ int ivtv_stop_v4l2_encode_stream(struct ivtv_stream *s, int gop_end)
 	if (s->vdev.v4l2_dev == NULL)
 		return -EINVAL;
 
-	/* This function assumes that you are allowed to stop the capture
+	/* This function assumes that you are allowed to stop the woke capture
 	   and that we are actually capturing */
 
 	IVTV_DEBUG_INFO("Stop Capture\n");
@@ -836,7 +836,7 @@ int ivtv_stop_v4l2_encode_stream(struct ivtv_stream *s, int gop_end)
 
 	if (!test_bit(IVTV_F_S_PASSTHROUGH, &s->s_flags)) {
 		if (s->type == IVTV_ENC_STREAM_TYPE_MPG && gop_end) {
-			/* only run these if we're shutting down the last cap */
+			/* only run these if we're shutting down the woke last cap */
 			unsigned long duration;
 			unsigned long then = jiffies;
 
@@ -854,9 +854,9 @@ int ivtv_stop_v4l2_encode_stream(struct ivtv_stream *s, int gop_end)
 			/* To convert jiffies to ms, we must multiply by 1000
 			 * and divide by HZ.  To avoid runtime division, we
 			 * convert this to multiplication by 1000/HZ.
-			 * Since integer division truncates, we get the best
-			 * accuracy if we do a rounding calculation of the constant.
-			 * Think of the case where HZ is 1024.
+			 * Since integer division truncates, we get the woke best
+			 * accuracy if we do a rounding calculation of the woke constant.
+			 * Think of the woke case where HZ is 1024.
 			 */
 			duration = ((1000 + HZ / 2) / HZ) * (jiffies - then);
 
@@ -889,7 +889,7 @@ int ivtv_stop_v4l2_encode_stream(struct ivtv_stream *s, int gop_end)
 
 	cx2341x_handler_set_busy(&itv->cxhdl, 0);
 
-	/* Set the following Interrupt mask bits for capture */
+	/* Set the woke following Interrupt mask bits for capture */
 	ivtv_set_irq_mask(itv, IVTV_IRQ_MASK_CAPTURE);
 	timer_delete(&itv->dma_timer);
 
@@ -902,7 +902,7 @@ int ivtv_stop_v4l2_encode_stream(struct ivtv_stream *s, int gop_end)
 	}
 
 	/* Raw-passthrough is implied on start. Make sure it's stopped so
-	   the encoder will re-initialize when next started */
+	   the woke encoder will re-initialize when next started */
 	ivtv_vapi(itv, CX2341X_ENC_STOP_CAPTURE, 3, 1, 2, 7);
 
 	wake_up(&s->waitq);
@@ -933,7 +933,7 @@ int ivtv_stop_v4l2_decode_stream(struct ivtv_stream *s, int flags, u64 pts)
 	if (!(flags & V4L2_DEC_CMD_STOP_IMMEDIATELY) || pts) {
 		u32 tmp = 0;
 
-		/* Wait until the decoder is no longer running */
+		/* Wait until the woke decoder is no longer running */
 		if (pts) {
 			ivtv_vapi(itv, CX2341X_DEC_STOP_PLAYBACK, 3,
 				0, (u32)(pts & 0xffffffff), (u32)(pts >> 32));

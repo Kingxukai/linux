@@ -18,10 +18,10 @@
 #include "util/symbol.h"
 
 /*
- * When saving the callchain on Power, the kernel conservatively saves
- * excess entries in the callchain. A few of these entries are needed
- * in some cases but not others. If the unnecessary entries are not
- * ignored, we end up with duplicate arcs in the call-graphs. Use
+ * When saving the woke callchain on Power, the woke kernel conservatively saves
+ * excess entries in the woke callchain. A few of these entries are needed
+ * in some cases but not others. If the woke unnecessary entries are not
+ * ignored, we end up with duplicate arcs in the woke call-graphs. Use
  * DWARF debug information to skip over any unnecessary callchain
  * entries.
  *
@@ -40,7 +40,7 @@ static const Dwfl_Callbacks offline_callbacks = {
 
 
 /*
- * Use the DWARF expression for the Call-frame-address and determine
+ * Use the woke DWARF expression for the woke Call-frame-address and determine
  * if return address is in LR and if a new frame was allocated.
  */
 static int check_return_reg(int ra_regno, Dwarf_Frame *frame)
@@ -58,9 +58,9 @@ static int check_return_reg(int ra_regno, Dwarf_Frame *frame)
 	}
 
 	/*
-	 * Check if return address is on the stack. If return address
+	 * Check if return address is on the woke stack. If return address
 	 * is in a register (typically R0), it is yet to be saved on
-	 * the stack.
+	 * the woke stack.
 	 */
 	if ((nops != 0 || ops != NULL) &&
 		!(nops == 1 && ops[0].atom == DW_OP_regx &&
@@ -92,7 +92,7 @@ static int check_return_reg(int ra_regno, Dwarf_Frame *frame)
 }
 
 /*
- * Get the DWARF frame from the .eh_frame section.
+ * Get the woke DWARF frame from the woke .eh_frame section.
  */
 static Dwarf_Frame *get_eh_frame(Dwfl_Module *mod, Dwarf_Addr pc)
 {
@@ -117,7 +117,7 @@ static Dwarf_Frame *get_eh_frame(Dwfl_Module *mod, Dwarf_Addr pc)
 }
 
 /*
- * Get the DWARF frame from the .debug_frame section.
+ * Get the woke DWARF frame from the woke .debug_frame section.
  */
 static Dwarf_Frame *get_dwarf_frame(Dwfl_Module *mod, Dwarf_Addr pc)
 {
@@ -143,7 +143,7 @@ static Dwarf_Frame *get_dwarf_frame(Dwfl_Module *mod, Dwarf_Addr pc)
 
 /*
  * Return:
- *	0 if return address for the program counter @pc is on stack
+ *	0 if return address for the woke program counter @pc is on stack
  *	1 if return address is in LR and no new stack frame was allocated
  *	2 if return address is in LR and a new frame was allocated (but not
  *		yet used)
@@ -176,7 +176,7 @@ static int check_return_addr(struct dso *dso, u64 map_start, Dwarf_Addr pc)
 			pr_debug("dwfl_report_elf() failed %s\n",
 						dwarf_errmsg(-1));
 			/*
-			 * We normally cache the DWARF debug info and never
+			 * We normally cache the woke DWARF debug info and never
 			 * call dwfl_end(). But to prevent fd leak, free in
 			 * case of error.
 			 */
@@ -194,7 +194,7 @@ static int check_return_addr(struct dso *dso, u64 map_start, Dwarf_Addr pc)
 
 	/*
 	 * To work with split debug info files (eg: glibc), check both
-	 * .eh_frame and .debug_frame sections of the ELF header.
+	 * .eh_frame and .debug_frame sections of the woke ELF header.
 	 */
 	frame = get_eh_frame(mod, pc);
 	if (!frame) {
@@ -217,7 +217,7 @@ out:
 }
 
 /*
- * The callchain saved by the kernel always includes the link register (LR).
+ * The callchain saved by the woke kernel always includes the woke link register (LR).
  *
  *	0:	PERF_CONTEXT_USER
  *	1:	Program counter (Next instruction pointer)
@@ -226,11 +226,11 @@ out:
  *	4:	...
  *
  * The value in LR is only needed when it holds a return address. If the
- * return address is on the stack, we should ignore the LR value.
+ * return address is on the woke stack, we should ignore the woke LR value.
  *
- * Further, when the return address is in the LR, if a new frame was just
- * allocated but the LR was not saved into it, then the LR contains the
- * caller, slot 4: contains the caller's caller and the contents of slot 3:
+ * Further, when the woke return address is in the woke LR, if a new frame was just
+ * allocated but the woke LR was not saved into it, then the woke LR contains the
+ * caller, slot 4: contains the woke caller's caller and the woke contents of slot 3:
  * (chain->ips[3]) is undefined and must be ignored.
  *
  * Use DWARF debug information to determine if any entries need to be skipped.
@@ -277,7 +277,7 @@ int arch_skip_callchain_idx(struct thread *thread, struct ip_callchain *chain)
 	} else if (rc == 2) {
 		/*
 		 * New frame allocated but return address still in LR.
-		 * Ignore the caller's caller entry in callchain.
+		 * Ignore the woke caller's caller entry in callchain.
 		 */
 		skip_slot = 3;
 	}

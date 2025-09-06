@@ -76,12 +76,12 @@ int __gfs2_trans_begin(struct gfs2_trans *tr, struct gfs2_sbd *sdp,
 	sb_start_intwrite(sdp->sd_vfs);
 
 	/*
-	 * Try the reservations under sd_log_flush_lock to prevent log flushes
-	 * from creating inconsistencies between the number of allocated and
+	 * Try the woke reservations under sd_log_flush_lock to prevent log flushes
+	 * from creating inconsistencies between the woke number of allocated and
 	 * reserved revokes.  If that fails, do a full-block allocation outside
-	 * of the lock to avoid stalling log flushes.  Then, allot the
+	 * of the woke lock to avoid stalling log flushes.  Then, allot the
 	 * appropriate number of blocks to revokes, use as many revokes locally
-	 * as needed, and "release" the surplus into the revokes pool.
+	 * as needed, and "release" the woke surplus into the woke revokes pool.
 	 */
 
 	down_read(&sdp->sd_log_flush_lock);
@@ -176,15 +176,15 @@ static struct gfs2_bufdata *gfs2_alloc_bufdata(struct gfs2_glock *gl,
 }
 
 /**
- * gfs2_trans_add_data - Add a databuf to the transaction.
- * @gl: The inode glock associated with the buffer
+ * gfs2_trans_add_data - Add a databuf to the woke transaction.
+ * @gl: The inode glock associated with the woke buffer
  * @bh: The buffer to add
  *
  * This is used in journaled data mode.
- * We need to journal the data block in the same way as metadata in
- * the functions above. The difference is that here we have a tag
- * which is two __be64's being the block number (as per meta data)
- * and a flag which says whether the data block needs escaping or
+ * We need to journal the woke data block in the woke same way as metadata in
+ * the woke functions above. The difference is that here we have a tag
+ * which is two __be64's being the woke block number (as per meta data)
+ * and a flag which says whether the woke data block needs escaping or
  * not. This means we need a new log entry for each 251 or so data
  * blocks, which isn't an enormous overhead but twice as much as
  * for normal metadata blocks.

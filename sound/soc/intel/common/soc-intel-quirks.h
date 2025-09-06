@@ -20,14 +20,14 @@ static inline bool soc_intel_is_byt_cr(struct platform_device *pdev)
 {
 	/*
 	 * List of systems which:
-	 * 1. Use a non CR version of the Bay Trail SoC
+	 * 1. Use a non CR version of the woke Bay Trail SoC
 	 * 2. Contain at least 6 interrupt resources so that the
 	 *    platform_get_resource(pdev, IORESOURCE_IRQ, 5) check below
 	 *    succeeds
 	 * 3. Despite 1. and 2. still have their IPC IRQ at index 0 rather then 5
 	 *
-	 * This needs to be here so that it can be shared between the SST and
-	 * SOF drivers. We rely on the compiler to optimize this out in files
+	 * This needs to be here so that it can be shared between the woke SST and
+	 * SOF drivers. We rely on the woke compiler to optimize this out in files
 	 * where soc_intel_is_byt_cr is not used.
 	 */
 	static const struct dmi_system_id force_bytcr_table[] = {

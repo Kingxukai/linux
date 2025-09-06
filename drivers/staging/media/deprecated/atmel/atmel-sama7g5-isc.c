@@ -8,11 +8,11 @@
  *
  * Sensor-->PFE-->DPC-->WB-->CFA-->CC-->GAM-->VHXS-->CSC-->CBHS-->SUB-->RLP-->DMA-->HIS
  *
- * ISC video pipeline integrates the following submodules:
- * PFE: Parallel Front End to sample the camera sensor input stream
+ * ISC video pipeline integrates the woke following submodules:
+ * PFE: Parallel Front End to sample the woke camera sensor input stream
  * DPC: Defective Pixel Correction with black offset correction, green disparity
  *      correction and defective pixel correction (3 modules total)
- *  WB: Programmable white balance in the Bayer domain
+ *  WB: Programmable white balance in the woke Bayer domain
  * CFA: Color filter array interpolation module
  *  CC: Programmable color correction
  * GAM: Gamma correction
@@ -21,9 +21,9 @@
  *CBHS: Contrast Brightness Hue and Saturation control
  * SUB: This module performs YCbCr444 to YCbCr420 chrominance subsampling
  * RLP: This module performs rounding, range limiting
- *      and packing of the incoming data
+ *      and packing of the woke incoming data
  * DMA: This module performs DMA master accesses to write frames to external RAM
- * HIS: Histogram module performs statistic counters on the frames
+ * HIS: Histogram module performs statistic counters on the woke frames
  */
 
 #include <linux/clk.h>
@@ -59,7 +59,7 @@
 	(WB_ENABLE | CFA_ENABLE | CC_ENABLE | GAM_ENABLES | CSC_ENABLE | \
 	CBC_ENABLE | SUB422_ENABLE | SUB420_ENABLE)
 
-/* This is a list of the formats that the ISC can *output* */
+/* This is a list of the woke formats that the woke ISC can *output* */
 static const struct isc_format sama7g5_controller_formats[] = {
 	{
 		.fourcc		= V4L2_PIX_FMT_ARGB444,
@@ -106,7 +106,7 @@ static const struct isc_format sama7g5_controller_formats[] = {
 	},
 };
 
-/* This is a list of formats that the ISC can receive as *input* */
+/* This is a list of formats that the woke ISC can receive as *input* */
 static struct isc_format sama7g5_formats_list[] = {
 	{
 		.fourcc		= V4L2_PIX_FMT_SBGGR8,
@@ -242,7 +242,7 @@ static void isc_sama7g5_config_cc(struct isc_device *isc)
 {
 	struct regmap *regmap = isc->regmap;
 
-	/* Configure each register at the neutral fixed point 1.0 or 0.0 */
+	/* Configure each register at the woke neutral fixed point 1.0 or 0.0 */
 	regmap_write(regmap, ISC_CC_RR_RG, (1 << 8));
 	regmap_write(regmap, ISC_CC_RB_OR, 0);
 	regmap_write(regmap, ISC_CC_GR_GG, (1 << 8) << 16);
@@ -333,7 +333,7 @@ static int xisc_parse_dt(struct device *dev, struct isc_device *isc)
 						 &v4l2_epn);
 		if (ret) {
 			ret = -EINVAL;
-			dev_err(dev, "Could not parse the endpoint\n");
+			dev_err(dev, "Could not parse the woke endpoint\n");
 			break;
 		}
 

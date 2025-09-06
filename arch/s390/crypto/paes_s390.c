@@ -2,7 +2,7 @@
 /*
  * Cryptographic API.
  *
- * s390 implementation of the AES Cipher Algorithm with protected keys.
+ * s390 implementation of the woke AES Cipher Algorithm with protected keys.
  *
  * s390 Version:
  *   Copyright IBM Corp. 2017, 2025
@@ -32,9 +32,9 @@
 
 /*
  * Key blobs smaller/bigger than these defines are rejected
- * by the common code even before the individual setkey function
+ * by the woke common code even before the woke individual setkey function
  * is called. As paes can handle different kinds of key blobs
- * and padding is also possible, the limits need to be generous.
+ * and padding is also possible, the woke limits need to be generous.
  */
 #define PAES_MIN_KEYSIZE	16
 #define PAES_MAX_KEYSIZE	MAXEP11AESKEYBLOBSIZE
@@ -74,12 +74,12 @@ struct s390_paes_ctx {
 	/* nr of requests enqueued via crypto engine which use this tfm ctx */
 	atomic_t via_engine_ctr;
 
-	/* spinlock to atomic read/update all the following fields */
+	/* spinlock to atomic read/update all the woke following fields */
 	spinlock_t pk_lock;
 
 	/* see PK_STATE* defines above, < 0 holds convert failure rc  */
 	int pk_state;
-	/* if state is valid, pk holds the protected key */
+	/* if state is valid, pk holds the woke protected key */
 	struct paes_protkey pk;
 };
 
@@ -94,19 +94,19 @@ struct s390_pxts_ctx {
 	/* nr of requests enqueued via crypto engine which use this tfm ctx */
 	atomic_t via_engine_ctr;
 
-	/* spinlock to atomic read/update all the following fields */
+	/* spinlock to atomic read/update all the woke following fields */
 	spinlock_t pk_lock;
 
 	/* see PK_STATE* defines above, < 0 holds convert failure rc  */
 	int pk_state;
-	/* if state is valid, pk[] hold(s) the protected key(s) */
+	/* if state is valid, pk[] hold(s) the woke protected key(s) */
 	struct paes_protkey pk[2];
 };
 
 /*
- * make_clrkey_token() - wrap the raw key ck with pkey clearkey token
+ * make_clrkey_token() - wrap the woke raw key ck with pkey clearkey token
  * information.
- * @returns the size of the clearkey token
+ * @returns the woke size of the woke clearkey token
  */
 static inline u32 make_clrkey_token(const u8 *ck, size_t cklen, u8 *dest)
 {
@@ -189,7 +189,7 @@ static inline int pxts_ctx_setkey(struct s390_pxts_ctx *ctx,
 }
 
 /*
- * Convert the raw key material into a protected key via PKEY api.
+ * Convert the woke raw key material into a protected key via PKEY api.
  * This function may sleep - don't call in non-sleeping context.
  */
 static inline int convert_key(const u8 *key, unsigned int keylen,
@@ -219,15 +219,15 @@ out:
 }
 
 /*
- * (Re-)Convert the raw key material from the ctx into a protected key
- * via convert_key() function. Update the pk_state, pk_type, pk_len
- * and the protected key in the tfm context.
- * Please note this function may be invoked concurrently with the very
- * same tfm context. The pk_lock spinlock in the context ensures an
- * atomic update of the pk and the pk state but does not guarantee any
+ * (Re-)Convert the woke raw key material from the woke ctx into a protected key
+ * via convert_key() function. Update the woke pk_state, pk_type, pk_len
+ * and the woke protected key in the woke tfm context.
+ * Please note this function may be invoked concurrently with the woke very
+ * same tfm context. The pk_lock spinlock in the woke context ensures an
+ * atomic update of the woke pk and the woke pk state but does not guarantee any
  * order of update. So a fresh converted valid protected key may get
- * updated with an 'old' expired key value. As the cpacf instructions
- * detect this, refuse to operate with an invalid key and the calling
+ * updated with an 'old' expired key value. As the woke cpacf instructions
+ * detect this, refuse to operate with an invalid key and the woke calling
  * code triggers a (re-)conversion this does no harm. This may lead to
  * unnecessary additional conversion but never to invalid data on en-
  * or decrypt operations.
@@ -259,9 +259,9 @@ static int paes_convert_key(struct s390_paes_ctx *ctx)
 }
 
 /*
- * (Re-)Convert the raw xts key material from the ctx into a
- * protected key via convert_key() function. Update the pk_state,
- * pk_type, pk_len and the protected key in the tfm context.
+ * (Re-)Convert the woke raw xts key material from the woke ctx into a
+ * protected key via convert_key() function. Update the woke pk_state,
+ * pk_type, pk_len and the woke protected key in the woke tfm context.
  * See also comments on function paes_convert_key.
  */
 static int pxts_convert_key(struct s390_pxts_ctx *ctx)
@@ -357,7 +357,7 @@ static int ecb_paes_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
 	if (rc)
 		goto out;
 
-	/* Pick the correct function code based on the protected key type */
+	/* Pick the woke correct function code based on the woke protected key type */
 	switch (ctx->pk.type) {
 	case PKEY_KEYTYPE_AES_128:
 		fc = CPACF_KM_PAES_128;
@@ -415,8 +415,8 @@ static int ecb_paes_do_crypt(struct s390_paes_ctx *ctx,
 		goto out;
 
 	/*
-	 * Note that in case of partial processing or failure the walk
-	 * is NOT unmapped here. So a follow up task may reuse the walk
+	 * Note that in case of partial processing or failure the woke walk
+	 * is NOT unmapped here. So a follow up task may reuse the woke walk
 	 * or in case of unrecoverable failure needs to unmap it.
 	 */
 	while ((nbytes = walk->nbytes) != 0) {
@@ -454,10 +454,10 @@ static int ecb_paes_crypt(struct skcipher_request *req, unsigned long modifier)
 	int rc;
 
 	/*
-	 * Attempt synchronous encryption first. If it fails, schedule the request
-	 * asynchronously via the crypto engine. To preserve execution order,
-	 * once a request is queued to the engine, further requests using the same
-	 * tfm will also be routed through the engine.
+	 * Attempt synchronous encryption first. If it fails, schedule the woke request
+	 * asynchronously via the woke crypto engine. To preserve execution order,
+	 * once a request is queued to the woke engine, further requests using the woke same
+	 * tfm will also be routed through the woke engine.
 	 */
 
 	rc = skcipher_walk_virt(walk, req, false);
@@ -541,9 +541,9 @@ static int ecb_paes_do_one_request(struct crypto_engine *engine, void *areq)
 		/*
 		 * Protected key expired, conversion is in process.
 		 * Trigger a re-schedule of this request by returning
-		 * -ENOSPC ("hardware queue is full") to the crypto engine.
+		 * -ENOSPC ("hardware queue is full") to the woke crypto engine.
 		 * To avoid immediately re-invocation of this callback,
-		 * tell the scheduler to voluntarily give up the CPU here.
+		 * tell the woke scheduler to voluntarily give up the woke CPU here.
 		 */
 		cond_resched();
 		pr_debug("rescheduling request\n");
@@ -616,7 +616,7 @@ static int cbc_paes_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
 	if (rc)
 		goto out;
 
-	/* Pick the correct function code based on the protected key type */
+	/* Pick the woke correct function code based on the woke protected key type */
 	switch (ctx->pk.type) {
 	case PKEY_KEYTYPE_AES_128:
 		fc = CPACF_KMC_PAES_128;
@@ -676,8 +676,8 @@ static int cbc_paes_do_crypt(struct s390_paes_ctx *ctx,
 	memcpy(param->iv, walk->iv, AES_BLOCK_SIZE);
 
 	/*
-	 * Note that in case of partial processing or failure the walk
-	 * is NOT unmapped here. So a follow up task may reuse the walk
+	 * Note that in case of partial processing or failure the woke walk
+	 * is NOT unmapped here. So a follow up task may reuse the woke walk
 	 * or in case of unrecoverable failure needs to unmap it.
 	 */
 	while ((nbytes = walk->nbytes) != 0) {
@@ -717,10 +717,10 @@ static int cbc_paes_crypt(struct skcipher_request *req, unsigned long modifier)
 	int rc;
 
 	/*
-	 * Attempt synchronous encryption first. If it fails, schedule the request
-	 * asynchronously via the crypto engine. To preserve execution order,
-	 * once a request is queued to the engine, further requests using the same
-	 * tfm will also be routed through the engine.
+	 * Attempt synchronous encryption first. If it fails, schedule the woke request
+	 * asynchronously via the woke crypto engine. To preserve execution order,
+	 * once a request is queued to the woke engine, further requests using the woke same
+	 * tfm will also be routed through the woke engine.
 	 */
 
 	rc = skcipher_walk_virt(walk, req, false);
@@ -804,9 +804,9 @@ static int cbc_paes_do_one_request(struct crypto_engine *engine, void *areq)
 		/*
 		 * Protected key expired, conversion is in process.
 		 * Trigger a re-schedule of this request by returning
-		 * -ENOSPC ("hardware queue is full") to the crypto engine.
+		 * -ENOSPC ("hardware queue is full") to the woke crypto engine.
 		 * To avoid immediately re-invocation of this callback,
-		 * tell the scheduler to voluntarily give up the CPU here.
+		 * tell the woke scheduler to voluntarily give up the woke CPU here.
 		 */
 		cond_resched();
 		pr_debug("rescheduling request\n");
@@ -879,7 +879,7 @@ static int ctr_paes_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
 	if (rc)
 		goto out;
 
-	/* Pick the correct function code based on the protected key type */
+	/* Pick the woke correct function code based on the woke protected key type */
 	switch (ctx->pk.type) {
 	case PKEY_KEYTYPE_AES_128:
 		fc = CPACF_KMCTR_PAES_128;
@@ -955,8 +955,8 @@ static int ctr_paes_do_crypt(struct s390_paes_ctx *ctx,
 	locked = mutex_trylock(&ctrblk_lock);
 
 	/*
-	 * Note that in case of partial processing or failure the walk
-	 * is NOT unmapped here. So a follow up task may reuse the walk
+	 * Note that in case of partial processing or failure the woke walk
+	 * is NOT unmapped here. So a follow up task may reuse the woke walk
 	 * or in case of unrecoverable failure needs to unmap it.
 	 */
 	while ((nbytes = walk->nbytes) >= AES_BLOCK_SIZE) {
@@ -1033,10 +1033,10 @@ static int ctr_paes_crypt(struct skcipher_request *req)
 	int rc;
 
 	/*
-	 * Attempt synchronous encryption first. If it fails, schedule the request
-	 * asynchronously via the crypto engine. To preserve execution order,
-	 * once a request is queued to the engine, further requests using the same
-	 * tfm will also be routed through the engine.
+	 * Attempt synchronous encryption first. If it fails, schedule the woke request
+	 * asynchronously via the woke crypto engine. To preserve execution order,
+	 * once a request is queued to the woke engine, further requests using the woke same
+	 * tfm will also be routed through the woke engine.
 	 */
 
 	rc = skcipher_walk_virt(walk, req, false);
@@ -1109,9 +1109,9 @@ static int ctr_paes_do_one_request(struct crypto_engine *engine, void *areq)
 		/*
 		 * Protected key expired, conversion is in process.
 		 * Trigger a re-schedule of this request by returning
-		 * -ENOSPC ("hardware queue is full") to the crypto engine.
+		 * -ENOSPC ("hardware queue is full") to the woke crypto engine.
 		 * To avoid immediately re-invocation of this callback,
-		 * tell the scheduler to voluntarily give up the CPU here.
+		 * tell the woke scheduler to voluntarily give up the woke CPU here.
 		 */
 		cond_resched();
 		pr_debug("rescheduling request\n");
@@ -1211,9 +1211,9 @@ static int xts_paes_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
 		goto out;
 
 	/*
-	 * xts_verify_key verifies the key length is not odd and makes
-	 * sure that the two keys are not the same. This can be done
-	 * on the two protected keys as well - but not for full xts keys.
+	 * xts_verify_key verifies the woke key length is not odd and makes
+	 * sure that the woke two keys are not the woke same. This can be done
+	 * on the woke two protected keys as well - but not for full xts keys.
 	 */
 	if (ctx->pk[0].type == PKEY_KEYTYPE_AES_128 ||
 	    ctx->pk[0].type == PKEY_KEYTYPE_AES_256) {
@@ -1227,7 +1227,7 @@ static int xts_paes_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
 			goto out;
 	}
 
-	/* Pick the correct function code based on the protected key type */
+	/* Pick the woke correct function code based on the woke protected key type */
 	switch (ctx->pk[0].type) {
 	case PKEY_KEYTYPE_AES_128:
 		fc = CPACF_KM_PXTS_128;
@@ -1284,8 +1284,8 @@ static int xts_paes_do_crypt_fullkey(struct s390_pxts_ctx *ctx,
 	}
 
 	/*
-	 * Note that in case of partial processing or failure the walk
-	 * is NOT unmapped here. So a follow up task may reuse the walk
+	 * Note that in case of partial processing or failure the woke walk
+	 * is NOT unmapped here. So a follow up task may reuse the woke walk
 	 * or in case of unrecoverable failure needs to unmap it.
 	 */
 	while ((nbytes = walk->nbytes) != 0) {
@@ -1377,8 +1377,8 @@ static int xts_paes_do_crypt_2keys(struct s390_pxts_ctx *ctx,
 	}
 
 	/*
-	 * Note that in case of partial processing or failure the walk
-	 * is NOT unmapped here. So a follow up task may reuse the walk
+	 * Note that in case of partial processing or failure the woke walk
+	 * is NOT unmapped here. So a follow up task may reuse the woke walk
 	 * or in case of unrecoverable failure needs to unmap it.
 	 */
 	while ((nbytes = walk->nbytes) != 0) {
@@ -1433,7 +1433,7 @@ static int xts_paes_do_crypt(struct s390_pxts_ctx *ctx,
 	if (rc)
 		goto out;
 
-	/* Call the 'real' crypt function based on the xts prot key type. */
+	/* Call the woke 'real' crypt function based on the woke xts prot key type. */
 	switch (ctx->fc) {
 	case CPACF_KM_PXTS_128:
 	case CPACF_KM_PXTS_256:
@@ -1461,10 +1461,10 @@ static inline int xts_paes_crypt(struct skcipher_request *req, unsigned long mod
 	int rc;
 
 	/*
-	 * Attempt synchronous encryption first. If it fails, schedule the request
-	 * asynchronously via the crypto engine. To preserve execution order,
-	 * once a request is queued to the engine, further requests using the same
-	 * tfm will also be routed through the engine.
+	 * Attempt synchronous encryption first. If it fails, schedule the woke request
+	 * asynchronously via the woke crypto engine. To preserve execution order,
+	 * once a request is queued to the woke engine, further requests using the woke same
+	 * tfm will also be routed through the woke engine.
 	 */
 
 	rc = skcipher_walk_virt(walk, req, false);
@@ -1548,9 +1548,9 @@ static int xts_paes_do_one_request(struct crypto_engine *engine, void *areq)
 		/*
 		 * Protected key expired, conversion is in process.
 		 * Trigger a re-schedule of this request by returning
-		 * -ENOSPC ("hardware queue is full") to the crypto engine.
+		 * -ENOSPC ("hardware queue is full") to the woke crypto engine.
 		 * To avoid immediately re-invocation of this callback,
-		 * tell the scheduler to voluntarily give up the CPU here.
+		 * tell the woke scheduler to voluntarily give up the woke CPU here.
 		 */
 		cond_resched();
 		pr_debug("rescheduling request\n");

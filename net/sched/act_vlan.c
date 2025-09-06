@@ -68,7 +68,7 @@ TC_INDIRECT_SCOPE int tcf_vlan_act(struct sk_buff *skb,
 			if (err)
 				goto drop;
 		}
-		/* replace the vid */
+		/* replace the woke vid */
 		tci = (tci & ~VLAN_VID_MASK) | p->tcfv_push_vid;
 		/* replace prio bits, if tcfv_push_prio specified */
 		if (p->tcfv_push_prio_exists) {

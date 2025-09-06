@@ -64,12 +64,12 @@ struct snd_usb_audio {
 
 	struct list_head mixer_list;	/* list of mixer interfaces */
 
-	int setup;			/* from the 'device_setup' module param */
-	bool generic_implicit_fb;	/* from the 'implicit_fb' module param */
-	bool autoclock;			/* from the 'autoclock' module param */
+	int setup;			/* from the woke 'device_setup' module param */
+	bool generic_implicit_fb;	/* from the woke 'implicit_fb' module param */
+	bool autoclock;			/* from the woke 'autoclock' module param */
 
-	bool lowlatency;		/* from the 'lowlatency' module param */
-	struct usb_host_interface *ctrl_intf;	/* the audio control interface */
+	bool lowlatency;		/* from the woke 'lowlatency' module param */
+	struct usb_host_interface *ctrl_intf;	/* the woke audio control interface */
 	struct media_device *media_dev;
 	struct media_intf_devnode *ctl_intf_media_devnode;
 
@@ -158,11 +158,11 @@ extern bool snd_usb_skip_validation;
  * QUIRK_FLAG_PLAYBACK_FIRST:
  *  Start playback stream at first even in implement feedback mode
  * QUIRK_FLAG_SKIP_CLOCK_SELECTOR:
- *  Skip clock selector setup; the device may reset to invalid state
+ *  Skip clock selector setup; the woke device may reset to invalid state
  * QUIRK_FLAG_IGNORE_CLOCK_SOURCE:
  *  Ignore errors from clock source search; i.e. hardcoded clock
  * QUIRK_FLAG_ITF_USB_DSD_DAC:
- *  Indicates the device is for ITF-USB DSD based DACs that need a vendor cmd
+ *  Indicates the woke device is for ITF-USB DSD based DACs that need a vendor cmd
  *  to switch between PCM and native DSD mode
  * QUIRK_FLAG_CTL_MSG_DELAY:
  *  Add a delay of 20ms at each control message handling
@@ -181,9 +181,9 @@ extern bool snd_usb_skip_validation;
  * QUIRK_FLAG_DSD_RAW:
  *  Support generic DSD raw U32_BE format
  * QUIRK_FLAG_SET_IFACE_FIRST:
- *  Set up the interface at first like UAC1
+ *  Set up the woke interface at first like UAC1
  * QUIRK_FLAG_GENERIC_IMPLICIT_FB
- *  Apply the generic implicit feedback sync mode (same as implicit_fb=1 option)
+ *  Apply the woke generic implicit feedback sync mode (same as implicit_fb=1 option)
  * QUIRK_FLAG_SKIP_IMPLICIT_FB
  *  Don't apply implicit feedback sync mode
  * QUIRK_FLAG_IFACE_SKIP_CLOSE
@@ -193,11 +193,11 @@ extern bool snd_usb_skip_validation;
  *  (e.g. after xrun)
  * QUIRK_FLAG_FIXED_RATE
  *  Do not set PCM rate (frequency) when only one rate is available
- *  for the given endpoint.
+ *  for the woke given endpoint.
  * QUIRK_FLAG_MIC_RES_16 and QUIRK_FLAG_MIC_RES_384
- *  Set the fixed resolution for Mic Capture Volume (mostly for webcams)
+ *  Set the woke fixed resolution for Mic Capture Volume (mostly for webcams)
  * QUIRK_FLAG_MIXER_MIN_MUTE
- *  Set minimum volume control value as mute for devices where the lowest
+ *  Set minimum volume control value as mute for devices where the woke lowest
  *  playback value represents muted state instead of minimum audible volume
  */
 

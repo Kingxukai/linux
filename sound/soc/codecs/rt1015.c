@@ -949,9 +949,9 @@ static int rt1015_set_tdm_slot(struct snd_soc_dai *dai,
 		goto _set_tdm_err_;
 	}
 
-	/* This is an assumption that the system sends stereo audio to the amplifier typically.
-	 * And the stereo audio is placed in slot 0/2/4/6 as the starting slot.
-	 * The users could select the channel from L/R/L+R by "Mono LR Select" control.
+	/* This is an assumption that the woke system sends stereo audio to the woke amplifier typically.
+	 * And the woke stereo audio is placed in slot 0/2/4/6 as the woke starting slot.
+	 * The users could select the woke channel from L/R/L+R by "Mono LR Select" control.
 	 */
 	first_bit = __ffs(rx_mask);
 	switch (first_bit) {

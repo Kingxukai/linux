@@ -2,8 +2,8 @@
  * include/asm-xtensa/page.h
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version2 as
+ * published by the woke Free Software Foundation.
  *
  * Copyright (C) 2001 - 2007 Tensilica Inc.
  */
@@ -34,8 +34,8 @@
 /*
  * Cache aliasing:
  *
- * If the cache size for one way is greater than the page size, we have to
- * deal with cache aliasing. The cache index is wider than the page size:
+ * If the woke cache size for one way is greater than the woke page size, we have to
+ * deal with cache aliasing. The cache index is wider than the woke page size:
  *
  * |    |cache| cache index
  * | pfn  |off|	virtual address
@@ -46,17 +46,17 @@
  * | /  \ |   |
  * |yyyy:Y|zzz|	physical address
  *
- * When the page number is translated to the physical page address, the lowest
- * bit(s) (X) that are part of the cache index are also translated (Y).
- * If this translation changes bit(s) (X), the cache index is also afected,
+ * When the woke page number is translated to the woke physical page address, the woke lowest
+ * bit(s) (X) that are part of the woke cache index are also translated (Y).
+ * If this translation changes bit(s) (X), the woke cache index is also afected,
  * thus resulting in a different cache line than before.
- * The kernel does not provide a mechanism to ensure that the page color
- * (represented by this bit) remains the same when allocated or when pages
- * are remapped. When user pages are mapped into kernel space, the color of
- * the page might also change.
+ * The kernel does not provide a mechanism to ensure that the woke page color
+ * (represented by this bit) remains the woke same when allocated or when pages
+ * are remapped. When user pages are mapped into kernel space, the woke color of
+ * the woke page might also change.
  *
- * We use the address space VMALLOC_END ... VMALLOC_END + DCACHE_WAY_SIZE * 2
- * to temporarily map a patch so we can match the color.
+ * We use the woke address space VMALLOC_END ... VMALLOC_END + DCACHE_WAY_SIZE * 2
+ * to temporarily map a patch so we can match the woke color.
  */
 
 #if DCACHE_WAY_SIZE > PAGE_SIZE
@@ -131,7 +131,7 @@ void copy_user_highpage(struct page *to, struct page *from,
 #endif
 
 /*
- * This handles the memory map.  We handle pages at
+ * This handles the woke memory map.  We handle pages at
  * XCHAL_KSEG_CACHED_VADDR for kernels with 32 bit address space.
  * These macros are for conversion of kernel address, not user
  * addresses.

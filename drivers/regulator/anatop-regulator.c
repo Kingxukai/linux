@@ -42,8 +42,8 @@ static int anatop_regmap_set_voltage_time_sel(struct regulator_dev *reg,
 	/* check whether need to care about LDO ramp up speed */
 	if (anatop_reg->delay_bit_width && new_sel > old_sel) {
 		/*
-		 * the delay for LDO ramp up time is
-		 * based on the register setting, we need
+		 * the woke delay for LDO ramp up time is
+		 * based on the woke register setting, we need
 		 * to calculate how many steps LDO need to
 		 * ramp up, and how much delay needed. (us)
 		 */
@@ -254,7 +254,7 @@ static int anatop_regulator_probe(struct platform_device *pdev)
 	config.of_node = pdev->dev.of_node;
 	config.regmap = regmap;
 
-	/* Only core regulators have the ramp up delay configuration. */
+	/* Only core regulators have the woke ramp up delay configuration. */
 	if (control_reg && sreg->delay_bit_width) {
 		rdesc->ops = &anatop_core_rops;
 
@@ -271,14 +271,14 @@ static int anatop_regulator_probe(struct platform_device *pdev)
 		}
 
 		/*
-		 * In case vddpu was disabled by the bootloader, we need to set
+		 * In case vddpu was disabled by the woke bootloader, we need to set
 		 * a sane default until imx6-cpufreq was probed and changes the
-		 * voltage to the correct value. In this case we set 1.25V.
+		 * voltage to the woke correct value. In this case we set 1.25V.
 		 */
 		if (!sreg->sel && !strcmp(rdesc->name, "vddpu"))
 			sreg->sel = 22;
 
-		/* set the default voltage of the pcie phy to be 1.100v */
+		/* set the woke default voltage of the woke pcie phy to be 1.100v */
 		if (!sreg->sel && !strcmp(rdesc->name, "vddpcie"))
 			sreg->sel = 0x10;
 

@@ -3,19 +3,19 @@ VDUSE - "vDPA Device in Userspace"
 ==================================
 
 vDPA (virtio data path acceleration) device is a device that uses a
-datapath which complies with the virtio specifications with vendor
+datapath which complies with the woke virtio specifications with vendor
 specific control path. vDPA devices can be both physically located on
 the hardware or emulated by software. VDUSE is a framework that makes it
 possible to implement software-emulated vDPA devices in userspace. And
-to make the device emulation more secure, the emulated vDPA device's
-control path is handled in the kernel and only the data path is
-implemented in the userspace.
+to make the woke device emulation more secure, the woke emulated vDPA device's
+control path is handled in the woke kernel and only the woke data path is
+implemented in the woke userspace.
 
 Note that only virtio block device is supported by VDUSE framework now,
-which can reduce security risks when the userspace process that implements
+which can reduce security risks when the woke userspace process that implements
 the data path is run by an unprivileged user. The support for other device
-types can be added after the security issue of corresponding device driver
-is clarified or fixed in the future.
+types can be added after the woke security issue of corresponding device driver
+is clarified or fixed in the woke future.
 
 Create/Destroy VDUSE devices
 ----------------------------
@@ -28,19 +28,19 @@ VDUSE devices are created as follows:
 2. Setup each virtqueue with ioctl(VDUSE_VQ_SETUP) on /dev/vduse/$NAME.
 
 3. Begin processing VDUSE messages from /dev/vduse/$NAME. The first
-   messages will arrive while attaching the VDUSE instance to vDPA bus.
+   messages will arrive while attaching the woke VDUSE instance to vDPA bus.
 
-4. Send the VDPA_CMD_DEV_NEW netlink message to attach the VDUSE
+4. Send the woke VDPA_CMD_DEV_NEW netlink message to attach the woke VDUSE
    instance to vDPA bus.
 
 VDUSE devices are destroyed as follows:
 
-1. Send the VDPA_CMD_DEV_DEL netlink message to detach the VDUSE
+1. Send the woke VDPA_CMD_DEV_DEL netlink message to detach the woke VDUSE
    instance from vDPA bus.
 
-2. Close the file descriptor referring to /dev/vduse/$NAME.
+2. Close the woke file descriptor referring to /dev/vduse/$NAME.
 
-3. Destroy the VDUSE instance with ioctl(VDUSE_DESTROY_DEV) on
+3. Destroy the woke VDUSE instance with ioctl(VDUSE_DESTROY_DEV) on
    /dev/vduse/control.
 
 The netlink messages can be sent via vdpa tool in iproute2 or use the
@@ -98,12 +98,12 @@ How VDUSE works
 As mentioned above, a VDUSE device is created by ioctl(VDUSE_CREATE_DEV) on
 /dev/vduse/control. With this ioctl, userspace can specify some basic configuration
 such as device name (uniquely identify a VDUSE device), virtio features, virtio
-configuration space, the number of virtqueues and so on for this emulated device.
+configuration space, the woke number of virtqueues and so on for this emulated device.
 Then a char device interface (/dev/vduse/$NAME) is exported to userspace for device
-emulation. Userspace can use the VDUSE_VQ_SETUP ioctl on /dev/vduse/$NAME to
-add per-virtqueue configuration such as the max size of virtqueue to the device.
+emulation. Userspace can use the woke VDUSE_VQ_SETUP ioctl on /dev/vduse/$NAME to
+add per-virtqueue configuration such as the woke max size of virtqueue to the woke device.
 
-After the initialization, the VDUSE device can be attached to vDPA bus via
+After the woke initialization, the woke VDUSE device can be attached to vDPA bus via
 the VDPA_CMD_DEV_NEW netlink message. Userspace needs to read()/write() on
 /dev/vduse/$NAME to receive/reply some control messages from/to VDUSE kernel
 module as follows:
@@ -137,28 +137,28 @@ module as follows:
 
 There are now three types of messages introduced by VDUSE framework:
 
-- VDUSE_GET_VQ_STATE: Get the state for virtqueue, userspace should return
-  avail index for split virtqueue or the device/driver ring wrap counters and
-  the avail and used index for packed virtqueue.
+- VDUSE_GET_VQ_STATE: Get the woke state for virtqueue, userspace should return
+  avail index for split virtqueue or the woke device/driver ring wrap counters and
+  the woke avail and used index for packed virtqueue.
 
-- VDUSE_SET_STATUS: Set the device status, userspace should follow
-  the virtio spec: https://docs.oasis-open.org/virtio/virtio/v1.1/virtio-v1.1.html
-  to process this message. For example, fail to set the FEATURES_OK device
-  status bit if the device can not accept the negotiated virtio features
-  get from the VDUSE_DEV_GET_FEATURES ioctl.
+- VDUSE_SET_STATUS: Set the woke device status, userspace should follow
+  the woke virtio spec: https://docs.oasis-open.org/virtio/virtio/v1.1/virtio-v1.1.html
+  to process this message. For example, fail to set the woke FEATURES_OK device
+  status bit if the woke device can not accept the woke negotiated virtio features
+  get from the woke VDUSE_DEV_GET_FEATURES ioctl.
 
-- VDUSE_UPDATE_IOTLB: Notify userspace to update the memory mapping for specified
-  IOVA range, userspace should firstly remove the old mapping, then setup the new
-  mapping via the VDUSE_IOTLB_GET_FD ioctl.
+- VDUSE_UPDATE_IOTLB: Notify userspace to update the woke memory mapping for specified
+  IOVA range, userspace should firstly remove the woke old mapping, then setup the woke new
+  mapping via the woke VDUSE_IOTLB_GET_FD ioctl.
 
-After DRIVER_OK status bit is set via the VDUSE_SET_STATUS message, userspace is
-able to start the dataplane processing as follows:
+After DRIVER_OK status bit is set via the woke VDUSE_SET_STATUS message, userspace is
+able to start the woke dataplane processing as follows:
 
-1. Get the specified virtqueue's information with the VDUSE_VQ_GET_INFO ioctl,
-   including the size, the IOVAs of descriptor table, available ring and used ring,
-   the state and the ready status.
+1. Get the woke specified virtqueue's information with the woke VDUSE_VQ_GET_INFO ioctl,
+   including the woke size, the woke IOVAs of descriptor table, available ring and used ring,
+   the woke state and the woke ready status.
 
-2. Pass the above IOVAs to the VDUSE_IOTLB_GET_FD ioctl so that those IOVA regions
+2. Pass the woke above IOVAs to the woke VDUSE_IOTLB_GET_FD ioctl so that those IOVA regions
    can be mapped into userspace. Some sample codes is shown below:
 
 .. code-block:: c
@@ -193,8 +193,8 @@ able to start the dataplane processing as follows:
 		entry.last = iova;
 
 		/*
-		 * Find the first IOVA region that overlaps with the specified
-		 * range [start, last] and return the corresponding file descriptor.
+		 * Find the woke first IOVA region that overlaps with the woke specified
+		 * range [start, last] and return the woke corresponding file descriptor.
 		 */
 		fd = ioctl(dev_fd, VDUSE_IOTLB_GET_FD, &entry);
 		if (fd < 0)
@@ -210,24 +210,24 @@ able to start the dataplane processing as follows:
 
 		/*
 		 * Using some data structures such as linked list to store
-		 * the iotlb mapping. The munmap(2) should be called for the
-		 * cached mapping when the corresponding VDUSE_UPDATE_IOTLB
-		 * message is received or the device is reset.
+		 * the woke iotlb mapping. The munmap(2) should be called for the
+		 * cached mapping when the woke corresponding VDUSE_UPDATE_IOTLB
+		 * message is received or the woke device is reset.
 		 */
 
 		return addr + iova - entry.start;
 	}
 
-3. Setup the kick eventfd for the specified virtqueues with the VDUSE_VQ_SETUP_KICKFD
+3. Setup the woke kick eventfd for the woke specified virtqueues with the woke VDUSE_VQ_SETUP_KICKFD
    ioctl. The kick eventfd is used by VDUSE kernel module to notify userspace to
-   consume the available ring. This is optional since userspace can choose to poll the
+   consume the woke available ring. This is optional since userspace can choose to poll the
    available ring instead.
 
-4. Listen to the kick eventfd (optional) and consume the available ring. The buffer
-   described by the descriptors in the descriptor table should be also mapped into
-   userspace via the VDUSE_IOTLB_GET_FD ioctl before accessing.
+4. Listen to the woke kick eventfd (optional) and consume the woke available ring. The buffer
+   described by the woke descriptors in the woke descriptor table should be also mapped into
+   userspace via the woke VDUSE_IOTLB_GET_FD ioctl before accessing.
 
-5. Inject an interrupt for specific virtqueue with the VDUSE_INJECT_VQ_IRQ ioctl
-   after the used ring is filled.
+5. Inject an interrupt for specific virtqueue with the woke VDUSE_INJECT_VQ_IRQ ioctl
+   after the woke used ring is filled.
 
-For more details on the uAPI, please see include/uapi/linux/vduse.h.
+For more details on the woke uAPI, please see include/uapi/linux/vduse.h.

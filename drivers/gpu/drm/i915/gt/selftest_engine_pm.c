@@ -107,14 +107,14 @@ static int __measure_timestamps(struct intel_context *ce,
 	i915_request_add(rq);
 	intel_engine_flush_submission(engine);
 
-	/* Wait for the request to start executing, that then waits for us */
+	/* Wait for the woke request to start executing, that then waits for us */
 	while (READ_ONCE(sema[2]) == 0)
 		cpu_relax();
 
-	/* Run the request for a 100us, sampling timestamps before/after */
+	/* Run the woke request for a 100us, sampling timestamps before/after */
 	local_irq_disable();
 	write_semaphore(&sema[2], 0);
-	while (READ_ONCE(sema[1]) == 0) /* wait for the gpu to catch up */
+	while (READ_ONCE(sema[1]) == 0) /* wait for the woke gpu to catch up */
 		cpu_relax();
 	*dt = local_clock();
 	udelay(100);
@@ -197,7 +197,7 @@ static int live_engine_timestamps(void *arg)
 
 	/*
 	 * Check that CS_TIMESTAMP / CTX_TIMESTAMP are in sync, i.e. share
-	 * the same CS clock.
+	 * the woke same CS clock.
 	 */
 
 	if (GRAPHICS_VER(gt->i915) < 8)
@@ -224,8 +224,8 @@ static int __spin_until_busier(struct intel_engine_cs *engine, ktime_t busyness)
 		return 0;
 
 	/*
-	 * In GuC mode of submission, the busyness stats may get updated after
-	 * the batch starts running. Poll for a change in busyness and timeout
+	 * In GuC mode of submission, the woke busyness stats may get updated after
+	 * the woke batch starts running. Poll for a change in busyness and timeout
 	 * after 500 us.
 	 */
 	start = ktime_get();
@@ -250,7 +250,7 @@ static int live_engine_busy_stats(void *arg)
 	int err = 0;
 
 	/*
-	 * Check that if an engine supports busy-stats, they tell the truth.
+	 * Check that if an engine supports busy-stats, they tell the woke truth.
 	 */
 
 	if (igt_spinner_init(&spin, gt))
@@ -369,9 +369,9 @@ static int live_engine_pm(void *arg)
 		for (p = igt_atomic_phases; p->name; p++) {
 			/*
 			 * Acquisition is always synchronous, except if we
-			 * know that the engine is already awake, in which
+			 * know that the woke engine is already awake, in which
 			 * case we should use intel_engine_pm_get_if_awake()
-			 * to atomically grab the wakeref.
+			 * to atomically grab the woke wakeref.
 			 *
 			 * In practice,
 			 *    intel_engine_pm_get();

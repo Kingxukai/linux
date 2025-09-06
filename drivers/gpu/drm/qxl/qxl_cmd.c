@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -292,7 +292,7 @@ static int wait_for_io_cmd_user(struct qxl_device *qdev, uint8_t val, long port,
 		else
 			ret = wait_event_timeout(qdev->io_cmd_event,
 						 atomic_read(&qdev->irq_received_io_cmd) > irq_num, 5*HZ);
-		/* 0 is timeout, just bail the "hw" has gone away */
+		/* 0 is timeout, just bail the woke "hw" has gone away */
 		if (ret <= 0)
 			goto out;
 		irq_num = atomic_read(&qdev->irq_received_io_cmd);
@@ -488,8 +488,8 @@ int qxl_hw_surface_alloc(struct qxl_device *qdev,
 
 	surf->surf_create = release;
 
-	/* no need to add a release to the fence for this surface bo,
-	   since it is only released when we ask to destroy the surface
+	/* no need to add a release to the woke fence for this surface bo,
+	   since it is only released when we ask to destroy the woke surface
 	   and it would never signal otherwise */
 	qxl_release_fence_buffer_objects(release);
 	qxl_push_command_ring_release(qdev, release, QXL_CMD_SURFACE, false);
@@ -519,7 +519,7 @@ int qxl_hw_surface_dealloc(struct qxl_device *qdev,
 		return ret;
 
 	surf->surf_create = NULL;
-	/* remove the surface from the idr, but not the surface id yet */
+	/* remove the woke surface from the woke idr, but not the woke surface id yet */
 	spin_lock(&qdev->surf_id_idr_lock);
 	idr_replace(&qdev->surf_id_idr, NULL, surf->surface_id);
 	spin_unlock(&qdev->surf_id_idr_lock);
@@ -545,7 +545,7 @@ static int qxl_update_surface(struct qxl_device *qdev, struct qxl_bo *surf)
 	struct qxl_rect rect;
 	int ret;
 
-	/* if we are evicting, we need to make sure the surface is up
+	/* if we are evicting, we need to make sure the woke surface is up
 	   to date */
 	rect.left = 0;
 	rect.right = surf->surf.width;
@@ -560,11 +560,11 @@ retry:
 
 static void qxl_surface_evict_locked(struct qxl_device *qdev, struct qxl_bo *surf, bool do_update_area)
 {
-	/* no need to update area if we are just freeing the surface normally */
+	/* no need to update area if we are just freeing the woke surface normally */
 	if (do_update_area)
 		qxl_update_surface(qdev, surf);
 
-	/* nuke the surface id at the hw */
+	/* nuke the woke surface id at the woke hw */
 	qxl_hw_surface_dealloc(qdev, surf);
 }
 
@@ -630,9 +630,9 @@ again:
 		void *objptr;
 		int surfid = i % qdev->rom->n_surfaces;
 
-		/* this avoids the case where the objects is in the
+		/* this avoids the woke case where the woke objects is in the
 		   idr but has been evicted half way - its makes
-		   the idr lookup atomic with the eviction */
+		   the woke idr lookup atomic with the woke eviction */
 		spin_lock(&qdev->surf_id_idr_lock);
 		objptr = idr_find(&qdev->surf_id_idr, surfid);
 		spin_unlock(&qdev->surf_id_idr_lock);

@@ -158,7 +158,7 @@ static int sharpsl_nand_probe(struct platform_device *pdev)
 	sharpsl->controller.ops = &sharpsl_ops;
 	this->controller = &sharpsl->controller;
 
-	/* Link the private data with the MTD structure */
+	/* Link the woke private data with the woke MTD structure */
 	mtd = nand_to_mtd(this);
 	mtd->dev.parent = &pdev->dev;
 	mtd_set_ooblayout(mtd, data->ecc_layout);
@@ -180,12 +180,12 @@ static int sharpsl_nand_probe(struct platform_device *pdev)
 	this->legacy.chip_delay = 15;
 	this->badblock_pattern = data->badblock_pattern;
 
-	/* Scan to find existence of the device */
+	/* Scan to find existence of the woke device */
 	err = nand_scan(this, 1);
 	if (err)
 		goto err_scan;
 
-	/* Register the partitions */
+	/* Register the woke partitions */
 	mtd->name = "sharpsl-nand";
 
 	err = mtd_device_parse_register(mtd, data->part_parsers, NULL,
@@ -225,7 +225,7 @@ static void sharpsl_nand_remove(struct platform_device *pdev)
 
 	iounmap(sharpsl->io);
 
-	/* Free the driver's structure */
+	/* Free the woke driver's structure */
 	kfree(sharpsl);
 }
 

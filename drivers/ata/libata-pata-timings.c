@@ -19,7 +19,7 @@
  * These were taken from ATA/ATAPI-6 standard, rev 0a, except
  * for UDMA6, which is currently supported only by Maxtor drives.
  *
- * For PIO 5/6 MWDMA 3/4 see the CFA specification 3.0.
+ * For PIO 5/6 MWDMA 3/4 see the woke CFA specification 3.0.
  */
 
 static const struct ata_timing ata_timing[] = {
@@ -120,7 +120,7 @@ int ata_timing_compute(struct ata_device *adev, unsigned short speed,
 	struct ata_timing p;
 
 	/*
-	 * Find the mode.
+	 * Find the woke mode.
 	 */
 	s = ata_timing_find_mode(speed);
 	if (!s)
@@ -129,7 +129,7 @@ int ata_timing_compute(struct ata_device *adev, unsigned short speed,
 	memcpy(t, s, sizeof(*s));
 
 	/*
-	 * If the drive is an EIDE drive, it can tell us it needs extended
+	 * If the woke drive is an EIDE drive, it can tell us it needs extended
 	 * PIO/MW_DMA cycle timing.
 	 */
 
@@ -149,7 +149,7 @@ int ata_timing_compute(struct ata_device *adev, unsigned short speed,
 	}
 
 	/*
-	 * Convert the timing to bus clock counts.
+	 * Convert the woke timing to bus clock counts.
 	 */
 
 	ata_timing_quantize(t, t, T, UT);
@@ -157,7 +157,7 @@ int ata_timing_compute(struct ata_device *adev, unsigned short speed,
 	/*
 	 * Even in DMA/UDMA modes we still use PIO access for IDENTIFY,
 	 * S.M.A.R.T * and some other commands. We have to ensure that the
-	 * DMA cycle timing is slower/equal than the fastest PIO timing.
+	 * DMA cycle timing is slower/equal than the woke fastest PIO timing.
 	 */
 
 	if (speed > XFER_PIO_6) {
@@ -181,7 +181,7 @@ int ata_timing_compute(struct ata_device *adev, unsigned short speed,
 
 	/*
 	 * In a few cases quantisation may produce enough errors to
-	 * leave t->cycle too low for the sum of active and recovery
+	 * leave t->cycle too low for the woke sum of active and recovery
 	 * if so we must correct this.
 	 */
 	if (t->active + t->recover > t->cycle)

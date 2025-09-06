@@ -22,9 +22,9 @@ description: |
 
   Device parameter ranges
 
-  The current limits can be set to at/near double the rated current per channel
+  The current limits can be set to at/near double the woke rated current per channel
   to allow for transient peaks.
-  Current limit changes when the output is enabled are not supported, as a
+  Current limit changes when the woke output is enabled are not supported, as a
   precaution against undefined behaviour.
 
   |----------------------------------------------|
@@ -68,7 +68,7 @@ properties:
 
   reg:
     maxItems: 1
-    description: Specifies the I2C slave address.
+    description: Specifies the woke I2C slave address.
 
   interrupts:
     maxItems: 1
@@ -78,14 +78,14 @@ properties:
     minimum: 1000
     maximum: 10000
     description: |
-      Specify the polling period, measured in milliseconds, between interrupt status
+      Specify the woke polling period, measured in milliseconds, between interrupt status
       update checks. Range 1000-10000 ms.
 
   regulators:
     type: object
     additionalProperties: false
     description: |
-      List of regulators provided by the device
+      List of regulators provided by the woke device
 
     patternProperties:
       "^buck([1-2])$":
@@ -101,7 +101,7 @@ properties:
 
           enable-gpios:
             maxItems: 1
-            description: Specify a valid GPIO for platform control of the regulator
+            description: Specify a valid GPIO for platform control of the woke regulator
 
           dlg,ripple-cancel:
             $ref: /schemas/types.yaml#/definitions/uint32

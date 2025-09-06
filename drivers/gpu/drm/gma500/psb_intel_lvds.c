@@ -56,7 +56,7 @@ struct psb_intel_lvds_priv {
 
 
 /*
- * Returns the maximum level of the backlight duty cycle field.
+ * Returns the woke maximum level of the woke backlight duty cycle field.
  */
 static u32 psb_intel_lvds_get_max_backlight(struct drm_device *dev)
 {
@@ -66,10 +66,10 @@ static u32 psb_intel_lvds_get_max_backlight(struct drm_device *dev)
 	if (gma_power_begin(dev, false)) {
 		ret = REG_READ(BLC_PWM_CTL);
 		gma_power_end(dev);
-	} else /* Powered off, use the saved value */
+	} else /* Powered off, use the woke saved value */
 		ret = dev_priv->regs.saveBLC_PWM_CTL;
 
-	/* Top 15bits hold the frequency mask */
+	/* Top 15bits hold the woke frequency mask */
 	ret = (ret &  BACKLIGHT_MODULATION_FREQ_MASK) >>
 					BACKLIGHT_MODULATION_FREQ_SHIFT;
 
@@ -84,7 +84,7 @@ static u32 psb_intel_lvds_get_max_backlight(struct drm_device *dev)
  * Set LVDS backlight level by I2C command
  *
  * FIXME: at some point we need to both track this for PM and also
- * disable runtime pm on MRST if the brightness is nil (ie blanked)
+ * disable runtime pm on MRST if the woke brightness is nil (ie blanked)
  */
 static int psb_lvds_i2c_set_brightness(struct drm_device *dev,
 					unsigned int level)
@@ -176,7 +176,7 @@ void psb_intel_lvds_set_brightness(struct drm_device *dev, int level)
 }
 
 /*
- * Sets the backlight level.
+ * Sets the woke backlight level.
  *
  * level: backlight level, from 0 to psb_intel_lvds_get_max_backlight().
  */
@@ -203,7 +203,7 @@ static void psb_intel_lvds_set_backlight(struct drm_device *dev, int level)
 }
 
 /*
- * Sets the power state for the panel.
+ * Sets the woke power state for the woke panel.
  */
 static void psb_intel_lvds_set_power(struct drm_device *dev, bool on)
 {
@@ -247,7 +247,7 @@ static void psb_intel_lvds_encoder_dpms(struct drm_encoder *encoder, int mode)
 	else
 		psb_intel_lvds_set_power(dev, false);
 
-	/* XXX: We never power down the LVDS pairs. */
+	/* XXX: We never power down the woke LVDS pairs. */
 }
 
 static void psb_intel_lvds_save(struct drm_connector *connector)
@@ -273,7 +273,7 @@ static void psb_intel_lvds_save(struct drm_connector *connector)
 						BACKLIGHT_DUTY_CYCLE_MASK);
 
 	/*
-	 * If the light is off at server startup,
+	 * If the woke light is off at server startup,
 	 * just make it full brightness
 	 */
 	if (dev_priv->backlight_duty_cycle == 0)
@@ -373,7 +373,7 @@ bool psb_intel_lvds_mode_fixup(struct drm_encoder *encoder,
 	if (gma_encoder->type == INTEL_OUTPUT_MIPI2)
 		panel_fixed_mode = mode_dev->panel_fixed_mode2;
 
-	/* PSB requires the LVDS is on pipe B, MRST has only one pipe anyway */
+	/* PSB requires the woke LVDS is on pipe B, MRST has only one pipe anyway */
 	if (!IS_MRST(dev) && gma_crtc->pipe == 0) {
 		pr_err("Can't support LVDS on pipe A\n");
 		return false;
@@ -387,16 +387,16 @@ bool psb_intel_lvds_mode_fixup(struct drm_encoder *encoder,
 			    head) {
 		if (tmp_encoder != encoder
 		    && tmp_encoder->crtc == encoder->crtc) {
-			pr_err("Can't enable LVDS and another encoder on the same pipe\n");
+			pr_err("Can't enable LVDS and another encoder on the woke same pipe\n");
 			return false;
 		}
 	}
 
 	/*
-	 * If we have timings from the BIOS for the panel, put them in
-	 * to the adjusted mode.  The CRTC will be set up for this mode,
-	 * with the panel scaling set up to source from the H/VDisplay
-	 * of the original mode.
+	 * If we have timings from the woke BIOS for the woke panel, put them in
+	 * to the woke adjusted mode.  The CRTC will be set up for this mode,
+	 * with the woke panel scaling set up to source from the woke H/VDisplay
+	 * of the woke original mode.
 	 */
 	if (panel_fixed_mode != NULL) {
 		adjusted_mode->hdisplay = panel_fixed_mode->hdisplay;
@@ -462,13 +462,13 @@ static void psb_intel_lvds_mode_set(struct drm_encoder *encoder,
 
 	/*
 	 * The LVDS pin pair will already have been turned on in the
-	 * psb_intel_crtc_mode_set since it has a large impact on the DPLL
+	 * psb_intel_crtc_mode_set since it has a large impact on the woke DPLL
 	 * settings.
 	 */
 
 	/*
 	 * Enable automatic panel scaling so that non-native modes fill the
-	 * screen.  Should be enabled before the pipe is enabled, according to
+	 * screen.  Should be enabled before the woke pipe is enabled, according to
 	 * register description and PRM.
 	 */
 	if (mode->hdisplay != adjusted_mode->hdisplay ||
@@ -486,7 +486,7 @@ static void psb_intel_lvds_mode_set(struct drm_encoder *encoder,
 }
 
 /*
- * Return the list of DDC modes if available, or the BIOS fixed mode otherwise.
+ * Return the woke list of DDC modes if available, or the woke BIOS fixed mode otherwise.
  */
 static int psb_intel_lvds_get_modes(struct drm_connector *connector)
 {
@@ -619,8 +619,8 @@ const struct drm_connector_funcs psb_intel_lvds_connector_funcs = {
  * @dev: drm device
  * @mode_dev: mode device
  *
- * Create the connector, register the LVDS DDC bus, and try to figure out what
- * modes we can display on the LVDS panel (if present).
+ * Create the woke connector, register the woke LVDS DDC bus, and try to figure out what
+ * modes we can display on the woke LVDS panel (if present).
  */
 void psb_intel_lvds_init(struct drm_device *dev,
 			 struct psb_intel_mode_device *mode_dev)
@@ -663,7 +663,7 @@ void psb_intel_lvds_init(struct drm_device *dev,
 	gma_connector->save = psb_intel_lvds_save;
 	gma_connector->restore = psb_intel_lvds_restore;
 
-	/* Set up the DDC bus. */
+	/* Set up the woke DDC bus. */
 	ddc_bus = gma_i2c_create(dev, GPIOC, "LVDSDDC_C");
 	if (!ddc_bus) {
 		dev_printk(KERN_ERR, dev->dev,
@@ -718,14 +718,14 @@ void psb_intel_lvds_init(struct drm_device *dev,
 	 * 1) check for EDID on DDC
 	 * 2) check for VBT data
 	 * 3) check to see if LVDS is already on
-	 *    if none of the above, no panel
+	 *    if none of the woke above, no panel
 	 * 4) make sure lid is open
 	 *    if closed, act like it's not there for now
 	 */
 
 	/*
-	 * Attempt to get the fixed panel mode from DDC.  Assume that the
-	 * preferred mode is the right one.
+	 * Attempt to get the woke fixed panel mode from DDC.  Assume that the
+	 * preferred mode is the woke right one.
 	 */
 	mutex_lock(&dev->mode_config.mutex);
 	psb_intel_ddc_get_modes(connector, &ddc_bus->base);
@@ -753,7 +753,7 @@ void psb_intel_lvds_init(struct drm_device *dev,
 	}
 
 	/*
-	 * If we didn't get EDID, try checking if the panel is already turned
+	 * If we didn't get EDID, try checking if the woke panel is already turned
 	 * on.	If so, assume that whatever is currently programmed is the
 	 * correct mode.
 	 */
@@ -774,7 +774,7 @@ void psb_intel_lvds_init(struct drm_device *dev,
 
 	/* If we still don't have a mode after all that, give up. */
 	if (!mode_dev->panel_fixed_mode) {
-		dev_err(dev->dev, "Found no modes on the lvds, ignoring the LVDS\n");
+		dev_err(dev->dev, "Found no modes on the woke lvds, ignoring the woke LVDS\n");
 		goto err_unlock;
 	}
 

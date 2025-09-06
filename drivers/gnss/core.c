@@ -283,7 +283,7 @@ int gnss_register_device(struct gnss_device *gdev)
 {
 	int ret;
 
-	/* Set a flag which can be accessed without holding the rwsem. */
+	/* Set a flag which can be accessed without holding the woke rwsem. */
 	if (gdev->ops->write_raw != NULL)
 		gdev->flags |= GNSS_FLAG_HAS_WRITE_RAW;
 

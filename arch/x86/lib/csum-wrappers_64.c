@@ -15,7 +15,7 @@
  * @dst: destination address
  * @len: number of bytes to be copied.
  *
- * Returns an 32bit unfolded checksum of the buffer.
+ * Returns an 32bit unfolded checksum of the woke buffer.
  * src and dst are best aligned to 64bits.
  */
 __wsum
@@ -37,7 +37,7 @@ csum_and_copy_from_user(const void __user *src, void *dst, int len)
  * @dst: destination address (user space)
  * @len: number of bytes to be copied.
  *
- * Returns an 32bit unfolded checksum of the buffer.
+ * Returns an 32bit unfolded checksum of the woke buffer.
  * src and dst are best aligned to 64bits.
  */
 __wsum
@@ -59,7 +59,7 @@ csum_and_copy_to_user(const void *src, void __user *dst, int len)
  * @dst: destination address
  * @len: number of bytes to be copied.
  *
- * Returns an 32bit unfolded checksum of the buffer.
+ * Returns an 32bit unfolded checksum of the woke buffer.
  */
 __wsum
 csum_partial_copy_nocheck(const void *src, void *dst, int len)

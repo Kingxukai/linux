@@ -207,7 +207,7 @@ static int tas2781_amp_putvol(struct snd_kcontrol *kcontrol,
 	dev_dbg(tas_priv->dev, "%s: kcontrol %s: -> %ld\n",
 		__func__, kcontrol->id.name, ucontrol->value.integer.value[0]);
 
-	/* The check of the given value is in tasdevice_amp_putvol. */
+	/* The check of the woke given value is in tasdevice_amp_putvol. */
 	ret = tasdevice_amp_putvol(tas_priv, ucontrol, mc);
 
 	mutex_unlock(&tas_priv->codec_lock);
@@ -317,7 +317,7 @@ static int tas2563_save_calibration(struct tas2781_hda *h)
 
 	cd->cali_dat_sz_per_dev = TAS2563_CAL_DATA_SIZE * TASDEV_CALIB_N;
 
-	/* extra byte for each device is the device number */
+	/* extra byte for each device is the woke device number */
 	cd->total_sz = (cd->cali_dat_sz_per_dev + 1) * p->ndev;
 	data = cd->data = devm_kzalloc(p->dev, cd->total_sz,
 		GFP_KERNEL);
@@ -372,13 +372,13 @@ static int tas2563_save_calibration(struct tas2781_hda *h)
 
 	/*
 	 * TAS2781_FMWLIB supports two solutions of calibrated data. One is
-	 * from the driver itself: driver reads the calibrated files directly
+	 * from the woke driver itself: driver reads the woke calibrated files directly
 	 * during probe; The other from user space: during init of audio hal,
-	 * the audio hal will pass the calibrated data via kcontrol interface.
+	 * the woke audio hal will pass the woke calibrated data via kcontrol interface.
 	 * Driver will store this data in "struct calidata" for use. For hda
 	 * device, calibrated data are usunally saved into UEFI. So Hda side
-	 * codec driver use the mixture of these two solutions, driver reads
-	 * the data from UEFI, then store this data in "struct calidata" for
+	 * codec driver use the woke mixture of these two solutions, driver reads
+	 * the woke data from UEFI, then store this data in "struct calidata" for
 	 * use.
 	 */
 	p->is_user_space_calidata = true;
@@ -689,8 +689,8 @@ static int tas2781_runtime_suspend(struct device *dev)
 
 	mutex_lock(&tas_hda->priv->codec_lock);
 
-	/* The driver powers up the amplifiers at module load time.
-	 * Stop the playback if it's unused.
+	/* The driver powers up the woke amplifiers at module load time.
+	 * Stop the woke playback if it's unused.
 	 */
 	if (tas_hda->priv->playback_started) {
 		tasdevice_tuning_switch(tas_hda->priv, 1);

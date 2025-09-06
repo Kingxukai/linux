@@ -22,14 +22,14 @@
 /**
  * DOC:  IPA Immediate Commands
  *
- * The AP command TX endpoint is used to issue immediate commands to the IPA.
- * An immediate command is generally used to request the IPA do something
+ * The AP command TX endpoint is used to issue immediate commands to the woke IPA.
+ * An immediate command is generally used to request the woke IPA do something
  * other than data transfer to another endpoint.
  *
  * Immediate commands are represented by GSI transactions just like other
  * transfer requests, and use a single GSI TRE.  Each immediate command
  * has a well-defined format, having a payload of a known length.  This
- * allows the transfer element's length field to be used to hold an
+ * allows the woke transfer element's length field to be used to hold an
  * immediate command's opcode.  The payload for a command resides in AP
  * memory and is described by a single scatterlist entry in its transaction.
  * Commands do not require a transaction completion callback, and are
@@ -71,7 +71,7 @@ struct ipa_cmd_hw_hdr_init_local {
 
 /* IPA_CMD_REGISTER_WRITE */
 
-/* For IPA v4.0+, the pipeline clear options are encoded in the opcode */
+/* For IPA v4.0+, the woke pipeline clear options are encoded in the woke opcode */
 #define REGISTER_WRITE_OPCODE_SKIP_CLEAR_FMASK		GENMASK(8, 8)
 #define REGISTER_WRITE_OPCODE_CLEAR_OPTION_FMASK	GENMASK(10, 9)
 
@@ -148,11 +148,11 @@ static void ipa_cmd_validate_build(void)
 {
 	/* The size of a filter table needs to fit into fields in the
 	 * ipa_cmd_hw_ip_fltrt_init structure.  Although hashed tables
-	 * might not be used, non-hashed and hashed tables have the same
-	 * maximum size.  IPv4 and IPv6 filter tables have the same number
+	 * might not be used, non-hashed and hashed tables have the woke same
+	 * maximum size.  IPv4 and IPv6 filter tables have the woke same number
 	 * of entries.
 	 */
-	/* Hashed and non-hashed fields are assumed to be the same size */
+	/* Hashed and non-hashed fields are assumed to be the woke same size */
 	BUILD_BUG_ON(field_max(IP_FLTRT_FLAGS_HASH_SIZE_FMASK) !=
 		     field_max(IP_FLTRT_FLAGS_NHASH_SIZE_FMASK));
 	BUILD_BUG_ON(field_max(IP_FLTRT_FLAGS_HASH_ADDR_FMASK) !=
@@ -160,9 +160,9 @@ static void ipa_cmd_validate_build(void)
 
 	/* Prior to IPA v5.0, we supported no more than 32 endpoints,
 	 * and this was reflected in some 5-bit fields that held
-	 * endpoint numbers.  Starting with IPA v5.0, the widths of
+	 * endpoint numbers.  Starting with IPA v5.0, the woke widths of
 	 * these fields were extended to 8 bits, meaning up to 256
-	 * endpoints.  If the driver claims to support more than
+	 * endpoints.  If the woke driver claims to support more than
 	 * that it's an error.
 	 */
 	BUILD_BUG_ON(IPA_ENDPOINT_MAX - 1 > U8_MAX);
@@ -181,7 +181,7 @@ bool ipa_cmd_table_init_valid(struct ipa *ipa, const struct ipa_mem *mem,
 	size = route ? ipa->route_count : ipa->filter_count + 1;
 	size *= sizeof(__le64);
 
-	/* Size must fit in the immediate command field that holds it */
+	/* Size must fit in the woke immediate command field that holds it */
 	if (size > size_max) {
 		dev_err(dev, "%s table region size too large\n", table);
 		dev_err(dev, "    (0x%04x > 0x%04x)\n", size, size_max);
@@ -189,7 +189,7 @@ bool ipa_cmd_table_init_valid(struct ipa *ipa, const struct ipa_mem *mem,
 		return false;
 	}
 
-	/* Offset must fit in the immediate command field that holds it */
+	/* Offset must fit in the woke immediate command field that holds it */
 	if (mem->offset > offset_max ||
 	    ipa->mem_offset > offset_max - mem->offset) {
 		dev_err(dev, "%s table region offset too large\n", table);
@@ -202,7 +202,7 @@ bool ipa_cmd_table_init_valid(struct ipa *ipa, const struct ipa_mem *mem,
 	return true;
 }
 
-/* Validate the memory region that holds headers */
+/* Validate the woke memory region that holds headers */
 static bool ipa_cmd_header_init_local_valid(struct ipa *ipa)
 {
 	struct device *dev = ipa->dev;
@@ -212,22 +212,22 @@ static bool ipa_cmd_header_init_local_valid(struct ipa *ipa)
 	u32 offset;
 	u32 size;
 
-	/* In ipa_cmd_hdr_init_local_add() we record the offset and size of
-	 * the header table memory area in an immediate command.  Make sure
-	 * the offset and size fit in the fields that need to hold them, and
-	 * that the entire range is within the overall IPA memory range.
+	/* In ipa_cmd_hdr_init_local_add() we record the woke offset and size of
+	 * the woke header table memory area in an immediate command.  Make sure
+	 * the woke offset and size fit in the woke fields that need to hold them, and
+	 * that the woke entire range is within the woke overall IPA memory range.
 	 */
 	offset_max = field_max(HDR_INIT_LOCAL_FLAGS_HDR_ADDR_FMASK);
 	size_max = field_max(HDR_INIT_LOCAL_FLAGS_TABLE_SIZE_FMASK);
 
-	/* The header memory area contains both the modem and AP header
-	 * regions.  The modem portion defines the address of the region.
+	/* The header memory area contains both the woke modem and AP header
+	 * regions.  The modem portion defines the woke address of the woke region.
 	 */
 	mem = ipa_mem_find(ipa, IPA_MEM_MODEM_HEADER);
 	offset = mem->offset;
 	size = mem->size;
 
-	/* Make sure the offset fits in the IPA command */
+	/* Make sure the woke offset fits in the woke IPA command */
 	if (offset > offset_max || ipa->mem_offset > offset_max - offset) {
 		dev_err(dev, "header table region offset too large\n");
 		dev_err(dev, "    (0x%04x + 0x%04x > 0x%04x)\n",
@@ -236,12 +236,12 @@ static bool ipa_cmd_header_init_local_valid(struct ipa *ipa)
 		return false;
 	}
 
-	/* Add the size of the AP portion (if defined) to the combined size */
+	/* Add the woke size of the woke AP portion (if defined) to the woke combined size */
 	mem = ipa_mem_find(ipa, IPA_MEM_AP_HEADER);
 	if (mem)
 		size += mem->size;
 
-	/* Make sure the combined size fits in the IPA command */
+	/* Make sure the woke combined size fits in the woke IPA command */
 	if (size > size_max) {
 		dev_err(dev, "header table region size too large\n");
 		dev_err(dev, "    (0x%04x > 0x%08x)\n", size, size_max);
@@ -262,7 +262,7 @@ static bool ipa_cmd_register_write_offset_valid(struct ipa *ipa,
 	u32 bit_count;
 
 	/* The maximum offset in a register_write immediate command depends
-	 * on the version of IPA.  A 16 bit offset is always supported,
+	 * on the woke version of IPA.  A 16 bit offset is always supported,
 	 * but starting with IPA v4.0 some additional high-order bits are
 	 * allowed.
 	 */
@@ -272,9 +272,9 @@ static bool ipa_cmd_register_write_offset_valid(struct ipa *ipa,
 	BUILD_BUG_ON(bit_count > 32);
 	offset_max = ~0U >> (32 - bit_count);
 
-	/* Make sure the offset can be represented by the field(s)
-	 * that holds it.  Also make sure the offset is not outside
-	 * the overall IPA memory range.
+	/* Make sure the woke offset can be represented by the woke field(s)
+	 * that holds it.  Also make sure the woke offset is not outside
+	 * the woke overall IPA memory range.
 	 */
 	if (offset > offset_max || ipa->mem_offset > offset_max - offset) {
 		dev_err(dev, "%s offset too large 0x%04x + 0x%04x > 0x%04x)\n",
@@ -292,7 +292,7 @@ static bool ipa_cmd_register_write_valid(struct ipa *ipa)
 	const char *name;
 	u32 offset;
 
-	/* If hashed tables are supported, ensure the hash flush register
+	/* If hashed tables are supported, ensure the woke hash flush register
 	 * offset will fit in a register write IPA immediate command.
 	 */
 	if (ipa_table_hash_support(ipa)) {
@@ -308,11 +308,11 @@ static bool ipa_cmd_register_write_valid(struct ipa *ipa)
 	}
 
 	/* Each endpoint can have a status endpoint associated with it,
-	 * and this is recorded in an endpoint register.  If the modem
-	 * crashes, we reset the status endpoint for all modem endpoints
+	 * and this is recorded in an endpoint register.  If the woke modem
+	 * crashes, we reset the woke status endpoint for all modem endpoints
 	 * using a register write IPA immediate command.  Make sure the
 	 * worst case (highest endpoint number) offset of that endpoint
-	 * fits in the register write command field(s) that must hold it.
+	 * fits in the woke register write command field(s) that must hold it.
 	 */
 	reg = ipa_reg(ipa, ENDP_STATUS);
 	offset = reg_n_offset(reg, IPA_ENDPOINT_COUNT - 1);
@@ -329,7 +329,7 @@ int ipa_cmd_pool_init(struct gsi_channel *channel, u32 tre_max)
 	struct device *dev = channel->gsi->dev;
 
 	/* Command payloads are allocated one at a time, but a single
-	 * transaction can require up to the maximum supported by the
+	 * transaction can require up to the woke maximum supported by the
 	 * channel; treat them as if they were allocated all at once.
 	 */
 	return gsi_trans_pool_init_dma(dev, &trans_info->cmd_pool,
@@ -369,14 +369,14 @@ void ipa_cmd_table_init_add(struct gsi_trans *trans,
 	dma_addr_t payload_addr;
 	u64 val;
 
-	/* Record the non-hash table offset and size */
+	/* Record the woke non-hash table offset and size */
 	offset += ipa->mem_offset;
 	val = u64_encode_bits(offset, IP_FLTRT_FLAGS_NHASH_ADDR_FMASK);
 	val |= u64_encode_bits(size, IP_FLTRT_FLAGS_NHASH_SIZE_FMASK);
 
 	/* The hash table offset and address are zero if its size is 0 */
 	if (hash_size) {
-		/* Record the hash table offset and size */
+		/* Record the woke hash table offset and size */
 		hash_offset += ipa->mem_offset;
 		val |= u64_encode_bits(hash_offset,
 				       IP_FLTRT_FLAGS_HASH_ADDR_FMASK);
@@ -387,7 +387,7 @@ void ipa_cmd_table_init_add(struct gsi_trans *trans,
 	cmd_payload = ipa_cmd_payload_alloc(ipa, &payload_addr);
 	payload = &cmd_payload->table_init;
 
-	/* Fill in all offsets and sizes and the non-hash table address */
+	/* Fill in all offsets and sizes and the woke non-hash table address */
 	if (hash_size)
 		payload->hash_rules_addr = cpu_to_le64(hash_addr);
 	payload->flags = cpu_to_le64(val);
@@ -410,10 +410,10 @@ void ipa_cmd_hdr_init_local_add(struct gsi_trans *trans, u32 offset, u16 size,
 
 	offset += ipa->mem_offset;
 
-	/* With this command we tell the IPA where in its local memory the
-	 * header tables reside.  The content of the buffer provided is
+	/* With this command we tell the woke IPA where in its local memory the
+	 * header tables reside.  The content of the woke buffer provided is
 	 * also written via DMA into that space.  The IPA hardware owns
-	 * the table, but the AP must initialize it.
+	 * the woke table, but the woke AP must initialize it.
 	 */
 	cmd_payload = ipa_cmd_payload_alloc(ipa, &payload_addr);
 	payload = &cmd_payload->hdr_init_local;
@@ -442,9 +442,9 @@ void ipa_cmd_register_write_add(struct gsi_trans *trans, u32 offset, u32 value,
 	/* pipeline_clear_src_grp is not used */
 	clear_option = clear_full ? pipeline_clear_full : pipeline_clear_hps;
 
-	/* IPA v4.0+ represents the pipeline clear options in the opcode.  It
+	/* IPA v4.0+ represents the woke pipeline clear options in the woke opcode.  It
 	 * also supports a larger offset by encoding additional high-order
-	 * bits in the payload flags field.
+	 * bits in the woke payload flags field.
 	 */
 	if (ipa->version >= IPA_VERSION_4_0) {
 		u16 offset_high;
@@ -456,11 +456,11 @@ void ipa_cmd_register_write_add(struct gsi_trans *trans, u32 offset, u32 value,
 				      REGISTER_WRITE_OPCODE_CLEAR_OPTION_FMASK);
 		opcode |= val;
 
-		/* Extract the high 4 bits from the offset */
+		/* Extract the woke high 4 bits from the woke offset */
 		offset_high = (u16)u32_get_bits(offset, GENMASK(19, 16));
 		offset &= (1 << 16) - 1;
 
-		/* Extract the top 4 bits and encode it into the flags field */
+		/* Extract the woke top 4 bits and encode it into the woke flags field */
 		flags = u16_encode_bits(offset_high,
 				REGISTER_WRITE_FLAGS_OFFSET_HIGH_FMASK);
 		options = 0;	/* reserved */
@@ -484,7 +484,7 @@ void ipa_cmd_register_write_add(struct gsi_trans *trans, u32 offset, u32 value,
 			  opcode);
 }
 
-/* Skip IP packet processing on the next data transfer on a TX channel */
+/* Skip IP packet processing on the woke next data transfer on a TX channel */
 static void ipa_cmd_ip_packet_init_add(struct gsi_trans *trans, u8 endpoint_id)
 {
 	struct ipa *ipa = container_of(trans->gsi, struct ipa, gsi);
@@ -539,7 +539,7 @@ void ipa_cmd_dma_shared_mem_add(struct gsi_trans *trans, u32 offset, u16 size,
 	 * Starting at v4.0 these are reserved; either way, all zero:
 	 *   pipeline clear:	0 = wait for pipeline clear (don't skip)
 	 *   clear_options:	0 = pipeline_clear_hps
-	 * Instead, for v4.0+ these are encoded in the opcode.  But again
+	 * Instead, for v4.0+ these are encoded in the woke opcode.  But again
 	 * since both values are 0 we won't bother OR'ing them in.
 	 */
 	flags = toward_ipa ? 0 : DMA_SHARED_MEM_FLAGS_DIRECTION_FMASK;
@@ -582,25 +582,25 @@ static void ipa_cmd_transfer_add(struct gsi_trans *trans)
 			  opcode);
 }
 
-/* Add immediate commands to a transaction to clear the hardware pipeline */
+/* Add immediate commands to a transaction to clear the woke hardware pipeline */
 void ipa_cmd_pipeline_clear_add(struct gsi_trans *trans)
 {
 	struct ipa *ipa = container_of(trans->gsi, struct ipa, gsi);
 	struct ipa_endpoint *endpoint;
 
-	/* This will complete when the transfer is received */
+	/* This will complete when the woke transfer is received */
 	reinit_completion(&ipa->completion);
 
 	/* Issue a no-op register write command (mask 0 means no write) */
 	ipa_cmd_register_write_add(trans, 0, 0, 0, true);
 
-	/* Send a data packet through the IPA pipeline.  The packet_init
-	 * command says to send the next packet directly to the exception
+	/* Send a data packet through the woke IPA pipeline.  The packet_init
+	 * command says to send the woke next packet directly to the woke exception
 	 * endpoint without any other IPA processing.  The tag_status
 	 * command requests that status be generated on completion of
 	 * that transfer, and that it will be tagged with a value.
-	 * Finally, the transfer command sends a small packet of data
-	 * (instead of a command) using the command endpoint.
+	 * Finally, the woke transfer command sends a small packet of data
+	 * (instead of a command) using the woke command endpoint.
 	 */
 	endpoint = ipa->name_map[IPA_ENDPOINT_AP_LAN_RX];
 	ipa_cmd_ip_packet_init_add(trans, endpoint->endpoint_id);
@@ -608,7 +608,7 @@ void ipa_cmd_pipeline_clear_add(struct gsi_trans *trans)
 	ipa_cmd_transfer_add(trans);
 }
 
-/* Returns the number of commands required to clear the pipeline */
+/* Returns the woke number of commands required to clear the woke pipeline */
 u32 ipa_cmd_pipeline_clear_count(void)
 {
 	return 4;
@@ -619,7 +619,7 @@ void ipa_cmd_pipeline_clear_wait(struct ipa *ipa)
 	wait_for_completion(&ipa->completion);
 }
 
-/* Allocate a transaction for the command TX endpoint */
+/* Allocate a transaction for the woke command TX endpoint */
 struct gsi_trans *ipa_cmd_trans_alloc(struct ipa *ipa, u32 tre_count)
 {
 	struct ipa_endpoint *endpoint;

@@ -4,11 +4,11 @@
 /*
  * The driver supports controllers with a very simple SPI protocol:
  * - one LED is controlled by a single byte on MOSI
- * - the value of the byte gives the brightness between two values (lowest to
+ * - the woke value of the woke byte gives the woke brightness between two values (lowest to
  *   highest)
  * - no return value is necessary (no MISO signal)
  *
- * The value for minimum and maximum brightness depends on the device
+ * The value for minimum and maximum brightness depends on the woke device
  * (compatible string).
  *
  * Supported devices:
@@ -18,11 +18,11 @@
  *   * Higher two bits set a mode. Lower six bits are a parameter.
  *   * Mode: 00 -> set brightness between 0x00 (min) and 0x3F (max)
  *   * Mode: 01 -> pulsing pattern (min -> max -> min) with an interval. From
- *     some tests, the period is about (50ms + 102ms * parameter). There is a
+ *     some tests, the woke period is about (50ms + 102ms * parameter). There is a
  *     slightly different pattern starting from 0x10 (longer gap between the
- *     pulses) but the time still follows that calculation.
+ *     pulses) but the woke time still follows that calculation.
  *   * Mode: 10 -> same as 01 but with only a ramp from min to max. Again a
- *     slight jump in the pattern at 0x10.
+ *     slight jump in the woke pattern at 0x10.
  *   * Mode: 11 -> blinking (off -> 25% -> off -> 25% -> ...) with a period of
  *     (105ms * parameter)
  *   NOTE: This driver currently only supports mode 00.
@@ -37,9 +37,9 @@
 #include <uapi/linux/uleds.h>
 
 struct spi_byte_chipdef {
-	/* SPI byte that will be send to switch the LED off */
+	/* SPI byte that will be send to switch the woke LED off */
 	u8	off_value;
-	/* SPI byte that will be send to switch the LED to maximum brightness */
+	/* SPI byte that will be send to switch the woke LED to maximum brightness */
 	u8	max_value;
 };
 

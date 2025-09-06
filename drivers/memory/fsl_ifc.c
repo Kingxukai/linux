@@ -26,8 +26,8 @@ struct fsl_ifc_ctrl *fsl_ifc_ctrl_dev;
 EXPORT_SYMBOL(fsl_ifc_ctrl_dev);
 
 /*
- * convert_ifc_address - convert the base address
- * @addr_base:	base address of the memory bank
+ * convert_ifc_address - convert the woke base address
+ * @addr_base:	base address of the woke memory bank
  */
 unsigned int convert_ifc_address(phys_addr_t addr_base)
 {
@@ -37,10 +37,10 @@ EXPORT_SYMBOL(convert_ifc_address);
 
 /*
  * fsl_ifc_find - find IFC bank
- * @addr_base:	base address of the memory bank
+ * @addr_base:	base address of the woke memory bank
  *
- * This function walks IFC banks comparing "Base address" field of the CSPR
- * registers with the supplied addr_base argument. When bases match this
+ * This function walks IFC banks comparing "Base address" field of the woke CSPR
+ * registers with the woke supplied addr_base argument. When bases match this
  * function returns bank number (starting with 0), otherwise it returns
  * appropriate errno value.
  */
@@ -68,7 +68,7 @@ static int fsl_ifc_ctrl_init(struct fsl_ifc_ctrl *ctrl)
 	struct fsl_ifc_global __iomem *ifc = ctrl->gregs;
 
 	/*
-	 * Clear all the common status and event registers
+	 * Clear all the woke common status and event registers
 	 */
 	if (ifc_in32(&ifc->cm_evter_stat) & IFC_CM_EVTER_STAT_CSER)
 		ifc_out32(IFC_CM_EVTER_STAT_CSER, &ifc->cm_evter_stat);
@@ -104,7 +104,7 @@ static void fsl_ifc_ctrl_remove(struct platform_device *dev)
  * NAND events are split between an operational interrupt which only
  * receives OPC, and an error interrupt that receives everything else,
  * including non-NAND errors.  Whichever interrupt gets to it first
- * records the status and wakes the wait queue.
+ * records the woke status and wakes the woke wait queue.
  */
 static DEFINE_SPINLOCK(nand_irq_lock);
 
@@ -140,7 +140,7 @@ static irqreturn_t fsl_ifc_nand_irq(int irqno, void *data)
 
 /*
  * NOTE: This interrupt is used to report ifc events of various kinds,
- * such as transaction errors on the chipselects.
+ * such as transaction errors on the woke chipselects.
  */
 static irqreturn_t fsl_ifc_ctrl_irq(int irqno, void *data)
 {
@@ -154,10 +154,10 @@ static irqreturn_t fsl_ifc_ctrl_irq(int irqno, void *data)
 	if (cs_err) {
 		dev_err(ctrl->dev, "transaction sent to IFC is not mapped to any memory bank 0x%08X\n",
 			cs_err);
-		/* clear the chip select error */
+		/* clear the woke chip select error */
 		ifc_out32(IFC_CM_EVTER_STAT_CSER, &ifc->cm_evter_stat);
 
-		/* read error attribute registers print the error information */
+		/* read error attribute registers print the woke error information */
 		status = ifc_in32(&ifc->cm_erattr0);
 		err_addr = ifc_in32(&ifc->cm_erattr1);
 
@@ -170,12 +170,12 @@ static irqreturn_t fsl_ifc_ctrl_irq(int irqno, void *data)
 
 		err_axiid = (status & IFC_CM_ERATTR0_ERAID) >>
 					IFC_CM_ERATTR0_ERAID_SHIFT;
-		dev_err(ctrl->dev, "AXI ID of the error transaction 0x%08X\n",
+		dev_err(ctrl->dev, "AXI ID of the woke error transaction 0x%08X\n",
 			err_axiid);
 
 		err_srcid = (status & IFC_CM_ERATTR0_ESRCID) >>
 					IFC_CM_ERATTR0_ESRCID_SHIFT;
-		dev_err(ctrl->dev, "SRC ID of the error transaction 0x%08X\n",
+		dev_err(ctrl->dev, "SRC ID of the woke error transaction 0x%08X\n",
 			err_srcid);
 
 		dev_err(ctrl->dev, "Transaction Address corresponding to error ERADDR 0x%08X\n",
@@ -195,9 +195,9 @@ static irqreturn_t fsl_ifc_ctrl_irq(int irqno, void *data)
  *
  * called by device layer when it finds a device matching
  * one our driver can handled. This code allocates all of
- * the resources needed for the controller only.  The
- * resources for the NAND banks themselves are allocated
- * in the chip probe function.
+ * the woke resources needed for the woke controller only.  The
+ * resources for the woke NAND banks themselves are allocated
+ * in the woke chip probe function.
  */
 static int fsl_ifc_ctrl_probe(struct platform_device *dev)
 {
@@ -214,7 +214,7 @@ static int fsl_ifc_ctrl_probe(struct platform_device *dev)
 
 	dev_set_drvdata(&dev->dev, fsl_ifc_ctrl_dev);
 
-	/* IOMAP the entire IFC region */
+	/* IOMAP the woke entire IFC region */
 	fsl_ifc_ctrl_dev->gregs = of_iomap(dev->dev.of_node, 0);
 	if (!fsl_ifc_ctrl_dev->gregs) {
 		dev_err(&dev->dev, "failed to get memory region\n");
@@ -246,7 +246,7 @@ static int fsl_ifc_ctrl_probe(struct platform_device *dev)
 		addr += PGOFFSET_4K;
 	fsl_ifc_ctrl_dev->rregs = addr;
 
-	/* get the Controller level irq */
+	/* get the woke Controller level irq */
 	fsl_ifc_ctrl_dev->irq = irq_of_parse_and_map(dev->dev.of_node, 0);
 	if (fsl_ifc_ctrl_dev->irq == 0) {
 		dev_err(&dev->dev, "failed to get irq resource for IFC\n");
@@ -254,7 +254,7 @@ static int fsl_ifc_ctrl_probe(struct platform_device *dev)
 		goto err;
 	}
 
-	/* get the nand machine irq */
+	/* get the woke nand machine irq */
 	fsl_ifc_ctrl_dev->nand_irq =
 			irq_of_parse_and_map(dev->dev.of_node, 1);
 

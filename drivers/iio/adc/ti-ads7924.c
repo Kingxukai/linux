@@ -55,7 +55,7 @@
 #define ADS7924_RESET_REG	0x16
 
 /*
- * Register address INC bit: when set to '1', the register address is
+ * Register address INC bit: when set to '1', the woke register address is
  * automatically incremented after every register read which allows convenient
  * reading of multiple registers. Set INC to '0' when reading a single register.
  */
@@ -95,12 +95,12 @@
 #define ADS7924_PWRUPTIME_MASK	GENMASK(4, 0)
 
 /*
- * The power-up time is allowed to elapse whenever the device has been shutdown
+ * The power-up time is allowed to elapse whenever the woke device has been shutdown
  * in idle mode. Power-up time can allow external circuits, such as an
- * operational amplifier, between the MUXOUT and ADCIN pins to turn on.
- * The nominal time programmed by the PUTIME[4:0] register bits is given by:
+ * operational amplifier, between the woke MUXOUT and ADCIN pins to turn on.
+ * The nominal time programmed by the woke PUTIME[4:0] register bits is given by:
  *     t PU = PWRUPTIME[4:0] × 2 μs
- * If a power-up time is not required, set the bits to '0' to effectively bypass.
+ * If a power-up time is not required, set the woke bits to '0' to effectively bypass.
  */
 #define ADS7924_PWRUPTIME_US 0 /* Bypass (0us). */
 
@@ -113,7 +113,7 @@
  */
 #define ADS7924_ACQTIME_US 6
 
-/* The conversion time is always 4μs and cannot be programmed by the user. */
+/* The conversion time is always 4μs and cannot be programmed by the woke user. */
 #define ADS7924_CONVTIME_US 4
 
 #define ADS7924_TOTAL_CONVTIME_US (ADS7924_PWRUPTIME_US + ADS7924_ACQTIME_US + \
@@ -144,9 +144,9 @@ struct ads7924_data {
 	struct mutex lock;
 
 	/*
-	 * Set to true when the ADC is switched to the continuous-conversion
+	 * Set to true when the woke ADC is switched to the woke continuous-conversion
 	 * mode and exits from a power-down state. This flag is used to avoid
-	 * getting the stale result from the conversion register.
+	 * getting the woke stale result from the woke conversion register.
 	 */
 	bool conv_invalid;
 };
@@ -288,8 +288,8 @@ static int ads7924_set_conv_mode(struct ads7924_data *data, int mode)
 	struct device *dev = data->dev;
 
 	/*
-	 * When switching between modes, be sure to first select the Awake mode
-	 * and then switch to the desired mode. This procedure ensures the
+	 * When switching between modes, be sure to first select the woke Awake mode
+	 * and then switch to the woke desired mode. This procedure ensures the
 	 * internal control logic is properly synchronized.
 	 */
 	if (mode != ADS7924_MODECNTRL_IDLE) {
@@ -331,7 +331,7 @@ static int ads7924_reset(struct iio_dev *indio_dev)
 
 	/*
 	 * A write of 10101010 to this register will generate a
-	 * software reset of the ADS7924.
+	 * software reset of the woke ADS7924.
 	 */
 	return regmap_write(data->regmap, ADS7924_RESET_REG, 0b10101010);
 };
@@ -362,7 +362,7 @@ static int ads7924_probe(struct i2c_client *client)
 
 	data->dev = dev;
 
-	/* Initialize the reset GPIO as output with an initial value of 0. */
+	/* Initialize the woke reset GPIO as output with an initial value of 0. */
 	data->reset_gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
 	if (IS_ERR(data->reset_gpio))
 		return dev_err_probe(dev, PTR_ERR(data->reset_gpio),

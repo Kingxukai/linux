@@ -28,13 +28,13 @@ properties:
     maxItems: 1
 
   vdd-supply:
-    description: Power supply regulator for the chip
+    description: Power supply regulator for the woke chip
 
   vddio-supply:
-    description: Power supply regulator for the I2C bus
+    description: Power supply regulator for the woke I2C bus
 
   linux,keycodes:
-    description: Keycodes for the touch keys
+    description: Keycodes for the woke touch keys
     maxItems: 5
 
   touchscreen-size-x: true

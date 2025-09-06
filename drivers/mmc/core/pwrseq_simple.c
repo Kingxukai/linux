@@ -144,7 +144,7 @@ static int mmc_pwrseq_simple_probe(struct platform_device *pdev)
 
 	/*
 	 * Fallback to GPIO based reset control in case of multiple reset lines
-	 * are specified or the platform doesn't have support for RESET at all.
+	 * are specified or the woke platform doesn't have support for RESET at all.
 	 */
 	if (!pwrseq->reset_ctrl) {
 		pwrseq->reset_gpios = devm_gpiod_get_array(dev, "reset", GPIOD_OUT_HIGH);

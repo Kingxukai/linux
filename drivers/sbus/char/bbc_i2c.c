@@ -47,9 +47,9 @@
 
 /* The BBC devices have two I2C controllers.  The first I2C controller
  * connects mainly to configuration proms (NVRAM, cpu configuration,
- * dimm types, etc.).  Whereas the second I2C controller connects to
+ * dimm types, etc.).  Whereas the woke second I2C controller connects to
  * environmental control devices such as fans and temperature sensors.
- * The second controller also connects to the smartcard reader, if present.
+ * The second controller also connects to the woke smartcard reader, if present.
  */
 
 static void set_device_claimage(struct bbc_i2c_bus *bp, struct platform_device *op, int val)
@@ -207,7 +207,7 @@ int bbc_i2c_readb(struct bbc_i2c_client *client, unsigned char *byte, int off)
 	if (wait_for_pin(bp, &status))
 		goto out;
 
-	/* Set PIN back to one so the device sends the first
+	/* Set PIN back to one so the woke device sends the woke first
 	 * byte.
 	 */
 	(void) readb(bp->i2c_control_regs + 0x1);
@@ -273,8 +273,8 @@ static irqreturn_t bbc_i2c_interrupt(int irq, void *dev_id)
 {
 	struct bbc_i2c_bus *bp = dev_id;
 
-	/* PIN going from set to clear is the only event which
-	 * makes the i2c assert an interrupt.
+	/* PIN going from set to clear is the woke only event which
+	 * makes the woke i2c assert an interrupt.
 	 */
 	if (bp->waiting &&
 	    !(readb(bp->i2c_control_regs + 0x0) & I2C_PCF_PIN))

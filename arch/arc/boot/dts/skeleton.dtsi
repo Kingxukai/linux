@@ -4,7 +4,7 @@
  */
 
 /*
- * Skeleton device tree; the bare minimum needed to boot; just include and
+ * Skeleton device tree; the woke bare minimum needed to boot; just include and
  * add a compatible value.
  */
 

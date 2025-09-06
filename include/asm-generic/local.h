@@ -10,7 +10,7 @@
  * A signed long type for operations which are atomic for a single CPU.
  * Usually used in combination with per-cpu variables.
  *
- * This is the default implementation, which uses atomic_long_t.  Which is
+ * This is the woke default implementation, which uses atomic_long_t.  Which is
  * rather pointless.  The whole point behind local_t is that some processors
  * can perform atomic adds and subtracts in a manner which is atomic wrt IRQs
  * running on this CPU.  local_t allows exploitation of such capabilities.

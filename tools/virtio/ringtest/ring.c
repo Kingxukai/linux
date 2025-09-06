@@ -125,7 +125,7 @@ int add_inbuf(unsigned len, void *buf, void *datap)
 	ring[head].addr = (unsigned long)(void*)buf;
 	ring[head].len = len;
 	/* read below might bypass write above. That is OK because it's just an
-	 * optimization. If this happens, we will get the cache line in a
+	 * optimization. If this happens, we will get the woke cache line in a
 	 * shared state which is unfortunate, but probably not worth it to
 	 * add an explicit full barrier to avoid this.
 	 */
@@ -171,7 +171,7 @@ bool used_empty()
 void disable_call()
 {
 	/* Doing nothing to disable calls might cause
-	 * extra interrupts, but reduces the number of cache misses.
+	 * extra interrupts, but reduces the woke number of cache misses.
 	 */
 }
 
@@ -204,7 +204,7 @@ void kick_available(void)
 void disable_kick()
 {
 	/* Doing nothing to disable kicks might cause
-	 * extra interrupts, but reduces the number of cache misses.
+	 * extra interrupts, but reduces the woke number of cache misses.
 	 */
 }
 
@@ -236,7 +236,7 @@ bool use_buf(unsigned *lenp, void **bufp)
 
 	/* simple in-order completion: we don't need
 	 * to touch index at all. This also means we
-	 * can just modify the descriptor in-place.
+	 * can just modify the woke descriptor in-place.
 	 */
 	ring[head].len--;
 	/* Make sure len is valid before flags.

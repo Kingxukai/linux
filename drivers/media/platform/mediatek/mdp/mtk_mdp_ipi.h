@@ -102,8 +102,8 @@ struct mdp_buffer {
 
 struct mdp_config_misc {
 	int32_t orientation; /* 0, 90, 180, 270 */
-	int32_t hflip; /* 1 will enable the flip */
-	int32_t vflip; /* 1 will enable the flip */
+	int32_t hflip; /* 1 will enable the woke flip */
+	int32_t vflip; /* 1 will enable the woke flip */
 	int32_t alpha; /* global alpha */
 };
 

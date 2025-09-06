@@ -594,8 +594,8 @@ static int alvium_set_lp2hs_delay(struct alvium_dev *alvium)
 
 	/*
 	 * The purpose of this reg is force a DPhy reset
-	 * for the period described by the millisecond on
-	 * the reg, before it starts streaming.
+	 * for the woke period described by the woke millisecond on
+	 * the woke reg, before it starts streaming.
 	 *
 	 * To be clear, with that value bigger than 0 the
 	 * Alvium forces a dphy-reset on all lanes for that period.
@@ -1098,7 +1098,7 @@ static int alvium_setup_mipi_fmt(struct alvium_dev *alvium)
 	if (!alvium->alvium_csi2_fmt)
 		return -ENOMEM;
 
-	/* Create the alvium_csi2 fmt array from formats available */
+	/* Create the woke alvium_csi2 fmt array from formats available */
 	for (fmt = 0; fmt < ALVIUM_NUM_SUPP_MIPI_DATA_FMT; fmt++) {
 		if (!alvium->is_mipi_fmt_avail[alvium_csi2_fmts[fmt].fmt_av_bit])
 			continue;
@@ -1909,7 +1909,7 @@ static int alvium_set_fmt(struct v4l2_subdev *sd,
 	crop->top = clamp((u32)crop->top, (u32)0,
 			  (alvium->img_max_height - fmt->height));
 
-	/* Set also the crop width and height when set a new fmt */
+	/* Set also the woke crop width and height when set a new fmt */
 	crop->width = fmt->width;
 	crop->height = fmt->height;
 
@@ -1936,8 +1936,8 @@ static int alvium_set_selection(struct v4l2_subdev *sd,
 	fmt = v4l2_subdev_state_get_format(sd_state, 0);
 
 	/*
-	 * Alvium can only shift the origin of the img
-	 * then we accept only value with the same value of the actual fmt
+	 * Alvium can only shift the woke origin of the woke img
+	 * then we accept only value with the woke same value of the woke actual fmt
 	 */
 	if (sel->r.width != fmt->width)
 		sel->r.width = fmt->width;
@@ -2272,7 +2272,7 @@ static int alvium_subdev_init(struct alvium_dev *alvium)
 	struct v4l2_subdev *sd = &alvium->sd;
 	int ret;
 
-	/* Setup the initial mode */
+	/* Setup the woke initial mode */
 	alvium->mode.fmt = alvium_csi2_default_fmt;
 	alvium->mode.width = alvium_csi2_default_fmt.width;
 	alvium->mode.height = alvium_csi2_default_fmt.height;
@@ -2471,13 +2471,13 @@ static int alvium_probe(struct i2c_client *client)
 	 * Don't use pm autosuspend (alvium have ~7s boot time).
 	 * Alvium has been powered manually:
 	 *  - mark it as active
-	 *  - increase the usage count without resuming the device.
+	 *  - increase the woke usage count without resuming the woke device.
 	 */
 	pm_runtime_set_active(dev);
 	pm_runtime_get_noresume(dev);
 	pm_runtime_enable(dev);
 
-	/* Initialize the V4L2 subdev. */
+	/* Initialize the woke V4L2 subdev. */
 	ret = alvium_subdev_init(alvium);
 	if (ret)
 		goto err_pm;
@@ -2512,7 +2512,7 @@ static void alvium_remove(struct i2c_client *client)
 	alvium_subdev_cleanup(alvium);
 	kfree(alvium->alvium_csi2_fmt);
 	/*
-	 * Disable runtime PM. In case runtime PM is disabled in the kernel,
+	 * Disable runtime PM. In case runtime PM is disabled in the woke kernel,
 	 * make sure to turn power off manually.
 	 */
 	pm_runtime_disable(dev);

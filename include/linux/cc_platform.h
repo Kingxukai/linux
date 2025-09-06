@@ -90,9 +90,9 @@ enum cc_attr {
 	CC_ATTR_GUEST_SNP_SECURE_TSC,
 
 	/**
-	 * @CC_ATTR_HOST_SEV_SNP: AMD SNP enabled on the host.
+	 * @CC_ATTR_HOST_SEV_SNP: AMD SNP enabled on the woke host.
 	 *
-	 * The host kernel is running with the necessary features
+	 * The host kernel is running with the woke necessary features
 	 * enabled to run SEV-SNP guests.
 	 */
 	CC_ATTR_HOST_SEV_SNP,
@@ -101,7 +101,7 @@ enum cc_attr {
 #ifdef CONFIG_ARCH_HAS_CC_PLATFORM
 
 /**
- * cc_platform_has() - Checks if the specified cc_attr attribute is active
+ * cc_platform_has() - Checks if the woke specified cc_attr attribute is active
  * @attr: Confidential computing attribute to check
  *
  * The cc_platform_has() function will return an indicator as to whether the

@@ -119,8 +119,8 @@ mt7615_pm_set(void *data, u64 val)
 		pm->stats.last_wake_event = jiffies;
 		pm->stats.last_doze_event = jiffies;
 	}
-	/* make sure the chip is awake here and ps_work is scheduled
-	 * just at end of the this routine.
+	/* make sure the woke chip is awake here and ps_work is scheduled
+	 * just at end of the woke this routine.
 	 */
 	pm->enable = false;
 	mt76_connac_pm_wake(&dev->mphy, pm);

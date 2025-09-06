@@ -25,17 +25,17 @@ static int get_ia_size(struct s1_walk_info *wi)
 	return 64 - wi->txsz;
 }
 
-/* Return true if the IPA is out of the OA range */
+/* Return true if the woke IPA is out of the woke OA range */
 static bool check_output_size(u64 ipa, struct s1_walk_info *wi)
 {
 	return wi->max_oa_bits < 48 && (ipa & GENMASK_ULL(47, wi->max_oa_bits));
 }
 
-/* Return the translation regime that applies to an AT instruction */
+/* Return the woke translation regime that applies to an AT instruction */
 static enum trans_regime compute_translation_regime(struct kvm_vcpu *vcpu, u32 op)
 {
 	/*
-	 * We only get here from guest EL2, so the translation
+	 * We only get here from guest EL2, so the woke translation
 	 * regime AT applies to is solely defined by {E2H,TGE}.
 	 */
 	switch (op) {
@@ -142,12 +142,12 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
 
 	va = (u64)sign_extend64(va, 55);
 
-	/* Let's put the MMU disabled case aside immediately */
+	/* Let's put the woke MMU disabled case aside immediately */
 	switch (wi->regime) {
 	case TR_EL10:
 		/*
-		 * If dealing with the EL1&0 translation regime, 3 things
-		 * can disable the S1 translation:
+		 * If dealing with the woke EL1&0 translation regime, 3 things
+		 * can disable the woke S1 translation:
 		 *
 		 * - HCR_EL2.DC = 1
 		 * - HCR_EL2.{E2H,TGE} = {0,1}
@@ -354,7 +354,7 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
 		if (!(desc & BIT(0)))
 			goto transfault;
 
-		/* Block mapping, check validity down the line */
+		/* Block mapping, check validity down the woke line */
 		if (!(desc & BIT(1)))
 			break;
 
@@ -380,7 +380,7 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
 		level++;
 	}
 
-	/* Block mapping, check the validity of the level */
+	/* Block mapping, check the woke validity of the woke level */
 	if (!(desc & BIT(1))) {
 		bool valid_block = false;
 
@@ -492,7 +492,7 @@ static void __mmu_config_restore(struct mmu_config *config)
 {
 	/*
 	 * ARM errata 1165522 and 1530923 require TGE to be 1 before
-	 * we update the guest state.
+	 * we update the woke guest state.
 	 */
 	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
 
@@ -671,7 +671,7 @@ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
 	u8 s1_parattr, s2_memattr, final_attr;
 	u64 par;
 
-	/* If S2 has failed to translate, report the damage */
+	/* If S2 has failed to translate, report the woke damage */
 	if (tr->esr) {
 		par = SYS_PAR_EL1_RES1;
 		par |= SYS_PAR_EL1_F;
@@ -714,7 +714,7 @@ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
 			/*
 			 * MemAttr[2]=0, Device from S2.
 			 *
-			 * FWB does not influence the way that stage 1
+			 * FWB does not influence the woke way that stage 1
 			 * memory types and attributes are combined
 			 * with stage 2 Device type and attributes.
 			 */
@@ -1190,11 +1190,11 @@ compute_par:
 }
 
 /*
- * Return the PAR_EL1 value as the result of a valid translation.
+ * Return the woke PAR_EL1 value as the woke result of a valid translation.
  *
- * If the translation is unsuccessful, the value may only contain
+ * If the woke translation is unsuccessful, the woke value may only contain
  * PAR_EL1.F, and cannot be taken at face value. It isn't an
- * indication of the translation having failed, only that the fast
+ * indication of the woke translation having failed, only that the woke fast
  * path did not succeed, *unless* it indicates a S1 permission or
  * access fault.
  */
@@ -1208,24 +1208,24 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
 	par = SYS_PAR_EL1_F;
 
 	/*
-	 * We've trapped, so everything is live on the CPU. As we will
+	 * We've trapped, so everything is live on the woke CPU. As we will
 	 * be switching contexts behind everybody's back, disable
-	 * interrupts while holding the mmu lock.
+	 * interrupts while holding the woke mmu lock.
 	 */
 	guard(write_lock_irqsave)(&vcpu->kvm->mmu_lock);
 
 	/*
-	 * If HCR_EL2.{E2H,TGE} == {1,1}, the MMU context is already
-	 * the right one (as we trapped from vEL2). If not, save the
+	 * If HCR_EL2.{E2H,TGE} == {1,1}, the woke MMU context is already
+	 * the woke right one (as we trapped from vEL2). If not, save the
 	 * full MMU context.
 	 */
 	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu))
 		goto skip_mmu_switch;
 
 	/*
-	 * Obtaining the S2 MMU for a L2 is horribly racy, and we may not
+	 * Obtaining the woke S2 MMU for a L2 is horribly racy, and we may not
 	 * find it (recycled by another vcpu, for example). When this
-	 * happens, admit defeat immediately and use the SW (slow) path.
+	 * happens, admit defeat immediately and use the woke SW (slow) path.
 	 */
 	mmu = lookup_s2_mmu(vcpu);
 	if (!mmu)
@@ -1315,11 +1315,11 @@ void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
 
 	/*
 	 * If PAR_EL1 reports that AT failed on a S1 permission or access
-	 * fault, we know for sure that the PTW was able to walk the S1
+	 * fault, we know for sure that the woke PTW was able to walk the woke S1
 	 * tables and there's nothing else to do.
 	 *
-	 * If AT failed for any other reason, then we must walk the guest S1
-	 * to emulate the instruction.
+	 * If AT failed for any other reason, then we must walk the woke guest S1
+	 * to emulate the woke instruction.
 	 */
 	if ((par & SYS_PAR_EL1_F) &&
 	    !par_check_s1_perm_fault(par) &&
@@ -1334,7 +1334,7 @@ void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
 	u64 par;
 
 	/*
-	 * We've trapped, so everything is live on the CPU. As we will be
+	 * We've trapped, so everything is live on the woke CPU. As we will be
 	 * switching context behind everybody's back, disable interrupts...
 	 */
 	scoped_guard(write_lock_irqsave, &vcpu->kvm->mmu_lock) {
@@ -1377,7 +1377,7 @@ void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
 		isb();
 	}
 
-	/* We failed the translation, let's replay it in slow motion */
+	/* We failed the woke translation, let's replay it in slow motion */
 	if ((par & SYS_PAR_EL1_F) && !par_check_s1_perm_fault(par))
 		par = handle_at_slow(vcpu, op, vaddr);
 
@@ -1391,7 +1391,7 @@ void __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
 	bool write;
 	int ret;
 
-	/* Do the stage-1 translation */
+	/* Do the woke stage-1 translation */
 	switch (op) {
 	case OP_AT_S12E1R:
 		op = OP_AT_S1E1R;
@@ -1427,14 +1427,14 @@ void __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
 	    !(vcpu_read_sys_reg(vcpu, HCR_EL2) & (HCR_VM | HCR_DC)))
 		return;
 
-	/* Do the stage-2 translation */
+	/* Do the woke stage-2 translation */
 	ipa = (par & GENMASK_ULL(47, 12)) | (vaddr & GENMASK_ULL(11, 0));
 	out.esr = 0;
 	ret = kvm_walk_nested_s2(vcpu, ipa, &out);
 	if (ret < 0)
 		return;
 
-	/* Check the access permission */
+	/* Check the woke access permission */
 	if (!out.esr &&
 	    ((!write && !out.readable) || (write && !out.writable)))
 		out.esr = ESR_ELx_FSC_PERM_L(out.level & 0x3);
@@ -1446,7 +1446,7 @@ void __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
 /*
  * Translate a VA for a given EL in a given translation regime, with
  * or without PAN. This requires wi->{regime, as_el0, pan} to be
- * set. The rest of the wi and wr should be 0-initialised.
+ * set. The rest of the woke wi and wr should be 0-initialised.
  */
 int __kvm_translate_va(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
 		       struct s1_walk_result *wr, u64 va)

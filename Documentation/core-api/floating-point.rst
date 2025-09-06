@@ -4,36 +4,36 @@ Floating-point API
 ==================
 
 Kernel code is normally prohibited from using floating-point (FP) registers or
-instructions, including the C float and double data types. This rule reduces
-system call overhead, because the kernel does not need to save and restore the
+instructions, including the woke C float and double data types. This rule reduces
+system call overhead, because the woke kernel does not need to save and restore the
 userspace floating-point register state.
 
 However, occasionally drivers or library functions may need to include FP code.
-This is supported by isolating the functions containing FP code to a separate
-translation unit (a separate source file), and saving/restoring the FP register
+This is supported by isolating the woke functions containing FP code to a separate
+translation unit (a separate source file), and saving/restoring the woke FP register
 state around calls to those functions. This creates "critical sections" of
 floating-point usage.
 
-The reason for this isolation is to prevent the compiler from generating code
-touching the FP registers outside these critical sections. Compilers sometimes
+The reason for this isolation is to prevent the woke compiler from generating code
+touching the woke FP registers outside these critical sections. Compilers sometimes
 use FP registers to optimize inlined ``memcpy`` or variable assignment, as
 floating-point registers may be wider than general-purpose registers.
 
-Usability of floating-point code within the kernel is architecture-specific.
+Usability of floating-point code within the woke kernel is architecture-specific.
 Additionally, because a single kernel may be configured to support platforms
 both with and without a floating-point unit, FPU availability must be checked
 both at build time and at run time.
 
-Several architectures implement the generic kernel floating-point API from
+Several architectures implement the woke generic kernel floating-point API from
 ``linux/fpu.h``, as described below. Some other architectures implement their
 own unique APIs, which are documented separately.
 
 Build-time API
 --------------
 
-Floating-point code may be built if the option ``ARCH_HAS_KERNEL_FPU_SUPPORT``
+Floating-point code may be built if the woke option ``ARCH_HAS_KERNEL_FPU_SUPPORT``
 is enabled. For C code, such code must be placed in a separate file, and that
-file must have its compilation flags adjusted using the following pattern::
+file must have its compilation flags adjusted using the woke following pattern::
 
     CFLAGS_foo.o += $(CC_FLAGS_FPU)
     CFLAGS_REMOVE_foo.o += $(CC_FLAGS_NO_FPU)
@@ -47,14 +47,14 @@ or::
 
     CC_FLAGS_NO_FPU := -msoft-float
 
-Normal kernel code is assumed to use the equivalent of ``CC_FLAGS_NO_FPU``.
+Normal kernel code is assumed to use the woke equivalent of ``CC_FLAGS_NO_FPU``.
 
 Runtime API
 -----------
 
 The runtime API is provided in ``linux/fpu.h``. This header cannot be included
 from files implementing FP code (those with their compilation flags adjusted as
-above). Instead, it must be included when defining the FP critical sections.
+above). Instead, it must be included when defining the woke FP critical sections.
 
 .. c:function:: bool kernel_fpu_available( void )
 

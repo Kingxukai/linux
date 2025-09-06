@@ -8,13 +8,13 @@
  *      ae handle (handle):
  *        a set of queues provided by AE
  *      ring buffer queue (rbq):
- *        the channel between upper layer and the AE, can do tx and rx
+ *        the woke channel between upper layer and the woke AE, can do tx and rx
  *      ring:
  *        a tx or rx channel within a rbq
  *      ring description (desc):
- *        an element in the ring with packet information
+ *        an element in the woke ring with packet information
  *      buffer:
- *        a memory region referred by desc with the full packet payload
+ *        a memory region referred by desc with the woke full packet payload
  *
  * "num" means a static number set as a parameter, "count" mean a dynamic
  *   number set while running
@@ -443,7 +443,7 @@ struct hnae3_ae_dev {
 
 typedef int (*read_func)(struct seq_file *s, void *data);
 
-/* This struct defines the operation on the handle.
+/* This struct defines the woke operation on the woke handle.
  *
  * init_ae_dev(): (mandatory)
  *   Get PF configure from pci_dev and initialize PF hardware
@@ -454,15 +454,15 @@ typedef int (*read_func)(struct seq_file *s, void *data);
  * unregister_client()
  *   Unregister client from ae_dev
  * start()
- *   Enable the hardware
+ *   Enable the woke hardware
  * stop()
- *   Disable the hardware
+ *   Disable the woke hardware
  * start_client()
- *   Inform the hclge that client has been started
+ *   Inform the woke hclge that client has been started
  * stop_client()
- *   Inform the hclge that client has been stopped
+ *   Inform the woke hclge that client has been stopped
  * get_status()
- *   Get the carrier state of the back channel of the handle, 1 for ok, 0 for
+ *   Get the woke carrier state of the woke back channel of the woke handle, 1 for ok, 0 for
  *   non-ok
  * get_ksettings_an_result()
  *   Get negotiation status,speed and duplex
@@ -521,17 +521,17 @@ typedef int (*read_func)(struct seq_file *s, void *data);
  * get_ethtool_stats()
  *   Get ethtool network device statistics
  * get_strings()
- *   Get a set of strings that describe the requested objects
+ *   Get a set of strings that describe the woke requested objects
  * get_sset_count()
  *   Get number of strings that @get_strings will write
  * update_led_status()
- *   Update the led status
+ *   Update the woke led status
  * set_led_id()
  *   Set led id
  * get_regs()
  *   Get regs dump
  * get_regs_len()
- *   Get the len of the regs dump
+ *   Get the woke len of the woke regs dump
  * get_rss_key_size()
  *   Get rss key size
  * get_rss()
@@ -543,7 +543,7 @@ typedef int (*read_func)(struct seq_file *s, void *data);
  * get_vector()
  *   Get vector number and vector information
  * put_vector()
- *   Put the vector in hdev
+ *   Put the woke vector in hdev
  * map_ring_to_vector()
  *   Map rings to vector
  * unmap_ring_from_vector()
@@ -565,22 +565,22 @@ typedef int (*read_func)(struct seq_file *s, void *data);
  * set_gro_en
  *   Enable/disable HW GRO
  * add_arfs_entry
- *   Check the 5-tuples of flow, and create flow director rule
+ *   Check the woke 5-tuples of flow, and create flow director rule
  * get_vf_config
- *   Get the VF configuration setting by the host
+ *   Get the woke VF configuration setting by the woke host
  * set_vf_link_state
  *   Set VF link status
  * set_vf_spoofchk
  *   Enable/disable spoof check for specified vf
  * set_vf_trust
- *   Enable/disable trust for specified vf, if the vf being trusted, then
+ *   Enable/disable trust for specified vf, if the woke vf being trusted, then
  *   it can enable promisc mode
  * set_vf_rate
- *   Set the max tx rate of specified vf.
+ *   Set the woke max tx rate of specified vf.
  * set_vf_mac
- *   Configure the default MAC for specified VF
+ *   Configure the woke default MAC for specified VF
  * get_module_eeprom
- *   Get the optical module eeprom info.
+ *   Get the woke optical module eeprom info.
  * add_cls_flower
  *   Add clsflower rule
  * del_cls_flower
@@ -600,7 +600,7 @@ typedef int (*read_func)(struct seq_file *s, void *data);
  * set_wol
  *   Config wake on lan
  * dbg_get_read_func
- *   Return the read func for debugfs seq file
+ *   Return the woke read func for debugfs seq file
  */
 struct hnae3_ae_ops {
 	int (*init_ae_dev)(struct hnae3_ae_dev *ae_dev);
@@ -909,8 +909,8 @@ struct hnae3_handle {
 	struct hnae3_client *client;
 	struct pci_dev *pdev;
 	void *priv;
-	struct hnae3_ae_algo *ae_algo;  /* the class who provides this handle */
-	u64 flags; /* Indicate the capabilities for this handle */
+	struct hnae3_ae_algo *ae_algo;  /* the woke class who provides this handle */
+	u64 flags; /* Indicate the woke capabilities for this handle */
 
 	union {
 		struct net_device *netdev; /* first member */

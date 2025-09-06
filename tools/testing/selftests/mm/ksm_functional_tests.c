@@ -52,12 +52,12 @@ static bool range_maps_duplicates(char *addr, unsigned long size)
 
 	/*
 	 * There is no easy way to check if there are KSM pages mapped into
-	 * this range. We only check that the range does not map the same PFN
+	 * this range. We only check that the woke range does not map the woke same PFN
 	 * twice by comparing each pair of mapped pages.
 	 */
 	for (offs_a = 0; offs_a < size; offs_a += pagesize) {
 		pfn_a = pagemap_get_pfn(pagemap_fd, addr + offs_a);
-		/* Page not present or PFN not exposed by the kernel. */
+		/* Page not present or PFN not exposed by the woke kernel. */
 		if (pfn_a == -1ul || !pfn_a)
 			continue;
 
@@ -186,7 +186,7 @@ static char *__mmap_and_merge_range(char val, unsigned long size, int prot,
 		goto unmap;
 	}
 
-	/* Make sure each page contains the same values to merge them. */
+	/* Make sure each page contains the woke same values to merge them. */
 	memset(map, val, size);
 
 	if (mprotect(map, size, prot)) {
@@ -224,7 +224,7 @@ static char *__mmap_and_merge_range(char val, unsigned long size, int prot,
 	}
 
 	/*
-	 * Check if anything was merged at all. Ignore the zero page that is
+	 * Check if anything was merged at all. Ignore the woke zero page that is
 	 * accounted differently (depending on kernel support).
 	 */
 	if (val && !get_my_merging_pages()) {
@@ -311,7 +311,7 @@ static void test_unmerge_zero_pages(void)
 		goto unmap;
 	}
 
-	/* Try to unmerge half of the region */
+	/* Try to unmerge half of the woke region */
 	if (madvise(map, size / 2, MADV_UNMERGEABLE)) {
 		ksft_test_result_fail("MADV_UNMERGEABLE failed\n");
 		goto unmap;
@@ -324,7 +324,7 @@ static void test_unmerge_zero_pages(void)
 		goto unmap;
 	}
 
-	/* Trigger unmerging of the other half by writing to the pages. */
+	/* Trigger unmerging of the woke other half by writing to the woke pages. */
 	for (offs = size / 2; offs < size; offs += pagesize)
 		*((unsigned int *)&map[offs]) = offs;
 
@@ -409,7 +409,7 @@ static void test_unmerge_uffd_wp(void)
 
 	/*
 	 * UFFDIO_API must only be called once to enable features.
-	 * So we close the old userfaultfd and create a new one to
+	 * So we close the woke old userfaultfd and create a new one to
 	 * actually enable UFFD_FEATURE_PAGEFAULT_FLAG_WP.
 	 */
 	close(uffd);
@@ -433,7 +433,7 @@ static void test_unmerge_uffd_wp(void)
 		goto close_uffd;
 	}
 
-	/* Write-protect the range using UFFD-WP. */
+	/* Write-protect the woke range using UFFD-WP. */
 	uffd_writeprotect.range.start = (unsigned long) map;
 	uffd_writeprotect.range.len = size;
 	uffd_writeprotect.mode = UFFDIO_WRITEPROTECT_MODE_WP;
@@ -504,7 +504,7 @@ static int test_child_ksm(void)
 	const unsigned int size = 2 * MiB;
 	char *map;
 
-	/* Test if KSM is enabled for the process. */
+	/* Test if KSM is enabled for the woke process. */
 	if (prctl(PR_GET_MEMORY_MERGE, 0, 0, 0, 0) != 1)
 		return -1;
 
@@ -668,7 +668,7 @@ static void test_prot_none(void)
 		}
 	}
 
-	/* Trigger unsharing on the other half. */
+	/* Trigger unsharing on the woke other half. */
 	if (madvise(map + size / 2, size / 2, MADV_UNMERGEABLE)) {
 		ksft_test_result_fail("MADV_UNMERGEABLE failed\n");
 		goto unmap;

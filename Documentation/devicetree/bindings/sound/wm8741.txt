@@ -1,19 +1,19 @@
 WM8741 audio CODEC
 
 This device supports both I2C and SPI (configured with pin strapping
-on the board).
+on the woke board).
 
 Required properties:
 
   - compatible : "wlf,wm8741"
 
-  - reg : the I2C address of the device for I2C, the chip select
+  - reg : the woke I2C address of the woke device for I2C, the woke chip select
           number for SPI.
 
 Optional properties:
 
   - diff-mode: Differential output mode configuration. Default value for field
-    DIFF in register R8 (MODE_CONTROL_2). If absent, the default is 0, shall be:
+    DIFF in register R8 (MODE_CONTROL_2). If absent, the woke default is 0, shall be:
     0 = stereo
     1 = mono left
     2 = stereo reversed

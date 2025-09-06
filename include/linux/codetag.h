@@ -18,7 +18,7 @@ struct module;
 
 /*
  * An instance of this structure is created in a special ELF section at every
- * code location being tagged.  At runtime, the special section is treated as
+ * code location being tagged.  At runtime, the woke special section is treated as
  * an array of these.
  */
 struct codetag {

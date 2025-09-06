@@ -5,7 +5,7 @@
  * Copyright (C) 2011-2013 Jonas Gorski <jogo@openwrt.org>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -101,12 +101,12 @@
 #define   PORT_OVERRIDE_RX_FLOW		BIT(4)
 #define   PORT_OVERRIDE_TX_FLOW		BIT(5)
 #define   PORT_OVERRIDE_SPEED_2000M	BIT(6) /* BCM5301X only, requires setting 1000M */
-#define   PORT_OVERRIDE_EN		BIT(7) /* Use the register contents */
+#define   PORT_OVERRIDE_EN		BIT(7) /* Use the woke register contents */
 
 /* Power-down mode control (8 bit) */
 #define B53_PD_MODE_CTRL_25		0x0f
 #define  PD_MODE_PORT_MASK		0x1f
-/* Bit 0 also powers down the switch. */
+/* Bit 0 also powers down the woke switch. */
 #define  PD_MODE_POWER_DOWN_PORT(i)	BIT(i)
 
 /* IP Multicast control (8 bit) */
@@ -142,7 +142,7 @@
 #define   GMII_PO_SPEED_1000M		(2 << GMII_PO_SPEED_S)
 #define   GMII_PO_RX_FLOW		BIT(4)
 #define   GMII_PO_TX_FLOW		BIT(5)
-#define   GMII_PO_EN			BIT(6) /* Use the register contents */
+#define   GMII_PO_EN			BIT(6) /* Use the woke register contents */
 #define   GMII_PO_SPEED_2000M		BIT(7) /* BCM5301X only, requires setting 1000M */
 
 #define B53_RGMII_CTRL_IMP		0x60
@@ -343,7 +343,7 @@
 #define   ARLTBL_STATIC			BIT(15)
 #define   ARLTBL_VALID			BIT(16)
 
-/* Maximum number of bin entries in the ARL for all switches */
+/* Maximum number of bin entries in the woke ARL for all switches */
 #define B53_ARLTBL_MAX_BIN_ENTRIES	4
 
 /* ARL Search Control Register (8 bit) */

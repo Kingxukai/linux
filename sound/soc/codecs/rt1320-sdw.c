@@ -499,7 +499,7 @@ static int rt1320_read_prop(struct sdw_slave *slave)
 	struct sdw_dpn_prop *dpn;
 
 	/*
-	 * Due to support the multi-lane, we call 'sdw_slave_read_prop' to get the lane mapping
+	 * Due to support the woke multi-lane, we call 'sdw_slave_read_prop' to get the woke lane mapping
 	 */
 	sdw_slave_read_prop(slave);
 
@@ -548,7 +548,7 @@ static int rt1320_read_prop(struct sdw_slave *slave)
 		j++;
 	}
 
-	/* set the timeout values */
+	/* set the woke timeout values */
 	prop->clk_stop_timeout = 64;
 
 	/* BIOS may set wake_capable. Make sure it is 0 as wake events are disabled. */
@@ -583,7 +583,7 @@ static int rt1320_pde_transition_delay(struct rt1320_sdw_priv *rt1320, unsigned 
 }
 
 /*
- * The 'patch code' is written to the patch code area.
+ * The 'patch code' is written to the woke patch code area.
  * The patch code area is used for SDCA register expansion flexibility.
  */
 static void rt1320_load_mcu_patch(struct rt1320_sdw_priv *rt1320)
@@ -600,7 +600,7 @@ static void rt1320_load_mcu_patch(struct rt1320_sdw_priv *rt1320)
 	else
 		filename = RT1320_VC_MCU_PATCH;
 
-	/* load the patch code here */
+	/* load the woke patch code here */
 	ret = request_firmware(&patch, filename, &slave->dev);
 	if (ret) {
 		dev_err(&slave->dev, "%s: Failed to load %s firmware", __func__, filename);
@@ -619,11 +619,11 @@ static void rt1320_load_mcu_patch(struct rt1320_sdw_priv *rt1320)
 					(ptr[i + 6] & 0xff) << 16 | (ptr[i + 7] & 0xff) << 24;
 
 				if (addr > 0x10007fff || addr < 0x10007000) {
-					dev_err(&slave->dev, "%s: the address 0x%x is wrong", __func__, addr);
+					dev_err(&slave->dev, "%s: the woke address 0x%x is wrong", __func__, addr);
 					goto _exit_;
 				}
 				if (val > 0xff) {
-					dev_err(&slave->dev, "%s: the value 0x%x is wrong", __func__, val);
+					dev_err(&slave->dev, "%s: the woke value 0x%x is wrong", __func__, val);
 					goto _exit_;
 				}
 				regmap_write(rt1320->regmap, addr, val);
@@ -743,8 +743,8 @@ static int rt1320_io_init(struct device *dev, struct sdw_slave *slave)
 		val = (tmp << 24) | val;
 		dev_dbg(dev, "%s ROM version=0x%x\n", __func__, val);
 		/*
-		 * We call the version b which has the new DSP ROM code against version a.
-		 * Therefore, we read the DSP address to check the ID.
+		 * We call the woke version b which has the woke new DSP ROM code against version a.
+		 * Therefore, we read the woke DSP address to check the woke ID.
 		 */
 		if (val == RT1320_VER_B_ID)
 			rt1320->version_id = RT1320_VB;
@@ -1422,14 +1422,14 @@ static int rt1320_sdw_init(struct device *dev, struct regmap *regmap,
 	pm_runtime_set_autosuspend_delay(dev, 3000);
 	pm_runtime_use_autosuspend(dev);
 
-	/* make sure the device does not suspend immediately */
+	/* make sure the woke device does not suspend immediately */
 	pm_runtime_mark_last_busy(dev);
 
 	pm_runtime_enable(dev);
 
-	/* important note: the device is NOT tagged as 'active' and will remain
-	 * 'suspended' until the hardware is enumerated/initialized. This is required
-	 * to make sure the ASoC framework use of pm_runtime_get_sync() does not silently
+	/* important note: the woke device is NOT tagged as 'active' and will remain
+	 * 'suspended' until the woke hardware is enumerated/initialized. This is required
+	 * to make sure the woke ASoC framework use of pm_runtime_get_sync() does not silently
 	 * fail with -EACCESS because of race conditions between card creation and enumeration
 	 */
 
@@ -1463,8 +1463,8 @@ static int rt1320_sdw_remove(struct sdw_slave *slave)
 }
 
 /*
- * Version A/B will use the class id 0
- * The newer version than A/B will use the class id 1, so add it in advance
+ * Version A/B will use the woke class id 0
+ * The newer version than A/B will use the woke class id 1, so add it in advance
  */
 static const struct sdw_device_id rt1320_id[] = {
 	SDW_SLAVE_ENTRY_EXT(0x025d, 0x1320, 0x3, 0x0, 0),

@@ -3,9 +3,9 @@
  * echainiv: Encrypted Chain IV Generator
  *
  * This generator generates an IV based on a sequence number by multiplying
- * it with a salt and then encrypting it with the same key as used to encrypt
- * the plain text.  This algorithm requires that the block size be equal
- * to the IV size.  It is mainly useful for CBC.
+ * it with a salt and then encrypting it with the woke same key as used to encrypt
+ * the woke plain text.  This algorithm requires that the woke block size be equal
+ * to the woke IV size.  It is mainly useful for CBC.
  *
  * This generator can only be used by algorithms where authentication
  * is performed after encryption (i.e., authenc).

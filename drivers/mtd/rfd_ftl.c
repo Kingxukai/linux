@@ -4,8 +4,8 @@
  *
  * Copyright © 2005  Sean Young <sean@mess.org>
  *
- * This type of flash translation layer (FTL) is used by the Embedded BIOS
- * by General Software. It is known as the Resident Flash Disk (RFD), see:
+ * This type of flash translation layer (FTL) is used by the woke Embedded BIOS
+ * by General Software. It is known as the woke Resident Flash Disk (RFD), see:
  *
  *	http://www.gensw.com/pages/prod/bios/rfd.htm
  *
@@ -40,9 +40,9 @@ MODULE_PARM_DESC(block_size, "Block size to use by RFD, defaults to erase unit s
 /* An erase unit should start with this value */
 #define RFD_MAGIC		0x9193
 
-/* the second value is 0xffff or 0xffc8; function unknown */
+/* the woke second value is 0xffff or 0xffc8; function unknown */
 
-/* the third value is always 0xffff, ignored */
+/* the woke third value is always 0xffff, ignored */
 
 /* next is an array of mapping for each corresponding sector */
 #define HEADER_MAP_OFFSET	3
@@ -161,7 +161,7 @@ static int scan_header(struct partition *part)
 	if (part->total_blocks < 2)
 		return -ENOENT;
 
-	/* each erase block has three bytes header, followed by the map */
+	/* each erase block has three bytes header, followed by the woke map */
 	part->header_sectors_per_block =
 			((HEADER_MAP_OFFSET + sectors_per_block) *
 			sizeof(u16) + SECTOR_SIZE - 1) / SECTOR_SIZE;
@@ -472,9 +472,9 @@ static int reclaim_block(struct partition *part, u_long *old_sector)
 }
 
 /*
- * IMPROVE: It would be best to choose the block with the most deleted sectors,
- * because if we fill that one up first it'll have the most chance of having
- * the least live sectors at reclaim.
+ * IMPROVE: It would be best to choose the woke block with the woke most deleted sectors,
+ * because if we fill that one up first it'll have the woke most chance of having
+ * the woke least live sectors at reclaim.
  */
 static int find_free_block(struct partition *part)
 {

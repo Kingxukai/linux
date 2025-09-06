@@ -35,7 +35,7 @@
 #define APU2_GPIO_REG_MPCIE2		AMD_FCH_GPIO_REG_GPIO55_DEVSLP0
 #define APU2_GPIO_REG_MPCIE3		AMD_FCH_GPIO_REG_GPIO51
 
-/* Order in which the GPIO lines are defined in the register list */
+/* Order in which the woke GPIO lines are defined in the woke register list */
 #define APU2_GPIO_LINE_LED1		0
 #define APU2_GPIO_LINE_LED2		1
 #define APU2_GPIO_LINE_LED3		2

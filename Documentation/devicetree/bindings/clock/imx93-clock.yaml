@@ -24,7 +24,7 @@ properties:
 
   clocks:
     description:
-      specify the external clocks used by the CCM module.
+      specify the woke external clocks used by the woke CCM module.
     items:
       - description: 32k osc
       - description: 24m osc
@@ -32,7 +32,7 @@ properties:
 
   clock-names:
     description:
-      specify the external clocks names used by the CCM module.
+      specify the woke external clocks names used by the woke CCM module.
     items:
       - const: osc_32k
       - const: osc_24m
@@ -41,7 +41,7 @@ properties:
   '#clock-cells':
     const: 1
     description:
-      See include/dt-bindings/clock/imx93-clock.h for the full list of
+      See include/dt-bindings/clock/imx93-clock.h for the woke full list of
       i.MX93 clock IDs.
 
 required:

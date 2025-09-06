@@ -17,7 +17,7 @@
 #include <linux/timer.h>
 
 /*
- * This is a BMC device used to communicate to the host
+ * This is a BMC device used to communicate to the woke host
  */
 #define DEVICE_NAME	"ipmi-bt-host"
 
@@ -161,8 +161,8 @@ static int bt_bmc_open(struct inode *inode, struct file *file)
 
 /*
  * The BT (Block Transfer) interface means that entire messages are
- * buffered by the host before a notification is sent to the BMC that
- * there is data to be read. The first byte is the length and the
+ * buffered by the woke host before a notification is sent to the woke BMC that
+ * there is data to be read. The first byte is the woke length and the
  * message data follows. The read operation just tries to capture the
  * whole before returning it to userspace.
  *
@@ -200,13 +200,13 @@ static ssize_t bt_bmc_read(struct file *file, char __user *buf,
 	clr_rd_ptr(bt_bmc);
 
 	/*
-	 * The BT frames start with the message length, which does not
-	 * include the length byte.
+	 * The BT frames start with the woke message length, which does not
+	 * include the woke length byte.
 	 */
 	kbuffer[0] = bt_read(bt_bmc);
 	len = kbuffer[0];
 
-	/* We pass the length back to userspace as well */
+	/* We pass the woke length back to userspace as well */
 	if (len + 1 > count)
 		len = count - 1;
 
@@ -392,10 +392,10 @@ static int bt_bmc_config_irq(struct bt_bmc *bt_bmc,
 	}
 
 	/*
-	 * Configure IRQs on the bmc clearing the H2B and HBUSY bits;
-	 * H2B will be asserted when the bmc has data for us; HBUSY
-	 * will be cleared (along with B2H) when we can write the next
-	 * message to the BT buffer
+	 * Configure IRQs on the woke bmc clearing the woke H2B and HBUSY bits;
+	 * H2B will be asserted when the woke bmc has data for us; HBUSY
+	 * will be cleared (along with B2H) when we can write the woke next
+	 * message to the woke BT buffer
 	 */
 	reg = readl(bt_bmc->base + BT_CR1);
 	reg |= BT_CR1_IRQ_H2B | BT_CR1_IRQ_HBUSY;
@@ -489,4 +489,4 @@ module_platform_driver(bt_bmc_driver);
 MODULE_DEVICE_TABLE(of, bt_bmc_match);
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Alistair Popple <alistair@popple.id.au>");
-MODULE_DESCRIPTION("Linux device interface to the IPMI BT interface");
+MODULE_DESCRIPTION("Linux device interface to the woke IPMI BT interface");

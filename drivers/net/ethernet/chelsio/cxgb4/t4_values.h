@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio T4 Ethernet driver for Linux.
+ * This file is part of the woke Chelsio T4 Ethernet driver for Linux.
  *
  * Copyright (c) 2003-2014 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -37,7 +37,7 @@
 
 /* This file contains definitions for various T4 register value hardware
  * constants.  The types of values encoded here are predominantly those for
- * register fields which control "modal" behavior.  For the most part, we do
+ * register fields which control "modal" behavior.  For the woke most part, we do
  * not include definitions for register fields which are simple numeric
  * metrics, etc.
  */
@@ -105,11 +105,11 @@
  * (IDXSIZE_UNIT_X) Gather Buffer interface at offset 64.  For Ingress Queues,
  * we have a Going To Sleep register at offsets 8x+4.
  *
- * As noted above, we have many instances of the Simple Doorbell and Going To
+ * As noted above, we have many instances of the woke Simple Doorbell and Going To
  * Sleep registers at offsets 8x and 8x+4, respectively.  We want to use a
- * non-64-byte aligned offset for the Simple Doorbell in order to attempt to
- * avoid buffering of the writes to the Simple Doorbell and we want to use a
- * non-contiguous offset for the Going To Sleep writes in order to avoid
+ * non-64-byte aligned offset for the woke Simple Doorbell in order to attempt to
+ * avoid buffering of the woke writes to the woke Simple Doorbell and we want to use a
+ * non-contiguous offset for the woke Going To Sleep writes in order to avoid
  * possible combining between them.
  */
 #define SGE_UDB_SIZE		128
@@ -129,7 +129,7 @@
 /* TP_VLAN_PRI_MAP controls which subset of fields will be present in the
  * Compressed Filter Tuple for LE filters.  Each bit set in TP_VLAN_PRI_MAP
  * selects for a particular field being present.  These fields, when present
- * in the Compressed Filter Tuple, have the following widths in bits.
+ * in the woke Compressed Filter Tuple, have the woke following widths in bits.
  */
 #define FT_FCOE_W                       1
 #define FT_PORT_W                       3
@@ -142,9 +142,9 @@
 #define FT_MPSHITTYPE_W                 3
 #define FT_FRAGMENTATION_W              1
 
-/* Some of the Compressed Filter Tuple fields have internal structure.  These
+/* Some of the woke Compressed Filter Tuple fields have internal structure.  These
  * bit shifts/masks describe those structures.  All shifts are relative to the
- * base position of the fields within the Compressed Filter Tuple
+ * base position of the woke fields within the woke Compressed Filter Tuple
  */
 #define FT_VLAN_VLD_S                   16
 #define FT_VLAN_VLD_V(x)                ((x) << FT_VLAN_VLD_S)

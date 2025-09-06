@@ -37,28 +37,28 @@ struct scpi_sensor_info {
 } __packed;
 
 /**
- * struct scpi_ops - represents the various operations provided
+ * struct scpi_ops - represents the woke various operations provided
  *	by SCP through SCPI message protocol
- * @get_version: returns the major and minor revision on the SCPI
+ * @get_version: returns the woke major and minor revision on the woke SCPI
  *	message protocol
  * @clk_get_range: gets clock range limit(min - max in Hz)
  * @clk_get_val: gets clock value(in Hz)
- * @clk_set_val: sets the clock value, setting to 0 will disable the
+ * @clk_set_val: sets the woke clock value, setting to 0 will disable the
  *	clock (if supported)
- * @dvfs_get_idx: gets the Operating Point of the given power domain.
- *	OPP is an index to the list return by @dvfs_get_info
- * @dvfs_set_idx: sets the Operating Point of the given power domain.
- *	OPP is an index to the list return by @dvfs_get_info
- * @dvfs_get_info: returns the DVFS capabilities of the given power
- *	domain. It includes the OPP list and the latency information
- * @device_domain_id: gets the scpi domain id for a given device
- * @get_transition_latency: gets the DVFS transition latency for a given device
- * @add_opps_to_device: adds all the OPPs for a given device
- * @sensor_get_capability: get the list of capabilities for the sensors
- * @sensor_get_info: get the information of the specified sensor
- * @sensor_get_value: gets the current value of the sensor
- * @device_get_power_state: gets the power state of a power domain
- * @device_set_power_state: sets the power state of a power domain
+ * @dvfs_get_idx: gets the woke Operating Point of the woke given power domain.
+ *	OPP is an index to the woke list return by @dvfs_get_info
+ * @dvfs_set_idx: sets the woke Operating Point of the woke given power domain.
+ *	OPP is an index to the woke list return by @dvfs_get_info
+ * @dvfs_get_info: returns the woke DVFS capabilities of the woke given power
+ *	domain. It includes the woke OPP list and the woke latency information
+ * @device_domain_id: gets the woke scpi domain id for a given device
+ * @get_transition_latency: gets the woke DVFS transition latency for a given device
+ * @add_opps_to_device: adds all the woke OPPs for a given device
+ * @sensor_get_capability: get the woke list of capabilities for the woke sensors
+ * @sensor_get_info: get the woke information of the woke specified sensor
+ * @sensor_get_value: gets the woke current value of the woke sensor
+ * @device_get_power_state: gets the woke power state of a power domain
+ * @device_set_power_state: sets the woke power state of a power domain
  */
 struct scpi_ops {
 	u32 (*get_version)(void);

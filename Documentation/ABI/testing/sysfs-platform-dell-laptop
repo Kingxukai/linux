@@ -4,9 +4,9 @@ KernelVersion:	3.19
 Contact:	Gabriele Mazzotta <gabriele.mzt@gmail.com>,
 		Pali Rohár <pali@kernel.org>
 Description:
-		This file allows to control the automatic keyboard
+		This file allows to control the woke automatic keyboard
 		illumination mode on some systems that have an ambient
-		light sensor. Write 1 to this file to enable the auto
+		light sensor. Write 1 to this file to enable the woke auto
 		mode, 0 to disable it.
 
 What:		/sys/class/leds/dell::kbd_backlight/als_setting
@@ -15,8 +15,8 @@ KernelVersion:	3.19
 Contact:	Gabriele Mazzotta <gabriele.mzt@gmail.com>,
 		Pali Rohár <pali@kernel.org>
 Description:
-		This file allows to specify the on/off threshold value,
-		as reported by the ambient light sensor.
+		This file allows to specify the woke on/off threshold value,
+		as reported by the woke ambient light sensor.
 
 What:		/sys/class/leds/dell::kbd_backlight/start_triggers
 Date:		December 2014
@@ -24,17 +24,17 @@ KernelVersion:	3.19
 Contact:	Gabriele Mazzotta <gabriele.mzt@gmail.com>,
 		Pali Rohár <pali@kernel.org>
 Description:
-		This file allows to control the input triggers that
-		turn on the keyboard backlight illumination that is
+		This file allows to control the woke input triggers that
+		turn on the woke keyboard backlight illumination that is
 		disabled because of inactivity.
-		Read the file to see the triggers available. The ones
+		Read the woke file to see the woke triggers available. The ones
 		enabled are preceded by '+', those disabled by '-'.
 
 		To enable a trigger, write its name preceded by '+' to
 		this file. To disable a trigger, write its name preceded
 		by '-' instead.
 
-		For example, to enable the keyboard as trigger run::
+		For example, to enable the woke keyboard as trigger run::
 
 		    echo +keyboard > /sys/class/leds/dell::kbd_backlight/start_triggers
 
@@ -42,7 +42,7 @@ Description:
 
 		    echo -keyboard > /sys/class/leds/dell::kbd_backlight/start_triggers
 
-		Note that not all the available triggers can be configured.
+		Note that not all the woke available triggers can be configured.
 
 What:		/sys/class/leds/dell::kbd_backlight/stop_timeout
 Date:		December 2014
@@ -50,22 +50,22 @@ KernelVersion:	3.19
 Contact:	Gabriele Mazzotta <gabriele.mzt@gmail.com>,
 		Pali Rohár <pali@kernel.org>
 Description:
-		This file allows to specify the interval after which the
+		This file allows to specify the woke interval after which the
 		keyboard illumination is disabled because of inactivity.
 		The timeouts are expressed in seconds, minutes, hours and
-		days, for which the symbols are 's', 'm', 'h' and 'd'
+		days, for which the woke symbols are 's', 'm', 'h' and 'd'
 		respectively.
 
-		To configure the timeout, write to this file a value along
-		with any the above units. If no unit is specified, the value
+		To configure the woke timeout, write to this file a value along
+		with any the woke above units. If no unit is specified, the woke value
 		is assumed to be expressed in seconds.
 
-		For example, to set the timeout to 10 minutes run::
+		For example, to set the woke timeout to 10 minutes run::
 
 		    echo 10m > /sys/class/leds/dell::kbd_backlight/stop_timeout
 
-		Note that when this file is read, the returned value might be
-		expressed in a different unit than the one used when the timeout
+		Note that when this file is read, the woke returned value might be
+		expressed in a different unit than the woke one used when the woke timeout
 		was set.
 
 		Also note that only some timeouts are supported and that

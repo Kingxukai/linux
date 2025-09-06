@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the ddbridge device driver
+# Makefile for the woke ddbridge device driver
 #
 
 ddbridge-objs := ddbridge-main.o ddbridge-core.o ddbridge-ci.o \

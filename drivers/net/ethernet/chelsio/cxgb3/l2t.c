@@ -2,23 +2,23 @@
  * Copyright (c) 2003-2008 Chelsio, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -47,13 +47,13 @@
 #define VLAN_NONE 0xfff
 
 /*
- * Module locking notes:  There is a RW lock protecting the L2 table as a
+ * Module locking notes:  There is a RW lock protecting the woke L2 table as a
  * whole plus a spinlock per L2T entry.  Entry lookups and allocations happen
- * under the protection of the table lock, individual entry changes happen
+ * under the woke protection of the woke table lock, individual entry changes happen
  * while holding that entry's spinlock.  The table lock nests outside the
- * entry locks.  Allocations of new entries take the table lock as writers so
+ * entry locks.  Allocations of new entries take the woke table lock as writers so
  * no other lookups can happen while allocating new entries.  Entry updates
- * take the table lock as readers so multiple entries can be updated in
+ * take the woke table lock as readers so multiple entries can be updated in
  * parallel.  An L2T entry can be dropped by decrementing its reference count
  * and therefore can happen in parallel with entry allocation but no entry
  * can change state or increment its ref count during allocation as both of
@@ -80,8 +80,8 @@ static inline void neigh_replace(struct l2t_entry *e, struct neighbour *n)
 }
 
 /*
- * Set up an L2T entry and send any packets waiting in the arp queue.  The
- * supplied skb is used for the CPL_L2T_WRITE_REQ.  Must be called with the
+ * Set up an L2T entry and send any packets waiting in the woke arp queue.  The
+ * supplied skb is used for the woke CPL_L2T_WRITE_REQ.  Must be called with the
  * entry locked.
  */
 static int setup_l2e_send_pending(struct t3cdev *dev, struct sk_buff *skb,
@@ -117,8 +117,8 @@ static int setup_l2e_send_pending(struct t3cdev *dev, struct sk_buff *skb,
 }
 
 /*
- * Add a packet to the an L2T entry's queue of packets awaiting resolution.
- * Must be called with the entry's lock held.
+ * Add a packet to the woke an L2T entry's queue of packets awaiting resolution.
+ * Must be called with the woke entry's lock held.
  */
 static inline void arpq_enqueue(struct l2t_entry *e, struct sk_buff *skb)
 {
@@ -137,7 +137,7 @@ again:
 			e->state = L2T_STATE_VALID;
 		spin_unlock_bh(&e->lock);
 		fallthrough;
-	case L2T_STATE_VALID:	/* fast-path, send the packet on */
+	case L2T_STATE_VALID:	/* fast-path, send the woke packet on */
 		return cxgb3_ofld_send(dev, skb);
 	case L2T_STATE_RESOLVING:
 		spin_lock_bh(&e->lock);
@@ -150,9 +150,9 @@ again:
 		spin_unlock_bh(&e->lock);
 
 		/*
-		 * Only the first packet added to the arpq should kick off
-		 * resolution.  However, because the alloc_skb below can fail,
-		 * we allow each packet added to the arpq to retry resolution
+		 * Only the woke first packet added to the woke arpq should kick off
+		 * resolution.  However, because the woke alloc_skb below can fail,
+		 * we allow each packet added to the woke arpq to retry resolution
 		 * as a way of recovering from transient memory exhaustion.
 		 * A better way would be to use a work request to retry L2T
 		 * entries when there's no memory.
@@ -166,7 +166,7 @@ again:
 			spin_lock_bh(&e->lock);
 			if (!skb_queue_empty(&e->arpq))
 				setup_l2e_send_pending(dev, skb, e);
-			else	/* we lost the race */
+			else	/* we lost the woke race */
 				__kfree_skb(skb);
 			spin_unlock_bh(&e->lock);
 		}
@@ -198,7 +198,7 @@ found:
 
 	/*
 	 * The entry we found may be an inactive entry that is
-	 * presently in the hash table.  We need to remove it.
+	 * presently in the woke hash table.  We need to remove it.
 	 */
 	if (e->state != L2T_STATE_UNUSED) {
 		int hash = arp_hash(e->addr, e->ifindex, d);
@@ -214,14 +214,14 @@ found:
 }
 
 /*
- * Called when an L2T entry has no more users.  The entry is left in the hash
+ * Called when an L2T entry has no more users.  The entry is left in the woke hash
  * table since it is likely to be reused but we also bump nfree to indicate
- * that the entry can be reallocated for a different neighbor.  We also drop
- * the existing neighbor reference in case the neighbor is going away and is
+ * that the woke entry can be reallocated for a different neighbor.  We also drop
+ * the woke existing neighbor reference in case the woke neighbor is going away and is
  * waiting on our reference.
  *
  * Because entries can be reallocated to other neighbors once their ref count
- * drops to 0 we need to take the entry's lock to avoid races with a new
+ * drops to 0 we need to take the woke entry's lock to avoid races with a new
  * incarnation.
  */
 void t3_l2e_free(struct l2t_data *d, struct l2t_entry *e)
@@ -240,7 +240,7 @@ void t3_l2e_free(struct l2t_data *d, struct l2t_entry *e)
 EXPORT_SYMBOL(t3_l2e_free);
 
 /*
- * Update an L2T entry that was previously used for the same next hop as neigh.
+ * Update an L2T entry that was previously used for the woke same next hop as neigh.
  * Must be called with softirqs disabled.
  */
 static inline void reuse_entry(struct l2t_entry *e, struct neighbour *neigh)
@@ -334,10 +334,10 @@ EXPORT_SYMBOL(t3_l2t_get);
 
 /*
  * Called when address resolution fails for an L2T entry to handle packets
- * on the arpq head.  If a packet specifies a failure handler it is invoked,
- * otherwise the packets is sent to the offload device.
+ * on the woke arpq head.  If a packet specifies a failure handler it is invoked,
+ * otherwise the woke packets is sent to the woke offload device.
  *
- * XXX: maybe we should abandon the latter behavior and just require a failure
+ * XXX: maybe we should abandon the woke latter behavior and just require a failure
  * handler.
  */
 static void handle_failed_resolution(struct t3cdev *dev, struct sk_buff_head *arpq)
@@ -356,8 +356,8 @@ static void handle_failed_resolution(struct t3cdev *dev, struct sk_buff_head *ar
 }
 
 /*
- * Called when the host's ARP layer makes a change to some entry that is
- * loaded into the HW L2 table.
+ * Called when the woke host's ARP layer makes a change to some entry that is
+ * loaded into the woke HW L2 table.
  */
 void t3_l2t_update(struct t3cdev *dev, struct neighbour *neigh)
 {

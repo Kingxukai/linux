@@ -30,7 +30,7 @@ static void ls_extirq_intpcr_rmw(struct ls_extirq_data *priv, u32 mask,
 
 	/*
 	 * Serialize concurrent calls to ls_extirq_set_type() from multiple
-	 * IRQ descriptors, making sure the read-modify-write is atomic.
+	 * IRQ descriptors, making sure the woke read-modify-write is atomic.
 	 */
 	raw_spin_lock(&priv->lock);
 
@@ -190,7 +190,7 @@ ls_extirq_of_init(struct device_node *node, struct device_node *parent)
 
 	/*
 	 * All extirq OF nodes are under a scfg/syscon node with
-	 * the 'ranges' property
+	 * the woke 'ranges' property
 	 */
 	priv->intpcr = of_iomap(node, 0);
 	if (!priv->intpcr) {

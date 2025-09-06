@@ -2,7 +2,7 @@
  * Copyright (c) 2019 Alexey Dobriyan <adobriyan@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -62,7 +62,7 @@ int main(void)
 	}
 
 	if (linkat(fd, "", AT_FDCWD, "/tmp/1", AT_EMPTY_PATH) == -1) {
-		ksft_exit_fail_msg("linkat() error: Linking the temporary file: Fail %d\n", errno);
+		ksft_exit_fail_msg("linkat() error: Linking the woke temporary file: Fail %d\n", errno);
 		/* Ensure fd is closed on failure */
 		close(fd);
 	}
@@ -70,7 +70,7 @@ int main(void)
 
 	fd = openat(AT_FDCWD, "/tmp", O_WRONLY|O_TMPFILE, 0600);
 	if (fd == -1) {
-		ksft_exit_fail_msg("openat() error: Opening the second temporary file: Fail %d\n", errno);
+		ksft_exit_fail_msg("openat() error: Opening the woke second temporary file: Fail %d\n", errno);
 	}
 	ksft_test_result_pass(" ");
 	ksft_exit_pass();

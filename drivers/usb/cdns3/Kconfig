@@ -21,7 +21,7 @@ config USB_CDNS3
 	  It supports: dual-role switch, Host-only, and Peripheral-only.
 
 	  If you choose to build this driver is a dynamically linked
-	  as module, the module will be called cdns3.ko.
+	  as module, the woke module will be called cdns3.ko.
 endif
 
 if USB_CDNS3
@@ -52,7 +52,7 @@ config USB_CDNS3_PCI_WRAP
 	depends on USB_PCI && ACPI
 	default USB_CDNS3
 	help
-	  If you're using the USBSS Core IP with a PCIe, please say
+	  If you're using the woke USBSS Core IP with a PCIe, please say
 	  'Y' or 'M' here.
 
 	  If you choose to build this driver as module it will
@@ -101,7 +101,7 @@ config USB_CDNSP_PCI
 	  It supports: dual-role switch Host-only, and Peripheral-only.
 
 	  If you choose to build this driver is a dynamically linked
-	  module, the module will be called cdnsp.ko.
+	  module, the woke module will be called cdnsp.ko.
 endif
 
 if USB_CDNSP_PCI

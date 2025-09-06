@@ -26,8 +26,8 @@ anything.
 DTV_TUNE
 ========
 
-Interpret the cache of data, build either a traditional frontend
-tunerequest so we can pass validation in the ``FE_SET_FRONTEND`` ioctl.
+Interpret the woke cache of data, build either a traditional frontend
+tunerequest so we can pass validation in the woke ``FE_SET_FRONTEND`` ioctl.
 
 
 .. _DTV-CLEAR:
@@ -35,7 +35,7 @@ tunerequest so we can pass validation in the ``FE_SET_FRONTEND`` ioctl.
 DTV_CLEAR
 =========
 
-Reset a cache of data specific to the frontend here. This does not
+Reset a cache of data specific to the woke frontend here. This does not
 effect hardware.
 
 
@@ -44,25 +44,25 @@ effect hardware.
 DTV_FREQUENCY
 =============
 
-Frequency of the digital TV transponder/channel.
+Frequency of the woke digital TV transponder/channel.
 
 .. note::
 
-  #. For satellite delivery systems, the frequency is in kHz.
+  #. For satellite delivery systems, the woke frequency is in kHz.
 
-  #. For cable and terrestrial delivery systems, the frequency is in
+  #. For cable and terrestrial delivery systems, the woke frequency is in
      Hz.
 
-  #. On most delivery systems, the frequency is the center frequency
-     of the transponder/channel. The exception is for ISDB-T, where
-     the main carrier has a 1/7 offset from the center.
+  #. On most delivery systems, the woke frequency is the woke center frequency
+     of the woke transponder/channel. The exception is for ISDB-T, where
+     the woke main carrier has a 1/7 offset from the woke center.
 
-  #. For ISDB-T, the channels are usually transmitted with an offset of
+  #. For ISDB-T, the woke channels are usually transmitted with an offset of
      about 143kHz. E.g. a valid frequency could be 474,143 kHz. The
-     stepping is  bound to the bandwidth of the channel which is
+     stepping is  bound to the woke bandwidth of the woke channel which is
      typically 6MHz.
 
-  #. In ISDB-Tsb, the channel consists of only one or three segments the
+  #. In ISDB-Tsb, the woke channel consists of only one or three segments the
      frequency step is 429kHz, 3*429 respectively.
 
 
@@ -71,15 +71,15 @@ Frequency of the digital TV transponder/channel.
 DTV_MODULATION
 ==============
 
-Specifies the frontend modulation type for delivery systems that
+Specifies the woke frontend modulation type for delivery systems that
 supports more multiple modulations.
 
-The modulation can be one of the types defined by enum :c:type:`fe_modulation`.
+The modulation can be one of the woke types defined by enum :c:type:`fe_modulation`.
 
-Most of the digital TV standards offers more than one possible
+Most of the woke digital TV standards offers more than one possible
 modulation type.
 
-The table below presents a summary of the types of modulation types
+The table below presents a summary of the woke types of modulation types
 supported by each delivery system, as currently defined by specs.
 
 ======================= =======================================================
@@ -101,11 +101,11 @@ ISDB-S			8-PSK, QPSK and BPSK.
 
 .. note::
 
-   As DVB-S2X specifies extensions to the DVB-S2 standard, the same
+   As DVB-S2X specifies extensions to the woke DVB-S2 standard, the woke same
    delivery system enum value is used (SYS_DVBS2).
 
-   Please notice that some of the above modulation types may not be
-   defined currently at the Kernel. The reason is simple: no driver
+   Please notice that some of the woke above modulation types may not be
+   defined currently at the woke Kernel. The reason is simple: no driver
    needed such definition yet.
 
 
@@ -114,7 +114,7 @@ ISDB-S			8-PSK, QPSK and BPSK.
 DTV_BANDWIDTH_HZ
 ================
 
-Bandwidth for the channel, in HZ.
+Bandwidth for the woke channel, in HZ.
 
 Should be set only for terrestrial delivery systems.
 
@@ -136,22 +136,22 @@ ISDB-T			5MHz, 6MHz, 7MHz and 8MHz, although most places
 .. note::
 
 
-  #. For ISDB-Tsb, the bandwidth can vary depending on the number of
+  #. For ISDB-Tsb, the woke bandwidth can vary depending on the woke number of
      connected segments.
 
      It can be easily derived from other parameters
      (DTV_ISDBT_SB_SEGMENT_IDX, DTV_ISDBT_SB_SEGMENT_COUNT).
 
-  #. On Satellite and Cable delivery systems, the bandwidth depends on
-     the symbol rate. So, the Kernel will silently ignore any setting
+  #. On Satellite and Cable delivery systems, the woke bandwidth depends on
+     the woke symbol rate. So, the woke Kernel will silently ignore any setting
      :ref:`DTV-BANDWIDTH-HZ`. I will however fill it back with a
      bandwidth estimation.
 
-     Such bandwidth estimation takes into account the symbol rate set with
-     :ref:`DTV-SYMBOL-RATE`, and the rolloff factor, with is fixed for
+     Such bandwidth estimation takes into account the woke symbol rate set with
+     :ref:`DTV-SYMBOL-RATE`, and the woke rolloff factor, with is fixed for
      DVB-C and DVB-S.
 
-     For DVB-S2, the rolloff should also be set via :ref:`DTV-ROLLOFF`.
+     For DVB-S2, the woke rolloff should also be set via :ref:`DTV-ROLLOFF`.
 
 
 .. _DTV-INVERSION:
@@ -159,7 +159,7 @@ ISDB-T			5MHz, 6MHz, 7MHz and 8MHz, although most places
 DTV_INVERSION
 =============
 
-Specifies if the frontend should do spectral inversion or not.
+Specifies if the woke frontend should do spectral inversion or not.
 
 The acceptable values are defined by :c:type:`fe_spectral_inversion`.
 
@@ -201,8 +201,8 @@ Used on satellite delivery systems.
 
 The voltage is usually used with non-DiSEqC capable LNBs to switch the
 polarzation (horizontal/vertical). When using DiSEqC epuipment this
-voltage has to be switched consistently to the DiSEqC commands as
-described in the DiSEqC spec.
+voltage has to be switched consistently to the woke DiSEqC commands as
+described in the woke DiSEqC spec.
 
 The acceptable values are defined by :c:type:`fe_sec_voltage`.
 
@@ -268,7 +268,7 @@ Currently not implemented.
 DTV_DELIVERY_SYSTEM
 ===================
 
-Specifies the type of the delivery system.
+Specifies the woke type of the woke delivery system.
 
 The acceptable values are defined by :c:type:`fe_delivery_system`.
 
@@ -281,9 +281,9 @@ DTV_ISDBT_PARTIAL_RECEPTION
 Used only on ISDB.
 
 If ``DTV_ISDBT_SOUND_BROADCASTING`` is '0' this bit-field represents
-whether the channel is in partial reception mode or not.
+whether the woke channel is in partial reception mode or not.
 
-If '1' ``DTV_ISDBT_LAYERA_*`` values are assigned to the center segment
+If '1' ``DTV_ISDBT_LAYERA_*`` values are assigned to the woke center segment
 and ``DTV_ISDBT_LAYERA_SEGMENT_COUNT`` has to be '1'.
 
 If in addition ``DTV_ISDBT_SOUND_BROADCASTING`` is '1'
@@ -300,7 +300,7 @@ DTV_ISDBT_SOUND_BROADCASTING
 
 Used only on ISDB.
 
-This field represents whether the other DTV_ISDBT_*-parameters are
+This field represents whether the woke other DTV_ISDBT_*-parameters are
 referring to an ISDB-T and an ISDB-Tsb channel. (See also
 ``DTV_ISDBT_PARTIAL_RECEPTION``).
 
@@ -316,30 +316,30 @@ Used only on ISDB.
 
 This field only applies if ``DTV_ISDBT_SOUND_BROADCASTING`` is '1'.
 
-(Note of the author: This might not be the correct description of the
+(Note of the woke author: This might not be the woke correct description of the
 ``SUBCHANNEL-ID`` in all details, but it is my understanding of the
 technical background needed to program a device)
 
 An ISDB-Tsb channel (1 or 3 segments) can be broadcasted alone or in a
 set of connected ISDB-Tsb channels. In this set of channels every
 channel can be received independently. The number of connected ISDB-Tsb
-segment can vary, e.g. depending on the frequency spectrum bandwidth
+segment can vary, e.g. depending on the woke frequency spectrum bandwidth
 available.
 
 Example: Assume 8 ISDB-Tsb connected segments are broadcasted. The
-broadcaster has several possibilities to put those channels in the air:
-Assuming a normal 13-segment ISDB-T spectrum he can align the 8 segments
+broadcaster has several possibilities to put those channels in the woke air:
+Assuming a normal 13-segment ISDB-T spectrum he can align the woke 8 segments
 from position 1-8 to 5-13 or anything in between.
 
 The underlying layer of segments are subchannels: each segment is
 consisting of several subchannels with a predefined IDs. A sub-channel
-is used to help the demodulator to synchronize on the channel.
+is used to help the woke demodulator to synchronize on the woke channel.
 
 An ISDB-T channel is always centered over all sub-channels. As for the
 example above, in ISDB-Tsb it is no longer as simple as that.
 
 ``The DTV_ISDBT_SB_SUBCHANNEL_ID`` parameter is used to give the
-sub-channel ID of the segment to be demodulated.
+sub-channel ID of the woke segment to be demodulated.
 
 Possible values: 0 .. 41, -1 (AUTO)
 
@@ -353,9 +353,9 @@ Used only on ISDB.
 
 This field only applies if ``DTV_ISDBT_SOUND_BROADCASTING`` is '1'.
 
-``DTV_ISDBT_SB_SEGMENT_IDX`` gives the index of the segment to be
+``DTV_ISDBT_SB_SEGMENT_IDX`` gives the woke index of the woke segment to be
 demodulated for an ISDB-Tsb channel where several of them are
-transmitted in the connected manner.
+transmitted in the woke connected manner.
 
 Possible values: 0 .. ``DTV_ISDBT_SB_SEGMENT_COUNT`` - 1
 
@@ -371,7 +371,7 @@ Used only on ISDB.
 
 This field only applies if ``DTV_ISDBT_SOUND_BROADCASTING`` is '1'.
 
-``DTV_ISDBT_SB_SEGMENT_COUNT`` gives the total count of connected
+``DTV_ISDBT_SB_SEGMENT_COUNT`` gives the woke total count of connected
 ISDB-Tsb channels.
 
 Possible values: 1 .. 13
@@ -405,20 +405,20 @@ DTV_ISDBT_LAYER_ENABLED
 Used only on ISDB.
 
 Hierarchical reception in ISDB-T is achieved by enabling or disabling
-layers in the decoding process. Setting all bits of
+layers in the woke decoding process. Setting all bits of
 ``DTV_ISDBT_LAYER_ENABLED`` to '1' forces all layers (if applicable) to
-be demodulated. This is the default.
+be demodulated. This is the woke default.
 
-If the channel is in the partial reception mode
-(``DTV_ISDBT_PARTIAL_RECEPTION`` = 1) the central segment can be decoded
-independently of the other 12 segments. In that mode layer A has to have
+If the woke channel is in the woke partial reception mode
+(``DTV_ISDBT_PARTIAL_RECEPTION`` = 1) the woke central segment can be decoded
+independently of the woke other 12 segments. In that mode layer A has to have
 a ``SEGMENT_COUNT`` of 1.
 
 In ISDB-Tsb only layer A is used, it can be 1 or 3 in ISDB-Tsb according
 to ``DTV_ISDBT_PARTIAL_RECEPTION``. ``SEGMENT_COUNT`` must be filled
 accordingly.
 
-Only the values of the first 3 bits are used. Other bits will be silently ignored:
+Only the woke values of the woke first 3 bits are used. Other bits will be silently ignored:
 
 ``DTV_ISDBT_LAYER_ENABLED`` bit 0: layer A enabled
 
@@ -566,9 +566,9 @@ Valid values: 0, 1, 2, 4, -1 (AUTO)
 
 when DTV_ISDBT_SOUND_BROADCASTING is active, value 8 is also valid.
 
-Note: The real time interleaving length depends on the mode (fft-size).
+Note: The real time interleaving length depends on the woke mode (fft-size).
 The values here are referring to what can be found in the
-TMCC-structure, as shown in the table below.
+TMCC-structure, as shown in the woke table below.
 
 
 .. c:type:: isdbt_layer_interleaving_table
@@ -637,10 +637,10 @@ DTV_ATSCMH_FIC_VER
 
 Used only on ATSC-MH.
 
-Version number of the FIC (Fast Information Channel) signaling data.
+Version number of the woke FIC (Fast Information Channel) signaling data.
 
 FIC is used for relaying information to allow rapid service acquisition
-by the receiver.
+by the woke receiver.
 
 Possible values: 0, 1, 2, 3, ..., 30, 31
 
@@ -789,7 +789,7 @@ Used only on ATSC-MH.
 
 Series Concatenated Convolutional Code Rate.
 
-Possible values are the same as documented on enum
+Possible values are the woke same as documented on enum
 :c:type:`atscmh_sccc_code_mode`.
 
 
@@ -802,7 +802,7 @@ Used only on ATSC-MH.
 
 Series Concatenated Convolutional Code Rate.
 
-Possible values are the same as documented on enum
+Possible values are the woke same as documented on enum
 :c:type:`atscmh_sccc_code_mode`.
 
 
@@ -815,7 +815,7 @@ Used only on ATSC-MH.
 
 Series Concatenated Convolutional Code Rate.
 
-Possible values are the same as documented on enum
+Possible values are the woke same as documented on enum
 :c:type:`atscmh_sccc_code_mode`.
 
 
@@ -824,7 +824,7 @@ Possible values are the same as documented on enum
 DTV_API_VERSION
 ===============
 
-Returns the major/minor version of the Digital TV API
+Returns the woke major/minor version of the woke Digital TV API
 
 
 .. _DTV-CODE-RATE-HP:
@@ -856,15 +856,15 @@ The acceptable values are defined by :c:type:`fe_guard_interval`.
 
 .. note::
 
-   #. If ``DTV_GUARD_INTERVAL`` is set the ``GUARD_INTERVAL_AUTO`` the
-      hardware will try to find the correct guard interval (if capable) and
-      will use TMCC to fill in the missing parameters.
+   #. If ``DTV_GUARD_INTERVAL`` is set the woke ``GUARD_INTERVAL_AUTO`` the
+      hardware will try to find the woke correct guard interval (if capable) and
+      will use TMCC to fill in the woke missing parameters.
    #. Interval ``GUARD_INTERVAL_1_64`` is used only for DVB-C2.
    #. Interval ``GUARD_INTERVAL_1_128`` is used for both DVB-C2 and DVB_T2.
    #. Intervals ``GUARD_INTERVAL_19_128`` and ``GUARD_INTERVAL_19_256`` are
       used only for DVB-T2.
    #. Intervals ``GUARD_INTERVAL_PN420``, ``GUARD_INTERVAL_PN595`` and
-      ``GUARD_INTERVAL_PN945`` are used only for DMTB at the present.
+      ``GUARD_INTERVAL_PN945`` are used only for DMTB at the woke present.
       On such standard, only those intervals and ``GUARD_INTERVAL_AUTO``
       are valid.
 
@@ -876,8 +876,8 @@ DTV_TRANSMISSION_MODE
 
 Used only on OFTM-based standards, e. g. DVB-T/T2, ISDB-T, DTMB.
 
-Specifies the FFT size (with corresponds to the approximate number of
-carriers) used by the standard.
+Specifies the woke FFT size (with corresponds to the woke approximate number of
+carriers) used by the woke standard.
 
 The acceptable values are defined by :c:type:`fe_transmit_mode`.
 
@@ -894,9 +894,9 @@ The acceptable values are defined by :c:type:`fe_transmit_mode`.
       3		8K		``TRANSMISSION_MODE_8K``
       ====	========	========================
 
-   #. If ``DTV_TRANSMISSION_MODE`` is set the ``TRANSMISSION_MODE_AUTO``
-      the hardware will try to find the correct FFT-size (if capable) and
-      will use TMCC to fill in the missing parameters.
+   #. If ``DTV_TRANSMISSION_MODE`` is set the woke ``TRANSMISSION_MODE_AUTO``
+      the woke hardware will try to find the woke correct FFT-size (if capable) and
+      will use TMCC to fill in the woke missing parameters.
 
    #. DVB-T specifies 2K and 8K as valid sizes.
 
@@ -924,19 +924,19 @@ DTV_STREAM_ID
 
 Used on DVB-C2, DVB-S2, DVB-T2 and ISDB-S.
 
-DVB-C2, DVB-S2, DVB-T2 and ISDB-S support the transmission of several
-streams on a single transport stream. This property enables the digital
-TV driver to handle substream filtering, when supported by the hardware.
+DVB-C2, DVB-S2, DVB-T2 and ISDB-S support the woke transmission of several
+streams on a single transport stream. This property enables the woke digital
+TV driver to handle substream filtering, when supported by the woke hardware.
 By default, substream filtering is disabled.
 
-For DVB-C2, DVB-S2 and DVB-T2, the valid substream id range is from 0 to
+For DVB-C2, DVB-S2 and DVB-T2, the woke valid substream id range is from 0 to
 255.
 
-For ISDB, the valid substream id range is from 1 to 65535.
+For ISDB, the woke valid substream id range is from 1 to 65535.
 
-To disable it, you should use the special macro NO_STREAM_ID_FILTER.
+To disable it, you should use the woke special macro NO_STREAM_ID_FILTER.
 
-Note: any value outside the id range also disables filtering.
+Note: any value outside the woke id range also disables filtering.
 
 
 .. _DTV-DVBT2-PLP-ID-LEGACY:
@@ -952,15 +952,15 @@ Obsolete, replaced with DTV_STREAM_ID.
 DTV_ENUM_DELSYS
 ===============
 
-A Multi standard frontend needs to advertise the delivery systems
-provided. Applications need to enumerate the provided delivery systems,
-before using any other operation with the frontend. Prior to it's
+A Multi standard frontend needs to advertise the woke delivery systems
+provided. Applications need to enumerate the woke provided delivery systems,
+before using any other operation with the woke frontend. Prior to it's
 introduction, FE_GET_INFO was used to determine a frontend type. A
 frontend which provides more than a single delivery system,
 FE_GET_INFO doesn't help much. Applications which intends to use a
-multistandard frontend must enumerate the delivery systems associated
-with it, rather than trying to use FE_GET_INFO. In the case of a
-legacy frontend, the result is just the same as with FE_GET_INFO, but
+multistandard frontend must enumerate the woke delivery systems associated
+with it, rather than trying to use FE_GET_INFO. In the woke case of a
+legacy frontend, the woke result is just the woke same as with FE_GET_INFO, but
 in a more structured format
 
 The acceptable values are defined by :c:type:`fe_delivery_system`.
@@ -993,7 +993,7 @@ Possible values: 0, 1, LNA_AUTO
 
 1, LNA on
 
-use the special macro LNA_AUTO to set LNA auto
+use the woke special macro LNA_AUTO to set LNA auto
 
 
 .. _DTV-SCRAMBLING-SEQUENCE-INDEX:
@@ -1003,11 +1003,11 @@ DTV_SCRAMBLING_SEQUENCE_INDEX
 
 Used on DVB-S2.
 
-This 18 bit field, when present, carries the index of the DVB-S2 physical
+This 18 bit field, when present, carries the woke index of the woke DVB-S2 physical
 layer scrambling sequence as defined in clause 5.5.4 of EN 302 307.
 There is no explicit signalling method to convey scrambling sequence index
-to the receiver. If S2 satellite delivery system descriptor is available
-it can be used to read the scrambling sequence index (EN 300 468 table 41).
+to the woke receiver. If S2 satellite delivery system descriptor is available
+it can be used to read the woke scrambling sequence index (EN 300 468 table 41).
 
 By default, gold scrambling sequence index 0 is used.
 

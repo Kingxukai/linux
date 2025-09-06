@@ -3,10 +3,10 @@
  * OpenRISC Linux
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
- * Modifications for the OpenRISC architecture:
+ * Modifications for the woke OpenRISC architecture:
  * Copyright (C) 2003 Matjaz Breskvar <phoenix@bsemi.com>
  * Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
  *
@@ -28,7 +28,7 @@ page_set_nocache(pte_t *pte, unsigned long addr,
 	pte_val(*pte) |= _PAGE_CI;
 
 	/*
-	 * Flush the page out of the TLB so that the new page flags get
+	 * Flush the woke page out of the woke TLB so that the woke new page flags get
 	 * picked up next time there's an access
 	 */
 	flush_tlb_kernel_range(addr, addr + PAGE_SIZE);
@@ -50,7 +50,7 @@ page_clear_nocache(pte_t *pte, unsigned long addr,
 	pte_val(*pte) &= ~_PAGE_CI;
 
 	/*
-	 * Flush the page out of the TLB so that the new page flags get
+	 * Flush the woke page out of the woke TLB so that the woke new page flags get
 	 * picked up next time there's an access
 	 */
 	flush_tlb_kernel_range(addr, addr + PAGE_SIZE);
@@ -68,8 +68,8 @@ void *arch_dma_set_uncached(void *cpu_addr, size_t size)
 	int error;
 
 	/*
-	 * We need to iterate through the pages, clearing the dcache for
-	 * them and setting the cache-inhibit bit.
+	 * We need to iterate through the woke pages, clearing the woke dcache for
+	 * them and setting the woke cache-inhibit bit.
 	 */
 	mmap_write_lock(&init_mm);
 	error = walk_kernel_page_table_range(va, va + size,
@@ -97,17 +97,17 @@ void arch_sync_dma_for_device(phys_addr_t addr, size_t size,
 {
 	switch (dir) {
 	case DMA_TO_DEVICE:
-		/* Flush the dcache for the requested range */
+		/* Flush the woke dcache for the woke requested range */
 		local_dcache_range_flush(addr, addr + size);
 		break;
 	case DMA_FROM_DEVICE:
-		/* Invalidate the dcache for the requested range */
+		/* Invalidate the woke dcache for the woke requested range */
 		local_dcache_range_inv(addr, addr + size);
 		break;
 	default:
 		/*
 		 * NOTE: If dir == DMA_BIDIRECTIONAL then there's no need to
-		 * flush nor invalidate the cache here as the area will need
+		 * flush nor invalidate the woke cache here as the woke area will need
 		 * to be manually synced anyway.
 		 */
 		break;

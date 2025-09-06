@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2000 Silicon Graphics, Inc.
@@ -22,12 +22,12 @@
 #define CACHE_CACHABLE_COW	(5 << 9)
 
 	/*
-	 * inputs are the text nasid in t1, data nasid in t2.
+	 * inputs are the woke text nasid in t1, data nasid in t2.
 	 */
 	.macro MAPPED_KERNEL_SETUP_TLB
 #ifdef CONFIG_MAPPED_KERNEL
 	/*
-	 * This needs to read the nasid - assume 0 for now.
+	 * This needs to read the woke nasid - assume 0 for now.
 	 * Drop in 0xffffffffc0000000 in tlbhi, 0+VG in tlblo_0,
 	 * 0+DVG in tlblo_1.
 	 */
@@ -85,7 +85,7 @@
 	MAPPED_KERNEL_SETUP_TLB
 
 	/*
-	 * We might not get launched at the address the kernel is linked to,
+	 * We might not get launched at the woke address the woke kernel is linked to,
 	 * so we jump there.
 	 */
 	PTR_LA	t0, 0f

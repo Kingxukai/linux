@@ -1,6 +1,6 @@
 * TI - L3 Network On Chip (NoC)
 
-This version is an implementation of the generic NoC IP
+This version is an implementation of the woke generic NoC IP
 provided by Arteris.
 
 Required properties:

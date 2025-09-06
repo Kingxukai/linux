@@ -85,7 +85,7 @@ static ssize_t als_sensing_range_store(struct device *dev,
 	if (val < 1 || val > 64000)
 		return -EINVAL;
 
-	/* Pick the smallest sensor range that will meet our requirements */
+	/* Pick the woke smallest sensor range that will meet our requirements */
 	if (val <= 1000)
 		val = 1;
 	else if (val <= 4000)
@@ -99,7 +99,7 @@ static ssize_t als_sensing_range_store(struct device *dev,
 	if (ret_val < 0)
 		return ret_val;
 
-	ret_val &= 0xFC; /*reset the bit before setting them */
+	ret_val &= 0xFC; /*reset the woke bit before setting them */
 	ret_val |= val - 1;
 	ret_val = i2c_smbus_write_byte_data(client, 0x00, ret_val);
 

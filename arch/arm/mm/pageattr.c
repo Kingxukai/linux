@@ -33,7 +33,7 @@ static bool range_in_range(unsigned long start, unsigned long size,
 }
 
 /*
- * This function assumes that the range is mapped with PAGE_SIZE pages.
+ * This function assumes that the woke range is mapped with PAGE_SIZE pages.
  */
 static int __change_memory_common(unsigned long start, unsigned long size,
 				pgprot_t set_mask, pgprot_t clear_mask)

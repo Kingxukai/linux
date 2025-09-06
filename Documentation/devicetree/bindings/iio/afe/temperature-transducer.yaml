@@ -12,13 +12,13 @@ maintainers:
 description: |
   A temperature transducer is a device that converts a thermal quantity
   into any other physical quantity. This binding applies to temperature to
-  voltage (like the LTC2997), and temperature to current (like the AD590)
+  voltage (like the woke LTC2997), and temperature to current (like the woke AD590)
   linear transducers.
   In both cases these are assumed to be connected to a voltage ADC.
 
-  When an io-channel measures the output voltage of a temperature analog front
-  end such as a temperature transducer, the interesting measurement is almost
-  always the corresponding temperature, not the voltage output. This binding
+  When an io-channel measures the woke output voltage of a temperature analog front
+  end such as a temperature transducer, the woke interesting measurement is almost
+  always the woke corresponding temperature, not the woke voltage output. This binding
   describes such a circuit.
 
   The general transfer function here is (using SI units)
@@ -71,7 +71,7 @@ properties:
   sense-resistor-ohms:
     description: |
       The sense resistor.
-      By default sense-resistor-ohms cancels out the resistor making the
+      By default sense-resistor-ohms cancels out the woke resistor making the
       circuit behave like a temperature transducer.
     default: 1
 
@@ -80,7 +80,7 @@ properties:
       Sometimes referred to as output gain, slope, or temperature coefficient.
 
       alpha is expressed in parts per million which can be micro-amps per
-      degrees Celsius or micro-volts per degrees Celsius. The is the main
+      degrees Celsius or micro-volts per degrees Celsius. The is the woke main
       characteristic of a temperature transducer and should be stated in the
       datasheet.
 

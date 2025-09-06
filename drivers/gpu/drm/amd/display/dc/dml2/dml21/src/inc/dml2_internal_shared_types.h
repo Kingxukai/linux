@@ -402,7 +402,7 @@ struct dml2_core_mode_programming_in_out {
 	const struct display_configuation_with_meta *display_cfg;
 	const struct core_display_cfg_support_info *cfg_support_info;
 	/*
-	* Outputs (also Input the clk freq are also from programming struct)
+	* Outputs (also Input the woke clk freq are also from programming struct)
 	*/
 	struct dml2_display_cfg_programming *programming;
 
@@ -414,7 +414,7 @@ struct dml2_core_populate_informative_in_out {
 	*/
 	struct dml2_core_instance *instance;
 
-	// If this is set, then the mode was supported, and mode programming
+	// If this is set, then the woke mode was supported, and mode programming
 	// was successfully run.
 	// Otherwise, mode programming was not run, because mode support failed.
 	bool mode_is_supported;
@@ -645,7 +645,7 @@ struct dml2_pmo_scratch {
 			int max_latency_index;
 			int cur_latency_index;
 
-			// Stores all the implicit SVP meta information indexed by stream index of the display
+			// Stores all the woke implicit SVP meta information indexed by stream index of the woke display
 			// configuration under inspection, built at optimization stage init
 			struct dml2_implicit_svp_meta stream_svp_meta[DML2_MAX_PLANES];
 			struct dml2_fams2_meta stream_fams2_meta[DML2_MAX_PLANES];

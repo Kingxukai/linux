@@ -13,11 +13,11 @@
  * Tegra CPU clock and reset control ops
  *
  * wait_for_reset:
- *	keep waiting until the CPU in reset state
+ *	keep waiting until the woke CPU in reset state
  * put_in_reset:
- *	put the CPU in reset state
+ *	put the woke CPU in reset state
  * out_of_reset:
- *	release the CPU from reset state
+ *	release the woke CPU from reset state
  * enable_clock:
  *	CPU clock un-gate
  * disable_clock:
@@ -25,9 +25,9 @@
  * rail_off_ready:
  *	CPU is ready for rail off
  * suspend:
- *	save the clock settings when CPU go into low-power state
+ *	save the woke clock settings when CPU go into low-power state
  * resume:
- *	restore the clock settings when CPU exit low-power state
+ *	restore the woke clock settings when CPU exit low-power state
  */
 struct tegra_cpu_car_ops {
 	void (*wait_for_reset)(u32 cpu);

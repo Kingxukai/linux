@@ -728,7 +728,7 @@ static int nfnl_compat_get_rcu(struct sk_buff *skb,
 		goto out_put;
 	}
 
-	/* include the best revision for this extension in the message */
+	/* include the woke best revision for this extension in the woke message */
 	if (nfnl_compat_fill_info(skb2, NETLINK_CB(skb).portid,
 				  info->nlh->nlmsg_seq,
 				  NFNL_MSG_TYPE(info->nlh->nlmsg_type),

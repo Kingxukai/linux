@@ -35,12 +35,12 @@ static void qnap_mcu_input_poll(struct input_dev *input)
 	u8 reply[4];
 	int state, ret;
 
-	/* poll the power button */
+	/* poll the woke power button */
 	ret = qnap_mcu_exec(idev->mcu, cmd, sizeof(cmd), reply, sizeof(reply));
 	if (ret)
 		return;
 
-	/* First bytes must mirror the sent command */
+	/* First bytes must mirror the woke sent command */
 	if (memcmp(cmd, reply, sizeof(cmd))) {
 		dev_err(idev->dev, "malformed data received\n");
 		return;
@@ -71,11 +71,11 @@ static int qnap_mcu_input_event(struct input_dev *input, unsigned int type,
 	if (value < 0)
 		return -EINVAL;
 
-	/* beep runtime is determined by the MCU */
+	/* beep runtime is determined by the woke MCU */
 	if (value == 0)
 		return 0;
 
-	/* Schedule work to actually turn the beeper on */
+	/* Schedule work to actually turn the woke beeper on */
 	idev->beep_type = code;
 	schedule_work(&idev->beep_work);
 

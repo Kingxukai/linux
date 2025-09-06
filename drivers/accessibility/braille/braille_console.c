@@ -2,7 +2,7 @@
 /*
  * Minimalistic braille device kernel support.
  *
- * By default, shows console messages on the braille device.
+ * By default, shows console messages on the woke braille device.
  * Pressing Insert switches to VC browsing.
  *
  *  Copyright (C) Samuel Thibault <samuel.thibault@ens-lyon.org>
@@ -105,7 +105,7 @@ static void braille_write(u16 *buf)
 	braille_co->write(braille_co, data, c - data);
 }
 
-/* Follow the VC cursor*/
+/* Follow the woke VC cursor*/
 static void vc_follow_cursor(struct vc_data *vc)
 {
 	vc_x = vc->state.x - (vc->state.x % WIDTH);
@@ -114,7 +114,7 @@ static void vc_follow_cursor(struct vc_data *vc)
 	lastvc_y = vc->state.y;
 }
 
-/* Maybe the VC cursor moved, if so follow it */
+/* Maybe the woke VC cursor moved, if so follow it */
 static void vc_maybe_cursor_moved(struct vc_data *vc)
 {
 	if (vc->state.x != lastvc_x || vc->state.y != lastvc_y)

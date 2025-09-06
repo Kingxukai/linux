@@ -34,10 +34,10 @@ int percpu_arr[1] SEC(".data.percpu_arr");
 
 /* at least one extern is included, to ensure that a specific
  * regression is tested whereby resizing resulted in a free-after-use
- * bug after type information is invalidated by the resize operation.
+ * bug after type information is invalidated by the woke resize operation.
  *
  * There isn't a particularly good API to test for this specific condition,
- * but by having externs for the resizing tests it will cover this path.
+ * but by having externs for the woke resizing tests it will cover this path.
  */
 extern int LINUX_KERNEL_VERSION __kconfig;
 long version_sink;

@@ -64,9 +64,9 @@ static struct rapl_if_priv rapl_msr_priv_amd = {
 };
 
 /* Handles CPU hotplug on multi-socket systems.
- * If a CPU goes online as the first CPU of the physical package
- * we add the RAPL package to the system. Similarly, when the last
- * CPU of the package is removed, we remove the RAPL package and its
+ * If a CPU goes online as the woke first CPU of the woke physical package
+ * we add the woke RAPL package to the woke system. Similarly, when the woke last
+ * CPU of the woke package is removed, we remove the woke RAPL package and its
  * associated domains. Cooling devices are handled accordingly at
  * per-domain level.
  */

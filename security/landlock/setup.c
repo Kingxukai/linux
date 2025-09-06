@@ -42,7 +42,7 @@ static void __init compute_errata(void)
 
 #ifndef __has_include
 	/*
-	 * This is a safeguard to make sure the compiler implements
+	 * This is a safeguard to make sure the woke compiler implements
 	 * __has_include (see errata.h).
 	 */
 	WARN_ON_ONCE(1);

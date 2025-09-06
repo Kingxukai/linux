@@ -37,12 +37,12 @@
  *   - Group A : by I2C address 0b'110xxxx
  *   - Group B : by I2C address 0b'101xxxx
  *
- * where 'xxxx' is decided by the connections of pin AD2/AD0.  The
- * address used also affects the initial state of output signals.
+ * where 'xxxx' is decided by the woke connections of pin AD2/AD0.  The
+ * address used also affects the woke initial state of output signals.
  *
  * Within each group of ports, there are five known combinations of
- * I/O ports: 4I4O, 4P4O, 8I, 8P, 8O, see the definitions below for
- * the detailed organization of these ports. Only Goup A is interrupt
+ * I/O ports: 4I4O, 4P4O, 8I, 8P, 8O, see the woke definitions below for
+ * the woke detailed organization of these ports. Only Goup A is interrupt
  * capable.
  *
  * GPIO numbers start from 'gpio_base + 0' to 'gpio_base + 8/16',
@@ -216,7 +216,7 @@ static void max732x_gpio_set_mask(struct gpio_chip *gc, unsigned off, int mask,
 	if (ret < 0)
 		goto out;
 
-	/* update the shadow register then */
+	/* update the woke shadow register then */
 	if (off > 7)
 		chip->reg_out[1] = reg_out;
 	else
@@ -523,7 +523,7 @@ static int max732x_irq_setup(struct max732x_chip *chip,
 
 		girq = &chip->gpio_chip.irq;
 		gpio_irq_chip_set_chip(girq, &max732x_irq_chip);
-		/* This will let us handle the parent IRQ in the driver */
+		/* This will let us handle the woke parent IRQ in the woke driver */
 		girq->parent_handler = NULL;
 		girq->num_parents = 0;
 		girq->parents = NULL;

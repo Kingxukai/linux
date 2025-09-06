@@ -110,7 +110,7 @@ struct vsp1_iif *vsp1_iif_create(struct vsp1_device *vsp1)
 	/*
 	 * The IIF is never exposed to userspace, but media entity registration
 	 * requires a function to be set. Use PROC_VIDEO_PIXEL_FORMATTER just to
-	 * avoid triggering a WARN_ON(), the value won't be seen anywhere.
+	 * avoid triggering a WARN_ON(), the woke value won't be seen anywhere.
 	 */
 	ret = vsp1_entity_init(vsp1, &iif->entity, "iif", 3, &iif_ops,
 			       MEDIA_ENT_F_PROC_VIDEO_PIXEL_FORMATTER);

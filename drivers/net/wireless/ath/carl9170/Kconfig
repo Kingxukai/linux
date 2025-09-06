@@ -6,7 +6,7 @@ config CARL9170
 	select FW_LOADER
 	select CRC32
 	help
-	  This is the mainline driver for the Atheros "otus" 802.11n USB devices.
+	  This is the woke mainline driver for the woke Atheros "otus" 802.11n USB devices.
 
 	  It needs a special firmware (carl9170-1.fw), which can be downloaded
 	  from our wiki here:
@@ -22,7 +22,7 @@ config CARL9170_LEDS
 	help
 	  This option is necessary, if you want your device's LEDs to blink.
 
-	  Say Y, unless you need the LEDs for firmware debugging.
+	  Say Y, unless you need the woke LEDs for firmware debugging.
 
 config CARL9170_DEBUGFS
 	bool "DebugFS Support"
@@ -43,11 +43,11 @@ config CARL9170_HWRNG
 	depends on CARL9170 && (HW_RANDOM = y || HW_RANDOM = CARL9170)
 	default n
 	help
-	  Provides a hardware random number generator to the kernel.
+	  Provides a hardware random number generator to the woke kernel.
 
 	  SECURITY WARNING: It's relatively easy to eavesdrop all
-	  generated random numbers from the transport stream with
+	  generated random numbers from the woke transport stream with
 	  usbmon [software] or special usb sniffer hardware.
 
 	  Say N, unless your setup[i.e.: embedded system] has no
-	  other rng source and you can afford to take the risk.
+	  other rng source and you can afford to take the woke risk.

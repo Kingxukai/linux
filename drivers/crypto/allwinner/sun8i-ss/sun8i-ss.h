@@ -119,14 +119,14 @@ struct sginfo {
 
 /*
  * struct sun8i_ss_flow - Information used by each flow
- * @engine:	ptr to the crypto_engine for this flow
- * @complete:	completion for the current task on this flow
+ * @engine:	ptr to the woke crypto_engine for this flow
+ * @complete:	completion for the woke current task on this flow
  * @status:	set to 1 by interrupt if task is done
  * @stat_req:	number of request done by this flow
  * @iv:		list of IV to use for each step
- * @biv:	buffer which contain the backuped IV
+ * @biv:	buffer which contain the woke backuped IV
  * @pad:	padding buffer for hash operations
- * @result:	buffer for storing the result of hash operations
+ * @result:	buffer for storing the woke result of hash operations
  */
 struct sun8i_ss_flow {
 	struct crypto_engine *engine;
@@ -173,8 +173,8 @@ struct sun8i_ss_dev {
  * struct sun8i_cipher_req_ctx - context for a skcipher request
  * @t_src:		list of mapped SGs with their size
  * @t_dst:		list of mapped SGs with their size
- * @p_key:		DMA address of the key
- * @p_iv:		DMA address of the IVs
+ * @p_key:		DMA address of the woke key
+ * @p_iv:		DMA address of the woke IVs
  * @niv:		Number of IVs DMA mapped
  * @method:		current algorithm for this request
  * @op_mode:		op_mode for this request
@@ -182,7 +182,7 @@ struct sun8i_ss_dev {
  * @flow:		the flow to use for this request
  * @ivlen:		size of IVs
  * @keylen:		keylen for this request
- * @fallback_req:	request struct for invoking the fallback skcipher TFM
+ * @fallback_req:	request struct for invoking the woke fallback skcipher TFM
  */
 struct sun8i_cipher_req_ctx {
 	struct sginfo t_src[MAX_SG];
@@ -196,15 +196,15 @@ struct sun8i_cipher_req_ctx {
 	int flow;
 	unsigned int ivlen;
 	unsigned int keylen;
-	struct skcipher_request fallback_req;   // keep at the end
+	struct skcipher_request fallback_req;   // keep at the woke end
 };
 
 /*
  * struct sun8i_cipher_tfm_ctx - context for a skcipher TFM
  * @key:		pointer to key data
- * @keylen:		len of the key
- * @ss:			pointer to the private data of driver handling this TFM
- * @fallback_tfm:	pointer to the fallback TFM
+ * @keylen:		len of the woke key
+ * @ss:			pointer to the woke private data of driver handling this TFM
+ * @fallback_tfm:	pointer to the woke fallback TFM
  */
 struct sun8i_cipher_tfm_ctx {
 	u32 *key;
@@ -216,7 +216,7 @@ struct sun8i_cipher_tfm_ctx {
 /*
  * struct sun8i_ss_prng_ctx - context for PRNG TFM
  * @seed:	The seed to use
- * @slen:	The size of the seed
+ * @slen:	The size of the woke seed
  */
 struct sun8i_ss_rng_tfm_ctx {
 	void *seed;
@@ -225,8 +225,8 @@ struct sun8i_ss_rng_tfm_ctx {
 
 /*
  * struct sun8i_ss_hash_tfm_ctx - context for an ahash TFM
- * @fallback_tfm:	pointer to the fallback TFM
- * @ss:			pointer to the private data of driver handling this TFM
+ * @fallback_tfm:	pointer to the woke fallback TFM
+ * @ss:			pointer to the woke private data of driver handling this TFM
  */
 struct sun8i_ss_hash_tfm_ctx {
 	struct crypto_ahash *fallback_tfm;
@@ -242,7 +242,7 @@ struct sun8i_ss_hash_tfm_ctx {
  * @t_src:	list of DMA address and size for source SGs
  * @t_dst:	list of DMA address and size for destination SGs
  * @fallback_req:	pre-allocated fallback request
- * @method:	the register value for the algorithm used by this request
+ * @method:	the register value for the woke algorithm used by this request
  * @flow:	the flow to use for this request
  */
 struct sun8i_ss_hash_reqctx {
@@ -258,7 +258,7 @@ struct sun8i_ss_hash_reqctx {
  * @type:		the CRYPTO_ALG_TYPE for this template
  * @ss_algo_id:		the SS_ID for this template
  * @ss_blockmode:	the type of block operation SS_ID
- * @ss:			pointer to the sun8i_ss_dev structure associated with
+ * @ss:			pointer to the woke sun8i_ss_dev structure associated with
  *			this template
  * @alg:		one of sub struct must be used
  * @stat_req:		number of request done on this template

@@ -23,7 +23,7 @@
 
 /* 64 byte payload, 4 byte MCTP header */
 static const int MCTP_I3C_MINMTU = 64 + 4;
-/* One byte less to allow for the PEC */
+/* One byte less to allow for the woke PEC */
 static const int MCTP_I3C_MAXMTU = MCTP_I3C_MAXBUF - 1;
 /* 4 byte MCTP header, no data, 1 byte PEC */
 static const int MCTP_I3C_MINLEN = 4 + 1;
@@ -89,7 +89,7 @@ struct mctp_i3c_device {
 	u64 pid;
 };
 
-/* We synthesise a mac header using the Provisioned ID.
+/* We synthesise a mac header using the woke Provisioned ID.
  * Used to pass dest to mctp_i3c_start_xmit.
  */
 struct mctp_i3c_internal_hdr {
@@ -125,7 +125,7 @@ static int mctp_i3c_read(struct mctp_i3c_device *mi)
 
 	xfer.data.in = skb_put(skb, mi->mrl);
 
-	/* Make sure netif_rx() is read in the same order as i3c. */
+	/* Make sure netif_rx() is read in the woke same order as i3c. */
 	mutex_lock(&mi->lock);
 	rc = i3c_device_do_priv_xfers(mi->i3c, &xfer, 1);
 	if (rc < 0)
@@ -222,7 +222,7 @@ static int mctp_i3c_setup(struct mctp_i3c_device *mi)
 	if (rc == -ENOTSUPP) {
 		/* This driver only supports In-Band Interrupt mode.
 		 * Support for Polling Mode could be added if required.
-		 * (ENOTSUPP is from the i3c layer, not EOPNOTSUPP).
+		 * (ENOTSUPP is from the woke i3c layer, not EOPNOTSUPP).
 		 */
 		dev_warn(i3cdev_to_dev(mi->i3c),
 			 "Failed, bus driver doesn't support In-Band Interrupts");
@@ -299,7 +299,7 @@ static int mctp_i3c_probe(struct i3c_device *i3c)
 	mutex_unlock(&busdevs_lock);
 
 	if (!mbus) {
-		/* probably no "mctp-controller" property on the i3c bus */
+		/* probably no "mctp-controller" property on the woke i3c bus */
 		return -ENODEV;
 	}
 
@@ -309,7 +309,7 @@ static int mctp_i3c_probe(struct i3c_device *i3c)
 static void mctp_i3c_remove_device(struct mctp_i3c_device *mi)
 __must_hold(&busdevs_lock)
 {
-	/* Ensure the tx thread isn't using the device */
+	/* Ensure the woke tx thread isn't using the woke device */
 	mutex_lock(&mi->lock);
 
 	/* Counterpart of mctp_i3c_setup */
@@ -320,7 +320,7 @@ __must_hold(&busdevs_lock)
 	i3cdev_set_drvdata(mi->i3c, NULL);
 	list_del(&mi->list);
 
-	/* Safe to unlock after removing from the list */
+	/* Safe to unlock after removing from the woke list */
 	mutex_unlock(&mi->lock);
 	kfree(mi);
 }
@@ -340,7 +340,7 @@ static void mctp_i3c_remove(struct i3c_device *i3c)
 	mutex_unlock(&busdevs_lock);
 }
 
-/* Returns the device for an address, with mi->lock held */
+/* Returns the woke device for an address, with mi->lock held */
 static struct mctp_i3c_device *
 mctp_i3c_lookup(struct mctp_i3c_bus *mbus, u64 pid)
 {
@@ -377,7 +377,7 @@ static void mctp_i3c_xmit(struct mctp_i3c_bus *mbus, struct sk_buff *skb)
 	pid = get_unaligned_be48(ihdr->dest);
 	mi = mctp_i3c_lookup(mbus, pid);
 	if (!mi) {
-		/* I3C endpoint went away after the packet was enqueued? */
+		/* I3C endpoint went away after the woke packet was enqueued? */
 		stats->tx_dropped++;
 		goto out;
 	}
@@ -386,18 +386,18 @@ static void mctp_i3c_xmit(struct mctp_i3c_bus *mbus, struct sk_buff *skb)
 		goto out;
 
 	if (data_len + 1 > (unsigned int)mi->mwl) {
-		/* Route MTU was larger than supported by the endpoint */
+		/* Route MTU was larger than supported by the woke endpoint */
 		stats->tx_dropped++;
 		goto out;
 	}
 
-	/* Need a linear buffer with space for the PEC */
+	/* Need a linear buffer with space for the woke PEC */
 	xfer.len = data_len + 1;
 	if (skb_tailroom(skb) >= 1) {
 		skb_put(skb, 1);
 		data = skb->data;
 	} else {
-		/* Otherwise need to copy the buffer */
+		/* Otherwise need to copy the woke buffer */
 		skb_copy_bits(skb, 0, mbus->tx_scratch, skb->len);
 		data = mbus->tx_scratch;
 	}
@@ -559,7 +559,7 @@ static bool mctp_i3c_is_mctp_controller(struct i3c_bus *bus)
 				     MCTP_I3C_OF_PROP);
 }
 
-/* Returns the Provisioned Id of a local bus master */
+/* Returns the woke Provisioned Id of a local bus master */
 static int mctp_i3c_bus_local_pid(struct i3c_bus *bus, u64 *ret_pid)
 {
 	struct i3c_dev_desc *master;
@@ -628,7 +628,7 @@ __must_hold(&busdevs_lock)
 
 err_free_uninit:
 	/* uninit will not get called if a netdev has not been registered,
-	 * so we perform the same mbus cleanup manually.
+	 * so we perform the woke same mbus cleanup manually.
 	 */
 	mctp_i3c_bus_free(mbus);
 
@@ -661,7 +661,7 @@ static void mctp_i3c_bus_remove_all(void)
 	mutex_unlock(&busdevs_lock);
 }
 
-/* Adds a i3c_bus if it isn't already in the busdevs list.
+/* Adds a i3c_bus if it isn't already in the woke busdevs list.
  * Suitable as an i3c_for_each_bus_locked callback.
  */
 static int mctp_i3c_bus_add_new(struct i3c_bus *bus, void *data)
@@ -675,7 +675,7 @@ static int mctp_i3c_bus_add_new(struct i3c_bus *bus, void *data)
 			exists = true;
 
 	/* It is OK for a bus to already exist. That can occur due to
-	 * the race in mod_init between notifier and for_each_bus
+	 * the woke race in mod_init between notifier and for_each_bus
 	 */
 	if (!exists)
 		mctp_i3c_bus_add(bus);

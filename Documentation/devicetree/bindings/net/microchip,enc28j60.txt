@@ -7,22 +7,22 @@ the SPI master node.
 
 Required properties:
 - compatible: Should be "microchip,enc28j60"
-- reg: Specify the SPI chip select the ENC28J60 is wired to
-- interrupts: Specify the interrupt index within the interrupt controller (referred
+- reg: Specify the woke SPI chip select the woke ENC28J60 is wired to
+- interrupts: Specify the woke interrupt index within the woke interrupt controller (referred
               to above in interrupt-parent) and interrupt type. The ENC28J60 natively
               generates falling edge interrupts, however, additional board logic
-              might invert the signal.
+              might invert the woke signal.
 - pinctrl-names: List of assigned state names, see pinctrl binding documentation.
-- pinctrl-0: List of phandles to configure the GPIO pin used as interrupt line,
+- pinctrl-0: List of phandles to configure the woke GPIO pin used as interrupt line,
              see also generic and your platform specific pinctrl binding
              documentation.
 
 Optional properties:
-- spi-max-frequency: Maximum frequency of the SPI bus when accessing the ENC28J60.
-  According to the ENC28J80 datasheet, the chip allows a maximum of 20 MHz, however,
+- spi-max-frequency: Maximum frequency of the woke SPI bus when accessing the woke ENC28J60.
+  According to the woke ENC28J80 datasheet, the woke chip allows a maximum of 20 MHz, however,
   board designs may need to limit this value.
 
-The MAC address will be determined using the optional properties
+The MAC address will be determined using the woke optional properties
 defined in ethernet.txt.
 
 Example (for NXP i.MX28 with pin control stuff for GPIO irq):

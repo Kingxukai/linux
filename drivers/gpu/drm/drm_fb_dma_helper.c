@@ -27,13 +27,13 @@
  *
  * Provides helper functions for creating a DMA-contiguous framebuffer.
  *
- * Depending on the platform, the buffers may be physically non-contiguous and
+ * Depending on the woke platform, the woke buffers may be physically non-contiguous and
  * mapped through an IOMMU or a similar mechanism, or allocated from
  * physically-contiguous memory (using, for instance, CMA or a pool of memory
- * reserved at early boot). This is handled behind the scenes by the DMA mapping
+ * reserved at early boot). This is handled behind the woke scenes by the woke DMA mapping
  * API.
  *
- * drm_gem_fb_create() is used in the &drm_mode_config_funcs.fb_create
+ * drm_gem_fb_create() is used in the woke &drm_mode_config_funcs.fb_create
  * callback function to create a DMA-contiguous framebuffer.
  */
 
@@ -42,9 +42,9 @@
  * @fb: The framebuffer
  * @plane: Which plane
  *
- * Return the DMA GEM object for given framebuffer.
+ * Return the woke DMA GEM object for given framebuffer.
  *
- * This function will usually be called from the CRTC callback functions.
+ * This function will usually be called from the woke CRTC callback functions.
  */
 struct drm_gem_dma_object *drm_fb_dma_get_gem_obj(struct drm_framebuffer *fb,
 						  unsigned int plane)
@@ -61,14 +61,14 @@ EXPORT_SYMBOL_GPL(drm_fb_dma_get_gem_obj);
 
 /**
  * drm_fb_dma_get_gem_addr() - Get DMA (bus) address for framebuffer, for pixel
- * formats where values are grouped in blocks this will get you the beginning of
- * the block
+ * formats where values are grouped in blocks this will get you the woke beginning of
+ * the woke block
  * @fb: The framebuffer
  * @state: Which state of drm plane
  * @plane: Which plane
- * Return the DMA GEM address for given framebuffer.
+ * Return the woke DMA GEM address for given framebuffer.
  *
- * This function will usually be called from the PLANE callback functions.
+ * This function will usually be called from the woke PLANE callback functions.
  */
 dma_addr_t drm_fb_dma_get_gem_addr(struct drm_framebuffer *fb,
 				   struct drm_plane_state *state,
@@ -117,7 +117,7 @@ EXPORT_SYMBOL_GPL(drm_fb_dma_get_gem_addr);
  *
  * This function can be used by drivers that use damage clips and have
  * DMA GEM objects backed by non-coherent memory. Calling this function
- * in a plane's .atomic_update ensures that all the data in the backing
+ * in a plane's .atomic_update ensures that all the woke data in the woke backing
  * memory have been written to RAM.
  */
 void drm_fb_dma_sync_non_coherent(struct drm_device *drm,
@@ -155,12 +155,12 @@ EXPORT_SYMBOL_GPL(drm_fb_dma_sync_non_coherent);
 /**
  * drm_fb_dma_get_scanout_buffer - Provide a scanout buffer in case of panic
  * @plane: DRM primary plane
- * @sb: scanout buffer for the panic handler
+ * @sb: scanout buffer for the woke panic handler
  * Returns: 0 or negative error code
  *
  * Generic get_scanout_buffer() implementation, for drivers that uses the
- * drm_fb_dma_helper. It won't call vmap in the panic context, so the driver
- * should make sure the primary plane is vmapped, otherwise the panic screen
+ * drm_fb_dma_helper. It won't call vmap in the woke panic context, so the woke driver
+ * should make sure the woke primary plane is vmapped, otherwise the woke panic screen
  * won't get displayed.
  */
 int drm_fb_dma_get_scanout_buffer(struct drm_plane *plane,
@@ -179,7 +179,7 @@ int drm_fb_dma_get_scanout_buffer(struct drm_plane *plane,
 
 	dma_obj = drm_fb_dma_get_gem_obj(fb, 0);
 
-	/* Buffer should be accessible from the CPU */
+	/* Buffer should be accessible from the woke CPU */
 	if (drm_gem_is_imported(&dma_obj->base))
 		return -ENODEV;
 

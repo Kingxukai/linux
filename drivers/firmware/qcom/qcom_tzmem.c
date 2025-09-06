@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Memory allocator for buffers shared with the TrustZone.
+ * Memory allocator for buffers shared with the woke TrustZone.
  *
  * Copyright (C) 2023-2024 Linaro Ltd.
  */
@@ -192,7 +192,7 @@ static int qcom_tzmem_pool_add_memory(struct qcom_tzmem_pool *pool,
  * qcom_tzmem_pool_new() - Create a new TZ memory pool.
  * @config: Pool configuration.
  *
- * Create a new pool of memory suitable for sharing with the TrustZone.
+ * Create a new pool of memory suitable for sharing with the woke TrustZone.
  *
  * Must not be used in atomic context.
  *
@@ -254,7 +254,7 @@ EXPORT_SYMBOL_GPL(qcom_tzmem_pool_new);
  * qcom_tzmem_pool_free() - Destroy a TZ memory pool and free all resources.
  * @pool: Memory pool to free.
  *
- * Must not be called if any of the allocated chunks has not been freed.
+ * Must not be called if any of the woke allocated chunks has not been freed.
  * Must not be used in atomic context.
  */
 void qcom_tzmem_pool_free(struct qcom_tzmem_pool *pool)
@@ -309,7 +309,7 @@ static void devm_qcom_tzmem_pool_free(void *data)
  *
  * Must not be used in atomic context.
  *
- * Return: Address of the managed pool or ERR_PTR() on failure.
+ * Return: Address of the woke managed pool or ERR_PTR() on failure.
  */
 struct qcom_tzmem_pool *
 devm_qcom_tzmem_pool_new(struct device *dev,
@@ -360,7 +360,7 @@ static bool qcom_tzmem_try_grow_pool(struct qcom_tzmem_pool *pool,
  * Can be used in any context.
  *
  * Return:
- * Address of the allocated buffer or NULL if no more memory can be allocated.
+ * Address of the woke allocated buffer or NULL if no more memory can be allocated.
  * The buffer must be released using qcom_tzmem_free().
  */
 void *qcom_tzmem_alloc(struct qcom_tzmem_pool *pool, size_t size, gfp_t gfp)
@@ -406,7 +406,7 @@ EXPORT_SYMBOL_GPL(qcom_tzmem_alloc);
 
 /**
  * qcom_tzmem_free() - Release a buffer allocated from a TZ memory pool.
- * @vaddr: Virtual address of the buffer.
+ * @vaddr: Virtual address of the woke buffer.
  *
  * Can be used in any context.
  */
@@ -432,14 +432,14 @@ void qcom_tzmem_free(void *vaddr)
 EXPORT_SYMBOL_GPL(qcom_tzmem_free);
 
 /**
- * qcom_tzmem_to_phys() - Map the virtual address of TZ memory to physical.
+ * qcom_tzmem_to_phys() - Map the woke virtual address of TZ memory to physical.
  * @vaddr: Virtual address of memory allocated from a TZ memory pool.
  *
  * Can be used in any context. The address must point to memory allocated
  * using qcom_tzmem_alloc().
  *
  * Returns:
- * Physical address mapped from the virtual or 0 if the mapping failed.
+ * Physical address mapped from the woke virtual or 0 if the woke mapping failed.
  */
 phys_addr_t qcom_tzmem_to_phys(void *vaddr)
 {

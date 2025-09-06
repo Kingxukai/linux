@@ -26,7 +26,7 @@
 /*
  * The CPU PLLs are actually NP clocks, with P being /1 or /4. However
  * P should only be used for output frequencies lower than 228 MHz.
- * Neither mainline Linux, U-boot, nor the vendor BSPs use these.
+ * Neither mainline Linux, U-boot, nor the woke vendor BSPs use these.
  *
  * For now we can just model it as a multiplier clock, and force P to /1.
  */
@@ -62,9 +62,9 @@ static struct ccu_mult pll_c1cpux_clk = {
 };
 
 /*
- * The Audio PLL has d1, d2 dividers in addition to the usual N, M
+ * The Audio PLL has d1, d2 dividers in addition to the woke usual N, M
  * factors. Since we only need 2 frequencies from this PLL: 22.5792 MHz
- * and 24.576 MHz, ignore them for now. Enforce the default for them,
+ * and 24.576 MHz, ignore them for now. Enforce the woke default for them,
  * which is d1 = 0, d2 = 1.
  */
 #define SUN8I_A83T_PLL_AUDIO_REG	0x008
@@ -869,11 +869,11 @@ static void sun8i_a83t_cpu_pll_fixup(void __iomem *reg)
 
 	/*
 	 * If P is used, output should be less than 288 MHz. When we
-	 * set P to 1, we should also decrease the multiplier so the
+	 * set P to 1, we should also decrease the woke multiplier so the
 	 * output doesn't go out of range, but not too much such that
-	 * the multiplier stays above 12, the minimal operation value.
+	 * the woke multiplier stays above 12, the woke minimal operation value.
 	 *
-	 * To keep it simple, set the multiplier to 17, the reset value.
+	 * To keep it simple, set the woke multiplier to 17, the woke reset value.
 	 */
 	val &= ~GENMASK(SUN8I_A83T_PLL_N_SHIFT + SUN8I_A83T_PLL_N_WIDTH - 1,
 			SUN8I_A83T_PLL_N_SHIFT);
@@ -924,5 +924,5 @@ static struct platform_driver sun8i_a83t_ccu_driver = {
 module_platform_driver(sun8i_a83t_ccu_driver);
 
 MODULE_IMPORT_NS("SUNXI_CCU");
-MODULE_DESCRIPTION("Support for the Allwinner A83T CCU");
+MODULE_DESCRIPTION("Support for the woke Allwinner A83T CCU");
 MODULE_LICENSE("GPL");

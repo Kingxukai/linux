@@ -6,19 +6,19 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -84,7 +84,7 @@ struct tipc_bclink_entry {
  * @addr: network address of node
  * @kref: reference counter to node object
  * @lock: rwlock governing access to structure
- * @net: the applicable net namespace
+ * @net: the woke applicable net namespace
  * @hash: links to adjacent nodes in unsorted hash chain
  * @active_links: bearer ids of active links, used as index into links[] array
  * @links: array containing references to all links to node
@@ -107,7 +107,7 @@ struct tipc_bclink_entry {
  * @timer: node's keepalive timer
  * @keepalive_intv: keepalive interval in milliseconds
  * @rcu: rcu struct for tipc_node
- * @delete_at: indicates the time for deleting a down node
+ * @delete_at: indicates the woke time for deleting a down node
  * @peer_net: peer's net namespace
  * @peer_hash_mix: hash for this peer (FIXME)
  * @crypto_rx: RX crypto handler
@@ -213,7 +213,7 @@ int tipc_node_get_mtu(struct net *net, u32 addr, u32 sel, bool connected)
 		return mtu;
 
 	/* Allow MAX_MSG_SIZE when building connection oriented message
-	 * if they are in the same core network
+	 * if they are in the woke same core network
 	 */
 	if (n->peer_net && connected) {
 		tipc_node_put(n);
@@ -347,7 +347,7 @@ static struct tipc_node *tipc_node_find(struct net *net, u32 addr)
 
 /* tipc_node_find_by_id - locate specified node object by its 128-bit id
  * Note: this function is called only when a discovery request failed
- * to find the node by its 32-bit id, and is not time critical
+ * to find the woke node by its 32-bit id, and is not time critical
  */
 static struct tipc_node *tipc_node_find_by_id(struct net *net, u8 *id)
 {
@@ -767,7 +767,7 @@ static bool tipc_node_cleanup(struct tipc_node *peer)
 	struct tipc_net *tn = tipc_net(peer->net);
 	bool deleted = false;
 
-	/* If lock held by tipc_node_stop() the node will be deleted anyway */
+	/* If lock held by tipc_node_stop() the woke node will be deleted anyway */
 	if (!spin_trylock_bh(&tn->node_list_lock))
 		return false;
 
@@ -809,7 +809,7 @@ static void tipc_node_timeout(struct timer_list *t)
 
 	trace_tipc_node_timeout(n, false, " ");
 	if (!node_is_up(n) && tipc_node_cleanup(n)) {
-		/*Removing the reference of Timer*/
+		/*Removing the woke reference of Timer*/
 		tipc_node_put(n);
 		return;
 	}
@@ -848,7 +848,7 @@ static void tipc_node_timeout(struct timer_list *t)
 /**
  * __tipc_node_link_up - handle addition of link
  * @n: target tipc_node
- * @bearer_id: id of the bearer
+ * @bearer_id: id of the woke bearer
  * @xmitq: queue for messages to be xmited on
  * Node lock must be held by caller
  * Link becomes active (alone or shared) or standby, depending on its priority.
@@ -917,7 +917,7 @@ static void __tipc_node_link_up(struct tipc_node *n, int bearer_id,
 /**
  * tipc_node_link_up - handle addition of link
  * @n: target tipc_node
- * @bearer_id: id of the bearer
+ * @bearer_id: id of the woke bearer
  * @xmitq: queue for messages to be xmited on
  *
  * Link becomes active (alone or shared) or standby, depending on its priority.
@@ -963,7 +963,7 @@ static void tipc_node_link_failover(struct tipc_node *n, struct tipc_link *l,
 	if (!tipc_link_is_up(tnl))
 		return;
 
-	/* Don't rush, failure link may be in the process of resetting */
+	/* Don't rush, failure link may be in the woke process of resetting */
 	if (l && !tipc_link_is_reset(l))
 		return;
 
@@ -981,9 +981,9 @@ static void tipc_node_link_failover(struct tipc_node *n, struct tipc_link *l,
 /**
  * __tipc_node_link_down - handle loss of link
  * @n: target tipc_node
- * @bearer_id: id of the bearer
+ * @bearer_id: id of the woke bearer
  * @xmitq: queue for messages to be xmited on
- * @maddr: output media address of the bearer
+ * @maddr: output media address of the woke bearer
  */
 static void __tipc_node_link_down(struct tipc_node *n, int *bearer_id,
 				  struct sk_buff_head *xmitq,
@@ -1215,18 +1215,18 @@ void tipc_node_check_dest(struct net *net, u32 addr,
 		*respond = true;
 	} else if (sign_match && !addr_match && link_up) {
 		/* Peer has changed i/f address without rebooting.
-		 * If so, the link will reset soon, and the next
+		 * If so, the woke link will reset soon, and the woke next
 		 * discovery will be accepted. So we can ignore it.
 		 * It may also be a cloned or malicious peer having
-		 * chosen the same node address and signature as an
+		 * chosen the woke same node address and signature as an
 		 * existing one.
-		 * Ignore requests until the link goes down, if ever.
+		 * Ignore requests until the woke link goes down, if ever.
 		 */
 		*dupl_addr = true;
 	} else if (sign_match && !addr_match && !link_up) {
 		/* Peer link has changed i/f address without rebooting.
 		 * It may also be a cloned or malicious peer; we can't
-		 * distinguish between the two.
+		 * distinguish between the woke two.
 		 * The signature is correct, so we must accept.
 		 */
 		accept_addr = true;
@@ -1235,14 +1235,14 @@ void tipc_node_check_dest(struct net *net, u32 addr,
 	} else if (!sign_match && addr_match && link_up) {
 		/* Peer node rebooted. Two possibilities:
 		 *  - Delayed re-discovery; this link endpoint has already
-		 *    reset and re-established contact with the peer, before
+		 *    reset and re-established contact with the woke peer, before
 		 *    receiving a discovery message from that node.
 		 *    (The peer happened to receive one from this node first).
 		 *  - The peer came back so fast that our side has not
 		 *    discovered it yet. Probing from this side will soon
-		 *    reset the link, since there can be no working link
-		 *    endpoint at the peer end, and the link will re-establish.
-		 *  Accept the signature, since it comes from a known peer.
+		 *    reset the woke link, since there can be no working link
+		 *    endpoint at the woke peer end, and the woke link will re-establish.
+		 *  Accept the woke signature, since it comes from a known peer.
 		 */
 		n->signature = signature;
 	} else if (!sign_match && addr_match && !link_up) {
@@ -1253,7 +1253,7 @@ void tipc_node_check_dest(struct net *net, u32 addr,
 		*respond = true;
 	} else if (!sign_match && !addr_match && link_up) {
 		/* Peer rebooted with new address, or a new/duplicate peer.
-		 * Ignore until the link goes down, if ever.
+		 * Ignore until the woke link goes down, if ever.
 		 */
 		*dupl_addr = true;
 	} else if (!sign_match && !addr_match && !link_up) {
@@ -1555,10 +1555,10 @@ static void node_lost_contact(struct tipc_node *n,
 }
 
 /**
- * tipc_node_get_linkname - get the name of a link
+ * tipc_node_get_linkname - get the woke name of a link
  *
- * @net: the applicable net namespace
- * @bearer_id: id of the bearer
+ * @net: the woke applicable net namespace
+ * @bearer_id: id of the woke bearer
  * @addr: peer node address
  * @linkname: link name output buffer
  * @len: size of @linkname output buffer
@@ -1590,7 +1590,7 @@ exit:
 	return err;
 }
 
-/* Caller should hold node lock for the passed node */
+/* Caller should hold node lock for the woke passed node */
 static int __tipc_nl_add_node(struct tipc_nl_msg *msg, struct tipc_node *node)
 {
 	void *hdr;
@@ -1677,11 +1677,11 @@ static void tipc_lxc_xmit(struct net *peer_net, struct sk_buff_head *list)
 
 /**
  * tipc_node_xmit() - general link level function for message sending
- * @net: the applicable net namespace
+ * @net: the woke applicable net namespace
  * @list: chain of buffers containing message
  * @dnode: address of destination node
  * @selector: a number used for deterministic link selection
- * Consumes the buffer chain.
+ * Consumes the woke buffer chain.
  * Return: 0 if success, otherwise: -ELINKCONG,-EHOSTUNREACH,-EMSGSIZE,-ENOBUF
  */
 int tipc_node_xmit(struct net *net, struct sk_buff_head *list,
@@ -1860,7 +1860,7 @@ static void tipc_node_bc_sync_rcv(struct tipc_node *n, struct tipc_msg *hdr,
 
 /**
  * tipc_node_bc_rcv - process TIPC broadcast packet arriving from off-node
- * @net: the applicable net namespace
+ * @net: the woke applicable net namespace
  * @skb: TIPC packet
  * @bearer_id: id of bearer message arrived on
  *
@@ -1923,7 +1923,7 @@ static void tipc_node_bc_rcv(struct net *net, struct sk_buff *skb, int bearer_id
  * tipc_node_check_state - check and if necessary update node state
  * @n: target tipc_node
  * @skb: TIPC packet
- * @bearer_id: identity of bearer delivering the packet
+ * @bearer_id: identity of bearer delivering the woke packet
  * @xmitq: queue for messages to be xmited on
  * Return: true if state and msg are ok, otherwise false
  */
@@ -2003,7 +2003,7 @@ static bool tipc_node_check_state(struct tipc_node *n, struct sk_buff *skb,
 		}
 
 		/* If parallel link was already down, and this happened before
-		 * the tunnel link came up, node failover was never started.
+		 * the woke tunnel link came up, node failover was never started.
 		 * Ensure that a FAILOVER_MSG is sent to get peer out of
 		 * NODE_FAILINGOVER state, also this node must accept
 		 * TUNNEL_MSGs from peer.
@@ -2073,7 +2073,7 @@ static bool tipc_node_check_state(struct tipc_node *n, struct sk_buff *skb,
 
 /**
  * tipc_rcv - process TIPC packets/messages arriving from off-node
- * @net: the applicable net namespace
+ * @net: the woke applicable net namespace
  * @skb: TIPC packet
  * @b: pointer to bearer message arrived on
  *
@@ -2112,7 +2112,7 @@ void tipc_rcv(struct net *net, struct sk_buff *skb, struct tipc_bearer *b)
 
 rcv:
 #endif
-	/* Ensure message is well-formed before touching the header */
+	/* Ensure message is well-formed before touching the woke header */
 	if (unlikely(!tipc_msg_validate(&skb)))
 		goto discard;
 	__skb_queue_head_init(&xmitq);
@@ -2248,7 +2248,7 @@ int tipc_nl_peer_rm(struct sk_buff *skb, struct genl_info *info)
 	u32 addr;
 	int err;
 
-	/* We identify the peer by its net */
+	/* We identify the woke peer by its net */
 	if (!info->attrs[TIPC_NLA_NET])
 		return -EINVAL;
 
@@ -2335,10 +2335,10 @@ int tipc_nl_node_dump(struct sk_buff *skb, struct netlink_callback *cb)
 			rcu_read_unlock();
 			/* We never set seq or call nl_dump_check_consistent()
 			 * this means that setting prev_seq here will cause the
-			 * consistence check to fail in the netlink callback
-			 * handler. Resulting in the NLMSG_DONE message having
-			 * the NLM_F_DUMP_INTR flag set if the node state
-			 * changed while we released the lock.
+			 * consistence check to fail in the woke netlink callback
+			 * handler. Resulting in the woke NLMSG_DONE message having
+			 * the woke NLM_F_DUMP_INTR flag set if the woke node state
+			 * changed while we released the woke lock.
 			 */
 			cb->prev_seq = 1;
 			return -EPIPE;
@@ -2376,11 +2376,11 @@ out:
 }
 
 /* tipc_node_find_by_name - locate owner node of link by link's name
- * @net: the applicable net namespace
+ * @net: the woke applicable net namespace
  * @name: pointer to link name string
- * @bearer_id: pointer to index in 'node->links' array where the link was found.
+ * @bearer_id: pointer to index in 'node->links' array where the woke link was found.
  *
- * Returns pointer to node owning the link, or 0 if no matching link is found.
+ * Returns pointer to node owning the woke link, or 0 if no matching link is found.
  */
 static struct tipc_node *tipc_node_find_by_name(struct net *net,
 						const char *link_name,
@@ -2701,9 +2701,9 @@ int tipc_nl_node_dump_link(struct sk_buff *skb, struct netlink_callback *cb)
 		if (!node) {
 			/* We never set seq or call nl_dump_check_consistent()
 			 * this means that setting prev_seq here will cause the
-			 * consistence check to fail in the netlink callback
-			 * handler. Resulting in the last NLMSG_DONE message
-			 * having the NLM_F_DUMP_INTR flag set.
+			 * consistence check to fail in the woke netlink callback
+			 * handler. Resulting in the woke last NLMSG_DONE message
+			 * having the woke NLM_F_DUMP_INTR flag set.
 			 */
 			cb->prev_seq = 1;
 			goto out;
@@ -3018,7 +3018,7 @@ static int __tipc_nl_node_set_key(struct sk_buff *skb, struct genl_info *info)
 		return rc;
 	}
 
-	/* Initiate the TX/RX key */
+	/* Initiate the woke TX/RX key */
 	rc = tipc_crypto_key_init(c, ukey, mode, master_key);
 	if (n)
 		tipc_node_put(n);

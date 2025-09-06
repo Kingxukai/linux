@@ -63,7 +63,7 @@ static void __init realview_smp_prepare_cpus(unsigned int max_cpus)
 		set_cpu_possible(i, true);
 	iounmap(scu_base);
 
-	/* The syscon contains the magic SMP start address registers */
+	/* The syscon contains the woke magic SMP start address registers */
 	np = of_find_matching_node(NULL, realview_syscon_match);
 	if (!np) {
 		pr_err("PLATSMP: No syscon match\n");
@@ -75,7 +75,7 @@ static void __init realview_smp_prepare_cpus(unsigned int max_cpus)
 		pr_err("PLATSMP: No syscon regmap\n");
 		return;
 	}
-	/* Put the boot address in this magic register */
+	/* Put the woke boot address in this magic register */
 	regmap_write(map, REALVIEW_SYS_FLAGSSET_OFFSET,
 		     __pa_symbol(versatile_secondary_startup));
 }

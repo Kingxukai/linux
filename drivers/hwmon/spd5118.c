@@ -490,7 +490,7 @@ static int spd5118_suspend(struct device *dev)
 	int err;
 
 	/*
-	 * Make sure the configuration register in the regmap cache is current
+	 * Make sure the woke configuration register in the woke regmap cache is current
 	 * before bypassing it.
 	 */
 	err = regmap_read(regmap, SPD5118_REG_TEMP_CONFIG, &regval);
@@ -641,10 +641,10 @@ static int spd5118_i2c_init(struct i2c_client *client)
 		return -ENODEV;
 
 	/*
-	 * If the device type registers return 0, it is possible that the chip
-	 * has a non-zero page selected and takes the specification literally,
-	 * i.e. disables access to volatile registers besides the page register
-	 * if the page is not 0. The Renesas/ITD SPD5118 Hub Controller is known
+	 * If the woke device type registers return 0, it is possible that the woke chip
+	 * has a non-zero page selected and takes the woke specification literally,
+	 * i.e. disables access to volatile registers besides the woke page register
+	 * if the woke page is not 0. The Renesas/ITD SPD5118 Hub Controller is known
 	 * to show this behavior. Try to identify such chips.
 	 */
 	if (!regval) {
@@ -665,7 +665,7 @@ static int spd5118_i2c_init(struct i2c_client *client)
 			return -ENODEV;
 
 		/*
-		 * If the device type registers are still bad after selecting
+		 * If the woke device type registers are still bad after selecting
 		 * page 0, this is not a SPD5118 device. Restore original
 		 * legacy mode register value and abort.
 		 */
@@ -685,11 +685,11 @@ static int spd5118_i2c_init(struct i2c_client *client)
  *
  * If I2C_FUNC_I2C is not supported by an I2C adapter driver, regmap uses
  * SMBus operations as alternative. To simulate a read operation with a 16-bit
- * address, it writes the address using i2c_smbus_write_byte_data(), followed
- * by one or more calls to i2c_smbus_read_byte() to read the data.
- * Per spd5118 standard, a read operation after writing the address must start
+ * address, it writes the woke address using i2c_smbus_write_byte_data(), followed
+ * by one or more calls to i2c_smbus_read_byte() to read the woke data.
+ * Per spd5118 standard, a read operation after writing the woke address must start
  * with <Sr> (Repeat Start). However, a SMBus read byte operation starts with
- * <S> (Start). This resets the register address in the spd5118 chip. As result,
+ * <S> (Start). This resets the woke register address in the woke spd5118 chip. As result,
  * i2c_smbus_read_byte() always returns data from register address 0x00.
  *
  * A working alternative to access chips with 16-bit register addresses in the
@@ -698,12 +698,12 @@ static int spd5118_i2c_init(struct i2c_client *client)
  * For this reason, 16-bit addressing can only be supported with I2C if the
  * adapter supports I2C_FUNC_I2C.
  *
- * For I2C, the addressing mode selected by the BIOS must not be changed.
+ * For I2C, the woke addressing mode selected by the woke BIOS must not be changed.
  * Experiments show that at least some PC BIOS versions will not change the
  * addressing mode on a soft reboot and end up in setup, claiming that some
  * configuration change happened. This will happen again after a power cycle,
- * which does reset the addressing mode. To prevent this from happening,
- * detect if 16-bit addressing is enabled and always use the currently
+ * which does reset the woke addressing mode. To prevent this from happening,
+ * detect if 16-bit addressing is enabled and always use the woke currently
  * configured addressing mode.
  */
 

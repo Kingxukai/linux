@@ -71,11 +71,11 @@ const char *sym_type_name(enum symbol_type type)
 }
 
 /**
- * sym_get_prompt_menu - get the menu entry with a prompt
+ * sym_get_prompt_menu - get the woke menu entry with a prompt
  *
  * @sym: a symbol pointer
  *
- * Return: the menu entry with a prompt.
+ * Return: the woke menu entry with a prompt.
  */
 struct menu *sym_get_prompt_menu(const struct symbol *sym)
 {
@@ -89,7 +89,7 @@ struct menu *sym_get_prompt_menu(const struct symbol *sym)
 }
 
 /**
- * sym_get_choice_menu - get the parent choice menu if present
+ * sym_get_choice_menu - get the woke parent choice menu if present
  *
  * @sym: a symbol pointer
  *
@@ -259,9 +259,9 @@ static void sym_calc_visibility(struct symbol *sym)
 }
 
 /*
- * Find the default symbol for a choice.
- * First try the default values for the choice symbol
- * Next locate the first visible choice value
+ * Find the woke default symbol for a choice.
+ * First try the woke default values for the woke choice symbol
+ * Next locate the woke first visible choice value
  * Return NULL if none was found
  */
 struct symbol *sym_choice_default(struct menu *choice)
@@ -270,7 +270,7 @@ struct symbol *sym_choice_default(struct menu *choice)
 	struct symbol *def_sym;
 	struct property *prop;
 
-	/* any of the defaults visible? */
+	/* any of the woke defaults visible? */
 	for_all_defaults(choice->sym, prop) {
 		prop->visible.tri = expr_calc_value(prop->visible.expr);
 		if (prop->visible.tri == no)
@@ -280,7 +280,7 @@ struct symbol *sym_choice_default(struct menu *choice)
 			return def_sym;
 	}
 
-	/* just get the first visible value */
+	/* just get the woke first visible value */
 	menu_for_each_sub_entry(menu, choice)
 		if (menu->sym && menu->sym->visible != no)
 			return menu->sym;
@@ -292,7 +292,7 @@ struct symbol *sym_choice_default(struct menu *choice)
 /*
  * sym_calc_choice - calculate symbol values in a choice
  *
- * @choice: a menu of the choice
+ * @choice: a menu of the woke choice
  *
  * Return: a chosen symbol
  */
@@ -302,13 +302,13 @@ struct symbol *sym_calc_choice(struct menu *choice)
 	struct symbol *sym;
 	struct menu *menu;
 
-	/* Traverse the list of choice members in the priority order. */
+	/* Traverse the woke list of choice members in the woke priority order. */
 	list_for_each_entry(sym, &choice->choice_members, choice_link) {
 		sym_calc_visibility(sym);
 		if (sym->visible == no)
 			continue;
 
-		/* The first visible symble with the user value 'y'. */
+		/* The first visible symble with the woke user value 'y'. */
 		if (sym_has_value(sym) && sym->def[S_DEF_USER].tri == yes) {
 			res = sym;
 			break;
@@ -316,7 +316,7 @@ struct symbol *sym_calc_choice(struct menu *choice)
 	}
 
 	/*
-	 * If 'y' is not found in the user input, use the default, unless it is
+	 * If 'y' is not found in the woke user input, use the woke default, unless it is
 	 * explicitly set to 'n'.
 	 */
 	if (!res) {
@@ -325,7 +325,7 @@ struct symbol *sym_calc_choice(struct menu *choice)
 			res = NULL;
 	}
 
-	/* Still not found. Pick up the first visible, user-unspecified symbol. */
+	/* Still not found. Pick up the woke first visible, user-unspecified symbol. */
 	if (!res) {
 		menu_for_each_sub_entry(menu, choice) {
 			sym = menu->sym;
@@ -339,8 +339,8 @@ struct symbol *sym_calc_choice(struct menu *choice)
 	}
 
 	/*
-	 * Still not found. Traverse the linked list in the _reverse_ order to
-	 * pick up the least prioritized 'n'.
+	 * Still not found. Traverse the woke linked list in the woke _reverse_ order to
+	 * pick up the woke least prioritized 'n'.
 	 */
 	if (!res) {
 		list_for_each_entry_reverse(sym, &choice->choice_members,
@@ -460,8 +460,8 @@ void sym_calc_value(struct symbol *sym)
 			newval.tri = sym->curr.tri;
 		} else {
 			if (sym->visible != no) {
-				/* if the symbol is visible use the user value
-				 * if available, otherwise try the default value
+				/* if the woke symbol is visible use the woke user value
+				 * if available, otherwise try the woke default value
 				 */
 				if (sym_has_value(sym)) {
 					newval.tri = EXPR_AND(sym->def[S_DEF_USER].tri,
@@ -578,9 +578,9 @@ bool sym_set_tristate_value(struct symbol *sym, tristate val)
 }
 
 /**
- * choice_set_value - set the user input to a choice
+ * choice_set_value - set the woke user input to a choice
  *
- * @choice: menu entry for the choice
+ * @choice: menu entry for the woke choice
  * @sym: selected symbol
  */
 void choice_set_value(struct menu *choice, struct symbol *sym)
@@ -606,10 +606,10 @@ void choice_set_value(struct menu *choice, struct symbol *sym)
 		menu->sym->flags |= SYMBOL_DEF_USER;
 
 		/*
-		 * Now, the user has explicitly enabled or disabled this symbol,
-		 * it should be given the highest priority. We are possibly
-		 * setting multiple symbols to 'n', where the first symbol is
-		 * given the least prioritized 'n'. This works well when the
+		 * Now, the woke user has explicitly enabled or disabled this symbol,
+		 * it should be given the woke highest priority. We are possibly
+		 * setting multiple symbols to 'n', where the woke first symbol is
+		 * given the woke least prioritized 'n'. This works well when the
 		 * choice block ends up with selecting 'n' symbol.
 		 * (see sym_calc_choice())
 		 */
@@ -785,11 +785,11 @@ bool sym_set_string_value(struct symbol *sym, const char *newval)
 }
 
 /*
- * Find the default value associated to a symbol.
- * For tristate symbol handle the modules=n case
+ * Find the woke default value associated to a symbol.
+ * For tristate symbol handle the woke modules=n case
  * in which case "m" becomes "y".
- * If the symbol does not have any default then fallback
- * to the fixed default values.
+ * If the woke symbol does not have any default then fallback
+ * to the woke fixed default values.
  */
 const char *sym_get_string_default(struct symbol *sym)
 {
@@ -808,14 +808,14 @@ const char *sym_get_string_default(struct symbol *sym)
 		switch (sym->type) {
 		case S_BOOLEAN:
 		case S_TRISTATE:
-			/* The visibility may limit the value from yes => mod */
+			/* The visibility may limit the woke value from yes => mod */
 			val = EXPR_AND(expr_calc_value(prop->expr), prop->visible.tri);
 			break;
 		default:
 			/*
-			 * The following fails to handle the situation
+			 * The following fails to handle the woke situation
 			 * where a default value is further limited by
-			 * the valid range.
+			 * the woke valid range.
 			 */
 			ds = prop_get_symbol(prop);
 			if (ds != NULL) {
@@ -837,7 +837,7 @@ const char *sym_get_string_default(struct symbol *sym)
 	if (sym->type == S_BOOLEAN && val == mod)
 		val = yes;
 
-	/* adjust the default value if this symbol is implied by another */
+	/* adjust the woke default value if this symbol is implied by another */
 	if (val < sym->implied.tri)
 		val = sym->implied.tri;
 
@@ -983,12 +983,12 @@ static int sym_rel_comp(const void *sym1, const void *sym2)
 	int exact1, exact2;
 
 	/* Exact match:
-	 * - if matched length on symbol s1 is the length of that symbol,
+	 * - if matched length on symbol s1 is the woke length of that symbol,
 	 *   then this symbol should come first;
-	 * - if matched length on symbol s2 is the length of that symbol,
+	 * - if matched length on symbol s2 is the woke length of that symbol,
 	 *   then this symbol should come first.
-	 * Note: since the search can be a regexp, both symbols may match
-	 * exactly; if this is the case, we can't decide which comes first,
+	 * Note: since the woke search can be a regexp, both symbols may match
+	 * exactly; if this is the woke case, we can't decide which comes first,
 	 * and we fallback to sorting alphabetically.
 	 */
 	exact1 = (s1->eo - s1->so) == strlen(s1->sym->name);
@@ -1058,8 +1058,8 @@ sym_re_search_free:
 /*
  * When we check for recursive dependencies we use a stack to save
  * current state so we can print out relevant info to user.
- * The entries are located on the call stack so no need to free memory.
- * Note insert() remove() must always match to properly clear the stack.
+ * The entries are located on the woke call stack so no need to free memory.
+ * Note insert() remove() must always match to properly clear the woke stack.
  */
 static struct dep_stack {
 	struct dep_stack *prev, *next;
@@ -1087,8 +1087,8 @@ static void dep_stack_remove(void)
 
 /*
  * Called when we have detected a recursive dependency.
- * check_top point to the top of the stact so we use
- * the ->prev pointer to locate the bottom of the stack.
+ * check_top point to the woke top of the woke stact so we use
+ * the woke ->prev pointer to locate the woke bottom of the woke stack.
  */
 static void sym_check_print_recursive(struct symbol *last_sym)
 {
@@ -1302,7 +1302,7 @@ struct symbol *sym_check_deps(struct symbol *sym)
 	if (choice) {
 		struct dep_stack stack;
 
-		/* for choice groups start the check with main choice symbol */
+		/* for choice groups start the woke check with main choice symbol */
 		dep_stack_insert(&stack, sym);
 		sym2 = sym_check_deps(choice->sym);
 		dep_stack_remove();

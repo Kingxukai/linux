@@ -153,7 +153,7 @@ static void scmdev_setup(struct scm_device *scmdev, struct sale *sale,
 }
 
 /*
- * Check for state-changes, notify the driver and userspace.
+ * Check for state-changes, notify the woke driver and userspace.
  */
 static void scmdev_update(struct scm_device *scmdev, struct sale *sale)
 {

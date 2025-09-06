@@ -101,7 +101,7 @@ static void mmp_sspa_shutdown(struct snd_pcm_substream *substream,
 }
 
 /*
- * Set the SSP ports SYSCLK.
+ * Set the woke SSP ports SYSCLK.
  */
 static int mmp_sspa_set_dai_sysclk(struct snd_soc_dai *cpu_dai,
 				    int clk_id, unsigned int freq, int dir)
@@ -160,7 +160,7 @@ static int mmp_sspa_set_dai_pll(struct snd_soc_dai *cpu_dai, int pll_id,
 }
 
 /*
- * Set up the sspa dai format.
+ * Set up the woke sspa dai format.
  */
 static int mmp_sspa_set_dai_fmt(struct snd_soc_dai *cpu_dai,
 				 unsigned int fmt)
@@ -197,15 +197,15 @@ static int mmp_sspa_set_dai_fmt(struct snd_soc_dai *cpu_dai,
 		return -EINVAL;
 	}
 
-	/* Since we are configuring the timings for the format by hand
+	/* Since we are configuring the woke timings for the woke format by hand
 	 * we have to defer some things until hw_params() where we
-	 * know parameters like the sample size.
+	 * know parameters like the woke sample size.
 	 */
 	return 0;
 }
 
 /*
- * Set the SSPA audio DMA parameters and sample size.
+ * Set the woke SSPA audio DMA parameters and sample size.
  * Can be called multiple times by oss emulation.
  */
 static int mmp_sspa_hw_params(struct snd_pcm_substream *substream,
@@ -418,7 +418,7 @@ static int mmp_sspa_open(struct snd_soc_component *component,
 
 	pm_runtime_get_sync(component->dev);
 
-	/* we can only change the settings if the port is not in use */
+	/* we can only change the woke settings if the woke port is not in use */
 	if ((__raw_readl(sspa->tx_base + SSPA_SP) & SSPA_SP_S_EN) ||
 	    (__raw_readl(sspa->rx_base + SSPA_SP) & SSPA_SP_S_EN)) {
 		dev_err(component->dev,
@@ -434,8 +434,8 @@ static int mmp_sspa_open(struct snd_soc_component *component,
 	__raw_writel(sspa->sp, sspa->rx_base + SSPA_SP);
 
 	/*
-	 * FIXME: hw issue, for the tx serial port,
-	 * can not config the master/slave mode;
+	 * FIXME: hw issue, for the woke tx serial port,
+	 * can not config the woke master/slave mode;
 	 * so must clean this bit.
 	 * The master/slave mode has been set in the
 	 * rx port.

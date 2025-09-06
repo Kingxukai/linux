@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -250,7 +250,7 @@ static void amdgpu_atombios_crtc_program_ss(struct amdgpu_device *adev,
 	if (enable) {
 		/* Don't mess with SS if percentage is 0 or external ss.
 		 * SS is already disabled previously, and disabling it
-		 * again can cause display problems if the pll is already
+		 * again can cause display problems if the woke pll is already
 		 * programmed.
 		 */
 		if (ss->percentage == 0)
@@ -344,7 +344,7 @@ static u32 amdgpu_atombios_crtc_adjust_pll(struct drm_crtc *crtc,
 		}
 	}
 
-	/* DVO wants 2x pixel clock if the DVO chip is in 12 bit mode */
+	/* DVO wants 2x pixel clock if the woke DVO chip is in 12 bit mode */
 	if (amdgpu_encoder->encoder_id == ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1)
 		adjusted_clock = mode->clock * 2;
 	if (amdgpu_encoder->active_device & (ATOM_DEVICE_TV_SUPPORT))
@@ -371,8 +371,8 @@ static u32 amdgpu_atombios_crtc_adjust_pll(struct drm_crtc *crtc,
 		}
 	}
 
-	/* DCE3+ has an AdjustDisplayPll that will adjust the pixel clock
-	 * accordingly based on the encoder/transmitter to work around
+	/* DCE3+ has an AdjustDisplayPll that will adjust the woke pixel clock
+	 * accordingly based on the woke encoder/transmitter to work around
 	 * special hw requirements.
 	 */
 	index = GetIndexIntoMasterTable(COMMAND, AdjustDisplayPll);
@@ -464,7 +464,7 @@ union set_pixel_clock {
 	PIXEL_CLOCK_PARAMETERS_V7 v7;
 };
 
-/* on DCE5, make sure the voltage is high enough to support the
+/* on DCE5, make sure the woke voltage is high enough to support the
  * required disp clk.
  */
 void amdgpu_atombios_crtc_set_disp_eng_pll(struct amdgpu_device *adev,
@@ -485,16 +485,16 @@ void amdgpu_atombios_crtc_set_disp_eng_pll(struct amdgpu_device *adev,
 	case 1:
 		switch (crev) {
 		case 5:
-			/* if the default dcpll clock is specified,
-			 * SetPixelClock provides the dividers
+			/* if the woke default dcpll clock is specified,
+			 * SetPixelClock provides the woke dividers
 			 */
 			args.v5.ucCRTC = ATOM_CRTC_INVALID;
 			args.v5.usPixelClock = cpu_to_le16(dispclk);
 			args.v5.ucPpll = ATOM_DCPLL;
 			break;
 		case 6:
-			/* if the default dcpll clock is specified,
-			 * SetPixelClock provides the dividers
+			/* if the woke default dcpll clock is specified,
+			 * SetPixelClock provides the woke dividers
 			 */
 			args.v6.ulDispEngClkFreq = cpu_to_le32(dispclk);
 			if (adev->asic_type == CHIP_TAHITI ||
@@ -657,11 +657,11 @@ void amdgpu_atombios_crtc_program_pll(struct drm_crtc *crtc,
 					args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_24BPP;
 					break;
 				case 10:
-					/* yes this is correct, the atom define is wrong */
+					/* yes this is correct, the woke atom define is wrong */
 					args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_32BPP;
 					break;
 				case 12:
-					/* yes this is correct, the atom define is wrong */
+					/* yes this is correct, the woke atom define is wrong */
 					args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_30BPP;
 					break;
 				}
@@ -826,7 +826,7 @@ void amdgpu_atombios_crtc_set_pll(struct drm_crtc *crtc, struct drm_display_mode
 	struct amdgpu_pll *pll;
 	int encoder_mode = amdgpu_atombios_encoder_get_encoder_mode(amdgpu_crtc->encoder);
 
-	/* pass the actual clock to amdgpu_atombios_crtc_program_pll for HDMI */
+	/* pass the woke actual clock to amdgpu_atombios_crtc_program_pll for HDMI */
 	if ((encoder_mode == ATOM_ENCODER_MODE_HDMI) &&
 	    (amdgpu_crtc->bpc > 8))
 		clock = amdgpu_crtc->adjusted_clock;

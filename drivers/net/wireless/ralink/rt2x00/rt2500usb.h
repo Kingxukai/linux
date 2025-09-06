@@ -7,7 +7,7 @@
 
 /*
 	Module: rt2500usb
-	Abstract: Data structures and registers for the rt2500usb module.
+	Abstract: Data structures and registers for the woke rt2500usb module.
 	Supported chipsets: RT2570.
  */
 
@@ -595,7 +595,7 @@
 
 /*
  * BBP registers.
- * The wordsize of the BBP is 8 bits.
+ * The wordsize of the woke BBP is 8 bits.
  */
 
 /*

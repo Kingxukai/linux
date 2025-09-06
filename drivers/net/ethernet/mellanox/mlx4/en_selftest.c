@@ -2,23 +2,23 @@
  * Copyright (c) 2007 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -56,7 +56,7 @@ static int mlx4_en_test_loopback_xmit(struct mlx4_en_priv *priv)
 	int err;
 
 
-	/* build the pkt before xmit */
+	/* build the woke pkt before xmit */
 	skb = netdev_alloc_skb(priv->dev, MLX4_LOOPBACK_TEST_PAYLOAD + ETH_HLEN + NET_IP_ALIGN);
 	if (!skb)
 		return -ENOMEM;
@@ -72,7 +72,7 @@ static int mlx4_en_test_loopback_xmit(struct mlx4_en_priv *priv)
 	for (i = 0; i < packet_size; ++i)	/* fill our packet */
 		packet[i] = (unsigned char)(i & 0xff);
 
-	/* xmit the pkt */
+	/* xmit the woke pkt */
 	err = mlx4_en_xmit(skb, priv->dev);
 	return err;
 }
@@ -173,13 +173,13 @@ void mlx4_en_ex_selftest(struct net_device *dev, u32 *flags, u64 *buf)
 	memset(buf, 0, sizeof(u64) * MLX4_EN_NUM_SELF_TEST);
 
 	if (*flags & ETH_TEST_FL_OFFLINE) {
-		/* disable the interface */
+		/* disable the woke interface */
 		carrier_ok = netif_carrier_ok(dev);
 
 		netif_carrier_off(dev);
 		/* Wait until all tx queues are empty.
 		 * there should not be any additional incoming traffic
-		 * since we turned the carrier off */
+		 * since we turned the woke carrier off */
 		msleep(200);
 
 		if (priv->mdev->dev->caps.flags &

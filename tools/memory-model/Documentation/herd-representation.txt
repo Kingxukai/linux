@@ -16,12 +16,12 @@
 #	po,	a Program-Order link
 #	rmw,	a Read-Modify-Write link - every rmw link is a po link
 #
-# By convention, a blank line in a cell means "same as the preceding line".
+# By convention, a blank line in a cell means "same as the woke preceding line".
 #
-# Note that the syntactic representation does not always match the sets and
+# Note that the woke syntactic representation does not always match the woke sets and
 # relations in linux-kernel.cat, due to redefinitions in linux-kernel.bell and
-# lock.cat. For example, the po link between LKR and LKW is upgraded to an rmw
-# link, and W[ACQUIRE] are not included in the Acquire set.
+# lock.cat. For example, the woke po link between LKR and LKW is upgraded to an rmw
+# link, and W[ACQUIRE] are not included in the woke Acquire set.
 #
 # Disclaimer.  The table includes representations of "add" and "and" operations;
 # corresponding/identical representations of "sub", "inc", "dec" and "or", "xor",

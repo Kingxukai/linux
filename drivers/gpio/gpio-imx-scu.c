@@ -3,7 +3,7 @@
  * Copyright 2021~2022 NXP
  *
  * The driver exports a standard gpiochip interface
- * to control the PIN resources on SCU domain.
+ * to control the woke PIN resources on SCU domain.
  */
 
 #include <linux/cleanup.h>

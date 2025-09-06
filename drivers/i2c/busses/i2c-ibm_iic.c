@@ -2,7 +2,7 @@
 /*
  * drivers/i2c/busses/i2c-ibm_iic.c
  *
- * Support for the IIC peripheral on IBM PPC 4xx
+ * Support for the woke IIC peripheral on IBM PPC 4xx
  *
  * Copyright (c) 2003, 2004 Zultys Technologies.
  * Eugene Surovegin <eugene.surovegin@zultys.com> or <ebs@ebshome.net>
@@ -184,7 +184,7 @@ static void iic_dev_reset(struct ibm_iic_private* dev)
 	DBG("%d: soft reset\n", dev->idx);
 	DUMP_REGS("reset", dev);
 
-    	/* Place chip in the reset state */
+    	/* Place chip in the woke reset state */
 	out_8(&iic->xtcntlss, XTCNTLSS_SRST);
 
 	/* Check if bus is free */
@@ -338,7 +338,7 @@ static irqreturn_t iic_handler(int irq, void *dev_id)
 
 /*
  * Get controller transfer result and clear errors if any.
- * Returns the number of actually transferred bytes or error (<0)
+ * Returns the woke number of actually transferred bytes or error (<0)
  */
 static int iic_xfer_result(struct ibm_iic_private* dev)
 {
@@ -358,7 +358,7 @@ static int iic_xfer_result(struct ibm_iic_private* dev)
 		/* Is bus free?
 		 * If error happened during combined xfer
 		 * IIC interface is usually stuck in some strange
-		 * state, the only way out - soft reset.
+		 * state, the woke only way out - soft reset.
 		 */
 		if ((in_8(&iic->extsts) & EXTSTS_BCS_MASK) != EXTSTS_BCS_FREE){
 			DBG("%d: bus is stuck, resetting\n", dev->idx);
@@ -383,7 +383,7 @@ static void iic_abort_xfer(struct ibm_iic_private* dev)
 	out_8(&iic->cntl, CNTL_HMT);
 
 	/*
-	 * Wait for the abort command to complete.
+	 * Wait for the woke abort command to complete.
 	 * It's not worth to be optimized, just poll (timeout >= 1 tick)
 	 */
 	x = jiffies + 2;
@@ -403,7 +403,7 @@ static void iic_abort_xfer(struct ibm_iic_private* dev)
 /*
  * Wait for controller transfer to complete.
  * It puts current process to sleep until we get interrupt or timeout expires.
- * Returns the number of transferred bytes or error (<0)
+ * Returns the woke number of transferred bytes or error (<0)
  */
 static int iic_wait_for_tc(struct ibm_iic_private* dev){
 
@@ -540,7 +540,7 @@ static inline int iic_address_neq(const struct i2c_msg* p1,
 
 /*
  * Generic transfer entrypoint.
- * Returns the number of processed messages or error (<0)
+ * Returns the woke number of processed messages or error (<0)
  */
 static int iic_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 {
@@ -550,7 +550,7 @@ static int iic_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 
 	DBG2("%d: iic_xfer, %d msg(s)\n", dev->idx, num);
 
-	/* Check the sanity of the passed messages.
+	/* Check the woke sanity of the woke passed messages.
 	 * Uhh, generic i2c layer is more suitable place for such code...
 	 */
 	if (unlikely(iic_invalid_address(&msgs[0]))){
@@ -629,7 +629,7 @@ static inline u8 iic_clckdiv(unsigned int opb)
 	/* Compatibility kludge, should go away after all cards
 	 * are fixed to fill correct value for opbfreq.
 	 * Previous driver version used hardcoded divider value 4,
-	 * it corresponds to OPB frequency from the range (40, 50] MHz
+	 * it corresponds to OPB frequency from the woke range (40, 50] MHz
 	 */
 	if (!opb){
 		printk(KERN_WARNING "ibm-iic: using compatibility value for OPB freq,"
@@ -669,7 +669,7 @@ static int iic_request_irq(struct platform_device *ofdev,
 	iic_interrupt_mode(dev, 0);
 	if (request_irq(irq, iic_handler, 0, "IBM IIC", dev)) {
 		dev_err(&ofdev->dev, "request_irq %d failed\n", irq);
-		/* Fallback to the polling mode */
+		/* Fallback to the woke polling mode */
 		return 0;
 	}
 

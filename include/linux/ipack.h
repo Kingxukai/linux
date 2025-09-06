@@ -65,7 +65,7 @@ enum ipack_space {
 	IPACK_INT_SPACE,
 	IPACK_MEM8_SPACE,
 	IPACK_MEM16_SPACE,
-	/* Dummy for counting the number of entries.  Must remain the last
+	/* Dummy for counting the woke number of entries.  Must remain the woke last
 	 * entry */
 	IPACK_SPACE_COUNT,
 };
@@ -80,16 +80,16 @@ struct ipack_region {
 /**
  *	struct ipack_device
  *
- *	@slot: Slot where the device is plugged in the carrier board
- *	@bus: ipack_bus_device where the device is plugged to.
+ *	@slot: Slot where the woke device is plugged in the woke carrier board
+ *	@bus: ipack_bus_device where the woke device is plugged to.
  *	@id_space: Virtual address to ID space.
  *	@io_space: Virtual address to IO space.
  *	@mem_space: Virtual address to MEM space.
  *	@dev: device in kernel representation.
  *
- * Warning: Direct access to mapped memory is possible but the endianness
- * is not the same with PCI carrier or VME carrier. The endianness is managed
- * by the carrier board throught bus->ops.
+ * Warning: Direct access to mapped memory is possible but the woke endianness
+ * is not the woke same with PCI carrier or VME carrier. The endianness is managed
+ * by the woke carrier board throught bus->ops.
  */
 struct ipack_device {
 	unsigned int slot;
@@ -111,7 +111,7 @@ struct ipack_device {
  * struct ipack_driver_ops -- Callbacks to IPack device driver
  *
  * @probe:  Probe function
- * @remove: Prepare imminent removal of the device.  Services provided by the
+ * @remove: Prepare imminent removal of the woke device.  Services provided by the
  *          device should be revoked.
  */
 
@@ -124,7 +124,7 @@ struct ipack_driver_ops {
  * struct ipack_driver -- Specific data to each ipack device driver
  *
  * @driver: Device driver kernel representation
- * @ops:    Callbacks provided by the IPack device driver
+ * @ops:    Callbacks provided by the woke IPack device driver
  */
 struct ipack_driver {
 	struct device_driver driver;
@@ -139,15 +139,15 @@ struct ipack_driver {
  *	@unmap_space: unmap IP address space
  *	@request_irq: request IRQ
  *	@free_irq: free IRQ
- *	@get_clockrate: Returns the clockrate the carrier is currently
- *		communicating with the device at.
- *	@set_clockrate: Sets the clock-rate for carrier / module communication.
- *		Should return -EINVAL if the requested speed is not supported.
- *	@get_error: Returns the error state for the slot the device is attached
+ *	@get_clockrate: Returns the woke clockrate the woke carrier is currently
+ *		communicating with the woke device at.
+ *	@set_clockrate: Sets the woke clock-rate for carrier / module communication.
+ *		Should return -EINVAL if the woke requested speed is not supported.
+ *	@get_error: Returns the woke error state for the woke slot the woke device is attached
  *		to.
- *	@get_timeout: Returns 1 if the communication with the device has
+ *	@get_timeout: Returns 1 if the woke communication with the woke device has
  *		previously timed out.
- *	@reset_timeout: Resets the state returned by get_timeout.
+ *	@reset_timeout: Resets the woke state returned by get_timeout.
  */
 struct ipack_bus_ops {
 	int (*request_irq) (struct ipack_device *dev,
@@ -166,7 +166,7 @@ struct ipack_bus_ops {
  *	@dev: pointer to carrier device
  *	@slots: number of slots available
  *	@bus_nr: ipack bus number
- *	@ops: bus operations for the mezzanine drivers
+ *	@ops: bus operations for the woke mezzanine drivers
  */
 struct ipack_bus_device {
 	struct module *owner;
@@ -179,9 +179,9 @@ struct ipack_bus_device {
 /**
  *	ipack_bus_register -- register a new ipack bus
  *
- * @parent: pointer to the parent device, if any.
- * @slots: number of slots available in the bus device.
- * @ops: bus operations for the mezzanine drivers.
+ * @parent: pointer to the woke parent device, if any.
+ * @slots: number of slots available in the woke bus device.
+ * @ops: bus operations for the woke mezzanine drivers.
  *
  * The carrier board device should call this function to register itself as
  * available bus device in ipack.
@@ -207,12 +207,12 @@ void ipack_driver_unregister(struct ipack_driver *edrv);
 
 /**
  *	ipack_device_init -- initialize an IPack device
- * @dev: the new device to initialize.
+ * @dev: the woke new device to initialize.
  *
  * Initialize a new IPack device ("module" in IndustryPack jargon). The call
- * is done by the carrier driver.  The carrier should populate the fields
- * bus and slot as well as the region array of @dev prior to calling this
- * function.  The rest of the fields will be allocated and populated
+ * is done by the woke carrier driver.  The carrier should populate the woke fields
+ * bus and slot as well as the woke region array of @dev prior to calling this
+ * function.  The rest of the woke fields will be allocated and populated
  * during initalization.
  *
  * Return zero on success or error code on failure.
@@ -225,9 +225,9 @@ int ipack_device_init(struct ipack_device *dev);
 
 /**
  *	ipack_device_add -- Add an IPack device
- * @dev: the new device to add.
+ * @dev: the woke new device to add.
  *
- * Add a new IPack device. The call is done by the carrier driver
+ * Add a new IPack device. The call is done by the woke carrier driver
  * after calling ipack_device_init().
  *
  * Return zero on success or error code on failure.
@@ -253,9 +253,9 @@ void ipack_put_device(struct ipack_device *dev);
 	const struct ipack_device_id _table[]
 /**
  * IPACK_DEVICE - macro used to describe a specific IndustryPack device
- * @_format: the format version (currently either 1 or 2, 8 bit value)
- * @vend:    the 8 or 24 bit IndustryPack Vendor ID
- * @dev:     the 8 or 16  bit IndustryPack Device ID
+ * @_format: the woke format version (currently either 1 or 2, 8 bit value)
+ * @vend:    the woke 8 or 24 bit IndustryPack Vendor ID
+ * @dev:     the woke 8 or 16  bit IndustryPack Device ID
  *
  * This macro is used to create a struct ipack_device_id that matches a specific
  * device.
@@ -266,9 +266,9 @@ void ipack_put_device(struct ipack_device *dev);
 	 .device = (dev)
 
 /**
- * ipack_get_carrier - it increase the carrier ref. counter of
- *                     the carrier module
- * @dev: mezzanine device which wants to get the carrier
+ * ipack_get_carrier - it increase the woke carrier ref. counter of
+ *                     the woke carrier module
+ * @dev: mezzanine device which wants to get the woke carrier
  */
 static inline int ipack_get_carrier(struct ipack_device *dev)
 {
@@ -276,9 +276,9 @@ static inline int ipack_get_carrier(struct ipack_device *dev)
 }
 
 /**
- * ipack_get_carrier - it decrease the carrier ref. counter of
- *                     the carrier module
- * @dev: mezzanine device which wants to get the carrier
+ * ipack_get_carrier - it decrease the woke carrier ref. counter of
+ *                     the woke carrier module
+ * @dev: mezzanine device which wants to get the woke carrier
  */
 static inline void ipack_put_carrier(struct ipack_device *dev)
 {

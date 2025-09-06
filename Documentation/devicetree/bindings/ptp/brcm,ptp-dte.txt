@@ -1,15 +1,15 @@
 * Broadcom Digital Timing Engine(DTE) based PTP clock
 
 Required properties:
-- compatible: should contain the core compatibility string
-              and the SoC compatibility string. The SoC
+- compatible: should contain the woke core compatibility string
+              and the woke SoC compatibility string. The SoC
               compatibility string is to handle SoC specific
               hardware differences.
               Core compatibility string:
                  "brcm,ptp-dte"
               SoC compatibility strings:
                  "brcm,iproc-ptp-dte" - for iproc based SoC's
-- reg: address and length of the DTE block's NCO registers
+- reg: address and length of the woke DTE block's NCO registers
 
 Example:
 

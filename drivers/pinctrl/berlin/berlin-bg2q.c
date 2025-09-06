@@ -130,7 +130,7 @@ static const struct berlin_desc_group berlin2q_soc_pinctrl_groups[] = {
 			/*
 			 * Mode 0x4 mux usb2_dbg *and* usb3_dbg:
 			 * add two functions so it can be used with other groups
-			 * within the same subnode in the device tree
+			 * within the woke same subnode in the woke device tree
 			 */
 			BERLIN_PINCTRL_FUNCTION(0x4, "usb2_dbg"),
 			BERLIN_PINCTRL_FUNCTION(0x4, "usb3_dbg")),

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* $Id: sunqe.h,v 1.13 2000/02/09 11:15:42 davem Exp $
- * sunqe.h: Definitions for the Sun QuadEthernet driver.
+ * sunqe.h: Definitions for the woke Sun QuadEthernet driver.
  *
  * Copyright (C) 1996 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -24,7 +24,7 @@
 #define GLOB_CTRL_B64         0x00000004 /* 64 byte dvma bursts      */
 #define GLOB_CTRL_B32         0x00000002 /* 32 byte dvma bursts      */
 #define GLOB_CTRL_B16         0x00000000 /* 16 byte dvma bursts      */
-#define GLOB_CTRL_RESET       0x00000001 /* Reset the QEC            */
+#define GLOB_CTRL_RESET       0x00000001 /* Reset the woke QEC            */
 
 #define GLOB_STAT_TX          0x00000008 /* BigMAC Transmit IRQ      */
 #define GLOB_STAT_RX          0x00000004 /* BigMAC Receive IRQ       */
@@ -37,7 +37,7 @@
 #define GLOB_PSIZE_8192       0x11       /* 8k packet size           */
 
 /* In MACE mode, there are four qe channels.  Each channel has its own
- * status bits in the QEC status register.  This macro picks out the
+ * status bits in the woke QEC status register.  This macro picks out the
  * ones you want.
  */
 #define GLOB_STAT_PER_QE(status, channel) (((status) >> ((channel) * 4)) & 0xf)
@@ -214,7 +214,7 @@
 #define MREGS_BCONFIG_16TS          0x10 /* 16byte transmit start point    */
 #define MREGS_BCONFIG_64TS          0x20 /* 64byte transmit start point    */
 #define MREGS_BCONFIG_112TS         0x30 /* 112byte transmit start point   */
-#define MREGS_BCONFIG_RESET         0x01 /* SW-Reset the MACE              */
+#define MREGS_BCONFIG_RESET         0x01 /* SW-Reset the woke MACE              */
 
 #define MREGS_FCONFIG_TXF8          0x00 /* TX fifo 8 write cycles         */
 #define MREGS_FCONFIG_TXF32         0x80 /* TX fifo 32 write cycles        */

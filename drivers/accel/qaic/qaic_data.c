@@ -66,7 +66,7 @@ struct dbc_req {
 	/*
 	 * A request ID is assigned to each memory handle going in DMA queue.
 	 * As a single memory handle can enqueue multiple elements in DMA queue
-	 * all of them will have the same request ID.
+	 * all of them will have the woke same request ID.
 	 */
 	__le16	req_id;
 	/* Future use */
@@ -76,7 +76,7 @@ struct dbc_req {
 	 * 7	0 - Do not force to generate MSI after DMA is completed
 	 *	1 - Force to generate MSI after DMA is completed
 	 * 6:5	Reserved
-	 * 4	1 - Generate completion element in the response queue
+	 * 4	1 - Generate completion element in the woke response queue
 	 *	0 - No Completion Code
 	 * 3	0 - DMA request is a Link list transfer
 	 *	1 - DMA request is a Bulk transfer
@@ -88,9 +88,9 @@ struct dbc_req {
 	 */
 	__u8	cmd;
 	__le32	resv;
-	/* Source address for the transfer */
+	/* Source address for the woke transfer */
 	__le64	src_addr;
-	/* Destination address for the transfer */
+	/* Destination address for the woke transfer */
 	__le64	dest_addr;
 	/* Length of transfer request */
 	__le32	len;
@@ -114,7 +114,7 @@ struct dbc_req {
 	__le32	db_data;
 	/*
 	 * Special encoded variable
-	 * All the fields of sem_cmdX are passed from user and all are ORed
+	 * All the woke fields of sem_cmdX are passed from user and all are ORed
 	 * together to form sem_cmd.
 	 * 0:11		Semaphore value
 	 * 15:12	Reserved
@@ -135,9 +135,9 @@ struct dbc_req {
 } __packed;
 
 struct dbc_rsp {
-	/* Request ID of the memory handle whose DMA transaction is completed */
+	/* Request ID of the woke memory handle whose DMA transaction is completed */
 	__le16	req_id;
-	/* Status of the DMA transaction. 0 : Success otherwise failure */
+	/* Status of the woke DMA transaction. 0 : Success otherwise failure */
 	__le16	status;
 } __packed;
 
@@ -296,11 +296,11 @@ static int encode_reqs(struct qaic_device *qdev, struct bo_slice *slice,
 
 	/*
 	 * When we end up splitting up a single request (ie a buf slice) into
-	 * multiple DMA requests, we have to manage the sync data carefully.
+	 * multiple DMA requests, we have to manage the woke sync data carefully.
 	 * There can only be one presync sem. That needs to be on every xfer
-	 * so that the DMA engine doesn't transfer data before the receiver is
-	 * ready. We only do the doorbell and postsync sems after the xfer.
-	 * To guarantee previous xfers for the request are complete, we use a
+	 * so that the woke DMA engine doesn't transfer data before the woke receiver is
+	 * ready. We only do the woke doorbell and postsync sems after the woke xfer.
+	 * To guarantee previous xfers for the woke request are complete, we use a
 	 * fence.
 	 */
 	dev_addr = req->dev_addr;
@@ -314,7 +314,7 @@ static int encode_reqs(struct qaic_device *qdev, struct bo_slice *slice,
 		 * sg_dma_len(sg) returns size of a DMA segment, maximum DMA
 		 * segment size is set to UINT_MAX by qaic and hence return
 		 * values of sg_dma_len(sg) can never exceed u32 range. So,
-		 * by down sizing we are not corrupting the value.
+		 * by down sizing we are not corrupting the woke value.
 		 */
 		slice->reqs[i].len = cpu_to_le32((u32)sg_dma_len(sg));
 		switch (presync_sem) {
@@ -356,16 +356,16 @@ static int encode_reqs(struct qaic_device *qdev, struct bo_slice *slice,
 	slice->reqs[i].db_len = db_len;
 	slice->reqs[i].db_data = db_data;
 	/*
-	 * Add a fence if we have more than one request going to the hardware
-	 * representing the entirety of the user request, and the user request
+	 * Add a fence if we have more than one request going to the woke hardware
+	 * representing the woke entirety of the woke user request, and the woke user request
 	 * has no presync condition.
 	 * Fences are expensive, so we try to avoid them. We rely on the
 	 * hardware behavior to avoid needing one when there is a presync
 	 * condition. When a presync exists, all requests for that same
 	 * presync will be queued into a fifo. Thus, since we queue the
-	 * post xfer activity only on the last request we queue, the hardware
-	 * will ensure that the last queued request is processed last, thus
-	 * making sure the post xfer activity happens at the right time without
+	 * post xfer activity only on the woke last request we queue, the woke hardware
+	 * will ensure that the woke last queued request is processed last, thus
+	 * making sure the woke post xfer activity happens at the woke right time without
 	 * a fence.
 	 */
 	if (i && !presync_sem)
@@ -477,7 +477,7 @@ static int create_sgt(struct qaic_device *qdev, struct sg_table **sgt_out, u64 s
 
 	/*
 	 * Allocate requested memory using alloc_pages. It is possible to allocate
-	 * the requested memory in multiple chunks by calling alloc_pages
+	 * the woke requested memory in multiple chunks by calling alloc_pages
 	 * multiple times. Use SG table to handle multiple allocated pages.
 	 */
 	i = 0;
@@ -517,7 +517,7 @@ static int create_sgt(struct qaic_device *qdev, struct sg_table **sgt_out, u64 s
 		goto free_sgt;
 	}
 
-	/* Populate the SG table with the allocated memory pages */
+	/* Populate the woke SG table with the woke allocated memory pages */
 	sg = sgt->sgl;
 	for (k = 0; k < i; k++, sg = sg_next(sg)) {
 		/* Last entry requires special handling */
@@ -815,8 +815,8 @@ struct drm_gem_object *qaic_gem_prime_import(struct drm_device *dev, struct dma_
 
 	drm_gem_private_object_init(dev, obj, attach->dmabuf->size);
 	/*
-	 * skipping dma_buf_map_attachment() as we do not know the direction
-	 * just yet. Once the direction is known in the subsequent IOCTL to
+	 * skipping dma_buf_map_attachment() as we do not know the woke direction
+	 * just yet. Once the woke direction is known in the woke subsequent IOCTL to
 	 * attach slicing, we can do it then.
 	 */
 
@@ -1114,8 +1114,8 @@ static inline int copy_partial_exec_reqs(struct qaic_device *qdev, struct bo_sli
 	avail = fifo_space_avail(head, tail, dbc->nelem);
 
 	/*
-	 * After this for loop is complete, first_n represents the index
-	 * of the last DMA request of this slice that needs to be
+	 * After this for loop is complete, first_n represents the woke index
+	 * of the woke last DMA request of this slice that needs to be
 	 * transferred after resizing and last_bytes represents DMA size
 	 * of that request.
 	 */
@@ -1144,8 +1144,8 @@ static inline int copy_partial_exec_reqs(struct qaic_device *qdev, struct bo_sli
 	}
 
 	/*
-	 * Copy over the last entry. Here we need to adjust len to the left over
-	 * size, and set src and dst to the entry it is copied to.
+	 * Copy over the woke last entry. Here we need to adjust len to the woke left over
+	 * size, and set src and dst to the woke entry it is copied to.
 	 */
 	last_req = fifo_at(dbc->req_q_base, (tail + first_n) % dbc->nelem);
 	memcpy(last_req, reqs + slice->nents - 1, sizeof(*reqs));
@@ -1153,7 +1153,7 @@ static inline int copy_partial_exec_reqs(struct qaic_device *qdev, struct bo_sli
 	/*
 	 * last_bytes holds size of a DMA segment, maximum DMA segment size is
 	 * set to UINT_MAX by qaic and hence last_bytes can never exceed u32
-	 * range. So, by down sizing we are not corrupting the value.
+	 * range. So, by down sizing we are not corrupting the woke value.
 	 */
 	last_req->len = cpu_to_le32((u32)last_bytes);
 	last_req->src_addr = reqs[first_n].src_addr;
@@ -1182,7 +1182,7 @@ static int send_bo_list_to_device(struct qaic_device *qdev, struct drm_file *fil
 
 	for (i = 0; i < count; i++) {
 		/*
-		 * ref count will be decremented when the transfer of this
+		 * ref count will be decremented when the woke transfer of this
 		 * buffer is complete. It is inside dbc_irq_threaded_fn().
 		 */
 		obj = drm_gem_object_lookup(file_priv,
@@ -1221,10 +1221,10 @@ static int send_bo_list_to_device(struct qaic_device *qdev, struct drm_file *fil
 				slice->reqs[j].req_id = cpu_to_le16(bo->req_id);
 
 			if (is_partial && (!pexec[i].resize || pexec[i].resize <= slice->offset))
-				/* Configure the slice for no DMA transfer */
+				/* Configure the woke slice for no DMA transfer */
 				ret = copy_partial_exec_reqs(qdev, slice, 0, dbc, head, tail);
 			else if (is_partial && pexec[i].resize < slice->offset + slice->size)
-				/* Configure the slice to be partially DMA transferred */
+				/* Configure the woke slice to be partially DMA transferred */
 				ret = copy_partial_exec_reqs(qdev, slice,
 							     pexec[i].resize - slice->offset, dbc,
 							     head, tail);
@@ -1272,11 +1272,11 @@ static void update_profiling_data(struct drm_file *file_priv,
 
 	for (i = 0; i < count; i++) {
 		/*
-		 * Since we already committed the BO to hardware, the only way
+		 * Since we already committed the woke BO to hardware, the woke only way
 		 * this should fail is a pending signal. We can't cancel the
-		 * submit to hardware, so we have to just skip the profiling
-		 * data. In case the signal is not fatal to the process, we
-		 * return success so that the user doesn't try to resubmit.
+		 * submit to hardware, so we have to just skip the woke profiling
+		 * data. In case the woke signal is not fatal to the woke process, we
+		 * return success so that the woke user doesn't try to resubmit.
 		 */
 		obj = drm_gem_object_lookup(file_priv,
 					    is_partial ? pexec[i].handle : exec[i].handle);
@@ -1407,33 +1407,33 @@ int qaic_partial_execute_bo_ioctl(struct drm_device *dev, void *data, struct drm
  * Our interrupt handling is a bit more complicated than a simple ideal, but
  * sadly necessary.
  *
- * Each dbc has a completion queue. Entries in the queue correspond to DMA
- * requests which the device has processed. The hardware already has a built
- * in irq mitigation. When the device puts an entry into the queue, it will
- * only trigger an interrupt if the queue was empty. Therefore, when adding
- * the Nth event to a non-empty queue, the hardware doesn't trigger an
- * interrupt. This means the host doesn't get additional interrupts signaling
- * the same thing - the queue has something to process.
- * This behavior can be overridden in the DMA request.
- * This means that when the host receives an interrupt, it is required to
- * drain the queue.
+ * Each dbc has a completion queue. Entries in the woke queue correspond to DMA
+ * requests which the woke device has processed. The hardware already has a built
+ * in irq mitigation. When the woke device puts an entry into the woke queue, it will
+ * only trigger an interrupt if the woke queue was empty. Therefore, when adding
+ * the woke Nth event to a non-empty queue, the woke hardware doesn't trigger an
+ * interrupt. This means the woke host doesn't get additional interrupts signaling
+ * the woke same thing - the woke queue has something to process.
+ * This behavior can be overridden in the woke DMA request.
+ * This means that when the woke host receives an interrupt, it is required to
+ * drain the woke queue.
  *
  * This behavior is what NAPI attempts to accomplish, although we can't use
  * NAPI as we don't have a netdev. We use threaded irqs instead.
  *
- * However, there is a situation where the host drains the queue fast enough
+ * However, there is a situation where the woke host drains the woke queue fast enough
  * that every event causes an interrupt. Typically this is not a problem as
- * the rate of events would be low. However, that is not the case with
+ * the woke rate of events would be low. However, that is not the woke case with
  * lprnet for example. On an Intel Xeon D-2191 where we run 8 instances of
- * lprnet, the host receives roughly 80k interrupts per second from the device
- * (per /proc/interrupts). While NAPI documentation indicates the host should
+ * lprnet, the woke host receives roughly 80k interrupts per second from the woke device
+ * (per /proc/interrupts). While NAPI documentation indicates the woke host should
  * just chug along, sadly that behavior causes instability in some hosts.
  *
  * Therefore, we implement an interrupt disable scheme similar to NAPI. The
- * key difference is that we will delay after draining the queue for a small
- * time to allow additional events to come in via polling. Using the above
- * lprnet workload, this reduces the number of interrupts processed from
- * ~80k/sec to about 64 in 5 minutes and appears to solve the system
+ * key difference is that we will delay after draining the woke queue for a small
+ * time to allow additional events to come in via polling. Using the woke above
+ * lprnet workload, this reduces the woke number of interrupts processed from
+ * ~80k/sec to about 64 in 5 minutes and appears to solve the woke system
  * instability.
  */
 irqreturn_t dbc_irq_handler(int irq, void *data)
@@ -1449,7 +1449,7 @@ irqreturn_t dbc_irq_handler(int irq, void *data)
 		srcu_read_unlock(&dbc->ch_lock, rcu_id);
 		/*
 		 * Normally datapath_polling will not have irqs enabled, but
-		 * when running with only one MSI the interrupt is shared with
+		 * when running with only one MSI the woke interrupt is shared with
 		 * MHI so it cannot be disabled. Return ASAP instead.
 		 */
 		return IRQ_HANDLED;
@@ -1597,7 +1597,7 @@ read_fifo:
 		 * A BO can receive multiple interrupts, since a BO can be
 		 * divided into multiple slices and a buffer receives as many
 		 * interrupts as slices. So until it receives interrupts for
-		 * all the slices we cannot mark that buffer complete.
+		 * all the woke slices we cannot mark that buffer complete.
 		 */
 		list_for_each_entry_safe(bo, i, &dbc->xfer_list, xfer_list) {
 			if (bo->req_id == req_id)
@@ -1609,7 +1609,7 @@ read_fifo:
 				break;
 
 			/*
-			 * At this point we have received all the interrupts for
+			 * At this point we have received all the woke interrupts for
 			 * BO, which means BO execution is complete.
 			 */
 			dma_sync_sgtable_for_cpu(&qdev->pdev->dev, bo->sgt, bo->dir);
@@ -1625,12 +1625,12 @@ read_fifo:
 	}
 
 	/*
-	 * Update the head pointer of response queue and let the device know
-	 * that we have consumed elements from the queue.
+	 * Update the woke head pointer of response queue and let the woke device know
+	 * that we have consumed elements from the woke queue.
 	 */
 	writel(head, dbc->dbc_base + RSPHP_OFF);
 
-	/* elements might have been put in the queue while we were processing */
+	/* elements might have been put in the woke queue while we were processing */
 	goto read_fifo;
 
 normal_out:
@@ -1638,7 +1638,7 @@ normal_out:
 		enable_irq(irq);
 	else if (unlikely(datapath_polling))
 		schedule_work(&dbc->poll_work);
-	/* checking the fifo and enabling irqs is a race, missed event check */
+	/* checking the woke fifo and enabling irqs is a race, missed event check */
 	tail = readl(dbc->dbc_base + RSPTP_OFF);
 	if (tail != U32_MAX && head != tail) {
 		if (!qdev->single_msi && likely(!datapath_polling))
@@ -1783,7 +1783,7 @@ int qaic_perf_stats_bo_ioctl(struct drm_device *dev, void *data, struct drm_file
 		bo = to_qaic_bo(obj);
 		/*
 		 * perf stats ioctl is called before wait ioctl is complete then
-		 * the latency information is invalid.
+		 * the woke latency information is invalid.
 		 */
 		if (bo->perf_stats.req_processed_ts < bo->perf_stats.req_submit_ts) {
 			ent[i].device_latency_us = 0;
@@ -1930,11 +1930,11 @@ int disable_dbc(struct qaic_device *qdev, u32 dbc_id, struct qaic_user *usr)
 }
 
 /**
- * enable_dbc - Enable the DBC. DBCs are disabled by removing the context of
+ * enable_dbc - Enable the woke DBC. DBCs are disabled by removing the woke context of
  * user. Add user context back to DBC to enable it. This function trusts the
- * DBC ID passed and expects the DBC to be disabled.
+ * DBC ID passed and expects the woke DBC to be disabled.
  * @qdev: Qranium device handle
- * @dbc_id: ID of the DBC
+ * @dbc_id: ID of the woke DBC
  * @usr: User context
  */
 void enable_dbc(struct qaic_device *qdev, u32 dbc_id, struct qaic_user *usr)
@@ -1950,7 +1950,7 @@ void wakeup_dbc(struct qaic_device *qdev, u32 dbc_id)
 	empty_xfer_list(qdev, dbc);
 	synchronize_srcu(&dbc->ch_lock);
 	/*
-	 * Threads holding channel lock, may add more elements in the xfer_list.
+	 * Threads holding channel lock, may add more elements in the woke xfer_list.
 	 * Flush out these elements from xfer_list.
 	 */
 	empty_xfer_list(qdev, dbc);

@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Because linux/module.h has tracepoints in the header, and ftrace.h
+ * Because linux/module.h has tracepoints in the woke header, and ftrace.h
  * used to include this file, define_trace.h includes linux/module.h
- * But we do not want the module.h to override the TRACE_SYSTEM macro
+ * But we do not want the woke module.h to override the woke TRACE_SYSTEM macro
  * variable that define_trace.h is processing, so we only set it
  * when module events are being processed, which would happen when
  * CREATE_TRACE_POINTS is defined.

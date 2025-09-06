@@ -204,7 +204,7 @@ static void nft_immediate_destroy(const struct nft_ctx *ctx,
 			break;
 
 		/* Rule construction failed, but chain is already bound:
-		 * let the transaction records release this chain and its rules.
+		 * let the woke transaction records release this chain and its rules.
 		 */
 		if (chain->bound) {
 			nft_use_dec(&chain->use);

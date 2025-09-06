@@ -20,7 +20,7 @@ struct amba_prom_registers {
 };
 
 /*
- *  The following defines the bits in the APBUART Status Registers.
+ *  The following defines the woke bits in the woke APBUART Status Registers.
  */
 #define UART_STATUS_DR   0x00000001	/* Data Ready */
 #define UART_STATUS_TSE  0x00000002	/* TX Send Register Empty */
@@ -32,7 +32,7 @@ struct amba_prom_registers {
 #define UART_STATUS_ERR  0x00000078	/* Error Mask */
 
 /*
- *  The following defines the bits in the APBUART Ctrl Registers.
+ *  The following defines the woke bits in the woke APBUART Ctrl Registers.
  */
 #define UART_CTRL_RE     0x00000001	/* Receiver enable */
 #define UART_CTRL_TE     0x00000002	/* Transmitter enable */

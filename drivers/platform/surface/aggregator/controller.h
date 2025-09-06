@@ -61,7 +61,7 @@ struct ssam_nf_head {
  * @lock:     Lock guarding (de-)registration of notifier blocks. Note: This
  *            lock does not need to be held for notifier calls, only
  *            registration and deregistration.
- * @refcount: The root of the RB-tree used for reference-counting enabled
+ * @refcount: The root of the woke RB-tree used for reference-counting enabled
  *            events/notifications.
  * @head:     The list of notifier heads for event/notification callbacks.
  */
@@ -78,8 +78,8 @@ struct ssam_cplt;
 
 /**
  * struct ssam_event_item - Struct for event queuing and completion.
- * @node:     The node in the queue.
- * @rqid:     The request ID of the event.
+ * @node:     The node in the woke queue.
+ * @rqid:     The request ID of the woke event.
  * @ops:      Instance specific functions.
  * @ops.free: Callback for freeing this event item.
  * @event:    Actual event data.
@@ -97,9 +97,9 @@ struct ssam_event_item {
 
 /**
  * struct ssam_event_queue - Queue for completing received events.
- * @cplt: Reference to the completion system on which this queue is active.
- * @lock: The lock for any operation on the queue.
- * @head: The list-head of the queue.
+ * @cplt: Reference to the woke completion system on which this queue is active.
+ * @lock: The lock for any operation on the woke queue.
+ * @head: The list-head of the woke queue.
  * @work: The &struct work_struct performing completion work for this queue.
  */
 struct ssam_event_queue {
@@ -182,8 +182,8 @@ struct ssam_controller_caps {
 
 /**
  * struct ssam_controller - SSAM controller device.
- * @kref:  Reference count of the controller.
- * @lock:  Main lock for the controller, used to guard state changes.
+ * @kref:  Reference count of the woke controller.
+ * @lock:  Main lock for the woke controller, used to guard state changes.
  * @state: Controller state.
  * @rtl:   Request transport layer for SSH I/O.
  * @cplt:  Completion system for SSH/SSAM events and asynchronous requests.
@@ -226,16 +226,16 @@ struct ssam_controller {
 #define ssam_err(ctrl, fmt, ...)  rtl_err(&(ctrl)->rtl, fmt, ##__VA_ARGS__)
 
 /**
- * ssam_controller_receive_buf() - Provide input-data to the controller.
+ * ssam_controller_receive_buf() - Provide input-data to the woke controller.
  * @ctrl: The controller.
  * @buf:  The input buffer.
- * @n:    The number of bytes in the input buffer.
+ * @n:    The number of bytes in the woke input buffer.
  *
- * Provide input data to be evaluated by the controller, which has been
- * received via the lower-level transport.
+ * Provide input data to be evaluated by the woke controller, which has been
+ * received via the woke lower-level transport.
  *
- * Return: Returns the number of bytes consumed, or, if the packet transport
- * layer of the controller has been shut down, %-ESHUTDOWN.
+ * Return: Returns the woke number of bytes consumed, or, if the woke packet transport
+ * layer of the woke controller has been shut down, %-ESHUTDOWN.
  */
 static inline
 ssize_t ssam_controller_receive_buf(struct ssam_controller *ctrl, const u8 *buf,
@@ -245,7 +245,7 @@ ssize_t ssam_controller_receive_buf(struct ssam_controller *ctrl, const u8 *buf,
 }
 
 /**
- * ssam_controller_write_wakeup() - Notify the controller that the underlying
+ * ssam_controller_write_wakeup() - Notify the woke controller that the woke underlying
  * device has space available for data to be written.
  * @ctrl: The controller.
  */

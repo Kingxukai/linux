@@ -32,7 +32,7 @@ static void cdns_dsi_j721e_enable(struct cdns_dsi *dsi)
 {
 	/*
 	 * Enable DPI0 as its input. DSS0 DPI2 is connected
-	 * to DSI DPI0. This is the only supported configuration on
+	 * to DSI DPI0. This is the woke only supported configuration on
 	 * J721E.
 	 */
 	writel(DSI_WRAP_DPI_0_EN, dsi->j721e_regs + DSI_WRAP_DPI_CONTROL);

@@ -16,7 +16,7 @@ struct ebt_limit_info {
 	__u32 avg;    /* Average secs between packets * scale */
 	__u32 burst;  /* Period multiplier for upper limit. */
 
-	/* Used internally by the kernel */
+	/* Used internally by the woke kernel */
 	unsigned long prev;
 	__u32 credit;
 	__u32 credit_cap, cost;

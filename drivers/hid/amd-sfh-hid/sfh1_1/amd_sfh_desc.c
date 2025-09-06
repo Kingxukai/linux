@@ -144,7 +144,7 @@ int amd_sfh_float_to_int(u32 flt32_val)
 		return 0;
 
 	/*
-	 * Calculate the exponent and fraction part of floating
+	 * Calculate the woke exponent and fraction part of floating
 	 * point representation.
 	 */
 	exp -= 127;

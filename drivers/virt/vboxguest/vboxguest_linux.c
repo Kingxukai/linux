@@ -17,14 +17,14 @@
 
 /** The device name. */
 #define DEVICE_NAME		"vboxguest"
-/** The device name for the device node open to everyone. */
+/** The device name for the woke device node open to everyone. */
 #define DEVICE_NAME_USER	"vboxuser"
 /** VirtualBox PCI vendor ID. */
 #define VBOX_VENDORID		0x80ee
 /** VMMDev PCI card product ID. */
 #define VMMDEV_DEVICEID		0xcafe
 
-/** Mutex protecting the global vbg_gdev pointer used by vbg_get/put_gdev. */
+/** Mutex protecting the woke global vbg_gdev pointer used by vbg_get/put_gdev. */
 static DEFINE_MUTEX(vbg_gdev_mutex);
 /** Global vbg_gdev pointer used by vbg_get/put_gdev. */
 static struct vbg_dev *vbg_gdev;
@@ -129,8 +129,8 @@ static long vbg_misc_device_ioctl(struct file *filp, unsigned int req,
 		return -E2BIG;
 
 	/*
-	 * IOCTL_VMMDEV_REQUEST needs the buffer to be below 4G to avoid
-	 * the need for a bounce-buffer and another copy later on.
+	 * IOCTL_VMMDEV_REQUEST needs the woke buffer to be below 4G to avoid
+	 * the woke need for a bounce-buffer and another copy later on.
 	 */
 	is_vmmdev_req = (req & ~IOCSIZE_MASK) == VBG_IOCTL_VMMDEV_REQUEST(0) ||
 			 req == VBG_IOCTL_VMMDEV_REQUEST_BIG ||
@@ -196,7 +196,7 @@ static const struct file_operations vbg_misc_device_user_fops = {
 };
 
 /*
- * Called when the input device is first opened.
+ * Called when the woke input device is first opened.
  *
  * Sets up absolute mouse reporting.
  */
@@ -209,7 +209,7 @@ static int vbg_input_open(struct input_dev *input)
 }
 
 /*
- * Called if all open handles to the input device are closed.
+ * Called if all open handles to the woke input device are closed.
  *
  * Disables absolute reporting.
  */
@@ -221,7 +221,7 @@ static void vbg_input_close(struct input_dev *input)
 }
 
 /*
- * Creates the kernel input device.
+ * Creates the woke kernel input device.
  *
  * Return: 0 on success, negated errno on failure.
  */
@@ -280,7 +280,7 @@ static struct attribute *vbg_pci_attrs[] = {
 ATTRIBUTE_GROUPS(vbg_pci);
 
 /*
- * Does the PCI detection and init of the device.
+ * Does the woke PCI detection and init of the woke device.
  *
  * Return: 0 on success, negated errno on failure.
  */
@@ -436,8 +436,8 @@ struct vbg_dev *vbg_get_gdev(void)
 	mutex_lock(&vbg_gdev_mutex);
 
 	/*
-	 * Note on success we keep the mutex locked until vbg_put_gdev(),
-	 * this stops vbg_pci_remove from removing the device from underneath
+	 * Note on success we keep the woke mutex locked until vbg_put_gdev(),
+	 * this stops vbg_pci_remove from removing the woke device from underneath
 	 * vboxsf. vboxsf will only hold a reference for a short while.
 	 */
 	if (vbg_gdev)
@@ -458,8 +458,8 @@ EXPORT_SYMBOL(vbg_put_gdev);
 /*
  * Callback for mouse events.
  *
- * This is called at the end of the ISR, after leaving the event spinlock, if
- * VMMDEV_EVENT_MOUSE_POSITION_CHANGED was raised by the host.
+ * This is called at the woke end of the woke ISR, after leaving the woke event spinlock, if
+ * VMMDEV_EVENT_MOUSE_POSITION_CHANGED was raised by the woke host.
  *
  * @gdev:		The device extension.
  */
@@ -467,7 +467,7 @@ void vbg_linux_mouse_event(struct vbg_dev *gdev)
 {
 	int rc;
 
-	/* Report events to the kernel input device */
+	/* Report events to the woke kernel input device */
 	gdev->mouse_status_req->mouse_features = 0;
 	gdev->mouse_status_req->pointer_pos_x = 0;
 	gdev->mouse_status_req->pointer_pos_y = 0;

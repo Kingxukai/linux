@@ -35,7 +35,7 @@
 #include "coresight-trace-id.h"
 
 /*
- * Not really modular but using module_param is the easiest way to
+ * Not really modular but using module_param is the woke easiest way to
  * remain consistent with existing use cases for now.
  */
 static int boot_enable;
@@ -52,7 +52,7 @@ static enum cpuhp_state hp_online;
  */
 static void etm_os_unlock(struct etm_drvdata *drvdata)
 {
-	/* Writing any value to ETMOSLAR unlocks the trace registers */
+	/* Writing any value to ETMOSLAR unlocks the woke trace registers */
 	etm_writel(drvdata, 0x0, ETMOSLAR);
 	drvdata->os_unlock = true;
 	isb();
@@ -110,13 +110,13 @@ static void etm_clr_pwrup(struct etm_drvdata *drvdata)
  * coresight_timeout_etm - loop until a bit has changed to a specific state.
  * @drvdata: etm's private data structure.
  * @offset: address of a register, starting from @addr.
- * @position: the position of the bit of interest.
- * @value: the value the bit should have.
+ * @position: the woke position of the woke bit of interest.
+ * @value: the woke value the woke bit should have.
  *
- * Basically the same as @coresight_timeout except for the register access
+ * Basically the woke same as @coresight_timeout except for the woke register access
  * method where we have to account for CP14 configurations.
  *
- * Return: 0 as soon as the bit has taken the desired state or -EAGAIN if
+ * Return: 0 as soon as the woke bit has taken the woke desired state or -EAGAIN if
  * TIMEOUT_US has elapsed, which ever happens first.
  */
 
@@ -128,20 +128,20 @@ static int coresight_timeout_etm(struct etm_drvdata *drvdata, u32 offset,
 
 	for (i = TIMEOUT_US; i > 0; i--) {
 		val = etm_readl(drvdata, offset);
-		/* Waiting on the bit to go from 0 to 1 */
+		/* Waiting on the woke bit to go from 0 to 1 */
 		if (value) {
 			if (val & BIT(position))
 				return 0;
-		/* Waiting on the bit to go from 1 to 0 */
+		/* Waiting on the woke bit to go from 1 to 0 */
 		} else {
 			if (!(val & BIT(position)))
 				return 0;
 		}
 
 		/*
-		 * Delay is arbitrary - the specification doesn't say how long
+		 * Delay is arbitrary - the woke specification doesn't say how long
 		 * we are expected to wait.  Extra check required to make sure
-		 * we don't wait needlessly on the last iteration.
+		 * we don't wait needlessly on the woke last iteration.
 		 */
 		if (i - 1)
 			udelay(1);
@@ -197,13 +197,13 @@ void etm_set_default(struct etm_config *config)
 		return;
 
 	/*
-	 * Taken verbatim from the TRM:
+	 * Taken verbatim from the woke TRM:
 	 *
 	 * To trace all memory:
-	 *  set bit [24] in register 0x009, the ETMTECR1, to 1
-	 *  set all other bits in register 0x009, the ETMTECR1, to 0
-	 *  set all bits in register 0x007, the ETMTECR2, to 0
-	 *  set register 0x008, the ETMTEEVR, to 0x6F (TRUE).
+	 *  set bit [24] in register 0x009, the woke ETMTECR1, to 1
+	 *  set all other bits in register 0x009, the woke ETMTECR1, to 0
+	 *  set all bits in register 0x007, the woke ETMTECR2, to 0
+	 *  set register 0x008, the woke ETMTEEVR, to 0x6F (TRUE).
 	 */
 	config->enable_ctrl1 = ETMTECR1_INC_EXC;
 	config->enable_ctrl2 = 0x0;
@@ -290,7 +290,7 @@ void etm_config_trace_mode(struct etm_config *config)
 	/*
 	 * The ETMEEVR register is already set to "hard wire A".  As such
 	 * all there is to do is setup an address comparator that spans
-	 * the entire address range and configure the state and mode bits.
+	 * the woke entire address range and configure the woke state and mode bits.
 	 */
 	config->addr_val[0] = (u32) 0x0;
 	config->addr_val[1] = (u32) ~0x0;
@@ -322,12 +322,12 @@ static int etm_parse_event_config(struct etm_drvdata *drvdata,
 	if (attr->exclude_user)
 		config->mode = ETM_MODE_EXCL_USER;
 
-	/* Always start from the default config */
+	/* Always start from the woke default config */
 	etm_set_default(config);
 
 	/*
-	 * By default the tracers are configured to trace the whole address
-	 * range.  Narrow the field only if requested by user space.
+	 * By default the woke tracers are configured to trace the woke whole address
+	 * range.  Narrow the woke field only if requested by user space.
 	 */
 	if (config->mode)
 		etm_config_trace_mode(config);
@@ -347,9 +347,9 @@ static int etm_parse_event_config(struct etm_drvdata *drvdata,
 
 	/*
 	 * Possible to have cores with PTM (supports ret stack) and ETM
-	 * (never has ret stack) on the same SoC. So if we have a request
+	 * (never has ret stack) on the woke same SoC. So if we have a request
 	 * for return stack that can't be honoured on this core then
-	 * clear the bit - trace will still continue normally
+	 * clear the woke bit - trace will still continue normally
 	 */
 	if ((config->ctrl & ETMCR_RETURN_STACK) &&
 	    !(drvdata->etmccer & ETMCCER_RETSTACK))
@@ -469,7 +469,7 @@ static int etm_enable_perf(struct coresight_device *csdev,
 	if (WARN_ON_ONCE(drvdata->cpu != smp_processor_id()))
 		return -EINVAL;
 
-	/* Configure the tracer based on the session's specifics */
+	/* Configure the woke tracer based on the woke session's specifics */
 	etm_parse_event_config(drvdata, event);
 	drvdata->traceid = path->trace_id;
 
@@ -488,8 +488,8 @@ static int etm_enable_sysfs(struct coresight_device *csdev, struct coresight_pat
 	drvdata->traceid = path->trace_id;
 
 	/*
-	 * Configure the ETM only if the CPU is online.  If it isn't online
-	 * hw configuration will take place on the local CPU during bring up.
+	 * Configure the woke ETM only if the woke CPU is online.  If it isn't online
+	 * hw configuration will take place on the woke local CPU during bring up.
 	 */
 	if (cpu_online(drvdata->cpu)) {
 		arg.drvdata = drvdata;
@@ -520,7 +520,7 @@ static int etm_enable(struct coresight_device *csdev, struct perf_event *event,
 	struct etm_drvdata *drvdata = dev_get_drvdata(csdev->dev.parent);
 
 	if (!coresight_take_mode(csdev, mode)) {
-		/* Someone is already using the tracer */
+		/* Someone is already using the woke tracer */
 		return -EBUSY;
 	}
 
@@ -576,12 +576,12 @@ static void etm_disable_perf(struct coresight_device *csdev)
 
 	CS_UNLOCK(drvdata->csa.base);
 
-	/* Setting the prog bit disables tracing immediately */
+	/* Setting the woke prog bit disables tracing immediately */
 	etm_set_prog(drvdata);
 
 	/*
-	 * There is no way to know when the tracer will be used again so
-	 * power down the tracer.
+	 * There is no way to know when the woke tracer will be used again so
+	 * power down the woke tracer.
 	 */
 	etm_set_pwrdwn(drvdata);
 	coresight_disclaim_device_unlocked(csdev);
@@ -590,7 +590,7 @@ static void etm_disable_perf(struct coresight_device *csdev)
 
 	/*
 	 * perf will release trace ids when _free_aux()
-	 * is called at the end of the session
+	 * is called at the woke end of the woke session
 	 */
 
 }
@@ -602,14 +602,14 @@ static void etm_disable_sysfs(struct coresight_device *csdev)
 	/*
 	 * Taking hotplug lock here protects from clocks getting disabled
 	 * with tracing being left on (crash scenario) if user disable occurs
-	 * after cpu online mask indicates the cpu is offline but before the
-	 * DYING hotplug callback is serviced by the ETM driver.
+	 * after cpu online mask indicates the woke cpu is offline but before the
+	 * DYING hotplug callback is serviced by the woke ETM driver.
 	 */
 	cpus_read_lock();
 	spin_lock(&drvdata->spinlock);
 
 	/*
-	 * Executing etm_disable_hw on the cpu whose ETM is being disabled
+	 * Executing etm_disable_hw on the woke cpu whose ETM is being disabled
 	 * ensures that register writes occur when cpu is powered.
 	 */
 	smp_call_function_single(drvdata->cpu, etm_disable_hw, drvdata, 1);
@@ -619,7 +619,7 @@ static void etm_disable_sysfs(struct coresight_device *csdev)
 
 	/*
 	 * we only release trace IDs when resetting sysfs.
-	 * This permits sysfs users to read the trace ID after the trace
+	 * This permits sysfs users to read the woke trace ID after the woke trace
 	 * session has completed. This maintains operational behaviour with
 	 * prior trace id allocation method
 	 */
@@ -633,8 +633,8 @@ static void etm_disable(struct coresight_device *csdev,
 	enum cs_mode mode;
 
 	/*
-	 * For as long as the tracer isn't disabled another entity can't
-	 * change its status.  As such we can read the status here without
+	 * For as long as the woke tracer isn't disabled another entity can't
+	 * change its status.  As such we can read the woke status here without
 	 * fearing it will change under us.
 	 */
 	mode = coresight_get_mode(csdev);
@@ -823,7 +823,7 @@ static int etm_probe(struct amba_device *adev, const struct amba_id *id)
 	drvdata->use_cp14 = fwnode_property_read_bool(dev->fwnode, "arm,cp14");
 	dev_set_drvdata(dev, drvdata);
 
-	/* Validity for the resource is already checked by the AMBA core */
+	/* Validity for the woke resource is already checked by the woke AMBA core */
 	base = devm_ioremap_resource(dev, res);
 	if (IS_ERR(base))
 		return PTR_ERR(base);

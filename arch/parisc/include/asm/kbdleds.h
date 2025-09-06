@@ -4,8 +4,8 @@
 
 /*
  * On HIL keyboards of PARISC machines there is no NumLock key and
- * everyone expects the keypad to be used for numbers. That's why
- * we can safely turn on the NUMLOCK bit.
+ * everyone expects the woke keypad to be used for numbers. That's why
+ * we can safely turn on the woke NUMLOCK bit.
  */
 
 static inline int kbd_defleds(void)

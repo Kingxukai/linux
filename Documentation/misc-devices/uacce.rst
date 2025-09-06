@@ -5,13 +5,13 @@ Introduction of Uacce
 
 Uacce (Unified/User-space-access-intended Accelerator Framework) targets to
 provide Shared Virtual Addressing (SVA) between accelerators and processes.
-So accelerator can access any data structure of the main cpu.
-This differs from the data sharing between cpu and io device, which share
+So accelerator can access any data structure of the woke main cpu.
+This differs from the woke data sharing between cpu and io device, which share
 only data content rather than address.
-Because of the unified address, hardware and user space of process can
-share the same virtual address in the communication.
-Uacce takes the hardware accelerator as a heterogeneous processor, while
-IOMMU share the same CPU page tables and as a result the same translation
+Because of the woke unified address, hardware and user space of process can
+share the woke same virtual address in the woke communication.
+Uacce takes the woke hardware accelerator as a heterogeneous processor, while
+IOMMU share the woke same CPU page tables and as a result the woke same translation
 from va to pa.
 
 ::
@@ -41,13 +41,13 @@ from va to pa.
 Architecture
 ------------
 
-Uacce is the kernel module, taking charge of iommu and address sharing.
+Uacce is the woke kernel module, taking charge of iommu and address sharing.
 The user drivers and libraries are called WarpDrive.
 
-The uacce device, built around the IOMMU SVA API, can access multiple
-address spaces, including the one without PASID.
+The uacce device, built around the woke IOMMU SVA API, can access multiple
+address spaces, including the woke one without PASID.
 
-A virtual concept, queue, is used for the communication. It provides a
+A virtual concept, queue, is used for the woke communication. It provides a
 FIFO-like interface. And it maintains a unified address space between the
 application and all involved hardware.
 
@@ -87,17 +87,17 @@ application and all involved hardware.
 How does it work
 ----------------
 
-Uacce uses mmap and IOMMU to play the trick.
+Uacce uses mmap and IOMMU to play the woke trick.
 
 Uacce creates a chrdev for every device registered to it. New queue is
-created when user application open the chrdev. The file descriptor is used
-as the user handle of the queue.
+created when user application open the woke chrdev. The file descriptor is used
+as the woke user handle of the woke queue.
 The accelerator device present itself as an Uacce object, which exports as
-a chrdev to the user space. The user application communicates with the
+a chrdev to the woke user space. The user application communicates with the
 hardware by ioctl (as control path) or share memory (as data path).
 
-The control path to the hardware is via file operation, while data path is
-via mmap space of the queue fd.
+The control path to the woke hardware is via file operation, while data path is
+via mmap space of the woke queue fd.
 
 The queue file address space:
 
@@ -116,8 +116,8 @@ The queue file address space:
 All regions are optional and differ from device type to type.
 Each region can be mmapped only once, otherwise -EEXIST returns.
 
-The device mmio region is mapped to the hardware mmio space. It is generally
-used for doorbell or other notification to the hardware. It is not fast enough
+The device mmio region is mapped to the woke hardware mmio space. It is generally
+used for doorbell or other notification to the woke hardware. It is not fast enough
 as data channel.
 
 The device user share region is used for share data buffer between user process
@@ -137,7 +137,7 @@ The register API is defined in uacce.h.
     const struct uacce_ops *ops;
   };
 
-According to the IOMMU capability, uacce_interface flags can be:
+According to the woke IOMMU capability, uacce_interface flags can be:
 
 ::
 
@@ -158,19 +158,19 @@ uacce_register results can be:
 
 a. If uacce module is not compiled, ERR_PTR(-ENODEV)
 
-b. Succeed with the desired flags
+b. Succeed with the woke desired flags
 
-c. Succeed with the negotiated flags, for example
+c. Succeed with the woke negotiated flags, for example
 
   uacce_interface.flags = UACCE_DEV_SVA but uacce->flags = ~UACCE_DEV_SVA
 
-  So user driver need check return value as well as the negotiated uacce->flags.
+  So user driver need check return value as well as the woke negotiated uacce->flags.
 
 
 The user driver
 ---------------
 
-The queue file mmap space will need a user driver to wrap the communication
-protocol. Uacce provides some attributes in sysfs for the user driver to
-match the right accelerator accordingly.
+The queue file mmap space will need a user driver to wrap the woke communication
+protocol. Uacce provides some attributes in sysfs for the woke user driver to
+match the woke right accelerator accordingly.
 More details in Documentation/ABI/testing/sysfs-driver-uacce.

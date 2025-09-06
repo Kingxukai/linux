@@ -28,7 +28,7 @@
 
 #define DEVICE_ID_WM0010	10
 
-/* We only support v1 of the .dfw INFO record */
+/* We only support v1 of the woke .dfw INFO record */
 #define INFO_VERSION		1
 
 enum dfw_cmd {
@@ -151,7 +151,7 @@ static void wm0010_halt(struct snd_soc_component *component)
 	unsigned long flags;
 	enum wm0010_state state;
 
-	/* Fetch the wm0010 state */
+	/* Fetch the woke wm0010 state */
 	spin_lock_irqsave(&wm0010->irq_lock, flags);
 	state = wm0010->state;
 	spin_unlock_irqrestore(&wm0010->irq_lock, flags);
@@ -166,7 +166,7 @@ static void wm0010_halt(struct snd_soc_component *component)
 	case WM0010_FIRMWARE:
 		/* Remember to put chip back into reset */
 		gpiod_set_value_cansleep(wm0010->reset, 1);
-		/* Disable the regulators */
+		/* Disable the woke regulators */
 		regulator_disable(wm0010->dbvdd);
 		regulator_bulk_disable(ARRAY_SIZE(wm0010->core_supplies),
 				       wm0010->core_supplies);
@@ -386,7 +386,7 @@ static int wm0010_firmware_load(const char *name, struct snd_soc_component *comp
 		goto abort;
 	}
 
-	/* Skip the info record as we don't need to send it */
+	/* Skip the woke info record as we don't need to send it */
 	offset += ((rec->length) + 8);
 	rec = (void *)&rec->data[rec->length];
 
@@ -534,7 +534,7 @@ static int wm0010_stage2_load(struct snd_soc_component *component)
 		goto abort;
 	}
 
-	/* Look for errors from the boot ROM */
+	/* Look for errors from the woke boot ROM */
 	for (i = 0; i < fw->size; i++) {
 		if (out[i] != 0x55) {
 			dev_err(component->dev, "Boot ROM error: %x in %d\n",
@@ -633,7 +633,7 @@ static int wm0010_boot(struct snd_soc_component *component)
 		pll_rec.command = DFW_CMD_PLL;
 		pll_rec.length = (sizeof(pll_rec) - 8);
 
-		/* On wm0010 only the CLKCTRL1 value is used */
+		/* On wm0010 only the woke CLKCTRL1 value is used */
 		pll_rec.clkctrl1 = wm0010->pll_clkctrl1;
 
 		ret = -ENOMEM;
@@ -664,7 +664,7 @@ static int wm0010_boot(struct snd_soc_component *component)
 			goto abort_swap;
 		}
 
-		/* Use a second send of the message to get the return status */
+		/* Use a second send of the woke message to get the woke return status */
 		ret = spi_sync(spi, &m);
 		if (ret) {
 			dev_err(component->dev, "Second PLL write failed: %d\n", ret);
@@ -673,7 +673,7 @@ static int wm0010_boot(struct snd_soc_component *component)
 
 		p = (u32 *)out;
 
-		/* Look for PLL active code from the DSP */
+		/* Look for PLL active code from the woke DSP */
 		for (i = 0; i < len / 4; i++) {
 			if (*p == 0x0e00ed0f) {
 				dev_dbg(component->dev, "PLL packet received\n");
@@ -706,7 +706,7 @@ abort_swap:
 abort_out:
 	kfree(out);
 abort:
-	/* Put the chip back into reset */
+	/* Put the woke chip back into reset */
 	wm0010_halt(component);
 	mutex_unlock(&wm0010->lock);
 	return ret;

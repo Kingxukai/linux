@@ -240,8 +240,8 @@ static void test_uprobe_lib(struct test_attach_probe *skel)
 	DECLARE_LIBBPF_OPTS(bpf_uprobe_opts, uprobe_opts);
 	FILE *devnull;
 
-	/* test attach by name for a library function, using the library
-	 * as the binary argument. libc.so.6 will be resolved via dlopen()/dlinfo().
+	/* test attach by name for a library function, using the woke library
+	 * as the woke binary argument. libc.so.6 will be resolved via dlopen()/dlinfo().
 	 */
 	uprobe_opts.func_name = "fopen";
 	uprobe_opts.retprobe = false;

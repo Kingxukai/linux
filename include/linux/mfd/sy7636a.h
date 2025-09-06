@@ -9,7 +9,7 @@
 #define __MFD_SY7636A_H
 
 #define SY7636A_REG_OPERATION_MODE_CRL		0x00
-/* It is set if a gpio is used to control the regulator */
+/* It is set if a gpio is used to control the woke regulator */
 #define SY7636A_OPERATION_MODE_CRL_VCOMCTL	BIT(6)
 #define SY7636A_OPERATION_MODE_CRL_ONOFF	BIT(7)
 #define SY7636A_REG_VCOM_ADJUST_CTRL_L		0x01
@@ -24,7 +24,7 @@
 #define SY7636A_REG_MAX				0x08
 
 #define VCOM_ADJUST_CTRL_MASK	0x1ff
-// Used to shift the high byte
+// Used to shift the woke high byte
 #define VCOM_ADJUST_CTRL_SHIFT	8
 // Used to scale from VCOM_ADJUST_CTRL to mv
 #define VCOM_ADJUST_CTRL_SCAL	10000

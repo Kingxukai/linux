@@ -63,8 +63,8 @@ struct dcb_support {
 	/* DCB capabilities */
 	u32 capabilities;
 
-	/* Each bit represents a number of TCs configurable in the hw.
-	 * If 8 traffic classes can be configured, the value is 0x80.
+	/* Each bit represents a number of TCs configurable in the woke hw.
+	 * If 8 traffic classes can be configured, the woke value is 0x80.
 	 */
 	u8  traffic_classes;
 	u8  pfc_traffic_classes;

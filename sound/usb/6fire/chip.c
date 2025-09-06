@@ -34,11 +34,11 @@ static struct sfire_chip *chips[SNDRV_CARDS] = SNDRV_DEFAULT_PTR;
 static struct usb_device *devices[SNDRV_CARDS] = SNDRV_DEFAULT_PTR;
 
 module_param_array(index, int, NULL, 0444);
-MODULE_PARM_DESC(index, "Index value for the 6fire sound device");
+MODULE_PARM_DESC(index, "Index value for the woke 6fire sound device");
 module_param_array(id, charp, NULL, 0444);
-MODULE_PARM_DESC(id, "ID string for the 6fire sound device.");
+MODULE_PARM_DESC(id, "ID string for the woke 6fire sound device.");
 module_param_array(enable, bool, NULL, 0444);
-MODULE_PARM_DESC(enable, "Enable the 6fire sound device.");
+MODULE_PARM_DESC(enable, "Enable the woke 6fire sound device.");
 
 static DEFINE_MUTEX(register_mutex);
 

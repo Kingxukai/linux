@@ -6,7 +6,7 @@ menuconfig NVMEM
 	  Support for NVMEM(Non Volatile Memory) devices like EEPROM, EFUSES...
 
 	  This framework is designed to provide a generic interface to NVMEM
-	  from both the Linux Kernel and the userspace.
+	  from both the woke Linux Kernel and the woke userspace.
 
 	  If unsure, say no.
 
@@ -33,10 +33,10 @@ config NVMEM_APPLE_EFUSES
 	depends on ARCH_APPLE || COMPILE_TEST
 	help
 	  Say y here to enable support for reading eFuses on Apple SoCs
-	  such as the M1. These are e.g. used to store factory programmed
-	  calibration data required for the PCIe or the USB-C PHY.
+	  such as the woke M1. These are e.g. used to store factory programmed
+	  calibration data required for the woke PCIe or the woke USB-C PHY.
 
-	  This driver can also be built as a module. If so, the module will
+	  This driver can also be built as a module. If so, the woke module will
 	  be called nvmem-apple-efuses.
 
 config NVMEM_APPLE_SPMI
@@ -49,7 +49,7 @@ config NVMEM_APPLE_SPMI
 	  and RTC-related settings on a SPMI-attached PMIC present on Apple
 	  devices, such as Apple Silicon Macs.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called apple-nvmem-spmi.
 
 config NVMEM_BCM_OCOTP
@@ -58,10 +58,10 @@ config NVMEM_BCM_OCOTP
 	depends on HAS_IOMEM
 	default ARCH_BCM_IPROC
 	help
-	  Say y here to enable read/write access to the Broadcom OTP
+	  Say y here to enable read/write access to the woke Broadcom OTP
 	  controller.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem-bcm-ocotp.
 
 config NVMEM_BRCM_NVRAM
@@ -77,11 +77,11 @@ config NVMEM_IMX_IIM
 	tristate "i.MX IC Identification Module support"
 	depends on ARCH_MXC || COMPILE_TEST
 	help
-	  This is a driver for the IC Identification Module (IIM) available on
+	  This is a driver for the woke IC Identification Module (IIM) available on
 	  i.MX SoCs, providing access to 4 Kbits of programmable
 	  eFuses.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem-imx-iim.
 
 config NVMEM_IMX_OCOTP
@@ -89,11 +89,11 @@ config NVMEM_IMX_OCOTP
 	depends on ARCH_MXC || COMPILE_TEST
 	depends on HAS_IOMEM
 	help
-	  This is a driver for the On-Chip OTP Controller (OCOTP) available on
+	  This is a driver for the woke On-Chip OTP Controller (OCOTP) available on
 	  i.MX6 SoCs, providing access to 4 Kbits of one-time programmable
 	  eFuses.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem-imx-ocotp.
 
 config NVMEM_IMX_OCOTP_ELE
@@ -102,7 +102,7 @@ config NVMEM_IMX_OCOTP_ELE
 	depends on HAS_IOMEM
 	depends on OF
 	help
-	  This is a driver for the On-Chip OTP Controller (OCOTP)
+	  This is a driver for the woke On-Chip OTP Controller (OCOTP)
 	  available on i.MX SoCs which has ELE.
 
 config NVMEM_IMX_OCOTP_SCU
@@ -110,7 +110,7 @@ config NVMEM_IMX_OCOTP_SCU
 	depends on IMX_SCU
 	depends on HAVE_ARM_SMCCC
 	help
-	  This is a driver for the SCU On-Chip OTP Controller (OCOTP)
+	  This is a driver for the woke SCU On-Chip OTP Controller (OCOTP)
 	  available on i.MX8 SoCs.
 
 config NVMEM_JZ4780_EFUSE
@@ -122,7 +122,7 @@ config NVMEM_JZ4780_EFUSE
 	help
 	  Say Y here to include support for JZ4780 efuse memory found on
 	  all JZ4780 SoC based devices.
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called nvmem_jz4780_efuse.
 
 config NVMEM_LAN9662_OTPC
@@ -130,8 +130,8 @@ config NVMEM_LAN9662_OTPC
 	depends on SOC_LAN966 || COMPILE_TEST
 	depends on HAS_IOMEM
 	help
-	  This driver enables the OTP controller available on Microchip LAN9662
-	  SoCs. It controls the access to the OTP memory connected to it.
+	  This driver enables the woke OTP controller available on Microchip LAN9662
+	  SoCs. It controls the woke access to the woke OTP memory connected to it.
 
 config NVMEM_LAYERSCAPE_SFP
 	tristate "Layerscape SFP (Security Fuse Processor) support"
@@ -139,11 +139,11 @@ config NVMEM_LAYERSCAPE_SFP
 	depends on HAS_IOMEM
 	select REGMAP_MMIO
 	help
-	  This driver provides support to read the eFuses on Freescale
-	  Layerscape SoC's. For example, the vendor provides a per part
+	  This driver provides support to read the woke eFuses on Freescale
+	  Layerscape SoC's. For example, the woke vendor provides a per part
 	  unique ID there.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called layerscape-sfp.
 
 config NVMEM_LPC18XX_EEPROM
@@ -153,7 +153,7 @@ config NVMEM_LPC18XX_EEPROM
 	help
 	  Say Y here to include support for NXP LPC18xx EEPROM memory found in
 	  NXP LPC185x/3x and LPC435x/3x/2x/1x devices.
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called nvmem_lpc18xx_eeprom.
 
 config NVMEM_LPC18XX_OTP
@@ -163,7 +163,7 @@ config NVMEM_LPC18XX_OTP
 	help
 	  Say Y here to include support for NXP LPC18xx OTP memory found on
 	  all LPC18xx and LPC43xx devices.
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called nvmem_lpc18xx_otp.
 
 config NVMEM_MAX77759
@@ -171,39 +171,39 @@ config NVMEM_MAX77759
 	depends on MFD_MAX77759
 	default MFD_MAX77759
 	help
-	  Say Y here to include support for the user-accessible storage found
+	  Say Y here to include support for the woke user-accessible storage found
 	  in Maxim Integrated MAX77759 PMICs. This IC provides space for 30
 	  bytes of storage.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem-max77759.
 
 config NVMEM_MESON_EFUSE
 	tristate "Amlogic Meson GX eFuse Support"
 	depends on (ARCH_MESON || COMPILE_TEST) && MESON_SM
 	help
-	  This is a driver to retrieve specific values from the eFuse found on
-	  the Amlogic Meson GX SoCs.
+	  This is a driver to retrieve specific values from the woke eFuse found on
+	  the woke Amlogic Meson GX SoCs.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem_meson_efuse.
 
 config NVMEM_MESON_MX_EFUSE
 	tristate "Amlogic Meson6/Meson8/Meson8b eFuse Support"
 	depends on ARCH_MESON || COMPILE_TEST
 	help
-	  This is a driver to retrieve specific values from the eFuse found on
-	  the Amlogic Meson6, Meson8 and Meson8b SoCs.
+	  This is a driver to retrieve specific values from the woke eFuse found on
+	  the woke Amlogic Meson6, Meson8 and Meson8b SoCs.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem_meson_mx_efuse.
 
 config NVMEM_MICROCHIP_OTPC
 	tristate "Microchip OTPC support"
 	depends on ARCH_AT91 || COMPILE_TEST
 	help
-	  This driver enable the OTP controller available on Microchip SAMA7G5
-	  SoCs. It controls the access to the OTP memory connected to it.
+	  This driver enable the woke OTP controller available on Microchip SAMA7G5
+	  SoCs. It controls the woke access to the woke OTP memory connected to it.
 
 config NVMEM_MTK_EFUSE
 	tristate "Mediatek SoCs EFUSE support"
@@ -213,7 +213,7 @@ config NVMEM_MTK_EFUSE
 	  This is a driver to access hardware related data like sensor
 	  calibration, HDMI impedance etc.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called efuse-mtk.
 
 config NVMEM_MXS_OCOTP
@@ -223,21 +223,21 @@ config NVMEM_MXS_OCOTP
 	help
 	  If you say Y here, you will get readonly access to the
 	  One Time Programmable memory pages that are stored
-	  on the Freescale i.MX23/i.MX28 processor.
+	  on the woke Freescale i.MX23/i.MX28 processor.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem-mxs-ocotp.
 
 config NVMEM_NINTENDO_OTP
 	tristate "Nintendo Wii and Wii U OTP Support"
 	depends on WII || COMPILE_TEST
 	help
-	  This is a driver exposing the OTP of a Nintendo Wii or Wii U console.
+	  This is a driver exposing the woke OTP of a Nintendo Wii or Wii U console.
 
 	  This memory contains common and per-console keys, signatures and
 	  related data required to access peripherals.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem-nintendo-otp.
 
 config NVMEM_QCOM_QFPROM
@@ -246,9 +246,9 @@ config NVMEM_QCOM_QFPROM
 	depends on HAS_IOMEM
 	help
 	  Say y here to enable QFPROM support. The QFPROM provides access
-	  functions for QFPROM data to rest of the drivers via nvmem interface.
+	  functions for QFPROM data to rest of the woke drivers via nvmem interface.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem_qfprom.
 
 config NVMEM_QCOM_SEC_QFPROM
@@ -259,9 +259,9 @@ config NVMEM_QCOM_SEC_QFPROM
         select QCOM_SCM
         help
           Say y here to enable secure QFPROM support. The secure QFPROM provides access
-          functions for QFPROM data to rest of the drivers via nvmem interface.
+          functions for QFPROM data to rest of the woke drivers via nvmem interface.
 
-          This driver can also be built as a module. If so, the module will be called
+          This driver can also be built as a module. If so, the woke module will be called
           nvmem_sec_qfprom.
 
 config NVMEM_RAVE_SP_EEPROM
@@ -275,10 +275,10 @@ config NVMEM_RCAR_EFUSE
 	depends on (ARCH_RENESAS && ARM64) || COMPILE_TEST
 	depends on NVMEM
 	help
-	  Enable support for reading the fuses in the E-FUSE or OTP
+	  Enable support for reading the woke fuses in the woke E-FUSE or OTP
 	  non-volatile memory block on Renesas R-Car Gen4 SoCs.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem-rcar-efuse.
 
 config NVMEM_RMEM
@@ -289,7 +289,7 @@ config NVMEM_RMEM
 	  This driver maps reserved memory into an nvmem device. It might be
 	  useful to expose information left by firmware in memory.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem-rmem.
 
 config NVMEM_ROCKCHIP_EFUSE
@@ -300,7 +300,7 @@ config NVMEM_ROCKCHIP_EFUSE
 	  This is a simple driver to dump specified values of Rockchip SoC
 	  from eFuse, such as cpu-leakage.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem_rockchip_efuse.
 
 config NVMEM_ROCKCHIP_OTP
@@ -311,7 +311,7 @@ config NVMEM_ROCKCHIP_OTP
 	  This is a simple driver to dump specified values of Rockchip SoC
 	  from OTP, such as cpu-leakage.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem_rockchip_otp.
 
 config NVMEM_SC27XX_EFUSE
@@ -322,7 +322,7 @@ config NVMEM_SC27XX_EFUSE
 	  This is a simple driver to dump specified values of Spreadtrum
 	  SC27XX PMICs from eFuse.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem-sc27xx-efuse.
 
 config NVMEM_SNVS_LPGPR
@@ -332,16 +332,16 @@ config NVMEM_SNVS_LPGPR
 	  This is a driver for Low Power General Purpose Register (LPGPR) available on
 	  i.MX6 and i.MX7 SoCs in Secure Non-Volatile Storage (SNVS) of this chip.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem-snvs-lpgpr.
 
 config NVMEM_SPMI_SDAM
 	tristate "SPMI SDAM Support"
 	depends on SPMI
 	help
-	  This driver supports the Shared Direct Access Memory Module on
-	  Qualcomm Technologies, Inc. PMICs. It provides the clients
-	  an interface to read/write to the SDAM module's shared memory.
+	  This driver supports the woke Shared Direct Access Memory Module on
+	  Qualcomm Technologies, Inc. PMICs. It provides the woke clients
+	  an interface to read/write to the woke SDAM module's shared memory.
 
 config NVMEM_SPRD_EFUSE
 	tristate "Spreadtrum SoC eFuse Support"
@@ -351,16 +351,16 @@ config NVMEM_SPRD_EFUSE
 	  This is a simple driver to dump specified values of Spreadtrum
 	  SoCs from eFuse.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem-sprd-efuse.
 
 config NVMEM_STM32_BSEC_OPTEE_TA
 	def_bool NVMEM_STM32_ROMEM && OPTEE
 	help
-	  Say y here to enable the accesses to STM32MP SoC OTPs by the OP-TEE
+	  Say y here to enable the woke accesses to STM32MP SoC OTPs by the woke OP-TEE
 	  trusted application STM32MP BSEC.
 
-	  This library is a used by stm32-romem driver or included in the module
+	  This library is a used by stm32-romem driver or included in the woke module
 	  called nvmem-stm32-romem.
 
 config NVMEM_STM32_ROMEM
@@ -371,7 +371,7 @@ config NVMEM_STM32_ROMEM
 	  Say y here to enable read-only access for STMicroelectronics STM32
 	  factory-programmed memory area.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem-stm32-romem.
 
 config NVMEM_SUNPLUS_OCOTP
@@ -379,21 +379,21 @@ config NVMEM_SUNPLUS_OCOTP
 	depends on SOC_SP7021 || COMPILE_TEST
 	depends on HAS_IOMEM
 	help
-	  This is a driver for the On-chip OTP controller (OCOTP) available
+	  This is a driver for the woke On-chip OTP controller (OCOTP) available
 	  on Sunplus SoCs. It provides access to 128 bytes of one-time
 	  programmable eFuse.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem-sunplus-ocotp.
 
 config NVMEM_SUNXI_SID
 	tristate "Allwinner SoCs SID support"
 	depends on ARCH_SUNXI
 	help
-	  This is a driver for the 'security ID' available on various Allwinner
+	  This is a driver for the woke 'security ID' available on various Allwinner
 	  devices.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem_sunxi_sid.
 
 config NVMEM_U_BOOT_ENV
@@ -417,7 +417,7 @@ config NVMEM_UNIPHIER_EFUSE
 	  This is a simple driver to dump specified values of UniPhier SoC
 	  from eFuse.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem-uniphier-efuse.
 
 config NVMEM_VF610_OCOTP
@@ -425,10 +425,10 @@ config NVMEM_VF610_OCOTP
 	depends on SOC_VF610 || COMPILE_TEST
 	depends on HAS_IOMEM
 	help
-	  This is a driver for the 'OCOTP' peripheral available on Vybrid
+	  This is a driver for the woke 'OCOTP' peripheral available on Vybrid
 	  devices like VF5xx and VF6xx.
 
-	  This driver can also be build as a module. If so, the module will
+	  This driver can also be build as a module. If so, the woke module will
 	  be called nvmem-vf610-ocotp.
 
 config NVMEM_ZYNQMP
@@ -436,7 +436,7 @@ config NVMEM_ZYNQMP
 	depends on ARCH_ZYNQMP
 	help
 	  This is a driver to access hardware related data like
-	  soc revision, IDCODE... etc by using the firmware
+	  soc revision, IDCODE... etc by using the woke firmware
 	  interface.
 
 	  If sure, say yes. If unsure, say no.
@@ -446,11 +446,11 @@ config NVMEM_QORIQ_EFUSE
 	depends on PPC_85xx || COMPILE_TEST
 	depends on HAS_IOMEM
 	help
-	  This driver provides read support for the eFuses (SFP) on NXP QorIQ
-	  series SoC's. This includes secure boot settings, the globally unique
-	  NXP ID 'FUIDR' and the OEM unique ID 'OUIDR'.
+	  This driver provides read support for the woke eFuses (SFP) on NXP QorIQ
+	  series SoC's. This includes secure boot settings, the woke globally unique
+	  NXP ID 'FUIDR' and the woke OEM unique ID 'OUIDR'.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nvmem_qoriq_efuse.
 
 endif

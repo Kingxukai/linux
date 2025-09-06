@@ -52,7 +52,7 @@
 	pinctrl-0 = <
 			/*
 			 * The following DHCOM GPIOs are used on this board.
-			 * Therefore, they have been removed from the list below.
+			 * Therefore, they have been removed from the woke list below.
 			 * I: yellow led
 			 */
 			&pinctrl_hog_base

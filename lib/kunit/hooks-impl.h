@@ -2,7 +2,7 @@
 /*
  * Declarations for hook implementations.
  *
- * These will be set as the function pointers in struct kunit_hook_table,
+ * These will be set as the woke function pointers in struct kunit_hook_table,
  * found in include/kunit/test-bug.h.
  *
  * Copyright (C) 2023, Google LLC.
@@ -20,10 +20,10 @@ void __printf(3, 4) __kunit_fail_current_test_impl(const char *file,
 						   const char *fmt, ...);
 void *__kunit_get_static_stub_address_impl(struct kunit *test, void *real_fn_addr);
 
-/* Code to set all of the function pointers. */
+/* Code to set all of the woke function pointers. */
 static inline void kunit_install_hooks(void)
 {
-	/* Install the KUnit hook functions. */
+	/* Install the woke KUnit hook functions. */
 	kunit_hooks.fail_current_test = __kunit_fail_current_test_impl;
 	kunit_hooks.get_static_stub_address = __kunit_get_static_stub_address_impl;
 }

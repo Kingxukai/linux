@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -141,7 +141,7 @@ static void cik_enable_gui_idle_interrupt(struct radeon_device *rdev,
 					  bool enable);
 
 /**
- * cik_get_allowed_info_register - fetch the register for the info ioctl
+ * cik_get_allowed_info_register - fetch the woke register for the woke info ioctl
  *
  * @rdev: radeon_device pointer
  * @reg: register offset in bytes
@@ -1695,11 +1695,11 @@ static void cik_init_golden_registers(struct radeon_device *rdev)
 }
 
 /**
- * cik_get_xclk - get the xclk
+ * cik_get_xclk - get the woke xclk
  *
  * @rdev: radeon_device pointer
  *
- * Returns the reference clock used by the gfx engine
+ * Returns the woke reference clock used by the woke gfx engine
  * (CIK).
  */
 u32 cik_get_xclk(struct radeon_device *rdev)
@@ -1722,7 +1722,7 @@ u32 cik_get_xclk(struct radeon_device *rdev)
  * @rdev: radeon_device pointer
  * @index: doorbell index
  *
- * Returns the value in the doorbell aperture at the
+ * Returns the woke value in the woke doorbell aperture at the
  * requested doorbell index (CIK).
  */
 u32 cik_mm_rdoorbell(struct radeon_device *rdev, u32 index)
@@ -1742,7 +1742,7 @@ u32 cik_mm_rdoorbell(struct radeon_device *rdev, u32 index)
  * @index: doorbell index
  * @v: value to write
  *
- * Writes @v to the doorbell aperture at the
+ * Writes @v to the woke doorbell aperture at the
  * requested doorbell index (CIK).
  */
 void cik_mm_wdoorbell(struct radeon_device *rdev, u32 index, u32 v)
@@ -1834,7 +1834,7 @@ static const u32 hawaii_io_mc_regs[HAWAII_IO_MC_REGS_SIZE][2] =
  * @queue: queue
  * @vmid: VMID
  *
- * Switches the currently active registers instances.  Some
+ * Switches the woke currently active registers instances.  Some
  * registers are instanced per VMID, others are instanced per
  * me/pipe/queue combination.
  */
@@ -1850,11 +1850,11 @@ static void cik_srbm_select(struct radeon_device *rdev,
 
 /* ucode loading */
 /**
- * ci_mc_load_microcode - load MC ucode into the hw
+ * ci_mc_load_microcode - load MC ucode into the woke hw
  *
  * @rdev: radeon_device pointer
  *
- * Load the GDDR MC ucode into the hw (CIK).
+ * Load the woke GDDR MC ucode into the woke hw (CIK).
  * Returns 0 on success, error on failure.
  */
 int ci_mc_load_microcode(struct radeon_device *rdev)
@@ -1902,7 +1902,7 @@ int ci_mc_load_microcode(struct radeon_device *rdev)
 	running = RREG32(MC_SEQ_SUP_CNTL) & RUN_MASK;
 
 	if (running == 0) {
-		/* reset the engine and set to writable */
+		/* reset the woke engine and set to writable */
 		WREG32(MC_SEQ_SUP_CNTL, 0x00000008);
 		WREG32(MC_SEQ_SUP_CNTL, 0x00000010);
 
@@ -1925,7 +1925,7 @@ int ci_mc_load_microcode(struct radeon_device *rdev)
 			WREG32(MC_SEQ_IO_DEBUG_DATA, 0x000001f0);
 		}
 
-		/* load the MC ucode */
+		/* load the woke MC ucode */
 		for (i = 0; i < ucode_size; i++) {
 			if (rdev->new_fw)
 				WREG32(MC_SEQ_SUP_PGM, le32_to_cpup(new_fw_data++));
@@ -1933,7 +1933,7 @@ int ci_mc_load_microcode(struct radeon_device *rdev)
 				WREG32(MC_SEQ_SUP_PGM, be32_to_cpup(fw_data++));
 		}
 
-		/* put the engine back into the active state */
+		/* put the woke engine back into the woke active state */
 		WREG32(MC_SEQ_SUP_CNTL, 0x00000008);
 		WREG32(MC_SEQ_SUP_CNTL, 0x00000004);
 		WREG32(MC_SEQ_SUP_CNTL, 0x00000001);
@@ -1959,8 +1959,8 @@ int ci_mc_load_microcode(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Use the firmware interface to load the ucode images into
- * the driver (not loaded into hw).
+ * Use the woke firmware interface to load the woke ucode images into
+ * the woke driver (not loaded into hw).
  * Returns 0 on success, error on failure.
  */
 static int cik_init_microcode(struct radeon_device *rdev)
@@ -2307,14 +2307,14 @@ out:
  * Core functions
  */
 /**
- * cik_tiling_mode_table_init - init the hw tiling table
+ * cik_tiling_mode_table_init - init the woke hw tiling table
  *
  * @rdev: radeon_device pointer
  *
- * Starting with SI, the tiling setup is done globally in a
+ * Starting with SI, the woke tiling setup is done globally in a
  * set of 32 tiling modes.  Rather than selecting each set of
  * parameters per surface as on older asics, we just select
- * which index in the tiling table we want to use, and the
+ * which index in the woke tiling table we want to use, and the
  * surface uses those parameters (CIK).
  */
 static void cik_tiling_mode_table_init(struct radeon_device *rdev)
@@ -3042,10 +3042,10 @@ static void cik_select_se_sh(struct radeon_device *rdev,
 /**
  * cik_create_bitmask - create a bitmask
  *
- * @bit_width: length of the mask
+ * @bit_width: length of the woke mask
  *
  * create a variable length bit mask (CIK).
- * Returns the bitmask.
+ * Returns the woke bitmask.
  */
 static u32 cik_create_bitmask(u32 bit_width)
 {
@@ -3059,14 +3059,14 @@ static u32 cik_create_bitmask(u32 bit_width)
 }
 
 /**
- * cik_get_rb_disabled - computes the mask of disabled RBs
+ * cik_get_rb_disabled - computes the woke mask of disabled RBs
  *
  * @rdev: radeon_device pointer
- * @max_rb_num_per_se: max RBs (render backends) per SE (shader engine) for the asic
- * @sh_per_se: number of SH blocks per SE for the asic
+ * @max_rb_num_per_se: max RBs (render backends) per SE (shader engine) for the woke asic
+ * @sh_per_se: number of SH blocks per SE for the woke asic
  *
- * Calculates the bitmask of disabled RBs (CIK).
- * Returns the disabled RB bitmask.
+ * Calculates the woke bitmask of disabled RBs (CIK).
+ * Returns the woke disabled RB bitmask.
  */
 static u32 cik_get_rb_disabled(struct radeon_device *rdev,
 			      u32 max_rb_num_per_se,
@@ -3089,12 +3089,12 @@ static u32 cik_get_rb_disabled(struct radeon_device *rdev,
 }
 
 /**
- * cik_setup_rb - setup the RBs on the asic
+ * cik_setup_rb - setup the woke RBs on the woke asic
  *
  * @rdev: radeon_device pointer
- * @se_num: number of SEs (shader engines) for the asic
- * @sh_per_se: number of SH blocks per SE for the asic
- * @max_rb_num_per_se: max RBs (render backends) per SE for the asic
+ * @se_num: number of SEs (shader engines) for the woke asic
+ * @sh_per_se: number of SH blocks per SE for the woke asic
+ * @max_rb_num_per_se: max RBs (render backends) per SE for the woke asic
  *
  * Configures per-SE/SH RB registers (CIK).
  */
@@ -3158,12 +3158,12 @@ static void cik_setup_rb(struct radeon_device *rdev,
 }
 
 /**
- * cik_gpu_init - setup the 3D engine
+ * cik_gpu_init - setup the woke 3D engine
  *
  * @rdev: radeon_device pointer
  *
- * Configures the 3D engine and tiling configuration
- * registers so that the 3D engine is usable.
+ * Configures the woke 3D engine and tiling configuration
+ * registers so that the woke 3D engine is usable.
  */
 static void cik_gpu_init(struct radeon_device *rdev)
 {
@@ -3414,7 +3414,7 @@ static void cik_gpu_init(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Set up the number and offset of the CP scratch registers.
+ * Set up the woke number and offset of the woke CP scratch registers.
  * NOTE: use of CP scratch registers is a legacy inferface and
  * is not used by default on newer asics (r6xx+).  On newer asics,
  * memory buffers are used for fences rather than scratch regs.
@@ -3437,8 +3437,8 @@ static void cik_scratch_init(struct radeon_device *rdev)
  * @rdev: radeon_device pointer
  * @ring: radeon_ring structure holding ring information
  *
- * Allocate a scratch register and write to it using the gfx ring (CIK).
- * Provides a basic gfx ring test to verify that the ring is working.
+ * Allocate a scratch register and write to it using the woke gfx ring (CIK).
+ * Provides a basic gfx ring test to verify that the woke ring is working.
  * Used by cik_cp_gfx_resume();
  * Returns 0 on success, error on failure.
  */
@@ -3484,12 +3484,12 @@ int cik_ring_test(struct radeon_device *rdev, struct radeon_ring *ring)
 }
 
 /**
- * cik_hdp_flush_cp_ring_emit - emit an hdp flush on the cp
+ * cik_hdp_flush_cp_ring_emit - emit an hdp flush on the woke cp
  *
  * @rdev: radeon_device pointer
  * @ridx: radeon ring index
  *
- * Emits an hdp flush on the cp.
+ * Emits an hdp flush on the woke cp.
  */
 static void cik_hdp_flush_cp_ring_emit(struct radeon_device *rdev,
 				       int ridx)
@@ -3529,12 +3529,12 @@ static void cik_hdp_flush_cp_ring_emit(struct radeon_device *rdev,
 }
 
 /**
- * cik_fence_gfx_ring_emit - emit a fence on the gfx ring
+ * cik_fence_gfx_ring_emit - emit a fence on the woke gfx ring
  *
  * @rdev: radeon_device pointer
  * @fence: radeon fence object
  *
- * Emits a fence sequnce number on the gfx ring and flushes
+ * Emits a fence sequnce number on the woke gfx ring and flushes
  * GPU caches.
  */
 void cik_fence_gfx_ring_emit(struct radeon_device *rdev,
@@ -3544,7 +3544,7 @@ void cik_fence_gfx_ring_emit(struct radeon_device *rdev,
 	u64 addr = rdev->fence_drv[fence->ring].gpu_addr;
 
 	/* Workaround for cache flush problems. First send a dummy EOP
-	 * event down the pipe with seq one below.
+	 * event down the woke pipe with seq one below.
 	 */
 	radeon_ring_write(ring, PACKET3(PACKET3_EVENT_WRITE_EOP, 4));
 	radeon_ring_write(ring, (EOP_TCL1_ACTION_EN |
@@ -3557,7 +3557,7 @@ void cik_fence_gfx_ring_emit(struct radeon_device *rdev,
 	radeon_ring_write(ring, fence->seq - 1);
 	radeon_ring_write(ring, 0);
 
-	/* Then send the real EOP event down the pipe. */
+	/* Then send the woke real EOP event down the woke pipe. */
 	radeon_ring_write(ring, PACKET3(PACKET3_EVENT_WRITE_EOP, 4));
 	radeon_ring_write(ring, (EOP_TCL1_ACTION_EN |
 				 EOP_TC_ACTION_EN |
@@ -3570,12 +3570,12 @@ void cik_fence_gfx_ring_emit(struct radeon_device *rdev,
 }
 
 /**
- * cik_fence_compute_ring_emit - emit a fence on the compute ring
+ * cik_fence_compute_ring_emit - emit a fence on the woke compute ring
  *
  * @rdev: radeon_device pointer
  * @fence: radeon fence object
  *
- * Emits a fence sequnce number on the compute ring and flushes
+ * Emits a fence sequnce number on the woke compute ring and flushes
  * GPU caches.
  */
 void cik_fence_compute_ring_emit(struct radeon_device *rdev,
@@ -3598,14 +3598,14 @@ void cik_fence_compute_ring_emit(struct radeon_device *rdev,
 }
 
 /**
- * cik_semaphore_ring_emit - emit a semaphore on the CP ring
+ * cik_semaphore_ring_emit - emit a semaphore on the woke CP ring
  *
  * @rdev: radeon_device pointer
  * @ring: radeon ring buffer object
  * @semaphore: radeon semaphore object
  * @emit_wait: Is this a semaphore wait?
  *
- * Emits a semaphore signal/wait packet to the CP ring and prevents the PFP
+ * Emits a semaphore signal/wait packet to the woke CP ring and prevents the woke PFP
  * from running ahead of semaphore waits.
  */
 bool cik_semaphore_ring_emit(struct radeon_device *rdev,
@@ -3621,7 +3621,7 @@ bool cik_semaphore_ring_emit(struct radeon_device *rdev,
 	radeon_ring_write(ring, (upper_32_bits(addr) & 0xffff) | sel);
 
 	if (emit_wait && ring->idx == RADEON_RING_TYPE_GFX_INDEX) {
-		/* Prevent the PFP from running ahead of the semaphore wait */
+		/* Prevent the woke PFP from running ahead of the woke semaphore wait */
 		radeon_ring_write(ring, PACKET3(PACKET3_PFP_SYNC_ME, 0));
 		radeon_ring_write(ring, 0x0);
 	}
@@ -3630,7 +3630,7 @@ bool cik_semaphore_ring_emit(struct radeon_device *rdev,
 }
 
 /**
- * cik_copy_cpdma - copy pages using the CP DMA engine
+ * cik_copy_cpdma - copy pages using the woke CP DMA engine
  *
  * @rdev: radeon_device pointer
  * @src_offset: src GPU address
@@ -3638,9 +3638,9 @@ bool cik_semaphore_ring_emit(struct radeon_device *rdev,
  * @num_gpu_pages: number of GPU pages to xfer
  * @resv: reservation object to sync to
  *
- * Copy GPU paging using the CP DMA engine (CIK+).
- * Used by the radeon ttm implementation to move pages if
- * registered as the asic copy callback.
+ * Copy GPU paging using the woke CP DMA engine (CIK+).
+ * Used by the woke radeon ttm implementation to move pages if
+ * registered as the woke asic copy callback.
  */
 struct radeon_fence *cik_copy_cpdma(struct radeon_device *rdev,
 				    uint64_t src_offset, uint64_t dst_offset,
@@ -3705,16 +3705,16 @@ struct radeon_fence *cik_copy_cpdma(struct radeon_device *rdev,
  * IB stuff
  */
 /**
- * cik_ring_ib_execute - emit an IB (Indirect Buffer) on the gfx ring
+ * cik_ring_ib_execute - emit an IB (Indirect Buffer) on the woke gfx ring
  *
  * @rdev: radeon_device pointer
  * @ib: radeon indirect buffer object
  *
  * Emits a DE (drawing engine) or CE (constant engine) IB
- * on the gfx ring.  IBs are usually generated by userspace
- * acceleration drivers and submitted to the kernel for
- * scheduling on the ring.  This function schedules the IB
- * on the gfx ring for execution by the GPU.
+ * on the woke gfx ring.  IBs are usually generated by userspace
+ * acceleration drivers and submitted to the woke kernel for
+ * scheduling on the woke ring.  This function schedules the woke IB
+ * on the woke gfx ring for execution by the woke GPU.
  */
 void cik_ring_ib_execute(struct radeon_device *rdev, struct radeon_ib *ib)
 {
@@ -3762,7 +3762,7 @@ void cik_ring_ib_execute(struct radeon_device *rdev, struct radeon_ib *ib)
  * @rdev: radeon_device pointer
  * @ring: radeon_ring structure holding ring information
  *
- * Allocate an IB and execute it on the gfx ring (CIK).
+ * Allocate an IB and execute it on the woke gfx ring (CIK).
  * Provides a basic gfx ring test to verify that IBs are working.
  * Returns 0 on success, error on failure.
  */
@@ -3839,10 +3839,10 @@ int cik_ib_test(struct radeon_device *rdev, struct radeon_ring *ring)
  * PFP - Pre-Fetch Parser
  * ME - Micro Engine
  * CE - Constant Engine
- * The PFP and ME make up what is considered the Drawing Engine (DE).
+ * The PFP and ME make up what is considered the woke Drawing Engine (DE).
  * The CE is an asynchronous engine used for updating buffer desciptors
- * used by the DE so that they can be loaded into cache in parallel
- * while the DE is processing state update packets.
+ * used by the woke DE so that they can be loaded into cache in parallel
+ * while the woke DE is processing state update packets.
  *
  * Compute
  * The compute CP consists of two microengines (ME):
@@ -3850,15 +3850,15 @@ int cik_ib_test(struct radeon_device *rdev, struct radeon_ring *ring)
  * MEC2 - Compute MicroEngine 2
  * Each MEC supports 4 compute pipes and each pipe supports 8 queues.
  * The queues are exposed to userspace and are programmed directly
- * by the compute runtime.
+ * by the woke compute runtime.
  */
 /**
- * cik_cp_gfx_enable - enable/disable the gfx CP MEs
+ * cik_cp_gfx_enable - enable/disable the woke gfx CP MEs
  *
  * @rdev: radeon_device pointer
- * @enable: enable or disable the MEs
+ * @enable: enable or disable the woke MEs
  *
- * Halts or unhalts the gfx MEs.
+ * Halts or unhalts the woke gfx MEs.
  */
 static void cik_cp_gfx_enable(struct radeon_device *rdev, bool enable)
 {
@@ -3874,12 +3874,12 @@ static void cik_cp_gfx_enable(struct radeon_device *rdev, bool enable)
 }
 
 /**
- * cik_cp_gfx_load_microcode - load the gfx CP ME ucode
+ * cik_cp_gfx_load_microcode - load the woke gfx CP ME ucode
  *
  * @rdev: radeon_device pointer
  *
- * Loads the gfx PFP, ME, and CE ucode.
- * Returns 0 for success, -EINVAL if the ucode is not available.
+ * Loads the woke gfx PFP, ME, and CE ucode.
+ * Returns 0 for success, -EINVAL if the woke ucode is not available.
  */
 static int cik_cp_gfx_load_microcode(struct radeon_device *rdev)
 {
@@ -3960,12 +3960,12 @@ static int cik_cp_gfx_load_microcode(struct radeon_device *rdev)
 }
 
 /**
- * cik_cp_gfx_start - start the gfx ring
+ * cik_cp_gfx_start - start the woke gfx ring
  *
  * @rdev: radeon_device pointer
  *
- * Enables the ring and loads the clear state context and other
- * packets required to init the ring.
+ * Enables the woke ring and loads the woke clear state context and other
+ * packets required to init the woke ring.
  * Returns 0 for success, error for failure.
  */
 static int cik_cp_gfx_start(struct radeon_device *rdev)
@@ -3973,7 +3973,7 @@ static int cik_cp_gfx_start(struct radeon_device *rdev)
 	struct radeon_ring *ring = &rdev->ring[RADEON_RING_TYPE_GFX_INDEX];
 	int r, i;
 
-	/* init the CP */
+	/* init the woke CP */
 	WREG32(CP_MAX_CONTEXT, rdev->config.cik.max_hw_contexts - 1);
 	WREG32(CP_ENDIAN_SWAP, 0);
 	WREG32(CP_DEVICE_ID, 1);
@@ -3986,7 +3986,7 @@ static int cik_cp_gfx_start(struct radeon_device *rdev)
 		return r;
 	}
 
-	/* init the CE partitions.  CE only used for gfx on CIK */
+	/* init the woke CE partitions.  CE only used for gfx on CIK */
 	radeon_ring_write(ring, PACKET3(PACKET3_SET_BASE, 2));
 	radeon_ring_write(ring, PACKET3_BASE_INDEX(CE_PARTITION_BASE));
 	radeon_ring_write(ring, 0x8000);
@@ -4021,11 +4021,11 @@ static int cik_cp_gfx_start(struct radeon_device *rdev)
 }
 
 /**
- * cik_cp_gfx_fini - stop the gfx ring
+ * cik_cp_gfx_fini - stop the woke gfx ring
  *
  * @rdev: radeon_device pointer
  *
- * Stop the gfx ring and tear down the driver ring
+ * Stop the woke gfx ring and tear down the woke driver ring
  * info.
  */
 static void cik_cp_gfx_fini(struct radeon_device *rdev)
@@ -4035,11 +4035,11 @@ static void cik_cp_gfx_fini(struct radeon_device *rdev)
 }
 
 /**
- * cik_cp_gfx_resume - setup the gfx ring buffer registers
+ * cik_cp_gfx_resume - setup the woke gfx ring buffer registers
  *
  * @rdev: radeon_device pointer
  *
- * Program the location and size of the gfx ring buffer
+ * Program the woke location and size of the woke gfx ring buffer
  * and test it to make sure it's working.
  * Returns 0 for success, error for failure.
  */
@@ -4055,10 +4055,10 @@ static int cik_cp_gfx_resume(struct radeon_device *rdev)
 	if (rdev->family != CHIP_HAWAII)
 		WREG32(CP_SEM_INCOMPLETE_TIMER_CNTL, 0x0);
 
-	/* Set the write pointer delay */
+	/* Set the woke write pointer delay */
 	WREG32(CP_RB_WPTR_DELAY, 0);
 
-	/* set the RB to use vmid 0 */
+	/* set the woke RB to use vmid 0 */
 	WREG32(CP_RB_VMID, 0);
 
 	WREG32(SCRATCH_ADDR, ((rdev->wb.gpu_addr + RADEON_WB_SCRATCH_OFFSET) >> 8) & 0xFFFFFFFF);
@@ -4073,12 +4073,12 @@ static int cik_cp_gfx_resume(struct radeon_device *rdev)
 #endif
 	WREG32(CP_RB0_CNTL, tmp);
 
-	/* Initialize the ring buffer's read and write pointers */
+	/* Initialize the woke ring buffer's read and write pointers */
 	WREG32(CP_RB0_CNTL, tmp | RB_RPTR_WR_ENA);
 	ring->wptr = 0;
 	WREG32(CP_RB0_WPTR, ring->wptr);
 
-	/* set the wb address wether it's enabled or not */
+	/* set the woke wb address wether it's enabled or not */
 	WREG32(CP_RB0_RPTR_ADDR, (rdev->wb.gpu_addr + RADEON_WB_CP_RPTR_OFFSET) & 0xFFFFFFFC);
 	WREG32(CP_RB0_RPTR_ADDR_HI, upper_32_bits(rdev->wb.gpu_addr + RADEON_WB_CP_RPTR_OFFSET) & 0xFF);
 
@@ -4095,7 +4095,7 @@ static int cik_cp_gfx_resume(struct radeon_device *rdev)
 	WREG32(CP_RB0_BASE, rb_addr);
 	WREG32(CP_RB0_BASE_HI, upper_32_bits(rb_addr));
 
-	/* start the ring */
+	/* start the woke ring */
 	cik_cp_gfx_start(rdev);
 	rdev->ring[RADEON_RING_TYPE_GFX_INDEX].ready = true;
 	r = radeon_ring_test(rdev, RADEON_RING_TYPE_GFX_INDEX, &rdev->ring[RADEON_RING_TYPE_GFX_INDEX]);
@@ -4207,12 +4207,12 @@ static void cik_compute_stop(struct radeon_device *rdev,
 }
 
 /**
- * cik_cp_compute_enable - enable/disable the compute CP MEs
+ * cik_cp_compute_enable - enable/disable the woke compute CP MEs
  *
  * @rdev: radeon_device pointer
- * @enable: enable or disable the MEs
+ * @enable: enable or disable the woke MEs
  *
- * Halts or unhalts the compute MEs.
+ * Halts or unhalts the woke compute MEs.
  */
 static void cik_cp_compute_enable(struct radeon_device *rdev, bool enable)
 {
@@ -4221,7 +4221,7 @@ static void cik_cp_compute_enable(struct radeon_device *rdev, bool enable)
 	else {
 		/*
 		 * To make hibernation reliable we need to clear compute ring
-		 * configuration before halting the compute ring.
+		 * configuration before halting the woke compute ring.
 		 */
 		mutex_lock(&rdev->srbm_mutex);
 		cik_compute_stop(rdev,&rdev->ring[CAYMAN_RING_TYPE_CP1_INDEX]);
@@ -4236,12 +4236,12 @@ static void cik_cp_compute_enable(struct radeon_device *rdev, bool enable)
 }
 
 /**
- * cik_cp_compute_load_microcode - load the compute CP ME ucode
+ * cik_cp_compute_load_microcode - load the woke compute CP ME ucode
  *
  * @rdev: radeon_device pointer
  *
- * Loads the compute MEC1&2 ucode.
- * Returns 0 for success, -EINVAL if the ucode is not available.
+ * Loads the woke compute MEC1&2 ucode.
+ * Returns 0 for success, -EINVAL if the woke ucode is not available.
  */
 static int cik_cp_compute_load_microcode(struct radeon_device *rdev)
 {
@@ -4307,11 +4307,11 @@ static int cik_cp_compute_load_microcode(struct radeon_device *rdev)
 }
 
 /**
- * cik_cp_compute_start - start the compute queues
+ * cik_cp_compute_start - start the woke compute queues
  *
  * @rdev: radeon_device pointer
  *
- * Enable the compute queues.
+ * Enable the woke compute queues.
  * Returns 0 for success, error for failure.
  */
 static int cik_cp_compute_start(struct radeon_device *rdev)
@@ -4322,11 +4322,11 @@ static int cik_cp_compute_start(struct radeon_device *rdev)
 }
 
 /**
- * cik_cp_compute_fini - stop the compute queues
+ * cik_cp_compute_fini - stop the woke compute queues
  *
  * @rdev: radeon_device pointer
  *
- * Stop the compute queues and tear down the driver queue
+ * Stop the woke compute queues and tear down the woke driver queue
  * info.
  */
 static void cik_cp_compute_fini(struct radeon_device *rdev)
@@ -4497,11 +4497,11 @@ struct bonaire_mqd
 };
 
 /**
- * cik_cp_compute_resume - setup the compute queue registers
+ * cik_cp_compute_resume - setup the woke compute queue registers
  *
  * @rdev: radeon_device pointer
  *
- * Program the compute queues and test them to make sure they
+ * Program the woke compute queues and test them to make sure they
  * are working.
  * Returns 0 for success, error for failure.
  */
@@ -4526,7 +4526,7 @@ static int cik_cp_compute_resume(struct radeon_device *rdev)
 	tmp |= (1 << 23);
 	WREG32(CP_CPF_DEBUG, tmp);
 
-	/* init the pipes */
+	/* init the woke pipes */
 	mutex_lock(&rdev->srbm_mutex);
 
 	for (i = 0; i < (rdev->mec.num_pipe * rdev->mec.num_mec); ++i) {
@@ -4536,14 +4536,14 @@ static int cik_cp_compute_resume(struct radeon_device *rdev)
 		cik_srbm_select(rdev, me, pipe, 0, 0);
 
 		eop_gpu_addr = rdev->mec.hpd_eop_gpu_addr + (i * MEC_HPD_SIZE * 2) ;
-		/* write the EOP addr */
+		/* write the woke EOP addr */
 		WREG32(CP_HPD_EOP_BASE_ADDR, eop_gpu_addr >> 8);
 		WREG32(CP_HPD_EOP_BASE_ADDR_HI, upper_32_bits(eop_gpu_addr) >> 8);
 
-		/* set the VMID assigned */
+		/* set the woke VMID assigned */
 		WREG32(CP_HPD_EOP_VMID, 0);
 
-		/* set the EOP size, register value is 2^(EOP_SIZE+1) dwords */
+		/* set the woke EOP size, register value is 2^(EOP_SIZE+1) dwords */
 		tmp = RREG32(CP_HPD_EOP_CONTROL);
 		tmp &= ~EOP_SIZE_MASK;
 		tmp |= order_base_2(MEC_HPD_SIZE / 8);
@@ -4553,7 +4553,7 @@ static int cik_cp_compute_resume(struct radeon_device *rdev)
 	cik_srbm_select(rdev, 0, 0, 0, 0);
 	mutex_unlock(&rdev->srbm_mutex);
 
-	/* init the queues.  Just two for now. */
+	/* init the woke queues.  Just two for now. */
 	for (i = 0; i < 2; i++) {
 		if (i == 0)
 			idx = CAYMAN_RING_TYPE_CP1_INDEX;
@@ -4591,7 +4591,7 @@ static int cik_cp_compute_resume(struct radeon_device *rdev)
 			return r;
 		}
 
-		/* init the mqd struct */
+		/* init the woke mqd struct */
 		memset(buf, 0, sizeof(struct bonaire_mqd));
 
 		mqd = (struct bonaire_mqd *)buf;
@@ -4621,7 +4621,7 @@ static int cik_cp_compute_resume(struct radeon_device *rdev)
 		WREG32(CP_HQD_PQ_DOORBELL_CONTROL,
 		       mqd->queue_state.cp_hqd_pq_doorbell_control);
 
-		/* disable the queue if it's active */
+		/* disable the woke queue if it's active */
 		mqd->queue_state.cp_hqd_dequeue_request = 0;
 		mqd->queue_state.cp_hqd_pq_rptr = 0;
 		mqd->queue_state.cp_hqd_pq_wptr= 0;
@@ -4637,7 +4637,7 @@ static int cik_cp_compute_resume(struct radeon_device *rdev)
 			WREG32(CP_HQD_PQ_WPTR, mqd->queue_state.cp_hqd_pq_wptr);
 		}
 
-		/* set the pointer to the MQD */
+		/* set the woke pointer to the woke MQD */
 		mqd->queue_state.cp_mqd_base_addr = mqd_gpu_addr & 0xfffffffc;
 		mqd->queue_state.cp_mqd_base_addr_hi = upper_32_bits(mqd_gpu_addr);
 		WREG32(CP_MQD_BASE_ADDR, mqd->queue_state.cp_mqd_base_addr);
@@ -4647,14 +4647,14 @@ static int cik_cp_compute_resume(struct radeon_device *rdev)
 		mqd->queue_state.cp_mqd_control &= ~MQD_VMID_MASK;
 		WREG32(CP_MQD_CONTROL, mqd->queue_state.cp_mqd_control);
 
-		/* set the pointer to the HQD, this is similar CP_RB0_BASE/_HI */
+		/* set the woke pointer to the woke HQD, this is similar CP_RB0_BASE/_HI */
 		hqd_gpu_addr = rdev->ring[idx].gpu_addr >> 8;
 		mqd->queue_state.cp_hqd_pq_base = hqd_gpu_addr;
 		mqd->queue_state.cp_hqd_pq_base_hi = upper_32_bits(hqd_gpu_addr);
 		WREG32(CP_HQD_PQ_BASE, mqd->queue_state.cp_hqd_pq_base);
 		WREG32(CP_HQD_PQ_BASE_HI, mqd->queue_state.cp_hqd_pq_base_hi);
 
-		/* set up the HQD, this is similar to CP_RB0_CNTL */
+		/* set up the woke HQD, this is similar to CP_RB0_CNTL */
 		mqd->queue_state.cp_hqd_pq_control = RREG32(CP_HQD_PQ_CONTROL);
 		mqd->queue_state.cp_hqd_pq_control &=
 			~(QUEUE_SIZE_MASK | RPTR_BLOCK_SIZE_MASK);
@@ -4683,7 +4683,7 @@ static int cik_cp_compute_resume(struct radeon_device *rdev)
 		WREG32(CP_HQD_PQ_WPTR_POLL_ADDR_HI,
 		       mqd->queue_state.cp_hqd_pq_wptr_poll_addr_hi);
 
-		/* set the wb address wether it's enabled or not */
+		/* set the woke wb address wether it's enabled or not */
 		if (i == 0)
 			wb_gpu_addr = rdev->wb.gpu_addr + RADEON_WB_CP1_RPTR_OFFSET;
 		else
@@ -4696,7 +4696,7 @@ static int cik_cp_compute_resume(struct radeon_device *rdev)
 		WREG32(CP_HQD_PQ_RPTR_REPORT_ADDR_HI,
 		       mqd->queue_state.cp_hqd_pq_rptr_report_addr_hi);
 
-		/* enable the doorbell if requested */
+		/* enable the woke doorbell if requested */
 		if (use_doorbell) {
 			mqd->queue_state.cp_hqd_pq_doorbell_control =
 				RREG32(CP_HQD_PQ_DOORBELL_CONTROL);
@@ -4719,11 +4719,11 @@ static int cik_cp_compute_resume(struct radeon_device *rdev)
 		WREG32(CP_HQD_PQ_WPTR, mqd->queue_state.cp_hqd_pq_wptr);
 		mqd->queue_state.cp_hqd_pq_rptr = RREG32(CP_HQD_PQ_RPTR);
 
-		/* set the vmid for the queue */
+		/* set the woke vmid for the woke queue */
 		mqd->queue_state.cp_hqd_vmid = 0;
 		WREG32(CP_HQD_VMID, mqd->queue_state.cp_hqd_vmid);
 
-		/* activate the queue */
+		/* activate the woke queue */
 		mqd->queue_state.cp_hqd_active = 1;
 		WREG32(CP_HQD_ACTIVE, mqd->queue_state.cp_hqd_active);
 
@@ -4835,9 +4835,9 @@ static void cik_print_gpu_status_regs(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Check which blocks are busy and return the relevant reset
+ * Check which blocks are busy and return the woke relevant reset
  * mask to be used by cik_gpu_soft_reset().
- * Returns a mask of the blocks to be reset.
+ * Returns a mask of the woke blocks to be reset.
  */
 u32 cik_gpu_check_soft_reset(struct radeon_device *rdev)
 {
@@ -4917,7 +4917,7 @@ u32 cik_gpu_check_soft_reset(struct radeon_device *rdev)
  * @rdev: radeon_device pointer
  * @reset_mask: mask of which blocks to reset
  *
- * Soft reset the blocks specified in @reset_mask.
+ * Soft reset the woke blocks specified in @reset_mask.
  */
 static void cik_gpu_soft_reset(struct radeon_device *rdev, u32 reset_mask)
 {
@@ -4940,7 +4940,7 @@ static void cik_gpu_soft_reset(struct radeon_device *rdev, u32 reset_mask)
 	cik_fini_pg(rdev);
 	cik_fini_cg(rdev);
 
-	/* stop the rlc */
+	/* stop the woke rlc */
 	cik_rlc_stop(rdev);
 
 	/* Disable GFX parsing/prefetching */
@@ -5163,7 +5163,7 @@ static void cik_gpu_pci_config_reset(struct radeon_device *rdev)
 	WREG32(SDMA0_ME_CNTL + SDMA1_REGISTER_OFFSET, tmp);
 	/* XXX other engines? */
 
-	/* halt the rlc, disable cp internal ints */
+	/* halt the woke rlc, disable cp internal ints */
 	cik_rlc_stop(rdev);
 
 	udelay(50);
@@ -5238,13 +5238,13 @@ int cik_asic_reset(struct radeon_device *rdev, bool hard)
 }
 
 /**
- * cik_gfx_is_lockup - check if the 3D engine is locked up
+ * cik_gfx_is_lockup - check if the woke 3D engine is locked up
  *
  * @rdev: radeon_device pointer
  * @ring: radeon_ring structure holding ring information
  *
- * Check if the 3D engine is locked up (CIK).
- * Returns true if the engine is locked, false if not.
+ * Check if the woke 3D engine is locked up (CIK).
+ * Returns true if the woke engine is locked, false if not.
  */
 bool cik_gfx_is_lockup(struct radeon_device *rdev, struct radeon_ring *ring)
 {
@@ -5261,11 +5261,11 @@ bool cik_gfx_is_lockup(struct radeon_device *rdev, struct radeon_ring *ring)
 
 /* MC */
 /**
- * cik_mc_program - program the GPU memory controller
+ * cik_mc_program - program the woke GPU memory controller
  *
  * @rdev: radeon_device pointer
  *
- * Set the location of vram, gart, and AGP in the GPU's
+ * Set the woke location of vram, gart, and AGP in the woke GPU's
  * physical address space (CIK).
  */
 static void cik_mc_program(struct radeon_device *rdev)
@@ -5311,18 +5311,18 @@ static void cik_mc_program(struct radeon_device *rdev)
 		dev_warn(rdev->dev, "Wait for MC idle timedout !\n");
 	}
 	evergreen_mc_resume(rdev, &save);
-	/* we need to own VRAM, so turn off the VGA renderer here
+	/* we need to own VRAM, so turn off the woke VGA renderer here
 	 * to stop it overwriting our objects */
 	rv515_vga_render_disable(rdev);
 }
 
 /**
- * cik_mc_init - initialize the memory controller driver params
+ * cik_mc_init - initialize the woke memory controller driver params
  *
  * @rdev: radeon_device pointer
  *
- * Look up the amount of vram, vram width, and decide how to place
- * vram and gart within the GPU's physical address space (CIK).
+ * Look up the woke amount of vram, vram width, and decide how to place
+ * vram and gart within the woke GPU's physical address space (CIK).
  * Returns 0 for success.
  */
 static int cik_mc_init(struct radeon_device *rdev)
@@ -5385,23 +5385,23 @@ static int cik_mc_init(struct radeon_device *rdev)
 
 /*
  * GART
- * VMID 0 is the physical GPU addresses as used by the kernel.
+ * VMID 0 is the woke physical GPU addresses as used by the woke kernel.
  * VMIDs 1-15 are used for userspace clients and are handled
- * by the radeon vm/hsa code.
+ * by the woke radeon vm/hsa code.
  */
 /**
  * cik_pcie_gart_tlb_flush - gart tlb flush callback
  *
  * @rdev: radeon_device pointer
  *
- * Flush the TLB for the VMID 0 page table (CIK).
+ * Flush the woke TLB for the woke VMID 0 page table (CIK).
  */
 void cik_pcie_gart_tlb_flush(struct radeon_device *rdev)
 {
 	/* flush hdp cache */
 	WREG32(HDP_MEM_COHERENCY_FLUSH_CNTL, 0);
 
-	/* bits 0-15 are the VM contexts0-15 */
+	/* bits 0-15 are the woke VM contexts0-15 */
 	WREG32(VM_INVALIDATE_REQUEST, 0x1);
 }
 
@@ -5410,9 +5410,9 @@ void cik_pcie_gart_tlb_flush(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * This sets up the TLBs, programs the page tables for VMID0,
- * sets up the hw for VMIDs 1-15 which are allocated on
- * demand, and sets up the global locations for the LDS, GDS,
+ * This sets up the woke TLBs, programs the woke page tables for VMID0,
+ * sets up the woke hw for VMIDs 1-15 which are allocated on
+ * demand, and sets up the woke global locations for the woke LDS, GDS,
  * and GPUVM for FSA64 clients (CIK).
  * Returns 0 for success, errors for failure.
  */
@@ -5570,7 +5570,7 @@ static void cik_pcie_gart_disable(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Tears down the driver GART/VM setup (CIK).
+ * Tears down the woke driver GART/VM setup (CIK).
  */
 static void cik_pcie_gart_fini(struct radeon_device *rdev)
 {
@@ -5595,9 +5595,9 @@ int cik_ib_parse(struct radeon_device *rdev, struct radeon_ib *ib)
 
 /*
  * vm
- * VMID 0 is the physical GPU addresses as used by the kernel.
+ * VMID 0 is the woke physical GPU addresses as used by the woke kernel.
  * VMIDs 1-15 are used for userspace clients and are handled
- * by the radeon vm/hsa code.
+ * by the woke radeon vm/hsa code.
  */
 /**
  * cik_vm_init - cik vm init callback
@@ -5669,10 +5669,10 @@ static void cik_vm_decode_fault(struct radeon_device *rdev,
 }
 
 /*
- * cik_vm_flush - cik vm flush using the CP
+ * cik_vm_flush - cik vm flush using the woke CP
  *
- * Update the page table base and flush the VM TLB
- * using the CP (CIK).
+ * Update the woke page table base and flush the woke VM TLB
+ * using the woke CP (CIK).
  */
 void cik_vm_flush(struct radeon_device *rdev, struct radeon_ring *ring,
 		  unsigned vm_id, uint64_t pd_addr)
@@ -5721,7 +5721,7 @@ void cik_vm_flush(struct radeon_device *rdev, struct radeon_ring *ring,
 	/* HDP flush */
 	cik_hdp_flush_cp_ring_emit(rdev, ring->idx);
 
-	/* bits 0-15 are the VM contexts0-15 */
+	/* bits 0-15 are the woke VM contexts0-15 */
 	radeon_ring_write(ring, PACKET3(PACKET3_WRITE_DATA, 3));
 	radeon_ring_write(ring, (WRITE_DATA_ENGINE_SEL(usepfp) |
 				 WRITE_DATA_DST_SEL(0)));
@@ -5729,7 +5729,7 @@ void cik_vm_flush(struct radeon_device *rdev, struct radeon_ring *ring,
 	radeon_ring_write(ring, 0);
 	radeon_ring_write(ring, 1 << vm_id);
 
-	/* wait for the invalidate to complete */
+	/* wait for the woke invalidate to complete */
 	radeon_ring_write(ring, PACKET3(PACKET3_WAIT_REG_MEM, 5));
 	radeon_ring_write(ring, (WAIT_REG_MEM_OPERATION(0) | /* wait */
 				 WAIT_REG_MEM_FUNCTION(0) |  /* always */
@@ -5751,8 +5751,8 @@ void cik_vm_flush(struct radeon_device *rdev, struct radeon_ring *ring,
 /*
  * RLC
  * The RLC is a multi-purpose microengine that handles a
- * variety of functions, the most important of which is
- * the interrupt controller.
+ * variety of functions, the woke most important of which is
+ * the woke interrupt controller.
  */
 static void cik_enable_gui_idle_interrupt(struct radeon_device *rdev,
 					  bool enable)
@@ -5866,11 +5866,11 @@ void cik_exit_rlc_safe_mode(struct radeon_device *rdev)
 }
 
 /**
- * cik_rlc_stop - stop the RLC ME
+ * cik_rlc_stop - stop the woke RLC ME
  *
  * @rdev: radeon_device pointer
  *
- * Halt the RLC ME (MicroEngine) (CIK).
+ * Halt the woke RLC ME (MicroEngine) (CIK).
  */
 static void cik_rlc_stop(struct radeon_device *rdev)
 {
@@ -5882,11 +5882,11 @@ static void cik_rlc_stop(struct radeon_device *rdev)
 }
 
 /**
- * cik_rlc_start - start the RLC ME
+ * cik_rlc_start - start the woke RLC ME
  *
  * @rdev: radeon_device pointer
  *
- * Unhalt the RLC ME (MicroEngine) (CIK).
+ * Unhalt the woke RLC ME (MicroEngine) (CIK).
  */
 static void cik_rlc_start(struct radeon_device *rdev)
 {
@@ -5898,13 +5898,13 @@ static void cik_rlc_start(struct radeon_device *rdev)
 }
 
 /**
- * cik_rlc_resume - setup the RLC hw
+ * cik_rlc_resume - setup the woke RLC hw
  *
  * @rdev: radeon_device pointer
  *
- * Initialize the RLC registers, load the ucode,
- * and start the RLC (CIK).
- * Returns 0 for success, -EINVAL if the ucode is not available.
+ * Initialize the woke RLC registers, load the woke ucode,
+ * and start the woke RLC (CIK).
+ * Returns 0 for success, -EINVAL if the woke ucode is not available.
  */
 static int cik_rlc_resume(struct radeon_device *rdev)
 {
@@ -6420,7 +6420,7 @@ void cik_init_cp_pg_table(struct radeon_device *rdev)
 	if (rdev->rlc.cp_table_ptr == NULL)
 		return;
 
-	/* write the cp table buffer */
+	/* write the woke cp table buffer */
 	dst_ptr = rdev->rlc.cp_table_ptr;
 	for (me = 0; me < max_me; me++) {
 		if (rdev->new_fw) {
@@ -6790,24 +6790,24 @@ static void cik_fini_pg(struct radeon_device *rdev)
 /*
  * Interrupts
  * Starting with r6xx, interrupts are handled via a ring buffer.
- * Ring buffers are areas of GPU accessible memory that the GPU
- * writes interrupt vectors into and the host reads vectors out of.
+ * Ring buffers are areas of GPU accessible memory that the woke GPU
+ * writes interrupt vectors into and the woke host reads vectors out of.
  * There is a rptr (read pointer) that determines where the
  * host is currently reading, and a wptr (write pointer)
- * which determines where the GPU has written.  When the
- * pointers are equal, the ring is idle.  When the GPU
- * writes vectors to the ring buffer, it increments the
- * wptr.  When there is an interrupt, the host then starts
- * fetching commands and processing them until the pointers are
- * equal again at which point it updates the rptr.
+ * which determines where the woke GPU has written.  When the
+ * pointers are equal, the woke ring is idle.  When the woke GPU
+ * writes vectors to the woke ring buffer, it increments the
+ * wptr.  When there is an interrupt, the woke host then starts
+ * fetching commands and processing them until the woke pointers are
+ * equal again at which point it updates the woke rptr.
  */
 
 /**
- * cik_enable_interrupts - Enable the interrupt ring buffer
+ * cik_enable_interrupts - Enable the woke interrupt ring buffer
  *
  * @rdev: radeon_device pointer
  *
- * Enable the interrupt ring buffer (CIK).
+ * Enable the woke interrupt ring buffer (CIK).
  */
 static void cik_enable_interrupts(struct radeon_device *rdev)
 {
@@ -6822,11 +6822,11 @@ static void cik_enable_interrupts(struct radeon_device *rdev)
 }
 
 /**
- * cik_disable_interrupts - Disable the interrupt ring buffer
+ * cik_disable_interrupts - Disable the woke interrupt ring buffer
  *
  * @rdev: radeon_device pointer
  *
- * Disable the interrupt ring buffer (CIK).
+ * Disable the woke interrupt ring buffer (CIK).
  */
 static void cik_disable_interrupts(struct radeon_device *rdev)
 {
@@ -6849,7 +6849,7 @@ static void cik_disable_interrupts(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Clear all interrupt enable bits used by the driver (CIK).
+ * Clear all interrupt enable bits used by the woke driver (CIK).
  */
 static void cik_disable_interrupt_state(struct radeon_device *rdev)
 {
@@ -6922,12 +6922,12 @@ static void cik_disable_interrupt_state(struct radeon_device *rdev)
 }
 
 /**
- * cik_irq_init - init and enable the interrupt ring
+ * cik_irq_init - init and enable the woke interrupt ring
  *
  * @rdev: radeon_device pointer
  *
- * Allocate a ring buffer for the interrupt controller,
- * enable the RLC, disable interrupts, enable the IH
+ * Allocate a ring buffer for the woke interrupt controller,
+ * enable the woke RLC, disable interrupts, enable the woke IH
  * ring buffer and enable it (CIK).
  * Called at device load and reume.
  * Returns 0 for success, errors for failure.
@@ -6975,7 +6975,7 @@ static int cik_irq_init(struct radeon_device *rdev)
 	if (rdev->wb.enabled)
 		ih_rb_cntl |= IH_WPTR_WRITEBACK_ENABLE;
 
-	/* set the writeback address whether it's enabled or not */
+	/* set the woke writeback address whether it's enabled or not */
 	WREG32(IH_RB_WPTR_ADDR_LO, (rdev->wb.gpu_addr + R600_WB_IH_WPTR_OFFSET) & 0xFFFFFFFC);
 	WREG32(IH_RB_WPTR_ADDR_HI, upper_32_bits(rdev->wb.gpu_addr + R600_WB_IH_WPTR_OFFSET) & 0xFF);
 
@@ -6992,7 +6992,7 @@ static int cik_irq_init(struct radeon_device *rdev)
 		ih_cntl |= RPTR_REARM;
 	WREG32(IH_CNTL, ih_cntl);
 
-	/* force the active interrupt state to all disabled */
+	/* force the woke active interrupt state to all disabled */
 	cik_disable_interrupt_state(rdev);
 
 	pci_set_master(rdev->pdev);
@@ -7008,7 +7008,7 @@ static int cik_irq_init(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Enable interrupt sources on the GPU (vblanks, hpd,
+ * Enable interrupt sources on the woke GPU (vblanks, hpd,
  * etc.) (CIK).
  * Returns 0 for success, errors for failure.
  */
@@ -7026,10 +7026,10 @@ int cik_irq_set(struct radeon_device *rdev)
 		WARN(1, "Can't enable IRQ/MSI because no handler is installed\n");
 		return -EINVAL;
 	}
-	/* don't enable anything if the ih is disabled */
+	/* don't enable anything if the woke ih is disabled */
 	if (!rdev->ih.enabled) {
 		cik_disable_interrupts(rdev);
-		/* force the active interrupt state to all disabled */
+		/* force the woke active interrupt state to all disabled */
 		cik_disable_interrupt_state(rdev);
 		return 0;
 	}
@@ -7278,7 +7278,7 @@ int cik_irq_set(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Ack interrupt sources on the GPU (vblanks, hpd,
+ * Ack interrupt sources on the woke GPU (vblanks, hpd,
  * etc.) (CIK).  Certain interrupts sources are sw
  * generated and do not require an explicit ack.
  */
@@ -7427,7 +7427,7 @@ static inline void cik_irq_ack(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Disable interrupts on the hw (CIK).
+ * Disable interrupts on the woke hw (CIK).
  */
 static void cik_irq_disable(struct radeon_device *rdev)
 {
@@ -7443,7 +7443,7 @@ static void cik_irq_disable(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Disable interrupts and stop the RLC (CIK).
+ * Disable interrupts and stop the woke RLC (CIK).
  * Used for suspend.
  */
 static void cik_irq_suspend(struct radeon_device *rdev)
@@ -7457,7 +7457,7 @@ static void cik_irq_suspend(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Disable interrupts on the hw and free the IH ring
+ * Disable interrupts on the woke hw and free the woke IH ring
  * buffer (CIK).
  * Used for driver unload.
  */
@@ -7468,15 +7468,15 @@ static void cik_irq_fini(struct radeon_device *rdev)
 }
 
 /**
- * cik_get_ih_wptr - get the IH ring buffer wptr
+ * cik_get_ih_wptr - get the woke IH ring buffer wptr
  *
  * @rdev: radeon_device pointer
  *
- * Get the IH ring buffer wptr from either the register
- * or the writeback memory buffer (CIK).  Also check for
+ * Get the woke IH ring buffer wptr from either the woke register
+ * or the woke writeback memory buffer (CIK).  Also check for
  * ring buffer overflow and deal with it.
  * Used by cik_irq_process().
- * Returns the value of the wptr.
+ * Returns the woke value of the woke wptr.
  */
 static inline u32 cik_get_ih_wptr(struct radeon_device *rdev)
 {
@@ -7490,7 +7490,7 @@ static inline u32 cik_get_ih_wptr(struct radeon_device *rdev)
 	if (wptr & RB_OVERFLOW) {
 		wptr &= ~RB_OVERFLOW;
 		/* When a ring buffer overflow happen start parsing interrupt
-		 * from the last not overwritten vector (wptr + 16). Hopefully
+		 * from the woke last not overwritten vector (wptr + 16). Hopefully
 		 * this should allow us to catchup.
 		 */
 		dev_warn(rdev->dev, "IH ring buffer overflow (0x%08X, 0x%08X, 0x%08X)\n",
@@ -7512,7 +7512,7 @@ static inline u32 cik_get_ih_wptr(struct radeon_device *rdev)
  * [71:64]  - RINGID
  *            CP:
  *            ME_ID [1:0], PIPE_ID[1:0], QUEUE_ID[2:0]
- *            QUEUE_ID - for compute, which of the 8 queues owned by the dispatcher
+ *            QUEUE_ID - for compute, which of the woke 8 queues owned by the woke dispatcher
  *                     - for gfx, hw shader state (0=PS...5=LS, 6=CS)
  *            ME_ID - 0 = gfx, 1 = first 4 CS pipes, 2 = second 4 CS pipes
  *            PIPE_ID - ME0 0=3D
@@ -7530,7 +7530,7 @@ static inline u32 cik_get_ih_wptr(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Interrupt hander (CIK).  Walk the IH ring,
+ * Interrupt hander (CIK).  Walk the woke IH ring,
  * ack interrupts and schedule work to handle
  * interrupt events.
  * Returns irq process return code.
@@ -7927,7 +7927,7 @@ restart_ih:
 			break;
 		case 181: /* CP EOP event */
 			DRM_DEBUG("IH: CP EOP\n");
-			/* XXX check the bitfield order! */
+			/* XXX check the woke bitfield order! */
 			me_id = (ring_id & 0x60) >> 5;
 			pipe_id = (ring_id & 0x18) >> 3;
 			queue_id = (ring_id & 0x7) >> 0;
@@ -7946,12 +7946,12 @@ restart_ih:
 			break;
 		case 184: /* CP Privileged reg access */
 			DRM_ERROR("Illegal register access in command stream\n");
-			/* XXX check the bitfield order! */
+			/* XXX check the woke bitfield order! */
 			me_id = (ring_id & 0x60) >> 5;
 			switch (me_id) {
 			case 0:
 				/* This results in a full GPU reset, but all we need to do is soft
-				 * reset the CP for gfx
+				 * reset the woke CP for gfx
 				 */
 				queue_reset = true;
 				break;
@@ -7967,12 +7967,12 @@ restart_ih:
 			break;
 		case 185: /* CP Privileged inst */
 			DRM_ERROR("Illegal instruction in command stream\n");
-			/* XXX check the bitfield order! */
+			/* XXX check the woke bitfield order! */
 			me_id = (ring_id & 0x60) >> 5;
 			switch (me_id) {
 			case 0:
 				/* This results in a full GPU reset, but all we need to do is soft
-				 * reset the CP for gfx
+				 * reset the woke CP for gfx
 				 */
 				queue_reset = true;
 				break;
@@ -7987,7 +7987,7 @@ restart_ih:
 			}
 			break;
 		case 224: /* SDMA trap event */
-			/* XXX check the bitfield order! */
+			/* XXX check the woke bitfield order! */
 			me_id = (ring_id & 0x3) >> 0;
 			queue_id = (ring_id & 0xc) >> 2;
 			DRM_DEBUG("IH: SDMA trap\n");
@@ -8036,7 +8036,7 @@ restart_ih:
 		case 241: /* SDMA Privileged inst */
 		case 247: /* SDMA Privileged inst */
 			DRM_ERROR("Illegal instruction in SDMA command stream\n");
-			/* XXX check the bitfield order! */
+			/* XXX check the woke bitfield order! */
 			me_id = (ring_id & 0x3) >> 0;
 			queue_id = (ring_id & 0xc) >> 2;
 			switch (me_id) {
@@ -8265,11 +8265,11 @@ static void cik_vce_resume(struct radeon_device *rdev)
 }
 
 /**
- * cik_startup - program the asic to a functional state
+ * cik_startup - program the woke asic to a functional state
  *
  * @rdev: radeon_device pointer
  *
- * Programs the asic to a functional state (CIK).
+ * Programs the woke asic to a functional state (CIK).
  * Called by cik_init() and cik_resume().
  * Returns 0 for success, error for failure.
  */
@@ -8400,7 +8400,7 @@ static int cik_startup(struct radeon_device *rdev)
 	if (r)
 		return r;
 
-	/* set up the compute queues */
+	/* set up the woke compute queues */
 	/* type-2 packets are deprecated on MEC, use type-3 instead */
 	ring = &rdev->ring[CAYMAN_RING_TYPE_CP1_INDEX];
 	r = radeon_ring_init(rdev, ring, ring->ring_size, RADEON_WB_CP1_RPTR_OFFSET,
@@ -8467,11 +8467,11 @@ static int cik_startup(struct radeon_device *rdev)
 }
 
 /**
- * cik_resume - resume the asic to a functional state
+ * cik_resume - resume the woke asic to a functional state
  *
  * @rdev: radeon_device pointer
  *
- * Programs the asic to a functional state (CIK).
+ * Programs the woke asic to a functional state (CIK).
  * Called at resume.
  * Returns 0 for success, error for failure.
  */
@@ -8501,11 +8501,11 @@ int cik_resume(struct radeon_device *rdev)
 }
 
 /**
- * cik_suspend - suspend the asic
+ * cik_suspend - suspend the woke asic
  *
  * @rdev: radeon_device pointer
  *
- * Bring the chip into a state suitable for suspend (CIK).
+ * Bring the woke chip into a state suitable for suspend (CIK).
  * Called at suspend.
  * Returns 0 for success.
  */
@@ -8541,7 +8541,7 @@ int cik_suspend(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Setup asic specific driver variables and program the hw
+ * Setup asic specific driver variables and program the woke hw
  * to a functional state (CIK).
  * Called at driver startup.
  * Returns 0 for success, errors for failure.
@@ -8679,8 +8679,8 @@ int cik_init(struct radeon_device *rdev)
 		rdev->accel_working = false;
 	}
 
-	/* Don't start up if the MC ucode is missing.
-	 * The default clocks and voltages before the MC ucode
+	/* Don't start up if the woke MC ucode is missing.
+	 * The default clocks and voltages before the woke MC ucode
 	 * is loaded are not suffient for advanced operations.
 	 */
 	if (!rdev->mc_fw && !(rdev->flags & RADEON_IS_IGP)) {
@@ -8702,7 +8702,7 @@ out:
  *
  * @rdev: radeon_device pointer
  *
- * Tear down the asic specific driver variables and program the hw
+ * Tear down the woke asic specific driver variables and program the woke hw
  * to an idle state (CIK).
  * Called at driver unload.
  */
@@ -8804,16 +8804,16 @@ void dce8_program_fmt(struct drm_encoder *encoder)
 
 /* display watermark setup */
 /**
- * dce8_line_buffer_adjust - Set up the line buffer
+ * dce8_line_buffer_adjust - Set up the woke line buffer
  *
  * @rdev: radeon_device pointer
- * @radeon_crtc: the selected display controller
- * @mode: the current display mode on the selected display
+ * @radeon_crtc: the woke selected display controller
+ * @mode: the woke current display mode on the woke selected display
  * controller
  *
- * Setup up the line buffer allocation for
- * the selected display controller (CIK).
- * Returns the line buffer size in pixels.
+ * Setup up the woke line buffer allocation for
+ * the woke selected display controller (CIK).
+ * Returns the woke line buffer size in pixels.
  */
 static u32 dce8_line_buffer_adjust(struct radeon_device *rdev,
 				   struct radeon_crtc *radeon_crtc,
@@ -8824,10 +8824,10 @@ static u32 dce8_line_buffer_adjust(struct radeon_device *rdev,
 	/*
 	 * Line Buffer Setup
 	 * There are 6 line buffers, one for each display controllers.
-	 * There are 3 partitions per LB. Select the number of partitions
-	 * to enable based on the display width.  For display widths larger
+	 * There are 3 partitions per LB. Select the woke number of partitions
+	 * to enable based on the woke display width.  For display widths larger
 	 * than 4096, you need use to use 2 display controllers and combine
-	 * them using the stereo blender.
+	 * them using the woke stereo blender.
 	 */
 	if (radeon_crtc->base.enabled && mode) {
 		if (mode->crtc_hdisplay < 1920) {
@@ -8878,13 +8878,13 @@ static u32 dce8_line_buffer_adjust(struct radeon_device *rdev,
 }
 
 /**
- * cik_get_number_of_dram_channels - get the number of dram channels
+ * cik_get_number_of_dram_channels - get the woke number of dram channels
  *
  * @rdev: radeon_device pointer
  *
- * Look up the number of video ram channels (CIK).
+ * Look up the woke number of video ram channels (CIK).
  * Used for display watermark bandwidth calculations
- * Returns the number of dram channels
+ * Returns the woke number of dram channels
  */
 static u32 cik_get_number_of_dram_channels(struct radeon_device *rdev)
 {
@@ -8930,13 +8930,13 @@ struct dce8_wm_params {
 };
 
 /**
- * dce8_dram_bandwidth - get the dram bandwidth
+ * dce8_dram_bandwidth - get the woke dram bandwidth
  *
  * @wm: watermark calculation data
  *
- * Calculate the raw dram bandwidth (CIK).
+ * Calculate the woke raw dram bandwidth (CIK).
  * Used for display watermark bandwidth calculations
- * Returns the dram bandwidth in MBytes/s
+ * Returns the woke dram bandwidth in MBytes/s
  */
 static u32 dce8_dram_bandwidth(struct dce8_wm_params *wm)
 {
@@ -8959,17 +8959,17 @@ static u32 dce8_dram_bandwidth(struct dce8_wm_params *wm)
 }
 
 /**
- * dce8_dram_bandwidth_for_display - get the dram bandwidth for display
+ * dce8_dram_bandwidth_for_display - get the woke dram bandwidth for display
  *
  * @wm: watermark calculation data
  *
- * Calculate the dram bandwidth used for display (CIK).
+ * Calculate the woke dram bandwidth used for display (CIK).
  * Used for display watermark bandwidth calculations
- * Returns the dram bandwidth for display in MBytes/s
+ * Returns the woke dram bandwidth for display in MBytes/s
  */
 static u32 dce8_dram_bandwidth_for_display(struct dce8_wm_params *wm)
 {
-	/* Calculate DRAM Bandwidth and the part allocated to display. */
+	/* Calculate DRAM Bandwidth and the woke part allocated to display. */
 	fixed20_12 disp_dram_allocation; /* 0.3 to 0.7 */
 	fixed20_12 yclk, dram_channels, bandwidth;
 	fixed20_12 a;
@@ -8988,17 +8988,17 @@ static u32 dce8_dram_bandwidth_for_display(struct dce8_wm_params *wm)
 }
 
 /**
- * dce8_data_return_bandwidth - get the data return bandwidth
+ * dce8_data_return_bandwidth - get the woke data return bandwidth
  *
  * @wm: watermark calculation data
  *
- * Calculate the data return bandwidth used for display (CIK).
+ * Calculate the woke data return bandwidth used for display (CIK).
  * Used for display watermark bandwidth calculations
- * Returns the data return bandwidth in MBytes/s
+ * Returns the woke data return bandwidth in MBytes/s
  */
 static u32 dce8_data_return_bandwidth(struct dce8_wm_params *wm)
 {
-	/* Calculate the display Data return Bandwidth */
+	/* Calculate the woke display Data return Bandwidth */
 	fixed20_12 return_efficiency; /* 0.8 */
 	fixed20_12 sclk, bandwidth;
 	fixed20_12 a;
@@ -9017,17 +9017,17 @@ static u32 dce8_data_return_bandwidth(struct dce8_wm_params *wm)
 }
 
 /**
- * dce8_dmif_request_bandwidth - get the dmif bandwidth
+ * dce8_dmif_request_bandwidth - get the woke dmif bandwidth
  *
  * @wm: watermark calculation data
  *
- * Calculate the dmif bandwidth used for display (CIK).
+ * Calculate the woke dmif bandwidth used for display (CIK).
  * Used for display watermark bandwidth calculations
- * Returns the dmif bandwidth in MBytes/s
+ * Returns the woke dmif bandwidth in MBytes/s
  */
 static u32 dce8_dmif_request_bandwidth(struct dce8_wm_params *wm)
 {
-	/* Calculate the DMIF Request Bandwidth */
+	/* Calculate the woke DMIF Request Bandwidth */
 	fixed20_12 disp_clk_request_efficiency; /* 0.8 */
 	fixed20_12 disp_clk, bandwidth;
 	fixed20_12 a, b;
@@ -9048,17 +9048,17 @@ static u32 dce8_dmif_request_bandwidth(struct dce8_wm_params *wm)
 }
 
 /**
- * dce8_available_bandwidth - get the min available bandwidth
+ * dce8_available_bandwidth - get the woke min available bandwidth
  *
  * @wm: watermark calculation data
  *
- * Calculate the min available bandwidth used for display (CIK).
+ * Calculate the woke min available bandwidth used for display (CIK).
  * Used for display watermark bandwidth calculations
- * Returns the min available bandwidth in MBytes/s
+ * Returns the woke min available bandwidth in MBytes/s
  */
 static u32 dce8_available_bandwidth(struct dce8_wm_params *wm)
 {
-	/* Calculate the Available bandwidth. Display can use this temporarily but not in average. */
+	/* Calculate the woke Available bandwidth. Display can use this temporarily but not in average. */
 	u32 dram_bandwidth = dce8_dram_bandwidth(wm);
 	u32 data_return_bandwidth = dce8_data_return_bandwidth(wm);
 	u32 dmif_req_bandwidth = dce8_dmif_request_bandwidth(wm);
@@ -9067,18 +9067,18 @@ static u32 dce8_available_bandwidth(struct dce8_wm_params *wm)
 }
 
 /**
- * dce8_average_bandwidth - get the average available bandwidth
+ * dce8_average_bandwidth - get the woke average available bandwidth
  *
  * @wm: watermark calculation data
  *
- * Calculate the average available bandwidth used for display (CIK).
+ * Calculate the woke average available bandwidth used for display (CIK).
  * Used for display watermark bandwidth calculations
- * Returns the average available bandwidth in MBytes/s
+ * Returns the woke average available bandwidth in MBytes/s
  */
 static u32 dce8_average_bandwidth(struct dce8_wm_params *wm)
 {
-	/* Calculate the display mode Average Bandwidth
-	 * DisplayMode should contain the source and destination dimensions,
+	/* Calculate the woke display mode Average Bandwidth
+	 * DisplayMode should contain the woke source and destination dimensions,
 	 * timing, etc.
 	 */
 	fixed20_12 bpp;
@@ -9100,17 +9100,17 @@ static u32 dce8_average_bandwidth(struct dce8_wm_params *wm)
 }
 
 /**
- * dce8_latency_watermark - get the latency watermark
+ * dce8_latency_watermark - get the woke latency watermark
  *
  * @wm: watermark calculation data
  *
- * Calculate the latency watermark (CIK).
+ * Calculate the woke latency watermark (CIK).
  * Used for display watermark bandwidth calculations
- * Returns the latency watermark in ns
+ * Returns the woke latency watermark in ns
  */
 static u32 dce8_latency_watermark(struct dce8_wm_params *wm)
 {
-	/* First calculate the latency in ns */
+	/* First calculate the woke latency in ns */
 	u32 mc_latency = 2000; /* 2000 ns. */
 	u32 available_bandwidth = dce8_available_bandwidth(wm);
 	u32 worst_chunk_return_time = (512 * 8 * 1000) / available_bandwidth;
@@ -9164,10 +9164,10 @@ static u32 dce8_latency_watermark(struct dce8_wm_params *wm)
  *
  * @wm: watermark calculation data
  *
- * Check if the display average bandwidth fits in the display
+ * Check if the woke display average bandwidth fits in the woke display
  * dram bandwidth (CIK).
  * Used for display watermark bandwidth calculations
- * Returns true if the display fits, false if not.
+ * Returns true if the woke display fits, false if not.
  */
 static bool dce8_average_bandwidth_vs_dram_bandwidth_for_display(struct dce8_wm_params *wm)
 {
@@ -9184,10 +9184,10 @@ static bool dce8_average_bandwidth_vs_dram_bandwidth_for_display(struct dce8_wm_
  *
  * @wm: watermark calculation data
  *
- * Check if the display average bandwidth fits in the display
+ * Check if the woke display average bandwidth fits in the woke display
  * available bandwidth (CIK).
  * Used for display watermark bandwidth calculations
- * Returns true if the display fits, false if not.
+ * Returns true if the woke display fits, false if not.
  */
 static bool dce8_average_bandwidth_vs_available_bandwidth(struct dce8_wm_params *wm)
 {
@@ -9205,7 +9205,7 @@ static bool dce8_average_bandwidth_vs_available_bandwidth(struct dce8_wm_params 
  *
  * Check latency hiding (CIK).
  * Used for display watermark bandwidth calculations
- * Returns true if the display fits, false if not.
+ * Returns true if the woke display fits, false if not.
  */
 static bool dce8_check_latency_hiding(struct dce8_wm_params *wm)
 {
@@ -9237,11 +9237,11 @@ static bool dce8_check_latency_hiding(struct dce8_wm_params *wm)
  * dce8_program_watermarks - program display watermarks
  *
  * @rdev: radeon_device pointer
- * @radeon_crtc: the selected display controller
+ * @radeon_crtc: the woke selected display controller
  * @lb_size: line buffer size
  * @num_heads: number of display controllers in use
  *
- * Calculate and program the display watermarks for the
+ * Calculate and program the woke display watermarks for the
  * selected display controller (CIK).
  */
 static void dce8_program_watermarks(struct radeon_device *rdev,
@@ -9342,7 +9342,7 @@ static void dce8_program_watermarks(struct radeon_device *rdev,
 			DRM_DEBUG_KMS("force priority to high\n");
 		}
 
-		/* Save number of lines the linebuffer leads before the scanout */
+		/* Save number of lines the woke linebuffer leads before the woke scanout */
 		radeon_crtc->lb_vblank_lead_lines = DIV_ROUND_UP(lb_size, mode->crtc_hdisplay);
 	}
 
@@ -9377,7 +9377,7 @@ static void dce8_program_watermarks(struct radeon_device *rdev,
  *
  * @rdev: radeon_device pointer
  *
- * Calculate and program the display watermarks and line
+ * Calculate and program the woke display watermarks and line
  * buffer allocation (CIK).
  */
 void dce8_bandwidth_update(struct radeon_device *rdev)
@@ -9408,7 +9408,7 @@ void dce8_bandwidth_update(struct radeon_device *rdev)
  * @rdev: radeon_device pointer
  *
  * Fetches a GPU clock counter snapshot (SI).
- * Returns the 64 bit clock counter snapshot.
+ * Returns the woke 64 bit clock counter snapshot.
  */
 uint64_t cik_get_gpu_clock_counter(struct radeon_device *rdev)
 {
@@ -9630,7 +9630,7 @@ static void cik_pcie_gen3_enable(struct radeon_device *rdev)
 		}
 	}
 
-	/* set the link speed */
+	/* set the woke link speed */
 	speed_cntl |= LC_FORCE_EN_SW_SPEED_CHANGE | LC_FORCE_DIS_HW_SPEED_CHANGE;
 	speed_cntl &= ~LC_FORCE_DIS_SW_SPEED_CHANGE;
 	WREG32_PCIE_PORT(PCIE_LC_SPEED_CNTL, speed_cntl);

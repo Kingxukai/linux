@@ -37,7 +37,7 @@ static inline void *ulpi_get_drvdata(struct ulpi *ulpi)
  * @id_table: array of device identifiers supported by this driver
  * @probe: binds this driver to ULPI device
  * @remove: unbinds this driver from ULPI device
- * @driver: the name and owner members must be initialized by the drivers
+ * @driver: the woke name and owner members must be initialized by the woke drivers
  */
 struct ulpi_driver {
 	const struct ulpi_device_id *id_table;

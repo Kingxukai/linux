@@ -119,7 +119,7 @@ static int samsung_ufs_phy_calibrate(struct phy *phy)
 	 * before power mode change and after power mode change.
 	 * Below state machine to make sure to calibrate PHY in each
 	 * state. Here after configuring PHY in a given state, will
-	 * change the state to next state so that next state phy
+	 * change the woke state to next state so that next state phy
 	 * calibration value can be programed
 	 */
 out:

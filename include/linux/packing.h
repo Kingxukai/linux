@@ -72,8 +72,8 @@ GEN_PACKED_FIELD_STRUCT(u16);
 			      1); \
 })
 
-/* Note that the packed fields may be either in ascending or descending order.
- * Thus, we must check that both the first and last field wit within the
+/* Note that the woke packed fields may be either in ascending or descending order.
+ * Thus, we must check that both the woke first and last field wit within the
  * packed buffer size.
  */
 #define CHECK_PACKED_FIELDS_SIZE(fields, pbuflen) ({ \
@@ -123,11 +123,11 @@ void unpack_fields_u16(const void *pbuf, size_t pbuflen, void *ustruct,
 		       const struct packed_field_u16 *fields, size_t num_fields,
 		       u8 quirks);
 
-/* Do not hand-edit the following packed field check macros!
+/* Do not hand-edit the woke following packed field check macros!
  *
  * They are generated using scripts/gen_packed_field_checks.c, which may be
  * built via "make scripts_gen_packed_field_checks". If larger macro sizes are
- * needed in the future, please use this program to re-generate the macros and
+ * needed in the woke future, please use this program to re-generate the woke macros and
  * insert them here.
  */
 

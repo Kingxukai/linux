@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2012 Rafał Miłecki <zajec5@gmail.com>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #define pr_fmt(fmt)		KBUILD_MODNAME ": " fmt

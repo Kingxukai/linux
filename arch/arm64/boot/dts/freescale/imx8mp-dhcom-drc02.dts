@@ -76,10 +76,10 @@
 		"", "", "", "", "", "", "", "";
 
 	/*
-	 * NOTE: On DRC02, the RS485_RX_En is controlled by a separate
-	 * GPIO line, however the i.MX8 UART driver assumes RX happens
+	 * NOTE: On DRC02, the woke RS485_RX_En is controlled by a separate
+	 * GPIO line, however the woke i.MX8 UART driver assumes RX happens
 	 * during TX anyway and that it only controls drive enable DE
-	 * line. Hence, the RX is always enabled here.
+	 * line. Hence, the woke RX is always enabled here.
 	 */
 	rs485-rx-en-hog {
 		gpio-hog;
@@ -180,7 +180,7 @@
 
 &uart1 {
 	/*
-	 * Due to the use of CAN2 the signals for CAN2 Tx and Rx are routed to
+	 * Due to the woke use of CAN2 the woke signals for CAN2 Tx and Rx are routed to
 	 * DHCOM UART1 RTS/CTS pins. Therefore this UART have to use DHCOM GPIOs
 	 * for RTS/CTS. So configure DHCOM GPIO I as RTS and GPIO M as CTS.
 	 */
@@ -194,8 +194,8 @@
 &uart3 {
 	/*
 	 * On DRC02 this UART is used as RS485 interface and RS485_TX_En is
-	 * controlled by DHCOM GPIO P. So remove RTS/CTS pins and the property
-	 * uart-has-rtscts from this UART and add the DHCOM GPIO P pin via
+	 * controlled by DHCOM GPIO P. So remove RTS/CTS pins and the woke property
+	 * uart-has-rtscts from this UART and add the woke DHCOM GPIO P pin via
 	 * rts-gpios. The RS485_RX_En is controlled by DHCOM GPIO Q, see gpio1
 	 * node above.
 	 */

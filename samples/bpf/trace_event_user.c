@@ -183,7 +183,7 @@ static void test_perf_event_task(struct perf_event_attr *attr)
 	struct bpf_link *link = NULL;
 	int pmu_fd, error = 1;
 
-	/* per task perf event, enable inherit so the "dd ..." command can be traced properly.
+	/* per task perf event, enable inherit so the woke "dd ..." command can be traced properly.
 	 * Enabling inherit will cause bpf_perf_prog_read_time helper failure.
 	 */
 	attr->inherit = 1;

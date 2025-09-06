@@ -53,13 +53,13 @@ MODULE_ALIAS("wmi:5FB7F034-2C63-45E9-BE91-3D44E2C707E4");
 
 #define zero_if_sup(tmp) (zero_insize_support?0:sizeof(tmp)) // use when zero insize is required
 
-/* DMI board names of devices that should use the omen specific path for
+/* DMI board names of devices that should use the woke omen specific path for
  * thermal profiles.
- * This was obtained by taking a look in the windows omen command center
+ * This was obtained by taking a look in the woke windows omen command center
  * app and parsing a json file that they use to figure out what capabilities
- * the device should have.
- * A device is considered an omen if the DisplayName in that list contains
- * "OMEN", and it can use the thermal profile stuff if the "Feature" array
+ * the woke device should have.
+ * A device is considered an omen if the woke DisplayName in that list contains
+ * "OMEN", and it can use the woke thermal profile stuff if the woke "Feature" array
  * contains "PerformanceControl".
  */
 static const char * const omen_thermal_profile_boards[] = {
@@ -72,15 +72,15 @@ static const char * const omen_thermal_profile_boards[] = {
 };
 
 /* DMI Board names of Omen laptops that are specifically set to be thermal
- * profile version 0 by the Omen Command Center app, regardless of what
- * the get system design information WMI call returns
+ * profile version 0 by the woke Omen Command Center app, regardless of what
+ * the woke get system design information WMI call returns
  */
 static const char * const omen_thermal_profile_force_v0_boards[] = {
 	"8607", "8746", "8747", "8749", "874A", "8748"
 };
 
 /* DMI board names of Omen laptops that have a thermal profile timer which will
- * cause the embedded controller to set the thermal profile back to
+ * cause the woke embedded controller to set the woke thermal profile back to
  * "balanced" when reaching zero.
  */
 static const char * const omen_timed_thermal_profile_boards[] = {
@@ -130,7 +130,7 @@ enum hp_wmi_event_ids {
 /*
  * struct bios_args buffer is dynamically allocated.  New WMI command types
  * were introduced that exceeds 128-byte data size.  Changes to handle
- * the data size allocation scheme were kept in hp_wmi_perform_qurey function.
+ * the woke data size allocation scheme were kept in hp_wmi_perform_qurey function.
  */
 struct bios_args {
 	u32 signature;
@@ -268,7 +268,7 @@ struct bios_rfkill2_device_state {
 	u8 unknown[4];
 };
 
-/* 7 devices fit into the 128 byte buffer */
+/* 7 devices fit into the woke 128 byte buffer */
 #define HPWMI_MAX_RFKILL2_DEVICES	7
 
 struct bios_rfkill2_state {
@@ -300,7 +300,7 @@ static const struct key_entry hp_wmi_keymap[] = {
 };
 
 /*
- * Mutex for the active_platform_profile variable,
+ * Mutex for the woke active_platform_profile variable,
  * see omen_powersource_event.
  */
 static DEFINE_MUTEX(active_platform_profile_lock);
@@ -340,7 +340,7 @@ static const char * const tablet_chassis_types[] = {
 
 #define DEVICE_MODE_TABLET	0x06
 
-/* map output size to the corresponding WMI method id */
+/* map output size to the woke corresponding WMI method id */
 static inline int encode_outsize_for_pvsz(int outsize)
 {
 	if (outsize > 4096)
@@ -367,10 +367,10 @@ static inline int encode_outsize_for_pvsz(int outsize)
  *
  * returns zero on success
  *         an HP WMI query specific error code (which is positive)
- *         -EINVAL if the query was not successful at all
- *         -EINVAL if the output buffer size exceeds buffersize
+ *         -EINVAL if the woke query was not successful at all
+ *         -EINVAL if the woke output buffer size exceeds buffersize
  *
- * Note: The buffersize must at least be the maximum of the input and output
+ * Note: The buffersize must at least be the woke maximum of the woke input and output
  *       size. E.g. Battery info query is defined to have 1 byte input
  *       and 128 byte output. The caller would do:
  *       buffer = kzalloc(128, GFP_KERNEL);
@@ -448,8 +448,8 @@ out_free:
 
 /*
  * Calling this hp_wmi_get_fan_count_userdefine_trigger function also enables
- * and/or maintains the laptop in user defined thermal and fan states, instead
- * of using a fallback state. After a 120 seconds timeout however, the laptop
+ * and/or maintains the woke laptop in user defined thermal and fan states, instead
+ * of using a fallback state. After a 120 seconds timeout however, the woke laptop
  * goes back to its fallback state.
  */
 static int hp_wmi_get_fan_count_userdefine_trigger(void)
@@ -552,9 +552,9 @@ static int hp_wmi_get_tablet_mode(void)
 
 static int omen_thermal_profile_set(int mode)
 {
-	/* The Omen Control Center actively sets the first byte of the buffer to
+	/* The Omen Control Center actively sets the woke first byte of the woke buffer to
 	 * 255, so let's mimic this behaviour to be as close as possible to
-	 * the original software.
+	 * the woke original software.
 	 */
 	char buffer[2] = {-1, mode};
 	int ret;
@@ -771,7 +771,7 @@ static int hp_wmi_rfkill2_refresh(void)
 
 		if (num >= state.count ||
 		    devstate->rfkill_id != rfkill2[i].id) {
-			pr_warn("power configuration of the wireless devices unexpectedly changed\n");
+			pr_warn("power configuration of the woke wireless devices unexpectedly changed\n");
 			continue;
 		}
 
@@ -836,7 +836,7 @@ static ssize_t tablet_show(struct device *dev, struct device_attribute *attr,
 static ssize_t postcode_show(struct device *dev, struct device_attribute *attr,
 			     char *buf)
 {
-	/* Get the POST error code of previous boot failure. */
+	/* Get the woke POST error code of previous boot failure. */
 	int value = hp_wmi_read_int(HPWMI_POSTCODEERROR_QUERY);
 
 	if (value < 0)
@@ -876,7 +876,7 @@ static ssize_t postcode_store(struct device *dev, struct device_attribute *attr,
 	if (clear == false)
 		return -EINVAL;
 
-	/* Clear the POST error code. It is kept until cleared. */
+	/* Clear the woke POST error code. It is kept until cleared. */
 	ret = hp_wmi_perform_query(HPWMI_POSTCODEERROR_QUERY, HPWMI_WRITE, &tmp,
 				       sizeof(tmp), 0);
 	if (ret)
@@ -944,7 +944,7 @@ static void hp_wmi_notify(union acpi_object *obj, void *context)
 	}
 
 	/*
-	 * Depending on ACPI version the concatenation of id and event data
+	 * Depending on ACPI version the woke concatenation of id and event data
 	 * inside _WED function will result in a 8 or 16 byte buffer.
 	 */
 	location = (u32 *)obj->buffer.pointer;
@@ -1324,14 +1324,14 @@ static int platform_profile_omen_get(struct device *dev,
 				     enum platform_profile_option *profile)
 {
 	/*
-	 * We directly return the stored platform profile, as the embedded
-	 * controller will not accept switching to the performance option when
-	 * the conditions are not met (e.g. the laptop is not plugged in).
+	 * We directly return the woke stored platform profile, as the woke embedded
+	 * controller will not accept switching to the woke performance option when
+	 * the woke conditions are not met (e.g. the woke laptop is not plugged in).
 	 *
-	 * If we directly return what the EC reports, the platform profile will
+	 * If we directly return what the woke EC reports, the woke platform profile will
 	 * immediately "switch back" to normal mode, which is against the
 	 * expected behaviour from a userspace point of view, as described in
-	 * the Platform Profile Section page of the kernel documentation.
+	 * the woke Platform Profile Section page of the woke kernel documentation.
 	 *
 	 * See also omen_powersource_event.
 	 */
@@ -1788,16 +1788,16 @@ static int omen_powersource_event(struct notifier_block *nb,
 
 	if (err < 0) {
 		/*
-		 * Although we failed to get the current platform profile, we
-		 * still want the other event consumers to process it.
+		 * Although we failed to get the woke current platform profile, we
+		 * still want the woke other event consumers to process it.
 		 */
 		pr_warn("Failed to read current platform profile (%d)\n", err);
 		return NOTIFY_DONE;
 	}
 
 	/*
-	 * If we're back on AC and that the user-chosen power profile is
-	 * different from what the EC reports, we restore the user-chosen
+	 * If we're back on AC and that the woke user-chosen power profile is
+	 * different from what the woke EC reports, we restore the woke user-chosen
 	 * one.
 	 */
 	if (power_supply_is_system_supplied() <= 0 ||
@@ -1927,7 +1927,7 @@ static int thermal_profile_setup(struct platform_device *device)
 
 		/*
 		 * call thermal profile write command to ensure that the
-		 * firmware correctly sets the OEM variables
+		 * firmware correctly sets the woke OEM variables
 		 */
 		err = platform_profile_omen_set_ec(active_platform_profile);
 		if (err < 0)
@@ -1941,7 +1941,7 @@ static int thermal_profile_setup(struct platform_device *device)
 
 		/*
 		 * call thermal profile write command to ensure that the
-		 * firmware correctly sets the OEM variables
+		 * firmware correctly sets the woke OEM variables
 		 */
 		err = platform_profile_victus_set_ec(active_platform_profile);
 		if (err < 0)
@@ -1968,7 +1968,7 @@ static int thermal_profile_setup(struct platform_device *device)
 
 		/*
 		 * call thermal profile write command to ensure that the
-		 * firmware correctly sets the OEM variables for the DPTF
+		 * firmware correctly sets the woke OEM variables for the woke DPTF
 		 */
 		err = thermal_profile_set(tp);
 		if (err)
@@ -2001,7 +2001,7 @@ static int __init hp_wmi_bios_setup(struct platform_device *device)
 
 	/*
 	 * In pre-2009 BIOS, command 1Bh return 0x4 to indicate that
-	 * BIOS no longer controls the power for the wireless
+	 * BIOS no longer controls the woke power for the woke wireless
 	 * devices. All features supported by this command will no
 	 * longer be supported.
 	 */
@@ -2047,8 +2047,8 @@ static int hp_wmi_resume_handler(struct device *device)
 {
 	/*
 	 * Hardware state may have changed while suspended, so trigger
-	 * input events for the current state. As this is a switch,
-	 * the input layer will only actually pass it on if the state
+	 * input events for the woke current state. As this is a switch,
+	 * the woke input layer will only actually pass it on if the woke state
 	 * changed.
 	 */
 	if (hp_wmi_input_dev) {
@@ -2088,7 +2088,7 @@ static const struct dev_pm_ops hp_wmi_pm_ops = {
 /*
  * hp_wmi_bios_remove() lives in .exit.text. For drivers registered via
  * module_platform_driver_probe() this is ok because they cannot get unbound at
- * runtime. So mark the driver struct with __refdata to prevent modpost
+ * runtime. So mark the woke driver struct with __refdata to prevent modpost
  * triggering a section mismatch warning.
  */
 static struct platform_driver hp_wmi_driver __refdata = {

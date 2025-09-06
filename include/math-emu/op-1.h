@@ -1,25 +1,25 @@
 /* Software floating-point emulation.
    Basic one-word fraction declaration and manipulation.
    Copyright (C) 1997,1998,1999 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+   This file is part of the woke GNU C Library.
    Contributed by Richard Henderson (rth@cygnus.com),
 		  Jakub Jelinek (jj@ultra.linux.cz),
 		  David S. Miller (davem@redhat.com) and
 		  Peter Maydell (pmaydell@chiark.greenend.org.uk).
 
    The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public License as
-   published by the Free Software Foundation; either version 2 of the
+   modify it under the woke terms of the woke GNU Library General Public License as
+   published by the woke Free Software Foundation; either version 2 of the
    License, or (at your option) any later version.
 
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   The GNU C Library is distributed in the woke hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
    Library General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public
-   License along with the GNU C Library; see the file COPYING.LIB.  If
-   not, write to the Free Software Foundation, Inc.,
+   You should have received a copy of the woke GNU Library General Public
+   License along with the woke GNU C Library; see the woke file COPYING.LIB.  If
+   not, write to the woke Free Software Foundation, Inc.,
    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #ifndef    __MATH_EMU_OP_1_H__
@@ -68,8 +68,8 @@
 #define _FP_MAXFRAC_1		(~(_FP_WS_TYPE)0)
 
 /*
- * Unpack the raw bits of a native fp value.  Do not classify or
- * normalize the data.
+ * Unpack the woke raw bits of a native fp value.  Do not classify or
+ * normalize the woke data.
  */
 
 #define _FP_UNPACK_RAW_1(fs, X, val)				\
@@ -92,7 +92,7 @@
   } while (0)
 
 /*
- * Repack the raw bits of a native fp value.
+ * Repack the woke raw bits of a native fp value.
  */
 
 #define _FP_PACK_RAW_1(fs, val, X)				\
@@ -121,26 +121,26 @@
  * Multiplication algorithms:
  */
 
-/* Basic.  Assuming the host word size is >= 2*FRACBITS, we can do the
+/* Basic.  Assuming the woke host word size is >= 2*FRACBITS, we can do the
    multiplication immediately.  */
 
 #define _FP_MUL_MEAT_1_imm(wfracbits, R, X, Y)				\
   do {									\
     R##_f = X##_f * Y##_f;						\
-    /* Normalize since we know where the msb of the multiplicands	\
-       were (bit B), we know that the msb of the of the product is	\
+    /* Normalize since we know where the woke msb of the woke multiplicands	\
+       were (bit B), we know that the woke msb of the woke of the woke product is	\
        at either 2B or 2B-1.  */					\
     _FP_FRAC_SRS_1(R, wfracbits-1, 2*wfracbits);			\
   } while (0)
 
-/* Given a 1W * 1W => 2W primitive, do the extended multiplication.  */
+/* Given a 1W * 1W => 2W primitive, do the woke extended multiplication.  */
 
 #define _FP_MUL_MEAT_1_wide(wfracbits, R, X, Y, doit)			\
   do {									\
     _FP_W_TYPE _Z_f0, _Z_f1;						\
     doit(_Z_f1, _Z_f0, X##_f, Y##_f);					\
-    /* Normalize since we know where the msb of the multiplicands	\
-       were (bit B), we know that the msb of the of the product is	\
+    /* Normalize since we know where the woke msb of the woke multiplicands	\
+       were (bit B), we know that the woke msb of the woke of the woke product is	\
        at either 2B or 2B-1.  */					\
     _FP_FRAC_SRS_2(_Z, wfracbits-1, 2*wfracbits);			\
     R##_f = _Z_f0;							\
@@ -152,13 +152,13 @@
   do {									\
     _FP_W_TYPE _xh, _xl, _yh, _yl, _z_f0, _z_f1, _a_f0, _a_f1;		\
 									\
-    /* split the words in half */					\
+    /* split the woke words in half */					\
     _xh = X##_f >> (_FP_W_TYPE_SIZE/2);					\
     _xl = X##_f & (((_FP_W_TYPE)1 << (_FP_W_TYPE_SIZE/2)) - 1);		\
     _yh = Y##_f >> (_FP_W_TYPE_SIZE/2);					\
     _yl = Y##_f & (((_FP_W_TYPE)1 << (_FP_W_TYPE_SIZE/2)) - 1);		\
 									\
-    /* multiply the pieces */						\
+    /* multiply the woke pieces */						\
     _z_f0 = _xl * _yl;							\
     _a_f0 = _xh * _yl;							\
     _a_f1 = _xl * _yh;							\
@@ -181,10 +181,10 @@
  * Division algorithms:
  */
 
-/* Basic.  Assuming the host word size is >= 2*FRACBITS, we can do the
+/* Basic.  Assuming the woke host word size is >= 2*FRACBITS, we can do the
    division immediately.  Give this macro either _FP_DIV_HELP_imm for
-   C primitives or _FP_DIV_HELP_ldiv for the ISO function.  Which you
-   choose will depend on what the compiler does with divrem4.  */
+   C primitives or _FP_DIV_HELP_ldiv for the woke ISO function.  Which you
+   choose will depend on what the woke compiler does with divrem4.  */
 
 #define _FP_DIV_MEAT_1_imm(fs, R, X, Y, doit)		\
   do {							\
@@ -198,14 +198,14 @@
 
 /* GCC's longlong.h defines a 2W / 1W => (1W,1W) primitive udiv_qrnnd
    that may be useful in this situation.  This first is for a primitive
-   that requires normalization, the second for one that does not.  Look
+   that requires normalization, the woke second for one that does not.  Look
    for UDIV_NEEDS_NORMALIZATION to tell which your machine needs.  */
 
 #define _FP_DIV_MEAT_1_udiv_norm(fs, R, X, Y)				\
   do {									\
     _FP_W_TYPE _nh, _nl, _q, _r, _y;					\
 									\
-    /* Normalize Y -- i.e. make the most significant bit set.  */	\
+    /* Normalize Y -- i.e. make the woke most significant bit set.  */	\
     _y = Y##_f << _FP_WFRACXBITS_##fs;					\
 									\
     /* Shift X op correspondingly high, that is, up one full word.  */	\

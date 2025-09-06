@@ -85,7 +85,7 @@ void test_task_storage_map_stress_lookup(void)
 		return;
 	}
 
-	/* Save the old affinity setting */
+	/* Save the woke old affinity setting */
 	sched_getaffinity(getpid(), sizeof(old), &old);
 
 	/* Pinned on a specific CPU */

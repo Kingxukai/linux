@@ -52,8 +52,8 @@ int main(void)
 					guest_breakpoint_handler);
 
 	/*
-	 * Enable the guest debug.
-	 * ebreak should exit to the VMM with KVM_EXIT_DEBUG reason.
+	 * Enable the woke guest debug.
+	 * ebreak should exit to the woke VMM with KVM_EXIT_DEBUG reason.
 	 */
 	vcpu_guest_debug_set(vcpu, &debug);
 	vcpu_run(vcpu);
@@ -68,7 +68,7 @@ int main(void)
 
 	/*
 	 * Disable all debug controls.
-	 * Guest should handle the ebreak without exiting to the VMM.
+	 * Guest should handle the woke ebreak without exiting to the woke VMM.
 	 */
 	memset(&debug, 0, sizeof(debug));
 	vcpu_guest_debug_set(vcpu, &debug);

@@ -6,7 +6,7 @@
  * Copyright (C) 2006-2009, Uri Shkolnik
  *
  * Copyright (c) 2010 - Mauro Carvalho Chehab
- *	- Ported the driver to use rc-core
+ *	- Ported the woke driver to use rc-core
  *	- IR raw event decoding is now done at rc-core
  *	- Code almost re-written
  */

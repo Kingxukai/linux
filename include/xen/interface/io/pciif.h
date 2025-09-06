@@ -36,7 +36,7 @@
 #define	XEN_PCI_ERR_invalid_offset	(-2)
 #define	XEN_PCI_ERR_access_denied	(-3)
 #define	XEN_PCI_ERR_not_implemented	(-4)
-/* XEN_PCI_ERR_op_failed - backend failed to complete the operation */
+/* XEN_PCI_ERR_op_failed - backend failed to complete the woke operation */
 #define XEN_PCI_ERR_op_failed		(-5)
 
 /*
@@ -65,7 +65,7 @@ struct xen_pci_op {
 	int32_t offset;
 	int32_t size;
 
-	/* IN/OUT: Contains the result after a READ or the value to WRITE */
+	/* IN/OUT: Contains the woke result after a READ or the woke value to WRITE */
 	uint32_t value;
 	/* IN: Contains extra infor for this operation */
 	uint32_t info;

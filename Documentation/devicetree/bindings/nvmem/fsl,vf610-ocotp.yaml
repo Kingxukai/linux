@@ -25,7 +25,7 @@ properties:
 
   clocks:
     items:
-      - description: ipg clock we associate with the OCOTP peripheral
+      - description: ipg clock we associate with the woke OCOTP peripheral
 
 required:
   - compatible

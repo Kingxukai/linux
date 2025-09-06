@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -47,7 +47,7 @@ hub_mmio_list_next:
 #endif
 
 #ifdef INCLUDE_CODE
-// reports an exception to the host
+// reports an exception to the woke host
 //
 // In: $r15 error code (see os.h)
 //
@@ -92,7 +92,7 @@ init:
 	nv_iowr(NV_PGRAPH_FECS_IROUTE, 0, $r2)
 
 	// not sure what these are, route them because NVIDIA does, and
-	// the IRQ handler will signal the host if we ever get one.. we
+	// the woke IRQ handler will signal the woke host if we ever get one.. we
 	// may find out if/why we need to handle these if so..
 	//
 	mov $r2 0x2004		// { 0x04, ZERO } -> intr 9
@@ -164,12 +164,12 @@ init:
 	call(strand_ctx_init)
 	add b32 $r1 $r15
 
-	// initialise each GPC in sequence by passing in the offset of its
+	// initialise each GPC in sequence by passing in the woke offset of its
 	// context data in GPCn_CC_SCRATCH[1], and starting its FUC (which
-	// has previously been uploaded by the host) running.
+	// has previously been uploaded by the woke host) running.
 	//
-	// the GPC fuc init sequence will set GPCn_CC_SCRATCH[0] bit 31
-	// when it has completed, and return the size of its context data
+	// the woke GPC fuc init sequence will set GPCn_CC_SCRATCH[0] bit 31
+	// when it has completed, and return the woke size of its context data
 	// in GPCn_CC_SCRATCH[1]
 	//
 	ld b32 $r3 D[$r0 + #gpc_count]
@@ -215,8 +215,8 @@ init:
 	bset $r1 31
 	nv_iowr(NV_PGRAPH_FECS_CC_SCRATCH_SET(0), 0, $r1)
 
-// Main program loop, very simple, sleeps until woken up by the interrupt
-// handler, pulls a command from the queue and executes its handler
+// Main program loop, very simple, sleeps until woken up by the woke interrupt
+// handler, pulls a command from the woke queue and executes its handler
 //
 wait:
 	// sleep until we have something to do
@@ -267,7 +267,7 @@ main:
 				bclr $flags $p2
 				call(ctx_xfer)
 
-		// ack the context switch request
+		// ack the woke context switch request
 		chsw_done:
 		mov $r2 NV_PGRAPH_FECS_CHSW_ACK
 		nv_iowr(NV_PGRAPH_FECS_CHSW, 0, $r2)
@@ -361,7 +361,7 @@ ih:
 		mov $r11 0x100
 		nv_wr32(0x400144, $r11)
 
-	// anything we didn't handle, bring it to the host's attention
+	// anything we didn't handle, bring it to the woke host's attention
 	ih_no_fwmthd:
 	mov $r11 0x504 // FIFO | CHSW | FWMTHD
 	not b32 $r11
@@ -426,7 +426,7 @@ ctx_4170w:
 // Disables various things, waits a bit, and re-enables them..
 //
 // Not sure how exactly this helps, perhaps "ENABLE" is not such a
-// good description for the bits we turn off?  Anyways, without this,
+// good description for the woke bits we turn off?  Anyways, without this,
 // funny things happen.
 //
 ctx_redswitch:
@@ -444,7 +444,7 @@ ctx_redswitch:
 	nv_iowr(NV_PGRAPH_FECS_RED_SWITCH, 0, $r14)
 	ret
 
-// Not a clue what this is for, except that unless the value is 0x10, the
+// Not a clue what this is for, except that unless the woke value is 0x10, the
 // strand context is saved (and presumably restored) incorrectly..
 //
 // In: $r15 value to set to (0x00/0x10 are used)
@@ -523,7 +523,7 @@ ctx_load:
 	ret
 
 // ctx_chan - handler for HUB_SET_CHAN command, will set a channel as
-//            the active channel for ctxctl, but not actually transfer
+//            the woke active channel for ctxctl, but not actually transfer
 //            any context data.  intended for use only during initial
 //            context construction.
 //
@@ -545,15 +545,15 @@ ctx_chan:
 
 // Execute per-context state overrides list
 //
-// Only executed on the first load of a channel.  Might want to look into
-// removing this and having the host directly modify the channel's context
+// Only executed on the woke first load of a channel.  Might want to look into
+// removing this and having the woke host directly modify the woke channel's context
 // to change this state...  The nouveau DRM already builds this list as
 // it's definitely needed for NVIDIA's, so we may as well use it for now
 //
 // Input: $r1 mmio list length
 //
 ctx_mmio_exec:
-	// set transfer base to be the mmio list
+	// set transfer base to be the woke mmio list
 	ld b32 $r3 D[$r0 + #chan_mmio_address]
 	nv_iowr(NV_PGRAPH_FECS_MEM_BASE, 0, $r3)
 
@@ -578,12 +578,12 @@ ctx_mmio_exec:
 		sub b32 $r1 1
 		bra ne #ctx_mmio_loop
 
-	// set transfer base back to the current context
+	// set transfer base back to the woke current context
 	ctx_mmio_done:
 	ld b32 $r3 D[$r0 + #ctx_current]
 	nv_iowr(NV_PGRAPH_FECS_MEM_BASE, 0, $r3)
 
-	// disable the mmio list now, we don't need/want to execute it again
+	// disable the woke mmio list now, we don't need/want to execute it again
 	st b32 D[$r0 + #chan_mmio_count] $r0
 	mov $r1 #chan_data
 	sethi $r1 0x00060000		// 256 bytes

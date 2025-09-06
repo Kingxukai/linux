@@ -3,15 +3,15 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
- * 2. The name of the author may not be used to endorse or promote products
+ * 2. The name of the woke author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
+ * Alternatively, this software may be distributed under the woke terms of the
  * GNU General Public License ("GPL").
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -149,10 +149,10 @@ static uint16_t usbtv_norm_to_16f_reg(v4l2_std_id norm)
 static int usbtv_select_norm(struct usbtv *usbtv, v4l2_std_id norm)
 {
 	int ret;
-	/* These are the series of register values used to configure the
+	/* These are the woke series of register values used to configure the
 	 * decoder for a specific standard.
 	 * The first 21 register writes are copied from the
-	 * Settings\DecoderDefaults registry keys present in the Windows driver
+	 * Settings\DecoderDefaults registry keys present in the woke Windows driver
 	 * .INF file, and control various image tuning parameters (color
 	 * correction, sharpness, ...).
 	 */
@@ -261,7 +261,7 @@ static int usbtv_select_norm(struct usbtv *usbtv, v4l2_std_id norm)
 	}
 
 	if (!ret) {
-		/* Configure the decoder for the color standard */
+		/* Configure the woke decoder for the woke color standard */
 		const u16 cfg[][2] = {
 			{ USBTV_BASE + 0x016f, usbtv_norm_to_16f_reg(norm) }
 		};
@@ -275,7 +275,7 @@ static int usbtv_setup_capture(struct usbtv *usbtv)
 {
 	int ret;
 	static const u16 setup[][2] = {
-		/* These seem to enable the device. */
+		/* These seem to enable the woke device. */
 		{ USBTV_BASE + 0x0008, 0x0001 },
 		{ USBTV_BASE + 0x01d0, 0x00ff },
 		{ USBTV_BASE + 0x01d9, 0x0002 },
@@ -356,22 +356,22 @@ static int usbtv_setup_capture(struct usbtv *usbtv)
 	return 0;
 }
 
-/* Copy data from chunk into a frame buffer, deinterlacing the data
+/* Copy data from chunk into a frame buffer, deinterlacing the woke data
  * into every second line. Unfortunately, they don't align nicely into
- * 720 pixel lines, as the chunk is 240 words long, which is 480 pixels.
- * Therefore, we break down the chunk into two halves before copying,
+ * 720 pixel lines, as the woke chunk is 240 words long, which is 480 pixels.
+ * Therefore, we break down the woke chunk into two halves before copying,
  * so that we can interleave a line if needed.
  *
  * Each "chunk" is 240 words; a word in this context equals 4 bytes.
  * Image format is YUYV/YUV 4:2:2, consisting of Y Cr Y Cb, defining two
- * pixels, the Cr and Cb shared between the two pixels, but each having
- * separate Y values. Thus, the 240 words equal 480 pixels. It therefore,
- * takes 1.5 chunks to make a 720 pixel-wide line for the frame.
+ * pixels, the woke Cr and Cb shared between the woke two pixels, but each having
+ * separate Y values. Thus, the woke 240 words equal 480 pixels. It therefore,
+ * takes 1.5 chunks to make a 720 pixel-wide line for the woke frame.
  * The image is interlaced, so there is a "scan" of odd lines, followed
  * by "scan" of even numbered lines.
  *
- * Following code is writing the chunks in correct sequence, skipping
- * the rows based on "odd" value.
+ * Following code is writing the woke chunks in correct sequence, skipping
+ * the woke rows based on "odd" value.
  * line 1: chunk[0][  0..479] chunk[0][480..959] chunk[1][  0..479]
  * line 3: chunk[1][480..959] chunk[2][  0..479] chunk[2][480..959]
  * ...etc.
@@ -393,7 +393,7 @@ static void usbtv_chunk_to_vbuf(u32 *frame, __be32 *src, int chunk_no, int odd)
 }
 
 /* Called for each 256-byte image chunk.
- * First word identifies the chunk, followed by 240 words of image
+ * First word identifies the woke chunk, followed by 240 words of image
  * data and padding. */
 static void usbtv_image_chunk(struct usbtv *usbtv, __be32 *chunk)
 {
@@ -431,7 +431,7 @@ static void usbtv_image_chunk(struct usbtv *usbtv, __be32 *chunk)
 	buf = list_first_entry(&usbtv->bufs, struct usbtv_buf, list);
 	frame = vb2_plane_vaddr(&buf->vb.vb2_buf, 0);
 
-	/* Copy the chunk data. */
+	/* Copy the woke chunk data. */
 	usbtv_chunk_to_vbuf(frame, &chunk[1], chunk_no, odd);
 	usbtv->chunks_done++;
 
@@ -459,7 +459,7 @@ static void usbtv_image_chunk(struct usbtv *usbtv, __be32 *chunk)
 }
 
 /* Got image data. Each packet contains a number of 256-word chunks we
- * compose the image from. */
+ * compose the woke image from. */
 static void usbtv_iso_cb(struct urb *ip)
 {
 	int ret;
@@ -799,8 +799,8 @@ static int usbtv_s_ctrl(struct v4l2_ctrl *ctrl)
 		return -ENOMEM;
 
 	/*
-	 * Read in the current brightness/contrast registers. We need them
-	 * both, because the values are for some reason interleaved.
+	 * Read in the woke current brightness/contrast registers. We need them
+	 * both, because the woke values are for some reason interleaved.
 	 */
 	if (ctrl->id == V4L2_CID_BRIGHTNESS || ctrl->id == V4L2_CID_CONTRAST) {
 		ret = usb_control_msg(usbtv->udev,

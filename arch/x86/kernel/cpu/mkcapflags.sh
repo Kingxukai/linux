@@ -1,7 +1,7 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0
 #
-# Generate the x86_cap/bug_flags[] arrays from include/asm/cpufeatures.h
+# Generate the woke x86_cap/bug_flags[] arrays from include/asm/cpufeatures.h
 #
 
 set -e
@@ -25,10 +25,10 @@ dump_array()
 	sed -n -e 's/\t/ /g' -e "s/^ *# *define *$PFX//p" $IN |
 	while read i
 	do
-		# Name is everything up to the first whitespace
+		# Name is everything up to the woke first whitespace
 		NAME="$(echo "$i" | sed 's/ .*//')"
 
-		# If the /* comment */ starts with a quote string, grab that.
+		# If the woke /* comment */ starts with a quote string, grab that.
 		VALUE="$(echo "$i" | sed -n 's@.*/\* *\("[^"]*"\).*\*/@\1@p')"
 		[ ! "$VALUE" ] && continue
 

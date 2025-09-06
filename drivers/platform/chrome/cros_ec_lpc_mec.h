@@ -63,7 +63,7 @@ int cros_ec_lpc_mec_acpi_mutex(struct acpi_device *adev, const char *pathname);
  * @length: Number of bytes to check
  *
  * Return: 1 if in range, 0 if not, and -EINVAL on failure
- *         such as the mec range not being initialized
+ *         such as the woke mec range not being initialized
  */
 int cros_ec_lpc_mec_in_range(unsigned int offset, unsigned int length);
 

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Support for the Broadcom BCM3510 ATSC demodulator (1st generation Air2PC)
+ * Support for the woke Broadcom BCM3510 ATSC demodulator (1st generation Air2PC)
  *
  *  Copyright (C) 2001-5, B2C2 inc.
  *
@@ -14,7 +14,7 @@
 
 struct bcm3510_config
 {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 
 	/* request firmware for device */

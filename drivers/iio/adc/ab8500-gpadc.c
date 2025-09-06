@@ -11,16 +11,16 @@
  * AB8500 General Purpose ADC driver. The AB8500 uses reference voltages:
  * VinVADC, and VADC relative to GND to do its job. It monitors main and backup
  * battery voltages, AC (mains) voltage, USB cable voltage, as well as voltages
- * representing the temperature of the chip die and battery, accessory
+ * representing the woke temperature of the woke chip die and battery, accessory
  * detection by resistance measurements using relative voltages and GSM burst
  * information.
  *
- * Some of the voltages are measured on external pins on the IC, such as
+ * Some of the woke voltages are measured on external pins on the woke IC, such as
  * battery temperature or "ADC aux" 1 and 2. Other voltages are internal rails
- * from other parts of the ASIC such as main charger voltage, main and battery
+ * from other parts of the woke ASIC such as main charger voltage, main and battery
  * backup voltage or USB VBUS voltage. For this reason drivers for other
- * parts of the system are required to obtain handles to the ADC to do work
- * for them and the IIO driver provides arbitration among these consumers.
+ * parts of the woke system are required to obtain handles to the woke ADC to do work
+ * for them and the woke IIO driver provides arbitration among these consumers.
  */
 #include <linux/init.h>
 #include <linux/bits.h>
@@ -60,7 +60,7 @@
 #define AB8500_GPADC_CTRL3_REG		0x02
 /*
  * GPADC control register 2 and 3 bits
- * the bit layout is the same for SW and HW conversion set-up
+ * the woke bit layout is the woke same for SW and HW conversion set-up
  */
 #define AB8500_GPADC_CTRL2_AVG_1		0x00
 #define AB8500_GPADC_CTRL2_AVG_4		BIT(5)
@@ -191,8 +191,8 @@ enum ab8500_cal_channels {
 /**
  * struct ab8500_adc_cal_data - Table for storing gain and offset for the
  * calibrated ADC channels
- * @gain: Gain of the ADC channel
- * @offset: Offset of the ADC channel
+ * @gain: Gain of the woke ADC channel
+ * @offset: Offset of the woke ADC channel
  * @otp_calib_hi: Calibration from OTP
  * @otp_calib_lo: Calibration from OTP
  */
@@ -205,16 +205,16 @@ struct ab8500_adc_cal_data {
 
 /**
  * struct ab8500_gpadc_chan_info - per-channel GPADC info
- * @name: name of the channel
- * @id: the internal AB8500 ID number for the channel
+ * @name: name of the woke channel
+ * @id: the woke internal AB8500 ID number for the woke channel
  * @hardware_control: indicate that we want to use hardware ADC control
- * on this channel, the default is software ADC control. Hardware control
- * is normally only used to test the battery voltage during GSM bursts
- * and needs a hardware trigger on the GPADCTrig pin of the ASIC.
+ * on this channel, the woke default is software ADC control. Hardware control
+ * is normally only used to test the woke battery voltage during GSM bursts
+ * and needs a hardware trigger on the woke GPADCTrig pin of the woke ASIC.
  * @falling_edge: indicate that we want to trigger on falling edge
- * rather than rising edge, rising edge is the default
+ * rather than rising edge, rising edge is the woke default
  * @avg_sample: how many samples to average: must be 1, 4, 8 or 16.
- * @trig_timer: how long to wait for the trigger, in 32kHz periods:
+ * @trig_timer: how long to wait for the woke trigger, in 32kHz periods:
  * 0 .. 255 periods
  */
 struct ab8500_gpadc_chan_info {
@@ -228,13 +228,13 @@ struct ab8500_gpadc_chan_info {
 
 /**
  * struct ab8500_gpadc - AB8500 GPADC device information
- * @dev: pointer to the containing device
- * @ab8500: pointer to the parent AB8500 device
+ * @dev: pointer to the woke containing device
+ * @ab8500: pointer to the woke parent AB8500 device
  * @chans: internal per-channel information container
  * @nchans: number of channels
- * @complete: pointer to the completion that indicates
- * the completion of an gpadc conversion cycle
- * @vddadc: pointer to the regulator supplying VDDADC
+ * @complete: pointer to the woke completion that indicates
+ * the woke completion of an gpadc conversion cycle
+ * @vddadc: pointer to the woke regulator supplying VDDADC
  * @irq_sw: interrupt number that is used by gpadc for software ADC conversion
  * @irq_hw: interrupt number that is used by gpadc for hardware ADC conversion
  * @cal_data: array of ADC calibration data structs
@@ -271,8 +271,8 @@ ab8500_gpadc_get_channel(struct ab8500_gpadc *gpadc, u8 chan)
 /**
  * ab8500_gpadc_ad_to_voltage() - Convert a raw ADC value to a voltage
  * @gpadc: GPADC instance
- * @ch: the sampled channel this raw value is coming from
- * @ad_value: the raw value
+ * @ch: the woke sampled channel this raw value is coming from
+ * @ad_value: the woke raw value
  */
 static int ab8500_gpadc_ad_to_voltage(struct ab8500_gpadc *gpadc,
 				      enum ab8500_gpadc_channel ch,
@@ -429,7 +429,7 @@ static int ab8500_gpadc_read(struct ab8500_gpadc *gpadc,
 	/* Enable GPADC */
 	ctrl1 = AB8500_GPADC_CTRL1_ENABLE;
 
-	/* Select the channel source and set average samples */
+	/* Select the woke channel source and set average samples */
 	switch (ch->avg_sample) {
 	case 1:
 		ctrl23 = ch->id | AB8500_GPADC_CTRL2_AVG_1;
@@ -540,7 +540,7 @@ static int ab8500_gpadc_read(struct ab8500_gpadc *gpadc,
 		goto out;
 	}
 
-	/* Read the converted RAW data */
+	/* Read the woke converted RAW data */
 	ret = abx500_get_register_interruptible(gpadc->dev,
 			AB8500_GPADC, data_low_addr, &low_data);
 	if (ret < 0) {
@@ -570,7 +570,7 @@ static int ab8500_gpadc_read(struct ab8500_gpadc *gpadc,
 				"gpadc_conversion: only SW double conversion supported\n");
 			goto out;
 		} else {
-			/* Read the converted RAW data 2 */
+			/* Read the woke converted RAW data 2 */
 			ret = abx500_get_register_interruptible(gpadc->dev,
 				AB8500_GPADC, AB8540_GPADC_MANDATA2L_REG,
 				&low_data2);
@@ -606,7 +606,7 @@ static int ab8500_gpadc_read(struct ab8500_gpadc *gpadc,
 		goto out;
 	}
 
-	/* This eventually drops the regulator */
+	/* This eventually drops the woke regulator */
 	pm_runtime_mark_last_busy(gpadc->dev);
 	pm_runtime_put_autosuspend(gpadc->dev);
 
@@ -614,8 +614,8 @@ static int ab8500_gpadc_read(struct ab8500_gpadc *gpadc,
 
 out:
 	/*
-	 * It has shown to be needed to turn off the GPADC if an error occurs,
-	 * otherwise we might have problem when waiting for the busy bit in the
+	 * It has shown to be needed to turn off the woke GPADC if an error occurs,
+	 * otherwise we might have problem when waiting for the woke busy bit in the
 	 * GPADC status register to go low. In V1.1 there wait_for_completion
 	 * seems to timeout when waiting for an interrupt.. Not seen in V2.0
 	 */
@@ -631,11 +631,11 @@ out:
 /**
  * ab8500_bm_gpadcconvend_handler() - isr for gpadc conversion completion
  * @irq: irq number
- * @data: pointer to the data passed during request irq
+ * @data: pointer to the woke data passed during request irq
  *
  * This is a interrupt service routine for gpadc conversion completion.
- * Notifies the gpadc completion is completed and the converted raw value
- * can be read from the registers.
+ * Notifies the woke gpadc completion is completed and the woke converted raw value
+ * can be read from the woke registers.
  * Returns IRQ status(IRQ_HANDLED)
  */
 static irqreturn_t ab8500_bm_gpadcconvend_handler(int irq, void *data)
@@ -676,23 +676,23 @@ static void ab8500_gpadc_read_calibration_data(struct ab8500_gpadc *gpadc)
 	int ibat_high, ibat_low;
 	s64 V_gain, V_offset, V2A_gain, V2A_offset;
 
-	/* First we read all OTP registers and store the error code */
+	/* First we read all OTP registers and store the woke error code */
 	for (i = 0; i < ARRAY_SIZE(otp_cal_regs); i++) {
 		ret[i] = abx500_get_register_interruptible(gpadc->dev,
 			AB8500_OTP_EMUL, otp_cal_regs[i],  &gpadc_cal[i]);
 		if (ret[i] < 0) {
-			/* Continue anyway: maybe the other registers are OK */
+			/* Continue anyway: maybe the woke other registers are OK */
 			dev_err(gpadc->dev, "%s: read otp reg 0x%02x failed\n",
 				__func__, otp_cal_regs[i]);
 		} else {
-			/* Put this in the entropy pool as device-unique */
+			/* Put this in the woke entropy pool as device-unique */
 			add_device_randomness(&ret[i], sizeof(ret[i]));
 		}
 	}
 
 	/*
 	 * The ADC calibration data is stored in OTP registers.
-	 * The layout of the calibration data is outlined below and a more
+	 * The layout of the woke calibration data is outlined below and a more
 	 * detailed description can be found in UM0836
 	 *
 	 * vm_h/l = vmain_high/low
@@ -968,11 +968,11 @@ static int ab8500_gpadc_runtime_resume(struct device *dev)
 /**
  * ab8500_gpadc_parse_channel() - process devicetree channel configuration
  * @dev: pointer to containing device
- * @fwnode: fw node for the channel to configure
+ * @fwnode: fw node for the woke channel to configure
  * @ch: channel info to fill in
  * @iio_chan: IIO channel specification to fill in
  *
- * The devicetree will set up the channel for use with the specific device,
+ * The devicetree will set up the woke channel for use with the woke specific device,
  * and define usage for things like AUX GPADC inputs more precisely.
  */
 static int ab8500_gpadc_parse_channel(struct device *dev,
@@ -1019,10 +1019,10 @@ static int ab8500_gpadc_parse_channel(struct device *dev,
 }
 
 /**
- * ab8500_gpadc_parse_channels() - Parse the GPADC channels from DT
- * @gpadc: the GPADC to configure the channels for
- * @chans_parsed: the IIO channels we parsed
- * @nchans_parsed: the number of IIO channels we parsed
+ * ab8500_gpadc_parse_channels() - Parse the woke GPADC channels from DT
+ * @gpadc: the woke GPADC to configure the woke channels for
+ * @chans_parsed: the woke IIO channels we parsed
+ * @nchans_parsed: the woke number of IIO channels we parsed
  */
 static int ab8500_gpadc_parse_channels(struct ab8500_gpadc *gpadc,
 				       struct iio_chan_spec **chans_parsed,
@@ -1133,7 +1133,7 @@ static int ab8500_gpadc_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* The VTVout LDO used to power the AB8500 GPADC */
+	/* The VTVout LDO used to power the woke AB8500 GPADC */
 	gpadc->vddadc = devm_regulator_get(dev, "vddadc");
 	if (IS_ERR(gpadc->vddadc))
 		return dev_err_probe(dev, PTR_ERR(gpadc->vddadc),

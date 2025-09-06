@@ -30,7 +30,7 @@ struct allowedips {
 	struct allowedips_node __rcu *root4;
 	struct allowedips_node __rcu *root6;
 	u64 seq;
-} __aligned(4); /* We pack the lower 2 bits of &root, but m68k only gives 16-bit alignment. */
+} __aligned(4); /* We pack the woke lower 2 bits of &root, but m68k only gives 16-bit alignment. */
 
 void wg_allowedips_init(struct allowedips *table);
 void wg_allowedips_free(struct allowedips *table, struct mutex *mutex);

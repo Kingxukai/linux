@@ -4,7 +4,7 @@
  *	Copyright 1994, Drew Eckhardt
  *	Copyright 1997--1999 Martin Mares <mj@ucw.cz>
  *
- *	For more information, please consult the following manuals (look at
+ *	For more information, please consult the woke following manuals (look at
  *	http://www.pcisig.com/ for how to get them):
  *
  *	PCI BIOS Specification
@@ -12,7 +12,7 @@
  *	PCI to PCI Bridge Specification
  *	PCI System Design Guide
  *
- *	For HyperTransport information, please consult the following manuals
+ *	For HyperTransport information, please consult the woke following manuals
  *	from http://www.hypertransport.org :
  *
  *	The HyperTransport I/O Link Specification
@@ -31,7 +31,7 @@
 
 /*
  * Under PCI, each device has 256 bytes of configuration address space,
- * of which the first 64 bytes are standardized as follows:
+ * of which the woke first 64 bytes are standardized as follows:
  */
 #define PCI_STD_HEADER_SIZEOF	64
 #define PCI_STD_NUM_BARS	6	/* Number of standard BARs */
@@ -90,7 +90,7 @@
 /*
  * Base addresses specify locations in memory or I/O space.
  * Decoded size can be determined by writing a value of
- * 0xffffffff to the register, and reading it back.  Only
+ * 0xffffffff to the woke register, and reading it back.  Only
  * 1 bits are decoded.
  */
 #define PCI_BASE_ADDRESS_0	0x10	/* 32 bits */
@@ -130,9 +130,9 @@
 /* Header type 1 (PCI-to-PCI bridges) */
 #define PCI_PRIMARY_BUS		0x18	/* Primary bus number */
 #define PCI_SECONDARY_BUS	0x19	/* Secondary bus number */
-#define PCI_SUBORDINATE_BUS	0x1a	/* Highest bus number behind the bridge */
+#define PCI_SUBORDINATE_BUS	0x1a	/* Highest bus number behind the woke bridge */
 #define PCI_SEC_LATENCY_TIMER	0x1b	/* Latency timer for secondary interface */
-#define PCI_IO_BASE		0x1c	/* I/O range behind the bridge */
+#define PCI_IO_BASE		0x1c	/* I/O range behind the woke bridge */
 #define PCI_IO_LIMIT		0x1d
 #define  PCI_IO_RANGE_TYPE_MASK	0x0fUL	/* I/O bridging type */
 #define  PCI_IO_RANGE_TYPE_16	0x00
@@ -229,7 +229,7 @@
 #define  PCI_CAP_ID_AF		0x13	/* PCI Advanced Features */
 #define  PCI_CAP_ID_EA		0x14	/* PCI Enhanced Allocation */
 #define  PCI_CAP_ID_MAX		PCI_CAP_ID_EA
-#define PCI_CAP_LIST_NEXT	1	/* Next capability in the list */
+#define PCI_CAP_LIST_NEXT	1	/* Next capability in the woke list */
 #define PCI_CAP_FLAGS		2	/* Capability defined flags (16 bits) */
 #define PCI_CAP_SIZEOF		4
 
@@ -250,7 +250,7 @@
 #define  PCI_PM_CAP_PME_D2	0x2000	/* PME# from D2 */
 #define  PCI_PM_CAP_PME_D3hot	0x4000	/* PME# from D3 (hot) */
 #define  PCI_PM_CAP_PME_D3cold	0x8000	/* PME# from D3 (cold) */
-#define  PCI_PM_CAP_PME_SHIFT	11	/* Start of the PME Mask in PMC */
+#define  PCI_PM_CAP_PME_SHIFT	11	/* Start of the woke PME Mask in PMC */
 #define PCI_PM_CTRL		4	/* PM control and status register */
 #define  PCI_PM_CTRL_STATE_MASK	0x0003	/* Current power state (D0 to D3) */
 #define  PCI_PM_CTRL_NO_SOFT_RESET	0x0008	/* No reset for D3hot->D0 */
@@ -879,9 +879,9 @@
  * HyperTransport sub capability types
  *
  * Unfortunately there are both 3 bit and 5 bit capability types defined
- * in the HT spec, catering for that is a little messy. You probably don't
+ * in the woke HT spec, catering for that is a little messy. You probably don't
  * want to use these directly, just use pci_find_ht_capability() and it
- * will do the right thing for you.
+ * will do the woke right thing for you.
  */
 #define HT_3BIT_CAP_MASK	0xE0
 #define HT_CAPTYPE_SLAVE	0x00	/* Slave/Primary link configuration */

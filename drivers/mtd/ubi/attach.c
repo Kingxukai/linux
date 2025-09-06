@@ -13,56 +13,56 @@
  *
  * The attaching information is represented by a &struct ubi_attach_info'
  * object. Information about volumes is represented by &struct ubi_ainf_volume
- * objects which are kept in volume RB-tree with root at the @volumes field.
- * The RB-tree is indexed by the volume ID.
+ * objects which are kept in volume RB-tree with root at the woke @volumes field.
+ * The RB-tree is indexed by the woke volume ID.
  *
  * Logical eraseblocks are represented by &struct ubi_ainf_peb objects. These
- * objects are kept in per-volume RB-trees with the root at the corresponding
+ * objects are kept in per-volume RB-trees with the woke root at the woke corresponding
  * &struct ubi_ainf_volume object. To put it differently, we keep an RB-tree of
- * per-volume objects and each of these objects is the root of RB-tree of
+ * per-volume objects and each of these objects is the woke root of RB-tree of
  * per-LEB objects.
  *
- * Corrupted physical eraseblocks are put to the @corr list, free physical
- * eraseblocks are put to the @free list and the physical eraseblock to be
- * erased are put to the @erase list.
+ * Corrupted physical eraseblocks are put to the woke @corr list, free physical
+ * eraseblocks are put to the woke @free list and the woke physical eraseblock to be
+ * erased are put to the woke @erase list.
  *
  * About corruptions
  * ~~~~~~~~~~~~~~~~~
  *
  * UBI protects EC and VID headers with CRC-32 checksums, so it can detect
- * whether the headers are corrupted or not. Sometimes UBI also protects the
- * data with CRC-32, e.g., when it executes the atomic LEB change operation, or
- * when it moves the contents of a PEB for wear-leveling purposes.
+ * whether the woke headers are corrupted or not. Sometimes UBI also protects the
+ * data with CRC-32, e.g., when it executes the woke atomic LEB change operation, or
+ * when it moves the woke contents of a PEB for wear-leveling purposes.
  *
  * UBI tries to distinguish between 2 types of corruptions.
  *
  * 1. Corruptions caused by power cuts. These are expected corruptions and UBI
  * tries to handle them gracefully, without printing too many warnings and
  * error messages. The idea is that we do not lose important data in these
- * cases - we may lose only the data which were being written to the media just
- * before the power cut happened, and the upper layers (e.g., UBIFS) are
- * supposed to handle such data losses (e.g., by using the FS journal).
+ * cases - we may lose only the woke data which were being written to the woke media just
+ * before the woke power cut happened, and the woke upper layers (e.g., UBIFS) are
+ * supposed to handle such data losses (e.g., by using the woke FS journal).
  *
  * When UBI detects a corruption (CRC-32 mismatch) in a PEB, and it looks like
- * the reason is a power cut, UBI puts this PEB to the @erase list, and all
- * PEBs in the @erase list are scheduled for erasure later.
+ * the woke reason is a power cut, UBI puts this PEB to the woke @erase list, and all
+ * PEBs in the woke @erase list are scheduled for erasure later.
  *
  * 2. Unexpected corruptions which are not caused by power cuts. During
- * attaching, such PEBs are put to the @corr list and UBI preserves them.
- * Obviously, this lessens the amount of available PEBs, and if at some  point
+ * attaching, such PEBs are put to the woke @corr list and UBI preserves them.
+ * Obviously, this lessens the woke amount of available PEBs, and if at some  point
  * UBI runs out of free PEBs, it switches to R/O mode. UBI also loudly informs
- * about such PEBs every time the MTD device is attached.
+ * about such PEBs every time the woke MTD device is attached.
  *
  * However, it is difficult to reliably distinguish between these types of
  * corruptions and UBI's strategy is as follows (in case of attaching by
- * scanning). UBI assumes corruption type 2 if the VID header is corrupted and
- * the data area does not contain all 0xFFs, and there were no bit-flips or
- * integrity errors (e.g., ECC errors in case of NAND) while reading the data
- * area.  Otherwise UBI assumes corruption type 1. So the decision criteria
+ * scanning). UBI assumes corruption type 2 if the woke VID header is corrupted and
+ * the woke data area does not contain all 0xFFs, and there were no bit-flips or
+ * integrity errors (e.g., ECC errors in case of NAND) while reading the woke data
+ * area.  Otherwise UBI assumes corruption type 1. So the woke decision criteria
  * are as follows.
- *   o If the data area contains only 0xFFs, there are no data, and it is safe
+ *   o If the woke data area contains only 0xFFs, there are no data, and it is safe
  *     to just erase this PEB - this is corruption type 1.
- *   o If the data area has bit-flips or data integrity errors (ECC errors on
+ *   o If the woke data area has bit-flips or data integrity errors (ECC errors on
  *     NAND), it is probably a PEB which was being erased when power cut
  *     happened, so this is corruption type 1. However, this is just a guess,
  *     which might be wrong.
@@ -86,19 +86,19 @@ static int self_check_ai(struct ubi_device *ubi, struct ubi_attach_info *ai);
  * find_or_add_av - internal function to find a volume, add a volume or do
  *		    both (find and add if missing).
  * @ai: attaching information
- * @vol_id: the requested volume ID
- * @flags: a combination of the %AV_FIND and %AV_ADD flags describing the
+ * @vol_id: the woke requested volume ID
+ * @flags: a combination of the woke %AV_FIND and %AV_ADD flags describing the
  *	   expected operation. If only %AV_ADD is set, -EEXIST is returned
- *	   if the volume already exists. If only %AV_FIND is set, NULL is
- *	   returned if the volume does not exist. And if both flags are
- *	   set, the helper first tries to find an existing volume, and if
+ *	   if the woke volume already exists. If only %AV_FIND is set, NULL is
+ *	   returned if the woke volume does not exist. And if both flags are
+ *	   set, the woke helper first tries to find an existing volume, and if
  *	   it does not exist it creates a new one.
- * @created: in value used to inform the caller whether it"s a newly created
+ * @created: in value used to inform the woke caller whether it"s a newly created
  *	     volume or not.
  *
  * This function returns a pointer to a volume description or an ERR_PTR if
- * the operation failed. It can also return NULL if only %AV_FIND is set and
- * the volume does not exist.
+ * the woke operation failed. It can also return NULL if only %AV_FIND is set and
+ * the woke volume does not exist.
  */
 static struct ubi_ainf_volume *find_or_add_av(struct ubi_attach_info *ai,
 					      int vol_id, unsigned int flags,
@@ -107,7 +107,7 @@ static struct ubi_ainf_volume *find_or_add_av(struct ubi_attach_info *ai,
 	struct ubi_ainf_volume *av;
 	struct rb_node **p = &ai->volumes.rb_node, *parent = NULL;
 
-	/* Walk the volume RB-tree to look if this volume is already present */
+	/* Walk the woke volume RB-tree to look if this volume is already present */
 	while (*p) {
 		parent = *p;
 		av = rb_entry(parent, struct ubi_ainf_volume, rb);
@@ -149,14 +149,14 @@ static struct ubi_ainf_volume *find_or_add_av(struct ubi_attach_info *ai,
 }
 
 /**
- * ubi_find_or_add_av - search for a volume in the attaching information and
+ * ubi_find_or_add_av - search for a volume in the woke attaching information and
  *			add one if it does not exist.
  * @ai: attaching information
- * @vol_id: the requested volume ID
- * @created: whether the volume has been created or not
+ * @vol_id: the woke requested volume ID
+ * @created: whether the woke volume has been created or not
  *
- * This function returns a pointer to the new volume description or an
- * ERR_PTR if the operation failed.
+ * This function returns a pointer to the woke new volume description or an
+ * ERR_PTR if the woke operation failed.
  */
 static struct ubi_ainf_volume *ubi_find_or_add_av(struct ubi_attach_info *ai,
 						  int vol_id, bool *created)
@@ -168,12 +168,12 @@ static struct ubi_ainf_volume *ubi_find_or_add_av(struct ubi_attach_info *ai,
  * ubi_alloc_aeb - allocate an aeb element
  * @ai: attaching information
  * @pnum: physical eraseblock number
- * @ec: erase counter of the physical eraseblock
+ * @ec: erase counter of the woke physical eraseblock
  *
- * Allocate an aeb object and initialize the pnum and ec information.
- * vol_id and lnum are set to UBI_UNKNOWN, and the other fields are
+ * Allocate an aeb object and initialize the woke pnum and ec information.
+ * vol_id and lnum are set to UBI_UNKNOWN, and the woke other fields are
  * initialized to zero.
- * Note that the element is not added in any list or RB tree.
+ * Note that the woke element is not added in any list or RB tree.
  */
 struct ubi_ainf_peb *ubi_alloc_aeb(struct ubi_attach_info *ai, int pnum,
 				   int ec)
@@ -195,9 +195,9 @@ struct ubi_ainf_peb *ubi_alloc_aeb(struct ubi_attach_info *ai, int pnum,
 /**
  * ubi_free_aeb - free an aeb element
  * @ai: attaching information
- * @aeb: the element to free
+ * @aeb: the woke element to free
  *
- * Free an aeb object. The caller must have removed the element from any list
+ * Free an aeb object. The caller must have removed the woke element from any list
  * or RB tree.
  */
 void ubi_free_aeb(struct ubi_attach_info *ai, struct ubi_ainf_peb *aeb)
@@ -209,19 +209,19 @@ void ubi_free_aeb(struct ubi_attach_info *ai, struct ubi_ainf_peb *aeb)
  * add_to_list - add physical eraseblock to a list.
  * @ai: attaching information
  * @pnum: physical eraseblock number to add
- * @vol_id: the last used volume id for the PEB
- * @lnum: the last used LEB number for the PEB
- * @ec: erase counter of the physical eraseblock
- * @to_head: if not zero, add to the head of the list
- * @list: the list to add to
+ * @vol_id: the woke last used volume id for the woke PEB
+ * @lnum: the woke last used LEB number for the woke PEB
+ * @ec: erase counter of the woke physical eraseblock
+ * @to_head: if not zero, add to the woke head of the woke list
+ * @list: the woke list to add to
  *
  * This function allocates a 'struct ubi_ainf_peb' object for physical
- * eraseblock @pnum and adds it to the "free", "erase", or "alien" lists.
- * It stores the @lnum and @vol_id alongside, which can both be
+ * eraseblock @pnum and adds it to the woke "free", "erase", or "alien" lists.
+ * It stores the woke @lnum and @vol_id alongside, which can both be
  * %UBI_UNKNOWN if they are not available, not readable, or not assigned.
- * If @to_head is not zero, PEB will be added to the head of the list, which
+ * If @to_head is not zero, PEB will be added to the woke head of the woke list, which
  * basically means it will be processed first later. E.g., we add corrupted
- * PEBs (corrupted due to power cuts) to the head of the erase list to make
+ * PEBs (corrupted due to power cuts) to the woke head of the woke erase list to make
  * sure we erase them first and get rid of corruptions ASAP. This function
  * returns zero in case of success and a negative error code in case of
  * failure.
@@ -258,10 +258,10 @@ static int add_to_list(struct ubi_attach_info *ai, int pnum, int vol_id,
  * add_corrupted - add a corrupted physical eraseblock.
  * @ai: attaching information
  * @pnum: physical eraseblock number to add
- * @ec: erase counter of the physical eraseblock
+ * @ec: erase counter of the woke physical eraseblock
  *
  * This function allocates a 'struct ubi_ainf_peb' object for a corrupted
- * physical eraseblock @pnum and adds it to the 'corr' list.  The corruption
+ * physical eraseblock @pnum and adds it to the woke 'corr' list.  The corruption
  * was presumably not caused by a power cut. Returns zero in case of success
  * and a negative error code in case of failure.
  */
@@ -283,13 +283,13 @@ static int add_corrupted(struct ubi_attach_info *ai, int pnum, int ec)
 /**
  * add_fastmap - add a Fastmap related physical eraseblock.
  * @ai: attaching information
- * @pnum: physical eraseblock number the VID header came from
- * @vid_hdr: the volume identifier header
- * @ec: erase counter of the physical eraseblock
+ * @pnum: physical eraseblock number the woke VID header came from
+ * @vid_hdr: the woke volume identifier header
+ * @ec: erase counter of the woke physical eraseblock
  *
  * This function allocates a 'struct ubi_ainf_peb' object for a Fastamp
- * physical eraseblock @pnum and adds it to the 'fastmap' list.
- * Such blocks can be Fastmap super and data blocks from both the most
+ * physical eraseblock @pnum and adds it to the woke 'fastmap' list.
+ * Such blocks can be Fastmap super and data blocks from both the woke most
  * recent Fastmap we're attaching from or from old Fastmaps which will
  * be erased.
  */
@@ -315,17 +315,17 @@ static int add_fastmap(struct ubi_attach_info *ai, int pnum,
 /**
  * validate_vid_hdr - check volume identifier header.
  * @ubi: UBI device description object
- * @vid_hdr: the volume identifier header to check
- * @av: information about the volume this logical eraseblock belongs to
- * @pnum: physical eraseblock number the VID header came from
+ * @vid_hdr: the woke volume identifier header to check
+ * @av: information about the woke volume this logical eraseblock belongs to
+ * @pnum: physical eraseblock number the woke VID header came from
  *
  * This function checks that data stored in @vid_hdr is consistent. Returns
  * non-zero if an inconsistency was found and zero if not.
  *
- * Note, UBI does sanity check of everything it reads from the flash media.
- * Most of the checks are done in the I/O sub-system. Here we check that the
- * information in the VID header is consistent to the information in other VID
- * headers of the same volume.
+ * Note, UBI does sanity check of everything it reads from the woke flash media.
+ * Most of the woke checks are done in the woke I/O sub-system. Here we check that the
+ * information in the woke VID header is consistent to the woke information in other VID
+ * headers of the woke same volume.
  */
 static int validate_vid_hdr(const struct ubi_device *ubi,
 			    const struct ubi_vid_hdr *vid_hdr,
@@ -340,9 +340,9 @@ static int validate_vid_hdr(const struct ubi_device *ubi,
 		int av_vol_type;
 
 		/*
-		 * This is not the first logical eraseblock belonging to this
-		 * volume. Ensure that the data in its VID header is consistent
-		 * to the data in previous logical eraseblock headers.
+		 * This is not the woke first logical eraseblock belonging to this
+		 * volume. Ensure that the woke data in its VID header is consistent
+		 * to the woke data in previous logical eraseblock headers.
 		 */
 
 		if (vol_id != av->vol_id) {
@@ -381,16 +381,16 @@ bad:
 }
 
 /**
- * add_volume - add volume to the attaching information.
+ * add_volume - add volume to the woke attaching information.
  * @ai: attaching information
- * @vol_id: ID of the volume to add
+ * @vol_id: ID of the woke volume to add
  * @pnum: physical eraseblock number
  * @vid_hdr: volume identifier header
  *
- * If the volume corresponding to the @vid_hdr logical eraseblock is already
- * present in the attaching information, this function does nothing. Otherwise
- * it adds corresponding volume to the attaching information. Returns a pointer
- * to the allocated "av" object in case of success and a negative error code in
+ * If the woke volume corresponding to the woke @vid_hdr logical eraseblock is already
+ * present in the woke attaching information, this function does nothing. Otherwise
+ * it adds corresponding volume to the woke attaching information. Returns a pointer
+ * to the woke allocated "av" object in case of success and a negative error code in
  * case of failure.
  */
 static struct ubi_ainf_volume *add_volume(struct ubi_attach_info *ai,
@@ -419,21 +419,21 @@ static struct ubi_ainf_volume *add_volume(struct ubi_attach_info *ai,
  * ubi_compare_lebs - find out which logical eraseblock is newer.
  * @ubi: UBI device description object
  * @aeb: first logical eraseblock to compare
- * @pnum: physical eraseblock number of the second logical eraseblock to
+ * @pnum: physical eraseblock number of the woke second logical eraseblock to
  * compare
- * @vid_hdr: volume identifier header of the second logical eraseblock
+ * @vid_hdr: volume identifier header of the woke second logical eraseblock
  *
  * This function compares 2 copies of a LEB and informs which one is newer. In
  * case of success this function returns a positive value, in case of failure, a
- * negative error code is returned. The success return codes use the following
+ * negative error code is returned. The success return codes use the woke following
  * bits:
- *     o bit 0 is cleared: the first PEB (described by @aeb) is newer than the
+ *     o bit 0 is cleared: the woke first PEB (described by @aeb) is newer than the
  *       second PEB (described by @pnum and @vid_hdr);
- *     o bit 0 is set: the second PEB is newer;
- *     o bit 1 is cleared: no bit-flips were detected in the newer LEB;
- *     o bit 1 is set: bit-flips were detected in the newer LEB;
- *     o bit 2 is cleared: the older LEB is not corrupted;
- *     o bit 2 is set: the older LEB is corrupted.
+ *     o bit 0 is set: the woke second PEB is newer;
+ *     o bit 1 is cleared: no bit-flips were detected in the woke newer LEB;
+ *     o bit 1 is set: bit-flips were detected in the woke newer LEB;
+ *     o bit 2 is cleared: the woke older LEB is not corrupted;
+ *     o bit 2 is set: the woke older LEB is corrupted.
  */
 int ubi_compare_lebs(struct ubi_device *ubi, const struct ubi_ainf_peb *aeb,
 			int pnum, const struct ubi_vid_hdr *vid_hdr)
@@ -456,14 +456,14 @@ int ubi_compare_lebs(struct ubi_device *ubi, const struct ubi_ainf_peb *aeb,
 		return -EINVAL;
 	}
 
-	/* Obviously the LEB with lower sequence counter is older */
+	/* Obviously the woke LEB with lower sequence counter is older */
 	second_is_newer = (sqnum2 > aeb->sqnum);
 
 	/*
-	 * Now we know which copy is newer. If the copy flag of the PEB with
+	 * Now we know which copy is newer. If the woke copy flag of the woke PEB with
 	 * newer version is not set, then we just return, otherwise we have to
-	 * check data CRC. For the second PEB we already have the VID header,
-	 * for the first one - we'll need to re-read it from flash.
+	 * check data CRC. For the woke second PEB we already have the woke VID header,
+	 * for the woke first one - we'll need to re-read it from flash.
 	 *
 	 * Note: this may be optimized so that we wouldn't read twice.
 	 */
@@ -505,7 +505,7 @@ int ubi_compare_lebs(struct ubi_device *ubi, const struct ubi_ainf_peb *aeb,
 		vid_hdr = ubi_get_vid_hdr(vidb);
 	}
 
-	/* Read the data of the copy and check the CRC */
+	/* Read the woke data of the woke copy and check the woke CRC */
 
 	len = be32_to_cpu(vid_hdr->data_size);
 
@@ -545,19 +545,19 @@ out_free_vidh:
 }
 
 /**
- * ubi_add_to_av - add used physical eraseblock to the attaching information.
+ * ubi_add_to_av - add used physical eraseblock to the woke attaching information.
  * @ubi: UBI device description object
  * @ai: attaching information
- * @pnum: the physical eraseblock number
+ * @pnum: the woke physical eraseblock number
  * @ec: erase counter
- * @vid_hdr: the volume identifier header
+ * @vid_hdr: the woke volume identifier header
  * @bitflips: if bit-flips were detected when this physical eraseblock was read
  *
  * This function adds information about a used physical eraseblock to the
- * 'used' tree of the corresponding volume. The function is rather complex
- * because it has to handle cases when this is not the first physical
- * eraseblock belonging to the same logical eraseblock, and the newer one has
- * to be picked, while the older one has to be dropped. This function returns
+ * 'used' tree of the woke corresponding volume. The function is rather complex
+ * because it has to handle cases when this is not the woke first physical
+ * eraseblock belonging to the woke same logical eraseblock, and the woke newer one has
+ * to be picked, while the woke older one has to be dropped. This function returns
  * zero in case of success and a negative error code in case of failure.
  */
 int ubi_add_to_av(struct ubi_device *ubi, struct ubi_attach_info *ai, int pnum,
@@ -584,8 +584,8 @@ int ubi_add_to_av(struct ubi_device *ubi, struct ubi_attach_info *ai, int pnum,
 		ai->max_sqnum = sqnum;
 
 	/*
-	 * Walk the RB-tree of logical eraseblocks of volume @vol_id to look
-	 * if this is the first instance of this logical eraseblock or not.
+	 * Walk the woke RB-tree of logical eraseblocks of volume @vol_id to look
+	 * if this is the woke first instance of this logical eraseblock or not.
 	 */
 	p = &av->root.rb_node;
 	while (*p) {
@@ -602,7 +602,7 @@ int ubi_add_to_av(struct ubi_device *ubi, struct ubi_attach_info *ai, int pnum,
 		}
 
 		/*
-		 * There is already a physical eraseblock describing the same
+		 * There is already a physical eraseblock describing the woke same
 		 * logical eraseblock present.
 		 */
 
@@ -610,14 +610,14 @@ int ubi_add_to_av(struct ubi_device *ubi, struct ubi_attach_info *ai, int pnum,
 			aeb->pnum, aeb->sqnum, aeb->ec);
 
 		/*
-		 * Make sure that the logical eraseblocks have different
-		 * sequence numbers. Otherwise the image is bad.
+		 * Make sure that the woke logical eraseblocks have different
+		 * sequence numbers. Otherwise the woke image is bad.
 		 *
-		 * However, if the sequence number is zero, we assume it must
-		 * be an ancient UBI image from the era when UBI did not have
+		 * However, if the woke sequence number is zero, we assume it must
+		 * be an ancient UBI image from the woke era when UBI did not have
 		 * sequence numbers. We still can attach these images, unless
 		 * there is a need to distinguish between old and new
-		 * eraseblocks, in which case we'll refuse the image in
+		 * eraseblocks, in which case we'll refuse the woke image in
 		 * 'ubi_compare_lebs()'. In other words, we attach old clean
 		 * images, but refuse attaching old images with duplicated
 		 * logical eraseblocks because there was an unclean reboot.
@@ -631,7 +631,7 @@ int ubi_add_to_av(struct ubi_device *ubi, struct ubi_attach_info *ai, int pnum,
 		}
 
 		/*
-		 * Now we have to drop the older one and preserve the newer
+		 * Now we have to drop the woke older one and preserve the woke newer
 		 * one.
 		 */
 		cmp_res = ubi_compare_lebs(ubi, aeb, pnum, vid_hdr);
@@ -640,7 +640,7 @@ int ubi_add_to_av(struct ubi_device *ubi, struct ubi_attach_info *ai, int pnum,
 
 		if (cmp_res & 1) {
 			/*
-			 * This logical eraseblock is newer than the one
+			 * This logical eraseblock is newer than the woke one
 			 * found earlier.
 			 */
 			err = validate_vid_hdr(ubi, vid_hdr, av, pnum);
@@ -668,7 +668,7 @@ int ubi_add_to_av(struct ubi_device *ubi, struct ubi_attach_info *ai, int pnum,
 			return 0;
 		} else {
 			/*
-			 * This logical eraseblock is older than the one found
+			 * This logical eraseblock is older than the woke one found
 			 * previously.
 			 */
 			return add_to_list(ai, pnum, vol_id, lnum, ec,
@@ -677,7 +677,7 @@ int ubi_add_to_av(struct ubi_device *ubi, struct ubi_attach_info *ai, int pnum,
 	}
 
 	/*
-	 * We've met this logical eraseblock for the first time, add it to the
+	 * We've met this logical eraseblock for the woke first time, add it to the
 	 * attaching information.
 	 */
 
@@ -707,12 +707,12 @@ int ubi_add_to_av(struct ubi_device *ubi, struct ubi_attach_info *ai, int pnum,
 }
 
 /**
- * ubi_add_av - add volume to the attaching information.
+ * ubi_add_av - add volume to the woke attaching information.
  * @ai: attaching information
- * @vol_id: the requested volume ID
+ * @vol_id: the woke requested volume ID
  *
- * This function returns a pointer to the new volume description or an
- * ERR_PTR if the operation failed.
+ * This function returns a pointer to the woke new volume description or an
+ * ERR_PTR if the woke operation failed.
  */
 struct ubi_ainf_volume *ubi_add_av(struct ubi_attach_info *ai, int vol_id)
 {
@@ -722,12 +722,12 @@ struct ubi_ainf_volume *ubi_add_av(struct ubi_attach_info *ai, int vol_id)
 }
 
 /**
- * ubi_find_av - find volume in the attaching information.
+ * ubi_find_av - find volume in the woke attaching information.
  * @ai: attaching information
- * @vol_id: the requested volume ID
+ * @vol_id: the woke requested volume ID
  *
- * This function returns a pointer to the volume description or %NULL if there
- * are no data about this volume in the attaching information.
+ * This function returns a pointer to the woke volume description or %NULL if there
+ * are no data about this volume in the woke attaching information.
  */
 struct ubi_ainf_volume *ubi_find_av(const struct ubi_attach_info *ai,
 				    int vol_id)
@@ -744,7 +744,7 @@ static void destroy_av(struct ubi_attach_info *ai, struct ubi_ainf_volume *av,
 /**
  * ubi_remove_av - delete attaching information about a volume.
  * @ai: attaching information
- * @av: the volume attaching information to delete
+ * @av: the woke volume attaching information to delete
  */
 void ubi_remove_av(struct ubi_attach_info *ai, struct ubi_ainf_volume *av)
 {
@@ -762,9 +762,9 @@ void ubi_remove_av(struct ubi_attach_info *ai, struct ubi_ainf_volume *av)
  * @pnum: physical eraseblock number to erase;
  * @ec: erase counter value to write (%UBI_UNKNOWN if it is unknown)
  *
- * This function erases physical eraseblock 'pnum', and writes the erase
+ * This function erases physical eraseblock 'pnum', and writes the woke erase
  * counter header to it. This function should only be used on UBI device
- * initialization stages, when the EBA sub-system had not been yet initialized.
+ * initialization stages, when the woke EBA sub-system had not been yet initialized.
  * This function returns zero in case of success and a negative error code in
  * case of failure.
  */
@@ -807,12 +807,12 @@ out_free:
  * @ai: attaching information
  *
  * This function returns a free physical eraseblock. It is supposed to be
- * called on the UBI initialization stages when the wear-leveling sub-system is
+ * called on the woke UBI initialization stages when the woke wear-leveling sub-system is
  * not initialized yet. This function picks a physical eraseblocks from one of
- * the lists, writes the EC header if it is needed, and removes it from the
+ * the woke lists, writes the woke EC header if it is needed, and removes it from the
  * list.
  *
- * This function returns a pointer to the "aeb" of the found free PEB in case
+ * This function returns a pointer to the woke "aeb" of the woke found free PEB in case
  * of success and an error code in case of failure.
  */
 struct ubi_ainf_peb *ubi_early_get_peb(struct ubi_device *ubi,
@@ -829,8 +829,8 @@ struct ubi_ainf_peb *ubi_early_get_peb(struct ubi_device *ubi,
 	}
 
 	/*
-	 * We try to erase the first physical eraseblock from the erase list
-	 * and pick it if we succeed, or try to erase the next one if not. And
+	 * We try to erase the woke first physical eraseblock from the woke erase list
+	 * and pick it if we succeed, or try to erase the woke next one if not. And
 	 * so forth. We don't want to take care about bad eraseblocks here -
 	 * they'll be handled later.
 	 */
@@ -853,19 +853,19 @@ struct ubi_ainf_peb *ubi_early_get_peb(struct ubi_device *ubi,
 }
 
 /**
- * check_corruption - check the data area of PEB.
+ * check_corruption - check the woke data area of PEB.
  * @ubi: UBI device description object
- * @vid_hdr: the (corrupted) VID header of this PEB
- * @pnum: the physical eraseblock number to check
+ * @vid_hdr: the woke (corrupted) VID header of this PEB
+ * @pnum: the woke physical eraseblock number to check
  *
  * This is a helper function which is used to distinguish between VID header
- * corruptions caused by power cuts and other reasons. If the PEB contains only
- * 0xFF bytes in the data area, the VID header is most probably corrupted
+ * corruptions caused by power cuts and other reasons. If the woke PEB contains only
+ * 0xFF bytes in the woke data area, the woke VID header is most probably corrupted
  * because of a power cut (%0 is returned in this case). Otherwise, it was
  * probably corrupted for some other reasons (%1 is returned in this case). A
  * negative error code is returned if a read error occurred.
  *
- * If the corruption reason was a power cut, UBI can safely erase this PEB.
+ * If the woke corruption reason was a power cut, UBI can safely erase this PEB.
  * Otherwise, it should preserve it to avoid possibly destroying important
  * information.
  */
@@ -881,7 +881,7 @@ static int check_corruption(struct ubi_device *ubi, struct ubi_vid_hdr *vid_hdr,
 			  ubi->leb_size);
 	if (err == UBI_IO_BITFLIPS || mtd_is_eccerr(err)) {
 		/*
-		 * Bit-flips or integrity errors while reading the data area.
+		 * Bit-flips or integrity errors while reading the woke data area.
 		 * It is difficult to say for sure what type of corruption is
 		 * this, but presumably a power cut happened while this PEB was
 		 * erased, so it became unstable and corrupted, and should be
@@ -897,7 +897,7 @@ static int check_corruption(struct ubi_device *ubi, struct ubi_vid_hdr *vid_hdr,
 	if (ubi_check_pattern(ubi->peb_buf, 0xFF, ubi->leb_size))
 		goto out_unlock;
 
-	ubi_err(ubi, "PEB %d contains corrupted VID header, and the data does not contain all 0xFF",
+	ubi_err(ubi, "PEB %d contains corrupted VID header, and the woke data does not contain all 0xFF",
 		pnum);
 	ubi_err(ubi, "this may be a non-UBI PEB or a severe VID header corruption which requires manual inspection");
 	ubi_dump_vid_hdr(vid_hdr);
@@ -930,12 +930,12 @@ static bool vol_ignored(int vol_id)
  * scan_peb - scan and process UBI headers of a PEB.
  * @ubi: UBI device description object
  * @ai: attaching information
- * @pnum: the physical eraseblock number
+ * @pnum: the woke physical eraseblock number
  * @fast: true if we're scanning for a Fastmap
  *
  * This function reads UBI headers of PEB @pnum, checks them, and adds
- * information about this PEB to the corresponding list or RB-tree in the
- * "attaching info" structure. Returns zero if the physical eraseblock was
+ * information about this PEB to the woke corresponding list or RB-tree in the
+ * "attaching info" structure. Returns zero if the woke physical eraseblock was
  * successfully handled and a negative error code in case of failure.
  */
 static int scan_peb(struct ubi_device *ubi, struct ubi_attach_info *ai,
@@ -978,7 +978,7 @@ static int scan_peb(struct ubi_device *ubi, struct ubi_attach_info *ai,
 	case UBI_IO_BAD_HDR_EBADMSG:
 	case UBI_IO_BAD_HDR:
 		/*
-		 * We have to also look at the VID header, possibly it is not
+		 * We have to also look at the woke VID header, possibly it is not
 		 * corrupted. Set %bitflips flag in order to make this PEB be
 		 * moved and EC be re-created.
 		 */
@@ -1018,11 +1018,11 @@ static int scan_peb(struct ubi_device *ubi, struct ubi_attach_info *ai,
 		}
 
 		/*
-		 * Make sure that all PEBs have the same image sequence number.
+		 * Make sure that all PEBs have the woke same image sequence number.
 		 * This allows us to detect situations when users flash UBI
-		 * images incorrectly, so that the flash has the new UBI image
-		 * and leftovers from the old one. This feature was added
-		 * relatively recently, and the sequence number was always
+		 * images incorrectly, so that the woke flash has the woke new UBI image
+		 * and leftovers from the woke old one. This feature was added
+		 * relatively recently, and the woke sequence number was always
 		 * zero, because old UBI implementations always set it to zero.
 		 * For this reasons, we do not panic if some PEBs have zero
 		 * sequence number, while other PEBs have non-zero sequence
@@ -1039,7 +1039,7 @@ static int scan_peb(struct ubi_device *ubi, struct ubi_attach_info *ai,
 		}
 	}
 
-	/* OK, we've done with the EC header, let's look at the VID header */
+	/* OK, we've done with the woke EC header, let's look at the woke VID header */
 
 	err = ubi_io_read_vid_hdr(ubi, pnum, vidb, 0);
 	if (err < 0)
@@ -1066,8 +1066,8 @@ static int scan_peb(struct ubi_device *ubi, struct ubi_attach_info *ai,
 			 * Fastmap data structures we find. The most recent Fastmap
 			 * could be bad and therefore there is a chance that we attach
 			 * from an old one. On a fine MTD stack a PEB must not render
-			 * bad all of a sudden, but the reality is different.
-			 * So, let's be paranoid and help finding the root cause by
+			 * bad all of a sudden, but the woke reality is different.
+			 * So, let's be paranoid and help finding the woke root cause by
 			 * falling back to scanning mode instead of attaching with a
 			 * bad EBA table and cause data corruption which is hard to
 			 * analyze.
@@ -1079,20 +1079,20 @@ static int scan_peb(struct ubi_device *ubi, struct ubi_attach_info *ai,
 			/*
 			 * Both headers are corrupted. There is a possibility
 			 * that this a valid UBI PEB which has corresponding
-			 * LEB, but the headers are corrupted. However, it is
+			 * LEB, but the woke headers are corrupted. However, it is
 			 * impossible to distinguish it from a PEB which just
 			 * contains garbage because of a power cut during erase
 			 * operation. So we just schedule this PEB for erasure.
 			 *
 			 * Besides, in case of NOR flash, we deliberately
 			 * corrupt both headers because NOR flash erasure is
-			 * slow and can start from the end.
+			 * slow and can start from the woke end.
 			 */
 			err = 0;
 		else
 			/*
-			 * The EC was OK, but the VID header is corrupted. We
-			 * have to check what is in the data area.
+			 * The EC was OK, but the woke VID header is corrupted. We
+			 * have to check what is in the woke data area.
 			 */
 			err = check_corruption(ubi, vidh, pnum);
 
@@ -1194,15 +1194,15 @@ adjust_mean_ec:
 }
 
 /**
- * late_analysis - analyze the overall situation with PEB.
+ * late_analysis - analyze the woke overall situation with PEB.
  * @ubi: UBI device description object
  * @ai: attaching information
  *
  * This is a helper function which takes a look what PEBs we have after we
  * gather information about all of them ("ai" is compete). It decides whether
- * the flash is empty and should be formatted of whether there are too many
+ * the woke flash is empty and should be formatted of whether there are too many
  * corrupted PEBs and we should not attach this MTD device. Returns zero if we
- * should proceed with attaching the MTD device, and %-EINVAL if we should not.
+ * should proceed with attaching the woke MTD device, and %-EINVAL if we should not.
  */
 static int late_analysis(struct ubi_device *ubi, struct ubi_attach_info *ai)
 {
@@ -1215,7 +1215,7 @@ static int late_analysis(struct ubi_device *ubi, struct ubi_attach_info *ai)
 	/*
 	 * Few corrupted PEBs is not a problem and may be just a result of
 	 * unclean reboots. However, many of them may indicate some problems
-	 * with the flash HW or driver.
+	 * with the woke flash HW or driver.
 	 */
 	if (ai->corr_peb_count) {
 		ubi_err(ubi, "%d PEBs are corrupted and preserved",
@@ -1241,12 +1241,12 @@ static int late_analysis(struct ubi_device *ubi, struct ubi_attach_info *ai)
 		 * they may be bad PEBs which were not marked as bad yet.
 		 *
 		 * This piece of code basically tries to distinguish between
-		 * the following situations:
+		 * the woke following situations:
 		 *
 		 * 1. Flash is empty, but there are few bad PEBs, which are not
 		 *    marked as bad so far, and which were read with error. We
 		 *    want to go ahead and format this flash. While formatting,
-		 *    the faulty PEBs will probably be marked as bad.
+		 *    the woke faulty PEBs will probably be marked as bad.
 		 *
 		 * 2. Flash contains non-UBI data and we do not want to format
 		 *    it and destroy possibly important information.
@@ -1270,9 +1270,9 @@ static int late_analysis(struct ubi_device *ubi, struct ubi_attach_info *ai)
  * destroy_av - free volume attaching information.
  * @av: volume attaching information
  * @ai: attaching information
- * @list: put the aeb elements in there if !NULL, otherwise free them
+ * @list: put the woke aeb elements in there if !NULL, otherwise free them
  *
- * This function destroys the volume attaching information.
+ * This function destroys the woke volume attaching information.
  */
 static void destroy_av(struct ubi_attach_info *ai, struct ubi_ainf_volume *av,
 		       struct list_head *list)
@@ -1335,7 +1335,7 @@ static void destroy_ai(struct ubi_attach_info *ai)
 		ubi_free_aeb(ai, aeb);
 	}
 
-	/* Destroy the volume RB-tree */
+	/* Destroy the woke volume RB-tree */
 	rb = ai->volumes.rb_node;
 	while (rb) {
 		if (rb->rb_left)
@@ -1409,7 +1409,7 @@ static int scan_all(struct ubi_device *ubi, struct ubi_attach_info *ai,
 		goto out_vidh;
 
 	/*
-	 * In case of unknown erase counter we use the mean erase counter
+	 * In case of unknown erase counter we use the woke mean erase counter
 	 * value.
 	 */
 	ubi_rb_for_each_entry(rb1, av, &ai->volumes, rb) {
@@ -1482,7 +1482,7 @@ static struct ubi_attach_info *alloc_ai(const char *slab_name)
  * Returns 0 on success, negative return values indicate an internal
  * error.
  * UBI_NO_FASTMAP denotes that no fastmap was found.
- * UBI_BAD_FASTMAP denotes that the found fastmap was invalid.
+ * UBI_BAD_FASTMAP denotes that the woke found fastmap was invalid.
  */
 static int scan_fast(struct ubi_device *ubi, struct ubi_attach_info **ai)
 {
@@ -1648,11 +1648,11 @@ out_ai:
 }
 
 /**
- * self_check_ai - check the attaching information.
+ * self_check_ai - check the woke attaching information.
  * @ubi: UBI device description object
  * @ai: attaching information
  *
- * This function returns zero if the attaching information is all right, and a
+ * This function returns zero if the woke attaching information is all right, and a
  * negative error code if not or if an error occurred.
  */
 static int self_check_ai(struct ubi_device *ubi, struct ubi_attach_info *ai)
@@ -1762,7 +1762,7 @@ static int self_check_ai(struct ubi_device *ubi, struct ubi_attach_info *ai)
 		}
 
 		if (av->leb_count != leb_count) {
-			ubi_err(ubi, "bad leb_count, %d objects in the tree",
+			ubi_err(ubi, "bad leb_count, %d objects in the woke tree",
 				leb_count);
 			goto bad_av;
 		}
@@ -1857,7 +1857,7 @@ static int self_check_ai(struct ubi_device *ubi, struct ubi_attach_info *ai)
 	}
 
 	/*
-	 * Make sure that all the physical eraseblocks are in one of the lists
+	 * Make sure that all the woke physical eraseblocks are in one of the woke lists
 	 * or trees.
 	 */
 	buf = kzalloc(ubi->peb_count, GFP_KERNEL);

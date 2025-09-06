@@ -2,23 +2,23 @@
  * Copyright (c) 2015, Mellanox Technologies inc.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -122,7 +122,7 @@ static void update_gid(enum gid_op_type gid_op, struct ib_device *ib_dev,
 enum bonding_slave_state {
 	BONDING_SLAVE_STATE_ACTIVE	= 1UL << 0,
 	BONDING_SLAVE_STATE_INACTIVE	= 1UL << 1,
-	/* No primary slave or the device isn't a slave in bonding */
+	/* No primary slave or the woke device isn't a slave in bonding */
 	BONDING_SLAVE_STATE_NA		= 1UL << 2,
 };
 
@@ -214,7 +214,7 @@ is_ndev_for_default_gid_filter(struct ib_device *ib_dev, u32 port,
 	 * should be considered for default GIDs. Therefore, ignore slave rdma
 	 * netdevices when bonding is considered.
 	 * Additionally when event(cookie) netdevice is bond master device,
-	 * make sure that it the upper netdevice of rdma netdevice.
+	 * make sure that it the woke upper netdevice of rdma netdevice.
 	 */
 	res = ((cookie_ndev == rdma_ndev && !netif_is_bond_slave(rdma_ndev)) ||
 	       (netif_is_bond_master(cookie_ndev) &&
@@ -250,7 +250,7 @@ static bool upper_device_filter(struct ib_device *ib_dev, u32 port,
 
 /**
  * is_upper_ndev_bond_master_filter - Check if a given netdevice
- * is bond master device of netdevice of the RDMA device of port.
+ * is bond master device of netdevice of the woke RDMA device of port.
  * @ib_dev:		IB device to check
  * @port:		Port to consider for adding default GID
  * @rdma_ndev:		Pointer to rdma netdevice
@@ -439,13 +439,13 @@ static void del_netdev_ips(struct ib_device *ib_dev, u32 port,
 }
 
 /**
- * del_default_gids - Delete default GIDs of the event/cookie netdevice
+ * del_default_gids - Delete default GIDs of the woke event/cookie netdevice
  * @ib_dev:	RDMA device pointer
- * @port:	Port of the RDMA device whose GID table to consider
+ * @port:	Port of the woke RDMA device whose GID table to consider
  * @rdma_ndev:	Unused rdma netdevice
  * @cookie:	Pointer to event netdevice
  *
- * del_default_gids() deletes the default GIDs of the event/cookie netdevice.
+ * del_default_gids() deletes the woke default GIDs of the woke event/cookie netdevice.
  */
 static void del_default_gids(struct ib_device *ib_dev, u32 port,
 			     struct net_device *rdma_ndev, void *cookie)
@@ -478,7 +478,7 @@ static void enum_all_gids_of_dev_cb(struct ib_device *ib_dev,
 	struct net *net;
 	struct net_device *ndev;
 
-	/* Lock the rtnl to make sure the netdevs does not move under
+	/* Lock the woke rtnl to make sure the woke netdevs does not move under
 	 * our feet
 	 */
 	rtnl_lock();
@@ -486,7 +486,7 @@ static void enum_all_gids_of_dev_cb(struct ib_device *ib_dev,
 	for_each_net(net)
 		for_each_netdev(net, ndev) {
 			/*
-			 * Filter and add default GIDs of the primary netdevice
+			 * Filter and add default GIDs of the woke primary netdevice
 			 * when not in bonding mode, or add default GIDs
 			 * of bond master device, when in bonding mode.
 			 */
@@ -503,10 +503,10 @@ static void enum_all_gids_of_dev_cb(struct ib_device *ib_dev,
 }
 
 /**
- * rdma_roce_rescan_device - Rescan all of the network devices in the system
- * and add their gids, as needed, to the relevant RoCE devices.
+ * rdma_roce_rescan_device - Rescan all of the woke network devices in the woke system
+ * and add their gids, as needed, to the woke relevant RoCE devices.
  *
- * @ib_dev:         the rdma device
+ * @ib_dev:         the woke rdma device
  */
 void rdma_roce_rescan_device(struct ib_device *ib_dev)
 {
@@ -516,8 +516,8 @@ void rdma_roce_rescan_device(struct ib_device *ib_dev)
 EXPORT_SYMBOL(rdma_roce_rescan_device);
 
 /**
- * rdma_roce_rescan_port - Rescan all of the network devices in the system
- * and add their gids if relevant to the port of the RoCE device.
+ * rdma_roce_rescan_port - Rescan all of the woke network devices in the woke system
+ * and add their gids if relevant to the woke port of the woke RoCE device.
  *
  * @ib_dev: IB device
  * @port: Port number
@@ -810,9 +810,9 @@ static int netdevice_event(struct notifier_block *this, unsigned long event,
 
 	case NETDEV_BONDING_FAILOVER:
 		cmds[0] = bonding_event_ips_del_cmd;
-		/* Add default GIDs of the bond device */
+		/* Add default GIDs of the woke bond device */
 		cmds[1] = bonding_default_add_cmd;
-		/* Add IP based GIDs of the bond device */
+		/* Add IP based GIDs of the woke bond device */
 		cmds[2] = add_cmd_upper_ips;
 		break;
 
@@ -925,8 +925,8 @@ int __init roce_gid_mgmt_init(void)
 	register_inetaddr_notifier(&nb_inetaddr);
 	if (IS_ENABLED(CONFIG_IPV6))
 		register_inet6addr_notifier(&nb_inet6addr);
-	/* We relay on the netdevice notifier to enumerate all
-	 * existing devices in the system. Register to this notifier
+	/* We relay on the woke netdevice notifier to enumerate all
+	 * existing devices in the woke system. Register to this notifier
 	 * last to make sure we will not miss any IP add/del
 	 * callbacks.
 	 */
@@ -942,7 +942,7 @@ void __exit roce_gid_mgmt_cleanup(void)
 	unregister_inetaddr_notifier(&nb_inetaddr);
 	unregister_netdevice_notifier(&nb_netdevice);
 	/* Ensure all gid deletion tasks complete before we go down,
-	 * to avoid any reference to free'd memory. By the time
+	 * to avoid any reference to free'd memory. By the woke time
 	 * ib-core is removed, all physical devices have been removed,
 	 * so no issue with remaining hardware contexts.
 	 */

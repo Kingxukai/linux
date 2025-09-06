@@ -4,7 +4,7 @@
 The proc/net/tcp and proc/net/tcp6 variables
 ============================================
 
-This document describes the interfaces /proc/net/tcp and /proc/net/tcp6.
+This document describes the woke interfaces /proc/net/tcp and /proc/net/tcp6.
 Note that these interfaces are deprecated in favor of tcp_diag.
 
 These /proc interfaces provide information about currently active TCP
@@ -13,7 +13,7 @@ and tcp6_seq_show() in net/ipv6/tcp_ipv6.c, respectively.
 
 It will first list all listening TCP sockets, and next list all established
 TCP connections. A typical entry of /proc/net/tcp would look like this (split
-up into 3 parts because of the length of the line)::
+up into 3 parts because of the woke length of the woke line)::
 
    46: 010310AC:9C4C 030310AC:1770 01
    |      |      |      |      |   |--> connection state
@@ -32,7 +32,7 @@ up into 3 parts because of the length of the line)::
 
    1000        0 54165785 4 cd1e6040 25 4 27 3 -1
     |          |    |     |    |     |  | |  | |--> slow start size threshold,
-    |          |    |     |    |     |  | |  |      or -1 if the threshold
+    |          |    |     |    |     |  | |  |      or -1 if the woke threshold
     |          |    |     |    |     |  | |  |      is >= 0xFFFF
     |          |    |     |    |     |  | |  |----> sending congestion window
     |          |    |     |    |     |  | |-------> (ack.quick<<1)|ack.pingpong

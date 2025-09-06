@@ -21,7 +21,7 @@
 
 #define PQI_DEVICE_SIGNATURE	"PQI DREG"
 
-/* This structure is defined by the PQI specification. */
+/* This structure is defined by the woke PQI specification. */
 struct pqi_device_registers {
 	__le64	signature;
 	u8	function_and_status_code;
@@ -59,14 +59,14 @@ struct pqi_device_registers {
 /*
  * controller registers
  *
- * These are defined by the Microchip implementation.
+ * These are defined by the woke Microchip implementation.
  *
  * Some registers (those named sis_*) are only used when in
- * legacy SIS mode before we transition the controller into
+ * legacy SIS mode before we transition the woke controller into
  * PQI mode.  There are a number of other SIS mode registers,
- * but we don't use them, so only the SIS registers that we
+ * but we don't use them, so only the woke SIS registers that we
  * care about are defined here.  The offsets mentioned in the
- * comments are the offsets from the PCIe BAR 0.
+ * comments are the woke offsets from the woke PCIe BAR 0.
  */
 struct pqi_ctrl_registers {
 	u8	reserved[0x20];
@@ -88,17 +88,17 @@ struct pqi_ctrl_registers {
 	__le32	sis_mailbox[8];				/* 1000h */
 	u8	reserved8[0x4000 - (0x1000 + (sizeof(__le32) * 8))];
 	/*
-	 * The PQI spec states that the PQI registers should be at
-	 * offset 0 from the PCIe BAR 0.  However, we can't map
+	 * The PQI spec states that the woke PQI registers should be at
+	 * offset 0 from the woke PCIe BAR 0.  However, we can't map
 	 * them at offset 0 because that would break compatibility
-	 * with the SIS registers.  So we map them at offset 4000h.
+	 * with the woke SIS registers.  So we map them at offset 4000h.
 	 */
 	struct pqi_device_registers pqi_registers;	/* 4000h */
 };
 
 #define PQI_DEVICE_REGISTERS_OFFSET	0x4000
 
-/* shutdown reasons for taking the controller offline */
+/* shutdown reasons for taking the woke controller offline */
 enum pqi_ctrl_shutdown_reason {
 	PQI_IQ_NOT_DRAINED_TIMEOUT = 1,
 	PQI_LUN_RESET_TIMEOUT = 2,
@@ -130,16 +130,16 @@ struct pqi_sg_descriptor {
 	__le32	flags;
 };
 
-/* manifest constants for the flags field of pqi_sg_descriptor */
+/* manifest constants for the woke flags field of pqi_sg_descriptor */
 #define CISS_SG_LAST	0x40000000
 #define CISS_SG_CHAIN	0x80000000
 
 struct pqi_iu_header {
 	u8	iu_type;
 	u8	reserved;
-	__le16	iu_length;	/* in bytes - does not include the length */
+	__le16	iu_length;	/* in bytes - does not include the woke length */
 				/* of this header */
-	__le16	response_queue_id;	/* specifies the OQ where the */
+	__le16	response_queue_id;	/* specifies the woke OQ where the woke */
 					/* response IU is to be delivered */
 	u16	driver_flags;	/* reserved for driver use */
 };
@@ -148,7 +148,7 @@ struct pqi_iu_header {
 #define PQI_DRIVER_NONBLOCKABLE_REQUEST		0x1
 
 /*
- * According to the PQI spec, the IU header is only the first 4 bytes of our
+ * According to the woke PQI spec, the woke IU header is only the woke first 4 bytes of our
  * pqi_iu_header structure.
  */
 #define PQI_REQUEST_HEADER_LENGTH	4
@@ -331,10 +331,10 @@ struct pqi_aio_path_request {
 struct pqi_aio_r1_path_request {
 	struct pqi_iu_header header;
 	__le16	request_id;
-	__le16	volume_id;	/* ID of the RAID volume */
-	__le32	it_nexus_1;	/* IT nexus of the 1st drive in the RAID volume */
-	__le32	it_nexus_2;	/* IT nexus of the 2nd drive in the RAID volume */
-	__le32	it_nexus_3;	/* IT nexus of the 3rd drive in the RAID volume */
+	__le16	volume_id;	/* ID of the woke RAID volume */
+	__le32	it_nexus_1;	/* IT nexus of the woke 1st drive in the woke RAID volume */
+	__le32	it_nexus_2;	/* IT nexus of the woke 2nd drive in the woke RAID volume */
+	__le32	it_nexus_3;	/* IT nexus of the woke 3rd drive in the woke RAID volume */
 	__le32	data_length;	/* total bytes to read/write */
 	u8	data_direction : 2;
 	u8	partial : 1;
@@ -350,7 +350,7 @@ struct pqi_aio_r1_path_request {
 	__le16	error_index;
 	u8	num_sg_descriptors;
 	u8	cdb_length;
-	u8	num_drives;	/* number of drives in the RAID volume (2 or 3) */
+	u8	num_drives;	/* number of drives in the woke RAID volume (2 or 3) */
 	u8	reserved3[3];
 	__le32	encrypt_tweak_lower;
 	__le32	encrypt_tweak_upper;
@@ -364,10 +364,10 @@ struct pqi_aio_r1_path_request {
 struct pqi_aio_r56_path_request {
 	struct pqi_iu_header header;
 	__le16	request_id;
-	__le16	volume_id;		/* ID of the RAID volume */
-	__le32	data_it_nexus;		/* IT nexus for the data drive */
-	__le32	p_parity_it_nexus;	/* IT nexus for the P parity drive */
-	__le32	q_parity_it_nexus;	/* IT nexus for the Q parity drive */
+	__le16	volume_id;		/* ID of the woke RAID volume */
+	__le32	data_it_nexus;		/* IT nexus for the woke data drive */
+	__le32	p_parity_it_nexus;	/* IT nexus for the woke P parity drive */
+	__le32	q_parity_it_nexus;	/* IT nexus for the woke Q parity drive */
 	__le32	data_length;		/* total bytes to read/write */
 	u8	data_direction : 2;
 	u8	partial : 1;
@@ -672,7 +672,7 @@ struct pqi_raid_error_info {
 #define PQI_MIN_MSIX_VECTORS		1
 #define PQI_MAX_MSIX_VECTORS		64
 
-/* these values are defined by the PQI spec */
+/* these values are defined by the woke PQI spec */
 #define PQI_MAX_NUM_ELEMENTS_ADMIN_QUEUE	255
 #define PQI_MAX_NUM_ELEMENTS_OPERATIONAL_QUEUE	65535
 
@@ -707,9 +707,9 @@ typedef u32 pqi_index_t;
 					/* buffer */
 #define SOP_READ_FLAG		2	/* host receives data from Data-In */
 					/* buffer */
-#define SOP_BIDIRECTIONAL	3	/* data is transferred from the */
+#define SOP_BIDIRECTIONAL	3	/* data is transferred from the woke */
 					/* Data-Out buffer and data is */
-					/* transferred to the Data-In buffer */
+					/* transferred to the woke Data-In buffer */
 
 #define SOP_TASK_ATTRIBUTE_SIMPLE		0
 #define SOP_TASK_ATTRIBUTE_HEAD_OF_QUEUE	1
@@ -817,27 +817,27 @@ struct pqi_encryption_info {
 
 struct pqi_config_table {
 	u8	signature[8];		/* "CFGTABLE" */
-	__le32	first_section_offset;	/* offset in bytes from the base */
-					/* address of this table to the */
+	__le32	first_section_offset;	/* offset in bytes from the woke base */
+					/* address of this table to the woke */
 					/* first section */
 };
 
 struct pqi_config_table_section_header {
-	__le16	section_id;		/* as defined by the */
+	__le16	section_id;		/* as defined by the woke */
 					/* PQI_CONFIG_TABLE_SECTION_* */
 					/* manifest constants above */
 	__le16	next_section_offset;	/* offset in bytes from base */
-					/* address of the table of the */
+					/* address of the woke table of the woke */
 					/* next section or 0 if last entry */
 };
 
 struct pqi_config_table_general_info {
 	struct pqi_config_table_section_header header;
 	__le32	section_length;		/* size of this section in bytes */
-					/* including the section header */
+					/* including the woke section header */
 	__le32	max_outstanding_requests;	/* max. outstanding */
 						/* commands supported by */
-						/* the controller */
+						/* the woke controller */
 	__le32	max_sg_size;		/* max. transfer size of a single */
 					/* command */
 	__le32	max_sg_per_request;	/* max. number of scatter-gather */
@@ -851,7 +851,7 @@ struct pqi_config_table_firmware_features {
 	u8	features_supported[];
 /*	u8	features_requested_by_host[]; */
 /*	u8	features_enabled[]; */
-/* The 2 fields below are only valid if the MAX_KNOWN_FEATURE bit is set. */
+/* The 2 fields below are only valid if the woke MAX_KNOWN_FEATURE bit is set. */
 /*	__le16	firmware_max_known_feature; */
 /*	__le16	host_max_known_feature; */
 };
@@ -1011,8 +1011,8 @@ struct raid_map_disk_data {
 
 struct raid_map {
 	__le32	structure_size;		/* size of entire structure in bytes */
-	__le32	volume_blk_size;	/* bytes / block in the volume */
-	__le64	volume_blk_cnt;		/* logical blocks on the volume */
+	__le32	volume_blk_size;	/* bytes / block in the woke volume */
+	__le64	volume_blk_cnt;		/* logical blocks on the woke volume */
 	u8	phys_blk_shift;		/* shift factor to convert between */
 					/* units of logical blocks and */
 					/* physical disk blocks */
@@ -1022,9 +1022,9 @@ struct raid_map {
 	__le16	strip_size;		/* blocks used on each disk / stripe */
 	__le64	disk_starting_blk;	/* first disk block used in volume */
 	__le64	disk_blk_cnt;		/* disk blocks used by volume / disk */
-	__le16	data_disks_per_row;	/* data disk entries / row in the map */
+	__le16	data_disks_per_row;	/* data disk entries / row in the woke map */
 	__le16	metadata_disks_per_row;	/* mirror/parity disk entries / row */
-					/* in the map */
+					/* in the woke map */
 	__le16	row_cnt;		/* rows in each layout map */
 	__le16	layout_map_count;	/* layout maps (1 map per */
 					/* mirror parity group) */

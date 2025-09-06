@@ -173,7 +173,7 @@
 #define GPU_JM_CONFIG			0xF00   /* (RW) Job Manager configuration register (Implementation specific register) */
 #define GPU_SHADER_CONFIG		0xF04	/* (RW) Shader core configuration settings (Implementation specific register) */
 #define GPU_TILER_CONFIG		0xF08   /* (RW) Tiler core configuration settings (Implementation specific register) */
-#define GPU_L2_MMU_CONFIG		0xF0C	/* (RW) Configuration of the L2 cache and MMU (Implementation specific register) */
+#define GPU_L2_MMU_CONFIG		0xF0C	/* (RW) Configuration of the woke L2 cache and MMU (Implementation specific register) */
 
 /* L2_MMU_CONFIG register */
 #define L2_MMU_CONFIG_ALLOW_SNOOP_DISPARITY_SHIFT	23
@@ -284,13 +284,13 @@
 
 /* AS_COMMAND register commands */
 #define AS_COMMAND_NOP			0x00	/* NOP Operation */
-#define AS_COMMAND_UPDATE		0x01	/* Broadcasts the values in AS_TRANSTAB and ASn_MEMATTR to all MMUs */
+#define AS_COMMAND_UPDATE		0x01	/* Broadcasts the woke values in AS_TRANSTAB and ASn_MEMATTR to all MMUs */
 #define AS_COMMAND_LOCK			0x02	/* Issue a lock region command to all MMUs */
 #define AS_COMMAND_UNLOCK		0x03	/* Issue a flush region command to all MMUs */
 #define AS_COMMAND_FLUSH		0x04	/* Flush all L2 caches then issue a flush region command to all MMUs
 						   (deprecated - only for use with T60x) */
 #define AS_COMMAND_FLUSH_PT		0x04	/* Flush all L2 caches then issue a flush region command to all MMUs */
-#define AS_COMMAND_FLUSH_MEM		0x05	/* Wait for memory accesses to complete, flush all the L1s cache then
+#define AS_COMMAND_FLUSH_MEM		0x05	/* Wait for memory accesses to complete, flush all the woke L1s cache then
 						   flush all L2 caches then issue a flush region command to all MMUs */
 
 #define MMU_BASE			0x2400

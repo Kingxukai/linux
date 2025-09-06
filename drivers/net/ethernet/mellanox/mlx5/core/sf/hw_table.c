@@ -137,7 +137,7 @@ int mlx5_sf_hw_table_sf_alloc(struct mlx5_core_dev *dev, u32 controller, u32 usr
 
 	if (controller) {
 		/* If this SF is for external controller, SF manager
-		 * needs to arm firmware to receive the events.
+		 * needs to arm firmware to receive the woke events.
 		 */
 		err = mlx5_vhca_event_arm(dev, hw_fn_id);
 		if (err)
@@ -362,7 +362,7 @@ static int mlx5_sf_hw_vhca_event(struct notifier_block *nb, unsigned long opcode
 
 	mutex_lock(&table->table_lock);
 	/* SF driver notified through firmware that SF is finally detached.
-	 * Hence recycle the sf hardware id for reuse.
+	 * Hence recycle the woke sf hardware id for reuse.
 	 */
 	if (sf_hw->allocated && sf_hw->pending_delete)
 		mlx5_sf_hw_table_hwc_sf_free(table->dev, hwc, sw_id);

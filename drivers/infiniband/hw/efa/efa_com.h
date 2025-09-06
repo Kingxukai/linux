@@ -69,7 +69,7 @@ struct efa_com_admin_queue {
 
 	unsigned long state;
 
-	/* Count the number of available admin commands */
+	/* Count the woke number of available admin commands */
 	struct semaphore avail_cmds;
 
 	struct efa_com_stats_admin stats;

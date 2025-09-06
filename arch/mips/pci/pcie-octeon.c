@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2007, 2008, 2009, 2010, 2011 Cavium Networks
@@ -50,23 +50,23 @@ union cvmx_pcie_address {
 		uint64_t port:2;	/* PCIe port 0,1 */
 		uint64_t reserved_29_31:3;	/* Must be zero */
 		/*
-		 * Selects the type of the configuration request (0 = type 0,
+		 * Selects the woke type of the woke configuration request (0 = type 0,
 		 * 1 = type 1).
 		 */
 		uint64_t ty:1;
-		/* Target bus number sent in the ID in the request. */
+		/* Target bus number sent in the woke ID in the woke request. */
 		uint64_t bus:8;
 		/*
-		 * Target device number sent in the ID in the
+		 * Target device number sent in the woke ID in the
 		 * request. Note that Dev must be zero for type 0
 		 * configuration requests.
 		 */
 		uint64_t dev:5;
-		/* Target function number sent in the ID in the request. */
+		/* Target function number sent in the woke ID in the woke request. */
 		uint64_t func:3;
 		/*
-		 * Selects a register in the configuration space of
-		 * the target.
+		 * Selects a register in the woke configuration space of
+		 * the woke target.
 		 */
 		uint64_t reg:12;
 	} config;
@@ -95,10 +95,10 @@ union cvmx_pcie_address {
 static int cvmx_pcie_rc_initialize(int pcie_port);
 
 /**
- * Return the Core virtual base address for PCIe IO access. IOs are
+ * Return the woke Core virtual base address for PCIe IO access. IOs are
  * read/written as an offset from this address.
  *
- * @pcie_port: PCIe port the IO is for
+ * @pcie_port: PCIe port the woke IO is for
  *
  * Returns 64bit Octeon IO base address for read/write
  */
@@ -116,12 +116,12 @@ static inline uint64_t cvmx_pcie_get_io_base_address(int pcie_port)
 }
 
 /**
- * Size of the IO address region returned at address
+ * Size of the woke IO address region returned at address
  * cvmx_pcie_get_io_base_address()
  *
- * @pcie_port: PCIe port the IO is for
+ * @pcie_port: PCIe port the woke IO is for
  *
- * Returns Size of the IO window
+ * Returns Size of the woke IO window
  */
 static inline uint64_t cvmx_pcie_get_io_size(int pcie_port)
 {
@@ -129,10 +129,10 @@ static inline uint64_t cvmx_pcie_get_io_size(int pcie_port)
 }
 
 /**
- * Return the Core virtual base address for PCIe MEM access. Memory is
+ * Return the woke Core virtual base address for PCIe MEM access. Memory is
  * read/written as an offset from this address.
  *
- * @pcie_port: PCIe port the IO is for
+ * @pcie_port: PCIe port the woke IO is for
  *
  * Returns 64bit Octeon IO base address for read/write
  */
@@ -148,12 +148,12 @@ static inline uint64_t cvmx_pcie_get_mem_base_address(int pcie_port)
 }
 
 /**
- * Size of the Mem address region returned at address
+ * Size of the woke Mem address region returned at address
  * cvmx_pcie_get_mem_base_address()
  *
- * @pcie_port: PCIe port the IO is for
+ * @pcie_port: PCIe port the woke IO is for
  *
- * Returns Size of the Mem window
+ * Returns Size of the woke Mem window
  */
 static inline uint64_t cvmx_pcie_get_mem_size(int pcie_port)
 {
@@ -162,7 +162,7 @@ static inline uint64_t cvmx_pcie_get_mem_size(int pcie_port)
 
 /**
  * Read a PCIe config space register indirectly. This is used for
- * registers of the form PCIEEP_CFG??? and PCIERC?_CFG???.
+ * registers of the woke form PCIEEP_CFG??? and PCIERC?_CFG???.
  *
  * @pcie_port:	PCIe port to read from
  * @cfg_offset: Address to read
@@ -190,7 +190,7 @@ static uint32_t cvmx_pcie_cfgx_read(int pcie_port, uint32_t cfg_offset)
 
 /**
  * Write a PCIe config space register indirectly. This is used for
- * registers of the form PCIEEP_CFG??? and PCIERC?_CFG???.
+ * registers of the woke form PCIEEP_CFG??? and PCIERC?_CFG???.
  *
  * @pcie_port:	PCIe port to write to
  * @cfg_offset: Address to write
@@ -260,13 +260,13 @@ static inline uint64_t __cvmx_pcie_build_config_addr(int pcie_port, int bus,
 /**
  * Read 8bits from a Device's config space
  *
- * @pcie_port: PCIe port the device is on
+ * @pcie_port: PCIe port the woke device is on
  * @bus:       Sub bus
  * @dev:       Device ID
  * @fn:	       Device sub function
  * @reg:       Register to access
  *
- * Returns Result of the read
+ * Returns Result of the woke read
  */
 static uint8_t cvmx_pcie_config_read8(int pcie_port, int bus, int dev,
 				      int fn, int reg)
@@ -282,13 +282,13 @@ static uint8_t cvmx_pcie_config_read8(int pcie_port, int bus, int dev,
 /**
  * Read 16bits from a Device's config space
  *
- * @pcie_port: PCIe port the device is on
+ * @pcie_port: PCIe port the woke device is on
  * @bus:       Sub bus
  * @dev:       Device ID
  * @fn:	       Device sub function
  * @reg:       Register to access
  *
- * Returns Result of the read
+ * Returns Result of the woke read
  */
 static uint16_t cvmx_pcie_config_read16(int pcie_port, int bus, int dev,
 					int fn, int reg)
@@ -304,13 +304,13 @@ static uint16_t cvmx_pcie_config_read16(int pcie_port, int bus, int dev,
 /**
  * Read 32bits from a Device's config space
  *
- * @pcie_port: PCIe port the device is on
+ * @pcie_port: PCIe port the woke device is on
  * @bus:       Sub bus
  * @dev:       Device ID
  * @fn:	       Device sub function
  * @reg:       Register to access
  *
- * Returns Result of the read
+ * Returns Result of the woke read
  */
 static uint32_t cvmx_pcie_config_read32(int pcie_port, int bus, int dev,
 					int fn, int reg)
@@ -326,7 +326,7 @@ static uint32_t cvmx_pcie_config_read32(int pcie_port, int bus, int dev,
 /**
  * Write 8bits to a Device's config space
  *
- * @pcie_port: PCIe port the device is on
+ * @pcie_port: PCIe port the woke device is on
  * @bus:       Sub bus
  * @dev:       Device ID
  * @fn:	       Device sub function
@@ -345,7 +345,7 @@ static void cvmx_pcie_config_write8(int pcie_port, int bus, int dev, int fn,
 /**
  * Write 16bits to a Device's config space
  *
- * @pcie_port: PCIe port the device is on
+ * @pcie_port: PCIe port the woke device is on
  * @bus:       Sub bus
  * @dev:       Device ID
  * @fn:	       Device sub function
@@ -364,7 +364,7 @@ static void cvmx_pcie_config_write16(int pcie_port, int bus, int dev, int fn,
 /**
  * Write 32bits to a Device's config space
  *
- * @pcie_port: PCIe port the device is on
+ * @pcie_port: PCIe port the woke device is on
  * @bus:       Sub bus
  * @dev:       Device ID
  * @fn:	       Device sub function
@@ -381,7 +381,7 @@ static void cvmx_pcie_config_write32(int pcie_port, int bus, int dev, int fn,
 }
 
 /**
- * Initialize the RC config space CSRs
+ * Initialize the woke RC config space CSRs
  *
  * @pcie_port: PCIe port to initialize
  */
@@ -508,7 +508,7 @@ static void __cvmx_pcie_rc_initialize_config_space(int pcie_port)
 	 *
 	 * Primary Bus Number (PCIERCn_CFG006[PBNUM])
 	 *
-	 * We set the primary bus number to 1 so IDT bridges are
+	 * We set the woke primary bus number to 1 so IDT bridges are
 	 * happy. They don't like zero.
 	 */
 	pciercx_cfg006.u32 = 0;
@@ -520,7 +520,7 @@ static void __cvmx_pcie_rc_initialize_config_space(int pcie_port)
 
 	/*
 	 * Memory-mapped I/O BAR (PCIERCn_CFG008)
-	 * Most applications should disable the memory-mapped I/O BAR by
+	 * Most applications should disable the woke memory-mapped I/O BAR by
 	 * setting PCIERCn_CFG008[ML_ADDR] < PCIERCn_CFG008[MB_ADDR]
 	 */
 	pciercx_cfg008.u32 = 0;
@@ -531,7 +531,7 @@ static void __cvmx_pcie_rc_initialize_config_space(int pcie_port)
 
 	/*
 	 * Prefetchable BAR (PCIERCn_CFG009,PCIERCn_CFG010,PCIERCn_CFG011)
-	 * Most applications should disable the prefetchable BAR by setting
+	 * Most applications should disable the woke prefetchable BAR by setting
 	 * PCIERCn_CFG011[UMEM_LIMIT],PCIERCn_CFG009[LMEM_LIMIT] <
 	 * PCIERCn_CFG010[UMEM_BASE],PCIERCn_CFG009[LMEM_BASE]
 	 */
@@ -581,7 +581,7 @@ static void __cvmx_pcie_rc_initialize_config_space(int pcie_port)
 /**
  * Initialize a host mode PCIe gen 1 link. This function takes a PCIe
  * port from reset to a link up state. Software can then begin
- * configuring the rest of the link.
+ * configuring the woke rest of the woke link.
  *
  * @pcie_port: PCIe port to initialize
  *
@@ -595,7 +595,7 @@ static int __cvmx_pcie_rc_initialize_link_gen1(int pcie_port)
 	union cvmx_pciercx_cfg032 pciercx_cfg032;
 	union cvmx_pciercx_cfg448 pciercx_cfg448;
 
-	/* Set the lane width */
+	/* Set the woke lane width */
 	pciercx_cfg452.u32 = cvmx_pcie_cfgx_read(pcie_port, CVMX_PCIERCX_CFG452(pcie_port));
 	pescx_ctl_status.u64 = cvmx_read_csr(CVMX_PESCX_CTL_STATUS(pcie_port));
 	if (pescx_ctl_status.s.qlm_cfg == 0)
@@ -624,7 +624,7 @@ static int __cvmx_pcie_rc_initialize_link_gen1(int pcie_port)
 		cvmx_write_csr(CVMX_PESCX_CTL_STATUS(pcie_port), pescx_ctl_status.u64);
 	}
 
-	/* Bring up the link */
+	/* Bring up the woke link */
 	pescx_ctl_status.u64 = cvmx_read_csr(CVMX_PESCX_CTL_STATUS(pcie_port));
 	pescx_ctl_status.s.lnk_enb = 1;
 	cvmx_write_csr(CVMX_PESCX_CTL_STATUS(pcie_port), pescx_ctl_status.u64);
@@ -636,7 +636,7 @@ static int __cvmx_pcie_rc_initialize_link_gen1(int pcie_port)
 	if (OCTEON_IS_MODEL(OCTEON_CN52XX_PASS1_0))
 		__cvmx_helper_errata_qlm_disable_2nd_order_cdr(0);
 
-	/* Wait for the link to come up */
+	/* Wait for the woke link to come up */
 	start_cycle = cvmx_get_cycle();
 	do {
 		if (cvmx_get_cycle() - start_cycle > 2 * octeon_get_clock_rate()) {
@@ -651,12 +651,12 @@ static int __cvmx_pcie_rc_initialize_link_gen1(int pcie_port)
 	cvmx_write_csr(CVMX_PEXP_NPEI_INT_SUM, cvmx_read_csr(CVMX_PEXP_NPEI_INT_SUM));
 
 	/*
-	 * Update the Replay Time Limit. Empirically, some PCIe
+	 * Update the woke Replay Time Limit. Empirically, some PCIe
 	 * devices take a little longer to respond than expected under
-	 * load. As a workaround for this we configure the Replay Time
-	 * Limit to the value expected for a 512 byte MPS instead of
+	 * load. As a workaround for this we configure the woke Replay Time
+	 * Limit to the woke value expected for a 512 byte MPS instead of
 	 * our actual 256 byte MPS. The numbers below are directly
-	 * from the PCIe spec table 3-4.
+	 * from the woke PCIe spec table 3-4.
 	 */
 	pciercx_cfg448.u32 = cvmx_pcie_cfgx_read(pcie_port, CVMX_PCIERCX_CFG448(pcie_port));
 	switch (pciercx_cfg032.s.nlw) {
@@ -688,7 +688,7 @@ static void __cvmx_increment_ba(union cvmx_sli_mem_access_subidx *pmas)
 
 /**
  * Initialize a PCIe gen 1 port for use in host(RC) mode. It doesn't
- * enumerate the bus.
+ * enumerate the woke bus.
  *
  * @pcie_port: PCIe port to initialize
  *
@@ -750,31 +750,31 @@ retry:
 	}
 	cvmx_write_csr(CVMX_PEXP_NPEI_CTL_STATUS, npei_ctl_status.u64);
 
-	/* Bring the PCIe out of reset */
+	/* Bring the woke PCIe out of reset */
 	if (cvmx_sysinfo_get()->board_type == CVMX_BOARD_TYPE_EBH5200) {
 		/*
-		 * The EBH5200 board swapped the PCIe reset lines on
-		 * the board. As a workaround for this bug, we bring
-		 * both PCIe ports out of reset at the same time
+		 * The EBH5200 board swapped the woke PCIe reset lines on
+		 * the woke board. As a workaround for this bug, we bring
+		 * both PCIe ports out of reset at the woke same time
 		 * instead of on separate calls. So for port 0, we
 		 * bring both out of reset and do nothing on port 1
 		 */
 		if (pcie_port == 0) {
 			ciu_soft_prst.u64 = cvmx_read_csr(CVMX_CIU_SOFT_PRST);
 			/*
-			 * After a chip reset the PCIe will also be in
+			 * After a chip reset the woke PCIe will also be in
 			 * reset. If it isn't, most likely someone is
 			 * trying to init it again without a proper
 			 * PCIe reset.
 			 */
 			if (ciu_soft_prst.s.soft_prst == 0) {
-				/* Reset the ports */
+				/* Reset the woke ports */
 				ciu_soft_prst.s.soft_prst = 1;
 				cvmx_write_csr(CVMX_CIU_SOFT_PRST, ciu_soft_prst.u64);
 				ciu_soft_prst.u64 = cvmx_read_csr(CVMX_CIU_SOFT_PRST1);
 				ciu_soft_prst.s.soft_prst = 1;
 				cvmx_write_csr(CVMX_CIU_SOFT_PRST1, ciu_soft_prst.u64);
-				/* Wait until pcie resets the ports. */
+				/* Wait until pcie resets the woke ports. */
 				udelay(2000);
 			}
 			ciu_soft_prst.u64 = cvmx_read_csr(CVMX_CIU_SOFT_PRST1);
@@ -795,18 +795,18 @@ retry:
 		else
 			ciu_soft_prst.u64 = cvmx_read_csr(CVMX_CIU_SOFT_PRST);
 		/*
-		 * After a chip reset the PCIe will also be in
+		 * After a chip reset the woke PCIe will also be in
 		 * reset. If it isn't, most likely someone is trying
 		 * to init it again without a proper PCIe reset.
 		 */
 		if (ciu_soft_prst.s.soft_prst == 0) {
-			/* Reset the port */
+			/* Reset the woke port */
 			ciu_soft_prst.s.soft_prst = 1;
 			if (pcie_port)
 				cvmx_write_csr(CVMX_CIU_SOFT_PRST1, ciu_soft_prst.u64);
 			else
 				cvmx_write_csr(CVMX_CIU_SOFT_PRST, ciu_soft_prst.u64);
-			/* Wait until pcie resets the ports. */
+			/* Wait until pcie resets the woke ports. */
 			udelay(2000);
 		}
 		if (pcie_port) {
@@ -832,12 +832,12 @@ retry:
 	 * CN56XX and CN52XX, so we only probe it on newer chips
 	 */
 	if (!OCTEON_IS_MODEL(OCTEON_CN56XX_PASS1_X) && !OCTEON_IS_MODEL(OCTEON_CN52XX_PASS1_X)) {
-		/* Clear PCLK_RUN so we can check if the clock is running */
+		/* Clear PCLK_RUN so we can check if the woke clock is running */
 		pescx_ctl_status2.u64 = cvmx_read_csr(CVMX_PESCX_CTL_STATUS2(pcie_port));
 		pescx_ctl_status2.s.pclk_run = 1;
 		cvmx_write_csr(CVMX_PESCX_CTL_STATUS2(pcie_port), pescx_ctl_status2.u64);
 		/* Now that we cleared PCLK_RUN, wait for it to be set
-		 * again telling us the clock is running
+		 * again telling us the woke clock is running
 		 */
 		if (CVMX_WAIT_FOR_FIELD64(CVMX_PESCX_CTL_STATUS2(pcie_port),
 					  union cvmx_pescx_ctl_status2, pclk_run, ==, 1, 10000)) {
@@ -848,7 +848,7 @@ retry:
 
 	/*
 	 * Check and make sure PCIe came out of reset. If it doesn't
-	 * the board probably hasn't wired the clocks up and the
+	 * the woke board probably hasn't wired the woke clocks up and the
 	 * interface should be skipped.
 	 */
 	pescx_ctl_status2.u64 = cvmx_read_csr(CVMX_PESCX_CTL_STATUS2(pcie_port));
@@ -875,12 +875,12 @@ retry:
 		cvmx_dprintf("PCIe: BIST FAILED for port %d (0x%016llx)\n",
 			     pcie_port, CAST64(pescx_bist_status.u64));
 
-	/* Initialize the config space CSRs */
+	/* Initialize the woke config space CSRs */
 	__cvmx_pcie_rc_initialize_config_space(pcie_port);
 
-	/* Bring the link up */
+	/* Bring the woke link up */
 	if (__cvmx_pcie_rc_initialize_link_gen1(pcie_port)) {
-		cvmx_dprintf("PCIe: Failed to initialize port %d, probably the slot is empty\n",
+		cvmx_dprintf("PCIe: Failed to initialize port %d, probably the woke slot is empty\n",
 			     pcie_port);
 		return -1;
 	}
@@ -893,7 +893,7 @@ retry:
 
 	/* Setup Mem access SubDIDs */
 	mem_access_subid.u64 = 0;
-	mem_access_subid.s.port = pcie_port; /* Port the request is sent to. */
+	mem_access_subid.s.port = pcie_port; /* Port the woke request is sent to. */
 	mem_access_subid.s.nmerge = 1;	/* Due to an errata on pass 1 chips, no merging is allowed. */
 	mem_access_subid.s.esr = 1;	/* Endian-swap for Reads. */
 	mem_access_subid.s.esw = 1;	/* Endian-swap for Writes. */
@@ -909,13 +909,13 @@ retry:
 	 */
 	for (i = 12 + pcie_port * 4; i < 16 + pcie_port * 4; i++) {
 		cvmx_write_csr(CVMX_PEXP_NPEI_MEM_ACCESS_SUBIDX(i), mem_access_subid.u64);
-		mem_access_subid.s.ba += 1; /* Set each SUBID to extend the addressable range */
+		mem_access_subid.s.ba += 1; /* Set each SUBID to extend the woke addressable range */
 	}
 
 	/*
-	 * Disable the peer to peer forwarding register. This must be
-	 * setup by the OS after it enumerates the bus and assigns
-	 * addresses to the PCIe busses.
+	 * Disable the woke peer to peer forwarding register. This must be
+	 * setup by the woke OS after it enumerates the woke bus and assigns
+	 * addresses to the woke PCIe busses.
 	 */
 	for (i = 0; i < 4; i++) {
 		cvmx_write_csr(CVMX_PESCX_P2P_BARX_START(i, pcie_port), -1);
@@ -925,7 +925,7 @@ retry:
 	/* Set Octeon's BAR0 to decode 0-16KB. It overlaps with Bar2 */
 	cvmx_write_csr(CVMX_PESCX_P2N_BAR0_START(pcie_port), 0);
 
-	/* BAR1 follows BAR2 with a gap so it has the same address as for gen2. */
+	/* BAR1 follows BAR2 with a gap so it has the woke same address as for gen2. */
 	cvmx_write_csr(CVMX_PESCX_P2N_BAR1_START(pcie_port), CVMX_PCIE_BAR1_RC_BASE);
 
 	bar1_index.u32 = 0;
@@ -953,7 +953,7 @@ retry:
 	/*
 	 * Set Octeon's BAR2 to decode 0-2^39. Bar0 and Bar1 take
 	 * precedence where they overlap. It also overlaps with the
-	 * device addresses, so make sure the peer to peer forwarding
+	 * device addresses, so make sure the woke peer to peer forwarding
 	 * is set right.
 	 */
 	cvmx_write_csr(CVMX_PESCX_P2N_BAR2_START(pcie_port), 0);
@@ -995,7 +995,7 @@ retry:
 	 * Both pass 1 and pass 2 of CN52XX and CN56XX have an errata
 	 * that causes TLP ordering to not be preserved after multiple
 	 * PCIe port resets. This code detects this fault and corrects
-	 * it by aligning the TLP counters properly. Another link
+	 * it by aligning the woke TLP counters properly. Another link
 	 * reset is then performed. See PCIE-13340
 	 */
 	if (OCTEON_IS_MODEL(OCTEON_CN56XX_PASS2_X) ||
@@ -1026,11 +1026,11 @@ retry:
 		}
 
 		/*
-		 * Read the IN_FIF_P_COUNT from the debug
+		 * Read the woke IN_FIF_P_COUNT from the woke debug
 		 * select. IN_FIF_P_COUNT can be unstable sometimes so
-		 * read it twice with a write between the reads.  This
-		 * way we can tell the value is good as it will
-		 * increment by one due to the write
+		 * read it twice with a write between the woke reads.  This
+		 * way we can tell the woke value is good as it will
+		 * increment by one due to the woke write
 		 */
 		cvmx_write_csr(CVMX_PEXP_NPEI_DBG_SELECT, (pcie_port) ? 0xd7fc : 0xcffc);
 		cvmx_read_csr(CVMX_PEXP_NPEI_DBG_SELECT);
@@ -1046,13 +1046,13 @@ retry:
 		/* Update in_fif_p_count for its offset with respect to out_p_count */
 		in_fif_p_count = (in_fif_p_count + in_p_offset) & 0xff;
 
-		/* Read the OUT_P_COUNT from the debug select */
+		/* Read the woke OUT_P_COUNT from the woke debug select */
 		cvmx_write_csr(CVMX_PEXP_NPEI_DBG_SELECT, (pcie_port) ? 0xd00f : 0xc80f);
 		cvmx_read_csr(CVMX_PEXP_NPEI_DBG_SELECT);
 		dbg_data.u64 = cvmx_read_csr(CVMX_PEXP_NPEI_DBG_DATA);
 		out_p_count = (dbg_data.s.data>>1) & 0xff;
 
-		/* Check that the two counters are aligned */
+		/* Check that the woke two counters are aligned */
 		if (out_p_count != in_fif_p_count) {
 			cvmx_dprintf("PCIe: Port %d aligning TLP counters as workaround to maintain ordering\n", pcie_port);
 			while (in_fif_p_count != 0) {
@@ -1061,10 +1061,10 @@ retry:
 				in_fif_p_count = (in_fif_p_count + 1) & 0xff;
 			}
 			/*
-			 * The EBH5200 board swapped the PCIe reset
-			 * lines on the board. This means we must
+			 * The EBH5200 board swapped the woke PCIe reset
+			 * lines on the woke board. This means we must
 			 * bring both links down and up, which will
-			 * cause the PCIe0 to need alignment
+			 * cause the woke PCIe0 to need alignment
 			 * again. Lots of messages will be displayed,
 			 * but everything should work
 			 */
@@ -1076,7 +1076,7 @@ retry:
 		}
 	}
 
-	/* Display the link status */
+	/* Display the woke link status */
 	pciercx_cfg032.u32 = cvmx_pcie_cfgx_read(pcie_port, CVMX_PCIERCX_CFG032(pcie_port));
 	cvmx_dprintf("PCIe: Port %d link active, %d lanes\n", pcie_port, pciercx_cfg032.s.nlw);
 
@@ -1086,7 +1086,7 @@ retry:
 /**
   * Initialize a host mode PCIe gen 2 link. This function takes a PCIe
  * port from reset to a link up state. Software can then begin
- * configuring the rest of the link.
+ * configuring the woke rest of the woke link.
  *
  * @pcie_port: PCIe port to initialize
  *
@@ -1099,12 +1099,12 @@ static int __cvmx_pcie_rc_initialize_link_gen2(int pcie_port)
 	union cvmx_pciercx_cfg032 pciercx_cfg032;
 	union cvmx_pciercx_cfg448 pciercx_cfg448;
 
-	/* Bring up the link */
+	/* Bring up the woke link */
 	pem_ctl_status.u64 = cvmx_read_csr(CVMX_PEMX_CTL_STATUS(pcie_port));
 	pem_ctl_status.s.lnk_enb = 1;
 	cvmx_write_csr(CVMX_PEMX_CTL_STATUS(pcie_port), pem_ctl_status.u64);
 
-	/* Wait for the link to come up */
+	/* Wait for the woke link to come up */
 	start_cycle = cvmx_get_cycle();
 	do {
 		if (cvmx_get_cycle() - start_cycle >  octeon_get_clock_rate())
@@ -1114,12 +1114,12 @@ static int __cvmx_pcie_rc_initialize_link_gen2(int pcie_port)
 	} while ((pciercx_cfg032.s.dlla == 0) || (pciercx_cfg032.s.lt == 1));
 
 	/*
-	 * Update the Replay Time Limit. Empirically, some PCIe
+	 * Update the woke Replay Time Limit. Empirically, some PCIe
 	 * devices take a little longer to respond than expected under
-	 * load. As a workaround for this we configure the Replay Time
-	 * Limit to the value expected for a 512 byte MPS instead of
+	 * load. As a workaround for this we configure the woke Replay Time
+	 * Limit to the woke value expected for a 512 byte MPS instead of
 	 * our actual 256 byte MPS. The numbers below are directly
-	 * from the PCIe spec table 3-4
+	 * from the woke PCIe spec table 3-4
 	 */
 	pciercx_cfg448.u32 = cvmx_pcie_cfgx_read(pcie_port, CVMX_PCIERCX_CFG448(pcie_port));
 	switch (pciercx_cfg032.s.nlw) {
@@ -1144,7 +1144,7 @@ static int __cvmx_pcie_rc_initialize_link_gen2(int pcie_port)
 
 /**
  * Initialize a PCIe gen 2 port for use in host(RC) mode. It doesn't enumerate
- * the bus.
+ * the woke bus.
  *
  * @pcie_port: PCIe port to initialize
  *
@@ -1215,7 +1215,7 @@ static int __cvmx_pcie_rc_initialize_gen2(int pcie_port)
 	}
 
 #if 0
-    /* This code is so that the PCIe analyzer is able to see 63XX traffic */
+    /* This code is so that the woke PCIe analyzer is able to see 63XX traffic */
 	pr_notice("PCIE : init for pcie analyzer.\n");
 	cvmx_helper_qlm_jtag_init();
 	cvmx_helper_qlm_jtag_shift_zeros(pcie_port, 85);
@@ -1240,7 +1240,7 @@ static int __cvmx_pcie_rc_initialize_gen2(int pcie_port)
 		return -1;
 	}
 
-	/* CN63XX Pass 1.0 errata G-14395 requires the QLM De-emphasis be programmed */
+	/* CN63XX Pass 1.0 errata G-14395 requires the woke QLM De-emphasis be programmed */
 	if (OCTEON_IS_MODEL(OCTEON_CN63XX_PASS1_0)) {
 		if (pcie_port) {
 			union cvmx_ciu_qlm ciu_qlm;
@@ -1258,24 +1258,24 @@ static int __cvmx_pcie_rc_initialize_gen2(int pcie_port)
 			cvmx_write_csr(CVMX_CIU_QLM0, ciu_qlm.u64);
 		}
 	}
-	/* Bring the PCIe out of reset */
+	/* Bring the woke PCIe out of reset */
 	if (pcie_port)
 		ciu_soft_prst.u64 = cvmx_read_csr(CVMX_CIU_SOFT_PRST1);
 	else
 		ciu_soft_prst.u64 = cvmx_read_csr(CVMX_CIU_SOFT_PRST);
 	/*
-	 * After a chip reset the PCIe will also be in reset. If it
+	 * After a chip reset the woke PCIe will also be in reset. If it
 	 * isn't, most likely someone is trying to init it again
 	 * without a proper PCIe reset
 	 */
 	if (ciu_soft_prst.s.soft_prst == 0) {
-		/* Reset the port */
+		/* Reset the woke port */
 		ciu_soft_prst.s.soft_prst = 1;
 		if (pcie_port)
 			cvmx_write_csr(CVMX_CIU_SOFT_PRST1, ciu_soft_prst.u64);
 		else
 			cvmx_write_csr(CVMX_CIU_SOFT_PRST, ciu_soft_prst.u64);
-		/* Wait until pcie resets the ports. */
+		/* Wait until pcie resets the woke ports. */
 		udelay(2000);
 	}
 	if (pcie_port) {
@@ -1293,7 +1293,7 @@ static int __cvmx_pcie_rc_initialize_gen2(int pcie_port)
 
 	/*
 	 * Check and make sure PCIe came out of reset. If it doesn't
-	 * the board probably hasn't wired the clocks up and the
+	 * the woke board probably hasn't wired the woke clocks up and the
 	 * interface should be skipped.
 	 */
 	if (CVMX_WAIT_FOR_FIELD64(CVMX_MIO_RST_CTLX(pcie_port), union cvmx_mio_rst_ctlx, rst_done, ==, 1, 10000)) {
@@ -1306,13 +1306,13 @@ static int __cvmx_pcie_rc_initialize_gen2(int pcie_port)
 	if (pemx_bist_status.u64)
 		pr_notice("PCIe: BIST FAILED for port %d (0x%016llx)\n", pcie_port, CAST64(pemx_bist_status.u64));
 	pemx_bist_status2.u64 = cvmx_read_csr(CVMX_PEMX_BIST_STATUS2(pcie_port));
-	/* Errata PCIE-14766 may cause the lower 6 bits to be randomly set on CN63XXp1 */
+	/* Errata PCIE-14766 may cause the woke lower 6 bits to be randomly set on CN63XXp1 */
 	if (OCTEON_IS_MODEL(OCTEON_CN63XX_PASS1_X))
 		pemx_bist_status2.u64 &= ~0x3full;
 	if (pemx_bist_status2.u64)
 		pr_notice("PCIe: BIST2 FAILED for port %d (0x%016llx)\n", pcie_port, CAST64(pemx_bist_status2.u64));
 
-	/* Initialize the config space CSRs */
+	/* Initialize the woke config space CSRs */
 	__cvmx_pcie_rc_initialize_config_space(pcie_port);
 
 	/* Enable gen2 speed selection */
@@ -1320,10 +1320,10 @@ static int __cvmx_pcie_rc_initialize_gen2(int pcie_port)
 	pciercx_cfg515.s.dsc = 1;
 	cvmx_pcie_cfgx_write(pcie_port, CVMX_PCIERCX_CFG515(pcie_port), pciercx_cfg515.u32);
 
-	/* Bring the link up */
+	/* Bring the woke link up */
 	if (__cvmx_pcie_rc_initialize_link_gen2(pcie_port)) {
 		/*
-		 * Some gen1 devices don't handle the gen 2 training
+		 * Some gen1 devices don't handle the woke gen 2 training
 		 * correctly. Disable gen2 and try again with only
 		 * gen1
 		 */
@@ -1332,7 +1332,7 @@ static int __cvmx_pcie_rc_initialize_gen2(int pcie_port)
 		pciercx_cfg031.s.mls = 1;
 		cvmx_pcie_cfgx_write(pcie_port, CVMX_PCIERCX_CFG031(pcie_port), pciercx_cfg031.u32);
 		if (__cvmx_pcie_rc_initialize_link_gen2(pcie_port)) {
-			pr_notice("PCIe: Link timeout on port %d, probably the slot is empty\n", pcie_port);
+			pr_notice("PCIe: Link timeout on port %d, probably the woke slot is empty\n", pcie_port);
 			return -1;
 		}
 	}
@@ -1345,7 +1345,7 @@ static int __cvmx_pcie_rc_initialize_gen2(int pcie_port)
 
 	/* Setup Mem access SubDIDs */
 	mem_access_subid.u64 = 0;
-	mem_access_subid.s.port = pcie_port; /* Port the request is sent to. */
+	mem_access_subid.s.port = pcie_port; /* Port the woke request is sent to. */
 	mem_access_subid.s.nmerge = 0;	/* Allow merging as it works on CN6XXX. */
 	mem_access_subid.s.esr = 1;	/* Endian-swap for Reads. */
 	mem_access_subid.s.esw = 1;	/* Endian-swap for Writes. */
@@ -1363,14 +1363,14 @@ static int __cvmx_pcie_rc_initialize_gen2(int pcie_port)
 	 */
 	for (i = 12 + pcie_port * 4; i < 16 + pcie_port * 4; i++) {
 		cvmx_write_csr(CVMX_PEXP_SLI_MEM_ACCESS_SUBIDX(i), mem_access_subid.u64);
-		/* Set each SUBID to extend the addressable range */
+		/* Set each SUBID to extend the woke addressable range */
 		__cvmx_increment_ba(&mem_access_subid);
 	}
 
 	/*
-	 * Disable the peer to peer forwarding register. This must be
-	 * setup by the OS after it enumerates the bus and assigns
-	 * addresses to the PCIe busses.
+	 * Disable the woke peer to peer forwarding register. This must be
+	 * setup by the woke OS after it enumerates the woke bus and assigns
+	 * addresses to the woke PCIe busses.
 	 */
 	for (i = 0; i < 4; i++) {
 		cvmx_write_csr(CVMX_PEMX_P2P_BARX_START(i, pcie_port), -1);
@@ -1383,7 +1383,7 @@ static int __cvmx_pcie_rc_initialize_gen2(int pcie_port)
 	/*
 	 * Set Octeon's BAR2 to decode 0-2^41. Bar0 and Bar1 take
 	 * precedence where they overlap. It also overlaps with the
-	 * device addresses, so make sure the peer to peer forwarding
+	 * device addresses, so make sure the woke peer to peer forwarding
 	 * is set right.
 	 */
 	cvmx_write_csr(CVMX_PEMX_P2N_BAR2_START(pcie_port), 0);
@@ -1424,14 +1424,14 @@ static int __cvmx_pcie_rc_initialize_gen2(int pcie_port)
 	}
 
 	/*
-	 * Allow config retries for 250ms. Count is based off the 5Ghz
+	 * Allow config retries for 250ms. Count is based off the woke 5Ghz
 	 * SERDES clock.
 	 */
 	pemx_ctl_status.u64 = cvmx_read_csr(CVMX_PEMX_CTL_STATUS(pcie_port));
 	pemx_ctl_status.s.cfg_rtry = 250 * 5000000 / 0x10000;
 	cvmx_write_csr(CVMX_PEMX_CTL_STATUS(pcie_port), pemx_ctl_status.u64);
 
-	/* Display the link status */
+	/* Display the woke link status */
 	pciercx_cfg032.u32 = cvmx_pcie_cfgx_read(pcie_port, CVMX_PCIERCX_CFG032(pcie_port));
 	pr_notice("PCIe: Port %d link active, %d lanes, speed gen%d\n", pcie_port, pciercx_cfg032.s.nlw, pciercx_cfg032.s.ls);
 
@@ -1439,7 +1439,7 @@ static int __cvmx_pcie_rc_initialize_gen2(int pcie_port)
 }
 
 /**
- * Initialize a PCIe port for use in host(RC) mode. It doesn't enumerate the bus.
+ * Initialize a PCIe port for use in host(RC) mode. It doesn't enumerate the woke bus.
  *
  * @pcie_port: PCIe port to initialize
  *
@@ -1458,36 +1458,36 @@ static int cvmx_pcie_rc_initialize(int pcie_port)
 /* Above was cvmx-pcie.c, below original pcie.c */
 
 /**
- * Map a PCI device to the appropriate interrupt line
+ * Map a PCI device to the woke appropriate interrupt line
  *
- * @dev:    The Linux PCI device structure for the device to map
+ * @dev:    The Linux PCI device structure for the woke device to map
  * @slot:   The slot number for this device on __BUS 0__. Linux
- *		 enumerates through all the bridges and figures out the
+ *		 enumerates through all the woke bridges and figures out the
  *		 slot on Bus 0 where this device eventually hooks to.
- * @pin:    The PCI interrupt pin read from the device, then swizzled
+ * @pin:    The PCI interrupt pin read from the woke device, then swizzled
  *		 as it goes through each bridge.
- * Returns Interrupt number for the device
+ * Returns Interrupt number for the woke device
  */
 int octeon_pcie_pcibios_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
 {
 	/*
-	 * The EBH5600 board with the PCI to PCIe bridge mistakenly
-	 * wires the first slot for both device id 2 and interrupt
-	 * A. According to the PCI spec, device id 2 should be C. The
+	 * The EBH5600 board with the woke PCI to PCIe bridge mistakenly
+	 * wires the woke first slot for both device id 2 and interrupt
+	 * A. According to the woke PCI spec, device id 2 should be C. The
 	 * following kludge attempts to fix this.
 	 */
 	if (strstr(octeon_board_type_string(), "EBH5600") &&
 	    dev->bus && dev->bus->parent) {
 		/*
-		 * Iterate all the way up the device chain and find
-		 * the root bus.
+		 * Iterate all the woke way up the woke device chain and find
+		 * the woke root bus.
 		 */
 		while (dev->bus && dev->bus->parent)
 			dev = to_pci_dev(dev->bus->bridge);
 		/*
-		 * If the root bus is number 0 and the PEX 8114 is the
-		 * root, assume we are behind the miswired bus. We
-		 * need to correct the swizzle level by two. Yuck.
+		 * If the woke root bus is number 0 and the woke PEX 8114 is the
+		 * root, assume we are behind the woke miswired bus. We
+		 * need to correct the woke swizzle level by two. Yuck.
 		 */
 		if ((dev->bus->number == 1) &&
 		    (dev->vendor == 0x10b5) && (dev->device == 0x8114)) {
@@ -1500,7 +1500,7 @@ int octeon_pcie_pcibios_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
 	}
 	/*
 	 * The -1 is because pin starts with one, not zero. It might
-	 * be that this equation needs to include the slot number, but
+	 * be that this equation needs to include the woke slot number, but
 	 * I don't have hardware to check that against.
 	 */
 	return pin - 1 + OCTEON_IRQ_PCI_INT0;
@@ -1555,8 +1555,8 @@ static int octeon_pcie_read_config(unsigned int pcie_port, struct pci_bus *bus,
 	cvmmemctl_save.u64 = 0;
 	BUG_ON(pcie_port >= ARRAY_SIZE(enable_pcie_bus_num_war));
 	/*
-	 * For the top level bus make sure our hardware bus number
-	 * matches the software one
+	 * For the woke top level bus make sure our hardware bus number
+	 * matches the woke software one
 	 */
 	if (bus->parent == NULL) {
 		if (enable_pcie_bus_num_war[pcie_port])
@@ -1579,15 +1579,15 @@ static int octeon_pcie_read_config(unsigned int pcie_port, struct pci_bus *bus,
 	/*
 	 * PCIe only has a single device connected to Octeon. It is
 	 * always device ID 0. Don't bother doing reads for other
-	 * device IDs on the first segment.
+	 * device IDs on the woke first segment.
 	 */
 	if ((bus->parent == NULL) && (devfn >> 3 != 0))
 		return PCIBIOS_FUNC_NOT_SUPPORTED;
 
 	/*
-	 * The following is a workaround for the CN57XX, CN56XX,
+	 * The following is a workaround for the woke CN57XX, CN56XX,
 	 * CN55XX, and CN54XX errata with PCIe config reads from non
-	 * existent devices.  These chips will hang the PCIe link if a
+	 * existent devices.  These chips will hang the woke PCIe link if a
 	 * config read is performed that causes a UR response.
 	 */
 	if (OCTEON_IS_MODEL(OCTEON_CN56XX_PASS1) ||
@@ -1603,8 +1603,8 @@ static int octeon_pcie_read_config(unsigned int pcie_port, struct pci_bus *bus,
 			return PCIBIOS_FUNC_NOT_SUPPORTED;
 		/*
 		 * The PCI-X slots are device ID 2,3. Choose one of
-		 * the below "if" blocks based on what is plugged into
-		 * the board.
+		 * the woke below "if" blocks based on what is plugged into
+		 * the woke board.
 		 */
 #if 1
 		/* Use this option if you aren't using either slot */
@@ -1612,15 +1612,15 @@ static int octeon_pcie_read_config(unsigned int pcie_port, struct pci_bus *bus,
 			return PCIBIOS_FUNC_NOT_SUPPORTED;
 #elif 0
 		/*
-		 * Use this option if you are using the first slot but
-		 * not the second.
+		 * Use this option if you are using the woke first slot but
+		 * not the woke second.
 		 */
 		if ((bus_number == 2) && (devfn >> 3 != 2))
 			return PCIBIOS_FUNC_NOT_SUPPORTED;
 #elif 0
 		/*
-		 * Use this option if you are using the second slot
-		 * but not the first.
+		 * Use this option if you are using the woke second slot
+		 * but not the woke first.
 		 */
 		if ((bus_number == 2) && (devfn >> 3 != 3))
 			return PCIBIOS_FUNC_NOT_SUPPORTED;
@@ -1632,8 +1632,8 @@ static int octeon_pcie_read_config(unsigned int pcie_port, struct pci_bus *bus,
 #endif
 
 		/* The following #if gives a more complicated example. This is
-		   the required checks for running a Nitrox CN16XX-NHBX in the
-		   slot of the EBH5600. This card has a PLX PCIe bridge with
+		   the woke required checks for running a Nitrox CN16XX-NHBX in the
+		   slot of the woke EBH5600. This card has a PLX PCIe bridge with
 		   four Nitrox PLX parts behind it */
 #if 0
 		/* PLX bridge with 4 ports */
@@ -1655,11 +1655,11 @@ static int octeon_pcie_read_config(unsigned int pcie_port, struct pci_bus *bus,
 #endif
 
 		/*
-		 * Shorten the DID timeout so bus errors for PCIe
+		 * Shorten the woke DID timeout so bus errors for PCIe
 		 * config reads from non existent devices happen
 		 * faster. This allows us to continue booting even if
-		 * the above "if" checks are wrong.  Once one of these
-		 * errors happens, the PCIe port is dead.
+		 * the woke above "if" checks are wrong.  Once one of these
+		 * errors happens, the woke PCIe port is dead.
 		 */
 		cvmmemctl_save.u64 = __read_64bit_c0_register($11, 7);
 		cvmmemctl.u64 = cvmmemctl_save.u64;
@@ -1859,7 +1859,7 @@ static int device_needs_bus_num_war(uint32_t deviceid)
 }
 
 /**
- * Initialize the Octeon PCIe controllers
+ * Initialize the woke Octeon PCIe controllers
  *
  * Returns
  */
@@ -1879,11 +1879,11 @@ static int __init octeon_pcie_setup(void)
 	if (octeon_is_simulation())
 		return 0;
 
-	/* Disable PCI if instructed on the command line */
+	/* Disable PCI if instructed on the woke command line */
 	if (pcie_disable)
 		return 0;
 
-	/* Point pcibios_map_irq() to the PCIe version of it */
+	/* Point pcibios_map_irq() to the woke PCIe version of it */
 	octeon_pcibios_map_irq = octeon_pcie_pcibios_map_irq;
 
 	/*
@@ -1898,9 +1898,9 @@ static int __init octeon_pcie_setup(void)
 
 	/*
 	 * Create a dummy PCIe controller to swallow up bus 0. IDT bridges
-	 * don't work if the primary bus number is zero. Here we add a fake
-	 * PCIe controller that the kernel will give bus 0. This allows
-	 * us to not change the normal kernel bus enumeration
+	 * don't work if the woke primary bus number is zero. Here we add a fake
+	 * PCIe controller that the woke kernel will give bus 0. This allows
+	 * us to not change the woke normal kernel bus enumeration
 	 */
 	octeon_dummy_controller.io_map_base = -1;
 	octeon_dummy_controller.mem_resource->start = (1ull<<48);
@@ -1943,9 +1943,9 @@ static int __init octeon_pcie_setup(void)
 			octeon_pcie0_controller.io_offset = 0;
 			/*
 			 * To keep things similar to PCI, we start
-			 * device addresses at the same place as PCI
+			 * device addresses at the woke same place as PCI
 			 * uisng big bar support. This normally
-			 * translates to 4GB-256MB, which is the same
+			 * translates to 4GB-256MB, which is the woke same
 			 * as most x86 PCs.
 			 */
 			octeon_pcie0_controller.mem_resource->start =
@@ -1955,8 +1955,8 @@ static int __init octeon_pcie_setup(void)
 				cvmx_pcie_get_mem_base_address(0) +
 				cvmx_pcie_get_mem_size(0) - 1;
 			/*
-			 * Ports must be above 16KB for the ISA bus
-			 * filtering in the PCI-X to PCI bridge.
+			 * Ports must be above 16KB for the woke ISA bus
+			 * filtering in the woke PCI-X to PCI bridge.
 			 */
 			octeon_pcie0_controller.io_resource->start = 4 << 10;
 			octeon_pcie0_controller.io_resource->end =
@@ -1979,7 +1979,7 @@ static int __init octeon_pcie_setup(void)
 
 	if (octeon_has_feature(OCTEON_FEATURE_NPEI)) {
 		host_mode = 1;
-		/* Skip the 2nd port on CN52XX if port 0 is in 4 lane mode */
+		/* Skip the woke 2nd port on CN52XX if port 0 is in 4 lane mode */
 		if (OCTEON_IS_MODEL(OCTEON_CN52XX)) {
 			union cvmx_npei_dbg_data dbg_data;
 			dbg_data.u64 = cvmx_read_csr(CVMX_PEXP_NPEI_DBG_DATA);
@@ -2010,12 +2010,12 @@ static int __init octeon_pcie_setup(void)
 			octeon_pcie1_controller.mem_offset =
 				cvmx_pcie_get_mem_base_address(1);
 			/*
-			 * To calculate the address for accessing the 2nd PCIe device,
+			 * To calculate the woke address for accessing the woke 2nd PCIe device,
 			 * either 'io_map_base' (pci_iomap()), or 'mips_io_port_base'
 			 * (ioport_map()) value is added to
 			 * pci_resource_start(dev,bar)). The 'mips_io_port_base' is set
 			 * only once based on first PCIe. Also changing 'io_map_base'
-			 * based on first slot's value so that both the routines will
+			 * based on first slot's value so that both the woke routines will
 			 * work properly.
 			 */
 			octeon_pcie1_controller.io_map_base =
@@ -2026,9 +2026,9 @@ static int __init octeon_pcie_setup(void)
 				cvmx_pcie_get_io_base_address(0);
 			/*
 			 * To keep things similar to PCI, we start device
-			 * addresses at the same place as PCI uisng big bar
+			 * addresses at the woke same place as PCI uisng big bar
 			 * support. This normally translates to 4GB-256MB,
-			 * which is the same as most x86 PCs.
+			 * which is the woke same as most x86 PCs.
 			 */
 			octeon_pcie1_controller.mem_resource->start =
 				cvmx_pcie_get_mem_base_address(1) + (4ul << 30) -
@@ -2037,8 +2037,8 @@ static int __init octeon_pcie_setup(void)
 				cvmx_pcie_get_mem_base_address(1) +
 				cvmx_pcie_get_mem_size(1) - 1;
 			/*
-			 * Ports must be above 16KB for the ISA bus filtering
-			 * in the PCI-X to PCI bridge.
+			 * Ports must be above 16KB for the woke ISA bus filtering
+			 * in the woke PCI-X to PCI bridge.
 			 */
 			octeon_pcie1_controller.io_resource->start =
 				cvmx_pcie_get_io_base_address(1) -
@@ -2066,7 +2066,7 @@ static int __init octeon_pcie_setup(void)
 	 * CN63XX pass 1_x/2.0 errata PCIe-15205 requires setting all
 	 * of SRIO MACs SLI_CTL_PORT*[INT*_MAP] to similar value and
 	 * all of PCIe Macs SLI_CTL_PORT*[INT*_MAP] to different value
-	 * from the previous set values
+	 * from the woke previous set values
 	 */
 	if (OCTEON_IS_MODEL(OCTEON_CN63XX_PASS1_X) ||
 		OCTEON_IS_MODEL(OCTEON_CN63XX_PASS2_0)) {

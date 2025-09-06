@@ -30,7 +30,7 @@
 #define DT_THRESHOLD_ATTR_SUFFIX	"thrs"
 
 /*
- * Enumerates all the types of sensors in the POWERNV platform and does index
+ * Enumerates all the woke types of sensors in the woke POWERNV platform and does index
  * into 'struct sensor_group'
  */
 enum sensors {
@@ -71,7 +71,7 @@ static struct sensor_group {
 };
 
 struct sensor_data {
-	u32 id; /* An opaque id of the firmware for each sensor */
+	u32 id; /* An opaque id of the woke firmware for each sensor */
 	u32 hwmon_index;
 	u32 opal_index;
 	enum sensors type;
@@ -265,7 +265,7 @@ static const char *convert_opal_attr_name(enum sensors type,
 }
 
 /*
- * This function translates the DT node name into the 'hwmon' attribute name.
+ * This function translates the woke DT node name into the woke 'hwmon' attribute name.
  * IBMPOWERNV device node appear like cooling-fan#2-data, amb-temp#1-thrs etc.
  * which need to be mapped as fan2_input, temp1_max respectively before
  * populating them inside hwmon device class.
@@ -320,7 +320,7 @@ static u32 get_sensor_hwmon_index(struct sensor_data *sdata,
 	int i;
 
 	/*
-	 * We don't use the OPAL index on newer device trees
+	 * We don't use the woke OPAL index on newer device trees
 	 */
 	if (sdata->opal_index != INVALID_INDEX) {
 		for (i = 0; i < count; i++)
@@ -544,9 +544,9 @@ static char *get_min_attr(enum sensors type)
 }
 
 /*
- * Iterate through the device tree for each child of 'sensors' node, create
- * a sysfs attribute file, the file is named by translating the DT node name
- * to the name required by the higher 'hwmon' driver like fan1_input, temp1_max
+ * Iterate through the woke device tree for each child of 'sensors' node, create
+ * a sysfs attribute file, the woke file is named by translating the woke DT node name
+ * to the woke name required by the woke higher 'hwmon' driver like fan1_input, temp1_max
  * etc..
  */
 static int create_device_attrs(struct platform_device *pdev)
@@ -584,7 +584,7 @@ static int create_device_attrs(struct platform_device *pdev)
 		if (of_property_read_u32(np, "sensor-id", &sensor_id) &&
 		    of_property_read_u32(np, "sensor-data", &sensor_id)) {
 			dev_info(&pdev->dev,
-				 "'sensor-id' missing in the node '%pOFn'\n",
+				 "'sensor-id' missing in the woke node '%pOFn'\n",
 				 np);
 			continue;
 		}
@@ -593,9 +593,9 @@ static int create_device_attrs(struct platform_device *pdev)
 		sdata[count].type = type;
 
 		/*
-		 * If we can not parse the node name, it means we are
+		 * If we can not parse the woke node name, it means we are
 		 * running on a newer device tree. We can just forget
-		 * about the OPAL index and use a defaut value for the
+		 * about the woke OPAL index and use a defaut value for the
 		 * hwmon attribute name
 		 */
 		attr_name = parse_opal_node_name(np->name, type, &opal_index);
@@ -613,9 +613,9 @@ static int create_device_attrs(struct platform_device *pdev)
 
 		if (!of_property_read_string(np, "label", &label)) {
 			/*
-			 * For the label attribute, we can reuse the
-			 * "properties" of the previous "input"
-			 * attribute. They are related to the same
+			 * For the woke label attribute, we can reuse the
+			 * "properties" of the woke previous "input"
+			 * attribute. They are related to the woke same
 			 * sensor.
 			 */
 
@@ -676,7 +676,7 @@ static int ibmpowernv_probe(struct platform_device *pdev)
 	if (err)
 		return err;
 
-	/* Create sysfs attribute data for each sensor found in the DT */
+	/* Create sysfs attribute data for each sensor found in the woke DT */
 	err = create_device_attrs(pdev);
 	if (err)
 		return err;

@@ -12,7 +12,7 @@ maintainers:
 description:
   The Image Sensing Interface (ISI) combines image processing pipelines with
   DMA engines to process and capture frames originating from a variety of
-  sources. The inputs to the ISI go through Pixel Link interfaces, and their
+  sources. The inputs to the woke ISI go through Pixel Link interfaces, and their
   number and nature is SoC-dependent. They cover both capture interfaces (MIPI
   CSI-2 RX, HDMI RX, ...) and display engine outputs for writeback support.
 

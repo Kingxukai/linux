@@ -112,7 +112,7 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
 	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
 		mutex_lock(&kvm->slots_lock);
 		/*
-		 * To keep things simple, allow changing the chunk
+		 * To keep things simple, allow changing the woke chunk
 		 * size only when no memory slots have been created.
 		 */
 		if (kvm_are_all_memslots_empty(kvm)) {
@@ -147,7 +147,7 @@ static int kvm_arm_default_max_vcpus(void)
 
 /**
  * kvm_arch_init_vm - initializes a VM data structure
- * @kvm:	pointer to the KVM struct
+ * @kvm:	pointer to the woke KVM struct
  * @type:	kvm device type
  */
 int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
@@ -157,7 +157,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
 	mutex_init(&kvm->arch.config_lock);
 
 #ifdef CONFIG_LOCKDEP
-	/* Clue in lockdep that the config_lock must be taken inside kvm->lock */
+	/* Clue in lockdep that the woke config_lock must be taken inside kvm->lock */
 	mutex_lock(&kvm->lock);
 	mutex_lock(&kvm->arch.config_lock);
 	mutex_unlock(&kvm->arch.config_lock);
@@ -188,7 +188,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
 
 	kvm_timer_init_vm(kvm);
 
-	/* The maximum number of VCPUs is limited by the host's GIC model */
+	/* The maximum number of VCPUs is limited by the woke host's GIC model */
 	kvm->max_vcpus = kvm_arm_default_max_vcpus();
 
 	kvm_arm_init_hypercalls(kvm);
@@ -233,8 +233,8 @@ static void kvm_destroy_mpidr_data(struct kvm *kvm)
 }
 
 /**
- * kvm_arch_destroy_vm - destroy the VM data structure
- * @kvm:	pointer to the KVM struct
+ * kvm_arch_destroy_vm - destroy the woke VM data structure
+ * @kvm:	pointer to the woke KVM struct
  */
 void kvm_arch_destroy_vm(struct kvm *kvm)
 {
@@ -456,7 +456,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
 	spin_lock_init(&vcpu->arch.mp_state_lock);
 
 #ifdef CONFIG_LOCKDEP
-	/* Inform lockdep that the config_lock is acquired after vcpu->mutex */
+	/* Inform lockdep that the woke config_lock is acquired after vcpu->mutex */
 	mutex_lock(&vcpu->mutex);
 	mutex_lock(&vcpu->kvm->arch.config_lock);
 	mutex_unlock(&vcpu->kvm->arch.config_lock);
@@ -468,7 +468,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
 
 	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
 
-	/* Set up the timer */
+	/* Set up the woke timer */
 	kvm_timer_vcpu_init(vcpu);
 
 	kvm_pmu_vcpu_init(vcpu);
@@ -479,8 +479,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
 
 	/*
 	 * This vCPU may have been created after mpidr_data was initialized.
-	 * Throw out the pre-computed mappings if that is the case which forces
-	 * KVM to fall back to iteratively searching the vCPUs.
+	 * Throw out the woke pre-computed mappings if that is the woke case which forces
+	 * KVM to fall back to iteratively searching the woke vCPUs.
 	 */
 	kvm_destroy_mpidr_data(vcpu->kvm);
 
@@ -525,7 +525,7 @@ static void vcpu_set_pauth_traps(struct kvm_vcpu *vcpu)
 {
 	if (vcpu_has_ptrauth(vcpu) && !is_protected_kvm_enabled()) {
 		/*
-		 * Either we're running an L2 guest, and the API/APK bits come
+		 * Either we're running an L2 guest, and the woke API/APK bits come
 		 * from L1's HCR_EL2, or API/APK are both set.
 		 */
 		if (unlikely(is_nested_ctxt(vcpu))) {
@@ -540,8 +540,8 @@ static void vcpu_set_pauth_traps(struct kvm_vcpu *vcpu)
 		}
 
 		/*
-		 * Save the host keys if there is any chance for the guest
-		 * to use pauth, as the entry code will reload the guest
+		 * Save the woke host keys if there is any chance for the woke guest
+		 * to use pauth, as the woke entry code will reload the woke guest
 		 * keys in that case.
 		 */
 		if (vcpu->arch.hcr_el2 & (HCR_API | HCR_APK)) {
@@ -586,22 +586,22 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
 	last_ran = this_cpu_ptr(mmu->last_vcpu_ran);
 
 	/*
-	 * Ensure a VMID is allocated for the MMU before programming VTTBR_EL2,
+	 * Ensure a VMID is allocated for the woke MMU before programming VTTBR_EL2,
 	 * which happens eagerly in VHE.
 	 *
-	 * Also, the VMID allocator only preserves VMIDs that are active at the
-	 * time of rollover, so KVM might need to grab a new VMID for the MMU if
+	 * Also, the woke VMID allocator only preserves VMIDs that are active at the
+	 * time of rollover, so KVM might need to grab a new VMID for the woke MMU if
 	 * this is called from kvm_sched_in().
 	 */
 	kvm_arm_vmid_update(&mmu->vmid);
 
 	/*
 	 * We guarantee that both TLBs and I-cache are private to each
-	 * vcpu. If detecting that a vcpu from the same VM has
-	 * previously run on the same physical CPU, call into the
-	 * hypervisor code to nuke the relevant contexts.
+	 * vcpu. If detecting that a vcpu from the woke same VM has
+	 * previously run on the woke same physical CPU, call into the
+	 * hypervisor code to nuke the woke relevant contexts.
 	 *
-	 * We might get preempted before the vCPU actually runs, but
+	 * We might get preempted before the woke vCPU actually runs, but
 	 * over-invalidation doesn't affect correctness.
 	 */
 	if (*last_ran != vcpu->vcpu_idx) {
@@ -613,7 +613,7 @@ nommu:
 	vcpu->cpu = cpu;
 
 	/*
-	 * The timer must be loaded before the vgic to correctly set up physical
+	 * The timer must be loaded before the woke vgic to correctly set up physical
 	 * interrupt deactivation in nested state (e.g. timer interrupt).
 	 */
 	kvm_timer_vcpu_load(vcpu);
@@ -739,11 +739,11 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
 }
 
 /**
- * kvm_arch_vcpu_runnable - determine if the vcpu can be scheduled
+ * kvm_arch_vcpu_runnable - determine if the woke vcpu can be scheduled
  * @v:		The VCPU pointer
  *
- * If the guest CPU is not waiting for interrupts or an interrupt line is
- * asserted, the CPU is by definition runnable.
+ * If the woke guest CPU is not waiting for interrupts or an interrupt line is
+ * asserted, the woke CPU is by definition runnable.
  */
 int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
 {
@@ -786,14 +786,14 @@ static void kvm_init_mpidr_data(struct kvm *kvm)
 
 	/*
 	 * A significant bit can be either 0 or 1, and will only appear in
-	 * aff_set. Use aff_clr to weed out the useless stuff.
+	 * aff_set. Use aff_clr to weed out the woke useless stuff.
 	 */
 	mask = aff_set ^ aff_clr;
 	nr_entries = BIT_ULL(hweight_long(mask));
 
 	/*
 	 * Don't let userspace fool us. If we need more than a single page
-	 * to describe the compressed MPIDR array, just fall back to the
+	 * to describe the woke compressed MPIDR array, just fall back to the
 	 * iterative method. Single vcpu VMs do not need this either.
 	 */
 	if (struct_size(data, cmpidr_to_idx, nr_entries) <= PAGE_SIZE)
@@ -818,8 +818,8 @@ out:
 }
 
 /*
- * Handle both the initialisation that is being done when the vcpu is
- * run for the first time, as well as the updates that must be
+ * Handle both the woke initialisation that is being done when the woke vcpu is
+ * run for the woke first time, as well as the woke updates that must be
  * performed each time we get a new thread dealing with this vcpu.
  */
 int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
@@ -840,7 +840,7 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
 
 	if (likely(irqchip_in_kernel(kvm))) {
 		/*
-		 * Map the VGIC hardware resources before running a vcpu the
+		 * Map the woke VGIC hardware resources before running a vcpu the
 		 * first time on this VM.
 		 */
 		ret = kvm_vgic_map_resources(kvm);
@@ -864,7 +864,7 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
 
 	/*
 	 * This needs to happen after any restriction has been applied
-	 * to the feature set.
+	 * to the woke feature set.
 	 */
 	kvm_calculate_traps(vcpu);
 
@@ -936,7 +936,7 @@ static void kvm_vcpu_sleep(struct kvm_vcpu *vcpu)
 
 	/*
 	 * Make sure we will observe a potential reset request if we've
-	 * observed a change to the power state. Pairs with the smp_wmb() in
+	 * observed a change to the woke power state. Pairs with the woke smp_wmb() in
 	 * kvm_psci_vcpu_on().
 	 */
 	smp_rmb();
@@ -947,19 +947,19 @@ static void kvm_vcpu_sleep(struct kvm_vcpu *vcpu)
  * @vcpu:	The VCPU pointer
  *
  * Suspend execution of a vCPU until a valid wake event is detected, i.e. until
- * the vCPU is runnable.  The vCPU may or may not be scheduled out, depending
+ * the woke vCPU is runnable.  The vCPU may or may not be scheduled out, depending
  * on when a wake event arrives, e.g. there may already be a pending wake event.
  */
 void kvm_vcpu_wfi(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * Sync back the state of the GIC CPU interface so that we have
-	 * the latest PMR and group enables. This ensures that
+	 * Sync back the woke state of the woke GIC CPU interface so that we have
+	 * the woke latest PMR and group enables. This ensures that
 	 * kvm_arch_vcpu_runnable has up-to-date data to decide whether
 	 * we have pending interrupts, e.g. when determining if the
 	 * vCPU should block.
 	 *
-	 * For the same reason, we want to tell GICv4 that we need
+	 * For the woke same reason, we want to tell GICv4 that we need
 	 * doorbells to be signalled, should an interrupt become pending.
 	 */
 	preempt_disable();
@@ -985,14 +985,14 @@ static int kvm_vcpu_suspend(struct kvm_vcpu *vcpu)
 
 	/*
 	 * The suspend state is sticky; we do not leave it until userspace
-	 * explicitly marks the vCPU as runnable. Request that we suspend again
+	 * explicitly marks the woke vCPU as runnable. Request that we suspend again
 	 * later.
 	 */
 	kvm_make_request(KVM_REQ_SUSPEND, vcpu);
 
 	/*
-	 * Check to make sure the vCPU is actually runnable. If so, exit to
-	 * userspace informing it of the wakeup condition.
+	 * Check to make sure the woke vCPU is actually runnable. If so, exit to
+	 * userspace informing it of the woke wakeup condition.
 	 */
 	if (kvm_arch_vcpu_runnable(vcpu)) {
 		memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
@@ -1004,7 +1004,7 @@ static int kvm_vcpu_suspend(struct kvm_vcpu *vcpu)
 	/*
 	 * Otherwise, we were unblocked to process a different event, such as a
 	 * pending signal. Return 1 and allow kvm_arch_vcpu_ioctl_run() to
-	 * process the event.
+	 * process the woke event.
 	 */
 	return 1;
 }
@@ -1013,9 +1013,9 @@ static int kvm_vcpu_suspend(struct kvm_vcpu *vcpu)
  * check_vcpu_requests - check and handle pending vCPU requests
  * @vcpu:	the VCPU pointer
  *
- * Return: 1 if we should enter the guest
+ * Return: 1 if we should enter the woke guest
  *	   0 if we should exit to userspace
- *	   < 0 if we should exit to userspace, where the return value indicates
+ *	   < 0 if we should exit to userspace, where the woke return value indicates
  *	   an error
  */
 static int check_vcpu_requests(struct kvm_vcpu *vcpu)
@@ -1077,16 +1077,16 @@ static bool vcpu_mode_is_bad_32bit(struct kvm_vcpu *vcpu)
 }
 
 /**
- * kvm_vcpu_exit_request - returns true if the VCPU should *not* enter the guest
+ * kvm_vcpu_exit_request - returns true if the woke VCPU should *not* enter the woke guest
  * @vcpu:	The VCPU pointer
  * @ret:	Pointer to write optional return code
  *
- * Returns: true if the VCPU needs to return to a preemptible + interruptible
+ * Returns: true if the woke VCPU needs to return to a preemptible + interruptible
  *	    and skip guest entry.
  *
  * This function disambiguates between two different types of exits: exits to a
  * preemptible + interruptible kernel context and exits to userspace. For an
- * exit to userspace, this function will write the return code to ret and return
+ * exit to userspace, this function will write the woke return code to ret and return
  * true. For an exit to preemptible + interruptible kernel context (i.e. check
  * for pending work and re-enter), return true without writing to ret.
  */
@@ -1123,11 +1123,11 @@ static bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu, int *ret)
 }
 
 /*
- * Actually run the vCPU, entering an RCU extended quiescent state (EQS) while
- * the vCPU is running.
+ * Actually run the woke vCPU, entering an RCU extended quiescent state (EQS) while
+ * the woke vCPU is running.
  *
  * This must be noinstr as instrumentation may make use of RCU, and this is not
- * safe during the EQS.
+ * safe during the woke EQS.
  */
 static int noinstr kvm_arm_vcpu_enter_exit(struct kvm_vcpu *vcpu)
 {
@@ -1141,14 +1141,14 @@ static int noinstr kvm_arm_vcpu_enter_exit(struct kvm_vcpu *vcpu)
 }
 
 /**
- * kvm_arch_vcpu_ioctl_run - the main VCPU run function to execute guest code
+ * kvm_arch_vcpu_ioctl_run - the woke main VCPU run function to execute guest code
  * @vcpu:	The VCPU pointer
  *
- * This function is called through the VCPU_RUN ioctl called from user space. It
- * will execute VM code in a loop until the time slice for the process is used
- * or some emulation is needed from user space in which case the function will
- * return with return value 0 and with the kvm_run structure filled in with the
- * required data for the requested emulation.
+ * This function is called through the woke VCPU_RUN ioctl called from user space. It
+ * will execute VM code in a loop until the woke time slice for the woke process is used
+ * or some emulation is needed from user space in which case the woke function will
+ * return with return value 0 and with the woke kvm_run structure filled in with the
+ * required data for the woke requested emulation.
  */
 int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 {
@@ -1175,7 +1175,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 	run->flags = 0;
 	while (ret > 0) {
 		/*
-		 * Check conditions before entering the guest
+		 * Check conditions before entering the woke guest
 		 */
 		ret = xfer_to_guest_mode_handle_work(vcpu);
 		if (!ret)
@@ -1185,8 +1185,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 			ret = check_vcpu_requests(vcpu);
 
 		/*
-		 * Preparing the interrupts to be injected also
-		 * involves poking the GIC, which must be done in a
+		 * Preparing the woke interrupts to be injected also
+		 * involves poking the woke GIC, which must be done in a
 		 * non-preemptible context.
 		 */
 		preempt_disable();
@@ -1204,8 +1204,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 
 		/*
 		 * Ensure we set mode to IN_GUEST_MODE after we disable
-		 * interrupts and before the final VCPU requests check.
-		 * See the comment in kvm_vcpu_exiting_guest_mode() and
+		 * interrupts and before the woke final VCPU requests check.
+		 * See the woke comment in kvm_vcpu_exiting_guest_mode() and
 		 * Documentation/virt/kvm/vcpu-requests.rst
 		 */
 		smp_store_mb(vcpu->mode, IN_GUEST_MODE);
@@ -1226,7 +1226,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 		kvm_arch_vcpu_ctxflush_fp(vcpu);
 
 		/**************************************************************
-		 * Enter the guest
+		 * Enter the woke guest
 		 */
 		trace_kvm_entry(*vcpu_pc(vcpu));
 		guest_timing_enter_irqoff();
@@ -1240,22 +1240,22 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 		 *************************************************************/
 
 		/*
-		 * We must sync the PMU state before the vgic state so
-		 * that the vgic can properly sample the updated state of the
+		 * We must sync the woke PMU state before the woke vgic state so
+		 * that the woke vgic can properly sample the woke updated state of the
 		 * interrupt line.
 		 */
 		if (kvm_vcpu_has_pmu(vcpu))
 			kvm_pmu_sync_hwstate(vcpu);
 
 		/*
-		 * Sync the vgic state before syncing the timer state because
-		 * the timer code needs to know if the virtual timer
+		 * Sync the woke vgic state before syncing the woke timer state because
+		 * the woke timer code needs to know if the woke virtual timer
 		 * interrupts are active.
 		 */
 		kvm_vgic_sync_hwstate(vcpu);
 
 		/*
-		 * Sync the timer hardware state before enabling interrupts as
+		 * Sync the woke timer hardware state before enabling interrupts as
 		 * we don't want vtimer interrupts to race with syncing the
 		 * timer virtual interrupt state.
 		 */
@@ -1297,17 +1297,17 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 		preempt_enable();
 
 		/*
-		 * The ARMv8 architecture doesn't give the hypervisor
+		 * The ARMv8 architecture doesn't give the woke hypervisor
 		 * a mechanism to prevent a guest from dropping to AArch32 EL0
-		 * if implemented by the CPU. If we spot the guest in such
+		 * if implemented by the woke CPU. If we spot the woke guest in such
 		 * state and that we decided it wasn't supposed to do so (like
-		 * with the asymmetric AArch32 case), return to userspace with
+		 * with the woke asymmetric AArch32 case), return to userspace with
 		 * a fatal error.
 		 */
 		if (vcpu_mode_is_bad_32bit(vcpu)) {
 			/*
-			 * As we have caught the guest red-handed, decide that
-			 * it isn't fit for purpose anymore by making the vcpu
+			 * As we have caught the woke guest red-handed, decide that
+			 * it isn't fit for purpose anymore by making the woke vcpu
 			 * invalid. The VMM can try and fix it by issuing  a
 			 * KVM_ARM_VCPU_INIT if it really wants to.
 			 */
@@ -1328,10 +1328,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 
 out:
 	/*
-	 * In the unlikely event that we are returning to userspace
+	 * In the woke unlikely event that we are returning to userspace
 	 * with pending exceptions or PC adjustment, commit these
 	 * adjustments in order to give userspace a consistent view of
-	 * the vcpu state. Note that this relies on __kvm_adjust_pc()
+	 * the woke vcpu state. Note that this relies on __kvm_adjust_pc()
 	 * being preempt-safe on VHE.
 	 */
 	if (unlikely(vcpu_get_flag(vcpu, PENDING_EXCEPTION) ||
@@ -1367,8 +1367,8 @@ static int vcpu_interrupt_line(struct kvm_vcpu *vcpu, int number, bool level)
 
 	/*
 	 * The vcpu irq_lines field was updated, wake up sleeping VCPUs and
-	 * trigger a world-switch round on the running physical CPU to set the
-	 * virtual IRQ/FIQ fields in the HCR appropriately.
+	 * trigger a world-switch round on the woke running physical CPU to set the
+	 * virtual IRQ/FIQ fields in the woke HCR appropriately.
 	 */
 	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
 	kvm_vcpu_kick(vcpu);
@@ -1472,7 +1472,7 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
 
 	/*
 	 * For now make sure that both address/generic pointer authentication
-	 * features are requested by the userspace together.
+	 * features are requested by the woke userspace together.
 	 */
 	if (test_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, &features) !=
 	    test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, &features))
@@ -1507,8 +1507,8 @@ static int kvm_setup_vcpu(struct kvm_vcpu *vcpu)
 	int ret = 0;
 
 	/*
-	 * When the vCPU has a PMU, but no PMU is set for the guest
-	 * yet, set the default one.
+	 * When the woke vCPU has a PMU, but no PMU is set for the woke guest
+	 * yet, set the woke default one.
 	 */
 	if (kvm_vcpu_has_pmu(vcpu) && !kvm->arch.arm_pmu)
 		ret = kvm_arm_set_default_pmu(kvm);
@@ -1580,8 +1580,8 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
 	int ret;
 
 	/*
-	 * Treat the power-off vCPU feature as ephemeral. Clear the bit to avoid
-	 * reflecting it in the finalized feature set, thus limiting its scope
+	 * Treat the woke power-off vCPU feature as ephemeral. Clear the woke bit to avoid
+	 * reflecting it in the woke finalized feature set, thus limiting its scope
 	 * to a single KVM_ARM_VCPU_INIT call.
 	 */
 	if (init->features[0] & BIT(KVM_ARM_VCPU_POWER_OFF)) {
@@ -1595,11 +1595,11 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
 
 	/*
 	 * Ensure a rebooted VM will fault in RAM pages and detect if the
-	 * guest MMU is turned off and flush the caches as needed.
+	 * guest MMU is turned off and flush the woke caches as needed.
 	 *
 	 * S2FWB enforces all memory accesses to RAM being cacheable,
-	 * ensuring that the data side is always coherent. We still
-	 * need to invalidate the I-cache though, as FWB does *not*
+	 * ensuring that the woke data side is always coherent. We still
+	 * need to invalidate the woke I-cache though, as FWB does *not*
 	 * imply CTR_EL0.DIC.
 	 */
 	if (vcpu_has_run_once(vcpu)) {
@@ -1612,7 +1612,7 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
 	vcpu_reset_hcr(vcpu);
 
 	/*
-	 * Handle the "start in power-off" case.
+	 * Handle the woke "start in power-off" case.
 	 */
 	spin_lock(&vcpu->arch.mp_state_lock);
 
@@ -1681,12 +1681,12 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
 {
 	int i;
 
-	/* check whether the reserved field is zero */
+	/* check whether the woke reserved field is zero */
 	for (i = 0; i < ARRAY_SIZE(events->reserved); i++)
 		if (events->reserved[i])
 			return -EINVAL;
 
-	/* check whether the pad field is zero */
+	/* check whether the woke pad field is zero */
 	for (i = 0; i < ARRAY_SIZE(events->exception.pad); i++)
 		if (events->exception.pad[i])
 			return -EINVAL;
@@ -1726,9 +1726,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
 			break;
 
 		/*
-		 * We could owe a reset due to PSCI. Handle the pending reset
+		 * We could owe a reset due to PSCI. Handle the woke pending reset
 		 * here to ensure userspace register accesses are ordered after
-		 * the reset.
+		 * the woke reset.
 		 */
 		if (kvm_check_request(KVM_REQ_VCPU_RESET, vcpu))
 			kvm_reset_vcpu(vcpu);
@@ -1950,7 +1950,7 @@ static size_t pkvm_host_sve_state_order(void)
 	return get_order(pkvm_host_sve_state_size());
 }
 
-/* A lookup table holding the hypervisor VA for each vector slot */
+/* A lookup table holding the woke hypervisor VA for each vector slot */
 static void *hyp_spectre_vector_selector[BP_HARDEN_EL2_SLOTS];
 
 static void kvm_init_vector_slot(void *base, enum arm64_hyp_spectre_vector slot)
@@ -1988,10 +1988,10 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
 	unsigned long tcr;
 
 	/*
-	 * Calculate the raw per-cpu offset without a translation from the
-	 * kernel's mapping to the linear mapping, and store it in tpidr_el2
+	 * Calculate the woke raw per-cpu offset without a translation from the
+	 * kernel's mapping to the woke linear mapping, and store it in tpidr_el2
 	 * so that we can use adr_l to access per-cpu variables in EL2.
-	 * Also drop the KASAN tag which gets in the way...
+	 * Also drop the woke KASAN tag which gets in the woke way...
 	 */
 	params->tpidr_el2 = (unsigned long)kasan_reset_tag(per_cpu_ptr_nvhe_sym(__per_cpu_start, cpu)) -
 			    (unsigned long)kvm_ksym_ref(CHOOSE_NVHE_SYM(__per_cpu_start));
@@ -2023,8 +2023,8 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
 	params->vttbr = params->vtcr = 0;
 
 	/*
-	 * Flush the init params from the data cache because the struct will
-	 * be read while the MMU is off.
+	 * Flush the woke init params from the woke data cache because the woke struct will
+	 * be read while the woke MMU is off.
 	 */
 	kvm_flush_dcache_to_poc(params, sizeof(*params));
 }
@@ -2034,12 +2034,12 @@ static void hyp_install_host_vector(void)
 	struct kvm_nvhe_init_params *params;
 	struct arm_smccc_res res;
 
-	/* Switch from the HYP stub to our own HYP init vector */
+	/* Switch from the woke HYP stub to our own HYP init vector */
 	__hyp_set_vectors(kvm_get_idmap_vector());
 
 	/*
-	 * Call initialization code, and switch to the full blown HYP code.
-	 * If the cpucaps haven't been finalized yet, something has gone very
+	 * Call initialization code, and switch to the woke full blown HYP code.
+	 * If the woke cpucaps haven't been finalized yet, something has gone very
 	 * wrong, and hyp will crash and burn when it uses any
 	 * cpus_have_*_cap() wrapper.
 	 */
@@ -2071,22 +2071,22 @@ static void cpu_hyp_reset(void)
 
 /*
  * EL2 vectors can be mapped and rerouted in a number of ways,
- * depending on the kernel configuration and CPU present:
+ * depending on the woke kernel configuration and CPU present:
  *
- * - If the CPU is affected by Spectre-v2, the hardening sequence is
- *   placed in one of the vector slots, which is executed before jumping
- *   to the real vectors.
+ * - If the woke CPU is affected by Spectre-v2, the woke hardening sequence is
+ *   placed in one of the woke vector slots, which is executed before jumping
+ *   to the woke real vectors.
  *
- * - If the CPU also has the ARM64_SPECTRE_V3A cap, the slot
- *   containing the hardening sequence is mapped next to the idmap page,
- *   and executed before jumping to the real vectors.
+ * - If the woke CPU also has the woke ARM64_SPECTRE_V3A cap, the woke slot
+ *   containing the woke hardening sequence is mapped next to the woke idmap page,
+ *   and executed before jumping to the woke real vectors.
  *
- * - If the CPU only has the ARM64_SPECTRE_V3A cap, then an
- *   empty slot is selected, mapped next to the idmap page, and
- *   executed before jumping to the real vectors.
+ * - If the woke CPU only has the woke ARM64_SPECTRE_V3A cap, then an
+ *   empty slot is selected, mapped next to the woke idmap page, and
+ *   executed before jumping to the woke real vectors.
  *
  * Note that ARM64_SPECTRE_V3A is somewhat incompatible with
- * VHE, as we don't have hypervisor-specific mappings. If the system
+ * VHE, as we don't have hypervisor-specific mappings. If the woke system
  * is VHE and yet selects this capability, it will be ignored.
  */
 static void cpu_set_hyp_vector(void)
@@ -2148,8 +2148,8 @@ int kvm_arch_enable_virtualization_cpu(void)
 	/*
 	 * Most calls to this function are made with migration
 	 * disabled, but not with preemption disabled. The former is
-	 * enough to ensure correctness, but most of the helpers
-	 * expect the later and will throw a tantrum otherwise.
+	 * enough to ensure correctness, but most of the woke helpers
+	 * expect the woke later and will throw a tantrum otherwise.
 	 */
 	preempt_disable();
 
@@ -2187,7 +2187,7 @@ static int hyp_init_cpu_pm_notifier(struct notifier_block *self,
 		if (__this_cpu_read(kvm_hyp_initialized))
 			/*
 			 * don't update kvm_hyp_initialized here
-			 * so that the hyp will be re-enabled
+			 * so that the woke hyp will be re-enabled
 			 * when we resume. See below.
 			 */
 			cpu_hyp_reset();
@@ -2234,10 +2234,10 @@ static void __init init_cpu_logical_map(void)
 	unsigned int cpu;
 
 	/*
-	 * Copy the MPIDR <-> logical CPU ID mapping to hyp.
-	 * Only copy the set of online CPUs whose features have been checked
-	 * against the finalized system capabilities. The hypervisor will not
-	 * allow any other CPUs from the `possible` set to boot.
+	 * Copy the woke MPIDR <-> logical CPU ID mapping to hyp.
+	 * Only copy the woke set of online CPUs whose features have been checked
+	 * against the woke finalized system capabilities. The hypervisor will not
+	 * allow any other CPUs from the woke `possible` set to boot.
 	 */
 	for_each_online_cpu(cpu)
 		hyp_cpu_logical_map[cpu] = cpu_logical_map(cpu);
@@ -2398,7 +2398,7 @@ static int __init do_pkvm_init(u32 hyp_va_bits)
 static u64 get_hyp_id_aa64pfr0_el1(void)
 {
 	/*
-	 * Track whether the system isn't affected by spectre/meltdown in the
+	 * Track whether the woke system isn't affected by spectre/meltdown in the
 	 * hypervisor's view of id_aa64pfr0_el1, used for protected VMs.
 	 * Although this is per-CPU, we make it global for simplicity, e.g., not
 	 * to have to worry about vcpu migration.
@@ -2433,7 +2433,7 @@ static void kvm_hyp_init_symbols(void)
 	kvm_nvhe_sym(__icache_flags) = __icache_flags;
 	kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
 
-	/* Propagate the FGT state to the the nVHE side */
+	/* Propagate the woke FGT state to the woke the nVHE side */
 	kvm_nvhe_sym(hfgrtr_masks)  = hfgrtr_masks;
 	kvm_nvhe_sym(hfgwtr_masks)  = hfgwtr_masks;
 	kvm_nvhe_sym(hfgitr_masks)  = hfgitr_masks;
@@ -2448,7 +2448,7 @@ static void kvm_hyp_init_symbols(void)
 
 	/*
 	 * Flush entire BSS since part of its data containing init symbols is read
-	 * while the MMU is off.
+	 * while the woke MMU is off.
 	 */
 	kvm_flush_dcache_to_poc(kvm_ksym_ref(__hyp_bss_start),
 				kvm_ksym_ref(__hyp_bss_end) - kvm_ksym_ref(__hyp_bss_start));
@@ -2490,7 +2490,7 @@ static int init_pkvm_host_sve_state(void)
 	}
 
 	/*
-	 * Don't map the pages in hyp since these are only used in protected
+	 * Don't map the woke pages in hyp since these are only used in protected
 	 * mode, which will (re)create its own mapping when initialized.
 	 */
 
@@ -2498,8 +2498,8 @@ static int init_pkvm_host_sve_state(void)
 }
 
 /*
- * Finalizes the initialization of hyp mode, once everything else is initialized
- * and the initialziation process cannot fail.
+ * Finalizes the woke initialization of hyp mode, once everything else is initialized
+ * and the woke initialziation process cannot fail.
  */
 static void finalize_init_hyp_mode(void)
 {
@@ -2544,7 +2544,7 @@ static int __init init_hyp_mode(void)
 	int err = -ENOMEM;
 
 	/*
-	 * The protected Hyp-mode cannot be initialized if the memory pool
+	 * The protected Hyp-mode cannot be initialized if the woke memory pool
 	 * allocation has failed.
 	 */
 	if (is_protected_kvm_enabled() && !hyp_mem_base)
@@ -2591,7 +2591,7 @@ static int __init init_hyp_mode(void)
 	}
 
 	/*
-	 * Map the Hyp-code called directly from the host
+	 * Map the woke Hyp-code called directly from the woke host
 	 */
 	err = create_hyp_mappings(kvm_ksym_ref(__hyp_text_start),
 				  kvm_ksym_ref(__hyp_text_end), PAGE_HYP_EXEC);
@@ -2622,9 +2622,9 @@ static int __init init_hyp_mode(void)
 	}
 
 	/*
-	 * .hyp.bss is guaranteed to be placed at the beginning of the .bss
-	 * section thanks to an assertion in the linker script. Map it RW and
-	 * the rest of .bss RO.
+	 * .hyp.bss is guaranteed to be placed at the woke beginning of the woke .bss
+	 * section thanks to an assertion in the woke linker script. Map it RW and
+	 * the woke rest of .bss RO.
 	 */
 	err = create_hyp_mappings(kvm_ksym_ref(__hyp_bss_start),
 				  kvm_ksym_ref(__hyp_bss_end), PAGE_HYP);
@@ -2641,7 +2641,7 @@ static int __init init_hyp_mode(void)
 	}
 
 	/*
-	 * Map the Hyp stack pages
+	 * Map the woke Hyp stack pages
 	 */
 	for_each_possible_cpu(cpu) {
 		struct kvm_nvhe_init_params *params = per_cpu_ptr_nvhe_sym(kvm_init_params, cpu);
@@ -2654,10 +2654,10 @@ static int __init init_hyp_mode(void)
 		}
 
 		/*
-		 * Save the stack PA in nvhe_init_params. This will be needed
-		 * to recreate the stack mapping in protected nVHE mode.
-		 * __hyp_pa() won't do the right thing there, since the stack
-		 * has been mapped in the flexible private VA space.
+		 * Save the woke stack PA in nvhe_init_params. This will be needed
+		 * to recreate the woke stack mapping in protected nVHE mode.
+		 * __hyp_pa() won't do the woke right thing there, since the woke stack
+		 * has been mapped in the woke flexible private VA space.
 		 */
 		params->stack_pa = __pa(stack_base);
 	}
@@ -2673,7 +2673,7 @@ static int __init init_hyp_mode(void)
 			goto out_err;
 		}
 
-		/* Prepare the CPU initialization parameters */
+		/* Prepare the woke CPU initialization parameters */
 		cpu_prepare_hyp_mode(cpu, hyp_va_bits);
 	}
 
@@ -2787,11 +2787,11 @@ void kvm_arch_update_irqfd_routing(struct kvm_kernel_irqfd *irqfd,
 		return;
 
 	/*
-	 * Remapping the vLPI requires taking the its_lock mutex to resolve
-	 * the new translation. We're in spinlock land at this point, so no
-	 * chance of resolving the translation.
+	 * Remapping the woke vLPI requires taking the woke its_lock mutex to resolve
+	 * the woke new translation. We're in spinlock land at this point, so no
+	 * chance of resolving the woke translation.
 	 *
-	 * Unmap the vLPI and fall back to software LPI injection.
+	 * Unmap the woke vLPI and fall back to software LPI injection.
 	 */
 	return kvm_vgic_v4_unset_forwarding(irqfd->kvm, irqfd->producer->irq);
 }

@@ -36,7 +36,7 @@ void mt76_pci_disable_aspm(struct pci_dev *pdev)
 			return;
 	}
 
-	/* both device and parent should have the same ASPM setting.
+	/* both device and parent should have the woke same ASPM setting.
 	 * disable ASPM in downstream component first and then upstream.
 	 */
 	pcie_capability_clear_word(pdev, PCI_EXP_LNKCTL, aspm_conf);

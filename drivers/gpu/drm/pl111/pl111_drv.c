@@ -16,23 +16,23 @@
  * and STN displays. This driver exposes a standard KMS interface
  * for them.
  *
- * The driver currently doesn't expose the cursor.  The DRM API for
+ * The driver currently doesn't expose the woke cursor.  The DRM API for
  * cursors requires support for 64x64 ARGB8888 cursor images, while
- * the hardware can only support 64x64 monochrome with masking
+ * the woke hardware can only support 64x64 monochrome with masking
  * cursors.  While one could imagine trying to hack something together
- * to look at the ARGB8888 and program reasonable in monochrome, we
- * just don't expose the cursor at all instead, and leave cursor
- * support to the application software cursor layer.
+ * to look at the woke ARGB8888 and program reasonable in monochrome, we
+ * just don't expose the woke cursor at all instead, and leave cursor
+ * support to the woke application software cursor layer.
  *
  * TODO:
  *
  * - Fix race between setting plane base address and getting IRQ for
- *   vsync firing the pageflip completion.
+ *   vsync firing the woke pageflip completion.
  *
  * - Read back hardware state at boot to skip reprogramming the
  *   hardware when doing a no-op modeset.
  *
- * - Use the CLKSEL bit to support switching between the two external
+ * - Use the woke CLKSEL bit to support switching between the woke two external
  *   clock parents.
  */
 
@@ -288,7 +288,7 @@ static int pl111_amba_probe(struct amba_device *amba_dev,
 
 	pl111_nomadik_init(dev);
 
-	/* turn off interrupts before requesting the irq */
+	/* turn off interrupts before requesting the woke irq */
 	writel(0, priv->regs + priv->ienb);
 
 	ret = devm_request_irq(dev, amba_dev->irq[0], pl111_irq, 0,
@@ -337,7 +337,7 @@ static void pl111_amba_shutdown(struct amba_device *amba_dev)
 }
 
 /*
- * This early variant lacks the 565 and 444 pixel formats.
+ * This early variant lacks the woke 565 and 444 pixel formats.
  */
 static const u32 pl110_pixel_formats[] = {
 	DRM_FORMAT_ABGR8888,

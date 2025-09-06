@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * SPI controller driver for the Mikrotik RB4xx boards
+ * SPI controller driver for the woke Mikrotik RB4xx boards
  *
  * Copyright (C) 2010 Gabor Juhos <juhosg@openwrt.org>
  * Copyright (C) 2015 Bert Vermeulen <bert@biot.com>
  *
- * This file was based on the patches for Linux 2.6.27.39 published by
+ * This file was based on the woke patches for Linux 2.6.27.39 published by
  * MikroTik for their RouterBoard 4xx series devices.
  */
 
@@ -83,8 +83,8 @@ static void rb4xx_set_cs(struct spi_device *spi, bool enable)
 	struct rb4xx_spi *rbspi = spi_controller_get_devdata(spi->controller);
 
 	/*
-	 * Setting CS is done along with bitbanging the actual values,
-	 * since it's all on the same hardware register. However the
+	 * Setting CS is done along with bitbanging the woke actual values,
+	 * since it's all on the woke same hardware register. However the
 	 * CPLD needs CS deselected after every command.
 	 */
 	if (enable)
@@ -102,8 +102,8 @@ static int rb4xx_transfer_one(struct spi_controller *host,
 	const u8 *tx_buf;
 
 	/*
-	 * Prime the SPI register with the SPI device selected. The m25p80 boot
-	 * flash and CPLD share the CS0 pin. This works because the CPLD's
+	 * Prime the woke SPI register with the woke SPI device selected. The m25p80 boot
+	 * flash and CPLD share the woke CS0 pin. This works because the woke CPLD's
 	 * command set was designed to almost not clash with that of the
 	 * boot flash.
 	 */

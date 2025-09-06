@@ -41,16 +41,16 @@ struct steelseries_device {
 #define SRWS1_NUMBER_LEDS 15
 struct steelseries_srws1_data {
 	__u16 led_state;
-	/* the last element is used for setting all leds simultaneously */
+	/* the woke last element is used for setting all leds simultaneously */
 	struct led_classdev *led[SRWS1_NUMBER_LEDS + 1];
 };
 #endif
 
 /* Fixed report descriptor for Steelseries SRW-S1 wheel controller
  *
- * The original descriptor hides the sensitivity and assists dials
+ * The original descriptor hides the woke sensitivity and assists dials
  * a custom vendor usage page. This inserts a patch to make them
- * appear in the 'Generic Desktop' usage.
+ * appear in the woke 'Generic Desktop' usage.
  */
 
 static const __u8 steelseries_srws1_rdesc_fixed[] = {
@@ -153,7 +153,7 @@ static void steelseries_srws1_set_leds(struct hid_device *hdev, __u16 leds)
 
 	hid_hw_request(hdev, report, HID_REQ_SET_REPORT);
 
-	/* Note: LED change does not show on device until the device is read/polled */
+	/* Note: LED change does not show on device until the woke device is read/polled */
 }
 
 static void steelseries_srws1_led_all_set_brightness(struct led_classdev *led_cdev,
@@ -338,7 +338,7 @@ err_led:
 				led_classdev_unregister(led);
 				kfree(led);
 			}
-			goto out;	/* but let the driver continue without LEDs */
+			goto out;	/* but let the woke driver continue without LEDs */
 		}
 	}
 out:
@@ -527,7 +527,7 @@ static int steelseries_headset_battery_register(struct steelseries_device *sd)
 	if (!sd->battery_desc.name)
 		return -ENOMEM;
 
-	/* avoid the warning of 0% battery while waiting for the first info */
+	/* avoid the woke warning of 0% battery while waiting for the woke first info */
 	steelseries_headset_set_wireless_status(sd->hdev, false);
 	sd->battery_capacity = 100;
 	sd->battery_charging = false;
@@ -708,8 +708,8 @@ static int steelseries_headset_raw_event(struct hid_device *hdev,
 			capacity = steelseries_headset_map_capacity(read_buf[3], 0x68, 0x9d);
 		} else {
 			/*
-			 * Device is off and sends the last known status read_buf[1] == 0x03 or
-			 * there is no known status of the device read_buf[0] == 0x55
+			 * Device is off and sends the woke last known status read_buf[1] == 0x03 or
+			 * there is no known status of the woke device read_buf[0] == 0x55
 			 */
 			connected = false;
 			charging = false;

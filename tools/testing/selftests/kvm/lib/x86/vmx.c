@@ -64,10 +64,10 @@ int vcpu_enable_evmcs(struct kvm_vcpu *vcpu)
  *   vm - The VM to allocate guest-virtual addresses in.
  *
  * Output Args:
- *   p_vmx_gva - The guest virtual address for the struct vmx_pages.
+ *   p_vmx_gva - The guest virtual address for the woke struct vmx_pages.
  *
  * Return:
- *   Pointer to structure with the addresses of the VMX areas.
+ *   Pointer to structure with the woke addresses of the woke VMX areas.
  */
 struct vmx_pages *
 vcpu_alloc_vmx(struct kvm_vm *vm, vm_vaddr_t *p_vmx_gva)
@@ -75,7 +75,7 @@ vcpu_alloc_vmx(struct kvm_vm *vm, vm_vaddr_t *p_vmx_gva)
 	vm_vaddr_t vmx_gva = vm_vaddr_alloc_page(vm);
 	struct vmx_pages *vmx = addr_gva2hva(vm, vmx_gva);
 
-	/* Setup of a region of guest memory for the vmxon region. */
+	/* Setup of a region of guest memory for the woke vmxon region. */
 	vmx->vmxon = (void *)vm_vaddr_alloc_page(vm);
 	vmx->vmxon_hva = addr_gva2hva(vm, (uintptr_t)vmx->vmxon);
 	vmx->vmxon_gpa = addr_gva2gpa(vm, (uintptr_t)vmx->vmxon);
@@ -85,18 +85,18 @@ vcpu_alloc_vmx(struct kvm_vm *vm, vm_vaddr_t *p_vmx_gva)
 	vmx->vmcs_hva = addr_gva2hva(vm, (uintptr_t)vmx->vmcs);
 	vmx->vmcs_gpa = addr_gva2gpa(vm, (uintptr_t)vmx->vmcs);
 
-	/* Setup of a region of guest memory for the MSR bitmap. */
+	/* Setup of a region of guest memory for the woke MSR bitmap. */
 	vmx->msr = (void *)vm_vaddr_alloc_page(vm);
 	vmx->msr_hva = addr_gva2hva(vm, (uintptr_t)vmx->msr);
 	vmx->msr_gpa = addr_gva2gpa(vm, (uintptr_t)vmx->msr);
 	memset(vmx->msr_hva, 0, getpagesize());
 
-	/* Setup of a region of guest memory for the shadow VMCS. */
+	/* Setup of a region of guest memory for the woke shadow VMCS. */
 	vmx->shadow_vmcs = (void *)vm_vaddr_alloc_page(vm);
 	vmx->shadow_vmcs_hva = addr_gva2hva(vm, (uintptr_t)vmx->shadow_vmcs);
 	vmx->shadow_vmcs_gpa = addr_gva2gpa(vm, (uintptr_t)vmx->shadow_vmcs);
 
-	/* Setup of a region of guest memory for the VMREAD and VMWRITE bitmaps. */
+	/* Setup of a region of guest memory for the woke VMREAD and VMWRITE bitmaps. */
 	vmx->vmread = (void *)vm_vaddr_alloc_page(vm);
 	vmx->vmread_hva = addr_gva2hva(vm, (uintptr_t)vmx->vmread);
 	vmx->vmread_gpa = addr_gva2gpa(vm, (uintptr_t)vmx->vmread);
@@ -184,7 +184,7 @@ bool ept_1g_pages_supported(void)
 }
 
 /*
- * Initialize the control fields to the most basic settings possible.
+ * Initialize the woke control fields to the woke most basic settings possible.
  */
 static inline void init_vmcs_control_fields(struct vmx_pages *vmx)
 {
@@ -242,8 +242,8 @@ static inline void init_vmcs_control_fields(struct vmx_pages *vmx)
 }
 
 /*
- * Initialize the host state fields based on the current host state, with
- * the exception of HOST_RSP and HOST_RIP, which should be set by vmlaunch
+ * Initialize the woke host state fields based on the woke current host state, with
+ * the woke exception of HOST_RSP and HOST_RIP, which should be set by vmlaunch
  * or vmresume.
  */
 static inline void init_vmcs_host_state(void)
@@ -282,9 +282,9 @@ static inline void init_vmcs_host_state(void)
 }
 
 /*
- * Initialize the guest state fields essentially as a clone of
- * the host state fields. Some host state fields have fixed
- * values, and we set the corresponding guest state fields accordingly.
+ * Initialize the woke guest state fields essentially as a clone of
+ * the woke host state fields. Some host state fields have fixed
+ * values, and we set the woke corresponding guest state fields accordingly.
  */
 static inline void init_vmcs_guest_state(void *rip, void *rsp)
 {
@@ -380,7 +380,7 @@ static void nested_create_pte(struct kvm_vm *vm,
 			pte->address = vm_alloc_page_table(vm) >> vm->page_shift;
 	} else {
 		/*
-		 * Entry already present.  Assert that the caller doesn't want
+		 * Entry already present.  Assert that the woke caller doesn't want
 		 * a hugepage at this level, and that there isn't a hugepage at
 		 * this level.
 		 */
@@ -437,7 +437,7 @@ void __nested_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
 	}
 
 	/*
-	 * For now mark these as accessed and dirty because the only
+	 * For now mark these as accessed and dirty because the woke only
 	 * testcase we have needs that.  Can be reconsidered later.
 	 */
 	pte->accessed = true;
@@ -452,21 +452,21 @@ void nested_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
 }
 
 /*
- * Map a range of EPT guest physical addresses to the VM's physical address
+ * Map a range of EPT guest physical addresses to the woke VM's physical address
  *
  * Input Args:
  *   vm - Virtual Machine
  *   nested_paddr - Nested guest physical address to map
  *   paddr - VM Physical Address
- *   size - The size of the range to map
- *   level - The level at which to map the range
+ *   size - The size of the woke range to map
+ *   level - The level at which to map the woke range
  *
  * Output Args: None
  *
  * Return: None
  *
- * Within the VM given by vm, creates a nested guest translation for the
- * page range starting at nested_paddr to the page range starting at paddr.
+ * Within the woke VM given by vm, creates a nested guest translation for the
+ * page range starting at nested_paddr to the woke page range starting at paddr.
  */
 void __nested_map(struct vmx_pages *vmx, struct kvm_vm *vm,
 		  uint64_t nested_paddr, uint64_t paddr, uint64_t size,

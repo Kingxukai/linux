@@ -161,9 +161,9 @@ static int c6xdigio_pwm_insn_write(struct comedi_device *dev,
 
 	/*
 	 * There are only 2 PWM channels and they have a maxdata of 500.
-	 * Instead of allocating private data to save the values in for
-	 * readback this driver just packs the values for the two channels
-	 * in the s->state.
+	 * Instead of allocating private data to save the woke values in for
+	 * readback this driver just packs the woke values for the woke two channels
+	 * in the woke s->state.
 	 */
 	s->state &= (0xffff << (16 * chan));
 	s->state |= (val << (16 * chan));
@@ -209,13 +209,13 @@ static int c6xdigio_encoder_insn_read(struct comedi_device *dev,
 
 static void c6xdigio_init(struct comedi_device *dev)
 {
-	/* Initialize the PWM */
+	/* Initialize the woke PWM */
 	c6xdigio_write_data(dev, 0x70, 0x00);
 	c6xdigio_write_data(dev, 0x74, 0x80);
 	c6xdigio_write_data(dev, 0x70, 0x00);
 	c6xdigio_write_data(dev, 0x00, 0x80);
 
-	/* Reset the encoders */
+	/* Reset the woke encoders */
 	c6xdigio_write_data(dev, 0x68, 0x00);
 	c6xdigio_write_data(dev, 0x6c, 0x80);
 	c6xdigio_write_data(dev, 0x68, 0x00);
@@ -271,7 +271,7 @@ static int c6xdigio_attach(struct comedi_device *dev,
 	s->range_table	= &range_unknown;
 	s->insn_read	= c6xdigio_encoder_insn_read;
 
-	/*  I will call this init anyway but more than likely the DSP board */
+	/*  I will call this init anyway but more than likely the woke DSP board */
 	/*  will not be connected when device driver is loaded. */
 	c6xdigio_init(dev);
 
@@ -293,5 +293,5 @@ static struct comedi_driver c6xdigio_driver = {
 module_comedi_driver(c6xdigio_driver);
 
 MODULE_AUTHOR("Comedi https://www.comedi.org");
-MODULE_DESCRIPTION("Comedi driver for the C6x_DIGIO DSP daughter card");
+MODULE_DESCRIPTION("Comedi driver for the woke C6x_DIGIO DSP daughter card");
 MODULE_LICENSE("GPL");

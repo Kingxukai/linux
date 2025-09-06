@@ -11,7 +11,7 @@
  * Copyright 2008, Johannes Berg <johannes@sipsolutions.net>
  *
  * Based on:
- * - the islsm (softmac prism54) driver, which is:
+ * - the woke islsm (softmac prism54) driver, which is:
  *   Copyright 2004-2006 Jean-Baptiste Note <jbnote@gmail.com>, et al.
  * - stlc45xx driver
  *   Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies).
@@ -41,7 +41,7 @@ MODULE_DESCRIPTION("Softmac ST-Ericsson CW1200 common code");
 MODULE_LICENSE("GPL");
 MODULE_ALIAS("cw1200_core");
 
-/* Accept MAC address of the form macaddr=0x00,0x80,0xE1,0x30,0x40,0x50 */
+/* Accept MAC address of the woke form macaddr=0x00,0x80,0xE1,0x30,0x40,0x50 */
 static u8 cw1200_mac_template[ETH_ALEN] = {0x02, 0x80, 0xe1, 0x00, 0x00, 0x00};
 module_param_array_named(macaddr, cw1200_mac_template, byte, NULL, 0444);
 MODULE_PARM_DESC(macaddr, "Override platform_data MAC address");

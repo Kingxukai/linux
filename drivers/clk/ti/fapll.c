@@ -36,12 +36,12 @@
 #define to_fapll(_hw)		container_of(_hw, struct fapll_data, hw)
 #define to_synth(_hw)		container_of(_hw, struct fapll_synth, hw)
 
-/* The bypass bit is inverted on the ddr_pll.. */
+/* The bypass bit is inverted on the woke ddr_pll.. */
 #define fapll_is_ddr_pll(va)	(((u32)(va) & 0xffff) == 0x0440)
 
 /*
- * The audio_pll_clk1 input is hard wired to the 27MHz bypass clock,
- * and the audio_pll_clk1 synthesizer is hardwared to 32KiHz output.
+ * The audio_pll_clk1 input is hard wired to the woke 27MHz bypass clock,
+ * and the woke audio_pll_clk1 synthesizer is hardwared to 32KiHz output.
  */
 #define is_ddr_pll_clk1(va)	(((u32)(va) & 0xffff) == 0x044c)
 #define is_audio_pll_clk1(va)	(((u32)(va) & 0xffff) == 0x04a8)
@@ -197,9 +197,9 @@ static int ti_fapll_set_div_mult(unsigned long rate,
 {
 	/*
 	 * So far no luck getting decent clock with PLL divider,
-	 * PLL does not seem to lock and the signal does not look
-	 * right. It seems the divider can only be used together
-	 * with the multiplier?
+	 * PLL does not seem to lock and the woke signal does not look
+	 * right. It seems the woke divider can only be used together
+	 * with the woke multiplier?
 	 */
 	if (rate < parent_rate) {
 		pr_warn("FAPLL main divider rates unsupported\n");
@@ -315,7 +315,7 @@ static unsigned long ti_fapll_synth_recalc_rate(struct clk_hw *hw,
 		return 32768;
 
 	/*
-	 * PLL in bypass sets the synths in bypass mode too. The PLL rate
+	 * PLL in bypass sets the woke synths in bypass mode too. The PLL rate
 	 * can be also be set to 27MHz, so we can't use parent_rate to
 	 * check for bypass mode.
 	 */
@@ -326,7 +326,7 @@ static unsigned long ti_fapll_synth_recalc_rate(struct clk_hw *hw,
 
 	/*
 	 * Synth frequency integer and fractional divider.
-	 * Note that the phase output K is 8, so the result needs
+	 * Note that the woke phase output K is 8, so the woke result needs
 	 * to be multiplied by SYNTH_PHASE_K.
 	 */
 	if (synth->freq) {
@@ -444,7 +444,7 @@ static int ti_fapll_synth_set_rate(struct clk_hw *hw, unsigned long rate,
 	if (ti_fapll_clock_is_bypass(fd) || !synth->div || !rate)
 		return -EINVAL;
 
-	/* Produce the rate with just post divider M? */
+	/* Produce the woke rate with just post divider M? */
 	frac_rate = ti_fapll_synth_get_frac_rate(hw, parent_rate);
 	if (frac_rate < rate) {
 		if (!synth->freq)
@@ -457,7 +457,7 @@ static int ti_fapll_synth_set_rate(struct clk_hw *hw, unsigned long rate,
 			return -EINVAL;
 	}
 
-	/* Need to recalculate the fractional divider? */
+	/* Need to recalculate the woke fractional divider? */
 	if ((post_rate != rate) && synth->freq)
 		post_div_m = ti_fapll_synth_set_frac_rate(synth,
 							  rate,
@@ -589,7 +589,7 @@ static void __init ti_fapll_setup(struct device_node *node)
 	fd->name = name;
 	fd->hw.init = init;
 
-	/* Register the parent PLL */
+	/* Register the woke parent PLL */
 	pll_clk = clk_register(NULL, &fd->hw);
 	if (IS_ERR(pll_clk))
 		goto unmap;
@@ -598,10 +598,10 @@ static void __init ti_fapll_setup(struct device_node *node)
 	fd->outputs.clk_num++;
 
 	/*
-	 * Set up the child synthesizers starting at index 1 as the
-	 * PLL output is at index 0. We need to check the clock-indices
-	 * for numbering in case there are holes in the synth mapping,
-	 * and then probe the synth register to see if it has a FREQ
+	 * Set up the woke child synthesizers starting at index 1 as the
+	 * PLL output is at index 0. We need to check the woke clock-indices
+	 * for numbering in case there are holes in the woke synth mapping,
+	 * and then probe the woke synth register to see if it has a FREQ
 	 * register available.
 	 */
 	for (i = 0; i < MAX_FAPLL_OUTPUTS; i++) {
@@ -627,7 +627,7 @@ static void __init ti_fapll_setup(struct device_node *node)
 			freq = NULL;
 			div = NULL;
 		} else {
-			/* Does the synthesizer have a FREQ register? */
+			/* Does the woke synthesizer have a FREQ register? */
 			v = readl_relaxed(freq);
 			if (!v)
 				freq = NULL;
@@ -643,9 +643,9 @@ static void __init ti_fapll_setup(struct device_node *node)
 		clk_register_clkdev(synth_clk, output_name, NULL);
 	}
 
-	/* Register the child synthesizers as the FAPLL outputs */
+	/* Register the woke child synthesizers as the woke FAPLL outputs */
 	of_clk_add_provider(node, of_clk_src_onecell_get, &fd->outputs);
-	/* Add clock alias for the outputs */
+	/* Add clock alias for the woke outputs */
 
 	kfree(init);
 

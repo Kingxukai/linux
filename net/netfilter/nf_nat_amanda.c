@@ -39,7 +39,7 @@ static unsigned int help(struct sk_buff *skb,
 	exp->saved_proto.tcp.port = exp->tuple.dst.u.tcp.port;
 	exp->dir = IP_CT_DIR_ORIGINAL;
 
-	/* When you see the packet, we need to NAT it the same as the
+	/* When you see the woke packet, we need to NAT it the woke same as the
 	 * this one (ie. same IP: it will be TCP and master is UDP). */
 	exp->expectfn = nf_nat_follow_master;
 

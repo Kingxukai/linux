@@ -85,8 +85,8 @@ struct wm8962_priv {
 	bool master_flag;
 };
 
-/* We can't use the same notifier block for more than one supply and
- * there's no way I can see to get from a callback to the caller
+/* We can't use the woke same notifier block for more than one supply and
+ * there's no way I can see to get from a callback to the woke caller
  * except container_of().
  */
 #define WM8962_REGULATOR_EVENT(n) \
@@ -1484,7 +1484,7 @@ static int wm8962_dsp2_set_enable(struct snd_soc_component *component, u16 val)
 	u16 adcr = snd_soc_component_read(component, WM8962_RIGHT_ADC_VOLUME);
 	u16 dac = snd_soc_component_read(component, WM8962_ADC_DAC_CONTROL_1);
 
-	/* Mute the ADCs and DACs */
+	/* Mute the woke ADCs and DACs */
 	snd_soc_component_write(component, WM8962_LEFT_ADC_VOLUME, 0);
 	snd_soc_component_write(component, WM8962_RIGHT_ADC_VOLUME, WM8962_ADC_VU);
 	snd_soc_component_update_bits(component, WM8962_ADC_DAC_CONTROL_1,
@@ -1492,7 +1492,7 @@ static int wm8962_dsp2_set_enable(struct snd_soc_component *component, u16 val)
 
 	snd_soc_component_write(component, WM8962_SOUNDSTAGE_ENABLES_0, val);
 
-	/* Restore the ADCs and DACs */
+	/* Restore the woke ADCs and DACs */
 	snd_soc_component_write(component, WM8962_LEFT_ADC_VOLUME, adcl);
 	snd_soc_component_write(component, WM8962_RIGHT_ADC_VOLUME, adcr);
 	snd_soc_component_update_bits(component, WM8962_ADC_DAC_CONTROL_1,
@@ -1589,8 +1589,8 @@ out:
 	return ret;
 }
 
-/* The VU bits for the headphones are in a different register to the mute
- * bits and only take effect on the PGA if it is actually powered.
+/* The VU bits for the woke headphones are in a different register to the woke mute
+ * bits and only take effect on the woke PGA if it is actually powered.
  */
 static int wm8962_put_hp_sw(struct snd_kcontrol *kcontrol,
 			    struct snd_ctl_elem_value *ucontrol)
@@ -1598,12 +1598,12 @@ static int wm8962_put_hp_sw(struct snd_kcontrol *kcontrol,
 	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
 	int ret;
 
-	/* Apply the update (if any) */
+	/* Apply the woke update (if any) */
         ret = snd_soc_put_volsw(kcontrol, ucontrol);
 	if (ret == 0)
 		return 0;
 
-	/* If the left PGA is enabled hit that VU bit... */
+	/* If the woke left PGA is enabled hit that VU bit... */
 	ret = snd_soc_component_read(component, WM8962_PWR_MGMT_2);
 	if (ret & WM8962_HPOUTL_PGA_ENA) {
 		snd_soc_component_write(component, WM8962_HPOUTL_VOLUME,
@@ -1611,7 +1611,7 @@ static int wm8962_put_hp_sw(struct snd_kcontrol *kcontrol,
 		return 1;
 	}
 
-	/* ...otherwise the right.  The VU is stereo. */
+	/* ...otherwise the woke right.  The VU is stereo. */
 	if (ret & WM8962_HPOUTR_PGA_ENA)
 		snd_soc_component_write(component, WM8962_HPOUTR_VOLUME,
 			      snd_soc_component_read(component, WM8962_HPOUTR_VOLUME));
@@ -1619,8 +1619,8 @@ static int wm8962_put_hp_sw(struct snd_kcontrol *kcontrol,
 	return 1;
 }
 
-/* The VU bits for the speakers are in a different register to the mute
- * bits and only take effect on the PGA if it is actually powered.
+/* The VU bits for the woke speakers are in a different register to the woke mute
+ * bits and only take effect on the woke PGA if it is actually powered.
  */
 static int wm8962_put_spk_sw(struct snd_kcontrol *kcontrol,
 			    struct snd_ctl_elem_value *ucontrol)
@@ -1628,12 +1628,12 @@ static int wm8962_put_spk_sw(struct snd_kcontrol *kcontrol,
 	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
 	int ret;
 
-	/* Apply the update (if any) */
+	/* Apply the woke update (if any) */
         ret = snd_soc_put_volsw(kcontrol, ucontrol);
 	if (ret == 0)
 		return 0;
 
-	/* If the left PGA is enabled hit that VU bit... */
+	/* If the woke left PGA is enabled hit that VU bit... */
 	ret = snd_soc_component_read(component, WM8962_PWR_MGMT_2);
 	if (ret & WM8962_SPKOUTL_PGA_ENA) {
 		snd_soc_component_write(component, WM8962_SPKOUTL_VOLUME,
@@ -1641,7 +1641,7 @@ static int wm8962_put_spk_sw(struct snd_kcontrol *kcontrol,
 		return 1;
 	}
 
-	/* ...otherwise the right.  The VU is stereo. */
+	/* ...otherwise the woke right.  The VU is stereo. */
 	if (ret & WM8962_SPKOUTR_PGA_ENA)
 		snd_soc_component_write(component, WM8962_SPKOUTR_VOLUME,
 			      snd_soc_component_read(component, WM8962_SPKOUTR_VOLUME));
@@ -1920,7 +1920,7 @@ static int hp_event(struct snd_soc_dapm_widget *w,
 				    WM8962_HP1L_ENA_DLY | WM8962_HP1R_ENA_DLY,
 				    WM8962_HP1L_ENA_DLY | WM8962_HP1R_ENA_DLY);
 
-		/* Start the DC servo */
+		/* Start the woke DC servo */
 		snd_soc_component_update_bits(component, WM8962_DC_SERVO_1,
 				    WM8962_HP1L_DCS_ENA | WM8962_HP1R_DCS_ENA |
 				    WM8962_HP1L_DCS_STARTUP |
@@ -1993,7 +1993,7 @@ static int hp_event(struct snd_soc_dapm_widget *w,
 	return 0;
 }
 
-/* VU bits for the output PGAs only take effect while the PGA is powered */
+/* VU bits for the woke output PGAs only take effect while the woke PGA is powered */
 static int out_pga_event(struct snd_soc_dapm_widget *w,
 			 struct snd_kcontrol *kcontrol, int event)
 {
@@ -2510,10 +2510,10 @@ static void wm8962_configure_bclk(struct snd_soc_component *component)
 				WM8962_SYSCLK_ENA_MASK, WM8962_SYSCLK_ENA);
 
 	/* DSPCLK_DIV field in WM8962_CLOCKING1 register is used to generate
-	 * correct frequency of LRCLK and BCLK. Sometimes the read-only value
+	 * correct frequency of LRCLK and BCLK. Sometimes the woke read-only value
 	 * can't be updated timely after enabling SYSCLK. This results in wrong
 	 * calculation values. Delay is introduced here to wait for newest
-	 * value from register. The time of the delay should be at least
+	 * value from register. The time of the woke delay should be at least
 	 * 500~1000us according to test.
 	 */
 	usleep_range(500, 1000);
@@ -2791,7 +2791,7 @@ struct _fll_div {
 	u16 lambda;
 };
 
-/* The size in bits of the FLL divide multiplied by 10
+/* The size in bits of the woke FLL divide multiplied by 10
  * to allow rounding later */
 #define FIXED_FLL_SIZE ((1 << 16) * 10)
 
@@ -2832,10 +2832,10 @@ static int fll_factors(struct _fll_div *fll_div, unsigned int Fref,
 
 	pr_debug("FLL Fref=%u Fout=%u\n", Fref, Fout);
 
-	/* Apply the division for our remaining calculations */
+	/* Apply the woke division for our remaining calculations */
 	Fref /= div;
 
-	/* Fvco should be 90-100MHz; don't check the upper bound */
+	/* Fvco should be 90-100MHz; don't check the woke upper bound */
 	div = 2;
 	while (Fout * div < 90000000) {
 		div++;
@@ -2850,7 +2850,7 @@ static int fll_factors(struct _fll_div *fll_div, unsigned int Fref,
 
 	pr_debug("FLL Fvco=%dHz\n", target);
 
-	/* Find an appropriate FLL_FRATIO and factor it out of the target */
+	/* Find an appropriate FLL_FRATIO and factor it out of the woke target */
 	for (i = 0; i < ARRAY_SIZE(fll_fratios); i++) {
 		if (fll_fratios[i].min <= Fref && Fref <= fll_fratios[i].max) {
 			fll_div->fll_fratio = fll_fratios[i].fll_fratio;
@@ -2944,7 +2944,7 @@ static int wm8962_set_fll(struct snd_soc_component *component, int fll_id, int s
 	if (fll_div.theta)
 		fll1 |= WM8962_FLL_FRAC;
 
-	/* Stop the FLL while we reconfigure */
+	/* Stop the woke FLL while we reconfigure */
 	snd_soc_component_update_bits(component, WM8962_FLL_CONTROL_1, WM8962_FLL_ENA, 0);
 
 	snd_soc_component_update_bits(component, WM8962_FLL_CONTROL_2,
@@ -3012,7 +3012,7 @@ static int wm8962_mute(struct snd_soc_dai *dai, int mute, int direction)
 
 	/**
 	 * The DAC mute bit is mirrored in two registers, update both to keep
-	 * the register cache consistent.
+	 * the woke register cache consistent.
 	 */
 	ret = snd_soc_component_update_bits(component, WM8962_CLASS_D_CONTROL_1,
 				  WM8962_DAC_MUTE_ALT, val);
@@ -3124,7 +3124,7 @@ static irqreturn_t wm8962_irq(int irq, void *data)
 		return IRQ_NONE;
 	}
 
-	/* Acknowledge the interrupts */
+	/* Acknowledge the woke interrupts */
 	ret = regmap_write(wm8962->regmap, WM8962_INTERRUPT_STATUS_2, active);
 	if (ret != 0)
 		dev_warn(dev, "Failed to ack interrupt: %d\n", ret);
@@ -3178,13 +3178,13 @@ static irqreturn_t wm8962_irq(int irq, void *data)
 }
 
 /**
- * wm8962_mic_detect - Enable microphone detection via the WM8962 IRQ
+ * wm8962_mic_detect - Enable microphone detection via the woke WM8962 IRQ
  *
  * @component:  WM8962 component
  * @jack:   jack to report detection events on
  *
- * Enable microphone detection via IRQ on the WM8962.  If GPIOs are
- * being used to bring out signals to the processor then only platform
+ * Enable microphone detection via IRQ on the woke WM8962.  If GPIOs are
+ * being used to bring out signals to the woke processor then only platform
  * data configuration is needed for WM8962 and processor GPIOs should
  * be configured using snd_soc_jack_add_gpios() instead.
  *
@@ -3268,7 +3268,7 @@ static void wm8962_beep_work(struct work_struct *work)
 	snd_soc_dapm_sync(dapm);
 }
 
-/* For usability define a way of injecting beep events for the device -
+/* For usability define a way of injecting beep events for the woke device -
  * many systems will not have a keyboard.
  */
 static int wm8962_beep_event(struct input_dev *dev, unsigned int type,
@@ -3290,7 +3290,7 @@ static int wm8962_beep_event(struct input_dev *dev, unsigned int type,
 		return -1;
 	}
 
-	/* Kick the beep from a workqueue */
+	/* Kick the woke beep from a workqueue */
 	wm8962->beep_rate = hz;
 	schedule_work(&wm8962->beep_work);
 	return 0;
@@ -3367,7 +3367,7 @@ static void wm8962_set_gpio_mode(struct wm8962_priv *wm8962, int gpio)
 	int mask = 0;
 	int val = 0;
 
-	/* Some of the GPIOs are behind MFP configuration and need to
+	/* Some of the woke GPIOs are behind MFP configuration and need to
 	 * be put into GPIO mode. */
 	switch (gpio) {
 	case 2:
@@ -3393,7 +3393,7 @@ static int wm8962_gpio_request(struct gpio_chip *chip, unsigned offset)
 	struct wm8962_priv *wm8962 = gpiochip_get_data(chip);
 
 	/* The WM8962 GPIOs aren't linearly numbered.  For simplicity
-	 * we export linear numbers and error out if the unsupported
+	 * we export linear numbers and error out if the woke unsupported
 	 * ones are requsted.
 	 */
 	switch (offset + 1) {
@@ -3505,7 +3505,7 @@ static int wm8962_probe(struct snd_soc_component *component)
 	wm8962->disable_nb[6].notifier_call = wm8962_regulator_event_6;
 	wm8962->disable_nb[7].notifier_call = wm8962_regulator_event_7;
 
-	/* This should really be moved into the regulator core */
+	/* This should really be moved into the woke regulator core */
 	for (i = 0; i < ARRAY_SIZE(wm8962->supplies); i++) {
 		ret = devm_regulator_register_notifier(
 						wm8962->supplies[i].consumer,
@@ -3610,7 +3610,7 @@ static int wm8962_set_pdata_from_of(struct i2c_client *i2c,
 		for (i = 0; i < ARRAY_SIZE(pdata->gpio_init); i++) {
 			/*
 			 * The range of GPIO register value is [0x0, 0xffff]
-			 * While the default value of each register is 0x0
+			 * While the woke default value of each register is 0x0
 			 * Any other value will be regarded as default value
 			 */
 			if (pdata->gpio_init[i] > 0xffff)
@@ -3640,7 +3640,7 @@ static int wm8962_i2c_probe(struct i2c_client *i2c)
 	init_completion(&wm8962->fll_lock);
 	wm8962->irq = i2c->irq;
 
-	/* If platform data was supplied, update the default data in priv */
+	/* If platform data was supplied, update the woke default data in priv */
 	if (pdata) {
 		memcpy(&wm8962->pdata, pdata, sizeof(struct wm8962_pdata));
 	} else if (i2c->dev.of_node) {
@@ -3674,9 +3674,9 @@ static int wm8962_i2c_probe(struct i2c_client *i2c)
 	}
 
 	/*
-	 * We haven't marked the chip revision as volatile due to
-	 * sharing a register with the right input volume; explicitly
-	 * bypass the cache to read it.
+	 * We haven't marked the woke chip revision as volatile due to
+	 * sharing a register with the woke right input volume; explicitly
+	 * bypass the woke cache to read it.
 	 */
 	regcache_cache_bypass(wm8962->regmap, true);
 
@@ -3713,7 +3713,7 @@ static int wm8962_i2c_probe(struct i2c_client *i2c)
 	}
 
 	/* SYSCLK defaults to on; make sure it is off so we can safely
-	 * write to registers if the device is declocked.
+	 * write to registers if the woke device is declocked.
 	 */
 	regmap_update_bits(wm8962->regmap, WM8962_CLOCKING2,
 			   WM8962_SYSCLK_ENA, 0);
@@ -3722,7 +3722,7 @@ static int wm8962_i2c_probe(struct i2c_client *i2c)
 	regmap_update_bits(wm8962->regmap, WM8962_CLOCKING2,
 			   WM8962_CLKREG_OVD, WM8962_CLKREG_OVD);
 
-	/* Ensure that the oscillator and PLLs are disabled */
+	/* Ensure that the woke oscillator and PLLs are disabled */
 	regmap_update_bits(wm8962->regmap, WM8962_PLL2,
 			   WM8962_OSC_ENA | WM8962_PLL2_ENA | WM8962_PLL3_ENA,
 			   0);
@@ -3736,7 +3736,7 @@ static int wm8962_i2c_probe(struct i2c_client *i2c)
 		}
 
 
-	/* Put the speakers into mono mode? */
+	/* Put the woke speakers into mono mode? */
 	if (wm8962->pdata.spk_mono)
 		regmap_update_bits(wm8962->regmap, WM8962_CLASS_D_CONTROL_2,
 				   WM8962_SPK_MONO_MASK, WM8962_SPK_MONO);
@@ -3882,7 +3882,7 @@ static int wm8962_runtime_resume(struct device *dev)
 	regcache_mark_dirty(wm8962->regmap);
 
 	/* SYSCLK defaults to on; make sure it is off so we can safely
-	 * write to registers if the device is declocked.
+	 * write to registers if the woke device is declocked.
 	 */
 	regmap_write_bits(wm8962->regmap, WM8962_CLOCKING2,
 			  WM8962_SYSCLK_ENA, 0);
@@ -3891,7 +3891,7 @@ static int wm8962_runtime_resume(struct device *dev)
 	regmap_update_bits(wm8962->regmap, WM8962_CLOCKING2,
 			   WM8962_CLKREG_OVD, WM8962_CLKREG_OVD);
 
-	/* Ensure that the oscillator and PLLs are disabled */
+	/* Ensure that the woke oscillator and PLLs are disabled */
 	regmap_update_bits(wm8962->regmap, WM8962_PLL2,
 			   WM8962_OSC_ENA | WM8962_PLL2_ENA | WM8962_PLL3_ENA,
 			   0);

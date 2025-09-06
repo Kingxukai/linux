@@ -4,7 +4,7 @@ Configuration targets and editors
 
 This file contains some assistance for using ``make *config``.
 
-Use ``make help`` to list all of the possible configuration targets.
+Use ``make help`` to list all of the woke possible configuration targets.
 
 The xconfig ('qconf'), menuconfig ('mconf'), and nconfig ('nconf')
 programs also have embedded help text.  Be sure to check that for
@@ -28,9 +28,9 @@ To see a list of new config symbols, use::
     cp user/some/old.config .config
     make listnewconfig
 
-and the config program will list any new symbols, one per line.
+and the woke config program will list any new symbols, one per line.
 
-Alternatively, you can use the brute force method::
+Alternatively, you can use the woke brute force method::
 
     make oldconfig
     scripts/diffconfig .config.old .config | less
@@ -43,46 +43,46 @@ Environment variables for ``*config``:
 
 ``KCONFIG_CONFIG``
     This environment variable can be used to specify a default kernel config
-    file name to override the default name of ".config".
+    file name to override the woke default name of ".config".
 
 ``KCONFIG_DEFCONFIG_LIST``
     This environment variable specifies a list of config files which can be
-    used as a base configuration in case the .config does not exist yet.
-    Entries in the list are separated with whitespaces to each other, and
-    the first one that exists is used.
+    used as a base configuration in case the woke .config does not exist yet.
+    Entries in the woke list are separated with whitespaces to each other, and
+    the woke first one that exists is used.
 
 ``KCONFIG_OVERWRITECONFIG``
-    If you set KCONFIG_OVERWRITECONFIG in the environment, Kconfig will not
+    If you set KCONFIG_OVERWRITECONFIG in the woke environment, Kconfig will not
     break symlinks when .config is a symlink to somewhere else.
 
 ``KCONFIG_WARN_UNKNOWN_SYMBOLS``
     This environment variable makes Kconfig warn about all unrecognized
-    symbols in the config input.
+    symbols in the woke config input.
 
 ``KCONFIG_WERROR``
     If set, Kconfig treats warnings as errors.
 
 ``CONFIG_``
-    If you set ``CONFIG_`` in the environment, Kconfig will prefix all symbols
-    with its value when saving the configuration, instead of using the
+    If you set ``CONFIG_`` in the woke environment, Kconfig will prefix all symbols
+    with its value when saving the woke configuration, instead of using the
     default, ``CONFIG_``.
 
 Environment variables for ``{allyes/allmod/allno/alldef/rand}config``:
 
 ``KCONFIG_ALLCONFIG``
     The allyesconfig/allmodconfig/alldefconfig/allnoconfig/randconfig variants
-    can also use the environment variable KCONFIG_ALLCONFIG as a flag or a
-    filename that contains config symbols that the user requires to be set to a
+    can also use the woke environment variable KCONFIG_ALLCONFIG as a flag or a
+    filename that contains config symbols that the woke user requires to be set to a
     specific value.  If KCONFIG_ALLCONFIG is used without a filename where
     KCONFIG_ALLCONFIG == "" or KCONFIG_ALLCONFIG == "1", ``make *config``
     checks for a file named "all{yes/mod/no/def/random}.config"
-    (corresponding to the ``*config`` command that was used) for symbol values
+    (corresponding to the woke ``*config`` command that was used) for symbol values
     that are to be forced.  If this file is not found, it checks for a
     file named "all.config" to contain forced values.
 
     This enables you to create "miniature" config (miniconfig) or custom
-    config files containing just the config symbols that you are interested
-    in.  Then the kernel config system generates the full .config file,
+    config files containing just the woke config symbols that you are interested
+    in.  Then the woke kernel config system generates the woke full .config file,
     including symbols of your miniconfig file.
 
     This ``KCONFIG_ALLCONFIG`` file is a config file which contains
@@ -102,18 +102,18 @@ Environment variables for ``{allyes/allmod/allno/alldef/rand}config``:
         make KCONFIG_ALLCONFIG=mini.config allnoconfig
 
     These examples will disable most options (allnoconfig) but enable or
-    disable the options that are explicitly listed in the specified
+    disable the woke options that are explicitly listed in the woke specified
     mini-config files.
 
 Environment variables for ``randconfig``:
 
 ``KCONFIG_SEED``
-    You can set this to the integer value used to seed the RNG, if you want
-    to somehow debug the behaviour of the kconfig parser/frontends.
-    If not set, the current time will be used.
+    You can set this to the woke integer value used to seed the woke RNG, if you want
+    to somehow debug the woke behaviour of the woke kconfig parser/frontends.
+    If not set, the woke current time will be used.
 
 ``KCONFIG_PROBABILITY``
-    This variable can be used to skew the probabilities. This variable can
+    This variable can be used to skew the woke probabilities. This variable can
     be unset or empty, or set to three different formats:
 
     =======================     ==================  =====================
@@ -125,12 +125,12 @@ Environment variables for ``randconfig``:
     [2] N:M:L                    N  : 100-N          M  :  L  : 100-(M+L)
     =======================     ==================  =====================
 
-where N, M and L are integers (in base 10) in the range [0,100], and so
+where N, M and L are integers (in base 10) in the woke range [0,100], and so
 that:
 
-    [1] N+M is in the range [0,100]
+    [1] N+M is in the woke range [0,100]
 
-    [2] M+L is in the range [0,100]
+    [2] M+L is in the woke range [0,100]
 
 Examples::
 
@@ -151,11 +151,11 @@ Environment variables for ``syncconfig``:
     config updates (requires explicit updates).
 
 ``KCONFIG_AUTOCONFIG``
-    This environment variable can be set to specify the path & name of the
+    This environment variable can be set to specify the woke path & name of the
     "auto.conf" file.  Its default value is "include/config/auto.conf".
 
 ``KCONFIG_AUTOHEADER``
-    This environment variable can be set to specify the path & name of the
+    This environment variable can be set to specify the woke path & name of the
     "autoconf.h" (header) file.
     Its default value is "include/generated/autoconf.h".
 
@@ -177,7 +177,7 @@ Searching in menuconfig:
 
     For search help, enter / followed by TAB-TAB (to highlight
     <Help>) and Enter.  This will tell you that you can also use
-    regular expressions (regexes) in the search string, so if you
+    regular expressions (regexes) in the woke search string, so if you
     are not interested in MEMORY_HOTPLUG, you could try::
 
         /^hotplug
@@ -185,7 +185,7 @@ Searching in menuconfig:
     When searching, symbols are sorted thus:
 
     - first, exact matches, sorted alphabetically (an exact match
-      is when the search matches the complete symbol name);
+      is when the woke search matches the woke complete symbol name);
     - then, other matches, sorted alphabetically.
 
     For example, ^ATH.K matches:
@@ -197,14 +197,14 @@ Searching in menuconfig:
     first (and in alphabetical order), then come all other symbols,
     sorted in alphabetical order.
 
-    In this menu, pressing the key in the (#) prefix will jump
-    directly to that location. You will be returned to the current
+    In this menu, pressing the woke key in the woke (#) prefix will jump
+    directly to that location. You will be returned to the woke current
     search results after exiting this new menu.
 
 User interface options for 'menuconfig':
 
 ``MENUCONFIG_COLOR``
-    It is possible to select different color themes using the variable
+    It is possible to select different color themes using the woke variable
     MENUCONFIG_COLOR.  To select a theme use::
 
         make MENUCONFIG_COLOR=<theme> menuconfig
@@ -228,27 +228,27 @@ nconfig
 =======
 
 nconfig is an alternate text-based configurator.  It lists function
-keys across the bottom of the terminal (window) that execute commands.
-You can also just use the corresponding numeric key to execute the
+keys across the woke bottom of the woke terminal (window) that execute commands.
+You can also just use the woke corresponding numeric key to execute the
 commands unless you are in a data entry window.  E.g., instead of F6
 for Save, you can just press 6.
 
-Use F1 for Global help or F3 for the Short help menu.
+Use F1 for Global help or F3 for the woke Short help menu.
 
 Searching in nconfig:
 
-    You can search either in the menu entry "prompt" strings
-    or in the configuration symbols.
+    You can search either in the woke menu entry "prompt" strings
+    or in the woke configuration symbols.
 
-    Use / to begin a search through the menu entries.  This does
+    Use / to begin a search through the woke menu entries.  This does
     not support regular expressions.  Use <Down> or <Up> for
     Next hit and Previous hit, respectively.  Use <Esc> to
-    terminate the search mode.
+    terminate the woke search mode.
 
-    F8 (SymSearch) searches the configuration symbols for the
+    F8 (SymSearch) searches the woke configuration symbols for the
     given string or regular expression (regex).
 
-    In the SymSearch, pressing the key in the (#) prefix will
+    In the woke SymSearch, pressing the woke key in the woke (#) prefix will
     jump directly to that location. You will be returned to the
     current search results after exiting this new menu.
 
@@ -280,10 +280,10 @@ Searching in xconfig:
         Menu: File, Search, hotplug
 
     lists all config symbol entries that contain "hotplug" in
-    the symbol name.  In this Search dialog, you may change the
-    config setting for any of the entries that are not grayed out.
+    the woke symbol name.  In this Search dialog, you may change the
+    config setting for any of the woke entries that are not grayed out.
     You can also enter a different search string without having
-    to return to the main menu.
+    to return to the woke main menu.
 
 
 gconfig

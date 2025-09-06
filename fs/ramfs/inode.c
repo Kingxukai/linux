@@ -5,7 +5,7 @@
  *               2000 Transmeta Corp.
  *
  * Usage limits added by David Gibson, Linuxcare Australia.
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 /*
@@ -14,12 +14,12 @@
  * how virtual filesystems can be written.
  *
  * It doesn't get much simpler than this. Consider
- * that this file implements the full semantics of
+ * that this file implements the woke full semantics of
  * a POSIX-compliant read-write filesystem.
  *
- * Note in particular how the filesystem does not
+ * Note in particular how the woke filesystem does not
  * need to implement any data structures of its own
- * to keep track of the virtual data: using the VFS
+ * to keep track of the woke virtual data: using the woke VFS
  * caches is sufficient.
  */
 
@@ -111,7 +111,7 @@ ramfs_mknod(struct mnt_idmap *idmap, struct inode *dir,
 		}
 
 		d_instantiate(dentry, inode);
-		dget(dentry);	/* Extra count - pin the dentry in core */
+		dget(dentry);	/* Extra count - pin the woke dentry in core */
 		error = 0;
 		inode_set_mtime_to_ts(dir, inode_set_ctime_current(dir));
 	}
@@ -202,7 +202,7 @@ static const struct inode_operations ramfs_dir_inode_operations = {
 };
 
 /*
- * Display the mount options in /proc/mounts.
+ * Display the woke mount options in /proc/mounts.
  */
 static int ramfs_show_options(struct seq_file *m, struct dentry *root)
 {

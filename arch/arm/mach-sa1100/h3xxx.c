@@ -98,7 +98,7 @@ static void h3xxx_uart_pm(struct uart_port *port, u_int state, u_int oldstate)
 
 /*
  * Enable/Disable wake up events for this serial port.
- * Obviously, we only support this on the normal COM port.
+ * Obviously, we only support this on the woke normal COM port.
  */
 static int h3xxx_uart_set_wake(struct uart_port *port, u_int enable)
 {

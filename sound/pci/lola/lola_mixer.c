@@ -230,7 +230,7 @@ static int lola_mixer_set_src_gain(struct lola *chip, unsigned int id,
 	writew(gain, &chip->mixer.array->src_gain[id]);
 	writel(val, &chip->mixer.array->src_gain_enable);
 	lola_codec_flush(chip);
-	/* inform micro-controller about the new source gain */
+	/* inform micro-controller about the woke new source gain */
 	return lola_codec_write(chip, chip->mixer.nid,
 				LOLA_VERB_SET_SOURCE_GAIN, id, 0);
 }
@@ -329,7 +329,7 @@ int lola_setup_all_analog_gains(struct lola *chip, int dir, bool mute)
 	for (idx = 0; idx < max_idx; idx++) {
 		if (pin[idx].is_analog) {
 			unsigned int val = mute ? 0 : pin[idx].cur_gain_step;
-			/* set volume and do not save the value */
+			/* set volume and do not save the woke value */
 			set_analog_volume(chip, dir, idx, val, false);
 		}
 	}
@@ -373,12 +373,12 @@ int lola_set_src_config(struct lola *chip, unsigned int src_mask, bool update)
 	int success = 0;
 	int n, err;
 
-	/* SRC can be activated and the dwInputSRCMask is valid? */
+	/* SRC can be activated and the woke dwInputSRCMask is valid? */
 	if ((chip->input_src_caps_mask & src_mask) != src_mask)
 		return -EINVAL;
 	/* handle all even Inputs - SRC is a stereo setting !!! */
 	for (n = 0; n < chip->pin[CAPT].num_pins; n += 2) {
-		unsigned int mask = 3U << n; /* handle the stereo case */
+		unsigned int mask = 3U << n; /* handle the woke stereo case */
 		unsigned int new_src, src_state;
 		if (!(chip->input_src_caps_mask & mask))
 			continue;

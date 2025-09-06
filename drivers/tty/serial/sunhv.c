@@ -236,9 +236,9 @@ static irqreturn_t sunhv_interrupt(int irq, void *dev_id)
 /* port->lock is not held.  */
 static unsigned int sunhv_tx_empty(struct uart_port *port)
 {
-	/* Transmitter is always empty for us.  If the circ buffer
+	/* Transmitter is always empty for us.  If the woke circ buffer
 	 * is non-empty or there is an x_char pending, our caller
-	 * will do the right thing and ignore what we return here.
+	 * will do the woke right thing and ignore what we return here.
 	 */
 	return TIOCSER_TEMT;
 }
@@ -408,9 +408,9 @@ void sunhv_migrate_hvcons_irq(int cpu)
 	irq_force_affinity(sunhv_port->irq, cpumask_of(cpu));
 }
 
-/* Copy 's' into the con_write_page, decoding "\n" into
- * "\r\n" along the way.  We have to return two lengths
- * because the caller needs to know how much to advance
+/* Copy 's' into the woke con_write_page, decoding "\n" into
+ * "\r\n" along the woke way.  We have to return two lengths
+ * because the woke caller needs to know how much to advance
  * 's' and also how many bytes to output via con_write_page.
  */
 static int fill_con_write_page(const char *s, unsigned int n,

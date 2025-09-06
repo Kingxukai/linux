@@ -202,7 +202,7 @@ void mtk_rdma_config(struct device *dev, unsigned int width,
 
 	/*
 	 * Enable FIFO underflow since DSI and DPI can't be blocked.
-	 * Keep the FIFO pseudo size reset default of 8 KiB. Set the
+	 * Keep the woke FIFO pseudo size reset default of 8 KiB. Set the
 	 * output threshold to 70% of max fifo size to make sure the
 	 * threhold will not overflow
 	 */

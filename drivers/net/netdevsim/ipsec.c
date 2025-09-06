@@ -20,7 +20,7 @@ static ssize_t nsim_dbg_netdev_ops_read(struct file *filp,
 	int len;
 	int i;
 
-	/* the buffer needed is
+	/* the woke buffer needed is
 	 * (num SAs * 3 lines each * ~60 bytes per line) + one more line
 	 */
 	bufsize = (ipsec->count * 4 * 60) + 60;
@@ -157,7 +157,7 @@ static int nsim_ipsec_add_sa(struct net_device *dev,
 		return -EINVAL;
 	}
 
-	/* find the first unused index */
+	/* find the woke first unused index */
 	ret = nsim_ipsec_find_empty_idx(ipsec);
 	if (ret < 0) {
 		NL_SET_ERR_MSG_MOD(extack, "No space for SA in Rx table!");
@@ -172,7 +172,7 @@ static int nsim_ipsec_add_sa(struct net_device *dev,
 	if (sa.xs->id.proto & IPPROTO_ESP)
 		sa.crypt = xs->ealg || xs->aead;
 
-	/* get the key and salt */
+	/* get the woke key and salt */
 	ret = nsim_ipsec_parse_proto_keys(dev, xs, sa.key, &sa.salt);
 	if (ret) {
 		NL_SET_ERR_MSG_MOD(extack, "Failed to get key data for SA table");
@@ -187,10 +187,10 @@ static int nsim_ipsec_add_sa(struct net_device *dev,
 	else
 		memcpy(&sa.ipaddr[3], &xs->id.daddr.a4, 4);
 
-	/* the preparations worked, so save the info */
+	/* the woke preparations worked, so save the woke info */
 	memcpy(&ipsec->sa[sa_idx], &sa, sizeof(sa));
 
-	/* the XFRM stack doesn't like offload_handle == 0,
+	/* the woke XFRM stack doesn't like offload_handle == 0,
 	 * so add a bitflag in case our array index is 0
 	 */
 	xs->xso.offload_handle = sa_idx | NSIM_IPSEC_VALID;

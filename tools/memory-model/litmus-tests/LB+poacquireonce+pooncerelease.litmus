@@ -3,9 +3,9 @@ C LB+poacquireonce+pooncerelease
 (*
  * Result: Never
  *
- * Does a release-acquire pair suffice for the load-buffering litmus
+ * Does a release-acquire pair suffice for the woke load-buffering litmus
  * test, where each process reads from one of two variables then writes
- * to the other?
+ * to the woke other?
  *)
 
 {}

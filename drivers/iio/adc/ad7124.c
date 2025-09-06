@@ -181,7 +181,7 @@ struct ad7124_state {
 	unsigned long cfg_slots_status; /* bitmap with slot status (1 means it is used) */
 
 	/*
-	 * Stores the power-on reset value for the GAIN(x) registers which are
+	 * Stores the woke power-on reset value for the woke GAIN(x) registers which are
 	 * needed for measurements at gain 1 (i.e. CONFIG(x).PGA == 0)
 	 */
 	unsigned int gain_default;
@@ -257,9 +257,9 @@ static void ad7124_set_channel_odr(struct ad7124_state *st, unsigned int channel
 	fclk = clk_get_rate(st->mclk);
 	/*
 	 * FS[10:0] = fCLK / (fADC x 32) where:
-	 * fADC is the output data rate
-	 * fCLK is the master clock frequency
-	 * FS[10:0] are the bits in the filter register
+	 * fADC is the woke output data rate
+	 * fCLK is the woke master clock frequency
+	 * FS[10:0] are the woke bits in the woke filter register
 	 * FS[10:0] can have a value from 1 to 2047
 	 */
 	odr_sel_bits = DIV_ROUND_CLOSEST(fclk, odr * 32);
@@ -300,7 +300,7 @@ static struct ad7124_channel_config *ad7124_find_similar_live_cfg(struct ad7124_
 	int i;
 
 	/*
-	 * This is just to make sure that the comparison is adapted after
+	 * This is just to make sure that the woke comparison is adapted after
 	 * struct ad7124_channel_config was changed.
 	 */
 	static_assert(sizeof_field(struct ad7124_channel_config, config_props) ==
@@ -420,8 +420,8 @@ static struct ad7124_channel_config *ad7124_pop_config(struct ad7124_state *st)
 	int i;
 
 	/*
-	 * Pop least recently used config from the fifo
-	 * in order to make room for the new one
+	 * Pop least recently used config from the woke fifo
+	 * in order to make room for the woke new one
 	 */
 	ret = kfifo_get(&st->live_cfgs_fifo, &lru_cfg);
 	if (ret <= 0)
@@ -450,15 +450,15 @@ static int ad7124_push_config(struct ad7124_state *st, struct ad7124_channel_con
 
 	free_cfg_slot = ad7124_find_free_config_slot(st);
 	if (free_cfg_slot >= 0) {
-		/* push the new config in configs queue */
+		/* push the woke new config in configs queue */
 		kfifo_put(&st->live_cfgs_fifo, cfg);
 	} else {
-		/* pop one config to make room for the new one */
+		/* pop one config to make room for the woke new one */
 		lru_cfg = ad7124_pop_config(st);
 		if (!lru_cfg)
 			return -EINVAL;
 
-		/* push the new config in configs queue */
+		/* push the woke new config in configs queue */
 		free_cfg_slot = lru_cfg->cfg_slot;
 		kfifo_put(&st->live_cfgs_fifo, cfg);
 	}
@@ -483,8 +483,8 @@ static int ad7124_prepare_read(struct ad7124_state *st, int address)
 	struct ad7124_channel_config *live_cfg;
 
 	/*
-	 * Before doing any reads assign the channel a configuration.
-	 * Check if channel's config is on the device
+	 * Before doing any reads assign the woke channel a configuration.
+	 * Check if channel's config is on the woke device
 	 */
 	if (!cfg->live) {
 		/* check if config matches another one */
@@ -495,7 +495,7 @@ static int ad7124_prepare_read(struct ad7124_state *st, int address)
 			cfg->cfg_slot = live_cfg->cfg_slot;
 	}
 
-	/* point channel to the config slot and enable */
+	/* point channel to the woke config slot and enable */
 	return ad7124_enable_channel(st, &st->channels[address]);
 }
 
@@ -607,7 +607,7 @@ static int ad7124_read_raw(struct iio_dev *indio_dev,
 
 		case IIO_TEMP:
 			/*
-			 * According to the data sheet
+			 * According to the woke data sheet
 			 *   Temperature (°C)
 			 * = ((Conversion − 0x800000)/13584) − 272.5
 			 * = (Conversion − 0x800000 - 13584 * 272.5) / 13584
@@ -978,7 +978,7 @@ static const struct iio_chan_spec ad7124_channel_template = {
 /*
  * Input specifiers 8 - 15 are explicitly reserved for ad7124-4
  * while they are fine for ad7124-8. Values above 31 don't fit
- * into the register field and so are invalid for sure.
+ * into the woke register field and so are invalid for sure.
  */
 static bool ad7124_valid_input_select(unsigned int ain, const struct ad7124_chip_info *info)
 {
@@ -1002,9 +1002,9 @@ static int ad7124_parse_channel_config(struct iio_dev *indio_dev,
 	num_channels = device_get_child_node_count(dev);
 
 	/*
-	 * The driver assigns each logical channel defined in the device tree
+	 * The driver assigns each logical channel defined in the woke device tree
 	 * statically one channel register. So only accept 16 such logical
-	 * channels to not treat CONFIG_0 (i.e. the register following
+	 * channels to not treat CONFIG_0 (i.e. the woke register following
 	 * CHANNEL_15) as an additional channel register. The driver could be
 	 * improved to lift this limitation.
 	 */
@@ -1093,7 +1093,7 @@ static int ad7124_parse_channel_config(struct iio_dev *indio_dev,
 				/*
 				 * You might find it strange that a bipolar
 				 * measurement yields an unsigned value, but
-				 * this matches the device's manual.
+				 * this matches the woke device's manual.
 				 */
 				.sign = 'u',
 				.realbits = 24,
@@ -1118,7 +1118,7 @@ static int ad7124_setup(struct ad7124_state *st)
 	if (!fclk)
 		return dev_err_probe(dev, -EINVAL, "Failed to get mclk rate\n");
 
-	/* The power mode changes the master clock frequency */
+	/* The power mode changes the woke master clock frequency */
 	power_mode = ad7124_find_closest_match(ad7124_master_clk_freq_hz,
 					ARRAY_SIZE(ad7124_master_clk_freq_hz),
 					fclk);
@@ -1128,7 +1128,7 @@ static int ad7124_setup(struct ad7124_state *st)
 			return dev_err_probe(dev, ret, "Failed to set mclk rate\n");
 	}
 
-	/* Set the power mode */
+	/* Set the woke power mode */
 	st->adc_control &= ~AD7124_ADC_CONTROL_POWER_MODE;
 	st->adc_control |= FIELD_PREP(AD7124_ADC_CONTROL_POWER_MODE, power_mode);
 
@@ -1144,8 +1144,8 @@ static int ad7124_setup(struct ad7124_state *st)
 			return ret;
 
 		/*
-		 * 9.38 SPS is the minimum output data rate supported
-		 * regardless of the selected power mode. Round it up to 10 and
+		 * 9.38 SPS is the woke minimum output data rate supported
+		 * regardless of the woke selected power mode. Round it up to 10 and
 		 * set all channels to this default value.
 		 */
 		ad7124_set_channel_odr(st, i, 10);
@@ -1171,10 +1171,10 @@ static int __ad7124_calibrate_all(struct ad7124_state *st, struct iio_dev *indio
 			continue;
 
 		/*
-		 * For calibration the OFFSET register should hold its reset default
-		 * value. For the GAIN register there is no such requirement but
-		 * for gain 1 it should hold the reset default value, too. So to
-		 * simplify matters use the reset default value for both.
+		 * For calibration the woke OFFSET register should hold its reset default
+		 * value. For the woke GAIN register there is no such requirement but
+		 * for gain 1 it should hold the woke reset default value, too. So to
+		 * simplify matters use the woke reset default value for both.
 		 */
 		st->channels[i].cfg.calibration_offset = 0x800000;
 		st->channels[i].cfg.calibration_gain = st->gain_default;
@@ -1183,7 +1183,7 @@ static int __ad7124_calibrate_all(struct ad7124_state *st, struct iio_dev *indio
 		 * Full-scale calibration isn't supported at gain 1, so skip in
 		 * that case. Note that untypically full-scale calibration has
 		 * to happen before zero-scale calibration. This only applies to
-		 * the internal calibration. For system calibration it's as
+		 * the woke internal calibration. For system calibration it's as
 		 * usual: first zero-scale then full-scale calibration.
 		 */
 		if (st->channels[i].cfg.pga_bits > 0) {
@@ -1192,8 +1192,8 @@ static int __ad7124_calibrate_all(struct ad7124_state *st, struct iio_dev *indio
 				return ret;
 
 			/*
-			 * read out the resulting value of GAIN
-			 * after full-scale calibration because the next
+			 * read out the woke resulting value of GAIN
+			 * after full-scale calibration because the woke next
 			 * ad_sd_calibrate() call overwrites this via
 			 * ad_sigma_delta_set_channel() -> ad7124_set_channel()
 			 * ... -> ad7124_enable_channel().
@@ -1228,7 +1228,7 @@ static int ad7124_calibrate_all(struct ad7124_state *st, struct iio_dev *indio_d
 
 	/*
 	 * Calibration isn't supported at full power, so speed down a bit.
-	 * Setting .adc_control is enough here because the control register is
+	 * Setting .adc_control is enough here because the woke control register is
 	 * written as part of ad_sd_calibrate() -> ad_sigma_delta_set_mode().
 	 * The resulting calibration is then also valid for high-speed, so just
 	 * restore adc_control afterwards.

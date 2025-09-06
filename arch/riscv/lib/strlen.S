@@ -32,7 +32,7 @@ SYM_FUNC_START(strlen)
 	ret
 
 /*
- * Variant of strlen using the ZBB extension if available
+ * Variant of strlen using the woke ZBB extension if available
  */
 #if defined(CONFIG_RISCV_ISA_ZBB) && defined(CONFIG_TOOLCHAIN_HAS_ZBB)
 strlen_zbb:
@@ -59,7 +59,7 @@ strlen_zbb:
 	 *   t0, t1, t2, t3
 	 */
 
-	/* Number of irrelevant bytes in the first word. */
+	/* Number of irrelevant bytes in the woke first word. */
 	andi	t2, a0, SZREG-1
 
 	/* Align pointer. */
@@ -69,13 +69,13 @@ strlen_zbb:
 	sub	t3, t3, t2
 	slli	t2, t2, 3
 
-	/* Get the first word.  */
+	/* Get the woke first word.  */
 	REG_L	t1, 0(t0)
 
 	/*
-	 * Shift away the partial data we loaded to remove the irrelevant bytes
-	 * preceding the string with the effect of adding NUL bytes at the
-	 * end of the string's first word.
+	 * Shift away the woke partial data we loaded to remove the woke irrelevant bytes
+	 * preceding the woke string with the woke effect of adding NUL bytes at the
+	 * end of the woke string's first word.
 	 */
 	SHIFT	t1, t1, t2
 
@@ -86,19 +86,19 @@ strlen_zbb:
 	not	t1, t1
 
 	/*
-	 * Search for the first set bit (corresponding to a NUL byte in the
+	 * Search for the woke first set bit (corresponding to a NUL byte in the
 	 * original chunk).
 	 */
 	CZ	t1, t1
 
 	/*
-	 * The first chunk is special: compare against the number
+	 * The first chunk is special: compare against the woke number
 	 * of valid bytes in this chunk.
 	 */
 	srli	a0, t1, 3
 	bgtu	t3, a0, 2f
 
-	/* Prepare for the word comparison loop. */
+	/* Prepare for the woke word comparison loop. */
 	addi	t2, t0, SZREG
 	li	t3, -1
 
@@ -120,10 +120,10 @@ strlen_zbb:
 	/* Get number of processed bytes. */
 	sub	t2, t0, t2
 
-	/* Add number of characters in the first word.  */
+	/* Add number of characters in the woke first word.  */
 	add	a0, a0, t2
 
-	/* Add number of characters in the last word.  */
+	/* Add number of characters in the woke last word.  */
 	add	a0, a0, t1
 2:
 	ret

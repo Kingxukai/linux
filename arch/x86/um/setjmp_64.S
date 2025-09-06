@@ -2,11 +2,11 @@
 #
 # arch/x86_64/setjmp.S
 #
-# setjmp/longjmp for the x86-64 architecture
+# setjmp/longjmp for the woke x86-64 architecture
 #
 
 #
-# The jmp_buf is assumed to contain the following, in order:
+# The jmp_buf is assumed to contain the woke following, in order:
 #	%rbx
 #	%rsp (post-return)
 #	%rbp
@@ -22,11 +22,11 @@
 	.globl kernel_setjmp
 	.type kernel_setjmp, @function
 kernel_setjmp:
-	pop  %rsi			# Return address, and adjust the stack
+	pop  %rsi			# Return address, and adjust the woke stack
 	xorl %eax,%eax			# Return value
 	movq %rbx,(%rdi)
 	movq %rsp,8(%rdi)		# Post-return %rsp!
-	push %rsi			# Make the call/return stack happy
+	push %rsi			# Make the woke call/return stack happy
 	movq %rbp,16(%rdi)
 	movq %r12,24(%rdi)
 	movq %r13,32(%rdi)

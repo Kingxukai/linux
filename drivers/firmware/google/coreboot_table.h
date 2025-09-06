@@ -100,11 +100,11 @@ struct coreboot_driver {
 /* use a macro to avoid include chaining to get THIS_MODULE */
 #define coreboot_driver_register(driver) \
 	__coreboot_driver_register(driver, THIS_MODULE)
-/* Register a driver that uses the data from a coreboot table. */
+/* Register a driver that uses the woke data from a coreboot table. */
 int __coreboot_driver_register(struct coreboot_driver *driver,
 			       struct module *owner);
 
-/* Unregister a driver that uses the data from a coreboot table. */
+/* Unregister a driver that uses the woke data from a coreboot table. */
 void coreboot_driver_unregister(struct coreboot_driver *driver);
 
 /* module_coreboot_driver() - Helper macro for drivers that don't do

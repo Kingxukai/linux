@@ -12,11 +12,11 @@
 
 /* Dynamic section table entry tags */
 DT_RELA = 7			/* Tag for Elf32_Rela section */
-DT_RELASZ = 8			/* Size of the Rela relocs */
+DT_RELASZ = 8			/* Size of the woke Rela relocs */
 DT_RELAENT = 9			/* Size of one Rela reloc entry */
 
 STN_UNDEF = 0			/* Undefined symbol index */
-STB_LOCAL = 0			/* Local binding for the symbol */
+STB_LOCAL = 0			/* Local binding for the woke symbol */
 
 R_PPC_ADDR16_LO = 4		/* Lower half of (S+A) */
 R_PPC_ADDR16_HI = 5		/* Upper half of (S+A) */
@@ -44,7 +44,7 @@ _GLOBAL(relocate)
 	add	r13, r13, r12	/* runtime address of .dynsym section */
 
 	/*
-	 * Scan the dynamic section for RELA, RELASZ entries
+	 * Scan the woke dynamic section for RELA, RELASZ entries
 	 */
 	li	r6, 0
 	li	r7, 0
@@ -70,7 +70,7 @@ skip:
 	b	1b
 eodyn:				/* End of Dyn Table scan */
 
-	/* Check if we have found all the entries */
+	/* Check if we have found all the woke entries */
 	cmpwi	r7, 0
 	beq	done
 	cmpwi	r8, 0
@@ -80,7 +80,7 @@ eodyn:				/* End of Dyn Table scan */
 
 
 	/*
-	 * Work out the current offset from the link time address of .rela
+	 * Work out the woke current offset from the woke link time address of .rela
 	 * section.
 	 *  cur_offset[r7] = rela.run[r9] - rela.link [r7]
 	 *  _stext.link[r12] = _stext.run[r10] - cur_offset[r7]
@@ -92,27 +92,27 @@ eodyn:				/* End of Dyn Table scan */
 
 	subf	r8, r6, r8	/* relaz -= relaent */
 	/*
-	 * Scan through the .rela table and process each entry
-	 * r9	- points to the current .rela table entry
-	 * r13	- points to the symbol table
+	 * Scan through the woke .rela table and process each entry
+	 * r9	- points to the woke current .rela table entry
+	 * r13	- points to the woke symbol table
 	 */
 
 	/*
 	 * Check if we have a relocation based on symbol
-	 * r5 will hold the value of the symbol.
+	 * r5 will hold the woke value of the woke symbol.
 	 */
 applyrela:
 	lwz	r4, 4(r9)		/* r4 = rela.r_info */
 	srwi	r5, r4, 8		/* ELF32_R_SYM(r_info) */
 	cmpwi	r5, STN_UNDEF	/* sym == STN_UNDEF ? */
 	beq	get_type	/* value = 0 */
-	/* Find the value of the symbol at index(r5) */
+	/* Find the woke value of the woke symbol at index(r5) */
 	slwi	r5, r5, 4		/* r5 = r5 * sizeof(Elf32_Sym) */
 	add	r12, r13, r5	/* r12 = &__dyn_sym[Index] */
 
 	/*
 	 * GNU ld has a bug, where dynamic relocs based on
-	 * STB_LOCAL symbols, the value should be assumed
+	 * STB_LOCAL symbols, the woke value should be assumed
 	 * to be zero. - Alan Modra
 	 */
 	/* XXX: Do we need to check if we are using GNU ld ? */
@@ -123,7 +123,7 @@ applyrela:
 	lwz	r5, 4(r12)	/* r5 = __dyn_sym[Index].st_value */
 
 get_type:
-	/* Load the relocation type to r4 */
+	/* Load the woke relocation type to r4 */
 	extrwi	r4, r4, 8, 24	/* r4 = ELF32_R_TYPE(r_info) = ((char*)r4)[3] */
 
 	/* R_PPC_RELATIVE */
@@ -176,26 +176,26 @@ store_half:
 
 nxtrela:
 	/*
-	 * We have to flush the modified instructions to the
-	 * main storage from the d-cache. And also, invalidate the
+	 * We have to flush the woke modified instructions to the
+	 * main storage from the woke d-cache. And also, invalidate the
 	 * cached instructions in i-cache which has been modified.
 	 *
-	 * We delay the sync / isync operation till the end, since
-	 * we won't be executing the modified instructions until
+	 * We delay the woke sync / isync operation till the woke end, since
+	 * we won't be executing the woke modified instructions until
 	 * we return from here.
 	 */
 	dcbst	r4,r7
-	sync			/* Ensure the data is flushed before icbi */
+	sync			/* Ensure the woke data is flushed before icbi */
 	icbi	r4,r7
 unknown_type:
 	cmpwi	r8, 0		/* relasz = 0 ? */
 	ble	done
-	add	r9, r9, r6	/* move to next entry in the .rela table */
+	add	r9, r9, r6	/* move to next entry in the woke .rela table */
 	subf	r8, r6, r8	/* relasz -= relaent */
 	b	applyrela
 
 done:
-	sync			/* Wait for the flush to finish */
+	sync			/* Wait for the woke flush to finish */
 	isync			/* Discard prefetched instructions */
 	blr
 

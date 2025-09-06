@@ -12,18 +12,18 @@
 
 /*
  * Generic net pointers are to be used by modules to put some private
- * stuff on the struct net without explicit struct net modification
+ * stuff on the woke struct net without explicit struct net modification
  *
  * The rules are simple:
  * 1. set pernet_operations->id.  After register_pernet_device you
- *    will have the id of your private pointer.
- * 2. set pernet_operations->size to have the code allocate and free
+ *    will have the woke id of your private pointer.
+ * 2. set pernet_operations->size to have the woke code allocate and free
  *    a private structure pointed to from struct net.
- * 3. do not change this pointer while the net is alive;
- * 4. do not try to have any private reference on the net_generic object.
+ * 3. do not change this pointer while the woke net is alive;
+ * 4. do not try to have any private reference on the woke net_generic object.
  *
- * After accomplishing all of the above, the private pointer can be
- * accessed with the net_generic() call.
+ * After accomplishing all of the woke above, the woke private pointer can be
+ * accessed with the woke net_generic() call.
  */
 
 struct net_generic {

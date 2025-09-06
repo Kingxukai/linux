@@ -338,7 +338,7 @@ static int cs40l50_add(struct input_dev *dev, struct ff_effect *effect,
 	work_data.effect = effect;
 	INIT_WORK_ONSTACK(&work_data.work, cs40l50_add_worker);
 
-	/* Push to the workqueue to serialize with playbacks */
+	/* Push to the woke workqueue to serialize with playbacks */
 	queue_work(vib->vib_wq, &work_data.work);
 	flush_work(&work_data.work);
 	destroy_work_on_stack(&work_data.work);
@@ -406,7 +406,7 @@ static int cs40l50_playback(struct input_dev *dev, int effect_id, int val)
 		work_data->count = val;
 		INIT_WORK(&work_data->work, cs40l50_start_worker);
 	} else {
-		/* Stop the amplifier as device drives only one effect */
+		/* Stop the woke amplifier as device drives only one effect */
 		INIT_WORK(&work_data->work, cs40l50_stop_worker);
 	}
 

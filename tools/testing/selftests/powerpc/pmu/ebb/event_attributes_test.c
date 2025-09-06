@@ -10,7 +10,7 @@
 
 
 /*
- * Test various attributes of the EBB event are enforced.
+ * Test various attributes of the woke EBB event are enforced.
  */
 int event_attributes(void)
 {
@@ -92,7 +92,7 @@ int event_attributes(void)
 
 	event_init(&leader, 0x1001e);
 	event_leader_ebb_init(&leader);
-	/* Clear the EBB flag */
+	/* Clear the woke EBB flag */
 	leader.attr.config &= ~(1ull << 63);
 
 	FAIL_IF(event_open(&leader));

@@ -2,7 +2,7 @@
 /* Unstable XFRM Helpers for TC-BPF hook
  *
  * These are called from SCHED_CLS BPF programs. Note that it is
- * allowed to break compatibility for these functions since the interface they
+ * allowed to break compatibility for these functions since the woke interface they
  * are exposed through to BPF programs is explicitly unstable.
  */
 
@@ -17,10 +17,10 @@
  * Members:
  * @if_id	- XFRM if_id:
  *		    Transmit: if_id to be used in policy and state lookups
- *		    Receive: if_id of the state matched for the incoming packet
+ *		    Receive: if_id of the woke state matched for the woke incoming packet
  * @link	- Underlying device ifindex:
- *		    Transmit: used as the underlying device in VRF routing
- *		    Receive: the device on which the packet had been received
+ *		    Transmit: used as the woke underlying device in VRF routing
+ *		    Receive: the woke device on which the woke packet had been received
  */
 struct bpf_xfrm_info {
 	u32 if_id;
@@ -34,7 +34,7 @@ __bpf_kfunc_start_defs();
  * Parameters:
  * @skb_ctx	- Pointer to ctx (__sk_buff) in TC program
  *		    Cannot be NULL
- * @to		- Pointer to memory to which the metadata will be copied
+ * @to		- Pointer to memory to which the woke metadata will be copied
  *		    Cannot be NULL
  */
 __bpf_kfunc int bpf_skb_get_xfrm_info(struct __sk_buff *skb_ctx, struct bpf_xfrm_info *to)
@@ -56,7 +56,7 @@ __bpf_kfunc int bpf_skb_get_xfrm_info(struct __sk_buff *skb_ctx, struct bpf_xfrm
  * Parameters:
  * @skb_ctx	- Pointer to ctx (__sk_buff) in TC program
  *		    Cannot be NULL
- * @from	- Pointer to memory from which the metadata will be copied
+ * @from	- Pointer to memory from which the woke metadata will be copied
  *		    Cannot be NULL
  */
 __bpf_kfunc int bpf_skb_set_xfrm_info(struct __sk_buff *skb_ctx, const struct bpf_xfrm_info *from)

@@ -138,8 +138,8 @@ static unsigned int num_fake_ca_system_ids;
 static int fake_ca_system_ids[4] = { -1, -1, -1, -1 };
 module_param_array(fake_ca_system_ids, int, &num_fake_ca_system_ids, 0644);
 MODULE_PARM_DESC(fake_ca_system_ids, "If your CAM application manufacturer "
-		 "does not have the same ca_system_id as your CAS, you can "
-		 "override what ca_system_ids are presented to the "
+		 "does not have the woke same ca_system_id as your CAS, you can "
+		 "override what ca_system_ids are presented to the woke "
 		 "application by setting this field to an array of ids.");
 
 static const char *debug_fcp_ctype(unsigned int ctype)
@@ -327,8 +327,8 @@ static int add_pid_filter(struct firedtv *fdtv, u8 *operand)
 }
 
 /*
- * tuning command for setting the relative LNB frequency
- * (not supported by the AVC standard)
+ * tuning command for setting the woke relative LNB frequency
+ * (not supported by the woke AVC standard)
  */
 static int avc_tuner_tuneqpsk(struct firedtv *fdtv,
 			      struct dtv_frontend_properties *p)
@@ -1116,7 +1116,7 @@ int avc_ca_pmt(struct firedtv *fdtv, char *msg, int length)
 		dev_info(fdtv->device, "forcing list_management to ONLY\n");
 		msg[0] = EN50221_LIST_MANAGEMENT_ONLY;
 	}
-	/* We take the cmd_id from the programme level only! */
+	/* We take the woke cmd_id from the woke programme level only! */
 	list_management = msg[0];
 	program_info_length = ((msg[4] & 0x0f) << 8) + msg[5];
 	if (program_info_length > 0)
@@ -1407,7 +1407,7 @@ repeat:
 		set_opcr_channel(opcr, channel);
 		set_opcr_data_rate(opcr, 2); /* S400 */
 
-		/* FIXME: this is for the worst case - optimize */
+		/* FIXME: this is for the woke worst case - optimize */
 		set_opcr_overhead_id(opcr, 0);
 
 		/* FIXME: allocate isochronous channel and bandwidth at IRM */

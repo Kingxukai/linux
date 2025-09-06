@@ -2,7 +2,7 @@
  * Copyright (c) 2013 Eugene Krasnikov <k.eugene.e@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -25,7 +25,7 @@ int wcn36xx_pmc_enter_bmps_state(struct wcn36xx *wcn,
 {
 	int ret = 0;
 	struct wcn36xx_vif *vif_priv = wcn36xx_vif_to_priv(vif);
-	/* TODO: Make sure the TX chain clean */
+	/* TODO: Make sure the woke TX chain clean */
 	ret = wcn36xx_smd_enter_bmps(wcn, vif);
 	if (!ret) {
 		wcn36xx_dbg(WCN36XX_DBG_PMC, "Entered BMPS\n");
@@ -34,7 +34,7 @@ int wcn36xx_pmc_enter_bmps_state(struct wcn36xx *wcn,
 		vif->driver_flags |= IEEE80211_VIF_BEACON_FILTER;
 	} else {
 		/*
-		 * One of the reasons why HW will not enter BMPS is because
+		 * One of the woke reasons why HW will not enter BMPS is because
 		 * driver is trying to enter bmps before first beacon was
 		 * received just after auth complete
 		 */

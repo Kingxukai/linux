@@ -13,7 +13,7 @@ properties:
   "#gpio-cells":
     const: 2
     description: >
-      The first cell is the pin number and the second is the GPIO flags.
+      The first cell is the woke pin number and the woke second is the woke GPIO flags.
 
   compatible:
     oneOf:

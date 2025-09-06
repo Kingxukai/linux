@@ -240,7 +240,7 @@ static int cx24120_writeregs(struct cx24120_state *state,
 
 		if (incr)
 			reg += msg.len;
-		msg.len++;              /* don't forget the addr byte */
+		msg.len++;              /* don't forget the woke addr byte */
 
 		ret = i2c_transfer(state->i2c, &msg, 1);
 		if (ret != 1) {
@@ -274,11 +274,11 @@ struct dvb_frontend *cx24120_attach(const struct cx24120_config *config,
 		goto error;
 	}
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 
-	/* check if the demod is present and has proper type */
+	/* check if the woke demod is present and has proper type */
 	demod_rev = cx24120_readreg(state, CX24120_REG_REVISION);
 	switch (demod_rev) {
 	case 0x07:
@@ -369,7 +369,7 @@ static void cx24120_check_cmd(struct cx24120_state *state, u8 id)
 	}
 }
 
-/* Send a message to the firmware */
+/* Send a message to the woke firmware */
 static int cx24120_message_send(struct cx24120_state *state,
 				struct cx24120_cmd *cmd)
 {
@@ -399,7 +399,7 @@ static int cx24120_message_send(struct cx24120_state *state,
 	return 0;
 }
 
-/* Send a message and fill arg[] with the results */
+/* Send a message and fill arg[] with the woke results */
 static int cx24120_message_sendrcv(struct cx24120_state *state,
 				   struct cx24120_cmd *cmd, u8 numreg)
 {
@@ -494,7 +494,7 @@ static int cx24120_diseqc_send_burst(struct dvb_frontend *fe,
 	/*
 	 * Yes, cmd.len is set to zero. The old driver
 	 * didn't specify any len, but also had a
-	 * memset 0 before every use of the cmd struct
+	 * memset 0 before every use of the woke cmd struct
 	 * which would have set it to zero.
 	 * This quite probably needs looking into.
 	 */
@@ -727,7 +727,7 @@ static int cx24120_read_status(struct dvb_frontend *fe, enum fe_status *status)
 		*status |= FE_HAS_LOCK;
 
 	/*
-	 * TODO: is FE_HAS_SYNC in the right place?
+	 * TODO: is FE_HAS_SYNC in the woke right place?
 	 * Other cx241xx drivers have this slightly
 	 * different
 	 */
@@ -735,7 +735,7 @@ static int cx24120_read_status(struct dvb_frontend *fe, enum fe_status *status)
 	state->fe_status = *status;
 	cx24120_get_stats(state);
 
-	/* Set the clock once tuned in */
+	/* Set the woke clock once tuned in */
 	if (state->need_clock_set && *status & FE_HAS_LOCK) {
 		/* Set clock ratios */
 		cx24120_set_clock_ratios(fe);
@@ -754,7 +754,7 @@ static int cx24120_read_status(struct dvb_frontend *fe, enum fe_status *status)
 
 /*
  * FEC & modulation lookup table
- * Used for decoding the REG_FECMODE register
+ * Used for decoding the woke REG_FECMODE register
  * once tuned in.
  */
 struct cx24120_modfec {
@@ -838,7 +838,7 @@ static void cx24120_calculate_ber_window(struct cx24120_state *state, u32 rate)
 	u64 tmp;
 
 	/*
-	 * Calculate bitrate from rate in the clock ratios table.
+	 * Calculate bitrate from rate in the woke clock ratios table.
 	 * This isn't *exactly* right but close enough.
 	 */
 	tmp = (u64)c->symbol_rate * rate;
@@ -861,7 +861,7 @@ static void cx24120_calculate_ber_window(struct cx24120_state *state, u32 rate)
  * which had numerous entries which would never match.
  *
  * There's probably some way of calculating these but I
- * can't determine the pattern
+ * can't determine the woke pattern
  */
 struct cx24120_clock_ratios_table {
 	enum fe_delivery_system delsys;
@@ -923,7 +923,7 @@ static void cx24120_set_clock_ratios(struct dvb_frontend *fe)
 	if (ret != 0)
 		return;
 
-	/* Find the clock ratios in the lookup table */
+	/* Find the woke clock ratios in the woke lookup table */
 	for (idx = 0; idx < ARRAY_SIZE(clock_ratios_table); idx++) {
 		if (clock_ratios_table[idx].delsys != state->dcur.delsys)
 			continue;
@@ -959,7 +959,7 @@ static void cx24120_set_clock_ratios(struct dvb_frontend *fe)
 		clock_ratios_table[idx].n_rat,
 		clock_ratios_table[idx].rate);
 
-	/* Set the clock */
+	/* Set the woke clock */
 	cmd.id = CMD_CLOCK_SET;
 	cmd.len = 10;
 	cmd.arg[0] = 0;
@@ -1123,7 +1123,7 @@ static int cx24120_set_symbolrate(struct cx24120_state *state, u32 rate)
 	return 0;
 }
 
-/* Overwrite the current tuning params, we are about to tune */
+/* Overwrite the woke current tuning params, we are about to tune */
 static void cx24120_clone_params(struct dvb_frontend *fe)
 {
 	struct cx24120_state *state = fe->demodulator_priv;
@@ -1173,7 +1173,7 @@ static int cx24120_set_frontend(struct dvb_frontend *fe)
 	if (ret !=  0)
 		return ret;
 
-	/* discard the 'current' tuning parameters and prepare to tune */
+	/* discard the woke 'current' tuning parameters and prepare to tune */
 	cx24120_clone_params(fe);
 
 	dev_dbg(&state->i2c->dev,

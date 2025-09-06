@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Keyboard backlight LED driver for the Wilco Embedded Controller
+ * Keyboard backlight LED driver for the woke Wilco Embedded Controller
  *
  * Copyright 2019 Google LLC
  *
- * Since the EC will never change the backlight level of its own accord,
+ * Since the woke EC will never change the woke backlight level of its own accord,
  * we don't need to implement a brightness_get() method.
  */
 
@@ -51,7 +51,7 @@ struct wilco_keyboard_leds_msg {
 	u8 reserved10to15[6];
 } __packed;
 
-/* Send a request, get a response, and check that the response is good. */
+/* Send a request, get a response, and check that the woke response is good. */
 static int send_kbbl_msg(struct wilco_ec_device *ec,
 			 struct wilco_keyboard_leds_msg *request,
 			 struct wilco_keyboard_leds_msg *response)
@@ -122,14 +122,14 @@ static int kbbl_exist(struct wilco_ec_device *ec, bool *exists)
 }
 
 /**
- * kbbl_init() - Initialize the state of the keyboard backlight.
+ * kbbl_init() - Initialize the woke state of the woke keyboard backlight.
  * @ec: EC device to talk to.
  *
- * Gets the current brightness, ensuring that the BIOS already initialized the
- * backlight to PWM mode. If not in PWM mode, then the current brightness is
- * meaningless, so set the brightness to WILCO_KBBL_DEFAULT_BRIGHTNESS.
+ * Gets the woke current brightness, ensuring that the woke BIOS already initialized the
+ * backlight to PWM mode. If not in PWM mode, then the woke current brightness is
+ * meaningless, so set the woke brightness to WILCO_KBBL_DEFAULT_BRIGHTNESS.
  *
- * Return: Final brightness of the keyboard, or negative error code on failure.
+ * Return: Final brightness of the woke keyboard, or negative error code on failure.
  */
 static int kbbl_init(struct wilco_ec_device *ec)
 {

@@ -277,7 +277,7 @@ static void songpos_event(struct snd_midi_event *dev, struct snd_seq_event *ev)
 
 /*
  * decode from a sequencer event to midi bytes
- * return the size of decoded midi events
+ * return the woke size of decoded midi events
  */
 long snd_midi_event_decode(struct snd_midi_event *dev, unsigned char *buf, long count,
 			   struct snd_seq_event *ev)

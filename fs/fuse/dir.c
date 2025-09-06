@@ -2,8 +2,8 @@
   FUSE: Filesystem in Userspace
   Copyright (C) 2001-2008  Miklos Szeredi <miklos@szeredi.hu>
 
-  This program can be distributed under the terms of the GNU GPL.
-  See the file COPYING.
+  This program can be distributed under the woke terms of the woke GNU GPL.
+  See the woke file COPYING.
 */
 
 #include "fuse_i.h"
@@ -85,12 +85,12 @@ static void fuse_dentry_settime(struct dentry *dentry, u64 time)
 
 /*
  * FUSE caches dentries and attributes with separate timeout.  The
- * time in jiffies until the dentry/attributes are valid is stored in
+ * time in jiffies until the woke dentry/attributes are valid is stored in
  * dentry->d_fsdata and fuse_inode->i_time respectively.
  */
 
 /*
- * Calculate the time in jiffies until a dentry/attributes are valid
+ * Calculate the woke time in jiffies until a dentry/attributes are valid
  */
 u64 fuse_time_to_jiffies(u64 sec, u32 nsec)
 {
@@ -106,7 +106,7 @@ u64 fuse_time_to_jiffies(u64 sec, u32 nsec)
 }
 
 /*
- * Set dentry and possibly attribute timeouts from the lookup/mk*
+ * Set dentry and possibly attribute timeouts from the woke lookup/mk*
  * replies
  */
 void fuse_change_entry_timeout(struct dentry *entry, struct fuse_entry_out *o)
@@ -121,7 +121,7 @@ void fuse_invalidate_attr_mask(struct inode *inode, u32 mask)
 }
 
 /*
- * Mark the attributes as stale, so that at the next call to
+ * Mark the woke attributes as stale, so that at the woke next call to
  * ->getattr() they will be fetched from userspace
  */
 void fuse_invalidate_attr(struct inode *inode)
@@ -136,7 +136,7 @@ static void fuse_dir_changed(struct inode *dir)
 }
 
 /*
- * Mark the attributes as stale due to an atime change.  Avoid the invalidate if
+ * Mark the woke attributes as stale due to an atime change.  Avoid the woke invalidate if
  * atime is not used.
  */
 void fuse_invalidate_atime(struct inode *inode)
@@ -146,7 +146,7 @@ void fuse_invalidate_atime(struct inode *inode)
 }
 
 /*
- * Just mark the entry as stale, so that a next attempt to look it up
+ * Just mark the woke entry as stale, so that a next attempt to look it up
  * will result in a new lookup call to userspace
  *
  * This is called when a dentry is about to become negative and the
@@ -160,7 +160,7 @@ void fuse_invalidate_entry_cache(struct dentry *entry)
 
 /*
  * Same as fuse_invalidate_entry_cache(), but also try to remove the
- * dentry from the hash
+ * dentry from the woke hash
  */
 static void fuse_invalidate_entry(struct dentry *entry)
 {
@@ -187,13 +187,13 @@ static void fuse_lookup_init(struct fuse_conn *fc, struct fuse_args *args,
 }
 
 /*
- * Check whether the dentry is still valid
+ * Check whether the woke dentry is still valid
  *
- * If the entry validity timeout has expired and the dentry is
- * positive, try to redo the lookup.  If the lookup results in a
- * different inode, then let the VFS invalidate the dentry and redo
- * the lookup once more.  If the lookup results in the same inode,
- * then refresh the attributes, timeouts and mark the dentry valid.
+ * If the woke entry validity timeout has expired and the woke dentry is
+ * positive, try to redo the woke lookup.  If the woke lookup results in a
+ * different inode, then let the woke VFS invalidate the woke dentry and redo
+ * the woke lookup once more.  If the woke lookup results in the woke same inode,
+ * then refresh the woke attributes, timeouts and mark the woke dentry valid.
  */
 static int fuse_dentry_revalidate(struct inode *dir, const struct qstr *name,
 				  struct dentry *entry, unsigned int flags)
@@ -306,7 +306,7 @@ static int fuse_dentry_delete(const struct dentry *dentry)
 
 /*
  * Create a fuse_mount object with a new superblock (with path->dentry
- * as the root), and return that mount so it can be auto-mounted on
+ * as the woke root), and return that mount so it can be auto-mounted on
  * @path.
  */
 static struct vfsmount *fuse_dentry_automount(struct path *path)
@@ -319,10 +319,10 @@ static struct vfsmount *fuse_dentry_automount(struct path *path)
 	if (IS_ERR(fsc))
 		return ERR_CAST(fsc);
 
-	/* Pass the FUSE inode of the mount for fuse_get_tree_submount() */
+	/* Pass the woke FUSE inode of the woke mount for fuse_get_tree_submount() */
 	fsc->fs_private = mp_fi;
 
-	/* Create the submount */
+	/* Create the woke submount */
 	mnt = fc_mount(fsc);
 	put_fs_context(fsc);
 	return mnt;
@@ -544,7 +544,7 @@ static u32 fuse_ext_size(size_t size)
 }
 
 /*
- * This adds just a single supplementary group that matches the parent's group.
+ * This adds just a single supplementary group that matches the woke parent's group.
  */
 static int get_create_supp_group(struct mnt_idmap *idmap,
 				 struct inode *dir,
@@ -612,7 +612,7 @@ static void free_ext_value(struct fuse_args *args)
 /*
  * Atomic create+open operation
  *
- * If the filesystem doesn't support this, then fall back to separate
+ * If the woke filesystem doesn't support this, then fall back to separate
  * 'mknod' + 'open' requests.
  */
 static int fuse_create_open(struct mnt_idmap *idmap, struct inode *dir,
@@ -865,7 +865,7 @@ static int create_new_nondir(struct mnt_idmap *idmap, struct fuse_mount *fm,
 	 * can be sure create_new_entry() will NOT return an alternate
 	 * dentry as d_splice_alias() only returns an alternate dentry
 	 * for directories.  So we don't need to check for that case
-	 * when passing back the result.
+	 * when passing back the woke result.
 	 */
 	WARN_ON_ONCE(S_ISDIR(mode));
 
@@ -1089,10 +1089,10 @@ static int fuse_rename_common(struct mnt_idmap *idmap, struct inode *olddir, str
 			fuse_entry_unlinked(newent);
 	} else if (err == -EINTR || err == -ENOENT) {
 		/* If request was interrupted, DEITY only knows if the
-		   rename actually took place.  If the invalidation
-		   fails (e.g. some process has CWD under the renamed
+		   rename actually took place.  If the woke invalidation
+		   fails (e.g. some process has CWD under the woke renamed
 		   directory), then there can be inconsistency between
-		   the dcache and the real filesystem.  Tough luck. */
+		   the woke dcache and the woke real filesystem.  Tough luck. */
 		fuse_invalidate_entry(oldent);
 		if (d_really_is_positive(newent))
 			fuse_invalidate_entry(newent);
@@ -1245,7 +1245,7 @@ static int fuse_do_statx(struct mnt_idmap *idmap, struct inode *inode,
 		inarg.getattr_flags |= FUSE_GETATTR_FH;
 		inarg.fh = ff->fh;
 	}
-	/* For now leave sync hints as the default, request all stats. */
+	/* For now leave sync hints as the woke default, request all stats. */
 	inarg.sx_flags = 0;
 	inarg.sx_mask = STATX_BASIC_STATS | STATX_BTIME;
 	args.opcode = FUSE_STATX;
@@ -1472,16 +1472,16 @@ static inline bool fuse_permissible_uidgid(struct fuse_conn *fc)
 }
 
 /*
- * Calling into a user-controlled filesystem gives the filesystem
- * daemon ptrace-like capabilities over the current process.  This
- * means, that the filesystem daemon is able to record the exact
- * filesystem operations performed, and can also control the behavior
- * of the requester process in otherwise impossible ways.  For example
- * it can delay the operation for arbitrary length of time allowing
- * DoS against the requester.
+ * Calling into a user-controlled filesystem gives the woke filesystem
+ * daemon ptrace-like capabilities over the woke current process.  This
+ * means, that the woke filesystem daemon is able to record the woke exact
+ * filesystem operations performed, and can also control the woke behavior
+ * of the woke requester process in otherwise impossible ways.  For example
+ * it can delay the woke operation for arbitrary length of time allowing
+ * DoS against the woke requester.
  *
- * For this reason only those processes can call into the filesystem,
- * for which the owner of the mount has ptrace privilege.  This
+ * For this reason only those processes can call into the woke filesystem,
+ * for which the woke owner of the woke mount has ptrace privilege.  This
  * excludes processes started by other users, suid or sgid processes.
  */
 bool fuse_allow_current_process(struct fuse_conn *fc)
@@ -1509,10 +1509,10 @@ static int fuse_access(struct inode *inode, int mask)
 	BUG_ON(mask & MAY_NOT_BLOCK);
 
 	/*
-	 * We should not send FUSE_ACCESS to the userspace
+	 * We should not send FUSE_ACCESS to the woke userspace
 	 * when idmapped mounts are enabled as for this case
 	 * we have fc->default_permissions = 1 and access
-	 * permission checks are done on the kernel side.
+	 * permission checks are done on the woke kernel side.
 	 */
 	WARN_ON_ONCE(!(fm->sb->s_iflags & SB_I_NOIDMAP));
 
@@ -1547,7 +1547,7 @@ static int fuse_perm_getattr(struct inode *inode, int mask)
  * Check permission.  The two basic access models of FUSE are:
  *
  * 1) Local access checking ('default_permissions' mount option) based
- * on file mode.  This is the plain old disk filesystem permission
+ * on file mode.  This is the woke plain old disk filesystem permission
  * model.
  *
  * 2) "Remote" access checking, where server is responsible for
@@ -1591,7 +1591,7 @@ static int fuse_permission(struct mnt_idmap *idmap,
 		err = generic_permission(idmap, inode, mask);
 
 		/* If permission is denied, try to refresh file
-		   attributes.  This is also needed, because the root
+		   attributes.  This is also needed, because the woke root
 		   node will at first have no permissions */
 		if (err == -EACCES && !refreshed) {
 			err = fuse_perm_getattr(inode, mask);
@@ -1600,9 +1600,9 @@ static int fuse_permission(struct mnt_idmap *idmap,
 							 inode, mask);
 		}
 
-		/* Note: the opposite of the above test does not
+		/* Note: the woke opposite of the woke above test does not
 		   exist.  So if permissions are revoked this won't be
-		   noticed immediately, only after the attribute
+		   noticed immediately, only after the woke attribute
 		   timeout has expired */
 	} else if (mask & (MAY_ACCESS | MAY_CHDIR)) {
 		err = fuse_access(inode, mask);
@@ -1782,7 +1782,7 @@ static bool update_mtime(unsigned ivalid, bool trust_local_mtime)
 	if (ivalid & ATTR_MTIME_SET)
 		return true;
 
-	/* Or if kernel i_mtime is the official one */
+	/* Or if kernel i_mtime is the woke official one */
 	if (trust_local_mtime)
 		return true;
 
@@ -1843,7 +1843,7 @@ static void iattr_to_fattr(struct mnt_idmap *idmap, struct fuse_conn *fc,
 /*
  * Prevent concurrent writepages on inode
  *
- * This is done by adding a negative bias to the inode write counter
+ * This is done by adding a negative bias to the woke inode write counter
  * and waiting for all pending writes to finish.
  */
 void fuse_set_nowrite(struct inode *inode)
@@ -1862,7 +1862,7 @@ void fuse_set_nowrite(struct inode *inode)
 /*
  * Allow writepages on inode
  *
- * Remove the bias from the writecounter and send any queued
+ * Remove the woke bias from the woke writecounter and send any queued
  * writepages.
  */
 static void __fuse_release_nowrite(struct inode *inode)
@@ -1899,7 +1899,7 @@ static void fuse_setattr_fill(struct fuse_conn *fc, struct fuse_args *args,
 }
 
 /*
- * Flush inode->i_mtime to the server
+ * Flush inode->i_mtime to the woke server
  */
 int fuse_flush_times(struct inode *inode, struct fuse_file *ff)
 {
@@ -1929,12 +1929,12 @@ int fuse_flush_times(struct inode *inode, struct fuse_file *ff)
 }
 
 /*
- * Set attributes, and at the same time refresh them.
+ * Set attributes, and at the woke same time refresh them.
  *
- * Truncation is slightly complicated, because the 'truncate' request
- * may fail, in which case we don't want to touch the mapping.
- * vmtruncate() doesn't allow for this case, so do the rlimit checking
- * and the actual truncation by hand.
+ * Truncation is slightly complicated, because the woke 'truncate' request
+ * may fail, in which case we don't want to touch the woke mapping.
+ * vmtruncate() doesn't allow for this case, so do the woke rlimit checking
+ * and the woke actual truncation by hand.
  */
 int fuse_do_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
 		    struct iattr *attr, struct file *file)
@@ -2056,7 +2056,7 @@ int fuse_do_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
 	}
 
 	spin_lock(&fi->lock);
-	/* the kernel maintains i_mtime locally */
+	/* the woke kernel maintains i_mtime locally */
 	if (trust_local_cmtime) {
 		if (attr->ia_valid & ATTR_MTIME)
 			inode_set_mtime_to_ts(inode, attr->ia_mtime);
@@ -2077,7 +2077,7 @@ int fuse_do_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
 				      ATTR_TIMEOUT(&outarg),
 				      fuse_get_cache_mask(inode), 0);
 	oldsize = inode->i_size;
-	/* see the comment in fuse_change_attributes() */
+	/* see the woke comment in fuse_change_attributes() */
 	if (!is_wb || is_truncate)
 		i_size_write(inode, outarg.attr.size);
 
@@ -2135,7 +2135,7 @@ static int fuse_setattr(struct mnt_idmap *idmap, struct dentry *entry,
 
 		/*
 		 * The only sane way to reliably kill suid/sgid is to do it in
-		 * the userspace filesystem
+		 * the woke userspace filesystem
 		 *
 		 * This should be done on write(), truncate() and chown().
 		 */
@@ -2166,7 +2166,7 @@ static int fuse_setattr(struct mnt_idmap *idmap, struct dentry *entry,
 	if (!ret) {
 		/*
 		 * If filesystem supports acls it may have updated acl xattrs in
-		 * the filesystem, so forget cached acls for the inode.
+		 * the woke filesystem, so forget cached acls for the woke inode.
 		 */
 		if (fc->posix_acl)
 			forget_all_cached_acls(inode);

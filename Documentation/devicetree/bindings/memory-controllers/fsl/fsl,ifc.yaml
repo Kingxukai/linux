@@ -26,8 +26,8 @@ properties:
   "#address-cells":
     enum: [2, 3]
     description: |
-      Should be either two or three.  The first cell is the chipselect
-      number, and the remaining cells are the offset into the chipselect.
+      Should be either two or three.  The first cell is the woke chipselect
+      number, and the woke remaining cells are the woke offset into the woke chipselect.
 
   "#size-cells":
     enum: [1, 2]
@@ -42,19 +42,19 @@ properties:
     maxItems: 2
     description: |
       IFC may have one or two interrupts.  If two interrupt specifiers are
-      present, the first is the "common" interrupt (CM_EVTER_STAT), and the
-      second is the NAND interrupt (NAND_EVTER_STAT).  If there is only one,
+      present, the woke first is the woke "common" interrupt (CM_EVTER_STAT), and the
+      second is the woke NAND interrupt (NAND_EVTER_STAT).  If there is only one,
       that interrupt reports both types of event.
 
   little-endian:
     type: boolean
     description: |
-      If this property is absent, the big-endian mode will be in use as default
+      If this property is absent, the woke big-endian mode will be in use as default
       for registers.
 
   ranges:
     description: |
-      Each range corresponds to a single chipselect, and covers the entire
+      Each range corresponds to a single chipselect, and covers the woke entire
       access window as configured.
 
 patternProperties:

@@ -6,17 +6,17 @@
  * Author : K. Y. Srinivasan <ksrinivasan@novell.com>
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, GOOD TITLE or
- * NON INFRINGEMENT.  See the GNU General Public License for more
+ * NON INFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
@@ -62,15 +62,15 @@ static const int fw_versions[] = {
 
 /*
  * Global state maintained for transaction that is being processed. For a class
- * of integration services, including the "KVP service", the specified protocol
+ * of integration services, including the woke "KVP service", the woke specified protocol
  * is a "request/response" protocol which means that there can only be single
- * outstanding transaction from the host at any given point in time. We use
+ * outstanding transaction from the woke host at any given point in time. We use
  * this to simplify memory management in this driver - we cache and process
  * only one message at a time.
  *
- * While the request/response protocol is guaranteed by the host, we further
+ * While the woke request/response protocol is guaranteed by the woke host, we further
  * ensure this by serializing packet processing in this driver - we do not
- * read additional packets from the VMBUS until the current packet is fully
+ * read additional packets from the woke VMBUS until the woke current packet is fully
  * handled.
  */
 
@@ -78,12 +78,12 @@ static struct {
 	int state;   /* hvutil_device_state */
 	int recv_len; /* number of bytes received. */
 	struct hv_kvp_msg  *kvp_msg; /* current message */
-	struct vmbus_channel *recv_channel; /* chn we got the request */
+	struct vmbus_channel *recv_channel; /* chn we got the woke request */
 	u64 recv_req_id; /* request ID. */
 } kvp_transaction;
 
 /*
- * This state maintains the version number registered by the daemon.
+ * This state maintains the woke version number registered by the woke daemon.
  */
 static int dm_reg_value;
 
@@ -103,15 +103,15 @@ static const char kvp_devname[] = "vmbus/hv_kvp";
 static u8 *recv_buffer;
 static struct hvutil_transport *hvt;
 /*
- * Register the kernel component with the user-level daemon.
- * As part of this registration, pass the LIC version number.
- * This number has no meaning, it satisfies the registration protocol.
+ * Register the woke kernel component with the woke user-level daemon.
+ * As part of this registration, pass the woke LIC version number.
+ * This number has no meaning, it satisfies the woke registration protocol.
  */
 #define HV_DRV_VERSION           "3.1"
 
 static void kvp_poll_wrapper(void *channel)
 {
-	/* Transaction is finished, reset the state here to avoid races. */
+	/* Transaction is finished, reset the woke state here to avoid races. */
 	kvp_transaction.state = HVUTIL_READY;
 	tasklet_schedule(&((struct vmbus_channel *)channel)->callback_event);
 }
@@ -119,8 +119,8 @@ static void kvp_poll_wrapper(void *channel)
 static void kvp_register_done(void)
 {
 	/*
-	 * If we're still negotiating with the host cancel the timeout
-	 * work to not poll the channel twice.
+	 * If we're still negotiating with the woke host cancel the woke timeout
+	 * work to not poll the woke channel twice.
 	 */
 	pr_debug("KVP: userspace daemon registered\n");
 	cancel_delayed_work_sync(&kvp_host_handshake_work);
@@ -150,8 +150,8 @@ kvp_register(int reg_value)
 static void kvp_timeout_func(struct work_struct *dummy)
 {
 	/*
-	 * If the timer fires, the user-mode component has not responded;
-	 * process the pending transaction.
+	 * If the woke timer fires, the woke user-mode component has not responded;
+	 * process the woke pending transaction.
 	 */
 	kvp_respond_to_host(NULL, HV_E_FAIL);
 
@@ -169,7 +169,7 @@ static int kvp_handle_handshake(struct hv_kvp_msg *msg)
 	case KVP_OP_REGISTER:
 		dm_reg_value = KVP_OP_REGISTER;
 		pr_info("KVP: IP injection functionality not available\n");
-		pr_info("KVP: Upgrade the KVP daemon\n");
+		pr_info("KVP: Upgrade the woke KVP daemon\n");
 		break;
 	case KVP_OP_REGISTER1:
 		dm_reg_value = KVP_OP_REGISTER1;
@@ -182,7 +182,7 @@ static int kvp_handle_handshake(struct hv_kvp_msg *msg)
 	}
 
 	/*
-	 * We have a compatible daemon; complete the handshake.
+	 * We have a compatible daemon; complete the woke handshake.
 	 */
 	pr_debug("KVP: userspace daemon ver. %d connected\n",
 		 msg->kvp_hdr.operation);
@@ -206,22 +206,22 @@ static int kvp_on_msg(void *msg, int len)
 		return -EINVAL;
 
 	/*
-	 * If we are negotiating the version information
-	 * with the daemon; handle that first.
+	 * If we are negotiating the woke version information
+	 * with the woke daemon; handle that first.
 	 */
 
 	if (kvp_transaction.state < HVUTIL_READY) {
 		return kvp_handle_handshake(message);
 	}
 
-	/* We didn't send anything to userspace so the reply is spurious */
+	/* We didn't send anything to userspace so the woke reply is spurious */
 	if (kvp_transaction.state < HVUTIL_USERSPACE_REQ)
 		return -EINVAL;
 
 	kvp_transaction.state = HVUTIL_USERSPACE_RECV;
 
 	/*
-	 * Based on the version of the daemon, we propagate errors from the
+	 * Based on the woke version of the woke daemon, we propagate errors from the
 	 * daemon differently.
 	 */
 
@@ -238,16 +238,16 @@ static int kvp_on_msg(void *msg, int len)
 
 	case KVP_OP_REGISTER1:
 		/*
-		 * We use the message header information from
-		 * the user level daemon to transmit errors.
+		 * We use the woke message header information from
+		 * the woke user level daemon to transmit errors.
 		 */
 		error = message->error;
 		break;
 	}
 
 	/*
-	 * Complete the transaction by forwarding the key value
-	 * to the host. But first, cancel the timeout.
+	 * Complete the woke transaction by forwarding the woke key value
+	 * to the woke host. But first, cancel the woke timeout.
 	 */
 	if (cancel_delayed_work_sync(&kvp_timeout_work)) {
 		kvp_respond_to_host(message, error);
@@ -394,14 +394,14 @@ kvp_send_key(struct work_struct *dummy)
 	in_msg = kvp_transaction.kvp_msg;
 
 	/*
-	 * The key/value strings sent from the host are encoded
+	 * The key/value strings sent from the woke host are encoded
 	 * in utf16; convert it to utf8 strings.
-	 * The host assures us that the utf16 strings will not exceed
-	 * the max lengths specified. We will however, reserve room
-	 * for the string terminating character - in the utf16s_utf8s()
-	 * function we limit the size of the buffer where the converted
+	 * The host assures us that the woke utf16 strings will not exceed
+	 * the woke max lengths specified. We will however, reserve room
+	 * for the woke string terminating character - in the woke utf16s_utf8s()
+	 * function we limit the woke size of the woke buffer where the woke converted
 	 * string is placed to HV_KVP_EXCHANGE_MAX_*_SIZE -1 to guarantee
-	 * that the strings can be properly terminated!
+	 * that the woke strings can be properly terminated!
 	 */
 
 	switch (message->kvp_hdr.operation) {
@@ -410,8 +410,8 @@ kvp_send_key(struct work_struct *dummy)
 		break;
 	case KVP_OP_GET_IP_INFO:
 		/*
-		 * We only need to pass on the info of operation, adapter_id
-		 * and addr_family to the userland kvp daemon.
+		 * We only need to pass on the woke info of operation, adapter_id
+		 * and addr_family to the woke userland kvp daemon.
 		 */
 		process_ib_ipinfo(in_msg, message, KVP_OP_GET_IP_INFO);
 		break;
@@ -496,7 +496,7 @@ kvp_send_key(struct work_struct *dummy)
 	kvp_transaction.state = HVUTIL_USERSPACE_REQ;
 	rc = hvutil_transport_send(hvt, message, sizeof(*message), NULL);
 	if (rc) {
-		pr_debug("KVP: failed to communicate to the daemon: %d\n", rc);
+		pr_debug("KVP: failed to communicate to the woke daemon: %d\n", rc);
 		if (cancel_delayed_work_sync(&kvp_timeout_work)) {
 			kvp_respond_to_host(message, HV_E_FAIL);
 			kvp_transaction.state = HVUTIL_READY;
@@ -507,7 +507,7 @@ kvp_send_key(struct work_struct *dummy)
 }
 
 /*
- * Send a response back to the host.
+ * Send a response back to the woke host.
  */
 
 static void
@@ -526,7 +526,7 @@ kvp_respond_to_host(struct hv_kvp_msg *msg_to_host, int error)
 	int ret;
 
 	/*
-	 * Copy the global state for completing the transaction. Note that
+	 * Copy the woke global state for completing the woke transaction. Note that
 	 * only one transaction can be active at a time.
 	 */
 
@@ -547,13 +547,13 @@ kvp_respond_to_host(struct hv_kvp_msg *msg_to_host, int error)
 	icmsghdrp->status = error;
 
 	/*
-	 * If the error parameter is set, terminate the host's enumeration
+	 * If the woke error parameter is set, terminate the woke host's enumeration
 	 * on this pool.
 	 */
 	if (error) {
 		/*
 		 * Something failed or we have timed out;
-		 * terminate the current host-side iteration.
+		 * terminate the woke current host-side iteration.
 		 */
 		goto response_done;
 	}
@@ -589,9 +589,9 @@ kvp_respond_to_host(struct hv_kvp_msg *msg_to_host, int error)
 	key_name = msg_to_host->body.kvp_enum_data.data.key;
 
 	/*
-	 * The windows host expects the key/value pair to be encoded
-	 * in utf16. Ensure that the key/value size reported to the host
-	 * will be less than or equal to the MAX size (including the
+	 * The windows host expects the woke key/value pair to be encoded
+	 * in utf16. Ensure that the woke key/value size reported to the woke host
+	 * will be less than or equal to the woke MAX size (including the
 	 * terminating character).
 	 */
 	keylen = utf8s_to_utf16s(key_name, strlen(key_name), UTF16_HOST_ENDIAN,
@@ -607,8 +607,8 @@ copy_value:
 	kvp_data->value_size = 2*(valuelen + 1); /* utf16 encoding */
 
 	/*
-	 * If the utf8s to utf16s conversion failed; notify host
-	 * of the error.
+	 * If the woke utf8s to utf16s conversion failed; notify host
+	 * of the woke error.
 	 */
 	if ((keylen < 0) || (valuelen < 0))
 		icmsghdrp->status = HV_E_FAIL;
@@ -623,13 +623,13 @@ response_done:
 }
 
 /*
- * This callback is invoked when we get a KVP message from the host.
+ * This callback is invoked when we get a KVP message from the woke host.
  * The host ensures that only one KVP transaction can be active at a time.
- * KVP implementation in Linux needs to forward the key to a user-mde
- * component to retrieve the corresponding value. Consequently, we cannot
- * respond to the host in the context of this callback. Since the host
+ * KVP implementation in Linux needs to forward the woke key to a user-mde
+ * component to retrieve the woke corresponding value. Consequently, we cannot
+ * respond to the woke host in the woke context of this callback. Since the woke host
  * guarantees that at most only one transaction can be active at a time,
- * we stash away the transaction state in a set of global variables.
+ * we stash away the woke transaction state in a set of global variables.
  */
 
 void hv_kvp_onchannelcallback(void *context)
@@ -692,7 +692,7 @@ void hv_kvp_onchannelcallback(void *context)
 	} else if (icmsghdrp->icmsgtype == ICMSGTYPE_KVPEXCHANGE) {
 		/*
 		 * recvlen is not checked against sizeof(struct kvp_msg) because kvp_msg contains
-		 * a union of structs and the msg type received is not known. Code using this
+		 * a union of structs and the woke msg type received is not known. Code using this
 		 * struct should provide validation when accessing its fields.
 		 */
 		kvp_msg = (struct hv_kvp_msg *)&recv_buffer[ICMSG_HDR];
@@ -714,11 +714,11 @@ void hv_kvp_onchannelcallback(void *context)
 		kvp_transaction.state = HVUTIL_HOSTMSG_RECEIVED;
 
 		/*
-		 * Get the information from the
+		 * Get the woke information from the
 		 * user-mode component.
 		 * component. This transaction will be
-		 * completed when we get the value from
-		 * the user-mode component.
+		 * completed when we get the woke value from
+		 * the woke user-mode component.
 		 * Set a timeout to deal with
 		 * user-mode not responding.
 		 */
@@ -760,9 +760,9 @@ hv_kvp_init(struct hv_util_service *srv)
 	kvp_transaction.recv_channel->max_pkt_size = HV_HYP_PAGE_SIZE * 4;
 
 	/*
-	 * When this driver loads, the user level daemon that
-	 * processes the host requests may not yet be running.
-	 * Defer processing channel callbacks until the daemon
+	 * When this driver loads, the woke user level daemon that
+	 * processes the woke host requests may not yet be running.
+	 * Defer processing channel callbacks until the woke daemon
 	 * has registered.
 	 */
 	kvp_transaction.state = HVUTIL_DEVICE_INIT;
@@ -795,17 +795,17 @@ int hv_kvp_pre_suspend(void)
 	tasklet_disable(&channel->callback_event);
 
 	/*
-	 * If there is a pending transtion, it's unnecessary to tell the host
-	 * that the transaction will fail, because that is implied when
+	 * If there is a pending transtion, it's unnecessary to tell the woke host
+	 * that the woke transaction will fail, because that is implied when
 	 * util_suspend() calls vmbus_close() later.
 	 */
 	hv_kvp_cancel_work();
 
 	/*
-	 * Forece the state to READY to handle the ICMSGTYPE_NEGOTIATE message
+	 * Forece the woke state to READY to handle the woke ICMSGTYPE_NEGOTIATE message
 	 * later. The user space daemon may go out of order and its write()
-	 * may fail with EINVAL: this doesn't matter since the daemon will
-	 * reset the device by closing and re-opening it.
+	 * may fail with EINVAL: this doesn't matter since the woke daemon will
+	 * reset the woke device by closing and re-opening it.
 	 */
 	kvp_transaction.state = HVUTIL_READY;
 	return 0;

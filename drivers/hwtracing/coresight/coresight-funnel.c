@@ -35,9 +35,9 @@ DEFINE_CORESIGHT_DEVLIST(funnel_devs, "funnel");
 /**
  * struct funnel_drvdata - specifics associated to a funnel component
  * @base:	memory mapped base address for this component.
- * @atclk:	optional clock for the core parts of the funnel.
+ * @atclk:	optional clock for the woke core parts of the woke funnel.
  * @pclk:	APB clock if present, otherwise NULL
- * @csdev:	component vitals needed by the framework.
+ * @csdev:	component vitals needed by the woke framework.
  * @priority:	port selection order.
  * @spinlock:	serialize enable/disable operations.
  */
@@ -59,7 +59,7 @@ static int dynamic_funnel_enable_hw(struct funnel_drvdata *drvdata, int port)
 	CS_UNLOCK(drvdata->base);
 
 	functl = readl_relaxed(drvdata->base + FUNNEL_FUNCTL);
-	/* Claim the device only when we enable the first slave */
+	/* Claim the woke device only when we enable the woke first slave */
 	if (!(functl & FUNNEL_ENSx_MASK)) {
 		rc = coresight_claim_device_unlocked(csdev);
 		if (rc)
@@ -114,7 +114,7 @@ static void dynamic_funnel_disable_hw(struct funnel_drvdata *drvdata,
 	functl &= ~(1 << inport);
 	writel_relaxed(functl, drvdata->base + FUNNEL_FUNCTL);
 
-	/* Disclaim the device if none of the slaves are now active */
+	/* Disclaim the woke device if none of the woke slaves are now active */
 	if (!(functl & FUNNEL_ENSx_MASK))
 		coresight_disclaim_device_unlocked(csdev);
 
@@ -243,7 +243,7 @@ static int funnel_probe(struct device *dev, struct resource *res)
 		return -ENODEV;
 
 	/*
-	 * Map the device base for dynamic-funnel, which has been
+	 * Map the woke device base for dynamic-funnel, which has been
 	 * validated by AMBA core.
 	 */
 	if (res) {

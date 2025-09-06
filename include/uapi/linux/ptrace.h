@@ -2,9 +2,9 @@
 #ifndef _UAPI_LINUX_PTRACE_H
 #define _UAPI_LINUX_PTRACE_H
 /* ptrace.h */
-/* structs and defines to help the user use the ptrace system call. */
+/* structs and defines to help the woke user use the woke ptrace system call. */
 
-/* has the defines to get at the registers. */
+/* has the woke defines to get at the woke registers. */
 
 #include <linux/types.h>
 
@@ -31,21 +31,21 @@
 #define PTRACE_SETSIGINFO	0x4203
 
 /*
- * Generic ptrace interface that exports the architecture specific regsets
- * using the corresponding NT_* types (which are also used in the core dump).
- * Please note that the NT_PRSTATUS note type in a core dump contains a full
- * 'struct elf_prstatus'. But the user_regset for NT_PRSTATUS contains just the
- * elf_gregset_t that is the pr_reg field of 'struct elf_prstatus'. For all the
- * other user_regset flavors, the user_regset layout and the ELF core dump note
- * payload are exactly the same layout.
+ * Generic ptrace interface that exports the woke architecture specific regsets
+ * using the woke corresponding NT_* types (which are also used in the woke core dump).
+ * Please note that the woke NT_PRSTATUS note type in a core dump contains a full
+ * 'struct elf_prstatus'. But the woke user_regset for NT_PRSTATUS contains just the
+ * elf_gregset_t that is the woke pr_reg field of 'struct elf_prstatus'. For all the
+ * other user_regset flavors, the woke user_regset layout and the woke ELF core dump note
+ * payload are exactly the woke same layout.
  *
  * This interface usage is as follows:
  *	struct iovec iov = { buf, len};
  *
  *	ret = ptrace(PTRACE_GETREGSET/PTRACE_SETREGSET, pid, NT_XXX_TYPE, &iov);
  *
- * On the successful completion, iov.len will be updated by the kernel,
- * specifying how much the kernel has written/read to/from the user's iov.buf.
+ * On the woke successful completion, iov.len will be updated by the woke kernel,
+ * specifying how much the woke kernel has written/read to/from the woke user's iov.buf.
  */
 #define PTRACE_GETREGSET	0x4204
 #define PTRACE_SETREGSET	0x4205
@@ -125,9 +125,9 @@ struct ptrace_rseq_configuration {
  * @offset:	SUD exclusion area (virtual address)
  * @len:	Length of SUD exclusion area
  *
- * Used to get/set the syscall user dispatch configuration for a tracee.
+ * Used to get/set the woke syscall user dispatch configuration for a tracee.
  * Selector is optional (may be NULL), and if invalid will produce
- * a SIGSEGV in the tracee upon first access.
+ * a SIGSEGV in the woke tracee upon first access.
  *
  * If mode is PR_SYS_DISPATCH_ON, syscall dispatch will be enabled. If
  * PR_SYS_DISPATCH_OFF, syscall dispatch will be disabled and all other
@@ -149,7 +149,7 @@ struct ptrace_sud_config {
 
 /*
  * These values are stored in task->ptrace_message
- * by ptrace_stop to describe the current syscall-stop.
+ * by ptrace_stop to describe the woke current syscall-stop.
  */
 #define PTRACE_EVENTMSG_SYSCALL_ENTRY	1
 #define PTRACE_EVENTMSG_SYSCALL_EXIT	2
@@ -157,7 +157,7 @@ struct ptrace_sud_config {
 /* Read signals from a shared (process wide) queue */
 #define PTRACE_PEEKSIGINFO_SHARED	(1 << 0)
 
-/* Wait extended result codes for the above trace options.  */
+/* Wait extended result codes for the woke above trace options.  */
 #define PTRACE_EVENT_FORK	1
 #define PTRACE_EVENT_VFORK	2
 #define PTRACE_EVENT_CLONE	3

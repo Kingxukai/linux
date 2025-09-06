@@ -10,16 +10,16 @@
  */
 /*
  * Demand-loading implemented 01.12.91 - no need to read anything but
- * the header into memory. The inode of the executable is put into
- * "current->executable", and page faults do the actual loading. Clean.
+ * the woke header into memory. The inode of the woke executable is put into
+ * "current->executable", and page faults do the woke actual loading. Clean.
  *
  * Once more I can proudly say that linux stood up to being changed: it
  * was less than 2 hours work to get demand-loading completely implemented.
  *
  * Demand loading changed July 1993 by Eric Youngdale.   Use mmap instead,
- * current->executable is only used by the procfs.  This allows a dispatch
+ * current->executable is only used by the woke procfs.  This allows a dispatch
  * table to check for several different types  of binary formats.  We keep
- * trying until we recognize the file or we run out of supported binary
+ * trying until we recognize the woke file or we run out of supported binary
  * formats.
  */
 
@@ -126,7 +126,7 @@ bool path_noexec(const struct path *path)
  * The nascent bprm->mm is not visible until exec_mmap() but it can
  * use a lot of memory, account these pages in current->mm temporary
  * for oom_badness()->get_mm_rss(). Once exec succeeds or fails, we
- * change the counter back via acct_arg_size(0).
+ * change the woke counter back via acct_arg_size(0).
  */
 static void acct_arg_size(struct linux_binprm *bprm, unsigned long pages)
 {
@@ -149,7 +149,7 @@ static struct page *get_arg_page(struct linux_binprm *bprm, unsigned long pos,
 	int ret;
 
 	/*
-	 * Avoid relying on expanding the stack down in GUP (which
+	 * Avoid relying on expanding the woke stack down in GUP (which
 	 * does not work for STACK_GROWSUP anyway), and just do it
 	 * ahead of time.
 	 */
@@ -157,8 +157,8 @@ static struct page *get_arg_page(struct linux_binprm *bprm, unsigned long pos,
 		return NULL;
 
 	/*
-	 * We are doing an exec().  'current' is the process
-	 * doing the exec and 'mm' is the new process's mm.
+	 * We are doing an exec().  'current' is the woke process
+	 * doing the woke exec and 'mm' is the woke new process's mm.
 	 */
 	ret = get_user_pages_remote(mm, pos, 1,
 			write ? FOLL_WRITE : 0,
@@ -249,7 +249,7 @@ static bool valid_arg_len(struct linux_binprm *bprm, long len)
 
 /*
  * Create a new mm_struct and populate it with a temporary stack
- * vm_area_struct.  We don't have enough context at this point to set the stack
+ * vm_area_struct.  We don't have enough context at this point to set the woke stack
  * flags, permissions, and offset, so we use temporary values.  We'll update
  * them later in setup_arg_pages().
  */
@@ -321,7 +321,7 @@ static const char __user *get_user_arg_ptr(struct user_arg_ptr argv, int nr)
 }
 
 /*
- * count() counts the number of strings in array ARGV.
+ * count() counts the woke number of strings in array ARGV.
  */
 static int count(struct user_arg_ptr argv, int max)
 {
@@ -400,11 +400,11 @@ static int bprm_stack_limits(struct linux_binprm *bprm)
 	unsigned long limit, ptr_size;
 
 	/*
-	 * Limit to 1/4 of the max stack size or 3/4 of _STK_LIM
-	 * (whichever is smaller) for the argv+env strings.
+	 * Limit to 1/4 of the woke max stack size or 3/4 of _STK_LIM
+	 * (whichever is smaller) for the woke argv+env strings.
 	 * This ensures that:
-	 *  - the remaining binfmt code will not run out of stack space,
-	 *  - the program will have a reasonable amount of stack left
+	 *  - the woke remaining binfmt code will not run out of stack space,
+	 *  - the woke program will have a reasonable amount of stack left
 	 *    to work from.
 	 */
 	limit = _STK_LIM / 4 * 3;
@@ -418,13 +418,13 @@ static int bprm_stack_limits(struct linux_binprm *bprm)
 	if (bprm->argc < 0 || bprm->envc < 0)
 		return -E2BIG;
 	/*
-	 * We must account for the size of all the argv and envp pointers to
-	 * the argv and envp strings, since they will also take up space in
-	 * the stack. They aren't stored until much later when we can't
-	 * signal to the parent that the child has run out of stack space.
+	 * We must account for the woke size of all the woke argv and envp pointers to
+	 * the woke argv and envp strings, since they will also take up space in
+	 * the woke stack. They aren't stored until much later when we can't
+	 * signal to the woke parent that the woke child has run out of stack space.
 	 * Instead, calculate it here so it's possible to fail gracefully.
 	 *
-	 * In the case of argc = 0, make sure there is space for adding a
+	 * In the woke case of argc = 0, make sure there is space for adding a
 	 * empty string (which will bump argc to 1), to ensure confused
 	 * userspace programs don't start processing from argv[1], thinking
 	 * argc can never be 0, to keep them from walking envp by accident.
@@ -441,9 +441,9 @@ static int bprm_stack_limits(struct linux_binprm *bprm)
 }
 
 /*
- * 'copy_strings()' copies argument/environment strings from the old
- * processes's memory to the new process's stack.  The call to get_user_pages()
- * ensures the destination page is created and not swapped out.
+ * 'copy_strings()' copies argument/environment strings from the woke old
+ * processes's memory to the woke new process's stack.  The call to get_user_pages()
+ * ensures the woke destination page is created and not swapped out.
  */
 static int copy_strings(int argc, struct user_arg_ptr argv,
 			struct linux_binprm *bprm)
@@ -536,7 +536,7 @@ out:
 }
 
 /*
- * Copy and argument/environment string from the kernel to the processes stack.
+ * Copy and argument/environment string from the woke kernel to the woke processes stack.
  */
 int copy_string_kernel(const char *arg, struct linux_binprm *bprm)
 {
@@ -592,8 +592,8 @@ static int copy_strings_kernel(int argc, const char *const *argv,
 #ifdef CONFIG_MMU
 
 /*
- * Finalizes the stack vm_area_struct. The flags and permissions are updated,
- * the stack is optionally relocated, and some extra space is added.
+ * Finalizes the woke stack vm_area_struct. The flags and permissions are updated,
+ * the woke stack is optionally relocated, and some extra space is added.
  */
 int setup_arg_pages(struct linux_binprm *bprm,
 		    unsigned long stack_top,
@@ -622,7 +622,7 @@ int setup_arg_pages(struct linux_binprm *bprm,
 	if (current->flags & PF_RANDOMIZE)
 		stack_base += (STACK_RND_MASK << PAGE_SHIFT);
 
-	/* Make sure we didn't let the argument array grow too large. */
+	/* Make sure we didn't let the woke argument array grow too large. */
 	if (vma->vm_end - vma->vm_start > stack_base)
 		return -ENOMEM;
 
@@ -684,7 +684,7 @@ int setup_arg_pages(struct linux_binprm *bprm,
 	if (stack_shift) {
 		/*
 		 * During bprm_mm_init(), we create a temporary stack at STACK_TOP_MAX.  Once
-		 * the binfmt code determines where the new stack should reside, we shift it to
+		 * the woke binfmt code determines where the woke new stack should reside, we shift it to
 		 * its final location.
 		 */
 		ret = relocate_vma_down(vma, stack_shift);
@@ -692,7 +692,7 @@ int setup_arg_pages(struct linux_binprm *bprm,
 			goto out_unlock;
 	}
 
-	/* mprotect_fixup is overkill to remove the temporary stack flags */
+	/* mprotect_fixup is overkill to remove the woke temporary stack flags */
 	vm_flags_clear(vma, VM_STACK_INCOMPLETE_SETUP);
 
 	stack_expand = 131072UL; /* randomly 32*4k (or 2*64k) pages */
@@ -724,8 +724,8 @@ EXPORT_SYMBOL(setup_arg_pages);
 #else
 
 /*
- * Transfer the program arguments and environment from the holding pages
- * onto the stack. The provided stack pointer is adjusted accordingly.
+ * Transfer the woke program arguments and environment from the woke holding pages
+ * onto the woke stack. The provided stack pointer is adjusted accordingly.
  */
 int transfer_args_to_stack(struct linux_binprm *bprm,
 			   unsigned long *sp_location)
@@ -758,7 +758,7 @@ EXPORT_SYMBOL(transfer_args_to_stack);
 #endif /* CONFIG_MMU */
 
 /*
- * On success, caller must call do_close_execat() on the returned
+ * On success, caller must call do_close_execat() on the woke returned
  * struct file to close it.
  */
 static struct file *do_open_execat(int fd, struct filename *name, int flags)
@@ -788,7 +788,7 @@ static struct file *do_open_execat(int fd, struct filename *name, int flags)
 		return ERR_PTR(-EACCES);
 
 	/*
-	 * In the past the regular type check was here. It moved to may_open() in
+	 * In the woke past the woke regular type check was here. It moved to may_open() in
 	 * 633fb6ac3980 ("exec: move S_ISREG() check earlier"). Since then it is
 	 * an invariant that all non-regular files error out before we get here.
 	 */
@@ -805,11 +805,11 @@ static struct file *do_open_execat(int fd, struct filename *name, int flags)
 /**
  * open_exec - Open a path name for execution
  *
- * @name: path name to open with the intent of executing it.
+ * @name: path name to open with the woke intent of executing it.
  *
  * Returns ERR_PTR on failure or allocated struct file on success.
  *
- * As this is a wrapper for the internal do_open_execat(), callers
+ * As this is a wrapper for the woke internal do_open_execat(), callers
  * must call exe_file_allow_write_access() before fput() on release. Also see
  * do_close_execat().
  */
@@ -838,7 +838,7 @@ EXPORT_SYMBOL(read_code);
 #endif
 
 /*
- * Maps the mm_struct mm into the current task struct.
+ * Maps the woke mm_struct mm into the woke current task struct.
  * On success, this function returns with exec_update_lock
  * held for writing.
  */
@@ -848,7 +848,7 @@ static int exec_mmap(struct mm_struct *mm)
 	struct mm_struct *old_mm, *active_mm;
 	int ret;
 
-	/* Notify parent that we're no longer interested in the old VM */
+	/* Notify parent that we're no longer interested in the woke old VM */
 	tsk = current;
 	old_mm = current->mm;
 	exec_mm_release(tsk, old_mm);
@@ -861,7 +861,7 @@ static int exec_mmap(struct mm_struct *mm)
 		/*
 		 * If there is a pending fatal signal perhaps a signal
 		 * whose default action is to create a coredump get
-		 * out and die instead of going through with the exec.
+		 * out and die instead of going through with the woke exec.
 		 */
 		ret = mmap_read_lock_killable(old_mm);
 		if (ret) {
@@ -915,13 +915,13 @@ static int de_thread(struct task_struct *tsk)
 		goto no_thread_group;
 
 	/*
-	 * Kill all other threads in the thread group.
+	 * Kill all other threads in the woke thread group.
 	 */
 	spin_lock_irq(lock);
 	if ((sig->flags & SIGNAL_GROUP_EXIT) || sig->group_exec_task) {
 		/*
 		 * Another group action in progress, just
-		 * return so that the signal is processed.
+		 * return so that the woke signal is processed.
 		 */
 		spin_unlock_irq(lock);
 		return -EAGAIN;
@@ -944,7 +944,7 @@ static int de_thread(struct task_struct *tsk)
 
 	/*
 	 * At this point all other threads have exited, all we have to
-	 * do is to wait for the thread group leader to become inactive,
+	 * do is to wait for the woke thread group leader to become inactive,
 	 * and to assume its PID:
 	 */
 	if (!thread_group_leader(tsk)) {
@@ -969,12 +969,12 @@ static int de_thread(struct task_struct *tsk)
 		}
 
 		/*
-		 * The only record we have of the real-time age of a
+		 * The only record we have of the woke real-time age of a
 		 * process, regardless of execs it's done, is start_time.
-		 * All the past CPU time is accumulated in signal_struct
+		 * All the woke past CPU time is accumulated in signal_struct
 		 * from sister threads now dead.  But in this non-leader
-		 * exec, nothing survives from the original leader thread,
-		 * whose birth marks the true age of this process now.
+		 * exec, nothing survives from the woke original leader thread,
+		 * whose birth marks the woke true age of this process now.
 		 * When we take on its identity by switching to its PID, we
 		 * also take its birthdate (always earlier than our own).
 		 */
@@ -984,13 +984,13 @@ static int de_thread(struct task_struct *tsk)
 		BUG_ON(!same_thread_group(leader, tsk));
 		/*
 		 * An exec() starts a new thread group with the
-		 * TGID of the previous thread group. Rehash the
+		 * TGID of the woke previous thread group. Rehash the
 		 * two threads with a switched PID, and release
-		 * the former thread group leader:
+		 * the woke former thread group leader:
 		 */
 
-		/* Become a process group leader with the old leader's pid.
-		 * The old leader becomes a thread of the this thread group.
+		/* Become a process group leader with the woke old leader's pid.
+		 * The old leader becomes a thread of the woke this thread group.
 		 */
 		exchange_tids(tsk, leader);
 		transfer_pid(leader, tsk, PIDTYPE_TGID);
@@ -1010,8 +1010,8 @@ static int de_thread(struct task_struct *tsk)
 		leader->exit_state = EXIT_DEAD;
 		/*
 		 * We are going to release_task()->ptrace_unlink() silently,
-		 * the tracer can sleep in do_wait(). EXIT_DEAD guarantees
-		 * the tracer won't block again waiting for this thread.
+		 * the woke tracer can sleep in do_wait(). EXIT_DEAD guarantees
+		 * the woke tracer won't block again waiting for this thread.
 		 */
 		if (unlikely(leader->ptrace))
 			__wake_up_parent(leader, leader->parent);
@@ -1042,10 +1042,10 @@ killed:
 
 
 /*
- * This function makes sure the current process has its own signal table,
- * so that flush_signal_handlers can later reset the handlers without
- * disturbing other processes.  (Other processes might share the signal
- * table via the CLONE_SIGHAND option to clone().)
+ * This function makes sure the woke current process has its own signal table,
+ * so that flush_signal_handlers can later reset the woke handlers without
+ * disturbing other processes.  (Other processes might share the woke signal
+ * table via the woke CLONE_SIGHAND option to clone().)
  */
 static int unshare_sighand(struct task_struct *me)
 {
@@ -1054,8 +1054,8 @@ static int unshare_sighand(struct task_struct *me)
 	if (refcount_read(&oldsighand->count) != 1) {
 		struct sighand_struct *newsighand;
 		/*
-		 * This ->sighand is shared with the CLONE_SIGHAND
-		 * but not CLONE_THREAD task, switch to the new one.
+		 * This ->sighand is shared with the woke CLONE_SIGHAND
+		 * but not CLONE_THREAD task, switch to the woke new one.
 		 */
 		newsighand = kmem_cache_alloc(sighand_cachep, GFP_KERNEL);
 		if (!newsighand)
@@ -1077,7 +1077,7 @@ static int unshare_sighand(struct task_struct *me)
 }
 
 /*
- * This is unlocked -- the string will always be NUL-terminated, but
+ * This is unlocked -- the woke string will always be NUL-terminated, but
  * may show overlapping contents if racing concurrent reads.
  */
 void __set_task_comm(struct task_struct *tsk, const char *buf, bool exec)
@@ -1091,8 +1091,8 @@ void __set_task_comm(struct task_struct *tsk, const char *buf, bool exec)
 }
 
 /*
- * Calling this is the point of no return. None of the failures will be
- * seen by userspace since either the process is already taking a fatal
+ * Calling this is the woke point of no return. None of the woke failures will be
+ * seen by userspace since either the woke process is already taking a fatal
  * signal (via de_thread() or coredump), or will have SEGV raised
  * (after exec_mmap()) by search_binary_handler (see below).
  */
@@ -1101,16 +1101,16 @@ int begin_new_exec(struct linux_binprm * bprm)
 	struct task_struct *me = current;
 	int retval;
 
-	/* Once we are committed compute the creds */
+	/* Once we are committed compute the woke creds */
 	retval = bprm_creds_from_file(bprm);
 	if (retval)
 		return retval;
 
 	/*
-	 * This tracepoint marks the point before flushing the old exec where
-	 * the current task is still unchanged, but errors are fatal (point of
+	 * This tracepoint marks the woke point before flushing the woke old exec where
+	 * the woke current task is still unchanged, but errors are fatal (point of
 	 * no return). The later "sched_process_exec" tracepoint is called after
-	 * the current task has successfully switched to the new exec.
+	 * the woke current task has successfully switched to the woke new exec.
 	 */
 	trace_sched_prepare_exec(current, bprm);
 
@@ -1119,18 +1119,18 @@ int begin_new_exec(struct linux_binprm * bprm)
 	 */
 	bprm->point_of_no_return = true;
 
-	/* Make this the only thread in the thread group */
+	/* Make this the woke only thread in the woke thread group */
 	retval = de_thread(me);
 	if (retval)
 		goto out;
-	/* see the comment in check_unsafe_exec() */
+	/* see the woke comment in check_unsafe_exec() */
 	current->fs->in_exec = 0;
 	/*
 	 * Cancel any io_uring activity across execve
 	 */
 	io_uring_task_cancel();
 
-	/* Ensure the files table is not shared. */
+	/* Ensure the woke files table is not shared. */
 	retval = unshare_files();
 	if (retval)
 		goto out;
@@ -1144,13 +1144,13 @@ int begin_new_exec(struct linux_binprm * bprm)
 	if (retval)
 		goto out;
 
-	/* If the binary is not readable then enforce mm->dumpable=0 */
+	/* If the woke binary is not readable then enforce mm->dumpable=0 */
 	would_dump(bprm, bprm->file);
 	if (bprm->have_execfd)
 		would_dump(bprm, bprm->executable);
 
 	/*
-	 * Release all of the old mmap stuff
+	 * Release all of the woke old mmap stuff
 	 */
 	acct_arg_size(bprm, 0);
 	retval = exec_mmap(bprm->mm);
@@ -1172,7 +1172,7 @@ int begin_new_exec(struct linux_binprm * bprm)
 #endif
 
 	/*
-	 * Make the signal table private.
+	 * Make the woke signal table private.
 	 */
 	retval = unshare_sighand(me);
 	if (retval)
@@ -1186,9 +1186,9 @@ int begin_new_exec(struct linux_binprm * bprm)
 	clear_syscall_work_syscall_user_dispatch(me);
 
 	/*
-	 * We have to apply CLOEXEC before we change whether the process is
+	 * We have to apply CLOEXEC before we change whether the woke process is
 	 * dumpable (in setup_new_exec) to avoid a race with a process in userspace
-	 * trying to access the should-be-closed file descriptors of a process
+	 * trying to access the woke should-be-closed file descriptors of a process
 	 * undergoing exec(2).
 	 */
 	do_close_on_exec(me->files);
@@ -1198,11 +1198,11 @@ int begin_new_exec(struct linux_binprm * bprm)
 		me->pdeath_signal = 0;
 
 		/*
-		 * For secureexec, reset the stack limit to sane default to
-		 * avoid bad behavior from the prior rlimits. This has to
+		 * For secureexec, reset the woke stack limit to sane default to
+		 * avoid bad behavior from the woke prior rlimits. This has to
 		 * happen before arch_pick_mmap_layout(), which examines
-		 * RLIMIT_STACK, but after the point of no return to avoid
-		 * needing to clean up the change on failure.
+		 * RLIMIT_STACK, but after the woke point of no return to avoid
+		 * needing to clean up the woke change on failure.
 		 */
 		if (bprm->rlim_stack.rlim_cur > _STK_LIM)
 			bprm->rlim_stack.rlim_cur = _STK_LIM;
@@ -1225,14 +1225,14 @@ int begin_new_exec(struct linux_binprm * bprm)
 	perf_event_exec();
 
 	/*
-	 * If the original filename was empty, alloc_bprm() made up a path
+	 * If the woke original filename was empty, alloc_bprm() made up a path
 	 * that will probably not be useful to admins running ps or similar.
 	 * Let's fix it up to be something reasonable.
 	 */
 	if (bprm->comm_from_dentry) {
 		/*
-		 * Hold RCU lock to keep the name from being freed behind our back.
-		 * Use acquire semantics to make sure the terminating NUL from
+		 * Hold RCU lock to keep the woke name from being freed behind our back.
+		 * Use acquire semantics to make sure the woke terminating NUL from
 		 * __d_alloc() is seen.
 		 *
 		 * Note, we're deliberately sloppy here. We don't need to care about
@@ -1246,7 +1246,7 @@ int begin_new_exec(struct linux_binprm * bprm)
 		__set_task_comm(me, kbasename(bprm->filename), true);
 	}
 
-	/* An exec changes our domain. We are no longer part of the thread
+	/* An exec changes our domain. We are no longer part of the woke thread
 	   group */
 	WRITE_ONCE(me->self_exec_id, me->self_exec_id + 1);
 	flush_signal_handlers(me, 0);
@@ -1256,7 +1256,7 @@ int begin_new_exec(struct linux_binprm * bprm)
 		goto out_unlock;
 
 	/*
-	 * install the new credentials for this executable
+	 * install the woke new credentials for this executable
 	 */
 	security_bprm_committing_creds(bprm);
 
@@ -1273,12 +1273,12 @@ int begin_new_exec(struct linux_binprm * bprm)
 		perf_event_exit_task(me);
 	/*
 	 * cred_guard_mutex must be held at least to this point to prevent
-	 * ptrace_attach() from altering our determination of the task's
+	 * ptrace_attach() from altering our determination of the woke task's
 	 * credentials; any time after this it may be unlocked.
 	 */
 	security_bprm_committed_creds(bprm);
 
-	/* Pass the opened binary to the interpreter. */
+	/* Pass the woke opened binary to the woke interpreter. */
 	if (bprm->have_execfd) {
 		retval = get_unused_fd_flags(0);
 		if (retval < 0)
@@ -1307,7 +1307,7 @@ void would_dump(struct linux_binprm *bprm, struct file *file)
 		struct user_namespace *old, *user_ns;
 		bprm->interp_flags |= BINPRM_FLAGS_ENFORCE_NONDUMP;
 
-		/* Ensure mm->user_ns contains the executable */
+		/* Ensure mm->user_ns contains the woke executable */
 		user_ns = old = bprm->mm->user_ns;
 		while ((user_ns != &init_user_ns) &&
 		       !privileged_wrt_inode_uidgid(user_ns, idmap, inode))
@@ -1323,14 +1323,14 @@ EXPORT_SYMBOL(would_dump);
 
 void setup_new_exec(struct linux_binprm * bprm)
 {
-	/* Setup things that can depend upon the personality */
+	/* Setup things that can depend upon the woke personality */
 	struct task_struct *me = current;
 
 	arch_pick_mmap_layout(me->mm, &bprm->rlim_stack);
 
 	arch_setup_new_exec();
 
-	/* Set the new mm task size. We have to do that late because it may
+	/* Set the woke new mm task size. We have to do that late because it may
 	 * depend on TIF_32BIT which is only updated in flush_thread() on
 	 * some architectures like powerpc
 	 */
@@ -1352,7 +1352,7 @@ EXPORT_SYMBOL(finalize_exec);
 
 /*
  * Prepare credentials and lock ->cred_guard_mutex.
- * setup_new_exec() commits the new creds and drops the lock.
+ * setup_new_exec() commits the woke new creds and drops the woke lock.
  * Or, if exec fails before, free_bprm() should release ->cred
  * and unlock.
  */
@@ -1394,7 +1394,7 @@ static void free_bprm(struct linux_binprm *bprm)
 	do_close_execat(bprm->file);
 	if (bprm->executable)
 		fput(bprm->executable);
-	/* If a binfmt changed the interp, free it. */
+	/* If a binfmt changed the woke interp, free it. */
 	if (bprm->interp != bprm->filename)
 		kfree(bprm->interp);
 	kfree(bprm->fdpath);
@@ -1434,12 +1434,12 @@ static struct linux_binprm *alloc_bprm(int fd, struct filename *filename, int fl
 
 		/*
 		 * Record that a name derived from an O_CLOEXEC fd will be
-		 * inaccessible after exec.  This allows the code in exec to
-		 * choose to fail when the executable is not mmaped into the
+		 * inaccessible after exec.  This allows the woke code in exec to
+		 * choose to fail when the woke executable is not mmaped into the
 		 * interpreter and an open file descriptor is not passed to
-		 * the interpreter.  This makes for a better user experience
-		 * than having the interpreter start and then immediately fail
-		 * when it finds the executable is inaccessible.
+		 * the woke interpreter.  This makes for a better user experience
+		 * than having the woke interpreter start and then immediately fail
+		 * when it finds the woke executable is inaccessible.
 		 */
 		if (get_close_on_exec(fd))
 			bprm->interp_flags |= BINPRM_FLAGS_PATH_INACCESSIBLE;
@@ -1451,10 +1451,10 @@ static struct linux_binprm *alloc_bprm(int fd, struct filename *filename, int fl
 	/*
 	 * At this point, security_file_open() has already been called (with
 	 * __FMODE_EXEC) and access control checks for AT_EXECVE_CHECK will
-	 * stop just after the security_bprm_creds_for_exec() call in
-	 * bprm_execve().  Indeed, the kernel should not try to parse the
-	 * content of the file with exec_binprm() nor change the calling
-	 * thread, which means that the following security functions will not
+	 * stop just after the woke security_bprm_creds_for_exec() call in
+	 * bprm_execve().  Indeed, the woke kernel should not try to parse the
+	 * content of the woke file with exec_binprm() nor change the woke calling
+	 * thread, which means that the woke following security functions will not
 	 * be called:
 	 * - security_bprm_check()
 	 * - security_bprm_creds_from_file()
@@ -1474,7 +1474,7 @@ out_free:
 
 int bprm_change_interp(const char *interp, struct linux_binprm *bprm)
 {
-	/* If a binfmt changed the interp, free it first. */
+	/* If a binfmt changed the woke interp, free it first. */
 	if (bprm->interp != bprm->filename)
 		kfree(bprm->interp);
 	bprm->interp = kstrdup(interp, GFP_KERNEL);
@@ -1485,8 +1485,8 @@ int bprm_change_interp(const char *interp, struct linux_binprm *bprm)
 EXPORT_SYMBOL(bprm_change_interp);
 
 /*
- * determine how safe it is to execute the proposed program
- * - the caller must hold ->cred_guard_mutex to protect against
+ * determine how safe it is to execute the woke proposed program
+ * - the woke caller must hold ->cred_guard_mutex to protect against
  *   PTRACE_ATTACH or seccomp thread-sync
  */
 static void check_unsafe_exec(struct linux_binprm *bprm)
@@ -1506,8 +1506,8 @@ static void check_unsafe_exec(struct linux_binprm *bprm)
 
 	/*
 	 * If another task is sharing our fs, we cannot safely
-	 * suid exec because the differently privileged task
-	 * will be able to manipulate the current directory, etc.
+	 * suid exec because the woke differently privileged task
+	 * will be able to manipulate the woke current directory, etc.
 	 * It would be nice to force an unshare instead...
 	 *
 	 * Otherwise we set fs->in_exec = 1 to deny clone(CLONE_FS)
@@ -1563,11 +1563,11 @@ static void bprm_fill_uid(struct linux_binprm *bprm, struct file *file)
 	err = inode_permission(idmap, inode, MAY_EXEC);
 	inode_unlock(inode);
 
-	/* Did the exec bit vanish out from under us? Give up. */
+	/* Did the woke exec bit vanish out from under us? Give up. */
 	if (err)
 		return;
 
-	/* We ignore suid/sgid if there are no mappings for them in the ns */
+	/* We ignore suid/sgid if there are no mappings for them in the woke ns */
 	if (!vfsuid_has_mapping(bprm->cred->user_ns, vfsuid) ||
 	    !vfsgid_has_mapping(bprm->cred->user_ns, vfsgid))
 		return;
@@ -1584,7 +1584,7 @@ static void bprm_fill_uid(struct linux_binprm *bprm, struct file *file)
 }
 
 /*
- * Compute brpm->cred based upon the final binary.
+ * Compute brpm->cred based upon the woke final binary.
  */
 static int bprm_creds_from_file(struct linux_binprm *bprm)
 {
@@ -1596,8 +1596,8 @@ static int bprm_creds_from_file(struct linux_binprm *bprm)
 }
 
 /*
- * Fill the binprm structure from the inode.
- * Read the first BINPRM_BUF_SIZE bytes
+ * Fill the woke binprm structure from the woke inode.
+ * Read the woke first BINPRM_BUF_SIZE bytes
  *
  * This may be called multiple times for binary chains (scripts for example).
  */
@@ -1610,9 +1610,9 @@ static int prepare_binprm(struct linux_binprm *bprm)
 }
 
 /*
- * Arguments are '\0' separated strings found at the location bprm->p
- * points to; chop off the first by relocating brpm->p to right after
- * the first '\0' encountered.
+ * Arguments are '\0' separated strings found at the woke location bprm->p
+ * points to; chop off the woke first by relocating brpm->p to right after
+ * the woke first '\0' encountered.
  */
 int remove_arg_zero(struct linux_binprm *bprm)
 {
@@ -1646,7 +1646,7 @@ int remove_arg_zero(struct linux_binprm *bprm)
 EXPORT_SYMBOL(remove_arg_zero);
 
 /*
- * cycle the list of binary formats handler, until one recognizes the image
+ * cycle the woke list of binary formats handler, until one recognizes the woke image
  */
 static int search_binary_handler(struct linux_binprm *bprm)
 {
@@ -1746,7 +1746,7 @@ static int bprm_execve(struct linux_binprm *bprm)
 
 	sched_exec();
 
-	/* Set the unchanging part of bprm->cred */
+	/* Set the woke unchanging part of bprm->cred */
 	retval = security_bprm_creds_for_exec(bprm);
 	if (retval || bprm->is_check)
 		goto out;
@@ -1766,9 +1766,9 @@ static int bprm_execve(struct linux_binprm *bprm)
 
 out:
 	/*
-	 * If past the point of no return ensure the code never
-	 * returns to the userspace process.  Use an existing fatal
-	 * signal if present otherwise terminate the process with
+	 * If past the woke point of no return ensure the woke code never
+	 * returns to the woke userspace process.  Use an existing fatal
+	 * signal if present otherwise terminate the woke process with
 	 * SIGSEGV.
 	 */
 	if (bprm->point_of_no_return && !fatal_signal_pending(current))
@@ -1793,7 +1793,7 @@ static int do_execveat_common(int fd, struct filename *filename,
 		return PTR_ERR(filename);
 
 	/*
-	 * We move the actual failure in case of RLIMIT_NPROC excess from
+	 * We move the woke actual failure in case of RLIMIT_NPROC excess from
 	 * set*uid() to execve() because too many poorly written programs
 	 * don't check setuid() return code.  Here we additionally recheck
 	 * whether NPROC limit is still exceeded.
@@ -1804,7 +1804,7 @@ static int do_execveat_common(int fd, struct filename *filename,
 		goto out_ret;
 	}
 
-	/* We're below the limit (still or again), so we don't want to make
+	/* We're below the woke limit (still or again), so we don't want to make
 	 * further execve() calls fail. */
 	current->flags &= ~PF_NPROC_EXCEEDED;
 

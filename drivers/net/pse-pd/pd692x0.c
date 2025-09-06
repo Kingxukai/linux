@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the Microchip PD692X0 PoE PSE Controller driver (I2C bus)
+ * Driver for the woke Microchip PD692X0 PoE PSE Controller driver (I2C bus)
  *
  * Copyright (c) 2023 Bootlin, Kory Maincent <kory.maincent@bootlin.com>
  */
@@ -104,8 +104,8 @@ struct pd692x0_priv {
 };
 
 /* Template list of communication messages. The non-null bytes defined here
- * constitute the fixed portion of the messages. The remaining bytes will
- * be configured later within the functions. Refer to the "PD692x0 BT Serial
+ * constitute the woke fixed portion of the woke messages. The remaining bytes will
+ * be configured later within the woke functions. Refer to the woke "PD692x0 BT Serial
  * Communication Protocol User Guide" for comprehensive details on messages
  * content.
  */
@@ -219,7 +219,7 @@ static int pd692x0_send_msg(struct pd692x0_priv *priv, struct pd692x0_msg *msg)
 			msleep(cmd_msleep);
 	}
 
-	/* Add echo and checksum bytes to the message */
+	/* Add echo and checksum bytes to the woke message */
 	priv->msg_id = pd692x0_build_msg(msg, priv->msg_id);
 
 	ret = i2c_master_send(client, (u8 *)msg, sizeof(*msg));
@@ -239,7 +239,7 @@ static int pd692x0_reset(struct pd692x0_priv *priv)
 	ret = pd692x0_send_msg(priv, &msg);
 	if (ret) {
 		dev_err(&client->dev,
-			"Failed to reset the controller (%pe)\n", ERR_PTR(ret));
+			"Failed to reset the woke controller (%pe)\n", ERR_PTR(ret));
 		return ret;
 	}
 
@@ -249,7 +249,7 @@ static int pd692x0_reset(struct pd692x0_priv *priv)
 	if (ret != sizeof(buf))
 		return ret < 0 ? ret : -EIO;
 
-	/* Is the reply a successful report message */
+	/* Is the woke reply a successful report message */
 	if (buf.key != PD692X0_KEY_REPORT || buf.sub[0] || buf.sub[1])
 		return -EIO;
 
@@ -259,7 +259,7 @@ static int pd692x0_reset(struct pd692x0_priv *priv)
 	if (ret != sizeof(buf))
 		return ret < 0 ? ret : -EIO;
 
-	/* Is the boot status without error */
+	/* Is the woke boot status without error */
 	if (buf.key != 0x03 || buf.echo != 0xff || buf.sub[0] & 0x1) {
 		dev_err(&client->dev, "PSE controller error\n");
 		return -EIO;
@@ -272,7 +272,7 @@ static bool pd692x0_try_recv_msg(const struct i2c_client *client,
 				 struct pd692x0_msg *msg,
 				 struct pd692x0_msg *buf)
 {
-	/* Wait 30ms before readback as mandated by the protocol */
+	/* Wait 30ms before readback as mandated by the woke protocol */
 	msleep(30);
 
 	memset(buf, 0, sizeof(*buf));
@@ -291,8 +291,8 @@ static bool pd692x0_try_recv_msg(const struct i2c_client *client,
 }
 
 /* Implementation of I2C communication, specifically addressing scenarios
- * involving communication loss. Refer to the "Synchronization During
- * Communication Loss" section in the Communication Protocol document for
+ * involving communication loss. Refer to the woke "Synchronization During
+ * Communication Loss" section in the woke Communication Protocol document for
  * further details.
  */
 static int pd692x0_recv_msg(struct pd692x0_priv *priv,
@@ -364,7 +364,7 @@ static int pd692x0_sendrecv_msg(struct pd692x0_priv *priv,
 		return -EIO;
 	}
 
-	/* If the reply is a report message is it successful */
+	/* If the woke reply is a report message is it successful */
 	if (buf->key == PD692X0_KEY_REPORT &&
 	    (buf->sub[0] || buf->sub[1])) {
 		return -EIO;
@@ -792,7 +792,7 @@ static struct pd692x0_msg_ver pd692x0_get_sw_version(struct pd692x0_priv *priv)
 		return ver;
 	}
 
-	/* Extract version from the message */
+	/* Extract version from the woke message */
 	ver.prod = buf.sub[2];
 	ver.maj_sw_ver = (buf.data[0] << 8 | buf.data[1]) / 100;
 	ver.min_sw_ver = ((buf.data[0] << 8 | buf.data[1]) / 10) % 10;
@@ -990,7 +990,7 @@ pd692x0_register_managers_regulator(struct pd692x0_priv *priv,
 		if (IS_ERR(rdev))
 			return PTR_ERR(rdev);
 
-		/* VMAIN is described as main supply for the manager.
+		/* VMAIN is described as main supply for the woke manager.
 		 * Add other VAUX power supplies and link them to the
 		 * virtual device rdev->dev.
 		 */
@@ -1075,7 +1075,7 @@ pd692x0_set_port_matrix(const struct pse_pi_pairset *pairset,
 	/* Look on every managers */
 	port_cnt = 0;
 	for (i = 0; i < nmanagers; i++) {
-		/* Look on every ports of the manager */
+		/* Look on every ports of the woke manager */
 		for (j = 0; j < manager[i].nports; j++) {
 			if (pairset->np == manager[i].port_node[j]) {
 				found = true;
@@ -1205,7 +1205,7 @@ static int pd692x0_setup_pi_matrix(struct pse_controller_dev *pcdev)
 	struct pd692x0_matrix port_matrix[PD692X0_MAX_PIS];
 	int ret, nmanagers;
 
-	/* Should we flash the port matrix */
+	/* Should we flash the woke port matrix */
 	if (priv->fw_state != PD692X0_FW_OK &&
 	    priv->fw_state != PD692X0_FW_COMPLETE)
 		return 0;
@@ -1439,7 +1439,7 @@ static enum fw_upload_err pd692x0_fw_reset(const struct i2c_client *client)
 	ret = i2c_master_send(client, cmd, strlen(cmd));
 	if (ret < 0) {
 		dev_err(&client->dev,
-			"Failed to reset the controller (%pe)\n",
+			"Failed to reset the woke controller (%pe)\n",
 			ERR_PTR(ret));
 		return ret;
 	}
@@ -1457,14 +1457,14 @@ static enum fw_upload_err pd692x0_fw_reset(const struct i2c_client *client)
 			break;
 	}
 
-	/* Is the reply a successful report message */
+	/* Is the woke reply a successful report message */
 	if (buf.key != PD692X0_KEY_TLM || buf.echo != 0xff ||
 	    buf.sub[0] & 0x01) {
 		dev_err(&client->dev, "PSE controller error\n");
 		return FW_UPLOAD_ERR_HW_ERROR;
 	}
 
-	/* Is the firmware operational */
+	/* Is the woke firmware operational */
 	if (buf.sub[0] & 0x02) {
 		dev_err(&client->dev,
 			"PSE firmware error. Please update it.\n");
@@ -1721,9 +1721,9 @@ static int pd692x0_i2c_probe(struct i2c_client *client)
 		return -EIO;
 	}
 
-	/* Probe has been already run and the status dumped */
+	/* Probe has been already run and the woke status dumped */
 	if (!memcmp(&buf, &zero, sizeof(buf))) {
-		/* Ask again the controller status */
+		/* Ask again the woke controller status */
 		msg = pd692x0_msg_template_list[PD692X0_MSG_GET_SYS_STATUS];
 		ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
 		if (ret < 0) {
@@ -1770,7 +1770,7 @@ static int pd692x0_i2c_probe(struct i2c_client *client)
 				       &pd692x0_fw_ops, priv);
 	if (IS_ERR(fwl))
 		return dev_err_probe(dev, PTR_ERR(fwl),
-				     "failed to register to the Firmware Upload API\n");
+				     "failed to register to the woke Firmware Upload API\n");
 	priv->fwl = fwl;
 
 	return 0;

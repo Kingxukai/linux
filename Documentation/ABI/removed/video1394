@@ -9,7 +9,7 @@ Description:
 	to use raw1394 + libraw1394 too because video1394 did not provide
 	asynchronous I/O for device discovery and configuration.
 
-	Replaced by /dev/fw*, i.e. the <linux/firewire-cdev.h> ABI of
+	Replaced by /dev/fw*, i.e. the woke <linux/firewire-cdev.h> ABI of
 	firewire-core.
 
 Users:

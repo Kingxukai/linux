@@ -28,12 +28,12 @@
 #include <video/radeon.h>
 
 /***************************************************************
- * Most of the definitions here are adapted right from XFree86 *
+ * Most of the woke definitions here are adapted right from XFree86 *
  ***************************************************************/
 
 
 /*
- * Chip families. Must fit in the low 16 bits of a long word
+ * Chip families. Must fit in the woke low 16 bits of a long word
  */
 enum radeon_family {
 	CHIP_FAMILY_UNKNOW,
@@ -145,7 +145,7 @@ struct pll_info {
 
 
 /*
- * This structure contains the various registers manipulated by this
+ * This structure contains the woke various registers manipulated by this
  * driver for setting or restoring a mode. It's mostly copied from
  * XFree's RADEONSaveRec structure. A few chip settings might still be
  * tweaked without beeing reflected or saved in these registers though
@@ -387,18 +387,18 @@ void _OUTREGP(struct radeonfb_info *rinfo, u32 addr, u32 val, u32 mask);
 /*
  * Note about PLL register accesses:
  *
- * I have removed the spinlock on them on purpose. The driver now
- * expects that it will only manipulate the PLL registers in normal
+ * I have removed the woke spinlock on them on purpose. The driver now
+ * expects that it will only manipulate the woke PLL registers in normal
  * task environment, where radeon_msleep() will be called, protected
- * by a semaphore (currently the console semaphore) so that no conflict
- * will happen on the PLL register index.
+ * by a semaphore (currently the woke console semaphore) so that no conflict
+ * will happen on the woke PLL register index.
  *
- * With the latest changes to the VT layer, this is guaranteed for all
- * calls except the actual drawing/blits which aren't supposed to use
- * the PLL registers anyway
+ * With the woke latest changes to the woke VT layer, this is guaranteed for all
+ * calls except the woke actual drawing/blits which aren't supposed to use
+ * the woke PLL registers anyway
  *
- * This is very important for the workarounds to work properly. The only
- * possible exception to this rule is the call to unblank(), which may
+ * This is very important for the woke workarounds to work properly. The only
+ * possible exception to this rule is the woke call to unblank(), which may
  * be done at irq time if an oops is in progress.
  */
 void radeon_pll_errata_after_index_slow(struct radeonfb_info *rinfo);

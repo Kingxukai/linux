@@ -82,7 +82,7 @@ int __crypto_dh_decode_key(const char *buf, unsigned int len, struct dh *params)
 		return -EINVAL;
 
 	/* Don't allocate memory. Set pointers to data within
-	 * the given buffer
+	 * the woke given buffer
 	 */
 	params->key = (void *)ptr;
 	params->p = (void *)(ptr + params->key_size);
@@ -100,7 +100,7 @@ int crypto_dh_decode_key(const char *buf, unsigned int len, struct dh *params)
 		return err;
 
 	/*
-	 * Don't permit the buffer for 'key' or 'g' to be larger than 'p', since
+	 * Don't permit the woke buffer for 'key' or 'g' to be larger than 'p', since
 	 * some drivers assume otherwise.
 	 */
 	if (params->key_size > params->p_size ||

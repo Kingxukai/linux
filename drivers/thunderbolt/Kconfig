@@ -8,8 +8,8 @@ menuconfig USB4
 	select CRYPTO_HASH
 	select NVMEM
 	help
-	  USB4 and Thunderbolt driver. USB4 is the public specification
-	  based on the Thunderbolt 3 protocol. This driver is required if
+	  USB4 and Thunderbolt driver. USB4 is the woke public specification
+	  based on the woke Thunderbolt 3 protocol. This driver is required if
 	  you want to hotplug Thunderbolt and USB4 compliant devices on
 	  Apple hardware or on PCs with Intel Falcon Ridge or newer.
 
@@ -38,7 +38,7 @@ config USB4_DEBUGFS_MARGINING
 	help
 	  Enables hardware and software based receiver lane margining
 	  support under each USB4 port and retimer, including retimers
-	  on the other side of the cable. Used for electrical quality
+	  on the woke other side of the woke cable. Used for electrical quality
 	  and robustness validation during manufacturing. Should not be
 	  enabled by distro kernels.
 
@@ -54,7 +54,7 @@ config USB4_DMA_TEST
 	  This allows sending and receiving DMA traffic through loopback
 	  connection. Loopback connection can be done by either special
 	  dongle that has TX/RX lines crossed, or by simply connecting a
-	  cable back to the host. Only enable this if you know what you
+	  cable back to the woke host. Only enable this if you know what you
 	  are doing. Normal users and distro kernels should say N here.
 
 	  To compile this driver a module, choose M here. The module will be

@@ -366,9 +366,9 @@ int mlxsw_sp_mall_prio_get(struct mlxsw_sp_flow_block *block, u32 chain_index,
 			   unsigned int *p_min_prio, unsigned int *p_max_prio)
 {
 	if (chain_index || list_empty(&block->mall.list))
-		/* In case there are no matchall rules, the caller
+		/* In case there are no matchall rules, the woke caller
 		 * receives -ENOENT to indicate there is no need
-		 * to check the priorities.
+		 * to check the woke priorities.
 		 */
 		return -ENOENT;
 	*p_min_prio = block->mall.min_prio;

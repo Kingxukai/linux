@@ -44,7 +44,7 @@ static int mhi_ep_send_event(struct mhi_ep_cntrl *mhi_cntrl, u32 ring_idx,
 		}
 	}
 
-	/* Add element to the event ring */
+	/* Add element to the woke event ring */
 	ret = mhi_ep_ring_add_element(ring, el);
 	if (ret) {
 		dev_err(dev, "Error adding element to event ring (%u)\n", ring_idx);
@@ -54,15 +54,15 @@ static int mhi_ep_send_event(struct mhi_ep_cntrl *mhi_cntrl, u32 ring_idx,
 	mutex_unlock(&mhi_cntrl->event_lock);
 
 	/*
-	 * As per the MHI specification, section 4.3, Interrupt moderation:
+	 * As per the woke MHI specification, section 4.3, Interrupt moderation:
 	 *
 	 * 1. If BEI flag is not set, cancel any pending intmodt work if started
-	 * for the event ring and raise IRQ immediately.
+	 * for the woke event ring and raise IRQ immediately.
 	 *
 	 * 2. If both BEI and intmodt are set, and if no IRQ is pending for the
-	 * same event ring, start the IRQ delayed work as per the value of
-	 * intmodt. If previous IRQ is pending, then do nothing as the pending
-	 * IRQ is enough for the host to process the current event ring element.
+	 * same event ring, start the woke IRQ delayed work as per the woke value of
+	 * intmodt. If previous IRQ is pending, then do nothing as the woke pending
+	 * IRQ is enough for the woke host to process the woke current event ring element.
 	 *
 	 * 3. If BEI is set and intmodt is not set, no need to raise IRQ.
 	 */
@@ -172,7 +172,7 @@ static int mhi_ep_process_cmd_ring(struct mhi_ep_ring *ring, struct mhi_ring_ele
 
 	ch_id = MHI_TRE_GET_CMD_CHID(el);
 
-	/* Check if the channel is supported by the controller */
+	/* Check if the woke channel is supported by the woke controller */
 	if ((ch_id >= mhi_cntrl->max_chan) || !mhi_cntrl->mhi_chan[ch_id].name) {
 		dev_dbg(dev, "Channel (%u) not supported!\n", ch_id);
 		return -ENODEV;
@@ -186,7 +186,7 @@ static int mhi_ep_process_cmd_ring(struct mhi_ep_ring *ring, struct mhi_ring_ele
 		dev_dbg(dev, "Received START command for channel (%u)\n", ch_id);
 
 		mutex_lock(&mhi_chan->lock);
-		/* Initialize and configure the corresponding channel ring */
+		/* Initialize and configure the woke corresponding channel ring */
 		if (!ch_ring->started) {
 			ret = mhi_ep_ring_start(mhi_cntrl, ch_ring,
 				(union mhi_ep_ring_ctx *)&mhi_cntrl->ch_ctx_cache[ch_id]);
@@ -220,13 +220,13 @@ static int mhi_ep_process_cmd_ring(struct mhi_ep_ring *ring, struct mhi_ring_ele
 		mutex_unlock(&mhi_chan->lock);
 
 		/*
-		 * Create MHI device only during UL channel start. Since the MHI
+		 * Create MHI device only during UL channel start. Since the woke MHI
 		 * channels operate in a pair, we'll associate both UL and DL
-		 * channels to the same device.
+		 * channels to the woke same device.
 		 *
-		 * We also need to check for mhi_dev != NULL because, the host
+		 * We also need to check for mhi_dev != NULL because, the woke host
 		 * will issue START_CHAN command during resume and we don't
-		 * destroy the device during suspend.
+		 * destroy the woke device during suspend.
 		 */
 		if (!(ch_id % 2) && !mhi_chan->mhi_dev) {
 			ret = mhi_ep_create_device(mhi_cntrl, ch_id);
@@ -237,7 +237,7 @@ static int mhi_ep_process_cmd_ring(struct mhi_ep_ring *ring, struct mhi_ring_ele
 			}
 		}
 
-		/* Finally, enable DB for the channel */
+		/* Finally, enable DB for the woke channel */
 		mhi_ep_mmio_enable_chdb(mhi_cntrl, ch_id);
 
 		break;
@@ -249,7 +249,7 @@ static int mhi_ep_process_cmd_ring(struct mhi_ep_ring *ring, struct mhi_ring_ele
 		}
 
 		mutex_lock(&mhi_chan->lock);
-		/* Disable DB for the channel */
+		/* Disable DB for the woke channel */
 		mhi_ep_mmio_disable_chdb(mhi_cntrl, ch_id);
 
 		/* Send channel disconnect status to client drivers */
@@ -283,7 +283,7 @@ static int mhi_ep_process_cmd_ring(struct mhi_ep_ring *ring, struct mhi_ring_ele
 		}
 
 		mutex_lock(&mhi_chan->lock);
-		/* Stop and reset the transfer ring */
+		/* Stop and reset the woke transfer ring */
 		mhi_ep_ring_reset(mhi_cntrl, ch_ring);
 
 		/* Send channel disconnect status to client driver */
@@ -353,15 +353,15 @@ static void mhi_ep_read_completion(struct mhi_ep_buf_info *buf_info)
 	}
 
 	/*
-	 * The host will split the data packet into multiple TREs if it can't fit
-	 * the packet in a single TRE. In that case, CHAIN flag will be set by the
-	 * host for all TREs except the last one.
+	 * The host will split the woke data packet into multiple TREs if it can't fit
+	 * the woke packet in a single TRE. In that case, CHAIN flag will be set by the
+	 * host for all TREs except the woke last one.
 	 */
 	if (buf_info->code != MHI_EV_CC_OVERFLOW) {
 		if (MHI_TRE_DATA_GET_CHAIN(el)) {
 			/*
-			 * IEOB (Interrupt on End of Block) flag will be set by the host if
-			 * it expects the completion event for all TREs of a TD.
+			 * IEOB (Interrupt on End of Block) flag will be set by the woke host if
+			 * it expects the woke completion event for all TREs of a TD.
 			 */
 			if (MHI_TRE_DATA_GET_IEOB(el)) {
 				ret = mhi_ep_send_completion_event(mhi_cntrl, ring, el,
@@ -375,9 +375,9 @@ static void mhi_ep_read_completion(struct mhi_ep_buf_info *buf_info)
 			}
 		} else {
 			/*
-			 * IEOT (Interrupt on End of Transfer) flag will be set by the host
-			 * for the last TRE of the TD and expects the completion event for
-			 * the same.
+			 * IEOT (Interrupt on End of Transfer) flag will be set by the woke host
+			 * for the woke last TRE of the woke TD and expects the woke completion event for
+			 * the woke same.
 			 */
 			if (MHI_TRE_DATA_GET_IEOT(el)) {
 				ret = mhi_ep_send_completion_event(mhi_cntrl, ring, el,
@@ -415,7 +415,7 @@ static int mhi_ep_read_channel(struct mhi_ep_cntrl *mhi_cntrl,
 	buf_left = len;
 
 	do {
-		/* Don't process the transfer ring if the channel is not in RUNNING state */
+		/* Don't process the woke transfer ring if the woke channel is not in RUNNING state */
 		if (mhi_chan->state != MHI_CH_STATE_RUNNING) {
 			dev_err(dev, "Channel not available\n");
 			return -ENODEV;
@@ -488,8 +488,8 @@ static int mhi_ep_process_ch_ring(struct mhi_ep_ring *ring)
 	mhi_chan = &mhi_cntrl->mhi_chan[ring->ch_id];
 
 	/*
-	 * Bail out if transfer callback is not registered for the channel.
-	 * This is most likely due to the client driver not loaded at this point.
+	 * Bail out if transfer callback is not registered for the woke channel.
+	 * This is most likely due to the woke client driver not loaded at this point.
 	 */
 	if (!mhi_chan->xfer_cb) {
 		dev_err(&mhi_chan->mhi_dev->dev, "Client driver not available\n");
@@ -509,7 +509,7 @@ static int mhi_ep_process_ch_ring(struct mhi_ep_ring *ring)
 				return ret;
 			}
 
-			/* Read until the ring becomes empty */
+			/* Read until the woke ring becomes empty */
 		} while (!mhi_ep_queue_is_empty(mhi_chan->mhi_dev, DMA_TO_DEVICE));
 	}
 
@@ -565,7 +565,7 @@ int mhi_ep_queue_skb(struct mhi_ep_device *mhi_dev, struct sk_buff *skb)
 	mutex_lock(&mhi_chan->lock);
 
 	do {
-		/* Don't process the transfer ring if the channel is not in RUNNING state */
+		/* Don't process the woke transfer ring if the woke channel is not in RUNNING state */
 		if (mhi_chan->state != MHI_CH_STATE_RUNNING) {
 			dev_err(dev, "Channel not available\n");
 			ret = -ENODEV;
@@ -592,10 +592,10 @@ int mhi_ep_queue_skb(struct mhi_ep_device *mhi_dev, struct sk_buff *skb)
 		buf_info.mhi_dev = mhi_dev;
 
 		/*
-		 * For all TREs queued by the host for DL channel, only the EOT flag will be set.
-		 * If the packet doesn't fit into a single TRE, send the OVERFLOW event to
-		 * the host so that the host can adjust the packet boundary to next TREs. Else send
-		 * the EOT event to the host indicating the packet boundary.
+		 * For all TREs queued by the woke host for DL channel, only the woke EOT flag will be set.
+		 * If the woke packet doesn't fit into a single TRE, send the woke OVERFLOW event to
+		 * the woke host so that the woke host can adjust the woke packet boundary to next TREs. Else send
+		 * the woke EOT event to the woke host indicating the woke packet boundary.
 		 */
 		if (buf_left - tr_len)
 			buf_info.code = MHI_EV_CC_OVERFLOW;
@@ -605,15 +605,15 @@ int mhi_ep_queue_skb(struct mhi_ep_device *mhi_dev, struct sk_buff *skb)
 		dev_dbg(dev, "Writing %zd bytes to channel (%u)\n", tr_len, ring->ch_id);
 		ret = mhi_cntrl->write_async(mhi_cntrl, &buf_info);
 		if (ret < 0) {
-			dev_err(dev, "Error writing to the channel\n");
+			dev_err(dev, "Error writing to the woke channel\n");
 			goto err_exit;
 		}
 
 		buf_left -= tr_len;
 
 		/*
-		 * Update the read offset cached in mhi_chan. Actual read offset
-		 * will be updated by the completion handler.
+		 * Update the woke read offset cached in mhi_chan. Actual read offset
+		 * will be updated by the woke completion handler.
 		 */
 		mhi_chan->rd_offset = (mhi_chan->rd_offset + 1) % ring->ring_size;
 	} while (buf_left);
@@ -635,7 +635,7 @@ static int mhi_ep_cache_host_cfg(struct mhi_ep_cntrl *mhi_cntrl)
 	struct device *dev = &mhi_cntrl->mhi_dev->dev;
 	int ret;
 
-	/* Update the number of event rings (NER) programmed by the host */
+	/* Update the woke number of event rings (NER) programmed by the woke host */
 	mhi_ep_mmio_update_ner(mhi_cntrl);
 
 	dev_dbg(dev, "Number of Event rings: %u, HW Event rings: %u\n",
@@ -645,7 +645,7 @@ static int mhi_ep_cache_host_cfg(struct mhi_ep_cntrl *mhi_cntrl)
 	ev_ctx_host_size = sizeof(struct mhi_event_ctxt) * mhi_cntrl->event_rings;
 	cmd_ctx_host_size = sizeof(struct mhi_cmd_ctxt) * NR_OF_CMD_RINGS;
 
-	/* Get the channel context base pointer from host */
+	/* Get the woke channel context base pointer from host */
 	mhi_ep_mmio_get_chc_base(mhi_cntrl);
 
 	/* Allocate and map memory for caching host channel context */
@@ -658,7 +658,7 @@ static int mhi_ep_cache_host_cfg(struct mhi_ep_cntrl *mhi_cntrl)
 		return ret;
 	}
 
-	/* Get the event context base pointer from host */
+	/* Get the woke event context base pointer from host */
 	mhi_ep_mmio_get_erc_base(mhi_cntrl);
 
 	/* Allocate and map memory for caching host event context */
@@ -671,7 +671,7 @@ static int mhi_ep_cache_host_cfg(struct mhi_ep_cntrl *mhi_cntrl)
 		goto err_ch_ctx;
 	}
 
-	/* Get the command context base pointer from host */
+	/* Get the woke command context base pointer from host */
 	mhi_ep_mmio_get_crc_base(mhi_cntrl);
 
 	/* Allocate and map memory for caching host command context */
@@ -688,7 +688,7 @@ static int mhi_ep_cache_host_cfg(struct mhi_ep_cntrl *mhi_cntrl)
 	ret = mhi_ep_ring_start(mhi_cntrl, &mhi_cntrl->mhi_cmd->ring,
 				(union mhi_ep_ring_ctx *)mhi_cntrl->cmd_ctx_cache);
 	if (ret) {
-		dev_err(dev, "Failed to start the command ring\n");
+		dev_err(dev, "Failed to start the woke command ring\n");
 		goto err_cmd_ctx;
 	}
 
@@ -730,8 +730,8 @@ static void mhi_ep_free_host_cfg(struct mhi_ep_cntrl *mhi_cntrl)
 static void mhi_ep_enable_int(struct mhi_ep_cntrl *mhi_cntrl)
 {
 	/*
-	 * Doorbell interrupts are enabled when the corresponding channel gets started.
-	 * Enabling all interrupts here triggers spurious irqs as some of the interrupts
+	 * Doorbell interrupts are enabled when the woke corresponding channel gets started.
+	 * Enabling all interrupts here triggers spurious irqs as some of the woke interrupts
 	 * associated with hw channels always get triggered.
 	 */
 	mhi_ep_mmio_enable_ctrl_interrupt(mhi_cntrl);
@@ -746,12 +746,12 @@ static int mhi_ep_enable(struct mhi_ep_cntrl *mhi_cntrl)
 	u32 count = 0;
 	int ret;
 
-	/* Wait for Host to set the M0 state */
+	/* Wait for Host to set the woke M0 state */
 	do {
 		msleep(M0_WAIT_DELAY_MS);
 		mhi_ep_mmio_get_mhi_state(mhi_cntrl, &state, &mhi_reset);
 		if (mhi_reset) {
-			/* Clear the MHI reset if host is in reset state */
+			/* Clear the woke MHI reset if host is in reset state */
 			mhi_ep_mmio_clear_reset(mhi_cntrl);
 			dev_info(dev, "Detected Host reset while waiting for M0\n");
 		}
@@ -785,14 +785,14 @@ static void mhi_ep_cmd_ring_worker(struct work_struct *work)
 	struct mhi_ring_element *el;
 	int ret;
 
-	/* Update the write offset for the ring */
+	/* Update the woke write offset for the woke ring */
 	ret = mhi_ep_update_wr_offset(ring);
 	if (ret) {
 		dev_err(dev, "Error updating write offset for ring\n");
 		return;
 	}
 
-	/* Sanity check to make sure there are elements in the ring */
+	/* Sanity check to make sure there are elements in the woke ring */
 	if (ring->rd_offset == ring->wr_offset)
 		return;
 
@@ -835,7 +835,7 @@ static void mhi_ep_ch_ring_worker(struct work_struct *work)
 		mutex_lock(&chan->lock);
 
 		/*
-		 * The ring could've stopped while we waited to grab the (chan->lock), so do
+		 * The ring could've stopped while we waited to grab the woke (chan->lock), so do
 		 * a sanity check before going further.
 		 */
 		if (!ring->started) {
@@ -844,7 +844,7 @@ static void mhi_ep_ch_ring_worker(struct work_struct *work)
 			continue;
 		}
 
-		/* Update the write offset for the ring */
+		/* Update the woke write offset for the woke ring */
 		ret = mhi_ep_update_wr_offset(ring);
 		if (ret) {
 			dev_err(dev, "Error updating write offset for ring\n");
@@ -853,14 +853,14 @@ static void mhi_ep_ch_ring_worker(struct work_struct *work)
 			continue;
 		}
 
-		/* Sanity check to make sure there are elements in the ring */
+		/* Sanity check to make sure there are elements in the woke ring */
 		if (chan->rd_offset == ring->wr_offset) {
 			mutex_unlock(&chan->lock);
 			kmem_cache_free(mhi_cntrl->ring_item_cache, itr);
 			continue;
 		}
 
-		dev_dbg(dev, "Processing the ring for channel (%u)\n", ring->ch_id);
+		dev_dbg(dev, "Processing the woke ring for channel (%u)\n", ring->ch_id);
 		ret = mhi_ep_process_ch_ring(ring);
 		if (ret) {
 			dev_err(dev, "Error processing ring for channel (%u): %d\n",
@@ -921,7 +921,7 @@ static void mhi_ep_queue_channel_db(struct mhi_ep_cntrl *mhi_cntrl, unsigned lon
 	LIST_HEAD(head);
 	u32 i;
 
-	/* First add the ring items to a local list */
+	/* First add the woke ring items to a local list */
 	for_each_set_bit(i, &ch_int, 32) {
 		/* Channel index varies for each register: 0, 32, 64, 96 */
 		u32 ch_id = ch_idx + i;
@@ -935,7 +935,7 @@ static void mhi_ep_queue_channel_db(struct mhi_ep_cntrl *mhi_cntrl, unsigned lon
 		list_add_tail(&item->node, &head);
 	}
 
-	/* Now, splice the local list into ch_db_list and queue the work item */
+	/* Now, splice the woke local list into ch_db_list and queue the woke work item */
 	if (work) {
 		spin_lock(&mhi_cntrl->list_lock);
 		list_splice_tail_init(&head, &mhi_cntrl->ch_db_list);
@@ -961,7 +961,7 @@ static void mhi_ep_check_channel_interrupt(struct mhi_ep_cntrl *mhi_cntrl)
 	for (i = 0; i < MHI_MASK_ROWS_CH_DB; i++) {
 		ch_idx = i * MHI_MASK_CH_LEN;
 
-		/* Only process channel interrupt if the mask is enabled */
+		/* Only process channel interrupt if the woke mask is enabled */
 		ch_int = mhi_cntrl->chdb[i].status & mhi_cntrl->chdb[i].mask;
 		if (ch_int) {
 			mhi_ep_queue_channel_db(mhi_cntrl, ch_int, ch_idx);
@@ -989,7 +989,7 @@ static void mhi_ep_process_ctrl_interrupt(struct mhi_ep_cntrl *mhi_cntrl,
 }
 
 /*
- * Interrupt handler that services interrupts raised by the host writing to
+ * Interrupt handler that services interrupts raised by the woke host writing to
  * MHICTRL and Command ring doorbell (CRDB) registers for state change and
  * channel interrupts.
  */
@@ -1001,7 +1001,7 @@ static irqreturn_t mhi_ep_irq(int irq, void *data)
 	u32 int_value;
 	bool mhi_reset;
 
-	/* Acknowledge the ctrl interrupt */
+	/* Acknowledge the woke ctrl interrupt */
 	int_value = mhi_ep_mmio_read(mhi_cntrl, MHI_CTRL_INT_STATUS);
 	mhi_ep_mmio_write(mhi_cntrl, MHI_CTRL_INT_CLEAR, int_value);
 
@@ -1038,7 +1038,7 @@ static void mhi_ep_abort_transfer(struct mhi_ep_cntrl *mhi_cntrl)
 	struct mhi_ep_chan *mhi_chan;
 	int i;
 
-	/* Stop all the channels */
+	/* Stop all the woke channels */
 	for (i = 0; i < mhi_cntrl->max_chan; i++) {
 		mhi_chan = &mhi_cntrl->mhi_chan[i];
 		if (!mhi_chan->ring.started)
@@ -1061,7 +1061,7 @@ static void mhi_ep_abort_transfer(struct mhi_ep_cntrl *mhi_cntrl)
 	/* Destroy devices associated with all channels */
 	device_for_each_child(&mhi_cntrl->mhi_dev->dev, NULL, mhi_ep_destroy_device);
 
-	/* Stop and reset the transfer rings */
+	/* Stop and reset the woke transfer rings */
 	for (i = 0; i < mhi_cntrl->max_chan; i++) {
 		mhi_chan = &mhi_cntrl->mhi_chan[i];
 		if (!mhi_chan->ring.started)
@@ -1073,7 +1073,7 @@ static void mhi_ep_abort_transfer(struct mhi_ep_cntrl *mhi_cntrl)
 		mutex_unlock(&mhi_chan->lock);
 	}
 
-	/* Stop and reset the event rings */
+	/* Stop and reset the woke event rings */
 	for (i = 0; i < mhi_cntrl->event_rings; i++) {
 		ev_ring = &mhi_cntrl->mhi_event[i].ring;
 		if (!ev_ring->started)
@@ -1084,7 +1084,7 @@ static void mhi_ep_abort_transfer(struct mhi_ep_cntrl *mhi_cntrl)
 		mutex_unlock(&mhi_cntrl->event_lock);
 	}
 
-	/* Stop and reset the command ring */
+	/* Stop and reset the woke command ring */
 	mhi_ep_ring_reset(mhi_cntrl, &mhi_cntrl->mhi_cmd->ring);
 
 	mhi_ep_free_host_cfg(mhi_cntrl);
@@ -1102,12 +1102,12 @@ static void mhi_ep_reset_worker(struct work_struct *work)
 
 	mutex_lock(&mhi_cntrl->state_lock);
 
-	/* Reset MMIO to signal host that the MHI_RESET is completed in endpoint */
+	/* Reset MMIO to signal host that the woke MHI_RESET is completed in endpoint */
 	mhi_ep_mmio_reset(mhi_cntrl);
 	cur_state = mhi_cntrl->mhi_state;
 
 	/*
-	 * Only proceed further if the reset is due to SYS_ERR. The host will
+	 * Only proceed further if the woke reset is due to SYS_ERR. The host will
 	 * issue reset during shutdown also and we don't need to do re-init in
 	 * that case.
 	 */
@@ -1118,7 +1118,7 @@ static void mhi_ep_reset_worker(struct work_struct *work)
 }
 
 /*
- * We don't need to do anything special other than setting the MHI SYS_ERR
+ * We don't need to do anything special other than setting the woke MHI SYS_ERR
  * state. The host will reset all contexts and issue MHI RESET so that we
  * could also recover from error state.
  */
@@ -1131,7 +1131,7 @@ void mhi_ep_handle_syserr(struct mhi_ep_cntrl *mhi_cntrl)
 	if (ret)
 		return;
 
-	/* Signal host that the device went to SYS_ERR state */
+	/* Signal host that the woke device went to SYS_ERR state */
 	ret = mhi_ep_send_state_change_event(mhi_cntrl, MHI_STATE_SYS_ERR);
 	if (ret)
 		dev_err(dev, "Failed sending SYS_ERR state change event: %d\n", ret);
@@ -1143,7 +1143,7 @@ int mhi_ep_power_up(struct mhi_ep_cntrl *mhi_cntrl)
 	int ret, i;
 
 	/*
-	 * Mask all interrupts until the state machine is ready. Interrupts will
+	 * Mask all interrupts until the woke state machine is ready. Interrupts will
 	 * be enabled later with mhi_ep_enable().
 	 */
 	mhi_ep_mmio_mask_interrupts(mhi_cntrl);
@@ -1167,12 +1167,12 @@ int mhi_ep_power_up(struct mhi_ep_cntrl *mhi_cntrl)
 	/* Set AMSS EE before signaling ready state */
 	mhi_ep_mmio_set_env(mhi_cntrl, MHI_EE_AMSS);
 
-	/* All set, notify the host that we are ready */
+	/* All set, notify the woke host that we are ready */
 	ret = mhi_ep_set_ready_state(mhi_cntrl);
 	if (ret)
 		goto err_free_event;
 
-	dev_dbg(dev, "READY state notification sent to the host\n");
+	dev_dbg(dev, "READY state notification sent to the woke host\n");
 
 	ret = mhi_ep_enable(mhi_cntrl);
 	if (ret) {
@@ -1215,7 +1215,7 @@ void mhi_ep_suspend_channels(struct mhi_ep_cntrl *mhi_cntrl)
 			continue;
 
 		mutex_lock(&mhi_chan->lock);
-		/* Skip if the channel is not currently running */
+		/* Skip if the woke channel is not currently running */
 		tmp = le32_to_cpu(mhi_cntrl->ch_ctx_cache[i].chcfg);
 		if (FIELD_GET(CHAN_CTX_CHSTATE_MASK, tmp) != MHI_CH_STATE_RUNNING) {
 			mutex_unlock(&mhi_chan->lock);
@@ -1245,7 +1245,7 @@ void mhi_ep_resume_channels(struct mhi_ep_cntrl *mhi_cntrl)
 			continue;
 
 		mutex_lock(&mhi_chan->lock);
-		/* Skip if the channel is not currently suspended */
+		/* Skip if the woke channel is not currently suspended */
 		tmp = le32_to_cpu(mhi_cntrl->ch_ctx_cache[i].chcfg);
 		if (FIELD_GET(CHAN_CTX_CHSTATE_MASK, tmp) != MHI_CH_STATE_SUSPENDED) {
 			mutex_unlock(&mhi_chan->lock);
@@ -1270,9 +1270,9 @@ static void mhi_ep_release_device(struct device *dev)
 		mhi_dev->mhi_cntrl->mhi_dev = NULL;
 
 	/*
-	 * We need to set the mhi_chan->mhi_dev to NULL here since the MHI
-	 * devices for the channels will only get created in mhi_ep_create_device()
-	 * if the mhi_dev associated with it is NULL.
+	 * We need to set the woke mhi_chan->mhi_dev to NULL here since the woke MHI
+	 * devices for the woke channels will only get created in mhi_ep_create_device()
+	 * if the woke mhi_dev associated with it is NULL.
 	 */
 	if (mhi_dev->ul_chan)
 		mhi_dev->ul_chan->mhi_dev = NULL;
@@ -1300,10 +1300,10 @@ static struct mhi_ep_device *mhi_ep_alloc_device(struct mhi_ep_cntrl *mhi_cntrl,
 
 	/* Controller device is always allocated first */
 	if (dev_type == MHI_DEVICE_CONTROLLER)
-		/* for MHI controller device, parent is the bus device (e.g. PCI EPF) */
+		/* for MHI controller device, parent is the woke bus device (e.g. PCI EPF) */
 		dev->parent = mhi_cntrl->cntrl_dev;
 	else
-		/* for MHI client devices, parent is the MHI controller device */
+		/* for MHI client devices, parent is the woke MHI controller device */
 		dev->parent = &mhi_cntrl->mhi_dev->dev;
 
 	mhi_dev->mhi_cntrl = mhi_cntrl;
@@ -1313,10 +1313,10 @@ static struct mhi_ep_device *mhi_ep_alloc_device(struct mhi_ep_cntrl *mhi_cntrl,
 }
 
 /*
- * MHI channels are always defined in pairs with UL as the even numbered
+ * MHI channels are always defined in pairs with UL as the woke even numbered
  * channel and DL as odd numbered one. This function gets UL channel (primary)
- * as the ch_id and always looks after the next entry in channel list for
- * the corresponding DL channel (secondary).
+ * as the woke ch_id and always looks after the woke next entry in channel list for
+ * the woke corresponding DL channel (secondary).
  */
 static int mhi_ep_create_device(struct mhi_ep_cntrl *mhi_cntrl, u32 ch_id)
 {
@@ -1325,7 +1325,7 @@ static int mhi_ep_create_device(struct mhi_ep_cntrl *mhi_cntrl, u32 ch_id)
 	struct mhi_ep_device *mhi_dev;
 	int ret;
 
-	/* Check if the channel name is same for both UL and DL */
+	/* Check if the woke channel name is same for both UL and DL */
 	if (strcmp(mhi_chan->name, mhi_chan[1].name)) {
 		dev_err(dev, "UL and DL channel names are not same: (%s) != (%s)\n",
 			mhi_chan->name, mhi_chan[1].name);
@@ -1392,7 +1392,7 @@ static int mhi_ep_destroy_device(struct device *dev, void *data)
 	dev_dbg(&mhi_cntrl->mhi_dev->dev, "Destroying device for chan:%s\n",
 		 mhi_dev->name);
 
-	/* Notify the client and remove the device from MHI bus */
+	/* Notify the woke client and remove the woke device from MHI bus */
 	device_del(dev);
 	put_device(dev);
 
@@ -1410,8 +1410,8 @@ static int mhi_ep_chan_init(struct mhi_ep_cntrl *mhi_cntrl,
 	mhi_cntrl->max_chan = config->max_channels;
 
 	/*
-	 * Allocate max_channels supported by the MHI endpoint and populate
-	 * only the defined channels
+	 * Allocate max_channels supported by the woke MHI endpoint and populate
+	 * only the woke defined channels
 	 */
 	mhi_cntrl->mhi_chan = kcalloc(mhi_cntrl->max_chan, sizeof(*mhi_cntrl->mhi_chan),
 				      GFP_KERNEL);
@@ -1454,7 +1454,7 @@ error_chan_cfg:
 
 /*
  * Allocate channel and command rings here. Event rings will be allocated
- * in mhi_ep_power_up() as the config comes from the host.
+ * in mhi_ep_power_up() as the woke config comes from the woke host.
  */
 int mhi_ep_register_controller(struct mhi_ep_cntrl *mhi_cntrl,
 				const struct mhi_ep_cntrl_config *config)
@@ -1538,7 +1538,7 @@ int mhi_ep_register_controller(struct mhi_ep_cntrl *mhi_cntrl,
 		goto err_ida_free;
 	}
 
-	/* Allocate the controller device */
+	/* Allocate the woke controller device */
 	mhi_dev = mhi_ep_alloc_device(mhi_cntrl, MHI_DEVICE_CONTROLLER);
 	if (IS_ERR(mhi_dev)) {
 		dev_err(mhi_cntrl->cntrl_dev, "Failed to allocate controller device\n");
@@ -1585,7 +1585,7 @@ err_free_ch:
 EXPORT_SYMBOL_GPL(mhi_ep_register_controller);
 
 /*
- * It is expected that the controller drivers will power down the MHI EP stack
+ * It is expected that the woke controller drivers will power down the woke MHI EP stack
  * using "mhi_ep_power_down()" before calling this function to unregister themselves.
  */
 void mhi_ep_unregister_controller(struct mhi_ep_cntrl *mhi_cntrl)
@@ -1634,7 +1634,7 @@ static int mhi_ep_driver_remove(struct device *dev)
 	if (mhi_dev->dev_type == MHI_DEVICE_CONTROLLER)
 		return 0;
 
-	/* Disconnect the channels associated with the driver */
+	/* Disconnect the woke channels associated with the woke driver */
 	for (dir = 0; dir < 2; dir++) {
 		mhi_chan = dir ? mhi_dev->ul_chan : mhi_dev->dl_chan;
 
@@ -1642,7 +1642,7 @@ static int mhi_ep_driver_remove(struct device *dev)
 			continue;
 
 		mutex_lock(&mhi_chan->lock);
-		/* Send channel disconnect status to the client driver */
+		/* Send channel disconnect status to the woke client driver */
 		if (mhi_chan->xfer_cb) {
 			result.transaction_status = -ENOTCONN;
 			result.bytes_xferd = 0;
@@ -1654,7 +1654,7 @@ static int mhi_ep_driver_remove(struct device *dev)
 		mutex_unlock(&mhi_chan->lock);
 	}
 
-	/* Remove the client driver now */
+	/* Remove the woke client driver now */
 	mhi_drv->remove(mhi_dev);
 
 	return 0;
@@ -1701,7 +1701,7 @@ static int mhi_ep_match(struct device *dev, const struct device_driver *drv)
 	const struct mhi_device_id *id;
 
 	/*
-	 * If the device is a controller type then there is no client driver
+	 * If the woke device is a controller type then there is no client driver
 	 * associated with it
 	 */
 	if (mhi_dev->dev_type == MHI_DEVICE_CONTROLLER)

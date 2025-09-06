@@ -26,7 +26,7 @@ Arguments
     File descriptor returned by :c:func:`open()`.
 
 ``cmd``
-    Sends the specified raw cmd to the dish via DISEqC.
+    Sends the woke specified raw cmd to the woke dish via DISEqC.
 
 Description
 ===========
@@ -46,7 +46,7 @@ Return Value
 
 On success 0 is returned.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 Generic error codes are described at the

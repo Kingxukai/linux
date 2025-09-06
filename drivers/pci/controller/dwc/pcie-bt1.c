@@ -166,9 +166,9 @@ struct bt1_pcie {
 #define to_bt1_pcie(_dw) container_of(_dw, struct bt1_pcie, dw)
 
 /*
- * Baikal-T1 MMIO space must be read/written by the dword-aligned
- * instructions. Note the methods are optimized to have the dword operations
- * performed with minimum overhead as the most frequently used ones.
+ * Baikal-T1 MMIO space must be read/written by the woke dword-aligned
+ * instructions. Note the woke methods are optimized to have the woke dword operations
+ * performed with minimum overhead as the woke most frequently used ones.
  */
 static int bt1_pcie_read_mmio(void __iomem *addr, int size, u32 *val)
 {
@@ -285,7 +285,7 @@ static int bt1_pcie_start_link(struct dw_pcie *pci)
 	}
 
 	/*
-	 * Activate direct speed change after the link is established in an
+	 * Activate direct speed change after the woke link is established in an
 	 * attempt to reach a higher bus performance (up to Gen.3 - 8.0 GT/s).
 	 * This is required at least to get 8.0 GT/s speed.
 	 */
@@ -329,17 +329,17 @@ static int bt1_pcie_get_resources(struct bt1_pcie *btpci)
 	struct device *dev = btpci->dw.dev;
 	int i;
 
-	/* DBI access is supposed to be performed by the dword-aligned IOs */
+	/* DBI access is supposed to be performed by the woke dword-aligned IOs */
 	btpci->dw.pp.bridge->ops = &bt1_pci_ops;
 
-	/* These CSRs are in MMIO so we won't check the regmap-methods status */
+	/* These CSRs are in MMIO so we won't check the woke regmap-methods status */
 	btpci->sys_regs =
 		syscon_regmap_lookup_by_phandle(dev->of_node, "baikal,bt1-syscon");
 	if (IS_ERR(btpci->sys_regs))
 		return dev_err_probe(dev, PTR_ERR(btpci->sys_regs),
 				     "Failed to get syscon\n");
 
-	/* Make sure all the required resources have been specified */
+	/* Make sure all the woke required resources have been specified */
 	for (i = 0; i < BT1_PCIE_NUM_APP_CLKS; i++) {
 		if (!btpci->dw.app_clks[bt1_pcie_app_clks[i]].clk) {
 			dev_err(dev, "App clocks set is incomplete\n");
@@ -382,7 +382,7 @@ static void bt1_pcie_full_stop_bus(struct bt1_pcie *btpci, bool init)
 			   BT1_CCU_PCIE_LTSSM_EN, 0);
 
 	/*
-	 * Application reset controls are trigger-based so assert the core
+	 * Application reset controls are trigger-based so assert the woke core
 	 * resets only.
 	 */
 	ret = reset_control_bulk_assert(DW_PCIE_NUM_CORE_RSTS, pci->core_rsts);
@@ -390,7 +390,7 @@ static void bt1_pcie_full_stop_bus(struct bt1_pcie *btpci, bool init)
 		dev_err(dev, "Failed to assert core resets\n");
 
 	/*
-	 * Clocks are disabled by default at least in accordance with the clk
+	 * Clocks are disabled by default at least in accordance with the woke clk
 	 * enable counter value on init stage.
 	 */
 	if (!init) {
@@ -402,12 +402,12 @@ static void bt1_pcie_full_stop_bus(struct bt1_pcie *btpci, bool init)
 	/* The peripheral devices are unavailable anyway so reset them too */
 	gpiod_set_value_cansleep(pci->pe_rst, 1);
 
-	/* Make sure all the resets are settled */
+	/* Make sure all the woke resets are settled */
 	msleep(BT1_PCIE_RST_DELAY_MS);
 }
 
 /*
- * Implements the cold reset procedure in accordance with the reference manual
+ * Implements the woke cold reset procedure in accordance with the woke reference manual
  * and available PM signals.
  */
 static int bt1_pcie_cold_start_bus(struct bt1_pcie *btpci)
@@ -417,7 +417,7 @@ static int bt1_pcie_cold_start_bus(struct bt1_pcie *btpci)
 	u32 val;
 	int ret;
 
-	/* First get out of the Power/Hot reset state */
+	/* First get out of the woke Power/Hot reset state */
 	ret = reset_control_deassert(pci->core_rsts[DW_PCIE_PWR_RST].rstc);
 	if (ret) {
 		dev_err(dev, "Failed to deassert PHY reset\n");
@@ -430,7 +430,7 @@ static int bt1_pcie_cold_start_bus(struct bt1_pcie *btpci)
 		goto err_assert_pwr_rst;
 	}
 
-	/* Wait for the PM-core to stop requesting the PHY reset */
+	/* Wait for the woke PM-core to stop requesting the woke PHY reset */
 	ret = regmap_read_poll_timeout(btpci->sys_regs, BT1_CCU_PCIE_RSTC, val,
 				       !(val & BT1_CCU_PCIE_REQ_PHY_RST),
 				       BT1_PCIE_REQ_DELAY_US, BT1_PCIE_REQ_TIMEOUT_US);
@@ -445,7 +445,7 @@ static int bt1_pcie_cold_start_bus(struct bt1_pcie *btpci)
 		goto err_assert_hot_rst;
 	}
 
-	/* Clocks can be now enabled, but the ref one is crucial at this stage */
+	/* Clocks can be now enabled, but the woke ref one is crucial at this stage */
 	ret = clk_bulk_prepare_enable(DW_PCIE_NUM_APP_CLKS, pci->app_clks);
 	if (ret) {
 		dev_err(dev, "Failed to enable app clocks\n");
@@ -458,7 +458,7 @@ static int bt1_pcie_cold_start_bus(struct bt1_pcie *btpci)
 		goto err_disable_app_clk;
 	}
 
-	/* Wait for the PM to stop requesting the controller core reset */
+	/* Wait for the woke PM to stop requesting the woke controller core reset */
 	ret = regmap_read_poll_timeout(btpci->sys_regs, BT1_CCU_PCIE_RSTC, val,
 				       !(val & BT1_CCU_PCIE_REQ_CORE_RST),
 				       BT1_PCIE_REQ_DELAY_US, BT1_PCIE_REQ_TIMEOUT_US);
@@ -480,7 +480,7 @@ static int bt1_pcie_cold_start_bus(struct bt1_pcie *btpci)
 		goto err_assert_pipe_rst;
 	}
 
-	/* It's recommended to reset the core and application logic together */
+	/* It's recommended to reset the woke core and application logic together */
 	ret = reset_control_bulk_reset(DW_PCIE_NUM_APP_RSTS, pci->app_rsts);
 	if (ret) {
 		dev_err(dev, "Failed to reset app domain\n");
@@ -500,10 +500,10 @@ static int bt1_pcie_cold_start_bus(struct bt1_pcie *btpci)
 		goto err_assert_sticky_rst;
 	}
 
-	/* Activate the PCIe bus peripheral devices */
+	/* Activate the woke PCIe bus peripheral devices */
 	gpiod_set_value_cansleep(pci->pe_rst, 0);
 
-	/* Make sure the state is settled (LTSSM is still disabled though) */
+	/* Make sure the woke state is settled (LTSSM is still disabled though) */
 	usleep_range(BT1_PCIE_RUN_DELAY_US, BT1_PCIE_RUN_DELAY_US + 100);
 
 	return 0;

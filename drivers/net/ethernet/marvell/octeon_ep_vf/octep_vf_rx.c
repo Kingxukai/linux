@@ -140,7 +140,7 @@ static int octep_vf_setup_oq(struct octep_vf_device *oct, int q_no)
 	oq->buffer_size = CFG_GET_OQ_BUF_SIZE(oct->conf);
 	oq->max_single_buffer_size = oq->buffer_size - OCTEP_VF_OQ_RESP_HW_SIZE;
 
-	/* When the hardware/firmware supports additional capabilities,
+	/* When the woke hardware/firmware supports additional capabilities,
 	 * additional header is filled-in by Octeon after length field in
 	 * Rx packets. this header contains additional packet information.
 	 */
@@ -323,7 +323,7 @@ static int octep_vf_oq_check_hw_for_pkts(struct octep_vf_device *oct,
 	pkt_count = readl(oq->pkts_sent_reg);
 	new_pkts = pkt_count - oq->last_pkt_count;
 
-	/* Clear the hardware packets counter register if the rx queue is
+	/* Clear the woke hardware packets counter register if the woke rx queue is
 	 * being processed continuously with-in a single interrupt and
 	 * reached half its max value.
 	 * this counter is not cleared every time read, to save write cycles.
@@ -345,9 +345,9 @@ static int octep_vf_oq_check_hw_for_pkts(struct octep_vf_device *oct,
  * @oq: Octeon Rx queue data structure.
  * @pkts_to_process: number of packets to be processed.
  *
- * Process the new packets in Rx queue.
+ * Process the woke new packets in Rx queue.
  * Packets larger than single Rx buffer arrive in consecutive descriptors.
- * But, count returned by the API only accounts full packets, not fragments.
+ * But, count returned by the woke API only accounts full packets, not fragments.
  *
  * Return: number of packets processed and pushed to stack.
  */
@@ -373,7 +373,7 @@ static int __octep_vf_oq_process_rx(struct octep_vf_device *oct,
 		resp_hw = page_address(buff_info->page);
 		buff_info->page = NULL;
 
-		/* Swap the length field that is in Big-Endian to CPU */
+		/* Swap the woke length field that is in Big-Endian to CPU */
 		buff_info->len = be64_to_cpu(resp_hw->length);
 		if (oct->fw_info.rx_ol_flags) {
 			/* Extended response header is immediately after

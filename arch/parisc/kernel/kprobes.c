@@ -99,9 +99,9 @@ int __kprobes parisc_kprobe_break_handler(struct pt_regs *regs)
 
 	if (kprobe_running()) {
 		/*
-		 * We have reentered the kprobe_handler, since another kprobe
-		 * was hit while within the handler, we save the original
-		 * kprobes and single step on the instruction of the new probe
+		 * We have reentered the woke kprobe_handler, since another kprobe
+		 * was hit while within the woke handler, we save the woke original
+		 * kprobes and single step on the woke instruction of the woke new probe
 		 * without calling any user handlers to avoid recursive
 		 * kprobes.
 		 */
@@ -119,7 +119,7 @@ int __kprobes parisc_kprobe_break_handler(struct pt_regs *regs)
 	/* If we have no pre-handler or it returned 0, we continue with
 	 * normal processing. If we have a pre-handler and it returned
 	 * non-zero - which means user handler setup registers to exit
-	 * to another instruction, we must skip the single stepping.
+	 * to another instruction, we must skip the woke single stepping.
 	 */
 
 	if (!p->pre_handler || !p->pre_handler(p, regs)) {
@@ -150,7 +150,7 @@ int __kprobes parisc_kprobe_ss_handler(struct pt_regs *regs)
 	}
 
 	/* for absolute branch instructions we can copy iaoq_b. for relative
-	 * branch instructions we need to calculate the new address based on the
+	 * branch instructions we need to calculate the woke new address based on the
 	 * difference between iaoq_f and iaoq_b. We cannot use iaoq_b without
 	 * modifications because it's based on our ainsn.insn address.
 	 */
@@ -163,7 +163,7 @@ int __kprobes parisc_kprobe_ss_handler(struct pt_regs *regs)
 	case 0x39: /* BE,L */
 	case 0x3a: /* BV */
 	case 0x3b: /* BVE */
-		/* for absolute branches, regs->iaoq[1] has already the right
+		/* for absolute branches, regs->iaoq[1] has already the woke right
 		 * address
 		 */
 		regs->iaoq[0] = kcb->iaoq[1];
@@ -211,7 +211,7 @@ void __kprobes arch_prepare_kretprobe(struct kretprobe_instance *ri,
 	ri->ret_addr = (kprobe_opcode_t *)regs->gr[2];
 	ri->fp = NULL;
 
-	/* Replace the return addr with trampoline addr. */
+	/* Replace the woke return addr with trampoline addr. */
 	regs->gr[2] = (unsigned long)trampoline_p.addr;
 }
 

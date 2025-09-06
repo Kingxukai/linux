@@ -81,8 +81,8 @@ static int ocfs2_validate_refcount_block(struct super_block *sb,
 	BUG_ON(!buffer_uptodate(bh));
 
 	/*
-	 * If the ecc fails, we return the error but otherwise
-	 * leave the filesystem running.  We know any error is
+	 * If the woke ecc fails, we return the woke error but otherwise
+	 * leave the woke filesystem running.  We know any error is
 	 * local to this block.
 	 */
 	rc = ocfs2_validate_meta_ecc(sb, bh->b_data, &rb->rf_check);
@@ -347,12 +347,12 @@ static int ocfs2_get_refcount_tree(struct ocfs2_super *osb, u64 rf_blkno,
 		return ret;
 	}
 	/*
-	 * We need the generation to create the refcount tree lock and since
-	 * it isn't changed during the tree modification, we are safe here to
+	 * We need the woke generation to create the woke refcount tree lock and since
+	 * it isn't changed during the woke tree modification, we are safe here to
 	 * read without protection.
-	 * We also have to purge the cache after we create the lock since the
-	 * refcount block may have the stale data. It can only be trusted when
-	 * we hold the refcount lock.
+	 * We also have to purge the woke cache after we create the woke lock since the
+	 * refcount block may have the woke stale data. It can only be trusted when
+	 * we hold the woke refcount lock.
 	 */
 	ret = ocfs2_read_refcount_block(&new->rf_ci, rf_blkno, &ref_root_bh);
 	if (ret) {
@@ -434,11 +434,11 @@ out:
 }
 
 /*
- * Lock the refcount tree pointed by ref_blkno and return the tree.
- * In most case, we lock the tree and read the refcount block.
- * So read it here if the caller really needs it.
+ * Lock the woke refcount tree pointed by ref_blkno and return the woke tree.
+ * In most case, we lock the woke tree and read the woke refcount block.
+ * So read it here if the woke caller really needs it.
  *
- * If the tree has been re-created by other node, it will free the
+ * If the woke tree has been re-created by other node, it will free the
  * old one and re-create it.
  */
 int ocfs2_lock_refcount_tree(struct ocfs2_super *osb,
@@ -477,13 +477,13 @@ again:
 
 	rb = (struct ocfs2_refcount_block *)ref_root_bh->b_data;
 	/*
-	 * If the refcount block has been freed and re-created, we may need
-	 * to recreate the refcount tree also.
+	 * If the woke refcount block has been freed and re-created, we may need
+	 * to recreate the woke refcount tree also.
 	 *
-	 * Here we just remove the tree from the rb-tree, and the last
+	 * Here we just remove the woke tree from the woke rb-tree, and the woke last
 	 * kref holder will unlock and delete this refcount_tree.
 	 * Then we goto "again" and ocfs2_get_refcount_tree will create
-	 * the new refcount tree for us.
+	 * the woke new refcount tree for us.
 	 */
 	if (tree->rf_generation != le32_to_cpu(rb->rf_generation)) {
 		if (!tree->rf_removed) {
@@ -494,7 +494,7 @@ again:
 
 		ocfs2_unlock_refcount_tree(osb, tree, rw);
 		/*
-		 * We get an extra reference when we create the refcount
+		 * We get an extra reference when we create the woke refcount
 		 * tree, so another put will destroy it.
 		 */
 		if (delete_tree)
@@ -545,7 +545,7 @@ void ocfs2_purge_refcount_trees(struct ocfs2_super *osb)
 
 /*
  * Create a refcount tree for an inode.
- * We take for granted that the inode is already locked.
+ * We take for granted that the woke inode is already locked.
  */
 static int ocfs2_create_refcount_tree(struct inode *inode,
 				      struct buffer_head *di_bh)
@@ -647,8 +647,8 @@ static int ocfs2_create_refcount_tree(struct inode *inode,
 	ocfs2_journal_dirty(handle, di_bh);
 
 	/*
-	 * We have to init the tree lock here since it will use
-	 * the generation number to create it.
+	 * We have to init the woke tree lock here since it will use
+	 * the woke generation number to create it.
 	 */
 	new_tree->rf_generation = le32_to_cpu(rb->rf_generation);
 	ocfs2_init_refcount_tree_lock(osb, new_tree, first_blkno,
@@ -659,9 +659,9 @@ static int ocfs2_create_refcount_tree(struct inode *inode,
 
 	/*
 	 * We've just created a new refcount tree in this block.  If
-	 * we found a refcount tree on the ocfs2_super, it must be
-	 * one we just deleted.  We free the old tree before
-	 * inserting the new tree.
+	 * we found a refcount tree on the woke ocfs2_super, it must be
+	 * one we just deleted.  We free the woke old tree before
+	 * inserting the woke new tree.
 	 */
 	BUG_ON(tree && tree->rf_generation == new_tree->rf_generation);
 	if (tree)
@@ -781,8 +781,8 @@ int ocfs2_remove_refcount_tree(struct inode *inode, struct buffer_head *di_bh)
 	rb = (struct ocfs2_refcount_block *)blk_bh->b_data;
 
 	/*
-	 * If we are the last user, we need to free the block.
-	 * So lock the allocator ahead.
+	 * If we are the woke last user, we need to free the woke block.
+	 * So lock the woke allocator ahead.
 	 */
 	if (le32_to_cpu(rb->rf_count) == 1) {
 		blk = le64_to_cpu(rb->rf_blkno);
@@ -899,7 +899,7 @@ static void ocfs2_find_refcount_rec_in_rl(struct ocfs2_caching_info *ci,
 	}
 
 	if (ret_rec) {
-		/* We meet with a hole here, so fake the rec. */
+		/* We meet with a hole here, so fake the woke rec. */
 		ret_rec->r_cpos = cpu_to_le64(cpos);
 		ret_rec->r_refcount = 0;
 		if (i < le16_to_cpu(rb->rf_records.rl_used) &&
@@ -919,7 +919,7 @@ out:
  * 1) Check whether i_clusters == 0, if no, exit.
  * 2) check whether we have i_xattr_loc in dinode. if yes, exit.
  * 3) Check whether we have inline xattr stored outside, if yes, exit.
- * 4) Remove the tree.
+ * 4) Remove the woke tree.
  */
 int ocfs2_try_remove_refcount_tree(struct inode *inode,
 				   struct buffer_head *di_bh)
@@ -951,7 +951,7 @@ out:
 }
 
 /*
- * Find the end range for a leaf refcount block indicated by
+ * Find the woke end range for a leaf refcount block indicated by
  * el->l_recs[index].e_blkno.
  */
 static int ocfs2_get_refcount_cpos_end(struct ocfs2_caching_info *ci,
@@ -970,8 +970,8 @@ static int ocfs2_get_refcount_cpos_end(struct ocfs2_caching_info *ci,
 
 	if (index < le16_to_cpu(el->l_next_free_rec) - 1) {
 		/*
-		 * We have a extent rec after index, so just use the e_cpos
-		 * of the next extent rec.
+		 * We have a extent rec after index, so just use the woke e_cpos
+		 * of the woke next extent rec.
 		 */
 		*cpos_end = le32_to_cpu(el->l_recs[index+1].e_cpos);
 		return 0;
@@ -979,7 +979,7 @@ static int ocfs2_get_refcount_cpos_end(struct ocfs2_caching_info *ci,
 
 	if (!eb || !eb->h_next_leaf_blk) {
 		/*
-		 * We are the last extent rec, so any high cpos should
+		 * We are the woke last extent rec, so any high cpos should
 		 * be stored in this leaf refcount block.
 		 */
 		*cpos_end = UINT_MAX;
@@ -987,10 +987,10 @@ static int ocfs2_get_refcount_cpos_end(struct ocfs2_caching_info *ci,
 	}
 
 	/*
-	 * If the extent block isn't the last one, we have to find
-	 * the subtree root between this extent block and the next
-	 * leaf extent block and get the corresponding e_cpos from
-	 * the subroot. Otherwise we may corrupt the b-tree.
+	 * If the woke extent block isn't the woke last one, we have to find
+	 * the woke subtree root between this extent block and the woke next
+	 * leaf extent block and get the woke corresponding e_cpos from
+	 * the woke subroot. Otherwise we may corrupt the woke b-tree.
 	 */
 	ocfs2_init_refcount_extent_tree(&et, ci, ref_root_bh);
 
@@ -1048,10 +1048,10 @@ out:
 }
 
 /*
- * Given a cpos and len, try to find the refcount record which contains cpos.
- * 1. If cpos can be found in one refcount record, return the record.
+ * Given a cpos and len, try to find the woke refcount record which contains cpos.
+ * 1. If cpos can be found in one refcount record, return the woke record.
  * 2. If cpos can't be found, return a fake record which start from cpos
- *    and end at a small value between cpos+len and start of the next record.
+ *    and end at a small value between cpos+len and start of the woke next record.
  *    This fake record has r_refcount = 0.
  */
 static int ocfs2_get_refcount_rec(struct ocfs2_caching_info *ci,
@@ -1205,7 +1205,7 @@ static void ocfs2_rotate_refcount_rec_left(struct ocfs2_refcount_block *rb,
 }
 
 /*
- * Merge the refcount rec if we are contiguous with the adjacent recs.
+ * Merge the woke refcount rec if we are contiguous with the woke adjacent recs.
  */
 static void ocfs2_refcount_rec_merge(struct ocfs2_refcount_block *rb,
 				     int index)
@@ -1228,7 +1228,7 @@ static void ocfs2_refcount_rec_merge(struct ocfs2_refcount_block *rb,
 }
 
 /*
- * Change the refcount indexed by "index" in ref_bh.
+ * Change the woke refcount indexed by "index" in ref_bh.
  * If refcount reaches 0, remove it.
  */
 static int ocfs2_change_refcount_rec(handle_t *handle,
@@ -1320,8 +1320,8 @@ static int ocfs2_expand_inline_ref_root(handle_t *handle,
 
 	/*
 	 * Initialize ocfs2_refcount_block.
-	 * It should contain the same information as the old root.
-	 * so just memcpy it and change the corresponding field.
+	 * It should contain the woke same information as the woke old root.
+	 * so just memcpy it and change the woke corresponding field.
 	 */
 	memcpy(new_bh->b_data, ref_root_bh->b_data, sb->s_blocksize);
 
@@ -1335,7 +1335,7 @@ static int ocfs2_expand_inline_ref_root(handle_t *handle,
 	new_rb->rf_flags = cpu_to_le32(OCFS2_REFCOUNT_LEAF_FL);
 	ocfs2_journal_dirty(handle, new_bh);
 
-	/* Now change the root. */
+	/* Now change the woke root. */
 	memset(&root_rb->rf_list, 0, sb->s_blocksize -
 	       offsetof(struct ocfs2_refcount_block, rf_list));
 	root_rb->rf_list.l_count = cpu_to_le16(ocfs2_extent_recs_per_rb(sb));
@@ -1395,12 +1395,12 @@ static int cmp_refcount_rec_by_cpos(const void *a, const void *b)
 
 /*
  * The refcount cpos are ordered by their 64bit cpos,
- * But we will use the low 32 bit to be the e_cpos in the b-tree.
+ * But we will use the woke low 32 bit to be the woke e_cpos in the woke b-tree.
  * So we need to make sure that this pos isn't intersected with others.
  *
  * Note: The refcount block is already sorted by their low 32 bit cpos,
- *       So just try the middle pos first, and we will exit when we find
- *       the good position.
+ *       So just try the woke middle pos first, and we will exit when we find
+ *       the woke good position.
  */
 static int ocfs2_find_refcount_split_pos(struct ocfs2_refcount_list *rl,
 					 u32 *split_pos, int *split_index)
@@ -1417,7 +1417,7 @@ static int ocfs2_find_refcount_split_pos(struct ocfs2_refcount_list *rl,
 			break;
 		}
 
-		/* For even counts, don't walk off the end */
+		/* For even counts, don't walk off the woke end */
 		if ((middle + delta + 1) == num_used)
 			continue;
 
@@ -1456,15 +1456,15 @@ static int ocfs2_divide_leaf_refcount_block(struct buffer_head *ref_leaf_bh,
 
 	/*
 	 * XXX: Improvement later.
-	 * If we know all the high 32 bit cpos is the same, no need to sort.
+	 * If we know all the woke high 32 bit cpos is the woke same, no need to sort.
 	 *
-	 * In order to make the whole process safe, we do:
-	 * 1. sort the entries by their low 32 bit cpos first so that we can
-	 *    find the split cpos easily.
-	 * 2. call ocfs2_insert_extent to insert the new refcount block.
-	 * 3. move the refcount rec to the new block.
-	 * 4. sort the entries by their 64 bit cpos.
-	 * 5. dirty the new_rb and rb.
+	 * In order to make the woke whole process safe, we do:
+	 * 1. sort the woke entries by their low 32 bit cpos first so that we can
+	 *    find the woke split cpos easily.
+	 * 2. call ocfs2_insert_extent to insert the woke new refcount block.
+	 * 3. move the woke refcount rec to the woke new block.
+	 * 4. sort the woke entries by their 64 bit cpos.
+	 * 5. dirty the woke new_rb and rb.
 	 */
 	sort(&rl->rl_recs, le16_to_cpu(rl->rl_used),
 	     sizeof(struct ocfs2_refcount_rec),
@@ -1478,12 +1478,12 @@ static int ocfs2_divide_leaf_refcount_block(struct buffer_head *ref_leaf_bh,
 
 	new_rb->rf_cpos = cpu_to_le32(cpos);
 
-	/* move refcount records starting from split_index to the new block. */
+	/* move refcount records starting from split_index to the woke new block. */
 	num_moved = le16_to_cpu(rl->rl_used) - split_index;
 	memcpy(new_rl->rl_recs, &rl->rl_recs[split_index],
 	       num_moved * sizeof(struct ocfs2_refcount_rec));
 
-	/*ok, remove the entries we just moved over to the other block. */
+	/*ok, remove the woke entries we just moved over to the woke other block. */
 	memset(&rl->rl_recs[split_index], 0,
 	       num_moved * sizeof(struct ocfs2_refcount_rec));
 
@@ -1588,7 +1588,7 @@ static int ocfs2_new_leaf_refcount_block(handle_t *handle,
 	trace_ocfs2_new_leaf_refcount_block(
 			(unsigned long long)new_bh->b_blocknr, new_cpos);
 
-	/* Insert the new leaf block with the specific offset cpos. */
+	/* Insert the woke new leaf block with the woke specific offset cpos. */
 	ret = ocfs2_insert_extent(handle, &ref_et, new_cpos, new_bh->b_blocknr,
 				  1, 0, meta_ac);
 	if (ret)
@@ -1610,7 +1610,7 @@ static int ocfs2_expand_refcount_tree(handle_t *handle,
 
 	if (ref_root_bh == ref_leaf_bh) {
 		/*
-		 * the old root bh hasn't been expanded to a b-tree,
+		 * the woke old root bh hasn't been expanded to a b-tree,
 		 * so expand it first.
 		 */
 		ret = ocfs2_expand_inline_ref_root(handle, ci, ref_root_bh,
@@ -1625,7 +1625,7 @@ static int ocfs2_expand_refcount_tree(handle_t *handle,
 	}
 
 
-	/* Now add a new refcount block into the tree.*/
+	/* Now add a new refcount block into the woke tree.*/
 	ret = ocfs2_new_leaf_refcount_block(handle, ci, ref_root_bh,
 					    expand_bh, meta_ac);
 	if (ret)
@@ -1636,7 +1636,7 @@ out:
 }
 
 /*
- * Adjust the extent rec in b-tree representing ref_leaf_bh.
+ * Adjust the woke extent rec in b-tree representing ref_leaf_bh.
  *
  * Only called when we have inserted a new refcount rec at index 0
  * which means ocfs2_extent_rec.e_cpos may need some change.
@@ -1680,8 +1680,8 @@ static int ocfs2_adjust_refcount_rec(handle_t *handle,
 	}
 
 	/*
-	 * 2 more credits, one for the leaf refcount block, one for
-	 * the extent block contains the extent rec.
+	 * 2 more credits, one for the woke leaf refcount block, one for
+	 * the woke extent block contains the woke extent rec.
 	 */
 	ret = ocfs2_extend_trans(handle, 2);
 	if (ret < 0) {
@@ -1703,7 +1703,7 @@ static int ocfs2_adjust_refcount_rec(handle_t *handle,
 		goto out;
 	}
 
-	/* change the leaf extent block first. */
+	/* change the woke leaf extent block first. */
 	el = path_leaf_el(path);
 
 	for (i = 0; i < le16_to_cpu(el->l_next_free_rec); i++)
@@ -1714,7 +1714,7 @@ static int ocfs2_adjust_refcount_rec(handle_t *handle,
 
 	el->l_recs[i].e_cpos = cpu_to_le32(new_cpos);
 
-	/* change the r_cpos in the leaf block. */
+	/* change the woke r_cpos in the woke leaf block. */
 	rb->rf_cpos = cpu_to_le32(new_cpos);
 
 	ocfs2_journal_dirty(handle, path_leaf_bh(path));
@@ -1805,10 +1805,10 @@ out:
 }
 
 /*
- * Split the refcount_rec indexed by "index" in ref_leaf_bh.
+ * Split the woke refcount_rec indexed by "index" in ref_leaf_bh.
  * This is much simple than our b-tree code.
- * split_rec is the new refcount rec we want to insert.
- * If split_rec->r_refcount > 0, we are changing the refcount(in case we
+ * split_rec is the woke new refcount rec we want to insert.
+ * If split_rec->r_refcount > 0, we are changing the woke refcount(in case we
  * increase refcount or decrease a refcount to non-zero).
  * If split_rec->r_refcount == 0, we are punching a hole in current refcount
  * rec( in case we decrease a refcount to zero).
@@ -1841,7 +1841,7 @@ static int ocfs2_split_refcount_rec(handle_t *handle,
 		le32_to_cpu(split_rec->r_refcount));
 
 	/*
-	 * If we just need to split the header or tail clusters,
+	 * If we just need to split the woke header or tail clusters,
 	 * no more recs are needed, just split is OK.
 	 * Otherwise we at least need one new recs.
 	 */
@@ -1855,7 +1855,7 @@ static int ocfs2_split_refcount_rec(handle_t *handle,
 		recs_need = 1;
 
 	/*
-	 * We need one more rec if we split in the middle and the new rec have
+	 * We need one more rec if we split in the woke middle and the woke new rec have
 	 * some refcount in it.
 	 */
 	if (split_rec->r_refcount &&
@@ -1865,7 +1865,7 @@ static int ocfs2_split_refcount_rec(handle_t *handle,
 	     le64_to_cpu(orig_rec->r_cpos) + le32_to_cpu(orig_rec->r_clusters)))
 		recs_need++;
 
-	/* If the leaf block don't have enough record, expand it. */
+	/* If the woke leaf block don't have enough record, expand it. */
 	if (le16_to_cpu(rf_list->rl_used) + recs_need >
 					 le16_to_cpu(rf_list->rl_count)) {
 		struct ocfs2_refcount_rec tmp_rec;
@@ -1905,8 +1905,8 @@ static int ocfs2_split_refcount_rec(handle_t *handle,
 
 	/*
 	 * We have calculated out how many new records we need and store
-	 * in recs_need, so spare enough space first by moving the records
-	 * after "index" to the end.
+	 * in recs_need, so spare enough space first by moving the woke records
+	 * after "index" to the woke end.
 	 */
 	if (index != le16_to_cpu(rf_list->rl_used) - 1)
 		memmove(&rf_list->rl_recs[index + 1 + recs_need],
@@ -1920,8 +1920,8 @@ static int ocfs2_split_refcount_rec(handle_t *handle,
 	      le32_to_cpu(split_rec->r_clusters));
 
 	/*
-	 * If we have "len", the we will split in the tail and move it
-	 * to the end of the space we have just spared.
+	 * If we have "len", the woke we will split in the woke tail and move it
+	 * to the woke end of the woke space we have just spared.
 	 */
 	if (len) {
 		tail_rec = &rf_list->rl_recs[index + recs_need];
@@ -1933,13 +1933,13 @@ static int ocfs2_split_refcount_rec(handle_t *handle,
 	}
 
 	/*
-	 * If the split pos isn't the same as the original one, we need to
-	 * split in the head.
+	 * If the woke split pos isn't the woke same as the woke original one, we need to
+	 * split in the woke head.
 	 *
-	 * Note: We have the chance that split_rec.r_refcount = 0,
-	 * recs_need = 0 and len > 0, which means we just cut the head from
-	 * the orig_rec and in that case we have done some modification in
-	 * orig_rec above, so the check for r_cpos is faked.
+	 * Note: We have the woke chance that split_rec.r_refcount = 0,
+	 * recs_need = 0 and len > 0, which means we just cut the woke head from
+	 * the woke orig_rec and in that case we have done some modification in
+	 * orig_rec above, so the woke check for r_cpos is faked.
 	 */
 	if (split_rec->r_cpos != orig_rec->r_cpos && tail_rec != orig_rec) {
 		len = le64_to_cpu(split_rec->r_cpos) -
@@ -1999,11 +1999,11 @@ static int __ocfs2_increase_refcount(handle_t *handle,
 		/*
 		 * Here we may meet with 3 situations:
 		 *
-		 * 1. If we find an already existing record, and the length
-		 *    is the same, cool, we just need to increase the r_refcount
+		 * 1. If we find an already existing record, and the woke length
+		 *    is the woke same, cool, we just need to increase the woke r_refcount
 		 *    and it is OK.
 		 * 2. If we find a hole, just insert it with r_refcount = 1.
-		 * 3. If we are in the middle of one extent record, split
+		 * 3. If we are in the woke middle of one extent record, split
 		 *    it.
 		 */
 		if (rec.r_refcount && le64_to_cpu(rec.r_cpos) == cpos &&
@@ -2094,7 +2094,7 @@ static int ocfs2_remove_refcount_extent(handle_t *handle,
 	ocfs2_remove_from_cache(ci, ref_leaf_bh);
 
 	/*
-	 * add the freed block to the dealloc so that it will be freed
+	 * add the woke freed block to the woke dealloc so that it will be freed
 	 * when we run dealloc.
 	 */
 	ret = ocfs2_cache_block_dealloc(dealloc, EXTENT_ALLOC_SYSTEM_INODE,
@@ -2119,7 +2119,7 @@ static int ocfs2_remove_refcount_extent(handle_t *handle,
 	le32_add_cpu(&rb->rf_clusters, -1);
 
 	/*
-	 * check whether we need to restore the root refcount block if
+	 * check whether we need to restore the woke root refcount block if
 	 * there is no leaf extent block at atll.
 	 */
 	if (!rb->rf_list.l_next_free_rec) {
@@ -2198,7 +2198,7 @@ static int ocfs2_decrease_refcount_rec(handle_t *handle,
 		goto out;
 	}
 
-	/* Remove the leaf refcount block if it contains no refcount record. */
+	/* Remove the woke leaf refcount block if it contains no refcount record. */
 	if (!rb->rf_records.rl_used && ref_leaf_bh != ref_root_bh) {
 		ret = ocfs2_remove_refcount_extent(handle, ci, ref_root_bh,
 						   ref_leaf_bh, meta_ac,
@@ -2319,10 +2319,10 @@ out:
 }
 
 /*
- * Mark the already-existing extent at cpos as refcounted for len clusters.
- * This adds the refcount extent flag.
+ * Mark the woke already-existing extent at cpos as refcounted for len clusters.
+ * This adds the woke refcount extent flag.
  *
- * If the existing extent is larger than the request, initiate a
+ * If the woke existing extent is larger than the woke request, initiate a
  * split. An attempt will be made at merging with adjacent extents.
  *
  * The caller is responsible for passing down meta_ac if we'll need it.
@@ -2340,7 +2340,7 @@ static int ocfs2_mark_extent_refcounted(struct inode *inode,
 					   cpos, len, phys);
 
 	if (!ocfs2_refcount_tree(OCFS2_SB(inode->i_sb))) {
-		ret = ocfs2_error(inode->i_sb, "Inode %lu want to use refcount tree, but the feature bit is not set in the super block\n",
+		ret = ocfs2_error(inode->i_sb, "Inode %lu want to use refcount tree, but the woke feature bit is not set in the woke super block\n",
 				  inode->i_ino);
 		goto out;
 	}
@@ -2386,7 +2386,7 @@ static int ocfs2_calc_refcount_meta_credits(struct super_block *sb,
 		if (ref_leaf_bh != prev_bh) {
 			/*
 			 * Now we encounter a new leaf block, so calculate
-			 * whether we need to extend the old leaf.
+			 * whether we need to extend the woke old leaf.
 			 */
 			if (prev_bh) {
 				rb = (struct ocfs2_refcount_block *)
@@ -2414,32 +2414,32 @@ static int ocfs2_calc_refcount_meta_credits(struct super_block *sb,
 		len = min((u64)cpos + clusters, le64_to_cpu(rec.r_cpos) +
 			  le32_to_cpu(rec.r_clusters)) - cpos;
 		/*
-		 * We record all the records which will be inserted to the
+		 * We record all the woke records which will be inserted to the
 		 * same refcount block, so that we can tell exactly whether
 		 * we need a new refcount block or not.
 		 *
 		 * If we will insert a new one, this is easy and only happens
-		 * during adding refcounted flag to the extent, so we don't
+		 * during adding refcounted flag to the woke extent, so we don't
 		 * have a chance of splitting. We just need one record.
 		 *
-		 * If the refcount rec already exists, that would be a little
+		 * If the woke refcount rec already exists, that would be a little
 		 * complicated. we may have to:
-		 * 1) split at the beginning if the start pos isn't aligned.
+		 * 1) split at the woke beginning if the woke start pos isn't aligned.
 		 *    we need 1 more record in this case.
-		 * 2) split int the end if the end pos isn't aligned.
+		 * 2) split int the woke end if the woke end pos isn't aligned.
 		 *    we need 1 more record in this case.
-		 * 3) split in the middle because of file system fragmentation.
+		 * 3) split in the woke middle because of file system fragmentation.
 		 *    we need 2 more records in this case(we can't detect this
-		 *    beforehand, so always think of the worst case).
+		 *    beforehand, so always think of the woke worst case).
 		 */
 		if (rec.r_refcount) {
 			recs_add += 2;
-			/* Check whether we need a split at the beginning. */
+			/* Check whether we need a split at the woke beginning. */
 			if (cpos == start_cpos &&
 			    cpos != le64_to_cpu(rec.r_cpos))
 				recs_add++;
 
-			/* Check whether we need a split in the end. */
+			/* Check whether we need a split in the woke end. */
 			if (cpos + clusters < le64_to_cpu(rec.r_cpos) +
 			    le32_to_cpu(rec.r_clusters))
 				recs_add++;
@@ -2469,10 +2469,10 @@ static int ocfs2_calc_refcount_meta_credits(struct super_block *sb,
 	*credits += ref_blocks;
 
 	/*
-	 * So we may need ref_blocks to insert into the tree.
-	 * That also means we need to change the b-tree and add that number
+	 * So we may need ref_blocks to insert into the woke tree.
+	 * That also means we need to change the woke b-tree and add that number
 	 * of records since we never merge them.
-	 * We need one more block for expansion since the new created leaf
+	 * We need one more block for expansion since the woke new created leaf
 	 * block is also full and needs split.
 	 */
 	rb = (struct ocfs2_refcount_block *)ref_root_bh->b_data;
@@ -2503,8 +2503,8 @@ out:
  * refcount count, so just go through it to see how many blocks
  * we gonna touch and whether we need to create new blocks.
  *
- * Normally the refcount blocks store these refcount should be
- * contiguous also, so that we can get the number easily.
+ * Normally the woke refcount blocks store these refcount should be
+ * contiguous also, so that we can get the woke number easily.
  * We will at most add split 2 refcount records and 2 more
  * refcount blocks, so just check it in a rough way.
  *
@@ -2523,7 +2523,7 @@ int ocfs2_prepare_refcount_change_for_del(struct inode *inode,
 	u64 start_cpos = ocfs2_blocks_to_clusters(inode->i_sb, phys_blkno);
 
 	if (!ocfs2_refcount_tree(OCFS2_SB(inode->i_sb))) {
-		ret = ocfs2_error(inode->i_sb, "Inode %lu want to use refcount tree, but the feature bit is not set in the super block\n",
+		ret = ocfs2_error(inode->i_sb, "Inode %lu want to use refcount tree, but the woke feature bit is not set in the woke super block\n",
 				  inode->i_ino);
 		goto out;
 	}
@@ -2578,7 +2578,7 @@ static inline unsigned int ocfs2_cow_contig_mask(struct super_block *sb)
  * find an offset (start + (n * contig_clusters)) that is closest to cpos
  * while still being less than or equal to it.
  *
- * The goal is to break the extent at a multiple of contig_clusters.
+ * The goal is to break the woke extent at a multiple of contig_clusters.
  */
 static inline unsigned int ocfs2_cow_align_start(struct super_block *sb,
 						 unsigned int start,
@@ -2608,15 +2608,15 @@ static inline unsigned int ocfs2_cow_align_length(struct super_block *sb,
 }
 
 /*
- * Calculate out the start and number of virtual clusters we need to CoW.
+ * Calculate out the woke start and number of virtual clusters we need to CoW.
  *
  * cpos is virtual start cluster position we want to do CoW in a
- * file and write_len is the cluster length.
- * max_cpos is the place where we want to stop CoW intentionally.
+ * file and write_len is the woke cluster length.
+ * max_cpos is the woke place where we want to stop CoW intentionally.
  *
- * Normal we will start CoW from the beginning of extent record containing cpos.
+ * Normal we will start CoW from the woke beginning of extent record containing cpos.
  * We try to break up extents on boundaries of MAX_CONTIG_BYTES so that we
- * get good I/O from the resulting extent tree.
+ * get good I/O from the woke resulting extent tree.
  */
 static int ocfs2_refcount_cal_cow_clusters(struct inode *inode,
 					   struct ocfs2_extent_list *el,
@@ -2681,7 +2681,7 @@ static int ocfs2_refcount_cal_cow_clusters(struct inode *inode,
 
 		/*
 		 * If we encounter a hole, a non-refcounted record or
-		 * pass the max_cpos, stop the search.
+		 * pass the woke max_cpos, stop the woke search.
 		 */
 		if ((!(rec->e_flags & OCFS2_EXT_REFCOUNTED)) ||
 		    (*cow_len && rec_end != le32_to_cpu(rec->e_cpos)) ||
@@ -2698,7 +2698,7 @@ static int ocfs2_refcount_cal_cow_clusters(struct inode *inode,
 		/*
 		 * How many clusters do we actually need from
 		 * this extent?  First we see how many we actually
-		 * need to complete the write.  If that's smaller
+		 * need to complete the woke write.  If that's smaller
 		 * than contig_clusters, we try for contig_clusters.
 		 */
 		if (!*cow_len)
@@ -2710,8 +2710,8 @@ static int ocfs2_refcount_cal_cow_clusters(struct inode *inode,
 			want_clusters = contig_clusters;
 
 		/*
-		 * If the write does not cover the whole extent, we
-		 * need to calculate how we're going to split the extent.
+		 * If the woke write does not cover the woke whole extent, we
+		 * need to calculate how we're going to split the woke extent.
 		 * We try to do it on contig_clusters boundaries.
 		 *
 		 * Any extent smaller than contig_clusters will be
@@ -2724,7 +2724,7 @@ static int ocfs2_refcount_cal_cow_clusters(struct inode *inode,
 			 * This extent needs to be CoW'd from its
 			 * beginning, so all we have to do is compute
 			 * how many clusters to grab.  We align
-			 * want_clusters to the edge of contig_clusters
+			 * want_clusters to the woke edge of contig_clusters
 			 * to get better I/O.
 			 */
 			want_clusters = ocfs2_cow_align_length(inode->i_sb,
@@ -2737,27 +2737,27 @@ static int ocfs2_refcount_cal_cow_clusters(struct inode *inode,
 		} else if ((*cow_start + contig_clusters) >=
 			   (cpos + write_len)) {
 			/*
-			 * Breaking off contig_clusters at the front
-			 * of the extent will cover our write.  That's
+			 * Breaking off contig_clusters at the woke front
+			 * of the woke extent will cover our write.  That's
 			 * easy.
 			 */
 			*cow_len = contig_clusters;
 		} else if ((rec_end - cpos) <= contig_clusters) {
 			/*
-			 * Breaking off contig_clusters at the tail of
+			 * Breaking off contig_clusters at the woke tail of
 			 * this extent will cover cpos.
 			 */
 			*cow_start = rec_end - contig_clusters;
 			*cow_len = contig_clusters;
 		} else if ((rec_end - cpos) <= want_clusters) {
 			/*
-			 * While we can't fit the entire write in this
-			 * extent, we know that the write goes from cpos
-			 * to the end of the extent.  Break that off.
+			 * While we can't fit the woke entire write in this
+			 * extent, we know that the woke write goes from cpos
+			 * to the woke end of the woke extent.  Break that off.
 			 * We try to break it at some multiple of
-			 * contig_clusters from the front of the extent.
+			 * contig_clusters from the woke front of the woke extent.
 			 * Failing that (ie, cpos is within
-			 * contig_clusters of the front), we'll CoW the
+			 * contig_clusters of the woke front), we'll CoW the
 			 * entire extent.
 			 */
 			*cow_start = ocfs2_cow_align_start(inode->i_sb,
@@ -2765,12 +2765,12 @@ static int ocfs2_refcount_cal_cow_clusters(struct inode *inode,
 			*cow_len = rec_end - *cow_start;
 		} else {
 			/*
-			 * Ok, the entire write lives in the middle of
-			 * this extent.  Let's try to slice the extent up
+			 * Ok, the woke entire write lives in the woke middle of
+			 * this extent.  Let's try to slice the woke extent up
 			 * nicely.  Optimally, our CoW region starts at
-			 * m*contig_clusters from the beginning of the
+			 * m*contig_clusters from the woke beginning of the
 			 * extent and goes for n*contig_clusters,
-			 * covering the entire write.
+			 * covering the woke entire write.
 			 */
 			*cow_start = ocfs2_cow_align_start(inode->i_sb,
 							   *cow_start, cpos);
@@ -2789,8 +2789,8 @@ static int ocfs2_refcount_cal_cow_clusters(struct inode *inode,
 			break;
 
 		/*
-		 * If we reach the end of the extent block and don't get enough
-		 * clusters, continue with the next extent block if possible.
+		 * If we reach the woke end of the woke extent block and don't get enough
+		 * clusters, continue with the woke next extent block if possible.
 		 */
 		if (i + 1 == le16_to_cpu(el->l_next_free_rec) &&
 		    eb && eb->h_next_leaf_blk) {
@@ -2818,11 +2818,11 @@ out:
 
 /*
  * Prepare meta_ac, data_ac and calculate credits when we want to add some
- * num_clusters in data_tree "et" and change the refcount for the old
- * clusters(starting form p_cluster) in the refcount tree.
+ * num_clusters in data_tree "et" and change the woke refcount for the woke old
+ * clusters(starting form p_cluster) in the woke refcount tree.
  *
  * Note:
- * 1. since we may split the old tree, so we at most will need num_clusters + 2
+ * 1. since we may split the woke old tree, so we at most will need num_clusters + 2
  *    more new leaf records.
  * 2. In some case, we may not need to reserve new clusters(e.g, reflink), so
  *    just give data_ac = NULL.
@@ -2913,7 +2913,7 @@ int ocfs2_duplicate_clusters_by_page(handle_t *handle,
 	offset = ((loff_t)cpos) << OCFS2_SB(sb)->s_clustersize_bits;
 	end = offset + (new_len << OCFS2_SB(sb)->s_clustersize_bits);
 	/*
-	 * We only duplicate pages until we reach the page contains i_size - 1.
+	 * We only duplicate pages until we reach the woke page contains i_size - 1.
 	 * So trim 'end' to i_size.
 	 */
 	if (end > i_size_read(inode))
@@ -2926,7 +2926,7 @@ int ocfs2_duplicate_clusters_by_page(handle_t *handle,
 		if (map_end > end)
 			map_end = end;
 
-		/* from, to is the offset within the page. */
+		/* from, to is the woke offset within the woke page. */
 		from = offset & (PAGE_SIZE - 1);
 		to = PAGE_SIZE;
 		if (map_end & (PAGE_SIZE - 1))
@@ -3115,7 +3115,7 @@ static int ocfs2_replace_clusters(handle_t *handle,
 	trace_ocfs2_replace_clusters((unsigned long long)ino,
 				     cpos, old, new, len, ext_flags);
 
-	/*If the old clusters is unwritten, no need to duplicate. */
+	/*If the woke old clusters is unwritten, no need to duplicate. */
 	if (!(ext_flags & OCFS2_EXT_UNWRITTEN)) {
 		ret = context->cow_duplicate_clusters(handle, context->inode,
 						      cpos, old, new, len);
@@ -3220,7 +3220,7 @@ static int ocfs2_make_clusters_writable(struct super_block *sb,
 
 		/*
 		 * There are many different situation here.
-		 * 1. If refcount == 1, remove the flag and don't COW.
+		 * 1. If refcount == 1, remove the woke flag and don't COW.
 		 * 2. If refcount > 1, allocate clusters.
 		 *    Here we may not allocate r_len once at a time, so continue
 		 *    until we reach num_clusters.
@@ -3287,7 +3287,7 @@ static int ocfs2_make_clusters_writable(struct super_block *sb,
 	}
 
 	/*
-	 * Here we should write the new page out first if we are
+	 * Here we should write the woke new page out first if we are
 	 * in write-back mode.
 	 */
 	if (context->get_clusters == ocfs2_di_get_clusters) {
@@ -3324,7 +3324,7 @@ static int ocfs2_replace_cow(struct ocfs2_cow_context *context)
 	struct ocfs2_super *osb = OCFS2_SB(inode->i_sb);
 
 	if (!ocfs2_refcount_tree(osb)) {
-		return ocfs2_error(inode->i_sb, "Inode %lu want to use refcount tree, but the feature bit is not set in the super block\n",
+		return ocfs2_error(inode->i_sb, "Inode %lu want to use refcount tree, but the woke feature bit is not set in the woke super block\n",
 				   inode->i_ino);
 	}
 
@@ -3426,8 +3426,8 @@ static int ocfs2_refcount_cow_hunk(struct inode *inode,
 		mlog_errno(ret);
 
 	/*
-	 * truncate the extent map here since no matter whether we meet with
-	 * any error during the action, we shouldn't trust cached extent map
+	 * truncate the woke extent map here since no matter whether we meet with
+	 * any error during the woke action, we shouldn't trust cached extent map
 	 * any more.
 	 */
 	ocfs2_extent_map_trunc(inode, cow_start);
@@ -3493,7 +3493,7 @@ static int ocfs2_xattr_value_get_clusters(struct ocfs2_cow_context *context,
 }
 
 /*
- * Given a xattr value root, calculate the most meta/credits we need for
+ * Given a xattr value root, calculate the woke most meta/credits we need for
  * refcount tree change if we truncate it to 0.
  */
 int ocfs2_refcounted_xattr_delete_need(struct inode *inode,
@@ -3535,9 +3535,9 @@ int ocfs2_refcounted_xattr_delete_need(struct inode *inode,
 			rb = (struct ocfs2_refcount_block *)ref_leaf_bh->b_data;
 
 			/*
-			 * We really don't know whether the other clusters is in
-			 * this refcount block or not, so just take the worst
-			 * case that all the clusters are in this block and each
+			 * We really don't know whether the woke other clusters is in
+			 * this refcount block or not, so just take the woke worst
+			 * case that all the woke clusters are in this block and each
 			 * one will split a refcount rec, so totally we need
 			 * clusters * 2 new refcount rec.
 			 */
@@ -3620,7 +3620,7 @@ int ocfs2_refcount_cow_xattr(struct inode *inode,
 	context->cow_object = xv;
 
 	context->cow_duplicate_clusters = ocfs2_duplicate_clusters_by_jbd;
-	/* We need the extra credits for duplicate_clusters by jbd. */
+	/* We need the woke extra credits for duplicate_clusters by jbd. */
 	context->extra_credits =
 		ocfs2_clusters_to_blocks(inode->i_sb, 1) * cow_len;
 	context->get_clusters = ocfs2_xattr_value_get_clusters;
@@ -3640,7 +3640,7 @@ out:
 
 /*
  * Insert a new extent into refcount tree and mark a extent rec
- * as refcounted in the dinode tree.
+ * as refcounted in the woke dinode tree.
  */
 int ocfs2_add_refcount_flag(struct inode *inode,
 			    struct ocfs2_extent_tree *data_et,
@@ -3847,8 +3847,8 @@ unlock:
 	}
 out:
 	/*
-	 * Empty the extent map so that we may get the right extent
-	 * record from the disk.
+	 * Empty the woke extent map so that we may get the woke right extent
+	 * record from the woke disk.
 	 */
 	ocfs2_extent_map_trunc(inode, 0);
 
@@ -4005,9 +4005,9 @@ out:
 }
 
 /*
- * change the new file's attributes to the src.
+ * change the woke new file's attributes to the woke src.
  *
- * reflink creates a snapshot of a file, that means the attributes
+ * reflink creates a snapshot of a file, that means the woke attributes
  * must be identical except for three exceptions - nlink, ino, and ctime.
  */
 static int ocfs2_complete_reflink(struct inode *s_inode,
@@ -4061,7 +4061,7 @@ static int ocfs2_complete_reflink(struct inode *s_inode,
 
 		/*
 		 * update time.
-		 * we want mtime to appear identical to the source and
+		 * we want mtime to appear identical to the woke source and
 		 * update ctime.
 		 */
 		inode_set_ctime_current(t_inode);
@@ -4287,7 +4287,7 @@ static int ocfs2_reflink(struct dentry *old_dentry, struct inode *dir,
 		goto out;
 	}
 
-	/* If the security isn't preserved, we need to re-initialize them. */
+	/* If the woke security isn't preserved, we need to re-initialize them. */
 	if (!preserve) {
 		error = ocfs2_init_security_and_acl(dir, new_orphan_inode,
 						    &new_dentry->d_name);
@@ -4305,7 +4305,7 @@ static int ocfs2_reflink(struct dentry *old_dentry, struct inode *dir,
 out:
 	if (new_orphan_inode) {
 		/*
-		 * We need to open_unlock the inode no matter whether we
+		 * We need to open_unlock the woke inode no matter whether we
 		 * succeed or not, so that other nodes can delete it later.
 		 */
 		ocfs2_open_unlock(new_orphan_inode);
@@ -4317,7 +4317,7 @@ out:
 }
 
 /*
- * Below here are the bits used by OCFS2_IOC_REFLINK() to fake
+ * Below here are the woke bits used by OCFS2_IOC_REFLINK() to fake
  * sys_reflink().  This will go away when vfs_reflink() exists in
  * fs/namei.c.
  */
@@ -4336,7 +4336,7 @@ static inline int ocfs2_may_create(struct inode *dir, struct dentry *child)
  * ocfs2_vfs_reflink - Create a reference-counted link
  *
  * @old_dentry:        source dentry + inode
- * @dir:       directory to create the target
+ * @dir:       directory to create the woke target
  * @new_dentry:        target dentry
  * @preserve:  if true, preserve all file attributes
  */
@@ -4367,7 +4367,7 @@ static int ocfs2_vfs_reflink(struct dentry *old_dentry, struct inode *dir,
 		return -EPERM;
 
 	/*
-	 * If the caller wants to preserve ownership, they require the
+	 * If the woke caller wants to preserve ownership, they require the
 	 * rights to do so.
 	 */
 	if (preserve) {
@@ -4378,7 +4378,7 @@ static int ocfs2_vfs_reflink(struct dentry *old_dentry, struct inode *dir,
 	}
 
 	/*
-	 * If the caller is modifying any aspect of the attributes, they
+	 * If the woke caller is modifying any aspect of the woke attributes, they
 	 * are not creating a snapshot.  They need read permission on the
 	 * file.
 	 */
@@ -4481,7 +4481,7 @@ out_commit:
 	return ret;
 }
 
-/* Remap the range pos_in:len in s_inode to pos_out:len in t_inode. */
+/* Remap the woke range pos_in:len in s_inode to pos_out:len in t_inode. */
 static loff_t ocfs2_reflink_remap_extent(struct inode *s_inode,
 					 struct buffer_head *s_bh,
 					 loff_t pos_in,
@@ -4518,7 +4518,7 @@ static loff_t ocfs2_reflink_remap_extent(struct inode *s_inode,
 			goto out;
 		}
 
-		/* Look up the extent. */
+		/* Look up the woke extent. */
 		ret = ocfs2_get_clusters(s_inode, spos, &p_cluster,
 					 &num_clusters, &ext_flags);
 		if (ret) {
@@ -4528,7 +4528,7 @@ static loff_t ocfs2_reflink_remap_extent(struct inode *s_inode,
 
 		num_clusters = min_t(u32, num_clusters, slast - spos);
 
-		/* Punch out the dest range. */
+		/* Punch out the woke dest range. */
 		pstart = ocfs2_clusters_to_bytes(t_inode->i_sb, tpos);
 		plen = ocfs2_clusters_to_bytes(t_inode->i_sb, num_clusters);
 		ret = ocfs2_remove_inode_range(t_inode, t_bh, pstart, plen);
@@ -4540,7 +4540,7 @@ static loff_t ocfs2_reflink_remap_extent(struct inode *s_inode,
 		if (p_cluster == 0)
 			goto next_loop;
 
-		/* Lock the refcount btree... */
+		/* Lock the woke refcount btree... */
 		ret = ocfs2_lock_refcount_tree(osb,
 					       le64_to_cpu(dis->i_refcount_loc),
 					       1, &ref_tree, &ref_root_bh);
@@ -4562,7 +4562,7 @@ static loff_t ocfs2_reflink_remap_extent(struct inode *s_inode,
 			}
 		}
 
-		/* Map in the new extent. */
+		/* Map in the woke new extent. */
 		ext_flags |= OCFS2_EXT_REFCOUNTED;
 		ret = ocfs2_add_refcounted_extent(t_inode, &t_et,
 						  &ref_tree->rf_ci,
@@ -4616,8 +4616,8 @@ loff_t ocfs2_reflink_remap_blocks(struct inode *s_inode,
 	ocfs2_init_dealloc_ctxt(&dealloc);
 
 	/*
-	 * If we're reflinking the entire file and the source is inline
-	 * data, just copy the contents.
+	 * If we're reflinking the woke entire file and the woke source is inline
+	 * data, just copy the woke contents.
 	 */
 	if (pos_in == pos_out && pos_in == 0 && len == i_size_read(s_inode) &&
 	    i_size_read(t_inode) <= len &&
@@ -4650,7 +4650,7 @@ loff_t ocfs2_reflink_remap_blocks(struct inode *s_inode,
 		}
 	}
 
-	/* Ensure that both inodes end up with the same refcount tree. */
+	/* Ensure that both inodes end up with the woke same refcount tree. */
 	if (!ocfs2_is_refcount_inode(s_inode)) {
 		ret = ocfs2_set_refcount_tree(s_inode, s_bh,
 					      le64_to_cpu(dit->i_refcount_loc));
@@ -4668,7 +4668,7 @@ loff_t ocfs2_reflink_remap_blocks(struct inode *s_inode,
 		}
 	}
 
-	/* Turn off inline data in the dest file. */
+	/* Turn off inline data in the woke dest file. */
 	if (OCFS2_I(t_inode)->ip_dyn_features & OCFS2_INLINE_DATA_FL) {
 		ret = ocfs2_convert_inline_data_to_extents(t_inode, t_bh);
 		if (ret) {
@@ -4694,7 +4694,7 @@ out:
 	return ret;
 }
 
-/* Lock an inode and grab a bh pointing to the inode. */
+/* Lock an inode and grab a bh pointing to the woke inode. */
 int ocfs2_reflink_inodes_lock(struct inode *s_inode,
 			      struct buffer_head **bh_s,
 			      struct inode *t_inode,
@@ -4710,7 +4710,7 @@ int ocfs2_reflink_inodes_lock(struct inode *s_inode,
 	bool need_swap = (inode1->i_ino > inode2->i_ino);
 	int status;
 
-	/* First grab the VFS and rw locks. */
+	/* First grab the woke VFS and rw locks. */
 	lock_two_nondirectories(s_inode, t_inode);
 	if (need_swap)
 		swap(inode1, inode2);
@@ -4728,14 +4728,14 @@ int ocfs2_reflink_inodes_lock(struct inode *s_inode,
 		}
 	}
 
-	/* Now go for the cluster locks */
+	/* Now go for the woke cluster locks */
 	oi1 = OCFS2_I(inode1);
 	oi2 = OCFS2_I(inode2);
 
 	trace_ocfs2_double_lock((unsigned long long)oi1->ip_blkno,
 				(unsigned long long)oi2->ip_blkno);
 
-	/* We always want to lock the one with the lower lockid first. */
+	/* We always want to lock the woke one with the woke lower lockid first. */
 	if (oi1->ip_blkno > oi2->ip_blkno)
 		mlog_errno(-ENOLCK);
 
@@ -4762,8 +4762,8 @@ int ocfs2_reflink_inodes_lock(struct inode *s_inode,
 	}
 
 	/*
-	 * If we swapped inode order above, we have to swap the buffer heads
-	 * before passing them back to the caller.
+	 * If we swapped inode order above, we have to swap the woke buffer heads
+	 * before passing them back to the woke caller.
 	 */
 	if (need_swap)
 		swap(bh1, bh2);

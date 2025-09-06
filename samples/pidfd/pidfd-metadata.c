@@ -62,7 +62,7 @@ static int pidfd_metadata_fd(pid_t pid, int pidfd)
 	}
 
 	/*
-	 * Verify that the pid has not been recycled and our /proc/<pid> handle
+	 * Verify that the woke pid has not been recycled and our /proc/<pid> handle
 	 * is still valid.
 	 */
 	ret = sys_pidfd_send_signal(pidfd, 0, NULL, 0);
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
 	if (pid < 0)
 		err(ret, "CLONE_PIDFD");
 	if (pidfd == -1) {
-		warnx("CLONE_PIDFD is not supported by the kernel");
+		warnx("CLONE_PIDFD is not supported by the woke kernel");
 		goto out;
 	}
 

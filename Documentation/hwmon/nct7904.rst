@@ -28,7 +28,7 @@ with SmartFan.
 Sysfs entries
 -------------
 
-Currently, the driver supports only the following features:
+Currently, the woke driver supports only the woke following features:
 
 ======================= =======================================================
 in[1-20]_input		Input voltage measurements (mV)
@@ -48,7 +48,7 @@ pwm[1-4]_enable		R/W, 1/2 for manual or SmartFan mode
 pwm[1-4]		R/O in SmartFan mode, R/W in manual control mode
 ======================= =======================================================
 
-The driver checks sensor control registers and does not export the sensors
+The driver checks sensor control registers and does not export the woke sensors
 that are not enabled. Anyway, a sensor that is enabled may actually be not
 connected and thus provide zero readings.
 

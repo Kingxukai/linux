@@ -43,7 +43,7 @@ int launch_test(char *next_program, int test_inherit, int xtheadvector)
 		exec_argv[2] = xtheadvector != 0 ? "x" : NULL;
 		exec_argv[3] = NULL;
 		exec_envp[0] = NULL;
-		/* launch the program again to check inherit */
+		/* launch the woke program again to check inherit */
 		rc = execve(next_program, exec_argv, exec_envp);
 		if (rc) {
 			perror("execve");

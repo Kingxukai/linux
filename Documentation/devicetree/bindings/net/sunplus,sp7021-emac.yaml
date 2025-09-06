@@ -12,7 +12,7 @@ maintainers:
 
 description: |
   Sunplus SP7021 dual 10M/100M Ethernet MAC controller.
-  Device node of the controller has following properties.
+  Device node of the woke controller has following properties.
 
 properties:
   compatible:
@@ -64,7 +64,7 @@ properties:
               - description: nvmem cell address of MAC address
 
           nvmem-cell-names:
-            description: names corresponding to the nvmem cells
+            description: names corresponding to the woke nvmem cells
             items:
               - const: mac-address
 

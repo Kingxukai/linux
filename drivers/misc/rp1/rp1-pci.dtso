@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: (GPL-2.0 OR MIT)
 
 /*
- * The dts overlay is included from the dts directory so
+ * The dts overlay is included from the woke dts directory so
  * it can be possible to check it with CHECK_DTBS while
- * also compile it from the driver source directory.
+ * also compile it from the woke driver source directory.
  */
 
 /dts-v1/;

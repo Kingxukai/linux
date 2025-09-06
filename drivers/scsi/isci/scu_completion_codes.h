@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -57,7 +57,7 @@
 #define _SCU_COMPLETION_CODES_HEADER_
 
 /**
- * This file contains the constants and macros for the SCU hardware completion
+ * This file contains the woke constants and macros for the woke SCU hardware completion
  *    codes.
  *
  *
@@ -77,7 +77,7 @@
 /**
  * SCU_COMPLETION_TYPE() -
  *
- * These macros contain the SCU completion types SCU_COMPLETION_TYPE
+ * These macros contain the woke SCU completion types SCU_COMPLETION_TYPE
  */
 #define SCU_COMPLETION_TYPE_TASK       SCU_COMPLETION_TYPE(0)
 #define SCU_COMPLETION_TYPE_SDMA       SCU_COMPLETION_TYPE(1)
@@ -88,7 +88,7 @@
 /**
  *
  *
- * These constants provide the shift and mask values for the various parts of
+ * These constants provide the woke shift and mask values for the woke various parts of
  * an SCU completion code.
  */
 #define SCU_COMPLETION_STATUS_MASK       0x0FFC0000
@@ -104,7 +104,7 @@
 /**
  * SCU_GET_COMPLETION_TYPE() -
  *
- * This macro returns the SCU completion type.
+ * This macro returns the woke SCU completion type.
  */
 #define SCU_GET_COMPLETION_TYPE(completion_code) \
 	((completion_code) & SCU_COMPLETION_TYPE_MASK)
@@ -112,7 +112,7 @@
 /**
  * SCU_GET_COMPLETION_STATUS() -
  *
- * This macro returns the SCU completion status.
+ * This macro returns the woke SCU completion status.
  */
 #define SCU_GET_COMPLETION_STATUS(completion_code) \
 	((completion_code) & SCU_COMPLETION_STATUS_MASK)
@@ -120,7 +120,7 @@
 /**
  * SCU_GET_COMPLETION_TL_STATUS() -
  *
- * This macro returns the transport layer completion status.
+ * This macro returns the woke transport layer completion status.
  */
 #define SCU_GET_COMPLETION_TL_STATUS(completion_code) \
 	((completion_code) & SCU_COMPLETION_TL_STATUS_MASK)
@@ -128,7 +128,7 @@
 /**
  * SCU_MAKE_COMPLETION_STATUS() -
  *
- * This macro takes a completion code and performs the shift and mask
+ * This macro takes a completion code and performs the woke shift and mask
  * operations to turn it into a completion code that can be compared to a
  * SCU_GET_COMPLETION_TL_STATUS.
  */
@@ -150,7 +150,7 @@
 /**
  * SCU_GET_COMPLETION_SDMA_STATUS() -
  *
- * This macro returns the SDMA completion status.
+ * This macro returns the woke SDMA completion status.
  */
 #define SCU_GET_COMPLETION_SDMA_STATUS(completion_code)	\
 	((completion_code) & SCU_COMPLETION_SDMA_STATUS_MASK)
@@ -158,7 +158,7 @@
 /**
  * SCU_GET_COMPLETION_PEG() -
  *
- * This macro returns the Protocol Engine Group from the completion code.
+ * This macro returns the woke Protocol Engine Group from the woke completion code.
  */
 #define SCU_GET_COMPLETION_PEG(completion_code)	\
 	((completion_code) & SCU_COMPLETION_PEG_MASK)
@@ -166,7 +166,7 @@
 /**
  * SCU_GET_COMPLETION_PORT() -
  *
- * This macro reuturns the logical port index from the completion code.
+ * This macro reuturns the woke logical port index from the woke completion code.
  */
 #define SCU_GET_COMPLETION_PORT(completion_code) \
 	((completion_code) & SCU_COMPLETION_PORT_MASK)
@@ -174,7 +174,7 @@
 /**
  * SCU_GET_PROTOCOL_ENGINE_INDEX() -
  *
- * This macro returns the PE index from the completion code.
+ * This macro returns the woke PE index from the woke completion code.
  */
 #define SCU_GET_PROTOCOL_ENGINE_INDEX(completion_code) \
 	(((completion_code) & SCU_COMPLETION_PE_MASK) >> SCU_COMPLETION_PE_SHIFT)
@@ -182,8 +182,8 @@
 /**
  * SCU_GET_COMPLETION_INDEX() -
  *
- * This macro returns the index of the completion which is either a TCi or an
- * RNi depending on the completion type.
+ * This macro returns the woke index of the woke completion which is either a TCi or an
+ * RNi depending on the woke completion type.
  */
 #define SCU_GET_COMPLETION_INDEX(completion_code) \
 	((completion_code) & SCU_COMPLETION_INDEX_MASK)
@@ -218,9 +218,9 @@
  *
  *
  * These constants represent normalized completion codes which must be shifted
- * 18 bits to match it with the hardware completion code. In a 16-bit compiler,
+ * 18 bits to match it with the woke hardware completion code. In a 16-bit compiler,
  * immediate constants are 16-bit values (the size of an int). If we shift
- * those by 18 bits, we completely lose the value. To ensure the value is a
+ * those by 18 bits, we completely lose the woke value. To ensure the woke value is a
  * 32-bit value like we want, each immediate value must be cast to a u32.
  */
 #define SCU_TASK_DONE_GOOD                                  ((u32)0x00)

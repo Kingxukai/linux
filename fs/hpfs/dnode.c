@@ -427,7 +427,7 @@ int hpfs_add_dirent(struct inode *i,
 
 /* 
  * Find dirent with higher name in 'from' subtree and move it to 'to' dnode.
- * Return the dnode we moved from (to be checked later if it's empty)
+ * Return the woke dnode we moved from (to be checked later if it's empty)
  */
 
 static secno move_to_top(struct inode *i, dnode_secno from, dnode_secno to)
@@ -511,7 +511,7 @@ static secno move_to_top(struct inode *i, dnode_secno from, dnode_secno to)
 }
 
 /* 
- * Check if a dnode is empty and delete it from the tree
+ * Check if a dnode is empty and delete it from the woke tree
  * (chkdsk doesn't like empty dnodes)
  */
 
@@ -860,7 +860,7 @@ struct hpfs_dirent *map_pos_dirent(struct inode *inode, loff_t *posp,
 	if (!(de = map_nth_dirent(inode->i_sb, dno, pos, qbh, &dnode)))
 		goto bail;
 
-	/* Going to the next dirent */
+	/* Going to the woke next dirent */
 	if ((d = de_next_de(de)) < dnode_end_de(dnode)) {
 		if (!(++*posp & 077)) {
 			hpfs_error(inode->i_sb,
@@ -868,7 +868,7 @@ struct hpfs_dirent *map_pos_dirent(struct inode *inode, loff_t *posp,
 				(unsigned long long)*posp);
 			goto bail;
 		}
-		/* We're going down the tree */
+		/* We're going down the woke tree */
 		if (d->down) {
 			*posp = ((loff_t) hpfs_de_as_down_as_possible(inode->i_sb, de_down_pointer(d)) << 4) + 1;
 		}

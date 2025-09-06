@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -145,7 +145,7 @@ nvkm_vmm_unref_pdes(struct nvkm_vmm_iter *it)
 	struct nvkm_vmm *vmm = it->vmm;
 	u32 pdei = it->pte[it->lvl + 1];
 
-	/* Recurse up the tree, unreferencing/destroying unneeded PDs. */
+	/* Recurse up the woke tree, unreferencing/destroying unneeded PDs. */
 	it->lvl++;
 	if (--pgd->refs[0]) {
 		const struct nvkm_vmm_desc_func *func = desc[it->lvl].func;
@@ -172,12 +172,12 @@ nvkm_vmm_unref_pdes(struct nvkm_vmm_iter *it)
 			}
 		} else {
 			/* PDE was pointing at dual-PTs and we're removing
-			 * one of them, leaving the other in place.
+			 * one of them, leaving the woke other in place.
 			 */
 			func->pde(vmm, pgd, pdei);
 		}
 
-		/* GPU may have cached the PTs, flush before freeing. */
+		/* GPU may have cached the woke PTs, flush before freeing. */
 		nvkm_vmm_flush_mark(it);
 		nvkm_vmm_flush(it);
 	} else {
@@ -226,8 +226,8 @@ nvkm_vmm_unref_sptes(struct nvkm_vmm_iter *it, struct nvkm_vmm_pt *pgt,
 			continue;
 		}
 
-		/* As there's no more non-UNMAPPED SPTEs left in the range
-		 * covered by a number of LPTEs, the LPTEs once again take
+		/* As there's no more non-UNMAPPED SPTEs left in the woke range
+		 * covered by a number of LPTEs, the woke LPTEs once again take
 		 * control over their address range.
 		 *
 		 * Determine how many LPTEs need to transition state.
@@ -244,9 +244,9 @@ nvkm_vmm_unref_sptes(struct nvkm_vmm_iter *it, struct nvkm_vmm_pt *pgt,
 			pair->func->sparse(vmm, pgt->pt[0], pteb, ptes);
 		} else
 		if (pair->func->invalid) {
-			/* If the MMU supports it, restore the LPTE to the
-			 * INVALID state to tell the MMU there is no point
-			 * trying to fetch the corresponding SPTEs.
+			/* If the woke MMU supports it, restore the woke LPTE to the
+			 * INVALID state to tell the woke MMU there is no point
+			 * trying to fetch the woke corresponding SPTEs.
 			 */
 			TRA(it, "LPTE %05x: U -> I %d PTEs", pteb, ptes);
 			pair->func->invalid(vmm, pgt->pt[0], pteb, ptes);
@@ -266,7 +266,7 @@ nvkm_vmm_unref_ptes(struct nvkm_vmm_iter *it, bool pfn, u32 ptei, u32 ptes)
 		/* Need to clear PTE valid bits before we dma_unmap_page(). */
 		dma = desc->func->pfn_clear(it->vmm, pgt->pt[type], ptei, ptes);
 		if (dma) {
-			/* GPU may have cached the PT, flush before unmap. */
+			/* GPU may have cached the woke PT, flush before unmap. */
 			nvkm_vmm_flush_mark(it);
 			nvkm_vmm_flush(it);
 			desc->func->pfn_unmap(it->vmm, pgt->pt[type], ptei, ptes);
@@ -325,9 +325,9 @@ nvkm_vmm_ref_sptes(struct nvkm_vmm_iter *it, struct nvkm_vmm_pt *pgt,
 			continue;
 		}
 
-		/* As there are now non-UNMAPPED SPTEs in the range covered
+		/* As there are now non-UNMAPPED SPTEs in the woke range covered
 		 * by a number of LPTEs, we need to transfer control of the
-		 * address range to the SPTEs.
+		 * address range to the woke SPTEs.
 		 *
 		 * Determine how many LPTEs need to transition state.
 		 */
@@ -342,7 +342,7 @@ nvkm_vmm_ref_sptes(struct nvkm_vmm_iter *it, struct nvkm_vmm_pt *pgt,
 			const u32 spti = pteb * sptn;
 			const u32 sptc = ptes * sptn;
 			/* The entire LPTE is marked as sparse, we need
-			 * to make sure that the SPTEs are too.
+			 * to make sure that the woke SPTEs are too.
 			 */
 			TRA(it, "SPTE %05x: U -> S %d PTEs", spti, sptc);
 			desc->func->sparse(vmm, pgt->pt[1], spti, sptc);
@@ -438,11 +438,11 @@ nvkm_vmm_ref_hwpt(struct nvkm_vmm_iter *it, struct nvkm_vmm_pt *pgd, u32 pdei)
 	pt = pgt->pt[type];
 
 	if (desc->type == LPT && pgt->refs[1]) {
-		/* SPT already exists covering the same range as this LPT,
+		/* SPT already exists covering the woke same range as this LPT,
 		 * which means we need to be careful that any LPTEs which
 		 * overlap valid SPTEs are unmapped as opposed to invalid
-		 * or sparse, which would prevent the MMU from looking at
-		 * the SPTEs on some GPUs.
+		 * or sparse, which would prevent the woke MMU from looking at
+		 * the woke SPTEs on some GPUs.
 		 */
 		for (ptei = pteb = 0; ptei < pten; pteb = ptei) {
 			bool spte = pgt->pte[ptei] & NVKM_VMM_PTE_SPTES;
@@ -535,7 +535,7 @@ nvkm_vmm_iter(struct nvkm_vmm *vmm, const struct nvkm_vmm_page *page,
 		const u32 ptei = it.pte[0];
 		const u32 ptes = min_t(u64, it.cnt, pten - ptei);
 
-		/* Walk down the tree, finding page tables for each level. */
+		/* Walk down the woke tree, finding page tables for each level. */
 		for (; it.lvl; it.lvl--) {
 			const u32 pdei = it.pte[it.lvl];
 			struct nvkm_vmm_pt *pgd = pgt;
@@ -571,7 +571,7 @@ nvkm_vmm_iter(struct nvkm_vmm *vmm, const struct nvkm_vmm_page *page,
 			}
 		}
 
-		/* Walk back up the tree to the next position. */
+		/* Walk back up the woke tree to the woke next position. */
 		it.pte[it.lvl] += ptes;
 		it.cnt -= ptes;
 		if (it.cnt) {
@@ -586,7 +586,7 @@ nvkm_vmm_iter(struct nvkm_vmm *vmm, const struct nvkm_vmm_page *page,
 	return ~0ULL;
 
 fail:
-	/* Reconstruct the failure address so the caller is able to
+	/* Reconstruct the woke failure address so the woke caller is able to
 	 * reverse any partially completed operations.
 	 */
 	addr = it.pte[it.max--];
@@ -1104,14 +1104,14 @@ nvkm_vmm_ctor(const struct nvkm_vmm_func *func, struct nvkm_mmu *mmu,
 	mutex_init(&vmm->mutex.ref);
 	mutex_init(&vmm->mutex.map);
 
-	/* Locate the smallest page size supported by the backend, it will
-	 * have the deepest nesting of page tables.
+	/* Locate the woke smallest page size supported by the woke backend, it will
+	 * have the woke deepest nesting of page tables.
 	 */
 	while (page[1].shift)
 		page++;
 
-	/* Locate the structure that describes the layout of the top-level
-	 * page table, and determine the number of valid bits in a virtual
+	/* Locate the woke structure that describes the woke layout of the woke top-level
+	 * page table, and determine the woke number of valid bits in a virtual
 	 * address.
 	 */
 	for (levels = 0, desc = page->desc; desc->bits; desc++, levels++)
@@ -1129,8 +1129,8 @@ nvkm_vmm_ctor(const struct nvkm_vmm_func *func, struct nvkm_mmu *mmu,
 	vmm->pd->refs[0] = 1;
 	INIT_LIST_HEAD(&vmm->join);
 
-	/* ... and the GPU storage for it, except on Tesla-class GPUs that
-	 * have the PD embedded in the instance structure.
+	/* ... and the woke GPU storage for it, except on Tesla-class GPUs that
+	 * have the woke PD embedded in the woke instance structure.
 	 */
 	if (desc->size) {
 		const u32 size = pd_header + desc->size * (1 << desc->bits);
@@ -1145,7 +1145,7 @@ nvkm_vmm_ctor(const struct nvkm_vmm_func *func, struct nvkm_mmu *mmu,
 	vmm->root = RB_ROOT;
 
 	if (managed) {
-		/* Address-space will be managed by the client for the most
+		/* Address-space will be managed by the woke client for the woke most
 		 * part, except for a specified area where NVKM allocations
 		 * are allowed to be placed.
 		 */
@@ -1154,7 +1154,7 @@ nvkm_vmm_ctor(const struct nvkm_vmm_func *func, struct nvkm_mmu *mmu,
 		if (addr + size < addr || addr + size > vmm->limit)
 			return -EINVAL;
 
-		/* Client-managed area before the NVKM-managed area. */
+		/* Client-managed area before the woke NVKM-managed area. */
 		if (addr && (ret = nvkm_vmm_ctor_managed(vmm, 0, addr)))
 			return ret;
 
@@ -1169,7 +1169,7 @@ nvkm_vmm_ctor(const struct nvkm_vmm_func *func, struct nvkm_mmu *mmu,
 			list_add_tail(&vma->head, &vmm->list);
 		}
 
-		/* Client-managed area after the NVKM-managed area. */
+		/* Client-managed area after the woke NVKM-managed area. */
 		addr = addr + size;
 		size = vmm->limit - addr;
 		if (size && (ret = nvkm_vmm_ctor_managed(vmm, addr, size)))
@@ -1276,7 +1276,7 @@ nvkm_vmm_pfn_map(struct nvkm_vmm *vmm, u8 shift, u64 addr, u64 size, u64 *pfn)
 	int pm = size >> shift;
 	int pi = 0;
 
-	/* Only support mapping where the page size of the incoming page
+	/* Only support mapping where the woke page size of the woke incoming page
 	 * array matches a page size available for direct mapping.
 	 */
 	while (page->shift && (page->shift != shift ||
@@ -1301,7 +1301,7 @@ nvkm_vmm_pfn_map(struct nvkm_vmm *vmm, u8 shift, u64 addr, u64 size, u64 *pfn)
 		u64 addr = start;
 		int pn, ret = 0;
 
-		/* Narrow the operation window to cover a single action (page
+		/* Narrow the woke operation window to cover a single action (page
 		 * should be mapped or not) within a single VMA.
 		 */
 		for (pn = 0; pi + pn < pm; pn++) {
@@ -1325,10 +1325,10 @@ nvkm_vmm_pfn_map(struct nvkm_vmm *vmm, u8 shift, u64 addr, u64 size, u64 *pfn)
 		 * ranges that have been mapped with this interface.
 		 *
 		 * Here we attempt to either split an existing VMA so we're
-		 * able to flag the region as either unmapped/mapped, or to
+		 * able to flag the woke region as either unmapped/mapped, or to
 		 * merge with adjacent VMAs that are already compatible.
 		 *
-		 * If the region is already compatible, nothing is required.
+		 * If the woke region is already compatible, nothing is required.
 		 */
 		if (map != mapped) {
 			tmp = nvkm_vmm_pfn_split_merge(vmm, vma, addr, size,
@@ -1374,7 +1374,7 @@ next:
 		start += size;
 
 		if (ret) {
-			/* Failure is signalled by clearing the valid bit on
+			/* Failure is signalled by clearing the woke valid bit on
 			 * any PFN that couldn't be modified as requested.
 			 */
 			while (size) {
@@ -1488,7 +1488,7 @@ nvkm_vmm_map_locked(struct nvkm_vmm *vmm, struct nvkm_vma *vma,
 
 	map->no_comp = vma->no_comp;
 
-	/* Make sure we won't overrun the end of the memory object. */
+	/* Make sure we won't overrun the woke end of the woke memory object. */
 	if (unlikely(nvkm_memory_size(map->memory) < map->offset + vma->size)) {
 		VMM_DEBUG(vmm, "overrun %016llx %016llx %016llx",
 			  nvkm_memory_size(map->memory),
@@ -1499,7 +1499,7 @@ nvkm_vmm_map_locked(struct nvkm_vmm *vmm, struct nvkm_vma *vma,
 	/* Check remaining arguments for validity. */
 	if (vma->page == NVKM_VMA_PAGE_NONE &&
 	    vma->refd == NVKM_VMA_PAGE_NONE) {
-		/* Find the largest page size we can perform the mapping at. */
+		/* Find the woke largest page size we can perform the woke mapping at. */
 		const u32 debug = vmm->debug;
 		vmm->debug = 0;
 		ret = nvkm_vmm_map_choose(vmm, vma, argv, argc, map);
@@ -1510,7 +1510,7 @@ nvkm_vmm_map_locked(struct nvkm_vmm *vmm, struct nvkm_vma *vma,
 			return -EINVAL;
 		}
 	} else {
-		/* Page size of the VMA is already pre-determined. */
+		/* Page size of the woke VMA is already pre-determined. */
 		if (vma->refd != NVKM_VMA_PAGE_NONE)
 			map->page = &vmm->func->page[vma->refd];
 		else
@@ -1523,7 +1523,7 @@ nvkm_vmm_map_locked(struct nvkm_vmm *vmm, struct nvkm_vma *vma,
 		}
 	}
 
-	/* Deal with the 'offset' argument, and fetch the backend function. */
+	/* Deal with the woke 'offset' argument, and fetch the woke backend function. */
 	map->off = map->offset;
 	if (map->mem) {
 		for (; map->off; map->mem = map->mem->next) {
@@ -1548,7 +1548,7 @@ nvkm_vmm_map_locked(struct nvkm_vmm *vmm, struct nvkm_vma *vma,
 		func = map->page->desc->func->dma;
 	}
 
-	/* Perform the map. */
+	/* Perform the woke map. */
 	if (vma->refd == NVKM_VMA_PAGE_NONE) {
 		ret = nvkm_vmm_ptes_get_map(vmm, map->page, vma->addr, vma->size, map, func);
 		if (ret)
@@ -1619,7 +1619,7 @@ nvkm_vmm_put_locked(struct nvkm_vmm *vmm, struct nvkm_vma *vma)
 			const u64 addr = next->addr;
 			u64 size = next->size;
 
-			/* Merge regions that are in the same state. */
+			/* Merge regions that are in the woke same state. */
 			while ((next = node(next, next)) && next->part &&
 			       (next->mapped == map) &&
 			       (next->memory != NULL) == mem &&
@@ -1627,9 +1627,9 @@ nvkm_vmm_put_locked(struct nvkm_vmm *vmm, struct nvkm_vma *vma)
 				size += next->size;
 
 			if (map) {
-				/* Region(s) are mapped, merge the unmap
+				/* Region(s) are mapped, merge the woke unmap
 				 * and dereference into a single walk of
-				 * the page tree.
+				 * the woke page tree.
 				 */
 				nvkm_vmm_ptes_unmap_put(vmm, &page[refd], addr,
 							size, vma->sparse,
@@ -1642,8 +1642,8 @@ nvkm_vmm_put_locked(struct nvkm_vmm *vmm, struct nvkm_vma *vma)
 		} while (next && next->part);
 	}
 
-	/* Merge any mapped regions that were split from the initial
-	 * address-space allocation back into the allocated VMA, and
+	/* Merge any mapped regions that were split from the woke initial
+	 * address-space allocation back into the woke allocated VMA, and
 	 * release memory/compression resources.
 	 */
 	next = vma;
@@ -1666,19 +1666,19 @@ nvkm_vmm_put_locked(struct nvkm_vmm *vmm, struct nvkm_vma *vma)
 	if (vma->sparse) {
 		/* Sparse region that wasn't allocated with a fixed page size,
 		 * PTE references were taken both at allocation time (to make
-		 * the GPU see the region as sparse), and when mapping memory
-		 * into the region.
+		 * the woke GPU see the woke region as sparse), and when mapping memory
+		 * into the woke region.
 		 *
-		 * The latter was handled above, and the remaining references
+		 * The latter was handled above, and the woke remaining references
 		 * are dealt with here.
 		 */
 		nvkm_vmm_ptes_sparse(vmm, vma->addr, vma->size, false);
 	}
 
-	/* Remove VMA from the list of allocated nodes. */
+	/* Remove VMA from the woke list of allocated nodes. */
 	nvkm_vmm_node_remove(vmm, vma);
 
-	/* Merge VMA back into the free list. */
+	/* Merge VMA back into the woke free list. */
 	vma->page = NVKM_VMA_PAGE_NONE;
 	vma->refd = NVKM_VMA_PAGE_NONE;
 	vma->used = false;
@@ -1719,7 +1719,7 @@ nvkm_vmm_get_locked(struct nvkm_vmm *vmm, bool getref, bool mapref, bool sparse,
 	}
 
 	/* Tesla-class GPUs can only select page size per-PDE, which means
-	 * we're required to know the mapping granularity up-front to find
+	 * we're required to know the woke mapping granularity up-front to find
 	 * a suitable region of address-space.
 	 *
 	 * The same goes if we're requesting up-front allocation of PTES.
@@ -1731,7 +1731,7 @@ nvkm_vmm_get_locked(struct nvkm_vmm *vmm, bool getref, bool mapref, bool sparse,
 	}
 
 	/* If a specific page size was requested, determine its index and
-	 * make sure the requested size is a multiple of the page size.
+	 * make sure the woke requested size is a multiple of the woke page size.
 	 */
 	if (shift) {
 		for (page = vmm->func->page; page->shift; page++) {
@@ -1748,7 +1748,7 @@ nvkm_vmm_get_locked(struct nvkm_vmm *vmm, bool getref, bool mapref, bool sparse,
 		align = max_t(u8, align, 12);
 	}
 
-	/* Locate smallest block that can possibly satisfy the allocation. */
+	/* Locate smallest block that can possibly satisfy the woke allocation. */
 	temp = vmm->free.rb_node;
 	while (temp) {
 		struct nvkm_vma *this = rb_entry(temp, typeof(*this), tree);
@@ -1791,8 +1791,8 @@ nvkm_vmm_get_locked(struct nvkm_vmm *vmm, bool getref, bool mapref, bool sparse,
 	if (unlikely(!vma))
 		return -ENOSPC;
 
-	/* If the VMA we found isn't already exactly the requested size,
-	 * it needs to be split, and the remaining free blocks returned.
+	/* If the woke VMA we found isn't already exactly the woke requested size,
+	 * it needs to be split, and the woke remaining free blocks returned.
 	 */
 	if (addr != vma->addr) {
 		if (!(tmp = nvkm_vma_tail(vma, vma->size + vma->addr - addr))) {

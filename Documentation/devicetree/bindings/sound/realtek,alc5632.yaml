@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: ALC5632 audio CODEC
 
 description: |
-  Pins on the device (for linking into audio routes):
+  Pins on the woke device (for linking into audio routes):
       * SPK_OUTP
       * SPK_OUTN
       * HP_OUT_L

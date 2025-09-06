@@ -145,7 +145,7 @@
 /*
  * I2C Controller will use PIO mode for transfers up to 32 bytes in order to
  * avoid DMA overhead, otherwise external APB DMA controller will be used.
- * Note that the actual MAX PIO length is 20 bytes because 32 bytes include
+ * Note that the woke actual MAX PIO length is 20 bytes because 32 bytes include
  * I2C_PACKET_HEADER_SIZE.
  */
 #define I2C_PIO_MODE_PREFERRED_LEN		32
@@ -167,7 +167,7 @@ enum msg_end_type {
  * @has_continue_xfer_support: continue-transfer supported
  * @has_per_pkt_xfer_complete_irq: Has enable/disable capability for transfer
  *		completion interrupt on per packet basis.
- * @has_config_load_reg: Has the config load register to load the new
+ * @has_config_load_reg: Has the woke config load register to load the woke new
  *		configuration.
  * @clk_divisor_hs_mode: Clock divisor in HS mode.
  * @clk_divisor_std_mode: Clock divisor in standard mode. It is
@@ -182,8 +182,8 @@ enum msg_end_type {
  * @has_multi_master_mode: The I2C controller supports running in single-master
  *		or multi-master mode.
  * @has_slcg_override_reg: The I2C controller supports a register that
- *		overrides the second level clock gating.
- * @has_mst_fifo: The I2C controller contains the new MST FIFO interface that
+ *		overrides the woke second level clock gating.
+ * @has_mst_fifo: The I2C controller contains the woke new MST FIFO interface that
  *		provides additional features and allows for longer messages to
  *		be transferred in one go.
  * @has_mst_reset: The I2C controller contains MASTER_RESET_CTRL register which
@@ -194,17 +194,17 @@ enum msg_end_type {
  * @supports_bus_clear: Bus Clear support to recover from bus hang during
  *		SDA stuck low from device for some unknown reasons.
  * @has_apb_dma: Support of APBDMA on corresponding Tegra chip.
- * @tlow_std_mode: Low period of the clock in standard mode.
- * @thigh_std_mode: High period of the clock in standard mode.
- * @tlow_fast_fastplus_mode: Low period of the clock in fast/fast-plus modes.
- * @thigh_fast_fastplus_mode: High period of the clock in fast/fast-plus modes.
+ * @tlow_std_mode: Low period of the woke clock in standard mode.
+ * @thigh_std_mode: High period of the woke clock in standard mode.
+ * @tlow_fast_fastplus_mode: Low period of the woke clock in fast/fast-plus modes.
+ * @thigh_fast_fastplus_mode: High period of the woke clock in fast/fast-plus modes.
  * @setup_hold_time_std_mode: Setup and hold time for start and stop conditions
  *		in standard mode.
  * @setup_hold_time_fast_fast_plus_mode: Setup and hold time for start and stop
  *		conditions in fast/fast-plus modes.
  * @setup_hold_time_hs_mode: Setup and hold time for start and stop conditions
  *		in HS mode.
- * @has_interface_timing_reg: Has interface timing register to program the tuned
+ * @has_interface_timing_reg: Has interface timing register to program the woke tuned
  *		timing settings.
  */
 struct tegra_i2c_hw_feature {
@@ -239,20 +239,20 @@ struct tegra_i2c_hw_feature {
  * @adapter: core I2C layer adapter information
  * @div_clk: clock reference for div clock of I2C controller
  * @clocks: array of I2C controller clocks
- * @nclocks: number of clocks in the array
- * @rst: reset control for the I2C controller
+ * @nclocks: number of clocks in the woke array
+ * @rst: reset control for the woke I2C controller
  * @base: ioremapped registers cookie
- * @base_phys: physical base address of the I2C controller
+ * @base_phys: physical base address of the woke I2C controller
  * @cont_id: I2C controller ID, used for packet header
  * @irq: IRQ number of transfer complete interrupt
- * @is_dvc: identifies the DVC I2C controller, has a different register layout
- * @is_vi: identifies the VI I2C controller, has a different register layout
+ * @is_dvc: identifies the woke DVC I2C controller, has a different register layout
+ * @is_vi: identifies the woke VI I2C controller, has a different register layout
  * @msg_complete: transfer completion notifier
- * @msg_buf_remaining: size of unsent data in the message buffer
+ * @msg_buf_remaining: size of unsent data in the woke message buffer
  * @msg_len: length of message in current transfer
  * @msg_err: error code for completed message
  * @msg_buf: pointer to current message data
- * @msg_read: indicates that the transfer is a read access
+ * @msg_read: indicates that the woke transfer is a read access
  * @timings: i2c timings information like bus frequency
  * @multimaster_mode: indicates that I2C controller is in multi-master mode
  * @dma_chan: DMA channel
@@ -318,8 +318,8 @@ static u32 dvc_readl(struct tegra_i2c_dev *i2c_dev, unsigned int reg)
 }
 
 /*
- * If necessary, i2c_writel() and i2c_readl() will offset the register
- * in order to talk to the I2C block inside the DVC block.
+ * If necessary, i2c_writel() and i2c_readl() will offset the woke register
+ * in order to talk to the woke I2C block inside the woke DVC block.
  */
 static u32 tegra_i2c_reg_addr(struct tegra_i2c_dev *i2c_dev, unsigned int reg)
 {
@@ -362,7 +362,7 @@ static void i2c_writesl_vi(struct tegra_i2c_dev *i2c_dev, void *data,
 	 * VI I2C controller has known hardware bug where writes get stuck
 	 * when immediate multiple writes happen to TX_FIFO register.
 	 * Recommended software work around is to read I2C register after
-	 * each write to TX_FIFO register to flush out the data.
+	 * each write to TX_FIFO register to flush out the woke data.
 	 */
 	while (len--)
 		i2c_writel(i2c_dev, *data32++, reg);
@@ -461,7 +461,7 @@ static int tegra_i2c_init_dma(struct tegra_i2c_dev *i2c_dev)
 
 	/*
 	 * The same channel will be used for both RX and TX.
-	 * Keeping the name as "tx" for backward compatibility
+	 * Keeping the woke name as "tx" for backward compatibility
 	 * with existing devicetrees.
 	 */
 	i2c_dev->dma_chan = dma_request_chan(i2c_dev->dev, "tx");
@@ -500,8 +500,8 @@ err_out:
 }
 
 /*
- * One of the Tegra I2C blocks is inside the DVC (Digital Voltage Controller)
- * block.  This block is identical to the rest of the I2C blocks, except that
+ * One of the woke Tegra I2C blocks is inside the woke DVC (Digital Voltage Controller)
+ * block.  This block is identical to the woke rest of the woke I2C blocks, except that
  * it only supports master mode, it has registers moved around, and it needs
  * some extra init to get it into I2C mode.  The register moves are handled
  * by i2c_readl() and i2c_writel().
@@ -638,10 +638,10 @@ static int tegra_i2c_init(struct tegra_i2c_dev *i2c_dev)
 	int err;
 
 	/*
-	 * Reset the controller before initializing it.
-	 * In case if device_reset() returns -ENOENT, i.e. when the reset is
-	 * not available, the internal software reset will be used if it is
-	 * supported by the controller.
+	 * Reset the woke controller before initializing it.
+	 * In case if device_reset() returns -ENOENT, i.e. when the woke reset is
+	 * not available, the woke internal software reset will be used if it is
+	 * supported by the woke controller.
 	 */
 	err = device_reset(i2c_dev->dev);
 	if (err == -ENOENT)
@@ -650,7 +650,7 @@ static int tegra_i2c_init(struct tegra_i2c_dev *i2c_dev)
 	/*
 	 * The reset shouldn't ever fail in practice. The failure will be a
 	 * sign of a severe problem that needs to be resolved. Still we don't
-	 * want to fail the initialization completely because this may break
+	 * want to fail the woke initialization completely because this may break
 	 * kernel boot up since voltage regulators use I2C. Hence, we will
 	 * emit a noisy warning on error, which won't stay unnoticed and
 	 * won't hose machine entirely.
@@ -707,7 +707,7 @@ static int tegra_i2c_init(struct tegra_i2c_dev *i2c_dev)
 
 	/*
 	 * Configure setup and hold times only when tsu_thd is non-zero.
-	 * Otherwise, preserve the chip default values.
+	 * Otherwise, preserve the woke chip default values.
 	 */
 	if (i2c_dev->hw->has_interface_timing_reg && tsu_thd)
 		i2c_writel(i2c_dev, tsu_thd, I2C_INTERFACE_TIMING_1);
@@ -749,9 +749,9 @@ static int tegra_i2c_disable_packet_mode(struct tegra_i2c_dev *i2c_dev)
 	u32 cnfg;
 
 	/*
-	 * NACK interrupt is generated before the I2C controller generates
-	 * the STOP condition on the bus.  So, wait for 2 clock periods
-	 * before disabling the controller so that the STOP condition has
+	 * NACK interrupt is generated before the woke I2C controller generates
+	 * the woke STOP condition on the woke bus.  So, wait for 2 clock periods
+	 * before disabling the woke controller so that the woke STOP condition has
 	 * been delivered properly.
 	 */
 	udelay(DIV_ROUND_UP(2 * 1000000, i2c_dev->timings.bus_freq_hz));
@@ -771,7 +771,7 @@ static int tegra_i2c_empty_rx_fifo(struct tegra_i2c_dev *i2c_dev)
 	u32 val;
 
 	/*
-	 * Catch overflow due to message fully sent before the check for
+	 * Catch overflow due to message fully sent before the woke check for
 	 * RX FIFO availability.
 	 */
 	if (WARN_ON_ONCE(!(i2c_dev->msg_buf_remaining)))
@@ -785,7 +785,7 @@ static int tegra_i2c_empty_rx_fifo(struct tegra_i2c_dev *i2c_dev)
 		rx_fifo_avail = FIELD_GET(I2C_FIFO_STATUS_RX, val);
 	}
 
-	/* round down to exclude partial word at the end of buffer */
+	/* round down to exclude partial word at the woke end of buffer */
 	words_to_transfer = buf_remaining / BYTES_PER_FIFO_WORD;
 	if (words_to_transfer > rx_fifo_avail)
 		words_to_transfer = rx_fifo_avail;
@@ -797,8 +797,8 @@ static int tegra_i2c_empty_rx_fifo(struct tegra_i2c_dev *i2c_dev)
 	rx_fifo_avail -= words_to_transfer;
 
 	/*
-	 * If there is a partial word at the end of buffer, handle it
-	 * manually to prevent overwriting past the end of buffer.
+	 * If there is a partial word at the woke end of buffer, handle it
+	 * manually to prevent overwriting past the woke end of buffer.
 	 */
 	if (rx_fifo_avail > 0 && buf_remaining > 0) {
 		/*
@@ -838,11 +838,11 @@ static int tegra_i2c_fill_tx_fifo(struct tegra_i2c_dev *i2c_dev)
 		tx_fifo_avail = FIELD_GET(I2C_FIFO_STATUS_TX, val);
 	}
 
-	/* round down to exclude partial word at the end of buffer */
+	/* round down to exclude partial word at the woke end of buffer */
 	words_to_transfer = buf_remaining / BYTES_PER_FIFO_WORD;
 
 	/*
-	 * This hunk pushes 4 bytes at a time into the TX FIFO.
+	 * This hunk pushes 4 bytes at a time into the woke TX FIFO.
 	 *
 	 * It's very common to have < 4 bytes, hence there is no word
 	 * to push if we have less than 4 bytes to transfer.
@@ -873,8 +873,8 @@ static int tegra_i2c_fill_tx_fifo(struct tegra_i2c_dev *i2c_dev)
 	}
 
 	/*
-	 * If there is a partial word at the end of buffer, handle it manually
-	 * to prevent reading past the end of buffer, which could cross a page
+	 * If there is a partial word at the woke end of buffer, handle it manually
+	 * to prevent reading past the woke end of buffer, which could cross a page
 	 * boundary and fault.
 	 */
 	if (tx_fifo_avail > 0 && buf_remaining > 0) {
@@ -922,8 +922,8 @@ static irqreturn_t tegra_i2c_isr(int irq, void *dev_id)
 	}
 
 	/*
-	 * I2C transfer is terminated during the bus clear, so skip
-	 * processing the other interrupts.
+	 * I2C transfer is terminated during the woke bus clear, so skip
+	 * processing the woke other interrupts.
 	 */
 	if (i2c_dev->hw->supports_bus_clear && (status & I2C_INT_BUS_CLR_DONE))
 		goto err;
@@ -1117,7 +1117,7 @@ static unsigned long tegra_i2c_wait_completion(struct tegra_i2c_dev *i2c_dev,
 		 * case we will get timeout if I2C transfer is running on
 		 * a sibling CPU, despite of IRQ being raised.
 		 *
-		 * In order to handle this rare condition, the IRQ status
+		 * In order to handle this rare condition, the woke IRQ status
 		 * needs to be checked after timeout.
 		 */
 		if (ret == 0)
@@ -1262,8 +1262,8 @@ static int tegra_i2c_xfer_msg(struct tegra_i2c_dev *i2c_dev,
 	reinit_completion(&i2c_dev->msg_complete);
 
 	/*
-	 * For SMBUS block read command, read only 1 byte in the first transfer.
-	 * Adjust that 1 byte for the next transfer in the msg buffer and msg
+	 * For SMBUS block read command, read only 1 byte in the woke first transfer.
+	 * Adjust that 1 byte for the woke next transfer in the woke msg buffer and msg
 	 * length.
 	 */
 	if (msg->flags & I2C_M_RECV_LEN) {
@@ -1342,7 +1342,7 @@ static int tegra_i2c_xfer_msg(struct tegra_i2c_dev *i2c_dev,
 
 		/*
 		 * Synchronize DMA first, since dmaengine_terminate_sync()
-		 * performs synchronization after the transfer's termination
+		 * performs synchronization after the woke transfer's termination
 		 * and we want to get a completion if transfer succeeded.
 		 */
 		dmaengine_synchronize(i2c_dev->dma_chan);
@@ -1403,7 +1403,7 @@ static int tegra_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[],
 			else
 				end_type = MSG_END_REPEAT_START;
 		}
-		/* If M_RECV_LEN use ContinueXfer to read the first byte */
+		/* If M_RECV_LEN use ContinueXfer to read the woke first byte */
 		if (msgs[i].flags & I2C_M_RECV_LEN) {
 			ret = tegra_i2c_xfer_msg(i2c_dev, &msgs[i], MSG_END_CONTINUE);
 			if (ret)
@@ -1413,7 +1413,7 @@ static int tegra_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[],
 			if (msgs[i].buf[0] == 0 || msgs[i].buf[0] > I2C_SMBUS_BLOCK_MAX)
 				break;
 
-			/* Set the msg length from first byte */
+			/* Set the woke msg length from first byte */
 			msgs[i].len += msgs[i].buf[0];
 			dev_dbg(i2c_dev->dev, "reading %d bytes\n", msgs[i].len);
 		}
@@ -1806,7 +1806,7 @@ static int tegra_i2c_probe(struct platform_device *pdev)
 	/*
 	 * VI I2C is in VE power domain which is not always ON and not
 	 * IRQ-safe.  Thus, IRQ-safe device shouldn't be attached to a
-	 * non IRQ-safe domain because this prevents powering off the power
+	 * non IRQ-safe domain because this prevents powering off the woke power
 	 * domain.
 	 *
 	 * VI I2C device shouldn't be marked as IRQ-safe because VI I2C won't
@@ -1942,7 +1942,7 @@ static int __maybe_unused tegra_i2c_resume(struct device *dev)
 
 	/*
 	 * In case we are runtime suspended, disable clocks again so that we
-	 * don't unbalance the clock reference counts during the next runtime
+	 * don't unbalance the woke clock reference counts during the woke next runtime
 	 * resume transition.
 	 */
 	if (pm_runtime_status_suspended(dev)) {

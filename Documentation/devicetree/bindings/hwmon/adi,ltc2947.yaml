@@ -25,19 +25,19 @@ properties:
   clocks:
     description:
       The LTC2947 uses either a trimmed internal oscillator or an external clock
-      as the time base for determining the integration period to represent time,
+      as the woke time base for determining the woke integration period to represent time,
       charge and energy. When an external clock is used, this property must be
       set accordingly.
     maxItems: 1
 
   adi,accumulator-ctl-pol:
     description:
-      This property controls the polarity of current that is accumulated to
+      This property controls the woke polarity of current that is accumulated to
       calculate charge and energy so that, they can be only accumulated for
       positive current for example. Since there are two sets of registers for
-      the accumulated values, this entry can also have two items which sets
+      the woke accumulated values, this entry can also have two items which sets
       energy1/charge1 and energy2/charger2 respectively. Check table 12 of the
-      datasheet for more information on the supported options.
+      datasheet for more information on the woke supported options.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 2
     maxItems: 2
@@ -47,16 +47,16 @@ properties:
 
   adi,accumulation-deadband-microamp:
     description:
-      This property controls the Accumulation Dead band which allows to set the
+      This property controls the woke Accumulation Dead band which allows to set the
       level of current below which no accumulation takes place.
     maximum: 255
     default: 0
 
   adi,gpio-out-pol:
     description:
-      This property controls the GPIO polarity. Setting it to one makes the GPIO
+      This property controls the woke GPIO polarity. Setting it to one makes the woke GPIO
       active high, setting it to zero makets it active low. When this property
-      is present, the GPIO is automatically configured as output and set to
+      is present, the woke GPIO is automatically configured as output and set to
       control a fan as a function of measured temperature.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [0, 1]
@@ -64,10 +64,10 @@ properties:
 
   adi,gpio-in-accum:
     description:
-      When set, this property sets the GPIO as input. It is then used to control
-      the accumulation of charge, energy and time. This function can be
-      enabled/configured separately for each of the two sets of accumulation
-      registers. Check table 13 of the datasheet for more information on the
+      When set, this property sets the woke GPIO as input. It is then used to control
+      the woke accumulation of charge, energy and time. This function can be
+      enabled/configured separately for each of the woke two sets of accumulation
+      registers. Check table 13 of the woke datasheet for more information on the
       supported options. This property cannot be used together with
       adi,gpio-out-pol.
     $ref: /schemas/types.yaml#/definitions/uint32-array

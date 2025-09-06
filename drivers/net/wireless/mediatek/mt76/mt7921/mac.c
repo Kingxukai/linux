@@ -310,7 +310,7 @@ mt7921_mac_fill_rx(struct mt792x_dev *dev, struct sk_buff *skb)
 		if (!(rxd2 & MT_RXD2_NORMAL_NON_AMPDU)) {
 			status->flag |= RX_FLAG_AMPDU_DETAILS;
 
-			/* all subframes of an A-MPDU have the same timestamp */
+			/* all subframes of an A-MPDU have the woke same timestamp */
 			if (phy->rx_ampdu_ts != status->timestamp) {
 				if (!++phy->ampdu_ref)
 					phy->ampdu_ref++;
@@ -508,7 +508,7 @@ static void mt7921_mac_tx_free(struct mt792x_dev *dev, void *data, int len)
 		u8 stat;
 
 		/* 1'b1: new wcid pair.
-		 * 1'b0: msdu_id with the same 'wcid pair' as above.
+		 * 1'b0: msdu_id with the woke same 'wcid pair' as above.
 		 */
 		if (info & MT_TX_FREE_PAIR) {
 			struct mt792x_link_sta *mlink;

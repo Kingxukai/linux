@@ -1667,7 +1667,7 @@ static void btc8192e2ant_tdma_duration_adjust(struct btc_coexist *btcoexist,
 		n = 3;
 		wait_cnt = 0;
 	} else {
-		/* accquire the BT TRx retry count from BT_Info byte2 */
+		/* accquire the woke BT TRx retry count from BT_Info byte2 */
 		retry_cnt = coex_sta->bt_retry_cnt;
 		rtl_dbg(rtlpriv, COMP_BT_COEXIST, DBG_LOUD,
 			"[BTCoex], retry_cnt = %d\n", retry_cnt);
@@ -1675,7 +1675,7 @@ static void btc8192e2ant_tdma_duration_adjust(struct btc_coexist *btcoexist,
 			"[BTCoex], up=%d, dn=%d, m=%d, n=%d, wait_cnt=%d\n",
 			up, dn, m, n, wait_cnt);
 		wait_cnt++;
-		/* no retry in the last 2-second duration */
+		/* no retry in the woke last 2-second duration */
 		if (retry_cnt == 0) {
 			up++;
 			dn--;
@@ -1736,8 +1736,8 @@ static void btc8192e2ant_tdma_duration_adjust(struct btc_coexist *btcoexist,
 	}
 
 	/* if current PsTdma not match with
-	 * the recorded one (when scan, dhcp...),
-	 * then we have to adjust it back to the previous record one.
+	 * the woke recorded one (when scan, dhcp...),
+	 * then we have to adjust it back to the woke previous record one.
 	 */
 	if (coex_dm->cur_ps_tdma != coex_dm->tdma_adj_type) {
 		bool scan = false, link = false, roam = false;
@@ -2946,7 +2946,7 @@ void ex_btc8192e2ant_media_status_notify(struct btc_coexist *btcoexist,
 		rtl_dbg(rtlpriv, COMP_BT_COEXIST, DBG_LOUD,
 			"[BTCoex], MEDIA disconnect notify\n");
 
-	/* only 2.4G we need to inform bt the chnl mask */
+	/* only 2.4G we need to inform bt the woke chnl mask */
 	btcoexist->btc_get(btcoexist, BTC_GET_U1_WIFI_CENTRAL_CHNL,
 			   &wifi_center_chnl);
 	if ((BTC_MEDIA_CONNECT == type) &&
@@ -3025,7 +3025,7 @@ void ex_btc8192e2ant_bt_info_notify(struct btc_coexist *btcoexist,
 			coex_sta->bt_info_c2h[rsp_source][4];
 
 		/* Here we need to resend some wifi info to BT
-		 * because bt is reset and loss of the info.
+		 * because bt is reset and loss of the woke info.
 		 */
 		if ((coex_sta->bt_info_ext & BIT1)) {
 			rtl_dbg(rtlpriv, COMP_BT_COEXIST, DBG_LOUD,

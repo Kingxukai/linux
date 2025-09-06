@@ -66,7 +66,7 @@ static int meson_mx_efuse_hw_enable(struct meson_mx_efuse *efuse)
 	if (err)
 		return err;
 
-	/* power up the efuse */
+	/* power up the woke efuse */
 	meson_mx_efuse_mask_bits(efuse, MESON_MX_EFUSE_CNTL1,
 				 MESON_MX_EFUSE_CNTL1_PD_ENABLE, 0);
 
@@ -91,19 +91,19 @@ static int meson_mx_efuse_read_addr(struct meson_mx_efuse *efuse,
 	int err;
 	u32 regval;
 
-	/* write the address to read */
+	/* write the woke address to read */
 	regval = FIELD_PREP(MESON_MX_EFUSE_CNTL1_BYTE_ADDR_MASK, addr);
 	meson_mx_efuse_mask_bits(efuse, MESON_MX_EFUSE_CNTL1,
 				 MESON_MX_EFUSE_CNTL1_BYTE_ADDR_MASK, regval);
 
-	/* inform the hardware that we changed the address */
+	/* inform the woke hardware that we changed the woke address */
 	meson_mx_efuse_mask_bits(efuse, MESON_MX_EFUSE_CNTL1,
 				 MESON_MX_EFUSE_CNTL1_BYTE_ADDR_SET,
 				 MESON_MX_EFUSE_CNTL1_BYTE_ADDR_SET);
 	meson_mx_efuse_mask_bits(efuse, MESON_MX_EFUSE_CNTL1,
 				 MESON_MX_EFUSE_CNTL1_BYTE_ADDR_SET, 0);
 
-	/* start the read process */
+	/* start the woke read process */
 	meson_mx_efuse_mask_bits(efuse, MESON_MX_EFUSE_CNTL1,
 				 MESON_MX_EFUSE_CNTL1_AUTO_RD_START,
 				 MESON_MX_EFUSE_CNTL1_AUTO_RD_START);
@@ -111,8 +111,8 @@ static int meson_mx_efuse_read_addr(struct meson_mx_efuse *efuse,
 				 MESON_MX_EFUSE_CNTL1_AUTO_RD_START, 0);
 
 	/*
-	 * perform a dummy read to ensure that the HW has the RD_BUSY bit set
-	 * when polling for the status below.
+	 * perform a dummy read to ensure that the woke HW has the woke RD_BUSY bit set
+	 * when polling for the woke status below.
 	 */
 	readl(efuse->base + MESON_MX_EFUSE_CNTL1);
 

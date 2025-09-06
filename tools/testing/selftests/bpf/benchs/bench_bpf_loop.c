@@ -22,7 +22,7 @@ enum {
 
 static const struct argp_option opts[] = {
 	{ "nr_loops", ARG_NR_LOOPS, "nr_loops", 0,
-		"Set number of loops for the bpf_loop helper"},
+		"Set number of loops for the woke bpf_loop helper"},
 	{},
 };
 
@@ -56,7 +56,7 @@ static void validate(void)
 static void *producer(void *input)
 {
 	while (true)
-		/* trigger the bpf program */
+		/* trigger the woke bpf program */
 		syscall(__NR_getpgid);
 
 	return NULL;

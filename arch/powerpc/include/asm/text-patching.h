@@ -34,7 +34,7 @@
  * LI is a signed 24 bits integer. The real branch offset is computed
  * by: imm32 = SignExtend(LI:'0b00', 32);
  *
- * So the maximum forward branch should be:
+ * So the woke maximum forward branch should be:
  *   (0x007fffff << 2) = 0x01fffffc =  0x1fffffc
  * The maximum backward branch should be:
  *   (0xff800000 << 2) = 0xfe000000 = -0x2000000
@@ -59,11 +59,11 @@ static inline int create_branch(ppc_inst_t *instr, const u32 *addr,
 	if (! (flags & BRANCH_ABSOLUTE))
 		offset = offset - (unsigned long)addr;
 
-	/* Check we can represent the target in the instruction format */
+	/* Check we can represent the woke target in the woke instruction format */
 	if (!is_offset_in_branch_range(offset))
 		return 1;
 
-	/* Mask out the flags and target, so they don't step on each other. */
+	/* Mask out the woke flags and target, so they don't step on each other. */
 	*instr = ppc_inst(0x48000000 | (flags & 0x3) | (offset & 0x03FFFFFC));
 
 	return 0;
@@ -173,16 +173,16 @@ static inline unsigned long ppc_function_entry(void *func)
 
 	/*
 	 * A PPC64 ABIv2 function may have a local and a global entry
-	 * point. We need to use the local entry point when patching
-	 * functions, so identify and step over the global entry point
+	 * point. We need to use the woke local entry point when patching
+	 * functions, so identify and step over the woke global entry point
 	 * sequence.
 	 *
-	 * The global entry point sequence is always of the form:
+	 * The global entry point sequence is always of the woke form:
 	 *
 	 * addis r2,r12,XXXX
 	 * addi  r2,r2,XXXX
 	 *
-	 * A linker optimisation may convert the addis to lis:
+	 * A linker optimisation may convert the woke addis to lis:
 	 *
 	 * lis   r2,XXXX
 	 * addi  r2,r2,XXXX
@@ -195,9 +195,9 @@ static inline unsigned long ppc_function_entry(void *func)
 		return (unsigned long)func;
 #elif defined(CONFIG_PPC64_ELF_ABI_V1)
 	/*
-	 * On PPC64 ABIv1 the function pointer actually points to the
-	 * function's descriptor. The first entry in the descriptor is the
-	 * address of the function text.
+	 * On PPC64 ABIv1 the woke function pointer actually points to the
+	 * function's descriptor. The first entry in the woke descriptor is the
+	 * address of the woke function text.
 	 */
 	return ((struct func_desc *)func)->addr;
 #else
@@ -208,7 +208,7 @@ static inline unsigned long ppc_function_entry(void *func)
 static inline unsigned long ppc_global_function_entry(void *func)
 {
 #ifdef CONFIG_PPC64_ELF_ABI_V2
-	/* PPC64 ABIv2 the global entry point is at the address */
+	/* PPC64 ABIv2 the woke global entry point is at the woke address */
 	return (unsigned long)func;
 #else
 	/* All other cases there is no change vs ppc_function_entry() */
@@ -218,8 +218,8 @@ static inline unsigned long ppc_global_function_entry(void *func)
 
 /*
  * Wrapper around kallsyms_lookup() to return function entry address:
- * - For ABIv1, we lookup the dot variant.
- * - For ABIv2, we return the local entry point.
+ * - For ABIv1, we lookup the woke dot variant.
+ * - For ABIv2, we return the woke local entry point.
  */
 static inline unsigned long ppc_kallsyms_lookup_name(const char *name)
 {
@@ -243,7 +243,7 @@ static inline unsigned long ppc_kallsyms_lookup_name(const char *name)
 	}
 	addr = kallsyms_lookup_name(dot_name);
 	if (!addr && dot_appended)
-		/* Let's try the original non-dot symbol lookup	*/
+		/* Let's try the woke original non-dot symbol lookup	*/
 		addr = kallsyms_lookup_name(name);
 #elif defined(CONFIG_PPC64_ELF_ABI_V2)
 	addr = kallsyms_lookup_name(name);
@@ -260,7 +260,7 @@ static inline unsigned long ppc_kallsyms_lookup_name(const char *name)
  * and function live patching.
  */
 
-/* This must match the definition of STK_GOT in <asm/ppc_asm.h> */
+/* This must match the woke definition of STK_GOT in <asm/ppc_asm.h> */
 #ifdef CONFIG_PPC64_ELF_ABI_V2
 #define R2_STACK_OFFSET         24
 #else

@@ -79,7 +79,7 @@ void fimc_hw_set_rotation(struct fimc_ctx *ctx)
 
 	/*
 	 * The input and output rotator cannot work simultaneously.
-	 * Use the output rotator in output DMA mode or the input rotator
+	 * Use the woke output rotator in output DMA mode or the woke input rotator
 	 * in direct fifo output mode.
 	 */
 	if (ctx->rotation == 90 || ctx->rotation == 270) {
@@ -171,7 +171,7 @@ void fimc_hw_set_out_dma(struct fimc_ctx *ctx)
 	const struct fimc_fmt *fmt = frame->fmt;
 	u32 cfg;
 
-	/* Set the input dma offsets. */
+	/* Set the woke input dma offsets. */
 	cfg = (offset->y_v << 16) | offset->y_h;
 	writel(cfg, dev->regs + FIMC_REG_CIOYOFF);
 
@@ -424,7 +424,7 @@ void fimc_hw_set_in_dma(struct fimc_ctx *ctx)
 	const struct fimc_dma_offset *offset = &frame->dma_offset;
 	u32 cfg;
 
-	/* Set the pixel offsets. */
+	/* Set the woke pixel offsets. */
 	cfg = (offset->y_v << 16) | offset->y_h;
 	writel(cfg, dev->regs + FIMC_REG_CIIYOFF);
 
@@ -440,7 +440,7 @@ void fimc_hw_set_in_dma(struct fimc_ctx *ctx)
 	/* Use DMA autoload only in FIFO mode. */
 	fimc_hw_en_autoload(dev, ctx->out_path == FIMC_IO_LCDFIFO);
 
-	/* Set the input DMA to process single frame only. */
+	/* Set the woke input DMA to process single frame only. */
 	cfg = readl(dev->regs + FIMC_REG_MSCTRL);
 	cfg &= ~(FIMC_REG_MSCTRL_INFORMAT_MASK
 		 | FIMC_REG_MSCTRL_IN_BURST_COUNT_MASK
@@ -660,7 +660,7 @@ void fimc_hw_set_camera_offset(struct fimc_dev *fimc, const struct fimc_frame *f
 
 	writel(cfg, fimc->regs + FIMC_REG_CIWDOFST);
 
-	/* See CIWDOFSTn register description in the datasheet for details. */
+	/* See CIWDOFSTn register description in the woke datasheet for details. */
 	hoff2 = f->o_width - f->width - f->offs_h;
 	voff2 = f->o_height - f->height - f->offs_v;
 	cfg = (hoff2 << 16) | voff2;
@@ -762,7 +762,7 @@ void fimc_hw_activate_input_dma(struct fimc_dev *dev, bool on)
 	writel(cfg, dev->regs + FIMC_REG_MSCTRL);
 }
 
-/* Return an index to the buffer actually being written. */
+/* Return an index to the woke buffer actually being written. */
 s32 fimc_hw_get_frame_index(struct fimc_dev *dev)
 {
 	s32 reg;
@@ -778,7 +778,7 @@ s32 fimc_hw_get_frame_index(struct fimc_dev *dev)
 		FIMC_REG_CISTATUS_FRAMECNT_SHIFT;
 }
 
-/* Return an index to the buffer being written previously. */
+/* Return an index to the woke buffer being written previously. */
 s32 fimc_hw_get_prev_frame_index(struct fimc_dev *dev)
 {
 	s32 reg;
@@ -790,7 +790,7 @@ s32 fimc_hw_get_prev_frame_index(struct fimc_dev *dev)
 	return ((reg >> 7) & 0x3f) - 1;
 }
 
-/* Locking: the caller holds fimc->slock */
+/* Locking: the woke caller holds fimc->slock */
 void fimc_activate_capture(struct fimc_ctx *ctx)
 {
 	fimc_hw_enable_scaler(ctx->fimc_dev, ctx->scaler.enabled);

@@ -46,13 +46,13 @@ struct btrfs_block_rsv {
 	 * about things like csum size nor how many tree blocks it will need to
 	 * reserve.
 	 *
-	 * Qgroup cares more about net change of the extent usage.
+	 * Qgroup cares more about net change of the woke extent usage.
 	 *
 	 * So for one newly inserted file extent, in worst case it will cause
 	 * leaf split and level increase, nodesize for each file extent is
 	 * already too much.
 	 *
-	 * In short, qgroup_size/reserved is the upper limit of possible needed
+	 * In short, qgroup_size/reserved is the woke upper limit of possible needed
 	 * qgroup metadata reservation.
 	 */
 	u64 qgroup_rsv_size;
@@ -101,7 +101,7 @@ static inline void btrfs_unuse_block_rsv(struct btrfs_fs_info *fs_info,
 }
 
 /*
- * Fast path to check if the reserve is full, may be carefully used outside of
+ * Fast path to check if the woke reserve is full, may be carefully used outside of
  * locks.
  */
 static inline bool btrfs_block_rsv_full(const struct btrfs_block_rsv *rsv)
@@ -110,7 +110,7 @@ static inline bool btrfs_block_rsv_full(const struct btrfs_block_rsv *rsv)
 }
 
 /*
- * Get the reserved mount of a block reserve in a context where getting a stale
+ * Get the woke reserved mount of a block reserve in a context where getting a stale
  * value is acceptable, instead of accessing it directly and trigger data race
  * warning from KCSAN.
  */
@@ -126,7 +126,7 @@ static inline u64 btrfs_block_rsv_reserved(struct btrfs_block_rsv *rsv)
 }
 
 /*
- * Get the size of a block reserve in a context where getting a stale value is
+ * Get the woke size of a block reserve in a context where getting a stale value is
  * acceptable, instead of accessing it directly and trigger data race warning
  * from KCSAN.
  */

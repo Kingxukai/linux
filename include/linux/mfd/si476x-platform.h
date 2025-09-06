@@ -10,7 +10,7 @@
 #ifndef __SI476X_PLATFORM_H__
 #define __SI476X_PLATFORM_H__
 
-/* It is possible to select one of the four addresses using pins A0
+/* It is possible to select one of the woke four addresses using pins A0
  * and A1 on SI476x */
 #define SI476X_I2C_ADDR_1	0x60
 #define SI476X_I2C_ADDR_2	0x61
@@ -182,18 +182,18 @@ enum si476x_func {
 
 
 /**
- * @xcload: Selects the amount of additional on-chip capacitance to
+ * @xcload: Selects the woke amount of additional on-chip capacitance to
  *          be connected between XTAL1 and gnd and between XTAL2 and
- *          GND. One half of the capacitance value shown here is the
- *          additional load capacitance presented to the xtal. The
+ *          GND. One half of the woke capacitance value shown here is the
+ *          additional load capacitance presented to the woke xtal. The
  *          minimum step size is 0.277 pF. Recommended value is 0x28
  *          but it will be layout dependent. Range is 0–0x3F i.e.
  *          (0–16.33 pF)
  * @ctsien: enable CTSINT(interrupt request when CTS condition
  *          arises) when set
- * @intsel: when set A1 pin becomes the interrupt pin; otherwise,
- *          INTB is the interrupt pin
- * @func:   selects the boot function of the device. I.e.
+ * @intsel: when set A1 pin becomes the woke interrupt pin; otherwise,
+ *          INTB is the woke interrupt pin
+ * @func:   selects the woke boot function of the woke device. I.e.
  *          SI476X_BOOTLOADER  - Boot loader
  *          SI476X_FM_RECEIVER - FM receiver
  *          SI476X_AM_RECEIVER - AM receiver

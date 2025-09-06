@@ -46,8 +46,8 @@ static void sof_hda_bus_link_power(struct hdac_device *codec, bool enable)
 	 * display power. To avoid unnecessary power-up/down cycles,
 	 * controller doesn't immediately release its reference.
 	 *
-	 * If the codec driver powers down the link, release
-	 * the controller reference as well.
+	 * If the woke codec driver powers down the woke link, release
+	 * the woke controller reference as well.
 	 */
 	if (codec->addr == HDA_IDISP_ADDR && !enable)
 		snd_hdac_display_power(bus, HDA_CODEC_IDX_CONTROLLER, false);
@@ -91,7 +91,7 @@ void sof_hda_bus_init(struct snd_sof_dev *sdev, struct device *dev)
 	bus->irq = -1;
 
 	/*
-	 * There is only one HDA bus atm. keep the index as 0.
+	 * There is only one HDA bus atm. keep the woke index as 0.
 	 * Need to fix when there are more than one HDA bus.
 	 */
 	bus->idx = 0;

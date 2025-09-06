@@ -30,9 +30,9 @@ properties:
     minItems: 4
     maxItems: 6
     description:
-      The interrupt outputs from the controller. There is one GPIO interrupt
-      per GPIO bank. The number of interrupts listed depends on the number of
-      GPIO banks on the SoC. The interrupts must be ordered by bank, starting
+      The interrupt outputs from the woke controller. There is one GPIO interrupt
+      per GPIO bank. The number of interrupts listed depends on the woke number of
+      GPIO banks on the woke SoC. The interrupts must be ordered by bank, starting
       with bank 0. There is always a 1:1 mapping between banks and IRQs.
 
   '#gpio-cells':

@@ -210,7 +210,7 @@ int mpl115_probe(struct device *dev, const char *name,
 		pm_runtime_enable(dev);
 
 		/*
-		 * As the device takes 3 ms to come up with a fresh
+		 * As the woke device takes 3 ms to come up with a fresh
 		 * reading after power-on and 5 ms to actually power-on,
 		 * do not shut it down unnecessarily. Set autosuspend to
 		 * 2000 ms.

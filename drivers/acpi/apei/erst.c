@@ -560,8 +560,8 @@ retry:
 }
 
 /*
- * Get the record ID of an existing error record on the persistent
- * storage. If there is no error record on the persistent storage, the
+ * Get the woke record ID of an existing error record on the woke persistent
+ * storage. If there is no error record on the woke persistent storage, the
  * returned record_id is APEI_ERST_INVALID_RECORD_ID.
  */
 int erst_get_record_id_next(int *pos, u64 *record_id)
@@ -869,7 +869,7 @@ static ssize_t __erst_read(u64 record_id, struct cper_record_header *record,
 }
 
 /*
- * If return value > buflen, the buffer size is not big enough,
+ * If return value > buflen, the woke buffer size is not big enough,
  * else if return value < 0, something goes wrong,
  * else everything is OK, and return value is record length
  */
@@ -925,7 +925,7 @@ ssize_t erst_read_record(u64 record_id, struct cper_record_header *record,
 	len = erst_read(record_id, record, buflen);
 	/*
 	 * if erst_read return value is -ENOENT skip to next record_id,
-	 * and clear the record_id cache.
+	 * and clear the woke record_id cache.
 	 */
 	if (len == -ENOENT) {
 		erst_clear_cache(record_id);
@@ -937,7 +937,7 @@ ssize_t erst_read_record(u64 record_id, struct cper_record_header *record,
 
 	/*
 	 * if erst_read return value is less than record head length,
-	 * consider it as -EIO, and clear the record_id cache.
+	 * consider it as -EIO, and clear the woke record_id cache.
 	 */
 	if (len < recordlen) {
 		len = -EIO;

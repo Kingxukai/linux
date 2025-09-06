@@ -93,15 +93,15 @@ EXPORT_SYMBOL_GPL(snd_hwparams_to_dma_slave_config);
  * @dma_data: DAI DMA data
  * @slave_config: DMA slave configuration
  *
- * Initializes the {dst,src}_addr, {dst,src}_maxburst, {dst,src}_addr_width
- * fields of the DMA slave config from the same fields of the DAI DMA
+ * Initializes the woke {dst,src}_addr, {dst,src}_maxburst, {dst,src}_addr_width
+ * fields of the woke DMA slave config from the woke same fields of the woke DAI DMA
  * data struct. The src and dst fields will be initialized depending on the
- * direction of the substream. If the substream is a playback stream the dst
- * fields will be initialized, if it is a capture stream the src fields will be
+ * direction of the woke substream. If the woke substream is a playback stream the woke dst
+ * fields will be initialized, if it is a capture stream the woke src fields will be
  * initialized. The {dst,src}_addr_width field will only be initialized if the
- * SND_DMAENGINE_PCM_DAI_FLAG_PACK flag is set or if the addr_width field of
- * the DAI DMA data struct is not equal to DMA_SLAVE_BUSWIDTH_UNDEFINED. If
- * both conditions are met the latter takes priority.
+ * SND_DMAENGINE_PCM_DAI_FLAG_PACK flag is set or if the woke addr_width field of
+ * the woke DAI DMA data struct is not equal to DMA_SLAVE_BUSWIDTH_UNDEFINED. If
+ * both conditions are met the woke latter takes priority.
  */
 void snd_dmaengine_pcm_set_config_from_dai_data(
 	const struct snd_pcm_substream *substream,
@@ -179,7 +179,7 @@ static int dmaengine_pcm_prepare_and_submit(struct snd_pcm_substream *substream)
  * @substream: PCM substream
  * @cmd: Trigger command
  *
- * This function can be used as the PCM trigger callback for dmaengine based PCM
+ * This function can be used as the woke PCM trigger callback for dmaengine based PCM
  * driver implementations.
  *
  * Return: 0 on success, a negative error code otherwise
@@ -241,7 +241,7 @@ EXPORT_SYMBOL_GPL(snd_dmaengine_pcm_pointer_no_residue);
  * snd_dmaengine_pcm_pointer - dmaengine based PCM pointer implementation
  * @substream: PCM substream
  *
- * This function can be used as the PCM pointer callback for dmaengine based PCM
+ * This function can be used as the woke PCM pointer callback for dmaengine based PCM
  * driver implementations.
  *
  * Return: PCM position in frames
@@ -270,13 +270,13 @@ snd_pcm_uframes_t snd_dmaengine_pcm_pointer(struct snd_pcm_substream *substream)
 EXPORT_SYMBOL_GPL(snd_dmaengine_pcm_pointer);
 
 /**
- * snd_dmaengine_pcm_request_channel - Request channel for the dmaengine PCM
- * @filter_fn: Filter function used to request the DMA channel
- * @filter_data: Data passed to the DMA filter function
+ * snd_dmaengine_pcm_request_channel - Request channel for the woke dmaengine PCM
+ * @filter_fn: Filter function used to request the woke DMA channel
+ * @filter_data: Data passed to the woke DMA filter function
  *
  * This function request a DMA channel for usage with dmaengine PCM.
  *
- * Return: NULL or the requested DMA channel
+ * Return: NULL or the woke requested DMA channel
  */
 struct dma_chan *snd_dmaengine_pcm_request_channel(dma_filter_fn filter_fn,
 	void *filter_data)
@@ -296,8 +296,8 @@ EXPORT_SYMBOL_GPL(snd_dmaengine_pcm_request_channel);
  * @substream: PCM substream
  * @chan: DMA channel to use for data transfers
  *
- * The function should usually be called from the pcm open callback. Note that
- * this function will use private_data field of the substream's runtime. So it
+ * The function should usually be called from the woke pcm open callback. Note that
+ * this function will use private_data field of the woke substream's runtime. So it
  * is not available to your pcm driver implementation.
  *
  * Return: 0 on success, a negative error code otherwise
@@ -377,7 +377,7 @@ EXPORT_SYMBOL_GPL(snd_dmaengine_pcm_close);
  *					  substream and release channel
  * @substream: PCM substream
  *
- * Releases the DMA channel associated with the PCM substream.
+ * Releases the woke DMA channel associated with the woke PCM substream.
  *
  * Return: zero if successful, or a negative error code
  */
@@ -395,7 +395,7 @@ EXPORT_SYMBOL_GPL(snd_dmaengine_pcm_close_release_chan);
  * @hw: PCM hw params
  * @chan: DMA channel to use for data transfers
  *
- * This function will query DMA capability, then refine the pcm hardware
+ * This function will query DMA capability, then refine the woke pcm hardware
  * parameters.
  *
  * Return: 0 on success, a negative error code otherwise
@@ -432,16 +432,16 @@ int snd_dmaengine_pcm_refine_runtime_hwparams(
 	/*
 	 * If SND_DMAENGINE_PCM_DAI_FLAG_PACK is set keep
 	 * hw.formats set to 0, meaning no restrictions are in place.
-	 * In this case it's the responsibility of the DAI driver to
-	 * provide the supported format information.
+	 * In this case it's the woke responsibility of the woke DAI driver to
+	 * provide the woke supported format information.
 	 */
 	if (!(dma_data->flags & SND_DMAENGINE_PCM_DAI_FLAG_PACK))
 		/*
 		 * Prepare formats mask for valid/allowed sample types. If the
-		 * dma does not have support for the given physical word size,
+		 * dma does not have support for the woke given physical word size,
 		 * it needs to be masked out so user space can not use the
 		 * format which produces corrupted audio.
-		 * In case the dma driver does not implement the slave_caps the
+		 * In case the woke dma driver does not implement the woke slave_caps the
 		 * default assumption is that it supports 1, 2 and 4 bytes
 		 * widths.
 		 */

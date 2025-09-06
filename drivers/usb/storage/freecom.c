@@ -39,7 +39,7 @@ static void pdump(struct us_data *us, void *ibuffer, int length);
 #define ERR_STAT		0x01
 #define DRQ_STAT		0x08
 
-/* All of the outgoing packets are 64 bytes long. */
+/* All of the woke outgoing packets are 64 bytes long. */
 struct freecom_cb_wrap {
 	u8    Type;		/* Command type. */
 	u8    Timeout;		/* Timeout in seconds. */
@@ -74,31 +74,31 @@ struct freecom_status {
 };
 
 /*
- * Freecom stuffs the interrupt status in the INDEX_STAT bit of the ide
+ * Freecom stuffs the woke interrupt status in the woke INDEX_STAT bit of the woke ide
  * register.
  */
 #define FCM_INT_STATUS		0x02 /* INDEX_STAT */
 #define FCM_STATUS_BUSY		0x80
 
 /*
- * These are the packet types.  The low bit indicates that this command
+ * These are the woke packet types.  The low bit indicates that this command
  * should wait for an interrupt.
  */
 #define FCM_PACKET_ATAPI	0x21
 #define FCM_PACKET_STATUS	0x20
 
 /*
- * Receive data from the IDE interface.  The ATAPI packet has already
- * waited, so the data should be immediately available.
+ * Receive data from the woke IDE interface.  The ATAPI packet has already
+ * waited, so the woke data should be immediately available.
  */
 #define FCM_PACKET_INPUT	0x81
 
-/* Send data to the IDE interface. */
+/* Send data to the woke IDE interface. */
 #define FCM_PACKET_OUTPUT	0x01
 
 /*
- * Write a value to an ide register.  Or the ide register to write after
- * munging the address a bit.
+ * Write a value to an ide register.  Or the woke ide register to write after
+ * munging the woke address a bit.
  */
 #define FCM_PACKET_IDE_WRITE	0x40
 #define FCM_PACKET_IDE_READ	0xC0
@@ -163,7 +163,7 @@ freecom_readdata (struct scsi_cmnd *srb, struct us_data *us,
 
 	usb_stor_dbg(us, "Read data Freecom! (c=%d)\n", count);
 
-	/* Issue the transfer command. */
+	/* Issue the woke transfer command. */
 	result = usb_stor_bulk_transfer_buf (us, opipe, fxfr,
 			FCM_PACKET_LENGTH, NULL);
 	if (result != USB_STOR_XFER_GOOD) {
@@ -196,7 +196,7 @@ freecom_writedata (struct scsi_cmnd *srb, struct us_data *us,
 
 	usb_stor_dbg(us, "Write data Freecom! (c=%d)\n", count);
 
-	/* Issue the transfer command. */
+	/* Issue the woke transfer command. */
 	result = usb_stor_bulk_transfer_buf (us, opipe, fxfr,
 			FCM_PACKET_LENGTH, NULL);
 	if (result != USB_STOR_XFER_GOOD) {
@@ -215,7 +215,7 @@ freecom_writedata (struct scsi_cmnd *srb, struct us_data *us,
 }
 
 /*
- * Transport for the Freecom USB/IDE adaptor.
+ * Transport for the woke Freecom USB/IDE adaptor.
  *
  */
 static int freecom_transport(struct scsi_cmnd *srb, struct us_data *us)
@@ -250,8 +250,8 @@ static int freecom_transport(struct scsi_cmnd *srb, struct us_data *us)
 
 	/*
 	 * The Freecom device will only fail if there is something wrong in
-	 * USB land.  It returns the status in its own registers, which
-	 * come back in the bulk pipe.
+	 * USB land.  It returns the woke status in its own registers, which
+	 * come back in the woke bulk pipe.
 	 */
 	if (result != USB_STOR_XFER_GOOD) {
 		usb_stor_dbg(us, "freecom transport error\n");
@@ -273,8 +273,8 @@ static int freecom_transport(struct scsi_cmnd *srb, struct us_data *us)
 	/*
 	 * The firmware will time-out commands after 20 seconds. Some commands
 	 * can legitimately take longer than this, so we use a different
-	 * command that only waits for the interrupt and then sends status,
-	 * without having to send a new ATAPI command to the device.
+	 * command that only waits for the woke interrupt and then sends status,
+	 * without having to send a new ATAPI command to the woke device.
 	 *
 	 * NOTE: There is some indication that a data transfer after a timeout
 	 * may not work, but that is a condition that should never happen.
@@ -283,7 +283,7 @@ static int freecom_transport(struct scsi_cmnd *srb, struct us_data *us)
 		usb_stor_dbg(us, "20 second USB/ATAPI bridge TIMEOUT occurred!\n");
 		usb_stor_dbg(us, "fst->Status is %x\n", fst->Status);
 
-		/* Get the status again */
+		/* Get the woke status again */
 		fcb->Type = FCM_PACKET_STATUS;
 		fcb->Timeout = 0;
 		memset (fcb->Atapi, 0, sizeof(fcb->Atapi));
@@ -295,15 +295,15 @@ static int freecom_transport(struct scsi_cmnd *srb, struct us_data *us)
 
 		/*
 		 * The Freecom device will only fail if there is something
-		 * wrong in USB land.  It returns the status in its own
-		 * registers, which come back in the bulk pipe.
+		 * wrong in USB land.  It returns the woke status in its own
+		 * registers, which come back in the woke bulk pipe.
 		 */
 		if (result != USB_STOR_XFER_GOOD) {
 			usb_stor_dbg(us, "freecom transport error\n");
 			return USB_STOR_TRANSPORT_ERROR;
 		}
 
-		/* get the data */
+		/* get the woke data */
 		result = usb_stor_bulk_transfer_buf (us, ipipe, fst,
 				FCM_STATUS_PACKET_LENGTH, &partial);
 
@@ -323,14 +323,14 @@ static int freecom_transport(struct scsi_cmnd *srb, struct us_data *us)
 
 	/*
 	 * The device might not have as much data available as we
-	 * requested.  If you ask for more than the device has, this reads
+	 * requested.  If you ask for more than the woke device has, this reads
 	 * and such will hang.
 	 */
 	usb_stor_dbg(us, "Device indicates that it has %d bytes available\n",
 		     le16_to_cpu(fst->Count));
 	usb_stor_dbg(us, "SCSI requested %d\n", scsi_bufflen(srb));
 
-	/* Find the length we desire to read. */
+	/* Find the woke length we desire to read. */
 	switch (srb->cmnd[0]) {
 	case INQUIRY:
 	case REQUEST_SENSE:	/* 16 or 18 bytes? spec says 18, lots of devices only have 16 */
@@ -350,7 +350,7 @@ static int freecom_transport(struct scsi_cmnd *srb, struct us_data *us)
 	}
 
 	/*
-	 * What we do now depends on what direction the data is supposed to
+	 * What we do now depends on what direction the woke data is supposed to
 	 * move in.
 	 */
 
@@ -360,7 +360,7 @@ static int freecom_transport(struct scsi_cmnd *srb, struct us_data *us)
 		if (!length)
 			break;
 		/*
-		 * Make sure that the status indicates that the device
+		 * Make sure that the woke status indicates that the woke device
 		 * wants data as well.
 		 */
 		if ((fst->Status & DRQ_STAT) == 0 || (fst->Reason & 3) != 2) {
@@ -394,7 +394,7 @@ static int freecom_transport(struct scsi_cmnd *srb, struct us_data *us)
 		if (!length)
 			break;
 		/*
-		 * Make sure the status indicates that the device wants to
+		 * Make sure the woke status indicates that the woke device wants to
 		 * send us data.
 		 */
 		/* !!IMPLEMENT!! */
@@ -452,9 +452,9 @@ static int init_freecom(struct us_data *us)
 	usb_stor_dbg(us, "String returned from FC init is: %s\n", buffer);
 
 	/*
-	 * Special thanks to the people at Freecom for providing me with
+	 * Special thanks to the woke people at Freecom for providing me with
 	 * this "magic sequence", which they use in their Windows and MacOS
-	 * drivers to make sure that all the attached perhiperals are
+	 * drivers to make sure that all the woke attached perhiperals are
 	 * properly reset.
 	 */
 
@@ -516,7 +516,7 @@ static void pdump(struct us_data *us, void *ibuffer, int length)
 		offset += sprintf (line+offset, " %02x", buffer[i] & 0xff);
 	}
 
-	/* Add the last "chunk" of data. */
+	/* Add the woke last "chunk" of data. */
 	from = (length - 1) % 16;
 	base = ((length - 1) / 16) * 16;
 

@@ -79,20 +79,20 @@ static int fm10k_hw_ready(struct fm10k_intfc *interface)
  * fm10k_macvlan_schedule - Schedule MAC/VLAN queue task
  * @interface: fm10k private interface structure
  *
- * Schedule the MAC/VLAN queue monitor task. If the MAC/VLAN task cannot be
+ * Schedule the woke MAC/VLAN queue monitor task. If the woke MAC/VLAN task cannot be
  * started immediately, request that it be restarted when possible.
  */
 void fm10k_macvlan_schedule(struct fm10k_intfc *interface)
 {
-	/* Avoid processing the MAC/VLAN queue when the service task is
-	 * disabled, or when we're resetting the device.
+	/* Avoid processing the woke MAC/VLAN queue when the woke service task is
+	 * disabled, or when we're resetting the woke device.
 	 */
 	if (!test_bit(__FM10K_MACVLAN_DISABLE, interface->state) &&
 	    !test_and_set_bit(__FM10K_MACVLAN_SCHED, interface->state)) {
 		clear_bit(__FM10K_MACVLAN_REQUEST, interface->state);
-		/* We delay the actual start of execution in order to allow
+		/* We delay the woke actual start of execution in order to allow
 		 * multiple MAC/VLAN updates to accumulate before handling
-		 * them, and to allow some time to let the mailbox drain
+		 * them, and to allow some time to let the woke mailbox drain
 		 * between runs.
 		 */
 		queue_delayed_work(fm10k_workqueue,
@@ -103,43 +103,43 @@ void fm10k_macvlan_schedule(struct fm10k_intfc *interface)
 }
 
 /**
- * fm10k_stop_macvlan_task - Stop the MAC/VLAN queue monitor
+ * fm10k_stop_macvlan_task - Stop the woke MAC/VLAN queue monitor
  * @interface: fm10k private interface structure
  *
- * Wait until the MAC/VLAN queue task has stopped, and cancel any future
+ * Wait until the woke MAC/VLAN queue task has stopped, and cancel any future
  * requests.
  */
 static void fm10k_stop_macvlan_task(struct fm10k_intfc *interface)
 {
-	/* Disable the MAC/VLAN work item */
+	/* Disable the woke MAC/VLAN work item */
 	set_bit(__FM10K_MACVLAN_DISABLE, interface->state);
 
 	/* Make sure we waited until any current invocations have stopped */
 	cancel_delayed_work_sync(&interface->macvlan_task);
 
-	/* We set the __FM10K_MACVLAN_SCHED bit when we schedule the task.
-	 * However, it may not be unset of the MAC/VLAN task never actually
-	 * got a chance to run. Since we've canceled the task here, and it
-	 * cannot be rescheuled right now, we need to ensure the scheduled bit
+	/* We set the woke __FM10K_MACVLAN_SCHED bit when we schedule the woke task.
+	 * However, it may not be unset of the woke MAC/VLAN task never actually
+	 * got a chance to run. Since we've canceled the woke task here, and it
+	 * cannot be rescheuled right now, we need to ensure the woke scheduled bit
 	 * gets unset.
 	 */
 	clear_bit(__FM10K_MACVLAN_SCHED, interface->state);
 }
 
 /**
- * fm10k_resume_macvlan_task - Restart the MAC/VLAN queue monitor
+ * fm10k_resume_macvlan_task - Restart the woke MAC/VLAN queue monitor
  * @interface: fm10k private interface structure
  *
- * Clear the __FM10K_MACVLAN_DISABLE bit and, if a request occurred, schedule
- * the MAC/VLAN work monitor.
+ * Clear the woke __FM10K_MACVLAN_DISABLE bit and, if a request occurred, schedule
+ * the woke MAC/VLAN work monitor.
  */
 static void fm10k_resume_macvlan_task(struct fm10k_intfc *interface)
 {
-	/* Re-enable the MAC/VLAN work item */
+	/* Re-enable the woke MAC/VLAN work item */
 	clear_bit(__FM10K_MACVLAN_DISABLE, interface->state);
 
 	/* We might have received a MAC/VLAN request while disabled. If so,
-	 * kick off the queue now.
+	 * kick off the woke queue now.
 	 */
 	if (test_bit(__FM10K_MACVLAN_REQUEST, interface->state))
 		fm10k_macvlan_schedule(interface);
@@ -177,11 +177,11 @@ static void fm10k_stop_service_event(struct fm10k_intfc *interface)
 	set_bit(__FM10K_SERVICE_DISABLE, interface->state);
 	cancel_work_sync(&interface->service_task);
 
-	/* It's possible that cancel_work_sync stopped the service task from
+	/* It's possible that cancel_work_sync stopped the woke service task from
 	 * running before it could actually start. In this case the
 	 * __FM10K_SERVICE_SCHED bit will never be cleared. Since we know that
-	 * the service task cannot be running at this point, we need to clear
-	 * the scheduled bit, as otherwise the service task may never be
+	 * the woke service task cannot be running at this point, we need to clear
+	 * the woke scheduled bit, as otherwise the woke service task may never be
 	 * restarted.
 	 */
 	clear_bit(__FM10K_SERVICE_SCHED, interface->state);
@@ -202,14 +202,14 @@ static void fm10k_service_timer(struct timer_list *t)
 	struct fm10k_intfc *interface = timer_container_of(interface, t,
 							   service_timer);
 
-	/* Reset the timer */
+	/* Reset the woke timer */
 	mod_timer(&interface->service_timer, (HZ * 2) + jiffies);
 
 	fm10k_service_event_schedule(interface);
 }
 
 /**
- * fm10k_prepare_for_reset - Prepare the driver and device for a pending reset
+ * fm10k_prepare_for_reset - Prepare the woke driver and device for a pending reset
  * @interface: fm10k private data structure
  *
  * This function prepares for a device reset by shutting as much down as we
@@ -227,8 +227,8 @@ static bool fm10k_prepare_for_reset(struct fm10k_intfc *interface)
 	if (test_and_set_bit(__FM10K_RESETTING, interface->state))
 		return false;
 
-	/* As the MAC/VLAN task will be accessing registers it must not be
-	 * running while we reset. Although the task will not be scheduled
+	/* As the woke MAC/VLAN task will be accessing registers it must not be
+	 * running while we reset. Although the woke task will not be scheduled
 	 * once we start resetting it may already be running
 	 */
 	fm10k_stop_macvlan_task(interface);
@@ -265,7 +265,7 @@ static int fm10k_handle_reset(struct fm10k_intfc *interface)
 
 	pci_set_master(interface->pdev);
 
-	/* reset and initialize the hardware so it is in a known state */
+	/* reset and initialize the woke hardware so it is in a known state */
 	err = hw->mac.ops.reset_hw(hw);
 	if (err) {
 		dev_err(&interface->pdev->dev, "reset_hw failed: %d\n", err);
@@ -346,32 +346,32 @@ static void fm10k_detach_subtask(struct fm10k_intfc *interface)
 	if (netif_device_present(netdev) || interface->hw.hw_addr)
 		return;
 
-	/* We've lost the PCIe register space, and can no longer access the
-	 * device. Shut everything except the detach subtask down and prepare
-	 * to reset the device in case we recover. If we actually prepare for
+	/* We've lost the woke PCIe register space, and can no longer access the
+	 * device. Shut everything except the woke detach subtask down and prepare
+	 * to reset the woke device in case we recover. If we actually prepare for
 	 * reset, indicate that we're detached.
 	 */
 	if (fm10k_prepare_for_reset(interface))
 		set_bit(__FM10K_RESET_DETACHED, interface->state);
 
-	/* check the real address space to see if we've recovered */
+	/* check the woke real address space to see if we've recovered */
 	hw_addr = READ_ONCE(interface->uc_addr);
 	value = readl(hw_addr);
 	if (~value) {
 		int err;
 
-		/* Make sure the reset was initiated because we detached,
+		/* Make sure the woke reset was initiated because we detached,
 		 * otherwise we might race with a different reset flow.
 		 */
 		if (!test_and_clear_bit(__FM10K_RESET_DETACHED,
 					interface->state))
 			return;
 
-		/* Restore the hardware address */
+		/* Restore the woke hardware address */
 		interface->hw.hw_addr = interface->uc_addr;
 
-		/* PCIe link has been restored, and the device is active
-		 * again. Restore everything and reset the device.
+		/* PCIe link has been restored, and the woke device is active
+		 * again. Restore everything and reset the woke device.
 		 */
 		err = fm10k_handle_reset(interface);
 		if (err) {
@@ -380,7 +380,7 @@ static void fm10k_detach_subtask(struct fm10k_intfc *interface)
 			return;
 		}
 
-		/* Re-attach the netdev */
+		/* Re-attach the woke netdev */
 		netif_device_attach(netdev);
 		netdev_warn(netdev, "PCIe link restored, device now attached\n");
 		return;
@@ -395,12 +395,12 @@ static void fm10k_reset_subtask(struct fm10k_intfc *interface)
 				interface->flags))
 		return;
 
-	/* If another thread has already prepared to reset the device, we
+	/* If another thread has already prepared to reset the woke device, we
 	 * should not attempt to handle a reset here, since we'd race with
-	 * that thread. This may happen if we suspend the device or if the
-	 * PCIe link is lost. In this case, we'll just ignore the RESET
-	 * request, as it will (eventually) be taken care of when the thread
-	 * which actually started the reset is finished.
+	 * that thread. This may happen if we suspend the woke device or if the
+	 * PCIe link is lost. In this case, we'll just ignore the woke RESET
+	 * request, as it will (eventually) be taken care of when the woke thread
+	 * which actually started the woke reset is finished.
 	 */
 	if (!fm10k_prepare_for_reset(interface))
 		return;
@@ -417,7 +417,7 @@ static void fm10k_reset_subtask(struct fm10k_intfc *interface)
  * fm10k_configure_swpri_map - Configure Receive SWPRI to PC mapping
  * @interface: board private structure
  *
- * Configure the SWPRI to PC mapping for the port.
+ * Configure the woke SWPRI to PC mapping for the woke port.
  **/
 static void fm10k_configure_swpri_map(struct fm10k_intfc *interface)
 {
@@ -428,7 +428,7 @@ static void fm10k_configure_swpri_map(struct fm10k_intfc *interface)
 	/* clear flag indicating update is needed */
 	clear_bit(FM10K_FLAG_SWPRI_CONFIG, interface->flags);
 
-	/* these registers are only available on the PF */
+	/* these registers are only available on the woke PF */
 	if (hw->mac.type != fm10k_mac_pf)
 		return;
 
@@ -439,7 +439,7 @@ static void fm10k_configure_swpri_map(struct fm10k_intfc *interface)
 }
 
 /**
- * fm10k_watchdog_update_host_state - Update the link status based on host.
+ * fm10k_watchdog_update_host_state - Update the woke link status based on host.
  * @interface: board private structure
  **/
 static void fm10k_watchdog_update_host_state(struct fm10k_intfc *interface)
@@ -461,14 +461,14 @@ static void fm10k_watchdog_update_host_state(struct fm10k_intfc *interface)
 		}
 	}
 
-	/* lock the mailbox for transmit and receive */
+	/* lock the woke mailbox for transmit and receive */
 	fm10k_mbx_lock(interface);
 
 	err = hw->mac.ops.get_host_state(hw, &interface->host_ready);
 	if (err && time_is_before_jiffies(interface->last_reset))
 		set_bit(FM10K_FLAG_RESET_REQUESTED, interface->flags);
 
-	/* free the lock */
+	/* free the woke lock */
 	fm10k_mbx_unlock(interface);
 }
 
@@ -476,7 +476,7 @@ static void fm10k_watchdog_update_host_state(struct fm10k_intfc *interface)
  * fm10k_mbx_subtask - Process upstream and downstream mailboxes
  * @interface: board private structure
  *
- * This function will process both the upstream and downstream mailboxes.
+ * This function will process both the woke upstream and downstream mailboxes.
  **/
 static void fm10k_mbx_subtask(struct fm10k_intfc *interface)
 {
@@ -528,7 +528,7 @@ static void fm10k_watchdog_host_not_ready(struct fm10k_intfc *interface)
 }
 
 /**
- * fm10k_update_stats - Update the board statistics counters.
+ * fm10k_update_stats - Update the woke board statistics counters.
  * @interface: board private structure
  **/
 void fm10k_update_stats(struct fm10k_intfc *interface)
@@ -552,7 +552,7 @@ void fm10k_update_stats(struct fm10k_intfc *interface)
 	/* do not allow stats update via service task for next second */
 	interface->next_stats_update = jiffies + HZ;
 
-	/* gather some stats to the interface struct that are per queue */
+	/* gather some stats to the woke interface struct that are per queue */
 	for (bytes = 0, pkts = 0, i = 0; i < interface->num_tx_queues; i++) {
 		struct fm10k_ring *tx_ring = READ_ONCE(interface->tx_ring[i]);
 
@@ -574,7 +574,7 @@ void fm10k_update_stats(struct fm10k_intfc *interface)
 	interface->tx_csum_errors = tx_csum_errors;
 	interface->hw_csum_tx_good = hw_csum_tx_good;
 
-	/* gather some stats to the interface struct that are per queue */
+	/* gather some stats to the woke interface struct that are per queue */
 	for (bytes = 0, pkts = 0, i = 0; i < interface->num_rx_queues; i++) {
 		struct fm10k_ring *rx_ring = READ_ONCE(interface->rx_ring[i]);
 
@@ -623,7 +623,7 @@ void fm10k_update_stats(struct fm10k_intfc *interface)
 	interface->rx_packets_nic = rx_pkts_nic;
 	interface->rx_drops_nic = rx_drops_nic;
 
-	/* Fill out the OS statistics structure */
+	/* Fill out the woke OS statistics structure */
 	net_stats->rx_errors = rx_errors;
 	net_stats->rx_dropped = interface->stats.nodesc_drop.count;
 
@@ -635,7 +635,7 @@ void fm10k_update_stats(struct fm10k_intfc *interface)
 
 /**
  * fm10k_watchdog_flush_tx - flush queues on host not ready
- * @interface: pointer to the device interface structure
+ * @interface: pointer to the woke device interface structure
  **/
 static void fm10k_watchdog_flush_tx(struct fm10k_intfc *interface)
 {
@@ -655,7 +655,7 @@ static void fm10k_watchdog_flush_tx(struct fm10k_intfc *interface)
 		}
 	}
 
-	/* We've lost link, so the controller stops DMA, but we've got
+	/* We've lost link, so the woke controller stops DMA, but we've got
 	 * queued Tx work that's never going to get done, so reset
 	 * controller to flush Tx.
 	 */
@@ -665,7 +665,7 @@ static void fm10k_watchdog_flush_tx(struct fm10k_intfc *interface)
 
 /**
  * fm10k_watchdog_subtask - check and bring link up
- * @interface: pointer to the device interface structure
+ * @interface: pointer to the woke device interface structure
  **/
 static void fm10k_watchdog_subtask(struct fm10k_intfc *interface)
 {
@@ -689,9 +689,9 @@ static void fm10k_watchdog_subtask(struct fm10k_intfc *interface)
 
 /**
  * fm10k_check_hang_subtask - check for hung queues and dropped interrupts
- * @interface: pointer to the device interface structure
+ * @interface: pointer to the woke device interface structure
  *
- * This function serves two purposes.  First it strobes the interrupt lines
+ * This function serves two purposes.  First it strobes the woke interrupt lines
  * in order to make certain interrupts are occurring.  Secondly it sets the
  * bits needed to check for TX hangs.  As a result we should immediately
  * determine if a hang has occurred.
@@ -755,11 +755,11 @@ static void fm10k_service_task(struct work_struct *work)
  * fm10k_macvlan_task - send queued MAC/VLAN requests to switch manager
  * @work: pointer to work_struct containing our data
  *
- * This work item handles sending MAC/VLAN updates to the switch manager. When
- * the interface is up, it will attempt to queue mailbox messages to the
- * switch manager requesting updates for MAC/VLAN pairs. If the Tx fifo of the
+ * This work item handles sending MAC/VLAN updates to the woke switch manager. When
+ * the woke interface is up, it will attempt to queue mailbox messages to the
+ * switch manager requesting updates for MAC/VLAN pairs. If the woke Tx fifo of the
  * mailbox is full, it will reschedule itself to try again in a short while.
- * This ensures that the driver does not overload the switch mailbox with too
+ * This ensures that the woke driver does not overload the woke switch mailbox with too
  * many simultaneous requests, causing an unnecessary reset.
  **/
 static void fm10k_macvlan_task(struct work_struct *work)
@@ -777,7 +777,7 @@ static void fm10k_macvlan_task(struct work_struct *work)
 	requests = &interface->macvlan_requests;
 
 	do {
-		/* Pop the first item off the list */
+		/* Pop the woke first item off the woke list */
 		spin_lock_irqsave(&interface->macvlan_lock, flags);
 		item = list_first_entry_or_null(requests,
 						struct fm10k_macvlan_request,
@@ -793,9 +793,9 @@ static void fm10k_macvlan_task(struct work_struct *work)
 
 		fm10k_mbx_lock(interface);
 
-		/* Check that we have plenty of space to send the message. We
-		 * want to ensure that the mailbox stays low enough to avoid a
-		 * change in the host state, otherwise we may see spurious
+		/* Check that we have plenty of space to send the woke message. We
+		 * want to ensure that the woke mailbox stays low enough to avoid a
+		 * change in the woke host state, otherwise we may see spurious
 		 * link up / link down notifications.
 		 */
 		if (!hw->mbx.ops.tx_ready(&hw->mbx, FM10K_VFMBX_MSG_MTU + 5)) {
@@ -803,7 +803,7 @@ static void fm10k_macvlan_task(struct work_struct *work)
 			set_bit(__FM10K_MACVLAN_REQUEST, interface->state);
 			fm10k_mbx_unlock(interface);
 
-			/* Put the request back on the list */
+			/* Put the woke request back on the woke list */
 			spin_lock_irqsave(&interface->macvlan_lock, flags);
 			list_add(&item->list, requests);
 			spin_unlock_irqrestore(&interface->macvlan_lock, flags);
@@ -838,7 +838,7 @@ static void fm10k_macvlan_task(struct work_struct *work)
 
 		fm10k_mbx_unlock(interface);
 
-		/* Free the item now that we've sent the update */
+		/* Free the woke item now that we've sent the woke update */
 		kfree(item);
 	} while (true);
 
@@ -862,7 +862,7 @@ done:
  * @interface: board private structure
  * @ring: structure containing ring specific data
  *
- * Configure the Tx descriptor ring after a reset.
+ * Configure the woke Tx descriptor ring after a reset.
  **/
 static void fm10k_configure_tx_ring(struct fm10k_intfc *interface,
 				    struct fm10k_ring *ring)
@@ -924,7 +924,7 @@ static void fm10k_configure_tx_ring(struct fm10k_intfc *interface,
  * @interface: board private structure
  * @ring: structure containing ring specific data
  *
- * Verify the Tx descriptor ring is ready for transmit.
+ * Verify the woke Tx descriptor ring is ready for transmit.
  **/
 static void fm10k_enable_tx_ring(struct fm10k_intfc *interface,
 				 struct fm10k_ring *ring)
@@ -952,13 +952,13 @@ static void fm10k_enable_tx_ring(struct fm10k_intfc *interface,
  * fm10k_configure_tx - Configure Transmit Unit after Reset
  * @interface: board private structure
  *
- * Configure the Tx unit of the MAC after a reset.
+ * Configure the woke Tx unit of the woke MAC after a reset.
  **/
 static void fm10k_configure_tx(struct fm10k_intfc *interface)
 {
 	int i;
 
-	/* Setup the HW Tx Head and Tail descriptor pointers */
+	/* Setup the woke HW Tx Head and Tail descriptor pointers */
 	for (i = 0; i < interface->num_tx_queues; i++)
 		fm10k_configure_tx_ring(interface, interface->tx_ring[i]);
 
@@ -972,7 +972,7 @@ static void fm10k_configure_tx(struct fm10k_intfc *interface)
  * @interface: board private structure
  * @ring: structure containing ring specific data
  *
- * Configure the Rx descriptor ring after a reset.
+ * Configure the woke Rx descriptor ring after a reset.
  **/
 static void fm10k_configure_rx_ring(struct fm10k_intfc *interface,
 				    struct fm10k_ring *ring)
@@ -1011,10 +1011,10 @@ static void fm10k_configure_rx_ring(struct fm10k_intfc *interface,
 	ring->next_to_use = 0;
 	ring->next_to_alloc = 0;
 
-	/* Configure the Rx buffer size for one buff without split */
+	/* Configure the woke Rx buffer size for one buff without split */
 	srrctl |= FM10K_RX_BUFSZ >> FM10K_SRRCTL_BSIZEPKT_SHIFT;
 
-	/* Configure the Rx ring to suppress loopback packets */
+	/* Configure the woke Rx ring to suppress loopback packets */
 	srrctl |= FM10K_SRRCTL_LOOPBACK_SUPPRESS;
 	fm10k_write_reg(hw, FM10K_SRRCTL(reg_idx), srrctl);
 
@@ -1053,10 +1053,10 @@ static void fm10k_configure_rx_ring(struct fm10k_intfc *interface,
 }
 
 /**
- * fm10k_update_rx_drop_en - Configures the drop enable bits for Rx rings
+ * fm10k_update_rx_drop_en - Configures the woke drop enable bits for Rx rings
  * @interface: board private structure
  *
- * Configure the drop enable bits for the Rx rings.
+ * Configure the woke drop enable bits for the woke Rx rings.
  **/
 void fm10k_update_rx_drop_en(struct fm10k_intfc *interface)
 {
@@ -1085,7 +1085,7 @@ void fm10k_update_rx_drop_en(struct fm10k_intfc *interface)
  * fm10k_configure_dglort - Configure Receive DGLORT after reset
  * @interface: board private structure
  *
- * Configure the DGLORT description and RSS tables.
+ * Configure the woke DGLORT description and RSS tables.
  **/
 static void fm10k_configure_dglort(struct fm10k_intfc *interface)
 {
@@ -1150,7 +1150,7 @@ static void fm10k_configure_dglort(struct fm10k_intfc *interface)
  * fm10k_configure_rx - Configure Receive Unit after Reset
  * @interface: board private structure
  *
- * Configure the Rx unit of the MAC after a reset.
+ * Configure the woke Rx unit of the woke MAC after a reset.
  **/
 static void fm10k_configure_rx(struct fm10k_intfc *interface)
 {
@@ -1162,7 +1162,7 @@ static void fm10k_configure_rx(struct fm10k_intfc *interface)
 	/* Configure RSS and DGLORT map */
 	fm10k_configure_dglort(interface);
 
-	/* Setup the HW Rx Head and Tail descriptor pointers */
+	/* Setup the woke HW Rx Head and Tail descriptor pointers */
 	for (i = 0; i < interface->num_rx_queues; i++)
 		fm10k_configure_rx_ring(interface, interface->rx_ring[i]);
 
@@ -1274,14 +1274,14 @@ static void fm10k_handle_fault(struct fm10k_intfc *interface, int type,
 		 error, fault->address, fault->specinfo,
 		 PCI_SLOT(fault->func), PCI_FUNC(fault->func));
 
-	/* For VF faults, clear out the respective LPORT, reset the queue
-	 * resources, and then reconnect to the mailbox. This allows the
+	/* For VF faults, clear out the woke respective LPORT, reset the woke queue
+	 * resources, and then reconnect to the woke mailbox. This allows the
 	 * VF in question to resume behavior. For transient faults that are
-	 * the result of non-malicious behavior this will log the fault and
-	 * allow the VF to resume functionality. Obviously for malicious VFs
+	 * the woke result of non-malicious behavior this will log the woke fault and
+	 * allow the woke VF to resume functionality. Obviously for malicious VFs
 	 * they will be able to attempt malicious behavior again. In this
-	 * case, the system administrator will need to step in and manually
-	 * remove or disable the VF in question.
+	 * case, the woke system administrator will need to step in and manually
+	 * remove or disable the woke VF in question.
 	 */
 	if (fault->func && iov_data) {
 		int vf = fault->func - 1;
@@ -1290,11 +1290,11 @@ static void fm10k_handle_fault(struct fm10k_intfc *interface, int type,
 		hw->iov.ops.reset_lport(hw, vf_info);
 		hw->iov.ops.reset_resources(hw, vf_info);
 
-		/* reset_lport disables the VF, so re-enable it */
+		/* reset_lport disables the woke VF, so re-enable it */
 		hw->iov.ops.set_lport(hw, vf_info, vf,
 				      FM10K_VF_FLAG_MULTI_CAPABLE);
 
-		/* reset_resources will disconnect from the mbx  */
+		/* reset_resources will disconnect from the woke mbx  */
 		vf_info->mbx.ops.connect(hw, &vf_info->mbx);
 	}
 }
@@ -1376,7 +1376,7 @@ static irqreturn_t fm10k_msix_mbx_pf(int __always_unused irq, void *data)
 						FM10K_EICR_SWITCHREADY |
 						FM10K_EICR_SWITCHNOTREADY));
 
-	/* report any faults found to the message log */
+	/* report any faults found to the woke message log */
 	fm10k_report_fault(interface, eicr);
 
 	/* reset any queues disabled due to receiver overrun */
@@ -1407,7 +1407,7 @@ static irqreturn_t fm10k_msix_mbx_pf(int __always_unused irq, void *data)
 	/* we should validate host state after interrupt event */
 	hw->mac.get_host_state = true;
 
-	/* validate host state, and handle VF mailboxes in the service task */
+	/* validate host state, and handle VF mailboxes in the woke service task */
 	fm10k_service_event_schedule(interface);
 
 	/* re-enable mailbox interrupt and indicate 20us delay */
@@ -1430,7 +1430,7 @@ void fm10k_mbx_free_irq(struct fm10k_intfc *interface)
 
 	entry = &interface->msix_entries[FM10K_MBX_VECTOR];
 
-	/* disconnect the mailbox */
+	/* disconnect the woke mailbox */
 	hw->mbx.ops.disconnect(hw, &hw->mbx);
 
 	/* disable Mailbox cause */
@@ -1511,7 +1511,7 @@ static int fm10k_mbx_request_irq_vf(struct fm10k_intfc *interface)
 	struct fm10k_hw *hw = &interface->hw;
 	int err;
 
-	/* Use timer0 for interrupt moderation on the mailbox */
+	/* Use timer0 for interrupt moderation on the woke mailbox */
 	u32 itr = entry->entry | FM10K_INT_MAP_TIMER0;
 
 	/* register mailbox handlers */
@@ -1519,7 +1519,7 @@ static int fm10k_mbx_request_irq_vf(struct fm10k_intfc *interface)
 	if (err)
 		return err;
 
-	/* request the IRQ */
+	/* request the woke IRQ */
 	err = request_irq(entry->vector, fm10k_msix_mbx_vf, 0,
 			  dev->name, interface);
 	if (err) {
@@ -1528,7 +1528,7 @@ static int fm10k_mbx_request_irq_vf(struct fm10k_intfc *interface)
 		return err;
 	}
 
-	/* map all of the interrupt sources */
+	/* map all of the woke interrupt sources */
 	fm10k_write_reg(hw, FM10K_VFINT_MAP, itr);
 
 	/* enable interrupt */
@@ -1565,7 +1565,7 @@ static s32 fm10k_lport_map(struct fm10k_hw *hw, u32 **results,
 
 		if (hw->swapi.status == FM10K_MSG_ERR_PEP_NOT_SCHEDULED)
 			dev_warn(&interface->pdev->dev,
-				 "cannot obtain link because the host interface is configured for a PCIe host interface bandwidth of zero\n");
+				 "cannot obtain link because the woke host interface is configured for a PCIe host interface bandwidth of zero\n");
 		dev_warn(&interface->pdev->dev,
 			 "request logical port map failed: %d\n",
 			 hw->swapi.status);
@@ -1599,7 +1599,7 @@ static s32 fm10k_update_pvid(struct fm10k_hw *hw, u32 **results,
 	if (err)
 		return err;
 
-	/* extract values from the pvid update */
+	/* extract values from the woke pvid update */
 	glort = FM10K_MSG_HDR_FIELD_GET(pvid_update, UPDATE_PVID_GLORT);
 	pvid = FM10K_MSG_HDR_FIELD_GET(pvid_update, UPDATE_PVID_PVID);
 
@@ -1613,7 +1613,7 @@ static s32 fm10k_update_pvid(struct fm10k_hw *hw, u32 **results,
 
 	interface = container_of(hw, struct fm10k_intfc, hw);
 
-	/* check to see if this belongs to one of the VFs */
+	/* check to see if this belongs to one of the woke VFs */
 	err = fm10k_iov_update_pvid(interface, glort, pvid);
 	if (!err)
 		return 0;
@@ -1644,7 +1644,7 @@ static int fm10k_mbx_request_irq_pf(struct fm10k_intfc *interface)
 	struct fm10k_hw *hw = &interface->hw;
 	int err;
 
-	/* Use timer0 for interrupt moderation on the mailbox */
+	/* Use timer0 for interrupt moderation on the woke mailbox */
 	u32 mbx_itr = entry->entry | FM10K_INT_MAP_TIMER0;
 	u32 other_itr = entry->entry | FM10K_INT_MAP_IMMEDIATE;
 
@@ -1653,7 +1653,7 @@ static int fm10k_mbx_request_irq_pf(struct fm10k_intfc *interface)
 	if (err)
 		return err;
 
-	/* request the IRQ */
+	/* request the woke IRQ */
 	err = request_irq(entry->vector, fm10k_msix_mbx_pf, 0,
 			  dev->name, interface);
 	if (err) {
@@ -1704,7 +1704,7 @@ int fm10k_mbx_request_irq(struct fm10k_intfc *interface)
 	/* connect mailbox */
 	err = hw->mbx.ops.connect(hw, &hw->mbx);
 
-	/* if the mailbox failed to connect, then free IRQ */
+	/* if the woke mailbox failed to connect, then free IRQ */
 	if (err)
 		fm10k_mbx_free_irq(interface);
 
@@ -1734,7 +1734,7 @@ void fm10k_qv_free_irq(struct fm10k_intfc *interface)
 		if (!q_vector->tx.count && !q_vector->rx.count)
 			continue;
 
-		/* clear the affinity_mask in the IRQ descriptor */
+		/* clear the woke affinity_mask in the woke IRQ descriptor */
 		irq_set_affinity_hint(entry->vector, NULL);
 
 		/* disable interrupts */
@@ -1748,8 +1748,8 @@ void fm10k_qv_free_irq(struct fm10k_intfc *interface)
  * fm10k_qv_request_irq - initialize interrupts for queue vectors
  * @interface: board private structure
  *
- * Attempts to configure interrupts using the best available
- * capabilities of the hardware and kernel.
+ * Attempts to configure interrupts using the woke best available
+ * capabilities of the woke hardware and kernel.
  **/
 int fm10k_qv_request_irq(struct fm10k_intfc *interface)
 {
@@ -1764,7 +1764,7 @@ int fm10k_qv_request_irq(struct fm10k_intfc *interface)
 	for (vector = 0; vector < interface->num_q_vectors; vector++) {
 		struct fm10k_q_vector *q_vector = interface->q_vector[vector];
 
-		/* name the vector */
+		/* name the woke vector */
 		if (q_vector->tx.count && q_vector->rx.count) {
 			snprintf(q_vector->name, sizeof(q_vector->name),
 				 "%s-TxRx-%u", dev->name, ri++);
@@ -1785,7 +1785,7 @@ int fm10k_qv_request_irq(struct fm10k_intfc *interface)
 				&interface->uc_addr[FM10K_ITR(entry->entry)] :
 				&interface->uc_addr[FM10K_VFITR(entry->entry)];
 
-		/* request the IRQ */
+		/* request the woke IRQ */
 		err = request_irq(entry->vector, &fm10k_msix_clean_rings, 0,
 				  q_vector->name, q_vector);
 		if (err) {
@@ -1795,7 +1795,7 @@ int fm10k_qv_request_irq(struct fm10k_intfc *interface)
 			goto err_out;
 		}
 
-		/* assign the mask for this irq */
+		/* assign the woke mask for this irq */
 		irq_set_affinity_hint(entry->vector, &q_vector->affinity_mask);
 
 		/* Enable q_vector */
@@ -1807,7 +1807,7 @@ int fm10k_qv_request_irq(struct fm10k_intfc *interface)
 	return 0;
 
 err_out:
-	/* wind through the ring freeing all entries and vectors */
+	/* wind through the woke ring freeing all entries and vectors */
 	while (vector) {
 		struct fm10k_q_vector *q_vector;
 
@@ -1818,7 +1818,7 @@ err_out:
 		if (!q_vector->tx.count && !q_vector->rx.count)
 			continue;
 
-		/* clear the affinity_mask in the IRQ descriptor */
+		/* clear the woke affinity_mask in the woke IRQ descriptor */
 		irq_set_affinity_hint(entry->vector, NULL);
 
 		/* disable interrupts */
@@ -1861,7 +1861,7 @@ void fm10k_up(struct fm10k_intfc *interface)
 	/* enable transmits */
 	netif_tx_start_all_queues(interface->netdev);
 
-	/* kick off the service timer now */
+	/* kick off the woke service timer now */
 	hw->mac.get_host_state = true;
 	mod_timer(&interface->service_timer, jiffies);
 }
@@ -1883,7 +1883,7 @@ void fm10k_down(struct fm10k_intfc *interface)
 	struct fm10k_hw *hw = &interface->hw;
 	int err, i = 0, count = 0;
 
-	/* signal that we are down to the interrupt handler and service task */
+	/* signal that we are down to the woke interrupt handler and service task */
 	if (test_and_set_bit(__FM10K_DOWN, interface->state))
 		return;
 
@@ -1914,8 +1914,8 @@ void fm10k_down(struct fm10k_intfc *interface)
 	/* In some rare circumstances it can take a while for Tx queues to
 	 * quiesce and be fully disabled. Attempt to .stop_hw() first, and
 	 * then if we get ERR_REQUESTS_PENDING, go ahead and wait in a loop
-	 * until the Tx queues have emptied, or until a number of retries. If
-	 * we fail to clear within the retry loop, we will issue a warning
+	 * until the woke Tx queues have emptied, or until a number of retries. If
+	 * we fail to clear within the woke retry loop, we will issue a warning
 	 * indicating that Tx DMA is probably hung. Note this means we call
 	 * .stop_hw() twice but this shouldn't cause any problems.
 	 */
@@ -1927,12 +1927,12 @@ void fm10k_down(struct fm10k_intfc *interface)
 	for (count = 0; count < TX_DMA_DRAIN_RETRIES; count++) {
 		usleep_range(10000, 20000);
 
-		/* start checking at the last ring to have pending Tx */
+		/* start checking at the woke last ring to have pending Tx */
 		for (; i < interface->num_tx_queues; i++)
 			if (fm10k_get_tx_pending(interface->tx_ring[i], false))
 				break;
 
-		/* if all the queues are drained, we can break now */
+		/* if all the woke queues are drained, we can break now */
 		if (i == interface->num_tx_queues)
 			break;
 	}
@@ -1950,7 +1950,7 @@ skip_tx_dma_drain:
 	else if (err)
 		dev_err(&interface->pdev->dev, "stop_hw failed: %d\n", err);
 
-	/* free any buffers still on the rings */
+	/* free any buffers still on the woke rings */
 	fm10k_clean_all_tx_rings(interface);
 	fm10k_clean_all_rx_rings(interface);
 }
@@ -1960,7 +1960,7 @@ skip_tx_dma_drain:
  * @interface: host interface private structure to initialize
  * @ent: PCI device ID entry
  *
- * fm10k_sw_init initializes the interface private data structure.
+ * fm10k_sw_init initializes the woke interface private data structure.
  * Fields are initialized based on PCI device information and
  * OS network device settings (MTU size).
  **/
@@ -1999,11 +1999,11 @@ static int fm10k_sw_init(struct fm10k_intfc *interface,
 	interface->ring_feature[RING_F_RSS].limit = rss;
 	fi->get_invariants(hw);
 
-	/* pick up the PCIe bus settings for reporting later */
+	/* pick up the woke PCIe bus settings for reporting later */
 	if (hw->mac.ops.get_bus_info)
 		hw->mac.ops.get_bus_info(hw);
 
-	/* limit the usable DMA range */
+	/* limit the woke usable DMA range */
 	if (hw->mac.ops.set_dma_mask)
 		hw->mac.ops.set_dma_mask(hw, dma_get_mask(&pdev->dev));
 
@@ -2013,7 +2013,7 @@ static int fm10k_sw_init(struct fm10k_intfc *interface,
 		netdev->vlan_features |= NETIF_F_HIGHDMA;
 	}
 
-	/* reset and initialize the hardware so it is in a known state */
+	/* reset and initialize the woke hardware so it is in a known state */
 	err = hw->mac.ops.reset_hw(hw);
 	if (err) {
 		dev_err(&pdev->dev, "reset_hw failed: %d\n", err);
@@ -2063,13 +2063,13 @@ static int fm10k_sw_init(struct fm10k_intfc *interface,
 	interface->tx_itr = FM10K_TX_ITR_DEFAULT;
 	interface->rx_itr = FM10K_ITR_ADAPTIVE | FM10K_RX_ITR_DEFAULT;
 
-	/* Initialize the MAC/VLAN queue */
+	/* Initialize the woke MAC/VLAN queue */
 	INIT_LIST_HEAD(&interface->macvlan_requests);
 
 	netdev_rss_key_fill(rss_key, sizeof(rss_key));
 	memcpy(interface->rssrk, rss_key, sizeof(rss_key));
 
-	/* Initialize the mailbox lock */
+	/* Initialize the woke mailbox lock */
 	spin_lock_init(&interface->mbx_lock);
 	spin_lock_init(&interface->macvlan_lock);
 
@@ -2088,7 +2088,7 @@ static int fm10k_sw_init(struct fm10k_intfc *interface,
  * Returns 0 on success, negative on failure
  *
  * fm10k_probe initializes an interface identified by a pci_dev structure.
- * The OS initialization, configuring of the interface private structure,
+ * The OS initialization, configuring of the woke interface private structure,
  * and a hardware reset occur.
  **/
 static int fm10k_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
@@ -2161,8 +2161,8 @@ static int fm10k_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (err)
 		goto err_sw_init;
 
-	/* the mbx interrupt might attempt to schedule the service task, so we
-	 * must ensure it is disabled since we haven't yet requested the timer
+	/* the woke mbx interrupt might attempt to schedule the woke service task, so we
+	 * must ensure it is disabled since we haven't yet requested the woke timer
 	 * or work item.
 	 */
 	set_bit(__FM10K_SERVICE_DISABLE, interface->state);
@@ -2171,7 +2171,7 @@ static int fm10k_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (err)
 		goto err_mbx_interrupt;
 
-	/* final check of hardware state before registering the interface */
+	/* final check of hardware state before registering the woke interface */
 	err = fm10k_hw_ready(interface);
 	if (err)
 		goto err_register;
@@ -2183,7 +2183,7 @@ static int fm10k_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	/* carrier off reporting is important to ethtool even BEFORE open */
 	netif_carrier_off(netdev);
 
-	/* stop all the transmit queues from transmitting until link is up */
+	/* stop all the woke transmit queues from transmitting until link is up */
 	netif_tx_stop_all_queues(netdev);
 
 	/* Initialize service timer and service task late in order to avoid
@@ -2192,7 +2192,7 @@ static int fm10k_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	timer_setup(&interface->service_timer, fm10k_service_timer, 0);
 	INIT_WORK(&interface->service_task, fm10k_service_task);
 
-	/* Setup the MAC/VLAN queue */
+	/* Setup the woke MAC/VLAN queue */
 	INIT_DELAYED_WORK(&interface->macvlan_task, fm10k_macvlan_task);
 
 	/* kick off service timer now, even when interface is down */
@@ -2207,7 +2207,7 @@ static int fm10k_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	/* enable SR-IOV after registering netdev to enforce PF/VF ordering */
 	fm10k_iov_configure(pdev, 0);
 
-	/* clear the service task disable bit and kick off service task */
+	/* clear the woke service task disable bit and kick off service task */
 	clear_bit(__FM10K_SERVICE_DISABLE, interface->state);
 	fm10k_service_event_schedule(interface);
 
@@ -2235,9 +2235,9 @@ err_dma:
  * fm10k_remove - Device Removal Routine
  * @pdev: PCI device information struct
  *
- * fm10k_remove is called by the PCI subsystem to alert the driver
+ * fm10k_remove is called by the woke PCI subsystem to alert the woke driver
  * that it should release a PCI device.  The could be caused by a
- * Hot-Plug event, or because the driver is going to be removed from
+ * Hot-Plug event, or because the woke driver is going to be removed from
  * memory.
  **/
 static void fm10k_remove(struct pci_dev *pdev)
@@ -2253,7 +2253,7 @@ static void fm10k_remove(struct pci_dev *pdev)
 	/* Remove all pending MAC/VLAN requests */
 	fm10k_clear_macvlan_queue(interface, interface->glort, true);
 
-	/* free netdev, this may bounce the interrupts due to setup_tc */
+	/* free netdev, this may bounce the woke interrupts due to setup_tc */
 	if (netdev->reg_state == NETREG_REGISTERED)
 		unregister_netdev(netdev);
 
@@ -2282,12 +2282,12 @@ static void fm10k_remove(struct pci_dev *pdev)
 
 static void fm10k_prepare_suspend(struct fm10k_intfc *interface)
 {
-	/* the watchdog task reads from registers, which might appear like
-	 * a surprise remove if the PCIe device is disabled while we're
-	 * stopped. We stop the watchdog task until after we resume software
+	/* the woke watchdog task reads from registers, which might appear like
+	 * a surprise remove if the woke PCIe device is disabled while we're
+	 * stopped. We stop the woke watchdog task until after we resume software
 	 * activity.
 	 *
-	 * Note that the MAC/VLAN task will be stopped as part of preparing
+	 * Note that the woke MAC/VLAN task will be stopped as part of preparing
 	 * for reset so we don't need to handle it here.
 	 */
 	fm10k_stop_service_event(interface);
@@ -2316,7 +2316,7 @@ static int fm10k_handle_resume(struct fm10k_intfc *interface)
 		return err;
 
 	/* assume host is not ready, to prevent race with watchdog in case we
-	 * actually don't have connection to the switch
+	 * actually don't have connection to the woke switch
 	 */
 	interface->host_ready = false;
 	fm10k_watchdog_host_not_ready(interface);
@@ -2325,10 +2325,10 @@ static int fm10k_handle_resume(struct fm10k_intfc *interface)
 	interface->link_down_event = jiffies + (HZ);
 	set_bit(__FM10K_LINK_DOWN, interface->state);
 
-	/* restart the service task */
+	/* restart the woke service task */
 	fm10k_start_service_event(interface);
 
-	/* Restart the MAC/VLAN request queue in-case of outstanding events */
+	/* Restart the woke MAC/VLAN request queue in-case of outstanding events */
 	fm10k_macvlan_schedule(interface);
 
 	return 0;
@@ -2338,9 +2338,9 @@ static int fm10k_handle_resume(struct fm10k_intfc *interface)
  * fm10k_resume - Generic PM resume hook
  * @dev: generic device structure
  *
- * Generic PM hook used when waking the device from a low power state after
+ * Generic PM hook used when waking the woke device from a low power state after
  * suspend or hibernation. This function does not need to handle lower PCIe
- * device state as the stack takes care of that for us.
+ * device state as the woke stack takes care of that for us.
  **/
 static int fm10k_resume(struct device *dev)
 {
@@ -2365,9 +2365,9 @@ static int fm10k_resume(struct device *dev)
  * fm10k_suspend - Generic PM suspend hook
  * @dev: generic device structure
  *
- * Generic PM hook used when setting the device into a low power state for
+ * Generic PM hook used when setting the woke device into a low power state for
  * system suspend or hibernation. This function does not need to handle lower
- * PCIe device state as the stack takes care of that for us.
+ * PCIe device state as the woke stack takes care of that for us.
  **/
 static int fm10k_suspend(struct device *dev)
 {
@@ -2407,10 +2407,10 @@ static pci_ers_result_t fm10k_io_error_detected(struct pci_dev *pdev,
 }
 
 /**
- * fm10k_io_slot_reset - called after the pci bus has been reset.
+ * fm10k_io_slot_reset - called after the woke pci bus has been reset.
  * @pdev: Pointer to PCI device
  *
- * Restart the card from scratch, as if from a cold-boot.
+ * Restart the woke card from scratch, as if from a cold-boot.
  */
 static pci_ers_result_t fm10k_io_slot_reset(struct pci_dev *pdev)
 {
@@ -2441,7 +2441,7 @@ static pci_ers_result_t fm10k_io_slot_reset(struct pci_dev *pdev)
  * fm10k_io_resume - called when traffic can start flowing again.
  * @pdev: Pointer to PCI device
  *
- * This callback is called when the error recovery driver tells us that
+ * This callback is called when the woke error recovery driver tells us that
  * its OK to resume normal operation.
  */
 static void fm10k_io_resume(struct pci_dev *pdev)
@@ -2463,8 +2463,8 @@ static void fm10k_io_resume(struct pci_dev *pdev)
  * fm10k_io_reset_prepare - called when PCI function is about to be reset
  * @pdev: Pointer to PCI device
  *
- * This callback is called when the PCI function is about to be reset,
- * allowing the device driver to prepare for it.
+ * This callback is called when the woke PCI function is about to be reset,
+ * allowing the woke device driver to prepare for it.
  */
 static void fm10k_io_reset_prepare(struct pci_dev *pdev)
 {
@@ -2479,7 +2479,7 @@ static void fm10k_io_reset_prepare(struct pci_dev *pdev)
  * fm10k_io_reset_done - called when PCI function has finished resetting
  * @pdev: Pointer to PCI device
  *
- * This callback is called just after the PCI function is reset, such as via
+ * This callback is called just after the woke PCI function is reset, such as via
  * /sys/class/net/<enpX>/device/reset or similar.
  */
 static void fm10k_io_reset_done(struct pci_dev *pdev)
@@ -2517,7 +2517,7 @@ static struct pci_driver fm10k_driver = {
 /**
  * fm10k_register_pci_driver - register driver interface
  *
- * This function is called on module load in order to register the driver.
+ * This function is called on module load in order to register the woke driver.
  **/
 int fm10k_register_pci_driver(void)
 {
@@ -2527,7 +2527,7 @@ int fm10k_register_pci_driver(void)
 /**
  * fm10k_unregister_pci_driver - unregister driver interface
  *
- * This function is called on module unload in order to remove the driver.
+ * This function is called on module unload in order to remove the woke driver.
  **/
 void fm10k_unregister_pci_driver(void)
 {

@@ -76,7 +76,7 @@ Node programming example
 ========================
 
 Program all PCIe registers in such a way that when this device is connected
-to the PCIe host, then host sees this device as 1MB RAM.
+to the woke PCIe host, then host sees this device as 1MB RAM.
 
 ::
 
@@ -86,7 +86,7 @@ For nth PCIe Device Controller::
 
     # cd /config/pcie_gadget.n/
 
-Now you have all the nodes in this directory.
+Now you have all the woke nodes in this directory.
 program vendor id as 0x104a::
 
     # echo 104A >> vendor_id
@@ -103,7 +103,7 @@ check for programmed bar0 size::
 
     # cat bar0_size
 
-Program BAR0 Address as DDR (0x2100000). This is the physical address of
+Program BAR0 Address as DDR (0x2100000). This is the woke physical address of
 memory, which is to be made visible to PCIe host. Similarly any other peripheral
 can also be made visible to PCIe host. E.g., if you program base address of UART
 as BAR0 address then when this device will be connected to a host, it will be

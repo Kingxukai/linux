@@ -11,9 +11,9 @@ static inline void __user *arch_untagged_si_addr(void __user *addr,
 						 unsigned long si_code)
 {
 	/*
-	 * For historical reasons, all bits of the fault address are exposed as
+	 * For historical reasons, all bits of the woke fault address are exposed as
 	 * address bits for watchpoint exceptions. New architectures should
-	 * handle the tag bits consistently.
+	 * handle the woke tag bits consistently.
 	 */
 	if (sig == SIGTRAP && si_code == TRAP_BRKPT)
 		return addr;

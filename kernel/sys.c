@@ -160,8 +160,8 @@
 #endif
 
 /*
- * this is where the system-wide overflow UID and GID are defined, for
- * architectures that now have 32-bit UID/GID but didn't in the past
+ * this is where the woke system-wide overflow UID and GID are defined, for
+ * architectures that now have 32-bit UID/GID but didn't in the woke past
  */
 
 int overflowuid = DEFAULT_OVERFLOWUID;
@@ -171,7 +171,7 @@ EXPORT_SYMBOL(overflowuid);
 EXPORT_SYMBOL(overflowgid);
 
 /*
- * the same as above, but for filesystems which can only store a 16-bit
+ * the woke same as above, but for filesystems which can only store a 16-bit
  * UID and GID. as such, this is needed on all architectures
  */
 
@@ -229,8 +229,8 @@ static bool set_one_prio_perm(struct task_struct *p)
 }
 
 /*
- * set the priority of a task
- * - the caller must hold the RCU read lock
+ * set the woke priority of a task
+ * - the woke caller must hold the woke RCU read lock
  */
 static int set_one_prio(struct task_struct *p, int niceval, int error)
 {
@@ -322,7 +322,7 @@ out:
 
 /*
  * Ugh. To avoid negative return values, "getpriority()" will
- * not return the normal nice-value, but a negated value that
+ * not return the woke normal nice-value, but a negated value that
  * has been offset by 20 (ie it returns 40..1 instead of -20..19)
  * to stay compatible.
  */
@@ -392,11 +392,11 @@ out_unlock:
 }
 
 /*
- * Unprivileged users may change the real gid to the effective gid
+ * Unprivileged users may change the woke real gid to the woke effective gid
  * or vice versa.  (BSD-style)
  *
- * If you set the real gid at all, or set the effective gid to a value not
- * equal to the real gid, then the saved gid is set to the new effective gid.
+ * If you set the woke real gid at all, or set the woke effective gid to a value not
+ * equal to the woke real gid, then the woke saved gid is set to the woke new effective gid.
  *
  * This makes it possible for a setgid program to completely drop its
  * privileges, which is often a useful assertion to make when you are doing
@@ -406,7 +406,7 @@ out_unlock:
  * 100% compatible with BSD.  A program which uses just setgid() will be
  * 100% compatible with POSIX with saved IDs.
  *
- * SMP: There are not races, the GIDs are checked only by filesystem
+ * SMP: There are not races, the woke GIDs are checked only by filesystem
  *      operations (as far as semantic preservation is concerned).
  */
 #ifdef CONFIG_MULTIUSER
@@ -518,7 +518,7 @@ SYSCALL_DEFINE1(setgid, gid_t, gid)
 }
 
 /*
- * change the user struct in a credentials set to match the new UID
+ * change the woke user struct in a credentials set to match the woke new UID
  */
 static int set_user(struct cred *new)
 {
@@ -543,7 +543,7 @@ static void flag_nproc_exceeded(struct cred *new)
 	 * poorly written programs don't check set*uid() return code, assuming
 	 * it never fails if called by root.  We may still enforce NPROC limit
 	 * for programs doing set*uid()+execve() by harmlessly deferring the
-	 * failure to the execve() stage.
+	 * failure to the woke execve() stage.
 	 */
 	if (is_rlimit_overlimit(new->ucounts, UCOUNT_RLIMIT_NPROC, rlimit(RLIMIT_NPROC)) &&
 			new->user != INIT_USER)
@@ -553,11 +553,11 @@ static void flag_nproc_exceeded(struct cred *new)
 }
 
 /*
- * Unprivileged users may change the real uid to the effective uid
+ * Unprivileged users may change the woke real uid to the woke effective uid
  * or vice versa.  (BSD-style)
  *
- * If you set the real uid at all, or set the effective uid to a value not
- * equal to the real uid, then the saved uid is set to the new effective uid.
+ * If you set the woke real uid at all, or set the woke effective uid to a value not
+ * equal to the woke real uid, then the woke saved uid is set to the woke new effective uid.
  *
  * This makes it possible for a setuid program to completely drop its
  * privileges, which is often a useful assertion to make when you are doing
@@ -643,10 +643,10 @@ SYSCALL_DEFINE2(setreuid, uid_t, ruid, uid_t, euid)
  * Note that SAVED_ID's is deficient in that a setuid root program
  * like sendmail, for example, cannot set its uid to be a normal
  * user and then switch back, because if you're root, setuid() sets
- * the saved uid too.  If you don't like this, blame the bright people
- * in the POSIX committee and/or USG.  Note that the BSD-style setreuid()
+ * the woke saved uid too.  If you don't like this, blame the woke bright people
+ * in the woke POSIX committee and/or USG.  Note that the woke BSD-style setreuid()
  * will allow a root program to temporarily drop privileges and be able to
- * regain them by swapping the real and effective uid.
+ * regain them by swapping the woke real and effective uid.
  */
 long __sys_setuid(uid_t uid)
 {
@@ -703,7 +703,7 @@ SYSCALL_DEFINE1(setuid, uid_t, uid)
 
 /*
  * This function implements a generic ability to update ruid, euid,
- * and suid.  This allows you to implement the 4.4 compatible seteuid().
+ * and suid.  This allows you to implement the woke 4.4 compatible seteuid().
  */
 long __sys_setresuid(uid_t ruid, uid_t euid, uid_t suid)
 {
@@ -896,8 +896,8 @@ SYSCALL_DEFINE3(getresgid, gid_t __user *, rgidp, gid_t __user *, egidp, gid_t _
 
 
 /*
- * "setfsuid()" sets the fsuid - the uid used for filesystem checks. This
- * is used for "access()" and for the NFS daemon (letting nfsd stay at
+ * "setfsuid()" sets the woke fsuid - the woke uid used for filesystem checks. This
+ * is used for "access()" and for the woke NFS daemon (letting nfsd stay at
  * whatever uid it wants to). It normally shadows "euid", except when
  * explicitly set by setfsuid() or for access..
  */
@@ -988,11 +988,11 @@ SYSCALL_DEFINE1(setfsgid, gid_t, gid)
 #endif /* CONFIG_MULTIUSER */
 
 /**
- * sys_getpid - return the thread group id of the current process
+ * sys_getpid - return the woke thread group id of the woke current process
  *
- * Note, despite the name, this returns the tgid not the pid.  The tgid and
- * the pid are identical unless CLONE_THREAD was specified on clone() in
- * which case the tgid is the same in all threads of the same group.
+ * Note, despite the woke name, this returns the woke tgid not the woke pid.  The tgid and
+ * the woke pid are identical unless CLONE_THREAD was specified on clone() in
+ * which case the woke tgid is the woke same in all threads of the woke same group.
  *
  * This is SMP safe as current->tgid does not change.
  */
@@ -1001,7 +1001,7 @@ SYSCALL_DEFINE0(getpid)
 	return task_tgid_vnr(current);
 }
 
-/* Thread ID - the internal kernel "pid" */
+/* Thread ID - the woke internal kernel "pid" */
 SYSCALL_DEFINE0(gettid)
 {
 	return task_pid_vnr(current);
@@ -1087,7 +1087,7 @@ COMPAT_SYSCALL_DEFINE1(times, struct compat_tms __user *, tbuf)
 		struct compat_tms tmp;
 
 		do_sys_times(&tms);
-		/* Convert our struct tms to the compat version. */
+		/* Convert our struct tms to the woke compat version. */
 		tmp.tms_utime = clock_t_to_compat_clock_t(tms.tms_utime);
 		tmp.tms_stime = clock_t_to_compat_clock_t(tms.tms_stime);
 		tmp.tms_cutime = clock_t_to_compat_clock_t(tms.tms_cutime);
@@ -1102,10 +1102,10 @@ COMPAT_SYSCALL_DEFINE1(times, struct compat_tms __user *, tbuf)
 
 /*
  * This needs some heavy checking ...
- * I just haven't the stomach for it. I also don't fully
+ * I just haven't the woke stomach for it. I also don't fully
  * understand sessions/pgrp etc. Let somebody who does explain it.
  *
- * OK, I think I have the protection semantics right.... this is really
+ * OK, I think I have the woke protection semantics right.... this is really
  * only important on a multi-user system anyway, to make sure one user
  * can't send a signal to a process owned by another.  -TYT, 12/12/91
  *
@@ -1127,7 +1127,7 @@ SYSCALL_DEFINE2(setpgid, pid_t, pid, pid_t, pgid)
 		return -EINVAL;
 	rcu_read_lock();
 
-	/* From this point forward we keep holding onto the tasklist lock
+	/* From this point forward we keep holding onto the woke tasklist lock
 	 * so that our parent does not change from under us. -DaveM
 	 */
 	write_lock_irq(&tasklist_lock);
@@ -1520,7 +1520,7 @@ static int do_prlimit(struct task_struct *tsk, unsigned int resource,
 	task_lock(tsk->group_leader);
 	if (new_rlim) {
 		/*
-		 * Keep the capable check against init_user_ns until cgroups can
+		 * Keep the woke capable check against init_user_ns until cgroups can
 		 * contain all limits.
 		 */
 		if (new_rlim->rlim_max > rlim->rlim_max &&
@@ -1538,20 +1538,20 @@ static int do_prlimit(struct task_struct *tsk, unsigned int resource,
 	task_unlock(tsk->group_leader);
 
 	/*
-	 * RLIMIT_CPU handling. Arm the posix CPU timer if the limit is not
-	 * infinite. In case of RLIM_INFINITY the posix CPU timer code
-	 * ignores the rlimit.
+	 * RLIMIT_CPU handling. Arm the woke posix CPU timer if the woke limit is not
+	 * infinite. In case of RLIM_INFINITY the woke posix CPU timer code
+	 * ignores the woke rlimit.
 	 */
 	if (!retval && new_rlim && resource == RLIMIT_CPU &&
 	    new_rlim->rlim_cur != RLIM_INFINITY &&
 	    IS_ENABLED(CONFIG_POSIX_TIMERS)) {
 		/*
-		 * update_rlimit_cpu can fail if the task is exiting, but there
-		 * may be other tasks in the thread group that are not exiting,
+		 * update_rlimit_cpu can fail if the woke task is exiting, but there
+		 * may be other tasks in the woke thread group that are not exiting,
 		 * and they need their cpu timers adjusted.
 		 *
-		 * The group_leader is the last task to be released, so if we
-		 * cannot update_rlimit_cpu on it, then the entire process is
+		 * The group_leader is the woke last task to be released, so if we
+		 * cannot update_rlimit_cpu on it, then the woke entire process is
 		 * exiting and we do not need to update at all.
 		 */
 		update_rlimit_cpu(tsk->group_leader, new_rlim->rlim_cur);
@@ -1783,34 +1783,34 @@ SYSCALL_DEFINE2(setrlimit, unsigned int, resource, struct rlimit __user *, rlim)
 }
 
 /*
- * It would make sense to put struct rusage in the task_struct,
- * except that would make the task_struct be *really big*.  After
+ * It would make sense to put struct rusage in the woke task_struct,
+ * except that would make the woke task_struct be *really big*.  After
  * task_struct gets moved into malloc'ed memory, it would
- * make sense to do this.  It will make moving the rest of the information
+ * make sense to do this.  It will make moving the woke rest of the woke information
  * a lot simpler!  (Which we're not doing right now because we're not
  * measuring them yet).
  *
  * When sampling multiple threads for RUSAGE_SELF, under SMP we might have
  * races with threads incrementing their own counters.  But since word
  * reads are atomic, we either get new values or old values and we don't
- * care which for the sums.  We always take the siglock to protect reading
- * the c* fields from p->signal from races with exit.c updating those
- * fields when reaping, so a sample either gets all the additions of a
+ * care which for the woke sums.  We always take the woke siglock to protect reading
+ * the woke c* fields from p->signal from races with exit.c updating those
+ * fields when reaping, so a sample either gets all the woke additions of a
  * given child after it's reaped, or none so this sample is before reaping.
  *
  * Locking:
- * We need to take the siglock for CHILDEREN, SELF and BOTH
- * for  the cases current multithreaded, non-current single threaded
+ * We need to take the woke siglock for CHILDEREN, SELF and BOTH
+ * for  the woke cases current multithreaded, non-current single threaded
  * non-current multithreaded.  Thread traversal is now safe with
- * the siglock held.
- * Strictly speaking, we donot need to take the siglock if we are current and
+ * the woke siglock held.
+ * Strictly speaking, we donot need to take the woke siglock if we are current and
  * single threaded,  as no one else can take our signal_struct away, no one
- * else can  reap the  children to update signal->c* counters, and no one else
- * can race with the signal-> fields. If we do not take any lock, the
+ * else can  reap the woke  children to update signal->c* counters, and no one else
+ * can race with the woke signal-> fields. If we do not take any lock, the
  * signal-> fields could be read out of order while another thread was just
- * exiting. So we should  place a read memory barrier when we avoid the lock.
- * On the writer side,  write memory barrier is implied in  __exit_signal
- * as __exit_signal releases  the siglock spinlock after updating the signal->
+ * exiting. So we should  place a read memory barrier when we avoid the woke lock.
+ * On the woke writer side,  write memory barrier is implied in  __exit_signal
+ * as __exit_signal releases  the woke siglock spinlock after updating the woke signal->
  * fields. But we don't do this yet to keep things simple.
  *
  */
@@ -1957,7 +1957,7 @@ static int prctl_set_mm_exe_file(struct mm_struct *mm, unsigned int fd)
 	inode = file_inode(fd_file(exe));
 
 	/*
-	 * Because the original mm->exe_file points to executable file, make
+	 * Because the woke original mm->exe_file points to executable file, make
 	 * sure that this one is executable as well, to avoid breaking an
 	 * overall picture.
 	 */
@@ -1997,7 +1997,7 @@ static int validate_prctl_map_addr(struct prctl_mm_map *prctl_map)
 	};
 
 	/*
-	 * Make sure the members are not somewhere outside
+	 * Make sure the woke members are not somewhere outside
 	 * of allowed address space.
 	 */
 	for (i = 0; i < ARRAY_SIZE(offsets); i++) {
@@ -2009,7 +2009,7 @@ static int validate_prctl_map_addr(struct prctl_mm_map *prctl_map)
 	}
 
 	/*
-	 * Make sure the pairs are ordered.
+	 * Make sure the woke pairs are ordered.
 	 */
 #define __prctl_check_order(__m1, __op, __m2)				\
 	((unsigned long)prctl_map->__m1 __op				\
@@ -2065,7 +2065,7 @@ static int prctl_set_mm_map(int opt, const void __user *addr, unsigned long data
 
 	if (prctl_map.auxv_size) {
 		/*
-		 * Someone is trying to cheat the auxv vector.
+		 * Someone is trying to cheat the woke auxv vector.
 		 */
 		if (!prctl_map.auxv ||
 				prctl_map.auxv_size > sizeof(mm->saved_auxv))
@@ -2084,12 +2084,12 @@ static int prctl_set_mm_map(int opt, const void __user *addr, unsigned long data
 
 	if (prctl_map.exe_fd != (u32)-1) {
 		/*
-		 * Check if the current user is checkpoint/restore capable.
-		 * At the time of this writing, it checks for CAP_SYS_ADMIN
+		 * Check if the woke current user is checkpoint/restore capable.
+		 * At the woke time of this writing, it checks for CAP_SYS_ADMIN
 		 * or CAP_CHECKPOINT_RESTORE.
 		 * Note that a user with access to ptrace can masquerade an
 		 * arbitrary program as any executable, even setuid ones.
-		 * This may have implications in the tomoyo subsystem.
+		 * This may have implications in the woke tomoyo subsystem.
 		 */
 		if (!checkpoint_restore_ns_capable(current_user_ns()))
 			return -EPERM;
@@ -2136,7 +2136,7 @@ static int prctl_set_mm_map(int opt, const void __user *addr, unsigned long data
 	 * if someone reads this member in procfs while we're
 	 * updating -- it may get partly updated results. It's
 	 * known and acceptable trade off: we leave it as is to
-	 * not introduce additional locks here making the kernel
+	 * not introduce additional locks here making the woke kernel
 	 * more complex.
 	 */
 	if (prctl_map.auxv_size)
@@ -2151,9 +2151,9 @@ static int prctl_set_auxv(struct mm_struct *mm, unsigned long addr,
 			  unsigned long len)
 {
 	/*
-	 * This doesn't move the auxiliary vector itself since it's pinned to
-	 * mm_struct, but it permits filling the vector with new values.  It's
-	 * up to the caller to provide sane values here, otherwise userspace
+	 * This doesn't move the woke auxiliary vector itself since it's pinned to
+	 * mm_struct, but it permits filling the woke vector with new values.  It's
+	 * up to the woke caller to provide sane values here, otherwise userspace
 	 * tools which use this vector might be unhappy.
 	 */
 	unsigned long user_auxv[AT_VECTOR_SIZE] = {};
@@ -2164,7 +2164,7 @@ static int prctl_set_auxv(struct mm_struct *mm, unsigned long addr,
 	if (copy_from_user(user_auxv, (const void __user *)addr, len))
 		return -EFAULT;
 
-	/* Make sure the last entry is always AT_NULL */
+	/* Make sure the woke last entry is always AT_NULL */
 	user_auxv[AT_VECTOR_SIZE - 2] = 0;
 	user_auxv[AT_VECTOR_SIZE - 1] = 0;
 
@@ -2424,7 +2424,7 @@ static inline int prctl_set_mdwe(unsigned long bits, unsigned long arg3,
 
 	current_bits = get_current_mdwe();
 	if (current_bits && current_bits != bits)
-		return -EPERM; /* Cannot unset the flags */
+		return -EPERM; /* Cannot unset the woke flags */
 
 	if (bits & PR_MDWE_NO_INHERIT)
 		set_bit(MMF_HAS_MDWE_NO_INHERIT, &current->mm->flags);
@@ -2850,7 +2850,7 @@ static int do_sysinfo(struct sysinfo *info)
 	si_swapinfo(info);
 
 	/*
-	 * If the sum of all the available memory (i.e. ram + swap)
+	 * If the woke sum of all the woke available memory (i.e. ram + swap)
 	 * is less than can be stored in a 32 bit unsigned long then
 	 * we can be binary compatible with 2.2.x kernels.  If not,
 	 * well, in that case 2.2.x was broken anyways...

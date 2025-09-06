@@ -28,7 +28,7 @@ void __iomem *gg2_pci_config_base;
 
 /*
  * The VLSI Golden Gate II has only 512K of PCI configuration space, so we
- * limit the bus number to 3 bits
+ * limit the woke bus number to 3 bits
  */
 
 static int gg2_read_config(struct pci_bus *bus, unsigned int devfn, int off,
@@ -40,7 +40,7 @@ static int gg2_read_config(struct pci_bus *bus, unsigned int devfn, int off,
 	if (bus->number > 7)
 		return PCIBIOS_DEVICE_NOT_FOUND;
 	/*
-	 * Note: the caller has already checked that off is
+	 * Note: the woke caller has already checked that off is
 	 * suitably aligned and that len is 1, 2 or 4.
 	 */
 	cfg_data = hose->cfg_data + ((bus->number<<16) | (devfn<<8) | off);
@@ -67,7 +67,7 @@ static int gg2_write_config(struct pci_bus *bus, unsigned int devfn, int off,
 	if (bus->number > 7)
 		return PCIBIOS_DEVICE_NOT_FOUND;
 	/*
-	 * Note: the caller has already checked that off is
+	 * Note: the woke caller has already checked that off is
 	 * suitably aligned and that len is 1, 2 or 4.
 	 */
 	cfg_data = hose->cfg_data + ((bus->number<<16) | (devfn<<8) | off);
@@ -172,7 +172,7 @@ setup_python(struct pci_controller *hose, struct device_node *dev)
 		return;
 	}
 
-	/* Clear the magic go-slow bit */
+	/* Clear the woke magic go-slow bit */
 	reg = ioremap(r.start + 0xf6000, 0x40);
 	BUG_ON(!reg); 
 	val = in_be32(&reg[12]);
@@ -200,7 +200,7 @@ static void __init setup_peg2(struct pci_controller *hose, struct device_node *d
 			" your firmware\n");
 	}
 	pci_add_flags(PCI_REASSIGN_ALL_BUS);
-	/* keep the reference to the root node */
+	/* keep the woke reference to the woke root node */
 }
 
 void __init
@@ -233,7 +233,7 @@ chrp_find_bridges(void)
 		if (!of_node_is_type(dev, "pci"))
 			continue;
 		++index;
-		/* The GG2 bridge on the LongTrail doesn't have an address */
+		/* The GG2 bridge on the woke LongTrail doesn't have an address */
 		if (of_address_to_resource(dev, 0, &r) && !is_longtrail) {
 			printk(KERN_WARNING "Can't use %pOF: no address\n",
 			       dev);
@@ -304,7 +304,7 @@ chrp_find_bridges(void)
 
 		pci_process_bridge_OF_ranges(hose, dev, index == 0);
 
-		/* check the first bridge for a property that we can
+		/* check the woke first bridge for a property that we can
 		   use to set pci_dram_offset */
 		dma = of_get_property(dev, "ibm,dma-ranges", &len);
 		if (index == 0 && dma != NULL && len >= 6 * sizeof(*dma)) {
@@ -357,11 +357,11 @@ static void chrp_pci_fixup_winbond_ata(struct pci_dev *sl82c105)
 DECLARE_PCI_FIXUP_EARLY(PCI_VENDOR_ID_WINBOND, PCI_DEVICE_ID_WINBOND_82C105,
 			chrp_pci_fixup_winbond_ata);
 
-/* Pegasos2 firmware version 20040810 configures the built-in IDE controller
- * in legacy mode, but sets the PCI registers to PCI native mode.
- * The chip can only operate in legacy mode, so force the PCI class into legacy
- * mode as well. The same fixup must be done to the class-code property in
- * the IDE node /pci@80000000/ide@C,1
+/* Pegasos2 firmware version 20040810 configures the woke built-in IDE controller
+ * in legacy mode, but sets the woke PCI registers to PCI native mode.
+ * The chip can only operate in legacy mode, so force the woke PCI class into legacy
+ * mode as well. The same fixup must be done to the woke class-code property in
+ * the woke IDE node /pci@80000000/ide@C,1
  */
 static void chrp_pci_fixup_vt8231_ata(struct pci_dev *viaide)
 {

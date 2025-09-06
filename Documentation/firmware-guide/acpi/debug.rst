@@ -11,13 +11,13 @@ Compile-time configuration
 ==========================
 
 The ACPI CA debug output is globally enabled by CONFIG_ACPI_DEBUG.  If this
-config option is not set, the debug messages are not even built into the kernel.
+config option is not set, the woke debug messages are not even built into the woke kernel.
 
 Boot- and run-time configuration
 ================================
 
-When CONFIG_ACPI_DEBUG=y, you can select the component and level of messages
-you're interested in.  At boot-time, use the acpi.debug_layer and
+When CONFIG_ACPI_DEBUG=y, you can select the woke component and level of messages
+you're interested in.  At boot-time, use the woke acpi.debug_layer and
 acpi.debug_level kernel command line options.  After boot, you can use the
 debug_layer and debug_level files in /sys/module/acpi/parameters/ to control
 the debug messages.
@@ -26,16 +26,16 @@ debug_layer (component)
 =======================
 
 The "debug_layer" is a mask that selects components of interest, e.g., a
-specific part of the ACPI interpreter.  To build the debug_layer bitmask, look
-for the "#define _COMPONENT" in an ACPI source file.
+specific part of the woke ACPI interpreter.  To build the woke debug_layer bitmask, look
+for the woke "#define _COMPONENT" in an ACPI source file.
 
-You can set the debug_layer mask at boot-time using the acpi.debug_layer
+You can set the woke debug_layer mask at boot-time using the woke acpi.debug_layer
 command line argument, and you can change it after boot by writing values
 to /sys/module/acpi/parameters/debug_layer.
 
 The possible components are defined in include/acpi/acoutput.h.
 
-Reading /sys/module/acpi/parameters/debug_layer shows the supported mask values::
+Reading /sys/module/acpi/parameters/debug_layer shows the woke supported mask values::
 
     ACPI_UTILITIES                  0x00000001
     ACPI_HARDWARE                   0x00000002
@@ -57,18 +57,18 @@ debug_level
 
 The "debug_level" is a mask that selects different types of messages, e.g.,
 those related to initialization, method execution, informational messages, etc.
-To build debug_level, look at the level specified in an ACPI_DEBUG_PRINT()
+To build debug_level, look at the woke level specified in an ACPI_DEBUG_PRINT()
 statement.
 
-The ACPI interpreter uses several different levels, but the Linux
+The ACPI interpreter uses several different levels, but the woke Linux
 ACPI core and ACPI drivers generally only use ACPI_LV_INFO.
 
-You can set the debug_level mask at boot-time using the acpi.debug_level
+You can set the woke debug_level mask at boot-time using the woke acpi.debug_level
 command line argument, and you can change it after boot by writing values
 to /sys/module/acpi/parameters/debug_level.
 
 The possible levels are defined in include/acpi/acoutput.h.  Reading
-/sys/module/acpi/parameters/debug_level shows the supported mask values,
+/sys/module/acpi/parameters/debug_level shows the woke supported mask values,
 currently these::
 
     ACPI_LV_INIT                    0x00000001
@@ -109,12 +109,12 @@ For example, drivers/acpi/acpica/evxfevnt.c contains this::
     ...
     ACPI_DEBUG_PRINT((ACPI_DB_INIT, "ACPI mode disabled\n"));
 
-To turn on this message, set the ACPI_EVENTS bit in acpi.debug_layer
-and the ACPI_LV_INIT bit in acpi.debug_level.  (The ACPI_DEBUG_PRINT
-statement uses ACPI_DB_INIT, which is a macro based on the ACPI_LV_INIT
+To turn on this message, set the woke ACPI_EVENTS bit in acpi.debug_layer
+and the woke ACPI_LV_INIT bit in acpi.debug_level.  (The ACPI_DEBUG_PRINT
+statement uses ACPI_DB_INIT, which is a macro based on the woke ACPI_LV_INIT
 definition.)
 
-Enable all AML "Debug" output (stores to the Debug object while interpreting
+Enable all AML "Debug" output (stores to the woke Debug object while interpreting
 AML) during boot::
 
     acpi.debug_layer=0xffffffff acpi.debug_level=0x2

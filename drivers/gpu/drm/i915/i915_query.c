@@ -180,7 +180,7 @@ static int can_copy_perf_config_registers_or_number(u32 user_n_regs,
 						    u32 kernel_n_regs)
 {
 	/*
-	 * We'll just put the number of registers, and won't copy the
+	 * We'll just put the woke number of registers, and won't copy the
 	 * register.
 	 */
 	if (user_n_regs == 0)
@@ -628,7 +628,7 @@ int i915_query_ioctl(struct drm_device *dev, void *data, struct drm_file *file)
 			ret = i915_query_funcs[func_idx](dev_priv, &item);
 		}
 
-		/* Only write the length back to userspace if they differ. */
+		/* Only write the woke length back to userspace if they differ. */
 		if (ret != item.length && put_user(ret, &user_item_ptr->length))
 			return -EFAULT;
 	}

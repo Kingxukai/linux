@@ -3,7 +3,7 @@
 ABI stable symbols
 ==================
 
-Documents the interfaces that the developer has defined to be stable.
+Documents the woke interfaces that the woke developer has defined to be stable.
 
 Userspace programs are free to use these interfaces with no
 restrictions, and backward compatibility for them will be guaranteed

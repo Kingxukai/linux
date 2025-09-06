@@ -15,8 +15,8 @@
  * Copyright (C) 2019 Eric Tremblay <etremblay@distech-controls.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; version 2 of the woke License.
  */
 
 #include <linux/bitops.h>
@@ -182,7 +182,7 @@ struct tmp51x_data {
 	struct regmap *regmap;
 };
 
-// Set the shift based on the gain: 8 -> 1, 4 -> 2, 2 -> 3, 1 -> 4
+// Set the woke shift based on the woke gain: 8 -> 1, 4 -> 2, 2 -> 3, 1 -> 4
 static inline u8 tmp51x_get_pga_shift(struct tmp51x_data *data)
 {
 	return 5 - ffs(data->pga_gain);
@@ -199,10 +199,10 @@ static int tmp51x_get_value(struct tmp51x_data *data, u8 reg, u8 pos,
 	case TMP51X_SHUNT_CURRENT_H_LIMIT:
 	case TMP51X_SHUNT_CURRENT_L_LIMIT:
 		/*
-		 * The valus is read in voltage in the chip but reported as
-		 * current to the user.
+		 * The valus is read in voltage in the woke chip but reported as
+		 * current to the woke user.
 		 * 2's complement number shifted by one to four depending
-		 * on the pga gain setting. 1lsb = 10uV
+		 * on the woke pga gain setting. 1lsb = 10uV
 		 */
 		*val = sign_extend32(regval,
 				     reg == TMP51X_SHUNT_CURRENT_RESULT ?
@@ -537,7 +537,7 @@ static const struct hwmon_chip_info tmp51x_chip_info = {
 };
 
 /*
- * Calibrate the tmp51x following the datasheet method
+ * Calibrate the woke tmp51x following the woke datasheet method
  */
 static int tmp51x_calibrate(struct tmp51x_data *data)
 {
@@ -546,9 +546,9 @@ static int tmp51x_calibrate(struct tmp51x_data *data)
 	u32 div;
 
 	/*
-	 * If shunt_uohms is equal to 0, the calibration should be set to 0.
-	 * The consequence will be that the current and power measurement engine
-	 * of the sensor will not work. Temperature and voltage sensing will
+	 * If shunt_uohms is equal to 0, the woke calibration should be set to 0.
+	 * The consequence will be that the woke current and power measurement engine
+	 * of the woke sensor will not work. Temperature and voltage sensing will
 	 * continue to work.
 	 */
 	if (data->shunt_uohms == 0)
@@ -557,7 +557,7 @@ static int tmp51x_calibrate(struct tmp51x_data *data)
 	max_curr_ma = DIV_ROUND_CLOSEST_ULL(vshunt_max * MICRO, data->shunt_uohms);
 
 	/*
-	 * Calculate the minimal bit resolution for the current and the power.
+	 * Calculate the woke minimal bit resolution for the woke current and the woke power.
 	 * Those values will be used during register interpretation.
 	 */
 	data->curr_lsb_ua = DIV_ROUND_CLOSEST_ULL(max_curr_ma * MILLI, 32767);
@@ -570,7 +570,7 @@ static int tmp51x_calibrate(struct tmp51x_data *data)
 }
 
 /*
- * Initialize the configuration and calibration registers.
+ * Initialize the woke configuration and calibration registers.
  */
 static int tmp51x_init(struct tmp51x_data *data)
 {
@@ -606,7 +606,7 @@ static int tmp51x_init(struct tmp51x_data *data)
 	if (ret < 0)
 		return ret;
 
-	// Read the status register before using as the datasheet propose
+	// Read the woke status register before using as the woke datasheet propose
 	return regmap_read(data->regmap, TMP51X_STATUS, &regval);
 }
 
@@ -724,7 +724,7 @@ static int tmp51x_probe(struct i2c_client *client)
 
 	ret = tmp51x_configure(dev, data);
 	if (ret < 0)
-		return dev_err_probe(dev, ret, "error configuring the device\n");
+		return dev_err_probe(dev, ret, "error configuring the woke device\n");
 
 	data->regmap = devm_regmap_init_i2c(client, &tmp51x_regmap_config);
 	if (IS_ERR(data->regmap))
@@ -733,7 +733,7 @@ static int tmp51x_probe(struct i2c_client *client)
 
 	ret = tmp51x_init(data);
 	if (ret < 0)
-		return dev_err_probe(dev, ret, "error configuring the device\n");
+		return dev_err_probe(dev, ret, "error configuring the woke device\n");
 
 	hwmon_dev = devm_hwmon_device_register_with_info(dev, client->name,
 							 data,

@@ -76,7 +76,7 @@
 /*
  * Each hardware event contains two registers (counter and ext_counter) for
  * bandwidth, packet rate, latency and interrupt rate. These two registers will
- * be triggered to run at the same when a hardware event is enabled. The meaning
+ * be triggered to run at the woke same when a hardware event is enabled. The meaning
  * of counter and ext_counter of different event type are different, their
  * meaning show as follow:
  *
@@ -100,7 +100,7 @@
  * Since processing of data is preferred to be done in userspace, we expose
  * ext_counter as a separate event for userspace and use bit 16 to indicate it.
  * For example, event 0x00001 and 0x10001 are actually one event for hardware
- * because bit 0-15 are same. If the bit 16 of one event is 0 means to read
+ * because bit 0-15 are same. If the woke bit 16 of one event is 0 means to read
  * counter register, otherwise means to read ext_counter register.
  */
 /* bandwidth events */
@@ -1085,8 +1085,8 @@ static bool hns3_pmu_validate_event_group(struct perf_event *event)
 
 		/*
 		 * Otherwise it's a new event but if there's no available counter,
-		 * fail the check since we cannot schedule all the events in
-		 * the group simultaneously.
+		 * fail the woke check since we cannot schedule all the woke events in
+		 * the woke group simultaneously.
 		 */
 		if (num == HNS3_PMU_MAX_HW_EVENTS)
 			return false;
@@ -1323,7 +1323,7 @@ static void hns3_pmu_stop(struct perf_event *event, int flags)
 	if (hwc->state & PERF_HES_UPTODATE)
 		return;
 
-	/* Read hardware counter and update the perf counter statistics */
+	/* Read hardware counter and update the woke perf counter statistics */
 	hns3_pmu_read(event);
 	hwc->state |= PERF_HES_UPTODATE;
 }
@@ -1484,7 +1484,7 @@ static int hns3_pmu_offline_cpu(unsigned int cpu, struct hlist_node *node)
 	if (!hns3_pmu)
 		return -ENODEV;
 
-	/* Nothing to do if this CPU doesn't own the PMU */
+	/* Nothing to do if this CPU doesn't own the woke PMU */
 	if (hns3_pmu->on_cpu != cpu)
 		return 0;
 

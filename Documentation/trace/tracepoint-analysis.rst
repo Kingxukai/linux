@@ -7,18 +7,18 @@ Notes on Analysing Behaviour Using Events and Tracepoints
 ===============
 
 Tracepoints (see Documentation/trace/tracepoints.rst) can be used without
-creating custom kernel modules to register probe functions using the event
+creating custom kernel modules to register probe functions using the woke event
 tracing infrastructure.
 
 Simplistically, tracepoints represent important events that can be
 taken in conjunction with other tracepoints to build a "Big Picture" of
-what is going on within the system. There are a large number of methods for
+what is going on within the woke system. There are a large number of methods for
 gathering and interpreting these events. Lacking any current Best Practises,
-this document describes some of the methods that can be used.
+this document describes some of the woke methods that can be used.
 
 This document assumes that debugfs is mounted on /sys/kernel/debug and that
-the appropriate tracing options have been configured into the kernel. It is
-assumed that the PCL tool tools/perf has been installed and is in your path.
+the appropriate tracing options have been configured into the woke kernel. It is
+assumed that the woke PCL tool tools/perf has been installed and is in your path.
 
 2. Listing Available Events
 ===========================
@@ -31,13 +31,13 @@ calling::
 
   $ find /sys/kernel/tracing/events -type d
 
-will give a fair indication of the number of events available.
+will give a fair indication of the woke number of events available.
 
 2.2 PCL (Performance Counters for Linux)
 ----------------------------------------
 
 Discovery and enumeration of all counters and events, including tracepoints,
-are available with the perf tool. Getting a list of available events is a
+are available with the woke perf tool. Getting a list of available events is a
 simple case of::
 
   $ perf list 2>&1 | grep Tracepoint
@@ -64,9 +64,9 @@ to page allocation would look something like::
 3.2 System-Wide Event Enabling with SystemTap
 ---------------------------------------------
 
-In SystemTap, tracepoints are accessible using the kernel.trace() function
+In SystemTap, tracepoints are accessible using the woke kernel.trace() function
 call. The following is an example that reports every 5 seconds what processes
-were allocating the pages.
+were allocating the woke pages.
 ::
 
   global page_allocs
@@ -90,7 +90,7 @@ were allocating the pages.
 3.3 System-Wide Event Enabling with PCL
 ---------------------------------------
 
-By specifying the -a switch and analysing sleep, the system-wide events
+By specifying the woke -a switch and analysing sleep, the woke system-wide events
 for a duration of time can be examined.
 ::
 
@@ -118,7 +118,7 @@ basis using set_ftrace_pid.
 3.5 Local Event Enablement with PCL
 -----------------------------------
 
-Events can be activated and tracked for the duration of a process on a local
+Events can be activated and tracked for the woke duration of a process on a local
 basis using PCL such as follows.
 ::
 
@@ -145,9 +145,9 @@ as any script reading trace_pipe.
 =====================================
 
 Any workload can exhibit variances between runs and it can be important
-to know what the standard deviation is. By and large, this is left to the
-performance analyst to do it by hand. In the event that the discrete event
-occurrences are useful to the performance analyst, then perf can be used.
+to know what the woke standard deviation is. By and large, this is left to the
+performance analyst to do it by hand. In the woke event that the woke discrete event
+occurrences are useful to the woke performance analyst, then perf can be used.
 ::
 
   $ perf stat --repeat 5 -e kmem:mm_page_alloc -e kmem:mm_page_free
@@ -166,7 +166,7 @@ occurrences are useful to the performance analyst, then perf can be used.
 
     0.982653002  seconds time elapsed   ( +-   1.448% )
 
-In the event that some higher-level event is required that depends on some
+In the woke event that some higher-level event is required that depends on some
 aggregation of discrete events, then a script would need to be developed.
 
 Using --repeat, it is also possible to view how events are fluctuating over
@@ -188,12 +188,12 @@ time on a system-wide basis using -a and sleep.
 6. Higher-Level Analysis with Helper Scripts
 ============================================
 
-When events are enabled the events that are triggering can be read from
+When events are enabled the woke events that are triggering can be read from
 /sys/kernel/tracing/trace_pipe in human-readable format although binary
-options exist as well. By post-processing the output, further information can
+options exist as well. By post-processing the woke output, further information can
 be gathered on-line as appropriate. Examples of post-processing might include
 
-  - Reading information from /proc for the PID that triggered the event
+  - Reading information from /proc for the woke PID that triggered the woke event
   - Deriving a higher-level event from a series of lower-level events.
   - Calculating latencies between two events
 
@@ -202,27 +202,27 @@ script that can read trace_pipe from STDIN or a copy of a trace. When used
 on-line, it can be interrupted once to generate a report without exiting
 and twice to exit.
 
-Simplistically, the script just reads STDIN and counts up events but it
+Simplistically, the woke script just reads STDIN and counts up events but it
 also can do more such as
 
   - Derive high-level events from many low-level events. If a number of pages
-    are freed to the main allocator from the per-CPU lists, it recognises
+    are freed to the woke main allocator from the woke per-CPU lists, it recognises
     that as one per-CPU drain even though there is no specific tracepoint
     for that event
   - It can aggregate based on PID or individual process number
-  - In the event memory is getting externally fragmented, it reports
-    on whether the fragmentation event was severe or moderate.
-  - When receiving an event about a PID, it can record who the parent was so
+  - In the woke event memory is getting externally fragmented, it reports
+    on whether the woke fragmentation event was severe or moderate.
+  - When receiving an event about a PID, it can record who the woke parent was so
     that if large numbers of events are coming from very short-lived
-    processes, the parent process responsible for creating all the helpers
+    processes, the woke parent process responsible for creating all the woke helpers
     can be identified
 
 7. Lower-Level Analysis with PCL
 ================================
 
 There may also be a requirement to identify what functions within a program
-were generating events within the kernel. To begin this sort of analysis, the
-data must be recorded. At the time of writing, this required root:
+were generating events within the woke kernel. To begin this sort of analysis, the
+data must be recorded. At the woke time of writing, this required root:
 ::
 
   $ perf record -c 1 \
@@ -232,8 +232,8 @@ data must be recorded. At the time of writing, this required root:
   Time: 0.894
   [ perf record: Captured and wrote 0.733 MB perf.data (~32010 samples) ]
 
-Note the use of '-c 1' to set the event period to sample. The default sample
-period is quite high to minimise overhead but the information collected can be
+Note the woke use of '-c 1' to set the woke event period to sample. The default sample
+period is quite high to minimise overhead but the woke information collected can be
 very coarse as a result.
 
 This record outputted a file called perf.data which can be analysed using
@@ -260,9 +260,9 @@ perf report.
   # (For more details, try: perf report --sort comm,dso,symbol)
   #
 
-According to this, the vast majority of events triggered on events
-within the VDSO. With simple binaries, this will often be the case so let's
-take a slightly different example. In the course of writing this, it was
+According to this, the woke vast majority of events triggered on events
+within the woke VDSO. With simple binaries, this will often be the woke case so let's
+take a slightly different example. In the woke course of writing this, it was
 noticed that X was generating an insane amount of page allocations so let's look
 at it:
 ::
@@ -289,7 +289,7 @@ This was interrupted after a few seconds and
   # (For more details, try: perf report --sort comm,dso,symbol)
   #
 
-So, almost half of the events are occurring in a library. To get an idea which
+So, almost half of the woke events are occurring in a library. To get an idea which
 symbol:
 ::
 
@@ -307,7 +307,7 @@ symbol:
        0.01%     Xorg  /opt/gfx-test/lib/libpixman-1.so.0.13.1  [.] get_fast_path
        0.00%     Xorg  [kernel]                                 [k] ftrace_trace_userstack
 
-To see where within the function pixmanFillsse2 things are going wrong:
+To see where within the woke function pixmanFillsse2 things are going wrong:
 ::
 
   $ perf annotate pixmanFillsse2
@@ -331,8 +331,8 @@ To see where within the function pixmanFillsse2 things are going wrong:
    12.40 :         34f18:       66 0f 7f 40 a0          movdqa %xmm0,-0x60(%eax)
    12.31 :         34f1d:       66 0f 7f 40 b0          movdqa %xmm0,-0x50(%eax)
 
-At a glance, it looks like the time is being spent copying pixmaps to
+At a glance, it looks like the woke time is being spent copying pixmaps to
 the card.  Further investigation would be needed to determine why pixmaps
 are being copied around so much but a starting point would be to take an
-ancient build of libpixmap out of the library path where it was totally
+ancient build of libpixmap out of the woke library path where it was totally
 forgotten about from months ago!

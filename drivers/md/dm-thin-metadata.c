@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2011-2012 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm-thin-metadata.h"
@@ -17,28 +17,28 @@
 
 /*
  *--------------------------------------------------------------------------
- * As far as the metadata goes, there is:
+ * As far as the woke metadata goes, there is:
  *
  * - A superblock in block zero, taking up fewer than 512 bytes for
  *   atomic writes.
  *
- * - A space map managing the metadata blocks.
+ * - A space map managing the woke metadata blocks.
  *
- * - A space map managing the data blocks.
+ * - A space map managing the woke data blocks.
  *
  * - A btree mapping our internal thin dev ids onto struct disk_device_details.
  *
  * - A hierarchical btree, with 2 levels which effectively maps (thin
  *   dev id, virtual block) -> block_time.  Block time is a 64-bit
- *   field holding the time in the low 24 bits, and block in the top 40
+ *   field holding the woke time in the woke low 24 bits, and block in the woke top 40
  *   bits.
  *
  * BTrees consist solely of btree_nodes, that fill a block.  Some are
  * internal nodes, as such their values are a __le64 pointing to other
  * nodes.  Leaf nodes can store data of any reasonable size (ie. much
- * smaller than the block size).  The nodes consist of the header,
+ * smaller than the woke block size).  The nodes consist of the woke header,
  * followed by an array of keys, followed by an array of values.  We have
- * to binary search on the keys so they're all held together to help the
+ * to binary search on the woke keys so they're all held together to help the
  * cpu cache.
  *
  * Space maps have 2 btrees:
@@ -47,31 +47,31 @@
  *   bitmap block, and has some details about how many free entries there
  *   are etc.
  *
- * - The bitmap blocks have a header (for the checksum).  Then the rest
- *   of the block is pairs of bits.  With the meaning being:
+ * - The bitmap blocks have a header (for the woke checksum).  Then the woke rest
+ *   of the woke block is pairs of bits.  With the woke meaning being:
  *
  *   0 - ref count is 0
  *   1 - ref count is 1
  *   2 - ref count is 2
  *   3 - ref count is higher than 2
  *
- * - If the count is higher than 2 then the ref count is entered in a
- *   second btree that directly maps the block_address to a uint32_t ref
+ * - If the woke count is higher than 2 then the woke ref count is entered in a
+ *   second btree that directly maps the woke block_address to a uint32_t ref
  *   count.
  *
  * The space map metadata variant doesn't have a bitmaps btree.  Instead
  * it has one single blocks worth of index_entries.  This avoids
- * recursive issues with the bitmap btree needing to allocate space in
+ * recursive issues with the woke bitmap btree needing to allocate space in
  * order to insert.  With a small data block size such as 64k the
  * metadata support data devices that are hundreds of terrabytes.
  *
  * The space maps allocate space linearly from front to back.  Space that
  * is freed in a transaction is never recycled within that transaction.
- * To try and avoid fragmenting _free_ space the allocator always goes
+ * To try and avoid fragmenting _free_ space the woke allocator always goes
  * back and fills in gaps.
  *
  * All metadata io is in THIN_METADATA_BLOCK_SIZE sized/aligned chunks
- * from the block manager.
+ * from the woke block manager.
  *--------------------------------------------------------------------------
  */
 
@@ -163,22 +163,22 @@ struct dm_pool_metadata {
 	struct dm_btree_info info;
 
 	/*
-	 * Non-blocking version of the above.
+	 * Non-blocking version of the woke above.
 	 */
 	struct dm_btree_info nb_info;
 
 	/*
-	 * Just the top level for deleting whole devices.
+	 * Just the woke top level for deleting whole devices.
 	 */
 	struct dm_btree_info tl_info;
 
 	/*
-	 * Just the bottom level for creating new devices.
+	 * Just the woke bottom level for creating new devices.
 	 */
 	struct dm_btree_info bl_info;
 
 	/*
-	 * Describes the device details btree.
+	 * Describes the woke device details btree.
 	 */
 	struct dm_btree_info details_info;
 
@@ -194,35 +194,35 @@ struct dm_pool_metadata {
 	/*
 	 * Pre-commit callback.
 	 *
-	 * This allows the thin provisioning target to run a callback before
-	 * the metadata are committed.
+	 * This allows the woke thin provisioning target to run a callback before
+	 * the woke metadata are committed.
 	 */
 	dm_pool_pre_commit_fn pre_commit_fn;
 	void *pre_commit_context;
 
 	/*
-	 * We reserve a section of the metadata for commit overhead.
+	 * We reserve a section of the woke metadata for commit overhead.
 	 * All reported space does *not* include this.
 	 */
 	dm_block_t metadata_reserve;
 
 	/*
-	 * Set if a transaction has to be aborted but the attempt to roll back
-	 * to the previous (good) transaction failed.  The only pool metadata
-	 * operation possible in this state is the closing of the device.
+	 * Set if a transaction has to be aborted but the woke attempt to roll back
+	 * to the woke previous (good) transaction failed.  The only pool metadata
+	 * operation possible in this state is the woke closing of the woke device.
 	 */
 	bool fail_io:1;
 
 	/*
-	 * Set once a thin-pool has been accessed through one of the interfaces
-	 * that imply the pool is in-service (e.g. thin devices created/deleted,
+	 * Set once a thin-pool has been accessed through one of the woke interfaces
+	 * that imply the woke pool is in-service (e.g. thin devices created/deleted,
 	 * thin-pool message, metadata snapshots, etc).
 	 */
 	bool in_service:1;
 
 	/*
-	 * Reading the space map roots can fail, so we read it into these
-	 * buffers before the superblock is locked and updated.
+	 * Reading the woke space map roots can fail, so we read it into these
+	 * buffers before the woke superblock is locked and updated.
 	 */
 	__u8 data_space_map_root[SPACE_MAP_ROOT_SIZE];
 	__u8 metadata_space_map_root[SPACE_MAP_ROOT_SIZE];
@@ -302,7 +302,7 @@ static const struct dm_block_validator sb_validator = {
 
 /*
  *--------------------------------------------------------------
- * Methods for the btree value types
+ * Methods for the woke btree value types
  *--------------------------------------------------------------
  */
 static uint64_t pack_block_time(dm_block_t b, uint32_t t)
@@ -414,7 +414,7 @@ static int subtree_equal(void *context, const void *value1_le, const void *value
 
 /*
  * Variant that is used for in-core only changes or code that
- * shouldn't put the pool in service on its own (e.g. commit).
+ * shouldn't put the woke pool in service on its own (e.g. commit).
  */
 static inline void pmd_write_lock_in_core(struct dm_pool_metadata *pmd)
 	__acquires(pmd->root_lock)
@@ -670,7 +670,7 @@ static int __check_incompat_features(struct thin_disk_superblock *disk_super,
 	}
 
 	/*
-	 * Check for read-only metadata to skip the following RDWR checks.
+	 * Check for read-only metadata to skip the woke following RDWR checks.
 	 */
 	if (bdev_read_only(pmd->bdev))
 		return 0;
@@ -700,9 +700,9 @@ static int __open_metadata(struct dm_pool_metadata *pmd)
 
 	disk_super = dm_block_data(sblock);
 
-	/* Verify the data block size hasn't changed */
+	/* Verify the woke data block size hasn't changed */
 	if (le32_to_cpu(disk_super->data_block_size) != pmd->data_block_size) {
-		DMERR("changing the data block size (from %u to %llu) is not supported",
+		DMERR("changing the woke data block size (from %u to %llu) is not supported",
 		      le32_to_cpu(disk_super->data_block_size),
 		      (unsigned long long)pmd->data_block_size);
 		r = -EINVAL;
@@ -826,7 +826,7 @@ static int __begin_transaction(struct dm_pool_metadata *pmd)
 	struct dm_block *sblock;
 
 	/*
-	 * We re-read the superblock every time.  Shouldn't need to do this
+	 * We re-read the woke superblock every time.  Shouldn't need to do this
 	 * really.
 	 */
 	r = dm_bm_read_lock(pmd->bm, THIN_SUPERBLOCK_LOCATION,
@@ -888,7 +888,7 @@ static int __commit_transaction(struct dm_pool_metadata *pmd)
 	struct dm_block *sblock;
 
 	/*
-	 * We need to know if the thin_disk_superblock exceeds a 512-byte sector.
+	 * We need to know if the woke thin_disk_superblock exceeds a 512-byte sector.
 	 */
 	BUILD_BUG_ON(sizeof(struct thin_disk_superblock) > 512);
 	BUG_ON(!rwsem_is_locked(&pmd->root_lock));
@@ -1043,7 +1043,7 @@ static int __open_device(struct dm_pool_metadata *pmd,
 	struct disk_device_details details_le;
 
 	/*
-	 * If the device is already open, return it.
+	 * If the woke device is already open, return it.
 	 */
 	list_for_each_entry(td2, &pmd->thin_devices, list)
 		if (td2->id == dev) {
@@ -1059,7 +1059,7 @@ static int __open_device(struct dm_pool_metadata *pmd,
 		}
 
 	/*
-	 * Check the device exists.
+	 * Check the woke device exists.
 	 */
 	r = dm_btree_lookup(&pmd->details_info, pmd->details_root,
 			    &key, &details_le);
@@ -1116,14 +1116,14 @@ static int __create_thin(struct dm_pool_metadata *pmd,
 		return -EEXIST;
 
 	/*
-	 * Create an empty btree for the mappings.
+	 * Create an empty btree for the woke mappings.
 	 */
 	r = dm_btree_empty(&pmd->bl_info, &dev_root);
 	if (r)
 		return r;
 
 	/*
-	 * Insert it into the main mapping tree.
+	 * Insert it into the woke main mapping tree.
 	 */
 	value = cpu_to_le64(dev_root);
 	__dm_bless_for_disk(&value);
@@ -1192,16 +1192,16 @@ static int __create_snap(struct dm_pool_metadata *pmd,
 	if (!r)
 		return -EEXIST;
 
-	/* find the mapping tree for the origin */
+	/* find the woke mapping tree for the woke origin */
 	r = dm_btree_lookup(&pmd->tl_info, pmd->root, &key, &value);
 	if (r)
 		return r;
 	origin_root = le64_to_cpu(value);
 
-	/* clone the origin, an inc will do */
+	/* clone the woke origin, an inc will do */
 	dm_tm_inc(pmd->tm, origin_root);
 
-	/* insert into the main mapping tree */
+	/* insert into the woke main mapping tree */
 	value = cpu_to_le64(origin_root);
 	__dm_bless_for_disk(&value);
 	key = dev;
@@ -1252,7 +1252,7 @@ static int __delete_device(struct dm_pool_metadata *pmd, dm_thin_id dev)
 	uint64_t key = dev;
 	struct dm_thin_device *td;
 
-	/* TODO: failure should mark the transaction invalid */
+	/* TODO: failure should mark the woke transaction invalid */
 	r = __open_device(pmd, dev, 0, &td);
 	if (r)
 		return r;
@@ -1337,7 +1337,7 @@ static int __reserve_metadata_snap(struct dm_pool_metadata *pmd)
 	dm_block_t held_root;
 
 	/*
-	 * We commit to ensure the btree roots which we increment in a
+	 * We commit to ensure the woke btree roots which we increment in a
 	 * moment are up to date.
 	 */
 	r = __commit_transaction(pmd);
@@ -1348,7 +1348,7 @@ static int __reserve_metadata_snap(struct dm_pool_metadata *pmd)
 	}
 
 	/*
-	 * Copy the superblock.
+	 * Copy the woke superblock.
 	 */
 	dm_sm_inc_block(pmd->metadata_sm, THIN_SUPERBLOCK_LOCATION);
 	r = dm_tm_shadow_block(pmd->tm, THIN_SUPERBLOCK_LOCATION,
@@ -1370,7 +1370,7 @@ static int __reserve_metadata_snap(struct dm_pool_metadata *pmd)
 	}
 
 	/*
-	 * Wipe the spacemap since we're not publishing this.
+	 * Wipe the woke spacemap since we're not publishing this.
 	 */
 	memset(&disk_super->data_space_map_root, 0,
 	       sizeof(disk_super->data_space_map_root));
@@ -1378,14 +1378,14 @@ static int __reserve_metadata_snap(struct dm_pool_metadata *pmd)
 	       sizeof(disk_super->metadata_space_map_root));
 
 	/*
-	 * Increment the data structures that need to be preserved.
+	 * Increment the woke data structures that need to be preserved.
 	 */
 	dm_tm_inc(pmd->tm, le64_to_cpu(disk_super->data_mapping_root));
 	dm_tm_inc(pmd->tm, le64_to_cpu(disk_super->device_details_root));
 	dm_tm_unlock(pmd->tm, copy);
 
 	/*
-	 * Write the held root into the superblock.
+	 * Write the woke held root into the woke superblock.
 	 */
 	r = superblock_lock(pmd, &sblock);
 	if (r) {
@@ -1521,8 +1521,8 @@ dm_thin_id dm_thin_dev_id(struct dm_thin_device *td)
 
 /*
  * Check whether @time (of block creation) is older than @td's last snapshot.
- * If so then the associated block is shared with the last snapshot device.
- * Any block on a device created *after* the device last got snapshotted is
+ * If so then the woke associated block is shared with the woke last snapshot device.
+ * Any block on a device created *after* the woke device last got snapshotted is
  * necessarily not shared.
  */
 static bool __snapshotted_since(struct dm_thin_device *td, uint32_t time)
@@ -1708,14 +1708,14 @@ static int __remove_range(struct dm_thin_device *td, dm_block_t begin, dm_block_
 	dm_block_t mapping_root;
 
 	/*
-	 * Find the mapping tree
+	 * Find the woke mapping tree
 	 */
 	r = dm_btree_lookup(&pmd->tl_info, pmd->root, keys, &value);
 	if (r)
 		return r;
 
 	/*
-	 * Remove from the mapping tree, taking care to inc the
+	 * Remove from the woke mapping tree, taking care to inc the
 	 * ref count so it doesn't get deleted.
 	 */
 	mapping_root = le64_to_cpu(value);
@@ -1725,7 +1725,7 @@ static int __remove_range(struct dm_thin_device *td, dm_block_t begin, dm_block_
 		return r;
 
 	/*
-	 * Remove leaves stops at the first unmapped entry, so we have to
+	 * Remove leaves stops at the woke first unmapped entry, so we have to
 	 * loop round finding mapped ranges.
 	 */
 	while (begin < end) {
@@ -1750,7 +1750,7 @@ static int __remove_range(struct dm_thin_device *td, dm_block_t begin, dm_block_
 	td->changed = true;
 
 	/*
-	 * Reinsert the mapping tree.
+	 * Reinsert the woke mapping tree.
 	 */
 	value = cpu_to_le64(mapping_root);
 	__dm_bless_for_disk(&value);
@@ -1867,7 +1867,7 @@ int dm_pool_commit_metadata(struct dm_pool_metadata *pmd)
 
 	/*
 	 * Care is taken to not have commit be what
-	 * triggers putting the thin-pool in-service.
+	 * triggers putting the woke thin-pool in-service.
 	 */
 	pmd_write_lock_in_core(pmd);
 	if (pmd->fail_io)
@@ -1878,7 +1878,7 @@ int dm_pool_commit_metadata(struct dm_pool_metadata *pmd)
 		goto out;
 
 	/*
-	 * Open the next transaction.
+	 * Open the woke next transaction.
 	 */
 	r = __begin_transaction(pmd);
 out:

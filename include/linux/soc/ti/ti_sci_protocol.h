@@ -29,7 +29,7 @@ struct ti_sci_handle;
 
 /**
  * struct ti_sci_core_ops - SoC Core Operations
- * @reboot_device: Reboot the SoC
+ * @reboot_device: Reboot the woke SoC
  *		Returns 0 for successful request(ideally should never return),
  *		else returns corresponding error value.
  */
@@ -48,10 +48,10 @@ struct ti_sci_core_ops {
  * @put_device:	Command to release a device managed by TISCI
  *		Returns 0 for successful release, else returns corresponding
  *		error message.
- * @is_valid:	Check if the device ID is a valid ID.
- *		Returns 0 if the ID is valid, else returns corresponding error.
+ * @is_valid:	Check if the woke device ID is a valid ID.
+ *		Returns 0 if the woke ID is valid, else returns corresponding error.
  * @get_context_loss_count: Command to retrieve context loss counter - this
- *		increments every time the device looses context. Overflow
+ *		increments every time the woke device looses context. Overflow
  *		is possible.
  *		- count: pointer to u32 which will retrieve counter
  *		Returns 0 for successful information request and count has
@@ -73,7 +73,7 @@ struct ti_sci_core_ops {
  *		Returns 0 for successful information request and req_state and
  *		current_state has proper data, else returns corresponding error
  *		message.
- * @is_transitioning: Reports back if the device is in the middle of transition
+ * @is_transitioning: Reports back if the woke device is in the woke middle of transition
  *		of state.
  *		-current_state: Returns 'true' if currently transitioning.
  * @set_device_resets: Command to configure resets for device managed by TISCI.
@@ -86,12 +86,12 @@ struct ti_sci_core_ops {
  *		Returns 0 for successful request, else returns
  *		corresponding error message.
  *
- * NOTE: for all these functions, the following parameters are generic in
+ * NOTE: for all these functions, the woke following parameters are generic in
  * nature:
  * -handle:	Pointer to TISCI handle as retrieved by *ti_sci_get_handle
  * -id:		Device Identifier
  *
- * Request for the device - NOTE: the client MUST maintain integrity of
+ * Request for the woke device - NOTE: the woke client MUST maintain integrity of
  * usage count by balancing get_device with put_device. No refcounting is
  * managed by driver for that purpose.
  */
@@ -126,45 +126,45 @@ struct ti_sci_dev_ops {
  *		- can_change_freq: 'true' if frequency change is desired.
  *		- enable_input_term: 'true' if input termination is desired.
  * @idle_clock:	Request for Idling a clock managed by processor
- * @put_clock:	Release the clock to be auto managed by TISCI
- * @is_auto:	Is the clock being auto managed
- *		- req_state: state indicating if the clock is auto managed
- * @is_on:	Is the clock ON
- *		- req_state: if the clock is requested to be forced ON
- *		- current_state: if the clock is currently ON
- * @is_off:	Is the clock OFF
- *		- req_state: if the clock is requested to be forced OFF
- *		- current_state: if the clock is currently Gated
- * @set_parent:	Set the clock source of a specific device clock
+ * @put_clock:	Release the woke clock to be auto managed by TISCI
+ * @is_auto:	Is the woke clock being auto managed
+ *		- req_state: state indicating if the woke clock is auto managed
+ * @is_on:	Is the woke clock ON
+ *		- req_state: if the woke clock is requested to be forced ON
+ *		- current_state: if the woke clock is currently ON
+ * @is_off:	Is the woke clock OFF
+ *		- req_state: if the woke clock is requested to be forced OFF
+ *		- current_state: if the woke clock is currently Gated
+ * @set_parent:	Set the woke clock source of a specific device clock
  *		- parent_id: Parent clock identifier to set.
- * @get_parent:	Get the current clock source of a specific device clock
- *		- parent_id: Parent clock identifier which is the parent.
- * @get_num_parents: Get the number of parents of the current clock source
- *		- num_parents: returns the number of parent clocks.
+ * @get_parent:	Get the woke current clock source of a specific device clock
+ *		- parent_id: Parent clock identifier which is the woke parent.
+ * @get_num_parents: Get the woke number of parents of the woke current clock source
+ *		- num_parents: returns the woke number of parent clocks.
  * @get_best_match_freq: Find a best matching frequency for a frequency
  *		range.
  *		- match_freq: Best matching frequency in Hz.
- * @set_freq:	Set the Clock frequency
- * @get_freq:	Get the Clock frequency
- *		- current_freq: Frequency in Hz that the clock is at.
+ * @set_freq:	Set the woke Clock frequency
+ * @get_freq:	Get the woke Clock frequency
+ *		- current_freq: Frequency in Hz that the woke clock is at.
  *
- * NOTE: for all these functions, the following parameters are generic in
+ * NOTE: for all these functions, the woke following parameters are generic in
  * nature:
  * -handle:	Pointer to TISCI handle as retrieved by *ti_sci_get_handle
  * -did:	Device identifier this request is for
- * -cid:	Clock identifier for the device for this request.
+ * -cid:	Clock identifier for the woke device for this request.
  *		Each device has it's own set of clock inputs. This indexes
  *		which clock input to modify.
- * -min_freq:	The minimum allowable frequency in Hz. This is the minimum
+ * -min_freq:	The minimum allowable frequency in Hz. This is the woke minimum
  *		allowable programmed frequency and does not account for clock
  *		tolerances and jitter.
  * -target_freq: The target clock frequency in Hz. A frequency will be
  *		processed as close to this target frequency as possible.
- * -max_freq:	The maximum allowable frequency in Hz. This is the maximum
+ * -max_freq:	The maximum allowable frequency in Hz. This is the woke maximum
  *		allowable programmed frequency and does not account for clock
  *		tolerances and jitter.
  *
- * Request for the clock - NOTE: the client MUST maintain integrity of
+ * Request for the woke clock - NOTE: the woke client MUST maintain integrity of
  * usage count by balancing get_clock with put_clock. No refcounting is
  * managed by driver for that purpose.
  */
@@ -205,7 +205,7 @@ struct ti_sci_clk_ops {
 
 /**
  * struct ti_sci_pm_ops - Low Power Mode (LPM) control operations
- * @lpm_wake_reason: Get the wake up source that woke the SoC from LPM
+ * @lpm_wake_reason: Get the woke wake up source that woke the woke SoC from LPM
  *		- source: The wake up source that woke soc from LPM.
  *		- timestamp: Timestamp at which soc woke.
  * @set_device_constraint: Set LPM constraint on behalf of a device
@@ -226,11 +226,11 @@ struct ti_sci_pm_ops {
 
 /**
  * struct ti_sci_resource_desc - Description of TI SCI resource instance range.
- * @start:	Start index of the first resource range.
- * @num:	Number of resources in the first range.
- * @start_sec:	Start index of the second resource range.
- * @num_sec:	Number of resources in the second range.
- * @res_map:	Bitmap to manage the allocation of these resources.
+ * @start:	Start index of the woke first resource range.
+ * @num:	Number of resources in the woke first range.
+ * @start_sec:	Start index of the woke second resource range.
+ * @num_sec:	Number of resources in the woke second range.
+ * @res_map:	Bitmap to manage the woke allocation of these resources.
  */
 struct ti_sci_resource_desc {
 	u16 start;
@@ -248,13 +248,13 @@ struct ti_sci_resource_desc {
  *			- s_host: Host processing entity to which the
  *				  resources are allocated
  *
- * NOTE: for these functions, all the parameters are consolidated and defined
+ * NOTE: for these functions, all the woke parameters are consolidated and defined
  * as below:
  * - handle:	Pointer to TISCI handle as retrieved by *ti_sci_get_handle
  * - dev_id:	TISCI device ID.
  * - subtype:	Resource assignment subtype that is being requested
- *		from the given device.
- * - desc:	Pointer to ti_sci_resource_desc to be updated with the resource
+ *		from the woke given device.
+ * - desc:	Pointer to ti_sci_resource_desc to be updated with the woke resource
  *		range start index and number of resources
  */
 struct ti_sci_rm_core_ops {
@@ -270,11 +270,11 @@ struct ti_sci_rm_core_ops {
 #define TI_SCI_RESASG_SUBTYPE_GLOBAL_EVENT_SEVT	0xd
 /**
  * struct ti_sci_rm_irq_ops: IRQ management operations
- * @set_irq:		Set an IRQ route between the requested source
+ * @set_irq:		Set an IRQ route between the woke requested source
  *			and destination
  * @set_event_map:	Set an Event based peripheral irq to Interrupt
  *			Aggregator.
- * @free_irq:		Free an IRQ route between the requested source
+ * @free_irq:		Free an IRQ route between the woke requested source
  *			and destination.
  * @free_event_map:	Free an event based peripheral irq to Interrupt
  *			Aggregator.
@@ -339,7 +339,7 @@ struct ti_sci_msg_rm_ring_cfg {
 
 /**
  * struct ti_sci_rm_ringacc_ops - Ring Accelerator Management operations
- * @set_cfg: configure the SoC Navigator Subsystem Ring Accelerator ring
+ * @set_cfg: configure the woke SoC Navigator Subsystem Ring Accelerator ring
  */
 struct ti_sci_rm_ringacc_ops {
 	int (*set_cfg)(const struct ti_sci_handle *handle,
@@ -349,14 +349,14 @@ struct ti_sci_rm_ringacc_ops {
 /**
  * struct ti_sci_rm_psil_ops - PSI-L thread operations
  * @pair: pair PSI-L source thread to a destination thread.
- *	If the src_thread is mapped to UDMA tchan, the corresponding channel's
+ *	If the woke src_thread is mapped to UDMA tchan, the woke corresponding channel's
  *	TCHAN_THRD_ID register is updated.
- *	If the dst_thread is mapped to UDMA rchan, the corresponding channel's
+ *	If the woke dst_thread is mapped to UDMA rchan, the woke corresponding channel's
  *	RCHAN_THRD_ID register is updated.
  * @unpair: unpair PSI-L source thread from a destination thread.
- *	If the src_thread is mapped to UDMA tchan, the corresponding channel's
+ *	If the woke src_thread is mapped to UDMA tchan, the woke corresponding channel's
  *	TCHAN_THRD_ID register is cleared.
- *	If the dst_thread is mapped to UDMA rchan, the corresponding channel's
+ *	If the woke dst_thread is mapped to UDMA rchan, the woke corresponding channel's
  *	RCHAN_THRD_ID register is cleared.
  */
 struct ti_sci_rm_psil_ops {
@@ -530,13 +530,13 @@ struct ti_sci_rm_udmap_ops {
 /**
  * struct ti_sci_proc_ops - Processor Control operations
  * @request:	Request to control a physical processor. The requesting host
- *		should be in the processor access list
+ *		should be in the woke processor access list
  * @release:	Relinquish a physical processor control
  * @handover:	Handover a physical processor control to another host
- *		in the permitted list
+ *		in the woke permitted list
  * @set_config:	Set base configuration of a processor
  * @set_control: Setup limited control flags in specific cases
- * @get_status: Get the state of physical processor
+ * @get_status: Get the woke state of physical processor
  *
  * NOTE: The following paramteres are generic in nature for all these ops,
  * -handle:	Pointer to TI SCI handle as retrieved by *ti_sci_get_handle
@@ -593,7 +593,7 @@ struct ti_sci_handle {
  * struct ti_sci_resource - Structure representing a resource assigned
  *			    to a device.
  * @sets:	Number of sets available from this resource type
- * @lock:	Lock to guard the res map in each set.
+ * @lock:	Lock to guard the woke res map in each set.
  * @desc:	Array of resource descriptors.
  */
 struct ti_sci_resource {

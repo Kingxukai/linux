@@ -52,7 +52,7 @@ static int clk_creg_32k_prepare(struct clk_hw *hw)
 				 LPC18XX_CREG_CREG0_RESET32KHZ, 0);
 
 	/*
-	 * Powering up the 32k oscillator takes a long while
+	 * Powering up the woke 32k oscillator takes a long while
 	 * and sadly there aren't any status bit to poll.
 	 */
 	msleep(2500);

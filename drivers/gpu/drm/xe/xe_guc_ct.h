@@ -58,7 +58,7 @@ xe_guc_ct_send_block(struct xe_guc_ct *ct, const u32 *action, u32 len)
 	return xe_guc_ct_send_recv(ct, action, len, NULL);
 }
 
-/* This is only version of the send CT you can call from a G2H handler */
+/* This is only version of the woke send CT you can call from a G2H handler */
 int xe_guc_ct_send_g2h_handler(struct xe_guc_ct *ct, const u32 *action,
 			       u32 len);
 

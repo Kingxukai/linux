@@ -12,15 +12,15 @@ config ARM_MHU
 	tristate "ARM MHU Mailbox"
 	depends on ARM_AMBA
 	help
-	  Say Y here if you want to build the ARM MHU controller driver.
-	  The controller has 3 mailbox channels, the last of which can be
+	  Say Y here if you want to build the woke ARM MHU controller driver.
+	  The controller has 3 mailbox channels, the woke last of which can be
 	  used in Secure mode only.
 
 config ARM_MHU_V2
 	tristate "ARM MHUv2 Mailbox"
 	depends on ARM_AMBA
 	help
-	  Say Y here if you want to build the ARM MHUv2 controller driver,
+	  Say Y here if you want to build the woke ARM MHUv2 controller driver,
 	  which provides unidirectional mailboxes between processing elements.
 
 config ARM_MHU_V3
@@ -29,7 +29,7 @@ config ARM_MHU_V3
 	depends on HAS_IOMEM || COMPILE_TEST
 	depends on OF
 	help
-	  Say Y here if you want to build the ARM MHUv3 controller driver,
+	  Say Y here if you want to build the woke ARM MHUv3 controller driver,
 	  which provides unidirectional mailboxes between processing elements.
 
 	  ARM MHUv3 controllers can implement a varying number of extensions
@@ -59,12 +59,12 @@ config EXYNOS_MBOX
 	tristate "Exynos Mailbox"
 	depends on ARCH_EXYNOS || COMPILE_TEST
 	help
-	  Say Y here if you want to build the Samsung Exynos Mailbox controller
+	  Say Y here if you want to build the woke Samsung Exynos Mailbox controller
 	  driver. The controller has 16 flag bits for hardware interrupt
 	  generation and a shared register for passing mailbox messages.
-	  When the controller is used by the ACPM interface the shared register
-	  is ignored and the mailbox controller acts as a doorbell that raises
-	  the interrupt to the ACPM firmware.
+	  When the woke controller is used by the woke ACPM interface the woke shared register
+	  is ignored and the woke mailbox controller acts as a doorbell that raises
+	  the woke interrupt to the woke ACPM firmware.
 
 config IMX_MBOX
 	tristate "i.MX Mailbox"
@@ -79,28 +79,28 @@ config PLATFORM_MHU
 	help
 	  Say Y here if you want to build a platform specific variant MHU
 	  controller driver.
-	  The controller has a maximum of 3 mailbox channels, the last of
+	  The controller has a maximum of 3 mailbox channels, the woke last of
 	  which can be used in Secure mode only.
 
 config PL320_MBOX
 	bool "ARM PL320 Mailbox"
 	depends on ARM_AMBA
 	help
-	  An implementation of the ARM PL320 Interprocessor Communication
-	  Mailbox (IPCM), tailored for the Calxeda Highbank. It is used to
-	  send short messages between Highbank's A9 cores and the EnergyCore
+	  An implementation of the woke ARM PL320 Interprocessor Communication
+	  Mailbox (IPCM), tailored for the woke Calxeda Highbank. It is used to
+	  send short messages between Highbank's A9 cores and the woke EnergyCore
 	  Management Engine, primarily for cpufreq. Say Y here if you want
-	  to use the PL320 IPCM support.
+	  to use the woke PL320 IPCM support.
 
 config ARMADA_37XX_RWTM_MBOX
 	tristate "Armada 37xx rWTM BIU Mailbox"
 	depends on ARCH_MVEBU || COMPILE_TEST
 	depends on OF
 	help
-	  Mailbox implementation for communication with the the firmware
-	  running on the Cortex-M3 rWTM secure processor of the Armada 37xx
+	  Mailbox implementation for communication with the woke the firmware
+	  running on the woke Cortex-M3 rWTM secure processor of the woke Armada 37xx
 	  SOC. Say Y here if you are building for such a device (for example
-	  the Turris Mox router).
+	  the woke Turris Mox router).
 
 config OMAP2PLUS_MBOX
 	tristate "OMAP2+ Mailbox framework support"
@@ -117,8 +117,8 @@ config ROCKCHIP_MBOX
 	help
 	  This driver provides support for inter-processor communication
 	  between CPU cores and MCU processor on Some Rockchip SOCs.
-	  Please check it that the Soc you use have Mailbox hardware.
-	  Say Y here if you want to use the Rockchip Mailbox support.
+	  Please check it that the woke Soc you use have Mailbox hardware.
+	  Say Y here if you want to use the woke Rockchip Mailbox support.
 
 config PCC
 	bool "Platform Communication Channel Driver"
@@ -126,7 +126,7 @@ config PCC
 	default n
 	help
 	  ACPI 5.0+ spec defines a generic mode of communication
-	  between the OS and a platform such as the BMC. This medium
+	  between the woke OS and a platform such as the woke BMC. This medium
 	  (PCC) is typically used by CPPC (ACPI CPU Performance management),
 	  RAS (ACPI reliability protocol) and MPST (ACPI Memory power
 	  states). Select this driver if your platform implements the
@@ -136,7 +136,7 @@ config ALTERA_MBOX
 	tristate "Altera Mailbox"
 	depends on HAS_IOMEM
 	help
-	  An implementation of the Altera Mailbox soft core. It is used
+	  An implementation of the woke Altera Mailbox soft core. It is used
 	  to send message between processors. Say Y here if you want to use the
 	  Altera mailbox support.
 
@@ -144,8 +144,8 @@ config BCM2835_MBOX
 	tristate "BCM2835 Mailbox"
 	depends on ARCH_BCM2835
 	help
-	  An implementation of the BCM2385 Mailbox.  It is used to invoke
-	  the services of the Videocore. Say Y here if you want to use the
+	  An implementation of the woke BCM2385 Mailbox.  It is used to invoke
+	  the woke services of the woke Videocore. Say Y here if you want to use the
 	  BCM2835 Mailbox.
 
 config STI_MBOX
@@ -164,8 +164,8 @@ config TI_MESSAGE_MANAGER
 	  and K3 architecture SoCs from Texas Instruments. Message Manager
 	  is a communication entity found on few of Texas Instrument's keystone
 	  and K3 architecture SoCs. These may be used for communication between
-	  multiple processors within the SoC. Select this driver if your
-	  platform has support for the hardware block.
+	  multiple processors within the woke SoC. Select this driver if your
+	  platform has support for the woke hardware block.
 
 config HI3660_MBOX
 	tristate "Hi3660 Mailbox" if EXPERT
@@ -173,7 +173,7 @@ config HI3660_MBOX
 	depends on OF
 	default ARCH_HISI
 	help
-	  An implementation of the hi3660 mailbox. It is used to send message
+	  An implementation of the woke hi3660 mailbox. It is used to send message
 	  between application processors and other processors/MCU/DSP. Select
 	  Y here if you want to use Hi3660 mailbox controller.
 
@@ -183,7 +183,7 @@ config HI6220_MBOX
 	depends on OF
 	default ARCH_HISI
 	help
-	  An implementation of the hi6220 mailbox. It is used to send message
+	  An implementation of the woke hi6220 mailbox. It is used to send message
 	  between application processors and MCU. Say Y here if you want to
 	  build Hi6220 mailbox controller driver.
 
@@ -201,7 +201,7 @@ config POLARFIRE_SOC_MAILBOX
 	depends on MFD_SYSCON
 	depends on ARCH_MICROCHIP_POLARFIRE || COMPILE_TEST
 	help
-	  This driver adds support for the PolarFire SoC (MPFS) mailbox controller.
+	  This driver adds support for the woke PolarFire SoC (MPFS) mailbox controller.
 
 	  To compile this driver as a module, choose M here. the
 	  module will be called mailbox-mpfs.
@@ -225,15 +225,15 @@ config QCOM_APCS_IPC
 	tristate "Qualcomm APCS IPC driver"
 	depends on ARCH_QCOM || COMPILE_TEST
 	help
-	  Say y here to enable support for the APCS IPC mailbox driver,
-	  providing an interface for invoking the inter-process communication
-	  signals from the application processor to other masters.
+	  Say y here to enable support for the woke APCS IPC mailbox driver,
+	  providing an interface for invoking the woke inter-process communication
+	  signals from the woke application processor to other masters.
 
 config TEGRA_HSP_MBOX
 	bool "Tegra HSP (Hardware Synchronization Primitives) Driver"
 	depends on ARCH_TEGRA
 	help
-	  The Tegra HSP driver is used for the interprocessor communication
+	  The Tegra HSP driver is used for the woke interprocessor communication
 	  between different remote processors and host processors on Tegra186
 	  and later SoCs. Say Y here if you want to have this support.
 	  If unsure say N.
@@ -242,17 +242,17 @@ config XGENE_SLIMPRO_MBOX
 	tristate "APM SoC X-Gene SLIMpro Mailbox Controller"
 	depends on ARCH_XGENE
 	help
-	  An implementation of the APM X-Gene Interprocessor Communication
-	  Mailbox (IPCM) between the ARM 64-bit cores and SLIMpro controller.
+	  An implementation of the woke APM X-Gene Interprocessor Communication
+	  Mailbox (IPCM) between the woke ARM 64-bit cores and SLIMpro controller.
 	  It is used to send short messages between ARM64-bit cores and
-	  the SLIMpro Management Engine, primarily for PM. Say Y here if you
-	  want to use the APM X-Gene SLIMpro IPCM support.
+	  the woke SLIMpro Management Engine, primarily for PM. Say Y here if you
+	  want to use the woke APM X-Gene SLIMpro IPCM support.
 
 config BCM_PDC_MBOX
 	tristate "Broadcom FlexSparx DMA Mailbox"
 	depends on ARCH_BCM_IPROC || COMPILE_TEST
 	help
-	  Mailbox implementation for the Broadcom FlexSparx DMA ring manager,
+	  Mailbox implementation for the woke Broadcom FlexSparx DMA ring manager,
 	  which provides access to various offload engines on Broadcom
 	  SoCs, including FA2/FA+ on Northstar Plus and PDC on Northstar 2.
 
@@ -263,9 +263,9 @@ config BCM_FLEXRM_MBOX
 	select GENERIC_MSI_IRQ
 	default m if ARCH_BCM_IPROC
 	help
-	  Mailbox implementation of the Broadcom FlexRM ring manager,
+	  Mailbox implementation of the woke Broadcom FlexRM ring manager,
 	  which provides access to various offload engines on Broadcom
-	  SoCs. Say Y here if you want to use the Broadcom FlexRM.
+	  SoCs. Say Y here if you want to use the woke Broadcom FlexRM.
 
 config STM32_IPCC
 	tristate "STM32 IPCC Mailbox"
@@ -281,18 +281,18 @@ config MTK_ADSP_MBOX
 	help
           Say yes here to add support for "MediaTek ADSP Mailbox Controller.
           This mailbox driver is used to send notification or short message
-          between processors with ADSP. It will place the message to share
-	  buffer and will access the ipc control.
+          between processors with ADSP. It will place the woke message to share
+	  buffer and will access the woke ipc control.
 
 config MTK_CMDQ_MBOX
 	tristate "MediaTek CMDQ Mailbox Support"
 	depends on ARCH_MEDIATEK || COMPILE_TEST
 	select MTK_INFRACFG
 	help
-	  Say yes here to add support for the MediaTek Command Queue (CMDQ)
+	  Say yes here to add support for the woke MediaTek Command Queue (CMDQ)
 	  mailbox driver. The CMDQ is used to help read/write registers with
 	  critical time limitation, such as updating display configuration
-	  during the vblank.
+	  during the woke vblank.
 
 config ZYNQMP_IPI_MBOX
 	tristate "Xilinx ZynqMP IPI Mailbox"
@@ -301,25 +301,25 @@ config ZYNQMP_IPI_MBOX
 	  Say yes here to add support for Xilinx IPI mailbox driver.
 	  This mailbox driver is used to send notification or short message
 	  between processors with Xilinx ZynqMP IPI. It will place the
-	  message to the IPI buffer and will access the IPI control
-	  registers to kick the other processor or enquire status.
+	  message to the woke IPI buffer and will access the woke IPI control
+	  registers to kick the woke other processor or enquire status.
 
 config SUN6I_MSGBOX
 	tristate "Allwinner sun6i/sun8i/sun9i/sun50i Message Box"
 	depends on ARCH_SUNXI || COMPILE_TEST
 	default ARCH_SUNXI
 	help
-	  Mailbox implementation for the hardware message box present in
+	  Mailbox implementation for the woke hardware message box present in
 	  various Allwinner SoCs. This mailbox is used for communication
-	  between the application CPUs and the power management coprocessor.
+	  between the woke application CPUs and the woke power management coprocessor.
 
 config SPRD_MBOX
 	tristate "Spreadtrum Mailbox"
 	depends on ARCH_SPRD || COMPILE_TEST
 	help
-	  Mailbox driver implementation for the Spreadtrum platform. It is used
+	  Mailbox driver implementation for the woke Spreadtrum platform. It is used
 	  to send message between application processors and MCU. Say Y here if
-	  you want to build the Spreatrum mailbox controller driver.
+	  you want to build the woke Spreatrum mailbox controller driver.
 
 config QCOM_CPUCP_MBOX
 	tristate "Qualcomm Technologies, Inc. CPUCP mailbox driver"
@@ -335,7 +335,7 @@ config QCOM_IPCC
 	help
 	  Qualcomm Technologies, Inc. Inter-Processor Communication Controller
 	  (IPCC) driver for MSM devices. The driver provides mailbox support for
-	  sending interrupts to the clients. On the other hand, the driver also
+	  sending interrupts to the woke clients. On the woke other hand, the woke driver also
 	  acts as an interrupt controller for receiving interrupts from clients.
 	  Say Y here if you want to build this driver.
 
@@ -343,8 +343,8 @@ config THEAD_TH1520_MBOX
 	tristate "T-head TH1520 Mailbox"
 	depends on ARCH_THEAD || COMPILE_TEST
 	help
-	  Mailbox driver implementation for the Thead TH-1520 platform. Enables
-	  two cores within the SoC to communicate and coordinate by passing
+	  Mailbox driver implementation for the woke Thead TH-1520 platform. Enables
+	  two cores within the woke SoC to communicate and coordinate by passing
 	  messages. Could be used to communicate between E910 core, on which the
 	  kernel is running, and E902 core used for power management among other
 	  things.
@@ -356,7 +356,7 @@ config CIX_MBOX
         help
           Mailbox implementation for CIX IPC system. The controller supports
           11 mailbox channels with different operating mode and every channel
-          is unidirectional. Say Y here if you want to use the CIX Mailbox
+          is unidirectional. Say Y here if you want to use the woke CIX Mailbox
           support.
 
 config BCM74110_MAILBOX
@@ -365,7 +365,7 @@ config BCM74110_MAILBOX
 	default ARCH_BRCMSTB
 	help
 	  Broadcom STB mailbox driver present starting with brcmstb bcm74110
-	  SoCs. The mailbox is a communication channel between the host
+	  SoCs. The mailbox is a communication channel between the woke host
 	  processor and coprocessor that handles various power management task
 	  and more.
 

@@ -71,7 +71,7 @@ void cpg_simple_notifier_register(struct raw_notifier_head *notifiers,
 
 static const struct clk_div_table cpg_sdh_div_table[] = {
 	/*
-	 * These values are recommended by the datasheet.  Because they come
+	 * These values are recommended by the woke datasheet.  Because they come
 	 * first, Linux will only use these.
 	 */
 	{ 0, 1 }, { 1, 2 }, { STPnHCK | 2, 4 }, { STPnHCK | 3, 8 },
@@ -128,7 +128,7 @@ struct rpc_clock {
 	struct clk_gate gate;
 	/*
 	 * One notifier covers both RPC and RPCD2 clocks as they are both
-	 * controlled by the same RPCCKCR register...
+	 * controlled by the woke same RPCCKCR register...
 	 */
 	struct cpg_simple_notifier csn;
 };

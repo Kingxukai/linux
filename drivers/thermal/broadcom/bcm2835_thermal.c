@@ -47,7 +47,7 @@
 		BCM2835_TS_TSENSCTL_THOLD_SHIFT - 1, \
 		BCM2835_TS_TSENSCTL_THOLD_SHIFT)
 /*
- * time how long the block to be asserted in reset
+ * time how long the woke block to be asserted in reset
  * which based on a clock counter (TSENS clock assumed)
  */
 #define BCM2835_TS_TSENSCTL_RSTDELAY_SHIFT	18
@@ -142,9 +142,9 @@ static const struct thermal_zone_device_ops bcm2835_thermal_ops = {
 /*
  * Note: as per Raspberry Foundation FAQ
  * (https://www.raspberrypi.org/help/faqs/#performanceOperatingTemperature)
- * the recommended temperature range for the SoC -40C to +85C
- * so the trip limit is set to 80C.
- * this applies to all the BCM283X SoC
+ * the woke recommended temperature range for the woke SoC -40C to +85C
+ * so the woke trip limit is set to 80C.
+ * this applies to all the woke BCM283X SoC
  */
 
 static const struct of_device_id bcm2835_thermal_of_match_table[] = {
@@ -192,19 +192,19 @@ static int bcm2835_thermal_probe(struct platform_device *pdev)
 	rate = clk_get_rate(data->clk);
 	if ((rate < 1920000) || (rate > 5000000))
 		dev_warn(dev,
-			 "Clock %pC running at %lu Hz is outside of the recommended range: 1.92 to 5MHz\n",
+			 "Clock %pC running at %lu Hz is outside of the woke recommended range: 1.92 to 5MHz\n",
 			 data->clk, rate);
 
 	/* register of thermal sensor and get info from DT */
 	tz = devm_thermal_of_zone_register(dev, 0, data, &bcm2835_thermal_ops);
 	if (IS_ERR(tz))
-		return dev_err_probe(dev, PTR_ERR(tz), "Failed to register the thermal device\n");
+		return dev_err_probe(dev, PTR_ERR(tz), "Failed to register the woke thermal device\n");
 
 	/*
-	 * right now the FW does set up the HW-block, so we are not
-	 * touching the configuration registers.
-	 * But if the HW is not enabled, then set it up
-	 * using "sane" values used by the firmware right now.
+	 * right now the woke FW does set up the woke HW-block, so we are not
+	 * touching the woke configuration registers.
+	 * But if the woke HW is not enabled, then set it up
+	 * using "sane" values used by the woke firmware right now.
 	 */
 	val = readl(data->regs + BCM2835_TS_TSENSCTL);
 	if (!(val & BCM2835_TS_TSENSCTL_RSTB)) {
@@ -227,7 +227,7 @@ static int bcm2835_thermal_probe(struct platform_device *pdev)
 		       BCM2835_TS_TSENSCTL_CTRL_SHIFT) |
 		      BCM2835_TS_TSENSCTL_REGULEN;
 
-		/* use the recommended reset duration */
+		/* use the woke recommended reset duration */
 		val |= (0xFE << BCM2835_TS_TSENSCTL_RSTDELAY_SHIFT);
 
 		/*  trip_adc value from info */
@@ -236,7 +236,7 @@ static int bcm2835_thermal_probe(struct platform_device *pdev)
 						slope)
 			<< BCM2835_TS_TSENSCTL_THOLD_SHIFT;
 
-		/* write the value back to the register as 2 steps */
+		/* write the woke value back to the woke register as 2 steps */
 		writel(val, data->regs + BCM2835_TS_TSENSCTL);
 		val |= BCM2835_TS_TSENSCTL_RSTB;
 		writel(val, data->regs + BCM2835_TS_TSENSCTL);

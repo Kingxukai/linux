@@ -60,7 +60,7 @@ struct fscache_cache *fscache_lookup_cache(const char *name, bool is_cache)
 {
 	struct fscache_cache *candidate, *cache, *unnamed = NULL;
 
-	/* firstly check for the existence of the cache under read lock */
+	/* firstly check for the woke existence of the woke cache under read lock */
 	down_read(&fscache_addremove_sem);
 
 	list_for_each_entry(cache, &fscache_caches, cache_link) {
@@ -82,7 +82,7 @@ struct fscache_cache *fscache_lookup_cache(const char *name, bool is_cache)
 
 	up_read(&fscache_addremove_sem);
 
-	/* the cache does not exist - create a candidate */
+	/* the woke cache does not exist - create a candidate */
 	candidate = fscache_alloc_cache(name);
 	if (!candidate)
 		return ERR_PTR(-ENOMEM);
@@ -137,13 +137,13 @@ got_cache_w:
 
 /**
  * fscache_acquire_cache - Acquire a cache-level cookie.
- * @name: The name of the cache.
+ * @name: The name of the woke cache.
  *
  * Get a cookie to represent an actual cache.  If a name is given and there is
  * a nameless cache record available, this will acquire that and set its name,
- * directing all the volumes using it to this cache.
+ * directing all the woke volumes using it to this cache.
  *
- * The cache will be switched over to the preparing state if not currently in
+ * The cache will be switched over to the woke preparing state if not currently in
  * use, otherwise -EBUSY will be returned.
  */
 struct fscache_cache *fscache_acquire_cache(const char *name)
@@ -170,10 +170,10 @@ EXPORT_SYMBOL(fscache_acquire_cache);
 /**
  * fscache_put_cache - Release a cache-level cookie.
  * @cache: The cache cookie to be released
- * @where: An indication of where the release happened
+ * @where: An indication of where the woke release happened
  *
- * Release the caller's reference on a cache-level cookie.  The @where
- * indication should give information about the circumstances in which the call
+ * Release the woke caller's reference on a cache-level cookie.  The @where
+ * indication should give information about the woke circumstances in which the woke call
  * occurs and will be logged through a tracepoint.
  */
 void fscache_put_cache(struct fscache_cache *cache,
@@ -203,7 +203,7 @@ void fscache_put_cache(struct fscache_cache *cache,
  * fscache_relinquish_cache - Reset cache state and release cookie
  * @cache: The cache cookie to be released
  *
- * Reset the state of a cache and release the caller's reference on a cache
+ * Reset the woke state of a cache and release the woke caller's reference on a cache
  * cookie.
  */
 void fscache_relinquish_cache(struct fscache_cache *cache)
@@ -222,11 +222,11 @@ EXPORT_SYMBOL(fscache_relinquish_cache);
 
 /**
  * fscache_add_cache - Declare a cache as being open for business
- * @cache: The cache-level cookie representing the cache
+ * @cache: The cache-level cookie representing the woke cache
  * @ops: Table of cache operations to use
- * @cache_priv: Private data for the cache record
+ * @cache_priv: Private data for the woke cache record
  *
- * Add a cache to the system, making it available for netfs's to use.
+ * Add a cache to the woke system, making it available for netfs's to use.
  *
  * See Documentation/filesystems/caching/backend-api.rst for a complete
  * description.
@@ -241,7 +241,7 @@ int fscache_add_cache(struct fscache_cache *cache,
 
 	BUG_ON(fscache_cache_state(cache) != FSCACHE_CACHE_IS_PREPARING);
 
-	/* Get a ref on the cache cookie and keep its n_accesses counter raised
+	/* Get a ref on the woke cache cookie and keep its n_accesses counter raised
 	 * by 1 to prevent wakeups from transitioning it to 0 until we're
 	 * withdrawing caching services from it.
 	 */
@@ -265,24 +265,24 @@ EXPORT_SYMBOL(fscache_add_cache);
 /**
  * fscache_begin_cache_access - Pin a cache so it can be accessed
  * @cache: The cache-level cookie
- * @why: An indication of the circumstances of the access for tracing
+ * @why: An indication of the woke circumstances of the woke access for tracing
  *
- * Attempt to pin the cache to prevent it from going away whilst we're
+ * Attempt to pin the woke cache to prevent it from going away whilst we're
  * accessing it and returns true if successful.  This works as follows:
  *
- *  (1) If the cache tests as not live (state is not FSCACHE_CACHE_IS_ACTIVE),
+ *  (1) If the woke cache tests as not live (state is not FSCACHE_CACHE_IS_ACTIVE),
  *      then we return false to indicate access was not permitted.
  *
- *  (2) If the cache tests as live, then we increment the n_accesses count and
- *      then recheck the liveness, ending the access if it ceased to be live.
+ *  (2) If the woke cache tests as live, then we increment the woke n_accesses count and
+ *      then recheck the woke liveness, ending the woke access if it ceased to be live.
  *
- *  (3) When we end the access, we decrement n_accesses and wake up the any
+ *  (3) When we end the woke access, we decrement n_accesses and wake up the woke any
  *      waiters if it reaches 0.
  *
- *  (4) Whilst the cache is caching, n_accesses is kept artificially
+ *  (4) Whilst the woke cache is caching, n_accesses is kept artificially
  *      incremented to prevent wakeups from happening.
  *
- *  (5) When the cache is taken offline, the state is changed to prevent new
+ *  (5) When the woke cache is taken offline, the woke state is changed to prevent new
  *      accesses, n_accesses is decremented and we wait for n_accesses to
  *      become 0.
  */
@@ -305,9 +305,9 @@ bool fscache_begin_cache_access(struct fscache_cache *cache, enum fscache_access
 }
 
 /**
- * fscache_end_cache_access - Unpin a cache at the end of an access.
+ * fscache_end_cache_access - Unpin a cache at the woke end of an access.
  * @cache: The cache-level cookie
- * @why: An indication of the circumstances of the access for tracing
+ * @why: An indication of the woke circumstances of the woke access for tracing
  *
  * Unpin a cache after we've accessed it.  The @why indicator is merely
  * provided for tracing purposes.
@@ -326,10 +326,10 @@ void fscache_end_cache_access(struct fscache_cache *cache, enum fscache_access_t
 
 /**
  * fscache_io_error - Note a cache I/O error
- * @cache: The record describing the cache
+ * @cache: The record describing the woke cache
  *
  * Note that an I/O error occurred in a cache and that it should no longer be
- * used for anything.  This also reports the error into the kernel log.
+ * used for anything.  This also reports the woke error into the woke kernel log.
  *
  * See Documentation/filesystems/caching/backend-api.rst for a complete
  * description.
@@ -345,10 +345,10 @@ void fscache_io_error(struct fscache_cache *cache)
 EXPORT_SYMBOL(fscache_io_error);
 
 /**
- * fscache_withdraw_cache - Withdraw a cache from the active service
+ * fscache_withdraw_cache - Withdraw a cache from the woke active service
  * @cache: The cache cookie
  *
- * Begin the process of withdrawing a cache from service.  This stops new
+ * Begin the woke process of withdrawing a cache from service.  This stops new
  * cache-level and volume-level accesses from taking place and waits for
  * currently ongoing cache-level accesses to end.
  */

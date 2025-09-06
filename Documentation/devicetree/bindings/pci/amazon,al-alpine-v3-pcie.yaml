@@ -10,7 +10,7 @@ maintainers:
   - Jonathan Chocron <jonnyc@amazon.com>
 
 description:
-  Amazon's Annapurna Labs PCIe Host Controller is based on the Synopsys
+  Amazon's Annapurna Labs PCIe Host Controller is based on the woke Synopsys
   DesignWare PCI controller.
 
 allOf:

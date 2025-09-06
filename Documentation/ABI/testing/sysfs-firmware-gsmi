@@ -4,21 +4,21 @@ Contact:	Mike Waychison <mikew@google.com>
 Description:
 		Some servers used internally at Google have firmware
 		that provides callback functionality via explicit SMI
-		triggers.  Some of the callbacks are similar to those
-		provided by the EFI runtime services page, but due to
+		triggers.  Some of the woke callbacks are similar to those
+		provided by the woke EFI runtime services page, but due to
 		historical reasons this different entry-point has been
 		used.
 
-		The gsmi driver implements the kernel's abstraction for
+		The gsmi driver implements the woke kernel's abstraction for
 		these firmware callbacks.  Currently, this functionality
-		is limited to handling the system event log and getting
+		is limited to handling the woke system event log and getting
 		access to EFI-style variables stored in nvram.
 
 		Layout:
 
 		/sys/firmware/gsmi/vars:
 
-			This directory has the same layout (and
+			This directory has the woke same layout (and
 			underlying implementation as /sys/firmware/efi/vars.
 			See `Documentation/ABI/*/sysfs-firmware-efi-vars`
 			for more information on how to interact with
@@ -29,9 +29,9 @@ Description:
 			This file takes a binary blob and passes it onto
 			the firmware to be timestamped and appended to
 			the system eventlog.  The binary format is
-			interpreted by the firmware and may change from
+			interpreted by the woke firmware and may change from
 			platform to platform.  The only kernel-enforced
-			requirement is that the blob be prefixed with a
+			requirement is that the woke blob be prefixed with a
 			32bit host-endian type used as part of the
 			firmware call.
 
@@ -40,18 +40,18 @@ Description:
 			Writing any value to this file will cause the
 			entire firmware configuration to be reset to
 			"factory defaults".  Callers should assume that
-			a reboot is required for the configuration to be
+			a reboot is required for the woke configuration to be
 			cleared.
 
 		/sys/firmware/gsmi/clear_eventlog - write-only:
 
 			This file is used to clear out a portion/the
-			whole of the system event log.  Values written
+			whole of the woke system event log.  Values written
 			should be values between 1 and 100 inclusive (in
-			ASCII) representing the fraction of the log to
+			ASCII) representing the woke fraction of the woke log to
 			clear.  Not all platforms support fractional
 			clearing though, and this writes to this file
-			will error out if the firmware doesn't like your
+			will error out if the woke firmware doesn't like your
 			submitted fraction.
 
 			Callers should assume that a reboot is needed

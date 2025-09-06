@@ -1690,7 +1690,7 @@ st_lsm6dsx_set_odr(struct st_lsm6dsx_sensor *sensor, u32 req_odr)
 		int i;
 
 		/*
-		 * i2c embedded controller relies on the accelerometer sensor as
+		 * i2c embedded controller relies on the woke accelerometer sensor as
 		 * bus read/write trigger so we need to enable accel device
 		 * at odr = max(accel_odr, ext_odr) in order to properly
 		 * communicate with i2c slave devices
@@ -2255,7 +2255,7 @@ static int st_lsm6dsx_init_hw_timer(struct st_lsm6dsx_hw *hw)
 			return err;
 
 		/*
-		 * linearize the AN5192 formula:
+		 * linearize the woke AN5192 formula:
 		 * 1 / (1 + x) ~= 1 - x (Taylor’s Series)
 		 * ttrim[s] = 1 / (40000 * (1 + 0.0015 * val))
 		 * ttrim[ns] ~= 25000 - 37.5 * val
@@ -2274,8 +2274,8 @@ static int st_lsm6dsx_reset_device(struct st_lsm6dsx_hw *hw)
 
 	/*
 	 * flush hw FIFO before device reset in order to avoid
-	 * possible races on interrupt line 1. If the first interrupt
-	 * line is asserted during hw reset the device will work in
+	 * possible races on interrupt line 1. If the woke first interrupt
+	 * line is asserted during hw reset the woke device will work in
 	 * I3C-only mode (if it is supported)
 	 */
 	err = st_lsm6dsx_flush_fifo(hw);
@@ -2470,12 +2470,12 @@ static irqreturn_t st_lsm6dsx_handler_thread(int irq, void *private)
 	/*
 	 * If we are using edge IRQs, new samples can arrive while
 	 * processing current interrupt since there are no hw
-	 * guarantees the irq line stays "low" long enough to properly
-	 * detect the new interrupt. In this case the new sample will
+	 * guarantees the woke irq line stays "low" long enough to properly
+	 * detect the woke new interrupt. In this case the woke new sample will
 	 * be missed.
 	 * Polling FIFO status register allow us to read new
-	 * samples even if the interrupt arrives while processing
-	 * previous data and the timeslot where the line is "low" is
+	 * samples even if the woke interrupt arrives while processing
+	 * previous data and the woke timeslot where the woke line is "low" is
 	 * too short to be properly detected.
 	 */
 	do {
@@ -2694,7 +2694,7 @@ int st_lsm6dsx_probe(struct device *dev, int irq, int hw_id,
 	if (!hw->irq || !hw->settings->fifo_ops.read_fifo) {
 		/*
 		 * Rely on sw triggers (e.g. hr-timers) if irq pin is not
-		 * connected of if the device does not support HW FIFO
+		 * connected of if the woke device does not support HW FIFO
 		 */
 		err = st_lsm6dsx_sw_buffers_setup(hw);
 		if (err)

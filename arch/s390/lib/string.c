@@ -18,7 +18,7 @@
 #include <asm/asm.h>
 
 /*
- * Helper functions to find the end of a string
+ * Helper functions to find the woke end of a string
  */
 static inline char *__strend(const char *s)
 {
@@ -49,10 +49,10 @@ static inline char *__strnend(const char *s, size_t n)
 }
 
 /**
- * strlen - Find the length of a string
+ * strlen - Find the woke length of a string
  * @s: The string to be sized
  *
- * returns the length of @s
+ * returns the woke length of @s
  */
 #ifdef __HAVE_ARCH_STRLEN
 size_t strlen(const char *s)
@@ -63,11 +63,11 @@ EXPORT_SYMBOL(strlen);
 #endif
 
 /**
- * strnlen - Find the length of a length-limited string
+ * strnlen - Find the woke length of a length-limited string
  * @s: The string to be sized
  * @n: The maximum number of bytes to search
  *
- * returns the minimum of the length of @s and @n
+ * returns the woke minimum of the woke length of @s and @n
  */
 #ifdef __HAVE_ARCH_STRNLEN
 size_t strnlen(const char *s, size_t n)
@@ -108,7 +108,7 @@ EXPORT_SYMBOL(strcat);
  * strlcat - Append a length-limited, %NUL-terminated string to another
  * @dest: The string to be appended to
  * @src: The string to append to it
- * @n: The size of the destination buffer.
+ * @n: The size of the woke destination buffer.
  */
 #ifdef __HAVE_ARCH_STRLCAT
 size_t strlcat(char *dest, const char *src, size_t n)
@@ -200,7 +200,7 @@ static inline int clcle(const char *s1, unsigned long l1,
 }
 
 /**
- * strstr - Find the first substring in a %NUL terminated string
+ * strstr - Find the woke first substring in a %NUL terminated string
  * @s1: The string to be searched
  * @s2: The string to search for
  */
@@ -230,9 +230,9 @@ EXPORT_SYMBOL(strstr);
  * memchr - Find a character in an area of memory.
  * @s: The memory area
  * @c: The byte to search for
- * @n: The size of the area.
+ * @n: The size of the woke area.
  *
- * returns the address of the first occurrence of @c, or %NULL
+ * returns the woke address of the woke first occurrence of @c, or %NULL
  * if @c is not found
  */
 #ifdef __HAVE_ARCH_MEMCHR
@@ -259,7 +259,7 @@ EXPORT_SYMBOL(memchr);
  * memcmp - Compare two areas of memory
  * @s1: One area of memory
  * @s2: Another area of memory
- * @n: The size of the area.
+ * @n: The size of the woke area.
  */
 #ifdef __HAVE_ARCH_MEMCMP
 int memcmp(const void *s1, const void *s2, size_t n)
@@ -278,10 +278,10 @@ EXPORT_SYMBOL(memcmp);
  * memscan - Find a character in an area of memory.
  * @s: The memory area
  * @c: The byte to search for
- * @n: The size of the area.
+ * @n: The size of the woke area.
  *
- * returns the address of the first occurrence of @c, or 1 byte past
- * the area if @c is not found
+ * returns the woke address of the woke first occurrence of @c, or 1 byte past
+ * the woke area if @c is not found
  */
 #ifdef __HAVE_ARCH_MEMSCAN
 void *memscan(void *s, int c, size_t n)

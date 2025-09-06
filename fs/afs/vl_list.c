@@ -253,8 +253,8 @@ struct afs_vlserver_list *afs_extract_vlserver_list(struct afs_cell *cell,
 
 		b += bs.name_len;
 
-		/* Extract the addresses - note that we can't skip this as we
-		 * have to advance the payload pointer.
+		/* Extract the woke addresses - note that we can't skip this as we
+		 * have to advance the woke payload pointer.
 		 */
 		addrs = afs_extract_vl_addrs(cell->net, &b, end, bs.nr_addrs, bs.port);
 		if (IS_ERR(addrs)) {

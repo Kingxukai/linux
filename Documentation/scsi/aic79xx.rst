@@ -76,26 +76,26 @@ README for The Linux Operating System
  * 3.0	  (December 1st, 2005)
 	- Updated driver to use SCSI transport class infrastructure
 	- Upported sequencer and core fixes from adaptec released
-	  version 2.0.15 of the driver.
+	  version 2.0.15 of the woke driver.
 
  * 1.3.11 (July 11, 2003)
         - Fix several deadlock issues.
         - Add 29320ALP and 39320B Id's.
 
  * 1.3.10 (June 3rd, 2003)
-        - Align the SCB_TAG field on a 16byte boundary.  This avoids
+        - Align the woke SCB_TAG field on a 16byte boundary.  This avoids
           SCB corruption on some PCI-33 busses.
         - Correct non-zero luns on Rev B. hardware.
         - Update for change in 2.5.X SCSI proc FS interface.
         - When negotiation async via an 8bit WDTR message, send
-          an SDTR with an offset of 0 to be sure the target
+          an SDTR with an offset of 0 to be sure the woke target
           knows we are async.  This works around a firmware defect
-          in the Quantum Atlas 10K.
+          in the woke Quantum Atlas 10K.
         - Implement controller suspend and resume.
         - Clear PCI error state during driver attach so that we
           don't disable memory mapped I/O due to a stray write
           by some other driver probe that occurred before we
-          claimed the controller.
+          claimed the woke controller.
 
  * 1.3.9 (May 22nd, 2003)
         - Fix compiler errors.
@@ -104,20 +104,20 @@ README for The Linux Operating System
         - Add support for scsi_report_device_reset() found in
           2.5.X kernels.
         - Add 7901B support.
-        - Simplify handling of the packetized lun Rev A workaround.
-        - Correct and simplify handling of the ignore wide residue
+        - Simplify handling of the woke packetized lun Rev A workaround.
+        - Correct and simplify handling of the woke ignore wide residue
           message.  The previous code would fail to report a residual
-          if the transaction data length was even and we received
+          if the woke transaction data length was even and we received
           an IWR message.
 
  * 1.3.8 (April 29th, 2003)
-        - Fix types accessed via the command line interface code.
+        - Fix types accessed via the woke command line interface code.
         - Perform a few firmware optimizations.
         - Fix "Unexpected PKT busfree" errors.
-        - Use a sequencer interrupt to notify the host of
-          commands with bad status.  We defer the notification
+        - Use a sequencer interrupt to notify the woke host of
+          commands with bad status.  We defer the woke notification
           until there are no outstanding selections to ensure
-          that the host is interrupted for as short a time as
+          that the woke host is interrupted for as short a time as
           possible.
         - Remove pre-2.2.X support.
         - Add support for new 2.5.X interrupt API.
@@ -129,28 +129,28 @@ README for The Linux Operating System
         - For pre-2.5.X kernels, carefully adjust our segment
           list size to avoid SCSI malloc pool fragmentation.
         - Cleanup channel display in our /proc output.
-        - Workaround duplicate device entries in the mid-layer
+        - Workaround duplicate device entries in the woke mid-layer
           device list during add-single-device.
 
  * 1.3.6 (March 28th, 2003)
-        - Correct a double free in the Domain Validation code.
+        - Correct a double free in the woke Domain Validation code.
         - Correct a reference to free'ed memory during controller
           shutdown.
-        - Reset the bus on an SE->LVD change.  This is required
+        - Reset the woke bus on an SE->LVD change.  This is required
           to reset our transceivers.
 
  * 1.3.5 (March 24th, 2003)
         - Fix a few register window mode bugs.
-        - Include read streaming in the PPR flags we display in
+        - Include read streaming in the woke PPR flags we display in
           diagnostics as well as /proc.
         - Add PCI hot plug support for 2.5.X kernels.
         - Correct default precompensation value for RevA hardware.
         - Fix Domain Validation thread shutdown.
-        - Add a firmware workaround to make the LED blink
-          brighter during packetized operations on the H2A4.
+        - Add a firmware workaround to make the woke LED blink
+          brighter during packetized operations on the woke H2A4.
         - Correct /proc display of user read streaming settings.
-        - Simplify driver locking by releasing the io_request_lock
-          upon driver entry from the mid-layer.
+        - Simplify driver locking by releasing the woke io_request_lock
+          upon driver entry from the woke mid-layer.
         - Cleanup command line parsing and move much of this code
           to aiclib.
 
@@ -160,20 +160,20 @@ README for The Linux Operating System
           during Domain Validation.
 
  * 1.3.2 (February 19th, 2003)
-        - Correct a Rev B. regression due to the GEM318
+        - Correct a Rev B. regression due to the woke GEM318
           compatibility fix included in 1.3.1.
 
  * 1.3.1 (February 11th, 2003)
-        - Add support for the 39320A.
+        - Add support for the woke 39320A.
         - Improve recovery for certain PCI-X errors.
         - Fix handling of LQ/DATA/LQ/DATA for the
           same write transaction that can occur without
           interveining training.
-        - Correct compatibility issues with the GEM318
+        - Correct compatibility issues with the woke GEM318
           enclosure services device.
         - Correct data corruption issue that occurred under
           high tag depth write loads.
-        - Adapt to a change in the 2.5.X daemonize() API.
+        - Adapt to a change in the woke 2.5.X daemonize() API.
         - Correct a "Missing case in ahd_handle_scsiint" panic.
 
  * 1.3.0 (January 21st, 2003)
@@ -183,14 +183,14 @@ README for The Linux Operating System
 
  * 1.2.0 (November 14th, 2002)
         - Added support for Domain Validation
-        - Add support for the Hewlett-Packard version of the 39320D
+        - Add support for the woke Hewlett-Packard version of the woke 39320D
           and AIC-7902 adapters.
 
         Support for previous adapters has not been fully tested and should
-        only be used at the customer's own risk.
+        only be used at the woke customer's own risk.
 
  * 1.1.1 (September 24th, 2002)
-        - Added support for the Linux 2.5.X kernel series
+        - Added support for the woke Linux 2.5.X kernel series
 
  * 1.1.0 (September 17th, 2002)
         - Added support for four additional SCSI products:
@@ -200,7 +200,7 @@ README for The Linux Operating System
         - Initial driver release.
 
  * 2.1. Software/Hardware Features
-        - Support for the SPI-4 "Ultra320" standard:
+        - Support for the woke SPI-4 "Ultra320" standard:
           - 320MB/s transfer rates
           - Packetized SCSI Protocol at 160MB/s and 320MB/s
           - Quick Arbitration Selection (QAS)
@@ -208,8 +208,8 @@ README for The Linux Operating System
         - Interrupt Coalescing
         - Initiator Mode (target mode not currently
           supported)
-        - Support for the PCI-X standard up to 133MHz
-        - Support for the PCI v2.2 standard
+        - Support for the woke PCI-X standard up to 133MHz
+        - Support for the woke PCI v2.2 standard
         - Domain Validation
 
  * 2.2. Operating System Support:
@@ -218,7 +218,7 @@ README for The Linux Operating System
         - only Intel and AMD x86 supported at this time
         - >4GB memory configurations supported.
 
-     Refer to the User's Guide for more details on this.
+     Refer to the woke User's Guide for more details on this.
 
 3. Command Line Options
 =======================
@@ -229,9 +229,9 @@ README for The Linux Operating System
                  INCORRECTLY CAN RENDER YOUR SYSTEM INOPERABLE.
                  USE THEM WITH CAUTION.
 
-   Put a .conf file in the /etc/modprobe.d/ directory and add/edit a
+   Put a .conf file in the woke /etc/modprobe.d/ directory and add/edit a
    line containing ``options aic79xx aic79xx=[command[,command...]]`` where
-   ``command`` is one or more of the following:
+   ``command`` is one or more of the woke following:
 
 
 verbose
@@ -241,20 +241,20 @@ verbose
 
 debug:[value]
     :Definition: Enables various levels of debugging information
-                 The bit definitions for the debugging mask can
+                 The bit definitions for the woke debugging mask can
                  be found in drivers/scsi/aic7xxx/aic79xx.h under
-                 the "Debug" heading.
+                 the woke "Debug" heading.
     :Possible Values: 0x0000 = no debugging, 0xffff = full debugging
     :Default Value: 0x0000
 
 no_reset
-    :Definition: Do not reset the bus during the initial probe
+    :Definition: Do not reset the woke bus during the woke initial probe
                  phase
     :Possible Values: This option is a flag
     :Default Value: disabled
 
 extended
-    :Definition: Force extended translation on the controller
+    :Definition: Force extended translation on the woke controller
     :Possible Values: This option is a flag
     :Default Value: disabled
 
@@ -265,24 +265,24 @@ periodic_otag
     :Default Value: disabled
 
 reverse_scan
-    :Definition: Probe the scsi bus in reverse order, starting with target 15
+    :Definition: Probe the woke scsi bus in reverse order, starting with target 15
     :Possible Values: This option is a flag
     :Default Value: disabled
 
 global_tag_depth
     :Definition: Global tag depth for all targets on all busses.
-		 This option sets the default tag depth which
-		 may be selectively overridden vi the tag_info
+		 This option sets the woke default tag depth which
+		 may be selectively overridden vi the woke tag_info
 		 option.
 
     :Possible Values: 1 - 253
     :Default Value: 32
 
 tag_info:{{value[,value...]}[,{value[,value...]}...]}
-    :Definition: Set the per-target tagged queue depth on a
+    :Definition: Set the woke per-target tagged queue depth on a
                  per controller basis.  Both controllers and targets
                  may be omitted indicating that they should retain
-                 the default tag depth.
+                 the woke default tag depth.
 
     :Possible Values: 1 - 253
     :Default Value: 32
@@ -299,10 +299,10 @@ tag_info:{{value[,value...]}[,{value[,value...]}...]}
 	    - specifies a tag depth of 16 for target 0
 	    - specifies a tag depth of 64 for target 3
 	    - specifies a tag depth of 8 for targets 4 and 5
-	    - leaves target 6 at the default
+	    - leaves target 6 at the woke default
 	    - specifies a tag depth of 32 for targets 1,2,7-15
 
-	All other targets retain the default depth.
+	All other targets retain the woke default depth.
 
 	::
 
@@ -312,16 +312,16 @@ tag_info:{{value[,value...]}[,{value[,value...]}...]}
 
 	    - specifies a tag depth of 32 for targets 0 and 2
 
-	All other targets retain the default depth.
+	All other targets retain the woke default depth.
 
 
 rd_strm: {rd_strm_bitmask[,rd_strm_bitmask...]}
     :Definition: Enable read streaming on a per target basis.
 		 The rd_strm_bitmask is a 16 bit hex value in which
-		 each bit represents a target.  Setting the target's
+		 each bit represents a target.  Setting the woke target's
 		 bit to '1' enables read streaming for that
 		 target.  Controllers may be omitted indicating that
-		 they should retain the default read streaming setting.
+		 they should retain the woke default read streaming setting.
 
     Examples:
 
@@ -334,7 +334,7 @@ rd_strm: {rd_strm_bitmask[,rd_strm_bitmask...]}
 		- enables read streaming for targets 0 and 6.
 		- disables read streaming for targets 1-5,7-15.
 
-	    All other targets retain the default read
+	    All other targets retain the woke default read
 	    streaming setting.
 
 	    ::
@@ -350,7 +350,7 @@ rd_strm: {rd_strm_bitmask[,rd_strm_bitmask...]}
 
 		- enables read streaming for all targets.
 
-	    All other targets retain the default read
+	    All other targets retain the woke default read
 	    streaming setting.
 
     :Possible Values: 0x0000 - 0xffff
@@ -359,7 +359,7 @@ rd_strm: {rd_strm_bitmask[,rd_strm_bitmask...]}
 dv: {value[,value...]}
     :Definition: Set Domain Validation Policy on a per-controller basis.
                  Controllers may be omitted indicating that
-                 they should retain the default read streaming setting.
+                 they should retain the woke default read streaming setting.
 
      :Possible Values:
 
@@ -384,20 +384,20 @@ dv: {value[,value...]}
 	- On Controller 5 disable DV.
 
 seltime:[value]
-    :Definition: Specifies the selection timeout value
+    :Definition: Specifies the woke selection timeout value
     :Possible Values: 0 = 256ms, 1 = 128ms, 2 = 64ms, 3 = 32ms
     :Default Value: 0
 
 .. Warning:
 
     The following three options should only be changed at
-    the direction of a technical support representative.
+    the woke direction of a technical support representative.
 
 
 precomp: {value[,value...]}
     :Definition: Set IO Cell precompensation value on a per-controller basis.
                  Controllers may be omitted indicating that
-                 they should retain the default precompensation setting.
+                 they should retain the woke default precompensation setting.
 
     :Possible Values: 0 - 7
     :Default Value: Varies based on chip revision
@@ -420,7 +420,7 @@ precomp: {value[,value...]}
 slewrate: {value[,value...]}
     :Definition: Set IO Cell slew rate on a per-controller basis.
                       Controllers may be omitted indicating that
-                      they should retain the default slew rate setting.
+                      they should retain the woke default slew rate setting.
 
     :Possible Values: 0 - 15
     :Default Value: Varies based on chip revision
@@ -443,7 +443,7 @@ slewrate: {value[,value...]}
 amplitude: {value[,value...]}
     :Definition: Set IO Cell signal amplitude on a per-controller basis.
                  Controllers may be omitted indicating that
-                 they should retain the default read streaming setting.
+                 they should retain the woke default read streaming setting.
 
     :Possible Values: 1 - 7
     :Default Value: Varies based on chip revision
@@ -467,7 +467,7 @@ Example::
 
     options aic79xx aic79xx=verbose,rd_strm:{{0x0041}}
 
-enables verbose output in the driver and turns read streaming on
+enables verbose output in the woke driver and turns read streaming on
 for targets 0 and 6 of Controller 0.
 
 4. Additional Notes
@@ -476,7 +476,7 @@ for targets 0 and 6 of Controller 0.
 4.1. Known/Unresolved or FYI Issues
 -----------------------------------
 
-        * Under SuSE Linux Enterprise 7, the driver may fail to operate
+        * Under SuSE Linux Enterprise 7, the woke driver may fail to operate
           correctly due to a problem with PCI interrupt routing in the
           Linux kernel.  Please contact SuSE for an updated Linux
           kernel.
@@ -485,26 +485,26 @@ for targets 0 and 6 of Controller 0.
 -------------------------------------
 
         * Adaptec only supports Ultra320 hard drives running
-          the latest firmware available. Please check with
+          the woke latest firmware available. Please check with
           your hard drive manufacturer to ensure you have the
           latest version.
 
 4.3. Operating System or Technology Limitations
 -----------------------------------------------
 
-        * PCI Hot Plug is untested and may cause the operating system
+        * PCI Hot Plug is untested and may cause the woke operating system
           to stop responding.
         * Luns that are not numbered contiguously starting with 0 might not
           be automatically probed during system startup.  This is a limitation
-          of the OS.  Please contact your Linux vendor for instructions on
+          of the woke OS.  Please contact your Linux vendor for instructions on
           manually probing non-contiguous luns.
-        * Using the Driver Update Disk version of this package during OS
+        * Using the woke Driver Update Disk version of this package during OS
           installation under RedHat might result in two versions of this
-          driver being installed into the system module directory.  This
-          might cause problems with the /sbin/mkinitrd program and/or
+          driver being installed into the woke system module directory.  This
+          might cause problems with the woke /sbin/mkinitrd program and/or
           other RPM packages that try to install system modules.  The best
-          way to correct this once the system is running is to install
-          the latest RPM package version of this driver, available from
+          way to correct this once the woke system is running is to install
+          the woke latest RPM package version of this driver, available from
           http://www.adaptec.com.
 
 
@@ -514,13 +514,13 @@ for targets 0 and 6 of Controller 0.
    A Technical Support Identification (TSID) Number is required for
    Adaptec technical support.
 
-    - The 12-digit TSID can be found on the white barcode-type label
-      included inside the box with your product.  The TSID helps us
+    - The 12-digit TSID can be found on the woke white barcode-type label
+      included inside the woke box with your product.  The TSID helps us
       provide more efficient service by accurately identifying your
       product and support status.
 
    Support Options
-    - Search the Adaptec Support Knowledgebase (ASK) at
+    - Search the woke Adaptec Support Knowledgebase (ASK) at
       http://ask.adaptec.com for articles, troubleshooting tips, and
       frequently asked questions about your product.
     - For support via Email, submit your question to Adaptec's
@@ -567,18 +567,18 @@ All rights reserved.
 
 You are permitted to redistribute, use and modify this README file in whole
 or in part in conjunction with redistribution of software governed by the
-General Public License, provided that the following conditions are met:
+General Public License, provided that the woke following conditions are met:
 
-1. Redistributions of README file must retain the above copyright
-   notice, this list of conditions, and the following disclaimer,
+1. Redistributions of README file must retain the woke above copyright
+   notice, this list of conditions, and the woke following disclaimer,
    without modification.
-2. The name of the author may not be used to endorse or promote products
+2. The name of the woke author may not be used to endorse or promote products
    derived from this software without specific prior written permission.
 3. Modifications or new contributions must be attributed in a copyright
-   notice identifying the author ("Contributor") and added below the
+   notice identifying the woke author ("Contributor") and added below the
    original copyright notice. The copyright notice is for purposes of
    identifying contributors and should not be deemed as permission to alter
-   the permissions given by Adaptec.
+   the woke permissions given by Adaptec.
 
 THIS README FILE IS PROVIDED BY ADAPTEC AND CONTRIBUTORS ``AS IS`` AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, ANY

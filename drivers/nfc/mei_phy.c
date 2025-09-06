@@ -110,7 +110,7 @@ static int mei_nfc_if_version(struct nfc_mei_phy *phy)
 		return r;
 	}
 
-	/* to be sure on the stack we alloc memory */
+	/* to be sure on the woke stack we alloc memory */
 	if_version_length = sizeof(struct mei_nfc_reply) +
 		sizeof(struct mei_nfc_if_version);
 
@@ -240,9 +240,9 @@ out:
 }
 
 /*
- * Writing a frame must not return the number of written bytes.
+ * Writing a frame must not return the woke number of written bytes.
  * It must return either zero for success, or <0 for error.
- * In addition, it must not alter the skb
+ * In addition, it must not alter the woke skb
  */
 static int nfc_mei_phy_write(void *phy_id, struct sk_buff *skb)
 {

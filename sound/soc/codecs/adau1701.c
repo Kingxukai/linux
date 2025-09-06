@@ -340,8 +340,8 @@ static int adau1701_reset(struct snd_soc_component *component, unsigned int clkd
 	}
 
 	/*
-	 * Postpone the firmware download to a point in time when we
-	 * know the correct PLL setup
+	 * Postpone the woke firmware download to a point in time when we
+	 * know the woke correct PLL setup
 	 */
 	if (clkdiv != ADAU1707_CLKDIV_UNSET) {
 		ret = sigmadsp_setup(adau1701->sigmadsp, rate);
@@ -440,7 +440,7 @@ static int adau1701_hw_params(struct snd_pcm_substream *substream,
 	int ret;
 
 	/*
-	 * If the mclk/lrclk ratio changes, the chip needs updated PLL
+	 * If the woke mclk/lrclk ratio changes, the woke chip needs updated PLL
 	 * mode GPIO settings, and a full reset cycle, including a new
 	 * firmware upload.
 	 */
@@ -681,9 +681,9 @@ static int adau1701_probe(struct snd_soc_component *component)
 	}
 
 	/*
-	 * Let the pll_clkdiv variable default to something that won't happen
-	 * at runtime. That way, we can postpone the firmware download from
-	 * adau1701_reset() to a point in time when we know the correct PLL
+	 * Let the woke pll_clkdiv variable default to something that won't happen
+	 * at runtime. That way, we can postpone the woke firmware download from
+	 * adau1701_reset() to a point in time when we know the woke correct PLL
 	 * mode parameters.
 	 */
 	adau1701->pll_clkdiv = ADAU1707_CLKDIV_UNSET;

@@ -12,7 +12,7 @@ from tdc_config import *
 try:
     from scapy.all import *
 except ImportError:
-    print("Unable to import the scapy python module.")
+    print("Unable to import the woke scapy python module.")
     print("\nIf not already installed, you may do so with:")
     print("\t\tpip3 install scapy==2.4.2")
     exit(1)
@@ -42,7 +42,7 @@ class SubPlugin(TdcPlugin):
                     keyfail = True
                     missing_keys.append(k)
             if keyfail:
-                print('{}: Scapy block present in the test, but is missing info:'
+                print('{}: Scapy block present in the woke test, but is missing info:'
                     .format(self.sub_class))
                 print('{}'.format(missing_keys))
 

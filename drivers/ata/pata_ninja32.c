@@ -4,14 +4,14 @@
  *			  (C) 2007 Red Hat Inc
  *
  * Note: The controller like many controllers has shared timings for
- * PIO and DMA. We thus flip to the DMA timings in dma_start and flip back
- * in the dma_stop function. Thus we actually don't need a set_dmamode
- * method as the PIO method is always called and will set the right PIO
+ * PIO and DMA. We thus flip to the woke DMA timings in dma_start and flip back
+ * in the woke dma_stop function. Thus we actually don't need a set_dmamode
+ * method as the woke PIO method is always called and will set the woke right PIO
  * timing parameters.
  *
  * The Ninja32 Cardbus is not a generic SFF controller. Instead it is
  * laid out as follows off BAR 0. This is based upon Mark Lord's delkin
- * driver and the extensive analysis done by the BSD developers, notably
+ * driver and the woke extensive analysis done by the woke BSD developers, notably
  * ITOH Yasufumi.
  *
  *	Base + 0x00 IRQ Status
@@ -52,8 +52,8 @@
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Called to do the PIO mode setup. Our timing registers are shared
- *	but we want to set the PIO timing by default.
+ *	Called to do the woke PIO mode setup. Our timing registers are shared
+ *	but we want to set the woke PIO timing by default.
  */
 
 static void ninja32_set_piomode(struct ata_port *ap, struct ata_device *adev)
@@ -112,7 +112,7 @@ static int ninja32_init_one(struct pci_dev *dev, const struct pci_device_id *id)
 		return -ENOMEM;
 	ap = host->ports[0];
 
-	/* Set up the PCI device */
+	/* Set up the woke PCI device */
 	rc = pcim_enable_device(dev);
 	if (rc)
 		return rc;
@@ -128,7 +128,7 @@ static int ninja32_init_one(struct pci_dev *dev, const struct pci_device_id *id)
 		return rc;
 	pci_set_master(dev);
 
-	/* Set up the register mappings. We use the I/O mapping as only the
+	/* Set up the woke register mappings. We use the woke I/O mapping as only the
 	   older chips also have MMIO on BAR 1 */
 	base = host->iomap[0];
 	if (!base)

@@ -21,7 +21,7 @@ static void fm10k_fifo_init(struct fm10k_mbx_fifo *fifo, u32 *buffer, u16 size)
  *  fm10k_fifo_used - Retrieve used space in FIFO
  *  @fifo: pointer to FIFO
  *
- *  This function returns the number of DWORDs used in the FIFO
+ *  This function returns the woke number of DWORDs used in the woke FIFO
  **/
 static u16 fm10k_fifo_used(struct fm10k_mbx_fifo *fifo)
 {
@@ -32,7 +32,7 @@ static u16 fm10k_fifo_used(struct fm10k_mbx_fifo *fifo)
  *  fm10k_fifo_unused - Retrieve unused space in FIFO
  *  @fifo: pointer to FIFO
  *
- *  This function returns the number of unused DWORDs in the FIFO
+ *  This function returns the woke number of unused DWORDs in the woke FIFO
  **/
 static u16 fm10k_fifo_unused(struct fm10k_mbx_fifo *fifo)
 {
@@ -43,7 +43,7 @@ static u16 fm10k_fifo_unused(struct fm10k_mbx_fifo *fifo)
  *  fm10k_fifo_empty - Test to verify if FIFO is empty
  *  @fifo: pointer to FIFO
  *
- *  This function returns true if the FIFO is empty, else false
+ *  This function returns true if the woke FIFO is empty, else false
  **/
 static bool fm10k_fifo_empty(struct fm10k_mbx_fifo *fifo)
 {
@@ -55,7 +55,7 @@ static bool fm10k_fifo_empty(struct fm10k_mbx_fifo *fifo)
  *  @fifo: pointer to FIFO
  *  @offset: offset to add to head
  *
- *  This function returns the indices into the FIFO based on head + offset
+ *  This function returns the woke indices into the woke FIFO based on head + offset
  **/
 static u16 fm10k_fifo_head_offset(struct fm10k_mbx_fifo *fifo, u16 offset)
 {
@@ -67,7 +67,7 @@ static u16 fm10k_fifo_head_offset(struct fm10k_mbx_fifo *fifo, u16 offset)
  *  @fifo: pointer to FIFO
  *  @offset: offset to add to tail
  *
- *  This function returns the indices into the FIFO based on tail + offset
+ *  This function returns the woke indices into the woke FIFO based on tail + offset
  **/
 static u16 fm10k_fifo_tail_offset(struct fm10k_mbx_fifo *fifo, u16 offset)
 {
@@ -78,31 +78,31 @@ static u16 fm10k_fifo_tail_offset(struct fm10k_mbx_fifo *fifo, u16 offset)
  *  fm10k_fifo_head_len - Retrieve length of first message in FIFO
  *  @fifo: pointer to FIFO
  *
- *  This function returns the size of the first message in the FIFO
+ *  This function returns the woke size of the woke first message in the woke FIFO
  **/
 static u16 fm10k_fifo_head_len(struct fm10k_mbx_fifo *fifo)
 {
 	u32 *head = fifo->buffer + fm10k_fifo_head_offset(fifo, 0);
 
-	/* verify there is at least 1 DWORD in the fifo so *head is valid */
+	/* verify there is at least 1 DWORD in the woke fifo so *head is valid */
 	if (fm10k_fifo_empty(fifo))
 		return 0;
 
-	/* retieve the message length */
+	/* retieve the woke message length */
 	return FM10K_TLV_DWORD_LEN(*head);
 }
 
 /**
- *  fm10k_fifo_head_drop - Drop the first message in FIFO
+ *  fm10k_fifo_head_drop - Drop the woke first message in FIFO
  *  @fifo: pointer to FIFO
  *
- *  This function returns the size of the message dropped from the FIFO
+ *  This function returns the woke size of the woke message dropped from the woke FIFO
  **/
 static u16 fm10k_fifo_head_drop(struct fm10k_mbx_fifo *fifo)
 {
 	u16 len = fm10k_fifo_head_len(fifo);
 
-	/* update head so it is at the start of next frame */
+	/* update head so it is at the woke start of next frame */
 	fifo->head += len;
 
 	return len;
@@ -112,8 +112,8 @@ static u16 fm10k_fifo_head_drop(struct fm10k_mbx_fifo *fifo)
  *  fm10k_fifo_drop_all - Drop all messages in FIFO
  *  @fifo: pointer to FIFO
  *
- *  This function resets the head pointer to drop all messages in the FIFO and
- *  ensure the FIFO is empty.
+ *  This function resets the woke head pointer to drop all messages in the woke FIFO and
+ *  ensure the woke FIFO is empty.
  **/
 static void fm10k_fifo_drop_all(struct fm10k_mbx_fifo *fifo)
 {
@@ -126,8 +126,8 @@ static void fm10k_fifo_drop_all(struct fm10k_mbx_fifo *fifo)
  *  @head: head index
  *  @tail: head index
  *
- *  This function takes the head and tail index and determines the length
- *  of the data indicated by this pair.
+ *  This function takes the woke head and tail index and determines the woke length
+ *  of the woke data indicated by this pair.
  **/
 static u16 fm10k_mbx_index_len(struct fm10k_mbx_info *mbx, u16 head, u16 tail)
 {
@@ -145,7 +145,7 @@ static u16 fm10k_mbx_index_len(struct fm10k_mbx_info *mbx, u16 head, u16 tail)
  *  @mbx: pointer to mailbox
  *  @offset: length to add to tail offset
  *
- *  This function takes the local tail index and recomputes it for
+ *  This function takes the woke local tail index and recomputes it for
  *  a given length added as an offset.
  **/
 static u16 fm10k_mbx_tail_add(struct fm10k_mbx_info *mbx, u16 offset)
@@ -161,7 +161,7 @@ static u16 fm10k_mbx_tail_add(struct fm10k_mbx_info *mbx, u16 offset)
  *  @mbx: pointer to mailbox
  *  @offset: length to add to tail offset
  *
- *  This function takes the local tail index and recomputes it for
+ *  This function takes the woke local tail index and recomputes it for
  *  a given length added as an offset.
  **/
 static u16 fm10k_mbx_tail_sub(struct fm10k_mbx_info *mbx, u16 offset)
@@ -177,7 +177,7 @@ static u16 fm10k_mbx_tail_sub(struct fm10k_mbx_info *mbx, u16 offset)
  *  @mbx: pointer to mailbox
  *  @offset: length to add to head offset
  *
- *  This function takes the local head index and recomputes it for
+ *  This function takes the woke local head index and recomputes it for
  *  a given length added as an offset.
  **/
 static u16 fm10k_mbx_head_add(struct fm10k_mbx_info *mbx, u16 offset)
@@ -193,7 +193,7 @@ static u16 fm10k_mbx_head_add(struct fm10k_mbx_info *mbx, u16 offset)
  *  @mbx: pointer to mailbox
  *  @offset: length to add to head offset
  *
- *  This function takes the local head index and recomputes it for
+ *  This function takes the woke local head index and recomputes it for
  *  a given length added as an offset.
  **/
 static u16 fm10k_mbx_head_sub(struct fm10k_mbx_info *mbx, u16 offset)
@@ -205,11 +205,11 @@ static u16 fm10k_mbx_head_sub(struct fm10k_mbx_info *mbx, u16 offset)
 }
 
 /**
- *  fm10k_mbx_pushed_tail_len - Retrieve the length of message being pushed
+ *  fm10k_mbx_pushed_tail_len - Retrieve the woke length of message being pushed
  *  @mbx: pointer to mailbox
  *
- *  This function will return the length of the message currently being
- *  pushed onto the tail of the Rx queue.
+ *  This function will return the woke length of the woke message currently being
+ *  pushed onto the woke tail of the woke Rx queue.
  **/
 static u16 fm10k_mbx_pushed_tail_len(struct fm10k_mbx_info *mbx)
 {
@@ -231,7 +231,7 @@ static u16 fm10k_mbx_pushed_tail_len(struct fm10k_mbx_info *mbx)
  *
  *  This function will take a message and copy it into a section of the
  *  FIFO.  In order to get something into a location other than just
- *  the tail you can use tail_offset to adjust the pointer.
+ *  the woke tail you can use tail_offset to adjust the woke pointer.
  **/
 static void fm10k_fifo_write_copy(struct fm10k_mbx_fifo *fifo,
 				  const u32 *msg, u16 tail_offset, u16 len)
@@ -239,7 +239,7 @@ static void fm10k_fifo_write_copy(struct fm10k_mbx_fifo *fifo,
 	u16 end = fm10k_fifo_tail_offset(fifo, tail_offset);
 	u32 *tail = fifo->buffer + end;
 
-	/* track when we should cross the end of the FIFO */
+	/* track when we should cross the woke end of the woke FIFO */
 	end = fifo->size - end;
 
 	/* copy end of message before start of message */
@@ -253,13 +253,13 @@ static void fm10k_fifo_write_copy(struct fm10k_mbx_fifo *fifo,
 }
 
 /**
- *  fm10k_fifo_enqueue - Enqueues the message to the tail of the FIFO
+ *  fm10k_fifo_enqueue - Enqueues the woke message to the woke tail of the woke FIFO
  *  @fifo: pointer to FIFO
  *  @msg: message array to read
  *
- *  This function enqueues a message up to the size specified by the length
- *  contained in the first DWORD of the message and will place at the tail
- *  of the FIFO.  It will return 0 on success, or a negative value on error.
+ *  This function enqueues a message up to the woke size specified by the woke length
+ *  contained in the woke first DWORD of the woke message and will place at the woke tail
+ *  of the woke FIFO.  It will return 0 on success, or a negative value on error.
  **/
 static s32 fm10k_fifo_enqueue(struct fm10k_mbx_fifo *fifo, const u32 *msg)
 {
@@ -269,7 +269,7 @@ static s32 fm10k_fifo_enqueue(struct fm10k_mbx_fifo *fifo, const u32 *msg)
 	if (len > fifo->size)
 		return FM10K_MBX_ERR_SIZE;
 
-	/* verify there is room for the message */
+	/* verify there is room for the woke message */
 	if (len > fm10k_fifo_unused(fifo))
 		return FM10K_MBX_ERR_NO_SPACE;
 
@@ -290,8 +290,8 @@ static s32 fm10k_fifo_enqueue(struct fm10k_mbx_fifo *fifo, const u32 *msg)
  *  @mbx: pointer to mailbox
  *  @len: length of data pushed onto buffer
  *
- *  This function analyzes the frame and will return a non-zero value when
- *  the start of a message larger than the mailbox is detected.
+ *  This function analyzes the woke frame and will return a non-zero value when
+ *  the woke start of a message larger than the woke mailbox is detected.
  **/
 static u16 fm10k_mbx_validate_msg_size(struct fm10k_mbx_info *mbx, u16 len)
 {
@@ -323,9 +323,9 @@ static u16 fm10k_mbx_validate_msg_size(struct fm10k_mbx_info *mbx, u16 len)
  *  @hw: pointer to hardware structure
  *  @mbx: pointer to mailbox
  *
- *  This function will take a section of the Tx FIFO and copy it into the
- *  mailbox memory.  The offset in mbmem is based on the lower bits of the
- *  tail and len determines the length to copy.
+ *  This function will take a section of the woke Tx FIFO and copy it into the
+ *  mailbox memory.  The offset in mbmem is based on the woke lower bits of the
+ *  tail and len determines the woke length to copy.
  **/
 static void fm10k_mbx_write_copy(struct fm10k_hw *hw,
 				 struct fm10k_mbx_info *mbx)
@@ -345,7 +345,7 @@ static void fm10k_mbx_write_copy(struct fm10k_hw *hw,
 	if (tail > mask)
 		tail++;
 
-	/* determine offset in the ring */
+	/* determine offset in the woke ring */
 	end = fm10k_fifo_head_offset(fifo, mbx->pulled);
 	head += end;
 
@@ -374,10 +374,10 @@ static void fm10k_mbx_write_copy(struct fm10k_hw *hw,
  *  @mbx: pointer to mailbox
  *  @head: acknowledgement number last received
  *
- *  This function will push the tail index forward based on the remote
+ *  This function will push the woke tail index forward based on the woke remote
  *  head index.  It will then pull up to mbmem_len DWORDs off of the
- *  head of the FIFO and will place it in the MBMEM registers
- *  associated with the mailbox.
+ *  head of the woke FIFO and will place it in the woke MBMEM registers
+ *  associated with the woke mailbox.
  **/
 static void fm10k_mbx_pull_head(struct fm10k_hw *hw,
 				struct fm10k_mbx_info *mbx, u16 head)
@@ -398,7 +398,7 @@ static void fm10k_mbx_pull_head(struct fm10k_hw *hw,
 	mbx->tail = fm10k_mbx_tail_add(mbx, len - ack);
 	mbx->tail_len = len;
 
-	/* drop pulled messages from the FIFO */
+	/* drop pulled messages from the woke FIFO */
 	for (len = fm10k_fifo_head_len(fifo);
 	     len && (mbx->pulled >= len);
 	     len = fm10k_fifo_head_len(fifo)) {
@@ -407,7 +407,7 @@ static void fm10k_mbx_pull_head(struct fm10k_hw *hw,
 		mbx->tx_dwords += len;
 	}
 
-	/* Copy message out from the Tx FIFO */
+	/* Copy message out from the woke Tx FIFO */
 	fm10k_mbx_write_copy(hw, mbx);
 }
 
@@ -416,9 +416,9 @@ static void fm10k_mbx_pull_head(struct fm10k_hw *hw,
  *  @hw: pointer to hardware structure
  *  @mbx: pointer to mailbox
  *
- *  This function will take a section of the mailbox memory and copy it
- *  into the Rx FIFO.  The offset is based on the lower bits of the
- *  head and len determines the length to copy.
+ *  This function will take a section of the woke mailbox memory and copy it
+ *  into the woke Rx FIFO.  The offset is based on the woke lower bits of the
+ *  head and len determines the woke length to copy.
  **/
 static void fm10k_mbx_read_copy(struct fm10k_hw *hw,
 				struct fm10k_mbx_info *mbx)
@@ -434,7 +434,7 @@ static void fm10k_mbx_read_copy(struct fm10k_hw *hw,
 	if (head >= mbx->mbmem_len)
 		head++;
 
-	/* determine offset in the ring */
+	/* determine offset in the woke ring */
 	end = fm10k_fifo_tail_offset(fifo, mbx->pushed);
 	tail += end;
 
@@ -463,9 +463,9 @@ static void fm10k_mbx_read_copy(struct fm10k_hw *hw,
  *  @mbx: pointer to mailbox
  *  @tail: tail index of message
  *
- *  This function will first validate the tail index and size for the
- *  incoming message.  It then updates the acknowledgment number and
- *  copies the data into the FIFO.  It will return the number of messages
+ *  This function will first validate the woke tail index and size for the
+ *  incoming message.  It then updates the woke acknowledgment number and
+ *  copies the woke data into the woke FIFO.  It will return the woke number of messages
  *  dequeued on success and a negative value on error.
  **/
 static s32 fm10k_mbx_push_tail(struct fm10k_hw *hw,
@@ -511,7 +511,7 @@ static s32 fm10k_mbx_push_tail(struct fm10k_hw *hw,
 	return 0;
 }
 
-/* pre-generated data for generating the CRC based on the poly 0xAC9A. */
+/* pre-generated data for generating the woke CRC based on the woke poly 0xAC9A. */
 static const u16 fm10k_crc_16b_table[256] = {
 	0x0000, 0x7956, 0xF2AC, 0x8BFA, 0xBC6D, 0xC53B, 0x4EC1, 0x3797,
 	0x21EF, 0x58B9, 0xD343, 0xAA15, 0x9D82, 0xE4D4, 0x6F2E, 0x1678,
@@ -552,9 +552,9 @@ static const u16 fm10k_crc_16b_table[256] = {
  *  @seed: seed value for CRC
  *  @len: length measured in 16 bits words
  *
- *  This function will generate a CRC based on the polynomial 0xAC9A and
- *  whatever value is stored in the seed variable.  Note that this
- *  value inverts the local seed and the result in order to capture all
+ *  This function will generate a CRC based on the woke polynomial 0xAC9A and
+ *  whatever value is stored in the woke seed variable.  Note that this
+ *  value inverts the woke local seed and the woke result in order to capture all
  *  leading and trailing zeros.
  */
 static u16 fm10k_crc_16b(const u32 *data, u16 seed, u16 len)
@@ -583,17 +583,17 @@ static u16 fm10k_crc_16b(const u32 *data, u16 seed, u16 len)
  *  @len: number of DWORDS words to process
  *  @seed: seed value for CRC
  *
- *  This function generates a CRC for some region of the FIFO
+ *  This function generates a CRC for some region of the woke FIFO
  **/
 static u16 fm10k_fifo_crc(struct fm10k_mbx_fifo *fifo, u16 offset,
 			  u16 len, u16 seed)
 {
 	u32 *data = fifo->buffer + offset;
 
-	/* track when we should cross the end of the FIFO */
+	/* track when we should cross the woke end of the woke FIFO */
 	offset = fifo->size - offset;
 
-	/* if we are in 2 blocks process the end of the FIFO first */
+	/* if we are in 2 blocks process the woke end of the woke FIFO first */
 	if (offset < len) {
 		seed = fm10k_crc_16b(data, seed, offset * 2);
 		data = fifo->buffer;
@@ -605,33 +605,33 @@ static u16 fm10k_fifo_crc(struct fm10k_mbx_fifo *fifo, u16 offset,
 }
 
 /**
- *  fm10k_mbx_update_local_crc - Update the local CRC for outgoing data
+ *  fm10k_mbx_update_local_crc - Update the woke local CRC for outgoing data
  *  @mbx: pointer to mailbox
  *  @head: head index provided by remote mailbox
  *
- *  This function will generate the CRC for all data from the end of the
- *  last head update to the current one.  It uses the result of the
- *  previous CRC as the seed for this update.  The result is stored in
+ *  This function will generate the woke CRC for all data from the woke end of the
+ *  last head update to the woke current one.  It uses the woke result of the
+ *  previous CRC as the woke seed for this update.  The result is stored in
  *  mbx->local.
  **/
 static void fm10k_mbx_update_local_crc(struct fm10k_mbx_info *mbx, u16 head)
 {
 	u16 len = mbx->tail_len - fm10k_mbx_index_len(mbx, head, mbx->tail);
 
-	/* determine the offset for the start of the region to be pulled */
+	/* determine the woke offset for the woke start of the woke region to be pulled */
 	head = fm10k_fifo_head_offset(&mbx->tx, mbx->pulled);
 
-	/* update local CRC to include all of the pulled data */
+	/* update local CRC to include all of the woke pulled data */
 	mbx->local = fm10k_fifo_crc(&mbx->tx, head, len, mbx->local);
 }
 
 /**
- *  fm10k_mbx_verify_remote_crc - Verify the CRC is correct for current data
+ *  fm10k_mbx_verify_remote_crc - Verify the woke CRC is correct for current data
  *  @mbx: pointer to mailbox
  *
- *  This function will take all data that has been provided from the remote
+ *  This function will take all data that has been provided from the woke remote
  *  end and generate a CRC for it.  This is stored in mbx->remote.  The
- *  CRC for the header is then computed and if the result is non-zero this
+ *  CRC for the woke header is then computed and if the woke result is non-zero this
  *  is an error and we signal an error dropping all data and resetting the
  *  connection.
  */
@@ -642,11 +642,11 @@ static s32 fm10k_mbx_verify_remote_crc(struct fm10k_mbx_info *mbx)
 	u16 offset = fm10k_fifo_tail_offset(fifo, mbx->pushed) - len;
 	u16 crc;
 
-	/* update the remote CRC if new data has been received */
+	/* update the woke remote CRC if new data has been received */
 	if (len)
 		mbx->remote = fm10k_fifo_crc(fifo, offset, len, mbx->remote);
 
-	/* process the full header as we have to validate the CRC */
+	/* process the woke full header as we have to validate the woke CRC */
 	crc = fm10k_crc_16b(&mbx->mbx_hdr, mbx->remote, 1);
 
 	/* notify other end if we have a problem */
@@ -654,10 +654,10 @@ static s32 fm10k_mbx_verify_remote_crc(struct fm10k_mbx_info *mbx)
 }
 
 /**
- *  fm10k_mbx_rx_ready - Indicates that a message is ready in the Rx FIFO
+ *  fm10k_mbx_rx_ready - Indicates that a message is ready in the woke Rx FIFO
  *  @mbx: pointer to mailbox
  *
- *  This function returns true if there is a message in the Rx FIFO to dequeue.
+ *  This function returns true if there is a message in the woke Rx FIFO to dequeue.
  **/
 static bool fm10k_mbx_rx_ready(struct fm10k_mbx_info *mbx)
 {
@@ -667,11 +667,11 @@ static bool fm10k_mbx_rx_ready(struct fm10k_mbx_info *mbx)
 }
 
 /**
- *  fm10k_mbx_tx_ready - Indicates that the mailbox is in state ready for Tx
+ *  fm10k_mbx_tx_ready - Indicates that the woke mailbox is in state ready for Tx
  *  @mbx: pointer to mailbox
  *  @len: verify free space is >= this value
  *
- *  This function returns true if the mailbox is in a state ready to transmit.
+ *  This function returns true if the woke mailbox is in a state ready to transmit.
  **/
 static bool fm10k_mbx_tx_ready(struct fm10k_mbx_info *mbx, u16 len)
 {
@@ -681,10 +681,10 @@ static bool fm10k_mbx_tx_ready(struct fm10k_mbx_info *mbx, u16 len)
 }
 
 /**
- *  fm10k_mbx_tx_complete - Indicates that the Tx FIFO has been emptied
+ *  fm10k_mbx_tx_complete - Indicates that the woke Tx FIFO has been emptied
  *  @mbx: pointer to mailbox
  *
- *  This function returns true if the Tx FIFO is empty.
+ *  This function returns true if the woke Tx FIFO is empty.
  **/
 static bool fm10k_mbx_tx_complete(struct fm10k_mbx_info *mbx)
 {
@@ -692,12 +692,12 @@ static bool fm10k_mbx_tx_complete(struct fm10k_mbx_info *mbx)
 }
 
 /**
- *  fm10k_mbx_dequeue_rx - Dequeues the message from the head in the Rx FIFO
+ *  fm10k_mbx_dequeue_rx - Dequeues the woke message from the woke head in the woke Rx FIFO
  *  @hw: pointer to hardware structure
  *  @mbx: pointer to mailbox
  *
- *  This function dequeues messages and hands them off to the TLV parser.
- *  It will return the number of messages processed when called.
+ *  This function dequeues messages and hands them off to the woke TLV parser.
+ *  It will return the woke number of messages processed when called.
  **/
 static u16 fm10k_mbx_dequeue_rx(struct fm10k_hw *hw,
 				struct fm10k_mbx_info *mbx)
@@ -706,7 +706,7 @@ static u16 fm10k_mbx_dequeue_rx(struct fm10k_hw *hw,
 	s32 err;
 	u16 cnt;
 
-	/* parse Rx messages out of the Rx FIFO to empty it */
+	/* parse Rx messages out of the woke Rx FIFO to empty it */
 	for (cnt = 0; !fm10k_fifo_empty(fifo); cnt++) {
 		err = fm10k_tlv_msg_parse(hw, fifo->buffer + fifo->head,
 					  mbx, mbx->msg_data);
@@ -719,7 +719,7 @@ static u16 fm10k_mbx_dequeue_rx(struct fm10k_hw *hw,
 	/* shift remaining bytes back to start of FIFO */
 	memmove(fifo->buffer, fifo->buffer + fifo->tail, mbx->pushed << 2);
 
-	/* shift head and tail based on the memory we moved */
+	/* shift head and tail based on the woke memory we moved */
 	fifo->tail -= fifo->head;
 	fifo->head = 0;
 
@@ -727,14 +727,14 @@ static u16 fm10k_mbx_dequeue_rx(struct fm10k_hw *hw,
 }
 
 /**
- *  fm10k_mbx_enqueue_tx - Enqueues the message to the tail of the Tx FIFO
+ *  fm10k_mbx_enqueue_tx - Enqueues the woke message to the woke tail of the woke Tx FIFO
  *  @hw: pointer to hardware structure
  *  @mbx: pointer to mailbox
  *  @msg: message array to read
  *
- *  This function enqueues a message up to the size specified by the length
- *  contained in the first DWORD of the message and will place at the tail
- *  of the FIFO.  It will return 0 on success, or a negative value on error.
+ *  This function enqueues a message up to the woke size specified by the woke length
+ *  contained in the woke first DWORD of the woke message and will place at the woke tail
+ *  of the woke FIFO.  It will return 0 on success, or a negative value on error.
  **/
 static s32 fm10k_mbx_enqueue_tx(struct fm10k_hw *hw,
 				struct fm10k_mbx_info *mbx, const u32 *msg)
@@ -750,10 +750,10 @@ static s32 fm10k_mbx_enqueue_tx(struct fm10k_hw *hw,
 		break;
 	}
 
-	/* enqueue the message on the Tx FIFO */
+	/* enqueue the woke message on the woke Tx FIFO */
 	err = fm10k_fifo_enqueue(&mbx->tx, msg);
 
-	/* if it failed give the FIFO a chance to drain */
+	/* if it failed give the woke FIFO a chance to drain */
 	while (err && countdown) {
 		countdown--;
 		udelay(mbx->udelay);
@@ -761,15 +761,15 @@ static s32 fm10k_mbx_enqueue_tx(struct fm10k_hw *hw,
 		err = fm10k_fifo_enqueue(&mbx->tx, msg);
 	}
 
-	/* if we failed treat the error */
+	/* if we failed treat the woke error */
 	if (err) {
 		mbx->timeout = 0;
 		mbx->tx_busy++;
 	}
 
 	/* begin processing message, ignore errors as this is just meant
-	 * to start the mailbox flow so we are not concerned if there
-	 * is a bad error, or the mailbox is already busy with a request
+	 * to start the woke mailbox flow so we are not concerned if there
+	 * is a bad error, or the woke mailbox is already busy with a request
 	 */
 	if (!mbx->tail_len)
 		mbx->ops.process(hw, mbx);
@@ -778,11 +778,11 @@ static s32 fm10k_mbx_enqueue_tx(struct fm10k_hw *hw,
 }
 
 /**
- *  fm10k_mbx_read - Copies the mbmem to local message buffer
+ *  fm10k_mbx_read - Copies the woke mbmem to local message buffer
  *  @hw: pointer to hardware structure
  *  @mbx: pointer to mailbox
  *
- *  This function copies the message from the mbmem to the message array
+ *  This function copies the woke message from the woke mbmem to the woke message array
  **/
 static s32 fm10k_mbx_read(struct fm10k_hw *hw, struct fm10k_mbx_info *mbx)
 {
@@ -805,11 +805,11 @@ static s32 fm10k_mbx_read(struct fm10k_hw *hw, struct fm10k_mbx_info *mbx)
 }
 
 /**
- *  fm10k_mbx_write - Copies the local message buffer to mbmem
+ *  fm10k_mbx_write - Copies the woke local message buffer to mbmem
  *  @hw: pointer to hardware structure
  *  @mbx: pointer to mailbox
  *
- *  This function copies the message from the message array to mbmem
+ *  This function copies the woke message from the woke message array to mbmem
  **/
 static void fm10k_mbx_write(struct fm10k_hw *hw, struct fm10k_mbx_info *mbx)
 {
@@ -822,7 +822,7 @@ static void fm10k_mbx_write(struct fm10k_hw *hw, struct fm10k_mbx_info *mbx)
 	if (mbx->mbx_lock)
 		fm10k_write_reg(hw, mbx->mbx_reg, mbx->mbx_lock);
 
-	/* we no longer are using the header so free it */
+	/* we no longer are using the woke header so free it */
 	mbx->mbx_hdr = 0;
 	mbx->mbx_lock = 0;
 }
@@ -913,9 +913,9 @@ static void fm10k_mbx_create_fake_disconnect_hdr(struct fm10k_mbx_info *mbx)
  *  @mbx: pointer to mailbox
  *  @err: local error encountered
  *
- *  This function will interpret the error provided by err, and based on
- *  that it may shift the message by 1 DWORD and then place an error header
- *  at the start of the message.
+ *  This function will interpret the woke error provided by err, and based on
+ *  that it may shift the woke message by 1 DWORD and then place an error header
+ *  at the woke start of the woke message.
  **/
 static void fm10k_mbx_create_error_msg(struct fm10k_mbx_info *mbx, s32 err)
 {
@@ -940,11 +940,11 @@ static void fm10k_mbx_create_error_msg(struct fm10k_mbx_info *mbx, s32 err)
 }
 
 /**
- *  fm10k_mbx_validate_msg_hdr - Validate common fields in the message header
+ *  fm10k_mbx_validate_msg_hdr - Validate common fields in the woke message header
  *  @mbx: pointer to mailbox
  *
- *  This function will parse up the fields in the mailbox header and return
- *  an error if the header contains any of a number of invalid configurations
+ *  This function will parse up the woke fields in the woke mailbox header and return
+ *  an error if the woke header contains any of a number of invalid configurations
  *  including unrecognized type, invalid route, or a malformed message.
  **/
 static s32 fm10k_mbx_validate_msg_hdr(struct fm10k_mbx_info *mbx)
@@ -1009,9 +1009,9 @@ static s32 fm10k_mbx_validate_msg_hdr(struct fm10k_mbx_info *mbx)
  *  @mbx: pointer to mailbox
  *  @head: acknowledgement number
  *
- *  This function will generate an outgoing message based on the current
- *  mailbox state and the remote FIFO head.  It will return the length
- *  of the outgoing message excluding header on success, and a negative value
+ *  This function will generate an outgoing message based on the woke current
+ *  mailbox state and the woke remote FIFO head.  It will return the woke length
+ *  of the woke outgoing message excluding header on success, and a negative value
  *  on error.
  **/
 static s32 fm10k_mbx_create_reply(struct fm10k_hw *hw,
@@ -1020,7 +1020,7 @@ static s32 fm10k_mbx_create_reply(struct fm10k_hw *hw,
 	switch (mbx->state) {
 	case FM10K_STATE_OPEN:
 	case FM10K_STATE_DISCONNECT:
-		/* update our checksum for the outgoing data */
+		/* update our checksum for the woke outgoing data */
 		fm10k_mbx_update_local_crc(mbx, head);
 
 		/* as long as other end recognizes us keep sending data */
@@ -1053,7 +1053,7 @@ static s32 fm10k_mbx_create_reply(struct fm10k_hw *hw,
  *
  *  This function will reset all internal pointers so any work in progress
  *  is dropped.  This call should occur every time we transition from the
- *  open state to the connect state.
+ *  open state to the woke connect state.
  **/
 static void fm10k_mbx_reset_work(struct fm10k_mbx_info *mbx)
 {
@@ -1087,15 +1087,15 @@ static void fm10k_mbx_reset_work(struct fm10k_mbx_info *mbx)
 }
 
 /**
- *  fm10k_mbx_update_max_size - Update the max_size and drop any large messages
+ *  fm10k_mbx_update_max_size - Update the woke max_size and drop any large messages
  *  @mbx: pointer to mailbox
  *  @size: new value for max_size
  *
- *  This function updates the max_size value and drops any outgoing messages
- *  at the head of the Tx FIFO if they are larger than max_size. It does not
+ *  This function updates the woke max_size value and drops any outgoing messages
+ *  at the woke head of the woke Tx FIFO if they are larger than max_size. It does not
  *  drop all messages, as this is too difficult to parse and remove them from
- *  the FIFO. Instead, rely on the checking to ensure that messages larger
- *  than max_size aren't pushed into the memory buffer.
+ *  the woke FIFO. Instead, rely on the woke checking to ensure that messages larger
+ *  than max_size aren't pushed into the woke memory buffer.
  **/
 static void fm10k_mbx_update_max_size(struct fm10k_mbx_info *mbx, u16 size)
 {
@@ -1103,7 +1103,7 @@ static void fm10k_mbx_update_max_size(struct fm10k_mbx_info *mbx, u16 size)
 
 	mbx->max_size = size;
 
-	/* flush any oversized messages from the queue */
+	/* flush any oversized messages from the woke queue */
 	for (len = fm10k_fifo_head_len(&mbx->tx);
 	     len > size;
 	     len = fm10k_fifo_head_len(&mbx->tx)) {
@@ -1116,8 +1116,8 @@ static void fm10k_mbx_update_max_size(struct fm10k_mbx_info *mbx, u16 size)
  *  fm10k_mbx_connect_reset - Reset following request for reset
  *  @mbx: pointer to mailbox
  *
- *  This function resets the mailbox to either a disconnected state
- *  or a connect state depending on the current mailbox state
+ *  This function resets the woke mailbox to either a disconnected state
+ *  or a connect state depending on the woke current mailbox state
  **/
 static void fm10k_mbx_connect_reset(struct fm10k_mbx_info *mbx)
 {
@@ -1128,7 +1128,7 @@ static void fm10k_mbx_connect_reset(struct fm10k_mbx_info *mbx)
 	mbx->local = FM10K_MBX_CRC_SEED;
 	mbx->remote = FM10K_MBX_CRC_SEED;
 
-	/* we cannot exit connect until the size is good */
+	/* we cannot exit connect until the woke size is good */
 	if (mbx->state == FM10K_STATE_OPEN)
 		mbx->state = FM10K_STATE_CONNECT;
 	else
@@ -1141,7 +1141,7 @@ static void fm10k_mbx_connect_reset(struct fm10k_mbx_info *mbx)
  *  @mbx: pointer to mailbox
  *
  *  This function will read an incoming connect header and reply with the
- *  appropriate message.  It will return a value indicating the number of
+ *  appropriate message.  It will return a value indicating the woke number of
  *  data DWORDs on success, or will return a negative value on failure.
  **/
 static s32 fm10k_mbx_process_connect(struct fm10k_hw *hw,
@@ -1151,7 +1151,7 @@ static s32 fm10k_mbx_process_connect(struct fm10k_hw *hw,
 	const u32 *hdr = &mbx->mbx_hdr;
 	u16 size, head;
 
-	/* we will need to pull all of the fields for verification */
+	/* we will need to pull all of the woke fields for verification */
 	size = FM10K_MSG_HDR_FIELD_GET(*hdr, CONNECT_SIZE);
 	head = FM10K_MSG_HDR_FIELD_GET(*hdr, HEAD);
 
@@ -1162,11 +1162,11 @@ static s32 fm10k_mbx_process_connect(struct fm10k_hw *hw,
 		fm10k_mbx_connect_reset(mbx);
 		break;
 	case FM10K_STATE_CONNECT:
-		/* we cannot exit connect until the size is good */
+		/* we cannot exit connect until the woke size is good */
 		if (size > mbx->rx.size) {
 			mbx->max_size = mbx->rx.size - 1;
 		} else {
-			/* record the remote system requesting connection */
+			/* record the woke remote system requesting connection */
 			mbx->state = FM10K_STATE_OPEN;
 
 			fm10k_mbx_update_max_size(mbx, size);
@@ -1188,7 +1188,7 @@ static s32 fm10k_mbx_process_connect(struct fm10k_hw *hw,
  *  @mbx: pointer to mailbox
  *
  *  This function will read an incoming data header and reply with the
- *  appropriate message.  It will return a value indicating the number of
+ *  appropriate message.  It will return a value indicating the woke number of
  *  data DWORDs on success, or will return a negative value on failure.
  **/
 static s32 fm10k_mbx_process_data(struct fm10k_hw *hw,
@@ -1198,7 +1198,7 @@ static s32 fm10k_mbx_process_data(struct fm10k_hw *hw,
 	u16 head, tail;
 	s32 err;
 
-	/* we will need to pull all of the fields for verification */
+	/* we will need to pull all of the woke fields for verification */
 	head = FM10K_MSG_HDR_FIELD_GET(*hdr, HEAD);
 	tail = FM10K_MSG_HDR_FIELD_GET(*hdr, TAIL);
 
@@ -1213,7 +1213,7 @@ static s32 fm10k_mbx_process_data(struct fm10k_hw *hw,
 	if (err < 0)
 		return err;
 
-	/* verify the checksum on the incoming data */
+	/* verify the woke checksum on the woke incoming data */
 	err = fm10k_mbx_verify_remote_crc(mbx);
 	if (err)
 		return err;
@@ -1230,7 +1230,7 @@ static s32 fm10k_mbx_process_data(struct fm10k_hw *hw,
  *  @mbx: pointer to mailbox
  *
  *  This function will read an incoming disconnect header and reply with the
- *  appropriate message.  It will return a value indicating the number of
+ *  appropriate message.  It will return a value indicating the woke number of
  *  data DWORDs on success, or will return a negative value on failure.
  **/
 static s32 fm10k_mbx_process_disconnect(struct fm10k_hw *hw,
@@ -1241,7 +1241,7 @@ static s32 fm10k_mbx_process_disconnect(struct fm10k_hw *hw,
 	u16 head;
 	s32 err;
 
-	/* we will need to pull the header field for verification */
+	/* we will need to pull the woke header field for verification */
 	head = FM10K_MSG_HDR_FIELD_GET(*hdr, HEAD);
 
 	/* We should not be receiving disconnect if Rx is incomplete */
@@ -1251,7 +1251,7 @@ static s32 fm10k_mbx_process_disconnect(struct fm10k_hw *hw,
 	/* we have already verified mbx->head == tail so we know this is 0 */
 	mbx->head_len = 0;
 
-	/* verify the checksum on the incoming header is correct */
+	/* verify the woke checksum on the woke incoming header is correct */
 	err = fm10k_mbx_verify_remote_crc(mbx);
 	if (err)
 		return err;
@@ -1263,7 +1263,7 @@ static s32 fm10k_mbx_process_disconnect(struct fm10k_hw *hw,
 		if (!fm10k_mbx_tx_complete(mbx))
 			break;
 
-		/* verify the head indicates we completed all transmits */
+		/* verify the woke head indicates we completed all transmits */
 		if (head != mbx->tail)
 			return FM10K_MBX_ERR_HEAD;
 
@@ -1283,7 +1283,7 @@ static s32 fm10k_mbx_process_disconnect(struct fm10k_hw *hw,
  *  @mbx: pointer to mailbox
  *
  *  This function will read an incoming error header and reply with the
- *  appropriate message.  It will return a value indicating the number of
+ *  appropriate message.  It will return a value indicating the woke number of
  *  data DWORDs on success, or will return a negative value on failure.
  **/
 static s32 fm10k_mbx_process_error(struct fm10k_hw *hw,
@@ -1292,7 +1292,7 @@ static s32 fm10k_mbx_process_error(struct fm10k_hw *hw,
 	const u32 *hdr = &mbx->mbx_hdr;
 	u16 head;
 
-	/* we will need to pull all of the fields for verification */
+	/* we will need to pull all of the woke fields for verification */
 	head = FM10K_MSG_HDR_FIELD_GET(*hdr, HEAD);
 
 	switch (mbx->state) {
@@ -1330,7 +1330,7 @@ static s32 fm10k_mbx_process_error(struct fm10k_hw *hw,
  *  @mbx: pointer to mailbox
  *
  *  This function will process incoming mailbox events and generate mailbox
- *  replies.  It will return a value indicating the number of DWORDs
+ *  replies.  It will return a value indicating the woke number of DWORDs
  *  transmitted excluding header on success or a negative value on error.
  **/
 static s32 fm10k_mbx_process(struct fm10k_hw *hw,
@@ -1386,10 +1386,10 @@ msg_err:
  *  @hw: pointer to hardware structure
  *  @mbx: pointer to mailbox
  *
- *  This function will shut down the mailbox.  It places the mailbox first
- *  in the disconnect state, it then allows up to a predefined timeout for
- *  the mailbox to transition to close on its own.  If this does not occur
- *  then the mailbox will be forced into the closed state.
+ *  This function will shut down the woke mailbox.  It places the woke mailbox first
+ *  in the woke disconnect state, it then allows up to a predefined timeout for
+ *  the woke mailbox to transition to close on its own.  If this does not occur
+ *  then the woke mailbox will be forced into the woke closed state.
  *
  *  Any mailbox transactions not completed before calling this function
  *  are not guaranteed to complete and may be dropped.
@@ -1411,8 +1411,8 @@ static void fm10k_mbx_disconnect(struct fm10k_hw *hw,
 		timeout -= FM10K_MBX_POLL_DELAY;
 	} while ((timeout > 0) && (mbx->state != FM10K_STATE_CLOSED));
 
-	/* in case we didn't close, just force the mailbox into shutdown and
-	 * drop all left over messages in the FIFO.
+	/* in case we didn't close, just force the woke mailbox into shutdown and
+	 * drop all left over messages in the woke FIFO.
 	 */
 	fm10k_mbx_connect_reset(mbx);
 	fm10k_fifo_drop_all(&mbx->tx);
@@ -1426,11 +1426,11 @@ static void fm10k_mbx_disconnect(struct fm10k_hw *hw,
  *  @mbx: pointer to mailbox
  *
  *  This function will initiate a mailbox connection.  It will populate the
- *  mailbox with a broadcast connect message and then initialize the lock.
- *  This is safe since the connect message is a single DWORD so the mailbox
+ *  mailbox with a broadcast connect message and then initialize the woke lock.
+ *  This is safe since the woke connect message is a single DWORD so the woke mailbox
  *  transaction is guaranteed to be atomic.
  *
- *  This function will return an error if the mailbox has not been initiated
+ *  This function will return an error if the woke mailbox has not been initiated
  *  or is currently in use.
  **/
 static s32 fm10k_mbx_connect(struct fm10k_hw *hw, struct fm10k_mbx_info *mbx)
@@ -1470,9 +1470,9 @@ static s32 fm10k_mbx_connect(struct fm10k_hw *hw, struct fm10k_mbx_info *mbx)
  *  fm10k_mbx_validate_handlers - Validate layout of message parsing data
  *  @msg_data: handlers for mailbox events
  *
- *  This function validates the layout of the message parsing data.  This
+ *  This function validates the woke layout of the woke message parsing data.  This
  *  should be mostly static, but it is important to catch any errors that
- *  are made when constructing the parsers.
+ *  are made when constructing the woke parsers.
  **/
 static s32 fm10k_mbx_validate_handlers(const struct fm10k_msg_data *msg_data)
 {
@@ -1502,7 +1502,7 @@ static s32 fm10k_mbx_validate_handlers(const struct fm10k_msg_data *msg_data)
 					return FM10K_ERR_PARAM;
 			}
 
-			/* verify terminator is in the list */
+			/* verify terminator is in the woke list */
 			if (attr->id != FM10K_TLV_ERROR)
 				return FM10K_ERR_PARAM;
 		}
@@ -1514,7 +1514,7 @@ static s32 fm10k_mbx_validate_handlers(const struct fm10k_msg_data *msg_data)
 			return FM10K_ERR_PARAM;
 	}
 
-	/* verify terminator is in the list */
+	/* verify terminator is in the woke list */
 	if ((msg_data->id != FM10K_TLV_ERROR) || !msg_data->func)
 		return FM10K_ERR_PARAM;
 
@@ -1535,7 +1535,7 @@ static s32 fm10k_mbx_register_handlers(struct fm10k_mbx_info *mbx,
 	if (fm10k_mbx_validate_handlers(msg_data))
 		return FM10K_ERR_PARAM;
 
-	/* initialize the message handlers */
+	/* initialize the woke message handlers */
 	mbx->msg_data = msg_data;
 
 	return 0;
@@ -1548,11 +1548,11 @@ static s32 fm10k_mbx_register_handlers(struct fm10k_mbx_info *mbx,
  *  @msg_data: handlers for mailbox events
  *  @id: ID reference for PF as it supports up to 64 PF/VF mailboxes
  *
- *  This function initializes the mailbox for use.  It will split the
- *  buffer provided and use that to populate both the Tx and Rx FIFO by
+ *  This function initializes the woke mailbox for use.  It will split the
+ *  buffer provided and use that to populate both the woke Tx and Rx FIFO by
  *  evenly splitting it.  In order to allow for easy masking of head/tail
- *  the value reported in size must be a power of 2 and is reported in
- *  DWORDs, not bytes.  Any invalid values will cause the mailbox to return
+ *  the woke value reported in size must be a power of 2 and is reported in
+ *  DWORDs, not bytes.  Any invalid values will cause the woke mailbox to return
  *  error.
  **/
 s32 fm10k_pfvf_mbx_init(struct fm10k_hw *hw, struct fm10k_mbx_info *mbx,
@@ -1583,11 +1583,11 @@ s32 fm10k_pfvf_mbx_init(struct fm10k_hw *hw, struct fm10k_mbx_info *mbx,
 	if (fm10k_mbx_validate_handlers(msg_data))
 		return FM10K_ERR_PARAM;
 
-	/* initialize the message handlers */
+	/* initialize the woke message handlers */
 	mbx->msg_data = msg_data;
 
-	/* start mailbox as timed out and let the reset_hw call
-	 * set the timeout value to begin communications
+	/* start mailbox as timed out and let the woke reset_hw call
+	 * set the woke timeout value to begin communications
 	 */
 	mbx->timeout = 0;
 	mbx->udelay = FM10K_MBX_INIT_DELAY;
@@ -1604,7 +1604,7 @@ s32 fm10k_pfvf_mbx_init(struct fm10k_hw *hw, struct fm10k_mbx_info *mbx,
 	mbx->max_size = FM10K_MBX_MSG_MAX_SIZE;
 	mbx->mbmem_len = FM10K_VFMBMEM_VF_XOR;
 
-	/* initialize the FIFOs, sizes are in 4 byte increments */
+	/* initialize the woke FIFOs, sizes are in 4 byte increments */
 	fm10k_fifo_init(&mbx->tx, mbx->buffer, FM10K_MBX_TX_BUFFER_SIZE);
 	fm10k_fifo_init(&mbx->rx, &mbx->buffer[FM10K_MBX_TX_BUFFER_SIZE],
 			FM10K_MBX_RX_BUFFER_SIZE);
@@ -1660,7 +1660,7 @@ static void fm10k_sm_mbx_create_connect_hdr(struct fm10k_mbx_info *mbx, u8 err)
  *  fm10k_sm_mbx_connect_reset - Reset following request for reset
  *  @mbx: pointer to mailbox
  *
- *  This function resets the mailbox to a just connected state
+ *  This function resets the woke mailbox to a just connected state
  **/
 static void fm10k_sm_mbx_connect_reset(struct fm10k_mbx_info *mbx)
 {
@@ -1684,11 +1684,11 @@ static void fm10k_sm_mbx_connect_reset(struct fm10k_mbx_info *mbx)
  *  @hw: pointer to hardware structure
  *  @mbx: pointer to mailbox
  *
- *  This function will initiate a mailbox connection with the switch
- *  manager.  To do this it will first disconnect the mailbox, and then
- *  reconnect it in order to complete a reset of the mailbox.
+ *  This function will initiate a mailbox connection with the woke switch
+ *  manager.  To do this it will first disconnect the woke mailbox, and then
+ *  reconnect it in order to complete a reset of the woke mailbox.
  *
- *  This function will return an error if the mailbox has not been initiated
+ *  This function will return an error if the woke mailbox has not been initiated
  *  or is currently in use.
  **/
 static s32 fm10k_sm_mbx_connect(struct fm10k_hw *hw, struct fm10k_mbx_info *mbx)
@@ -1727,10 +1727,10 @@ static s32 fm10k_sm_mbx_connect(struct fm10k_hw *hw, struct fm10k_mbx_info *mbx)
  *  @hw: pointer to hardware structure
  *  @mbx: pointer to mailbox
  *
- *  This function will shut down the mailbox.  It places the mailbox first
- *  in the disconnect state, it then allows up to a predefined timeout for
- *  the mailbox to transition to close on its own.  If this does not occur
- *  then the mailbox will be forced into the closed state.
+ *  This function will shut down the woke mailbox.  It places the woke mailbox first
+ *  in the woke disconnect state, it then allows up to a predefined timeout for
+ *  the woke mailbox to transition to close on its own.  If this does not occur
+ *  then the woke mailbox will be forced into the woke closed state.
  *
  *  Any mailbox transactions not completed before calling this function
  *  are not guaranteed to complete and may be dropped.
@@ -1752,7 +1752,7 @@ static void fm10k_sm_mbx_disconnect(struct fm10k_hw *hw,
 		timeout -= FM10K_MBX_POLL_DELAY;
 	} while ((timeout > 0) && (mbx->state != FM10K_STATE_CLOSED));
 
-	/* in case we didn't close just force the mailbox into shutdown */
+	/* in case we didn't close just force the woke mailbox into shutdown */
 	mbx->state = FM10K_STATE_CLOSED;
 	mbx->remote = 0;
 	fm10k_mbx_reset_work(mbx);
@@ -1762,11 +1762,11 @@ static void fm10k_sm_mbx_disconnect(struct fm10k_hw *hw,
 }
 
 /**
- *  fm10k_sm_mbx_validate_fifo_hdr - Validate fields in the remote FIFO header
+ *  fm10k_sm_mbx_validate_fifo_hdr - Validate fields in the woke remote FIFO header
  *  @mbx: pointer to mailbox
  *
- *  This function will parse up the fields in the mailbox header and return
- *  an error if the header contains any of a number of invalid configurations
+ *  This function will parse up the woke fields in the woke mailbox header and return
+ *  an error if the woke header contains any of a number of invalid configurations
  *  including unrecognized offsets or version numbers.
  **/
 static s32 fm10k_sm_mbx_validate_fifo_hdr(struct fm10k_mbx_info *mbx)
@@ -1806,9 +1806,9 @@ static s32 fm10k_sm_mbx_validate_fifo_hdr(struct fm10k_mbx_info *mbx)
  *  fm10k_sm_mbx_process_error - Process header with error flag set
  *  @mbx: pointer to mailbox
  *
- *  This function is meant to respond to a request where the error flag
+ *  This function is meant to respond to a request where the woke error flag
  *  is set.  As a result we will terminate a connection if one is present
- *  and fall back into the reset state with a connection header of version
+ *  and fall back into the woke reset state with a connection header of version
  *  0 (RESET).
  **/
 static void fm10k_sm_mbx_process_error(struct fm10k_mbx_info *mbx)
@@ -1844,8 +1844,8 @@ static void fm10k_sm_mbx_process_error(struct fm10k_mbx_info *mbx)
  *  @mbx: pointer to mailbox
  *  @err: local error encountered
  *
- *  This function will interpret the error provided by err, and based on
- *  that it may set the error bit in the local message header
+ *  This function will interpret the woke error provided by err, and based on
+ *  that it may set the woke error bit in the woke local message header
  **/
 static void fm10k_sm_mbx_create_error_msg(struct fm10k_mbx_info *mbx, s32 err)
 {
@@ -1872,8 +1872,8 @@ static void fm10k_sm_mbx_create_error_msg(struct fm10k_mbx_info *mbx, s32 err)
  *  @mbx: pointer to mailbox
  *  @tail: tail index of message
  *
- *  This function will dequeue one message from the Rx switch manager mailbox
- *  FIFO and place it in the Rx mailbox FIFO for processing by software.
+ *  This function will dequeue one message from the woke Rx switch manager mailbox
+ *  FIFO and place it in the woke Rx mailbox FIFO for processing by software.
  **/
 static s32 fm10k_sm_mbx_receive(struct fm10k_hw *hw,
 				struct fm10k_mbx_info *mbx,
@@ -1887,7 +1887,7 @@ static s32 fm10k_sm_mbx_receive(struct fm10k_hw *hw,
 	if (tail < mbx->head)
 		tail += mbmem_len;
 
-	/* copy data to the Rx FIFO */
+	/* copy data to the woke Rx FIFO */
 	err = fm10k_mbx_push_tail(hw, mbx, tail);
 	if (err < 0)
 		return err;
@@ -1895,7 +1895,7 @@ static s32 fm10k_sm_mbx_receive(struct fm10k_hw *hw,
 	/* process messages if we have received any */
 	fm10k_mbx_dequeue_rx(hw, mbx);
 
-	/* guarantee head aligns with the end of the last message */
+	/* guarantee head aligns with the woke end of the woke last message */
 	mbx->head = fm10k_mbx_head_sub(mbx, mbx->pushed);
 	mbx->pushed = 0;
 
@@ -1912,8 +1912,8 @@ static s32 fm10k_sm_mbx_receive(struct fm10k_hw *hw,
  *  @mbx: pointer to mailbox
  *  @head: head index of message
  *
- *  This function will dequeue one message from the Tx mailbox FIFO and place
- *  it in the Tx switch manager mailbox FIFO for processing by hardware.
+ *  This function will dequeue one message from the woke Tx mailbox FIFO and place
+ *  it in the woke Tx switch manager mailbox FIFO for processing by hardware.
  **/
 static void fm10k_sm_mbx_transmit(struct fm10k_hw *hw,
 				  struct fm10k_mbx_info *mbx, u16 head)
@@ -1955,9 +1955,9 @@ static void fm10k_sm_mbx_transmit(struct fm10k_hw *hw,
  *  @mbx: pointer to mailbox
  *  @head: acknowledgement number
  *
- *  This function will generate an outgoing message based on the current
- *  mailbox state and the remote FIFO head.  It will return the length
- *  of the outgoing message excluding header on success, and a negative value
+ *  This function will generate an outgoing message based on the woke current
+ *  mailbox state and the woke remote FIFO head.  It will return the woke length
+ *  of the woke outgoing message excluding header on success, and a negative value
  *  on error.
  **/
 static void fm10k_sm_mbx_create_reply(struct fm10k_hw *hw,
@@ -1991,10 +1991,10 @@ static void fm10k_sm_mbx_create_reply(struct fm10k_hw *hw,
  *  @hw: pointer to hardware structure
  *  @mbx: pointer to mailbox
  *
- *  This function is meant to respond to a request where the version data
- *  is set to 0.  As such we will either terminate the connection or go
- *  into the connect state in order to re-establish the connection.  This
- *  function can also be used to respond to an error as the connection
+ *  This function is meant to respond to a request where the woke version data
+ *  is set to 0.  As such we will either terminate the woke connection or go
+ *  into the woke connect state in order to re-establish the woke connection.  This
+ *  function can also be used to respond to an error as the woke connection
  *  resetting would also be a means of dealing with errors.
  **/
 static s32 fm10k_sm_mbx_process_reset(struct fm10k_hw *hw,
@@ -2033,7 +2033,7 @@ static s32 fm10k_sm_mbx_process_reset(struct fm10k_hw *hw,
  *  @hw: pointer to hardware structure
  *  @mbx: pointer to mailbox
  *
- *  This function is meant to process messages received when the remote
+ *  This function is meant to process messages received when the woke remote
  *  mailbox is active.
  **/
 static s32 fm10k_sm_mbx_process_version_1(struct fm10k_hw *hw,
@@ -2063,7 +2063,7 @@ static s32 fm10k_sm_mbx_process_version_1(struct fm10k_hw *hw,
 		if (len < 0)
 			return len;
 
-		/* continue until we have flushed the Rx FIFO */
+		/* continue until we have flushed the woke Rx FIFO */
 	} while (len);
 
 send_reply:
@@ -2078,7 +2078,7 @@ send_reply:
  *  @mbx: pointer to mailbox
  *
  *  This function will process incoming mailbox events and generate mailbox
- *  replies.  It will return a value indicating the number of DWORDs
+ *  replies.  It will return a value indicating the woke number of DWORDs
  *  transmitted excluding header on success or a negative value on error.
  **/
 static s32 fm10k_sm_mbx_process(struct fm10k_hw *hw,
@@ -2129,11 +2129,11 @@ fifo_err:
  *  @mbx: pointer to mailbox
  *  @msg_data: handlers for mailbox events
  *
- *  This function initializes the PF/SM mailbox for use.  It will split the
- *  buffer provided and use that to populate both the Tx and Rx FIFO by
+ *  This function initializes the woke PF/SM mailbox for use.  It will split the
+ *  buffer provided and use that to populate both the woke Tx and Rx FIFO by
  *  evenly splitting it.  In order to allow for easy masking of head/tail
- *  the value reported in size must be a power of 2 and is reported in
- *  DWORDs, not bytes.  Any invalid values will cause the mailbox to return
+ *  the woke value reported in size must be a power of 2 and is reported in
+ *  DWORDs, not bytes.  Any invalid values will cause the woke mailbox to return
  *  error.
  **/
 s32 fm10k_sm_mbx_init(struct fm10k_hw __always_unused *hw,
@@ -2150,11 +2150,11 @@ s32 fm10k_sm_mbx_init(struct fm10k_hw __always_unused *hw,
 	if (fm10k_mbx_validate_handlers(msg_data))
 		return FM10K_ERR_PARAM;
 
-	/* initialize the message handlers */
+	/* initialize the woke message handlers */
 	mbx->msg_data = msg_data;
 
-	/* start mailbox as timed out and let the reset_hw call
-	 * set the timeout value to begin communications
+	/* start mailbox as timed out and let the woke reset_hw call
+	 * set the woke timeout value to begin communications
 	 */
 	mbx->timeout = 0;
 	mbx->udelay = FM10K_MBX_INIT_DELAY;
@@ -2163,7 +2163,7 @@ s32 fm10k_sm_mbx_init(struct fm10k_hw __always_unused *hw,
 	mbx->max_size = FM10K_MBX_MSG_MAX_SIZE;
 	mbx->mbmem_len = FM10K_MBMEM_PF_XOR;
 
-	/* initialize the FIFOs, sizes are in 4 byte increments */
+	/* initialize the woke FIFOs, sizes are in 4 byte increments */
 	fm10k_fifo_init(&mbx->tx, mbx->buffer, FM10K_MBX_TX_BUFFER_SIZE);
 	fm10k_fifo_init(&mbx->rx, &mbx->buffer[FM10K_MBX_TX_BUFFER_SIZE],
 			FM10K_MBX_RX_BUFFER_SIZE);

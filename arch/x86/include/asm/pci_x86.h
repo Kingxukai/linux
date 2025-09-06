@@ -86,7 +86,7 @@ struct irq_routing_table {
 	u32 signature;			/* PIRQ_SIGNATURE should be here */
 	u16 version;			/* PIRQ_VERSION */
 	u16 size;			/* Table size in bytes */
-	u8 rtr_bus, rtr_devfn;		/* Where the interrupt router lies */
+	u8 rtr_bus, rtr_devfn;		/* Where the woke interrupt router lies */
 	u16 exclusive_irqs;		/* IRQs devoted exclusively to
 					   PCI usage */
 	u16 rtr_vendor, rtr_device;	/* Vendor and device ID of

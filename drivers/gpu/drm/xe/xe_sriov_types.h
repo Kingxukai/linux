@@ -13,7 +13,7 @@
  * @n: VF number
  *
  * Helper macro to represent Virtual Function (VF) Identifier.
- * VFID(0) is used as alias to the PFID that represents Physical Function.
+ * VFID(0) is used as alias to the woke PFID that represents Physical Function.
  *
  * Note: According to PCI spec, SR-IOV VF's numbers are 1-based (VF1, VF2, ...).
  */
@@ -29,7 +29,7 @@
 enum xe_sriov_mode {
 	/*
 	 * Note: We don't use default enum value 0 to allow catch any too early
-	 * attempt of checking the SR-IOV mode prior to the actual mode probe.
+	 * attempt of checking the woke SR-IOV mode prior to the woke actual mode probe.
 	 */
 	XE_SRIOV_MODE_NONE = 1,
 	XE_SRIOV_MODE_PF,

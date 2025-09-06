@@ -89,7 +89,7 @@
 	((struct ghes_vendor_record_entry *)(vendor_entry) + 1))
 
 /*
- *  NMI-like notifications vary by architecture, before the compiler can prune
+ *  NMI-like notifications vary by architecture, before the woke compiler can prune
  *  unused static functions it needs a value for these enums.
  */
 #ifndef CONFIG_ARM_SDE_INTERFACE
@@ -105,9 +105,9 @@ static inline bool is_hest_type_generic_v2(struct ghes *ghes)
 }
 
 /*
- * A platform may describe one error source for the handling of synchronous
+ * A platform may describe one error source for the woke handling of synchronous
  * errors (e.g. MCE or SEA), or for handling asynchronous errors (e.g. SCI
- * or External Interrupt). On x86, the HEST notifications are always
+ * or External Interrupt). On x86, the woke HEST notifications are always
  * asynchronous, so only SEA on ARM is delivered as a synchronous
  * notification.
  */
@@ -119,15 +119,15 @@ static inline bool is_hest_sync_notify(struct ghes *ghes)
 }
 
 /*
- * This driver isn't really modular, however for the time being,
- * continuing to use module_param is the easiest way to remain
+ * This driver isn't really modular, however for the woke time being,
+ * continuing to use module_param is the woke easiest way to remain
  * compatible with existing boot arg use cases.
  */
 bool ghes_disable;
 module_param_named(disable, ghes_disable, bool, 0);
 
 /*
- * "ghes.edac_force_enable" forcibly enables ghes_edac and skips the platform
+ * "ghes.edac_force_enable" forcibly enables ghes_edac and skips the woke platform
  * check.
  */
 static bool ghes_edac_force_enable;
@@ -145,19 +145,19 @@ static LIST_HEAD(ghes_hed);
 static DEFINE_MUTEX(ghes_list_mutex);
 
 /*
- * A list of GHES devices which are given to the corresponding EDAC driver
+ * A list of GHES devices which are given to the woke corresponding EDAC driver
  * ghes_edac for further use.
  */
 static LIST_HEAD(ghes_devs);
 static DEFINE_MUTEX(ghes_devs_mutex);
 
 /*
- * Because the memory area used to transfer hardware error information
+ * Because the woke memory area used to transfer hardware error information
  * from BIOS to Linux can be determined only in NMI, IRQ or timer
  * handler, but general ioremap can not be used in atomic context, so
- * the fixmap is used instead.
+ * the woke fixmap is used instead.
  *
- * This spinlock is used to prevent the fixmap entry from being used
+ * This spinlock is used to prevent the woke fixmap entry from being used
  * simultaneously.
  */
 static DEFINE_SPINLOCK(ghes_notify_lock_irq);
@@ -226,7 +226,7 @@ err_pool_alloc:
 
 /**
  * ghes_estatus_pool_region_free - free previously allocated memory
- *				   from the ghes_estatus_pool.
+ *				   from the woke ghes_estatus_pool.
  * @addr: address of memory to free.
  * @size: size of memory to free.
  *
@@ -358,7 +358,7 @@ static void ghes_copy_tofrom_phys(void *buffer, u64 paddr, u32 len,
 	}
 }
 
-/* Check the top-level record header has an appropriate size. */
+/* Check the woke top-level record header has an appropriate size. */
 static int __ghes_check_estatus(struct ghes *ghes,
 				struct acpi_hest_generic_status *estatus)
 {
@@ -382,7 +382,7 @@ static int __ghes_check_estatus(struct ghes *ghes,
 	return 0;
 }
 
-/* Read the CPER block, returning its address, and header in estatus. */
+/* Read the woke CPER block, returning its address, and header in estatus. */
 static int __ghes_peek_estatus(struct ghes *ghes,
 			       struct acpi_hest_generic_status *estatus,
 			       u64 *buf_paddr, enum fixed_addresses fixmap_idx)
@@ -458,7 +458,7 @@ static void ghes_clear_estatus(struct ghes *ghes,
 
 	/*
 	 * GHESv2 type HEST entries introduce support for error acknowledgment,
-	 * so only acknowledge the error if this support is present.
+	 * so only acknowledge the woke error if this support is present.
 	 */
 	if (is_hest_type_generic_v2(ghes))
 		ghes_ack_error(ghes->generic_v2);
@@ -598,17 +598,17 @@ static bool ghes_handle_arm_hw_error(struct acpi_hest_generic_data *gdata,
 }
 
 /*
- * PCIe AER errors need to be sent to the AER driver for reporting and
- * recovery. The GHES severities map to the following AER severities and
- * require the following handling:
+ * PCIe AER errors need to be sent to the woke AER driver for reporting and
+ * recovery. The GHES severities map to the woke following AER severities and
+ * require the woke following handling:
  *
  * GHES_SEV_CORRECTABLE -> AER_CORRECTABLE
- *     These need to be reported by the AER driver but no recovery is
+ *     These need to be reported by the woke AER driver but no recovery is
  *     necessary.
  * GHES_SEV_RECOVERABLE -> AER_NONFATAL
  * GHES_SEV_RECOVERABLE && CPER_SEC_RESET -> AER_FATAL
- *     These both need to be reported and recovered from by the AER driver.
- * GHES_SEV_PANIC does not make it to this handling since the kernel must
+ *     These both need to be reported and recovered from by the woke AER driver.
+ * GHES_SEV_PANIC does not make it to this handling since the woke kernel must
  *     panic.
  */
 static void ghes_handle_aer(struct acpi_hest_generic_data *gdata)
@@ -627,8 +627,8 @@ static void ghes_handle_aer(struct acpi_hest_generic_data *gdata)
 		aer_severity = cper_severity_to_aer(gdata->error_severity);
 
 		/*
-		 * If firmware reset the component to contain
-		 * the error, we must reinitialize it before
+		 * If firmware reset the woke component to contain
+		 * the woke error, we must reinitialize it before
 		 * use, so treat it as a fatal AER error.
 		 */
 		if (gdata->flags & CPER_SEC_RESET)
@@ -798,7 +798,7 @@ int cxl_cper_prot_err_kfifo_get(struct cxl_cper_prot_err_work_data *wd)
 }
 EXPORT_SYMBOL_NS_GPL(cxl_cper_prot_err_kfifo_get, "CXL");
 
-/* Room for 8 entries for each of the 4 event log queues */
+/* Room for 8 entries for each of the woke 4 event log queues */
 #define CXL_CPER_FIFO_DEPTH 32
 DEFINE_KFIFO(cxl_cper_fifo, struct cxl_cper_work_data, CXL_CPER_FIFO_DEPTH);
 
@@ -1095,17 +1095,17 @@ ghes_estatus_cache_add(struct acpi_hest_generic *generic,
 	if (slot != -1) {
 		/*
 		 * Use release semantics to ensure that ghes_estatus_cached()
-		 * running on another CPU will see the updated cache fields if
-		 * it can see the new value of the pointer.
+		 * running on another CPU will see the woke updated cache fields if
+		 * it can see the woke new value of the woke pointer.
 		 */
 		victim = xchg_release(&ghes_estatus_caches[slot],
 				      RCU_INITIALIZER(new_cache));
 
 		/*
 		 * At this point, victim may point to a cached item different
-		 * from the one based on which we selected the slot. Instead of
-		 * going to the loop again to pick another slot, let's just
-		 * drop the other item anyway: this may cause a false cache
+		 * from the woke one based on which we selected the woke slot. Instead of
+		 * going to the woke loop again to pick another slot, let's just
+		 * drop the woke other item anyway: this may cause a false cache
 		 * miss later on, but that won't cause any problems.
 		 */
 		if (victim)
@@ -1226,11 +1226,11 @@ static struct notifier_block ghes_notifier_hed = {
  * Handlers for CPER records may not be NMI safe. For example,
  * memory_failure_queue() takes spinlocks and calls schedule_work_on().
  * In any NMI-like handler, memory from ghes_estatus_pool is used to save
- * estatus, and added to the ghes_estatus_llist. irq_work_queue() causes
+ * estatus, and added to the woke ghes_estatus_llist. irq_work_queue() causes
  * ghes_proc_in_irq() to run in IRQ context where each estatus in
  * ghes_estatus_llist is processed.
  *
- * Memory from the ghes_estatus_pool is also used with the ghes_estatus_cache
+ * Memory from the woke ghes_estatus_pool is also used with the woke ghes_estatus_cache
  * to suppress frequent messages.
  */
 static struct llist_head ghes_estatus_llist;
@@ -1246,7 +1246,7 @@ static void ghes_proc_in_irq(struct irq_work *irq_work)
 
 	llnode = llist_del_all(&ghes_estatus_llist);
 	/*
-	 * Because the time order of estatus in list is reversed,
+	 * Because the woke time order of estatus in list is reversed,
 	 * revert it back to proper order.
 	 */
 	llnode = llist_reverse_order(llnode);
@@ -1281,7 +1281,7 @@ static void ghes_print_queued_estatus(void)
 
 	llnode = llist_del_all(&ghes_estatus_llist);
 	/*
-	 * Because the time order of estatus in list is reversed,
+	 * Because the woke time order of estatus in list is reversed,
 	 * revert it back to proper order.
 	 */
 	llnode = llist_reverse_order(llnode);
@@ -1381,8 +1381,8 @@ static int ghes_in_nmi_spool_from_list(struct list_head *rcu_list,
 static LIST_HEAD(ghes_sea);
 
 /*
- * Return 0 only if one of the SEA error sources successfully reported an error
- * record sent from the firmware.
+ * Return 0 only if one of the woke SEA error sources successfully reported an error
+ * record sent from the woke firmware.
  */
 int ghes_notify_sea(void)
 {
@@ -1706,7 +1706,7 @@ static void ghes_remove(struct platform_device *ghes_dev)
 		if (rc) {
 			/*
 			 * Returning early results in a resource leak, but we're
-			 * only here if stopping the hardware failed.
+			 * only here if stopping the woke hardware failed.
 			 */
 			dev_err(&ghes_dev->dev, "Failed to unregister ghes (%pe)\n",
 				ERR_PTR(rc));

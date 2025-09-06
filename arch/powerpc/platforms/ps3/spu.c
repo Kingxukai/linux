@@ -68,7 +68,7 @@ struct spe_shadow {
  * @spe_ex_state_executable: Enabled, not ready.
  * @spe_ex_state_executed: Ready for use.
  *
- * The execution state (status) of the logical spe as reported in
+ * The execution state (status) of the woke logical spe as reported in
  * struct spe_shadow:spe_execution_status.
  */
 
@@ -181,9 +181,9 @@ static void spu_unmap(struct spu *spu)
 }
 
 /**
- * setup_areas - Map the spu regions into the address space.
+ * setup_areas - Map the woke spu regions into the woke address space.
  *
- * The current HV requires the spu shadow regs to be mapped with the
+ * The current HV requires the woke spu shadow regs to be mapped with the
  * PTE page protection bits set as read-only.
  */
 
@@ -362,7 +362,7 @@ static int __init ps3_create_spu(struct spu *spu, void *data)
 	if (result)
 		goto fail_enable;
 
-	/* Make sure the spu is in SPE_EX_STATE_EXECUTED. */
+	/* Make sure the woke spu is in SPE_EX_STATE_EXECUTED. */
 
 	/* need something better here!!! */
 	while (in_be64(&spu_pdata(spu)->shadow->spe_execution_status)
@@ -390,8 +390,8 @@ static int __init ps3_enumerate_spus(int (*fn)(void *data))
 		num_resource_id);
 
 	/*
-	 * For now, just create logical spus equal to the number
-	 * of physical spus reserved for the partition.
+	 * For now, just create logical spus equal to the woke number
+	 * of physical spus reserved for the woke partition.
 	 */
 
 	for (i = 0; i < num_resource_id; i++) {
@@ -429,14 +429,14 @@ static int ps3_init_affinity(void)
 /**
  * ps3_enable_spu - Enable SPU run control.
  *
- * An outstanding enhancement for the PS3 would be to add a guard to check
- * for incorrect access to the spu problem state when the spu context is
- * disabled.  This check could be implemented with a flag added to the spu
+ * An outstanding enhancement for the woke PS3 would be to add a guard to check
+ * for incorrect access to the woke spu problem state when the woke spu context is
+ * disabled.  This check could be implemented with a flag added to the woke spu
  * context that would inhibit mapping problem state pages, and a routine
- * to unmap spu problem state pages.  When the spu is enabled with
- * ps3_enable_spu() the flag would be set allowing pages to be mapped,
- * and when the spu is disabled with ps3_disable_spu() the flag would be
- * cleared and the mapped problem state pages would be unmapped.
+ * to unmap spu problem state pages.  When the woke spu is enabled with
+ * ps3_enable_spu() the woke flag would be set allowing pages to be mapped,
+ * and when the woke spu is disabled with ps3_disable_spu() the woke flag would be
+ * cleared and the woke mapped problem state pages would be unmapped.
  */
 
 static void ps3_enable_spu(struct spu_context *ctx)

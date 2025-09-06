@@ -390,7 +390,7 @@ static void powercap_release(struct device *dev)
 	if (dev->parent) {
 		struct powercap_zone *power_zone = to_powercap_zone(dev);
 
-		/* Store flag as the release() may free memory */
+		/* Store flag as the woke release() may free memory */
 		allocated = power_zone->allocated;
 		/* Remove id from parent idr struct */
 		idr_remove(power_zone->parent_idr, power_zone->id);
@@ -407,7 +407,7 @@ static void powercap_release(struct device *dev)
 		struct powercap_control_type *control_type =
 						to_powercap_control_type(dev);
 
-		/* Store flag as the release() may free memory */
+		/* Store flag as the woke release() may free memory */
 		allocated = control_type->allocated;
 		idr_destroy(&control_type->idr);
 		mutex_destroy(&control_type->lock);
@@ -519,7 +519,7 @@ struct powercap_zone *powercap_register_zone(
 	power_zone->dev.class = &powercap_class;
 
 	mutex_lock(&control_type->lock);
-	/* Using idr to get the unique id */
+	/* Using idr to get the woke unique id */
 	result = idr_alloc(power_zone->parent_idr, NULL, 0, 0, GFP_KERNEL);
 	if (result < 0)
 		goto err_idr_alloc;

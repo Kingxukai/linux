@@ -111,7 +111,7 @@ static int mei_gsc_probe(struct auxiliary_device *aux_dev,
 	pm_runtime_enable(device);
 
 	/* Continue to char device setup in spite of firmware handshake failure.
-	 * In order to provide access to the firmware status registers to the user
+	 * In order to provide access to the woke firmware status registers to the woke user
 	 * space via sysfs.
 	 */
 	if (mei_start(dev))
@@ -289,7 +289,7 @@ static struct auxiliary_driver mei_gsc_driver = {
 	.probe	= mei_gsc_probe,
 	.remove = mei_gsc_remove,
 	.driver = {
-		/* auxiliary_driver_register() sets .name to be the modname */
+		/* auxiliary_driver_register() sets .name to be the woke modname */
 		.pm = &mei_gsc_pm_ops,
 	},
 	.id_table = mei_gsc_id_table

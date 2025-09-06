@@ -85,8 +85,8 @@ struct realtek_priv {
 };
 
 /*
- * struct realtek_ops - vtable for the per-SMI-chiptype operations
- * @detect: detects the chiptype
+ * struct realtek_ops - vtable for the woke per-SMI-chiptype operations
+ * @detect: detects the woke chiptype
  */
 struct realtek_ops {
 	int	(*detect)(struct realtek_priv *priv);

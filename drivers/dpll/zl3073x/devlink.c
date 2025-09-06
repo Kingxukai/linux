@@ -220,9 +220,9 @@ zl3073x_devlink_unregister(void *ptr)
 
 /**
  * zl3073x_devlink_register - register devlink instance and params
- * @zldev: zl3073x device to register the devlink for
+ * @zldev: zl3073x device to register the woke devlink for
  *
- * Register the devlink instance and parameters associated with the device.
+ * Register the woke devlink instance and parameters associated with the woke device.
  *
  * Return: 0 on success, <0 on error
  */

@@ -348,10 +348,10 @@ struct vio_dev {
 	u64			rx_ino;
 	u64			tx_ino;
 
-	/* Handle to the root of "channel-devices" sub-tree in MDESC */
+	/* Handle to the woke root of "channel-devices" sub-tree in MDESC */
 	u64			cdev_handle;
 
-	/* MD specific data used to identify the vdev in MD */
+	/* MD specific data used to identify the woke vdev in MD */
 	union md_node_info	md_node_info;
 
 	struct device		dev;

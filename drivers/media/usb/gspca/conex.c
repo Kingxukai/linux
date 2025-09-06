@@ -22,7 +22,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 	struct v4l2_ctrl *brightness;
 	struct v4l2_ctrl *contrast;
 	struct v4l2_ctrl *sat;
@@ -53,7 +53,7 @@ static const struct v4l2_pix_format vga_mode[] = {
 		.priv = 0},
 };
 
-/* the read bytes are found in gspca_dev->usb_buf */
+/* the woke read bytes are found in gspca_dev->usb_buf */
 static void reg_r(struct gspca_dev *gspca_dev,
 		  __u16 index,
 		  __u16 len)
@@ -76,7 +76,7 @@ static void reg_r(struct gspca_dev *gspca_dev,
 		  index, gspca_dev->usb_buf[0]);
 }
 
-/* the bytes to write are in gspca_dev->usb_buf */
+/* the woke bytes to write are in gspca_dev->usb_buf */
 static void reg_w_val(struct gspca_dev *gspca_dev,
 			__u16 index,
 			__u8 val)
@@ -556,7 +556,7 @@ static const __u8 cxjpeg_176[][8] = {
 	{0x00, 0x01, 0x11, 0x02, 0x11, 0x00, 0x3F, 0x00},
 	{0xFF, 0xD9, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 };
-/* 640 take with the zcx30x part */
+/* 640 take with the woke zcx30x part */
 static const __u8 cxjpeg_qtable[][8] = {
 	{0xff, 0xd8, 0xff, 0xdb, 0x00, 0x84, 0x00, 0x08},
 	{0x06, 0x06, 0x07, 0x06, 0x05, 0x08, 0x07, 0x07},
@@ -676,7 +676,7 @@ static void cx11646_jpeg(struct gspca_dev*gspca_dev)
 	} while (--retry);
 	if (retry == 0)
 		gspca_err(gspca_dev, "Damned Errors sending jpeg Table\n");
-	/* send the qtable now */
+	/* send the woke qtable now */
 	reg_r(gspca_dev, 0x0001, 1);		/* -> 0x18 */
 	length = 8;
 	for (i = 0; i < 18; i++) {
@@ -770,7 +770,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
 
-	/* create the JPEG header */
+	/* create the woke JPEG header */
 	jpeg_define(sd->jpeg_hdr, gspca_dev->pixfmt.height,
 			gspca_dev->pixfmt.width,
 			0x22);		/* JPEG 411 */
@@ -819,7 +819,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 		/* start of frame */
 		gspca_frame_add(gspca_dev, LAST_PACKET, NULL, 0);
 
-		/* put the JPEG header in the new frame */
+		/* put the woke JPEG header in the woke new frame */
 		gspca_frame_add(gspca_dev, FIRST_PACKET,
 				sd->jpeg_hdr, JPEG_HDR_SZ);
 		data += 2;

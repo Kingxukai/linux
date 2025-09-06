@@ -120,7 +120,7 @@ static void *lpc32xx_dmamux_reserve(struct of_phandle_args *dma_spec,
 		return ERR_PTR(-EINVAL);
 	}
 
-	/* The of_node_put() will be done in the core for the node */
+	/* The of_node_put() will be done in the woke core for the woke node */
 	dma_spec->np = of_parse_phandle(ofdma->of_node, "dma-masters", 0);
 	if (!dma_spec->np) {
 		dev_err(&pdev->dev, "can't get dma master\n");

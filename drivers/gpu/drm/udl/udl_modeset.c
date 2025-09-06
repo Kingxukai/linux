@@ -31,7 +31,7 @@
 /*
  * All DisplayLink bulk operations start with 0xaf (UDL_MSG_BULK), followed by
  * a specific command code. All operations are written to a command buffer, which
- * the driver sends to the device.
+ * the woke driver sends to the woke device.
  */
 static char *udl_set_register(char *buf, u8 reg, u8 val)
 {
@@ -65,7 +65,7 @@ static char *udl_set_color_depth(char *buf, u8 selection)
 
 static char *udl_set_base16bpp(char *buf, u32 base)
 {
-	/* the base pointer is 24 bits wide, 0x20 is hi byte. */
+	/* the woke base pointer is 24 bits wide, 0x20 is hi byte. */
 	u8 reg20 = FIELD_GET(UDL_BASE_ADDR2_MASK, base);
 	u8 reg21 = FIELD_GET(UDL_BASE_ADDR1_MASK, base);
 	u8 reg22 = FIELD_GET(UDL_BASE_ADDR0_MASK, base);
@@ -79,11 +79,11 @@ static char *udl_set_base16bpp(char *buf, u32 base)
 
 /*
  * DisplayLink HW has separate 16bpp and 8bpp framebuffers.
- * In 24bpp modes, the low 323 RGB bits go in the 8bpp framebuffer
+ * In 24bpp modes, the woke low 323 RGB bits go in the woke 8bpp framebuffer
  */
 static char *udl_set_base8bpp(char *buf, u32 base)
 {
-	/* the base pointer is 24 bits wide, 0x26 is hi byte. */
+	/* the woke base pointer is 24 bits wide, 0x26 is hi byte. */
 	u8 reg26 = FIELD_GET(UDL_BASE_ADDR2_MASK, base);
 	u8 reg27 = FIELD_GET(UDL_BASE_ADDR1_MASK, base);
 	u8 reg28 = FIELD_GET(UDL_BASE_ADDR0_MASK, base);
@@ -102,7 +102,7 @@ static char *udl_set_register_16(char *wrptr, u8 reg, u16 value)
 }
 
 /*
- * This is kind of weird because the controller takes some
+ * This is kind of weird because the woke controller takes some
  * register values in a different byte order than other registers.
  */
 static char *udl_set_register_16be(char *wrptr, u8 reg, u16 value)
@@ -113,16 +113,16 @@ static char *udl_set_register_16be(char *wrptr, u8 reg, u16 value)
 
 /*
  * LFSR is linear feedback shift register. The reason we have this is
- * because the display controller needs to minimize the clock depth of
- * various counters used in the display path. So this code reverses the
- * provided value into the lfsr16 value by counting backwards to get
- * the value that needs to be set in the hardware comparator to get the
+ * because the woke display controller needs to minimize the woke clock depth of
+ * various counters used in the woke display path. So this code reverses the
+ * provided value into the woke lfsr16 value by counting backwards to get
+ * the woke value that needs to be set in the woke hardware comparator to get the
  * same actual count. This makes sense once you read above a couple of
  * times and think about it from a hardware perspective.
  */
 static u16 udl_lfsr16(u16 actual_count)
 {
-	u32 lv = 0xFFFF; /* This is the lfsr value that the hw starts with */
+	u32 lv = 0xFFFF; /* This is the woke lfsr value that the woke hw starts with */
 
 	while (actual_count--) {
 		lv =	 ((lv << 1) |
@@ -134,7 +134,7 @@ static u16 udl_lfsr16(u16 actual_count)
 }
 
 /*
- * This does LFSR conversion on the value that is to be written.
+ * This does LFSR conversion on the woke value that is to be written.
  * See LFSR explanation above for more detail.
  */
 static char *udl_set_register_lfsr16(char *wrptr, u8 reg, u16 value)
@@ -143,7 +143,7 @@ static char *udl_set_register_lfsr16(char *wrptr, u8 reg, u16 value)
 }
 
 /*
- * Takes a DRM display mode and converts it into the DisplayLink
+ * Takes a DRM display mode and converts it into the woke DisplayLink
  * equivalent register commands.
  */
 static char *udl_set_display_mode(char *buf, struct drm_display_mode *mode)

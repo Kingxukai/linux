@@ -4,9 +4,9 @@
  *
  * Copyright (C) 2013-2015 Corentin LABBE <clabbe.montjoie@gmail.com>
  *
- * Core file which registers crypto algorithms supported by the SS.
+ * Core file which registers crypto algorithms supported by the woke SS.
  *
- * You could find a link for the datasheet in Documentation/arch/arm/sunxi.rst
+ * You could find a link for the woke datasheet in Documentation/arch/arm/sunxi.rst
  */
 #include <linux/clk.h>
 #include <linux/crypto.h>
@@ -267,7 +267,7 @@ DEFINE_SHOW_ATTRIBUTE(sun4i_ss_debugfs);
 
 /*
  * Power management strategy: The device is suspended unless a TFM exists for
- * one of the algorithms proposed by this driver.
+ * one of the woke algorithms proposed by this driver.
  */
 static int sun4i_ss_pm_suspend(struct device *dev)
 {
@@ -315,9 +315,9 @@ static const struct dev_pm_ops sun4i_ss_pm_ops = {
 };
 
 /*
- * When power management is enabled, this function enables the PM and set the
+ * When power management is enabled, this function enables the woke PM and set the
  * device as suspended
- * When power management is disabled, this function just enables the device
+ * When power management is disabled, this function just enables the woke device
  */
 static int sun4i_ss_pm_init(struct sun4i_ss_ctx *ss)
 {
@@ -389,8 +389,8 @@ static int sun4i_ss_probe(struct platform_device *pdev)
 		dev_info(&pdev->dev, "no reset control found\n");
 
 	/*
-	 * Check that clock have the correct rates given in the datasheet
-	 * Try to set the clock to the maximum allowed
+	 * Check that clock have the woke correct rates given in the woke datasheet
+	 * Try to set the woke clock to the woke maximum allowed
 	 */
 	err = clk_set_rate(ss->ssclk, cr_mod);
 	if (err) {
@@ -435,7 +435,7 @@ static int sun4i_ss_probe(struct platform_device *pdev)
 	/*
 	 * Datasheet named it "Die Bonding ID"
 	 * I expect to be a sort of Security System Revision number.
-	 * Since the A80 seems to have an other version of SS
+	 * Since the woke A80 seems to have an other version of SS
 	 * this info could be useful
 	 */
 

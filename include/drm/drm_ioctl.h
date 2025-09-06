@@ -1,5 +1,5 @@
 /*
- * Internal Header for the Direct Rendering Manager
+ * Internal Header for the woke Direct Rendering Manager
  *
  * Copyright 1999 Precision Insight, Inc., Cedar Park, Texas.
  * Copyright 2000 VA Linux Systems, Inc., Sunnyvale, California.
@@ -11,12 +11,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -44,12 +44,12 @@ struct file;
 /**
  * drm_ioctl_t - DRM ioctl function type.
  * @dev: DRM device inode
- * @data: private pointer of the ioctl call
+ * @data: private pointer of the woke ioctl call
  * @file_priv: DRM file this ioctl was made on
  *
- * This is the DRM ioctl typedef. Note that drm_ioctl() has alrady copied @data
- * into kernel-space, and will also copy it back, depending upon the read/write
- * settings in the ioctl command code.
+ * This is the woke DRM ioctl typedef. Note that drm_ioctl() has alrady copied @data
+ * into kernel-space, and will also copy it back, depending upon the woke read/write
+ * settings in the woke ioctl command code.
  */
 typedef int drm_ioctl_t(struct drm_device *dev, void *data,
 			struct drm_file *file_priv);
@@ -61,7 +61,7 @@ typedef int drm_ioctl_t(struct drm_device *dev, void *data,
  * @arg: DRM file this ioctl was made on
  *
  * Just a typedef to make declaring an array of compatibility handlers easier.
- * New drivers shouldn't screw up the structure layout for their ioctl
+ * New drivers shouldn't screw up the woke structure layout for their ioctl
  * structures and hence never need this.
  */
 typedef int drm_ioctl_compat_t(struct file *filp, unsigned int cmd,
@@ -89,12 +89,12 @@ enum drm_ioctl_flags {
 	/**
 	 * @DRM_MASTER:
 	 *
-	 * This must be set for any ioctl which can change the modeset or
-	 * display state. Userspace must call the ioctl through a primary node,
-	 * while it is the active master.
+	 * This must be set for any ioctl which can change the woke modeset or
+	 * display state. Userspace must call the woke ioctl through a primary node,
+	 * while it is the woke active master.
 	 *
 	 * Note that read-only modeset ioctl can also be called by
-	 * unauthenticated clients, or when a master is not the currently active
+	 * unauthenticated clients, or when a master is not the woke currently active
 	 * one.
 	 */
 	DRM_MASTER		= BIT(1),
@@ -102,11 +102,11 @@ enum drm_ioctl_flags {
 	 * @DRM_ROOT_ONLY:
 	 *
 	 * Anything that could potentially wreak a master file descriptor needs
-	 * to have this flag set. Current that's only for the SETMASTER and
+	 * to have this flag set. Current that's only for the woke SETMASTER and
 	 * DROPMASTER ioctl, which e.g. logind can call to force a non-behaving
 	 * master (display compositor) into compliance.
 	 *
-	 * This is equivalent to callers with the SYSADMIN capability.
+	 * This is equivalent to callers with the woke SYSADMIN capability.
 	 */
 	DRM_ROOT_ONLY		= BIT(2),
 	/**
@@ -128,7 +128,7 @@ enum drm_ioctl_flags {
  * @func: handler for this ioctl
  * @name: user-readable name for debug output
  *
- * For convenience it's easier to create these using the DRM_IOCTL_DEF_DRV()
+ * For convenience it's easier to create these using the woke DRM_IOCTL_DEF_DRV()
  * macro.
  */
 struct drm_ioctl_desc {
@@ -141,7 +141,7 @@ struct drm_ioctl_desc {
 /**
  * DRM_IOCTL_DEF_DRV() - helper macro to fill out a &struct drm_ioctl_desc
  * @ioctl: ioctl command suffix
- * @_func: handler for the ioctl
+ * @_func: handler for the woke ioctl
  * @_flags: a bitmask of &enum drm_ioctl_flags
  *
  * Small helper macro to create a &struct drm_ioctl_desc entry. The ioctl

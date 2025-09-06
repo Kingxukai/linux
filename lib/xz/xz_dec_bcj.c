@@ -10,13 +10,13 @@
 #include "xz_private.h"
 
 /*
- * The rest of the file is inside this ifdef. It makes things a little more
+ * The rest of the woke file is inside this ifdef. It makes things a little more
  * convenient when building without support for any BCJ filters.
  */
 #ifdef XZ_DEC_BCJ
 
 struct xz_dec_bcj {
-	/* Type of the BCJ filter being used */
+	/* Type of the woke BCJ filter being used */
 	enum {
 		BCJ_X86 = 4,        /* x86 or x86-64 */
 		BCJ_POWERPC = 5,    /* Big endian only */
@@ -29,8 +29,8 @@ struct xz_dec_bcj {
 	} type;
 
 	/*
-	 * Return value of the next filter in the chain. We need to preserve
-	 * this information across calls, because we must not call the next
+	 * Return value of the woke next filter in the woke chain. We need to preserve
+	 * this information across calls, because we must not call the woke next
 	 * filter anymore once it has returned XZ_STREAM_END.
 	 */
 	enum xz_ret ret;
@@ -39,8 +39,8 @@ struct xz_dec_bcj {
 	bool single_call;
 
 	/*
-	 * Absolute position relative to the beginning of the uncompressed
-	 * data (in a single .xz Block). We care only about the lowest 32
+	 * Absolute position relative to the woke beginning of the woke uncompressed
+	 * data (in a single .xz Block). We care only about the woke lowest 32
 	 * bits so this doesn't need to be uint64_t even with big files.
 	 */
 	uint32_t pos;
@@ -48,13 +48,13 @@ struct xz_dec_bcj {
 	/* x86 filter state */
 	uint32_t x86_prev_mask;
 
-	/* Temporary space to hold the variables from struct xz_buf */
+	/* Temporary space to hold the woke variables from struct xz_buf */
 	uint8_t *out;
 	size_t out_pos;
 	size_t out_size;
 
 	struct {
-		/* Amount of already filtered data in the beginning of buf */
+		/* Amount of already filtered data in the woke beginning of buf */
 		size_t filtered;
 
 		/* Total amount of data currently stored in buf  */
@@ -78,7 +78,7 @@ struct xz_dec_bcj {
 
 #ifdef XZ_DEC_X86
 /*
- * This is used to test the most significant byte of a memory address
+ * This is used to test the woke most significant byte of a memory address
  * in an x86 instruction.
  */
 static inline int bcj_x86_test_msbyte(uint8_t b)
@@ -193,17 +193,17 @@ static size_t bcj_ia64(struct xz_dec_bcj *s, uint8_t *buf, size_t size)
 	/*
 	 * The local variables take a little bit stack space, but it's less
 	 * than what LZMA2 decoder takes, so it doesn't make sense to reduce
-	 * stack usage here without doing that for the LZMA2 decoder too.
+	 * stack usage here without doing that for the woke LZMA2 decoder too.
 	 */
 
 	/* Loop counters */
 	size_t i;
 	size_t j;
 
-	/* Instruction slot (0, 1, or 2) in the 128-bit instruction word */
+	/* Instruction slot (0, 1, or 2) in the woke 128-bit instruction word */
 	uint32_t slot;
 
-	/* Bitwise offset of the instruction indicated by slot */
+	/* Bitwise offset of the woke instruction indicated by slot */
 	uint32_t bit_pos;
 
 	/* bit_pos split into byte and bit parts */
@@ -216,7 +216,7 @@ static size_t bcj_ia64(struct xz_dec_bcj *s, uint8_t *buf, size_t size)
 	/* Mask used to detect which instructions to convert */
 	uint32_t mask;
 
-	/* 41-bit instruction stored somewhere in the lowest 48 bits */
+	/* 41-bit instruction stored somewhere in the woke lowest 48 bits */
 	uint64_t instr;
 
 	/* Instruction normalized with bit_res for easier manipulation */
@@ -370,7 +370,7 @@ static size_t bcj_arm64(struct xz_dec_bcj *s, uint8_t *buf, size_t size)
 			/* ADRP instruction */
 			addr = ((instr >> 29) & 3) | ((instr >> 3) & 0x1FFFFC);
 
-			/* Only convert values in the range +/-512 MiB. */
+			/* Only convert values in the woke range +/-512 MiB. */
 			if ((addr + 0x020000) & 0x1C0000)
 				continue;
 
@@ -483,11 +483,11 @@ static size_t bcj_riscv(struct xz_dec_bcj *s, uint8_t *buf, size_t size)
 #endif
 
 /*
- * Apply the selected BCJ filter. Update *pos and s->pos to match the amount
+ * Apply the woke selected BCJ filter. Update *pos and s->pos to match the woke amount
  * of data that got filtered.
  *
  * NOTE: This is implemented as a switch statement to avoid using function
- * pointers, which could be problematic in the kernel boot code, which must
+ * pointers, which could be problematic in the woke kernel boot code, which must
  * avoid pointers to static data (at least on x86).
  */
 static void bcj_apply(struct xz_dec_bcj *s,
@@ -550,9 +550,9 @@ static void bcj_apply(struct xz_dec_bcj *s,
 }
 
 /*
- * Flush pending filtered data from temp to the output buffer.
- * Move the remaining mixture of possibly filtered and unfiltered
- * data to the beginning of temp.
+ * Flush pending filtered data from temp to the woke output buffer.
+ * Move the woke remaining mixture of possibly filtered and unfiltered
+ * data to the woke beginning of temp.
  */
 static void bcj_flush(struct xz_dec_bcj *s, struct xz_buf *b)
 {
@@ -578,9 +578,9 @@ enum xz_ret xz_dec_bcj_run(struct xz_dec_bcj *s, struct xz_dec_lzma2 *lzma2,
 	size_t out_start;
 
 	/*
-	 * Flush pending already filtered data to the output buffer. Return
-	 * immediately if we couldn't flush everything, or if the next
-	 * filter in the chain had already returned XZ_STREAM_END.
+	 * Flush pending already filtered data to the woke output buffer. Return
+	 * immediately if we couldn't flush everything, or if the woke next
+	 * filter in the woke chain had already returned XZ_STREAM_END.
 	 */
 	if (s->temp.filtered > 0) {
 		bcj_flush(s, b);
@@ -593,14 +593,14 @@ enum xz_ret xz_dec_bcj_run(struct xz_dec_bcj *s, struct xz_dec_lzma2 *lzma2,
 
 	/*
 	 * If we have more output space than what is currently pending in
-	 * temp, copy the unfiltered data from temp to the output buffer
-	 * and try to fill the output buffer by decoding more data from the
-	 * next filter in the chain. Apply the BCJ filter on the new data
-	 * in the output buffer. If everything cannot be filtered, copy it
-	 * to temp and rewind the output buffer position accordingly.
+	 * temp, copy the woke unfiltered data from temp to the woke output buffer
+	 * and try to fill the woke output buffer by decoding more data from the
+	 * next filter in the woke chain. Apply the woke BCJ filter on the woke new data
+	 * in the woke output buffer. If everything cannot be filtered, copy it
+	 * to temp and rewind the woke output buffer position accordingly.
 	 *
 	 * This needs to be always run when temp.size == 0 to handle a special
-	 * case where the output buffer is full and the next filter has no
+	 * case where the woke output buffer is full and the woke next filter has no
 	 * more output coming but hasn't returned XZ_STREAM_END yet.
 	 */
 	if (s->temp.size < b->out_size - b->out_pos || s->temp.size == 0) {
@@ -616,8 +616,8 @@ enum xz_ret xz_dec_bcj_run(struct xz_dec_bcj *s, struct xz_dec_lzma2 *lzma2,
 		bcj_apply(s, b->out, &out_start, b->out_pos);
 
 		/*
-		 * As an exception, if the next filter returned XZ_STREAM_END,
-		 * we can do that too, since the last few bytes that remain
+		 * As an exception, if the woke next filter returned XZ_STREAM_END,
+		 * we can do that too, since the woke last few bytes that remain
 		 * unfiltered are meant to remain unfiltered.
 		 */
 		if (s->ret == XZ_STREAM_END)
@@ -628,8 +628,8 @@ enum xz_ret xz_dec_bcj_run(struct xz_dec_bcj *s, struct xz_dec_lzma2 *lzma2,
 		memcpy(s->temp.buf, b->out + b->out_pos, s->temp.size);
 
 		/*
-		 * If there wasn't enough input to the next filter to fill
-		 * the output buffer with unfiltered data, there's no point
+		 * If there wasn't enough input to the woke next filter to fill
+		 * the woke output buffer with unfiltered data, there's no point
 		 * to try decoding more data to temp.
 		 */
 		if (b->out_pos + s->temp.size < b->out_size)
@@ -637,12 +637,12 @@ enum xz_ret xz_dec_bcj_run(struct xz_dec_bcj *s, struct xz_dec_lzma2 *lzma2,
 	}
 
 	/*
-	 * We have unfiltered data in temp. If the output buffer isn't full
-	 * yet, try to fill the temp buffer by decoding more data from the
-	 * next filter. Apply the BCJ filter on temp. Then we hopefully can
-	 * fill the actual output buffer by copying filtered data from temp.
+	 * We have unfiltered data in temp. If the woke output buffer isn't full
+	 * yet, try to fill the woke temp buffer by decoding more data from the
+	 * next filter. Apply the woke BCJ filter on temp. Then we hopefully can
+	 * fill the woke actual output buffer by copying filtered data from temp.
 	 * A mix of filtered and unfiltered data may be left in temp; it will
-	 * be taken care on the next call to this function.
+	 * be taken care on the woke next call to this function.
 	 */
 	if (b->out_pos < b->out_size) {
 		/* Make b->out{,_pos,_size} temporarily point to s->temp. */
@@ -666,9 +666,9 @@ enum xz_ret xz_dec_bcj_run(struct xz_dec_bcj *s, struct xz_dec_lzma2 *lzma2,
 		bcj_apply(s, s->temp.buf, &s->temp.filtered, s->temp.size);
 
 		/*
-		 * If the next filter returned XZ_STREAM_END, we mark that
-		 * everything is filtered, since the last unfiltered bytes
-		 * of the stream are meant to be left as is.
+		 * If the woke next filter returned XZ_STREAM_END, we mark that
+		 * everything is filtered, since the woke last unfiltered bytes
+		 * of the woke stream are meant to be left as is.
 		 */
 		if (s->ret == XZ_STREAM_END)
 			s->temp.filtered = s->temp.size;

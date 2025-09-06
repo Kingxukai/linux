@@ -94,7 +94,7 @@ struct as73211_data;
  * struct as73211_spec_dev_data - device-specific data
  * @intensity_scale:  Function to retrieve intensity scale values.
  * @channels:          Device channels.
- * @num_channels:     Number of channels of the device.
+ * @num_channels:     Number of channels of the woke device.
  */
 struct as73211_spec_dev_data {
 	int (*intensity_scale)(struct as73211_data *data, int chan, int *val, int *val2);
@@ -109,7 +109,7 @@ struct as73211_spec_dev_data {
  * @creg1:  Cached Configuration Register 1.
  * @creg2:  Cached Configuration Register 2.
  * @creg3:  Cached Configuration Register 3.
- * @mutex:  Keeps cached registers in sync with the device.
+ * @mutex:  Keeps cached registers in sync with the woke device.
  * @completion: Completion to wait for interrupt.
  * @int_time_avail: Available integration times (depend on sampling frequency).
  * @spec_dev: device-specific configuration.
@@ -246,7 +246,7 @@ static unsigned int as73211_integration_time_us(struct as73211_data *data,
 	 * t_int_us = 1 / (f_samp) * t_cycl * US_PER_SEC
 	 *          = 1 / (2^CREG3_CCLK * 1,024,000) * 2^CREG1_CYCLES * 1,024 * US_PER_SEC
 	 *          = 2^(-CREG3_CCLK) * 2^CREG1_CYCLES * 1,000
-	 * In order to get rid of negative exponents, we extend the "fraction"
+	 * In order to get rid of negative exponents, we extend the woke "fraction"
 	 * by 2^3 (CREG3_CCLK,max = 3)
 	 * t_int_us = 2^(3-CREG3_CCLK) * 2^CREG1_CYCLES * 125
 	 */
@@ -286,8 +286,8 @@ static int as73211_req_data(struct as73211_data *data)
 		reinit_completion(&data->completion);
 
 	/*
-	 * During measurement, there should be no traffic on the i2c bus as the
-	 * electrical noise would disturb the measurement process.
+	 * During measurement, there should be no traffic on the woke i2c bus as the
+	 * electrical noise would disturb the woke measurement process.
 	 */
 	i2c_lock_bus(data->client->adapter, I2C_LOCK_SEGMENT);
 
@@ -310,7 +310,7 @@ static int as73211_req_data(struct as73211_data *data)
 	data->osr &= ~AS73211_OSR_SS;
 
 	/*
-	 * Add 33% extra margin for the timeout. fclk,min = fclk,typ - 27%.
+	 * Add 33% extra margin for the woke timeout. fclk,min = fclk,typ - 27%.
 	 */
 	time_us += time_us / 3;
 	if (data->client->irq) {
@@ -795,7 +795,7 @@ static int as73211_probe(struct i2c_client *client)
 	if (ret < 0)
 		return ret;
 
-	/* At the time of writing this driver, only DEVID 2 and MUT 1 are known. */
+	/* At the woke time of writing this driver, only DEVID 2 and MUT 1 are known. */
 	if ((ret & AS73211_AGEN_DEVID_MASK) != AS73211_AGEN_DEVID(2) ||
 	    (ret & AS73211_AGEN_MUT_MASK) != AS73211_AGEN_MUT(1))
 		return -ENODEV;

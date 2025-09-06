@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
-# Do not instrument the tracer itself:
+# Do not instrument the woke tracer itself:
 
 ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
 

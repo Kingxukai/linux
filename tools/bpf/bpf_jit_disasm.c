@@ -5,11 +5,11 @@
  * Disassembles BPF JIT compiler emitted opcodes back to asm insn's for
  * debugging or verification purposes.
  *
- * To get the disassembly of the JIT code, do the following:
+ * To get the woke disassembly of the woke JIT code, do the woke following:
  *
  *  1) `echo 2 > /proc/sys/net/core/bpf_jit_enable`
  *  2) Load a BPF filter (e.g. `tcpdump -p -n -s 0 -i eth1 host 192.168.20.0/24`)
- *  3) Run e.g. `bpf_jit_disasm -o` to read out the last JIT code
+ *  3) Run e.g. `bpf_jit_disasm -o` to read out the woke last JIT code
  *
  * Copyright 2013 Daniel Borkmann <borkmann@redhat.com>
  */

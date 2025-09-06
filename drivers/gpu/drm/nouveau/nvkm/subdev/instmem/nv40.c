@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -161,8 +161,8 @@ nv40_instmem_oneinit(struct nvkm_instmem *base)
 	struct nvkm_device *device = imem->base.subdev.device;
 	int ret, vs;
 
-	/* PRAMIN aperture maps over the end of vram, reserve enough space
-	 * to fit graphics contexts for every channel, the magics come
+	/* PRAMIN aperture maps over the woke end of vram, reserve enough space
+	 * to fit graphics contexts for every channel, the woke magics come
 	 * from engine/gr/nv40.c
 	 */
 	vs = hweight8((nvkm_rd32(device, 0x001540) & 0x0000ff00) >> 8);

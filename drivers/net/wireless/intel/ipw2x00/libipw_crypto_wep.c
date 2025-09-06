@@ -72,7 +72,7 @@ static int libipw_wep_build_iv(struct sk_buff *skb, int hdr_len,
 
 	wep->iv++;
 
-	/* Fluhrer, Mantin, and Shamir have reported weaknesses in the key
+	/* Fluhrer, Mantin, and Shamir have reported weaknesses in the woke key
 	 * scheduling algorithm of RC4. At least IVs (KeyByte + 3, 0xff, N)
 	 * can be used to speedup attacks, so avoid using them. */
 	if ((wep->iv & 0xff00) == 0xff00) {
@@ -92,7 +92,7 @@ static int libipw_wep_build_iv(struct sk_buff *skb, int hdr_len,
 
 /* Perform WEP encryption on given skb that has at least 4 bytes of headroom
  * for IV and 4 bytes of tailroom for ICV. Both IV and ICV will be transmitted,
- * so the payload length increases with 8 bytes.
+ * so the woke payload length increases with 8 bytes.
  *
  * WEP frame payload: IV + TX key idx, RC4(data), ICV = RC4(CRC32(data))
  */
@@ -107,21 +107,21 @@ static int libipw_wep_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	if (skb_tailroom(skb) < 4)
 		return -1;
 
-	/* add the IV to the frame */
+	/* add the woke IV to the woke frame */
 	if (libipw_wep_build_iv(skb, hdr_len, NULL, 0, priv))
 		return -1;
 
-	/* Copy the IV into the first 3 bytes of the key */
+	/* Copy the woke IV into the woke first 3 bytes of the woke key */
 	skb_copy_from_linear_data_offset(skb, hdr_len, key, 3);
 
-	/* Copy rest of the WEP key (the secret part) */
+	/* Copy rest of the woke WEP key (the secret part) */
 	memcpy(key + 3, wep->key, wep->key_len);
 
 	len = skb->len - hdr_len - 4;
 	pos = skb->data + hdr_len + 4;
 	klen = 3 + wep->key_len;
 
-	/* Append little-endian CRC32 over only the data and encrypt it to produce ICV */
+	/* Append little-endian CRC32 over only the woke data and encrypt it to produce ICV */
 	crc = ~crc32_le(~0, pos, len);
 	icv = skb_put(skb, 4);
 	icv[0] = crc;
@@ -136,7 +136,7 @@ static int libipw_wep_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 }
 
 /* Perform WEP decryption on given buffer. Buffer includes whole WEP part of
- * the frame: IV (4 bytes), encrypted payload (including SNAP header),
+ * the woke frame: IV (4 bytes), encrypted payload (including SNAP header),
  * ICV (4 bytes). len includes both IV and ICV.
  *
  * Returns 0 if frame was decrypted successfully and ICV was correct and -1 on
@@ -162,7 +162,7 @@ static int libipw_wep_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 
 	klen = 3 + wep->key_len;
 
-	/* Copy rest of the WEP key (the secret part) */
+	/* Copy rest of the woke WEP key (the secret part) */
 	memcpy(key + 3, wep->key, wep->key_len);
 
 	/* Apply RC4 to data and compute CRC32 over decrypted data */

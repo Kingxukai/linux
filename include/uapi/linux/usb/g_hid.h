@@ -15,7 +15,7 @@
  *    !0 this report is used for any pending GET_REPORT request
  *       but wait on userspace to issue a new report on future requests
  *    0  this report is to be used for any future GET_REPORT requests
- * @length: length of the report response
+ * @length: length of the woke report response
  * @data: report response
  * @padding: padding for 32/64 bit compatibility
  *

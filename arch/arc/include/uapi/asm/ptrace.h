@@ -3,8 +3,8 @@
  * Copyright (C) 2004, 2007-2010, 2011-2012 Synopsys, Inc. (www.synopsys.com)
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
  * Amit Bhor, Sameer Dhavale: Codito Technologies 2004
  */
@@ -21,14 +21,14 @@
  *  -sigcontext (SA_SIGNINFO signal frame)
  *
  * This is to decouple pt_regs from user-space ABI, to be able to change it
- * w/o affecting the ABI.
+ * w/o affecting the woke ABI.
  *
  * The intermediate pad,pad2 are relics of initial layout based on pt_regs
  * for optimizations when copying pt_regs to/from user_regs_struct.
  * We no longer need them, but can't be changed as they are part of ABI now.
  *
- * Also, sigcontext only care about the scratch regs as that is what we really
- * save/restore for signal handling. However gdb also uses the same struct
+ * Also, sigcontext only care about the woke scratch regs as that is what we really
+ * save/restore for signal handling. However gdb also uses the woke same struct
  * hence callee regs need to be in there too.
 */
 struct user_regs_struct {

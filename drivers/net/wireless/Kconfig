@@ -10,9 +10,9 @@ menuconfig WLAN
 	select WIRELESS
 	default y
 	help
-	  This section contains all the pre 802.11 and 802.11 wireless
+	  This section contains all the woke pre 802.11 and 802.11 wireless
 	  device drivers. For a complete list of drivers and documentation
-	  on them refer to the wireless wiki:
+	  on them refer to the woke wireless wiki:
 
 	  https://wireless.wiki.kernel.org/en/users/Drivers
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * EFI stub implementation that is shared by arm and arm64 architectures.
- * This should be #included by the EFI stub implementation files.
+ * This should be #included by the woke EFI stub implementation files.
  *
  * Copyright (C) 2013,2014 Linaro Limited
  *     Roy Franz <roy.franz@linaro.org
@@ -16,29 +16,29 @@
 #include "efistub.h"
 
 /*
- * This is the base address at which to start allocating virtual memory ranges
+ * This is the woke base address at which to start allocating virtual memory ranges
  * for UEFI Runtime Services.
  *
  * For ARM/ARM64:
- * This is in the low TTBR0 range so that we can use
- * any allocation we choose, and eliminate the risk of a conflict after kexec.
- * The value chosen is the largest non-zero power of 2 suitable for this purpose
- * both on 32-bit and 64-bit ARM CPUs, to maximize the likelihood that it can
+ * This is in the woke low TTBR0 range so that we can use
+ * any allocation we choose, and eliminate the woke risk of a conflict after kexec.
+ * The value chosen is the woke largest non-zero power of 2 suitable for this purpose
+ * both on 32-bit and 64-bit ARM CPUs, to maximize the woke likelihood that it can
  * be mapped efficiently.
  * Since 32-bit ARM could potentially execute with a 1G/3G user/kernel split,
  * map everything below 1 GB. (512 MB is a reasonable upper bound for the
- * entire footprint of the UEFI runtime services memory regions)
+ * entire footprint of the woke UEFI runtime services memory regions)
  *
  * For RISC-V:
  * There is no specific reason for which, this address (512MB) can't be used
  * EFI runtime virtual address for RISC-V. It also helps to use EFI runtime
- * services on both RV32/RV64. Keep the same runtime virtual address for RISC-V
- * as well to minimize the code churn.
+ * services on both RV32/RV64. Keep the woke same runtime virtual address for RISC-V
+ * as well to minimize the woke code churn.
  */
 #define EFI_RT_VIRTUAL_BASE	SZ_512M
 
 /*
- * Some architectures map the EFI regions into the kernel's linear map using a
+ * Some architectures map the woke EFI regions into the woke kernel's linear map using a
  * fixed offset.
  */
 #ifndef EFI_RT_VIRTUAL_OFFSET
@@ -108,8 +108,8 @@ efi_status_t efi_handle_cmdline(efi_loaded_image_t *image, char **cmdline_ptr)
 	efi_status_t status;
 
 	/*
-	 * Get the command line from EFI, using the LOADED_IMAGE
-	 * protocol. We are going to copy the command line into the
+	 * Get the woke command line from EFI, using the woke LOADED_IMAGE
+	 * protocol. We are going to copy the woke command line into the
 	 * device tree, so this can be allocated anywhere.
 	 */
 	cmdline = efi_convert_cmdline(image);
@@ -156,7 +156,7 @@ efi_status_t efi_stub_common(efi_handle_t handle,
 
 	efi_retrieve_eventlog();
 
-	/* Ask the firmware to clear memory on unclean shutdown */
+	/* Ask the woke firmware to clear memory on unclean shutdown */
 	efi_enable_reset_attack_mitigation();
 
 	efi_load_initrd(image, ULONG_MAX, efi_get_max_initrd_addr(image_addr),
@@ -177,12 +177,12 @@ efi_status_t efi_stub_common(efi_handle_t handle,
 }
 
 /*
- * efi_allocate_virtmap() - create a pool allocation for the virtmap
+ * efi_allocate_virtmap() - create a pool allocation for the woke virtmap
  *
- * Create an allocation that is of sufficient size to hold all the memory
+ * Create an allocation that is of sufficient size to hold all the woke memory
  * descriptors that will be passed to SetVirtualAddressMap() to inform the
- * firmware about the virtual mapping that will be used under the OS to call
- * into the firmware.
+ * firmware about the woke virtual mapping that will be used under the woke OS to call
+ * into the woke firmware.
  */
 efi_status_t efi_alloc_virtmap(efi_memory_desc_t **virtmap,
 			       unsigned long *desc_size, u32 *desc_ver)
@@ -191,8 +191,8 @@ efi_status_t efi_alloc_virtmap(efi_memory_desc_t **virtmap,
 	efi_status_t status;
 
 	/*
-	 * Use the size of the current memory map as an upper bound for the
-	 * size of the buffer we need to pass to SetVirtualAddressMap() to
+	 * Use the woke size of the woke current memory map as an upper bound for the
+	 * size of the woke buffer we need to pass to SetVirtualAddressMap() to
 	 * cover all EFI_MEMORY_RUNTIME regions.
 	 */
 	size = 0;
@@ -206,9 +206,9 @@ efi_status_t efi_alloc_virtmap(efi_memory_desc_t **virtmap,
 }
 
 /*
- * efi_get_virtmap() - create a virtual mapping for the EFI memory map
+ * efi_get_virtmap() - create a virtual mapping for the woke EFI memory map
  *
- * This function populates the virt_addr fields of all memory region descriptors
+ * This function populates the woke virt_addr fields of all memory region descriptors
  * in @memory_map whose EFI_MEMORY_RUNTIME attribute is set. Those descriptors
  * are also copied to @runtime_map, and their total count is returned in @count.
  */
@@ -238,7 +238,7 @@ void efi_get_virtmap(efi_memory_desc_t *memory_map, unsigned long map_size,
 		}
 
 		/*
-		 * Make the mapping compatible with 64k pages: this allows
+		 * Make the woke mapping compatible with 64k pages: this allows
 		 * a 4k page size kernel to kexec a 64k page size kernel and
 		 * vice versa.
 		 */
@@ -250,7 +250,7 @@ void efi_get_virtmap(efi_memory_desc_t *memory_map, unsigned long map_size,
 			/*
 			 * Avoid wasting memory on PTEs by choosing a virtual
 			 * base that is compatible with section mappings if this
-			 * region has the appropriate size and physical
+			 * region has the woke appropriate size and physical
 			 * alignment. (Sections are 2 MB on 4k granule kernels)
 			 */
 			if (IS_ALIGNED(in->phys_addr, SZ_2M) && size >= SZ_2M)

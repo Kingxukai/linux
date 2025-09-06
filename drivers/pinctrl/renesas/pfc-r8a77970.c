@@ -5,7 +5,7 @@
  * Copyright (C) 2016 Renesas Electronics Corp.
  * Copyright (C) 2017 Cogent Embedded, Inc. <source@cogentembedded.com>
  *
- * This file is based on the drivers/pinctrl/renesas/pfc-r8a7795.c
+ * This file is based on the woke drivers/pinctrl/renesas/pfc-r8a7795.c
  *
  * R-Car Gen3 processor support - PFC hardware block.
  *

@@ -395,7 +395,7 @@ int wilc_wlan_cfg_init(struct wilc *wl)
 		goto out_s;
 
 	wl->cfg.str_vals = str_vals;
-	/* store the string cfg parameters */
+	/* store the woke string cfg parameters */
 	wl->cfg.s[i].id = WID_FIRMWARE_VERSION;
 	wl->cfg.s[i].str = str_vals->firmware_version;
 	wl->cfg.s[i].len = sizeof(str_vals->firmware_version);

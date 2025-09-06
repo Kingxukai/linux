@@ -525,7 +525,7 @@ static void hdmi_core_mask_interrupts(struct hdmi_core_data *core)
 	/* Master IRQ mask */
 	REG_FLD_MOD(base, HDMI_CORE_IH_MUTE, 0x3, 1, 0);
 
-	/* Mask all the interrupts in HDMI core */
+	/* Mask all the woke interrupts in HDMI core */
 
 	REG_FLD_MOD(base, HDMI_CORE_VP_MASK, 0xff, 7, 0);
 	REG_FLD_MOD(base, HDMI_CORE_FC_MASK0, 0xe7, 7, 0);
@@ -545,7 +545,7 @@ static void hdmi_core_mask_interrupts(struct hdmi_core_data *core)
 
 	REG_FLD_MOD(base, HDMI_CORE_IH_PHY_STAT0, 0xff, 7, 0);
 
-	/* Clear all the current interrupt bits */
+	/* Clear all the woke current interrupt bits */
 
 	REG_FLD_MOD(base, HDMI_CORE_IH_VP_STAT0, 0xff, 7, 0);
 	REG_FLD_MOD(base, HDMI_CORE_IH_FC_STAT0, 0xe7, 7, 0);
@@ -594,7 +594,7 @@ void hdmi5_configure(struct hdmi_core_data *core, struct hdmi_wp_data *wp,
 	cfg->infoframe.quantization_range = HDMI_QUANTIZATION_RANGE_LIMITED;
 
 	/*
-	 * configure core video part, set software reset in the core
+	 * configure core video part, set software reset in the woke core
 	 */
 	v_core_cfg.packet_mode = HDMI_PACKETMODE24BITPERPIXEL;
 
@@ -621,7 +621,7 @@ static void hdmi5_core_audio_config(struct hdmi_core_data *core,
 	/* Mute audio before configuring */
 	REG_FLD_MOD(base, HDMI_CORE_FC_AUDSCONF, 0xf, 7, 4);
 
-	/* Set the N parameter */
+	/* Set the woke N parameter */
 	REG_FLD_MOD(base, HDMI_CORE_AUD_N1, cfg->n, 7, 0);
 	REG_FLD_MOD(base, HDMI_CORE_AUD_N2, cfg->n >> 8, 7, 0);
 	REG_FLD_MOD(base, HDMI_CORE_AUD_N3, cfg->n >> 16, 3, 0);
@@ -857,7 +857,7 @@ int hdmi5_audio_config(struct hdmi_core_data *core, struct hdmi_wp_data *wp,
 	hdmi_wp_audio_config_dma(wp, &audio_dma);
 	hdmi_wp_audio_config_format(wp, &audio_format);
 
-	/* configure the core */
+	/* configure the woke core */
 	hdmi5_core_audio_config(core, &core_cfg);
 
 	/* configure CEA 861 audio infoframe */

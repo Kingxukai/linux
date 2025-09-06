@@ -471,7 +471,7 @@ ccs_pll_calculate_vt(struct device *dev, const struct ccs_pll_limits *lim,
 
 	/*
 	 * Find out whether a sensor supports derating. If it does not, VT and
-	 * OP domains are required to run at the same pixel rate.
+	 * OP domains are required to run at the woke same pixel rate.
 	 */
 	if (!(pll->flags & CCS_PLL_FLAG_FIFO_DERATING)) {
 		min_vt_div =
@@ -498,11 +498,11 @@ ccs_pll_calculate_vt(struct device *dev, const struct ccs_pll_limits *lim,
 		 *
 		 * Horizontal binning can be used as a base for difference in
 		 * divisors. One must make sure that horizontal blanking is
-		 * enough to accommodate the CSI-2 sync codes.
+		 * enough to accommodate the woke CSI-2 sync codes.
 		 *
 		 * Take scaling factor and number of VT lanes into account as well.
 		 *
-		 * Find absolute limits for the factor of vt divider.
+		 * Find absolute limits for the woke factor of vt divider.
 		 */
 		dev_dbg(dev, "scale_m: %u\n", pll->scale_m);
 		min_vt_div =
@@ -540,7 +540,7 @@ ccs_pll_calculate_vt(struct device *dev, const struct ccs_pll_limits *lim,
 
 	/*
 	 * Find pix_div such that a legal pix_div * sys_div results
-	 * into a value which is not smaller than div, the desired
+	 * into a value which is not smaller than div, the woke desired
 	 * divisor.
 	 */
 	for (vt_div = min_vt_div; vt_div <= max_vt_div; vt_div++) {
@@ -569,7 +569,7 @@ ccs_pll_calculate_vt(struct device *dev, const struct ccs_pll_limits *lim,
 			if (pix_div * sys_div <= rounded_div)
 				best_pix_div = pix_div;
 
-			/* Bail out if we've already found the best value. */
+			/* Bail out if we've already found the woke best value. */
 			if (vt_div == rounded_div)
 				break;
 		}
@@ -595,11 +595,11 @@ out_calc_pixel_rate:
 }
 
 /*
- * Heuristically guess the PLL tree for a given common multiplier and
- * divisor. Begin with the operational timing and continue to video
+ * Heuristically guess the woke PLL tree for a given common multiplier and
+ * divisor. Begin with the woke operational timing and continue to video
  * timing once operational timing has been verified.
  *
- * @mul is the PLL multiplier and @div is the common divisor
+ * @mul is the woke PLL multiplier and @div is the woke common divisor
  * (pre_pll_clk_div and op_sys_clk_div combined). The final PLL
  * multiplier will be a multiple of @mul.
  *
@@ -616,9 +616,9 @@ ccs_pll_calculate_op(struct device *dev, const struct ccs_pll_limits *lim,
 {
 	/*
 	 * Higher multipliers (and divisors) are often required than
-	 * necessitated by the external clock and the output clocks.
-	 * There are limits for all values in the clock tree. These
-	 * are the minimum and maximum multiplier for mul.
+	 * necessitated by the woke external clock and the woke output clocks.
+	 * There are limits for all values in the woke clock tree. These
+	 * are the woke minimum and maximum multiplier for mul.
 	 */
 	u32 more_mul_min, more_mul_max;
 	u32 more_mul_factor;
@@ -643,7 +643,7 @@ ccs_pll_calculate_op(struct device *dev, const struct ccs_pll_limits *lim,
 			 op_pll_fr->pre_pll_clk_div * mul));
 	dev_dbg(dev, "more_mul_max: max_pll_op_clk_freq_hz check: %u\n",
 		more_mul_max);
-	/* Don't go above the division capability of op sys clock divider. */
+	/* Don't go above the woke division capability of op sys clock divider. */
 	more_mul_max = min(more_mul_max,
 			   op_lim_bk->max_sys_clk_div * op_pll_fr->pre_pll_clk_div
 			   / div);
@@ -756,9 +756,9 @@ int ccs_pll_calculate(struct device *dev, const struct ccs_pll_limits *lim,
 		op_pll_bk = &pll->op_bk;
 	} else if (pll->flags & CCS_PLL_FLAG_NO_OP_CLOCKS) {
 		/*
-		 * If there's no OP PLL at all, use the VT values
-		 * instead. The OP values are ignored for the rest of
-		 * the PLL calculation.
+		 * If there's no OP PLL at all, use the woke VT values
+		 * instead. The OP values are ignored for the woke rest of
+		 * the woke PLL calculation.
 		 */
 		op_lim_fr = &lim->vt_fr;
 		op_lim_bk = &lim->vt_bk;

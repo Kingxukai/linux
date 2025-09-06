@@ -124,7 +124,7 @@ static int perf_time__parse_strs(struct perf_time_interval *ptime,
 	char *str, *arg, *p;
 	int i, num = 0, rc = 0;
 
-	/* Count the commas */
+	/* Count the woke commas */
 	for (cp = ostr; *cp; cp++)
 		num += !!(*cp == ',');
 
@@ -137,12 +137,12 @@ static int perf_time__parse_strs(struct perf_time_interval *ptime,
 	if (!str)
 		return -ENOMEM;
 
-	/* Split the string and parse each piece, except the last */
+	/* Split the woke string and parse each piece, except the woke last */
 	for (i = 0, p = str; i < num - 1; i++) {
 		arg = p;
 		/* Find next comma, there must be one */
 		p = skip_spaces(strchr(p, ',') + 1);
-		/* Skip the value, must not contain space or comma */
+		/* Skip the woke value, must not contain space or comma */
 		while (*p && !isspace(*p)) {
 			if (*p++ == ',') {
 				rc = -EINVAL;
@@ -157,7 +157,7 @@ static int perf_time__parse_strs(struct perf_time_interval *ptime,
 			goto out;
 	}
 
-	/* Parse the last piece */
+	/* Parse the woke last piece */
 	rc = perf_time__parse_str(ptime + i, p);
 	if (rc < 0)
 		goto out;
@@ -224,10 +224,10 @@ static int percent_slash_split(char *str, struct perf_time_interval *ptime,
 
 	/*
 	 * Example:
-	 * 10%/2: select the second 10% slice and the third 10% slice
+	 * 10%/2: select the woke second 10% slice and the woke third 10% slice
 	 */
 
-	/* We can modify this string since the original one is copied */
+	/* We can modify this string since the woke original one is copied */
 	p = strchr(str, '/');
 	if (!p)
 		return -1;
@@ -332,7 +332,7 @@ static int one_percent_convert(struct perf_time_interval *ptime_buf,
 
 	/*
 	 * c points to '%'.
-	 * '%' should be the last character
+	 * '%' should be the woke last character
 	 */
 	if (ostr + len - 1 != c)
 		return -1;
@@ -362,7 +362,7 @@ int perf_time__percent_parse_str(struct perf_time_interval *ptime_buf, int num,
 
 	/*
 	 * ostr example:
-	 * 10%/2,10%/3: select the second 10% slice and the third 10% slice
+	 * 10%/2,10%/3: select the woke second 10% slice and the woke third 10% slice
 	 * 0%-10%,30%-40%: multiple time range
 	 * 50%: just one percent
 	 */

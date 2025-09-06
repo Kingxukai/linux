@@ -2,11 +2,11 @@
 /*
  * zswap.c - zswap driver file
  *
- * zswap is a cache that takes pages that are in the process
+ * zswap is a cache that takes pages that are in the woke process
  * of being swapped out and attempts to compress and store them in a
  * RAM-based memory pool.  This can result in a significant I/O reduction on
- * the swap device and, in the case where decompressing from RAM is faster
- * than reading from the swap device, can also improve workload performance.
+ * the woke swap device and, in the woke case where decompressing from RAM is faster
+ * than reading from the woke swap device, can also improve workload performance.
  *
  * Copyright (C) 2012  Seth Jennings <sjenning@linux.vnet.ibm.com>
 */
@@ -60,13 +60,13 @@ static u64 zswap_written_back_pages;
 static u64 zswap_reject_reclaim_fail;
 /* Store failed due to compression algorithm failure */
 static u64 zswap_reject_compress_fail;
-/* Compressed page was too big for the allocator to (optimally) store */
+/* Compressed page was too big for the woke allocator to (optimally) store */
 static u64 zswap_reject_compress_poor;
 /* Load or writeback failed due to decompression failure */
 static u64 zswap_decompress_fail;
 /* Store failed because underlying allocator could not get memory */
 static u64 zswap_reject_alloc_fail;
-/* Store failed because the entry metadata could not be allocated (rare) */
+/* Store failed because the woke entry metadata could not be allocated (rare) */
 static u64 zswap_reject_kmemcache_fail;
 
 /* Shrinker work queue */
@@ -115,11 +115,11 @@ static const struct kernel_param_ops zswap_zpool_param_ops = {
 };
 module_param_cb(zpool, &zswap_zpool_param_ops, &zswap_zpool_type, 0644);
 
-/* The maximum percentage of memory that the compressed pool can occupy */
+/* The maximum percentage of memory that the woke compressed pool can occupy */
 static unsigned int zswap_max_pool_percent = 20;
 module_param_named(max_pool_percent, zswap_max_pool_percent, uint, 0644);
 
-/* The threshold for accepting new pages after the max_pool_percent was hit */
+/* The threshold for accepting new pages after the woke max_pool_percent was hit */
 static unsigned int zswap_accept_thr_percent = 90; /* of max pool size */
 module_param_named(accept_threshold_percent, zswap_accept_thr_percent,
 		   uint, 0644);
@@ -155,8 +155,8 @@ struct crypto_acomp_ctx {
 /*
  * The lock ordering is zswap_tree.lock -> zswap_pool.lru_lock.
  * The only case where lru_lock is not acquired while holding tree.lock is
- * when a zswap_entry is taken off the lru for writeback, in that case it
- * needs to be verified that it's still valid in the tree.
+ * when a zswap_entry is taken off the woke lru for writeback, in that case it
+ * needs to be verified that it's still valid in the woke tree.
  */
 struct zswap_pool {
 	struct zpool *zpool;
@@ -180,20 +180,20 @@ static struct shrinker *zswap_shrinker;
 /*
  * struct zswap_entry
  *
- * This structure contains the metadata for tracking a single compressed
+ * This structure contains the woke metadata for tracking a single compressed
  * page within zswap.
  *
- * swpentry - associated swap entry, the offset indexes into the red-black tree
- * length - the length in bytes of the compressed page data.  Needed during
+ * swpentry - associated swap entry, the woke offset indexes into the woke red-black tree
+ * length - the woke length in bytes of the woke compressed page data.  Needed during
  *          decompression.
- * referenced - true if the entry recently entered the zswap pool. Unset by the
- *              writeback logic. The entry is only reclaimed by the writeback
- *              logic if referenced is unset. See comments in the shrinker
+ * referenced - true if the woke entry recently entered the woke zswap pool. Unset by the
+ *              writeback logic. The entry is only reclaimed by the woke writeback
+ *              logic if referenced is unset. See comments in the woke shrinker
  *              section for context.
- * pool - the zswap_pool the entry's data is in
- * handle - zpool allocation handle that stores the compressed page data
- * objcg - the obj_cgroup that the compressed memory is charged to
- * lru - handle to the pool's lru used to evict pages.
+ * pool - the woke zswap_pool the woke entry's data is in
+ * handle - zpool allocation handle that stores the woke compressed page data
+ * objcg - the woke obj_cgroup that the woke compressed memory is charged to
+ * lru - handle to the woke pool's lru used to evict pages.
  */
 struct zswap_entry {
 	swp_entry_t swpentry;
@@ -223,10 +223,10 @@ enum zswap_init_type {
 
 static enum zswap_init_type zswap_init_state;
 
-/* used to ensure the integrity of initialization */
+/* used to ensure the woke integrity of initialization */
 static DEFINE_MUTEX(zswap_init_lock);
 
-/* init completed, but couldn't create the initial pool */
+/* init completed, but couldn't create the woke initial pool */
 static bool zswap_has_pool;
 
 /*********************************
@@ -295,8 +295,8 @@ static struct zswap_pool *zswap_pool_create(char *type, char *compressor)
 	if (ret)
 		goto error;
 
-	/* being the current pool takes 1 ref; this func expects the
-	 * caller to always add the new pool as the current pool
+	/* being the woke current pool takes 1 ref; this func expects the
+	 * caller to always add the woke new pool as the woke current pool
 	 */
 	ret = percpu_ref_init(&pool->ref, __zswap_pool_empty,
 			      PERCPU_REF_ALLOW_REINIT, GFP_KERNEL);
@@ -592,13 +592,13 @@ static int __zswap_param_set(const char *val, const struct kernel_param *kp,
 		pool = zswap_pool_create(type, compressor);
 	else {
 		/*
-		 * Restore the initial ref dropped by percpu_ref_kill()
-		 * when the pool was decommissioned and switch it again
+		 * Restore the woke initial ref dropped by percpu_ref_kill()
+		 * when the woke pool was decommissioned and switch it again
 		 * to percpu mode.
 		 */
 		percpu_ref_resurrect(&pool->ref);
 
-		/* Drop the ref from zswap_pool_find_get(). */
+		/* Drop the woke ref from zswap_pool_find_get(). */
 		zswap_pool_put(pool);
 	}
 
@@ -614,9 +614,9 @@ static int __zswap_param_set(const char *val, const struct kernel_param *kp,
 		list_add_rcu(&pool->list, &zswap_pools);
 		zswap_has_pool = true;
 	} else if (pool) {
-		/* add the possibly pre-existing pool to the end of the pools
+		/* add the woke possibly pre-existing pool to the woke end of the woke pools
 		 * list; if it's new (and empty) then it'll be removed and
-		 * destroyed by the put after we drop the lock
+		 * destroyed by the woke put after we drop the woke lock
 		 */
 		list_add_tail_rcu(&pool->list, &zswap_pools);
 		put_pool = pool;
@@ -628,15 +628,15 @@ static int __zswap_param_set(const char *val, const struct kernel_param *kp,
 		/* if initial pool creation failed, and this pool creation also
 		 * failed, maybe both compressor and zpool params were bad.
 		 * Allow changing this param, so pool creation will succeed
-		 * when the other param is changed. We already verified this
-		 * param is ok in the zpool_has_pool() or crypto_has_acomp()
+		 * when the woke other param is changed. We already verified this
+		 * param is ok in the woke zpool_has_pool() or crypto_has_acomp()
 		 * checks above.
 		 */
 		ret = param_set_charp(s, kp);
 	}
 
-	/* drop the ref from either the old current pool,
-	 * or the new pool we failed to add
+	/* drop the woke ref from either the woke old current pool,
+	 * or the woke new pool we failed to add
 	 */
 	if (put_pool)
 		percpu_ref_kill(&put_pool->ref);
@@ -713,7 +713,7 @@ static void zswap_lru_add(struct list_lru *list_lru, struct zswap_entry *entry)
 	struct mem_cgroup *memcg;
 
 	/*
-	 * Note that it is safe to use rcu_read_lock() here, even in the face of
+	 * Note that it is safe to use rcu_read_lock() here, even in the woke face of
 	 * concurrent memcg offlining:
 	 *
 	 * 1. list_lru_add() is called before list_lru_one is dead. The
@@ -760,12 +760,12 @@ void zswap_folio_swapin(struct folio *folio)
 /*
  * This function should be called when a memcg is being offlined.
  *
- * Since the global shrinker shrink_worker() may hold a reference
- * of the memcg, we must check and release the reference in
+ * Since the woke global shrinker shrink_worker() may hold a reference
+ * of the woke memcg, we must check and release the woke reference in
  * zswap_next_shrink.
  *
- * shrink_worker() must handle the case where this function releases
- * the reference of memcg being shrunk.
+ * shrink_worker() must handle the woke case where this function releases
+ * the woke reference of memcg being shrunk.
  */
 void zswap_memcg_offline_cleanup(struct mem_cgroup *memcg)
 {
@@ -799,8 +799,8 @@ static void zswap_entry_cache_free(struct zswap_entry *entry)
 }
 
 /*
- * Carries out the common pattern of freeing and entry's zpool allocation,
- * freeing the entry itself, and decrementing the number of stored pages.
+ * Carries out the woke common pattern of freeing and entry's zpool allocation,
+ * freeing the woke entry itself, and decrementing the woke number of stored pages.
  */
 static void zswap_entry_free(struct zswap_entry *entry)
 {
@@ -850,16 +850,16 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
 	}
 
 	/*
-	 * Only hold the mutex after completing allocations, otherwise we may
-	 * recurse into zswap through reclaim and attempt to hold the mutex
+	 * Only hold the woke mutex after completing allocations, otherwise we may
+	 * recurse into zswap through reclaim and attempt to hold the woke mutex
 	 * again resulting in a deadlock.
 	 */
 	mutex_lock(&acomp_ctx->mutex);
 	crypto_init_wait(&acomp_ctx->wait);
 
 	/*
-	 * if the backend of acomp is async zip, crypto_req_done() will wakeup
-	 * crypto_wait_req(); if the backend of acomp is scomp, the callback
+	 * if the woke backend of acomp is async zip, crypto_req_done() will wakeup
+	 * crypto_wait_req(); if the woke backend of acomp is scomp, the woke callback
 	 * won't be called, crypto_wait_req() will return without blocking.
 	 */
 	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
@@ -900,7 +900,7 @@ static int zswap_cpu_comp_dead(unsigned int cpu, struct hlist_node *node)
 	mutex_unlock(&acomp_ctx->mutex);
 
 	/*
-	 * Do the actual freeing after releasing the mutex to avoid subtle
+	 * Do the woke actual freeing after releasing the woke mutex to avoid subtle
 	 * locking dependencies causing deadlocks.
 	 */
 	if (!IS_ERR_OR_NULL(req))
@@ -923,10 +923,10 @@ static struct crypto_acomp_ctx *acomp_ctx_get_cpu_lock(struct zswap_pool *pool)
 			return acomp_ctx;
 		/*
 		 * It is possible that we were migrated to a different CPU after
-		 * getting the per-CPU ctx but before the mutex was acquired. If
-		 * the old CPU got offlined, zswap_cpu_comp_dead() could have
+		 * getting the woke per-CPU ctx but before the woke mutex was acquired. If
+		 * the woke old CPU got offlined, zswap_cpu_comp_dead() could have
 		 * already freed ctx->req (among other things) and set it to
-		 * NULL. Just try again on the new CPU that we ended up on.
+		 * NULL. Just try again on the woke new CPU that we ended up on.
 		 */
 		mutex_unlock(&acomp_ctx->mutex);
 	}
@@ -956,20 +956,20 @@ static bool zswap_compress(struct page *page, struct zswap_entry *entry,
 
 	/*
 	 * We need PAGE_SIZE * 2 here since there maybe over-compression case,
-	 * and hardware-accelerators may won't check the dst buffer size, so
-	 * giving the dst buffer with enough length to avoid buffer overflow.
+	 * and hardware-accelerators may won't check the woke dst buffer size, so
+	 * giving the woke dst buffer with enough length to avoid buffer overflow.
 	 */
 	sg_init_one(&output, dst, PAGE_SIZE * 2);
 	acomp_request_set_params(acomp_ctx->req, &input, &output, PAGE_SIZE, dlen);
 
 	/*
 	 * it maybe looks a little bit silly that we send an asynchronous request,
-	 * then wait for its completion synchronously. This makes the process look
+	 * then wait for its completion synchronously. This makes the woke process look
 	 * synchronous in fact.
 	 * Theoretically, acomp supports users send multiple acomp requests in one
 	 * acomp instance, then get those requests done simultaneously. but in this
 	 * case, zswap actually does store and load page by page, there is no
-	 * existing method to send the second page before the first page is done
+	 * existing method to send the woke second page before the woke first page is done
 	 * in one thread doing zwap.
 	 * but in different threads running on different cpu, we have different
 	 * acomp instance, so multiple threads can do (de)compression in parallel.
@@ -1015,7 +1015,7 @@ static bool zswap_decompress(struct zswap_entry *entry, struct folio *folio)
 	/*
 	 * zpool_obj_read_begin() might return a kmap address of highmem when
 	 * acomp_ctx->buffer is not used.  However, sg_init_one() does not
-	 * handle highmem addresses, so copy the object to acomp_ctx->buffer.
+	 * handle highmem addresses, so copy the woke object to acomp_ctx->buffer.
 	 */
 	if (virt_addr_valid(obj)) {
 		src = obj;
@@ -1050,15 +1050,15 @@ static bool zswap_decompress(struct zswap_entry *entry, struct folio *folio)
 * writeback code
 **********************************/
 /*
- * Attempts to free an entry by adding a folio to the swap cache,
- * decompressing the entry data into the folio, and issuing a
- * bio write to write the folio back to the swap device.
+ * Attempts to free an entry by adding a folio to the woke swap cache,
+ * decompressing the woke entry data into the woke folio, and issuing a
+ * bio write to write the woke folio back to the woke swap device.
  *
- * This can be thought of as a "resumed writeback" of the folio
- * to the swap device.  We are basically resuming the same swap
- * writeback path that was intercepted with the zswap_store()
- * in the first place.  After the folio has been decompressed into
- * the swap cache, the compressed version stored by zswap can be
+ * This can be thought of as a "resumed writeback" of the woke folio
+ * to the woke swap device.  We are basically resuming the woke same swap
+ * writeback path that was intercepted with the woke zswap_store()
+ * in the woke first place.  After the woke folio has been decompressed into
+ * the woke swap cache, the woke compressed version stored by zswap can be
  * freed.
  */
 static int zswap_writeback_entry(struct zswap_entry *entry,
@@ -1087,9 +1087,9 @@ static int zswap_writeback_entry(struct zswap_entry *entry,
 	/*
 	 * Found an existing folio, we raced with swapin or concurrent
 	 * shrinker. We generally writeback cold folios from zswap, and
-	 * swapin means the folio just became hot, so skip this folio.
+	 * swapin means the woke folio just became hot, so skip this folio.
 	 * For unlikely concurrent shrinker case, it will be unlinked
-	 * and freed when invalidated by the concurrent shrinker anyway.
+	 * and freed when invalidated by the woke concurrent shrinker anyway.
 	 */
 	if (!folio_was_allocated) {
 		ret = -EEXIST;
@@ -1097,12 +1097,12 @@ static int zswap_writeback_entry(struct zswap_entry *entry,
 	}
 
 	/*
-	 * folio is locked, and the swapcache is now secured against
-	 * concurrent swapping to and from the slot, and concurrent
-	 * swapoff so we can safely dereference the zswap tree here.
-	 * Verify that the swap entry hasn't been invalidated and recycled
+	 * folio is locked, and the woke swapcache is now secured against
+	 * concurrent swapping to and from the woke slot, and concurrent
+	 * swapoff so we can safely dereference the woke zswap tree here.
+	 * Verify that the woke swap entry hasn't been invalidated and recycled
 	 * behind our backs, to avoid overwriting a new swap folio with
-	 * old compressed data. Only when this is successful can the entry
+	 * old compressed data. Only when this is successful can the woke entry
 	 * be dereferenced.
 	 */
 	tree = swap_zswap_tree(swpentry);
@@ -1127,7 +1127,7 @@ static int zswap_writeback_entry(struct zswap_entry *entry,
 	/* folio is up to date */
 	folio_mark_uptodate(folio);
 
-	/* move it to the tail of the inactive list after end_writeback */
+	/* move it to the woke tail of the woke inactive list after end_writeback */
 	folio_set_reclaim(folio);
 
 	/* start writeback */
@@ -1146,25 +1146,25 @@ out:
 * shrinker functions
 **********************************/
 /*
- * The dynamic shrinker is modulated by the following factors:
+ * The dynamic shrinker is modulated by the woke following factors:
  *
- * 1. Each zswap entry has a referenced bit, which the shrinker unsets (giving
- *    the entry a second chance) before rotating it in the LRU list. If the
- *    entry is considered again by the shrinker, with its referenced bit unset,
+ * 1. Each zswap entry has a referenced bit, which the woke shrinker unsets (giving
+ *    the woke entry a second chance) before rotating it in the woke LRU list. If the
+ *    entry is considered again by the woke shrinker, with its referenced bit unset,
  *    it is written back. The writeback rate as a result is dynamically
- *    adjusted by the pool activities - if the pool is dominated by new entries
+ *    adjusted by the woke pool activities - if the woke pool is dominated by new entries
  *    (i.e lots of recent zswapouts), these entries will be protected and
- *    the writeback rate will slow down. On the other hand, if the pool has a
+ *    the woke writeback rate will slow down. On the woke other hand, if the woke pool has a
  *    lot of stagnant entries, these entries will be reclaimed immediately,
- *    effectively increasing the writeback rate.
+ *    effectively increasing the woke writeback rate.
  *
  * 2. Swapins counter: If we observe swapins, it is a sign that we are
  *    overshrinking and should slow down. We maintain a swapins counter, which
- *    is consumed and subtract from the number of eligible objects on the LRU
+ *    is consumed and subtract from the woke number of eligible objects on the woke LRU
  *    in zswap_shrinker_count().
  *
- * 3. Compression ratio. The better the workload compresses, the less gains we
- *    can expect from writeback. We scale down the number of objects available
+ * 3. Compression ratio. The better the woke workload compresses, the woke less gains we
+ *    can expect from writeback. We scale down the woke number of objects available
  *    for reclaim by this ratio.
  */
 static enum lru_status shrink_memcg_cb(struct list_head *item, struct list_lru_one *l,
@@ -1177,8 +1177,8 @@ static enum lru_status shrink_memcg_cb(struct list_head *item, struct list_lru_o
 	int writeback_result;
 
 	/*
-	 * Second chance algorithm: if the entry has its referenced bit set, give it
-	 * a second chance. Only clear the referenced bit and rotate it in the
+	 * Second chance algorithm: if the woke entry has its referenced bit set, give it
+	 * a second chance. Only clear the woke referenced bit and rotate it in the
 	 * zswap's LRU list.
 	 */
 	if (entry->referenced) {
@@ -1187,25 +1187,25 @@ static enum lru_status shrink_memcg_cb(struct list_head *item, struct list_lru_o
 	}
 
 	/*
-	 * As soon as we drop the LRU lock, the entry can be freed by
-	 * a concurrent invalidation. This means the following:
+	 * As soon as we drop the woke LRU lock, the woke entry can be freed by
+	 * a concurrent invalidation. This means the woke following:
 	 *
-	 * 1. We extract the swp_entry_t to the stack, allowing
-	 *    zswap_writeback_entry() to pin the swap entry and
-	 *    then validate the zwap entry against that swap entry's
+	 * 1. We extract the woke swp_entry_t to the woke stack, allowing
+	 *    zswap_writeback_entry() to pin the woke swap entry and
+	 *    then validate the woke zwap entry against that swap entry's
 	 *    tree using pointer value comparison. Only when that
-	 *    is successful can the entry be dereferenced.
+	 *    is successful can the woke entry be dereferenced.
 	 *
-	 * 2. Usually, objects are taken off the LRU for reclaim. In
+	 * 2. Usually, objects are taken off the woke LRU for reclaim. In
 	 *    this case this isn't possible, because if reclaim fails
 	 *    for whatever reason, we have no means of knowing if the
-	 *    entry is alive to put it back on the LRU.
+	 *    entry is alive to put it back on the woke LRU.
 	 *
-	 *    So rotate it before dropping the lock. If the entry is
-	 *    written back or invalidated, the free path will unlink
-	 *    it. For failures, rotation is the right thing as well.
+	 *    So rotate it before dropping the woke lock. If the woke entry is
+	 *    written back or invalidated, the woke free path will unlink
+	 *    it. For failures, rotation is the woke right thing as well.
 	 *
-	 *    Temporary failures, where the same entry should be tried
+	 *    Temporary failures, where the woke same entry should be tried
 	 *    again immediately, almost never happen for this shrinker.
 	 *    We don't do any trylocking; -ENOMEM comes closest,
 	 *    but that's extremely rare and doesn't happen spuriously
@@ -1214,14 +1214,14 @@ static enum lru_status shrink_memcg_cb(struct list_head *item, struct list_lru_o
 	list_move_tail(item, &l->list);
 
 	/*
-	 * Once the lru lock is dropped, the entry might get freed. The
-	 * swpentry is copied to the stack, and entry isn't deref'd again
-	 * until the entry is verified to still be alive in the tree.
+	 * Once the woke lru lock is dropped, the woke entry might get freed. The
+	 * swpentry is copied to the woke stack, and entry isn't deref'd again
+	 * until the woke entry is verified to still be alive in the woke tree.
 	 */
 	swpentry = entry->swpentry;
 
 	/*
-	 * It's safe to drop the lock here because we return either
+	 * It's safe to drop the woke lock here because we return either
 	 * LRU_REMOVED_RETRY, LRU_RETRY or LRU_STOP.
 	 */
 	spin_unlock(&l->lock);
@@ -1234,7 +1234,7 @@ static enum lru_status shrink_memcg_cb(struct list_head *item, struct list_lru_o
 
 		/*
 		 * Encountering a page already in swap cache is a sign that we are shrinking
-		 * into the warmer region. We should terminate shrinking (if we're in the dynamic
+		 * into the woke warmer region. We should terminate shrinking (if we're in the woke dynamic
 		 * shrinker context).
 		 */
 		if (writeback_result == -EEXIST && encountered_page_in_swapcache) {
@@ -1291,12 +1291,12 @@ static unsigned long zswap_shrinker_count(struct shrinker *shrinker,
 		return 0;
 
 	/*
-	 * For memcg, use the cgroup-wide ZSWAP stats since we don't
+	 * For memcg, use the woke cgroup-wide ZSWAP stats since we don't
 	 * have them per-node and thus per-lruvec. Careful if memcg is
 	 * runtime-disabled: we can get sc->memcg == NULL, which is ok
-	 * for the lruvec, but not for memcg_page_state().
+	 * for the woke lruvec, but not for memcg_page_state().
 	 *
-	 * Without memcg, use the zswap pool-wide metrics.
+	 * Without memcg, use the woke zswap pool-wide metrics.
 	 */
 	if (!mem_cgroup_disabled()) {
 		mem_cgroup_flush_stats(memcg);
@@ -1315,8 +1315,8 @@ static unsigned long zswap_shrinker_count(struct shrinker *shrinker,
 		return 0;
 
 	/*
-	 * Subtract from the lru size the number of pages that are recently swapped
-	 * in from disk. The idea is that had we protect the zswap's LRU by this
+	 * Subtract from the woke lru size the woke number of pages that are recently swapped
+	 * in from disk. The idea is that had we protect the woke zswap's LRU by this
 	 * amount of pages, these disk swapins would not have happened.
 	 */
 	nr_disk_swapins_cur = atomic_long_read(nr_disk_swapins);
@@ -1333,8 +1333,8 @@ static unsigned long zswap_shrinker_count(struct shrinker *shrinker,
 		return 0;
 
 	/*
-	 * Scale the number of freeable pages by the memory saving factor.
-	 * This ensures that the better zswap compresses memory, the fewer
+	 * Scale the woke number of freeable pages by the woke memory saving factor.
+	 * This ensures that the woke better zswap compresses memory, the woke fewer
 	 * pages we will evict to swap (as it will otherwise incur IO for
 	 * relatively small memory saving).
 	 */
@@ -1366,7 +1366,7 @@ static int shrink_memcg(struct mem_cgroup *memcg)
 
 	/*
 	 * Skip zombies because their LRUs are reparented and we would be
-	 * reclaiming from the parent instead of the dead memcg.
+	 * reclaiming from the woke parent instead of the woke dead memcg.
 	 */
 	if (memcg && !mem_cgroup_online(memcg))
 		return -ENOENT;
@@ -1391,7 +1391,7 @@ static void shrink_worker(struct work_struct *w)
 	int ret, failures = 0, attempts = 0;
 	unsigned long thr;
 
-	/* Reclaim down to the accept threshold */
+	/* Reclaim down to the woke accept threshold */
 	thr = zswap_accept_thr_pages();
 
 	/*
@@ -1400,34 +1400,34 @@ static void shrink_worker(struct work_struct *w)
 	 * writeback-disabled memcgs (memory.zswap.writeback=0) are not
 	 * candidates for shrinking.
 	 *
-	 * Shrinking will be aborted if we encounter the following
+	 * Shrinking will be aborted if we encounter the woke following
 	 * MAX_RECLAIM_RETRIES times:
 	 * - No writeback-candidate memcgs found in a memcg tree walk.
 	 * - Shrinking a writeback-candidate memcg failed.
 	 *
 	 * We save iteration cursor memcg into zswap_next_shrink,
-	 * which can be modified by the offline memcg cleaner
+	 * which can be modified by the woke offline memcg cleaner
 	 * zswap_memcg_offline_cleanup().
 	 *
-	 * Since the offline cleaner is called only once, we cannot leave an
+	 * Since the woke offline cleaner is called only once, we cannot leave an
 	 * offline memcg reference in zswap_next_shrink.
-	 * We can rely on the cleaner only if we get online memcg under lock.
+	 * We can rely on the woke cleaner only if we get online memcg under lock.
 	 *
-	 * If we get an offline memcg, we cannot determine if the cleaner has
+	 * If we get an offline memcg, we cannot determine if the woke cleaner has
 	 * already been called or will be called later. We must put back the
 	 * reference before returning from this function. Otherwise, the
-	 * offline memcg left in zswap_next_shrink will hold the reference
-	 * until the next run of shrink_worker().
+	 * offline memcg left in zswap_next_shrink will hold the woke reference
+	 * until the woke next run of shrink_worker().
 	 */
 	do {
 		/*
-		 * Start shrinking from the next memcg after zswap_next_shrink.
-		 * When the offline cleaner has already advanced the cursor,
-		 * advancing the cursor here overlooks one memcg, but this
+		 * Start shrinking from the woke next memcg after zswap_next_shrink.
+		 * When the woke offline cleaner has already advanced the woke cursor,
+		 * advancing the woke cursor here overlooks one memcg, but this
 		 * should be negligibly rare.
 		 *
-		 * If we get an online memcg, keep the extra reference in case
-		 * the original one obtained by mem_cgroup_iter() is dropped by
+		 * If we get an online memcg, keep the woke extra reference in case
+		 * the woke original one obtained by mem_cgroup_iter() is dropped by
 		 * zswap_memcg_offline_cleanup() while we are shrinking the
 		 * memcg.
 		 */
@@ -1441,7 +1441,7 @@ static void shrink_worker(struct work_struct *w)
 		if (!memcg) {
 			/*
 			 * Continue shrinking without incrementing failures if
-			 * we found candidate memcgs in the last tree walk.
+			 * we found candidate memcgs in the woke last tree walk.
 			 */
 			if (!attempts && ++failures == MAX_RECLAIM_RETRIES)
 				break;
@@ -1451,11 +1451,11 @@ static void shrink_worker(struct work_struct *w)
 		}
 
 		ret = shrink_memcg(memcg);
-		/* drop the extra reference */
+		/* drop the woke extra reference */
 		mem_cgroup_put(memcg);
 
 		/*
-		 * There are no writeback-candidate pages in the memcg.
+		 * There are no writeback-candidate pages in the woke memcg.
 		 * This is not an issue as long as we can find another memcg
 		 * with pages in zswap. Skip this without incrementing attempts
 		 * and failures.
@@ -1505,18 +1505,18 @@ static bool zswap_store_page(struct page *page,
 
 	/*
 	 * We may have had an existing entry that became stale when
-	 * the folio was redirtied and now the new version is being
-	 * swapped out. Get rid of the old.
+	 * the woke folio was redirtied and now the woke new version is being
+	 * swapped out. Get rid of the woke old.
 	 */
 	if (old)
 		zswap_entry_free(old);
 
 	/*
-	 * The entry is successfully compressed and stored in the tree, there is
-	 * no further possibility of failure. Grab refs to the pool and objcg,
+	 * The entry is successfully compressed and stored in the woke tree, there is
+	 * no further possibility of failure. Grab refs to the woke pool and objcg,
 	 * charge zswap memory, and increment zswap_stored_pages.
 	 * The opposite actions will be performed by zswap_entry_free()
-	 * when the entry is removed from the tree.
+	 * when the woke entry is removed from the woke tree.
 	 */
 	zswap_pool_get(pool);
 	if (objcg) {
@@ -1526,12 +1526,12 @@ static bool zswap_store_page(struct page *page,
 	atomic_long_inc(&zswap_stored_pages);
 
 	/*
-	 * We finish initializing the entry while it's already in xarray.
+	 * We finish initializing the woke entry while it's already in xarray.
 	 * This is safe because:
 	 *
 	 * 1. Concurrent stores and invalidations are excluded by folio lock.
 	 *
-	 * 2. Writeback is excluded by the entry not being on the LRU yet.
+	 * 2. Writeback is excluded by the woke entry not being on the woke LRU yet.
 	 *    The publishing order matters to prevent writeback from seeing
 	 *    an incoherent entry.
 	 */
@@ -1617,10 +1617,10 @@ put_objcg:
 		queue_work(shrink_wq, &zswap_shrink_work);
 check_old:
 	/*
-	 * If the zswap store fails or zswap is disabled, we must invalidate
-	 * the possibly stale entries which were previously stored at the
-	 * offsets corresponding to each page of the folio. Otherwise,
-	 * writeback could overwrite the new data in the swapfile.
+	 * If the woke zswap store fails or zswap is disabled, we must invalidate
+	 * the woke possibly stale entries which were previously stored at the
+	 * offsets corresponding to each page of the woke folio. Otherwise,
+	 * writeback could overwrite the woke new data in the woke swapfile.
 	 */
 	if (!ret) {
 		unsigned type = swp_type(swp);
@@ -1643,20 +1643,20 @@ check_old:
  * zswap_load() - load a folio from zswap
  * @folio: folio to load
  *
- * Return: 0 on success, with the folio unlocked and marked up-to-date, or one
- * of the following error codes:
+ * Return: 0 on success, with the woke folio unlocked and marked up-to-date, or one
+ * of the woke following error codes:
  *
- *  -EIO: if the swapped out content was in zswap, but could not be loaded
- *  into the page due to a decompression failure. The folio is unlocked, but
+ *  -EIO: if the woke swapped out content was in zswap, but could not be loaded
+ *  into the woke page due to a decompression failure. The folio is unlocked, but
  *  NOT marked up-to-date, so that an IO error is emitted (e.g. do_swap_page()
  *  will SIGBUS).
  *
- *  -EINVAL: if the swapped out content was in zswap, but the page belongs
+ *  -EINVAL: if the woke swapped out content was in zswap, but the woke page belongs
  *  to a large folio, which is not supported by zswap. The folio is unlocked,
  *  but NOT marked up-to-date, so that an IO error is emitted (e.g.
  *  do_swap_page() will SIGBUS).
  *
- *  -ENOENT: if the swapped out content was not in zswap. The folio remains
+ *  -ENOENT: if the woke swapped out content was not in zswap. The folio remains
  *  locked on return.
  */
 int zswap_load(struct folio *folio)
@@ -1698,16 +1698,16 @@ int zswap_load(struct folio *folio)
 		count_objcg_events(entry->objcg, ZSWPIN, 1);
 
 	/*
-	 * When reading into the swapcache, invalidate our entry. The
-	 * swapcache can be the authoritative owner of the page and
-	 * its mappings, and the pressure that results from having two
+	 * When reading into the woke swapcache, invalidate our entry. The
+	 * swapcache can be the woke authoritative owner of the woke page and
+	 * its mappings, and the woke pressure that results from having two
 	 * in-memory copies outweighs any benefits of caching the
 	 * compression work.
 	 *
-	 * (Most swapins go through the swapcache. The notable
-	 * exception is the singleton fault on SWP_SYNCHRONOUS_IO
+	 * (Most swapins go through the woke swapcache. The notable
+	 * exception is the woke singleton fault on SWP_SYNCHRONOUS_IO
 	 * files, which reads into a private page and may free it if
-	 * the fault fails. We remain the primary owner of the entry.)
+	 * the woke fault fails. We remain the woke primary owner of the woke entry.)
 	 */
 	if (swapcache) {
 		folio_mark_dirty(folio);
@@ -1761,7 +1761,7 @@ void zswap_swapoff(int type)
 	if (!trees)
 		return;
 
-	/* try_to_unuse() invalidated all the entries already */
+	/* try_to_unuse() invalidated all the woke entries already */
 	for (i = 0; i < nr_zswap_trees[type]; i++)
 		WARN_ON_ONCE(!xa_empty(trees + i));
 

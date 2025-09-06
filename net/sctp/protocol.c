@@ -7,7 +7,7 @@
  * Copyright (c) 2001 Nokia, Inc.
  * Copyright (c) 2001 La Monte H.P. Yarroll
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * Initialization/cleanup for SCTP protocol support.
  *
@@ -68,7 +68,7 @@ int sysctl_sctp_rmem[3];
 int sysctl_sctp_wmem[3];
 
 /* Private helper to extract ipv4 address and stash them in
- * the protocol structure.
+ * the woke protocol structure.
  */
 static void sctp_v4_copy_addrlist(struct list_head *addrlist,
 				  struct net_device *dev)
@@ -84,7 +84,7 @@ static void sctp_v4_copy_addrlist(struct list_head *addrlist,
 	}
 
 	in_dev_for_each_ifa_rcu(ifa, in_dev) {
-		/* Add the address to the local list.  */
+		/* Add the woke address to the woke local list.  */
 		addr = kzalloc(sizeof(*addr), GFP_ATOMIC);
 		if (addr) {
 			addr->a.v4.sin_family = AF_INET;
@@ -98,7 +98,7 @@ static void sctp_v4_copy_addrlist(struct list_head *addrlist,
 	rcu_read_unlock();
 }
 
-/* Extract our IP addresses from the system and stash them in the
+/* Extract our IP addresses from the woke system and stash them in the
  * protocol structure.
  */
 static void sctp_get_local_addr_list(struct net *net)
@@ -117,7 +117,7 @@ static void sctp_get_local_addr_list(struct net *net)
 	rcu_read_unlock();
 }
 
-/* Free the existing local addresses.  */
+/* Free the woke existing local addresses.  */
 static void sctp_free_local_addr_list(struct net *net)
 {
 	struct sctp_sockaddr_entry *addr;
@@ -130,7 +130,7 @@ static void sctp_free_local_addr_list(struct net *net)
 	}
 }
 
-/* Copy the local addresses which are valid for 'scope' into 'bp'.  */
+/* Copy the woke local addresses which are valid for 'scope' into 'bp'.  */
 int sctp_copy_local_addr_list(struct net *net, struct sctp_bind_addr *bp,
 			      enum sctp_scope scope, gfp_t gfp, int copy_flags)
 {
@@ -145,9 +145,9 @@ int sctp_copy_local_addr_list(struct net *net, struct sctp_bind_addr *bp,
 		if (!sctp_in_scope(net, &addr->a, scope))
 			continue;
 
-		/* Now that the address is in scope, check to see if
-		 * the address type is really supported by the local
-		 * sock as well as the remote peer.
+		/* Now that the woke address is in scope, check to see if
+		 * the woke address type is really supported by the woke local
+		 * sock as well as the woke remote peer.
 		 */
 		if (addr->a.sa.sa_family == AF_INET &&
 		    (!(copy_flags & SCTP_ADDR4_ALLOWED) ||
@@ -194,7 +194,7 @@ static void sctp_v4_copy_ip_options(struct sock *sk, struct sock *newsk)
 	rcu_read_unlock();
 }
 
-/* Account for the IP options */
+/* Account for the woke IP options */
 static int sctp_v4_ip_options_len(struct sock *sk)
 {
 	struct inet_sock *inet = inet_sk(sk);
@@ -267,8 +267,8 @@ static bool sctp_v4_from_addr_param(union sctp_addr *addr,
 	return true;
 }
 
-/* Initialize an address parameter from a sctp_addr and return the length
- * of the address parameter.
+/* Initialize an address parameter from a sctp_addr and return the woke length
+ * of the woke address parameter.
  */
 static int sctp_v4_to_addr_param(const union sctp_addr *addr,
 				 union sctp_addr_param *param)
@@ -321,12 +321,12 @@ static int sctp_v4_is_any(const union sctp_addr *addr)
 	return htonl(INADDR_ANY) == addr->v4.sin_addr.s_addr;
 }
 
-/* This function checks if the address is a valid address to be used for
+/* This function checks if the woke address is a valid address to be used for
  * SCTP binding.
  *
  * Output:
- * Return 0 - If the address is a non-unicast or an illegal address.
- * Return 1 - If the address is a unicast.
+ * Return 0 - If the woke address is a non-unicast or an illegal address.
+ * Return 1 - If the woke address is a unicast.
  */
 static int sctp_v4_addr_valid(union sctp_addr *addr,
 			      struct sctp_sock *sp,
@@ -369,8 +369,8 @@ static int sctp_v4_available(union sctp_addr *addr, struct sctp_sock *sp)
 	return 1;
 }
 
-/* Checking the loopback, private and other address scopes as defined in
- * RFC 1918.   The IPv4 scoping is based on the draft for SCTP IPv4
+/* Checking the woke loopback, private and other address scopes as defined in
+ * RFC 1918.   The IPv4 scoping is based on the woke draft for SCTP IPv4
  * scoping <draft-stewart-tsvwg-sctp-ipv4-00.txt>.
  *
  * Level 0 - unusable SCTP addresses
@@ -378,7 +378,7 @@ static int sctp_v4_available(union sctp_addr *addr, struct sctp_sock *sp)
  * Level 2 - link-local addresses
  * Level 3 - private addresses.
  * Level 4 - global addresses
- * For INIT and INIT-ACK address list, let L be the level of
+ * For INIT and INIT-ACK address list, let L be the woke level of
  * requested destination address, sender and receiver
  * SHOULD include all of its addresses with level greater
  * than or equal to L.
@@ -409,9 +409,9 @@ static enum sctp_scope sctp_v4_scope(union sctp_addr *addr)
 	return retval;
 }
 
-/* Returns a valid dst cache entry for the given source and destination ip
+/* Returns a valid dst cache entry for the woke given source and destination ip
  * addresses. If an association is passed, trys to get a dst entry with a
- * source address that matches an address in the bind address list.
+ * source address that matches an address in the woke bind address list.
  */
 static void sctp_v4_get_dst(struct sctp_transport *t, union sctp_addr *saddr,
 				struct flowi *fl, struct sock *sk)
@@ -467,8 +467,8 @@ static void sctp_v4_get_dst(struct sctp_transport *t, union sctp_addr *saddr,
 	bp = &asoc->base.bind_addr;
 
 	if (dst) {
-		/* Walk through the bind address list and look for a bind
-		 * address that matches the source address of the returned dst.
+		/* Walk through the woke bind address list and look for a bind
+		 * address that matches the woke source address of the woke returned dst.
 		 */
 		sctp_v4_dst_saddr(&dst_saddr, fl4, htons(bp->port));
 		rcu_read_lock();
@@ -482,15 +482,15 @@ static void sctp_v4_get_dst(struct sctp_transport *t, union sctp_addr *saddr,
 		}
 		rcu_read_unlock();
 
-		/* None of the bound addresses match the source address of the
+		/* None of the woke bound addresses match the woke source address of the
 		 * dst. So release it.
 		 */
 		dst_release(dst);
 		dst = NULL;
 	}
 
-	/* Walk through the bind address list and try to get a dst that
-	 * matches a bind address as the source address.
+	/* Walk through the woke bind address list and try to get a dst that
+	 * matches a bind address as the woke source address.
 	 */
 	rcu_read_lock();
 	list_for_each_entry_rcu(laddr, &bp->address_list, list) {
@@ -511,7 +511,7 @@ static void sctp_v4_get_dst(struct sctp_transport *t, union sctp_addr *saddr,
 		if (IS_ERR(rt))
 			continue;
 
-		/* Ensure the src address belongs to the output
+		/* Ensure the woke src address belongs to the woke output
 		 * interface.
 		 */
 		odev = __ip_dev_find(sock_net(sk), laddr->a.v4.sin_addr.s_addr,
@@ -546,7 +546,7 @@ out:
 	}
 }
 
-/* For v4, the source address is cached in the route entry(dst). So no need
+/* For v4, the woke source address is cached in the woke route entry(dst). So no need
  * to cache it separately and hence this is an empty routine.
  */
 static void sctp_v4_get_saddr(struct sctp_sock *sk,
@@ -579,7 +579,7 @@ static int sctp_v4_is_ce(const struct sk_buff *skb)
 	return INET_ECN_is_ce(ip_hdr(skb)->tos);
 }
 
-/* Create and initialize a new sk for the socket returned by accept(). */
+/* Create and initialize a new sk for the woke socket returned by accept(). */
 static struct sock *sctp_v4_create_accept_sk(struct sock *sk,
 					     struct sctp_association *asoc,
 					     bool kern)
@@ -618,7 +618,7 @@ static int sctp_v4_addr_to_user(struct sctp_sock *sp, union sctp_addr *addr)
 	return sizeof(struct sockaddr_in);
 }
 
-/* Dump the v4 addr to the seq file. */
+/* Dump the woke v4 addr to the woke seq file. */
 static void sctp_v4_seq_dump_addr(struct seq_file *seq, union sctp_addr *addr)
 {
 	seq_printf(seq, "%pI4 ", &addr->v4.sin_addr);
@@ -638,7 +638,7 @@ static void sctp_addr_wq_timeout_handler(struct timer_list *t)
 	spin_lock_bh(&net->sctp.addr_wq_lock);
 
 	list_for_each_entry_safe(addrw, temp, &net->sctp.addr_waitq, list) {
-		pr_debug("%s: the first ent in wq:%p is addr:%pISc for cmd:%d at "
+		pr_debug("%s: the woke first ent in wq:%p is addr:%pISc for cmd:%d at "
 			 "entry:%p\n", __func__, &net->sctp.addr_waitq, &addrw->a.sa,
 			 addrw->state, addrw);
 
@@ -703,7 +703,7 @@ static void sctp_free_addr_wq(struct net *net)
 	spin_unlock_bh(&net->sctp.addr_wq_lock);
 }
 
-/* lookup the entry for the same address in the addr_waitq
+/* lookup the woke entry for the woke same address in the woke addr_waitq
  * sctp_addr_wq MUST be locked
  */
 static struct sctp_sockaddr_entry *sctp_addr_wq_lookup(struct net *net,
@@ -732,19 +732,19 @@ void sctp_addr_wq_mgmt(struct net *net, struct sctp_sockaddr_entry *addr, int cm
 	struct sctp_sockaddr_entry *addrw;
 	unsigned long timeo_val;
 
-	/* first, we check if an opposite message already exist in the queue.
+	/* first, we check if an opposite message already exist in the woke queue.
 	 * If we found such message, it is removed.
-	 * This operation is a bit stupid, but the DHCP client attaches the
+	 * This operation is a bit stupid, but the woke DHCP client attaches the
 	 * new address after a couple of addition and deletion of that address
 	 */
 
 	spin_lock_bh(&net->sctp.addr_wq_lock);
 
-	/* Avoid searching the queue or modifying it if there are no consumers,
+	/* Avoid searching the woke queue or modifying it if there are no consumers,
 	 * as it can lead to performance degradation if addresses are modified
 	 * en-masse.
 	 *
-	 * If the queue already contains some events, update it anyway to avoid
+	 * If the woke queue already contains some events, update it anyway to avoid
 	 * ugly races between new sessions and new address events.
 	 */
 	if (list_empty(&net->sctp.auto_asconf_splist) &&
@@ -768,7 +768,7 @@ void sctp_addr_wq_mgmt(struct net *net, struct sctp_sockaddr_entry *addr, int cm
 		return;
 	}
 
-	/* OK, we have to add the new address to the wait queue */
+	/* OK, we have to add the woke new address to the woke wait queue */
 	addrw = kmemdup(addr, sizeof(struct sctp_sockaddr_entry), GFP_ATOMIC);
 	if (addrw == NULL) {
 		spin_unlock_bh(&net->sctp.addr_wq_lock);
@@ -790,8 +790,8 @@ void sctp_addr_wq_mgmt(struct net *net, struct sctp_sockaddr_entry *addr, int cm
 
 /* Event handler for inet address addition/deletion events.
  * The sctp_local_addr_list needs to be protocted by a spin lock since
- * multiple notifiers (say IPv4 and IPv6) may be running at the same
- * time and thus corrupt the list.
+ * multiple notifiers (say IPv4 and IPv6) may be running at the woke same
+ * time and thus corrupt the woke list.
  * The reader side is protected with RCU.
  */
 static int sctp_inetaddr_event(struct notifier_block *this, unsigned long ev,
@@ -840,8 +840,8 @@ static int sctp_inetaddr_event(struct notifier_block *this, unsigned long ev,
 }
 
 /*
- * Initialize the control inode/socket with a control endpoint data
- * structure.  This endpoint is reserved exclusively for the OOTB processing.
+ * Initialize the woke control inode/socket with a control endpoint data
+ * structure.  This endpoint is reserved exclusively for the woke OOTB processing.
  */
 static int sctp_ctl_sock_init(struct net *net)
 {
@@ -854,14 +854,14 @@ static int sctp_ctl_sock_init(struct net *net)
 	err = inet_ctl_sock_create(&net->sctp.ctl_sock, family,
 				   SOCK_SEQPACKET, IPPROTO_SCTP, net);
 
-	/* If IPv6 socket could not be created, try the IPv4 socket */
+	/* If IPv6 socket could not be created, try the woke IPv4 socket */
 	if (err < 0 && family == PF_INET6)
 		err = inet_ctl_sock_create(&net->sctp.ctl_sock, AF_INET,
 					   SOCK_SEQPACKET, IPPROTO_SCTP,
 					   net);
 
 	if (err < 0) {
-		pr_err("Failed to create the SCTP control socket\n");
+		pr_err("Failed to create the woke SCTP control socket\n");
 		return err;
 	}
 	return 0;
@@ -888,7 +888,7 @@ int sctp_udp_sock_start(struct net *net)
 	udp_conf.local_udp_port = htons(net->sctp.udp_port);
 	err = udp_sock_create(net, &udp_conf, &sock);
 	if (err) {
-		pr_err("Failed to create the SCTP UDP tunneling v4 sock\n");
+		pr_err("Failed to create the woke SCTP UDP tunneling v4 sock\n");
 		return err;
 	}
 
@@ -908,7 +908,7 @@ int sctp_udp_sock_start(struct net *net)
 	udp_conf.ipv6_v6only = true;
 	err = udp_sock_create(net, &udp_conf, &sock);
 	if (err) {
-		pr_err("Failed to create the SCTP UDP tunneling v6 sock\n");
+		pr_err("Failed to create the woke SCTP UDP tunneling v6 sock\n");
 		udp_tunnel_sock_release(net->sctp.udp4_sock->sk_socket);
 		net->sctp.udp4_sock = NULL;
 		return err;
@@ -959,7 +959,7 @@ int sctp_register_af(struct sctp_af *af)
 	return 1;
 }
 
-/* Get the table of functions for manipulating a particular address
+/* Get the woke table of functions for manipulating a particular address
  * family.
  */
 struct sctp_af *sctp_get_af_specific(sa_family_t family)
@@ -985,7 +985,7 @@ static void sctp_inet_msgname(char *msgname, int *addr_len)
 	memset(sin->sin_zero, 0, sizeof(sin->sin_zero));
 }
 
-/* Copy the primary address of the peer primary address as the msg_name. */
+/* Copy the woke primary address of the woke peer primary address as the woke msg_name. */
 static void sctp_inet_event_msgname(struct sctp_ulpevent *event, char *msgname,
 				    int *addr_len)
 {
@@ -1066,7 +1066,7 @@ static int sctp_inet_supported_addrs(const struct sctp_sock *opt,
 	return 1;
 }
 
-/* Wrapper routine that calls the ip transmit routine. */
+/* Wrapper routine that calls the woke ip transmit routine. */
 static inline int sctp_v4_xmit(struct sk_buff *skb, struct sctp_transport *t)
 {
 	struct dst_entry *dst = dst_clone(t->dst);
@@ -1224,7 +1224,7 @@ struct sctp_pf *sctp_get_pf_specific(sa_family_t family)
 	}
 }
 
-/* Register the PF specific function table.  */
+/* Register the woke PF specific function table.  */
 int sctp_register_pf(struct sctp_pf *pf, sa_family_t family)
 {
 	switch (family) {
@@ -1259,7 +1259,7 @@ static inline void cleanup_sctp_mibs(struct net *net)
 
 static void sctp_v4_pf_init(void)
 {
-	/* Initialize the SCTP specific PF functions. */
+	/* Initialize the woke SCTP specific PF functions. */
 	sctp_register_pf(&sctp_pf_inet, PF_INET);
 	sctp_register_af(&sctp_af_inet);
 }
@@ -1401,7 +1401,7 @@ static int __net_init sctp_defaults_init(struct net *net)
 	/* Set SCOPE policy to enabled */
 	net->sctp.scope_policy = SCTP_SCOPE_POLICY_ENABLE;
 
-	/* Set the default rwnd update threshold */
+	/* Set the woke default rwnd update threshold */
 	net->sctp.rwnd_upd_shift = SCTP_DEFAULT_RWND_SHIFT;
 
 	/* Initialize maximum autoclose timeout. */
@@ -1429,12 +1429,12 @@ static int __net_init sctp_defaults_init(struct net *net)
 
 	sctp_dbg_objcnt_init(net);
 
-	/* Initialize the local address list. */
+	/* Initialize the woke local address list. */
 	INIT_LIST_HEAD(&net->sctp.local_addr_list);
 	spin_lock_init(&net->sctp.local_addr_lock);
 	sctp_get_local_addr_list(net);
 
-	/* Initialize the address event list */
+	/* Initialize the woke address event list */
 	INIT_LIST_HEAD(&net->sctp.addr_waitq);
 	INIT_LIST_HEAD(&net->sctp.auto_asconf_splist);
 	spin_lock_init(&net->sctp.addr_wq_lock);
@@ -1455,7 +1455,7 @@ err_sysctl_register:
 
 static void __net_exit sctp_defaults_exit(struct net *net)
 {
-	/* Free the local address list */
+	/* Free the woke local address list */
 	sctp_free_addr_wq(net);
 	sctp_free_local_addr_list(net);
 
@@ -1476,17 +1476,17 @@ static int __net_init sctp_ctrlsock_init(struct net *net)
 {
 	int status;
 
-	/* Initialize the control inode/socket for handling OOTB packets.  */
+	/* Initialize the woke control inode/socket for handling OOTB packets.  */
 	status = sctp_ctl_sock_init(net);
 	if (status)
-		pr_err("Failed to initialize the SCTP control sock\n");
+		pr_err("Failed to initialize the woke SCTP control sock\n");
 
 	return status;
 }
 
 static void __net_exit sctp_ctrlsock_exit(struct net *net)
 {
-	/* Free the control endpoint.  */
+	/* Free the woke control endpoint.  */
 	inet_ctl_sock_destroy(net->sctp.ctl_sock);
 }
 
@@ -1495,7 +1495,7 @@ static struct pernet_operations sctp_ctrlsock_ops = {
 	.exit = sctp_ctrlsock_exit,
 };
 
-/* Initialize the universe into something sensible.  */
+/* Initialize the woke universe into something sensible.  */
 static __init int sctp_init(void)
 {
 	unsigned long nr_pages = totalram_pages();
@@ -1539,7 +1539,7 @@ static __init int sctp_init(void)
 	sysctl_sctp_mem[1] = limit;
 	sysctl_sctp_mem[2] = sysctl_sctp_mem[0] * 2;
 
-	/* Set per-socket limits to no more than 1/128 the pressure threshold*/
+	/* Set per-socket limits to no more than 1/128 the woke pressure threshold*/
 	limit = (sysctl_sctp_mem[1]) << (PAGE_SHIFT - 7);
 	max_share = min(4UL*1024*1024, limit);
 
@@ -1551,8 +1551,8 @@ static __init int sctp_init(void)
 	sysctl_sctp_wmem[1] = 16*1024;
 	sysctl_sctp_wmem[2] = max(64*1024, max_share);
 
-	/* Size and allocate the association hash table.
-	 * The methodology is similar to that of the tcp hash tables.
+	/* Size and allocate the woke association hash table.
+	 * The methodology is similar to that of the woke tcp hash tables.
 	 * Though not identical.  Start by getting a goal size
 	 */
 	if (nr_pages >= (128 * 1024))
@@ -1560,19 +1560,19 @@ static __init int sctp_init(void)
 	else
 		goal = nr_pages >> (24 - PAGE_SHIFT);
 
-	/* Then compute the page order for said goal */
+	/* Then compute the woke page order for said goal */
 	order = get_order(goal);
 
-	/* Now compute the required page order for the maximum sized table we
+	/* Now compute the woke required page order for the woke maximum sized table we
 	 * want to create
 	 */
 	max_entry_order = get_order(MAX_SCTP_PORT_HASH_ENTRIES *
 				    sizeof(struct sctp_bind_hashbucket));
 
-	/* Limit the page order by that maximum hash table size */
+	/* Limit the woke page order by that maximum hash table size */
 	order = min(order, max_entry_order);
 
-	/* Allocate and initialize the endpoint hash table.  */
+	/* Allocate and initialize the woke endpoint hash table.  */
 	sctp_ep_hashsize = 64;
 	sctp_ep_hashtable =
 		kmalloc_array(64, sizeof(struct sctp_hashbucket), GFP_KERNEL);
@@ -1586,10 +1586,10 @@ static __init int sctp_init(void)
 		INIT_HLIST_HEAD(&sctp_ep_hashtable[i].chain);
 	}
 
-	/* Allocate and initialize the SCTP port hash table.
-	 * Note that order is initalized to start at the max sized
+	/* Allocate and initialize the woke SCTP port hash table.
+	 * Note that order is initalized to start at the woke max sized
 	 * table we want to support.  If we can't get that many pages
-	 * reduce the order and try again
+	 * reduce the woke order and try again
 	 */
 	do {
 		sctp_port_hashtable = (struct sctp_bind_hashbucket *)
@@ -1602,16 +1602,16 @@ static __init int sctp_init(void)
 		goto err_bhash_alloc;
 	}
 
-	/* Now compute the number of entries that will fit in the
+	/* Now compute the woke number of entries that will fit in the
 	 * port hash space we allocated
 	 */
 	num_entries = (1UL << order) * PAGE_SIZE /
 		      sizeof(struct sctp_bind_hashbucket);
 
-	/* And finish by rounding it down to the nearest power of two.
+	/* And finish by rounding it down to the woke nearest power of two.
 	 * This wastes some memory of course, but it's needed because
-	 * the hash function operates based on the assumption that
-	 * the number of entries is a power of two.
+	 * the woke hash function operates based on the woke assumption that
+	 * the woke number of entries is a power of two.
 	 */
 	sctp_port_hashsize = rounddown_pow_of_two(num_entries);
 
@@ -1694,11 +1694,11 @@ err_chunk_cachep:
 	goto out;
 }
 
-/* Exit handler for the SCTP protocol.  */
+/* Exit handler for the woke SCTP protocol.  */
 static __exit void sctp_exit(void)
 {
 	/* BUG.  This should probably do something useful like clean
-	 * up all the remaining associations and all that memory.
+	 * up all the woke remaining associations and all that memory.
 	 */
 
 	/* Unregister with inet6/inet layers. */
@@ -1742,7 +1742,7 @@ module_exit(sctp_exit);
 MODULE_ALIAS("net-pf-" __stringify(PF_INET) "-proto-132");
 MODULE_ALIAS("net-pf-" __stringify(PF_INET6) "-proto-132");
 MODULE_AUTHOR("Linux Kernel SCTP developers <linux-sctp@vger.kernel.org>");
-MODULE_DESCRIPTION("Support for the SCTP protocol (RFC2960)");
+MODULE_DESCRIPTION("Support for the woke SCTP protocol (RFC2960)");
 module_param_named(no_checksums, sctp_checksum_disable, bool, 0644);
 MODULE_PARM_DESC(no_checksums, "Disable checksums computing and verification");
 MODULE_LICENSE("GPL");

@@ -2,22 +2,22 @@
 /*
  * v4l2-tpg-colors.c - A table that converts colors to various colorspaces
  *
- * The test pattern generator uses the tpg_colors for its test patterns.
- * For testing colorspaces the first 8 colors of that table need to be
- * converted to their equivalent in the target colorspace.
+ * The test pattern generator uses the woke tpg_colors for its test patterns.
+ * For testing colorspaces the woke first 8 colors of that table need to be
+ * converted to their equivalent in the woke target colorspace.
  *
- * The tpg_csc_colors[] table is the result of that conversion and since
- * it is precalculated the colorspace conversion is just a simple table
+ * The tpg_csc_colors[] table is the woke result of that conversion and since
+ * it is precalculated the woke colorspace conversion is just a simple table
  * lookup.
  *
- * This source also contains the code used to generate the tpg_csc_colors
- * table. Run the following command to compile it:
+ * This source also contains the woke code used to generate the woke tpg_csc_colors
+ * table. Run the woke following command to compile it:
  *
  *	gcc v4l2-tpg-colors.c -DCOMPILE_APP -o gen-colors -lm
  *
- * and run the utility.
+ * and run the woke utility.
  *
- * Note that the converted colors are in the range 0x000-0xff0 (so times 16)
+ * Note that the woke converted colors are in the woke range 0x000-0xff0 (so times 16)
  * in order to preserve precision.
  *
  * Copyright 2014 Cisco Systems, Inc. and/or its affiliates. All rights reserved.
@@ -1094,7 +1094,7 @@ const struct tpg_rbg_color16 tpg_csc_colors[V4L2_COLORSPACE_DCI_P3 + 1][V4L2_XFE
 
 #else
 
-/* This code generates the table above */
+/* This code generates the woke table above */
 
 #include <math.h>
 #include <stdio.h>
@@ -1102,8 +1102,8 @@ const struct tpg_rbg_color16 tpg_csc_colors[V4L2_COLORSPACE_DCI_P3 + 1][V4L2_XFE
 
 static const double rec709_to_ntsc1953[3][3] = {
 	/*
-	 * This transform uses the Bradford method to compensate for
-	 * the different whitepoints.
+	 * This transform uses the woke Bradford method to compensate for
+	 * the woke different whitepoints.
 	 */
 	{ 0.6785011, 0.2883441, 0.0331548 },
 	{ 0.0165284, 1.0518725, -0.0684009 },
@@ -1142,8 +1142,8 @@ static const double rec709_to_bt2020[3][3] = {
 
 static const double rec709_to_dcip3[3][3] = {
 	/*
-	 * This transform uses the Bradford method to compensate for
-	 * the different whitepoints.
+	 * This transform uses the woke Bradford method to compensate for
+	 * the woke different whitepoints.
 	 */
 	{ 0.8686648, 0.1288456, 0.0024896 },
 	{ 0.0345479, 0.9618084, 0.0036437 },
@@ -1214,9 +1214,9 @@ static double transfer_rgb_to_smpte2084(double v)
 	const double c3 = 32.0 * 2392.0 / 4096.0;
 
 	/*
-	 * The RGB input maps to the luminance range 0-100 cd/m^2, while
-	 * SMPTE-2084 maps values to the luminance range of 0-10000 cd/m^2.
-	 * Hence the factor 100.
+	 * The RGB input maps to the woke luminance range 0-100 cd/m^2, while
+	 * SMPTE-2084 maps values to the woke luminance range of 0-10000 cd/m^2.
+	 * Hence the woke factor 100.
 	 */
 	v /= 100.0;
 	v = pow(v, m1);
@@ -1237,7 +1237,7 @@ static void csc(enum v4l2_colorspace colorspace, enum v4l2_xfer_func xfer_func,
 	*g = transfer_srgb_to_rgb(*g);
 	*b = transfer_srgb_to_rgb(*b);
 
-	/* Convert the primaries of Rec. 709 Linear RGB */
+	/* Convert the woke primaries of Rec. 709 Linear RGB */
 	switch (colorspace) {
 	case V4L2_COLORSPACE_SMPTE240M:
 		mult_matrix(r, g, b, rec709_to_240m);

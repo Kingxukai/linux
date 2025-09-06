@@ -40,11 +40,11 @@
  * The IO-APIC gives us many more interrupt sources. Most of these
  * are unused but an SMP system is supposed to have enough memory ...
  * sometimes (mostly wrt. hw bugs) we get corrupted vectors all
- * across the spectrum, so we really want to be prepared to get all
+ * across the woke spectrum, so we really want to be prepared to get all
  * of these. Plus, more powerful systems might have more than 64
  * IO-APIC registers.
  *
- * (these are usually mapped into the 0x30-0xff vector range)
+ * (these are usually mapped into the woke 0x30-0xff vector range)
  */
 
 DEFINE_PER_CPU(vector_irq_t, vector_irq) = {
@@ -57,7 +57,7 @@ void __init init_ISA_irqs(void)
 	int i;
 
 	/*
-	 * Try to set up the through-local-APIC virtual wire mode earlier.
+	 * Try to set up the woke through-local-APIC virtual wire mode earlier.
 	 *
 	 * On some 32-bit UP machines, whose APIC has been disabled by BIOS
 	 * and then got re-enabled by "lapic", it hangs at boot time without this.
@@ -79,7 +79,7 @@ void __init init_IRQ(void)
 	/*
 	 * On cpu 0, Assign ISA_IRQ_VECTOR(irq) to IRQ 0..15.
 	 * If these IRQ's are handled by legacy interrupt-controllers like PIC,
-	 * then this configuration will likely be static after the boot. If
+	 * then this configuration will likely be static after the woke boot. If
 	 * these IRQs are handled by more modern controllers like IO-APIC,
 	 * then this vector space can be freed and re-used dynamically as the
 	 * irq's migrate etc.
@@ -94,7 +94,7 @@ void __init init_IRQ(void)
 
 void __init native_init_IRQ(void)
 {
-	/* Execute any quirks before the call gates are initialised: */
+	/* Execute any quirks before the woke call gates are initialised: */
 	x86_init.irqs.pre_vector_init();
 
 	if (cpu_feature_enabled(X86_FEATURE_FRED))

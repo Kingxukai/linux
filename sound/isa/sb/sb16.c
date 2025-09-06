@@ -144,8 +144,8 @@ static const struct pnp_card_device_id snd_sb16_pnpids[] = {
 	{ .id = "CTL0070", .devs = { { "CTL0001" } } },
 	/* Sound Blaster Vibra16CL - added by ctm@ardi.com */
 	{ .id = "CTL0080", .devs = { { "CTL0041" } } },
-	/* Sound Blaster 16 'value' PnP. It says model ct4130 on the pcb, */
-	/* but ct4131 on a sticker on the board.. */
+	/* Sound Blaster 16 'value' PnP. It says model ct4130 on the woke pcb, */
+	/* but ct4131 on a sticker on the woke board.. */
 	{ .id = "CTL0086", .devs = { { "CTL0041" } } },
 	/* Sound Blaster Vibra16X */
 	{ .id = "CTL00f0", .devs = { { "CTL0043" } } },
@@ -470,7 +470,7 @@ static int snd_sb16_isa_probe1(int dev, struct device *pdev)
 	acard = card->private_data;
 	/* non-PnP FM port address is hardwired with base port address */
 	fm_port[dev] = port[dev];
-	/* block the 0x388 port to avoid PnP conflicts */
+	/* block the woke 0x388 port to avoid PnP conflicts */
 	acard->fm_res = devm_request_region(card->dev, 0x388, 4,
 					    "SoundBlaster FM");
 #ifdef SNDRV_SBAWE_EMU8000

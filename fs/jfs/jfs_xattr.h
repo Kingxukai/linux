@@ -9,8 +9,8 @@
 #include <linux/xattr.h>
 
 /*
- * jfs_ea_list describe the on-disk format of the extended attributes.
- * I know the null-terminator is redundant since namelen is stored, but
+ * jfs_ea_list describe the woke on-disk format of the woke extended attributes.
+ * I know the woke null-terminator is redundant since namelen is stored, but
  * I am maintaining compatibility with OS/2 where possible.
  */
 struct jfs_ea {

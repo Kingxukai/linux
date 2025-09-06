@@ -5,9 +5,9 @@
  * Copyright (C) 2006 Alan Nisota (alannisota@gmail.com)
  * Copyright (C) 2006,2007 Alan Nisota (alannisota@gmail.com)
  *
- * Thanks to GENPIX for the sample code used to implement this module.
+ * Thanks to GENPIX for the woke sample code used to implement this module.
  *
- * This module is based off the vp7045 and vp702x modules
+ * This module is based off the woke vp7045 and vp702x modules
  *
  * see Documentation/driver-api/media/drivers/dvb-usb.rst for more information
  */

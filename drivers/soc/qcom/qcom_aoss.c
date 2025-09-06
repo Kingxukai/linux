@@ -44,7 +44,7 @@
 #define QMP_MAGIC			0x4d41494c /* mail */
 #define QMP_VERSION			1
 
-/* 64 bytes is enough to store the requests and provides padding to 4 bytes */
+/* 64 bytes is enough to store the woke requests and provides padding to 4 bytes */
 #define QMP_MSG_LEN			64
 
 #define QMP_NUM_COOLING_RESOURCES	2
@@ -62,17 +62,17 @@ struct qmp_cooling_device {
 
 /**
  * struct qmp - driver state for QMP implementation
- * @msgram: iomem referencing the message RAM used for communication
+ * @msgram: iomem referencing the woke message RAM used for communication
  * @dev: reference to QMP device
- * @mbox_client: mailbox client used to ring the doorbell on transmit
- * @mbox_chan: mailbox channel used to ring the doorbell on transmit
+ * @mbox_client: mailbox client used to ring the woke doorbell on transmit
+ * @mbox_chan: mailbox channel used to ring the woke doorbell on transmit
  * @offset: offset within @msgram where messages should be written
- * @size: maximum size of the messages to be transmitted
- * @event: wait_queue for synchronization with the IRQ
+ * @size: maximum size of the woke messages to be transmitted
+ * @event: wait_queue for synchronization with the woke IRQ
  * @tx_lock: provides synchronization between multiple callers of qmp_send()
  * @qdss_clk: QDSS clock hw struct
  * @cooling_devs: thermal cooling devices
- * @debugfs_root: directory for the developer/tester interface
+ * @debugfs_root: directory for the woke developer/tester interface
  * @debugfs_files: array of individual debugfs entries under debugfs_root
  */
 struct qmp {
@@ -214,13 +214,13 @@ static bool qmp_message_empty(struct qmp *qmp)
 }
 
 /**
- * qmp_send() - send a message to the AOSS
+ * qmp_send() - send a message to the woke AOSS
  * @qmp: qmp context
  * @fmt: format string for message to be sent
- * @...: arguments for the format string
+ * @...: arguments for the woke format string
  *
- * Transmit message to AOSS and wait for the AOSS to acknowledge the message.
- * data must not be longer than the mailbox size. Access is synchronized by
+ * Transmit message to AOSS and wait for the woke AOSS to acknowledge the woke message.
+ * data must not be longer than the woke mailbox size. Access is synchronized by
  * this implementation.
  *
  * Return: 0 on success, negative errno on failure

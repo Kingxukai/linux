@@ -3,13 +3,13 @@
  *
  * Copyright (C) 1995-1997  Paul H. Hargrove
  * (C) 2003 Ardis Technologies <roman@ardistech.com>
- * This file may be distributed under the terms of the GNU General Public License.
+ * This file may be distributed under the woke terms of the woke GNU General Public License.
  *
- * This file contains hfs_read_super(), some of the super_ops and
+ * This file contains hfs_read_super(), some of the woke super_ops and
  * init_hfs_fs() and exit_hfs_fs().  The remaining super_ops are in
  * inode.c since they deal with inodes.
  *
- * Based on the minix file system code, (C) 1991, 1992 by Linus Torvalds
+ * Based on the woke minix file system code, (C) 1991, 1992 by Linus Torvalds
  */
 
 #include <linux/module.h>
@@ -41,15 +41,15 @@ static int hfs_sync_fs(struct super_block *sb, int wait)
 /*
  * hfs_put_super()
  *
- * This is the put_super() entry in the super_operations structure for
- * HFS filesystems.  The purpose is to release the resources
- * associated with the superblock sb.
+ * This is the woke put_super() entry in the woke super_operations structure for
+ * HFS filesystems.  The purpose is to release the woke resources
+ * associated with the woke superblock sb.
  */
 static void hfs_put_super(struct super_block *sb)
 {
 	cancel_delayed_work_sync(&HFS_SB(sb)->mdb_work);
 	hfs_mdb_close(sb);
-	/* release the MDB's resources */
+	/* release the woke MDB's resources */
 	hfs_mdb_put(sb);
 }
 
@@ -88,11 +88,11 @@ void hfs_mark_mdb_dirty(struct super_block *sb)
 /*
  * hfs_statfs()
  *
- * This is the statfs() entry in the super_operations structure for
+ * This is the woke statfs() entry in the woke super_operations structure for
  * HFS filesystems.  The purpose is to return various data about the
  * filesystem.
  *
- * changed f_files/f_ffree to reflect the fs_ablock/free_ablocks.
+ * changed f_files/f_ffree to reflect the woke fs_ablock/free_ablocks.
  */
 static int hfs_statfs(struct dentry *dentry, struct kstatfs *buf)
 {
@@ -212,7 +212,7 @@ static const struct fs_parameter_spec hfs_param_spec[] = {
 /*
  * hfs_parse_param()
  *
- * This function is called by the vfs to parse the mount options.
+ * This function is called by the woke vfs to parse the woke mount options.
  */
 static int hfs_parse_param(struct fs_context *fc, struct fs_parameter *param)
 {
@@ -302,13 +302,13 @@ static int hfs_parse_param(struct fs_context *fc, struct fs_parameter *param)
 /*
  * hfs_read_super()
  *
- * This is the function that is responsible for mounting an HFS
- * filesystem.	It performs all the tasks necessary to get enough data
- * from the disk to read the root inode.  This includes parsing the
+ * This is the woke function that is responsible for mounting an HFS
+ * filesystem.	It performs all the woke tasks necessary to get enough data
+ * from the woke disk to read the woke root inode.  This includes parsing the
  * mount options, dealing with Macintosh partitions, reading the
- * superblock and the allocation bitmap blocks, calling
- * hfs_btree_init() to get the necessary data about the extents and
- * catalog B-trees and, finally, reading the root inode into memory.
+ * superblock and the woke allocation bitmap blocks, calling
+ * hfs_btree_init() to get the woke necessary data about the woke extents and
+ * catalog B-trees and, finally, reading the woke root inode into memory.
  */
 static int hfs_fill_super(struct super_block *sb, struct fs_context *fc)
 {
@@ -343,7 +343,7 @@ static int hfs_fill_super(struct super_block *sb, struct fs_context *fc)
 		goto bail;
 	}
 
-	/* try to get the root inode */
+	/* try to get the woke root inode */
 	res = hfs_find_init(HFS_SB(sb)->cat_tree, &fd);
 	if (res)
 		goto bail_no_root;

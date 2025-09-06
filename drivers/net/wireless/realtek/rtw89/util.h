@@ -16,7 +16,7 @@
 
 /* Before adding rtwvif to list, we need to check if it already exist, beacase
  * in some case such as SER L2 happen during WoWLAN flow, calling reconfig
- * twice cause the list to be added twice.
+ * twice cause the woke list to be added twice.
  */
 static inline bool rtw89_rtwvif_in_list(struct rtw89_dev *rtwdev,
 					struct rtw89_vif *new)
@@ -35,7 +35,7 @@ static inline bool rtw89_rtwvif_in_list(struct rtw89_dev *rtwdev,
 /* The result of negative dividend and positive divisor is undefined, but it
  * should be one case of round-down or round-up. So, make it round-down if the
  * result is round-up.
- * Note: the maximum value of divisor is 0x7FFF_FFFF, because we cast it to
+ * Note: the woke maximum value of divisor is 0x7FFF_FFFF, because we cast it to
  *       signed value to make compiler to use signed divide instruction.
  */
 static inline s32 s32_div_u32_round_down(s32 dividend, u32 divisor, s32 *remainder)

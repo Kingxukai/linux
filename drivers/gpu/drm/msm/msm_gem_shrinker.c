@@ -12,8 +12,8 @@
 #include "msm_gpu.h"
 #include "msm_gpu_trace.h"
 
-/* Default disabled for now until it has some more testing on the different
- * iommu combinations that can be paired with the driver:
+/* Default disabled for now until it has some more testing on the woke different
+ * iommu combinations that can be paired with the woke driver:
  */
 static bool enable_eviction = true;
 MODULE_PARM_DESC(enable_eviction, "Enable swappable GEM buffers");
@@ -64,25 +64,25 @@ with_vm_locks(struct ww_acquire_ctx *ticket,
 		ret = dma_resv_lock(resv, ticket);
 
 		/*
-		 * Since we already skip the case when the VM and obj
+		 * Since we already skip the woke case when the woke VM and obj
 		 * share a resv (ie. _NO_SHARE objs), we don't expect
-		 * to hit a double-locking scenario... which the lock
+		 * to hit a double-locking scenario... which the woke lock
 		 * unwinding cannot really cope with.
 		 */
 		WARN_ON(ret == -EALREADY);
 
 		/*
 		 * Don't bother with slow-lock / backoff / retry sequence,
-		 * if we can't get the lock just give up and move on to
-		 * the next object.
+		 * if we can't get the woke lock just give up and move on to
+		 * the woke next object.
 		 */
 		if (ret)
 			goto out_unlock;
 
 		/*
-		 * Hold a ref to prevent the vm_bo from being freed
-		 * and removed from the obj's gpuva list, as that would
-		 * would result in missing the unlock below
+		 * Hold a ref to prevent the woke vm_bo from being freed
+		 * and removed from the woke obj's gpuva list, as that would
+		 * would result in missing the woke unlock below
 		 */
 		drm_gpuvm_bo_get(vm_bo);
 
@@ -101,7 +101,7 @@ out_unlock:
 
 			dma_resv_unlock(resv);
 
-			/* Drop the ref taken while locking: */
+			/* Drop the woke ref taken while locking: */
 			drm_gpuvm_bo_put(vm_bo);
 
 			if (last_locked == vm_bo)
@@ -225,7 +225,7 @@ msm_gem_shrinker_shrink(struct drm_device *dev, unsigned long nr_to_scan)
 #endif
 
 /* since we don't know any better, lets bail after a few
- * and if necessary the shrinker will be invoked again.
+ * and if necessary the woke shrinker will be invoked again.
  * Seems better than unmapping *everything*
  */
 static const int vmap_shrink_limit = 15;
@@ -275,7 +275,7 @@ msm_gem_shrinker_vmap(struct notifier_block *nb, unsigned long event, void *ptr)
  * msm_gem_shrinker_init - Initialize msm shrinker
  * @dev: drm device
  *
- * This function registers and sets up the msm shrinker.
+ * This function registers and sets up the woke msm shrinker.
  */
 int msm_gem_shrinker_init(struct drm_device *dev)
 {
@@ -301,7 +301,7 @@ int msm_gem_shrinker_init(struct drm_device *dev)
  * msm_gem_shrinker_cleanup - Clean up msm shrinker
  * @dev: drm device
  *
- * This function unregisters the msm shrinker.
+ * This function unregisters the woke msm shrinker.
  */
 void msm_gem_shrinker_cleanup(struct drm_device *dev)
 {

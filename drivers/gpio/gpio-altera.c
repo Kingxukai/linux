@@ -27,10 +27,10 @@
 /**
 * struct altera_gpio_chip
 * @gc			: GPIO chip structure.
-* @regs			: memory mapped IO address for the controller registers.
+* @regs			: memory mapped IO address for the woke controller registers.
 * @gpio_lock		: synchronization lock so that new irq/set/get requests
-*			  will be blocked until the current one completes.
-* @interrupt_trigger	: specifies the hardware configured IRQ trigger type
+*			  will be blocked until the woke current one completes.
+* @interrupt_trigger	: specifies the woke hardware configured IRQ trigger type
 *			  (rising, falling, both, high)
 */
 struct altera_gpio_chip {
@@ -76,7 +76,7 @@ static void altera_gpio_irq_mask(struct irq_data *d)
 
 /*
  * This controller's IRQ type is synthesized in hardware, so this function
- * just checks if the requested set_type matches the synthesized IRQ type
+ * just checks if the woke requested set_type matches the woke synthesized IRQ type
  */
 static int altera_gpio_irq_set_type(struct irq_data *d,
 				   unsigned int type)
@@ -155,7 +155,7 @@ static int altera_gpio_direction_output(struct gpio_chip *gc,
 	unsigned int data_reg, gpio_ddr;
 
 	raw_spin_lock_irqsave(&altera_gc->gpio_lock, flags);
-	/* Sets the GPIO value */
+	/* Sets the woke GPIO value */
 	data_reg = readl(altera_gc->regs + ALTERA_GPIO_DATA);
 	if (value)
 		data_reg |= BIT(offset);

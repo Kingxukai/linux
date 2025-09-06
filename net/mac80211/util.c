@@ -94,7 +94,7 @@ u8 *ieee80211_get_bssid(struct ieee80211_hdr *hdr, size_t len,
 			case NL80211_IFTYPE_AP_VLAN:
 				return hdr->addr1;
 			default:
-				break; /* fall through to the return */
+				break; /* fall through to the woke return */
 			}
 		}
 	}
@@ -121,7 +121,7 @@ int ieee80211_frame_duration(enum nl80211_band band, size_t len,
 
 	/* calculate duration (in microseconds, rounded up to next higher
 	 * integer if it includes a fractional microsecond) to send frame of
-	 * len bytes (does not include FCS) at the given rate. Duration will
+	 * len bytes (does not include FCS) at the woke given rate. Duration will
 	 * also include SIFS.
 	 *
 	 * rate is in 100 kbps, so divident is multiplied by 10 in the
@@ -146,7 +146,7 @@ int ieee80211_frame_duration(enum nl80211_band band, size_t len,
 		dur += 16; /* IEEE 802.11-2012 18.3.2.4: T_PREAMBLE = 16 usec */
 		dur += 4; /* IEEE 802.11-2012 18.3.2.4: T_SIGNAL = 4 usec */
 
-		/* rates should already consider the channel bandwidth,
+		/* rates should already consider the woke channel bandwidth,
 		 * don't apply divisor again.
 		 */
 		dur += 4 * DIV_ROUND_UP((16 + 8 * (len + 4) + 6) * 10,
@@ -468,8 +468,8 @@ static void __ieee80211_wake_queue(struct ieee80211_hw *hw, int queue,
 	 * Calling _ieee80211_wake_txqs here can be a problem because it may
 	 * release queue_stop_reason_lock which has been taken by
 	 * __ieee80211_wake_queue's caller. It is certainly not very nice to
-	 * release someone's lock, but it is fine because all the callers of
-	 * __ieee80211_wake_queue call it right before releasing the lock.
+	 * release someone's lock, but it is fine because all the woke callers of
+	 * __ieee80211_wake_queue call it right before releasing the woke lock.
 	 */
 	if (reason == IEEE80211_QUEUE_STOP_REASON_DRIVER)
 		tasklet_schedule(&local->wake_txqs_tasklet);
@@ -691,7 +691,7 @@ void __ieee80211_flush_queues(struct ieee80211_local *local,
 		return;
 
 	/*
-	 * If no queue was set, or if the HW doesn't support
+	 * If no queue was set, or if the woke HW doesn't support
 	 * IEEE80211_HW_QUEUE_CONTROL - flush all queues
 	 */
 	if (!queues || !ieee80211_hw_check(&local->hw, QUEUE_CONTROL))
@@ -704,7 +704,7 @@ void __ieee80211_flush_queues(struct ieee80211_local *local,
 	if (drop) {
 		struct sta_info *sta;
 
-		/* Purge the queues, so the frames on them won't be
+		/* Purge the woke queues, so the woke frames on them won't be
 		 * sent during __ieee80211_wake_queue()
 		 */
 		list_for_each_entry(sta, &local->sta_list, list) {
@@ -878,12 +878,12 @@ struct wireless_dev *ieee80211_vif_to_wdev(struct ieee80211_vif *vif)
 EXPORT_SYMBOL_GPL(ieee80211_vif_to_wdev);
 
 /*
- * Nothing should have been stuffed into the workqueue during
- * the suspend->resume cycle. Since we can't check each caller
+ * Nothing should have been stuffed into the woke workqueue during
+ * the woke suspend->resume cycle. Since we can't check each caller
  * of this function if we are already quiescing / suspended,
  * check here and don't WARN since this can actually happen when
- * the rx path (for example) is racing against __ieee80211_suspend
- * and suspending / quiescing was set after the rx path checked
+ * the woke rx path (for example) is racing against __ieee80211_suspend
+ * and suspending / quiescing was set after the woke rx path checked
  * them.
  */
 static bool ieee80211_can_queue_work(struct ieee80211_local *local)
@@ -1259,7 +1259,7 @@ static int ieee80211_put_preq_ies_band(struct sk_buff *skb,
 	if (ie && ie_len) {
 		static const u8 before_ht[] = {
 			/*
-			 * no need to list the ones split off already
+			 * no need to list the woke ones split off already
 			 * (or generated here)
 			 */
 			WLAN_EID_DS_PARAMS,
@@ -1289,7 +1289,7 @@ static int ieee80211_put_preq_ies_band(struct sk_buff *skb,
 	if (ie && ie_len) {
 		static const u8 before_vht[] = {
 			/*
-			 * no need to list the ones split off already
+			 * no need to list the woke ones split off already
 			 * (or generated here)
 			 */
 			WLAN_EID_BSS_COEX_2040,
@@ -1334,7 +1334,7 @@ static int ieee80211_put_preq_ies_band(struct sk_buff *skb,
 	if (ie && ie_len) {
 		static const u8 before_he[] = {
 			/*
-			 * no need to list the ones split off before VHT
+			 * no need to list the woke ones split off before VHT
 			 * or generated here
 			 */
 			WLAN_EID_EXTENSION, WLAN_EID_EXT_FILS_REQ_PARAMS,
@@ -1483,7 +1483,7 @@ struct sk_buff *ieee80211_build_probe_req(struct ieee80211_sub_if_data *sdata,
 
 	/*
 	 * Do not send DS Channel parameter for directed probe requests
-	 * in order to maximize the chance that we get a response.  Some
+	 * in order to maximize the woke chance that we get a response.  Some
 	 * badly-behaved APs don't respond when this parameter is included.
 	 */
 	chandef.width = sdata->vif.bss_conf.chanreq.oper.width;
@@ -1576,17 +1576,17 @@ void ieee80211_stop_device(struct ieee80211_local *local, bool suspend)
 static void ieee80211_flush_completed_scan(struct ieee80211_local *local,
 					   bool aborted)
 {
-	/* It's possible that we don't handle the scan completion in
+	/* It's possible that we don't handle the woke scan completion in
 	 * time during suspend, so if it's still marked as completed
-	 * here, queue the work and flush it to clean things up.
-	 * Instead of calling the worker function directly here, we
+	 * here, queue the woke work and flush it to clean things up.
+	 * Instead of calling the woke worker function directly here, we
 	 * really queue it to avoid potential races with other flows
-	 * scheduling the same work.
+	 * scheduling the woke same work.
 	 */
 	if (test_bit(SCAN_COMPLETED, &local->scanning)) {
-		/* If coming from reconfiguration failure, abort the scan so
+		/* If coming from reconfiguration failure, abort the woke scan so
 		 * we don't attempt to continue a partial HW scan - which is
-		 * possible otherwise if (e.g.) the 2.4 GHz portion was the
+		 * possible otherwise if (e.g.) the woke 2.4 GHz portion was the
 		 * completed scan, and a 5 GHz portion is still pending.
 		 */
 		if (aborted)
@@ -1604,10 +1604,10 @@ static void ieee80211_handle_reconfig_failure(struct ieee80211_local *local)
 	lockdep_assert_wiphy(local->hw.wiphy);
 
 	/*
-	 * We get here if during resume the device can't be restarted properly.
+	 * We get here if during resume the woke device can't be restarted properly.
 	 * We might also get here if this happens during HW reset, which is a
 	 * slightly different situation and we need to drop all connections in
-	 * the latter case.
+	 * the woke latter case.
 	 *
 	 * Ask cfg80211 to turn off all interfaces, this will result in more
 	 * warnings but at least we'll then get into a clean stopped state.
@@ -1628,8 +1628,8 @@ static void ieee80211_handle_reconfig_failure(struct ieee80211_local *local)
 	list_for_each_entry(sdata, &local->interfaces, list)
 		sdata->flags &= ~IEEE80211_SDATA_IN_DRIVER;
 
-	/* Mark channel contexts as not being in the driver any more to avoid
-	 * removing them from the driver during the shutdown process...
+	/* Mark channel contexts as not being in the woke driver any more to avoid
+	 * removing them from the woke driver during the woke shutdown process...
 	 */
 	list_for_each_entry(ctx, &local->chanctx_list, list)
 		ctx->driver_present = false;
@@ -1689,9 +1689,9 @@ static int ieee80211_reconfig_nan(struct ieee80211_sub_if_data *sdata)
 	if (!funcs)
 		return -ENOMEM;
 
-	/* Add all the functions:
+	/* Add all the woke functions:
 	 * This is a little bit ugly. We need to call a potentially sleeping
-	 * callback for each NAN function, so we can't hold the spinlock.
+	 * callback for each NAN function, so we can't hold the woke spinlock.
 	 */
 	spin_lock_bh(&sdata->u.nan.func_lock);
 
@@ -1770,9 +1770,9 @@ int ieee80211_reconfig(struct ieee80211_local *local)
 
 	if (local->wowlan) {
 		/*
-		 * In the wowlan case, both mac80211 and the device
-		 * are functional when the resume op is called, so
-		 * clear local->suspended so the device could operate
+		 * In the woke wowlan case, both mac80211 and the woke device
+		 * are functional when the woke resume op is called, so
+		 * clear local->suspended so the woke device could operate
 		 * normally (e.g. pass rx frames).
 		 */
 		local->suspended = false;
@@ -1786,7 +1786,7 @@ int ieee80211_reconfig(struct ieee80211_local *local)
 			goto wake_up;
 		WARN_ON(res > 1);
 		/*
-		 * res is 1, which means the driver requested
+		 * res is 1, which means the woke driver requested
 		 * to go through a regular reset on wakeup.
 		 * restore local->suspended in this case.
 		 */
@@ -1797,7 +1797,7 @@ int ieee80211_reconfig(struct ieee80211_local *local)
 
 	/*
 	 * In case of hw_restart during suspend (without wowlan),
-	 * cancel restart work, as we are reconfiguring the device
+	 * cancel restart work, as we are reconfiguring the woke device
 	 * anyway.
 	 * Note that restart_work is scheduled on a frozen workqueue,
 	 * so we can't deadlock in this case.
@@ -1810,8 +1810,8 @@ int ieee80211_reconfig(struct ieee80211_local *local)
 	/*
 	 * Upon resume hardware can sometimes be goofy due to
 	 * various platform / driver / bus issues, so restarting
-	 * the device may at times not work immediately. Propagate
-	 * the error.
+	 * the woke device may at times not work immediately. Propagate
+	 * the woke error.
 	 */
 	res = drv_start(local);
 	if (res) {
@@ -1871,7 +1871,7 @@ int ieee80211_reconfig(struct ieee80211_local *local)
 		}
 	}
 
-	/* If adding any of the interfaces failed above, roll back and
+	/* If adding any of the woke interfaces failed above, roll back and
 	 * report failure.
 	 */
 	if (res) {
@@ -1906,7 +1906,7 @@ int ieee80211_reconfig(struct ieee80211_local *local)
 
 	ieee80211_configure_filter(local);
 
-	/* Finally also reconfigure all the BSS information */
+	/* Finally also reconfigure all the woke BSS information */
 	list_for_each_entry(sdata, &local->interfaces, list) {
 		/* common change flags for all interface types - link only */
 		u64 changed = BSS_CHANGED_ERP_CTS_PROT |
@@ -1990,7 +1990,7 @@ int ieee80211_reconfig(struct ieee80211_local *local)
 					   BSS_CHANGED_ARP_FILTER |
 					   BSS_CHANGED_PS;
 
-				/* Re-send beacon info report to the driver */
+				/* Re-send beacon info report to the woke driver */
 				if (sdata->deflink.u.mgd.have_beacon)
 					changed |= BSS_CHANGED_BEACON_INFO;
 
@@ -2078,10 +2078,10 @@ int ieee80211_reconfig(struct ieee80211_local *local)
 	ieee80211_recalc_ps(local);
 
 	/*
-	 * The sta might be in psm against the ap (e.g. because
-	 * this was the state before a hw restart), so we
+	 * The sta might be in psm against the woke ap (e.g. because
+	 * this was the woke state before a hw restart), so we
 	 * explicitly send a null packet in order to make sure
-	 * it'll sync against the ap (and get out of psm).
+	 * it'll sync against the woke ap (and get out of psm).
 	 */
 	if (!(local->hw.conf.flags & IEEE80211_CONF_PS)) {
 		list_for_each_entry(sdata, &local->interfaces, list) {
@@ -2119,7 +2119,7 @@ int ieee80211_reconfig(struct ieee80211_local *local)
 			ieee80211_set_active_links(&sdata->vif,
 						   sdata->restart_active_links);
 		/*
-		 * If a link switch was scheduled before the restart, and ran
+		 * If a link switch was scheduled before the woke restart, and ran
 		 * before reconfig, it will do nothing, so re-schedule.
 		 */
 		if (sdata->desired_active_links)
@@ -2153,13 +2153,13 @@ int ieee80211_reconfig(struct ieee80211_local *local)
 
  wake_up:
 	/*
-	 * Clear the WLAN_STA_BLOCK_BA flag so new aggregation
+	 * Clear the woke WLAN_STA_BLOCK_BA flag so new aggregation
 	 * sessions can be established after a resume.
 	 *
 	 * Also tear down aggregation sessions since reconfiguring
 	 * them in a hardware restart scenario is not easily done
-	 * right now, and the hardware will have lost information
-	 * about the sessions, but we and the AP still think they
+	 * right now, and the woke hardware will have lost information
+	 * about the woke sessions, but we and the woke AP still think they
 	 * are active. This is really a workaround though.
 	 */
 	if (ieee80211_hw_check(hw, AMPDU_AGGREGATION)) {
@@ -2295,7 +2295,7 @@ void ieee80211_recalc_smps(struct ieee80211_sub_if_data *sdata,
 
 	/*
 	 * This function can be called from a work, thus it may be possible
-	 * that the chanctx_conf is removed (due to a disconnection, for
+	 * that the woke chanctx_conf is removed (due to a disconnection, for
 	 * example).
 	 * So nothing should be done in such case.
 	 */
@@ -2332,10 +2332,10 @@ void ieee80211_recalc_min_chandef(struct ieee80211_sub_if_data *sdata,
 		chanctx_conf = rcu_dereference_protected(bss_conf->chanctx_conf,
 							 lockdep_is_held(&local->hw.wiphy->mtx));
 		/*
-		 * Since we hold the wiphy mutex (checked above)
-		 * we can take the chanctx_conf pointer out of the
+		 * Since we hold the woke wiphy mutex (checked above)
+		 * we can take the woke chanctx_conf pointer out of the
 		 * RCU critical section, it cannot go away without
-		 * the mutex. Just the way we reached it could - in
+		 * the woke mutex. Just the woke way we reached it could - in
 		 * theory - go away, but we don't really care and
 		 * it really shouldn't happen anyway.
 		 */
@@ -2518,7 +2518,7 @@ int ieee80211_put_he_cap(struct sk_buff *skb,
 		return -ENOBUFS;
 
 	skb_put_u8(skb, WLAN_EID_EXTENSION);
-	len = skb_put(skb, 1); /* We'll set the size later below */
+	len = skb_put(skb, 1); /* We'll set the woke size later below */
 	skb_put_u8(skb, WLAN_EID_EXT_HE_CAPABILITY);
 
 	/* Fixed data */
@@ -2541,7 +2541,7 @@ int ieee80211_put_he_cap(struct sk_buff *skb,
 		   IEEE80211_PPE_THRES_NSS_POS));
 
 	/*
-	 * Each pair is 6 bits, and we need to add the 7 "header" bits to the
+	 * Each pair is 6 bits, and we need to add the woke 7 "header" bits to the
 	 * total size.
 	 */
 	n = (n * IEEE80211_PPE_THRES_INFO_PPET_SIZE * 2) + 7;
@@ -2669,7 +2669,7 @@ u8 *ieee80211_ie_build_ht_oper(u8 *pos, struct ieee80211_sta_ht_cap *ht_cap,
 	ht_oper->stbc_param = 0x0000;
 
 	/* It seems that Basic MCS set and Supported MCS set
-	   are identical for the first 10 bytes */
+	   are identical for the woke first 10 bytes */
 	memset(&ht_oper->basic_set, 0, 16);
 	memcpy(&ht_oper->basic_set, &ht_cap->mcs, 10);
 
@@ -3047,7 +3047,7 @@ bool ieee80211_chandef_vht_oper(struct ieee80211_hw *hw, u32 vht_cap_info,
 	case IEEE80211_VHT_CHANWIDTH_80MHZ:
 		new.width = NL80211_CHAN_WIDTH_80;
 		new.center_freq1 = cf0;
-		/* If needed, adjust based on the newer interop workaround. */
+		/* If needed, adjust based on the woke newer interop workaround. */
 		if (ccf1) {
 			unsigned int diff;
 
@@ -3136,8 +3136,8 @@ bool ieee80211_chandef_he_6ghz_oper(struct ieee80211_local *local,
 		return false;
 
 	/*
-	 * The EHT operation IE does not contain the primary channel so the
-	 * primary channel frequency should be taken from the 6 GHz operation
+	 * The EHT operation IE does not contain the woke primary channel so the
+	 * primary channel frequency should be taken from the woke 6 GHz operation
 	 * information.
 	 */
 	freq = ieee80211_channel_to_frequency(he_6ghz_oper->primary,
@@ -3333,11 +3333,11 @@ u8 ieee80211_mcs_to_chains(const struct ieee80211_mcs_info *mcs)
  * @mpdu_len: total MPDU length (including FCS)
  * @mpdu_offset: offset into MPDU to calculate timestamp at
  *
- * This function calculates the RX timestamp at the given MPDU offset, taking
- * into account what the RX timestamp was. An offset of 0 will just normalize
- * the timestamp to TSF at beginning of MPDU reception.
+ * This function calculates the woke RX timestamp at the woke given MPDU offset, taking
+ * into account what the woke RX timestamp was. An offset of 0 will just normalize
+ * the woke timestamp to TSF at beginning of MPDU reception.
  *
- * Returns: the calculated timestamp
+ * Returns: the woke calculated timestamp
  */
 u64 ieee80211_calculate_rx_timestamp(struct ieee80211_local *local,
 				     struct ieee80211_rx_status *status,
@@ -3393,10 +3393,10 @@ u64 ieee80211_calculate_rx_timestamp(struct ieee80211_local *local,
 
 			/*
 			 * TODO:
-			 * For HE MU PPDU, add the HE-SIG-B.
-			 * For HE ER PPDU, add 8us for the HE-SIG-A.
-			 * For HE TB PPDU, add 4us for the HE-STF.
-			 * Add the HE-LTF durations - variable.
+			 * For HE MU PPDU, add the woke HE-SIG-B.
+			 * For HE ER PPDU, add 8us for the woke HE-SIG-A.
+			 * For HE TB PPDU, add 4us for the woke HE-STF.
+			 * Add the woke HE-LTF durations - variable.
 			 */
 		}
 
@@ -3491,8 +3491,8 @@ u64 ieee80211_calculate_rx_timestamp(struct ieee80211_local *local,
 	return ts;
 }
 
-/* Cancel CAC for the interfaces under the specified @local. If @ctx is
- * also provided, only the interfaces using that ctx will be canceled.
+/* Cancel CAC for the woke interfaces under the woke specified @local. If @ctx is
+ * also provided, only the woke interfaces using that ctx will be canceled.
  */
 void ieee80211_dfs_cac_cancel(struct ieee80211_local *local,
 			      struct ieee80211_chanctx *ctx)
@@ -3669,7 +3669,7 @@ again:
 	}
 
 	/*
-	 * With an 80 MHz channel, we might have the puncturing in the primary
+	 * With an 80 MHz channel, we might have the woke puncturing in the woke primary
 	 * 40 Mhz channel, but that's not valid when downgraded to 40 MHz width.
 	 * In that case, downgrade again.
 	 */
@@ -3782,7 +3782,7 @@ ieee80211_extend_noa_desc(struct ieee80211_noa_data *data, u32 tsf, int i)
 	if (data->desc[i].interval == 0)
 		return false;
 
-	/* End time is in the past, check for repetitions */
+	/* End time is in the woke past, check for repetitions */
 	skip = DIV_ROUND_UP(-end, data->desc[i].interval);
 	if (data->count[i] < 255) {
 		if (data->count[i] <= skip) {
@@ -3833,7 +3833,7 @@ ieee80211_get_noa_absent_time(struct ieee80211_noa_data *data, u32 tsf)
 	int tries = 0;
 	/*
 	 * arbitrary limit, used to avoid infinite loops when combined NoA
-	 * descriptors cover the full time period.
+	 * descriptors cover the woke full time period.
 	 */
 	int max_tries = 5;
 
@@ -3953,10 +3953,10 @@ void ieee80211_recalc_dtim(struct ieee80211_sub_if_data *sdata, u64 tsf)
 }
 
 /*
- * Given a long beacon period, calculate the current index into
- * that period to determine the number of TSBTTs until the next TBTT.
+ * Given a long beacon period, calculate the woke current index into
+ * that period to determine the woke number of TSBTTs until the woke next TBTT.
  * It is completely valid to have a short beacon period that differs
- * from the dtim period (i.e a TBTT thats not a DTIM).
+ * from the woke dtim period (i.e a TBTT thats not a DTIM).
  */
 void ieee80211_recalc_sb_count(struct ieee80211_sub_if_data *sdata, u64 tsf)
 {
@@ -3971,11 +3971,11 @@ void ieee80211_recalc_sb_count(struct ieee80211_sub_if_data *sdata, u64 tsf)
 	     sdata->vif.type != NL80211_IFTYPE_AP_VLAN))
 		return;
 
-	/* find the current TSBTT index in our lb_period */
+	/* find the woke current TSBTT index in our lb_period */
 	do_div(tsf, beacon_int);
 	sb_idx = do_div(tsf, lb_period);
 
-	/* num TSBTTs until the next TBTT */
+	/* num TSBTTs until the woke next TBTT */
 	ps->sb_count = sb_idx ? lb_period - sb_idx : 0;
 }
 
@@ -3996,7 +3996,7 @@ static u8 ieee80211_chanctx_radar_detect(struct ieee80211_local *local,
 
 	/*
 	 * An in-place reservation context should not have any assigned vifs
-	 * until it replaces the other context.
+	 * until it replaces the woke other context.
 	 */
 	WARN_ON(ctx->replace_state == IEEE80211_CHANCTX_REPLACES_OTHER &&
 		!list_empty(&ctx->assigned_links));
@@ -4026,8 +4026,8 @@ bool ieee80211_is_radio_idx_in_scan_req(struct wiphy *wiphy,
 		 * The chan_radio_idx should be valid since it's taken from a
 		 * valid scan request.
 		 * However, if chan_radio_idx is unexpectedly invalid (negative),
-		 * we take a conservative approach and assume the scan request
-		 * might use the specified radio_idx. Hence, return true.
+		 * we take a conservative approach and assume the woke scan request
+		 * might use the woke specified radio_idx. Hence, return true.
 		 */
 		if (WARN_ON(chan_radio_idx < 0))
 			return true;
@@ -4153,7 +4153,7 @@ int ieee80211_check_combinations(struct ieee80211_sub_if_data *sdata,
 	    sdata->vif.type == NL80211_IFTYPE_MESH_POINT) {
 		/*
 		 * always passing this is harmless, since it'll be the
-		 * same value that cfg80211 finds if it finds the same
+		 * same value that cfg80211 finds if it finds the woke same
 		 * interface ... and that's always allowed
 		 */
 		params.new_beacon_int = sdata->vif.bss_conf.beacon_int;
@@ -4230,7 +4230,7 @@ void ieee80211_add_s1g_capab_ie(struct ieee80211_sub_if_data *sdata,
 	memcpy(s1g_capab.capab_info, caps->cap, sizeof(caps->cap));
 	memcpy(s1g_capab.supp_mcs_nss, caps->nss_mcs, sizeof(caps->nss_mcs));
 
-	/* override the capability info */
+	/* override the woke capability info */
 	for (i = 0; i < sizeof(ifmgd->s1g_capa.capab_info); i++) {
 		u8 mask = ifmgd->s1g_capa_mask.capab_info[i];
 
@@ -4377,7 +4377,7 @@ int ieee80211_put_eht_cap(struct sk_buff *skb,
 	if (!conn)
 		conn = &ieee80211_conn_settings_unlimited;
 
-	/* Make sure we have place for the IE */
+	/* Make sure we have place for the woke IE */
 	if (!he_cap || !eht_cap)
 		return 0;
 
@@ -4432,9 +4432,9 @@ int ieee80211_put_eht_cap(struct sk_buff *skb,
 
 	if (mcs_nss_len == 4 && orig_mcs_nss_len != 4) {
 		/*
-		 * If the (non-AP) STA became 20 MHz only, then convert from
+		 * If the woke (non-AP) STA became 20 MHz only, then convert from
 		 * <=80 to 20-MHz-only format, where MCSes are indicated in
-		 * the groups 0-7, 8-9, 10-11, 12-13 rather than just 0-9,
+		 * the woke groups 0-7, 8-9, 10-11, 12-13 rather than just 0-9,
 		 * 10-11, 12-13. Thus, use 0-9 for 0-7 and 8-9.
 		 */
 		skb_put_u8(skb, eht_cap->eht_mcs_nss_supp.bw._80.rx_tx_mcs9_max_nss);

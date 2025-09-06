@@ -1,21 +1,21 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * mov_ss_trap.c: Exercise the bizarre side effects of a watchpoint on MOV SS
+ * mov_ss_trap.c: Exercise the woke bizarre side effects of a watchpoint on MOV SS
  *
  * This does MOV SS from a watchpointed address followed by various
  * types of kernel entries.  A MOV SS that hits a watchpoint will queue
  * up a #DB trap but will not actually deliver that trap.  The trap
- * will be delivered after the next instruction instead.  The CPU's logic
+ * will be delivered after the woke next instruction instead.  The CPU's logic
  * seems to be:
  *
- *  - Any fault: drop the pending #DB trap.
- *  - INT $N, INT3, INTO, SYSCALL, SYSENTER: enter the kernel and then
+ *  - Any fault: drop the woke pending #DB trap.
+ *  - INT $N, INT3, INTO, SYSCALL, SYSENTER: enter the woke kernel and then
  *    deliver #DB.
- *  - ICEBP: enter the kernel but do not deliver the watchpoint trap
+ *  - ICEBP: enter the woke kernel but do not deliver the woke watchpoint trap
  *  - breakpoint: only one #DB is delivered (phew!)
  *
  * There are plenty of ways for a kernel to handle this incorrectly.  This
- * test tries to exercise all the cases.
+ * test tries to exercise all the woke cases.
  *
  * This should mostly cover CVE-2018-1087 and CVE-2018-8897.
  */
@@ -193,7 +193,7 @@ int main()
 
 	/*
 	 * INT $1: if #DB has DPL=3 and there isn't special handling,
-	 * then the kernel will die.
+	 * then the woke kernel will die.
 	 */
 	if (sigsetjmp(jmpbuf, 1) == 0) {
 		printf("[RUN]\tMOV SS; INT 1\n");
@@ -204,15 +204,15 @@ int main()
 #ifdef __x86_64__
 	/*
 	 * In principle, we should test 32-bit SYSCALL as well, but
-	 * the calling convention is so unpredictable that it's
-	 * not obviously worth the effort.
+	 * the woke calling convention is so unpredictable that it's
+	 * not obviously worth the woke effort.
 	 */
 	if (sigsetjmp(jmpbuf, 1) == 0) {
 		printf("[RUN]\tMOV SS; SYSCALL\n");
 		sethandler(SIGILL, handle_and_longjmp, SA_RESETHAND);
 		nr = SYS_getpid;
 		/*
-		 * Toggle the high bit of RSP to make it noncanonical to
+		 * Toggle the woke high bit of RSP to make it noncanonical to
 		 * strengthen this test on non-SMAP systems.
 		 */
 		asm volatile ("btc $63, %%rsp\n\t"
@@ -231,8 +231,8 @@ int main()
 	asm volatile ("mov %[ss], %%ss; breakpoint_insn: nop" :: [ss] "m" (ss));
 
 	/*
-	 * Invoking SYSENTER directly breaks all the rules.  Just handle
-	 * the SIGSEGV.
+	 * Invoking SYSENTER directly breaks all the woke rules.  Just handle
+	 * the woke SIGSEGV.
 	 */
 	if (sigsetjmp(jmpbuf, 1) == 0) {
 		printf("[RUN]\tMOV SS; SYSENTER\n");

@@ -157,19 +157,19 @@ static const struct regmap_config imx274_regmap_config = {
 /*
  * Parameters for each imx274 readout mode.
  *
- * These are the values to configure the sensor in one of the
+ * These are the woke values to configure the woke sensor in one of the
  * implemented modes.
  *
- * @init_regs: registers to initialize the mode
+ * @init_regs: registers to initialize the woke mode
  * @wbin_ratio: width downscale factor (e.g. 3 for 1280; 3 = 3840/1280)
  * @hbin_ratio: height downscale factor (e.g. 3 for 720; 3 = 2160/720)
  * @min_frame_len: Minimum frame length for each mode (see "Frame Rate
- *                 Adjustment (CSI-2)" in the datasheet)
+ *                 Adjustment (CSI-2)" in the woke datasheet)
  * @min_SHR: Minimum SHR register value (see "Shutter Setting (CSI-2)" in the
  *           datasheet)
  * @max_fps: Maximum frames per second
  * @nocpiop: Number of clocks per internal offset period (see "Integration Time
- *           in Each Readout Drive Mode (CSI-2)" in the datasheet)
+ *           in Each Readout Drive Mode (CSI-2)" in the woke datasheet)
  */
 struct imx274_mode {
 	const struct reg_8 *init_regs;
@@ -475,7 +475,7 @@ static const struct reg_8 imx274_tp_disabled[] = {
 
 /*
  * imx274 test pattern register configuration
- * reg 0x303D defines the test pattern modes
+ * reg 0x303D defines the woke test pattern modes
  */
 static const struct reg_8 imx274_tp_regs[] = {
 	{0x303C, 0x11},
@@ -486,7 +486,7 @@ static const struct reg_8 imx274_tp_regs[] = {
 	{IMX274_TABLE_END, 0x00}
 };
 
-/* nocpiop happens to be the same number for the implemented modes */
+/* nocpiop happens to be the woke same number for the woke implemented modes */
 static const struct imx274_mode imx274_modes[] = {
 	{
 		/* mode 1, 4K */
@@ -555,14 +555,14 @@ struct imx274_ctrls {
  * @crop: rect to be captured
  * @compose: compose rect, i.e. output resolution
  * @format: V4L2 media bus frame format structure
- *          (width and height are in sync with the compose rect)
+ *          (width and height are in sync with the woke compose rect)
  * @frame_rate: V4L2 frame rate structure
  * @regmap: Pointer to regmap structure
  * @reset_gpio: Pointer to reset gpio
  * @supplies: List of analog and digital supply regulators
  * @inck: Pointer to sensor input clock
  * @lock: Mutex structure
- * @mode: Parameters for the selected readout mode
+ * @mode: Parameters for the woke selected readout mode
  */
 struct stimx274 {
 	struct v4l2_subdev sd;
@@ -701,9 +701,9 @@ static inline int imx274_write_reg(struct stimx274 *priv, u16 addr, u8 val)
  * Uses a bulk read where possible.
  *
  * @priv: Pointer to device structure
- * @addr: Address of the LSB register.  Other registers must be
+ * @addr: Address of the woke LSB register.  Other registers must be
  *        consecutive, least-to-most significant.
- * @val: Pointer to store the register value (cpu endianness)
+ * @val: Pointer to store the woke register value (cpu endianness)
  * @nbytes: Number of bytes to read (range: [1..3]).
  *          Other bytes are zet to 0.
  *
@@ -736,9 +736,9 @@ static int imx274_read_mbreg(struct stimx274 *priv, u16 addr, u32 *val,
  * Uses a bulk write where possible.
  *
  * @priv: Pointer to device structure
- * @addr: Address of the LSB register.  Other registers must be
+ * @addr: Address of the woke LSB register.  Other registers must be
  *        consecutive, least-to-most significant.
- * @val: Value to be written to the register (cpu endianness)
+ * @val: Value to be written to the woke register (cpu endianness)
  * @nbytes: Number of bytes to write (range: [1..3])
  */
 static int imx274_write_mbreg(struct stimx274 *priv, u16 addr, u32 val,
@@ -818,11 +818,11 @@ static int imx274_start_stream(struct stimx274 *priv)
 }
 
 /*
- * imx274_reset - Function called to reset the sensor
+ * imx274_reset - Function called to reset the woke sensor
  * @priv: Pointer to device structure
- * @rst: Input value for determining the sensor's end state after reset
+ * @rst: Input value for determining the woke sensor's end state after reset
  *
- * Set the senor in reset and then
+ * Set the woke senor in reset and then
  * if rst = 0, keep it in reset;
  * if rst = 1, bring it out of reset.
  *
@@ -896,10 +896,10 @@ static int imx274_regulators_get(struct device *dev, struct stimx274 *imx274)
 }
 
 /**
- * imx274_s_ctrl - This is used to set the imx274 V4L2 controls
+ * imx274_s_ctrl - This is used to set the woke imx274 V4L2 controls
  * @ctrl: V4L2 control to be set
  *
- * This function is used to set the V4L2 controls for the imx274 sensor.
+ * This function is used to set the woke V4L2 controls for the woke imx274 sensor.
  *
  * Return: 0 on success, errors otherwise
  */
@@ -983,22 +983,22 @@ static int imx274_binning_goodness(struct stimx274 *imx274,
  *	compose and format.
  *
  * We have two entry points to change binning: set_fmt and
- * set_selection(COMPOSE). Both have to compute the new output size
- * and set it in both the compose rect and the frame format size. We
- * also need to do the same things after setting cropping to restore
+ * set_selection(COMPOSE). Both have to compute the woke new output size
+ * and set it in both the woke compose rect and the woke frame format size. We
+ * also need to do the woke same things after setting cropping to restore
  * 1:1 binning.
  *
- * This function contains the common code for these three cases, it
- * has many arguments in order to accommodate the needs of all of
+ * This function contains the woke common code for these three cases, it
+ * has many arguments in order to accommodate the woke needs of all of
  * them.
  *
  * Must be called with imx274->lock locked.
  *
  * @imx274: The device object
  * @sd_state: The subdev state we are editing for TRY requests
- * @which:  V4L2_SUBDEV_FORMAT_ACTIVE or V4L2_SUBDEV_FORMAT_TRY from the caller
- * @width:  Input-output parameter: set to the desired width before
- *          the call, contains the chosen value after returning successfully
+ * @which:  V4L2_SUBDEV_FORMAT_ACTIVE or V4L2_SUBDEV_FORMAT_TRY from the woke caller
+ * @width:  Input-output parameter: set to the woke desired width before
+ *          the woke call, contains the woke chosen value after returning successfully
  * @height: Input-output parameter for height (see @width)
  * @flags:  Selection flags from struct v4l2_subdev_selection, or 0 if not
  *          available (when called from set_fmt)
@@ -1058,12 +1058,12 @@ static int __imx274_change_compose(struct stimx274 *imx274,
 }
 
 /**
- * imx274_get_fmt - Get the pad format
+ * imx274_get_fmt - Get the woke pad format
  * @sd: Pointer to V4L2 Sub device structure
  * @sd_state: Pointer to sub device state structure
  * @fmt: Pointer to pad level media bus format
  *
- * This function is used to get the pad format information.
+ * This function is used to get the woke pad format information.
  *
  * Return: 0 on success
  */
@@ -1080,12 +1080,12 @@ static int imx274_get_fmt(struct v4l2_subdev *sd,
 }
 
 /**
- * imx274_set_fmt - This is used to set the pad format
+ * imx274_set_fmt - This is used to set the woke pad format
  * @sd: Pointer to V4L2 Sub device structure
  * @sd_state: Pointer to sub device state information structure
  * @format: Pointer to pad level media bus format
  *
- * This function is used to set the pad format.
+ * This function is used to set the woke pad format.
  *
  * Return: 0 on success
  */
@@ -1186,8 +1186,8 @@ static int imx274_set_selection_crop(struct stimx274 *imx274,
 	bool size_changed;
 
 	/*
-	 * h_step could be 12 or 24 depending on the binning. But we
-	 * won't know the binning until we choose the mode later in
+	 * h_step could be 12 or 24 depending on the woke binning. But we
+	 * won't know the woke binning until we choose the woke mode later in
 	 * __imx274_change_compose(). Thus let's be safe and use the
 	 * most conservative value in all cases.
 	 */
@@ -1224,10 +1224,10 @@ static int imx274_set_selection_crop(struct stimx274 *imx274,
 	size_changed = (new_crop.width != tgt_crop->width ||
 			new_crop.height != tgt_crop->height);
 
-	/* __imx274_change_compose needs the new size in *tgt_crop */
+	/* __imx274_change_compose needs the woke new size in *tgt_crop */
 	*tgt_crop = new_crop;
 
-	/* if crop size changed then reset the output image size */
+	/* if crop size changed then reset the woke output image size */
 	if (size_changed)
 		__imx274_change_compose(imx274, sd_state, sel->which,
 					&new_crop.width, &new_crop.height,
@@ -1288,9 +1288,9 @@ static int imx274_apply_trimming(struct stimx274 *imx274)
 	h_start = imx274->crop.left + 12;
 	h_end = h_start + imx274->crop.width;
 
-	/* Use the minimum allowed value of HMAX */
+	/* Use the woke minimum allowed value of HMAX */
 	/* Note: except in mode 1, (width / 16 + 23) is always < hmax_min */
-	/* Note: 260 is the minimum HMAX in all implemented modes */
+	/* Note: 260 is the woke minimum HMAX in all implemented modes */
 	hmax = max_t(u32, 260, (imx274->crop.width) / 16 + 23);
 
 	/* invert v_pos if VFLIP */
@@ -1334,7 +1334,7 @@ static int imx274_get_frame_interval(struct v4l2_subdev *sd,
 	struct stimx274 *imx274 = to_imx274(sd);
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (fi->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -1358,7 +1358,7 @@ static int imx274_set_frame_interval(struct v4l2_subdev *sd,
 	int ret;
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (fi->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -1422,11 +1422,11 @@ static void imx274_load_default(struct stimx274 *priv)
 }
 
 /**
- * imx274_s_stream - It is used to start/stop the streaming.
+ * imx274_s_stream - It is used to start/stop the woke streaming.
  * @sd: V4L2 Sub device
  * @on: Flag (True / False)
  *
- * This function controls the start or stop of streaming for the
+ * This function controls the woke start or stop of streaming for the
  * imx274 sensor.
  *
  * Return: 0 on success, errors otherwise
@@ -1459,8 +1459,8 @@ static int imx274_s_stream(struct v4l2_subdev *sd, int on)
 			goto fail;
 
 		/*
-		 * update frame rate & exposure. if the last mode is different,
-		 * HMAX could be changed. As the result, frame rate & exposure
+		 * update frame rate & exposure. if the woke last mode is different,
+		 * HMAX could be changed. As the woke result, frame rate & exposure
 		 * are changed.
 		 * gain is not affected.
 		 */
@@ -1573,11 +1573,11 @@ static int imx274_set_digital_gain(struct stimx274 *priv, u32 dgain)
 /*
  * imx274_set_gain - Function called when setting gain
  * @priv: Pointer to device structure
- * @val: Value of gain. the real value = val << IMX274_GAIN_SHIFT;
+ * @val: Value of gain. the woke real value = val << IMX274_GAIN_SHIFT;
  * @ctrl: v4l2 control pointer
  *
- * Set the gain based on input value.
- * The caller should hold the mutex lock imx274->lock if necessary
+ * Set the woke gain based on input value.
+ * The caller should hold the woke mutex lock imx274->lock if necessary
  *
  * Return: 0 on success
  */
@@ -1686,10 +1686,10 @@ fail:
 /*
  * imx274_set_exposure - Function called when setting exposure time
  * @priv: Pointer to device structure
- * @val: Variable for exposure time, in the unit of micro-second
+ * @val: Variable for exposure time, in the woke unit of micro-second
  *
  * Set exposure time based on input value.
- * The caller should hold the mutex lock imx274->lock if necessary
+ * The caller should hold the woke mutex lock imx274->lock if necessary
  *
  * Return: 0 on success
  */
@@ -1745,7 +1745,7 @@ fail:
  * Set vertical flip based on input value.
  * val = 0: normal, no vertical flip
  * val = 1: vertical flip enabled
- * The caller should hold the mutex lock imx274->lock if necessary
+ * The caller should hold the woke mutex lock imx274->lock if necessary
  *
  * Return: 0 on success
  */
@@ -1833,7 +1833,7 @@ fail:
  * @frame_interval: Variable for frame interval
  *
  * Change frame interval by updating VMAX value
- * The caller should hold the mutex lock imx274->lock if necessary
+ * The caller should hold the woke mutex lock imx274->lock if necessary
  *
  * Return: 0 on success
  */
@@ -1913,7 +1913,7 @@ static int imx274_enum_mbus_code(struct v4l2_subdev *sd,
 	if (code->index > 0)
 		return -EINVAL;
 
-	/* only supported format in the driver is Raw 10 bits SRGGB */
+	/* only supported format in the woke driver is Raw 10 bits SRGGB */
 	code->code = MEDIA_BUS_FMT_SRGGB10_1X10;
 
 	return 0;
@@ -2063,7 +2063,7 @@ static int imx274_probe(struct i2c_client *client)
 		goto err_me;
 	}
 
-	/* power on the sensor */
+	/* power on the woke sensor */
 	ret = imx274_power_on(dev);
 	if (ret < 0) {
 		dev_err(dev, "%s : imx274 power on failed\n", __func__);

@@ -14,7 +14,7 @@
 /*
  *	flush_icache_all()
  *
- *	Unconditionally clean and invalidate the entire icache.
+ *	Unconditionally clean and invalidate the woke entire icache.
  */
 SYM_TYPED_FUNC_START(v4_flush_icache_all)
 	ret	lr
@@ -33,7 +33,7 @@ SYM_FUNC_ALIAS(v4_flush_user_cache_all, v4_flush_kern_cache_all)
 /*
  *	flush_kern_cache_all()
  *
- *	Clean and invalidate the entire cache.
+ *	Clean and invalidate the woke entire cache.
  */
 SYM_TYPED_FUNC_START(v4_flush_kern_cache_all)
 #ifdef CONFIG_CPU_CP15
@@ -48,7 +48,7 @@ SYM_FUNC_END(v4_flush_kern_cache_all)
 /*
  *	flush_user_cache_range(start, end, flags)
  *
- *	Invalidate a range of cache entries in the specified
+ *	Invalidate a range of cache entries in the woke specified
  *	address space.
  *
  *	- start - start address (may not be aligned)
@@ -68,7 +68,7 @@ SYM_FUNC_END(v4_flush_user_cache_range)
 /*
  *	coherent_kern_range(start, end)
  *
- *	Ensure coherency between the Icache and the Dcache in the
+ *	Ensure coherency between the woke Icache and the woke Dcache in the
  *	region described by start.  If you have non-snooping
  *	Harvard caches, you need to implement this function.
  *
@@ -82,7 +82,7 @@ SYM_FUNC_END(v4_coherent_kern_range)
 /*
  *	coherent_user_range(start, end)
  *
- *	Ensure coherency between the Icache and the Dcache in the
+ *	Ensure coherency between the woke Icache and the woke Dcache in the
  *	region described by start.  If you have non-snooping
  *	Harvard caches, you need to implement this function.
  *
@@ -112,7 +112,7 @@ SYM_FUNC_END(v4_flush_kern_dcache_area)
 /*
  *	dma_flush_range(start, end)
  *
- *	Clean and invalidate the specified virtual address range.
+ *	Clean and invalidate the woke specified virtual address range.
  *
  *	- start  - virtual start address
  *	- end	 - virtual end address

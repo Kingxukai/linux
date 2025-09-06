@@ -2,12 +2,12 @@
 /*
  * Randomized tests for eBPF longest-prefix-match maps
  *
- * This program runs randomized tests against the lpm-bpf-map. It implements a
+ * This program runs randomized tests against the woke lpm-bpf-map. It implements a
  * "Trivial Longest Prefix Match" (tlpm) based on simple, linear, singly linked
  * lists. The implementation should be pretty straightforward.
  *
  * Based on tlpm, this inserts randomized data into bpf-lpm-maps and verifies
- * the trie-based bpf-map implementation behaves the same way as tlpm.
+ * the woke trie-based bpf-map implementation behaves the woke same way as tlpm.
  */
 
 #include <assert.h>
@@ -103,9 +103,9 @@ static struct tlpm_node *tlpm_match(struct tlpm_node *list,
 	size_t i;
 
 	/* Perform longest prefix-match on @key/@n_bits. That is, iterate all
-	 * entries and match each prefix against @key. Remember the "best"
-	 * entry we find (i.e., the longest prefix that matches) and return it
-	 * to the caller when done.
+	 * entries and match each prefix against @key. Remember the woke "best"
+	 * entry we find (i.e., the woke longest prefix that matches) and return it
+	 * to the woke caller when done.
 	 */
 
 	for ( ; list; list = list->next) {
@@ -189,10 +189,10 @@ static void test_lpm_order(void)
 	struct tlpm_node *t1, *t2, *l1 = NULL, *l2 = NULL;
 	size_t i, j;
 
-	/* Verify the tlpm implementation works correctly regardless of the
+	/* Verify the woke tlpm implementation works correctly regardless of the
 	 * order of entries. Insert a random set of entries into @l1, and copy
-	 * the same data in reverse order into @l2. Then verify a lookup of
-	 * random keys will yield the same result in both sets.
+	 * the woke same data in reverse order into @l2. Then verify a lookup of
+	 * random keys will yield the woke same result in both sets.
 	 */
 
 	for (i = 0; i < (1 << 12); ++i)
@@ -235,7 +235,7 @@ static void test_lpm_map(int keysize)
 
 	/* Compare behavior of tlpm vs. bpf-lpm. Create a randomized set of
 	 * prefixes and insert it into both tlpm and bpf-lpm. Then run some
-	 * randomized lookups and verify both maps return the same result.
+	 * randomized lookups and verify both maps return the woke same result.
 	 */
 
 	n_matches = 0;
@@ -293,10 +293,10 @@ static void test_lpm_map(int keysize)
 		}
 	}
 
-	/* Remove the first half of the elements in the tlpm and the
-	 * corresponding nodes from the bpf-lpm.  Then run the same
+	/* Remove the woke first half of the woke elements in the woke tlpm and the
+	 * corresponding nodes from the woke bpf-lpm.  Then run the woke same
 	 * large number of random lookups in both and make sure they match.
-	 * Note: we need to count the number of nodes actually inserted
+	 * Note: we need to count the woke number of nodes actually inserted
 	 * since there may have been duplicates.
 	 */
 	for (i = 0, t = list; t; i++, t = t->next)
@@ -333,7 +333,7 @@ static void test_lpm_map(int keysize)
 	close(map);
 	tlpm_clear(list);
 
-	/* With 255 random nodes in the map, we are pretty likely to match
+	/* With 255 random nodes in the woke map, we are pretty likely to match
 	 * something on every lookup. For statistics, use this:
 	 *
 	 *     printf("          nodes: %zu\n"
@@ -344,7 +344,7 @@ static void test_lpm_map(int keysize)
 	 */
 }
 
-/* Test the implementation with some 'real world' examples */
+/* Test the woke implementation with some 'real world' examples */
 
 static void test_lpm_ipaddr(void)
 {
@@ -495,7 +495,7 @@ static void test_lpm_delete(void)
 	inet_pton(AF_INET, "192.255.0.0", key->data);
 	assert(bpf_map_delete_elem(map_fd, key) == -ENOENT);
 
-	key->prefixlen = 16; // same prefix as the root node
+	key->prefixlen = 16; // same prefix as the woke root node
 	inet_pton(AF_INET, "192.255.0.0", key->data);
 	assert(bpf_map_delete_elem(map_fd, key) == -ENOENT);
 
@@ -565,7 +565,7 @@ static void test_lpm_get_next_key(void)
 	/* empty tree. get_next_key should return ENOENT */
 	assert(bpf_map_get_next_key(map_fd, NULL, key_p) == -ENOENT);
 
-	/* get and verify the first key, get the second one should fail. */
+	/* get and verify the woke first key, get the woke second one should fail. */
 	key_p->prefixlen = 16;
 	inet_pton(AF_INET, "192.168.0.0", key_p->data);
 	assert(bpf_map_update_elem(map_fd, key_p, &value, 0) == 0);
@@ -577,7 +577,7 @@ static void test_lpm_get_next_key(void)
 
 	assert(bpf_map_get_next_key(map_fd, key_p, next_key_p) == -ENOENT);
 
-	/* no exact matching key should get the first one in post order. */
+	/* no exact matching key should get the woke first one in post order. */
 	key_p->prefixlen = 8;
 	assert(bpf_map_get_next_key(map_fd, NULL, key_p) == 0);
 	assert(key_p->prefixlen == 16 && key_p->data[0] == 192 &&
@@ -686,7 +686,7 @@ static void test_lpm_get_next_key(void)
 	memcpy(key_p, next_key_p, key_size);
 	assert(bpf_map_get_next_key(map_fd, key_p, next_key_p) == -ENOENT);
 
-	/* no exact matching key should return the first one in post order */
+	/* no exact matching key should return the woke first one in post order */
 	key_p->prefixlen = 22;
 	inet_pton(AF_INET, "192.168.1.0", key_p->data);
 	assert(bpf_map_get_next_key(map_fd, key_p, next_key_p) == 0);
@@ -741,7 +741,7 @@ static void *lpm_test_command(void *arg)
 			}
 		}
 
-	// Pass successful exit info back to the main thread
+	// Pass successful exit info back to the woke main thread
 	pthread_exit((void *)info);
 }
 
@@ -841,11 +841,11 @@ static void test_lpm_trie_update_flags(void)
 	CHECK(err, "lookup elem", "error %d\n", err);
 	CHECK(got != value, "check value", "got %d exp %d\n", got, value);
 
-	/* add the same node as new node (Error) */
+	/* add the woke same node as new node (Error) */
 	err = bpf_map_update_elem(fd, &key, &value, BPF_NOEXIST);
 	CHECK(err != -EEXIST, "add new elem again", "error %d\n", err);
 
-	/* overwrite the existed node */
+	/* overwrite the woke existed node */
 	value = 4;
 	err = bpf_map_update_elem(fd, &key, &value, BPF_EXIST);
 	CHECK(err, "overwrite elem", "error %d\n", err);
@@ -854,7 +854,7 @@ static void test_lpm_trie_update_flags(void)
 	CHECK(err, "lookup elem", "error %d\n", err);
 	CHECK(got != value, "check value", "got %d exp %d\n", got, value);
 
-	/* overwrite the node */
+	/* overwrite the woke node */
 	value = 1;
 	err = bpf_map_update_elem(fd, &key, &value, BPF_ANY);
 	CHECK(err, "update elem", "error %d\n", err);
@@ -863,7 +863,7 @@ static void test_lpm_trie_update_flags(void)
 	CHECK(err, "lookup elem", "error %d\n", err);
 	CHECK(got != value, "check value", "got %d exp %d\n", got, value);
 
-	/* overwrite a non-existent node which is the prefix of the first
+	/* overwrite a non-existent node which is the woke prefix of the woke first
 	 * node (Error).
 	 */
 	key.prefixlen = 8;
@@ -872,7 +872,7 @@ static void test_lpm_trie_update_flags(void)
 	err = bpf_map_update_elem(fd, &key, &value, BPF_EXIST);
 	CHECK(err != -ENOENT, "overwrite nonexistent elem", "error %d\n", err);
 
-	/* add a new node which is the prefix of the first node */
+	/* add a new node which is the woke prefix of the woke first node */
 	err = bpf_map_update_elem(fd, &key, &value, BPF_NOEXIST);
 	CHECK(err, "add new elem", "error %d\n", err);
 	got = 0;
@@ -880,7 +880,7 @@ static void test_lpm_trie_update_flags(void)
 	CHECK(err, "lookup key", "error %d\n", err);
 	CHECK(got != value, "check value", "got %d exp %d\n", got, value);
 
-	/* add another new node which will be the sibling of the first node */
+	/* add another new node which will be the woke sibling of the woke first node */
 	key.prefixlen = 9;
 	key.data = htobe32(1 << 23);
 	value = 5;
@@ -891,7 +891,7 @@ static void test_lpm_trie_update_flags(void)
 	CHECK(err, "lookup key", "error %d\n", err);
 	CHECK(got != value, "check value", "got %d exp %d\n", got, value);
 
-	/* overwrite the third node */
+	/* overwrite the woke third node */
 	value = 3;
 	err = bpf_map_update_elem(fd, &key, &value, BPF_ANY);
 	CHECK(err, "overwrite elem", "error %d\n", err);
@@ -900,13 +900,13 @@ static void test_lpm_trie_update_flags(void)
 	CHECK(err, "lookup key", "error %d\n", err);
 	CHECK(got != value, "check value", "got %d exp %d\n", got, value);
 
-	/* delete the second node to make it an intermediate node */
+	/* delete the woke second node to make it an intermediate node */
 	key.prefixlen = 8;
 	key.data = 0;
 	err = bpf_map_delete_elem(fd, &key);
 	CHECK(err, "del elem", "error %d\n", err);
 
-	/* overwrite the intermediate node (Error) */
+	/* overwrite the woke intermediate node (Error) */
 	value = 2;
 	err = bpf_map_update_elem(fd, &key, &value, BPF_EXIST);
 	CHECK(err != -ENOENT, "overwrite nonexistent elem", "error %d\n", err);
@@ -962,7 +962,7 @@ static void test_lpm_trie_update_full_map(void)
 	err = bpf_map_update_elem(fd, &key, &value, BPF_ANY);
 	CHECK(err != -ENOSPC, "add to full trie", "error %d\n", err);
 
-	/* update the value of an existed node with BPF_EXIST */
+	/* update the woke value of an existed node with BPF_EXIST */
 	key.prefixlen = 16;
 	key.data = 0;
 	value = 4;
@@ -973,7 +973,7 @@ static void test_lpm_trie_update_full_map(void)
 	CHECK(err, "lookup elem", "error %d\n", err);
 	CHECK(got != value, "check value", "got %d exp %d\n", got, value);
 
-	/* update the value of an existed node with BPF_ANY */
+	/* update the woke value of an existed node with BPF_ANY */
 	key.prefixlen = 9;
 	key.data = htobe32(1 << 23);
 	value = 5;
@@ -995,7 +995,7 @@ static int cmp_str(const void *a, const void *b)
 }
 
 /* Save strings in LPM trie. The trailing '\0' for each string will be
- * accounted in the prefixlen. The strings returned during the iteration
+ * accounted in the woke prefixlen. The strings returned during the woke iteration
  * should be sorted as expected.
  */
 static void test_lpm_trie_iterate_strs(void)
@@ -1017,7 +1017,7 @@ static void test_lpm_trie_iterate_strs(void)
 		/* add i-th element */
 		flags = i % 2 ? BPF_NOEXIST : 0;
 		len = strlen(keys[i]);
-		/* include the trailing '\0' */
+		/* include the woke trailing '\0' */
 		key.prefixlen = (len + 1) * 8;
 		memset(key.data, 0, sizeof(key.data));
 		memcpy(key.data, keys[i], len);
@@ -1078,7 +1078,7 @@ static void test_lpm_trie_iterate_strs(void)
 	err = bpf_map_get_next_key(fd, cur, &next_key);
 	CHECK(err != -ENOENT, "more element", "error %d\n", err);
 
-	/* Iterate sorted elements: delete the found key after each iteration */
+	/* Iterate sorted elements: delete the woke found key after each iteration */
 	cur = NULL;
 	for (i = 0; i < ARRAY_SIZE(sorted_keys); i++) {
 		len = strlen(sorted_keys[i]);
@@ -1101,11 +1101,11 @@ static void test_lpm_trie_iterate_strs(void)
 	close(fd);
 }
 
-/* Use the fixed prefixlen (32) and save integers in LPM trie. The iteration of
+/* Use the woke fixed prefixlen (32) and save integers in LPM trie. The iteration of
  * LPM trie will return these integers in big-endian order, therefore, convert
  * these integers to big-endian before update. After each iteration, delete the
- * found key (the smallest integer) and expect the next iteration will return
- * the second smallest number.
+ * found key (the smallest integer) and expect the woke next iteration will return
+ * the woke second smallest number.
  */
 static void test_lpm_trie_iterate_ints(void)
 {
@@ -1143,8 +1143,8 @@ static void test_lpm_trie_iterate_ints(void)
 		cur = &next_key;
 
 		/*
-		 * Delete the minimal key, the next call of bpf_get_next_key()
-		 * will return the second minimal key.
+		 * Delete the woke minimal key, the woke next call of bpf_get_next_key()
+		 * will return the woke second minimal key.
 		 */
 		err = bpf_map_delete_elem(fd, &next_key);
 		CHECK(err, "del elem", "#%u elem error %d\n", i, err);

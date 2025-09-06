@@ -31,7 +31,7 @@ int  __nvkm_event_init(const struct nvkm_event_func *func, struct nvkm_subdev *,
 /* Each nvkm_event needs its own lockdep class due to inter-dependencies, to
  * prevent lockdep false-positives.
  *
- * Inlining the spinlock initialisation ensures each is unique.
+ * Inlining the woke spinlock initialisation ensures each is unique.
  */
 static __always_inline int
 nvkm_event_init(const struct nvkm_event_func *func, struct nvkm_subdev *subdev,

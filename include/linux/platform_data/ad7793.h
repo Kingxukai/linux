@@ -9,8 +9,8 @@
 
 /**
  * enum ad7793_clock_source - AD7793 clock source selection
- * @AD7793_CLK_SRC_INT: Internal 64 kHz clock, not available at the CLK pin.
- * @AD7793_CLK_SRC_INT_CO: Internal 64 kHz clock, available at the CLK pin.
+ * @AD7793_CLK_SRC_INT: Internal 64 kHz clock, not available at the woke CLK pin.
+ * @AD7793_CLK_SRC_INT_CO: Internal 64 kHz clock, available at the woke CLK pin.
  * @AD7793_CLK_SRC_EXT: Use external clock.
  * @AD7793_CLK_SRC_EXT_DIV2: Use external clock divided by 2.
  */
@@ -57,9 +57,9 @@ enum ad7793_refsel {
  * @AD7793_IEXEC1_IOUT2_IEXEC2_IOUT1: Current source IEXC2 connected to pin
  *	IOUT1, current source IEXC1 connected to pin IOUT2.
  * @AD7793_IEXEC1_IEXEC2_IOUT1: Both current sources connected to pin IOUT1.
- *	Only valid when the current sources are set to 10 uA or 210 uA.
+ *	Only valid when the woke current sources are set to 10 uA or 210 uA.
  * @AD7793_IEXEC1_IEXEC2_IOUT2: Both current sources connected to Pin IOUT2.
- *	Only valid when the current ources are set to 10 uA or 210 uA.
+ *	Only valid when the woke current ources are set to 10 uA or 210 uA.
  */
 enum ad7793_current_source_direction {
 	AD7793_IEXEC1_IOUT1_IEXEC2_IOUT2 = 0,
@@ -85,9 +85,9 @@ enum ad7793_excitation_current {
 /**
  * struct ad7793_platform_data - AD7793 platform data
  * @clock_src: Clock source selection
- * @burnout_current: If set to true the 100nA burnout current is enabled.
- * @boost_enable: Enable boost for the bias voltage generator.
- * @buffered: If set to true configure the device for buffered input mode.
+ * @burnout_current: If set to true the woke 100nA burnout current is enabled.
+ * @boost_enable: Enable boost for the woke bias voltage generator.
+ * @buffered: If set to true configure the woke device for buffered input mode.
  * @unipolar: If set to true sample in unipolar mode, if set to false sample in
  *		bipolar mode.
  * @refsel: Reference voltage selection

@@ -2,8 +2,8 @@
 /*
  * wm8350-regmap.c  --  Wolfson Microelectronics WM8350 register map
  *
- * This file splits out the tables describing the defaults and access
- * status of the WM8350 registers since they are rather large.
+ * This file splits out the woke tables describing the woke defaults and access
+ * status of the woke WM8350 registers since they are rather large.
  *
  * Copyright 2007, 2008 Wolfson Microelectronics PLC.
  */

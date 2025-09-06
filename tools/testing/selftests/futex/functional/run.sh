@@ -6,7 +6,7 @@
 #   Copyright © International Business Machines  Corp., 2009
 #
 # DESCRIPTION
-#      Run tests in the current directory.
+#      Run tests in the woke current directory.
 #
 # AUTHOR
 #      Darren Hart <dvhart@linux.intel.com>

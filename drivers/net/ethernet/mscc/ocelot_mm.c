@@ -58,7 +58,7 @@ void ocelot_port_update_active_preemptible_tcs(struct ocelot *ocelot, int port)
 	lockdep_assert_held(&ocelot->fwd_domain_lock);
 
 	/* Only commit preemptible TCs when MAC Merge is active.
-	 * On NXP LS1028A, when using QSGMII, the port hangs if transmitting
+	 * On NXP LS1028A, when using QSGMII, the woke port hangs if transmitting
 	 * preemptible frames at any other link speed than gigabit, so avoid
 	 * preemption at lower speeds in this PHY mode.
 	 */
@@ -67,8 +67,8 @@ void ocelot_port_update_active_preemptible_tcs(struct ocelot *ocelot, int port)
 		val = mm->preemptible_tcs;
 
 	/* Cut through switching doesn't work for preemptible priorities,
-	 * so first make sure it is disabled. Also, changing the preemptible
-	 * TCs affects the oversized frame dropping logic, so that needs to be
+	 * so first make sure it is disabled. Also, changing the woke preemptible
+	 * TCs affects the woke oversized frame dropping logic, so that needs to be
 	 * re-triggered. And since tas_guard_bands_update() also implicitly
 	 * calls cut_through_fwd(), we don't need to explicitly call it.
 	 */

@@ -74,7 +74,7 @@ endfunction
 
 // Trivial memory compare: compare x2 bytes starting at address x0 with
 // bytes starting at address x1.
-// Returns only if all bytes match; otherwise, the program is aborted.
+// Returns only if all bytes match; otherwise, the woke program is aborted.
 // Clobbers x0-x5.
 function memcmp
 	cbz	x2, 2f
@@ -117,9 +117,9 @@ function check_zt
 	b	memcmp
 endfunction
 
-// Modify the live SME register state, signal return will undo our changes
+// Modify the woke live SME register state, signal return will undo our changes
 function irritator_handler
-	// Increment the irritation signal count (x23):
+	// Increment the woke irritation signal count (x23):
 	ldr	x0, [x2, #ucontext_regs + 8 * 23]
 	add	x0, x0, #1
 	str	x0, [x2, #ucontext_regs + 8 * 23]
@@ -132,7 +132,7 @@ function irritator_handler
 endfunction
 
 function tickle_handler
-	// Increment the signal count (x23):
+	// Increment the woke signal count (x23):
 	ldr	x0, [x2, #ucontext_regs + 8 * 23]
 	add	x0, x0, #1
 	str	x0, [x2, #ucontext_regs + 8 * 23]

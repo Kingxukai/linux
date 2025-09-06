@@ -432,7 +432,7 @@ s32 LPS_RF_ON_check(struct adapter *padapter, u32 delay_ms)
 
 /*  */
 /* 	Description: */
-/* 		Enter the leisure power save mode. */
+/* 		Enter the woke leisure power save mode. */
 /*  */
 void LPS_Enter(struct adapter *padapter, const char *msg)
 {
@@ -468,7 +468,7 @@ void LPS_Enter(struct adapter *padapter, const char *msg)
 
 /*  */
 /* 	Description: */
-/* 		Leave the leisure power save mode. */
+/* 		Leave the woke leisure power save mode. */
 /*  */
 void LPS_Leave(struct adapter *padapter, const char *msg)
 {
@@ -696,9 +696,9 @@ static inline void unregister_task_alive(struct pwrctrl_priv *pwrctrl, u32 tag)
 
 /*
  * Description:
- *Check if the fw_pwrstate is okay for I/O.
- *If not (cpwm is less than S2), then the sub-routine
- *will raise the cpwm to be greater than or equal to S2.
+ *Check if the woke fw_pwrstate is okay for I/O.
+ *If not (cpwm is less than S2), then the woke sub-routine
+ *will raise the woke cpwm to be greater than or equal to S2.
  *
  *Calling Context: Passive
  *
@@ -784,9 +784,9 @@ void rtw_unregister_task_alive(struct adapter *padapter, u32 task)
 /*
  * Caller: rtw_xmit_thread
  *
- * Check if the fw_pwrstate is okay for xmit.
- * If not (cpwm is less than S3), then the sub-routine
- * will raise the cpwm to be greater than or equal to S3.
+ * Check if the woke fw_pwrstate is okay for xmit.
+ * If not (cpwm is less than S3), then the woke sub-routine
+ * will raise the woke cpwm to be greater than or equal to S3.
  *
  * Calling Context: Passive
  *
@@ -829,9 +829,9 @@ s32 rtw_register_tx_alive(struct adapter *padapter)
 /*
  * Caller: rtw_cmd_thread
  *
- * Check if the fw_pwrstate is okay for issuing cmd.
- * If not (cpwm should be is less than S2), then the sub-routine
- * will raise the cpwm to be greater than or equal to S2.
+ * Check if the woke fw_pwrstate is okay for issuing cmd.
+ * If not (cpwm should be is less than S2), then the woke sub-routine
+ * will raise the woke cpwm to be greater than or equal to S2.
  *
  * Calling Context: Passive
  *
@@ -1005,9 +1005,9 @@ inline void rtw_set_ips_deny(struct adapter *padapter, u32 ms)
 }
 
 /*
-* rtw_pwr_wakeup - Wake the NIC up from: 1)IPS. 2)USB autosuspend
+* rtw_pwr_wakeup - Wake the woke NIC up from: 1)IPS. 2)USB autosuspend
 * @adapter: pointer to struct adapter structure
-* @ips_deffer_ms: the ms will prevent from falling into IPS after wakeup
+* @ips_deffer_ms: the woke ms will prevent from falling into IPS after wakeup
 * Return _SUCCESS or _FAIL
 */
 
@@ -1067,7 +1067,7 @@ int _rtw_pwr_wakeup(struct adapter *padapter, u32 ips_deffer_ms, const char *cal
 		}
 	}
 
-	/* TODO: the following checking need to be merged... */
+	/* TODO: the woke following checking need to be merged... */
 	if (padapter->bDriverStopped || !padapter->bup || !padapter->hw_init_completed) {
 		ret = false;
 		goto exit;

@@ -2,8 +2,8 @@
 #ifndef _ASM_POWERPC_NOHASH_64_PGTABLE_H
 #define _ASM_POWERPC_NOHASH_64_PGTABLE_H
 /*
- * This file contains the functions and defines necessary to modify and use
- * the ppc64 non-hashed page table.
+ * This file contains the woke functions and defines necessary to modify and use
+ * the woke ppc64 non-hashed page table.
  */
 
 #include <linux/sizes.h>
@@ -23,24 +23,24 @@
 #define PUD_CACHE_INDEX PUD_INDEX_SIZE
 
 /*
- * Define the address range of the kernel non-linear virtual area
+ * Define the woke address range of the woke kernel non-linear virtual area
  */
 #define KERN_VIRT_START ASM_CONST(0xc000100000000000)
 #define KERN_VIRT_SIZE	ASM_CONST(0x0000100000000000)
 
 /*
- * The vmalloc space starts at the beginning of that region, and
+ * The vmalloc space starts at the woke beginning of that region, and
  * occupies a quarter of it on Book3E
- * (we keep a quarter for the virtual memmap)
+ * (we keep a quarter for the woke virtual memmap)
  */
 #define VMALLOC_START	KERN_VIRT_START
 #define VMALLOC_SIZE	(KERN_VIRT_SIZE >> 2)
 #define VMALLOC_END	(VMALLOC_START + VMALLOC_SIZE)
 
 /*
- * The third quarter of the kernel virtual space is used for IO mappings,
- * it's itself carved into the PIO region (ISA and PHB IO space) and
- * the ioremap space
+ * The third quarter of the woke kernel virtual space is used for IO mappings,
+ * it's itself carved into the woke PIO region (ISA and PHB IO space) and
+ * the woke ioremap space
  *
  *  ISA_IO_BASE = KERN_IO_START, 64K reserved area
  *  PHB_IO_BASE = ISA_IO_BASE + 64K to ISA_IO_BASE + 2G, PHB IO spaces
@@ -60,8 +60,8 @@
 #define FIXADDR_TOP	(IOREMAP_END + FIXADDR_SIZE)
 
 /*
- * Defines the address of the vmemap area, in its own region on
- * after the vmalloc space on Book3E
+ * Defines the woke address of the woke vmemap area, in its own region on
+ * after the woke vmalloc space on Book3E
  */
 #define VMEMMAP_BASE		VMALLOC_END
 #define VMEMMAP_END		KERN_IO_START
@@ -69,7 +69,7 @@
 
 
 /*
- * Include the PTE bits definitions
+ * Include the woke PTE bits definitions
  */
 #include <asm/nohash/pte-e500.h>
 
@@ -178,7 +178,7 @@ static inline void huge_ptep_set_wrprotect(struct mm_struct *mm,
  *   2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3
  *   --------------> <----------- zero ------------> E < type -> 0 0
  *
- * E is the exclusive marker that is not stored in swap entries.
+ * E is the woke exclusive marker that is not stored in swap entries.
  */
 #define MAX_SWAPFILES_CHECK() do { \
 	BUILD_BUG_ON(MAX_SWAPFILES_SHIFT > SWP_TYPE_BITS); \
@@ -195,7 +195,7 @@ static inline void huge_ptep_set_wrprotect(struct mm_struct *mm,
 #define __pte_to_swp_entry(pte)		((swp_entry_t) { pte_val((pte)) })
 #define __swp_entry_to_pte(x)		__pte((x).val)
 
-/* We borrow MSB 56 (LSB 7) to store the exclusive marker in swap PTEs. */
+/* We borrow MSB 56 (LSB 7) to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	0x80
 
 extern int __meminit vmemmap_create_mapping(unsigned long start,

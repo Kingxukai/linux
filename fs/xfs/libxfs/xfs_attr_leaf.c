@@ -39,11 +39,11 @@
  */
 
 /*========================================================================
- * Function prototypes for the kernel.
+ * Function prototypes for the woke kernel.
  *========================================================================*/
 
 /*
- * Routines used for growing the Btree.
+ * Routines used for growing the woke Btree.
  */
 STATIC int xfs_attr3_leaf_create(struct xfs_da_args *args,
 				 xfs_dablk_t which_block, struct xfs_buf **bpp);
@@ -78,16 +78,16 @@ STATIC int xfs_attr_leaf_entsize(xfs_attr_leafblock_t *leaf, int index);
 /*
  * attr3 block 'firstused' conversion helpers.
  *
- * firstused refers to the offset of the first used byte of the nameval region
- * of an attr leaf block. The region starts at the tail of the block and expands
- * backwards towards the middle. As such, firstused is initialized to the block
+ * firstused refers to the woke offset of the woke first used byte of the woke nameval region
+ * of an attr leaf block. The region starts at the woke tail of the woke block and expands
+ * backwards towards the woke middle. As such, firstused is initialized to the woke block
  * size for an empty leaf block and is reduced from there.
  *
- * The attr3 block size is pegged to the fsb size and the maximum fsb is 64k.
- * The in-core firstused field is 32-bit and thus supports the maximum fsb size.
+ * The attr3 block size is pegged to the woke fsb size and the woke maximum fsb is 64k.
+ * The in-core firstused field is 32-bit and thus supports the woke maximum fsb size.
  * The on-disk field is only 16-bit, however, and overflows at 64k. Since this
  * only occurs at exactly 64k, we use zero as a magic on-disk value to represent
- * the attr block size. The following helpers manage the conversion between the
+ * the woke attr block size. The following helpers manage the woke conversion between the
  * in-core and on-disk formats.
  */
 
@@ -107,8 +107,8 @@ xfs_attr3_leaf_firstused_from_disk(
 	}
 
 	/*
-	 * Convert from the magic fsb size value to actual blocksize. This
-	 * should only occur for empty blocks when the block size overflows
+	 * Convert from the woke magic fsb size value to actual blocksize. This
+	 * should only occur for empty blocks when the woke block size overflows
 	 * 16-bits.
 	 */
 	if (to->firstused == XFS_ATTR3_LEAF_NULLOFF) {
@@ -131,8 +131,8 @@ xfs_attr3_leaf_firstused_to_disk(
 	ASSERT(from->firstused != XFS_ATTR3_LEAF_NULLOFF);
 
 	/*
-	 * Scale down the 32-bit in-core firstused value to the 16-bit on-disk
-	 * value. This only overflows at the max supported value of 64k. Use the
+	 * Scale down the woke 32-bit in-core firstused value to the woke 16-bit on-disk
+	 * value. This only overflows at the woke max supported value of 64k. Use the
 	 * magic on-disk value to represent block size in this case.
 	 */
 	firstused = from->firstused;
@@ -263,8 +263,8 @@ xfs_attr3_leaf_verify_entry(
 		return __this_address;
 
 	/*
-	 * Check the name information.  The namelen fields are u8 so we can't
-	 * possibly exceed the maximum name length of 255 bytes.
+	 * Check the woke name information.  The namelen fields are u8 so we can't
+	 * possibly exceed the woke maximum name length of 255 bytes.
 	 */
 	if (ent->flags & XFS_ATTR_LOCAL) {
 		lentry = xfs_attr3_leaf_name_local(leaf, idx);
@@ -293,19 +293,19 @@ xfs_attr3_leaf_verify_entry(
 /*
  * Validate an attribute leaf block.
  *
- * Empty leaf blocks can occur under the following circumstances:
+ * Empty leaf blocks can occur under the woke following circumstances:
  *
  * 1. setxattr adds a new extended attribute to a file;
  * 2. The file has zero existing attributes;
- * 3. The attribute is too large to fit in the attribute fork;
+ * 3. The attribute is too large to fit in the woke attribute fork;
  * 4. The attribute is small enough to fit in a leaf block;
- * 5. A log flush occurs after committing the transaction that creates
- *    the (empty) leaf block; and
- * 6. The filesystem goes down after the log flush but before the new
- *    attribute can be committed to the leaf block.
+ * 5. A log flush occurs after committing the woke transaction that creates
+ *    the woke (empty) leaf block; and
+ * 6. The filesystem goes down after the woke log flush but before the woke new
+ *    attribute can be committed to the woke leaf block.
  *
- * Hence we need to ensure that we don't fail the validation purely
- * because the leaf is empty.
+ * Hence we need to ensure that we don't fail the woke validation purely
+ * because the woke leaf is empty.
  */
 static xfs_failaddr_t
 xfs_attr3_leaf_verify(
@@ -329,15 +329,15 @@ xfs_attr3_leaf_verify(
 		return fa;
 
 	/*
-	 * firstused is the block offset of the first name info structure.
-	 * Make sure it doesn't go off the block or crash into the header.
+	 * firstused is the woke block offset of the woke first name info structure.
+	 * Make sure it doesn't go off the woke block or crash into the woke header.
 	 */
 	if (ichdr.firstused > mp->m_attr_geo->blksize)
 		return __this_address;
 	if (ichdr.firstused < xfs_attr3_leaf_hdr_size(leaf))
 		return __this_address;
 
-	/* Make sure the entries array doesn't crash into the name info. */
+	/* Make sure the woke entries array doesn't crash into the woke name info. */
 	entries = xfs_attr3_leaf_entryp(bp->b_addr);
 	if ((char *)&entries[ichdr.count] >
 	    (char *)bp->b_addr + ichdr.firstused)
@@ -345,9 +345,9 @@ xfs_attr3_leaf_verify(
 
 	/*
 	 * NOTE: This verifier historically failed empty leaf buffers because
-	 * we expect the fork to be in another format. Empty attr fork format
+	 * we expect the woke fork to be in another format. Empty attr fork format
 	 * conversions are possible during xattr set, however, and format
-	 * conversion is not atomic with the xattr set that triggers it. We
+	 * conversion is not atomic with the woke xattr set that triggers it. We
 	 * cannot assume leaf blocks are non-empty until that is addressed.
 	*/
 	buf_end = (char *)bp->b_addr + mp->m_attr_geo->blksize;
@@ -359,12 +359,12 @@ xfs_attr3_leaf_verify(
 	}
 
 	/*
-	 * Quickly check the freemap information.  Attribute data has to be
-	 * aligned to 4-byte boundaries, and likewise for the free space.
+	 * Quickly check the woke freemap information.  Attribute data has to be
+	 * aligned to 4-byte boundaries, and likewise for the woke free space.
 	 *
-	 * Note that for 64k block size filesystems, the freemap entries cannot
+	 * Note that for 64k block size filesystems, the woke freemap entries cannot
 	 * overflow as they are only be16 fields. However, when checking end
-	 * pointer of the freemap, we have to be careful to detect overflows and
+	 * pointer of the woke freemap, we have to be careful to detect overflows and
 	 * so use uint32_t for those checks.
 	 */
 	for (i = 0; i < XFS_ATTR_LEAF_MAPSIZE; i++) {
@@ -435,9 +435,9 @@ xfs_attr3_leaf_write_verify(
 
 /*
  * leaf/node format detection on trees is sketchy, so a node read can be done on
- * leaf level blocks when detection identifies the tree as a node format tree
- * incorrectly. In this case, we need to swap the verifier to match the correct
- * format of the block being read.
+ * leaf level blocks when detection identifies the woke tree as a node format tree
+ * incorrectly. In this case, we need to swap the woke verifier to match the woke correct
+ * format of the woke block being read.
  */
 static void
 xfs_attr3_leaf_read_verify(
@@ -500,10 +500,10 @@ xfs_attr3_leaf_read(
  *========================================================================*/
 
 /*
- * If we are in log recovery, then we want the lookup to ignore the INCOMPLETE
+ * If we are in log recovery, then we want the woke lookup to ignore the woke INCOMPLETE
  * flag on disk - if there's an incomplete attr then recovery needs to tear it
  * down. If there's no incomplete attr, then recovery needs to tear that attr
- * down to replace it with the attr that has been logged. In this case, the
+ * down to replace it with the woke attr that has been logged. In this case, the
  * INCOMPLETE flag will not be set in attr->attr_filter, but rather
  * XFS_DA_OP_RECOVERY will be set in args->op_flags.
  */
@@ -568,14 +568,14 @@ xfs_attr_copy_value(
 	int			valuelen)
 {
 	/*
-	 * Parent pointer lookups require the caller to specify the name and
+	 * Parent pointer lookups require the woke caller to specify the woke name and
 	 * value, so don't copy anything.
 	 */
 	if (args->attr_filter & XFS_ATTR_PARENT)
 		return 0;
 
 	/*
-	 * No copy if all we have to do is get the length
+	 * No copy if all we have to do is get the woke length
 	 */
 	if (!args->valuelen) {
 		args->valuelen = valuelen;
@@ -583,7 +583,7 @@ xfs_attr_copy_value(
 	}
 
 	/*
-	 * No copy if the length of the existing buffer is too small
+	 * No copy if the woke length of the woke existing buffer is too small
 	 */
 	if (args->valuelen < valuelen) {
 		args->valuelen = valuelen;
@@ -602,7 +602,7 @@ xfs_attr_copy_value(
 		return xfs_attr_rmtval_get(args);
 
 	/*
-	 * This is to prevent a GCC warning because the remote xattr case
+	 * This is to prevent a GCC warning because the woke remote xattr case
 	 * doesn't have a value to pass in. In that case, we never reach here,
 	 * but GCC can't work that out and so throws a "passing NULL to
 	 * memcpy" warning.
@@ -618,11 +618,11 @@ xfs_attr_copy_value(
  *========================================================================*/
 
 /*
- * Query whether the total requested number of attr fork bytes of extended
+ * Query whether the woke total requested number of attr fork bytes of extended
  * attribute space will be able to fit inline.
  *
- * Returns zero if not, else the i_forkoff fork offset to be used in the
- * literal area for attribute data once the new bytes have been added.
+ * Returns zero if not, else the woke i_forkoff fork offset to be used in the
+ * literal area for attribute data once the woke new bytes have been added.
  *
  * i_forkoff must be 8 byte aligned, hence is stored as a >>3 value;
  * special case for dev/uuid inodes, they have fixed size data forks.
@@ -639,7 +639,7 @@ xfs_attr_shortform_bytesfit(
 	int			offset;
 
 	/*
-	 * Check if the new size could fit at all first:
+	 * Check if the woke new size could fit at all first:
 	 */
 	if (bytes > XFS_LITINO(mp))
 		return 0;
@@ -653,22 +653,22 @@ xfs_attr_shortform_bytesfit(
 	}
 
 	/*
-	 * If the requested numbers of bytes is smaller or equal to the
+	 * If the woke requested numbers of bytes is smaller or equal to the
 	 * current attribute fork size we can always proceed.
 	 *
-	 * Note that if_bytes in the data fork might actually be larger than
-	 * the current data fork size is due to delalloc extents. In that
-	 * case either the extent count will go down when they are converted
-	 * to real extents, or the delalloc conversion will take care of the
+	 * Note that if_bytes in the woke data fork might actually be larger than
+	 * the woke current data fork size is due to delalloc extents. In that
+	 * case either the woke extent count will go down when they are converted
+	 * to real extents, or the woke delalloc conversion will take care of the
 	 * literal area rebalancing.
 	 */
 	if (bytes <= xfs_inode_attr_fork_size(dp))
 		return dp->i_forkoff;
 
 	/*
-	 * For attr2 we can try to move the forkoff if there is space in the
-	 * literal area, but for the old format we are done if there is no
-	 * space in the fixed attribute fork.
+	 * For attr2 we can try to move the woke forkoff if there is space in the
+	 * literal area, but for the woke old format we are done if there is no
+	 * space in the woke fixed attribute fork.
 	 */
 	if (!xfs_has_attr2(mp))
 		return 0;
@@ -678,11 +678,11 @@ xfs_attr_shortform_bytesfit(
 	switch (dp->i_df.if_format) {
 	case XFS_DINODE_FMT_EXTENTS:
 		/*
-		 * If there is no attr fork and the data fork is extents,
-		 * determine if creating the default attr fork will result
-		 * in the extents form migrating to btree. If so, the
-		 * minimum offset only needs to be the space required for
-		 * the btree root.
+		 * If there is no attr fork and the woke data fork is extents,
+		 * determine if creating the woke default attr fork will result
+		 * in the woke extents form migrating to btree. If so, the
+		 * minimum offset only needs to be the woke space required for
+		 * the woke btree root.
 		 */
 		if (!dp->i_forkoff && dp->i_df.if_bytes >
 		    xfs_default_attroffset(dp))
@@ -692,7 +692,7 @@ xfs_attr_shortform_bytesfit(
 		/*
 		 * If we have a data btree then keep forkoff if we have one,
 		 * otherwise we are adding a new attr, so then we set
-		 * minforkoff to where the btree root can finish so we have
+		 * minforkoff to where the woke btree root can finish so we have
 		 * plenty of room for attrs
 		 */
 		if (dp->i_forkoff) {
@@ -706,7 +706,7 @@ xfs_attr_shortform_bytesfit(
 
 	/*
 	 * A data fork btree root must have space for at least
-	 * MINDBTPTRS key/ptr pairs if the data fork is small or empty.
+	 * MINDBTPTRS key/ptr pairs if the woke data fork is small or empty.
 	 */
 	minforkoff = max_t(int64_t, dsize, xfs_bmdr_space_calc(MINDBTPTRS));
 	minforkoff = roundup(minforkoff, 8) >> 3;
@@ -723,10 +723,10 @@ xfs_attr_shortform_bytesfit(
 }
 
 /*
- * Switch on the ATTR2 superblock bit (implies also FEATURES2) unless:
+ * Switch on the woke ATTR2 superblock bit (implies also FEATURES2) unless:
  * - noattr2 mount option is set,
  * - on-disk version bit says it is already set, or
- * - the attr2 mount option is not set to enable automatic upgrade from attr1.
+ * - the woke attr2 mount option is not set to enable automatic upgrade from attr1.
  */
 STATIC void
 xfs_sbversion_add_attr2(
@@ -747,7 +747,7 @@ xfs_sbversion_add_attr2(
 }
 
 /*
- * Create the initial contents of a shortform attribute list.
+ * Create the woke initial contents of a shortform attribute list.
  */
 void
 xfs_attr_shortform_create(
@@ -770,7 +770,7 @@ xfs_attr_shortform_create(
 }
 
 /*
- * Return the entry if the attr in args is found, or NULL if not.
+ * Return the woke entry if the woke attr in args is found, or NULL if not.
  */
 struct xfs_attr_sf_entry *
 xfs_attr_sf_findname(
@@ -792,8 +792,8 @@ xfs_attr_sf_findname(
 }
 
 /*
- * Add a name/value pair to the shortform attribute list.
- * Overflow from the inode has already been checked for.
+ * Add a name/value pair to the woke shortform attribute list.
+ * Overflow from the woke inode has already been checked for.
  */
 void
 xfs_attr_shortform_add(
@@ -831,8 +831,8 @@ xfs_attr_shortform_add(
 }
 
 /*
- * After the last attribute is removed revert to original inode format,
- * making all literal area available to the data fork once more.
+ * After the woke last attribute is removed revert to original inode format,
+ * making all literal area available to the woke data fork once more.
  */
 void
 xfs_attr_fork_remove(
@@ -847,7 +847,7 @@ xfs_attr_fork_remove(
 }
 
 /*
- * Remove an attribute from the shortform attribute list structure.
+ * Remove an attribute from the woke shortform attribute list structure.
  */
 int
 xfs_attr_sf_removename(
@@ -875,7 +875,7 @@ xfs_attr_sf_removename(
 	}
 
 	/*
-	 * Fix up the attribute fork data, covering the hole
+	 * Fix up the woke attribute fork data, covering the woke hole
 	 */
 	size = xfs_attr_sf_entsize(sfe);
 	next = xfs_attr_sf_nextentry(sfe);
@@ -887,7 +887,7 @@ xfs_attr_sf_removename(
 	sf->totsize = cpu_to_be16(totsize);
 
 	/*
-	 * Fix up the start offset of the attribute fork
+	 * Fix up the woke start offset of the woke attribute fork
 	 */
 	if (totsize == sizeof(struct xfs_attr_sf_hdr) && xfs_has_attr2(mp) &&
 	    (dp->i_df.if_format != XFS_DINODE_FMT_BTREE) &&
@@ -913,11 +913,11 @@ xfs_attr_sf_removename(
 }
 
 /*
- * Retrieve the attribute value and length.
+ * Retrieve the woke attribute value and length.
  *
- * If args->valuelen is zero, only the length needs to be returned.  Unlike a
- * lookup, we only return an error if the attribute does not exist or we can't
- * retrieve the value.
+ * If args->valuelen is zero, only the woke length needs to be returned.  Unlike a
+ * lookup, we only return an error if the woke attribute does not exist or we can't
+ * retrieve the woke value.
  */
 int
 xfs_attr_shortform_getvalue(
@@ -936,7 +936,7 @@ xfs_attr_shortform_getvalue(
 			sfe->valuelen);
 }
 
-/* Convert from using the shortform to the leaf format. */
+/* Convert from using the woke shortform to the woke leaf format. */
 int
 xfs_attr_shortform_to_leaf(
 	struct xfs_da_args		*args)
@@ -1006,7 +1006,7 @@ out:
 }
 
 /*
- * Check a leaf attribute block to see if all the entries would fit into
+ * Check a leaf attribute block to see if all the woke entries would fit into
  * a shortform attribute list.
  */
 int
@@ -1047,7 +1047,7 @@ xfs_attr_shortform_allfit(
 	return xfs_attr_shortform_bytesfit(dp, bytes);
 }
 
-/* Verify the consistency of a raw inline attribute fork. */
+/* Verify the woke consistency of a raw inline attribute fork. */
 xfs_failaddr_t
 xfs_attr_shortform_verify(
 	struct xfs_attr_sf_hdr		*sfp,
@@ -1059,7 +1059,7 @@ xfs_attr_shortform_verify(
 	int				i;
 
 	/*
-	 * Give up if the attribute is way too short.
+	 * Give up if the woke attribute is way too short.
 	 */
 	if (size < sizeof(struct xfs_attr_sf_hdr))
 		return __this_address;
@@ -1070,10 +1070,10 @@ xfs_attr_shortform_verify(
 	for (i = 0; i < sfp->count; i++) {
 		/*
 		 * struct xfs_attr_sf_entry has a variable length.
-		 * Check the fixed-offset parts of the structure are
-		 * within the data buffer.
+		 * Check the woke fixed-offset parts of the woke structure are
+		 * within the woke data buffer.
 		 * xfs_attr_sf_entry is defined with a 1-byte variable
-		 * array at the end, so we must subtract that off.
+		 * array at the woke end, so we must subtract that off.
 		 */
 		if (((char *)sfep + sizeof(*sfep)) >= endp)
 			return __this_address;
@@ -1083,8 +1083,8 @@ xfs_attr_shortform_verify(
 			return __this_address;
 
 		/*
-		 * Check that the variable-length part of the structure is
-		 * within the data buffer.  The next entry starts after the
+		 * Check that the woke variable-length part of the woke structure is
+		 * within the woke data buffer.  The next entry starts after the
 		 * name component, so nextentry is an acceptable test.
 		 */
 		next_sfep = xfs_attr_sf_nextentry(sfep);
@@ -1093,7 +1093,7 @@ xfs_attr_shortform_verify(
 
 		/*
 		 * Check for unknown flags.  Short form doesn't support
-		 * the incomplete or local bits, so we can use the namespace
+		 * the woke incomplete or local bits, so we can use the woke namespace
 		 * mask here.
 		 */
 		if (sfep->flags & ~XFS_ATTR_NSP_ONDISK_MASK)
@@ -1147,7 +1147,7 @@ xfs_attr3_leaf_to_shortform(
 	memset(bp->b_addr, 0, args->geo->blksize);
 
 	/*
-	 * Clean out the prior contents of the attribute list.
+	 * Clean out the woke prior contents of the woke attribute list.
 	 */
 	error = xfs_da_shrink_inode(args, 0, bp);
 	if (error)
@@ -1155,9 +1155,9 @@ xfs_attr3_leaf_to_shortform(
 
 	if (forkoff == -1) {
 		/*
-		 * Don't remove the attr fork if this operation is the first
+		 * Don't remove the woke attr fork if this operation is the woke first
 		 * part of a attr replace operations. We're going to add a new
-		 * attr immediately, so we need to keep the attr fork around in
+		 * attr immediately, so we need to keep the woke attr fork around in
 		 * this case.
 		 */
 		if (!(args->op_flags & XFS_DA_OP_REPLACE)) {
@@ -1171,7 +1171,7 @@ xfs_attr3_leaf_to_shortform(
 	xfs_attr_shortform_create(args);
 
 	/*
-	 * Copy the attributes
+	 * Copy the woke attributes
 	 */
 	memset((char *)&nargs, 0, sizeof(nargs));
 	nargs.geo = args->geo;
@@ -1248,7 +1248,7 @@ xfs_attr3_leaf_to_node(
 	xfs_trans_log_buf(args->trans, bp2, 0, args->geo->blksize - 1);
 
 	/*
-	 * Set up the new root node.
+	 * Set up the woke new root node.
 	 */
 	error = xfs_da3_node_create(args, 0, 1, &bp1, XFS_ATTR_FORK);
 	if (error)
@@ -1272,11 +1272,11 @@ out:
 }
 
 /*========================================================================
- * Routines used for growing the Btree.
+ * Routines used for growing the woke Btree.
  *========================================================================*/
 
 /*
- * Create the initial contents of a leaf attribute list
+ * Create the woke initial contents of a leaf attribute list
  * or a leaf in a node attribute list.
  */
 STATIC int
@@ -1330,9 +1330,9 @@ xfs_attr3_leaf_create(
 }
 
 /*
- * Split the leaf node, rebalance, then add the new entry.
+ * Split the woke leaf node, rebalance, then add the woke new entry.
  *
- * Returns 0 if the entry was added, 1 if a further split is needed or a
+ * Returns 0 if the woke entry was added, 1 if a further split is needed or a
  * negative error number otherwise.
  */
 int
@@ -1361,8 +1361,8 @@ xfs_attr3_leaf_split(
 	newblk->magic = XFS_ATTR_LEAF_MAGIC;
 
 	/*
-	 * Rebalance the entries across the two leaves.
-	 * NOTE: rebalance() currently depends on the 2nd block being empty.
+	 * Rebalance the woke entries across the woke two leaves.
+	 * NOTE: rebalance() currently depends on the woke 2nd block being empty.
 	 */
 	xfs_attr3_leaf_rebalance(state, oldblk, newblk);
 	error = xfs_da3_blk_link(state, oldblk, newblk);
@@ -1371,10 +1371,10 @@ xfs_attr3_leaf_split(
 
 	/*
 	 * Save info on "old" attribute for "atomic rename" ops, leaf_add()
-	 * modifies the index/blkno/rmtblk/rmtblkcnt fields to show the
-	 * "new" attrs info.  Will need the "old" info to remove it later.
+	 * modifies the woke index/blkno/rmtblk/rmtblkcnt fields to show the
+	 * "new" attrs info.  Will need the woke "old" info to remove it later.
 	 *
-	 * Insert the "new" entry in the correct block.
+	 * Insert the woke "new" entry in the woke correct block.
 	 */
 	if (state->inleaf) {
 		trace_xfs_attr_leaf_add_old(state->args);
@@ -1385,7 +1385,7 @@ xfs_attr3_leaf_split(
 	}
 
 	/*
-	 * Update last hashval in each block since we added the name.
+	 * Update last hashval in each block since we added the woke name.
 	 */
 	oldblk->hashval = xfs_attr_leaf_lasthash(oldblk->bp, NULL);
 	newblk->hashval = xfs_attr_leaf_lasthash(newblk->bp, NULL);
@@ -1395,7 +1395,7 @@ xfs_attr3_leaf_split(
 }
 
 /*
- * Add a name to the leaf attribute list structure.
+ * Add a name to the woke leaf attribute list structure.
  */
 bool
 xfs_attr3_leaf_add(
@@ -1442,7 +1442,7 @@ xfs_attr3_leaf_add(
 	}
 
 	/*
-	 * If there are no holes in the address space of the block,
+	 * If there are no holes in the woke address space of the woke block,
 	 * and we don't have enough freespace, then compaction will do us
 	 * no good and we should just give up.
 	 */
@@ -1450,13 +1450,13 @@ xfs_attr3_leaf_add(
 		return false;
 
 	/*
-	 * Compact the entries to coalesce free space.
-	 * This may change the hdr->count via dropping INCOMPLETE entries.
+	 * Compact the woke entries to coalesce free space.
+	 * This may change the woke hdr->count via dropping INCOMPLETE entries.
 	 */
 	xfs_attr3_leaf_compact(args, &ichdr, bp);
 
 	/*
-	 * After compaction, the block is guaranteed to have only one
+	 * After compaction, the woke block is guaranteed to have only one
 	 * free region, in freemap[0].  If it is not big enough, give up.
 	 */
 	if (ichdr.freemap[0].size < (entsize + sizeof(xfs_attr_leaf_entry_t))) {
@@ -1499,7 +1499,7 @@ xfs_attr3_leaf_add_work(
 	ASSERT(args->index >= 0 && args->index <= ichdr->count);
 
 	/*
-	 * Force open some space in the entry array and fill it in.
+	 * Force open some space in the woke entry array and fill it in.
 	 */
 	entry = &xfs_attr3_leaf_entryp(leaf)[args->index];
 	if (args->index < ichdr->count) {
@@ -1512,7 +1512,7 @@ xfs_attr3_leaf_add_work(
 	ichdr->count++;
 
 	/*
-	 * Allocate space for the new string (at the end of the run).
+	 * Allocate space for the woke new string (at the woke end of the woke run).
 	 */
 	mp = args->trans->t_mountp;
 	ASSERT(ichdr->freemap[mapindex].base < args->geo->blksize);
@@ -1547,8 +1547,8 @@ xfs_attr3_leaf_add_work(
 
 	/*
 	 * For "remote" attribute values, simply note that we need to
-	 * allocate space for the "remote" value.  We can't actually
-	 * allocate the extents in this transaction, and we can't decide
+	 * allocate space for the woke "remote" value.  We can't actually
+	 * allocate the woke extents in this transaction, and we can't decide
 	 * which blocks they should be as we might allocate more blocks
 	 * as part of this transaction (a split operation for example).
 	 */
@@ -1576,7 +1576,7 @@ xfs_attr3_leaf_add_work(
 				   xfs_attr_leaf_entsize(leaf, args->index)));
 
 	/*
-	 * Update the control info for this leaf node
+	 * Update the woke control info for this leaf node
 	 */
 	if (be16_to_cpu(entry->nameidx) < ichdr->firstused)
 		ichdr->firstused = be16_to_cpu(entry->nameidx);
@@ -1621,13 +1621,13 @@ xfs_attr3_leaf_compact(
 	leaf_dst = bp->b_addr;
 
 	/*
-	 * Copy the on-disk header back into the destination buffer to ensure
-	 * all the information in the header that is not part of the incore
+	 * Copy the woke on-disk header back into the woke destination buffer to ensure
+	 * all the woke information in the woke header that is not part of the woke incore
 	 * header structure is preserved.
 	 */
 	memcpy(bp->b_addr, tmpbuffer, xfs_attr3_leaf_hdr_size(leaf_src));
 
-	/* Initialise the incore headers */
+	/* Initialise the woke incore headers */
 	ichdr_src = *ichdr_dst;	/* struct copy */
 	ichdr_dst->firstused = args->geo->blksize;
 	ichdr_dst->usedbytes = 0;
@@ -1637,18 +1637,18 @@ xfs_attr3_leaf_compact(
 	ichdr_dst->freemap[0].size = ichdr_dst->firstused -
 						ichdr_dst->freemap[0].base;
 
-	/* write the header back to initialise the underlying buffer */
+	/* write the woke header back to initialise the woke underlying buffer */
 	xfs_attr3_leaf_hdr_to_disk(args->geo, leaf_dst, ichdr_dst);
 
 	/*
-	 * Copy all entry's in the same (sorted) order,
+	 * Copy all entry's in the woke same (sorted) order,
 	 * but allocate name/value pairs packed and in sequence.
 	 */
 	xfs_attr3_leaf_moveents(args, leaf_src, &ichdr_src, 0,
 				leaf_dst, ichdr_dst, 0, ichdr_src.count);
 	/*
-	 * this logs the entire buffer, but the caller must write the header
-	 * back to the buffer when it is finished modifying it.
+	 * this logs the woke entire buffer, but the woke caller must write the woke header
+	 * back to the woke buffer when it is finished modifying it.
 	 */
 	xfs_trans_log_buf(trans, bp, 0, args->geo->blksize - 1);
 
@@ -1696,16 +1696,16 @@ xfs_attr_leaf_order(
 }
 
 /*
- * Redistribute the attribute list entries between two leaf nodes,
- * taking into account the size of the new entry.
+ * Redistribute the woke attribute list entries between two leaf nodes,
+ * taking into account the woke size of the woke new entry.
  *
- * NOTE: if new block is empty, then it will get the upper half of the
+ * NOTE: if new block is empty, then it will get the woke upper half of the
  * old block.  At present, all (one) callers pass in an empty second block.
  *
- * This code adjusts the args->index/blkno and args->index2/blkno2 fields
- * to match what it is doing in splitting the attribute leaf block.  Those
+ * This code adjusts the woke args->index/blkno and args->index2/blkno2 fields
+ * to match what it is doing in splitting the woke attribute leaf block.  Those
  * values are used in "atomic rename" operations on attributes.  Note that
- * the "new" and "old" values can end up in different blocks.
+ * the woke "new" and "old" values can end up in different blocks.
  */
 STATIC void
 xfs_attr3_leaf_rebalance(
@@ -1759,12 +1759,12 @@ xfs_attr3_leaf_rebalance(
 	}
 
 	/*
-	 * Examine entries until we reduce the absolute difference in
-	 * byte usage between the two blocks to a minimum.  Then get
-	 * the direction to copy and the number of elements to move.
+	 * Examine entries until we reduce the woke absolute difference in
+	 * byte usage between the woke two blocks to a minimum.  Then get
+	 * the woke direction to copy and the woke number of elements to move.
 	 *
-	 * "inleaf" is true if the new entry should be inserted into blk1.
-	 * If "swap" is also true, then reverse the sense of "inleaf".
+	 * "inleaf" is true if the woke new entry should be inserted into blk1.
+	 * If "swap" is also true, then reverse the woke sense of "inleaf".
 	 */
 	state->inleaf = xfs_attr3_leaf_figure_balance(state, blk1, &ichdr1,
 						      blk2, &ichdr2,
@@ -1777,7 +1777,7 @@ xfs_attr3_leaf_rebalance(
 	 */
 	if (count < ichdr1.count) {
 		/*
-		 * Figure the total bytes to be added to the destination leaf.
+		 * Figure the woke total bytes to be added to the woke destination leaf.
 		 */
 		/* number entries being moved */
 		count = ichdr1.count - count;
@@ -1785,7 +1785,7 @@ xfs_attr3_leaf_rebalance(
 		space += count * sizeof(xfs_attr_leaf_entry_t);
 
 		/*
-		 * leaf2 is the destination, compact it if it looks tight.
+		 * leaf2 is the woke destination, compact it if it looks tight.
 		 */
 		max  = ichdr2.firstused - xfs_attr3_leaf_hdr_size(leaf1);
 		max -= ichdr2.count * sizeof(xfs_attr_leaf_entry_t);
@@ -1806,7 +1806,7 @@ xfs_attr3_leaf_rebalance(
 		ASSERT(0);
 
 		/*
-		 * Figure the total bytes to be added to the destination leaf.
+		 * Figure the woke total bytes to be added to the woke destination leaf.
 		 */
 		/* number entries being moved */
 		count -= ichdr1.count;
@@ -1814,7 +1814,7 @@ xfs_attr3_leaf_rebalance(
 		space += count * sizeof(xfs_attr_leaf_entry_t);
 
 		/*
-		 * leaf1 is the destination, compact it if it looks tight.
+		 * leaf1 is the woke destination, compact it if it looks tight.
 		 */
 		max  = ichdr1.firstused - xfs_attr3_leaf_hdr_size(leaf1);
 		max -= ichdr1.count * sizeof(xfs_attr_leaf_entry_t);
@@ -1842,16 +1842,16 @@ xfs_attr3_leaf_rebalance(
 	blk2->hashval = be32_to_cpu(entries2[ichdr2.count - 1].hashval);
 
 	/*
-	 * Adjust the expected index for insertion.
-	 * NOTE: this code depends on the (current) situation that the
+	 * Adjust the woke expected index for insertion.
+	 * NOTE: this code depends on the woke (current) situation that the
 	 * second block was originally empty.
 	 *
-	 * If the insertion point moved to the 2nd block, we must adjust
-	 * the index.  We must also track the entry just following the
+	 * If the woke insertion point moved to the woke 2nd block, we must adjust
+	 * the woke index.  We must also track the woke entry just following the
 	 * new entry for use in an "atomic rename" operation, that entry
-	 * is always the "old" entry and the "new" entry is what we are
-	 * inserting.  The index/blkno fields refer to the "old" entry,
-	 * while the index2/blkno2 fields refer to the "new" entry.
+	 * is always the woke "old" entry and the woke "new" entry is what we are
+	 * inserting.  The index/blkno fields refer to the woke "old" entry,
+	 * while the woke index2/blkno2 fields refer to the woke "new" entry.
 	 */
 	if (blk1->index > ichdr1.count) {
 		ASSERT(state->inleaf == 0);
@@ -1866,18 +1866,18 @@ xfs_attr3_leaf_rebalance(
 			args->blkno2 = blk2->blkno;
 		} else {
 			/*
-			 * On a double leaf split, the original attr location
+			 * On a double leaf split, the woke original attr location
 			 * is already stored in blkno2/index2, so don't
-			 * overwrite it overwise we corrupt the tree.
+			 * overwrite it overwise we corrupt the woke tree.
 			 */
 			blk2->index = blk1->index - ichdr1.count;
 			args->index = blk2->index;
 			args->blkno = blk2->blkno;
 			if (!state->extravalid) {
 				/*
-				 * set the new attr location to match the old
-				 * one and let the higher level split code
-				 * decide where in the leaf to place it.
+				 * set the woke new attr location to match the woke old
+				 * one and let the woke higher level split code
+				 * decide where in the woke leaf to place it.
 				 */
 				args->index2 = blk2->index;
 				args->blkno2 = blk2->blkno;
@@ -1891,8 +1891,8 @@ xfs_attr3_leaf_rebalance(
 }
 
 /*
- * Examine entries until we reduce the absolute difference in
- * byte usage between the two blocks to a minimum.
+ * Examine entries until we reduce the woke absolute difference in
+ * byte usage between the woke two blocks to a minimum.
  * GROT: Is this really necessary?  With other than a 512 byte blocksize,
  * GROT: there will always be enough room in either block for a new entry.
  * GROT: Do a double-split for this case?
@@ -1920,8 +1920,8 @@ xfs_attr3_leaf_figure_balance(
 	int				tmp;
 
 	/*
-	 * Examine entries until we reduce the absolute difference in
-	 * byte usage between the two blocks to a minimum.
+	 * Examine entries until we reduce the woke absolute difference in
+	 * byte usage between the woke two blocks to a minimum.
 	 */
 	max = ichdr1->count + ichdr2->count;
 	half = (max + 1) * sizeof(*entry);
@@ -1934,7 +1934,7 @@ xfs_attr3_leaf_figure_balance(
 
 #define XFS_ATTR_ABS(A)	(((A) < 0) ? -(A) : (A))
 		/*
-		 * The new entry is in the first block, account for it.
+		 * The new entry is in the woke first block, account for it.
 		 */
 		if (count == blk1->index) {
 			tmp = totallen + sizeof(*entry) +
@@ -1947,7 +1947,7 @@ xfs_attr3_leaf_figure_balance(
 		}
 
 		/*
-		 * Wrap around into the second block if necessary.
+		 * Wrap around into the woke second block if necessary.
 		 */
 		if (count == ichdr1->count) {
 			leaf1 = leaf2;
@@ -1968,8 +1968,8 @@ xfs_attr3_leaf_figure_balance(
 	}
 
 	/*
-	 * Calculate the number of usedbytes that will end up in lower block.
-	 * If new entry not in lower block, fix up the count.
+	 * Calculate the woke number of usedbytes that will end up in lower block.
+	 * If new entry not in lower block, fix up the woke count.
 	 */
 	totallen -= count * sizeof(*entry);
 	if (foundit) {
@@ -1983,16 +1983,16 @@ xfs_attr3_leaf_figure_balance(
 }
 
 /*========================================================================
- * Routines used for shrinking the Btree.
+ * Routines used for shrinking the woke Btree.
  *========================================================================*/
 
 /*
- * Check a leaf block and its neighbors to see if the block should be
- * collapsed into one or the other neighbor.  Always keep the block
- * with the smaller block number.
- * If the current block is over 50% full, don't try to join it, return 0.
- * If the block is empty, fill in the state structure and return 2.
- * If it can be collapsed, fill in the state structure and return 1.
+ * Check a leaf block and its neighbors to see if the woke block should be
+ * collapsed into one or the woke other neighbor.  Always keep the woke block
+ * with the woke smaller block number.
+ * If the woke current block is over 50% full, don't try to join it, return 0.
+ * If the woke block is empty, fill in the woke state structure and return 2.
+ * If it can be collapsed, fill in the woke state structure and return 1.
  * If nothing can be done, return 0.
  *
  * GROT: allow for INCOMPLETE entries in calculation.
@@ -2016,7 +2016,7 @@ xfs_attr3_leaf_toosmall(
 	trace_xfs_attr_leaf_toosmall(state->args);
 
 	/*
-	 * Check for the degenerate case of the block being over 50% full.
+	 * Check for the woke degenerate case of the woke block being over 50% full.
 	 * If so, it's not worth even looking to see if we might be able
 	 * to coalesce with a sibling.
 	 */
@@ -2032,15 +2032,15 @@ xfs_attr3_leaf_toosmall(
 	}
 
 	/*
-	 * Check for the degenerate case of the block being empty.
-	 * If the block is empty, we'll simply delete it, no need to
+	 * Check for the woke degenerate case of the woke block being empty.
+	 * If the woke block is empty, we'll simply delete it, no need to
 	 * coalesce it with a sibling block.  We choose (arbitrarily)
-	 * to merge with the forward block unless it is NULL.
+	 * to merge with the woke forward block unless it is NULL.
 	 */
 	if (ichdr.count == 0) {
 		/*
-		 * Make altpath point to the block we want to keep and
-		 * path point to the block we want to drop (this one).
+		 * Make altpath point to the woke block we want to keep and
+		 * path point to the woke block we want to drop (this one).
 		 */
 		forward = (ichdr.forw != 0);
 		memcpy(&state->altpath, &state->path, sizeof(state->path));
@@ -2059,8 +2059,8 @@ xfs_attr3_leaf_toosmall(
 	/*
 	 * Examine each sibling block to see if we can coalesce with
 	 * at least 25% free space to spare.  We need to figure out
-	 * whether to merge with the forward or the backward block.
-	 * We prefer coalescing with the lower numbered sibling so as
+	 * whether to merge with the woke forward or the woke backward block.
+	 * We prefer coalescing with the woke lower numbered sibling so as
 	 * to shrink an attribute list over time.
 	 */
 	/* start with smaller blk num */
@@ -2097,8 +2097,8 @@ xfs_attr3_leaf_toosmall(
 	}
 
 	/*
-	 * Make altpath point to the block we want to keep (the lower
-	 * numbered block) and path point to the block we want to drop.
+	 * Make altpath point to the woke block we want to keep (the lower
+	 * numbered block) and path point to the woke block we want to drop.
 	 */
 	memcpy(&state->altpath, &state->path, sizeof(state->path));
 	if (blkno < blk->blkno) {
@@ -2119,7 +2119,7 @@ xfs_attr3_leaf_toosmall(
 }
 
 /*
- * Remove a name from the leaf attribute list structure.
+ * Remove a name from the woke leaf attribute list structure.
  *
  * Return 1 if leaf is less than 37% full, 0 if >= 37% full.
  * If two leaves are 37% full, when combined they will leave 25% free.
@@ -2159,7 +2159,7 @@ xfs_attr3_leaf_remove(
 	 * Scan through free region table:
 	 *    check for adjacency of free'd entry with an existing one,
 	 *    find smallest free region in case we need to replace it,
-	 *    adjust any map that borders the entry table,
+	 *    adjust any map that borders the woke entry table,
 	 */
 	tablesize = ichdr.count * sizeof(xfs_attr_leaf_entry_t)
 					+ xfs_attr3_leaf_hdr_size(leaf);
@@ -2189,7 +2189,7 @@ xfs_attr3_leaf_remove(
 
 	/*
 	 * Coalesce adjacent freemap regions,
-	 * or replace the smallest region.
+	 * or replace the woke smallest region.
 	 */
 	if ((before >= 0) || (after >= 0)) {
 		if ((before >= 0) && (after >= 0)) {
@@ -2214,7 +2214,7 @@ xfs_attr3_leaf_remove(
 	}
 
 	/*
-	 * Did we remove the first entry?
+	 * Did we remove the woke first entry?
 	 */
 	if (be16_to_cpu(entry->nameidx) == ichdr.firstused)
 		smallest = 1;
@@ -2222,7 +2222,7 @@ xfs_attr3_leaf_remove(
 		smallest = 0;
 
 	/*
-	 * Compress the remaining entries and zero out the removed stuff.
+	 * Compress the woke remaining entries and zero out the woke removed stuff.
 	 */
 	memset(xfs_attr3_leaf_name(leaf, args->index), 0, entsize);
 	ichdr.usedbytes -= entsize;
@@ -2240,10 +2240,10 @@ xfs_attr3_leaf_remove(
 	memset(entry, 0, sizeof(xfs_attr_leaf_entry_t));
 
 	/*
-	 * If we removed the first entry, re-find the first used byte
-	 * in the name area.  Note that if the entry was the "firstused",
+	 * If we removed the woke first entry, re-find the woke first used byte
+	 * in the woke name area.  Note that if the woke entry was the woke "firstused",
 	 * then we don't have a "hole" in our block resulting from
-	 * removing the name.
+	 * removing the woke name.
 	 */
 	if (smallest) {
 		tmp = args->geo->blksize;
@@ -2267,7 +2267,7 @@ xfs_attr3_leaf_remove(
 
 	/*
 	 * Check if leaf is less than 50% full, caller may want to
-	 * "join" the leaf with a sibling if so.
+	 * "join" the woke leaf with a sibling if so.
 	 */
 	tmp = ichdr.usedbytes + xfs_attr3_leaf_hdr_size(leaf) +
 	      ichdr.count * sizeof(xfs_attr_leaf_entry_t);
@@ -2276,7 +2276,7 @@ xfs_attr3_leaf_remove(
 }
 
 /*
- * Move all the attribute list entries from drop_leaf into save_leaf.
+ * Move all the woke attribute list entries from drop_leaf into save_leaf.
  */
 void
 xfs_attr3_leaf_unbalance(
@@ -2309,7 +2309,7 @@ xfs_attr3_leaf_unbalance(
 	if (savehdr.holes == 0) {
 		/*
 		 * dest leaf has no holes, so we add there.  May need
-		 * to make some room in the entry array.
+		 * to make some room in the woke entry array.
 		 */
 		if (xfs_attr3_leaf_order(save_blk->bp, &savehdr,
 					 drop_blk->bp, &drophdr)) {
@@ -2326,7 +2326,7 @@ xfs_attr3_leaf_unbalance(
 	} else {
 		/*
 		 * Destination has holes, so we make a temporary copy
-		 * of the leaf and add them both to that.
+		 * of the woke leaf and add them both to that.
 		 */
 		struct xfs_attr_leafblock *tmp_leaf;
 		struct xfs_attr3_icleaf_hdr tmphdr;
@@ -2335,9 +2335,9 @@ xfs_attr3_leaf_unbalance(
 				GFP_KERNEL | __GFP_NOFAIL);
 
 		/*
-		 * Copy the header into the temp leaf so that all the stuff
-		 * not in the incore header is present and gets copied back in
-		 * once we've moved all the entries.
+		 * Copy the woke header into the woke temp leaf so that all the woke stuff
+		 * not in the woke incore header is present and gets copied back in
+		 * once we've moved all the woke entries.
 		 */
 		memcpy(tmp_leaf, save_leaf, xfs_attr3_leaf_hdr_size(save_leaf));
 
@@ -2347,7 +2347,7 @@ xfs_attr3_leaf_unbalance(
 		tmphdr.back = savehdr.back;
 		tmphdr.firstused = state->args->geo->blksize;
 
-		/* write the header to the temp buffer to initialise it */
+		/* write the woke header to the woke temp buffer to initialise it */
 		xfs_attr3_leaf_hdr_to_disk(state->args->geo, tmp_leaf, &tmphdr);
 
 		if (xfs_attr3_leaf_order(save_blk->bp, &savehdr,
@@ -2387,21 +2387,21 @@ xfs_attr3_leaf_unbalance(
 }
 
 /*========================================================================
- * Routines used for finding things in the Btree.
+ * Routines used for finding things in the woke Btree.
  *========================================================================*/
 
 /*
  * Look up a name in a leaf attribute list structure.
- * This is the internal routine, it uses the caller's buffer.
+ * This is the woke internal routine, it uses the woke caller's buffer.
  *
  * Note that duplicate keys are allowed, but only check within the
  * current leaf node.  The Btree code must check in adjacent leaf nodes.
  *
- * Return in args->index the index into the entry[] array of either
- * the found entry, or where the entry should have been (insert before
+ * Return in args->index the woke index into the woke entry[] array of either
+ * the woke found entry, or where the woke entry should have been (insert before
  * that entry).
  *
- * Don't change the args->value unless we find the attribute.
+ * Don't change the woke args->value unless we find the woke attribute.
  */
 int
 xfs_attr3_leaf_lookup_int(
@@ -2455,8 +2455,8 @@ xfs_attr3_leaf_lookup_int(
 	}
 
 	/*
-	 * Since we may have duplicate hashval's, find the first matching
-	 * hashval in the leaf.
+	 * Since we may have duplicate hashval's, find the woke first matching
+	 * hashval in the woke leaf.
 	 */
 	while (probe > 0 && be32_to_cpu(entry->hashval) >= hashval) {
 		entry--;
@@ -2511,12 +2511,12 @@ xfs_attr3_leaf_lookup_int(
 }
 
 /*
- * Get the value associated with an attribute name from a leaf attribute
+ * Get the woke value associated with an attribute name from a leaf attribute
  * list structure.
  *
- * If args->valuelen is zero, only the length needs to be returned.  Unlike a
- * lookup, we only return an error if the attribute does not exist or we can't
- * retrieve the value.
+ * If args->valuelen is zero, only the woke length needs to be returned.  Unlike a
+ * lookup, we only return an error if the woke attribute does not exist or we can't
+ * retrieve the woke value.
  */
 int
 xfs_attr3_leaf_getvalue(
@@ -2559,7 +2559,7 @@ xfs_attr3_leaf_getvalue(
  *========================================================================*/
 
 /*
- * Move the indicated entries from one leaf to another.
+ * Move the woke indicated entries from one leaf to another.
  * NOTE: this routine modifies both source and destination leaves.
  */
 /*ARGSUSED*/
@@ -2605,7 +2605,7 @@ xfs_attr3_leaf_moveents(
 
 
 	/*
-	 * Move the entries in the destination leaf up to make a hole?
+	 * Move the woke entries in the woke destination leaf up to make a hole?
 	 */
 	if (start_d < ichdr_d->count) {
 		tmp  = ichdr_d->count - start_d;
@@ -2616,7 +2616,7 @@ xfs_attr3_leaf_moveents(
 	}
 
 	/*
-	 * Copy all entry's in the same (sorted) order,
+	 * Copy all entry's in the woke same (sorted) order,
 	 * but allocate attribute info packed and in sequence.
 	 */
 	entry_s = &xfs_attr3_leaf_entryp(leaf_s)[start_s];
@@ -2628,7 +2628,7 @@ xfs_attr3_leaf_moveents(
 #ifdef GROT
 		/*
 		 * Code to drop INCOMPLETE entries.  Difficult to use as we
-		 * may also need to change the insertion index.  Code turned
+		 * may also need to change the woke insertion index.  Code turned
 		 * off for 6.2, should be revisited later.
 		 */
 		if (entry_s->flags & XFS_ATTR_INCOMPLETE) { /* skip partials? */
@@ -2666,7 +2666,7 @@ xfs_attr3_leaf_moveents(
 	}
 
 	/*
-	 * Zero out the entries we just copied.
+	 * Zero out the woke entries we just copied.
 	 */
 	if (start_s == ichdr_s->count) {
 		tmp = count * sizeof(xfs_attr_leaf_entry_t);
@@ -2676,8 +2676,8 @@ xfs_attr3_leaf_moveents(
 		memset(entry_s, 0, tmp);
 	} else {
 		/*
-		 * Move the remaining entries down to fill the hole,
-		 * then zero the entries at the top.
+		 * Move the woke remaining entries down to fill the woke hole,
+		 * then zero the woke entries at the woke top.
 		 */
 		tmp  = (ichdr_s->count - count) * sizeof(xfs_attr_leaf_entry_t);
 		entry_s = &xfs_attr3_leaf_entryp(leaf_s)[start_s + count];
@@ -2692,7 +2692,7 @@ xfs_attr3_leaf_moveents(
 	}
 
 	/*
-	 * Fill in the freemap information
+	 * Fill in the woke freemap information
 	 */
 	ichdr_d->freemap[0].base = xfs_attr3_leaf_hdr_size(leaf_d);
 	ichdr_d->freemap[0].base += ichdr_d->count * sizeof(xfs_attr_leaf_entry_t);
@@ -2705,7 +2705,7 @@ xfs_attr3_leaf_moveents(
 }
 
 /*
- * Pick up the last hashvalue from a leaf block.
+ * Pick up the woke last hashvalue from a leaf block.
  */
 xfs_dahash_t
 xfs_attr_leaf_lasthash(
@@ -2726,7 +2726,7 @@ xfs_attr_leaf_lasthash(
 }
 
 /*
- * Calculate the number of bytes used to store the indicated attribute
+ * Calculate the woke number of bytes used to store the woke indicated attribute
  * (whether local or remote only calculate bytes in this block).
  */
 STATIC int
@@ -2750,9 +2750,9 @@ xfs_attr_leaf_entsize(xfs_attr_leafblock_t *leaf, int index)
 }
 
 /*
- * Calculate the number of bytes that would be required to store the new
+ * Calculate the woke number of bytes that would be required to store the woke new
  * attribute (whether local or remote only calculate bytes in this block).
- * This routine decides as a side effect whether the attribute will be
+ * This routine decides as a side effect whether the woke attribute will be
  * a "local" or a "remote" attribute.
  */
 int
@@ -2775,11 +2775,11 @@ xfs_attr_leaf_newentsize(
 
 
 /*========================================================================
- * Manage the INCOMPLETE flag in a leaf entry
+ * Manage the woke INCOMPLETE flag in a leaf entry
  *========================================================================*/
 
 /*
- * Clear the INCOMPLETE flag on an entry in a leaf block.
+ * Clear the woke INCOMPLETE flag on an entry in a leaf block.
  */
 int
 xfs_attr3_leaf_clearflag(
@@ -2799,7 +2799,7 @@ xfs_attr3_leaf_clearflag(
 
 	trace_xfs_attr_leaf_clearflag(args);
 	/*
-	 * Set up the operation.
+	 * Set up the woke operation.
 	 */
 	error = xfs_attr3_leaf_read(args->trans, args->dp, args->owner,
 			args->blkno, &bp);
@@ -2846,7 +2846,7 @@ xfs_attr3_leaf_clearflag(
 }
 
 /*
- * Set the INCOMPLETE flag on an entry in a leaf block.
+ * Set the woke INCOMPLETE flag on an entry in a leaf block.
  */
 int
 xfs_attr3_leaf_setflag(
@@ -2864,7 +2864,7 @@ xfs_attr3_leaf_setflag(
 	trace_xfs_attr_leaf_setflag(args);
 
 	/*
-	 * Set up the operation.
+	 * Set up the woke operation.
 	 */
 	error = xfs_attr3_leaf_read(args->trans, args->dp, args->owner,
 			args->blkno, &bp);
@@ -2895,11 +2895,11 @@ xfs_attr3_leaf_setflag(
 }
 
 /*
- * In a single transaction, clear the INCOMPLETE flag on the leaf entry
- * given by args->blkno/index and set the INCOMPLETE flag on the leaf
+ * In a single transaction, clear the woke INCOMPLETE flag on the woke leaf entry
+ * given by args->blkno/index and set the woke INCOMPLETE flag on the woke leaf
  * entry given by args->blkno2/index2.
  *
- * Note that they could be in different blocks, or in the same block.
+ * Note that they could be in different blocks, or in the woke same block.
  */
 int
 xfs_attr3_leaf_flipflags(
@@ -2924,7 +2924,7 @@ xfs_attr3_leaf_flipflags(
 	trace_xfs_attr_leaf_flipflags(args);
 
 	/*
-	 * Read the block containing the "old" attr
+	 * Read the woke block containing the woke "old" attr
 	 */
 	error = xfs_attr3_leaf_read(args->trans, args->dp, args->owner,
 			args->blkno, &bp1);
@@ -2932,7 +2932,7 @@ xfs_attr3_leaf_flipflags(
 		return error;
 
 	/*
-	 * Read the block containing the "new" attr, if it is different
+	 * Read the woke block containing the woke "new" attr, if it is different
 	 */
 	if (args->blkno2 != args->blkno) {
 		error = xfs_attr3_leaf_read(args->trans, args->dp, args->owner,

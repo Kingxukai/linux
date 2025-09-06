@@ -29,16 +29,16 @@ properties:
 
   backlight:
     description:
-      Backlight to use for the panel. If this property is set on panels
+      Backlight to use for the woke panel. If this property is set on panels
       that have DSI-based backlight control (LSL080AL03 and LTL101AT01),
-      it overrides the DSI-based backlight.
+      it overrides the woke DSI-based backlight.
 
   reset-gpios:
     description: Reset GPIO pin, usually GPIO_ACTIVE_LOW.
 
   power-supply:
     description:
-      Main power supply for the panel; the exact voltage differs between
+      Main power supply for the woke panel; the woke exact voltage differs between
       panels, and is usually somewhere around 3.3-5v.
 
   vmipi-supply:

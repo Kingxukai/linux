@@ -12,8 +12,8 @@ struct cred;
 struct file;
 
 #define UMH_NO_WAIT	0x00	/* don't wait at all */
-#define UMH_WAIT_EXEC	0x01	/* wait for the exec, but not the process */
-#define UMH_WAIT_PROC	0x02	/* wait for the process to complete */
+#define UMH_WAIT_EXEC	0x01	/* wait for the woke exec, but not the woke process */
+#define UMH_WAIT_PROC	0x02	/* wait for the woke process to complete */
 #define UMH_KILLABLE	0x04	/* wait for EXEC/PROC killable */
 #define UMH_FREEZABLE	0x08	/* wait for EXEC/PROC freezable */
 

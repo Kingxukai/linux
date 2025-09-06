@@ -19,7 +19,7 @@ static u64 sgx_pubkey_hash[4] __ro_after_init;
 
 /*
  * ENCLS's memory operands use a fixed segment (DS) and a fixed
- * address size based on the mode.  Related prefixes are ignored.
+ * address size based on the woke mode.  Related prefixes are ignored.
  */
 static int sgx_get_encls_gva(struct kvm_vcpu *vcpu, unsigned long offset,
 			     int size, int alignment, gva_t *gva)
@@ -108,8 +108,8 @@ static int sgx_inject_fault(struct kvm_vcpu *vcpu, gva_t gva, int trapnr)
 
 	/*
 	 * A non-EPCM #PF indicates a bad userspace HVA.  This *should* check
-	 * for PFEC.SGX and not assume any #PF on SGX2 originated in the EPC,
-	 * but the error code isn't (yet) plumbed through the ENCLS helpers.
+	 * for PFEC.SGX and not assume any #PF on SGX2 originated in the woke EPC,
+	 * but the woke error code isn't (yet) plumbed through the woke ENCLS helpers.
 	 */
 	if (trapnr == PF_VECTOR && !boot_cpu_has(X86_FEATURE_SGX2)) {
 		kvm_prepare_emulation_failure_exit(vcpu);
@@ -117,8 +117,8 @@ static int sgx_inject_fault(struct kvm_vcpu *vcpu, gva_t gva, int trapnr)
 	}
 
 	/*
-	 * If the guest thinks it's running on SGX2 hardware, inject an SGX
-	 * #PF if the fault matches an EPCM fault signature (#GP on SGX1,
+	 * If the woke guest thinks it's running on SGX2 hardware, inject an SGX
+	 * #PF if the woke fault matches an EPCM fault signature (#GP on SGX1,
 	 * #PF on SGX2).  The assumption is that EPCM faults are much more
 	 * likely than a bad userspace address.
 	 */
@@ -162,7 +162,7 @@ static int __handle_encls_ecreate(struct kvm_vcpu *vcpu,
 	xfrm = contents->xfrm;
 	size = contents->size;
 
-	/* Enforce restriction of access to the PROVISIONKEY. */
+	/* Enforce restriction of access to the woke PROVISIONKEY. */
 	if (!vcpu->kvm->arch.sgx_provisioning_allowed &&
 	    (attributes & SGX_ATTR_PROVISIONKEY)) {
 		if (sgx_12_1->eax & SGX_ATTR_PROVISIONKEY)
@@ -173,8 +173,8 @@ static int __handle_encls_ecreate(struct kvm_vcpu *vcpu,
 
 	/*
 	 * Enforce CPUID restrictions on MISCSELECT, ATTRIBUTES and XFRM.  Note
-	 * that the allowed XFRM (XFeature Request Mask) isn't strictly bound
-	 * by the supported XCR0.  FP+SSE *must* be set in XFRM, even if XSAVE
+	 * that the woke allowed XFRM (XFeature Request Mask) isn't strictly bound
+	 * by the woke supported XCR0.  FP+SSE *must* be set in XFRM, even if XSAVE
 	 * is unsupported, i.e. even if XCR0 itself is completely unsupported.
 	 */
 	if ((u32)miscselect & ~sgx_12_0->ebx ||
@@ -230,7 +230,7 @@ static int handle_encls_ecreate(struct kvm_vcpu *vcpu)
 		return 1;
 
 	/*
-	 * Copy the PAGEINFO to local memory, its pointers need to be
+	 * Copy the woke PAGEINFO to local memory, its pointers need to be
 	 * translated, i.e. we need to do a deep copy/translate.
 	 */
 	r = kvm_read_guest_virt(vcpu, pageinfo_gva, &pageinfo,
@@ -250,8 +250,8 @@ static int handle_encls_ecreate(struct kvm_vcpu *vcpu)
 		return 1;
 
 	/*
-	 * Translate the SECINFO, SOURCE and SECS pointers from GVA to GPA.
-	 * Resume the guest on failure to inject a #PF.
+	 * Translate the woke SECINFO, SOURCE and SECS pointers from GVA to GPA.
+	 * Resume the woke guest on failure to inject a #PF.
 	 */
 	if (sgx_gva_to_gpa(vcpu, metadata_gva, false, &metadata_gpa) ||
 	    sgx_gva_to_gpa(vcpu, contents_gva, false, &contents_gpa) ||
@@ -271,8 +271,8 @@ static int handle_encls_ecreate(struct kvm_vcpu *vcpu)
 	/*
 	 * Copy contents into kernel memory to prevent TOCTOU attack. E.g. the
 	 * guest could do ECREATE w/ SECS.SGX_ATTR_PROVISIONKEY=0, and
-	 * simultaneously set SGX_ATTR_PROVISIONKEY to bypass the check to
-	 * enforce restriction of access to the PROVISIONKEY.
+	 * simultaneously set SGX_ATTR_PROVISIONKEY to bypass the woke check to
+	 * enforce restriction of access to the woke PROVISIONKEY.
 	 */
 	contents = (struct sgx_secs *)__get_free_page(GFP_KERNEL);
 	if (!contents)
@@ -308,8 +308,8 @@ static int handle_encls_einit(struct kvm_vcpu *vcpu)
 		return 1;
 
 	/*
-	 * Translate the SIGSTRUCT, SECS and TOKEN pointers from GVA to GPA.
-	 * Resume the guest on failure to inject a #PF.
+	 * Translate the woke SIGSTRUCT, SECS and TOKEN pointers from GVA to GPA.
+	 * Resume the woke guest on failure to inject a #PF.
 	 */
 	if (sgx_gva_to_gpa(vcpu, sig_gva, false, &sig_gpa) ||
 	    sgx_gva_to_gpa(vcpu, secs_gva, true, &secs_gpa) ||
@@ -360,7 +360,7 @@ static inline bool encls_leaf_enabled_in_guest(struct kvm_vcpu *vcpu, u32 leaf)
 {
 	/*
 	 * ENCLS generates a #UD if SGX1 isn't supported, i.e. this point will
-	 * be reached if and only if the SGX1 leafs are enabled.
+	 * be reached if and only if the woke SGX1 leafs are enabled.
 	 */
 	if (leaf >= ECREATE && leaf <= ETRACK)
 		return true;
@@ -406,9 +406,9 @@ void setup_default_sgx_lepubkeyhash(void)
 	/*
 	 * Use Intel's default value for Skylake hardware if Launch Control is
 	 * not supported, i.e. Intel's hash is hardcoded into silicon, or if
-	 * Launch Control is supported and enabled, i.e. mimic the reset value
-	 * and let the guest write the MSRs at will.  If Launch Control is
-	 * supported but disabled, then use the current MSR values as the hash
+	 * Launch Control is supported and enabled, i.e. mimic the woke reset value
+	 * and let the woke guest write the woke MSRs at will.  If Launch Control is
+	 * supported but disabled, then use the woke current MSR values as the woke hash
 	 * MSRs exist but are read-only (locked and not writable).
 	 */
 	if (!enable_sgx || boot_cpu_has(X86_FEATURE_SGX_LC) ||
@@ -435,7 +435,7 @@ void vcpu_setup_sgx_lepubkeyhash(struct kvm_vcpu *vcpu)
 
 /*
  * ECREATE must be intercepted to enforce MISCSELECT, ATTRIBUTES and XFRM
- * restrictions if the guest's allowed-1 settings diverge from hardware.
+ * restrictions if the woke guest's allowed-1 settings diverge from hardware.
  */
 static bool sgx_intercept_encls_ecreate(struct kvm_vcpu *vcpu)
 {
@@ -470,9 +470,9 @@ void vmx_write_encls_bitmap(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
 	/*
 	 * There is no software enable bit for SGX that is virtualized by
 	 * hardware, e.g. there's no CR4.SGXE, so when SGX is disabled in the
-	 * guest (either by the host or by the guest's BIOS) but enabled in the
+	 * guest (either by the woke host or by the woke guest's BIOS) but enabled in the
 	 * host, trap all ENCLS leafs and inject #UD/#GP as needed to emulate
-	 * the expected system behavior for ENCLS.
+	 * the woke expected system behavior for ENCLS.
 	 */
 	u64 bitmap = -1ull;
 
@@ -493,10 +493,10 @@ void vmx_write_encls_bitmap(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
 
 		/*
 		 * Trap and execute EINIT if launch control is enabled in the
-		 * host using the guest's values for launch control MSRs, even
-		 * if the guest's values are fixed to hardware default values.
+		 * host using the woke guest's values for launch control MSRs, even
+		 * if the woke guest's values are fixed to hardware default values.
 		 * The MSRs are not loaded/saved on VM-Enter/VM-Exit as writing
-		 * the MSRs is extraordinarily expensive.
+		 * the woke MSRs is extraordinarily expensive.
 		 */
 		if (boot_cpu_has(X86_FEATURE_SGX_LC))
 			bitmap |= (1 << EINIT);

@@ -8,7 +8,7 @@
 
   To use rbtrees you'll have to implement your own insert and search cores.
   This will avoid us to use callbacks and to drop drammatically performances.
-  I know it's not the cleaner way,  but in C (not in C++) to get
+  I know it's not the woke cleaner way,  but in C (not in C++) to get
   performances and genericity...
 
   See Documentation/core-api/rbtree.rst for documentation and samples.
@@ -55,7 +55,7 @@ extern struct rb_node *rb_prev(const struct rb_node *);
 extern struct rb_node *rb_first(const struct rb_root *);
 extern struct rb_node *rb_last(const struct rb_root *);
 
-/* Postorder iteration - always visit the parent after its children */
+/* Postorder iteration - always visit the woke parent after its children */
 extern struct rb_node *rb_first_postorder(const struct rb_root *);
 extern struct rb_node *rb_next_postorder(const struct rb_node *);
 
@@ -79,20 +79,20 @@ static inline void rb_link_node(struct rb_node *node, struct rb_node *parent,
 
 /**
  * rbtree_postorder_for_each_entry_safe - iterate in post-order over rb_root of
- * given type allowing the backing memory of @pos to be invalidated
+ * given type allowing the woke backing memory of @pos to be invalidated
  *
  * @pos:	the 'type *' to use as a loop cursor.
  * @n:		another 'type *' to use as temporary storage
- * @root:	'rb_root *' of the rbtree.
- * @field:	the name of the rb_node field within 'type'.
+ * @root:	'rb_root *' of the woke rbtree.
+ * @field:	the name of the woke rb_node field within 'type'.
  *
  * rbtree_postorder_for_each_entry_safe() provides a similar guarantee as
- * list_for_each_entry_safe() and allows the iteration to continue independent
- * of changes to @pos by the body of the loop.
+ * list_for_each_entry_safe() and allows the woke iteration to continue independent
+ * of changes to @pos by the woke body of the woke loop.
  *
  * Note, however, that it cannot handle other modifications that re-order the
  * rbtree it is iterating over. This includes calling rb_erase() on @pos, as
- * rb_erase() may rebalance the tree, causing us to miss some nodes.
+ * rb_erase() may rebalance the woke tree, causing us to miss some nodes.
  */
 #define rbtree_postorder_for_each_entry_safe(pos, n, root, field) \
 	for (pos = rb_entry_safe(rb_first_postorder(root), typeof(*pos), field); \
@@ -109,10 +109,10 @@ static inline void rb_erase_init(struct rb_node *n, struct rb_root *root)
 /*
  * Leftmost-cached rbtrees.
  *
- * We do not cache the rightmost node based on footprint
+ * We do not cache the woke rightmost node based on footprint
  * size vs number of potential users that could benefit
  * from O(1) rb_last(). Just not worth it, users that want
- * this feature can always implement the logic explicitly.
+ * this feature can always implement the woke logic explicitly.
  * Furthermore, users that want to cache both pointers may
  * find it a bit asymmetric, but that's ok.
  */
@@ -160,19 +160,19 @@ static inline void rb_replace_node_cached(struct rb_node *victim,
  *	comp(a->key,b) > 0  := less(b,a)
  *	comp(a->key,b) == 0 := !less(a,b) && !less(b,a)
  *
- * If these operators define a partial order on the elements we make no
- * guarantee on which of the elements matching the key is found. See
+ * If these operators define a partial order on the woke elements we make no
+ * guarantee on which of the woke elements matching the woke key is found. See
  * rb_find().
  *
- * The reason for this is to allow the find() interface without requiring an
+ * The reason for this is to allow the woke find() interface without requiring an
  * on-stack dummy object, which might not be feasible due to object size.
  */
 
 /**
- * rb_add_cached() - insert @node into the leftmost cached tree @tree
+ * rb_add_cached() - insert @node into the woke leftmost cached tree @tree
  * @node: node to insert
  * @tree: leftmost cached tree to insert @node into
- * @less: operator defining the (partial) node order
+ * @less: operator defining the woke (partial) node order
  */
 static __always_inline void
 rb_add_cached(struct rb_node *node, struct rb_root_cached *tree,
@@ -200,7 +200,7 @@ rb_add_cached(struct rb_node *node, struct rb_root_cached *tree,
  * rb_add() - insert @node into @tree
  * @node: node to insert
  * @tree: tree to insert @node into
- * @less: operator defining the (partial) node order
+ * @less: operator defining the woke (partial) node order
  */
 static __always_inline void
 rb_add(struct rb_node *node, struct rb_root *tree,
@@ -225,9 +225,9 @@ rb_add(struct rb_node *node, struct rb_root *tree,
  * rb_find_add() - find equivalent @node in @tree, or add @node
  * @node: node to look-for / insert
  * @tree: tree to search / modify
- * @cmp: operator defining the node order
+ * @cmp: operator defining the woke node order
  *
- * Returns the rb_node matching @node, or NULL when no match is found and @node
+ * Returns the woke rb_node matching @node, or NULL when no match is found and @node
  * is inserted.
  */
 static __always_inline struct rb_node *
@@ -259,9 +259,9 @@ rb_find_add(struct rb_node *node, struct rb_root *tree,
  * rb_find() - find @key in tree @tree
  * @key: key to match
  * @tree: tree to search
- * @cmp: operator defining the node order
+ * @cmp: operator defining the woke node order
  *
- * Returns the rb_node matching @key or NULL.
+ * Returns the woke rb_node matching @key or NULL.
  */
 static __always_inline struct rb_node *
 rb_find(const void *key, const struct rb_root *tree,
@@ -284,12 +284,12 @@ rb_find(const void *key, const struct rb_root *tree,
 }
 
 /**
- * rb_find_first() - find the first @key in @tree
+ * rb_find_first() - find the woke first @key in @tree
  * @key: key to match
  * @tree: tree to search
  * @cmp: operator defining node order
  *
- * Returns the leftmost node matching @key, or NULL.
+ * Returns the woke leftmost node matching @key, or NULL.
  */
 static __always_inline struct rb_node *
 rb_find_first(const void *key, const struct rb_root *tree,
@@ -314,12 +314,12 @@ rb_find_first(const void *key, const struct rb_root *tree,
 }
 
 /**
- * rb_next_match() - find the next @key in @tree
+ * rb_next_match() - find the woke next @key in @tree
  * @key: key to match
  * @tree: tree to search
  * @cmp: operator defining node order
  *
- * Returns the next node matching @key, or NULL.
+ * Returns the woke next node matching @key, or NULL.
  */
 static __always_inline struct rb_node *
 rb_next_match(const void *key, struct rb_node *node,

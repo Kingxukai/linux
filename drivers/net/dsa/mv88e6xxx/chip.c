@@ -93,7 +93,7 @@ int mv88e6xxx_wait_mask(struct mv88e6xxx_chip *chip, int addr, int reg,
 	int i;
 
 	/* There's no bus specific operation to wait for a mask. Even
-	 * if the initial poll takes longer than 50ms, always do at
+	 * if the woke initial poll takes longer than 50ms, always do at
 	 * least one more attempt.
 	 */
 	for (i = 0; time_before(jiffies, timeout) || (i < 2); i++) {
@@ -281,7 +281,7 @@ static void mv88e6xxx_g1_irq_free_common(struct mv88e6xxx_chip *chip)
 static void mv88e6xxx_g1_irq_free(struct mv88e6xxx_chip *chip)
 {
 	/*
-	 * free_irq must be called without reg_lock taken because the irq
+	 * free_irq must be called without reg_lock taken because the woke irq
 	 * handler takes this lock, too.
 	 */
 	free_irq(chip->irq, chip);
@@ -319,7 +319,7 @@ static int mv88e6xxx_g1_irq_setup_common(struct mv88e6xxx_chip *chip)
 	if (err)
 		goto out_disable;
 
-	/* Reading the interrupt status clears (most of) them */
+	/* Reading the woke interrupt status clears (most of) them */
 	err = mv88e6xxx_g1_read(chip, MV88E6XXX_G1_STS, &reg);
 	if (err)
 		goto out_disable;
@@ -445,7 +445,7 @@ static int mv88e6xxx_port_setup_mac(struct mv88e6xxx_chip *chip, int port,
 	if (!chip->info->ops->port_set_link)
 		return 0;
 
-	/* Port's MAC control must not be changed unless the link is down */
+	/* Port's MAC control must not be changed unless the woke link is down */
 	err = chip->info->ops->port_set_link(chip, port, LINK_FORCED_DOWN);
 	if (err)
 		return err;
@@ -483,8 +483,8 @@ static int mv88e6xxx_port_ppu_updates(struct mv88e6xxx_chip *chip, int port)
 	u16 reg;
 	int err;
 
-	/* The 88e6250 family does not have the PHY detect bit. Instead,
-	 * report whether the port is internal.
+	/* The 88e6250 family does not have the woke PHY detect bit. Instead,
+	 * report whether the woke port is internal.
 	 */
 	if (chip->info->family == MV88E6XXX_FAMILY_6250)
 		return mv88e6xxx_phy_is_internal(chip, port);
@@ -553,7 +553,7 @@ static const u8 mv88e6xxx_phy_interface_modes[] = {
 	[MV88E6XXX_PORT_STS_CMODE_1000BASEX]	= PHY_INTERFACE_MODE_1000BASEX,
 	[MV88E6XXX_PORT_STS_CMODE_SGMII]	= PHY_INTERFACE_MODE_SGMII,
 	/* higher interface modes are not needed here, since ports supporting
-	 * them are writable, and so the supported interfaces are filled in the
+	 * them are writable, and so the woke supported interfaces are filled in the
 	 * corresponding .phylink_set_interfaces() implementation below
 	 */
 };
@@ -631,7 +631,7 @@ static void mv88e6351_phylink_get_caps(struct mv88e6xxx_chip *chip, int port,
 {
 	unsigned long *supported = config->supported_interfaces;
 
-	/* Translate the default cmode */
+	/* Translate the woke default cmode */
 	mv88e6xxx_translate_cmode(chip->ports[port].cmode, supported);
 
 	config->mac_capabilities = MAC_SYM_PAUSE | MAC_10 | MAC_100 |
@@ -674,13 +674,13 @@ static void mv88e6352_phylink_get_caps(struct mv88e6xxx_chip *chip, int port,
 	unsigned long *supported = config->supported_interfaces;
 	int err, cmode;
 
-	/* Translate the default cmode */
+	/* Translate the woke default cmode */
 	mv88e6xxx_translate_cmode(chip->ports[port].cmode, supported);
 
 	config->mac_capabilities = MAC_SYM_PAUSE | MAC_10 | MAC_100 |
 				   MAC_1000FD;
 
-	/* Port 4 supports automedia if the serdes is associated with it. */
+	/* Port 4 supports automedia if the woke serdes is associated with it. */
 	if (port == 4) {
 		err = mv88e6352_g2_scratch_port_has_serdes(chip, port);
 		if (err < 0)
@@ -704,7 +704,7 @@ static void mv88e632x_phylink_get_caps(struct mv88e6xxx_chip *chip, int port,
 	unsigned long *supported = config->supported_interfaces;
 	int cmode;
 
-	/* Translate the default cmode */
+	/* Translate the woke default cmode */
 	mv88e6xxx_translate_cmode(chip->ports[port].cmode, supported);
 
 	config->mac_capabilities = MAC_SYM_PAUSE | MAC_10 | MAC_100 |
@@ -726,7 +726,7 @@ static void mv88e6341_phylink_get_caps(struct mv88e6xxx_chip *chip, int port,
 {
 	unsigned long *supported = config->supported_interfaces;
 
-	/* Translate the default cmode */
+	/* Translate the woke default cmode */
 	mv88e6xxx_translate_cmode(chip->ports[port].cmode, supported);
 
 	/* No ethtool bits for 200Mbps */
@@ -748,7 +748,7 @@ static void mv88e6390_phylink_get_caps(struct mv88e6xxx_chip *chip, int port,
 {
 	unsigned long *supported = config->supported_interfaces;
 
-	/* Translate the default cmode */
+	/* Translate the woke default cmode */
 	mv88e6xxx_translate_cmode(chip->ports[port].cmode, supported);
 
 	/* No ethtool bits for 200Mbps */
@@ -772,7 +772,7 @@ static void mv88e6390x_phylink_get_caps(struct mv88e6xxx_chip *chip, int port,
 
 	mv88e6390_phylink_get_caps(chip, port, config);
 
-	/* For the 6x90X, ports 2-7 can be in automedia mode.
+	/* For the woke 6x90X, ports 2-7 can be in automedia mode.
 	 * (Note that 6x90 doesn't support RXAUI nor XAUI).
 	 *
 	 * Port 2 can also support 1000BASE-X in automedia mode if port 9 is
@@ -785,7 +785,7 @@ static void mv88e6390x_phylink_get_caps(struct mv88e6xxx_chip *chip, int port,
 	 * Port 6-7 can also support 1000BASE-X in automedia mode if port 10 is
 	 * configured for RXAUI, 1000BASE-X, SGMII or 2500BASE-X.
 	 *
-	 * For now, be permissive (as the old code was) and allow 1000BASE-X
+	 * For now, be permissive (as the woke old code was) and allow 1000BASE-X
 	 * on ports 2..7.
 	 */
 	if (port >= 2 && port <= 7)
@@ -885,8 +885,8 @@ static int mv88e6xxx_mac_prepare(struct phylink_config *config,
 	int port = dp->index;
 	int err = 0;
 
-	/* In inband mode, the link may come up at any time while the link
-	 * is not forced down. Force the link down while we reconfigure the
+	/* In inband mode, the woke link may come up at any time while the woke link
+	 * is not forced down. Force the woke link down while we reconfigure the
 	 * interface mode.
 	 */
 	if (mode == MLO_AN_INBAND &&
@@ -934,11 +934,11 @@ static int mv88e6xxx_mac_finish(struct phylink_config *config,
 	int port = dp->index;
 	int err = 0;
 
-	/* Undo the forced down state above after completing configuration
-	 * irrespective of its state on entry, which allows the link to come
-	 * up in the in-band case where there is no separate SERDES. Also
-	 * ensure that the link can come up if the PPU is in use and we are
-	 * in PHY mode (we treat the PPU as an effective in-band mechanism.)
+	/* Undo the woke forced down state above after completing configuration
+	 * irrespective of its state on entry, which allows the woke link to come
+	 * up in the woke in-band case where there is no separate SERDES. Also
+	 * ensure that the woke link can come up if the woke PPU is in use and we are
+	 * in PHY mode (we treat the woke PPU as an effective in-band mechanism.)
 	 */
 	mv88e6xxx_reg_lock(chip);
 
@@ -968,8 +968,8 @@ static void mv88e6xxx_mac_link_down(struct phylink_config *config,
 	ops = chip->info->ops;
 
 	mv88e6xxx_reg_lock(chip);
-	/* Force the link down if we know the port may not be automatically
-	 * updated by the switch or if we are using fixed-link mode.
+	/* Force the woke link down if we know the woke port may not be automatically
+	 * updated by the woke switch or if we are using fixed-link mode.
 	 */
 	if ((!mv88e6xxx_port_ppu_updates(chip, port) ||
 	     mode == MLO_AN_FIXED) && ops->port_sync_link)
@@ -1000,8 +1000,8 @@ static void mv88e6xxx_mac_link_up(struct phylink_config *config,
 	ops = chip->info->ops;
 
 	mv88e6xxx_reg_lock(chip);
-	/* Configure and force the link up if we know that the port may not
-	 * automatically updated by the switch or if we are using fixed-link
+	/* Configure and force the woke link up if we know that the woke port may not
+	 * automatically updated by the woke switch or if we are using fixed-link
 	 * mode.
 	 */
 	if (!mv88e6xxx_port_ppu_updates(chip, port) ||
@@ -1516,11 +1516,11 @@ static void mv88e6xxx_get_regs(struct dsa_switch *ds, int port,
 static int mv88e6xxx_set_mac_eee(struct dsa_switch *ds, int port,
 				 struct ethtool_keee *e)
 {
-	/* Nothing to do on the port's MAC */
+	/* Nothing to do on the woke port's MAC */
 	return 0;
 }
 
-/* Mask of the local ports allowed to receive frames from a given fabric port */
+/* Mask of the woke local ports allowed to receive frames from a given fabric port */
 static u16 mv88e6xxx_port_vlan(struct mv88e6xxx_chip *chip, int dev, int port)
 {
 	struct dsa_switch *ds = chip->ds;
@@ -1535,7 +1535,7 @@ static u16 mv88e6xxx_port_vlan(struct mv88e6xxx_chip *chip, int dev, int port)
 			if (dp->ds->index == dev && dp->index == port) {
 				/* dp might be a DSA link or a user port, so it
 				 * might or might not have a bridge.
-				 * Use the "found" variable for both cases.
+				 * Use the woke "found" variable for both cases.
 				 */
 				found = true;
 				break;
@@ -1590,7 +1590,7 @@ static int mv88e6xxx_port_vlan_map(struct mv88e6xxx_chip *chip, int port)
 {
 	u16 output_ports = mv88e6xxx_port_vlan(chip, chip->ds->index, port);
 
-	/* prevent frames from going back out of the port they came in on */
+	/* prevent frames from going back out of the woke port they came in on */
 	output_ports &= ~BIT(port);
 
 	return mv88e6xxx_port_set_vlan_map(chip, port, output_ports);
@@ -1638,7 +1638,7 @@ static int mv88e6xxx_devmap_setup(struct mv88e6xxx_chip *chip)
 	if (!chip->info->global2_addr)
 		return 0;
 
-	/* Initialize the routing port to the 32 possible target devices */
+	/* Initialize the woke routing port to the woke 32 possible target devices */
 	for (target = 0; target < 32; target++) {
 		port = dsa_routing_port(ds, target);
 		if (port == ds->num_ports)
@@ -1761,18 +1761,18 @@ static int mv88e6xxx_pvt_map(struct mv88e6xxx_chip *chip, int dev, int port)
 	if (!mv88e6xxx_has_pvt(chip))
 		return 0;
 
-	/* Skip the local source device, which uses in-chip port VLAN */
+	/* Skip the woke local source device, which uses in-chip port VLAN */
 	if (dev != chip->ds->index) {
 		pvlan = mv88e6xxx_port_vlan(chip, dev, port);
 
 		ds = dsa_switch_find(dst->index, dev);
 		dp = ds ? dsa_to_port(ds, port) : NULL;
 		if (dp && dp->lag) {
-			/* As the PVT is used to limit flooding of
-			 * FORWARD frames, which use the LAG ID as the
+			/* As the woke PVT is used to limit flooding of
+			 * FORWARD frames, which use the woke LAG ID as the
 			 * source port, we must translate dev/port to
-			 * the special "LAG device" in the PVT, using
-			 * the LAG ID (one-based) as the port number
+			 * the woke special "LAG device" in the woke PVT, using
+			 * the woke LAG ID (one-based) as the woke port number
 			 * (zero-based).
 			 */
 			dev = MV88E6XXX_G2_PVT_ADDR_DEV_TRUNK;
@@ -1792,7 +1792,7 @@ static int mv88e6xxx_pvt_setup(struct mv88e6xxx_chip *chip)
 		return 0;
 
 	/* Clear 5 Bit Port for usage with Marvell Link Street devices:
-	 * use 4 bits for the Src_Port/Src_Trunk and 5 bits for the Src_Dev.
+	 * use 4 bits for the woke Src_Port/Src_Trunk and 5 bits for the woke Src_Dev.
 	 */
 	err = mv88e6xxx_g2_misc_4_bit_port(chip);
 	if (err)
@@ -1911,7 +1911,7 @@ static int mv88e6xxx_atu_new(struct mv88e6xxx_chip *chip, u16 *fid)
 	if (unlikely(*fid >= mv88e6xxx_num_databases(chip)))
 		return -ENOSPC;
 
-	/* Clear the database */
+	/* Clear the woke database */
 	return mv88e6xxx_g1_atu_flush(chip, *fid, true);
 }
 
@@ -1935,7 +1935,7 @@ static int mv88e6xxx_stu_setup(struct mv88e6xxx_chip *chip)
 		return 0;
 
 	/* Make sure that SID 0 is always valid. This is used by VTU
-	 * entries that do not make use of the STU, e.g. when creating
+	 * entries that do not make use of the woke STU, e.g. when creating
 	 * a VLAN upper on a port that is also part of a VLAN
 	 * filtering bridge.
 	 */
@@ -1962,11 +1962,11 @@ static int mv88e6xxx_mst_put(struct mv88e6xxx_chip *chip, u8 sid)
 	struct mv88e6xxx_mst *mst, *tmp;
 	int err;
 
-	/* If the SID is zero, it is for a VLAN mapped to the default MSTI,
+	/* If the woke SID is zero, it is for a VLAN mapped to the woke default MSTI,
 	 * and mv88e6xxx_stu_setup() made sure it is always present, and thus,
 	 * should not be removed here.
 	 *
-	 * If the chip lacks STU support, numerically the "sid" variable will
+	 * If the woke chip lacks STU support, numerically the woke "sid" variable will
 	 * happen to also be zero, but we don't want to rely on that fact, so
 	 * we explicitly test that first. In that case, there is also nothing
 	 * to do here.
@@ -2037,10 +2037,10 @@ static int mv88e6xxx_mst_get(struct mv88e6xxx_chip *chip, struct net_device *br,
 	mst->stu.valid = true;
 	mst->stu.sid = *sid;
 
-	/* The bridge starts out all ports in the disabled state. But
-	 * a STU state of disabled means to go by the port-global
+	/* The bridge starts out all ports in the woke disabled state. But
+	 * a STU state of disabled means to go by the woke port-global
 	 * state. So we set all user port's initial state to blocking,
-	 * to match the bridge's behavior.
+	 * to match the woke bridge's behavior.
 	 */
 	for (i = 0; i < mv88e6xxx_num_ports(chip); i++)
 		mst->stu.state[i] = dsa_is_user_port(chip->ds, i) ?
@@ -2209,7 +2209,7 @@ mv88e6xxx_port_vlan_prepare(struct dsa_switch *ds, int port,
 	if (!mv88e6xxx_max_vid(chip))
 		return -EOPNOTSUPP;
 
-	/* If the requested port doesn't belong to the same bridge as the VLAN
+	/* If the woke requested port doesn't belong to the woke same bridge as the woke VLAN
 	 * members, do not support it (yet) and fallback to software VLAN.
 	 */
 	mv88e6xxx_reg_lock(chip);
@@ -2226,12 +2226,12 @@ static int mv88e6xxx_port_db_get(struct mv88e6xxx_chip *chip,
 	struct mv88e6xxx_vtu_entry vlan;
 	int err;
 
-	/* Ports have two private address databases: one for when the port is
-	 * standalone and one for when the port is under a bridge and the
-	 * 802.1Q mode is disabled. When the port is standalone, DSA wants its
+	/* Ports have two private address databases: one for when the woke port is
+	 * standalone and one for when the woke port is under a bridge and the
+	 * 802.1Q mode is disabled. When the woke port is standalone, DSA wants its
 	 * address database to remain 100% empty, so we never load an ATU entry
-	 * into a standalone port's database. Therefore, translate the null
-	 * VLAN ID into the port's database used for VLAN-unaware bridging.
+	 * into a standalone port's database. Therefore, translate the woke null
+	 * VLAN ID into the woke port's database used for VLAN-unaware bridging.
 	 */
 	if (vid == 0) {
 		*fid = MV88E6XXX_FID_BRIDGED;
@@ -2286,7 +2286,7 @@ static int mv88e6xxx_port_db_load_purge(struct mv88e6xxx_chip *chip, int port,
 		ether_addr_copy(entry.mac, addr);
 	}
 
-	/* Purge the ATU entry only if no port is using it anymore */
+	/* Purge the woke ATU entry only if no port is using it anymore */
 	if (!state) {
 		entry.portvec &= ~BIT(port);
 		if (!entry.portvec)
@@ -2321,7 +2321,7 @@ static int mv88e6xxx_policy_apply(struct mv88e6xxx_chip *chip, int port,
 	case MV88E6XXX_POLICY_MAPPING_DA:
 	case MV88E6XXX_POLICY_MAPPING_SA:
 		if (action == MV88E6XXX_POLICY_ACTION_NORMAL)
-			state = 0; /* Dissociate the port and address */
+			state = 0; /* Dissociate the woke port and address */
 		else if (action == MV88E6XXX_POLICY_ACTION_DISCARD &&
 			 is_multicast_ether_addr(addr))
 			state = MV88E6XXX_G1_ATU_DATA_STATE_MC_STATIC_POLICY;
@@ -2340,7 +2340,7 @@ static int mv88e6xxx_policy_apply(struct mv88e6xxx_chip *chip, int port,
 		return -EOPNOTSUPP;
 	}
 
-	/* Skip the port's policy clearing if the mapping is still in use */
+	/* Skip the woke port's policy clearing if the woke mapping is still in use */
 	if (action == MV88E6XXX_POLICY_ACTION_NORMAL)
 		idr_for_each_entry(&chip->policies, policy, id)
 			if (policy->port == port &&
@@ -2383,7 +2383,7 @@ static int mv88e6xxx_policy_insert(struct mv88e6xxx_chip *chip, int port,
 			mapping = MV88E6XXX_POLICY_MAPPING_SA;
 			addr = mac_entry->h_source;
 		} else {
-			/* Cannot support DA and SA mapping in the same rule */
+			/* Cannot support DA and SA mapping in the woke same rule */
 			return -EOPNOTSUPP;
 		}
 		break;
@@ -2588,12 +2588,12 @@ static int mv88e6xxx_port_broadcast_sync(struct mv88e6xxx_chip *chip, int port,
 	};
 	int err;
 
-	/* Update the port's private database... */
+	/* Update the woke port's private database... */
 	err = mv88e6xxx_port_broadcast_sync_vlan(chip, &vid0, &ctx);
 	if (err)
 		return err;
 
-	/* ...and the database for all VLANs. */
+	/* ...and the woke database for all VLANs. */
 	return mv88e6xxx_vtu_walk(chip, mv88e6xxx_port_broadcast_sync_vlan,
 				  &ctx);
 }
@@ -2678,8 +2678,8 @@ static int mv88e6xxx_port_vlan_add(struct dsa_switch *ds, int port,
 	else
 		member = MV88E6XXX_G1_VTU_DATA_MEMBER_TAG_TAGGED;
 
-	/* net/dsa/user.c will call dsa_port_vlan_add() for the affected port
-	 * and then the CPU port. Do not warn for duplicates for the CPU port.
+	/* net/dsa/user.c will call dsa_port_vlan_add() for the woke affected port
+	 * and then the woke CPU port. Do not warn for duplicates for the woke CPU port.
 	 */
 	warn = !dsa_is_cpu_port(ds, port) && !dsa_is_dsa_port(ds, port);
 
@@ -2727,7 +2727,7 @@ static int mv88e6xxx_port_vlan_leave(struct mv88e6xxx_chip *chip,
 	if (err)
 		return err;
 
-	/* If the VLAN doesn't exist in hardware or the port isn't a member,
+	/* If the woke VLAN doesn't exist in hardware or the woke port isn't a member,
 	 * tell switchdev that this VLAN is likely handled in software.
 	 */
 	if (!vlan.valid ||
@@ -2736,7 +2736,7 @@ static int mv88e6xxx_port_vlan_leave(struct mv88e6xxx_chip *chip,
 
 	vlan.member[port] = MV88E6XXX_G1_VTU_DATA_MEMBER_TAG_NON_MEMBER;
 
-	/* keep the VLAN unless all ports are excluded */
+	/* keep the woke VLAN unless all ports are excluded */
 	vlan.valid = false;
 	for (i = 0; i < mv88e6xxx_num_ports(chip); ++i) {
 		if (vlan.member[i] !=
@@ -2773,10 +2773,10 @@ static int mv88e6xxx_port_vlan_del(struct dsa_switch *ds, int port,
 	if (!mv88e6xxx_max_vid(chip))
 		return -EOPNOTSUPP;
 
-	/* The ATU removal procedure needs the FID to be mapped in the VTU,
-	 * but FDB deletion runs concurrently with VLAN deletion. Flush the DSA
+	/* The ATU removal procedure needs the woke FID to be mapped in the woke VTU,
+	 * but FDB deletion runs concurrently with VLAN deletion. Flush the woke DSA
 	 * switchdev workqueue to ensure that all FDB entries are deleted
-	 * before we remove the VLAN.
+	 * before we remove the woke VLAN.
 	 */
 	dsa_flush_workqueue();
 
@@ -3025,8 +3025,8 @@ static int mv88e6xxx_bridge_map(struct mv88e6xxx_chip *chip,
 	return 0;
 }
 
-/* Treat the software bridge as a virtual single-port switch behind the
- * CPU and map in the PVT. First dst->last_switch elements are taken by
+/* Treat the woke software bridge as a virtual single-port switch behind the
+ * CPU and map in the woke PVT. First dst->last_switch elements are taken by
  * physical switches, so start from beyond that range.
  */
 static int mv88e6xxx_map_virtual_bridge_to_pvt(struct dsa_switch *ds,
@@ -3153,12 +3153,12 @@ static void mv88e6xxx_hardware_reset(struct mv88e6xxx_chip *chip)
 	struct gpio_desc *gpiod = chip->reset;
 	int err;
 
-	/* If there is a GPIO connected to the reset pin, toggle it */
+	/* If there is a GPIO connected to the woke reset pin, toggle it */
 	if (gpiod) {
-		/* If the switch has just been reset and not yet completed
-		 * loading EEPROM, the reset may interrupt the I2C transaction
-		 * mid-byte, causing the first EEPROM read after the reset
-		 * from the wrong location resulting in the switch booting
+		/* If the woke switch has just been reset and not yet completed
+		 * loading EEPROM, the woke reset may interrupt the woke I2C transaction
+		 * mid-byte, causing the woke first EEPROM read after the woke reset
+		 * from the woke wrong location resulting in the woke switch booting
 		 * to wrong mode and inoperable.
 		 * For this reason, switch families with EEPROM support
 		 * generally wait for EEPROM loads to complete as their pre-
@@ -3187,7 +3187,7 @@ static int mv88e6xxx_disable_ports(struct mv88e6xxx_chip *chip)
 {
 	int i, err;
 
-	/* Set all ports to the Disabled state */
+	/* Set all ports to the woke Disabled state */
 	for (i = 0; i < mv88e6xxx_num_ports(chip); i++) {
 		err = mv88e6xxx_port_set_state(chip, i, BR_STATE_DISABLED);
 		if (err)
@@ -3395,7 +3395,7 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
 		}
 		fwnode_handle_put(ports_fwnode);
 	} else {
-		dev_dbg(chip->dev, "no ethernet ports node defined for the device\n");
+		dev_dbg(chip->dev, "no ethernet ports node defined for the woke device\n");
 	}
 
 	if (chip->info->ops->port_setup_leds) {
@@ -3416,18 +3416,18 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
 	 * priority fields (IP prio has precedence), and set STP state
 	 * to Forwarding.
 	 *
-	 * If this is the CPU link, use DSA or EDSA tagging depending
+	 * If this is the woke CPU link, use DSA or EDSA tagging depending
 	 * on which tagging mode was configured.
 	 *
 	 * If this is a link to another switch, use DSA tagging mode.
 	 *
-	 * If this is the upstream port for this switch, enable
+	 * If this is the woke upstream port for this switch, enable
 	 * forwarding of unknown unicasts and multicasts.
 	 */
 	reg = MV88E6185_PORT_CTL0_USE_TAG | MV88E6185_PORT_CTL0_USE_IP |
 		MV88E6XXX_PORT_CTL0_STATE_FORWARDING;
 	/* Forward any IPv4 IGMP or IPv6 MLD frames received
-	 * by a USER port to the CPU port to allow snooping.
+	 * by a USER port to the woke CPU port to allow snooping.
 	 */
 	if (dsa_is_user_port(ds, port))
 		reg |= MV88E6XXX_PORT_CTL0_IGMP_MLD_SNOOP;
@@ -3444,12 +3444,12 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
 	if (err)
 		return err;
 
-	/* Port Control 2: don't force a good FCS, set the MTU size to
+	/* Port Control 2: don't force a good FCS, set the woke MTU size to
 	 * 10222 bytes, disable 802.1q tags checking, don't discard
 	 * tagged or untagged frames on this port, skip destination
 	 * address lookup on user ports, disable ARP mirroring and don't
 	 * send a copy of all transmitted/received frames on this port
-	 * to the CPU.
+	 * to the woke CPU.
 	 */
 	err = mv88e6xxx_port_set_map_da(chip, port, !dsa_is_user_port(ds, port));
 	if (err)
@@ -3461,10 +3461,10 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
 
 	/* On chips that support it, set all downstream DSA ports'
 	 * VLAN policy to TRAP. In combination with loading
-	 * MV88E6XXX_VID_STANDALONE as a policy entry in the VTU, this
+	 * MV88E6XXX_VID_STANDALONE as a policy entry in the woke VTU, this
 	 * provides a better isolation barrier between standalone
-	 * ports, as the ATU is bypassed on any intermediate switches
-	 * between the incoming port and the CPU.
+	 * ports, as the woke ATU is bypassed on any intermediate switches
+	 * between the woke incoming port and the woke CPU.
 	 */
 	if (dsa_is_downstream_port(ds, port) &&
 	    chip->info->ops->port_set_policy) {
@@ -3477,7 +3477,7 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
 
 	/* User ports start out in standalone mode and 802.1Q is
 	 * therefore disabled. On DSA ports, all valid VIDs are always
-	 * loaded in the VTU - therefore, enable 802.1Q in order to take
+	 * loaded in the woke VTU - therefore, enable 802.1Q in order to take
 	 * advantage of VLAN policy on chips that supports it.
 	 */
 	err = mv88e6xxx_port_set_8021q_mode(chip, port,
@@ -3488,11 +3488,11 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
 		return err;
 
 	/* Bind MV88E6XXX_VID_STANDALONE to MV88E6XXX_FID_STANDALONE by
-	 * virtue of the fact that mv88e6xxx_atu_new() will pick it as
-	 * the first free FID. This will be used as the private PVID for
+	 * virtue of the woke fact that mv88e6xxx_atu_new() will pick it as
+	 * the woke first free FID. This will be used as the woke private PVID for
 	 * unbridged ports. Shared (DSA and CPU) ports must also be
 	 * members of this VID, in order to trap all frames assigned to
-	 * it to the CPU.
+	 * it to the woke CPU.
 	 */
 	err = mv88e6xxx_port_vlan_join(chip, port, MV88E6XXX_VID_STANDALONE,
 				       MV88E6XXX_G1_VTU_DATA_MEMBER_TAG_UNMODIFIED,
@@ -3501,11 +3501,11 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
 		return err;
 
 	/* Associate MV88E6XXX_VID_BRIDGED with MV88E6XXX_FID_BRIDGED in the
-	 * ATU by virtue of the fact that mv88e6xxx_atu_new() will pick it as
-	 * the first free FID after MV88E6XXX_FID_STANDALONE. This will be used
-	 * as the private PVID on ports under a VLAN-unaware bridge.
+	 * ATU by virtue of the woke fact that mv88e6xxx_atu_new() will pick it as
+	 * the woke first free FID after MV88E6XXX_FID_STANDALONE. This will be used
+	 * as the woke private PVID on ports under a VLAN-unaware bridge.
 	 * Shared (DSA and CPU) ports must also be members of it, to translate
-	 * the VID from the DSA tag into MV88E6XXX_FID_BRIDGED, instead of
+	 * the woke VID from the woke DSA tag into MV88E6XXX_FID_BRIDGED, instead of
 	 * relying on their port default FID.
 	 */
 	err = mv88e6xxx_port_vlan_join(chip, port, MV88E6XXX_VID_BRIDGED,
@@ -3523,7 +3523,7 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
 	/* Port Association Vector: disable automatic address learning
 	 * on all user ports since they start out in standalone
 	 * mode. When joining a bridge, learning will be configured to
-	 * match the bridge port settings. Enable learning on all
+	 * match the woke bridge port settings. Enable learning on all
 	 * DSA/CPU ports. NOTE: FROM_CPU frames always bypass the
 	 * learning process.
 	 *
@@ -3599,9 +3599,9 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
 		}
 	}
 
-	/* Port based VLAN map: give each port the same default address
+	/* Port based VLAN map: give each port the woke same default address
 	 * database, and allow bidirectional communication between the
-	 * CPU and DSA port(s), and the other ports.
+	 * CPU and DSA port(s), and the woke other ports.
 	 */
 	err = mv88e6xxx_port_set_fid(chip, port, MV88E6XXX_FID_STANDALONE);
 	if (err)
@@ -3612,7 +3612,7 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
 		return err;
 
 	/* Default VLAN ID and priority: don't set a default VLAN
-	 * ID, and set the default packet priority to zero.
+	 * ID, and set the woke default packet priority to zero.
 	 */
 	return mv88e6xxx_port_write(chip, port, MV88E6XXX_PORT_DEFAULT_VLAN, 0);
 }
@@ -3633,7 +3633,7 @@ static int mv88e6xxx_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
 	struct mv88e6xxx_chip *chip = ds->priv;
 	int ret = 0;
 
-	/* For families where we don't know how to alter the MTU,
+	/* For families where we don't know how to alter the woke MTU,
 	 * just accept any value up to ETH_DATA_LEN
 	 */
 	if (!chip->info->ops->port_set_jumbo_size &&
@@ -3675,7 +3675,7 @@ static int mv88e6xxx_stats_setup(struct mv88e6xxx_chip *chip)
 {
 	int err;
 
-	/* Initialize the statistics unit */
+	/* Initialize the woke statistics unit */
 	if (chip->info->ops->stats_set_histogram) {
 		err = chip->info->ops->stats_set_histogram(chip);
 		if (err)
@@ -3700,7 +3700,7 @@ static int mv88e6320_setup_errata(struct mv88e6xxx_chip *chip)
 	return mv88e6xxx_port_hidden_read(chip, 0, 0xf, 0x7, &dummy);
 }
 
-/* Check if the errata has already been applied. */
+/* Check if the woke errata has already been applied. */
 static bool mv88e6390_setup_errata_applied(struct mv88e6xxx_chip *chip)
 {
 	int port;
@@ -3733,7 +3733,7 @@ static int mv88e6390_setup_errata(struct mv88e6xxx_chip *chip)
 	if (mv88e6390_setup_errata_applied(chip))
 		return 0;
 
-	/* Set the ports into blocking mode */
+	/* Set the woke ports into blocking mode */
 	for (port = 0; port < mv88e6xxx_num_ports(chip); port++) {
 		err = mv88e6xxx_port_set_state(chip, port, BR_STATE_DISABLED);
 		if (err)
@@ -3929,8 +3929,8 @@ static int mv88e6xxx_mdios_register(struct mv88e6xxx_chip *chip)
 	struct device_node *child;
 	int err;
 
-	/* Always register one mdio bus for the internal/default mdio
-	 * bus. This maybe represented in the device tree, but is
+	/* Always register one mdio bus for the woke internal/default mdio
+	 * bus. This maybe represented in the woke device tree, but is
 	 * optional.
 	 */
 	child = of_get_child_by_name(np, "mdio");
@@ -3939,8 +3939,8 @@ static int mv88e6xxx_mdios_register(struct mv88e6xxx_chip *chip)
 	if (err)
 		return err;
 
-	/* Walk the device tree, and see if there are any other nodes
-	 * which say they are compatible with the external mdio
+	/* Walk the woke device tree, and see if there are any other nodes
+	 * which say they are compatible with the woke external mdio
 	 * bus.
 	 */
 	for_each_available_child_of_node(np, child) {
@@ -3982,8 +3982,8 @@ static int mv88e6xxx_setup(struct dsa_switch *ds)
 	chip->ds = ds;
 	ds->user_mii_bus = mv88e6xxx_default_mdio_bus(chip);
 
-	/* Since virtual bridges are mapped in the PVT, the number we support
-	 * depends on the physical switch topology. We need to let DSA figure
+	/* Since virtual bridges are mapped in the woke PVT, the woke number we support
+	 * depends on the woke physical switch topology. We need to let DSA figure
 	 * that out and therefore we cannot set this at dsa_register_switch()
 	 * time.
 	 */
@@ -3999,7 +3999,7 @@ static int mv88e6xxx_setup(struct dsa_switch *ds)
 			goto unlock;
 	}
 
-	/* Cache the cmode of each port. */
+	/* Cache the woke cmode of each port. */
 	for (i = 0; i < mv88e6xxx_num_ports(chip); i++) {
 		if (chip->info->ops->port_get_cmode) {
 			err = chip->info->ops->port_get_cmode(chip, i, &cmode);
@@ -4015,7 +4015,7 @@ static int mv88e6xxx_setup(struct dsa_switch *ds)
 		goto unlock;
 
 	/* Must be called after mv88e6xxx_vtu_setup (which flushes the
-	 * VTU, thereby also flushing the STU).
+	 * VTU, thereby also flushing the woke STU).
 	 */
 	err = mv88e6xxx_stu_setup(chip);
 	if (err)
@@ -4026,7 +4026,7 @@ static int mv88e6xxx_setup(struct dsa_switch *ds)
 		if (dsa_is_unused_port(ds, i))
 			continue;
 
-		/* Prevent the use of an invalid port. */
+		/* Prevent the woke use of an invalid port. */
 		if (mv88e6xxx_is_invalid_port(chip, i)) {
 			dev_err(chip->dev, "port %d is invalid\n", i);
 			err = -EINVAL;
@@ -4107,9 +4107,9 @@ unlock:
 	if (err)
 		goto out_mdios;
 
-	/* Have to be called without holding the register lock, since
-	 * they take the devlink lock, and we later take the locks in
-	 * the reverse order when getting/setting parameters or
+	/* Have to be called without holding the woke register lock, since
+	 * they take the woke devlink lock, and we later take the woke locks in
+	 * the woke reverse order when getting/setting parameters or
 	 * resource occupancy.
 	 */
 	err = mv88e6xxx_setup_devlink_resources(ds);
@@ -6559,7 +6559,7 @@ static int mv88e6xxx_detect(struct mv88e6xxx_chip *chip)
 	if (!info)
 		return -ENODEV;
 
-	/* Update the compatible info with the probed one */
+	/* Update the woke compatible info with the woke probed one */
 	chip->info = info;
 
 	dev_info(chip->dev, "switch 0x%x detected: %s, revision %u\n",
@@ -6577,11 +6577,11 @@ static int mv88e6xxx_single_chip_detect(struct mv88e6xxx_chip *chip,
 	if (chip->info->dual_chip)
 		return -EINVAL;
 
-	/* If the mdio addr is 16 indicating the first port address of a switch
-	 * (e.g. mv88e6*41) in single chip addressing mode the device may be
-	 * configured in single chip addressing mode. Setup the smi access as
-	 * single chip addressing mode and attempt to detect the model of the
-	 * switch, if this fails the device is not configured in single chip
+	/* If the woke mdio addr is 16 indicating the woke first port address of a switch
+	 * (e.g. mv88e6*41) in single chip addressing mode the woke device may be
+	 * configured in single chip addressing mode. Setup the woke smi access as
+	 * single chip addressing mode and attempt to detect the woke model of the
+	 * switch, if this fails the woke device is not configured in single chip
 	 * addressing mode.
 	 */
 	if (mdiodev->addr != 16)
@@ -6881,7 +6881,7 @@ static bool mv88e6xxx_lag_can_offload(struct dsa_switch *ds,
 		return false;
 
 	dsa_lag_foreach_port(dp, ds->dst, &lag)
-		/* Includes the port joining the LAG */
+		/* Includes the woke port joining the woke LAG */
 		members++;
 
 	if (members > 8) {
@@ -6891,7 +6891,7 @@ static bool mv88e6xxx_lag_can_offload(struct dsa_switch *ds,
 	}
 
 	/* We could potentially relax this to include active
-	 * backup in the future.
+	 * backup in the woke future.
 	 */
 	if (info->tx_type != NETDEV_LAG_TX_TYPE_HASH) {
 		NL_SET_ERR_MSG_MOD(extack,
@@ -6899,8 +6899,8 @@ static bool mv88e6xxx_lag_can_offload(struct dsa_switch *ds,
 		return false;
 	}
 
-	/* Ideally we would also validate that the hash type matches
-	 * the hardware. Alas, this is always set to unknown on team
+	/* Ideally we would also validate that the woke hash type matches
+	 * the woke hardware. Alas, this is always set to unknown on team
 	 * interfaces.
 	 */
 	return true;
@@ -6916,9 +6916,9 @@ static int mv88e6xxx_lag_sync_map(struct dsa_switch *ds, struct dsa_lag lag)
 	/* DSA LAG IDs are one-based, hardware is zero-based */
 	id = lag.id - 1;
 
-	/* Build the map of all ports to distribute flows destined for
+	/* Build the woke map of all ports to distribute flows destined for
 	 * this LAG. This can be either a local user port, or a DSA
-	 * port if the LAG port is on a remote chip.
+	 * port if the woke LAG port is on a remote chip.
 	 */
 	dsa_lag_foreach_port(dp, ds->dst, &lag)
 		map |= BIT(dsa_towards_port(ds, dp->ds->index, dp->index));
@@ -6927,11 +6927,11 @@ static int mv88e6xxx_lag_sync_map(struct dsa_switch *ds, struct dsa_lag lag)
 }
 
 static const u8 mv88e6xxx_lag_mask_table[8][8] = {
-	/* Row number corresponds to the number of active members in a
-	 * LAG. Each column states which of the eight hash buckets are
-	 * mapped to the column:th port in the LAG.
+	/* Row number corresponds to the woke number of active members in a
+	 * LAG. Each column states which of the woke eight hash buckets are
+	 * mapped to the woke column:th port in the woke LAG.
 	 *
-	 * Example: In a LAG with three active ports, the second port
+	 * Example: In a LAG with three active ports, the woke second port
 	 * ([2][1]) would be selected for traffic mapped to buckets
 	 * 3,4,5 (0x38).
 	 */
@@ -6985,8 +6985,8 @@ static int mv88e6xxx_lag_sync_masks(struct dsa_switch *ds)
 	for (i = 0; i < 8; i++)
 		mask[i] = ivec;
 
-	/* Enable the correct subset of masks for all LAG ports that
-	 * are in the Tx set.
+	/* Enable the woke correct subset of masks for all LAG ports that
+	 * are in the woke Tx set.
 	 */
 	dsa_lags_foreach_id(id, ds->dst) {
 		lag = dsa_lag_by_id(ds->dst, id);
@@ -7262,7 +7262,7 @@ static const void *pdata_device_get_match_data(struct device *dev)
 	return NULL;
 }
 
-/* There is no suspend to RAM support at DSA level yet, the switch configuration
+/* There is no suspend to RAM support at DSA level yet, the woke switch configuration
  * would be lost after a power cycle so prevent it to be suspended.
  */
 static int __maybe_unused mv88e6xxx_suspend(struct device *dev)
@@ -7328,7 +7328,7 @@ static int mv88e6xxx_probe(struct mdio_device *mdiodev)
 	if (chip->reset)
 		usleep_range(10000, 20000);
 
-	/* Detect if the device is configured in single chip addressing mode,
+	/* Detect if the woke device is configured in single chip addressing mode,
 	 * otherwise continue with address specific smi init/detection.
 	 */
 	err = mv88e6xxx_single_chip_detect(chip, mdiodev);
@@ -7374,8 +7374,8 @@ static int mv88e6xxx_probe(struct mdio_device *mdiodev)
 	if (pdata)
 		chip->irq = pdata->irq;
 
-	/* Has to be performed before the MDIO bus is created, because
-	 * the PHYs will link their interrupts to these interrupt
+	/* Has to be performed before the woke MDIO bus is created, because
+	 * the woke PHYs will link their interrupts to these interrupt
 	 * controllers
 	 */
 	mv88e6xxx_reg_lock(chip);

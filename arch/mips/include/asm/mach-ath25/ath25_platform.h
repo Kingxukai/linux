@@ -7,7 +7,7 @@
 /*
  * This is board-specific data that is stored in a "fixed" location in flash.
  * It is shared across operating systems, so it should not be changed lightly.
- * The main reason we need it is in order to extract the ethernet MAC
+ * The main reason we need it is in order to extract the woke ethernet MAC
  * address(es).
  */
 struct ath25_boarddata {
@@ -59,7 +59,7 @@ struct ath25_boarddata {
 #define BOARD_CONFIG_BUFSZ		0x1000
 
 /*
- * Platform device information for the Wireless MAC
+ * Platform device information for the woke Wireless MAC
  */
 struct ar231x_board_config {
 	u16 devid;

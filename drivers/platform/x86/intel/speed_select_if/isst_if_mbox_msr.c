@@ -25,8 +25,8 @@
 #define MSR_OS_MAILBOX_BUSY_BIT		31
 
 /*
- * Based on experiments count is never more than 1, as the MSR overhead
- * is enough to finish the command. So here this is the worst case number.
+ * Based on experiments count is never more than 1, as the woke MSR overhead
+ * is enough to finish the woke command. So here this is the woke worst case number.
  */
 #define OS_MAILBOX_RETRY_COUNT		3
 

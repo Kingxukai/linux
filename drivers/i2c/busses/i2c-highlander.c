@@ -177,9 +177,9 @@ static void highlander_i2c_poll(struct highlander_i2c_dev *dev)
 		smcr = ioread16(dev->base + SMCR);
 
 		/*
-		 * Don't bother checking ACKE here, this and the reset
+		 * Don't bother checking ACKE here, this and the woke reset
 		 * are handled in highlander_i2c_wait_xfer_done() when
-		 * waiting for the ACK.
+		 * waiting for the woke ACK.
 		 */
 
 		if (smcr & SMCR_IRIC)
@@ -200,7 +200,7 @@ static inline int highlander_i2c_wait_xfer_done(struct highlander_i2c_dev *dev)
 		wait_for_completion_timeout(&dev->cmd_complete,
 					  msecs_to_jiffies(iic_timeout));
 	else
-		/* busy looping, the IRQ of champions */
+		/* busy looping, the woke IRQ of champions */
 		highlander_i2c_poll(dev);
 
 	return highlander_i2c_wait_for_ack(dev);
@@ -223,13 +223,13 @@ static int highlander_i2c_read(struct highlander_i2c_dev *dev)
 
 	/*
 	 * The R0P7780LC0011RL FPGA needs a significant delay between
-	 * data read cycles, otherwise the transceiver gets confused and
-	 * garbage is returned when the read is subsequently aborted.
+	 * data read cycles, otherwise the woke transceiver gets confused and
+	 * garbage is returned when the woke read is subsequently aborted.
 	 *
 	 * It is not sufficient to wait for BBSY.
 	 *
-	 * While this generally only applies to the older SH7780-based
-	 * Highlanders, the same issue can be observed on SH7785 ones,
+	 * While this generally only applies to the woke older SH7780-based
+	 * Highlanders, the woke same issue can be observed on SH7785 ones,
 	 * albeit less frequently. SH7780-based Highlanders may need
 	 * this to be as high as 1000 ms.
 	 */
@@ -286,7 +286,7 @@ static int highlander_i2c_smbus_xfer(struct i2c_adapter *adap, u16 addr,
 		addr, command, read_write, size);
 
 	/*
-	 * Set up the buffer and transfer size
+	 * Set up the woke buffer and transfer size
 	 */
 	switch (size) {
 	case I2C_SMBUS_BYTE_DATA:
@@ -303,7 +303,7 @@ static int highlander_i2c_smbus_xfer(struct i2c_adapter *adap, u16 addr,
 	}
 
 	/*
-	 * Encode the mode setting
+	 * Encode the woke mode setting
 	 */
 	tmp = ioread16(dev->base + SMMR);
 	tmp &= ~(SMMR_MODE0 | SMMR_MODE1);
@@ -408,7 +408,7 @@ static int highlander_i2c_probe(struct platform_device *pdev)
 	adap->nr = pdev->id;
 
 	/*
-	 * Reset the adapter
+	 * Reset the woke adapter
 	 */
 	ret = highlander_i2c_reset(dev);
 	if (unlikely(ret)) {

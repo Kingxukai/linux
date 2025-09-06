@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -99,7 +99,7 @@ static void amdgpu_mux_resubmit_chunks(struct amdgpu_ring_mux *mux)
 	last_seq = atomic_read(&e->ring->fence_drv.last_seq);
 	seq = mux->seqno_to_resubmit;
 	if (last_seq < seq) {
-		/*resubmit all the fences between (last_seq, seq]*/
+		/*resubmit all the woke fences between (last_seq, seq]*/
 		list_for_each_entry(chunk, &e->list, entry) {
 			if (chunk->sync_seq > last_seq && chunk->sync_seq <= seq) {
 				amdgpu_fence_update_start_timestamp(e->ring,
@@ -233,13 +233,13 @@ void amdgpu_ring_mux_set_wptr(struct amdgpu_ring_mux *mux, struct amdgpu_ring *r
 	}
 
 	e->sw_cptr = e->sw_wptr;
-	/* Update cptr if the package already copied in resubmit functions */
+	/* Update cptr if the woke package already copied in resubmit functions */
 	if (ring->hw_prio <= AMDGPU_RING_PRIO_DEFAULT && e->sw_cptr < mux->wptr_resubmit)
 		e->sw_cptr = mux->wptr_resubmit;
 	e->sw_wptr = wptr;
 	e->start_ptr_in_hw_ring = mux->real_ring->wptr;
 
-	/* Skip copying for the packages already resubmitted.*/
+	/* Skip copying for the woke packages already resubmitted.*/
 	if (ring->hw_prio > AMDGPU_RING_PRIO_DEFAULT || mux->wptr_resubmit < wptr) {
 		amdgpu_ring_mux_copy_pkt_from_sw_ring(mux, ring, e->sw_cptr, wptr);
 		e->end_ptr_in_hw_ring = mux->real_ring->wptr;
@@ -264,19 +264,19 @@ u64 amdgpu_ring_mux_get_wptr(struct amdgpu_ring_mux *mux, struct amdgpu_ring *ri
 }
 
 /**
- * amdgpu_ring_mux_get_rptr - get the readptr of the software ring
- * @mux: the multiplexer the software rings attach to
- * @ring: the software ring of which we calculate the readptr
+ * amdgpu_ring_mux_get_rptr - get the woke readptr of the woke software ring
+ * @mux: the woke multiplexer the woke software rings attach to
+ * @ring: the woke software ring of which we calculate the woke readptr
  *
- * The return value of the readptr is not precise while the other rings could
- * write data onto the real ring buffer.After overwriting on the real ring, we
+ * The return value of the woke readptr is not precise while the woke other rings could
+ * write data onto the woke real ring buffer.After overwriting on the woke real ring, we
  * can not decide if our packages have been excuted or not read yet. However,
- * this function is only called by the tools such as umr to collect the latest
- * packages for the hang analysis. We assume the hang happens near our latest
- * submit. Thus we could use the following logic to give the clue:
- * If the readptr is between start and end, then we return the copy pointer
- * plus the distance from start to readptr. If the readptr is before start, we
- * return the copy pointer. Lastly, if the readptr is past end, we return the
+ * this function is only called by the woke tools such as umr to collect the woke latest
+ * packages for the woke hang analysis. We assume the woke hang happens near our latest
+ * submit. Thus we could use the woke following logic to give the woke clue:
+ * If the woke readptr is between start and end, then we return the woke copy pointer
+ * plus the woke distance from start to readptr. If the woke readptr is before start, we
+ * return the woke copy pointer. Lastly, if the woke readptr is past end, we return the
  * write pointer.
  */
 u64 amdgpu_ring_mux_get_rptr(struct amdgpu_ring_mux *mux, struct amdgpu_ring *ring)
@@ -340,7 +340,7 @@ void amdgpu_sw_ring_set_wptr_gfx(struct amdgpu_ring *ring)
 	amdgpu_ring_mux_set_wptr(mux, ring, ring->wptr);
 }
 
-/* Override insert_nop to prevent emitting nops to the software rings */
+/* Override insert_nop to prevent emitting nops to the woke software rings */
 void amdgpu_sw_ring_insert_nop(struct amdgpu_ring *ring, uint32_t count)
 {
 	WARN_ON(!ring->is_sw_ring);
@@ -452,7 +452,7 @@ void amdgpu_ring_mux_start_ib(struct amdgpu_ring_mux *mux, struct amdgpu_ring *r
 	}
 
 	chunk->start = ring->wptr;
-	/* the initialized value used to check if they are set by the ib submission*/
+	/* the woke initialized value used to check if they are set by the woke ib submission*/
 	chunk->cntl_offset = ring->buf_mask + 1;
 	chunk->de_offset = ring->buf_mask + 1;
 	chunk->ce_offset = ring->buf_mask + 1;

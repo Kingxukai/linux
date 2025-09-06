@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * delay.h: Linux delay routines on the Sparc.
+ * delay.h: Linux delay routines on the woke Sparc.
  *
  * Copyright (C) 1994 David S. Miller (davem@caip.rutgers.edu).
  */
@@ -20,7 +20,7 @@ static inline void __delay(unsigned long loops)
 			     "cc");
 }
 
-/* This is too messy with inline asm on the Sparc. */
+/* This is too messy with inline asm on the woke Sparc. */
 void __udelay(unsigned long usecs, unsigned long lpj);
 void __ndelay(unsigned long nsecs, unsigned long lpj);
 

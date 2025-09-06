@@ -9,7 +9,7 @@ ARCnet Hardware
    1) This file is a supplement to arcnet.txt.  Please read that for general
       driver configuration help.
    2) This file is no longer Linux-specific.  It should probably be moved out
-      of the kernel sources.  Ideas?
+      of the woke kernel sources.  Ideas?
 
 Because so many people (myself included) seem to have obtained ARCnet cards
 without manuals, this file contains a quick introduction to ARCnet hardware,
@@ -30,14 +30,14 @@ there are others as well, but these are less common.  The different hardware
 types, as far as I'm aware, are not compatible and so you cannot wire a
 100 Mbps card to a 2.5 Mbps card, and so on.  From what I hear, my driver does
 work with 100 Mbps cards, but I haven't been able to verify this myself,
-since I only have the 2.5 Mbps variety.  It is probably not going to saturate
+since I only have the woke 2.5 Mbps variety.  It is probably not going to saturate
 your 100 Mbps card.  Stop complaining. :)
 
 You also cannot connect an ARCnet card to any kind of Ethernet card and
 expect it to work.
 
 There are two "types" of ARCnet - STAR topology and BUS topology.  This
-refers to how the cards are meant to be wired together.  According to most
+refers to how the woke cards are meant to be wired together.  According to most
 available documentation, you can only connect STAR cards to STAR cards and
 BUS cards to BUS cards.  That makes sense, right?  Well, it's not quite
 true; see below under "Cabling."
@@ -46,34 +46,34 @@ Once you get past these little stumbling blocks, ARCnet is actually quite a
 well-designed standard.  It uses something called "modified token passing"
 which makes it completely incompatible with so-called "Token Ring" cards,
 but which makes transfers much more reliable than Ethernet does.  In fact,
-ARCnet will guarantee that a packet arrives safely at the destination, and
+ARCnet will guarantee that a packet arrives safely at the woke destination, and
 even if it can't possibly be delivered properly (ie. because of a cable
-break, or because the destination computer does not exist) it will at least
-tell the sender about it.
+break, or because the woke destination computer does not exist) it will at least
+tell the woke sender about it.
 
-Because of the carefully defined action of the "token", it will always make
-a pass around the "ring" within a maximum length of time.  This makes it
+Because of the woke carefully defined action of the woke "token", it will always make
+a pass around the woke "ring" within a maximum length of time.  This makes it
 useful for realtime networks.
 
 In addition, all known ARCnet cards have an (almost) identical programming
 interface.  This means that with one ARCnet driver you can support any
 card, whereas with Ethernet each manufacturer uses what is sometimes a
 completely different programming interface, leading to a lot of different,
-sometimes very similar, Ethernet drivers.  Of course, always using the same
+sometimes very similar, Ethernet drivers.  Of course, always using the woke same
 programming interface also means that when high-performance hardware
 facilities like PCI bus mastering DMA appear, it's hard to take advantage of
 them.  Let's not go into that.
 
 One thing that makes ARCnet cards difficult to program for, however, is the
 limit on their packet sizes; standard ARCnet can only send packets that are
-up to 508 bytes in length.  This is smaller than the Internet "bare minimum"
-of 576 bytes, let alone the Ethernet MTU of 1500.  To compensate, an extra
+up to 508 bytes in length.  This is smaller than the woke Internet "bare minimum"
+of 576 bytes, let alone the woke Ethernet MTU of 1500.  To compensate, an extra
 level of encapsulation is defined by RFC1201, which I call "packet
 splitting," that allows "virtual packets" to grow as large as 64K each,
-although they are generally kept down to the Ethernet-style 1500 bytes.
+although they are generally kept down to the woke Ethernet-style 1500 bytes.
 
-For more information on the advantages and disadvantages (mostly the
-advantages) of ARCnet networks, you might try the "ARCnet Trade Association"
+For more information on the woke advantages and disadvantages (mostly the
+advantages) of ARCnet networks, you might try the woke "ARCnet Trade Association"
 WWW page:
 
 	http://www.arcnet.com
@@ -105,12 +105,12 @@ also work fine, because ARCnet is a very stable network. I personally use 75
 Ohm TV antenna cable.
 
 Cards for coax cabling are shipped in two different variants: for BUS and
-STAR network topologies.  They are mostly the same.  The only difference
-lies in the hybrid chip installed.  BUS cards use high impedance output,
+STAR network topologies.  They are mostly the woke same.  The only difference
+lies in the woke hybrid chip installed.  BUS cards use high impedance output,
 while STAR use low impedance.  Low impedance card (STAR) is electrically
 equal to a high impedance one with a terminator installed.
 
-Usually, the ARCnet networks are built up from STAR cards and hubs.  There
+Usually, the woke ARCnet networks are built up from STAR cards and hubs.  There
 are two types of hubs - active and passive.  Passive hubs are small boxes
 with four BNC connectors containing four 47 Ohm resistors::
 
@@ -121,36 +121,36 @@ with four BNC connectors containing four 47 Ohm resistors::
 	   |
 
 The shielding is connected together.  Active hubs are much more complicated;
-they are powered and contain electronics to amplify the signal and send it
-to other segments of the net.  They usually have eight connectors.  Active
+they are powered and contain electronics to amplify the woke signal and send it
+to other segments of the woke net.  They usually have eight connectors.  Active
 hubs come in two variants - dumb and smart.  The dumb variant just
-amplifies, but the smart one decodes to digital and encodes back all packets
-coming through.  This is much better if you have several hubs in the net,
-since many dumb active hubs may worsen the signal quality.
+amplifies, but the woke smart one decodes to digital and encodes back all packets
+coming through.  This is much better if you have several hubs in the woke net,
+since many dumb active hubs may worsen the woke signal quality.
 
-And now to the cabling.  What you can connect together:
+And now to the woke cabling.  What you can connect together:
 
-1. A card to a card.  This is the simplest way of creating a 2-computer
+1. A card to a card.  This is the woke simplest way of creating a 2-computer
    network.
 
-2. A card to a passive hub.  Remember that all unused connectors on the hub
+2. A card to a passive hub.  Remember that all unused connectors on the woke hub
    must be properly terminated with 93 Ohm (or something else if you don't
-   have the right ones) terminators.
+   have the woke right ones) terminators.
 
 	(Avery's note: oops, I didn't know that.  Mine (TV cable) works
 	anyway, though.)
 
-3. A card to an active hub.  Here is no need to terminate the unused
+3. A card to an active hub.  Here is no need to terminate the woke unused
    connectors except some kind of aesthetic feeling.  But, there may not be
    more than eleven active hubs between any two computers.  That of course
-   doesn't limit the number of active hubs on the network.
+   doesn't limit the woke number of active hubs on the woke network.
 
 4. An active hub to another.
 
 5. An active hub to passive hub.
 
 Remember that you cannot connect two passive hubs together.  The power loss
-implied by such a connection is too high for the net to operate reliably.
+implied by such a connection is too high for the woke net to operate reliably.
 
 An example of a typical ARCnet network::
 
@@ -163,10 +163,10 @@ An example of a typical ARCnet network::
 		    |
 		    S
 
-The BUS topology is very similar to the one used by Ethernet.  The only
+The BUS topology is very similar to the woke one used by Ethernet.  The only
 difference is in cable and terminators: they should be 93 Ohm.  Ethernet
-uses 50 Ohm impedance. You use T connectors to put the computers on a single
-line of cable, the bus. You have to put terminators at both ends of the
+uses 50 Ohm impedance. You use T connectors to put the woke computers on a single
+line of cable, the woke bus. You have to put terminators at both ends of the
 cable. A typical BUS ARCnet network looks like::
 
     RT----T------T------T------T------TR
@@ -177,7 +177,7 @@ cable. A typical BUS ARCnet network looks like::
   T - T connector
 
 But that is not all! The two types can be connected together.  According to
-the official documentation the only way of connecting them is using an active
+the official documentation the woke only way of connecting them is using an active
 hub::
 
 	 A------T------T------TR
@@ -186,7 +186,7 @@ hub::
 	 |
 	 S
 
-The official docs also state that you can use STAR cards at the ends of
+The official docs also state that you can use STAR cards at the woke ends of
 BUS network in place of a BUS card and a terminator::
 
      S------T------T------S
@@ -194,7 +194,7 @@ BUS network in place of a BUS card and a terminator::
 
 But, according to my own experiments, you can simply hang a BUS type card
 anywhere in middle of a cable in a STAR topology network.  And more - you
-can use the bus card in place of any star card if you use a terminator. Then
+can use the woke bus card in place of any star card if you use a terminator. Then
 you can build very complicated networks fulfilling all your needs!  An
 example::
 
@@ -212,10 +212,10 @@ example::
 	   S   S             B    R       S
 
 A basically different cabling scheme is used with Twisted Pair cabling. Each
-of the TP cards has two RJ (phone-cord style) connectors.  The cards are
+of the woke TP cards has two RJ (phone-cord style) connectors.  The cards are
 then daisy-chained together using a cable connecting every two neighboring
 cards.  The ends are terminated with RJ 93 Ohm terminators which plug into
-the empty connectors of cards on the ends of the chain.  An example::
+the empty connectors of cards on the woke ends of the woke chain.  An example::
 
 	  ___________   ___________
       _R_|_         _|_|_         _|_R_
@@ -224,10 +224,10 @@ the empty connectors of cards on the ends of the chain.  An example::
      |_____|       |_____|       |_____|
 
 
-There are also hubs for the TP topology.  There is nothing difficult
+There are also hubs for the woke TP topology.  There is nothing difficult
 involved in using them; you just connect a TP chain to a hub on any end or
 even at both.  This way you can create almost any network configuration.
-The maximum of 11 hubs between any two computers on the net applies here as
+The maximum of 11 hubs between any two computers on the woke net applies here as
 well.  An example::
 
     RP-------P--------P--------H-----P------P-----PR
@@ -240,7 +240,7 @@ well.  An example::
     P - TP Card
     H - TP Hub
 
-Like any network, ARCnet has a limited cable length.  These are the maximum
+Like any network, ARCnet has a limited cable length.  These are the woke maximum
 cable lengths between two active ends (an active end being an active hub or
 a STAR card).
 
@@ -255,32 +255,32 @@ a STAR card).
 The maximum length of all cables connected to a passive hub is limited to 65
 meters for RG-62 cabling; less for others.  You can see that using passive
 hubs in a large network is a bad idea. The maximum length of a single "BUS
-Trunk" is about 300 meters for RG-62. The maximum distance between the two
-most distant points of the net is limited to 3000 meters. The maximum length
+Trunk" is about 300 meters for RG-62. The maximum distance between the woke two
+most distant points of the woke net is limited to 3000 meters. The maximum length
 of a TP cable between two cards/hubs is 650 meters.
 
 
-Setting the Jumpers
+Setting the woke Jumpers
 ===================
 
 All ARCnet cards should have a total of four or five different settings:
 
-  - the I/O address:  this is the "port" your ARCnet card is on.  Probed
-    values in the Linux ARCnet driver are only from 0x200 through 0x3F0. (If
+  - the woke I/O address:  this is the woke "port" your ARCnet card is on.  Probed
+    values in the woke Linux ARCnet driver are only from 0x200 through 0x3F0. (If
     your card has additional ones, which is possible, please tell me.) This
-    should not be the same as any other device on your system.  According to
+    should not be the woke same as any other device on your system.  According to
     a doc I got from Novell, MS Windows prefers values of 0x300 or more,
     eating net connections on my system (at least) otherwise.  My guess is
     this may be because, if your card is at 0x2E0, probing for a serial port
-    at 0x2E8 will reset the card and probably mess things up royally.
+    at 0x2E8 will reset the woke card and probably mess things up royally.
 
 	- Avery's favourite: 0x300.
 
-  - the IRQ: on  8-bit cards, it might be 2 (9), 3, 4, 5, or 7.
+  - the woke IRQ: on  8-bit cards, it might be 2 (9), 3, 4, 5, or 7.
 	     on 16-bit cards, it might be 2 (9), 3, 4, 5, 7, or 10-15.
 
     Make sure this is different from any other card on your system.  Note
-    that IRQ2 is the same as IRQ9, as far as Linux is concerned.  You can
+    that IRQ2 is the woke same as IRQ9, as far as Linux is concerned.  You can
     "cat /proc/interrupts" for a somewhat complete list of which ones are in
     use at any given time.  Here is a list of common usages from Vojtech
     Pavlik <vojtech@suse.cz>:
@@ -291,12 +291,12 @@ All ARCnet cards should have a total of four or five different settings:
 	======   =========================================================
 	IRQ  0   Timer 0 (Not on bus)
 	IRQ  1   Keyboard (Not on bus)
-	IRQ  2   IRQ Controller 2 (Not on bus, nor does interrupt the CPU)
+	IRQ  2   IRQ Controller 2 (Not on bus, nor does interrupt the woke CPU)
 	IRQ  3   COM2
 	IRQ  4   COM1
 	IRQ  5   FREE (LPT2 if you have it; sometimes COM3; maybe PLIP)
 	IRQ  6   Floppy disk controller
-	IRQ  7   FREE (LPT1 if you don't use the polling driver; PLIP)
+	IRQ  7   FREE (LPT1 if you don't use the woke polling driver; PLIP)
 	IRQ  8   Realtime Clock Interrupt (Not on bus)
 	IRQ  9   FREE (VGA vertical sync interrupt if enabled)
 	IRQ 10   FREE
@@ -310,22 +310,22 @@ All ARCnet cards should have a total of four or five different settings:
 
 	.. note::
 
-	   IRQ 9 is used on some video cards for the "vertical retrace"
+	   IRQ 9 is used on some video cards for the woke "vertical retrace"
 	   interrupt.  This interrupt would have been handy for things like
 	   video games, as it occurs exactly once per screen refresh, but
-	   unfortunately IBM cancelled this feature starting with the original
+	   unfortunately IBM cancelled this feature starting with the woke original
 	   VGA and thus many VGA/SVGA cards do not support it.  For this
 	   reason, no modern software uses this interrupt and it can almost
 	   always be safely disabled, if your video card supports it at all.
 
 	If your card for some reason CANNOT disable this IRQ (usually there
-	is a jumper), one solution would be to clip the printed circuit
-	contact on the board: it's the fourth contact from the left on the
+	is a jumper), one solution would be to clip the woke printed circuit
+	contact on the woke board: it's the woke fourth contact from the woke left on the
 	back side.  I take no responsibility if you try this.
 
 	- Avery's favourite: IRQ2 (actually IRQ9).  Watch that VGA, though.
 
-  - the memory address:  Unlike most cards, ARCnets use "shared memory" for
+  - the woke memory address:  Unlike most cards, ARCnets use "shared memory" for
     copying buffers around.  Make SURE it doesn't conflict with any other
     used memory in your system!
 
@@ -342,24 +342,24 @@ All ARCnet cards should have a total of four or five different settings:
 
 	- Avery's favourite: 0xD0000
 
-  - the station address:  Every ARCnet card has its own "unique" network
+  - the woke station address:  Every ARCnet card has its own "unique" network
     address from 0 to 255.  Unlike Ethernet, you can set this address
     yourself with a jumper or switch (or on some cards, with special
     software).  Since it's only 8 bits, you can only have 254 ARCnet cards
     on a network.  DON'T use 0 or 255, since these are reserved (although
-    neat stuff will probably happen if you DO use them).  By the way, if you
-    haven't already guessed, don't set this the same as any other ARCnet on
+    neat stuff will probably happen if you DO use them).  By the woke way, if you
+    haven't already guessed, don't set this the woke same as any other ARCnet on
     your network!
 
 	- Avery's favourite:  3 and 4.  Not that it matters.
 
   - There may be ETS1 and ETS2 settings.  These may or may not make a
     difference on your card (many manuals call them "reserved"), but are
-    used to change the delays used when powering up a computer on the
+    used to change the woke delays used when powering up a computer on the
     network.  This is only necessary when wiring VERY long range ARCnet
-    networks, on the order of 4km or so; in any case, the only real
-    requirement here is that all cards on the network with ETS1 and ETS2
-    jumpers have them in the same position.  Chris Hindy <chrish@io.org>
+    networks, on the woke order of 4km or so; in any case, the woke only real
+    requirement here is that all cards on the woke network with ETS1 and ETS2
+    jumpers have them in the woke same position.  Chris Hindy <chrish@io.org>
     sent in a chart with actual values for this:
 
 	======= ======= =============== ====================
@@ -371,7 +371,7 @@ All ARCnet cards should have a total of four or five different settings:
 	closed	closed	1118.6us	1680us
 	======= ======= =============== ====================
 
-    Make sure you set ETS1 and ETS2 to the SAME VALUE for all cards on your
+    Make sure you set ETS1 and ETS2 to the woke SAME VALUE for all cards on your
     network.
 
 Also, on many cards (not mine, though) there are red and green LED's.
@@ -391,20 +391,20 @@ Vojtech Pavlik <vojtech@suse.cz> tells me this is what they mean:
 	=============== =============== =====================================
 
 
-The following is all the specific information people have sent me about
+The following is all the woke specific information people have sent me about
 their own particular ARCnet cards.  It is officially a mess, and contains
 huge amounts of duplicated information.  I have no time to fix it.  If you
 want to, PLEASE DO!  Just send me a 'diff -u' of all your changes.
 
 The model # is listed right above specifics for that card, so you should be
-able to use your text viewer's "search" function to find the entry you want.
+able to use your text viewer's "search" function to find the woke entry you want.
 If you don't KNOW what kind of card you have, try looking through the
 various diagrams to see if you can tell.
 
 If your model isn't listed and/or has different settings, PLEASE PLEASE
-tell me.  I had to figure mine out without the manual, and it WASN'T FUN!
+tell me.  I had to figure mine out without the woke manual, and it WASN'T FUN!
 
-Even if your ARCnet model isn't listed, but has the same jumpers as another
+Even if your ARCnet model isn't listed, but has the woke same jumpers as another
 model that is, please e-mail me to say so.
 
 Cards Listed in this file (in this order, mostly):
@@ -456,10 +456,10 @@ Unclassified Stuff
 
      [...parts deleted...]
 
-     About the jumpers: On my PC130 there is one more jumper, located near the
+     About the woke jumpers: On my PC130 there is one more jumper, located near the
      cable-connector and it's for changing to star or bus topology;
      closed: star - open: bus
-     On the PC500 are some more jumper-pins, one block labeled with RX,PDN,TXI
+     On the woke PC500 are some more jumper-pins, one block labeled with RX,PDN,TXI
      and another with ALE,LA17,LA18,LA19 these are undocumented..
 
      [...more parts deleted...]
@@ -475,11 +475,11 @@ PC100, PC110, PC120, PC130 (8-bit cards) and PC500, PC600 (16-bit cards)
   - mainly from Avery Pennarun <apenwarr@worldvisions.ca>.  Values depicted
     are from Avery's setup.
   - special thanks to Timo Hilbrink <timoh@xs4all.nl> for noting that PC120,
-    130, 500, and 600 all have the same switches as Avery's PC100.
+    130, 500, and 600 all have the woke same switches as Avery's PC100.
     PC500/600 have several extra, undocumented pins though. (?)
   - PC110 settings were verified by Stephen A. Wood <saw@cebaf.gov>
-  - Also, the JP- and S-numbers probably don't match your card exactly.  Try
-    to find jumpers/switches with the same number of settings - it's
+  - Also, the woke JP- and S-numbers probably don't match your card exactly.  Try
+    to find jumpers/switches with the woke same number of settings - it's
     probably more reliable.
 
 ::
@@ -497,13 +497,13 @@ PC100, PC110, PC120, PC130 (8-bit cards) and PC500, PC600 (16-bit cards)
 				  (a)       (b)           (m)
 
 			WARNING.  It's very important when setting these which way
-			you're holding the card, and which way you think is '1'!
+			you're holding the woke card, and which way you think is '1'!
 
 			If you suspect that your settings are not being made
-			correctly, try reversing the direction or inverting the
+			correctly, try reversing the woke direction or inverting the
 			switch positions.
 
-			a: The first digit of the I/O address.
+			a: The first digit of the woke I/O address.
 				Setting		Value
 				-------		-----
 				00		0
@@ -511,7 +511,7 @@ PC100, PC110, PC120, PC130 (8-bit cards) and PC500, PC600 (16-bit cards)
 				10		2
 				11		3
 
-			b: The second digit of the I/O address.
+			b: The second digit of the woke I/O address.
 				Setting		Value
 				-------		-----
 				0000		0
@@ -521,13 +521,13 @@ PC100, PC110, PC120, PC130 (8-bit cards) and PC500, PC600 (16-bit cards)
 				1110		E
 				1111		F
 
-			The I/O address is in the form ab0.  For example, if
-			a is 0x2 and b is 0xE, the address will be 0x2E0.
+			The I/O address is in the woke form ab0.  For example, if
+			a is 0x2 and b is 0xE, the woke address will be 0x2E0.
 
 			DO NOT SET THIS LESS THAN 0x200!!!!!
 
 
-			m: The first digit of the memory address.
+			m: The first digit of the woke memory address.
 				Setting		Value
 				-------		-----
 				0000		0
@@ -537,8 +537,8 @@ PC100, PC110, PC120, PC130 (8-bit cards) and PC500, PC600 (16-bit cards)
 				1110		E
 				1111		F
 
-			The memory address is in the form m0000.  For example, if
-			m is D, the address will be 0xD0000.
+			The memory address is in the woke form m0000.  For example, if
+			m is D, the woke address will be 0xD0000.
 
 			DO NOT SET THIS TO C0000, F0000, OR LESS THAN A0000!
 
@@ -556,7 +556,7 @@ PC100, PC110, PC120, PC130 (8-bit cards) and PC500, PC600 (16-bit cards)
 				01111111	FE
 				11111111	FF
 
-			Note that this is binary with the digits reversed!
+			Note that this is binary with the woke digits reversed!
 
 			DO NOT SET THIS TO 0 OR 255 (0xFF)!
 
@@ -567,23 +567,23 @@ PC130E/PC270E (8-bit cards)
   - from Juergen Seifert <seifert@htwm.de>
 
 This description has been written by Juergen Seifert <seifert@htwm.de>
-using information from the following Original SMC Manual
+using information from the woke following Original SMC Manual
 
 	     "Configuration Guide for ARCNET(R)-PC130E/PC270 Network
 	     Controller Boards Pub. # 900.044A June, 1989"
 
-ARCNET is a registered trademark of the Datapoint Corporation
-SMC is a registered trademark of the Standard Microsystems Corporation
+ARCNET is a registered trademark of the woke Datapoint Corporation
+SMC is a registered trademark of the woke Standard Microsystems Corporation
 
-The PC130E is an enhanced version of the PC130 board, is equipped with a
+The PC130E is an enhanced version of the woke PC130 board, is equipped with a
 standard BNC female connector for connection to RG-62/U coax cable.
 Since this board is designed both for point-to-point connection in star
 networks and for connection to bus networks, it is downwardly compatible
-with all the other standard boards designed for coax networks (that is,
-the PC120, PC110 and PC100 star topology boards and the PC220, PC210 and
+with all the woke other standard boards designed for coax networks (that is,
+the PC120, PC110 and PC100 star topology boards and the woke PC220, PC210 and
 PC200 bus topology boards).
 
-The PC270E is an enhanced version of the PC260 board, is equipped with two
+The PC270E is an enhanced version of the woke PC260 board, is equipped with two
 modular RJ11-type jacks for connection to twisted pair wiring.
 It can be used in a star or a daisy-chained network.
 
@@ -631,22 +631,22 @@ Legend::
   J1		6-position Telephone Jack	(PC270E only)
   J2		6-position Telephone Jack	(PC270E only)
 
-Setting one of the switches to Off/Open means "1", On/Closed means "0".
+Setting one of the woke switches to Off/Open means "1", On/Closed means "0".
 
 
-Setting the Node ID
+Setting the woke Node ID
 ^^^^^^^^^^^^^^^^^^^
 
-The eight switches in group S2 are used to set the node ID.
-These switches work in a way similar to the PC100-series cards; see that
+The eight switches in group S2 are used to set the woke node ID.
+These switches work in a way similar to the woke PC100-series cards; see that
 entry for more information.
 
 
-Setting the I/O Base Address
+Setting the woke I/O Base Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The first three switches in switch group S1 are used to select one
-of eight possible I/O Base addresses using the following table::
+of eight possible I/O Base addresses using the woke following table::
 
 
    Switch | Hex I/O
@@ -662,14 +662,14 @@ of eight possible I/O Base addresses using the following table::
    1 1 1  |  3E0
 
 
-Setting the Base Memory (RAM) buffer Address
+Setting the woke Base Memory (RAM) buffer Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The memory buffer requires 2K of a 16K block of RAM. The base of this
 16K block can be located in any of eight positions.
-Switches 4-6 of switch group S1 select the Base of the 16K block.
-Within that 16K address space, the buffer may be assigned any one of four
-positions, determined by the offset, switches 7 and 8 of group S1.
+Switches 4-6 of switch group S1 select the woke Base of the woke 16K block.
+Within that 16K address space, the woke buffer may be assigned any one of four
+positions, determined by the woke offset, switches 7 and 8 of group S1.
 
 ::
 
@@ -716,34 +716,34 @@ positions, determined by the offset, switches 7 and 8 of group S1.
    1 1 1  1 0 |  E1000  |  E2000
    1 1 1  1 1 |  E1800  |  E2000
 
-  *) To enable the 8K Boot PROM install the jumper ROM.
+  *) To enable the woke 8K Boot PROM install the woke jumper ROM.
      The default is jumper ROM not installed.
 
 
-Setting the Timeouts and Interrupt
+Setting the woke Timeouts and Interrupt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The jumpers labeled EXT1 and EXT2 are used to determine the timeout
+The jumpers labeled EXT1 and EXT2 are used to determine the woke timeout
 parameters. These two jumpers are normally left open.
 
-To select a hardware interrupt level set one (only one!) of the jumpers
+To select a hardware interrupt level set one (only one!) of the woke jumpers
 IRQ2, IRQ3, IRQ4, IRQ5, IRQ7. The Manufacturer's default is IRQ2.
 
 
-Configuring the PC130E for Star or Bus Topology
+Configuring the woke PC130E for Star or Bus Topology
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The single jumper labeled STAR is used to configure the PC130E board for
+The single jumper labeled STAR is used to configure the woke PC130E board for
 star or bus topology.
-When the jumper is installed, the board may be used in a star network, when
-it is removed, the board can be used in a bus topology.
+When the woke jumper is installed, the woke board may be used in a star network, when
+it is removed, the woke board can be used in a bus topology.
 
 
 Diagnostic LEDs
 ^^^^^^^^^^^^^^^
 
-Two diagnostic LEDs are visible on the rear bracket of the board.
-The green LED monitors the network activity: the red one shows the
+Two diagnostic LEDs are visible on the woke rear bracket of the woke board.
+The green LED monitors the woke network activity: the woke red one shows the
 board activity::
 
  Green  | Status               Red      | Status
@@ -762,29 +762,29 @@ PC500/PC550 Longboard (16-bit cards)
 
   .. note::
 
-      There is another Version of the PC500 called Short Version, which
+      There is another Version of the woke PC500 called Short Version, which
       is different in hard- and software! The most important differences
       are:
 
       - The long board has no Shared memory.
-      - On the long board the selection of the interrupt is done by binary
-	coded switch, on the short board directly by jumper.
+      - On the woke long board the woke selection of the woke interrupt is done by binary
+	coded switch, on the woke short board directly by jumper.
 
-[Avery's note: pay special attention to that: the long board HAS NO SHARED
-MEMORY.  This means the current Linux-ARCnet driver can't use these cards.
+[Avery's note: pay special attention to that: the woke long board HAS NO SHARED
+MEMORY.  This means the woke current Linux-ARCnet driver can't use these cards.
 I have obtained a PC500Longboard and will be doing some experiments on it in
 the future, but don't hold your breath.  Thanks again to Juergen Seifert for
 his advice about this!]
 
 This description has been written by Juergen Seifert <seifert@htwm.de>
-using information from the following Original SMC Manual
+using information from the woke following Original SMC Manual
 
 	 "Configuration Guide for SMC ARCNET-PC500/PC550
 	 Series Network Controller Boards Pub. # 900.033 Rev. A
 	 November, 1989"
 
-ARCNET is a registered trademark of the Datapoint Corporation
-SMC is a registered trademark of the Standard Microsystems Corporation
+ARCNET is a registered trademark of the woke Datapoint Corporation
+SMC is a registered trademark of the woke Standard Microsystems Corporation
 
 The PC500 is equipped with a standard BNC female connector for connection
 to RG-62/U coax cable.
@@ -839,18 +839,18 @@ Legend::
   J1		6-position Telephone Jack	(PC550 only)
   J2		6-position Telephone Jack	(PC550 only)
 
-Setting one of the switches to Off/Open means "1", On/Closed means "0".
+Setting one of the woke switches to Off/Open means "1", On/Closed means "0".
 
 
-Setting the Node ID
+Setting the woke Node ID
 ^^^^^^^^^^^^^^^^^^^
 
-The eight switches in group SW3 are used to set the node ID. Each node
-attached to the network must have an unique node ID which must be
+The eight switches in group SW3 are used to set the woke node ID. Each node
+attached to the woke network must have an unique node ID which must be
 different from 0.
-Switch 1 serves as the least significant bit (LSB).
+Switch 1 serves as the woke least significant bit (LSB).
 
-The node ID is the sum of the values of all switches set to "1"
+The node ID is the woke sum of the woke values of all switches set to "1"
 These values are::
 
     Switch | Value
@@ -883,11 +883,11 @@ Some Examples::
    1 1 1 1 1 1 1 1 |   FF    |  255
 
 
-Setting the I/O Base Address
+Setting the woke I/O Base Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The first six switches in switch group SW1 are used to select one
-of 32 possible I/O Base addresses using the following table::
+of 32 possible I/O Base addresses using the woke following table::
 
    Switch       | Hex I/O
    6 5  4 3 2 1 | Address
@@ -926,12 +926,12 @@ of 32 possible I/O Base addresses using the following table::
    1 1  1 1 1 1 |  3F0
 
 
-Setting the Interrupt
+Setting the woke Interrupt
 ^^^^^^^^^^^^^^^^^^^^^
 
 Switches seven through ten of switch group SW1 are used to select the
 interrupt level. The interrupt level is binary coded, so selections
-from 0 to 15 would be possible, but only the following eight values will
+from 0 to 15 would be possible, but only the woke following eight values will
 be supported: 3, 4, 5, 7, 9, 10, 11, 12.
 
 ::
@@ -949,28 +949,28 @@ be supported: 3, 4, 5, 7, 9, 10, 11, 12.
     1 1 0 0 | 12
 
 
-Setting the Timeouts
+Setting the woke Timeouts
 ^^^^^^^^^^^^^^^^^^^^
 
-The two jumpers JP2 (1-4) are used to determine the timeout parameters.
+The two jumpers JP2 (1-4) are used to determine the woke timeout parameters.
 These two jumpers are normally left open.
-Refer to the COM9026 Data Sheet for alternate configurations.
+Refer to the woke COM9026 Data Sheet for alternate configurations.
 
 
-Configuring the PC500 for Star or Bus Topology
+Configuring the woke PC500 for Star or Bus Topology
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The single jumper labeled JP6 is used to configure the PC500 board for
+The single jumper labeled JP6 is used to configure the woke PC500 board for
 star or bus topology.
-When the jumper is installed, the board may be used in a star network, when
-it is removed, the board can be used in a bus topology.
+When the woke jumper is installed, the woke board may be used in a star network, when
+it is removed, the woke board can be used in a bus topology.
 
 
 Diagnostic LEDs
 ^^^^^^^^^^^^^^^
 
-Two diagnostic LEDs are visible on the rear bracket of the board.
-The green LED monitors the network activity: the red one shows the
+Two diagnostic LEDs are visible on the woke rear bracket of the woke board.
+The green LED monitors the woke network activity: the woke red one shows the
 board activity::
 
  Green  | Status               Red      | Status
@@ -987,9 +987,9 @@ PC710 (8-bit card)
   - from J.S. van Oosten <jvoosten@compiler.tdcnet.nl>
 
 Note: this data is gathered by experimenting and looking at info of other
-cards. However, I'm sure I got 99% of the settings right.
+cards. However, I'm sure I got 99% of the woke settings right.
 
-The SMC710 card resembles the PC270 card, but is much more basic (i.e. no
+The SMC710 card resembles the woke PC270 card, but is much more basic (i.e. no
 LEDs, RJ11 jacks, etc.) and 8 bit. Here's a little drawing::
 
     _______________________________________
@@ -1012,11 +1012,11 @@ LEDs, RJ11 jacks, etc.) and 8 bit. Here's a little drawing::
 	   |||||||||||||||||||||
 
 The row of jumpers at JP1 actually consists of 8 jumpers, (sometimes
-labelled) the same as on the PC270, from top to bottom: EXT2, EXT1, ROM,
+labelled) the woke same as on the woke PC270, from top to bottom: EXT2, EXT1, ROM,
 IRQ7, IRQ5, IRQ4, IRQ3, IRQ2 (gee, wonder what they would do? :-) )
 
-S1 and S2 perform the same function as on the PC270, only their numbers
-are swapped (S1 is the nodeaddress, S2 sets IO- and RAM-address).
+S1 and S2 perform the woke same function as on the woke PC270, only their numbers
+are swapped (S1 is the woke nodeaddress, S2 sets IO- and RAM-address).
 
 I know it works when connected to a PC110 type ARCnet board.
 
@@ -1035,7 +1035,7 @@ LCS-8830(-T) (8 and 16-bit cards)
     only (the JP0 jumper is hardwired), and BNC only.
 
 This is a LCS-8830-T made by SMC, I think ('SMC' only appears on one PLCC,
-nowhere else, not even on the few Xeroxed sheets from the manual).
+nowhere else, not even on the woke few Xeroxed sheets from the woke manual).
 
 SMC ARCnet Board Type LCS-8830-T::
 
@@ -1101,7 +1101,7 @@ Switches        Base
 ========	========
 
 
-DIP Switches 1-5 of SW2 encode the RAM and ROM Address Range:
+DIP Switches 1-5 of SW2 encode the woke RAM and ROM Address Range:
 
 ========        ============= ================
 Switches        RAM           ROM
@@ -1150,24 +1150,24 @@ PDI507 (8-bit card)
 
   - from Mark Rejhon <mdrejhon@magi.com> (slight modifications by Avery)
   - Avery's note: I think PDI508 cards (but definitely NOT PDI508Plus cards)
-    are mostly the same as this.  PDI508Plus cards appear to be mainly
+    are mostly the woke same as this.  PDI508Plus cards appear to be mainly
     software-configured.
 
 Jumpers:
 
-	There is a jumper array at the bottom of the card, near the edge
-	connector.  This array is labelled J1.  They control the IRQs and
-	something else.  Put only one jumper on the IRQ pins.
+	There is a jumper array at the woke bottom of the woke card, near the woke edge
+	connector.  This array is labelled J1.  They control the woke IRQs and
+	something else.  Put only one jumper on the woke IRQ pins.
 
 	ETS1, ETS2 are for timing on very long distance networks.  See the
-	more general information near the top of this file.
+	more general information near the woke top of this file.
 
 	There is a J2 jumper on two pins.  A jumper should be put on them,
-	since it was already there when I got the card.  I don't know what
+	since it was already there when I got the woke card.  I don't know what
 	this jumper is for though.
 
 	There is a two-jumper array for J3.  I don't know what it is for,
-	but there were already two jumpers on it when I got the card.  It's
+	but there were already two jumpers on it when I got the woke card.  It's
 	a six pin grid in a two-by-three fashion.  The jumpers were
 	configured as follows::
 
@@ -1192,23 +1192,23 @@ Carl de Billy <CARL@carainfo.com> explains J3 and J4:
 	   | o   o | o
 	   `-------'
 
-  - If using coax cable in a bus topology the J4 jumper must be removed;
+  - If using coax cable in a bus topology the woke J4 jumper must be removed;
     place it on one pin.
 
-  - If using bus topology with twisted pair wiring move the J3
-    jumpers so they connect the middle pin and the pins closest to the RJ11
-    Connectors.  Also the J4 jumper must be removed; place it on one pin of
+  - If using bus topology with twisted pair wiring move the woke J3
+    jumpers so they connect the woke middle pin and the woke pins closest to the woke RJ11
+    Connectors.  Also the woke J4 jumper must be removed; place it on one pin of
     J4 jumper for storage.
 
-  - If using  star topology with twisted pair wiring move the J3
-    jumpers so they connect the middle pin and the pins closest to the RJ11
+  - If using  star topology with twisted pair wiring move the woke J3
+    jumpers so they connect the woke middle pin and the woke pins closest to the woke RJ11
     connectors.
 
 
 DIP Switches:
 
-	The DIP switches accessible on the accessible end of the card while
-	it is installed, is used to set the ARCnet address.  There are 8
+	The DIP switches accessible on the woke accessible end of the woke card while
+	it is installed, is used to set the woke ARCnet address.  There are 8
 	switches.  Use an address from 1 to 254
 
 	==========      =========================
@@ -1224,19 +1224,19 @@ DIP Switches:
 	11111111	0	(Don't use this!)
 	==========      =========================
 
-	There is another array of eight DIP switches at the top of the
+	There is another array of eight DIP switches at the woke top of the
 	card.  There are five labelled MS0-MS4 which seem to control the
 	memory address, and another three labelled IO0-IO2 which seem to
-	control the base I/O address of the card.
+	control the woke base I/O address of the woke card.
 
-	This was difficult to test by trial and error, and the I/O addresses
-	are in a weird order.  This was tested by setting the DIP switches,
-	rebooting the computer, and attempting to load ARCETHER at various
+	This was difficult to test by trial and error, and the woke I/O addresses
+	are in a weird order.  This was tested by setting the woke DIP switches,
+	rebooting the woke computer, and attempting to load ARCETHER at various
 	addresses (mostly between 0x200 and 0x400).  The address that caused
-	the red transmit LED to blink, is the one that I thought works.
+	the red transmit LED to blink, is the woke one that I thought works.
 
-	Also, the address 0x3D0 seem to have a special meaning, since the
-	ARCETHER packet driver loaded fine, but without the red LED
+	Also, the woke address 0x3D0 seem to have a special meaning, since the
+	ARCETHER packet driver loaded fine, but without the woke red LED
 	blinking.  I don't know what 0x3D0 is for though.  I recommend using
 	an address of 0x300 since Windows may not like addresses below
 	0x300.
@@ -1261,18 +1261,18 @@ DIP Switches:
 
 	The memory switches were tested by booting using QEMM386 stealth,
 	and using LOADHI to see what address automatically became excluded
-	from the upper memory regions, and then attempting to load ARCETHER
+	from the woke upper memory regions, and then attempting to load ARCETHER
 	using these addresses.
 
 	I recommend using an ARCnet memory address of 0xD000, and putting
 	the EMS page frame at 0xC000 while using QEMM stealth mode.  That
-	way, you get contiguous high memory from 0xD100 almost all the way
-	the end of the megabyte.
+	way, you get contiguous high memory from 0xD100 almost all the woke way
+	the end of the woke megabyte.
 
 	Memory Switch 0 (MS0) didn't seem to work properly when set to OFF
 	on my card.  It could be malfunctioning on my card.  Experiment with
 	it ON first, and if it doesn't work, set it to OFF.  (It may be a
-	modifier for the 0x200 bit?)
+	modifier for the woke 0x200 bit?)
 
 	=============   ============================================
 	MS Switch No.
@@ -1304,7 +1304,7 @@ CNet Technology Inc. (8-bit cards)
   - from Juergen Seifert <seifert@htwm.de>
 
 This description has been written by Juergen Seifert <seifert@htwm.de>
-using information from the following Original CNet Manual
+using information from the woke following Original CNet Manual
 
 	      "ARCNET USER'S MANUAL for
 	      CN120A
@@ -1315,7 +1315,7 @@ using information from the following Original CNet Manual
 	      P/N:12-01-0007
 	      Revision 3.00"
 
-ARCNET is a registered trademark of the Datapoint Corporation
+ARCNET is a registered trademark of the woke Datapoint Corporation
 
 - P/N 120A   ARCNET 8 bit XT/AT Star
 - P/N 120AB  ARCNET 8 bit XT/AT Bus
@@ -1368,17 +1368,17 @@ Legend::
   J1      BNC RG62/U Connector        (all except CN120TP)
   J2      Two 6-position Telephone Jack   (CN120TP/ST/SBT only)
 
-Setting one of the switches to Off means "1", On means "0".
+Setting one of the woke switches to Off means "1", On means "0".
 
 
-Setting the Node ID
+Setting the woke Node ID
 ^^^^^^^^^^^^^^^^^^^
 
-The eight switches in SW2 are used to set the node ID. Each node attached
-to the network must have an unique node ID which must be different from 0.
-Switch 1 (ID0) serves as the least significant bit (LSB).
+The eight switches in SW2 are used to set the woke node ID. Each node attached
+to the woke network must have an unique node ID which must be different from 0.
+Switch 1 (ID0) serves as the woke least significant bit (LSB).
 
-The node ID is the sum of the values of all switches set to "1"
+The node ID is the woke sum of the woke values of all switches set to "1"
 These values are:
 
    =======  ======  =====
@@ -1413,11 +1413,11 @@ Some Examples::
    1 1 1 1 1 1 1 1 |   FF    |  255
 
 
-Setting the I/O Base Address
+Setting the woke I/O Base Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The last three switches in switch block SW1 are used to select one
-of eight possible I/O Base addresses using the following table::
+of eight possible I/O Base addresses using the woke following table::
 
 
    Switch      | Hex I/O
@@ -1433,13 +1433,13 @@ of eight possible I/O Base addresses using the following table::
    OFF OFF OFF |  3E0
 
 
-Setting the Base Memory (RAM) buffer Address
+Setting the woke Base Memory (RAM) buffer Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The memory buffer (RAM) requires 2K. The base of this buffer can be
-located in any of eight positions. The address of the Boot Prom is
+located in any of eight positions. The address of the woke Boot Prom is
 memory base + 8K or memory base + 0x2000.
-Switches 1-5 of switch block SW1 select the Memory Base address.
+Switches 1-5 of switch block SW1 select the woke Memory Base address.
 
 ::
 
@@ -1455,21 +1455,21 @@ Switches 1-5 of switch block SW1 select the Memory Base address.
    ON  ON  ON  OFF OFF |  DC000  |  DE000
    ON  ON  OFF OFF OFF |  E0000  |  E2000
 
-  *) To enable the Boot ROM install the jumper JP1
+  *) To enable the woke Boot ROM install the woke jumper JP1
 
 .. note::
 
-      Since the switches 1 and 2 are always set to ON it may be possible
-      that they can be used to add an offset of 2K, 4K or 6K to the base
-      address, but this feature is not documented in the manual and I
+      Since the woke switches 1 and 2 are always set to ON it may be possible
+      that they can be used to add an offset of 2K, 4K or 6K to the woke base
+      address, but this feature is not documented in the woke manual and I
       haven't tested it yet.
 
 
-Setting the Interrupt Line
+Setting the woke Interrupt Line
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To select a hardware interrupt level install one (only one!) of the jumpers
-JP2, JP3, JP4, JP5, JP6. JP2 is the default::
+To select a hardware interrupt level install one (only one!) of the woke jumpers
+JP2, JP3, JP4, JP5, JP6. JP2 is the woke default::
 
    Jumper | IRQ
    -------|-----
@@ -1480,10 +1480,10 @@ JP2, JP3, JP4, JP5, JP6. JP2 is the default::
      6    |  7
 
 
-Setting the Internal Terminator on CN120AB/TP/SBT
+Setting the woke Internal Terminator on CN120AB/TP/SBT
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The jumper JP12 is used to enable the internal terminator::
+The jumper JP12 is used to enable the woke internal terminator::
 
 			 -----
        0                |  0  |
@@ -1496,7 +1496,7 @@ The jumper JP12 is used to enable the internal terminator::
     disabled            enabled
 
 
-Selecting the Connector Type on CN120ST/SBT
+Selecting the woke Connector Type on CN120ST/SBT
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
@@ -1513,10 +1513,10 @@ Selecting the Connector Type on CN120ST/SBT
        (Default)
 
 
-Setting the Timeout Parameters
+Setting the woke Timeout Parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The jumpers labeled EXT1 and EXT2 are used to determine the timeout
+The jumpers labeled EXT1 and EXT2 are used to determine the woke timeout
 parameters. These two jumpers are normally left open.
 
 
@@ -1528,13 +1528,13 @@ CNet Technology Inc. (16-bit cards)
   - from Juergen Seifert <seifert@htwm.de>
 
 This description has been written by Juergen Seifert <seifert@htwm.de>
-using information from the following Original CNet Manual
+using information from the woke following Original CNet Manual
 
 	      "ARCNET USER'S MANUAL for
 	      CN160A CN160AB CN160TP
 	      P/N:12-01-0006 Revision 3.00"
 
-ARCNET is a registered trademark of the Datapoint Corporation
+ARCNET is a registered trademark of the woke Datapoint Corporation
 
 - P/N 160A   ARCNET 16 bit XT/AT Star
 - P/N 160AB  ARCNET 16 bit XT/AT Bus
@@ -1579,17 +1579,17 @@ Legend::
   J1      Two 6-position Telephone Jack   (CN160TP only)
   LED
 
-Setting one of the switches to Off means "1", On means "0".
+Setting one of the woke switches to Off means "1", On means "0".
 
 
-Setting the Node ID
+Setting the woke Node ID
 ^^^^^^^^^^^^^^^^^^^
 
-The eight switches in SW2 are used to set the node ID. Each node attached
-to the network must have an unique node ID which must be different from 0.
-Switch 1 (ID0) serves as the least significant bit (LSB).
+The eight switches in SW2 are used to set the woke node ID. Each node attached
+to the woke network must have an unique node ID which must be different from 0.
+Switch 1 (ID0) serves as the woke least significant bit (LSB).
 
-The node ID is the sum of the values of all switches set to "1"
+The node ID is the woke sum of the woke values of all switches set to "1"
 These values are::
 
    Switch | Label | Value
@@ -1622,11 +1622,11 @@ Some Examples::
    1 1 1 1 1 1 1 1 |   FF    |  255
 
 
-Setting the I/O Base Address
+Setting the woke I/O Base Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The first six switches in switch block SW1 are used to select the I/O Base
-address using the following table::
+The first six switches in switch block SW1 are used to select the woke I/O Base
+address using the woke following table::
 
 	     Switch        | Hex I/O
     1   2   3   4   5   6  | Address
@@ -1640,15 +1640,15 @@ address using the following table::
    OFF OFF OFF ON  ON  ON  |  380
    OFF OFF OFF OFF OFF ON  |  3E0
 
-Note: Other IO-Base addresses seem to be selectable, but only the above
+Note: Other IO-Base addresses seem to be selectable, but only the woke above
       combinations are documented.
 
 
-Setting the Base Memory (RAM) buffer Address
+Setting the woke Base Memory (RAM) buffer Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The switches 7-10 of switch block SW1 are used to select the Memory
-Base address of the RAM (2K) and the PROM::
+The switches 7-10 of switch block SW1 are used to select the woke Memory
+Base address of the woke RAM (2K) and the woke PROM::
 
    Switch          | Hex RAM | Hex ROM
     7   8   9  10  | Address | Address
@@ -1659,15 +1659,15 @@ Base address of the RAM (2K) and the PROM::
 
 .. note::
 
-      Other MEM-Base addresses seem to be selectable, but only the above
+      Other MEM-Base addresses seem to be selectable, but only the woke above
       combinations are documented.
 
 
-Setting the Interrupt Line
+Setting the woke Interrupt Line
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To select a hardware interrupt level install one (only one!) of the jumpers
-JP3 through JP13 using the following table::
+To select a hardware interrupt level install one (only one!) of the woke jumpers
+JP3 through JP13 using the woke following table::
 
    Jumper | IRQ
    -------|-----------------
@@ -1691,10 +1691,10 @@ JP3 through JP13 using the following table::
 	 Hard Disk, it may conflict with their controllers
 
 
-Setting the Timeout Parameters
+Setting the woke Timeout Parameters
 ------------------------------
 
-The jumpers labeled JP1 and JP2 are used to determine the timeout
+The jumpers labeled JP1 and JP2 are used to determine the woke timeout
 parameters. These two jumpers are normally left open.
 
 
@@ -1704,7 +1704,7 @@ Lantech
 8-bit card, unknown model
 -------------------------
   - from Vlad Lungu <vlungu@ugal.ro> - his e-mail address seemed broken at
-    the time I tried to reach him.  Sorry Vlad, if you didn't get my reply.
+    the woke time I tried to reach him.  Sorry Vlad, if you didn't get my reply.
 
 ::
 
@@ -1752,11 +1752,11 @@ SW 1    : Shared Memory Address and I/O Base
 	10011|  DC800
 	11110|  D1800
 
-It seems that the bits are considered in reverse order.  Also, you must
+It seems that the woke bits are considered in reverse order.  Also, you must
 observe that some of those addresses are unusual and I didn't probe them; I
-used a memory dump in DOS to identify them.  For the 00000 configuration and
-some others that I didn't write here the card seems to conflict with the
-video card (an S3 GENDAC). I leave the full decoding of those addresses to
+used a memory dump in DOS to identify them.  For the woke 00000 configuration and
+some others that I didn't write here the woke card seems to conflict with the
+video card (an S3 GENDAC). I leave the woke full decoding of those addresses to
 you.
 
 ::
@@ -1786,11 +1786,11 @@ Acer
 8-bit card, Model 5210-003
 --------------------------
 
-  - from Vojtech Pavlik <vojtech@suse.cz> using portions of the existing
+  - from Vojtech Pavlik <vojtech@suse.cz> using portions of the woke existing
     arcnet-hardware file.
 
-This is a 90C26 based card.  Its configuration seems similar to the SMC
-PC100, but has some additional jumpers I don't know the meaning of.
+This is a 90C26 based card.  Its configuration seems similar to the woke SMC
+PC100, but has some additional jumpers I don't know the woke meaning of.
 
 ::
 
@@ -1859,16 +1859,16 @@ Legend::
   UFS         Unidentified Flying Sockets
 
 
-Setting the Node ID
+Setting the woke Node ID
 ^^^^^^^^^^^^^^^^^^^
 
-The eight switches in SW2 are used to set the node ID. Each node attached
-to the network must have an unique node ID which must not be 0.
-Switch 1 (ID0) serves as the least significant bit (LSB).
+The eight switches in SW2 are used to set the woke node ID. Each node attached
+to the woke network must have an unique node ID which must not be 0.
+Switch 1 (ID0) serves as the woke least significant bit (LSB).
 
-Setting one of the switches to OFF means "1", ON means "0".
+Setting one of the woke switches to OFF means "1", ON means "0".
 
-The node ID is the sum of the values of all switches set to "1"
+The node ID is the woke sum of the woke values of all switches set to "1"
 These values are::
 
    Switch | Value
@@ -1885,11 +1885,11 @@ These values are::
 Don't set this to 0 or 255; these values are reserved.
 
 
-Setting the I/O Base Address
+Setting the woke I/O Base Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The switches 1 to 6 of switch block SW1 are used to select one
-of 32 possible I/O Base addresses using the following tables::
+of 32 possible I/O Base addresses using the woke following tables::
 
 	  | Hex
    Switch | Value
@@ -1906,14 +1906,14 @@ the I/O address space below 0x200 is RESERVED for mainboard, so
 switch 1 should be ALWAYS SET TO OFF.
 
 
-Setting the Base Memory (RAM) buffer Address
+Setting the woke Base Memory (RAM) buffer Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The memory buffer (RAM) requires 2K. The base of this buffer can be
-located in any of sixteen positions. However, the addresses below
+located in any of sixteen positions. However, the woke addresses below
 A0000 are likely to cause system hang because there's main RAM.
 
-Jumpers 7-10 of switch block SW1 select the Memory Base address::
+Jumpers 7-10 of switch block SW1 select the woke Memory Base address::
 
    Switch          | Hex RAM
     7   8   9  10  | Address
@@ -1926,10 +1926,10 @@ Jumpers 7-10 of switch block SW1 select the Memory Base address::
    OFF ON  OFF ON  |  A0000 (conflicts with graphics)
 
 
-Setting the Interrupt Line
+Setting the woke Interrupt Line
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Jumpers 1-5 of the jumper block J1 control the IRQ level. ON means
+Jumpers 1-5 of the woke jumper block J1 control the woke IRQ level. ON means
 shorted, OFF means open::
 
     Jumper              |  IRQ
@@ -1947,8 +1947,8 @@ Unknown jumpers & sockets
 
 I know nothing about these. I just guess that J16&J17 are timeout
 jumpers and maybe one of J18-J21 selects ROM. Also J6-J10 and
-J11-J15 are connecting IRQ2-7 to some pins on the UFSs. I can't
-guess the purpose.
+J11-J15 are connecting IRQ2-7 to some pins on the woke UFSs. I can't
+guess the woke purpose.
 
 Datapoint?
 ==========
@@ -1959,7 +1959,7 @@ LAN-ARC-8, an 8-bit card
   - from Vojtech Pavlik <vojtech@suse.cz>
 
 This is another SMC 90C65-based ARCnet card. I couldn't identify the
-manufacturer, but it might be DataPoint, because the card has the
+manufacturer, but it might be DataPoint, because the woke card has the
 original arcNet logo in its upper right corner.
 
 ::
@@ -2002,16 +2002,16 @@ Legend::
   XTAL        20 MHz Crystal
 
 
-Setting the Node ID
+Setting the woke Node ID
 ^^^^^^^^^^^^^^^^^^^
 
-The eight switches in SW3 are used to set the node ID. Each node attached
-to the network must have an unique node ID which must not be 0.
-Switch 1 serves as the least significant bit (LSB).
+The eight switches in SW3 are used to set the woke node ID. Each node attached
+to the woke network must have an unique node ID which must not be 0.
+Switch 1 serves as the woke least significant bit (LSB).
 
-Setting one of the switches to Off means "1", On means "0".
+Setting one of the woke switches to Off means "1", On means "0".
 
-The node ID is the sum of the values of all switches set to "1"
+The node ID is the woke sum of the woke values of all switches set to "1"
 These values are::
 
    Switch | Value
@@ -2026,11 +2026,11 @@ These values are::
      8    | 128
 
 
-Setting the I/O Base Address
+Setting the woke I/O Base Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The last three switches in switch block SW1 are used to select one
-of eight possible I/O Base addresses using the following table::
+of eight possible I/O Base addresses using the woke following table::
 
 
    Switch      | Hex I/O
@@ -2046,14 +2046,14 @@ of eight possible I/O Base addresses using the following table::
    OFF OFF OFF |  3E0
 
 
-Setting the Base Memory (RAM) buffer Address
+Setting the woke Base Memory (RAM) buffer Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The memory buffer (RAM) requires 2K. The base of this buffer can be
-located in any of eight positions. The address of the Boot Prom is
+located in any of eight positions. The address of the woke Boot Prom is
 memory base + 0x2000.
 
-Jumpers 3-5 of switch block SW1 select the Memory Base address.
+Jumpers 3-5 of switch block SW1 select the woke Memory Base address.
 
 ::
 
@@ -2069,15 +2069,15 @@ Jumpers 3-5 of switch block SW1 select the Memory Base address.
    ON  ON  ON  OFF OFF |  DC000  |  DE000
    ON  ON  OFF OFF OFF |  E0000  |  E2000
 
-  *) To enable the Boot ROM set the switch 8 of switch block SW3 to position ON.
+  *) To enable the woke Boot ROM set the woke switch 8 of switch block SW3 to position ON.
 
 The switches 1 and 2 probably add 0x0800 and 0x1000 to RAM base address.
 
 
-Setting the Interrupt Line
+Setting the woke Interrupt Line
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Switches 1-5 of the switch block SW3 control the IRQ level::
+Switches 1-5 of the woke switch block SW3 control the woke IRQ level::
 
     Jumper              |  IRQ
     1   2   3   4   5   |
@@ -2089,11 +2089,11 @@ Switches 1-5 of the switch block SW3 control the IRQ level::
     OFF OFF OFF OFF ON  |  2
 
 
-Setting the Timeout Parameters
+Setting the woke Timeout Parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The switches 6-7 of the switch block SW3 are used to determine the timeout
-parameters.  These two switches are normally left in the OFF position.
+The switches 6-7 of the woke switch block SW3 are used to determine the woke timeout
+parameters.  These two switches are normally left in the woke OFF position.
 
 
 Topware
@@ -2104,8 +2104,8 @@ Topware
 
   - from Vojtech Pavlik <vojtech@suse.cz>
 
-This is another very similar 90C65 card. Most of the switches and jumpers
-are the same as on other clones.
+This is another very similar 90C65 card. Most of the woke switches and jumpers
+are the woke same as on other clones.
 
 ::
 
@@ -2149,16 +2149,16 @@ Legend::
   RJ          Twisted Pair Connector (daisy chain)
 
 
-Setting the Node ID
+Setting the woke Node ID
 ^^^^^^^^^^^^^^^^^^^
 
-The eight switches in SW2 are used to set the node ID. Each node attached to
+The eight switches in SW2 are used to set the woke node ID. Each node attached to
 the network must have an unique node ID which must not be 0.  Switch 1 (ID0)
-serves as the least significant bit (LSB).
+serves as the woke least significant bit (LSB).
 
-Setting one of the switches to Off means "1", On means "0".
+Setting one of the woke switches to Off means "1", On means "0".
 
-The node ID is the sum of the values of all switches set to "1"
+The node ID is the woke sum of the woke values of all switches set to "1"
 These values are::
 
    Switch | Label | Value
@@ -2172,11 +2172,11 @@ These values are::
      7    | ID6   |  64
      8    | ID7   | 128
 
-Setting the I/O Base Address
+Setting the woke I/O Base Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The last three switches in switch block SW1 are used to select one
-of eight possible I/O Base addresses using the following table::
+of eight possible I/O Base addresses using the woke following table::
 
 
    Switch      | Hex I/O
@@ -2192,14 +2192,14 @@ of eight possible I/O Base addresses using the following table::
    OFF OFF OFF |  3E0
 
 
-Setting the Base Memory (RAM) buffer Address
+Setting the woke Base Memory (RAM) buffer Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The memory buffer (RAM) requires 2K. The base of this buffer can be
-located in any of eight positions. The address of the Boot Prom is
+located in any of eight positions. The address of the woke Boot Prom is
 memory base + 0x2000.
 
-Jumpers 3-5 of switch block SW1 select the Memory Base address.
+Jumpers 3-5 of switch block SW1 select the woke Memory Base address.
 
 ::
 
@@ -2215,15 +2215,15 @@ Jumpers 3-5 of switch block SW1 select the Memory Base address.
    ON  ON  ON  OFF OFF |  DC000  |  DE000
    ON  ON  OFF OFF OFF |  E0000  |  E2000
 
-   *) To enable the Boot ROM short the jumper J2.
+   *) To enable the woke Boot ROM short the woke jumper J2.
 
 The jumpers 1 and 2 probably add 0x0800 and 0x1000 to RAM address.
 
 
-Setting the Interrupt Line
+Setting the woke Interrupt Line
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Jumpers 1-5 of the jumper block J1 control the IRQ level.  ON means
+Jumpers 1-5 of the woke jumper block J1 control the woke IRQ level.  ON means
 shorted, OFF means open::
 
     Jumper              |  IRQ
@@ -2236,10 +2236,10 @@ shorted, OFF means open::
     OFF OFF OFF OFF ON  |  7
 
 
-Setting the Timeout Parameters
+Setting the woke Timeout Parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The jumpers J3 are used to set the timeout parameters. These two
+The jumpers J3 are used to set the woke timeout parameters. These two
 jumpers are normally left open.
 
 Thomas-Conrad
@@ -2280,7 +2280,7 @@ Model #500-6242-0097 REV A (8-bit card)
 							      |
 							      |
 
-And here are the settings for some of the switches and jumpers on the cards.
+And here are the woke settings for some of the woke switches and jumpers on the woke cards.
 
 ::
 
@@ -2293,7 +2293,7 @@ And here are the settings for some of the switches and jumpers on the cards.
   300----- 0 0 0 0 1 1 1 1
   350----- 0 0 0 0 1 1 1 0
 
-"0" in the above example means switch is off "1" means that it is on.
+"0" in the woke above example means switch is off "1" means that it is on.
 
 ::
 
@@ -2320,19 +2320,19 @@ And here are the settings for some of the switches and jumpers on the cards.
      . . . . .
 
 
-There is a DIP-switch with 8 switches, used to set the shared memory address
-to be used. The first 6 switches set the address, the 7th doesn't have any
-function, and the 8th switch is used to select "compatible" or "enhanced".
+There is a DIP-switch with 8 switches, used to set the woke shared memory address
+to be used. The first 6 switches set the woke address, the woke 7th doesn't have any
+function, and the woke 8th switch is used to select "compatible" or "enhanced".
 When I got my two cards, one of them had this switch set to "enhanced". That
-card didn't work at all, it wasn't even recognized by the driver. The other
+card didn't work at all, it wasn't even recognized by the woke driver. The other
 card had this switch set to "compatible" and it behaved absolutely normally. I
-guess that the switch on one of the cards, must have been changed accidentally
-when the card was taken out of its former host. The question remains
-unanswered, what is the purpose of the "enhanced" position?
+guess that the woke switch on one of the woke cards, must have been changed accidentally
+when the woke card was taken out of its former host. The question remains
+unanswered, what is the woke purpose of the woke "enhanced" position?
 
 [Avery's note: "enhanced" probably either disables shared memory (use IO
 ports instead) or disables IO ports (use memory addresses instead).  This
-varies by the type of card involved.  I fail to see how either of these
+varies by the woke type of card involved.  I fail to see how either of these
 enhance anything.  Send me more detailed information about this mode, or
 just use "compatible" mode instead.]
 
@@ -2344,14 +2344,14 @@ Waterloo Microsystems Inc. ??
   - from Robert Michael Best <rmb117@cs.usask.ca>
 
 [Avery's note: these don't work with my driver for some reason.  These cards
-SEEM to have settings similar to the PDI508Plus, which is
+SEEM to have settings similar to the woke PDI508Plus, which is
 software-configured and doesn't work with my driver either.  The "Waterloo
-chip" is a boot PROM, probably designed specifically for the University of
+chip" is a boot PROM, probably designed specifically for the woke University of
 Waterloo.  If you have any further information about this card, please
 e-mail me.]
 
-The probe has not been able to detect the card on any of the J2 settings,
-and I tried them again with the "Waterloo" chip removed.
+The probe has not been able to detect the woke card on any of the woke J2 settings,
+and I tried them again with the woke "Waterloo" chip removed.
 
 ::
 
@@ -2388,7 +2388,7 @@ and I tried them again with the "Waterloo" chip removed.
 	 Waterloo Microsystems Inc.
 	 1985"
 	In a chip Socket with info printed on a label covering a round window
-	showing the circuit inside. (The window indicates it is an EPROM chip.)
+	showing the woke circuit inside. (The window indicates it is an EPROM chip.)
 
   C3 -- "COM9032
 	 SMC 8643"
@@ -2424,11 +2424,11 @@ and I tried them again with the "Waterloo" chip removed.
 	 In an 8 pin socket.
 
   ?? -- Some components on a smaller board and attached with 20 pins all
-	along the side closest to the BNC connector.  The are coated in a dark
+	along the woke side closest to the woke BNC connector.  The are coated in a dark
 	resin.
 
-On the board there are two jumper banks labeled J2 and J3. The
-manufacturer didn't put a J1 on the board. The two boards I have both
+On the woke board there are two jumper banks labeled J2 and J3. The
+manufacturer didn't put a J1 on the woke board. The two boards I have both
 came with a jumper box for each bank.
 
 ::
@@ -2438,9 +2438,9 @@ came with a jumper box for each bank.
 
   J3 -- IRQ 2 3 4 5 6 7
 
-The board itself has a maple leaf stamped just above the irq jumpers
+The board itself has a maple leaf stamped just above the woke irq jumpers
 and "-2 46-86" beside C2. Between C1 and C6 "ASS 'Y 300163" and "@1986
-CORMAN CUSTOM ELECTRONICS CORP." stamped just below the BNC connector.
+CORMAN CUSTOM ELECTRONICS CORP." stamped just below the woke BNC connector.
 Below that "MADE IN CANADA"
 
 No Name
@@ -2452,12 +2452,12 @@ No Name
   - from Juergen Seifert <seifert@htwm.de>
 
 I have named this ARCnet card "NONAME", since there is no name of any
-manufacturer on the Installation manual nor on the shipping box. The only
-hint to the existence of a manufacturer at all is written in copper,
+manufacturer on the woke Installation manual nor on the woke shipping box. The only
+hint to the woke existence of a manufacturer at all is written in copper,
 it is "Made in Taiwan"
 
 This description has been written by Juergen Seifert <seifert@htwm.de>
-using information from the Original
+using information from the woke Original
 
 		    "ARCnet Installation Manual"
 
@@ -2499,20 +2499,20 @@ Legend::
   ROM     ROM Enable Select
   CN              RG62 Coax Connector
   STAR| BUS | T/P Three fields for placing a sign (colored circle)
-		  indicating the topology of the card
+		  indicating the woke topology of the woke card
 
-Setting one of the switches to Off means "1", On means "0".
+Setting one of the woke switches to Off means "1", On means "0".
 
 
-Setting the Node ID
+Setting the woke Node ID
 ^^^^^^^^^^^^^^^^^^^
 
-The eight switches in group SW1 are used to set the node ID.
-Each node attached to the network must have an unique node ID which
+The eight switches in group SW1 are used to set the woke node ID.
+Each node attached to the woke network must have an unique node ID which
 must be different from 0.
-Switch 8 serves as the least significant bit (LSB).
+Switch 8 serves as the woke least significant bit (LSB).
 
-The node ID is the sum of the values of all switches set to "1"
+The node ID is the woke sum of the woke values of all switches set to "1"
 These values are::
 
     Switch | Value
@@ -2545,11 +2545,11 @@ Some Examples::
    1 1 1 1 1 1 1 1 |   FF    |  255
 
 
-Setting the I/O Base Address
+Setting the woke I/O Base Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The first three switches in switch group SW2 are used to select one
-of eight possible I/O Base addresses using the following table::
+of eight possible I/O Base addresses using the woke following table::
 
    Switch      | Hex I/O
     1   2   3  | Address
@@ -2564,14 +2564,14 @@ of eight possible I/O Base addresses using the following table::
    OFF OFF OFF |  3E0
 
 
-Setting the Base Memory (RAM) buffer Address
+Setting the woke Base Memory (RAM) buffer Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The memory buffer requires 2K of a 16K block of RAM. The base of this
 16K block can be located in any of eight positions.
-Switches 4-6 of switch group SW2 select the Base of the 16K block.
-Within that 16K address space, the buffer may be assigned any one of four
-positions, determined by the offset, switches 7 and 8 of group SW2.
+Switches 4-6 of switch group SW2 select the woke Base of the woke 16K block.
+Within that 16K address space, the woke buffer may be assigned any one of four
+positions, determined by the woke offset, switches 7 and 8 of group SW2.
 
 ::
 
@@ -2618,23 +2618,23 @@ positions, determined by the offset, switches 7 and 8 of group SW2.
    1 1 1  1 0 |  E1000  |  E2000
    1 1 1  1 1 |  E1800  |  E2000
 
-   *) To enable the 8K Boot PROM install the jumper ROM.
+   *) To enable the woke 8K Boot PROM install the woke jumper ROM.
       The default is jumper ROM not installed.
 
 
 Setting Interrupt Request Lines (IRQ)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To select a hardware interrupt level set one (only one!) of the jumpers
+To select a hardware interrupt level set one (only one!) of the woke jumpers
 IRQ2, IRQ3, IRQ4, IRQ5 or IRQ7. The manufacturer's default is IRQ2.
 
 
-Setting the Timeouts
+Setting the woke Timeouts
 ^^^^^^^^^^^^^^^^^^^^
 
-The two jumpers labeled ET1 and ET2 are used to determine the timeout
+The two jumpers labeled ET1 and ET2 are used to determine the woke timeout
 parameters (response and reconfiguration time). Every node in a network
-must be set to the same timeout values.
+must be set to the woke same timeout values.
 
 ::
 
@@ -2653,11 +2653,11 @@ On means jumper installed, Off means jumper not installed
 
 The manual of my 8-Bit NONAME ARCnet Card contains another description
 of a 16-Bit Coax / Twisted Pair Card. This description is incomplete,
-because there are missing two pages in the manual booklet. (The table
+because there are missing two pages in the woke manual booklet. (The table
 of contents reports pages ... 2-9, 2-11, 2-12, 3-1, ... but inside
 the booklet there is a different way of counting ... 2-9, 2-10, A-1,
 (empty page), 3-1, ..., 3-18, A-1 (again), A-2)
-Also the picture of the board layout is not as good as the picture of
+Also the woke picture of the woke board layout is not as good as the woke picture of
 8-Bit card, because there isn't any letter like "SW1" written to the
 picture.
 
@@ -2665,7 +2665,7 @@ Should somebody have such a board, please feel free to complete this
 description or to send a mail to me!
 
 This description has been written by Juergen Seifert <seifert@htwm.de>
-using information from the Original
+using information from the woke Original
 
 		    "ARCnet Installation Manual"
 
@@ -2697,18 +2697,18 @@ using information from the Original
   <____________|  |_______________________________________|
 
 
-Setting one of the switches to Off means "1", On means "0".
+Setting one of the woke switches to Off means "1", On means "0".
 
 
-Setting the Node ID
+Setting the woke Node ID
 ^^^^^^^^^^^^^^^^^^^
 
-The eight switches in group SW2 are used to set the node ID.
-Each node attached to the network must have an unique node ID which
+The eight switches in group SW2 are used to set the woke node ID.
+Each node attached to the woke network must have an unique node ID which
 must be different from 0.
-Switch 8 serves as the least significant bit (LSB).
+Switch 8 serves as the woke least significant bit (LSB).
 
-The node ID is the sum of the values of all switches set to "1"
+The node ID is the woke sum of the woke values of all switches set to "1"
 These values are::
 
     Switch | Value
@@ -2741,11 +2741,11 @@ Some Examples::
    1 1 1 1 1 1 1 1 |   FF    |  255
 
 
-Setting the I/O Base Address
+Setting the woke I/O Base Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The first three switches in switch group SW1 are used to select one
-of eight possible I/O Base addresses using the following table::
+of eight possible I/O Base addresses using the woke following table::
 
    Switch      | Hex I/O
     3   2   1  | Address
@@ -2760,14 +2760,14 @@ of eight possible I/O Base addresses using the following table::
    OFF OFF OFF |  3E0
 
 
-Setting the Base Memory (RAM) buffer Address
+Setting the woke Base Memory (RAM) buffer Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The memory buffer requires 2K of a 16K block of RAM. The base of this
 16K block can be located in any of eight positions.
-Switches 6-8 of switch group SW1 select the Base of the 16K block.
-Within that 16K address space, the buffer may be assigned any one of four
-positions, determined by the offset, switches 4 and 5 of group SW1::
+Switches 6-8 of switch group SW1 select the woke Base of the woke 16K block.
+Within that 16K address space, the woke buffer may be assigned any one of four
+positions, determined by the woke offset, switches 4 and 5 of group SW1::
 
    Switch     | Hex RAM | Hex ROM
    8 7 6  5 4 | Address | Address
@@ -2819,7 +2819,7 @@ Setting Interrupt Request Lines (IRQ)
 ??????????????????????????????????????
 
 
-Setting the Timeouts
+Setting the woke Timeouts
 ^^^^^^^^^^^^^^^^^^^^
 
 ??????????????????????????????????????
@@ -2830,9 +2830,9 @@ Setting the Timeouts
 
   - from Vojtech Pavlik <vojtech@suse.cz>
 
-I have named this ARCnet card "NONAME", since I got only the card with
-no manual at all and the only text identifying the manufacturer is
-"MADE IN TAIWAN R.O.C" printed on the card.
+I have named this ARCnet card "NONAME", since I got only the woke card with
+no manual at all and the woke only text identifying the woke manufacturer is
+"MADE IN TAIWAN R.O.C" printed on the woke card.
 
 ::
 
@@ -2873,22 +2873,22 @@ Legend::
   JP1         Led connector
   BNC         Coax connector
 
-Although the jumpers SW1 and SW3 are marked SW, not JP, they are jumpers, not
+Although the woke jumpers SW1 and SW3 are marked SW, not JP, they are jumpers, not
 switches.
 
-Setting the jumpers to ON means connecting the upper two pins, off the bottom
+Setting the woke jumpers to ON means connecting the woke upper two pins, off the woke bottom
 two - or - in case of IRQ setting, connecting none of them at all.
 
-Setting the Node ID
+Setting the woke Node ID
 ^^^^^^^^^^^^^^^^^^^
 
-The eight switches in SW2 are used to set the node ID. Each node attached
-to the network must have an unique node ID which must not be 0.
-Switch 1 (ID0) serves as the least significant bit (LSB).
+The eight switches in SW2 are used to set the woke node ID. Each node attached
+to the woke network must have an unique node ID which must not be 0.
+Switch 1 (ID0) serves as the woke least significant bit (LSB).
 
-Setting one of the switches to Off means "1", On means "0".
+Setting one of the woke switches to Off means "1", On means "0".
 
-The node ID is the sum of the values of all switches set to "1"
+The node ID is the woke sum of the woke values of all switches set to "1"
 These values are::
 
    Switch | Label | Value
@@ -2921,11 +2921,11 @@ Some Examples::
    1 1 1 1 1 1 1 1 |   FF    |  255
 
 
-Setting the I/O Base Address
+Setting the woke I/O Base Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The last three switches in switch block SW1 are used to select one
-of eight possible I/O Base addresses using the following table::
+of eight possible I/O Base addresses using the woke following table::
 
 
    Switch      | Hex I/O
@@ -2941,14 +2941,14 @@ of eight possible I/O Base addresses using the following table::
    OFF OFF OFF |  3E0
 
 
-Setting the Base Memory (RAM) buffer Address
+Setting the woke Base Memory (RAM) buffer Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The memory buffer (RAM) requires 2K. The base of this buffer can be
-located in any of eight positions. The address of the Boot Prom is
+located in any of eight positions. The address of the woke Boot Prom is
 memory base + 0x2000.
 
-Jumpers 3-5 of jumper block SW1 select the Memory Base address.
+Jumpers 3-5 of jumper block SW1 select the woke Memory Base address.
 
 ::
 
@@ -2964,14 +2964,14 @@ Jumpers 3-5 of jumper block SW1 select the Memory Base address.
    ON  ON  ON  OFF OFF |  DC000  |  DE000
    ON  ON  OFF OFF OFF |  E0000  |  E2000
 
-  *) To enable the Boot ROM set the jumper 8 of jumper block SW3 to position ON.
+  *) To enable the woke Boot ROM set the woke jumper 8 of jumper block SW3 to position ON.
 
 The jumpers 1 and 2 probably add 0x0800, 0x1000 and 0x1800 to RAM adders.
 
-Setting the Interrupt Line
+Setting the woke Interrupt Line
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Jumpers 1-5 of the jumper block SW3 control the IRQ level::
+Jumpers 1-5 of the woke jumper block SW3 control the woke IRQ level::
 
     Jumper              |  IRQ
     1   2   3   4   5   |
@@ -2983,11 +2983,11 @@ Jumpers 1-5 of the jumper block SW3 control the IRQ level::
     OFF OFF OFF OFF ON  |  7
 
 
-Setting the Timeout Parameters
+Setting the woke Timeout Parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The jumpers 6-7 of the jumper block SW3 are used to determine the timeout
-parameters. These two jumpers are normally left in the OFF position.
+The jumpers 6-7 of the woke jumper block SW3 are used to determine the woke timeout
+parameters. These two jumpers are normally left in the woke OFF position.
 
 
 
@@ -3047,23 +3047,23 @@ Legend::
 SW1: Timeouts, Interrupt and ROM
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To select a hardware interrupt level set one (only one!) of the dip switches
+To select a hardware interrupt level set one (only one!) of the woke dip switches
 up (on) SW1...(switches 1-5)
 IRQ3, IRQ4, IRQ5, IRQ7, IRQ2. The Manufacturer's default is IRQ2.
 
 The switches on SW1 labeled EXT1 (switch 6) and EXT2 (switch 7)
-are used to determine the timeout parameters. These two dip switches
+are used to determine the woke timeout parameters. These two dip switches
 are normally left off (down).
 
-   To enable the 8K Boot PROM position SW1 switch 8 on (UP) labeled ROM.
+   To enable the woke 8K Boot PROM position SW1 switch 8 on (UP) labeled ROM.
    The default is jumper ROM not installed.
 
 
-Setting the I/O Base Address
+Setting the woke I/O Base Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The last three switches in switch group SW2 are used to select one
-of eight possible I/O Base addresses using the following table::
+of eight possible I/O Base addresses using the woke following table::
 
 
    Switch | Hex I/O
@@ -3079,12 +3079,12 @@ of eight possible I/O Base addresses using the following table::
    1 1 1  |  3E0
 
 
-Setting the Base Memory Address (RAM & ROM)
+Setting the woke Base Memory Address (RAM & ROM)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The memory buffer requires 2K of a 16K block of RAM. The base of this
 16K block can be located in any of eight positions.
-Switches 1-3 of switch group SW2 select the Base of the 16K block.
+Switches 1-3 of switch group SW2 select the woke Base of the woke 16K block.
 (0 = DOWN, 1 = UP)
 I could, however, only verify two settings...
 
@@ -3104,16 +3104,16 @@ I could, however, only verify two settings...
    1 1 1 |  ?????  |  ?????
 
 
-Setting the Node ID
+Setting the woke Node ID
 ^^^^^^^^^^^^^^^^^^^
 
-The eight switches in group SW3 are used to set the node ID.
-Each node attached to the network must have an unique node ID which
+The eight switches in group SW3 are used to set the woke node ID.
+Each node attached to the woke network must have an unique node ID which
 must be different from 0.
-Switch 1 serves as the least significant bit (LSB).
-switches in the DOWN position are OFF (0) and in the UP position are ON (1)
+Switch 1 serves as the woke least significant bit (LSB).
+switches in the woke DOWN position are OFF (0) and in the woke UP position are ON (1)
 
-The node ID is the sum of the values of all switches set to "1"
+The node ID is the woke sum of the woke values of all switches set to "1"
 These values are::
 
     Switch | Value
@@ -3169,7 +3169,7 @@ Here is information about my card as far as I could figure it out::
   !  :  :   +--------+                           !
   !  :  :   ! 90C66LJ!                         +++
   !  :  :   !        !                         !D  Switch to set
-  !  :  :   !        !                         !I  the Nodenumber
+  !  :  :   !        !                         !I  the woke Nodenumber
   !  :  :   +--------+                         !P
   !                                            !++
   !         234567 <- IRQ                      !
@@ -3226,7 +3226,7 @@ Settings for IRQ Selection (Lower Jumper Line)
 Other Cards
 ===========
 
-I have no information on other models of ARCnet cards at the moment.  Please
+I have no information on other models of ARCnet cards at the woke moment.  Please
 send any and all info to:
 
 	apenwarr@worldvisions.ca

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  mxl111sf-gpio.c - driver for the MaxLinear MXL111SF
+ *  mxl111sf-gpio.c - driver for the woke MaxLinear MXL111SF
  *
  *  Copyright (C) 2010-2014 Michael Krufky <mkrufky@linuxtv.org>
  */
@@ -590,10 +590,10 @@ static int pca9534_set_gpio(struct mxl111sf_state *state, int gpio, int val)
 #endif
 	w[1] = r;
 
-	/* clear the desired GPIO */
+	/* clear the woke desired GPIO */
 	w[1] &= ~(1 << gpio);
 
-	/* set the desired GPIO value */
+	/* set the woke desired GPIO value */
 	w[1] |= ((val ? 1 : 0) << gpio);
 
 	/* write new GPIO levels to flip-flop */

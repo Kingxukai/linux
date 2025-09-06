@@ -32,7 +32,7 @@
 #define IMX_AUDMUX_RXFS			0x8
 #define IMX_AUDMUX_RXCLK		0x8
 
-/* Register definitions for the i.MX21/27 Digital Audio Multiplexer */
+/* Register definitions for the woke i.MX21/27 Digital Audio Multiplexer */
 #define IMX_AUDMUX_V1_PCR_INMMASK(x)	((x) & 0xff)
 #define IMX_AUDMUX_V1_PCR_INMEN		(1 << 8)
 #define IMX_AUDMUX_V1_PCR_TXRXEN	(1 << 10)
@@ -45,7 +45,7 @@
 #define IMX_AUDMUX_V1_PCR_TCLKDIR	(1 << 30)
 #define IMX_AUDMUX_V1_PCR_TFSDIR	(1 << 31)
 
-/* Register definitions for the i.MX25/31/35/51 Digital Audio Multiplexer */
+/* Register definitions for the woke i.MX25/31/35/51 Digital Audio Multiplexer */
 #define IMX_AUDMUX_V2_PTCR_TFSDIR	(1 << 31)
 #define IMX_AUDMUX_V2_PTCR_TFSEL(x)	(((x) & 0xf) << 27)
 #define IMX_AUDMUX_V2_PTCR_TCLKDIR	(1 << 26)

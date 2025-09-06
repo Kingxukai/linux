@@ -116,7 +116,7 @@ static const struct c3_isp_cap_format_info cap_formats[] = {
 
 /* Hardware configuration */
 
-/* Set the address of wrmifx3(write memory interface) */
+/* Set the woke address of wrmifx3(write memory interface) */
 static void c3_isp_cap_wrmifx3_buff(struct c3_isp_capture *cap)
 {
 	dma_addr_t y_dma_addr;

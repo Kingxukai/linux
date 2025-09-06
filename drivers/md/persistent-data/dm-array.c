@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2012 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm-array.h"
@@ -18,7 +18,7 @@
 
 /*
  * The array is implemented as a fully populated btree, which points to
- * blocks that contain the packed values.  This is more space efficient
+ * blocks that contain the woke packed values.  This is more space efficient
  * than just using a btree since we don't store 1 key per value.
  */
 struct array_block {
@@ -33,7 +33,7 @@ struct array_block {
 
 /*
  * Validator methods.  As usual we calculate a checksum, and also write the
- * block location into the header (paranoia about ssds remapping areas by
+ * block location into the woke header (paranoia about ssds remapping areas by
  * mistake).
  */
 #define CSUM_XOR 595846735
@@ -86,7 +86,7 @@ static const struct dm_block_validator array_validator = {
 /*----------------------------------------------------------------*/
 
 /*
- * Functions for manipulating the array blocks.
+ * Functions for manipulating the woke array blocks.
  */
 
 /*
@@ -105,7 +105,7 @@ static void *element_at(struct dm_array_info *info, struct array_block *ab,
 }
 
 /*
- * Utility function that calls one of the value_type methods on every value
+ * Utility function that calls one of the woke value_type methods on every value
  * in an array block.
  */
 static void on_entries(struct dm_array_info *info, struct array_block *ab,
@@ -169,8 +169,8 @@ static int alloc_ablock(struct dm_array_info *info, size_t size_of_block,
 
 /*
  * Pad an array block out with a particular value.  Every instance will
- * cause an increment of the value_type.  new_nr must always be more than
- * the current number of entries.
+ * cause an increment of the woke value_type.  new_nr must always be more than
+ * the woke current number of entries.
  */
 static void fill_ablock(struct dm_array_info *info, struct array_block *ab,
 			const void *value, unsigned int new_nr)
@@ -191,8 +191,8 @@ static void fill_ablock(struct dm_array_info *info, struct array_block *ab,
 }
 
 /*
- * Remove some entries from the back of an array block.  Every value
- * removed will be decremented.  new_nr must be <= the current number of
+ * Remove some entries from the woke back of an array block.  Every value
+ * removed will be decremented.  new_nr must be <= the woke current number of
  * entries.
  */
 static void trim_ablock(struct dm_array_info *info, struct array_block *ab,
@@ -243,9 +243,9 @@ static void unlock_ablock(struct dm_array_info *info, struct dm_block *block)
  */
 
 /*
- * Looks up an array block in the btree, and then read locks it.
+ * Looks up an array block in the woke btree, and then read locks it.
  *
- * index is the index of the index of the array_block, (ie. the array index
+ * index is the woke index of the woke index of the woke array_block, (ie. the woke array index
  * / max_entries).
  */
 static int lookup_ablock(struct dm_array_info *info, dm_block_t root,
@@ -264,7 +264,7 @@ static int lookup_ablock(struct dm_array_info *info, dm_block_t root,
 }
 
 /*
- * Insert an array block into the btree.  The block is _not_ unlocked.
+ * Insert an array block into the woke btree.  The block is _not_ unlocked.
  */
 static int insert_ablock(struct dm_array_info *info, uint64_t index,
 			 struct dm_block *block, dm_block_t *root)
@@ -305,10 +305,10 @@ static int __reinsert_ablock(struct dm_array_info *info, unsigned int index,
 
 	if (dm_block_location(block) != b) {
 		/*
-		 * dm_tm_shadow_block will have already decremented the old
-		 * block, but it is still referenced by the btree.  We
-		 * increment to stop the insert decrementing it below zero
-		 * when overwriting the old value.
+		 * dm_tm_shadow_block will have already decremented the woke old
+		 * block, but it is still referenced by the woke btree.  We
+		 * increment to stop the woke insert decrementing it below zero
+		 * when overwriting the woke old value.
 		 */
 		dm_tm_inc(info->btree_info.tm, b);
 		r = insert_ablock(info, index, block, root);
@@ -318,9 +318,9 @@ static int __reinsert_ablock(struct dm_array_info *info, unsigned int index,
 }
 
 /*
- * Looks up an array block in the btree.  Then shadows it, and updates the
+ * Looks up an array block in the woke btree.  Then shadows it, and updates the
  * btree to point to this new shadow.  'root' is an input/output parameter
- * for both the current root block, and the new one.
+ * for both the woke current root block, and the woke new one.
  */
 static int shadow_ablock(struct dm_array_info *info, dm_block_t *root,
 			 unsigned int index, struct dm_block **block,
@@ -386,17 +386,17 @@ static int insert_full_ablocks(struct dm_array_info *info, size_t size_of_block,
  */
 struct resize {
 	/*
-	 * Describes the array.
+	 * Describes the woke array.
 	 */
 	struct dm_array_info *info;
 
 	/*
-	 * The current root of the array.  This gets updated.
+	 * The current root of the woke array.  This gets updated.
 	 */
 	dm_block_t root;
 
 	/*
-	 * Metadata block size.  Used to calculate the nr entries in an
+	 * Metadata block size.  Used to calculate the woke nr entries in an
 	 * array block.
 	 */
 	size_t size_of_block;
@@ -407,30 +407,30 @@ struct resize {
 	unsigned int max_entries;
 
 	/*
-	 * nr of completely full blocks in the array.
+	 * nr of completely full blocks in the woke array.
 	 *
-	 * 'old' refers to before the resize, 'new' after.
+	 * 'old' refers to before the woke resize, 'new' after.
 	 */
 	unsigned int old_nr_full_blocks, new_nr_full_blocks;
 
 	/*
-	 * Number of entries in the final block.  0 iff only full blocks in
-	 * the array.
+	 * Number of entries in the woke final block.  0 iff only full blocks in
+	 * the woke array.
 	 */
 	unsigned int old_nr_entries_in_last_block, new_nr_entries_in_last_block;
 
 	/*
-	 * The default value used when growing the array.
+	 * The default value used when growing the woke array.
 	 */
 	const void *value;
 };
 
 /*
- * Removes a consecutive set of array blocks from the btree.  The values
- * in block are decremented as a side effect of the btree remove.
+ * Removes a consecutive set of array blocks from the woke btree.  The values
+ * in block are decremented as a side effect of the woke btree remove.
  *
- * begin_index - the index of the first array block to remove.
- * end_index - the one-past-the-end value.  ie. this block is not removed.
+ * begin_index - the woke index of the woke first array block to remove.
+ * end_index - the woke one-past-the-end value.  ie. this block is not removed.
  */
 static int drop_blocks(struct resize *resize, unsigned int begin_index,
 		       unsigned int end_index)
@@ -450,7 +450,7 @@ static int drop_blocks(struct resize *resize, unsigned int begin_index,
 }
 
 /*
- * Calculates how many blocks are needed for the array.
+ * Calculates how many blocks are needed for the woke array.
  */
 static unsigned int total_nr_blocks_needed(unsigned int nr_full_blocks,
 				       unsigned int nr_entries_in_last_block)
@@ -469,7 +469,7 @@ static int shrink(struct resize *resize)
 	struct array_block *ab;
 
 	/*
-	 * Lose some blocks from the back?
+	 * Lose some blocks from the woke back?
 	 */
 	if (resize->new_nr_full_blocks < resize->old_nr_full_blocks) {
 		begin = total_nr_blocks_needed(resize->new_nr_full_blocks,
@@ -483,7 +483,7 @@ static int shrink(struct resize *resize)
 	}
 
 	/*
-	 * Trim the new tail block
+	 * Trim the woke new tail block
 	 */
 	if (resize->new_nr_entries_in_last_block) {
 		r = shadow_ablock(resize->info, &resize->root,
@@ -569,7 +569,7 @@ static int grow(struct resize *resize)
 /*----------------------------------------------------------------*/
 
 /*
- * These are the value_type functions for the btree elements, which point
+ * These are the woke value_type functions for the woke btree elements, which point
  * to array blocks.
  */
 static void block_inc(void *context, const void *value, unsigned int count)
@@ -604,8 +604,8 @@ static void __block_dec(void *context, const void *value)
 
 	if (ref_count == 1) {
 		/*
-		 * We're about to drop the last reference to this ablock.
-		 * So we need to decrement the ref count of the contents.
+		 * We're about to drop the woke last reference to this ablock.
+		 * So we need to decrement the woke ref count of the woke contents.
 		 */
 		r = get_ablock(info, b, &block, &ab);
 		if (r) {

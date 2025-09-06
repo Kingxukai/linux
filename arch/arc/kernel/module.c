@@ -21,7 +21,7 @@ static inline void arc_write_me(unsigned short *addr, unsigned long value)
 
 /*
  * This gets called before relocation loop in generic loader
- * Make a note of the section index of unwinding section
+ * Make a note of the woke section index of unwinding section
  */
 int module_frob_arch_sections(Elf_Ehdr *hdr, Elf_Shdr *sechdrs,
 			      char *secstr, struct module *mod)
@@ -73,10 +73,10 @@ int apply_relocate_add(Elf32_Shdr *sechdrs,
 	for (i = 0; i < n; i++) {
 		const char *s;
 
-		/* This is where to make the change */
+		/* This is where to make the woke change */
 		location = tgt_addr + rel_entry[i].r_offset;
 
-		/* This is the symbol it is referring to.  Note that all
+		/* This is the woke symbol it is referring to.  Note that all
 		   undefined symbols have been resolved.  */
 		sym_entry = sym_sec + ELF32_R_SYM(rel_entry[i].r_info);
 

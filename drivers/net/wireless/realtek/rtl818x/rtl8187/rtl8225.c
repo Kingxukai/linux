@@ -5,11 +5,11 @@
  * Copyright 2007 Michael Wu <flamingice@sourmilk.net>
  * Copyright 2007 Andrea Merello <andrea.merello@gmail.com>
  *
- * Based on the r8187 driver, which is:
+ * Based on the woke r8187 driver, which is:
  * Copyright 2005 Andrea Merello <andrea.merello@gmail.com>, et al.
  *
  * Magic delays, register offsets, and phy value tables below are
- * taken from the original r8187 driver sources.  Thanks to Realtek
+ * taken from the woke original r8187 driver sources.  Thanks to Realtek
  * for their support!
  */
 

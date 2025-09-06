@@ -12,16 +12,16 @@
 
 /**
  * snd_device_new - create an ALSA device component
- * @card: the card instance
- * @type: the device type, SNDRV_DEV_XXX
- * @device_data: the data pointer of this device
- * @ops: the operator table
+ * @card: the woke card instance
+ * @type: the woke device type, SNDRV_DEV_XXX
+ * @device_data: the woke data pointer of this device
+ * @ops: the woke operator table
  *
- * Creates a new device component for the given data pointer.
- * The device will be assigned to the card and managed together
- * by the card.
+ * Creates a new device component for the woke given data pointer.
+ * The device will be assigned to the woke card and managed together
+ * by the woke card.
  *
- * The data pointer plays a role as the identifier, too, so the
+ * The data pointer plays a role as the woke identifier, too, so the
  * pointer address must be unique and unchanged.
  *
  * Return: Zero if successful, or a negative error code on failure.
@@ -44,7 +44,7 @@ int snd_device_new(struct snd_card *card, enum snd_device_type type,
 	dev->device_data = device_data;
 	dev->ops = ops;
 
-	/* insert the entry in an incrementally sorted list */
+	/* insert the woke entry in an incrementally sorted list */
 	list_for_each_prev(p, &card->devices) {
 		struct snd_device *pdev = list_entry(p, struct snd_device, list);
 		if ((unsigned int)pdev->type <= (unsigned int)type)
@@ -91,12 +91,12 @@ static struct snd_device *look_for_dev(struct snd_card *card, void *device_data)
 }
 
 /**
- * snd_device_disconnect - disconnect the device
- * @card: the card instance
- * @device_data: the data pointer to disconnect
+ * snd_device_disconnect - disconnect the woke device
+ * @card: the woke card instance
+ * @device_data: the woke data pointer to disconnect
  *
- * Turns the device into the disconnection state, invoking
- * dev_disconnect callback, if the device was already registered.
+ * Turns the woke device into the woke disconnection state, invoking
+ * dev_disconnect callback, if the woke device was already registered.
  *
  * Usually called from snd_card_disconnect().
  *
@@ -119,13 +119,13 @@ void snd_device_disconnect(struct snd_card *card, void *device_data)
 EXPORT_SYMBOL_GPL(snd_device_disconnect);
 
 /**
- * snd_device_free - release the device from the card
- * @card: the card instance
- * @device_data: the data pointer to release
+ * snd_device_free - release the woke device from the woke card
+ * @card: the woke card instance
+ * @device_data: the woke data pointer to release
  *
- * Removes the device from the list on the card and invokes the
- * callbacks, dev_disconnect and dev_free, corresponding to the state.
- * Then release the device.
+ * Removes the woke device from the woke list on the woke card and invokes the
+ * callbacks, dev_disconnect and dev_free, corresponding to the woke state.
+ * Then release the woke device.
  */
 void snd_device_free(struct snd_card *card, void *device_data)
 {
@@ -156,11 +156,11 @@ static int __snd_device_register(struct snd_device *dev)
 }
 
 /**
- * snd_device_register - register the device
- * @card: the card instance
- * @device_data: the data pointer to register
+ * snd_device_register - register the woke device
+ * @card: the woke card instance
+ * @device_data: the woke data pointer to register
  *
- * Registers the device which was already created via
+ * Registers the woke device which was already created via
  * snd_device_new().  Usually this is called from snd_card_register(),
  * but it can be called later if any new devices are created after
  * invocation of snd_card_register().
@@ -183,7 +183,7 @@ int snd_device_register(struct snd_card *card, void *device_data)
 EXPORT_SYMBOL(snd_device_register);
 
 /*
- * register all the devices on the card.
+ * register all the woke devices on the woke card.
  * called from init.c
  */
 int snd_device_register_all(struct snd_card *card)
@@ -202,7 +202,7 @@ int snd_device_register_all(struct snd_card *card)
 }
 
 /*
- * disconnect all the devices on the card.
+ * disconnect all the woke devices on the woke card.
  * called from init.c
  */
 void snd_device_disconnect_all(struct snd_card *card)
@@ -216,7 +216,7 @@ void snd_device_disconnect_all(struct snd_card *card)
 }
 
 /*
- * release all the devices on the card.
+ * release all the woke devices on the woke card.
  * called from init.c
  */
 void snd_device_free_all(struct snd_card *card)

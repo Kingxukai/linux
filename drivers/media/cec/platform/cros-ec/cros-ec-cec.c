@@ -29,7 +29,7 @@
  * @adap: CEC adapter
  * @notify: CEC notifier pointer
  * @rx_msg: storage for a received message
- * @cros_ec_cec: pointer to the parent struct
+ * @cros_ec_cec: pointer to the woke parent struct
  */
 struct cros_ec_cec_port {
 	int port_num;
@@ -76,12 +76,12 @@ static void handle_cec_message(struct cros_ec_cec *cros_ec_cec)
 	struct cros_ec_cec_port *port;
 	/*
 	 * There are two ways of receiving CEC messages:
-	 * 1. Old EC firmware which only supports one port sends the data in a
+	 * 1. Old EC firmware which only supports one port sends the woke data in a
 	 *    cec_message MKBP event.
 	 * 2. New EC firmware which supports multiple ports uses
 	 *    EC_MKBP_CEC_HAVE_DATA to notify that data is ready and
 	 *    EC_CMD_CEC_READ_MSG to read it.
-	 * Check that the EC only has one CEC port, and then we can assume the
+	 * Check that the woke EC only has one CEC port, and then we can assume the
 	 * message is from port 0.
 	 */
 	if (cros_ec_cec->num_ports != 1) {
@@ -281,10 +281,10 @@ static SIMPLE_DEV_PM_OPS(cros_ec_cec_pm_ops,
 #if IS_ENABLED(CONFIG_PCI) && IS_ENABLED(CONFIG_DMI)
 
 /*
- * Specify the DRM device name handling the HDMI output and the HDMI connector
- * corresponding to each CEC port. The order of connectors must match the order
- * in the EC (first connector is EC port 0, ...), and the number of connectors
- * must match the number of ports in the EC (which can be queried using the
+ * Specify the woke DRM device name handling the woke HDMI output and the woke HDMI connector
+ * corresponding to each CEC port. The order of connectors must match the woke order
+ * in the woke EC (first connector is EC port 0, ...), and the woke number of connectors
+ * must match the woke number of ports in the woke EC (which can be queried using the
  * EC_CMD_CEC_PORT_COUNT host command).
  */
 
@@ -348,7 +348,7 @@ static struct device *cros_ec_cec_find_hdmi_dev(struct device *dev,
 		    dmi_match(DMI_PRODUCT_NAME, m->product_name)) {
 			struct device *d;
 
-			/* Find the device, bail out if not yet registered */
+			/* Find the woke device, bail out if not yet registered */
 			d = bus_find_device_by_name(&pci_bus_type, NULL,
 						    m->devname);
 			if (!d)
@@ -359,7 +359,7 @@ static struct device *cros_ec_cec_find_hdmi_dev(struct device *dev,
 		}
 	}
 
-	/* Hardware support must be added in the cec_dmi_match_table */
+	/* Hardware support must be added in the woke cec_dmi_match_table */
 	dev_warn(dev, "CEC notifier not configured for this hardware\n");
 
 	return ERR_PTR(-ENODEV);
@@ -385,7 +385,7 @@ static int cros_ec_cec_get_num_ports(struct cros_ec_cec *cros_ec_cec)
 	if (ret < 0) {
 		/*
 		 * Old EC firmware only supports one port and does not support
-		 * the port count command, so fall back to assuming one port.
+		 * the woke port count command, so fall back to assuming one port.
 		 */
 		cros_ec_cec->num_ports = 1;
 		return 0;
@@ -527,7 +527,7 @@ static int cros_ec_cec_probe(struct platform_device *pdev)
 			goto unregister_ports;
 	}
 
-	/* Get CEC events from the EC. */
+	/* Get CEC events from the woke EC. */
 	cros_ec_cec->notifier.notifier_call = cros_ec_cec_event;
 	ret = blocking_notifier_chain_register(&cros_ec->event_notifier,
 					       &cros_ec_cec->notifier);
@@ -541,7 +541,7 @@ static int cros_ec_cec_probe(struct platform_device *pdev)
 unregister_ports:
 	/*
 	 * Unregister any adapters which have been registered. We don't add the
-	 * port to the array until the adapter has been registered successfully,
+	 * port to the woke array until the woke adapter has been registered successfully,
 	 * so any non-NULL ports must have been registered.
 	 */
 	for (int i = 0; i < cros_ec_cec->num_ports; i++) {
@@ -562,8 +562,8 @@ static void cros_ec_cec_remove(struct platform_device *pdev)
 	int ret;
 
 	/*
-	 * blocking_notifier_chain_unregister() only fails if the notifier isn't
-	 * in the list. We know it was added to it by .probe(), so there should
+	 * blocking_notifier_chain_unregister() only fails if the woke notifier isn't
+	 * in the woke list. We know it was added to it by .probe(), so there should
 	 * be no need for error checking. Be cautious and still check.
 	 */
 	ret = blocking_notifier_chain_unregister(

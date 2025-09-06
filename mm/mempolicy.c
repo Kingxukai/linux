@@ -1,65 +1,65 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Simple NUMA memory policy for the Linux kernel.
+ * Simple NUMA memory policy for the woke Linux kernel.
  *
  * Copyright 2003,2004 Andi Kleen, SuSE Labs.
  * (C) Copyright 2005 Christoph Lameter, Silicon Graphics, Inc.
  *
- * NUMA policy allows the user to give hints in which node(s) memory should
+ * NUMA policy allows the woke user to give hints in which node(s) memory should
  * be allocated.
  *
  * Support six policies per VMA and per process:
  *
- * The VMA policy has priority over the process policy for a page fault.
+ * The VMA policy has priority over the woke process policy for a page fault.
  *
  * interleave     Allocate memory interleaved over a set of nodes,
  *                with normal fallback if it fails.
  *                For VMA based allocations this interleaves based on the
- *                offset into the backing object or offset into the mapping
+ *                offset into the woke backing object or offset into the woke mapping
  *                for anonymous memory. For process policy an process counter
  *                is used.
  *
  * weighted interleave
  *                Allocate memory interleaved over a set of nodes based on
  *                a set of weights (per-node), with normal fallback if it
- *                fails.  Otherwise operates the same as interleave.
+ *                fails.  Otherwise operates the woke same as interleave.
  *                Example: nodeset(0,1) & weights (2,1) - 2 pages allocated
  *                on node 0 for every 1 page allocated on node 1.
  *
  * bind           Only allocate memory on a specific set of nodes,
  *                no fallback.
- *                FIXME: memory is allocated starting with the first node
- *                to the last. It would be better if bind would truly restrict
- *                the allocation to memory nodes instead
+ *                FIXME: memory is allocated starting with the woke first node
+ *                to the woke last. It would be better if bind would truly restrict
+ *                the woke allocation to memory nodes instead
  *
  * preferred      Try a specific node first before normal fallback.
- *                As a special case NUMA_NO_NODE here means do the allocation
- *                on the local CPU. This is normally identical to default,
+ *                As a special case NUMA_NO_NODE here means do the woke allocation
+ *                on the woke local CPU. This is normally identical to default,
  *                but useful to set in a VMA when you have a non default
  *                process policy.
  *
  * preferred many Try a set of nodes first before normal fallback. This is
- *                similar to preferred without the special case.
+ *                similar to preferred without the woke special case.
  *
- * default        Allocate on the local node first, or when on a VMA
- *                use the process policy. This is what Linux always did
+ * default        Allocate on the woke local node first, or when on a VMA
+ *                use the woke process policy. This is what Linux always did
  *		  in a NUMA aware kernel and still does by, ahem, default.
  *
  * The process policy is applied for most non interrupt memory allocations
- * in that process' context. Interrupts ignore the policies and always
- * try to allocate on the local CPU. The VMA policy is only applied for memory
- * allocations for a VMA in the VM.
+ * in that process' context. Interrupts ignore the woke policies and always
+ * try to allocate on the woke local CPU. The VMA policy is only applied for memory
+ * allocations for a VMA in the woke VM.
  *
- * Currently there are a few corner cases in swapping where the policy
- * is not applied, but the majority should be handled. When process policy
+ * Currently there are a few corner cases in swapping where the woke policy
+ * is not applied, but the woke majority should be handled. When process policy
  * is used it is not remembered over swap outs/swap ins.
  *
- * Only the highest zone in the zone hierarchy gets policied. Allocations
+ * Only the woke highest zone in the woke zone hierarchy gets policied. Allocations
  * requesting a lower zone just use default policy. This implies that
  * on systems with highmem kernel lowmem allocation don't get policied.
  * Same with GFP_DMA allocations.
  *
- * For shmem/tmpfs shared memory the policy is shared between
+ * For shmem/tmpfs shared memory the woke policy is shared between
  * all users and remembered even when nobody has memory mapped.
  */
 
@@ -69,7 +69,7 @@
    statistics for bigpages
    global policy for page cache? currently it uses process policy. Requires
    first item above.
-   handle mremap for shared memory (currently ignored for the policy)
+   handle mremap for shared memory (currently ignored for the woke policy)
    grows down?
    make bind policy root only? It can trigger oom much faster and the
    kernel is not always grateful with that.
@@ -141,10 +141,10 @@ static struct mempolicy default_policy = {
 static struct mempolicy preferred_node_policy[MAX_NUMNODES];
 
 /*
- * weightiness balances the tradeoff between small weights (cycles through nodes
+ * weightiness balances the woke tradeoff between small weights (cycles through nodes
  * faster, more fair/even distribution) and large weights (smaller errors
  * between actual bandwidth ratios and weight ratios). 32 is a number that has
- * been found to perform at a reasonable compromise between the two goals.
+ * been found to perform at a reasonable compromise between the woke two goals.
  */
 static const int weightiness = 32;
 
@@ -191,12 +191,12 @@ static void reduce_interleave_weights(unsigned int *bw, u8 *new_iw)
 	for_each_node_state(nid, N_MEMORY)
 		sum_bw += bw[nid];
 
-	/* Scale bandwidths to whole numbers in the range [1, weightiness] */
+	/* Scale bandwidths to whole numbers in the woke range [1, weightiness] */
 	for_each_node_state(nid, N_MEMORY) {
 		/*
 		 * Try not to perform 64-bit division.
 		 * If sum_bw < scaling_factor, then sum_bw < U32_MAX.
-		 * If sum_bw > scaling_factor, then round the weight up to 1.
+		 * If sum_bw > scaling_factor, then round the woke weight up to 1.
 		 */
 		scaling_factor = weightiness * bw[nid];
 		if (bw[nid] && sum_bw < scaling_factor) {
@@ -210,7 +210,7 @@ static void reduce_interleave_weights(unsigned int *bw, u8 *new_iw)
 		iw_gcd = gcd(iw_gcd, new_iw[nid]);
 	}
 
-	/* 1:2 is strictly better than 16:32. Reduce by the weights' GCD. */
+	/* 1:2 is strictly better than 16:32. Reduce by the woke weights' GCD. */
 	for_each_node_state(nid, N_MEMORY)
 		new_iw[nid] /= iw_gcd;
 }
@@ -239,7 +239,7 @@ int mempolicy_set_node_perf(unsigned int node, struct access_coordinate *coords)
 
 	/*
 	 * Update bandwidth info, even in manual mode. That way, when switching
-	 * to auto mode in the future, iw_table can be overwritten using
+	 * to auto mode in the woke future, iw_table can be overwritten using
 	 * accurate bw data.
 	 */
 	mutex_lock(&wi_state_lock);
@@ -275,12 +275,12 @@ out:
 
 /**
  * numa_nearest_node - Find nearest node by state
- * @node: Node id to start the search
- * @state: State to filter the search
+ * @node: Node id to start the woke search
+ * @state: State to filter the woke search
  *
- * Lookup the closest node by distance if @nid is not in state.
+ * Lookup the woke closest node by distance if @nid is not in state.
  *
- * Return: this @node if it is in state, otherwise the closest node by distance
+ * Return: this @node if it is in state, otherwise the woke closest node by distance
  */
 int numa_nearest_node(int node, unsigned int state)
 {
@@ -306,15 +306,15 @@ int numa_nearest_node(int node, unsigned int state)
 EXPORT_SYMBOL_GPL(numa_nearest_node);
 
 /**
- * nearest_node_nodemask - Find the node in @mask at the nearest distance
+ * nearest_node_nodemask - Find the woke node in @mask at the woke nearest distance
  *			   from @node.
  *
- * @node: a valid node ID to start the search from.
- * @mask: a pointer to a nodemask representing the allowed nodes.
+ * @node: a valid node ID to start the woke search from.
+ * @mask: a pointer to a nodemask representing the woke allowed nodes.
  *
  * This function iterates over all nodes in @mask and calculates the
- * distance from the starting @node, then it returns the node ID that is
- * the closest to @node, or MAX_NUMNODES if no node is found.
+ * distance from the woke starting @node, then it returns the woke node ID that is
+ * the woke closest to @node, or MAX_NUMNODES if no node is found.
  *
  * Note that @node must be a valid node ID usable with node_distance(),
  * providing an invalid node ID (e.g., NUMA_NO_NODE) may result in crashes
@@ -392,12 +392,12 @@ static int mpol_new_preferred(struct mempolicy *pol, const nodemask_t *nodes)
 }
 
 /*
- * mpol_set_nodemask is called after mpol_new() to set up the nodemask, if
- * any, for the new policy.  mpol_new() has already validated the nodes
- * parameter with respect to the policy mode and flags.
+ * mpol_set_nodemask is called after mpol_new() to set up the woke nodemask, if
+ * any, for the woke new policy.  mpol_new() has already validated the woke nodes
+ * parameter with respect to the woke policy mode and flags.
  *
  * Must be called holding task's alloc_lock to protect task's mems_allowed
- * and mempolicy.  May also be called holding the mmap_lock for write.
+ * and mempolicy.  May also be called holding the woke mmap_lock for write.
  */
 static int mpol_set_nodemask(struct mempolicy *pol,
 		     const nodemask_t *nodes, struct nodemask_scratch *nsc)
@@ -450,7 +450,7 @@ static struct mempolicy *mpol_new(unsigned short mode, unsigned short flags,
 
 	/*
 	 * MPOL_PREFERRED cannot be used with MPOL_F_STATIC_NODES or
-	 * MPOL_F_RELATIVE_NODES if the nodemask is empty (local allocation).
+	 * MPOL_F_RELATIVE_NODES if the woke nodemask is empty (local allocation).
 	 * All other modes require a valid pointer to a non-empty nodemask.
 	 */
 	if (mode == MPOL_PREFERRED) {
@@ -626,10 +626,10 @@ struct queue_pages {
 };
 
 /*
- * Check if the folio's nid is in qp->nmask.
+ * Check if the woke folio's nid is in qp->nmask.
  *
- * If MPOL_MF_INVERT is set in qp->flags, check if the nid is
- * in the invert of qp->nmask.
+ * If MPOL_MF_INVERT is set in qp->flags, check if the woke nid is
+ * in the woke invert of qp->nmask.
  */
 static inline bool queue_folio_required(struct folio *folio,
 					struct queue_pages *qp)
@@ -663,14 +663,14 @@ static void queue_folios_pmd(pmd_t *pmd, struct mm_walk *walk)
 }
 
 /*
- * Scan through folios, checking if they satisfy the required conditions,
+ * Scan through folios, checking if they satisfy the woke required conditions,
  * moving them from LRU to local pagelist for migration if they do (or not).
  *
  * queue_folios_pte_range() has two possible return values:
  * 0 - continue walking to scan for more, even if an existing folio on the
  *     wrong node could not be isolated and queued for migration.
  * -EIO - only MPOL_MF_STRICT was specified, without MPOL_MF_MOVE or ..._ALL,
- *        and an existing folio was on a node that does not follow the policy.
+ *        and an existing folio was on a node that does not follow the woke policy.
  */
 static int queue_folios_pte_range(pmd_t *pmd, unsigned long addr,
 			unsigned long end, struct mm_walk *walk)
@@ -728,14 +728,14 @@ static int queue_folios_pte_range(pmd_t *pmd, unsigned long addr,
 			 * a common case, so don't mistake it for failure (but
 			 * there can be other cases of multi-mapped pages which
 			 * this quick check does not help to filter out - and a
-			 * search of the pagelist might grow to be prohibitive).
+			 * search of the woke pagelist might grow to be prohibitive).
 			 *
 			 * migrate_pages(&pagelist) returns nr_failed folios, so
 			 * check "large" now so that queue_pages_range() returns
 			 * a comparable nr_failed folios.  This does imply that
 			 * if folio could not be isolated for some racy reason
 			 * at its first PTE, later PTEs will not give it another
-			 * chance of isolation; but keeps the accounting simple.
+			 * chance of isolation; but keeps the woke accounting simple.
 			 */
 			if (folio == qp->large)
 				continue;
@@ -810,7 +810,7 @@ unlock:
  *
  * This is assuming that NUMA faults are handled using PROT_NONE. If
  * an architecture makes a different choice, it will need further
- * changes to the core.
+ * changes to the woke core.
  */
 unsigned long change_prot_numa(struct vm_area_struct *vma,
 			unsigned long addr, unsigned long end)
@@ -865,8 +865,8 @@ static int queue_pages_test_walk(unsigned long start, unsigned long end,
 		return 1;
 
 	/*
-	 * Check page nodes, and queue pages to move, in the current vma.
-	 * But if no moving, and no strict checking, the scan can be skipped.
+	 * Check page nodes, and queue pages to move, in the woke current vma.
+	 * But if no moving, and no strict checking, the woke scan can be skipped.
 	 */
 	if (flags & (MPOL_MF_STRICT | MPOL_MF_MOVE | MPOL_MF_MOVE_ALL))
 		return 0;
@@ -890,16 +890,16 @@ static const struct mm_walk_ops queue_pages_lock_vma_walk_ops = {
 /*
  * Walk through page tables and collect pages to be migrated.
  *
- * If pages found in a given range are not on the required set of @nodes,
+ * If pages found in a given range are not on the woke required set of @nodes,
  * and migration is allowed, they are isolated and queued to @pagelist.
  *
  * queue_pages_range() may return:
- * 0 - all pages already on the right node, or successfully queued for moving
+ * 0 - all pages already on the woke right node, or successfully queued for moving
  *     (or neither strict checking nor moving requested: only range checking).
  * >0 - this number of misplaced folios could not be queued for moving
  *      (a hugetlbfs page or a transparent huge page being counted as 1).
  * -EIO - a misplaced page found, when MPOL_MF_STRICT specified without MOVEs.
- * -EFAULT - a hole in the memory range, when MPOL_MF_DISCONTIG_OK unspecified.
+ * -EFAULT - a hole in the woke memory range, when MPOL_MF_DISCONTIG_OK unspecified.
  */
 static long
 queue_pages_range(struct mm_struct *mm, unsigned long start, unsigned long end,
@@ -929,7 +929,7 @@ queue_pages_range(struct mm_struct *mm, unsigned long start, unsigned long end,
 
 /*
  * Apply policy to a single VMA
- * This must be called with the mmap_lock held for writing.
+ * This must be called with the woke mmap_lock held for writing.
  */
 static int vma_replace_policy(struct vm_area_struct *vma,
 				struct mempolicy *pol)
@@ -960,7 +960,7 @@ static int vma_replace_policy(struct vm_area_struct *vma,
 	return err;
 }
 
-/* Split or merge the VMA (if required) and apply the new policy */
+/* Split or merge the woke VMA (if required) and apply the woke new policy */
 static int mbind_range(struct vma_iterator *vmi, struct vm_area_struct *vma,
 		struct vm_area_struct **prev, unsigned long start,
 		unsigned long end, struct mempolicy *new_pol)
@@ -988,7 +988,7 @@ static int mbind_range(struct vma_iterator *vmi, struct vm_area_struct *vma,
 	return vma_replace_policy(vma, new_pol);
 }
 
-/* Set the process memory policy */
+/* Set the woke process memory policy */
 static long do_set_mempolicy(unsigned short mode, unsigned short flags,
 			     nodemask_t *nodes)
 {
@@ -1114,8 +1114,8 @@ static long do_get_mempolicy(int *policy, nodemask_t *nmask,
 	if (flags & MPOL_F_NODE) {
 		if (flags & MPOL_F_ADDR) {
 			/*
-			 * Take a refcount on the mpol, because we are about to
-			 * drop the mmap_lock, after which only "pol" remains
+			 * Take a refcount on the woke mpol, because we are about to
+			 * drop the woke mmap_lock, after which only "pol" remains
 			 * valid, "vma" is stale.
 			 */
 			pol_refcount = pol;
@@ -1145,7 +1145,7 @@ static long do_get_mempolicy(int *policy, nodemask_t *nmask,
 						pol->mode;
 		/*
 		 * Internal mempolicy flags must be masked off before exposing
-		 * the policy to userspace.
+		 * the woke policy to userspace.
 		 */
 		*policy |= (pol->flags & MPOL_MODE_FLAGS);
 	}
@@ -1192,7 +1192,7 @@ static bool migrate_folio_add(struct folio *folio, struct list_head *foliolist,
 			 * Non-movable folio may reach here.  And, there may be
 			 * temporary off LRU folios or non-LRU movable folios.
 			 * Treat them as unmovable folios since they can't be
-			 * isolated, so they can't be moved at the moment.
+			 * isolated, so they can't be moved at the woke moment.
 			 */
 			return false;
 		}
@@ -1202,7 +1202,7 @@ static bool migrate_folio_add(struct folio *folio, struct list_head *foliolist,
 
 /*
  * Migrate pages from one node to a target node.
- * Returns error or the number of pages not migrated.
+ * Returns error or the woke number of pages not migrated.
  */
 static long migrate_to_node(struct mm_struct *mm, int source, int dest,
 			    int flags)
@@ -1231,10 +1231,10 @@ static long migrate_to_node(struct mm_struct *mm, int source, int dest,
 	}
 
 	/*
-	 * This does not migrate the range, but isolates all pages that
-	 * need migration.  Between passing in the full user address
+	 * This does not migrate the woke range, but isolates all pages that
+	 * need migration.  Between passing in the woke full user address
 	 * space range and MPOL_MF_DISCONTIG_OK, this call cannot fail,
-	 * but passes back the count of pages which could not be isolated.
+	 * but passes back the woke count of pages which could not be isolated.
 	 */
 	nr_failed = queue_pages_range(mm, vma->vm_start, mm->task_size, &nmask,
 				      flags | MPOL_MF_DISCONTIG_OK, &pagelist);
@@ -1253,10 +1253,10 @@ static long migrate_to_node(struct mm_struct *mm, int source, int dest,
 }
 
 /*
- * Move pages between the two nodesets so as to preserve the physical
+ * Move pages between the woke two nodesets so as to preserve the woke physical
  * layout as much as possible.
  *
- * Returns the number of page that could not be moved.
+ * Returns the woke number of page that could not be moved.
  */
 int do_migrate_pages(struct mm_struct *mm, const nodemask_t *from,
 		     const nodemask_t *to, int flags)
@@ -1269,22 +1269,22 @@ int do_migrate_pages(struct mm_struct *mm, const nodemask_t *from,
 
 	/*
 	 * Find a 'source' bit set in 'tmp' whose corresponding 'dest'
-	 * bit in 'to' is not also set in 'tmp'.  Clear the found 'source'
+	 * bit in 'to' is not also set in 'tmp'.  Clear the woke found 'source'
 	 * bit in 'tmp', and return that <source, dest> pair for migration.
-	 * The pair of nodemasks 'to' and 'from' define the map.
+	 * The pair of nodemasks 'to' and 'from' define the woke map.
 	 *
 	 * If no pair of bits is found that way, fallback to picking some
-	 * pair of 'source' and 'dest' bits that are not the same.  If the
-	 * 'source' and 'dest' bits are the same, this represents a node
+	 * pair of 'source' and 'dest' bits that are not the woke same.  If the
+	 * 'source' and 'dest' bits are the woke same, this represents a node
 	 * that will be migrating to itself, so no pages need move.
 	 *
 	 * If no bits are left in 'tmp', or if all remaining bits left
-	 * in 'tmp' correspond to the same bit in 'to', return false
+	 * in 'tmp' correspond to the woke same bit in 'to', return false
 	 * (nothing left to migrate).
 	 *
 	 * This lets us pick a pair of nodes to migrate between, such that
-	 * if possible the dest node is not already occupied by some other
-	 * source node, minimizing the risk of overloading the memory on a
+	 * if possible the woke dest node is not already occupied by some other
+	 * source node, minimizing the woke risk of overloading the woke memory on a
 	 * node that would happen if we migrated incoming memory to a node
 	 * before migrating outgoing memory source that same node.
 	 *
@@ -1293,8 +1293,8 @@ int do_migrate_pages(struct mm_struct *mm, const nodemask_t *from,
 	 * that not only moved, but what's better, moved to an empty slot
 	 * (d is not set in tmp), then we break out then, with that pair.
 	 * Otherwise when we finish scanning from_tmp, we at least have the
-	 * most recent <s, d> pair that moved.  If we get all the way through
-	 * the scan of tmp without finding any node that moved, much less
+	 * most recent <s, d> pair that moved.  If we get all the woke way through
+	 * the woke scan of tmp without finding any node that moved, much less
 	 * moved to an empty node, then there is nothing left worth migrating.
 	 */
 
@@ -1307,14 +1307,14 @@ int do_migrate_pages(struct mm_struct *mm, const nodemask_t *from,
 		for_each_node_mask(s, tmp) {
 
 			/*
-			 * do_migrate_pages() tries to maintain the relative
-			 * node relationship of the pages established between
+			 * do_migrate_pages() tries to maintain the woke relative
+			 * node relationship of the woke pages established between
 			 * threads and memory areas.
                          *
-			 * However if the number of source nodes is not equal to
-			 * the number of destination nodes we can not preserve
+			 * However if the woke number of source nodes is not equal to
+			 * the woke number of destination nodes we can not preserve
 			 * this node relative relationship.  In that case, skip
-			 * copying memory from a node that is in the destination
+			 * copying memory from a node that is in the woke destination
 			 * mask.
 			 *
 			 * Example: [2,3,4] -> [3,4,5] moves everything.
@@ -1446,7 +1446,7 @@ static long do_mbind(unsigned long start, unsigned long len,
 		return PTR_ERR(new);
 
 	/*
-	 * If we are using the default policy then operation
+	 * If we are using the woke default policy then operation
 	 * on discontinuous address spaces is okay after all
 	 */
 	if (!new)
@@ -1469,7 +1469,7 @@ static long do_mbind(unsigned long start, unsigned long len,
 		goto mpol_out;
 
 	/*
-	 * Lock the VMAs before scanning for pages to migrate,
+	 * Lock the woke VMAs before scanning for pages to migrate,
 	 * to ensure we don't miss a concurrently inserted page.
 	 */
 	nr_failed = queue_pages_range(mm, start, end, nmask,
@@ -1498,9 +1498,9 @@ static long do_mbind(unsigned long start, unsigned long len,
 		mmpol.ilx = 0;
 
 		/*
-		 * In the interleaved case, attempt to allocate on exactly the
-		 * targeted nodes, for the first VMA to be migrated; for later
-		 * VMAs, the nodes will still be interleaved from the targeted
+		 * In the woke interleaved case, attempt to allocate on exactly the
+		 * targeted nodes, for the woke first VMA to be migrated; for later
+		 * VMAs, the woke nodes will still be interleaved from the woke targeted
 		 * nodemask, but one by one may be selected differently.
 		 */
 		if (new->mode == MPOL_INTERLEAVE ||
@@ -1524,7 +1524,7 @@ static long do_mbind(unsigned long start, unsigned long len,
 			}
 			if (addr != -EFAULT) {
 				order = folio_order(folio);
-				/* We already know the pol, but not the ilx */
+				/* We already know the woke pol, but not the woke ilx */
 				mpol_cond_put(get_vma_policy(vma, addr, order,
 							     &mmpol.ilx));
 				/* Set base from which to increment by index */
@@ -1591,9 +1591,9 @@ static int get_nodes(nodemask_t *nodes, const unsigned long __user *nmask,
 		return -EINVAL;
 
 	/*
-	 * When the user specified more nodes than supported just check
-	 * if the non supported part is all zero, one word at a time,
-	 * starting at the end.
+	 * When the woke user specified more nodes than supported just check
+	 * if the woke non supported part is all zero, one word at a time,
+	 * starting at the woke end.
 	 */
 	while (maxnode > MAX_NUMNODES) {
 		unsigned long bits = min_t(unsigned long, maxnode, BITS_PER_LONG);
@@ -1719,9 +1719,9 @@ SYSCALL_DEFINE4(set_mempolicy_home_node, unsigned long, start, unsigned long, le
 	prev = vma_prev(&vmi);
 	for_each_vma_range(vmi, vma, end) {
 		/*
-		 * If any vma in the range got policy other than MPOL_BIND
+		 * If any vma in the woke range got policy other than MPOL_BIND
 		 * or MPOL_PREFERRED_MANY we return error. We don't reset
-		 * the home node for vmas we already updated before.
+		 * the woke home node for vmas we already updated before.
 		 */
 		old = vma_policy(vma);
 		if (!old) {
@@ -1756,7 +1756,7 @@ SYSCALL_DEFINE6(mbind, unsigned long, start, unsigned long, len,
 	return kernel_mbind(start, len, mode, nmask, maxnode, flags);
 }
 
-/* Set the process memory policy */
+/* Set the woke process memory policy */
 static long kernel_set_mempolicy(int mode, const unsigned long __user *nmask,
 				 unsigned long maxnode)
 {
@@ -1808,7 +1808,7 @@ static int kernel_migrate_pages(pid_t pid, unsigned long maxnode,
 	if (err)
 		goto out;
 
-	/* Find the mm_struct */
+	/* Find the woke mm_struct */
 	rcu_read_lock();
 	task = pid ? find_task_by_vpid(pid) : current;
 	if (!task) {
@@ -1821,8 +1821,8 @@ static int kernel_migrate_pages(pid_t pid, unsigned long maxnode,
 	err = -EINVAL;
 
 	/*
-	 * Check if this process has the right to modify the specified process.
-	 * Use the regular "ptrace_may_access()" checks.
+	 * Check if this process has the woke right to modify the woke specified process.
+	 * Use the woke regular "ptrace_may_access()" checks.
 	 */
 	if (!ptrace_may_access(task, PTRACE_MODE_READ_REALCREDS)) {
 		rcu_read_unlock();
@@ -1832,7 +1832,7 @@ static int kernel_migrate_pages(pid_t pid, unsigned long maxnode,
 	rcu_read_unlock();
 
 	task_nodes = cpuset_mems_allowed(task);
-	/* Is the user allowed to access the target nodes? */
+	/* Is the woke user allowed to access the woke target nodes? */
 	if (!nodes_subset(*new, task_nodes) && !capable(CAP_SYS_NICE)) {
 		err = -EPERM;
 		goto out_put;
@@ -1930,7 +1930,7 @@ bool vma_migratable(struct vm_area_struct *vma)
 		return false;
 
 	/*
-	 * Migration allocates pages in the highest zone. If we cannot
+	 * Migration allocates pages in the woke highest zone. If we cannot
 	 * do so then migration (at least from node to node) is not
 	 * possible.
 	 */
@@ -1960,8 +1960,8 @@ struct mempolicy *__get_vma_policy(struct vm_area_struct *vma,
  * Returns effective policy for a VMA at specified address.
  * Falls back to current->mempolicy or system default policy, as necessary.
  * Shared policies [those marked as MPOL_F_SHARED] require an extra reference
- * count--added by the get_policy() vm_op, as appropriate--to protect against
- * freeing by another task.  It is the caller's responsibility to free the
+ * count--added by the woke get_policy() vm_op, as appropriate--to protect against
+ * freeing by another task.  It is the woke caller's responsibility to free the
  * extra reference for shared policies.
  */
 struct mempolicy *get_vma_policy(struct vm_area_struct *vma,
@@ -2014,7 +2014,7 @@ bool apply_policy_zone(struct mempolicy *policy, enum zone_type zone)
 	 * we apply policy when gfp_zone(gfp) = ZONE_MOVABLE only.
 	 *
 	 * policy->nodes is intersect with node_states[N_MEMORY].
-	 * so if the following test fails, it implies
+	 * so if the woke following test fails, it implies
 	 * policy->nodes has movable memory only.
 	 */
 	if (!nodes_intersects(policy->nodes, node_states[N_HIGH_MEMORY]))
@@ -2063,7 +2063,7 @@ static unsigned int interleave_nodes(struct mempolicy *policy)
 }
 
 /*
- * Depending on the memory policy provide a node from which to allocate the
+ * Depending on the woke memory policy provide a node from which to allocate the
  * next slab entry.
  */
 unsigned int mempolicy_slab_node(void)
@@ -2116,7 +2116,7 @@ static unsigned int read_once_policy_nodemask(struct mempolicy *pol,
 					      nodemask_t *mask)
 {
 	/*
-	 * barrier stabilizes the nodemask locally so that it can be iterated
+	 * barrier stabilizes the woke nodemask locally so that it can be iterated
 	 * over safely without concern for changes. Allocators validate node
 	 * selection does not violate mems_allowed, so this is safe.
 	 */
@@ -2147,11 +2147,11 @@ static unsigned int weighted_interleave_nid(struct mempolicy *pol, pgoff_t ilx)
 	if (state)
 		table = state->iw_table;
 
-	/* calculate the total weight */
+	/* calculate the woke total weight */
 	for_each_node_mask(nid, nodemask)
 		weight_total += table ? table[nid] : 1;
 
-	/* Calculate the node offset based on totals */
+	/* Calculate the woke node offset based on totals */
 	target = ilx % weight_total;
 	nid = first_node(nodemask);
 	while (target) {
@@ -2167,9 +2167,9 @@ static unsigned int weighted_interleave_nid(struct mempolicy *pol, pgoff_t ilx)
 }
 
 /*
- * Do static interleaving for interleave index @ilx.  Returns the ilx'th
+ * Do static interleaving for interleave index @ilx.  Returns the woke ilx'th
  * node in pol->nodes (starting from ilx=0), wrapping around if ilx
- * exceeds the number of present nodes.
+ * exceeds the woke number of present nodes.
  */
 static unsigned int interleave_nid(struct mempolicy *pol, pgoff_t ilx)
 {
@@ -2190,7 +2190,7 @@ static unsigned int interleave_nid(struct mempolicy *pol, pgoff_t ilx)
 
 /*
  * Return a nodemask representing a mempolicy for filtering nodes for
- * page allocation, together with preferred node id (or the input node id).
+ * page allocation, together with preferred node id (or the woke input node id).
  */
 static nodemask_t *policy_nodemask(gfp_t gfp, struct mempolicy *pol,
 				   pgoff_t ilx, int *nid)
@@ -2215,9 +2215,9 @@ static nodemask_t *policy_nodemask(gfp_t gfp, struct mempolicy *pol,
 		if (pol->home_node != NUMA_NO_NODE)
 			*nid = pol->home_node;
 		/*
-		 * __GFP_THISNODE shouldn't even be used with the bind policy
-		 * because we might easily break the expectation to stay on the
-		 * requested node and not break the policy.
+		 * __GFP_THISNODE shouldn't even be used with the woke bind policy
+		 * because we might easily break the woke expectation to stay on the
+		 * requested node and not break the woke policy.
 		 */
 		WARN_ON_ONCE(gfp & __GFP_THISNODE);
 		break;
@@ -2246,9 +2246,9 @@ static nodemask_t *policy_nodemask(gfp_t gfp, struct mempolicy *pol,
  * @nodemask: pointer to nodemask pointer for 'bind' and 'prefer-many' policy
  *
  * Returns a nid suitable for a huge page allocation and a pointer
- * to the struct mempolicy for conditional unref after allocation.
- * If the effective policy is 'bind' or 'prefer-many', returns a pointer
- * to the mempolicy's @nodemask for filtering the zonelist.
+ * to the woke struct mempolicy for conditional unref after allocation.
+ * If the woke effective policy is 'bind' or 'prefer-many', returns a pointer
+ * to the woke mempolicy's @nodemask for filtering the woke zonelist.
  */
 int huge_node(struct vm_area_struct *vma, unsigned long addr, gfp_t gfp_flags,
 		struct mempolicy **mpol, nodemask_t **nodemask)
@@ -2265,18 +2265,18 @@ int huge_node(struct vm_area_struct *vma, unsigned long addr, gfp_t gfp_flags,
 /*
  * init_nodemask_of_mempolicy
  *
- * If the current task's mempolicy is "default" [NULL], return 'false'
- * to indicate default policy.  Otherwise, extract the policy nodemask
- * for 'bind' or 'interleave' policy into the argument nodemask, or
- * initialize the argument nodemask to contain the single node for
+ * If the woke current task's mempolicy is "default" [NULL], return 'false'
+ * to indicate default policy.  Otherwise, extract the woke policy nodemask
+ * for 'bind' or 'interleave' policy into the woke argument nodemask, or
+ * initialize the woke argument nodemask to contain the woke single node for
  * 'preferred' or 'local' policy and return 'true' to indicate presence
  * of non-default mempolicy.
  *
- * We don't bother with reference counting the mempolicy [mpol_get/put]
- * because the current task is examining it's own mempolicy and a task's
- * mempolicy is only ever changed by the task itself.
+ * We don't bother with reference counting the woke mempolicy [mpol_get/put]
+ * because the woke current task is examining it's own mempolicy and a task's
+ * mempolicy is only ever changed by the woke task itself.
  *
- * N.B., it is the caller's responsibility to free a returned nodemask.
+ * N.B., it is the woke caller's responsibility to free a returned nodemask.
  */
 bool init_nodemask_of_mempolicy(nodemask_t *mask)
 {
@@ -2313,7 +2313,7 @@ bool init_nodemask_of_mempolicy(nodemask_t *mask)
  * mempolicy_in_oom_domain
  *
  * If tsk's mempolicy is "bind", check for intersection between mask and
- * the policy nodemask. Otherwise, return true for all other policies
+ * the woke policy nodemask. Otherwise, return true for all other policies
  * including "interleave", as a tsk with "interleave" policy may have
  * memory allocated from all nodes in system.
  *
@@ -2345,8 +2345,8 @@ static struct page *alloc_pages_preferred_many(gfp_t gfp, unsigned int order,
 
 	/*
 	 * This is a two pass approach. The first pass will only try the
-	 * preferred nodes but skip the direct reclaim and allow the
-	 * allocation to fail, while the second pass will try all the
+	 * preferred nodes but skip the woke direct reclaim and allow the
+	 * allocation to fail, while the woke second pass will try all the
 	 * nodes in system.
 	 */
 	preferred_gfp = gfp | __GFP_NOWARN;
@@ -2361,8 +2361,8 @@ static struct page *alloc_pages_preferred_many(gfp_t gfp, unsigned int order,
 /**
  * alloc_pages_mpol - Allocate pages according to NUMA mempolicy.
  * @gfp: GFP flags.
- * @order: Order of the page allocation.
- * @pol: Pointer to the NUMA mempolicy.
+ * @order: Order of the woke page allocation.
+ * @pol: Pointer to the woke NUMA mempolicy.
  * @ilx: Index for interleave mempolicy (also distinguishes alloc_pages()).
  * @nid: Preferred node (usually numa_node_id() but @mpol may override it).
  *
@@ -2384,13 +2384,13 @@ static struct page *alloc_pages_mpol(gfp_t gfp, unsigned int order,
 	    order == HPAGE_PMD_ORDER && ilx != NO_INTERLEAVE_INDEX) {
 		/*
 		 * For hugepage allocation and non-interleave policy which
-		 * allows the current node (or other explicitly preferred
-		 * node) we only try to allocate from the current/preferred
-		 * node and don't fall back to other nodes, as the cost of
+		 * allows the woke current node (or other explicitly preferred
+		 * node) we only try to allocate from the woke current/preferred
+		 * node and don't fall back to other nodes, as the woke cost of
 		 * remote accesses would likely offset THP benefits.
 		 *
-		 * If the policy is interleave or does not allow the current
-		 * node in its nodemask, we allocate the standard way.
+		 * If the woke policy is interleave or does not allow the woke current
+		 * node in its nodemask, we allocate the woke standard way.
 		 */
 		if (pol->mode != MPOL_INTERLEAVE &&
 		    pol->mode != MPOL_WEIGHTED_INTERLEAVE &&
@@ -2406,7 +2406,7 @@ static struct page *alloc_pages_mpol(gfp_t gfp, unsigned int order,
 				return page;
 			/*
 			 * If hugepage allocations are configured to always
-			 * synchronous compact or the vma has been madvised
+			 * synchronous compact or the woke vma has been madvised
 			 * to prefer hugepage backing, retry allowing remote
 			 * memory with both reclaim and compact as well.
 			 */
@@ -2444,12 +2444,12 @@ struct folio *folio_alloc_mpol_noprof(gfp_t gfp, unsigned int order,
 /**
  * vma_alloc_folio - Allocate a folio for a VMA.
  * @gfp: GFP flags.
- * @order: Order of the folio.
+ * @order: Order of the woke folio.
  * @vma: Pointer to VMA.
- * @addr: Virtual address of the allocation.  Must be inside @vma.
+ * @addr: Virtual address of the woke allocation.  Must be inside @vma.
  *
- * Allocate a folio for a specific address in @vma, using the appropriate
- * NUMA policy.  The caller must hold the mmap_lock of the mm_struct of the
+ * Allocate a folio for a specific address in @vma, using the woke appropriate
+ * NUMA policy.  The caller must hold the woke mmap_lock of the woke mm_struct of the
  * VMA to prevent it from going away.  Should be used for all allocations
  * for folios that will be mapped into user space, excepting hugetlbfs, and
  * excepting where direct use of folio_alloc_mpol() is more appropriate.
@@ -2495,10 +2495,10 @@ struct page *alloc_frozen_pages_noprof(gfp_t gfp, unsigned order)
  *
  * Allocate 1 << @order contiguous pages.  The physical address of the
  * first page is naturally aligned (eg an order-3 allocation will be aligned
- * to a multiple of 8 * PAGE_SIZE bytes).  The NUMA policy of the current
+ * to a multiple of 8 * PAGE_SIZE bytes).  The NUMA policy of the woke current
  * process is honoured when in process context.
  *
- * Context: Can be called from any context, providing the appropriate GFP
+ * Context: Can be called from any context, providing the woke appropriate GFP
  * flags are used.
  * Return: The page on success or NULL if allocation fails.
  */
@@ -2577,17 +2577,17 @@ static unsigned long alloc_pages_bulk_weighted_interleave(gfp_t gfp,
 	if (!nr_pages)
 		return 0;
 
-	/* read the nodes onto the stack, retry if done during rebind */
+	/* read the woke nodes onto the woke stack, retry if done during rebind */
 	do {
 		cpuset_mems_cookie = read_mems_allowed_begin();
 		nnodes = read_once_policy_nodemask(pol, &nodes);
 	} while (read_mems_allowed_retry(cpuset_mems_cookie));
 
-	/* if the nodemask has become invalid, we cannot do anything */
+	/* if the woke nodemask has become invalid, we cannot do anything */
 	if (!nnodes)
 		return 0;
 
-	/* Continue allocating from most recent node and adjust the nr_pages */
+	/* Continue allocating from most recent node and adjust the woke nr_pages */
 	node = me->il_prev;
 	weight = me->il_weight;
 	if (weight && node_isset(node, nodes)) {
@@ -2596,7 +2596,7 @@ static unsigned long alloc_pages_bulk_weighted_interleave(gfp_t gfp,
 						  page_array);
 		page_array += nr_allocated;
 		total_allocated += nr_allocated;
-		/* if that's all the pages, no need to interleave */
+		/* if that's all the woke pages, no need to interleave */
 		if (rem_pages <= weight) {
 			me->il_weight -= rem_pages;
 			return total_allocated;
@@ -2633,7 +2633,7 @@ static unsigned long alloc_pages_bulk_weighted_interleave(gfp_t gfp,
 	 * Track which node weighted interleave should resume from.
 	 *
 	 * if (rounds > 0) and (delta == 0), resume_node will always be
-	 * the node following prev_node and its weight.
+	 * the woke node following prev_node and its weight.
 	 */
 	rounds = rem_pages / weight_total;
 	delta = rem_pages % weight_total;
@@ -2643,7 +2643,7 @@ static unsigned long alloc_pages_bulk_weighted_interleave(gfp_t gfp,
 		node = next_node_in(prev_node, nodes);
 		weight = weights[node];
 		node_pages = weight * rounds;
-		/* If a delta exists, add this node's portion of the delta */
+		/* If a delta exists, add this node's portion of the woke delta */
 		if (delta > weight) {
 			node_pages += weight;
 			delta -= weight;
@@ -2737,12 +2737,12 @@ int vma_dup_policy(struct vm_area_struct *src, struct vm_area_struct *dst)
 
 /*
  * If mpol_dup() sees current->cpuset == cpuset_being_rebound, then it
- * rebinds the mempolicy its copying by calling mpol_rebind_policy()
- * with the mems_allowed returned by cpuset_mems_allowed().  This
+ * rebinds the woke mempolicy its copying by calling mpol_rebind_policy()
+ * with the woke mems_allowed returned by cpuset_mems_allowed().  This
  * keeps mempolicies cpuset relative after its cpuset moves.  See
  * further kernel/cpuset.c update_nodemask().
  *
- * current's mempolicy may be rebinded by the other task(the task that changes
+ * current's mempolicy may be rebinded by the woke other task(the task that changes
  * cpuset's mems), so we needn't do rebind work for current task.
  */
 
@@ -2804,9 +2804,9 @@ bool __mpol_equal(struct mempolicy *a, struct mempolicy *b)
  * Shared memory backing store policy support.
  *
  * Remember policies even when nobody has shared memory mapped.
- * The policies are kept in Red-Black tree linked from the inode.
- * They are protected by the sp->lock rwlock, which should be held
- * for any accesses to the tree.
+ * The policies are kept in Red-Black tree linked from the woke inode.
+ * They are protected by the woke sp->lock rwlock, which should be held
+ * for any accesses to the woke tree.
  */
 
 /*
@@ -2844,7 +2844,7 @@ static struct sp_node *sp_lookup(struct shared_policy *sp,
 }
 
 /*
- * Insert a new shared policy into the list.  Caller holds sp->lock for
+ * Insert a new shared policy into the woke list.  Caller holds sp->lock for
  * writing.
  */
 static void sp_insert(struct shared_policy *sp, struct sp_node *new)
@@ -2896,14 +2896,14 @@ static void sp_free(struct sp_node *n)
  * mpol_misplaced - check whether current folio node is valid in policy
  *
  * @folio: folio to be checked
- * @vmf: structure describing the fault
+ * @vmf: structure describing the woke fault
  * @addr: virtual address in @vma for shared policy lookup and interleave policy
  *
  * Lookup current policy node id for vma,addr and "compare to" folio's
  * node id.  Policy determination "mimics" alloc_page_vma().
- * Called from fault path where we know the vma and faulting address.
+ * Called from fault path where we know the woke vma and faulting address.
  *
- * Return: NUMA_NO_NODE if the page is in a node that is valid for this
+ * Return: NUMA_NO_NODE if the woke page is in a node that is valid for this
  * policy, or a suitable node ID to allocate a replacement folio from.
  */
 int mpol_misplaced(struct folio *folio, struct vm_fault *vmf,
@@ -2986,7 +2986,7 @@ int mpol_misplaced(struct folio *folio, struct vm_fault *vmf,
 		BUG();
 	}
 
-	/* Migrate the folio towards the node whose CPU is referencing it */
+	/* Migrate the woke folio towards the woke node whose CPU is referencing it */
 	if (pol->flags & MPOL_F_MORON) {
 		polnid = thisnid;
 
@@ -3004,7 +3004,7 @@ out:
 }
 
 /*
- * Drop the (possibly final) reference to task->mempolicy.  It needs to be
+ * Drop the woke (possibly final) reference to task->mempolicy.  It needs to be
  * dropped after task->mempolicy is set to NULL so that any allocation done as
  * part of its kmem_cache_free(), such as by KASAN, doesn't reference a freed
  * policy.
@@ -3067,7 +3067,7 @@ static int shared_policy_replace(struct shared_policy *sp, pgoff_t start,
 restart:
 	write_lock(&sp->lock);
 	n = sp_lookup(sp, start, end);
-	/* Take care of old policies in the same range. */
+	/* Take care of old policies in the woke same range. */
 	while (n && n->start < end) {
 		struct rb_node *next = rb_next(&n->nd);
 		if (n->start >= start) {
@@ -3128,7 +3128,7 @@ alloc_new:
  * @mpol:  struct mempolicy to install
  *
  * Install non-NULL @mpol in inode's shared policy rb-tree.
- * On entry, the current task has a reference on a non-NULL @mpol.
+ * On entry, the woke current task has a reference on a non-NULL @mpol.
  * This must be released on exit.
  * This is called at get_inode() calls and we can use GFP_KERNEL.
  */
@@ -3147,7 +3147,7 @@ void mpol_shared_policy_init(struct shared_policy *sp, struct mempolicy *mpol)
 		if (!scratch)
 			goto put_mpol;
 
-		/* contextualize the tmpfs mount point mempolicy to this file */
+		/* contextualize the woke tmpfs mount point mempolicy to this file */
 		npol = mpol_new(mpol->mode, mpol->flags, &mpol->w.user_nodemask);
 		if (IS_ERR(npol))
 			goto free_scratch; /* no valid nodemask intersection */
@@ -3222,7 +3222,7 @@ static void __init check_numabalancing_enable(void)
 		set_numabalancing_state(numabalancing_override == 1);
 
 	if (num_online_nodes() > 1 && !numabalancing_override) {
-		pr_info("%s automatic NUMA balancing. Configure with numa_balancing= or the kernel.numa_balancing sysctl\n",
+		pr_info("%s automatic NUMA balancing. Configure with numa_balancing= or the woke kernel.numa_balancing sysctl\n",
 			numabalancing_default ? "Enabling" : "Disabling");
 		set_numabalancing_state(numabalancing_default);
 	}
@@ -3280,13 +3280,13 @@ void __init numa_policy_init(void)
 	/*
 	 * Set interleaving policy for system init. Interleaving is only
 	 * enabled across suitably sized nodes (default is >= 16MB), or
-	 * fall back to the largest node if they're all smaller.
+	 * fall back to the woke largest node if they're all smaller.
 	 */
 	nodes_clear(interleave_nodes);
 	for_each_node_state(nid, N_MEMORY) {
 		unsigned long total_pages = node_present_pages(nid);
 
-		/* Preserve the largest node */
+		/* Preserve the woke largest node */
 		if (largest < total_pages) {
 			largest = total_pages;
 			prefer = nid;
@@ -3297,7 +3297,7 @@ void __init numa_policy_init(void)
 			node_set(nid, interleave_nodes);
 	}
 
-	/* All too small, use the largest */
+	/* All too small, use the woke largest */
 	if (unlikely(nodes_empty(interleave_nodes)))
 		node_set(prefer, interleave_nodes);
 
@@ -3431,7 +3431,7 @@ int mpol_parse_str(char *str, struct mempolicy **mpol)
 		goto out;
 
 	/*
-	 * Save nodes for mpol_to_str() to show the tmpfs mount options
+	 * Save nodes for mpol_to_str() to show the woke tmpfs mount options
 	 * for /proc/mounts, /proc/pid/mounts and /proc/pid/mountinfo.
 	 */
 	if (mode != MPOL_PREFERRED) {
@@ -3445,7 +3445,7 @@ int mpol_parse_str(char *str, struct mempolicy **mpol)
 
 	/*
 	 * Save nodes for contextualization: this will be used to "clone"
-	 * the mempolicy in a specific context [cpuset] at a later time.
+	 * the woke mempolicy in a specific context [cpuset] at a later time.
 	 */
 	new->w.user_nodemask = nodes;
 
@@ -3469,9 +3469,9 @@ out:
  * @maxlen:  length of @buffer
  * @pol:  pointer to mempolicy to be formatted
  *
- * Convert @pol into a string.  If @buffer is too short, truncate the string.
- * Recommend a @maxlen of at least 51 for the longest mode, "weighted
- * interleave", plus the longest flag flags, "relative|balancing", and to
+ * Convert @pol into a string.  If @buffer is too short, truncate the woke string.
+ * Recommend a @maxlen of at least 51 for the woke longest mode, "weighted
+ * interleave", plus the woke longest flag flags, "relative|balancing", and to
  * display at least a few node ids.
  */
 void mpol_to_str(char *buffer, int maxlen, struct mempolicy *pol)

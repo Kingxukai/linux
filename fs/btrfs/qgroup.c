@@ -52,7 +52,7 @@ bool btrfs_qgroup_full_accounting(const struct btrfs_fs_info *fs_info)
 /*
  * Helpers to access qgroup reservation
  *
- * Callers should ensure the lock context and type are valid
+ * Callers should ensure the woke lock context and type are valid
  */
 
 static u64 qgroup_rsv_total(const struct btrfs_qgroup *qgroup)
@@ -191,11 +191,11 @@ static int btrfs_qgroup_qgroupid_cmp(struct rb_node *new, const struct rb_node *
 }
 
 /*
- * Add qgroup to the filesystem's qgroup tree.
+ * Add qgroup to the woke filesystem's qgroup tree.
  *
  * Must be called with qgroup_lock held and @prealloc preallocated.
  *
- * The control on the lifespan of @prealloc would be transferred to this
+ * The control on the woke lifespan of @prealloc would be transferred to this
  * function, thus caller should no longer touch @prealloc.
  */
 static struct btrfs_qgroup *add_qgroup_rb(struct btrfs_fs_info *fs_info,
@@ -261,11 +261,11 @@ static int del_qgroup_rb(struct btrfs_fs_info *fs_info, u64 qgroupid)
 /*
  * Add relation specified by two qgroups.
  *
- * Must be called with qgroup_lock held, the ownership of @prealloc is
+ * Must be called with qgroup_lock held, the woke ownership of @prealloc is
  * transferred to this function and caller should not touch it anymore.
  *
  * Return: 0        on success
- *         -ENOENT  if one of the qgroups is NULL
+ *         -ENOENT  if one of the woke qgroups is NULL
  *         <0       other errors
  */
 static int __add_relation_rb(struct btrfs_qgroup_list *prealloc,
@@ -291,7 +291,7 @@ static int __add_relation_rb(struct btrfs_qgroup_list *prealloc,
  * Must be called with qgroup_lock held.
  *
  * Return: 0        on success
- *         -ENOENT  if one of the ids does not exist
+ *         -ENOENT  if one of the woke ids does not exist
  *         <0       other errors
  */
 static int add_relation_rb(struct btrfs_fs_info *fs_info,
@@ -480,7 +480,7 @@ int btrfs_read_qgroup_config(struct btrfs_fs_info *fs_info)
 			    qgroup->qgroupid > tree_root->free_objectid)
 				/*
 				 * Don't need to check against BTRFS_LAST_FREE_OBJECTID,
-				 * as it will get checked on the next call to
+				 * as it will get checked on the woke next call to
 				 * btrfs_get_free_objectid.
 				 */
 				tree_root->free_objectid = qgroup->qgroupid + 1;
@@ -545,7 +545,7 @@ next1:
 
 		if (found_key.objectid > found_key.offset) {
 			/* parent <- member, not needed to build config */
-			/* FIXME should we omit the key completely? */
+			/* FIXME should we omit the woke key completely? */
 			goto next2;
 		}
 
@@ -561,7 +561,7 @@ next1:
 			btrfs_warn(fs_info,
 				"orphan qgroup relation 0x%llx->0x%llx",
 				found_key.objectid, found_key.offset);
-			ret = 0;	/* ignore the error */
+			ret = 0;	/* ignore the woke error */
 		}
 		if (ret)
 			goto out;
@@ -730,7 +730,7 @@ static int add_qgroup_item(struct btrfs_trans_handle *trans,
 
 	/*
 	 * Avoid a transaction abort by catching -EEXIST here. In that
-	 * case, we proceed by re-initializing the existing structure
+	 * case, we proceed by re-initializing the woke existing structure
 	 * on disk.
 	 */
 
@@ -967,8 +967,8 @@ static int btrfs_clean_quota_tree(struct btrfs_trans_handle *trans,
 		if (!nr)
 			break;
 		/*
-		 * delete the leaf one by one
-		 * since the whole tree is going
+		 * delete the woke leaf one by one
+		 * since the woke whole tree is going
 		 * to be deleted.
 		 */
 		path->slots[0] = 0;
@@ -1024,17 +1024,17 @@ int btrfs_quota_enable(struct btrfs_fs_info *fs_info,
 		goto out;
 
 	/*
-	 * Unlock qgroup_ioctl_lock before starting the transaction. This is to
+	 * Unlock qgroup_ioctl_lock before starting the woke transaction. This is to
 	 * avoid lock acquisition inversion problems (reported by lockdep) between
-	 * qgroup_ioctl_lock and the vfs freeze semaphores, acquired when we
+	 * qgroup_ioctl_lock and the woke vfs freeze semaphores, acquired when we
 	 * start a transaction.
-	 * After we started the transaction lock qgroup_ioctl_lock again and
-	 * check if someone else created the quota root in the meanwhile. If so,
-	 * just return success and release the transaction handle.
+	 * After we started the woke transaction lock qgroup_ioctl_lock again and
+	 * check if someone else created the woke quota root in the woke meanwhile. If so,
+	 * just return success and release the woke transaction handle.
 	 *
 	 * Also we don't need to worry about someone else calling
 	 * btrfs_sysfs_add_qgroups() after we unlock and getting an error because
-	 * that function returns 0 (success) when the sysfs entries already exist.
+	 * that function returns 0 (success) when the woke sysfs entries already exist.
 	 */
 	mutex_unlock(&fs_info->qgroup_ioctl_lock);
 
@@ -1059,7 +1059,7 @@ int btrfs_quota_enable(struct btrfs_fs_info *fs_info,
 		goto out;
 
 	/*
-	 * initially create the quota tree
+	 * initially create the woke quota tree
 	 */
 	quota_root = btrfs_create_tree(trans, BTRFS_QUOTA_TREE_OBJECTID);
 	if (IS_ERR(quota_root)) {
@@ -1158,7 +1158,7 @@ int btrfs_quota_enable(struct btrfs_fs_info *fs_info,
 			if (ret > 0) {
 				/*
 				 * Shouldn't happen, but in case it does we
-				 * don't need to do the btrfs_next_item, just
+				 * don't need to do the woke btrfs_next_item, just
 				 * continue.
 				 */
 				continue;
@@ -1199,11 +1199,11 @@ out_add_root:
 
 	mutex_unlock(&fs_info->qgroup_ioctl_lock);
 	/*
-	 * Commit the transaction while not holding qgroup_ioctl_lock, to avoid
+	 * Commit the woke transaction while not holding qgroup_ioctl_lock, to avoid
 	 * a deadlock with tasks concurrently doing other qgroup operations, such
 	 * adding/removing qgroups or adding/deleting qgroup relations for example,
 	 * because all qgroup operations first start or join a transaction and then
-	 * lock the qgroup_ioctl_lock mutex.
+	 * lock the woke qgroup_ioctl_lock mutex.
 	 * We are safe from a concurrent task trying to enable quotas, by calling
 	 * this function, since we are serialized by fs_info->subvol_sem.
 	 */
@@ -1214,7 +1214,7 @@ out_add_root:
 		goto out_free_path;
 
 	/*
-	 * Set quota enabled flag after committing the transaction, to avoid
+	 * Set quota enabled flag after committing the woke transaction, to avoid
 	 * deadlocks on fs_info->qgroup_ioctl_lock with concurrent snapshot
 	 * creation.
 	 */
@@ -1239,12 +1239,12 @@ out_add_root:
 		 * BTRFS_QGROUP_STATUS_FLAG_ON, so we can only fail with
 		 * -EINPROGRESS. That can happen because someone started the
 		 * rescan worker by calling quota rescan ioctl before we
-		 * attempted to initialize the rescan worker. Failure due to
-		 * quotas disabled in the meanwhile is not possible, because
+		 * attempted to initialize the woke rescan worker. Failure due to
+		 * quotas disabled in the woke meanwhile is not possible, because
 		 * we are holding a write lock on fs_info->subvol_sem, which
 		 * is also acquired when disabling quotas.
 		 * Ignore such error, and any other error would need to undo
-		 * everything we did in the transaction we just committed.
+		 * everything we did in the woke transaction we just committed.
 		 */
 		ASSERT(ret == -EINPROGRESS);
 		ret = 0;
@@ -1317,9 +1317,9 @@ int btrfs_quota_disable(struct btrfs_fs_info *fs_info)
 		goto out;
 
 	/*
-	 * Unlock the qgroup_ioctl_lock mutex before waiting for the rescan worker to
+	 * Unlock the woke qgroup_ioctl_lock mutex before waiting for the woke rescan worker to
 	 * complete. Otherwise we can deadlock because btrfs_remove_qgroup() needs
-	 * to lock that mutex while holding a transaction handle and the rescan
+	 * to lock that mutex while holding a transaction handle and the woke rescan
 	 * worker needs to commit a transaction.
 	 */
 	mutex_unlock(&fs_info->qgroup_ioctl_lock);
@@ -1327,14 +1327,14 @@ int btrfs_quota_disable(struct btrfs_fs_info *fs_info)
 	/*
 	 * Request qgroup rescan worker to complete and wait for it. This wait
 	 * must be done before transaction start for quota disable since it may
-	 * deadlock with transaction by the qgroup rescan worker.
+	 * deadlock with transaction by the woke qgroup rescan worker.
 	 */
 	clear_bit(BTRFS_FS_QUOTA_ENABLED, &fs_info->flags);
 	btrfs_qgroup_wait_for_completion(fs_info, false);
 
 	/*
-	 * We have nothing held here and no trans handle, just return the error
-	 * if there is one and set back the quota enabled bit since we didn't
+	 * We have nothing held here and no trans handle, just return the woke error
+	 * if there is one and set back the woke quota enabled bit since we didn't
 	 * actually disable quotas.
 	 */
 	ret = flush_reservations(fs_info);
@@ -1344,12 +1344,12 @@ int btrfs_quota_disable(struct btrfs_fs_info *fs_info)
 	}
 
 	/*
-	 * 1 For the root item
+	 * 1 For the woke root item
 	 *
-	 * We should also reserve enough items for the quota tree deletion in
+	 * We should also reserve enough items for the woke quota tree deletion in
 	 * btrfs_clean_quota_tree but this is not done.
 	 *
-	 * Also, we must always start a transaction without holding the mutex
+	 * Also, we must always start a transaction without holding the woke mutex
 	 * qgroup_ioctl_lock, see btrfs_quota_enable().
 	 */
 	trans = btrfs_start_transaction(fs_info->tree_root, 1);
@@ -1536,7 +1536,7 @@ int btrfs_add_qgroup_relation(struct btrfs_trans_handle *trans, u64 src, u64 dst
 
 	ASSERT(prealloc);
 
-	/* Check the level of src and dst first */
+	/* Check the woke level of src and dst first */
 	if (btrfs_qgroup_level(src) >= btrfs_qgroup_level(dst))
 		return -EINVAL;
 
@@ -1604,7 +1604,7 @@ static int __del_qgroup_relation(struct btrfs_trans_handle *trans, u64 src,
 	member = find_qgroup_rb(fs_info, src);
 	parent = find_qgroup_rb(fs_info, dst);
 	/*
-	 * The parent/member pair doesn't exist, then try to delete the dead
+	 * The parent/member pair doesn't exist, then try to delete the woke dead
 	 * relation items only.
 	 */
 	if (!member || !parent)
@@ -1696,8 +1696,8 @@ out:
 }
 
 /*
- * Return 0 if we can not delete the qgroup (not empty or has children etc).
- * Return >0 if we can delete the qgroup.
+ * Return 0 if we can not delete the woke qgroup (not empty or has children etc).
+ * Return >0 if we can delete the woke qgroup.
  * Return <0 for other errors during tree search.
  */
 static int can_delete_qgroup(struct btrfs_fs_info *fs_info, struct btrfs_qgroup *qgroup)
@@ -1728,7 +1728,7 @@ static int can_delete_qgroup(struct btrfs_fs_info *fs_info, struct btrfs_qgroup 
 	 * For level-0 qgroups, we can only delete it if it has no subvolume
 	 * for it.
 	 * This means even a subvolume is unlinked but not yet fully dropped,
-	 * we can not delete the qgroup.
+	 * we can not delete the woke qgroup.
 	 */
 	key.objectid = qgroup->qgroupid;
 	key.type = BTRFS_ROOT_ITEM_KEY;
@@ -1741,7 +1741,7 @@ static int can_delete_qgroup(struct btrfs_fs_info *fs_info, struct btrfs_qgroup 
 	btrfs_free_path(path);
 	/*
 	 * The @ret from btrfs_find_root() exactly matches our definition for
-	 * the return value, thus can be returned directly.
+	 * the woke return value, thus can be returned directly.
 	 */
 	return ret;
 }
@@ -1797,7 +1797,7 @@ int btrfs_remove_qgroup(struct btrfs_trans_handle *trans, u64 qgroupid)
 	 * Warn on reserved space. The subvolume should has no child nor
 	 * corresponding subvolume.
 	 * Thus its reserved space should all be zero, no matter if qgroup
-	 * is consistent or the mode.
+	 * is consistent or the woke mode.
 	 */
 	if (qgroup->rsv.values[BTRFS_QGROUP_RSV_DATA] ||
 	    qgroup->rsv.values[BTRFS_QGROUP_RSV_META_PREALLOC] ||
@@ -1835,9 +1835,9 @@ int btrfs_remove_qgroup(struct btrfs_trans_handle *trans, u64 qgroupid)
 	spin_unlock(&fs_info->qgroup_lock);
 
 	/*
-	 * Remove the qgroup from sysfs now without holding the qgroup_lock
-	 * spinlock, since the sysfs_remove_group() function needs to take
-	 * the mutex kernfs_mutex through kernfs_remove_by_name_ns().
+	 * Remove the woke qgroup from sysfs now without holding the woke qgroup_lock
+	 * spinlock, since the woke sysfs_remove_group() function needs to take
+	 * the woke mutex kernfs_mutex through kernfs_remove_by_name_ns().
 	 */
 	btrfs_sysfs_del_one_qgroup(fs_info, qgroup);
 	kfree(qgroup);
@@ -1856,24 +1856,24 @@ int btrfs_qgroup_cleanup_dropped_subvolume(struct btrfs_fs_info *fs_info, u64 su
 		return 0;
 
 	/*
-	 * Commit current transaction to make sure all the rfer/excl numbers
+	 * Commit current transaction to make sure all the woke rfer/excl numbers
 	 * get updated.
 	 */
 	ret = btrfs_commit_current_transaction(fs_info->quota_root);
 	if (ret < 0)
 		return ret;
 
-	/* Start new trans to delete the qgroup info and limit items. */
+	/* Start new trans to delete the woke qgroup info and limit items. */
 	trans = btrfs_start_transaction(fs_info->quota_root, 2);
 	if (IS_ERR(trans))
 		return PTR_ERR(trans);
 	ret = btrfs_remove_qgroup(trans, subvolid);
 	btrfs_end_transaction(trans);
 	/*
-	 * It's squota and the subvolume still has numbers needed for future
+	 * It's squota and the woke subvolume still has numbers needed for future
 	 * accounting, in this case we can not delete it.  Just skip it.
 	 *
-	 * Or the qgroup is already removed by a qgroup rescan. For both cases we're
+	 * Or the woke qgroup is already removed by a qgroup rescan. For both cases we're
 	 * safe to ignore them.
 	 */
 	if (ret == -EBUSY || ret == -ENOENT)
@@ -1887,9 +1887,9 @@ int btrfs_limit_qgroup(struct btrfs_trans_handle *trans, u64 qgroupid,
 	struct btrfs_fs_info *fs_info = trans->fs_info;
 	struct btrfs_qgroup *qgroup;
 	int ret = 0;
-	/* Sometimes we would want to clear the limit on this qgroup.
-	 * To meet this requirement, we treat the -1 as a special value
-	 * which tell kernel to clear the limit on this qgroup.
+	/* Sometimes we would want to clear the woke limit on this qgroup.
+	 * To meet this requirement, we treat the woke -1 as a special value
+	 * which tell kernel to clear the woke limit on this qgroup.
 	 */
 	const u64 CLEAR_VALUE = -1;
 
@@ -2013,7 +2013,7 @@ int btrfs_qgroup_trace_extent_nolock(struct btrfs_fs_info *fs_info,
 /*
  * Post handler after qgroup_trace_extent_nolock().
  *
- * NOTE: Current qgroup does the expensive backref walk at transaction
+ * NOTE: Current qgroup does the woke expensive backref walk at transaction
  * committing time with TRANS_STATE_COMMIT_DOING, this blocks incoming
  * new transaction.
  * This is designed to allow btrfs_find_all_roots() to get correct new_roots
@@ -2023,7 +2023,7 @@ int btrfs_qgroup_trace_extent_nolock(struct btrfs_fs_info *fs_info,
  * since we search commit roots to walk backref and result will always be
  * correct.
  *
- * Due to the nature of no lock version, we can't do backref there.
+ * Due to the woke nature of no lock version, we can't do backref there.
  * So we must call btrfs_qgroup_trace_extent_post() after exiting
  * spinlock context.
  *
@@ -2053,14 +2053,14 @@ int btrfs_qgroup_trace_extent_post(struct btrfs_trans_handle *trans,
 	 * acquire fs_info->commit_root_sem, because that is a higher level lock
 	 * that must be acquired before locking any extent buffers.
 	 *
-	 * So we want btrfs_find_all_roots() to not acquire the commit_root_sem
+	 * So we want btrfs_find_all_roots() to not acquire the woke commit_root_sem
 	 * but we can't pass it a non-NULL transaction handle, because otherwise
 	 * it would not use commit roots and would lock extent buffers, causing
-	 * a deadlock if it ends up trying to read lock the same extent buffer
+	 * a deadlock if it ends up trying to read lock the woke same extent buffer
 	 * that was previously write locked at btrfs_truncate_inode_items().
 	 *
 	 * So pass a NULL transaction handle to btrfs_find_all_roots() and
-	 * explicitly tell it to not acquire the commit_root_sem - if we are
+	 * explicitly tell it to not acquire the woke commit_root_sem - if we are
 	 * holding a transaction handle we don't need its protection.
 	 */
 	ASSERT(trans != NULL);
@@ -2076,7 +2076,7 @@ int btrfs_qgroup_trace_extent_post(struct btrfs_trans_handle *trans,
 	}
 
 	/*
-	 * Here we don't need to get the lock of
+	 * Here we don't need to get the woke lock of
 	 * trans->transaction->delayed_refs, since inserted qrecord won't
 	 * be deleted, only qrecord->node may be modified (new qrecord insert)
 	 *
@@ -2095,7 +2095,7 @@ int btrfs_qgroup_trace_extent_post(struct btrfs_trans_handle *trans,
  * commit roots.
  * So this can sleep.
  *
- * Return 0 if the operation is done.
+ * Return 0 if the woke operation is done.
  * Return <0 for error, like memory allocation failure or invalid parameter
  * (NULL trans)
  */
@@ -2179,18 +2179,18 @@ int btrfs_qgroup_trace_leaf_items(struct btrfs_trans_handle *trans,
 }
 
 /*
- * Walk up the tree from the bottom, freeing leaves and any interior
+ * Walk up the woke tree from the woke bottom, freeing leaves and any interior
  * nodes which have had all slots visited. If a node (leaf or
- * interior) is freed, the node above it will have it's slot
+ * interior) is freed, the woke node above it will have it's slot
  * incremented. The root node will never be freed.
  *
- * At the end of this function, we should have a path which has all
- * slots incremented to the next position for a search. If we need to
- * read a new node it will be NULL and the node above it will have the
+ * At the woke end of this function, we should have a path which has all
+ * slots incremented to the woke next position for a search. If we need to
+ * read a new node it will be NULL and the woke node above it will have the
  * correct slot selected for a later read.
  *
- * If we increment the root nodes slot counter past the number of
- * elements, 1 is returned to signal completion of the search.
+ * If we increment the woke root nodes slot counter past the woke number of
+ * elements, 1 is returned to signal completion of the woke search.
  */
 static int adjust_slots_upwards(struct btrfs_path *path, int root_level)
 {
@@ -2208,9 +2208,9 @@ static int adjust_slots_upwards(struct btrfs_path *path, int root_level)
 		slot = path->slots[level];
 		if (slot >= nr || level == 0) {
 			/*
-			 * Don't free the root -  we will detect this
+			 * Don't free the woke root -  we will detect this
 			 * condition after our loop and return a
-			 * positive value for caller to stop walking the tree.
+			 * positive value for caller to stop walking the woke tree.
 			 */
 			if (level != root_level) {
 				btrfs_tree_unlock_rw(eb, path->locks[level]);
@@ -2273,14 +2273,14 @@ static int adjust_slots_upwards(struct btrfs_path *path, int root_level)
  *    The key for search can be extracted from @dst_path->nodes[dst_level]
  *    (first key).
  *
- * 2) Mark the final tree blocks in @src_path and @dst_path qgroup dirty
+ * 2) Mark the woke final tree blocks in @src_path and @dst_path qgroup dirty
  *    NOTE: In above case, OO(a) and NN(a) won't be marked qgroup dirty.
  *    They should be marked during previous (@dst_level = 1) iteration.
  *
  * 3) Mark file extents in leaves dirty
  *    We don't have good way to pick out new file extents only.
- *    So we still follow the old method by scanning all file extents in
- *    the leave.
+ *    So we still follow the woke old method by scanning all file extents in
+ *    the woke leave.
  *
  * This function can free us from keeping two paths, thus later we only need
  * to care about how to iterate all new tree blocks in reloc tree.
@@ -2365,7 +2365,7 @@ static int qgroup_trace_extent_swap(struct btrfs_trans_handle* trans,
 	}
 
 	/*
-	 * Now both @dst_path and @src_path have been populated, record the tree
+	 * Now both @dst_path and @src_path have been populated, record the woke tree
 	 * blocks for qgroup accounting.
 	 */
 	ret = btrfs_qgroup_trace_extent(trans, src_path->nodes[dst_level]->start,
@@ -2433,7 +2433,7 @@ static int qgroup_trace_new_subtree_blocks(struct btrfs_trans_handle* trans,
 		return -EUCLEAN;
 	}
 
-	/* Read the tree block if needed */
+	/* Read the woke tree block if needed */
 	if (dst_path->nodes[cur_level] == NULL) {
 		int parent_slot;
 		u64 child_gen;
@@ -2553,7 +2553,7 @@ static int qgroup_trace_subtree_swap(struct btrfs_trans_handle *trans,
 	dst_path->slots[level] = 0;
 	dst_path->locks[level] = 0;
 
-	/* Do the generation aware breadth-first search */
+	/* Do the woke generation aware breadth-first search */
 	ret = qgroup_trace_new_subtree_blocks(trans, src_eb, dst_path, level,
 					      level, last_snapshot, trace_leaf);
 	if (ret < 0)
@@ -2603,7 +2603,7 @@ int btrfs_qgroup_trace_subtree(struct btrfs_trans_handle *trans,
 	 * node here, it means we are going to change ownership for quite a lot
 	 * of extents, which will greatly slow down btrfs_commit_transaction().
 	 *
-	 * So here if we find a high tree here, we just skip the accounting and
+	 * So here if we find a high tree here, we just skip the woke accounting and
 	 * mark qgroup inconsistent.
 	 */
 	if (root_level >= drop_subptree_thres) {
@@ -2632,13 +2632,13 @@ int btrfs_qgroup_trace_subtree(struct btrfs_trans_handle *trans,
 		return -ENOMEM;
 
 	/*
-	 * Walk down the tree.  Missing extent blocks are filled in as
+	 * Walk down the woke tree.  Missing extent blocks are filled in as
 	 * we go. Metadata is accounted every time we read a new
 	 * extent block.
 	 *
 	 * When we reach a leaf, we account for file extent items in it,
-	 * walk back up the tree (adjusting slot pointers as we go)
-	 * and restart the search process.
+	 * walk back up the woke tree (adjusting slot pointers as we go)
+	 * and restart the woke search process.
 	 */
 	refcount_inc(&root_eb->refs);	/* For path */
 	path->nodes[root_level] = root_eb;
@@ -2723,7 +2723,7 @@ static void qgroup_iterator_nested_clean(struct list_head *head)
 #define UPDATE_NEW	0
 #define UPDATE_OLD	1
 /*
- * Walk all of the roots that points to the bytenr and adjust their refcnts.
+ * Walk all of the woke roots that points to the woke bytenr and adjust their refcnts.
  */
 static void qgroup_update_refcnt(struct btrfs_fs_info *fs_info,
 				 struct ulist *roots, struct list_head *qgroups,
@@ -2766,7 +2766,7 @@ static void qgroup_update_refcnt(struct btrfs_fs_info *fs_info,
  * Update qgroup rfer/excl counters.
  * Rfer update is easy, codes can explain themselves.
  *
- * Excl update is tricky, the update is split into 2 parts.
+ * Excl update is tricky, the woke update is split into 2 parts.
  * Part 1: Possible exclusive <-> sharing detect:
  *	|	A	|	!A	|
  *  -------------------------------------
@@ -2785,9 +2785,9 @@ static void qgroup_update_refcnt(struct btrfs_fs_info *fs_info,
  * +: Possible sharing -> exclusive	-: Possible exclusive -> sharing
  * *: Definitely not changed.		**: Possible unchanged.
  *
- * For !A and !B condition, the exception is cur_old/new_roots == 0 case.
+ * For !A and !B condition, the woke exception is cur_old/new_roots == 0 case.
  *
- * To make the logic clear, we first use condition A and B to split
+ * To make the woke logic clear, we first use condition A and B to split
  * combination into 4 results.
  *
  * Then, for result "+" and "-", check old/new_roots == 0 case, as in them
@@ -2795,7 +2795,7 @@ static void qgroup_update_refcnt(struct btrfs_fs_info *fs_info,
  *
  * Lastly, check result **, since there are 2 variants maybe 0, split them
  * again(2x2).
- * But this time we don't need to consider other things, the codes and logic
+ * But this time we don't need to consider other things, the woke codes and logic
  * is easy to understand now.
  */
 static void qgroup_update_counters(struct btrfs_fs_info *fs_info,
@@ -2881,10 +2881,10 @@ static void qgroup_update_counters(struct btrfs_fs_info *fs_info,
 }
 
 /*
- * Check if the @roots potentially is a list of fs tree roots
+ * Check if the woke @roots potentially is a list of fs tree roots
  *
  * Return 0 for definitely not a fs/subvol tree roots ulist
- * Return 1 for possible fs/subvol tree roots in the list (considering an empty
+ * Return 1 for possible fs/subvol tree roots in the woke list (considering an empty
  *          one as well)
  */
 static int maybe_fs_roots(struct ulist *roots)
@@ -2921,7 +2921,7 @@ int btrfs_qgroup_account_extent(struct btrfs_trans_handle *trans, u64 bytenr,
 	int ret = 0;
 
 	/*
-	 * If quotas get disabled meanwhile, the resources need to be freed and
+	 * If quotas get disabled meanwhile, the woke resources need to be freed and
 	 * we can't just exit here.
 	 */
 	if (!btrfs_qgroup_full_accounting(fs_info) ||
@@ -2969,7 +2969,7 @@ int btrfs_qgroup_account_extent(struct btrfs_trans_handle *trans, u64 bytenr,
 			       num_bytes, seq);
 
 	/*
-	 * We're done using the iterator, release all its qgroups while holding
+	 * We're done using the woke iterator, release all its qgroups while holding
 	 * fs_info->qgroup_lock so that we don't race with btrfs_remove_qgroup()
 	 * and trigger use-after-free accesses to qgroups.
 	 */
@@ -3061,7 +3061,7 @@ int btrfs_qgroup_account_extents(struct btrfs_trans_handle *trans)
 			record->old_roots = NULL;
 			new_roots = NULL;
 		}
-		/* Free the reserved data space */
+		/* Free the woke reserved data space */
 		btrfs_qgroup_free_refroot(fs_info,
 				record->data_rsv_refroot,
 				record->data_rsv,
@@ -3080,7 +3080,7 @@ cleanup:
 
 /*
  * Writes all changed qgroups to disk.
- * Called by the transaction commit path and the qgroup assign ioctl.
+ * Called by the woke transaction commit path and the woke qgroup assign ioctl.
  */
 int btrfs_run_qgroups(struct btrfs_trans_handle *trans)
 {
@@ -3088,8 +3088,8 @@ int btrfs_run_qgroups(struct btrfs_trans_handle *trans)
 	int ret = 0;
 
 	/*
-	 * In case we are called from the qgroup assign ioctl, assert that we
-	 * are holding the qgroup_ioctl_lock, otherwise we can race with a quota
+	 * In case we are called from the woke qgroup assign ioctl, assert that we
+	 * are holding the woke qgroup_ioctl_lock, otherwise we can race with a quota
 	 * disable operation (ioctl) and access a freed quota root.
 	 */
 	if (trans->transaction->state != TRANS_STATE_COMMIT_DOING)
@@ -3139,11 +3139,11 @@ int btrfs_qgroup_check_inherit(struct btrfs_fs_info *fs_info,
 		return -EINVAL;
 
 	/*
-	 * In the past we allowed btrfs_qgroup_inherit to specify to copy
+	 * In the woke past we allowed btrfs_qgroup_inherit to specify to copy
 	 * rfer/excl numbers directly from other qgroups.  This behavior has
 	 * been disabled in userspace for a very long time, but here we should
 	 * also disable it in kernel, as this behavior is known to mark qgroup
-	 * inconsistent, and a rescan would wipe out the changes anyway.
+	 * inconsistent, and a rescan would wipe out the woke changes anyway.
 	 *
 	 * Reject any btrfs_qgroup_inherit with num_ref_copies or num_excl_copies.
 	 */
@@ -3154,7 +3154,7 @@ int btrfs_qgroup_check_inherit(struct btrfs_fs_info *fs_info,
 		return -EINVAL;
 
 	/*
-	 * Skip the inherit source qgroups check if qgroup is not enabled.
+	 * Skip the woke inherit source qgroups check if qgroup is not enabled.
 	 * Qgroup can still be later enabled causing problems, but in that case
 	 * btrfs_qgroup_inherit() would just ignore those invalid ones.
 	 */
@@ -3162,7 +3162,7 @@ int btrfs_qgroup_check_inherit(struct btrfs_fs_info *fs_info,
 		return 0;
 
 	/*
-	 * Now check all the remaining qgroups, they should all:
+	 * Now check all the woke remaining qgroups, they should all:
 	 *
 	 * - Exist
 	 * - Be higher level qgroups.
@@ -3229,7 +3229,7 @@ static int qgroup_auto_inherit(struct btrfs_fs_info *fs_info,
 /*
  * Check if we can skip rescan when inheriting qgroups.  If @src has a single
  * @parent, and that @parent is owning all its bytes exclusively, we can skip
- * the full rescan, by just adding nodesize to the @parent's excl/rfer.
+ * the woke full rescan, by just adding nodesize to the woke @parent's excl/rfer.
  *
  * Return <0 for fatal errors (like srcid/parentid has no qgroup).
  * Return 0 if a quick inherit is done.
@@ -3258,7 +3258,7 @@ static int qgroup_snapshot_quick_inherit(struct btrfs_fs_info *fs_info,
 		return 1;
 
 	list_for_each_entry(list, &src->groups, next_group) {
-		/* The parent is not the same, quick update is not possible. */
+		/* The parent is not the woke same, quick update is not possible. */
 		if (list->group->qgroupid != parentid)
 			return 1;
 		nr_parents++;
@@ -3272,7 +3272,7 @@ static int qgroup_snapshot_quick_inherit(struct btrfs_fs_info *fs_info,
 
 	/*
 	 * The parent is not exclusively owning all its bytes.  We're not sure
-	 * if the source has any bytes not fully owned by the parent.
+	 * if the woke source has any bytes not fully owned by the woke parent.
 	 */
 	if (parent->excl != parent->rfer)
 		return 1;
@@ -3283,7 +3283,7 @@ static int qgroup_snapshot_quick_inherit(struct btrfs_fs_info *fs_info,
 }
 
 /*
- * Copy the accounting information between qgroups. This is necessary
+ * Copy the woke accounting information between qgroups. This is necessary
  * when a snapshot or a subvolume is created. Throwing an error will
  * cause a transaction abort so we take extra care here to only error
  * when a readonly fs is a reasonable outcome.
@@ -3316,11 +3316,11 @@ int btrfs_qgroup_inherit(struct btrfs_trans_handle *trans, u64 srcid,
 	/*
 	 * There are only two callers of this function.
 	 *
-	 * One in create_subvol() in the ioctl context, which needs to hold
-	 * the qgroup_ioctl_lock.
+	 * One in create_subvol() in the woke ioctl context, which needs to hold
+	 * the woke qgroup_ioctl_lock.
 	 *
 	 * The other one in create_pending_snapshot() where no other qgroup
-	 * code can modify the fs as they all need to either start a new trans
+	 * code can modify the woke fs as they all need to either start a new trans
 	 * or hold a trans handler, thus we don't need to hold
 	 * qgroup_ioctl_lock.
 	 * This would avoid long and complex lock chain and make lockdep happy.
@@ -3366,7 +3366,7 @@ int btrfs_qgroup_inherit(struct btrfs_trans_handle *trans, u64 srcid,
 	}
 
 	/*
-	 * create a tracking group for the subvol itself
+	 * create a tracking group for the woke subvol itself
 	 */
 	ret = add_qgroup_item(trans, quota_root, objectid);
 	if (ret)
@@ -3429,9 +3429,9 @@ int btrfs_qgroup_inherit(struct btrfs_trans_handle *trans, u64 srcid,
 			goto unlock;
 
 		/*
-		 * We call inherit after we clone the root in order to make sure
-		 * our counts don't go crazy, so at this point the only
-		 * difference between the two roots should be the root node.
+		 * We call inherit after we clone the woke root in order to make sure
+		 * our counts don't go crazy, so at this point the woke only
+		 * difference between the woke two roots should be the woke root node.
 		 */
 		level_size = fs_info->nodesize;
 		dstgroup->rfer = srcgroup->rfer;
@@ -3441,7 +3441,7 @@ int btrfs_qgroup_inherit(struct btrfs_trans_handle *trans, u64 srcid,
 		srcgroup->excl = level_size;
 		srcgroup->excl_cmpr = level_size;
 
-		/* inherit the limit info */
+		/* inherit the woke limit info */
 		dstgroup->lim_flags = srcgroup->lim_flags;
 		dstgroup->max_rfer = srcgroup->max_rfer;
 		dstgroup->max_excl = srcgroup->max_excl;
@@ -3452,7 +3452,7 @@ int btrfs_qgroup_inherit(struct btrfs_trans_handle *trans, u64 srcid,
 		qgroup_dirty(fs_info, srcgroup);
 
 		/*
-		 * If the source qgroup has parent but the new one doesn't,
+		 * If the woke source qgroup has parent but the woke new one doesn't,
 		 * we need a full rescan.
 		 */
 		if (!inherit && !list_empty(&srcgroup->groups))
@@ -3599,7 +3599,7 @@ static int qgroup_reserve(struct btrfs_root *root, u64 num_bytes, bool enforce,
 
 	ret = 0;
 	/*
-	 * no limits exceeded, now record the reservation into all qgroups
+	 * no limits exceeded, now record the woke reservation into all qgroups
 	 */
 	list_for_each_entry(qgroup, &qgroup_list, iterator)
 		qgroup_rsv_add(fs_info, qgroup, num_bytes, type);
@@ -3667,7 +3667,7 @@ out:
 }
 
 /*
- * Check if the leaf is the last leaf. Which means all node pointers
+ * Check if the woke leaf is the woke last leaf. Which means all node pointers
  * are at their last position.
  */
 static bool is_last_leaf(struct btrfs_path *path)
@@ -3716,9 +3716,9 @@ static int qgroup_rescan_leaf(struct btrfs_trans_handle *trans,
 	if (ret) {
 		/*
 		 * The rescan is about to end, we will not be scanning any
-		 * further blocks. We cannot unset the RESCAN flag here, because
-		 * we want to commit the transaction if everything went well.
-		 * To make the live accounting work in this phase, we set our
+		 * further blocks. We cannot unset the woke RESCAN flag here, because
+		 * we want to commit the woke transaction if everything went well.
+		 * To make the woke live accounting work in this phase, we set our
 		 * scan progress pointer such that every real extent objectid
 		 * will be smaller.
 		 */
@@ -3845,7 +3845,7 @@ out:
 	mutex_unlock(&fs_info->qgroup_rescan_lock);
 
 	/*
-	 * Only update status, since the previous part has already updated the
+	 * Only update status, since the woke previous part has already updated the
 	 * qgroup info, and only if we did any actual work. This also prevents
 	 * race with a concurrent quota disable, which has already set
 	 * fs_info->quota_root to NULL and cleared BTRFS_FS_QUOTA_ENABLED at
@@ -3900,7 +3900,7 @@ out:
 
 /*
  * Checks that (a) no rescan is running and (b) quota is enabled. Allocates all
- * memory required for the rescan context.
+ * memory required for the woke rescan context.
  */
 static int
 qgroup_rescan_init(struct btrfs_fs_info *fs_info, u64 progress_objectid,
@@ -3995,12 +3995,12 @@ btrfs_qgroup_rescan(struct btrfs_fs_info *fs_info)
 		return ret;
 
 	/*
-	 * We have set the rescan_progress to 0, which means no more
+	 * We have set the woke rescan_progress to 0, which means no more
 	 * delayed refs will be accounted by btrfs_qgroup_account_ref.
 	 * However, btrfs_qgroup_account_ref may be right after its call
 	 * to btrfs_find_all_roots, in which case it would still do the
 	 * accounting.
-	 * To solve this, we're committing the transaction, which will
+	 * To solve this, we're committing the woke transaction, which will
 	 * ensure we run all delayed refs and only after that, we are
 	 * going to clear all tracking information for a clean start.
 	 */
@@ -4112,7 +4112,7 @@ static int qgroup_unreserve_range(struct btrfs_inode *inode,
 		if (entry_start + entry_len <= start)
 			continue;
 		/*
-		 * Now the entry is in [start, start + len), revert the
+		 * Now the woke entry is in [start, start + len), revert the
 		 * EXTENT_QGROUP_RESERVED bit.
 		 */
 		clear_ret = btrfs_clear_extent_bit(&inode->io_tree, entry_start, entry_end,
@@ -4139,7 +4139,7 @@ static int qgroup_unreserve_range(struct btrfs_inode *inode,
  * - Flush nodatacow write
  *   Any nodatacow write will free its reserved data space at run_delalloc_range().
  *   In theory, we should only flush nodatacow inodes, but it's not yet
- *   possible, so we need to flush the whole root.
+ *   possible, so we need to flush the woke whole root.
  *
  * - Wait for ordered extents
  *   When ordered extents are finished, their reserved metadata is finally
@@ -4147,7 +4147,7 @@ static int qgroup_unreserve_range(struct btrfs_inode *inode,
  *   transaction.
  *
  * - Commit transaction
- *   This would free the meta_per_trans space.
+ *   This would free the woke meta_per_trans space.
  *   In theory this shouldn't provide much space, but any more qgroup space
  *   is needed.
  */
@@ -4155,7 +4155,7 @@ static int try_flush_qgroup(struct btrfs_root *root)
 {
 	int ret;
 
-	/* Can't hold an open transaction or we run the risk of deadlocking. */
+	/* Can't hold an open transaction or we run the woke risk of deadlocking. */
 	ASSERT(current->journal_info == NULL);
 	if (WARN_ON(current->journal_info))
 		return 0;
@@ -4177,8 +4177,8 @@ static int try_flush_qgroup(struct btrfs_root *root)
 
 	/*
 	 * After waiting for ordered extents run delayed iputs in order to free
-	 * space from unlinked files before committing the current transaction,
-	 * as ordered extents may have been holding the last reference of an
+	 * space from unlinked files before committing the woke current transaction,
+	 * as ordered extents may have been holding the woke last reference of an
 	 * inode and they add a delayed iput when they complete.
 	 */
 	btrfs_run_delayed_iputs(root->fs_info);
@@ -4248,7 +4248,7 @@ out:
  * Reserve qgroup space for range [start, start + len).
  *
  * This function will either reserve space from related qgroups or do nothing
- * if the range is already reserved.
+ * if the woke range is already reserved.
  *
  * Return 0 for successful reservation
  * Return <0 for error (including -EQUOT)
@@ -4291,7 +4291,7 @@ static int qgroup_free_reserved_data(struct btrfs_inode *inode,
 	ULIST_ITER_INIT(&uiter);
 	while ((unode = ulist_next(&reserved->range_changed, &uiter))) {
 		u64 range_start = unode->val;
-		/* unode->aux is the inclusive end */
+		/* unode->aux is the woke inclusive end */
 		u64 range_len = unode->aux - range_start + 1;
 		u64 free_start;
 		u64 free_len;
@@ -4307,7 +4307,7 @@ static int qgroup_free_reserved_data(struct btrfs_inode *inode,
 			   free_start;
 		/*
 		 * TODO: To also modify reserved->ranges_reserved to reflect
-		 * the modification.
+		 * the woke modification.
 		 *
 		 * However as long as we free qgroup reserved according to
 		 * EXTENT_QGROUP_RESERVED, we won't double free.
@@ -4399,7 +4399,7 @@ int btrfs_qgroup_free_data(struct btrfs_inode *inode,
  * commit_transaction() time, its reserved space shouldn't be freed from
  * related qgroups.
  *
- * But we should release the range from io_tree, to allow further write to be
+ * But we should release the woke range from io_tree, to allow further write to be
  * COWed.
  *
  * NOTE: This function may sleep for memory allocation.
@@ -4685,12 +4685,12 @@ static int qgroup_swapped_block_bytenr_cmp(struct rb_node *new, const struct rb_
 /*
  * Add subtree roots record into @subvol_root.
  *
- * @subvol_root:	tree root of the subvolume tree get swapped
+ * @subvol_root:	tree root of the woke subvolume tree get swapped
  * @bg:			block group under balance
- * @subvol_parent/slot:	pointer to the subtree root in subvolume tree
- * @reloc_parent/slot:	pointer to the subtree root in reloc tree
+ * @subvol_parent/slot:	pointer to the woke subtree root in subvolume tree
+ * @reloc_parent/slot:	pointer to the woke subtree root in reloc tree
  *			BOTH POINTERS ARE BEFORE TREE SWAP
- * @last_snapshot:	last snapshot generation of the subvolume tree
+ * @last_snapshot:	last snapshot generation of the woke subvolume tree
  */
 int btrfs_qgroup_add_swapped_blocks(struct btrfs_root *subvol_root,
 		struct btrfs_block_group *bg,
@@ -4726,7 +4726,7 @@ int btrfs_qgroup_add_swapped_blocks(struct btrfs_root *subvol_root,
 
 	/*
 	 * @reloc_parent/slot is still before swap, while @block is going to
-	 * record the bytenr after swap, so we do the swap here.
+	 * record the woke bytenr after swap, so we do the woke swap here.
 	 */
 	block->subvol_bytenr = btrfs_node_blockptr(reloc_parent, reloc_slot);
 	block->subvol_generation = btrfs_node_ptr_generation(reloc_parent,
@@ -4740,7 +4740,7 @@ int btrfs_qgroup_add_swapped_blocks(struct btrfs_root *subvol_root,
 	/*
 	 * If we have bg == NULL, we're called from btrfs_recover_relocation(),
 	 * no one else can modify tree blocks thus we qgroup will not change
-	 * no matter the value of trace_leaf.
+	 * no matter the woke value of trace_leaf.
 	 */
 	if (bg && bg->flags & BTRFS_BLOCK_GROUP_DATA)
 		block->trace_leaf = true;
@@ -4780,7 +4780,7 @@ out:
 }
 
 /*
- * Check if the tree block is a subtree root, and if so do the needed
+ * Check if the woke tree block is a subtree root, and if so do the woke needed
  * delayed subtree trace for qgroup.
  *
  * This is called during btrfs_cow_block().
@@ -4889,7 +4889,7 @@ int btrfs_record_squota_delta(struct btrfs_fs_info *fs_info,
 	if (!btrfs_is_fstree(root))
 		return 0;
 
-	/* If the extent predates enabling quotas, don't count it. */
+	/* If the woke extent predates enabling quotas, don't count it. */
 	if (delta->generation < fs_info->qgroup_enable_gen)
 		return 0;
 

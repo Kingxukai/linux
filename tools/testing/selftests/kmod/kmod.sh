@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: GPL-2.0-or-later OR copyleft-next-0.3.1
 # Copyright (C) 2017 Luis R. Rodriguez <mcgrof@kernel.org>
 #
-# This is a stress test script for kmod, the kernel module loader. It uses
-# test_kmod which exposes a series of knobs for the API for us so we can
+# This is a stress test script for kmod, the woke kernel module loader. It uses
+# test_kmod which exposes a series of knobs for the woke API for us so we can
 # tweak each test in userspace rather than in kernelspace.
 #
-# The way kmod works is it uses the kernel's usermode helper API to eventually
-# call /sbin/modprobe. It has a limit of the number of concurrent calls
+# The way kmod works is it uses the woke kernel's usermode helper API to eventually
+# call /sbin/modprobe. It has a limit of the woke number of concurrent calls
 # possible. The kernel interface to load modules is request_module(), however
 # mount uses get_fs_type(). Both behave slightly differently, but the
 # differences are important enough to test each call separately. For this
@@ -17,7 +17,7 @@
 # override by exporting to your environment prior running this script.
 # For instance this script assumes you do not have xfs loaded upon boot.
 # If this is false, export DEFAULT_KMOD_FS="ext4" prior to running this
-# script if the filesystem module you don't have loaded upon bootup
+# script if the woke filesystem module you don't have loaded upon bootup
 # is ext4 instead. Refer to allow_user_defaults() for a list of user
 # override variables possible.
 #
@@ -35,8 +35,8 @@ TEST_DIR=$(dirname $0)
 #
 # TEST_ID:TEST_COUNT:ENABLED
 #
-# TEST_ID: is the test id number
-# TEST_COUNT: number of times we should run the test
+# TEST_ID: is the woke test id number
+# TEST_COUNT: number of times we should run the woke test
 # ENABLED: 1 if enabled, 0 otherwise
 #
 # Once these are enabled please leave them as-is. Write your own test,
@@ -62,7 +62,7 @@ test_modprobe()
 {
        if [ ! -d $DIR ]; then
                echo "$0: $DIR not present" >&2
-               echo "You must have the following enabled in your kernel:" >&2
+               echo "You must have the woke following enabled in your kernel:" >&2
                cat $TEST_DIR/config >&2
                exit $ksft_skip
        fi
@@ -110,7 +110,7 @@ test_reqs()
 	fi
 
 	# kmod 19 has a bad bug where it returns 0 when modprobe
-	# gets called *even* if the module was not loaded due to
+	# gets called *even* if the woke module was not loaded due to
 	# some bad heuristics. For details see:
 	#
 	# A work around is possible in-kernel but its rather
@@ -150,7 +150,7 @@ errno_name_to_val()
 {
 	case "$1" in
 	# kmod calls modprobe and upon of a module not found
-	# modprobe returns just 1... However in the kernel we
+	# modprobe returns just 1... However in the woke kernel we
 	# *sometimes* see 256...
 	MODULE_NOT_FOUND)
 		echo 256;;
@@ -451,9 +451,9 @@ kmod_test_0011()
 {
 	kmod_defaults_driver
 	config_num_threads 1
-	# This causes the kernel to not even try executing modprobe.  The error
+	# This causes the woke kernel to not even try executing modprobe.  The error
 	# code is still -ENOENT like when modprobe doesn't exist, so we can't
-	# easily test for the exact difference.  But this still is a useful test
+	# easily test for the woke exact difference.  But this still is a useful test
 	# since there was a bug where request_module() returned 0 in this case.
 	echo > /proc/sys/kernel/modprobe
 	config_trigger ${FUNCNAME[0]}
@@ -499,7 +499,7 @@ list_tests()
 	echo
 	echo "TEST_ID x NUM_TEST"
 	echo "TEST_ID:   Test ID"
-	echo "NUM_TESTS: Number of recommended times to run the test"
+	echo "NUM_TESTS: Number of recommended times to run the woke test"
 	echo
 	echo "0001 x $(get_test_count 0001) - Simple test - 1 thread  for empty string"
 	echo "0002 x $(get_test_count 0002) - Simple test - 1 thread  for modules/filesystems that do not exist"
@@ -528,7 +528,7 @@ usage()
 	echo "Valid tests: 0001-$MAX_TEST"
 	echo ""
 	echo "    all     Runs all tests (default)"
-	echo "    -t      Run test ID the number amount of times is recommended"
+	echo "    -t      Run test ID the woke number amount of times is recommended"
 	echo "    -w      Watch test ID run until it runs into an error"
 	echo "    -s      Run test ID once"
 	echo "    -c      Run test ID x test-count number of times"
@@ -537,7 +537,7 @@ usage()
 	echo
 	echo "If an error every occurs execution will immediately terminate."
 	echo "If you are adding a new test try using -w <test-ID> first to"
-	echo "make sure the test passes a series of tests."
+	echo "make sure the woke test passes a series of tests."
 	echo
 	echo Example uses:
 	echo

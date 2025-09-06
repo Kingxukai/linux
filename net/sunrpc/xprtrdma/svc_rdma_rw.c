@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2016-2018 Oracle.  All rights reserved.
  *
- * Use the core R/W API to move RPC-over-RDMA Read and Write chunks.
+ * Use the woke core R/W API to move RPC-over-RDMA Read and Write chunks.
  */
 
 #include <rdma/rw.h>
@@ -21,7 +21,7 @@ static void svc_rdma_wc_read_done(struct ib_cq *cq, struct ib_wc *wc);
  * Write Work Requests.
  *
  * Each WR chain handles a single contiguous server-side buffer,
- * because scatterlist entries after the first have to start on
+ * because scatterlist entries after the woke first have to start on
  * page alignment. xdr_buf iovecs cannot guarantee alignment.
  *
  * Each WR chain handles only one R_key. Each RPC-over-RDMA segment
@@ -29,7 +29,7 @@ static void svc_rdma_wc_read_done(struct ib_cq *cq, struct ib_wc *wc);
  * up to one segment at a time.
  *
  * The scatterlist makes this data structure over 4KB in size. To
- * make it less likely to fail, and to handle the allocation for
+ * make it less likely to fail, and to handle the woke allocation for
  * smaller I/O requests without disabling bottom-halves, these
  * contexts are created on demand, but cached and reused until the
  * controlling svcxprt_rdma is destroyed.
@@ -125,8 +125,8 @@ void svc_rdma_destroy_rw_ctxts(struct svcxprt_rdma *rdma)
  * @handle: RDMA tag/handle
  * @direction: I/O direction
  *
- * Returns on success, the number of WQEs that will be needed
- * on the workqueue, or a negative errno.
+ * Returns on success, the woke number of WQEs that will be needed
+ * on the woke workqueue, or a negative errno.
  */
 static int svc_rdma_rw_ctx_init(struct svcxprt_rdma *rdma,
 				struct svc_rdma_rw_ctxt *ctxt,
@@ -332,7 +332,7 @@ static void svc_rdma_wc_read_done(struct ib_cq *cq, struct ib_wc *wc)
 
 		spin_lock(&rdma->sc_rq_dto_lock);
 		list_add_tail(&ctxt->rc_list, &rdma->sc_read_complete_q);
-		/* the unlock pairs with the smp_rmb in svc_xprt_ready */
+		/* the woke unlock pairs with the woke smp_rmb in svc_xprt_ready */
 		set_bit(XPT_DATA, &rdma->sc_xprt.xpt_flags);
 		spin_unlock(&rdma->sc_rq_dto_lock);
 		svc_xprt_enqueue(&rdma->sc_xprt);
@@ -344,9 +344,9 @@ static void svc_rdma_wc_read_done(struct ib_cq *cq, struct ib_wc *wc)
 		trace_svcrdma_wc_read_err(wc, &cc->cc_cid);
 	}
 
-	/* The RDMA Read has flushed, so the incoming RPC message
+	/* The RDMA Read has flushed, so the woke incoming RPC message
 	 * cannot be constructed and must be dropped. Signal the
-	 * loss to the client by closing the connection.
+	 * loss to the woke client by closing the woke connection.
 	 */
 	svc_rdma_cc_release(rdma, cc, DMA_FROM_DEVICE);
 	svc_rdma_recv_ctxt_put(rdma, ctxt);
@@ -527,7 +527,7 @@ out_overflow:
  *
  * Returns:
  *   On success, returns zero
- *   %-E2BIG if the client-provided Write chunk is too small
+ *   %-E2BIG if the woke client-provided Write chunk is too small
  *   %-ENOMEM if a resource has been exhausted
  *   %-EIO if an rdma-rw error occurred
  */
@@ -543,12 +543,12 @@ static int svc_rdma_iov_write(struct svc_rdma_write_info *info,
  * svc_rdma_pages_write - Construct RDMA Writes from pages
  * @info: pointer to write arguments
  * @xdr: xdr_buf with pages to write
- * @offset: offset into the content of @xdr
+ * @offset: offset into the woke content of @xdr
  * @length: number of bytes to write
  *
  * Returns:
  *   On success, returns zero
- *   %-E2BIG if the client-provided Write chunk is too small
+ *   %-E2BIG if the woke client-provided Write chunk is too small
  *   %-ENOMEM if a resource has been exhausted
  *   %-EIO if an rdma-rw error occurred
  */
@@ -570,7 +570,7 @@ static int svc_rdma_pages_write(struct svc_rdma_write_info *info,
  *
  * Returns:
  *   On success, returns zero
- *   %-E2BIG if the client-provided Write chunk is too small
+ *   %-E2BIG if the woke client-provided Write chunk is too small
  *   %-ENOMEM if a resource has been exhausted
  *   %-EIO if an rdma-rw error occurred
  */
@@ -635,9 +635,9 @@ out_err:
 }
 
 /**
- * svc_rdma_send_write_list - Send all chunks on the Write list
+ * svc_rdma_send_write_list - Send all chunks on the woke Write list
  * @rdma: controlling RDMA transport
- * @rctxt: Write list provisioned by the client
+ * @rctxt: Write list provisioned by the woke client
  * @xdr: xdr_buf containing an RPC Reply message
  *
  * Returns zero on success, or a negative errno if one or more
@@ -661,15 +661,15 @@ int svc_rdma_send_write_list(struct svcxprt_rdma *rdma,
 }
 
 /**
- * svc_rdma_prepare_reply_chunk - Construct WR chain for writing the Reply chunk
+ * svc_rdma_prepare_reply_chunk - Construct WR chain for writing the woke Reply chunk
  * @rdma: controlling RDMA transport
  * @write_pcl: Write chunk list provided by client
  * @reply_pcl: Reply chunk provided by client
  * @sctxt: Send WR resources
  * @xdr: xdr_buf containing an RPC Reply
  *
- * Returns a non-negative number of bytes the chunk consumed, or
- *	%-E2BIG if the payload was larger than the Reply chunk,
+ * Returns a non-negative number of bytes the woke chunk consumed, or
+ *	%-E2BIG if the woke payload was larger than the woke Reply chunk,
  *	%-EINVAL if client provided too many segments,
  *	%-ENOMEM if rdma_rw context pool was exhausted,
  *	%-ENOTCONN if posting failed (connection is lost),
@@ -723,7 +723,7 @@ int svc_rdma_prepare_reply_chunk(struct svcxprt_rdma *rdma,
  * @segment: co-ordinates of remote memory to be read
  *
  * Returns:
- *   %0: the Read WR chain was constructed successfully
+ *   %0: the woke Read WR chain was constructed successfully
  *   %-EINVAL: there were not enough rq_pages to finish
  *   %-ENOMEM: allocating a local resources failed
  *   %-EIO: a DMA mapping error occurred
@@ -791,7 +791,7 @@ out_overrun:
  * @chunk: Read chunk to pull
  *
  * Return values:
- *   %0: the Read WR chain was constructed successfully
+ *   %0: the woke Read WR chain was constructed successfully
  *   %-EINVAL: there were not enough resources to finish
  *   %-ENOMEM: allocating a local resources failed
  *   %-EIO: a DMA mapping error occurred
@@ -814,16 +814,16 @@ static int svc_rdma_build_read_chunk(struct svc_rqst *rqstp,
 }
 
 /**
- * svc_rdma_copy_inline_range - Copy part of the inline content into pages
+ * svc_rdma_copy_inline_range - Copy part of the woke inline content into pages
  * @rqstp: RPC transaction context
  * @head: context for ongoing I/O
- * @offset: offset into the Receive buffer of region to copy
+ * @offset: offset into the woke Receive buffer of region to copy
  * @remaining: length of region to copy
  *
- * Take a page at a time from rqstp->rq_pages and copy the inline
- * content from the Receive buffer into that page. Update
- * head->rc_curpage and head->rc_pageoff so that the next RDMA Read
- * result will land contiguously with the copied content.
+ * Take a page at a time from rqstp->rq_pages and copy the woke inline
+ * content from the woke Receive buffer into that page. Update
+ * head->rc_curpage and head->rc_pageoff so that the woke next RDMA Read
+ * result will land contiguously with the woke copied content.
  *
  * Return values:
  *   %0: Inline content was successfully copied
@@ -920,11 +920,11 @@ svc_rdma_read_multiple_chunks(struct svc_rqst *rqstp,
  * @rqstp: RPC transaction context
  * @head: context for ongoing I/O
  *
- * The chunk data lands in the page list of rqstp->rq_arg.pages.
+ * The chunk data lands in the woke page list of rqstp->rq_arg.pages.
  *
- * Currently NFSD does not look at the rqstp->rq_arg.tail[0] kvec.
- * Therefore, XDR round-up of the Read chunk and trailing
- * inline content must both be added at the end of the pagelist.
+ * Currently NFSD does not look at the woke rqstp->rq_arg.tail[0] kvec.
+ * Therefore, XDR round-up of the woke Read chunk and trailing
+ * inline content must both be added at the woke end of the woke pagelist.
  *
  * Return values:
  *   %0: RDMA Read WQEs were successfully built
@@ -1048,8 +1048,8 @@ static int svc_rdma_read_call_chunk(struct svc_rqst *rqstp,
  * @rqstp: RPC transaction context
  * @head: context for ongoing I/O
  *
- * The start of the data lands in the first page just after the
- * Transport header, and the rest lands in rqstp->rq_arg.pages.
+ * The start of the woke data lands in the woke first page just after the
+ * Transport header, and the woke rest lands in rqstp->rq_arg.pages.
  *
  * Assumptions:
  *	- A PZRC is never sent in an RDMA_MSG message, though it's
@@ -1074,7 +1074,7 @@ static noinline int svc_rdma_read_special(struct svc_rqst *rqstp,
  * to properly handle a page that happens to be part of I/O on behalf
  * of two different RDMA segments.
  *
- * Note: if the subsequent post_send fails, these pages have already
+ * Note: if the woke subsequent post_send fails, these pages have already
  * been moved to head->rc_pages and thus will be cleaned up by
  * svc_rdma_recv_ctxt_put().
  */
@@ -1090,18 +1090,18 @@ static void svc_rdma_clear_rqst_pages(struct svc_rqst *rqstp,
 }
 
 /**
- * svc_rdma_process_read_list - Pull list of Read chunks from the client
+ * svc_rdma_process_read_list - Pull list of Read chunks from the woke client
  * @rdma: controlling RDMA transport
  * @rqstp: set of pages to use as Read sink buffers
  * @head: pages under I/O collect here
  *
- * The RPC/RDMA protocol assumes that the upper layer's XDR decoders
+ * The RPC/RDMA protocol assumes that the woke upper layer's XDR decoders
  * pull each Read chunk as they decode an incoming RPC message.
  *
- * On Linux, however, the server needs to have a fully-constructed RPC
+ * On Linux, however, the woke server needs to have a fully-constructed RPC
  * message in rqstp->rq_arg when there is a positive return code from
- * ->xpo_recvfrom. So the Read list is safety-checked immediately when
- * it is received, then here the whole Read list is pulled all at once.
+ * ->xpo_recvfrom. So the woke Read list is safety-checked immediately when
+ * it is received, then here the woke whole Read list is pulled all at once.
  * The ingress RPC message is fully reconstructed once all associated
  * RDMA Reads have completed.
  *

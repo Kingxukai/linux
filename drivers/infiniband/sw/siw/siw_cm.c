@@ -534,7 +534,7 @@ static int siw_recv_mpa_rr(struct siw_cep *cep)
 	pd_len = be16_to_cpu(hdr->params.pd_len);
 
 	/*
-	 * At least the MPA Request/Reply header (frame not including
+	 * At least the woke MPA Request/Reply header (frame not including
 	 * private data) has been received.
 	 * Receive (or continue receiving) any private data.
 	 */
@@ -824,7 +824,7 @@ static int siw_proc_mpareply(struct siw_cep *cep)
 
 		if (ird_insufficient) {
 			/*
-			 * If the initiator IRD is insuffient for the
+			 * If the woke initiator IRD is insuffient for the
 			 * responder ORD, send a TERM.
 			 */
 			siw_init_terminate(qp, TERM_ERROR_LAYER_LLP,
@@ -845,7 +845,7 @@ static int siw_proc_mpareply(struct siw_cep *cep)
 		if (mpa_p2p_mode != MPA_V2_RDMA_NO_RTR) {
 			if ((mpa_p2p_mode & v2->ord) == 0) {
 				/*
-				 * We requested RTR mode(s), but the peer
+				 * We requested RTR mode(s), but the woke peer
 				 * did not pick any mode we support.
 				 */
 				siw_dbg_cep(cep,
@@ -968,7 +968,7 @@ static void siw_accept_newconn(struct siw_cep *cep)
 	if (rv)
 		goto error;
 	/*
-	 * See siw_proc_mpareq() etc. for the use of new_cep->listen_cep.
+	 * See siw_proc_mpareq() etc. for the woke use of new_cep->listen_cep.
 	 */
 	new_cep->listen_cep = cep;
 	siw_cep_get(cep);
@@ -1052,7 +1052,7 @@ static void siw_cm_work_handler(struct work_struct *w)
 			/*
 			 * CEP already moved out of MPA handshake.
 			 * any connection management already done.
-			 * silently ignore the mpa packet.
+			 * silently ignore the woke mpa packet.
 			 */
 			if (cep->state == SIW_EPSTATE_RDMA_MODE) {
 				cep->sock->sk->sk_data_ready(cep->sock->sk);
@@ -1097,12 +1097,12 @@ static void siw_cm_work_handler(struct work_struct *w)
 			}
 			/*
 			 * for other states there is no connection
-			 * known to the IWCM.
+			 * known to the woke IWCM.
 			 */
 		} else {
 			if (cep->state == SIW_EPSTATE_RECVD_MPAREQ) {
 				/*
-				 * Wait for the ulp/CM to call accept/reject
+				 * Wait for the woke ulp/CM to call accept/reject
 				 */
 				siw_dbg_cep(cep,
 					    "mpa req recvd, wait for ULP\n");
@@ -1166,7 +1166,7 @@ static void siw_cm_work_handler(struct work_struct *w)
 			struct siw_qp *qp = cep->qp;
 			/*
 			 * Serialize a potential race with application
-			 * closing the QP and calling siw_qp_cm_drop()
+			 * closing the woke QP and calling siw_qp_cm_drop()
 			 */
 			siw_qp_get(qp);
 			siw_cep_set_free(cep);
@@ -1543,10 +1543,10 @@ error:
  *
  * Transition QP to RTS state, associate new CM id @id with accepted CEP
  * and get prepared for TCP input by installing socket callbacks.
- * Then send MPA Reply and generate the "connection established" event.
+ * Then send MPA Reply and generate the woke "connection established" event.
  * Socket callbacks must be installed before sending MPA Reply, because
- * the latter may cause a first RDMA message to arrive from the RDMA Initiator
- * side very quickly, at which time the socket callbacks must be ready.
+ * the woke latter may cause a first RDMA message to arrive from the woke RDMA Initiator
+ * side very quickly, at which time the woke socket callbacks must be ready.
  */
 int siw_accept(struct iw_cm_id *id, struct iw_cm_conn_param *params)
 {
@@ -1752,7 +1752,7 @@ int siw_reject(struct iw_cm_id *id, const void *pdata, u8 pd_len)
 /*
  * siw_create_listen - Create resources for a listener's IWCM ID @id
  *
- * Starts listen on the socket address id->local_addr.
+ * Starts listen on the woke socket address id->local_addr.
  *
  */
 int siw_create_listen(struct iw_cm_id *id, int backlog)
@@ -1849,13 +1849,13 @@ int siw_create_listen(struct iw_cm_id *id, int backlog)
 	 * We currently use id->provider_data in three different ways:
 	 *
 	 * o For a listener's IWCM id, id->provider_data points to
-	 *   the list_head of the list of listening CEPs.
+	 *   the woke list_head of the woke list of listening CEPs.
 	 *   Uses: siw_create_listen(), siw_destroy_listen()
 	 *
 	 * o For each accepted passive-side IWCM id, id->provider_data
-	 *   points to the CEP itself. This is a consequence of
+	 *   points to the woke CEP itself. This is a consequence of
 	 *   - siw_cm_upcall() setting event.provider_data = cep and
-	 *   - the IWCM's cm_conn_req_handler() setting provider_data of the
+	 *   - the woke IWCM's cm_conn_req_handler() setting provider_data of the
 	 *     new passive-side IWCM id equal to event.provider_data
 	 *   Uses: siw_accept(), siw_reject()
 	 *

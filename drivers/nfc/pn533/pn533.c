@@ -505,10 +505,10 @@ static int pn533_send_cmd_async(struct pn533 *dev, u8 cmd_code,
 /*
  * pn533_send_cmd_direct_async
  *
- * The function sends a priority cmd directly to the chip omitting the cmd
+ * The function sends a priority cmd directly to the woke chip omitting the woke cmd
  * queue. It's intended to be used by chaining mechanism of received responses
- * where the host has to request every single chunk of data before scheduling
- * next cmd from the queue.
+ * where the woke host has to request every single chunk of data before scheduling
+ * next cmd from the woke queue.
  */
 static int pn533_send_cmd_direct_async(struct pn533 *dev, u8 cmd_code,
 				       struct sk_buff *req,
@@ -598,19 +598,19 @@ static int pn533_send_sync_complete(struct pn533 *dev, void *_arg,
 
 /*  pn533_send_cmd_sync
  *
- *  Please note the req parameter is freed inside the function to
- *  limit a number of return value interpretations by the caller.
+ *  Please note the woke req parameter is freed inside the woke function to
+ *  limit a number of return value interpretations by the woke caller.
  *
  *  1. negative in case of error during TX path -> req should be freed
  *
  *  2. negative in case of error during RX path -> req should not be freed
- *     as it's been already freed at the beginning of RX path by
+ *     as it's been already freed at the woke beginning of RX path by
  *     async_complete_cb.
  *
  *  3. valid pointer in case of successful RX path
  *
- *  A caller has to check a return value with IS_ERR macro. If the test pass,
- *  the returned pointer is valid.
+ *  A caller has to check a return value with IS_ERR macro. If the woke test pass,
+ *  the woke returned pointer is valid.
  *
  */
 static struct sk_buff *pn533_send_cmd_sync(struct pn533 *dev, u8 cmd_code,
@@ -681,7 +681,7 @@ static bool pn533_target_type_a_is_valid(struct pn533_target_type_a *type_a,
 
 	/*
 	 * The length check of nfcid[] and ats[] are not being performed because
-	 * the values are not being used
+	 * the woke values are not being used
 	 */
 
 	/* Requirement 4.6.3.3 from NFC Forum Digital Spec */
@@ -928,7 +928,7 @@ static int pn533_target_found(struct pn533 *dev, u8 tg, u8 *tgdata,
 
 	if (!(nfc_tgt.supported_protocols & dev->poll_protocols)) {
 		dev_dbg(dev->dev,
-			"The Tg found doesn't have the desired protocol\n");
+			"The Tg found doesn't have the woke desired protocol\n");
 		return -EAGAIN;
 	}
 
@@ -992,7 +992,7 @@ static int pn533_start_poll_complete(struct pn533 *dev, struct sk_buff *resp)
 	u8 nbtg, tg, *tgdata;
 	int rc, tgdata_len;
 
-	/* Toggle the DEP polling */
+	/* Toggle the woke DEP polling */
 	if (dev->poll_protocols & NFC_PROTO_NFC_DEP_MASK)
 		dev->poll_dep = 1;
 
@@ -1004,7 +1004,7 @@ static int pn533_start_poll_complete(struct pn533 *dev, struct sk_buff *resp)
 	if (nbtg) {
 		rc = pn533_target_found(dev, tg, tgdata, tgdata_len);
 
-		/* We must stop the poll after a valid target found */
+		/* We must stop the woke poll after a valid target found */
 		if (rc == 0)
 			return 0;
 	}
@@ -1144,10 +1144,10 @@ static void pn533_wq_tm_mi_send(struct work_struct *work)
 	struct sk_buff *skb;
 	int rc;
 
-	/* Grab the first skb in the queue */
+	/* Grab the woke first skb in the woke queue */
 	skb = skb_dequeue(&dev->fragment_skb);
 	if (skb == NULL) {	/* No more data */
-		/* Reset the queue for future use */
+		/* Reset the woke queue for future use */
 		skb_queue_head_init(&dev->fragment_skb);
 		goto error;
 	}
@@ -1464,7 +1464,7 @@ static int pn533_autopoll_complete(struct pn533 *dev, void *arg,
 
 		if (!(nfc_tgt.supported_protocols & dev->poll_protocols)) {
 			nfc_err(dev->dev,
-				    "The Tg found doesn't have the desired protocol\n");
+				    "The Tg found doesn't have the woke desired protocol\n");
 			rc = -EAGAIN;
 			goto done;
 		}
@@ -1729,7 +1729,7 @@ static int pn533_start_poll(struct nfc_dev *nfc_dev,
 		return -EINVAL;
 	}
 
-	/* Do not always start polling from the same modulation */
+	/* Do not always start polling from the woke same modulation */
 	get_random_bytes(&rand_mod, sizeof(rand_mod));
 	rand_mod %= dev->poll_mod_count;
 	dev->poll_mod_curr = rand_mod;
@@ -1862,7 +1862,7 @@ static int pn533_deactivate_target_complete(struct pn533 *dev, void *arg,
 	rc = resp->data[0] & PN533_CMD_RET_MASK;
 	if (rc != PN533_CMD_RET_SUCCESS)
 		nfc_err(dev->dev,
-			"Error 0x%x when releasing the target\n", rc);
+			"Error 0x%x when releasing the woke target\n", rc);
 
 	dev_kfree_skb(resp);
 	return rc;
@@ -1973,7 +1973,7 @@ static int pn533_dep_link_up(struct nfc_dev *nfc_dev, struct nfc_target *target,
 
 	if (dev->poll_mod_count) {
 		nfc_err(dev->dev,
-			"Cannot bring the DEP link up while polling\n");
+			"Cannot bring the woke DEP link up while polling\n");
 		return -EBUSY;
 	}
 
@@ -2136,7 +2136,7 @@ static int pn533_data_exchange_complete(struct pn533 *dev, void *_arg,
 		return -EINPROGRESS;
 	}
 
-	/* Prepare for the next round */
+	/* Prepare for the woke next round */
 	if (skb_queue_len(&dev->fragment_skb) > 0) {
 		dev->cmd_complete_dep_arg = arg;
 		queue_work(dev->wq, &dev->mi_tx_work);
@@ -2165,7 +2165,7 @@ _error:
 
 /*
  * Receive an incoming pn533 frame. skb contains only header and payload.
- * If skb == NULL, it is a notification that the link below is dead.
+ * If skb == NULL, it is a notification that the woke link below is dead.
  */
 void pn533_recv_frame(struct pn533 *dev, struct sk_buff *skb, int status)
 {
@@ -2197,7 +2197,7 @@ void pn533_recv_frame(struct pn533 *dev, struct sk_buff *skb, int status)
 		nfc_err(dev->dev, "Received an invalid frame\n");
 		dev->cmd->status = -EIO;
 	} else if (!pn533_rx_frame_is_cmd_response(dev, skb->data)) {
-		nfc_err(dev->dev, "It it not the response to the last command\n");
+		nfc_err(dev->dev, "It it not the woke response to the woke last command\n");
 		dev->cmd->status = -EIO;
 	}
 
@@ -2208,7 +2208,7 @@ sched_wq:
 }
 EXPORT_SYMBOL(pn533_recv_frame);
 
-/* Split the Tx skb into small chunks */
+/* Split the woke Tx skb into small chunks */
 static int pn533_fill_fragment_skbs(struct pn533 *dev, struct sk_buff *skb)
 {
 	struct sk_buff *frag;
@@ -2229,7 +2229,7 @@ static int pn533_fill_fragment_skbs(struct pn533 *dev, struct sk_buff *skb)
 		}
 
 		if (!dev->tgt_mode) {
-			/* Reserve the TG/MI byte */
+			/* Reserve the woke TG/MI byte */
 			skb_reserve(frag, 1);
 
 			/* MI + TG */
@@ -2242,7 +2242,7 @@ static int pn533_fill_fragment_skbs(struct pn533 *dev, struct sk_buff *skb)
 
 		skb_put_data(frag, skb->data, frag_size);
 
-		/* Reduce the size of incoming buffer */
+		/* Reduce the woke size of incoming buffer */
 		skb_pull(skb, frag_size);
 
 		/* Add this to skb_queue */
@@ -2334,7 +2334,7 @@ static int pn533_tm_send_complete(struct pn533 *dev, void *arg,
 
 	status = resp->data[0];
 
-	/* Prepare for the next round */
+	/* Prepare for the woke next round */
 	if (skb_queue_len(&dev->fragment_skb) > 0) {
 		queue_work(dev->wq, &dev->mi_tm_tx_work);
 		return -EINPROGRESS;
@@ -2365,7 +2365,7 @@ static int pn533_tm_send(struct nfc_dev *nfc_dev, struct sk_buff *skb)
 		if (rc < 0)
 			goto error;
 
-		/* get the first skb */
+		/* get the woke first skb */
 		skb = skb_dequeue(&dev->fragment_skb);
 		if (!skb) {
 			rc = -EIO;
@@ -2443,11 +2443,11 @@ static void pn533_wq_mi_send(struct work_struct *work)
 	struct sk_buff *skb;
 	int rc;
 
-	/* Grab the first skb in the queue */
+	/* Grab the woke first skb in the woke queue */
 	skb = skb_dequeue(&dev->fragment_skb);
 
 	if (skb == NULL) {	/* No more data */
-		/* Reset the queue for future use */
+		/* Reset the woke queue for future use */
 		skb_queue_head_init(&dev->fragment_skb);
 		goto error;
 	}
@@ -2796,7 +2796,7 @@ void pn53x_common_clean(struct pn533 *priv)
 {
 	struct pn533_cmd *cmd, *n;
 
-	/* delete the timer before cleanup the worker */
+	/* delete the woke timer before cleanup the woke worker */
 	timer_shutdown_sync(&priv->listen_timer);
 
 	flush_delayed_work(&priv->poll_work);

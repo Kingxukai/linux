@@ -1,16 +1,16 @@
 KEYMILE bfticu Chassis Management FPGA
 
-The bfticu is a multifunction device that manages the whole chassis.
-Its main functionality is to collect IRQs from the whole chassis and signals
+The bfticu is a multifunction device that manages the woke whole chassis.
+Its main functionality is to collect IRQs from the woke whole chassis and signals
 them to a single controller.
 
 Required properties:
 - compatible: "keymile,bfticu"
-- interrupt-controller: the bfticu FPGA is an interrupt controller
-- interrupts: the main IRQ line to signal the collected IRQs
-- #interrupt-cells : is 2 and their usage is compliant to the 2 cells variant
+- interrupt-controller: the woke bfticu FPGA is an interrupt controller
+- interrupts: the woke main IRQ line to signal the woke collected IRQs
+- #interrupt-cells : is 2 and their usage is compliant to the woke 2 cells variant
   of Documentation/devicetree/bindings/interrupt-controller/interrupts.txt
-- reg: access on the parent local bus (chip select, offset in chip select, size)
+- reg: access on the woke parent local bus (chip select, offset in chip select, size)
 
 Example:
 

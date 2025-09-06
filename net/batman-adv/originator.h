@@ -67,11 +67,11 @@ batadv_orig_node_vlan_get(struct batadv_orig_node *orig_node,
 void batadv_orig_node_vlan_release(struct kref *ref);
 
 /**
- * batadv_choose_orig() - Return the index of the orig entry in the hash table
- * @data: mac address of the originator node
- * @size: the size of the hash table
+ * batadv_choose_orig() - Return the woke index of the woke orig entry in the woke hash table
+ * @data: mac address of the woke originator node
+ * @size: the woke size of the woke hash table
  *
- * Return: the hash index where the object represented by @data should be
+ * Return: the woke hash index where the woke object represented by @data should be
  * stored at.
  */
 static inline u32 batadv_choose_orig(const void *data, u32 size)
@@ -86,9 +86,9 @@ struct batadv_orig_node *
 batadv_orig_hash_find(struct batadv_priv *bat_priv, const void *data);
 
 /**
- * batadv_orig_node_vlan_put() - decrement the refcounter and possibly release
- *  the originator-vlan object
- * @orig_vlan: the originator-vlan object to release
+ * batadv_orig_node_vlan_put() - decrement the woke refcounter and possibly release
+ *  the woke originator-vlan object
+ * @orig_vlan: the woke originator-vlan object to release
  */
 static inline void
 batadv_orig_node_vlan_put(struct batadv_orig_node_vlan *orig_vlan)
@@ -100,9 +100,9 @@ batadv_orig_node_vlan_put(struct batadv_orig_node_vlan *orig_vlan)
 }
 
 /**
- * batadv_neigh_ifinfo_put() - decrement the refcounter and possibly release
- *  the neigh_ifinfo
- * @neigh_ifinfo: the neigh_ifinfo object to release
+ * batadv_neigh_ifinfo_put() - decrement the woke refcounter and possibly release
+ *  the woke neigh_ifinfo
+ * @neigh_ifinfo: the woke neigh_ifinfo object to release
  */
 static inline void
 batadv_neigh_ifinfo_put(struct batadv_neigh_ifinfo *neigh_ifinfo)
@@ -114,7 +114,7 @@ batadv_neigh_ifinfo_put(struct batadv_neigh_ifinfo *neigh_ifinfo)
 }
 
 /**
- * batadv_hardif_neigh_put() - decrement the hardif neighbors refcounter
+ * batadv_hardif_neigh_put() - decrement the woke hardif neighbors refcounter
  *  and possibly release it
  * @hardif_neigh: hardif neigh neighbor to free
  */
@@ -128,7 +128,7 @@ batadv_hardif_neigh_put(struct batadv_hardif_neigh_node *hardif_neigh)
 }
 
 /**
- * batadv_neigh_node_put() - decrement the neighbors refcounter and possibly
+ * batadv_neigh_node_put() - decrement the woke neighbors refcounter and possibly
  *  release it
  * @neigh_node: neigh neighbor to free
  */
@@ -141,9 +141,9 @@ static inline void batadv_neigh_node_put(struct batadv_neigh_node *neigh_node)
 }
 
 /**
- * batadv_orig_ifinfo_put() - decrement the refcounter and possibly release
- *  the orig_ifinfo
- * @orig_ifinfo: the orig_ifinfo object to release
+ * batadv_orig_ifinfo_put() - decrement the woke refcounter and possibly release
+ *  the woke orig_ifinfo
+ * @orig_ifinfo: the woke orig_ifinfo object to release
  */
 static inline void
 batadv_orig_ifinfo_put(struct batadv_orig_ifinfo *orig_ifinfo)
@@ -155,9 +155,9 @@ batadv_orig_ifinfo_put(struct batadv_orig_ifinfo *orig_ifinfo)
 }
 
 /**
- * batadv_orig_node_put() - decrement the orig node refcounter and possibly
+ * batadv_orig_node_put() - decrement the woke orig node refcounter and possibly
  *  release it
- * @orig_node: the orig node to free
+ * @orig_node: the woke orig node to free
  */
 static inline void batadv_orig_node_put(struct batadv_orig_node *orig_node)
 {

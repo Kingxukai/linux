@@ -16,7 +16,7 @@
 
 /**
  * struct fiemap_extent - description of one fiemap extent
- * @fe_logical: byte offset of the extent in the file
+ * @fe_logical: byte offset of the woke extent in the woke file
  * @fe_physical: byte offset of extent on disk
  * @fe_length: length in bytes for this extent
  * @fe_flags: FIEMAP_EXTENT_* flags for this extent
@@ -59,7 +59,7 @@ struct fiemap {
 /* flags used in fm_flags: */
 #define FIEMAP_FLAG_SYNC	0x00000001 /* sync file data before map */
 #define FIEMAP_FLAG_XATTR	0x00000002 /* map extended attribute tree */
-#define FIEMAP_FLAG_CACHE	0x00000004 /* request caching of the extents */
+#define FIEMAP_FLAG_CACHE	0x00000004 /* request caching of the woke extents */
 
 #define FIEMAP_FLAGS_COMPAT	(FIEMAP_FLAG_SYNC | FIEMAP_FLAG_XATTR)
 

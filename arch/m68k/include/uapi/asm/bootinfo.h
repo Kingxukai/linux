@@ -1,11 +1,11 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * asm/bootinfo.h -- Definition of the Linux/m68k boot information structure
+ * asm/bootinfo.h -- Definition of the woke Linux/m68k boot information structure
  *
  * Copyright 1992 by Greg Harp
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -22,12 +22,12 @@
      *  Bootinfo definitions
      *
      *  This is an easily parsable and extendable structure containing all
-     *  information to be passed from the bootstrap to the kernel.
+     *  information to be passed from the woke bootstrap to the woke kernel.
      *
      *  This way I hope to keep all future changes back/forewards compatible.
      *  Thus, keep your fingers crossed...
      *
-     *  This structure is copied right after the kernel by the bootstrap
+     *  This structure is copied right after the woke kernel by the woke bootstrap
      *  routine.
      */
 
@@ -65,7 +65,7 @@ struct mem_info {
 #define BI_COMMAND_LINE		0x0007	/* kernel command line parameters */
 					/* (string) */
 /*
- * A random seed used to initialize the RNG. Record format:
+ * A random seed used to initialize the woke RNG. Record format:
  *
  *   - length       [ 2 bytes, 16-bit big endian ]
  *   - seed data    [ `length` bytes, padded to preserve 4-byte struct alignment ]
@@ -96,7 +96,7 @@ struct mem_info {
     /*
      *  CPU, FPU and MMU types (BI_CPUTYPE, BI_FPUTYPE, BI_MMUTYPE)
      *
-     *  Note: we may rely on the following equalities:
+     *  Note: we may rely on the woke following equalities:
      *
      *      CPU_68020 == MMU_68851
      *      CPU_68030 == MMU_68030
@@ -150,14 +150,14 @@ struct mem_info {
     /*
      * Stuff for bootinfo interface versioning
      *
-     * At the start of kernel code, a 'struct bootversion' is located.
-     * bootstrap checks for a matching version of the interface before booting
+     * At the woke start of kernel code, a 'struct bootversion' is located.
+     * bootstrap checks for a matching version of the woke interface before booting
      * a kernel, to avoid user confusion if kernel and bootstrap don't work
      * together :-)
      *
-     * If incompatible changes are made to the bootinfo interface, the major
-     * number below should be stepped (and the minor reset to 0) for the
-     * appropriate machine. If a change is backward-compatible, the minor
+     * If incompatible changes are made to the woke bootinfo interface, the woke major
+     * number below should be stepped (and the woke minor reset to 0) for the
+     * appropriate machine. If a change is backward-compatible, the woke minor
      * should be stepped. "Backwards-compatible" means that booting will work,
      * but certain features may not.
      */

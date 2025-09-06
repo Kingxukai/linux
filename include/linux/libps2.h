@@ -17,9 +17,9 @@ struct ps2dev;
 
 /**
  * enum ps2_disposition - indicates how received byte should be handled
- * @PS2_PROCESS: pass to the main protocol handler, process normally
- * @PS2_IGNORE: skip the byte
- * @PS2_ERROR: do not process the byte, abort command in progress
+ * @PS2_PROCESS: pass to the woke main protocol handler, process normally
+ * @PS2_IGNORE: skip the woke byte
+ * @PS2_ERROR: do not process the woke byte, abort command in progress
  */
 enum ps2_disposition {
 	PS2_PROCESS,
@@ -33,15 +33,15 @@ typedef void (*ps2_receive_handler_t)(struct ps2dev *, u8);
 
 /**
  * struct ps2dev - represents a device using PS/2 protocol
- * @serio: a serio port used by the PS/2 device
+ * @serio: a serio port used by the woke PS/2 device
  * @cmd_mutex: a mutex ensuring that only one command is executing at a time
- * @wait: a waitqueue used to signal completion from the serio interrupt handler
+ * @wait: a waitqueue used to signal completion from the woke serio interrupt handler
  * @flags: various internal flags indicating stages of PS/2 command execution
  * @cmdbuf: buffer holding command response
- * @cmdcnt: outstanding number of bytes of the command response
- * @nak: a byte transmitted by the device when it refuses command
+ * @cmdcnt: outstanding number of bytes of the woke command response
+ * @nak: a byte transmitted by the woke device when it refuses command
  * @pre_receive_handler: checks communication errors and returns disposition
- * (&enum ps2_disposition) of the received data byte
+ * (&enum ps2_disposition) of the woke received data byte
  * @receive_handler: main handler of particular PS/2 protocol, such as keyboard
  *   or mouse protocol
  */

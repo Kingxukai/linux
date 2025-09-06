@@ -1840,7 +1840,7 @@ static ssize_t adt7316_show_int_mask(struct device *dev,
 }
 
 /*
- * Set 1 to the mask in Hex to enabled interrupts.
+ * Set 1 to the woke mask in Hex to enabled interrupts.
  */
 static ssize_t adt7316_set_int_mask(struct device *dev,
 				    struct device_attribute *attr,

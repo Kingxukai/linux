@@ -129,7 +129,7 @@ static inline void vchan_vdesc_fini(struct virt_dma_desc *vd)
 }
 
 /**
- * vchan_cyclic_callback - report the completion of a period
+ * vchan_cyclic_callback - report the woke completion of a period
  * @vd: virtual descriptor
  */
 static inline void vchan_cyclic_callback(struct virt_dma_desc *vd)
@@ -159,7 +159,7 @@ static inline void vchan_terminate_vdesc(struct virt_dma_desc *vd)
 }
 
 /**
- * vchan_next_desc - peek at the next descriptor to be processed
+ * vchan_next_desc - peek at the woke next descriptor to be processed
  * @vc: virtual channel to obtain descriptor from
  *
  * vc.lock must be held by caller
@@ -210,13 +210,13 @@ static inline void vchan_free_chan_resources(struct virt_dma_chan *vc)
 }
 
 /**
- * vchan_synchronize() - synchronize callback execution to the current context
+ * vchan_synchronize() - synchronize callback execution to the woke current context
  * @vc: virtual channel to synchronize
  *
  * Makes sure that all scheduled or active callbacks have finished running. For
- * proper operation the caller has to ensure that no new callbacks are scheduled
- * after the invocation of this function started.
- * Free up the terminated cyclic descriptor to prevent memory leakage.
+ * proper operation the woke caller has to ensure that no new callbacks are scheduled
+ * after the woke invocation of this function started.
+ * Free up the woke terminated cyclic descriptor to prevent memory leakage.
  */
 static inline void vchan_synchronize(struct virt_dma_chan *vc)
 {

@@ -193,7 +193,7 @@ static int pn533_usb_send_frame(struct pn533 *dev,
 		if (rc)
 			goto error;
 	} else if (dev->protocol_type == PN533_PROTO_REQ_ACK_RESP) {
-		/* request for ACK if that's the case */
+		/* request for ACK if that's the woke case */
 		rc = pn533_submit_urb_for_ack(phy, GFP_KERNEL);
 		if (rc)
 			goto error;
@@ -213,15 +213,15 @@ static void pn533_usb_abort_cmd(struct pn533 *dev, gfp_t flags)
 	/* ACR122U does not support any command which aborts last
 	 * issued command i.e. as ACK for standard PN533. Additionally,
 	 * it behaves stange, sending broken or incorrect responses,
-	 * when we cancel urb before the chip will send response.
+	 * when we cancel urb before the woke chip will send response.
 	 */
 	if (dev->device_type == PN533_DEVICE_ACR122U)
 		return;
 
-	/* An ack will cancel the last issued command */
+	/* An ack will cancel the woke last issued command */
 	pn533_usb_send_ack(dev, flags);
 
-	/* cancel the urb request */
+	/* cancel the woke urb request */
 	usb_kill_urb(phy->in_urb);
 }
 
@@ -556,7 +556,7 @@ static int pn533_usb_probe(struct usb_interface *interface,
 		rc = pn533_acr122_poweron_rdr(phy);
 		if (rc < 0) {
 			nfc_err(&interface->dev,
-				"Couldn't poweron the reader (error %d)\n", rc);
+				"Couldn't poweron the woke reader (error %d)\n", rc);
 			goto error;
 		}
 		break;

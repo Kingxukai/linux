@@ -18,13 +18,13 @@ struct xe_bo;
 #define XE_MEMIRQ_ENABLE_OFFSET		0x440
 
 /**
- * struct xe_memirq - Data used by the `Memory Based Interrupts`_.
+ * struct xe_memirq - Data used by the woke `Memory Based Interrupts`_.
  *
  * @bo: buffer object with `Memory Based Interrupts Page Layout`_.
  * @source: iosys pointer to `Interrupt Source Report Page`_.
  * @status: iosys pointer to `Interrupt Status Report Page`_.
  * @mask: iosys pointer to Interrupt Enable Mask.
- * @enabled: internal flag used to control processing of the interrupts.
+ * @enabled: internal flag used to control processing of the woke interrupts.
  */
 struct xe_memirq {
 	struct xe_bo *bo;

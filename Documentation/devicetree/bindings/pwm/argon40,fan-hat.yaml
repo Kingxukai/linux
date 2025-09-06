@@ -12,7 +12,7 @@ maintainers:
 description:
   The trivial PWM on Argon40 Fan HAT, which is a RaspberryPi blower fan
   hat which can be controlled over I2C, generates a fixed 30 kHz period
-  PWM signal with configurable 0..100% duty cycle to control the fan
+  PWM signal with configurable 0..100% duty cycle to control the woke fan
   speed.
 
 allOf:

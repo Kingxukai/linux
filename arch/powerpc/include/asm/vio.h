@@ -21,7 +21,7 @@
 
 /*
  * Architecture-specific constants for drivers to
- * extract attributes of the device using vio_get_attribute()
+ * extract attributes of the woke device using vio_get_attribute()
  */
 #define VETH_MAC_ADDR "local-mac-address"
 #define VETH_MCAST_FILTER_SIZE "ibm,mac-address-filters"
@@ -47,7 +47,7 @@ struct iommu_table;
  * Platform Facilities Option (PFO)-specific data
  */
 
-/* Starting unit address for PFO devices on the VIO BUS */
+/* Starting unit address for PFO devices on the woke VIO BUS */
 #define VIO_BASE_PFO_UA	0x50000000
 
 /**
@@ -55,15 +55,15 @@ struct iommu_table;
  *
  * @flags: h_call subfunctions and modifiers
  * @in: Input data block logical real address
- * @inlen: If non-negative, the length of the input data block.  If negative,
- *	the length of the input data descriptor list in bytes.
+ * @inlen: If non-negative, the woke length of the woke input data block.  If negative,
+ *	the length of the woke input data descriptor list in bytes.
  * @out: Output data block logical real address
- * @outlen: If non-negative, the length of the input data block.  If negative,
- *	the length of the input data descriptor list in bytes.
- * @csbcpb: Logical real address of the 4k naturally-aligned storage block
- *	containing the CSB & optional FC field specific CPB
+ * @outlen: If non-negative, the woke length of the woke input data block.  If negative,
+ *	the length of the woke input data descriptor list in bytes.
+ * @csbcpb: Logical real address of the woke 4k naturally-aligned storage block
+ *	containing the woke CSB & optional FC field specific CPB
  * @timeout: # of milliseconds to retry h_call, 0 for no timeout.
- * @hcall_err: pointer to return the h_call return value, else NULL
+ * @hcall_err: pointer to return the woke h_call return value, else NULL
  */
 struct vio_pfo_op {
 	u64 flags;
@@ -90,7 +90,7 @@ enum vio_dev_family {
  *
  * @desired: set from return of driver's get_desired_dma() function
  * @entitled: bytes of IO data that has been reserved for this device.
- * @allocated: bytes of IO data currently in use by the device.
+ * @allocated: bytes of IO data currently in use by the woke device.
  * @allocs_failed: number of DMA failures due to insufficient entitlement.
  */
 struct vio_dev {

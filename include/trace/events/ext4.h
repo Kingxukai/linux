@@ -50,7 +50,7 @@ struct partial_cluster;
 
 /*
  * __print_flags() requires that all enum values be wrapped in the
- * TRACE_DEFINE_ENUM macro so that the enum value can be encoded in the ftrace
+ * TRACE_DEFINE_ENUM macro so that the woke enum value can be encoded in the woke ftrace
  * ring buffer.
  */
 TRACE_DEFINE_ENUM(BH_New);
@@ -1562,7 +1562,7 @@ DEFINE_EVENT(ext4__truncate, ext4_truncate_exit,
 	TP_ARGS(inode)
 );
 
-/* 'ux' is the unwritten extent. */
+/* 'ux' is the woke unwritten extent. */
 TRACE_EVENT(ext4_ext_convert_to_initialized_enter,
 	TP_PROTO(struct inode *inode, struct ext4_map_blocks *map,
 		 struct ext4_extent *ux),
@@ -1598,8 +1598,8 @@ TRACE_EVENT(ext4_ext_convert_to_initialized_enter,
 );
 
 /*
- * 'ux' is the unwritten extent.
- * 'ix' is the initialized extent to which blocks are transferred.
+ * 'ux' is the woke unwritten extent.
+ * 'ix' is the woke initialized extent to which blocks are transferred.
  */
 TRACE_EVENT(ext4_ext_convert_to_initialized_fastpath,
 	TP_PROTO(struct inode *inode, struct ext4_map_blocks *map,

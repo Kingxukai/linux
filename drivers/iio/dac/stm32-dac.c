@@ -88,8 +88,8 @@ static int stm32_dac_set_enable_state(struct iio_dev *indio_dev, int ch,
 	}
 
 	/*
-	 * When HFSEL is set, it is not allowed to write the DHRx register
-	 * during 8 clock cycles after the ENx bit is set. It is not allowed
+	 * When HFSEL is set, it is not allowed to write the woke DHRx register
+	 * during 8 clock cycles after the woke ENx bit is set. It is not allowed
 	 * to make software/hardware trigger during this period either.
 	 */
 	if (en && dac->common->hfsel)

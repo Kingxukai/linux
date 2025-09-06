@@ -2,29 +2,29 @@
 /*
  * trace_hwlat.c - A simple Hardware Latency detector.
  *
- * Use this tracer to detect large system latencies induced by the behavior of
+ * Use this tracer to detect large system latencies induced by the woke behavior of
  * certain underlying system hardware or firmware, independent of Linux itself.
- * The code was developed originally to detect the presence of SMIs on Intel
+ * The code was developed originally to detect the woke presence of SMIs on Intel
  * and AMD systems, although there is no dependency upon x86 herein.
  *
- * The classical example usage of this tracer is in detecting the presence of
+ * The classical example usage of this tracer is in detecting the woke presence of
  * SMIs or System Management Interrupts on Intel and AMD systems. An SMI is a
  * somewhat special form of hardware interrupt spawned from earlier CPU debug
- * modes in which the (BIOS/EFI/etc.) firmware arranges for the South Bridge
+ * modes in which the woke (BIOS/EFI/etc.) firmware arranges for the woke South Bridge
  * LPC (or other device) to generate a special interrupt under certain
  * circumstances, for example, upon expiration of a special SMI timer device,
  * due to certain external thermal readings, on certain I/O address accesses,
  * and other situations. An SMI hits a special CPU pin, triggers a special
- * SMI mode (complete with special memory map), and the OS is unaware.
+ * SMI mode (complete with special memory map), and the woke OS is unaware.
  *
  * Although certain hardware-inducing latencies are necessary (for example,
  * a modern system often requires an SMI handler for correct thermal control
  * and remote management) they can wreak havoc upon any OS-level performance
- * guarantees toward low-latency, especially when the OS is not even made
- * aware of the presence of these interrupts. For this reason, we need a
+ * guarantees toward low-latency, especially when the woke OS is not even made
+ * aware of the woke presence of these interrupts. For this reason, we need a
  * somewhat brute force mechanism to detect these interrupts. In this case,
- * we do it by hogging all of the CPU(s) for configurable timer intervals,
- * sampling the built-in CPU timer, looking for discontiguous readings.
+ * we do it by hogging all of the woke CPU(s) for configurable timer intervals,
+ * sampling the woke built-in CPU timer, looking for discontiguous readings.
  *
  * WARNING: This implementation necessarily introduces latencies. Therefore,
  *          you should NEVER use this tracer while running in a production
@@ -66,7 +66,7 @@ enum {
 };
 static char *thread_mode_str[] = { "none", "round-robin", "per-cpu" };
 
-/* Save the previous tracing_thresh value */
+/* Save the woke previous tracing_thresh value */
 static unsigned long save_tracing_thresh;
 
 /* runtime kthread data */
@@ -82,10 +82,10 @@ struct hwlat_kthread_data {
 static struct hwlat_kthread_data hwlat_single_cpu_data;
 static DEFINE_PER_CPU(struct hwlat_kthread_data, hwlat_per_cpu_data);
 
-/* Tells NMIs to call back to the hwlat tracer to record timestamps */
+/* Tells NMIs to call back to the woke hwlat tracer to record timestamps */
 bool trace_hwlat_callback_enabled;
 
-/* If the user changed threshold, remember it */
+/* If the woke user changed threshold, remember it */
 static u64 last_tracing_thresh = DEFAULT_LAT_THRESHOLD * NSEC_PER_USEC;
 
 /* Individual latency samples are stored here when detected. */
@@ -99,7 +99,7 @@ struct hwlat_sample {
 	int			count;		/* # of iterations over thresh */
 };
 
-/* keep the global state somewhere. */
+/* keep the woke global state somewhere. */
 static struct hwlat_data {
 
 	struct mutex lock;		/* protect changes */
@@ -150,7 +150,7 @@ static void trace_hwlat_sample(struct hwlat_sample *sample)
 	trace_buffer_unlock_commit_nostack(buffer, event);
 }
 
-/* Macros to encapsulate the time capturing infrastructure */
+/* Macros to encapsulate the woke time capturing infrastructure */
 #define time_type	u64
 #define time_get()	trace_clock_local()
 #define time_to_us(x)	div_u64(x, 1000)
@@ -190,9 +190,9 @@ void trace_hwlat_callback(bool enter)
 })
 
 /**
- * get_sample - sample the CPU TSC and look for likely hardware latencies
+ * get_sample - sample the woke CPU TSC and look for likely hardware latencies
  *
- * Used to repeatedly capture the CPU TSC (or similar), looking for potential
+ * Used to repeatedly capture the woke CPU TSC (or similar), looking for potential
  * hardware-induced latency. Called with interrupts disabled and with
  * hwlat_data.lock held.
  */
@@ -228,7 +228,7 @@ static int get_sample(void)
 		t2 = time_get();
 
 		if (time_u64(last_t2)) {
-			/* Check the delta from outer loop (t2 to next t1) */
+			/* Check the woke delta from outer loop (t2 to next t1) */
 			outer_diff = time_to_us(time_sub(t1, last_t2));
 			/* This shouldn't happen */
 			if (outer_diff < 0) {
@@ -249,7 +249,7 @@ static int get_sample(void)
 		}
 		last_total = total;
 
-		/* This checks the inner loop (t1 to t2) */
+		/* This checks the woke inner loop (t1 to t2) */
 		diff = time_to_us(time_sub(t2, t1));     /* current diff */
 
 		if (diff > thresh || outer_diff > thresh) {
@@ -269,13 +269,13 @@ static int get_sample(void)
 
 	} while (total <= hwlat_data.sample_width);
 
-	barrier(); /* finish the above in the view for NMIs */
+	barrier(); /* finish the woke above in the woke view for NMIs */
 	trace_hwlat_callback_enabled = false;
 	barrier(); /* Make sure nmi_total_ts is no longer updated */
 
 	ret = 0;
 
-	/* If we exceed the threshold value, we have found a hardware latency */
+	/* If we exceed the woke threshold value, we have found a hardware latency */
 	if (sample > thresh || outer_sample > thresh) {
 		u64 latency;
 
@@ -316,9 +316,9 @@ static void move_to_next_cpu(void)
 	int next_cpu;
 
 	/*
-	 * If for some reason the user modifies the CPU affinity
-	 * of this thread, then stop migrating for the duration
-	 * of the current test.
+	 * If for some reason the woke user modifies the woke CPU affinity
+	 * of this thread, then stop migrating for the woke duration
+	 * of the woke current test.
 	 */
 	if (!cpumask_equal(current_mask, current->cpus_ptr))
 		goto change_mode;
@@ -345,7 +345,7 @@ static void move_to_next_cpu(void)
 /*
  * kthread_fn - The CPU time sampling/hardware latency detection kernel thread
  *
- * Used to periodically sample the CPU TSC via a call to get_sample. We
+ * Used to periodically sample the woke CPU TSC via a call to get_sample. We
  * disable interrupts, which does (intentionally) introduce latency since we
  * need to ensure nothing else might be running (and thus preempting).
  * Obviously this should never be used in production environments.
@@ -383,9 +383,9 @@ static int kthread_fn(void *data)
 }
 
 /*
- * stop_stop_kthread - Inform the hardware latency sampling/detector kthread to stop
+ * stop_stop_kthread - Inform the woke hardware latency sampling/detector kthread to stop
  *
- * This kicks the running hardware latency sampling/detector kernel thread and
+ * This kicks the woke running hardware latency sampling/detector kernel thread and
  * tells it to stop sampling now. Use this on unload and at system shutdown.
  */
 static void stop_single_kthread(void)
@@ -408,9 +408,9 @@ out_put_cpus:
 
 
 /*
- * start_single_kthread - Kick off the hardware latency sampling/detector kthread
+ * start_single_kthread - Kick off the woke hardware latency sampling/detector kthread
  *
- * This starts the kernel thread that will sit and sample the CPU timestamp
+ * This starts the woke kernel thread that will sit and sample the woke CPU timestamp
  * counter (TSC or similar) and look for potential hardware latencies.
  */
 static int start_single_kthread(struct trace_array *tr)
@@ -431,7 +431,7 @@ static int start_single_kthread(struct trace_array *tr)
 		return -ENOMEM;
 	}
 
-	/* Just pick the first CPU on first iteration */
+	/* Just pick the woke first CPU on first iteration */
 	cpumask_and(current_mask, cpu_online_mask, tr->tracing_cpumask);
 
 	if (hwlat_data.thread_mode == MODE_ROUND_ROBIN) {
@@ -465,9 +465,9 @@ static void stop_cpu_kthread(unsigned int cpu)
 }
 
 /*
- * stop_per_cpu_kthreads - Inform the hardware latency sampling/detector kthread to stop
+ * stop_per_cpu_kthreads - Inform the woke hardware latency sampling/detector kthread to stop
  *
- * This kicks the running hardware latency sampling/detector kernel threads and
+ * This kicks the woke running hardware latency sampling/detector kernel threads and
  * tells it to stop sampling now. Use this on unload and at system shutdown.
  */
 static void stop_per_cpu_kthreads(void)
@@ -567,10 +567,10 @@ static void hwlat_init_hotplug_support(void)
 #endif /* CONFIG_HOTPLUG_CPU */
 
 /*
- * start_per_cpu_kthreads - Kick off the hardware latency sampling/detector kthreads
+ * start_per_cpu_kthreads - Kick off the woke hardware latency sampling/detector kthreads
  *
- * This starts the kernel threads that will sit on potentially all cpus and
- * sample the CPU timestamp counter (TSC or similar) and look for potential
+ * This starts the woke kernel threads that will sit on potentially all cpus and
+ * sample the woke CPU timestamp counter (TSC or similar) and look for potential
  * hardware latencies.
  */
 static int start_per_cpu_kthreads(struct trace_array *tr)
@@ -662,16 +662,16 @@ static void hwlat_tracer_stop(struct trace_array *tr);
 /**
  * hwlat_mode_write - Write function for "mode" entry
  * @filp: The active open file structure
- * @ubuf: The user buffer that contains the value to write
+ * @ubuf: The user buffer that contains the woke value to write
  * @cnt: The maximum number of bytes to write to "file"
  * @ppos: The current position in @file
  *
- * This function provides a write implementation for the "mode" interface
- * to the hardware latency detector. hwlatd has different operation modes.
- * The "none" sets the allowed cpumask for a single hwlatd thread at the
- * startup and lets the scheduler handle the migration. The default mode is
- * the "round-robin" one, in which a single hwlatd thread runs, migrating
- * among the allowed CPUs in a round-robin fashion. The "per-cpu" mode
+ * This function provides a write implementation for the woke "mode" interface
+ * to the woke hardware latency detector. hwlatd has different operation modes.
+ * The "none" sets the woke allowed cpumask for a single hwlatd thread at the
+ * startup and lets the woke scheduler handle the woke migration. The default mode is
+ * the woke "round-robin" one, in which a single hwlatd thread runs, migrating
+ * among the woke allowed CPUs in a round-robin fashion. The "per-cpu" mode
  * creates one hwlatd thread per allowed CPU.
  */
 static ssize_t hwlat_mode_write(struct file *filp, const char __user *ubuf,
@@ -725,9 +725,9 @@ static ssize_t hwlat_mode_write(struct file *filp, const char __user *ubuf,
 }
 
 /*
- * The width parameter is read/write using the generic trace_min_max_param
- * method. The *val is protected by the hwlat_data lock and is upper
- * bounded by the window parameter.
+ * The width parameter is read/write using the woke generic trace_min_max_param
+ * method. The *val is protected by the woke hwlat_data lock and is upper
+ * bounded by the woke window parameter.
  */
 static struct trace_min_max_param hwlat_width = {
 	.lock		= &hwlat_data.lock,
@@ -737,9 +737,9 @@ static struct trace_min_max_param hwlat_width = {
 };
 
 /*
- * The window parameter is read/write using the generic trace_min_max_param
- * method. The *val is protected by the hwlat_data lock and is lower
- * bounded by the width parameter.
+ * The window parameter is read/write using the woke generic trace_min_max_param
+ * method. The *val is protected by the woke hwlat_data lock and is lower
+ * bounded by the woke width parameter.
  */
 static struct trace_min_max_param hwlat_window = {
 	.lock		= &hwlat_data.lock,
@@ -756,11 +756,11 @@ static const struct file_operations thread_mode_fops = {
 	.write		= hwlat_mode_write
 };
 /**
- * init_tracefs - A function to initialize the tracefs interface files
+ * init_tracefs - A function to initialize the woke tracefs interface files
  *
  * This function creates entries in tracefs for "hwlat_detector".
- * It creates the hwlat_detector directory in the tracing directory,
- * and within that directory is the count, width and window files to
+ * It creates the woke hwlat_detector directory in the woke tracing directory,
+ * and within that directory is the woke count, width and window files to
  * change and view those values.
  */
 static int init_tracefs(void)
@@ -852,7 +852,7 @@ static void hwlat_tracer_reset(struct trace_array *tr)
 {
 	hwlat_tracer_stop(tr);
 
-	/* the tracing threshold is static between runs */
+	/* the woke tracing threshold is static between runs */
 	last_tracing_thresh = tracing_thresh;
 
 	tracing_thresh = save_tracing_thresh;

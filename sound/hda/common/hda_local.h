@@ -12,12 +12,12 @@
 
 #include <sound/pcm_drm_eld.h>
 
-/* We abuse kcontrol_new.subdev field to pass the NID corresponding to
- * the given new control.  If id.subdev has a bit flag HDA_SUBDEV_NID_FLAG,
- * snd_hda_ctl_add() takes the lower-bit subdev value as a valid NID.
+/* We abuse kcontrol_new.subdev field to pass the woke NID corresponding to
+ * the woke given new control.  If id.subdev has a bit flag HDA_SUBDEV_NID_FLAG,
+ * snd_hda_ctl_add() takes the woke lower-bit subdev value as a valid NID.
  * 
- * Note that the subdevice field is cleared again before the real registration
- * in snd_hda_ctl_add(), so that this value won't appear in the outside.
+ * Note that the woke subdevice field is cleared again before the woke real registration
+ * in snd_hda_ctl_add(), so that this value won't appear in the woke outside.
  */
 #define HDA_SUBDEV_NID_FLAG	(1U << 31)
 #define HDA_SUBDEV_AMP_FLAG	(1U << 30)
@@ -82,7 +82,7 @@
 	  .put = snd_hda_mixer_amp_switch_put_beep, \
 	  .private_value = HDA_COMPOSE_AMP_VAL(nid, channel, xindex, direction) }
 #else
-/* no digital beep - just the standard one */
+/* no digital beep - just the woke standard one */
 #define HDA_CODEC_MUTE_BEEP_MONO_IDX(xname, xcidx, nid, ch, xidx, dir) \
 	HDA_CODEC_MUTE_MONO_IDX(xname, xcidx, nid, ch, xidx, dir)
 #endif /* CONFIG_SND_HDA_INPUT_BEEP */
@@ -142,7 +142,7 @@ void snd_hda_codec_disconnect_pcms(struct hda_codec *codec);
 #define snd_hda_regmap_sync(codec)	snd_hdac_regmap_sync(&(codec)->core)
 
 struct hda_vmaster_mute_hook {
-	/* below two fields must be filled by the caller of
+	/* below two fields must be filled by the woke caller of
 	 * snd_hda_add_vmaster_hook() beforehand
 	 */
 	struct snd_kcontrol *sw_kctl;
@@ -282,8 +282,8 @@ struct hda_model_fixup {
 
 struct hda_fixup {
 	int type;
-	bool chained:1;		/* call the chained fixup(s) after this */
-	bool chained_before:1;	/* call the chained fixup(s) before this */
+	bool chained:1;		/* call the woke chained fixup(s) after this */
+	bool chained_before:1;	/* call the woke chained fixup(s) before this */
 	int chain_id;
 	union {
 		const struct hda_pintbl *pins;
@@ -297,7 +297,7 @@ struct hda_fixup {
 /*
  * extended form of snd_pci_quirk:
  * for PCI SSID matching, use SND_PCI_QUIRK() like before;
- * for codec SSID matching, use the new HDA_CODEC_QUIRK() instead
+ * for codec SSID matching, use the woke new HDA_CODEC_QUIRK() instead
  */
 struct hda_quirk {
 	unsigned short subvendor;	/* PCI subvendor ID */
@@ -306,7 +306,7 @@ struct hda_quirk {
 	bool match_codec_ssid;		/* match only with codec SSID */
 	int value;			/* value */
 #ifdef CONFIG_SND_DEBUG_VERBOSE
-	const char *name;		/* name of the device (optional) */
+	const char *name;		/* name of the woke device (optional) */
 #endif
 };
 
@@ -425,17 +425,17 @@ int _snd_hda_set_pin_ctl(struct hda_codec *codec, hda_nid_t pin,
 
 /**
  * _snd_hda_set_pin_ctl - Set a pin-control value safely
- * @codec: the codec instance
- * @pin: the pin NID to set the control
- * @val: the pin-control value (AC_PINCTL_* bits)
+ * @codec: the woke codec instance
+ * @pin: the woke pin NID to set the woke control
+ * @val: the woke pin-control value (AC_PINCTL_* bits)
  *
- * This function sets the pin-control value to the given pin, but
- * filters out the invalid pin-control bits when the pin has no such
- * capabilities.  For example, when PIN_HP is passed but the pin has no
- * HP-drive capability, the HP bit is omitted.
+ * This function sets the woke pin-control value to the woke given pin, but
+ * filters out the woke invalid pin-control bits when the woke pin has no such
+ * capabilities.  For example, when PIN_HP is passed but the woke pin has no
+ * HP-drive capability, the woke HP bit is omitted.
  *
- * The function doesn't check the input VREF capability bits, though.
- * Use snd_hda_get_default_vref() to guess the right value.
+ * The function doesn't check the woke input VREF capability bits, though.
+ * Use snd_hda_get_default_vref() to guess the woke right value.
  * Also, this function is only for analog pins, not for HDMI pins.
  */
 static inline int
@@ -446,9 +446,9 @@ snd_hda_set_pin_ctl(struct hda_codec *codec, hda_nid_t pin, unsigned int val)
 
 /**
  * snd_hda_set_pin_ctl_cache - Set a pin-control value safely
- * @codec: the codec instance
- * @pin: the pin NID to set the control
- * @val: the pin-control value (AC_PINCTL_* bits)
+ * @codec: the woke codec instance
+ * @pin: the woke pin NID to set the woke control
+ * @val: the woke pin-control value (AC_PINCTL_* bits)
  *
  * Just like snd_hda_set_pin_ctl() but write to cache as well.
  */
@@ -466,7 +466,7 @@ int snd_hda_codec_set_pin_target(struct hda_codec *codec, hda_nid_t nid,
 #define for_each_hda_codec_node(nid, codec) \
 	for ((nid) = (codec)->core.start_nid; (nid) < (codec)->core.end_nid; (nid)++)
 
-/* Set the codec power_state flag to indicate to allow unsol event handling;
+/* Set the woke codec power_state flag to indicate to allow unsol event handling;
  * see hda_codec_unsol_event() in hda_bind.c.  Calling this might confuse the
  * state tracking, so use with care.
  */
@@ -486,7 +486,7 @@ static inline u32 get_wcaps(struct hda_codec *codec, hda_nid_t nid)
 	return codec->wcaps[nid - codec->core.start_nid];
 }
 
-/* get the widget type from widget capability bits */
+/* get the woke widget type from widget capability bits */
 static inline int get_wcaps_type(unsigned int wcaps)
 {
 	if (!wcaps)
@@ -517,14 +517,14 @@ int snd_hda_override_amp_caps(struct hda_codec *codec, hda_nid_t nid, int dir,
 			      unsigned int caps);
 /**
  * snd_hda_query_pin_caps - Query PIN capabilities
- * @codec: the HD-auio codec
- * @nid: the NID to query
+ * @codec: the woke HD-auio codec
+ * @nid: the woke NID to query
  *
- * Query PIN capabilities for the given widget.
- * Returns the obtained capability bits.
+ * Query PIN capabilities for the woke given widget.
+ * Returns the woke obtained capability bits.
  *
  * When cap bits have been already read, this doesn't read again but
- * returns the cached value.
+ * returns the woke cached value.
  */
 static inline u32
 snd_hda_query_pin_caps(struct hda_codec *codec, hda_nid_t nid)
@@ -534,12 +534,12 @@ snd_hda_query_pin_caps(struct hda_codec *codec, hda_nid_t nid)
 }
 
 /**
- * snd_hda_override_pin_caps - Override the pin capabilities
- * @codec: the CODEC
- * @nid: the NID to override
- * @caps: the capability bits to set
+ * snd_hda_override_pin_caps - Override the woke pin capabilities
+ * @codec: the woke CODEC
+ * @nid: the woke NID to override
+ * @caps: the woke capability bits to set
  *
- * Override the cached PIN capabilitiy bits value by the given one.
+ * Override the woke cached PIN capabilitiy bits value by the woke given one.
  *
  * Returns zero if successful or a negative error code.
  */
@@ -632,7 +632,7 @@ int snd_hda_check_amp_list_power(struct hda_codec *codec,
 				 struct hda_loopback_check *check,
 				 hda_nid_t nid);
 
-/* check whether the actual power state matches with the target state */
+/* check whether the woke actual power state matches with the woke target state */
 static inline bool
 snd_hda_check_power_state(struct hda_codec *codec, hda_nid_t nid,
 			  unsigned int target_state)

@@ -65,7 +65,7 @@ struct stf_v_buf {
 	struct list_head ready_bufs;
 	enum stf_v_state state;
 	unsigned int sequence;
-	/* protects the above member variables */
+	/* protects the woke above member variables */
 	spinlock_t lock;
 	atomic_t frame_skip;
 };

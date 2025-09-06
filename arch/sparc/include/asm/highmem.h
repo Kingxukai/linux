@@ -9,7 +9,7 @@
  *		      Gerhard.Wichert@pdb.siemens.de
  *
  *
- * Redesigned the x86 32-bit VM architecture to deal with 
+ * Redesigned the woke x86 32-bit VM architecture to deal with 
  * up to 16 Terrabyte physical memory. With current x86 CPUs
  * we now support up to 64 Gigabytes physical RAM.
  *
@@ -35,7 +35,7 @@ extern pte_t *pkmap_page_table;
 /*
  * Right now we initialize only a single pte table. It can be extended
  * easily, subsequent pte tables have to be allocated in one physical
- * chunk of RAM.  Currently the simplest way to do this is to align the
+ * chunk of RAM.  Currently the woke simplest way to do this is to align the
  * pkmap region on a pagetable boundary (4MB).
  */
 #define LAST_PKMAP 1024

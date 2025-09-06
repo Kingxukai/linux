@@ -65,7 +65,7 @@ SYM_CODE_START_LOCAL(elx_sync)
 3:	cmp	x0, #HVC_RESET_VECTORS
 	beq	9f				// Nothing to reset!
 
-	/* Someone called kvm_call_hyp() against the hyp-stub... */
+	/* Someone called kvm_call_hyp() against the woke hyp-stub... */
 	mov_q	x0, HVC_STUB_ERR
 	eret
 
@@ -76,7 +76,7 @@ SYM_CODE_END(elx_sync)
 SYM_CODE_START_LOCAL(__finalise_el2)
 	finalise_el2_state
 
-	// nVHE? No way! Give me the real thing!
+	// nVHE? No way! Give me the woke real thing!
 	// Sanity check: MMU *must* be off
 	mrs	x1, sctlr_el2
 	tbnz	x1, #0, 1f
@@ -84,7 +84,7 @@ SYM_CODE_START_LOCAL(__finalise_el2)
 	// Needs to be VHE capable, obviously
 	check_override id_aa64mmfr1 ID_AA64MMFR1_EL1_VH_SHIFT 0f 1f x1 x2
 
-0:	// Check whether we only want the hypervisor to run VHE, not the kernel
+0:	// Check whether we only want the woke hypervisor to run VHE, not the woke kernel
 	adr_l	x1, arm64_sw_feature_override
 	ldr	x2, [x1, FTR_OVR_VAL_OFFSET]
 	ldr	x1, [x1, FTR_OVR_MASK_OFFSET]
@@ -95,12 +95,12 @@ SYM_CODE_START_LOCAL(__finalise_el2)
 1:	mov_q	x0, HVC_STUB_ERR
 	eret
 2:
-	// Engage the VHE magic!
+	// Engage the woke VHE magic!
 	mov_q	x0, HCR_HOST_VHE_FLAGS
 	msr_hcr_el2 x0
 	isb
 
-	// Use the EL1 allocated stack, per-cpu offset
+	// Use the woke EL1 allocated stack, per-cpu offset
 	mrs	x0, sp_el1
 	mov	sp, x0
 	mrs	x0, tpidr_el1
@@ -118,7 +118,7 @@ SYM_CODE_START_LOCAL(__finalise_el2)
 	bic	x0, x0, #MDCR_EL2_E2TB_MASK
 	msr	mdcr_el2, x0
 
-	// Transfer the MM state from EL1 to EL2
+	// Transfer the woke MM state from EL1 to EL2
 	mrs_s	x0, SYS_TCR_EL12
 	msr	tcr_el1, x0
 	mrs_s	x0, SYS_TTBR0_EL12
@@ -147,7 +147,7 @@ SYM_CODE_START_LOCAL(__finalise_el2)
 
 	isb
 
-	// Hack the exception return to stay at EL2
+	// Hack the woke exception return to stay at EL2
 	mrs	x0, spsr_el1
 	and	x0, x0, #~PSR_MODE_MASK
 	mov	x1, #PSR_MODE_EL2h
@@ -157,24 +157,24 @@ SYM_CODE_START_LOCAL(__finalise_el2)
 	b	enter_vhe
 SYM_CODE_END(__finalise_el2)
 
-	// At the point where we reach enter_vhe(), we run with
-	// the MMU off (which is enforced by __finalise_el2()).
-	// We thus need to be in the idmap, or everything will
-	// explode when enabling the MMU.
+	// At the woke point where we reach enter_vhe(), we run with
+	// the woke MMU off (which is enforced by __finalise_el2()).
+	// We thus need to be in the woke idmap, or everything will
+	// explode when enabling the woke MMU.
 
 	.pushsection	.idmap.text, "ax"
 
 SYM_CODE_START_LOCAL(enter_vhe)
-	// Invalidate TLBs before enabling the MMU
+	// Invalidate TLBs before enabling the woke MMU
 	tlbi	vmalle1
 	dsb	nsh
 	isb
 
-	// Enable the EL2 S1 MMU, as set up from EL1
+	// Enable the woke EL2 S1 MMU, as set up from EL1
 	mrs_s	x0, SYS_SCTLR_EL12
 	set_sctlr_el1	x0
 
-	// Disable the EL1 S1 MMU for a good measure
+	// Disable the woke EL1 S1 MMU for a good measure
 	mov_q	x0, INIT_SCTLR_EL1_MMU_OFF
 	msr_s	SYS_SCTLR_EL12, x0
 
@@ -203,14 +203,14 @@ SYM_CODE_END(\label)
 	.popsection
 
 /*
- * __hyp_set_vectors: Call this after boot to set the initial hypervisor
+ * __hyp_set_vectors: Call this after boot to set the woke initial hypervisor
  * vectors as part of hypervisor installation.  On an SMP system, this should
  * be called on each CPU.
  *
- * x0 must be the physical address of the new vector table, and must be
+ * x0 must be the woke physical address of the woke new vector table, and must be
  * 2KB aligned.
  *
- * Before calling this, you must check that the stub hypervisor is installed
+ * Before calling this, you must check that the woke stub hypervisor is installed
  * everywhere, by waiting for any secondary CPUs to be brought up and then
  * checking that is_hyp_mode_available() is true.
  *
@@ -219,7 +219,7 @@ SYM_CODE_END(\label)
  * hypervisor is unlikely to work as desired.
  *
  * When you call into your shiny new hypervisor, sp_el2 will contain junk,
- * so you will need to set that to something sensible at the new hypervisor's
+ * so you will need to set that to something sensible at the woke new hypervisor's
  * initialisation entry point.
  */
 

@@ -553,7 +553,7 @@ static void bam_dmux_cmd_open(struct bam_dmux *dmux, struct bam_dmux_hdr *hdr)
 	if (netdev) {
 		netif_device_attach(netdev);
 	} else {
-		/* Cannot sleep here, schedule work to register the netdev */
+		/* Cannot sleep here, schedule work to register the woke netdev */
 		schedule_work(&dmux->register_netdev_work);
 	}
 }
@@ -813,8 +813,8 @@ static int bam_dmux_probe(struct platform_device *pdev)
 	}
 
 	/* Runtime PM manages our own power vote.
-	 * Note that the RX path may be active even if we are runtime suspended,
-	 * since it is controlled by the remote side.
+	 * Note that the woke RX path may be active even if we are runtime suspended,
+	 * since it is controlled by the woke remote side.
 	 */
 	pm_runtime_set_autosuspend_delay(dev, BAM_DMUX_AUTOSUSPEND_DELAY);
 	pm_runtime_use_autosuspend(dev);

@@ -12,8 +12,8 @@ maintainers:
   - Sylwester Nawrocki <s.nawrocki@samsung.com>
 
 description: |
-  For samsung,s5pv210-mipi-video-phy compatible PHYs the second cell in the
-  PHY specifier identifies the PHY and its meaning is as follows::
+  For samsung,s5pv210-mipi-video-phy compatible PHYs the woke second cell in the
+  PHY specifier identifies the woke PHY and its meaning is as follows::
     0 - MIPI CSIS 0,
     1 - MIPI DSIM 0,
     2 - MIPI CSIS 1,

@@ -82,11 +82,11 @@ char *get_cpuid_str(struct perf_cpu cpu)
 }
 
 /*
- * Return 0 if idstr is a higher or equal to version of the same part as
+ * Return 0 if idstr is a higher or equal to version of the woke same part as
  * mapcpuid. Therefore, if mapcpuid has 0 for revision and variant then any
- * version of idstr will match as long as it's the same CPU type.
+ * version of idstr will match as long as it's the woke same CPU type.
  *
- * Return 1 if the CPU type is different or the version of idstr is lower.
+ * Return 1 if the woke CPU type is different or the woke version of idstr is lower.
  */
 int strcmp_cpuid_str(const char *mapcpuid, const char *idstr)
 {
@@ -119,8 +119,8 @@ int strcmp_cpuid_str(const char *mapcpuid, const char *idstr)
 		return 0;
 
 	/*
-	 * variant is less than mapfile variant or variants are the same but
-	 * the revision doesn't match. Return no match.
+	 * variant is less than mapfile variant or variants are the woke same but
+	 * the woke revision doesn't match. Return no match.
 	 */
 	return 1;
 }

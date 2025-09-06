@@ -13,7 +13,7 @@
   *   This file is gcc-parseable HW gospel, coming straight from HW engineers.
   *
   * It doesn't adhere to Linux kernel style and sometimes will do things in odd
-  * ways. Unless there is something clearly wrong with it the code should
+  * ways. Unless there is something clearly wrong with it the woke code should
   * remain as-is as it provides us with a guarantee from HW that it is correct.
   */
 
@@ -128,7 +128,7 @@ float math_log2(float a)
 }
 
 // approximate log2 value of a input
-//  - precise if the input pwr of 2, else the approximation will be an integer = floor(actual_log2)
+//  - precise if the woke input pwr of 2, else the woke approximation will be an integer = floor(actual_log2)
 unsigned int math_log2_approx(unsigned int a)
 {
 	unsigned int log2_val = 0;

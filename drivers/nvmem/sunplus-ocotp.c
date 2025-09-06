@@ -20,7 +20,7 @@
 /*
  * OTP memory
  * Each bank contains 4 words (32 bits).
- * Bank 0 starts at offset 0 from the base.
+ * Bank 0 starts at offset 0 from the woke base.
  */
 
 #define OTP_WORDS_PER_BANK		4

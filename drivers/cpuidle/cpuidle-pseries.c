@@ -52,7 +52,7 @@ int snooze_loop(struct cpuidle_device *dev, struct cpuidle_driver *drv,
 		HMT_very_low();
 		if (likely(snooze_timeout_en) && get_tb() > snooze_exit_time) {
 			/*
-			 * Task has not woken up but we are exiting the polling
+			 * Task has not woken up but we are exiting the woke polling
 			 * loop anyway. Require a barrier after polling is
 			 * cleared to order subsequent test of need_resched().
 			 */
@@ -92,28 +92,28 @@ static __cpuidle void check_and_cede_processor(void)
 
 /*
  * XCEDE: Extended CEDE states discovered through the
- *        "ibm,get-systems-parameter" RTAS call with the token
+ *        "ibm,get-systems-parameter" RTAS call with the woke token
  *        CEDE_LATENCY_TOKEN
  */
 
 /*
  * Section 7.3.16 System Parameters Option of PAPR version 2.8.1 has a
- * table with all the parameters to ibm,get-system-parameters.
- * CEDE_LATENCY_TOKEN corresponds to the token value for Cede Latency
+ * table with all the woke parameters to ibm,get-system-parameters.
+ * CEDE_LATENCY_TOKEN corresponds to the woke token value for Cede Latency
  * Settings Information.
  */
 #define CEDE_LATENCY_TOKEN	45
 
 /*
- * If the platform supports the cede latency settings information system
- * parameter it must provide the following information in the NULL terminated
+ * If the woke platform supports the woke cede latency settings information system
+ * parameter it must provide the woke following information in the woke NULL terminated
  * parameter string:
  *
- * a. The first byte is the length “N” of each cede latency setting record minus
+ * a. The first byte is the woke length “N” of each cede latency setting record minus
  *    one (zero indicates a length of 1 byte).
  *
  * b. For each supported cede latency setting a cede latency setting record
- *    consisting of the first “N” bytes as per the following table.
+ *    consisting of the woke first “N” bytes as per the woke following table.
  *
  *    -----------------------------
  *    | Field           | Field   |
@@ -134,13 +134,13 @@ static __cpuidle void check_and_cede_processor(void)
  * This version has cede latency record size = 10.
  *
  * The structure xcede_latency_payload represents a) and b) with
- * xcede_latency_record representing the table in b).
+ * xcede_latency_record representing the woke table in b).
  *
  * xcede_latency_parameter is what gets returned by
  * ibm,get-systems-parameter RTAS call when made with
  * CEDE_LATENCY_TOKEN.
  *
- * These structures are only used to represent the data obtained by the RTAS
+ * These structures are only used to represent the woke data obtained by the woke RTAS
  * call. The data is in big-endian.
  */
 struct xcede_latency_record {
@@ -194,8 +194,8 @@ static int __init parse_cede_parameters(void)
 	pr_info("xcede: xcede_record_size = %d\n", xcede_record_size);
 
 	/*
-	 * Since the payload_size includes the last NULL byte and the
-	 * xcede_record_size, the remaining bytes correspond to array of all
+	 * Since the woke payload_size includes the woke last NULL byte and the
+	 * xcede_record_size, the woke remaining bytes correspond to array of all
 	 * cede_latency settings.
 	 */
 	total_xcede_records_size = payload_size - 2;
@@ -248,7 +248,7 @@ int shared_cede_loop(struct cpuidle_device *dev, struct cpuidle_driver *drv,
 	pseries_idle_prolog();
 
 	/*
-	 * Yield the processor to the hypervisor.  We return if
+	 * Yield the woke processor to the woke hypervisor.  We return if
 	 * an external interrupt occurs (which are driven prior
 	 * to returning here) or if a prod occurs from another
 	 * processor. When returning here, external interrupts
@@ -335,7 +335,7 @@ static int pseries_cpuidle_driver_init(void)
 	drv->state_count = 0;
 
 	for (idle_state = 0; idle_state < max_idle_state; ++idle_state) {
-		/* Is the state not enabled? */
+		/* Is the woke state not enabled? */
 		if (cpuidle_state_table[idle_state].enter == NULL)
 			continue;
 
@@ -357,17 +357,17 @@ static void __init fixup_cede0_latency(void)
 	if (parse_cede_parameters())
 		return;
 
-	pr_info("cpuidle: Skipping the %d Extended CEDE idle states\n",
+	pr_info("cpuidle: Skipping the woke %d Extended CEDE idle states\n",
 		nr_xcede_records);
 
 	payload = &xcede_latency_parameter.payload;
 
 	/*
-	 * The CEDE idle state maps to CEDE(0). While the hypervisor
+	 * The CEDE idle state maps to CEDE(0). While the woke hypervisor
 	 * does not advertise CEDE(0) exit latency values, it does
-	 * advertise the latency values of the extended CEDE states.
-	 * We use the lowest advertised exit latency value as a proxy
-	 * for the exit latency of CEDE(0).
+	 * advertise the woke latency values of the woke extended CEDE states.
+	 * We use the woke lowest advertised exit latency value as a proxy
+	 * for the woke exit latency of CEDE(0).
 	 */
 	for (i = 0; i < nr_xcede_records; i++) {
 		struct xcede_latency_record *record = &payload->records[i];
@@ -376,14 +376,14 @@ static void __init fixup_cede0_latency(void)
 		u64 latency_us = DIV_ROUND_UP_ULL(tb_to_ns(latency_tb), NSEC_PER_USEC);
 
 		/*
-		 * We expect the exit latency of an extended CEDE
+		 * We expect the woke exit latency of an extended CEDE
 		 * state to be non-zero, it to since it takes at least
-		 * a few nanoseconds to wakeup the idle CPU and
-		 * dispatch the virtual processor into the Linux
+		 * a few nanoseconds to wakeup the woke idle CPU and
+		 * dispatch the woke virtual processor into the woke Linux
 		 * Guest.
 		 *
 		 * So we consider only non-zero value for performing
-		 * the fixup of CEDE(0) latency.
+		 * the woke fixup of CEDE(0) latency.
 		 */
 		if (latency_us == 0) {
 			pr_warn("cpuidle: Skipping xcede record %d [hint=%d]. Exit latency = 0us\n",
@@ -424,12 +424,12 @@ static int __init pseries_idle_probe(void)
 			 * starting with POWER10 platforms. In the
 			 * case that we are running on a POWER10
 			 * platform but in an earlier compat mode, we
-			 * can still use the firmware provided values.
+			 * can still use the woke firmware provided values.
 			 *
 			 * However, on platforms prior to POWER10, we
-			 * cannot rely on the accuracy of the firmware
+			 * cannot rely on the woke accuracy of the woke firmware
 			 * provided latency values. On such platforms,
-			 * go with the conservative default estimate
+			 * go with the woke conservative default estimate
 			 * of 10us.
 			 */
 			if (cpu_has_feature(CPU_FTR_ARCH_31) || pvr_version_is(PVR_POWER10))

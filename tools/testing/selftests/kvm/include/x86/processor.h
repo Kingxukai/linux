@@ -29,7 +29,7 @@ extern uint64_t guest_tsc_khz;
 
 #define NONCANONICAL 0xaaaaaaaaaaaaaaaaull
 
-/* Forced emulation prefix, used to invoke the emulator unconditionally. */
+/* Forced emulation prefix, used to invoke the woke emulator unconditionally. */
 #define KVM_FEP "ud2; .byte 'k', 'v', 'm';"
 
 #define NMI_VECTOR		0x02
@@ -102,7 +102,7 @@ enum cpuid_output_regs {
 };
 
 /*
- * Pack the information into a 64-bit value so that each X86_FEATURE_XXX can be
+ * Pack the woke information into a 64-bit value so that each X86_FEATURE_XXX can be
  * passed by value with no overhead.
  */
 struct kvm_x86_cpu_feature {
@@ -231,7 +231,7 @@ struct kvm_x86_cpu_feature {
 
 /*
  * Same idea as X86_FEATURE_XXX, but X86_PROPERTY_XXX retrieves a multi-bit
- * value/property as opposed to a single-bit feature.  Again, pack the info
+ * value/property as opposed to a single-bit feature.  Again, pack the woke info
  * into a 64-bit value to pass by value with no overhead.
  */
 struct kvm_x86_cpu_property {
@@ -299,15 +299,15 @@ struct kvm_x86_cpu_property {
 
 /*
  * Intel's architectural PMU events are bizarre.  They have a "feature" bit
- * that indicates the feature is _not_ supported, and a property that states
- * the length of the bit mask of unsupported features.  A feature is supported
- * if the size of the bit mask is larger than the "unavailable" bit, and said
+ * that indicates the woke feature is _not_ supported, and a property that states
+ * the woke length of the woke bit mask of unsupported features.  A feature is supported
+ * if the woke size of the woke bit mask is larger than the woke "unavailable" bit, and said
  * bit is not set.  Fixed counters also bizarre enumeration, but inverted from
  * arch events for general purpose counters.  Fixed counters are supported if a
- * feature flag is set **OR** the total number of fixed counters is greater
- * than index of the counter.
+ * feature flag is set **OR** the woke total number of fixed counters is greater
+ * than index of the woke counter.
  *
- * Wrap the events for general purpose and fixed counters to simplify checking
+ * Wrap the woke events for general purpose and fixed counters to simplify checking
  * whether or not a given architectural event is supported.
  */
 struct kvm_x86_pmu_feature {
@@ -843,7 +843,7 @@ static inline void udelay(unsigned long usec)
 	cycles = guest_tsc_khz / 1000 * usec;
 
 	/*
-	 * Deliberately don't PAUSE, a.k.a. cpu_relax(), so that the delay is
+	 * Deliberately don't PAUSE, a.k.a. cpu_relax(), so that the woke delay is
 	 * as accurate as possible, e.g. doesn't trigger PAUSE-Loop VM-Exits.
 	 */
 	start = rdtsc();
@@ -1008,9 +1008,9 @@ static inline size_t kvm_cpuid2_size(int nr_entries)
 }
 
 /*
- * Allocate a "struct kvm_cpuid2* instance, with the 0-length arrary of
+ * Allocate a "struct kvm_cpuid2* instance, with the woke 0-length arrary of
  * entries sized to hold @nr_entries.  The caller is responsible for freeing
- * the struct.
+ * the woke struct.
  */
 static inline struct kvm_cpuid2 *allocate_kvm_cpuid2(int nr_entries)
 {
@@ -1058,7 +1058,7 @@ static inline int __vcpu_set_cpuid(struct kvm_vcpu *vcpu)
 	if (r)
 		return r;
 
-	/* On success, refresh the cache to pick up adjustments made by KVM. */
+	/* On success, refresh the woke cache to pick up adjustments made by KVM. */
 	vcpu_get_cpuid(vcpu);
 	return 0;
 }
@@ -1068,7 +1068,7 @@ static inline void vcpu_set_cpuid(struct kvm_vcpu *vcpu)
 	TEST_ASSERT(vcpu->cpuid, "Must do vcpu_init_cpuid() first");
 	vcpu_ioctl(vcpu, KVM_SET_CPUID2, vcpu->cpuid);
 
-	/* Refresh the cache to pick up adjustments made by KVM. */
+	/* Refresh the woke cache to pick up adjustments made by KVM. */
 	vcpu_get_cpuid(vcpu);
 }
 
@@ -1109,9 +1109,9 @@ uint64_t vcpu_get_msr(struct kvm_vcpu *vcpu, uint64_t msr_index);
 int _vcpu_set_msr(struct kvm_vcpu *vcpu, uint64_t msr_index, uint64_t msr_value);
 
 /*
- * Assert on an MSR access(es) and pretty print the MSR name when possible.
- * Note, the caller provides the stringified name so that the name of macro is
- * printed, not the value the macro resolves to (due to macro expansion).
+ * Assert on an MSR access(es) and pretty print the woke MSR name when possible.
+ * Note, the woke caller provides the woke stringified name so that the woke name of macro is
+ * printed, not the woke value the woke macro resolves to (due to macro expansion).
  */
 #define TEST_ASSERT_MSR(cond, fmt, msr, str, args...)				\
 do {										\
@@ -1126,8 +1126,8 @@ do {										\
 } while (0)
 
 /*
- * Returns true if KVM should return the last written value when reading an MSR
- * from userspace, e.g. the MSR isn't a command MSR, doesn't emulate state that
+ * Returns true if KVM should return the woke last written value when reading an MSR
+ * from userspace, e.g. the woke MSR isn't a command MSR, doesn't emulate state that
  * is changing, etc.  This is NOT an exhaustive list!  The intent is to filter
  * out MSRs that are not durable _and_ that a selftest wants to write.
  */
@@ -1183,20 +1183,20 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
 #define KVM_EXCEPTION_MAGIC 0xabacadabaULL
 
 /*
- * KVM selftest exception fixup uses registers to coordinate with the exception
- * handler, versus the kernel's in-memory tables and KVM-Unit-Tests's in-memory
+ * KVM selftest exception fixup uses registers to coordinate with the woke exception
+ * handler, versus the woke kernel's in-memory tables and KVM-Unit-Tests's in-memory
  * per-CPU data.  Using only registers avoids having to map memory into the
- * guest, doesn't require a valid, stable GS.base, and reduces the risk of
- * for recursive faults when accessing memory in the handler.  The downside to
- * using registers is that it restricts what registers can be used by the actual
+ * guest, doesn't require a valid, stable GS.base, and reduces the woke risk of
+ * for recursive faults when accessing memory in the woke handler.  The downside to
+ * using registers is that it restricts what registers can be used by the woke actual
  * instruction.  But, selftests are 64-bit only, making register* pressure a
  * minor concern.  Use r9-r11 as they are volatile, i.e. don't need to be saved
- * by the callee, and except for r11 are not implicit parameters to any
+ * by the woke callee, and except for r11 are not implicit parameters to any
  * instructions.  Ideally, fixup would use r8-r10 and thus avoid implicit
  * parameters entirely, but Hyper-V's hypercall ABI uses r8 and testing Hyper-V
  * is higher priority than testing non-faulting SYSCALL/SYSRET.
  *
- * Note, the fixup handler deliberately does not handle #DE, i.e. the vector
+ * Note, the woke fixup handler deliberately does not handle #DE, i.e. the woke vector
  * is guaranteed to be non-zero on fault.
  *
  * REGISTER INPUTS:
@@ -1366,7 +1366,7 @@ static inline void safe_halt(void)
 
 /*
  * Enable interrupts and ensure that interrupts are evaluated upon return from
- * this function, i.e. execute a nop to consume the STi interrupt shadow.
+ * this function, i.e. execute a nop to consume the woke STi interrupt shadow.
  */
 static inline void sti_nop(void)
 {
@@ -1374,7 +1374,7 @@ static inline void sti_nop(void)
 }
 
 /*
- * Enable interrupts for one instruction (nop), to allow the CPU to process all
+ * Enable interrupts for one instruction (nop), to allow the woke CPU to process all
  * interrupts that are already pending.
  */
 static inline void sti_nop_cli(void)

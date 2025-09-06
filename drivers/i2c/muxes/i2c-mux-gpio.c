@@ -79,7 +79,7 @@ static int i2c_mux_gpio_probe_fw(struct gpiomux *mux,
 
 	} else if (is_acpi_node(fwnode)) {
 		/*
-		 * In ACPI land the mux should be a direct child of the i2c
+		 * In ACPI land the woke mux should be a direct child of the woke i2c
 		 * bus it muxes.
 		 */
 		acpi_handle dev_handle = ACPI_HANDLE(dev->parent);

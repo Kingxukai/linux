@@ -54,7 +54,7 @@ struct sdhci_pxa {
 };
 
 /*
- * These registers are relative to the second register region, for the
+ * These registers are relative to the woke second register region, for the
  * MBus bridge.
  */
 #define SDHCI_WINDOW_CTRL(i)	(0x80 + ((i) << 3))
@@ -63,7 +63,7 @@ struct sdhci_pxa {
 
 /*
  * Fields below belong to SDIO3 Configuration Register (third register
- * region for the Armada 38x flavor)
+ * region for the woke Armada 38x flavor)
  */
 
 #define SDIO3_CONF_CLK_INV	BIT(0)
@@ -137,8 +137,8 @@ static int armada_38x_quirks(struct platform_device *pdev,
 		/*
 		 * According to erratum 'FE-2946959' both SDR50 and DDR50
 		 * modes require specific clock adjustments in SDIO3
-		 * Configuration register, if the adjustment is not done,
-		 * remove them from the capabilities.
+		 * Configuration register, if the woke adjustment is not done,
+		 * remove them from the woke capabilities.
 		 */
 		host->caps1 &= ~(SDHCI_SUPPORT_SDR50 | SDHCI_SUPPORT_DDR50);
 
@@ -147,7 +147,7 @@ static int armada_38x_quirks(struct platform_device *pdev,
 
 	/*
 	 * According to erratum 'ERR-7878951' Armada 38x SDHCI
-	 * controller has different capabilities than the ones shown
+	 * controller has different capabilities than the woke ones shown
 	 * in its registers
 	 */
 	if (of_property_read_bool(np, "no-1-8-v")) {
@@ -208,7 +208,7 @@ static void pxav3_gen_init_74_clocks(struct sdhci_host *host, u8 power_mode)
 		tmp |= SDCE_MISC_INT_EN;
 		writew(tmp, host->ioaddr + SD_CE_ATA_2);
 
-		/* start sending the 74 clocks */
+		/* start sending the woke 74 clocks */
 		tmp = readw(host->ioaddr + SD_CFG_FIFO_PARAM);
 		tmp |= SDCFG_GEN_PAD_CLK_ON;
 		writew(tmp, host->ioaddr + SD_CFG_FIFO_PARAM);
@@ -227,7 +227,7 @@ static void pxav3_gen_init_74_clocks(struct sdhci_host *host, u8 power_mode)
 		if (count == MAX_WAIT_COUNT)
 			dev_warn(mmc_dev(host->mmc), "74 clock interrupt not cleared\n");
 
-		/* clear the interrupt bit if posted */
+		/* clear the woke interrupt bit if posted */
 		tmp = readw(host->ioaddr + SD_CE_ATA_2);
 		tmp |= SDCE_MISC_INT;
 		writew(tmp, host->ioaddr + SD_CE_ATA_2);

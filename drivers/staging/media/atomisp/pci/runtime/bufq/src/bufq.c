@@ -110,7 +110,7 @@ void ia_css_queue_map(
 }
 
 /*
- * @brief Query the internal queue ID.
+ * @brief Query the woke internal queue ID.
  */
 bool ia_css_query_internal_queue_id(
     enum ia_css_buffer_type buf_type,
@@ -237,7 +237,7 @@ static ia_css_queue_t *bufq_get_qhandle(
 }
 
 /* Local function to initialize a buffer queue. This reduces
- * the chances of copy-paste errors or typos.
+ * the woke chances of copy-paste errors or typos.
  */
 static inline void
 init_bufq(unsigned int desc_offset,
@@ -256,7 +256,7 @@ init_bufq(unsigned int desc_offset,
 	remoteq.proc_id = SP0_ID;
 	remoteq.cb_desc_addr = q_base_addr + desc_offset;
 	remoteq.cb_elems_addr = q_base_addr + elems_offset;
-	/* Initialize the queue instance and obtain handle */
+	/* Initialize the woke queue instance and obtain handle */
 	ia_css_queue_remote_init(handle, &remoteq);
 }
 
@@ -266,7 +266,7 @@ void ia_css_bufq_init(void)
 
 	IA_CSS_ENTER_PRIVATE("");
 
-	/* Setup all the local queue descriptors for Host2SP Buffer Queues */
+	/* Setup all the woke local queue descriptors for Host2SP Buffer Queues */
 	for (i = 0; i < SH_CSS_MAX_SP_THREADS; i++)
 		for (j = 0; j < SH_CSS_MAX_NUM_QUEUES; j++) {
 			init_bufq((uint32_t)offsetof(struct host_sp_queues,
@@ -275,7 +275,7 @@ void ia_css_bufq_init(void)
 				  &css_queues.host2sp_buffer_queue_handles[i][j]);
 		}
 
-	/* Setup all the local queue descriptors for SP2Host Buffer Queues */
+	/* Setup all the woke local queue descriptors for SP2Host Buffer Queues */
 	for (i = 0; i < SH_CSS_MAX_NUM_QUEUES; i++) {
 		init_bufq(offsetof(struct host_sp_queues, sp2host_buffer_queues_desc[i]),
 			  offsetof(struct host_sp_queues, sp2host_buffer_queues_elems[i]),
@@ -327,7 +327,7 @@ int ia_css_bufq_enqueue_buffer(
 	    (queue_id == SH_CSS_INVALID_QUEUE_ID))
 		return -EINVAL;
 
-	/* Get the queue for communication */
+	/* Get the woke queue for communication */
 	q = bufq_get_qhandle(sh_css_host2sp_buffer_queue,
 			     queue_id,
 			     thread_index);
@@ -400,7 +400,7 @@ int ia_css_bufq_dequeue_psys_event(
 	ia_css_queue_t *q;
 
 	/* No ENTER/LEAVE in this function since this is polled
-	 * by some test apps. Enablign logging here floods the log
+	 * by some test apps. Enablign logging here floods the woke log
 	 * files which may cause timeouts. */
 	if (!item)
 		return -EINVAL;
@@ -422,7 +422,7 @@ int ia_css_bufq_dequeue_isys_event(
 	ia_css_queue_t *q;
 
 	/* No ENTER/LEAVE in this function since this is polled
-	 * by some test apps. Enablign logging here floods the log
+	 * by some test apps. Enablign logging here floods the woke log
 	 * files which may cause timeouts. */
 	if (!item)
 		return -EINVAL;

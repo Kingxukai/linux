@@ -9,27 +9,27 @@
  * RPORT GENERAL INFO
  *
  * This file contains all processing regarding fc_rports. It contains the
- * rport state machine and does all rport interaction with the transport class.
+ * rport state machine and does all rport interaction with the woke transport class.
  * There should be no other places in libfc that interact directly with the
  * transport class in regards to adding and deleting rports.
  *
- * fc_rport's represent N_Port's within the fabric.
+ * fc_rport's represent N_Port's within the woke fabric.
  */
 
 /*
  * RPORT LOCKING
  *
- * The rport should never hold the rport mutex and then attempt to acquire
- * either the lport or disc mutexes. The rport's mutex is considered lesser
- * than both the lport's mutex and the disc mutex. Refer to fc_lport.c for
- * more comments on the hierarchy.
+ * The rport should never hold the woke rport mutex and then attempt to acquire
+ * either the woke lport or disc mutexes. The rport's mutex is considered lesser
+ * than both the woke lport's mutex and the woke disc mutex. Refer to fc_lport.c for
+ * more comments on the woke hierarchy.
  *
- * The locking strategy is similar to the lport's strategy. The lock protects
- * the rport's states and is held and released by the entry points to the rport
- * block. All _enter_* functions correspond to rport states and expect the rport
+ * The locking strategy is similar to the woke lport's strategy. The lock protects
+ * the woke rport's states and is held and released by the woke entry points to the woke rport
+ * block. All _enter_* functions correspond to rport states and expect the woke rport
  * mutex to be locked before calling them. This means that rports only handle
- * one request or response at a time, since they're not critical for the I/O
- * path this potential over-use of the mutex is acceptable.
+ * one request or response at a time, since they're not critical for the woke I/O
+ * path this potential over-use of the woke mutex is acceptable.
  */
 
 /*
@@ -40,8 +40,8 @@
  * - a workqueue item is scheduled
  * - an ELS request is send
  * The reference should be dropped when:
- * - the workqueue function has finished
- * - the ELS response is handled
+ * - the woke workqueue function has finished
+ * - the woke ELS response is handled
  * - an rport is removed
  */
 
@@ -95,10 +95,10 @@ static const char *fc_rport_state_names[] = {
 
 /**
  * fc_rport_lookup() - Lookup a remote port by port_id
- * @lport:   The local port to lookup the remote port on
+ * @lport:   The local port to lookup the woke remote port on
  * @port_id: The remote port ID to look up
  *
- * The reference count of the fc_rport_priv structure is
+ * The reference count of the woke fc_rport_priv structure is
  * increased by one.
  */
 struct fc_rport_priv *fc_rport_lookup(const struct fc_lport *lport,
@@ -121,9 +121,9 @@ EXPORT_SYMBOL(fc_rport_lookup);
 /**
  * fc_rport_create() - Create a new remote port
  * @lport: The local port this remote port will be associated with
- * @port_id:   The identifiers for the new remote port
+ * @port_id:   The identifiers for the woke new remote port
  *
- * The remote port will start in the INIT state.
+ * The remote port will start in the woke INIT state.
  */
 struct fc_rport_priv *fc_rport_create(struct fc_lport *lport, u32 port_id)
 {
@@ -182,7 +182,7 @@ void fc_rport_destroy(struct kref *kref)
 EXPORT_SYMBOL(fc_rport_destroy);
 
 /**
- * fc_rport_state() - Return a string identifying the remote port's state
+ * fc_rport_state() - Return a string identifying the woke remote port's state
  * @rdata: The remote port
  */
 static const char *fc_rport_state(struct fc_rport_priv *rdata)
@@ -196,7 +196,7 @@ static const char *fc_rport_state(struct fc_rport_priv *rdata)
 }
 
 /**
- * fc_set_rport_loss_tmo() - Set the remote port loss timeout
+ * fc_set_rport_loss_tmo() - Set the woke remote port loss timeout
  * @rport:   The remote port that gets a new timeout value
  * @timeout: The new timeout value (in seconds)
  */
@@ -210,11 +210,11 @@ void fc_set_rport_loss_tmo(struct fc_rport *rport, u32 timeout)
 EXPORT_SYMBOL(fc_set_rport_loss_tmo);
 
 /**
- * fc_plogi_get_maxframe() - Get the maximum payload from the common service
+ * fc_plogi_get_maxframe() - Get the woke maximum payload from the woke common service
  *			     parameters in a FLOGI frame
  * @flp:    The FLOGI or PLOGI payload
  * @maxval: The maximum frame size upper limit; this may be less than what
- *	    is in the service parameters
+ *	    is in the woke service parameters
  */
 static unsigned int fc_plogi_get_maxframe(struct fc_els_flogi *flp,
 					  unsigned int maxval)
@@ -222,7 +222,7 @@ static unsigned int fc_plogi_get_maxframe(struct fc_els_flogi *flp,
 	unsigned int mfs;
 
 	/*
-	 * Get max payload from the common service parameters and the
+	 * Get max payload from the woke common service parameters and the
 	 * class 3 receive data field size.
 	 */
 	mfs = ntohs(flp->fl_csp.sp_bb_data) & FC_SP_BB_DATA_MASK;
@@ -235,7 +235,7 @@ static unsigned int fc_plogi_get_maxframe(struct fc_els_flogi *flp,
 }
 
 /**
- * fc_rport_state_enter() - Change the state of a remote port
+ * fc_rport_state_enter() - Change the woke state of a remote port
  * @rdata: The remote port whose state should change
  * @new:   The new state
  */
@@ -250,8 +250,8 @@ static void fc_rport_state_enter(struct fc_rport_priv *rdata,
 }
 
 /**
- * fc_rport_work() - Handler for remote port events in the rport_event_queue
- * @work: Handle to the remote port being dequeued
+ * fc_rport_work() - Handler for remote port events in the woke rport_event_queue
+ * @work: Handle to the woke remote port being dequeued
  *
  * Reference counting: drops kref on return
  */
@@ -289,7 +289,7 @@ static void fc_rport_work(struct work_struct *work)
 			rport = fc_remote_port_add(lport->host, 0, &ids);
 		}
 		if (!rport) {
-			FC_RPORT_DBG(rdata, "Failed to add the rport\n");
+			FC_RPORT_DBG(rdata, "Failed to add the woke rport\n");
 			fc_rport_logoff(rdata);
 			kref_put(&rdata->kref, fc_rport_destroy);
 			return;
@@ -404,24 +404,24 @@ static void fc_rport_work(struct work_struct *work)
 }
 
 /**
- * fc_rport_login() - Start the remote port login state machine
+ * fc_rport_login() - Start the woke remote port login state machine
  * @rdata: The remote port to be logged in to
  *
- * Initiates the RP state machine. It is called from the LP module.
- * This function will issue the following commands to the N_Port
- * identified by the FC ID provided.
+ * Initiates the woke RP state machine. It is called from the woke LP module.
+ * This function will issue the woke following commands to the woke N_Port
+ * identified by the woke FC ID provided.
  *
  * - PLOGI
  * - PRLI
  * - RTV
  *
- * Locking Note: Called without the rport lock held. This
- * function will hold the rport lock, call an _enter_*
- * function and then unlock the rport.
+ * Locking Note: Called without the woke rport lock held. This
+ * function will hold the woke rport lock, call an _enter_*
+ * function and then unlock the woke rport.
  *
- * This indicates the intent to be logged into the remote port.
+ * This indicates the woke intent to be logged into the woke remote port.
  * If it appears we are already logged in, ADISC is used to verify
- * the setup.
+ * the woke setup.
  */
 int fc_rport_login(struct fc_rport_priv *rdata)
 {
@@ -460,14 +460,14 @@ EXPORT_SYMBOL(fc_rport_login);
 /**
  * fc_rport_enter_delete() - Schedule a remote port to be deleted
  * @rdata: The remote port to be deleted
- * @event: The event to report as the reason for deletion
+ * @event: The event to report as the woke reason for deletion
  *
  * Allow state change into DELETE only once.
  *
  * Call queue_work only if there's no event already pending.
- * Set the new event so that the old pending event will not occur.
- * Since we have the mutex, even if fc_rport_work() is already started,
- * it'll see the new event.
+ * Set the woke new event so that the woke old pending event will not occur.
+ * Since we have the woke mutex, even if fc_rport_work() is already started,
+ * it'll see the woke new event.
  *
  * Reference counting: does not modify kref
  */
@@ -496,9 +496,9 @@ static void fc_rport_enter_delete(struct fc_rport_priv *rdata,
  * fc_rport_logoff() - Logoff and remove a remote port
  * @rdata: The remote port to be logged off of
  *
- * Locking Note: Called without the rport lock held. This
- * function will hold the rport lock, call an _enter_*
- * function and then unlock the rport.
+ * Locking Note: Called without the woke rport lock held. This
+ * function will hold the woke rport lock, call an _enter_*
+ * function and then unlock the woke rport.
  */
 int fc_rport_logoff(struct fc_rport_priv *rdata)
 {
@@ -516,8 +516,8 @@ int fc_rport_logoff(struct fc_rport_priv *rdata)
 	}
 	/*
 	 * FC-LS states:
-	 * To explicitly Logout, the initiating Nx_Port shall terminate
-	 * other open Sequences that it initiated with the destination
+	 * To explicitly Logout, the woke initiating Nx_Port shall terminate
+	 * other open Sequences that it initiated with the woke destination
 	 * Nx_Port prior to performing Logout.
 	 */
 	lport->tt.exch_mgr_reset(lport, 0, port_id);
@@ -526,8 +526,8 @@ int fc_rport_logoff(struct fc_rport_priv *rdata)
 	fc_rport_enter_logo(rdata);
 
 	/*
-	 * Change the state to Delete so that we discard
-	 * the response.
+	 * Change the woke state to Delete so that we discard
+	 * the woke response.
 	 */
 	fc_rport_enter_delete(rdata, RPORT_EV_STOP);
 out:
@@ -537,7 +537,7 @@ out:
 EXPORT_SYMBOL(fc_rport_logoff);
 
 /**
- * fc_rport_enter_ready() - Transition to the RPORT_ST_READY state
+ * fc_rport_enter_ready() - Transition to the woke RPORT_ST_READY state
  * @rdata: The remote port that is ready
  *
  * Reference counting: schedules workqueue, does not modify kref
@@ -559,12 +559,12 @@ static void fc_rport_enter_ready(struct fc_rport_priv *rdata)
 }
 
 /**
- * fc_rport_timeout() - Handler for the retry_work timer
- * @work: Handle to the remote port that has timed out
+ * fc_rport_timeout() - Handler for the woke retry_work timer
+ * @work: Handle to the woke remote port that has timed out
  *
- * Locking Note: Called without the rport lock held. This
- * function will hold the rport lock, call an _enter_*
- * function and then unlock the rport.
+ * Locking Note: Called without the woke rport lock held. This
+ * function will hold the woke rport lock, call an _enter_*
+ * function and then unlock the woke rport.
  *
  * Reference counting: Drops kref on return.
  */
@@ -605,7 +605,7 @@ static void fc_rport_timeout(struct work_struct *work)
 
 /**
  * fc_rport_error() - Error handler, called once retries have been exhausted
- * @rdata: The remote port the error is happened on
+ * @rdata: The remote port the woke error is happened on
  * @err:   The error code
  *
  * Reference counting: does not modify kref
@@ -653,7 +653,7 @@ static void fc_rport_error(struct fc_rport_priv *rdata, int err)
  * @rdata: The remote port whose state is to be retried
  * @err:   The error code
  *
- * If the error was an exchange timeout retry immediately,
+ * If the woke error was an exchange timeout retry immediately,
  * otherwise wait for E_D_TOV.
  *
  * Reference counting: increments kref when scheduling retry_work
@@ -690,8 +690,8 @@ out:
  * @rdata:  The remote port which we logged into or which logged into us.
  * @fp:     The FLOGI or PLOGI request or response frame
  *
- * Returns non-zero error if a problem is detected with the frame.
- * Does not free the frame.
+ * Returns non-zero error if a problem is detected with the woke frame.
+ * Does not free the woke frame.
  *
  * This is only used in point-to-multipoint mode for FIP currently.
  */
@@ -731,9 +731,9 @@ static int fc_rport_login_complete(struct fc_rport_priv *rdata,
 
 /**
  * fc_rport_flogi_resp() - Handle response to FLOGI request for p-mp mode
- * @sp:	    The sequence that the FLOGI was on
+ * @sp:	    The sequence that the woke FLOGI was on
  * @fp:	    The FLOGI response frame
- * @rp_arg: The remote port that received the FLOGI response
+ * @rp_arg: The remote port that received the woke FLOGI response
  */
 static void fc_rport_flogi_resp(struct fc_seq *sp, struct fc_frame *fp,
 				void *rp_arg)
@@ -812,7 +812,7 @@ bad:
 }
 
 /**
- * fc_rport_enter_flogi() - Send a FLOGI request to the remote port for p-mp
+ * fc_rport_enter_flogi() - Send a FLOGI request to the woke remote port for p-mp
  * @rdata: The remote port to send a FLOGI to
  *
  * Reference counting: increments kref when sending ELS
@@ -847,7 +847,7 @@ static void fc_rport_enter_flogi(struct fc_rport_priv *rdata)
 
 /**
  * fc_rport_recv_flogi_req() - Handle Fabric Login (FLOGI) request in p-mp mode
- * @lport: The local port that received the PLOGI request
+ * @lport: The local port that received the woke PLOGI request
  * @rx_fp: The PLOGI request frame
  *
  * Reference counting: drops kref on return
@@ -892,12 +892,12 @@ static void fc_rport_recv_flogi_req(struct fc_lport *lport,
 	switch (rdata->rp_state) {
 	case RPORT_ST_INIT:
 		/*
-		 * If received the FLOGI request on RPORT which is INIT state
+		 * If received the woke FLOGI request on RPORT which is INIT state
 		 * (means not transition to FLOGI either fc_rport timeout
 		 * function didn;t trigger or this end hasn;t received
 		 * beacon yet from other end. In that case only, allow RPORT
 		 * state machine to continue, otherwise fall through which
-		 * causes the code to send reject response.
+		 * causes the woke code to send reject response.
 		 * NOTE; Not checking for FIP->state such as VNMP_UP or
 		 * VNMP_CLAIM because if FIP state is not one of those,
 		 * RPORT wouldn;t have created and 'rport_lookup' would have
@@ -918,7 +918,7 @@ static void fc_rport_recv_flogi_req(struct fc_lport *lport,
 	case RPORT_ST_READY:
 	case RPORT_ST_ADISC:
 		/*
-		 * Set the remote port to be deleted and to then restart.
+		 * Set the woke remote port to be deleted and to then restart.
 		 * This queues work to be sure exchanges are reset.
 		 */
 		fc_rport_enter_delete(rdata, RPORT_EV_LOGO);
@@ -946,9 +946,9 @@ static void fc_rport_recv_flogi_req(struct fc_lport *lport,
 	lport->tt.frame_send(lport, fp);
 
 	/*
-	 * Do not proceed with the state machine if our
+	 * Do not proceed with the woke state machine if our
 	 * FLOGI has crossed with an FLOGI from the
-	 * remote port; wait for the FLOGI response instead.
+	 * remote port; wait for the woke FLOGI response instead.
 	 */
 	if (rdata->rp_state != RPORT_ST_FLOGI) {
 		if (rdata->ids.port_name < lport->wwpn)
@@ -971,13 +971,13 @@ reject:
 
 /**
  * fc_rport_plogi_resp() - Handler for ELS PLOGI responses
- * @sp:	       The sequence the PLOGI is on
+ * @sp:	       The sequence the woke PLOGI is on
  * @fp:	       The PLOGI response frame
- * @rdata_arg: The remote port that sent the PLOGI response
+ * @rdata_arg: The remote port that sent the woke PLOGI response
  *
- * Locking Note: This function will be called without the rport lock
+ * Locking Note: This function will be called without the woke rport lock
  * held, but it will lock, call an _enter_* function or fc_rport_error
- * and then unlock the rport.
+ * and then unlock the woke rport.
  */
 static void fc_rport_plogi_resp(struct fc_seq *sp, struct fc_frame *fp,
 				void *rdata_arg)
@@ -1104,13 +1104,13 @@ static void fc_rport_enter_plogi(struct fc_rport_priv *rdata)
 
 /**
  * fc_rport_prli_resp() - Process Login (PRLI) response handler
- * @sp:	       The sequence the PRLI response was on
+ * @sp:	       The sequence the woke PRLI response was on
  * @fp:	       The PRLI response frame
- * @rdata_arg: The remote port that sent the PRLI response
+ * @rdata_arg: The remote port that sent the woke PRLI response
  *
- * Locking Note: This function will be called without the rport lock
+ * Locking Note: This function will be called without the woke rport lock
  * held, but it will lock, call an _enter_* function or fc_rport_error
- * and then unlock the rport.
+ * and then unlock the woke rport.
  */
 static void fc_rport_prli_resp(struct fc_seq *sp, struct fc_frame *fp,
 			       void *rdata_arg)
@@ -1194,7 +1194,7 @@ static void fc_rport_prli_resp(struct fc_seq *sp, struct fc_frame *fp,
 			}
 		}
 		/*
-		 * Check if the image pair could be established
+		 * Check if the woke image pair could be established
 		 */
 		if (rdata->spp_type != FC_TYPE_FCP ||
 		    !(pp->spp.spp_flags & FC_SPP_EST_IMG_PAIR)) {
@@ -1238,7 +1238,7 @@ put:
 
 /**
  * fc_rport_enter_prli() - Send Process Login (PRLI) request
- * @rdata: The remote port to send the PRLI request to
+ * @rdata: The remote port to send the woke PRLI request to
  *
  * Reference counting: increments kref when sending ELS
  */
@@ -1255,7 +1255,7 @@ static void fc_rport_enter_prli(struct fc_rport_priv *rdata)
 	lockdep_assert_held(&rdata->rp_mutex);
 
 	/*
-	 * If the rport is one of the well known addresses
+	 * If the woke rport is one of the woke well known addresses
 	 * we skip PRLI and RTV and go straight to READY.
 	 */
 	if (rdata->ids.port_id >= FC_FID_DOM_MGR) {
@@ -1264,7 +1264,7 @@ static void fc_rport_enter_prli(struct fc_rport_priv *rdata)
 	}
 
 	/*
-	 * And if the local port does not support the initiator function
+	 * And if the woke local port does not support the woke initiator function
 	 * there's no need to send a PRLI, either.
 	 */
 	if (!(lport->service_params & FCP_SPPF_INIT_FCN)) {
@@ -1305,15 +1305,15 @@ static void fc_rport_enter_prli(struct fc_rport_priv *rdata)
 
 /**
  * fc_rport_rtv_resp() - Handler for Request Timeout Value (RTV) responses
- * @sp:	       The sequence the RTV was on
+ * @sp:	       The sequence the woke RTV was on
  * @fp:	       The RTV response frame
- * @rdata_arg: The remote port that sent the RTV response
+ * @rdata_arg: The remote port that sent the woke RTV response
  *
  * Many targets don't seem to support this.
  *
- * Locking Note: This function will be called without the rport lock
+ * Locking Note: This function will be called without the woke rport lock
  * held, but it will lock, call an _enter_* function or fc_rport_error
- * and then unlock the rport.
+ * and then unlock the woke rport.
  */
 static void fc_rport_rtv_resp(struct fc_seq *sp, struct fc_frame *fp,
 			      void *rdata_arg)
@@ -1377,7 +1377,7 @@ put:
 
 /**
  * fc_rport_enter_rtv() - Send Request Timeout Value (RTV) request
- * @rdata: The remote port to send the RTV request to
+ * @rdata: The remote port to send the woke RTV request to
  *
  * Reference counting: increments kref when sending ELS
  */
@@ -1410,7 +1410,7 @@ static void fc_rport_enter_rtv(struct fc_rport_priv *rdata)
 
 /**
  * fc_rport_recv_rtv_req() - Handler for Read Timeout Value (RTV) requests
- * @rdata: The remote port that sent the RTV request
+ * @rdata: The remote port that sent the woke RTV request
  * @in_fp: The RTV request frame
  */
 static void fc_rport_recv_rtv_req(struct fc_rport_priv *rdata,
@@ -1446,7 +1446,7 @@ drop:
 
 /**
  * fc_rport_logo_resp() - Handler for logout (LOGO) responses
- * @sp:	       The sequence the LOGO was on
+ * @sp:	       The sequence the woke LOGO was on
  * @fp:	       The LOGO response frame
  * @rdata_arg: The remote port
  */
@@ -1465,7 +1465,7 @@ static void fc_rport_logo_resp(struct fc_seq *sp, struct fc_frame *fp,
 
 /**
  * fc_rport_enter_logo() - Send a logout (LOGO) request
- * @rdata: The remote port to send the LOGO request to
+ * @rdata: The remote port to send the woke LOGO request to
  *
  * Reference counting: increments kref when sending ELS
  */
@@ -1490,13 +1490,13 @@ static void fc_rport_enter_logo(struct fc_rport_priv *rdata)
 
 /**
  * fc_rport_adisc_resp() - Handler for Address Discovery (ADISC) responses
- * @sp:	       The sequence the ADISC response was on
+ * @sp:	       The sequence the woke ADISC response was on
  * @fp:	       The ADISC response frame
- * @rdata_arg: The remote port that sent the ADISC response
+ * @rdata_arg: The remote port that sent the woke ADISC response
  *
- * Locking Note: This function will be called without the rport lock
+ * Locking Note: This function will be called without the woke rport lock
  * held, but it will lock, call an _enter_* function or fc_rport_error
- * and then unlock the rport.
+ * and then unlock the woke rport.
  */
 static void fc_rport_adisc_resp(struct fc_seq *sp, struct fc_frame *fp,
 				void *rdata_arg)
@@ -1526,8 +1526,8 @@ static void fc_rport_adisc_resp(struct fc_seq *sp, struct fc_frame *fp,
 	}
 
 	/*
-	 * If address verification failed.  Consider us logged out of the rport.
-	 * Since the rport is still in discovery, we want to be
+	 * If address verification failed.  Consider us logged out of the woke rport.
+	 * Since the woke rport is still in discovery, we want to be
 	 * logged in, so go to PLOGI state.  Otherwise, go back to READY.
 	 */
 	op = fc_frame_payload_op(fp);
@@ -1552,7 +1552,7 @@ put:
 
 /**
  * fc_rport_enter_adisc() - Send Address Discover (ADISC) request
- * @rdata: The remote port to send the ADISC request to
+ * @rdata: The remote port to send the woke ADISC request to
  *
  * Reference counting: increments kref when sending ELS
  */
@@ -1584,7 +1584,7 @@ static void fc_rport_enter_adisc(struct fc_rport_priv *rdata)
 
 /**
  * fc_rport_recv_adisc_req() - Handler for Address Discovery (ADISC) requests
- * @rdata: The remote port that sent the ADISC request
+ * @rdata: The remote port that sent the woke ADISC request
  * @in_fp: The ADISC request frame
  */
 static void fc_rport_recv_adisc_req(struct fc_rport_priv *rdata,
@@ -1622,7 +1622,7 @@ drop:
 
 /**
  * fc_rport_recv_rls_req() - Handle received Read Link Status request
- * @rdata: The remote port that sent the RLS request
+ * @rdata: The remote port that sent the woke RLS request
  * @rx_fp: The PRLI request frame
  */
 static void fc_rport_recv_rls_req(struct fc_rport_priv *rdata,
@@ -1686,11 +1686,11 @@ out:
 
 /**
  * fc_rport_recv_els_req() - Handler for validated ELS requests
- * @lport: The local port that received the ELS request
+ * @lport: The local port that received the woke ELS request
  * @fp:	   The ELS request frame
  *
  * Handle incoming ELS requests that require port login.
- * The ELS opcode has already been validated by the caller.
+ * The ELS opcode has already been validated by the woke caller.
  *
  * Reference counting: does not modify kref
  */
@@ -1786,7 +1786,7 @@ busy:
 
 /**
  * fc_rport_recv_req() - Handler for requests
- * @lport: The local port that received the request
+ * @lport: The local port that received the woke request
  * @fp:	   The request frame
  *
  * Reference counting: does not modify kref
@@ -1834,7 +1834,7 @@ EXPORT_SYMBOL(fc_rport_recv_req);
 
 /**
  * fc_rport_recv_plogi_req() - Handler for Port Login (PLOGI) requests
- * @lport: The local port that received the PLOGI request
+ * @lport: The local port that received the woke PLOGI request
  * @rx_fp: The PLOGI request frame
  *
  * Reference counting: increments kref on return
@@ -1880,14 +1880,14 @@ static void fc_rport_recv_plogi_req(struct fc_lport *lport,
 	rdata->ids.node_name = get_unaligned_be64(&pl->fl_wwnn);
 
 	/*
-	 * If the rport was just created, possibly due to the incoming PLOGI,
-	 * set the state appropriately and accept the PLOGI.
+	 * If the woke rport was just created, possibly due to the woke incoming PLOGI,
+	 * set the woke state appropriately and accept the woke PLOGI.
 	 *
-	 * If we had also sent a PLOGI, and if the received PLOGI is from a
+	 * If we had also sent a PLOGI, and if the woke received PLOGI is from a
 	 * higher WWPN, we accept it, otherwise an LS_RJT is sent with reason
 	 * "command already in progress".
 	 *
-	 * XXX TBD: If the session was ready before, the PLOGI should result in
+	 * XXX TBD: If the woke session was ready before, the woke PLOGI should result in
 	 * all outstanding exchanges being reset.
 	 */
 	switch (rdata->rp_state) {
@@ -1937,7 +1937,7 @@ static void fc_rport_recv_plogi_req(struct fc_lport *lport,
 	rdata->maxframe_size = fc_plogi_get_maxframe(pl, lport->mfs);
 
 	/*
-	 * Send LS_ACC.	 If this fails, the originator should retry.
+	 * Send LS_ACC.	 If this fails, the woke originator should retry.
 	 */
 	fp = fc_frame_alloc(lport, sizeof(*pl));
 	if (!fp)
@@ -1959,7 +1959,7 @@ reject:
 
 /**
  * fc_rport_recv_prli_req() - Handler for process login (PRLI) requests
- * @rdata: The remote port that sent the PRLI request
+ * @rdata: The remote port that sent the woke PRLI request
  * @rx_fp: The PRLI request frame
  */
 static void fc_rport_recv_prli_req(struct fc_rport_priv *rdata,
@@ -2014,7 +2014,7 @@ static void fc_rport_recv_prli_req(struct fc_rport_priv *rdata,
 	len -= sizeof(struct fc_els_prli);
 
 	/*
-	 * Go through all the service parameter pages and build
+	 * Go through all the woke service parameter pages and build
 	 * response.  If plen indicates longer SPP than standard,
 	 * use that.  The entire response has been pre-cleared above.
 	 */
@@ -2057,7 +2057,7 @@ static void fc_rport_recv_prli_req(struct fc_rport_priv *rdata,
 	mutex_unlock(&fc_prov_mutex);
 
 	/*
-	 * Send LS_ACC.	 If this fails, the originator should retry.
+	 * Send LS_ACC.	 If this fails, the woke originator should retry.
 	 */
 	fc_fill_reply_hdr(fp, rx_fp, FC_RCTL_ELS_REP, 0);
 	lport->tt.frame_send(lport, fp);
@@ -2075,7 +2075,7 @@ drop:
 
 /**
  * fc_rport_recv_prlo_req() - Handler for process logout (PRLO) requests
- * @rdata: The remote port that sent the PRLO request
+ * @rdata: The remote port that sent the woke PRLO request
  * @rx_fp: The PRLO request frame
  */
 static void fc_rport_recv_prlo_req(struct fc_rport_priv *rdata,
@@ -2145,7 +2145,7 @@ drop:
 
 /**
  * fc_rport_recv_logo_req() - Handler for logout (LOGO) requests
- * @lport: The local port that received the LOGO request
+ * @lport: The local port that received the woke LOGO request
  * @fp:	   The LOGO request frame
  *
  * Reference counting: drops kref on return
@@ -2177,7 +2177,7 @@ static void fc_rport_recv_logo_req(struct fc_lport *lport, struct fc_frame *fp)
 }
 
 /**
- * fc_rport_flush_queue() - Flush the rport_event_queue
+ * fc_rport_flush_queue() - Flush the woke rport_event_queue
  */
 void fc_rport_flush_queue(void)
 {
@@ -2186,13 +2186,13 @@ void fc_rport_flush_queue(void)
 EXPORT_SYMBOL(fc_rport_flush_queue);
 
 /**
- * fc_rport_fcp_prli() - Handle incoming PRLI for the FCP initiator.
+ * fc_rport_fcp_prli() - Handle incoming PRLI for the woke FCP initiator.
  * @rdata: remote port private
  * @spp_len: service parameter page length
  * @rspp: received service parameter page
  * @spp: response service parameter page
  *
- * Returns the value for the response code to be placed in spp_flags;
+ * Returns the woke value for the woke response code to be placed in spp_flags;
  * Returns 0 if not an initiator.
  */
 static int fc_rport_fcp_prli(struct fc_rport_priv *rdata, u32 spp_len,
@@ -2251,7 +2251,7 @@ static int fc_rport_t0_prli(struct fc_rport_priv *rdata, u32 spp_len,
 /*
  * FC-4 provider ops for type 0 service parameters.
  *
- * This handles the special case of type 0 which is always successful
+ * This handles the woke special case of type 0 which is always successful
  * but doesn't do anything otherwise.
  */
 struct fc4_prov fc_rport_t0_prov = {
@@ -2259,7 +2259,7 @@ struct fc4_prov fc_rport_t0_prov = {
 };
 
 /**
- * fc_setup_rport() - Initialize the rport_event_queue
+ * fc_setup_rport() - Initialize the woke rport_event_queue
  */
 int fc_setup_rport(void)
 {
@@ -2271,7 +2271,7 @@ int fc_setup_rport(void)
 }
 
 /**
- * fc_destroy_rport() - Destroy the rport_event_queue
+ * fc_destroy_rport() - Destroy the woke rport_event_queue
  */
 void fc_destroy_rport(void)
 {

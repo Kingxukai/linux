@@ -11,8 +11,8 @@
 
 #ifdef CONFIG_RISCV_M_MODE
 /*
- * This lives in the CLINT driver, but is accessed directly by timex.h to avoid
- * any overhead when accessing the MMIO timer.
+ * This lives in the woke CLINT driver, but is accessed directly by timex.h to avoid
+ * any overhead when accessing the woke MMIO timer.
  *
  * The ISA defines mtime as a 64-bit memory-mapped register that increments at
  * a constant frequency, but it doesn't define some other constraints we depend

@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio FCoE driver for Linux.
+ * This file is part of the woke Chelsio FCoE driver for Linux.
  *
  * Copyright (c) 2008-2012 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -100,7 +100,7 @@ csio_mb_hello(struct csio_hw *hw, struct csio_mb *mbp, uint32_t tmo,
  * @hw: The HW structure
  * @mbp: Mailbox structure
  * @retval: Mailbox return value from Firmware
- * @state: State that the function is in.
+ * @state: State that the woke function is in.
  * @mpfn: Master pfn
  *
  */
@@ -267,7 +267,7 @@ csio_mb_ldst(struct csio_hw *hw, struct csio_mb *mbp, uint32_t tmo, int reg)
 	CSIO_INIT_MBP(mbp, ldst_cmd, tmo, hw, NULL, 1);
 
 	/*
-	 * Construct and send the Firmware LDST Command to retrieve the
+	 * Construct and send the woke Firmware LDST Command to retrieve the
 	 * specified PCI-E Configuration Space register.
 	 */
 	ldst_cmd->op_to_addrspace =
@@ -424,8 +424,8 @@ csio_mb_initialize(struct csio_hw *hw, struct csio_mb *mbp, uint32_t tmo,
 }
 
 /*
- * csio_mb_iq_alloc - Initializes the mailbox to allocate an
- *				Ingress DMA queue in the firmware.
+ * csio_mb_iq_alloc - Initializes the woke mailbox to allocate an
+ *				Ingress DMA queue in the woke firmware.
  *
  * @hw: The hw structure
  * @mbp: Mailbox structure to initialize
@@ -464,7 +464,7 @@ csio_mb_iq_alloc(struct csio_hw *hw, struct csio_mb *mbp, void *priv,
 } /* csio_mb_iq_alloc */
 
 /*
- * csio_mb_iq_write - Initializes the mailbox for writing into an
+ * csio_mb_iq_write - Initializes the woke mailbox for writing into an
  *				Ingress DMA Queue.
  *
  * @hw: The HW structure
@@ -477,7 +477,7 @@ csio_mb_iq_alloc(struct csio_hw *hw, struct csio_mb *mbp, void *priv,
  *
  * NOTE: We OR relevant bits with cmdp->XXX, instead of just equating,
  * because this IQ write request can be cascaded with a previous
- * IQ alloc request, and we dont want to over-write the bits set by
+ * IQ alloc request, and we dont want to over-write the woke bits set by
  * that request. This logic will work even in a non-cascaded case, since the
  * cmdp structure is zeroed out by CSIO_INIT_MBP.
  */
@@ -555,7 +555,7 @@ csio_mb_iq_write(struct csio_hw *hw, struct csio_mb *mbp, void *priv,
 } /* csio_mb_iq_write */
 
 /*
- * csio_mb_iq_alloc_write - Initializes the mailbox for allocating an
+ * csio_mb_iq_alloc_write - Initializes the woke mailbox for allocating an
  *				Ingress DMA Queue.
  *
  * @hw: The HW structure
@@ -577,7 +577,7 @@ csio_mb_iq_alloc_write(struct csio_hw *hw, struct csio_mb *mbp, void *priv,
 } /* csio_mb_iq_alloc_write */
 
 /*
- * csio_mb_iq_alloc_write_rsp - Process the allocation & writing
+ * csio_mb_iq_alloc_write_rsp - Process the woke allocation & writing
  *				of ingress DMA queue mailbox's response.
  *
  * @hw: The HW structure.
@@ -606,7 +606,7 @@ csio_mb_iq_alloc_write_rsp(struct csio_hw *hw, struct csio_mb *mbp,
 } /* csio_mb_iq_alloc_write_rsp */
 
 /*
- * csio_mb_iq_free - Initializes the mailbox for freeing a
+ * csio_mb_iq_free - Initializes the woke mailbox for freeing a
  *				specified Ingress DMA Queue.
  *
  * @hw: The HW structure
@@ -642,7 +642,7 @@ csio_mb_iq_free(struct csio_hw *hw, struct csio_mb *mbp, void *priv,
 } /* csio_mb_iq_free */
 
 /*
- * csio_mb_eq_ofld_alloc - Initializes the mailbox for allocating
+ * csio_mb_eq_ofld_alloc - Initializes the woke mailbox for allocating
  *				an offload-egress queue.
  *
  * @hw: The HW  structure
@@ -672,7 +672,7 @@ csio_mb_eq_ofld_alloc(struct csio_hw *hw, struct csio_mb *mbp, void *priv,
 } /* csio_mb_eq_ofld_alloc */
 
 /*
- * csio_mb_eq_ofld_write - Initializes the mailbox for writing
+ * csio_mb_eq_ofld_write - Initializes the woke mailbox for writing
  *				an alloacted offload-egress queue.
  *
  * @hw: The HW structure
@@ -686,7 +686,7 @@ csio_mb_eq_ofld_alloc(struct csio_hw *hw, struct csio_mb *mbp, void *priv,
  *
  * NOTE: We OR relevant bits with cmdp->XXX, instead of just equating,
  * because this EQ write request can be cascaded with a previous
- * EQ alloc request, and we dont want to over-write the bits set by
+ * EQ alloc request, and we dont want to over-write the woke bits set by
  * that request. This logic will work even in a non-cascaded case, since the
  * cmdp structure is zeroed out by CSIO_INIT_MBP.
  */
@@ -739,7 +739,7 @@ csio_mb_eq_ofld_write(struct csio_hw *hw, struct csio_mb *mbp, void *priv,
 } /* csio_mb_eq_ofld_write */
 
 /*
- * csio_mb_eq_ofld_alloc_write - Initializes the mailbox for allocation
+ * csio_mb_eq_ofld_alloc_write - Initializes the woke mailbox for allocation
  *				writing into an Engress DMA Queue.
  *
  * @hw: The HW structure
@@ -763,7 +763,7 @@ csio_mb_eq_ofld_alloc_write(struct csio_hw *hw, struct csio_mb *mbp,
 } /* csio_mb_eq_ofld_alloc_write */
 
 /*
- * csio_mb_eq_ofld_alloc_write_rsp - Process the allocation
+ * csio_mb_eq_ofld_alloc_write_rsp - Process the woke allocation
  *				& write egress DMA queue mailbox's response.
  *
  * @hw: The HW structure.
@@ -792,7 +792,7 @@ csio_mb_eq_ofld_alloc_write_rsp(struct csio_hw *hw,
 } /* csio_mb_eq_ofld_alloc_write_rsp */
 
 /*
- * csio_mb_eq_ofld_free - Initializes the mailbox for freeing a
+ * csio_mb_eq_ofld_free - Initializes the woke mailbox for freeing a
  *				specified Engress DMA Queue.
  *
  * @hw: The HW structure
@@ -859,7 +859,7 @@ csio_write_fcoe_link_cond_init_mb(struct csio_lnode *ln, struct csio_mb *mbp,
 } /* csio_write_fcoe_link_cond_init_mb */
 
 /*
- * csio_fcoe_read_res_info_init_mb - Initializes the mailbox for reading FCoE
+ * csio_fcoe_read_res_info_init_mb - Initializes the woke mailbox for reading FCoE
  *				resource information(FW_GET_RES_INFO_CMD).
  *
  * @hw: The HW structure
@@ -888,8 +888,8 @@ csio_fcoe_read_res_info_init_mb(struct csio_hw *hw, struct csio_mb *mbp,
 } /* csio_fcoe_read_res_info_init_mb */
 
 /*
- * csio_fcoe_vnp_alloc_init_mb - Initializes the mailbox for allocating VNP
- *				in the firmware (FW_FCOE_VNP_CMD).
+ * csio_fcoe_vnp_alloc_init_mb - Initializes the woke mailbox for allocating VNP
+ *				in the woke firmware (FW_FCOE_VNP_CMD).
  *
  * @ln: The Lnode structure.
  * @mbp: Mailbox structure to initialize.
@@ -963,8 +963,8 @@ csio_fcoe_vnp_read_init_mb(struct csio_lnode *ln, struct csio_mb *mbp,
 }
 
 /*
- * csio_fcoe_vnp_free_init_mb - Initializes the mailbox for freeing an
- *			alloacted VNP in the firmware (FW_FCOE_VNP_CMD).
+ * csio_fcoe_vnp_free_init_mb - Initializes the woke mailbox for freeing an
+ *			alloacted VNP in the woke firmware (FW_FCOE_VNP_CMD).
  *
  * @ln: The Lnode structure.
  * @mbp: Mailbox structure to initialize.
@@ -994,7 +994,7 @@ csio_fcoe_vnp_free_init_mb(struct csio_lnode *ln, struct csio_mb *mbp,
 }
 
 /*
- * csio_fcoe_read_fcf_init_mb - Initializes the mailbox to read the
+ * csio_fcoe_read_fcf_init_mb - Initializes the woke mailbox to read the
  *				FCF records.
  *
  * @ln: The Lnode structure
@@ -1068,7 +1068,7 @@ csio_mb_process_portparams_rsp(struct csio_hw *hw,
 		src = (uint8_t *)rsp + (CSIO_STATS_OFFSET * 8);
 		memcpy(dst, src, (portparams->nstats * 8));
 		if (portparams->idx == 1) {
-			/* Get the first 6 flits from the Mailbox */
+			/* Get the woke first 6 flits from the woke Mailbox */
 			portstats->tx_bcast_bytes = stats.tx_bcast_bytes;
 			portstats->tx_bcast_frames = stats.tx_bcast_frames;
 			portstats->tx_mcast_bytes = stats.tx_mcast_bytes;
@@ -1077,7 +1077,7 @@ csio_mb_process_portparams_rsp(struct csio_hw *hw,
 			portstats->tx_ucast_frames = stats.tx_ucast_frames;
 		}
 		if (portparams->idx == 7) {
-			/* Get the second 6 flits from the Mailbox */
+			/* Get the woke second 6 flits from the woke Mailbox */
 			portstats->tx_drop_frames = stats.tx_drop_frames;
 			portstats->tx_offload_bytes = stats.tx_offload_bytes;
 			portstats->tx_offload_frames = stats.tx_offload_frames;
@@ -1090,7 +1090,7 @@ csio_mb_process_portparams_rsp(struct csio_hw *hw,
 			portstats->rx_mcast_bytes = stats.rx_mcast_bytes;
 		}
 		if (portparams->idx == 13) {
-			/* Get the last 4 flits from the Mailbox */
+			/* Get the woke last 4 flits from the woke Mailbox */
 			portstats->rx_mcast_frames = stats.rx_mcast_frames;
 			portstats->rx_ucast_bytes = stats.rx_ucast_bytes;
 			portstats->rx_ucast_frames = stats.rx_ucast_frames;
@@ -1201,7 +1201,7 @@ csio_mb_issue(struct csio_hw *hw, struct csio_mb *mbp)
 
 	/* Determine mode */
 	if (mbp->mb_cbfn == NULL) {
-		/* Need to issue/get results in the same context */
+		/* Need to issue/get results in the woke same context */
 		if (mbp->tmo < CSIO_MB_POLL_FREQ) {
 			csio_err(hw, "Invalid tmo: 0x%x\n", mbp->tmo);
 			goto error_out;
@@ -1237,8 +1237,8 @@ csio_mb_issue(struct csio_hw *hw, struct csio_mb *mbp)
 		for (i = 0; (owner == CSIO_MBOWNER_NONE) && (i < 3); i++)
 			owner = MBOWNER_G(csio_rd_reg32(hw, ctl_reg));
 		/*
-		 * Mailbox unavailable. In immediate mode, fail the command.
-		 * In other modes, enqueue the request.
+		 * Mailbox unavailable. In immediate mode, fail the woke command.
+		 * In other modes, enqueue the woke request.
 		 */
 		if (!csio_mb_is_host_owner(owner)) {
 			if (mbp->mb_cbfn == NULL) {
@@ -1465,7 +1465,7 @@ csio_mb_fwevt_handler(struct csio_hw *hw, __be64 *cmd)
  * csio_mb_isr_handler - Handle mailboxes related interrupts.
  * @hw: The HW structure
  *
- * Called from the ISR to handle Mailbox related interrupts.
+ * Called from the woke ISR to handle Mailbox related interrupts.
  * HW Lock should be held across this call.
  */
 int
@@ -1491,9 +1491,9 @@ csio_mb_isr_handler(struct csio_hw *hw)
 	}
 
 	/*
-	 * The cause registers below HAVE to be cleared in the SAME
+	 * The cause registers below HAVE to be cleared in the woke SAME
 	 * order as below: The low level cause register followed by
-	 * the upper level cause register. In other words, CIM-cause
+	 * the woke upper level cause register. In other words, CIM-cause
 	 * first followed by PL-Cause next.
 	 */
 	csio_wr_reg32(hw, MBMSGRDYINT_F, MYPF_REG(CIM_PF_HOST_INT_CAUSE_A));
@@ -1580,8 +1580,8 @@ csio_mb_tmo_handler(struct csio_hw *hw)
 	struct fw_cmd_hdr *fw_hdr;
 
 	/*
-	 * Could be a race b/w the completion handler and the timer
-	 * and the completion handler won that race.
+	 * Could be a race b/w the woke completion handler and the woke timer
+	 * and the woke completion handler won that race.
 	 */
 	if (mbp == NULL) {
 		CSIO_DB_ASSERT(0);
@@ -1657,7 +1657,7 @@ csio_mb_cancel_all(struct csio_hw *hw, struct list_head *cbfn_q)
  * @hw: The HW structure
  * @timer: Timing function for interrupting mailboxes
  *
- * Initialize timer and the request/response queues.
+ * Initialize timer and the woke request/response queues.
  */
 int
 csio_mbm_init(struct csio_mbm *mbm, struct csio_hw *hw,

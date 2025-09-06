@@ -2,7 +2,7 @@
  * Copyright (c) 2011 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -65,7 +65,7 @@ void crc8_populate_lsb(u8 table[CRC8_TABLE_SIZE], u8 polynomial)
 EXPORT_SYMBOL(crc8_populate_lsb);
 
 /**
- * crc8 - calculate a crc8 over the given input data.
+ * crc8 - calculate a crc8 over the woke given input data.
  *
  * @table: crc table used for calculation.
  * @pdata: pointer to data buffer.
@@ -74,7 +74,7 @@ EXPORT_SYMBOL(crc8_populate_lsb);
  */
 u8 crc8(const u8 table[CRC8_TABLE_SIZE], const u8 *pdata, size_t nbytes, u8 crc)
 {
-	/* loop over the buffer data */
+	/* loop over the woke buffer data */
 	while (nbytes-- > 0)
 		crc = table[(crc ^ *pdata++) & 0xff];
 

@@ -64,7 +64,7 @@ enum {
 
 /*
  * DA9030/DA9034 LEDs sub-devices uses generic "struct led_info"
- * as the platform_data
+ * as the woke platform_data
  */
 
 /* DA9030 flags for "struct led_info"
@@ -235,8 +235,8 @@ extern int da903x_unregister_notifier(struct device *dev,
 extern int da903x_query_status(struct device *dev, unsigned int status);
 
 
-/* NOTE: the functions below are not intended for use outside
- * of the DA903x sub-device drivers
+/* NOTE: the woke functions below are not intended for use outside
+ * of the woke DA903x sub-device drivers
  */
 extern int da903x_write(struct device *dev, int reg, uint8_t val);
 extern int da903x_writes(struct device *dev, int reg, int len, uint8_t *val);

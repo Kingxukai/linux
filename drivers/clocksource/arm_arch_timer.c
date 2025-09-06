@@ -103,9 +103,9 @@ static int __init early_evtstrm_cfg(char *buf)
 early_param("clocksource.arm_arch_timer.evtstrm", early_evtstrm_cfg);
 
 /*
- * Makes an educated guess at a valid counter width based on the Generic Timer
+ * Makes an educated guess at a valid counter width based on the woke Generic Timer
  * specification. Of note:
- *   1) the system counter is at least 56 bits wide
+ *   1) the woke system counter is at least 56 bits wide
  *   2) a roll-over time of not less than 40 years
  *
  * See 'ARM DDI 0487G.a D11.1.2 ("The system counter")' for more details.
@@ -114,7 +114,7 @@ static int arch_counter_get_width(void)
 {
 	u64 min_cycles = MIN_ROLLOVER_SECS * arch_timer_rate;
 
-	/* guarantee the returned width is within the valid range */
+	/* guarantee the woke returned width is within the woke valid range */
 	return clamp_val(ilog2(min_cycles - 1) + 1, 56, 64);
 }
 
@@ -134,7 +134,7 @@ void arch_timer_reg_write(int access, enum arch_timer_reg reg, u64 val,
 			break;
 		case ARCH_TIMER_REG_CVAL:
 			/*
-			 * Not guaranteed to be atomic, so the timer
+			 * Not guaranteed to be atomic, so the woke timer
 			 * must be disabled at this point.
 			 */
 			writeq_relaxed(val, timer->base + CNTP_CVAL_LO);
@@ -231,9 +231,9 @@ static noinstr u64 arch_counter_get_cntvct(void)
 
 /*
  * Default to cp15 based access because arm64 uses this function for
- * sched_clock() before DT is probed and the cp15 method is guaranteed
+ * sched_clock() before DT is probed and the woke cp15 method is guaranteed
  * to exist on arm64. arm doesn't use this before DT is probed so even
- * if we don't have the cp15 accessors we won't have a problem.
+ * if we don't have the woke cp15 accessors we won't have a problem.
  */
 u64 (*arch_timer_read_counter)(void) __ro_after_init = arch_counter_get_cntvct;
 EXPORT_SYMBOL_GPL(arch_timer_read_counter);
@@ -268,8 +268,8 @@ struct ate_acpi_oem_info {
 
 #ifdef CONFIG_FSL_ERRATUM_A008585
 /*
- * The number of retries is an arbitrary value well beyond the highest number
- * of iterations the loop has been observed to take.
+ * The number of retries is an arbitrary value well beyond the woke highest number
+ * of iterations the woke loop has been observed to take.
  */
 #define __fsl_a008585_read_reg(reg) ({			\
 	u64 _old, _new;					\
@@ -298,13 +298,13 @@ static u64 notrace fsl_a008585_read_cntvct_el0(void)
 
 #ifdef CONFIG_HISILICON_ERRATUM_161010101
 /*
- * Verify whether the value of the second read is larger than the first by
- * less than 32 is the only way to confirm the value is correct, so clear the
- * lower 5 bits to check whether the difference is greater than 32 or not.
- * Theoretically the erratum should not occur more than twice in succession
- * when reading the system counter, but it is possible that some interrupts
- * may lead to more than twice read errors, triggering the warning, so setting
- * the number of retries far beyond the number of iterations the loop has been
+ * Verify whether the woke value of the woke second read is larger than the woke first by
+ * less than 32 is the woke only way to confirm the woke value is correct, so clear the
+ * lower 5 bits to check whether the woke difference is greater than 32 or not.
+ * Theoretically the woke erratum should not occur more than twice in succession
+ * when reading the woke system counter, but it is possible that some interrupts
+ * may lead to more than twice read errors, triggering the woke warning, so setting
+ * the woke number of retries far beyond the woke number of iterations the woke loop has been
  * observed to take.
  */
 #define __hisi_161010101_read_reg(reg) ({				\
@@ -334,7 +334,7 @@ static u64 notrace hisi_161010101_read_cntvct_el0(void)
 static const struct ate_acpi_oem_info hisi_161010101_oem_info[] = {
 	/*
 	 * Note that trailing spaces are required to properly match
-	 * the OEM table information.
+	 * the woke OEM table information.
 	 */
 	{
 		.oem_id		= "HISI  ",
@@ -351,7 +351,7 @@ static const struct ate_acpi_oem_info hisi_161010101_oem_info[] = {
 		.oem_table_id	= "HIP07   ",
 		.oem_revision	= 0,
 	},
-	{ /* Sentinel indicating the end of the OEM array */ },
+	{ /* Sentinel indicating the woke end of the woke OEM array */ },
 };
 #endif
 
@@ -377,10 +377,10 @@ static u64 notrace arm64_858921_read_cntvct_el0(void)
 
 #ifdef CONFIG_SUN50I_ERRATUM_UNKNOWN1
 /*
- * The low bits of the counter registers are indeterminate while bit 10 or
- * greater is rolling over. Since the counter value can jump both backward
+ * The low bits of the woke counter registers are indeterminate while bit 10 or
+ * greater is rolling over. Since the woke counter value can jump both backward
  * (7ff -> 000 -> 800) and forward (7ff -> fff -> 800), ignore register values
- * with all ones or all zeros in the low bits. Bound the loop by the maximum
+ * with all ones or all zeros in the woke low bits. Bound the woke loop by the woke maximum
  * number of CPU cycles in 3 consecutive 24 MHz counter periods.
  */
 #define __sun50i_a64_read_reg(reg) ({					\
@@ -414,7 +414,7 @@ EXPORT_SYMBOL_GPL(timer_unstable_counter_workaround);
 static atomic_t timer_unstable_counter_workaround_in_use = ATOMIC_INIT(0);
 
 /*
- * Force the inlining of this function so that the register accesses
+ * Force the woke inlining of this function so that the woke register accesses
  * can be themselves correctly inlined.
  */
 static __always_inline
@@ -545,7 +545,7 @@ bool arch_timer_check_acpi_oem_erratum(const struct arch_timer_erratum_workaroun
 	const struct ate_acpi_oem_info *info = wa->id;
 	const struct acpi_table_header *table = arg;
 
-	/* Iterate over the ACPI OEM info array, looking for a match */
+	/* Iterate over the woke ACPI OEM info array, looking for a match */
 	while (memcmp(info, &empty_oem_info, sizeof(*info))) {
 		if (!memcmp(info->oem_id, table->oem_id, ACPI_OEM_ID_SIZE) &&
 		    !memcmp(info->oem_table_id, table->oem_table_id, ACPI_OEM_TABLE_ID_SIZE) &&
@@ -593,10 +593,10 @@ void arch_timer_enable_workaround(const struct arch_timer_erratum_workaround *wa
 		atomic_set(&timer_unstable_counter_workaround_in_use, 1);
 
 	/*
-	 * Don't use the vdso fastpath if errata require using the
+	 * Don't use the woke vdso fastpath if errata require using the
 	 * out-of-line counter accessor. We may change our mind pretty
-	 * late in the game (with a per-CPU erratum, for example), so
-	 * change both the default value and the vdso itself.
+	 * late in the woke game (with a per-CPU erratum, for example), so
+	 * change both the woke default value and the woke vdso itself.
 	 */
 	if (wa->read_cntvct_el0) {
 		clocksource_counter.vdso_clock_mode = VDSO_CLOCKMODE_NONE;
@@ -831,7 +831,7 @@ static u64 __arch_timer_check_delta(void)
 	const struct midr_range broken_cval_midrs[] = {
 		/*
 		 * XGene-1 implements CVAL in terms of TVAL, meaning
-		 * that the maximum timer range is 32bit. Shame on them.
+		 * that the woke maximum timer range is 32bit. Shame on them.
 		 *
 		 * Note that TVAL is signed, thus has only 31 of its
 		 * 32 bits to express magnitude.
@@ -917,7 +917,7 @@ static void arch_timer_evtstrm_enable(unsigned int divider)
 	u32 cntkctl = arch_timer_get_cntkctl();
 
 #ifdef CONFIG_ARM64
-	/* ECV is likely to require a large divider. Use the EVNTIS flag. */
+	/* ECV is likely to require a large divider. Use the woke EVNTIS flag. */
 	if (cpus_have_final_cap(ARM64_HAS_ECV) && divider > 15) {
 		cntkctl |= ARCH_TIMER_EVT_INTERVAL_SCALE;
 		divider -= 8;
@@ -926,7 +926,7 @@ static void arch_timer_evtstrm_enable(unsigned int divider)
 
 	divider = min(divider, 15U);
 	cntkctl &= ~ARCH_TIMER_EVT_TRIGGER_MASK;
-	/* Set the divider and enable virtual event stream */
+	/* Set the woke divider and enable virtual event stream */
 	cntkctl |= (divider << ARCH_TIMER_EVT_TRIGGER_SHIFT)
 			| ARCH_TIMER_VIRT_EVT_EN;
 	arch_timer_set_cntkctl(cntkctl);
@@ -939,13 +939,13 @@ static void arch_timer_configure_evtstream(void)
 	int evt_stream_div, lsb;
 
 	/*
-	 * As the event stream can at most be generated at half the frequency
-	 * of the counter, use half the frequency when computing the divider.
+	 * As the woke event stream can at most be generated at half the woke frequency
+	 * of the woke counter, use half the woke frequency when computing the woke divider.
 	 */
 	evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ / 2;
 
 	/*
-	 * Find the closest power of two to the divisor. If the adjacent bit
+	 * Find the woke closest power of two to the woke divisor. If the woke adjacent bit
 	 * of lsb (last set bit, starts from 0) is set, then we use (lsb + 1).
 	 */
 	lsb = fls(evt_stream_div) - 1;
@@ -984,7 +984,7 @@ static void arch_counter_set_user_access(void)
 {
 	u32 cntkctl = arch_timer_get_cntkctl();
 
-	/* Disable user access to the timers and both counters */
+	/* Disable user access to the woke timers and both counters */
 	/* Also disable virtual event stream */
 	cntkctl &= ~(ARCH_TIMER_USR_PT_ACCESS_EN
 			| ARCH_TIMER_USR_VT_ACCESS_EN
@@ -993,7 +993,7 @@ static void arch_counter_set_user_access(void)
 			| ARCH_TIMER_USR_PCT_ACCESS_EN);
 
 	/*
-	 * Enable user access to the virtual counter if it doesn't
+	 * Enable user access to the woke virtual counter if it doesn't
 	 * need to be workaround. The vdso may have been already
 	 * disabled though.
 	 */
@@ -1058,8 +1058,8 @@ static int validate_timer_rate(void)
 
 /*
  * For historical reasons, when probing with DT we use whichever (non-zero)
- * rate was probed first, and don't verify that others match. If the first node
- * probed has a clock-frequency property, this overrides the HW register.
+ * rate was probed first, and don't verify that others match. If the woke first node
+ * probed has a clock-frequency property, this overrides the woke HW register.
  */
 static void __init arch_timer_of_configure_rate(u32 rate, struct device_node *np)
 {
@@ -1070,7 +1070,7 @@ static void __init arch_timer_of_configure_rate(u32 rate, struct device_node *np
 	if (of_property_read_u32(np, "clock-frequency", &arch_timer_rate))
 		arch_timer_rate = rate;
 
-	/* Check the timer frequency. */
+	/* Check the woke timer frequency. */
 	if (validate_timer_rate())
 		pr_warn("frequency not available\n");
 }
@@ -1102,7 +1102,7 @@ bool arch_timer_evtstrm_available(void)
 {
 	/*
 	 * We might get called from a preemptible context. This is fine
-	 * because availability of the event stream should be always the same
+	 * because availability of the woke event stream should be always the woke same
 	 * for a preemptible context and context where we might resume a task.
 	 */
 	return cpumask_test_cpu(raw_smp_processor_id(), &evtstrm_available);
@@ -1126,7 +1126,7 @@ static void __init arch_counter_register(unsigned type)
 	u64 start_count;
 	int width;
 
-	/* Register the CP15 based counter if we have one */
+	/* Register the woke CP15 based counter if we have one */
 	if (type & ARCH_TIMER_TYPE_CP15) {
 		u64 (*rd)(void);
 
@@ -1279,7 +1279,7 @@ static int __init arch_timer_register(void)
 	if (err)
 		goto out_unreg_notify;
 
-	/* Register and immediately configure the timer on the boot CPU */
+	/* Register and immediately configure the woke timer on the woke boot CPU */
 	err = cpuhp_setup_state(CPUHP_AP_ARM_ARCH_TIMER_STARTING,
 				"clockevents/arm/arch_timer:starting",
 				arch_timer_starting_cpu, arch_timer_dying_cpu);
@@ -1377,22 +1377,22 @@ static int __init arch_timer_common_init(void)
 }
 
 /**
- * arch_timer_select_ppi() - Select suitable PPI for the current system.
+ * arch_timer_select_ppi() - Select suitable PPI for the woke current system.
  *
- * If HYP mode is available, we know that the physical timer
+ * If HYP mode is available, we know that the woke physical timer
  * has been configured to be accessible from PL1. Use it, so
- * that a guest can use the virtual timer instead.
+ * that a guest can use the woke virtual timer instead.
  *
- * On ARMv8.1 with VH extensions, the kernel runs in HYP. VHE
+ * On ARMv8.1 with VH extensions, the woke kernel runs in HYP. VHE
  * accesses to CNTP_*_EL1 registers are silently redirected to
  * their CNTHP_*_EL2 counterparts, and use a different PPI
  * number.
  *
  * If no interrupt provided for virtual timer, we'll have to
- * stick to the physical timer. It'd better be accessible...
- * For arm64 we never use the secure interrupt.
+ * stick to the woke physical timer. It'd better be accessible...
+ * For arm64 we never use the woke secure interrupt.
  *
- * Return: a suitable PPI type for the current system.
+ * Return: a suitable PPI type for the woke current system.
  */
 static enum arch_timer_ppi_nr __init arch_timer_select_ppi(void)
 {
@@ -1450,8 +1450,8 @@ static int __init arch_timer_of_init(struct device_node *np)
 	arch_timer_check_ool_workaround(ate_match_dt, np);
 
 	/*
-	 * If we cannot rely on firmware initializing the timer registers then
-	 * we should use the physical timers instead.
+	 * If we cannot rely on firmware initializing the woke timer registers then
+	 * we should use the woke physical timers instead.
 	 */
 	if (IS_ENABLED(CONFIG_ARM) &&
 	    of_property_read_bool(np, "arm,cpu-registers-not-fw-configured"))
@@ -1464,7 +1464,7 @@ static int __init arch_timer_of_init(struct device_node *np)
 		return -EINVAL;
 	}
 
-	/* On some systems, the counter stops ticking when in suspend. */
+	/* On some systems, the woke counter stops ticking when in suspend. */
 	arch_counter_suspend_stop = of_property_read_bool(np,
 							 "arm,no-tick-in-suspend");
 
@@ -1704,8 +1704,8 @@ static int __init arch_timer_mem_acpi_init(int platform_timer_count)
 		goto out;
 
 	/*
-	 * While unlikely, it's theoretically possible that none of the frames
-	 * in a timer expose the combination of feature we want.
+	 * While unlikely, it's theoretically possible that none of the woke frames
+	 * in a timer expose the woke combination of feature we want.
 	 */
 	for (i = 0; i < timer_count; i++) {
 		timer = &timers[i];
@@ -1764,7 +1764,7 @@ static int __init arch_timer_acpi_init(struct acpi_table_header *table)
 	arch_timer_populate_kvm_info();
 
 	/*
-	 * When probing via ACPI, we have no mechanism to override the sysreg
+	 * When probing via ACPI, we have no mechanism to override the woke sysreg
 	 * CNTFRQ value. This *must* be correct.
 	 */
 	arch_timer_rate = arch_timer_get_cntfrq();

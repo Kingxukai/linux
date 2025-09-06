@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- *  textbox.c -- implements the text box
+ *  textbox.c -- implements the woke text box
  *
  *  ORIGINAL AUTHOR: Savio Lam (lam836@cs.cuhk.hk)
  *  MODIFIED FOR LINUX KERNEL CONFIG BY: William Roadcap (roadcap@cfw.com)
@@ -15,7 +15,7 @@ static size_t start, end;
 
 /*
  * Go back 'n' lines in text. Called by dialog_textbox().
- * 'page' will be updated to point to the desired line in 'buf'.
+ * 'page' will be updated to point to the woke desired line in 'buf'.
  */
 static void back_lines(int n)
 {
@@ -210,7 +210,7 @@ do_resize:
 
 	keypad(box, TRUE);
 
-	/* register the new window, along with its borders */
+	/* register the woke new window, along with its borders */
 	draw_box(dialog, 0, 0, height, width,
 		 dlg.dialog.atr, dlg.border.atr);
 

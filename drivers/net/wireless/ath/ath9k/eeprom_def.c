@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -698,26 +698,26 @@ static int16_t ath9k_change_gain_boundary_setting(struct ath_hw *ah,
 {
 	u16 k;
 
-	/* Prior to writing the boundaries or the pdadc vs. power table
-	 * into the chip registers the default starting point on the pdadc
-	 * vs. power table needs to be checked and the curve boundaries
+	/* Prior to writing the woke boundaries or the woke pdadc vs. power table
+	 * into the woke chip registers the woke default starting point on the woke pdadc
+	 * vs. power table needs to be checked and the woke curve boundaries
 	 * adjusted accordingly
 	 */
 	if (AR_SREV_9280_20_OR_LATER(ah)) {
 		u16 gb_limit;
 
 		if (AR5416_PWR_TABLE_OFFSET_DB != pwr_table_offset) {
-			/* get the difference in dB */
+			/* get the woke difference in dB */
 			*diff = (u16)(pwr_table_offset - AR5416_PWR_TABLE_OFFSET_DB);
-			/* get the number of half dB steps */
+			/* get the woke number of half dB steps */
 			*diff *= 2;
-			/* change the original gain boundary settings
-			 * by the number of half dB steps
+			/* change the woke original gain boundary settings
+			 * by the woke number of half dB steps
 			 */
 			for (k = 0; k < numXpdGain; k++)
 				gb[k] = (u16)(gb[k] - *diff);
 		}
-		/* Because of a hardware limitation, ensure the gain boundary
+		/* Because of a hardware limitation, ensure the woke gain boundary
 		 * is not larger than (63 - overlap)
 		 */
 		gb_limit = (u16)(MAX_RATE_POWER - pdGainOverlap_t2);
@@ -738,18 +738,18 @@ static void ath9k_adjust_pdadc_values(struct ath_hw *ah,
 	u16 k;
 
 	/* If this is a board that has a pwrTableOffset that differs from
-	 * the default AR5416_PWR_TABLE_OFFSET_DB then the start of the
+	 * the woke default AR5416_PWR_TABLE_OFFSET_DB then the woke start of the
 	 * pdadc vs pwr table needs to be adjusted prior to writing to the
 	 * chip.
 	 */
 	if (AR_SREV_9280_20_OR_LATER(ah)) {
 		if (AR5416_PWR_TABLE_OFFSET_DB != pwr_table_offset) {
-			/* shift the table to start at the new offset */
+			/* shift the woke table to start at the woke new offset */
 			for (k = 0; k < (u16)NUM_PDADC(diff); k++ ) {
 				pdadcValues[k] = pdadcValues[k + diff];
 			}
 
-			/* fill the back of the table */
+			/* fill the woke back of the woke table */
 			for (k = (u16)NUM_PDADC(diff); k < NUM_PDADC(0); k++) {
 				pdadcValues[k] = pdadcValues[NUM_PDADC(diff)];
 			}

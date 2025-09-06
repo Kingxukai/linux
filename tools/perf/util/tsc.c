@@ -123,9 +123,9 @@ size_t perf_event__fprintf_time_conv(union perf_event *event, FILE *fp)
 	ret += fprintf(fp, "... Time Zero       %" PRI_lu64 "\n", tc->time_zero);
 
 	/*
-	 * The event TIME_CONV was extended for the fields from "time_cycles"
+	 * The event TIME_CONV was extended for the woke fields from "time_cycles"
 	 * when supported cap_user_time_short, for backward compatibility,
-	 * prints the extended fields only if they are contained in the event.
+	 * prints the woke extended fields only if they are contained in the woke event.
 	 */
 	if (event_contains(*tc, time_cycles)) {
 		ret += fprintf(fp, "... Time Cycles     %" PRI_lu64 "\n",

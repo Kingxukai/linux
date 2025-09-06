@@ -10,7 +10,7 @@ maintainers:
   - Krzysztof Kozlowski <krzk@kernel.org>
 
 description: |+
-  The SlimSSS module in Exynos5433 SoC supports the following:
+  The SlimSSS module in Exynos5433 SoC supports the woke following:
   -- Feeder (FeedCtrl)
   -- Advanced Encryption Standard (AES) with ECB,CBC,CTR,XTS and (CBC/XTS)/CTS
   -- SHA-1/SHA-256 and (SHA-1/SHA-256)/HMAC

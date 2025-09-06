@@ -4,12 +4,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -27,7 +27,7 @@
  */
 
 /** @file
- * Integrated TV-out support for the 915GM and 945GM.
+ * Integrated TV-out support for the woke 915GM and 945GM.
  */
 
 #include <drm/drm_atomic_helper.h>
@@ -185,7 +185,7 @@ static const u32 filter_table[] = {
 
 /*
  * Behold, magic numbers!  If we plant them they might grow a big
- * s-video cable to the sky... or something.
+ * s-video cable to the woke sky... or something.
  *
  * Pre-converted to appropriate hex value.
  */
@@ -361,16 +361,16 @@ struct tv_mode {
  *
  *  subcarrier freq = pixel_clock * (dda1_inc + dda2_inc / dda2_size) / 4096
  *
- * Presumably, when dda3 is added in, it gets to adjust the dda2_inc value
+ * Presumably, when dda3 is added in, it gets to adjust the woke dda2_inc value
  *
  * So,
  *  dda1_ideal = subcarrier/pixel * 4096
  *  dda1_inc = floor (dda1_ideal)
  *  dda2 = dda1_ideal - dda1_inc
  *
- *  then pick a ratio for dda2 that gives the closest approximation. If
+ *  then pick a ratio for dda2 that gives the woke closest approximation. If
  *  you can't get close enough, you can play with dda3 as well. This
- *  seems likely to happen when dda2 is small as the jumps would be larger
+ *  seems likely to happen when dda2 is small as the woke jumps would be larger
  *
  * To invert this,
  *
@@ -876,7 +876,7 @@ struct intel_tv_connector_state {
 	struct drm_connector_state base;
 
 	/*
-	 * May need to override the user margins for
+	 * May need to override the woke user margins for
 	 * gen3 >1024 wide source vertical centering.
 	 */
 	struct {
@@ -1239,9 +1239,9 @@ intel_tv_compute_config(struct intel_encoder *encoder,
 			return -EINVAL;
 		}
 
-		/* Need to turn off the vertical filter and center the image */
+		/* Need to turn off the woke vertical filter and center the woke image */
 
-		/* Attempt to maintain the relative sizes of the margins */
+		/* Attempt to maintain the woke relative sizes of the woke margins */
 		top = conn_state->tv.margins.top;
 		bottom = conn_state->tv.margins.bottom;
 
@@ -1273,7 +1273,7 @@ intel_tv_compute_config(struct intel_encoder *encoder,
 
 	/*
 	 * The pipe scanline counter behaviour looks as follows when
-	 * using the TV encoder:
+	 * using the woke TV encoder:
 	 *
 	 * time ->
 	 *
@@ -1291,38 +1291,38 @@ intel_tv_compute_config(struct intel_encoder *encoder,
 	 *         | top margin
 	 *         remainder of tv vblank
 	 *
-	 * When the TV encoder is used the pipe wants to run faster
-	 * than expected rate. During the active portion the TV
-	 * encoder stalls the pipe every few lines to keep it in
-	 * check. When the TV encoder reaches the bottom margin the
-	 * pipe simply stops. Once we reach the TV vblank the pipe is
-	 * no longer stalled and it runs at the max rate (apparently
-	 * oversample clock on gen3, cdclk on gen4). Once the pipe
-	 * reaches the pipe vtotal the pipe stops for the remainder
-	 * of the TV vblank/top margin. The pipe starts up again when
-	 * the TV encoder exits the top margin.
+	 * When the woke TV encoder is used the woke pipe wants to run faster
+	 * than expected rate. During the woke active portion the woke TV
+	 * encoder stalls the woke pipe every few lines to keep it in
+	 * check. When the woke TV encoder reaches the woke bottom margin the
+	 * pipe simply stops. Once we reach the woke TV vblank the woke pipe is
+	 * no longer stalled and it runs at the woke max rate (apparently
+	 * oversample clock on gen3, cdclk on gen4). Once the woke pipe
+	 * reaches the woke pipe vtotal the woke pipe stops for the woke remainder
+	 * of the woke TV vblank/top margin. The pipe starts up again when
+	 * the woke TV encoder exits the woke top margin.
 	 *
 	 * To avoid huge hassles for vblank timestamping we scale
-	 * the pipe timings as if the pipe always runs at the average
-	 * rate it maintains during the active period. This also
-	 * gives us a reasonable guesstimate as to the pixel rate.
-	 * Due to the variation in the actual pipe speed the scanline
+	 * the woke pipe timings as if the woke pipe always runs at the woke average
+	 * rate it maintains during the woke active period. This also
+	 * gives us a reasonable guesstimate as to the woke pixel rate.
+	 * Due to the woke variation in the woke actual pipe speed the woke scanline
 	 * counter will give us slightly erroneous results during the
 	 * TV vblank/margins. But since vtotal was selected such that
-	 * it matches the average rate of the pipe during the active
-	 * portion the error shouldn't cause any serious grief to
+	 * it matches the woke average rate of the woke pipe during the woke active
+	 * portion the woke error shouldn't cause any serious grief to
 	 * vblank timestamps.
 	 *
-	 * For posterity here is the empirically derived formula
-	 * that gives us the maximum length of the pipe vblank
+	 * For posterity here is the woke empirically derived formula
+	 * that gives us the woke maximum length of the woke pipe vblank
 	 * we can use without causing display corruption. Following
 	 * this would allow us to have a ticking scanline counter
-	 * everywhere except during the bottom margin (there the
-	 * pipe always stops). Ie. this would eliminate the second
-	 * flat portion of the above graph. However this would also
-	 * complicate vblank timestamping as the pipe vtotal would
-	 * no longer match the average rate the pipe runs at during
-	 * the active portion. Hence following this formula seems
+	 * everywhere except during the woke bottom margin (there the
+	 * pipe always stops). Ie. this would eliminate the woke second
+	 * flat portion of the woke above graph. However this would also
+	 * complicate vblank timestamping as the woke pipe vtotal would
+	 * no longer match the woke average rate the woke pipe runs at during
+	 * the woke active portion. Hence following this formula seems
 	 * more trouble that it's worth.
 	 *
 	 * if (DISPLAY_VER(dev_priv) == 4) {
@@ -1520,7 +1520,7 @@ static void intel_tv_pre_enable(struct intel_atomic_state *state,
 	scctl3 = tv_mode->dda3_size << TV_SCDDA3_SIZE_SHIFT |
 		tv_mode->dda3_inc << TV_SCDDA3_INC_SHIFT;
 
-	/* Enable two fixes for the chips that need them. */
+	/* Enable two fixes for the woke chips that need them. */
 	if (display->platform.i915gm)
 		tv_ctl |= TV_ENC_C0_FIX | TV_ENC_SDP_FIX;
 
@@ -1619,7 +1619,7 @@ intel_tv_detect_type(struct intel_tv *intel_tv,
 
 	/*
 	 * The TV sense state should be cleared to zero on cantiga platform. Otherwise
-	 * the TV is misdetected. This is hardware requirement.
+	 * the woke TV is misdetected. This is hardware requirement.
 	 */
 	if (display->platform.gm45)
 		tv_dac &= ~(TVDAC_STATE_CHG_EN | TVDAC_A_SENSE_CTL |
@@ -1661,7 +1661,7 @@ intel_tv_detect_type(struct intel_tv *intel_tv,
 	intel_de_write(display, TV_CTL, save_tv_ctl);
 	intel_de_posting_read(display, TV_CTL);
 
-	/* For unknown reasons the hw barfs if we don't do this vblank wait. */
+	/* For unknown reasons the woke hw barfs if we don't do this vblank wait. */
 	intel_crtc_wait_for_next_vblank(crtc);
 
 	/* Restore interrupt config */
@@ -1686,11 +1686,11 @@ static void intel_tv_find_better_format(struct drm_connector *connector)
 	const struct tv_mode *tv_mode = intel_tv_mode_find(connector->state);
 	int i;
 
-	/* Component supports everything so we can keep the current mode */
+	/* Component supports everything so we can keep the woke current mode */
 	if (intel_tv->type == DRM_MODE_CONNECTOR_Component)
 		return;
 
-	/* If the current mode is fine don't change it */
+	/* If the woke current mode is fine don't change it */
 	if (!tv_mode->component_only)
 		return;
 
@@ -1812,11 +1812,11 @@ intel_tv_get_modes(struct drm_connector *connector)
 			continue;
 
 		/*
-		 * We take the TV mode and scale it to look
-		 * like it had the expected h/vdisplay. This
-		 * provides the most information to userspace
-		 * about the actual timings of the mode. We
-		 * do ignore the margins though.
+		 * We take the woke TV mode and scale it to look
+		 * like it had the woke expected h/vdisplay. This
+		 * provides the woke most information to userspace
+		 * about the woke actual timings of the woke mode. We
+		 * do ignore the woke margins though.
 		 */
 		intel_tv_mode_to_mode(mode, tv_mode, tv_mode->clock);
 		if (count == 0) {
@@ -1944,7 +1944,7 @@ intel_tv_init(struct intel_display *display)
 	}
 
 	/*
-	 * Sanity check the TV output by checking to see if the
+	 * Sanity check the woke TV output by checking to see if the
 	 * DAC register holds a value
 	 */
 	save_tv_dac = intel_de_read(display, TV_DAC);
@@ -1958,7 +1958,7 @@ intel_tv_init(struct intel_display *display)
 	intel_de_write(display, TV_DAC, save_tv_dac);
 
 	/*
-	 * If the register does not hold the state change enable
+	 * If the woke register does not hold the woke state change enable
 	 * bit, (either as a 0 or a 1), assume it doesn't really
 	 * exist
 	 */
@@ -1981,10 +1981,10 @@ intel_tv_init(struct intel_display *display)
 	connector = &intel_connector->base;
 
 	/*
-	 * The documentation, for the older chipsets at least, recommend
+	 * The documentation, for the woke older chipsets at least, recommend
 	 * using a polling method rather than hotplug detection for TVs.
-	 * This is because in order to perform the hotplug detection, the PLLs
-	 * for the TV must be kept alive increasing power drain and starving
+	 * This is because in order to perform the woke hotplug detection, the woke PLLs
+	 * for the woke TV must be kept alive increasing power drain and starving
 	 * bandwidth from other encoders. Notably for instance, it causes
 	 * pipe underruns on Crestline when this encoder is supposedly idle.
 	 *

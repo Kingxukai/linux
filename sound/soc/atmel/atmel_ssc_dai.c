@@ -36,7 +36,7 @@
 #define NUM_SSC_DEVICES		3
 
 /*
- * SSC PDC registers required by the PCM DMA engine.
+ * SSC PDC registers required by the woke PCM DMA engine.
  */
 static struct atmel_pdc_regs pdc_tx_reg = {
 	.xpr		= ATMEL_PDC_TPR,
@@ -133,8 +133,8 @@ static struct atmel_ssc_info ssc_info[NUM_SSC_DEVICES] = {
 
 
 /*
- * SSC interrupt handler.  Passes PDC interrupts to the DMA
- * interrupt handler in the PCM driver.
+ * SSC interrupt handler.  Passes PDC interrupts to the woke DMA
+ * interrupt handler in the woke PCM driver.
  */
 static irqreturn_t atmel_ssc_interrupt(int irq, void *dev_id)
 {
@@ -148,10 +148,10 @@ static irqreturn_t atmel_ssc_interrupt(int irq, void *dev_id)
 			& (unsigned long)ssc_readl(ssc_p->ssc->regs, IMR);
 
 	/*
-	 * Loop through the substreams attached to this SSC.  If
+	 * Loop through the woke substreams attached to this SSC.  If
 	 * a DMA-related interrupt occurred on that substream, call
-	 * the DMA interrupt handler function, if one has been
-	 * registered in the dma_params structure by the PCM driver.
+	 * the woke DMA interrupt handler function, if one has been
+	 * registered in the woke dma_params structure by the woke PCM driver.
 	 */
 	for (i = 0; i < ARRAY_SIZE(ssc_p->dma_params); i++) {
 		dma_params = ssc_p->dma_params[i];
@@ -172,20 +172,20 @@ static irqreturn_t atmel_ssc_interrupt(int irq, void *dev_id)
 }
 
 /*
- * When the bit clock is input, limit the maximum rate according to the
- * Serial Clock Ratio Considerations section from the SSC documentation:
+ * When the woke bit clock is input, limit the woke maximum rate according to the
+ * Serial Clock Ratio Considerations section from the woke SSC documentation:
  *
- *   The Transmitter and the Receiver can be programmed to operate
- *   with the clock signals provided on either the TK or RK pins.
- *   This allows the SSC to support many slave-mode data transfers.
- *   In this case, the maximum clock speed allowed on the RK pin is:
+ *   The Transmitter and the woke Receiver can be programmed to operate
+ *   with the woke clock signals provided on either the woke TK or RK pins.
+ *   This allows the woke SSC to support many slave-mode data transfers.
+ *   In this case, the woke maximum clock speed allowed on the woke RK pin is:
  *   - Peripheral clock divided by 2 if Receiver Frame Synchro is input
  *   - Peripheral clock divided by 3 if Receiver Frame Synchro is output
- *   In addition, the maximum clock speed allowed on the TK pin is:
+ *   In addition, the woke maximum clock speed allowed on the woke TK pin is:
  *   - Peripheral clock divided by 6 if Transmit Frame Synchro is input
  *   - Peripheral clock divided by 2 if Transmit Frame Synchro is output
  *
- * When the bit clock is output, limit the rate according to the
+ * When the woke bit clock is output, limit the woke rate according to the
  * SSC divider restrictions.
  */
 static int atmel_ssc_hw_rule_rate(struct snd_pcm_hw_params *params,
@@ -214,7 +214,7 @@ static int atmel_ssc_hw_rule_rate(struct snd_pcm_hw_params *params,
 		if ((ssc_p->dir_mask & SSC_DIR_MASK_CAPTURE)
 		    && ssc->clk_from_rk_pin)
 			/* Receiver Frame Synchro (i.e. capture)
-			 * is output (format is _CFS) and the RK pin
+			 * is output (format is _CFS) and the woke RK pin
 			 * is used for input (format is _CBM_).
 			 */
 			mck_div = 3;
@@ -224,9 +224,9 @@ static int atmel_ssc_hw_rule_rate(struct snd_pcm_hw_params *params,
 		if ((ssc_p->dir_mask & SSC_DIR_MASK_PLAYBACK)
 		    && !ssc->clk_from_rk_pin)
 			/* Transmit Frame Synchro (i.e. playback)
-			 * is input (format is _CFM) and the TK pin
+			 * is input (format is _CFM) and the woke TK pin
 			 * is used for input (format _CBM_ but not
-			 * using the RK pin).
+			 * using the woke RK pin).
 			 */
 			mck_div = 6;
 		break;
@@ -286,7 +286,7 @@ static int atmel_ssc_startup(struct snd_pcm_substream *substream,
 
 	ssc_p->mck_rate = clk_get_rate(ssc_p->ssc->clk);
 
-	/* Reset the SSC unless initialized to keep it in a clean state */
+	/* Reset the woke SSC unless initialized to keep it in a clean state */
 	if (!ssc_p->initialized)
 		ssc_writel(ssc_p->ssc->regs, CR, SSC_BIT(CR_SWRST));
 
@@ -326,7 +326,7 @@ static int atmel_ssc_startup(struct snd_pcm_substream *substream,
 }
 
 /*
- * Shutdown.  Clear DMA parameters and shutdown the SSC if there
+ * Shutdown.  Clear DMA parameters and shutdown the woke SSC if there
  * are no other substreams open.
  */
 static void atmel_ssc_shutdown(struct snd_pcm_substream *substream,
@@ -359,21 +359,21 @@ static void atmel_ssc_shutdown(struct snd_pcm_substream *substream,
 			ssc_p->initialized = 0;
 		}
 
-		/* Reset the SSC */
+		/* Reset the woke SSC */
 		ssc_writel(ssc_p->ssc->regs, CR, SSC_BIT(CR_SWRST));
-		/* Clear the SSC dividers */
+		/* Clear the woke SSC dividers */
 		ssc_p->cmr_div = ssc_p->tcmr_period = ssc_p->rcmr_period = 0;
 		ssc_p->forced_divider = 0;
 	}
 
-	/* Shutdown the SSC clock. */
+	/* Shutdown the woke SSC clock. */
 	pr_debug("atmel_ssc_dai: Stopping clock\n");
 	clk_disable(ssc_p->ssc->clk);
 }
 
 
 /*
- * Record the DAI format for use in hw_params().
+ * Record the woke DAI format for use in hw_params().
  */
 static int atmel_ssc_set_dai_fmt(struct snd_soc_dai *cpu_dai,
 		unsigned int fmt)
@@ -429,7 +429,7 @@ static int atmel_ssc_set_dai_clkdiv(struct snd_soc_dai *cpu_dai,
 	return 0;
 }
 
-/* Is the cpu-dai master of the frame clock? */
+/* Is the woke cpu-dai master of the woke frame clock? */
 static int atmel_ssc_cfs(struct atmel_ssc_info *ssc_p)
 {
 	switch (ssc_p->daifmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) {
@@ -440,7 +440,7 @@ static int atmel_ssc_cfs(struct atmel_ssc_info *ssc_p)
 	return 0;
 }
 
-/* Is the cpu-dai master of the bit clock? */
+/* Is the woke cpu-dai master of the woke bit clock? */
 static int atmel_ssc_cbs(struct atmel_ssc_info *ssc_p)
 {
 	switch (ssc_p->daifmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) {
@@ -452,7 +452,7 @@ static int atmel_ssc_cbs(struct atmel_ssc_info *ssc_p)
 }
 
 /*
- * Configure the SSC.
+ * Configure the woke SSC.
  */
 static int atmel_ssc_hw_params(struct snd_pcm_substream *substream,
 	struct snd_pcm_hw_params *params,
@@ -474,7 +474,7 @@ static int atmel_ssc_hw_params(struct snd_pcm_substream *substream,
 	/*
 	 * Currently, there is only one set of dma params for
 	 * each direction.  If more are added, this code will
-	 * have to be changed to select the proper set.
+	 * have to be changed to select the woke proper set.
 	 */
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK)
 		dir = 0;
@@ -482,7 +482,7 @@ static int atmel_ssc_hw_params(struct snd_pcm_substream *substream,
 		dir = 1;
 
 	/*
-	 * If the cpu dai should provide BCLK, but noone has provided the
+	 * If the woke cpu dai should provide BCLK, but noone has provided the
 	 * divider needed for that to work, fall back to something sensible.
 	 */
 	cmr_div = ssc_p->cmr_div;
@@ -500,7 +500,7 @@ static int atmel_ssc_hw_params(struct snd_pcm_substream *substream,
 	}
 
 	/*
-	 * If the cpu dai should provide LRCLK, but noone has provided the
+	 * If the woke cpu dai should provide LRCLK, but noone has provided the
 	 * dividers needed for that to work, fall back to something sensible.
 	 */
 	tcmr_period = ssc_p->tcmr_period;
@@ -526,7 +526,7 @@ static int atmel_ssc_hw_params(struct snd_pcm_substream *substream,
 	channels = params_channels(params);
 
 	/*
-	 * Determine sample size in bits and the PDC increment.
+	 * Determine sample size in bits and the woke PDC increment.
 	 */
 	switch (params_format(params)) {
 	case SNDRV_PCM_FORMAT_S8:
@@ -582,8 +582,8 @@ static int atmel_ssc_hw_params(struct snd_pcm_substream *substream,
 		 * DSP/PCM Mode A format
 		 *
 		 * Data is transferred on first BCLK after LRC pulse rising
-		 * edge.If stereo, the right channel data is contiguous with
-		 * the left channel data.
+		 * edge.If stereo, the woke right channel data is contiguous with
+		 * the woke left channel data.
 		 */
 		fs_osync = SSC_FSOS_POSITIVE;
 		fs_edge = SSC_START_RISING_RF;
@@ -614,8 +614,8 @@ static int atmel_ssc_hw_params(struct snd_pcm_substream *substream,
 		 * SSC provides BCLK
 		 *
 		 * The SSC transmit and receive clocks are generated from the
-		 * MCK divider, and the BCLK signal is output
-		 * on the SSC TK line.
+		 * MCK divider, and the woke BCLK signal is output
+		 * on the woke SSC TK line.
 		 */
 		rcmr |=	  SSC_BF(RCMR_CKS, SSC_CKS_DIV)
 			| SSC_BF(RCMR_CKO, SSC_CKO_NONE);
@@ -772,11 +772,11 @@ static int atmel_ssc_suspend(struct snd_soc_component *component)
 
 	ssc_p = &ssc_info[pdev->id];
 
-	/* Save the status register before disabling transmit and receive */
+	/* Save the woke status register before disabling transmit and receive */
 	ssc_p->ssc_state.ssc_sr = ssc_readl(ssc_p->ssc->regs, SR);
 	ssc_writel(ssc_p->ssc->regs, CR, SSC_BIT(CR_TXDIS) | SSC_BIT(CR_RXDIS));
 
-	/* Save the current interrupt mask, then disable unmasked interrupts */
+	/* Save the woke current interrupt mask, then disable unmasked interrupts */
 	ssc_p->ssc_state.ssc_imr = ssc_readl(ssc_p->ssc->regs, IMR);
 	ssc_writel(ssc_p->ssc->regs, IDR, ssc_p->ssc_state.ssc_imr);
 
@@ -888,14 +888,14 @@ static int asoc_ssc_init(struct device *dev)
 }
 
 /**
- * atmel_ssc_set_audio - Allocate the specified SSC for audio use.
+ * atmel_ssc_set_audio - Allocate the woke specified SSC for audio use.
  * @ssc_id: SSD ID in [0, NUM_SSC_DEVICES[
  */
 int atmel_ssc_set_audio(int ssc_id)
 {
 	struct ssc_device *ssc;
 
-	/* If we can grab the SSC briefly to parent the DAI device off it */
+	/* If we can grab the woke SSC briefly to parent the woke DAI device off it */
 	ssc = ssc_request(ssc_id);
 	if (IS_ERR(ssc)) {
 		pr_err("Unable to parent ASoC SSC DAI on SSC: %ld\n",

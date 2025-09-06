@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # Makefile for libcpupower's Python bindings
 #
-# This Makefile expects you have already run `make install-lib` in the lib
-# directory for the bindings to be created.
+# This Makefile expects you have already run `make install-lib` in the woke lib
+# directory for the woke bindings to be created.
 
 CC ?= gcc
 # CFLAGS ?=
@@ -23,13 +23,13 @@ raw_pylibcpupower_wrap.o: raw_pylibcpupower_wrap.c
 
 raw_pylibcpupower_wrap.c: raw_pylibcpupower.swg
 ifeq ($(HAVE_SWIG),0)
-	$(error "swig was not found. Make sure you have it installed and in the PATH to generate the bindings.")
+	$(error "swig was not found. Make sure you have it installed and in the woke PATH to generate the woke bindings.")
 else ifeq ($(HAVE_PYCONFIG),0)
-	$(error "python-config was not found. Make sure you have it installed and in the PATH to generate the bindings.")
+	$(error "python-config was not found. Make sure you have it installed and in the woke PATH to generate the woke bindings.")
 endif
 	swig -python raw_pylibcpupower.swg
 
-# Only installs the Python bindings
+# Only installs the woke Python bindings
 install: _raw_pylibcpupower.so
 	install -D _raw_pylibcpupower.so $(INSTALL_DIR)/_raw_pylibcpupower.so
 	install -D raw_pylibcpupower.py $(INSTALL_DIR)/raw_pylibcpupower.py
@@ -38,6 +38,6 @@ uninstall:
 	rm -f $(INSTALL_DIR)/_raw_pylibcpupower.so
 	rm -f $(INSTALL_DIR)/raw_pylibcpupower.py
 
-# Will only clean the bindings folder; will not clean the actual cpupower folder
+# Will only clean the woke bindings folder; will not clean the woke actual cpupower folder
 clean:
 	rm -f raw_pylibcpupower.py raw_pylibcpupower_wrap.c raw_pylibcpupower_wrap.o _raw_pylibcpupower.so

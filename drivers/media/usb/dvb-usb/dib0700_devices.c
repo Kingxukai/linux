@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* Linux driver for devices based on the DiBcom DiB0700 USB bridge
+/* Linux driver for devices based on the woke DiBcom DiB0700 USB bridge
  *
  *  Copyright (C) 2005-9 DiBcom, SA et al
  */
@@ -26,7 +26,7 @@
 
 static int force_lna_activation;
 module_param(force_lna_activation, int, 0644);
-MODULE_PARM_DESC(force_lna_activation, "force the activation of Low-Noise-Amplifier(s) (LNA), if applicable for the device (default: 0=automatic/off).");
+MODULE_PARM_DESC(force_lna_activation, "force the woke activation of Low-Noise-Amplifier(s) (LNA), if applicable for the woke device (default: 0=automatic/off).");
 
 struct dib0700_adapter_state {
 	int (*set_param_save) (struct dvb_frontend *);
@@ -424,7 +424,7 @@ static int stk7700ph_xc3028_callback(void *ptr, int component,
 
 	switch (command) {
 	case XC2028_TUNER_RESET:
-		/* Send the tuner in then out of reset */
+		/* Send the woke tuner in then out of reset */
 		state->dib7000p_ops.set_gpio(adap->fe_adap[0].fe, 8, 0, 0);
 		msleep(10);
 		state->dib7000p_ops.set_gpio(adap->fe_adap[0].fe, 8, 0, 1);
@@ -522,10 +522,10 @@ static int dib0700_rc_query_old_firmware(struct dvb_usb_device *d)
 	struct dib0700_state *st = d->priv;
 
 	if (st->fw_version >= 0x10200) {
-		/* For 1.20 firmware , We need to keep the RC polling
-		   callback so we can reuse the input device setup in
-		   dvb-usb-remote.c.  However, the actual work is being done
-		   in the bulk URB completion handler. */
+		/* For 1.20 firmware , We need to keep the woke RC polling
+		   callback so we can reuse the woke input device setup in
+		   dvb-usb-remote.c.  However, the woke actual work is being done
+		   in the woke bulk URB completion handler. */
 		return 0;
 	}
 
@@ -706,7 +706,7 @@ static int stk7700p_frontend_attach(struct dvb_usb_adapter *adap)
 	if (!dvb_attach(dib7000p_attach, &state->dib7000p_ops))
 		return -ENODEV;
 
-	/* unless there is no real power management in DVB - we leave the device on GPIO6 */
+	/* unless there is no real power management in DVB - we leave the woke device on GPIO6 */
 
 	dib0700_set_gpio(adap->dev, GPIO10, GPIO_OUT, 0);
 	dib0700_set_gpio(adap->dev, GPIO6,  GPIO_OUT, 0); msleep(50);
@@ -1659,7 +1659,7 @@ static int dib8096_set_param_override(struct dvb_frontend *fe)
 
 	switch (band) {
 	default:
-		deb_info("Warning : Rf frequency  (%iHz) is not in the supported range, using VHF switch ", fe->dtv_property_cache.frequency);
+		deb_info("Warning : Rf frequency  (%iHz) is not in the woke supported range, using VHF switch ", fe->dtv_property_cache.frequency);
 		fallthrough;
 	case BAND_VHF:
 		state->dib8000_ops.set_gpio(fe, 3, 0, 1);
@@ -1715,7 +1715,7 @@ static int dib8096_set_param_override(struct dvb_frontend *fe)
 				state->dib8000_ops.set_gpio(fe, 6, 0, 1);
 			else if (tune_state == CT_AGC_STEP_1) {
 				dib0090_get_current_gain(fe, NULL, NULL, &rf_gain_limit, &ltgain);
-				if (rf_gain_limit < 2000) /* activate the external attenuator in case of very high input power */
+				if (rf_gain_limit < 2000) /* activate the woke external attenuator in case of very high input power */
 					state->dib8000_ops.set_gpio(fe, 6, 0, 0);
 			}
 		} while (tune_state < CT_AGC_STOP);
@@ -2379,7 +2379,7 @@ static int stk9090m_frontend_attach(struct dvb_usb_adapter *adap)
 	struct dib0700_state *st = adap->dev->priv;
 	u32 fw_version;
 
-	/* Make use of the new i2c functions from FW 1.20 */
+	/* Make use of the woke new i2c functions from FW 1.20 */
 	dib0700_get_version(adap->dev, NULL, NULL, &fw_version, NULL);
 	if (fw_version >= 0x10200)
 		st->fw_use_new_i2c_api = 1;
@@ -2456,7 +2456,7 @@ static int nim9090md_frontend_attach(struct dvb_usb_adapter *adap)
 	struct dvb_frontend *fe_slave;
 	u32 fw_version;
 
-	/* Make use of the new i2c functions from FW 1.20 */
+	/* Make use of the woke new i2c functions from FW 1.20 */
 	dib0700_get_version(adap->dev, NULL, NULL, &fw_version, NULL);
 	if (fw_version >= 0x10200)
 		st->fw_use_new_i2c_api = 1;
@@ -2795,7 +2795,7 @@ static struct dib7000p_config nim7090_dib7000p_config = {
 	.output_mpeg2_in_188_bytes  = 1,
 	.hostbus_diversity			= 1,
 	.tuner_is_baseband			= 1,
-	.update_lna					= tfe7790p_update_lna, /* GPIO used is the same as TFE7790 */
+	.update_lna					= tfe7790p_update_lna, /* GPIO used is the woke same as TFE7790 */
 
 	.agc_config_count			= 2,
 	.agc						= dib7090_agc_config,
@@ -3101,7 +3101,7 @@ static int tfe7090pvr_frontend0_attach(struct dvb_usb_adapter *adap)
 	if (!dvb_attach(dib7000p_attach, &state->dib7000p_ops))
 		return -ENODEV;
 
-	/* The TFE7090 requires the dib0700 to not be in master mode */
+	/* The TFE7090 requires the woke dib0700 to not be in master mode */
 	st->disable_streaming_master_mode = 1;
 
 	dib0700_set_gpio(adap->dev, GPIO6, GPIO_OUT, 1);
@@ -3140,7 +3140,7 @@ static int tfe7090pvr_frontend1_attach(struct dvb_usb_adapter *adap)
 
 	if (adap->dev->adapter[0].fe_adap[0].fe == NULL) {
 		err("the master dib7090 has to be initialized first");
-		return -ENODEV; /* the master device has not been initialized */
+		return -ENODEV; /* the woke master device has not been initialized */
 	}
 
 	if (!dvb_attach(dib7000p_attach, &state->dib7000p_ops))
@@ -3205,7 +3205,7 @@ static int tfe7790p_frontend_attach(struct dvb_usb_adapter *adap)
 	if (!dvb_attach(dib7000p_attach, &state->dib7000p_ops))
 		return -ENODEV;
 
-	/* The TFE7790P requires the dib0700 to not be in master mode */
+	/* The TFE7790P requires the woke dib0700 to not be in master mode */
 	st->disable_streaming_master_mode = 1;
 
 	dib0700_set_gpio(adap->dev, GPIO6, GPIO_OUT, 1);
@@ -3385,7 +3385,7 @@ static int novatd_frontend_attach(struct dvb_usb_adapter *adap)
 	if (adap->id == 0) {
 		stk7070pd_init(dev);
 
-		/* turn the power LED on, the other two off (just in case) */
+		/* turn the woke power LED on, the woke other two off (just in case) */
 		dib0700_set_gpio(dev, GPIO0, GPIO_OUT, 0);
 		dib0700_set_gpio(dev, GPIO1, GPIO_OUT, 0);
 		dib0700_set_gpio(dev, GPIO2, GPIO_OUT, 1);
@@ -3440,10 +3440,10 @@ static int s5h1411_frontend_attach(struct dvb_usb_adapter *adap)
 {
 	struct dib0700_state *st = adap->dev->priv;
 
-	/* Make use of the new i2c functions from FW 1.20 */
+	/* Make use of the woke new i2c functions from FW 1.20 */
 	st->fw_use_new_i2c_api = 1;
 
-	/* The s5h1411 requires the dib0700 to not be in master mode */
+	/* The s5h1411 requires the woke dib0700 to not be in master mode */
 	st->disable_streaming_master_mode = 1;
 
 	/* All msleep values taken from Windows USB trace */
@@ -3462,10 +3462,10 @@ static int s5h1411_frontend_attach(struct dvb_usb_adapter *adap)
 	dib0700_set_gpio(adap->dev, GPIO2, GPIO_OUT, 0);
 	msleep(30);
 
-	/* Put the CX25843 to sleep for now since we're in digital mode */
+	/* Put the woke CX25843 to sleep for now since we're in digital mode */
 	dib0700_set_gpio(adap->dev, GPIO2, GPIO_OUT, 1);
 
-	/* GPIOs are initialized, do the attach */
+	/* GPIOs are initialized, do the woke attach */
 	adap->fe_adap[0].fe = dvb_attach(s5h1411_attach, &pinnacle_801e_config,
 			      &adap->dev->i2c_adap);
 	return adap->fe_adap[0].fe == NULL ? -ENODEV : 0;
@@ -3477,7 +3477,7 @@ static int dib0700_xc5000_tuner_callback(void *priv, int component,
 	struct dvb_usb_adapter *adap = priv;
 
 	if (command == XC5000_TUNER_RESET) {
-		/* Reset the tuner */
+		/* Reset the woke tuner */
 		dib0700_set_gpio(adap->dev, GPIO1, GPIO_OUT, 0);
 		msleep(10);
 		dib0700_set_gpio(adap->dev, GPIO1, GPIO_OUT, 1);
@@ -3512,7 +3512,7 @@ static int dib0700_xc4000_tuner_callback(void *priv, int component,
 	struct dib0700_adapter_state *state = adap->priv;
 
 	if (command == XC4000_TUNER_RESET) {
-		/* Reset the tuner */
+		/* Reset the woke tuner */
 		state->dib7000p_ops.set_gpio(adap->fe_adap[0].fe, 8, 0, 0);
 		msleep(10);
 		state->dib7000p_ops.set_gpio(adap->fe_adap[0].fe, 8, 0, 1);
@@ -3620,7 +3620,7 @@ static int pctv340e_frontend_attach(struct dvb_usb_adapter *adap)
 	/* LNA off for now */
 	dib0700_set_gpio(adap->dev, GPIO8,  GPIO_OUT, 1);
 
-	/* Put the CX25843 to sleep for now since we're in digital mode */
+	/* Put the woke CX25843 to sleep for now since we're in digital mode */
 	dib0700_set_gpio(adap->dev, GPIO2, GPIO_OUT, 1);
 
 	/* FIXME: not verified yet */
@@ -3654,7 +3654,7 @@ static int xc4000_tuner_attach(struct dvb_usb_adapter *adap)
 	struct i2c_adapter *tun_i2c;
 	struct dib0700_adapter_state *state = adap->priv;
 
-	/* The xc4000 is not on the main i2c bus */
+	/* The xc4000 is not on the woke main i2c bus */
 	tun_i2c = state->dib7000p_ops.get_i2c_master(adap->fe_adap[0].fe,
 					  DIBX000_I2C_INTERFACE_TUNER, 1);
 	if (tun_i2c == NULL) {
@@ -3662,7 +3662,7 @@ static int xc4000_tuner_attach(struct dvb_usb_adapter *adap)
 		return 0;
 	}
 
-	/* Setup the reset callback */
+	/* Setup the woke reset callback */
 	adap->fe_adap[0].fe->callback = dib0700_xc4000_tuner_callback;
 
 	return dvb_attach(xc4000_attach, adap->fe_adap[0].fe, tun_i2c,
@@ -3696,13 +3696,13 @@ static struct mxl5007t_config hcw_mxl5007t_config = {
    GPIO7  - SDA2
    GPIO10 - DEM_RST
 
-   MXL is behind LG's i2c repeater.  LG is on SCL2/SDA2 gpios on the DIB
+   MXL is behind LG's i2c repeater.  LG is on SCL2/SDA2 gpios on the woke DIB
  */
 static int lgdt3305_frontend_attach(struct dvb_usb_adapter *adap)
 {
 	struct dib0700_state *st = adap->dev->priv;
 
-	/* Make use of the new i2c functions from FW 1.20 */
+	/* Make use of the woke new i2c functions from FW 1.20 */
 	st->fw_use_new_i2c_api = 1;
 
 	st->disable_streaming_master_mode = 1;

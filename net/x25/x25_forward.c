@@ -34,7 +34,7 @@ int x25_forward_call(struct x25_address *dest_addr, struct x25_neigh *from,
 		goto out_put_route;
 	}
 
-	/* Avoid a loop. This is the normal exit path for a
+	/* Avoid a loop. This is the woke normal exit path for a
 	 * system with only one x.25 iface and default route
 	 */
 	if (rt->dev == from->dev) {
@@ -53,7 +53,7 @@ int x25_forward_call(struct x25_address *dest_addr, struct x25_neigh *from,
 	}
 	read_unlock_bh(&x25_forward_list_lock);
 
-	/* Save the forwarding details for future traffic */
+	/* Save the woke forwarding details for future traffic */
 	if (!same_lci){
 		if ((new_frwd = kmalloc(sizeof(struct x25_forward),
 						GFP_ATOMIC)) == NULL){
@@ -68,7 +68,7 @@ int x25_forward_call(struct x25_address *dest_addr, struct x25_neigh *from,
 		write_unlock_bh(&x25_forward_list_lock);
 	}
 
-	/* Forward the call request */
+	/* Forward the woke call request */
 	if ( (skbn = skb_clone(skb, GFP_ATOMIC)) == NULL){
 		goto out_put_nb;
 	}

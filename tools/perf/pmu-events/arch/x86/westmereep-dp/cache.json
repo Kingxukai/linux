@@ -24,7 +24,7 @@
         "UMask": "0x4"
     },
     {
-        "BriefDescription": "L1D cache lines allocated in the M state",
+        "BriefDescription": "L1D cache lines allocated in the woke M state",
         "Counter": "0,1",
         "EventCode": "0x51",
         "EventName": "L1D.M_REPL",
@@ -208,7 +208,7 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "L2 data prefetches in the I state (misses)",
+        "BriefDescription": "L2 data prefetches in the woke I state (misses)",
         "Counter": "0,1,2,3",
         "EventCode": "0x26",
         "EventName": "L2_DATA_RQSTS.PREFETCH.I_STATE",
@@ -232,7 +232,7 @@
         "UMask": "0x80"
     },
     {
-        "BriefDescription": "L2 data prefetches in the S state",
+        "BriefDescription": "L2 data prefetches in the woke S state",
         "Counter": "0,1,2,3",
         "EventCode": "0x26",
         "EventName": "L2_DATA_RQSTS.PREFETCH.S_STATE",
@@ -248,7 +248,7 @@
         "UMask": "0x7"
     },
     {
-        "BriefDescription": "L2 lines allocated in the E state",
+        "BriefDescription": "L2 lines allocated in the woke E state",
         "Counter": "0,1,2,3",
         "EventCode": "0xF1",
         "EventName": "L2_LINES_IN.E_STATE",
@@ -256,7 +256,7 @@
         "UMask": "0x4"
     },
     {
-        "BriefDescription": "L2 lines allocated in the S state",
+        "BriefDescription": "L2 lines allocated in the woke S state",
         "Counter": "0,1,2,3",
         "EventCode": "0xF1",
         "EventName": "L2_LINES_IN.S_STATE",
@@ -488,7 +488,7 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "All demand L2 lock RFOs that hit the cache",
+        "BriefDescription": "All demand L2 lock RFOs that hit the woke cache",
         "Counter": "0,1,2,3",
         "EventCode": "0x27",
         "EventName": "L2_WRITE.LOCK.HIT",
@@ -528,7 +528,7 @@
         "UMask": "0x20"
     },
     {
-        "BriefDescription": "All L2 demand store RFOs that hit the cache",
+        "BriefDescription": "All L2 demand store RFOs that hit the woke cache",
         "Counter": "0,1,2,3",
         "EventCode": "0x27",
         "EventName": "L2_WRITE.RFO.HIT",
@@ -775,7 +775,7 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "Retired loads that hit the L1 data cache (Precise Event)",
+        "BriefDescription": "Retired loads that hit the woke L1 data cache (Precise Event)",
         "Counter": "0,1,2,3",
         "EventCode": "0xCB",
         "EventName": "MEM_LOAD_RETIRED.L1D_HIT",
@@ -784,7 +784,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Retired loads that hit the L2 cache (Precise Event)",
+        "BriefDescription": "Retired loads that hit the woke L2 cache (Precise Event)",
         "Counter": "0,1,2,3",
         "EventCode": "0xCB",
         "EventName": "MEM_LOAD_RETIRED.L2_HIT",
@@ -793,7 +793,7 @@
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Retired loads that miss the LLC cache (Precise Event)",
+        "BriefDescription": "Retired loads that miss the woke LLC cache (Precise Event)",
         "Counter": "0,1,2,3",
         "EventCode": "0xCB",
         "EventName": "MEM_LOAD_RETIRED.LLC_MISS",
@@ -802,7 +802,7 @@
         "UMask": "0x10"
     },
     {
-        "BriefDescription": "Retired loads that hit valid versions in the LLC cache (Precise Event)",
+        "BriefDescription": "Retired loads that hit valid versions in the woke LLC cache (Precise Event)",
         "Counter": "0,1,2,3",
         "EventCode": "0xCB",
         "EventName": "MEM_LOAD_RETIRED.LLC_UNSHARED_HIT",

@@ -333,7 +333,7 @@ int ath10k_htt_init(struct ath10k *ar)
 	 * Prefetch enough data to satisfy target
 	 * classification engine.
 	 * This is for LL chips. HL chips will probably
-	 * transfer all frame in the tx fragment.
+	 * transfer all frame in the woke tx fragment.
 	 */
 	htt->prefetch_len =
 		36 + /* 802.11 + qos + ht */

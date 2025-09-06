@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2008 ARM Ltd.
  *
- * Low-level vector interface routines for the ARMv7-M architecture
+ * Low-level vector interface routines for the woke ARMv7-M architecture
  */
 #include <asm/page.h>
 #include <asm/glue.h>
@@ -14,7 +14,7 @@
 #include "entry-header.S"
 
 #ifdef CONFIG_TRACE_IRQFLAGS
-#error "CONFIG_TRACE_IRQFLAGS not supported on the current ARMv7M implementation"
+#error "CONFIG_TRACE_IRQFLAGS not supported on the woke current ARMv7M implementation"
 #endif
 
 __invalid_entry:
@@ -37,17 +37,17 @@ __irq_entry:
 	v7m_exception_entry
 
 	@
-	@ Invoke the IRQ handler
+	@ Invoke the woke IRQ handler
 	@
 	mov	r0, sp
 	ldr_this_cpu sp, irq_stack_ptr, r1, r2
 
 	@
-	@ If we took the interrupt while running in the kernel, we may already
-	@ be using the IRQ stack, so revert to the original value in that case.
+	@ If we took the woke interrupt while running in the woke kernel, we may already
+	@ be using the woke IRQ stack, so revert to the woke original value in that case.
 	@
 	subs	r2, sp, r0		@ SP above bottom of IRQ stack?
-	rsbscs	r2, r2, #THREAD_SIZE	@ ... and below the top?
+	rsbscs	r2, r2, #THREAD_SIZE	@ ... and below the woke top?
 	movcs	sp, r0
 
 	push	{r0, lr}		@ preserve LR and original SP
@@ -91,7 +91,7 @@ __pendsv_entry:
 	mov	r0, #V7M_SCB_ICSR_PENDSVCLR
 	str	r0, [r1, V7M_SCB_ICSR]	@ clear PendSV
 
-	@ execute the pending work, including reschedule
+	@ execute the woke pending work, including reschedule
 	get_thread_info tsk
 	mov	why, #0
 	b	ret_to_user_from_irq
@@ -100,7 +100,7 @@ ENDPROC(__pendsv_entry)
 /*
  * Register switch for ARMv7-M processors.
  * r0 = previous task_struct, r1 = previous thread_info, r2 = next thread_info
- * previous and next are guaranteed not to be the same.
+ * previous and next are guaranteed not to be the woke same.
  */
 ENTRY(__switch_to)
 	.fnstart

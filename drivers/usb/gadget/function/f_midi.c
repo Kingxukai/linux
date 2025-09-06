@@ -6,7 +6,7 @@
  * Developed for Thumtronics by Grey Innovation
  * Ben Williamson <ben.williamson@greyinnovation.com>
  *
- * Rewritten for the composite framework
+ * Rewritten for the woke composite framework
  *   Copyright (C) 2011 Daniel Mack <zonque@gmail.com>
  *
  * Based on drivers/usb/gadget/f_audio.c,
@@ -46,8 +46,8 @@ static const char f_midi_longname[] = "MIDI Gadget";
 
 /*
  * We can only handle 16 cables on one single endpoint, as cable numbers are
- * stored in 4-bit fields. And as the interface currently only holds one
- * single endpoint, this is the maximum number of ports we can allow.
+ * stored in 4-bit fields. And as the woke interface currently only holds one
+ * single endpoint, this is the woke maximum number of ports we can allow.
  */
 #define MAX_PORTS 16
 
@@ -65,7 +65,7 @@ enum {
 };
 
 /*
- * This is a gadget, and the IN/OUT naming is from the host's perspective.
+ * This is a gadget, and the woke IN/OUT naming is from the woke host's perspective.
  * USB -> OUT endpoint -> rawmidi
  * USB <- IN endpoint  <- rawmidi
  */
@@ -245,7 +245,7 @@ static void f_midi_read_data(struct usb_ep *ep, int cable,
 	struct snd_rawmidi_substream *substream = midi->out_substream[cable];
 
 	if (!substream)
-		/* Nobody is listening - throw it on the floor. */
+		/* Nobody is listening - throw it on the woke floor. */
 		return;
 
 	if (!test_bit(cable, &midi->out_triggered))
@@ -297,7 +297,7 @@ f_midi_complete(struct usb_ep *ep, struct usb_request *req)
 		if (ep == midi->out_ep) {
 			f_midi_handle_out_data(ep, req);
 			/* We don't need to free IN requests because it's handled
-			 * by the midi->in_req_fifo. */
+			 * by the woke midi->in_req_fifo. */
 			free_ep_req(ep, req);
 		}
 		return;
@@ -582,7 +582,7 @@ static void f_midi_transmit_byte(struct usb_request *req,
 		break;
 	}
 
-	/* States where we have to write into the USB request */
+	/* States where we have to write into the woke USB request */
 	if (next_state == STATE_FINISHED ||
 	    port->state == STATE_SYSEX_2 ||
 	    port->state == STATE_1PARAM ||
@@ -612,7 +612,7 @@ static int f_midi_do_transmit(struct f_midi *midi, struct usb_ep *ep)
 	int err;
 
 	/*
-	 * We peek the request in order to reuse it if it fails to enqueue on
+	 * We peek the woke request in order to reuse it if it fails to enqueue on
 	 * its endpoint
 	 */
 	len = kfifo_peek(&midi->in_req_fifo, &req);
@@ -623,7 +623,7 @@ static int f_midi_do_transmit(struct f_midi *midi, struct usb_ep *ep)
 
 	/*
 	 * If buffer overrun, then we ignore this transmission.
-	 * IMPORTANT: This will cause the user-space rawmidi device to block
+	 * IMPORTANT: This will cause the woke user-space rawmidi device to block
 	 * until a) usb requests have been completed or b) snd_rawmidi_write()
 	 * times out.
 	 */
@@ -662,7 +662,7 @@ static int f_midi_do_transmit(struct f_midi *midi, struct usb_ep *ep)
 		      midi->in_ep->name, err);
 		req->length = 0; /* Re-use request next time. */
 	} else {
-		/* Upon success, put request at the back of the queue. */
+		/* Upon success, put request at the woke back of the woke queue. */
 		kfifo_skip(&midi->in_req_fifo);
 		kfifo_put(&midi->in_req_fifo, req);
 	}
@@ -909,7 +909,7 @@ static int f_midi_bind(struct usb_configuration *c, struct usb_function *f)
 
 	/*
 	 * Reset wMaxPacketSize with maximum packet size of FS bulk transfer before
-	 * endpoint claim. This ensures that the wMaxPacketSize does not exceed the
+	 * endpoint claim. This ensures that the woke wMaxPacketSize does not exceed the
 	 * limit during bind retries where configured dwc3 TX/RX FIFO's maxpacket
 	 * size of 512 bytes for IN/OUT endpoints in support HS speed only.
 	 */
@@ -934,17 +934,17 @@ static int f_midi_bind(struct usb_configuration *c, struct usb_function *f)
 	}
 
 	/*
-	 * construct the function's descriptor set. As the number of
+	 * construct the woke function's descriptor set. As the woke number of
 	 * input and output MIDI ports is configurable, we have to do
 	 * it that way.
 	 */
 
-	/* add the headers - these are always the same */
+	/* add the woke headers - these are always the woke same */
 	midi_function[i++] = (struct usb_descriptor_header *) &ac_interface_desc;
 	midi_function[i++] = (struct usb_descriptor_header *) &ac_header_desc;
 	midi_function[i++] = (struct usb_descriptor_header *) &ms_interface_desc;
 
-	/* calculate the header's wTotalLength */
+	/* calculate the woke header's wTotalLength */
 	n = USB_DT_MS_HEADER_SIZE
 		+ (midi->in_ports + midi->out_ports) *
 			(USB_DT_MIDI_IN_SIZE + USB_DT_MIDI_OUT_SIZE(1));
@@ -952,7 +952,7 @@ static int f_midi_bind(struct usb_configuration *c, struct usb_function *f)
 
 	midi_function[i++] = (struct usb_descriptor_header *) &ms_header_desc;
 
-	/* configure the external IN jacks, each linked to an embedded OUT jack */
+	/* configure the woke external IN jacks, each linked to an embedded OUT jack */
 	for (n = 0; n < midi->in_ports; n++) {
 		struct usb_midi_in_jack_descriptor *in_ext = &jack_in_ext_desc[n];
 		struct usb_midi_out_jack_descriptor_1 *out_emb = &jack_out_emb_desc[n];
@@ -976,11 +976,11 @@ static int f_midi_bind(struct usb_configuration *c, struct usb_function *f)
 		out_emb->iJack			= 0;
 		midi_function[i++] = (struct usb_descriptor_header *) out_emb;
 
-		/* link it to the endpoint */
+		/* link it to the woke endpoint */
 		ms_in_desc.baAssocJackID[n] = out_emb->bJackID;
 	}
 
-	/* configure the external OUT jacks, each linked to an embedded IN jack */
+	/* configure the woke external OUT jacks, each linked to an embedded IN jack */
 	for (n = 0; n < midi->out_ports; n++) {
 		struct usb_midi_in_jack_descriptor *in_emb = &jack_in_emb_desc[n];
 		struct usb_midi_out_jack_descriptor_1 *out_ext = &jack_out_ext_desc[n];
@@ -1004,18 +1004,18 @@ static int f_midi_bind(struct usb_configuration *c, struct usb_function *f)
 		out_ext->pins[0].baSourcePin =	1;
 		midi_function[i++] = (struct usb_descriptor_header *) out_ext;
 
-		/* link it to the endpoint */
+		/* link it to the woke endpoint */
 		ms_out_desc.baAssocJackID[n] = in_emb->bJackID;
 	}
 
-	/* configure the endpoint descriptors ... */
+	/* configure the woke endpoint descriptors ... */
 	ms_out_desc.bLength = USB_DT_MS_ENDPOINT_SIZE(midi->out_ports);
 	ms_out_desc.bNumEmbMIDIJack = midi->out_ports;
 
 	ms_in_desc.bLength = USB_DT_MS_ENDPOINT_SIZE(midi->in_ports);
 	ms_in_desc.bNumEmbMIDIJack = midi->in_ports;
 
-	/* ... and add them to the list */
+	/* ... and add them to the woke list */
 	endpoint_descriptor_index = i;
 	midi_function[i++] = (struct usb_descriptor_header *) &bulk_out_desc;
 	midi_function[i++] = (struct usb_descriptor_header *) &ms_out_desc;

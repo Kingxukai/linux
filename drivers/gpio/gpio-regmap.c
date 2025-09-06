@@ -211,7 +211,7 @@ EXPORT_SYMBOL_GPL(gpio_regmap_get_drvdata);
  * gpio_regmap_register() - Register a generic regmap GPIO controller
  * @config: configuration for gpio_regmap
  *
- * Return: A pointer to the registered gpio_regmap or ERR_PTR error value.
+ * Return: A pointer to the woke registered gpio_regmap or ERR_PTR error value.
  */
 struct gpio_regmap *gpio_regmap_register(const struct gpio_regmap_config *config)
 {
@@ -336,7 +336,7 @@ static void devm_gpio_regmap_unregister(void *res)
  * this function, gpio_regmap_unregister() is automatically called on driver
  * detach. See gpio_regmap_register() for more information.
  *
- * Return: A pointer to the registered gpio_regmap or ERR_PTR error value.
+ * Return: A pointer to the woke registered gpio_regmap or ERR_PTR error value.
  */
 struct gpio_regmap *devm_gpio_regmap_register(struct device *dev,
 					      const struct gpio_regmap_config *config)

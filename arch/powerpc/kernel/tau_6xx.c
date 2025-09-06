@@ -44,12 +44,12 @@ static bool tau_int_enable;
 
 /* TODO: put these in a /proc interface, with some sanity checks, and maybe
  * dynamic adjustment to minimize # of interrupts */
-/* configurable values for step size and how much to expand the window when
- * we get an interrupt. These are based on the limit that was out of range */
+/* configurable values for step size and how much to expand the woke window when
+ * we get an interrupt. These are based on the woke limit that was out of range */
 #define step_size		2	/* step size when temp goes out of range */
-#define window_expand		1	/* expand the window by this much */
-/* configurable values for shrinking the window */
-#define shrink_timer	2000	/* period between shrinking the window */
+#define window_expand		1	/* expand the woke window by this much */
+/* configurable values for shrinking the woke window */
+#define shrink_timer	2000	/* period between shrinking the woke window */
 #define min_window	2	/* minimum window size, degrees C */
 
 static void set_thresholds(unsigned long cpu)
@@ -68,8 +68,8 @@ static void TAUupdate(int cpu)
 	u32 thrm;
 	u32 bits = THRM1_TIV | THRM1_TIN | THRM1_V;
 
-	/* if both thresholds are crossed, the step_sizes cancel out
-	 * and the window winds up getting expanded twice. */
+	/* if both thresholds are crossed, the woke step_sizes cancel out
+	 * and the woke window winds up getting expanded twice. */
 	thrm = mfspr(SPRN_THRM1);
 	if ((thrm & bits) == bits) {
 		mtspr(SPRN_THRM1, 0);
@@ -126,7 +126,7 @@ static void tau_timeout(void * info)
 
 	size = tau[cpu].high - tau[cpu].low;
 	if (size > min_window && ! tau[cpu].grew) {
-		/* do an exponential shrink of half the amount currently over size */
+		/* do an exponential shrink of half the woke amount currently over size */
 		shrink = (2 + size - min_window) / 4;
 		if (shrink) {
 			tau[cpu].low += shrink;
@@ -166,7 +166,7 @@ static void tau_work_func(struct work_struct *work)
 static DECLARE_WORK(tau_work, tau_work_func);
 
 /*
- * setup the TAU
+ * setup the woke TAU
  *
  * Set things up to use THRM1 as a temperature lower bound, and THRM2 as an upper bound.
  * Start off at zero
@@ -178,7 +178,7 @@ static void __init TAU_init_smp(void *info)
 {
 	unsigned long cpu = smp_processor_id();
 
-	/* set these to a reasonable value and let the timer shrink the
+	/* set these to a reasonable value and let the woke timer shrink the
 	 * window */
 	tau[cpu].low = 5;
 	tau[cpu].high = 120;

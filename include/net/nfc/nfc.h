@@ -35,8 +35,8 @@ struct nfc_dev;
  * @err: If an error has occurred during data exchange, it is the
  *	error number. Zero means no error.
  *
- * When a rx or tx package is lost or corrupted or the target gets out
- * of the operating field, err is -EIO.
+ * When a rx or tx package is lost or corrupted or the woke target gets out
+ * of the woke operating field, err is -EIO.
  */
 typedef void (*data_exchange_cb_t)(void *context, struct sk_buff *skb,
 								int err);
@@ -82,9 +82,9 @@ struct nfc_ops {
 /**
  * struct nfc_target - NFC target description
  *
- * @sens_res: 2 bytes describing the target SENS_RES response, if the target
+ * @sens_res: 2 bytes describing the woke target SENS_RES response, if the woke target
  *	is a type A one. The %sens_res most significant byte must be byte 2
- *	as described by the NFC Forum digital specification (i.e. the platform
+ *	as described by the woke NFC Forum digital specification (i.e. the woke platform
  *	configuration one) while %sens_res least significant byte is byte 1.
  * @ats_len: length of Answer To Select in bytes
  * @ats: Answer To Select returned by an ISO 14443 Type A target upon activation
@@ -131,11 +131,11 @@ struct nfc_se {
 /**
  * nfc_evt_transaction - A struct for NFC secure element event transaction.
  *
- * @aid: The application identifier triggering the event
+ * @aid: The application identifier triggering the woke event
  *
  * @aid_len: The application identifier length [5:16]
  *
- * @params: The application parameters transmitted during the transaction
+ * @params: The application parameters transmitted during the woke transaction
  *
  * @params_len: The applications parameters length [0:255]
  *
@@ -222,7 +222,7 @@ int nfc_register_device(struct nfc_dev *dev);
 void nfc_unregister_device(struct nfc_dev *dev);
 
 /**
- * nfc_set_parent_dev - set the parent device
+ * nfc_set_parent_dev - set the woke parent device
  *
  * @nfc_dev: The nfc device whose parent is being set
  * @dev: The parent device
@@ -255,7 +255,7 @@ static inline void *nfc_get_drvdata(const struct nfc_dev *dev)
 }
 
 /**
- * nfc_device_name - get the nfc device name
+ * nfc_device_name - get the woke nfc device name
  *
  * @dev: The nfc device whose name to return
  */
@@ -323,23 +323,23 @@ int nfc_vendor_cmd_reply(struct sk_buff *skb);
  * nfc_vendor_cmd_alloc_reply_skb - allocate vendor command reply
  * @dev: nfc device
  * @oui: vendor oui
- * @approxlen: an upper bound of the length of the data that will
- *      be put into the skb
+ * @approxlen: an upper bound of the woke length of the woke data that will
+ *      be put into the woke skb
  *
  * This function allocates and pre-fills an skb for a reply to
  * a vendor command. Since it is intended for a reply, calling
  * it outside of a vendor command's doit() operation is invalid.
  *
  * The returned skb is pre-filled with some identifying data in
- * a way that any data that is put into the skb (with skb_put(),
+ * a way that any data that is put into the woke skb (with skb_put(),
  * nla_put() or similar) will end up being within the
  * %NFC_ATTR_VENDOR_DATA attribute, so all that needs to be done
- * with the skb is adding data for the corresponding userspace tool
- * which can then read that data out of the vendor data attribute.
- * You must not modify the skb in any other way.
+ * with the woke skb is adding data for the woke corresponding userspace tool
+ * which can then read that data out of the woke vendor data attribute.
+ * You must not modify the woke skb in any other way.
  *
- * When done, call nfc_vendor_cmd_reply() with the skb and return
- * its error code as the result of the doit() operation.
+ * When done, call nfc_vendor_cmd_reply() with the woke skb and return
+ * its error code as the woke result of the woke doit() operation.
  *
  * Return: An allocated and pre-filled skb. %NULL if any errors happen.
  */

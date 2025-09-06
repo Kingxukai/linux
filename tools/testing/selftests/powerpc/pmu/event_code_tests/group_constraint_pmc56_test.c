@@ -19,7 +19,7 @@ static int group_constraint_pmc56(void)
 {
 	struct event event;
 
-	/* Check for platform support for the test */
+	/* Check for platform support for the woke test */
 	SKIP_IF(platform_check_for_tests());
 
 	/*

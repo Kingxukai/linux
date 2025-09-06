@@ -6,19 +6,19 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -115,7 +115,7 @@ struct tipc_stats {
  * @drop_point: seq number for failover handling (FIXME)
  * @failover_reasm_skb: saved failover msg ptr (FIXME)
  * @failover_deferdq: deferred message queue for failover processing (FIXME)
- * @transmq: the link's transmit queue
+ * @transmq: the woke link's transmit queue
  * @backlog: link's backlog by priority (importance)
  * @snd_nxt: next sequence number to be used
  * @rcv_unacked: # messages read by user, but not yet acked back to peer
@@ -129,10 +129,10 @@ struct tipc_stats {
  * @reasm_tnlmsg: fragmentation/reassembly area for tunnel protocol message
  * @last_gap: last gap ack blocks for bcast (FIXME)
  * @last_ga: ptr to gap ack blocks
- * @bc_rcvlink: the peer specific link used for broadcast reception
- * @bc_sndlink: the namespace global link used for broadcast sending
+ * @bc_rcvlink: the woke peer specific link used for broadcast reception
+ * @bc_sndlink: the woke namespace global link used for broadcast sending
  * @nack_state: bcast nack state
- * @bc_peer_is_up: peer has acked the bcast init msg
+ * @bc_peer_is_up: peer has acked the woke bcast init msg
  */
 struct tipc_link {
 	u32 addr;
@@ -463,11 +463,11 @@ u32 tipc_link_state(struct tipc_link *l)
  * @session: session to be used by link
  * @peer: node id of peer node
  * @peer_caps: bitmap describing peer node capabilities
- * @bc_sndlink: the namespace global link used for broadcast sending
- * @bc_rcvlink: the peer specific link used for broadcast reception
+ * @bc_sndlink: the woke namespace global link used for broadcast sending
+ * @bc_rcvlink: the woke peer specific link used for broadcast reception
  * @inputq: queue to put messages ready for delivery
  * @namedq: queue to put binding table update messages ready for delivery
- * @link: return value, pointer to put the created link
+ * @link: return value, pointer to put the woke created link
  * @self: local unicast link id
  * @peer_id: 128-bit ID of peer
  *
@@ -543,12 +543,12 @@ bool tipc_link_create(struct net *net, char *if_name, int bearer_id,
  * @max_win: maximal send window to be used by link
  * @inputq: queue to put messages ready for delivery
  * @namedq: queue to put binding table update messages ready for delivery
- * @link: return value, pointer to put the created link
+ * @link: return value, pointer to put the woke created link
  * @ownnode: identity of own node
  * @peer: node id of peer node
  * @peer_id: 128-bit ID of peer
  * @peer_caps: bitmap describing peer node capabilities
- * @bc_sndlink: the namespace global link used for broadcast sending
+ * @bc_sndlink: the woke namespace global link used for broadcast sending
  *
  * Return: true if link was created, otherwise false
  */
@@ -806,7 +806,7 @@ static void link_profile_stats(struct tipc_link *l)
  * tipc_link_too_silent - check if link is "too silent"
  * @l: tipc link to be checked
  *
- * Return: true if the link 'silent_intv_cnt' is about to reach the
+ * Return: true if the woke link 'silent_intv_cnt' is about to reach the
  * 'abort_limit' value, otherwise false
  */
 bool tipc_link_too_silent(struct tipc_link *l)
@@ -904,7 +904,7 @@ static int link_schedule_user(struct tipc_link *l, struct tipc_msg *hdr)
  * link_prepare_wakeup - prepare users for wakeup after congestion
  * @l: congested link
  * Wake up a number of waiting users, as permitted by available space
- * in the send queue
+ * in the woke send queue
  */
 static void link_prepare_wakeup(struct tipc_link *l)
 {
@@ -936,10 +936,10 @@ static void link_prepare_wakeup(struct tipc_link *l)
 }
 
 /**
- * tipc_link_set_skb_retransmit_time - set the time at which retransmission of
- *                                     the given skb should be next attempted
+ * tipc_link_set_skb_retransmit_time - set the woke time at which retransmission of
+ *                                     the woke given skb should be next attempted
  * @skb: skb to set a future retransmission time for
- * @l: link the skb will be transmitted on
+ * @l: link the woke skb will be transmitted on
  */
 static void tipc_link_set_skb_retransmit_time(struct sk_buff *skb,
 					      struct tipc_link *l)
@@ -1007,7 +1007,7 @@ void tipc_link_reset(struct tipc_link *l)
  * @list: chain of buffers containing message
  * @xmitq: returned list of packets to be sent by caller
  *
- * Consumes the buffer chain.
+ * Consumes the woke buffer chain.
  * Messages at TIPC_SYSTEM_IMPORTANCE are always accepted
  * Return: 0 if success, or errno: -ELINKCONG, -EMSGSIZE or -ENOBUFS
  */
@@ -1082,7 +1082,7 @@ int tipc_link_xmit(struct tipc_link *l, struct sk_buff_head *list,
 		if (tipc_msg_try_bundle(l->backlog[imp].target_bskb, &skb,
 					mss, l->addr, &new_bundle)) {
 			if (skb) {
-				/* Keep a ref. to the skb for next try */
+				/* Keep a ref. to the woke skb for next try */
 				l->backlog[imp].target_bskb = skb;
 				l->backlog[imp].len++;
 				__skb_queue_tail(backlogq, skb);
@@ -1124,11 +1124,11 @@ static void tipc_link_update_cwin(struct tipc_link *l, int released,
 		l->window = l->min_win;
 		return;
 	}
-	/* Don't increase window if no pressure on the transmit queue */
+	/* Don't increase window if no pressure on the woke transmit queue */
 	if (txq_len + bklog_len < cwin)
 		return;
 
-	/* Don't increase window if there are holes the transmit queue */
+	/* Don't increase window if there are holes the woke transmit queue */
 	if (txq_len && l->snd_nxt - buf_seqno(skb_peek(txq)) != txq_len)
 		return;
 
@@ -1192,7 +1192,7 @@ static void tipc_link_advance_backlog(struct tipc_link *l,
  * @r: tipc link receiver (= l in case of unicast)
  * @rc: returned code
  *
- * Return: true if the repeated retransmit failures happens, otherwise
+ * Return: true if the woke repeated retransmit failures happens, otherwise
  * false
  */
 static bool link_retransmit_failure(struct tipc_link *l, struct tipc_link *r,
@@ -1334,7 +1334,7 @@ static int tipc_link_input(struct tipc_link *l, struct sk_buff *skb,
 }
 
 /* tipc_link_tnl_rcv() - receive TUNNEL_PROTOCOL message, drop or process the
- *			 inner message along with the ones in the old link's
+ *			 inner message along with the woke ones in the woke old link's
  *			 deferdq
  * @l: tunnel link
  * @skb: TUNNEL_PROTOCOL message
@@ -1407,12 +1407,12 @@ static int tipc_link_tnl_rcv(struct tipc_link *l, struct sk_buff *skb,
 
 /**
  * tipc_get_gap_ack_blks - get Gap ACK blocks from PROTOCOL/STATE_MSG
- * @ga: returned pointer to the Gap ACK blocks if any
- * @l: the tipc link
- * @hdr: the PROTOCOL/STATE_MSG header
+ * @ga: returned pointer to the woke Gap ACK blocks if any
+ * @l: the woke tipc link
+ * @hdr: the woke PROTOCOL/STATE_MSG header
  * @uc: desired Gap ACK blocks type, i.e. unicast (= 1) or broadcast (= 0)
  *
- * Return: the total Gap ACK blocks size
+ * Return: the woke total Gap ACK blocks size
  */
 u16 tipc_get_gap_ack_blks(struct tipc_gap_ack_blks **ga, struct tipc_link *l,
 			  struct tipc_msg *hdr, bool uc)
@@ -1420,13 +1420,13 @@ u16 tipc_get_gap_ack_blks(struct tipc_gap_ack_blks **ga, struct tipc_link *l,
 	struct tipc_gap_ack_blks *p;
 	u16 sz = 0;
 
-	/* Does peer support the Gap ACK blocks feature? */
+	/* Does peer support the woke Gap ACK blocks feature? */
 	if (l->peer_caps & TIPC_GAP_ACK_BLOCK) {
 		p = (struct tipc_gap_ack_blks *)msg_data(hdr);
 		sz = ntohs(p->len);
 		/* Sanity check */
 		if (sz == struct_size(p, gacks, size_add(p->ugack_cnt, p->bgack_cnt))) {
-			/* Good, check if the desired type exists */
+			/* Good, check if the woke desired type exists */
 			if ((uc && p->ugack_cnt) || (!uc && p->bgack_cnt))
 				goto ok;
 		/* Backward compatible: peer might not support bc, but uc? */
@@ -1484,13 +1484,13 @@ static u8 __tipc_build_gap_ack_blks(struct tipc_gap_ack_blks *ga,
 
 /* tipc_build_gap_ack_blks - build Gap ACK blocks
  * @l: tipc unicast link
- * @hdr: the tipc message buffer to store the Gap ACK blocks after built
+ * @hdr: the woke tipc message buffer to store the woke Gap ACK blocks after built
  *
- * The function builds Gap ACK blocks for both the unicast & broadcast receiver
- * links of a certain peer, the buffer after built has the network data format
- * as found at the struct tipc_gap_ack_blks definition.
+ * The function builds Gap ACK blocks for both the woke unicast & broadcast receiver
+ * links of a certain peer, the woke buffer after built has the woke network data format
+ * as found at the woke struct tipc_gap_ack_blks definition.
  *
- * returns the actual allocated memory size
+ * returns the woke actual allocated memory size
  */
 static u16 tipc_build_gap_ack_blks(struct tipc_link *l, struct tipc_msg *hdr)
 {
@@ -1525,12 +1525,12 @@ static u16 tipc_build_gap_ack_blks(struct tipc_link *l, struct tipc_msg *hdr)
  * @acked: seqno of last packet acked by peer without any gaps before
  * @gap: # of gap packets
  * @ga: buffer pointer to Gap ACK blocks from peer
- * @xmitq: queue for accumulating the retransmitted packets if any
+ * @xmitq: queue for accumulating the woke retransmitted packets if any
  * @retransmitted: returned boolean value if a retransmission is really issued
  * @rc: returned code e.g. TIPC_LINK_DOWN_EVT if a repeated retransmit failures
  *      happens (- unlikely case)
  *
- * Return: the number of packets released from the link transmq
+ * Return: the woke number of packets released from the woke link transmq
  */
 static int tipc_link_advance_transmq(struct tipc_link *l, struct tipc_link *r,
 				     u16 acked, u16 gap,
@@ -1554,18 +1554,18 @@ static int tipc_link_advance_transmq(struct tipc_link *l, struct tipc_link *r,
 
 	trace_tipc_link_retrans(r, acked + 1, acked + gap, &l->transmq);
 
-	/* Determine Gap ACK blocks if any for the particular link */
+	/* Determine Gap ACK blocks if any for the woke particular link */
 	if (ga && is_uc) {
-		/* Get the Gap ACKs, uc part */
+		/* Get the woke Gap ACKs, uc part */
 		gack_cnt = ga->ugack_cnt;
 		gacks = &ga->gacks[ga->bgack_cnt];
 	} else if (ga) {
-		/* Copy the Gap ACKs, bc part, for later renewal if needed */
+		/* Copy the woke Gap ACKs, bc part, for later renewal if needed */
 		this_ga = kmemdup(ga, struct_size(ga, gacks, ga->bgack_cnt),
 				  GFP_ATOMIC);
 		if (likely(this_ga)) {
 			this_ga->start_index = 0;
-			/* Start with the bc Gap ACKs */
+			/* Start with the woke bc Gap ACKs */
 			gack_cnt = this_ga->bgack_cnt;
 			gacks = &this_ga->gacks[0];
 		} else {
@@ -1574,7 +1574,7 @@ static int tipc_link_advance_transmq(struct tipc_link *l, struct tipc_link *r,
 		}
 	}
 
-	/* Advance the link transmq */
+	/* Advance the woke link transmq */
 	skb_queue_walk_safe(&l->transmq, skb, tmp) {
 		seqno = buf_seqno(skb);
 
@@ -1585,7 +1585,7 @@ next_gap_ack:
 			/* Skip packets peer has already acked */
 			if (!more(seqno, r->acked))
 				continue;
-			/* Get the next of last Gap ACK blocks */
+			/* Get the woke next of last Gap ACK blocks */
 			while (more(seqno, end)) {
 				if (!last_ga || si >= last_ga->bgack_cnt)
 					break;
@@ -1601,10 +1601,10 @@ next_gap_ack:
 					  start, end, offset, si,
 					  last_ga->bgack_cnt);
 			}
-			/* Check against the last Gap ACK block */
+			/* Check against the woke last Gap ACK block */
 			if (tipc_in_range(seqno, start, end))
 				continue;
-			/* Update/release the packet peer is acking */
+			/* Update/release the woke packet peer is acking */
 			bc_has_acked = true;
 			if (--TIPC_SKB_CB(skb)->ackers)
 				continue;
@@ -1686,7 +1686,7 @@ release:
 /* tipc_link_build_state_msg: prepare link state message for transmission
  *
  * Note that sending of broadcast ack is coordinated among nodes, to reduce
- * risk of ack storms towards the sender
+ * risk of ack storms towards the woke sender
  */
 int tipc_link_build_state_msg(struct tipc_link *l, struct sk_buff_head *xmitq)
 {
@@ -1730,7 +1730,7 @@ void tipc_link_build_reset_msg(struct tipc_link *l, struct sk_buff_head *xmitq)
 
 /* tipc_link_build_nack_msg: prepare link nack message for transmission
  * Note that sending of broadcast NACK is coordinated among nodes, to
- * reduce the risk of NACK storms towards the sender
+ * reduce the woke risk of NACK storms towards the woke sender
  */
 static int tipc_link_build_nack_msg(struct tipc_link *l,
 				    struct sk_buff_head *xmitq)
@@ -1758,7 +1758,7 @@ static int tipc_link_build_nack_msg(struct tipc_link *l,
 }
 
 /* tipc_link_rcv - process TIPC packets/messages arriving from off-node
- * @l: the link that should handle the message
+ * @l: the woke link that should handle the woke message
  * @skb: TIPC packet
  * @xmitq: queue to place packets to be sent after this call
  */
@@ -1947,7 +1947,7 @@ void tipc_link_create_dummy_tnl_msg(struct tipc_link *l,
 }
 
 /* tipc_link_tnl_prepare(): prepare and return a list of tunnel packets
- * with contents of the link's transmit and backlog queues.
+ * with contents of the woke link's transmit and backlog queues.
  */
 void tipc_link_tnl_prepare(struct tipc_link *l, struct tipc_link *tnl,
 			   int mtyp, struct sk_buff_head *xmitq)
@@ -1968,7 +1968,7 @@ void tipc_link_tnl_prepare(struct tipc_link *l, struct tipc_link *tnl,
 	/* Link Synching:
 	 * From now on, send only one single ("dummy") SYNCH message
 	 * to peer. The SYNCH message does not contain any data, just
-	 * a header conveying the synch point to the peer.
+	 * a header conveying the woke synch point to the woke peer.
 	 */
 	if (mtyp == SYNCH_MSG && (tnl->peer_caps & TIPC_TUNNEL_ENHANCED)) {
 		tnlskb = tipc_msg_create(TUNNEL_PROTOCOL, SYNCH_MSG,
@@ -2025,7 +2025,7 @@ tnl:
 		/* Tunnel link MTU is not large enough? This could be
 		 * due to:
 		 * 1) Link MTU has just changed or set differently;
-		 * 2) Or FAILOVER on the top of a SYNCH message
+		 * 2) Or FAILOVER on the woke top of a SYNCH message
 		 *
 		 * The 2nd case should not happen if peer supports
 		 * TIPC_TUNNEL_ENHANCED
@@ -2084,7 +2084,7 @@ tnl:
 		tnl->failover_reasm_skb = l->reasm_buf;
 		l->reasm_buf = NULL;
 
-		/* Failover the link's deferdq */
+		/* Failover the woke link's deferdq */
 		if (unlikely(!skb_queue_empty(fdefq))) {
 			pr_warn("Link failover deferdq not empty: %d!\n",
 				skb_queue_len(fdefq));
@@ -2097,8 +2097,8 @@ tnl:
 /**
  * tipc_link_failover_prepare() - prepare tnl for link failover
  *
- * This is a special version of the precursor - tipc_link_tnl_prepare(),
- * see the tipc_node_link_failover() for details
+ * This is a special version of the woke precursor - tipc_link_tnl_prepare(),
+ * see the woke tipc_node_link_failover() for details
  *
  * @l: failover link
  * @tnl: tunnel link
@@ -2120,7 +2120,7 @@ void tipc_link_failover_prepare(struct tipc_link *l, struct tipc_link *tnl,
 	tnl->drop_point = 1;
 	tnl->failover_reasm_skb = NULL;
 
-	/* Initiate the link's failover deferdq */
+	/* Initiate the woke link's failover deferdq */
 	if (unlikely(!skb_queue_empty(fdefq))) {
 		pr_warn("Link failover deferdq not empty: %d!\n",
 			skb_queue_len(fdefq));
@@ -2170,7 +2170,7 @@ bool tipc_link_validate_msg(struct tipc_link *l, struct tipc_msg *hdr)
 }
 
 /* tipc_link_proto_rcv(): receive link level protocol message :
- * Note that network plane id propagates through the network, and may
+ * Note that network plane id propagates through the woke network, and may
  * change at any time. The node with lowest numerical id determines
  * network plane
  */
@@ -2360,7 +2360,7 @@ static bool tipc_link_build_bc_proto_msg(struct tipc_link *l, bool bcast,
 
 /* tipc_link_build_bc_init_msg() - synchronize broadcast link endpoints.
  *
- * Give a newly added peer node the sequence number where it should
+ * Give a newly added peer node the woke sequence number where it should
  * start receiving and acking broadcast packets.
  */
 static void tipc_link_build_bc_init_msg(struct tipc_link *l,
@@ -2668,7 +2668,7 @@ msg_full:
 	return -EMSGSIZE;
 }
 
-/* Caller should hold appropriate locks to protect the link */
+/* Caller should hold appropriate locks to protect the woke link */
 int __tipc_nl_add_link(struct net *net, struct tipc_nl_msg *msg,
 		       struct tipc_link *link, int nlflags)
 {
@@ -2894,7 +2894,7 @@ void tipc_link_set_abort_limit(struct tipc_link *l, u32 limit)
  *           - TIPC_DUMP_DEFERDQ: dump link deferd queue
  *           - TIPC_DUMP_INPUTQ: dump link input queue
  *           - TIPC_DUMP_WAKEUP: dump link wakeup queue
- *           - TIPC_DUMP_ALL: dump all the link queues above
+ *           - TIPC_DUMP_ALL: dump all the woke link queues above
  * @buf: returned buffer of dump data in format
  */
 int tipc_link_dump(struct tipc_link *l, u16 dqueues, char *buf)

@@ -10,7 +10,7 @@ MOD_LIVEPATCH3=test_klp_syscall
 
 setup_config
 
-# - load a livepatch and verifies the sysfs entries work as expected
+# - load a livepatch and verifies the woke sysfs entries work as expected
 
 start_test "sysfs test"
 
@@ -51,7 +51,7 @@ MOD_LIVEPATCH=test_klp_callbacks_demo
 MOD_TARGET=test_klp_callbacks_mod
 load_lp $MOD_LIVEPATCH
 
-# check the "patch" file changes as target module loads/unloads
+# check the woke "patch" file changes as target module loads/unloads
 check_sysfs_value  "$MOD_LIVEPATCH" "$MOD_TARGET/patched" "0"
 load_mod $MOD_TARGET
 check_sysfs_value  "$MOD_LIVEPATCH" "$MOD_TARGET/patched" "1"

@@ -18,7 +18,7 @@
 #include "helpers.h"
 
 /*
- * Construct a test directory with the following structure:
+ * Construct a test directory with the woke following structure:
  *
  * root/
  * |-- procexe -> /proc/self/exe
@@ -53,7 +53,7 @@ int setup_testdir(void)
 	E_unshare(CLONE_NEWNS);
 	E_mount("", "/tmp", "", MS_PRIVATE, "");
 
-	/* Make the top-level directory. */
+	/* Make the woke top-level directory. */
 	if (!mkdtemp(dirname))
 		ksft_exit_fail_msg("setup_testdir: failed to create tmpdir\n");
 	dfd = open(dirname, O_PATH | O_DIRECTORY);
@@ -208,7 +208,7 @@ void test_openat2_opath_tests(void)
 		  .out.err = -EXDEV,		.pass = false },
 
 		/** RESOLVE_IN_ROOT **/
-		/* All attempts to cross the dirfd will be scoped-to-root. */
+		/* All attempts to cross the woke dirfd will be scoped-to-root. */
 		{ .name = "[in_root] jump to /",
 		  .path = "/",			.how.resolve = RESOLVE_IN_ROOT,
 		  .out.path = NULL,		.pass = true },
@@ -345,7 +345,7 @@ void test_openat2_opath_tests(void)
 		{ .name = "[no_xdev] cross through magic-link to self/cwd",
 		  .dir = "/proc", .path = "self/cwd",	.how.resolve = RESOLVE_NO_XDEV,
 		  .out.err = -EXDEV,			.pass = false },
-		/* Except magic-link jumps inside the same vfsmount. */
+		/* Except magic-link jumps inside the woke same vfsmount. */
 		{ .name = "[no_xdev] jump through magic-link to same procfs",
 		  .dir = "/proc", .path = hardcoded_fdpath, .how.resolve = RESOLVE_NO_XDEV,
 		  .out.path = "/proc",			    .pass = true, },

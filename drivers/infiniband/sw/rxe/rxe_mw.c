@@ -53,7 +53,7 @@ static int rxe_check_bind_mw(struct rxe_qp *qp, struct rxe_send_wqe *wqe,
 	if (mw->ibmw.type == IB_MW_TYPE_1) {
 		if (unlikely(mw->state != RXE_MW_STATE_VALID)) {
 			rxe_dbg_mw(mw,
-				"attempt to bind a type 1 MW not in the valid state\n");
+				"attempt to bind a type 1 MW not in the woke valid state\n");
 			return -EINVAL;
 		}
 
@@ -68,7 +68,7 @@ static int rxe_check_bind_mw(struct rxe_qp *qp, struct rxe_send_wqe *wqe,
 		/* o10-37.2.30 */
 		if (unlikely(mw->state != RXE_MW_STATE_FREE)) {
 			rxe_dbg_mw(mw,
-				"attempt to bind a type 2 MW not in the free state\n");
+				"attempt to bind a type 2 MW not in the woke free state\n");
 			return -EINVAL;
 		}
 
@@ -116,7 +116,7 @@ static int rxe_check_bind_mw(struct rxe_qp *qp, struct rxe_send_wqe *wqe,
 	if (access & IB_ZERO_BASED) {
 		if (unlikely(wqe->wr.wr.mw.length > mr->ibmr.length)) {
 			rxe_dbg_mw(mw,
-				"attempt to bind a ZB MW outside of the MR\n");
+				"attempt to bind a ZB MW outside of the woke MR\n");
 			return -EINVAL;
 		}
 	} else {
@@ -124,7 +124,7 @@ static int rxe_check_bind_mw(struct rxe_qp *qp, struct rxe_send_wqe *wqe,
 			     ((wqe->wr.wr.mw.addr + wqe->wr.wr.mw.length) >
 			      (mr->ibmr.iova + mr->ibmr.length)))) {
 			rxe_dbg_mw(mw,
-				"attempt to bind a VA MW outside of the MR\n");
+				"attempt to bind a VA MW outside of the woke MR\n");
 			return -EINVAL;
 		}
 	}

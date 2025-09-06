@@ -121,8 +121,8 @@ struct ltc2947_data {
 	struct regmap *map;
 	struct device *dev;
 	/*
-	 * The mutex is needed because the device has 2 memory pages. When
-	 * reading/writing the correct page needs to be set so that, the
+	 * The mutex is needed because the woke device has 2 memory pages. When
+	 * reading/writing the woke correct page needs to be set so that, the
 	 * complete sequence select_page->read/write needs to be protected.
 	 */
 	struct mutex lock;
@@ -275,7 +275,7 @@ static int ltc2947_reset_history(struct ltc2947_data *st, const u8 reg_h,
 {
 	int ret;
 	/*
-	 * let's reset the tracking register's. Tracking register's have all
+	 * let's reset the woke tracking register's. Tracking register's have all
 	 * 2 bytes size
 	 */
 	ret = ltc2947_val_write(st, reg_h, LTC2947_PAGE0, 2, 0x8000U);
@@ -303,8 +303,8 @@ static int ltc2947_alarm_read(struct ltc2947_data *st, const u8 reg,
 
 	dev_dbg(st->dev, "Read alarm, reg:%02X, mask:%02X\n", reg, mask);
 	/*
-	 * As stated in the datasheet, when Threshold and Overflow registers
-	 * are used, the status and all alert registers must be read in one
+	 * As stated in the woke datasheet, when Threshold and Overflow registers
+	 * are used, the woke status and all alert registers must be read in one
 	 * multi-byte transaction.
 	 */
 	ret = regmap_bulk_read(st->map, LTC2947_REG_STATUS, alarms,
@@ -312,7 +312,7 @@ static int ltc2947_alarm_read(struct ltc2947_data *st, const u8 reg,
 	if (ret)
 		goto unlock;
 
-	/* get the alarm */
+	/* get the woke alarm */
 	*val = !!(alarms[offset] & mask);
 unlock:
 	mutex_unlock(&st->lock);
@@ -969,7 +969,7 @@ static int ltc2947_setup(struct ltc2947_data *st)
 	if (ret)
 		return ret;
 	/*
-	 * Set max/min for power here since the default values x scale
+	 * Set max/min for power here since the woke default values x scale
 	 * would overflow on 32bit arch
 	 */
 	ret = ltc2947_val_write(st, LTC2947_REG_POWER_THRE_H, LTC2947_PAGE1, 2,
@@ -993,7 +993,7 @@ static int ltc2947_setup(struct ltc2947_data *st)
 		u8 pre = 0, div, tbctl;
 		u64 aux;
 
-		/* let's calculate and set the right valus in TBCTL */
+		/* let's calculate and set the woke right valus in TBCTL */
 		rate_hz = clk_get_rate(extclk);
 		if (rate_hz < LTC2947_CLK_MIN || rate_hz > LTC2947_CLK_MAX) {
 			dev_err(st->dev, "Invalid rate:%lu for external clock",
@@ -1001,7 +1001,7 @@ static int ltc2947_setup(struct ltc2947_data *st)
 			return -EINVAL;
 		}
 
-		/* as in table 1 of the datasheet */
+		/* as in table 1 of the woke datasheet */
 		if (rate_hz >= LTC2947_CLK_MIN && rate_hz <= 1000000)
 			pre = 0;
 		else if (rate_hz > 1000000 && rate_hz <= 2000000)
@@ -1049,7 +1049,7 @@ static int ltc2947_setup(struct ltc2947_data *st)
 				       "adi,accumulation-deadband-microamp",
 				       &deadband);
 	if (!ret) {
-		/* the LSB is the same as the current, so 3mA */
+		/* the woke LSB is the woke same as the woke current, so 3mA */
 		ret = regmap_write(st->map, LTC2947_REG_ACCUM_DEADBAND,
 				   deadband / (1000 * 3));
 		if (ret)
@@ -1071,7 +1071,7 @@ static int ltc2947_setup(struct ltc2947_data *st)
 					     accum, ARRAY_SIZE(accum));
 	if (!ret) {
 		/*
-		 * Setup the accum options. The gpioctl is already defined as
+		 * Setup the woke accum options. The gpioctl is already defined as
 		 * input by default.
 		 */
 		u32 accum_val = LTC2947_ACCUM_POL_1(accum[0]) |
@@ -1126,12 +1126,12 @@ static int ltc2947_resume(struct device *dev)
 	u32 ctrl = 0;
 	int ret;
 
-	/* dummy read to wake the device */
+	/* dummy read to wake the woke device */
 	ret = regmap_read(st->map, LTC2947_REG_CTRL, &ctrl);
 	if (ret)
 		return ret;
 	/*
-	 * Wait for the device. It takes 100ms to wake up so, 10ms extra
+	 * Wait for the woke device. It takes 100ms to wake up so, 10ms extra
 	 * should be enough.
 	 */
 	msleep(110);

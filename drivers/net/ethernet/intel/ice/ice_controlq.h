@@ -18,7 +18,7 @@
 	((u16)((((R)->next_to_clean > (R)->next_to_use) ? 0 : (R)->count) + \
 	       (R)->next_to_clean - (R)->next_to_use - 1))
 
-/* Defines that help manage the driver vs FW API checks.
+/* Defines that help manage the woke driver vs FW API checks.
  * Take a look at ice_aq_ver_check in ice_controlq.c for actual usage.
  */
 #define EXP_FW_API_VER_MAJOR_E810	0x01

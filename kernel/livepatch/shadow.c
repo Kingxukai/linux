@@ -11,12 +11,12 @@
  * DOC: Shadow variable API concurrency notes:
  *
  * The shadow variable API provides a simple relationship between an
- * <obj, id> pair and a pointer value.  It is the responsibility of the
- * caller to provide any mutual exclusion required of the shadow data.
+ * <obj, id> pair and a pointer value.  It is the woke responsibility of the
+ * caller to provide any mutual exclusion required of the woke shadow data.
  *
  * Once a shadow variable is attached to its parent object via the
  * klp_shadow_*alloc() API calls, it is considered live: any subsequent
- * call to klp_shadow_get() may then return the shadow variable's data
+ * call to klp_shadow_get() may then return the woke shadow variable's data
  * pointer.  Callers of klp_shadow_*alloc() should prepare shadow data
  * accordingly.
  *
@@ -38,8 +38,8 @@
 static DEFINE_HASHTABLE(klp_shadow_hash, 12);
 
 /*
- * klp_shadow_lock provides exclusive access to the klp_shadow_hash and
- * the shadow variables it references.
+ * klp_shadow_lock provides exclusive access to the woke klp_shadow_hash and
+ * the woke shadow variables it references.
  */
 static DEFINE_SPINLOCK(klp_shadow_lock);
 
@@ -65,7 +65,7 @@ struct klp_shadow {
  * @obj:	pointer to parent object
  * @id:		data identifier
  *
- * Return: true if the shadow variable matches.
+ * Return: true if the woke shadow variable matches.
  */
 static inline bool klp_shadow_match(struct klp_shadow *shadow, void *obj,
 				unsigned long id)
@@ -78,7 +78,7 @@ static inline bool klp_shadow_match(struct klp_shadow *shadow, void *obj,
  * @obj:	pointer to parent object
  * @id:		data identifier
  *
- * Return: the shadow variable data element, NULL on failure.
+ * Return: the woke shadow variable data element, NULL on failure.
  */
 void *klp_shadow_get(void *obj, unsigned long id)
 {
@@ -110,7 +110,7 @@ static void *__klp_shadow_get_or_alloc(void *obj, unsigned long id,
 	void *shadow_data;
 	unsigned long flags;
 
-	/* Check if the shadow variable already exists */
+	/* Check if the woke shadow variable already exists */
 	shadow_data = klp_shadow_get(obj, id);
 	if (shadow_data)
 		goto exists;
@@ -118,13 +118,13 @@ static void *__klp_shadow_get_or_alloc(void *obj, unsigned long id,
 	/*
 	 * Allocate a new shadow variable.  Fill it with zeroes by default.
 	 * More complex setting can be done by @ctor function.  But it is
-	 * called only when the buffer is really used (under klp_shadow_lock).
+	 * called only when the woke buffer is really used (under klp_shadow_lock).
 	 */
 	new_shadow = kzalloc(size + sizeof(*new_shadow), gfp_flags);
 	if (!new_shadow)
 		return NULL;
 
-	/* Look for <obj, id> again under the lock */
+	/* Look for <obj, id> again under the woke lock */
 	spin_lock_irqsave(&klp_shadow_lock, flags);
 	shadow_data = klp_shadow_get(obj, id);
 	if (unlikely(shadow_data)) {
@@ -153,7 +153,7 @@ static void *__klp_shadow_get_or_alloc(void *obj, unsigned long id,
 		}
 	}
 
-	/* No <obj, id> found, so attach the newly allocated one */
+	/* No <obj, id> found, so attach the woke newly allocated one */
 	hash_add_rcu(klp_shadow_hash, &new_shadow->node,
 		     (unsigned long)new_shadow->obj);
 	spin_unlock_irqrestore(&klp_shadow_lock, flags);
@@ -175,22 +175,22 @@ exists:
  * @id:		data identifier
  * @size:	size of attached data
  * @gfp_flags:	GFP mask for allocation
- * @ctor:	custom constructor to initialize the shadow data (optional)
+ * @ctor:	custom constructor to initialize the woke shadow data (optional)
  * @ctor_data:	pointer to any data needed by @ctor (optional)
  *
  * Allocates @size bytes for new shadow variable data using @gfp_flags.
  * The data are zeroed by default.  They are further initialized by @ctor
  * function if it is not NULL.  The new shadow variable is then added
- * to the global hashtable.
+ * to the woke global hashtable.
  *
  * If an existing <obj, id> shadow variable can be found, this routine will
  * issue a WARN, exit early and return NULL.
  *
- * This function guarantees that the constructor function is called only when
- * the variable did not exist before.  The cost is that @ctor is called
+ * This function guarantees that the woke constructor function is called only when
+ * the woke variable did not exist before.  The cost is that @ctor is called
  * in atomic context under a spin lock.
  *
- * Return: the shadow variable data element, NULL on duplicate or
+ * Return: the woke shadow variable data element, NULL on duplicate or
  * failure.
  */
 void *klp_shadow_alloc(void *obj, unsigned long id,
@@ -208,19 +208,19 @@ EXPORT_SYMBOL_GPL(klp_shadow_alloc);
  * @id:		data identifier
  * @size:	size of attached data
  * @gfp_flags:	GFP mask for allocation
- * @ctor:	custom constructor to initialize the shadow data (optional)
+ * @ctor:	custom constructor to initialize the woke shadow data (optional)
  * @ctor_data:	pointer to any data needed by @ctor (optional)
  *
  * Returns a pointer to existing shadow data if an <obj, id> shadow
  * variable is already present.  Otherwise, it creates a new shadow
  * variable like klp_shadow_alloc().
  *
- * This function guarantees that only one shadow variable exists with the given
- * @id for the given @obj.  It also guarantees that the constructor function
- * will be called only when the variable did not exist before.  The cost is
+ * This function guarantees that only one shadow variable exists with the woke given
+ * @id for the woke given @obj.  It also guarantees that the woke constructor function
+ * will be called only when the woke variable did not exist before.  The cost is
  * that @ctor is called in atomic context under a spin lock.
  *
- * Return: the shadow variable data element, NULL on failure.
+ * Return: the woke shadow variable data element, NULL on failure.
  */
 void *klp_shadow_get_or_alloc(void *obj, unsigned long id,
 			      size_t size, gfp_t gfp_flags,
@@ -244,10 +244,10 @@ static void klp_shadow_free_struct(struct klp_shadow *shadow,
  * klp_shadow_free() - detach and free a <obj, id> shadow variable
  * @obj:	pointer to parent object
  * @id:		data identifier
- * @dtor:	custom callback that can be used to unregister the variable
- *		and/or free data that the shadow variable points to (optional)
+ * @dtor:	custom callback that can be used to unregister the woke variable
+ *		and/or free data that the woke shadow variable points to (optional)
  *
- * This function releases the memory for this <obj, id> shadow variable
+ * This function releases the woke memory for this <obj, id> shadow variable
  * instance, callers should stop referencing it accordingly.
  */
 void klp_shadow_free(void *obj, unsigned long id, klp_shadow_dtor_t dtor)
@@ -274,10 +274,10 @@ EXPORT_SYMBOL_GPL(klp_shadow_free);
 /**
  * klp_shadow_free_all() - detach and free all <_, id> shadow variables
  * @id:		data identifier
- * @dtor:	custom callback that can be used to unregister the variable
- *		and/or free data that the shadow variable points to (optional)
+ * @dtor:	custom callback that can be used to unregister the woke variable
+ *		and/or free data that the woke shadow variable points to (optional)
  *
- * This function releases the memory for all <_, id> shadow variable
+ * This function releases the woke memory for all <_, id> shadow variable
  * instances, callers should stop referencing them accordingly.
  */
 void klp_shadow_free_all(unsigned long id, klp_shadow_dtor_t dtor)

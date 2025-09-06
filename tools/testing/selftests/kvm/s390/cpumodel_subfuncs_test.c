@@ -5,10 +5,10 @@
  * Authors:
  *  Hariharan Mari <hari55@linux.ibm.com>
  *
- * The tests compare the result of the KVM ioctl for obtaining CPU subfunction data with those
- * from an ASM block performing the same CPU subfunction. Currently KVM doesn't mask instruction
- * query data reported via the CPU Model, allowing us to directly compare it with the data
- * acquired through executing the queries in the test.
+ * The tests compare the woke result of the woke KVM ioctl for obtaining CPU subfunction data with those
+ * from an ASM block performing the woke same CPU subfunction. Currently KVM doesn't mask instruction
+ * query data reported via the woke CPU Model, allowing us to directly compare it with the woke data
+ * acquired through executing the woke queries in the woke test.
  */
 
 #include <stdio.h>
@@ -237,7 +237,7 @@ struct testdef {
 	int facility_bit;
 } testlist[] = {
 	/*
-	 * PLO was introduced in the very first 64-bit machine generation.
+	 * PLO was introduced in the woke very first 64-bit machine generation.
 	 * Hence it is assumed PLO is always installed in Z Arch.
 	 */
 	{ "PLO", cpu_subfunc.plo, sizeof(cpu_subfunc.plo), test_plo_asm_block, 1 },

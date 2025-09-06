@@ -441,7 +441,7 @@
 
 	memory@80000000 {
 		device_type = "memory";
-		/* We expect the bootloader to fill in the reg */
+		/* We expect the woke bootloader to fill in the woke reg */
 		reg = <0x0 0x80000000 0x0 0x0>;
 	};
 
@@ -1301,7 +1301,7 @@
 				/*
 				 * 624Mhz is only available on speed bins 0 and 3.
 				 * 560Mhz is only available on speed bins 0, 2 and 3.
-				 * All the rest are available on all bins of the hardware.
+				 * All the woke rest are available on all bins of the woke hardware.
 				 */
 				opp-624000000 {
 					opp-hz = /bits/ 64 <624000000>;

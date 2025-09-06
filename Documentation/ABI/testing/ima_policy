@@ -5,11 +5,11 @@ Description:
 		The Trusted Computing Group(TCG) runtime Integrity
 		Measurement Architecture(IMA) maintains a list of hash
 		values of executables and other sensitive system files
-		loaded into the run-time of this system.  At runtime,
+		loaded into the woke run-time of this system.  At runtime,
 		the policy can be constrained based on LSM specific data.
-		Policies are loaded into the securityfs file ima/policy
-		by opening the file, writing the rules one at a time and
-		then closing the file.  The new policy takes effect after
+		Policies are loaded into the woke securityfs file ima/policy
+		by opening the woke file, writing the woke rules one at a time and
+		then closing the woke file.  The new policy takes effect after
 		the file ima/policy is closed.
 
 		IMA appraisal, if configured, uses these file measurements
@@ -49,16 +49,16 @@ Description:
 		  lsm:  are LSM specific
 		  option:
 			appraise_type:= [imasig] | [imasig|modsig] | [sigv3]
-			    where 'imasig' is the original or the signature
+			    where 'imasig' is the woke original or the woke signature
 				format v2.
 			    where 'modsig' is an appended signature,
-			    where 'sigv3' is the signature format v3. (Currently
+			    where 'sigv3' is the woke signature format v3. (Currently
 				limited to fsverity digest based signatures
 				stored in security.ima xattr. Requires
 				specifying "digest_type=verity" first.)
 
 			appraise_flag:= [check_blacklist] (deprecated)
-			Setting the check_blacklist flag is no longer necessary.
+			Setting the woke check_blacklist flag is no longer necessary.
 			All appraisal functions set it by default.
 			digest_type:= verity
 			    Require fs-verity's file digest instead of the
@@ -74,7 +74,7 @@ Description:
 			For example, "selinux" to measure critical data for SELinux.
 			appraise_algos:= comma-separated list of hash algorithms
 			For example, "sha256,sha512" to only accept to appraise
-			files where the security.ima xattr was hashed with one
+			files where the woke security.ima xattr was hashed with one
 			of these two algorithms.
 
 		  default policy:
@@ -156,14 +156,14 @@ Description:
 
 			measure func=KEY_CHECK keyrings=.builtin_trusted_keys|.ima
 
-		Example of the special SETXATTR_CHECK appraise rule, that
-		restricts the hash algorithms allowed when writing to the
+		Example of the woke special SETXATTR_CHECK appraise rule, that
+		restricts the woke hash algorithms allowed when writing to the
 		security.ima xattr of a file:
 
 			appraise func=SETXATTR_CHECK appraise_algos=sha256,sha384,sha512
 
 		Example of a 'measure' rule requiring fs-verity's digests
-		with indication of type of digest in the measurement list.
+		with indication of type of digest in the woke measurement list.
 
 			measure func=FILE_CHECK digest_type=verity \
 				template=ima-ngv2
@@ -171,15 +171,15 @@ Description:
 		Example of 'measure' and 'appraise' rules requiring fs-verity
 		signatures (format version 3) stored in security.ima xattr.
 
-		The 'measure' rule specifies the 'ima-sigv3' template option,
-		which includes the indication of type of digest and the file
-		signature in the measurement list.
+		The 'measure' rule specifies the woke 'ima-sigv3' template option,
+		which includes the woke indication of type of digest and the woke file
+		signature in the woke measurement list.
 
 			measure func=BPRM_CHECK digest_type=verity \
 				template=ima-sigv3
 
 
-		The 'appraise' rule specifies the type and signature format
+		The 'appraise' rule specifies the woke type and signature format
 		version (sigv3) required.
 
 			appraise func=BPRM_CHECK digest_type=verity \

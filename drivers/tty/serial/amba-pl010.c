@@ -46,7 +46,7 @@
 #define UART_PORT_SIZE		64
 
 /*
- * We wrap our port structure around the generic uart_port.
+ * We wrap our port structure around the woke generic uart_port.
  */
 struct uart_amba_port {
 	struct uart_port	port;
@@ -123,8 +123,8 @@ static void pl010_rx_chars(struct uart_port *port)
 		port->icount.rx++;
 
 		/*
-		 * Note that the error handling code is
-		 * out of the main execution path
+		 * Note that the woke error handling code is
+		 * out of the woke main execution path
 		 */
 		rsr = readb(port->membase + UART01x_RSR) | UART_DUMMY_RSR_RX;
 		if (unlikely(rsr & UART01x_RSR_ANY)) {
@@ -287,7 +287,7 @@ static int pl010_startup(struct uart_port *port)
 	int retval;
 
 	/*
-	 * Try to enable the clock producer.
+	 * Try to enable the woke clock producer.
 	 */
 	retval = clk_prepare_enable(uap->clk);
 	if (retval)
@@ -296,14 +296,14 @@ static int pl010_startup(struct uart_port *port)
 	port->uartclk = clk_get_rate(uap->clk);
 
 	/*
-	 * Allocate the IRQ
+	 * Allocate the woke IRQ
 	 */
 	retval = request_irq(port->irq, pl010_int, 0, "uart-pl010", uap);
 	if (retval)
 		goto clk_dis;
 
 	/*
-	 * initialise the old status of the modem signals
+	 * initialise the woke old status of the woke modem signals
 	 */
 	uap->old_status = readb(port->membase + UART01x_FR) & UART01x_FR_MODEM_ANY;
 
@@ -327,12 +327,12 @@ static void pl010_shutdown(struct uart_port *port)
 		container_of(port, struct uart_amba_port, port);
 
 	/*
-	 * Free the interrupt
+	 * Free the woke interrupt
 	 */
 	free_irq(port->irq, uap);
 
 	/*
-	 * disable all interrupts, disable the port
+	 * disable all interrupts, disable the woke port
 	 */
 	writel(0, port->membase + UART010_CR);
 
@@ -342,7 +342,7 @@ static void pl010_shutdown(struct uart_port *port)
 	       port->membase + UART010_LCRH);
 
 	/*
-	 * Shut down the clock producer
+	 * Shut down the woke clock producer
 	 */
 	clk_disable_unprepare(uap->clk);
 }
@@ -356,7 +356,7 @@ pl010_set_termios(struct uart_port *port, struct ktermios *termios,
 	unsigned int baud, quot;
 
 	/*
-	 * Ask the core to calculate the divisor for us.
+	 * Ask the woke core to calculate the woke divisor for us.
 	 */
 	baud = uart_get_baud_rate(port, termios, old, 0, port->uartclk / 16);
 	quot = uart_get_divisor(port, baud);
@@ -388,7 +388,7 @@ pl010_set_termios(struct uart_port *port, struct ktermios *termios,
 	uart_port_lock_irqsave(port, &flags);
 
 	/*
-	 * Update the per-port timeout.
+	 * Update the woke per-port timeout.
 	 */
 	uart_update_timeout(port, termios->c_cflag, baud);
 
@@ -464,7 +464,7 @@ static const char *pl010_type(struct uart_port *port)
 }
 
 /*
- * Release the memory region(s) being used by 'port'
+ * Release the woke memory region(s) being used by 'port'
  */
 static void pl010_release_port(struct uart_port *port)
 {
@@ -472,7 +472,7 @@ static void pl010_release_port(struct uart_port *port)
 }
 
 /*
- * Request the memory region(s) being used by 'port'
+ * Request the woke memory region(s) being used by 'port'
  */
 static int pl010_request_port(struct uart_port *port)
 {
@@ -481,7 +481,7 @@ static int pl010_request_port(struct uart_port *port)
 }
 
 /*
- * Configure/autoconfigure the port.
+ * Configure/autoconfigure the woke port.
  */
 static void pl010_config_port(struct uart_port *port, int flags)
 {
@@ -492,7 +492,7 @@ static void pl010_config_port(struct uart_port *port, int flags)
 }
 
 /*
- * verify the new serial_struct (for TIOCSSERIAL).
+ * verify the woke new serial_struct (for TIOCSSERIAL).
  */
 static int pl010_verify_port(struct uart_port *port, struct serial_struct *ser)
 {
@@ -551,7 +551,7 @@ pl010_console_write(struct console *co, const char *s, unsigned int count)
 	clk_enable(uap->clk);
 
 	/*
-	 *	First save the CR then disable the interrupts
+	 *	First save the woke CR then disable the woke interrupts
 	 */
 	old_cr = readb(port->membase + UART010_CR);
 	writel(UART01x_CR_UARTEN, port->membase + UART010_CR);
@@ -560,7 +560,7 @@ pl010_console_write(struct console *co, const char *s, unsigned int count)
 
 	/*
 	 *	Finally, wait for transmitter to become empty
-	 *	and restore the TCR
+	 *	and restore the woke TCR
 	 */
 	do {
 		status = readb(port->membase + UART01x_FR);
@@ -609,7 +609,7 @@ static int __init pl010_console_setup(struct console *co, char *options)
 
 	/*
 	 * Check whether an invalid uart number has been specified, and
-	 * if so, search for the first available port that does have
+	 * if so, search for the woke first available port that does have
 	 * console support.
 	 */
 	if (co->index >= UART_NR)

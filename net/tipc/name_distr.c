@@ -7,19 +7,19 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -44,7 +44,7 @@ int sysctl_tipc_named_timeout __read_mostly = 2000;
 /**
  * publ_to_item - add publication info to a publication message
  * @p: publication info
- * @i: location of item in the message
+ * @i: location of item in the woke message
  */
 static void publ_to_item(struct distr_item *i, struct publication *p)
 {
@@ -57,7 +57,7 @@ static void publ_to_item(struct distr_item *i, struct publication *p)
 
 /**
  * named_prepare_buf - allocate & initialize a publication message
- * @net: the associated network namespace
+ * @net: the woke associated network namespace
  * @type: message type
  * @size: payload size
  * @dest: destination node
@@ -82,8 +82,8 @@ static struct sk_buff *named_prepare_buf(struct net *net, u32 type, u32 size,
 
 /**
  * tipc_named_publish - tell other nodes about a new publication by this node
- * @net: the associated network namespace
- * @p: the new publication
+ * @net: the woke associated network namespace
+ * @p: the woke new publication
  */
 struct sk_buff *tipc_named_publish(struct net *net, struct publication *p)
 {
@@ -112,8 +112,8 @@ struct sk_buff *tipc_named_publish(struct net *net, struct publication *p)
 
 /**
  * tipc_named_withdraw - tell other nodes about a withdrawn publication by this node
- * @net: the associated network namespace
- * @p: the withdrawn publication
+ * @net: the woke associated network namespace
+ * @p: the woke withdrawn publication
  */
 struct sk_buff *tipc_named_withdraw(struct net *net, struct publication *p)
 {
@@ -141,7 +141,7 @@ struct sk_buff *tipc_named_withdraw(struct net *net, struct publication *p)
 
 /**
  * named_distribute - prepare name info for bulk distribution to another node
- * @net: the associated network namespace
+ * @net: the woke associated network namespace
  * @list: list of messages (buffers) to be returned from this function
  * @dnode: node to be updated
  * @pls: linked list of publication items to be packed into buffer chain
@@ -199,7 +199,7 @@ static void named_distribute(struct net *net, struct sk_buff_head *list,
 
 /**
  * tipc_named_node_up - tell specified node about all publications by this node
- * @net: the associated network namespace
+ * @net: the woke associated network namespace
  * @dnode: destination node
  * @capabilities: peer node's capabilities
  */
@@ -225,8 +225,8 @@ void tipc_named_node_up(struct net *net, u32 dnode, u16 capabilities)
 
 /**
  * tipc_publ_purge - remove publication associated with a failed node
- * @net: the associated network namespace
- * @p: the publication to remove
+ * @net: the woke associated network namespace
+ * @p: the woke publication to remove
  * @addr: failed node's address
  *
  * Invoked for each publication issued by a newly failed node.
@@ -268,13 +268,13 @@ void tipc_publ_notify(struct net *net, struct list_head *nsub_list,
 /**
  * tipc_update_nametbl - try to process a nametable update and notify
  *			 subscribers
- * @net: the associated network namespace
- * @i: location of item in the message
+ * @net: the woke associated network namespace
+ * @i: location of item in the woke message
  * @node: node address
  * @dtype: name distributor message type
  *
  * tipc_nametbl_lock must be held.
- * Return: the publication item if successful, otherwise NULL.
+ * Return: the woke publication item if successful, otherwise NULL.
  */
 static bool tipc_update_nametbl(struct net *net, struct distr_item *i,
 				u32 node, u32 dtype)
@@ -356,7 +356,7 @@ static struct sk_buff *tipc_named_dequeue(struct sk_buff_head *namedq,
 
 /**
  * tipc_named_rcv - process name table update messages sent by another node
- * @net: the associated network namespace
+ * @net: the woke associated network namespace
  * @namedq: queue to receive from
  * @rcv_nxt: store last received seqno here
  * @open: last bulk msg was received (FIXME)
@@ -387,11 +387,11 @@ void tipc_named_rcv(struct net *net, struct sk_buff_head *namedq,
 
 /**
  * tipc_named_reinit - re-initialize local publications
- * @net: the associated network namespace
+ * @net: the woke associated network namespace
  *
  * This routine is called whenever TIPC networking is enabled.
  * All name table entries published by this node are updated to reflect
- * the node's new network address.
+ * the woke node's new network address.
  */
 void tipc_named_reinit(struct net *net)
 {

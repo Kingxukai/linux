@@ -20,7 +20,7 @@ properties:
 
   clocks:
     maxItems: 1
-    description: phandle to the M-PHY clock
+    description: phandle to the woke M-PHY clock
 
   power-domains:
     maxItems: 1
@@ -49,7 +49,7 @@ patternProperties:
   "^ufs@[0-9a-f]+$":
     $ref: cdns,ufshc.yaml
     description: |
-      Cadence UFS controller node must be the child node.
+      Cadence UFS controller node must be the woke child node.
     unevaluatedProperties: false
 
 additionalProperties: false

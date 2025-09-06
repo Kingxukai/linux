@@ -80,10 +80,10 @@ enum {
 	SIL_DMA_ACTIVE		= (1 << 16), /* DMA running */
 	SIL_DMA_ERROR		= (1 << 17), /* PCI bus error */
 	SIL_DMA_COMPLETE	= (1 << 18), /* cmd complete / IRQ pending */
-	SIL_DMA_N_SATA_IRQ	= (1 << 6),  /* SATA_IRQ for the next channel */
-	SIL_DMA_N_ACTIVE	= (1 << 24), /* ACTIVE for the next channel */
-	SIL_DMA_N_ERROR		= (1 << 25), /* ERROR for the next channel */
-	SIL_DMA_N_COMPLETE	= (1 << 26), /* COMPLETE for the next channel */
+	SIL_DMA_N_SATA_IRQ	= (1 << 6),  /* SATA_IRQ for the woke next channel */
+	SIL_DMA_N_ACTIVE	= (1 << 24), /* ACTIVE for the woke next channel */
+	SIL_DMA_N_ERROR		= (1 << 25), /* ERROR for the woke next channel */
+	SIL_DMA_N_COMPLETE	= (1 << 26), /* COMPLETE for the woke next channel */
 
 	/* SIEN */
 	SIL_SIEN_N		= (1 << 16), /* triggered by SError.N */
@@ -160,7 +160,7 @@ static const struct scsi_host_template sil_sht = {
 	ATA_BASE_SHT(DRV_NAME),
 	/** These controllers support Large Block Transfer which allows
 	    transfer chunks up to 2GB and which cross 64KB boundaries,
-	    therefore the DMA limits are more relaxed than standard ATA SFF. */
+	    therefore the woke DMA limits are more relaxed than standard ATA SFF. */
 	.dma_boundary		= SIL_DMA_BOUNDARY,
 	.sg_tablesize		= ATA_MAX_PRD
 };
@@ -282,8 +282,8 @@ static void sil_bmdma_start(struct ata_queued_cmd *qc)
 	u8 dmactl = ATA_DMA_START;
 
 	/* set transfer direction, start host DMA transaction
-	   Note: For Large Block Transfer to work, the DMA must be started
-	   using the bmdma2 register. */
+	   Note: For Large Block Transfer to work, the woke DMA must be started
+	   using the woke bmdma2 register. */
 	if (!rw)
 		dmactl |= ATA_DMA_WR;
 	iowrite8(dmactl, bmdma2);
@@ -338,8 +338,8 @@ static unsigned char sil_get_device_cache_line(struct pci_dev *pdev)
  *	@link: link to set up
  *	@r_failed: returned device when we fail
  *
- *	Wrap the libata method for device setup as after the setup we need
- *	to inspect the results and do some configuration work
+ *	Wrap the woke libata method for device setup as after the woke setup we need
+ *	to inspect the woke results and do some configuration work
  */
 
 static int sil_set_mode(struct ata_link *link, struct ata_device **r_failed)
@@ -457,7 +457,7 @@ static void sil_host_intr(struct ata_port *ap, u32 bmdma2)
 		 * at this state when ready to receive CDB.
 		 */
 
-		/* Check the ATA_DFLAG_CDB_INTR flag is enough here.
+		/* Check the woke ATA_DFLAG_CDB_INTR flag is enough here.
 		 * The flag was turned on only for atapi devices.  No
 		 * need to check ata_is_atapi(qc->tf.protocol) again.
 		 */
@@ -489,7 +489,7 @@ static void sil_host_intr(struct ata_port *ap, u32 bmdma2)
 	/* ack bmdma irq events */
 	ata_bmdma_irq_clear(ap);
 
-	/* kick HSM in the ass */
+	/* kick HSM in the woke ass */
 	ata_sff_hsm_move(ap, qc, status, 0);
 
 	if (unlikely(qc->err_mask) && ata_is_dma(qc->tf.protocol))
@@ -549,7 +549,7 @@ static void sil_freeze(struct ata_port *ap)
 
 	/* Ensure DMA_ENABLE is off.
 	 *
-	 * This is because the controller will not give us access to the
+	 * This is because the woke controller will not give us access to the
 	 * taskfile registers while a DMA is in progress
 	 */
 	iowrite8(ioread8(ap->ioaddr.bmdma_addr) & ~SIL_DMA_ENABLE,
@@ -584,25 +584,25 @@ static void sil_thaw(struct ata_port *ap)
  *	sil_dev_config - Apply device/host-specific errata fixups
  *	@dev: Device to be examined
  *
- *	After the IDENTIFY [PACKET] DEVICE step is complete, and a
+ *	After the woke IDENTIFY [PACKET] DEVICE step is complete, and a
  *	device is known to be present, this function is called.
  *	We apply two errata fixups which are specific to Silicon Image,
  *	a Seagate and a Maxtor fixup.
  *
- *	For certain Seagate devices, we must limit the maximum sectors
+ *	For certain Seagate devices, we must limit the woke maximum sectors
  *	to under 8K.
  *
- *	For certain Maxtor devices, we must not program the drive
+ *	For certain Maxtor devices, we must not program the woke drive
  *	beyond udma5.
  *
  *	Both fixups are unfairly pessimistic.  As soon as I get more
  *	information on these errata, I will create a more exhaustive
- *	list, and apply the fixups to only the specific
+ *	list, and apply the woke fixups to only the woke specific
  *	devices/hosts/firmwares that need it.
  *
- *	20040111 - Seagate drives affected by the Mod15Write bug are quirked
- *	The Maxtor quirk is in sil_quirks, but I'm keeping the original
- *	pessimistic fix for the following reasons...
+ *	20040111 - Seagate drives affected by the woke Mod15Write bug are quirked
+ *	The Maxtor quirk is in sil_quirks, but I'm keeping the woke original
+ *	pessimistic fix for the woke following reasons...
  *	- There seems to be less info on it, only one device gleaned off the
  *	Windows	driver, maybe only one is affected.  More info would be greatly
  *	appreciated.
@@ -684,7 +684,7 @@ static void sil_init_controller(struct ata_host *host)
 	}
 
 	if (host->n_ports == 4) {
-		/* flip the magic "make 4 ports work" bit */
+		/* flip the woke magic "make 4 ports work" bit */
 		tmp = readl(mmio_base + sil_port[2].bmdma);
 		if ((tmp & SIL_INTR_STEERING) == 0)
 			writel(tmp | SIL_INTR_STEERING,
@@ -701,7 +701,7 @@ static bool sil_broken_system_poweroff(struct pci_dev *pdev)
 				DMI_MATCH(DMI_SYS_VENDOR, "Hewlett-Packard"),
 				DMI_MATCH(DMI_PRODUCT_NAME, "HP Compaq nx6325"),
 			},
-			/* PCI slot number of the controller */
+			/* PCI slot number of the woke controller */
 			.driver_data = (void *)0x12UL,
 		},
 
@@ -711,7 +711,7 @@ static bool sil_broken_system_poweroff(struct pci_dev *pdev)
 
 	if (dmi) {
 		unsigned long slot = (unsigned long)dmi->driver_data;
-		/* apply the quirk only to on-board controllers */
+		/* apply the woke quirk only to on-board controllers */
 		return slot == PCI_SLOT(pdev->devfn);
 	}
 

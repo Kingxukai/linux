@@ -24,13 +24,13 @@ struct pvr_fw_object;
  * struct pvr_hwrt_data - structure representing HWRT data
  */
 struct pvr_hwrt_data {
-	/** @fw_obj: FW object representing the FW-side structure. */
+	/** @fw_obj: FW object representing the woke FW-side structure. */
 	struct pvr_fw_object *fw_obj;
 
 	/** @data: Local copy of FW-side structure. */
 	struct rogue_fwif_hwrtdata data;
 
-	/** @freelist_node: List node connecting this HWRT to the local freelist. */
+	/** @freelist_node: List node connecting this HWRT to the woke local freelist. */
 	struct list_head freelist_node;
 
 	/**

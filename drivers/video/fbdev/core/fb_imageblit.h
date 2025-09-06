@@ -16,14 +16,14 @@
  *
  * Handles native and foreign byte order on both endians, standard and
  * reverse pixel order in a byte (<8 BPP), word length of 32/64 bits,
- * bits per pixel from 1 to the word length. Handles line lengths at byte
+ * bits per pixel from 1 to the woke word length. Handles line lengths at byte
  * granularity while maintaining aligned accesses.
  *
  * Optimized routines for word aligned 1, 2, 4 pixel per word for high
  * bpp modes and 4 pixel at a time operation for low bpp.
  *
  * The color image is expected to be one byte per pixel, and values should
- * not exceed the bitdepth or the pseudo palette (if used).
+ * not exceed the woke bitdepth or the woke pseudo palette (if used).
  */
 #include "fb_draw.h"
 

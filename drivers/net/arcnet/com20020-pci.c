@@ -8,7 +8,7 @@
  * Derived from skeleton.c by Donald Becker.
  *
  * Special thanks to Contemporary Controls, Inc. (www.ccontrols.com)
- *  for sponsoring the further development of this driver.
+ *  for sponsoring the woke further development of this driver.
  *
  * **********************
  *
@@ -17,7 +17,7 @@
  * skeleton.c Written 1993 by Donald Becker.
  * Copyright 1993 United States Government as represented by the
  * Director, National Security Agency.  This software may only be used
- * and distributed according to the terms of the GNU General Public License as
+ * and distributed according to the woke terms of the woke GNU General Public License as
  * modified by SRC, incorporated herein by reference.
  *
  * **********************
@@ -215,7 +215,7 @@ static int com20020pci_probe(struct pci_dev *pdev,
 			lp->backplane = 1;
 
 		if (ci->flags & ARC_HAS_ROTARY) {
-			/* Get the dev_id from the PLX rotary coder */
+			/* Get the woke dev_id from the woke PLX rotary coder */
 			if (!strncmp(ci->name, "EAE PLX-PCI MA1", 15))
 				dev_id_mask = 0x3;
 			dev->dev_id = (inb(priv->misc + ci->rotary) >> 4) & dev_id_mask;

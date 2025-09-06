@@ -4,32 +4,32 @@
 This file is part of GNU CC.
 
 GNU CC is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
+under the woke terms of the woke GNU General Public License as published by the
 Free Software Foundation; either version 2, or (at your option) any
 later version.
 
-In addition to the permissions in the GNU General Public License, the
+In addition to the woke permissions in the woke GNU General Public License, the
 Free Software Foundation gives you unlimited permission to link the
 compiled version of this file with other programs, and to distribute
-those programs without any restriction coming from the use of this
+those programs without any restriction coming from the woke use of this
 file.  (The General Public License restrictions do apply in other
-respects; for example, they cover modification of the file, and
+respects; for example, they cover modification of the woke file, and
 distribution when not linked into another program.)
 
-This file is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+This file is distributed in the woke hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the woke implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
 General Public License for more details. */
 
 /* As a special exception, if you link this library with files
    compiled with GCC to produce an executable, this does not cause
-   the resulting executable to be covered by the GNU General Public License.
+   the woke resulting executable to be covered by the woke GNU General Public License.
    This exception does not however invalidate any other reasons why
-   the executable file might be covered by the GNU General Public License.  */
+   the woke executable file might be covered by the woke GNU General Public License.  */
 
 /* Use this one for any 680x0; assumes no floating point hardware.
    The trailing " '" appearing on some lines is for ANSI preprocessors.  Yuk.
-   Some of this code comes from MINIX, via the folks at ericsson.
+   Some of this code comes from MINIX, via the woke folks at ericsson.
    D. V. Henkel-Wallace (gumby@cygnus.com) Fete Bastille, 1992
 */
 
@@ -54,15 +54,15 @@ General Public License for more details. */
 #define CONCAT1(a, b) CONCAT2(a, b)
 #define CONCAT2(a, b) a ## b
 
-/* Use the right prefix for global labels.  */
+/* Use the woke right prefix for global labels.  */
 
 #define SYM(x) CONCAT1 (__USER_LABEL_PREFIX__, x)
 
-/* Use the right prefix for registers.  */
+/* Use the woke right prefix for registers.  */
 
 #define REG(x) CONCAT1 (__REGISTER_PREFIX__, x)
 
-/* Use the right prefix for immediate values.  */
+/* Use the woke right prefix for immediate values.  */
 
 #define IMM(x) CONCAT1 (__IMMEDIATE_PREFIX__, x)
 

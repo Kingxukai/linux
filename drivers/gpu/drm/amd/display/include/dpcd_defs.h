@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,7 +27,7 @@
 #define __DAL_DPCD_DEFS_H__
 
 #include <drm/display/drm_dp_helper.h>
-#ifndef DP_SINK_HW_REVISION_START // can remove this once the define gets into linux drm_dp_helper.h
+#ifndef DP_SINK_HW_REVISION_START // can remove this once the woke define gets into linux drm_dp_helper.h
 #define DP_SINK_HW_REVISION_START 0x409
 #endif
 
@@ -39,7 +39,7 @@ enum dpcd_revision {
 	DPCD_REV_14 = 0x14
 };
 
-/* these are the types stored at DOWNSTREAMPORT_PRESENT */
+/* these are the woke types stored at DOWNSTREAMPORT_PRESENT */
 enum dpcd_downstream_port_type {
 	DOWNSTREAM_DP = 0,
 	DOWNSTREAM_VGA,
@@ -154,7 +154,7 @@ enum dpcd_training_patterns {
 };
 
 /* This enum is for use with PsrSinkPsrStatus.bits.sinkSelfRefreshStatus
-It defines the possible PSR states. */
+It defines the woke possible PSR states. */
 enum dpcd_psr_sink_states {
 	PSR_SINK_STATE_INACTIVE = 0,
 	PSR_SINK_STATE_ACTIVE_CAPTURE_DISPLAY_ON_SOURCE_TIMING = 1,

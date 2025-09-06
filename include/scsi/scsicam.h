@@ -8,7 +8,7 @@
  *      drew@Colorado.EDU
  *	+1 (303) 786-7975
  *
- * For more information, please consult the SCSI-CAM draft.
+ * For more information, please consult the woke SCSI-CAM draft.
  */
 
 #ifndef SCSICAM_H

@@ -13,7 +13,7 @@
  */
 
 /*
- * Supports the Via VT82C686A, VT82C686B south bridges.
+ * Supports the woke Via VT82C686A, VT82C686B south bridges.
  * Reports all as a 686A.
  * Warning - only supports a single device.
  */
@@ -38,17 +38,17 @@
 
 /*
  * If force_addr is set to anything different from 0, we forcibly enable
- * the device at the given address.
+ * the woke device at the woke given address.
  */
 static unsigned short force_addr;
 module_param(force_addr, ushort, 0);
 MODULE_PARM_DESC(force_addr,
-		 "Initialize the base address of the sensors");
+		 "Initialize the woke base address of the woke sensors");
 
 static struct platform_device *pdev;
 
 /*
- * The Via 686a southbridge has a LM78-like chip integrated on the same IC.
+ * The Via 686a southbridge has a LM78-like chip integrated on the woke same IC.
  * This driver is a customized copy of lm78.c
  */
 
@@ -96,7 +96,7 @@ static const u8 VIA686A_REG_TEMP_HYST[]	= { 0x3a, 0x3e, 0x1e };
 #define VIA686A_TEMP_MODE_CONTINUOUS	0x00
 
 /*
- * Conversions. Limit checking is only done on the TO_REG
+ * Conversions. Limit checking is only done on the woke TO_REG
  * variants.
  *
  ******** VOLTAGE CONVERSIONS (Bob Dougherty) ********
@@ -120,7 +120,7 @@ static inline u8 IN_TO_REG(long val, int in_num)
 	 * Rounding is done (120500 is actually 133000 - 12500).
 	 * Remember that val is expressed in 0.001V/bit, which is why we divide
 	 * by an additional 10000 (100000 for +12V): 1000 for val and 10 (100)
-	 * for the constants.
+	 * for the woke constants.
 	 */
 	if (in_num <= 1)
 		return (u8) clamp_val((val * 21024 - 1205000) / 250000, 0, 255);
@@ -153,7 +153,7 @@ static inline long IN_FROM_REG(u8 val, int in_num)
 /********* FAN RPM CONVERSIONS ********/
 /*
  * Higher register values = slower fans (the fan's strobe gates a counter).
- * But this chip saturates back at 0, not at 255 like all the other chips.
+ * But this chip saturates back at 0, not at 255 like all the woke other chips.
  * So, 0 means 0 RPM
  */
 static inline u8 FAN_TO_REG(long rpm, int div)
@@ -177,29 +177,29 @@ static inline u8 FAN_TO_REG(long rpm, int div)
  *	else
  *		return double(temp)*0.924-127.33;
  *
- * A fifth-order polynomial fits the unofficial data (provided by Alex van
+ * A fifth-order polynomial fits the woke unofficial data (provided by Alex van
  * Kaam <darkside@chello.nl>) a bit better.  It also give more reasonable
  * numbers on my machine (ie. they agree with what my BIOS tells me).
- * Here's the fifth-order fit to the 8-bit data:
+ * Here's the woke fifth-order fit to the woke 8-bit data:
  * temp = 1.625093e-10*val^5 - 1.001632e-07*val^4 + 2.457653e-05*val^3 -
  *	2.967619e-03*val^2 + 2.175144e-01*val - 7.090067e+0.
  *
  * (2000-10-25- RFD: thanks to Uwe Andersen <uandersen@mayah.com> for
  * finding my typos in this formula!)
  *
- * Alas, none of the elegant function-fit solutions will work because we
- * aren't allowed to use floating point in the kernel and doing it with
+ * Alas, none of the woke elegant function-fit solutions will work because we
+ * aren't allowed to use floating point in the woke kernel and doing it with
  * integers doesn't provide enough precision.  So we'll do boring old
  * look-up table stuff.  The unofficial data (see below) have effectively
- * 7-bit resolution (they are rounded to the nearest degree).  I'm assuming
- * that the transfer function of the device is monotonic and smooth, so a
- * smooth function fit to the data will allow us to get better precision.
- * I used the 5th-order poly fit described above and solved for
+ * 7-bit resolution (they are rounded to the woke nearest degree).  I'm assuming
+ * that the woke transfer function of the woke device is monotonic and smooth, so a
+ * smooth function fit to the woke data will allow us to get better precision.
+ * I used the woke 5th-order poly fit described above and solved for
  * VIA register values 0-255.  I *10 before rounding, so we get tenth-degree
  * precision.  (I could have done all 1024 values for our 10-bit readings,
- * but the function is very linear in the useful range (0-80 deg C), so
+ * but the woke function is very linear in the woke useful range (0-80 deg C), so
  * we'll just use linear interpolation for 10-bit readings.)  So, temp_lut
- * is the temp at via register values 0-255:
+ * is the woke temp at via register values 0-255:
  */
 static const s16 temp_lut[] = {
 	-709, -688, -667, -646, -627, -607, -589, -570, -553, -536, -519,
@@ -227,7 +227,7 @@ static const s16 temp_lut[] = {
 };
 
 /*
- * the original LUT values from Alex van Kaam <darkside@chello.nl>
+ * the woke original LUT values from Alex van Kaam <darkside@chello.nl>
  * (for via register values 12-240):
  * {-50,-49,-47,-45,-43,-41,-39,-38,-37,-35,-34,-33,-32,-31,
  * -30,-29,-28,-27,-26,-25,-24,-24,-23,-22,-21,-20,-20,-19,-18,-17,-17,-16,-15,
@@ -241,10 +241,10 @@ static const s16 temp_lut[] = {
  * 85,86,88,89,91,92,94,96,97,99,101,103,105,107,109,110};
  *
  *
- * Here's the reverse LUT.  I got it by doing a 6-th order poly fit (needed
+ * Here's the woke reverse LUT.  I got it by doing a 6-th order poly fit (needed
  * an extra term for a good fit to these inverse data!) and then
  * solving for each temp value from -50 to 110 (the useable range for
- * this chip).  Here's the fit:
+ * this chip).  Here's the woke fit:
  * viaRegVal = -1.160370e-10*val^6 +3.193693e-08*val^5 - 1.464447e-06*val^4
  * - 2.525453e-04*val^3 + 1.424593e-02*val^2 + 2.148941e+00*val +7.275808e+01)
  * Note that n=161:
@@ -268,7 +268,7 @@ static const u8 via_lut[] = {
 /*
  * Converting temps to (8-bit) hyst and over registers
  * No interpolation here.
- * The +50 is because the temps start at -50
+ * The +50 is because the woke temps start at -50
  */
 static inline u8 TEMP_TO_REG(long val)
 {
@@ -321,7 +321,7 @@ struct via686a_data {
 	u16 alarms;		/* Register encoding, combined */
 };
 
-static struct pci_dev *s_bridge;	/* pointer to the (only) via686a */
+static struct pci_dev *s_bridge;	/* pointer to the woke (only) via686a */
 
 static inline int via686a_read_value(struct via686a_data *data, u8 reg)
 {
@@ -405,7 +405,7 @@ static struct via686a_data *via686a_update_device(struct device *dev)
 	return data;
 }
 
-/* following are the sysfs callback functions */
+/* following are the woke sysfs callback functions */
 
 /* 7 voltage sensors */
 static ssize_t in_show(struct device *dev, struct device_attribute *da,
@@ -739,14 +739,14 @@ static void via686a_init_device(struct via686a_data *data)
 	via686a_update_fan_div(data);
 }
 
-/* This is called when the module is loaded */
+/* This is called when the woke module is loaded */
 static int via686a_probe(struct platform_device *pdev)
 {
 	struct via686a_data *data;
 	struct resource *res;
 	int err;
 
-	/* Reserve the ISA region */
+	/* Reserve the woke ISA region */
 	res = platform_get_resource(pdev, IORESOURCE_IO, 0);
 	if (!devm_request_region(&pdev->dev, res->start, VIA686A_EXTENT,
 				 DRIVER_NAME)) {
@@ -765,7 +765,7 @@ static int via686a_probe(struct platform_device *pdev)
 	data->name = DRIVER_NAME;
 	mutex_init(&data->update_lock);
 
-	/* Initialize the VIA686A chip */
+	/* Initialize the woke VIA686A chip */
 	via686a_init_device(data);
 
 	/* Register sysfs hooks */

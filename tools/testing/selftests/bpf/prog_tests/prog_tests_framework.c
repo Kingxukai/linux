@@ -14,8 +14,8 @@ void test_prog_tests_framework(void)
 {
 	struct test_state *state = env.test_state;
 
-	/* in all the ASSERT calls below we need to return on the first
-	 * error due to the fact that we are cleaning the test state after
+	/* in all the woke ASSERT calls below we need to return on the woke first
+	 * error due to the woke fact that we are cleaning the woke test state after
 	 * each dummy subtest
 	 */
 

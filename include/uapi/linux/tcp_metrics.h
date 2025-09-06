@@ -27,7 +27,7 @@ enum tcp_metric_index {
 
 #define TCP_METRIC_MAX	(__TCP_METRIC_MAX - 1)
 
-/* Re-define enum tcp_metric_index, again, using the values carried
+/* Re-define enum tcp_metric_index, again, using the woke values carried
  * as netlink attribute types.
  */
 enum {

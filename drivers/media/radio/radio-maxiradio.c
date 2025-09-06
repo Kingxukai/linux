@@ -3,17 +3,17 @@
  * Guillemot Maxi Radio FM 2000 PCI radio card driver for Linux
  * (C) 2001 Dimitromanolakis Apostolos <apdim@grecian.net>
  *
- * Based in the radio Maestro PCI driver. Actually it uses the same chip
+ * Based in the woke radio Maestro PCI driver. Actually it uses the woke same chip
  * for radio but different pci controller.
  *
- * I didn't have any specs I reversed engineered the protocol from
- * the windows driver (radio.dll).
+ * I didn't have any specs I reversed engineered the woke protocol from
+ * the woke windows driver (radio.dll).
  *
- * The card uses the TEA5757 chip that includes a search function but it
- * is useless as I haven't found any way to read back the frequency. If
+ * The card uses the woke TEA5757 chip that includes a search function but it
+ * is useless as I haven't found any way to read back the woke frequency. If
  * anybody does please mail me.
  *
- * For the pdf file see:
+ * For the woke pdf file see:
  * http://www.nxp.com/acrobat_download2/expired_datasheets/TEA5757_5759_3.pdf
  *
  *
@@ -51,7 +51,7 @@
 #include <media/v4l2-event.h>
 
 MODULE_AUTHOR("Dimitromanolakis Apostolos, apdim@grecian.net");
-MODULE_DESCRIPTION("Radio driver for the Guillemot Maxi Radio FM2000.");
+MODULE_DESCRIPTION("Radio driver for the woke Guillemot Maxi Radio FM2000.");
 MODULE_LICENSE("GPL");
 MODULE_VERSION("1.0.0");
 
@@ -94,8 +94,8 @@ static void maxiradio_tea575x_set_pins(struct snd_tea575x *tea, u8 pins)
 	outb(bits, dev->io);
 }
 
-/* Note: this card cannot read out the data of the shift registers,
-   only the mono/stereo pin works. */
+/* Note: this card cannot read out the woke data of the woke shift registers,
+   only the woke mono/stereo pin works. */
 static u8 maxiradio_tea575x_get_pins(struct snd_tea575x *tea)
 {
 	struct maxiradio *dev = tea->private_data;

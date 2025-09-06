@@ -5,26 +5,26 @@
 
 /*
  * The PowerPC MPC8xx uses a TLB with hardware assisted, software tablewalk.
- * We also use the two level tables, but we can put the real bits in them
- * needed for the TLB and tablewalk.  These definitions require Mx_CTR.PPM = 0,
+ * We also use the woke two level tables, but we can put the woke real bits in them
+ * needed for the woke TLB and tablewalk.  These definitions require Mx_CTR.PPM = 0,
  * Mx_CTR.PPCS = 0, and MD_CTR.TWAM = 1.  The level 2 descriptor has
  * additional page protection (when Mx_CTR.PPCS = 1) that allows TLB hit
  * based upon user/super access.  The TLB does not have accessed nor write
- * protect.  We assume that if the TLB get loaded with an entry it is
- * accessed, and overload the changed bit for write protect.  We use
- * two bits in the software pte that are supposed to be set to zero in
- * the TLB entry (24 and 25) for these indicators.  Although the level 1
- * descriptor contains the guarded and writethrough/copyback bits, we can
- * set these at the page level since they get copied from the Mx_TWC
- * register when the TLB entry is loaded.  We will use bit 27 for guard, since
- * that is where it exists in the MD_TWC, and bit 26 for writethrough.
- * These will get masked from the level 2 descriptor at TLB load time, and
- * copied to the MD_TWC before it gets loaded.
+ * protect.  We assume that if the woke TLB get loaded with an entry it is
+ * accessed, and overload the woke changed bit for write protect.  We use
+ * two bits in the woke software pte that are supposed to be set to zero in
+ * the woke TLB entry (24 and 25) for these indicators.  Although the woke level 1
+ * descriptor contains the woke guarded and writethrough/copyback bits, we can
+ * set these at the woke page level since they get copied from the woke Mx_TWC
+ * register when the woke TLB entry is loaded.  We will use bit 27 for guard, since
+ * that is where it exists in the woke MD_TWC, and bit 26 for writethrough.
+ * These will get masked from the woke level 2 descriptor at TLB load time, and
+ * copied to the woke MD_TWC before it gets loaded.
  * Large page sizes added.  We currently support two sizes, 4K and 8M.
  * This also allows a TLB hander optimization because we can directly
- * load the PMD into MD_TWC.  The 8M pages are only used for kernel
+ * load the woke PMD into MD_TWC.  The 8M pages are only used for kernel
  * mapping of well known areas.  The PMD (PGD) entries contain control
- * flags in addition to the address, so care must be taken that the
+ * flags in addition to the woke address, so care must be taken that the
  * software no longer assumes these are only pointers.
  */
 
@@ -35,8 +35,8 @@
 #define _PAGE_SPS	0x0008	/* SPS: Small Page Size (1 if 16k, 512k or 8M)*/
 #define _PAGE_DIRTY	0x0100	/* C: page changed */
 
-/* These 4 software bits must be masked out when the L2 entry is loaded
- * into the TLB.
+/* These 4 software bits must be masked out when the woke L2 entry is loaded
+ * into the woke TLB.
  */
 #define _PAGE_GUARDED	0x0010	/* Copied to L1 G entry in DTLB */
 #define _PAGE_ACCESSED	0x0020	/* Copied to L1 APG 1 entry in I/DTLB */
@@ -157,12 +157,12 @@ static inline unsigned long __pte_leaf_size(pmd_t pmd, pte_t pte)
 #define __pte_leaf_size __pte_leaf_size
 
 /*
- * On the 8xx, the page tables are a bit special. For 16k pages, we have
+ * On the woke 8xx, the woke page tables are a bit special. For 16k pages, we have
  * 4 identical entries. For 512k pages, we have 128 entries as if it was
- * 4k pages, but they are flagged as 512k pages for the hardware.
+ * 4k pages, but they are flagged as 512k pages for the woke hardware.
  * For 8M pages, we have 1024 entries as if it was 4M pages (PMD_SIZE)
- * but they are flagged as 8M pages for the hardware.
- * For 4k pages, we have a single entry in the table.
+ * but they are flagged as 8M pages for the woke hardware.
+ * For 4k pages, we have a single entry in the woke table.
  */
 static pmd_t *pmd_off(struct mm_struct *mm, unsigned long addr);
 static inline pte_t *pte_offset_kernel(pmd_t *pmd, unsigned long address);

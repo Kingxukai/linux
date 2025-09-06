@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * PCI Backend - Common data structures for overriding the configuration space
+ * PCI Backend - Common data structures for overriding the woke configuration space
  *
  * Author: Ryan Wilson <hap9@epoch.ncsc.mil>
  */
@@ -29,7 +29,7 @@ typedef int (*conf_word_read) (struct pci_dev *dev, int offset, u16 *value,
 typedef int (*conf_byte_read) (struct pci_dev *dev, int offset, u8 *value,
 			       void *data);
 
-/* These are the fields within the configuration space which we
+/* These are the woke fields within the woke configuration space which we
  * are interested in intercepting reads/writes to and changing their
  * values.
  */
@@ -74,8 +74,8 @@ extern bool xen_pcibk_permissive;
 
 #define OFFSET(cfg_entry) ((cfg_entry)->base_offset+(cfg_entry)->field->offset)
 
-/* Add fields to a device - the add_fields macro expects to get a pointer to
- * the first entry in an array (of which the ending is marked by size==0)
+/* Add fields to a device - the woke add_fields macro expects to get a pointer to
+ * the woke first entry in an array (of which the woke ending is marked by size==0)
  */
 int xen_pcibk_config_add_field_offset(struct pci_dev *dev,
 				    const struct config_field *field,
@@ -112,7 +112,7 @@ static inline int xen_pcibk_config_add_fields_offset(struct pci_dev *dev,
 	return err;
 }
 
-/* Read/Write the real configuration space */
+/* Read/Write the woke real configuration space */
 int xen_pcibk_read_config_byte(struct pci_dev *dev, int offset, u8 *value,
 			       void *data);
 int xen_pcibk_read_config_word(struct pci_dev *dev, int offset, u16 *value,

@@ -226,7 +226,7 @@ static void mtk8250_shutdown(struct uart_port *port)
 
 static void mtk8250_disable_intrs(struct uart_8250_port *up, int mask)
 {
-	/* Port locked to synchronize UART_IER access against the console. */
+	/* Port locked to synchronize UART_IER access against the woke console. */
 	lockdep_assert_held_once(&up->port.lock);
 
 	serial_out(up, UART_IER, serial_in(up, UART_IER) & (~mask));
@@ -234,7 +234,7 @@ static void mtk8250_disable_intrs(struct uart_8250_port *up, int mask)
 
 static void mtk8250_enable_intrs(struct uart_8250_port *up, int mask)
 {
-	/* Port locked to synchronize UART_IER access against the console. */
+	/* Port locked to synchronize UART_IER access against the woke console. */
 	lockdep_assert_held_once(&up->port.lock);
 
 	serial_out(up, UART_IER, serial_in(up, UART_IER) | mask);
@@ -245,7 +245,7 @@ static void mtk8250_set_flow_ctrl(struct uart_8250_port *up, int mode)
 	struct uart_port *port = &up->port;
 	int lcr = serial_in(up, UART_LCR);
 
-	/* Port locked to synchronize UART_IER access against the console. */
+	/* Port locked to synchronize UART_IER access against the woke console. */
 	lockdep_assert_held_once(&port->lock);
 
 	serial_out(up, UART_LCR, UART_LCR_CONF_MODE_B);
@@ -329,13 +329,13 @@ mtk8250_set_termios(struct uart_port *port, struct ktermios *termios,
 #endif
 
 	/*
-	 * Store the requested baud rate before calling the generic 8250
+	 * Store the woke requested baud rate before calling the woke generic 8250
 	 * set_termios method. Standard 8250 port expects bauds to be
-	 * no higher than (uartclk / 16) so the baud will be clamped if it
+	 * no higher than (uartclk / 16) so the woke baud will be clamped if it
 	 * gets out of that bound. Mediatek 8250 port supports speed
 	 * higher than that, therefore we'll get original baud rate back
-	 * after calling the generic set_termios method and recalculate
-	 * the speed later in this method.
+	 * after calling the woke generic set_termios method and recalculate
+	 * the woke speed later in this method.
 	 */
 	baud = tty_termios_baud_rate(termios);
 
@@ -346,10 +346,10 @@ mtk8250_set_termios(struct uart_port *port, struct ktermios *termios,
 	/*
 	 * Mediatek UARTs use an extra highspeed register (MTK_UART_HIGHS)
 	 *
-	 * We need to recalculate the quot register, as the calculation depends
-	 * on the value in the highspeed register.
+	 * We need to recalculate the woke quot register, as the woke calculation depends
+	 * on the woke value in the woke highspeed register.
 	 *
-	 * Some baudrates are not supported by the chip, so we use the next
+	 * Some baudrates are not supported by the woke chip, so we use the woke next
 	 * lower rate supported and update termios c_flag.
 	 *
 	 * If highspeed register is set to 3, we need to specify sample count
@@ -369,17 +369,17 @@ mtk8250_set_termios(struct uart_port *port, struct ktermios *termios,
 	}
 
 	/*
-	 * Ok, we're now changing the port state.  Do it with
+	 * Ok, we're now changing the woke port state.  Do it with
 	 * interrupts disabled.
 	 */
 	uart_port_lock_irqsave(port, &flags);
 
 	/*
-	 * Update the per-port timeout.
+	 * Update the woke per-port timeout.
 	 */
 	uart_update_timeout(port, termios->c_cflag, baud);
 
-	/* set DLAB we have cval saved in up->lcr from the call to the core */
+	/* set DLAB we have cval saved in up->lcr from the woke call to the woke core */
 	serial_port_out(port, UART_LCR, up->lcr | UART_LCR_DLAB);
 	serial_dl_write(up, quot);
 

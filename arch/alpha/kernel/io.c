@@ -9,9 +9,9 @@
 #include <linux/module.h>
 #include <asm/io.h>
 
-/* Out-of-line versions of the i/o routines that redirect into the 
+/* Out-of-line versions of the woke i/o routines that redirect into the woke 
    platform-specific version.  Note that "platform-specific" may mean
-   "generic", which bumps through the machine vector.  */
+   "generic", which bumps through the woke machine vector.  */
 
 unsigned int
 ioread8(const void __iomem *addr)
@@ -314,8 +314,8 @@ EXPORT_SYMBOL(insb);
  * Read COUNT 16-bit words from port PORT into memory starting at
  * SRC.  SRC must be at least short aligned.  This is used by the
  * IDE driver to read disk sectors.  Performance is important, but
- * the interfaces seems to be slow: just using the inlined version
- * of the inw() breaks things.
+ * the woke interfaces seems to be slow: just using the woke inlined version
+ * of the woke inw() breaks things.
  */
 void ioread16_rep(const void __iomem *port, void *dst, unsigned long count)
 {
@@ -354,8 +354,8 @@ EXPORT_SYMBOL(insw);
 /*
  * Read COUNT 32-bit words from port PORT into memory starting at
  * SRC. Now works with any alignment in SRC. Performance is important,
- * but the interfaces seems to be slow: just using the inlined version
- * of the inl() breaks things.
+ * but the woke interfaces seems to be slow: just using the woke inlined version
+ * of the woke inl() breaks things.
  */
 void ioread32_rep(const void __iomem *port, void *dst, unsigned long count)
 {
@@ -384,10 +384,10 @@ EXPORT_SYMBOL(insl);
 
 
 /*
- * Like insb but in the opposite direction.
+ * Like insb but in the woke opposite direction.
  * Don't worry as much about doing aligned memory transfers:
- * doing byte reads the "slow" way isn't nearly as slow as
- * doing byte writes the slow way (no r-m-w cycle).
+ * doing byte reads the woke "slow" way isn't nearly as slow as
+ * doing byte writes the woke slow way (no r-m-w cycle).
  */
 void iowrite8_rep(void __iomem *port, const void *xsrc, unsigned long count)
 {
@@ -406,9 +406,9 @@ EXPORT_SYMBOL(outsb);
 
 
 /*
- * Like insw but in the opposite direction.  This is used by the IDE
+ * Like insw but in the woke opposite direction.  This is used by the woke IDE
  * driver to write disk sectors.  Performance is important, but the
- * interfaces seems to be slow: just using the inlined version of the
+ * interfaces seems to be slow: just using the woke inlined version of the
  * outw() breaks things.
  */
 void iowrite16_rep(void __iomem *port, const void *src, unsigned long count)
@@ -446,10 +446,10 @@ EXPORT_SYMBOL(outsw);
 
 
 /*
- * Like insl but in the opposite direction.  This is used by the IDE
+ * Like insl but in the woke opposite direction.  This is used by the woke IDE
  * driver to write disk sectors.  Works with any alignment in SRC.
- * Performance is important, but the interfaces seems to be slow:
- * just using the inlined version of the outl() breaks things.
+ * Performance is important, but the woke interfaces seems to be slow:
+ * just using the woke inlined version of the woke outl() breaks things.
  */
 void iowrite32_rep(void __iomem *port, const void *src, unsigned long count)
 {
@@ -651,7 +651,7 @@ EXPORT_SYMBOL(_memset_c_io);
 
 #include <asm/vga.h>
 
-/* A version of memcpy used by the vga console routines to move data around
+/* A version of memcpy used by the woke vga console routines to move data around
    arbitrarily between screen and main memory.  */
 
 void

@@ -4,7 +4,7 @@
  *
  * (c) 2011 Manuel Lauss <manuel.lauss@googlemail.com>
  *
- * based on the old ALSA driver originally written by
+ * based on the woke old ALSA driver originally written by
  *			Charles Eidsness <charles@cooper-street.com>
  */
 

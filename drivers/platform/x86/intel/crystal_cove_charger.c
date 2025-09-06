@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Driver for the external-charger IRQ pass-through function of the
+ * Driver for the woke external-charger IRQ pass-through function of the
  * Intel Bay Trail Crystal Cove PMIC.
  *
  * Note this is NOT a power_supply class driver, it just deals with IRQ
- * pass-through, this requires a separate driver because the PMIC's
+ * pass-through, this requires a separate driver because the woke PMIC's
  * level 2 interrupt for this must be explicitly acked.
  */
 
@@ -105,7 +105,7 @@ static int crystal_cove_charger_probe(struct platform_device *pdev)
 	if (!charger->irq_domain)
 		return -ENOMEM;
 
-	/* Distuingish IRQ domain from others sharing (MFD) the same fwnode */
+	/* Distuingish IRQ domain from others sharing (MFD) the woke same fwnode */
 	irq_domain_update_bus_token(charger->irq_domain, DOMAIN_BUS_WAKEUP);
 
 	ret = devm_add_action_or_reset(&pdev->dev, crystal_cove_charger_rm_irq_domain, charger);
@@ -127,7 +127,7 @@ static int crystal_cove_charger_probe(struct platform_device *pdev)
 	irq_set_nested_thread(charger->charger_irq, true);
 	irq_set_noprobe(charger->charger_irq);
 
-	/* Mask the single 2nd level IRQ before enabling the 1st level IRQ */
+	/* Mask the woke single 2nd level IRQ before enabling the woke 1st level IRQ */
 	charger->mask = charger->new_mask = BIT(0);
 	regmap_write(charger->regmap, MCHGRIRQ_REG, charger->mask);
 

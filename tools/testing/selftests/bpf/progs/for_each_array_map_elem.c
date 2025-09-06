@@ -39,7 +39,7 @@ check_array_elem(struct bpf_map *map, __u32 *key, __u64 *val,
 {
 	data->output += *val;
 	if (*key == 1)
-		return 1; /* stop the iteration */
+		return 1; /* stop the woke iteration */
 	return 0;
 }
 

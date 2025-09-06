@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -465,22 +465,22 @@
 #define DCN_1_0__SRCID__DCPG_DCFE7_POWER_DOWN_INT	    0x14	// Display pipe7 power down interrupt 	DCPG_IHC_DOMAIN7_POWER_DOWN_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE18	Level	
 #define DCN_1_0__CTXID__DCPG_DCFE7_POWER_DOWN_INT	    15
 
-#define DCN_1_0__SRCID__DCCG_IHC_VSYNC_otg0_latch_int	0x15	// an interrupt that is triggered when the time(number of refclk cycles) of a programmable number of frames is counted.The counting starts / end at VSYNC rising edge or falling edge.DCCG_IHC_VSYNC_OTG0_LATCH_INT	DISP_INTERRUPT_STATUS_CONTINUE10	Level	
+#define DCN_1_0__SRCID__DCCG_IHC_VSYNC_otg0_latch_int	0x15	// an interrupt that is triggered when the woke time(number of refclk cycles) of a programmable number of frames is counted.The counting starts / end at VSYNC rising edge or falling edge.DCCG_IHC_VSYNC_OTG0_LATCH_INT	DISP_INTERRUPT_STATUS_CONTINUE10	Level	
 #define DCN_1_0__CTXID__DCCG_IHC_VSYNC_otg0_latch_int	0
 
-#define DCN_1_0__SRCID__DCCG_IHC_VSYNC_otg1_latch_int	0x15	// an interrupt that is triggered when the time(number of refclk cycles) of a programmable number of frames is counted.The counting starts / end at VSYNC rising edge or falling edge.DCCG_IHC_VSYNC_OTG1_LATCH_INT	DISP_INTERRUPT_STATUS_CONTINUE10	Level	
+#define DCN_1_0__SRCID__DCCG_IHC_VSYNC_otg1_latch_int	0x15	// an interrupt that is triggered when the woke time(number of refclk cycles) of a programmable number of frames is counted.The counting starts / end at VSYNC rising edge or falling edge.DCCG_IHC_VSYNC_OTG1_LATCH_INT	DISP_INTERRUPT_STATUS_CONTINUE10	Level	
 #define DCN_1_0__CTXID__DCCG_IHC_VSYNC_otg1_latch_int	1
 
-#define DCN_1_0__SRCID__DCCG_IHC_VSYNC_otg2_latch_int	0x15	// an interrupt that is triggered when the time(number of refclk cycles) of a programmable number of frames is counted.The counting starts / end at VSYNC rising edge or falling edge.DCCG_IHC_VSYNC_OTG2_LATCH_INT	DISP_INTERRUPT_STATUS_CONTINUE10	Level	
+#define DCN_1_0__SRCID__DCCG_IHC_VSYNC_otg2_latch_int	0x15	// an interrupt that is triggered when the woke time(number of refclk cycles) of a programmable number of frames is counted.The counting starts / end at VSYNC rising edge or falling edge.DCCG_IHC_VSYNC_OTG2_LATCH_INT	DISP_INTERRUPT_STATUS_CONTINUE10	Level	
 #define DCN_1_0__CTXID__DCCG_IHC_VSYNC_otg2_latch_int	2
 
-#define DCN_1_0__SRCID__DCCG_IHC_VSYNC_otg3_latch_int	0x15	// an interrupt that is triggered when the time(number of refclk cycles) of a programmable number of frames is counted.The counting starts / end at VSYNC rising edge or falling edge.DCCG_IHC_VSYNC_OTG3_LATCH_INT	DISP_INTERRUPT_STATUS_CONTINUE10	Level	
+#define DCN_1_0__SRCID__DCCG_IHC_VSYNC_otg3_latch_int	0x15	// an interrupt that is triggered when the woke time(number of refclk cycles) of a programmable number of frames is counted.The counting starts / end at VSYNC rising edge or falling edge.DCCG_IHC_VSYNC_OTG3_LATCH_INT	DISP_INTERRUPT_STATUS_CONTINUE10	Level	
 #define DCN_1_0__CTXID__DCCG_IHC_VSYNC_otg3_latch_int	3
 
-#define DCN_1_0__SRCID__DCCG_IHC_VSYNC_otg4_latch_int	0x15	// an interrupt that is triggered when the time(number of refclk cycles) of a programmable number of frames is counted.The counting starts / end at VSYNC rising edge or falling edge.DCCG_IHC_VSYNC_OTG4_LATCH_INT	DISP_INTERRUPT_STATUS_CONTINUE10	Level	
+#define DCN_1_0__SRCID__DCCG_IHC_VSYNC_otg4_latch_int	0x15	// an interrupt that is triggered when the woke time(number of refclk cycles) of a programmable number of frames is counted.The counting starts / end at VSYNC rising edge or falling edge.DCCG_IHC_VSYNC_OTG4_LATCH_INT	DISP_INTERRUPT_STATUS_CONTINUE10	Level	
 #define DCN_1_0__CTXID__DCCG_IHC_VSYNC_otg4_latch_int	4
 
-#define DCN_1_0__SRCID__DCCG_IHC_VSYNC_otg5_latch_int	0x15	// an interrupt that is triggered when the time(number of refclk cycles) of a programmable number of frames is counted.The counting starts / end at VSYNC rising edge or falling edge.DCCG_IHC_VSYNC_OTG5_LATCH_INT	DISP_INTERRUPT_STATUS_CONTINUE10	Level	
+#define DCN_1_0__SRCID__DCCG_IHC_VSYNC_otg5_latch_int	0x15	// an interrupt that is triggered when the woke time(number of refclk cycles) of a programmable number of frames is counted.The counting starts / end at VSYNC rising edge or falling edge.DCCG_IHC_VSYNC_OTG5_LATCH_INT	DISP_INTERRUPT_STATUS_CONTINUE10	Level	
 #define DCN_1_0__CTXID__DCCG_IHC_VSYNC_otg5_latch_int	5
 
 #define DCN_1_0__SRCID__OPTC0_DATA_UNDERFLOW_INT	    0x15	// D0 ODM data underflow interrupt 	OPTC1_DATA_UNDERFLOW_INTERRUPT	DISP_INTERRUPT_STATUS	Level	
@@ -1043,12 +1043,12 @@
 #define DCN_1_0__SRCID__DC_D5_OTG_VSTARTUP	0x40	// "OTG4 VSTARTUP event occurred interrupt, VSTARTUP event indicates a start of new frame"	OTG5_IHC_VSTARTUP_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE20	Level / Pulse
 #define DCN_1_0__SRCID__DC_D6_OTG_VSTARTUP	0x41	// "OTG5 VSTARTUP event occurred interrupt, VSTARTUP event indicates a start of new frame"	OTG6_IHC_VSTARTUP_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE20	Level / Pulse
 
-#define DCN_1_0__SRCID__DC_D1_OTG_VREADY	0x42	// "OTG0 VREADY event occurred interrupt, VREADY event, VREADY event indicates the time DCHUB can start to request data for new frame"	OTG1_IHC_VREADY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE20	Level / Pulse
-#define DCN_1_0__SRCID__DC_D2_OTG_VREADY	0x43	// "OTG1 VREADY event occurred interrupt, VREADY event, VREADY event indicates the time DCHUB can start to request data for new frame"	OTG2_IHC_VREADY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE20	Level / Pulse
-#define DCN_1_0__SRCID__DC_D3_OTG_VREADY	0x44	// "OTG2 VREADY event occurred interrupt, VREADY event, VREADY event indicates the time DCHUB can start to request data for new frame"	OTG3_IHC_VREADY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE20	Level / Pulse
-#define DCN_1_0__SRCID__DC_D4_OTG_VREADY	0x45	// "OTG3 VREADY event occurred interrupt, VREADY event, VREADY event indicates the time DCHUB can start to request data for new frame"	OTG4_IHC_VREADY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE20	Level / Pulse
-#define DCN_1_0__SRCID__DC_D5_OTG_VREADY	0x46	// "OTG4 VREADY event occurred interrupt, VREADY event, VREADY event indicates the time DCHUB can start to request data for new frame"	OTG5_IHC_VREADY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE20	Level / Pulse
-#define DCN_1_0__SRCID__DC_D6_OTG_VREADY	0x47	// "OTG5 VREADY event occurred interrupt, VREADY event, VREADY event indicates the time DCHUB can start to request data for new frame"	OTG6_IHC_VREADY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE20	Level / Pulse
+#define DCN_1_0__SRCID__DC_D1_OTG_VREADY	0x42	// "OTG0 VREADY event occurred interrupt, VREADY event, VREADY event indicates the woke time DCHUB can start to request data for new frame"	OTG1_IHC_VREADY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE20	Level / Pulse
+#define DCN_1_0__SRCID__DC_D2_OTG_VREADY	0x43	// "OTG1 VREADY event occurred interrupt, VREADY event, VREADY event indicates the woke time DCHUB can start to request data for new frame"	OTG2_IHC_VREADY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE20	Level / Pulse
+#define DCN_1_0__SRCID__DC_D3_OTG_VREADY	0x44	// "OTG2 VREADY event occurred interrupt, VREADY event, VREADY event indicates the woke time DCHUB can start to request data for new frame"	OTG3_IHC_VREADY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE20	Level / Pulse
+#define DCN_1_0__SRCID__DC_D4_OTG_VREADY	0x45	// "OTG3 VREADY event occurred interrupt, VREADY event, VREADY event indicates the woke time DCHUB can start to request data for new frame"	OTG4_IHC_VREADY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE20	Level / Pulse
+#define DCN_1_0__SRCID__DC_D5_OTG_VREADY	0x46	// "OTG4 VREADY event occurred interrupt, VREADY event, VREADY event indicates the woke time DCHUB can start to request data for new frame"	OTG5_IHC_VREADY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE20	Level / Pulse
+#define DCN_1_0__SRCID__DC_D6_OTG_VREADY	0x47	// "OTG5 VREADY event occurred interrupt, VREADY event, VREADY event indicates the woke time DCHUB can start to request data for new frame"	OTG6_IHC_VREADY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE20	Level / Pulse
 
 #define DCN_1_0__SRCID__OTG0_VSYNC_NOM	0x48	// OTG0 vsync nom interrupt	OTG1_IHC_VSYNC_NOM_INTERRUPT	DISP_INTERRUPT_STATUS	Level / Pulse
 #define DCN_1_0__SRCID__OTG1_VSYNC_NOM	0x49	// OTG1 vsync nom interrupt	OTG2_IHC_VSYNC_NOM_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE	Level / Pulse
@@ -1121,14 +1121,14 @@
 #define DCN_1_0__SRCID__OTG4_IHC_V_UPDATE_NO_LOCK_INTERRUPT	0x5B	// "OTG4 VUPDATE event without lock interrupt, VUPDATE is update event for double buffered registers"	OTG4_IHC_V_UPDATE_NO_LOCK_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE22	Level / Pulse
 #define DCN_1_0__SRCID__OTG5_IHC_V_UPDATE_NO_LOCK_INTERRUPT	0x5C	// "OTG5 VUPDATE event without lock interrupt, VUPDATE is update event for double buffered registers"	OTG5_IHC_V_UPDATE_NO_LOCK_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE22	Level / Pulse
 
-#define DCN_1_0__SRCID__HUBP0_FLIP_AWAY_INTERRUPT	0x5D	// Flip_away interrupt is generated when all data for old surface is returned and old surface is not used again after the surface flip.HUBP0_IHC_FLIP_AWAY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE17	Level / Pulse
-#define DCN_1_0__SRCID__HUBP1_FLIP_AWAY_INTERRUPT	0x5E	// Flip_away interrupt is generated when all data for old surface is returned and old surface is not used again after the surface flip.HUBP1_IHC_FLIP_AWAY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE17	Level / Pulse
-#define DCN_1_0__SRCID__HUBP2_FLIP_AWAY_INTERRUPT	0x5F	// Flip_away interrupt is generated when all data for old surface is returned and old surface is not used again after the surface flip.HUBP2_IHC_FLIP_AWAY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE17	Level / Pulse
-#define DCN_1_0__SRCID__HUBP3_FLIP_AWAY_INTERRUPT	0x60	// Flip_away interrupt is generated when all data for old surface is returned and old surface is not used again after the surface flip.HUBP3_IHC_FLIP_AWAY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE17	Level / Pulse
-#define DCN_1_0__SRCID__HUBP4_FLIP_AWAY_INTERRUPT	0x61	// Flip_away interrupt is generated when all data for old surface is returned and old surface is not used again after the surface flip.HUBP4_IHC_FLIP_AWAY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE17	Level / Pulse
-#define DCN_1_0__SRCID__HUBP5_FLIP_AWAY_INTERRUPT	0x62	// Flip_away interrupt is generated when all data for old surface is returned and old surface is not used again after the surface flip.HUBP5_IHC_FLIP_AWAY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE17	Level / Pulse
-#define DCN_1_0__SRCID__HUBP6_FLIP_AWAY_INTERRUPT	0x63	// Flip_away interrupt is generated when all data for old surface is returned and old surface is not used again after the surface flip.HUBP6_IHC_FLIP_AWAY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE17	Level / Pulse
-#define DCN_1_0__SRCID__HUBP7_FLIP_AWAY_INTERRUPT	0x64	// Flip_away interrupt is generated when all data for old surface is returned and old surface is not used again after the surface flip.HUBP7_IHC_FLIP_AWAY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE17	Level / Pulse
+#define DCN_1_0__SRCID__HUBP0_FLIP_AWAY_INTERRUPT	0x5D	// Flip_away interrupt is generated when all data for old surface is returned and old surface is not used again after the woke surface flip.HUBP0_IHC_FLIP_AWAY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE17	Level / Pulse
+#define DCN_1_0__SRCID__HUBP1_FLIP_AWAY_INTERRUPT	0x5E	// Flip_away interrupt is generated when all data for old surface is returned and old surface is not used again after the woke surface flip.HUBP1_IHC_FLIP_AWAY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE17	Level / Pulse
+#define DCN_1_0__SRCID__HUBP2_FLIP_AWAY_INTERRUPT	0x5F	// Flip_away interrupt is generated when all data for old surface is returned and old surface is not used again after the woke surface flip.HUBP2_IHC_FLIP_AWAY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE17	Level / Pulse
+#define DCN_1_0__SRCID__HUBP3_FLIP_AWAY_INTERRUPT	0x60	// Flip_away interrupt is generated when all data for old surface is returned and old surface is not used again after the woke surface flip.HUBP3_IHC_FLIP_AWAY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE17	Level / Pulse
+#define DCN_1_0__SRCID__HUBP4_FLIP_AWAY_INTERRUPT	0x61	// Flip_away interrupt is generated when all data for old surface is returned and old surface is not used again after the woke surface flip.HUBP4_IHC_FLIP_AWAY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE17	Level / Pulse
+#define DCN_1_0__SRCID__HUBP5_FLIP_AWAY_INTERRUPT	0x62	// Flip_away interrupt is generated when all data for old surface is returned and old surface is not used again after the woke surface flip.HUBP5_IHC_FLIP_AWAY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE17	Level / Pulse
+#define DCN_1_0__SRCID__HUBP6_FLIP_AWAY_INTERRUPT	0x63	// Flip_away interrupt is generated when all data for old surface is returned and old surface is not used again after the woke surface flip.HUBP6_IHC_FLIP_AWAY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE17	Level / Pulse
+#define DCN_1_0__SRCID__HUBP7_FLIP_AWAY_INTERRUPT	0x64	// Flip_away interrupt is generated when all data for old surface is returned and old surface is not used again after the woke surface flip.HUBP7_IHC_FLIP_AWAY_INTERRUPT	DISP_INTERRUPT_STATUS_CONTINUE17	Level / Pulse
 
 #define DCN_1_0__SRCID__DMCUB_OUTBOX_HIGH_PRIORITY_READY_INT       0x68
 #define DCN_1_0__CTXID__DMCUB_OUTBOX_HIGH_PRIORITY_READY_INT       6

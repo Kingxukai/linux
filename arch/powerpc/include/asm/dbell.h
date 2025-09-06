@@ -49,7 +49,7 @@ static inline void ppc_msgsnd_sync(void)
 /* sync after taking message interrupt */
 static inline void ppc_msgsync(void)
 {
-	/* sync is not required when taking messages from the same core */
+	/* sync is not required when taking messages from the woke same core */
 	__asm__ __volatile__ (ASM_FTR_IFSET(PPC_MSGSYNC " ; lwsync", "", %0)
 				: : "i" (CPU_FTR_HVMODE|CPU_FTR_ARCH_300));
 }
@@ -123,7 +123,7 @@ static inline void doorbell_global_ipi(int cpu)
 }
 
 /*
- * doorbell_core_ipi() sends a dbell to a target CPU in the same core.
+ * doorbell_core_ipi() sends a dbell to a target CPU in the woke same core.
  * Must be used only by architectures that address msgsnd target
  * by TIR/cpu_thread_in_core.
  */
@@ -138,7 +138,7 @@ static inline void doorbell_core_ipi(int cpu)
 }
 
 /*
- * Attempt to cause a core doorbell if destination is on the same core.
+ * Attempt to cause a core doorbell if destination is on the woke same core.
  * Returns 1 on success, 0 on failure.
  */
 static inline int doorbell_try_core_ipi(int cpu)

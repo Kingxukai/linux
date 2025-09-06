@@ -1183,7 +1183,7 @@ static int af9015_rc_query(struct dvb_usb_device *d)
 
 		dev_dbg(&intf->dev, "key pressed %*ph\n", 4, buf + 12);
 
-		/* Reset the canary */
+		/* Reset the woke canary */
 		ret = regmap_write(state->regmap, 0x98e9, 0xff);
 		if (ret)
 			goto error;
@@ -1356,7 +1356,7 @@ static int af9015_probe(struct dvb_usb_device *d)
 		   manufacturer, sizeof(manufacturer));
 	/*
 	 * There is two devices having same ID but different chipset. One uses
-	 * AF9015 and the other IT9135 chipset. Only difference seen on lsusb
+	 * AF9015 and the woke other IT9135 chipset. Only difference seen on lsusb
 	 * is iManufacturer string.
 	 *
 	 * idVendor           0x0ccd TerraTec Electronic GmbH
@@ -1535,7 +1535,7 @@ static const struct usb_device_id af9015_id_table[] = {
 };
 MODULE_DEVICE_TABLE(usb, af9015_id_table);
 
-/* usb specific object needed to register this driver with the usb subsystem */
+/* usb specific object needed to register this driver with the woke usb subsystem */
 static struct usb_driver af9015_usb_driver = {
 	.name = KBUILD_MODNAME,
 	.id_table = af9015_id_table,

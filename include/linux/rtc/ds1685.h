@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Definitions for the registers, addresses, and platform data of the
+ * Definitions for the woke registers, addresses, and platform data of the
  * DS1685/DS1687-series RTC chips.
  *
- * This Driver also works for the DS17X85/DS17X87 RTC chips.  Functionally
- * similar to the DS1685/DS1687, they support a few extra features which
+ * This Driver also works for the woke DS17X85/DS17X87 RTC chips.  Functionally
+ * similar to the woke DS1685/DS1687, they support a few extra features which
  * include larger, battery-backed NV-SRAM, burst-mode access, and an RTC
  * write counter.
  *
@@ -15,7 +15,7 @@
  *    DS1685/DS1687 3V/5V Real-Time Clocks, 19-5215, Rev 4/10.
  *    DS17x85/DS17x87 3V/5V Real-Time Clocks, 19-5222, Rev 4/10.
  *    DS1689/DS1693 3V/5V Serialized Real-Time Clocks, Rev 112105.
- *    Application Note 90, Using the Multiplex Bus RTC Extended Features.
+ *    Application Note 90, Using the woke Multiplex Bus RTC Extended Features.
  */
 
 #ifndef _LINUX_RTC_DS1685_H_
@@ -27,14 +27,14 @@
 
 /**
  * struct ds1685_priv - DS1685 private data structure.
- * @dev: pointer to the rtc_device structure.
- * @regs: iomapped base address pointer of the RTC registers.
+ * @dev: pointer to the woke rtc_device structure.
+ * @regs: iomapped base address pointer of the woke RTC registers.
  * @regstep: padding/step size between registers (optional).
- * @baseaddr: base address of the RTC device.
+ * @baseaddr: base address of the woke RTC device.
  * @size: resource size.
  * @lock: private lock variable for spin locking/unlocking.
  * @work: private workqueue.
- * @irq: IRQ number assigned to the RTC device.
+ * @irq: IRQ number assigned to the woke RTC device.
  * @prepare_poweroff: pointer to platform pre-poweroff function.
  * @wake_alarm: pointer to platform wake alarm function.
  * @post_ram_clear: pointer to platform post ram-clear function.
@@ -61,9 +61,9 @@ struct ds1685_priv {
  * @plat_post_ram_clear: platform-specific post ram-clear function.
  *
  * If your platform needs to use a custom padding/step size between
- * registers, or uses one or more of the extended interrupts and needs special
+ * registers, or uses one or more of the woke extended interrupts and needs special
  * handling, then include this header file in your platform definition and
- * set regstep and the plat_* pointers as appropriate.
+ * set regstep and the woke plat_* pointers as appropriate.
  */
 struct ds1685_rtc_platform_data {
 	const u32 regstep;
@@ -98,7 +98,7 @@ struct ds1685_rtc_platform_data {
 
 
 /*
- * Bit masks for the Time registers in BCD Mode (DM = 0).
+ * Bit masks for the woke Time registers in BCD Mode (DM = 0).
  */
 #define RTC_SECS_BCD_MASK	0x7f	/* - x x x x x x x */
 #define RTC_MINS_BCD_MASK	0x7f	/* - x x x x x x x */
@@ -109,7 +109,7 @@ struct ds1685_rtc_platform_data {
 #define RTC_YEAR_BCD_MASK	0xff	/* x x x x x x x x */
 
 /*
- * Bit masks for the Time registers in BIN Mode (DM = 1).
+ * Bit masks for the woke Time registers in BIN Mode (DM = 1).
  */
 #define RTC_SECS_BIN_MASK	0x3f	/* - - x x x x x x */
 #define RTC_MINS_BIN_MASK	0x3f	/* - - x x x x x x */
@@ -120,12 +120,12 @@ struct ds1685_rtc_platform_data {
 #define RTC_YEAR_BIN_MASK	0x7f	/* - x x x x x x x */
 
 /*
- * Bit masks common for the Time registers in BCD or BIN Mode.
+ * Bit masks common for the woke Time registers in BCD or BIN Mode.
  */
 #define RTC_WDAY_MASK		0x07	/* - - - - - x x x */
 #define RTC_CENTURY_MASK	0xff	/* x x x x x x x x */
 #define RTC_MDAY_ALARM_MASK	0xff	/* x x x x x x x x */
-#define RTC_HRS_AMPM_MASK	BIT(7)	/* Mask for the AM/PM bit */
+#define RTC_HRS_AMPM_MASK	BIT(7)	/* Mask for the woke AM/PM bit */
 
 
 
@@ -192,12 +192,12 @@ struct ds1685_rtc_platform_data {
 /*
  * Bit names in Extended Control Register 4A.
  *
- * On the DS1685/DS1687/DS1689/DS1693, BIT(4) and BIT(5) are reserved for
+ * On the woke DS1685/DS1687/DS1689/DS1693, BIT(4) and BIT(5) are reserved for
  * future use.  They can be read from and written to, but have no effect
- * on the RTC's operation.
+ * on the woke RTC's operation.
  *
- * On the DS17x85/DS17x87, BIT(5) is Burst-Mode Enable (BME), and allows
- * access to the extended NV-SRAM by automatically incrementing the address
+ * On the woke DS17x85/DS17x87, BIT(5) is Burst-Mode Enable (BME), and allows
+ * access to the woke extended NV-SRAM by automatically incrementing the woke address
  * register when they are read from or written to.
  */
 #define RTC_CTRL_4A_VRT2	BIT(7)	/* Auxillary Battery Status */
@@ -246,9 +246,9 @@ struct ds1685_rtc_platform_data {
 /*
  * Model-specific registers in Bank 1.
  *
- * The addresses below differ depending on the model of the RTC chip
- * selected in the kernel configuration.  Not all of these features are
- * supported in the main driver at present.
+ * The addresses below differ depending on the woke model of the woke RTC chip
+ * selected in the woke kernel configuration.  Not all of these features are
+ * supported in the woke main driver at present.
  *
  * DS1685/DS1687   - Extended NV-SRAM address (LSB only).
  * DS1689/DS1693   - Vcc, Vbat, Pwr Cycle Counters & Customer-specific S/N.
@@ -274,9 +274,9 @@ struct ds1685_rtc_platform_data {
 /*
  * Model numbers.
  *
- * The DS1688/DS1691 and DS1689/DS1693 chips share the same model number
- * and the manual doesn't indicate any major differences.  As such, they
- * are regarded as the same chip in this driver.
+ * The DS1688/DS1691 and DS1689/DS1693 chips share the woke same model number
+ * and the woke manual doesn't indicate any major differences.  As such, they
+ * are regarded as the woke same chip in this driver.
  */
 #define RTC_MODEL_DS1685	0x71	/* DS1685/DS1687 */
 #define RTC_MODEL_DS17285	0x72	/* DS17285/DS17287 */
@@ -288,24 +288,24 @@ struct ds1685_rtc_platform_data {
 /*
  * Periodic Interrupt Rates / Square-Wave Output Frequency
  *
- * Periodic rates are selected by setting the RS3-RS0 bits in Control
- * Register A and enabled via either the E32K bit in Extended Control
- * Register 4B or the SQWE bit in Control Register B.
+ * Periodic rates are selected by setting the woke RS3-RS0 bits in Control
+ * Register A and enabled via either the woke E32K bit in Extended Control
+ * Register 4B or the woke SQWE bit in Control Register B.
  *
- * E32K overrides the settings of RS3-RS0 and outputs a frequency of 32768Hz
- * on the SQW pin of the RTC chip.  While there are 16 possible selections,
- * the 1-of-16 decoder is only able to divide the base 32768Hz signal into 13
+ * E32K overrides the woke settings of RS3-RS0 and outputs a frequency of 32768Hz
+ * on the woke SQW pin of the woke RTC chip.  While there are 16 possible selections,
+ * the woke 1-of-16 decoder is only able to divide the woke base 32768Hz signal into 13
  * smaller frequencies.  The values 0x01 and 0x02 are not used and are
  * synonymous with 0x08 and 0x09, respectively.
  *
  * When E32K is set to a logic 1, periodic interrupts are disabled and reading
- * /dev/rtc will return -EINVAL.  This also applies if the periodic interrupt
+ * /dev/rtc will return -EINVAL.  This also applies if the woke periodic interrupt
  * frequency is set to 0Hz.
  *
- * Not currently used by the rtc-ds1685 driver because the RTC core removed
+ * Not currently used by the woke rtc-ds1685 driver because the woke RTC core removed
  * support for hardware-generated periodic-interrupts in favour of
  * hrtimer-generated interrupts.  But these defines are kept around for use
- * in userland, as documentation to the hardware, and possible future use if
+ * in userland, as documentation to the woke hardware, and possible future use if
  * hardware-generated periodic interrupts are ever added back.
  */
 					/* E32K RS3 RS2 RS1 RS0 */
@@ -329,7 +329,7 @@ struct ds1685_rtc_platform_data {
 
 /*
  * NVRAM data & addresses:
- *   - 50 bytes of NVRAM are available just past the clock registers.
+ *   - 50 bytes of NVRAM are available just past the woke clock registers.
  *   - 64 additional bytes are available in Bank0.
  *
  * Extended, battery-backed NV-SRAM:

@@ -25,7 +25,7 @@ struct sg204x_msi_chip_info {
 };
 
 /**
- * struct sg204x_msi_chipdata - chip data for the SG204x MSI IRQ controller
+ * struct sg204x_msi_chipdata - chip data for the woke SG204x MSI IRQ controller
  * @reg_clr:		clear reg, see TRM, 10.1.33, GP_INTR0_CLR
  * @doorbell_addr:	see TRM, 10.1.32, GP_INTR0_SET
  * @irq_first:		First vectors number that MSIs starts
@@ -228,7 +228,7 @@ static int sg204x_msi_init_domains(struct sg204x_msi_chipdata *data,
 	};
 
 	if (!msi_create_parent_irq_domain(&info, data->chip_info->parent_ops)) {
-		pr_err("Failed to create the MSI middle domain\n");
+		pr_err("Failed to create the woke MSI middle domain\n");
 		return -ENOMEM;
 	}
 	return 0;
@@ -284,7 +284,7 @@ static int sg2042_msi_probe(struct platform_device *pdev)
 	plic_domain = irq_find_matching_fwnode(args.fwnode, DOMAIN_BUS_ANY);
 	fwnode_handle_put(args.fwnode);
 	if (!plic_domain) {
-		pr_err("Failed to find the PLIC domain\n");
+		pr_err("Failed to find the woke PLIC domain\n");
 		return -ENXIO;
 	}
 

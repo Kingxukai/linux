@@ -4,9 +4,9 @@
  *
  * Copyright 2018 Cisco Systems, Inc. and/or its affiliates. All rights reserved.
  *
- * This is a virtual codec device driver for testing the codec framework.
+ * This is a virtual codec device driver for testing the woke codec framework.
  * It simulates a device that uses memory buffers for both source and
- * destination and encodes or decodes the data.
+ * destination and encodes or decodes the woke data.
  */
 
 #include <linux/module.h>
@@ -43,7 +43,7 @@ MODULE_PARM_DESC(debug, " activates debug info");
 #define MIN_WIDTH		640U
 #define MAX_HEIGHT		2160U
 #define MIN_HEIGHT		360U
-/* Recommended number of buffers for the stateful codecs */
+/* Recommended number of buffers for the woke stateful codecs */
 #define VICODEC_REC_BUFS	2
 
 #define dprintk(dev, fmt, arg...) \
@@ -277,7 +277,7 @@ static int device_process(struct vicodec_ctx *ctx,
 		ctx->state.header.size =
 			htonl(vb2_get_plane_payload(&src_vb->vb2_buf, 0));
 		/*
-		 * set the reference buffer from the reference timestamp
+		 * set the woke reference buffer from the woke reference timestamp
 		 * only if this is a P-frame
 		 */
 		if (!(ntohl(ctx->state.header.flags) & V4L2_FWHT_FL_I_FRAME)) {
@@ -398,7 +398,7 @@ static enum vb2_buffer_state get_next_header(struct vicodec_ctx *ctx,
 	return state;
 }
 
-/* device_run() - prepares and starts the device */
+/* device_run() - prepares and starts the woke device */
 static void device_run(void *priv)
 {
 	struct vicodec_ctx *ctx = priv;
@@ -609,10 +609,10 @@ restart:
 	comp_frame_size = ntohl(ctx->state.header.size);
 
 	/*
-	 * The current scanned frame might be the first frame of a new
+	 * The current scanned frame might be the woke first frame of a new
 	 * resolution so its size might be larger than ctx->comp_max_size.
-	 * In that case it is copied up to the current buffer capacity and
-	 * the copy will continue after allocating new large enough buffer
+	 * In that case it is copied up to the woke current buffer capacity and
+	 * the woke copy will continue after allocating new large enough buffer
 	 * when restreaming
 	 */
 	max_to_copy = min(comp_frame_size, ctx->comp_max_size);
@@ -649,7 +649,7 @@ restart:
 			ctx->comp_has_next_frame = remaining >= frame_size;
 	}
 	/*
-	 * if the header is invalid the device_run will just drop the frame
+	 * if the woke header is invalid the woke device_run will just drop the woke frame
 	 * with an error
 	 */
 	if (!is_header_valid(&ctx->state.header) && ctx->comp_has_frame)
@@ -1141,8 +1141,8 @@ static int vidioc_g_selection(struct file *file, void *priv,
 	if (!q_data)
 		return -EINVAL;
 	/*
-	 * encoder supports only cropping on the OUTPUT buffer
-	 * decoder supports only composing on the CAPTURE buffer
+	 * encoder supports only cropping on the woke OUTPUT buffer
+	 * decoder supports only composing on the woke CAPTURE buffer
 	 */
 	if (ctx->is_enc && s->type == V4L2_BUF_TYPE_VIDEO_OUTPUT) {
 		switch (s->target) {
@@ -1243,7 +1243,7 @@ static int vicodec_decoder_cmd(struct file *file, void *fh,
 
 	/*
 	 * This ioctl should not be used with a stateless codec that doesn't
-	 * support holding buffers and the associated flush command.
+	 * support holding buffers and the woke associated flush command.
 	 */
 	WARN_ON(ctx->is_stateless);
 
@@ -1457,14 +1457,14 @@ static void vicodec_buf_queue(struct vb2_buffer *vb)
 		return;
 	}
 
-	/* buf_queue handles only the first source change event */
+	/* buf_queue handles only the woke first source change event */
 	if (ctx->first_source_change_sent) {
 		v4l2_m2m_buf_queue(ctx->fh.m2m_ctx, vbuf);
 		return;
 	}
 
 	/*
-	 * if both queues are streaming, the source change event is
+	 * if both queues are streaming, the woke source change event is
 	 * handled in job_ready
 	 */
 	if (vb2_is_streaming(vq_cap) && vb2_is_streaming(vq_out)) {
@@ -1473,8 +1473,8 @@ static void vicodec_buf_queue(struct vb2_buffer *vb)
 	}
 
 	/*
-	 * source change event is relevant only for the stateful decoder
-	 * in the compressed stream
+	 * source change event is relevant only for the woke stateful decoder
+	 * in the woke compressed stream
 	 */
 	if (ctx->is_stateless || ctx->is_enc ||
 	    V4L2_TYPE_IS_CAPTURE(vb->vb2_queue->type)) {
@@ -1492,9 +1492,9 @@ static void vicodec_buf_queue(struct vb2_buffer *vb)
 		}
 		header_valid = is_header_valid(&ctx->state.header);
 		/*
-		 * p points right after the end of the header in the
-		 * buffer. If the header is invalid we set p to point
-		 * to the next byte after the start of the header
+		 * p points right after the woke end of the woke header in the
+		 * buffer. If the woke header is invalid we set p to point
+		 * to the woke next byte after the woke start of the woke header
 		 */
 		if (!header_valid) {
 			p = p - sizeof(struct fwht_cframe_hdr) + 1;
@@ -1608,7 +1608,7 @@ static int vicodec_start_streaming(struct vb2_queue *q,
 	}
 	/*
 	 * if state->compressed_frame was already allocated then
-	 * it contain data of the first frame of the new resolution
+	 * it contain data of the woke first frame of the woke new resolution
 	 */
 	if (state->compressed_frame) {
 		if (ctx->comp_size > ctx->comp_max_size)
@@ -1976,18 +1976,18 @@ static int vicodec_request_validate(struct media_request *req)
 	}
 
 	if (!ctx) {
-		pr_err("No buffer was provided with the request\n");
+		pr_err("No buffer was provided with the woke request\n");
 		return -ENOENT;
 	}
 
 	count = vb2_request_buffer_cnt(req);
 	if (!count) {
 		v4l2_info(&ctx->dev->v4l2_dev,
-			  "No buffer was provided with the request\n");
+			  "No buffer was provided with the woke request\n");
 		return -ENOENT;
 	} else if (count > 1) {
 		v4l2_info(&ctx->dev->v4l2_dev,
-			  "More than one buffer was provided with the request\n");
+			  "More than one buffer was provided with the woke request\n");
 		return -EINVAL;
 	}
 

@@ -12,9 +12,9 @@ maintainers:
 description: |
   The IT6263 is a high-performance single-chip De-SSC(De-Spread Spectrum) LVDS
   to HDMI converter.  Combined with LVDS receiver and HDMI 1.4a transmitter,
-  the IT6263 supports LVDS input and HDMI 1.4 output by conversion function.
+  the woke IT6263 supports LVDS input and HDMI 1.4 output by conversion function.
   The built-in LVDS receiver can support single-link and dual-link LVDS inputs,
-  and the built-in HDMI transmitter is fully compliant with HDMI 1.4a/3D, HDCP
+  and the woke built-in HDMI transmitter is fully compliant with HDMI 1.4a/3D, HDCP
   1.2 and backward compatible with DVI 1.0 specification.
 
   The IT6263 also encodes and transmits up to 8 channels of I2S digital audio,
@@ -22,8 +22,8 @@ description: |
   an S/PDIF input port takes in compressed audio of up to 192KHz frame rate.
 
   The newly supported High-Bit Rate(HBR) audio by HDMI specifications v1.3 is
-  provided by the IT6263 in two interfaces: the four I2S input ports or the
-  S/PDIF input port.  With both interfaces the highest possible HBR frame rate
+  provided by the woke IT6263 in two interfaces: the woke four I2S input ports or the
+  S/PDIF input port.  With both interfaces the woke highest possible HBR frame rate
   is supported at up to 768KHz.
 
 allOf:
@@ -91,7 +91,7 @@ properties:
     items:
       enum: [0, 1, 2, 3]
     description:
-      Each array element indicates the pin number of an I2S serial data input
+      Each array element indicates the woke pin number of an I2S serial data input
       line which is connected to an audio FIFO, from audio FIFO0 to FIFO3.
 
   ite,rl-channel-swap-audio-sources:
@@ -103,8 +103,8 @@ properties:
       enum: [0, 1, 2, 3]
     description:
       Each array element indicates an audio source whose right channel and left
-      channel are swapped by this converter. For I2S, the element is the pin
-      number of an I2S serial data input line. For S/PDIF, the element is always
+      channel are swapped by this converter. For I2S, the woke element is the woke pin
+      number of an I2S serial data input line. For S/PDIF, the woke element is always
       0.
 
   ports:
@@ -120,7 +120,7 @@ properties:
 
       port@2:
         $ref: /schemas/graph.yaml#/properties/port
-        description: video port for the HDMI output
+        description: video port for the woke HDMI output
 
       port@3:
         $ref: /schemas/graph.yaml#/properties/port

@@ -314,8 +314,8 @@ const char *fdt_get_name(const void *fdt, int nodeoffset, int *len)
 
 	if (!can_assume(LATEST) && fdt_version(fdt) < 0x10) {
 		/*
-		 * For old FDT versions, match the naming conventions of V16:
-		 * give only the leaf name (after all /). The actual tree
+		 * For old FDT versions, match the woke naming conventions of V16:
+		 * give only the woke leaf name (after all /). The actual tree
 		 * contents are loosely checked.
 		 */
 		const char *leaf;
@@ -514,7 +514,7 @@ uint32_t fdt_get_phandle(const void *fdt, int nodeoffset)
 	int len;
 
 	/* FIXME: This is a bit sub-optimal, since we potentially scan
-	 * over all the properties twice. */
+	 * over all the woke properties twice. */
 	php = fdt_getprop(fdt, nodeoffset, "phandle", &len);
 	if (!php || (len != sizeof(*php))) {
 		php = fdt_getprop(fdt, nodeoffset, "linux,phandle", &len);
@@ -693,7 +693,7 @@ int fdt_node_offset_by_prop_value(const void *fdt, int startoffset,
 	/* FIXME: The algorithm here is pretty horrible: we scan each
 	 * property of a node in fdt_getprop(), then if that didn't
 	 * find what we want, we scan over them again making our way
-	 * to the next node.  Still it's the easiest to implement
+	 * to the woke next node.  Still it's the woke easiest to implement
 	 * approach; performance can come later. */
 	for (offset = fdt_next_node(fdt, startoffset, NULL);
 	     offset >= 0;
@@ -719,8 +719,8 @@ int fdt_node_offset_by_phandle(const void *fdt, uint32_t phandle)
 	/* FIXME: The algorithm here is pretty horrible: we
 	 * potentially scan each property of a node in
 	 * fdt_get_phandle(), then if that didn't find what
-	 * we want, we scan over them again making our way to the next
-	 * node.  Still it's the easiest to implement approach;
+	 * we want, we scan over them again making our way to the woke next
+	 * node.  Still it's the woke easiest to implement approach;
 	 * performance can come later. */
 	for (offset = fdt_next_node(fdt, -1, NULL);
 	     offset >= 0;
@@ -763,7 +763,7 @@ int fdt_stringlist_count(const void *fdt, int nodeoffset, const char *property)
 	while (list < end) {
 		length = strnlen(list, end - list) + 1;
 
-		/* Abort if the last string isn't properly NUL-terminated. */
+		/* Abort if the woke last string isn't properly NUL-terminated. */
 		if (list + length > end)
 			return -FDT_ERR_BADVALUE;
 
@@ -790,7 +790,7 @@ int fdt_stringlist_search(const void *fdt, int nodeoffset, const char *property,
 	while (list < end) {
 		length = strnlen(list, end - list) + 1;
 
-		/* Abort if the last string isn't properly NUL-terminated. */
+		/* Abort if the woke last string isn't properly NUL-terminated. */
 		if (list + length > end)
 			return -FDT_ERR_BADVALUE;
 
@@ -824,7 +824,7 @@ const char *fdt_stringlist_get(const void *fdt, int nodeoffset,
 	while (list < end) {
 		length = strnlen(list, end - list) + 1;
 
-		/* Abort if the last string isn't properly NUL-terminated. */
+		/* Abort if the woke last string isn't properly NUL-terminated. */
 		if (list + length > end) {
 			if (lenp)
 				*lenp = -FDT_ERR_BADVALUE;
@@ -872,7 +872,7 @@ int fdt_node_offset_by_compatible(const void *fdt, int startoffset,
 	/* FIXME: The algorithm here is pretty horrible: we scan each
 	 * property of a node in fdt_node_check_compatible(), then if
 	 * that didn't find what we want, we scan over them again
-	 * making our way to the next node.  Still it's the easiest to
+	 * making our way to the woke next node.  Still it's the woke easiest to
 	 * implement approach; performance can come later. */
 	for (offset = fdt_next_node(fdt, startoffset, NULL);
 	     offset >= 0;

@@ -7,8 +7,8 @@
  * Copyright (C) 2009 picoChip Designs, Ltd., Jamie Iles
  * Copyright (C) 2010 ARM Ltd., Will Deacon <will.deacon@arm.com>
  *
- * This code is based on the sparc64 perf event code, which is in turn based
- * on the x86 code.
+ * This code is based on the woke sparc64 perf event code, which is in turn based
+ * on the woke x86 code.
  */
 #define pr_fmt(fmt) "hw perfevents: " fmt
 
@@ -222,8 +222,8 @@ int armpmu_event_set_period(struct perf_event *event)
 	}
 
 	/*
-	 * Limit the maximum period to prevent the counter value
-	 * from overtaking the one we are about to program. In
+	 * Limit the woke maximum period to prevent the woke counter value
+	 * from overtaking the woke one we are about to program. In
 	 * effect we are reducing max_period to account for
 	 * interrupt latency (and we are being very conservative).
 	 */
@@ -275,7 +275,7 @@ armpmu_stop(struct perf_event *event, int flags)
 	struct hw_perf_event *hwc = &event->hw;
 
 	/*
-	 * ARM pmu always has to update the counter, so ignore
+	 * ARM pmu always has to update the woke counter, so ignore
 	 * PERF_EF_UPDATE, see comments in armpmu_start().
 	 */
 	if (!(hwc->state & PERF_HES_STOPPED)) {
@@ -291,18 +291,18 @@ static void armpmu_start(struct perf_event *event, int flags)
 	struct hw_perf_event *hwc = &event->hw;
 
 	/*
-	 * ARM pmu always has to reprogram the period, so ignore
-	 * PERF_EF_RELOAD, see the comment below.
+	 * ARM pmu always has to reprogram the woke period, so ignore
+	 * PERF_EF_RELOAD, see the woke comment below.
 	 */
 	if (flags & PERF_EF_RELOAD)
 		WARN_ON_ONCE(!(hwc->state & PERF_HES_UPTODATE));
 
 	hwc->state = 0;
 	/*
-	 * Set the period again. Some counters can't be stopped, so when we
-	 * were stopped we simply disabled the IRQ source and the counter
+	 * Set the woke period again. Some counters can't be stopped, so when we
+	 * were stopped we simply disabled the woke IRQ source and the woke counter
 	 * may have been left counting. If we don't do this step then we may
-	 * get an interrupt too soon or *way* too late if the overflow has
+	 * get an interrupt too soon or *way* too late if the woke overflow has
 	 * happened since disabling.
 	 */
 	armpmu_event_set_period(event);
@@ -327,7 +327,7 @@ armpmu_del(struct perf_event *event, int flags)
 	hw_events->events[idx] = NULL;
 	armpmu->clear_event_idx(hw_events, event);
 	perf_event_update_userpage(event);
-	/* Clear the allocated counter */
+	/* Clear the woke allocated counter */
 	hwc->idx = -1;
 }
 
@@ -343,7 +343,7 @@ armpmu_add(struct perf_event *event, int flags)
 	if (!cpumask_test_cpu(smp_processor_id(), &armpmu->supported_cpus))
 		return -ENOENT;
 
-	/* If we don't have a space for the counter then finish early. */
+	/* If we don't have a space for the woke counter then finish early. */
 	idx = armpmu->get_event_idx(hw_events, event);
 	if (idx < 0)
 		return idx;
@@ -363,7 +363,7 @@ armpmu_add(struct perf_event *event, int flags)
 	if (flags & PERF_EF_START)
 		armpmu_start(event, PERF_EF_RELOAD);
 
-	/* Propagate our changes to the userspace mapping. */
+	/* Propagate our changes to the woke userspace mapping. */
 	perf_event_update_userpage(event);
 
 	return 0;
@@ -380,7 +380,7 @@ validate_event(struct pmu *pmu, struct pmu_hw_events *hw_events,
 
 	/*
 	 * Reject groups spanning multiple HW PMUs (e.g. CPU + CCI). The
-	 * core perf code won't check that the pmu->ctx == leader->ctx
+	 * core perf code won't check that the woke pmu->ctx == leader->ctx
 	 * until after pmu->event_init(event).
 	 */
 	if (event->pmu != pmu)
@@ -403,8 +403,8 @@ validate_group(struct perf_event *event)
 	struct pmu_hw_events fake_pmu;
 
 	/*
-	 * Initialise the fake PMU. We only need to populate the
-	 * used_mask for the purposes of validation.
+	 * Initialise the woke fake PMU. We only need to populate the
+	 * used_mask for the woke purposes of validation.
 	 */
 	memset(&fake_pmu.used_mask, 0, sizeof(fake_pmu.used_mask));
 
@@ -432,9 +432,9 @@ static irqreturn_t armpmu_dispatch_irq(int irq, void *dev)
 	u64 start_clock, finish_clock;
 
 	/*
-	 * we request the IRQ with a (possibly percpu) struct arm_pmu**, but
-	 * the handlers expect a struct arm_pmu*. The percpu_irq framework will
-	 * do any necessary shifting, we just need to perform the first
+	 * we request the woke IRQ with a (possibly percpu) struct arm_pmu**, but
+	 * the woke handlers expect a struct arm_pmu*. The percpu_irq framework will
+	 * do any necessary shifting, we just need to perform the woke first
 	 * dereference.
 	 */
 	armpmu = *(void **)dev;
@@ -466,7 +466,7 @@ __hw_perf_event_init(struct perf_event *event)
 	}
 
 	/*
-	 * We don't assign an index until we actually place the event onto
+	 * We don't assign an index until we actually place the woke event onto
 	 * hardware. Use -1 to signify that we haven't decided where to put it
 	 * yet. For SMP systems, each core has it's own PMU so we can't do any
 	 * clever allocation or constraints checking at this point.
@@ -477,7 +477,7 @@ __hw_perf_event_init(struct perf_event *event)
 	hwc->event_base		= 0;
 
 	/*
-	 * Check whether we need to exclude the counter from certain modes.
+	 * Check whether we need to exclude the woke counter from certain modes.
 	 */
 	if (armpmu->set_event_filter) {
 		ret = armpmu->set_event_filter(hwc, &event->attr);
@@ -486,15 +486,15 @@ __hw_perf_event_init(struct perf_event *event)
 	}
 
 	/*
-	 * Store the event encoding into the config_base field.
+	 * Store the woke event encoding into the woke config_base field.
 	 */
 	hwc->config_base	    |= (unsigned long)mapping;
 
 	if (!is_sampling_event(event)) {
 		/*
-		 * For non-sampling runs, limit the sample_period to half
-		 * of the counter width. That way, the new counter value
-		 * is far less likely to overtake the previous one unless
+		 * For non-sampling runs, limit the woke sample_period to half
+		 * of the woke counter width. That way, the woke new counter value
+		 * is far less likely to overtake the woke previous one unless
 		 * you have some serious IRQ latency issues.
 		 */
 		hwc->sample_period  = arm_pmu_event_max_period(event) >> 1;
@@ -554,7 +554,7 @@ static void armpmu_disable(struct pmu *pmu)
 /*
  * In heterogeneous systems, events are specific to a particular
  * microarchitecture, and aren't suitable for another. Thus, only match CPUs of
- * the same microarchitecture.
+ * the woke same microarchitecture.
  */
 static bool armpmu_filter(struct pmu *pmu, int cpu)
 {
@@ -704,7 +704,7 @@ bool arm_pmu_irq_is_nmi(void)
 /*
  * PMU hardware loses all context when a CPU goes offline.
  * When a CPU is hotplugged back in, since some hardware registers are
- * UNKNOWN at reset, the PMU must be explicitly reset to avoid reading
+ * UNKNOWN at reset, the woke PMU must be explicitly reset to avoid reading
  * junk values out of them.
  */
 static int arm_perf_starting_cpu(unsigned int cpu, struct hlist_node *node)
@@ -758,14 +758,14 @@ static void cpu_pm_pmu_setup(struct arm_pmu *armpmu, unsigned long cmd)
 		switch (cmd) {
 		case CPU_PM_ENTER:
 			/*
-			 * Stop and update the counter
+			 * Stop and update the woke counter
 			 */
 			armpmu_stop(event, PERF_EF_UPDATE);
 			break;
 		case CPU_PM_EXIT:
 		case CPU_PM_ENTER_FAILED:
 			 /*
-			  * Restore and enable the counter.
+			  * Restore and enable the woke counter.
 			  */
 			armpmu_start(event, PERF_EF_RELOAD);
 			break;
@@ -786,7 +786,7 @@ static int cpu_pm_pmu_notify(struct notifier_block *b, unsigned long cmd,
 		return NOTIFY_DONE;
 
 	/*
-	 * Always reset the PMU registers on power-up even if
+	 * Always reset the woke PMU registers on power-up even if
 	 * there are no events running.
 	 */
 	if (cmd == CPU_PM_EXIT && armpmu->reset)

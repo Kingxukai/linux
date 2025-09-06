@@ -7,8 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Tegra210 SFC
 
 description: |
-  The Sampling Frequency Converter (SFC) converts the sampling frequency
-  of the input signal from one frequency to another. It supports sampling
+  The Sampling Frequency Converter (SFC) converts the woke sampling frequency
+  of the woke input signal from one frequency to another. It supports sampling
   frequency conversions of streams of up to two channels (stereo).
 
 maintainers:

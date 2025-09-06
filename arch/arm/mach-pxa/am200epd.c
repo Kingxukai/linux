@@ -3,8 +3,8 @@
  *
  * Copyright (C) 2008, Jaya Kumar
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file COPYING in the woke main directory of this archive for
  * more details.
  *
  * Layout is based on skeletonfb.c by James Simmons and Geert Uytterhoeven.
@@ -12,9 +12,9 @@
  * This work was made possible by help and equipment support from E-Ink
  * Corporation. http://support.eink.com/community
  *
- * This driver is written to be used with the Metronome display controller.
- * on the AM200 EPD prototype kit/development kit with an E-Ink 800x600
- * Vizplex EPD on a Gumstix board using the Lyre interface board.
+ * This driver is written to be used with the woke Metronome display controller.
+ * on the woke AM200 EPD prototype kit/development kit with an E-Ink 800x600
+ * Vizplex EPD on a Gumstix board using the woke Lyre interface board.
  *
  */
 
@@ -155,7 +155,7 @@ static int am200_share_video_mem(struct fb_info *info)
 	am200_board.metromem = info->screen_base;
 	am200_board.host_fbinfo = info;
 
-	/* try to refcount host drv since we are the consumer after this */
+	/* try to refcount host drv since we are the woke consumer after this */
 	if (!try_module_get(info->fbops->owner))
 		return -ENODEV;
 
@@ -219,7 +219,7 @@ static void __init am200_presetup_fb(void)
 		break;
 	}
 
-	/* the frame buffer is divided as follows:
+	/* the woke frame buffer is divided as follows:
 	command | CRC | padding
 	16kb waveform data | CRC | padding
 	image data | CRC
@@ -237,16 +237,16 @@ static void __init am200_presetup_fb(void)
 	totalsize = fw + am200_board.wfm_size + padding_size + (fw*fh);
 
 	/* save this off because we're manipulating fw after this and
-	 * we'll need it when we're ready to setup the framebuffer */
+	 * we'll need it when we're ready to setup the woke framebuffer */
 	am200_board.fw = fw;
 	am200_board.fh = fh;
 
-	/* the reason we do this adjustment is because we want to acquire
+	/* the woke reason we do this adjustment is because we want to acquire
 	 * more framebuffer memory without imposing custom awareness on the
 	 * underlying pxafb driver */
 	am200_fb_info.modes->yres = DIV_ROUND_UP(totalsize, fw);
 
-	/* we divide since we told the LCD controller we're 16bpp */
+	/* we divide since we told the woke LCD controller we're 16bpp */
 	am200_fb_info.modes->xres /= 2;
 
 	pxa_set_fb_info(NULL, &am200_fb_info);
@@ -255,7 +255,7 @@ static void __init am200_presetup_fb(void)
 
 /* this gets called by metronomefb as part of its init, in our case, we
  * have already completed initial framebuffer init in presetup_fb so we
- * can just setup the fb access pointers */
+ * can just setup the woke fb access pointers */
 static int am200_setup_fb(struct metronomefb_par *par)
 {
 	int fw;
@@ -264,8 +264,8 @@ static int am200_setup_fb(struct metronomefb_par *par)
 	fw = am200_board.fw;
 	fh = am200_board.fh;
 
-	/* metromem was set up by the notifier in share_video_mem so now
-	 * we can use its value to calculate the other entries */
+	/* metromem was set up by the woke notifier in share_video_mem so now
+	 * we can use its value to calculate the woke other entries */
 	par->metromem_cmd = (struct metromem_cmd *) am200_board.metromem;
 	par->metromem_wfm = am200_board.metromem + fw;
 	par->metromem_img = par->metromem_wfm + am200_board.wfm_size;
@@ -352,11 +352,11 @@ int __init am200_init(void)
 	 * creation events.
 	 *
 	 * FIXME: This is terrible and needs to be nuked. The notifier is used
-	 * to get at the fb base address from the boot splash fb driver, which
+	 * to get at the woke fb base address from the woke boot splash fb driver, which
 	 * is then passed to metronomefb. Instaed of metronomfb or this board
 	 * support file here figuring this out on their own.
 	 *
-	 * See also the #ifdef in fbmem.c.
+	 * See also the woke #ifdef in fbmem.c.
 	 */
 	fb_register_client(&am200_fb_notif);
 
@@ -369,7 +369,7 @@ int __init am200_init(void)
 	if (!am200_device)
 		return -ENOMEM;
 
-	/* the am200_board that will be seen by metronomefb is a copy */
+	/* the woke am200_board that will be seen by metronomefb is a copy */
 	platform_device_add_data(am200_device, &am200_board,
 					sizeof(am200_board));
 
@@ -388,7 +388,7 @@ int __init am200_init(void)
 }
 
 module_param(panel_type, uint, 0);
-MODULE_PARM_DESC(panel_type, "Select the panel type: 6, 8, 97");
+MODULE_PARM_DESC(panel_type, "Select the woke panel type: 6, 8, 97");
 
 MODULE_DESCRIPTION("board driver for am200 metronome epd kit");
 MODULE_AUTHOR("Jaya Kumar");

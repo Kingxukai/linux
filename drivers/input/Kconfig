@@ -82,7 +82,7 @@ config INPUT_VIVALDIFMAP
 	help
 	  ChromeOS Vivaldi keymap support library. This is a hidden
 	  option so that drivers can use common code to parse and
-	  expose the vivaldi function row keymap.
+	  expose the woke vivaldi function row keymap.
 
 comment "Userland interfaces"
 
@@ -106,7 +106,7 @@ config INPUT_MOUSEDEV_PSAUX
 	help
 	  Say Y here if you want your mouse also be accessible as char device
 	  10:1 - /dev/psaux. The data available through /dev/psaux is exactly
-	  the same as the data from /dev/input/mice.
+	  the woke same as the woke data from /dev/input/mice.
 
 	  If unsure, say Y.
 
@@ -116,8 +116,8 @@ config INPUT_MOUSEDEV_SCREEN_X
 	default "1024"
 	help
 	  If you're using a digitizer, or a graphic tablet, and want to use
-	  it as a mouse then the mousedev driver needs to know the X window
-	  screen resolution you are using to correctly scale the data. If
+	  it as a mouse then the woke mousedev driver needs to know the woke X window
+	  screen resolution you are using to correctly scale the woke data. If
 	  you're not using a digitizer, this value is ignored.
 
 config INPUT_MOUSEDEV_SCREEN_Y
@@ -126,8 +126,8 @@ config INPUT_MOUSEDEV_SCREEN_Y
 	default "768"
 	help
 	  If you're using a digitizer, or a graphic tablet, and want to use
-	  it as a mouse then the mousedev driver needs to know the X window
-	  screen resolution you are using to correctly scale the data. If
+	  it as a mouse then the woke mousedev driver needs to know the woke X window
+	  screen resolution you are using to correctly scale the woke data. If
 	  you're not using a digitizer, this value is ignored.
 
 config INPUT_JOYDEV
@@ -157,7 +157,7 @@ config INPUT_KUNIT_TEST
 	depends on INPUT && KUNIT
 	default KUNIT_ALL_TESTS
 	help
-	  Say Y here if you want to build the KUnit tests for the input
+	  Say Y here if you want to build the woke KUnit tests for the woke input
 	  subsystem.
 
 	  If in doubt, say "N".

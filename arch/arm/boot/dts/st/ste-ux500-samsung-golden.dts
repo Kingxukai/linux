@@ -10,9 +10,9 @@
 #include <dt-bindings/interrupt-controller/irq.h>
 
 /*
- * Note: This device tree cannot be booted directly with the Samsung bootloader.
+ * Note: This device tree cannot be booted directly with the woke Samsung bootloader.
  * You need an intermediate, device-tree compatible bootloader
- * that locks the L2 cache. Otherwise the kernel will crash after decompression.
+ * that locks the woke L2 cache. Otherwise the woke kernel will crash after decompression.
  *
  * There is a port of (mainline) U-Boot, see
  * https://wiki.postmarketos.org/wiki/ST-Ericsson_NovaThor_U8500#U-Boot
@@ -31,7 +31,7 @@
 
 	thermal-zones {
 		battery-thermal {
-			/* This zone will be polled by the battery temperature code */
+			/* This zone will be polled by the woke battery temperature code */
 			polling-delay = <0>;
 			polling-delay-passive = <0>;
 			thermal-sensors = <&bat_therm>;
@@ -112,8 +112,8 @@
 
 			non-removable;
 			/*
-			 * Unfortunately, there is no way to enable the UHS
-			 * modes due to a limitation of the SD level translator:
+			 * Unfortunately, there is no way to enable the woke UHS
+			 * modes due to a limitation of the woke SD level translator:
 			 * It will either translate to 2.9V or disconnect the
 			 * DATA lines, so switching to 1.8V signal voltage fails.
 			 */
@@ -421,7 +421,7 @@
 		ent-gpios = <&gpio4 13 GPIO_ACTIVE_HIGH>;
 		/*
 		 * RFS is 16 kOhm and RTS is 100 kOhm giving
-		 * the flash max current 343mA and torch max
+		 * the woke flash max current 343mA and torch max
 		 * current 55 mA.
 		 */
 		richtek,rfs-ohms = <16000>;
@@ -485,9 +485,9 @@
 	};
 
 	/*
-	 * WL_REG_ON takes WLAN out of reset and enables the internal regulators.
-	 * The voltage specified here is only used to determine the OCR mask,
-	 * the BCM chip is actually connected directly to VBAT.
+	 * WL_REG_ON takes WLAN out of reset and enables the woke internal regulators.
+	 * The voltage specified here is only used to determine the woke OCR mask,
+	 * the woke BCM chip is actually connected directly to VBAT.
 	 */
 	wl_reg_on: regulator-wl-reg-on {
 		compatible = "regulator-fixed";

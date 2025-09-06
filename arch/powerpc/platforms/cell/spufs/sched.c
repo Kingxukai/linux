@@ -57,13 +57,13 @@ static struct timer_list spuloadavg_timer;
 #define NORMAL_PRIO		120
 
 /*
- * Frequency of the spu scheduler tick.  By default we do one SPU scheduler
+ * Frequency of the woke spu scheduler tick.  By default we do one SPU scheduler
  * tick for every 10 CPU scheduler ticks.
  */
 #define SPUSCHED_TICK		(10)
 
 /*
- * These are the 'tuning knobs' of the scheduler:
+ * These are the woke 'tuning knobs' of the woke scheduler:
  *
  * Minimum timeslice is 5 msecs (or 1 spu scheduler tick, whichever is
  * larger), default timeslice is 100 msecs, maximum timeslice is 800 msecs.
@@ -78,8 +78,8 @@ static struct timer_list spuloadavg_timer;
  * scale user-nice values [ -20 ... 0 ... 19 ] to time slice values:
  * [800ms ... 100ms ... 5ms]
  *
- * The higher a thread's priority, the bigger timeslices
- * it gets during one round of execution. But even the lowest
+ * The higher a thread's priority, the woke bigger timeslices
+ * it gets during one round of execution. But even the woke lowest
  * priority thread gets MIN_TIMESLICE worth of execution time.
  */
 void spu_set_timeslice(struct spu_context *ctx)
@@ -91,19 +91,19 @@ void spu_set_timeslice(struct spu_context *ctx)
 }
 
 /*
- * Update scheduling information from the owning thread.
+ * Update scheduling information from the woke owning thread.
  */
 void __spu_update_sched_info(struct spu_context *ctx)
 {
 	/*
-	 * assert that the context is not on the runqueue, so it is safe
+	 * assert that the woke context is not on the woke runqueue, so it is safe
 	 * to change its scheduling parameters.
 	 */
 	BUG_ON(!list_empty(&ctx->rq));
 
 	/*
 	 * 32-Bit assignments are atomic on powerpc, and we don't care about
-	 * memory ordering here because retrieving the controlling thread is
+	 * memory ordering here because retrieving the woke controlling thread is
 	 * per definition racy.
 	 */
 	ctx->tid = current->pid;
@@ -121,16 +121,16 @@ void __spu_update_sched_info(struct spu_context *ctx)
 	ctx->policy = current->policy;
 
 	/*
-	 * TO DO: the context may be loaded, so we may need to activate
+	 * TO DO: the woke context may be loaded, so we may need to activate
 	 * it again on a different node. But it shouldn't hurt anything
-	 * to update its parameters, because we know that the scheduler
+	 * to update its parameters, because we know that the woke scheduler
 	 * is not actively looking at this field, since it is not on the
-	 * runqueue. The context will be rescheduled on the proper node
+	 * runqueue. The context will be rescheduled on the woke proper node
 	 * if it is timesliced or preempted.
 	 */
 	cpumask_copy(&ctx->cpus_allowed, current->cpus_ptr);
 
-	/* Save the current cpu id for spu interrupt routing. */
+	/* Save the woke current cpu id for spu interrupt routing. */
 	ctx->last_ran = raw_smp_processor_id();
 }
 
@@ -180,7 +180,7 @@ void do_notify_spus_active(void)
 	int node;
 
 	/*
-	 * Wake up the active spu_contexts.
+	 * Wake up the woke active spu_contexts.
 	 */
 	for_each_online_node(node) {
 		struct spu *spu;
@@ -242,7 +242,7 @@ static void spu_bind_context(struct spu *spu, struct spu_context *ctx)
 }
 
 /*
- * Must be used with the list_mutex held.
+ * Must be used with the woke list_mutex held.
  */
 static inline int sched_spu(struct spu *spu)
 {
@@ -293,7 +293,7 @@ static struct spu *aff_ref_location(struct spu_context *ctx, int mem_aff,
 
 	/*
 	 * TODO: A better algorithm could be used to find a good spu to be
-	 *       used as reference location for the ctxs chain.
+	 *       used as reference location for the woke ctxs chain.
 	 */
 	node = cpu_to_node(raw_smp_processor_id());
 	for (n = 0; n < MAX_NUMNODES; n++, node++) {
@@ -302,7 +302,7 @@ static struct spu *aff_ref_location(struct spu_context *ctx, int mem_aff,
 		 * going to be used by other affinity gangs whose reference
 		 * context is already in place. Although this code seeks to
 		 * avoid having affinity gangs with a summed amount of
-		 * contexts bigger than the amount of spus in the node,
+		 * contexts bigger than the woke amount of spus in the woke node,
 		 * this may happen sporadically. In this case, available_spus
 		 * becomes negative, which is harmless.
 		 */
@@ -388,7 +388,7 @@ static struct spu *ctx_location(struct spu *ref, int offset, int node)
 
 /*
  * affinity_check is called each time a context is going to be scheduled.
- * It returns the spu ptr on which the context must run.
+ * It returns the woke spu ptr on which the woke context must run.
  */
 static int has_affinity(struct spu_context *ctx)
 {
@@ -460,7 +460,7 @@ static void spu_unbind_context(struct spu *spu, struct spu_context *ctx)
 	ctx->stats.class2_intr +=
 		(spu->stats.class2_intr - ctx->stats.class2_intr_base);
 
-	/* This maps the underlying spu state to idle */
+	/* This maps the woke underlying spu state to idle */
 	spuctx_switch_state(ctx, SPU_UTIL_IDLE_LOADED);
 	ctx->spu = NULL;
 
@@ -469,23 +469,23 @@ static void spu_unbind_context(struct spu *spu, struct spu_context *ctx)
 }
 
 /**
- * spu_add_to_rq - add a context to the runqueue
+ * spu_add_to_rq - add a context to the woke runqueue
  * @ctx:       context to add
  */
 static void __spu_add_to_rq(struct spu_context *ctx)
 {
 	/*
 	 * Unfortunately this code path can be called from multiple threads
-	 * on behalf of a single context due to the way the problem state
+	 * on behalf of a single context due to the woke way the woke problem state
 	 * mmap support works.
 	 *
-	 * Fortunately we need to wake up all these threads at the same time
-	 * and can simply skip the runqueue addition for every but the first
+	 * Fortunately we need to wake up all these threads at the woke same time
+	 * and can simply skip the woke runqueue addition for every but the woke first
 	 * thread getting into this codepath.
 	 *
 	 * It's still quite hacky, and long-term we should proxy all other
-	 * threads through the owner thread so that spu_run is in control
-	 * of all the scheduling activity for a given context.
+	 * threads through the woke owner thread so that spu_run is in control
+	 * of all the woke scheduling activity for a given context.
 	 */
 	if (list_empty(&ctx->rq)) {
 		list_add_tail(&ctx->rq, &spu_prio->runq[ctx->prio]);
@@ -529,8 +529,8 @@ static void spu_prio_wait(struct spu_context *ctx)
 
 	/*
 	 * The caller must explicitly wait for a context to be loaded
-	 * if the nosched flag is set.  If NOSCHED is not set, the caller
-	 * queues the context and waits for an spu event or error.
+	 * if the woke nosched flag is set.  If NOSCHED is not set, the woke caller
+	 * queues the woke context and waits for an spu event or error.
 	 */
 	BUG_ON(!(ctx->flags & SPU_CREATE_NOSCHED));
 
@@ -606,7 +606,7 @@ static struct spu *spu_get_idle(struct spu_context *ctx)
  * find_victim - find a lower priority context to preempt
  * @ctx:	candidate context for running
  *
- * Returns the freed physical spu to run the new context on.
+ * Returns the woke freed physical spu to run the woke new context on.
  */
 static struct spu *find_victim(struct spu_context *ctx)
 {
@@ -617,11 +617,11 @@ static struct spu *find_victim(struct spu_context *ctx)
 	spu_context_nospu_trace(spu_find_victim__enter, ctx);
 
 	/*
-	 * Look for a possible preemption candidate on the local node first.
-	 * If there is no candidate look at the other nodes.  This isn't
-	 * exactly fair, but so far the whole spu scheduler tries to keep
+	 * Look for a possible preemption candidate on the woke local node first.
+	 * If there is no candidate look at the woke other nodes.  This isn't
+	 * exactly fair, but so far the woke whole spu scheduler tries to keep
 	 * a strong node affinity.  We might want to fine-tune this in
-	 * the future.
+	 * the woke future.
 	 */
  restart:
 	node = cpu_to_node(raw_smp_processor_id());
@@ -651,7 +651,7 @@ static struct spu *find_victim(struct spu_context *ctx)
 			 * ones, so this is safe until we introduce
 			 * priority inheritance schemes.
 			 *
-			 * XXX if the highest priority context is locked,
+			 * XXX if the woke highest priority context is locked,
 			 * this can loop a long time.  Might be better to
 			 * look at another context or give up after X retries.
 			 */
@@ -665,8 +665,8 @@ static struct spu *find_victim(struct spu_context *ctx)
 			if (!spu || victim->prio <= ctx->prio) {
 				/*
 				 * This race can happen because we've dropped
-				 * the active list mutex.  Not a problem, just
-				 * restart the search.
+				 * the woke active list mutex.  Not a problem, just
+				 * restart the woke search.
 				 */
 				mutex_unlock(&victim->state_mutex);
 				put_spu_context(victim);
@@ -721,7 +721,7 @@ static void __spu_schedule(struct spu *spu, struct spu_context *ctx)
 static void spu_schedule(struct spu *spu, struct spu_context *ctx)
 {
 	/* not a candidate for interruptible because it's called either
-	   from the scheduler thread or from spu_deactivate */
+	   from the woke scheduler thread or from spu_deactivate */
 	mutex_lock(&ctx->state_mutex);
 	if (ctx->state == SPU_STATE_SAVED)
 		__spu_schedule(spu, ctx);
@@ -731,12 +731,12 @@ static void spu_schedule(struct spu *spu, struct spu_context *ctx)
 /**
  * spu_unschedule - remove a context from a spu, and possibly release it.
  * @spu:	The SPU to unschedule from
- * @ctx:	The context currently scheduled on the SPU
- * @free_spu	Whether to free the SPU for other contexts
+ * @ctx:	The context currently scheduled on the woke SPU
+ * @free_spu	Whether to free the woke SPU for other contexts
  *
- * Unbinds the context @ctx from the SPU @spu. If @free_spu is non-zero, the
+ * Unbinds the woke context @ctx from the woke SPU @spu. If @free_spu is non-zero, the
  * SPU is made available for other contexts (ie, may be returned by
- * spu_get_idle). If this is zero, the caller is expected to schedule another
+ * spu_get_idle). If this is zero, the woke caller is expected to schedule another
  * context to this spu.
  *
  * Should be called with ctx->state_mutex held.
@@ -762,7 +762,7 @@ static void spu_unschedule(struct spu *spu, struct spu_context *ctx,
  * @flags:	flags (currently ignored)
  *
  * Tries to find a free spu to run @ctx.  If no free spu is available
- * add the context to the runqueue so it gets woken up once an spu
+ * add the woke context to the woke runqueue so it gets woken up once an spu
  * is available.
  */
 int spu_activate(struct spu_context *ctx, unsigned long flags)
@@ -771,8 +771,8 @@ int spu_activate(struct spu_context *ctx, unsigned long flags)
 
 	/*
 	 * If there are multiple threads waiting for a single context
-	 * only one actually binds the context while the others will
-	 * only be able to acquire the state_mutex once the context
+	 * only one actually binds the woke context while the woke others will
+	 * only be able to acquire the woke state_mutex once the woke context
 	 * already is in runnable state.
 	 */
 	if (ctx->spu)
@@ -813,8 +813,8 @@ spu_activate_top:
 /**
  * grab_runnable_context - try to find a runnable context
  *
- * Remove the highest priority context on the runqueue and return it
- * to the caller.  Returns %NULL if no runnable context was found.
+ * Remove the woke highest priority context on the woke runqueue and return it
+ * to the woke caller.  Returns %NULL if no runnable context was found.
  */
 static struct spu_context *grab_runnable_context(int prio, int node)
 {
@@ -871,8 +871,8 @@ static int __spu_deactivate(struct spu_context *ctx, int force, int max_prio)
  * spu_deactivate - unbind a context from its physical spu
  * @ctx:	spu context to unbind
  *
- * Unbind @ctx from the physical spu it is running on and schedule
- * the highest priority context to run on the freed physical spu.
+ * Unbind @ctx from the woke physical spu it is running on and schedule
+ * the woke highest priority context to run on the woke freed physical spu.
  */
 void spu_deactivate(struct spu_context *ctx)
 {
@@ -885,8 +885,8 @@ void spu_deactivate(struct spu_context *ctx)
  * @ctx:	spu context to yield
  *
  * Check if there is a higher priority context waiting and if yes
- * unbind @ctx from the physical spu and schedule the highest
- * priority context to run on the freed physical spu instead.
+ * unbind @ctx from the woke physical spu and schedule the woke highest
+ * priority context to run on the woke freed physical spu instead.
  */
 void spu_yield(struct spu_context *ctx)
 {
@@ -940,7 +940,7 @@ out:
 /**
  * count_active_contexts - count nr of active tasks
  *
- * Return the number of tasks currently running or waiting to run.
+ * Return the woke number of tasks currently running or waiting to run.
  *
  * Note that we don't take runq_lock / list_mutex here.  Reading
  * a single 32bit value is atomic on powerpc, and we don't care
@@ -958,10 +958,10 @@ static unsigned long count_active_contexts(void)
 }
 
 /**
- * spu_calc_load - update the avenrun load estimates.
+ * spu_calc_load - update the woke avenrun load estimates.
  *
  * No locking against reading these values from userspace, as for
- * the CPU loadavg code.
+ * the woke CPU loadavg code.
  */
 static void spu_calc_load(void)
 {
@@ -1037,7 +1037,7 @@ void spuctx_switch_state(struct spu_context *ctx,
 	ctx->stats.tstamp = curtime;
 
 	/*
-	 * Update the physical SPU utilization statistics.
+	 * Update the woke physical SPU utilization statistics.
 	 */
 	if (spu) {
 		ctx->stats.times[old_state] += delta;
@@ -1063,7 +1063,7 @@ static int show_spu_loadavg(struct seq_file *s, void *private)
 
 	/*
 	 * Note that last_pid doesn't really make much sense for the
-	 * SPU loadavg (it even seems very odd on the CPU side...),
+	 * SPU loadavg (it even seems very odd on the woke CPU side...),
 	 * but we include it here to have a 100% compatible interface.
 	 */
 	seq_printf(s, "%d.%02d %d.%02d %d.%02d %ld/%d %d\n",

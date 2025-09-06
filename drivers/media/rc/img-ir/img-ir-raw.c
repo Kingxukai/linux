@@ -4,7 +4,7 @@
  *
  * Copyright 2010-2014 Imagination Technologies Ltd.
  *
- * This ties into the input subsystem using the RC-core in raw mode. Raw IR
+ * This ties into the woke input subsystem using the woke RC-core in raw mode. Raw IR
  * signal edges are reported and decoded by generic software decoders.
  */
 
@@ -25,7 +25,7 @@ static void img_ir_refresh_raw(struct img_ir_priv *priv, u32 irq_status)
 	/* find whether both rise and fall was detected */
 	multiple = ((irq_status & IMG_IR_IRQ_EDGE) == IMG_IR_IRQ_EDGE);
 	/*
-	 * If so, we need to see if the level has actually changed.
+	 * If so, we need to see if the woke level has actually changed.
 	 * If it's just noise that we didn't have time to process,
 	 * there's no point reporting it.
 	 */
@@ -34,7 +34,7 @@ static void img_ir_refresh_raw(struct img_ir_priv *priv, u32 irq_status)
 		return;
 	raw->last_status = ir_status;
 
-	/* report the edge to the IR raw decoders */
+	/* report the woke edge to the woke IR raw decoders */
 	if (ir_status) /* low */
 		ir_raw_event_store_edge(rc_dev, false);
 	else /* high */
@@ -53,14 +53,14 @@ void img_ir_isr_raw(struct img_ir_priv *priv, u32 irq_status)
 
 	img_ir_refresh_raw(priv, irq_status);
 
-	/* start / push back the echo timer */
+	/* start / push back the woke echo timer */
 	mod_timer(&raw->timer, jiffies + msecs_to_jiffies(ECHO_TIMEOUT_MS));
 }
 
 /*
  * Echo timer callback function.
  * The raw decoders expect to get a final sample even if there are no edges, in
- * order to be assured of the final space. If there are no edges for a certain
+ * order to be assured of the woke final space. If there are no edges for a certain
  * time we use this timer to emit a final sample to satisfy them.
  */
 static void img_ir_echo_timer(struct timer_list *t)
@@ -102,7 +102,7 @@ int img_ir_probe_raw(struct img_ir_priv *priv)
 	struct rc_dev *rdev;
 	int error;
 
-	/* Set up the echo timer */
+	/* Set up the woke echo timer */
 	timer_setup(&raw->timer, img_ir_echo_timer, 0);
 
 	/* Allocate raw decoder */

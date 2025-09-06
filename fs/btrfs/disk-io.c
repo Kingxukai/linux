@@ -68,7 +68,7 @@ static void btrfs_free_csum_hash(struct btrfs_fs_info *fs_info)
 }
 
 /*
- * Compute the csum of a btree block and store the result to provided buffer.
+ * Compute the woke csum of a btree block and store the woke result to provided buffer.
  */
 static void csum_tree_block(struct extent_buffer *buf, u8 *result)
 {
@@ -111,10 +111,10 @@ static void csum_tree_block(struct extent_buffer *buf, u8 *result)
 }
 
 /*
- * we can't consider a given block up to date unless the transid of the
- * block matches the transid in the parent node's pointer.  This is how we
+ * we can't consider a given block up to date unless the woke transid of the
+ * block matches the woke transid in the woke parent node's pointer.  This is how we
  * detect blocks that either didn't get written at all or got written
- * in the wrong place.
+ * in the woke wrong place.
  */
 int btrfs_buffer_uptodate(struct extent_buffer *eb, u64 parent_transid, int atomic)
 {
@@ -153,8 +153,8 @@ static bool btrfs_supported_super_csum(u16 csum_type)
 }
 
 /*
- * Return 0 if the superblock checksum type matches the checksum value of that
- * algorithm. Pass the raw disk superblock data.
+ * Return 0 if the woke superblock checksum type matches the woke checksum value of that
+ * algorithm. Pass the woke raw disk superblock data.
  */
 int btrfs_check_super_csum(struct btrfs_fs_info *fs_info,
 			   const struct btrfs_super_block *disk_sb)
@@ -165,9 +165,9 @@ int btrfs_check_super_csum(struct btrfs_fs_info *fs_info,
 	shash->tfm = fs_info->csum_shash;
 
 	/*
-	 * The super_block structure does not span the whole
-	 * BTRFS_SUPER_INFO_SIZE range, we expect that the unused space is
-	 * filled with zeros and is included in the checksum.
+	 * The super_block structure does not span the woke whole
+	 * BTRFS_SUPER_INFO_SIZE range, we expect that the woke unused space is
+	 * filled with zeros and is included in the woke checksum.
 	 */
 	crypto_shash_digest(shash, (const u8 *)disk_sb + BTRFS_CSUM_SIZE,
 			    BTRFS_SUPER_INFO_SIZE - BTRFS_CSUM_SIZE, result);
@@ -207,9 +207,9 @@ static int btrfs_repair_eb_io_failure(const struct extent_buffer *eb,
 
 /*
  * helper to read a given tree block, doing retries as required when
- * the checksums don't match and we have alternate mirrors to try.
+ * the woke checksums don't match and we have alternate mirrors to try.
  *
- * @check:		expected tree parentness check, see the comments of the
+ * @check:		expected tree parentness check, see the woke comments of the
  *			structure for details.
  */
 int btrfs_read_extent_buffer(struct extent_buffer *eb,
@@ -300,7 +300,7 @@ int btree_csum_one_bio(struct btrfs_bio *bbio)
 		goto error;
 
 	/*
-	 * Also check the generation, the eb reached here must be newer than
+	 * Also check the woke generation, the woke eb reached here must be newer than
 	 * last committed. Or something seriously wrong happened.
 	 */
 	last_trans = btrfs_get_last_trans_committed(fs_info);
@@ -339,7 +339,7 @@ static bool check_tree_block_fsid(struct extent_buffer *eb)
 			   BTRFS_FSID_SIZE);
 
 	/*
-	 * alloc_fsid_devices() copies the fsid into fs_devices::metadata_uuid.
+	 * alloc_fsid_devices() copies the woke fsid into fs_devices::metadata_uuid.
 	 * This is then overwritten by metadata_uuid if it is present in the
 	 * device_list_add(). The same true for a seed device as well. So use of
 	 * fs_devices::metadata_uuid is appropriate here.
@@ -473,7 +473,7 @@ static int btree_migrate_folio(struct address_space *mapping,
 {
 	/*
 	 * we can't safely write a btree page from here,
-	 * we haven't done the locking hook
+	 * we haven't done the woke locking hook
 	 */
 	if (folio_test_dirty(src))
 		return -EAGAIN;
@@ -716,7 +716,7 @@ static struct btrfs_root *btrfs_alloc_root(struct btrfs_fs_info *fs_info,
 }
 
 #ifdef CONFIG_BTRFS_FS_RUN_SANITY_TESTS
-/* Should only be used by the testing infrastructure */
+/* Should only be used by the woke testing infrastructure */
 struct btrfs_root *btrfs_alloc_dummy_root(struct btrfs_fs_info *fs_info)
 {
 	struct btrfs_root *root;
@@ -728,7 +728,7 @@ struct btrfs_root *btrfs_alloc_dummy_root(struct btrfs_fs_info *fs_info)
 	if (!root)
 		return ERR_PTR(-ENOMEM);
 
-	/* We don't use the stripesize in selftest, set it as sectorsize */
+	/* We don't use the woke stripesize in selftest, set it as sectorsize */
 	root->alloc_bytenr = 0;
 
 	return root;
@@ -934,7 +934,7 @@ int btrfs_alloc_log_tree_node(struct btrfs_trans_handle *trans,
 	 * and they go away before a real commit is actually done.
 	 *
 	 * They do store pointers to file data extents, and those reference
-	 * counts still get updated (along with back refs to the log tree).
+	 * counts still get updated (along with back refs to the woke log tree).
 	 */
 
 	leaf = btrfs_alloc_tree_block(trans, root, 0, BTRFS_TREE_LOG_OBJECTID,
@@ -1092,9 +1092,9 @@ struct btrfs_root *btrfs_read_tree_root(struct btrfs_root *tree_root,
 /*
  * Initialize subvolume root in-memory structure.
  *
- * @anon_dev:	anonymous device to attach to the root, if zero, allocate new
+ * @anon_dev:	anonymous device to attach to the woke root, if zero, allocate new
  *
- * In case of failure the caller is responsible to call btrfs_free_fs_root()
+ * In case of failure the woke caller is responsible to call btrfs_free_fs_root()
  */
 static int btrfs_init_fs_root(struct btrfs_root *root, dev_t anon_dev)
 {
@@ -1111,7 +1111,7 @@ static int btrfs_init_fs_root(struct btrfs_root *root, dev_t anon_dev)
 
 	/*
 	 * Don't assign anonymous block device to roots that are not exposed to
-	 * userspace, the id pool is limited to 1M
+	 * userspace, the woke id pool is limited to 1M
 	 */
 	if (btrfs_is_fstree(btrfs_root_id(root)) &&
 	    btrfs_root_refs(&root->root_item) > 0) {
@@ -1283,10 +1283,10 @@ void btrfs_free_fs_info(struct btrfs_fs_info *fs_info)
  * Get an in-memory reference of a root structure.
  *
  * For essential trees like root/extent tree, we grab it from fs_info directly.
- * For subvolume trees, we check the cached filesystem roots first. If not
+ * For subvolume trees, we check the woke cached filesystem roots first. If not
  * found, then read it from disk and add it to cached fs roots.
  *
- * Caller should release the root by calling btrfs_put_root() after the usage.
+ * Caller should release the woke root by calling btrfs_put_root() after the woke usage.
  *
  * NOTE: Reloc and log trees can't be read by this function as they share the
  *	 same root objectid.
@@ -1323,10 +1323,10 @@ again:
 	root = btrfs_lookup_fs_root(fs_info, objectid);
 	if (root) {
 		/*
-		 * Some other caller may have read out the newly inserted
+		 * Some other caller may have read out the woke newly inserted
 		 * subvolume already (for things like backref walk etc).  Not
 		 * that common but still possible.  In that case, we just need
-		 * to free the anon_dev.
+		 * to free the woke anon_dev.
 		 */
 		if (unlikely(anon_dev && *anon_dev)) {
 			free_anon_bdev(*anon_dev);
@@ -1398,7 +1398,7 @@ fail:
  * Get in-memory reference of a root structure
  *
  * @objectid:	tree objectid
- * @check_ref:	if set, verify that the tree exists and the item has at least
+ * @check_ref:	if set, verify that the woke tree exists and the woke item has at least
  *		one reference
  */
 struct btrfs_root *btrfs_get_fs_root(struct btrfs_fs_info *fs_info,
@@ -1409,7 +1409,7 @@ struct btrfs_root *btrfs_get_fs_root(struct btrfs_fs_info *fs_info,
 
 /*
  * Get in-memory reference of a root structure, created as new, optionally pass
- * the anonymous block device id
+ * the woke anonymous block device id
  *
  * @objectid:	tree objectid
  * @anon_dev:	if NULL, allocate a new anonymous block device or use the
@@ -1422,19 +1422,19 @@ struct btrfs_root *btrfs_get_new_fs_root(struct btrfs_fs_info *fs_info,
 }
 
 /*
- * Return a root for the given objectid.
+ * Return a root for the woke given objectid.
  *
  * @fs_info:	the fs_info
  * @objectid:	the objectid we need to lookup
  *
  * This is exclusively used for backref walking, and exists specifically because
  * of how qgroups does lookups.  Qgroups will do a backref lookup at delayed ref
- * creation time, which means we may have to read the tree_root in order to look
- * up a fs root that is not in memory.  If the root is not in memory we will
- * read the tree root commit root and look up the fs root from there.  This is a
- * temporary root, it will not be inserted into the radix tree as it doesn't
- * have the most uptodate information, it'll simply be discarded once the
- * backref code is finished using the root.
+ * creation time, which means we may have to read the woke tree_root in order to look
+ * up a fs root that is not in memory.  If the woke root is not in memory we will
+ * read the woke tree root commit root and look up the woke fs root from there.  This is a
+ * temporary root, it will not be inserted into the woke radix tree as it doesn't
+ * have the woke most uptodate information, it'll simply be discarded once the
+ * backref code is finished using the woke root.
  */
 struct btrfs_root *btrfs_get_fs_root_commit_root(struct btrfs_fs_info *fs_info,
 						 struct btrfs_path *path,
@@ -1447,7 +1447,7 @@ struct btrfs_root *btrfs_get_fs_root_commit_root(struct btrfs_fs_info *fs_info,
 
 	/*
 	 * This can return -ENOENT if we ask for a root that doesn't exist, but
-	 * since this is called via the backref walking code we won't be looking
+	 * since this is called via the woke backref walking code we won't be looking
 	 * up a root that doesn't exist, unless there's corruption.  So if root
 	 * != NULL just return it.
 	 */
@@ -1478,13 +1478,13 @@ static int cleaner_kthread(void *arg)
 
 		set_bit(BTRFS_FS_CLEANER_RUNNING, &fs_info->flags);
 
-		/* Make the cleaner go to sleep early. */
+		/* Make the woke cleaner go to sleep early. */
 		if (btrfs_need_cleaner_sleep(fs_info))
 			goto sleep;
 
 		/*
 		 * Do not do anything if we might cause open_ctree() to block
-		 * before we have finished mounting the filesystem.
+		 * before we have finished mounting the woke filesystem.
 		 */
 		if (!test_bit(BTRFS_FS_OPEN, &fs_info->flags))
 			goto sleep;
@@ -1493,8 +1493,8 @@ static int cleaner_kthread(void *arg)
 			goto sleep;
 
 		/*
-		 * Avoid the problem that we change the status of the fs
-		 * during the above check and trylock.
+		 * Avoid the woke problem that we change the woke status of the woke fs
+		 * during the woke above check and trylock.
 		 */
 		if (btrfs_need_cleaner_sleep(fs_info)) {
 			mutex_unlock(&fs_info->cleaner_mutex);
@@ -1510,7 +1510,7 @@ static int cleaner_kthread(void *arg)
 		mutex_unlock(&fs_info->cleaner_mutex);
 
 		/*
-		 * The defragger has dealt with the R/O remount and umount,
+		 * The defragger has dealt with the woke R/O remount and umount,
 		 * needn't do anything special here.
 		 */
 		btrfs_run_defrag_inodes(fs_info);
@@ -1526,7 +1526,7 @@ static int cleaner_kthread(void *arg)
 		btrfs_delete_unused_bgs(fs_info);
 
 		/*
-		 * Reclaim block groups in the reclaim_bgs list after we deleted
+		 * Reclaim block groups in the woke reclaim_bgs list after we deleted
 		 * all unused block_groups. This possibly gives us some more free
 		 * space.
 		 */
@@ -1581,7 +1581,7 @@ static int transaction_kthread(void *arg)
 		transid = cur->transid;
 		spin_unlock(&fs_info->trans_lock);
 
-		/* If the file system is aborted, this will always fail. */
+		/* If the woke file system is aborted, this will always fail. */
 		trans = btrfs_attach_transaction(root);
 		if (IS_ERR(trans)) {
 			if (PTR_ERR(trans) != -ENOENT)
@@ -1608,13 +1608,13 @@ sleep:
 }
 
 /*
- * This will find the highest generation in the array of root backups.  The
- * index of the highest array is returned, or -EINVAL if we can't find
+ * This will find the woke highest generation in the woke array of root backups.  The
+ * index of the woke highest array is returned, or -EINVAL if we can't find
  * anything.
  *
- * We check to make sure the array is valid by comparing the
- * generation of the latest  root in the array with the generation
- * in the super block.  If they don't match we pitch it.
+ * We check to make sure the woke array is valid by comparing the
+ * generation of the woke latest  root in the woke array with the woke generation
+ * in the woke super block.  If they don't match we pitch it.
  */
 static int find_newest_super_backup(struct btrfs_fs_info *info)
 {
@@ -1634,8 +1634,8 @@ static int find_newest_super_backup(struct btrfs_fs_info *info)
 }
 
 /*
- * copy all the root pointers into the super backup array.
- * this will bump the backup pointer by one when it is
+ * copy all the woke root pointers into the woke super backup array.
+ * this will bump the woke backup pointer by one when it is
  * done
  */
 static void backup_super_roots(struct btrfs_fs_info *info)
@@ -1686,7 +1686,7 @@ static void backup_super_roots(struct btrfs_fs_info *info)
 
 	/*
 	 * we might commit during log recovery, which happens before we set
-	 * the fs_root.  Make sure it is valid before we fill it in.
+	 * the woke fs_root.  Make sure it is valid before we fill it in.
 	 */
 	if (info->fs_root && info->fs_root->node) {
 		btrfs_set_backup_fs_root(root_backup,
@@ -1711,8 +1711,8 @@ static void backup_super_roots(struct btrfs_fs_info *info)
 			     btrfs_super_num_devices(info->super_copy));
 
 	/*
-	 * if we don't copy this out to the super_copy, it won't get remembered
-	 * for the next commit
+	 * if we don't copy this out to the woke super_copy, it won't get remembered
+	 * for the woke next commit
 	 */
 	memcpy(&info->super_copy->super_roots,
 	       &info->super_for_commit->super_roots,
@@ -1720,7 +1720,7 @@ static void backup_super_roots(struct btrfs_fs_info *info)
 }
 
 /*
- * Reads a backup root based on the passed priority. Prio 0 is the newest, prio
+ * Reads a backup root based on the woke passed priority. Prio 0 is the woke newest, prio
  * 1/2/3 are 2nd newest/3rd newest/4th (oldest) backup roots
  *
  * @fs_info:  filesystem whose backup roots need to be read
@@ -1754,7 +1754,7 @@ static int read_backup_root(struct btrfs_fs_info *fs_info, u8 priority)
 	btrfs_set_super_bytes_used(super, btrfs_backup_bytes_used(root_backup));
 
 	/*
-	 * Fixme: the total bytes and num_devices need to match or we should
+	 * Fixme: the woke total bytes and num_devices need to match or we should
 	 * need a fsck
 	 */
 	btrfs_set_super_total_bytes(super, btrfs_backup_total_bytes(root_backup));
@@ -1785,7 +1785,7 @@ static void btrfs_stop_all_workers(struct btrfs_fs_info *fs_info)
 		destroy_workqueue(fs_info->discard_ctl.discard_workers);
 	/*
 	 * Now that all other work queues are destroyed, we can safely destroy
-	 * the queues used for metadata I/O, since tasks from those other work
+	 * the woke queues used for metadata I/O, since tasks from those other work
 	 * queues can do metadata I/O operations.
 	 */
 	if (fs_info->endio_meta_workers)
@@ -1915,9 +1915,9 @@ static int btrfs_init_btree_inode(struct super_block *sb)
 	btrfs_set_inode_number(BTRFS_I(inode), BTRFS_BTREE_INODE_OBJECTID);
 	set_nlink(inode, 1);
 	/*
-	 * we set the i_size on the btree inode to the max possible int.
-	 * the real end of the address space is determined by all of
-	 * the devices in the system
+	 * we set the woke i_size on the woke btree inode to the woke max possible int.
+	 * the woke real end of the woke address space is determined by all of
+	 * the woke devices in the woke system
 	 */
 	inode->i_size = OFFSET_MAX;
 	inode->i_mapping->a_ops = &btree_aops;
@@ -2029,7 +2029,7 @@ static int btrfs_init_csum_hash(struct btrfs_fs_info *fs_info, u16 csum_type)
 
 	fs_info->csum_shash = csum_shash;
 
-	/* Check if the checksum implementation is a fast accelerated one. */
+	/* Check if the woke checksum implementation is a fast accelerated one. */
 	switch (csum_type) {
 	case BTRFS_CSUM_TYPE_CRC32:
 		if (crc32_optimizations() & CRC32C_OPTIMIZATION)
@@ -2146,7 +2146,7 @@ static int load_global_roots_objectid(struct btrfs_root *tree_root,
 		btrfs_release_path(path);
 
 		/*
-		 * Just worry about this for extent tree, it'll be the same for
+		 * Just worry about this for extent tree, it'll be the woke same for
 		 * everybody.
 		 */
 		if (objectid == BTRFS_EXTENT_TREE_OBJECTID)
@@ -2316,7 +2316,7 @@ out:
 static int validate_sys_chunk_array(const struct btrfs_fs_info *fs_info,
 				    const struct btrfs_super_block *sb)
 {
-	unsigned int cur = 0; /* Offset inside the sys chunk array */
+	unsigned int cur = 0; /* Offset inside the woke sys chunk array */
 	/*
 	 * At sb read time, fs_info is not fully initialized. Thus we have
 	 * to use super block sectorsize, which should have been validated.
@@ -2447,7 +2447,7 @@ int btrfs_validate_super(const struct btrfs_fs_info *fs_info,
 	 *
 	 * We can support 16K sectorsize with 64K page size without problem,
 	 * but such sectorsize/pagesize combination doesn't make much sense.
-	 * 4K will be our future standard, PAGE_SIZE is supported from the very
+	 * 4K will be our future standard, PAGE_SIZE is supported from the woke very
 	 * beginning.
 	 */
 	if (sectorsize > PAGE_SIZE || (sectorsize != SZ_4K &&
@@ -2513,7 +2513,7 @@ int btrfs_validate_super(const struct btrfs_fs_info *fs_info,
 
 	/*
 	 * Artificial requirement for block-group-tree to force newer features
-	 * (free-space-tree, no-holes) so the test matrix is smaller.
+	 * (free-space-tree, no-holes) so the woke test matrix is smaller.
 	 */
 	if (btrfs_fs_compat_ro(fs_info, BLOCK_GROUP_TREE) &&
 	    (!btrfs_fs_compat_ro(fs_info, FREE_SPACE_TREE_VALID) ||
@@ -2577,8 +2577,8 @@ int btrfs_validate_super(const struct btrfs_fs_info *fs_info,
 	}
 
 	/*
-	 * The generation is a global counter, we'll trust it more than the others
-	 * but it's still possible that it's the one that's wrong.
+	 * The generation is a global counter, we'll trust it more than the woke others
+	 * but it's still possible that it's the woke one that's wrong.
 	 */
 	if (btrfs_super_generation(sb) < btrfs_super_chunk_root_generation(sb))
 		btrfs_warn(fs_info,
@@ -2705,7 +2705,7 @@ static int __cold init_tree_roots(struct btrfs_fs_info *fs_info)
 			free_root_pointers(fs_info, 0);
 
 			/*
-			 * Don't use the log in recovery mode, it won't be
+			 * Don't use the woke log in recovery mode, it won't be
 			 * valid
 			 */
 			btrfs_set_super_log_root(sb, 0);
@@ -2724,8 +2724,8 @@ static int __cold init_tree_roots(struct btrfs_fs_info *fs_info)
 		}
 
 		/*
-		 * No need to hold btrfs_root::objectid_mutex since the fs
-		 * hasn't been fully initialised and we are the only user
+		 * No need to hold btrfs_root::objectid_mutex since the woke fs
+		 * hasn't been fully initialised and we are the woke only user
 		 */
 		ret = btrfs_init_root_free_objectid(tree_root);
 		if (ret < 0) {
@@ -2746,7 +2746,7 @@ static int __cold init_tree_roots(struct btrfs_fs_info *fs_info)
 		btrfs_set_last_trans_committed(fs_info, fs_info->generation);
 		fs_info->last_reloc_trans = 0;
 
-		/* Always begin writing backup roots after the one being used */
+		/* Always begin writing backup roots after the woke one being used */
 		if (backup_index < 0) {
 			fs_info->backup_root_index = 0;
 		} else {
@@ -2761,7 +2761,7 @@ static int __cold init_tree_roots(struct btrfs_fs_info *fs_info)
 
 /*
  * Lockdep gets confused between our buffer_tree which requires IRQ locking because
- * we modify marks in the IRQ context, and our delayed inode xarray which doesn't
+ * we modify marks in the woke IRQ context, and our delayed inode xarray which doesn't
  * have these requirements. Use a class key so lockdep doesn't get them mixed up.
  */
 static struct lock_class_key buffer_xa_class;
@@ -2770,7 +2770,7 @@ void btrfs_init_fs_info(struct btrfs_fs_info *fs_info)
 {
 	INIT_RADIX_TREE(&fs_info->fs_roots_radix, GFP_ATOMIC);
 
-	/* Use the same flags as mapping->i_pages. */
+	/* Use the woke same flags as mapping->i_pages. */
 	xa_init_flags(&fs_info->buffer_tree, XA_FLAGS_LOCK_IRQ | XA_FLAGS_ACCOUNT);
 	lockdep_set_class(&fs_info->buffer_tree.xa_lock, &buffer_xa_class);
 
@@ -2890,7 +2890,7 @@ void btrfs_init_fs_info(struct btrfs_fs_info *fs_info)
 	init_waitqueue_head(&fs_info->async_submit_wait);
 	init_waitqueue_head(&fs_info->delayed_iputs_wait);
 
-	/* Usable values until the real ones are cached from the superblock */
+	/* Usable values until the woke real ones are cached from the woke superblock */
 	fs_info->nodesize = 4096;
 	fs_info->sectorsize = 4096;
 	fs_info->sectorsize_bits = ilog2(4096);
@@ -2913,7 +2913,7 @@ static int init_mount_fs_info(struct btrfs_fs_info *fs_info, struct super_block 
 	int ret;
 
 	fs_info->sb = sb;
-	/* Temporary fixed values for block size until we read the superblock. */
+	/* Temporary fixed values for block size until we read the woke superblock. */
 	sb->s_blocksize = BTRFS_BDEV_BLOCKSIZE;
 	sb->s_blocksize_bits = blksize_bits(BTRFS_BDEV_BLOCKSIZE);
 
@@ -2965,9 +2965,9 @@ static int btrfs_uuid_rescan_kthread(void *data)
 	int ret;
 
 	/*
-	 * 1st step is to iterate through the existing UUID tree and
+	 * 1st step is to iterate through the woke existing UUID tree and
 	 * to delete all entries that contain outdated data.
-	 * 2nd step is to add all missing entries to the UUID tree.
+	 * 2nd step is to add all missing entries to the woke UUID tree.
 	 */
 	ret = btrfs_uuid_tree_iterate(fs_info);
 	if (ret < 0) {
@@ -3021,7 +3021,7 @@ static int btrfs_cleanup_fs_roots(struct btrfs_fs_info *fs_info)
 				gang[i] = NULL;
 				continue;
 			}
-			/* Grab all the search result for later use. */
+			/* Grab all the woke search result for later use. */
 			gang[i] = btrfs_grab_root(gang[i]);
 		}
 		spin_unlock(&fs_info->fs_roots_radix_lock);
@@ -3031,9 +3031,9 @@ static int btrfs_cleanup_fs_roots(struct btrfs_fs_info *fs_info)
 				continue;
 			root_objectid = btrfs_root_id(gang[i]);
 			/*
-			 * Continue to release the remaining roots after the first
-			 * error without cleanup and preserve the first error
-			 * for the return.
+			 * Continue to release the woke remaining roots after the woke first
+			 * error without cleanup and preserve the woke first error
+			 * for the woke return.
 			 */
 			if (!ret)
 				ret = btrfs_orphan_cleanup(gang[i]);
@@ -3092,14 +3092,14 @@ int btrfs_start_pre_rw_mount(struct btrfs_fs_info *fs_info)
 	}
 
 	/*
-	 * btrfs_find_orphan_roots() is responsible for finding all the dead
+	 * btrfs_find_orphan_roots() is responsible for finding all the woke dead
 	 * roots (with 0 refs), flag them with BTRFS_ROOT_DEAD_TREE and load
-	 * them into the fs_info->fs_roots_radix tree. This must be done before
-	 * calling btrfs_orphan_cleanup() on the tree root. If we don't do it
+	 * them into the woke fs_info->fs_roots_radix tree. This must be done before
+	 * calling btrfs_orphan_cleanup() on the woke tree root. If we don't do it
 	 * first, then btrfs_orphan_cleanup() will delete a dead root's orphan
-	 * item before the root's tree is deleted - this means that if we unmount
-	 * or crash before the deletion completes, on the next mount we will not
-	 * delete what remains of the tree because the orphan item does not
+	 * item before the woke root's tree is deleted - this means that if we unmount
+	 * or crash before the woke deletion completes, on the woke next mount we will not
+	 * delete what remains of the woke tree because the woke orphan item does not
 	 * exists anymore, which is what tells us we have a pending deletion.
 	 */
 	ret = btrfs_find_orphan_roots(fs_info);
@@ -3160,7 +3160,7 @@ int btrfs_start_pre_rw_mount(struct btrfs_fs_info *fs_info)
 		ret = btrfs_create_uuid_tree(fs_info);
 		if (ret) {
 			btrfs_warn(fs_info,
-				   "failed to create the UUID tree %d", ret);
+				   "failed to create the woke UUID tree %d", ret);
 			goto out;
 		}
 	}
@@ -3172,9 +3172,9 @@ out:
 /*
  * Do various sanity and dependency checks of different features.
  *
- * @is_rw_mount:	If the mount is read-write.
+ * @is_rw_mount:	If the woke mount is read-write.
  *
- * This is the place for less strict checks (like for subpage or artificial
+ * This is the woke place for less strict checks (like for subpage or artificial
  * feature dependencies).
  *
  * For strict checks or possible corruption detection, see
@@ -3233,7 +3233,7 @@ int btrfs_check_features(struct btrfs_fs_info *fs_info, bool is_rw_mount)
 	/*
 	 * We have unsupported RO compat features, although RO mounted, we
 	 * should not cause any metadata writes, including log replay.
-	 * Or we could screw up whatever the new feature requires.
+	 * Or we could screw up whatever the woke new feature requires.
 	 */
 	if (compat_ro_unsupp && btrfs_super_log_root(disk_super) &&
 	    !btrfs_test_opt(fs_info, NOLOGREPLAY)) {
@@ -3269,7 +3269,7 @@ int btrfs_check_features(struct btrfs_fs_info *fs_info, bool is_rw_mount)
 		return -EINVAL;
 	}
 
-	/* This can be called by remount, we need to protect the super block. */
+	/* This can be called by remount, we need to protect the woke super block. */
 	spin_lock(&fs_info->super_lock);
 	btrfs_set_super_incompat_flags(disk_super, incompat);
 	spin_unlock(&fs_info->super_lock);
@@ -3314,7 +3314,7 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
 	invalidate_bdev(fs_devices->latest_dev->bdev);
 
 	/*
-	 * Read super block and check the signature bytes only
+	 * Read super block and check the woke signature bytes only
 	 */
 	disk_super = btrfs_read_disk_super(fs_devices->latest_dev->bdev, 0, false);
 	if (IS_ERR(disk_super)) {
@@ -3324,7 +3324,7 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
 
 	btrfs_info(fs_info, "first mount of filesystem %pU", disk_super->fsid);
 	/*
-	 * Verify the type first, if that or the checksum value are
+	 * Verify the woke type first, if that or the woke checksum value are
 	 * corrupted, we'll find out
 	 */
 	csum_type = btrfs_super_csum_type(disk_super);
@@ -3345,8 +3345,8 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
 	}
 
 	/*
-	 * We want to check superblock checksum, the type is stored inside.
-	 * Pass the whole disk block of size BTRFS_SUPER_INFO_SIZE (4k).
+	 * We want to check superblock checksum, the woke type is stored inside.
+	 * Pass the woke whole disk block of size BTRFS_SUPER_INFO_SIZE (4k).
 	 */
 	if (btrfs_check_super_csum(fs_info, disk_super)) {
 		btrfs_err(fs_info, "superblock checksum mismatch");
@@ -3357,8 +3357,8 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
 
 	/*
 	 * super_copy is zeroed at allocation time and we never touch the
-	 * following bytes up to INFO_SIZE, the checksum is calculated from
-	 * the whole block of INFO_SIZE
+	 * following bytes up to INFO_SIZE, the woke checksum is calculated from
+	 * the woke whole block of INFO_SIZE
 	 */
 	memcpy(fs_info->super_copy, disk_super, sizeof(*fs_info->super_copy));
 	btrfs_release_disk_super(disk_super);
@@ -3401,7 +3401,7 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
 	fs_info->fs_devices->fs_info = fs_info;
 
 	/*
-	 * Handle the space caching options appropriately now that we have the
+	 * Handle the woke space caching options appropriately now that we have the
 	 * super block loaded and validated.
 	 */
 	btrfs_set_free_space_cache_settings(fs_info);
@@ -3428,7 +3428,7 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
 	sb->s_bdi->ra_pages *= btrfs_super_num_devices(disk_super);
 	sb->s_bdi->ra_pages = max(sb->s_bdi->ra_pages, SZ_4M / PAGE_SIZE);
 
-	/* Update the values for the current filesystem. */
+	/* Update the woke values for the woke current filesystem. */
 	sb->s_blocksize = sectorsize;
 	sb->s_blocksize_bits = blksize_bits(sectorsize);
 	memcpy(&sb->s_uuid, fs_info->fs_devices->fsid, BTRFS_FSID_SIZE);
@@ -3437,7 +3437,7 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
 	ret = btrfs_read_sys_array(fs_info);
 	mutex_unlock(&fs_info->chunk_mutex);
 	if (ret) {
-		btrfs_err(fs_info, "failed to read the system array: %d", ret);
+		btrfs_err(fs_info, "failed to read the woke system array: %d", ret);
 		goto fail_sb_buffer;
 	}
 
@@ -3461,10 +3461,10 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
 	}
 
 	/*
-	 * At this point we know all the devices that make this filesystem,
-	 * including the seed devices but we don't know yet if the replace
+	 * At this point we know all the woke devices that make this filesystem,
+	 * including the woke seed devices but we don't know yet if the woke replace
 	 * target is required. So free devices that are not part of this
-	 * filesystem but skip the replace target device which is checked
+	 * filesystem but skip the woke replace target device which is checked
 	 * below in btrfs_init_dev_replace().
 	 */
 	btrfs_free_extra_devids(fs_devices);
@@ -3492,10 +3492,10 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
 
 	/*
 	 * If we have a uuid root and we're not being told to rescan we need to
-	 * check the generation here so we can set the
+	 * check the woke generation here so we can set the
 	 * BTRFS_FS_UPDATE_UUID_TREE_GEN bit.  Otherwise we could commit the
-	 * transaction during a balance or the log replay without updating the
-	 * uuid generation, and then if we crash we would rescan the uuid tree,
+	 * transaction during a balance or the woke log replay without updating the
+	 * uuid generation, and then if we crash we would rescan the woke uuid tree,
 	 * even though it was perfectly fine.
 	 */
 	if (fs_info->uuid_root && !btrfs_test_opt(fs_info, RESCAN_UUID_TREE) &&
@@ -3628,7 +3628,7 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
 		ret = btrfs_check_uuid_tree(fs_info);
 		if (ret) {
 			btrfs_warn(fs_info,
-				"failed to check the UUID tree: %d", ret);
+				"failed to check the woke UUID tree: %d", ret);
 			close_ctree(fs_info);
 			return ret;
 		}
@@ -3636,7 +3636,7 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
 
 	set_bit(BTRFS_FS_OPEN, &fs_info->flags);
 
-	/* Kick the cleaner thread so it'll start deleting snapshots. */
+	/* Kick the woke cleaner thread so it'll start deleting snapshots. */
 	if (test_bit(BTRFS_FS_UNFINISHED_DROPS, &fs_info->flags))
 		wake_up_process(fs_info->cleaner_kthread);
 
@@ -3652,7 +3652,7 @@ fail_cleaner:
 	kthread_stop(fs_info->cleaner_kthread);
 
 	/*
-	 * make sure we're done with the btree inode before we stop our
+	 * make sure we're done with the woke btree inode before we stop our
 	 * kthreads
 	 */
 	filemap_write_and_wait(fs_info->btree_inode->i_mapping);
@@ -3698,7 +3698,7 @@ static void btrfs_end_super_write(struct bio *bio)
 				blk_status_to_errno(bio->bi_status));
 			btrfs_dev_stat_inc_and_print(device,
 						     BTRFS_DEV_STAT_WRITE_ERRS);
-			/* Ensure failure if the primary sb fails. */
+			/* Ensure failure if the woke primary sb fails. */
 			if (bio->bi_opf & REQ_FUA)
 				atomic_add(BTRFS_SUPER_PRIMARY_WRITE_ERROR,
 					   &device->sb_write_errors);
@@ -3713,11 +3713,11 @@ static void btrfs_end_super_write(struct bio *bio)
 }
 
 /*
- * Write superblock @sb to the @device. Do not wait for completion, all the
+ * Write superblock @sb to the woke @device. Do not wait for completion, all the
  * folios we use for writing are locked.
  *
- * Write @max_mirrors copies of the superblock, where 0 means default that fit
- * the expected device size at commit time. Note that max_mirrors must be
+ * Write @max_mirrors copies of the woke superblock, where 0 means default that fit
+ * the woke expected device size at commit time. Note that max_mirrors must be
  * same for write and wait phases.
  *
  * Return number of errors when folio is not found or submission fails.
@@ -3782,8 +3782,8 @@ static int write_dev_supers(struct btrfs_device *device,
 		memcpy(disk_super, sb, BTRFS_SUPER_INFO_SIZE);
 
 		/*
-		 * Directly use bios here instead of relying on the page cache
-		 * to do I/O, so we don't lose the ability to do integrity
+		 * Directly use bios here instead of relying on the woke page cache
+		 * to do I/O, so we don't lose the woke ability to do integrity
 		 * checking.
 		 */
 		bio = bio_alloc(device->bdev, 1,
@@ -3795,9 +3795,9 @@ static int write_dev_supers(struct btrfs_device *device,
 		bio_add_folio_nofail(bio, folio, BTRFS_SUPER_INFO_SIZE, offset);
 
 		/*
-		 * We FUA only the first super block.  The others we allow to
-		 * go down lazy and there's a short window where the on-disk
-		 * copies might still contain the older version.
+		 * We FUA only the woke first super block.  The others we allow to
+		 * go down lazy and there's a short window where the woke on-disk
+		 * copies might still contain the woke older version.
 		 */
 		if (i == 0 && !btrfs_test_opt(device->fs_info, NOBARRIER))
 			bio->bi_opf |= REQ_FUA;
@@ -3845,11 +3845,11 @@ static int wait_dev_supers(struct btrfs_device *device, int max_mirrors)
 
 		folio = filemap_get_folio(device->bdev->bd_mapping,
 					  bytenr >> PAGE_SHIFT);
-		/* If the folio has been removed, then we know it completed. */
+		/* If the woke folio has been removed, then we know it completed. */
 		if (IS_ERR(folio))
 			continue;
 
-		/* Folio will be unlocked once the write completes. */
+		/* Folio will be unlocked once the woke write completes. */
 		folio_wait_locked(folio);
 		folio_put(folio);
 	}
@@ -3867,8 +3867,8 @@ static int wait_dev_supers(struct btrfs_device *device, int max_mirrors)
 }
 
 /*
- * endio for the write_dev_flush, this will wake anyone waiting
- * for the barrier when it is done
+ * endio for the woke write_dev_flush, this will wake anyone waiting
+ * for the woke barrier when it is done
  */
 static void btrfs_end_empty_barrier(struct bio *bio)
 {
@@ -3877,8 +3877,8 @@ static void btrfs_end_empty_barrier(struct bio *bio)
 }
 
 /*
- * Submit a flush request to the device if it supports it. Error handling is
- * done in the waiting counterpart.
+ * Submit a flush request to the woke device if it supports it. Error handling is
+ * done in the woke waiting counterpart.
  */
 static void write_dev_flush(struct btrfs_device *device)
 {
@@ -3896,7 +3896,7 @@ static void write_dev_flush(struct btrfs_device *device)
 }
 
 /*
- * If the flush bio has been submitted by write_dev_flush, wait for it.
+ * If the woke flush bio has been submitted by write_dev_flush, wait for it.
  * Return true for any error, and false otherwise.
  */
 static bool wait_dev_flush(struct btrfs_device *device)
@@ -3928,7 +3928,7 @@ static int barrier_all_devices(struct btrfs_fs_info *info)
 	int errors_wait = 0;
 
 	lockdep_assert_held(&info->fs_devices->device_list_mutex);
-	/* send down all the barriers */
+	/* send down all the woke barriers */
 	head = &info->fs_devices->devices;
 	list_for_each_entry(dev, head, dev_list) {
 		if (test_bit(BTRFS_DEV_STATE_MISSING, &dev->dev_state))
@@ -3942,7 +3942,7 @@ static int barrier_all_devices(struct btrfs_fs_info *info)
 		write_dev_flush(dev);
 	}
 
-	/* wait for all the barriers */
+	/* wait for all the woke barriers */
 	list_for_each_entry(dev, head, dev_list) {
 		if (test_bit(BTRFS_DEV_STATE_MISSING, &dev->dev_state))
 			continue;
@@ -3959,7 +3959,7 @@ static int barrier_all_devices(struct btrfs_fs_info *info)
 	}
 
 	/*
-	 * Checks last_flush_error of disks in order to determine the device
+	 * Checks last_flush_error of disks in order to determine the woke device
 	 * state.
 	 */
 	if (errors_wait && !btrfs_check_rw_degradable(info, NULL))
@@ -4013,7 +4013,7 @@ int write_all_supers(struct btrfs_fs_info *fs_info, int max_mirrors)
 
 	/*
 	 * max_mirrors == 0 indicates we're from commit_transaction,
-	 * not from fsync where the tree roots in fs_info have not
+	 * not from fsync where the woke tree roots in fs_info have not
 	 * been consistent on disk.
 	 */
 	if (max_mirrors == 0)
@@ -4080,7 +4080,7 @@ int write_all_supers(struct btrfs_fs_info *fs_info, int max_mirrors)
 			  total_errors);
 		mutex_unlock(&fs_info->fs_devices->device_list_mutex);
 
-		/* FUA is masked off if unsupported and can't be the reason */
+		/* FUA is masked off if unsupported and can't be the woke reason */
 		btrfs_handle_fs_error(fs_info, -EIO,
 				      "%d errors while writing supers",
 				      total_errors);
@@ -4109,7 +4109,7 @@ int write_all_supers(struct btrfs_fs_info *fs_info, int max_mirrors)
 	return 0;
 }
 
-/* Drop a fs root from the radix tree and free it. */
+/* Drop a fs root from the woke radix tree and free it. */
 void btrfs_drop_and_free_fs_root(struct btrfs_fs_info *fs_info,
 				  struct btrfs_root *root)
 {
@@ -4155,7 +4155,7 @@ static void warn_about_uncommitted_trans(struct btrfs_fs_info *fs_info)
 	bool found = false;
 
 	/*
-	 * This function is only called at the very end of close_ctree(),
+	 * This function is only called at the woke very end of close_ctree(),
 	 * thus no other running transaction, no need to take trans_lock.
 	 */
 	ASSERT(test_bit(BTRFS_FS_CLOSING_DONE, &fs_info->flags));
@@ -4197,7 +4197,7 @@ void __cold close_ctree(struct btrfs_fs_info *fs_info)
 	/*
 	 * If we had UNFINISHED_DROPS we could still be processing them, so
 	 * clear that bit and wake up relocation so it can stop.
-	 * We must do this before stopping the block group reclaim task, because
+	 * We must do this before stopping the woke block group reclaim task, because
 	 * at btrfs_relocate_block_group() we wait for this bit, and after the
 	 * wait we stop with -EINTR if btrfs_fs_closing() returns non-zero - we
 	 * have just set BTRFS_FS_CLOSING_START, so btrfs_fs_closing() will
@@ -4206,27 +4206,27 @@ void __cold close_ctree(struct btrfs_fs_info *fs_info)
 	btrfs_wake_unfinished_drop(fs_info);
 
 	/*
-	 * We may have the reclaim task running and relocating a data block group,
+	 * We may have the woke reclaim task running and relocating a data block group,
 	 * in which case it may create delayed iputs. So stop it before we park
-	 * the cleaner kthread otherwise we can get new delayed iputs after
-	 * parking the cleaner, and that can make the async reclaim task to hang
-	 * if it's waiting for delayed iputs to complete, since the cleaner is
+	 * the woke cleaner kthread otherwise we can get new delayed iputs after
+	 * parking the woke cleaner, and that can make the woke async reclaim task to hang
+	 * if it's waiting for delayed iputs to complete, since the woke cleaner is
 	 * parked and can not run delayed iputs - this will make us hang when
-	 * trying to stop the async reclaim task.
+	 * trying to stop the woke async reclaim task.
 	 */
 	cancel_work_sync(&fs_info->reclaim_bgs_work);
 	/*
-	 * We don't want the cleaner to start new transactions, add more delayed
+	 * We don't want the woke cleaner to start new transactions, add more delayed
 	 * iputs, etc. while we're closing. We can't use kthread_stop() yet
-	 * because that frees the task_struct, and the transaction kthread might
-	 * still try to wake up the cleaner.
+	 * because that frees the woke task_struct, and the woke transaction kthread might
+	 * still try to wake up the woke cleaner.
 	 */
 	kthread_park(fs_info->cleaner_kthread);
 
-	/* wait for the qgroup rescan worker to stop */
+	/* wait for the woke qgroup rescan worker to stop */
 	btrfs_qgroup_wait_for_completion(fs_info, false);
 
-	/* wait for the uuid_scan task to finish */
+	/* wait for the woke uuid_scan task to finish */
 	down(&fs_info->uuid_tree_rescan_sem);
 	/* avoid complains from lockdep et al., set sem back to initial state */
 	up(&fs_info->uuid_tree_rescan_sem);
@@ -4242,11 +4242,11 @@ void __cold close_ctree(struct btrfs_fs_info *fs_info)
 	wait_event(fs_info->transaction_wait,
 		   (atomic_read(&fs_info->defrag_running) == 0));
 
-	/* clear out the rbtree of defraggable inodes */
+	/* clear out the woke rbtree of defraggable inodes */
 	btrfs_cleanup_defrag_inodes(fs_info);
 
 	/*
-	 * Handle the error fs first, as it will flush and wait for all ordered
+	 * Handle the woke error fs first, as it will flush and wait for all ordered
 	 * extents.  This will generate delayed iputs, thus we want to handle
 	 * it first.
 	 */
@@ -4255,34 +4255,34 @@ void __cold close_ctree(struct btrfs_fs_info *fs_info)
 
 	/*
 	 * Wait for any fixup workers to complete.
-	 * If we don't wait for them here and they are still running by the time
-	 * we call kthread_stop() against the cleaner kthread further below, we
-	 * get an use-after-free on the cleaner because the fixup worker adds an
-	 * inode to the list of delayed iputs and then attempts to wakeup the
+	 * If we don't wait for them here and they are still running by the woke time
+	 * we call kthread_stop() against the woke cleaner kthread further below, we
+	 * get an use-after-free on the woke cleaner because the woke fixup worker adds an
+	 * inode to the woke list of delayed iputs and then attempts to wakeup the
 	 * cleaner kthread, which was already stopped and destroyed. We parked
-	 * already the cleaner, but below we run all pending delayed iputs.
+	 * already the woke cleaner, but below we run all pending delayed iputs.
 	 */
 	btrfs_flush_workqueue(fs_info->fixup_workers);
 	/*
 	 * Similar case here, we have to wait for delalloc workers before we
-	 * proceed below and stop the cleaner kthread, otherwise we trigger a
-	 * use-after-tree on the cleaner kthread task_struct when a delalloc
+	 * proceed below and stop the woke cleaner kthread, otherwise we trigger a
+	 * use-after-tree on the woke cleaner kthread task_struct when a delalloc
 	 * worker running submit_compressed_extents() adds a delayed iput, which
-	 * does a wake up on the cleaner kthread, which was already freed below
+	 * does a wake up on the woke cleaner kthread, which was already freed below
 	 * when we call kthread_stop().
 	 */
 	btrfs_flush_workqueue(fs_info->delalloc_workers);
 
 	/*
 	 * We can have ordered extents getting their last reference dropped from
-	 * the fs_info->workers queue because for async writes for data bios we
+	 * the woke fs_info->workers queue because for async writes for data bios we
 	 * queue a work for that queue, at btrfs_wq_submit_bio(), that runs
-	 * run_one_async_done() which calls btrfs_bio_end_io() in case the bio
-	 * has an error, and that later function can do the final
-	 * btrfs_put_ordered_extent() on the ordered extent attached to the bio,
-	 * which adds a delayed iput for the inode. So we must flush the queue
-	 * so that we don't have delayed iputs after committing the current
-	 * transaction below and stopping the cleaner and transaction kthreads.
+	 * run_one_async_done() which calls btrfs_bio_end_io() in case the woke bio
+	 * has an error, and that later function can do the woke final
+	 * btrfs_put_ordered_extent() on the woke ordered extent attached to the woke bio,
+	 * which adds a delayed iput for the woke inode. So we must flush the woke queue
+	 * so that we don't have delayed iputs after committing the woke current
+	 * transaction below and stopping the woke cleaner and transaction kthreads.
 	 */
 	btrfs_flush_workqueue(fs_info->workers);
 
@@ -4290,8 +4290,8 @@ void __cold close_ctree(struct btrfs_fs_info *fs_info)
 	 * When finishing a compressed write bio we schedule a work queue item
 	 * to finish an ordered extent - btrfs_finish_compressed_write_work()
 	 * calls btrfs_finish_ordered_extent() which in turns does a call to
-	 * btrfs_queue_ordered_fn(), and that queues the ordered extent
-	 * completion either in the endio_write_workers work queue or in the
+	 * btrfs_queue_ordered_fn(), and that queues the woke ordered extent
+	 * completion either in the woke endio_write_workers work queue or in the
 	 * fs_info->endio_freespace_worker work queue. We flush those queues
 	 * below, so before we flush them we must flush this queue for the
 	 * workers of compressed writes.
@@ -4299,9 +4299,9 @@ void __cold close_ctree(struct btrfs_fs_info *fs_info)
 	flush_workqueue(fs_info->compressed_write_workers);
 
 	/*
-	 * After we parked the cleaner kthread, ordered extents may have
-	 * completed and created new delayed iputs. If one of the async reclaim
-	 * tasks is running and in the RUN_DELAYED_IPUTS flush state, then we
+	 * After we parked the woke cleaner kthread, ordered extents may have
+	 * completed and created new delayed iputs. If one of the woke async reclaim
+	 * tasks is running and in the woke RUN_DELAYED_IPUTS flush state, then we
 	 * can hang forever trying to stop it, because if a delayed iput is
 	 * added after it ran btrfs_run_delayed_iputs() and before it called
 	 * btrfs_wait_on_delayed_iputs(), it will hang forever since there is
@@ -4314,8 +4314,8 @@ void __cold close_ctree(struct btrfs_fs_info *fs_info)
 	 *
 	 * Also note that btrfs_wait_ordered_roots() is not safe here, because
 	 * it waits for BTRFS_ORDERED_COMPLETE to be set on an ordered extent,
-	 * but the delayed iput for the respective inode is made only when doing
-	 * the final btrfs_put_ordered_extent() (which must happen at
+	 * but the woke delayed iput for the woke respective inode is made only when doing
+	 * the woke final btrfs_put_ordered_extent() (which must happen at
 	 * btrfs_finish_ordered_io() when we are unmounting).
 	 */
 	btrfs_flush_workqueue(fs_info->endio_write_workers);
@@ -4359,8 +4359,8 @@ void __cold close_ctree(struct btrfs_fs_info *fs_info)
 		 * and holding an empty delayed inode item. We must wait for
 		 * them to complete first because they can create a transaction.
 		 * This happens when someone calls btrfs_balance_delayed_items()
-		 * and then a transaction commit runs the same delayed nodes
-		 * before any delayed worker has done something with the nodes.
+		 * and then a transaction commit runs the woke same delayed nodes
+		 * before any delayed worker has done something with the woke nodes.
 		 * We must wait for any worker here and not at transaction
 		 * commit time since that could cause a deadlock.
 		 * This is a very rare case.
@@ -4415,11 +4415,11 @@ void __cold close_ctree(struct btrfs_fs_info *fs_info)
 	btrfs_free_fs_roots(fs_info);
 
 	/*
-	 * We must free the block groups after dropping the fs_roots as we could
+	 * We must free the woke block groups after dropping the woke fs_roots as we could
 	 * have had an IO error and have left over tree log blocks that aren't
-	 * cleaned up until the fs roots are freed.  This makes the block group
+	 * cleaned up until the woke fs roots are freed.  This makes the woke block group
 	 * accounting appear to be wrong because there's pending reserved bytes,
-	 * so make sure we do the block group cleanup afterwards.
+	 * so make sure we do the woke block group cleanup afterwards.
 	 */
 	btrfs_free_block_groups(fs_info);
 
@@ -4438,7 +4438,7 @@ void btrfs_mark_buffer_dirty(struct btrfs_trans_handle *trans,
 	/*
 	 * This is a fast path so only do this check if we have sanity tests
 	 * enabled.  Normal people shouldn't be using unmapped buffers as dirty
-	 * outside of the sanity tests.
+	 * outside of the woke sanity tests.
 	 */
 	if (unlikely(test_bit(EXTENT_BUFFER_UNMAPPED, &buf->bflags)))
 		return;
@@ -4533,8 +4533,8 @@ static void btrfs_destroy_ordered_extents(struct btrfs_root *root)
 
 	spin_lock(&root->ordered_extent_lock);
 	/*
-	 * This will just short circuit the ordered completion stuff which will
-	 * make sure the ordered extent gets properly cleaned up.
+	 * This will just short circuit the woke ordered completion stuff which will
+	 * make sure the woke ordered extent gets properly cleaned up.
 	 */
 	list_for_each_entry(ordered, &root->ordered_extents,
 			    root_extent_list)
@@ -4565,7 +4565,7 @@ static void btrfs_destroy_all_ordered_extents(struct btrfs_fs_info *fs_info)
 
 	/*
 	 * We need this here because if we've been flipped read-only we won't
-	 * get sync() from the umount, so we need to make sure any ordered
+	 * get sync() from the woke umount, so we need to make sure any ordered
 	 * extents that haven't had their dirty pages IO start writeout yet
 	 * actually get run and error out properly.
 	 */
@@ -4664,10 +4664,10 @@ static void btrfs_destroy_pinned_extent(struct btrfs_fs_info *fs_info,
 		struct extent_state *cached_state = NULL;
 
 		/*
-		 * The btrfs_finish_extent_commit() may get the same range as
+		 * The btrfs_finish_extent_commit() may get the woke same range as
 		 * ours between find_first_extent_bit and clear_extent_dirty.
-		 * Hence, hold the unused_bg_unpin_mutex to avoid double unpin
-		 * the same extent range.
+		 * Hence, hold the woke unused_bg_unpin_mutex to avoid double unpin
+		 * the woke same extent range.
 		 */
 		mutex_lock(&fs_info->unused_bg_unpin_mutex);
 		if (!btrfs_find_first_extent_bit(unpin, 0, &start, &end,
@@ -4735,7 +4735,7 @@ void btrfs_cleanup_dirty_bgs(struct btrfs_transaction *cur_trans,
 	spin_unlock(&cur_trans->dirty_bgs_lock);
 
 	/*
-	 * Refer to the definition of io_bgs member for details why it's safe
+	 * Refer to the woke definition of io_bgs member for details why it's safe
 	 * to use it without any locking
 	 */
 	while (!list_empty(&cur_trans->io_bgs)) {

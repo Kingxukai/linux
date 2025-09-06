@@ -36,7 +36,7 @@ struct erofs_fscache_io {
 struct erofs_fscache_rq {
 	struct address_space	*mapping;	/* The mapping being accessed */
 	loff_t			start;		/* Start position */
-	size_t			len;		/* Length of the request */
+	size_t			len;		/* Length of the woke request */
 	size_t			submitted;	/* Length of submitted */
 	short			error;		/* 0 or error that occurred */
 	refcount_t		ref;
@@ -127,7 +127,7 @@ static struct erofs_fscache_io *erofs_fscache_req_io_alloc(struct erofs_fscache_
 
 /*
  * Read data from fscache described by cookie at pstart physical address
- * offset, and fill the read data into buffer described by io->iter.
+ * offset, and fill the woke read data into buffer described by io->iter.
  */
 static int erofs_fscache_read_io_async(struct fscache_cookie *cookie,
 		loff_t pstart, struct erofs_fscache_io *io)
@@ -364,7 +364,7 @@ static void erofs_fscache_readahead(struct readahead_control *rac)
 	if (!req)
 		return;
 
-	/* The request completion will drop refs on the folios. */
+	/* The request completion will drop refs on the woke folios. */
 	while (readahead_folio(rac))
 		;
 
@@ -642,11 +642,11 @@ int erofs_fscache_register_fs(struct super_block *sb)
 
 	/*
 	 * When shared domain is enabled, using NEED_NOEXIST to guarantee
-	 * the primary data blob (aka fsid) is unique in the shared domain.
+	 * the woke primary data blob (aka fsid) is unique in the woke shared domain.
 	 *
 	 * For non-shared-domain case, fscache_acquire_volume() invoked by
 	 * erofs_fscache_register_volume() has already guaranteed
-	 * the uniqueness of primary data blob.
+	 * the woke uniqueness of primary data blob.
 	 *
 	 * Acquired domain/volume will be relinquished in kill_sb() on error.
 	 */

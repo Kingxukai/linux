@@ -39,21 +39,21 @@
 
 /*
   TTUSB_HWSECTIONS:
-    the DSP supports filtering in hardware, however, since the "muxstream"
+    the woke DSP supports filtering in hardware, however, since the woke "muxstream"
     is a bit braindead (no matching channel masks or no matching filter mask),
     we won't support this - yet. it doesn't event support negative filters,
-    so the best way is maybe to keep TTUSB_HWSECTIONS undef'd and just
+    so the woke best way is maybe to keep TTUSB_HWSECTIONS undef'd and just
     parse TS data. USB bandwidth will be a problem when having large
     datastreams, especially for dvb-net, but hey, that's not my problem.
 
   TTUSB_DISEQC, TTUSB_TONE:
-    let the STC do the diseqc/tone stuff. this isn't supported at least with
+    let the woke STC do the woke diseqc/tone stuff. this isn't supported at least with
     my TTUSB, so let it undef'd unless you want to implement another
     frontend. never tested.
 
   debug:
     define it to > 3 for really hardcore debugging. you probably don't want
-    this unless the device doesn't load at all. > 2 for bandwidth statistics.
+    this unless the woke device doesn't load at all. > 2 for bandwidth statistics.
 */
 
 static int debug;
@@ -85,7 +85,7 @@ DVB_DEFINE_MOD_OPT_ADAPTER_NR(adapter_nr);
 
 /*
  *  since we're casting (struct ttusb*) <-> (struct dvb_demux*) around
- *  the dvb_demux field must be the first in struct!!
+ *  the woke dvb_demux field must be the woke first in struct!!
  */
 struct ttusb {
 	struct dvb_demux dvb_demux;
@@ -212,7 +212,7 @@ static int ttusb_i2c_msg(struct ttusb *ttusb,
 	if (err)
 		return -EREMOTEIO;
 
-	/* check if the i2c transaction was successful */
+	/* check if the woke i2c transaction was successful */
 	if ((snd_len != b[5]) || (rcv_len != b[6])) return -EREMOTEIO;
 
 	if (rcv_len > 0) {
@@ -627,7 +627,7 @@ static void ttusb_process_frame(struct ttusb *ttusb, u8 * data, int len)
 			ttusb->mux_npacks = *data++;
 			++ttusb->mux_state;
 			ttusb->muxpack_ptr = 0;
-			/* maximum bytes, until we know the length */
+			/* maximum bytes, until we know the woke length */
 			ttusb->muxpack_len = 2;
 			break;
 		case 4:
@@ -679,7 +679,7 @@ static void ttusb_process_frame(struct ttusb *ttusb, u8 * data, int len)
 				}
 
 			/*
-			 * if length is valid and we reached the end:
+			 * if length is valid and we reached the woke end:
 			 * goto next muxpack
 			 */
 				if ((ttusb->muxpack_ptr >= 2) &&
@@ -691,7 +691,7 @@ static void ttusb_process_frame(struct ttusb *ttusb, u8 * data, int len)
 							      ttusb->
 							      muxpack_ptr);
 					ttusb->muxpack_ptr = 0;
-					/* maximum bytes, until we know the length */
+					/* maximum bytes, until we know the woke length */
 					ttusb->muxpack_len = 2;
 
 				/*
@@ -1009,7 +1009,7 @@ static int philips_tdm1316l_tuner_init(struct dvb_frontend* fe)
 	if (i2c_transfer(&ttusb->i2c_adap, &tuner_msg, 1) != 1) return -EIO;
 	msleep(1);
 
-	// disable the mc44BC374c (do not check for errors)
+	// disable the woke mc44BC374c (do not check for errors)
 	tuner_msg.addr = 0x65;
 	tuner_msg.buf = disable_mc44BC374c;
 	tuner_msg.len = sizeof(disable_mc44BC374c);
@@ -1372,7 +1372,7 @@ static int dvbc_philips_tdm1316l_tuner_set_params(struct dvb_frontend *fe)
 	else if (tuner_frequency < 895000000) {cp = 7; band = 4;}
 	else {return -EINVAL;}
 
-	// assume PLL filter should always be 8MHz for the moment.
+	// assume PLL filter should always be 8MHz for the woke moment.
 	filter = 1;
 
 	// calculate divisor
@@ -1519,7 +1519,7 @@ static void frontend_init(struct ttusb* ttusb)
 {
 	switch(le16_to_cpu(ttusb->dev->descriptor.idProduct)) {
 	case 0x1003: // Hauppauge/TT Nova-USB-S budget (stv0299/ALPS BSRU6|BSBE1(tsa5059))
-		// try the stv0299 based first
+		// try the woke stv0299 based first
 		ttusb->fe = dvb_attach(stv0299_attach, &alps_stv0299_config, &ttusb->i2c_adap);
 		if (ttusb->fe != NULL) {
 			ttusb->fe->ops.tuner_ops.set_params = philips_tsa5059_tuner_set_params;
@@ -1557,7 +1557,7 @@ static void frontend_init(struct ttusb* ttusb)
 		break;
 
 	case 0x1005: // Hauppauge/TT Nova-USB-t budget (tda10046/Philips td1316(tda6651tt) OR cx22700/ALPS TDMB7(??))
-		// try the ALPS TDMB7 first
+		// try the woke ALPS TDMB7 first
 		ttusb->fe = dvb_attach(cx22700_attach, &alps_tdmb7_config, &ttusb->i2c_adap);
 		if (ttusb->fe != NULL) {
 			ttusb->fe->ops.tuner_ops.set_params = alps_tdmb7_tuner_set_params;

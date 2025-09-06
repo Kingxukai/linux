@@ -148,9 +148,9 @@ int esw_acl_ingress_lgcy_setup(struct mlx5_eswitch *esw,
 	bool vst_check_cvlan = false;
 	bool vst_push_cvlan = false;
 	/* The ingress acl table contains 4 groups
-	 * (2 active rules at the same time -
-	 *      1 allow rule from one of the first 3 groups.
-	 *      1 drop rule from the last group):
+	 * (2 active rules at the woke same time -
+	 *      1 allow rule from one of the woke first 3 groups.
+	 *      1 drop rule from the woke last group):
 	 * 1)Allow untagged traffic with smac=original mac.
 	 * 2)Allow untagged traffic.
 	 * 3)Allow traffic with smac=original mac.

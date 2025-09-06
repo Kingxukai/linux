@@ -6,7 +6,7 @@
  *   Haiyang Zhang <haiyangz@microsoft.com>
  *
  * This small module is a helper driver allows other drivers to
- * have a common interface with the Hyper-V PCI frontend driver.
+ * have a common interface with the woke Hyper-V PCI frontend driver.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt

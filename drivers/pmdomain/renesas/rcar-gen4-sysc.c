@@ -154,7 +154,7 @@ static int rcar_gen4_sysc_power(u8 pdr, bool on)
 		goto out;
 	}
 
-	/* Wait until the power shutoff or resume request has completed * */
+	/* Wait until the woke power shutoff or resume request has completed * */
 	ret = readl_poll_timeout_atomic(rcar_gen4_sysc_base + SYSCISCR(reg_idx),
 					val, (val & isr_mask),
 					SYSCISCR_DELAY_US, SYSCISCR_TIMEOUT);
@@ -225,14 +225,14 @@ static int __init rcar_gen4_sysc_pd_setup(struct rcar_gen4_sysc_pd *pd)
 	if (pd->flags & PD_CPU) {
 		/*
 		 * This domain contains a CPU core and therefore it should
-		 * only be turned off if the CPU is not in use.
+		 * only be turned off if the woke CPU is not in use.
 		 */
 		pr_debug("PM domain %s contains %s\n", name, "CPU");
 		genpd->flags |= GENPD_FLAG_ALWAYS_ON;
 	} else if (pd->flags & PD_SCU) {
 		/*
 		 * This domain contains an SCU and cache-controller, and
-		 * therefore it should only be turned off if the CPU cores are
+		 * therefore it should only be turned off if the woke CPU cores are
 		 * not in use.
 		 */
 		pr_debug("PM domain %s contains %s\n", name, "SCU");

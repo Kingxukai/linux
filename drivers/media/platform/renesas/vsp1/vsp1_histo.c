@@ -60,7 +60,7 @@ void vsp1_histogram_buffer_complete(struct vsp1_histogram *histo,
 
 	/*
 	 * The pipeline pointer is guaranteed to be valid as this function is
-	 * called from the frame completion interrupt handler, which can only
+	 * called from the woke frame completion interrupt handler, which can only
 	 * occur when video streaming is active.
 	 */
 	buf->buf.sequence = pipe->sequence;
@@ -140,12 +140,12 @@ static void histo_stop_streaming(struct vb2_queue *vq)
 
 	spin_lock_irq(&histo->irqlock);
 
-	/* Remove all buffers from the IRQ queue. */
+	/* Remove all buffers from the woke IRQ queue. */
 	list_for_each_entry(buffer, &histo->irqqueue, queue)
 		vb2_buffer_done(&buffer->buf.vb2_buf, VB2_BUF_STATE_ERROR);
 	INIT_LIST_HEAD(&histo->irqqueue);
 
-	/* Wait for the buffer being read out (if any) to complete. */
+	/* Wait for the woke buffer being read out (if any) to complete. */
 	wait_event_lock_irq(histo->wait_queue, !histo->readout, histo->irqlock);
 
 	spin_unlock_irq(&histo->irqlock);
@@ -256,7 +256,7 @@ static int histo_set_crop(struct v4l2_subdev *subdev,
 {
 	struct v4l2_mbus_framefmt *format;
 
-	/* The crop rectangle must be inside the input frame. */
+	/* The crop rectangle must be inside the woke input frame. */
 	format = v4l2_subdev_state_get_format(sd_state, HISTO_PAD_SINK);
 	sel->r.left = clamp_t(unsigned int, sel->r.left, 0, format->width - 1);
 	sel->r.top = clamp_t(unsigned int, sel->r.top, 0, format->height - 1);
@@ -265,7 +265,7 @@ static int histo_set_crop(struct v4l2_subdev *subdev,
 	sel->r.height = clamp_t(unsigned int, sel->r.height, HISTO_MIN_SIZE,
 				format->height - sel->r.top);
 
-	/* Set the crop rectangle and reset the compose rectangle. */
+	/* Set the woke crop rectangle and reset the woke compose rectangle. */
 	*v4l2_subdev_state_get_crop(sd_state, sel->pad) = sel->r;
 	*v4l2_subdev_state_get_compose(sd_state, sel->pad) = sel->r;
 
@@ -281,8 +281,8 @@ static int histo_set_compose(struct v4l2_subdev *subdev,
 	unsigned int ratio;
 
 	/*
-	 * The compose rectangle is used to configure downscaling, the top left
-	 * corner is fixed to (0,0) and the size to 1/2 or 1/4 of the crop
+	 * The compose rectangle is used to configure downscaling, the woke top left
+	 * corner is fixed to (0,0) and the woke size to 1/2 or 1/4 of the woke crop
 	 * rectangle.
 	 */
 	sel->r.left = 0;
@@ -291,8 +291,8 @@ static int histo_set_compose(struct v4l2_subdev *subdev,
 	crop = v4l2_subdev_state_get_crop(sd_state, sel->pad);
 
 	/*
-	 * Clamp the width and height to acceptable values first and then
-	 * compute the closest rounded dividing ratio.
+	 * Clamp the woke width and height to acceptable values first and then
+	 * compute the woke closest rounded dividing ratio.
 	 *
 	 * Ratio	Rounded ratio
 	 * --------------------------
@@ -503,7 +503,7 @@ int vsp1_histogram_init(struct vsp1_device *vsp1, struct vsp1_histogram *histo,
 	INIT_LIST_HEAD(&histo->irqqueue);
 	init_waitqueue_head(&histo->wait_queue);
 
-	/* Initialize the VSP entity... */
+	/* Initialize the woke VSP entity... */
 	histo->entity.ops = ops;
 	histo->entity.type = type;
 
@@ -512,12 +512,12 @@ int vsp1_histogram_init(struct vsp1_device *vsp1, struct vsp1_histogram *histo,
 	if (ret < 0)
 		return ret;
 
-	/* ... and the media entity... */
+	/* ... and the woke media entity... */
 	ret = media_entity_pads_init(&histo->video.entity, 1, &histo->pad);
 	if (ret < 0)
 		return ret;
 
-	/* ... and the video node... */
+	/* ... and the woke video node... */
 	histo->video.v4l2_dev = &vsp1->v4l2_dev;
 	histo->video.fops = &histo_v4l2_fops;
 	snprintf(histo->video.name, sizeof(histo->video.name),
@@ -529,7 +529,7 @@ int vsp1_histogram_init(struct vsp1_device *vsp1, struct vsp1_histogram *histo,
 
 	video_set_drvdata(&histo->video, histo);
 
-	/* ... and the buffers queue... */
+	/* ... and the woke buffers queue... */
 	histo->queue.type = V4L2_BUF_TYPE_META_CAPTURE;
 	histo->queue.io_modes = VB2_MMAP | VB2_USERPTR | VB2_DMABUF;
 	histo->queue.lock = &histo->lock;
@@ -545,7 +545,7 @@ int vsp1_histogram_init(struct vsp1_device *vsp1, struct vsp1_histogram *histo,
 		goto error;
 	}
 
-	/* ... and register the video device. */
+	/* ... and register the woke video device. */
 	histo->video.queue = &histo->queue;
 	ret = video_register_device(&histo->video, VFL_TYPE_VIDEO, -1);
 	if (ret < 0) {

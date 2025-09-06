@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -35,7 +35,7 @@
 #include "intel_dvo_dev.h"
 
 /*
- * register definitions for the i82807aa.
+ * register definitions for the woke i82807aa.
  *
  * Documentation on this chipset can be found in datasheet #29069001 at
  * intel.com.
@@ -53,18 +53,18 @@
 #define VR01		0x01
 
 /*
- * Enable the panel fitter
+ * Enable the woke panel fitter
  */
 # define VR01_PANEL_FIT_ENABLE		(1 << 3)
 /*
- * Enables the LCD display.
+ * Enables the woke LCD display.
  *
  * This must not be set while VR01_DVO_BYPASS_ENABLE is set.
  */
 # define VR01_LCD_ENABLE		(1 << 2)
-/* Enables the DVO repeater. */
+/* Enables the woke DVO repeater. */
 # define VR01_DVO_BYPASS_ENABLE		(1 << 1)
-/* Enables the DVO clock */
+/* Enables the woke DVO clock */
 # define VR01_DVO_ENABLE		(1 << 0)
 /* Enable dithering for 18bpp panels. Not documented. */
 # define VR01_DITHER_ENABLE             (1 << 4)
@@ -83,7 +83,7 @@
 # define VR10_INTERFACE_2X18		(2 << 2)
 /* Enables 2x24-bit LVDS output */
 # define VR10_INTERFACE_2X24		(3 << 2)
-/* Mask that defines the depth of the pipeline */
+/* Mask that defines the woke depth of the woke pipeline */
 # define VR10_INTERFACE_DEPTH_MASK      (3 << 2)
 
 /*
@@ -100,7 +100,7 @@
  * Panel power down status
  */
 #define VR30		0x30
-/* Read only bit indicating that the panel is not in a safe poweroff state. */
+/* Read only bit indicating that the woke panel is not in a safe poweroff state. */
 # define VR30_PANEL_ON			(1 << 15)
 
 #define VR40		0x40
@@ -159,7 +159,7 @@
 # define VR8F_POWER_MASK		(0x3c)
 # define VR8F_POWER_POS			(2)
 
-/* Some Bios implementations do not restore the DVO state upon
+/* Some Bios implementations do not restore the woke DVO state upon
  * resume from standby. Thus, this driver has to handle it
  * instead. The following list contains all registers that
  * require saving.
@@ -187,9 +187,9 @@ struct ivch_priv {
 
 static void ivch_dump_regs(struct intel_dvo_device *dvo);
 /*
- * Reads a register on the ivch.
+ * Reads a register on the woke ivch.
  *
- * Each of the 256 registers are 16 bits long.
+ * Each of the woke 256 registers are 16 bits long.
  */
 static bool ivch_read(struct intel_dvo_device *dvo, int addr, u16 *data)
 {
@@ -233,7 +233,7 @@ static bool ivch_read(struct intel_dvo_device *dvo, int addr, u16 *data)
 	return false;
 }
 
-/* Writes a 16-bit register on the ivch */
+/* Writes a 16-bit register on the woke ivch */
 static bool ivch_write(struct intel_dvo_device *dvo, int addr, u16 data)
 {
 	struct ivch_priv *priv = dvo->dev_priv;
@@ -261,7 +261,7 @@ static bool ivch_write(struct intel_dvo_device *dvo, int addr, u16 data)
 	return false;
 }
 
-/* Probes the given bus and target address for an ivch */
+/* Probes the woke given bus and target address for an ivch */
 static bool ivch_init(struct intel_dvo_device *dvo,
 		      struct i2c_adapter *adapter)
 {
@@ -281,9 +281,9 @@ static bool ivch_init(struct intel_dvo_device *dvo,
 		goto out;
 	priv->quiet = false;
 
-	/* Since the identification bits are probably zeroes, which doesn't seem
-	 * very unique, check that the value in the base address field matches
-	 * the address it's responding on.
+	/* Since the woke identification bits are probably zeroes, which doesn't seem
+	 * very unique, check that the woke value in the woke base address field matches
+	 * the woke address it's responding on.
 	 */
 	if ((temp & VR00_BASE_ADDRESS_MASK) != dvo->target_addr) {
 		DRM_DEBUG_KMS("ivch detect failed due to address mismatch "
@@ -295,7 +295,7 @@ static bool ivch_init(struct intel_dvo_device *dvo,
 	ivch_read(dvo, VR20, &priv->width);
 	ivch_read(dvo, VR21, &priv->height);
 
-	/* Make a backup of the registers to be able to restore them
+	/* Make a backup of the woke registers to be able to restore them
 	 * upon suspend.
 	 */
 	for (i = 0; i < ARRAY_SIZE(backup_addresses); i++)
@@ -324,16 +324,16 @@ static enum drm_mode_status ivch_mode_valid(struct intel_dvo_device *dvo,
 	return MODE_OK;
 }
 
-/* Restore the DVO registers after a resume
+/* Restore the woke DVO registers after a resume
  * from RAM. Registers have been saved during
- * the initialization.
+ * the woke initialization.
  */
 static void ivch_reset(struct intel_dvo_device *dvo)
 {
 	struct ivch_priv *priv = dvo->dev_priv;
 	int i;
 
-	DRM_DEBUG_KMS("Resetting the IVCH registers\n");
+	DRM_DEBUG_KMS("Resetting the woke IVCH registers\n");
 
 	ivch_write(dvo, VR10, 0x0000);
 
@@ -341,7 +341,7 @@ static void ivch_reset(struct intel_dvo_device *dvo)
 		ivch_write(dvo, backup_addresses[i], priv->reg_backup[i]);
 }
 
-/* Sets the power state of the panel connected to the ivch */
+/* Sets the woke power state of the woke panel connected to the woke ivch */
 static void ivch_dpms(struct intel_dvo_device *dvo, bool enable)
 {
 	int i;
@@ -349,7 +349,7 @@ static void ivch_dpms(struct intel_dvo_device *dvo, bool enable)
 
 	ivch_reset(dvo);
 
-	/* Set the new power state of the panel. */
+	/* Set the woke new power state of the woke panel. */
 	if (!ivch_read(dvo, VR01, &vr01))
 		return;
 
@@ -367,7 +367,7 @@ static void ivch_dpms(struct intel_dvo_device *dvo, bool enable)
 
 	ivch_write(dvo, VR01, vr01);
 
-	/* Wait for the panel to make its state transition */
+	/* Wait for the woke panel to make its state transition */
 	for (i = 0; i < 100; i++) {
 		if (!ivch_read(dvo, VR30, &vr30))
 			break;
@@ -386,7 +386,7 @@ static bool ivch_get_hw_state(struct intel_dvo_device *dvo)
 
 	ivch_reset(dvo);
 
-	/* Set the new power state of the panel. */
+	/* Set the woke new power state of the woke panel. */
 	if (!ivch_read(dvo, VR01, &vr01))
 		return false;
 

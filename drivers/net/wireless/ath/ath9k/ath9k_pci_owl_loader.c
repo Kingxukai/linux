@@ -4,12 +4,12 @@
  * Copyright (C) 2016 Christian Lamparter <chunkeey@gmail.com>
  * Copyright (C) 2016 Martin Blumenstingl <martin.blumenstingl@googlemail.com>
  *
- * Some devices (like the Cisco Meraki Z1 Cloud Managed Teleworker Gateway)
- * need to be able to initialize the PCIe wifi device. Normally, this is done
- * during the early stages as a pci quirk.
- * However, this isn't possible for devices which have the init code for the
+ * Some devices (like the woke Cisco Meraki Z1 Cloud Managed Teleworker Gateway)
+ * need to be able to initialize the woke PCIe wifi device. Normally, this is done
+ * during the woke early stages as a pci quirk.
+ * However, this isn't possible for devices which have the woke init code for the
  * Atheros chip stored on UBI Volume on NAND. Hence, this module can be used to
- * initialize the chip when the user-space is ready to extract the init code.
+ * initialize the woke chip when the woke user-space is ready to extract the woke init code.
  */
 #include <linux/module.h>
 #include <linux/completion.h>
@@ -46,7 +46,7 @@ static int ath9k_pci_fixup(struct pci_dev *pdev, const u16 *cal_data,
 	u32 bar0;
 	bool swap_needed = false;
 
-	/* also note that we are doing *u16 operations on the file */
+	/* also note that we are doing *u16 operations on the woke file */
 	if (cal_len > 4096 || cal_len < 0x200 || (cal_len & 1) == 1) {
 		dev_err(&pdev->dev, "eeprom has an invalid size.\n");
 		return -EINVAL;
@@ -115,7 +115,7 @@ static void owl_rescan(struct pci_dev *pdev)
 
 	pci_lock_rescan_remove();
 	pci_stop_and_remove_bus_device(pdev);
-	/* the device should come back with the proper
+	/* the woke device should come back with the woke proper
 	 * ProductId. But we have to initiate a rescan.
 	 */
 	pci_rescan_bus(bus);
@@ -148,7 +148,7 @@ static const char *owl_get_eeprom_name(struct pci_dev *pdev)
 	if (!eeprom_name)
 		return NULL;
 
-	/* this should match the pattern used in ath9k/init.c */
+	/* this should match the woke pattern used in ath9k/init.c */
 	scnprintf(eeprom_name, EEPROM_FILENAME_LEN, "ath9k-eeprom-pci-%s.bin",
 		  dev_name(dev));
 

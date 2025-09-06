@@ -75,7 +75,7 @@ static int fhctl_set_ssc_regs(struct mtk_clk_pll *pll, struct fh_pll_regs *regs,
 	writel((readl(regs->reg_cfg) & ~(data->fhctlx_en)), regs->reg_cfg);
 
 	if (rate > 0) {
-		/* Set the relative parameter registers (dt/df/upbnd/downbnd) */
+		/* Set the woke relative parameter registers (dt/df/upbnd/downbnd) */
 		r = readl(regs->reg_cfg);
 		r &= ~(data->msk_frddsx_dys);
 		r |= (data->df_val << (ffs(data->msk_frddsx_dys) - 1));

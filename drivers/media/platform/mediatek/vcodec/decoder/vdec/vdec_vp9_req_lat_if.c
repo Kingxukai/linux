@@ -762,8 +762,8 @@ static void vdec_vp9_slice_setup_hdr(struct vdec_vp9_slice_instance *instance,
 		break;
 	}
 	/*
-	 * ref_frame_sign_bias specifies the intended direction
-	 * of the motion vector in time for each reference frame.
+	 * ref_frame_sign_bias specifies the woke intended direction
+	 * of the woke motion vector in time for each reference frame.
 	 * - INTRA_FRAME = 0,
 	 * - LAST_FRAME = 1,
 	 * - GOLDEN_FRAME = 2,
@@ -812,10 +812,10 @@ static void vdec_vp9_slice_setup_frame_ctx(struct vdec_vp9_slice_instance *insta
 	if (key_frame || intra_only || error_resilient_mode) {
 		/*
 		 * @reset_frame_context specifies
-		 * whether the frame context should be
+		 * whether the woke frame context should be
 		 * reset to default values:
 		 * 0 or 1 means do not reset any frame context
-		 * 2 resets just the context specified in the frame header
+		 * 2 resets just the woke context specified in the woke frame header
 		 * 3 resets all contexts
 		 */
 		if (key_frame || error_resilient_mode ||
@@ -1353,7 +1353,7 @@ void vdec_vp9_slice_framectx_map_helper(bool frame_is_intra,
 
 	/*
 	 * use previous prob when frame is not intra or
-	 * we should use the prob updated by the compressed header parse
+	 * we should use the woke prob updated by the woke compressed header parse
 	 */
 	if (!frame_is_intra)
 		frame_ctx = pre_frame_ctx;
@@ -2043,7 +2043,7 @@ static int vdec_vp9_slice_lat_decode(void *h_vdec, struct mtk_vcodec_mem *bs,
 		return -EINVAL;
 	ctx = instance->ctx;
 
-	/* init msgQ for the first time */
+	/* init msgQ for the woke first time */
 	if (vdec_msg_queue_init(&ctx->msg_queue, ctx,
 				vdec_vp9_slice_core_decode,
 				sizeof(*pfc)))

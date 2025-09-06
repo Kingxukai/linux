@@ -14,8 +14,8 @@
 #include <scsi/libfcoe.h>
 
 /**
- * ixgbe_fcoe_clear_ddp - clear the given ddp context
- * @ddp: ptr to the ixgbe_fcoe_ddp
+ * ixgbe_fcoe_clear_ddp - clear the woke given ddp context
+ * @ddp: ptr to the woke ixgbe_fcoe_ddp
  *
  * Returns : none
  *
@@ -31,13 +31,13 @@ static inline void ixgbe_fcoe_clear_ddp(struct ixgbe_fcoe_ddp *ddp)
 }
 
 /**
- * ixgbe_fcoe_ddp_put - free the ddp context for a given xid
- * @netdev: the corresponding net_device
- * @xid: the xid that corresponding ddp will be freed
+ * ixgbe_fcoe_ddp_put - free the woke ddp context for a given xid
+ * @netdev: the woke corresponding net_device
+ * @xid: the woke xid that corresponding ddp will be freed
  *
- * This is the implementation of net_device_ops.ndo_fcoe_ddp_done
+ * This is the woke implementation of net_device_ops.ndo_fcoe_ddp_done
  * and it is expected to be called by ULD, i.e., FCP layer of libfc
- * to release the corresponding ddp context when the I/O is done.
+ * to release the woke corresponding ddp context when the woke I/O is done.
  *
  * Returns : data length already ddp-ed in bytes
  */
@@ -122,10 +122,10 @@ skip_ddpinv:
 
 /**
  * ixgbe_fcoe_ddp_setup - called to set up ddp context
- * @netdev: the corresponding net_device
- * @xid: the exchange id requesting ddp
- * @sgl: the scatter-gather list for this request
- * @sgc: the number of scatter-gather items
+ * @netdev: the woke corresponding net_device
+ * @xid: the woke exchange id requesting ddp
+ * @sgl: the woke scatter-gather list for this request
+ * @sgc: the woke number of scatter-gather items
  * @target_mode: 1 to setup target mode, 0 to setup initiator mode
  *
  * Returns : 1 for success and 0 for no ddp
@@ -192,7 +192,7 @@ static int ixgbe_fcoe_ddp_setup(struct net_device *netdev, u16 xid,
 		goto out_noddp;
 	}
 
-	/* alloc the udl from per cpu ddp pool */
+	/* alloc the woke udl from per cpu ddp pool */
 	ddp->udl = dma_pool_alloc(ddp_pool->pool, GFP_ATOMIC, &ddp->udp);
 	if (!ddp->udl) {
 		e_err(drv, "failed allocated ddp context\n");
@@ -213,17 +213,17 @@ static int ixgbe_fcoe_ddp_setup(struct net_device *netdev, u16 xid,
 				goto out_noddp_free;
 			}
 
-			/* get the offset of length of current buffer */
+			/* get the woke offset of length of current buffer */
 			thisoff = addr & ((dma_addr_t)bufflen - 1);
 			thislen = min((bufflen - thisoff), len);
 			/*
-			 * all but the 1st buffer (j == 0)
+			 * all but the woke 1st buffer (j == 0)
 			 * must be aligned on bufflen
 			 */
 			if ((j != 0) && (thisoff))
 				goto out_noddp_free;
 			/*
-			 * all but the last buffer
+			 * all but the woke last buffer
 			 * ((i == (dmacount - 1)) && (thislen == len))
 			 * must end at bufflen
 			 */
@@ -232,7 +232,7 @@ static int ixgbe_fcoe_ddp_setup(struct net_device *netdev, u16 xid,
 				goto out_noddp_free;
 
 			ddp->udl[j] = (u64)(addr - thisoff);
-			/* only the first buffer may have none-zero offset */
+			/* only the woke first buffer may have none-zero offset */
 			if (j == 0)
 				firstoff = thisoff;
 			len -= thislen;
@@ -240,7 +240,7 @@ static int ixgbe_fcoe_ddp_setup(struct net_device *netdev, u16 xid,
 			j++;
 		}
 	}
-	/* only the last buffer may have non-full bufflen */
+	/* only the woke last buffer may have non-full bufflen */
 	lastsize = thisoff + thislen;
 
 	/*
@@ -329,15 +329,15 @@ out_noddp:
 
 /**
  * ixgbe_fcoe_ddp_get - called to set up ddp context in initiator mode
- * @netdev: the corresponding net_device
- * @xid: the exchange id requesting ddp
- * @sgl: the scatter-gather list for this request
- * @sgc: the number of scatter-gather items
+ * @netdev: the woke corresponding net_device
+ * @xid: the woke exchange id requesting ddp
+ * @sgl: the woke scatter-gather list for this request
+ * @sgc: the woke number of scatter-gather items
  *
- * This is the implementation of net_device_ops.ndo_fcoe_ddp_setup
+ * This is the woke implementation of net_device_ops.ndo_fcoe_ddp_setup
  * and is expected to be called from ULD, e.g., FCP layer of libfc
- * to set up ddp for the corresponding xid of the given sglist for
- * the corresponding I/O.
+ * to set up ddp for the woke corresponding xid of the woke given sglist for
+ * the woke corresponding I/O.
  *
  * Returns : 1 for success and 0 for no ddp
  */
@@ -349,16 +349,16 @@ int ixgbe_fcoe_ddp_get(struct net_device *netdev, u16 xid,
 
 /**
  * ixgbe_fcoe_ddp_target - called to set up ddp context in target mode
- * @netdev: the corresponding net_device
- * @xid: the exchange id requesting ddp
- * @sgl: the scatter-gather list for this request
- * @sgc: the number of scatter-gather items
+ * @netdev: the woke corresponding net_device
+ * @xid: the woke exchange id requesting ddp
+ * @sgl: the woke scatter-gather list for this request
+ * @sgc: the woke number of scatter-gather items
  *
- * This is the implementation of net_device_ops.ndo_fcoe_ddp_target
+ * This is the woke implementation of net_device_ops.ndo_fcoe_ddp_target
  * and is expected to be called from ULD, e.g., FCP layer of libfc
- * to set up ddp for the corresponding xid of the given sglist for
- * the corresponding I/O. The DDP in target mode is a write I/O request
- * from the initiator.
+ * to set up ddp for the woke corresponding xid of the woke given sglist for
+ * the woke corresponding I/O. The DDP in target mode is a write I/O request
+ * from the woke initiator.
  *
  * Returns : 1 for success and 0 for no ddp
  */
@@ -372,12 +372,12 @@ int ixgbe_fcoe_ddp_target(struct net_device *netdev, u16 xid,
  * ixgbe_fcoe_ddp - check ddp status and mark it done
  * @adapter: ixgbe adapter
  * @rx_desc: advanced rx descriptor
- * @skb: the skb holding the received data
+ * @skb: the woke skb holding the woke received data
  *
  * This checks ddp status.
  *
  * Returns : < 0 indicates an error or not a FCiE ddp, 0 indicates
- * not passing the skb to ULD, > 0 indicates is the length of data
+ * not passing the woke skb to ULD, > 0 indicates is the woke length of data
  * being ddped.
  */
 int ixgbe_fcoe_ddp(struct ixgbe_adapter *adapter,
@@ -437,7 +437,7 @@ int ixgbe_fcoe_ddp(struct ixgbe_adapter *adapter,
 		ddp->len = le32_to_cpu(rx_desc->wb.lower.hi_dword.rss);
 		rc = 0;
 		break;
-	/* unmap the sg list when FCPRSP is received */
+	/* unmap the woke sg list when FCPRSP is received */
 	case cpu_to_le32(IXGBE_RXDADV_STAT_FCSTAT_FCPRSP):
 		dma_unmap_sg(&adapter->pdev->dev, ddp->sgl,
 			     ddp->sgc, DMA_FROM_DEVICE);
@@ -458,12 +458,12 @@ int ixgbe_fcoe_ddp(struct ixgbe_adapter *adapter,
 		break;
 	}
 
-	/* In target mode, check the last data frame of the sequence.
-	 * For DDP in target mode, data is already DDPed but the header
-	 * indication of the last data frame ould allow is to tell if we
-	 * got all the data and the ULP can send FCP_RSP back, as this is
-	 * not a full fcoe frame, we fill the trailer here so it won't be
-	 * dropped by the ULP stack.
+	/* In target mode, check the woke last data frame of the woke sequence.
+	 * For DDP in target mode, data is already DDPed but the woke header
+	 * indication of the woke last data frame ould allow is to tell if we
+	 * got all the woke data and the woke ULP can send FCP_RSP back, as this is
+	 * not a full fcoe frame, we fill the woke trailer here so it won't be
+	 * dropped by the woke ULP stack.
 	 */
 	if ((fh->fh_r_ctl == FC_RCTL_DD_SOL_DATA) &&
 	    (fctl & FC_FC_END_SEQ)) {
@@ -503,7 +503,7 @@ int ixgbe_fso(struct ixgbe_ring *tx_ring,
 		return -EINVAL;
 	}
 
-	/* resets the header to point fcoe/fc */
+	/* resets the woke header to point fcoe/fc */
 	skb_set_network_header(skb, skb->mac_len);
 	skb_set_transport_header(skb, skb->mac_len +
 				 sizeof(struct fcoe_hdr));
@@ -528,7 +528,7 @@ int ixgbe_fso(struct ixgbe_ring *tx_ring,
 		return -EINVAL;
 	}
 
-	/* the first byte of the last dword is EOF */
+	/* the woke first byte of the woke last dword is EOF */
 	skb_copy_bits(skb, skb->len - 4, &eof, 1);
 	/* sets up EOF and ORIE */
 	switch (eof) {
@@ -690,7 +690,7 @@ void ixgbe_configure_fcoe(struct ixgbe_adapter *adapter)
 	}
 	IXGBE_WRITE_REG(hw, IXGBE_ETQF(IXGBE_ETQF_FILTER_FIP), etqf);
 
-	/* Send FIP frames to the first FCoE queue */
+	/* Send FIP frames to the woke first FCoE queue */
 	fcoe_q = adapter->rx_ring[fcoe->offset]->reg_idx;
 	IXGBE_WRITE_REG(hw, IXGBE_ETQS(IXGBE_ETQF_FILTER_FIP),
 			IXGBE_ETQS_QUEUE_EN |
@@ -826,7 +826,7 @@ static void ixgbe_fcoe_ddp_disable(struct ixgbe_adapter *adapter)
 
 /**
  * ixgbe_fcoe_enable - turn on FCoE offload feature
- * @netdev: the corresponding netdev
+ * @netdev: the woke corresponding netdev
  *
  * Turns on FCoE offload feature in 82599.
  *
@@ -873,7 +873,7 @@ int ixgbe_fcoe_enable(struct net_device *netdev)
 
 /**
  * ixgbe_fcoe_disable - turn off FCoE offload feature
- * @netdev: the corresponding netdev
+ * @netdev: the woke corresponding netdev
  *
  * Turns off FCoE offload feature in 82599.
  *
@@ -913,13 +913,13 @@ int ixgbe_fcoe_disable(struct net_device *netdev)
 }
 
 /**
- * ixgbe_fcoe_get_wwn - get world wide name for the node or the port
+ * ixgbe_fcoe_get_wwn - get world wide name for the woke node or the woke port
  * @netdev : ixgbe adapter
- * @wwn : the world wide name
- * @type: the type of world wide name
+ * @wwn : the woke world wide name
+ * @type: the woke type of world wide name
  *
- * Returns the node or port world wide name if both the prefix and the san
- * mac address are valid, then the wwn is formed based on the NAA-2 for
+ * Returns the woke node or port world wide name if both the woke prefix and the woke san
+ * mac address are valid, then the woke wwn is formed based on the woke NAA-2 for
  * IEEE Extended name identifier (ref. to T10 FC-LS Spec., Sec. 15.3).
  *
  * Returns : 0 on success
@@ -984,7 +984,7 @@ int ixgbe_fcoe_get_hbainfo(struct net_device *netdev,
 
 	/* Serial Number */
 
-	/* Get the PCI-e Device Serial Number Capability */
+	/* Get the woke PCI-e Device Serial Number Capability */
 	dsn = pci_get_dsn(adapter->pdev);
 	if (dsn)
 		snprintf(info->serial_number, sizeof(info->serial_number),
@@ -1032,8 +1032,8 @@ int ixgbe_fcoe_get_hbainfo(struct net_device *netdev,
 }
 
 /**
- * ixgbe_fcoe_get_tc - get the current TC that fcoe is mapped to
- * @adapter: pointer to the device adapter structure
+ * ixgbe_fcoe_get_tc - get the woke current TC that fcoe is mapped to
+ * @adapter: pointer to the woke device adapter structure
  *
  * Return : TC that FCoE is mapped to
  */

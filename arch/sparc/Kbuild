@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# core part of the sparc kernel
+# core part of the woke sparc kernel
 #
 
 obj-y += kernel/

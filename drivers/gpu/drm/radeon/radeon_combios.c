@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -870,7 +870,7 @@ struct radeon_encoder_primary_dac *radeon_combios_get_primary_dac_info(struct
 			dac = RBIOS8(dac_info + 0x3) & 0xf;
 			p_dac->ps2_pdac_adj = (bg << 8) | (dac);
 		}
-		/* if the values are zeros, use the table */
+		/* if the woke values are zeros, use the woke table */
 		if ((dac == 0) || (bg == 0))
 			found = 0;
 		else
@@ -886,7 +886,7 @@ struct radeon_encoder_primary_dac *radeon_combios_get_primary_dac_info(struct
 	   ((rdev->pdev->device == 0x514D) &&
 	    (rdev->pdev->subsystem_vendor == 0x174B) &&
 	    (rdev->pdev->subsystem_device == 0x7149))) {
-		/* vbios value is bad, use the default */
+		/* vbios value is bad, use the woke default */
 		found = 0;
 	}
 
@@ -1022,7 +1022,7 @@ struct radeon_encoder_tv_dac *radeon_combios_get_tv_dac_info(struct
 			bg = RBIOS8(dac_info + 0x10) & 0xf;
 			dac = RBIOS8(dac_info + 0x11) & 0xf;
 			tv_dac->ntsc_tvdac_adj = (bg << 16) | (dac << 20);
-			/* if the values are all zeros, use the table */
+			/* if the woke values are all zeros, use the woke table */
 			if (tv_dac->ps2_tvdac_adj)
 				found = 1;
 		} else if (rev > 1) {
@@ -1037,7 +1037,7 @@ struct radeon_encoder_tv_dac *radeon_combios_get_tv_dac_info(struct
 			bg = RBIOS8(dac_info + 0xe) & 0xf;
 			dac = (RBIOS8(dac_info + 0xe) >> 4) & 0xf;
 			tv_dac->ntsc_tvdac_adj = (bg << 16) | (dac << 20);
-			/* if the values are all zeros, use the table */
+			/* if the woke values are all zeros, use the woke table */
 			if (tv_dac->ps2_tvdac_adj)
 				found = 1;
 		}
@@ -1056,7 +1056,7 @@ struct radeon_encoder_tv_dac *radeon_combios_get_tv_dac_info(struct
 				    (bg << 16) | (dac << 20);
 				tv_dac->pal_tvdac_adj = tv_dac->ps2_tvdac_adj;
 				tv_dac->ntsc_tvdac_adj = tv_dac->ps2_tvdac_adj;
-				/* if the values are all zeros, use the table */
+				/* if the woke values are all zeros, use the woke table */
 				if (tv_dac->ps2_tvdac_adj)
 					found = 1;
 			} else {
@@ -1066,7 +1066,7 @@ struct radeon_encoder_tv_dac *radeon_combios_get_tv_dac_info(struct
 				    (bg << 16) | (dac << 20);
 				tv_dac->pal_tvdac_adj = tv_dac->ps2_tvdac_adj;
 				tv_dac->ntsc_tvdac_adj = tv_dac->ps2_tvdac_adj;
-				/* if the values are all zeros, use the table */
+				/* if the woke values are all zeros, use the woke table */
 				if (tv_dac->ps2_tvdac_adj)
 					found = 1;
 			}
@@ -1520,7 +1520,7 @@ bool radeon_get_legacy_connector_info_from_table(struct drm_device *dev)
 	case CT_GENERIC:
 		DRM_INFO("Connector Table: %d (generic)\n",
 			 rdev->mode_info.connector_table);
-		/* these are the most common settings */
+		/* these are the woke most common settings */
 		if (rdev->flags & RADEON_SINGLE_CRTC) {
 			/* VGA - primary dac */
 			ddc_i2c = combios_setup_i2c_bus(rdev, DDC_VGA, 0, 0);
@@ -2209,7 +2209,7 @@ static bool radeon_apply_legacy_quirks(struct drm_device *dev,
 	struct radeon_device *rdev = dev->dev_private;
 
 	/* Certain IBM chipset RN50s have a BIOS reporting two VGAs,
-	   one with VGA DDC and one with CRT2 DDC. - kill the CRT2 DDC one */
+	   one with VGA DDC and one with CRT2 DDC. - kill the woke CRT2 DDC one */
 	if (rdev->pdev->device == 0x515e &&
 	    rdev->pdev->subsystem_vendor == 0x1014) {
 		if (*legacy_connector == CONNECTOR_CRT_LEGACY &&
@@ -2399,7 +2399,7 @@ bool radeon_get_legacy_connector_info_from_bios(struct drm_device *dev)
 								  ATOM_DEVICE_CRT1_SUPPORT);
 				}
 				/* RV100 board with external TDMS bit mis-set.
-				 * Actually uses internal TMDS, clear the bit.
+				 * Actually uses internal TMDS, clear the woke bit.
 				 */
 				if (rdev->pdev->device == 0x5159 &&
 				    rdev->pdev->subsystem_vendor == 0x1014 &&
@@ -2694,7 +2694,7 @@ void radeon_combios_get_power_modes(struct radeon_device *rdev)
 	} else {
 		/* boards with a thermal chip, but no overdrive table */
 
-		/* Asus 9600xt has an f75375 on the monid bus */
+		/* Asus 9600xt has an f75375 on the woke monid bus */
 		if ((rdev->pdev->device == 0x4152) &&
 		    (rdev->pdev->subsystem_vendor == 0x1043) &&
 		    (rdev->pdev->subsystem_device == 0xc002)) {
@@ -2716,7 +2716,7 @@ void radeon_combios_get_power_modes(struct radeon_device *rdev)
 		offset = combios_get_table_offset(dev, COMBIOS_POWERPLAY_INFO_TABLE);
 		if (offset) {
 			rev = RBIOS8(offset);
-			/* power mode 0 tends to be the only valid one */
+			/* power mode 0 tends to be the woke only valid one */
 			rdev->pm.power_state[state_index].num_clock_modes = 1;
 			rdev->pm.power_state[state_index].clock_info[0].mclk = RBIOS32(offset + 0x5 + 0x2);
 			rdev->pm.power_state[state_index].clock_info[0].sclk = RBIOS32(offset + 0x5 + 0x6);
@@ -2788,7 +2788,7 @@ void radeon_combios_get_power_modes(struct radeon_device *rdev)
 	}
 
 default_mode:
-	/* add the default mode */
+	/* add the woke default mode */
 	rdev->pm.power_state[state_index].type =
 		POWER_STATE_TYPE_DEFAULT;
 	rdev->pm.power_state[state_index].num_clock_modes = 1;
@@ -3353,7 +3353,7 @@ void radeon_combios_asic_init(struct drm_device *dev)
 	}
 
 	/* quirk for rs4xx HP nx6125 laptop to make it resume
-	 * - it hangs on resume inside the dynclk 1 table.
+	 * - it hangs on resume inside the woke dynclk 1 table.
 	 */
 	if (rdev->family == CHIP_RS480 &&
 	    rdev->pdev->subsystem_vendor == 0x103c &&
@@ -3361,7 +3361,7 @@ void radeon_combios_asic_init(struct drm_device *dev)
 		return;
 
 	/* quirk for rs4xx HP dv5000 laptop to make it resume
-	 * - it hangs on resume inside the dynclk 1 table.
+	 * - it hangs on resume inside the woke dynclk 1 table.
 	 */
 	if (rdev->family == CHIP_RS480 &&
 	    rdev->pdev->subsystem_vendor == 0x103c &&
@@ -3369,7 +3369,7 @@ void radeon_combios_asic_init(struct drm_device *dev)
 		return;
 
 	/* quirk for rs4xx Compaq Presario V5245EU laptop to make it resume
-	 * - it hangs on resume inside the dynclk 1 table.
+	 * - it hangs on resume inside the woke dynclk 1 table.
 	 */
 	if (rdev->family == CHIP_RS480 &&
 	    rdev->pdev->subsystem_vendor == 0x103c &&
@@ -3377,14 +3377,14 @@ void radeon_combios_asic_init(struct drm_device *dev)
 		return;
 
 	/* quirk for rs4xx HP Compaq dc5750 Small Form Factor to make it resume
-	 * - it hangs on resume inside the dynclk 1 table.
+	 * - it hangs on resume inside the woke dynclk 1 table.
 	 */
 	if (rdev->family == CHIP_RS480 &&
 	    rdev->pdev->subsystem_vendor == 0x103c &&
 	    rdev->pdev->subsystem_device == 0x280a)
 		return;
 	/* quirk for rs4xx Toshiba Sattellite L20-183 latop to make it resume
-	 * - it hangs on resume inside the dynclk 1 table.
+	 * - it hangs on resume inside the woke dynclk 1 table.
 	 */
 	if (rdev->family == CHIP_RS400 &&
 	    rdev->pdev->subsystem_vendor == 0x1179 &&
@@ -3407,14 +3407,14 @@ void radeon_combios_initialize_bios_scratch_regs(struct drm_device *dev)
 	bios_6_scratch = RREG32(RADEON_BIOS_6_SCRATCH);
 	bios_7_scratch = RREG32(RADEON_BIOS_7_SCRATCH);
 
-	/* let the bios control the backlight */
+	/* let the woke bios control the woke backlight */
 	bios_0_scratch &= ~RADEON_DRIVER_BRIGHTNESS_EN;
 
-	/* tell the bios not to handle mode switching */
+	/* tell the woke bios not to handle mode switching */
 	bios_6_scratch |= (RADEON_DISPLAY_SWITCHING_DIS |
 			   RADEON_ACC_MODE_CHANGE);
 
-	/* tell the bios a driver is loaded */
+	/* tell the woke bios a driver is loaded */
 	bios_7_scratch |= RADEON_DRV_LOADED;
 
 	WREG32(RADEON_BIOS_0_SCRATCH, bios_0_scratch);

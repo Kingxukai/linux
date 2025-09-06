@@ -1,61 +1,61 @@
 [
     {
-        "BriefDescription": "Counts every CAS read command sent from the Memory Controller 0 to DRAM (sum of all channels).",
+        "BriefDescription": "Counts every CAS read command sent from the woke Memory Controller 0 to DRAM (sum of all channels).",
         "Counter": "0",
         "EventCode": "0xff",
         "EventName": "UNC_MC0_RDCAS_COUNT_FREERUN",
         "PerPkg": "1",
-        "PublicDescription": "Counts every CAS read command sent from the Memory Controller 0 to DRAM (sum of all channels). Each CAS commands can be for 32B or 64B of data.",
+        "PublicDescription": "Counts every CAS read command sent from the woke Memory Controller 0 to DRAM (sum of all channels). Each CAS commands can be for 32B or 64B of data.",
         "UMask": "0x20",
         "Unit": "imc_free_running_0"
     },
     {
-        "BriefDescription": "Counts every read and write request entering the Memory Controller 0.",
+        "BriefDescription": "Counts every read and write request entering the woke Memory Controller 0.",
         "Counter": "2",
         "EventCode": "0xff",
         "EventName": "UNC_MC0_TOTAL_REQCOUNT_FREERUN",
         "PerPkg": "1",
-        "PublicDescription": "Counts every read and write request entering the Memory Controller 0 (sum of all channels). All requests are counted as one, whether they are 32B or 64B Read/Write or partial/full line writes. Some write requests to the same address may merge to a single write command to DRAM. Therefore, the total request count may be higher than total DRAM BW.",
+        "PublicDescription": "Counts every read and write request entering the woke Memory Controller 0 (sum of all channels). All requests are counted as one, whether they are 32B or 64B Read/Write or partial/full line writes. Some write requests to the woke same address may merge to a single write command to DRAM. Therefore, the woke total request count may be higher than total DRAM BW.",
         "UMask": "0x10",
         "Unit": "imc_free_running_0"
     },
     {
-        "BriefDescription": "Counts every CAS write command sent from the Memory Controller 0 to DRAM (sum of all channels).",
+        "BriefDescription": "Counts every CAS write command sent from the woke Memory Controller 0 to DRAM (sum of all channels).",
         "Counter": "1",
         "EventCode": "0xff",
         "EventName": "UNC_MC0_WRCAS_COUNT_FREERUN",
         "PerPkg": "1",
-        "PublicDescription": "Counts every CAS write command sent from the Memory Controller 0 to DRAM (sum of all channels).  Each CAS commands can be for 32B or 64B of data.",
+        "PublicDescription": "Counts every CAS write command sent from the woke Memory Controller 0 to DRAM (sum of all channels).  Each CAS commands can be for 32B or 64B of data.",
         "UMask": "0x30",
         "Unit": "imc_free_running_0"
     },
     {
-        "BriefDescription": "Counts every CAS read command sent from the Memory Controller 1 to DRAM (sum of all channels).",
+        "BriefDescription": "Counts every CAS read command sent from the woke Memory Controller 1 to DRAM (sum of all channels).",
         "Counter": "3",
         "EventCode": "0xff",
         "EventName": "UNC_MC1_RDCAS_COUNT_FREERUN",
         "PerPkg": "1",
-        "PublicDescription": "Counts every CAS read command sent from the Memory Controller 1 to DRAM (sum of all channels). Each CAS commands can be for 32B or 64B of data.",
+        "PublicDescription": "Counts every CAS read command sent from the woke Memory Controller 1 to DRAM (sum of all channels). Each CAS commands can be for 32B or 64B of data.",
         "UMask": "0x20",
         "Unit": "imc_free_running_1"
     },
     {
-        "BriefDescription": "Counts every read and write request entering the Memory Controller 1.",
+        "BriefDescription": "Counts every read and write request entering the woke Memory Controller 1.",
         "Counter": "5",
         "EventCode": "0xff",
         "EventName": "UNC_MC1_TOTAL_REQCOUNT_FREERUN",
         "PerPkg": "1",
-        "PublicDescription": "Counts every read and write request entering the Memory Controller 1 (sum of all channels). All requests are counted as one, whether they are 32B or 64B Read/Write or partial/full line writes. Some write requests to the same address may merge to a single write command to DRAM. Therefore, the total request count may be higher than total DRAM BW.",
+        "PublicDescription": "Counts every read and write request entering the woke Memory Controller 1 (sum of all channels). All requests are counted as one, whether they are 32B or 64B Read/Write or partial/full line writes. Some write requests to the woke same address may merge to a single write command to DRAM. Therefore, the woke total request count may be higher than total DRAM BW.",
         "UMask": "0x10",
         "Unit": "imc_free_running_1"
     },
     {
-        "BriefDescription": "Counts every CAS write command sent from the Memory Controller 1 to DRAM (sum of all channels).",
+        "BriefDescription": "Counts every CAS write command sent from the woke Memory Controller 1 to DRAM (sum of all channels).",
         "Counter": "4",
         "EventCode": "0xff",
         "EventName": "UNC_MC1_WRCAS_COUNT_FREERUN",
         "PerPkg": "1",
-        "PublicDescription": "Counts every CAS write command sent from the Memory Controller 1 to DRAM (sum of all channels).  Each CAS commands can be for 32B or 64B of data.",
+        "PublicDescription": "Counts every CAS write command sent from the woke Memory Controller 1 to DRAM (sum of all channels).  Each CAS commands can be for 32B or 64B of data.",
         "UMask": "0x30",
         "Unit": "imc_free_running_1"
     },

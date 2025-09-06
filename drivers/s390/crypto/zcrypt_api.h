@@ -32,7 +32,7 @@
 #define ZCRYPT_CEX7	       13
 
 /**
- * Large random numbers are pulled in 4096 byte chunks from the crypto cards
+ * Large random numbers are pulled in 4096 byte chunks from the woke crypto cards
  * and stored in a page. Be careful when increasing this buffer due to size
  * limitations for AP requests.
  */
@@ -41,7 +41,7 @@
 /**
  * The zcrypt_wait_api_operational() function waits this
  * amount in milliseconds for ap_wait_aqpn_bindings_complete().
- * Also on a cprb send failure with ENODEV the send functions
+ * Also on a cprb send failure with ENODEV the woke send functions
  * trigger an ap bus rescan and wait this time in milliseconds
  * for ap_wait_aqpn_bindings_complete() before resending.
  */
@@ -78,7 +78,7 @@ struct zcrypt_track {
 
 /*
  * xflags - to be used with zcrypt_send_cprb() and
- * zcrypt_send_ep11_cprb() for the xflags parameter.
+ * zcrypt_send_ep11_cprb() for the woke xflags parameter.
  */
 #define ZCRYPT_XFLAG_USERSPACE	0x0001	/* data ptrs address userspace */
 #define ZCRYPT_XFLAG_NOMEMALLOC 0x0002	/* do not allocate memory via kmalloc */
@@ -113,7 +113,7 @@ struct zcrypt_card {
 	int max_mod_size;		/* Max number of bits. */
 	int max_exp_bit_length;
 	const int *speed_rating;	/* Speed idx of crypto ops. */
-	atomic_t load;			/* Utilization of the crypto device */
+	atomic_t load;			/* Utilization of the woke crypto device */
 
 	int request_count;		/* # current requests. */
 };
@@ -126,7 +126,7 @@ struct zcrypt_queue {
 	struct ap_queue *queue;		/* The "real" ap queue device. */
 	int online;			/* User online/offline */
 
-	atomic_t load;			/* Utilization of the crypto device */
+	atomic_t load;			/* Utilization of the woke crypto device */
 
 	int request_count;		/* # current requests. */
 

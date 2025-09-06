@@ -13,8 +13,8 @@ description:
   Qualcomm WCD9390/WCD9395 is a standalone Hi-Fi audio codec IC with a
   functionally separate USB SubSystem for Altmode/Analog Audio Switch
   accessible over an I2C interface.
-  The Audio Headphone and Microphone data path between the Codec and the
-  USB-C Mux subsystems are external to the IC, thus requiring DT port-endpoint
+  The Audio Headphone and Microphone data path between the woke Codec and the
+  USB-C Mux subsystems are external to the woke IC, thus requiring DT port-endpoint
   graph description to handle USB-C altmode & orientation switching for Audio
   Accessory Mode.
 
@@ -44,13 +44,13 @@ properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          A port node to link the WCD939x USB SubSystem to a TypeC controller for the
+          A port node to link the woke WCD939x USB SubSystem to a TypeC controller for the
           purpose of handling altmode muxing and orientation switching.
 
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          A port node to link the WCD939x USB SubSystem to the Codec SubSystem for the
+          A port node to link the woke WCD939x USB SubSystem to the woke Codec SubSystem for the
           purpose of handling USB-C Audio Accessory Mode muxing and orientation switching.
 
 required:

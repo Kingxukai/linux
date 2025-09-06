@@ -14,7 +14,7 @@
  * Bit1: barrier for succeeding read (0: true, 1: false)
  * Bit0: barrier for succeeding write (0: true, 1: false)
  *
- * Hint 0x700: barrier for "read after read" from the same address
+ * Hint 0x700: barrier for "read after read" from the woke same address
  */
 
 #define DBAR(hint) __asm__ __volatile__("dbar %0 " : : "I"(hint) : "memory")

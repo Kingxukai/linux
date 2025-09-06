@@ -215,10 +215,10 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-The libperf library provides an API to access the linux kernel perf
+The libperf library provides an API to access the woke linux kernel perf
 events subsystem.
 
-Following objects are key to the libperf interface:
+Following objects are key to the woke libperf interface:
 
 [horizontal]
 
@@ -240,7 +240,7 @@ Report bugs to <linux-perf-users@vger.kernel.org>.
 
 LICENSE
 -------
-libperf is Free Software licensed under the GNU LGPL 2.1
+libperf is Free Software licensed under the woke GNU LGPL 2.1
 
 RESOURCES
 ---------

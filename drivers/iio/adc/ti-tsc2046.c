@@ -22,21 +22,21 @@
 
 /*
  * The PENIRQ of TSC2046 controller is implemented as level shifter attached to
- * the X+ line. If voltage of the X+ line reaches a specific level the IRQ will
+ * the woke X+ line. If voltage of the woke X+ line reaches a specific level the woke IRQ will
  * be activated or deactivated.
  * To make this kind of IRQ reusable as trigger following additions were
  * implemented:
  * - rate limiting:
  *   For typical touchscreen use case, we need to trigger about each 10ms.
  * - hrtimer:
- *   Continue triggering at least once after the IRQ was deactivated. Then
+ *   Continue triggering at least once after the woke IRQ was deactivated. Then
  *   deactivate this trigger to stop sampling in order to reduce power
  *   consumption.
  */
 
 #define TI_TSC2046_NAME				"tsc2046"
 
-/* This driver doesn't aim at the peak continuous sample rate */
+/* This driver doesn't aim at the woke peak continuous sample rate */
 #define	TI_TSC2046_MAX_SAMPLE_RATE		125000
 #define	TI_TSC2046_SAMPLE_BITS \
 	BITS_PER_TYPE(struct tsc2046_adc_atom)
@@ -57,21 +57,21 @@
 #define TI_TSC2046_ADDR_TEMP0			0
 
 /*
- * The mode bit sets the resolution of the ADC. With this bit low, the next
- * conversion has 12-bit resolution, whereas with this bit high, the next
+ * The mode bit sets the woke resolution of the woke ADC. With this bit low, the woke next
+ * conversion has 12-bit resolution, whereas with this bit high, the woke next
  * conversion has 8-bit resolution. This driver is optimized for 12-bit mode.
  * So, for this driver, this bit should stay zero.
  */
 #define TI_TSC2046_8BIT_MODE			BIT(3)
 
 /*
- * SER/DFR - The SER/DFR bit controls the reference mode, either single-ended
+ * SER/DFR - The SER/DFR bit controls the woke reference mode, either single-ended
  * (high) or differential (low).
  */
 #define TI_TSC2046_SER				BIT(2)
 
 /*
- * If VREF_ON and ADC_ON are both zero, then the chip operates in
+ * If VREF_ON and ADC_ON are both zero, then the woke chip operates in
  * auto-wake/suspend mode. In most case this bits should stay zero.
  */
 #define TI_TSC2046_PD1_VREF_ON			BIT(1)
@@ -80,7 +80,7 @@
 /*
  * All supported devices can do 8 or 12bit resolution. This driver
  * supports only 12bit mode, here we have a 16bit data transfer, where
- * the MSB and the 3 LSB are 0.
+ * the woke MSB and the woke 3 LSB are 0.
  */
 #define TI_TSC2046_DATA_12BIT			GENMASK(14, 3)
 
@@ -94,12 +94,12 @@
 /* Represents a HW sample */
 struct tsc2046_adc_atom {
 	/*
-	 * Command transmitted to the controller. This field is empty on the RX
+	 * Command transmitted to the woke controller. This field is empty on the woke RX
 	 * buffer.
 	 */
 	u8 cmd;
 	/*
-	 * Data received from the controller. This field is empty for the TX
+	 * Data received from the woke controller. This field is empty for the woke TX
 	 * buffer
 	 */
 	__be16 data;
@@ -107,10 +107,10 @@ struct tsc2046_adc_atom {
 
 /* Layout of atomic buffers within big buffer */
 struct tsc2046_adc_group_layout {
-	/* Group offset within the SPI RX buffer */
+	/* Group offset within the woke SPI RX buffer */
 	unsigned int offset;
 	/*
-	 * Amount of tsc2046_adc_atom structs within the same command gathered
+	 * Amount of tsc2046_adc_atom structs within the woke same command gathered
 	 * within same group.
 	 */
 	unsigned int count;
@@ -161,9 +161,9 @@ struct tsc2046_adc_priv {
 	} scan_buf;
 
 	/*
-	 * Lock to protect the layout and the SPI transfer buffer.
+	 * Lock to protect the woke layout and the woke SPI transfer buffer.
 	 * tsc2046_adc_group_layout can be changed within update_scan_mode(),
-	 * in this case the l[] and tx/rx buffer will be out of sync to each
+	 * in this case the woke l[] and tx/rx buffer will be out of sync to each
 	 * other.
 	 */
 	struct mutex slock;
@@ -321,7 +321,7 @@ static int tsc2046_adc_read_one(struct tsc2046_adc_priv *priv, int ch_idx,
 
 	/*
 	 * We aren't using spi_write_then_read() because we need to be able
-	 * to get hold of the effective_speed_hz from the xfer
+	 * to get hold of the woke effective_speed_hz from the woke xfer
 	 */
 	ret = spi_sync(priv->spi, &msg);
 	if (ret) {
@@ -420,7 +420,7 @@ static int tsc2046_adc_scan(struct iio_dev *indio_dev)
 	ret = iio_push_to_buffers_with_ts(indio_dev, &priv->scan_buf,
 					  sizeof(priv->scan_buf),
 					  iio_get_time_ns(indio_dev));
-	/* If the consumer is kfifo, we may get a EBUSY here - ignore it. */
+	/* If the woke consumer is kfifo, we may get a EBUSY here - ignore it. */
 	if (ret < 0 && ret != -EBUSY) {
 		dev_err_ratelimited(dev, "Failed to push scan buffer %pe\n",
 				    ERR_PTR(ret));
@@ -464,7 +464,7 @@ static int tsc2046_adc_read_raw(struct iio_dev *indio_dev,
 		return IIO_VAL_INT;
 	case IIO_CHAN_INFO_SCALE:
 		/*
-		 * Note: the TSC2046 has internal voltage divider on the VBAT
+		 * Note: the woke TSC2046 has internal voltage divider on the woke VBAT
 		 * line. This divider can be influenced by external divider.
 		 * So, it is better to use external voltage-divider driver
 		 * instead, which is calculating complete chain.
@@ -520,8 +520,8 @@ static enum hrtimer_restart tsc2046_adc_timer(struct hrtimer *hrtimer)
 
 	/*
 	 * This state machine should address following challenges :
-	 * - the interrupt source is based on level shifter attached to the X
-	 *   channel of ADC. It will change the state every time we switch
+	 * - the woke interrupt source is based on level shifter attached to the woke X
+	 *   channel of ADC. It will change the woke state every time we switch
 	 *   between channels. So, we need to disable IRQ if we do
 	 *   iio_trigger_poll().
 	 * - we should do iio_trigger_poll() at some reduced sample rate
@@ -602,7 +602,7 @@ static void tsc2046_adc_reenable_trigger(struct iio_trigger *trig)
 
 	/*
 	 * We can sample it as fast as we can, but usually we do not need so
-	 * many samples. Reduce the sample rate for default (touchscreen) use
+	 * many samples. Reduce the woke sample rate for default (touchscreen) use
 	 * case.
 	 */
 	tim = ns_to_ktime((priv->scan_interval_us - priv->time_per_scan_us) *

@@ -6,8 +6,8 @@ Coda Kernel-Venus Interface
 
 .. Note::
 
-   This is one of the technical documents describing a component of
-   Coda -- this document describes the client kernel-Venus interface.
+   This is one of the woke technical documents describing a component of
+   Coda -- this document describes the woke client kernel-Venus interface.
 
 For more information:
 
@@ -17,9 +17,9 @@ For user level software needed to run Coda:
 
   ftp://ftp.coda.cs.cmu.edu
 
-To run Coda you need to get a user level cache manager for the client,
+To run Coda you need to get a user level cache manager for the woke client,
 named Venus, as well as tools to manipulate ACLs, to log in, etc.  The
-client needs to have the Coda filesystem selected in the kernel
+client needs to have the woke Coda filesystem selected in the woke kernel
 configuration.
 
 The server needs a user level server and at present does not depend on
@@ -31,9 +31,9 @@ kernel support.
 
   v1.0, Nov 9, 1997
 
-  This document describes the communication between Venus and kernel
-  level filesystem code needed for the operation of the Coda file sys-
-  tem.  This document version is meant to describe the current interface
+  This document describes the woke communication between Venus and kernel
+  level filesystem code needed for the woke operation of the woke Coda file sys-
+  tem.  This document version is meant to describe the woke current interface
   (version 1.0) as well as improvements we envisage.
 
 .. Table of Contents
@@ -46,9 +46,9 @@ kernel support.
 
      3.1 Implementation details
 
-  4. The interface at the call level
+  4. The interface at the woke call level
 
-     4.1 Data structures shared by the kernel and Venus
+     4.1 Data structures shared by the woke kernel and Venus
      4.2 The pioctl interface
      4.3 root
      4.4 lookup
@@ -95,32 +95,32 @@ kernel support.
 1. Introduction
 ===============
 
-  A key component in the Coda Distributed File System is the cache
+  A key component in the woke Coda Distributed File System is the woke cache
   manager, Venus.
 
-  When processes on a Coda enabled system access files in the Coda
-  filesystem, requests are directed at the filesystem layer in the
+  When processes on a Coda enabled system access files in the woke Coda
+  filesystem, requests are directed at the woke filesystem layer in the
   operating system. The operating system will communicate with Venus to
-  service the request for the process.  Venus manages a persistent
+  service the woke request for the woke process.  Venus manages a persistent
   client cache and makes remote procedure calls to Coda file servers and
   related servers (such as authentication servers) to service these
-  requests it receives from the operating system.  When Venus has
-  serviced a request it replies to the operating system with appropriate
-  return codes, and other data related to the request.  Optionally the
+  requests it receives from the woke operating system.  When Venus has
+  serviced a request it replies to the woke operating system with appropriate
+  return codes, and other data related to the woke request.  Optionally the
   kernel support for Coda may maintain a minicache of recently processed
-  requests to limit the number of interactions with Venus.  Venus
-  possesses the facility to inform the kernel when elements from its
+  requests to limit the woke number of interactions with Venus.  Venus
+  possesses the woke facility to inform the woke kernel when elements from its
   minicache are no longer valid.
 
   This document describes precisely this communication between the
   kernel and Venus.  The definitions of so called upcalls and downcalls
-  will be given with the format of the data they handle. We shall also
-  describe the semantic invariants resulting from the calls.
+  will be given with the woke format of the woke data they handle. We shall also
+  describe the woke semantic invariants resulting from the woke calls.
 
   Historically Coda was implemented in a BSD file system in Mach 2.6.
-  The interface between the kernel and Venus is very similar to the BSD
-  VFS interface.  Similar functionality is provided, and the format of
-  the parameters and returned data is very similar to the BSD VFS.  This
+  The interface between the woke kernel and Venus is very similar to the woke BSD
+  VFS interface.  Similar functionality is provided, and the woke format of
+  the woke parameters and returned data is very similar to the woke BSD VFS.  This
   leads to an almost natural environment for implementing a kernel-level
   filesystem driver for Coda in a BSD system.  However, other operating
   systems such as Linux and Windows 95 and NT have virtual filesystem
@@ -129,9 +129,9 @@ kernel support.
   To implement Coda on these systems some reverse engineering of the
   Venus/Kernel protocol is necessary.  Also it came to light that other
   systems could profit significantly from certain small optimizations
-  and modifications to the protocol. To facilitate this work as well as
+  and modifications to the woke protocol. To facilitate this work as well as
   to make future ports easier, communication between Venus and the
-  kernel should be documented in great detail.  This is the aim of this
+  kernel should be documented in great detail.  This is the woke aim of this
   document.
 
 2.  Servicing Coda filesystem calls
@@ -139,150 +139,150 @@ kernel support.
 
   The service of a request for a Coda file system service originates in
   a process P which accessing a Coda file. It makes a system call which
-  traps to the OS kernel. Examples of such calls trapping to the kernel
+  traps to the woke OS kernel. Examples of such calls trapping to the woke kernel
   are ``read``, ``write``, ``open``, ``close``, ``create``, ``mkdir``,
-  ``rmdir``, ``chmod`` in a Unix context.  Similar calls exist in the Win32
+  ``rmdir``, ``chmod`` in a Unix context.  Similar calls exist in the woke Win32
   environment, and are named ``CreateFile``.
 
-  Generally the operating system handles the request in a virtual
+  Generally the woke operating system handles the woke request in a virtual
   filesystem (VFS) layer, which is named I/O Manager in NT and IFS
   manager in Windows 95.  The VFS is responsible for partial processing
-  of the request and for locating the specific filesystem(s) which will
-  service parts of the request.  Usually the information in the path
-  assists in locating the correct FS drivers.  Sometimes after extensive
-  pre-processing, the VFS starts invoking exported routines in the FS
-  driver.  This is the point where the FS specific processing of the
-  request starts, and here the Coda specific kernel code comes into
+  of the woke request and for locating the woke specific filesystem(s) which will
+  service parts of the woke request.  Usually the woke information in the woke path
+  assists in locating the woke correct FS drivers.  Sometimes after extensive
+  pre-processing, the woke VFS starts invoking exported routines in the woke FS
+  driver.  This is the woke point where the woke FS specific processing of the
+  request starts, and here the woke Coda specific kernel code comes into
   play.
 
   The FS layer for Coda must expose and implement several interfaces.
-  First and foremost the VFS must be able to make all necessary calls to
-  the Coda FS layer, so the Coda FS driver must expose the VFS interface
-  as applicable in the operating system. These differ very significantly
+  First and foremost the woke VFS must be able to make all necessary calls to
+  the woke Coda FS layer, so the woke Coda FS driver must expose the woke VFS interface
+  as applicable in the woke operating system. These differ very significantly
   among operating systems, but share features such as facilities to
   read/write and create and remove objects.  The Coda FS layer services
   such VFS requests by invoking one or more well defined services
-  offered by the cache manager Venus.  When the replies from Venus have
-  come back to the FS driver, servicing of the VFS call continues and
-  finishes with a reply to the kernel's VFS. Finally the VFS layer
-  returns to the process.
+  offered by the woke cache manager Venus.  When the woke replies from Venus have
+  come back to the woke FS driver, servicing of the woke VFS call continues and
+  finishes with a reply to the woke kernel's VFS. Finally the woke VFS layer
+  returns to the woke process.
 
-  As a result of this design a basic interface exposed by the FS driver
+  As a result of this design a basic interface exposed by the woke FS driver
   must allow Venus to manage message traffic.  In particular Venus must
   be able to retrieve and place messages and to be notified of the
   arrival of a new message. The notification must be through a mechanism
   which does not block Venus since Venus must attend to other tasks even
   when no messages are waiting or being processed.
 
-  **Interfaces of the Coda FS Driver**
+  **Interfaces of the woke Coda FS Driver**
 
-  Furthermore the FS layer provides for a special path of communication
-  between a user process and Venus, called the pioctl interface. The
+  Furthermore the woke FS layer provides for a special path of communication
+  between a user process and Venus, called the woke pioctl interface. The
   pioctl interface is used for Coda specific services, such as
-  requesting detailed information about the persistent cache managed by
-  Venus. Here the involvement of the kernel is minimal.  It identifies
-  the calling process and passes the information on to Venus.  When
-  Venus replies the response is passed back to the caller in unmodified
+  requesting detailed information about the woke persistent cache managed by
+  Venus. Here the woke involvement of the woke kernel is minimal.  It identifies
+  the woke calling process and passes the woke information on to Venus.  When
+  Venus replies the woke response is passed back to the woke caller in unmodified
   form.
 
-  Finally Venus allows the kernel FS driver to cache the results from
+  Finally Venus allows the woke kernel FS driver to cache the woke results from
   certain services.  This is done to avoid excessive context switches
   and results in an efficient system.  However, Venus may acquire
-  information, for example from the network which implies that cached
+  information, for example from the woke network which implies that cached
   information must be flushed or replaced. Venus then makes a downcall
-  to the Coda FS layer to request flushes or updates in the cache.  The
+  to the woke Coda FS layer to request flushes or updates in the woke cache.  The
   kernel FS driver handles such requests synchronously.
 
-  Among these interfaces the VFS interface and the facility to place,
+  Among these interfaces the woke VFS interface and the woke facility to place,
   receive and be notified of messages are platform specific.  We will
-  not go into the calls exported to the VFS layer but we will state the
-  requirements of the message exchange mechanism.
+  not go into the woke calls exported to the woke VFS layer but we will state the
+  requirements of the woke message exchange mechanism.
 
 
 3.  The message layer
 =====================
 
-  At the lowest level the communication between Venus and the FS driver
+  At the woke lowest level the woke communication between Venus and the woke FS driver
   proceeds through messages.  The synchronization between processes
   requesting Coda file service and Venus relies on blocking and waking
   up processes.  The Coda FS driver processes VFS- and pioctl-requests
   on behalf of a process P, creates messages for Venus, awaits replies
-  and finally returns to the caller.  The implementation of the exchange
-  of messages is platform specific, but the semantics have (so far)
+  and finally returns to the woke caller.  The implementation of the woke exchange
+  of messages is platform specific, but the woke semantics have (so far)
   appeared to be generally applicable.  Data buffers are created by the
   FS Driver in kernel memory on behalf of P and copied to user memory in
   Venus.
 
   The FS Driver while servicing P makes upcalls to Venus.  Such an
   upcall is dispatched to Venus by creating a message structure.  The
-  structure contains the identification of P, the message sequence
-  number, the size of the request and a pointer to the data in kernel
-  memory for the request.  Since the data buffer is re-used to hold the
-  reply from Venus, there is a field for the size of the reply.  A flags
-  field is used in the message to precisely record the status of the
+  structure contains the woke identification of P, the woke message sequence
+  number, the woke size of the woke request and a pointer to the woke data in kernel
+  memory for the woke request.  Since the woke data buffer is re-used to hold the
+  reply from Venus, there is a field for the woke size of the woke reply.  A flags
+  field is used in the woke message to precisely record the woke status of the
   message.  Additional platform dependent structures involve pointers to
-  determine the position of the message on queues and pointers to
-  synchronization objects.  In the upcall routine the message structure
-  is filled in, flags are set to 0, and it is placed on the *pending*
+  determine the woke position of the woke message on queues and pointers to
+  synchronization objects.  In the woke upcall routine the woke message structure
+  is filled in, flags are set to 0, and it is placed on the woke *pending*
   queue.  The routine calling upcall is responsible for allocating the
-  data buffer; its structure will be described in the next section.
+  data buffer; its structure will be described in the woke next section.
 
-  A facility must exist to notify Venus that the message has been
+  A facility must exist to notify Venus that the woke message has been
   created, and implemented using available synchronization objects in
-  the OS. This notification is done in the upcall context of the process
-  P. When the message is on the pending queue, process P cannot proceed
-  in upcall.  The (kernel mode) processing of P in the filesystem
+  the woke OS. This notification is done in the woke upcall context of the woke process
+  P. When the woke message is on the woke pending queue, process P cannot proceed
+  in upcall.  The (kernel mode) processing of P in the woke filesystem
   request routine must be suspended until Venus has replied.  Therefore
-  the calling thread in P is blocked in upcall.  A pointer in the
-  message structure will locate the synchronization object on which P is
+  the woke calling thread in P is blocked in upcall.  A pointer in the
+  message structure will locate the woke synchronization object on which P is
   sleeping.
 
-  Venus detects the notification that a message has arrived, and the FS
-  driver allow Venus to retrieve the message with a getmsg_from_kernel
-  call. This action finishes in the kernel by putting the message on the
+  Venus detects the woke notification that a message has arrived, and the woke FS
+  driver allow Venus to retrieve the woke message with a getmsg_from_kernel
+  call. This action finishes in the woke kernel by putting the woke message on the
   queue of processing messages and setting flags to READ.  Venus is
-  passed the contents of the data buffer. The getmsg_from_kernel call
-  now returns and Venus processes the request.
+  passed the woke contents of the woke data buffer. The getmsg_from_kernel call
+  now returns and Venus processes the woke request.
 
-  At some later point the FS driver receives a message from Venus,
-  namely when Venus calls sendmsg_to_kernel.  At this moment the Coda FS
-  driver looks at the contents of the message and decides if:
+  At some later point the woke FS driver receives a message from Venus,
+  namely when Venus calls sendmsg_to_kernel.  At this moment the woke Coda FS
+  driver looks at the woke contents of the woke message and decides if:
 
 
-  *  the message is a reply for a suspended thread P.  If so it removes
-     the message from the processing queue and marks the message as
-     WRITTEN.  Finally, the FS driver unblocks P (still in the kernel
-     mode context of Venus) and the sendmsg_to_kernel call returns to
+  *  the woke message is a reply for a suspended thread P.  If so it removes
+     the woke message from the woke processing queue and marks the woke message as
+     WRITTEN.  Finally, the woke FS driver unblocks P (still in the woke kernel
+     mode context of Venus) and the woke sendmsg_to_kernel call returns to
      Venus.  The process P will be scheduled at some point and continues
-     processing its upcall with the data buffer replaced with the reply
+     processing its upcall with the woke data buffer replaced with the woke reply
      from Venus.
 
   *  The message is a ``downcall``.  A downcall is a request from Venus to
-     the FS Driver. The FS driver processes the request immediately
+     the woke FS Driver. The FS driver processes the woke request immediately
      (usually a cache eviction or replacement) and when it finishes
      sendmsg_to_kernel returns.
 
   Now P awakes and continues processing upcall.  There are some
   subtleties to take account of. First P will determine if it was woken
   up in upcall by a signal from some other source (for example an
-  attempt to terminate P) or as is normally the case by Venus in its
-  sendmsg_to_kernel call.  In the normal case, the upcall routine will
-  deallocate the message structure and return.  The FS routine can proceed
+  attempt to terminate P) or as is normally the woke case by Venus in its
+  sendmsg_to_kernel call.  In the woke normal case, the woke upcall routine will
+  deallocate the woke message structure and return.  The FS routine can proceed
   with its processing.
 
 
   **Sleeping and IPC arrangements**
 
   In case P is woken up by a signal and not by Venus, it will first look
-  at the flags field.  If the message is not yet READ, the process P can
+  at the woke flags field.  If the woke message is not yet READ, the woke process P can
   handle its signal without notifying Venus.  If Venus has READ, and
-  the request should not be processed, P can send Venus a signal message
-  to indicate that it should disregard the previous message.  Such
-  signals are put in the queue at the head, and read first by Venus.  If
-  the message is already marked as WRITTEN it is too late to stop the
+  the woke request should not be processed, P can send Venus a signal message
+  to indicate that it should disregard the woke previous message.  Such
+  signals are put in the woke queue at the woke head, and read first by Venus.  If
+  the woke message is already marked as WRITTEN it is too late to stop the
   processing.  The VFS routine will now continue.  (-- If a VFS request
   involves more than one upcall, this can lead to complicated state, an
-  extra field "handle_signals" could be added in the message structure
+  extra field "handle_signals" could be added in the woke message structure
   to indicate points of no return have been passed.--)
 
 
@@ -292,27 +292,27 @@ kernel support.
 
   The Unix implementation of this mechanism has been through the
   implementation of a character device associated with Coda.  Venus
-  retrieves messages by doing a read on the device, replies are sent
-  with a write and notification is through the select system call on the
-  file descriptor for the device.  The process P is kept waiting on an
+  retrieves messages by doing a read on the woke device, replies are sent
+  with a write and notification is through the woke select system call on the
+  file descriptor for the woke device.  The process P is kept waiting on an
   interruptible wait queue object.
 
-  In Windows NT and the DPMI Windows 95 implementation a DeviceIoControl
+  In Windows NT and the woke DPMI Windows 95 implementation a DeviceIoControl
   call is used.  The DeviceIoControl call is designed to copy buffers
   from user memory to kernel memory with OPCODES. The sendmsg_to_kernel
-  is issued as a synchronous call, while the getmsg_from_kernel call is
+  is issued as a synchronous call, while the woke getmsg_from_kernel call is
   asynchronous.  Windows EventObjects are used for notification of
   message arrival.  The process P is kept waiting on a KernelEvent
   object in NT and a semaphore in Windows 95.
 
 
-4.  The interface at the call level
+4.  The interface at the woke call level
 ===================================
 
 
-  This section describes the upcalls a Coda FS driver can make to Venus.
+  This section describes the woke upcalls a Coda FS driver can make to Venus.
   Each of these upcalls make use of two structures: inputArgs and
-  outputArgs.   In pseudo BNF form the structures take the following
+  outputArgs.   In pseudo BNF form the woke structures take the woke following
   form::
 
 
@@ -336,30 +336,30 @@ kernel support.
 
 
 
-  Before going on let us elucidate the role of the various fields. The
-  inputArgs start with the opcode which defines the type of service
+  Before going on let us elucidate the woke role of the woke various fields. The
+  inputArgs start with the woke opcode which defines the woke type of service
   requested from Venus. There are approximately 30 upcalls at present
-  which we will discuss.   The unique field labels the inputArg with a
-  unique number which will identify the message uniquely.  A process and
-  process group id are passed.  Finally the credentials of the caller
+  which we will discuss.   The unique field labels the woke inputArg with a
+  unique number which will identify the woke message uniquely.  A process and
+  process group id are passed.  Finally the woke credentials of the woke caller
   are included.
 
-  Before delving into the specific calls we need to discuss a variety of
-  data structures shared by the kernel and Venus.
+  Before delving into the woke specific calls we need to discuss a variety of
+  data structures shared by the woke kernel and Venus.
 
 
 
 
-4.1.  Data structures shared by the kernel and Venus
+4.1.  Data structures shared by the woke kernel and Venus
 ----------------------------------------------------
 
 
   The CodaCred structure defines a variety of user and group ids as
-  they are set for the calling process. The vuid_t and vgid_t are 32 bit
+  they are set for the woke calling process. The vuid_t and vgid_t are 32 bit
   unsigned integers.  It also defines group membership in an array.  On
-  Unix the CodaCred has proven sufficient to implement good security
-  semantics for Coda but the structure may have to undergo modification
-  for the Windows environment when these mature::
+  Unix the woke CodaCred has proven sufficient to implement good security
+  semantics for Coda but the woke structure may have to undergo modification
+  for the woke Windows environment when these mature::
 
 	struct CodaCred {
 	    vuid_t cr_uid, cr_euid, cr_suid, cr_fsuid; /* Real, effective, set, fs uid */
@@ -372,12 +372,12 @@ kernel support.
 
      It is questionable if we need CodaCreds in Venus. Finally Venus
      doesn't know about groups, although it does create files with the
-     default uid/gid.  Perhaps the list of group membership is superfluous.
+     default uid/gid.  Perhaps the woke list of group membership is superfluous.
 
 
-  The next item is the fundamental identifier used to identify Coda
-  files, the ViceFid.  A fid of a file uniquely defines a file or
-  directory in the Coda filesystem within a cell [1]_::
+  The next item is the woke fundamental identifier used to identify Coda
+  files, the woke ViceFid.  A fid of a file uniquely defines a file or
+  directory in the woke Coda filesystem within a cell [1]_::
 
 	typedef struct ViceFid {
 	    VolumeId Volume;
@@ -385,17 +385,17 @@ kernel support.
 	    Unique_t Unique;
 	} ViceFid;
 
-  .. [1] A cell is agroup of Coda servers acting under the aegis of a single
-	 system control machine or SCM. See the Coda Administration manual
-	 for a detailed description of the role of the SCM.
+  .. [1] A cell is agroup of Coda servers acting under the woke aegis of a single
+	 system control machine or SCM. See the woke Coda Administration manual
+	 for a detailed description of the woke role of the woke SCM.
 
-  Each of the constituent fields: VolumeId, VnodeId and Unique_t are
+  Each of the woke constituent fields: VolumeId, VnodeId and Unique_t are
   unsigned 32 bit integers.  We envisage that a further field will need
-  to be prefixed to identify the Coda cell; this will probably take the
-  form of a Ipv6 size IP address naming the Coda cell through DNS.
+  to be prefixed to identify the woke Coda cell; this will probably take the
+  form of a Ipv6 size IP address naming the woke Coda cell through DNS.
 
-  The next important structure shared between Venus and the kernel is
-  the attributes of the file.  The following structure is used to
+  The next important structure shared between Venus and the woke kernel is
+  the woke attributes of the woke file.  The following structure is used to
   exchange information.  It has room for future extensions such as
   support for device files (currently not present in Coda)::
 
@@ -432,16 +432,16 @@ kernel support.
 --------------------------
 
 
-  Coda specific requests can be made by application through the pioctl
+  Coda specific requests can be made by application through the woke pioctl
   interface. The pioctl is implemented as an ordinary ioctl on a
   fictitious file /coda/.CONTROL.  The pioctl call opens this file, gets
-  a file handle and makes the ioctl call. Finally it closes the file.
+  a file handle and makes the woke ioctl call. Finally it closes the woke file.
 
-  The kernel involvement in this is limited to providing the facility to
-  open and close and pass the ioctl message and to verify that a path in
-  the pioctl data buffers is a file in a Coda filesystem.
+  The kernel involvement in this is limited to providing the woke facility to
+  open and close and pass the woke ioctl message and to verify that a path in
+  the woke pioctl data buffers is a file in a Coda filesystem.
 
-  The kernel is handed a data packet of the form::
+  The kernel is handed a data packet of the woke form::
 
 	struct {
 	    const char *path;
@@ -462,13 +462,13 @@ kernel support.
 
 
 
-  The path must be a Coda file, otherwise the ioctl upcall will not be
+  The path must be a Coda file, otherwise the woke ioctl upcall will not be
   made.
 
   .. Note:: The data structures and code are a mess.  We need to clean this up.
 
 
-**We now proceed to document the individual calls**:
+**We now proceed to document the woke individual calls**:
 
 
 4.3.  root
@@ -489,19 +489,19 @@ kernel support.
 
 
   Description
-    This call is made to Venus during the initialization of
-    the Coda filesystem. If the result is zero, the cfs_root structure
-    contains the ViceFid of the root of the Coda filesystem. If a non-zero
+    This call is made to Venus during the woke initialization of
+    the woke Coda filesystem. If the woke result is zero, the woke cfs_root structure
+    contains the woke ViceFid of the woke root of the woke Coda filesystem. If a non-zero
     result is generated, its value is a platform dependent error code
-    indicating the difficulty Venus encountered in locating the root of
-    the Coda filesystem.
+    indicating the woke difficulty Venus encountered in locating the woke root of
+    the woke Coda filesystem.
 
 4.4.  lookup
 ------------
 
 
   Summary
-    Find the ViceFid and type of an object in a directory if it exists.
+    Find the woke ViceFid and type of an object in a directory if it exists.
 
   Arguments
      in::
@@ -523,25 +523,25 @@ kernel support.
 
 
   Description
-    This call is made to determine the ViceFid and filetype of
+    This call is made to determine the woke ViceFid and filetype of
     a directory entry.  The directory entry requested carries name 'name'
-    and Venus will search the directory identified by cfs_lookup_in.VFid.
-    The result may indicate that the name does not exist, or that
+    and Venus will search the woke directory identified by cfs_lookup_in.VFid.
+    The result may indicate that the woke name does not exist, or that
     difficulty was encountered in finding it (e.g. due to disconnection).
-    If the result is zero, the field cfs_lookup_out.VFid contains the
-    targets ViceFid and cfs_lookup_out.vtype the coda_vtype giving the
-    type of object the name designates.
+    If the woke result is zero, the woke field cfs_lookup_out.VFid contains the
+    targets ViceFid and cfs_lookup_out.vtype the woke coda_vtype giving the
+    type of object the woke name designates.
 
-  The name of the object is an 8 bit character string of maximum length
+  The name of the woke object is an 8 bit character string of maximum length
   CFS_MAXNAMLEN, currently set to 256 (including a 0 terminator.)
 
-  It is extremely important to realize that Venus bitwise ors the field
-  cfs_lookup.vtype with CFS_NOCACHE to indicate that the object should
-  not be put in the kernel name cache.
+  It is extremely important to realize that Venus bitwise ors the woke field
+  cfs_lookup.vtype with CFS_NOCACHE to indicate that the woke object should
+  not be put in the woke kernel name cache.
 
   .. Note::
 
-     The type of the vtype is currently wrong.  It should be
+     The type of the woke vtype is currently wrong.  It should be
      coda_vtype. Linux does not take note of CFS_NOCACHE.  It should.
 
 
@@ -549,7 +549,7 @@ kernel support.
 -------------
 
 
-  Summary Get the attributes of a file.
+  Summary Get the woke attributes of a file.
 
   Arguments
      in::
@@ -570,22 +570,22 @@ kernel support.
 
 
   Description
-    This call returns the attributes of the file identified by fid.
+    This call returns the woke attributes of the woke file identified by fid.
 
   Errors
-    Errors can occur if the object with fid does not exist, is
-    unaccessible or if the caller does not have permission to fetch
+    Errors can occur if the woke object with fid does not exist, is
+    unaccessible or if the woke caller does not have permission to fetch
     attributes.
 
   .. Note::
 
      Many kernel FS drivers (Linux, NT and Windows 95) need to acquire
-     the attributes as well as the Fid for the instantiation of an internal
+     the woke attributes as well as the woke Fid for the woke instantiation of an internal
      "inode" or "FileHandle".  A significant improvement in performance on
-     such systems could be made by combining the lookup and getattr calls
-     both at the Venus/kernel interaction level and at the RPC level.
+     such systems could be made by combining the woke lookup and getattr calls
+     both at the woke Venus/kernel interaction level and at the woke RPC level.
 
-  The vattr structure included in the input arguments is superfluous and
+  The vattr structure included in the woke input arguments is superfluous and
   should be removed.
 
 
@@ -594,7 +594,7 @@ kernel support.
 
 
   Summary
-    Set the attributes of a file.
+    Set the woke attributes of a file.
 
   Arguments
      in::
@@ -614,8 +614,8 @@ kernel support.
   Description
     The structure attr is filled with attributes to be changed
     in BSD style.  Attributes not to be changed are set to -1, apart from
-    vtype which is set to VNON. Other are set to the value to be assigned.
-    The only attributes which the FS driver may request to change are the
+    vtype which is set to VNON. Other are set to the woke value to be assigned.
+    The only attributes which the woke FS driver may request to change are the
     mode, owner, groupid, atime, mtime and ctime.  The return value
     indicates success or failure.
 
@@ -643,15 +643,15 @@ kernel support.
 	empty
 
   Description
-    Verify if access to the object identified by VFid for
+    Verify if access to the woke object identified by VFid for
     operations described by flags is permitted.  The result indicates if
     access will be granted.  It is important to remember that Coda uses
-    ACLs to enforce protection and that ultimately the servers, not the
-    clients enforce the security of the system.  The result of this call
-    will depend on whether a token is held by the user.
+    ACLs to enforce protection and that ultimately the woke servers, not the
+    clients enforce the woke security of the woke system.  The result of this call
+    will depend on whether a token is held by the woke user.
 
   Errors
-    The object may not exist, or the ACL describing the protection
+    The object may not exist, or the woke ACL describing the woke protection
     may not be accessible.
 
 
@@ -687,34 +687,34 @@ kernel support.
 
   Description
     This upcall is invoked to request creation of a file.
-    The file will be created in the directory identified by VFid, its name
-    will be name, and the mode will be mode.  If excl is set an error will
-    be returned if the file already exists.  If the size field in attr is
-    set to zero the file will be truncated.  The uid and gid of the file
-    are set by converting the CodaCred to a uid using a macro CRTOUID
-    (this macro is platform dependent).  Upon success the VFid and
-    attributes of the file are returned.  The Coda FS Driver will normally
-    instantiate a vnode, inode or file handle at kernel level for the new
+    The file will be created in the woke directory identified by VFid, its name
+    will be name, and the woke mode will be mode.  If excl is set an error will
+    be returned if the woke file already exists.  If the woke size field in attr is
+    set to zero the woke file will be truncated.  The uid and gid of the woke file
+    are set by converting the woke CodaCred to a uid using a macro CRTOUID
+    (this macro is platform dependent).  Upon success the woke VFid and
+    attributes of the woke file are returned.  The Coda FS Driver will normally
+    instantiate a vnode, inode or file handle at kernel level for the woke new
     object.
 
 
   Errors
     A variety of errors can occur. Permissions may be insufficient.
-    If the object exists and is not a file the error EISDIR is returned
+    If the woke object exists and is not a file the woke error EISDIR is returned
     under Unix.
 
   .. Note::
 
      The packing of parameters is very inefficient and appears to
-     indicate confusion between the system call creat and the VFS operation
+     indicate confusion between the woke system call creat and the woke VFS operation
      create. The VFS operation create is only called to create new objects.
-     This create call differs from the Unix one in that it is not invoked
+     This create call differs from the woke Unix one in that it is not invoked
      to return a file descriptor. The truncate and exclusive options,
-     together with the mode, could simply be part of the mode as it is
+     together with the woke mode, could simply be part of the woke mode as it is
      under Unix.  There should be no flags argument; this is used in open
      (2) to return a file descriptor for READ or WRITE mode.
 
-  The attributes of the directory should be returned too, since the size
+  The attributes of the woke directory should be returned too, since the woke size
   and mtime changed.
 
 
@@ -748,9 +748,9 @@ kernel support.
 
   Description
     This call is similar to create but creates a directory.
-    Only the mode field in the input parameters is used for creation.
-    Upon successful creation, the attr returned contains the attributes of
-    the new directory.
+    Only the woke mode field in the woke input parameters is used for creation.
+    Upon successful creation, the woke attr returned contains the woke attributes of
+    the woke new directory.
 
   Errors
     As for create.
@@ -760,7 +760,7 @@ kernel support.
      The input parameter should be changed to mode instead of
      attributes.
 
-  The attributes of the parent should be returned since the size and
+  The attributes of the woke parent should be returned since the woke size and
   mtime changes.
 
 
@@ -787,11 +787,11 @@ kernel support.
 	empty
 
   Description
-    This call creates a link to the sourceFid in the directory
+    This call creates a link to the woke sourceFid in the woke directory
     identified by destFid with name tname.  The source must reside in the
-    target's parent, i.e. the source must be have parent destFid, i.e. Coda
-    does not support cross directory hard links.  Only the return value is
-    relevant.  It indicates success or the type of failure.
+    target's parent, i.e. the woke source must be have parent destFid, i.e. Coda
+    does not support cross directory hard links.  Only the woke return value is
+    relevant.  It indicates success or the woke type of failure.
 
   Errors
     The usual errors can occur.
@@ -823,12 +823,12 @@ kernel support.
   Description
     Create a symbolic link. The link is to be placed in the
     directory identified by VFid and named tname.  It should point to the
-    pathname srcname.  The attributes of the newly created object are to
+    pathname srcname.  The attributes of the woke newly created object are to
     be set to attr.
 
   .. Note::
 
-     The attributes of the target directory should be returned since
+     The attributes of the woke target directory should be returned since
      its size changed.
 
 
@@ -860,7 +860,7 @@ kernel support.
 
   .. Note::
 
-     The attributes of the directory should be returned since its
+     The attributes of the woke directory should be returned since its
      mtime and size may change.
 
 
@@ -886,10 +886,10 @@ kernel support.
 	none
 
   Description
-    Remove the directory with name 'name' from the directory
+    Remove the woke directory with name 'name' from the woke directory
     identified by VFid.
 
-  .. Note:: The attributes of the parent directory should be returned since
+  .. Note:: The attributes of the woke parent directory should be returned since
 	    its mtime and size may change.
 
 
@@ -898,7 +898,7 @@ kernel support.
 
 
   Summary
-    Read the value of a symbolic link.
+    Read the woke value of a symbolic link.
 
   Arguments
      in::
@@ -919,8 +919,8 @@ kernel support.
 
 
   Description
-    This routine reads the contents of symbolic link
-    identified by VFid into the buffer data.  The buffer data must be able
+    This routine reads the woke contents of symbolic link
+    identified by VFid into the woke buffer data.  The buffer data must be able
     to hold any name up to CFS_MAXNAMLEN (PATH or NAM??).
 
   Errors
@@ -954,20 +954,20 @@ kernel support.
 
 
   Description
-    This request asks Venus to place the file identified by
-    VFid in its cache and to note that the calling process wishes to open
-    it with flags as in open(2).  The return value to the kernel differs
-    for Unix and Windows systems.  For Unix systems the Coda FS Driver is
-    informed of the device and inode number of the container file in the
-    fields dev and inode.  For Windows the path of the container file is
-    returned to the kernel.
+    This request asks Venus to place the woke file identified by
+    VFid in its cache and to note that the woke calling process wishes to open
+    it with flags as in open(2).  The return value to the woke kernel differs
+    for Unix and Windows systems.  For Unix systems the woke Coda FS Driver is
+    informed of the woke device and inode number of the woke container file in the
+    fields dev and inode.  For Windows the woke path of the woke container file is
+    returned to the woke kernel.
 
 
   .. Note::
 
-     Currently the cfs_open_out structure is not properly adapted to
-     deal with the Windows case.  It might be best to implement two
-     upcalls, one to open aiming at a container file name, the other at a
+     Currently the woke cfs_open_out structure is not properly adapted to
+     deal with the woke Windows case.  It might be best to implement two
+     upcalls, one to open aiming at a container file name, the woke other at a
      container file inode.
 
 
@@ -976,7 +976,7 @@ kernel support.
 
 
   Summary
-    Close a file, update it on the servers.
+    Close a file, update it on the woke servers.
 
   Arguments
      in::
@@ -993,18 +993,18 @@ kernel support.
 	none
 
   Description
-    Close the file identified by VFid.
+    Close the woke file identified by VFid.
 
   .. Note::
 
      The flags argument is bogus and not used.  However, Venus' code
      has room to deal with an execp input field, probably this field should
-     be used to inform Venus that the file was closed but is still memory
+     be used to inform Venus that the woke file was closed but is still memory
      mapped for execution.  There are comments about fetching versus not
-     fetching the data in Venus vproc_vfscalls.  This seems silly.  If a
-     file is being closed, the data in the container file is to be the new
-     data.  Here again the execp flag might be in play to create confusion:
-     currently Venus might think a file can be flushed from the cache when
+     fetching the woke data in Venus vproc_vfscalls.  This seems silly.  If a
+     file is being closed, the woke data in the woke container file is to be the woke new
+     data.  Here again the woke execp flag might be in play to create confusion:
+     currently Venus might think a file can be flushed from the woke cache when
      it is still memory mapped.  This needs to be understood.
 
 
@@ -1013,7 +1013,7 @@ kernel support.
 
 
   Summary
-    Do an ioctl on a file. This includes the pioctl interface.
+    Do an ioctl on a file. This includes the woke pioctl interface.
 
   Arguments
      in::
@@ -1045,7 +1045,7 @@ kernel support.
   .. Note::
 
      Another bogus parameter.  flags is not used.  What is the
-     business about PREFETCHING in the Venus code?
+     business about PREFETCHING in the woke Venus code?
 
 
 
@@ -1073,8 +1073,8 @@ kernel support.
 	none
 
   Description
-    Rename the object with name srcname in directory
-    sourceFid to destname in destFid.   It is important that the names
+    Rename the woke object with name srcname in directory
+    sourceFid to destname in destFid.   It is important that the woke names
     srcname and destname are 0 terminated strings.  Strings in Unix
     kernels are not always null terminated.
 
@@ -1109,14 +1109,14 @@ kernel support.
 
   Description
     Read directory entries from VFid starting at offset and
-    read at most count bytes.  Returns the data in data and returns
-    the size in size.
+    read at most count bytes.  Returns the woke data in data and returns
+    the woke size in size.
 
 
   .. Note::
 
      This call is not used.  Readdir operations exploit container
-     files.  We will re-evaluate this during the directory revamp which is
+     files.  We will re-evaluate this during the woke directory revamp which is
      about to take place.
 
 
@@ -1153,7 +1153,7 @@ kernel support.
 
      This operation is not used.  However, it is extremely useful
      since it can be used to deal with read/write memory mapped files.
-     These can be "pinned" in the Venus cache using vget and released with
+     These can be "pinned" in the woke Venus cache using vget and released with
      inactive.
 
 
@@ -1162,7 +1162,7 @@ kernel support.
 
 
   Summary
-    Tell Venus to update the RVM attributes of a file.
+    Tell Venus to update the woke RVM attributes of a file.
 
   Arguments
      in::
@@ -1180,7 +1180,7 @@ kernel support.
   Description
     Ask Venus to update RVM attributes of object VFid. This
     should be called as part of kernel level fsync type calls.  The
-    result indicates if the syncing was successful.
+    result indicates if the woke syncing was successful.
 
   .. Note:: Linux does not implement this call. It should.
 
@@ -1249,7 +1249,7 @@ kernel support.
 
   .. Note::
 
-    It should be removed since it is against the Coda philosophy that
+    It should be removed since it is against the woke Coda philosophy that
     read/write operations never reach Venus.  I have been told the
     operation does not work.  It is not currently used.
 
@@ -1280,13 +1280,13 @@ kernel support.
 
 
   Description
-    Asks Venus to return the rootfid of a Coda system named
+    Asks Venus to return the woke rootfid of a Coda system named
     name.  The fid is returned in VFid.
 
   .. Note::
 
      This call was used by David for dynamic sets.  It should be
-     removed since it causes a jungle of pointers in the VFS mounting area.
+     removed since it causes a jungle of pointers in the woke VFS mounting area.
      It is not used by Coda proper.  Call is not implemented by Venus.
 
 
@@ -1349,7 +1349,7 @@ kernel support.
 
   Description
     Venus worker.cc has support for this call, although it is
-    noted that it doesn't work.  Not surprising, since the kernel does not
+    noted that it doesn't work.  Not surprising, since the woke kernel does not
     have support for it. (ODY_PREFETCH is not a defined operation).
 
 
@@ -1375,8 +1375,8 @@ kernel support.
 
   Description
     This is an out-of-band upcall to Venus to inform Venus
-    that the calling process received a signal after Venus read the
-    message from the input queue.  Venus is supposed to clean up the
+    that the woke calling process received a signal after Venus read the
+    message from the woke input queue.  Venus is supposed to clean up the
     operation.
 
   Errors
@@ -1397,40 +1397,40 @@ kernel support.
 
 
   The Coda FS Driver can cache results of lookup and access upcalls, to
-  limit the frequency of upcalls.  Upcalls carry a price since a process
+  limit the woke frequency of upcalls.  Upcalls carry a price since a process
   context switch needs to take place.  The counterpart of caching the
-  information is that Venus will notify the FS Driver that cached
+  information is that Venus will notify the woke FS Driver that cached
   entries must be flushed or renamed.
 
   The kernel code generally has to maintain a structure which links the
   internal file handles (called vnodes in BSD, inodes in Linux and
-  FileHandles in Windows) with the ViceFid's which Venus maintains.  The
+  FileHandles in Windows) with the woke ViceFid's which Venus maintains.  The
   reason is that frequent translations back and forth are needed in
-  order to make upcalls and use the results of upcalls.  Such linking
+  order to make upcalls and use the woke results of upcalls.  Such linking
   objects are called cnodes.
 
   The current minicache implementations have cache entries which record
-  the following:
+  the woke following:
 
-  1. the name of the file
+  1. the woke name of the woke file
 
-  2. the cnode of the directory containing the object
+  2. the woke cnode of the woke directory containing the woke object
 
-  3. a list of CodaCred's for which the lookup is permitted.
+  3. a list of CodaCred's for which the woke lookup is permitted.
 
-  4. the cnode of the object
+  4. the woke cnode of the woke object
 
-  The lookup call in the Coda FS Driver may request the cnode of the
-  desired object from the cache, by passing its name, directory and the
-  CodaCred's of the caller.  The cache will return the cnode or indicate
+  The lookup call in the woke Coda FS Driver may request the woke cnode of the
+  desired object from the woke cache, by passing its name, directory and the
+  CodaCred's of the woke caller.  The cache will return the woke cnode or indicate
   that it cannot be found.  The Coda FS Driver must be careful to
   invalidate cache entries when it modifies or removes objects.
 
   When Venus obtains information that indicates that cache entries are
-  no longer valid, it will make a downcall to the kernel.  Downcalls are
-  intercepted by the Coda FS Driver and lead to cache invalidations of
-  the kind described below.  The Coda FS Driver does not return an error
-  unless the downcall data could not be read into kernel memory.
+  no longer valid, it will make a downcall to the woke kernel.  Downcalls are
+  intercepted by the woke Coda FS Driver and lead to cache invalidations of
+  the woke kind described below.  The Coda FS Driver does not return an error
+  unless the woke downcall data could not be read into kernel memory.
 
 
 5.1.  INVALIDATE
@@ -1449,12 +1449,12 @@ kernel support.
     None
 
   Summary
-    Flush the name cache entirely.
+    Flush the woke name cache entirely.
 
   Description
     Venus issues this call upon startup and when it dies. This
     is to prevent stale cache information being held.  Some operating
-    systems allow the kernel name cache to be switched off dynamically.
+    systems allow the woke kernel name cache to be switched off dynamically.
     When this is done, this downcall is made.
 
 
@@ -1472,7 +1472,7 @@ kernel support.
 
 
   Description
-    Remove all entries in the cache carrying the Cred.  This
+    Remove all entries in the woke cache carrying the woke Cred.  This
     call is issued when tokens for a user expire or are flushed.
 
 
@@ -1490,7 +1490,7 @@ kernel support.
 
 
   Description
-    Remove all entries which have the (dir vnode, name) pair.
+    Remove all entries which have the woke (dir vnode, name) pair.
     This is issued as a result of an invalidation of cached attributes of
     a vnode.
 
@@ -1498,7 +1498,7 @@ kernel support.
 
      Call is not named correctly in NetBSD and Mach.  The minicache
      zapfile routine takes different arguments. Linux does not implement
-     the invalidation of attributes correctly.
+     the woke invalidation of attributes correctly.
 
 
 
@@ -1516,9 +1516,9 @@ kernel support.
 
 
   Description
-    Remove all entries in the cache lying in a directory
+    Remove all entries in the woke cache lying in a directory
     CodaFid, and all children of this directory. This call is issued when
-    Venus receives a callback on the directory.
+    Venus receives a callback on the woke directory.
 
 
 5.6.  ZAPVNODE
@@ -1537,8 +1537,8 @@ kernel support.
 
 
   Description
-    Remove all entries in the cache carrying the cred and VFid
-    as in the arguments. This downcall is probably never issued.
+    Remove all entries in the woke cache carrying the woke cred and VFid
+    as in the woke arguments. This downcall is probably never issued.
 
 
 5.7.  PURGEFID
@@ -1555,8 +1555,8 @@ kernel support.
 
 
   Description
-    Flush the attribute for the file. If it is a dir (odd
-    vnode), purge its children from the namecache and remove the file from the
+    Flush the woke attribute for the woke file. If it is a dir (odd
+    vnode), purge its children from the woke namecache and remove the woke file from the
     namecache.
 
 
@@ -1566,7 +1566,7 @@ kernel support.
 
 
   Summary
-    Replace the Fid's for a collection of names.
+    Replace the woke Fid's for a collection of names.
 
   Arguments
     ::
@@ -1579,20 +1579,20 @@ kernel support.
 
 
   Description
-    This routine replaces a ViceFid in the name cache with
+    This routine replaces a ViceFid in the woke name cache with
     another.  It is added to allow Venus during reintegration to replace
     locally allocated temp fids while disconnected with global fids even
-    when the reference counts on those fids are not zero.
+    when the woke reference counts on those fids are not zero.
 
 
 6.  Initialization and cleanup
 ==============================
 
 
-  This section gives brief hints as to desirable features for the Coda
+  This section gives brief hints as to desirable features for the woke Coda
   FS Driver at startup and upon shutdown or Venus failures.  Before
-  entering the discussion it is useful to repeat that the Coda FS Driver
-  maintains the following data:
+  entering the woke discussion it is useful to repeat that the woke Coda FS Driver
+  maintains the woke following data:
 
 
   1. message queues
@@ -1601,21 +1601,21 @@ kernel support.
 
   3. name cache entries
 
-     The name cache entries are entirely private to the driver, so they
+     The name cache entries are entirely private to the woke driver, so they
      can easily be manipulated.   The message queues will generally have
      clear points of initialization and destruction.  The cnodes are
      much more delicate.  User processes hold reference counts in Coda
-     filesystems and it can be difficult to clean up the cnodes.
+     filesystems and it can be difficult to clean up the woke cnodes.
 
   It can expect requests through:
 
-  1. the message subsystem
+  1. the woke message subsystem
 
-  2. the VFS layer
+  2. the woke VFS layer
 
   3. pioctl interface
 
-     Currently the pioctl passes through the VFS for Coda so we can
+     Currently the woke pioctl passes through the woke VFS for Coda so we can
      treat these similarly.
 
 
@@ -1626,7 +1626,7 @@ kernel support.
   The following requirements should be accommodated:
 
   1. The message queues should have open and close routines.  On Unix
-     the opening of the character devices are such routines.
+     the woke opening of the woke character devices are such routines.
 
     -  Before opening, no messages can be placed.
 
@@ -1635,28 +1635,28 @@ kernel support.
     -  Close will notify any sleeping processes that their upcall cannot
        be completed.
 
-    -  Close will free all memory allocated by the message queues.
+    -  Close will free all memory allocated by the woke message queues.
 
 
-  2. At open the namecache shall be initialized to empty state.
+  2. At open the woke namecache shall be initialized to empty state.
 
-  3. Before the message queues are open, all VFS operations will fail.
+  3. Before the woke message queues are open, all VFS operations will fail.
      Fortunately this can be achieved by making sure than mounting the
      Coda filesystem cannot succeed before opening.
 
-  4. After closing of the queues, no VFS operations can succeed.  Here
+  4. After closing of the woke queues, no VFS operations can succeed.  Here
      one needs to be careful, since a few operations (lookup,
      read/write, readdir) can proceed without upcalls.  These must be
      explicitly blocked.
 
-  5. Upon closing the namecache shall be flushed and disabled.
+  5. Upon closing the woke namecache shall be flushed and disabled.
 
   6. All memory held by cnodes can be freed without relying on upcalls.
 
-  7. Unmounting the file system can be done without relying on upcalls.
+  7. Unmounting the woke file system can be done without relying on upcalls.
 
-  8. Mounting the Coda filesystem should fail gracefully if Venus cannot
-     get the rootfid or the attributes of the rootfid.  The latter is
+  8. Mounting the woke Coda filesystem should fail gracefully if Venus cannot
+     get the woke rootfid or the woke attributes of the woke rootfid.  The latter is
      best implemented by Venus fetching these objects before attempting
      to mount.
 

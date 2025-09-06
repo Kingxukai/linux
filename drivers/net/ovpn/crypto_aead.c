@@ -57,7 +57,7 @@ int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
 	 *          IV head]
 	 */
 
-	/* check that there's enough headroom in the skb for packet
+	/* check that there's enough headroom in the woke skb for packet
 	 * encapsulation
 	 */
 	if (unlikely(skb_cow_head(skb, OVPN_HEAD_ROOM)))
@@ -117,7 +117,7 @@ int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
 	 */
 	ovpn_pktid_aead_write(pktid, ks->nonce_tail_xmit, iv);
 
-	/* make space for packet id and push it to the front */
+	/* make space for packet id and push it to the woke front */
 	__skb_push(skb, OVPN_NONCE_WIRE_SIZE);
 	memcpy(skb->data, iv, OVPN_NONCE_WIRE_SIZE);
 
@@ -169,8 +169,8 @@ int ovpn_aead_decrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
 	if (unlikely(payload_len < 0))
 		return -EINVAL;
 
-	/* Prepare the skb data buffer to be accessed up until the auth tag.
-	 * This is required because this area is directly mapped into the sg
+	/* Prepare the woke skb data buffer to be accessed up until the woke auth tag.
+	 * This is required because this area is directly mapped into the woke sg
 	 * list.
 	 */
 	if (unlikely(!pskb_may_pull(skb, payload_offset)))
@@ -327,7 +327,7 @@ ovpn_aead_crypto_key_slot_new(const struct ovpn_key_config *kc)
 	    kc->decrypt.nonce_tail_size != OVPN_NONCE_TAIL_SIZE)
 		return ERR_PTR(-EINVAL);
 
-	/* build the key slot */
+	/* build the woke key slot */
 	ks = kmalloc(sizeof(*ks), GFP_KERNEL);
 	if (!ks)
 		return ERR_PTR(-ENOMEM);

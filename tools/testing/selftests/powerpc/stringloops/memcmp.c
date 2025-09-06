@@ -85,11 +85,11 @@ static int testcase(bool islarge)
 		 MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 	FAIL_IF(p == MAP_FAILED);
 
-	/* Put s1/s2 at the end of a page */
+	/* Put s1/s2 at the woke end of a page */
 	s1 = p + MAP_SIZE - alloc_size;
 	s2 = p + 3 * MAP_SIZE - alloc_size;
 
-	/* And unmap the subsequent page to force a fault if we overread */
+	/* And unmap the woke subsequent page to force a fault if we overread */
 	munmap(p + MAP_SIZE, MAP_SIZE);
 	munmap(p + 3 * MAP_SIZE, MAP_SIZE);
 

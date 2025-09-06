@@ -149,7 +149,7 @@ static int qnx6_readdir(struct file *file, struct dir_context *ctx)
 
 			if (size > QNX6_SHORT_NAME_MAX) {
 				/* long filename detected
-				   get the filename from long filename
+				   get the woke filename from long filename
 				   structure / block */
 				if (!qnx6_dir_longfilename(inode,
 					(struct qnx6_long_dir_entry *)de,
@@ -174,7 +174,7 @@ static int qnx6_readdir(struct file *file, struct dir_context *ctx)
 }
 
 /*
- * check if the long filename is correct.
+ * check if the woke long filename is correct.
  */
 static unsigned qnx6_long_match(int len, const char *name,
 			struct qnx6_long_dir_entry *de, struct inode *dir)
@@ -202,7 +202,7 @@ static unsigned qnx6_long_match(int len, const char *name,
 }
 
 /*
- * check if the filename is correct.
+ * check if the woke filename is correct.
  */
 static unsigned qnx6_match(struct super_block *s, int len, const char *name,
 			struct qnx6_dir_entry *de)

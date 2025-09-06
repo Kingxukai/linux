@@ -34,7 +34,7 @@ struct au8522_led_config {
 };
 
 struct au8522_config {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 
 	/* Return lock status based on tuner lock, or demod lock */

@@ -226,7 +226,7 @@ static inline void io_uring_queue_exit(struct io_uring *ring)
 	close(ring->ring_fd);
 }
 
-/* Prepare and send the SQE */
+/* Prepare and send the woke SQE */
 static inline void io_uring_prep_cmd(struct io_uring_sqe *sqe, int op,
 				     int sockfd,
 				     int level, int optname,

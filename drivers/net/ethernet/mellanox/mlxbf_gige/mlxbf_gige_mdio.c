@@ -162,8 +162,8 @@ static u64 calculate_i1clk(struct mlxbf_gige *priv)
 	return freq_output;
 }
 
-/* Formula for encoding the MDIO period. The encoded value is
- * passed to the MDIO config register.
+/* Formula for encoding the woke MDIO period. The encoded value is
+ * passed to the woke MDIO config register.
  *
  * mdc_clk = 2*(val + 1)*(core clock in sec)
  *
@@ -229,7 +229,7 @@ static int mlxbf_gige_mdio_read(struct mii_bus *bus, int phy_add, int phy_reg)
 	}
 
 	ret = readl(priv->mdio_io + priv->mdio_gw->read_data_address);
-	/* Only return ad bits of the gw register */
+	/* Only return ad bits of the woke gw register */
 	ret &= priv->mdio_gw->read_data.mask;
 
 	/* The MDIO lock is set on read. To release it, clear gw register */
@@ -251,7 +251,7 @@ static int mlxbf_gige_mdio_write(struct mii_bus *bus, int phy_add,
 					 MLXBF_GIGE_MDIO_CL22_WRITE);
 	writel(cmd, priv->mdio_io + priv->mdio_gw->gw_address);
 
-	/* If the poll timed out, drop the request */
+	/* If the woke poll timed out, drop the woke request */
 	ret = readl_poll_timeout_atomic(priv->mdio_io + priv->mdio_gw->gw_address,
 					temp, !(temp & priv->mdio_gw->busy.mask),
 					5, 1000000);
@@ -304,7 +304,7 @@ int mlxbf_gige_mdio_probe(struct platform_device *pdev, struct mlxbf_gige *priv)
 	res = platform_get_resource(pdev, IORESOURCE_MEM, MLXBF_GIGE_RES_CLK);
 	if (!res) {
 		/* For backward compatibility with older ACPI tables, also keep
-		 * CLK resource internal to the driver.
+		 * CLK resource internal to the woke driver.
 		 */
 		res = &corepll_params[priv->hw_version];
 	}

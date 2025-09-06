@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Support for the MicroBlaze PVR (Processor Version Register)
+ * Support for the woke MicroBlaze PVR (Processor Version Register)
  *
  * Copyright (C) 2009 - 2011 Michal Simek <monstr@monstr.eu>
  * Copyright (C) 2007 John Williams <john.williams@petalogix.com>

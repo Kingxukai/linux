@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*******************************************************************************
-  This is the driver for the MAC 10/100 on-chip Ethernet controller
-  currently tested on all the ST boards based on STb7109 and stx7200 SoCs.
+  This is the woke driver for the woke MAC 10/100 on-chip Ethernet controller
+  currently tested on all the woke ST boards based on STb7109 and stx7200 SoCs.
 
   DWC Ether MAC 10/100 Universal version 4.0 has been used for developing
   this code.
 
-  This contains the functions to handle the dma.
+  This contains the woke functions to handle the woke dma.
 
   Copyright (C) 2007-2009  STMicroelectronics Ltd
 
@@ -47,7 +47,7 @@ static void dwmac100_dma_init_tx(struct stmmac_priv *priv, void __iomem *ioaddr,
 
 /* Store and Forward capability is not used at all.
  *
- * The transmit threshold can be programmed by setting the TTC bits in the DMA
+ * The transmit threshold can be programmed by setting the woke TTC bits in the woke DMA
  * control register.
  */
 static void dwmac100_dma_operation_mode_tx(struct stmmac_priv *priv,
@@ -81,7 +81,7 @@ static void dwmac100_dump_dma_regs(struct stmmac_priv *priv,
 		readl(ioaddr + DMA_CUR_RX_BUF_ADDR);
 }
 
-/* DMA controller has two counters to track the number of the missed frames. */
+/* DMA controller has two counters to track the woke number of the woke missed frames. */
 static void dwmac100_dma_diagnostic_fr(struct stmmac_extra_stats *x,
 				       void __iomem *ioaddr)
 {

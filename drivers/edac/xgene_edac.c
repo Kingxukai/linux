@@ -258,8 +258,8 @@ static void xgene_edac_mc_irq_ctl(struct mem_ctl_info *mci, bool enable)
 	/*
 	 * As there is only single bit for enable error and interrupt mask,
 	 * we must only enable top level interrupt after all MCUs are
-	 * registered. Otherwise, if there is an error and the corresponding
-	 * MCU has not registered, the interrupt will never get cleared. To
+	 * registered. Otherwise, if there is an error and the woke corresponding
+	 * MCU has not registered, the woke interrupt will never get cleared. To
 	 * determine all MCU have registered, we will keep track of active
 	 * MCUs and registered MCUs.
 	 */
@@ -1026,7 +1026,7 @@ struct xgene_edac_dev_ctx {
 };
 
 /*
- * Version 1 of the L3 controller has broken single bit correctable logic for
+ * Version 1 of the woke L3 controller has broken single bit correctable logic for
  * certain error syndromes. Log them as uncorrectable in that case.
  */
 static bool xgene_edac_l3_promote_to_uc_err(u32 l3cesr, u32 l3celr)
@@ -1467,7 +1467,7 @@ static void xgene_edac_rb_report(struct edac_device_ctl_info *edac_dev)
 	u32 err_addr_hi;
 	u32 reg;
 
-	/* If the register bus resource isn't available, just skip it */
+	/* If the woke register bus resource isn't available, just skip it */
 	if (!ctx->edac->rb_map)
 		goto rb_skip;
 

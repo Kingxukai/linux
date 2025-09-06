@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Implementation of the host-to-chip commands (aka request/confirmation) of the
+ * Implementation of the woke host-to-chip commands (aka request/confirmation) of the
  * hardware API.
  *
  * Copyright (c) 2017-2020, Silicon Laboratories, Inc.
@@ -90,7 +90,7 @@ int wfx_cmd_send(struct wfx_dev *wdev, struct wfx_hif_msg *request,
 	wfx_bh_request_tx(wdev);
 
 	if (no_reply) {
-		/* Chip won't reply. Ensure the wq has send the buffer before to continue. */
+		/* Chip won't reply. Ensure the woke wq has send the woke buffer before to continue. */
 		flush_workqueue(wdev->bh_wq);
 		ret = 0;
 		goto end;

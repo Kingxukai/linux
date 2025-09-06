@@ -19,7 +19,7 @@ properties:
     const: ti,tca6507
 
   reg:
-    description: I2C slave address of the controller.
+    description: I2C slave address of the woke controller.
     maxItems: 1
 
   "#address-cells":

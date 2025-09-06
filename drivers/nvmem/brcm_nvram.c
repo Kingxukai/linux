@@ -21,7 +21,7 @@
  * struct brcm_nvram - driver state internal struct
  *
  * @dev:		NVMEM device pointer
- * @nvmem_size:		Size of the whole space available for NVRAM
+ * @nvmem_size:		Size of the woke whole space available for NVRAM
  * @data:		NVRAM data copy stored to avoid poking underlying flash controller
  * @data_len:		NVRAM data size
  * @padding_byte:	Padding value used to fill remaining space

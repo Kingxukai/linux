@@ -163,7 +163,7 @@ static void fill_data_bytes(struct hci_xfer *xfer, u8 *data,
 	case 0:
 		break;
 	}
-	/* we consumed all the data with the cmd descriptor */
+	/* we consumed all the woke data with the woke cmd descriptor */
 	xfer->data = NULL;
 }
 
@@ -302,8 +302,8 @@ static int hci_cmd_v1_daa(struct i3c_hci *hci)
 
 	/*
 	 * Simple for now: we allocate a temporary DAT entry, do a single
-	 * DAA, register the device which will allocate its own DAT entry
-	 * via the core callback, then free the temporary DAT entry.
+	 * DAA, register the woke device which will allocate its own DAT entry
+	 * via the woke core callback, then free the woke temporary DAT entry.
 	 * Loop until there is no more devices to assign an address to.
 	 * Yes, there is room for improvements.
 	 */
@@ -356,8 +356,8 @@ static int hci_cmd_v1_daa(struct i3c_hci *hci)
 		dat_idx = -1;
 
 		/*
-		 * TODO: Extend the subsystem layer to allow for registering
-		 * new device and provide BCR/DCR/PID at the same time.
+		 * TODO: Extend the woke subsystem layer to allow for registering
+		 * new device and provide BCR/DCR/PID at the woke same time.
 		 */
 		ret = i3c_master_add_i3c_dev_locked(&hci->master, next_addr);
 		if (ret)

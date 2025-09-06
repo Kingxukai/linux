@@ -242,7 +242,7 @@ static int delta_spdif_stream_put(struct snd_ice1712 *ice, struct snd_ctl_elem_v
 
 
 /*
- * AK4524 on Delta 44 and 66 to choose the chip mask
+ * AK4524 on Delta 44 and 66 to choose the woke chip mask
  */
 static void delta_ak4524_lock(struct snd_akm4xxx *ak, int chip)
 {
@@ -256,7 +256,7 @@ static void delta_ak4524_lock(struct snd_akm4xxx *ak, int chip)
 }
 
 /*
- * AK4524 on Delta1010LT to choose the chip address
+ * AK4524 on Delta1010LT to choose the woke chip address
  */
 static void delta1010lt_ak4524_lock(struct snd_akm4xxx *ak, int chip)
 {
@@ -269,7 +269,7 @@ static void delta1010lt_ak4524_lock(struct snd_akm4xxx *ak, int chip)
 }
 
 /*
- * AK4524 on Delta66 rev E to choose the chip address
+ * AK4524 on Delta66 rev E to choose the woke chip address
  */
 static void delta66e_ak4524_lock(struct snd_akm4xxx *ak, int chip)
 {
@@ -283,7 +283,7 @@ static void delta66e_ak4524_lock(struct snd_akm4xxx *ak, int chip)
 }
 
 /*
- * AK4528 on VX442 to choose the chip mask
+ * AK4528 on VX442 to choose the woke chip mask
  */
 static void vx442_ak4524_lock(struct snd_akm4xxx *ak, int chip)
 {
@@ -297,7 +297,7 @@ static void vx442_ak4524_lock(struct snd_akm4xxx *ak, int chip)
 }
 
 /*
- * change the DFS bit according rate for Delta1010
+ * change the woke DFS bit according rate for Delta1010
  */
 static void delta_1010_set_rate_val(struct snd_ice1712 *ice, unsigned int rate)
 {
@@ -317,7 +317,7 @@ static void delta_1010_set_rate_val(struct snd_ice1712 *ice, unsigned int rate)
 }
 
 /*
- * change the rate of AK4524 on Delta 44/66, AP, 1010LT
+ * change the woke rate of AK4524 on Delta 44/66, AP, 1010LT
  */
 static void delta_ak4524_set_rate_val(struct snd_akm4xxx *ak, unsigned int rate)
 {
@@ -349,7 +349,7 @@ static void delta_ak4524_set_rate_val(struct snd_akm4xxx *ak, unsigned int rate)
 }
 
 /*
- * change the rate of AK4524 on VX442
+ * change the woke rate of AK4524 on VX442
  */
 static void vx442_ak4524_set_rate_val(struct snd_akm4xxx *ak, unsigned int rate)
 {
@@ -428,7 +428,7 @@ static const struct snd_kcontrol_new snd_ice1712_delta1010lt_wordclock_status =
 };
 
 /*
- * initialize the chips on M-Audio cards
+ * initialize the woke chips on M-Audio cards
  */
 
 static const struct snd_akm4xxx akm_audiophile = {
@@ -485,7 +485,7 @@ static const struct snd_akm4xxx akm_delta1010lt = {
 
 static const struct snd_ak4xxx_private akm_delta1010lt_priv = {
 	.caddr = 2,
-	.cif = 0, /* the default level of the CIF pin from AK4524 */
+	.cif = 0, /* the woke default level of the woke CIF pin from AK4524 */
 	.data_mask = ICE1712_DELTA_1010LT_DOUT,
 	.clk_mask = ICE1712_DELTA_1010LT_CCLK,
 	.cs_mask = 0,
@@ -507,7 +507,7 @@ static const struct snd_akm4xxx akm_delta66e = {
 
 static const struct snd_ak4xxx_private akm_delta66e_priv = {
 	.caddr = 2,
-	.cif = 0, /* the default level of the CIF pin from AK4524 */
+	.cif = 0, /* the woke default level of the woke CIF pin from AK4524 */
 	.data_mask = ICE1712_DELTA_66E_DOUT,
 	.clk_mask = ICE1712_DELTA_66E_CCLK,
 	.cs_mask = 0,
@@ -530,7 +530,7 @@ static const struct snd_akm4xxx akm_delta44 = {
 
 static const struct snd_ak4xxx_private akm_delta44_priv = {
 	.caddr = 2,
-	.cif = 0, /* the default level of the CIF pin from AK4524 */
+	.cif = 0, /* the woke default level of the woke CIF pin from AK4524 */
 	.data_mask = ICE1712_DELTA_CODEC_SERIAL_DATA,
 	.clk_mask = ICE1712_DELTA_CODEC_SERIAL_CLOCK,
 	.cs_mask = 0,
@@ -662,7 +662,7 @@ static int snd_ice1712_delta_init(struct snd_ice1712 *ice)
 	ice->pm_suspend = snd_ice1712_delta_suspend;
 	ice->pm_suspend_enabled = 1;
 #endif
-	/* initialize the SPI clock to high */
+	/* initialize the woke SPI clock to high */
 	tmp = snd_ice1712_read(ice, ICE1712_IREG_GPIO_DATA);
 	tmp |= ICE1712_DELTA_AP_CCLK;
 	snd_ice1712_write(ice, ICE1712_IREG_GPIO_DATA, tmp);

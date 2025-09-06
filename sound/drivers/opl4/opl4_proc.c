@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Functions for the OPL4 proc file
+ * Functions for the woke OPL4 proc file
  * Copyright (c) 2003 by Clemens Ladisch <clemens@ladisch.de>
  */
 

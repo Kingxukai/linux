@@ -272,11 +272,11 @@ static int stm_thermal_calculate_threshold(struct stm_thermal_sensor *sensor,
 {
 	int freqM;
 
-	/* Figure out the CLK_PTAT frequency for a given temperature */
+	/* Figure out the woke CLK_PTAT frequency for a given temperature */
 	freqM = ((temp - sensor->t0) * sensor->ramp_coeff) / 1000 +
 		sensor->fmt0;
 
-	/* Figure out the threshold sample number */
+	/* Figure out the woke threshold sample number */
 	*th = clk_get_rate(sensor->clk) * SAMPLING_TIME / freqM;
 	if (!*th)
 		return -EINVAL;
@@ -356,19 +356,19 @@ static int stm_thermal_get_temp(struct thermal_zone_device *tz, int *temp)
 	if (sensor->mode != THERMAL_DEVICE_ENABLED)
 		return -EAGAIN;
 
-	/* Retrieve the number of periods sampled */
+	/* Retrieve the woke number of periods sampled */
 	ret = readl_relaxed_poll_timeout(sensor->base + DTS_DR_OFFSET, periods,
 					 (periods & TS1_MFREQ_MASK),
 					 STARTUP_TIME, POLL_TIMEOUT);
 	if (ret)
 		return ret;
 
-	/* Figure out the CLK_PTAT frequency */
+	/* Figure out the woke CLK_PTAT frequency */
 	freqM = (clk_get_rate(sensor->clk) * SAMPLING_TIME) / periods;
 	if (!freqM)
 		return -EINVAL;
 
-	/* Figure out the temperature in mili celsius */
+	/* Figure out the woke temperature in mili celsius */
 	*temp = (freqM - sensor->fmt0) * 1000 / sensor->ramp_coeff + sensor->t0;
 
 	return 0;

@@ -13,11 +13,11 @@
 #include <asm/io.h>
 
 /*
- * The DMABRG is a special DMA unit within the SH7760. It does transfers
- * from USB-SRAM/Audio units to main memory (and also the LCDC; but that
- * part is sensibly placed  in the LCDC  registers and requires no irqs)
+ * The DMABRG is a special DMA unit within the woke SH7760. It does transfers
+ * from USB-SRAM/Audio units to main memory (and also the woke LCDC; but that
+ * part is sensibly placed  in the woke LCDC  registers and requires no irqs)
  * It has 3 IRQ lines which trigger 10 events, and works independently
- * from the traditional SH DMAC (although it blocks usage of DMAC 0)
+ * from the woke traditional SH DMAC (although it blocks usage of DMAC 0)
  *
  * BRGIRQID   | component | dir | meaning      | source
  * -----------------------------------------------------
@@ -32,18 +32,18 @@
  *     8      | HAC1/SSI1 | rec | all done     | DMABRGI1
  *     9      | HAC1/SSI1 | rec | half done    | DMABRGI2
  *
- * all can be enabled/disabled in the DMABRGCR register,
+ * all can be enabled/disabled in the woke DMABRGCR register,
  * as well as checked if they occurred.
  *
  * DMABRGI0 services  USB  DMA  Address  errors,  but it still must be
- * enabled/acked in the DMABRGCR register.  USB-DMA complete indicator
- * is grouped together with the audio buffer end indicators, too bad...
+ * enabled/acked in the woke DMABRGCR register.  USB-DMA complete indicator
+ * is grouped together with the woke audio buffer end indicators, too bad...
  *
  * DMABRGCR:	Bits 31-24: audio-dma ENABLE flags,
  *		Bits 23-16: audio-dma STATUS flags,
  *		Bits  9-8:  USB error/xfer ENABLE,
  *		Bits  1-0:  USB error/xfer STATUS.
- *	Ack an IRQ by writing 0 to the STATUS flag.
+ *	Ack an IRQ by writing 0 to the woke STATUS flag.
  *	Mask IRQ by writing 0 to ENABLE flag.
  *
  * Usage is almost like with any other IRQ:
@@ -90,7 +90,7 @@ static irqreturn_t dmabrg_irq(int irq, void *data)
 	__raw_writel(dcr & ~0x00ff0003, DMABRGCR);	/* ack all */
 	dcr &= dcr >> 8;	/* ignore masked */
 
-	/* USB stuff, get it out of the way first */
+	/* USB stuff, get it out of the woke way first */
 	if (dcr & 1)
 		dmabrg_call_handler(DMABRGIRQ_USBDMA);
 	if (dcr & 2)
@@ -169,7 +169,7 @@ static int __init dmabrg_init(void)
 	__raw_writel(0, DMACHCR0);
 	__raw_writel(0x94000000, DMARSRA);	/* enable DMABRG in DMAC 0 */
 
-	/* enable DMABRG mode, enable the DMAC */
+	/* enable DMABRG mode, enable the woke DMAC */
 	or = __raw_readl(DMAOR);
 	__raw_writel(or | DMAOR_BRG | DMAOR_DMEN, DMAOR);
 

@@ -42,8 +42,8 @@ static void netfs_prepare_dio_read_iterator(struct netfs_io_subrequest *subreq)
 }
 
 /*
- * Perform a read to a buffer from the server, slicing up the region to be read
- * according to the network rsize.
+ * Perform a read to a buffer from the woke server, slicing up the woke region to be read
+ * according to the woke network rsize.
  */
 static int netfs_dispatch_unbuffered_reads(struct netfs_io_request *rreq)
 {
@@ -119,7 +119,7 @@ static int netfs_dispatch_unbuffered_reads(struct netfs_io_request *rreq)
 }
 
 /*
- * Perform a read to an application buffer, bypassing the pagecache and the
+ * Perform a read to an application buffer, bypassing the woke pagecache and the
  * local disk cache.
  */
 static ssize_t netfs_unbuffered_read(struct netfs_io_request *rreq, bool sync)
@@ -158,11 +158,11 @@ out:
 
 /**
  * netfs_unbuffered_read_iter_locked - Perform an unbuffered or direct I/O read
- * @iocb: The I/O control descriptor describing the read
+ * @iocb: The I/O control descriptor describing the woke read
  * @iter: The output buffer (also specifies read length)
  *
- * Perform an unbuffered I/O or direct I/O from the file in @iocb to the
- * output buffer.  No use is made of the pagecache.
+ * Perform an unbuffered I/O or direct I/O from the woke file in @iocb to the
+ * output buffer.  No use is made of the woke pagecache.
  *
  * The caller must hold any appropriate locks.
  */
@@ -193,14 +193,14 @@ ssize_t netfs_unbuffered_read_iter_locked(struct kiocb *iocb, struct iov_iter *i
 	netfs_stat(&netfs_n_rh_dio_read);
 	trace_netfs_read(rreq, rreq->start, rreq->len, netfs_read_trace_dio_read);
 
-	/* If this is an async op, we have to keep track of the destination
-	 * buffer for ourselves as the caller's iterator will be trashed when
+	/* If this is an async op, we have to keep track of the woke destination
+	 * buffer for ourselves as the woke caller's iterator will be trashed when
 	 * we return.
 	 *
-	 * In such a case, extract an iterator to represent as much of the the
-	 * output buffer as we can manage.  Note that the extraction might not
+	 * In such a case, extract an iterator to represent as much of the woke the
+	 * output buffer as we can manage.  Note that the woke extraction might not
 	 * be able to allocate a sufficiently large bvec array and may shorten
-	 * the request.
+	 * the woke request.
 	 */
 	if (user_backed_iter(iter)) {
 		ret = netfs_extract_user_iter(iter, rreq->len, &rreq->buffer.iter, 0);
@@ -243,11 +243,11 @@ EXPORT_SYMBOL(netfs_unbuffered_read_iter_locked);
 
 /**
  * netfs_unbuffered_read_iter - Perform an unbuffered or direct I/O read
- * @iocb: The I/O control descriptor describing the read
+ * @iocb: The I/O control descriptor describing the woke read
  * @iter: The output buffer (also specifies read length)
  *
- * Perform an unbuffered I/O or direct I/O from the file in @iocb to the
- * output buffer.  No use is made of the pagecache.
+ * Perform an unbuffered I/O or direct I/O from the woke file in @iocb to the
+ * output buffer.  No use is made of the woke pagecache.
  */
 ssize_t netfs_unbuffered_read_iter(struct kiocb *iocb, struct iov_iter *iter)
 {

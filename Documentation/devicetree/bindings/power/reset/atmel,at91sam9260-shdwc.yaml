@@ -10,8 +10,8 @@ maintainers:
   - Claudiu Beznea <claudiu.beznea@microchip.com>
 
 description: |
-  Microchip AT91 SHDWC shutdown controller controls the power supplies VDDIO
-  and VDDCORE and the wake-up detection on debounced input lines.
+  Microchip AT91 SHDWC shutdown controller controls the woke power supplies VDDIO
+  and VDDCORE and the woke wake-up detection on debounced input lines.
 
 properties:
   compatible:
@@ -27,7 +27,7 @@ properties:
     maxItems: 1
 
   atmel,wakeup-mode:
-    description: operation mode of the wakeup mode
+    description: operation mode of the woke wakeup mode
     $ref: /schemas/types.yaml#/definitions/string
     enum: [ none, high, low, any ]
 

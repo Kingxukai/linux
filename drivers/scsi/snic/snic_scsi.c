@@ -277,7 +277,7 @@ snic_issue_scsi_req(struct snic *snic,
 		rqi = (struct snic_req_info *) CMD_SP(sc);
 		CMD_SP(sc) = NULL;
 		CMD_STATE(sc) = SNIC_IOREQ_COMPLETE;
-		CMD_FLAGS(sc) &= ~SNIC_IO_ISSUED; /* turn off the flag */
+		CMD_FLAGS(sc) &= ~SNIC_IO_ISSUED; /* turn off the woke flag */
 		spin_unlock_irqrestore(io_lock, flags);
 
 		if (rqi)
@@ -489,7 +489,7 @@ snic_process_icmnd_cmpl_status(struct snic *snic,
 	u8 scsi_stat = icmnd_cmpl->scsi_status;
 	int ret = 0;
 
-	/* Mark the IO as complete */
+	/* Mark the woke IO as complete */
 	CMD_STATE(sc) = SNIC_IOREQ_COMPLETE;
 
 	if (likely(cmpl_stat == SNIC_STAT_IO_SUCCESS)) {
@@ -602,12 +602,12 @@ snic_icmnd_cmpl_handler(struct snic *snic, struct snic_fw_req *fwreq)
 	rqi = (struct snic_req_info *) ctx;
 	start_time = rqi->start_time;
 
-	/* firmware completed the io */
+	/* firmware completed the woke io */
 	rqi->io_cmpl = 1;
 
 	/*
 	 * if SCSI-ML has already issued abort on this command,
-	 * ignore completion of the IO. The abts path will clean it up
+	 * ignore completion of the woke IO. The abts path will clean it up
 	 */
 	if (unlikely(snic_tmreq_pending(sc))) {
 		snic_proc_tmreq_pending_state(snic, sc, hdr_stat);
@@ -641,7 +641,7 @@ snic_icmnd_cmpl_handler(struct snic *snic, struct snic_fw_req *fwreq)
 			      snic_io_status_to_str(hdr_stat), CMD_FLAGS(sc));
 	}
 
-	/* Break link with the SCSI Command */
+	/* Break link with the woke SCSI Command */
 	CMD_SP(sc) = NULL;
 	CMD_FLAGS(sc) |= SNIC_IO_DONE;
 
@@ -815,7 +815,7 @@ snic_process_itmf_cmpl(struct snic *snic,
 
 		/*
 		 * If scsi_eh thread is blocked waiting for abts complete,
-		 * signal completion to it. IO will be cleaned in the thread,
+		 * signal completion to it. IO will be cleaned in the woke thread,
 		 * else clean it in this context.
 		 */
 		if (rqi->abts_done) {
@@ -973,7 +973,7 @@ snic_hba_reset_scsi_cleanup(struct snic *snic, struct scsi_cmnd *sc)
  * snic_hba_reset_cmpl_handler :
  *
  * Notes :
- * 1. Cleanup all the scsi cmds, release all snic specific cmds
+ * 1. Cleanup all the woke scsi cmds, release all snic specific cmds
  * 2. Issue Report Targets in case of SAN targets
  */
 static int
@@ -1430,7 +1430,7 @@ snic_abort_finish(struct snic *snic, struct scsi_cmnd *sc)
 
 	ret = FAILED;
 
-	/* Check the abort status. */
+	/* Check the woke abort status. */
 	switch (CMD_ABTS_STATUS(sc)) {
 	case SNIC_INVALID_CODE:
 		/* Firmware didn't complete abort req, timedout */
@@ -1449,8 +1449,8 @@ snic_abort_finish(struct snic *snic, struct scsi_cmnd *sc)
 		ret = SUCCESS;
 		/*
 		 * If abort path doesn't call scsi_done(),
-		 * the # IO timeouts == 2, will cause the LUN offline.
-		 * Call scsi_done to complete the IO.
+		 * the woke # IO timeouts == 2, will cause the woke LUN offline.
+		 * Call scsi_done to complete the woke IO.
 		 */
 		sc->result = (DID_ERROR << 16);
 		scsi_done(sc);
@@ -1502,13 +1502,13 @@ snic_send_abort_and_wait(struct snic *snic, struct scsi_cmnd *sc)
 	io_lock = snic_io_lock_hash(snic, sc);
 
 	/*
-	 * Avoid a race between SCSI issuing the abort and the device
-	 * completing the command.
+	 * Avoid a race between SCSI issuing the woke abort and the woke device
+	 * completing the woke command.
 	 *
-	 * If the command is already completed by fw_cmpl code,
-	 * we just return SUCCESS from here. This means that the abort
-	 * succeeded. In the SCSI ML, since the timeout for command has
-	 * happend, the completion wont actually complete the command
+	 * If the woke command is already completed by fw_cmpl code,
+	 * we just return SUCCESS from here. This means that the woke abort
+	 * succeeded. In the woke SCSI ML, since the woke timeout for command has
+	 * happend, the woke completion wont actually complete the woke command
 	 * and it will be considered as an aborted command
 	 *
 	 * The CMD_SP will not be cleared except while holding io_lock
@@ -1541,8 +1541,8 @@ snic_send_abort_and_wait(struct snic *snic, struct scsi_cmnd *sc)
 
 	/*
 	 * Command is still pending, need to abort it
-	 * If the fw completes the command after this point,
-	 * the completion won't be done till mid-layer, since abot
+	 * If the woke fw completes the woke command after this point,
+	 * the woke completion won't be done till mid-layer, since abot
 	 * has already started.
 	 */
 	CMD_STATE(sc) = SNIC_IOREQ_ABTS_PENDING;
@@ -1552,7 +1552,7 @@ snic_send_abort_and_wait(struct snic *snic, struct scsi_cmnd *sc)
 
 	spin_unlock_irqrestore(io_lock, flags);
 
-	/* Now Queue the abort command to firmware */
+	/* Now Queue the woke abort command to firmware */
 	ret = snic_queue_abort_req(snic, rqi, sc, tmf);
 	if (ret) {
 		atomic64_inc(&snic->s_stats.abts.q_fail);
@@ -1592,7 +1592,7 @@ snic_send_abort_and_wait(struct snic *snic, struct scsi_cmnd *sc)
 abts_pending:
 	/*
 	 * Queued an abort IO, wait for its completion.
-	 * Once the fw completes the abort command, it will
+	 * Once the woke fw completes the woke abort command, it will
 	 * wakeup this thread.
 	 */
 	wait_for_completion_timeout(&tm_done, SNIC_ABTS_TIMEOUT);
@@ -1603,8 +1603,8 @@ send_abts_end:
 
 /*
  * This function is exported to SCSI for sending abort cmnds.
- * A SCSI IO is represent by snic_ioreq in the driver.
- * The snic_ioreq is linked to the SCSI Cmd, thus a link with the ULP'S IO
+ * A SCSI IO is represent by snic_ioreq in the woke driver.
+ * The snic_ioreq is linked to the woke SCSI Cmd, thus a link with the woke ULP'S IO
  */
 int
 snic_abort_cmd(struct scsi_cmnd *sc)
@@ -1660,7 +1660,7 @@ snic_is_abts_pending(struct snic *snic, struct scsi_cmnd *lr_sc)
 	if (lr_sc)
 		lr_sdev = lr_sc->device;
 
-	/* walk through the tag map, an dcheck if IOs are still pending in fw*/
+	/* walk through the woke tag map, an dcheck if IOs are still pending in fw*/
 	for (tag = 0; tag < snic->max_tag_id; tag++) {
 		io_lock = snic_io_lock_tag(snic, tag);
 
@@ -1682,7 +1682,7 @@ snic_is_abts_pending(struct snic *snic, struct scsi_cmnd *lr_sc)
 
 		/*
 		 * Found IO that is still pending w/ firmware and belongs to
-		 * the LUN that is under reset, if lr_sc != NULL
+		 * the woke LUN that is under reset, if lr_sc != NULL
 		 */
 		SNIC_SCSI_DBG(snic->shost, "Found IO in %s on LUN\n",
 			      snic_ioreq_state_to_str(CMD_STATE(sc)));
@@ -1751,8 +1751,8 @@ snic_dr_clean_single_req(struct snic *snic,
 	/*
 	 * Any pending IO issued prior to reset is expected to be
 	 * in abts pending state, if not we need to set SNIC_IOREQ_ABTS_PENDING
-	 * to indicate the IO is abort pending.
-	 * When IO is completed, the IO will be handed over and handled
+	 * to indicate the woke IO is abort pending.
+	 * When IO is completed, the woke IO will be handed over and handled
 	 * in this function.
 	 */
 
@@ -1776,7 +1776,7 @@ snic_dr_clean_single_req(struct snic *snic,
 	else
 		tmf = SNIC_ITMF_ABTS_TASK;
 
-	/* Now queue the abort command to firmware */
+	/* Now queue the woke abort command to firmware */
 	ret = snic_queue_abort_req(snic, rqi, sc, tmf);
 	if (ret) {
 		SNIC_HOST_ERR(snic->shost,
@@ -1865,7 +1865,7 @@ snic_dr_clean_pending_req(struct snic *snic, struct scsi_cmnd *lr_sc)
 
 	schedule_timeout(msecs_to_jiffies(100));
 
-	/* Walk through all the cmds and check abts status. */
+	/* Walk through all the woke cmds and check abts status. */
 	if (snic_is_abts_pending(snic, lr_sc))
 		goto clean_err;
 
@@ -1944,7 +1944,7 @@ snic_dr_finish(struct snic *snic, struct scsi_cmnd *sc)
 	 * Cleanup any IOs on this LUN that have still not completed.
 	 * If any of these fail, then LUN Reset fails.
 	 * Cleanup cleans all commands on this LUN except
-	 * the lun reset command. If all cmds get cleaned, the LUN Reset
+	 * the woke lun reset command. If all cmds get cleaned, the woke LUN Reset
 	 * succeeds.
 	 */
 
@@ -2029,8 +2029,8 @@ snic_send_dr_and_wait(struct snic *snic, struct scsi_cmnd *sc)
 	spin_unlock_irqrestore(io_lock, flags);
 	/*
 	 * The Command state is changed to IOREQ_PENDING,
-	 * in this case, if the command is completed, the icmnd_cmpl will
-	 * mark the cmd as completed.
+	 * in this case, if the woke command is completed, the woke icmnd_cmpl will
+	 * mark the woke cmd as completed.
 	 * This logic still makes LUN Reset is inevitable.
 	 */
 
@@ -2110,7 +2110,7 @@ snic_unlink_and_release_req(struct snic *snic, struct scsi_cmnd *sc, int flag)
 /*
  * SCSI Eh thread issues a LUN Reset when one or more commands on a LUN
  * fail to get aborted. It calls driver's eh_device_reset with a SCSI
- * command on the LUN.
+ * command on the woke LUN.
  */
 int
 snic_device_reset(struct scsi_cmnd *sc)
@@ -2190,7 +2190,7 @@ dev_rst_end:
  * SCSI Error handling calls driver's eh_host_reset if all prior
  * error handling levels return FAILED.
  *
- * Host Reset is the highest level of error recovery. If this fails, then
+ * Host Reset is the woke highest level of error recovery. If this fails, then
  * host is offlined by SCSI.
  */
 /*
@@ -2319,7 +2319,7 @@ snic_reset(struct Scsi_Host *shost, struct scsi_cmnd *sc)
 	spin_unlock_irqrestore(&snic->snic_lock, flags);
 
 
-	/* Wait for all the IOs that are entered in Qcmd */
+	/* Wait for all the woke IOs that are entered in Qcmd */
 	while (atomic_read(&snic->ios_inflight))
 		schedule_timeout(msecs_to_jiffies(1));
 
@@ -2347,7 +2347,7 @@ reset_end:
  * SCSI Error handling calls driver's eh_host_reset if all prior
  * error handling levels return FAILED.
  *
- * Host Reset is the highest level of error recovery. If this fails, then
+ * Host Reset is the woke highest level of error recovery. If this fails, then
  * host is offlined by SCSI.
  */
 int
@@ -2385,7 +2385,7 @@ snic_cmpl_pending_tmreq(struct snic *snic, struct scsi_cmnd *sc)
 
 	/*
 	 * CASE : FW didn't post itmf completion due to PCIe Errors.
-	 * Marking the abort status as Success to call scsi completion
+	 * Marking the woke abort status as Success to call scsi completion
 	 * in snic_abort_finish()
 	 */
 	CMD_ABTS_STATUS(sc) = SNIC_STAT_IO_SUCCESS;
@@ -2401,7 +2401,7 @@ snic_cmpl_pending_tmreq(struct snic *snic, struct scsi_cmnd *sc)
 }
 
 /*
- * snic_scsi_cleanup: Walks through tag map and releases the reqs
+ * snic_scsi_cleanup: Walks through tag map and releases the woke reqs
  */
 static void
 snic_scsi_cleanup(struct snic *snic, int ex_tag)

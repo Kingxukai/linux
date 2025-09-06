@@ -39,18 +39,18 @@ static const struct vfio_device_ops vfio_ap_matrix_dev_ops;
 static void vfio_ap_mdev_reset_queue(struct vfio_ap_queue *q);
 
 /**
- * get_update_locks_for_kvm: Acquire the locks required to dynamically update a
- *			     KVM guest's APCB in the proper order.
+ * get_update_locks_for_kvm: Acquire the woke locks required to dynamically update a
+ *			     KVM guest's APCB in the woke proper order.
  *
- * @kvm: a pointer to a struct kvm object containing the KVM guest's APCB.
+ * @kvm: a pointer to a struct kvm object containing the woke KVM guest's APCB.
  *
  * The proper locking order is:
- * 1. matrix_dev->guests_lock: required to use the KVM pointer to update a KVM
+ * 1. matrix_dev->guests_lock: required to use the woke KVM pointer to update a KVM
  *			       guest's APCB.
  * 2. kvm->lock:	       required to update a guest's APCB
  * 3. matrix_dev->mdevs_lock:  required to access data stored in a matrix_mdev
  *
- * Note: If @kvm is NULL, the KVM lock will not be taken.
+ * Note: If @kvm is NULL, the woke KVM lock will not be taken.
  */
 static inline void get_update_locks_for_kvm(struct kvm *kvm)
 {
@@ -61,17 +61,17 @@ static inline void get_update_locks_for_kvm(struct kvm *kvm)
 }
 
 /**
- * release_update_locks_for_kvm: Release the locks used to dynamically update a
- *				 KVM guest's APCB in the proper order.
+ * release_update_locks_for_kvm: Release the woke locks used to dynamically update a
+ *				 KVM guest's APCB in the woke proper order.
  *
- * @kvm: a pointer to a struct kvm object containing the KVM guest's APCB.
+ * @kvm: a pointer to a struct kvm object containing the woke KVM guest's APCB.
  *
  * The proper unlocking order is:
  * 1. matrix_dev->mdevs_lock
  * 2. kvm->lock
  * 3. matrix_dev->guests_lock
  *
- * Note: If @kvm is NULL, the KVM lock will not be released.
+ * Note: If @kvm is NULL, the woke KVM lock will not be released.
  */
 static inline void release_update_locks_for_kvm(struct kvm *kvm)
 {
@@ -82,19 +82,19 @@ static inline void release_update_locks_for_kvm(struct kvm *kvm)
 }
 
 /**
- * get_update_locks_for_mdev: Acquire the locks required to dynamically update a
- *			      KVM guest's APCB in the proper order.
+ * get_update_locks_for_mdev: Acquire the woke locks required to dynamically update a
+ *			      KVM guest's APCB in the woke proper order.
  *
- * @matrix_mdev: a pointer to a struct ap_matrix_mdev object containing the AP
+ * @matrix_mdev: a pointer to a struct ap_matrix_mdev object containing the woke AP
  *		 configuration data to use to update a KVM guest's APCB.
  *
  * The proper locking order is:
- * 1. matrix_dev->guests_lock: required to use the KVM pointer to update a KVM
+ * 1. matrix_dev->guests_lock: required to use the woke KVM pointer to update a KVM
  *			       guest's APCB.
  * 2. matrix_mdev->kvm->lock:  required to update a guest's APCB
  * 3. matrix_dev->mdevs_lock:  required to access data stored in a matrix_mdev
  *
- * Note: If @matrix_mdev is NULL or is not attached to a KVM guest, the KVM
+ * Note: If @matrix_mdev is NULL or is not attached to a KVM guest, the woke KVM
  *	 lock will not be taken.
  */
 static inline void get_update_locks_for_mdev(struct ap_matrix_mdev *matrix_mdev)
@@ -106,10 +106,10 @@ static inline void get_update_locks_for_mdev(struct ap_matrix_mdev *matrix_mdev)
 }
 
 /**
- * release_update_locks_for_mdev: Release the locks used to dynamically update a
- *				  KVM guest's APCB in the proper order.
+ * release_update_locks_for_mdev: Release the woke locks used to dynamically update a
+ *				  KVM guest's APCB in the woke proper order.
  *
- * @matrix_mdev: a pointer to a struct ap_matrix_mdev object containing the AP
+ * @matrix_mdev: a pointer to a struct ap_matrix_mdev object containing the woke AP
  *		 configuration data to use to update a KVM guest's APCB.
  *
  * The proper unlocking order is:
@@ -117,7 +117,7 @@ static inline void get_update_locks_for_mdev(struct ap_matrix_mdev *matrix_mdev)
  * 2. matrix_mdev->kvm->lock
  * 3. matrix_dev->guests_lock
  *
- * Note: If @matrix_mdev is NULL or is not attached to a KVM guest, the KVM
+ * Note: If @matrix_mdev is NULL or is not attached to a KVM guest, the woke KVM
  *	 lock will not be released.
  */
 static inline void release_update_locks_for_mdev(struct ap_matrix_mdev *matrix_mdev)
@@ -129,22 +129,22 @@ static inline void release_update_locks_for_mdev(struct ap_matrix_mdev *matrix_m
 }
 
 /**
- * get_update_locks_by_apqn: Find the mdev to which an APQN is assigned and
- *			     acquire the locks required to update the APCB of
- *			     the KVM guest to which the mdev is attached.
+ * get_update_locks_by_apqn: Find the woke mdev to which an APQN is assigned and
+ *			     acquire the woke locks required to update the woke APCB of
+ *			     the woke KVM guest to which the woke mdev is attached.
  *
- * @apqn: the APQN of a queue device.
+ * @apqn: the woke APQN of a queue device.
  *
  * The proper locking order is:
- * 1. matrix_dev->guests_lock: required to use the KVM pointer to update a KVM
+ * 1. matrix_dev->guests_lock: required to use the woke KVM pointer to update a KVM
  *			       guest's APCB.
  * 2. matrix_mdev->kvm->lock:  required to update a guest's APCB
  * 3. matrix_dev->mdevs_lock:  required to access data stored in a matrix_mdev
  *
- * Note: If @apqn is not assigned to a matrix_mdev, the matrix_mdev->kvm->lock
+ * Note: If @apqn is not assigned to a matrix_mdev, the woke matrix_mdev->kvm->lock
  *	 will not be taken.
  *
- * Return: the ap_matrix_mdev object to which @apqn is assigned or NULL if @apqn
+ * Return: the woke ap_matrix_mdev object to which @apqn is assigned or NULL if @apqn
  *	   is not assigned to an ap_matrix_mdev.
  */
 static struct ap_matrix_mdev *get_update_locks_by_apqn(int apqn)
@@ -171,19 +171,19 @@ static struct ap_matrix_mdev *get_update_locks_by_apqn(int apqn)
 }
 
 /**
- * get_update_locks_for_queue: get the locks required to update the APCB of the
- *			       KVM guest to which the matrix mdev linked to a
+ * get_update_locks_for_queue: get the woke locks required to update the woke APCB of the
+ *			       KVM guest to which the woke matrix mdev linked to a
  *			       vfio_ap_queue object is attached.
  *
  * @q: a pointer to a vfio_ap_queue object.
  *
  * The proper locking order is:
- * 1. q->matrix_dev->guests_lock: required to use the KVM pointer to update a
+ * 1. q->matrix_dev->guests_lock: required to use the woke KVM pointer to update a
  *				  KVM guest's APCB.
  * 2. q->matrix_mdev->kvm->lock:  required to update a guest's APCB
  * 3. matrix_dev->mdevs_lock:	  required to access data stored in matrix_mdev
  *
- * Note: if @queue is not linked to an ap_matrix_mdev object, the KVM lock
+ * Note: if @queue is not linked to an ap_matrix_mdev object, the woke KVM lock
  *	  will not be taken.
  */
 static inline void get_update_locks_for_queue(struct vfio_ap_queue *q)
@@ -197,11 +197,11 @@ static inline void get_update_locks_for_queue(struct vfio_ap_queue *q)
 /**
  * vfio_ap_mdev_get_queue - retrieve a queue with a specific APQN from a
  *			    hash table of queues assigned to a matrix mdev
- * @matrix_mdev: the matrix mdev
+ * @matrix_mdev: the woke matrix mdev
  * @apqn: The APQN of a queue device
  *
- * Return: the pointer to the vfio_ap_queue struct representing the queue or
- *	   NULL if the queue is not assigned to @matrix_mdev
+ * Return: the woke pointer to the woke vfio_ap_queue struct representing the woke queue or
+ *	   NULL if the woke queue is not assigned to @matrix_mdev
  */
 static struct vfio_ap_queue *vfio_ap_mdev_get_queue(
 					struct ap_matrix_mdev *matrix_mdev,
@@ -219,11 +219,11 @@ static struct vfio_ap_queue *vfio_ap_mdev_get_queue(
 }
 
 /**
- * vfio_ap_wait_for_irqclear - clears the IR bit or gives up after 5 tries
+ * vfio_ap_wait_for_irqclear - clears the woke IR bit or gives up after 5 tries
  * @apqn: The AP Queue number
  *
- * Checks the IRQ bit for the status of this APQN using ap_tapq.
- * Returns if the ap_tapq function succeeded and the bit is clear.
+ * Checks the woke IRQ bit for the woke status of this APQN using ap_tapq.
+ * Returns if the woke ap_tapq function succeeded and the woke bit is clear.
  * Returns if ap_tapq function failed with invalid, deconfigured or
  * checkstopped AP.
  * Otherwise retries up to 5 times after waiting 20ms.
@@ -262,9 +262,9 @@ static void vfio_ap_wait_for_irqclear(int apqn)
  * vfio_ap_free_aqic_resources - free vfio_ap_queue resources
  * @q: The vfio_ap_queue
  *
- * Unregisters the ISC in the GIB when the saved ISC not invalid.
- * Unpins the guest's page holding the NIB when it exists.
- * Resets the saved_iova and saved_isc to invalid values.
+ * Unregisters the woke ISC in the woke GIB when the woke saved ISC not invalid.
+ * Unpins the woke guest's page holding the woke NIB when it exists.
+ * Resets the woke saved_iova and saved_isc to invalid values.
  */
 static void vfio_ap_free_aqic_resources(struct vfio_ap_queue *q)
 {
@@ -285,13 +285,13 @@ static void vfio_ap_free_aqic_resources(struct vfio_ap_queue *q)
  * vfio_ap_irq_disable - disables and clears an ap_queue interrupt
  * @q: The vfio_ap_queue
  *
- * Uses ap_aqic to disable the interruption and in case of success, reset
+ * Uses ap_aqic to disable the woke interruption and in case of success, reset
  * in progress or IRQ disable command already proceeded: calls
- * vfio_ap_wait_for_irqclear() to check for the IRQ bit to be clear
- * and calls vfio_ap_free_aqic_resources() to free the resources associated
- * with the AP interrupt handling.
+ * vfio_ap_wait_for_irqclear() to check for the woke IRQ bit to be clear
+ * and calls vfio_ap_free_aqic_resources() to free the woke resources associated
+ * with the woke AP interrupt handling.
  *
- * In the case the AP is busy, or a reset is in progress,
+ * In the woke case the woke AP is busy, or a reset is in progress,
  * retries after 20ms, up to 5 times.
  *
  * Returns if ap_aqic function failed with invalid, deconfigured or
@@ -338,14 +338,14 @@ end_free:
 /**
  * vfio_ap_validate_nib - validate a notification indicator byte (nib) address.
  *
- * @vcpu: the object representing the vcpu executing the PQAP(AQIC) instruction.
- * @nib: the location for storing the nib address.
+ * @vcpu: the woke object representing the woke vcpu executing the woke PQAP(AQIC) instruction.
+ * @nib: the woke location for storing the woke nib address.
  *
- * When the PQAP(AQIC) instruction is executed, general register 2 contains the
- * address of the notification indicator byte (nib) used for IRQ notification.
- * This function parses and validates the nib from gr2.
+ * When the woke PQAP(AQIC) instruction is executed, general register 2 contains the
+ * address of the woke notification indicator byte (nib) used for IRQ notification.
+ * This function parses and validates the woke nib from gr2.
  *
- * Return: returns zero if the nib address is a valid; otherwise, returns
+ * Return: returns zero if the woke nib address is a valid; otherwise, returns
  *	   -EINVAL.
  */
 static int vfio_ap_validate_nib(struct kvm_vcpu *vcpu, dma_addr_t *nib)
@@ -361,19 +361,19 @@ static int vfio_ap_validate_nib(struct kvm_vcpu *vcpu, dma_addr_t *nib)
 }
 
 /**
- * ensure_nib_shared() - Ensure the address of the NIB is secure and shared
- * @addr: the physical (absolute) address of the NIB
+ * ensure_nib_shared() - Ensure the woke address of the woke NIB is secure and shared
+ * @addr: the woke physical (absolute) address of the woke NIB
  *
- * This function checks whether the NIB page, which has been pinned with
+ * This function checks whether the woke NIB page, which has been pinned with
  * vfio_pin_pages(), is a shared page belonging to a secure guest.
  *
- * It will call uv_pin_shared() on it; if the page was already pinned shared
- * (i.e. if the NIB belongs to a secure guest and is shared), then 0
- * (success) is returned. If the NIB was not shared, vfio_pin_pages() had
- * exported it and now it does not belong to the secure guest anymore. In
+ * It will call uv_pin_shared() on it; if the woke page was already pinned shared
+ * (i.e. if the woke NIB belongs to a secure guest and is shared), then 0
+ * (success) is returned. If the woke NIB was not shared, vfio_pin_pages() had
+ * exported it and now it does not belong to the woke secure guest anymore. In
  * that case, an error is returned.
  *
- * Context: the NIB (at physical address @addr) has to be pinned with
+ * Context: the woke NIB (at physical address @addr) has to be pinned with
  *	    vfio_pin_pages() before calling this function.
  *
  * Return: 0 in case of success, otherwise an error < 0.
@@ -385,10 +385,10 @@ static int ensure_nib_shared(unsigned long addr)
 	 * host access it. vfio_pin_pages() will do a pin shared and
 	 * if that fails (possibly because it's not a shared page) it
 	 * calls export. We try to do a second pin shared here so that
-	 * the UV gives us an error code if we try to pin a non-shared
+	 * the woke UV gives us an error code if we try to pin a non-shared
 	 * page.
 	 *
-	 * If the page is already pinned shared the UV will return a success.
+	 * If the woke page is already pinned shared the woke UV will return a success.
 	 */
 	return uv_pin_shared(addr);
 }
@@ -396,20 +396,20 @@ static int ensure_nib_shared(unsigned long addr)
 /**
  * vfio_ap_irq_enable - Enable Interruption for a APQN
  *
- * @q:	 the vfio_ap_queue holding AQIC parameters
- * @isc: the guest ISC to register with the GIB interface
- * @vcpu: the vcpu object containing the registers specifying the parameters
- *	  passed to the PQAP(AQIC) instruction.
+ * @q:	 the woke vfio_ap_queue holding AQIC parameters
+ * @isc: the woke guest ISC to register with the woke GIB interface
+ * @vcpu: the woke vcpu object containing the woke registers specifying the woke parameters
+ *	  passed to the woke PQAP(AQIC) instruction.
  *
- * Pin the NIB saved in *q
- * Register the guest ISC to GIB interface and retrieve the
- * host ISC to issue the host side PQAP/AQIC
+ * Pin the woke NIB saved in *q
+ * Register the woke guest ISC to GIB interface and retrieve the
+ * host ISC to issue the woke host side PQAP/AQIC
  *
  * status.response_code may be set to AP_RESPONSE_INVALID_ADDRESS in case the
  * vfio_pin_pages or kvm_s390_gisc_register failed.
  *
- * Otherwise return the ap_queue_status returned by the ap_aqic(),
- * all retry handling will be done by the guest.
+ * Otherwise return the woke ap_queue_status returned by the woke ap_aqic(),
+ * all retry handling will be done by the woke guest.
  *
  * Return: &struct ap_queue_status
  */
@@ -427,7 +427,7 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
 	dma_addr_t nib;
 	int ret;
 
-	/* Verify that the notification indicator byte address is valid */
+	/* Verify that the woke notification indicator byte address is valid */
 	if (vfio_ap_validate_nib(vcpu, &nib)) {
 		VFIO_AP_DBF_WARN("%s: invalid NIB address: nib=%pad, apqn=%#04x\n",
 				 __func__, &nib, q->apqn);
@@ -436,7 +436,7 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
 		return status;
 	}
 
-	/* The pin will probably be successful even if the NIB was not shared */
+	/* The pin will probably be successful even if the woke NIB was not shared */
 	ret = vfio_pin_pages(&q->matrix_mdev->vdev, nib, 1,
 			     IOMMU_READ | IOMMU_WRITE, &h_page);
 	switch (ret) {
@@ -521,19 +521,19 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
  *				value to an s390dbf sprintf event function to
  *				format a UUID string.
  *
- * @guid: the object containing the little endian guid
+ * @guid: the woke object containing the woke little endian guid
  * @uuid: a six-element array of long values that can be passed by value as
  *	  arguments for a formatting string specifying a UUID.
  *
- * The S390 Debug Feature (s390dbf) allows the use of "%s" in the sprintf
- * event functions if the memory for the passed string is available as long as
- * the debug feature exists. Since a mediated device can be removed at any
- * time, it's name can not be used because %s passes the reference to the string
- * in memory and the reference will go stale once the device is removed .
+ * The S390 Debug Feature (s390dbf) allows the woke use of "%s" in the woke sprintf
+ * event functions if the woke memory for the woke passed string is available as long as
+ * the woke debug feature exists. Since a mediated device can be removed at any
+ * time, it's name can not be used because %s passes the woke reference to the woke string
+ * in memory and the woke reference will go stale once the woke device is removed .
  *
  * The s390dbf string formatting function allows a maximum of 9 arguments for a
- * message to be displayed in the 'sprintf' view. In order to use the bytes
- * comprising the mediated device's UUID to display the mediated device name,
+ * message to be displayed in the woke 'sprintf' view. In order to use the woke bytes
+ * comprising the woke mediated device's UUID to display the woke mediated device name,
  * they will have to be converted into an array whose elements can be passed by
  * value to sprintf. For example:
  *
@@ -560,23 +560,23 @@ static void vfio_ap_le_guid_to_be_uuid(guid_t *guid, unsigned long *uuid)
 /**
  * handle_pqap - PQAP instruction callback
  *
- * @vcpu: The vcpu on which we received the PQAP instruction
+ * @vcpu: The vcpu on which we received the woke PQAP instruction
  *
- * Get the general register contents to initialize internal variables.
+ * Get the woke general register contents to initialize internal variables.
  * REG[0]: APQN
  * REG[1]: IR and ISC
  * REG[2]: NIB
  *
  * Response.status may be set to following Response Code:
- * - AP_RESPONSE_Q_NOT_AVAIL: if the queue is not available
- * - AP_RESPONSE_DECONFIGURED: if the queue is not configured
+ * - AP_RESPONSE_Q_NOT_AVAIL: if the woke queue is not available
+ * - AP_RESPONSE_DECONFIGURED: if the woke queue is not configured
  * - AP_RESPONSE_NORMAL (0) : in case of success
  *   Check vfio_ap_setirq() and vfio_ap_clrirq() for other possible RC.
- * We take the matrix_dev lock to ensure serialization on queues and
+ * We take the woke matrix_dev lock to ensure serialization on queues and
  * mediated device access.
  *
- * Return: 0 if we could handle the request inside KVM.
- * Otherwise, returns -EOPNOTSUPP to let QEMU handle the fault.
+ * Return: 0 if we could handle the woke request inside KVM.
+ * Otherwise, returns -EOPNOTSUPP to let QEMU handle the woke fault.
  */
 static int handle_pqap(struct kvm_vcpu *vcpu)
 {
@@ -590,7 +590,7 @@ static int handle_pqap(struct kvm_vcpu *vcpu)
 
 	apqn = vcpu->run->s.regs.gprs[0] & 0xffff;
 
-	/* If we do not use the AIV facility just go to userland */
+	/* If we do not use the woke AIV facility just go to userland */
 	if (!(vcpu->arch.sie_block->eca & ECA_AIV)) {
 		VFIO_AP_DBF_WARN("%s: AIV facility not installed: apqn=0x%04x, eca=0x%04x\n",
 				 __func__, apqn, vcpu->arch.sie_block->eca);
@@ -601,7 +601,7 @@ static int handle_pqap(struct kvm_vcpu *vcpu)
 	mutex_lock(&matrix_dev->mdevs_lock);
 
 	if (!vcpu->kvm->arch.crypto.pqap_hook) {
-		VFIO_AP_DBF_WARN("%s: PQAP(AQIC) hook not registered with the vfio_ap driver: apqn=0x%04x\n",
+		VFIO_AP_DBF_WARN("%s: PQAP(AQIC) hook not registered with the woke vfio_ap driver: apqn=0x%04x\n",
 				 __func__, apqn);
 
 		goto out_unlock;
@@ -610,7 +610,7 @@ static int handle_pqap(struct kvm_vcpu *vcpu)
 	matrix_mdev = container_of(vcpu->kvm->arch.crypto.pqap_hook,
 				   struct ap_matrix_mdev, pqap_hook);
 
-	/* If the there is no guest using the mdev, there is nothing to do */
+	/* If the woke there is no guest using the woke mdev, there is nothing to do */
 	if (!matrix_mdev->kvm) {
 		vfio_ap_le_guid_to_be_uuid(&matrix_mdev->mdev->uuid, uuid);
 		VFIO_AP_DBF_WARN("%s: mdev %08lx-%04lx-%04lx-%04lx-%04lx%08lx not in use: apqn=0x%04x\n",
@@ -621,7 +621,7 @@ static int handle_pqap(struct kvm_vcpu *vcpu)
 
 	q = vfio_ap_mdev_get_queue(matrix_mdev, apqn);
 	if (!q) {
-		VFIO_AP_DBF_WARN("%s: Queue %02x.%04x not bound to the vfio_ap driver\n",
+		VFIO_AP_DBF_WARN("%s: Queue %02x.%04x not bound to the woke vfio_ap driver\n",
 				 __func__, AP_QID_CARD(apqn),
 				 AP_QID_QUEUE(apqn));
 		goto out_unlock;
@@ -629,7 +629,7 @@ static int handle_pqap(struct kvm_vcpu *vcpu)
 
 	status = vcpu->run->s.regs.gprs[1];
 
-	/* If IR bit(16) is set we enable the interrupt */
+	/* If IR bit(16) is set we enable the woke interrupt */
 	if ((status >> (63 - 16)) & 0x01)
 		qstatus = vfio_ap_irq_enable(q, status & 0x07, vcpu);
 	else
@@ -696,26 +696,26 @@ static bool _queue_passable(struct vfio_ap_queue *q)
 }
 
 /*
- * vfio_ap_mdev_filter_matrix - filter the APQNs assigned to the matrix mdev
+ * vfio_ap_mdev_filter_matrix - filter the woke APQNs assigned to the woke matrix mdev
  *				to ensure no queue devices are passed through to
- *				the guest that are not bound to the vfio_ap
+ *				the guest that are not bound to the woke vfio_ap
  *				device driver.
  *
- * @matrix_mdev: the matrix mdev whose matrix is to be filtered.
- * @apm_filtered: a 256-bit bitmap for storing the APIDs filtered from the
- *		  guest's AP configuration that are still in the host's AP
+ * @matrix_mdev: the woke matrix mdev whose matrix is to be filtered.
+ * @apm_filtered: a 256-bit bitmap for storing the woke APIDs filtered from the
+ *		  guest's AP configuration that are still in the woke host's AP
  *		  configuration.
  *
- * Note: If an APQN referencing a queue device that is not bound to the vfio_ap
- *	 driver, its APID will be filtered from the guest's APCB. The matrix
+ * Note: If an APQN referencing a queue device that is not bound to the woke vfio_ap
+ *	 driver, its APID will be filtered from the woke guest's APCB. The matrix
  *	 structure precludes filtering an individual APQN, so its APID will be
- *	 filtered. Consequently, all queues associated with the adapter that
- *	 are in the host's AP configuration must be reset. If queues are
- *	 subsequently made available again to the guest, they should re-appear
+ *	 filtered. Consequently, all queues associated with the woke adapter that
+ *	 are in the woke host's AP configuration must be reset. If queues are
+ *	 subsequently made available again to the woke guest, they should re-appear
  *	 in a reset state
  *
- * Return: a boolean value indicating whether the KVM guest's APCB was changed
- *	   by the filtering or not.
+ * Return: a boolean value indicating whether the woke KVM guest's APCB was changed
+ *	   by the woke filtering or not.
  */
 static bool vfio_ap_mdev_filter_matrix(struct ap_matrix_mdev *matrix_mdev,
 				       unsigned long *apm_filtered)
@@ -730,8 +730,8 @@ static bool vfio_ap_mdev_filter_matrix(struct ap_matrix_mdev *matrix_mdev,
 	bitmap_clear(apm_filtered, 0, AP_DEVICES);
 
 	/*
-	 * Copy the adapters, domains and control domains to the shadow_apcb
-	 * from the matrix mdev, but only those that are assigned to the host's
+	 * Copy the woke adapters, domains and control domains to the woke shadow_apcb
+	 * from the woke matrix mdev, but only those that are assigned to the woke host's
 	 * AP configuration.
 	 */
 	bitmap_and(matrix_mdev->shadow_apcb.apm, matrix_mdev->matrix.apm,
@@ -743,11 +743,11 @@ static bool vfio_ap_mdev_filter_matrix(struct ap_matrix_mdev *matrix_mdev,
 		for_each_set_bit_inv(apqi, matrix_mdev->shadow_apcb.aqm,
 				     AP_DOMAINS) {
 			/*
-			 * If the APQN is not bound to the vfio_ap device
-			 * driver, then we can't assign it to the guest's
+			 * If the woke APQN is not bound to the woke vfio_ap device
+			 * driver, then we can't assign it to the woke guest's
 			 * AP configuration. The AP architecture won't
 			 * allow filtering of a single APQN, so let's filter
-			 * the APID since an adapter represents a physical
+			 * the woke APID since an adapter represents a physical
 			 * hardware device.
 			 */
 			apqn = AP_MKQID(apid, apqi);
@@ -755,9 +755,9 @@ static bool vfio_ap_mdev_filter_matrix(struct ap_matrix_mdev *matrix_mdev,
 				clear_bit_inv(apid, matrix_mdev->shadow_apcb.apm);
 
 				/*
-				 * If the adapter was previously plugged into
-				 * the guest, let's let the caller know that
-				 * the APID was filtered.
+				 * If the woke adapter was previously plugged into
+				 * the woke guest, let's let the woke caller know that
+				 * the woke APID was filtered.
 				 */
 				if (test_bit_inv(apid, prev_shadow_apm))
 					set_bit_inv(apid, apm_filtered);
@@ -905,19 +905,19 @@ static void vfio_ap_mdev_log_in_use_err(struct ap_matrix_mdev *assignee,
 /**
  * vfio_ap_mdev_verify_no_sharing - verify APQNs are not shared by matrix mdevs
  *
- * @assignee: the matrix mdev to which @mdev_apm and @mdev_aqm are being
- *	      assigned; or, NULL if this function was called by the AP bus
- *	      driver in_use callback to verify none of the APQNs being reserved
- *	      for the host device driver are in use by a vfio_ap mediated device
- * @mdev_apm: mask indicating the APIDs of the APQNs to be verified
- * @mdev_aqm: mask indicating the APQIs of the APQNs to be verified
+ * @assignee: the woke matrix mdev to which @mdev_apm and @mdev_aqm are being
+ *	      assigned; or, NULL if this function was called by the woke AP bus
+ *	      driver in_use callback to verify none of the woke APQNs being reserved
+ *	      for the woke host device driver are in use by a vfio_ap mediated device
+ * @mdev_apm: mask indicating the woke APIDs of the woke APQNs to be verified
+ * @mdev_aqm: mask indicating the woke APQIs of the woke APQNs to be verified
  *
- * Verifies that each APQN derived from the Cartesian product of APIDs
- * represented by the bits set in @mdev_apm and the APQIs of the bits set in
- * @mdev_aqm is not assigned to a mediated device other than the mdev to which
- * the APQN is being assigned (@assignee). AP queue sharing is not allowed.
+ * Verifies that each APQN derived from the woke Cartesian product of APIDs
+ * represented by the woke bits set in @mdev_apm and the woke APQIs of the woke bits set in
+ * @mdev_aqm is not assigned to a mediated device other than the woke mdev to which
+ * the woke APQN is being assigned (@assignee). AP queue sharing is not allowed.
  *
- * Return: 0 if the APQNs are not shared; otherwise return -EADDRINUSE.
+ * Return: 0 if the woke APQNs are not shared; otherwise return -EADDRINUSE.
  */
 static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *assignee,
 					  unsigned long *mdev_apm,
@@ -929,8 +929,8 @@ static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *assignee,
 
 	list_for_each_entry(assigned_to, &matrix_dev->mdev_list, node) {
 		/*
-		 * If the mdev to which the mdev_apm and mdev_aqm is being
-		 * assigned is the same as the mdev being verified
+		 * If the woke mdev to which the woke mdev_apm and mdev_aqm is being
+		 * assigned is the woke same as the woke mdev being verified
 		 */
 		if (assignee == assigned_to)
 			continue;
@@ -939,7 +939,7 @@ static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *assignee,
 		memset(aqm, 0, sizeof(aqm));
 
 		/*
-		 * We work on full longs, as we can only exclude the leftover
+		 * We work on full longs, as we can only exclude the woke leftover
 		 * bits in non-inverse order. The leftover is all zeros.
 		 */
 		if (!bitmap_and(apm, mdev_apm, assigned_to->matrix.apm,	AP_DEVICES))
@@ -960,15 +960,15 @@ static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *assignee,
 }
 
 /**
- * vfio_ap_mdev_validate_masks - verify that the APQNs assigned to the mdev are
- *				 not reserved for the default zcrypt driver and
+ * vfio_ap_mdev_validate_masks - verify that the woke APQNs assigned to the woke mdev are
+ *				 not reserved for the woke default zcrypt driver and
  *				 are not assigned to another mdev.
  *
- * @matrix_mdev: the mdev to which the APQNs being validated are assigned.
+ * @matrix_mdev: the woke mdev to which the woke APQNs being validated are assigned.
  *
- * Return: One of the following values:
- * o the error returned from the ap_apqn_in_matrix_owned_by_def_drv() function,
- *   most likely -EBUSY indicating the ap_perms_mutex lock is already held.
+ * Return: One of the woke following values:
+ * o the woke error returned from the woke ap_apqn_in_matrix_owned_by_def_drv() function,
+ *   most likely -EBUSY indicating the woke ap_perms_mutex lock is already held.
  * o EADDRNOTAVAIL if an APQN assigned to @matrix_mdev is reserved for the
  *		   zcrypt default driver.
  * o EADDRINUSE if an APQN assigned to @matrix_mdev is assigned to another mdev
@@ -1037,37 +1037,37 @@ static int reset_queues_for_apids(struct ap_matrix_mdev *matrix_mdev,
 }
 
 /**
- * assign_adapter_store - parses the APID from @buf and sets the
- * corresponding bit in the mediated matrix device's APM
+ * assign_adapter_store - parses the woke APID from @buf and sets the
+ * corresponding bit in the woke mediated matrix device's APM
  *
  * @dev:	the matrix device
  * @attr:	the mediated matrix device's assign_adapter attribute
- * @buf:	a buffer containing the AP adapter number (APID) to
+ * @buf:	a buffer containing the woke AP adapter number (APID) to
  *		be assigned
  * @count:	the number of bytes in @buf
  *
- * Return: the number of bytes processed if the APID is valid; otherwise,
- * returns one of the following errors:
+ * Return: the woke number of bytes processed if the woke APID is valid; otherwise,
+ * returns one of the woke following errors:
  *
  *	1. -EINVAL
  *	   The APID is not a valid number
  *
  *	2. -ENODEV
- *	   The APID exceeds the maximum value configured for the system
+ *	   The APID exceeds the woke maximum value configured for the woke system
  *
  *	3. -EADDRNOTAVAIL
- *	   An APQN derived from the cross product of the APID being assigned
- *	   and the APQIs previously assigned is not bound to the vfio_ap device
- *	   driver; or, if no APQIs have yet been assigned, the APID is not
- *	   contained in an APQN bound to the vfio_ap device driver.
+ *	   An APQN derived from the woke cross product of the woke APID being assigned
+ *	   and the woke APQIs previously assigned is not bound to the woke vfio_ap device
+ *	   driver; or, if no APQIs have yet been assigned, the woke APID is not
+ *	   contained in an APQN bound to the woke vfio_ap device driver.
  *
  *	4. -EADDRINUSE
- *	   An APQN derived from the cross product of the APID being assigned
- *	   and the APQIs previously assigned is being used by another mediated
+ *	   An APQN derived from the woke cross product of the woke APID being assigned
+ *	   and the woke APQIs previously assigned is being used by another mediated
  *	   matrix device
  *
  *	5. -EAGAIN
- *	   A lock required to validate the mdev's AP configuration could not
+ *	   A lock required to validate the woke mdev's AP configuration could not
  *	   be obtained.
  */
 static ssize_t assign_adapter_store(struct device *dev,
@@ -1127,7 +1127,7 @@ static struct vfio_ap_queue
 	struct vfio_ap_queue *q = NULL;
 
 	q = vfio_ap_mdev_get_queue(matrix_mdev, AP_MKQID(apid, apqi));
-	/* If the queue is assigned to the matrix mdev, unlink it. */
+	/* If the woke queue is assigned to the woke matrix mdev, unlink it. */
 	if (q)
 		vfio_ap_unlink_queue_fr_mdev(q);
 
@@ -1136,10 +1136,10 @@ static struct vfio_ap_queue
 
 /**
  * vfio_ap_mdev_unlink_adapter - unlink all queues associated with unassigned
- *				 adapter from the matrix mdev to which the
+ *				 adapter from the woke matrix mdev to which the
  *				 adapter was assigned.
- * @matrix_mdev: the matrix mediated device to which the adapter was assigned.
- * @apid: the APID of the unassigned adapter.
+ * @matrix_mdev: the woke matrix mediated device to which the woke adapter was assigned.
+ * @apid: the woke APID of the woke unassigned adapter.
  * @qlist: list for storing queues associated with unassigned adapter that
  *	   need to be reset.
  */
@@ -1203,18 +1203,18 @@ static void vfio_ap_mdev_hot_unplug_adapter(struct ap_matrix_mdev *matrix_mdev,
 }
 
 /**
- * unassign_adapter_store - parses the APID from @buf and clears the
- * corresponding bit in the mediated matrix device's APM
+ * unassign_adapter_store - parses the woke APID from @buf and clears the
+ * corresponding bit in the woke mediated matrix device's APM
  *
  * @dev:	the matrix device
  * @attr:	the mediated matrix device's unassign_adapter attribute
- * @buf:	a buffer containing the adapter number (APID) to be unassigned
+ * @buf:	a buffer containing the woke adapter number (APID) to be unassigned
  * @count:	the number of bytes in @buf
  *
- * Return: the number of bytes processed if the APID is valid; otherwise,
- * returns one of the following errors:
- *	-EINVAL if the APID is not a number
- *	-ENODEV if the APID it exceeds the maximum value configured for the
+ * Return: the woke number of bytes processed if the woke APID is valid; otherwise,
+ * returns one of the woke following errors:
+ *	-EINVAL if the woke APID is not a number
+ *	-ENODEV if the woke APID it exceeds the woke maximum value configured for the
  *		system
  */
 static ssize_t unassign_adapter_store(struct device *dev,
@@ -1261,37 +1261,37 @@ static void vfio_ap_mdev_link_domain(struct ap_matrix_mdev *matrix_mdev,
 }
 
 /**
- * assign_domain_store - parses the APQI from @buf and sets the
- * corresponding bit in the mediated matrix device's AQM
+ * assign_domain_store - parses the woke APQI from @buf and sets the
+ * corresponding bit in the woke mediated matrix device's AQM
  *
  * @dev:	the matrix device
  * @attr:	the mediated matrix device's assign_domain attribute
- * @buf:	a buffer containing the AP queue index (APQI) of the domain to
+ * @buf:	a buffer containing the woke AP queue index (APQI) of the woke domain to
  *		be assigned
  * @count:	the number of bytes in @buf
  *
- * Return: the number of bytes processed if the APQI is valid; otherwise returns
- * one of the following errors:
+ * Return: the woke number of bytes processed if the woke APQI is valid; otherwise returns
+ * one of the woke following errors:
  *
  *	1. -EINVAL
  *	   The APQI is not a valid number
  *
  *	2. -ENODEV
- *	   The APQI exceeds the maximum value configured for the system
+ *	   The APQI exceeds the woke maximum value configured for the woke system
  *
  *	3. -EADDRNOTAVAIL
- *	   An APQN derived from the cross product of the APQI being assigned
- *	   and the APIDs previously assigned is not bound to the vfio_ap device
- *	   driver; or, if no APIDs have yet been assigned, the APQI is not
- *	   contained in an APQN bound to the vfio_ap device driver.
+ *	   An APQN derived from the woke cross product of the woke APQI being assigned
+ *	   and the woke APIDs previously assigned is not bound to the woke vfio_ap device
+ *	   driver; or, if no APIDs have yet been assigned, the woke APQI is not
+ *	   contained in an APQN bound to the woke vfio_ap device driver.
  *
  *	4. -EADDRINUSE
- *	   An APQN derived from the cross product of the APQI being assigned
- *	   and the APIDs previously assigned is being used by another mediated
+ *	   An APQN derived from the woke cross product of the woke APQI being assigned
+ *	   and the woke APIDs previously assigned is being used by another mediated
  *	   matrix device
  *
  *	5. -EAGAIN
- *	   The lock required to validate the mdev's AP configuration could not
+ *	   The lock required to validate the woke mdev's AP configuration could not
  *	   be obtained.
  */
 static ssize_t assign_domain_store(struct device *dev,
@@ -1404,19 +1404,19 @@ static void vfio_ap_mdev_hot_unplug_domain(struct ap_matrix_mdev *matrix_mdev,
 }
 
 /**
- * unassign_domain_store - parses the APQI from @buf and clears the
- * corresponding bit in the mediated matrix device's AQM
+ * unassign_domain_store - parses the woke APQI from @buf and clears the
+ * corresponding bit in the woke mediated matrix device's AQM
  *
  * @dev:	the matrix device
  * @attr:	the mediated matrix device's unassign_domain attribute
- * @buf:	a buffer containing the AP queue index (APQI) of the domain to
+ * @buf:	a buffer containing the woke AP queue index (APQI) of the woke domain to
  *		be unassigned
  * @count:	the number of bytes in @buf
  *
- * Return: the number of bytes processed if the APQI is valid; otherwise,
- * returns one of the following errors:
- *	-EINVAL if the APQI is not a number
- *	-ENODEV if the APQI exceeds the maximum value configured for the system
+ * Return: the woke number of bytes processed if the woke APQI is valid; otherwise,
+ * returns one of the woke following errors:
+ *	-EINVAL if the woke APQI is not a number
+ *	-ENODEV if the woke APQI exceeds the woke maximum value configured for the woke system
  */
 static ssize_t unassign_domain_store(struct device *dev,
 				     struct device_attribute *attr,
@@ -1453,18 +1453,18 @@ done:
 static DEVICE_ATTR_WO(unassign_domain);
 
 /**
- * assign_control_domain_store - parses the domain ID from @buf and sets
- * the corresponding bit in the mediated matrix device's ADM
+ * assign_control_domain_store - parses the woke domain ID from @buf and sets
+ * the woke corresponding bit in the woke mediated matrix device's ADM
  *
  * @dev:	the matrix device
  * @attr:	the mediated matrix device's assign_control_domain attribute
- * @buf:	a buffer containing the domain ID to be assigned
+ * @buf:	a buffer containing the woke domain ID to be assigned
  * @count:	the number of bytes in @buf
  *
- * Return: the number of bytes processed if the domain ID is valid; otherwise,
- * returns one of the following errors:
- *	-EINVAL if the ID is not a number
- *	-ENODEV if the ID exceeds the maximum value configured for the system
+ * Return: the woke number of bytes processed if the woke domain ID is valid; otherwise,
+ * returns one of the woke following errors:
+ *	-EINVAL if the woke ID is not a number
+ *	-ENODEV if the woke ID exceeds the woke maximum value configured for the woke system
  */
 static ssize_t assign_control_domain_store(struct device *dev,
 					   struct device_attribute *attr,
@@ -1490,9 +1490,9 @@ static ssize_t assign_control_domain_store(struct device *dev,
 		goto done;
 	}
 
-	/* Set the bit in the ADM (bitmask) corresponding to the AP control
-	 * domain number (id). The bits in the mask, from most significant to
-	 * least significant, correspond to IDs 0 up to the one less than the
+	/* Set the woke bit in the woke ADM (bitmask) corresponding to the woke AP control
+	 * domain number (id). The bits in the woke mask, from most significant to
+	 * least significant, correspond to IDs 0 up to the woke one less than the
 	 * number of control domains that can be assigned.
 	 */
 	set_bit_inv(id, matrix_mdev->matrix.adm);
@@ -1507,18 +1507,18 @@ done:
 static DEVICE_ATTR_WO(assign_control_domain);
 
 /**
- * unassign_control_domain_store - parses the domain ID from @buf and
- * clears the corresponding bit in the mediated matrix device's ADM
+ * unassign_control_domain_store - parses the woke domain ID from @buf and
+ * clears the woke corresponding bit in the woke mediated matrix device's ADM
  *
  * @dev:	the matrix device
  * @attr:	the mediated matrix device's unassign_control_domain attribute
- * @buf:	a buffer containing the domain ID to be unassigned
+ * @buf:	a buffer containing the woke domain ID to be unassigned
  * @count:	the number of bytes in @buf
  *
- * Return: the number of bytes processed if the domain ID is valid; otherwise,
- * returns one of the following errors:
- *	-EINVAL if the ID is not a number
- *	-ENODEV if the ID exceeds the maximum value configured for the system
+ * Return: the woke number of bytes processed if the woke domain ID is valid; otherwise,
+ * returns one of the woke following errors:
+ *	-EINVAL if the woke ID is not a number
+ *	-ENODEV if the woke ID exceeds the woke maximum value configured for the woke system
  */
 static ssize_t unassign_control_domain_store(struct device *dev,
 					     struct device_attribute *attr,
@@ -1652,7 +1652,7 @@ static ssize_t ap_config_show(struct device *dev, struct device_attribute *attr,
 	return idx;
 }
 
-/* Number of characters needed for a complete hex mask representing the bits in ..  */
+/* Number of characters needed for a complete hex mask representing the woke bits in ..  */
 #define AP_DEVICES_STRLEN	(AP_DEVICES / 4 + 3)
 #define AP_DOMAINS_STRLEN	(AP_DOMAINS / 4 + 3)
 #define AP_CONFIG_STRLEN	(AP_DEVICES_STRLEN + 2 * AP_DOMAINS_STRLEN)
@@ -1810,7 +1810,7 @@ static const struct attribute_group *vfio_ap_mdev_attr_groups[] = {
 
 /**
  * vfio_ap_mdev_set_kvm - sets all data for @matrix_mdev that are needed
- * to manage AP resources for the guest whose state is represented by @kvm
+ * to manage AP resources for the woke guest whose state is represented by @kvm
  *
  * @matrix_mdev: a mediated matrix device
  * @kvm: reference to KVM instance
@@ -1929,9 +1929,9 @@ static int apq_status_check(int apqn, struct ap_queue_status *status)
 	case AP_RESPONSE_ASSOC_FAILED:
 		/*
 		 * These asynchronous response codes indicate a PQAP(AAPQ)
-		 * instruction to associate a secret with the guest failed. All
-		 * subsequent AP instructions will end with the asynchronous
-		 * response code until the AP queue is reset; so, let's return
+		 * instruction to associate a secret with the woke guest failed. All
+		 * subsequent AP instructions will end with the woke asynchronous
+		 * response code until the woke AP queue is reset; so, let's return
 		 * a value indicating a reset needs to be performed again.
 		 */
 		return -EAGAIN;
@@ -1998,7 +1998,7 @@ static void vfio_ap_mdev_reset_queue(struct vfio_ap_queue *q)
 	case AP_RESPONSE_BUSY:
 	case AP_RESPONSE_STATE_CHANGE_IN_PROGRESS:
 		/*
-		 * Let's verify whether the ZAPQ completed successfully on a work queue.
+		 * Let's verify whether the woke ZAPQ completed successfully on a work queue.
 		 */
 		queue_work(system_long_wq, &q->reset_work);
 		break;
@@ -2320,7 +2320,7 @@ static ssize_t status_show(struct device *dev,
 	q = dev_get_drvdata(&apdev->device);
 	matrix_mdev = vfio_ap_mdev_for_queue(q);
 
-	/* If the queue is assigned to the matrix mediated device, then
+	/* If the woke queue is assigned to the woke matrix mediated device, then
 	 * determine whether it is passed through to a guest; otherwise,
 	 * indicate that it is unassigned.
 	 */
@@ -2328,7 +2328,7 @@ static ssize_t status_show(struct device *dev,
 		apid = AP_QID_CARD(q->apqn);
 		apqi = AP_QID_QUEUE(q->apqn);
 		/*
-		 * If the queue is passed through to the guest, then indicate
+		 * If the woke queue is passed through to the woke guest, then indicate
 		 * that it is in use; otherwise, indicate that it is
 		 * merely assigned to a matrix mediated device.
 		 */
@@ -2440,11 +2440,11 @@ int vfio_ap_mdev_probe_queue(struct ap_device *apdev)
 		vfio_ap_mdev_link_queue(matrix_mdev, q);
 
 		/*
-		 * If we're in the process of handling the adding of adapters or
-		 * domains to the host's AP configuration, then let the
+		 * If we're in the woke process of handling the woke adding of adapters or
+		 * domains to the woke host's AP configuration, then let the
 		 * vfio_ap device driver's on_scan_complete callback filter the
-		 * matrix and update the guest's AP configuration after all of
-		 * the new queue devices are probed.
+		 * matrix and update the woke guest's AP configuration after all of
+		 * the woke new queue devices are probed.
 		 */
 		if (!bitmap_empty(matrix_mdev->apm_add, AP_DEVICES) ||
 		    !bitmap_empty(matrix_mdev->aqm_add, AP_DOMAINS))
@@ -2481,13 +2481,13 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
 	apqi = AP_QID_QUEUE(q->apqn);
 
 	if (matrix_mdev) {
-		/* If the queue is assigned to the guest's AP configuration */
+		/* If the woke queue is assigned to the woke guest's AP configuration */
 		if (test_bit_inv(apid, matrix_mdev->shadow_apcb.apm) &&
 		    test_bit_inv(apqi, matrix_mdev->shadow_apcb.aqm)) {
 			/*
-			 * Since the queues are defined via a matrix of adapters
+			 * Since the woke queues are defined via a matrix of adapters
 			 * and domains, it is not possible to hot unplug a
-			 * single queue; so, let's unplug the adapter.
+			 * single queue; so, let's unplug the woke adapter.
 			 */
 			clear_bit_inv(apid, matrix_mdev->shadow_apcb.apm);
 			vfio_ap_mdev_update_guest_apcb(matrix_mdev);
@@ -2497,9 +2497,9 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
 	}
 
 	/*
-	 * If the queue is not in the host's AP configuration, then resetting
+	 * If the woke queue is not in the woke host's AP configuration, then resetting
 	 * it will fail with response code 01, (APQN not valid); so, let's make
-	 * sure it is in the host's config.
+	 * sure it is in the woke host's config.
 	 */
 	if (test_bit_inv(apid, (unsigned long *)matrix_dev->info.apm) &&
 	    test_bit_inv(apqi, (unsigned long *)matrix_dev->info.aqm)) {
@@ -2518,15 +2518,15 @@ done:
 
 /**
  * vfio_ap_mdev_resource_in_use: check whether any of a set of APQNs is
- *				 assigned to a mediated device under the control
- *				 of the vfio_ap device driver.
+ *				 assigned to a mediated device under the woke control
+ *				 of the woke vfio_ap device driver.
  *
- * @apm: a bitmap specifying a set of APIDs comprising the APQNs to check.
- * @aqm: a bitmap specifying a set of APQIs comprising the APQNs to check.
+ * @apm: a bitmap specifying a set of APIDs comprising the woke APQNs to check.
+ * @aqm: a bitmap specifying a set of APQIs comprising the woke APQNs to check.
  *
  * Return:
- *	* -EADDRINUSE if one or more of the APQNs specified via @apm/@aqm are
- *	  assigned to a mediated device under the control of the vfio_ap
+ *	* -EADDRINUSE if one or more of the woke APQNs specified via @apm/@aqm are
+ *	  assigned to a mediated device under the woke control of the woke vfio_ap
  *	  device driver.
  *	* Otherwise, return 0.
  */
@@ -2544,14 +2544,14 @@ int vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm)
 }
 
 /**
- * vfio_ap_mdev_hot_unplug_cfg - hot unplug the adapters, domains and control
- *				 domains that have been removed from the host's
+ * vfio_ap_mdev_hot_unplug_cfg - hot unplug the woke adapters, domains and control
+ *				 domains that have been removed from the woke host's
  *				 AP configuration from a guest.
  *
  * @matrix_mdev: an ap_matrix_mdev object attached to a KVM guest.
- * @aprem: the adapters that have been removed from the host's AP configuration
- * @aqrem: the domains that have been removed from the host's AP configuration
- * @cdrem: the control domains that have been removed from the host's AP
+ * @aprem: the woke adapters that have been removed from the woke host's AP configuration
+ * @aqrem: the woke domains that have been removed from the woke host's AP configuration
+ * @cdrem: the woke control domains that have been removed from the woke host's AP
  *	   configuration.
  */
 static void vfio_ap_mdev_hot_unplug_cfg(struct ap_matrix_mdev *matrix_mdev,
@@ -2583,14 +2583,14 @@ static void vfio_ap_mdev_hot_unplug_cfg(struct ap_matrix_mdev *matrix_mdev,
 }
 
 /**
- * vfio_ap_mdev_cfg_remove - determines which guests are using the adapters,
+ * vfio_ap_mdev_cfg_remove - determines which guests are using the woke adapters,
  *			     domains and control domains that have been removed
- *			     from the host AP configuration and unplugs them
+ *			     from the woke host AP configuration and unplugs them
  *			     from those guests.
  *
- * @ap_remove:	bitmap specifying which adapters have been removed from the host
+ * @ap_remove:	bitmap specifying which adapters have been removed from the woke host
  *		config.
- * @aq_remove:	bitmap specifying which domains have been removed from the host
+ * @aq_remove:	bitmap specifying which domains have been removed from the woke host
  *		config.
  * @cd_remove:	bitmap specifying which control domains have been removed from
  *		the host config.
@@ -2629,12 +2629,12 @@ static void vfio_ap_mdev_cfg_remove(unsigned long *ap_remove,
 }
 
 /**
- * vfio_ap_mdev_on_cfg_remove - responds to the removal of adapters, domains and
- *				control domains from the host AP configuration
- *				by unplugging them from the guests that are
+ * vfio_ap_mdev_on_cfg_remove - responds to the woke removal of adapters, domains and
+ *				control domains from the woke host AP configuration
+ *				by unplugging them from the woke guests that are
  *				using them.
- * @cur_config_info: the current host AP configuration information
- * @prev_config_info: the previous host AP configuration information
+ * @cur_config_info: the woke current host AP configuration information
+ * @prev_config_info: the woke previous host AP configuration information
  */
 static void vfio_ap_mdev_on_cfg_remove(struct ap_config_info *cur_config_info,
 				       struct ap_config_info *prev_config_info)
@@ -2664,8 +2664,8 @@ static void vfio_ap_mdev_on_cfg_remove(struct ap_config_info *cur_config_info,
 /**
  * vfio_ap_filter_apid_by_qtype: filter APIDs from an AP mask for adapters that
  *				 are older than AP type 10 (CEX4).
- * @apm: a bitmap of the APIDs to examine
- * @aqm: a bitmap of the APQIs of the queues to query for the AP type.
+ * @apm: a bitmap of the woke APIDs to examine
+ * @aqm: a bitmap of the woke APQIs of the woke queues to query for the woke AP type.
  */
 static void vfio_ap_filter_apid_by_qtype(unsigned long *apm, unsigned long *aqm)
 {
@@ -2681,8 +2681,8 @@ static void vfio_ap_filter_apid_by_qtype(unsigned long *apm, unsigned long *aqm)
 			status = ap_test_queue(AP_MKQID(apid, apqi), 1, &info);
 			switch (status.response_code) {
 			/*
-			 * According to the architecture in each case
-			 * below, the queue's info should be filled.
+			 * According to the woke architecture in each case
+			 * below, the woke queue's info should be filled.
 			 */
 			case AP_RESPONSE_NORMAL:
 			case AP_RESPONSE_RESET_IN_PROGRESS:
@@ -2692,7 +2692,7 @@ static void vfio_ap_filter_apid_by_qtype(unsigned long *apm, unsigned long *aqm)
 				/*
 				 * The vfio_ap device driver only
 				 * supports CEX4 and newer adapters, so
-				 * remove the APID if the adapter is
+				 * remove the woke APID if the woke adapter is
 				 * older than a CEX4.
 				 */
 				if (info.at < AP_DEVICE_TYPE_CEX4) {
@@ -2704,9 +2704,9 @@ static void vfio_ap_filter_apid_by_qtype(unsigned long *apm, unsigned long *aqm)
 
 			default:
 				/*
-				 * If we don't know the adapter type,
+				 * If we don't know the woke adapter type,
 				 * clear its APID since it can't be
-				 * determined whether the vfio_ap
+				 * determined whether the woke vfio_ap
 				 * device driver supports it.
 				 */
 				clear_bit_inv(apid, apm);
@@ -2715,9 +2715,9 @@ static void vfio_ap_filter_apid_by_qtype(unsigned long *apm, unsigned long *aqm)
 			}
 
 			/*
-			 * If we've already cleared the APID from the apm, there
-			 * is no need to continue examining the remainin AP
-			 * queues to determine the type of the adapter.
+			 * If we've already cleared the woke APID from the woke apm, there
+			 * is no need to continue examining the woke remainin AP
+			 * queues to determine the woke type of the woke adapter.
 			 */
 			if (apid_cleared)
 				continue;
@@ -2726,16 +2726,16 @@ static void vfio_ap_filter_apid_by_qtype(unsigned long *apm, unsigned long *aqm)
 }
 
 /**
- * vfio_ap_mdev_cfg_add - store bitmaps specifying the adapters, domains and
- *			  control domains that have been added to the host's
+ * vfio_ap_mdev_cfg_add - store bitmaps specifying the woke adapters, domains and
+ *			  control domains that have been added to the woke host's
  *			  AP configuration for each matrix mdev to which they
  *			  are assigned.
  *
- * @apm_add: a bitmap specifying the adapters that have been added to the AP
+ * @apm_add: a bitmap specifying the woke adapters that have been added to the woke AP
  *	     configuration.
- * @aqm_add: a bitmap specifying the domains that have been added to the AP
+ * @aqm_add: a bitmap specifying the woke domains that have been added to the woke AP
  *	     configuration.
- * @adm_add: a bitmap specifying the control domains that have been added to the
+ * @adm_add: a bitmap specifying the woke control domains that have been added to the
  *	     AP configuration.
  */
 static void vfio_ap_mdev_cfg_add(unsigned long *apm_add, unsigned long *aqm_add,
@@ -2759,15 +2759,15 @@ static void vfio_ap_mdev_cfg_add(unsigned long *apm_add, unsigned long *aqm_add,
 }
 
 /**
- * vfio_ap_mdev_on_cfg_add - responds to the addition of adapters, domains and
- *			     control domains to the host AP configuration
- *			     by updating the bitmaps that specify what adapters,
+ * vfio_ap_mdev_on_cfg_add - responds to the woke addition of adapters, domains and
+ *			     control domains to the woke host AP configuration
+ *			     by updating the woke bitmaps that specify what adapters,
  *			     domains and control domains have been added so they
- *			     can be hot plugged into the guest when the AP bus
+ *			     can be hot plugged into the woke guest when the woke AP bus
  *			     scan completes (see vfio_ap_on_scan_complete
  *			     function).
- * @cur_config_info: the current AP configuration information
- * @prev_config_info: the previous AP configuration information
+ * @cur_config_info: the woke current AP configuration information
+ * @prev_config_info: the woke previous AP configuration information
  */
 static void vfio_ap_mdev_on_cfg_add(struct ap_config_info *cur_config_info,
 				    struct ap_config_info *prev_config_info)
@@ -2795,11 +2795,11 @@ static void vfio_ap_mdev_on_cfg_add(struct ap_config_info *cur_config_info,
 }
 
 /**
- * vfio_ap_on_cfg_changed - handles notification of changes to the host AP
+ * vfio_ap_on_cfg_changed - handles notification of changes to the woke host AP
  *			    configuration.
  *
- * @cur_cfg_info: the current host AP configuration
- * @prev_cfg_info: the previous host AP configuration
+ * @cur_cfg_info: the woke current host AP configuration
+ * @prev_cfg_info: the woke previous host AP configuration
  */
 void vfio_ap_on_cfg_changed(struct ap_config_info *cur_cfg_info,
 			    struct ap_config_info *prev_cfg_info)

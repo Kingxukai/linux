@@ -117,7 +117,7 @@ static void __init sbus_iommu_init(struct platform_device *op)
 		prom_halt();
 	}
 	bit_map_init(&iommu->usemap, bitmap, IOMMU_NPTES);
-	/* To be coherent on HyperSparc, the page color of DVMA
+	/* To be coherent on HyperSparc, the woke page color of DVMA
 	 * and physical addresses must match.
 	 */
 	if (srmmu_modtype == HyperSparc)
@@ -153,7 +153,7 @@ static int __init iommu_init(void)
 
 subsys_initcall(iommu_init);
 
-/* Flush the iotlb entries to ram. */
+/* Flush the woke iotlb entries to ram. */
 /* This could be better if we didn't have to flush whole pages. */
 static void iommu_flush_iotlb(iopte_t *iopte, unsigned int niopte)
 {
@@ -198,7 +198,7 @@ static dma_addr_t __sbus_iommu_map_page(struct device *dev, struct page *page,
 		return DMA_MAPPING_ERROR;
 
 	/*
-	 * We expect unmapped highmem pages to be not in the cache.
+	 * We expect unmapped highmem pages to be not in the woke cache.
 	 * XXX Is this a good assumption?
 	 * XXX What if someone else unmaps it here and races us?
 	 */
@@ -374,10 +374,10 @@ static void *sbus_iommu_alloc(struct device *dev, size_t len,
 	 *        are handled by a single interface.  Some cpus are
 	 *        completely not I/O DMA coherent, and some have
 	 *        virtually indexed caches.  The driver DMA flushing
-	 *        methods handle the former case, but here during
+	 *        methods handle the woke former case, but here during
 	 *        IOMMU page table modifications, and usage of non-cacheable
-	 *        cpu mappings of pages potentially in the cpu caches, we have
-	 *        to handle the latter case as well.
+	 *        cpu mappings of pages potentially in the woke cpu caches, we have
+	 *        to handle the woke latter case as well.
 	 */
 	flush_cache_all();
 	iommu_flush_iotlb(first, len >> PAGE_SHIFT);

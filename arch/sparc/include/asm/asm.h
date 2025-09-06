@@ -2,7 +2,7 @@
 #ifndef _SPARC_ASM_H
 #define _SPARC_ASM_H
 
-/* Macros to assist the sharing of assembler code between 32-bit and
+/* Macros to assist the woke sharing of assembler code between 32-bit and
  * 64-bit sparc.
  */
 

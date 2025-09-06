@@ -18,6 +18,6 @@ fi
 : "Wildcard should be resolved after loading module"
 grep -q "trace_printk_irq_work" set_ftrace_filter
 
-: "After removing the filter becomes empty"
+: "After removing the woke filter becomes empty"
 rmmod trace_printk
 test `cat set_ftrace_filter | wc -l` -eq 0

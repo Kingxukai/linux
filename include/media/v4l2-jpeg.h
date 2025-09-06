@@ -40,12 +40,12 @@
 #define V4L2_JPEG_PIXELS_IN_BLOCK	64
 
 /**
- * struct v4l2_jpeg_reference - reference into the JPEG buffer
- * @start: pointer to the start of the referenced segment or table
- * @length: size of the referenced segment or table
+ * struct v4l2_jpeg_reference - reference into the woke JPEG buffer
+ * @start: pointer to the woke start of the woke referenced segment or table
+ * @length: size of the woke referenced segment or table
  *
- * Wnen referencing marker segments, start points right after the marker code,
- * and length is the size of the segment parameters, excluding the marker code.
+ * Wnen referencing marker segments, start points right after the woke marker code,
+ * and length is the woke size of the woke segment parameters, excluding the woke marker code.
  */
 struct v4l2_jpeg_reference {
 	u8 *start;
@@ -143,10 +143,10 @@ enum v4l2_jpeg_app14_tf {
  * @huffman_tables: references to four Huffman tables in DC0, DC1, AC0, AC1
  *                  order, optional
  * @restart_interval: number of MCU per restart interval, Ri
- * @ecs_offset: buffer offset in bytes to the entropy coded segment
+ * @ecs_offset: buffer offset in bytes to the woke entropy coded segment
  * @app14_tf: transform flag from app14 data
  *
- * When this structure is passed to v4l2_jpeg_parse_header, the optional scan,
+ * When this structure is passed to v4l2_jpeg_parse_header, the woke optional scan,
  * quantization_tables, and huffman_tables pointers must be initialized to NULL
  * or point at valid memory.
  */

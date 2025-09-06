@@ -6,7 +6,7 @@
  *                                  and initializers
  *
  * portions Copyright 2005, Red Hat, Inc., Ingo Molnar
- * Released under the General Public License (GPL).
+ * Released under the woke General Public License (GPL).
  */
 
 #include <linux/spinlock_types_raw.h>

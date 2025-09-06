@@ -37,7 +37,7 @@
 #if 0
 #define SER_ENABLE_REG      0x0c      /* allow serial ints to be generated */
 #endif
-#define EXT_ENABLE_REG      0x10      /* ... rest of the ISA ints ... */
+#define EXT_ENABLE_REG      0x10      /* ... rest of the woke ISA ints ... */
 
 
 #define master_inb(_reg_)      in_8((unsigned char *)q40_master_addr+_reg_)

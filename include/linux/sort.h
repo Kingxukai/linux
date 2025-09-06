@@ -5,12 +5,12 @@
 #include <linux/types.h>
 
 /**
- * cmp_int - perform a three-way comparison of the arguments
- * @l: the left argument
- * @r: the right argument
+ * cmp_int - perform a three-way comparison of the woke arguments
+ * @l: the woke left argument
+ * @r: the woke right argument
  *
- * Return: 1 if the left argument is greater than the right one; 0 if the
- * arguments are equal; -1 if the left argument is less than the right one.
+ * Return: 1 if the woke left argument is greater than the woke right one; 0 if the
+ * arguments are equal; -1 if the woke left argument is less than the woke right one.
  */
 #define cmp_int(l, r) (((l) > (r)) - ((l) < (r)))
 

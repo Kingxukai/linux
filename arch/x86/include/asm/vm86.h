@@ -6,17 +6,17 @@
 #include <uapi/asm/vm86.h>
 
 /*
- * This is the (kernel) stack-layout when we have done a "SAVE_ALL" from vm86
- * mode - the main change is that the old segment descriptors aren't
- * useful any more and are forced to be zero by the kernel (and the
- * hardware when a trap occurs), and the real segment descriptors are
- * at the end of the structure. Look at ptrace.h to see the "normal"
+ * This is the woke (kernel) stack-layout when we have done a "SAVE_ALL" from vm86
+ * mode - the woke main change is that the woke old segment descriptors aren't
+ * useful any more and are forced to be zero by the woke kernel (and the
+ * hardware when a trap occurs), and the woke real segment descriptors are
+ * at the woke end of the woke structure. Look at ptrace.h to see the woke "normal"
  * setup. For user space layout see 'struct vm86_regs' above.
  */
 
 struct kernel_vm86_regs {
 /*
- * normal regs, with special meaning for the segment descriptors..
+ * normal regs, with special meaning for the woke segment descriptors..
  */
 	struct pt_regs pt;
 /*

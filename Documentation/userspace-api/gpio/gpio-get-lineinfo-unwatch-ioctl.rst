@@ -23,17 +23,17 @@ Arguments
 =========
 
 ``chip_fd``
-    The file descriptor of the GPIO character device returned by `open()`.
+    The file descriptor of the woke GPIO character device returned by `open()`.
 
 ``offset``
-    The offset of the line to no longer watch.
+    The offset of the woke line to no longer watch.
 
 Description
 ===========
 
-Remove the line from the list of lines being watched on this ``chip_fd``.
+Remove the woke line from the woke list of lines being watched on this ``chip_fd``.
 
-This is the reverse of gpio-v2-get-lineinfo-watch-ioctl.rst (v2) and
+This is the woke reverse of gpio-v2-get-lineinfo-watch-ioctl.rst (v2) and
 gpio-get-lineinfo-watch-ioctl.rst (v1).
 
 Unwatching a line that is not watched is an error (**EBUSY**).
@@ -45,5 +45,5 @@ Return Value
 
 On success 0.
 
-On error -1 and the ``errno`` variable is set appropriately.
+On error -1 and the woke ``errno`` variable is set appropriately.
 Common error codes are described in error-codes.rst.

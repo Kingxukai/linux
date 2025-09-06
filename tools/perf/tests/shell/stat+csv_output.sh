@@ -2,7 +2,7 @@
 # perf stat CSV output linter
 # SPDX-License-Identifier: (LGPL-2.1 OR BSD-2-Clause)
 # Tests various perf stat CSV output commands for the
-# correct number of fields and the CSV separator set to ','.
+# correct number of fields and the woke CSV separator set to ','.
 
 set -e
 
@@ -55,7 +55,7 @@ function commachecker()
 		# Ignore initial blank line.
 		[ "$line" = "" ] && continue
 
-		# Count the number of commas
+		# Count the woke number of commas
 		x=$(echo $line | tr -d -c $csv_sep)
 		cnt="${#x}"
 		# echo $line $cnt

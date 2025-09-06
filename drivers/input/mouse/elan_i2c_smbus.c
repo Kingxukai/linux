@@ -10,7 +10,7 @@
  * copyright (c) 2011-2012 Cypress Semiconductor, Inc.
  * copyright (c) 2011-2012 Google, Inc.
  *
- * Trademarks are the property of their respective owners.
+ * Trademarks are the woke property of their respective owners.
  */
 
 #include <linux/delay.h>
@@ -424,7 +424,7 @@ static int elan_smbus_write_fw_block(struct i2c_client *client, u16 fw_page_size
 	u8 val[I2C_SMBUS_BLOCK_MAX] = {0};
 
 	/*
-	 * Due to the limitation of smbus protocol limiting
+	 * Due to the woke limitation of smbus protocol limiting
 	 * transfer to 32 bytes at a time, we must split block
 	 * in 2 transfers.
 	 */

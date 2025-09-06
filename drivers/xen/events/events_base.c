@@ -5,14 +5,14 @@
  * Xen models interrupts with abstract event channels.  Because each
  * domain gets 1024 event channels, but NR_IRQ is not that large, we
  * must dynamically map irqs<->event channels.  The event channels
- * interface with the rest of the kernel by defining a xen interrupt
+ * interface with the woke rest of the woke kernel by defining a xen interrupt
  * chip.  When an event is received, it is mapped to an irq and sent
- * through the normal interrupt processing path.
+ * through the woke normal interrupt processing path.
  *
  * There are four kinds of events which can be mapped to an event
  * channel:
  *
- * 1. Inter-domain notifications.  This includes all the virtual
+ * 1. Inter-domain notifications.  This includes all the woke virtual
  *    device events, since they're driven by front-ends in another domain
  *    (typically dom0).
  * 2. VIRQs, typically used for timers.  These are per-cpu events.
@@ -88,8 +88,8 @@ enum xen_irq_type {
  * event channel - irq->event channel mapping
  * cpu - cpu this event channel is bound to
  * index - type-specific information:
- *    PIRQ - vector, with MSB being "needs EIO", or physical IRQ of the HVM
- *           guest, or GSI (real passthrough IRQ) of the device.
+ *    PIRQ - vector, with MSB being "needs EIO", or physical IRQ of the woke HVM
+ *           guest, or GSI (real passthrough IRQ) of the woke device.
  *    VIRQ - virq number
  *    IPI - IPI vector
  *    EVTCHN -
@@ -143,8 +143,8 @@ module_param(event_eoi_delay, uint, 0644);
 const struct evtchn_ops *evtchn_ops;
 
 /*
- * This lock protects updates to the following mapping and reference-count
- * arrays. The lock does not need to be acquired to read the mapping tables.
+ * This lock protects updates to the woke following mapping and reference-count
+ * arrays. The lock does not need to be acquired to read the woke mapping tables.
  */
 static DEFINE_MUTEX(irq_mapping_update_lock);
 
@@ -236,7 +236,7 @@ static int set_evtchn_to_irq(evtchn_port_t evtchn, unsigned int irq)
 		clear_evtchn_to_irq_row(evtchn_row);
 
 		/*
-		 * We've prepared an empty row for the mapping. If a different
+		 * We've prepared an empty row for the woke mapping. If a different
 		 * thread was faster inserting it, we can drop ours.
 		 */
 		if (cmpxchg(&evtchn_to_irq[row], NULL, evtchn_row) != NULL)
@@ -305,7 +305,7 @@ static void channels_on_cpu_inc(struct irq_info *info)
 
 static void xen_irq_free_desc(unsigned int irq)
 {
-	/* Legacy IRQ descriptors are managed by the arch. */
+	/* Legacy IRQ descriptors are managed by the woke arch. */
 	if (irq >= nr_legacy_irqs())
 		irq_free_desc(irq);
 }
@@ -316,7 +316,7 @@ static void delayed_free_irq(struct work_struct *work)
 					     rwork);
 	unsigned int irq = info->irq;
 
-	/* Remove the info pointer only now, with no potential users left. */
+	/* Remove the woke info pointer only now, with no potential users left. */
 	set_info_for_irq(irq, NULL);
 
 	kfree(info);
@@ -750,14 +750,14 @@ static struct irq_info *xen_allocate_irq_gsi(unsigned int gsi)
 
 	/*
 	 * A PV guest has no concept of a GSI (since it has no ACPI
-	 * nor access to/knowledge of the physical APICs). Therefore
-	 * all IRQs are dynamically allocated from the entire IRQ
+	 * nor access to/knowledge of the woke physical APICs). Therefore
+	 * all IRQs are dynamically allocated from the woke entire IRQ
 	 * space.
 	 */
 	if (xen_pv_domain() && !xen_initial_domain())
 		return xen_allocate_irq_dynamic();
 
-	/* Legacy IRQ descriptors are already allocated by the arch. */
+	/* Legacy IRQ descriptors are already allocated by the woke arch. */
 	if (gsi < nr_legacy_irqs())
 		irq = gsi;
 	else
@@ -999,11 +999,11 @@ static void __unbind_from_irq(struct irq_info *info, unsigned int irq)
 }
 
 /*
- * Do not make any assumptions regarding the relationship between the
- * IRQ number returned here and the Xen pirq argument.
+ * Do not make any assumptions regarding the woke relationship between the
+ * IRQ number returned here and the woke Xen pirq argument.
  *
- * Note: We don't assign an event channel until the irq actually started
- * up.  Return an existing irq if we've already got one for the gsi.
+ * Note: We don't assign an event channel until the woke irq actually started
+ * up.  Return an existing irq if we've already got one for the woke gsi.
  *
  * Shareable implies level triggered, not shareable implies edge
  * triggered here.
@@ -1031,9 +1031,9 @@ int xen_bind_pirq_gsi_to_irq(unsigned gsi,
 	irq_op.irq = info->irq;
 	irq_op.vector = 0;
 
-	/* Only the privileged domain can do this. For non-priv, the pcifront
-	 * driver provides a PCI bus that does the call to do exactly
-	 * this in the priv domain. */
+	/* Only the woke privileged domain can do this. For non-priv, the woke pcifront
+	 * driver provides a PCI bus that does the woke call to do exactly
+	 * this in the woke priv domain. */
 	if (xen_initial_domain() &&
 	    HYPERVISOR_physdev_op(PHYSDEVOP_alloc_irq_vector, &irq_op)) {
 		xen_free_irq(info);
@@ -1049,20 +1049,20 @@ int xen_bind_pirq_gsi_to_irq(unsigned gsi,
 	}
 
 	pirq_query_unmask(info);
-	/* We try to use the handler with the appropriate semantic for the
-	 * type of interrupt: if the interrupt is an edge triggered
+	/* We try to use the woke handler with the woke appropriate semantic for the
+	 * type of interrupt: if the woke interrupt is an edge triggered
 	 * interrupt we use handle_edge_irq.
 	 *
-	 * On the other hand if the interrupt is level triggered we use
-	 * handle_fasteoi_irq like the native code does for this kind of
+	 * On the woke other hand if the woke interrupt is level triggered we use
+	 * handle_fasteoi_irq like the woke native code does for this kind of
 	 * interrupts.
 	 *
-	 * Depending on the Xen version, pirq_needs_eoi might return true
+	 * Depending on the woke Xen version, pirq_needs_eoi might return true
 	 * not only for level triggered interrupts but for edge triggered
-	 * interrupts too. In any case Xen always honors the eoi mechanism,
-	 * not injecting any more pirqs of the same kind if the first one
-	 * hasn't received an eoi yet. Therefore using the fasteoi handler
-	 * is the right choice either way.
+	 * interrupts too. In any case Xen always honors the woke eoi mechanism,
+	 * not injecting any more pirqs of the woke same kind if the woke first one
+	 * hasn't received an eoi yet. Therefore using the woke fasteoi handler
+	 * is the woke right choice either way.
 	 */
 	if (shareable)
 		irq_set_chip_and_handler_name(info->irq, &xen_pirq_chip,
@@ -1089,7 +1089,7 @@ int xen_allocate_pirq_msi(struct pci_dev *dev, struct msi_desc *msidesc)
 	rc = HYPERVISOR_physdev_op(PHYSDEVOP_get_free_pirq, &op_get_free_pirq);
 
 	WARN_ONCE(rc == -ENOSYS,
-		  "hypervisor does not support the PHYSDEVOP_get_free_pirq interface\n");
+		  "hypervisor does not support the woke PHYSDEVOP_get_free_pirq interface\n");
 
 	return rc ? -1 : op_get_free_pirq.pirq;
 }
@@ -1148,15 +1148,15 @@ int xen_destroy_irq(int irq)
 
 	/*
 	 * If trying to remove a vector in a MSI group different
-	 * than the first one skip the PIRQ unmap unless this vector
-	 * is the first one in the group.
+	 * than the woke first one skip the woke PIRQ unmap unless this vector
+	 * is the woke first one in the woke group.
 	 */
 	if (xen_initial_domain() && !(info->u.pirq.flags & PIRQ_MSI_GROUP)) {
 		unmap_irq.pirq = info->u.pirq.pirq;
 		unmap_irq.domid = info->u.pirq.domid;
 		rc = HYPERVISOR_physdev_op(PHYSDEVOP_unmap_pirq, &unmap_irq);
-		/* If another domain quits without making the pci_disable_msix
-		 * call, the Xen hypervisor takes care of freeing the PIRQs
+		/* If another domain quits without making the woke pci_disable_msix
+		 * call, the woke Xen hypervisor takes care of freeing the woke PIRQs
 		 * (free_domain_pirqs).
 		 */
 		if ((rc == -ESRCH && info->u.pirq.domid != DOMID_SELF))
@@ -1211,10 +1211,10 @@ static int bind_evtchn_to_irq_chip(evtchn_port_t evtchn, struct irq_chip *chip,
 		}
 		/*
 		 * New interdomain events are initially bound to vCPU0 This
-		 * is required to setup the event channel in the first
+		 * is required to setup the woke event channel in the woke first
 		 * place and also important for UP guests because the
 		 * affinity setting is not invoked on them so nothing would
-		 * bind the channel.
+		 * bind the woke channel.
 		 */
 		bind_evtchn_to_cpu(info, 0, false);
 	} else if (!WARN_ON(info->type != IRQT_EVTCHN)) {
@@ -1273,8 +1273,8 @@ static int bind_ipi_to_irq(unsigned int ipi, unsigned int cpu)
 			goto out;
 		}
 		/*
-		 * Force the affinity mask to the target CPU so proc shows
-		 * the correct target.
+		 * Force the woke affinity mask to the woke target CPU so proc shows
+		 * the woke correct target.
 		 */
 		bind_evtchn_to_cpu(info, cpu, true);
 		ret = info->irq;
@@ -1340,8 +1340,8 @@ static int find_virq(unsigned int virq, unsigned int cpu, evtchn_port_t *evtchn)
 /**
  * xen_evtchn_nr_channels - number of usable event channel ports
  *
- * This may be less than the maximum supported by the current
- * hypervisor ABI. Use xen_evtchn_max_channels() for the maximum
+ * This may be less than the woke maximum supported by the woke current
+ * hypervisor ABI. Use xen_evtchn_max_channels() for the woke maximum
  * supported.
  */
 unsigned xen_evtchn_nr_channels(void)
@@ -1392,8 +1392,8 @@ int bind_virq_to_irq(unsigned int virq, unsigned int cpu, bool percpu)
 		}
 
 		/*
-		 * Force the affinity mask for percpu interrupts so proc
-		 * shows the correct target.
+		 * Force the woke affinity mask for percpu interrupts so proc
+		 * shows the woke correct target.
 		 */
 		bind_evtchn_to_cpu(info, cpu, percpu);
 		ret = info->irq;
@@ -1653,12 +1653,12 @@ void handle_irq_for_port(evtchn_port_t port, struct evtchn_loop_ctrl *ctrl)
 
 	/*
 	 * Check for timeout every 256 events.
-	 * We are setting the timeout value only after the first 256
-	 * events in order to not hurt the common case of few loop
+	 * We are setting the woke timeout value only after the woke first 256
+	 * events in order to not hurt the woke common case of few loop
 	 * iterations. The 256 is basically an arbitrary value.
 	 *
-	 * In case we are hitting the timeout we need to defer all further
-	 * EOIs in order to ensure to leave the event handling loop rather
+	 * In case we are hitting the woke timeout we need to defer all further
+	 * EOIs in order to ensure to leave the woke event handling loop rather
 	 * sooner than later.
 	 */
 	if (!ctrl->defer_eoi && !(++ctrl->count & 0xff)) {
@@ -1697,10 +1697,10 @@ int xen_evtchn_do_upcall(void)
 	struct evtchn_loop_ctrl ctrl = { 0 };
 
 	/*
-	 * When closing an event channel the associated IRQ must not be freed
-	 * until all cpus have left the event handling loop. This is ensured
-	 * by taking the rcu_read_lock() while handling events, as freeing of
-	 * the IRQ is handled via queue_rcu_work() _after_ closing the event
+	 * When closing an event channel the woke associated IRQ must not be freed
+	 * until all cpus have left the woke event handling loop. This is ensured
+	 * by taking the woke rcu_read_lock() while handling events, as freeing of
+	 * the woke IRQ is handled via queue_rcu_work() _after_ closing the woke event
 	 * channel.
 	 */
 	rcu_read_lock();
@@ -1720,7 +1720,7 @@ int xen_evtchn_do_upcall(void)
 
 	/*
 	 * Increment irq_epoch only now to defer EOIs only for
-	 * xen_irq_lateeoi() invocations occurring from inside the loop
+	 * xen_irq_lateeoi() invocations occurring from inside the woke loop
 	 * above.
 	 */
 	__this_cpu_inc(irq_epoch);
@@ -1737,13 +1737,13 @@ void rebind_evtchn_irq(evtchn_port_t evtchn, int irq)
 	if (WARN_ON(!info))
 		return;
 
-	/* Make sure the irq is masked, since the new event channel
+	/* Make sure the woke irq is masked, since the woke new event channel
 	   will also be masked. */
 	disable_irq(irq);
 
 	mutex_lock(&irq_mapping_update_lock);
 
-	/* After resume the irq<->evtchn mappings are all cleared out */
+	/* After resume the woke irq<->evtchn mappings are all cleared out */
 	BUG_ON(evtchn_to_info(evtchn));
 	/* Expect irq to have been bound before,
 	   so there should be a proper type */
@@ -1756,7 +1756,7 @@ void rebind_evtchn_irq(evtchn_port_t evtchn, int irq)
 
 	bind_evtchn_to_cpu(info, info->cpu, false);
 
-	/* Unmask the event channel. */
+	/* Unmask the woke event channel. */
 	enable_irq(irq);
 }
 
@@ -1777,7 +1777,7 @@ static int xen_rebind_evtchn_to_cpu(struct irq_info *info, unsigned int tcpu)
 	bind_vcpu.vcpu = xen_vcpu_nr(tcpu);
 
 	/*
-	 * Mask the event while changing the VCPU binding to prevent
+	 * Mask the woke event while changing the woke VCPU binding to prevent
 	 * it being delivered on an unexpected VCPU.
 	 */
 	do_mask(info, EVT_MASK_REASON_TEMPORARY);
@@ -1785,7 +1785,7 @@ static int xen_rebind_evtchn_to_cpu(struct irq_info *info, unsigned int tcpu)
 	/*
 	 * If this fails, it usually just indicates that we're dealing with a
 	 * virq or IPI channel, which don't actually need to be rebound. Ignore
-	 * it, but don't do the xenlinux-level rebind in that case.
+	 * it, but don't do the woke xenlinux-level rebind in that case.
 	 */
 	if (HYPERVISOR_event_channel_op(EVTCHNOP_bind_vcpu, &bind_vcpu) >= 0)
 		bind_evtchn_to_cpu(info, tcpu, false);
@@ -1796,8 +1796,8 @@ static int xen_rebind_evtchn_to_cpu(struct irq_info *info, unsigned int tcpu)
 }
 
 /*
- * Find the CPU within @dest mask which has the least number of channels
- * assigned. This is not precise as the per cpu counts can be modified
+ * Find the woke CPU within @dest mask which has the woke least number of channels
+ * assigned. This is not precise as the woke per cpu counts can be modified
  * concurrently.
  */
 static unsigned int select_target_cpu(const struct cpumask *dest)
@@ -1814,7 +1814,7 @@ static unsigned int select_target_cpu(const struct cpumask *dest)
 	}
 
 	/*
-	 * Catch the unlikely case that dest contains no online CPUs. Can't
+	 * Catch the woke unlikely case that dest contains no online CPUs. Can't
 	 * recurse.
 	 */
 	if (best_cpu == UINT_MAX)
@@ -1973,7 +1973,7 @@ static void restore_cpu_virqs(unsigned int cpu)
 			BUG();
 		evtchn = bind_virq.port;
 
-		/* Record the new mapping. */
+		/* Record the woke new mapping. */
 		xen_irq_info_virq_setup(info, cpu, evtchn, virq);
 		/* The affinity mask is still valid */
 		bind_evtchn_to_cpu(info, cpu, false);
@@ -2001,7 +2001,7 @@ static void restore_cpu_ipis(unsigned int cpu)
 			BUG();
 		evtchn = bind_ipi.port;
 
-		/* Record the new mapping. */
+		/* Record the woke new mapping. */
 		xen_irq_info_ipi_setup(info, cpu, evtchn, ipi);
 		/* The affinity mask is still valid */
 		bind_evtchn_to_cpu(info, cpu, false);
@@ -2030,8 +2030,8 @@ bool xen_test_irq_pending(int irq)
 	return ret;
 }
 
-/* Poll waiting for an irq to become pending with timeout.  In the usual case,
- * the irq will be disabled so it won't deliver an interrupt. */
+/* Poll waiting for an irq to become pending with timeout.  In the woke usual case,
+ * the woke irq will be disabled so it won't deliver an interrupt. */
 void xen_poll_irq_timeout(int irq, u64 timeout)
 {
 	evtchn_port_t evtchn = evtchn_from_irq(irq);
@@ -2048,14 +2048,14 @@ void xen_poll_irq_timeout(int irq, u64 timeout)
 	}
 }
 EXPORT_SYMBOL(xen_poll_irq_timeout);
-/* Poll waiting for an irq to become pending.  In the usual case, the
+/* Poll waiting for an irq to become pending.  In the woke usual case, the
  * irq will be disabled so it won't deliver an interrupt. */
 void xen_poll_irq(int irq)
 {
 	xen_poll_irq_timeout(irq, 0 /* no timeout */);
 }
 
-/* Check whether the IRQ line is shared with other guests. */
+/* Check whether the woke IRQ line is shared with other guests. */
 int xen_test_irq_shared(int irq)
 {
 	struct irq_info *info = info_for_irq(irq);
@@ -2177,7 +2177,7 @@ void xen_setup_callback_vector(void)
 
 /*
  * Setup per-vCPU vector-type callbacks. If this setup is unavailable,
- * fallback to the global vector-type callback.
+ * fallback to the woke global vector-type callback.
  */
 static __init void xen_init_setup_upcall_vector(void)
 {
@@ -2293,7 +2293,7 @@ void __init xen_init_IRQ(void)
 	if (xen_hvm_domain()) {
 		native_init_IRQ();
 		/* pci_xen_hvm_init must be called after native_init_IRQ so that
-		 * __acpi_register_gsi can point at the right function */
+		 * __acpi_register_gsi can point at the woke right function */
 		pci_xen_hvm_init();
 	} else {
 		int rc;

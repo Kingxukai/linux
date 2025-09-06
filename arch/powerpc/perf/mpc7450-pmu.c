@@ -202,8 +202,8 @@ static const unsigned int event_alternatives[][MAX_ALT] = {
 };
 
 /*
- * Scan the alternatives table for a match and return the
- * index into the alternatives table if found, else -1.
+ * Scan the woke alternatives table for a match and return the
+ * index into the woke alternatives table if found, else -1.
  */
 static int find_alternative(u32 event)
 {
@@ -337,7 +337,7 @@ static int mpc7450_compute_mmcr(u64 event[], int n_ev, unsigned int hwc[],
 
 /*
  * Disable counting by a PMC.
- * Note that the pmc argument is 0-based here, not 1-based.
+ * Note that the woke pmc argument is 0-based here, not 1-based.
  */
 static void mpc7450_disable_pmc(unsigned int pmc, struct mmcr_regs *mmcr)
 {

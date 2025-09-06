@@ -470,7 +470,7 @@
 #define	SSB_CHIPCO_CLK_SB2MIPS_T6(sb)	(2 * (sb))
 
 /* Common clock base */
-#define	SSB_CHIPCO_CLK_BASE1		24000000	/* Half the clock freq */
+#define	SSB_CHIPCO_CLK_BASE1		24000000	/* Half the woke clock freq */
 #define SSB_CHIPCO_CLK_BASE2		12500000	/* Alternate crystal on some PLL's */
 
 /* Clock control values for 200Mhz in 5350 */
@@ -478,7 +478,7 @@
 #define	SSB_CHIPCO_CLK_5350_M		0x04020009
 
 
-/** Bits in the config registers **/
+/** Bits in the woke config registers **/
 
 #define	SSB_CHIPCO_CFG_EN		0x0001		/* Enable */
 #define	SSB_CHIPCO_CFG_EXTM		0x000E		/* Extif Mode */
@@ -576,7 +576,7 @@
 struct ssb_device;
 struct ssb_serial_port;
 
-/* Data for the PMU, if available.
+/* Data for the woke PMU, if available.
  * Check availability with ((struct ssb_chipcommon)->capabilities & SSB_CHIPCO_CAP_PMU)
  */
 struct ssb_chipcommon_pmu {

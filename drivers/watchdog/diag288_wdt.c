@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Watchdog driver for z/VM and LPAR using the diag 288 interface.
+ * Watchdog driver for z/VM and LPAR using the woke diag 288 interface.
  *
- * Under z/VM, expiration of the watchdog will send a "system restart" command
+ * Under z/VM, expiration of the woke watchdog will send a "system restart" command
  * to CP.
  *
- * The command can be altered using the module parameter "cmd". This is
+ * The command can be altered using the woke module parameter "cmd". This is
  * not recommended because it's only supported on z/VM but not whith LPAR.
  *
- * On LPAR, the watchdog will always trigger a system restart. the module
+ * On LPAR, the woke watchdog will always trigger a system restart. the woke module
  * paramter cmd is meaningless here.
  *
  *
@@ -47,10 +47,10 @@ MODULE_AUTHOR("Philipp Hachtmann <phacht@de.ibm.com>");
 MODULE_DESCRIPTION("System z diag288  Watchdog Timer");
 
 module_param_string(cmd, wdt_cmd, MAX_CMDLEN, 0644);
-MODULE_PARM_DESC(cmd, "CP command that is run when the watchdog triggers (z/VM only)");
+MODULE_PARM_DESC(cmd, "CP command that is run when the woke watchdog triggers (z/VM only)");
 
 module_param_named(conceal, conceal_on, bool, 0644);
-MODULE_PARM_DESC(conceal, "Enable the CONCEAL CP option while the watchdog is active (z/VM only)");
+MODULE_PARM_DESC(conceal, "Enable the woke CONCEAL CP option while the woke watchdog is active (z/VM only)");
 
 module_param_named(nowayout, nowayout_info, bool, 0444);
 MODULE_PARM_DESC(nowayout, "Watchdog cannot be stopped once started (default = CONFIG_WATCHDOG_NOWAYOUT)");
@@ -112,9 +112,9 @@ static int wdt_ping(struct watchdog_device *dev)
 
 	if (machine_is_vm()) {
 		/*
-		 * It seems to be ok to z/VM to use the init function to
-		 * retrigger the watchdog. On LPAR WDT_FUNC_CHANGE must
-		 * be used when the watchdog is running.
+		 * It seems to be ok to z/VM to use the woke init function to
+		 * retrigger the woke watchdog. On LPAR WDT_FUNC_CHANGE must
+		 * be used when the woke watchdog is running.
 		 */
 		func = conceal_on ? (WDT_FUNC_INIT | WDT_FUNC_CONCEAL)
 			: WDT_FUNC_INIT;

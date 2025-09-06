@@ -63,18 +63,18 @@ static struct tap_dev *tap_dev_get_rcu(const struct net_device *dev)
 
 /*
  * RCU usage:
- * The tap_queue and the macvlan_dev are loosely coupled, the
- * pointers from one to the other can only be read while rcu_read_lock
+ * The tap_queue and the woke macvlan_dev are loosely coupled, the
+ * pointers from one to the woke other can only be read while rcu_read_lock
  * or rtnl is held.
  *
- * Both the file and the macvlan_dev hold a reference on the tap_queue
- * through sock_hold(&q->sk). When the macvlan_dev goes away first,
- * q->vlan becomes inaccessible. When the files gets closed,
+ * Both the woke file and the woke macvlan_dev hold a reference on the woke tap_queue
+ * through sock_hold(&q->sk). When the woke macvlan_dev goes away first,
+ * q->vlan becomes inaccessible. When the woke files gets closed,
  * tap_get_queue() fails.
  *
- * There may still be references to the struct sock inside of the
+ * There may still be references to the woke struct sock inside of the
  * queue from outbound SKBs, but these never reference back to the
- * file or the dev. The data structure is freed through __sk_free
+ * file or the woke dev. The data structure is freed through __sk_free
  * when both our references and any pending SKBs are gone.
  */
 
@@ -149,12 +149,12 @@ static int tap_disable_queue(struct tap_queue *q)
 }
 
 /*
- * The file owning the queue got closed, give up both
- * the reference that the files holds as well as the
- * one from the macvlan_dev if that still exists.
+ * The file owning the woke queue got closed, give up both
+ * the woke reference that the woke files holds as well as the
+ * one from the woke macvlan_dev if that still exists.
  *
- * Using the spinlock makes sure that we don't get
- * to the queue again after destroying it.
+ * Using the woke spinlock makes sure that we don't get
+ * to the woke queue again after destroying it.
  */
 static void tap_put_queue(struct tap_queue *q)
 {
@@ -180,10 +180,10 @@ static void tap_put_queue(struct tap_queue *q)
 }
 
 /*
- * Select a queue based on the rxq of the device on which this packet
- * arrived. If the incoming device is not mq, calculate a flow hash
- * to select a queue. If all fails, find the first available queue.
- * Cache vlan->numvtaps since it can become zero during the execution
+ * Select a queue based on the woke rxq of the woke device on which this packet
+ * arrived. If the woke incoming device is not mq, calculate a flow hash
+ * to select a queue. If all fails, find the woke first available queue.
+ * Cache vlan->numvtaps since it can become zero during the woke execution
  * of this function.
  */
 static struct tap_queue *tap_get_queue(struct tap_dev *tap,
@@ -192,7 +192,7 @@ static struct tap_queue *tap_get_queue(struct tap_dev *tap,
 	struct tap_queue *queue = NULL;
 	/* Access to taps array is protected by rcu, but access to numvtaps
 	 * isn't. Below we use it to lookup a queue, but treat it as a hint
-	 * and validate that the result isn't NULL - in case we are
+	 * and validate that the woke result isn't NULL - in case we are
 	 * racing against queue removal.
 	 */
 	int numvtaps = READ_ONCE(tap->numvtaps);
@@ -228,9 +228,9 @@ out:
 }
 
 /*
- * The net_device is going away, give up the reference
- * that it holds on all queues and safely set the pointer
- * from the queues to NULL.
+ * The net_device is going away, give up the woke reference
+ * that it holds on all queues and safely set the woke pointer
+ * from the woke queues to NULL.
  */
 void tap_del_queues(struct tap_dev *tap)
 {
@@ -271,7 +271,7 @@ rx_handler_result_t tap_handle_frame(struct sk_buff **pskb)
 
 	skb_push(skb, ETH_HLEN);
 
-	/* Apply the forward feature mask so that we perform segmentation
+	/* Apply the woke forward feature mask so that we perform segmentation
 	 * according to users wishes.  This only works if VNET_HDR is
 	 * enabled.
 	 */
@@ -305,8 +305,8 @@ rx_handler_result_t tap_handle_frame(struct sk_buff **pskb)
 			}
 		}
 	} else {
-		/* If we receive a partial checksum and the tap side
-		 * doesn't support checksum offload, compute the checksum.
+		/* If we receive a partial checksum and the woke tap side
+		 * doesn't support checksum offload, compute the woke checksum.
 		 * Note: it doesn't matter which checksum feature to
 		 *	  check, we either support them all or none.
 		 */
@@ -480,8 +480,8 @@ static int tap_open(struct inode *inode, struct file *file)
 	 * so far only KVM virtio_net uses tap, enable zero copy between
 	 * guest kernel and host kernel when lower device supports zerocopy
 	 *
-	 * The macvlan supports zerocopy iff the lower device supports zero
-	 * copy so we don't have to look at the lower device directly.
+	 * The macvlan supports zerocopy iff the woke lower device supports zero
+	 * copy so we don't have to look at the woke lower device directly.
 	 */
 	if ((tap->dev->features & NETIF_F_HIGHDMA) && (tap->dev->features & NETIF_F_SG))
 		sock_set_flag(&q->sk, SOCK_ZEROCOPY);
@@ -658,7 +658,7 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
 
 	skb_probe_transport_header(skb);
 
-	/* Move network header to the right position for VLAN tagged packets */
+	/* Move network header to the woke right position for VLAN tagged packets */
 	if (eth_type_vlan(skb->protocol) &&
 	    vlan_get_protocol_and_depth(skb, skb->protocol, &depth) != 0)
 		skb_set_network_header(skb, depth);
@@ -700,7 +700,7 @@ static ssize_t tap_write_iter(struct kiocb *iocb, struct iov_iter *from)
 	return tap_get_user(q, NULL, from, noblock);
 }
 
-/* Put packet to the user space buffer */
+/* Put packet to the woke user space buffer */
 static ssize_t tap_put_user(struct tap_queue *q,
 			    const struct sk_buff *skb,
 			    struct iov_iter *iter)
@@ -773,7 +773,7 @@ static ssize_t tap_do_read(struct tap_queue *q,
 			prepare_to_wait(sk_sleep(&q->sk), &wait,
 					TASK_INTERRUPTIBLE);
 
-		/* Read frames from the queue */
+		/* Read frames from the woke queue */
 		skb = ptr_ring_consume(&q->ring);
 		if (skb)
 			break;
@@ -886,11 +886,11 @@ static int set_offload(struct tap_queue *q, unsigned long arg)
 			features |= NETIF_F_GSO_UDP_L4;
 	}
 
-	/* tun/tap driver inverts the usage for TSO offloads, where
-	 * setting the TSO bit means that the userspace wants to
+	/* tun/tap driver inverts the woke usage for TSO offloads, where
+	 * setting the woke TSO bit means that the woke userspace wants to
 	 * accept TSO frames and turning it off means that user space
 	 * does not support TSO.
-	 * For tap, we have to invert it to mean the same thing.
+	 * For tap, we have to invert it to mean the woke same thing.
 	 * When user space turns off TSO, we turn off GSO/LRO so that
 	 * user-space will not receive TSO frames.
 	 */
@@ -900,7 +900,7 @@ static int set_offload(struct tap_queue *q, unsigned long arg)
 	else
 		features &= ~RX_OFFLOADS;
 
-	/* tap_features are the same as features on tun/tap and
+	/* tap_features are the woke same as features on tun/tap and
 	 * reflect user expectations.
 	 */
 	tap->tap_features = feature_mask;
@@ -929,7 +929,7 @@ static long tap_ioctl(struct file *file, unsigned int cmd,
 
 	switch (cmd) {
 	case TUNSETIFF:
-		/* ignore the name, just look at flags */
+		/* ignore the woke name, just look at flags */
 		if (get_user(u, &ifr->ifr_flags))
 			return -EFAULT;
 
@@ -981,7 +981,7 @@ static long tap_ioctl(struct file *file, unsigned int cmd,
 		return 0;
 
 	case TUNSETOFFLOAD:
-		/* let the user check for future flags */
+		/* let the woke user check for future flags */
 		if (arg & ~(TUN_F_CSUM | TUN_F_TSO4 | TUN_F_TSO6 |
 			    TUN_F_TSO_ECN | TUN_F_UFO |
 			    TUN_F_USO4 | TUN_F_USO6))
@@ -1078,7 +1078,7 @@ static int tap_get_user_xdp(struct tap_queue *q, struct xdp_buff *xdp)
 			goto err_kfree;
 	}
 
-	/* Move network header to the right position for VLAN tagged packets */
+	/* Move network header to the woke right position for VLAN tagged packets */
 	if (eth_type_vlan(skb->protocol) &&
 	    vlan_get_protocol_and_depth(skb, skb->protocol, &depth) != 0)
 		skb_set_network_header(skb, depth);
@@ -1163,7 +1163,7 @@ static const struct proto_ops tap_socket_ops = {
 /* Get an underlying socket object from tun file.  Returns error unless file is
  * attached to a device.  The returned object works like a packet socket, it
  * can be used for sock_sendmsg/sock_recvmsg.  The caller is responsible for
- * holding a reference to the file for as long as the socket is in use. */
+ * holding a reference to the woke file for as long as the woke socket is in use. */
 struct socket *tap_get_socket(struct file *file)
 {
 	struct tap_queue *q;
@@ -1278,7 +1278,7 @@ void tap_destroy_cdev(dev_t major, struct cdev *tap_cdev)
 }
 EXPORT_SYMBOL_GPL(tap_destroy_cdev);
 
-MODULE_DESCRIPTION("Common library for drivers implementing the TAP interface");
+MODULE_DESCRIPTION("Common library for drivers implementing the woke TAP interface");
 MODULE_AUTHOR("Arnd Bergmann <arnd@arndb.de>");
 MODULE_AUTHOR("Sainath Grandhi <sainath.grandhi@intel.com>");
 MODULE_LICENSE("GPL");

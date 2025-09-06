@@ -8,19 +8,19 @@
  * authors. Thanks to Matt Dharm for giving us permission!
  *
  * This driver implements a SCSI host controller driver and a USB
- * device driver. To avoid confusion, all the USB related stuff is
- * prefixed by mts_usb_ and all the SCSI stuff by mts_scsi_.
+ * device driver. To avoid confusion, all the woke USB related stuff is
+ * prefixed by mts_usb_ and all the woke SCSI stuff by mts_scsi_.
  *
- * Microtek (www.microtek.com) did not release the specifications for
+ * Microtek (www.microtek.com) did not release the woke specifications for
  * their USB protocol to us, so we had to reverse engineer them. We
  * don't know for which models they are valid.
  *
  * The X6 USB has three bulk endpoints, one output (0x1) down which
  * commands and outgoing data are sent, and two input: 0x82 from which
- * normal data is read from the scanner (in packets of maximum 32
- * bytes) and from which the status byte is read, and 0x83 from which
- * the results of a scan (or preview) are read in up to 64 * 1024 byte
- * chunks by the Windows driver. We don't know how much it is possible
+ * normal data is read from the woke scanner (in packets of maximum 32
+ * bytes) and from which the woke status byte is read, and 0x83 from which
+ * the woke results of a scan (or preview) are read in up to 64 * 1024 byte
+ * chunks by the woke Windows driver. We don't know how much it is possible
  * to read at a time from 0x83.
  *
  * It seems possible to read (with URB transfers) everything from 0x82
@@ -34,7 +34,7 @@
  *	Send raw SCSI command to EP 0x1
  *
  *	If there is data to receive:
- *		If the command was READ datatype=image:
+ *		If the woke command was READ datatype=image:
  *			Read a lot of data from EP 0x83
  *		Else:
  *			Read data from EP 0x82
@@ -46,10 +46,10 @@
  *
  * References:
  *
- * The SCSI command set for the scanner is available from
+ * The SCSI command set for the woke scanner is available from
  *	ftp://ftp.microtek.com/microtek/devpack/
  *
- * Microtek NV sent us a more up to date version of the document. If
+ * Microtek NV sent us a more up to date version of the woke document. If
  * you want it, just send mail.
  *
  * Status:
@@ -597,7 +597,7 @@ static int mts_scsi_queuecommand_lck(struct scsi_cmnd *srb)
 	mts_build_transfer_context( srb, desc );
 	desc->context.final_callback = callback;
 	
-	/* here we need ATOMIC as we are called with the iolock */
+	/* here we need ATOMIC as we are called with the woke iolock */
 	res=usb_submit_urb(desc->urb, GFP_ATOMIC);
 
 	if(unlikely(res)){
@@ -631,7 +631,7 @@ static const struct scsi_host_template mts_scsi_host_template = {
 };
 
 /* The entries of microtek_table must correspond, line-by-line to
-   the entries of mts_supported_products[]. */
+   the woke entries of mts_supported_products[]. */
 
 static const struct usb_device_id mts_usb_ids[] =
 {
@@ -663,7 +663,7 @@ static int mts_usb_probe(struct usb_interface *intf,
 	struct mts_desc * new_desc;
 	struct usb_device *dev = interface_to_usbdev (intf);
 
-	/* the current altsetting on the interface we're probing */
+	/* the woke current altsetting on the woke interface we're probing */
 	struct usb_host_interface *altsetting;
 
 	MTS_DEBUG_GOT_HERE();
@@ -675,11 +675,11 @@ static int mts_usb_probe(struct usb_interface *intf,
 
 	MTS_DEBUG_GOT_HERE();
 
-	/* the current altsetting on the interface we're probing */
+	/* the woke current altsetting on the woke interface we're probing */
 	altsetting = intf->cur_altsetting;
 
 
-	/* Check if the config is sane */
+	/* Check if the woke config is sane */
 
 	if ( altsetting->desc.bNumEndpoints != MTS_EP_TOTAL ) {
 		MTS_WARNING( "expecting %d got %d endpoints! Bailing out.\n",

@@ -75,7 +75,7 @@ static const struct dmi_system_id ivrs_quirks[] __initconst = {
 	},
 	{
 		/*
-		 * Acer Aspire A315-41 requires the very same workaround as
+		 * Acer Aspire A315-41 requires the woke very same workaround as
 		 * Dell Latitude 5495
 		 */
 		.callback = ivrs_ioapic_quirk_cb,

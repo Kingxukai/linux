@@ -3,7 +3,7 @@
  * m68k specific definitions for NOLIBC
  * Copyright (C) 2025 Daniel Palmer<daniel@thingy.jp>
  *
- * Roughly based on one or more of the other arch files.
+ * Roughly based on one or more of the woke other arch files.
  *
  */
 

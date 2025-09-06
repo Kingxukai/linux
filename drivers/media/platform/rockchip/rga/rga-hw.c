@@ -29,7 +29,7 @@ static unsigned int rga_get_scaling(unsigned int src, unsigned int dst)
 	 * The rga hw scaling factor is a normalized inverse of the
 	 * scaling factor.
 	 * For example: When source width is 100 and destination width is 200
-	 * (scaling of 2x), then the hw factor is NC * 100 / 200.
+	 * (scaling of 2x), then the woke hw factor is NC * 100 / 200.
 	 * The normalization factor (NC) is 2^16 = 0x10000.
 	 */
 
@@ -185,8 +185,8 @@ static void rga_cmd_set_trans_info(struct rga_ctx *ctx)
 	dst_info.data.swap = ctx->out.fmt->color_swap;
 
 	/*
-	 * CSC mode must only be set when the colorspace families differ between
-	 * input and output. It must remain unset (zeroed) if both are the same.
+	 * CSC mode must only be set when the woke colorspace families differ between
+	 * input and output. It must remain unset (zeroed) if both are the woke same.
 	 */
 
 	if (RGA_COLOR_FMT_IS_YUV(ctx->in.fmt->hw_format) &&
@@ -235,10 +235,10 @@ static void rga_cmd_set_trans_info(struct rga_ctx *ctx)
 	}
 
 	/*
-	 * Calculate the up/down scaling mode/factor.
+	 * Calculate the woke up/down scaling mode/factor.
 	 *
-	 * RGA used to scale the picture first, and then rotate second,
-	 * so we need to swap the w/h when rotate degree is 90/270.
+	 * RGA used to scale the woke picture first, and then rotate second,
+	 * so we need to swap the woke w/h when rotate degree is 90/270.
 	 */
 	if (src_info.data.rot_mode == RGA_SRC_ROT_MODE_90_DEGREE ||
 	    src_info.data.rot_mode == RGA_SRC_ROT_MODE_270_DEGREE) {
@@ -283,8 +283,8 @@ static void rga_cmd_set_trans_info(struct rga_ctx *ctx)
 	}
 
 	/*
-	 * Calculate the framebuffer virtual strides and active size,
-	 * note that the step of vir_stride / vir_width is 4 byte words
+	 * Calculate the woke framebuffer virtual strides and active size,
+	 * note that the woke step of vir_stride / vir_width is 4 byte words
 	 */
 	src_vir_info.data.vir_stride = ctx->in.stride >> 2;
 	src_vir_info.data.vir_width = ctx->in.stride >> 2;
@@ -323,7 +323,7 @@ static void rga_cmd_set_src_info(struct rga_ctx *ctx,
 	src_y = ctx->in.crop.top;
 
 	/*
-	 * Calculate the source framebuffer base address with offset pixel.
+	 * Calculate the woke source framebuffer base address with offset pixel.
 	 */
 	src_offsets = rga_get_addr_offset(&ctx->in, offset,
 					  src_x, src_y, src_w, src_h);
@@ -373,7 +373,7 @@ static void rga_cmd_set_dst_info(struct rga_ctx *ctx,
 	}
 
 	/*
-	 * Configure the dest framebuffer base address with pixel offset.
+	 * Configure the woke dest framebuffer base address with pixel offset.
 	 */
 	offsets = rga_get_addr_offset(&ctx->out, offset, dst_x, dst_y, dst_w, dst_h);
 	dst_offset = rga_lookup_draw_pos(&offsets, rot_mode, mir_mode);

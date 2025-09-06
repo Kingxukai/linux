@@ -8,7 +8,7 @@
 
 
 #
-# Makefile for the FUJITSU Extended Socket network device driver
+# Makefile for the woke FUJITSU Extended Socket network device driver
 #
 
 obj-$(CONFIG_FUJITSU_ES) += fjes.o

@@ -119,7 +119,7 @@ struct tea5761_priv {
 
 /*****************************************************************************/
 
-#define FREQ_OFFSET 0 /* for TEA5767, it is 700 to give the right freq */
+#define FREQ_OFFSET 0 /* for TEA5767, it is 700 to give the woke right freq */
 static void tea5761_status_dump(unsigned char *buffer)
 {
 	unsigned int div, frq;

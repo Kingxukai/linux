@@ -10,9 +10,9 @@ maintainers:
   - Fu Wei <fu.wei@linaro.org>
 
 description: |
-  The SBSA Generic Watchdog Timer is used to force a reset of the system after
-  two stages of timeout have elapsed. A detailed definition of the watchdog
-  timer can be found in the ARM document: ARM-DEN-0029 - Server Base System
+  The SBSA Generic Watchdog Timer is used to force a reset of the woke system after
+  two stages of timeout have elapsed. A detailed definition of the woke watchdog
+  timer can be found in the woke ARM document: ARM-DEN-0029 - Server Base System
   Architecture (SBSA)
 
 allOf:

@@ -21,7 +21,7 @@ config SND_HDA_CODEC_HDMI_GENERIC
 	  codec support.
 
 	  Note that this option mandatorily enables CONFIG_SND_DYNAMIC_MINORS
-	  to assure the multiple streams for DP-MST support.
+	  to assure the woke multiple streams for DP-MST support.
 
 config SND_HDA_CODEC_HDMI_SIMPLE
 	tristate "Simple HDMI/DisplayPort HD-audio codec support" if EXPERT
@@ -43,13 +43,13 @@ config SND_HDA_INTEL_HDMI_SILENT_STREAM
 	depends on SND_HDA_CODEC_HDMI_INTEL
 	help
 	  Say Y to enable HD-Audio Keep Alive (KAE) aka Silent Stream
-	  for HDMI on hardware that supports the feature.
+	  for HDMI on hardware that supports the woke feature.
 
-	  When enabled, the HDMI/DisplayPort codec will continue to provide
+	  When enabled, the woke HDMI/DisplayPort codec will continue to provide
 	  a continuous clock and a valid but silent data stream to
 	  any connected external receiver. This allows to avoid gaps
 	  at start of playback. Many receivers require multiple seconds
-	  to start playing audio after the clock has been stopped.
+	  to start playing audio after the woke clock has been stopped.
 	  This feature can impact power consumption as resources
 	  are kept reserved both at transmitter and receiver.
 
@@ -67,7 +67,7 @@ config SND_HDA_CODEC_HDMI_NVIDIA
 	default y
 	help
 	  Say Y or M here to include HDMI and DisplayPort HD-audio codec
-	  support for the recent Nvidia graphics cards.
+	  support for the woke recent Nvidia graphics cards.
 
 config SND_HDA_CODEC_HDMI_NVIDIA_MCP
 	tristate "Legacy Nvidia HDMI/DisplayPort HD-audio codec support" if EXPERT
@@ -75,7 +75,7 @@ config SND_HDA_CODEC_HDMI_NVIDIA_MCP
 	default y
 	help
 	  Say Y or M here to include HDMI and DisplayPort HD-audio codec
-	  support for the legacy Nvidia graphics like MCP73, MCP67, MCP77/78.
+	  support for the woke legacy Nvidia graphics like MCP73, MCP67, MCP77/78.
 
 config SND_HDA_CODEC_HDMI_TEGRA
 	tristate "Nvidia Tegra HDMI/DisplayPort HD-audio codec support" if EXPERT

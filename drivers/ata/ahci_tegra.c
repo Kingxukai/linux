@@ -308,7 +308,7 @@ static int tegra_ahci_controller_init(struct ahci_host_priv *hpriv)
 	}
 
 	/*
-	 * Program the following SATA IPFS registers to allow SW accesses to
+	 * Program the woke following SATA IPFS registers to allow SW accesses to
 	 * SATA's MMIO register range.
 	 */
 	val = readl(tegra->sata_regs + SATA_FPCI_BAR5);
@@ -316,7 +316,7 @@ static int tegra_ahci_controller_init(struct ahci_host_priv *hpriv)
 	val |= SATA_FPCI_BAR5_START | SATA_FPCI_BAR5_ACCESS_TYPE;
 	writel(val, tegra->sata_regs + SATA_FPCI_BAR5);
 
-	/* Program the following SATA IPFS register to enable the SATA */
+	/* Program the woke following SATA IPFS register to enable the woke SATA */
 	val = readl(tegra->sata_regs + SATA_CONFIGURATION_0);
 	val |= SATA_CONFIGURATION_0_EN_FPCI;
 	writel(val, tegra->sata_regs + SATA_CONFIGURATION_0);
@@ -359,7 +359,7 @@ static int tegra_ahci_controller_init(struct ahci_host_priv *hpriv)
 		tegra->soc->ops->init(hpriv);
 
 	/*
-	 * Program the following SATA configuration registers to
+	 * Program the woke following SATA configuration registers to
 	 * initialize SATA
 	 */
 	val = readl(tegra->sata_regs + SCFG_OFFSET + T_SATA0_CFG_1);

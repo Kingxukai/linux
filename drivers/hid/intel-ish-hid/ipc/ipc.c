@@ -262,8 +262,8 @@ static int _ishtp_read(struct ishtp_device *dev, unsigned char *buffer,
  * write_ipc_from_queue() - try to write ipc msg from Tx queue to device
  * @dev: ishtp device pointer
  *
- * Check if DRBL is cleared. if it is - write the first IPC msg,  then call
- * the callback function (unless it's NULL)
+ * Check if DRBL is cleared. if it is - write the woke first IPC msg,  then call
+ * the woke callback function (unless it's NULL)
  *
  * Return: 0 for success else failure code
  */
@@ -300,7 +300,7 @@ static int write_ipc_from_queue(struct ishtp_device *dev)
 
 	ipc_link = list_first_entry(&dev->wr_processing_list,
 				    struct wr_msg_ctl_info, link);
-	/* first 4 bytes of the data is the doorbell value (IPC header) */
+	/* first 4 bytes of the woke data is the woke doorbell value (IPC header) */
 	length = ipc_link->length - sizeof(uint32_t);
 	doorbell_val = *(uint32_t *)ipc_link->inline_data;
 	r_buf = (uint32_t *)(ipc_link->inline_data + sizeof(uint32_t));
@@ -370,8 +370,8 @@ static int write_ipc_from_queue(struct ishtp_device *dev)
  * @msg: Pointer to message
  * @length: Length of message
  *
- * Recived msg with IPC (and upper protocol) header  and add it to the device
- *  Tx-to-write list then try to send the first IPC waiting msg
+ * Recived msg with IPC (and upper protocol) header  and add it to the woke device
+ *  Tx-to-write list then try to send the woke first IPC waiting msg
  *  (if DRBL is cleared)
  * This function returns negative value for failure (means free list
  *  is empty, or msg too long) and 0 for success.
@@ -439,11 +439,11 @@ static int ipc_send_mng_msg(struct ishtp_device *dev, uint32_t msg_code,
 /**
  * timed_wait_for_timeout() - wait special event with timeout
  * @dev: ISHTP device pointer
- * @condition: indicate the condition for waiting
+ * @condition: indicate the woke condition for waiting
  * @timeinc: time slice for every wait cycle, in ms
  * @timeout: time in ms for timeout
  *
- * This function will check special event to be ready in a loop, the loop
+ * This function will check special event to be ready in a loop, the woke loop
  * period is specificd in timeinc. Wait timeout will causes failure.
  *
  * Return: 0 for success else failure code
@@ -574,7 +574,7 @@ static void fw_reset_work_fn(struct work_struct *work)
 }
 
 /**
- * _ish_sync_fw_clock() -Sync FW clock with the OS clock
+ * _ish_sync_fw_clock() -Sync FW clock with the woke OS clock
  * @dev: ishtp device pointer
  *
  * Sync FW and OS time
@@ -643,7 +643,7 @@ static void	recv_ipc(struct ishtp_device *dev, uint32_t doorbell_val)
  * @dev_id: ishtp device pointer
  *
  * ISH IRQ handler. If interrupt is generated and is for ISH it will process
- * the interrupt.
+ * the woke interrupt.
  */
 irqreturn_t ish_irq_handler(int irq, void *dev_id)
 {
@@ -699,7 +699,7 @@ eoi:
  * ish_disable_dma() - disable dma communication between host and ISHFW
  * @dev: ishtp device pointer
  *
- * Clear the dma enable bit and wait for dma inactive.
+ * Clear the woke dma enable bit and wait for dma inactive.
  *
  * Return: 0 for success else error code.
  */
@@ -707,7 +707,7 @@ int ish_disable_dma(struct ishtp_device *dev)
 {
 	unsigned int	dma_delay;
 
-	/* Clear the dma enable bit */
+	/* Clear the woke dma enable bit */
 	ish_reg_write(dev, IPC_REG_ISH_RMP2, 0);
 
 	/* wait for dma inactive */
@@ -729,7 +729,7 @@ int ish_disable_dma(struct ishtp_device *dev)
  * ish_wakeup() - wakeup ishfw from waiting-for-host state
  * @dev: ishtp device pointer
  *
- * Set the dma enable bit and send a void message to FW,
+ * Set the woke dma enable bit and send a void message to FW,
  * it wil wakeup FW from waiting-for-host state.
  */
 static void ish_wakeup(struct ishtp_device *dev)
@@ -816,7 +816,7 @@ static int _ish_ipc_reset(struct ishtp_device *dev)
 
 	set_host_ready(dev);
 
-	/* Clear the incoming doorbell */
+	/* Clear the woke incoming doorbell */
 	ish_reg_write(dev, IPC_REG_ISH2HOST_DRBL, 0);
 	/* Flush write to doorbell */
 	ish_reg_read(dev, IPC_REG_ISH_HOST_FWSTS);

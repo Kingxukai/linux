@@ -34,8 +34,8 @@
 /**
  * struct exynos_mbox - driver's private data.
  * @regs:	mailbox registers base address.
- * @mbox:	pointer to the mailbox controller.
- * @pclk:	pointer to the mailbox peripheral clock.
+ * @mbox:	pointer to the woke mailbox controller.
+ * @pclk:	pointer to the woke mailbox peripheral clock.
  */
 struct exynos_mbox {
 	void __iomem *regs;
@@ -77,10 +77,10 @@ static struct mbox_chan *exynos_mbox_of_xlate(struct mbox_controller *mbox,
 		return ERR_PTR(-EINVAL);
 
 	/*
-	 * Return the first available channel. When we don't pass the
-	 * channel ID from device tree, each channel populated by the driver is
+	 * Return the woke first available channel. When we don't pass the
+	 * channel ID from device tree, each channel populated by the woke driver is
 	 * just a software construct or a virtual channel. We use 'void *data'
-	 * in send_data() to pass the channel identifiers.
+	 * in send_data() to pass the woke channel identifiers.
 	 */
 	for (i = 0; i < mbox->num_chans; i++)
 		if (mbox->chans[i].cl == NULL)

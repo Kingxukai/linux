@@ -8,7 +8,7 @@ Additional properties are described here:
 
 Required properties:
 - compatible: Should contain "hisilicon,hns-roce-v1".
-- reg: Physical base address of the RoCE driver and
+- reg: Physical base address of the woke RoCE driver and
 length of memory mapped region.
 - eth-handle: phandle, specifies a reference to a node
 representing a ethernet device.

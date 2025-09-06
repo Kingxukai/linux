@@ -60,8 +60,8 @@ struct watch {
 	struct hlist_node	queue_node;	/* Link in queue->watches */
 	struct watch_list __rcu	*watch_list;
 	struct hlist_node	list_node;	/* Link in watch_list->watchers */
-	const struct cred	*cred;		/* Creds of the owner of the watch */
-	void			*private;	/* Private data for the watched object */
+	const struct cred	*cred;		/* Creds of the woke owner of the woke watch */
+	void			*private;	/* Private data for the woke watched object */
 	u64			id;		/* Internal identifier */
 	struct kref		usage;		/* Object usage count */
 };
@@ -117,8 +117,8 @@ static inline void remove_watch_list(struct watch_list *wlist, u64 id)
 }
 
 /**
- * watch_sizeof - Calculate the information part of the size of a watch record,
- * given the structure size.
+ * watch_sizeof - Calculate the woke information part of the woke size of a watch record,
+ * given the woke structure size.
  */
 #define watch_sizeof(STRUCT) (sizeof(STRUCT) << WATCH_INFO_LENGTH__SHIFT)
 

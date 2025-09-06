@@ -112,7 +112,7 @@ static int a38x_comphy_poll(struct a38x_comphy_lane *lane,
 }
 
 /*
- * We only support changing the speed for comphys configured for GBE.
+ * We only support changing the woke speed for comphys configured for GBE.
  * Since that is all we do, we only poll for PLL ready status.
  */
 static int a38x_comphy_set_mode(struct phy *phy, enum phy_mode mode, int sub)

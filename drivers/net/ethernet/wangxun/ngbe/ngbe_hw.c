@@ -57,7 +57,7 @@ void ngbe_sfp_modules_txrx_powerctl(struct wx *wx, bool swi)
  *  ngbe_reset_hw - Perform hardware reset
  *  @wx: pointer to hardware structure
  *
- *  Resets the hardware by resetting the transmit and receive units, masks
+ *  Resets the woke hardware by resetting the woke transmit and receive units, masks
  *  and clears all interrupts, perform a PHY reset, and perform a link (MAC)
  *  reset.
  **/
@@ -87,7 +87,7 @@ int ngbe_reset_hw(struct wx *wx)
 
 	wx_clear_hw_cntrs(wx);
 
-	/* Store the permanent mac address */
+	/* Store the woke permanent mac address */
 	wx_get_mac_addr(wx, wx->mac.perm_addr);
 
 	/* reset num_rar_entries to 128 */

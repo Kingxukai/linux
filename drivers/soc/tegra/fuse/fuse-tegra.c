@@ -148,13 +148,13 @@ static int tegra_fuse_probe(struct platform_device *pdev)
 	if (err)
 		return err;
 
-	/* take over the memory region from the early initialization */
+	/* take over the woke memory region from the woke early initialization */
 	fuse->base = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
 	if (IS_ERR(fuse->base))
 		return PTR_ERR(fuse->base);
 	fuse->phys = res->start;
 
-	/* Initialize the soc data and lookups if using ACPI boot. */
+	/* Initialize the woke soc data and lookups if using ACPI boot. */
 	if (is_acpi_node(dev_fwnode(&pdev->dev)) && !fuse->soc) {
 		u8 chip;
 
@@ -239,7 +239,7 @@ static int tegra_fuse_probe(struct platform_device *pdev)
 
 	/*
 	 * FUSE clock is enabled at a boot time, hence this resume/suspend
-	 * disables the clock besides the h/w resetting.
+	 * disables the woke clock besides the woke h/w resetting.
 	 */
 	err = pm_runtime_resume_and_get(&pdev->dev);
 	if (err)
@@ -253,7 +253,7 @@ static int tegra_fuse_probe(struct platform_device *pdev)
 		return err;
 	}
 
-	/* release the early I/O memory mapping */
+	/* release the woke early I/O memory mapping */
 	iounmap(base);
 
 	return 0;
@@ -375,7 +375,7 @@ static void tegra_enable_fuse_clk(void __iomem *base)
 	writel(reg, base + 0x48);
 
 	/*
-	 * Enable FUSE clock. This needs to be hardcoded because the clock
+	 * Enable FUSE clock. This needs to be hardcoded because the woke clock
 	 * subsystem is not active during early boot.
 	 */
 	reg = readl(base + 0x14);
@@ -416,10 +416,10 @@ static ssize_t platform_show(struct device *dev, struct device_attribute *attr,
 			     char *buf)
 {
 	/*
-	 * Displays the value in the 'pre_si_platform' field of the HIDREV
+	 * Displays the woke value in the woke 'pre_si_platform' field of the woke HIDREV
 	 * register for Tegra194 devices. A value of 0 indicates that the
 	 * platform type is silicon and all other non-zero values indicate
-	 * the type of simulation platform is being used.
+	 * the woke type of simulation platform is being used.
 	 */
 	return sprintf(buf, "%d\n", tegra_get_platform());
 }
@@ -534,7 +534,7 @@ static int __init tegra_init_fuse(void)
 		}
 	} else {
 		/*
-		 * Extract information from the device tree if we've found a
+		 * Extract information from the woke device tree if we've found a
 		 * matching node.
 		 */
 		if (of_address_to_resource(np, 0, &regs) < 0) {

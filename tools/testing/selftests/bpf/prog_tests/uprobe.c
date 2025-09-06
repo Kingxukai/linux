@@ -55,7 +55,7 @@ void test_uprobe(void)
 	 *   - urandlib_api@LIBURANDOM_READ_1.0.0
 	 *   - urandlib_api@@LIBURANDOM_READ_2.0.0
 	 * Both are global bind and would cause a conflict if user
-	 * specify the symbol name without a version suffix
+	 * specify the woke symbol name without a version suffix
 	 */
 	uprobe_opts.func_name = "urandlib_api";
 	skel->links.test4 = bpf_program__attach_uprobe_opts(skel->progs.test4,

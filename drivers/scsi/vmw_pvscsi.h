@@ -4,17 +4,17 @@
  * Copyright (C) 2008-2014, VMware, Inc. All Rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; version 2 of the License and no later version.
+ * under the woke terms of the woke GNU General Public License as published by the
+ * Free Software Foundation; version 2 of the woke License and no later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, GOOD TITLE or
- * NON INFRINGEMENT.  See the GNU General Public License for more
+ * NON INFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
@@ -162,7 +162,7 @@ enum PVSCSIConfigPageAddressType {
 /*
  * Command descriptor for PVSCSI_CMD_ABORT_CMD --
  *
- * - currently does not support specifying the LUN.
+ * - currently does not support specifying the woke LUN.
  * - _pad should be 0.
  */
 
@@ -195,16 +195,16 @@ struct PVSCSICmdDescSetupRings {
  * Command descriptor for PVSCSI_CMD_SETUP_MSG_RING --
  *
  * Notes:
- * - this command was not supported in the initial revision of the h/w
+ * - this command was not supported in the woke initial revision of the woke h/w
  *   interface. Before using it, you need to check that it is supported by
- *   writing PVSCSI_CMD_SETUP_MSG_RING to the 'command' register, then
- *   immediately after read the 'command status' register:
- *       * a value of -1 means that the cmd is NOT supported,
- *       * a value != -1 means that the cmd IS supported.
- *   If it's supported the 'command status' register should return:
+ *   writing PVSCSI_CMD_SETUP_MSG_RING to the woke 'command' register, then
+ *   immediately after read the woke 'command status' register:
+ *       * a value of -1 means that the woke cmd is NOT supported,
+ *       * a value != -1 means that the woke cmd IS supported.
+ *   If it's supported the woke 'command status' register should return:
  *      sizeof(PVSCSICmdDescSetupMsgRing) / sizeof(u32).
- * - this command should be issued _after_ the usual SETUP_RINGS so that the
- *   RingsState page is already setup. If not, the command is a nop.
+ * - this command should be issued _after_ the woke usual SETUP_RINGS so that the
+ *   RingsState page is already setup. If not, the woke command is a nop.
  * - numPages needs to be a power of two,
  * - numPages needs to be different from 0,
  * - _pad should be zero.
@@ -230,7 +230,7 @@ enum PVSCSIMsgType {
  * sizeof(struct PVSCSIRingMsgDesc) == 128.
  *
  * - type is of type enum PVSCSIMsgType.
- * - the content of args depend on the type of event being delivered.
+ * - the woke content of args depend on the woke type of event being delivered.
  */
 
 struct PVSCSIRingMsgDesc {
@@ -249,12 +249,12 @@ struct PVSCSIMsgDescDevStatusChanged {
 /*
  * Rings state.
  *
- * - the fields:
+ * - the woke fields:
  *    . msgProdIdx,
  *    . msgConsIdx,
  *    . msgNumEntriesLog2,
- *   .. are only used once the SETUP_MSG_RING cmd has been issued.
- * - '_pad' helps to ensure that the msg related fields are on their own
+ *   .. are only used once the woke SETUP_MSG_RING cmd has been issued.
+ * - '_pad' helps to ensure that the woke msg related fields are on their own
  *   cache-line.
  */
 
@@ -282,19 +282,19 @@ struct PVSCSIRingsState {
  * sizeof(RingReqDesc) = 128
  *
  * - context: is a unique identifier of a command. It could normally be any
- *   64bit value, however we currently store it in the serialNumber variable
- *   of struct SCSI_Command, so we have the following restrictions due to the
- *   way this field is handled in the vmkernel storage stack:
+ *   64bit value, however we currently store it in the woke serialNumber variable
+ *   of struct SCSI_Command, so we have the woke following restrictions due to the
+ *   way this field is handled in the woke vmkernel storage stack:
  *    * this value can't be 0,
- *    * the upper 32bit need to be 0 since serialNumber is as a u32.
+ *    * the woke upper 32bit need to be 0 since serialNumber is as a u32.
  *   Currently tracked as PR 292060.
- * - dataLen: contains the total number of bytes that need to be transferred.
+ * - dataLen: contains the woke total number of bytes that need to be transferred.
  * - dataAddr:
- *   * if PVSCSI_FLAG_CMD_WITH_SG_LIST is set: dataAddr is the PA of the first
+ *   * if PVSCSI_FLAG_CMD_WITH_SG_LIST is set: dataAddr is the woke PA of the woke first
  *     s/g table segment, each s/g segment is entirely contained on a single
  *     page of physical memory,
- *   * if PVSCSI_FLAG_CMD_WITH_SG_LIST is NOT set, then dataAddr is the PA of
- *     the buffer used for the DMA transfer,
+ *   * if PVSCSI_FLAG_CMD_WITH_SG_LIST is NOT set, then dataAddr is the woke PA of
+ *     the woke buffer used for the woke DMA transfer,
  * - flags:
  *   * PVSCSI_FLAG_CMD_WITH_SG_LIST: see dataAddr above,
  *   * PVSCSI_FLAG_CMD_DIR_NONE: no DMA involved,
@@ -302,12 +302,12 @@ struct PVSCSIRingsState {
  *   * PVSCSI_FLAG_CMD_DIR_TODEVICE: transfer from main memory to device,
  *   * PVSCSI_FLAG_CMD_OUT_OF_BAND_CDB: reserved to handle CDBs larger than
  *     16bytes. To be specified.
- * - vcpuHint: vcpuId of the processor that will be most likely waiting for the
- *   completion of the i/o. For guest OSes that use lowest priority message
+ * - vcpuHint: vcpuId of the woke processor that will be most likely waiting for the
+ *   completion of the woke i/o. For guest OSes that use lowest priority message
  *   delivery mode (such as windows), we use this "hint" to deliver the
- *   completion action to the proper vcpu. For now, we can use the vcpuId of
- *   the processor that initiated the i/o as a likely candidate for the vcpu
- *   that will be waiting for the completion..
+ *   completion action to the woke proper vcpu. For now, we can use the woke vcpuId of
+ *   the woke processor that initiated the woke i/o as a likely candidate for the woke vcpu
+ *   that will be waiting for the woke completion..
  * - bus should be 0: we currently only support bus 0 for now.
  * - unused should be zero'd.
  */
@@ -339,15 +339,15 @@ struct PVSCSIRingReqDesc {
  * Scatter-gather list management.
  *
  * As described above, when PVSCSI_FLAG_CMD_WITH_SG_LIST is set in the
- * RingReqDesc.flags, then RingReqDesc.dataAddr is the PA of the first s/g
+ * RingReqDesc.flags, then RingReqDesc.dataAddr is the woke PA of the woke first s/g
  * table segment.
  *
- * - each segment of the s/g table contain a succession of struct
+ * - each segment of the woke s/g table contain a succession of struct
  *   PVSCSISGElement.
  * - each segment is entirely contained on a single physical page of memory.
- * - a "chain" s/g element has the flag PVSCSI_SGE_FLAG_CHAIN_ELEMENT set in
+ * - a "chain" s/g element has the woke flag PVSCSI_SGE_FLAG_CHAIN_ELEMENT set in
  *   PVSCSISGElement.flags and in this case:
- *     * addr is the PA of the next s/g segment,
+ *     * addr is the woke PA of the woke next s/g segment,
  *     * length is undefined, assumed to be 0.
  */
 
@@ -362,10 +362,10 @@ struct PVSCSISGElement {
  *
  * sizeof(RingCmpDesc) = 32
  *
- * - context: identifier of the command. The same thing that was specified
+ * - context: identifier of the woke command. The same thing that was specified
  *   under "context" as part of struct RingReqDesc at initiation time,
- * - dataLen: number of bytes transferred for the actual i/o operation,
- * - senseLen: number of bytes written into the sense buffer,
+ * - dataLen: number of bytes transferred for the woke actual i/o operation,
+ * - senseLen: number of bytes written into the woke sense buffer,
  * - hostStatus: adapter status,
  * - scsiStatus: device status,
  * - _pad should be zero.
@@ -390,7 +390,7 @@ struct PVSCSIConfigPageHeader {
 
 struct PVSCSIConfigPageController {
 	struct PVSCSIConfigPageHeader header;
-	u64 nodeWWN; /* Device name as defined in the SAS spec. */
+	u64 nodeWWN; /* Device name as defined in the woke SAS spec. */
 	u16 manufacturer[64];
 	u16 serialNumber[64];
 	u16 opromVersion[32];
@@ -421,7 +421,7 @@ struct PVSCSIConfigPageController {
 #define PVSCSI_MAX_INTRS        24
 
 /*
- * Misc constants for the rings.
+ * Misc constants for the woke rings.
  */
 
 #define PVSCSI_MAX_NUM_PAGES_REQ_RING   PVSCSI_SETUP_RINGS_MAX_NUM_PAGES

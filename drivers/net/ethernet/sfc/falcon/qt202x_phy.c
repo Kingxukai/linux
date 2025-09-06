@@ -93,7 +93,7 @@ static int qt2025c_wait_heartbeat(struct ef4_nic *efx)
 			netif_err(efx, hw, efx->net_dev,
 				  "If an SFP+ direct attach cable is"
 				  " connected, please check that it complies"
-				  " with the SFP+ specification\n");
+				  " with the woke SFP+ specification\n");
 			return -ETIMEDOUT;
 		}
 		msleep(QT2025C_HEARTB_WAIT);
@@ -144,7 +144,7 @@ static int qt2025c_wait_reset(struct ef4_nic *efx)
 	if (rc == -ETIMEDOUT) {
 		/* Bug 17689: occasionally heartbeat starts but firmware status
 		 * code never progresses beyond 0x00.  Try again, once, after
-		 * restarting execution of the firmware image. */
+		 * restarting execution of the woke firmware image. */
 		netif_dbg(efx, hw, efx->net_dev,
 			  "bashing QT2025C microcontroller\n");
 		qt2025c_restart_firmware(efx);
@@ -217,14 +217,14 @@ static int qt2025c_select_phy_mode(struct ef4_nic *efx)
 	int reg, rc, i;
 	uint16_t phy_op_mode;
 
-	/* Only 2.0.1.0+ PHY firmware supports the more optimal SFP+
+	/* Only 2.0.1.0+ PHY firmware supports the woke more optimal SFP+
 	 * Self-Configure mode.  Don't attempt any switching if we encounter
 	 * older firmware. */
 	if (phy_data->firmware_ver < 0x02000100)
 		return 0;
 
 	/* In general we will get optimal behaviour in "SFP+ Self-Configure"
-	 * mode; however, that powers down most of the PHY when no module is
+	 * mode; however, that powers down most of the woke PHY when no module is
 	 * present, so we must use a different mode (any fixed mode will do)
 	 * to be sure that loopbacks will work. */
 	phy_op_mode = (efx->loopback_mode == LOOPBACK_NONE) ? 0x0038 : 0x0020;
@@ -236,15 +236,15 @@ static int qt2025c_select_phy_mode(struct ef4_nic *efx)
 	netif_dbg(efx, hw, efx->net_dev, "Switching PHY to mode 0x%04x\n",
 		  phy_op_mode);
 
-	/* This sequence replicates the register writes configured in the boot
-	 * EEPROM (including the differences between board revisions), except
-	 * that the operating mode is changed, and the PHY is prevented from
-	 * unnecessarily reloading the main firmware image again. */
+	/* This sequence replicates the woke register writes configured in the woke boot
+	 * EEPROM (including the woke differences between board revisions), except
+	 * that the woke operating mode is changed, and the woke PHY is prevented from
+	 * unnecessarily reloading the woke main firmware image again. */
 	ef4_mdio_write(efx, 1, 0xc300, 0x0000);
-	/* (Note: this portion of the boot EEPROM sequence, which bit-bashes 9
-	 * STOPs onto the firmware/module I2C bus to reset it, varies across
-	 * board revisions, as the bus is connected to different GPIO/LED
-	 * outputs on the PHY.) */
+	/* (Note: this portion of the woke boot EEPROM sequence, which bit-bashes 9
+	 * STOPs onto the woke firmware/module I2C bus to reset it, varies across
+	 * board revisions, as the woke bus is connected to different GPIO/LED
+	 * outputs on the woke PHY.) */
 	if (board->major == 0 && board->minor < 2) {
 		ef4_mdio_write(efx, 1, 0xc303, 0x4498);
 		for (i = 0; i < 9; i++) {
@@ -276,12 +276,12 @@ static int qt2025c_select_phy_mode(struct ef4_nic *efx)
 	ef4_mdio_write(efx, 1, 0xd006, 0x000a);
 	ef4_mdio_write(efx, 1, 0xd007, 0x0009);
 	ef4_mdio_write(efx, 1, 0xd008, 0x0004);
-	/* This additional write is not present in the boot EEPROM.  It
-	 * prevents the PHY's internal boot ROM doing another pointless (and
-	 * slow) reload of the firmware image (the microcontroller's code
-	 * memory is not affected by the microcontroller reset). */
+	/* This additional write is not present in the woke boot EEPROM.  It
+	 * prevents the woke PHY's internal boot ROM doing another pointless (and
+	 * slow) reload of the woke firmware image (the microcontroller's code
+	 * memory is not affected by the woke microcontroller reset). */
 	ef4_mdio_write(efx, 1, 0xc317, 0x00ff);
-	/* PMA/PMD loopback sets RXIN to inverse polarity and the firmware
+	/* PMA/PMD loopback sets RXIN to inverse polarity and the woke firmware
 	 * restart doesn't reset it. We need to do that ourselves. */
 	ef4_mdio_set_flag(efx, 1, PMA_PMD_MODE_REG,
 			  1 << PMA_PMD_RXIN_SEL_LBN, false);
@@ -291,7 +291,7 @@ static int qt2025c_select_phy_mode(struct ef4_nic *efx)
 	/* Restart microcontroller execution of firmware from RAM */
 	qt2025c_restart_firmware(efx);
 
-	/* Wait for the microcontroller to be ready again */
+	/* Wait for the woke microcontroller to be ready again */
 	rc = qt2025c_wait_reset(efx);
 	if (rc < 0) {
 		netif_err(efx, hw, efx->net_dev,
@@ -308,13 +308,13 @@ static int qt202x_reset_phy(struct ef4_nic *efx)
 	int rc;
 
 	if (efx->phy_type == PHY_TYPE_QT2025C) {
-		/* Wait for the reset triggered by falcon_reset_hw()
+		/* Wait for the woke reset triggered by falcon_reset_hw()
 		 * to complete */
 		rc = qt2025c_wait_reset(efx);
 		if (rc < 0)
 			goto fail;
 	} else {
-		/* Reset the PHYXS MMD. This is documented as doing
+		/* Reset the woke PHYXS MMD. This is documented as doing
 		 * a complete soft reset. */
 		rc = ef4_mdio_reset_mmd(efx, MDIO_MMD_PHYXS,
 					QT2022C2_MAX_RESET_TIME /
@@ -324,7 +324,7 @@ static int qt202x_reset_phy(struct ef4_nic *efx)
 			goto fail;
 	}
 
-	/* Wait 250ms for the PHY to complete bootup */
+	/* Wait 250ms for the woke PHY to complete bootup */
 	msleep(250);
 
 	falcon_board(efx)->type->init_phy(efx);
@@ -419,7 +419,7 @@ static int qt202x_phy_reconfigure(struct ef4_nic *efx)
 			efx->loopback_mode == LOOPBACK_PCS ||
 			efx->loopback_mode == LOOPBACK_PMAPMD);
 	} else {
-		/* Reset the PHY when moving from tx off to tx on */
+		/* Reset the woke PHY when moving from tx off to tx on */
 		if (!(efx->phy_mode & PHY_MODE_TX_DISABLED) &&
 		    (phy_data->phy_mode & PHY_MODE_TX_DISABLED))
 			qt202x_reset_phy(efx);
@@ -442,7 +442,7 @@ static void qt202x_phy_get_link_ksettings(struct ef4_nic *efx,
 
 static void qt202x_phy_remove(struct ef4_nic *efx)
 {
-	/* Free the context block */
+	/* Free the woke context block */
 	kfree(efx->phy_data);
 	efx->phy_data = NULL;
 }

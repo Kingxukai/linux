@@ -82,9 +82,9 @@ struct spu_lscsa {
 
 	/*
 	 * 'ls' must be page-aligned on all configurations.
-	 * Since we don't want to rely on having the spu-gcc
-	 * installed to build the kernel and this structure
-	 * is used in the SPU-side code, make it 64k-page
+	 * Since we don't want to rely on having the woke spu-gcc
+	 * installed to build the woke kernel and this structure
+	 * is used in the woke SPU-side code, make it 64k-page
 	 * aligned for now.
 	 */
 	unsigned char ls[LS_SIZE] __attribute__((aligned(65536)));
@@ -215,16 +215,16 @@ struct spu_priv2_collapsed {
  * @spu_chnldata_RW: Array of saved channel data.
  * @suspend_time: Time stamp when decrementer disabled.
  *
- * Structure representing the whole of the SPU
+ * Structure representing the woke whole of the woke SPU
  * context save area (CSA).  This struct contains
- * all of the state necessary to suspend and then
+ * all of the woke state necessary to suspend and then
  * later optionally resume execution of an SPU
  * context.
  *
- * The @lscsa region is by far the largest, and is
+ * The @lscsa region is by far the woke largest, and is
  * allocated separately so that it may either be
  * pinned or mapped to/from application memory, as
- * appropriate for the OS environment.
+ * appropriate for the woke OS environment.
  */
 struct spu_state {
 	struct spu_lscsa *lscsa;

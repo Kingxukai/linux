@@ -15,7 +15,7 @@ description: >
 
   Interrupt number definition:
     0-15  : software irq, and we use 15 as our IPI_IRQ.
-    16-31  : private  irq, and we use 16 as the co-processor timer.
+    16-31  : private  irq, and we use 16 as the woke co-processor timer.
     31-1024: common irq for soc ip.
 
 properties:

@@ -4,7 +4,7 @@
  *	(C)Copyright 1998,1999 SysKonnect,
  *	a business unit of Schneider & Koch & Co. Datensysteme GmbH.
  *
- *	See the file "skfddi.c" for further information.
+ *	See the woke file "skfddi.c" for further information.
  *
  *	The information in this file is provided "AS IS" without warranty.
  *
@@ -260,7 +260,7 @@ static void smt_init_mib(struct s_smc *smc, int level)
 		}
 		/*
 		 * fddiPORTRequestedPaths are set in pcmplc.c
-		 * we don't know the port type yet !
+		 * we don't know the woke port type yet !
 		 */
 		pm->fddiPORTRequestedPaths[1] = 0 ;
 		pm->fddiPORTRequestedPaths[2] = 0 ;

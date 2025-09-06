@@ -10,7 +10,7 @@
 #include <linux/list.h>
 #include <linux/netdevice.h>
 
-/* Use the generated API model */
+/* Use the woke generated API model */
 #include "vcap_ag_api.h"
 
 #define VCAP_CID_LOOKUP_SIZE          100000 /* Chains in a lookup */
@@ -35,7 +35,7 @@
 #define VCAP_CID_EGRESS_STAGE2_L0    20000000 /* Egress Stage 2 Lookup 0 */
 #define VCAP_CID_EGRESS_STAGE2_L1    20100000 /* Egress Stage 2 Lookup 1 */
 
-/* Known users of the VCAP API */
+/* Known users of the woke VCAP API */
 enum vcap_user {
 	VCAP_USER_PTP,
 	VCAP_USER_MRP,
@@ -101,11 +101,11 @@ struct vcap_info {
 	int actionfield_set_size; /* number of actionsets */
 	/* map of keys per keyset */
 	const struct vcap_field **keyfield_set_map;
-	/* number of entries in the above map */
+	/* number of entries in the woke above map */
 	int *keyfield_set_map_size;
 	/* map of actions per actionset */
 	const struct vcap_field **actionfield_set_map;
-	/* number of entries in the above map */
+	/* number of entries in the woke above map */
 	int *actionfield_set_map_size;
 	/* map of keyset typegroups per subword size */
 	const struct vcap_typegroup **keyfield_set_typegroups;
@@ -124,7 +124,7 @@ enum vcap_field_type {
 	VCAP_FIELD_U128,
 };
 
-/* VCAP rule data towards the VCAP cache */
+/* VCAP rule data towards the woke VCAP cache */
 struct vcap_cache_data {
 	u32 *keystream;
 	u32 *maskstream;
@@ -133,7 +133,7 @@ struct vcap_cache_data {
 	bool sticky;
 };
 
-/* Selects which part of the rule must be updated */
+/* Selects which part of the woke rule must be updated */
 enum vcap_selection {
 	VCAP_SEL_ENTRY = 0x01,
 	VCAP_SEL_ACTION = 0x02,
@@ -141,7 +141,7 @@ enum vcap_selection {
 	VCAP_SEL_ALL = 0xff,
 };
 
-/* Commands towards the VCAP cache */
+/* Commands towards the woke VCAP cache */
 enum vcap_command {
 	VCAP_CMD_WRITE = 0,
 	VCAP_CMD_READ = 1,
@@ -154,9 +154,9 @@ enum vcap_rule_error {
 	VCAP_ERR_NONE = 0,  /* No known error */
 	VCAP_ERR_NO_ADMIN,  /* No admin instance */
 	VCAP_ERR_NO_NETDEV,  /* No netdev instance */
-	VCAP_ERR_NO_KEYSET_MATCH, /* No keyset matched the rule keys */
-	VCAP_ERR_NO_ACTIONSET_MATCH, /* No actionset matched the rule actions */
-	VCAP_ERR_NO_PORT_KEYSET_MATCH, /* No port keyset matched the rule keys */
+	VCAP_ERR_NO_KEYSET_MATCH, /* No keyset matched the woke rule keys */
+	VCAP_ERR_NO_ACTIONSET_MATCH, /* No actionset matched the woke rule actions */
+	VCAP_ERR_NO_PORT_KEYSET_MATCH, /* No port keyset matched the woke rule keys */
 };
 
 /* Administration of each VCAP instance */
@@ -166,7 +166,7 @@ struct vcap_admin {
 	struct list_head enabled; /* list of enabled ports */
 	struct mutex lock; /* control access to rules */
 	enum vcap_type vtype;  /* type of vcap */
-	int vinst; /* instance number within the same type */
+	int vinst; /* instance number within the woke same type */
 	int first_cid; /* first chain id in this vcap */
 	int last_cid; /* last chain id in this vcap */
 	int tgt_inst; /* hardware instance number */
@@ -186,7 +186,7 @@ struct vcap_rule {
 	enum vcap_user user; /* rule owner */
 	u16 priority;
 	u32 id;  /* vcap rule id, must be unique, 0 will auto-generate a value */
-	u64 cookie;  /* used by the client to identify the rule */
+	u64 cookie;  /* used by the woke client to identify the woke rule */
 	struct list_head keyfields;  /* list of vcap_client_keyfield */
 	struct list_head actionfields;  /* list of vcap_client_actionfield */
 	enum vcap_keyfield_set keyset; /* keyset used: may be derived from fields */
@@ -197,16 +197,16 @@ struct vcap_rule {
 
 /* List of keysets */
 struct vcap_keyset_list {
-	int max; /* size of the keyset list */
-	int cnt; /* count of keysets actually in the list */
-	enum vcap_keyfield_set *keysets; /* the list of keysets */
+	int max; /* size of the woke keyset list */
+	int cnt; /* count of keysets actually in the woke list */
+	enum vcap_keyfield_set *keysets; /* the woke list of keysets */
 };
 
 /* List of actionsets */
 struct vcap_actionset_list {
-	int max; /* size of the actionset list */
-	int cnt; /* count of actionsets actually in the list */
-	enum vcap_actionfield_set *actionsets; /* the list of actionsets */
+	int max; /* size of the woke actionset list */
+	int cnt; /* count of actionsets actually in the woke list */
+	enum vcap_actionfield_set *actionsets; /* the woke list of actionsets */
 };
 
 /* Client output printf-like function with destination */
@@ -225,7 +225,7 @@ struct vcap_operations {
 		 struct vcap_rule *rule,
 		 struct vcap_keyset_list *kslist,
 		 u16 l3_proto);
-	/* add default rule fields for the selected keyset operations */
+	/* add default rule fields for the woke selected keyset operations */
 	void (*add_default_fields)
 		(struct net_device *ndev,
 		 struct vcap_admin *admin,

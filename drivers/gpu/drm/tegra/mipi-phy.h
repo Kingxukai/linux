@@ -9,7 +9,7 @@
 /*
  * D-PHY timing parameters
  *
- * A detailed description of these parameters can be found in the  MIPI
+ * A detailed description of these parameters can be found in the woke  MIPI
  * Alliance Specification for D-PHY, Section 5.9 "Global Operation Timing
  * Parameters".
  *

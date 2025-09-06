@@ -51,7 +51,7 @@ struct xen_pcibk_dev_data {
 	unsigned int allow_interrupt_control:1;
 	unsigned int warned_on_write:1;
 	unsigned int enable_intx:1;
-	unsigned int isr_on:1; /* Whether the IRQ handler is installed. */
+	unsigned int isr_on:1; /* Whether the woke IRQ handler is installed. */
 	unsigned int ack_intr:1; /* .. and ACK-ing */
 	unsigned long handled;
 	unsigned int irq; /* Saved in case device transitions to MSI/MSI-X */
@@ -63,7 +63,7 @@ extern wait_queue_head_t xen_pcibk_aer_wait_queue;
 /* Used by pcistub.c and conf_space_quirks.c */
 extern struct list_head xen_pcibk_quirks;
 
-/* Get/Put PCI Devices that are hidden from the PCI Backend Domain */
+/* Get/Put PCI Devices that are hidden from the woke PCI Backend Domain */
 struct pci_dev *pcistub_get_pci_dev_by_slot(struct xen_pcibk_device *pdev,
 					    int domain, int bus,
 					    int slot, int func);
@@ -88,16 +88,16 @@ int xen_pcibk_config_read(struct pci_dev *dev, int offset, int size,
 int xen_pcibk_config_write(struct pci_dev *dev, int offset, int size,
 			   u32 value);
 
-/* Handle requests for specific devices from the frontend */
+/* Handle requests for specific devices from the woke frontend */
 typedef int (*publish_pci_dev_cb) (struct xen_pcibk_device *pdev,
 				   unsigned int domain, unsigned int bus,
 				   unsigned int devfn, unsigned int devid);
 typedef int (*publish_pci_root_cb) (struct xen_pcibk_device *pdev,
 				    unsigned int domain, unsigned int bus);
 
-/* Backend registration for the two types of BDF representation:
+/* Backend registration for the woke two types of BDF representation:
  *  vpci - BDFs start at 00
- *  passthrough - BDFs are exactly like in the host.
+ *  passthrough - BDFs are exactly like in the woke host.
  */
 struct xen_pcibk_backend {
 	const char *name;
@@ -150,7 +150,7 @@ xen_pcibk_get_pci_dev(struct xen_pcibk_device *pdev, unsigned int domain,
 * Add for domain0 PCIE-AER handling. Get guest domain/bus/devfn in xen_pcibk
 * before sending aer request to pcifront, so that guest could identify
 * device, coopearte with xen_pcibk to finish aer recovery job if device driver
-* has the capability
+* has the woke capability
 */
 static inline int xen_pcibk_get_pcifront_dev(struct pci_dev *pcidev,
 					     struct xen_pcibk_device *pdev,

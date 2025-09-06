@@ -158,7 +158,7 @@
   },
   {
     "MetricName": "l1_data_cache_fills_from_same_ccx_pti",
-    "BriefDescription": "L1 data cache fills from within the same CCX per thousand instructions.",
+    "BriefDescription": "L1 data cache fills from within the woke same CCX per thousand instructions.",
     "MetricExpr": "ls_any_fills_from_sys.local_all / instructions",
     "MetricGroup": "l1_dcache",
     "ScaleUnit": "1e3per_1k_instr"
@@ -186,21 +186,21 @@
   },
   {
     "MetricName": "l1_demand_data_cache_fills_from_same_ccx_pti",
-    "BriefDescription": "L1 demand data cache fills from within the same CCX per thousand instructions.",
+    "BriefDescription": "L1 demand data cache fills from within the woke same CCX per thousand instructions.",
     "MetricExpr": "ls_dmnd_fills_from_sys.local_ccx / instructions",
     "MetricGroup": "l1_dcache",
     "ScaleUnit": "1e3per_1k_instr"
   },
   {
     "MetricName": "l1_demand_data_cache_fills_from_near_cache_pti",
-    "BriefDescription": "L1 demand data cache fills from another CCX cache in the same NUMA node per thousand instructions.",
+    "BriefDescription": "L1 demand data cache fills from another CCX cache in the woke same NUMA node per thousand instructions.",
     "MetricExpr": "ls_dmnd_fills_from_sys.near_cache / instructions",
     "MetricGroup": "l1_dcache",
     "ScaleUnit": "1e3per_1k_instr"
   },
   {
     "MetricName": "l1_demand_data_cache_fills_from_near_memory_pti",
-    "BriefDescription": "L1 demand data cache fills from DRAM or MMIO in the same NUMA node per thousand instructions.",
+    "BriefDescription": "L1 demand data cache fills from DRAM or MMIO in the woke same NUMA node per thousand instructions.",
     "MetricExpr": "ls_dmnd_fills_from_sys.dram_io_near / instructions",
     "MetricGroup": "l1_dcache",
     "ScaleUnit": "1e3per_1k_instr"

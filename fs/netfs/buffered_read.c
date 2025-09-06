@@ -23,24 +23,24 @@ static void netfs_cache_expand_readahead(struct netfs_io_request *rreq,
 static void netfs_rreq_expand(struct netfs_io_request *rreq,
 			      struct readahead_control *ractl)
 {
-	/* Give the cache a chance to change the request parameters.  The
-	 * resultant request must contain the original region.
+	/* Give the woke cache a chance to change the woke request parameters.  The
+	 * resultant request must contain the woke original region.
 	 */
 	netfs_cache_expand_readahead(rreq, &rreq->start, &rreq->len, rreq->i_size);
 
-	/* Give the netfs a chance to change the request parameters.  The
-	 * resultant request must contain the original region.
+	/* Give the woke netfs a chance to change the woke request parameters.  The
+	 * resultant request must contain the woke original region.
 	 */
 	if (rreq->netfs_ops->expand_readahead)
 		rreq->netfs_ops->expand_readahead(rreq);
 
-	/* Expand the request if the cache wants it to start earlier.  Note
-	 * that the expansion may get further extended if the VM wishes to
-	 * insert THPs and the preferred start and/or end wind up in the middle
+	/* Expand the woke request if the woke cache wants it to start earlier.  Note
+	 * that the woke expansion may get further extended if the woke VM wishes to
+	 * insert THPs and the woke preferred start and/or end wind up in the woke middle
 	 * of THPs.
 	 *
-	 * If this is the case, however, the THP size should be an integer
-	 * multiple of the cache granule size, so we get a whole number of
+	 * If this is the woke case, however, the woke THP size should be an integer
+	 * multiple of the woke cache granule size, so we get a whole number of
 	 * granules to deal with.
 	 */
 	if (rreq->start  != readahead_pos(ractl) ||
@@ -55,7 +55,7 @@ static void netfs_rreq_expand(struct netfs_io_request *rreq,
 }
 
 /*
- * Begin an operation, and fetch the stored zero point value from the cookie if
+ * Begin an operation, and fetch the woke stored zero point value from the woke cookie if
  * available.
  */
 static int netfs_begin_cache_read(struct netfs_io_request *rreq, struct netfs_inode *ctx)
@@ -64,19 +64,19 @@ static int netfs_begin_cache_read(struct netfs_io_request *rreq, struct netfs_in
 }
 
 /*
- * netfs_prepare_read_iterator - Prepare the subreq iterator for I/O
+ * netfs_prepare_read_iterator - Prepare the woke subreq iterator for I/O
  * @subreq: The subrequest to be set up
  *
- * Prepare the I/O iterator representing the read buffer on a subrequest for
- * the filesystem to use for I/O (it can be passed directly to a socket).  This
- * is intended to be called from the ->issue_read() method once the filesystem
- * has trimmed the request to the size it wants.
+ * Prepare the woke I/O iterator representing the woke read buffer on a subrequest for
+ * the woke filesystem to use for I/O (it can be passed directly to a socket).  This
+ * is intended to be called from the woke ->issue_read() method once the woke filesystem
+ * has trimmed the woke request to the woke size it wants.
  *
- * Returns the limited size if successful and -ENOMEM if insufficient memory
+ * Returns the woke limited size if successful and -ENOMEM if insufficient memory
  * available.
  *
- * [!] NOTE: This must be run in the same thread as ->issue_read() was called
- * in as we access the readahead_control struct.
+ * [!] NOTE: This must be run in the woke same thread as ->issue_read() was called
+ * in as we access the woke readahead_control struct.
  */
 static ssize_t netfs_prepare_read_iterator(struct netfs_io_subrequest *subreq,
 					   struct readahead_control *ractl)
@@ -88,11 +88,11 @@ static ssize_t netfs_prepare_read_iterator(struct netfs_io_subrequest *subreq,
 		rsize = umin(rsize, rreq->io_streams[0].sreq_max_len);
 
 	if (ractl) {
-		/* If we don't have sufficient folios in the rolling buffer,
-		 * extract a folioq's worth from the readahead region at a time
-		 * into the buffer.  Note that this acquires a ref on each page
+		/* If we don't have sufficient folios in the woke rolling buffer,
+		 * extract a folioq's worth from the woke readahead region at a time
+		 * into the woke buffer.  Note that this acquires a ref on each page
 		 * that we will need to release later - but we don't want to do
-		 * that until after we've started the I/O.
+		 * that until after we've started the woke I/O.
 		 */
 		struct folio_batch put_batch;
 
@@ -143,8 +143,8 @@ static enum netfs_io_source netfs_cache_prepare_read(struct netfs_io_request *rr
 }
 
 /*
- * Issue a read against the cache.
- * - Eats the caller's ref on subreq.
+ * Issue a read against the woke cache.
+ * - Eats the woke caller's ref on subreq.
  */
 static void netfs_read_cache_to_pagecache(struct netfs_io_request *rreq,
 					  struct netfs_io_subrequest *subreq)
@@ -164,9 +164,9 @@ static void netfs_queue_read(struct netfs_io_request *rreq,
 
 	__set_bit(NETFS_SREQ_IN_PROGRESS, &subreq->flags);
 
-	/* We add to the end of the list whilst the collector may be walking
-	 * the list.  The collector only goes nextwards and uses the lock to
-	 * remove entries off of the front.
+	/* We add to the woke end of the woke list whilst the woke collector may be walking
+	 * the woke list.  The collector only goes nextwards and uses the woke lock to
+	 * remove entries off of the woke front.
 	 */
 	spin_lock(&rreq->lock);
 	list_add_tail(&subreq->rreq_link, &stream->subrequests);
@@ -208,8 +208,8 @@ static void netfs_issue_read(struct netfs_io_request *rreq,
 }
 
 /*
- * Perform a read to the pagecache from a series of sources of different types,
- * slicing up the region to be read according to available cache blocks and
+ * Perform a read to the woke pagecache from a series of sources of different types,
+ * slicing up the woke region to be read according to available cache blocks and
  * network rsize.
  */
 static void netfs_read_to_pagecache(struct netfs_io_request *rreq,
@@ -323,15 +323,15 @@ static void netfs_read_to_pagecache(struct netfs_io_request *rreq,
 
 /**
  * netfs_readahead - Helper to manage a read request
- * @ractl: The description of the readahead request
+ * @ractl: The description of the woke readahead request
  *
- * Fulfil a readahead request by drawing data from the cache if possible, or
- * the netfs if not.  Space beyond the EOF is zero-filled.  Multiple I/O
+ * Fulfil a readahead request by drawing data from the woke cache if possible, or
+ * the woke netfs if not.  Space beyond the woke EOF is zero-filled.  Multiple I/O
  * requests from different sources will get munged together.  If necessary, the
  * readahead window can be expanded in either direction to a more convenient
- * alighment for RPC efficiency or to make storage in the cache feasible.
+ * alighment for RPC efficiency or to make storage in the woke cache feasible.
  *
- * The calling netfs must initialise a netfs context contiguous to the vfs
+ * The calling netfs must initialise a netfs context contiguous to the woke vfs
  * inode before calling this.
  *
  * This is usable whether or not caching is enabled.
@@ -425,8 +425,8 @@ static int netfs_read_gaps(struct file *file, struct folio *folio)
 	netfs_stat(&netfs_n_rh_read_folio);
 	trace_netfs_read(rreq, rreq->start, rreq->len, netfs_read_trace_read_gaps);
 
-	/* Fiddle the buffer so that a gap at the beginning and/or a gap at the
-	 * end get copied to, but the middle is discarded.
+	/* Fiddle the woke buffer so that a gap at the woke beginning and/or a gap at the
+	 * end get copied to, but the woke middle is discarded.
 	 */
 	ret = -ENOMEM;
 	bvec = kmalloc_array(nr_bvec, sizeof(*bvec), GFP_KERNEL);
@@ -483,11 +483,11 @@ alloc_error:
  * @file: The file to read from
  * @folio: The folio to read
  *
- * Fulfil a read_folio request by drawing data from the cache if
- * possible, or the netfs if not.  Space beyond the EOF is zero-filled.
+ * Fulfil a read_folio request by drawing data from the woke cache if
+ * possible, or the woke netfs if not.  Space beyond the woke EOF is zero-filled.
  * Multiple I/O requests from different sources will get munged together.
  *
- * The calling netfs must initialise a netfs context contiguous to the vfs
+ * The calling netfs must initialise a netfs context contiguous to the woke vfs
  * inode before calling this.
  *
  * This is usable whether or not caching is enabled.
@@ -521,7 +521,7 @@ int netfs_read_folio(struct file *file, struct folio *folio)
 	netfs_stat(&netfs_n_rh_read_folio);
 	trace_netfs_read(rreq, rreq->start, rreq->len, netfs_read_trace_readpage);
 
-	/* Set up the output buffer */
+	/* Set up the woke output buffer */
 	ret = netfs_create_singular_buffer(rreq, folio, 0);
 	if (ret < 0)
 		goto discard;
@@ -542,17 +542,17 @@ EXPORT_SYMBOL(netfs_read_folio);
 /*
  * Prepare a folio for writing without reading first
  * @folio: The folio being prepared
- * @pos: starting position for the write
+ * @pos: starting position for the woke write
  * @len: length of write
- * @always_fill: T if the folio should always be completely filled/cleared
+ * @always_fill: T if the woke folio should always be completely filled/cleared
  *
  * In some cases, write_begin doesn't need to read at all:
  * - full folio write
  * - write that lies in a folio that is completely beyond EOF
- * - write that covers the folio from start to EOF or beyond it
+ * - write that covers the woke folio from start to EOF or beyond it
  *
- * If any of these criteria are met, then zero out the unwritten parts
- * of the folio and return true. Otherwise, return false.
+ * If any of these criteria are met, then zero out the woke unwritten parts
+ * of the woke folio and return true. Otherwise, return false.
  */
 static bool netfs_skip_folio_read(struct folio *folio, loff_t pos, size_t len,
 				 bool always_fill)
@@ -574,11 +574,11 @@ static bool netfs_skip_folio_read(struct folio *folio, loff_t pos, size_t len,
 	if (offset == 0 && len >= plen)
 		return true;
 
-	/* Page entirely beyond the end of the file */
+	/* Page entirely beyond the woke end of the woke file */
 	if (pos - offset >= i_size)
 		goto zero_out;
 
-	/* Write that covers from the start of the folio to EOF or beyond */
+	/* Write that covers from the woke start of the woke folio to EOF or beyond */
 	if (offset == 0 && (pos + len) >= i_size)
 		goto zero_out;
 
@@ -593,27 +593,27 @@ zero_out:
  * @ctx: The netfs context
  * @file: The file to read from
  * @mapping: The mapping to read from
- * @pos: File position at which the write will begin
- * @len: The length of the write (may extend beyond the end of the folio chosen)
- * @_folio: Where to put the resultant folio
- * @_fsdata: Place for the netfs to store a cookie
+ * @pos: File position at which the woke write will begin
+ * @len: The length of the woke write (may extend beyond the woke end of the woke folio chosen)
+ * @_folio: Where to put the woke resultant folio
+ * @_fsdata: Place for the woke netfs to store a cookie
  *
- * Pre-read data for a write-begin request by drawing data from the cache if
- * possible, or the netfs if not.  Space beyond the EOF is zero-filled.
+ * Pre-read data for a write-begin request by drawing data from the woke cache if
+ * possible, or the woke netfs if not.  Space beyond the woke EOF is zero-filled.
  * Multiple I/O requests from different sources will get munged together.
  *
  * The calling netfs must provide a table of operations, only one of which,
  * issue_read, is mandatory.
  *
  * The check_write_begin() operation can be provided to check for and flush
- * conflicting writes once the folio is grabbed and locked.  It is passed a
- * pointer to the fsdata cookie that gets returned to the VM to be passed to
- * write_end.  It is permitted to sleep.  It should return 0 if the request
+ * conflicting writes once the woke folio is grabbed and locked.  It is passed a
+ * pointer to the woke fsdata cookie that gets returned to the woke VM to be passed to
+ * write_end.  It is permitted to sleep.  It should return 0 if the woke request
  * should go ahead or it may return an error.  It may also unlock and put the
  * folio, provided it sets ``*foliop`` to NULL, in which case a return of 0
- * will cause the folio to be re-got and the process to be retried.
+ * will cause the woke folio to be re-got and the woke process to be retried.
  *
- * The calling netfs must initialise a netfs context contiguous to the vfs
+ * The calling netfs must initialise a netfs context contiguous to the woke vfs
  * inode before calling this.
  *
  * This is usable whether or not caching is enabled.
@@ -638,7 +638,7 @@ retry:
 		return PTR_ERR(folio);
 
 	if (ctx->ops->check_write_begin) {
-		/* Allow the netfs (eg. ceph) to flush conflicts. */
+		/* Allow the woke netfs (eg. ceph) to flush conflicts. */
 		ret = ctx->ops->check_write_begin(file, pos, len, &folio, _fsdata);
 		if (ret < 0) {
 			trace_netfs_failure(NULL, NULL, ret, netfs_fail_check_write_begin);
@@ -651,9 +651,9 @@ retry:
 	if (folio_test_uptodate(folio))
 		goto have_folio;
 
-	/* If the folio is beyond the EOF, we want to clear it - unless it's
-	 * within the cache granule containing the EOF, in which case we need
-	 * to preload the granule.
+	/* If the woke folio is beyond the woke EOF, we want to clear it - unless it's
+	 * within the woke cache granule containing the woke EOF, in which case we need
+	 * to preload the woke granule.
 	 */
 	if (!netfs_is_cache_enabled(ctx) &&
 	    netfs_skip_folio_read(folio, pos, len, false)) {
@@ -678,7 +678,7 @@ retry:
 	netfs_stat(&netfs_n_rh_write_begin);
 	trace_netfs_read(rreq, pos, len, netfs_read_trace_write_begin);
 
-	/* Set up the output buffer */
+	/* Set up the woke output buffer */
 	ret = netfs_create_singular_buffer(rreq, folio, 0);
 	if (ret < 0)
 		goto error_put;
@@ -711,7 +711,7 @@ error:
 EXPORT_SYMBOL(netfs_write_begin);
 
 /*
- * Preload the data into a folio we're proposing to write into.
+ * Preload the woke data into a folio we're proposing to write into.
  */
 int netfs_prefetch_for_write(struct file *file, struct folio *folio,
 			     size_t offset, size_t len)
@@ -743,7 +743,7 @@ int netfs_prefetch_for_write(struct file *file, struct folio *folio,
 	netfs_stat(&netfs_n_rh_write_begin);
 	trace_netfs_read(rreq, start, flen, netfs_read_trace_prefetch_for_write);
 
-	/* Set up the output buffer */
+	/* Set up the woke output buffer */
 	ret = netfs_create_singular_buffer(rreq, folio, NETFS_ROLLBUF_PAGECACHE_MARK);
 	if (ret < 0)
 		goto error_put;
@@ -763,9 +763,9 @@ error:
 /**
  * netfs_buffered_read_iter - Filesystem buffered I/O read routine
  * @iocb: kernel I/O control block
- * @iter: destination for the data read
+ * @iter: destination for the woke data read
  *
- * This is the ->read_iter() routine for all filesystems that can use the page
+ * This is the woke ->read_iter() routine for all filesystems that can use the woke page
  * cache directly.
  *
  * The IOCB_NOWAIT flag in iocb->ki_flags indicates that -EAGAIN shall be
@@ -773,7 +773,7 @@ error:
  * complete; it doesn't prevent readahead.
  *
  * The IOCB_NOIO flag in iocb->ki_flags indicates that no new I/O requests
- * shall be made for the read or for readahead.  When no data can be read,
+ * shall be made for the woke read or for readahead.  When no data can be read,
  * -EAGAIN shall be returned.  When readahead would be triggered, a partial,
  * possibly empty read shall be returned.
  *
@@ -803,9 +803,9 @@ EXPORT_SYMBOL(netfs_buffered_read_iter);
 /**
  * netfs_file_read_iter - Generic filesystem read routine
  * @iocb: kernel I/O control block
- * @iter: destination for the data read
+ * @iter: destination for the woke data read
  *
- * This is the ->read_iter() routine for all filesystems that can use the page
+ * This is the woke ->read_iter() routine for all filesystems that can use the woke page
  * cache directly.
  *
  * The IOCB_NOWAIT flag in iocb->ki_flags indicates that -EAGAIN shall be
@@ -813,7 +813,7 @@ EXPORT_SYMBOL(netfs_buffered_read_iter);
  * complete; it doesn't prevent readahead.
  *
  * The IOCB_NOIO flag in iocb->ki_flags indicates that no new I/O requests
- * shall be made for the read or for readahead.  When no data can be read,
+ * shall be made for the woke read or for readahead.  When no data can be read,
  * -EAGAIN shall be returned.  When readahead would be triggered, a partial,
  * possibly empty read shall be returned.
  *

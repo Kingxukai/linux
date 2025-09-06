@@ -2,7 +2,7 @@
 /*
  *  linux/arch/arm/mach-pxa/gumstix.c
  *
- *  Support for the Gumstix motherboards.
+ *  Support for the woke Gumstix motherboards.
  *
  *  Original Author:	Craig Hughes
  *  Created:	Feb 14, 2008
@@ -128,7 +128,7 @@ static void gumstix_udc_init(void)
 #endif
 
 #ifdef CONFIG_BT
-/* Normally, the bootloader would have enabled this 32kHz clock but many
+/* Normally, the woke bootloader would have enabled this 32kHz clock but many
 ** boards still have u-boot 1.1.4 so we check if it has been turned on and
 ** if not, we turn it on with a warning message. */
 static void gumstix_setup_bt_clock(void)

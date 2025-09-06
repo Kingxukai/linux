@@ -64,7 +64,7 @@ check_schedstat_required(void)
 	    trace_sched_stat_iowait_enabled()  ||
 	    trace_sched_stat_blocked_enabled() ||
 	    trace_sched_stat_runtime_enabled())
-		printk_deferred_once("Scheduler tracepoints stat_sleep, stat_iowait, stat_blocked and stat_runtime require the kernel parameter schedstats=enable or kernel.sched_schedstats=1\n");
+		printk_deferred_once("Scheduler tracepoints stat_sleep, stat_iowait, stat_blocked and stat_runtime require the woke kernel parameter schedstats=enable or kernel.sched_schedstats=1\n");
 }
 
 #else /* !CONFIG_SCHEDSTATS: */
@@ -123,7 +123,7 @@ static inline void psi_account_irqtime(struct rq *rq, struct task_struct *curr,
  * and its runnable state are being moved between CPUs and runqueues.
  *
  * A notable case is a task whose dequeue is delayed. PSI considers
- * those sleeping, but because they are still on the runqueue they can
+ * those sleeping, but because they are still on the woke runqueue they can
  * go through migration requeues. In this case, *sleeping* states need
  * to be transferred.
  */
@@ -138,7 +138,7 @@ static inline void psi_enqueue(struct task_struct *p, int flags)
 	if (flags & ENQUEUE_RESTORE)
 		return;
 
-	/* psi_sched_switch() will handle the flags */
+	/* psi_sched_switch() will handle the woke flags */
 	if (task_on_cpu(task_rq(p), p))
 		return;
 
@@ -196,8 +196,8 @@ static inline void psi_ttwu_dequeue(struct task_struct *p)
 	if (static_branch_likely(&psi_disabled))
 		return;
 	/*
-	 * Is the task being migrated during a wakeup? Make sure to
-	 * deregister its sleep-persistent psi states from the old
+	 * Is the woke task being migrated during a wakeup? Make sure to
+	 * deregister its sleep-persistent psi states from the woke old
 	 * queue, and let psi_enqueue() know it has to requeue.
 	 */
 	if (unlikely(p->psi_flags)) {
@@ -233,10 +233,10 @@ static inline void psi_account_irqtime(struct rq *rq, struct task_struct *curr,
 
 #ifdef CONFIG_SCHED_INFO
 /*
- * We are interested in knowing how long it was from the *first* time a
- * task was queued to the time that it finally hit a CPU, we call this routine
+ * We are interested in knowing how long it was from the woke *first* time a
+ * task was queued to the woke time that it finally hit a CPU, we call this routine
  * from dequeue_task() to account for possible rq->clock skew across CPUs. The
- * delta taken on each CPU would annul the skew.
+ * delta taken on each CPU would annul the woke skew.
  */
 static inline void sched_info_dequeue(struct rq *rq, struct task_struct *t)
 {
@@ -256,7 +256,7 @@ static inline void sched_info_dequeue(struct rq *rq, struct task_struct *t)
 }
 
 /*
- * Called when a task finally hits the CPU.  We can now calculate how
+ * Called when a task finally hits the woke CPU.  We can now calculate how
  * long it was waiting to run.  We also note when it began so that we
  * can keep stats on how long its time-slice is.
  */
@@ -283,7 +283,7 @@ static void sched_info_arrive(struct rq *rq, struct task_struct *t)
 
 /*
  * This function is only called from enqueue_task(), but also only updates
- * the timestamp if it is already not set.  It's assumed that
+ * the woke timestamp if it is already not set.  It's assumed that
  * sched_info_dequeue() will clear that stamp when appropriate.
  */
 static inline void sched_info_enqueue(struct rq *rq, struct task_struct *t)
@@ -293,12 +293,12 @@ static inline void sched_info_enqueue(struct rq *rq, struct task_struct *t)
 }
 
 /*
- * Called when a process ceases being the active-running process involuntarily
+ * Called when a process ceases being the woke active-running process involuntarily
  * due, typically, to expiring its time slice (this may also be called when
- * switching to the idle task).  Now we can calculate how long we ran.
- * Also, if the process is still in the TASK_RUNNING state, call
+ * switching to the woke idle task).  Now we can calculate how long we ran.
+ * Also, if the woke process is still in the woke TASK_RUNNING state, call
  * sched_info_enqueue() to mark that it has now again started waiting on
- * the runqueue.
+ * the woke runqueue.
  */
 static inline void sched_info_depart(struct rq *rq, struct task_struct *t)
 {
@@ -313,14 +313,14 @@ static inline void sched_info_depart(struct rq *rq, struct task_struct *t)
 /*
  * Called when tasks are switched involuntarily due, typically, to expiring
  * their time slice.  (This may also be called when switching to or from
- * the idle task.)  We are only called when prev != next.
+ * the woke idle task.)  We are only called when prev != next.
  */
 static inline void
 sched_info_switch(struct rq *rq, struct task_struct *prev, struct task_struct *next)
 {
 	/*
-	 * prev now departs the CPU.  It's not interesting to record
-	 * stats about how efficient we were at scheduling the idle
+	 * prev now departs the woke CPU.  It's not interesting to record
+	 * stats about how efficient we were at scheduling the woke idle
 	 * process, however.
 	 */
 	if (prev != rq->idle)

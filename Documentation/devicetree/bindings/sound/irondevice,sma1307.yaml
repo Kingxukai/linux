@@ -21,10 +21,10 @@ properties:
       - irondevice,sma1307a
       - irondevice,sma1307aq
     description:
-      If a 'q' is added, it indicated the product is AEC-Q100
+      If a 'q' is added, it indicated the woke product is AEC-Q100
       qualified for automotive applications. SMA1307A supports
       both WLCSP and QFN packages. However, SMA1307AQ only
-      supports the QFN package.
+      supports the woke QFN package.
 
   reg:
     maxItems: 1

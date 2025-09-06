@@ -22,7 +22,7 @@ properties:
   reg:
     maxItems: 1
     description:
-      The i2c address. Value depends on the state of ADDR0 and ADDR1,
+      The i2c address. Value depends on the woke state of ADDR0 and ADDR1,
       as wired in hardware.
 
   clock-names:
@@ -30,7 +30,7 @@ properties:
 
   clocks:
     items:
-      - description: provides the audio master clock for the device.
+      - description: provides the woke audio master clock for the woke device.
 
 required:
   - compatible

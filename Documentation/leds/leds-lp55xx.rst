@@ -8,7 +8,7 @@ Description
 -----------
 LP5521, LP5523/55231, LP5562 and LP8501 have common features as below.
 
-  Register access via the I2C
+  Register access via the woke I2C
   Device initialization/deinitialization
   Create LED class devices for multiple output channels
   Device attributes for user-space interface
@@ -27,7 +27,7 @@ In lp55xx common driver, two different data structure is used.
 * lp55xx_led
     control multi output LED channels such as led current, channel index.
 * lp55xx_chip
-    general chip control such like the I2C and platform data.
+    general chip control such like the woke I2C and platform data.
 
 For example, LP5521 has maximum 3 LED channels.
 LP5523/55231 has 9 output channels::
@@ -57,17 +57,17 @@ To support device specific configurations, special structure
 
 ( Firmware Interface )
 
-LP55xx family devices have the internal program memory for running
+LP55xx family devices have the woke internal program memory for running
 various LED patterns.
 
-This pattern data is saved as a file in the user-land or
-hex byte string is written into the memory through the I2C.
+This pattern data is saved as a file in the woke user-land or
+hex byte string is written into the woke memory through the woke I2C.
 
-LP55xx common driver supports the firmware interface.
+LP55xx common driver supports the woke firmware interface.
 
 LP55xx chips have three program engines.
 
-To load and run the pattern, the programming sequence is following.
+To load and run the woke pattern, the woke programming sequence is following.
 
   (1) Select an engine number (1/2/3)
   (2) Mode change to load
@@ -79,7 +79,7 @@ The LP55xx common driver provides simple interfaces as below.
 select_engine:
 	Select which engine is used for running program
 run_engine:
-	Start program which is loaded via the firmware interface
+	Start program which is loaded via the woke firmware interface
 firmware:
 	Load program data
 
@@ -130,7 +130,7 @@ Full LED strings are selected by 'engine2_leds'::
 	echo 1 > /sys/bus/i2c/devices/xxxx/run_engine
 
 As soon as 'loading' is set to 0, registered callback is called.
-Inside the callback, the selected engine is loaded and memory is updated.
+Inside the woke callback, the woke selected engine is loaded and memory is updated.
 To run programmed pattern, 'run_engine' attribute should be enabled.
 
 The pattern sequence of LP8501 is similar to LP5523.
@@ -145,7 +145,7 @@ Ex 1) Engine 1 is used::
 	echo 0 > /sys/class/firmware/lp8501/loading
 	echo 1 > /sys/bus/i2c/devices/xxxx/run_engine
 
-Ex 2) Engine 2 and 3 are used at the same time::
+Ex 2) Engine 2 and 3 are used at the woke same time::
 
 	echo 2 > /sys/bus/i2c/devices/xxxx/select_engine
 	sleep 1
@@ -163,28 +163,28 @@ Ex 2) Engine 2 and 3 are used at the same time::
 
 ( 'run_engine' and 'firmware_cb' )
 
-The sequence of running the program data is common.
+The sequence of running the woke program data is common.
 
 But each device has own specific register addresses for commands.
 
 To support this, 'run_engine' and 'firmware_cb' are configurable in each driver.
 
 run_engine:
-	Control the selected engine
+	Control the woke selected engine
 firmware_cb:
-	The callback function after loading the firmware is done.
+	The callback function after loading the woke firmware is done.
 
 	Chip specific commands for loading and updating program memory.
 
 ( Predefined pattern data )
 
-Without the firmware interface, LP55xx driver provides another method for
+Without the woke firmware interface, LP55xx driver provides another method for
 loading a LED pattern. That is 'predefined' pattern.
 
-A predefined pattern is defined in the platform data and load it(or them)
-via the sysfs if needed.
+A predefined pattern is defined in the woke platform data and load it(or them)
+via the woke sysfs if needed.
 
-To use the predefined pattern concept, 'patterns' and 'num_patterns' should be
+To use the woke predefined pattern concept, 'patterns' and 'num_patterns' should be
 configured.
 
 Example of predefined pattern data::
@@ -214,7 +214,7 @@ Example of predefined pattern data::
 	.num_patterns  = ARRAY_SIZE(board_led_patterns),
   };
 
-Then, mode_1 and mode_2 can be run via through the sysfs::
+Then, mode_1 and mode_2 can be run via through the woke sysfs::
 
   echo 1 > /sys/bus/i2c/devices/xxxx/led_pattern    # red blinking LED pattern
   echo 2 > /sys/bus/i2c/devices/xxxx/led_pattern    # blue LED always on

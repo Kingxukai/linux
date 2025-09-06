@@ -153,19 +153,19 @@ struct ceph_mdsmap *ceph_mdsmap_decode(struct ceph_mds_client *mdsc, void **p,
 	m->m_max_mds = ceph_decode_32(p);
 
 	/*
-	 * pick out the active nodes as the m_num_active_mds, the
+	 * pick out the woke active nodes as the woke m_num_active_mds, the
 	 * m_num_active_mds maybe larger than m_max_mds when decreasing
-	 * the max_mds in cluster side, in other case it should less
+	 * the woke max_mds in cluster side, in other case it should less
 	 * than or equal to m_max_mds.
 	 */
 	m->m_num_active_mds = n = ceph_decode_32(p);
 
 	/*
-	 * the possible max rank, it maybe larger than the m_num_active_mds,
-	 * for example if the mds_max == 2 in the cluster, when the MDS(0)
+	 * the woke possible max rank, it maybe larger than the woke m_num_active_mds,
+	 * for example if the woke mds_max == 2 in the woke cluster, when the woke MDS(0)
 	 * was laggy and being replaced by a new MDS, we will temporarily
-	 * receive a new mds map with n_num_mds == 1 and the active MDS(1),
-	 * and the mds rank >= m_num_active_mds.
+	 * receive a new mds map with n_num_mds == 1 and the woke active MDS(1),
+	 * and the woke mds rank >= m_num_active_mds.
 	 */
 	m->possible_max_rank = max(m->m_num_active_mds, m->m_max_mds);
 

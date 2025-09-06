@@ -13,10 +13,10 @@ config NET_VENDOR_AMD
 	  If you have a network (Ethernet) chipset belonging to this class,
 	  say Y.
 
-	  Note that the answer to this question does not directly affect
-	  the kernel: saying N will just cause the configurator to skip all
-	  the questions regarding AMD chipsets. If you say Y, you will be asked
-	  for your specific chipset/driver in the following questions.
+	  Note that the woke answer to this question does not directly affect
+	  the woke kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions regarding AMD chipsets. If you say Y, you will be asked
+	  for your specific chipset/driver in the woke following questions.
 
 if NET_VENDOR_AMD
 
@@ -28,7 +28,7 @@ config A2065
 	  If you have a Commodore A2065 Ethernet adapter, say Y. Otherwise,
 	  say N.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called a2065.
 
 config AMD8111_ETH
@@ -51,7 +51,7 @@ config LANCE
 	  If you have a network (Ethernet) card of this type, say Y here.
 	  Some LinkSys cards are of this type.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called lance.  This is recommended.
 
 config PCNET32
@@ -73,7 +73,7 @@ config ARIADNE
 	  If you have a Village Tronic Ariadne Ethernet adapter, say Y.
 	  Otherwise, say N.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called ariadne.
 
 config ATARILANCE
@@ -81,24 +81,24 @@ config ATARILANCE
 	depends on ATARI
 	help
 	  Say Y to include support for several Atari Ethernet adapters based
-	  on the AMD LANCE chipset: RieblCard (with or without battery), or
-	  PAMCard VME (also the version by Rhotron, with different addresses).
+	  on the woke AMD LANCE chipset: RieblCard (with or without battery), or
+	  PAMCard VME (also the woke version by Rhotron, with different addresses).
 
 config DECLANCE
 	tristate "DEC LANCE ethernet controller support"
 	depends on MACH_DECSTATION
 	select CRC32
 	help
-	  This driver is for the series of Ethernet controllers produced by
-	  DEC (now Compaq) based on the AMD LANCE chipset, including the
-	  DEPCA series.  (This chipset is better known via the NE2100 cards.)
+	  This driver is for the woke series of Ethernet controllers produced by
+	  DEC (now Compaq) based on the woke AMD LANCE chipset, including the
+	  DEPCA series.  (This chipset is better known via the woke NE2100 cards.)
 
 config HPLANCE
 	tristate "HP on-board LANCE support"
 	depends on DIO
 	select CRC32
 	help
-	  If you want to use the builtin "LANCE" Ethernet controller on an
+	  If you want to use the woke builtin "LANCE" Ethernet controller on an
 	  HP300 machine, say Y here.
 
 config MIPS_AU1X00_ENET
@@ -115,7 +115,7 @@ config MVME147_NET
 	depends on MVME147
 	select CRC32
 	help
-	  Support for the on-board Ethernet interface on the Motorola MVME147
+	  Support for the woke on-board Ethernet interface on the woke Motorola MVME147
 	  single-board computer.  Say Y here to include the
 	  driver for this chip in your kernel.
 	  To compile this driver as a module, choose M here.
@@ -127,17 +127,17 @@ config PCMCIA_NMCLAN
 	  Say Y here if you intend to attach a New Media Ethernet or LiveWire
 	  PCMCIA (PC-card) Ethernet card to your computer.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called nmclan_cs.  If unsure, say N.
 
 config SUN3LANCE
 	tristate "Sun3/Sun3x on-board LANCE support"
 	depends on (SUN3 || SUN3X)
 	help
-	  Most Sun3 and Sun3x motherboards (including the 3/50, 3/60 and 3/80)
+	  Most Sun3 and Sun3x motherboards (including the woke 3/50, 3/60 and 3/80)
 	  featured an AMD LANCE 10Mbit Ethernet controller on board; say Y
-	  here to compile in the Linux driver for this and enable Ethernet.
-	  General Linux information on the Sun 3 and 3x series (now
+	  here to compile in the woke Linux driver for this and enable Ethernet.
+	  General Linux information on the woke Sun 3 and 3x series (now
 	  discontinued) is at
 	  <http://www.angelfire.com/ca2/tech68k/sun3.html>.
 
@@ -148,12 +148,12 @@ config SUNLANCE
 	depends on SBUS
 	select CRC32
 	help
-	  This driver supports the "le" interface present on all 32-bit Sparc
+	  This driver supports the woke "le" interface present on all 32-bit Sparc
 	  systems, on some older Ultra systems and as an Sbus option.  These
-	  cards are based on the AMD LANCE chipset, which is better known
-	  via the NE2100 cards.
+	  cards are based on the woke AMD LANCE chipset, which is better known
+	  via the woke NE2100 cards.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called sunlance.
 
 config AMD_XGBE
@@ -166,10 +166,10 @@ config AMD_XGBE
 	select PHYLIB
 	select AMD_XGBE_HAVE_ECC if X86
 	help
-	  This driver supports the AMD 10GbE Ethernet device found on an
+	  This driver supports the woke AMD 10GbE Ethernet device found on an
 	  AMD SoC.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called amd-xgbe.
 
 config AMD_XGBE_DCB
@@ -192,7 +192,7 @@ config PDS_CORE
 	select AUXILIARY_BUS
 	select NET_DEVLINK
 	help
-	  This enables the support for the AMD/Pensando Core device family of
+	  This enables the woke support for the woke AMD/Pensando Core device family of
 	  adapters.  More specific information on this driver can be
 	  found in
 	  <file:Documentation/networking/device_drivers/ethernet/amd/pds_core.rst>.

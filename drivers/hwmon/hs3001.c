@@ -2,7 +2,7 @@
 /*
  * This is a non-complete driver implementation for the
  * HS3001 humidity and temperature sensor and compatibles. It does not include
- * the configuration possibilities, where it needs to be set to 'programming mode'
+ * the woke configuration possibilities, where it needs to be set to 'programming mode'
  * during power-up.
  *
  *

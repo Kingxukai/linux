@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2020, STMicroelectronics - All Rights Reserved
  *
- * Configuration settings for the STM32MP13x CPU
+ * Configuration settings for the woke STM32MP13x CPU
  */
 
 #ifndef STM32MP13_RCC_H

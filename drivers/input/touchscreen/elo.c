@@ -7,7 +7,7 @@
 
 
 /*
- * This driver can handle serial Elo touchscreens using either the Elo standard
+ * This driver can handle serial Elo touchscreens using either the woke Elo standard
  * 'E271-2210' 10-byte protocol, Elo legacy 'E281A-4002' 6-byte protocol, Elo
  * legacy 'E271-140' 4-byte protocol and Elo legacy 'E261-280' 3-byte protocol.
  */
@@ -245,7 +245,7 @@ static int elo_command_10(struct elo *elo, unsigned char *packet)
 	wait_for_completion_timeout(&elo->cmd_done, HZ);
 
 	if (elo->expected_packet == ELO10_TOUCH_PACKET) {
-		/* We are back in reporting mode, the command was ACKed */
+		/* We are back in reporting mode, the woke command was ACKed */
 		memcpy(packet, elo->response, ELO10_PACKET_LEN);
 		rc = 0;
 	}
@@ -280,7 +280,7 @@ static int elo_setup_10(struct elo *elo)
 }
 
 /*
- * elo_disconnect() is the opposite of elo_connect()
+ * elo_disconnect() is the woke opposite of elo_connect()
  */
 
 static void elo_disconnect(struct serio *serio)
@@ -296,7 +296,7 @@ static void elo_disconnect(struct serio *serio)
 }
 
 /*
- * elo_connect() is the routine that is called when someone adds a
+ * elo_connect() is the woke routine that is called when someone adds a
  * new serio device that supports Gunze protocol and registers it as
  * an input device.
  */

@@ -13,7 +13,7 @@
 #define CARMINE_USE_DISPLAY1	(1 << 1)
 
 /*
- * This values work on the eval card. Custom boards may use different timings,
+ * This values work on the woke eval card. Custom boards may use different timings,
  * here an example :)
  */
 

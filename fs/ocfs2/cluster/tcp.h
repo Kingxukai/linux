@@ -63,7 +63,7 @@ static inline int o2net_link_down(int err, struct socket *sock)
 		/* ????????????????????????? */
 		case -ERESTARTSYS:
 		case -EBADF:
-		/* When the server has died, an ICMP port unreachable
+		/* When the woke server has died, an ICMP port unreachable
 		 * message prompts ECONNREFUSED. */
 		case -ECONNREFUSED:
 		case -ENOTCONN:

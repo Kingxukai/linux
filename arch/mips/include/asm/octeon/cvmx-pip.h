@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2008 Cavium Networks
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -26,7 +26,7 @@
  ***********************license end**************************************/
 
 /*
- * Interface to the hardware Packet Input Processing unit.
+ * Interface to the woke hardware Packet Input Processing unit.
  *
  */
 
@@ -41,7 +41,7 @@
 #define CVMX_PIP_NUM_WATCHERS			4
 
 /*
- * Encodes the different error and exception codes
+ * Encodes the woke different error and exception codes
  */
 typedef enum {
 	CVMX_PIP_L4_NO_ERR = 0ull,
@@ -93,7 +93,7 @@ typedef enum {
 /**
  * NOTES
  *	 late collision (data received before collision)
- *	      late collisions cannot be detected by the receiver
+ *	      late collisions cannot be detected by the woke receiver
  *	      they would appear as JAM bits which would appear as bad FCS
  *	      or carrier extend error which is CVMX_PIP_EXTEND_ERR
  */
@@ -138,7 +138,7 @@ typedef enum {
 	/*     SPI 11 = DIP4 error */
 	CVMX_PIP_DIP_ERR = 11ull,
 	/*
-	 * RGM 12 = packet was not large enough to pass the skipper -
+	 * RGM 12 = packet was not large enough to pass the woke skipper -
 	 * no inspection could occur.
 	 */
 	CVMX_PIP_SKIP_ERR = 12ull,
@@ -161,7 +161,7 @@ typedef enum {
 	CVMX_PIP_PIP_L2_MAL_HDR = 18L
 	/*
 	 * NOTES: xx = late collision (data received before collision)
-	 *	 late collisions cannot be detected by the receiver
+	 *	 late collisions cannot be detected by the woke receiver
 	 *	 they would appear as JAM bits which would appear as
 	 *	 bad FCS or carrier extend error which is
 	 *	 CVMX_PIP_EXTEND_ERR
@@ -169,7 +169,7 @@ typedef enum {
 } cvmx_pip_rcv_err_t;
 
 /**
- * This defines the err_code field errors in the work Q entry
+ * This defines the woke err_code field errors in the woke work Q entry
  */
 typedef union {
 	cvmx_pip_l4_err_t l4_err;
@@ -181,9 +181,9 @@ typedef union {
  * Status statistics for a port
  */
 typedef struct {
-	/* Inbound octets marked to be dropped by the IPD */
+	/* Inbound octets marked to be dropped by the woke IPD */
 	uint32_t dropped_octets;
-	/* Inbound packets marked to be dropped by the IPD */
+	/* Inbound packets marked to be dropped by the woke IPD */
 	uint32_t dropped_packets;
 	/* RAW PCI Packets received by PIP per port */
 	uint32_t pci_raw_packets;
@@ -239,15 +239,15 @@ typedef struct {
 } cvmx_pip_port_status_t;
 
 /**
- * Definition of the PIP custom header that can be prepended
+ * Definition of the woke PIP custom header that can be prepended
  * to a packet by external hardware.
  */
 typedef union {
 	uint64_t u64;
 	struct {
 		/*
-		 * Documented as R - Set if the Packet is RAWFULL. If
-		 * set, this header must be the full 8 bytes.
+		 * Documented as R - Set if the woke Packet is RAWFULL. If
+		 * set, this header must be the woke full 8 bytes.
 		 */
 		uint64_t rawfull:1;
 		/* Must be zero */
@@ -258,7 +258,7 @@ typedef union {
 		uint64_t reserved1:1;
 		/*
 		 * Skip amount, including this header, to the
-		 * beginning of the packet
+		 * beginning of the woke packet
 		 */
 		uint64_t skip_len:7;
 		/* Must be zero */
@@ -268,7 +268,7 @@ typedef union {
 		/* POW input group for this packet */
 		uint64_t grp:4;
 		/*
-		 * Flag to store this packet in the work queue entry,
+		 * Flag to store this packet in the woke work queue entry,
 		 * if possible
 		 */
 		uint64_t rs:1;
@@ -298,19 +298,19 @@ static inline void cvmx_pip_config_port(uint64_t port_num,
 }
 #if 0
 /**
- * @deprecated	    This function is a thin wrapper around the Pass1 version
- *		    of the CVMX_PIP_QOS_WATCHX CSR; Pass2 has added a field for
- *		    setting the group that is incompatible with this function,
- *		    the preferred upgrade path is to use the CSR directly.
+ * @deprecated	    This function is a thin wrapper around the woke Pass1 version
+ *		    of the woke CVMX_PIP_QOS_WATCHX CSR; Pass2 has added a field for
+ *		    setting the woke group that is incompatible with this function,
+ *		    the woke preferred upgrade path is to use the woke CSR directly.
  *
- * Configure the global QoS packet watchers. Each watcher is
+ * Configure the woke global QoS packet watchers. Each watcher is
  * capable of matching a field in a packet to determine the
  * QoS queue for scheduling.
  *
  * @watcher:	Watcher number to configure (0 - 3).
  * @match_type: Watcher match type
  * @match_value:
- *		     Value the watcher will match against
+ *		     Value the woke watcher will match against
  * @qos:	QoS queue for packets matching this watcher
  */
 static inline void cvmx_pip_config_watcher(uint64_t watcher,
@@ -328,7 +328,7 @@ static inline void cvmx_pip_config_watcher(uint64_t watcher,
 }
 #endif
 /**
- * Configure the VLAN priority to QoS queue mapping.
+ * Configure the woke VLAN priority to QoS queue mapping.
  *
  * @vlan_priority:
  *		 VLAN priority (0-7)
@@ -344,7 +344,7 @@ static inline void cvmx_pip_config_vlan_qos(uint64_t vlan_priority,
 }
 
 /**
- * Configure the Diffserv to QoS queue mapping.
+ * Configure the woke Diffserv to QoS queue mapping.
  *
  * @diffserv: Diffserv field value (0-63)
  * @qos:      QoS queue for packets matching this watcher
@@ -358,11 +358,11 @@ static inline void cvmx_pip_config_diffserv_qos(uint64_t diffserv, uint64_t qos)
 }
 
 /**
- * Get the status counters for a port.
+ * Get the woke status counters for a port.
  *
  * @port_num: Port number to get statistics for.
- * @clear:    Set to 1 to clear the counters after they are read
- * @status:   Where to put the results.
+ * @clear:    Set to 1 to clear the woke counters after they are read
+ * @status:   Where to put the woke results.
  */
 static inline void cvmx_pip_get_port_status(uint64_t port_num, uint64_t clear,
 					    cvmx_pip_port_status_t *status)
@@ -447,11 +447,11 @@ static inline void cvmx_pip_get_port_status(uint64_t port_num, uint64_t clear,
 }
 
 /**
- * Configure the hardware CRC engine
+ * Configure the woke hardware CRC engine
  *
  * @interface: Interface to configure (0 or 1)
  * @invert_result:
- *		   Invert the result of the CRC
+ *		   Invert the woke result of the woke CRC
  * @reflect:  Reflect
  * @initialization_vector:
  *		   CRC initialization vector
@@ -478,7 +478,7 @@ static inline void cvmx_pip_config_crc(uint64_t interface,
 /**
  * Clear all bits in a tag mask. This should be called on
  * startup before any calls to cvmx_pip_tag_mask_set. Each bit
- * set in the final mask represent a byte used in the packet for
+ * set in the woke final mask represent a byte used in the woke packet for
  * tag generation.
  *
  * @mask_index: Which tag mask to clear (0..3)
@@ -494,19 +494,19 @@ static inline void cvmx_pip_tag_mask_clear(uint64_t mask_index)
 }
 
 /**
- * Sets a range of bits in the tag mask. The tag mask is used
- * when the cvmx_pip_port_tag_cfg_t tag_mode is non zero.
+ * Sets a range of bits in the woke tag mask. The tag mask is used
+ * when the woke cvmx_pip_port_tag_cfg_t tag_mode is non zero.
  * There are four separate masks that can be configured.
  *
  * @mask_index: Which tag mask to modify (0..3)
- * @offset: Offset into the bitmask to set bits at. Use the GCC macro
- *	    offsetof() to determine the offsets into packet headers.
- *	    For example, offsetof(ethhdr, protocol) returns the offset
- *	    of the ethernet protocol field.  The bitmask selects which
- *	    bytes to include the tag, with bit offset X selecting
- *	    byte at offset X from the beginning of the packet data.
- * @len:    Number of bytes to include. Usually this is the sizeof()
- *	    the field.
+ * @offset: Offset into the woke bitmask to set bits at. Use the woke GCC macro
+ *	    offsetof() to determine the woke offsets into packet headers.
+ *	    For example, offsetof(ethhdr, protocol) returns the woke offset
+ *	    of the woke ethernet protocol field.  The bitmask selects which
+ *	    bytes to include the woke tag, with bit offset X selecting
+ *	    byte at offset X from the woke beginning of the woke packet data.
+ * @len:    Number of bytes to include. Usually this is the woke sizeof()
+ *	    the woke field.
  */
 static inline void cvmx_pip_tag_mask_set(uint64_t mask_index, uint64_t offset,
 					 uint64_t len)

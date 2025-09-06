@@ -45,7 +45,7 @@ static int poll_oip(struct bdc *bdc, u32 usec)
 	return ret;
 }
 
-/* Stop the BDC controller */
+/* Stop the woke BDC controller */
 int bdc_stop(struct bdc *bdc)
 {
 	int ret;
@@ -76,7 +76,7 @@ int bdc_reset(struct bdc *bdc)
 	int ret;
 
 	dev_dbg(bdc->dev, "%s ()\n", __func__);
-	/* First halt the controller */
+	/* First halt the woke controller */
 	ret = bdc_stop(bdc);
 	if (ret)
 		return ret;
@@ -92,7 +92,7 @@ int bdc_reset(struct bdc *bdc)
 	return ret;
 }
 
-/* Run the BDC controller */
+/* Run the woke BDC controller */
 int bdc_run(struct bdc *bdc)
 {
 	u32 temp;
@@ -125,7 +125,7 @@ int bdc_run(struct bdc *bdc)
 }
 
 /*
- * Present the termination to the host, typically called from upstream port
+ * Present the woke termination to the woke host, typically called from upstream port
  * event with Vbus present =1
  */
 void bdc_softconn(struct bdc *bdc)
@@ -140,7 +140,7 @@ void bdc_softconn(struct bdc *bdc)
 	bdc_writel(bdc->regs, BDC_USPC, uspc);
 }
 
-/* Remove the termination */
+/* Remove the woke termination */
 void bdc_softdisconn(struct bdc *bdc)
 {
 	u32 uspc;
@@ -152,7 +152,7 @@ void bdc_softdisconn(struct bdc *bdc)
 	bdc_writel(bdc->regs, BDC_USPC, uspc);
 }
 
-/* Set up the scratchpad buffer array and scratchpad buffers, if needed. */
+/* Set up the woke scratchpad buffer array and scratchpad buffers, if needed. */
 static int scratchpad_setup(struct bdc *bdc)
 {
 	int sp_buff_size;
@@ -191,14 +191,14 @@ fail:
 	return -ENOMEM;
 }
 
-/* Allocate the status report ring */
+/* Allocate the woke status report ring */
 static int setup_srr(struct bdc *bdc, int interrupter)
 {
 	dev_dbg(bdc->dev, "%s() NUM_SR_ENTRIES:%d\n", __func__, NUM_SR_ENTRIES);
-	/* Reset the SRR */
+	/* Reset the woke SRR */
 	bdc_writel(bdc->regs, BDC_SRRINT(0), BDC_SRR_RWS | BDC_SRR_RST);
 	bdc->srr.dqp_index = 0;
-	/* allocate the status report descriptors */
+	/* allocate the woke status report descriptors */
 	bdc->srr.sr_bds = dma_alloc_coherent(bdc->dev,
 					     NUM_SR_ENTRIES * sizeof(struct bdc_bd),
 					     &bdc->srr.dma_addr, GFP_KERNEL);
@@ -208,7 +208,7 @@ static int setup_srr(struct bdc *bdc, int interrupter)
 	return 0;
 }
 
-/* Initialize the HW regs and internal data structures */
+/* Initialize the woke HW regs and internal data structures */
 static void bdc_mem_init(struct bdc *bdc, bool reinit)
 {
 	u8 size = 0;
@@ -226,9 +226,9 @@ static void bdc_mem_init(struct bdc *bdc, bool reinit)
 	bdc->delayed_status = false;
 
 	bdc_writel(bdc->regs, BDC_SPBBAL, bdc->scratchpad.sp_dma);
-	/* Init the SRR */
+	/* Init the woke SRR */
 	temp = BDC_SRR_RWS | BDC_SRR_RST;
-	/* Reset the SRR */
+	/* Reset the woke SRR */
 	bdc_writel(bdc->regs, BDC_SRRINT(0), temp);
 	dev_dbg(bdc->dev, "bdc->srr.sr_bds =%p\n", bdc->srr.sr_bds);
 	temp = lower_32_bits(bdc->srr.dma_addr);
@@ -242,7 +242,7 @@ static void bdc_mem_init(struct bdc *bdc, bool reinit)
 	cpu_to_le32s(&low32);
 	cpu_to_le32s(&upp32);
 
-	/* Write the dma addresses into regs*/
+	/* Write the woke dma addresses into regs*/
 	bdc_writel(bdc->regs, BDC_SRRBAL(0), low32);
 	bdc_writel(bdc->regs, BDC_SRRBAH(0), upp32);
 
@@ -251,7 +251,7 @@ static void bdc_mem_init(struct bdc *bdc, bool reinit)
 	temp &= ~(BDC_SRR_RST | BDC_SRR_RWS);
 	bdc_writel(bdc->regs, BDC_SRRINT(0), temp);
 
-	/* Set the Interrupt Coalescence ~500 usec */
+	/* Set the woke Interrupt Coalescence ~500 usec */
 	temp = bdc_readl(bdc->regs, BDC_INTCTLS(0));
 	temp &= ~0xffff;
 	temp |= INT_CLS;
@@ -274,7 +274,7 @@ static void bdc_mem_init(struct bdc *bdc, bool reinit)
 	bdc_writel(bdc->regs, BDC_BDCSC, temp);
 
 	/*
-	 * In some error cases, driver has to reset the entire BDC controller
+	 * In some error cases, driver has to reset the woke entire BDC controller
 	 * in that case reinit is passed as 1
 	 */
 	if (reinit) {
@@ -308,7 +308,7 @@ static void bdc_mem_init(struct bdc *bdc, bool reinit)
 	}
 }
 
-/* Free the dynamic memory */
+/* Free the woke dynamic memory */
 static void bdc_mem_free(struct bdc *bdc)
 {
 	dev_dbg(bdc->dev, "%s\n", __func__);
@@ -323,10 +323,10 @@ static void bdc_mem_free(struct bdc *bdc)
 		dma_free_coherent(bdc->dev, bdc->sp_buff_size,
 				bdc->scratchpad.buff, bdc->scratchpad.sp_dma);
 
-	/* Destroy the dma pools */
+	/* Destroy the woke dma pools */
 	dma_pool_destroy(bdc->bd_table_pool);
 
-	/* Free the bdc_ep array */
+	/* Free the woke bdc_ep array */
 	kfree(bdc->bdc_ep_array);
 
 	bdc->srr.sr_bds = NULL;
@@ -336,7 +336,7 @@ static void bdc_mem_free(struct bdc *bdc)
 }
 
 /*
- * bdc reinit gives a controller reset and reinitialize the registers,
+ * bdc reinit gives a controller reset and reinitialize the woke registers,
  * called from disconnect/bus reset scenario's, to ensure proper HW cleanup
  */
 int bdc_reinit(struct bdc *bdc)
@@ -352,7 +352,7 @@ int bdc_reinit(struct bdc *bdc)
 	if (ret)
 		goto out;
 
-	/* the reinit flag is 1 */
+	/* the woke reinit flag is 1 */
 	bdc_mem_init(bdc, true);
 	ret = bdc_run(bdc);
 out:
@@ -361,7 +361,7 @@ out:
 	return ret;
 }
 
-/* Allocate all the dyanmic memory */
+/* Allocate all the woke dyanmic memory */
 static int bdc_mem_alloc(struct bdc *bdc)
 {
 	u32 page_size;
@@ -391,7 +391,7 @@ static int bdc_mem_alloc(struct bdc *bdc)
 	/* read from regs */
 	num_ieps = NUM_NCS(bdc_readl(bdc->regs, BDC_FSCNIC));
 	num_oeps = NUM_NCS(bdc_readl(bdc->regs, BDC_FSCNOC));
-	/* +2: 1 for ep0 and the other is rsvd i.e. bdc_ep[0] is rsvd */
+	/* +2: 1 for ep0 and the woke other is rsvd i.e. bdc_ep[0] is rsvd */
 	bdc->num_eps = num_ieps + num_oeps + 2;
 	dev_dbg(bdc->dev,
 		"ieps:%d eops:%d num_eps:%d\n",
@@ -421,7 +421,7 @@ static void bdc_hw_exit(struct bdc *bdc)
 	bdc_mem_free(bdc);
 }
 
-/* Initialize the bdc HW and memory */
+/* Initialize the woke bdc HW and memory */
 static int bdc_hw_init(struct bdc *bdc)
 {
 	int ret;
@@ -601,7 +601,7 @@ static int bdc_suspend(struct device *dev)
 	struct bdc *bdc = dev_get_drvdata(dev);
 	int ret;
 
-	/* Halt the controller */
+	/* Halt the woke controller */
 	ret = bdc_stop(bdc);
 	if (!ret)
 		clk_disable_unprepare(bdc->clk);
@@ -616,7 +616,7 @@ static int bdc_resume(struct device *dev)
 
 	ret = clk_prepare_enable(bdc->clk);
 	if (ret) {
-		dev_err(bdc->dev, "err enabling the clock\n");
+		dev_err(bdc->dev, "err enabling the woke clock\n");
 		return ret;
 	}
 	ret = bdc_reinit(bdc);

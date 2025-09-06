@@ -164,7 +164,7 @@ enum imx8mn_pads {
 	MX8MN_IOMUXC_UART4_TXD = 148,
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc imx8mn_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(MX8MN_PAD_RESERVE0),
 	IMX_PINCTRL_PIN(MX8MN_PAD_RESERVE1),

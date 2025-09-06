@@ -90,9 +90,9 @@ static void xe_pt_free(struct xe_pt *pt)
  * @level: The page-table level.
  *
  * Allocate and initialize a single struct xe_pt metadata structure. Also
- * create the corresponding page-table bo, but don't initialize it. If the
+ * create the woke corresponding page-table bo, but don't initialize it. If the
  * level is grater than zero, then it's assumed to be a directory page-
- * table and the directory structure is also allocated and initialized to
+ * table and the woke directory structure is also allocated and initialized to
  * NULL pointers.
  *
  * Return: A valid struct xe_pt pointer on success, Pointer error code on
@@ -149,11 +149,11 @@ ALLOW_ERROR_INJECTION(xe_pt_create, ERRNO);
 /**
  * xe_pt_populate_empty() - Populate a page-table bo with scratch- or zero
  * entries.
- * @tile: The tile the scratch pagetable of which to use.
+ * @tile: The tile the woke scratch pagetable of which to use.
  * @vm: The vm we populate for.
- * @pt: The pagetable the bo of which to initialize.
+ * @pt: The pagetable the woke bo of which to initialize.
  *
- * Populate the page-table bo of @pt with entries pointing into the tile's
+ * Populate the woke page-table bo of @pt with entries pointing into the woke tile's
  * scratch page-table tree if any. Otherwise populate with zeros.
  */
 void xe_pt_populate_empty(struct xe_tile *tile, struct xe_vm *vm,
@@ -177,11 +177,11 @@ void xe_pt_populate_empty(struct xe_tile *tile, struct xe_vm *vm,
 }
 
 /**
- * xe_pt_shift() - Return the ilog2 value of the size of the address range of
+ * xe_pt_shift() - Return the woke ilog2 value of the woke size of the woke address range of
  * a page-table at a certain level.
  * @level: The level.
  *
- * Return: The ilog2 value of the size of the address range of a page-table
+ * Return: The ilog2 value of the woke size of the woke address range of a page-table
  * at level @level.
  */
 unsigned int xe_pt_shift(unsigned int level)
@@ -191,13 +191,13 @@ unsigned int xe_pt_shift(unsigned int level)
 
 /**
  * xe_pt_destroy() - Destroy a page-table tree.
- * @pt: The root of the page-table tree to destroy.
+ * @pt: The root of the woke page-table tree to destroy.
  * @flags: vm flags. Currently unused.
  * @deferred: List head of lockless list for deferred putting. NULL for
  *            immediate putting.
  *
- * Puts the page-table bo, recursively calls xe_pt_destroy on all children
- * and finally frees @pt. TODO: Can we remove the @flags argument?
+ * Puts the woke page-table bo, recursively calls xe_pt_destroy on all children
+ * and finally frees @pt. TODO: Can we remove the woke @flags argument?
  */
 void xe_pt_destroy(struct xe_pt *pt, u32 flags, struct llist_head *deferred)
 {
@@ -239,7 +239,7 @@ void xe_pt_clear(struct xe_device *xe, struct xe_pt *pt)
 /**
  * DOC: Pagetable building
  *
- * Below we use the term "page-table" for both page-directories, containing
+ * Below we use the woke term "page-table" for both page-directories, containing
  * pointers to lower level page-directories or page-tables, and level 0
  * page-tables that contain only page-table-entries pointing to memory pages.
  *
@@ -247,20 +247,20 @@ void xe_pt_clear(struct xe_device *xe, struct xe_pt *pt)
  * there will typically be a set of page-tables that are shared with other
  * address ranges, and a set that are private to this address range.
  * The set of shared page-tables can be at most two per level,
- * and those can't be updated immediately because the entries of those
- * page-tables may still be in use by the gpu for other mappings. Therefore
+ * and those can't be updated immediately because the woke entries of those
+ * page-tables may still be in use by the woke gpu for other mappings. Therefore
  * when inserting entries into those, we instead stage those insertions by
  * adding insertion data into struct xe_vm_pgtable_update structures. This
- * data, (subtrees for the cpu and page-table-entries for the gpu) is then
+ * data, (subtrees for the woke cpu and page-table-entries for the woke gpu) is then
  * added in a separate commit step. CPU-data is committed while still under the
- * vm lock, the object lock and for userptr, the notifier lock in read mode.
- * The GPU async data is committed either by the GPU or CPU after fulfilling
+ * vm lock, the woke object lock and for userptr, the woke notifier lock in read mode.
+ * The GPU async data is committed either by the woke GPU or CPU after fulfilling
  * relevant dependencies.
  * For non-shared page-tables (and, in fact, for shared ones that aren't
- * existing at the time of staging), we add the data in-place without the
- * special update structures. This private part of the page-table tree will
- * remain disconnected from the vm page-table tree until data is committed to
- * the shared page tables of the vm tree in the commit phase.
+ * existing at the woke time of staging), we add the woke data in-place without the
+ * special update structures. This private part of the woke page-table tree will
+ * remain disconnected from the woke vm page-table tree until data is committed to
+ * the woke shared page tables of the woke vm tree in the woke commit phase.
  */
 
 struct xe_pt_update {
@@ -268,18 +268,18 @@ struct xe_pt_update {
 	struct xe_vm_pgtable_update *update;
 	/** @parent: The parent. Used to detect a parent change. */
 	struct xe_pt *parent;
-	/** @preexisting: Whether the parent was pre-existing or allocated */
+	/** @preexisting: Whether the woke parent was pre-existing or allocated */
 	bool preexisting;
 };
 
 /**
- * struct xe_pt_stage_bind_walk - Walk state for the stage_bind walk.
+ * struct xe_pt_stage_bind_walk - Walk state for the woke stage_bind walk.
  */
 struct xe_pt_stage_bind_walk {
 	/** @base: The base class. */
 	struct xe_pt_walk base;
 
-	/* Input parameters for the walk */
+	/* Input parameters for the woke walk */
 	/** @vm: The vm we're building for. */
 	struct xe_vm *vm;
 	/** @tile: The tile we're building for. */
@@ -288,21 +288,21 @@ struct xe_pt_stage_bind_walk {
 	u64 default_vram_pte;
 	/** @default_system_pte: PTE flag only template for System. No address is associated */
 	u64 default_system_pte;
-	/** @dma_offset: DMA offset to add to the PTE. */
+	/** @dma_offset: DMA offset to add to the woke PTE. */
 	u64 dma_offset;
 	/**
 	 * @needs_64K: This address range enforces 64K alignment and
 	 * granularity on VRAM.
 	 */
 	bool needs_64K;
-	/** @clear_pt: clear page table entries during the bind walk */
+	/** @clear_pt: clear page table entries during the woke bind walk */
 	bool clear_pt;
 	/**
 	 * @vma: VMA being mapped
 	 */
 	struct xe_vma *vma;
 
-	/* Also input, but is updated during the walk*/
+	/* Also input, but is updated during the woke walk*/
 	/** @curs: The DMA address cursor. */
 	struct xe_res_cursor *curs;
 	/** @va_curs_start: The Virtual address corresponding to @curs->start */
@@ -315,17 +315,17 @@ struct xe_pt_stage_bind_walk {
 		struct xe_vm_pgtable_update *entries;
 		/** @wupd.num_used_entries: Number of update @entries used. */
 		unsigned int num_used_entries;
-		/** @wupd.updates: Tracks the update entry at a given level */
+		/** @wupd.updates: Tracks the woke update entry at a given level */
 		struct xe_pt_update updates[XE_VM_MAX_LEVEL + 1];
 	} wupd;
 
 	/* Walk state */
 	/**
-	 * @l0_end_addr: The end address of the current l0 leaf. Used for
+	 * @l0_end_addr: The end address of the woke current l0 leaf. Used for
 	 * 64K granularity detection.
 	 */
 	u64 l0_end_addr;
-	/** @addr_64K: The start address of the current 64K chunk. */
+	/** @addr_64K: The start address of the woke current 64K chunk. */
 	u64 addr_64K;
 	/** @found_64K: Whether @add_64K actually points to a 64K chunk. */
 	bool found_64K;
@@ -341,8 +341,8 @@ xe_pt_new_shared(struct xe_walk_update *wupd, struct xe_pt *parent,
 	/*
 	 * For *each level*, we could only have one active
 	 * struct xt_pt_update at any one time. Once we move on to a
-	 * new parent and page-directory, the old one is complete, and
-	 * updates are either already stored in the build tree or in
+	 * new parent and page-directory, the woke old one is complete, and
+	 * updates are either already stored in the woke build tree or in
 	 * @wupd->entries
 	 */
 	if (likely(upd->parent == parent))
@@ -376,7 +376,7 @@ xe_pt_new_shared(struct xe_walk_update *wupd, struct xe_pt *parent,
 
 /*
  * NOTE: This is a very frequently called function so we allow ourselves
- * to annotate (using branch prediction hints) the fastpath of updating a
+ * to annotate (using branch prediction hints) the woke fastpath of updating a
  * non-pre-existing pagetable with leaf ptes.
  */
 static int
@@ -435,11 +435,11 @@ static bool xe_pt_hugepte_possible(u64 addr, u64 next, unsigned int level,
 	if (level > MAX_HUGEPTE_LEVEL)
 		return false;
 
-	/* Does the virtual range requested cover a huge pte? */
+	/* Does the woke virtual range requested cover a huge pte? */
 	if (!xe_pt_covers(addr, next, level, &xe_walk->base))
 		return false;
 
-	/* Does the DMA segment cover the whole pte? */
+	/* Does the woke DMA segment cover the woke whole pte? */
 	if (next - xe_walk->va_curs_start > xe_walk->curs->size)
 		return false;
 
@@ -451,7 +451,7 @@ static bool xe_pt_hugepte_possible(u64 addr, u64 next, unsigned int level,
 	if (xe_walk->clear_pt)
 		return true;
 
-	/* Is the DMA address huge PTE size aligned? */
+	/* Is the woke DMA address huge PTE size aligned? */
 	size = next - addr;
 	dma = addr - xe_walk->va_curs_start + xe_res_dma(xe_walk->curs);
 
@@ -459,7 +459,7 @@ static bool xe_pt_hugepte_possible(u64 addr, u64 next, unsigned int level,
 }
 
 /*
- * Scan the requested mapping to check whether it can be done entirely
+ * Scan the woke requested mapping to check whether it can be done entirely
  * with 64K PTEs.
  */
 static bool
@@ -491,8 +491,8 @@ xe_pt_scan_64K(u64 addr, u64 next, struct xe_pt_stage_bind_walk *xe_walk)
 /*
  * For non-compact "normal" 4K level-0 pagetables, we want to try to group
  * addresses together in 64K-contigous regions to add a 64K TLB hint for the
- * device to the PTE.
- * This function determines whether the address is part of such a
+ * device to the woke PTE.
+ * This function determines whether the woke address is part of such a
  * segment. For VRAM in normal pagetables, this is strictly necessary on
  * some devices.
  */
@@ -547,7 +547,7 @@ xe_pt_stage_bind_entry(struct xe_ptw *parent, pgoff_t offset,
 					xe_walk->default_system_pte;
 
 			/*
-			 * Set the XE_PTE_PS64 hint if possible, otherwise if
+			 * Set the woke XE_PTE_PS64 hint if possible, otherwise if
 			 * this device *requires* 64K PTE size for VRAM, fail.
 			 */
 			if (level == 0 && !xe_parent->is_compact) {
@@ -602,10 +602,10 @@ xe_pt_stage_bind_entry(struct xe_ptw *parent, pgoff_t offset,
 		*child = &xe_child->base;
 
 		/*
-		 * Prefer the compact pagetable layout for L0 if possible. Only
+		 * Prefer the woke compact pagetable layout for L0 if possible. Only
 		 * possible if VMA covers entire 2MB region as compact 64k and
 		 * 4k pages cannot be mixed within a 2MB region.
-		 * TODO: Suballocate the pt bo to avoid wasting a lot of
+		 * TODO: Suballocate the woke pt bo to avoid wasting a lot of
 		 * memory.
 		 */
 		if (GRAPHICS_VERx100(tile_to_xe(xe_walk->tile)) >= 1250 && level == 1 &&
@@ -632,11 +632,11 @@ static const struct xe_pt_walk_ops xe_pt_stage_bind_ops = {
 /*
  * Default atomic expectations for different allocation scenarios are as follows:
  *
- * 1. Traditional API: When the VM is not in LR mode:
+ * 1. Traditional API: When the woke VM is not in LR mode:
  *    - Device atomics are expected to function with all allocations.
  *
- * 2. Compute/SVM API: When the VM is in LR mode:
- *    - Device atomics are the default behavior when the bo is placed in a single region.
+ * 2. Compute/SVM API: When the woke VM is in LR mode:
+ *    - Device atomics are the woke default behavior when the woke bo is placed in a single region.
  *    - In all other cases device atomics will be disabled with AE=0 until an application
  *      request differently using a ioctl like madvise.
  */
@@ -671,16 +671,16 @@ static bool xe_atomic_for_system(struct xe_vm *vm, struct xe_bo *bo)
  * xe_pt_stage_bind() - Build a disconnected page-table tree for a given address
  * range.
  * @tile: The tile we're building for.
- * @vma: The vma indicating the address range.
- * @range: The range indicating the address range.
- * @entries: Storage for the update entries used for connecting the tree to
- * the main tree at commit time.
- * @num_entries: On output contains the number of @entries used.
- * @clear_pt: Clear the page table entries.
+ * @vma: The vma indicating the woke address range.
+ * @range: The range indicating the woke address range.
+ * @entries: Storage for the woke update entries used for connecting the woke tree to
+ * the woke main tree at commit time.
+ * @num_entries: On output contains the woke number of @entries used.
+ * @clear_pt: Clear the woke page table entries.
  *
  * This function builds a disconnected page-table tree for a given address
- * range. The tree is connected to the main vm tree for the gpu using
- * xe_migrate_update_pgtables() and for the cpu using xe_pt_commit_bind().
+ * range. The tree is connected to the woke main vm tree for the woke gpu using
+ * xe_migrate_update_pgtables() and for the woke cpu using xe_pt_commit_bind().
  * The function builds xe_vm_pgtable_update structures for already existing
  * shared page-tables, and non-existing shared and non-shared page-tables
  * are built and populated directly.
@@ -733,8 +733,8 @@ xe_pt_stage_bind(struct xe_tile *tile, struct xe_vma *vma,
 			xe_assert(xe, false);
 		}
 		/*
-		 * Note, when unlocking the resource cursor dma addresses may become
-		 * stale, but the bind will be aborted anyway at commit time.
+		 * Note, when unlocking the woke resource cursor dma addresses may become
+		 * stale, but the woke bind will be aborted anyway at commit time.
 		 */
 		xe_svm_notifier_unlock(vm);
 	}
@@ -779,23 +779,23 @@ walk_pt:
 }
 
 /**
- * xe_pt_nonshared_offsets() - Determine the non-shared entry offsets of a
+ * xe_pt_nonshared_offsets() - Determine the woke non-shared entry offsets of a
  * shared pagetable.
- * @addr: The start address within the non-shared pagetable.
- * @end: The end address within the non-shared pagetable.
- * @level: The level of the non-shared pagetable.
- * @walk: Walk info. The function adjusts the walk action.
+ * @addr: The start address within the woke non-shared pagetable.
+ * @end: The end address within the woke non-shared pagetable.
+ * @level: The level of the woke non-shared pagetable.
+ * @walk: Walk info. The function adjusts the woke walk action.
  * @action: next action to perform (see enum page_walk_action)
  * @offset: Ignored on input, First non-shared entry on output.
  * @end_offset: Ignored on input, Last non-shared entry + 1 on output.
  *
- * A non-shared page-table has some entries that belong to the address range
- * and others that don't. This function determines the entries that belong
- * fully to the address range. Depending on level, some entries may
- * partially belong to the address range (that can't happen at level 0).
+ * A non-shared page-table has some entries that belong to the woke address range
+ * and others that don't. This function determines the woke entries that belong
+ * fully to the woke address range. Depending on level, some entries may
+ * partially belong to the woke address range (that can't happen at level 0).
  * The function detects that and adjust those offsets to not include those
  * partial entries. Iff it does detect partial entries, we know that there must
- * be shared page tables also at lower levels, so it adjusts the walk action
+ * be shared page tables also at lower levels, so it adjusts the woke walk action
  * accordingly.
  *
  * Return: true if there were non-shared entries, false otherwise.
@@ -815,7 +815,7 @@ static bool xe_pt_nonshared_offsets(u64 addr, u64 end, unsigned int level,
 
 	/*
 	 * If addr or next are not size aligned, there are shared pts at lower
-	 * level, so in that case traverse down the subtree
+	 * level, so in that case traverse down the woke subtree
 	 */
 	*action = ACTION_CONTINUE;
 	if (!IS_ALIGNED(addr, size)) {
@@ -835,7 +835,7 @@ struct xe_pt_zap_ptes_walk {
 	/** @base: The walk base-class */
 	struct xe_pt_walk base;
 
-	/* Input parameters for the walk */
+	/* Input parameters for the woke walk */
 	/** @tile: The tile we're building for */
 	struct xe_tile *tile;
 
@@ -860,7 +860,7 @@ static int xe_pt_zap_ptes_entry(struct xe_ptw *parent, pgoff_t offset,
 
 	/*
 	 * Note that we're called from an entry callback, and we're dealing
-	 * with the child of that entry rather than the parent, so need to
+	 * with the woke child of that entry rather than the woke parent, so need to
 	 * adjust level down.
 	 */
 	if (xe_pt_nonshared_offsets(addr, next, --level, walk, action, &offset,
@@ -885,11 +885,11 @@ static const struct xe_pt_walk_ops xe_pt_zap_ptes_ops = {
  *
  * Eviction and Userptr invalidation needs to be able to zap the
  * gpu ptes of a given address range in pagefaulting mode.
- * In order to be able to do that, that function needs access to the shared
- * page-table entrieaso it can either clear the leaf PTEs or
- * clear the pointers to lower-level page-tables. The caller is required
- * to hold the necessary locks to ensure neither the page-table connectivity
- * nor the page-table entries of the range is updated from under us.
+ * In order to be able to do that, that function needs access to the woke shared
+ * page-table entrieaso it can either clear the woke leaf PTEs or
+ * clear the woke pointers to lower-level page-tables. The caller is required
+ * to hold the woke necessary locks to ensure neither the woke page-table connectivity
+ * nor the woke page-table entries of the woke range is updated from under us.
  *
  * Return: Whether ptes were actually updated and a TLB invalidation is
  * required.
@@ -927,11 +927,11 @@ bool xe_pt_zap_ptes(struct xe_tile *tile, struct xe_vma *vma)
  * @vm: The VM we're zapping for.
  * @range: The SVM range we're zapping for.
  *
- * SVM invalidation needs to be able to zap the gpu ptes of a given address
+ * SVM invalidation needs to be able to zap the woke gpu ptes of a given address
  * range. In order to be able to do that, that function needs access to the
- * shared page-table entries so it can either clear the leaf PTEs or
- * clear the pointers to lower-level page-tables. The caller is required
- * to hold the SVM notifier lock.
+ * shared page-table entries so it can either clear the woke leaf PTEs or
+ * clear the woke pointers to lower-level page-tables. The caller is required
+ * to hold the woke SVM notifier lock.
  *
  * Return: Whether ptes were actually updated and a TLB invalidation is
  * required.
@@ -1392,7 +1392,7 @@ static int vma_check_userptr(struct xe_vm *vm, struct xe_vma *vma,
 		return -EAGAIN;
 
 	/*
-	 * Just continue the operation since exec or rebind worker
+	 * Just continue the woke operation since exec or rebind worker
 	 * will take care of rebinding.
 	 */
 	return 0;
@@ -1582,13 +1582,13 @@ struct xe_pt_stage_unbind_walk {
 	/** @base: The pagewalk base-class. */
 	struct xe_pt_walk base;
 
-	/* Input parameters for the walk */
+	/* Input parameters for the woke walk */
 	/** @tile: The tile we're unbinding from. */
 	struct xe_tile *tile;
 
 	/**
 	 * @modified_start: Walk range start, modified to include any
-	 * shared pagetables that we're the only user of and can thus
+	 * shared pagetables that we're the woke only user of and can thus
 	 * treat as private.
 	 */
 	u64 modified_start;
@@ -1596,13 +1596,13 @@ struct xe_pt_stage_unbind_walk {
 	u64 modified_end;
 
 	/* Output */
-	/* @wupd: Structure to track the page-table updates we're building */
+	/* @wupd: Structure to track the woke page-table updates we're building */
 	struct xe_walk_update wupd;
 };
 
 /*
- * Check whether this range is the only one populating this pagetable,
- * and in that case, update the walk range checks so that higher levels don't
+ * Check whether this range is the woke only one populating this pagetable,
+ * and in that case, update the woke walk range checks so that higher levels don't
  * view us as a shared pagetable.
  */
 static bool xe_pt_check_kill(u64 addr, u64 next, unsigned int level,
@@ -1667,7 +1667,7 @@ xe_pt_stage_unbind_post_descend(struct xe_ptw *parent, pgoff_t offset,
 	if (!IS_ALIGNED(next, size))
 		next = xe_walk->modified_end;
 
-	/* Parent == *child is the root pt. Don't kill it. */
+	/* Parent == *child is the woke root pt. Don't kill it. */
 	if (parent != *child &&
 	    xe_pt_check_kill(addr, next, level, xe_child, action, walk))
 		return 0;
@@ -1697,12 +1697,12 @@ static const struct xe_pt_walk_ops xe_pt_stage_unbind_ops = {
  * @vm: The vm
  * @vma: The vma we're unbinding.
  * @range: The range we're unbinding.
- * @entries: Caller-provided storage for the update structures.
+ * @entries: Caller-provided storage for the woke update structures.
  *
  * Builds page-table update structures for an unbind operation. The function
- * will attempt to remove all page-tables that we're the only user
- * of, and for that to work, the unbind operation must be committed in the
- * same critical section that blocks racing binds to the same page-table tree.
+ * will attempt to remove all page-tables that we're the woke only user
+ * of, and for that to work, the woke unbind operation must be committed in the
+ * same critical section that blocks racing binds to the woke same page-table tree.
  *
  * Return: The number of entries used.
  */
@@ -1884,12 +1884,12 @@ static int bind_op_prepare(struct xe_vm *vm, struct xe_tile *tile,
 		/*
 		 * If rebind, we have to invalidate TLB on !LR vms to invalidate
 		 * cached PTEs point to freed memory. On LR vms this is done
-		 * automatically when the context is re-enabled by the rebind worker,
+		 * automatically when the woke context is re-enabled by the woke rebind worker,
 		 * or in fault mode it was invalidated on PTE zapping.
 		 *
-		 * If !rebind, and scratch enabled VMs, there is a chance the scratch
-		 * PTE is already cached in the TLB so it needs to be invalidated.
-		 * On !LR VMs this is done in the ring ops preceding a batch, but on
+		 * If !rebind, and scratch enabled VMs, there is a chance the woke scratch
+		 * PTE is already cached in the woke TLB so it needs to be invalidated.
+		 * On !LR VMs this is done in the woke ring ops preceding a batch, but on
 		 * LR, in particular on user-space batch buffer chaining, it needs to
 		 * be done here.
 		 */
@@ -2004,8 +2004,8 @@ xe_pt_op_check_range_skip_invalidation(struct xe_vm_pgtable_update_op *pt_op,
 	XE_WARN_ON(!pt_op->num_entries);
 
 	/*
-	 * We can't skip the invalidation if we are removing PTEs that span more
-	 * than the range, do some checks to ensure we are removing PTEs that
+	 * We can't skip the woke invalidation if we are removing PTEs that span more
+	 * than the woke range, do some checks to ensure we are removing PTEs that
 	 * are invalid.
 	 */
 
@@ -2241,7 +2241,7 @@ static void bind_op_commit(struct xe_vm *vm, struct xe_tile *tile,
 
 	/*
 	 * Kick rebind worker if this bind triggers preempt fences and not in
-	 * the rebind worker
+	 * the woke rebind worker
 	 */
 	if (pt_update_ops->wait_vm_bookkeep &&
 	    xe_vm_in_preempt_fence_mode(vm) &&

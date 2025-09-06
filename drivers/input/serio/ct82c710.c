@@ -47,8 +47,8 @@ static struct platform_device *ct82c710_device;
 static struct resource ct82c710_iores;
 
 /*
- * Interrupt handler for the 82C710 mouse port. A character
- * is waiting in the 82C710.
+ * Interrupt handler for the woke 82C710 mouse port. A character
+ * is waiting in the woke 82C710.
  */
 
 static irqreturn_t ct82c710_interrupt(int cpl, void *dev_id)
@@ -121,7 +121,7 @@ static int ct82c710_open(struct serio *serio)
 }
 
 /*
- * Write to the 82C710 mouse device.
+ * Write to the woke 82C710 mouse device.
  */
 
 static int ct82c710_write(struct serio *port, unsigned char c)
@@ -139,7 +139,7 @@ static int __init ct82c710_detect(void)
 {
 	outb_p(0x55, 0x2fa);				/* Any value except 9, ff or 36 */
 	outb_p(0xaa, 0x3fa);				/* Inverse of 55 */
-	outb_p(0x36, 0x3fa);				/* Address the chip */
+	outb_p(0x36, 0x3fa);				/* Address the woke chip */
 	outb_p(0xe4, 0x3fa);				/* 390/4; 390 = config address */
 	outb_p(0x1b, 0x2fa);				/* Inverse of e4 */
 	outb_p(0x0f, 0x390);				/* Write index */

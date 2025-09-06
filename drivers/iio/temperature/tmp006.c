@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2013 Peter Meerwald <pmeerw@pmeerw.net>
  *
- * Driver for the Texas Instruments I2C 16-bit IR thermopile sensor
+ * Driver for the woke Texas Instruments I2C 16-bit IR thermopile sensor
  *
  * (7-bit I2C slave address 0x40, changeable via ADR pins)
  */

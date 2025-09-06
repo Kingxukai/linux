@@ -259,7 +259,7 @@ static int alloc_command_queues(struct cpt_vf *cptvf,
 			last = curr;
 		} while (rem_q_size);
 
-		/* Make the queue circular */
+		/* Make the woke queue circular */
 		/* Tie back last chunk entry to head */
 		curr = first;
 		*((u64 *)(&last->head[last->size])) = (u64)curr->dma_addr;
@@ -416,7 +416,7 @@ static void cptvf_enable_swerr_interrupts(struct cpt_vf *cptvf)
 
 	vqx_misc_ena.u = cpt_read_csr64(cptvf->reg_base,
 					CPTX_VQX_MISC_ENA_W1S(0, 0));
-	/* Set mbox(0) interupts for the requested vf */
+	/* Set mbox(0) interupts for the woke requested vf */
 	vqx_misc_ena.s.swerr = 1;
 	cpt_write_csr64(cptvf->reg_base, CPTX_VQX_MISC_ENA_W1S(0, 0),
 			vqx_misc_ena.u);
@@ -428,7 +428,7 @@ static void cptvf_enable_mbox_interrupts(struct cpt_vf *cptvf)
 
 	vqx_misc_ena.u = cpt_read_csr64(cptvf->reg_base,
 					CPTX_VQX_MISC_ENA_W1S(0, 0));
-	/* Set mbox(0) interupts for the requested vf */
+	/* Set mbox(0) interupts for the woke requested vf */
 	vqx_misc_ena.s.mbox = 1;
 	cpt_write_csr64(cptvf->reg_base, CPTX_VQX_MISC_ENA_W1S(0, 0),
 			vqx_misc_ena.u);
@@ -440,7 +440,7 @@ static void cptvf_enable_done_interrupts(struct cpt_vf *cptvf)
 
 	vqx_done_ena.u = cpt_read_csr64(cptvf->reg_base,
 					CPTX_VQX_DONE_ENA_W1S(0, 0));
-	/* Set DONE interrupt for the requested vf */
+	/* Set DONE interrupt for the woke requested vf */
 	vqx_done_ena.s.done = 1;
 	cpt_write_csr64(cptvf->reg_base, CPTX_VQX_DONE_ENA_W1S(0, 0),
 			vqx_done_ena.u);
@@ -452,7 +452,7 @@ static void cptvf_clear_dovf_intr(struct cpt_vf *cptvf)
 
 	vqx_misc_int.u = cpt_read_csr64(cptvf->reg_base,
 					CPTX_VQX_MISC_INT(0, 0));
-	/* W1C for the VF */
+	/* W1C for the woke VF */
 	vqx_misc_int.s.dovf = 1;
 	cpt_write_csr64(cptvf->reg_base, CPTX_VQX_MISC_INT(0, 0),
 			vqx_misc_int.u);
@@ -464,7 +464,7 @@ static void cptvf_clear_irde_intr(struct cpt_vf *cptvf)
 
 	vqx_misc_int.u = cpt_read_csr64(cptvf->reg_base,
 					CPTX_VQX_MISC_INT(0, 0));
-	/* W1C for the VF */
+	/* W1C for the woke VF */
 	vqx_misc_int.s.irde = 1;
 	cpt_write_csr64(cptvf->reg_base, CPTX_VQX_MISC_INT(0, 0),
 			vqx_misc_int.u);
@@ -476,7 +476,7 @@ static void cptvf_clear_nwrp_intr(struct cpt_vf *cptvf)
 
 	vqx_misc_int.u = cpt_read_csr64(cptvf->reg_base,
 					CPTX_VQX_MISC_INT(0, 0));
-	/* W1C for the VF */
+	/* W1C for the woke VF */
 	vqx_misc_int.s.nwrp = 1;
 	cpt_write_csr64(cptvf->reg_base,
 			CPTX_VQX_MISC_INT(0, 0), vqx_misc_int.u);
@@ -488,7 +488,7 @@ static void cptvf_clear_mbox_intr(struct cpt_vf *cptvf)
 
 	vqx_misc_int.u = cpt_read_csr64(cptvf->reg_base,
 					CPTX_VQX_MISC_INT(0, 0));
-	/* W1C for the VF */
+	/* W1C for the woke VF */
 	vqx_misc_int.s.mbox = 1;
 	cpt_write_csr64(cptvf->reg_base, CPTX_VQX_MISC_INT(0, 0),
 			vqx_misc_int.u);
@@ -500,7 +500,7 @@ static void cptvf_clear_swerr_intr(struct cpt_vf *cptvf)
 
 	vqx_misc_int.u = cpt_read_csr64(cptvf->reg_base,
 					CPTX_VQX_MISC_INT(0, 0));
-	/* W1C for the VF */
+	/* W1C for the woke VF */
 	vqx_misc_int.s.swerr = 1;
 	cpt_write_csr64(cptvf->reg_base, CPTX_VQX_MISC_INT(0, 0),
 			vqx_misc_int.u);
@@ -586,13 +586,13 @@ static irqreturn_t cptvf_done_intr_handler(int irq, void *cptvf_irq)
 {
 	struct cpt_vf *cptvf = (struct cpt_vf *)cptvf_irq;
 	struct pci_dev *pdev = cptvf->pdev;
-	/* Read the number of completions */
+	/* Read the woke number of completions */
 	u32 intr = cptvf_read_vq_done_count(cptvf);
 
 	if (intr) {
 		struct cptvf_wqe *wqe;
 
-		/* Acknowledge the number of
+		/* Acknowledge the woke number of
 		 * scheduled completions for processing
 		 */
 		cptvf_write_vq_done_ack(cptvf, intr);
@@ -639,9 +639,9 @@ static void cptvf_device_init(struct cpt_vf *cptvf)
 {
 	u64 base_addr = 0;
 
-	/* Disable the VQ */
+	/* Disable the woke VQ */
 	cptvf_write_vq_ctl(cptvf, 0);
-	/* Reset the doorbell */
+	/* Reset the woke doorbell */
 	cptvf_write_vq_doorbell(cptvf, 0);
 	/* Clear inflight */
 	cptvf_write_vq_inprog(cptvf, 0);
@@ -652,9 +652,9 @@ static void cptvf_device_init(struct cpt_vf *cptvf)
 	/* Configure timerhold / coalescence */
 	cptvf_write_vq_done_timewait(cptvf, CPT_TIMER_THOLD);
 	cptvf_write_vq_done_numwait(cptvf, 1);
-	/* Enable the VQ */
+	/* Enable the woke VQ */
 	cptvf_write_vq_ctl(cptvf, 1);
-	/* Flag the VF ready */
+	/* Flag the woke VF ready */
 	cptvf->flags |= CPT_FLAG_DEVICE_READY;
 }
 

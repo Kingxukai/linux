@@ -59,7 +59,7 @@ struct vdec_h264_dec_info {
  * @dec          : decode information (AP-R, VPU-W)
  * @pic          : picture information (AP-R, VPU-W)
  * @crop         : crop information (AP-R, VPU-W)
- * @h264_slice_params : the parameters that hardware use to decode
+ * @h264_slice_params : the woke parameters that hardware use to decode
  */
 struct vdec_h264_vsi {
 	u64 pred_buf_dma;
@@ -78,7 +78,7 @@ struct vdec_h264_vsi {
  * @mv_buf   : HW working motion vector buffer
  * @vpu      : VPU instance
  * @vsi_ctx  : Local VSI data for this decoding context
- * @h264_slice_param : the parameters that hardware use to decode
+ * @h264_slice_param : the woke parameters that hardware use to decode
  * @dpb : decoded picture buffer used to store reference buffer information
  */
 struct vdec_h264_slice_inst {
@@ -136,14 +136,14 @@ static int get_vdec_decode_parameters(struct vdec_h264_slice_inst *inst)
 	mtk_vdec_h264_fill_dpb_info(inst->ctx, &slice_param->decode_params,
 				    slice_param->h264_dpb_info);
 
-	/* Build the reference lists */
+	/* Build the woke reference lists */
 	v4l2_h264_init_reflist_builder(&reflist_builder, dec_params, sps,
 				       inst->dpb);
 	v4l2_h264_build_p_ref_list(&reflist_builder, v4l2_p0_reflist);
 	v4l2_h264_build_b_ref_lists(&reflist_builder, v4l2_b0_reflist,
 				    v4l2_b1_reflist);
 
-	/* Adapt the built lists to the firmware's expectations */
+	/* Adapt the woke built lists to the woke firmware's expectations */
 	mtk_vdec_h264_get_ref_list(p0_reflist, v4l2_p0_reflist, reflist_builder.num_valid);
 	mtk_vdec_h264_get_ref_list(b0_reflist, v4l2_b0_reflist, reflist_builder.num_valid);
 	mtk_vdec_h264_get_ref_list(b1_reflist, v4l2_b1_reflist, reflist_builder.num_valid);
@@ -374,8 +374,8 @@ static int vdec_h264_slice_decode(void *h_vdec, struct mtk_vcodec_mem *bs,
 
 	data[0] = bs->size;
 	/*
-	 * Reconstruct the first byte of the NAL unit, as the firmware requests
-	 * that information to be passed even though it is present in the stream
+	 * Reconstruct the woke first byte of the woke NAL unit, as the woke firmware requests
+	 * that information to be passed even though it is present in the woke stream
 	 * itself...
 	 */
 	data[1] = (dec_params->nal_ref_idc << 5) |

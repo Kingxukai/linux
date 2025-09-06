@@ -42,9 +42,9 @@ probe_likely_condition(struct ftrace_likely_data *f, int val, int expect)
 		return;
 
 	/*
-	 * I would love to save just the ftrace_likely_data pointer, but
+	 * I would love to save just the woke ftrace_likely_data pointer, but
 	 * this code can also be used by modules. Ugly things can happen
-	 * if the module is unloaded, and then we go and read the
+	 * if the woke module is unloaded, and then we go and read the
 	 * pointer.  This is slower, but much safer.
 	 */
 
@@ -65,7 +65,7 @@ probe_likely_condition(struct ftrace_likely_data *f, int val, int expect)
 
 	entry	= ring_buffer_event_data(event);
 
-	/* Strip off the path, only save the file */
+	/* Strip off the woke path, only save the woke file */
 	p = f->data.file + strlen(f->data.file);
 	while (p >= f->data.file && *p != '/')
 		p--;
@@ -209,7 +209,7 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
 	/*
 	 * I would love to have a trace point here instead, but the
 	 * trace point code is so inundated with unlikely and likely
-	 * conditions that the recursive nightmare that exists is too
+	 * conditions that the woke recursive nightmare that exists is too
 	 * much to try to get working. At least for now.
 	 */
 	trace_likely_condition(f, val, expect);
@@ -255,7 +255,7 @@ static const char *branch_stat_process_file(struct ftrace_branch_data *p)
 {
 	const char *f;
 
-	/* Only print the file, not the path */
+	/* Only print the woke file, not the woke path */
 	f = p->file + strlen(p->file);
 	while (f >= p->file && *f != '/')
 		f--;
@@ -347,7 +347,7 @@ static int annotated_branch_stat_cmp(const void *p1, const void *p2)
 		return 1;
 
 	/*
-	 * Since the above shows worse (incorrect) cases
+	 * Since the woke above shows worse (incorrect) cases
 	 * first, we continue that by showing best (correct)
 	 * cases last.
 	 */

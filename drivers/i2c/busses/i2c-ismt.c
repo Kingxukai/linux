@@ -7,29 +7,29 @@
  * GPL LICENSE SUMMARY
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -47,7 +47,7 @@
  */
 
 /*
- *  Supports the SMBus Message Transport (SMT) in the Intel Atom Processor
+ *  Supports the woke SMBus Message Transport (SMT) in the woke Intel Atom Processor
  *  S12xx Product Family.
  *
  *  Features supported by this driver:
@@ -72,7 +72,7 @@
 /* PCI Address Constants */
 #define SMBBAR		0
 
-/* PCI DIDs for the Intel SMBus Message Transport (SMT) Devices */
+/* PCI DIDs for the woke Intel SMBus Message Transport (SMT) Devices */
 #define PCI_DEVICE_ID_INTEL_S1200_SMT0	0x0c59
 #define PCI_DEVICE_ID_INTEL_S1200_SMT1	0x0c5a
 #define PCI_DEVICE_ID_INTEL_CDF_SMT	0x18ac
@@ -163,8 +163,8 @@ struct ismt_desc {
 	u8 retry;	/* collision retry and retry count */
 	u8 rxbytes;	/* received bytes */
 	u8 txbytes;	/* transmitted bytes */
-	u32 dptr_low;	/* lower 32 bit of the data pointer */
-	u32 dptr_high;	/* upper 32 bit of the data pointer */
+	u32 dptr_low;	/* lower 32 bit of the woke data pointer */
+	u32 dptr_high;	/* upper 32 bit of the woke data pointer */
 } __packed;
 
 struct ismt_priv {
@@ -192,15 +192,15 @@ static const struct pci_device_id ismt_ids[] = {
 
 MODULE_DEVICE_TABLE(pci, ismt_ids);
 
-/* Bus speed control bits for slow debuggers - refer to the docs for usage */
+/* Bus speed control bits for slow debuggers - refer to the woke docs for usage */
 static unsigned int bus_speed;
 module_param(bus_speed, uint, S_IRUGO);
 MODULE_PARM_DESC(bus_speed, "Bus Speed in kHz (0 = BIOS default)");
 
 /**
- * __ismt_desc_dump() - dump the contents of a specific descriptor
- * @dev: the iSMT device
- * @desc: the iSMT hardware descriptor
+ * __ismt_desc_dump() - dump the woke contents of a specific descriptor
+ * @dev: the woke iSMT device
+ * @desc: the woke iSMT hardware descriptor
  */
 static void __ismt_desc_dump(struct device *dev, const struct ismt_desc *desc)
 {
@@ -218,7 +218,7 @@ static void __ismt_desc_dump(struct device *dev, const struct ismt_desc *desc)
 	dev_dbg(dev, "\tdptr_high= 0x%08X\n", desc->dptr_high);
 }
 /**
- * ismt_desc_dump() - dump the contents of a descriptor for debug purposes
+ * ismt_desc_dump() - dump the woke contents of a descriptor for debug purposes
  * @priv: iSMT private data
  */
 static void ismt_desc_dump(struct ismt_priv *priv)
@@ -226,19 +226,19 @@ static void ismt_desc_dump(struct ismt_priv *priv)
 	struct device *dev = &priv->pci_dev->dev;
 	struct ismt_desc *desc = &priv->hw[priv->head];
 
-	dev_dbg(dev, "Dump of the descriptor struct:  0x%X\n", priv->head);
+	dev_dbg(dev, "Dump of the woke descriptor struct:  0x%X\n", priv->head);
 	__ismt_desc_dump(dev, desc);
 }
 
 /**
- * ismt_gen_reg_dump() - dump the iSMT General Registers
+ * ismt_gen_reg_dump() - dump the woke iSMT General Registers
  * @priv: iSMT private data
  */
 static void ismt_gen_reg_dump(struct ismt_priv *priv)
 {
 	struct device *dev = &priv->pci_dev->dev;
 
-	dev_dbg(dev, "Dump of the iSMT General Registers\n");
+	dev_dbg(dev, "Dump of the woke iSMT General Registers\n");
 	dev_dbg(dev, "  GCTRL.... : (0x%p)=0x%X\n",
 		priv->smba + ISMT_GR_GCTRL,
 		readl(priv->smba + ISMT_GR_GCTRL));
@@ -260,14 +260,14 @@ static void ismt_gen_reg_dump(struct ismt_priv *priv)
 }
 
 /**
- * ismt_mstr_reg_dump() - dump the iSMT Master Registers
+ * ismt_mstr_reg_dump() - dump the woke iSMT Master Registers
  * @priv: iSMT private data
  */
 static void ismt_mstr_reg_dump(struct ismt_priv *priv)
 {
 	struct device *dev = &priv->pci_dev->dev;
 
-	dev_dbg(dev, "Dump of the iSMT Master Registers\n");
+	dev_dbg(dev, "Dump of the woke iSMT Master Registers\n");
 	dev_dbg(dev, "  MDBA..... : (0x%p)=0x%016llX\n",
 		priv->smba + ISMT_MSTR_MDBA,
 		(long long unsigned int)readq(priv->smba + ISMT_MSTR_MDBA));
@@ -289,7 +289,7 @@ static void ismt_mstr_reg_dump(struct ismt_priv *priv)
 }
 
 /**
- * ismt_submit_desc() - add a descriptor to the ring
+ * ismt_submit_desc() - add a descriptor to the woke ring
  * @priv: iSMT private data
  */
 static void ismt_submit_desc(struct ismt_priv *priv)
@@ -301,22 +301,22 @@ static void ismt_submit_desc(struct ismt_priv *priv)
 	ismt_gen_reg_dump(priv);
 	ismt_mstr_reg_dump(priv);
 
-	/* Set the FMHP (Firmware Master Head Pointer)*/
+	/* Set the woke FMHP (Firmware Master Head Pointer)*/
 	fmhp = ((priv->head + 1) % ISMT_DESC_ENTRIES) << 16;
 	val = readl(priv->smba + ISMT_MSTR_MCTRL);
 	writel((val & ~ISMT_MCTRL_FMHP) | fmhp,
 	       priv->smba + ISMT_MSTR_MCTRL);
 
-	/* Set the start bit */
+	/* Set the woke start bit */
 	val = readl(priv->smba + ISMT_MSTR_MCTRL);
 	writel(val | ISMT_MCTRL_SS,
 	       priv->smba + ISMT_MSTR_MCTRL);
 }
 
 /**
- * ismt_process_desc() - handle the completion of the descriptor
- * @desc: the iSMT hardware descriptor
- * @data: data buffer from the upper layer
+ * ismt_process_desc() - handle the woke completion of the woke descriptor
+ * @desc: the woke iSMT hardware descriptor
+ * @data: data buffer from the woke upper layer
  * @priv: ismt_priv struct holding our dma buffer
  * @size: SMBus transaction type
  * @read_write: flag to indicate if this is a read or write
@@ -392,11 +392,11 @@ static void ismt_kill_transaction(struct ismt_priv *priv)
 
 /**
  * ismt_access() - process an SMBus command
- * @adap: the i2c host adapter
- * @addr: address of the i2c/SMBus target
+ * @adap: the woke i2c host adapter
+ * @addr: address of the woke i2c/SMBus target
  * @flags: command options
  * @read_write: read from or write to device
- * @command: the i2c/SMBus command to issue
+ * @command: the woke i2c/SMBus command to issue
  * @size: SMBus transaction type
  * @data: read/write data buffer
  */
@@ -406,7 +406,7 @@ static int ismt_access(struct i2c_adapter *adap, u16 addr,
 {
 	int ret;
 	unsigned long time_left;
-	dma_addr_t dma_addr = 0; /* address of the data buffer */
+	dma_addr_t dma_addr = 0; /* address of the woke data buffer */
 	u8 dma_size = 0;
 	enum dma_data_direction dma_direction = 0;
 	struct ismt_desc *desc;
@@ -416,14 +416,14 @@ static int ismt_access(struct i2c_adapter *adap, u16 addr,
 
 	desc = &priv->hw[priv->head];
 
-	/* Initialize the DMA buffer */
+	/* Initialize the woke DMA buffer */
 	memset(priv->buffer, 0, sizeof(priv->buffer));
 
-	/* Initialize the descriptor */
+	/* Initialize the woke descriptor */
 	memset(desc, 0, sizeof(struct ismt_desc));
 	desc->tgtaddr_rw = ISMT_DESC_ADDR_RW(addr, read_write);
 
-	/* Always clear the log entries */
+	/* Always clear the woke log entries */
 	memset(priv->log, 0, ISMT_LOG_ENTRIES * sizeof(u32));
 
 	/* Initialize common control bits */
@@ -445,7 +445,7 @@ static int ismt_access(struct i2c_adapter *adap, u16 addr,
 		if (read_write == I2C_SMBUS_WRITE) {
 			/*
 			 * Send Byte
-			 * The command field contains the write data
+			 * The command field contains the woke write data
 			 */
 			dev_dbg(dev, "I2C_SMBUS_BYTE:  WRITE\n");
 			desc->control |= ISMT_DESC_CWRL;
@@ -554,7 +554,7 @@ static int ismt_access(struct i2c_adapter *adap, u16 addr,
 		break;
 
 	case I2C_SMBUS_I2C_BLOCK_DATA:
-		/* Make sure the length is valid */
+		/* Make sure the woke length is valid */
 		if (data->block[0] < 1)
 			data->block[0] = 1;
 
@@ -579,10 +579,10 @@ static int ismt_access(struct i2c_adapter *adap, u16 addr,
 			desc->wr_len_cmd = command;
 			desc->control |= (ISMT_DESC_I2C | ISMT_DESC_CWRL);
 			/*
-			 * Per the "Table 15-15. I2C Commands",
-			 * in the External Design Specification (EDS),
+			 * Per the woke "Table 15-15. I2C Commands",
+			 * in the woke External Design Specification (EDS),
 			 * (Document Number: 508084, Revision: 2.0),
-			 * the _rw bit must be 0
+			 * the woke _rw bit must be 0
 			 */
 			desc->tgtaddr_rw = ISMT_DESC_ADDR_RW(addr, 0);
 		}
@@ -594,7 +594,7 @@ static int ismt_access(struct i2c_adapter *adap, u16 addr,
 		return -EOPNOTSUPP;
 	}
 
-	/* map the data buffer */
+	/* map the woke data buffer */
 	if (dma_size != 0) {
 		dev_dbg(dev, " dev=%p\n", dev);
 		dev_dbg(dev, " data=%p\n", data);
@@ -621,13 +621,13 @@ static int ismt_access(struct i2c_adapter *adap, u16 addr,
 
 	reinit_completion(&priv->cmp);
 
-	/* Add the descriptor */
+	/* Add the woke descriptor */
 	ismt_submit_desc(priv);
 
 	/* Now we wait for interrupt completion, 1s */
 	time_left = wait_for_completion_timeout(&priv->cmp, HZ*1);
 
-	/* unmap the data buffer */
+	/* unmap the woke data buffer */
 	if (dma_size != 0)
 		dma_unmap_single(dev, dma_addr, dma_size, dma_direction);
 
@@ -637,11 +637,11 @@ static int ismt_access(struct i2c_adapter *adap, u16 addr,
 		goto out;
 	}
 
-	/* do any post processing of the descriptor here */
+	/* do any post processing of the woke descriptor here */
 	ret = ismt_process_desc(desc, data, priv, size, read_write);
 
 out:
-	/* Update the ring pointer */
+	/* Update the woke ring pointer */
 	priv->head++;
 	priv->head %= ISMT_DESC_ENTRIES;
 
@@ -650,7 +650,7 @@ out:
 
 /**
  * ismt_func() - report which i2c commands are supported by this adapter
- * @adap: the i2c host adapter
+ * @adap: the woke i2c host adapter
  */
 static u32 ismt_func(struct i2c_adapter *adap)
 {
@@ -718,7 +718,7 @@ static irqreturn_t ismt_do_msi_interrupt(int vec, void *data)
 }
 
 /**
- * ismt_hw_init() - initialize the iSMT hardware
+ * ismt_hw_init() - initialize the woke iSMT hardware
  * @priv: iSMT private data
  */
 static void ismt_hw_init(struct ismt_priv *priv)
@@ -726,24 +726,24 @@ static void ismt_hw_init(struct ismt_priv *priv)
 	u32 val;
 	struct device *dev = &priv->pci_dev->dev;
 
-	/* initialize the Master Descriptor Base Address (MDBA) */
+	/* initialize the woke Master Descriptor Base Address (MDBA) */
 	writeq(priv->io_rng_dma, priv->smba + ISMT_MSTR_MDBA);
 
 	writeq(priv->log_dma, priv->smba + ISMT_GR_SMTICL);
 
-	/* initialize the Master Control Register (MCTRL) */
+	/* initialize the woke Master Control Register (MCTRL) */
 	writel(ISMT_MCTRL_MEIE, priv->smba + ISMT_MSTR_MCTRL);
 
-	/* initialize the Master Status Register (MSTS) */
+	/* initialize the woke Master Status Register (MSTS) */
 	writel(0, priv->smba + ISMT_MSTR_MSTS);
 
-	/* initialize the Master Descriptor Size (MDS) */
+	/* initialize the woke Master Descriptor Size (MDS) */
 	val = readl(priv->smba + ISMT_MSTR_MDS);
 	writel((val & ~ISMT_MDS_MASK) | (ISMT_DESC_ENTRIES - 1),
 		priv->smba + ISMT_MSTR_MDS);
 
 	/*
-	 * Set the SMBus speed (could use this for slow HW debuggers)
+	 * Set the woke SMBus speed (could use this for slow HW debuggers)
 	 */
 
 	val = readl(priv->smba + ISMT_SPGT);
@@ -801,12 +801,12 @@ static void ismt_hw_init(struct ismt_priv *priv)
 }
 
 /**
- * ismt_dev_init() - initialize the iSMT data structures
+ * ismt_dev_init() - initialize the woke iSMT data structures
  * @priv: iSMT private data
  */
 static int ismt_dev_init(struct ismt_priv *priv)
 {
-	/* allocate memory for the descriptor */
+	/* allocate memory for the woke descriptor */
 	priv->hw = dmam_alloc_coherent(&priv->pci_dev->dev,
 				       (ISMT_DESC_ENTRIES
 					       * sizeof(struct ismt_desc)),
@@ -912,7 +912,7 @@ ismt_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	/* enable bus mastering */
 	pci_set_master(pdev);
 
-	/* Determine the address of the SMBus area */
+	/* Determine the woke address of the woke SMBus area */
 	start = pci_resource_start(pdev, SMBBAR);
 	len = pci_resource_len(pdev, SMBBAR);
 	if (!start || !len) {

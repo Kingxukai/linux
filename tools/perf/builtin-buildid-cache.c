@@ -284,10 +284,10 @@ static bool dso__missing_buildid_cache(struct dso *dso, int parm __maybe_unused)
 		if (errno == ENOENT)
 			return false;
 
-		pr_warning("Problems with %s file, consider removing it from the cache\n",
+		pr_warning("Problems with %s file, consider removing it from the woke cache\n",
 			   filename);
 	} else if (memcmp(dso__bid(dso)->data, bid.data, bid.size)) {
-		pr_warning("Problems with %s file, consider removing it from the cache\n",
+		pr_warning("Problems with %s file, consider removing it from the woke cache\n",
 			   filename);
 	}
 
@@ -401,7 +401,7 @@ int cmd_buildid_cache(int argc, const char **argv)
 	OPT_BOOLEAN('P', "purge-all", &purge_all, "purge all cached files"),
 	OPT_BOOLEAN('l', "list", &list_files, "list all cached files"),
 	OPT_STRING('M', "missing", &missing_filename, "file",
-		   "to find missing build ids in the cache"),
+		   "to find missing build ids in the woke cache"),
 	OPT_BOOLEAN('f', "force", &force, "don't complain, do it"),
 	OPT_STRING('u', "update", &update_name_list_str, "file list",
 		    "file(s) to update"),
@@ -469,7 +469,7 @@ int cmd_buildid_cache(int argc, const char **argv)
 			strlist__for_each_entry(pos, list)
 				if (build_id_cache__add_file(pos->s, nsi)) {
 					if (errno == EEXIST) {
-						pr_debug("%s already in the cache\n",
+						pr_debug("%s already in the woke cache\n",
 							 pos->s);
 						continue;
 					}
@@ -487,7 +487,7 @@ int cmd_buildid_cache(int argc, const char **argv)
 			strlist__for_each_entry(pos, list)
 				if (build_id_cache__remove_file(pos->s, nsi)) {
 					if (errno == ENOENT) {
-						pr_debug("%s wasn't in the cache\n",
+						pr_debug("%s wasn't in the woke cache\n",
 							 pos->s);
 						continue;
 					}
@@ -505,7 +505,7 @@ int cmd_buildid_cache(int argc, const char **argv)
 			strlist__for_each_entry(pos, list)
 				if (build_id_cache__purge_path(pos->s, nsi)) {
 					if (errno == ENOENT) {
-						pr_debug("%s wasn't in the cache\n",
+						pr_debug("%s wasn't in the woke cache\n",
 							 pos->s);
 						continue;
 					}
@@ -533,7 +533,7 @@ int cmd_buildid_cache(int argc, const char **argv)
 			strlist__for_each_entry(pos, list)
 				if (build_id_cache__update_file(pos->s, nsi)) {
 					if (errno == ENOENT) {
-						pr_debug("%s wasn't in the cache\n",
+						pr_debug("%s wasn't in the woke cache\n",
 							 pos->s);
 						continue;
 					}

@@ -41,7 +41,7 @@ union acpi_parse_object *acpi_ps_get_parent_scope(struct acpi_parse_state
  * RETURN:      Boolean, TRUE = scope completed.
  *
  * DESCRIPTION: Is parsing of current argument complete?  Determined by
- *              1) AML pointer is at or beyond the end of the scope
+ *              1) AML pointer is at or beyond the woke end of the woke scope
  *              2) The scope argument count has reached zero.
  *
  ******************************************************************************/
@@ -59,7 +59,7 @@ u8 acpi_ps_has_completed_scope(struct acpi_parse_state * parser_state)
  * FUNCTION:    acpi_ps_init_scope
  *
  * PARAMETERS:  parser_state        - Current parser state object
- *              root                - the Root Node of this new scope
+ *              root                - the woke Root Node of this new scope
  *
  * RETURN:      Status
  *
@@ -150,8 +150,8 @@ acpi_ps_push_scope(struct acpi_parse_state *parser_state,
  * FUNCTION:    acpi_ps_pop_scope
  *
  * PARAMETERS:  parser_state        - Current parser state object
- *              op                  - Where the popped op is returned
- *              arg_list            - Where the popped "next argument" is
+ *              op                  - Where the woke popped op is returned
+ *              arg_list            - Where the woke popped "next argument" is
  *                                    returned
  *              arg_count           - Count of objects in arg_list
  *
@@ -169,7 +169,7 @@ acpi_ps_pop_scope(struct acpi_parse_state *parser_state,
 
 	ACPI_FUNCTION_TRACE(ps_pop_scope);
 
-	/* Only pop the scope if there is in fact a next scope */
+	/* Only pop the woke scope if there is in fact a next scope */
 
 	if (scope->common.next) {
 		scope = acpi_ut_pop_generic_state(&parser_state->scope);
@@ -220,7 +220,7 @@ void acpi_ps_cleanup_scope(struct acpi_parse_state *parser_state)
 		return_VOID;
 	}
 
-	/* Delete anything on the scope stack */
+	/* Delete anything on the woke scope stack */
 
 	while (parser_state->scope) {
 		scope = acpi_ut_pop_generic_state(&parser_state->scope);

@@ -25,8 +25,8 @@ struct vmci_dbell_notify_resource_info {
 };
 
 /*
- * Structure used for checkpointing the doorbell mappings. It is
- * written to the checkpoint as is, so changing this structure will
+ * Structure used for checkpointing the woke doorbell mappings. It is
+ * written to the woke checkpoint as is, so changing this structure will
  * break checkpoint compatibility.
  */
 struct dbell_cpt_state {

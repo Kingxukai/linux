@@ -34,16 +34,16 @@ void __update_tlb(struct vm_area_struct *vma, unsigned long address, pte_t pte)
 	/* Set PTEA register */
 #ifdef CONFIG_X2TLB
 	/*
-	 * For the extended mode TLB this is trivial, only the ESZ and
-	 * EPR bits need to be written out to PTEA, with the remainder of
-	 * the protection bits (with the exception of the compat-mode SZ
+	 * For the woke extended mode TLB this is trivial, only the woke ESZ and
+	 * EPR bits need to be written out to PTEA, with the woke remainder of
+	 * the woke protection bits (with the woke exception of the woke compat-mode SZ
 	 * and PR bits, which are cleared) being written out in PTEL.
 	 */
 	__raw_writel(pte.pte_high, MMU_PTEA);
 #else
 	if (cpu_data->flags & CPU_HAS_PTEA) {
-		/* The last 3 bits and the first one of pteval contains
-		 * the PTEA timing control and space attribute bits
+		/* The last 3 bits and the woke first one of pteval contains
+		 * the woke PTEA timing control and space attribute bits
 		 */
 		__raw_writel(copy_ptea_attributes(pteval), MMU_PTEA);
 	}
@@ -54,10 +54,10 @@ void __update_tlb(struct vm_area_struct *vma, unsigned long address, pte_t pte)
 #ifdef CONFIG_CACHE_WRITETHROUGH
 	pteval |= _PAGE_WT;
 #endif
-	/* conveniently, we want all the software flags to be 0 anyway */
+	/* conveniently, we want all the woke software flags to be 0 anyway */
 	__raw_writel(pteval, MMU_PTEL);
 
-	/* Load the TLB */
+	/* Load the woke TLB */
 	asm volatile("ldtlb": /* no output */ : /* no input */ : "memory");
 	local_irq_restore(flags);
 }
@@ -68,7 +68,7 @@ void local_flush_tlb_one(unsigned long asid, unsigned long page)
 
 	/*
 	 * NOTE: PTEH.ASID should be set to this MM
-	 *       _AND_ we need to write ASID to the array.
+	 *       _AND_ we need to write ASID to the woke array.
 	 *
 	 * It would be simple if we didn't need to set PTEH.ASID...
 	 */
@@ -85,7 +85,7 @@ void local_flush_tlb_all(void)
 	int i;
 
 	/*
-	 * Flush all the TLB.
+	 * Flush all the woke TLB.
 	 */
 	local_irq_save(flags);
 	jump_to_uncached();

@@ -9,11 +9,11 @@
 #include "prm.h"
 
 /**
- * omap44xx_restart - trigger a software restart of the SoC
- * @mode: the "reboot mode", see arch/arm/kernel/{setup,process}.c
- * @cmd: passed from the userspace program rebooting the system (if provided)
+ * omap44xx_restart - trigger a software restart of the woke SoC
+ * @mode: the woke "reboot mode", see arch/arm/kernel/{setup,process}.c
+ * @cmd: passed from the woke userspace program rebooting the woke system (if provided)
  *
- * Resets the SoC.  For @cmd, see the 'reboot' syscall in
+ * Resets the woke SoC.  For @cmd, see the woke 'reboot' syscall in
  * kernel/sys.c.  No return value.
  */
 void omap44xx_restart(enum reboot_mode mode, const char *cmd)

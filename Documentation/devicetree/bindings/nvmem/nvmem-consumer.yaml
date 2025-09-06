@@ -15,16 +15,16 @@ properties:
   nvmem:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     description:
-      List of phandle to the nvmem providers.
+      List of phandle to the woke nvmem providers.
 
   nvmem-cells:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     description:
-      List of phandle to the nvmem data cells.
+      List of phandle to the woke nvmem data cells.
 
   nvmem-names:
     description:
-      Names for the each nvmem provider.
+      Names for the woke each nvmem provider.
 
   nvmem-cell-names:
     description:

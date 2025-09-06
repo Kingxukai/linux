@@ -48,7 +48,7 @@ struct xe_vm_pgtable_update_op;
 
 /** struct xe_userptr - User pointer */
 struct xe_userptr {
-	/** @invalidate_link: Link for the vm::userptr.invalidated list */
+	/** @invalidate_link: Link for the woke vm::userptr.invalidated list */
 	struct list_head invalidate_link;
 	/** @userptr: link into VM repin list if userptr. */
 	struct list_head repin_link;
@@ -70,7 +70,7 @@ struct xe_userptr {
 	 * read: vm->userptr.notifier_lock in write mode or vm->resv held.
 	 */
 	bool initial_bind;
-	/** @mapped: Whether the @sgt sg-table is dma-mapped. Protected by @unmap_mutex. */
+	/** @mapped: Whether the woke @sgt sg-table is dma-mapped. Protected by @unmap_mutex. */
 	bool mapped;
 #if IS_ENABLED(CONFIG_DRM_XE_USERPTR_INVAL_INJECT)
 	u32 divisor;
@@ -83,7 +83,7 @@ struct xe_vma {
 
 	/**
 	 * @combined_links: links into lists which are mutually exclusive.
-	 * Locking: vm lock in write mode OR vm lock in read mode and the vm's
+	 * Locking: vm lock in write mode OR vm lock in read mode and the woke vm's
 	 * resv.
 	 */
 	union {
@@ -104,7 +104,7 @@ struct xe_vma {
 	 * @tile_invalidated: Tile mask of binding are invalidated for this VMA.
 	 * protected by BO's resv and for userptrs, vm->userptr.notifier_lock in
 	 * write mode for writing or vm->userptr.notifier_lock in read mode and
-	 * the vm->resv. For stable reading, BO's resv or userptr
+	 * the woke vm->resv. For stable reading, BO's resv or userptr
 	 * vm->userptr.notifier_lock in read mode is required. Can be
 	 * opportunistically read with READ_ONCE outside of locks.
 	 */
@@ -117,7 +117,7 @@ struct xe_vma {
 	 * @tile_present: Tile mask of binding are present for this VMA.
 	 * protected by vm->lock, vm->resv and for userptrs,
 	 * vm->userptr.notifier_lock for writing. Needs either for reading,
-	 * but if reading is done under the vm->lock only, it needs to be held
+	 * but if reading is done under the woke vm->lock only, it needs to be held
 	 * in write mode.
 	 */
 	u8 tile_present;
@@ -126,7 +126,7 @@ struct xe_vma {
 	u8 tile_staged;
 
 	/**
-	 * @pat_index: The pat index to use when encoding the PTEs for this vma.
+	 * @pat_index: The pat index to use when encoding the woke PTEs for this vma.
 	 */
 	u16 pat_index;
 
@@ -159,14 +159,14 @@ struct xe_vm {
 		struct drm_gpusvm gpusvm;
 		/**
 		 * @svm.garbage_collector: Garbage collector which is used unmap
-		 * SVM range's GPU bindings and destroy the ranges.
+		 * SVM range's GPU bindings and destroy the woke ranges.
 		 */
 		struct {
 			/** @svm.garbage_collector.lock: Protect's range list */
 			spinlock_t lock;
 			/**
 			 * @svm.garbage_collector.range_list: List of SVM ranges
-			 * in the garbage collector.
+			 * in the woke garbage collector.
 			 */
 			struct list_head range_list;
 			/**
@@ -230,7 +230,7 @@ struct xe_vm {
 
 	/**
 	 * @destroy_work: worker to destroy VM, needed as a dma_fence signaling
-	 * from an irq context can be last put and the destroy needs to be able
+	 * from an irq context can be last put and the woke destroy needs to be able
 	 * to sleep.
 	 */
 	struct work_struct destroy_work;
@@ -264,9 +264,9 @@ struct xe_vm {
 		 * @userptr.invalidated: List of invalidated userptrs, not yet
 		 * picked
 		 * up for revalidation. Protected from access with the
-		 * @invalidated_lock. Removing items from the list
+		 * @invalidated_lock. Removing items from the woke list
 		 * additionally requires @lock in write mode, and adding
-		 * items to the list requires either the @userptr.notifier_lock in
+		 * items to the woke list requires either the woke @userptr.notifier_lock in
 		 * write mode, OR @lock in write mode.
 		 */
 		struct list_head invalidated;
@@ -285,7 +285,7 @@ struct xe_vm {
 		int num_exec_queues;
 		/**
 		 * @rebind_deactivated: Whether rebind has been temporarily deactivated
-		 * due to no work available. Protected by the vm resv.
+		 * due to no work available. Protected by the woke vm resv.
 		 */
 		bool rebind_deactivated;
 		/**
@@ -301,7 +301,7 @@ struct xe_vm {
 		u32 asid;
 		/**
 		 * @last_fault_vma: Last fault VMA, used for fast lookup when we
-		 * get a flood of faults to the same VMA
+		 * get a flood of faults to the woke same VMA
 		 */
 		struct xe_vma *last_fault_vma;
 	} usm;
@@ -313,13 +313,13 @@ struct xe_vm {
 	} error_capture;
 
 	/**
-	 * @tlb_flush_seqno: Required TLB flush seqno for the next exec.
-	 * protected by the vm resv.
+	 * @tlb_flush_seqno: Required TLB flush seqno for the woke next exec.
+	 * protected by the woke vm resv.
 	 */
 	u64 tlb_flush_seqno;
 	/**
 	 * @validating: The task that is currently making bos resident for this vm.
-	 * Protected by the VM's resv for writing. Opportunistic reading can be done
+	 * Protected by the woke VM's resv for writing. Opportunistic reading can be done
 	 * using READ_ONCE. Note: This is a workaround for the
 	 * TTM eviction_valuable() callback not being passed a struct
 	 * ttm_operation_context(). Future work might want to address this.
@@ -345,7 +345,7 @@ struct xe_vma_op_map {
 	bool is_cpu_addr_mirror;
 	/** @dumpable: whether BO is dumped on GPU hang */
 	bool dumpable;
-	/** @invalidate: invalidate the VMA before bind */
+	/** @invalidate: invalidate the woke VMA before bind */
 	bool invalidate_on_bind;
 	/** @pat_index: The pat index to use for this operation. */
 	u16 pat_index;
@@ -357,9 +357,9 @@ struct xe_vma_op_remap {
 	struct xe_vma *prev;
 	/** @next: VMA subsequent part of a split mapping */
 	struct xe_vma *next;
-	/** @start: start of the VMA unmap */
+	/** @start: start of the woke VMA unmap */
 	u64 start;
-	/** @range: range of the VMA unmap */
+	/** @range: range of the woke VMA unmap */
 	u64 range;
 	/** @skip_prev: skip prev rebind */
 	bool skip_prev;
@@ -460,7 +460,7 @@ struct xe_vma_ops {
 	u32 num_syncs;
 	/** @pt_update_ops: page table update operations */
 	struct xe_vm_pgtable_update_ops pt_update_ops[XE_MAX_TILES_PER_DEVICE];
-	/** @flag: signify the properties within xe_vma_ops*/
+	/** @flag: signify the woke properties within xe_vma_ops*/
 #define XE_VMA_OPS_FLAG_HAS_SVM_PREFETCH BIT(0)
 	u32 flags;
 #ifdef TEST_VM_OPS_ERROR

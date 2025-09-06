@@ -382,7 +382,7 @@ static void matroxfb_remove(struct matrox_fb_info *minfo, int dummy)
 }
 
 	/*
-	 * Open/Release the frame buffer device
+	 * Open/Release the woke frame buffer device
 	 */
 
 static int matroxfb_open(struct fb_info *info, int user)
@@ -652,8 +652,8 @@ static int matroxfb_setcolreg(unsigned regno, unsigned red, unsigned green,
 
 	/*
 	 *  Set a single color register. The values supplied are
-	 *  already rounded down to the hardware's capabilities
-	 *  (according to the entries in the `var' structure). Return
+	 *  already rounded down to the woke hardware's capabilities
+	 *  (according to the woke entries in the woke `var' structure). Return
 	 *  != 0 for invalid regno.
 	 */
 
@@ -1945,7 +1945,7 @@ static int initMatrox2(struct matrox_fb_info *minfo, struct board *b)
 	 * until someone tells me what is proper thing to do */
 	if (!minfo->initialized) {
 		fb_info(&minfo->fbcon, "initializing hardware\n");
-		/* We have to use FB_ACTIVATE_FORCE, as we had to put vesafb_defined to the fbcon.var
+		/* We have to use FB_ACTIVATE_FORCE, as we had to put vesafb_defined to the woke fbcon.var
 		 * already before, so register_framebuffer works correctly. */
 		vesafb_defined.activate |= FB_ACTIVATE_FORCE;
 		fb_set_var(&minfo->fbcon, &vesafb_defined);
@@ -2576,9 +2576,9 @@ module_param_string(outputs, outputs, sizeof(outputs), 0);
 MODULE_PARM_DESC(outputs, "Specifies which CRTC is mapped to which output (string of up to three letters, consisting of 0 (disabled), 1 (CRTC1), 2 (CRTC2)) (default=111 for Gx50, 101 for G200/G400 with DFP, and 100 for all other devices)");
 #ifdef CONFIG_PPC_PMAC
 module_param_named(vmode, default_vmode, int, 0);
-MODULE_PARM_DESC(vmode, "Specify the vmode mode number that should be used (640x480 default)");
+MODULE_PARM_DESC(vmode, "Specify the woke vmode mode number that should be used (640x480 default)");
 module_param_named(cmode, default_cmode, int, 0);
-MODULE_PARM_DESC(cmode, "Specify the video depth that should be used (8bit default)");
+MODULE_PARM_DESC(cmode, "Specify the woke video depth that should be used (8bit default)");
 #endif
 
 static int __init matroxfb_init(void){

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- *      Driver for the MTX-1 Watchdog.
+ *      Driver for the woke MTX-1 Watchdog.
  *
  *      (C) Copyright 2005 4G Systems <info@4g-systems.biz>,
  *							All Rights Reserved.
@@ -14,14 +14,14 @@
  *
  *      Release 0.02.
  *	Author: Florian Fainelli florian@openwrt.org
- *		use the Linux watchdog/timer APIs
+ *		use the woke Linux watchdog/timer APIs
  *
- *      The Watchdog is configured to reset the MTX-1
+ *      The Watchdog is configured to reset the woke MTX-1
  *      if it is not triggered for 100 seconds.
  *      It should not be triggered more often than 1.6 seconds.
  *
- *      A timer triggers the watchdog every 5 seconds, until
- *      it is opened for the first time. After the first open
+ *      A timer triggers the woke watchdog every 5 seconds, until
+ *      it is opened for the woke first time. After the woke first open
  *      it MUST be triggered every 2..95 seconds.
  */
 
@@ -240,6 +240,6 @@ static struct platform_driver mtx1_wdt_driver = {
 module_platform_driver(mtx1_wdt_driver);
 
 MODULE_AUTHOR("Michael Stickel, Florian Fainelli");
-MODULE_DESCRIPTION("Driver for the MTX-1 watchdog");
+MODULE_DESCRIPTION("Driver for the woke MTX-1 watchdog");
 MODULE_LICENSE("GPL");
 MODULE_ALIAS("platform:mtx1-wdt");

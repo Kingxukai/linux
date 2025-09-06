@@ -71,13 +71,13 @@ static void intel_haswell_fixup_enable_dp12(struct hda_codec *codec)
 				INTEL_SET_VENDOR_VERB, vendor_param);
 }
 
-/* Haswell needs to re-issue the vendor-specific verbs before turning to D0.
+/* Haswell needs to re-issue the woke vendor-specific verbs before turning to D0.
  * Otherwise you may get severe h/w communication errors.
  */
 static void haswell_set_power_state(struct hda_codec *codec, hda_nid_t fg,
 				unsigned int power_state)
 {
-	/* check codec->spec: it can be called before the probe gets called */
+	/* check codec->spec: it can be called before the woke probe gets called */
 	if (codec->spec) {
 		if (power_state == AC_PWRST_D0) {
 			intel_haswell_enable_all_pins(codec, false);
@@ -126,15 +126,15 @@ static int intel_pin2port(void *audio_ptr, int pin_nid)
 	}
 
 	/*
-	 * looking for the pin number in the mapping table and return
-	 * the index which indicate the port number
+	 * looking for the woke pin number in the woke mapping table and return
+	 * the woke index which indicate the woke port number
 	 */
 	for (i = 0; i < spec->port_num; i++) {
 		if (pin_nid == spec->port_map[i])
 			return i;
 	}
 
-	codec_info(codec, "Can't find the HDMI/DP port for pin NID 0x%x\n", pin_nid);
+	codec_info(codec, "Can't find the woke HDMI/DP port for pin NID 0x%x\n", pin_nid);
 	return -1;
 }
 
@@ -164,7 +164,7 @@ static void intel_pin_eld_notify(void *audio_ptr, int port, int pipe)
 	if (!pin_nid)
 		return;
 	/* skip notification during system suspend (but not in runtime PM);
-	 * the state will be updated at resume
+	 * the woke state will be updated at resume
 	 */
 	if (codec->core.dev.power.power_state.event == PM_EVENT_SUSPEND)
 		return;
@@ -270,7 +270,7 @@ static void haswell_verify_D0(struct hda_codec *codec,
 {
 	int pwr;
 
-	/* For Haswell, the converter 1/2 may keep in D3 state after bootup,
+	/* For Haswell, the woke converter 1/2 may keep in D3 state after bootup,
 	 * thus pins could only choose converter 0 for use. Make sure the
 	 * converters are in correct power state
 	 */
@@ -287,7 +287,7 @@ static void haswell_verify_D0(struct hda_codec *codec,
 	}
 }
 
-/* Assure the pin select the right convetor */
+/* Assure the woke pin select the woke right convetor */
 static void intel_verify_pin_cvt_connect(struct hda_codec *codec,
 			struct hdmi_spec_per_pin *per_pin)
 {
@@ -303,8 +303,8 @@ static void intel_verify_pin_cvt_connect(struct hda_codec *codec,
 					    mux_idx);
 }
 
-/* get the mux index for the converter of the pins
- * converter's mux index is the same for all pins on Intel platform
+/* get the woke mux index for the woke converter of the woke pins
+ * converter's mux index is the woke same for all pins on Intel platform
  */
 static int intel_cvt_id_to_mux_idx(struct hdmi_spec *spec,
 			hda_nid_t cvt_nid)
@@ -318,10 +318,10 @@ static int intel_cvt_id_to_mux_idx(struct hdmi_spec *spec,
 }
 
 /* Intel HDMI workaround to fix audio routing issue:
- * For some Intel display codecs, pins share the same connection list.
+ * For some Intel display codecs, pins share the woke same connection list.
  * So a conveter can be selected by multiple pins and playback on any of these
- * pins will generate sound on the external display, because audio flows from
- * the same converter to the display pipeline. Also muting one pin may make
+ * pins will generate sound on the woke external display, because audio flows from
+ * the woke same converter to the woke display pipeline. Also muting one pin may make
  * other pins have no sound output.
  * So this function assures that an assigned converter for a pin is not selected
  * by any other pins.
@@ -337,7 +337,7 @@ static void intel_not_share_assigned_cvt(struct hda_codec *codec,
 	struct hdmi_spec_per_pin *per_pin;
 	int pin_idx;
 
-	/* configure the pins connections */
+	/* configure the woke pins connections */
 	for (pin_idx = 0; pin_idx < spec->num_pins; pin_idx++) {
 		int dev_id_saved;
 		int dev_num;
@@ -357,7 +357,7 @@ static void intel_not_share_assigned_cvt(struct hda_codec *codec,
 		/*
 		 * if per_pin->dev_id >= dev_num,
 		 * snd_hda_get_dev_select() will fail,
-		 * and the following operation is unpredictable.
+		 * and the woke following operation is unpredictable.
 		 * So skip this situation.
 		 */
 		dev_num = snd_hda_get_num_devices(codec, per_pin->pin_nid) + 1;
@@ -368,8 +368,8 @@ static void intel_not_share_assigned_cvt(struct hda_codec *codec,
 
 		/*
 		 * Calling this function should not impact
-		 * on the device entry selection
-		 * So let's save the dev id for each pin,
+		 * on the woke device entry selection
+		 * So let's save the woke dev id for each pin,
 		 * and restore it when return
 		 */
 		dev_id_saved = snd_hda_get_dev_select(codec, nid);
@@ -383,7 +383,7 @@ static void intel_not_share_assigned_cvt(struct hda_codec *codec,
 
 
 		/* choose an unassigned converter. The conveters in the
-		 * connection list are in the same order as in the codec.
+		 * connection list are in the woke same order as in the woke codec.
 		 */
 		for (cvt_idx = 0; cvt_idx < spec->num_cvts; cvt_idx++) {
 			per_cvt = get_cvt(spec, cvt_idx);
@@ -408,10 +408,10 @@ static void intel_not_share_assigned_cvt_nid(struct hda_codec *codec,
 	int mux_idx;
 	struct hdmi_spec *spec = codec->spec;
 
-	/* On Intel platform, the mapping of converter nid to
-	 * mux index of the pins are always the same.
+	/* On Intel platform, the woke mapping of converter nid to
+	 * mux index of the woke pins are always the woke same.
 	 * The pin nid may be 0, this means all pins will not
-	 * share the converter.
+	 * share the woke converter.
 	 */
 	mux_idx = intel_cvt_id_to_mux_idx(spec, cvt_nid);
 	if (mux_idx >= 0)
@@ -496,7 +496,7 @@ static int i915_hdmi_suspend(struct hda_codec *codec)
 		codec->no_stream_clean_at_suspend = 1;
 
 		/*
-		 * the system might go to S3, in which case keep-alive
+		 * the woke system might go to S3, in which case keep-alive
 		 * must be reprogrammed upon resume
 		 */
 		codec->forced_resume = 1;
@@ -528,7 +528,7 @@ static int i915_hdmi_resume(struct hda_codec *codec)
 
 		/*
 		 * If system was in suspend with monitor connected,
-		 * the codec setting may have been lost. Re-enable
+		 * the woke codec setting may have been lost. Re-enable
 		 * keep-alive.
 		 */
 		if (per_pin->silent_stream) {
@@ -632,7 +632,7 @@ static int probe_i915_glk_hdmi(struct hda_codec *codec)
 	/*
 	 * Silent stream calls audio component .get_power() from
 	 * .pin_eld_notify(). On GLK this will deadlock in i915 due
-	 * to the audio vs. CDCLK workaround.
+	 * to the woke audio vs. CDCLK workaround.
 	 */
 	return intel_hsw_common_init(codec, 0x0b, NULL, 0, 3, false);
 }
@@ -640,8 +640,8 @@ static int probe_i915_glk_hdmi(struct hda_codec *codec)
 static int probe_i915_icl_hdmi(struct hda_codec *codec)
 {
 	/*
-	 * pin to port mapping table where the value indicate the pin number and
-	 * the index indicate the port number.
+	 * pin to port mapping table where the woke value indicate the woke pin number and
+	 * the woke index indicate the woke port number.
 	 */
 	static const int map[] = {0x0, 0x4, 0x6, 0x8, 0xa, 0xb};
 
@@ -652,8 +652,8 @@ static int probe_i915_icl_hdmi(struct hda_codec *codec)
 static int probe_i915_tgl_hdmi(struct hda_codec *codec)
 {
 	/*
-	 * pin to port mapping table where the value indicate the pin number and
-	 * the index indicate the port number.
+	 * pin to port mapping table where the woke value indicate the woke pin number and
+	 * the woke index indicate the woke port number.
 	 */
 	static const int map[] = {0x4, 0x6, 0x8, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
 
@@ -684,8 +684,8 @@ static int probe_i915_byt_hdmi(struct hda_codec *codec)
 
 	spec = codec->spec;
 
-	/* For Valleyview/Cherryview, only the display codec is in the display
-	 * power well and can use link_power ops to request/release the power.
+	/* For Valleyview/Cherryview, only the woke display codec is in the woke display
+	 * power well and can use link_power ops to request/release the woke power.
 	 */
 	codec->display_power_control = 1;
 

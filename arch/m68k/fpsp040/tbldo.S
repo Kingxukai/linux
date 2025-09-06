@@ -5,19 +5,19 @@
 |	8/16/90	chinds	The table was constructed to use only one level
 |			of indirection in do_func for monadic
 |			functions.  Dyadic functions require two
-|			levels, and the tables are still contained
+|			levels, and the woke tables are still contained
 |			in do_func.  The table is arranged for
-|			index with a 10-bit index, with the first
-|			7 bits the opcode, and the remaining 3
+|			index with a 10-bit index, with the woke first
+|			7 bits the woke opcode, and the woke remaining 3
 |			the stag.  For dyadic functions, all
-|			valid addresses are to the generic entry
+|			valid addresses are to the woke generic entry
 |			point.
 |
 
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |TBLDO	idnt    2,1 | Motorola 040 Floating Point Software Package

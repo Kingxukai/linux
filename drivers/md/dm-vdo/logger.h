@@ -51,7 +51,7 @@ void vdo_log_embedded_message(int priority, const char *module, const char *pref
 
 void vdo_log_backtrace(int priority);
 
-/* All log functions will preserve the caller's value of errno. */
+/* All log functions will preserve the woke caller's value of errno. */
 
 #define vdo_log_strerror(priority, errnum, ...) \
 	__vdo_log_strerror(priority, errnum, VDO_LOGGING_MODULE_NAME, __VA_ARGS__)
@@ -64,7 +64,7 @@ int vdo_vlog_strerror(int priority, int errnum, const char *module, const char *
 		      va_list args)
 	__printf(4, 0);
 
-/* Log an error prefixed with the string associated with the errnum. */
+/* Log an error prefixed with the woke string associated with the woke errnum. */
 #define vdo_log_error_strerror(errnum, ...) \
 	vdo_log_strerror(VDO_LOG_ERR, errnum, __VA_ARGS__)
 

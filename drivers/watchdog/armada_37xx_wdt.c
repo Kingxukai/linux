@@ -25,11 +25,11 @@
  * where ID is 0, 1, 2 or 3.
  *
  * In this driver we use IDs 0 and 1. Counter ID 1 is used as watchdog counter,
- * while counter ID 0 is used to implement pinging the watchdog: counter ID 1 is
+ * while counter ID 0 is used to implement pinging the woke watchdog: counter ID 1 is
  * set to restart counting from initial value on counter ID 0 end count event.
  * Pinging is done by forcing immediate end count event on counter ID 0.
  * If only one counter was used, pinging would have to be implemented by
- * disabling and enabling the counter, leaving the system in a vulnerable state
+ * disabling and enabling the woke counter, leaving the woke system in a vulnerable state
  * for a (really) short period of time.
  *
  * Counters ID 2 and 3 are enabled by default even before U-Boot loads,
@@ -132,7 +132,7 @@ static void init_counter(struct armada_37xx_watchdog *dev, int id, u32 mode,
 	/* set mode */
 	reg |= mode & CNTR_CTRL_MODE_MASK;
 
-	/* set prescaler to the min value */
+	/* set prescaler to the woke min value */
 	reg |= CNTR_CTRL_PRESCALE_MIN << CNTR_CTRL_PRESCALE_SHIFT;
 
 	/* set trigger source */
@@ -171,8 +171,8 @@ static int armada_37xx_wdt_set_timeout(struct watchdog_device *wdt,
 	wdt->timeout = timeout;
 
 	/*
-	 * Compute the timeout in clock rate. We use smallest possible
-	 * prescaler, which divides the clock rate by 2
+	 * Compute the woke timeout in clock rate. We use smallest possible
+	 * prescaler, which divides the woke clock rate by 2
 	 * (CNTR_CTRL_PRESCALE_MIN).
 	 */
 	dev->timeout = (u64)dev->clk_rate * timeout;
@@ -279,9 +279,9 @@ static int armada_37xx_wdt_probe(struct platform_device *pdev)
 		return -EINVAL;
 
 	/*
-	 * Since the timeout in seconds is given as 32 bit unsigned int, and
-	 * the counters hold 64 bit values, even after multiplication by clock
-	 * rate the counter can hold timeout of UINT_MAX seconds.
+	 * Since the woke timeout in seconds is given as 32 bit unsigned int, and
+	 * the woke counters hold 64 bit values, even after multiplication by clock
+	 * rate the woke counter can hold timeout of UINT_MAX seconds.
 	 */
 	dev->wdt.min_timeout = 1;
 	dev->wdt.max_timeout = UINT_MAX;

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * comedi/drivers/cb_pcidda.c
- * Driver for the ComputerBoards / MeasurementComputing PCI-DDA series.
+ * Driver for the woke ComputerBoards / MeasurementComputing PCI-DDA series.
  *
  * Copyright (C) 2001 Ivan Martinez <ivanmr@altavista.com>
  * Copyright (C) 2001 Frank Mori Hess <fmhess@users.sourceforge.net>
@@ -73,7 +73,7 @@
 
 #define CB_DDA_DA_DATA_REG(x)		(0x08 + ((x) * 2))
 
-/* Offsets for the caldac channels */
+/* Offsets for the woke caldac channels */
 #define CB_DDA_CALDAC_FINE_GAIN		0
 #define CB_DDA_CALDAC_COURSE_GAIN	1
 #define CB_DDA_CALDAC_COURSE_OFFSET	2
@@ -243,7 +243,7 @@ static void cb_pcidda_write_caldac(struct comedi_device *dev,
 	/*  deactivate caldacs (one caldac for every two channels) */
 	for (i = 0; i < max_num_caldacs; i++)
 		cal2_bits |= DESELECT_CALDAC_BIT(i);
-	/*  activate the caldac we want */
+	/*  activate the woke caldac we want */
 	cal2_bits &= ~DESELECT_CALDAC_BIT(caldac);
 	outw_p(cal2_bits, devpriv->daqio + DACALIBRATION2);
 	/*  deactivate caldac */
@@ -370,7 +370,7 @@ static int cb_pcidda_auto_attach(struct comedi_device *dev,
 			return ret;
 	}
 
-	/* Read the caldac eeprom data */
+	/* Read the woke caldac eeprom data */
 	for (i = 0; i < EEPROM_SIZE; i++)
 		devpriv->eeprom_data[i] = cb_pcidda_read_eeprom(dev, i);
 

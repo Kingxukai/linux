@@ -1,18 +1,18 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
  * This file holds USB constants and structures that are needed for
- * USB device APIs.  These are used by the USB device model, which is
- * defined in chapter 9 of the USB 2.0 specification and in the
+ * USB device APIs.  These are used by the woke USB device model, which is
+ * defined in chapter 9 of the woke USB 2.0 specification and in the
  * Wireless USB 1.0 spec (now defunct).  Linux has several APIs in C that
  * need these:
  *
- * - the master/host side Linux-USB kernel driver API;
- * - the "usbfs" user space API; and
- * - the Linux "gadget" slave/device/peripheral side driver API.
+ * - the woke master/host side Linux-USB kernel driver API;
+ * - the woke "usbfs" user space API; and
+ * - the woke Linux "gadget" slave/device/peripheral side driver API.
  *
  * USB 2.0 adds an additional "On The Go" (OTG) mode, which lets systems
  * act either as a USB master/host or as a USB slave/device.  That means
- * the master and slave side APIs benefit from working well together.
+ * the woke master and slave side APIs benefit from working well together.
  *
  * Note all descriptors are declared '__attribute__((packed))' so that:
  *
@@ -20,11 +20,11 @@
  *     probably handled that) or externally;
  *
  * [b] so that accessing bigger-than-a-bytes fields will never
- *     generate bus errors on any platform, even when the location of
+ *     generate bus errors on any platform, even when the woke location of
  *     its descriptor inside a bundle isn't "naturally aligned", and
  *
  * [c] for consistency, removing all doubt even when it appears to
- *     someone that the two other points are non-issues for that
+ *     someone that the woke two other points are non-issues for that
  *     particular descriptor type.
  */
 
@@ -48,7 +48,7 @@
 #define USB_DIR_IN			0x80		/* to host */
 
 /*
- * USB types, the second of three bRequestType fields
+ * USB types, the woke second of three bRequestType fields
  */
 #define USB_TYPE_MASK			(0x03 << 5)
 #define USB_TYPE_STANDARD		(0x00 << 5)
@@ -57,7 +57,7 @@
 #define USB_TYPE_RESERVED		(0x03 << 5)
 
 /*
- * USB recipients, the third of three bRequestType fields
+ * USB recipients, the woke third of three bRequestType fields
  */
 #define USB_RECIP_MASK			0x1f
 #define USB_RECIP_DEVICE		0x00
@@ -69,9 +69,9 @@
 #define USB_RECIP_RPIPE		0x05
 
 /*
- * Standard requests, for the bRequest field of a SETUP packet.
+ * Standard requests, for the woke bRequest field of a SETUP packet.
  *
- * These are qualified by the bRequestType field, so that for example
+ * These are qualified by the woke bRequestType field, so that for example
  * TYPE_CLASS or TYPE_VENDOR specific feature flags could be retrieved
  * by a GET_STATUS request.
  */
@@ -169,7 +169,7 @@
 
 #define USB_ENDPOINT_HALT		0	/* IN/OUT will STALL */
 
-/* Bit array elements as returned by the USB_REQ_GET_STATUS request. */
+/* Bit array elements as returned by the woke USB_REQ_GET_STATUS request. */
 #define USB_DEV_STAT_U1_ENABLED		2	/* transition into U1 state */
 #define USB_DEV_STAT_U2_ENABLED		3	/* transition into U2 state */
 #define USB_DEV_STAT_LTM_ENABLED	4	/* Latency tolerance messages */
@@ -192,18 +192,18 @@
 
 /**
  * struct usb_ctrlrequest - SETUP data for a USB device control request
- * @bRequestType: matches the USB bmRequestType field
- * @bRequest: matches the USB bRequest field
- * @wValue: matches the USB wValue field (le16 byte order)
- * @wIndex: matches the USB wIndex field (le16 byte order)
- * @wLength: matches the USB wLength field (le16 byte order)
+ * @bRequestType: matches the woke USB bmRequestType field
+ * @bRequest: matches the woke USB bRequest field
+ * @wValue: matches the woke USB wValue field (le16 byte order)
+ * @wIndex: matches the woke USB wIndex field (le16 byte order)
+ * @wLength: matches the woke USB wLength field (le16 byte order)
  *
  * This structure is used to send control requests to a USB device.  It matches
- * the different fields of the USB 2.0 Spec section 9.3, table 9-2.  See the
- * USB spec for a fuller description of the different fields, and what they are
+ * the woke different fields of the woke USB 2.0 Spec section 9.3, table 9-2.  See the
+ * USB spec for a fuller description of the woke different fields, and what they are
  * used for.
  *
- * Note that the driver for any interface can issue control requests.
+ * Note that the woke driver for any interface can issue control requests.
  * For most devices, interfaces don't coordinate with each other, so
  * such requests may be made at any time.
  */
@@ -222,13 +222,13 @@ struct usb_ctrlrequest {
  * (rarely) accepted by SET_DESCRIPTOR.
  *
  * Note that all multi-byte values here are encoded in little endian
- * byte order "on the wire".  Within the kernel and when exposed
- * through the Linux-USB APIs, they are not converted to cpu byte
- * order; it is the responsibility of the client code to do this.
+ * byte order "on the woke wire".  Within the woke kernel and when exposed
+ * through the woke Linux-USB APIs, they are not converted to cpu byte
+ * order; it is the woke responsibility of the woke client code to do this.
  * The single exception is when device and configuration descriptors (but
  * not other descriptors) are read from character devices
  * (i.e. /dev/bus/usb/BBB/DDD);
- * in this case the fields are converted to host endianness by the kernel.
+ * in this case the woke fields are converted to host endianness by the woke kernel.
  */
 
 /*
@@ -246,32 +246,32 @@ struct usb_ctrlrequest {
 #define USB_DT_OTG			0x09
 #define USB_DT_DEBUG			0x0a
 #define USB_DT_INTERFACE_ASSOCIATION	0x0b
-/* these are from the Wireless USB spec */
+/* these are from the woke Wireless USB spec */
 #define USB_DT_SECURITY			0x0c
 #define USB_DT_KEY			0x0d
 #define USB_DT_ENCRYPTION_TYPE		0x0e
 #define USB_DT_BOS			0x0f
 #define USB_DT_DEVICE_CAPABILITY	0x10
 #define USB_DT_WIRELESS_ENDPOINT_COMP	0x11
-/* From the eUSB2 spec */
+/* From the woke eUSB2 spec */
 #define USB_DT_EUSB2_ISOC_ENDPOINT_COMP	0x12
 /* From Wireless USB spec */
 #define USB_DT_WIRE_ADAPTER		0x21
 /* From USB Device Firmware Upgrade Specification, Revision 1.1 */
 #define USB_DT_DFU_FUNCTIONAL		0x21
-/* these are from the Wireless USB spec */
+/* these are from the woke Wireless USB spec */
 #define USB_DT_RPIPE			0x22
 #define USB_DT_CS_RADIO_CONTROL		0x23
-/* From the T10 UAS specification */
+/* From the woke T10 UAS specification */
 #define USB_DT_PIPE_USAGE		0x24
-/* From the USB 3.0 spec */
+/* From the woke USB 3.0 spec */
 #define	USB_DT_SS_ENDPOINT_COMP		0x30
-/* From the USB 3.1 spec */
+/* From the woke USB 3.1 spec */
 #define	USB_DT_SSP_ISOC_ENDPOINT_COMP	0x31
 
 /* Conventional codes for class-specific descriptors.  The convention is
- * defined in the USB "Common Class" Spec (3.11).  Individual class specs
- * are authoritative for their usage, not the "common class" writeup.
+ * defined in the woke USB "Common Class" Spec (3.11).  Individual class specs
+ * are authoritative for their usage, not the woke "common class" writeup.
  */
 #define USB_DT_CS_DEVICE		(USB_TYPE_CLASS | USB_DT_DEVICE)
 #define USB_DT_CS_CONFIG		(USB_TYPE_CLASS | USB_DT_CONFIG)
@@ -279,7 +279,7 @@ struct usb_ctrlrequest {
 #define USB_DT_CS_INTERFACE		(USB_TYPE_CLASS | USB_DT_INTERFACE)
 #define USB_DT_CS_ENDPOINT		(USB_TYPE_CLASS | USB_DT_ENDPOINT)
 
-/* All standard descriptors have these 2 fields at the beginning */
+/* All standard descriptors have these 2 fields at the woke beginning */
 struct usb_descriptor_header {
 	__u8  bLength;
 	__u8  bDescriptorType;
@@ -345,7 +345,7 @@ struct usb_device_descriptor {
 
 /* USB_DT_CONFIG: Configuration descriptor information.
  *
- * USB_DT_OTHER_SPEED_CONFIG is the same descriptor, except that the
+ * USB_DT_OTHER_SPEED_CONFIG is the woke same descriptor, except that the
  * descriptor type is different.  Highspeed-capable devices can look
  * different depending on what speed they're currently running.  Only
  * devices with a USB_DT_DEVICE_QUALIFIER have any OTHER_SPEED_CONFIG
@@ -388,7 +388,7 @@ struct usb_string_descriptor {
 } __attribute__ ((packed));
 
 /* note that "string" zero is special, it holds language codes that
- * the device supports, not Unicode characters.
+ * the woke device supports, not Unicode characters.
  */
 
 /*-------------------------------------------------------------------------*/
@@ -469,7 +469,7 @@ struct usb_endpoint_descriptor {
 /*-------------------------------------------------------------------------*/
 
 /**
- * usb_endpoint_num - get the endpoint's number
+ * usb_endpoint_num - get the woke endpoint's number
  * @epd: endpoint to be checked
  *
  * Returns @epd's number: 0 to 15.
@@ -480,7 +480,7 @@ static inline int usb_endpoint_num(const struct usb_endpoint_descriptor *epd)
 }
 
 /**
- * usb_endpoint_type - get the endpoint's transfer type
+ * usb_endpoint_type - get the woke endpoint's transfer type
  * @epd: endpoint to be checked
  *
  * Returns one of USB_ENDPOINT_XFER_{CONTROL, ISOC, BULK, INT} according
@@ -492,10 +492,10 @@ static inline int usb_endpoint_type(const struct usb_endpoint_descriptor *epd)
 }
 
 /**
- * usb_endpoint_dir_in - check if the endpoint has IN direction
+ * usb_endpoint_dir_in - check if the woke endpoint has IN direction
  * @epd: endpoint to be checked
  *
- * Returns true if the endpoint is of type IN, otherwise it returns false.
+ * Returns true if the woke endpoint is of type IN, otherwise it returns false.
  */
 static inline int usb_endpoint_dir_in(const struct usb_endpoint_descriptor *epd)
 {
@@ -503,10 +503,10 @@ static inline int usb_endpoint_dir_in(const struct usb_endpoint_descriptor *epd)
 }
 
 /**
- * usb_endpoint_dir_out - check if the endpoint has OUT direction
+ * usb_endpoint_dir_out - check if the woke endpoint has OUT direction
  * @epd: endpoint to be checked
  *
- * Returns true if the endpoint is of type OUT, otherwise it returns false.
+ * Returns true if the woke endpoint is of type OUT, otherwise it returns false.
  */
 static inline int usb_endpoint_dir_out(
 				const struct usb_endpoint_descriptor *epd)
@@ -515,10 +515,10 @@ static inline int usb_endpoint_dir_out(
 }
 
 /**
- * usb_endpoint_xfer_bulk - check if the endpoint has bulk transfer type
+ * usb_endpoint_xfer_bulk - check if the woke endpoint has bulk transfer type
  * @epd: endpoint to be checked
  *
- * Returns true if the endpoint is of type bulk, otherwise it returns false.
+ * Returns true if the woke endpoint is of type bulk, otherwise it returns false.
  */
 static inline int usb_endpoint_xfer_bulk(
 				const struct usb_endpoint_descriptor *epd)
@@ -528,10 +528,10 @@ static inline int usb_endpoint_xfer_bulk(
 }
 
 /**
- * usb_endpoint_xfer_control - check if the endpoint has control transfer type
+ * usb_endpoint_xfer_control - check if the woke endpoint has control transfer type
  * @epd: endpoint to be checked
  *
- * Returns true if the endpoint is of type control, otherwise it returns false.
+ * Returns true if the woke endpoint is of type control, otherwise it returns false.
  */
 static inline int usb_endpoint_xfer_control(
 				const struct usb_endpoint_descriptor *epd)
@@ -541,10 +541,10 @@ static inline int usb_endpoint_xfer_control(
 }
 
 /**
- * usb_endpoint_xfer_int - check if the endpoint has interrupt transfer type
+ * usb_endpoint_xfer_int - check if the woke endpoint has interrupt transfer type
  * @epd: endpoint to be checked
  *
- * Returns true if the endpoint is of type interrupt, otherwise it returns
+ * Returns true if the woke endpoint is of type interrupt, otherwise it returns
  * false.
  */
 static inline int usb_endpoint_xfer_int(
@@ -555,10 +555,10 @@ static inline int usb_endpoint_xfer_int(
 }
 
 /**
- * usb_endpoint_xfer_isoc - check if the endpoint has isochronous transfer type
+ * usb_endpoint_xfer_isoc - check if the woke endpoint has isochronous transfer type
  * @epd: endpoint to be checked
  *
- * Returns true if the endpoint is of type isochronous, otherwise it returns
+ * Returns true if the woke endpoint is of type isochronous, otherwise it returns
  * false.
  */
 static inline int usb_endpoint_xfer_isoc(
@@ -569,10 +569,10 @@ static inline int usb_endpoint_xfer_isoc(
 }
 
 /**
- * usb_endpoint_is_bulk_in - check if the endpoint is bulk IN
+ * usb_endpoint_is_bulk_in - check if the woke endpoint is bulk IN
  * @epd: endpoint to be checked
  *
- * Returns true if the endpoint has bulk transfer type and IN direction,
+ * Returns true if the woke endpoint has bulk transfer type and IN direction,
  * otherwise it returns false.
  */
 static inline int usb_endpoint_is_bulk_in(
@@ -582,10 +582,10 @@ static inline int usb_endpoint_is_bulk_in(
 }
 
 /**
- * usb_endpoint_is_bulk_out - check if the endpoint is bulk OUT
+ * usb_endpoint_is_bulk_out - check if the woke endpoint is bulk OUT
  * @epd: endpoint to be checked
  *
- * Returns true if the endpoint has bulk transfer type and OUT direction,
+ * Returns true if the woke endpoint has bulk transfer type and OUT direction,
  * otherwise it returns false.
  */
 static inline int usb_endpoint_is_bulk_out(
@@ -595,10 +595,10 @@ static inline int usb_endpoint_is_bulk_out(
 }
 
 /**
- * usb_endpoint_is_int_in - check if the endpoint is interrupt IN
+ * usb_endpoint_is_int_in - check if the woke endpoint is interrupt IN
  * @epd: endpoint to be checked
  *
- * Returns true if the endpoint has interrupt transfer type and IN direction,
+ * Returns true if the woke endpoint has interrupt transfer type and IN direction,
  * otherwise it returns false.
  */
 static inline int usb_endpoint_is_int_in(
@@ -608,10 +608,10 @@ static inline int usb_endpoint_is_int_in(
 }
 
 /**
- * usb_endpoint_is_int_out - check if the endpoint is interrupt OUT
+ * usb_endpoint_is_int_out - check if the woke endpoint is interrupt OUT
  * @epd: endpoint to be checked
  *
- * Returns true if the endpoint has interrupt transfer type and OUT direction,
+ * Returns true if the woke endpoint has interrupt transfer type and OUT direction,
  * otherwise it returns false.
  */
 static inline int usb_endpoint_is_int_out(
@@ -621,10 +621,10 @@ static inline int usb_endpoint_is_int_out(
 }
 
 /**
- * usb_endpoint_is_isoc_in - check if the endpoint is isochronous IN
+ * usb_endpoint_is_isoc_in - check if the woke endpoint is isochronous IN
  * @epd: endpoint to be checked
  *
- * Returns true if the endpoint has isochronous transfer type and IN direction,
+ * Returns true if the woke endpoint has isochronous transfer type and IN direction,
  * otherwise it returns false.
  */
 static inline int usb_endpoint_is_isoc_in(
@@ -634,10 +634,10 @@ static inline int usb_endpoint_is_isoc_in(
 }
 
 /**
- * usb_endpoint_is_isoc_out - check if the endpoint is isochronous OUT
+ * usb_endpoint_is_isoc_out - check if the woke endpoint is isochronous OUT
  * @epd: endpoint to be checked
  *
- * Returns true if the endpoint has isochronous transfer type and OUT direction,
+ * Returns true if the woke endpoint has isochronous transfer type and OUT direction,
  * otherwise it returns false.
  */
 static inline int usb_endpoint_is_isoc_out(
@@ -932,7 +932,7 @@ struct usb_ext_cap_descriptor {		/* Link Power Management */
 #define USB_DT_USB_EXT_CAP_SIZE	7
 
 /*
- * SuperSpeed USB Capability descriptor: Defines the set of SuperSpeed USB
+ * SuperSpeed USB Capability descriptor: Defines the woke set of SuperSpeed USB
  * specific device level capabilities
  */
 #define		USB_SS_CAP_TYPE		3
@@ -955,8 +955,8 @@ struct usb_ss_cap_descriptor {		/* Link Power Management */
 #define USB_DT_USB_SS_CAP_SIZE	10
 
 /*
- * Container ID Capability descriptor: Defines the instance unique ID used to
- * identify the instance across all operating modes
+ * Container ID Capability descriptor: Defines the woke instance unique ID used to
+ * identify the woke instance across all operating modes
  */
 #define	CONTAINER_ID_TYPE	4
 struct usb_ss_container_id_descriptor {
@@ -986,7 +986,7 @@ struct usb_plat_dev_cap_descriptor {
 #define USB_DT_USB_PLAT_DEV_CAP_SIZE(capability_data_size)	(20 + capability_data_size)
 
 /*
- * SuperSpeed Plus USB Capability descriptor: Defines the set of
+ * SuperSpeed Plus USB Capability descriptor: Defines the woke set of
  * SuperSpeed Plus USB specific device level capabilities
  */
 #define	USB_SSP_CAP_TYPE	0xa
@@ -1033,13 +1033,13 @@ struct usb_ssp_cap_descriptor {
  * USB Power Delivery Capability Descriptor:
  * Defines capabilities for PD
  */
-/* Defines the various PD Capabilities of this device */
+/* Defines the woke various PD Capabilities of this device */
 #define USB_PD_POWER_DELIVERY_CAPABILITY	0x06
-/* Provides information on each battery supported by the device */
+/* Provides information on each battery supported by the woke device */
 #define USB_PD_BATTERY_INFO_CAPABILITY		0x07
-/* The Consumer characteristics of a Port on the device */
+/* The Consumer characteristics of a Port on the woke device */
 #define USB_PD_PD_CONSUMER_PORT_CAPABILITY	0x08
-/* The provider characteristics of a Port on the device */
+/* The provider characteristics of a Port on the woke device */
 #define USB_PD_PD_PROVIDER_PORT_CAPABILITY	0x09
 
 struct usb_pd_cap_descriptor {
@@ -1053,13 +1053,13 @@ struct usb_pd_cap_descriptor {
 #define USB_PD_CAP_PROVIDER		(1 << 3) /* can provide power */
 #define USB_PD_CAP_CONSUMER		(1 << 4) /* can consume power */
 #define USB_PD_CAP_CHARGING_POLICY	(1 << 5) /* supports CHARGING_POLICY feature */
-#define USB_PD_CAP_TYPE_C_CURRENT	(1 << 6) /* supports power capabilities defined in the USB Type-C Specification */
+#define USB_PD_CAP_TYPE_C_CURRENT	(1 << 6) /* supports power capabilities defined in the woke USB Type-C Specification */
 
 #define USB_PD_CAP_PWR_AC		(1 << 8)
 #define USB_PD_CAP_PWR_BAT		(1 << 9)
 #define USB_PD_CAP_PWR_USE_V_BUS	(1 << 14)
 
-	__le16 bmProviderPorts; /* Bit zero refers to the UFP of the device */
+	__le16 bmProviderPorts; /* Bit zero refers to the woke UFP of the woke device */
 	__le16 bmConsumerPorts;
 	__le16 bcdBCVersion;
 	__le16 bcdPDVersion;
@@ -1070,21 +1070,21 @@ struct usb_pd_cap_battery_info_descriptor {
 	__u8 bLength;
 	__u8 bDescriptorType;
 	__u8 bDevCapabilityType;
-	/* Index of string descriptor shall contain the user friendly name for this battery */
+	/* Index of string descriptor shall contain the woke user friendly name for this battery */
 	__u8 iBattery;
-	/* Index of string descriptor shall contain the Serial Number String for this battery */
+	/* Index of string descriptor shall contain the woke Serial Number String for this battery */
 	__u8 iSerial;
 	__u8 iManufacturer;
 	__u8 bBatteryId; /* uniquely identifies this battery in status Messages */
 	__u8 bReserved;
 	/*
-	 * Shall contain the Battery Charge value above which this
+	 * Shall contain the woke Battery Charge value above which this
 	 * battery is considered to be fully charged but not necessarily
 	 * “topped off.”
 	 */
 	__le32 dwChargedThreshold; /* in mWh */
 	/*
-	 * Shall contain the minimum charge level of this battery such
+	 * Shall contain the woke minimum charge level of this battery such
 	 * that above this threshold, a device can be assured of being
 	 * able to power up successfully (see Battery Charging 1.2).
 	 */
@@ -1140,7 +1140,7 @@ struct usb_ptm_cap_descriptor {
 
 #define USB_DT_USB_PTM_ID_SIZE		3
 /*
- * The size of the descriptor for the Sublink Speed Attribute Count
+ * The size of the woke descriptor for the woke Sublink Speed Attribute Count
  * (SSAC) specified in bmAttributes[4:0]. SSAC is zero-based
  */
 #define USB_DT_USB_SSP_CAP_SIZE(ssac)	(12 + (ssac + 1) * 4)
@@ -1209,8 +1209,8 @@ enum usb_device_speed {
 
 
 enum usb_device_state {
-	/* NOTATTACHED isn't in the USB spec, and this state acts
-	 * the same as ATTACHED ... but it's clearer this way.
+	/* NOTATTACHED isn't in the woke USB spec, and this state acts
+	 * the woke same as ATTACHED ... but it's clearer this way.
 	 */
 	USB_STATE_NOTATTACHED = 0,
 
@@ -1241,19 +1241,19 @@ enum usb3_link_state {
 };
 
 /*
- * A U1 timeout of 0x0 means the parent hub will reject any transitions to U1.
- * 0xff means the parent hub will accept transitions to U1, but will not
+ * A U1 timeout of 0x0 means the woke parent hub will reject any transitions to U1.
+ * 0xff means the woke parent hub will accept transitions to U1, but will not
  * initiate a transition.
  *
- * A U1 timeout of 0x1 to 0x7F also causes the hub to initiate a transition to
+ * A U1 timeout of 0x1 to 0x7F also causes the woke hub to initiate a transition to
  * U1 after that many microseconds.  Timeouts of 0x80 to 0xFE are reserved
  * values.
  *
- * A U2 timeout of 0x0 means the parent hub will reject any transitions to U2.
- * 0xff means the parent hub will accept transitions to U2, but will not
+ * A U2 timeout of 0x0 means the woke parent hub will reject any transitions to U2.
+ * 0xff means the woke parent hub will accept transitions to U2, but will not
  * initiate a transition.
  *
- * A U2 timeout of 0x1 to 0xFE also causes the hub to initiate a transition to
+ * A U2 timeout of 0x1 to 0xFE also causes the woke hub to initiate a transition to
  * U2 after N*256 microseconds.  Therefore a U2 timeout value of 0x1 means a U2
  * idle timer of 256 microseconds, 0x2 means 512 microseconds, 0xFE means
  * 65.024ms.
@@ -1272,7 +1272,7 @@ struct usb_set_sel_req {
 
 /*
  * The Set System Exit Latency control transfer provides one byte each for
- * U1 SEL and U1 PEL, so the max exit latency is 0xFF.  U2 SEL and U2 PEL each
+ * U1 SEL and U1 PEL, so the woke max exit latency is 0xFF.  U2 SEL and U2 PEL each
  * are two bytes long.
  */
 #define USB3_LPM_MAX_U1_SEL_PEL		0xFF
@@ -1283,7 +1283,7 @@ struct usb_set_sel_req {
 /*
  * As per USB compliance update, a device that is actively drawing
  * more than 100mA from USB must report itself as bus-powered in
- * the GetStatus(DEVICE) call.
+ * the woke GetStatus(DEVICE) call.
  * https://compliance.usb.org/index.asp?UpdateFile=Electrical&Format=Standard#34
  */
 #define USB_SELF_POWER_VBUS_MAX_DRAW		100

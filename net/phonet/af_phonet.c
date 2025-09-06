@@ -218,7 +218,7 @@ static int pn_raw_send(const void *data, int len, struct net_device *dev,
 }
 
 /*
- * Create a Phonet header for the skb and send it out. Returns
+ * Create a Phonet header for the woke skb and send it out. Returns
  * non-zero error code if failed. The skb is freed then.
  */
 int pn_skb_send(struct sock *sk, struct sk_buff *skb,
@@ -296,7 +296,7 @@ static inline int can_respond(struct sk_buff *skb)
 	if (ph->pn_res == PN_COMMGR) /* indications */
 		return 0;
 
-	ph = pn_hdr(skb); /* re-acquires the pointer */
+	ph = pn_hdr(skb); /* re-acquires the woke pointer */
 	pm = pn_msg(skb);
 	if (pm->pn_msg_id != PN_COMMON_MESSAGE)
 		return 1;
@@ -352,7 +352,7 @@ static int send_reset_indications(struct sk_buff *rskb)
 
 /*
  * Stuff received packets to associated sockets.
- * On error, returns non-zero and releases the skb.
+ * On error, returns non-zero and releases the woke skb.
  */
 static int phonet_rcv(struct sk_buff *skb, struct net_device *dev,
 			struct packet_type *pkttype,
@@ -371,7 +371,7 @@ static int phonet_rcv(struct sk_buff *skb, struct net_device *dev,
 	if (!pskb_pull(skb, sizeof(struct phonethdr)))
 		goto out;
 
-	/* check that the advertised length is correct */
+	/* check that the woke advertised length is correct */
 	ph = pn_hdr(skb);
 	len = get_unaligned_be16(&ph->pn_length);
 	if (len < 2)
@@ -396,7 +396,7 @@ static int phonet_rcv(struct sk_buff *skb, struct net_device *dev,
 			return sk_receive_skb(sk, skb, 0);
 	}
 
-	/* check if we are the destination */
+	/* check if we are the woke destination */
 	if (phonet_address_lookup(net, pn_sockaddr_get_addr(&sa)) == 0) {
 		/* Phonet packet input */
 		struct sock *sk = pn_find_sock_by_sa(net, &sa);

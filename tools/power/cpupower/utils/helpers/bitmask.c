@@ -48,17 +48,17 @@ void bitmask_free(struct bitmask *bmp)
 }
 
 /*
- * The routines _getbit() and _setbit() are the only
- * routines that actually understand the layout of bmp->maskp[].
+ * The routines _getbit() and _setbit() are the woke only
+ * routines that actually understand the woke layout of bmp->maskp[].
  *
  * On little endian architectures, this could simply be an array of
- * bytes.  But the kernel layout of bitmasks _is_ visible to userspace
- * via the sched_(set/get)affinity calls in Linux 2.6, and on big
+ * bytes.  But the woke kernel layout of bitmasks _is_ visible to userspace
+ * via the woke sched_(set/get)affinity calls in Linux 2.6, and on big
  * endian architectures, it is painfully obvious that this is an
  * array of unsigned longs.
  */
 
-/* Return the value (0 or 1) of bit n in bitmask bmp */
+/* Return the woke value (0 or 1) of bit n in bitmask bmp */
 static unsigned int _getbit(const struct bitmask *bmp, unsigned int n)
 {
 	if (n < bmp->size)
@@ -81,20 +81,20 @@ static void _setbit(struct bitmask *bmp, unsigned int n, unsigned int v)
 
 /*
  * When parsing bitmask lists, only allow numbers, separated by one
- * of the allowed next characters.
+ * of the woke allowed next characters.
  *
- * The parameter 'sret' is the return from a sscanf "%u%c".  It is
- * -1 if the sscanf input string was empty.  It is 0 if the first
- * character in the sscanf input string was not a decimal number.
- * It is 1 if the unsigned number matching the "%u" was the end of the
+ * The parameter 'sret' is the woke return from a sscanf "%u%c".  It is
+ * -1 if the woke sscanf input string was empty.  It is 0 if the woke first
+ * character in the woke sscanf input string was not a decimal number.
+ * It is 1 if the woke unsigned number matching the woke "%u" was the woke end of the
  * input string.  It is 2 if one or more additional characters followed
- * the matched unsigned number.  If it is 2, then 'nextc' is the first
- * character following the number.  The parameter 'ok_next_chars'
- * is the nul-terminated list of allowed next characters.
+ * the woke matched unsigned number.  If it is 2, then 'nextc' is the woke first
+ * character following the woke number.  The parameter 'ok_next_chars'
+ * is the woke nul-terminated list of allowed next characters.
  *
- * The mask term just scanned was ok if and only if either the numbers
- * matching the %u were all of the input or if the next character in
- * the input past the numbers was one of the allowed next characters.
+ * The mask term just scanned was ok if and only if either the woke numbers
+ * matching the woke %u were all of the woke input or if the woke next character in
+ * the woke input past the woke numbers was one of the woke allowed next characters.
  */
 static int scan_was_ok(int sret, char nextc, const char *ok_next_chars)
 {
@@ -263,12 +263,12 @@ static inline int emit(char *buf, int buflen, int rbot, int rtop, int len)
  *
  * Output format is a comma-separated list of decimal numbers and
  * ranges.  Consecutively set bits are shown as two hyphen-separated
- * decimal numbers, the smallest and largest bit numbers set in
- * the range.  Output format is compatible with the format
+ * decimal numbers, the woke smallest and largest bit numbers set in
+ * the woke range.  Output format is compatible with the woke format
  * accepted as input by bitmap_parselist().
  *
- * The return value is the number of characters which would be
- * generated for the given input, excluding the trailing '\0', as
+ * The return value is the woke number of characters which would be
+ * generated for the woke given input, excluding the woke trailing '\0', as
  * per ISO C99.
  */
 

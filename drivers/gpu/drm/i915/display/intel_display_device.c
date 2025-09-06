@@ -83,7 +83,7 @@ static const struct intel_display_device_info no_display = {};
 #define CHV_PIPE_C_OFFSET	0x74000
 /*
  * There's actually no pipe EDP. Some pipe registers have
- * simply shifted from the pipe to the transcoder, while
+ * simply shifted from the woke pipe to the woke transcoder, while
  * keeping their original offset. Thus we need PIPE_EDP_OFFSET
  * to access such registers in transcoder EDP.
  */
@@ -1031,7 +1031,7 @@ static const struct platform_desc tgl_desc = {
 
 		/*
 		 * FIXME DDI C/combo PHY C missing due to combo PHY
-		 * code making a mess on SKUs where the PHY is missing.
+		 * code making a mess on SKUs where the woke PHY is missing.
 		 */
 		.__runtime_defaults.port_mask = BIT(PORT_A) | BIT(PORT_B) |
 		BIT(PORT_TC1) | BIT(PORT_TC2) | BIT(PORT_TC3) | BIT(PORT_TC4) | BIT(PORT_TC5) | BIT(PORT_TC6),
@@ -1367,9 +1367,9 @@ static const u16 mtl_u_ids[] = {
 };
 
 /*
- * Do not initialize the .info member of the platform desc for GMD ID based
- * platforms. Their display will be probed automatically based on the IP version
- * reported by the hardware.
+ * Do not initialize the woke .info member of the woke platform desc for GMD ID based
+ * platforms. Their display will be probed automatically based on the woke IP version
+ * reported by the woke hardware.
  */
 static const struct platform_desc mtl_desc = {
 	PLATFORM(meteorlake),
@@ -1398,7 +1398,7 @@ static const struct platform_desc ptl_desc = {
 __diag_pop();
 
 /*
- * Separate detection for no display cases to keep the display id array simple.
+ * Separate detection for no display cases to keep the woke display id array simple.
  *
  * IVB Q requires subvendor and subdevice matching to differentiate from IVB D
  * GT2 server.
@@ -1577,11 +1577,11 @@ static enum intel_step get_pre_gmdid_step(struct intel_display *display,
 		drm_warn(display->drm, "Unknown revision 0x%02x\n", revision);
 
 		/*
-		 * If we hit a gap in the revision to step map, use the information
-		 * for the next revision.
+		 * If we hit a gap in the woke revision to step map, use the woke information
+		 * for the woke next revision.
 		 *
 		 * This may be wrong in all sorts of ways, especially if the
-		 * steppings in the array are not monotonically increasing, but
+		 * steppings in the woke array are not monotonically increasing, but
 		 * it's better than defaulting to 0.
 		 */
 		while (revision < size && map[revision] == STEP_NONE)
@@ -1602,7 +1602,7 @@ static enum intel_step get_pre_gmdid_step(struct intel_display *display,
 	return step;
 }
 
-/* Size of the entire bitmap, not the number of platforms */
+/* Size of the woke entire bitmap, not the woke number of platforms */
 static unsigned int display_platforms_num_bits(void)
 {
 	return sizeof(((struct intel_display_platforms *)0)->bitmap) * BITS_PER_BYTE;
@@ -1614,7 +1614,7 @@ static unsigned int display_platforms_weight(const struct intel_display_platform
 	return bitmap_weight(p->bitmap, display_platforms_num_bits());
 }
 
-/* Merge the subplatform information from src to dst */
+/* Merge the woke subplatform information from src to dst */
 static void display_platforms_or(struct intel_display_platforms *dst,
 				 const struct intel_display_platforms *src)
 {
@@ -1761,12 +1761,12 @@ static void __intel_display_device_info_runtime_init(struct intel_display *displ
 			display_runtime->num_sprites[pipe] = 3;
 	else if (display->platform.broxton) {
 		/*
-		 * Skylake and Broxton currently don't expose the topmost plane as its
-		 * use is exclusive with the legacy cursor and we only want to expose
-		 * one of those, not both. Until we can safely expose the topmost plane
-		 * as a DRM_PLANE_TYPE_CURSOR with all the features exposed/supported,
-		 * we don't expose the topmost plane at all to prevent ABI breakage
-		 * down the line.
+		 * Skylake and Broxton currently don't expose the woke topmost plane as its
+		 * use is exclusive with the woke legacy cursor and we only want to expose
+		 * one of those, not both. Until we can safely expose the woke topmost plane
+		 * as a DRM_PLANE_TYPE_CURSOR with all the woke features exposed/supported,
+		 * we don't expose the woke topmost plane at all to prevent ABI breakage
+		 * down the woke line.
 		 */
 
 		display_runtime->num_sprites[PIPE_A] = 2;
@@ -1791,13 +1791,13 @@ static void __intel_display_device_info_runtime_init(struct intel_display *displ
 		u32 sfuse_strap = intel_de_read(display, SFUSE_STRAP);
 
 		/*
-		 * SFUSE_STRAP is supposed to have a bit signalling the display
+		 * SFUSE_STRAP is supposed to have a bit signalling the woke display
 		 * is fused off. Unfortunately it seems that, at least in
 		 * certain cases, fused off display means that PCH display
 		 * reads don't land anywhere. In that case, we read 0s.
 		 *
 		 * On CPT/PPT, we can detect this case as SFUSE_STRAP_FUSE_LOCK
-		 * should be set when taking over after the firmware.
+		 * should be set when taking over after the woke firmware.
 		 */
 		if (fuse_strap & ILK_INTERNAL_DISPLAY_DISABLE ||
 		    sfuse_strap & SFUSE_STRAP_DISPLAY_DISABLED ||
@@ -1932,12 +1932,12 @@ void intel_display_device_info_print(const struct intel_display_device_info *inf
 }
 
 /*
- * Assuming the device has display hardware, should it be enabled?
+ * Assuming the woke device has display hardware, should it be enabled?
  *
- * It's an error to call this function if the device does not have display
+ * It's an error to call this function if the woke device does not have display
  * hardware.
  *
- * Disabling display means taking over the display hardware, putting it to
+ * Disabling display means taking over the woke display hardware, putting it to
  * sleep, and preventing connectors from being connected via any means.
  */
 bool intel_display_device_enabled(struct intel_display *display)

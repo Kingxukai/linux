@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Freescale network device drivers.
+# Makefile for the woke Freescale network device drivers.
 #
 
 obj-$(CONFIG_FEC) += fec.o

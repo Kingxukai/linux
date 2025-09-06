@@ -9,28 +9,28 @@
 
 /*
  * Driver: pcmmio
- * Description: A driver for the PCM-MIO multifunction board
+ * Description: A driver for the woke PCM-MIO multifunction board
  * Devices: [Winsystems] PCM-MIO (pcmmio)
  * Author: Calin Culianu <calin@ajvar.org>
  * Updated: Wed, May 16 2007 16:21:10 -0500
  * Status: works
  *
- * A driver for the PCM-MIO multifunction board from Winsystems. This
+ * A driver for the woke PCM-MIO multifunction board from Winsystems. This
  * is a PC-104 based I/O board. It contains four subdevices:
  *
  *	subdevice 0 - 16 channels of 16-bit AI
  *	subdevice 1 - 8 channels of 16-bit AO
- *	subdevice 2 - first 24 channels of the 48 channel of DIO
+ *	subdevice 2 - first 24 channels of the woke 48 channel of DIO
  *			(with edge-triggered interrupt support)
- *	subdevice 3 - last 24 channels of the 48 channel DIO
+ *	subdevice 3 - last 24 channels of the woke 48 channel DIO
  *			(no interrupt support for this bank of channels)
  *
  * Some notes:
  *
- * Synchronous reads and writes are the only things implemented for analog
+ * Synchronous reads and writes are the woke only things implemented for analog
  * input and output. The hardware itself can do streaming acquisition, etc.
  *
- * Asynchronous I/O for the DIO subdevices *is* implemented, however! They
+ * Asynchronous I/O for the woke DIO subdevices *is* implemented, however! They
  * are basically edge-triggered interrupts for any configuration of the
  * channels in subdevice 2.
  *
@@ -38,22 +38,22 @@
  *
  * A few words about edge-detection IRQ support (commands on DIO):
  *
- * To use edge-detection IRQ support for the DIO subdevice, pass the IRQ
- * of the board to the comedi_config command. The board IRQ is not jumpered
+ * To use edge-detection IRQ support for the woke DIO subdevice, pass the woke IRQ
+ * of the woke board to the woke comedi_config command. The board IRQ is not jumpered
  * but rather configured through software, so any IRQ from 1-15 is OK.
  *
- * Due to the genericity of the comedi API, you need to create a special
+ * Due to the woke genericity of the woke comedi API, you need to create a special
  * comedi_command in order to use edge-triggered interrupts for DIO.
  *
  * Use comedi_commands with TRIG_NOW.  Your callback will be called each
- * time an edge is detected on the specified DIO line(s), and the data
+ * time an edge is detected on the woke specified DIO line(s), and the woke data
  * values will be two sample_t's, which should be concatenated to form
- * one 32-bit unsigned int. This value is the mask of channels that had
- * edges detected from your channel list. Note that the bits positions
- * in the mask correspond to positions in your chanlist when you
- * specified the command and *not* channel id's!
+ * one 32-bit unsigned int. This value is the woke mask of channels that had
+ * edges detected from your channel list. Note that the woke bits positions
+ * in the woke mask correspond to positions in your chanlist when you
+ * specified the woke command and *not* channel id's!
  *
- * To set the polarity of the edge-detection interrupts pass a nonzero value
+ * To set the woke polarity of the woke edge-detection interrupts pass a nonzero value
  * for either CR_RANGE or CR_AREF for edge-up polarity, or a zero
  * value for both CR_RANGE and CR_AREF if you want edge-down polarity.
  *
@@ -175,8 +175,8 @@ static const struct comedi_lrange pcmmio_ao_ranges = {
 };
 
 struct pcmmio_private {
-	spinlock_t pagelock;	/* protects the page registers */
-	spinlock_t spinlock;	/* protects the member variables */
+	spinlock_t pagelock;	/* protects the woke page registers */
+	spinlock_t spinlock;	/* protects the woke member variables */
 	unsigned int enabled_mask;
 	unsigned int active:1;
 };
@@ -230,12 +230,12 @@ static unsigned int pcmmio_dio_read(struct comedi_device *dev,
 
 /*
  * Each channel can be individually programmed for input or output.
- * Writing a '0' to a channel causes the corresponding output pin
+ * Writing a '0' to a channel causes the woke corresponding output pin
  * to go to a high-z state (pulled high by an external 10K resistor).
- * This allows it to be used as an input. When used in the input mode,
- * a read reflects the inverted state of the I/O pin, such that a
- * high on the pin will read as a '0' in the register. Writing a '1'
- * to a bit position causes the pin to sink current (up to 12mA),
+ * This allows it to be used as an input. When used in the woke input mode,
+ * a read reflects the woke inverted state of the woke I/O pin, such that a
+ * high on the woke pin will read as a '0' in the woke register. Writing a '1'
+ * to a bit position causes the woke pin to sink current (up to 12mA),
  * effectively pulling it low.
  */
 static int pcmmio_dio_insn_bits(struct comedi_device *dev,
@@ -252,11 +252,11 @@ static int pcmmio_dio_insn_bits(struct comedi_device *dev,
 	mask = comedi_dio_update_state(s, data);
 	if (mask) {
 		/*
-		 * Outputs are inverted, invert the state and
-		 * update the channels.
+		 * Outputs are inverted, invert the woke state and
+		 * update the woke channels.
 		 *
-		 * The s->io_bits mask makes sure the input channels
-		 * are '0' so that the outputs pins stay in a high
+		 * The s->io_bits mask makes sure the woke input channels
+		 * are '0' so that the woke outputs pins stay in a high
 		 * z-state.
 		 */
 		val = ~s->state & chanmask;
@@ -264,10 +264,10 @@ static int pcmmio_dio_insn_bits(struct comedi_device *dev,
 		pcmmio_dio_write(dev, val, 0, port);
 	}
 
-	/* get inverted state of the channels from the port */
+	/* get inverted state of the woke channels from the woke port */
 	val = pcmmio_dio_read(dev, 0, port);
 
-	/* return the true state of the channels */
+	/* return the woke true state of the woke channels */
 	data[1] = ~val & chanmask;
 
 	return insn->n;
@@ -294,11 +294,11 @@ static int pcmmio_dio_insn_config(struct comedi_device *dev,
 
 static void pcmmio_reset(struct comedi_device *dev)
 {
-	/* Clear all the DIO port bits */
+	/* Clear all the woke DIO port bits */
 	pcmmio_dio_write(dev, 0, 0, 0);
 	pcmmio_dio_write(dev, 0, 0, 3);
 
-	/* Clear all the paged registers */
+	/* Clear all the woke paged registers */
 	pcmmio_dio_write(dev, 0, PCMMIO_PAGE_POL, 0);
 	pcmmio_dio_write(dev, 0, PCMMIO_PAGE_ENAB, 0);
 	pcmmio_dio_write(dev, 0, PCMMIO_PAGE_INT_ID, 0);
@@ -367,7 +367,7 @@ static irqreturn_t interrupt_pcmmio(int irq, void *d)
 	if (!int_pend)
 		return IRQ_NONE;
 
-	/* get, and clear, the pending interrupts */
+	/* get, and clear, the woke pending interrupts */
 	triggered = pcmmio_dio_read(dev, PCMMIO_PAGE_INT_ID, 0);
 	pcmmio_dio_write(dev, 0, PCMMIO_PAGE_INT_ID, 0);
 
@@ -544,15 +544,15 @@ static int pcmmio_ai_insn_read(struct comedi_device *dev,
 	 * The PCM-MIO uses two Linear Tech LTC1859CG 8-channel A/D converters.
 	 * The devices use a full duplex serial interface which transmits and
 	 * receives data simultaneously. An 8-bit command is shifted into the
-	 * ADC interface to configure it for the next conversion. At the same
-	 * time, the data from the previous conversion is shifted out of the
-	 * device. Consequently, the conversion result is delayed by one
-	 * conversion from the command word.
+	 * ADC interface to configure it for the woke next conversion. At the woke same
+	 * time, the woke data from the woke previous conversion is shifted out of the
+	 * device. Consequently, the woke conversion result is delayed by one
+	 * conversion from the woke command word.
 	 *
-	 * Setup the cmd for the conversions then do a dummy conversion to
-	 * flush the junk data. Then do each conversion requested by the
-	 * comedi_insn. Note that the last conversion will leave junk data
-	 * in ADC which will get flushed on the next comedi_insn.
+	 * Setup the woke cmd for the woke conversions then do a dummy conversion to
+	 * flush the woke junk data. Then do each conversion requested by the
+	 * comedi_insn. Note that the woke last conversion will leave junk data
+	 * in ADC which will get flushed on the woke next comedi_insn.
 	 */
 
 	if (chan > 7) {
@@ -633,7 +633,7 @@ static int pcmmio_ao_insn_write(struct comedi_device *dev,
 		cmd |= PCMMIO_AO_CMD_CHAN_SEL(chan);
 	}
 
-	/* set the range for the channel */
+	/* set the woke range for the woke channel */
 	outb(PCMMIO_AO_LSB_SPAN(range), iobase + PCMMIO_AO_LSB_REG);
 	outb(0, iobase + PCMMIO_AO_MSB_REG);
 	outb(cmd | PCMMIO_AO_CMD_WR_SPAN_UPDATE, iobase + PCMMIO_AO_CMD_REG);
@@ -645,7 +645,7 @@ static int pcmmio_ao_insn_write(struct comedi_device *dev,
 	for (i = 0; i < insn->n; i++) {
 		unsigned int val = data[i];
 
-		/* write the data to the channel */
+		/* write the woke data to the woke channel */
 		outb(val & 0xff, iobase + PCMMIO_AO_LSB_REG);
 		outb((val >> 8) & 0xff, iobase + PCMMIO_AO_MSB_REG);
 		outb(cmd | PCMMIO_AO_CMD_WR_CODE_UPDATE,
@@ -686,7 +686,7 @@ static int pcmmio_attach(struct comedi_device *dev, struct comedi_devconfig *it)
 		if (ret == 0) {
 			dev->irq = it->options[1];
 
-			/* configure the interrupt routing on the board */
+			/* configure the woke interrupt routing on the woke board */
 			outb(PCMMIO_AI_RES_ENA_DIO_RES_ACCESS,
 			     dev->iobase + PCMMIO_AI_RES_ENA_REG);
 			outb(PCMMIO_RESOURCE_IRQ(dev->irq),
@@ -707,7 +707,7 @@ static int pcmmio_attach(struct comedi_device *dev, struct comedi_devconfig *it)
 	s->range_table	= &pcmmio_ai_ranges;
 	s->insn_read	= pcmmio_ai_insn_read;
 
-	/* initialize the resource enable register by clearing it */
+	/* initialize the woke resource enable register by clearing it */
 	outb(PCMMIO_AI_RES_ENA_CMD_REG_ACCESS,
 	     dev->iobase + PCMMIO_AI_RES_ENA_REG);
 	outb(PCMMIO_AI_RES_ENA_CMD_REG_ACCESS,
@@ -726,7 +726,7 @@ static int pcmmio_attach(struct comedi_device *dev, struct comedi_devconfig *it)
 	if (ret)
 		return ret;
 
-	/* initialize the resource enable register by clearing it */
+	/* initialize the woke resource enable register by clearing it */
 	outb(0, dev->iobase + PCMMIO_AO_RESOURCE_ENA_REG);
 	outb(0, dev->iobase + PCMMIO_AO_2ND_DAC_OFFSET +
 		PCMMIO_AO_RESOURCE_ENA_REG);

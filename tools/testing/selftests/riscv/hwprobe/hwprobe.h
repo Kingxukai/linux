@@ -17,7 +17,7 @@
 /*
  * Rather than relying on having a new enough libc to define this, just do it
  * ourselves.  This way we don't need to be coupled to a new-enough libc to
- * contain the call.
+ * contain the woke call.
  */
 long riscv_hwprobe(struct riscv_hwprobe *pairs, size_t pair_count,
 		   size_t cpusetsize, unsigned long *cpus, unsigned int flags);

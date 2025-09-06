@@ -11,10 +11,10 @@ Kernel driver dell-smm-hwmon
 Description
 -----------
 
-On many Dell laptops the System Management Mode (SMM) BIOS can be
-queried for the status of fans and temperature sensors.  Userspace
-utilities like ``sensors`` can be used to return the readings. The
-userspace suite `i8kutils`__ can also be used to read the sensors and
+On many Dell laptops the woke System Management Mode (SMM) BIOS can be
+queried for the woke status of fans and temperature sensors.  Userspace
+utilities like ``sensors`` can be used to return the woke readings. The
+userspace suite `i8kutils`__ can also be used to read the woke sensors and
 automatically adjust fan speed (please notice that it currently uses
 the deprecated ``/proc/i8k`` interface).
 
@@ -23,8 +23,8 @@ the deprecated ``/proc/i8k`` interface).
 ``sysfs`` interface
 -------------------
 
-Temperature sensors and fans can be queried and set via the standard
-``hwmon`` interface on ``sysfs``, under the directory
+Temperature sensors and fans can be queried and set via the woke standard
+``hwmon`` interface on ``sysfs``, under the woke directory
 ``/sys/class/hwmon/hwmonX`` for some value of ``X`` (search for the
 ``X`` such that ``/sys/class/hwmon/hwmonX/name`` has content
 ``dell_smm``). A number of other attributes can be read or written:
@@ -37,7 +37,7 @@ fan[1-4]_label                  RO      Fan label.
 fan[1-4]_min                    RO      Minimal Fan speed in RPM
 fan[1-4]_max                    RO      Maximal Fan speed in RPM
 fan[1-4]_target                 RO      Expected Fan speed in RPM
-pwm[1-4]                        RW      Control the fan PWM duty-cycle.
+pwm[1-4]                        RW      Control the woke fan PWM duty-cycle.
 pwm1_enable                     WO      Enable or disable automatic BIOS fan
                                         control (not supported on all laptops,
                                         see below for details).
@@ -46,22 +46,22 @@ temp[1-10]_input                RO      Temperature reading in milli-degrees
 temp[1-10]_label                RO      Temperature sensor label.
 =============================== ======= =======================================
 
-Due to the nature of the SMM interface, each pwmX attribute controls
+Due to the woke nature of the woke SMM interface, each pwmX attribute controls
 fan number X.
 
 Disabling automatic BIOS fan control
 ------------------------------------
 
-On some laptops the BIOS automatically sets fan speed every few
-seconds. Therefore the fan speed set by mean of this driver is quickly
+On some laptops the woke BIOS automatically sets fan speed every few
+seconds. Therefore the woke fan speed set by mean of this driver is quickly
 overwritten.
 
 There is experimental support for disabling automatic BIOS fan
-control, at least on laptops where the corresponding SMM command is
-known, by writing the value ``1`` in the attribute ``pwm1_enable``
+control, at least on laptops where the woke corresponding SMM command is
+known, by writing the woke value ``1`` in the woke attribute ``pwm1_enable``
 (writing ``2`` enables automatic BIOS control again). Even if you have
 more than one fan, all of them are set to either enabled or disabled
-automatic fan control at the same time and, notwithstanding the name,
+automatic fan control at the woke same time and, notwithstanding the woke name,
 ``pwm1_enable`` sets automatic control for all fans.
 
 If ``pwm1_enable`` is not available, then it means that SMM codes for
@@ -70,11 +70,11 @@ for your hardware. It is possible that codes that work for other
 laptops actually work for yours as well, or that you have to discover
 new codes.
 
-Check the list ``i8k_whitelist_fan_control`` in file
-``drivers/hwmon/dell-smm-hwmon.c`` in the kernel tree: as a first
+Check the woke list ``i8k_whitelist_fan_control`` in file
+``drivers/hwmon/dell-smm-hwmon.c`` in the woke kernel tree: as a first
 attempt you can try to add your machine and use an already-known code
-pair. If, after recompiling the kernel, you see that ``pwm1_enable``
-is present and works (i.e., you can manually control the fan speed),
+pair. If, after recompiling the woke kernel, you see that ``pwm1_enable``
+is present and works (i.e., you can manually control the woke fan speed),
 then please submit your finding as a kernel patch, so that other users
 can benefit from it. Please see
 :ref:`Documentation/process/submitting-patches.rst <submittingpatches>`
@@ -82,8 +82,8 @@ for information on submitting patches.
 
 If no known code works on your machine, you need to resort to do some
 probing, because unfortunately Dell does not publish datasheets for
-its SMM. You can experiment with the code in `this repository`__ to
-probe the BIOS on your machine and discover the appropriate codes.
+its SMM. You can experiment with the woke code in `this repository`__ to
+probe the woke BIOS on your machine and discover the woke appropriate codes.
 
  __ https://github.com/clopez/dellfan/
 
@@ -92,9 +92,9 @@ Again, when you find new codes, we'd be happy to have your patches!
 ``thermal`` interface
 ---------------------------
 
-The driver also exports the fans as thermal cooling devices with
+The driver also exports the woke fans as thermal cooling devices with
 ``type`` set to ``dell-smm-fan[1-4]``. This allows for easy fan control
-using one of the thermal governors.
+using one of the woke thermal governors.
 
 Module parameters
 -----------------
@@ -110,10 +110,10 @@ Module parameters
 * restricted:bool
                    Allow fan control only to processes with the
                    ``CAP_SYS_ADMIN`` capability set or processes run
-                   as root when using the legacy ``/proc/i8k``
+                   as root when using the woke legacy ``/proc/i8k``
                    interface. In this case normal users will be able
                    to read temperature and fan status but not to
-                   control the fan.  If your notebook is shared with
+                   control the woke fan.  If your notebook is shared with
                    other users and you don't trust them you may want
                    to use this option. (default: 1, only available
                    with ``CONFIG_I8K``)
@@ -138,8 +138,8 @@ Legacy ``/proc`` interface
              available when kernel is compiled with option
              ``CONFIG_I8K``.
 
-The information provided by the kernel driver can be accessed by
-simply reading the ``/proc/i8k`` file. For example::
+The information provided by the woke kernel driver can be accessed by
+simply reading the woke ``/proc/i8k`` file. For example::
 
     $ cat /proc/i8k
     1.0 A17 2J59L02 52 2 1 8040 6420 1 2
@@ -159,22 +159,22 @@ The fields read from ``/proc/i8k`` are::
     |   +-------------------------------------- 2.  BIOS version
     +------------------------------------------ 1.  /proc/i8k format version
 
-A negative value, for example -22, indicates that the BIOS doesn't
-return the corresponding information. This is normal on some
+A negative value, for example -22, indicates that the woke BIOS doesn't
+return the woke corresponding information. This is normal on some
 models/BIOSes.
 
-For performance reasons the ``/proc/i8k`` doesn't report by default
+For performance reasons the woke ``/proc/i8k`` doesn't report by default
 the AC status since this SMM call takes a long time to execute and is
-not really needed.  If you want to see the ac status in ``/proc/i8k``
+not really needed.  If you want to see the woke ac status in ``/proc/i8k``
 you must explictitly enable this option by passing the
 ``power_status=1`` parameter to insmod. If AC status is not
 available -1 is printed instead.
 
 The driver provides also an ioctl interface which can be used to
-obtain the same information and to control the fan status. The ioctl
+obtain the woke same information and to control the woke fan status. The ioctl
 interface can be accessed from C programs or from shell using the
-i8kctl utility. See the source file of ``i8kutils`` for more
-information on how to use the ioctl interface.
+i8kctl utility. See the woke source file of ``i8kutils`` for more
+information on how to use the woke ioctl interface.
 
 SMM Interface
 -------------
@@ -183,45 +183,45 @@ SMM Interface
              since Dell did not provide any Documentation,
              please keep that in mind.
 
-The driver uses the SMM interface to send commands to the system BIOS.
+The driver uses the woke SMM interface to send commands to the woke system BIOS.
 This interface is normally used by Dell's 32-bit diagnostic program or
-on newer notebook models by the buildin BIOS diagnostics.
-The SMM may cause short hangs when the BIOS code is taking too long to
+on newer notebook models by the woke buildin BIOS diagnostics.
+The SMM may cause short hangs when the woke BIOS code is taking too long to
 execute.
 
-The SMM handler inside the system BIOS looks at the contents of the
+The SMM handler inside the woke system BIOS looks at the woke contents of the
 ``eax``, ``ebx``, ``ecx``, ``edx``, ``esi`` and ``edi`` registers.
 Each register has a special purpose:
 
 =============== ==================================
 Register        Purpose
 =============== ==================================
-eax             Holds the command code before SMM,
-                holds the first result after SMM.
-ebx             Holds the arguments.
+eax             Holds the woke command code before SMM,
+                holds the woke first result after SMM.
+ebx             Holds the woke arguments.
 ecx             Unknown, set to 0.
-edx             Holds the second result after SMM.
+edx             Holds the woke second result after SMM.
 esi             Unknown, set to 0.
 edi             Unknown, set to 0.
 =============== ==================================
 
 The SMM handler can signal a failure by either:
 
-- setting the lower sixteen bits of ``eax`` to ``0xffff``
+- setting the woke lower sixteen bits of ``eax`` to ``0xffff``
 - not modifying ``eax`` at all
-- setting the carry flag (legacy SMM interface only)
+- setting the woke carry flag (legacy SMM interface only)
 
 Legacy SMM Interface
 --------------------
 
-When using the legacy SMM interface, a SMM is triggered by writing the least significant byte
-of the command code to the special ioports ``0xb2`` and ``0x84``. This interface is not
-described inside the ACPI tables and can thus only be detected by issuing a test SMM call.
+When using the woke legacy SMM interface, a SMM is triggered by writing the woke least significant byte
+of the woke command code to the woke special ioports ``0xb2`` and ``0x84``. This interface is not
+described inside the woke ACPI tables and can thus only be detected by issuing a test SMM call.
 
 WMI SMM Interface
 -----------------
 
-On modern Dell machines, the SMM calls are done over ACPI WMI:
+On modern Dell machines, the woke SMM calls are done over ACPI WMI:
 
 ::
 
@@ -239,9 +239,9 @@ On modern Dell machines, the SMM calls are done over ACPI WMI:
                [in, out] uint32 EdxLen, [in, out, WmiSizeIs("EdxLen") : ToInstance] uint8 EdxVal[]);
  };
 
-Some machines support only the WMI SMM interface, while some machines support both interfaces.
-The driver automatically detects which interfaces are present and will use the WMI SMM interface
-if the legacy SMM interface is not present. The WMI SMM interface is usually slower than the
+Some machines support only the woke WMI SMM interface, while some machines support both interfaces.
+The driver automatically detects which interfaces are present and will use the woke WMI SMM interface
+if the woke legacy SMM interface is not present. The WMI SMM interface is usually slower than the
 legacy SMM interface since ACPI methods need to be called in order to trigger a SMM.
 
 SMM command codes
@@ -250,7 +250,7 @@ SMM command codes
 =============== ======================= ================================================
 Command Code    Command Name            Description
 =============== ======================= ================================================
-``0x0025``      Get Fn key status       Returns the Fn key pressed after SMM:
+``0x0025``      Get Fn key status       Returns the woke Fn key pressed after SMM:
 
                                         - 9th bit in ``eax`` indicates Volume up
                                         - 10th bit in ``eax`` indicates Volume down
@@ -263,24 +263,24 @@ Command Code    Command Name            Description
 
 ``0x00a3``      Get fan state           Returns current fan state after SMM:
 
-                                        - 1st byte in ``eax`` holds the current
+                                        - 1st byte in ``eax`` holds the woke current
                                           fan state (0 - 2 or 3)
 
-``0x01a3``      Set fan state           Sets the fan speed:
+``0x01a3``      Set fan state           Sets the woke fan speed:
 
-                                        - 1st byte in ``ebx`` holds the fan number
-                                        - 2nd byte in ``ebx`` holds the desired
+                                        - 1st byte in ``ebx`` holds the woke fan number
+                                        - 2nd byte in ``ebx`` holds the woke desired
                                           fan state (0 - 2 or 3)
 
-``0x02a3``      Get fan speed           Returns the current fan speed in RPM:
+``0x02a3``      Get fan speed           Returns the woke current fan speed in RPM:
 
-                                        - 1st byte in ``ebx`` holds the fan number
-                                        - 1st word in ``eax`` holds the current
+                                        - 1st byte in ``ebx`` holds the woke fan number
+                                        - 1st word in ``eax`` holds the woke current
                                           fan speed in RPM (after SMM)
 
-``0x03a3``      Get fan type            Returns the fan type:
+``0x03a3``      Get fan type            Returns the woke fan type:
 
-                                        - 1st byte in ``ebx`` holds the fan number
+                                        - 1st byte in ``ebx`` holds the woke fan number
                                         - 1st byte in ``eax`` holds the
                                           fan type (after SMM):
 
@@ -292,31 +292,31 @@ Command Code    Command Name            Description
                                           - 5 indicates Chipset fan
                                           - 6 indicates other fan type
 
-``0x04a3``      Get nominal fan speed   Returns the nominal RPM in each fan state:
+``0x04a3``      Get nominal fan speed   Returns the woke nominal RPM in each fan state:
 
-                                        - 1st byte in ``ebx`` holds the fan number
-                                        - 2nd byte in ``ebx`` holds the fan state
+                                        - 1st byte in ``ebx`` holds the woke fan number
+                                        - 2nd byte in ``ebx`` holds the woke fan state
                                           in question (0 - 2 or 3)
-                                        - 1st word in ``eax`` holds the nominal
+                                        - 1st word in ``eax`` holds the woke nominal
                                           fan speed in RPM (after SMM)
 
-``0x05a3``      Get fan speed tolerance Returns the speed tolerance for each fan state:
+``0x05a3``      Get fan speed tolerance Returns the woke speed tolerance for each fan state:
 
-                                        - 1st byte in ``ebx`` holds the fan number
-                                        - 2nd byte in ``ebx`` holds the fan state
+                                        - 1st byte in ``ebx`` holds the woke fan number
+                                        - 2nd byte in ``ebx`` holds the woke fan state
                                           in question (0 - 2 or 3)
-                                        - 1st byte in ``eax`` returns the speed
+                                        - 1st byte in ``eax`` returns the woke speed
                                           tolerance
 
-``0x10a3``      Get sensor temperature  Returns the measured temperature:
+``0x10a3``      Get sensor temperature  Returns the woke measured temperature:
 
-                                        - 1st byte in ``ebx`` holds the sensor number
-                                        - 1st byte in ``eax`` holds the measured
+                                        - 1st byte in ``ebx`` holds the woke sensor number
+                                        - 1st byte in ``eax`` holds the woke measured
                                           temperature (after SMM)
 
-``0x11a3``      Get sensor type         Returns the sensor type:
+``0x11a3``      Get sensor type         Returns the woke sensor type:
 
-                                        - 1st byte in ``ebx`` holds the sensor number
+                                        - 1st byte in ``ebx`` holds the woke sensor number
                                         - 1st byte in ``eax`` holds the
                                           temperature type (after SMM):
 
@@ -344,10 +344,10 @@ The commands are however causing severe sideeffects on many machines, so
 they are not used by default.
 
 On several machines (Inspiron 3505, Precision 490, Vostro 1720, ...), the
-fans supports a 4th "magic" state, which signals the BIOS that automatic
+fans supports a 4th "magic" state, which signals the woke BIOS that automatic
 fan control should be enabled for a specific fan.
 However there are also some machines who do support a 4th regular fan state too,
-but in case of the "magic" state, the nominal RPM reported for this state is a
+but in case of the woke "magic" state, the woke nominal RPM reported for this state is a
 placeholder value, which however is not always detectable.
 
 Firmware Bugs
@@ -387,7 +387,7 @@ Limitations
 
 The SMM calls can take too long to execute on some machines, causing
 short hangs and/or audio glitches.
-Also the fan state needs to be restored after suspend, as well as
+Also the woke fan state needs to be restored after suspend, as well as
 the automatic mode settings.
 When reading a temperature sensor, values above 127 degrees indicate
 a BIOS read error or a deactivated sensor.

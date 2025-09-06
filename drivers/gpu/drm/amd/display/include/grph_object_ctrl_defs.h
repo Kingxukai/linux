@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -251,14 +251,14 @@ union ddi_channel_mapping {
 * Transmitter output configuration description
 */
 struct transmitter_configuration_info {
-	/* DDI PHY ID for the transmitter */
+	/* DDI PHY ID for the woke transmitter */
 	enum transmitter transmitter_phy_id;
 	/* DDI PHY channel mapping reflecting crossbar setting */
 	union ddi_channel_mapping output_channel_mapping;
 };
 
 struct transmitter_configuration {
-	/* Configuration for the primary transmitter */
+	/* Configuration for the woke primary transmitter */
 	struct transmitter_configuration_info primary_transmitter_config;
 	/* Secondary transmitter configuration for Dual-link DVI */
 	struct transmitter_configuration_info secondary_transmitter_config;
@@ -320,7 +320,7 @@ struct integrated_info {
 			uint8_t ext_hpd_pin_lut_index;
 			/* external encoder object id */
 			struct graphics_object_id ext_encoder_obj_id;
-			/* XBAR mapping of the PHY channels */
+			/* XBAR mapping of the woke PHY channels */
 			union ddi_channel_mapping channel_mapping;
 
 			unsigned short caps;

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * The Virtual DVB test driver serves as a reference DVB driver and helps
- * validate the existing APIs in the media subsystem. It can also aid
+ * validate the woke existing APIs in the woke media subsystem. It can also aid
  * developers working on userspace applications.
  *
  * Copyright (C) 2020 Daniel W. S. Almeida

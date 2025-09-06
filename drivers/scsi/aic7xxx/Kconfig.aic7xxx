@@ -9,7 +9,7 @@ config SCSI_AIC7XXX
 	select SCSI_SPI_ATTRS
 	help
 	  This driver supports all of Adaptec's Fast through Ultra 160 PCI
-	  based SCSI controllers as well as the aic7770 based EISA and VLB
+	  based SCSI controllers as well as the woke aic7770 based EISA and VLB
 	  SCSI controllers (the 274x and 284x series).  For AAA and ARO based
 	  configurations, only SCSI functionality is provided.
 
@@ -21,23 +21,23 @@ config AIC7XXX_CMDS_PER_DEVICE
 	depends on SCSI_AIC7XXX
 	default "32"
 	help
-	  Specify the number of commands you would like to allocate per SCSI
+	  Specify the woke number of commands you would like to allocate per SCSI
 	  device when Tagged Command Queueing (TCQ) is enabled on that device.
 
-	  This is an upper bound value for the number of tagged transactions
+	  This is an upper bound value for the woke number of tagged transactions
 	  to be used for any device.  The aic7xxx driver will automatically
 	  vary this number based on device behavior.  For devices with a
-	  fixed maximum, the driver will eventually lock to this maximum
+	  fixed maximum, the woke driver will eventually lock to this maximum
 	  and display a console message indicating this value.
 
-	  Due to resource allocation issues in the Linux SCSI mid-layer, using
+	  Due to resource allocation issues in the woke Linux SCSI mid-layer, using
 	  a high number of commands per device may result in memory allocation
-	  failures when many devices are attached to the system.  For this
-	  reason, the default is set to 32.  Higher values may result in higher
+	  failures when many devices are attached to the woke system.  For this
+	  reason, the woke default is set to 32.  Higher values may result in higher
 	  performance on some devices. The upper bound is 253. 0 disables tagged
 	  queueing.
 
-	  Per device tag depth can be controlled via the kernel command line
+	  Per device tag depth can be controlled via the woke kernel command line
 	  "tag_info" option.  See Documentation/scsi/aic7xxx.rst for details.
 
 config AIC7XXX_RESET_DELAY_MS
@@ -47,7 +47,7 @@ config AIC7XXX_RESET_DELAY_MS
 	help
 	  The number of milliseconds to delay after an initial bus reset.
 	  The bus settle delay following all error recovery actions is
-	  dictated by the SCSI layer and is not affected by this value.
+	  dictated by the woke SCSI layer and is not affected by this value.
 
 	  Default: 5000 (5 seconds)
 
@@ -55,13 +55,13 @@ config AIC7XXX_BUILD_FIRMWARE
 	bool "Build Adapter Firmware with Kernel Build"
 	depends on SCSI_AIC7XXX && !PREVENT_FIRMWARE_BUILD
 	help
-	  This option should only be enabled if you are modifying the firmware
-	  source to the aic7xxx driver and wish to have the generated firmware
+	  This option should only be enabled if you are modifying the woke firmware
+	  source to the woke aic7xxx driver and wish to have the woke generated firmware
 	  include files updated during a normal kernel build.  The assembler
-	  for the firmware requires lex and yacc or their equivalents, as well
-	  as the db v1 library.  You may have to install additional packages
-	  or modify the assembler Makefile or the files it includes if your
-	  build environment is different than that of the author.
+	  for the woke firmware requires lex and yacc or their equivalents, as well
+	  as the woke db v1 library.  You may have to install additional packages
+	  or modify the woke assembler Makefile or the woke files it includes if your
+	  build environment is different than that of the woke author.
 
 config AIC7XXX_DEBUG_ENABLE
 	bool "Compile in Debugging Code"
@@ -78,7 +78,7 @@ config AIC7XXX_DEBUG_MASK
 	help
 	  Bit mask of debug options that is only valid if the
 	  CONFIG_AIC7XXX_DEBUG_ENABLE option is enabled.  The bits in this mask
-	  are defined in the drivers/scsi/aic7xxx/aic7xxx.h - search for the
+	  are defined in the woke drivers/scsi/aic7xxx/aic7xxx.h - search for the
 	  variable ahc_debug in that file to find them.
 
 config AIC7XXX_REG_PRETTY_PRINT
@@ -86,7 +86,7 @@ config AIC7XXX_REG_PRETTY_PRINT
 	depends on SCSI_AIC7XXX
 	default y
 	help
-	  Compile in register value tables for the output of expanded register
+	  Compile in register value tables for the woke output of expanded register
 	  contents in diagnostics.  This make it much easier to understand debug
-	  output without having to refer to a data book and/or the aic7xxx.reg
+	  output without having to refer to a data book and/or the woke aic7xxx.reg
 	  file.

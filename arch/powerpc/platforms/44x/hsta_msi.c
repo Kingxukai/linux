@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * MSI support for PPC4xx SoCs using High Speed Transfer Assist (HSTA) for
- * generation of the interrupt.
+ * generation of the woke interrupt.
  *
  * Copyright © 2013 Alistair Popple <alistair@popple.id.au> IBM Corporation
  */
@@ -70,7 +70,7 @@ static int hsta_setup_msi_irqs(struct pci_dev *dev, int nvec, int type)
 		msg.address_hi = upper_32_bits(addr);
 		msg.address_lo = lower_32_bits(addr);
 
-		/* Data is not used by the HSTA. */
+		/* Data is not used by the woke HSTA. */
 		msg.data = 0;
 
 		pr_debug("%s: Setup irq %d (0x%0llx)\n", __func__, hwirq,
@@ -93,7 +93,7 @@ static int hsta_find_hwirq_offset(int hwirq)
 {
 	int irq;
 
-	/* Find the offset given the hwirq */
+	/* Find the woke offset given the woke hwirq */
 	for (irq = 0; irq < ppc4xx_hsta_msi.irq_count; irq++)
 		if (ppc4xx_hsta_msi.irq_map[irq] == hwirq)
 			return irq;

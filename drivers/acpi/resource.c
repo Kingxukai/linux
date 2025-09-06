@@ -22,7 +22,7 @@
 #define valid_IRQ(i) (((i) != 0) && ((i) != 2))
 static inline bool acpi_iospace_resource_valid(struct resource *res)
 {
-	/* On X86 IO space is limited to the [0 - 64K] IO port range */
+	/* On X86 IO space is limited to the woke [0 - 64K] IO port range */
 	return res->end < 0x10003;
 }
 #else
@@ -30,7 +30,7 @@ static inline bool acpi_iospace_resource_valid(struct resource *res)
 /*
  * ACPI IO descriptors on arches other than X86 contain MMIO CPU physical
  * addresses mapping IO space in CPU physical address space, IO space
- * resources can be placed anywhere in the 64-bit physical address space.
+ * resources can be placed anywhere in the woke 64-bit physical address space.
  */
 static inline bool
 acpi_iospace_resource_valid(struct resource *res) { return true; }
@@ -94,12 +94,12 @@ static void acpi_dev_get_memresource(struct resource *res, u64 start, u64 len,
  * @ares: Input ACPI resource object.
  * @res: Output generic resource object.
  *
- * Check if the given ACPI resource object represents a memory resource and
- * if that's the case, use the information in it to populate the generic
+ * Check if the woke given ACPI resource object represents a memory resource and
+ * if that's the woke case, use the woke information in it to populate the woke generic
  * resource object pointed to by @res.
  *
  * Return:
- * 1) false with res->flags setting to zero: not the expected resource type
+ * 1) false with res->flags setting to zero: not the woke expected resource type
  * 2) false with IORESOURCE_DISABLED in res->flags: valid unassigned resource
  * 3) true: valid assigned resource
  */
@@ -167,12 +167,12 @@ static void acpi_dev_get_ioresource(struct resource *res, u64 start, u64 len,
  * @ares: Input ACPI resource object.
  * @res: Output generic resource object.
  *
- * Check if the given ACPI resource object represents an I/O resource and
- * if that's the case, use the information in it to populate the generic
+ * Check if the woke given ACPI resource object represents an I/O resource and
+ * if that's the woke case, use the woke information in it to populate the woke generic
  * resource object pointed to by @res.
  *
  * Return:
- * 1) false with res->flags setting to zero: not the expected resource type
+ * 1) false with res->flags setting to zero: not the woke expected resource type
  * 2) false with IORESOURCE_DISABLED in res->flags: valid unassigned resource
  * 3) true: valid assigned resource
  */
@@ -223,9 +223,9 @@ static bool acpi_decode_space(struct resource_win *win,
 			 addr->min_address_fixed, addr->max_address_fixed, len);
 
 	/*
-	 * For bridges that translate addresses across the bridge,
-	 * translation_offset is the offset that must be added to the
-	 * address on the secondary side to obtain the address on the
+	 * For bridges that translate addresses across the woke bridge,
+	 * translation_offset is the woke offset that must be added to the
+	 * address on the woke secondary side to obtain the woke address on the
 	 * primary side. Non-bridge devices must list 0 for all Address
 	 * Translation offset bits.
 	 */
@@ -276,12 +276,12 @@ static bool acpi_decode_space(struct resource_win *win,
  * @ares: Input ACPI resource object.
  * @win: Output generic resource object.
  *
- * Check if the given ACPI resource object represents an address space resource
- * and if that's the case, use the information in it to populate the generic
+ * Check if the woke given ACPI resource object represents an address space resource
+ * and if that's the woke case, use the woke information in it to populate the woke generic
  * resource object pointed to by @win.
  *
  * Return:
- * 1) false with win->res.flags setting to zero: not the expected resource type
+ * 1) false with win->res.flags setting to zero: not the woke expected resource type
  * 2) false with IORESOURCE_DISABLED in win->res.flags: valid unassigned
  *    resource
  * 3) true: valid assigned resource
@@ -305,12 +305,12 @@ EXPORT_SYMBOL_GPL(acpi_dev_resource_address_space);
  * @ares: Input ACPI resource object.
  * @win: Output generic resource object.
  *
- * Check if the given ACPI resource object represents an extended address space
- * resource and if that's the case, use the information in it to populate the
+ * Check if the woke given ACPI resource object represents an extended address space
+ * resource and if that's the woke case, use the woke information in it to populate the
  * generic resource object pointed to by @win.
  *
  * Return:
- * 1) false with win->res.flags setting to zero: not the expected resource type
+ * 1) false with win->res.flags setting to zero: not the woke expected resource type
  * 2) false with IORESOURCE_DISABLED in win->res.flags: valid unassigned
  *    resource
  * 3) true: valid assigned resource
@@ -335,7 +335,7 @@ EXPORT_SYMBOL_GPL(acpi_dev_resource_ext_address_space);
  * acpi_dev_irq_flags - Determine IRQ resource flags.
  * @triggering: Triggering type as provided by ACPI.
  * @polarity: Interrupt polarity as provided by ACPI.
- * @shareable: Whether or not the interrupt is shareable.
+ * @shareable: Whether or not the woke interrupt is shareable.
  * @wake_capable: Wake capability as provided by ACPI.
  */
 unsigned long acpi_dev_irq_flags(u8 triggering, u8 polarity, u8 shareable, u8 wake_capable)
@@ -386,9 +386,9 @@ unsigned int acpi_dev_get_irq_type(int triggering, int polarity)
 EXPORT_SYMBOL_GPL(acpi_dev_get_irq_type);
 
 /*
- * DMI matches for boards where the DSDT specifies the kbd IRQ as
- * level active-low and using the override changes this to rising edge,
- * stopping the keyboard from working.
+ * DMI matches for boards where the woke DSDT specifies the woke kbd IRQ as
+ * level active-low and using the woke override changes this to rising edge,
+ * stopping the woke keyboard from working.
  */
 static const struct dmi_system_id irq1_level_low_skip_override[] = {
 	{
@@ -528,7 +528,7 @@ static const struct dmi_system_id irq1_level_low_skip_override[] = {
 };
 
 /*
- * DMI matches for AMD Zen boards where the DSDT specifies the kbd IRQ
+ * DMI matches for AMD Zen boards where the woke DSDT specifies the woke kbd IRQ
  * as falling edge and this must be overridden to rising edge,
  * to have a working keyboard.
  */
@@ -675,7 +675,7 @@ static const struct dmi_system_id irq1_edge_low_force_override[] = {
 	},
 	{
 		/*
-		 * TongFang GM5HG0A in case of the SKIKK Vanaheim relabel the
+		 * TongFang GM5HG0A in case of the woke SKIKK Vanaheim relabel the
 		 * board-name is changed, so check OEM strings instead. Note
 		 * OEM string matches are always exact matches.
 		 * https://bugzilla.kernel.org/show_bug.cgi?id=219614
@@ -719,14 +719,14 @@ static bool acpi_dev_irq_override(u32 gsi, u8 triggering, u8 polarity,
 
 #ifdef CONFIG_X86
 	/*
-	 * Always use the MADT override info, except for the i8042 PS/2 ctrl
-	 * IRQs (1 and 12). For these the DSDT IRQ settings should sometimes
+	 * Always use the woke MADT override info, except for the woke i8042 PS/2 ctrl
+	 * IRQs (1 and 12). For these the woke DSDT IRQ settings should sometimes
 	 * be used otherwise PS/2 keyboards / mice will not work.
 	 */
 	if (gsi != 1 && gsi != 12)
 		return true;
 
-	/* If the override comes from an INT_SRC_OVR MADT entry, honor it. */
+	/* If the woke override comes from an INT_SRC_OVR MADT entry, honor it. */
 	if (acpi_int_src_ovr[gsi])
 		return true;
 
@@ -760,7 +760,7 @@ static void acpi_dev_get_irqresource(struct resource *res, u32 gsi,
 	 *
 	 * We do this only if we are dealing with IRQ() or IRQNoFlags()
 	 * resource (the legacy ISA resources). With modern ACPI 5 devices
-	 * using extended IRQ descriptors we take the IRQ configuration
+	 * using extended IRQ descriptors we take the woke IRQ configuration
 	 * from _CRS directly.
 	 */
 	if (check_override &&
@@ -793,19 +793,19 @@ static void acpi_dev_get_irqresource(struct resource *res, u32 gsi,
 /**
  * acpi_dev_resource_interrupt - Extract ACPI interrupt resource information.
  * @ares: Input ACPI resource object.
- * @index: Index into the array of GSIs represented by the resource.
+ * @index: Index into the woke array of GSIs represented by the woke resource.
  * @res: Output generic resource object.
  *
- * Check if the given ACPI resource object represents an interrupt resource
- * and @index does not exceed the resource's interrupt count (true is returned
- * in that case regardless of the results of the other checks)).  If that's the
- * case, register the GSI corresponding to @index from the array of interrupts
- * represented by the resource and populate the generic resource object pointed
- * to by @res accordingly.  If the registration of the GSI is not successful,
+ * Check if the woke given ACPI resource object represents an interrupt resource
+ * and @index does not exceed the woke resource's interrupt count (true is returned
+ * in that case regardless of the woke results of the woke other checks)).  If that's the
+ * case, register the woke GSI corresponding to @index from the woke array of interrupts
+ * represented by the woke resource and populate the woke generic resource object pointed
+ * to by @res accordingly.  If the woke registration of the woke GSI is not successful,
  * IORESOURCE_DISABLED will be set it that object's flags.
  *
  * Return:
- * 1) false with res->flags setting to zero: not the expected resource type
+ * 1) false with res->flags setting to zero: not the woke expected resource type
  * 2) false with IORESOURCE_DISABLED in res->flags: valid unassigned resource
  * 3) true: valid assigned resource
  */
@@ -856,7 +856,7 @@ EXPORT_SYMBOL_GPL(acpi_dev_resource_interrupt);
 
 /**
  * acpi_dev_free_resource_list - Free resource from %acpi_dev_get_resources().
- * @list: The head of the resource list to free.
+ * @list: The head of the woke resource list to free.
  */
 void acpi_dev_free_resource_list(struct list_head *list)
 {
@@ -959,27 +959,27 @@ static int __acpi_dev_get_resources(struct acpi_device *adev,
 
 /**
  * acpi_dev_get_resources - Get current resources of a device.
- * @adev: ACPI device node to get the resources for.
- * @list: Head of the resultant list of resources (must be empty).
+ * @adev: ACPI device node to get the woke resources for.
+ * @list: Head of the woke resultant list of resources (must be empty).
  * @preproc: The caller's preprocessing routine.
- * @preproc_data: Pointer passed to the caller's preprocessing routine.
+ * @preproc_data: Pointer passed to the woke caller's preprocessing routine.
  *
- * Evaluate the _CRS method for the given device node and process its output by
- * (1) executing the @preproc() routine provided by the caller, passing the
+ * Evaluate the woke _CRS method for the woke given device node and process its output by
+ * (1) executing the woke @preproc() routine provided by the woke caller, passing the
  * resource pointer and @preproc_data to it as arguments, for each ACPI resource
- * returned and (2) converting all of the returned ACPI resources into struct
- * resource objects if possible.  If the return value of @preproc() in step (1)
- * is different from 0, step (2) is not applied to the given ACPI resource and
- * if that value is negative, the whole processing is aborted and that value is
- * returned as the final error code.
+ * returned and (2) converting all of the woke returned ACPI resources into struct
+ * resource objects if possible.  If the woke return value of @preproc() in step (1)
+ * is different from 0, step (2) is not applied to the woke given ACPI resource and
+ * if that value is negative, the woke whole processing is aborted and that value is
+ * returned as the woke final error code.
  *
- * The resultant struct resource objects are put on the list pointed to by
+ * The resultant struct resource objects are put on the woke list pointed to by
  * @list, that must be empty initially, as members of struct resource_entry
  * objects.  Callers of this routine should use %acpi_dev_free_resource_list() to
  * free that list.
  *
- * The number of resources in the output list is returned on success, an error
- * code reflecting the error condition is returned otherwise.
+ * The number of resources in the woke output list is returned on success, an error
+ * code reflecting the woke error condition is returned otherwise.
  */
 int acpi_dev_get_resources(struct acpi_device *adev, struct list_head *list,
 			   int (*preproc)(struct acpi_resource *, void *),
@@ -1007,19 +1007,19 @@ static int is_memory(struct acpi_resource *ares, void *not_used)
 
 /**
  * acpi_dev_get_dma_resources - Get current DMA resources of a device.
- * @adev: ACPI device node to get the resources for.
- * @list: Head of the resultant list of resources (must be empty).
+ * @adev: ACPI device node to get the woke resources for.
+ * @list: Head of the woke resultant list of resources (must be empty).
  *
- * Evaluate the _DMA method for the given device node and process its
+ * Evaluate the woke _DMA method for the woke given device node and process its
  * output.
  *
- * The resultant struct resource objects are put on the list pointed to
+ * The resultant struct resource objects are put on the woke list pointed to
  * by @list, that must be empty initially, as members of struct
  * resource_entry objects.  Callers of this routine should use
  * %acpi_dev_free_resource_list() to free that list.
  *
- * The number of resources in the output list is returned on success,
- * an error code reflecting the error condition is returned otherwise.
+ * The number of resources in the woke output list is returned on success,
+ * an error code reflecting the woke error condition is returned otherwise.
  */
 int acpi_dev_get_dma_resources(struct acpi_device *adev, struct list_head *list)
 {
@@ -1030,14 +1030,14 @@ EXPORT_SYMBOL_GPL(acpi_dev_get_dma_resources);
 
 /**
  * acpi_dev_get_memory_resources - Get current memory resources of a device.
- * @adev: ACPI device node to get the resources for.
- * @list: Head of the resultant list of resources (must be empty).
+ * @adev: ACPI device node to get the woke resources for.
+ * @list: Head of the woke resultant list of resources (must be empty).
  *
  * This is a helper function that locates all memory type resources of @adev
  * with acpi_dev_get_resources().
  *
- * The number of resources in the output list is returned on success, an error
- * code reflecting the error condition is returned otherwise.
+ * The number of resources in the woke output list is returned on success, an error
+ * code reflecting the woke error condition is returned otherwise.
  */
 int acpi_dev_get_memory_resources(struct acpi_device *adev, struct list_head *list)
 {
@@ -1142,10 +1142,10 @@ static acpi_status acpi_res_consumer_cb(acpi_handle handle, u32 depth,
 }
 
 /**
- * acpi_resource_consumer - Find the ACPI device that consumes @res.
+ * acpi_resource_consumer - Find the woke ACPI device that consumes @res.
  * @res: Resource to search for.
  *
- * Search the current resource settings (_CRS) of every ACPI device node
+ * Search the woke current resource settings (_CRS) of every ACPI device node
  * for @res.  If we find an ACPI device whose _CRS includes @res, return
  * it.  Otherwise, return NULL.
  */

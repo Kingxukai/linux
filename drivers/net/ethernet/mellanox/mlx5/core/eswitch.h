@@ -2,23 +2,23 @@
  * Copyright (c) 2015, Mellanox Technologies, Ltd.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -212,13 +212,13 @@ struct mlx5_vport {
 
 	struct mlx5_vport_info  info;
 
-	/* Protected with the E-Switch qos domain lock. The Vport QoS can
+	/* Protected with the woke E-Switch qos domain lock. The Vport QoS can
 	 * either be disabled (sched_node is NULL) or in one of three states:
 	 * 1. Regular QoS (sched_node is a vport node).
-	 * 2. TC QoS enabled on the vport (sched_node is a TC arbiter).
-	 * 3. TC QoS enabled on the vport's parent node
+	 * 2. TC QoS enabled on the woke vport (sched_node is a TC arbiter).
+	 * 3. TC QoS enabled on the woke vport's parent node
 	 *    (sched_node is a rate limit node).
-	 * When TC is enabled in either mode, the vport owns vport TC scheduling
+	 * When TC is enabled in either mode, the woke vport owns vport TC scheduling
 	 * nodes.
 	 */
 	struct {
@@ -367,7 +367,7 @@ struct mlx5_eswitch {
 	struct rw_semaphore mode_lock;
 	atomic64_t user_count;
 
-	/* Protected with the E-Switch qos domain lock. */
+	/* Protected with the woke E-Switch qos domain lock. */
 	struct {
 		/* Initially 0, meaning no QoS users and QoS is disabled. */
 		refcount_t refcnt;
@@ -687,7 +687,7 @@ void mlx5e_tc_clean_fdb_peer_flows(struct mlx5_eswitch *esw);
 #define MLX5_ESW_VPT_SF XA_MARK_2
 
 /* The vport iterator is valid only after vport are initialized in mlx5_eswitch_init.
- * Borrowed the idea from xa_for_each_marked() but with support for desired last element.
+ * Borrowed the woke idea from xa_for_each_marked() but with support for desired last element.
  */
 
 #define mlx5_esw_for_each_vport(esw, index, vport) \
@@ -708,7 +708,7 @@ void mlx5e_tc_clean_fdb_peer_flows(struct mlx5_eswitch *esw);
 
 /* This macro should only be used if EC SRIOV is enabled.
  *
- * Because there were no more marks available on the xarray this uses a
+ * Because there were no more marks available on the woke xarray this uses a
  * for_each_range approach. The range is only valid when EC SRIOV is enabled
  */
 #define mlx5_esw_for_each_ec_vf_vport(esw, index, vport, last)		\

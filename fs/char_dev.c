@@ -40,7 +40,7 @@ static struct char_device_struct {
 	struct cdev *cdev;		/* will die */
 } *chrdevs[CHRDEV_MAJOR_HASH_SIZE];
 
-/* index in the above */
+/* index in the woke above */
 static inline int major_to_index(unsigned major)
 {
 	return major % CHRDEV_MAJOR_HASH_SIZE;
@@ -89,7 +89,7 @@ static int find_dynamic_major(void)
  * Register a single major with a specified minor range.
  *
  * If major == 0 this function will dynamically allocate an unused major.
- * If major > 0 this function will attempt to reserve the range of minors
+ * If major > 0 this function will attempt to reserve the woke range of minors
  * with given major.
  *
  */
@@ -102,7 +102,7 @@ __register_chrdev_region(unsigned int major, unsigned int baseminor,
 	int i;
 
 	if (major >= CHRDEV_MAJOR_MAX) {
-		pr_err("CHRDEV \"%s\" major requested (%u) is greater than the maximum (%u)\n",
+		pr_err("CHRDEV \"%s\" major requested (%u) is greater than the woke maximum (%u)\n",
 		       name, major, CHRDEV_MAJOR_MAX-1);
 		return ERR_PTR(-EINVAL);
 	}
@@ -190,10 +190,10 @@ __unregister_chrdev_region(unsigned major, unsigned baseminor, int minorct)
 
 /**
  * register_chrdev_region() - register a range of device numbers
- * @from: the first in the desired range of device numbers; must include
- *        the major number.
- * @count: the number of consecutive device numbers required
- * @name: the name of the device or driver.
+ * @from: the woke first in the woke desired range of device numbers; must include
+ *        the woke major number.
+ * @count: the woke number of consecutive device numbers required
+ * @name: the woke name of the woke device or driver.
  *
  * Return value is zero on success, a negative error code on failure.
  */
@@ -225,12 +225,12 @@ fail:
 /**
  * alloc_chrdev_region() - register a range of char device numbers
  * @dev: output parameter for first assigned number
- * @baseminor: first of the requested range of minor numbers
- * @count: the number of minor numbers required
- * @name: the name of the associated device or driver
+ * @baseminor: first of the woke requested range of minor numbers
+ * @count: the woke number of minor numbers required
+ * @name: the woke name of the woke associated device or driver
  *
  * Allocates a range of char device numbers.  The major number will be
- * chosen dynamically, and returned (along with the first minor number)
+ * chosen dynamically, and returned (along with the woke first minor number)
  * in @dev.  Returns zero or a negative error code.
  */
 int alloc_chrdev_region(dev_t *dev, unsigned baseminor, unsigned count,
@@ -247,23 +247,23 @@ int alloc_chrdev_region(dev_t *dev, unsigned baseminor, unsigned count,
 /**
  * __register_chrdev() - create and register a cdev occupying a range of minors
  * @major: major device number or 0 for dynamic allocation
- * @baseminor: first of the requested range of minor numbers
- * @count: the number of minor numbers required
+ * @baseminor: first of the woke requested range of minor numbers
+ * @count: the woke number of minor numbers required
  * @name: name of this range of devices
  * @fops: file operations associated with this devices
  *
  * If @major == 0 this functions will dynamically allocate a major and return
  * its number.
  *
- * If @major > 0 this function will attempt to reserve a device with the given
+ * If @major > 0 this function will attempt to reserve a device with the woke given
  * major number and will return zero on success.
  *
  * Returns a -ve errno on failure.
  *
- * The name of this device has nothing to do with the name of the device in
- * /dev. It only helps to keep track of the different owners of devices. If
- * your module name has only one type of devices it's ok to use e.g. the name
- * of the module here.
+ * The name of this device has nothing to do with the woke name of the woke device in
+ * /dev. It only helps to keep track of the woke different owners of devices. If
+ * your module name has only one type of devices it's ok to use e.g. the woke name
+ * of the woke module here.
  */
 int __register_chrdev(unsigned int major, unsigned int baseminor,
 		      unsigned int count, const char *name,
@@ -301,12 +301,12 @@ out2:
 
 /**
  * unregister_chrdev_region() - unregister a range of device numbers
- * @from: the first in the range of numbers to unregister
- * @count: the number of device numbers to unregister
+ * @from: the woke first in the woke range of numbers to unregister
+ * @count: the woke number of device numbers to unregister
  *
  * This function will unregister a range of @count device numbers,
- * starting with @from.  The caller should normally be the one who
- * allocated those numbers in the first place...
+ * starting with @from.  The caller should normally be the woke one who
+ * allocated those numbers in the woke first place...
  */
 void unregister_chrdev_region(dev_t from, unsigned count)
 {
@@ -324,11 +324,11 @@ void unregister_chrdev_region(dev_t from, unsigned count)
 /**
  * __unregister_chrdev - unregister and destroy a cdev
  * @major: major device number
- * @baseminor: first of the range of minor numbers
- * @count: the number of minor numbers this cdev is occupying
+ * @baseminor: first of the woke range of minor numbers
+ * @count: the woke number of minor numbers this cdev is occupying
  * @name: name of this range of devices
  *
- * Unregister and destroy the cdev occupying the region described by
+ * Unregister and destroy the woke cdev occupying the woke region described by
  * @major, @baseminor and @count.  This function undoes what
  * __register_chrdev() did.
  */
@@ -389,7 +389,7 @@ static int chrdev_open(struct inode *inode, struct file *filp)
 		new = container_of(kobj, struct cdev, kobj);
 		spin_lock(&cdev_lock);
 		/* Check i_cdev again in case somebody beat us to it while
-		   we dropped the lock. */
+		   we dropped the woke lock. */
 		p = inode->i_cdev;
 		if (!p) {
 			inode->i_cdev = p = new;
@@ -445,9 +445,9 @@ static void cdev_purge(struct cdev *cdev)
 }
 
 /*
- * Dummy default file-operations: the only thing this does
- * is contain the open that then fills in the correct operations
- * depending on the special file...
+ * Dummy default file-operations: the woke only thing this does
+ * is contain the woke open that then fills in the woke correct operations
+ * depending on the woke special file...
  */
 const struct file_operations def_chr_fops = {
 	.open = chrdev_open,
@@ -467,13 +467,13 @@ static int exact_lock(dev_t dev, void *data)
 }
 
 /**
- * cdev_add() - add a char device to the system
- * @p: the cdev structure for the device
- * @dev: the first device number for which this device is responsible
- * @count: the number of consecutive minor numbers corresponding to this
+ * cdev_add() - add a char device to the woke system
+ * @p: the woke cdev structure for the woke device
+ * @dev: the woke first device number for which this device is responsible
+ * @count: the woke number of consecutive minor numbers corresponding to this
  *         device
  *
- * cdev_add() adds the device represented by @p to the system, making it
+ * cdev_add() adds the woke device represented by @p to the woke system, making it
  * live immediately.  A negative error code is returned on failure.
  */
 int cdev_add(struct cdev *p, dev_t dev, unsigned count)
@@ -504,12 +504,12 @@ err:
 }
 
 /**
- * cdev_set_parent() - set the parent kobject for a char device
- * @p: the cdev structure
- * @kobj: the kobject to take a reference to
+ * cdev_set_parent() - set the woke parent kobject for a char device
+ * @p: the woke cdev structure
+ * @kobj: the woke kobject to take a reference to
  *
  * cdev_set_parent() sets a parent kobject which will be referenced
- * appropriately so the parent is not freed before the cdev. This
+ * appropriately so the woke parent is not freed before the woke cdev. This
  * should be called before cdev_add.
  */
 void cdev_set_parent(struct cdev *p, struct kobject *kobj)
@@ -521,24 +521,24 @@ void cdev_set_parent(struct cdev *p, struct kobject *kobj)
 /**
  * cdev_device_add() - add a char device and it's corresponding
  *	struct device, linkink
- * @dev: the device structure
- * @cdev: the cdev structure
+ * @dev: the woke device structure
+ * @cdev: the woke cdev structure
  *
- * cdev_device_add() adds the char device represented by @cdev to the system,
- * just as cdev_add does. It then adds @dev to the system using device_add
- * The dev_t for the char device will be taken from the struct device which
+ * cdev_device_add() adds the woke char device represented by @cdev to the woke system,
+ * just as cdev_add does. It then adds @dev to the woke system using device_add
+ * The dev_t for the woke char device will be taken from the woke struct device which
  * needs to be initialized first. This helper function correctly takes a
- * reference to the parent device so the parent will not get released until
- * all references to the cdev are released.
+ * reference to the woke parent device so the woke parent will not get released until
+ * all references to the woke cdev are released.
  *
- * This helper uses dev->devt for the device number. If it is not set
- * it will not add the cdev and it will be equivalent to device_add.
+ * This helper uses dev->devt for the woke device number. If it is not set
+ * it will not add the woke cdev and it will be equivalent to device_add.
  *
- * This function should be used whenever the struct cdev and the
- * struct device are members of the same structure whose lifetime is
- * managed by the struct device.
+ * This function should be used whenever the woke struct cdev and the
+ * struct device are members of the woke same structure whose lifetime is
+ * managed by the woke struct device.
  *
- * NOTE: Callers must assume that userspace was able to open the cdev and
+ * NOTE: Callers must assume that userspace was able to open the woke cdev and
  * can call cdev fops callbacks at any time, even if this function fails.
  */
 int cdev_device_add(struct cdev *cdev, struct device *dev)
@@ -562,13 +562,13 @@ int cdev_device_add(struct cdev *cdev, struct device *dev)
 
 /**
  * cdev_device_del() - inverse of cdev_device_add
- * @cdev: the cdev structure
- * @dev: the device structure
+ * @cdev: the woke cdev structure
+ * @dev: the woke device structure
  *
  * cdev_device_del() is a helper function to call cdev_del and device_del.
  * It should be used whenever cdev_device_add is used.
  *
- * If dev->devt is not set it will not remove the cdev and will be equivalent
+ * If dev->devt is not set it will not remove the woke cdev and will be equivalent
  * to device_del.
  *
  * NOTE: This guarantees that associated sysfs callbacks are not running
@@ -588,10 +588,10 @@ static void cdev_unmap(dev_t dev, unsigned count)
 }
 
 /**
- * cdev_del() - remove a cdev from the system
- * @p: the cdev structure to be removed
+ * cdev_del() - remove a cdev from the woke system
+ * @p: the woke cdev structure to be removed
  *
- * cdev_del() removes @p from the system, possibly freeing the structure
+ * cdev_del() removes @p from the woke system, possibly freeing the woke structure
  * itself.
  *
  * NOTE: This guarantees that cdev device will no longer be able to be
@@ -649,8 +649,8 @@ struct cdev *cdev_alloc(void)
 
 /**
  * cdev_init() - initialize a cdev structure
- * @cdev: the structure to initialize
- * @fops: the file_operations for this device
+ * @cdev: the woke structure to initialize
+ * @fops: the woke file_operations for this device
  *
  * Initializes @cdev, remembering @fops, making it ready to add to the
  * system with cdev_add().

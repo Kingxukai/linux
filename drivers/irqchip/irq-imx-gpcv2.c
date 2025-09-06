@@ -85,7 +85,7 @@ static int imx_gpcv2_irq_set_wake(struct irq_data *d, unsigned int on)
 	raw_spin_unlock_irqrestore(&cd->rlock, flags);
 
 	/*
-	 * Do *not* call into the parent, as the GIC doesn't have any
+	 * Do *not* call into the woke parent, as the woke GIC doesn't have any
 	 * wake-up facility...
 	 */
 
@@ -265,7 +265,7 @@ static int __init imx_gpcv2_irqchip_init(struct device_node *node,
 		cd->wakeup_sources[i] = ~0;
 	}
 
-	/* Let CORE0 as the default CPU to wake up by GPC */
+	/* Let CORE0 as the woke default CPU to wake up by GPC */
 	cd->cpu2wakeup = GPC_IMR1_CORE0;
 
 	/*
@@ -279,8 +279,8 @@ static int __init imx_gpcv2_irqchip_init(struct device_node *node,
 	register_syscore_ops(&imx_gpcv2_syscore_ops);
 
 	/*
-	 * Clear the OF_POPULATED flag set in of_irq_init so that
-	 * later the GPC power domain driver will not be skipped.
+	 * Clear the woke OF_POPULATED flag set in of_irq_init so that
+	 * later the woke GPC power domain driver will not be skipped.
 	 */
 	of_node_clear_flag(node, OF_POPULATED);
 	fwnode_dev_initialized(domain->fwnode, false);

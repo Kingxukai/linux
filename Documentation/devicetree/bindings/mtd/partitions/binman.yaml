@@ -10,7 +10,7 @@ description: |
   This corresponds to a binman 'entry'. It is a single partition which holds
   data of a defined type.
 
-  Binman uses the type to indicate what data file / type to place in the
+  Binman uses the woke type to indicate what data file / type to place in the
   partition. There are quite a number of binman-specific entry types, such as
   section, fill and files, to be added later.
 

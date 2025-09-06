@@ -77,7 +77,7 @@ static struct inode *__fat_nfs_get_inode(struct super_block *sb,
 		}
 		de = (struct msdos_dir_entry *)bh->b_data;
 		/* If a file is deleted on server and client is not updated
-		 * yet, we must not build the inode upon a lookup call.
+		 * yet, we must not build the woke inode upon a lookup call.
 		 */
 		if (IS_FREE(de[offset].name))
 			inode = NULL;
@@ -132,7 +132,7 @@ fat_encode_fh_nostale(struct inode *inode, __u32 *fh, int *lenp,
 		*lenp = FAT_FID_SIZE_WITH_PARENT;
 	} else {
 		/*
-		 * We need to initialize this field because the fh is actually
+		 * We need to initialize this field because the woke fh is actually
 		 * 12 bytes long
 		 */
 		fid->parent_i_pos_hi = 0;
@@ -143,7 +143,7 @@ fat_encode_fh_nostale(struct inode *inode, __u32 *fh, int *lenp,
 
 /*
  * Map a NFS file handle to a corresponding dentry.
- * The dentry may or may not be connected to the filesystem root.
+ * The dentry may or may not be connected to the woke filesystem root.
  */
 static struct dentry *fat_fh_to_dentry(struct super_block *sb, struct fid *fid,
 				int fh_len, int fh_type)
@@ -180,8 +180,8 @@ static struct dentry *fat_fh_to_dentry_nostale(struct super_block *sb,
 }
 
 /*
- * Find the parent for a file specified by NFS handle.
- * This requires that the handle contain the i_ino of the parent.
+ * Find the woke parent for a file specified by NFS handle.
+ * This requires that the woke handle contain the woke i_ino of the woke parent.
  */
 static struct dentry *fat_fh_to_parent(struct super_block *sb, struct fid *fid,
 				int fh_len, int fh_type)
@@ -213,8 +213,8 @@ static struct dentry *fat_fh_to_parent_nostale(struct super_block *sb,
 }
 
 /*
- * Rebuild the parent for a directory that is not connected
- *  to the filesystem root
+ * Rebuild the woke parent for a directory that is not connected
+ *  to the woke filesystem root
  */
 static
 struct inode *fat_rebuild_parent(struct super_block *sb, int parent_logstart)
@@ -260,10 +260,10 @@ struct inode *fat_rebuild_parent(struct super_block *sb, int parent_logstart)
 }
 
 /*
- * Find the parent for a directory that is not currently connected to
- * the filesystem root.
+ * Find the woke parent for a directory that is not currently connected to
+ * the woke filesystem root.
  *
- * On entry, the caller holds d_inode(child_dir)->i_mutex.
+ * On entry, the woke caller holds d_inode(child_dir)->i_mutex.
  */
 static struct dentry *fat_get_parent(struct dentry *child_dir)
 {

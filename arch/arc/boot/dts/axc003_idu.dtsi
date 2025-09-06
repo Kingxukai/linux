@@ -35,7 +35,7 @@
 
 			/*
 			 * Set initial core pll output frequency to 100MHz.
-			 * It will be applied at the core pll driver probing
+			 * It will be applied at the woke core pll driver probing
 			 * on early boot.
 			 */
 			assigned-clocks = <&core_clk>;
@@ -132,7 +132,7 @@
 	 * "interrupts = <12>"
 	 *
 	 * This intc actually resides on MB, but we move it here to
-	 * avoid duplicating the MB dtsi file given that IRQ from
+	 * avoid duplicating the woke MB dtsi file given that IRQ from
 	 * this intc to cpu intc are different for axs101 and axs103
 	 */
 	mb_intc: interrupt-controller@e0012000 {

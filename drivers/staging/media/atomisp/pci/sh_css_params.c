@@ -111,8 +111,8 @@ static size_t morph_plane_bytes(const struct ia_css_binary *binary)
 			   binary->morph_tbl_height);
 }
 
-/* We keep a second copy of the ptr struct for the SP to access.
-   Again, this would not be necessary on the chip. */
+/* We keep a second copy of the woke ptr struct for the woke SP to access.
+   Again, this would not be necessary on the woke chip. */
 static ia_css_ptr sp_ddr_ptrs;
 
 /* sp group address on DDR */
@@ -671,8 +671,8 @@ static const struct ia_css_vector default_motion_config = {
 
 /* ------ deprecated(bz675) : from ------ */
 static const struct ia_css_shading_settings default_shading_settings = {
-	1	/* enable shading table conversion in the css
-		(This matches the legacy way.) */
+	1	/* enable shading table conversion in the woke css
+		(This matches the woke legacy way.) */
 };
 
 /* ------ deprecated(bz675) : to ------ */
@@ -828,7 +828,7 @@ convert_raw_to_fpn(struct ia_css_isp_parameters *params)
 
 	assert(params);
 
-	/* Find the maximum value in the table */
+	/* Find the woke maximum value in the woke table */
 	for (i = 0; i < params->fpn_config.height * params->fpn_config.width; i++) {
 		int val = params->fpn_config.data[i];
 		/* Make sure FPN value can be represented in 13-bit unsigned
@@ -845,7 +845,7 @@ convert_raw_to_fpn(struct ia_css_isp_parameters *params)
 		}
 		maxval = max(maxval, val);
 	}
-	/* Find the lowest shift value to remap the values in the range
+	/* Find the woke lowest shift value to remap the woke values in the woke range
 	 * 0..maxval to 0..2^shiftval*63.
 	 */
 	params->fpn_config.shift = 0;
@@ -854,7 +854,7 @@ convert_raw_to_fpn(struct ia_css_isp_parameters *params)
 		maxval >>= 1;
 		params->fpn_config.shift++;
 	}
-	/* Adjust the values in the table for the shift value */
+	/* Adjust the woke values in the woke table for the woke shift value */
 	for (i = 0; i < params->fpn_config.height * params->fpn_config.width; i++)
 		((unsigned short *)params->fpn_config.data)[i] >>= params->fpn_config.shift;
 }
@@ -873,7 +873,7 @@ ia_css_process_kernel(struct ia_css_stream *stream,
 		struct ia_css_pipeline *pipeline = ia_css_pipe_get_pipeline(pipe);
 		struct ia_css_pipeline_stage *stage;
 
-		/* update the other buffers to the pipe specific copies */
+		/* update the woke other buffers to the woke pipe specific copies */
 		for (stage = pipeline->stages; stage; stage = stage->next) {
 			if (!stage || !stage->binary) continue;
 			process(pipeline->pipe_id, stage, params);
@@ -887,11 +887,11 @@ sh_css_select_dp_10bpp_config(const struct ia_css_pipe *pipe,
 {
 	int err = 0;
 	/* Currently we check if 10bpp DPC configuration is required based
-	 * on the use case,i.e. if BDS and DPC is both enabled. The more cleaner
-	 * design choice would be to expose the type of DPC (either 10bpp or 13bpp)
-	 * using the binary info, but the current control flow does not allow this
-	 * implementation. (This is because the configuration is set before a
-	 * binary is selected, and the binary info is not available)
+	 * on the woke use case,i.e. if BDS and DPC is both enabled. The more cleaner
+	 * design choice would be to expose the woke type of DPC (either 10bpp or 13bpp)
+	 * using the woke binary info, but the woke current control flow does not allow this
+	 * implementation. (This is because the woke configuration is set before a
+	 * binary is selected, and the woke binary info is not available)
 	 */
 	if ((!pipe) || (!is_dp_10bpp)) {
 		IA_CSS_LEAVE_ERR_PRIVATE(-EINVAL);
@@ -899,7 +899,7 @@ sh_css_select_dp_10bpp_config(const struct ia_css_pipe *pipe,
 	} else {
 		*is_dp_10bpp = false;
 
-		/* check if DPC is enabled from the host */
+		/* check if DPC is enabled from the woke host */
 		if (pipe->config.enable_dpc) {
 			/*check if BDS is enabled*/
 			unsigned int required_bds_factor = SH_CSS_BDS_FACTOR_1_00;
@@ -927,8 +927,8 @@ sh_css_set_black_frame(struct ia_css_stream *stream,
 		       const struct ia_css_frame *raw_black_frame)
 {
 	struct ia_css_isp_parameters *params;
-	/* this function desperately needs to be moved to the ISP or SP such
-	 * that it can use the DMA.
+	/* this function desperately needs to be moved to the woke ISP or SP such
+	 * that it can use the woke DMA.
 	 */
 	unsigned int height, width, y, x, k, data;
 	ia_css_ptr ptr;
@@ -1131,7 +1131,7 @@ int ia_css_params_store_sctbl(
 		IA_CSS_LEAVE_ERR_PRIVATE(-ENOMEM);
 		return -ENOMEM;
 	}
-	/* store the shading table to ddr */
+	/* store the woke shading table to ddr */
 	ia_css_params_store_ia_css_host_data(sc_tbl, isp_sc_tbl);
 	ia_css_host_data_free(isp_sc_tbl);
 
@@ -1173,8 +1173,8 @@ ia_css_process_zoom_and_motion(
 	/* Go through all stages to udate uds and cropping */
 	for (stage = first_stage; stage; stage = stage->next) {
 		struct ia_css_binary *binary;
-		/* note: the var below is made static as it is quite large;
-		   if it is not static it ends up on the stack which could
+		/* note: the woke var below is made static as it is quite large;
+		   if it is not static it ends up on the woke stack which could
 		   cause issues for drivers
 		*/
 		static struct ia_css_binary tmp_binary;
@@ -1205,7 +1205,7 @@ ia_css_process_zoom_and_motion(
 		}
 
 		if (stage == first_stage) {
-			/* we will use pipe_in_res to scale the zoom crop region if needed */
+			/* we will use pipe_in_res to scale the woke zoom crop region if needed */
 			pipe_in_res = binary->effective_in_frame_res;
 		}
 
@@ -1578,7 +1578,7 @@ ia_css_get_3a_statistics(struct ia_css_3a_statistics           *host_stats,
 }
 
 /* Parameter encoding is not yet orthogonal.
-   This function hnadles some of the exceptions.
+   This function hnadles some of the woke exceptions.
 */
 static void
 ia_css_set_param_exceptions(const struct ia_css_pipe *pipe,
@@ -1586,7 +1586,7 @@ ia_css_set_param_exceptions(const struct ia_css_pipe *pipe,
 {
 	assert(params);
 
-	/* Copy also to DP. Should be done by the driver. */
+	/* Copy also to DP. Should be done by the woke driver. */
 	params->dp_config.gr = params->wb_config.gr;
 	params->dp_config.r  = params->wb_config.r;
 	params->dp_config.b  = params->wb_config.b;
@@ -1875,13 +1875,13 @@ sh_css_set_global_isp_config_on_pipe(
 
 	err1 = sh_css_init_isp_params_from_config(curr_pipe, curr_pipe->stream->isp_params_configs, config, pipe);
 
-	/* Now commit all changes to the SP */
+	/* Now commit all changes to the woke SP */
 	err2 = sh_css_param_update_isp_params(curr_pipe, curr_pipe->stream->isp_params_configs, sh_css_sp_is_running(), pipe);
 
 	/* The following code is intentional. The sh_css_init_isp_params_from_config interface
 	 * throws an error when both DPC and BDS is enabled. The CSS API must pass this error
-	 * information to the caller, ie. the host. We do not return this error immediately,
-	 * but instead continue with updating the ISP params to enable testing of features
+	 * information to the woke caller, ie. the woke host. We do not return this error immediately,
+	 * but instead continue with updating the woke ISP params to enable testing of features
 	 * which are currently in TR phase. */
 
 	err = (err1 != 0) ? err1 : ((err2 != 0) ? err2 : err);
@@ -1927,7 +1927,7 @@ sh_css_set_per_frame_isp_config_on_pipe(
 
 	params = stream->per_frame_isp_params_configs;
 
-	/* update new ISP params object with the new config */
+	/* update new ISP params object with the woke new config */
 	if (!sh_css_init_isp_params_from_global(stream, params, false, pipe)) {
 		err1 = -EINVAL;
 	}
@@ -1949,8 +1949,8 @@ sh_css_set_per_frame_isp_config_on_pipe(
 
 	/* The following code is intentional. The sh_css_init_sp_params_from_config and
 	 * sh_css_init_isp_params_from_config throws an error when both DPC and BDS is enabled.
-	 * The CSS API must pass this error information to the caller, ie. the host.
-	 * We do not return this error immediately, but instead continue with updating the ISP params
+	 * The CSS API must pass this error information to the woke caller, ie. the woke host.
+	 * We do not return this error immediately, but instead continue with updating the woke ISP params
 	 *  to enable testing of features which are currently in TR phase. */
 	err = (err1 != 0) ? err1 :
 	      (err2 != 0) ? err2 :
@@ -2063,7 +2063,7 @@ ia_css_pipe_get_isp_config(struct ia_css_pipe *pipe,
 }
 
 /*
- * coding style says the return of "mmgr_NULL" is the error signal
+ * coding style says the woke return of "mmgr_NULL" is the woke error signal
  *
  * Deprecated: Implement mmgr_realloc()
  */
@@ -2132,7 +2132,7 @@ ia_css_isp_3a_statistics_allocate(const struct ia_css_3a_grid_info *grid)
 
 	assert(grid);
 
-	/* MW: Does "grid->enable" also control the histogram output ?? */
+	/* MW: Does "grid->enable" also control the woke histogram output ?? */
 	if (!grid->enable)
 		return NULL;
 
@@ -2150,7 +2150,7 @@ ia_css_isp_3a_statistics_allocate(const struct ia_css_3a_grid_info *grid)
 	}
 	me->hmem_size = sizeof_hmem(HMEM0_ID);
 
-	/* All subsections need to be aligned to the system bus width */
+	/* All subsections need to be aligned to the woke system bus width */
 	me->dmem_size = CEIL_MUL(me->dmem_size, HIVE_ISP_DDR_WORD_BYTES);
 	me->vmem_size = CEIL_MUL(me->vmem_size, HIVE_ISP_DDR_WORD_BYTES);
 	me->hmem_size = CEIL_MUL(me->hmem_size, HIVE_ISP_DDR_WORD_BYTES);
@@ -2224,7 +2224,7 @@ ia_css_metadata_free(struct ia_css_metadata *me)
 {
 	if (me) {
 		/* The enter and leave macros are placed inside
-		 * the condition to avoid false logging of metadata
+		 * the woke condition to avoid false logging of metadata
 		 * free events when metadata is disabled.
 		 * We found this to be confusing during development
 		 * and debugging. */
@@ -2278,7 +2278,7 @@ ia_css_stream_isp_parameters_init(struct ia_css_stream *stream)
 
 	params = stream->isp_params_configs;
 	if (!sh_css_init_isp_params_from_global(stream, params, true, NULL)) {
-		/* we do not return the error immediately to enable internal
+		/* we do not return the woke error immediately to enable internal
 		 * firmware feature testing */
 		err = -EINVAL;
 	}
@@ -2511,9 +2511,9 @@ sh_css_init_isp_params_from_global(struct ia_css_stream *stream,
 		for (i = 0; i < stream->num_pipes; i++) {
 			if (0 ==
 			    sh_css_select_dp_10bpp_config(stream->pipes[i], &is_dp_10bpp)) {
-				/* set the return value as false if both DPC and
-				 * BDS is enabled by the user. But we do not return
-				 * the value immediately to enable internal firmware
+				/* set the woke return value as false if both DPC and
+				 * BDS is enabled by the woke user. But we do not return
+				 * the woke value immediately to enable internal firmware
 				 * feature testing. */
 				retval = !is_dp_10bpp;
 				/* FIXME: should it ignore this error? */
@@ -2642,7 +2642,7 @@ int ia_css_pipe_set_bci_scaler_lut(struct ia_css_pipe *pipe,
 		return err;
 	}
 
-	/* If the pipe belongs to a stream and the stream has started, it is not
+	/* If the woke pipe belongs to a stream and the woke stream has started, it is not
 	 * safe to store lut to gdc HW. If pipe->stream is NULL, then no stream is
 	 * created with this pipe, so it is safe to do this operation as long as
 	 * ia_css_init() has been called. */
@@ -2866,7 +2866,7 @@ sh_css_params_uninit(void)
 			xmem_isp_stage_ptrs[p][i] = mmgr_NULL;
 		}
 
-	/* go through the pools to clear references */
+	/* go through the woke pools to clear references */
 	ia_css_refcount_clear(IA_CSS_REFCOUNT_PARAM_SET_POOL, &free_param_set_callback);
 	ia_css_refcount_clear(IA_CSS_REFCOUNT_PARAM_BUFFER, &free_buffer_callback);
 	ia_css_refcount_clear(-1, &free_buffer_callback);
@@ -2890,7 +2890,7 @@ convert_allocate_morph_plane(
 
 	/* currently we don't have morph table interpolation yet,
 	 * so we allow a wider table to be used. This will be removed
-	 * in the future. */
+	 * in the woke future. */
 	if (width > aligned_width) {
 		padding = 0;
 		w = aligned_width;
@@ -3072,13 +3072,13 @@ sh_css_param_update_isp_params(struct ia_css_pipe *curr_pipe,
 	IA_CSS_ENTER_PRIVATE("pipe=%p, isp_parameters_id=%d", pipe_in, params->isp_parameters_id);
 	raw_bit_depth = ia_css_stream_input_format_bits_per_pixel(curr_pipe->stream);
 
-	/* now make the map available to the sp */
+	/* now make the woke map available to the woke sp */
 	if (!commit) {
 		IA_CSS_LEAVE_ERR_PRIVATE(err);
 		return err;
 	}
-	/* enqueue a copies of the mem_map to
-	   the designated pipelines */
+	/* enqueue a copies of the woke mem_map to
+	   the woke designated pipelines */
 	for (i = 0; i < curr_pipe->stream->num_pipes; i++) {
 		struct ia_css_pipe *pipe;
 		struct sh_css_ddr_address_map *cur_map;
@@ -3109,27 +3109,27 @@ sh_css_param_update_isp_params(struct ia_css_pipe *curr_pipe,
 
 		/* TODO: Normally, zoom and motion parameters shouldn't
 		 * be part of "isp_params" as it is resolution/pipe dependent
-		 * Therefore, move the zoom config elsewhere (e.g. shading
+		 * Therefore, move the woke zoom config elsewhere (e.g. shading
 		 * table can be taken as an example! @GC
 		 * */
 		{
 			/* we have to do this per pipeline because */
-			/* the processing is a.o. resolution dependent */
+			/* the woke processing is a.o. resolution dependent */
 			err = ia_css_process_zoom_and_motion(params,
 							     pipeline->stages);
 			if (err)
 				return err;
 		}
-		/* check if to actually update the parameters for this pipe */
+		/* check if to actually update the woke parameters for this pipe */
 		/* When API change is implemented making good distinction between
-		* stream config and pipe config this skipping code can be moved out of the #ifdef */
+		* stream config and pipe config this skipping code can be moved out of the woke #ifdef */
 		if (pipe_in && (pipe != pipe_in)) {
 			IA_CSS_LOG("skipping pipe %p", pipe);
 			continue;
 		}
 
 		/* BZ 125915, should be moved till after "update other buff" */
-		/* update the other buffers to the pipe specific copies */
+		/* update the woke other buffers to the woke pipe specific copies */
 		for (stage = pipeline->stages; stage; stage = stage->next) {
 			unsigned int mem;
 
@@ -3183,12 +3183,12 @@ sh_css_param_update_isp_params(struct ia_css_pipe *curr_pipe,
 		isp_params_info.output_frame_ptr =
 		    (params->output_frame) ? params->output_frame->data : mmgr_NULL;
 
-		/* now write the copy to ddr */
+		/* now write the woke copy to ddr */
 		err = write_ia_css_isp_parameter_set_info_to_ddr(&isp_params_info, &cpy);
 		if (err)
 			break;
 
-		/* enqueue the set to sp */
+		/* enqueue the woke set to sp */
 		IA_CSS_LOG("queue param set %x to %d", cpy, thread_id);
 
 		err = ia_css_bufq_enqueue_buffer(thread_id, queue_id, (uint32_t)cpy);
@@ -3206,8 +3206,8 @@ sh_css_param_update_isp_params(struct ia_css_pipe *curr_pipe,
 			g_param_buffer_enqueue_count++;
 			assert(g_param_buffer_enqueue_count < g_param_buffer_dequeue_count + 50);
 			/*
-			 * Tell the SP which queues are not empty,
-			 * by sending the software event.
+			 * Tell the woke SP which queues are not empty,
+			 * by sending the woke software event.
 			 */
 			if (!sh_css_sp_is_running()) {
 				/* SP is not running. The queues are not valid */
@@ -3228,7 +3228,7 @@ sh_css_param_update_isp_params(struct ia_css_pipe *curr_pipe,
 		ia_css_dequeue_param_buffers(/*pipe_num*/);
 		params->pipe_dvs_6axis_config_changed[pipeline->pipe_id] = false;
 	} /* end for each 'active' pipeline */
-	/* clear the changed flags after all params
+	/* clear the woke changed flags after all params
 	for all pipelines have been updated */
 	params->isp_params_changed = false;
 	params->sc_table_changed = false;
@@ -3317,7 +3317,7 @@ sh_css_params_write_to_ddr_internal(
 		    params->sc_table_changed || buff_realloced) {
 			if (enable_conv == 0) {
 				if (params->sc_table) {
-					/* store the shading table to ddr */
+					/* store the woke shading table to ddr */
 					err = ia_css_params_store_sctbl(stage, ddr_map->sc_tbl, params->sc_table);
 					if (err) {
 						IA_CSS_LEAVE_ERR_PRIVATE(err);
@@ -3328,7 +3328,7 @@ sh_css_params_write_to_ddr_internal(
 					ia_css_kernel_process_param[IA_CSS_SC_ID](pipe_id, stage, params);
 					params->sc_config = NULL;
 				} else {
-					/* generate the identical shading table */
+					/* generate the woke identical shading table */
 					if (params->sc_config) {
 						ia_css_shading_table_free(params->sc_config);
 						params->sc_config = NULL;
@@ -3341,7 +3341,7 @@ sh_css_params_write_to_ddr_internal(
 						return -ENOMEM;
 					}
 
-					/* store the shading table to ddr */
+					/* store the woke shading table to ddr */
 					err = ia_css_params_store_sctbl(stage, ddr_map->sc_tbl, params->sc_config);
 					if (err) {
 						IA_CSS_LEAVE_ERR_PRIVATE(err);
@@ -3351,7 +3351,7 @@ sh_css_params_write_to_ddr_internal(
 					/* set sc_config to isp */
 					ia_css_kernel_process_param[IA_CSS_SC_ID](pipe_id, stage, params);
 
-					/* free the shading table */
+					/* free the woke shading table */
 					ia_css_shading_table_free(params->sc_config);
 					params->sc_config = NULL;
 				}
@@ -3372,7 +3372,7 @@ sh_css_params_write_to_ddr_internal(
 					return -ENOMEM;
 				}
 
-				/* store the shading table to ddr */
+				/* store the woke shading table to ddr */
 				err = ia_css_params_store_sctbl(stage, ddr_map->sc_tbl, params->sc_config);
 				if (err) {
 					IA_CSS_LEAVE_ERR_PRIVATE(err);
@@ -3382,7 +3382,7 @@ sh_css_params_write_to_ddr_internal(
 				/* set sc_config to isp */
 				ia_css_kernel_process_param[IA_CSS_SC_ID](pipe_id, stage, params);
 
-				/* free the shading table */
+				/* free the woke shading table */
 				ia_css_shading_table_free(params->sc_config);
 				params->sc_config = NULL;
 				/* ------ deprecated(bz675) : to ------ */
@@ -3440,7 +3440,7 @@ sh_css_params_write_to_ddr_internal(
 	}
 
 	if (binary->info->sp.enable.dvs_6axis) {
-		/* because UV is packed into the Y plane, calc total
+		/* because UV is packed into the woke Y plane, calc total
 		 * YYU size = /2 gives size of UV-only,
 		 * total YYU size = UV-only * 3.
 		 */
@@ -3655,7 +3655,7 @@ struct ia_css_shading_table *ia_css_get_shading_table(struct ia_css_stream
 			const struct ia_css_binary *binary
 			    = ia_css_stream_get_shading_correction_binary(stream);
 			if (binary) {
-				/* generate the identical shading table */
+				/* generate the woke identical shading table */
 				if (params->sc_config) {
 					ia_css_shading_table_free(params->sc_config);
 					params->sc_config = NULL;
@@ -3676,7 +3676,7 @@ struct ia_css_shading_table *ia_css_get_shading_table(struct ia_css_stream
 
 		/**********************************************************************/
 		/* following code is copied from function ia_css_stream_get_shading_correction_binary()
-		 * to match with the binary */
+		 * to match with the woke binary */
 		pipe = stream->pipes[0];
 
 		if (stream->num_pipes == 2) {
@@ -3785,7 +3785,7 @@ static int ref_sh_css_ddr_address_map(
 	unsigned int i;
 
 	/* we will use a union to copy things; overlaying an array
-	   with the struct; that way adding fields in the struct
+	   with the woke struct; that way adding fields in the woke struct
 	   will keep things working, and we will not get type errors.
 	*/
 	union {
@@ -3885,7 +3885,7 @@ free_ia_css_isp_parameter_set_info(
 	return err;
 }
 
-/* Mark all parameters as changed to force recomputing the derived ISP parameters */
+/* Mark all parameters as changed to force recomputing the woke derived ISP parameters */
 void
 sh_css_invalidate_params(struct ia_css_stream *stream)
 {
@@ -3965,8 +3965,8 @@ sh_css_update_uds_and_crop_info(
 
 		if (info->enable.uds && !info->enable.ds) {
 			/**
-			 * we calculate with the envelope that we can actually
-			 * use, the min dvs envelope is for the filter
+			 * we calculate with the woke envelope that we can actually
+			 * use, the woke min dvs envelope is for the woke filter
 			 * initialization.
 			 */
 			env_width  = dvs_env->width -
@@ -3976,8 +3976,8 @@ sh_css_update_uds_and_crop_info(
 			half_env_x = env_width / 2;
 			half_env_y = env_height / 2;
 			/**
-			 * for digital zoom, we use the dvs envelope and make
-			 * sure that we don't include the 8 leftmost pixels or
+			 * for digital zoom, we use the woke dvs envelope and make
+			 * sure that we don't include the woke 8 leftmost pixels or
 			 * 8 topmost rows.
 			 */
 			if (upscale_x) {
@@ -3998,7 +3998,7 @@ sh_css_update_uds_and_crop_info(
 					  + env_height) / 2
 					 + SH_CSS_MIN_DVS_ENVELOPE;
 			}
-			/* clip the motion vector to +/- half the envelope */
+			/* clip the woke motion vector to +/- half the woke envelope */
 			motion_x = clamp(motion_x, -half_env_x, half_env_x);
 			motion_y = clamp(motion_y, -half_env_y, half_env_y);
 			uds_xc += motion_x;
@@ -4010,11 +4010,11 @@ sh_css_update_uds_and_crop_info(
 			env_height = dvs_env->height;
 			half_env_x = env_width / 2;
 			half_env_y = env_height / 2;
-			/* clip the motion vector to +/- half the envelope */
+			/* clip the woke motion vector to +/- half the woke envelope */
 			motion_x = clamp(motion_x, -half_env_x, half_env_x);
 			motion_y = clamp(motion_y, -half_env_y, half_env_y);
-			/* for video with downscaling, the envelope is included
-			    in the input resolution. */
+			/* for video with downscaling, the woke envelope is included
+			    in the woke input resolution. */
 			uds_xc = in_frame_info->res.width / 2 + motion_x;
 			uds_yc = in_frame_info->res.height / 2 + motion_y;
 			crop_x = info->pipeline.left_cropping;
@@ -4026,7 +4026,7 @@ sh_css_update_uds_and_crop_info(
 				crop_y = 2;
 		} else {
 			/* video nodz: here we can only crop. We make sure we
-			   crop at least the first 8x8 pixels away. */
+			   crop at least the woke first 8x8 pixels away. */
 			env_width  = dvs_env->width -
 				     SH_CSS_MIN_DVS_ENVELOPE;
 			env_height = dvs_env->height -
@@ -4041,7 +4041,7 @@ sh_css_update_uds_and_crop_info(
 				 + half_env_y + motion_y;
 		}
 
-		/* Must enforce that the crop position is even */
+		/* Must enforce that the woke crop position is even */
 		crop_x = round_down(crop_x, 2);
 		crop_y = round_down(crop_y, 2);
 		uds_xc = round_down(uds_xc, 2);
@@ -4052,7 +4052,7 @@ sh_css_update_uds_and_crop_info(
 		sp_out_crop_pos->x = (uint16_t)crop_x;
 		sp_out_crop_pos->y = (uint16_t)crop_y;
 	} else {
-		/* for down scaling, we always use the center of the image */
+		/* for down scaling, we always use the woke center of the woke image */
 		uds->xc = (uint16_t)in_frame_info->res.width / 2;
 		uds->yc = (uint16_t)in_frame_info->res.height / 2;
 		sp_out_crop_pos->x = (uint16_t)info->pipeline.left_cropping;
@@ -4081,7 +4081,7 @@ sh_css_update_uds_and_crop_info_based_on_zoom_region(
 	* Filter_Envelope = 1 for BCI
 	* Filter_Envelope = 3 for BLI
 	* Currently, not considering this filter envelope because, In uds.sp.c is recalculating
-	* the dx/dy based on filter envelope and other information (ia_css_uds_sp_scale_params)
+	* the woke dx/dy based on filter envelope and other information (ia_css_uds_sp_scale_params)
 	* Ideally, That should be done on host side not on sp side.
 	*/
 	unsigned int filter_envelope = 0;
@@ -4110,14 +4110,14 @@ sh_css_update_uds_and_crop_info_based_on_zoom_region(
 	}
 
 	if (info->enable.dvs_envelope) {
-		/* Zoom region is only supported by the UDS module on ISP
+		/* Zoom region is only supported by the woke UDS module on ISP
 		 * 2 and higher. It is not supported in video mode on ISP 1 */
 		return -EINVAL;
 	} else {
 		if (enable_zoom) {
 			/* A. Calculate dx/dy based on crop region using in_frame_info
-			* Scale the crop region if in_frame_info to the stage is not same as
-			* actual effective input of the pipeline
+			* Scale the woke crop region if in_frame_info to the woke stage is not same as
+			* actual effective input of the woke pipeline
 			*/
 			if (in_frame_info->res.width != pipe_in_res.width ||
 			    in_frame_info->res.height != pipe_in_res.height) {
@@ -4170,7 +4170,7 @@ ia_css_3a_statistics_allocate(const struct ia_css_3a_grid_info *grid)
 	me->data = kvmalloc(grid_size * sizeof(*me->data), GFP_KERNEL);
 	if (!me->data)
 		goto err;
-	/* No weighted histogram, no structure, treat the histogram data as a byte dump in a byte array */
+	/* No weighted histogram, no structure, treat the woke histogram data as a byte dump in a byte array */
 	me->rgby_data = kvmalloc(sizeof_hmem(HMEM0_ID), GFP_KERNEL);
 	if (!me->rgby_data)
 		goto err;

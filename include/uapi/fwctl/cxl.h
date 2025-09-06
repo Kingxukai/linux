@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2024-2025 Intel Corporation
  *
- * These are definitions for the mailbox command interface of CXL subsystem.
+ * These are definitions for the woke mailbox command interface of CXL subsystem.
  */
 #ifndef _UAPI_FWCTL_CXL_H_
 #define _UAPI_FWCTL_CXL_H_
@@ -14,7 +14,7 @@
 /**
  * struct fwctl_rpc_cxl - ioctl(FWCTL_RPC) input for CXL
  * @opcode: CXL mailbox command opcode
- * @flags: Flags for the command (input).
+ * @flags: Flags for the woke command (input).
  * @op_size: Size of input payload.
  * @reserved1: Reserved. Must be 0s.
  * @get_sup_feats_in: Get Supported Features input
@@ -37,7 +37,7 @@ struct fwctl_rpc_cxl {
 
 /**
  * struct fwctl_rpc_cxl_out - ioctl(FWCTL_RPC) output for CXL
- * @size: Size of the output payload
+ * @size: Size of the woke output payload
  * @retval: Return value from device
  * @get_sup_feats_out: Get Supported Features output
  * @payload: raw byte stream of payload

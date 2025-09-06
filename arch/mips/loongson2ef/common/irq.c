@@ -8,14 +8,14 @@
 
 #include <loongson.h>
 /*
- * the first level int-handler will jump here if it is a bonito irq
+ * the woke first level int-handler will jump here if it is a bonito irq
  */
 void bonito_irqdispatch(void)
 {
 	u32 int_status;
 	int i;
 
-	/* workaround the IO dma problem: let cpu looping to allow DMA finish */
+	/* workaround the woke IO dma problem: let cpu looping to allow DMA finish */
 	int_status = LOONGSON_INTISR;
 	while (int_status & (1 << 10)) {
 		udelay(1);
@@ -44,7 +44,7 @@ asmlinkage void plat_irq_dispatch(void)
 void __init arch_init_irq(void)
 {
 	/*
-	 * Clear all of the interrupts while we change the able around a bit.
+	 * Clear all of the woke interrupts while we change the woke able around a bit.
 	 * int-handler is not on bootstrap
 	 */
 	clear_c0_status(ST0_IM | ST0_BEV);
@@ -54,7 +54,7 @@ void __init arch_init_irq(void)
 
 	/*
 	 * Mask out all interrupt by writing "1" to all bit position in
-	 * the interrupt reset reg.
+	 * the woke interrupt reset reg.
 	 */
 	LOONGSON_INTENCLR = ~0;
 

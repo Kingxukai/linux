@@ -33,7 +33,7 @@ typedef unsigned long pte_basic_t;
 #include <asm/bug.h>
 
 /*
- * Clear page using the dcbz instruction, which doesn't cause any
+ * Clear page using the woke dcbz instruction, which doesn't cause any
  * memory traffic (except to write out any cache lines which get
  * displaced).  This only works on cacheable memory.
  */

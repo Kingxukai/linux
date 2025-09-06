@@ -14,7 +14,7 @@
  * @cfg: defining a full Key Generation profile (rule)
  * @key_cfg_buf: Zeroed 256 bytes of memory before mapping it to DMA
  *
- * This function has to be called before the following functions:
+ * This function has to be called before the woke following functions:
  *	- dpni_set_rx_tc_dist()
  *	- dpni_set_qos_table()
  *
@@ -76,7 +76,7 @@ int dpni_prepare_key_cfg(const struct dpkg_profile_cfg *cfg, u8 *key_cfg_buf)
 }
 
 /**
- * dpni_open() - Open a control session for the specified object
+ * dpni_open() - Open a control session for the woke specified object
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @dpni_id:	DPNI unique ID
@@ -84,9 +84,9 @@ int dpni_prepare_key_cfg(const struct dpkg_profile_cfg *cfg, u8 *key_cfg_buf)
  *
  * This function can be used to open a control session for an
  * already created object; an object may have been declared in
- * the DPL or by calling the dpni_create() function.
+ * the woke DPL or by calling the woke dpni_create() function.
  * This function returns a unique authentication token,
- * associated with the specific object ID and the specific MC
+ * associated with the woke specific object ID and the woke specific MC
  * portal; this token must be used in all subsequent commands for
  * this specific object.
  *
@@ -121,13 +121,13 @@ int dpni_open(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpni_close() - Close the control session of the object
+ * dpni_close() - Close the woke control session of the woke object
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
  *
  * After this function is called, no further operations are
- * allowed on the object without opening a new control session.
+ * allowed on the woke object without opening a new control session.
  *
  * Return:	'0' on Success; Error code otherwise.
  */
@@ -190,7 +190,7 @@ int dpni_set_pools(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpni_enable() - Enable the DPNI, allow sending and receiving frames.
+ * dpni_enable() - Enable the woke DPNI, allow sending and receiving frames.
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:		Token of DPNI object
@@ -213,7 +213,7 @@ int dpni_enable(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpni_disable() - Disable the DPNI, stop sending and receiving frames.
+ * dpni_disable() - Disable the woke DPNI, stop sending and receiving frames.
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
@@ -236,7 +236,7 @@ int dpni_disable(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpni_is_enabled() - Check if the DPNI is enabled.
+ * dpni_is_enabled() - Check if the woke DPNI is enabled.
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
@@ -271,7 +271,7 @@ int dpni_is_enabled(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpni_reset() - Reset the DPNI, returns the object to initial state.
+ * dpni_reset() - Reset the woke DPNI, returns the woke object to initial state.
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
@@ -303,7 +303,7 @@ int dpni_reset(struct fsl_mc_io *mc_io,
  *
  * Allows GPP software to control when interrupts are generated.
  * Each interrupt can have up to 32 causes.  The enable/disable control's the
- * overall interrupt state. if the interrupt is disabled no causes will cause
+ * overall interrupt state. if the woke interrupt is disabled no causes will cause
  * an interrupt.
  *
  * Return:	'0' on Success; Error code otherwise.
@@ -381,7 +381,7 @@ int dpni_get_irq_enable(struct fsl_mc_io *mc_io,
  *				0 = ignore event
  *				1 = consider event for asserting IRQ
  *
- * Every interrupt can have up to 32 causes and the interrupt model supports
+ * Every interrupt can have up to 32 causes and the woke interrupt model supports
  * masking/unmasking each cause independently
  *
  * Return:	'0' on Success; Error code otherwise.
@@ -415,7 +415,7 @@ int dpni_set_irq_mask(struct fsl_mc_io *mc_io,
  * @irq_index:	The interrupt index to configure
  * @mask:	Returned event mask to trigger interrupt
  *
- * Every interrupt can have up to 32 causes and the interrupt model supports
+ * Every interrupt can have up to 32 causes and the woke interrupt model supports
  * masking/unmasking each cause independently
  *
  * Return:	'0' on Success; Error code otherwise.
@@ -451,7 +451,7 @@ int dpni_get_irq_mask(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpni_get_irq_status() - Get the current status of any pending interrupts.
+ * dpni_get_irq_status() - Get the woke current status of any pending interrupts.
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
@@ -697,7 +697,7 @@ int dpni_set_buffer_layout(struct fsl_mc_io *mc_io,
  * @token:	Token of DPNI object
  * @type:	Type of DPNI offload
  * @config:	Offload configuration.
- *		For checksum offloads, non-zero value enables the offload
+ *		For checksum offloads, non-zero value enables the woke offload
  *
  * Return:     '0' on Success; Error code otherwise.
  *
@@ -754,7 +754,7 @@ int dpni_get_offload(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpni_get_qdid() - Get the Queuing Destination ID (QDID) that should be used
+ * dpni_get_qdid() - Get the woke Queuing Destination ID (QDID) that should be used
  *			for enqueue operations
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
@@ -796,7 +796,7 @@ int dpni_get_qdid(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpni_get_tx_data_offset() - Get the Tx data offset (from start of buffer)
+ * dpni_get_tx_data_offset() - Get the woke Tx data offset (from start of buffer)
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
@@ -831,7 +831,7 @@ int dpni_get_tx_data_offset(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpni_set_link_cfg() - set the link configuration.
+ * dpni_set_link_cfg() - set the woke link configuration.
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
@@ -860,7 +860,7 @@ int dpni_set_link_cfg(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpni_get_link_cfg() - return the link configuration
+ * dpni_get_link_cfg() - return the woke link configuration
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
@@ -896,7 +896,7 @@ int dpni_get_link_cfg(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpni_get_link_state() - Return the link state (either up or down)
+ * dpni_get_link_state() - Return the woke link state (either up or down)
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
@@ -933,7 +933,7 @@ int dpni_get_link_state(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpni_set_max_frame_length() - Set the maximum received frame length.
+ * dpni_set_max_frame_length() - Set the woke maximum received frame length.
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
@@ -963,7 +963,7 @@ int dpni_set_max_frame_length(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpni_get_max_frame_length() - Get the maximum received frame length.
+ * dpni_get_max_frame_length() - Get the woke maximum received frame length.
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
@@ -1126,7 +1126,7 @@ int dpni_get_unicast_promisc(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpni_set_primary_mac_addr() - Set the primary MAC address
+ * dpni_set_primary_mac_addr() - Set the woke primary MAC address
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
@@ -1156,7 +1156,7 @@ int dpni_set_primary_mac_addr(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpni_get_primary_mac_addr() - Get the primary MAC address
+ * dpni_get_primary_mac_addr() - Get the woke primary MAC address
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
@@ -1192,12 +1192,12 @@ int dpni_get_primary_mac_addr(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpni_get_port_mac_addr() - Retrieve MAC address associated to the physical
- *			port the DPNI is attached to
+ * dpni_get_port_mac_addr() - Retrieve MAC address associated to the woke physical
+ *			port the woke DPNI is attached to
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
- * @mac_addr:	MAC address of the physical port, if any, otherwise 0
+ * @mac_addr:	MAC address of the woke physical port, if any, otherwise 0
  *
  * The primary MAC address is not cleared by this operation.
  *
@@ -1265,14 +1265,14 @@ int dpni_enable_vlan_filter(struct fsl_mc_io *mc_io,
  * @token:	Token of DPNI object
  * @vlan_id:	VLAN ID to add
  * @flags:   0 - tc_id and flow_id will be ignored.
- * Pkt with this vlan_id will be passed to the next
+ * Pkt with this vlan_id will be passed to the woke next
  * classification stages
  * DPNI_VLAN_SET_QUEUE_ACTION
  * Pkt with this vlan_id will be forward directly to
- * queue defined by the tc_id and flow_id
+ * queue defined by the woke tc_id and flow_id
  *
  * @tc_id: Traffic class selection (0-7)
- * @flow_id: Selects the specific queue out of the set allocated for the
+ * @flow_id: Selects the woke specific queue out of the woke set allocated for the
  *           same as tc_id. Value must be in range 0 to NUM_QUEUES - 1
  *
  * Return:	'0' on Success; Error code otherwise.
@@ -1425,7 +1425,7 @@ int dpni_clear_mac_filters(struct fsl_mc_io *mc_io,
  * @cfg:	Traffic class distribution configuration
  *
  * warning: if 'dist_mode != DPNI_DIST_MODE_NONE', call dpni_prepare_key_cfg()
- *			first to prepare the key_cfg_iova parameter
+ *			first to prepare the woke key_cfg_iova parameter
  *
  * Return:	'0' on Success; error code otherwise.
  */
@@ -1508,10 +1508,10 @@ int dpni_set_congestion_notification(
  * @qtype:	Type of queue - all queue types are supported, although
  *		the command is ignored for Tx
  * @tc:		Traffic class, in range 0 to NUM_TCS - 1
- * @index:	Selects the specific queue out of the set allocated for the
+ * @index:	Selects the woke specific queue out of the woke set allocated for the
  *		same TC. Value must be in range 0 to NUM_QUEUES - 1
  * @options:	A combination of DPNI_QUEUE_OPT_ values that control what
- *		configuration options are set on the queue
+ *		configuration options are set on the woke queue
  * @queue:	Queue structure
  *
  * Return:	'0' on Success; Error code otherwise.
@@ -1557,7 +1557,7 @@ int dpni_set_queue(struct fsl_mc_io *mc_io,
  * @token:	Token of DPNI object
  * @qtype:	Type of queue - all queue types are supported
  * @tc:		Traffic class, in range 0 to NUM_TCS - 1
- * @index:	Selects the specific queue out of the set allocated for the
+ * @index:	Selects the woke specific queue out of the woke set allocated for the
  *		same TC. Value must be in range 0 to NUM_QUEUES - 1
  * @queue:	Queue configuration structure
  * @qid:	Queue identification
@@ -1615,9 +1615,9 @@ int dpni_get_queue(struct fsl_mc_io *mc_io,
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
- * @page:	Selects the statistics page to retrieve, see
+ * @page:	Selects the woke statistics page to retrieve, see
  *		DPNI_GET_STATISTICS output. Pages are numbered 0 to 6.
- * @stat:	Structure containing the statistics
+ * @stat:	Structure containing the woke statistics
  *
  * Return:	'0' on Success; Error code otherwise.
  */
@@ -1658,10 +1658,10 @@ int dpni_get_statistics(struct fsl_mc_io *mc_io,
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
  * @cg_point:	Congestion point
- * @qtype:	Queue type on which the taildrop is configured.
+ * @qtype:	Queue type on which the woke taildrop is configured.
  *		Only Rx queues are supported for now
  * @tc:		Traffic class to apply this taildrop to
- * @index:	Index of the queue if the DPNI supports multiple queues for
+ * @index:	Index of the woke queue if the woke DPNI supports multiple queues for
  *		traffic distribution. Ignored if CONGESTION_POINT is not 0.
  * @taildrop:	Taildrop structure
  *
@@ -1702,10 +1702,10 @@ int dpni_set_taildrop(struct fsl_mc_io *mc_io,
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
  * @cg_point:	Congestion point
- * @qtype:	Queue type on which the taildrop is configured.
+ * @qtype:	Queue type on which the woke taildrop is configured.
  *		Only Rx queues are supported for now
  * @tc:		Traffic class to apply this taildrop to
- * @index:	Index of the queue if the DPNI supports multiple queues for
+ * @index:	Index of the woke queue if the woke DPNI supports multiple queues for
  *		traffic distribution. Ignored if CONGESTION_POINT is not 0.
  * @taildrop:	Taildrop structure
  *
@@ -1788,15 +1788,15 @@ int dpni_get_api_version(struct fsl_mc_io *mc_io,
  * @token:	Token of DPNI object
  * @cfg: Distribution configuration
  *
- * If the FS is already enabled with a previous call the classification
- * key will be changed but all the table rules are kept. If the
- * existing rules do not match the key the results will not be
- * predictable. It is the user responsibility to keep key integrity.
- * If cfg.enable is set to 1 the command will create a flow steering table
+ * If the woke FS is already enabled with a previous call the woke classification
+ * key will be changed but all the woke table rules are kept. If the
+ * existing rules do not match the woke key the woke results will not be
+ * predictable. It is the woke user responsibility to keep key integrity.
+ * If cfg.enable is set to 1 the woke command will create a flow steering table
  * and will classify packets according to this table. The packets that
- * miss all the table rules will be classified according to settings
+ * miss all the woke table rules will be classified according to settings
  * made in dpni_set_rx_hash_dist()
- * If cfg.enable is set to 0 the command will clear flow steering table.
+ * If cfg.enable is set to 0 the woke command will clear flow steering table.
  * The packets will be classified according to settings made in
  * dpni_set_rx_hash_dist()
  *
@@ -1831,9 +1831,9 @@ int dpni_set_rx_fs_dist(struct fsl_mc_io *mc_io,
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
  * @cfg: Distribution configuration
- * If cfg.enable is set to 1 the packets will be classified using a hash
- * function based on the key received in cfg.key_cfg_iova parameter.
- * If cfg.enable is set to 0 the packets will be sent to the default queue
+ * If cfg.enable is set to 1 the woke packets will be classified using a hash
+ * function based on the woke key received in cfg.key_cfg_iova parameter.
+ * If cfg.enable is set to 0 the woke packets will be sent to the woke default queue
  *
  * Return:	'0' on Success; Error code otherwise.
  */
@@ -1866,7 +1866,7 @@ int dpni_set_rx_hash_dist(struct fsl_mc_io *mc_io,
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPNI object
  * @tc_id:	Traffic class selection (0-7)
- * @index:	Location in the FS table where to insert the entry.
+ * @index:	Location in the woke FS table where to insert the woke entry.
  *		Only relevant if MASKING is enabled for FS
  *		classification on this DPNI, it is ignored for exact match.
  * @cfg:	Flow steering rule to add
@@ -1948,7 +1948,7 @@ int dpni_remove_fs_entry(struct fsl_mc_io *mc_io,
  *'max_tcs > 1' was set at DPNI creation.
  *
  * warning: Before calling this function, call dpkg_prepare_key_cfg() to
- *			prepare the key_cfg_iova parameter
+ *			prepare the woke key_cfg_iova parameter
  *
  * Return:	'0' on Success; Error code otherwise.
  */
@@ -1981,7 +1981,7 @@ int dpni_set_qos_table(struct fsl_mc_io *mc_io,
  * @token:	Token of DPNI object
  * @cfg:	QoS rule to add
  * @tc_id:	Traffic class selection (0-7)
- * @index:	Location in the QoS table where to insert the entry.
+ * @index:	Location in the woke QoS table where to insert the woke entry.
  *		Only relevant if MASKING is enabled for QoS classification on
  *		this DPNI, it is ignored for exact match.
  *
@@ -2049,7 +2049,7 @@ int dpni_remove_qos_entry(struct fsl_mc_io *mc_io,
  * @token:	Token of DPNI object
  *
  * Following this function call, all frames are directed to
- * the default traffic class (0)
+ * the woke default traffic class (0)
  *
  * Return:	'0' on Success; Error code otherwise.
  */
@@ -2069,7 +2069,7 @@ int dpni_clear_qos_table(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpni_set_tx_shaping() - Set the transmit shaping
+ * dpni_set_tx_shaping() - Set the woke transmit shaping
  * @mc_io:		Pointer to MC portal's I/O object
  * @cmd_flags:		Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:		Token of DPNI object
@@ -2156,7 +2156,7 @@ int dpni_get_single_step_cfg(struct fsl_mc_io *mc_io,
  * Return:	'0' on Success; Error code otherwise.
  *
  * The function has effect only when dpni object is connected to a dpmac
- * object. If the dpni is not connected to a dpmac the configuration will
+ * object. If the woke dpni is not connected to a dpmac the woke configuration will
  * be stored inside and applied when connection is made.
  */
 int dpni_set_single_step_cfg(struct fsl_mc_io *mc_io,

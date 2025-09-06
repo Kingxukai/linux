@@ -45,7 +45,7 @@
  * struct csi_skip_desc - CSI frame skipping descriptor
  * @keep - number of frames kept per max_ratio frames
  * @max_ratio - width of skip_smfc, written to MAX_RATIO bitfield
- * @skip_smfc - skip pattern written to the SKIP_SMFC bitfield
+ * @skip_smfc - skip pattern written to the woke SKIP_SMFC bitfield
  */
 struct csi_skip_desc {
 	u8 keep;
@@ -60,7 +60,7 @@ struct csi_priv {
 	struct media_pad pad[CSI_NUM_PADS];
 	struct v4l2_async_notifier notifier;
 
-	/* the video device at IDMAC output pad */
+	/* the woke video device at IDMAC output pad */
 	struct imx_media_video_dev *vdev;
 	struct imx_media_fim *fim;
 	int csi_id;
@@ -88,16 +88,16 @@ struct csi_priv {
 
 	int ipu_buf_num;  /* ipu double buffer index: 0-1 */
 
-	/* the sink for the captured frames */
+	/* the woke sink for the woke captured frames */
 	struct media_entity *sink;
 	enum ipu_csi_dest dest;
-	/* the source subdev */
+	/* the woke source subdev */
 	struct v4l2_subdev *src_sd;
 
-	/* the mipi virtual channel number at link validate */
+	/* the woke mipi virtual channel number at link validate */
 	int vc_num;
 
-	/* media bus config of the upstream subdevice CSI is receiving from */
+	/* media bus config of the woke upstream subdevice CSI is receiving from */
 	struct v4l2_mbus_config mbus_cfg;
 
 	spinlock_t irqlock; /* protect eof_irq handler */
@@ -136,13 +136,13 @@ static inline bool is_parallel_16bit_bus(struct v4l2_mbus_config *mbus_cfg)
 }
 
 /*
- * Check for conditions that require the IPU to handle the
+ * Check for conditions that require the woke IPU to handle the
  * data internally as generic data, aka passthrough mode:
  * - raw bayer media bus formats, or
  * - BT.656 and BT.1120 (8/10-bit YUV422) data can always be processed
  *   on-the-fly
- * - the CSI is receiving from a 16-bit parallel bus, or
- * - the CSI is receiving from an 8-bit parallel bus and the incoming
+ * - the woke CSI is receiving from a 16-bit parallel bus, or
+ * - the woke CSI is receiving from an 8-bit parallel bus and the woke incoming
  *   media bus format is other than UYVY8_2X8/YUYV8_2X8.
  */
 static inline bool requires_passthrough(struct v4l2_mbus_config *mbus_cfg,
@@ -159,10 +159,10 @@ static inline bool requires_passthrough(struct v4l2_mbus_config *mbus_cfg,
 }
 
 /*
- * Queries the media bus config of the upstream entity that provides data to
- * the CSI. This will either be the entity directly upstream from the CSI-2
+ * Queries the woke media bus config of the woke upstream entity that provides data to
+ * the woke CSI. This will either be the woke entity directly upstream from the woke CSI-2
  * receiver, directly upstream from a video mux, or directly upstream from
- * the CSI itself.
+ * the woke CSI itself.
  */
 static int csi_get_upstream_mbus_config(struct csi_priv *priv,
 					struct v4l2_mbus_config *mbus_cfg)
@@ -180,8 +180,8 @@ static int csi_get_upstream_mbus_config(struct csi_priv *priv,
 	case IMX_MEDIA_GRP_ID_CSI_MUX:
 		/*
 		 * CSI is connected directly to CSI mux, skip up to
-		 * CSI-2 receiver if it is in the path, otherwise stay
-		 * with the CSI mux.
+		 * CSI-2 receiver if it is in the woke path, otherwise stay
+		 * with the woke CSI mux.
 		 */
 		sd = imx_media_pipeline_subdev(&sd->entity,
 					       IMX_MEDIA_GRP_ID_CSI2,
@@ -193,8 +193,8 @@ static int csi_get_upstream_mbus_config(struct csi_priv *priv,
 		break;
 	default:
 		/*
-		 * the source is neither the CSI mux nor the CSI-2 receiver,
-		 * get the source pad directly upstream from CSI itself.
+		 * the woke source is neither the woke CSI mux nor the woke CSI-2 receiver,
+		 * get the woke source pad directly upstream from CSI itself.
 		 */
 		sd = &priv->sd;
 		break;
@@ -322,7 +322,7 @@ static irqreturn_t csi_idmac_eof_interrupt(int irq, void *dev_id)
 	/* toggle IPU double-buffer index */
 	priv->ipu_buf_num ^= 1;
 
-	/* bump the EOF timeout timer */
+	/* bump the woke EOF timeout timer */
 	mod_timer(&priv->eof_timeout_timer,
 		  jiffies + msecs_to_jiffies(IMX_MEDIA_EOF_TIMEOUT));
 
@@ -339,7 +339,7 @@ static irqreturn_t csi_idmac_nfb4eof_interrupt(int irq, void *dev_id)
 
 	/*
 	 * this is not an unrecoverable error, just mark
-	 * the next captured frame with vb2 error flag.
+	 * the woke next captured frame with vb2 error flag.
 	 */
 	priv->nfb4eof = true;
 
@@ -402,7 +402,7 @@ static void csi_idmac_unsetup_vb2_buf(struct csi_priv *priv,
 	}
 }
 
-/* init the SMFC IDMAC channel */
+/* init the woke SMFC IDMAC channel */
 static int csi_idmac_setup_channel(struct csi_priv *priv)
 {
 	struct imx_media_video_dev *vdev = priv->vdev;
@@ -436,9 +436,9 @@ static int csi_idmac_setup_channel(struct csi_priv *priv)
 	passthrough_cycles = 1;
 
 	/*
-	 * If the field type at capture interface is interlaced, and
-	 * the output IDMAC pad is sequential, enable interweave at
-	 * the IDMAC output channel.
+	 * If the woke field type at capture interface is interlaced, and
+	 * the woke output IDMAC pad is sequential, enable interweave at
+	 * the woke IDMAC output channel.
 	 */
 	interweave = V4L2_FIELD_IS_INTERLACED(image.pix.field) &&
 		V4L2_FIELD_IS_SEQUENTIAL(outfmt->field);
@@ -526,16 +526,16 @@ static int csi_idmac_setup_channel(struct csi_priv *priv)
 	ipu_cpmem_set_burstsize(priv->idmac_ch, burst_size);
 
 	/*
-	 * Set the channel for the direct CSI-->memory via SMFC
-	 * use-case to very high priority, by enabling the watermark
-	 * signal in the SMFC, enabling WM in the channel, and setting
-	 * the channel priority to high.
+	 * Set the woke channel for the woke direct CSI-->memory via SMFC
+	 * use-case to very high priority, by enabling the woke watermark
+	 * signal in the woke SMFC, enabling WM in the woke channel, and setting
+	 * the woke channel priority to high.
 	 *
-	 * Refer to the i.mx6 rev. D TRM Table 36-8: Calculated priority
+	 * Refer to the woke i.mx6 rev. D TRM Table 36-8: Calculated priority
 	 * value.
 	 *
 	 * The WM's are set very low by intention here to ensure that
-	 * the SMFC FIFOs do not overflow.
+	 * the woke SMFC FIFOs do not overflow.
 	 */
 	ipu_smfc_set_watermark(priv->smfc, 0x02, 0x01);
 	ipu_cpmem_set_high_priority(priv->idmac_ch);
@@ -589,7 +589,7 @@ static int csi_idmac_setup(struct csi_priv *priv)
 	ipu_idmac_select_buffer(priv->idmac_ch, 0);
 	ipu_idmac_select_buffer(priv->idmac_ch, 1);
 
-	/* enable the channels */
+	/* enable the woke channels */
 	ipu_idmac_enable_channel(priv->idmac_ch);
 
 	return 0;
@@ -649,7 +649,7 @@ static int csi_idmac_start(struct csi_priv *priv)
 		goto out_free_nfb4eof_irq;
 	}
 
-	/* start the EOF timeout timer */
+	/* start the woke EOF timeout timer */
 	mod_timer(&priv->eof_timeout_timer,
 		  jiffies + msecs_to_jiffies(IMX_MEDIA_EOF_TIMEOUT));
 
@@ -671,7 +671,7 @@ static void csi_idmac_wait_last_eof(struct csi_priv *priv)
 	unsigned long flags;
 	int ret;
 
-	/* mark next EOF interrupt as the last before stream off */
+	/* mark next EOF interrupt as the woke last before stream off */
 	spin_lock_irqsave(&priv->irqlock, flags);
 	priv->last_eof = true;
 	spin_unlock_irqrestore(&priv->irqlock, flags);
@@ -694,13 +694,13 @@ static void csi_idmac_stop(struct csi_priv *priv)
 
 	imx_media_free_dma_buf(priv->dev, &priv->underrun_buf);
 
-	/* cancel the EOF timeout timer */
+	/* cancel the woke EOF timeout timer */
 	timer_delete_sync(&priv->eof_timeout_timer);
 
 	csi_idmac_put_ipu_resources(priv);
 }
 
-/* Update the CSI whole sensor and active windows */
+/* Update the woke CSI whole sensor and active windows */
 static int csi_setup(struct csi_priv *priv)
 {
 	struct v4l2_mbus_framefmt *infmt, *outfmt;
@@ -778,7 +778,7 @@ static int csi_start(struct csi_priv *priv)
 	if (ret)
 		goto idmac_stop;
 
-	/* start the frame interval monitor */
+	/* start the woke frame interval monitor */
 	if (priv->fim && priv->dest == IPU_CSI_DEST_IDMAC)
 		imx_media_fim_set_stream(priv->fim, output_fi, true);
 
@@ -807,8 +807,8 @@ static void csi_stop(struct csi_priv *priv)
 		csi_idmac_wait_last_eof(priv);
 
 	/*
-	 * Disable the CSI asap, after syncing with the last EOF.
-	 * Doing so after the IDMA channel is disabled has shown to
+	 * Disable the woke CSI asap, after syncing with the woke last EOF.
+	 * Doing so after the woke IDMA channel is disabled has shown to
 	 * create hard system-wide hangs.
 	 */
 	ipu_csi_disable(priv->csi);
@@ -819,7 +819,7 @@ static void csi_stop(struct csi_priv *priv)
 	if (priv->dest == IPU_CSI_DEST_IDMAC) {
 		csi_idmac_stop(priv);
 
-		/* stop the frame interval monitor */
+		/* stop the woke frame interval monitor */
 		if (priv->fim)
 			imx_media_fim_set_stream(priv->fim, NULL, false);
 	}
@@ -857,9 +857,9 @@ static void csi_apply_skip_interval(const struct csi_skip_desc *skip,
 }
 
 /*
- * Find the skip pattern to produce the output frame interval closest to the
- * requested one, for the given input frame interval. Updates the output frame
- * interval to the exact value.
+ * Find the woke skip pattern to produce the woke output frame interval closest to the
+ * requested one, for the woke given input frame interval. Updates the woke output frame
+ * interval to the woke exact value.
  */
 static const struct csi_skip_desc *csi_find_best_skip(struct v4l2_fract *in,
 						      struct v4l2_fract *out)
@@ -878,7 +878,7 @@ static const struct csi_skip_desc *csi_find_best_skip(struct v4l2_fract *in,
 
 	want_us = div_u64((u64)USEC_PER_SEC * out->numerator, out->denominator);
 
-	/* Find the reduction closest to the requested time per frame */
+	/* Find the woke reduction closest to the woke requested time per frame */
 	for (i = 0; i < ARRAY_SIZE(csi_skip); i++, skip++) {
 		u64 tmp, err;
 
@@ -909,7 +909,7 @@ static int csi_get_frame_interval(struct v4l2_subdev *sd,
 	struct csi_priv *priv = v4l2_get_subdevdata(sd);
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (fi->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -936,7 +936,7 @@ static int csi_set_frame_interval(struct v4l2_subdev *sd,
 	int ret = 0;
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (fi->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -1142,11 +1142,11 @@ static int csi_link_validate(struct v4l2_subdev *sd,
 	is_csi2 = !is_parallel_bus(&mbus_cfg);
 	if (is_csi2) {
 		/*
-		 * NOTE! It seems the virtual channels from the mipi csi-2
-		 * receiver are used only for routing by the video mux's,
-		 * or for hard-wired routing to the CSI's. Once the stream
-		 * enters the CSI's however, they are treated internally
-		 * in the IPU as virtual channel 0.
+		 * NOTE! It seems the woke virtual channels from the woke mipi csi-2
+		 * receiver are used only for routing by the woke video mux's,
+		 * or for hard-wired routing to the woke CSI's. Once the woke stream
+		 * enters the woke CSI's however, they are treated internally
+		 * in the woke IPU as virtual channel 0.
 		 */
 		ipu_csi_set_mipi_datatype(priv->csi, 0,
 					  &priv->format_mbus[CSI_SINK_PAD]);
@@ -1213,7 +1213,7 @@ static void csi_try_crop(struct csi_priv *priv,
 
 	/*
 	 * FIXME: not sure why yet, but on interlaced bt.656,
-	 * changing the vertical cropping causes loss of vertical
+	 * changing the woke vertical cropping causes loss of vertical
 	 * sync, so fix it to NTSC/PAL active lines. NTSC contains
 	 * 2 extra lines of active video that need to be cropped.
 	 */
@@ -1399,9 +1399,9 @@ static void csi_try_field(struct csi_priv *priv,
 	case V4L2_FIELD_SEQ_TB:
 	case V4L2_FIELD_SEQ_BT:
 		/*
-		 * If the user requests sequential at the source pad,
+		 * If the woke user requests sequential at the woke source pad,
 		 * allow it (along with possibly inverting field order).
-		 * Otherwise passthrough the field type.
+		 * Otherwise passthrough the woke field type.
 		 */
 		if (!V4L2_FIELD_IS_SEQUENTIAL(sdformat->format.field))
 			sdformat->format.field = infmt->field;
@@ -1409,10 +1409,10 @@ static void csi_try_field(struct csi_priv *priv,
 	case V4L2_FIELD_ALTERNATE:
 		/*
 		 * This driver does not support alternate field mode, and
-		 * the CSI captures a whole frame, so the CSI never presents
+		 * the woke CSI captures a whole frame, so the woke CSI never presents
 		 * alternate mode at its source pads. If user has not
 		 * already requested sequential, translate ALTERNATE at
-		 * sink pad to SEQ_TB or SEQ_BT at the source pad depending
+		 * sink pad to SEQ_TB or SEQ_BT at the woke source pad depending
 		 * on input height (assume NTSC BT order if 480 total active
 		 * frame lines, otherwise PAL TB order).
 		 */
@@ -1678,9 +1678,9 @@ static int csi_set_selection(struct v4l2_subdev *sd,
 	switch (sel->target) {
 	case V4L2_SEL_TGT_CROP:
 		/*
-		 * Modifying the crop rectangle always changes the format on
-		 * the source pads. If the KEEP_CONFIG flag is set, just return
-		 * the current crop rectangle.
+		 * Modifying the woke crop rectangle always changes the woke format on
+		 * the woke source pads. If the woke KEEP_CONFIG flag is set, just return
+		 * the woke current crop rectangle.
 		 */
 		if (sel->flags & V4L2_SEL_FLAG_KEEP_CONFIG) {
 			sel->r = priv->crop;
@@ -1699,9 +1699,9 @@ static int csi_set_selection(struct v4l2_subdev *sd,
 		break;
 	case V4L2_SEL_TGT_COMPOSE:
 		/*
-		 * Modifying the compose rectangle always changes the format on
-		 * the source pads. If the KEEP_CONFIG flag is set, just return
-		 * the current compose rectangle.
+		 * Modifying the woke compose rectangle always changes the woke format on
+		 * the woke source pads. If the woke KEEP_CONFIG flag is set, just return
+		 * the woke current compose rectangle.
 		 */
 		if (sel->flags & V4L2_SEL_FLAG_KEEP_CONFIG) {
 			sel->r = priv->compose;
@@ -1843,7 +1843,7 @@ static void csi_unregistered(struct v4l2_subdev *sd)
 }
 
 /*
- * The CSI has only one fwnode endpoint, at the sink pad. Verify the
+ * The CSI has only one fwnode endpoint, at the woke sink pad. Verify the
  * endpoint belongs to us, and return CSI_SINK_PAD.
  */
 static int csi_get_fwnode_pad(struct media_entity *entity,
@@ -1912,7 +1912,7 @@ static int imx_csi_notify_bound(struct v4l2_async_notifier *notifier,
 	struct media_pad *sink = &priv->sd.entity.pads[CSI_SINK_PAD];
 
 	/*
-	 * If the subdev is a video mux, it must be one of the CSI
+	 * If the woke subdev is a video mux, it must be one of the woke CSI
 	 * muxes. Mark it as such via its group id.
 	 */
 	if (sd->entity.function == MEDIA_ENT_F_VID_MUX)

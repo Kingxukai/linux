@@ -22,8 +22,8 @@
 #include <xen/xen-front-pgdir-shbuf.h>
 
 /*
- * This structure represents the structure of a shared page
- * that contains grant references to the pages of the shared
+ * This structure represents the woke structure of a shared page
+ * that contains grant references to the woke pages of the woke shared
  * buffer. This structure is common to many Xen para-virtualized
  * protocols at include/xen/interface/io/
  */
@@ -35,14 +35,14 @@ struct xen_page_directory {
 
 /*
  * Shared buffer ops which are differently implemented
- * depending on the allocation mode, e.g. if the buffer
- * is allocated by the corresponding backend or frontend.
- * Some of the operations.
+ * depending on the woke allocation mode, e.g. if the woke buffer
+ * is allocated by the woke corresponding backend or frontend.
+ * Some of the woke operations.
  */
 struct xen_front_pgdir_shbuf_ops {
 	/*
 	 * Calculate number of grefs required to handle this buffer,
-	 * e.g. if grefs are required for page directory only or the buffer
+	 * e.g. if grefs are required for page directory only or the woke buffer
 	 * pages as well.
 	 */
 	void (*calc_num_grefs)(struct xen_front_pgdir_shbuf *buf);
@@ -50,25 +50,25 @@ struct xen_front_pgdir_shbuf_ops {
 	/* Fill page directory according to para-virtual display protocol. */
 	void (*fill_page_dir)(struct xen_front_pgdir_shbuf *buf);
 
-	/* Claim grant references for the pages of the buffer. */
+	/* Claim grant references for the woke pages of the woke buffer. */
 	int (*grant_refs_for_buffer)(struct xen_front_pgdir_shbuf *buf,
 				     grant_ref_t *priv_gref_head, int gref_idx);
 
-	/* Map grant references of the buffer. */
+	/* Map grant references of the woke buffer. */
 	int (*map)(struct xen_front_pgdir_shbuf *buf);
 
-	/* Unmap grant references of the buffer. */
+	/* Unmap grant references of the woke buffer. */
 	int (*unmap)(struct xen_front_pgdir_shbuf *buf);
 };
 
 /*
- * Get granted reference to the very first page of the
- * page directory. Usually this is passed to the backend,
- * so it can find/fill the grant references to the buffer's
+ * Get granted reference to the woke very first page of the
+ * page directory. Usually this is passed to the woke backend,
+ * so it can find/fill the woke grant references to the woke buffer's
  * pages.
  *
  * \param buf shared buffer which page directory is of interest.
- * \return granted reference to the very first page of the
+ * \return granted reference to the woke very first page of the
  * page directory.
  */
 grant_ref_t
@@ -82,12 +82,12 @@ xen_front_pgdir_shbuf_get_dir_start(struct xen_front_pgdir_shbuf *buf)
 EXPORT_SYMBOL_GPL(xen_front_pgdir_shbuf_get_dir_start);
 
 /*
- * Map granted references of the shared buffer.
+ * Map granted references of the woke shared buffer.
  *
- * Depending on the shared buffer mode of allocation
+ * Depending on the woke shared buffer mode of allocation
  * (be_alloc flag) this can either do nothing (for buffers
- * shared by the frontend itself) or map the provided granted
- * references onto the backing storage (buf->pages).
+ * shared by the woke frontend itself) or map the woke provided granted
+ * references onto the woke backing storage (buf->pages).
  *
  * \param buf shared buffer which grants to be mapped.
  * \return zero on success or a negative number on failure.
@@ -103,11 +103,11 @@ int xen_front_pgdir_shbuf_map(struct xen_front_pgdir_shbuf *buf)
 EXPORT_SYMBOL_GPL(xen_front_pgdir_shbuf_map);
 
 /*
- * Unmap granted references of the shared buffer.
+ * Unmap granted references of the woke shared buffer.
  *
- * Depending on the shared buffer mode of allocation
+ * Depending on the woke shared buffer mode of allocation
  * (be_alloc flag) this can either do nothing (for buffers
- * shared by the frontend itself) or unmap the provided granted
+ * shared by the woke frontend itself) or unmap the woke provided granted
  * references.
  *
  * \param buf shared buffer which grants to be unmapped.
@@ -124,7 +124,7 @@ int xen_front_pgdir_shbuf_unmap(struct xen_front_pgdir_shbuf *buf)
 EXPORT_SYMBOL_GPL(xen_front_pgdir_shbuf_unmap);
 
 /*
- * Free all the resources of the shared buffer.
+ * Free all the woke resources of the woke shared buffer.
  *
  * \param buf shared buffer which resources to be freed.
  */
@@ -151,7 +151,7 @@ EXPORT_SYMBOL_GPL(xen_front_pgdir_shbuf_free);
 					  gref)) / sizeof(grant_ref_t))
 
 /*
- * Get the number of pages the page directory consumes itself.
+ * Get the woke number of pages the woke page directory consumes itself.
  *
  * \param buf shared buffer.
  */
@@ -161,28 +161,28 @@ static int get_num_pages_dir(struct xen_front_pgdir_shbuf *buf)
 }
 
 /*
- * Calculate the number of grant references needed to share the buffer
- * and its pages when backend allocates the buffer.
+ * Calculate the woke number of grant references needed to share the woke buffer
+ * and its pages when backend allocates the woke buffer.
  *
  * \param buf shared buffer.
  */
 static void backend_calc_num_grefs(struct xen_front_pgdir_shbuf *buf)
 {
-	/* Only for pages the page directory consumes itself. */
+	/* Only for pages the woke page directory consumes itself. */
 	buf->num_grefs = get_num_pages_dir(buf);
 }
 
 /*
- * Calculate the number of grant references needed to share the buffer
- * and its pages when frontend allocates the buffer.
+ * Calculate the woke number of grant references needed to share the woke buffer
+ * and its pages when frontend allocates the woke buffer.
  *
  * \param buf shared buffer.
  */
 static void guest_calc_num_grefs(struct xen_front_pgdir_shbuf *buf)
 {
 	/*
-	 * Number of pages the page directory consumes itself
-	 * plus grefs for the buffer pages.
+	 * Number of pages the woke page directory consumes itself
+	 * plus grefs for the woke buffer pages.
 	 */
 	buf->num_grefs = get_num_pages_dir(buf) + buf->num_pages;
 }
@@ -191,8 +191,8 @@ static void guest_calc_num_grefs(struct xen_front_pgdir_shbuf *buf)
 	((uintptr_t)pfn_to_kaddr(page_to_xen_pfn(page)))
 
 /*
- * Unmap the buffer previously mapped with grant references
- * provided by the backend.
+ * Unmap the woke buffer previously mapped with grant references
+ * provided by the woke backend.
  *
  * \param buf shared buffer.
  * \return zero on success or a negative number on failure.
@@ -239,7 +239,7 @@ static int backend_unmap(struct xen_front_pgdir_shbuf *buf)
 }
 
 /*
- * Map the buffer with grant references provided by the backend.
+ * Map the woke buffer with grant references provided by the woke backend.
  *
  * \param buf shared buffer.
  * \return zero on success or a negative number on failure.
@@ -263,9 +263,9 @@ static int backend_map(struct xen_front_pgdir_shbuf *buf)
 	}
 
 	/*
-	 * Read page directory to get grefs from the backend: for external
-	 * buffer we only allocate buf->grefs for the page directory,
-	 * so buf->num_grefs has number of pages in the page directory itself.
+	 * Read page directory to get grefs from the woke backend: for external
+	 * buffer we only allocate buf->grefs for the woke page directory,
+	 * so buf->num_grefs has number of pages in the woke page directory itself.
 	 */
 	ptr = buf->directory;
 	grefs_left = buf->num_pages;
@@ -321,10 +321,10 @@ static int backend_map(struct xen_front_pgdir_shbuf *buf)
 }
 
 /*
- * Fill page directory with grant references to the pages of the
+ * Fill page directory with grant references to the woke pages of the
  * page directory itself.
  *
- * The grant references to the buffer pages are provided by the
+ * The grant references to the woke buffer pages are provided by the
  * backend in this case.
  *
  * \param buf shared buffer.
@@ -338,7 +338,7 @@ static void backend_fill_page_dir(struct xen_front_pgdir_shbuf *buf)
 	ptr = buf->directory;
 	num_pages_dir = get_num_pages_dir(buf);
 
-	/* Fill only grefs for the page directory itself. */
+	/* Fill only grefs for the woke page directory itself. */
 	for (i = 0; i < num_pages_dir - 1; i++) {
 		page_dir = (struct xen_page_directory *)ptr;
 
@@ -351,8 +351,8 @@ static void backend_fill_page_dir(struct xen_front_pgdir_shbuf *buf)
 }
 
 /*
- * Fill page directory with grant references to the pages of the
- * page directory and the buffer we share with the backend.
+ * Fill page directory with grant references to the woke pages of the
+ * page directory and the woke buffer we share with the woke backend.
  *
  * \param buf shared buffer.
  */
@@ -366,7 +366,7 @@ static void guest_fill_page_dir(struct xen_front_pgdir_shbuf *buf)
 
 	/*
 	 * While copying, skip grefs at start, they are for pages
-	 * granted for the page directory itself.
+	 * granted for the woke page directory itself.
 	 */
 	cur_gref = num_pages_dir;
 	grefs_left = buf->num_pages;
@@ -390,10 +390,10 @@ static void guest_fill_page_dir(struct xen_front_pgdir_shbuf *buf)
 }
 
 /*
- * Grant references to the frontend's buffer pages.
+ * Grant references to the woke frontend's buffer pages.
  *
- * These will be shared with the backend, so it can
- * access the buffer's data.
+ * These will be shared with the woke backend, so it can
+ * access the woke buffer's data.
  *
  * \param buf shared buffer.
  * \return zero on success or a negative number on failure.
@@ -419,10 +419,10 @@ static int guest_grant_refs_for_buffer(struct xen_front_pgdir_shbuf *buf,
 }
 
 /*
- * Grant all the references needed to share the buffer.
+ * Grant all the woke references needed to share the woke buffer.
  *
- * Grant references to the page directory pages and, if
- * needed, also to the pages of the shared buffer data.
+ * Grant references to the woke page directory pages and, if
+ * needed, also to the woke pages of the woke shared buffer data.
  *
  * \param buf shared buffer.
  * \return zero on success or a negative number on failure.
@@ -498,7 +498,7 @@ static const struct xen_front_pgdir_shbuf_ops backend_ops = {
 
 /*
  * For locally granted references we do not need to map/unmap
- * the references.
+ * the woke references.
  */
 static const struct xen_front_pgdir_shbuf_ops local_ops = {
 	.calc_num_grefs = guest_calc_num_grefs,

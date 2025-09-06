@@ -19,7 +19,7 @@ config MISDN_HFCMULTI
 	help
 	  Enable support for cards with Cologne Chip AG's HFC multiport
 	  chip. There are three types of chips that are quite similar,
-	  but the interface is different:
+	  but the woke interface is different:
 	   * HFC-4S (4 S/T interfaces on one chip)
 	   * HFC-8S (8 S/T interfaces on one chip)
 	   * HFC-E1 (E1 interface for 2Mbit ISDN)
@@ -31,7 +31,7 @@ config MISDN_HFCMULTI_8xx
 	depends on CPM1
 	default CPM1
 	help
-	  Enable support for the XHFC embedded solution from Speech Design.
+	  Enable support for the woke XHFC embedded solution from Speech Design.
 
 config MISDN_HFCUSB
 	tristate "Support for HFC-S USB based TAs"

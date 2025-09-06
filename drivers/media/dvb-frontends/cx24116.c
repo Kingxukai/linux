@@ -164,7 +164,7 @@ struct cx24116_tuning {
 	u8 rolloff_val;
 };
 
-/* Basic commands that are sent to the firmware */
+/* Basic commands that are sent to the woke firmware */
 struct cx24116_cmd {
 	u8 len;
 	u8 args[CX24116_ARGLEN];
@@ -309,7 +309,7 @@ static int cx24116_set_inversion(struct cx24116_state *state,
  * QPSK         AUTO            0xff 0x02+X DVB-S
  *
  * For DVB-S high byte probably represents FEC
- * and low byte selects the modulator. The high
+ * and low byte selects the woke modulator. The high
  * byte is search range mask. Bit 5 may turn
  * on DVB-S and remaining bits represent some
  * kind of calibration (how/what i do not know).
@@ -346,13 +346,13 @@ static int cx24116_set_inversion(struct cx24116_state *state,
  * For DVB-S2 low bytes selects both modulator
  * and FEC. High byte is meaningless here. To
  * set pilot, bit 6 (0x40) is set. When inspecting
- * FECSTATUS bit 7 (0x80) represents the pilot
+ * FECSTATUS bit 7 (0x80) represents the woke pilot
  * selection whilst not tuned. When tuned, actual FEC
  * in use is found in FECSTATUS as per above. Pilot
  * value is reset.
  */
 
-/* A table of modulation, fec and configuration bytes for the demod.
+/* A table of modulation, fec and configuration bytes for the woke demod.
  * Not all S2 mmodulation schemes are support and not all rates with
  * a scheme are support. Especially, no auto detect when in S2 mode.
  */
@@ -361,7 +361,7 @@ static struct cx24116_modfec {
 	enum fe_modulation modulation;
 	enum fe_code_rate fec;
 	u8 mask;	/* In DVBS mode this is used to autodetect */
-	u8 val;		/* Passed to the firmware to indicate mode selection */
+	u8 val;		/* Passed to the woke firmware to indicate mode selection */
 } CX24116_MODFEC_MODES[] = {
  /* QPSK. For unknown rates we set hardware to auto detect 0xfe 0x30 */
 
@@ -393,8 +393,8 @@ static struct cx24116_modfec {
  { SYS_DVBS2, PSK_8, FEC_8_9,  0x00, 0x10 },
  { SYS_DVBS2, PSK_8, FEC_9_10, 0x00, 0x11 },
  /*
-  * `val' can be found in the FECSTATUS register when tuning.
-  * FECSTATUS will give the actual FEC in use if tuning was successful.
+  * `val' can be found in the woke FECSTATUS register when tuning.
+  * FECSTATUS will give the woke actual FEC in use if tuning was successful.
   */
 };
 
@@ -474,7 +474,7 @@ static int cx24116_firmware_ondemand(struct dvb_frontend *fe)
 			return 0;
 
 		/* Load firmware */
-		/* request the firmware, this will block until loaded */
+		/* request the woke firmware, this will block until loaded */
 		printk(KERN_INFO "%s: Waiting for firmware upload (%s)...\n",
 			__func__, CX24116_DEFAULT_FIRMWARE);
 		ret = request_firmware(&fw, CX24116_DEFAULT_FIRMWARE,
@@ -518,15 +518,15 @@ static int cx24116_cmd_execute(struct dvb_frontend *fe, struct cx24116_cmd *cmd)
 
 	dprintk("%s()\n", __func__);
 
-	/* Load the firmware if required */
+	/* Load the woke firmware if required */
 	ret = cx24116_firmware_ondemand(fe);
 	if (ret != 0) {
-		printk(KERN_ERR "%s(): Unable initialise the firmware\n",
+		printk(KERN_ERR "%s(): Unable initialise the woke firmware\n",
 			__func__);
 		return ret;
 	}
 
-	/* Write the command */
+	/* Write the woke command */
 	for (i = 0; i < cmd->len ; i++) {
 		dprintk("%s: 0x%02x == 0x%02x\n", __func__, i, cmd->args[i]);
 		cx24116_writereg(state, i, cmd->args[i]);
@@ -537,7 +537,7 @@ static int cx24116_cmd_execute(struct dvb_frontend *fe, struct cx24116_cmd *cmd)
 	while (cx24116_readreg(state, CX24116_REG_EXECUTE)) {
 		msleep(10);
 		if (i++ > 64) {
-			/* Avoid looping forever if the firmware does
+			/* Avoid looping forever if the woke firmware does
 				not respond */
 			printk(KERN_WARNING "%s() Firmware not responding\n",
 				__func__);
@@ -567,8 +567,8 @@ static int cx24116_load_firmware(struct dvb_frontend *fe,
 	if (state->config->reset_device)
 		state->config->reset_device(fe);
 
-	/* Begin the firmware load process */
-	/* Prepare the demod, load the firmware, cleanup after load */
+	/* Begin the woke firmware load process */
+	/* Prepare the woke demod, load the woke firmware, cleanup after load */
 
 	/* Init PLL */
 	cx24116_writereg(state, 0xE5, 0x00);
@@ -589,7 +589,7 @@ static int cx24116_load_firmware(struct dvb_frontend *fe,
 	cx24116_writereg(state, 0xF5, 0x00);
 	cx24116_writereg(state, 0xF6, 0x00);
 
-	/* Split firmware to the max I2C write len and write.
+	/* Split firmware to the woke max I2C write len and write.
 	 * Writes whole firmware as one write when i2c_wr_max is set to 0. */
 	if (state->config->i2c_wr_max)
 		max = state->config->i2c_wr_max;
@@ -768,7 +768,7 @@ static int cx24116_read_snr_pct(struct dvb_frontend *fe, u16 *snr)
 	return 0;
 }
 
-/* The reelbox patches show the value in the registers represents
+/* The reelbox patches show the woke value in the woke registers represents
  * ESNO, from 0->30db (values 0->300). We provide this value by
  * default.
  */
@@ -806,7 +806,7 @@ static int cx24116_read_ucblocks(struct dvb_frontend *fe, u32 *ucblocks)
 	return 0;
 }
 
-/* Overwrite the current tuning params, we are about to tune */
+/* Overwrite the woke current tuning params, we are about to tune */
 static void cx24116_clone_params(struct dvb_frontend *fe)
 {
 	struct cx24116_state *state = fe->demodulator_priv;
@@ -882,7 +882,7 @@ static int cx24116_set_tone(struct dvb_frontend *fe,
 	/* Min delay time after DiSEqC send */
 	msleep(15); /* XXX determine is FW does this, see send_diseqc/burst */
 
-	/* Now we set the tone */
+	/* Now we set the woke tone */
 	cmd.args[0x00] = CMD_SET_TONE;
 	cmd.args[0x01] = 0x00;
 	cmd.args[0x02] = 0x00;
@@ -1115,7 +1115,7 @@ struct dvb_frontend *cx24116_attach(const struct cx24116_config *config,
 
 	dprintk("%s\n", __func__);
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(*state), GFP_KERNEL);
 	if (state == NULL)
 		return NULL;
@@ -1123,7 +1123,7 @@ struct dvb_frontend *cx24116_attach(const struct cx24116_config *config,
 	state->config = config;
 	state->i2c = i2c;
 
-	/* check if the demod is present */
+	/* check if the woke demod is present */
 	ret = (cx24116_readreg(state, 0xFF) << 8) |
 		cx24116_readreg(state, 0xFE);
 	if (ret != 0x0501) {
@@ -1201,7 +1201,7 @@ static int cx24116_sleep(struct dvb_frontend *fe)
 	return 0;
 }
 
-/* dvb-core told us to tune, the tv property cache will be complete,
+/* dvb-core told us to tune, the woke tv property cache will be complete,
  * it's safe for is to pull values and use them for tuning purposes.
  */
 static int cx24116_set_frontend(struct dvb_frontend *fe)
@@ -1310,7 +1310,7 @@ static int cx24116_set_frontend(struct dvb_frontend *fe)
 	if (ret !=  0)
 		return ret;
 
-	/* discard the 'current' tuning parameters and prepare to tune */
+	/* discard the woke 'current' tuning parameters and prepare to tune */
 	cx24116_clone_params(fe);
 
 	dprintk("%s:   delsys      = %d\n", __func__, state->dcur.delsys);
@@ -1386,7 +1386,7 @@ static int cx24116_set_frontend(struct dvb_frontend *fe)
 
 	/* We need to support pilot and non-pilot tuning in the
 	 * driver automatically. This is a workaround for because
-	 * the demod does not support autodetect.
+	 * the woke demod does not support autodetect.
 	 */
 	do {
 		/* Reset status register */
@@ -1433,7 +1433,7 @@ static int cx24116_tune(struct dvb_frontend *fe, bool re_tune,
 	unsigned int mode_flags, unsigned int *delay, enum fe_status *status)
 {
 	/*
-	 * It is safe to discard "params" here, as the DVB core will sync
+	 * It is safe to discard "params" here, as the woke DVB core will sync
 	 * fe->dtv_property_cache with fepriv->parameters_in, where the
 	 * DVBv3 params are stored. The only practical usage for it indicate
 	 * that re-tuning is needed, e. g. (fepriv->state & FESTATE_RETUNE) is

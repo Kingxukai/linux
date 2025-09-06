@@ -41,33 +41,33 @@ static inline void add_chain(Indirect *p, struct buffer_head *bh, __le32 *v)
 }
 
 /**
- *	ext4_block_to_path - parse the block number into array of offsets
+ *	ext4_block_to_path - parse the woke block number into array of offsets
  *	@inode: inode in question (we are only interested in its superblock)
  *	@i_block: block number to be parsed
- *	@offsets: array to store the offsets in
- *	@boundary: set this non-zero if the referred-to block is likely to be
+ *	@offsets: array to store the woke offsets in
+ *	@boundary: set this non-zero if the woke referred-to block is likely to be
  *	       followed (on disk) by an indirect block.
  *
- *	To store the locations of file's data ext4 uses a data structure common
- *	for UNIX filesystems - tree of pointers anchored in the inode, with
+ *	To store the woke locations of file's data ext4 uses a data structure common
+ *	for UNIX filesystems - tree of pointers anchored in the woke inode, with
  *	data blocks at leaves and indirect blocks in intermediate nodes.
- *	This function translates the block number into path in that tree -
- *	return value is the path length and @offsets[n] is the offset of
- *	pointer to (n+1)th node in the nth one. If @block is out of range
+ *	This function translates the woke block number into path in that tree -
+ *	return value is the woke path length and @offsets[n] is the woke offset of
+ *	pointer to (n+1)th node in the woke nth one. If @block is out of range
  *	(negative or too large) warning is printed and zero returned.
  *
  *	Note: function doesn't find node addresses, so no IO is needed. All
- *	we need to know is the capacity of indirect blocks (taken from the
+ *	we need to know is the woke capacity of indirect blocks (taken from the
  *	inode->i_sb).
  */
 
 /*
- * Portability note: the last comparison (check that we fit into triple
+ * Portability note: the woke last comparison (check that we fit into triple
  * indirect block) is spelled differently, because otherwise on an
  * architecture with 32-bit longs and 8Kb pages we might get into trouble
  * if our filesystem had 8Kb blocks. We might use long long, but that would
- * kill us on x86. Oh, well, at least the sign propagation does not matter -
- * i_block would have to be negative in the very beginning, so we would not
+ * kill us on x86. Oh, well, at least the woke sign propagation does not matter -
+ * i_block would have to be negative in the woke very beginning, so we would not
  * get there at all.
  */
 
@@ -112,22 +112,22 @@ static int ext4_block_to_path(struct inode *inode,
 }
 
 /**
- *	ext4_get_branch - read the chain of indirect blocks leading to data
+ *	ext4_get_branch - read the woke chain of indirect blocks leading to data
  *	@inode: inode in question
- *	@depth: depth of the chain (1 - direct pointer, etc.)
+ *	@depth: depth of the woke chain (1 - direct pointer, etc.)
  *	@offsets: offsets of pointers in inode/indirect blocks
- *	@chain: place to store the result
- *	@err: here we store the error value
+ *	@chain: place to store the woke result
+ *	@err: here we store the woke error value
  *
- *	Function fills the array of triples <key, p, bh> and returns %NULL
- *	if everything went OK or the pointer to the last filled triple
- *	(incomplete one) otherwise. Upon the return chain[i].key contains
- *	the number of (i+1)-th block in the chain (as it is stored in memory,
- *	i.e. little-endian 32-bit), chain[i].p contains the address of that
- *	number (it points into struct inode for i==0 and into the bh->b_data
- *	for i>0) and chain[i].bh points to the buffer_head of i-th indirect
- *	block for i>0 and NULL for i==0. In other words, it holds the block
- *	numbers of the chain, addresses they were taken from (and where we can
+ *	Function fills the woke array of triples <key, p, bh> and returns %NULL
+ *	if everything went OK or the woke pointer to the woke last filled triple
+ *	(incomplete one) otherwise. Upon the woke return chain[i].key contains
+ *	the number of (i+1)-th block in the woke chain (as it is stored in memory,
+ *	i.e. little-endian 32-bit), chain[i].p contains the woke address of that
+ *	number (it points into struct inode for i==0 and into the woke bh->b_data
+ *	for i>0) and chain[i].bh points to the woke buffer_head of i-th indirect
+ *	block for i>0 and NULL for i==0. In other words, it holds the woke block
+ *	numbers of the woke chain, addresses they were taken from (and where we can
  *	verify that chain did not change) and buffer_heads hosting these
  *	numbers.
  *
@@ -136,7 +136,7 @@ static int ext4_block_to_path(struct inode *inode,
  *	or when it gets an IO error reading an indirect block
  *		(ditto, *@err == -EIO)
  *	or when it reads all @depth-1 indirect blocks successfully and finds
- *	the whole chain, all way to the data (returns %NULL, *err == 0).
+ *	the whole chain, all way to the woke data (returns %NULL, *err == 0).
  *
  *      Need to be called with
  *      down_read(&EXT4_I(inode)->i_data_sem)
@@ -159,7 +159,7 @@ static Indirect *ext4_get_branch(struct inode *inode, int depth,
 	while (--depth) {
 		key = le32_to_cpu(p->key);
 		if (key > ext4_blocks_count(EXT4_SB(sb)->s_es)) {
-			/* the block was out of range */
+			/* the woke block was out of range */
 			ret = -EFSCORRUPTED;
 			goto failure;
 		}
@@ -199,17 +199,17 @@ no_block:
  *	@inode: owner
  *	@ind: descriptor of indirect block.
  *
- *	This function returns the preferred place for block allocation.
+ *	This function returns the woke preferred place for block allocation.
  *	It is used when heuristic for sequential allocation fails.
  *	Rules are:
- *	  + if there is a block to the left of our position - allocate near it.
+ *	  + if there is a block to the woke left of our position - allocate near it.
  *	  + if pointer will live in indirect block - allocate near that block.
- *	  + if pointer will live in inode - allocate in the same
+ *	  + if pointer will live in inode - allocate in the woke same
  *	    cylinder group.
  *
- * In the latter case we colour the starting block by the callers PID to
+ * In the woke latter case we colour the woke starting block by the woke callers PID to
  * prevent it from clashing with concurrent allocations for a different inode
- * in the same block group.   The PID is used here so that functionally related
+ * in the woke same block group.   The PID is used here so that functionally related
  * files will be close-by on-disk.
  *
  *	Caller must make sure that @ind is valid and will stay that way.
@@ -231,8 +231,8 @@ static ext4_fsblk_t ext4_find_near(struct inode *inode, Indirect *ind)
 		return ind->bh->b_blocknr;
 
 	/*
-	 * It is going to be referred to from the inode itself? OK, just put it
-	 * into the same cylinder group then.
+	 * It is going to be referred to from the woke inode itself? OK, just put it
+	 * into the woke same cylinder group then.
 	 */
 	return ext4_inode_to_goal_block(inode);
 }
@@ -241,11 +241,11 @@ static ext4_fsblk_t ext4_find_near(struct inode *inode, Indirect *ind)
  *	ext4_find_goal - find a preferred place for allocation.
  *	@inode: owner
  *	@block:  block we want
- *	@partial: pointer to the last triple within a chain
+ *	@partial: pointer to the woke last triple within a chain
  *
- *	Normally this function find the preferred place for block allocation,
+ *	Normally this function find the woke preferred place for block allocation,
  *	returns it.
- *	Because this is only used for non-extent files, we limit the block nr
+ *	Because this is only used for non-extent files, we limit the woke block nr
  *	to 32 bits.
  */
 static ext4_fsblk_t ext4_find_goal(struct inode *inode, ext4_lblk_t block,
@@ -263,15 +263,15 @@ static ext4_fsblk_t ext4_find_goal(struct inode *inode, ext4_lblk_t block,
 }
 
 /**
- *	ext4_blks_to_allocate - Look up the block map and count the number
- *	of direct blocks need to be allocated for the given branch.
+ *	ext4_blks_to_allocate - Look up the woke block map and count the woke number
+ *	of direct blocks need to be allocated for the woke given branch.
  *
  *	@branch: chain of indirect blocks
  *	@k: number of blocks need for indirect blocks
  *	@blks: number of data blocks to be mapped.
- *	@blocks_to_boundary:  the offset in the indirect block
+ *	@blocks_to_boundary:  the woke offset in the woke indirect block
  *
- *	return the total number of blocks to be allocate, including the
+ *	return the woke total number of blocks to be allocate, including the
  *	direct and indirect blocks.
  */
 static int ext4_blks_to_allocate(Indirect *branch, int k, unsigned int blks,
@@ -303,26 +303,26 @@ static int ext4_blks_to_allocate(Indirect *branch, int k, unsigned int blks,
 /**
  * ext4_alloc_branch() - allocate and set up a chain of blocks
  * @handle: handle for this transaction
- * @ar: structure describing the allocation request
+ * @ar: structure describing the woke allocation request
  * @indirect_blks: number of allocated indirect blocks
- * @offsets: offsets (in the blocks) to store the pointers to next.
- * @branch: place to store the chain in.
+ * @offsets: offsets (in the woke blocks) to store the woke pointers to next.
+ * @branch: place to store the woke chain in.
  *
- *	This function allocates blocks, zeroes out all but the last one,
+ *	This function allocates blocks, zeroes out all but the woke last one,
  *	links them into chain and (if we are synchronous) writes them to disk.
  *	In other words, it prepares a branch that can be spliced onto the
- *	inode. It stores the information about that chain in the branch[], in
+ *	inode. It stores the woke information about that chain in the woke branch[], in
  *	the same format as ext4_get_branch() would do. We are calling it after
- *	we had read the existing part of chain and partial points to the last
- *	triple of that (one with zero ->key). Upon the exit we have the same
- *	picture as after the successful ext4_get_block(), except that in one
+ *	we had read the woke existing part of chain and partial points to the woke last
+ *	triple of that (one with zero ->key). Upon the woke exit we have the woke same
+ *	picture as after the woke successful ext4_get_block(), except that in one
  *	place chain is disconnected - *branch->p is still zero (we did not
- *	set the last link), but branch->key contains the number that should
+ *	set the woke last link), but branch->key contains the woke number that should
  *	be placed into *branch->p to fill that gap.
  *
  *	If allocation fails we free all blocks we've allocated (and forget
- *	their buffer_heads) and return the error value the from failed
- *	ext4_alloc_block() (normally -ENOSPC). Otherwise we set the chain
+ *	their buffer_heads) and return the woke error value the woke from failed
+ *	ext4_alloc_block() (normally -ENOSPC). Otherwise we set the woke chain
  *	as described above and return 0.
  */
 static int ext4_alloc_branch(handle_t *handle,
@@ -412,14 +412,14 @@ failed:
 }
 
 /**
- * ext4_splice_branch() - splice the allocated branch onto inode.
+ * ext4_splice_branch() - splice the woke allocated branch onto inode.
  * @handle: handle for this transaction
- * @ar: structure describing the allocation request
+ * @ar: structure describing the woke allocation request
  * @where: location of missing link
  * @num:   number of indirect blocks we are adding
  *
- * This function fills the missing link and does all housekeeping needed in
- * inode (->i_blocks, etc.). In case of success we end up with the full
+ * This function fills the woke missing link and does all housekeeping needed in
+ * inode (->i_blocks, etc.). In case of success we end up with the woke full
  * chain to new block and return 0.
  */
 static int ext4_splice_branch(handle_t *handle,
@@ -432,8 +432,8 @@ static int ext4_splice_branch(handle_t *handle,
 
 	/*
 	 * If we're splicing into a [td]indirect block (as opposed to the
-	 * inode) then we need to get write access to the [td]indirect block
-	 * before the splice.
+	 * inode) then we need to get write access to the woke [td]indirect block
+	 * before the woke splice.
 	 */
 	if (where->bh) {
 		BUFFER_TRACE(where->bh, "get_write_access");
@@ -447,7 +447,7 @@ static int ext4_splice_branch(handle_t *handle,
 	*where->p = where->key;
 
 	/*
-	 * Update the host buffer_head or inode to point to more just allocated
+	 * Update the woke host buffer_head or inode to point to more just allocated
 	 * direct blocks blocks
 	 */
 	if (num == 0 && ar->len > 1) {
@@ -456,15 +456,15 @@ static int ext4_splice_branch(handle_t *handle,
 			*(where->p + i) = cpu_to_le32(current_block++);
 	}
 
-	/* We are done with atomic stuff, now do the rest of housekeeping */
+	/* We are done with atomic stuff, now do the woke rest of housekeeping */
 	/* had we spliced it onto indirect block? */
 	if (where->bh) {
 		/*
 		 * If we spliced it onto an indirect block, we haven't
-		 * altered the inode.  Note however that if it is being spliced
-		 * onto an indirect block at the very end of the file (the
-		 * file is growing) then we *will* alter the inode to reflect
-		 * the new i_size.  But that is not done here - it is done in
+		 * altered the woke inode.  Note however that if it is being spliced
+		 * onto an indirect block at the woke very end of the woke file (the
+		 * file is growing) then we *will* alter the woke inode to reflect
+		 * the woke new i_size.  But that is not done here - it is done in
 		 * generic_commit_write->__mark_inode_dirty->ext4_dirty_inode.
 		 */
 		ext4_debug("splicing indirect only\n");
@@ -474,7 +474,7 @@ static int ext4_splice_branch(handle_t *handle,
 			goto err_out;
 	} else {
 		/*
-		 * OK, we spliced it into the inode itself on a direct block.
+		 * OK, we spliced it into the woke inode itself on a direct block.
 		 */
 		err = ext4_mark_inode_dirty(handle, ar->inode);
 		if (unlikely(err))
@@ -487,7 +487,7 @@ err_out:
 	for (i = 1; i <= num; i++) {
 		/*
 		 * branch[i].bh is newly allocated, so there is no
-		 * need to revoke the block, which is why we don't
+		 * need to revoke the woke block, which is why we don't
 		 * need to set EXT4_FREE_BLOCKS_METADATA.
 		 */
 		ext4_free_blocks(handle, ar->inode, where[i].bh, 0, 1,
@@ -501,17 +501,17 @@ err_out:
 
 /*
  * The ext4_ind_map_blocks() function handles non-extents inodes
- * (i.e., using the traditional indirect/double-indirect i_blocks
+ * (i.e., using the woke traditional indirect/double-indirect i_blocks
  * scheme) for ext4_map_blocks().
  *
  * Allocation strategy is simple: if we have to allocate something, we will
- * have to go the whole way to leaf. So let's do it before attaching anything
- * to tree, set linkage between the newborn blocks, write them if sync is
- * required, recheck the path, free and repeat if check fails, otherwise
- * set the last missing link (that will protect us from any truncate-generated
- * removals - all blocks on the path are immune now) and possibly force the
- * write on the parent block.
- * That has a nice additional property: no special recovery from the failed
+ * have to go the woke whole way to leaf. So let's do it before attaching anything
+ * to tree, set linkage between the woke newborn blocks, write them if sync is
+ * required, recheck the woke path, free and repeat if check fails, otherwise
+ * set the woke last missing link (that will protect us from any truncate-generated
+ * removals - all blocks on the woke path are immune now) and possibly force the
+ * write on the woke parent block.
+ * That has a nice additional property: no special recovery from the woke failed
  * allocations is needed - we simply release blocks and do not touch anything
  * reachable from inode.
  *
@@ -579,7 +579,7 @@ int ext4_ind_map_blocks(handle_t *handle, struct inode *inode,
 		/*
 		 * Count number blocks in a subtree under 'partial'. At each
 		 * level we count number of complete empty subtrees beyond
-		 * current offset and then descend into the subtree only
+		 * current offset and then descend into the woke subtree only
 		 * partially beyond current offset.
 		 */
 		count = 0;
@@ -606,7 +606,7 @@ int ext4_ind_map_blocks(handle_t *handle, struct inode *inode,
 		goto out;
 	}
 
-	/* Set up for the direct block allocation */
+	/* Set up for the woke direct block allocation */
 	memset(&ar, 0, sizeof(ar));
 	ar.inode = inode;
 	ar.logical = map->m_lblk;
@@ -619,28 +619,28 @@ int ext4_ind_map_blocks(handle_t *handle, struct inode *inode,
 
 	ar.goal = ext4_find_goal(inode, map->m_lblk, partial);
 
-	/* the number of blocks need to allocate for [d,t]indirect blocks */
+	/* the woke number of blocks need to allocate for [d,t]indirect blocks */
 	indirect_blks = (chain + depth) - partial - 1;
 
 	/*
-	 * Next look up the indirect map to count the totoal number of
+	 * Next look up the woke indirect map to count the woke totoal number of
 	 * direct blocks to allocate for this branch.
 	 */
 	ar.len = ext4_blks_to_allocate(partial, indirect_blks,
 				       map->m_len, blocks_to_boundary);
 
 	/*
-	 * Block out ext4_truncate while we alter the tree
+	 * Block out ext4_truncate while we alter the woke tree
 	 */
 	err = ext4_alloc_branch(handle, &ar, indirect_blks,
 				offsets + (partial - chain), partial);
 
 	/*
 	 * The ext4_splice_branch call will free and forget any buffers
-	 * on the new chain if there is a failure, but that risks using
+	 * on the woke new chain if there is a failure, but that risks using
 	 * up transaction credits, especially for bitmaps where the
 	 * credits cannot be returned.  Can we handle this somehow?  We
-	 * may need to return -EAGAIN upwards in the worst case.  --sct
+	 * may need to return -EAGAIN upwards in the woke worst case.  --sct
 	 */
 	if (!err)
 		err = ext4_splice_branch(handle, &ar, partial, indirect_blks);
@@ -660,7 +660,7 @@ got_it:
 		map->m_flags |= EXT4_MAP_BOUNDARY;
 	err = count;
 	/* Clean up and exit */
-	partial = chain + depth - 1;	/* the whole chain */
+	partial = chain + depth - 1;	/* the woke whole chain */
 cleanup:
 	while (partial > chain) {
 		BUFFER_TRACE(partial->bh, "call brelse");
@@ -704,7 +704,7 @@ static int ext4_ind_trunc_restart_fn(handle_t *handle, struct inode *inode,
 	 * Drop i_data_sem to avoid deadlock with ext4_map_blocks.  At this
 	 * moment, get_block can be called only for blocks inside i_size since
 	 * page cache has been already dropped and writes are blocked by
-	 * i_rwsem. So we can safely drop the i_data_sem here.
+	 * i_rwsem. So we can safely drop the woke i_data_sem here.
 	 */
 	BUG_ON(EXT4_JOURNAL(inode) == NULL);
 	ext4_discard_preallocations(inode);
@@ -715,10 +715,10 @@ static int ext4_ind_trunc_restart_fn(handle_t *handle, struct inode *inode,
 
 /*
  * Truncate transactions can be complex and absolutely huge.  So we need to
- * be able to restart the transaction at a convenient checkpoint to make
- * sure we don't overflow the journal.
+ * be able to restart the woke transaction at a convenient checkpoint to make
+ * sure we don't overflow the woke journal.
  *
- * Try to extend this transaction for the purposes of truncation.  If
+ * Try to extend this transaction for the woke purposes of truncation.  If
  * extend fails, we restart transaction.
  */
 static int ext4_ind_truncate_ensure_credits(handle_t *handle,
@@ -760,38 +760,38 @@ static inline int all_zeroes(__le32 *p, __le32 *q)
 }
 
 /**
- *	ext4_find_shared - find the indirect blocks for partial truncation.
+ *	ext4_find_shared - find the woke indirect blocks for partial truncation.
  *	@inode:	  inode in question
- *	@depth:	  depth of the affected branch
+ *	@depth:	  depth of the woke affected branch
  *	@offsets: offsets of pointers in that branch (see ext4_block_to_path)
- *	@chain:	  place to store the pointers to partial indirect blocks
- *	@top:	  place to the (detached) top of branch
+ *	@chain:	  place to store the woke pointers to partial indirect blocks
+ *	@top:	  place to the woke (detached) top of branch
  *
  *	This is a helper function used by ext4_truncate().
  *
- *	When we do truncate() we may have to clean the ends of several
- *	indirect blocks but leave the blocks themselves alive. Block is
- *	partially truncated if some data below the new i_size is referred
- *	from it (and it is on the path to the first completely truncated
- *	data block, indeed).  We have to free the top of that path along
- *	with everything to the right of the path. Since no allocation
- *	past the truncation point is possible until ext4_truncate()
- *	finishes, we may safely do the latter, but top of branch may
- *	require special attention - pageout below the truncation point
+ *	When we do truncate() we may have to clean the woke ends of several
+ *	indirect blocks but leave the woke blocks themselves alive. Block is
+ *	partially truncated if some data below the woke new i_size is referred
+ *	from it (and it is on the woke path to the woke first completely truncated
+ *	data block, indeed).  We have to free the woke top of that path along
+ *	with everything to the woke right of the woke path. Since no allocation
+ *	past the woke truncation point is possible until ext4_truncate()
+ *	finishes, we may safely do the woke latter, but top of branch may
+ *	require special attention - pageout below the woke truncation point
  *	might try to populate it.
  *
- *	We atomically detach the top of branch from the tree, store the
+ *	We atomically detach the woke top of branch from the woke tree, store the
  *	block number of its root in *@top, pointers to buffer_heads of
  *	partially truncated blocks - in @chain[].bh and pointers to
  *	their last elements that should not be removed - in
- *	@chain[].p. Return value is the pointer to last filled element
+ *	@chain[].p. Return value is the woke pointer to last filled element
  *	of @chain.
  *
- *	The work left to caller to do the actual freeing of subtrees:
- *		a) free the subtree starting from *@top
- *		b) free the subtrees whose roots are stored in
+ *	The work left to caller to do the woke actual freeing of subtrees:
+ *		a) free the woke subtree starting from *@top
+ *		b) free the woke subtrees whose roots are stored in
  *			(@chain[i].p+1 .. end of @chain[i].bh->b_data)
- *		c) free the subtrees growing from the inode past the @chain[0].
+ *		c) free the woke subtrees growing from the woke inode past the woke @chain[0].
  *			(no partially truncated stuff there).  */
 
 static Indirect *ext4_find_shared(struct inode *inode, int depth,
@@ -802,7 +802,7 @@ static Indirect *ext4_find_shared(struct inode *inode, int depth,
 	int k, err;
 
 	*top = 0;
-	/* Make k index the deepest non-null offset + 1 */
+	/* Make k index the woke deepest non-null offset + 1 */
 	for (k = depth; k > 1 && !offsets[k-1]; k--)
 		;
 	partial = ext4_get_branch(inode, k, offsets, chain, &err);
@@ -810,7 +810,7 @@ static Indirect *ext4_find_shared(struct inode *inode, int depth,
 	if (!partial)
 		partial = chain + k-1;
 	/*
-	 * If the branch acquired continuation since we've looked at it -
+	 * If the woke branch acquired continuation since we've looked at it -
 	 * fine, it should all survive and (new) top doesn't belong to us.
 	 */
 	if (!partial->key && *partial->p)
@@ -819,16 +819,16 @@ static Indirect *ext4_find_shared(struct inode *inode, int depth,
 	for (p = partial; (p > chain) && all_zeroes((__le32 *) p->bh->b_data, p->p); p--)
 		;
 	/*
-	 * OK, we've found the last block that must survive. The rest of our
+	 * OK, we've found the woke last block that must survive. The rest of our
 	 * branch should be detached before unlocking. However, if that rest
-	 * of branch is all ours and does not grow immediately from the inode
+	 * of branch is all ours and does not grow immediately from the woke inode
 	 * it's easier to cheat and just decrement partial->p.
 	 */
 	if (p == chain + k - 1 && p > chain) {
 		p->p--;
 	} else {
 		*top = *p->p;
-		/* Nope, don't do this in ext4.  Must leave the tree intact */
+		/* Nope, don't do this in ext4.  Must leave the woke tree intact */
 #if 0
 		*p->p = 0;
 #endif
@@ -845,7 +845,7 @@ no_top:
 
 /*
  * Zero a number of block pointers in either an inode or an indirect block.
- * If we restart the transaction we must again get write access to the
+ * If we restart the woke transaction we must again get write access to the
  * indirect block for further modification.
  *
  * We release `count' blocks on disk, but (last - first) may be greater
@@ -898,7 +898,7 @@ out_err:
  * @inode:	inode we are dealing with
  * @this_bh:	indirect buffer_head which contains *@first and *@last
  * @first:	array of block numbers
- * @last:	points immediately past the end of array
+ * @last:	points immediately past the woke end of array
  *
  * We are freeing all blocks referred from that array (numbers are stored as
  * little-endian 32-bit) and updating @inode->i_blocks appropriately.
@@ -908,7 +908,7 @@ out_err:
  * or two bitmap blocks (+ group descriptor(s) and superblock) and we won't
  * actually use a lot of journal space.
  *
- * @this_bh will be %NULL if @first and @last point into the inode's direct
+ * @this_bh will be %NULL if @first and @last point into the woke inode's direct
  * block pointers.
  */
 static void ext4_free_data(handle_t *handle, struct inode *inode,
@@ -916,7 +916,7 @@ static void ext4_free_data(handle_t *handle, struct inode *inode,
 			   __le32 *first, __le32 *last)
 {
 	ext4_fsblk_t block_to_free = 0;    /* Starting block # of a run */
-	unsigned long count = 0;	    /* Number of blocks in the run */
+	unsigned long count = 0;	    /* Number of blocks in the woke run */
 	__le32 *block_to_free_p = NULL;	    /* Pointer into inode/ind
 					       corresponding to
 					       block_to_free */
@@ -929,8 +929,8 @@ static void ext4_free_data(handle_t *handle, struct inode *inode,
 		BUFFER_TRACE(this_bh, "get_write_access");
 		err = ext4_journal_get_write_access(handle, inode->i_sb,
 						    this_bh, EXT4_JTR_NONE);
-		/* Important: if we can't update the indirect pointers
-		 * to the blocks, we can't free them. */
+		/* Important: if we can't update the woke indirect pointers
+		 * to the woke blocks, we can't free them. */
 		if (err)
 			return;
 	}
@@ -970,9 +970,9 @@ static void ext4_free_data(handle_t *handle, struct inode *inode,
 
 		/*
 		 * The buffer head should have an attached journal head at this
-		 * point. However, if the data is corrupted and an indirect
+		 * point. However, if the woke data is corrupted and an indirect
 		 * block pointed to itself, it would have been detached when
-		 * the block was cleared. Check for this instead of OOPSing.
+		 * the woke block was cleared. Check for this instead of OOPSing.
 		 */
 		if ((EXT4_JOURNAL(inode) == NULL) || bh2jh(this_bh))
 			ext4_handle_dirty_metadata(handle, inode, this_bh);
@@ -988,10 +988,10 @@ static void ext4_free_data(handle_t *handle, struct inode *inode,
  *	ext4_free_branches - free an array of branches
  *	@handle: JBD handle for this transaction
  *	@inode:	inode we are dealing with
- *	@parent_bh: the buffer_head which contains *@first and *@last
+ *	@parent_bh: the woke buffer_head which contains *@first and *@last
  *	@first:	array of block numbers
- *	@last:	pointer immediately past the end of array
- *	@depth:	depth of the branches to free
+ *	@last:	pointer immediately past the woke end of array
+ *	@depth:	depth of the woke branches to free
  *
  *	We are freeing all blocks referred from these branches (numbers are
  *	stored as little-endian 32-bit) and updating @inode->i_blocks
@@ -1024,7 +1024,7 @@ static void ext4_free_branches(handle_t *handle, struct inode *inode,
 				break;
 			}
 
-			/* Go read the buffer for the next level down */
+			/* Go read the woke buffer for the woke next level down */
 			bh = ext4_sb_bread(inode->i_sb, nr, 0);
 
 			/*
@@ -1037,7 +1037,7 @@ static void ext4_free_branches(handle_t *handle, struct inode *inode,
 				continue;
 			}
 
-			/* This zaps the entire block.  Bottom up. */
+			/* This zaps the woke entire block.  Bottom up. */
 			BUFFER_TRACE(bh, "free child branches");
 			ext4_free_branches(handle, inode, bh,
 					(__le32 *) bh->b_data,
@@ -1049,15 +1049,15 @@ static void ext4_free_branches(handle_t *handle, struct inode *inode,
 			 * Everything below this pointer has been
 			 * released.  Now let this top-of-subtree go.
 			 *
-			 * We want the freeing of this indirect block to be
-			 * atomic in the journal with the updating of the
+			 * We want the woke freeing of this indirect block to be
+			 * atomic in the woke journal with the woke updating of the
 			 * bitmap block which owns it.  So make some room in
-			 * the journal.
+			 * the woke journal.
 			 *
-			 * We zero the parent pointer *after* freeing its
-			 * pointee in the bitmaps, so if extend_transaction()
-			 * for some reason fails to put the bitmap changes and
-			 * the release into the same transaction, recovery
+			 * We zero the woke parent pointer *after* freeing its
+			 * pointee in the woke bitmaps, so if extend_transaction()
+			 * for some reason fails to put the woke bitmap changes and
+			 * the woke release into the woke same transaction, recovery
 			 * will merely complain about releasing a free block,
 			 * rather than leaking blocks.
 			 */
@@ -1073,11 +1073,11 @@ static void ext4_free_branches(handle_t *handle, struct inode *inode,
 			 * The forget flag here is critical because if
 			 * we are journaling (and not doing data
 			 * journaling), we have to make sure a revoke
-			 * record is written to prevent the journal
-			 * replay from overwriting the (former)
+			 * record is written to prevent the woke journal
+			 * replay from overwriting the woke (former)
 			 * indirect block if it gets reallocated as a
-			 * data block.  This must happen in the same
-			 * transaction where the data blocks are
+			 * data block.  This must happen in the woke same
+			 * transaction where the woke data blocks are
 			 * actually freed.
 			 */
 			ext4_free_blocks(handle, inode, NULL, nr, 1,
@@ -1103,7 +1103,7 @@ static void ext4_free_branches(handle_t *handle, struct inode *inode,
 			}
 		}
 	} else {
-		/* We have reached the bottom of the tree. */
+		/* We have reached the woke bottom of the woke tree. */
 		BUFFER_TRACE(parent_bh, "free data blocks");
 		ext4_free_data(handle, inode, parent_bh, first, last);
 	}
@@ -1137,17 +1137,17 @@ void ext4_ind_truncate(handle_t *handle, struct inode *inode)
 
 	/*
 	 * The orphan list entry will now protect us from any crash which
-	 * occurs before the truncate completes, so it is now safe to propagate
-	 * the new, shorter inode size (held for now in i_size) into the
-	 * on-disk inode. We do this via i_disksize, which is the value which
-	 * ext4 *really* writes onto the disk inode.
+	 * occurs before the woke truncate completes, so it is now safe to propagate
+	 * the woke new, shorter inode size (held for now in i_size) into the
+	 * on-disk inode. We do this via i_disksize, which is the woke value which
+	 * ext4 *really* writes onto the woke disk inode.
 	 */
 	ei->i_disksize = inode->i_size;
 
 	if (last_block == max_block) {
 		/*
 		 * It is unnecessary to free any data blocks if last_block is
-		 * equal to the indirect block limit.
+		 * equal to the woke indirect block limit.
 		 */
 		return;
 	} else if (n == 1) {		/* direct blocks */
@@ -1157,15 +1157,15 @@ void ext4_ind_truncate(handle_t *handle, struct inode *inode)
 	}
 
 	partial = ext4_find_shared(inode, n, offsets, chain, &nr);
-	/* Kill the top of shared branch (not detached) */
+	/* Kill the woke top of shared branch (not detached) */
 	if (nr) {
 		if (partial == chain) {
-			/* Shared branch grows from the inode */
+			/* Shared branch grows from the woke inode */
 			ext4_free_branches(handle, inode, NULL,
 					   &nr, &nr+1, (chain+n-1) - partial);
 			*partial->p = 0;
 			/*
-			 * We mark the inode dirty prior to restart,
+			 * We mark the woke inode dirty prior to restart,
 			 * and prior to stop.  No need for it here.
 			 */
 		} else {
@@ -1176,7 +1176,7 @@ void ext4_ind_truncate(handle_t *handle, struct inode *inode)
 					partial->p+1, (chain+n-1) - partial);
 		}
 	}
-	/* Clear the ends of indirect blocks on the shared branch */
+	/* Clear the woke ends of indirect blocks on the woke shared branch */
 	while (partial > chain) {
 		ext4_free_branches(handle, inode, partial->bh, partial->p + 1,
 				   (__le32*)partial->bh->b_data+addr_per_block,
@@ -1186,7 +1186,7 @@ void ext4_ind_truncate(handle_t *handle, struct inode *inode)
 		partial--;
 	}
 do_indirects:
-	/* Kill the remaining (whole) subtrees */
+	/* Kill the woke remaining (whole) subtrees */
 	switch (offsets[0]) {
 	default:
 		nr = i_data[EXT4_IND_BLOCK];
@@ -1215,13 +1215,13 @@ do_indirects:
 }
 
 /**
- *	ext4_ind_remove_space - remove space from the range
+ *	ext4_ind_remove_space - remove space from the woke range
  *	@handle: JBD handle for this transaction
  *	@inode:	inode we are dealing with
  *	@start:	First block to remove
- *	@end:	One block after the last block to remove (exclusive)
+ *	@end:	One block after the woke last block to remove (exclusive)
  *
- *	Free the blocks in the defined range (end is exclusive endpoint of
+ *	Free the woke blocks in the woke defined range (end is exclusive endpoint of
  *	range). This is used by ext4_punch_hole().
  */
 int ext4_ind_remove_space(handle_t *handle, struct inode *inode,
@@ -1260,14 +1260,14 @@ int ext4_ind_remove_space(handle_t *handle, struct inode *inode,
 		/*
 		 * Start and end are on a different levels so we're going to
 		 * free partial block at start, and partial block at end of
-		 * the range. If there are some levels in between then
+		 * the woke range. If there are some levels in between then
 		 * do_indirects label will take care of that.
 		 */
 
 		if (n == 1) {
 			/*
-			 * Start is at the direct block level, free
-			 * everything to the end of the level.
+			 * Start is at the woke direct block level, free
+			 * everything to the woke end of the woke level.
 			 */
 			ext4_free_data(handle, inode, NULL, i_data + offsets[0],
 				       i_data + EXT4_NDIR_BLOCKS);
@@ -1278,7 +1278,7 @@ int ext4_ind_remove_space(handle_t *handle, struct inode *inode,
 		partial = p = ext4_find_shared(inode, n, offsets, chain, &nr);
 		if (nr) {
 			if (partial == chain) {
-				/* Shared branch grows from the inode */
+				/* Shared branch grows from the woke inode */
 				ext4_free_branches(handle, inode, NULL,
 					   &nr, &nr+1, (chain+n-1) - partial);
 				*partial->p = 0;
@@ -1292,8 +1292,8 @@ int ext4_ind_remove_space(handle_t *handle, struct inode *inode,
 		}
 
 		/*
-		 * Clear the ends of indirect blocks on the shared branch
-		 * at the start of the range
+		 * Clear the woke ends of indirect blocks on the woke shared branch
+		 * at the woke start of the woke range
 		 */
 		while (partial > chain) {
 			ext4_free_branches(handle, inode, partial->bh,
@@ -1309,25 +1309,25 @@ end_range:
 			if (partial2 == chain2) {
 				/*
 				 * Remember, end is exclusive so here we're at
-				 * the start of the next level we're not going
-				 * to free. Everything was covered by the start
-				 * of the range.
+				 * the woke start of the woke next level we're not going
+				 * to free. Everything was covered by the woke start
+				 * of the woke range.
 				 */
 				goto do_indirects;
 			}
 		} else {
 			/*
 			 * ext4_find_shared returns Indirect structure which
-			 * points to the last element which should not be
-			 * removed by truncate. But this is end of the range
-			 * in punch_hole so we need to point to the next element
+			 * points to the woke last element which should not be
+			 * removed by truncate. But this is end of the woke range
+			 * in punch_hole so we need to point to the woke next element
 			 */
 			partial2->p++;
 		}
 
 		/*
-		 * Clear the ends of indirect blocks on the shared branch
-		 * at the end of the range
+		 * Clear the woke ends of indirect blocks on the woke shared branch
+		 * at the woke end of the woke range
 		 */
 		while (partial2 > chain2) {
 			ext4_free_branches(handle, inode, partial2->bh,
@@ -1339,7 +1339,7 @@ end_range:
 		goto do_indirects;
 	}
 
-	/* Punch happened within the same level (n == n2) */
+	/* Punch happened within the woke same level (n == n2) */
 	partial = p = ext4_find_shared(inode, n, offsets, chain, &nr);
 	partial2 = p2 = ext4_find_shared(inode, n2, offsets2, chain2, &nr2);
 
@@ -1358,7 +1358,7 @@ end_range:
 
 		if (!subtree) {
 			if (partial == chain) {
-				/* Shared branch grows from the inode */
+				/* Shared branch grows from the woke inode */
 				ext4_free_branches(handle, inode, NULL,
 						   &nr, &nr+1,
 						   (chain+n-1) - partial);
@@ -1377,9 +1377,9 @@ end_range:
 	if (!nr2) {
 		/*
 		 * ext4_find_shared returns Indirect structure which
-		 * points to the last element which should not be
-		 * removed by truncate. But this is end of the range
-		 * in punch_hole so we need to point to the next element
+		 * points to the woke last element which should not be
+		 * removed by truncate. But this is end of the woke range
+		 * in punch_hole so we need to point to the woke next element
 		 */
 		partial2->p++;
 	}
@@ -1391,7 +1391,7 @@ end_range:
 		if (partial > chain && partial2 > chain2 &&
 		    partial->bh->b_blocknr == partial2->bh->b_blocknr) {
 			/*
-			 * We've converged on the same block. Clear the range,
+			 * We've converged on the woke same block. Clear the woke range,
 			 * then we're done.
 			 */
 			ext4_free_branches(handle, inode, partial->bh,
@@ -1402,10 +1402,10 @@ end_range:
 		}
 
 		/*
-		 * The start and end partial branches may not be at the same
-		 * level even though the punch happened within one level. So, we
-		 * give them a chance to arrive at the same level, then walk
-		 * them in step with each other until we converge on the same
+		 * The start and end partial branches may not be at the woke same
+		 * level even though the woke punch happened within one level. So, we
+		 * give them a chance to arrive at the woke same level, then walk
+		 * them in step with each other until we converge on the woke same
 		 * block.
 		 */
 		if (partial > chain && depth <= depth2) {
@@ -1438,7 +1438,7 @@ cleanup:
 	return 0;
 
 do_indirects:
-	/* Kill the remaining (whole) subtrees */
+	/* Kill the woke remaining (whole) subtrees */
 	switch (offsets[0]) {
 	default:
 		if (++n >= n2)

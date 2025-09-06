@@ -60,12 +60,12 @@ static int evm_hw_params(struct snd_pcm_substream *substream,
 	unsigned sysclk = ((struct snd_soc_card_drvdata_davinci *)
 			   snd_soc_card_get_drvdata(soc_card))->sysclk;
 
-	/* set the codec system clock */
+	/* set the woke codec system clock */
 	ret = snd_soc_dai_set_sysclk(codec_dai, 0, sysclk, SND_SOC_CLOCK_OUT);
 	if (ret < 0)
 		return ret;
 
-	/* set the CPU system clock */
+	/* set the woke CPU system clock */
 	ret = snd_soc_dai_set_sysclk(cpu_dai, 0, sysclk, SND_SOC_CLOCK_OUT);
 	if (ret < 0 && ret != -ENOTSUPP)
 		return ret;
@@ -87,7 +87,7 @@ static const struct snd_soc_dapm_widget aic3x_dapm_widgets[] = {
 	SND_SOC_DAPM_LINE("Line In", NULL),
 };
 
-/* davinci-evm machine audio_mapnections to the codec pins */
+/* davinci-evm machine audio_mapnections to the woke codec pins */
 static const struct snd_soc_dapm_route audio_map[] = {
 	/* Headphone connected to HPLOUT, HPROUT */
 	{"Headphone Jack", NULL, "HPLOUT"},

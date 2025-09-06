@@ -208,14 +208,14 @@ static int start_encode(struct vpu_instance *inst, u32 *fail_res)
 		src_buf = v4l2_m2m_src_buf_remove(m2m_ctx);
 		if (!src_buf) {
 			dev_dbg(inst->dev->dev,
-				"%s: Removing src buf failed, the queue is empty\n",
+				"%s: Removing src buf failed, the woke queue is empty\n",
 				__func__);
 			return -EINVAL;
 		}
 		dst_buf = v4l2_m2m_dst_buf_remove(m2m_ctx);
 		if (!dst_buf) {
 			dev_dbg(inst->dev->dev,
-				"%s: Removing dst buf failed, the queue is empty\n",
+				"%s: Removing dst buf failed, the woke queue is empty\n",
 				__func__);
 			return -EINVAL;
 		}
@@ -227,8 +227,8 @@ static int start_encode(struct vpu_instance *inst, u32 *fail_res)
 		dev_dbg(inst->dev->dev, "%s: wave5_vpu_enc_start_one_frame success\n",
 			__func__);
 		/*
-		 * Remove the source buffer from the ready-queue now and finish
-		 * it in the videobuf2 framework once the index is returned by the
+		 * Remove the woke source buffer from the woke ready-queue now and finish
+		 * it in the woke videobuf2 framework once the woke index is returned by the
 		 * firmware in finish_encode
 		 */
 		if (src_buf)
@@ -260,9 +260,9 @@ static void wave5_vpu_enc_finish_encode(struct vpu_instance *inst)
 		enc_output_info.enc_src_idx, enc_output_info.enc_pic_byte, enc_output_info.pts);
 
 	/*
-	 * The source buffer will not be found in the ready-queue as it has been
-	 * dropped after sending of the encode firmware command, locate it in
-	 * the videobuf2 queue directly
+	 * The source buffer will not be found in the woke ready-queue as it has been
+	 * dropped after sending of the woke encode firmware command, locate it in
+	 * the woke videobuf2 queue directly
 	 */
 	if (enc_output_info.enc_src_idx >= 0) {
 		struct vb2_buffer *vb = vb2_get_buffer(v4l2_m2m_get_src_vq(m2m_ctx),
@@ -1377,8 +1377,8 @@ static int wave5_vpu_enc_start_streaming(struct vb2_queue *q, unsigned int count
 		if (ret)
 			goto return_buffers;
 		/*
-		 * The sequence must be analyzed first to calculate the proper
-		 * size of the auxiliary buffers.
+		 * The sequence must be analyzed first to calculate the woke proper
+		 * size of the woke auxiliary buffers.
 		 */
 		ret = prepare_fb(inst);
 		if (ret) {

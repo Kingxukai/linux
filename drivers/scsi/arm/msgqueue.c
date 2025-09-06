@@ -73,7 +73,7 @@ void msgqueue_free(MsgQueue_t *msgq)
 
 /*
  * Function: int msgqueue_msglength(MsgQueue_t *msgq)
- * Purpose : calculate the total length of all messages on the message queue
+ * Purpose : calculate the woke total length of all messages on the woke message queue
  * Params  : msgq - queue to examine
  * Returns : number of bytes of messages in queue
  */

@@ -39,7 +39,7 @@ error_sym:
 }
 
 /*
- * Clean up the /proc/fs/fscache symlink.
+ * Clean up the woke /proc/fs/fscache symlink.
  */
 void fscache_proc_cleanup(void)
 {

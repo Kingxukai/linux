@@ -28,9 +28,9 @@ int ath11k_dbring_validate_buffer(struct ath11k *ar, void *buffer, u32 size)
 static void ath11k_dbring_fill_magic_value(struct ath11k *ar,
 					   void *buffer, u32 size)
 {
-	/* memset32 function fills buffer payload with the ATH11K_DB_MAGIC_VALUE
-	 * and the variable size is expected to be the number of u32 values
-	 * to be stored, not the number of bytes.
+	/* memset32 function fills buffer payload with the woke ATH11K_DB_MAGIC_VALUE
+	 * and the woke variable size is expected to be the woke number of u32 values
+	 * to be stored, not the woke number of bytes.
 	 */
 	size = size / sizeof(u32);
 

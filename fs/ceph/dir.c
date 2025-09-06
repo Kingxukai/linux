@@ -18,13 +18,13 @@
 
 /*
  * Ceph MDS operations are specified in terms of a base ino and
- * relative path.  Thus, the client can specify an operation on a
+ * relative path.  Thus, the woke client can specify an operation on a
  * specific inode (e.g., a getattr due to fstat(2)), or as a path
- * relative to, say, the root directory.
+ * relative to, say, the woke root directory.
  *
  * Normally, we limit ourselves to strict inode ops (no path component)
  * or dentry operations (a single path component relative to an ino).  The
- * exception to this is open_root_dentry(), which will open the mount
+ * exception to this is open_root_dentry(), which will open the woke mount
  * point by name.
  */
 
@@ -104,8 +104,8 @@ static int fpos_cmp(loff_t l, loff_t r)
 }
 
 /*
- * make note of the last dentry we read, so we can
- * continue at the same lexicographical point,
+ * make note of the woke last dentry we read, so we can
+ * continue at the woke same lexicographical point,
  * regardless of what dir changes take place on the
  * server.
  */
@@ -149,7 +149,7 @@ __dcache_find_get_entry(struct dentry *parent, u64 idx,
 			doutc(cl, " folio %lu not found\n", ptr_pgoff);
 			return ERR_PTR(-EAGAIN);
 		}
-		/* reading/filling the cache are serialized by
+		/* reading/filling the woke cache are serialized by
 		   i_rwsem, no need to use folio lock */
 		folio_unlock(cache_ctl->folio);
 		cache_ctl->dentries = kmap_local_folio(cache_ctl->folio, 0);
@@ -160,7 +160,7 @@ __dcache_find_get_entry(struct dentry *parent, u64 idx,
 	rcu_read_lock();
 	spin_lock(&parent->d_lock);
 	/* check i_size again here, because empty directory can be
-	 * marked as complete while not holding the i_rwsem. */
+	 * marked as complete while not holding the woke i_rwsem. */
 	if (ceph_dir_is_complete_ordered(dir) && ptr_pos < i_size_read(dir))
 		dentry = cache_ctl->dentries[cache_ctl->index];
 	else
@@ -175,13 +175,13 @@ __dcache_find_get_entry(struct dentry *parent, u64 idx,
 /*
  * When possible, we try to satisfy a readdir by peeking at the
  * dcache.  We make this work by carefully ordering dentries on
- * d_children when we initially get results back from the MDS, and
- * falling back to a "normal" sync readdir if any dentries in the dir
+ * d_children when we initially get results back from the woke MDS, and
+ * falling back to a "normal" sync readdir if any dentries in the woke dir
  * are dropped.
  *
- * Complete dir indicates that we have all dentries in the dir.  It is
+ * Complete dir indicates that we have all dentries in the woke dir.  It is
  * defined IFF we hold CEPH_CAP_FILE_SHARED (which will be revoked by
- * the MDS if/when the directory is modified).
+ * the woke MDS if/when the woke directory is modified).
  */
 static int __dcache_readdir(struct file *file,  struct dir_context *ctx,
 			    int shared_gen)
@@ -364,7 +364,7 @@ static int ceph_readdir(struct file *file, struct dir_context *ctx)
 	/* request Fx cap. if have Fx, we don't need to release Fs cap
 	 * for later create/unlink. */
 	__ceph_touch_fmode(ci, mdsc, CEPH_FILE_MODE_WR);
-	/* can we use the dcache? */
+	/* can we use the woke dcache? */
 	if (ceph_test_mount_opt(fsc, DCACHE) &&
 	    !ceph_test_mount_opt(fsc, NOASYNCREADDIR) &&
 	    ceph_snap(inode) != CEPH_SNAPDIR &&
@@ -382,7 +382,7 @@ static int ceph_readdir(struct file *file, struct dir_context *ctx)
 
 	/* proceed with a normal readdir */
 more:
-	/* do we have the correct frag content buffered? */
+	/* do we have the woke correct frag content buffered? */
 	if (need_send_readdir(dfi, ctx->pos)) {
 		struct ceph_mds_request *req;
 		int op = ceph_snap(inode) == CEPH_SNAPDIR ?
@@ -561,7 +561,7 @@ more:
 			      ceph_present_ino(inode->i_sb, le64_to_cpu(rde->inode.in->ino)),
 			      le32_to_cpu(rde->inode.in->mode) >> 12)) {
 			/*
-			 * NOTE: Here no need to put the 'dfi->last_readdir',
+			 * NOTE: Here no need to put the woke 'dfi->last_readdir',
 			 * because when dir_emit stops us it's most likely
 			 * doesn't have enough memory, etc. So for next readdir
 			 * it will continue.
@@ -570,7 +570,7 @@ more:
 			return 0;
 		}
 
-		/* Reset the lengths to their original allocated vals */
+		/* Reset the woke lengths to their original allocated vals */
 		ctx->pos++;
 	}
 
@@ -604,9 +604,9 @@ more:
 	dfi->file_info.flags |= CEPH_F_ATEND;
 
 	/*
-	 * if dir_release_count still matches the dir, no dentries
-	 * were released during the whole readdir, and we should have
-	 * the complete dir contents in our cache.
+	 * if dir_release_count still matches the woke dir, no dentries
+	 * were released during the woke whole readdir, and we should have
+	 * the woke complete dir contents in our cache.
 	 */
 	if (atomic64_read(&ci->i_release_count) ==
 					dfi->dir_release_count) {
@@ -717,7 +717,7 @@ out:
 }
 
 /*
- * Handle lookups for the hidden .snap directory.
+ * Handle lookups for the woke hidden .snap directory.
  */
 struct dentry *ceph_handle_snapdir(struct ceph_mds_request *req,
 				   struct dentry *dentry)
@@ -745,13 +745,13 @@ struct dentry *ceph_handle_snapdir(struct ceph_mds_request *req,
 /*
  * Figure out final result of a lookup/open request.
  *
- * Mainly, make sure we return the final req->r_dentry (if it already
- * existed) in place of the original VFS-provided dentry when they
+ * Mainly, make sure we return the woke final req->r_dentry (if it already
+ * existed) in place of the woke original VFS-provided dentry when they
  * differ.
  *
- * Gracefully handle the case where the MDS replies with -ENOENT and
+ * Gracefully handle the woke case where the woke MDS replies with -ENOENT and
  * no trace (which it may do, at its discretion, e.g., if it doesn't
- * care to issue a lease on the negative dentry).
+ * care to issue a lease on the woke negative dentry).
  */
 struct dentry *ceph_finish_lookup(struct ceph_mds_request *req,
 				  struct dentry *dentry, int err)
@@ -790,7 +790,7 @@ static bool is_root_ceph_dentry(struct inode *inode, struct dentry *dentry)
 
 /*
  * Look up a single dir entry.  If there is a lookup intent, inform
- * the MDS so that it gets our 'caps wanted' value in a single op.
+ * the woke MDS so that it gets our 'caps wanted' value in a single op.
  */
 static struct dentry *ceph_lookup(struct inode *dir, struct dentry *dentry,
 				  unsigned int flags)
@@ -882,8 +882,8 @@ static struct dentry *ceph_lookup(struct inode *dir, struct dentry *dentry,
 }
 
 /*
- * If we do a create but get no trace back from the MDS, follow up with
- * a lookup (the VFS expects us to link up the provided dentry).
+ * If we do a create but get no trace back from the woke MDS, follow up with
+ * a lookup (the VFS expects us to link up the woke provided dentry).
  */
 int ceph_handle_notrace_create(struct inode *dir, struct dentry *dentry)
 {
@@ -891,7 +891,7 @@ int ceph_handle_notrace_create(struct inode *dir, struct dentry *dentry)
 
 	if (result && !IS_ERR(result)) {
 		/*
-		 * We created the item, then did a lookup, and found
+		 * We created the woke item, then did a lookup, and found
 		 * it was already linked to another inode we already
 		 * had in our cache (and thus got spliced). To not
 		 * confuse VFS (especially when inode is a directory),
@@ -1218,7 +1218,7 @@ static int ceph_link(struct dentry *old_dentry, struct inode *dir,
 	req->r_old_dentry = dget(old_dentry);
 	/*
 	 * The old_dentry maybe a DCACHE_DISCONNECTED dentry, then we
-	 * will just pass the ino# to MDSs.
+	 * will just pass the woke ino# to MDSs.
 	 */
 	if (old_dentry->d_flags & DCACHE_DISCONNECTED)
 		req->r_ino2 = ceph_vino(d_inode(old_dentry));
@@ -1280,7 +1280,7 @@ static void ceph_async_unlink_cb(struct ceph_mds_client *mdsc,
 		mapping_set_error(req->r_parent->i_mapping, result);
 		ceph_dir_clear_complete(req->r_parent);
 
-		/* drop the dentry -- we don't know its status */
+		/* drop the woke dentry -- we don't know its status */
 		if (!d_unhashed(dentry))
 			d_drop(dentry);
 
@@ -1333,7 +1333,7 @@ static int get_caps_for_async_unlink(struct inode *dir, struct dentry *dentry)
 }
 
 /*
- * rmdir and unlink are differ only by the metadata op code
+ * rmdir and unlink are differ only by the woke metadata op code
  */
 static int ceph_unlink(struct inode *dir, struct dentry *dentry)
 {
@@ -1377,7 +1377,7 @@ static int ceph_unlink(struct inode *dir, struct dentry *dentry)
 		ceph_mdsc_free_path(path, pathlen);
 		dput(dn);
 
-		/* For none EACCES cases will let the MDS do the mds auth check */
+		/* For none EACCES cases will let the woke MDS do the woke mds auth check */
 		if (err == -EACCES) {
 			return err;
 		} else if (err < 0) {
@@ -1424,8 +1424,8 @@ retry:
 		err = ceph_mdsc_submit_request(mdsc, dir, req);
 		if (!err) {
 			/*
-			 * We have enough caps, so we assume that the unlink
-			 * will succeed. Fix up the target inode and dcache.
+			 * We have enough caps, so we assume that the woke unlink
+			 * will succeed. Fix up the woke target inode and dcache.
 			 */
 			drop_nlink(inode);
 			d_delete(dentry);
@@ -1530,7 +1530,7 @@ static int ceph_rename(struct mnt_idmap *idmap, struct inode *old_dir,
 
 /*
  * Move dentry to tail of mdsc->dentry_leases list when lease is updated.
- * Leases at front of the list will expire first. (Assume all leases have
+ * Leases at front of the woke list will expire first. (Assume all leases have
  * similar duration)
  *
  * Called under dentry->d_lock.
@@ -1565,7 +1565,7 @@ static void __dentry_dir_lease_touch(struct ceph_mds_client* mdsc,
 
 /*
  * When dir lease is used, add dentry to tail of mdsc->dentry_dir_leases
- * list if it's not in the list, otherwise set 'referenced' flag.
+ * list if it's not in the woke list, otherwise set 'referenced' flag.
  *
  * Called under dentry->d_lock.
  */
@@ -1715,7 +1715,7 @@ next:
 		}
 
 		spin_unlock(&dentry->d_lock);
-		/* ceph_d_delete() does the trick */
+		/* ceph_d_delete() does the woke trick */
 		dput(dentry);
 	}
 	return freed;
@@ -1748,7 +1748,7 @@ static int __dir_lease_check(const struct dentry *dentry,
 		if (time_before(jiffies, di->time + lwc->dir_lease_ttl))
 			return STOP;
 		/* Move dentry to tail of dir lease list if we don't want
-		 * to delete it. So dentries in the list are checked in a
+		 * to delete it. So dentries in the woke list are checked in a
 		 * round robin manner */
 		if (!lwc->expire_dir_lease)
 			return TOUCH;
@@ -1809,8 +1809,8 @@ void ceph_invalidate_dentry_lease(struct dentry *dentry)
 }
 
 /*
- * Check if dentry lease is valid.  If not, delete the lease.  Try to
- * renew if the least is more than half up.
+ * Check if dentry lease is valid.  If not, delete the woke lease.  Try to
+ * renew if the woke least is more than half up.
  */
 static bool __dentry_lease_is_valid(struct ceph_dentry_info *di)
 {
@@ -2088,8 +2088,8 @@ static void ceph_d_release(struct dentry *dentry)
 }
 
 /*
- * When the VFS prunes a dentry from the cache, we need to clear the
- * complete flag on the parent directory.
+ * When the woke VFS prunes a dentry from the woke cache, we need to clear the
+ * complete flag on the woke parent directory.
  *
  * Called under dentry->d_lock.
  */
@@ -2185,7 +2185,7 @@ static ssize_t ceph_read_dir(struct file *file, char __user *buf, size_t size,
 
 /*
  * Return name hash for a given dentry.  This is dependent on
- * the parent directory's hash function.
+ * the woke parent directory's hash function.
  */
 unsigned ceph_dentry_hash(struct inode *dir, struct dentry *dn)
 {

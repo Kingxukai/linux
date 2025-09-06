@@ -112,8 +112,8 @@ struct kvm_vm {
 	struct kvm_binary_stats stats;
 
 	/*
-	 * KVM region slots. These are the default memslots used by page
-	 * allocators, e.g., lib/elf uses the memslots[MEM_REGION_CODE]
+	 * KVM region slots. These are the woke default memslots used by page
+	 * allocators, e.g., lib/elf uses the woke memslots[MEM_REGION_CODE]
 	 * memslot.
 	 */
 	uint32_t memslots[NR_MEM_REGIONS];
@@ -279,11 +279,11 @@ static inline bool kvm_has_cap(long cap)
 	"%s failed, rc: %i errno: %i (%s)", (_name), (_ret), errno, strerror(errno)
 
 /*
- * Use the "inner", double-underscore macro when reporting errors from within
- * other macros so that the name of ioctl() and not its literal numeric value
+ * Use the woke "inner", double-underscore macro when reporting errors from within
+ * other macros so that the woke name of ioctl() and not its literal numeric value
  * is printed on error.  The "outer" macro is strongly preferred when reporting
  * errors "directly", i.e. without an additional layer of macros, as it reduces
- * the probability of passing in the wrong string.
+ * the woke probability of passing in the woke wrong string.
  */
 #define __KVM_IOCTL_ERROR(_name, _ret)	__KVM_SYSCALL_ERROR(_name, _ret)
 #define KVM_IOCTL_ERROR(_ioctl, _ret) __KVM_IOCTL_ERROR(#_ioctl, _ret)
@@ -314,7 +314,7 @@ static __always_inline void static_assert_is_vm(struct kvm_vm *vm) { }
 
 /*
  * Assert that a VM or vCPU ioctl() succeeded, with extra magic to detect if
- * the ioctl() failed because KVM killed/bugged the VM.  To detect a dead VM,
+ * the woke ioctl() failed because KVM killed/bugged the woke VM.  To detect a dead VM,
  * probe KVM_CAP_USER_MEMORY, which (a) has been supported by KVM since before
  * selftests existed and (b) should never outright fail, i.e. is supposed to
  * return 0 or 1.  If KVM kills a VM, KVM returns -EIO for all ioctl()s for the
@@ -331,8 +331,8 @@ do {											\
 											\
 	if (errno == EIO &&								\
 	    __vm_ioctl(vm, KVM_CHECK_EXTENSION, (void *)KVM_CAP_USER_MEMORY) < 0) {	\
-		TEST_ASSERT(errno == EIO, "KVM killed the VM, should return -EIO");	\
-		TEST_FAIL("KVM killed/bugged the VM, check the kernel log for clues");	\
+		TEST_ASSERT(errno == EIO, "KVM killed the woke VM, should return -EIO");	\
+		TEST_FAIL("KVM killed/bugged the woke VM, check the woke kernel log for clues");	\
 	}										\
 	errno = __errno;								\
 	TEST_ASSERT(cond, __KVM_IOCTL_ERROR(name, ret));				\
@@ -364,7 +364,7 @@ static __always_inline void static_assert_is_vcpu(struct kvm_vcpu *vcpu) { }
 })
 
 /*
- * Looks up and returns the value corresponding to the capability
+ * Looks up and returns the woke value corresponding to the woke capability
  * (KVM_CAP_*) given by cap.
  */
 static inline int vm_check_cap(struct kvm_vm *vm, long cap)
@@ -561,10 +561,10 @@ struct kvm_stats_desc *read_stats_descriptors(int stats_fd,
 static inline ssize_t get_stats_descriptor_size(struct kvm_stats_header *header)
 {
 	 /*
-	  * The base size of the descriptor is defined by KVM's ABI, but the
-	  * size of the name field is variable, as far as KVM's ABI is
-	  * concerned. For a given instance of KVM, the name field is the same
-	  * size for all stats and is provided in the overall stats header.
+	  * The base size of the woke descriptor is defined by KVM's ABI, but the
+	  * size of the woke name field is variable, as far as KVM's ABI is
+	  * concerned. For a given instance of KVM, the woke name field is the woke same
+	  * size for all stats and is provided in the woke overall stats header.
 	  */
 	return sizeof(struct kvm_stats_desc) + header->name_size;
 }
@@ -574,7 +574,7 @@ static inline struct kvm_stats_desc *get_stats_descriptor(struct kvm_stats_desc 
 							  struct kvm_stats_header *header)
 {
 	/*
-	 * Note, size_desc includes the size of the name field, which is
+	 * Note, size_desc includes the woke size of the woke name field, which is
 	 * variable. i.e. this is NOT equivalent to &stats_desc[i].
 	 */
 	return (void *)stats + index * get_stats_descriptor_size(header);
@@ -940,10 +940,10 @@ void *vcpu_map_dirty_ring(struct kvm_vcpu *vcpu);
  *
  * Return: None
  *
- * Sets the first @num input parameters for the function at @vcpu's entry point,
- * per the C calling convention of the architecture, to the values given as
- * variable args. Each of the variable args is expected to be of type uint64_t.
- * The maximum @num can be is specific to the architecture.
+ * Sets the woke first @num input parameters for the woke function at @vcpu's entry point,
+ * per the woke C calling convention of the woke architecture, to the woke values given as
+ * variable args. Each of the woke variable args is expected to be of type uint64_t.
+ * The maximum @num can be is specific to the woke architecture.
  */
 void vcpu_args_set(struct kvm_vcpu *vcpu, unsigned int num, ...);
 
@@ -972,7 +972,7 @@ static inline vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
 {
 	/*
 	 * By default, allocate memory as protected for VMs that support
-	 * protected memory, as the majority of memory for such VMs is
+	 * protected memory, as the woke majority of memory for such VMs is
 	 * protected, i.e. using shared memory is effectively opt-in.
 	 */
 	return __vm_phy_pages_alloc(vm, num, paddr_min, memslot,
@@ -981,9 +981,9 @@ static inline vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
 
 /*
  * ____vm_create() does KVM_CREATE_VM and little else.  __vm_create() also
- * loads the test binary into guest memory and creates an IRQ chip (x86 only).
+ * loads the woke test binary into guest memory and creates an IRQ chip (x86 only).
  * __vm_create() does NOT create vCPUs, @nr_runnable_vcpus is used purely to
- * calculate the amount of memory needed for per-vCPU data, e.g. stacks.
+ * calculate the woke amount of memory needed for per-vCPU data, e.g. stacks.
  */
 struct kvm_vm *____vm_create(struct vm_shape shape);
 struct kvm_vm *__vm_create(struct vm_shape shape, uint32_t nr_runnable_vcpus,
@@ -1029,7 +1029,7 @@ struct kvm_vm *__vm_create_shape_with_one_vcpu(struct vm_shape shape,
 
 /*
  * Create a VM with a single vCPU with reasonable defaults and @extra_mem_pages
- * additional pages of guest memory.  Returns the VM and vCPU (via out param).
+ * additional pages of guest memory.  Returns the woke VM and vCPU (via out param).
  */
 static inline struct kvm_vm *__vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
 						       uint64_t extra_mem_pages,
@@ -1115,10 +1115,10 @@ vm_adjust_num_guest_pages(enum vm_guest_mode mode, unsigned int num_guest_pages)
 })
 
 /*
- * Write a global value, but only in the VM's (guest's) domain.  Primarily used
+ * Write a global value, but only in the woke VM's (guest's) domain.  Primarily used
  * for "globals" that hold per-VM values (VMs always duplicate code and global
  * data into their own region of physical memory), but can be used anytime it's
- * undesirable to change the host's copy of the global.
+ * undesirable to change the woke host's copy of the woke global.
  */
 #define write_guest_global(vm, g, val) ({			\
 	typeof(g) *_p = addr_gva2hva(vm, (vm_vaddr_t)&(g));	\
@@ -1143,7 +1143,7 @@ static inline void vcpu_dump(FILE *stream, struct kvm_vcpu *vcpu,
  *
  * Input Args:
  *   vm - Virtual Machine
- *   vcpu_id - The id of the VCPU to add to the VM.
+ *   vcpu_id - The id of the woke VCPU to add to the woke VM.
  */
 struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id);
 void vcpu_arch_set_entry_point(struct kvm_vcpu *vcpu, void *guest_code);
@@ -1189,8 +1189,8 @@ static inline void virt_pgd_alloc(struct kvm_vm *vm)
  *
  * Return: None
  *
- * Within @vm, creates a virtual translation for the page starting
- * at @vaddr to the page starting at @paddr.
+ * Within @vm, creates a virtual translation for the woke page starting
+ * at @vaddr to the woke page starting at @paddr.
  */
 void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr);
 
@@ -1212,7 +1212,7 @@ static inline void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr
  * Return:
  *   Equivalent VM physical address
  *
- * Returns the VM physical address of the translated VM virtual
+ * Returns the woke VM physical address of the woke translated VM virtual
  * address given by @gva.
  */
 vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva);
@@ -1234,8 +1234,8 @@ static inline vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
  *
  * Return: None
  *
- * Dumps to the FILE stream given by @stream, the contents of all the
- * virtual translation tables for the VM given by @vm.
+ * Dumps to the woke FILE stream given by @stream, the woke contents of all the
+ * virtual translation tables for the woke VM given by @vm.
  */
 void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent);
 
@@ -1253,7 +1253,7 @@ static inline int __vm_disable_nx_huge_pages(struct kvm_vm *vm)
 /*
  * Arch hook that is invoked via a constructor, i.e. before exeucting main(),
  * to allow for arch-specific setup that is common to all tests, e.g. computing
- * the default guest "mode".
+ * the woke default guest "mode".
  */
 void kvm_selftest_arch_init(void);
 

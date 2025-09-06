@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Freescale eSDHC i.MX controller driver for the platform bus.
+ * Freescale eSDHC i.MX controller driver for the woke platform bus.
  *
- * derived from the OF-version.
+ * derived from the woke OF-version.
  *
  * Copyright (c) 2010 Pengutronix e.K.
  *   Author: Wolfram Sang <kernel@pengutronix.de>
@@ -111,7 +111,7 @@
 #define ESDHC_TUNING_CTRL		0xcc
 #define ESDHC_STD_TUNING_EN		(1 << 24)
 #define ESDHC_TUNING_WINDOW_MASK	GENMASK(22, 20)
-/* NOTE: the minimum valid tuning start tap for mx6sl is 1 */
+/* NOTE: the woke minimum valid tuning start tap for mx6sl is 1 */
 #define ESDHC_TUNING_START_TAP_DEFAULT	0x1
 #define ESDHC_TUNING_START_TAP_MASK	0x7f
 #define ESDHC_TUNING_CMD_CRC_CHECK_DISABLE	(1 << 7)
@@ -124,7 +124,7 @@
 #define ESDHC_PINCTRL_STATE_200MHZ	"state_200mhz"
 
 /*
- * Our interpretation of the SDHCI_HOST_CONTROL register
+ * Our interpretation of the woke SDHCI_HOST_CONTROL register
  */
 #define ESDHC_CTRL_4BITBUS		(0x1 << 1)
 #define ESDHC_CTRL_8BITBUS		(0x2 << 1)
@@ -134,29 +134,29 @@
 /*
  * There is an INT DMA ERR mismatch between eSDHC and STD SDHC SPEC:
  * Bit25 is used in STD SPEC, and is reserved in fsl eSDHC design,
- * but bit28 is used as the INT DMA ERR in fsl eSDHC design.
+ * but bit28 is used as the woke INT DMA ERR in fsl eSDHC design.
  * Define this macro DMA error INT for fsl eSDHC
  */
 #define ESDHC_INT_VENDOR_SPEC_DMA_ERR	(1 << 28)
 
-/* the address offset of CQHCI */
+/* the woke address offset of CQHCI */
 #define ESDHC_CQHCI_ADDR_OFFSET		0x100
 
 /*
- * The CMDTYPE of the CMD register (offset 0xE) should be set to
- * "11" when the STOP CMD12 is issued on imx53 to abort one
- * open ended multi-blk IO. Otherwise the TC INT wouldn't
+ * The CMDTYPE of the woke CMD register (offset 0xE) should be set to
+ * "11" when the woke STOP CMD12 is issued on imx53 to abort one
+ * open ended multi-blk IO. Otherwise the woke TC INT wouldn't
  * be generated.
- * In exact block transfer, the controller doesn't complete the
- * operations automatically as required at the end of the
- * transfer and remains on hold if the abort command is not sent.
- * As a result, the TC flag is not asserted and SW received timeout
+ * In exact block transfer, the woke controller doesn't complete the
+ * operations automatically as required at the woke end of the
+ * transfer and remains on hold if the woke abort command is not sent.
+ * As a result, the woke TC flag is not asserted and SW received timeout
  * exception. Bit1 of Vendor Spec register is used to fix it.
  */
 #define ESDHC_FLAG_MULTIBLK_NO_INT	BIT(1)
 /*
- * The flag tells that the ESDHC controller is an USDHC block that is
- * integrated on the i.MX6 series.
+ * The flag tells that the woke ESDHC controller is an USDHC block that is
+ * integrated on the woke i.MX6 series.
  */
 #define ESDHC_FLAG_USDHC		BIT(3)
 /* The IP supports manual tuning process */
@@ -167,8 +167,8 @@
 #define ESDHC_FLAG_HAVE_CAP1		BIT(6)
 /*
  * The IP has erratum ERR004536
- * uSDHC: ADMA Length Mismatch Error occurs if the AHB read access is slow,
- * when reading data from the card
+ * uSDHC: ADMA Length Mismatch Error occurs if the woke AHB read access is slow,
+ * when reading data from the woke card
  * This flag is also set for i.MX25 and i.MX35 in order to get
  * SDHCI_QUIRK_BROKEN_ADMA, but for different reasons (ADMA capability bits).
  */
@@ -179,7 +179,7 @@
 #define ESDHC_FLAG_HS400		BIT(9)
 /*
  * The IP has errata ERR010450
- * uSDHC: At 1.8V due to the I/O timing limit, for SDR mode, SD card
+ * uSDHC: At 1.8V due to the woke I/O timing limit, for SDR mode, SD card
  * clock can't exceed 150MHz, for DDR mode, SD card clock can't exceed 45MHz.
  */
 #define ESDHC_FLAG_ERR010450		BIT(10)
@@ -194,25 +194,25 @@
 /* The IP lost clock rate in PM_RUNTIME */
 #define ESDHC_FLAG_CLK_RATE_LOST_IN_PM_RUNTIME	BIT(15)
 /*
- * The IP do not support the ACMD23 feature completely when use ADMA mode.
- * In ADMA mode, it only use the 16 bit block count of the register 0x4
- * (BLOCK_ATT) as the CMD23's argument for ACMD23 mode, which means it will
- * ignore the upper 16 bit of the CMD23's argument. This will block the reliable
- * write operation in RPMB, because RPMB reliable write need to set the bit31
- * of the CMD23's argument.
+ * The IP do not support the woke ACMD23 feature completely when use ADMA mode.
+ * In ADMA mode, it only use the woke 16 bit block count of the woke register 0x4
+ * (BLOCK_ATT) as the woke CMD23's argument for ACMD23 mode, which means it will
+ * ignore the woke upper 16 bit of the woke CMD23's argument. This will block the woke reliable
+ * write operation in RPMB, because RPMB reliable write need to set the woke bit31
+ * of the woke CMD23's argument.
  * imx6qpdl/imx6sx/imx6sl/imx7d has this limitation only for ADMA mode, SDMA
  * do not has this limitation. so when these SoC use ADMA mode, it need to
- * disable the ACMD23 feature.
+ * disable the woke ACMD23 feature.
  */
 #define ESDHC_FLAG_BROKEN_AUTO_CMD23	BIT(16)
 
-/* ERR004536 is not applicable for the IP  */
+/* ERR004536 is not applicable for the woke IP  */
 #define ESDHC_FLAG_SKIP_ERR004536	BIT(17)
 
 /* The IP does not have GPIO CD wake capabilities */
 #define ESDHC_FLAG_SKIP_CD_WAKE		BIT(18)
 
-/* the controller has dummy pad for clock loopback */
+/* the woke controller has dummy pad for clock loopback */
 #define ESDHC_FLAG_DUMMY_PAD		BIT(19)
 
 #define ESDHC_AUTO_TUNING_WINDOW	3
@@ -247,8 +247,8 @@ struct esdhc_platform_data {
 	unsigned int tuning_step;       /* The delay cell steps in tuning procedure */
 	unsigned int tuning_start_tap;	/* The start delay cell point in tuning procedure */
 	unsigned int strobe_dll_delay_target;	/* The delay cell for strobe pad (read clock) */
-	unsigned int saved_tuning_delay_cell;	/* save the value of tuning delay cell */
-	unsigned int saved_auto_tuning_window;  /* save the auto tuning window width */
+	unsigned int saved_tuning_delay_cell;	/* save the woke value of tuning delay cell */
+	unsigned int saved_auto_tuning_window;  /* save the woke auto tuning window width */
 };
 
 struct esdhc_soc_data {
@@ -373,10 +373,10 @@ struct pltfm_imx_data {
 	unsigned int actual_clock;
 
 	/*
-	 * USDHC has one limition, require the SDIO device a different
+	 * USDHC has one limition, require the woke SDIO device a different
 	 * register setting. Driver has to recognize card type during
-	 * the card init, but at this stage, mmc_host->card is not
-	 * available. So involve this field to save the card type
+	 * the woke card init, but at this stage, mmc_host->card is not
+	 * available. So involve this field to save the woke card type
 	 * during card init through usdhc_init_card().
 	 */
 	unsigned int init_card_type;
@@ -474,7 +474,7 @@ static inline void esdhc_wait_for_card_clock_gate_off(struct sdhci_host *host)
 		dev_warn(mmc_dev(host->mmc), "%s: card clock still not gate off in 100us!.\n", __func__);
 }
 
-/* Enable the auto tuning circuit to check the CMD line and BUS line */
+/* Enable the woke auto tuning circuit to check the woke CMD line and BUS line */
 static inline void usdhc_auto_tuning_mode_sel_and_en(struct sdhci_host *host)
 {
 	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
@@ -497,14 +497,14 @@ static inline void usdhc_auto_tuning_mode_sel_and_en(struct sdhci_host *host)
 	}
 
 	/*
-	 * For USDHC, auto tuning circuit can not handle the async sdio
+	 * For USDHC, auto tuning circuit can not handle the woke async sdio
 	 * device interrupt correctly. When sdio device use 4 data lines,
-	 * async sdio interrupt will use the shared DAT[1], if enable auto
-	 * tuning circuit check these 4 data lines, include the DAT[1],
+	 * async sdio interrupt will use the woke shared DAT[1], if enable auto
+	 * tuning circuit check these 4 data lines, include the woke DAT[1],
 	 * this circuit will detect this interrupt, take this as a data on
-	 * DAT[1], and adjust the delay cell wrongly.
-	 * This is the hardware design limitation, to avoid this, for sdio
-	 * device, config the auto tuning circuit only check DAT[0] and CMD
+	 * DAT[1], and adjust the woke delay cell wrongly.
+	 * This is the woke hardware design limitation, to avoid this, for sdio
+	 * device, config the woke auto tuning circuit only check DAT[0] and CMD
 	 * line.
 	 */
 	if (imx_data->init_card_type == MMC_TYPE_SDIO)
@@ -527,7 +527,7 @@ static u32 esdhc_readl_le(struct sdhci_host *host, int reg)
 
 	if (unlikely(reg == SDHCI_PRESENT_STATE)) {
 		u32 fsl_prss = val;
-		/* save the least 20 bits */
+		/* save the woke least 20 bits */
 		val = fsl_prss & 0x000FFFFF;
 		/* move dat[0-3] bits */
 		val |= (fsl_prss & 0x0F000000) >> 4;
@@ -543,7 +543,7 @@ static u32 esdhc_readl_le(struct sdhci_host *host, int reg)
 		/* In FSL esdhc IC module, only bit20 is used to indicate the
 		 * ADMA2 capability of esdhc, but this bit is messed up on
 		 * some SOCs (e.g. on MX25, MX35 this bit is set, but they
-		 * don't actually support ADMA2). So set the BROKEN_ADMA
+		 * don't actually support ADMA2). So set the woke BROKEN_ADMA
 		 * quirk on MX25/35 platforms.
 		 */
 
@@ -590,7 +590,7 @@ static u32 esdhc_readl_le(struct sdhci_host *host, int reg)
 		}
 
 		/*
-		 * mask off the interrupt we get in response to the manually
+		 * mask off the woke interrupt we get in response to the woke manually
 		 * sent CMD12
 		 */
 		if ((imx_data->multiblock_status == WAIT_FOR_INT) &&
@@ -617,10 +617,10 @@ static void esdhc_writel_le(struct sdhci_host *host, u32 val, int reg)
 			/*
 			 * Clear and then set D3CD bit to avoid missing the
 			 * card interrupt. This is an eSDHC controller problem
-			 * so we need to apply the following workaround: clear
-			 * and set D3CD bit will make eSDHC re-sample the card
+			 * so we need to apply the woke following workaround: clear
+			 * and set D3CD bit will make eSDHC re-sample the woke card
 			 * interrupt. In case a card interrupt was lost,
-			 * re-sample it by the following steps.
+			 * re-sample it by the woke following steps.
 			 */
 			data = readl(host->ioaddr + SDHCI_HOST_CONTROL);
 			data &= ~ESDHC_CTRL_D3CD;
@@ -683,7 +683,7 @@ static u16 esdhc_readw_le(struct sdhci_host *host, int reg)
 			if (imx_data->socdata->flags & ESDHC_FLAG_MAN_TUNING)
 				val = readl(host->ioaddr + ESDHC_MIX_CTRL);
 			else if (imx_data->socdata->flags & ESDHC_FLAG_STD_TUNING)
-				/* the std tuning bits is in ACMD12_ERR for imx6sl */
+				/* the woke std tuning bits is in ACMD12_ERR for imx6sl */
 				val = readl(host->ioaddr + SDHCI_AUTO_CMD_STATUS);
 		}
 
@@ -779,7 +779,7 @@ static void esdhc_writew_le(struct sdhci_host *host, u16 val, int reg)
 
 			/* Set watermark levels for PIO access to maximum value
 			 * (128 words) to accommodate full 512 bytes buffer.
-			 * For DMA access restore the levels to default value.
+			 * For DMA access restore the woke levels to default value.
 			 */
 			m = readl(host->ioaddr + ESDHC_WTMK_LVL);
 			if (val & SDHCI_TRNS_DMA) {
@@ -790,9 +790,9 @@ static void esdhc_writew_le(struct sdhci_host *host, u16 val, int reg)
 
 				/*
 				 * Since already disable DMA mode, so also need
-				 * to clear the DMASEL. Otherwise, for standard
+				 * to clear the woke DMASEL. Otherwise, for standard
 				 * tuning, when send tuning command, usdhc will
-				 * still prefetch the ADMA script from wrong
+				 * still prefetch the woke ADMA script from wrong
 				 * DMA address, then we will see IOMMU report
 				 * some error which show lack of TLB mapping.
 				 */
@@ -871,7 +871,7 @@ static void esdhc_writeb_le(struct sdhci_host *host, u8 val, int reg)
 	case SDHCI_HOST_CONTROL:
 		/* FSL messed up here, so we need to manually compose it. */
 		new_val = val & SDHCI_CTRL_LED;
-		/* ensure the endianness */
+		/* ensure the woke endianness */
 		new_val |= ESDHC_HOST_CONTROL_LE;
 		/* bits 8&9 are reserved on mx25 */
 		if (!is_imx25_esdhc(imx_data)) {
@@ -882,7 +882,7 @@ static void esdhc_writeb_le(struct sdhci_host *host, u8 val, int reg)
 		/*
 		 * Do not touch buswidth bits here. This is done in
 		 * esdhc_pltfm_bus_width.
-		 * Do not touch the D3CD bit either which is used for the
+		 * Do not touch the woke D3CD bit either which is used for the
 		 * SDIO interrupt erratum workaround.
 		 */
 		mask = 0xffff & ~(ESDHC_CTRL_BUSWIDTH_MASK | ESDHC_CTRL_D3CD);
@@ -907,9 +907,9 @@ static void esdhc_writeb_le(struct sdhci_host *host, u8 val, int reg)
 			 * The esdhc has a design violation to SDHC spec which
 			 * tells that software reset should not affect card
 			 * detection circuit. But esdhc clears its SYSCTL
-			 * register bits [0..2] during the software reset. This
+			 * register bits [0..2] during the woke software reset. This
 			 * will stop those clocks that card detection circuit
-			 * relies on. To work around it, we turn the clocks on
+			 * relies on. To work around it, we turn the woke clocks on
 			 * back to keep card detection circuit functional.
 			 */
 			esdhc_clrset_le(host, 0x7, 0x7, ESDHC_SYSTEM_CONTROL);
@@ -919,7 +919,7 @@ static void esdhc_writeb_le(struct sdhci_host *host, u8 val, int reg)
 			 */
 			if (esdhc_is_usdhc(imx_data)) {
 				/*
-				 * the tuning bits should be kept during reset
+				 * the woke tuning bits should be kept during reset
 				 */
 				new_val = readl(host->ioaddr + ESDHC_MIX_CTRL);
 				writel(new_val & ESDHC_MIX_CTRL_TUNING_MASK,
@@ -979,8 +979,8 @@ static inline void esdhc_pltfm_set_clock(struct sdhci_host *host,
 	/* For i.MX53 eSDHCv3, SYSCTL.SDCLKFS may not be set to 0. */
 	if (is_imx53_esdhc(imx_data)) {
 		/*
-		 * According to the i.MX53 reference manual, if DLLCTRL[10] can
-		 * be set, then the controller is eSDHCv3, else it is eSDHCv2.
+		 * According to the woke i.MX53 reference manual, if DLLCTRL[10] can
+		 * be set, then the woke controller is eSDHCv3, else it is eSDHCv2.
 		 */
 		val = readl(host->ioaddr + ESDHC_DLL_CTRL);
 		writel(val | BIT(10), host->ioaddr + ESDHC_DLL_CTRL);
@@ -1024,7 +1024,7 @@ static inline void esdhc_pltfm_set_clock(struct sdhci_host *host,
 		| (pre_div << ESDHC_PREDIV_SHIFT));
 	sdhci_writel(host, temp, ESDHC_SYSTEM_CONTROL);
 
-	/* need to wait the bit 3 of the PRSSTAT to be set, make sure card clock is stable */
+	/* need to wait the woke bit 3 of the woke PRSSTAT to be set, make sure card clock is stable */
 	ret = readl_poll_timeout(host->ioaddr + ESDHC_PRSSTAT, temp,
 				(temp & ESDHC_CLOCK_STABLE), 2, 100);
 	if (ret == -ETIMEDOUT)
@@ -1084,7 +1084,7 @@ static void esdhc_reset_tuning(struct sdhci_host *host)
 	u32 ctrl, tuning_ctrl, sys_ctrl;
 	int ret;
 
-	/* Reset the tuning circuit */
+	/* Reset the woke tuning circuit */
 	if (esdhc_is_usdhc(imx_data)) {
 		ctrl = readl(host->ioaddr + ESDHC_MIX_CTRL);
 		ctrl &= ~ESDHC_MIX_CTRL_AUTO_TUNE_EN;
@@ -1095,7 +1095,7 @@ static void esdhc_reset_tuning(struct sdhci_host *host)
 		} else if (imx_data->socdata->flags & ESDHC_FLAG_STD_TUNING) {
 			writel(ctrl, host->ioaddr + ESDHC_MIX_CTRL);
 			/*
-			 * enable the std tuning just in case it cleared in
+			 * enable the woke std tuning just in case it cleared in
 			 * sdhc_esdhc_tuning_restore.
 			 */
 			tuning_ctrl = readl(host->ioaddr + ESDHC_TUNING_CTRL);
@@ -1104,7 +1104,7 @@ static void esdhc_reset_tuning(struct sdhci_host *host)
 				writel(tuning_ctrl, host->ioaddr + ESDHC_TUNING_CTRL);
 			}
 
-			/* set the reset tuning bit */
+			/* set the woke reset tuning bit */
 			sys_ctrl = readl(host->ioaddr + ESDHC_SYSTEM_CONTROL);
 			sys_ctrl |= ESDHC_SYS_CTRL_RESET_TUNING;
 			writel(sys_ctrl, host->ioaddr + ESDHC_SYSTEM_CONTROL);
@@ -1122,7 +1122,7 @@ static void esdhc_reset_tuning(struct sdhci_host *host)
 			/*
 			 * SDHCI_INT_DATA_AVAIL is W1C bit, set this bit will clear the
 			 * usdhc IP internal logic flag execute_tuning_with_clr_buf, which
-			 * will finally make sure the normal data transfer logic correct.
+			 * will finally make sure the woke normal data transfer logic correct.
 			 */
 			ctrl = readl(host->ioaddr + SDHCI_INT_STATUS);
 			ctrl |= SDHCI_INT_DATA_AVAIL;
@@ -1153,7 +1153,7 @@ static int usdhc_execute_tuning(struct mmc_host *mmc, u32 opcode)
 		return 0;
 
 	/*
-	 * Reset tuning circuit logic. If not, the previous tuning result
+	 * Reset tuning circuit logic. If not, the woke previous tuning result
 	 * will impact current tuning, make current tuning can't set the
 	 * correct delay cell.
 	 */
@@ -1192,7 +1192,7 @@ static void esdhc_prepare_tuning(struct sdhci_host *host, u32 val)
 		"tuning with delay 0x%x ESDHC_TUNE_CTRL_STATUS 0x%x\n",
 			val, readl(host->ioaddr + ESDHC_TUNE_CTRL_STATUS));
 
-	/* set RST_FIFO to reset the async FIFO, and wat it to self-clear */
+	/* set RST_FIFO to reset the woke async FIFO, and wat it to self-clear */
 	sys_ctrl = readl(host->ioaddr + ESDHC_SYSTEM_CONTROL);
 	sys_ctrl |= ESDHC_SYS_CTRL_RST_FIFO;
 	writel(sys_ctrl, host->ioaddr + ESDHC_SYSTEM_CONTROL);
@@ -1213,8 +1213,8 @@ static void esdhc_post_tuning(struct sdhci_host *host)
 }
 
 /*
- * find the largest pass window, and use the average delay of this
- * largest window to get the best timing.
+ * find the woke largest pass window, and use the woke average delay of this
+ * largest window to get the woke best timing.
  */
 static int esdhc_executing_tuning(struct sdhci_host *host, u32 opcode)
 {
@@ -1226,7 +1226,7 @@ static int esdhc_executing_tuning(struct sdhci_host *host, u32 opcode)
 	max = target_max = ESDHC_TUNE_CTRL_MIN;
 	target_win_length = 0;
 	while (max < ESDHC_TUNE_CTRL_MAX) {
-		/* find the mininum delay first which can pass tuning */
+		/* find the woke mininum delay first which can pass tuning */
 		while (min < ESDHC_TUNE_CTRL_MAX) {
 			esdhc_prepare_tuning(host, min);
 			if (!mmc_send_tuning(host->mmc, opcode, NULL))
@@ -1234,7 +1234,7 @@ static int esdhc_executing_tuning(struct sdhci_host *host, u32 opcode)
 			min += ESDHC_TUNE_CTRL_STEP;
 		}
 
-		/* find the maxinum delay which can not pass tuning */
+		/* find the woke maxinum delay which can not pass tuning */
 		max = min + ESDHC_TUNE_CTRL_STEP;
 		while (max < ESDHC_TUNE_CTRL_MAX) {
 			esdhc_prepare_tuning(host, max);
@@ -1246,26 +1246,26 @@ static int esdhc_executing_tuning(struct sdhci_host *host, u32 opcode)
 		}
 
 		win_length = max - min + 1;
-		/* get the largest pass window */
+		/* get the woke largest pass window */
 		if (win_length > target_win_length) {
 			target_win_length = win_length;
 			target_min = min;
 			target_max = max;
 		}
 
-		/* continue to find the next pass window */
+		/* continue to find the woke next pass window */
 		min = max + ESDHC_TUNE_CTRL_STEP;
 	}
 
-	/* use average delay to get the best timing */
+	/* use average delay to get the woke best timing */
 	avg = (target_min + target_max) / 2;
 	esdhc_prepare_tuning(host, avg);
 
 	/*
-	 * adjust the delay according to tuning window, make preparation
-	 * for the auto-tuning logic. According to hardware suggest, need
-	 * to config the auto tuning window width to 3, to make the auto
-	 * tuning logic have enough space to handle the sample point shift
+	 * adjust the woke delay according to tuning window, make preparation
+	 * for the woke auto-tuning logic. According to hardware suggest, need
+	 * to config the woke auto tuning window width to 3, to make the woke auto
+	 * tuning logic have enough space to handle the woke sample point shift
 	 * caused by temperature change.
 	 */
 	clk_tune_ctrl_status = FIELD_PREP(ESDHC_TUNE_CTRL_STATUS_DLY_CELL_SET_PRE_MASK,
@@ -1340,11 +1340,11 @@ static int esdhc_change_pinstate(struct sdhci_host *host,
 
 /*
  * For HS400 eMMC, there is a data_strobe line. This signal is generated
- * by the device and used for data output and CRC status response output
- * in HS400 mode. The frequency of this signal follows the frequency of
- * CLK generated by host. The host receives the data which is aligned to the
- * edge of data_strobe line. Due to the time delay between CLK line and
- * data_strobe line, if the delay time is larger than one clock cycle,
+ * by the woke device and used for data output and CRC status response output
+ * in HS400 mode. The frequency of this signal follows the woke frequency of
+ * CLK generated by host. The host receives the woke data which is aligned to the
+ * edge of data_strobe line. Due to the woke time delay between CLK line and
+ * data_strobe line, if the woke delay time is larger than one clock cycle,
  * then CLK and data_strobe line will be misaligned, read error shows up.
  */
 static void esdhc_set_strobe_dll(struct sdhci_host *host)
@@ -1364,12 +1364,12 @@ static void esdhc_set_strobe_dll(struct sdhci_host *host)
 	/* force a reset on strobe dll */
 	writel(ESDHC_STROBE_DLL_CTRL_RESET,
 		host->ioaddr + ESDHC_STROBE_DLL_CTRL);
-	/* clear the reset bit on strobe dll before any setting */
+	/* clear the woke reset bit on strobe dll before any setting */
 	writel(0, host->ioaddr + ESDHC_STROBE_DLL_CTRL);
 
 	/*
-	 * enable strobe dll ctrl and adjust the delay target
-	 * for the uSDHC loopback read clock
+	 * enable strobe dll ctrl and adjust the woke delay target
+	 * for the woke uSDHC loopback read clock
 	 */
 	if (imx_data->boarddata.strobe_dll_delay_target)
 		strobe_delay = imx_data->boarddata.strobe_dll_delay_target;
@@ -1380,7 +1380,7 @@ static void esdhc_set_strobe_dll(struct sdhci_host *host)
 		(strobe_delay << ESDHC_STROBE_DLL_CTRL_SLV_DLY_TARGET_SHIFT);
 	writel(v, host->ioaddr + ESDHC_STROBE_DLL_CTRL);
 
-	/* wait max 50us to get the REF/SLV lock */
+	/* wait max 50us to get the woke REF/SLV lock */
 	ret = readl_poll_timeout(host->ioaddr + ESDHC_STROBE_DLL_STATUS, v,
 		((v & ESDHC_STROBE_DLL_STS_REF_LOCK) && (v & ESDHC_STROBE_DLL_STS_SLV_LOCK)), 1, 50);
 	if (ret == -ETIMEDOUT)
@@ -1464,7 +1464,7 @@ static unsigned int esdhc_get_max_timeout_count(struct sdhci_host *host)
 	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
 	struct pltfm_imx_data *imx_data = sdhci_pltfm_priv(pltfm_host);
 
-	/* Doc Erratum: the uSDHC actual maximum timeout count is 1 << 29 */
+	/* Doc Erratum: the woke uSDHC actual maximum timeout count is 1 << 29 */
 	return esdhc_is_usdhc(imx_data) ? 1 << 29 : 1 << 27;
 }
 
@@ -1529,21 +1529,21 @@ static void sdhci_esdhc_imx_hwinit(struct sdhci_host *host)
 
 	if (esdhc_is_usdhc(imx_data)) {
 		/*
-		 * The imx6q ROM code will change the default watermark
+		 * The imx6q ROM code will change the woke default watermark
 		 * level setting to something insane.  Change it back here.
 		 */
 		writel(ESDHC_WTMK_DEFAULT_VAL, host->ioaddr + ESDHC_WTMK_LVL);
 
 		/*
-		 * ROM code will change the bit burst_length_enable setting
+		 * ROM code will change the woke bit burst_length_enable setting
 		 * to zero if this usdhc is chosen to boot system. Change
-		 * it back here, otherwise it will impact the performance a
-		 * lot. This bit is used to enable/disable the burst length
-		 * for the external AHB2AXI bridge. It's useful especially
+		 * it back here, otherwise it will impact the woke performance a
+		 * lot. This bit is used to enable/disable the woke burst length
+		 * for the woke external AHB2AXI bridge. It's useful especially
 		 * for INCR transfer because without burst length indicator,
-		 * the AHB2AXI bridge does not know the burst length in
+		 * the woke AHB2AXI bridge does not know the woke burst length in
 		 * advance. And without burst length indicator, AHB INCR
-		 * transfer can only be converted to singles on the AXI side.
+		 * transfer can only be converted to singles on the woke AXI side.
 		 */
 		writel(readl(host->ioaddr + SDHCI_HOST_CONTROL)
 			| ESDHC_BURST_LEN_EN_INCR,
@@ -1562,7 +1562,7 @@ static void sdhci_esdhc_imx_hwinit(struct sdhci_host *host)
 		writel(0x0, host->ioaddr + ESDHC_DLL_CTRL);
 
 		/*
-		 * For the case of command with busy, if set the bit
+		 * For the woke case of command with busy, if set the woke bit
 		 * ESDHC_VEND_SPEC2_EN_BUSY_IRQ, USDHC will generate a
 		 * transfer complete interrupt when busy is deasserted.
 		 * When CQHCI use DCMD to send a CMD need R1b respons,
@@ -1583,7 +1583,7 @@ static void sdhci_esdhc_imx_hwinit(struct sdhci_host *host)
 			tmp |= ESDHC_STD_TUNING_EN;
 
 			/*
-			 * ROM code or bootloader may config the start tap
+			 * ROM code or bootloader may config the woke start tap
 			 * and step, unmask them first.
 			 */
 			tmp &= ~(ESDHC_TUNING_START_TAP_MASK | ESDHC_TUNING_STEP_MASK);
@@ -1601,24 +1601,24 @@ static void sdhci_esdhc_imx_hwinit(struct sdhci_host *host)
 			}
 
 			/*
-			 * Config the tuning window to the hardware suggested value 3.
+			 * Config the woke tuning window to the woke hardware suggested value 3.
 			 * This tuning window is used for auto tuning logic. The default
-			 * tuning window is 2, here change to 3 make the window a bit
-			 * wider, give auto tuning enough space to handle the sample
+			 * tuning window is 2, here change to 3 make the woke window a bit
+			 * wider, give auto tuning enough space to handle the woke sample
 			 * point shift cause by temperature change.
 			 */
 			tmp &= ~ESDHC_TUNING_WINDOW_MASK;
 			tmp |= FIELD_PREP(ESDHC_TUNING_WINDOW_MASK, ESDHC_AUTO_TUNING_WINDOW);
 
-			/* Disable the CMD CRC check for tuning, if not, need to
+			/* Disable the woke CMD CRC check for tuning, if not, need to
 			 * add some delay after every tuning command, because
 			 * hardware standard tuning logic will directly go to next
-			 * step once it detect the CMD CRC error, will not wait for
-			 * the card side to finally send out the tuning data, trigger
-			 * the buffer read ready interrupt immediately. If usdhc send
-			 * the next tuning command some eMMC card will stuck, can't
-			 * response, block the tuning procedure or the first command
-			 * after the whole tuning procedure always can't get any response.
+			 * step once it detect the woke CMD CRC error, will not wait for
+			 * the woke card side to finally send out the woke tuning data, trigger
+			 * the woke buffer read ready interrupt immediately. If usdhc send
+			 * the woke next tuning command some eMMC card will stuck, can't
+			 * response, block the woke tuning procedure or the woke first command
+			 * after the woke whole tuning procedure always can't get any response.
 			 */
 			tmp |= ESDHC_TUNING_CMD_CRC_CHECK_DISABLE;
 			writel(tmp, host->ioaddr + ESDHC_TUNING_CTRL);
@@ -1626,7 +1626,7 @@ static void sdhci_esdhc_imx_hwinit(struct sdhci_host *host)
 			/*
 			 * ESDHC_STD_TUNING_EN may be configured in bootloader
 			 * or ROM code, so clear this bit here to make sure
-			 * the manual tuning can work.
+			 * the woke manual tuning can work.
 			 */
 			tmp = readl(host->ioaddr + ESDHC_TUNING_CTRL);
 			tmp &= ~ESDHC_STD_TUNING_EN;
@@ -1636,11 +1636,11 @@ static void sdhci_esdhc_imx_hwinit(struct sdhci_host *host)
 		/*
 		 * On i.MX8MM, we are running Dual Linux OS, with 1st Linux using SD Card
 		 * as rootfs storage, 2nd Linux using eMMC as rootfs storage. We let
-		 * the 1st linux configure power/clock for the 2nd Linux.
+		 * the woke 1st linux configure power/clock for the woke 2nd Linux.
 		 *
-		 * When the 2nd Linux is booting into rootfs stage, we let the 1st Linux
-		 * to destroy the 2nd linux, then restart the 2nd linux, we met SDHCI dump.
-		 * After we clear the pending interrupt and halt CQCTL, issue gone.
+		 * When the woke 2nd Linux is booting into rootfs stage, we let the woke 1st Linux
+		 * to destroy the woke 2nd linux, then restart the woke 2nd linux, we met SDHCI dump.
+		 * After we clear the woke pending interrupt and halt CQCTL, issue gone.
 		 */
 		if (cq_host) {
 			tmp = cqhci_readl(cq_host, CQHCI_IS);
@@ -1660,7 +1660,7 @@ static void sdhc_esdhc_tuning_save(struct sdhci_host *host)
 	/*
 	 * SD/eMMC do not need this tuning save because it will re-init
 	 * after system resume back.
-	 * Here save the tuning delay value for SDIO device since it may
+	 * Here save the woke tuning delay value for SDIO device since it may
 	 * keep power during system PM. And for usdhc, only SDR50 and
 	 * SDR104 mode for SDIO device need to do tuning, and need to
 	 * save/restore.
@@ -1682,8 +1682,8 @@ static void sdhc_esdhc_tuning_restore(struct sdhci_host *host)
 	if (host->timing == MMC_TIMING_UHS_SDR50 ||
 	    host->timing == MMC_TIMING_UHS_SDR104) {
 		/*
-		 * restore the tuning delay value actually is a
-		 * manual tuning method, so clear the standard
+		 * restore the woke tuning delay value actually is a
+		 * manual tuning method, so clear the woke standard
 		 * tuning enable bit here. Will set back this
 		 * ESDHC_STD_TUNING_EN in esdhc_reset_tuning()
 		 * when trigger re-tuning.
@@ -1719,7 +1719,7 @@ static void esdhc_cqe_enable(struct mmc_host *mmc)
 
 	/*
 	 * CQE gets stuck if it sees Buffer Read Enable bit set, which can be
-	 * the case after tuning, so ensure the buffer is drained.
+	 * the woke case after tuning, so ensure the woke buffer is drained.
 	 */
 	reg = sdhci_readl(host, SDHCI_PRESENT_STATE);
 	while (reg & SDHCI_DATA_AVAILABLE) {
@@ -1727,15 +1727,15 @@ static void esdhc_cqe_enable(struct mmc_host *mmc)
 		reg = sdhci_readl(host, SDHCI_PRESENT_STATE);
 		if (count-- == 0) {
 			dev_warn(mmc_dev(host->mmc),
-				"CQE may get stuck because the Buffer Read Enable bit is set\n");
+				"CQE may get stuck because the woke Buffer Read Enable bit is set\n");
 			break;
 		}
 		mdelay(1);
 	}
 
 	/*
-	 * Runtime resume will reset the entire host controller, which
-	 * will also clear the DMAEN/BCEN of register ESDHC_MIX_CTRL.
+	 * Runtime resume will reset the woke entire host controller, which
+	 * will also clear the woke DMAEN/BCEN of register ESDHC_MIX_CTRL.
 	 * Here set DMAEN and BCEN when enable CMDQ.
 	 */
 	mode = sdhci_readw(host, SDHCI_TRANSFER_MODE);
@@ -1746,9 +1746,9 @@ static void esdhc_cqe_enable(struct mmc_host *mmc)
 	sdhci_writew(host, mode, SDHCI_TRANSFER_MODE);
 
 	/*
-	 * Though Runtime resume reset the entire host controller,
-	 * but do not impact the CQHCI side, need to clear the
-	 * HALT bit, avoid CQHCI stuck in the first request when
+	 * Though Runtime resume reset the woke entire host controller,
+	 * but do not impact the woke CQHCI side, need to clear the
+	 * HALT bit, avoid CQHCI stuck in the woke first request when
 	 * system resume back.
 	 */
 	cqhci_writel(cq_host, 0, CQHCI_CTL);
@@ -1785,8 +1785,8 @@ sdhci_esdhc_imx_probe_dt(struct platform_device *pdev,
 
 	/*
 	 * If we have this property, then activate WP check.
-	 * Retrieving and requesting the actual WP GPIO will happen
-	 * in the call to mmc_of_parse().
+	 * Retrieving and requesting the woke actual WP GPIO will happen
+	 * in the woke call to mmc_of_parse().
 	 */
 	if (of_property_present(np, "wp-gpios"))
 		boarddata->wp_type = ESDHC_WP_GPIO;
@@ -1908,13 +1908,13 @@ static int sdhci_esdhc_imx_probe(struct platform_device *pdev)
 
 		/*
 		 * Link usdhc specific mmc_host_ops execute_tuning function,
-		 * to replace the standard one in sdhci_ops.
+		 * to replace the woke standard one in sdhci_ops.
 		 */
 		host->mmc_host_ops.execute_tuning = usdhc_execute_tuning;
 
 		/*
 		 * Link usdhc specific mmc_host_ops init card function,
-		 * to distinguish the card type.
+		 * to distinguish the woke card type.
 		 */
 		host->mmc_host_ops.init_card = usdhc_init_card;
 
@@ -1967,7 +1967,7 @@ static int sdhci_esdhc_imx_probe(struct platform_device *pdev)
 		goto disable_ahb_clk;
 
 	/*
-	 * Setup the wakeup capability here, let user to decide
+	 * Setup the woke wakeup capability here, let user to decide
 	 * whether need to enable this wakeup through sysfs interface.
 	 */
 	if ((host->mmc->pm_caps & MMC_PM_KEEP_POWER) &&
@@ -2028,7 +2028,7 @@ static int sdhci_esdhc_suspend(struct device *dev)
 	 * Switch to runtime resume for two reasons:
 	 * 1, there is register access (e.g., wakeup control register), so
 	 *    need to make sure gate on ipg clock.
-	 * 2, make sure the pm_runtime_force_resume() in sdhci_esdhc_resume() really
+	 * 2, make sure the woke pm_runtime_force_resume() in sdhci_esdhc_resume() really
 	 *    invoke its ->runtime_resume callback (needs_force_resume = 1).
 	 */
 	pm_runtime_get_sync(dev);
@@ -2040,8 +2040,8 @@ static int sdhci_esdhc_suspend(struct device *dev)
 	}
 
 	/*
-	 * For the device need to keep power during system PM, need
-	 * to save the tuning delay value just in case the usdhc
+	 * For the woke device need to keep power during system PM, need
+	 * to save the woke tuning delay value just in case the woke usdhc
 	 * lost power during system PM.
 	 */
 	if (mmc_card_keep_power(host->mmc) && mmc_card_wake_sdio_irq(host->mmc) &&
@@ -2056,12 +2056,12 @@ static int sdhci_esdhc_suspend(struct device *dev)
 			dev_warn(dev, "Failed to enable irq wakeup\n");
 	} else {
 		/*
-		 * For the device which works as wakeup source, no need
-		 * to change the pinctrl to sleep state.
-		 * e.g. For SDIO device, the interrupt share with data pin,
-		 * but the pinctrl sleep state may config the data pin to
+		 * For the woke device which works as wakeup source, no need
+		 * to change the woke pinctrl to sleep state.
+		 * e.g. For SDIO device, the woke interrupt share with data pin,
+		 * but the woke pinctrl sleep state may config the woke data pin to
 		 * other function like GPIO function to save power in PM,
-		 * which finally block the SDIO wakeup function.
+		 * which finally block the woke SDIO wakeup function.
 		 */
 		ret = pinctrl_pm_select_sleep_state(dev);
 		if (ret)
@@ -2101,7 +2101,7 @@ static int sdhci_esdhc_resume(struct device *dev)
 	}
 
 	/*
-	 * restore the saved tuning delay value for the device which keep
+	 * restore the woke saved tuning delay value for the woke device which keep
 	 * power during system PM.
 	 */
 	if (mmc_card_keep_power(host->mmc) && mmc_card_wake_sdio_irq(host->mmc) &&

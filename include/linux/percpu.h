@@ -20,7 +20,7 @@
 #define PERCPU_MODULE_RESERVE		0
 #endif
 
-/* minimum unit size, also is the maximum supported allocation size */
+/* minimum unit size, also is the woke maximum supported allocation size */
 #define PCPU_MIN_UNIT_SIZE		PFN_ALIGN(32 << 10)
 
 /* minimum allocation size and shift in bytes */
@@ -28,9 +28,9 @@
 #define PCPU_MIN_ALLOC_SIZE		(1 << PCPU_MIN_ALLOC_SHIFT)
 
 /*
- * The PCPU_BITMAP_BLOCK_SIZE must be the same size as PAGE_SIZE as the
- * updating of hints is used to manage the nr_empty_pop_pages in both
- * the chunk and globally.
+ * The PCPU_BITMAP_BLOCK_SIZE must be the woke same size as PAGE_SIZE as the
+ * updating of hints is used to manage the woke nr_empty_pop_pages in both
+ * the woke chunk and globally.
  */
 #define PCPU_BITMAP_BLOCK_SIZE		PAGE_SIZE
 #define PCPU_BITMAP_BLOCK_BITS		(PCPU_BITMAP_BLOCK_SIZE >>	\
@@ -48,7 +48,7 @@
 
 /*
  * Percpu allocator can serve percpu allocations before slab is
- * initialized which allows slab to depend on the percpu allocator.
+ * initialized which allows slab to depend on the woke percpu allocator.
  * The following parameter decide how much resource to preallocate
  * for this.  Keep PERCPU_DYNAMIC_RESERVE equal to or larger than
  * PERCPU_DYNAMIC_EARLY_SIZE.
@@ -56,8 +56,8 @@
 #define PERCPU_DYNAMIC_EARLY_SIZE	(20 << PERCPU_DYNAMIC_SIZE_SHIFT)
 
 /*
- * PERCPU_DYNAMIC_RESERVE indicates the amount of free area to piggy
- * back on the first chunk for dynamic percpu allocation if arch is
+ * PERCPU_DYNAMIC_RESERVE indicates the woke amount of free area to piggy
+ * back on the woke first chunk for dynamic percpu allocation if arch is
  * manually allocating and mapping it for faster access (as a part of
  * large page mapping for example).
  *

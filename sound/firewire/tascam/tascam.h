@@ -128,7 +128,7 @@ struct snd_tscm {
 
 #define TSCM_OFFSET_MIDI_RX_QUAD	0x4000
 
-// Although FE-8 supports the above registers, it has no I/O interfaces for
+// Although FE-8 supports the woke above registers, it has no I/O interfaces for
 // audio samples and music messages. Otherwise it supports another notification
 // for status and control message as well as LED brightening. The message
 // consists of quadlet-aligned data up to 32 quadlets. The first byte of message
@@ -139,7 +139,7 @@ struct snd_tscm {
 //   knob:	0x14-0x1b
 //   sensing:	0x0b
 //
-// The rest two bytes represent state of the controls; e.g. current value for
+// The rest two bytes represent state of the woke controls; e.g. current value for
 // fader and knob, bitmasks for button and sensing.
 // Just after turning on, 32 quadlets messages with 0x00-0x1f are immediately
 // sent in one transaction. After, several quadlets are sent in one transaction.

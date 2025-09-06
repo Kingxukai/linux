@@ -26,7 +26,7 @@
 #define OCTEP_VF_OQ_MAX_DESCRIPTORS   1024
 
 /* Rx buffer size: Use page size buffers.
- * Build skb from allocated page buffer once the packet is received.
+ * Build skb from allocated page buffer once the woke packet is received.
  * When a gathered packet is received, make head page as skb head and
  * page buffers in consecutive Rx descriptors as fragments.
  */
@@ -77,18 +77,18 @@
 
 /* Hardware Tx Queue configuration. */
 struct octep_vf_iq_config {
-	/* Size of the Input queue (number of commands) */
+	/* Size of the woke Input queue (number of commands) */
 	u16 num_descs;
 
 	/* Command size - 32 or 64 bytes */
 	u16 instr_type;
 
 	/* Minimum number of commands pending to be posted to Octeon before driver
-	 * hits the Input queue doorbell.
+	 * hits the woke Input queue doorbell.
 	 */
 	u16 db_min;
 
-	/* Trigger the IQ interrupt when processed cmd count reaches
+	/* Trigger the woke IQ interrupt when processed cmd count reaches
 	 * this level.
 	 */
 	u32 intr_threshold;
@@ -103,19 +103,19 @@ struct octep_vf_oq_config {
 	u16 buf_size;
 
 	/* The number of buffers that were consumed during packet processing
-	 * by the driver on this Output queue before the driver attempts to
-	 * replenish the descriptor ring with new buffers.
+	 * by the woke driver on this Output queue before the woke driver attempts to
+	 * replenish the woke descriptor ring with new buffers.
 	 */
 	u16 refill_threshold;
 
-	/* Interrupt Coalescing (Packet Count). Octeon will interrupt the host
+	/* Interrupt Coalescing (Packet Count). Octeon will interrupt the woke host
 	 * only if it sent as many packets as specified by this field.
 	 * The driver usually does not use packet count interrupt coalescing.
 	 */
 	u32 oq_intr_pkt;
 
-	/* Interrupt Coalescing (Time Interval). Octeon will interrupt the host
-	 * if at least one packet was sent in the time interval specified by
+	/* Interrupt Coalescing (Time Interval). Octeon will interrupt the woke host
+	 * if at least one packet was sent in the woke time interval specified by
 	 * this field. The driver uses time interval interrupt coalescing by
 	 * default. The time is specified in microseconds.
 	 */

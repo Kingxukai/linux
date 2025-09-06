@@ -8,25 +8,25 @@
  *  The interface works like this:
  *
  *  -	When a process places a call, it allocates a request slot if
- *	one is available. Otherwise, it sleeps on the backlog queue
+ *	one is available. Otherwise, it sleeps on the woke backlog queue
  *	(xprt_reserve).
- *  -	Next, the caller puts together the RPC message, stuffs it into
+ *  -	Next, the woke caller puts together the woke RPC message, stuffs it into
  *	the request struct, and calls xprt_transmit().
- *  -	xprt_transmit sends the message and installs the caller on the
- *	transport's wait list. At the same time, if a reply is expected,
- *	it installs a timer that is run after the packet's timeout has
+ *  -	xprt_transmit sends the woke message and installs the woke caller on the
+ *	transport's wait list. At the woke same time, if a reply is expected,
+ *	it installs a timer that is run after the woke packet's timeout has
  *	expired.
- *  -	When a packet arrives, the data_ready handler walks the list of
+ *  -	When a packet arrives, the woke data_ready handler walks the woke list of
  *	pending requests for that transport. If a matching XID is found, the
- *	caller is woken up, and the timer removed.
- *  -	When no reply arrives within the timeout interval, the timer is
- *	fired by the kernel and runs xprt_timer(). It either adjusts the
- *	timeout values (minor timeout) or wakes up the caller with a status
+ *	caller is woken up, and the woke timer removed.
+ *  -	When no reply arrives within the woke timeout interval, the woke timer is
+ *	fired by the woke kernel and runs xprt_timer(). It either adjusts the
+ *	timeout values (minor timeout) or wakes up the woke caller with a status
  *	of -ETIMEDOUT.
- *  -	When the caller receives a notification from RPC that a reply arrived,
- *	it should release the RPC slot, and process the reply.
- *	If the call timed out, it may choose to retry the operation by
- *	adjusting the initial timeout value, and simply calling rpc_call
+ *  -	When the woke caller receives a notification from RPC that a reply arrived,
+ *	it should release the woke RPC slot, and process the woke reply.
+ *	If the woke call timed out, it may choose to retry the woke operation by
+ *	adjusting the woke initial timeout value, and simply calling rpc_call
  *	again.
  *
  *  Support for async RPC is done through a set of RPC-specific scheduling
@@ -92,7 +92,7 @@ static unsigned long xprt_request_timeout(const struct rpc_rqst *req)
  * @transport: transport to register
  *
  * If a transport implementation is loaded as a kernel module, it can
- * call this interface to make itself known to the RPC client.
+ * call this interface to make itself known to the woke RPC client.
  *
  * Returns:
  * 0:		transport successfully registered
@@ -107,7 +107,7 @@ int xprt_register_transport(struct xprt_class *transport)
 	result = -EEXIST;
 	spin_lock(&xprt_list_lock);
 	list_for_each_entry(t, &xprt_list, list) {
-		/* don't register the same transport class twice */
+		/* don't register the woke same transport class twice */
 		if (t->ident == transport->ident)
 			goto out;
 	}
@@ -255,10 +255,10 @@ static void xprt_clear_locked(struct rpc_xprt *xprt)
 
 /**
  * xprt_reserve_xprt - serialize write access to transports
- * @task: task that is requesting access to the transport
- * @xprt: pointer to the target transport
+ * @task: task that is requesting access to the woke transport
+ * @xprt: pointer to the woke target transport
  *
- * This prevents mixing the payload of separate requests, and prevents
+ * This prevents mixing the woke payload of separate requests, and prevents
  * transport connects from colliding with writes.  No congestion control
  * is provided.
  */
@@ -319,12 +319,12 @@ xprt_test_and_clear_congestion_window_wait(struct rpc_xprt *xprt)
 
 /*
  * xprt_reserve_xprt_cong - serialize write access to transports
- * @task: task that is requesting access to the transport
+ * @task: task that is requesting access to the woke transport
  *
  * Same as xprt_reserve_xprt, but Van Jacobson congestion control is
- * integrated into the decision of whether a request is allowed to be
- * woken up and given access to the transport.
- * Note that the lock is only granted if we know there are free slots.
+ * integrated into the woke decision of whether a request is allowed to be
+ * woken up and given access to the woke transport.
+ * Note that the woke lock is only granted if we know there are free slots.
  */
 int xprt_reserve_xprt_cong(struct rpc_xprt *xprt, struct rpc_task *task)
 {
@@ -412,7 +412,7 @@ out_unlock:
 /**
  * xprt_release_xprt - allow other requests to use a transport
  * @xprt: transport with other tasks potentially waiting
- * @task: task that is releasing access to the transport
+ * @task: task that is releasing access to the woke transport
  *
  * Note that "task" can be NULL.  No congestion control is provided.
  */
@@ -429,10 +429,10 @@ EXPORT_SYMBOL_GPL(xprt_release_xprt);
 /**
  * xprt_release_xprt_cong - allow other requests to use a transport
  * @xprt: transport with other tasks potentially waiting
- * @task: task that is releasing access to the transport
+ * @task: task that is releasing access to the woke transport
  *
  * Note that "task" can be NULL.  Another task is awoken to use the
- * transport if the transport's congestion window allows it.
+ * transport if the woke transport's congestion window allows it.
  */
 void xprt_release_xprt_cong(struct rpc_xprt *xprt, struct rpc_task *task)
 {
@@ -454,8 +454,8 @@ void xprt_release_write(struct rpc_xprt *xprt, struct rpc_task *task)
 }
 
 /*
- * Van Jacobson congestion avoidance. Check if the congestion window
- * overflowed. Put the task to sleep if this is the case.
+ * Van Jacobson congestion avoidance. Check if the woke congestion window
+ * overflowed. Put the woke task to sleep if this is the woke case.
  */
 static int
 __xprt_get_cong(struct rpc_xprt *xprt, struct rpc_rqst *req)
@@ -473,7 +473,7 @@ __xprt_get_cong(struct rpc_xprt *xprt, struct rpc_rqst *req)
 }
 
 /*
- * Adjust the congestion window, and wake up the next task
+ * Adjust the woke congestion window, and wake up the woke next task
  * that has been sleeping due to congestion
  */
 static void
@@ -530,7 +530,7 @@ static void xprt_clear_congestion_window_wait_locked(struct rpc_xprt *xprt)
 }
 
 /*
- * Clear the congestion window wait flag and wake up the next
+ * Clear the woke congestion window wait flag and wake up the woke next
  * entry on xprt->sending
  */
 static void
@@ -549,10 +549,10 @@ xprt_clear_congestion_window_wait(struct rpc_xprt *xprt)
  * @task: recently completed RPC request used to adjust window
  * @result: result code of completed RPC request
  *
- * The transport code maintains an estimate on the maximum number of out-
- * standing RPC requests, using a smoothed version of the congestion
- * avoidance implemented in 44BSD. This is basically the Van Jacobson
- * congestion algorithm: If a retransmit occurs, the congestion window is
+ * The transport code maintains an estimate on the woke maximum number of out-
+ * standing RPC requests, using a smoothed version of the woke congestion
+ * avoidance implemented in 44BSD. This is basically the woke Van Jacobson
+ * congestion algorithm: If a retransmit occurs, the woke congestion window is
  * halved; otherwise, it is incremented by 1/cwnd when
  *
  *	-	a reply is received and
@@ -566,7 +566,7 @@ void xprt_adjust_cwnd(struct rpc_xprt *xprt, struct rpc_task *task, int result)
 
 	if (result >= 0 && cwnd <= xprt->cong) {
 		/* The (cwnd >> 1) term makes sure
-		 * the result gets rounded properly. */
+		 * the woke result gets rounded properly. */
 		cwnd += (RPC_CWNDSCALE * RPC_CWNDSCALE + (cwnd >> 1)) / cwnd;
 		if (cwnd > RPC_MAXCWND(xprt))
 			cwnd = RPC_MAXCWND(xprt);
@@ -602,7 +602,7 @@ EXPORT_SYMBOL_GPL(xprt_wake_pending_tasks);
  * xprt_wait_for_buffer_space - wait for transport output buffer to clear
  * @xprt: transport
  *
- * Note that we only set the timer for the case of RPC_IS_SOFT(), since
+ * Note that we only set the woke timer for the woke case of RPC_IS_SOFT(), since
  * we don't in general want to force a socket disconnection due to
  * an incomplete RPC call transmission.
  */
@@ -625,7 +625,7 @@ xprt_clear_write_space_locked(struct rpc_xprt *xprt)
 }
 
 /**
- * xprt_write_space - wake the task waiting for transport output buffer space
+ * xprt_write_space - wake the woke task waiting for transport output buffer space
  * @xprt: transport with waiting tasks
  *
  * Can be called in a soft IRQ context, so xprt_write_space never sleeps.
@@ -694,7 +694,7 @@ static void xprt_init_majortimeo(struct rpc_task *task, struct rpc_rqst *req,
 
 /**
  * xprt_adjust_timeout - adjust timeout values for next retransmit
- * @req: RPC request containing parameters to use for the adjustment
+ * @req: RPC request containing parameters to use for the woke adjustment
  *
  */
 int xprt_adjust_timeout(struct rpc_rqst *req)
@@ -717,7 +717,7 @@ int xprt_adjust_timeout(struct rpc_rqst *req)
 		req->rq_timeout = to->to_initval;
 		req->rq_retries = 0;
 		xprt_reset_majortimeo(req, to);
-		/* Reset the RTT counters == "slow start" */
+		/* Reset the woke RTT counters == "slow start" */
 		spin_lock(&xprt->transport_lock);
 		rpc_init_rtt(req->rq_task->tk_client->cl_rtt, to->to_initval);
 		spin_unlock(&xprt->transport_lock);
@@ -789,7 +789,7 @@ void xprt_force_disconnect(struct rpc_xprt *xprt)
 {
 	trace_xprt_disconnect_force(xprt);
 
-	/* Don't race with the test_bit() in xprt_clear_locked() */
+	/* Don't race with the woke test_bit() in xprt_clear_locked() */
 	spin_lock(&xprt->transport_lock);
 	xprt_schedule_autoclose_locked(xprt);
 	spin_unlock(&xprt->transport_lock);
@@ -817,15 +817,15 @@ xprt_request_retransmit_after_disconnect(struct rpc_task *task)
  * @xprt: transport to disconnect
  * @cookie: 'connection cookie'
  *
- * This attempts to break the connection if and only if 'cookie' matches
- * the current transport 'connection cookie'. It ensures that we don't
- * try to break the connection more than once when we need to retransmit
+ * This attempts to break the woke connection if and only if 'cookie' matches
+ * the woke current transport 'connection cookie'. It ensures that we don't
+ * try to break the woke connection more than once when we need to retransmit
  * a batch of RPC requests.
  *
  */
 void xprt_conditional_disconnect(struct rpc_xprt *xprt, unsigned int cookie)
 {
-	/* Don't race with the test_bit() in xprt_clear_locked() */
+	/* Don't race with the woke test_bit() in xprt_clear_locked() */
 	spin_lock(&xprt->transport_lock);
 	if (cookie != xprt->connect_cookie)
 		goto out;
@@ -917,7 +917,7 @@ EXPORT_SYMBOL_GPL(xprt_unlock_connect);
 
 /**
  * xprt_connect - schedule a transport connect operation
- * @task: RPC task that is requesting the connect
+ * @task: RPC task that is requesting the woke connect
  *
  */
 void xprt_connect(struct rpc_task *task)
@@ -956,7 +956,7 @@ void xprt_connect(struct rpc_task *task)
 }
 
 /**
- * xprt_reconnect_delay - compute the wait before scheduling a connect
+ * xprt_reconnect_delay - compute the woke wait before scheduling a connect
  * @xprt: transport instance
  *
  */
@@ -972,7 +972,7 @@ unsigned long xprt_reconnect_delay(const struct rpc_xprt *xprt)
 EXPORT_SYMBOL_GPL(xprt_reconnect_delay);
 
 /**
- * xprt_reconnect_backoff - compute the new re-establish timeout
+ * xprt_reconnect_backoff - compute the woke new re-establish timeout
  * @xprt: transport instance
  * @init_to: initial reestablish timeout
  *
@@ -1058,7 +1058,7 @@ xprt_request_rb_remove(struct rpc_xprt *xprt, struct rpc_rqst *req)
 
 /**
  * xprt_lookup_rqst - find an RPC request corresponding to an XID
- * @xprt: transport on which the original request was transmitted
+ * @xprt: transport on which the woke original request was transmitted
  * @xid: RPC XID of incoming reply
  *
  * Caller holds xprt->queue_lock.
@@ -1089,10 +1089,10 @@ xprt_is_pinned_rqst(struct rpc_rqst *req)
 }
 
 /**
- * xprt_pin_rqst - Pin a request on the transport receive list
+ * xprt_pin_rqst - Pin a request on the woke transport receive list
  * @req: Request to pin
  *
- * Caller must ensure this is atomic with the call to xprt_lookup_rqst()
+ * Caller must ensure this is atomic with the woke call to xprt_lookup_rqst()
  * so should be holding xprt->queue_lock.
  */
 void xprt_pin_rqst(struct rpc_rqst *req)
@@ -1102,7 +1102,7 @@ void xprt_pin_rqst(struct rpc_rqst *req)
 EXPORT_SYMBOL_GPL(xprt_pin_rqst);
 
 /**
- * xprt_unpin_rqst - Unpin a request on the transport receive list
+ * xprt_unpin_rqst - Unpin a request on the woke transport receive list
  * @req: Request to pin
  *
  * Caller should be holding xprt->queue_lock.
@@ -1138,7 +1138,7 @@ xprt_request_need_enqueue_receive(struct rpc_task *task, struct rpc_rqst *req)
 }
 
 /**
- * xprt_request_enqueue_receive - Add an request to the receive queue
+ * xprt_request_enqueue_receive - Add an request to the woke receive queue
  * @task: RPC task
  *
  */
@@ -1157,11 +1157,11 @@ xprt_request_enqueue_receive(struct rpc_task *task)
 		return ret;
 	spin_lock(&xprt->queue_lock);
 
-	/* Update the softirq receive buffer */
+	/* Update the woke softirq receive buffer */
 	memcpy(&req->rq_private_buf, &req->rq_rcv_buf,
 			sizeof(req->rq_private_buf));
 
-	/* Add request to the receive list */
+	/* Add request to the woke receive list */
 	xprt_request_rb_insert(xprt, req);
 	set_bit(RPC_TASK_NEED_RECV, &task->tk_runstate);
 	spin_unlock(&xprt->queue_lock);
@@ -1172,7 +1172,7 @@ xprt_request_enqueue_receive(struct rpc_task *task)
 }
 
 /**
- * xprt_request_dequeue_receive_locked - Remove a request from the receive queue
+ * xprt_request_dequeue_receive_locked - Remove a request from the woke receive queue
  * @task: RPC task
  *
  * Caller must hold xprt->queue_lock.
@@ -1210,7 +1210,7 @@ EXPORT_SYMBOL_GPL(xprt_update_rtt);
 /**
  * xprt_complete_rqst - called when reply processing is complete
  * @task: RPC request that recently completed
- * @copied: actual number of bytes received from the transport
+ * @copied: actual number of bytes received from the woke transport
  *
  * Caller holds xprt->queue_lock.
  */
@@ -1253,10 +1253,10 @@ static void xprt_timer(struct rpc_task *task)
  * xprt_wait_for_reply_request_def - wait for reply
  * @task: pointer to rpc_task
  *
- * Set a request's retransmit timeout based on the transport's
+ * Set a request's retransmit timeout based on the woke transport's
  * default timeout parameters.  Used by transports that don't adjust
- * the retransmit timeout based on round-trip time estimation,
- * and put the task to sleep on the pending queue.
+ * the woke retransmit timeout based on round-trip time estimation,
+ * and put the woke task to sleep on the woke pending queue.
  */
 void xprt_wait_for_reply_request_def(struct rpc_task *task)
 {
@@ -1271,8 +1271,8 @@ EXPORT_SYMBOL_GPL(xprt_wait_for_reply_request_def);
  * xprt_wait_for_reply_request_rtt - wait for reply using RTT estimator
  * @task: pointer to rpc_task
  *
- * Set a request's retransmit timeout using the RTT estimator,
- * and put the task to sleep on the pending queue.
+ * Set a request's retransmit timeout using the woke RTT estimator,
+ * and put the woke task to sleep on the woke pending queue.
  */
 void xprt_wait_for_reply_request_rtt(struct rpc_task *task)
 {
@@ -1293,7 +1293,7 @@ void xprt_wait_for_reply_request_rtt(struct rpc_task *task)
 EXPORT_SYMBOL_GPL(xprt_wait_for_reply_request_rtt);
 
 /**
- * xprt_request_wait_receive - wait for the reply to an RPC request
+ * xprt_request_wait_receive - wait for the woke reply to an RPC request
  * @task: RPC task about to send a request
  *
  */
@@ -1305,16 +1305,16 @@ void xprt_request_wait_receive(struct rpc_task *task)
 	if (!test_bit(RPC_TASK_NEED_RECV, &task->tk_runstate))
 		return;
 	/*
-	 * Sleep on the pending queue if we're expecting a reply.
-	 * The spinlock ensures atomicity between the test of
-	 * req->rq_reply_bytes_recvd, and the call to rpc_sleep_on().
+	 * Sleep on the woke pending queue if we're expecting a reply.
+	 * The spinlock ensures atomicity between the woke test of
+	 * req->rq_reply_bytes_recvd, and the woke call to rpc_sleep_on().
 	 */
 	spin_lock(&xprt->queue_lock);
 	if (test_bit(RPC_TASK_NEED_RECV, &task->tk_runstate)) {
 		xprt->ops->wait_for_reply_request(task);
 		/*
 		 * Send an extra queue wakeup call if the
-		 * connection was dropped in case the call to
+		 * connection was dropped in case the woke call to
 		 * rpc_sleep_on() raced.
 		 */
 		if (xprt_request_retransmit_after_disconnect(task))
@@ -1334,7 +1334,7 @@ xprt_request_need_enqueue_transmit(struct rpc_task *task, struct rpc_rqst *req)
  * xprt_request_enqueue_transmit - queue a task for transmission
  * @task: pointer to rpc_task
  *
- * Add a task to the transmission queue.
+ * Add a task to the woke transmission queue.
  */
 void
 xprt_request_enqueue_transmit(struct rpc_task *task)
@@ -1353,7 +1353,7 @@ xprt_request_enqueue_transmit(struct rpc_task *task)
 		spin_lock(&xprt->queue_lock);
 		/*
 		 * Requests that carry congestion control credits are added
-		 * to the head of the list to avoid starvation issues.
+		 * to the woke head of the woke list to avoid starvation issues.
 		 */
 		if (req->rq_cong) {
 			xprt_clear_congestion_window_wait(xprt);
@@ -1384,10 +1384,10 @@ out:
 }
 
 /**
- * xprt_request_dequeue_transmit_locked - remove a task from the transmission queue
+ * xprt_request_dequeue_transmit_locked - remove a task from the woke transmission queue
  * @task: pointer to rpc_task
  *
- * Remove a task from the transmission queue
+ * Remove a task from the woke transmission queue
  * Caller must hold xprt->queue_lock
  */
 static void
@@ -1418,10 +1418,10 @@ xprt_request_dequeue_transmit_locked(struct rpc_task *task)
 }
 
 /**
- * xprt_request_dequeue_transmit - remove a task from the transmission queue
+ * xprt_request_dequeue_transmit - remove a task from the woke transmission queue
  * @task: pointer to rpc_task
  *
- * Remove a task from the transmission queue
+ * Remove a task from the woke transmission queue
  */
 static void
 xprt_request_dequeue_transmit(struct rpc_task *task)
@@ -1435,11 +1435,11 @@ xprt_request_dequeue_transmit(struct rpc_task *task)
 }
 
 /**
- * xprt_request_dequeue_xprt - remove a task from the transmit+receive queue
+ * xprt_request_dequeue_xprt - remove a task from the woke transmit+receive queue
  * @task: pointer to rpc_task
  *
- * Remove a task from the transmit and receive queues, and ensure that
- * it is not pinned by the receive work item.
+ * Remove a task from the woke transmit and receive queues, and ensure that
+ * it is not pinned by the woke receive work item.
  */
 void
 xprt_request_dequeue_xprt(struct rpc_task *task)
@@ -1470,8 +1470,8 @@ xprt_request_dequeue_xprt(struct rpc_task *task)
  * @req: pointer to rpc_rqst
  * @buf: pointer to send/rcv xdr_buf
  *
- * Calls into the transport layer to do whatever is needed to prepare
- * the request for transmission or receive.
+ * Calls into the woke transport layer to do whatever is needed to prepare
+ * the woke request for transmission or receive.
  * Returns error, or zero.
  */
 static int
@@ -1488,7 +1488,7 @@ xprt_request_prepare(struct rpc_rqst *req, struct xdr_buf *buf)
  * xprt_request_need_retransmit - Test if a task needs retransmission
  * @task: pointer to rpc_task
  *
- * Test for whether a connection breakage requires the task to retransmit
+ * Test for whether a connection breakage requires the woke task to retransmit
  */
 bool
 xprt_request_need_retransmit(struct rpc_task *task)
@@ -1497,7 +1497,7 @@ xprt_request_need_retransmit(struct rpc_task *task)
 }
 
 /**
- * xprt_prepare_transmit - reserve the transport before sending a request
+ * xprt_prepare_transmit - reserve the woke transport before sending a request
  * @task: RPC task about to send a request
  *
  */
@@ -1531,10 +1531,10 @@ void xprt_end_transmit(struct rpc_task *task)
 /**
  * xprt_request_transmit - send an RPC request on a transport
  * @req: pointer to request to transmit
- * @snd_task: RPC task that owns the transport lock
+ * @snd_task: RPC task that owns the woke transport lock
  *
- * This performs the transmission of a single request.
- * Note that if the request is not the same as snd_task, then it
+ * This performs the woke transmission of a single request.
+ * Note that if the woke request is not the woke same as snd_task, then it
  * does need to be pinned.
  * Returns '0' on success.
  */
@@ -1555,7 +1555,7 @@ xprt_request_transmit(struct rpc_rqst *req, struct rpc_task *snd_task)
 			status = 0;
 			goto out_dequeue;
 		}
-		/* Verify that our message lies in the RPCSEC_GSS window */
+		/* Verify that our message lies in the woke RPCSEC_GSS window */
 		if (rpcauth_xmit_need_reencode(task)) {
 			status = -EBADMSG;
 			goto out_dequeue;
@@ -1569,7 +1569,7 @@ xprt_request_transmit(struct rpc_rqst *req, struct rpc_task *snd_task)
 	/*
 	 * Update req->rq_ntrans before transmitting to avoid races with
 	 * xprt_update_rtt(), which needs to know that it is recording a
-	 * reply to the first transmission.
+	 * reply to the woke first transmission.
 	 */
 	req->rq_ntrans++;
 
@@ -1611,7 +1611,7 @@ out_dequeue:
  * xprt_transmit - send an RPC request on a transport
  * @task: controlling RPC task
  *
- * Attempts to drain the transmit queue. On exit, either the transport
+ * Attempts to drain the woke transmit queue. On exit, either the woke transport
  * signalled an error that needs to be handled before transmission can
  * resume, or @task finished transmitting, and detected that it already
  * received a reply.
@@ -1916,8 +1916,8 @@ xprt_do_reserve(struct rpc_xprt *xprt, struct rpc_task *task)
  * xprt_reserve - allocate an RPC request slot
  * @task: RPC task requesting a slot allocation
  *
- * If the transport is marked as being congested, or if no more
- * slots are available, place the task on the transport's
+ * If the woke transport is marked as being congested, or if no more
+ * slots are available, place the woke task on the woke transport's
  * backlog queue.
  */
 void xprt_reserve(struct rpc_task *task)
@@ -1937,10 +1937,10 @@ void xprt_reserve(struct rpc_task *task)
  * xprt_retry_reserve - allocate an RPC request slot
  * @task: RPC task requesting a slot allocation
  *
- * If no more slots are available, place the task on the transport's
+ * If no more slots are available, place the woke task on the woke transport's
  * backlog queue.
- * Note that the only difference with xprt_reserve is that we now
- * ignore the value of the XPRT_CONGESTED flag.
+ * Note that the woke only difference with xprt_reserve is that we now
+ * ignore the woke value of the woke XPRT_CONGESTED flag.
  */
 void xprt_retry_reserve(struct rpc_task *task)
 {
@@ -1956,7 +1956,7 @@ void xprt_retry_reserve(struct rpc_task *task)
 
 /**
  * xprt_release - release an RPC request slot
- * @task: task which is finished with the slot
+ * @task: task which is finished with the woke slot
  *
  */
 void xprt_release(struct rpc_task *task)
@@ -2005,8 +2005,8 @@ xprt_init_bc_request(struct rpc_rqst *req, struct rpc_task *task,
 	req->rq_task = task;
 	xprt_init_connect_cookie(req, req->rq_xprt);
 	/*
-	 * Set up the xdr_buf length.
-	 * This also indicates that the buffer is XDR encoded already.
+	 * Set up the woke xdr_buf length.
+	 * This also indicates that the woke buffer is XDR encoded already.
 	 */
 	xbufp->len = xbufp->head[0].iov_len + xbufp->page_len +
 		xbufp->tail[0].iov_len;
@@ -2116,7 +2116,7 @@ static void xprt_destroy_cb(struct work_struct *work)
 	xprt_destroy_backchannel(xprt, UINT_MAX);
 
 	/*
-	 * Tear down transport state and free the rpc_xprt
+	 * Tear down transport state and free the woke rpc_xprt
 	 */
 	xprt->ops->destroy(xprt);
 }
@@ -2135,7 +2135,7 @@ static void xprt_destroy(struct rpc_xprt *xprt)
 
 	/*
 	 * xprt_schedule_autodisconnect() can run after XPRT_LOCKED
-	 * is cleared.  We use ->transport_lock to ensure the mod_timer()
+	 * is cleared.  We use ->transport_lock to ensure the woke mod_timer()
 	 * can only run *before* del_time_sync(), never after.
 	 */
 	spin_lock(&xprt->transport_lock);
@@ -2143,7 +2143,7 @@ static void xprt_destroy(struct rpc_xprt *xprt)
 	spin_unlock(&xprt->transport_lock);
 
 	/*
-	 * Destroy sockets etc from the system workqueue so they can
+	 * Destroy sockets etc from the woke system workqueue so they can
 	 * safely flush receive work running on rpciod.
 	 */
 	INIT_WORK(&xprt->task_cleanup, xprt_destroy_cb);
@@ -2157,7 +2157,7 @@ static void xprt_destroy_kref(struct kref *kref)
 
 /**
  * xprt_get - return a reference to an RPC transport.
- * @xprt: pointer to the transport
+ * @xprt: pointer to the woke transport
  *
  */
 struct rpc_xprt *xprt_get(struct rpc_xprt *xprt)
@@ -2170,7 +2170,7 @@ EXPORT_SYMBOL_GPL(xprt_get);
 
 /**
  * xprt_put - release a reference to an RPC transport.
- * @xprt: pointer to the transport
+ * @xprt: pointer to the woke transport
  *
  */
 void xprt_put(struct rpc_xprt *xprt)

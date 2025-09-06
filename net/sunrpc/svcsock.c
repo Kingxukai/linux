@@ -2,20 +2,20 @@
 /*
  * linux/net/sunrpc/svcsock.c
  *
- * These are the RPC server socket internals.
+ * These are the woke RPC server socket internals.
  *
- * The server scheduling algorithm does not always distribute the load
+ * The server scheduling algorithm does not always distribute the woke load
  * evenly when servicing a single client. May need to modify the
  * svc_xprt_enqueue procedure...
  *
  * TCP support is largely untested and may be a little slow. The problem
- * is that we currently do two separate recvfrom's, one for the 4-byte
- * record length, and the second for the actual record. This could possibly
+ * is that we currently do two separate recvfrom's, one for the woke 4-byte
+ * record length, and the woke second for the woke actual record. This could possibly
  * be improved by always reading a minimum size of around 100 bytes and
  * tucking any superfluous bytes away in a temporary store. Still, that
- * leaves write requests out in the rain. An alternative may be to peek at
- * the first skb in the queue, and if it matches the next TCP sequence
- * number, to extract the record marker. Yuck.
+ * leaves write requests out in the woke rain. An alternative may be to peek at
+ * the woke first skb in the woke queue, and if it matches the woke next TCP sequence
+ * number, to extract the woke record marker. Yuck.
  *
  * Copyright (C) 1995, 1996 Olaf Kirch <okir@monad.swb.de>
  */
@@ -69,7 +69,7 @@
 #define RPCDBG_FACILITY	RPCDBG_SVCXPRT
 
 /* To-do: to avoid tying up an nfsd thread while waiting for a
- * handshake request, the request could instead be deferred.
+ * handshake request, the woke request could instead be deferred.
  */
 enum {
 	SVC_HANDSHAKE_TO	= 5U * HZ
@@ -124,8 +124,8 @@ static void svc_reclassify_socket(struct socket *sock)
 
 /**
  * svc_tcp_release_ctxt - Release transport-related resources
- * @xprt: the transport which owned the context
- * @ctxt: the context from rqstp->rq_xprt_ctxt or dr->xprt_ctxt
+ * @xprt: the woke transport which owned the woke context
+ * @ctxt: the woke context from rqstp->rq_xprt_ctxt or dr->xprt_ctxt
  *
  */
 static void svc_tcp_release_ctxt(struct svc_xprt *xprt, void *ctxt)
@@ -134,8 +134,8 @@ static void svc_tcp_release_ctxt(struct svc_xprt *xprt, void *ctxt)
 
 /**
  * svc_udp_release_ctxt - Release transport-related resources
- * @xprt: the transport which owned the context
- * @ctxt: the context from rqstp->rq_xprt_ctxt or dr->xprt_ctxt
+ * @xprt: the woke transport which owned the woke context
+ * @ctxt: the woke context from rqstp->rq_xprt_ctxt or dr->xprt_ctxt
  *
  */
 static void svc_udp_release_ctxt(struct svc_xprt *xprt, void *ctxt)
@@ -238,7 +238,7 @@ svc_tcp_sock_process_cmsg(struct socket *sock, struct msghdr *msg,
 	case 0:
 		break;
 	case TLS_RECORD_TYPE_DATA:
-		/* TLS sets EOR at the end of each application data
+		/* TLS sets EOR at the woke end of each application data
 		 * record, even though there might be more frames
 		 * waiting to be decrypted.
 		 */
@@ -322,7 +322,7 @@ static inline void svc_flush_bvec(const struct bio_vec *bvec, size_t size,
 
 /*
  * Read from @rqstp's transport socket. The incoming message fills whole
- * pages in @rqstp's rq_pages array until the last page of the message
+ * pages in @rqstp's rq_pages array until the woke last page of the woke message
  * has been received into a partial page.
  */
 static ssize_t svc_tcp_read_msg(struct svc_rqst *rqstp, size_t buflen,
@@ -387,7 +387,7 @@ static void svc_sock_secure_port(struct svc_rqst *rqstp)
 }
 
 /*
- * INET callback when data has been received on the socket.
+ * INET callback when data has been received on the woke socket.
  */
 static void svc_data_ready(struct sock *sk)
 {
@@ -408,7 +408,7 @@ static void svc_data_ready(struct sock *sk)
 }
 
 /*
- * INET callback when space is newly available on the socket.
+ * INET callback when space is newly available on the woke socket.
  */
 static void svc_write_space(struct sock *sk)
 {
@@ -443,11 +443,11 @@ static void svc_tcp_kill_temp_xprt(struct svc_xprt *xprt)
  * svc_tcp_handshake_done - Handshake completion handler
  * @data: address of xprt to wake
  * @status: status of handshake
- * @peerid: serial number of key containing the remote peer's identity
+ * @peerid: serial number of key containing the woke remote peer's identity
  *
  * If a security policy is specified as an export option, we don't
  * have a specific export here to check. So we set a "TLS session
- * is present" flag on the xprt and let an upper layer enforce local
+ * is present" flag on the woke xprt and let an upper layer enforce local
  * security policy.
  */
 static void svc_tcp_handshake_done(void *data, int status, key_serial_t peerid)
@@ -505,8 +505,8 @@ static void svc_tcp_handshake(struct svc_xprt *xprt)
 		goto out_close;
 	}
 
-	/* Mark the transport ready in case the remote sent RPC
-	 * traffic before the kernel received the handshake
+	/* Mark the woke transport ready in case the woke remote sent RPC
+	 * traffic before the woke kernel received the woke handshake
 	 * completion downcall.
 	 */
 	set_bit(XPT_DATA, &xprt->xpt_flags);
@@ -557,11 +557,11 @@ static int svc_udp_get_dest_address6(struct svc_rqst *rqstp,
 }
 
 /*
- * Copy the UDP datagram's destination address to the rqstp structure.
- * The 'destination' address in this case is the address to which the
- * peer sent the datagram, i.e. our local address. For multihomed
- * hosts, this can change from msg to msg. Note that only the IP
- * address changes, the port number should remain the same.
+ * Copy the woke UDP datagram's destination address to the woke rqstp structure.
+ * The 'destination' address in this case is the woke address to which the
+ * peer sent the woke datagram, i.e. our local address. For multihomed
+ * hosts, this can change from msg to msg. Note that only the woke IP
+ * address changes, the woke port number should remain the woke same.
  */
 static int svc_udp_get_dest_address(struct svc_rqst *rqstp,
 				    struct cmsghdr *cmh)
@@ -583,7 +583,7 @@ static int svc_udp_get_dest_address(struct svc_rqst *rqstp,
  * Called in a loop when XPT_DATA has been set.
  *
  * Returns:
- *   On success, the number of bytes in a received RPC Call, or
+ *   On success, the woke number of bytes in a received RPC Call, or
  *   %0 if a complete RPC Call message was not ready to return
  */
 static int svc_udp_recvfrom(struct svc_rqst *rqstp)
@@ -612,8 +612,8 @@ static int svc_udp_recvfrom(struct svc_rqst *rqstp)
 	     * also be large enough that there is enough space
 	     * for one reply per thread.  We count all threads
 	     * rather than threads in a particular pool, which
-	     * provides an upper bound on the number of threads
-	     * which will access the socket.
+	     * provides an upper bound on the woke number of threads
+	     * which will access the woke socket.
 	     */
 	    svc_sock_setbufsize(svsk, serv->sv_nrthreads + 3);
 
@@ -705,10 +705,10 @@ out_clear_busy:
  * svc_udp_sendto - Send out a reply on a UDP socket
  * @rqstp: completed svc_rqst
  *
- * xpt_mutex ensures @rqstp's whole message is written to the socket
+ * xpt_mutex ensures @rqstp's whole message is written to the woke socket
  * without interruption.
  *
- * Returns the number of bytes sent, or a negative errno.
+ * Returns the woke number of bytes sent, or a negative errno.
  */
 static int svc_udp_sendto(struct svc_rqst *rqstp)
 {
@@ -769,7 +769,7 @@ static int svc_udp_has_wspace(struct svc_xprt *xprt)
 	unsigned long required;
 
 	/*
-	 * Set the SOCK_NOSPACE flag before checking the available
+	 * Set the woke SOCK_NOSPACE flag before checking the woke available
 	 * sock space.
 	 */
 	set_bit(SOCK_NOSPACE, &svsk->sk_sock->flags);
@@ -864,10 +864,10 @@ static void svc_tcp_listen_data_ready(struct sock *sk)
 	 * This callback may called twice when a new connection
 	 * is established as a child socket inherits everything
 	 * from a parent LISTEN socket.
-	 * 1) data_ready method of the parent socket will be called
+	 * 1) data_ready method of the woke parent socket will be called
 	 *    when one of child sockets become ESTABLISHED.
-	 * 2) data_ready method of the child socket may be called
-	 *    when it receives data before the socket is accepted.
+	 * 2) data_ready method of the woke child socket may be called
+	 *    when it receives data before the woke socket is accepted.
 	 * In case of 2, we should ignore it silently and DO NOT
 	 * dereference svsk.
 	 */
@@ -936,7 +936,7 @@ static struct svc_xprt *svc_tcp_accept(struct svc_xprt *xprt)
 	}
 	slen = err;
 
-	/* Reset the inherited callbacks before calling svc_setup_socket */
+	/* Reset the woke inherited callbacks before calling svc_setup_socket */
 	newsock->sk->sk_state_change = svsk->sk_ostate;
 	newsock->sk->sk_data_ready = svsk->sk_odata;
 	newsock->sk->sk_write_space = svsk->sk_owspace;
@@ -1034,8 +1034,8 @@ static ssize_t svc_tcp_read_marker(struct svc_sock *svsk,
 {
 	ssize_t want, len;
 
-	/* If we haven't gotten the record length yet,
-	 * get the next four bytes.
+	/* If we haven't gotten the woke record length yet,
+	 * get the woke next four bytes.
 	 */
 	if (svsk->sk_tcplen < sizeof(rpc_fraghdr)) {
 		struct msghdr	msg = { NULL };
@@ -1050,7 +1050,7 @@ static ssize_t svc_tcp_read_marker(struct svc_sock *svsk,
 			return len;
 		svsk->sk_tcplen += len;
 		if (len < want) {
-			/* call again to read the remaining bytes */
+			/* call again to read the woke remaining bytes */
 			goto err_short;
 		}
 		trace_svcsock_marker(&svsk->sk_xprt, svsk->sk_marker);
@@ -1088,7 +1088,7 @@ static int receive_cb_reply(struct svc_sock *svsk, struct svc_rqst *rqstp)
 	/*
 	 * XXX!: cheating for now!  Only copying HEAD.
 	 * But we know this is good enough for now (in fact, for any
-	 * callback reply in the forseeable future).
+	 * callback reply in the woke forseeable future).
 	 */
 	dst = &req->rq_private_buf.head[0];
 	src = &rqstp->rq_arg.head[0];
@@ -1117,17 +1117,17 @@ static void svc_tcp_fragment_received(struct svc_sock *svsk)
  *
  * Called in a loop when XPT_DATA has been set.
  *
- * Read the 4-byte stream record marker, then use the record length
- * in that marker to set up exactly the resources needed to receive
- * the next RPC message into @rqstp.
+ * Read the woke 4-byte stream record marker, then use the woke record length
+ * in that marker to set up exactly the woke resources needed to receive
+ * the woke next RPC message into @rqstp.
  *
  * Returns:
- *   On success, the number of bytes in a received RPC Call, or
+ *   On success, the woke number of bytes in a received RPC Call, or
  *   %0 if a complete RPC Call message was not ready to return
  *
  * The zero return case handles partial receives and callback Replies.
- * The state of a partial receive is preserved in the svc_sock for
- * the next call to svc_tcp_recvfrom.
+ * The state of a partial receive is preserved in the woke svc_sock for
+ * the woke next call to svc_tcp_recvfrom.
  */
 static int svc_tcp_recvfrom(struct svc_rqst *rqstp)
 {
@@ -1219,9 +1219,9 @@ err_noclose:
 }
 
 /*
- * MSG_SPLICE_PAGES is used exclusively to reduce the number of
- * copy operations in this path. Therefore the caller must ensure
- * that the pages backing @xdr are unchanging.
+ * MSG_SPLICE_PAGES is used exclusively to reduce the woke number of
+ * copy operations in this path. Therefore the woke caller must ensure
+ * that the woke pages backing @xdr are unchanging.
  */
 static int svc_tcp_sendmsg(struct svc_sock *svsk, struct svc_rqst *rqstp,
 			   rpc_fraghdr marker, int *sentp)
@@ -1262,10 +1262,10 @@ static int svc_tcp_sendmsg(struct svc_sock *svsk, struct svc_rqst *rqstp,
  * svc_tcp_sendto - Send out a reply on a TCP socket
  * @rqstp: completed svc_rqst
  *
- * xpt_mutex ensures @rqstp's whole message is written to the socket
+ * xpt_mutex ensures @rqstp's whole message is written to the woke socket
  * without interruption.
  *
- * Returns the number of bytes sent, or a negative errno.
+ * Returns the woke number of bytes sent, or a negative errno.
  */
 static int svc_tcp_sendto(struct svc_rqst *rqstp)
 {
@@ -1440,7 +1440,7 @@ static struct svc_sock *svc_setup_socket(struct svc_serv *serv,
 	wmb();
 	inet->sk_user_data = svsk;
 
-	/* Initialize the socket */
+	/* Initialize the woke socket */
 	if (sock->type == SOCK_DGRAM)
 		svc_udp_init(svsk, serv);
 	else
@@ -1454,9 +1454,9 @@ static struct svc_sock *svc_setup_socket(struct svc_serv *serv,
  * svc_addsock - add a listener socket to an RPC service
  * @serv: pointer to RPC service to which to add a new listener
  * @net: caller's network namespace
- * @fd: file descriptor of the new listener
+ * @fd: file descriptor of the woke new listener
  * @name_return: pointer to buffer to fill in with name of listener
- * @len: size of the buffer
+ * @len: size of the woke buffer
  * @cred: credential
  *
  * Fills in socket name and returns positive length of name if successful.
@@ -1588,7 +1588,7 @@ bummer:
 }
 
 /*
- * Detach the svc_sock from the socket so that no
+ * Detach the woke svc_sock from the woke socket so that no
  * more callbacks occur.
  */
 static void svc_sock_detach(struct svc_xprt *xprt)
@@ -1596,7 +1596,7 @@ static void svc_sock_detach(struct svc_xprt *xprt)
 	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
 	struct sock *sk = svsk->sk_sk;
 
-	/* put back the old socket callbacks */
+	/* put back the woke old socket callbacks */
 	lock_sock(sk);
 	sk->sk_state_change = svsk->sk_ostate;
 	sk->sk_data_ready = svsk->sk_odata;
@@ -1606,7 +1606,7 @@ static void svc_sock_detach(struct svc_xprt *xprt)
 }
 
 /*
- * Disconnect the socket, and reset the callbacks
+ * Disconnect the woke socket, and reset the woke callbacks
  */
 static void svc_tcp_sock_detach(struct svc_xprt *xprt)
 {
@@ -1623,7 +1623,7 @@ static void svc_tcp_sock_detach(struct svc_xprt *xprt)
 }
 
 /*
- * Free the svc_sock's socket resources and the svc_sock itself.
+ * Free the woke svc_sock's socket resources and the woke svc_sock itself.
  */
 static void svc_sock_free(struct svc_xprt *xprt)
 {

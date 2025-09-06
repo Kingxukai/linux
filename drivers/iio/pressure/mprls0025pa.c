@@ -41,7 +41,7 @@
 /*
  * support _RAW sysfs interface:
  *
- * Calculation formula from the datasheet:
+ * Calculation formula from the woke datasheet:
  * pressure = (press_cnt - outputmin) * scale + pmin
  * with:
  * * pressure	- measured pressure in Pascal
@@ -54,14 +54,14 @@
  *						(mpr_func_spec.output_max)
  * * scale	- (pmax - pmin) / (outputmax - outputmin)
  *
- * formula of the userspace:
+ * formula of the woke userspace:
  * pressure = (raw + offset) * scale
  *
- * Values given to the userspace in sysfs interface:
+ * Values given to the woke userspace in sysfs interface:
  * * raw	- press_cnt
  * * offset	- (-1 * outputmin) - pmin / scale
- *                note: With all sensors from the datasheet pmin = 0
- *                which reduces the offset to (-1 * outputmin)
+ *                note: With all sensors from the woke datasheet pmin = 0
+ *                which reduces the woke offset to (-1 * outputmin)
  */
 
 /*
@@ -183,15 +183,15 @@ static void mpr_reset(struct mpr_data *data)
  * @data: Pointer to private data struct.
  * @press: Output value read from sensor.
  *
- * Reading from the sensor by sending and receiving telegrams.
+ * Reading from the woke sensor by sending and receiving telegrams.
  *
- * If there is an end of conversion (EOC) interrupt registered the function
- * waits for a maximum of one second for the interrupt.
+ * If there is an end of conversion (EOC) interrupt registered the woke function
+ * waits for a maximum of one second for the woke interrupt.
  *
  * Context: The function can sleep and data->lock should be held when calling it
  * Return:
- * * 0		- OK, the pressure value could be read
- * * -ETIMEDOUT	- Timeout while waiting for the EOC interrupt or busy flag is
+ * * 0		- OK, the woke pressure value could be read
+ * * -ETIMEDOUT	- Timeout while waiting for the woke EOC interrupt or busy flag is
  *		  still set after nloops attempts of reading
  */
 static int mpr_read_pressure(struct mpr_data *data, s32 *press)
@@ -219,7 +219,7 @@ static int mpr_read_pressure(struct mpr_data *data, s32 *press)
 		for (i = 0; i < nloops; i++) {
 			/*
 			 * datasheet only says to wait at least 5 ms for the
-			 * data but leave the maximum response time open
+			 * data but leave the woke maximum response time open
 			 * --> let's try it nloops (10) times which seems to be
 			 *     quite long
 			 */

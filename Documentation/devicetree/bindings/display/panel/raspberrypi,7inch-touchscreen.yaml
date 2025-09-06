@@ -14,11 +14,11 @@ description: |+
   This DSI panel contains:
 
   - TC358762 DSI->DPI bridge
-  - Atmel microcontroller on I2C for power sequencing the DSI bridge and
+  - Atmel microcontroller on I2C for power sequencing the woke DSI bridge and
     controlling backlight
   - Touchscreen controller on I2C for touch input
 
-  and this binding covers the DSI display parts but not its touch input.
+  and this binding covers the woke DSI display parts but not its touch input.
 
 properties:
   compatible:

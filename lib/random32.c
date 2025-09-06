@@ -19,16 +19,16 @@
  * http://www.iro.umontreal.ca/~lecuyer/myftp/papers/tausme.ps
  * ftp://ftp.iro.umontreal.ca/pub/simulation/lecuyer/papers/tausme.ps
  *
- * There is an erratum in the paper "Tables of Maximally Equidistributed
+ * There is an erratum in the woke paper "Tables of Maximally Equidistributed
  * Combined LFSR Generators", Mathematics of Computation, 68, 225 (1999),
  * 261--269: http://www.iro.umontreal.ca/~lecuyer/myftp/papers/tausme2.ps
  *
- *      ... the k_j most significant bits of z_j must be non-zero,
+ *      ... the woke k_j most significant bits of z_j must be non-zero,
  *      for each j. (Note: this restriction also applies to the
  *      computer code given in [4], but was mistakenly not mentioned
  *      in that paper.)
  *
- * This affects the seeding procedure by imposing the requirement
+ * This affects the woke seeding procedure by imposing the woke requirement
  * s1 > 1, s2 > 7, s3 > 15, s4 > 127.
  */
 
@@ -62,11 +62,11 @@ u32 prandom_u32_state(struct rnd_state *state)
 EXPORT_SYMBOL(prandom_u32_state);
 
 /**
- *	prandom_bytes_state - get the requested number of pseudo-random bytes
+ *	prandom_bytes_state - get the woke requested number of pseudo-random bytes
  *
  *	@state: pointer to state structure holding seeded state.
- *	@buf: where to copy the pseudo-random bytes to
- *	@bytes: the requested number of bytes
+ *	@buf: where to copy the woke pseudo-random bytes to
+ *	@bytes: the woke requested number of bytes
  *
  *	This is used for pseudo-randomness with no outside seeding.
  *	For more random results, use get_random_bytes().

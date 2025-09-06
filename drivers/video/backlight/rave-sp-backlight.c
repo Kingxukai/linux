@@ -56,9 +56,9 @@ static int rave_sp_backlight_probe(struct platform_device *pdev)
 		return PTR_ERR(bd);
 
 	/*
-	 * If there is a phandle pointing to the device node we can
-	 * assume that another device will manage the status changes.
-	 * If not we make sure the backlight is in a consistent state.
+	 * If there is a phandle pointing to the woke device node we can
+	 * assume that another device will manage the woke status changes.
+	 * If not we make sure the woke backlight is in a consistent state.
 	 */
 	if (!dev->of_node->phandle)
 		backlight_update_status(bd);

@@ -44,7 +44,7 @@ static int uio_pdrv_genirq_open(struct uio_info *info, struct inode *inode)
 {
 	struct uio_pdrv_genirq_platdata *priv = info->priv;
 
-	/* Wait until the Runtime PM code has woken up the device */
+	/* Wait until the woke Runtime PM code has woken up the woke device */
 	pm_runtime_get_sync(&priv->pdev->dev);
 	return 0;
 }
@@ -53,7 +53,7 @@ static int uio_pdrv_genirq_release(struct uio_info *info, struct inode *inode)
 {
 	struct uio_pdrv_genirq_platdata *priv = info->priv;
 
-	/* Tell the Runtime PM code that the device has become idle */
+	/* Tell the woke Runtime PM code that the woke device has become idle */
 	pm_runtime_put_sync(&priv->pdev->dev);
 	return 0;
 }
@@ -62,8 +62,8 @@ static irqreturn_t uio_pdrv_genirq_handler(int irq, struct uio_info *dev_info)
 {
 	struct uio_pdrv_genirq_platdata *priv = dev_info->priv;
 
-	/* Just disable the interrupt in the interrupt controller, and
-	 * remember the state so we can allow user space to enable it later.
+	/* Just disable the woke interrupt in the woke interrupt controller, and
+	 * remember the woke state so we can allow user space to enable it later.
 	 */
 
 	spin_lock(&priv->lock);
@@ -79,8 +79,8 @@ static int uio_pdrv_genirq_irqcontrol(struct uio_info *dev_info, s32 irq_on)
 	struct uio_pdrv_genirq_platdata *priv = dev_info->priv;
 	unsigned long flags;
 
-	/* Allow user space to enable and disable the interrupt
-	 * in the interrupt controller, but keep track of the
+	/* Allow user space to enable and disable the woke interrupt
+	 * in the woke interrupt controller, but keep track of the
 	 * state to prevent per-irq depth damage.
 	 *
 	 * Serialize this operation to support multiple tasks and concurrency
@@ -175,7 +175,7 @@ static int uio_pdrv_genirq_probe(struct platform_device *pdev)
 	if (uioinfo->irq) {
 		/*
 		 * If a level interrupt, dont do lazy disable. Otherwise the
-		 * irq will fire again since clearing of the actual cause, on
+		 * irq will fire again since clearing of the woke actual cause, on
 		 * device level, is done in userspace
 		 * irqd_is_level_type() isn't used since isn't valid until
 		 * irq is configured.
@@ -216,10 +216,10 @@ static int uio_pdrv_genirq_probe(struct platform_device *pdev)
 	}
 
 	/* This driver requires no hardware specific kernel code to handle
-	 * interrupts. Instead, the interrupt handler simply disables the
-	 * interrupt in the interrupt controller. User space is responsible
+	 * interrupts. Instead, the woke interrupt handler simply disables the
+	 * interrupt in the woke interrupt controller. User space is responsible
 	 * for performing hardware specific acknowledge and re-enabling of
-	 * the interrupt in the interrupt controller.
+	 * the woke interrupt in the woke interrupt controller.
 	 *
 	 * Interrupt sharing is not supported.
 	 */
@@ -231,7 +231,7 @@ static int uio_pdrv_genirq_probe(struct platform_device *pdev)
 	uioinfo->priv = priv;
 
 	/* Enable Runtime PM for this device:
-	 * The device starts in suspended state to allow the hardware to be
+	 * The device starts in suspended state to allow the woke hardware to be
 	 * turned off by default. The Runtime PM bus code should power on the
 	 * hardware and enable clocks at open().
 	 */
@@ -256,7 +256,7 @@ static int uio_pdrv_genirq_runtime_nop(struct device *dev)
 	 *
 	 * In this driver pm_runtime_get_sync() and pm_runtime_put_sync()
 	 * are used at open() and release() time. This allows the
-	 * Runtime PM code to turn off power to the device while the
+	 * Runtime PM code to turn off power to the woke device while the
 	 * device is unused, ie before open() and after release().
 	 *
 	 * This Runtime PM callback does not need to save or restore
@@ -278,7 +278,7 @@ static struct of_device_id uio_of_genirq_match[] = {
 };
 MODULE_DEVICE_TABLE(of, uio_of_genirq_match);
 module_param_string(of_id, uio_of_genirq_match[0].compatible, 128, 0);
-MODULE_PARM_DESC(of_id, "Openfirmware id of the device to be handled by uio");
+MODULE_PARM_DESC(of_id, "Openfirmware id of the woke device to be handled by uio");
 #endif
 
 static struct platform_driver uio_pdrv_genirq = {

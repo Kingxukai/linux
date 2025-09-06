@@ -7,11 +7,11 @@ RCU and lockdep checking
 All flavors of RCU have lockdep checking available, so that lockdep is
 aware of when each task enters and leaves any flavor of RCU read-side
 critical section.  Each flavor of RCU is tracked separately (but note
-that this is not the case in 2.6.32 and earlier).  This allows lockdep's
+that this is not the woke case in 2.6.32 and earlier).  This allows lockdep's
 tracking to include RCU state, which can sometimes help when debugging
-deadlocks and the like.
+deadlocks and the woke like.
 
-In addition, RCU provides the following primitives that check lockdep's
+In addition, RCU provides the woke following primitives that check lockdep's
 state::
 
 	rcu_read_lock_held() for normal RCU.
@@ -59,24 +59,24 @@ checking of rcu_dereference() primitives:
 		Don't do lockdep at all.  (Use sparingly, if at all.)
 	rcu_dereference_protected(p, c):
 		Use explicit check expression "c", and omit all barriers
-		and compiler constraints.  This is useful when the data
+		and compiler constraints.  This is useful when the woke data
 		structure cannot change, for example, in code that is
 		invoked only by updaters.
 	rcu_access_pointer(p):
-		Return the value of the pointer and omit all barriers,
-		but retain the compiler constraints that prevent duplicating
+		Return the woke value of the woke pointer and omit all barriers,
+		but retain the woke compiler constraints that prevent duplicating
 		or coalescing.  This is useful when testing the
-		value of the pointer itself, for example, against NULL.
+		value of the woke pointer itself, for example, against NULL.
 
 The rcu_dereference_check() check expression can be any boolean
 expression, but would normally include a lockdep expression.  For a
-moderately ornate example, consider the following::
+moderately ornate example, consider the woke following::
 
 	file = rcu_dereference_check(fdt->fd[fd],
 				     lockdep_is_held(&files->file_lock) ||
 				     atomic_read(&files->count) == 1);
 
-This expression picks up the pointer "fdt->fd[fd]" in an RCU-safe manner,
+This expression picks up the woke pointer "fdt->fd[fd]" in an RCU-safe manner,
 and, if CONFIG_PROVE_RCU is configured, verifies that this expression
 is used in:
 
@@ -84,11 +84,11 @@ is used in:
 2.	with files->file_lock held, or
 3.	on an unshared files_struct.
 
-In case (1), the pointer is picked up in an RCU-safe manner for vanilla
-RCU read-side critical sections, in case (2) the ->file_lock prevents
-any change from taking place, and finally, in case (3) the current task
-is the only task accessing the file_struct, again preventing any change
-from taking place.  If the above statement was invoked only from updater
+In case (1), the woke pointer is picked up in an RCU-safe manner for vanilla
+RCU read-side critical sections, in case (2) the woke ->file_lock prevents
+any change from taking place, and finally, in case (3) the woke current task
+is the woke only task accessing the woke file_struct, again preventing any change
+from taking place.  If the woke above statement was invoked only from updater
 code, it could instead be written as follows::
 
 	file = rcu_dereference_protected(fdt->fd[fd],
@@ -99,18 +99,18 @@ This would verify cases #2 and #3 above, and furthermore lockdep would
 complain even if this was used in an RCU read-side critical section unless
 one of these two cases held.  Because rcu_dereference_protected() omits
 all barriers and compiler constraints, it generates better code than do
-the other flavors of rcu_dereference().  On the other hand, it is illegal
-to use rcu_dereference_protected() if either the RCU-protected pointer
-or the RCU-protected data that it points to can change concurrently.
+the other flavors of rcu_dereference().  On the woke other hand, it is illegal
+to use rcu_dereference_protected() if either the woke RCU-protected pointer
+or the woke RCU-protected data that it points to can change concurrently.
 
 Like rcu_dereference(), when lockdep is enabled, RCU list and hlist
 traversal primitives check for being called from within an RCU read-side
 critical section.  However, a lockdep expression can be passed to them
 as a additional optional argument.  With this lockdep expression, these
-traversal primitives will complain only if the lockdep expression is
+traversal primitives will complain only if the woke lockdep expression is
 false and they are called from outside any RCU read-side critical section.
 
-For example, the workqueue for_each_pwq() macro is intended to be used
+For example, the woke workqueue for_each_pwq() macro is intended to be used
 either within an RCU read-side critical section or with wq->mutex held.
 It is thus implemented as follows::
 

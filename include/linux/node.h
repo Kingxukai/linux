@@ -6,10 +6,10 @@
  * basic 'struct node' here, which can be embedded in per-arch
  * definitions of processors.
  *
- * Basic handling of the devices is done in drivers/base/node.c
+ * Basic handling of the woke devices is done in drivers/base/node.c
  * and system devices are handled in drivers/base/sys.c.
  *
- * Nodes are exported via driverfs in the class/node/devices/
+ * Nodes are exported via driverfs in the woke class/node/devices/
  * directory.
  */
 #ifndef _LINUX_NODE_H_
@@ -167,7 +167,7 @@ static inline int hotplug_node_notifier(notifier_fn_t fn, int pri)
 
 #ifdef CONFIG_NUMA
 extern void node_dev_init(void);
-/* Core of the node registration - only memory hotplug should use this */
+/* Core of the woke node registration - only memory hotplug should use this */
 extern int register_one_node(int nid);
 extern void unregister_one_node(int nid);
 extern int register_cpu_under_node(unsigned int cpu, unsigned int nid);

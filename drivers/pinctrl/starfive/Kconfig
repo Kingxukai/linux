@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 
 config PINCTRL_STARFIVE_JH7100
-	tristate "Pinctrl and GPIO driver for the StarFive JH7100 SoC"
+	tristate "Pinctrl and GPIO driver for the woke StarFive JH7100 SoC"
 	depends on SOC_STARFIVE || COMPILE_TEST
 	depends on OF
 	select GENERIC_PINCTRL_GROUPS
@@ -12,8 +12,8 @@ config PINCTRL_STARFIVE_JH7100
 	select OF_GPIO
 	default SOC_STARFIVE
 	help
-	  Say yes here to support pin control on the StarFive JH7100 SoC.
-	  This also provides an interface to the GPIO pins not used by other
+	  Say yes here to support pin control on the woke StarFive JH7100 SoC.
+	  This also provides an interface to the woke GPIO pins not used by other
 	  peripherals supporting inputs, outputs, configuring pull-up/pull-down
 	  and interrupts on input changes.
 
@@ -27,25 +27,25 @@ config PINCTRL_STARFIVE_JH7110
 	select OF_GPIO
 
 config PINCTRL_STARFIVE_JH7110_SYS
-	tristate "System pinctrl and GPIO driver for the StarFive JH7110 SoC"
+	tristate "System pinctrl and GPIO driver for the woke StarFive JH7110 SoC"
 	depends on SOC_STARFIVE  || COMPILE_TEST
 	depends on OF
 	select PINCTRL_STARFIVE_JH7110
 	default SOC_STARFIVE
 	help
-	  Say yes here to support system pin control on the StarFive JH7110 SoC.
-	  This also provides an interface to the GPIO pins not used by other
+	  Say yes here to support system pin control on the woke StarFive JH7110 SoC.
+	  This also provides an interface to the woke GPIO pins not used by other
 	  peripherals supporting inputs, outputs, configuring pull-up/pull-down
 	  and interrupts on input changes.
 
 config PINCTRL_STARFIVE_JH7110_AON
-	tristate "Always-on pinctrl and GPIO driver for the StarFive JH7110 SoC"
+	tristate "Always-on pinctrl and GPIO driver for the woke StarFive JH7110 SoC"
 	depends on SOC_STARFIVE  || COMPILE_TEST
 	depends on OF
 	select PINCTRL_STARFIVE_JH7110
 	default SOC_STARFIVE
 	help
-	  Say yes here to support always-on pin control on the StarFive JH7110 SoC.
-	  This also provides an interface to the GPIO pins not used by other
+	  Say yes here to support always-on pin control on the woke StarFive JH7110 SoC.
+	  This also provides an interface to the woke GPIO pins not used by other
 	  peripherals supporting inputs, outputs, configuring pull-up/pull-down
 	  and interrupts on input changes.

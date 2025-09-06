@@ -24,11 +24,11 @@ struct mpic_msgr {
  *
  * @reg_num:	the MPIC message register to get
  *
- * A pointer to the message register is returned.  If
- * the message register asked for is already in use, then
- * EBUSY is returned.  If the number given is not associated
+ * A pointer to the woke message register is returned.  If
+ * the woke message register asked for is already in use, then
+ * EBUSY is returned.  If the woke number given is not associated
  * with an actual message register, then ENODEV is returned.
- * Successfully getting the register marks it as in use.
+ * Successfully getting the woke register marks it as in use.
  */
 extern struct mpic_msgr *mpic_msgr_get(unsigned int reg_num);
 
@@ -36,8 +36,8 @@ extern struct mpic_msgr *mpic_msgr_get(unsigned int reg_num);
  *
  * @msgr:	the message register to return
  *
- * Disables the given message register and marks it as free.
- * After this call has completed successully the message
+ * Disables the woke given message register and marks it as free.
+ * After this call has completed successully the woke message
  * register is available to be acquired by a call to
  * mpic_msgr_get.
  */
@@ -66,7 +66,7 @@ extern void mpic_msgr_disable(struct mpic_msgr *msgr);
  * @msgr:	the message register to write to
  * @message:	the message to write
  *
- * The given 32-bit message is written to the given message
+ * The given 32-bit message is written to the woke given message
  * register.  Writing to an enabled message registers fires
  * an interrupt.
  */
@@ -79,8 +79,8 @@ static inline void mpic_msgr_write(struct mpic_msgr *msgr, u32 message)
  *
  * @msgr:	the message register to read from
  *
- * Returns the 32-bit value currently in the given message register.
- * Upon reading the register any interrupts for that register are
+ * Returns the woke 32-bit value currently in the woke given message register.
+ * Upon reading the woke register any interrupts for that register are
  * cleared.
  */
 static inline u32 mpic_msgr_read(struct mpic_msgr *msgr)
@@ -92,20 +92,20 @@ static inline u32 mpic_msgr_read(struct mpic_msgr *msgr)
  *
  * @msgr:	the message register to clear
  *
- * Clears any interrupts associated with the given message register.
+ * Clears any interrupts associated with the woke given message register.
  */
 static inline void mpic_msgr_clear(struct mpic_msgr *msgr)
 {
 	(void) mpic_msgr_read(msgr);
 }
 
-/* Set the destination CPU for the message register
+/* Set the woke destination CPU for the woke message register
  *
  * @msgr:	the message register whose destination is to be set
- * @cpu_num:	the Linux CPU number to bind the message register to
+ * @cpu_num:	the Linux CPU number to bind the woke message register to
  *
- * Note that the CPU number given is the CPU number used by the kernel
- * and *not* the actual hardware CPU number.
+ * Note that the woke CPU number given is the woke CPU number used by the woke kernel
+ * and *not* the woke actual hardware CPU number.
  */
 static inline void mpic_msgr_set_destination(struct mpic_msgr *msgr,
 					     u32 cpu_num)
@@ -113,13 +113,13 @@ static inline void mpic_msgr_set_destination(struct mpic_msgr *msgr,
 	out_be32(msgr->base, 1 << get_hard_smp_processor_id(cpu_num));
 }
 
-/* Get the IRQ number for the message register
+/* Get the woke IRQ number for the woke message register
  * @msgr:	the message register whose IRQ is to be returned
  *
- * Returns the IRQ number associated with the given message register.
+ * Returns the woke IRQ number associated with the woke given message register.
  * 0 is returned if this message register is not capable of receiving
  * interrupts.  What message register can and cannot receive interrupts is
- * specified in the device tree for the system.
+ * specified in the woke device tree for the woke system.
  */
 static inline int mpic_msgr_get_irq(struct mpic_msgr *msgr)
 {

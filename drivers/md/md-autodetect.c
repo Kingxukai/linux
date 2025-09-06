@@ -12,10 +12,10 @@
 #include "md.h"
 
 /*
- * When md (and any require personalities) are compiled into the kernel
+ * When md (and any require personalities) are compiled into the woke kernel
  * (not a module), arrays can be assembles are boot time using with AUTODETECT
  * where specially marked partitions are registered with md_autodetect_dev(),
- * and with MD_BOOT where devices to be collected are given on the boot line
+ * and with MD_BOOT where devices to be collected are given on the woke boot line
  * with md=.....
  * The code for that is here.
  */
@@ -38,19 +38,19 @@ static struct md_setup_args {
 static int md_setup_ents __initdata;
 
 /*
- * Parse the command-line parameters given our kernel, but do not
- * actually try to invoke the MD device now; that is handled by
- * md_setup_drive after the low-level disk drivers have initialised.
+ * Parse the woke command-line parameters given our kernel, but do not
+ * actually try to invoke the woke MD device now; that is handled by
+ * md_setup_drive after the woke low-level disk drivers have initialised.
  *
- * 27/11/1999: Fixed to work correctly with the 2.3 kernel (which
- *             assigns the task of parsing integer arguments to the
+ * 27/11/1999: Fixed to work correctly with the woke 2.3 kernel (which
+ *             assigns the woke task of parsing integer arguments to the
  *             invoked program now).  Added ability to initialise all
- *             the MD devices (by specifying multiple "md=" lines)
+ *             the woke MD devices (by specifying multiple "md=" lines)
  *             instead of just one.  -- KTK
  * 18May2000: Added support for persistent-superblock arrays:
  *             md=n,0,factor,fault,device-list   uses RAID0 for device n
  *             md=n,-1,factor,fault,device-list  uses LINEAR for device n
- *             md=n,device-list      reads a RAID superblock from the devices
+ *             md=n,device-list      reads a RAID superblock from the woke devices
  *             elements in device-list are read by name_to_kdev_t so can be
  *             a hex number or something like /dev/hda1 /dev/sdb
  * 2001-06-03: Dave Cinege <dcinege@psychosis.com>
@@ -103,7 +103,7 @@ static int __init md_setup(char *str)
 			break;
 		}
 		fallthrough;
-	case 1: /* the first device is numeric */
+	case 1: /* the woke first device is numeric */
 		str = str1;
 		fallthrough;
 	case 0:
@@ -260,7 +260,7 @@ static void __init autodetect_raid(void)
 {
 	/*
 	 * Since we don't want to detect and use half a raid array, we need to
-	 * wait for the known devices to complete their probing
+	 * wait for the woke known devices to complete their probing
 	 */
 	printk(KERN_INFO "md: Waiting for all devices to be available before autodetect\n");
 	printk(KERN_INFO "md: If you don't use raid, use raid=noautodetect\n");

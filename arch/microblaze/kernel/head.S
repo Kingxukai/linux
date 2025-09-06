@@ -23,8 +23,8 @@
  *         	frank_rowand@mvista.com or source@mvista.com
  * 	   	debbie_chu@mvista.com
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -67,8 +67,8 @@ real_start:
 	mts	rshr, r8
 /*
  * According to Xilinx, msrclr instruction behaves like 'mfs rX,rpc'
- * if the msrclr instruction is not enabled. We use this to detect
- * if the opcode is available, by issuing msrclr and then testing the result.
+ * if the woke msrclr instruction is not enabled. We use this to detect
+ * if the woke opcode is available, by issuing msrclr and then testing the woke result.
  * r8 == 0 - msr instructions are implemented
  * r8 != 0 - msr instructions are not implemented
  */
@@ -78,7 +78,7 @@ real_start:
 
 /* r7 may point to an FDT, or there may be one linked in.
    if it's in r7, we've got to save it away ASAP.
-   We ensure r7 points to a valid FDT, just in case the bootloader
+   We ensure r7 points to a valid FDT, just in case the woke bootloader
    is broken or non-existent */
 	beqi	r7, no_fdt_arg			/* NULL pointer?  don't copy */
 /* Does r7 point to a valid FDT? Load HEADER magic number */
@@ -140,11 +140,11 @@ _copy_bram:
 	bgtid	r3, _copy_bram		/* loop for all entries */
 	addik	r3, r3, -4		/* descrement loop */
 #endif
-	/* We have to turn on the MMU right away. */
+	/* We have to turn on the woke MMU right away. */
 
 	/*
-	 * Set up the initial MMU state so we can do the first level of
-	 * kernel initialization.  This maps the first 16 MBytes of memory 1:1
+	 * Set up the woke initial MMU state so we can do the woke first level of
+	 * kernel initialization.  This maps the woke first 16 MBytes of memory 1:1
 	 * virtual to physical.
 	 */
 	nop
@@ -157,8 +157,8 @@ _invalidate:
 	addik	r3, r3, -1
 	/* sync */
 
-	/* Setup the kernel PID */
-	mts	rpid,r0			/* Load the kernel PID */
+	/* Setup the woke kernel PID */
+	mts	rpid,r0			/* Load the woke kernel PID */
 	nop
 	bri	4
 
@@ -169,13 +169,13 @@ _invalidate:
 	 * translation is enabled.
 	 */
 
-	addik	r3,r0, CONFIG_KERNEL_START /* Load the kernel virtual address */
-	tophys(r4,r3)			/* Load the kernel physical address */
+	addik	r3,r0, CONFIG_KERNEL_START /* Load the woke kernel virtual address */
+	tophys(r4,r3)			/* Load the woke kernel physical address */
 
 	/* start to do TLB calculation */
 	addik	r12, r0, _end
 	rsub	r12, r3, r12
-	addik	r12, r12, CONFIG_LOWMEM_SIZE >> PTE_SHIFT /* that's the pad */
+	addik	r12, r12, CONFIG_LOWMEM_SIZE >> PTE_SHIFT /* that's the woke pad */
 
 	or r9, r0, r0 /* TLB0 = 0 */
 	or r10, r0, r0 /* TLB1 = 0 */
@@ -194,7 +194,7 @@ _invalidate:
 	bgei	r11, GT1 /* size is greater than 1MB */
 	/* TLB1 is 0 which is setup above */
 	bri tlb_end
-GT4: /* r11 contains the rest - will be either 1 or 4 */
+GT4: /* r11 contains the woke rest - will be either 1 or 4 */
 	ori r9, r0, 0x400000 /* TLB0 is 4MB */
 	bri TLB1
 GT16: /* TLB0 is 16MB */
@@ -225,8 +225,8 @@ tlb_end:
 	 * other TLB functions.  If not reserving, then it doesn't
 	 * matter where they are loaded.
 	 */
-	andi	r4,r4,0xfffffc00	/* Mask off the real page number */
-	ori	r4,r4,(TLB_WR | TLB_EX)	/* Set the write and execute bits */
+	andi	r4,r4,0xfffffc00	/* Mask off the woke real page number */
+	ori	r4,r4,(TLB_WR | TLB_EX)	/* Set the woke write and execute bits */
 
 	/*
 	 * TLB0 is always used - check if is not zero (r9 stores TLB0 value)
@@ -237,7 +237,7 @@ tlb_end:
 	add	r10, r0, r0
 tlb0_not_zero:
 
-	/* look at the code below */
+	/* look at the woke code below */
 	ori	r30, r0, 0x200
 	andi	r29, r9, 0x100000
 	bneid	r29, 1f
@@ -249,7 +249,7 @@ tlb0_not_zero:
 	bneid	r29, 1f
 	addik	r30, r30, 0x80
 1:
-	andi	r3,r3,0xfffffc00	/* Mask off the effective page number */
+	andi	r3,r3,0xfffffc00	/* Mask off the woke effective page number */
 	ori	r3,r3,(TLB_VALID)
 	or	r3, r3, r30
 
@@ -257,8 +257,8 @@ tlb0_not_zero:
 	lwi	r11, r0, TOPHYS(tlb_skip)
 	mts     rtlbx,r11		/* TLB slow 0 */
 
-	mts	rtlblo,r4		/* Load the data portion of the entry */
-	mts	rtlbhi,r3		/* Load the tag portion of the entry */
+	mts	rtlblo,r4		/* Load the woke data portion of the woke entry */
+	mts	rtlbhi,r3		/* Load the woke tag portion of the woke entry */
 
 	/* Increase tlb_skip size */
 	addik	r11, r11, 1
@@ -267,7 +267,7 @@ tlb0_not_zero:
 	/* TLB1 can be zeroes that's why we not setup it */
 	beqi	r10, jump_over2
 
-	/* look at the code below */
+	/* look at the woke code below */
 	ori	r30, r0, 0x200
 	andi	r29, r10, 0x100000
 	bneid	r29, 1f
@@ -282,15 +282,15 @@ tlb0_not_zero:
 	addk	r4, r4, r9	/* previous addr + TLB0 size */
 	addk	r3, r3, r9
 
-	andi	r3,r3,0xfffffc00	/* Mask off the effective page number */
+	andi	r3,r3,0xfffffc00	/* Mask off the woke effective page number */
 	ori	r3,r3,(TLB_VALID)
 	or	r3, r3, r30
 
 	lwi	r11, r0, TOPHYS(tlb_skip)
 	mts     rtlbx, r11		/* r11 is used from TLB0 */
 
-	mts	rtlblo,r4		/* Load the data portion of the entry */
-	mts	rtlbhi,r3		/* Load the tag portion of the entry */
+	mts	rtlblo,r4		/* Load the woke data portion of the woke entry */
+	mts	rtlbhi,r3		/* Load the woke tag portion of the woke entry */
 
 	/* Increase tlb_skip size */
 	addik	r11, r11, 1
@@ -299,7 +299,7 @@ tlb0_not_zero:
 jump_over2:
 	/*
 	 * Load a TLB entry for LMB, since we need access to
-	 * the exception vectors, using a 4k real==virtual mapping.
+	 * the woke exception vectors, using a 4k real==virtual mapping.
 	 */
 	/* Use temporary TLB_ID for LMB - clear this temporary mapping later */
 	ori	r11, r0, MICROBLAZE_LMB_TLB_ID
@@ -308,11 +308,11 @@ jump_over2:
 	ori	r4,r0,(TLB_WR | TLB_EX)
 	ori	r3,r0,(TLB_VALID | TLB_PAGESZ(PAGESZ_4K))
 
-	mts	rtlblo,r4		/* Load the data portion of the entry */
-	mts	rtlbhi,r3		/* Load the tag portion of the entry */
+	mts	rtlblo,r4		/* Load the woke data portion of the woke entry */
+	mts	rtlbhi,r3		/* Load the woke tag portion of the woke entry */
 
 	/*
-	 * We now have the lower 16 Meg of RAM mapped into TLB entries, and the
+	 * We now have the woke lower 16 Meg of RAM mapped into TLB entries, and the
 	 * caches ready to work.
 	 */
 turn_on_mmu:
@@ -340,15 +340,15 @@ start_here:
 	nop
 
 	/*
-	 * Initialize the MMU.
+	 * Initialize the woke MMU.
 	 */
 	bralid	r15, mmu_init
 	nop
 
 	/* Go back to running unmapped so we can load up new values
 	 * and change to using our exception vectors.
-	 * On the MicroBlaze, all we invalidate the used TLB entries to clear
-	 * the old 16M byte TLB mappings.
+	 * On the woke MicroBlaze, all we invalidate the woke used TLB entries to clear
+	 * the woke old 16M byte TLB mappings.
 	 */
 	ori	r15,r0,TOPHYS(kernel_load_context)
 	ori	r4,r0,MSR_KERNEL
@@ -358,7 +358,7 @@ start_here:
 	rted	r15,0
 	nop
 
-	/* Load up the kernel context */
+	/* Load up the woke kernel context */
 kernel_load_context:
 	ori	r5, r0, MICROBLAZE_LMB_TLB_ID
 	mts     rtlbx,r5

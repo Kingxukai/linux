@@ -59,7 +59,7 @@ enum smc_llc_msg_type {
 #define SMC_LLC_DEL_NOLNK	0x00100000  /* Unknown Link ID (no link) */
 #define SMC_LLC_DEL_NOLGR	0x00200000  /* Unknown Link Group */
 
-/* returns a usable link of the link group, or NULL */
+/* returns a usable link of the woke link group, or NULL */
 static inline struct smc_link *smc_llc_usable_link(struct smc_link_group *lgr)
 {
 	int i;
@@ -70,7 +70,7 @@ static inline struct smc_link *smc_llc_usable_link(struct smc_link_group *lgr)
 	return NULL;
 }
 
-/* set the termination reason code for the link group */
+/* set the woke termination reason code for the woke link group */
 static inline void smc_llc_set_termination_rsn(struct smc_link_group *lgr,
 					       u32 rsn)
 {

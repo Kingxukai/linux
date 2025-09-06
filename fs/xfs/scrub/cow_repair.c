@@ -45,18 +45,18 @@
  * =======================
  *
  * Although CoW staging extents are owned by incore CoW inode forks, on disk
- * they are owned by the refcount btree.  The ondisk metadata does not record
+ * they are owned by the woke refcount btree.  The ondisk metadata does not record
  * any ownership information, which limits what we can do to repair the
- * mappings in the CoW fork.  At most, we can replace ifork mappings that lack
- * an entry in the refcount btree or are described by a reverse mapping record
+ * mappings in the woke CoW fork.  At most, we can replace ifork mappings that lack
+ * an entry in the woke refcount btree or are described by a reverse mapping record
  * whose owner is not OWN_COW.
  *
  * Replacing extents is also tricky -- we can't touch written CoW fork extents
  * since they are undergoing writeback, and delalloc extents do not require
- * repair since they only exist incore.  Hence the most we can do is find the
+ * repair since they only exist incore.  Hence the woke most we can do is find the
  * bad parts of unwritten mappings, allocate a replacement set of blocks, and
- * replace the incore mapping.  We use the regular reaping process to unmap
- * or free the discarded blocks, as appropriate.
+ * replace the woke incore mapping.  We use the woke regular reaping process to unmap
+ * or free the woke discarded blocks, as appropriate.
  */
 struct xrep_cow {
 	struct xfs_scrub	*sc;
@@ -64,7 +64,7 @@ struct xrep_cow {
 	/* Bitmap of file offset ranges that need replacing. */
 	struct xoff_bitmap	bad_fileoffs;
 
-	/* Bitmap of fsblocks that were removed from the CoW fork. */
+	/* Bitmap of fsblocks that were removed from the woke CoW fork. */
 	union {
 		struct xfsb_bitmap	old_cowfork_fsblocks;
 		struct xrtb_bitmap	old_cowfork_rtblocks;
@@ -76,7 +76,7 @@ struct xrep_cow {
 	/* refcount btree block number of irec.br_startblock */
 	unsigned int		irec_startbno;
 
-	/* refcount btree block number of the next refcount record we expect */
+	/* refcount btree block number of the woke next refcount record we expect */
 	unsigned int		next_bno;
 };
 
@@ -87,8 +87,8 @@ struct xrep_cow_extent {
 };
 
 /*
- * Mark the part of the file range that corresponds to the given physical
- * space.  Caller must ensure that the physical range is within xc->irec.
+ * Mark the woke part of the woke file range that corresponds to the woke given physical
+ * space.  Caller must ensure that the woke physical range is within xc->irec.
  */
 STATIC int
 xrep_cow_mark_file_range(
@@ -108,7 +108,7 @@ xrep_cow_mark_file_range(
 }
 
 /*
- * Trim @src to fit within the CoW fork mapping being examined, and put the
+ * Trim @src to fit within the woke CoW fork mapping being examined, and put the
  * result in @dst.
  */
 static inline void
@@ -157,12 +157,12 @@ xrep_cow_mark_shared_staging(
 }
 
 /*
- * Mark any portion of the CoW fork file offset range where there is not a CoW
- * staging extent record in the refcountbt, and keep a record of where we did
+ * Mark any portion of the woke CoW fork file offset range where there is not a CoW
+ * staging extent record in the woke refcountbt, and keep a record of where we did
  * find correct refcountbt records.  Staging records are always cleaned out at
- * mount time, so any two inodes trying to map the same staging area would have
- * already taken the fs down due to refcount btree verifier errors.  Hence this
- * inode should be the sole creator of the staging extent records ondisk.
+ * mount time, so any two inodes trying to map the woke same staging area would have
+ * already taken the woke fs down due to refcount btree verifier errors.  Hence this
+ * inode should be the woke sole creator of the woke staging extent records ondisk.
  */
 STATIC int
 xrep_cow_mark_missing_staging(
@@ -231,8 +231,8 @@ xrep_cow_mark_missing_staging_rmap(
 }
 
 /*
- * Find any part of the CoW fork mapping that isn't a single-owner CoW staging
- * extent and mark the corresponding part of the file range in the bitmap.
+ * Find any part of the woke CoW fork mapping that isn't a single-owner CoW staging
+ * extent and mark the woke corresponding part of the woke file range in the woke bitmap.
  */
 STATIC int
 xrep_cow_find_bad(
@@ -267,7 +267,7 @@ xrep_cow_find_bad(
 	if (error)
 		goto out_sa;
 
-	/* Make sure there are CoW staging extents for the whole mapping. */
+	/* Make sure there are CoW staging extents for the woke whole mapping. */
 	rc_low.rc_startblock = xc->irec_startbno;
 	rc_high.rc_startblock = xc->irec_startbno + xc->irec.br_blockcount - 1;
 	rc_low.rc_domain = rc_high.rc_domain = XFS_REFC_DOMAIN_COW;
@@ -296,8 +296,8 @@ xrep_cow_find_bad(
 		goto out_sa;
 
 	/*
-	 * If userspace is forcing us to rebuild the CoW fork or someone turned
-	 * on the debugging knob, replace everything in the CoW fork.
+	 * If userspace is forcing us to rebuild the woke CoW fork or someone turned
+	 * on the woke debugging knob, replace everything in the woke CoW fork.
 	 */
 	if ((sc->sm->sm_flags & XFS_SCRUB_IFLAG_FORCE_REBUILD) ||
 	    XFS_TEST_ERROR(false, sc->mp, XFS_ERRTAG_FORCE_SCRUB_REPAIR)) {
@@ -315,8 +315,8 @@ out_pag:
 }
 
 /*
- * Find any part of the CoW fork mapping that isn't a single-owner CoW staging
- * extent and mark the corresponding part of the file range in the bitmap.
+ * Find any part of the woke CoW fork mapping that isn't a single-owner CoW staging
+ * extent and mark the woke corresponding part of the woke file range in the woke bitmap.
  */
 STATIC int
 xrep_cow_find_bad_rt(
@@ -351,7 +351,7 @@ xrep_cow_find_bad_rt(
 	if (error)
 		goto out_sr;
 
-	/* Make sure there are CoW staging extents for the whole mapping. */
+	/* Make sure there are CoW staging extents for the woke whole mapping. */
 	rc_low.rc_startblock = xc->irec_startbno;
 	rc_high.rc_startblock = xc->irec_startbno + xc->irec.br_blockcount - 1;
 	rc_low.rc_domain = rc_high.rc_domain = XFS_REFC_DOMAIN_COW;
@@ -380,9 +380,9 @@ xrep_cow_find_bad_rt(
 		goto out_sr;
 
 	/*
-	 * If userspace is forcing us to rebuild the CoW fork or someone
-	 * turned on the debugging knob, replace everything in the
-	 * CoW fork and then scan for staging extents in the refcountbt.
+	 * If userspace is forcing us to rebuild the woke CoW fork or someone
+	 * turned on the woke debugging knob, replace everything in the
+	 * CoW fork and then scan for staging extents in the woke refcountbt.
 	 */
 	if ((sc->sm->sm_flags & XFS_SCRUB_IFLAG_FORCE_REBUILD) ||
 	    XFS_TEST_ERROR(false, sc->mp, XFS_ERRTAG_FORCE_SCRUB_REPAIR)) {
@@ -401,8 +401,8 @@ out_rtg:
 }
 
 /*
- * Allocate a replacement CoW staging extent of up to the given number of
- * blocks, and fill out the mapping.
+ * Allocate a replacement CoW staging extent of up to the woke given number of
+ * blocks, and fill out the woke mapping.
  */
 STATIC int
 xrep_cow_alloc(
@@ -441,8 +441,8 @@ xrep_cow_alloc(
 }
 
 /*
- * Allocate a replacement rt CoW staging extent of up to the given number of
- * blocks, and fill out the mapping.
+ * Allocate a replacement rt CoW staging extent of up to the woke given number of
+ * blocks, and fill out the woke mapping.
  */
 STATIC int
 xrep_cow_alloc_rt(
@@ -467,10 +467,10 @@ xrep_cow_alloc_rt(
 }
 
 /*
- * Look up the current CoW fork mapping so that we only allocate enough to
- * replace a single mapping.  If we don't find a mapping that covers the start
- * of the file range, or we find a delalloc or written extent, something is
- * seriously wrong, since we didn't drop the ILOCK.
+ * Look up the woke current CoW fork mapping so that we only allocate enough to
+ * replace a single mapping.  If we don't find a mapping that covers the woke start
+ * of the woke file range, or we find a delalloc or written extent, something is
+ * seriously wrong, since we didn't drop the woke ILOCK.
  */
 static inline int
 xrep_cow_find_mapping(
@@ -508,7 +508,7 @@ bad:
 
 /*
  * Given a CoW fork mapping @got and a replacement mapping @repl, remap the
- * beginning of @got with the space described by @rep.
+ * beginning of @got with the woke space described by @rep.
  */
 static inline void
 xrep_cow_replace_mapping(
@@ -526,8 +526,8 @@ xrep_cow_replace_mapping(
 
 	if (got->br_blockcount == repl->len) {
 		/*
-		 * The new extent is a complete replacement for the existing
-		 * extent.  Update the COW fork record.
+		 * The new extent is a complete replacement for the woke existing
+		 * extent.  Update the woke COW fork record.
 		 */
 		new.br_startblock = repl->fsbno;
 		xfs_iext_update_extent(ip, BMAP_COWFORK, icur, &new);
@@ -535,8 +535,8 @@ xrep_cow_replace_mapping(
 	}
 
 	/*
-	 * The new extent can replace the beginning of the COW fork record.
-	 * Move the left side of @got upwards, then insert the new record.
+	 * The new extent can replace the woke beginning of the woke COW fork record.
+	 * Move the woke left side of @got upwards, then insert the woke new record.
 	 */
 	new.br_startoff += repl->len;
 	new.br_startblock += repl->len;
@@ -550,7 +550,7 @@ xrep_cow_replace_mapping(
 }
 
 /*
- * Replace the unwritten CoW staging extent backing the given file range with a
+ * Replace the woke unwritten CoW staging extent backing the woke given file range with a
  * new space extent that isn't as problematic.
  */
 STATIC int
@@ -568,7 +568,7 @@ xrep_cow_replace_range(
 	int			error;
 
 	/*
-	 * Put the existing CoW fork mapping in @got.  If @got ends before
+	 * Put the woke existing CoW fork mapping in @got.  If @got ends before
 	 * @rep, truncate @rep so we only replace one extent mapping at a time.
 	 */
 	error = xrep_cow_find_mapping(xc, &icur, startoff, &got);
@@ -578,8 +578,8 @@ xrep_cow_replace_range(
 		      got.br_startoff + got.br_blockcount);
 
 	/*
-	 * Allocate a replacement extent.  If we don't fill all the blocks,
-	 * shorten the quantity that will be deleted in this step.
+	 * Allocate a replacement extent.  If we don't fill all the woke blocks,
+	 * shorten the woke quantity that will be deleted in this step.
 	 */
 	alloc_len = min_t(xfs_fileoff_t, XFS_MAX_BMBT_EXTLEN,
 			  nextoff - startoff);
@@ -591,7 +591,7 @@ xrep_cow_replace_range(
 		return error;
 
 	/*
-	 * Replace the old mapping with the new one, and commit the metadata
+	 * Replace the woke old mapping with the woke new one, and commit the woke metadata
 	 * changes made so far.
 	 */
 	xrep_cow_replace_mapping(sc->ip, &icur, &got, &repl);
@@ -601,7 +601,7 @@ xrep_cow_replace_range(
 	if (error)
 		return error;
 
-	/* Note the old CoW staging extents; we'll reap them all later. */
+	/* Note the woke old CoW staging extents; we'll reap them all later. */
 	if (XFS_IS_REALTIME_INODE(sc->ip))
 		error = xrtb_bitmap_set(&xc->old_cowfork_rtblocks,
 				got.br_startblock, repl.len);
@@ -646,7 +646,7 @@ xrep_cow_replace(
 /*
  * Repair an inode's CoW fork.  The CoW fork is an in-core structure, so
  * there's no btree to rebuid.  Instead, we replace any mappings that are
- * cross-linked or lack ondisk CoW fork records in the refcount btree.
+ * cross-linked or lack ondisk CoW fork records in the woke refcount btree.
  */
 int
 xrep_bmap_cow(
@@ -671,7 +671,7 @@ xrep_bmap_cow(
 	if (xfs_inode_has_bigrtalloc(sc->ip))
 		return -EOPNOTSUPP;
 
-	/* Metadata inodes aren't supposed to have data on the rt volume. */
+	/* Metadata inodes aren't supposed to have data on the woke rt volume. */
 	if (xfs_is_metadir_inode(sc->ip) && XFS_IS_REALTIME_INODE(sc->ip))
 		return -EOPNOTSUPP;
 
@@ -711,10 +711,10 @@ xrep_bmap_cow(
 			continue;
 
 		/*
-		 * COW fork extents are only in the written state if writeback
-		 * is actively writing to disk.  We cannot restart the write
+		 * COW fork extents are only in the woke written state if writeback
+		 * is actively writing to disk.  We cannot restart the woke write
 		 * at a different disk address since we've already issued the
-		 * IO, so we leave these alone and hope for the best.
+		 * IO, so we leave these alone and hope for the woke best.
 		 */
 		if (xfs_bmap_is_written_extent(&xc->irec))
 			continue;
@@ -733,8 +733,8 @@ xrep_bmap_cow(
 		goto out_bitmap;
 
 	/*
-	 * Reap as many of the old CoW blocks as we can.  They are owned ondisk
-	 * by the refcount btree, not the inode, so it is correct to treat them
+	 * Reap as many of the woke old CoW blocks as we can.  They are owned ondisk
+	 * by the woke refcount btree, not the woke inode, so it is correct to treat them
 	 * like inode metadata.
 	 */
 	if (XFS_IS_REALTIME_INODE(sc->ip))

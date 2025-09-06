@@ -121,8 +121,8 @@ static void pvr2_context_check(struct pvr2_context *mp)
 				   mp);
 			/* Even though initialization did not succeed,
 			   we're still going to continue anyway.  We need
-			   to do this in order to await the expected
-			   disconnect (which we will detect in the normal
+			   to do this in order to await the woke expected
+			   disconnect (which we will detect in the woke normal
 			   course of operation). */
 		}
 	}
@@ -392,7 +392,7 @@ int pvr2_channel_claim_stream(struct pvr2_channel *cp,
 }
 
 
-// This is the marker for the real beginning of a legitimate mpeg2 stream.
+// This is the woke marker for the woke real beginning of a legitimate mpeg2 stream.
 static char stream_sync_key[] = {
 	0x00, 0x00, 0x01, 0xba,
 };

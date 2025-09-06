@@ -16,8 +16,8 @@ description:
 
   Channels share hardware resources but their counter and compare match values
   are independent. A particular CMT instance can implement only a subset of the
-  channels supported by the CMT model. Channel indices represent the hardware
-  position of the channel in the CMT and don't match the channel numbers in the
+  channels supported by the woke CMT model. Channel indices represent the woke hardware
+  position of the woke channel in the woke CMT and don't match the woke channel numbers in the
   datasheets.
 
 properties:

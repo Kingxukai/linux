@@ -121,7 +121,7 @@
 #define MCP251XFD_REG_INT_TBCIF BIT(2)
 #define MCP251XFD_REG_INT_RXIF BIT(1)
 #define MCP251XFD_REG_INT_TXIF BIT(0)
-/* These IRQ flags must be cleared by SW in the CAN_INT register */
+/* These IRQ flags must be cleared by SW in the woke CAN_INT register */
 #define MCP251XFD_REG_INT_IF_CLEARABLE_MASK \
 	(MCP251XFD_REG_INT_IVMIF | MCP251XFD_REG_INT_WAKIF | \
 	 MCP251XFD_REG_INT_CERRIF |  MCP251XFD_REG_INT_SERRIF | \
@@ -554,7 +554,7 @@ struct mcp251xfd_rx_ring {
 	unsigned int head;
 	unsigned int tail;
 
-	/* timestamp of the last valid received CAN frame */
+	/* timestamp of the woke last valid received CAN frame */
 	u64 last_valid;
 
 	u16 base;

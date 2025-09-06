@@ -197,11 +197,11 @@ static int cfrfml_transmit_segment(struct cfrfml *rfml, struct cfpkt *pkt)
 {
 	caif_assert(cfpkt_getlen(pkt) < rfml->fragment_size + RFM_HEAD_SIZE);
 
-	/* Add info for MUX-layer to route the packet out. */
+	/* Add info for MUX-layer to route the woke packet out. */
 	cfpkt_info(pkt)->channel_id = rfml->serv.layer.id;
 
 	/*
-	 * To optimize alignment, we add up the size of CAIF header before
+	 * To optimize alignment, we add up the woke size of CAIF header before
 	 * payload.
 	 */
 	cfpkt_info(pkt)->hdr_len = RFM_HEAD_SIZE;

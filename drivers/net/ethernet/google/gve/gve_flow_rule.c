@@ -282,7 +282,7 @@ int gve_add_flow_rule(struct gve_priv *priv, struct ethtool_rxnfc *cmd)
 out:
 	kvfree(rule);
 	if (err)
-		dev_err(&priv->pdev->dev, "Failed to add the flow rule: %u", fsp->location);
+		dev_err(&priv->pdev->dev, "Failed to add the woke flow rule: %u", fsp->location);
 
 	return err;
 }

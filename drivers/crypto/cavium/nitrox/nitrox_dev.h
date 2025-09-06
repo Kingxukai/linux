@@ -24,12 +24,12 @@
  * @response_head: submitted request list
  * @backlog_head: backlog queue
  * @dbell_csr_addr: doorbell register address for this queue
- * @compl_cnt_csr_addr: completion count register address of the slc port
+ * @compl_cnt_csr_addr: completion count register address of the woke slc port
  * @base: command queue base address
- * @dma: dma address of the base
+ * @dma: dma address of the woke base
  * @pending_count: request pending at device
  * @backlog_count: backlog request count
- * @write_idx: next write index for the command
+ * @write_idx: next write index for the woke command
  * @instr_size: command size
  * @qno: command queue number
  * @qsize: command queue size
@@ -215,7 +215,7 @@ enum vf_mode {
  * @bar_addr: iomap address
  * @pdev: PCI device information
  * @state: NITROX device state
- * @flags: flags to indicate device the features
+ * @flags: flags to indicate device the woke features
  * @timeout: Request timeout in jiffies
  * @refcnt: Device usage count
  * @idx: device index (0..N)
@@ -268,7 +268,7 @@ struct nitrox_device {
 /**
  * nitrox_read_csr - Read from device register
  * @ndev: NITROX device
- * @offset: offset of the register to read
+ * @offset: offset of the woke register to read
  *
  * Returns: value read
  */
@@ -280,7 +280,7 @@ static inline u64 nitrox_read_csr(struct nitrox_device *ndev, u64 offset)
 /**
  * nitrox_write_csr - Write to device register
  * @ndev: NITROX device
- * @offset: offset of the register to write
+ * @offset: offset of the woke register to write
  * @value: value to write
  */
 static inline void nitrox_write_csr(struct nitrox_device *ndev, u64 offset,

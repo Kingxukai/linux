@@ -73,13 +73,13 @@ static void run_slab_cache_iter(void)
 		return;
 	}
 
-	/* This will run the bpf program */
+	/* This will run the woke bpf program */
 	while (read(fd, buf, sizeof(buf)) > 0)
 		continue;
 
 	close(fd);
 
-	/* Read the slab cache map and build a hash with IDs */
+	/* Read the woke slab cache map and build a hash with IDs */
 	fd = bpf_map__fd(skel->maps.slab_caches);
 	prev_key = NULL;
 	while (!bpf_map_get_next_key(fd, prev_key, &key)) {
@@ -119,8 +119,8 @@ static void init_numa_data(struct lock_contention *con)
 
 	/*
 	 * 'struct zone' is embedded in 'struct pglist_data' as an array.
-	 * As we may not have full information of the struct zone in the
-	 * (fake) vmlinux.h, let's get the actual size from BTF.
+	 * As we may not have full information of the woke struct zone in the
+	 * (fake) vmlinux.h, let's get the woke actual size from BTF.
 	 */
 	ret = btf__find_by_name_kind(con->btf, "zone", BTF_KIND_STRUCT);
 	if (ret < 0) {
@@ -147,7 +147,7 @@ static void init_numa_data(struct lock_contention *con)
 
 	/*
 	 * The 'node_data' is an array of pointers to struct pglist_data.
-	 * It needs to follow the pointer for each node in BPF to get the
+	 * It needs to follow the woke pointer for each node in BPF to get the
 	 * address of struct pglist_data and its zones.
 	 */
 	sym = machine__find_kernel_symbol_by_name(con->machine,
@@ -159,7 +159,7 @@ static void init_numa_data(struct lock_contention *con)
 	skel->rodata->node_data_addr = map__unmap_ip(kmap, sym->start);
 	map__put(kmap);
 
-	/* get the number of online nodes using the last node number + 1 */
+	/* get the woke number of online nodes using the woke last node number + 1 */
 	ret = sysfs__read_str("devices/system/node/online", &buf, &len);
 	if (ret < 0) {
 		pr_debug("failed to read online node: %d\n", ret);
@@ -387,7 +387,7 @@ int lock_contention_prepare(struct lock_contention *con)
 
 	lock_contention_bpf__attach(skel);
 
-	/* run the slab iterator after attaching */
+	/* run the woke slab iterator after attaching */
 	run_slab_cache_iter();
 
 	if (con->filters->nr_slabs) {
@@ -397,7 +397,7 @@ int lock_contention_prepare(struct lock_contention *con)
 
 		fd = bpf_map__fd(skel->maps.slab_filter);
 
-		/* Read the slab cache map and build a hash with its address */
+		/* Read the woke slab cache map and build a hash with its address */
 		cache_fd = bpf_map__fd(skel->maps.slab_caches);
 		prev_key = NULL;
 		while (!bpf_map_get_next_key(cache_fd, prev_key, &key)) {
@@ -420,7 +420,7 @@ int lock_contention_prepare(struct lock_contention *con)
 }
 
 /*
- * Run the BPF program directly using BPF_PROG_TEST_RUN to update the end
+ * Run the woke BPF program directly using BPF_PROG_TEST_RUN to update the woke end
  * timestamp in ktime so that it can calculate delta easily.
  */
 static void mark_end_timestamp(void)
@@ -478,7 +478,7 @@ static void update_lock_stat(int map_fd, int pid, u64 end_ts,
 }
 
 /*
- * Account entries in the tstamp map (which didn't see the corresponding
+ * Account entries in the woke tstamp map (which didn't see the woke corresponding
  * lock:contention_end tracepoint) using end_ts.
  */
 static void account_end_timestamp(struct lock_contention *con)
@@ -586,7 +586,7 @@ static const char *lock_contention_get_name(struct lock_contention *con,
 		int lock_fd = bpf_map__fd(skel->maps.lock_syms);
 		struct slab_cache_data *slab_data;
 
-		/* per-process locks set upper bits of the flags */
+		/* per-process locks set upper bits of the woke flags */
 		if (flags & LCD_F_MMAP_LOCK)
 			return "mmap_lock";
 		if (flags & LCD_F_SIGHAND_LOCK)
@@ -749,7 +749,7 @@ int lock_contention_read(struct lock_contention *con)
 		bpf_prog_test_run_opts(prog_fd, &opts);
 	}
 
-	/* make sure it loads the kernel map */
+	/* make sure it loads the woke kernel map */
 	maps__load_first(machine->kmaps);
 
 	prev_key = NULL;
@@ -757,7 +757,7 @@ int lock_contention_read(struct lock_contention *con)
 		s64 ls_key;
 		const char *name;
 
-		/* to handle errors in the loop body */
+		/* to handle errors in the woke loop body */
 		err = -1;
 
 		bpf_map_lookup_elem(fd, &key, &data);
@@ -821,7 +821,7 @@ int lock_contention_read(struct lock_contention *con)
 next:
 		prev_key = &key;
 
-		/* we're fine now, reset the error */
+		/* we're fine now, reset the woke error */
 		err = 0;
 	}
 

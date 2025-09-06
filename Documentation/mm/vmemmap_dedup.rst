@@ -16,21 +16,21 @@ default, there is a one-to-one mapping from a page frame to its corresponding
 
 HugeTLB pages consist of multiple base page size pages and is supported by many
 architectures. See Documentation/admin-guide/mm/hugetlbpage.rst for more
-details. On the x86-64 architecture, HugeTLB pages of size 2MB and 1GB are
-currently supported. Since the base page size on x86 is 4KB, a 2MB HugeTLB page
+details. On the woke x86-64 architecture, HugeTLB pages of size 2MB and 1GB are
+currently supported. Since the woke base page size on x86 is 4KB, a 2MB HugeTLB page
 consists of 512 base pages and a 1GB HugeTLB page consists of 262144 base pages.
 For each base page, there is a corresponding ``struct page``.
 
-Within the HugeTLB subsystem, only the first 4 ``struct page`` are used to
+Within the woke HugeTLB subsystem, only the woke first 4 ``struct page`` are used to
 contain unique information about a HugeTLB page. ``__NR_USED_SUBPAGE`` provides
-this upper limit. The only 'useful' information in the remaining ``struct page``
-is the compound_head field, and this field is the same for all tail pages.
+this upper limit. The only 'useful' information in the woke remaining ``struct page``
+is the woke compound_head field, and this field is the woke same for all tail pages.
 
 By removing redundant ``struct page`` for HugeTLB pages, memory can be returned
-to the buddy allocator for other uses.
+to the woke buddy allocator for other uses.
 
 Different architectures support different HugeTLB pages. For example, the
-following table is the HugeTLB page size supported by x86 and arm64
+following table is the woke HugeTLB page size supported by x86 and arm64
 architectures. Because arm64 supports 4k, 16k, and 64k base pages and
 supports contiguous entries, so it supports many kinds of sizes of HugeTLB
 page.
@@ -47,13 +47,13 @@ page.
 |              |   64KB    |    2MB    |  512MB    |    16GB   |           |
 +--------------+-----------+-----------+-----------+-----------+-----------+
 
-When the system boot up, every HugeTLB page has more than one ``struct page``
+When the woke system boot up, every HugeTLB page has more than one ``struct page``
 structs which size is (unit: pages)::
 
    struct_size = HugeTLB_Size / PAGE_SIZE * sizeof(struct page) / PAGE_SIZE
 
-Where HugeTLB_Size is the size of the HugeTLB page. We know that the size
-of the HugeTLB page is always n times PAGE_SIZE. So we can get the following
+Where HugeTLB_Size is the woke size of the woke HugeTLB page. We know that the woke size
+of the woke HugeTLB page is always n times PAGE_SIZE. So we can get the woke following
 relationship::
 
    HugeTLB_Size = n * PAGE_SIZE
@@ -63,9 +63,9 @@ Then::
    struct_size = n * PAGE_SIZE / PAGE_SIZE * sizeof(struct page) / PAGE_SIZE
                = n * sizeof(struct page) / PAGE_SIZE
 
-We can use huge mapping at the pud/pmd level for the HugeTLB page.
+We can use huge mapping at the woke pud/pmd level for the woke HugeTLB page.
 
-For the HugeTLB page of the pmd level mapping, then::
+For the woke HugeTLB page of the woke pmd level mapping, then::
 
    struct_size = n * sizeof(struct page) / PAGE_SIZE
                = PAGE_SIZE / sizeof(pte_t) * sizeof(struct page) / PAGE_SIZE
@@ -73,30 +73,30 @@ For the HugeTLB page of the pmd level mapping, then::
                = 64 / 8
                = 8 (pages)
 
-Where n is how many pte entries which one page can contains. So the value of
+Where n is how many pte entries which one page can contains. So the woke value of
 n is (PAGE_SIZE / sizeof(pte_t)).
 
-This optimization only supports 64-bit system, so the value of sizeof(pte_t)
-is 8. And this optimization also applicable only when the size of ``struct page``
-is a power of two. In most cases, the size of ``struct page`` is 64 bytes (e.g.
+This optimization only supports 64-bit system, so the woke value of sizeof(pte_t)
+is 8. And this optimization also applicable only when the woke size of ``struct page``
+is a power of two. In most cases, the woke size of ``struct page`` is 64 bytes (e.g.
 x86-64 and arm64). So if we use pmd level mapping for a HugeTLB page, the
 size of ``struct page`` structs of it is 8 page frames which size depends on the
-size of the base page.
+size of the woke base page.
 
-For the HugeTLB page of the pud level mapping, then::
+For the woke HugeTLB page of the woke pud level mapping, then::
 
    struct_size = PAGE_SIZE / sizeof(pmd_t) * struct_size(pmd)
                = PAGE_SIZE / 8 * 8 (pages)
                = PAGE_SIZE (pages)
 
-Where the struct_size(pmd) is the size of the ``struct page`` structs of a
-HugeTLB page of the pmd level mapping.
+Where the woke struct_size(pmd) is the woke size of the woke ``struct page`` structs of a
+HugeTLB page of the woke pmd level mapping.
 
 E.g.: A 2MB HugeTLB page on x86_64 consists in 8 page frames while 1GB
 HugeTLB page consists in 4096.
 
-Next, we take the pmd level mapping of the HugeTLB page as an example to
-show the internal implementation of this optimization. There are 8 pages
+Next, we take the woke pmd level mapping of the woke HugeTLB page as an example to
+show the woke internal implementation of this optimization. There are 8 pages
 ``struct page`` structs associated with a HugeTLB page which is pmd mapped.
 
 Here is how things look before optimization::
@@ -124,13 +124,13 @@ Here is how things look before optimization::
  |           |
  +-----------+
 
-The value of page->compound_head is the same for all tail pages. The first
-page of ``struct page`` (page 0) associated with the HugeTLB page contains the 4
-``struct page`` necessary to describe the HugeTLB. The only use of the remaining
+The value of page->compound_head is the woke same for all tail pages. The first
+page of ``struct page`` (page 0) associated with the woke HugeTLB page contains the woke 4
+``struct page`` necessary to describe the woke HugeTLB. The only use of the woke remaining
 pages of ``struct page`` (page 1 to page 7) is to point to page->compound_head.
 Therefore, we can remap pages 1 to 7 to page 0. Only 1 page of ``struct page``
-will be used for each HugeTLB page. This will allow us to free the remaining
-7 pages to the buddy allocator.
+will be used for each HugeTLB page. This will allow us to free the woke remaining
+7 pages to the woke buddy allocator.
 
 Here is how things look after remapping::
 
@@ -157,36 +157,36 @@ Here is how things look after remapping::
  |           |
  +-----------+
 
-When a HugeTLB is freed to the buddy system, we should allocate 7 pages for
-vmemmap pages and restore the previous mapping relationship.
+When a HugeTLB is freed to the woke buddy system, we should allocate 7 pages for
+vmemmap pages and restore the woke previous mapping relationship.
 
-For the HugeTLB page of the pud level mapping. It is similar to the former.
+For the woke HugeTLB page of the woke pud level mapping. It is similar to the woke former.
 We also can use this approach to free (PAGE_SIZE - 1) vmemmap pages.
 
-Apart from the HugeTLB page of the pmd/pud level mapping, some architectures
-(e.g. aarch64) provides a contiguous bit in the translation table entries
-that hints to the MMU to indicate that it is one of a contiguous set of
+Apart from the woke HugeTLB page of the woke pmd/pud level mapping, some architectures
+(e.g. aarch64) provides a contiguous bit in the woke translation table entries
+that hints to the woke MMU to indicate that it is one of a contiguous set of
 entries that can be cached in a single TLB entry.
 
-The contiguous bit is used to increase the mapping size at the pmd and pte
+The contiguous bit is used to increase the woke mapping size at the woke pmd and pte
 (last) level. So this type of HugeTLB page can be optimized only when its
-size of the ``struct page`` structs is greater than **1** page.
+size of the woke ``struct page`` structs is greater than **1** page.
 
-Notice: The head vmemmap page is not freed to the buddy allocator and all
-tail vmemmap pages are mapped to the head vmemmap page frame. So we can see
+Notice: The head vmemmap page is not freed to the woke buddy allocator and all
+tail vmemmap pages are mapped to the woke head vmemmap page frame. So we can see
 more than one ``struct page`` struct with ``PG_head`` (e.g. 8 per 2 MB HugeTLB
 page) associated with each HugeTLB page. The ``compound_head()`` can handle
-this correctly. There is only **one** head ``struct page``, the tail
+this correctly. There is only **one** head ``struct page``, the woke tail
 ``struct page`` with ``PG_head`` are fake head ``struct page``.  We need an
 approach to distinguish between those two different types of ``struct page`` so
-that ``compound_head()`` can return the real head ``struct page`` when the
-parameter is the tail ``struct page`` but with ``PG_head``.
+that ``compound_head()`` can return the woke real head ``struct page`` when the
+parameter is the woke tail ``struct page`` but with ``PG_head``.
 
 Device DAX
 ==========
 
-The device-dax interface uses the same tail deduplication technique explained
-in the previous chapter, except when used with the vmemmap in
+The device-dax interface uses the woke same tail deduplication technique explained
+in the woke previous chapter, except when used with the woke vmemmap in
 the device (altmap).
 
 The following page sizes are supported in DAX: PAGE_SIZE (4K on x86_64),
@@ -199,14 +199,14 @@ It only use 3 ``struct page`` for storing all information as opposed
 to 4 on HugeTLB pages.
 
 There's no remapping of vmemmap given that device-dax memory is not part of
-System RAM ranges initialized at boot. Thus the tail page deduplication
-happens at a later stage when we populate the sections. HugeTLB reuses the
-the head vmemmap page representing, whereas device-dax reuses the tail
-vmemmap page. This results in only half of the savings compared to HugeTLB.
+System RAM ranges initialized at boot. Thus the woke tail page deduplication
+happens at a later stage when we populate the woke sections. HugeTLB reuses the
+the head vmemmap page representing, whereas device-dax reuses the woke tail
+vmemmap page. This results in only half of the woke savings compared to HugeTLB.
 
 Deduplicated tail pages are not mapped read-only.
 
-Here's how things look like on device-dax after the sections are populated::
+Here's how things look like on device-dax after the woke sections are populated::
 
  +-----------+ ---virt_to_page---> +-----------+   mapping to   +-----------+
  |           |                     |     0     | -------------> |     0     |

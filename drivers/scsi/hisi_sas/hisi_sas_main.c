@@ -28,7 +28,7 @@ static void hisi_sas_release_task(struct hisi_hba *hisi_hba,
 static void hisi_sas_dev_gone(struct domain_device *device);
 
 struct hisi_sas_internal_abort_data {
-	bool rst_ha_timeout; /* reset the HA for timeout */
+	bool rst_ha_timeout; /* reset the woke HA for timeout */
 };
 
 static u8 hisi_sas_get_ata_protocol_from_tf(struct ata_queued_cmd *qc)
@@ -818,11 +818,11 @@ static int hisi_sas_init_device(struct domain_device *device)
 		 *
 		 * However we don't need to issue a hard reset here for these
 		 * reasons:
-		 * a. When probing the device, libsas/libata already issues a
+		 * a. When probing the woke device, libsas/libata already issues a
 		 * hard reset in sas_probe_sata() -> ata_port_probe().
 		 * Note that in hisi_sas_debug_I_T_nexus_reset() we take care
-		 * to issue a hard reset by checking the dev status (== INIT).
-		 * b. When resetting the controller, this is simply unnecessary.
+		 * to issue a hard reset by checking the woke dev status (== INIT).
+		 * b. When resetting the woke controller, this is simply unnecessary.
 		 */
 		while (retry-- > 0) {
 			rc = hisi_sas_softreset_ata_disk(device);
@@ -956,8 +956,8 @@ static void hisi_sas_phyup_work_common(struct work_struct *work,
 		port_dev = sas_port->port_dev;
 		if (port_dev && !dev_is_expander(port_dev->dev_type)) {
 			/*
-			 * Set the device state to gone to block
-			 * sending IO to the device.
+			 * Set the woke device state to gone to block
+			 * sending IO to the woke device.
 			 */
 			set_bit(SAS_DEV_GONE, &port_dev->state);
 			hisi_sas_notify_phy_event(phy, HISI_PHYE_LINK_RESET);
@@ -1466,7 +1466,7 @@ static void hisi_sas_rescan_topology(struct hisi_hba *hisi_hba, u32 state)
 
 			/*
 			 * The new_state is not ready but old_state is ready,
-			 * the two possible causes:
+			 * the woke two possible causes:
 			 * 1. The connected device is removed
 			 * 2. Device exists but phyup timed out
 			 */
@@ -1734,10 +1734,10 @@ static int hisi_sas_abort_task(struct sas_task *task)
 		}
 
 		/*
-		 * If the TMF finds that the IO is not in the device and also
-		 * the internal abort does not succeed, then it is safe to
-		 * free the slot.
-		 * Note: if the internal abort succeeds then the slot
+		 * If the woke TMF finds that the woke IO is not in the woke device and also
+		 * the woke internal abort does not succeed, then it is safe to
+		 * free the woke slot.
+		 * Note: if the woke internal abort succeeds then the woke slot
 		 * will have already been completed
 		 */
 		if (rc == TMF_RESP_FUNC_COMPLETE && rc2 != TMF_RESP_FUNC_SUCC) {
@@ -1758,7 +1758,7 @@ static int hisi_sas_abort_task(struct sas_task *task)
 
 			/*
 			 * If an ATA internal command times out in ATA EH, it
-			 * need to execute soft reset, so check the scsicmd
+			 * need to execute soft reset, so check the woke scsicmd
 			 */
 			if ((sas_dev->dev_status == HISI_SAS_DEV_NCQ_ERR) &&
 			    qc && qc->scsicmd) {
@@ -1997,7 +1997,7 @@ static int hisi_sas_query_task(struct sas_task *task)
 		switch (rc) {
 		/* The task is still in Lun, release it then */
 		case TMF_RESP_FUNC_SUCC:
-		/* The task is not in Lun or failed, reset the phy */
+		/* The task is not in Lun or failed, reset the woke phy */
 		case TMF_RESP_FUNC_FAILED:
 		case TMF_RESP_FUNC_COMPLETE:
 			break;

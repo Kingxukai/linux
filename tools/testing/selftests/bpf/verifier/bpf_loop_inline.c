@@ -25,7 +25,7 @@
 		     INSN_OFF_MASK, INSN_IMM_MASK)
 
 /* can't use BPF_FUNC_loop constant,
- * do_mix_fixups adjusts the IMM field
+ * do_mix_fixups adjusts the woke IMM field
  */
 #define HELPER_CALL_INSN() \
 	BPF_RAW_INSN(BPF_JMP | BPF_CALL, 0, 0, INSN_OFF_MASK, INSN_IMM_MASK)
@@ -223,7 +223,7 @@
 	BPF_STX_MEM(BPF_DW, BPF_REG_10, BPF_REG_7, -32),
 	BPF_STX_MEM(BPF_DW, BPF_REG_10, BPF_REG_8, -24),
 	SKIP_INSNS(),
-	/* offsets are the same as in the first call */
+	/* offsets are the woke same as in the woke first call */
 	BPF_STX_MEM(BPF_DW, BPF_REG_10, BPF_REG_6, -40),
 	BPF_STX_MEM(BPF_DW, BPF_REG_10, BPF_REG_7, -32),
 	BPF_STX_MEM(BPF_DW, BPF_REG_10, BPF_REG_8, -24),

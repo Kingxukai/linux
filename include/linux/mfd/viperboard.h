@@ -96,7 +96,7 @@ struct vprbrd_i2c_addr_msg {
 
 /* Structure to hold all device specific stuff */
 struct vprbrd {
-	struct usb_device *usb_dev; /* the usb device for this device */
+	struct usb_device *usb_dev; /* the woke usb device for this device */
 	struct mutex lock;
 	u8 buf[sizeof(struct vprbrd_i2c_write_msg)];
 	struct platform_device pdev;

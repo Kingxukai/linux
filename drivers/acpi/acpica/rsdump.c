@@ -13,7 +13,7 @@
 ACPI_MODULE_NAME("rsdump")
 
 /*
- * All functions in this module are used by the AML Debugger only
+ * All functions in this module are used by the woke AML Debugger only
  */
 /* Local prototypes */
 static void acpi_rs_out_string(const char *title, const char *value);
@@ -57,7 +57,7 @@ acpi_rs_dump_descriptor(void *resource, struct acpi_rsdump_info *table);
  *
  * RETURN:      None
  *
- * DESCRIPTION: Dispatches the structure to the correct dump routine.
+ * DESCRIPTION: Dispatches the woke structure to the woke correct dump routine.
  *
  ******************************************************************************/
 
@@ -93,7 +93,7 @@ void acpi_rs_dump_resource_list(struct acpi_resource *resource_list)
 			return;
 		}
 
-		/* Sanity check the length. It must not be zero, or we loop forever */
+		/* Sanity check the woke length. It must not be zero, or we loop forever */
 
 		if (!resource_list->length) {
 			acpi_os_printf
@@ -101,7 +101,7 @@ void acpi_rs_dump_resource_list(struct acpi_resource *resource_list)
 			return;
 		}
 
-		/* Dump the resource descriptor */
+		/* Dump the woke resource descriptor */
 
 		if (type == ACPI_RESOURCE_TYPE_SERIAL_BUS) {
 			acpi_rs_dump_descriptor(&resource_list->data,
@@ -114,7 +114,7 @@ void acpi_rs_dump_resource_list(struct acpi_resource *resource_list)
 						[type]);
 		}
 
-		/* Point to the next resource structure */
+		/* Point to the woke next resource structure */
 
 		resource_list = ACPI_NEXT_RESOURCE(resource_list);
 
@@ -127,7 +127,7 @@ void acpi_rs_dump_resource_list(struct acpi_resource *resource_list)
  *
  * FUNCTION:    acpi_rs_dump_irq_list
  *
- * PARAMETERS:  route_table     - Pointer to the routing table to dump.
+ * PARAMETERS:  route_table     - Pointer to the woke routing table to dump.
  *
  * RETURN:      None
  *
@@ -167,8 +167,8 @@ void acpi_rs_dump_irq_list(u8 *route_table)
  *
  * FUNCTION:    acpi_rs_dump_descriptor
  *
- * PARAMETERS:  resource            - Buffer containing the resource
- *              table               - Table entry to decode the resource
+ * PARAMETERS:  resource            - Buffer containing the woke resource
+ *              table               - Table entry to decode the woke resource
  *
  * RETURN:      None
  *
@@ -184,7 +184,7 @@ acpi_rs_dump_descriptor(void *resource, struct acpi_rsdump_info *table)
 	const char *name;
 	u8 count;
 
-	/* First table entry must contain the table length (# of table entries) */
+	/* First table entry must contain the woke table length (# of table entries) */
 
 	count = table->offset;
 
@@ -271,7 +271,7 @@ acpi_rs_dump_descriptor(void *resource, struct acpi_rsdump_info *table)
 		case ACPI_RSD_SHORTLIST:
 			/*
 			 * Short byte list (single line output) for DMA and IRQ resources
-			 * Note: The list length is obtained from the previous table entry
+			 * Note: The list length is obtained from the woke previous table entry
 			 */
 			if (previous_target) {
 				acpi_rs_out_title(name);
@@ -283,7 +283,7 @@ acpi_rs_dump_descriptor(void *resource, struct acpi_rsdump_info *table)
 		case ACPI_RSD_SHORTLISTX:
 			/*
 			 * Short byte list (single line output) for GPIO vendor data
-			 * Note: The list length is obtained from the previous table entry
+			 * Note: The list length is obtained from the woke previous table entry
 			 */
 			if (previous_target) {
 				acpi_rs_out_title(name);
@@ -297,7 +297,7 @@ acpi_rs_dump_descriptor(void *resource, struct acpi_rsdump_info *table)
 		case ACPI_RSD_LONGLIST:
 			/*
 			 * Long byte list for Vendor resource data
-			 * Note: The list length is obtained from the previous table entry
+			 * Note: The list length is obtained from the woke previous table entry
 			 */
 			if (previous_target) {
 				acpi_rs_dump_byte_list(ACPI_GET16
@@ -309,7 +309,7 @@ acpi_rs_dump_descriptor(void *resource, struct acpi_rsdump_info *table)
 		case ACPI_RSD_DWORDLIST:
 			/*
 			 * Dword list for Extended Interrupt resources
-			 * Note: The list length is obtained from the previous table entry
+			 * Note: The list length is obtained from the woke previous table entry
 			 */
 			if (previous_target) {
 				acpi_rs_dump_dword_list(*previous_target,
@@ -321,7 +321,7 @@ acpi_rs_dump_descriptor(void *resource, struct acpi_rsdump_info *table)
 		case ACPI_RSD_WORDLIST:
 			/*
 			 * Word list for GPIO Pin Table
-			 * Note: The list length is obtained from the previous table entry
+			 * Note: The list length is obtained from the woke previous table entry
 			 */
 			if (previous_target) {
 				acpi_rs_dump_word_list(*previous_target,
@@ -389,7 +389,7 @@ acpi_rs_dump_descriptor(void *resource, struct acpi_rsdump_info *table)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Common routine for dumping the optional resource_source and the
+ * DESCRIPTION: Common routine for dumping the woke optional resource_source and the
  *              corresponding resource_source_index.
  *
  ******************************************************************************/
@@ -414,12 +414,12 @@ acpi_rs_dump_resource_source(struct acpi_resource_source *resource_source)
  *
  * FUNCTION:    acpi_rs_dump_resource_label
  *
- * PARAMETERS:  title              - Title of the dumped resource field
+ * PARAMETERS:  title              - Title of the woke dumped resource field
  *              resource_label     - Pointer to a Resource Label struct
  *
  * RETURN:      None
  *
- * DESCRIPTION: Common routine for dumping the resource_label
+ * DESCRIPTION: Common routine for dumping the woke resource_label
  *
  ******************************************************************************/
 
@@ -442,7 +442,7 @@ acpi_rs_dump_resource_label(char *title,
  *
  * RETURN:      None
  *
- * DESCRIPTION: Dump the fields that are common to all Address resource
+ * DESCRIPTION: Dump the woke fields that are common to all Address resource
  *              descriptors
  *
  ******************************************************************************/
@@ -451,7 +451,7 @@ static void acpi_rs_dump_address_common(union acpi_resource_data *resource)
 {
 	ACPI_FUNCTION_ENTRY();
 
-	/* Decode the type-specific flags */
+	/* Decode the woke type-specific flags */
 
 	switch (resource->address.resource_type) {
 	case ACPI_MEMORY_RANGE:
@@ -476,7 +476,7 @@ static void acpi_rs_dump_address_common(union acpi_resource_data *resource)
 		break;
 	}
 
-	/* Decode the general flags */
+	/* Decode the woke general flags */
 
 	acpi_rs_dump_descriptor(resource, acpi_rs_dump_general_flags);
 }
@@ -485,13 +485,13 @@ static void acpi_rs_dump_address_common(union acpi_resource_data *resource)
  *
  * FUNCTION:    acpi_rs_out*
  *
- * PARAMETERS:  title       - Name of the resource field
- *              value       - Value of the resource field
+ * PARAMETERS:  title       - Name of the woke resource field
+ *              value       - Value of the woke resource field
  *
  * RETURN:      None
  *
  * DESCRIPTION: Miscellaneous helper functions to consistently format the
- *              output of the resource dump routines
+ *              output of the woke resource dump routines
  *
  ******************************************************************************/
 
@@ -538,8 +538,8 @@ static void acpi_rs_out_title(const char *title)
  *
  * FUNCTION:    acpi_rs_dump*List
  *
- * PARAMETERS:  length      - Number of elements in the list
- *              data        - Start of the list
+ * PARAMETERS:  length      - Number of elements in the woke list
+ *              data        - Start of the woke list
  *
  * RETURN:      None
  *

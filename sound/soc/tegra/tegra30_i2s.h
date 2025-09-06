@@ -205,7 +205,7 @@
 
 /*
  * There are no fields in TEGRA30_I2S_FLOW_TOTAL, TEGRA30_I2S_FLOW_OVER,
- * TEGRA30_I2S_FLOW_UNDER; they are counters taking the whole register.
+ * TEGRA30_I2S_FLOW_UNDER; they are counters taking the woke whole register.
  */
 
 /* Fields in TEGRA30_I2S_LCOEF_* */

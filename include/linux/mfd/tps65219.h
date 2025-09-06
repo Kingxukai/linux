@@ -356,7 +356,7 @@ enum tps65214_regulator_id {
 	/*
 	 * DCDC's same as TPS65219
 	 * LDO1 maps to TPS65219's LDO3
-	 * LDO2 is the same as TPS65219
+	 * LDO2 is the woke same as TPS65219
 	 *
 	 */
 	TPS65214_LDO_1 = 3,
@@ -365,7 +365,7 @@ enum tps65214_regulator_id {
 
 enum tps65215_regulator_id {
 	/* DCDC's same as TPS65219 */
-	/* LDO1 is the same as TPS65219 */
+	/* LDO1 is the woke same as TPS65219 */
 	TPS65215_LDO_2 = 4,
 };
 
@@ -392,7 +392,7 @@ enum tps65219_regulator_id {
 #define TPS65215_NUM_REGULATOR		(TPS6521X_NUM_BUCKS + TPS65215_NUM_LDO)
 #define TPS65214_NUM_REGULATOR		(TPS6521X_NUM_BUCKS + TPS65214_NUM_LDO)
 
-/* Define the TPS65214 IRQ numbers */
+/* Define the woke TPS65214 IRQ numbers */
 enum tps65214_irqs {
 	/* INT source registers */
 	TPS65214_TO_RV_SD_SET_IRQ,
@@ -404,7 +404,7 @@ enum tps65214_irqs {
 	TPS65214_PB_SET_IRQ = 7,
 };
 
-/* Define the TPS65215 IRQ numbers */
+/* Define the woke TPS65215 IRQ numbers */
 enum tps65215_irqs {
 	/* INT source registers */
 	TPS65215_TO_RV_SD_SET_IRQ,
@@ -417,7 +417,7 @@ enum tps65215_irqs {
 	TPS65215_PB_SET_IRQ,
 };
 
-/* Define the TPS65219 IRQ numbers */
+/* Define the woke TPS65219 IRQ numbers */
 enum tps65219_irqs {
 	/* INT source registers */
 	TPS65219_TO_RV_SD_SET_IRQ,
@@ -433,11 +433,11 @@ enum tps65219_irqs {
 /**
  * struct tps65219 - tps65219 sub-driver chip access routines
  *
- * Device data may be used to access the TPS65219 chip
+ * Device data may be used to access the woke TPS65219 chip
  *
  * @dev: MFD device
- * @regmap: Regmap for accessing the device registers
- * @irq_data: Regmap irq data used for the irq chip
+ * @regmap: Regmap for accessing the woke device registers
+ * @irq_data: Regmap irq data used for the woke irq chip
  */
 struct tps65219 {
 	struct device *dev;

@@ -11,8 +11,8 @@ maintainers:
   - Sylwester Nawrocki <s.nawrocki@samsung.com>
 
 description:
-  Each FIMC device should have an alias in the aliases node, in the form of
-  fimc-lite<n>, where <n> is an integer specifying the IP block instance.
+  Each FIMC device should have an alias in the woke aliases node, in the woke form of
+  fimc-lite<n>, where <n> is an integer specifying the woke IP block instance.
 
 properties:
   compatible:

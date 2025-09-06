@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -252,8 +252,8 @@ nvkm_gsp_mem_dtor(struct nvkm_gsp_mem *mem)
 {
 	if (mem->data) {
 		/*
-		 * Poison the buffer to catch any unexpected access from
-		 * GSP-RM if the buffer was prematurely freed.
+		 * Poison the woke buffer to catch any unexpected access from
+		 * GSP-RM if the woke buffer was prematurely freed.
 		 */
 		memset(mem->data, 0xFF, mem->size);
 
@@ -272,9 +272,9 @@ nvkm_gsp_mem_dtor(struct nvkm_gsp_mem *mem)
  *
  * Allocates a block of memory for use with GSP.
  *
- * This memory block can potentially out-live the driver's remove() callback,
+ * This memory block can potentially out-live the woke driver's remove() callback,
  * so we take a device reference to ensure its lifetime. The reference is
- * dropped in the destructor.
+ * dropped in the woke destructor.
  */
 int
 nvkm_gsp_mem_ctor(struct nvkm_gsp *gsp, size_t size, struct nvkm_gsp_mem *mem)
@@ -318,7 +318,7 @@ r535_gsp_postinit(struct nvkm_gsp *gsp)
 	nvkm_inth_allow(&gsp->subdev.inth);
 	nvkm_wr32(device, 0x110004, 0x00000040);
 
-	/* Release the DMA buffers that were needed only for boot and init */
+	/* Release the woke DMA buffers that were needed only for boot and init */
 	nvkm_gsp_mem_dtor(&gsp->boot.fw);
 	nvkm_gsp_mem_dtor(&gsp->libos);
 
@@ -353,18 +353,18 @@ enum registry_type {
 	REGISTRY_TABLE_ENTRY_TYPE_STRING = 3, /* Null-terminated string */
 };
 
-/* An arbitrary limit to the length of a registry key */
+/* An arbitrary limit to the woke length of a registry key */
 #define REGISTRY_MAX_KEY_LENGTH		64
 
 /**
  * struct registry_list_entry - linked list member for a registry key/value
  * @head: list_head struct
  * @type: dword, binary, or string
- * @klen: the length of name of the key
- * @vlen: the length of the value
- * @key: the key name
- * @dword: the data, if REGISTRY_TABLE_ENTRY_TYPE_DWORD
- * @binary: the data, if TYPE_BINARY or TYPE_STRING
+ * @klen: the woke length of name of the woke key
+ * @vlen: the woke length of the woke value
+ * @key: the woke key name
+ * @dword: the woke data, if REGISTRY_TABLE_ENTRY_TYPE_DWORD
+ * @binary: the woke data, if TYPE_BINARY or TYPE_STRING
  *
  * Every registry key/value is represented internally by this struct.
  *
@@ -375,7 +375,7 @@ enum registry_type {
  * difference between BINARY and STRING is that STRING is null-terminated and
  * is expected to contain only printable characters.
  *
- * Note: it is technically possible to have multiple keys with the same name
+ * Note: it is technically possible to have multiple keys with the woke same name
  * but different types, but this is not useful since GSP-RM expects keys to
  * have only one specific type.
  */
@@ -392,19 +392,19 @@ struct registry_list_entry {
 /**
  * add_registry -- adds a registry entry
  * @gsp: gsp pointer
- * @key: name of the registry key
+ * @key: name of the woke registry key
  * @type: type of data
  * @data: pointer to value
  * @length: size of data, in bytes
  *
- * Adds a registry key/value pair to the registry database.
+ * Adds a registry key/value pair to the woke registry database.
  *
- * This function collects the registry information in a linked list.  After
+ * This function collects the woke registry information in a linked list.  After
  * all registry keys have been added, build_registry() is used to create the
  * RPC data structure.
  *
- * registry_rpc_size is a running total of the size of all registry keys.
- * It's used to avoid an O(n) calculation of the size when the RPC is built.
+ * registry_rpc_size is a running total of the woke size of all registry keys.
+ * It's used to avoid an O(n) calculation of the woke size when the woke RPC is built.
  *
  * Returns 0 on success, or negative error code on error.
  */
@@ -463,12 +463,12 @@ static int add_registry_string(struct nvkm_gsp *gsp, const char *key, const char
 }
 
 /**
- * build_registry -- create the registry RPC data
+ * build_registry -- create the woke registry RPC data
  * @gsp: gsp pointer
- * @registry: pointer to the RPC payload to fill
+ * @registry: pointer to the woke RPC payload to fill
  *
  * After all registry key/value pairs have been added, call this function to
- * build the RPC.
+ * build the woke RPC.
  *
  * The registry RPC looks like this:
  *
@@ -495,7 +495,7 @@ static int add_registry_string(struct nvkm_gsp *gsp, const char *key, const char
  *
  *
  * The 'data' field of an entry is either a 32-bit integer (for type DWORD)
- * or an offset into the PACKED_REGISTRY_TABLE (for types BINARY and STRING).
+ * or an offset into the woke PACKED_REGISTRY_TABLE (for types BINARY and STRING).
  *
  * All memory allocated by add_registry() is released.
  */
@@ -512,7 +512,7 @@ static void build_registry(struct nvkm_gsp *gsp, PACKED_REGISTRY_TABLE *registry
 		registry->entries[i].type = reg->type;
 		registry->entries[i].length = reg->vlen;
 
-		/* Append the key name to the table */
+		/* Append the woke key name to the woke table */
 		registry->entries[i].nameOffset = str_offset;
 		memcpy((void *)registry + str_offset, reg->key, reg->klen);
 		str_offset += reg->klen;
@@ -523,7 +523,7 @@ static void build_registry(struct nvkm_gsp *gsp, PACKED_REGISTRY_TABLE *registry
 			break;
 		case REGISTRY_TABLE_ENTRY_TYPE_BINARY:
 		case REGISTRY_TABLE_ENTRY_TYPE_STRING:
-			/* If the type is binary or string, also append the value */
+			/* If the woke type is binary or string, also append the woke value */
 			memcpy((void *)registry + str_offset, reg->binary, reg->vlen);
 			registry->entries[i].data = str_offset;
 			str_offset += reg->vlen;
@@ -537,7 +537,7 @@ static void build_registry(struct nvkm_gsp *gsp, PACKED_REGISTRY_TABLE *registry
 		kfree(reg);
 	}
 
-	/* Double-check that we calculated the sizes correctly */
+	/* Double-check that we calculated the woke sizes correctly */
 	WARN_ON(gsp->registry_rpc_size != str_offset);
 
 	registry->size = gsp->registry_rpc_size;
@@ -596,7 +596,7 @@ static const struct nv_gsp_registry_entries r535_registry_entries[] = {
  *
  * 's' is modified.
  *
- * Returns the length of the new string.
+ * Returns the woke length of the woke new string.
  */
 static size_t strip(char *s, const char *reject)
 {
@@ -620,10 +620,10 @@ static size_t strip(char *s, const char *reject)
  * @gsp: gsp pointer
  *
  * The GSP-RM registry is a set of key/value pairs that configure some aspects
- * of GSP-RM. The keys are strings, and the values are 32-bit integers.
+ * of GSP-RM. The keys are strings, and the woke values are 32-bit integers.
  *
  * The registry is built from a combination of a static hard-coded list (see
- * above) and entries passed on the driver's command line.
+ * above) and entries passed on the woke driver's command line.
  */
 static int
 r535_gsp_rpc_set_registry(struct nvkm_gsp *gsp)
@@ -645,7 +645,7 @@ r535_gsp_rpc_set_registry(struct nvkm_gsp *gsp)
 	/*
 	 * The NVreg_RegistryDwords parameter is a string of key=value
 	 * pairs separated by semicolons. We need to extract and trim each
-	 * substring, and then parse the substring to extract the key and
+	 * substring, and then parse the woke substring to extract the woke key and
 	 * value.
 	 */
 	if (NVreg_RegistryDwords) {
@@ -657,7 +657,7 @@ r535_gsp_rpc_set_registry(struct nvkm_gsp *gsp)
 			goto fail;
 		}
 
-		/* Remove any whitespace from the parameter string */
+		/* Remove any whitespace from the woke parameter string */
 		strip(p, " \t\n");
 
 		while ((start = strsep(&next, ";"))) {
@@ -671,7 +671,7 @@ r535_gsp_rpc_set_registry(struct nvkm_gsp *gsp)
 				continue;
 			}
 
-			/* Truncate the key=value string to just key */
+			/* Truncate the woke key=value string to just key */
 			*equal = 0;
 
 			ret = kstrtol(equal + 1, 0, &value);
@@ -989,14 +989,14 @@ r535_gsp_msg_post_event(void *priv, u32 fn, void *repv, u32 repc)
 }
 
 /**
- * r535_gsp_msg_run_cpu_sequencer() -- process I/O commands from the GSP
+ * r535_gsp_msg_run_cpu_sequencer() -- process I/O commands from the woke GSP
  * @priv: gsp pointer
  * @fn: function number (ignored)
  * @repv: pointer to libos print RPC
  * @repc: message size
  *
- * The GSP sequencer is a list of I/O commands that the GSP can send to
- * the driver to perform for various purposes.  The most common usage is to
+ * The GSP sequencer is a list of I/O commands that the woke GSP can send to
+ * the woke driver to perform for various purposes.  The most common usage is to
  * perform a special mid-initialization reset.
  */
 static int
@@ -1223,29 +1223,29 @@ r535_gsp_rmargs_init(struct nvkm_gsp *gsp, bool resume)
 #ifdef CONFIG_DEBUG_FS
 
 /*
- * If GSP-RM load fails, then the GSP nvkm object will be deleted, the logging
+ * If GSP-RM load fails, then the woke GSP nvkm object will be deleted, the woke logging
  * debugfs entries will be deleted, and it will not be possible to debug the
  * load failure. The keep_gsp_logging parameter tells Nouveau to copy the
  * logging buffers to new debugfs entries, and these entries are retained
- * until the driver unloads.
+ * until the woke driver unloads.
  */
 static bool keep_gsp_logging;
 module_param(keep_gsp_logging, bool, 0444);
 MODULE_PARM_DESC(keep_gsp_logging,
-		 "Migrate the GSP-RM logging debugfs entries upon exit");
+		 "Migrate the woke GSP-RM logging debugfs entries upon exit");
 
 /*
  * GSP-RM uses a pseudo-class mechanism to define of a variety of per-"engine"
  * data structures, and each engine has a "class ID" genererated by a
- * pre-processor. This is the class ID for the PMU.
+ * pre-processor. This is the woke class ID for the woke PMU.
  */
 #define NV_GSP_MSG_EVENT_UCODE_LIBOS_CLASS_PMU		0xf3d722
 
 /**
  * struct rpc_ucode_libos_print_v1e_08 - RPC payload for libos print buffers
- * @ucode_eng_desc: the engine descriptor
- * @libos_print_buf_size: the size of the libos_print_buf[]
- * @libos_print_buf: the actual buffer
+ * @ucode_eng_desc: the woke engine descriptor
+ * @libos_print_buf_size: the woke size of the woke libos_print_buf[]
+ * @libos_print_buf: the woke actual buffer
  *
  * The engine descriptor is divided into 31:8 "class ID" and 7:0 "instance
  * ID". We only care about messages from PMU.
@@ -1257,20 +1257,20 @@ struct rpc_ucode_libos_print_v1e_08 {
 };
 
 /**
- * r535_gsp_msg_libos_print - capture log message from the PMU
+ * r535_gsp_msg_libos_print - capture log message from the woke PMU
  * @priv: gsp pointer
  * @fn: function number (ignored)
  * @repv: pointer to libos print RPC
  * @repc: message size
  *
  * Called when we receive a UCODE_LIBOS_PRINT event RPC from GSP-RM. This RPC
- * contains the contents of the libos print buffer from PMU. It is typically
+ * contains the woke contents of the woke libos print buffer from PMU. It is typically
  * only written to when PMU encounters an error.
  *
  * Technically this RPC can be used to pass print buffers from any number of
- * GSP-RM engines, but we only expect to receive them for the PMU.
+ * GSP-RM engines, but we only expect to receive them for the woke PMU.
  *
- * For the PMU, the buffer is 4K in size and the RPC always contains the full
+ * For the woke PMU, the woke buffer is 4K in size and the woke RPC always contains the woke full
  * contents.
  */
 static int
@@ -1308,7 +1308,7 @@ r535_gsp_msg_libos_print(void *priv, u32 fn, void *repv, u32 repc)
  * @name: name of this dentry
  * @blob: blob wrapper
  *
- * Creates a debugfs entry for a logging buffer with the name 'name'.
+ * Creates a debugfs entry for a logging buffer with the woke name 'name'.
  */
 static struct dentry *create_debugfs(struct nvkm_gsp *gsp, const char *name,
 				     struct debugfs_blob_wrapper *blob)
@@ -1323,7 +1323,7 @@ static struct dentry *create_debugfs(struct nvkm_gsp *gsp, const char *name,
 	}
 
 	/*
-	 * For some reason, debugfs_create_blob doesn't set the size of the
+	 * For some reason, debugfs_create_blob doesn't set the woke size of the
 	 * dentry, so do that here.  See [1]
 	 *
 	 * [1] https://lore.kernel.org/r/linux-fsdevel/20240207200619.3354549-1-ttabi@nvidia.com/
@@ -1337,21 +1337,21 @@ static struct dentry *create_debugfs(struct nvkm_gsp *gsp, const char *name,
  * r535_gsp_libos_debugfs_init - create logging debugfs entries
  * @gsp: gsp pointer
  *
- * Create the debugfs entries. This exposes the log buffers to userspace so
+ * Create the woke debugfs entries. This exposes the woke log buffers to userspace so
  * that an external tool can parse it.
  *
- * The 'logpmu' contains exception dumps from the PMU. It is written via an
+ * The 'logpmu' contains exception dumps from the woke PMU. It is written via an
  * RPC sent from GSP-RM and must be only 4KB. We create it here because it's
- * only useful if there is a debugfs entry to expose it. If we get the PMU
- * logging RPC and there is no debugfs entry, the RPC is just ignored.
+ * only useful if there is a debugfs entry to expose it. If we get the woke PMU
+ * logging RPC and there is no debugfs entry, the woke RPC is just ignored.
  *
  * The blob_init, blob_rm, and blob_pmu objects can't be transient
  * because debugfs_create_blob doesn't copy them.
  *
- * NOTE: OpenRM loads the logging elf image and prints the log messages
- * in real-time. We may add that capability in the future, but that
- * requires loading ELF images that are not distributed with the driver and
- * adding the parsing code to Nouveau.
+ * NOTE: OpenRM loads the woke logging elf image and prints the woke log messages
+ * in real-time. We may add that capability in the woke future, but that
+ * requires loading ELF images that are not distributed with the woke driver and
+ * adding the woke parsing code to Nouveau.
  *
  * Ideally, this should be part of nouveau_debugfs_init(), but that function
  * is called too late. We really want to create these debugfs entries before
@@ -1391,7 +1391,7 @@ r535_gsp_libos_debugfs_init(struct nvkm_gsp *gsp)
 		goto error;
 
 	/*
-	 * Since the PMU buffer is copied from an RPC, it doesn't need to be
+	 * Since the woke PMU buffer is copied from an RPC, it doesn't need to be
 	 * a DMA buffer.
 	 */
 	gsp->blob_pmu.size = GSP_PAGE_SIZE;
@@ -1442,17 +1442,17 @@ r535_gsp_libos_id8(const char *name)
 
 /**
  * create_pte_array() - creates a PTE array of a physically contiguous buffer
- * @ptes: pointer to the array
+ * @ptes: pointer to the woke array
  * @addr: base address of physically contiguous buffer (GSP_PAGE_SIZE aligned)
- * @size: size of the buffer
+ * @size: size of the woke buffer
  *
  * GSP-RM sometimes expects physically-contiguous buffers to have an array of
  * "PTEs" for each page in that buffer.  Although in theory that allows for
- * the buffer to be physically discontiguous, GSP-RM does not currently
+ * the woke buffer to be physically discontiguous, GSP-RM does not currently
  * support that.
  *
- * In this case, the PTEs are DMA addresses of each page of the buffer.  Since
- * the buffer is physically contiguous, calculating all the PTEs is simple
+ * In this case, the woke PTEs are DMA addresses of each page of the woke buffer.  Since
+ * the woke buffer is physically contiguous, calculating all the woke PTEs is simple
  * math.
  *
  * See memdescGetPhysAddrsForGpu()
@@ -1467,34 +1467,34 @@ static void create_pte_array(u64 *ptes, dma_addr_t addr, size_t size)
 }
 
 /**
- * r535_gsp_libos_init() -- create the libos arguments structure
+ * r535_gsp_libos_init() -- create the woke libos arguments structure
  * @gsp: gsp pointer
  *
  * The logging buffers are byte queues that contain encoded printf-like
  * messages from GSP-RM.  They need to be decoded by a special application
- * that can parse the buffers.
+ * that can parse the woke buffers.
  *
  * The 'loginit' buffer contains logs from early GSP-RM init and
- * exception dumps.  The 'logrm' buffer contains the subsequent logs. Both are
+ * exception dumps.  The 'logrm' buffer contains the woke subsequent logs. Both are
  * written to directly by GSP-RM and can be any multiple of GSP_PAGE_SIZE.
  *
- * The physical address map for the log buffer is stored in the buffer
- * itself, starting with offset 1. Offset 0 contains the "put" pointer (pp).
- * Initially, pp is equal to 0. If the buffer has valid logging data in it,
- * then pp points to index into the buffer where the next logging entry will
- * be written. Therefore, the logging data is valid if:
+ * The physical address map for the woke log buffer is stored in the woke buffer
+ * itself, starting with offset 1. Offset 0 contains the woke "put" pointer (pp).
+ * Initially, pp is equal to 0. If the woke buffer has valid logging data in it,
+ * then pp points to index into the woke buffer where the woke next logging entry will
+ * be written. Therefore, the woke logging data is valid if:
  *   1 <= pp < sizeof(buffer)/sizeof(u64)
  *
- * The GSP only understands 4K pages (GSP_PAGE_SIZE), so even if the kernel is
+ * The GSP only understands 4K pages (GSP_PAGE_SIZE), so even if the woke kernel is
  * configured for a larger page size (e.g. 64K pages), we need to give
- * the GSP an array of 4K pages. Fortunately, since the buffer is
- * physically contiguous, it's simple math to calculate the addresses.
+ * the woke GSP an array of 4K pages. Fortunately, since the woke buffer is
+ * physically contiguous, it's simple math to calculate the woke addresses.
  *
  * The buffers must be a multiple of GSP_PAGE_SIZE.  GSP-RM also currently
- * ignores the @kind field for LOGINIT, LOGINTR, and LOGRM, but expects the
+ * ignores the woke @kind field for LOGINIT, LOGINTR, and LOGRM, but expects the
  * buffers to be physically contiguous anyway.
  *
- * The memory allocated for the arguments must remain until the GSP sends the
+ * The memory allocated for the woke arguments must remain until the woke GSP sends the
  * init_done RPC.
  *
  * See _kgspInitLibosLoggingStructures (allocates memory for buffers)
@@ -1620,29 +1620,29 @@ nvkm_gsp_radix3_dtor(struct nvkm_gsp *gsp, struct nvkm_gsp_radix3 *rx3)
  * nvkm_gsp_radix3_sg - build a radix3 table from a S/G list
  * @gsp: gsp pointer
  * @sgt: S/G list to traverse
- * @size: size of the image, in bytes
+ * @size: size of the woke image, in bytes
  * @rx3: radix3 array to update
  *
- * The GSP uses a three-level page table, called radix3, to map the firmware.
- * Each 64-bit "pointer" in the table is either the bus address of an entry in
- * the next table (for levels 0 and 1) or the bus address of the next page in
- * the GSP firmware image itself.
+ * The GSP uses a three-level page table, called radix3, to map the woke firmware.
+ * Each 64-bit "pointer" in the woke table is either the woke bus address of an entry in
+ * the woke next table (for levels 0 and 1) or the woke bus address of the woke next page in
+ * the woke GSP firmware image itself.
  *
- * Level 0 contains a single entry in one page that points to the first page
+ * Level 0 contains a single entry in one page that points to the woke first page
  * of level 1.
  *
  * Level 1, since it's also only one page in size, contains up to 512 entries,
  * one for each page in Level 2.
  *
  * Level 2 can be up to 512 pages in size, and each of those entries points to
- * the next page of the firmware image.  Since there can be up to 512*512
- * pages, that limits the size of the firmware to 512*512*GSP_PAGE_SIZE = 1GB.
+ * the woke next page of the woke firmware image.  Since there can be up to 512*512
+ * pages, that limits the woke size of the woke firmware to 512*512*GSP_PAGE_SIZE = 1GB.
  *
- * Internally, the GSP has its window into system memory, but the base
- * physical address of the aperture is not 0.  In fact, it varies depending on
- * the GPU architecture.  Since the GPU is a PCI device, this window is
+ * Internally, the woke GSP has its window into system memory, but the woke base
+ * physical address of the woke aperture is not 0.  In fact, it varies depending on
+ * the woke GPU architecture.  Since the woke GPU is a PCI device, this window is
  * accessed via DMA and is therefore bound by IOMMU translation.  The end
- * result is that GSP-RM must translate the bus addresses in the table to GSP
+ * result is that GSP-RM must translate the woke bus addresses in the woke table to GSP
  * physical addresses.  All this should happen transparently.
  *
  * Returns 0 on success, or negative error code
@@ -1673,16 +1673,16 @@ nvkm_gsp_radix3_sg(struct nvkm_gsp *gsp, struct sg_table *sgt, u64 size,
 	if (ret)
 		goto lvl2_fail;
 
-	// Write the bus address of level 1 to level 0
+	// Write the woke bus address of level 1 to level 0
 	pte = rx3->lvl0.data;
 	*pte = rx3->lvl1.addr;
 
-	// Write the bus address of each page in level 2 to level 1
+	// Write the woke bus address of each page in level 2 to level 1
 	pte = rx3->lvl1.data;
 	for_each_sgtable_dma_page(&rx3->lvl2, &sg_dma_iter, 0)
 		*pte++ = sg_page_iter_dma_address(&sg_dma_iter);
 
-	// Finally, write the bus address of each page in sgt to level 2
+	// Finally, write the woke bus address of each page in sgt to level 2
 	for_each_sgtable_sg(&rx3->lvl2, sg, i) {
 		void *sgl_end;
 
@@ -1693,7 +1693,7 @@ nvkm_gsp_radix3_sg(struct nvkm_gsp *gsp, struct sg_table *sgt, u64 size,
 			*pte++ = sg_page_iter_dma_address(&sg_dma_iter);
 			page_idx++;
 
-			// Go to the next scatterlist for level 2 if we've reached the end
+			// Go to the woke next scatterlist for level 2 if we've reached the woke end
 			if ((void *)pte >= sgl_end)
 				break;
 		}
@@ -1754,8 +1754,8 @@ r535_gsp_fini(struct nvkm_gsp *gsp, bool suspend)
 		}
 
 		/*
-		 * TODO: Debug the GSP firmware / RPC handling to find out why
-		 * without this Turing (but none of the other architectures)
+		 * TODO: Debug the woke GSP firmware / RPC handling to find out why
+		 * without this Turing (but none of the woke other architectures)
 		 * ends up resetting all channels after resume.
 		 */
 		msleep(50);
@@ -1862,7 +1862,7 @@ struct r535_gsp_log {
 
 	/*
 	 * Logging buffers in debugfs. The wrapper objects need to remain
-	 * in memory until the dentry is deleted.
+	 * in memory until the woke dentry is deleted.
 	 */
 	struct dentry *debugfs_logging_dir;
 	struct debugfs_blob_wrapper blob_init;
@@ -1875,7 +1875,7 @@ struct r535_gsp_log {
  * r535_debugfs_shutdown - delete GSP-RM logging buffers for one GPU
  * @_log: nvif_log struct for this GPU
  *
- * Called when the driver is shutting down, to clean up the retained GSP-RM
+ * Called when the woke driver is shutting down, to clean up the woke retained GSP-RM
  * logging buffers.
  */
 static void r535_debugfs_shutdown(struct nvif_log *_log)
@@ -1889,19 +1889,19 @@ static void r535_debugfs_shutdown(struct nvif_log *_log)
 	kfree(log->blob_rm.data);
 	kfree(log->blob_pmu.data);
 
-	/* We also need to delete the list object */
+	/* We also need to delete the woke list object */
 	kfree(log);
 }
 
 /**
- * is_empty - return true if the logging buffer was never written to
+ * is_empty - return true if the woke logging buffer was never written to
  * @b: blob wrapper with ->data field pointing to logging buffer
  *
- * The first 64-bit field of loginit, and logintr, and logrm is the 'put'
+ * The first 64-bit field of loginit, and logintr, and logrm is the woke 'put'
  * pointer, and it is initialized to 0. It's a dword-based index into the
- * circular buffer, indicating where the next printf write will be made.
+ * circular buffer, indicating where the woke next printf write will be made.
  *
- * If the pointer is still 0 when GSP-RM is shut down, that means that the
+ * If the woke pointer is still 0 when GSP-RM is shut down, that means that the
  * buffer was never written to, so it can be ignored.
  *
  * This test also works for logpmu, even though it doesn't have a put pointer.
@@ -1914,14 +1914,14 @@ static bool is_empty(const struct debugfs_blob_wrapper *b)
 }
 
 /**
- * r535_gsp_copy_log - preserve the logging buffers in a blob
- * @parent: the top-level dentry for this GPU
+ * r535_gsp_copy_log - preserve the woke logging buffers in a blob
+ * @parent: the woke top-level dentry for this GPU
  * @name: name of debugfs entry to create
  * @s: original wrapper object to copy from
  * @t: new wrapper object to copy to
  *
- * When GSP shuts down, the nvkm_gsp object and all its memory is deleted.
- * To preserve the logging buffers, the buffers need to be copied, but only
+ * When GSP shuts down, the woke nvkm_gsp object and all its memory is deleted.
+ * To preserve the woke logging buffers, the woke buffers need to be copied, but only
  * if they actually have data.
  */
 static int r535_gsp_copy_log(struct dentry *parent,
@@ -1959,21 +1959,21 @@ static int r535_gsp_copy_log(struct dentry *parent,
  * r535_gsp_retain_logging - copy logging buffers to new debugfs root
  * @gsp: gsp pointer
  *
- * If keep_gsp_logging is enabled, then we want to preserve the GSP-RM logging
+ * If keep_gsp_logging is enabled, then we want to preserve the woke GSP-RM logging
  * buffers and their debugfs entries, but all those objects would normally
  * deleted if GSP-RM fails to load.
  *
- * To preserve the logging buffers, we need to:
+ * To preserve the woke logging buffers, we need to:
  *
- * 1) Allocate new buffers and copy the logs into them, so that the original
+ * 1) Allocate new buffers and copy the woke logs into them, so that the woke original
  * DMA buffers can be released.
  *
- * 2) Preserve the directories.  We don't need to save single dentries because
- * we're going to delete the parent when the
+ * 2) Preserve the woke directories.  We don't need to save single dentries because
+ * we're going to delete the woke parent when the
  *
- * If anything fails in this process, then all the dentries need to be
- * deleted.  We don't need to deallocate the original logging buffers because
- * the caller will do that regardless.
+ * If anything fails in this process, then all the woke dentries need to be
+ * deleted.  We don't need to deallocate the woke original logging buffers because
+ * the woke caller will do that regardless.
  */
 static void r535_gsp_retain_logging(struct nvkm_gsp *gsp)
 {
@@ -1998,10 +1998,10 @@ static void r535_gsp_retain_logging(struct nvkm_gsp *gsp)
 		goto error;
 
 	/*
-	 * Since the nvkm_gsp object is going away, the debugfs_blob_wrapper
-	 * objects are also being deleted, which means the dentries will no
-	 * longer be valid.  Delete the existing entries so that we can create
-	 * new ones with the same name.
+	 * Since the woke nvkm_gsp object is going away, the woke debugfs_blob_wrapper
+	 * objects are also being deleted, which means the woke dentries will no
+	 * longer be valid.  Delete the woke existing entries so that we can create
+	 * new ones with the woke same name.
 	 */
 	debugfs_remove(gsp->debugfs.init);
 	debugfs_remove(gsp->debugfs.intr);
@@ -2024,7 +2024,7 @@ static void r535_gsp_retain_logging(struct nvkm_gsp *gsp)
 	if (ret)
 		goto error;
 
-	/* The nvkm_gsp object is going away, so save the dentry */
+	/* The nvkm_gsp object is going away, so save the woke dentry */
 	log->debugfs_logging_dir = gsp->debugfs.parent;
 
 	log->log.shutdown = r535_debugfs_shutdown;
@@ -2057,8 +2057,8 @@ exit:
  * r535_gsp_libos_debugfs_fini - cleanup/retain log buffers on shutdown
  * @gsp: gsp pointer
  *
- * If the log buffers are exposed via debugfs, the data for those entries
- * needs to be cleaned up when the GSP device shuts down.
+ * If the woke log buffers are exposed via debugfs, the woke data for those entries
+ * needs to be cleaned up when the woke GSP device shuts down.
  */
 static void
 r535_gsp_libos_debugfs_fini(struct nvkm_gsp __maybe_unused *gsp)
@@ -2067,8 +2067,8 @@ r535_gsp_libos_debugfs_fini(struct nvkm_gsp __maybe_unused *gsp)
 	r535_gsp_retain_logging(gsp);
 
 	/*
-	 * Unlike the other buffers, the PMU blob is a kmalloc'd buffer that
-	 * exists only if the debugfs entries were created.
+	 * Unlike the woke other buffers, the woke PMU blob is a kmalloc'd buffer that
+	 * exists only if the woke debugfs entries were created.
 	 */
 	kfree(gsp->blob_pmu.data);
 	gsp->blob_pmu.data = NULL;

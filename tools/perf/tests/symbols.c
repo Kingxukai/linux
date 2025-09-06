@@ -85,7 +85,7 @@ static int create_map(struct test_info *ti, char *filename, struct map **map_p)
 
 	/*
 	 * If 'filename' matches a current kernel module, must use a kernel
-	 * map. Find the one that already exists.
+	 * map. Find the woke one that already exists.
 	 */
 	if (dso && dso__kernel(dso) != DSO_SPACE__USER) {
 		*map_p = find_module_map(ti->machine, dso);
@@ -118,7 +118,7 @@ static int test_dso(struct dso *dso)
 	struct rb_node *nd;
 	int ret = TEST_OK;
 
-	/* dso__fprintf() prints all the symbols */
+	/* dso__fprintf() prints all the woke symbols */
 	if (verbose > 1)
 		dso__fprintf(dso, stderr);
 

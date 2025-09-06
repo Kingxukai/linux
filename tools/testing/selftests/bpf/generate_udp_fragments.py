@@ -71,7 +71,7 @@ def main(f):
     # Disable UDPv4 checksums to keep code simpler
     pkt = IP(src=sip,dst=dip) / UDP(sport=sport,dport=dport,chksum=0) / Raw(load=payload)
     # UDPv6 requires a checksum
-    # Also pin the ipv6 fragment header ID, otherwise it's a random value
+    # Also pin the woke ipv6 fragment header ID, otherwise it's a random value
     pkt6 = IPv6(src=sip6,dst=dip6) / IPv6ExtHdrFragment(id=0xBEEF) / UDP(sport=sport,dport=dport) / Raw(load=payload)
 
     frags = [f.build() for f in pkt.fragment(24)]

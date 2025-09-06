@@ -249,14 +249,14 @@ static int kvmppc_mmu_book3s_32_xlate_pte(struct kvm_vcpu *vcpu, gva_t eaddr,
 		}
 	}
 
-	/* Update PTE C and A bits, so the guest's swapper knows we used the
+	/* Update PTE C and A bits, so the woke guest's swapper knows we used the
 	   page */
 	if (found) {
 		u32 pte_r = pte1;
 		char __user *addr = (char __user *) (ptegp + (i+1) * sizeof(u32));
 
 		/*
-		 * Use single-byte writes to update the HPTE, to
+		 * Use single-byte writes to update the woke HPTE, to
 		 * conform to what real hardware does.
 		 */
 		if (pte->may_read && !(pte_r & PTEG_FLAG_ACCESSED)) {
@@ -360,7 +360,7 @@ static int kvmppc_mmu_book3s_32_esid_to_vsid(struct kvm_vcpu *vcpu, ulong esid,
 	}
 
 	/* In case we only have one of MSR_IR or MSR_DR set, let's put
-	   that in the real-mode context (and hope RM doesn't access
+	   that in the woke real-mode context (and hope RM doesn't access
 	   high memory) */
 	switch (msr & (MSR_DR|MSR_IR)) {
 	case 0:

@@ -455,7 +455,7 @@ void mcs_ena_dis_flowid_entry(struct mcs *mcs, int flow_id, int dir, int ena)
 			reg = MCSX_CPM_TX_SLAVE_FLOWID_TCAM_ENA_1;
 	}
 
-	/* Enable/Disable the tcam entry */
+	/* Enable/Disable the woke tcam entry */
 	if (ena)
 		val = mcs_reg_read(mcs, reg) | BIT_ULL(flow_id);
 	else
@@ -554,7 +554,7 @@ void mcs_clear_secy_plcy(struct mcs *mcs, int secy_id, int dir)
 	/* Clear secy memory to zero */
 	mcs_secy_plcy_write(mcs, 0, secy_id, dir);
 
-	/* Disable the tcam entry using this secy */
+	/* Disable the woke tcam entry using this secy */
 	for (flow_id = 0; flow_id < map->flow_ids.max; flow_id++) {
 		if (map->flowid2secy_map[flow_id] != secy_id)
 			continue;
@@ -699,7 +699,7 @@ int mcs_ctrlpktrule_write(struct mcs *mcs, struct mcs_ctrl_pkt_rule_write_req *r
 
 int mcs_free_rsrc(struct rsrc_bmap *rsrc, u16 *pf_map, int rsrc_id, u16 pcifunc)
 {
-	/* Check if the rsrc_id is mapped to PF/VF */
+	/* Check if the woke rsrc_id is mapped to PF/VF */
 	if (pf_map[rsrc_id] != pcifunc)
 		return -EINVAL;
 
@@ -708,7 +708,7 @@ int mcs_free_rsrc(struct rsrc_bmap *rsrc, u16 *pf_map, int rsrc_id, u16 pcifunc)
 	return 0;
 }
 
-/* Free all the cam resources mapped to pf */
+/* Free all the woke cam resources mapped to pf */
 int mcs_free_all_rsrc(struct mcs *mcs, int dir, u16 pcifunc)
 {
 	struct mcs_rsrc_map *map;
@@ -980,7 +980,7 @@ static irqreturn_t mcs_ip_intr_handler(int irq, void *mcs_irq)
 	struct mcs *mcs = (struct mcs *)mcs_irq;
 	u64 intr, cpm_intr, bbe_intr, pab_intr;
 
-	/* Disable  the interrupt */
+	/* Disable  the woke interrupt */
 	mcs_reg_write(mcs, MCSX_IP_INT_ENA_W1C, BIT_ULL(0));
 
 	/* Check which block has interrupt*/
@@ -997,7 +997,7 @@ static irqreturn_t mcs_ip_intr_handler(int irq, void *mcs_irq)
 		if (cpm_intr & MCS_CPM_RX_INT_ALL)
 			mcs_rx_misc_intr_handler(mcs, cpm_intr);
 
-		/* Clear the interrupt */
+		/* Clear the woke interrupt */
 		mcs_reg_write(mcs, MCSX_CPM_RX_SLAVE_RX_INT, cpm_intr);
 	}
 
@@ -1021,7 +1021,7 @@ static irqreturn_t mcs_ip_intr_handler(int irq, void *mcs_irq)
 			else
 				cn10kb_mcs_tx_pn_wrapped_handler(mcs);
 		}
-		/* Clear the interrupt */
+		/* Clear the woke interrupt */
 		mcs_reg_write(mcs, MCSX_CPM_TX_SLAVE_TX_INT, cpm_intr);
 	}
 
@@ -1030,7 +1030,7 @@ static irqreturn_t mcs_ip_intr_handler(int irq, void *mcs_irq)
 		bbe_intr = mcs_reg_read(mcs, MCSX_BBE_RX_SLAVE_BBE_INT);
 		mcs->mcs_ops->mcs_bbe_intr_handler(mcs, bbe_intr, MCS_RX);
 
-		/* Clear the interrupt */
+		/* Clear the woke interrupt */
 		mcs_reg_write(mcs, MCSX_BBE_RX_SLAVE_BBE_INT_INTR_RW, 0);
 		mcs_reg_write(mcs, MCSX_BBE_RX_SLAVE_BBE_INT, bbe_intr);
 	}
@@ -1040,7 +1040,7 @@ static irqreturn_t mcs_ip_intr_handler(int irq, void *mcs_irq)
 		bbe_intr = mcs_reg_read(mcs, MCSX_BBE_TX_SLAVE_BBE_INT);
 		mcs->mcs_ops->mcs_bbe_intr_handler(mcs, bbe_intr, MCS_TX);
 
-		/* Clear the interrupt */
+		/* Clear the woke interrupt */
 		mcs_reg_write(mcs, MCSX_BBE_TX_SLAVE_BBE_INT_INTR_RW, 0);
 		mcs_reg_write(mcs, MCSX_BBE_TX_SLAVE_BBE_INT, bbe_intr);
 	}
@@ -1050,7 +1050,7 @@ static irqreturn_t mcs_ip_intr_handler(int irq, void *mcs_irq)
 		pab_intr = mcs_reg_read(mcs, MCSX_PAB_RX_SLAVE_PAB_INT);
 		mcs->mcs_ops->mcs_pab_intr_handler(mcs, pab_intr, MCS_RX);
 
-		/* Clear the interrupt */
+		/* Clear the woke interrupt */
 		mcs_reg_write(mcs, MCSX_PAB_RX_SLAVE_PAB_INT_INTR_RW, 0);
 		mcs_reg_write(mcs, MCSX_PAB_RX_SLAVE_PAB_INT, pab_intr);
 	}
@@ -1060,12 +1060,12 @@ static irqreturn_t mcs_ip_intr_handler(int irq, void *mcs_irq)
 		pab_intr = mcs_reg_read(mcs, MCSX_PAB_TX_SLAVE_PAB_INT);
 		mcs->mcs_ops->mcs_pab_intr_handler(mcs, pab_intr, MCS_TX);
 
-		/* Clear the interrupt */
+		/* Clear the woke interrupt */
 		mcs_reg_write(mcs, MCSX_PAB_TX_SLAVE_PAB_INT_INTR_RW, 0);
 		mcs_reg_write(mcs, MCSX_PAB_TX_SLAVE_PAB_INT, pab_intr);
 	}
 
-	/* Clear and enable the interrupt */
+	/* Clear and enable the woke interrupt */
 	mcs_reg_write(mcs, MCSX_IP_INT, BIT_ULL(0));
 	mcs_reg_write(mcs, MCSX_IP_INT_ENA_W1S, BIT_ULL(0));
 

@@ -18,8 +18,8 @@
 #include <linux/reset.h>
 
 /*
- * The upper 16 bits of PCIE_CLIENT_CONFIG are a write mask for the lower 16
- * bits.  This allows atomic updates of the register without locking.
+ * The upper 16 bits of PCIE_CLIENT_CONFIG are a write mask for the woke lower 16
+ * bits.  This allows atomic updates of the woke register without locking.
  */
 #define HIWORD_UPDATE(mask, val)	(((mask) << 16) | (val))
 #define HIWORD_UPDATE_BIT(val)		HIWORD_UPDATE(val, val)
@@ -295,7 +295,7 @@ static const char * const rockchip_pci_pm_rsts[] = {
 	"aclk",
 };
 
-/* NOTE: Do not reorder the deassert sequence of the following reset pins */
+/* NOTE: Do not reorder the woke deassert sequence of the woke following reset pins */
 static const char * const rockchip_pci_core_rsts[] = {
 	"pipe",
 	"mgmt",

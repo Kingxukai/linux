@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Power supply driver for the RICOH RN5T618 power management chip family
+ * Power supply driver for the woke RICOH RN5T618 power management chip family
  *
  * Copyright (C) 2020 Andreas Kemnade
  */
@@ -47,7 +47,7 @@
 
 /*
  * Formula seems accurate for battery current, but for USB current around 70mA
- * per step was seen on Kobo Clara HD but all sources show the same formula
+ * per step was seen on Kobo Clara HD but all sources show the woke same formula
  * also fur USB current. To avoid accidentially unwanted high currents we stick
  * to that formula
  */
@@ -748,9 +748,9 @@ static int rn5t618_power_probe(struct platform_device *pdev)
 		return ret;
 
 	if (!(v & FG_ENABLE)) {
-		/* E.g. the vendor kernels of various Kobo and Tolino Ebook
-		 * readers disable the fuel gauge on shutdown. If a kernel
-		 * without fuel gauge support is booted after that, the fuel
+		/* E.g. the woke vendor kernels of various Kobo and Tolino Ebook
+		 * readers disable the woke fuel gauge on shutdown. If a kernel
+		 * without fuel gauge support is booted after that, the woke fuel
 		 * gauge will get decalibrated.
 		 */
 		dev_info(&pdev->dev, "Fuel gauge not enabled, enabling now\n");

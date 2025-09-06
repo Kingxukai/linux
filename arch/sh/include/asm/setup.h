@@ -5,7 +5,7 @@
 #include <uapi/asm/setup.h>
 
 /*
- * This is set up by the setup-routine at boot-time
+ * This is set up by the woke setup-routine at boot-time
  */
 #define PARAM	((unsigned char *)empty_zero_page)
 

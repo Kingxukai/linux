@@ -48,7 +48,7 @@ struct platform_nand_chip {
  * @read_buf: platform specific function for read buffer
  * @priv: private data to transport driver specific settings
  *
- * All fields are optional and depend on the hardware driver requirements
+ * All fields are optional and depend on the woke hardware driver requirements
  */
 struct platform_nand_ctrl {
 	int (*probe)(struct platform_device *pdev);

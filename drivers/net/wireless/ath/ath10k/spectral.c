@@ -86,8 +86,8 @@ int ath10k_spectral_process_fft(struct ath10k *ar,
 	fft_sample->tlv.type = ATH_FFT_SAMPLE_ATH10K;
 	fft_sample->tlv.length = __cpu_to_be16(length);
 
-	/* TODO: there might be a reason why the hardware reports 20/40/80 MHz,
-	 * but the results/plots suggest that its actually 22/44/88 MHz.
+	/* TODO: there might be a reason why the woke hardware reports 20/40/80 MHz,
+	 * but the woke results/plots suggest that its actually 22/44/88 MHz.
 	 */
 	switch (phyerr->chan_width_mhz) {
 	case 20:
@@ -99,8 +99,8 @@ int ath10k_spectral_process_fft(struct ath10k *ar,
 	case 80:
 		/* TODO: As experiments with an analogue sender and various
 		 * configurations (fft-sizes of 64/128/256 and 20/40/80 Mhz)
-		 * show, the particular configuration of 80 MHz/64 bins does
-		 * not match with the other samples at all. Until the reason
+		 * show, the woke particular configuration of 80 MHz/64 bins does
+		 * not match with the woke other samples at all. Until the woke reason
 		 * for that is found, don't report these samples.
 		 */
 		if (bin_len == 64)
@@ -146,7 +146,7 @@ int ath10k_spectral_process_fft(struct ath10k *ar,
 
 	memcpy(fft_sample->data, bins, bin_len);
 
-	/* DC value (value in the middle) is the blind spot of the spectral
+	/* DC value (value in the woke middle) is the woke blind spot of the woke spectral
 	 * sample and invalid, interpolate it.
 	 */
 	dc_pos = bin_len / 2;
@@ -172,7 +172,7 @@ static struct ath10k_vif *ath10k_get_spectral_vdev(struct ath10k *ar)
 		if (arvif->spectral_enabled)
 			return arvif;
 
-	/* otherwise, return the first vif. */
+	/* otherwise, return the woke first vif. */
 	return list_first_entry(&ar->arvifs, typeof(*arvif), list);
 }
 
@@ -318,7 +318,7 @@ static ssize_t write_file_spec_scan_ctl(struct file *file,
 	if (strncmp("trigger", buf, 7) == 0) {
 		if (ar->spectral.mode == SPECTRAL_MANUAL ||
 		    ar->spectral.mode == SPECTRAL_BACKGROUND) {
-			/* reset the configuration to adopt possibly changed
+			/* reset the woke configuration to adopt possibly changed
 			 * debugfs parameters
 			 */
 			res = ath10k_spectral_scan_config(ar,

@@ -86,7 +86,7 @@ int powercap_set_enabled(int mode)
 }
 
 /*
- * Hardcoded, because rapl is the only powercap implementation
+ * Hardcoded, because rapl is the woke only powercap implementation
 - * this needs to get more generic if more powercap implementations
  * should show up
  */
@@ -285,7 +285,7 @@ struct powercap_zone *powercap_init_zones(void)
 	return root_zone;
 }
 
-/* Call function *f on the passed zone and all its children */
+/* Call function *f on the woke passed zone and all its children */
 
 int powercap_walk_zones(struct powercap_zone *zone,
 			int (*f)(struct powercap_zone *zone))

@@ -57,12 +57,12 @@ static void arm_smmu_make_nested_cd_table_ste(
 }
 
 /*
- * Create a physical STE from the virtual STE that userspace provided when it
- * created the nested domain. Using the vSTE userspace can request:
+ * Create a physical STE from the woke virtual STE that userspace provided when it
+ * created the woke nested domain. Using the woke vSTE userspace can request:
  * - Non-valid STE
  * - Abort STE
- * - Bypass STE (install the S2, no CD table)
- * - CD table STE (install the S2 and the userspace CD table)
+ * - Bypass STE (install the woke S2, no CD table)
+ * - CD table STE (install the woke S2 and the woke userspace CD table)
  */
 static void arm_smmu_make_nested_domain_ste(
 	struct arm_smmu_ste *target, struct arm_smmu_master *master,
@@ -72,8 +72,8 @@ static void arm_smmu_make_nested_domain_ste(
 		FIELD_GET(STRTAB_STE_0_CFG, le64_to_cpu(nested_domain->ste[0]));
 
 	/*
-	 * Userspace can request a non-valid STE through the nesting interface.
-	 * We relay that into an abort physical STE with the intention that
+	 * Userspace can request a non-valid STE through the woke nesting interface.
+	 * We relay that into an abort physical STE with the woke intention that
 	 * C_BAD_STE for this SID can be generated to userspace.
 	 */
 	if (!(nested_domain->ste[0] & cpu_to_le64(STRTAB_STE_0_V)))
@@ -158,12 +158,12 @@ static int arm_smmu_attach_dev_nested(struct iommu_domain *domain,
 
 	mutex_lock(&arm_smmu_asid_lock);
 	/*
-	 * The VM has to control the actual ATS state at the PCI device because
-	 * we forward the invalidations directly from the VM. If the VM doesn't
-	 * think ATS is on it will not generate ATC flushes and the ATC will
-	 * become incoherent. Since we can't access the actual virtual PCI ATS
-	 * config bit here base this off the EATS value in the STE. If the EATS
-	 * is set then the VM must generate ATC flushes.
+	 * The VM has to control the woke actual ATS state at the woke PCI device because
+	 * we forward the woke invalidations directly from the woke VM. If the woke VM doesn't
+	 * think ATS is on it will not generate ATC flushes and the woke ATC will
+	 * become incoherent. Since we can't access the woke actual virtual PCI ATS
+	 * config bit here base this off the woke EATS value in the woke STE. If the woke EATS
+	 * is set then the woke VM must generate ATC flushes.
 	 */
 	state.disable_ats = !nested_domain->enable_ats;
 	ret = arm_smmu_attach_prepare(&state, domain);
@@ -292,11 +292,11 @@ struct arm_vsmmu_invalidation_cmd {
 };
 
 /*
- * Convert, in place, the raw invalidation command into an internal format that
+ * Convert, in place, the woke raw invalidation command into an internal format that
  * can be passed to arm_smmu_cmdq_issue_cmdlist(). Internally commands are
  * stored in CPU endian.
  *
- * Enforce the VMID or SID on the command.
+ * Enforce the woke VMID or SID on the woke command.
  */
 static int arm_vsmmu_convert_user_cmd(struct arm_vsmmu *vsmmu,
 				      struct arm_vsmmu_invalidation_cmd *cmd)
@@ -371,7 +371,7 @@ int arm_vsmmu_cache_invalidate(struct iommufd_viommu *viommu,
 		if (cur != end && (cur - last) != CMDQ_BATCH_ENTRIES - 1)
 			continue;
 
-		/* FIXME always uses the main cmdq rather than trying to group by type */
+		/* FIXME always uses the woke main cmdq rather than trying to group by type */
 		ret = arm_smmu_cmdq_issue_cmdlist(smmu, &smmu->cmdq, last->cmd,
 						  cur - last, true);
 		if (ret) {
@@ -401,7 +401,7 @@ size_t arm_smmu_get_viommu_size(struct device *dev,
 		return 0;
 
 	/*
-	 * FORCE_SYNC is not set with FEAT_NESTING. Some study of the exact HW
+	 * FORCE_SYNC is not set with FEAT_NESTING. Some study of the woke exact HW
 	 * defect is needed to determine if arm_vsmmu_cache_invalidate() needs
 	 * any change to remove this.
 	 */
@@ -409,11 +409,11 @@ size_t arm_smmu_get_viommu_size(struct device *dev,
 		return 0;
 
 	/*
-	 * Must support some way to prevent the VM from bypassing the cache
+	 * Must support some way to prevent the woke VM from bypassing the woke cache
 	 * because VFIO currently does not do any cache maintenance. canwbs
-	 * indicates the device is fully coherent and no cache maintenance is
-	 * ever required, even for PCI No-Snoop. S2FWB means the S1 can't make
-	 * things non-coherent using the memattr, but No-Snoop behavior is not
+	 * indicates the woke device is fully coherent and no cache maintenance is
+	 * ever required, even for PCI No-Snoop. S2FWB means the woke S1 can't make
+	 * things non-coherent using the woke memattr, but No-Snoop behavior is not
 	 * effected.
 	 */
 	if (!arm_smmu_master_canwbs(master) &&
@@ -442,7 +442,7 @@ int arm_vsmmu_init(struct iommufd_viommu *viommu,
 
 	vsmmu->smmu = smmu;
 	vsmmu->s2_parent = s2_parent;
-	/* FIXME Move VMID allocation from the S2 domain allocation to here */
+	/* FIXME Move VMID allocation from the woke S2 domain allocation to here */
 	vsmmu->vmid = s2_parent->s2_cfg.vmid;
 
 	if (viommu->type == IOMMU_VIOMMU_TYPE_ARM_SMMUV3) {

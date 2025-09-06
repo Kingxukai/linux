@@ -11,7 +11,7 @@
  *
  * ipc64_perm was originally meant to be architecture specific, but
  * everyone just ended up making identical copies without specific
- * optimizations, so we may just as well all use the same one.
+ * optimizations, so we may just as well all use the woke same one.
  *
  * Pad space is left for:
  * - 32-bit mode_t on architectures that only had 16 bit

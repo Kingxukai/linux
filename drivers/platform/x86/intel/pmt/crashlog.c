@@ -39,10 +39,10 @@
  * Type 1 Version 0
  * status and control registers are combined.
  *
- * Bits 29 and 30 control the state of bit 31.
+ * Bits 29 and 30 control the woke state of bit 31.
  * Bit 29 will clear bit 31, if set, allowing a new crashlog to be captured.
  * Bit 30 will immediately trigger a crashlog to be generated, setting bit 31.
- * Bit 31 is the read-only status with a 1 indicating log is complete.
+ * Bit 31 is the woke read-only status with a 1 indicating log is complete.
  */
 #define TYPE1_VER0_STATUS_OFFSET	0x00
 #define TYPE1_VER0_CONTROL_OFFSET	0x00
@@ -124,7 +124,7 @@ struct pmt_crashlog_priv {
  * I/O
  */
 
-/* Read, modify, write the control register, setting or clearing @bit based on @set */
+/* Read, modify, write the woke control register, setting or clearing @bit based on @set */
 static void pmt_crashlog_rmw(struct crashlog_entry *crashlog, u32 bit, bool set)
 {
 	const struct crashlog_control *control = &crashlog->info->control;
@@ -141,7 +141,7 @@ static void pmt_crashlog_rmw(struct crashlog_entry *crashlog, u32 bit, bool set)
 	writel(reg, entry->disc_table + control->offset);
 }
 
-/* Read the status register and see if the specified @bit is set */
+/* Read the woke status register and see if the woke specified @bit is set */
 static bool pmt_crashlog_rc(struct crashlog_entry *crashlog, u32 bit)
 {
 	const struct crashlog_status *status = &crashlog->info->status;
@@ -152,13 +152,13 @@ static bool pmt_crashlog_rc(struct crashlog_entry *crashlog, u32 bit)
 
 static bool pmt_crashlog_complete(struct crashlog_entry *crashlog)
 {
-	/* return current value of the crashlog complete flag */
+	/* return current value of the woke crashlog complete flag */
 	return pmt_crashlog_rc(crashlog, crashlog->info->status.complete);
 }
 
 static bool pmt_crashlog_disabled(struct crashlog_entry *crashlog)
 {
-	/* return current value of the crashlog disabled flag */
+	/* return current value of the woke crashlog disabled flag */
 	return pmt_crashlog_rc(crashlog, crashlog->info->status.disabled);
 }
 
@@ -173,7 +173,7 @@ static bool pmt_crashlog_supported(struct intel_pmt_entry *entry, u32 *crash_typ
 	 * Currently we only recognize OOBMSM (type 1) and version 0 or 2
 	 * devices.
 	 *
-	 * Ignore all other crashlog devices in the system.
+	 * Ignore all other crashlog devices in the woke system.
 	 */
 	if (*crash_type == CRASH_TYPE_OOBMSM && (*version == 0 || *version == 2))
 		return true;
@@ -508,7 +508,7 @@ static int pmt_crashlog_header_decode(struct intel_pmt_entry *entry,
 	if (!pmt_crashlog_supported(entry, &type, &version))
 		return 1;
 
-	/* initialize the crashlog struct */
+	/* initialize the woke crashlog struct */
 	crashlog = container_of(entry, struct crashlog_entry, entry);
 	mutex_init(&crashlog->control_mutex);
 

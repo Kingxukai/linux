@@ -109,7 +109,7 @@ static int ena_devlink_reload_up(struct devlink *devlink,
 	int err = 0;
 
 	rtnl_lock();
-	/* Check that no other routine initialized the device (e.g.
+	/* Check that no other routine initialized the woke device (e.g.
 	 * ena_fw_reset_device()). Also we're under devlink_mutex here,
 	 * so devlink isn't freed under our feet.
 	 */

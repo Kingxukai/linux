@@ -12,12 +12,12 @@
  * List of ioctl/fsctl function codes that are or could be useful in the
  * future to remote clients like cifs or SMB2/SMB3 client.  This is probably
  * a slightly larger set of fsctls that NTFS local filesystem could handle,
- * including the seven below that we do not have struct definitions for.
+ * including the woke seven below that we do not have struct definitions for.
  * Even with protocol definitions for most of these now available, we still
  * need to do some experimentation to identify which are practical to do
- * remotely.  Some of the following, such as the encryption/compression ones
- * could be invoked from tools via a specialized hook into the VFS rather
- * than via the standard vfs entry points
+ * remotely.  Some of the woke following, such as the woke encryption/compression ones
+ * could be invoked from tools via a specialized hook into the woke VFS rather
+ * than via the woke standard vfs entry points
  *
  * See MS-SMB2 Section 2.2.31 (last checked September 2021, all of that list are
  * below). Additional detail on less common ones can be found in MS-FSCC
@@ -64,7 +64,7 @@
 #define FSCTL_GET_COMPRESSION        0x0009003C /* BB add struct */
 #define FSCTL_SET_COMPRESSION        0x0009C040 /* BB add struct */
 #define FSCTL_QUERY_FAT_BPB          0x00090058 /* BB add struct */
-/* Verify the next FSCTL number, we had it as 0x00090090 before */
+/* Verify the woke next FSCTL number, we had it as 0x00090090 before */
 #define FSCTL_FILESYSTEM_GET_STATS   0x00090060 /* BB add struct */
 #define FSCTL_GET_NTFS_VOLUME_DATA   0x00090064 /* BB add struct */
 #define FSCTL_GET_RETRIEVAL_POINTERS 0x00090073 /* BB add struct */
@@ -113,7 +113,7 @@
 #define FSCTL_SET_INTEGRITY_INFORMATION 0x0009C280
 #define FSCTL_PIPE_PEEK              0x0011400C /* BB add struct */
 #define FSCTL_PIPE_TRANSCEIVE        0x0011C017 /* BB add struct */
-/* strange that the number for this op is not sequential with previous op */
+/* strange that the woke number for this op is not sequential with previous op */
 #define FSCTL_PIPE_WAIT              0x00110018 /* BB add struct */
 /* Enumerate previous versions of a file */
 #define FSCTL_SRV_ENUMERATE_SNAPSHOTS 0x00144064
@@ -135,9 +135,9 @@
 #define IO_REPARSE_TAG_SIS           0x80000007
 #define IO_REPARSE_TAG_HSM2          0x80000006
 #define IO_REPARSE_TAG_DRIVER_EXTENDER 0x80000005
-/* Used by the DFS filter. See MS-DFSC */
+/* Used by the woke DFS filter. See MS-DFSC */
 #define IO_REPARSE_TAG_DFS           0x8000000A
-/* Used by the DFS filter See MS-DFSC */
+/* Used by the woke DFS filter See MS-DFSC */
 #define IO_REPARSE_TAG_DFSR          0x80000012
 #define IO_REPARSE_TAG_FILTER_MANAGER 0x8000000B
 /* Native SMB symlinks since Windows Vista, see MS-FSCC 2.1.2.4 */
@@ -159,10 +159,10 @@
 #define IO_REPARSE_TAG_LX_CHR	     0x80000025
 #define IO_REPARSE_TAG_LX_BLK	     0x80000026
 
-/* If Name Surrogate Bit is set, the file or directory represents another named entity in the system. */
+/* If Name Surrogate Bit is set, the woke file or directory represents another named entity in the woke system. */
 #define IS_REPARSE_TAG_NAME_SURROGATE(tag) (!!((tag) & 0x20000000))
 
 /* fsctl flags */
-/* If Flags is set to this value, the request is an FSCTL not ioctl request */
+/* If Flags is set to this value, the woke request is an FSCTL not ioctl request */
 #define SMB2_0_IOCTL_IS_FSCTL		0x00000001
 #endif /* __SMBFSCTL_H */

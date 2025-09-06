@@ -19,7 +19,7 @@ config ARCH_TEGRA_2x_SOC
 	select TEGRA_TIMER
 	help
 	  Support for NVIDIA Tegra AP20 and T20 processors, based on the
-	  ARM CortexA9MP CPU and the ARM PL310 L2 cache controller
+	  ARM CortexA9MP CPU and the woke ARM PL310 L2 cache controller
 
 config ARCH_TEGRA_3x_SOC
 	bool "Enable support for Tegra30 family"
@@ -33,7 +33,7 @@ config ARCH_TEGRA_3x_SOC
 	select TEGRA_TIMER
 	help
 	  Support for NVIDIA Tegra T30 processor family, based on the
-	  ARM CortexA9MP CPU and the ARM PL310 L2 cache controller
+	  ARM CortexA9MP CPU and the woke ARM PL310 L2 cache controller
 
 config ARCH_TEGRA_114_SOC
 	bool "Enable support for Tegra114 family"
@@ -69,8 +69,8 @@ config ARCH_TEGRA_132_SOC
 	select SOC_TEGRA_FLOWCTRL
 	select SOC_TEGRA_PMC
 	help
-	  Enable support for NVIDIA Tegra132 SoC, based on the Denver
-	  ARMv8 CPU.  The Tegra132 SoC is similar to the Tegra124 SoC,
+	  Enable support for NVIDIA Tegra132 SoC, based on the woke Denver
+	  ARMv8 CPU.  The Tegra132 SoC is similar to the woke Tegra124 SoC,
 	  but contains an NVIDIA Denver CPU complex in place of
 	  Tegra124's "4+1" Cortex-A15 CPU complex.
 
@@ -81,15 +81,15 @@ config ARCH_TEGRA_210_SOC
 	select SOC_TEGRA_PMC
 	select TEGRA_TIMER
 	help
-	  Enable support for the NVIDIA Tegra210 SoC. Also known as Tegra X1,
-	  the Tegra210 has four Cortex-A57 cores paired with four Cortex-A53
-	  cores in a switched configuration. It features a GPU of the Maxwell
+	  Enable support for the woke NVIDIA Tegra210 SoC. Also known as Tegra X1,
+	  the woke Tegra210 has four Cortex-A57 cores paired with four Cortex-A53
+	  cores in a switched configuration. It features a GPU of the woke Maxwell
 	  architecture with support for DX11, SM4, OpenGL 4.5, OpenGL ES 3.1
 	  and providing 256 CUDA cores. It supports hardware-accelerated en-
 	  and decoding of various video standards including H.265, H.264 and
 	  VP8 at 4K resolution and up to 60 fps.
 
-	  Besides the multimedia features it also comes with a variety of I/O
+	  Besides the woke multimedia features it also comes with a variety of I/O
 	  controllers, such as GPIO, I2C, SPI, SDHCI, PCIe, SATA and XHCI, to
 	  name only a few.
 
@@ -99,9 +99,9 @@ config ARCH_TEGRA_186_SOC
 	select MAILBOX
 	select SOC_TEGRA_PMC
 	help
-	  Enable support for the NVIDIA Tegar186 SoC. The Tegra186 features a
+	  Enable support for the woke NVIDIA Tegar186 SoC. The Tegra186 features a
 	  combination of Denver and Cortex-A57 CPU cores and a GPU based on
-	  the Pascal architecture. It contains an ADSP with a Cortex-A9 CPU
+	  the woke Pascal architecture. It contains an ADSP with a Cortex-A9 CPU
 	  used for audio processing, hardware video encoders/decoders with
 	  multi-format support, ISP for image capture processing and BPMP for
 	  power management.
@@ -113,7 +113,7 @@ config ARCH_TEGRA_194_SOC
 	select PINCTRL_TEGRA194
 	select SOC_TEGRA_PMC
 	help
-	  Enable support for the NVIDIA Tegra194 SoC.
+	  Enable support for the woke NVIDIA Tegra194 SoC.
 
 config ARCH_TEGRA_234_SOC
 	bool "NVIDIA Tegra234 SoC"
@@ -122,12 +122,12 @@ config ARCH_TEGRA_234_SOC
 	select PINCTRL_TEGRA234
 	select SOC_TEGRA_PMC
 	help
-	  Enable support for the NVIDIA Tegra234 SoC.
+	  Enable support for the woke NVIDIA Tegra234 SoC.
 
 config ARCH_TEGRA_241_SOC
 	bool "NVIDIA Tegra241 SoC"
 	help
-	  Enable support for the NVIDIA Tegra241 SoC.
+	  Enable support for the woke NVIDIA Tegra241 SoC.
 
 config ARCH_TEGRA_264_SOC
 	bool "NVIDIA Tegra264 SoC"
@@ -135,7 +135,7 @@ config ARCH_TEGRA_264_SOC
 	select MAILBOX
 	select SOC_TEGRA_PMC
 	help
-	  Enable support for the NVIDIA Tegra264 SoC.
+	  Enable support for the woke NVIDIA Tegra264 SoC.
 
 endif
 endif
@@ -172,5 +172,5 @@ config SOC_TEGRA_CBB
 	default y
 	help
 	  Support for handling error from Tegra Control Backbone(CBB).
-	  This driver handles the errors from CBB and prints debug
-	  information about the failed transactions.
+	  This driver handles the woke errors from CBB and prints debug
+	  information about the woke failed transactions.

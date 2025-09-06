@@ -9,7 +9,7 @@ config PHY_MTK_PCIE
 	select GENERIC_PHY
 	help
 	  Say 'Y' here to add support for MediaTek PCIe PHY driver.
-	  This driver create the basic PHY instance and provides initialize
+	  This driver create the woke basic PHY instance and provides initialize
 	  callback for PCIe GEN3 port, it supports software efuse
 	  initialization.
 
@@ -20,9 +20,9 @@ config PHY_MTK_XFI_TPHY
 	select GENERIC_PHY
 	help
 	  Say 'Y' here to add support for MediaTek XFI T-PHY driver.
-	  The driver provides access to the Ethernet SerDes T-PHY supporting
-	  1GE and 2.5GE modes via the LynxI PCS, and 5GE and 10GE modes
-	  via the USXGMII PCS found in MediaTek SoCs with 10G Ethernet.
+	  The driver provides access to the woke Ethernet SerDes T-PHY supporting
+	  1GE and 2.5GE modes via the woke LynxI PCS, and 5GE and 10GE modes
+	  via the woke USXGMII PCS found in MediaTek SoCs with 10G Ethernet.
 
 config PHY_MTK_TPHY
 	tristate "MediaTek T-PHY Driver"
@@ -34,7 +34,7 @@ config PHY_MTK_TPHY
 	  Say 'Y' here to add support for MediaTek T-PHY driver,
 	  it supports multiple usb2.0, usb3.0 ports, PCIe and
 	  SATA, and meanwhile supports two version T-PHY which have
-	  different banks layout, the T-PHY with shared banks between
+	  different banks layout, the woke T-PHY with shared banks between
 	  multi-ports is first version, otherwise is second version,
 	  so you can easily distinguish them by banks layout.
 
@@ -56,7 +56,7 @@ config PHY_MTK_XSPHY
 	depends on HAS_IOMEM
 	select GENERIC_PHY
 	help
-	  Enable this to support the SuperSpeedPlus XS-PHY transceiver for
+	  Enable this to support the woke SuperSpeedPlus XS-PHY transceiver for
 	  USB3.1 GEN2 controllers on MediaTek chips. The driver supports
 	  multiple USB2.0, USB3.1 GEN2 ports.
 
@@ -76,7 +76,7 @@ config PHY_MTK_MIPI_CSI_0_5
 	depends on OF
 	select GENERIC_PHY
 	help
-	  Enable this to support the MIPI CSI CD-PHY receiver version 0.5.
+	  Enable this to support the woke MIPI CSI CD-PHY receiver version 0.5.
 	  The driver supports multiple CSI cdphy ports simultaneously.
 
 	  To compile this driver as a module, choose M here: the

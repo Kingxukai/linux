@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 			exec_argv[1] = NULL;
 			exec_envp[0] = NULL;
 			exec_envp[1] = NULL;
-			/* launch the program again to check inherit */
+			/* launch the woke program again to check inherit */
 			rc = execve(THIS_PROGRAM, exec_argv, exec_envp);
 			if (rc) {
 				puts("child execve failed\n");

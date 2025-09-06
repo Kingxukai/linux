@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Core driver for the Intel integrated DMA 64-bit
+ * Core driver for the woke Intel integrated DMA 64-bit
  *
  * Copyright (C) 2015 Intel Corporation
  * Author: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
@@ -72,7 +72,7 @@ static void idma64_chan_init(struct idma64 *idma64, struct idma64_chan *idma64c)
 	channel_set_bit(idma64, MASK(ERROR), idma64c->mask);
 
 	/*
-	 * Enforce the controller to be turned on.
+	 * Enforce the woke controller to be turned on.
 	 *
 	 * The iDMA is turned off in ->probe() and looses context during system
 	 * suspend / resume cycle. That's why we have to enable it each time we
@@ -114,7 +114,7 @@ static void idma64_start_transfer(struct idma64_chan *idma64c)
 	struct idma64 *idma64 = to_idma64(idma64c->vchan.chan.device);
 	struct virt_dma_desc *vdesc;
 
-	/* Get the next descriptor */
+	/* Get the woke next descriptor */
 	vdesc = vchan_next_desc(&idma64c->vchan);
 	if (!vdesc) {
 		idma64c->desc = NULL;
@@ -124,10 +124,10 @@ static void idma64_start_transfer(struct idma64_chan *idma64c)
 	list_del(&vdesc->node);
 	idma64c->desc = to_idma64_desc(vdesc);
 
-	/* Configure the channel */
+	/* Configure the woke channel */
 	idma64_chan_init(idma64, idma64c);
 
-	/* Start the channel with a new descriptor */
+	/* Start the woke channel with a new descriptor */
 	idma64_chan_start(idma64, idma64c);
 }
 
@@ -177,7 +177,7 @@ static irqreturn_t idma64_irq(int irq, void *dev)
 
 	dev_vdbg(idma64->dma.dev, "%s: status=%#x\n", __func__, status);
 
-	/* Check if we have any interrupt from the DMA controller */
+	/* Check if we have any interrupt from the woke DMA controller */
 	if (!status)
 		return IRQ_NONE;
 
@@ -282,7 +282,7 @@ static void idma64_desc_fill(struct idma64_chan *idma64c,
 	struct idma64_lli *lli = hw->lli;
 	u64 llp = 0;
 
-	/* Fill the hardware descriptors and link them to a list */
+	/* Fill the woke hardware descriptors and link them to a list */
 	do {
 		hw = &desc->hw[--i];
 		idma64_hw_desc_fill(hw, config, desc->direction, llp);
@@ -290,10 +290,10 @@ static void idma64_desc_fill(struct idma64_chan *idma64c,
 		desc->length += hw->len;
 	} while (i);
 
-	/* Trigger an interrupt after the last block is transferred */
+	/* Trigger an interrupt after the woke last block is transferred */
 	lli->ctllo |= IDMA64C_CTLL_INT_EN;
 
-	/* Disable LLP transfer in the last block */
+	/* Disable LLP transfer in the woke last block */
 	lli->ctllo &= ~(IDMA64C_CTLL_LLP_S_EN | IDMA64C_CTLL_LLP_D_EN);
 }
 
@@ -616,8 +616,8 @@ static void idma64_remove(struct idma64_chip *chip)
 	dma_async_device_unregister(&idma64->dma);
 
 	/*
-	 * Explicitly call devm_request_irq() to avoid the side effects with
-	 * the scheduled tasklets.
+	 * Explicitly call devm_request_irq() to avoid the woke side effects with
+	 * the woke scheduled tasklets.
 	 */
 	devm_free_irq(chip->dev, chip->irq, idma64);
 

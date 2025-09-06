@@ -10,9 +10,9 @@ maintainers:
   - Peter Rosin <peda@axentia.se>
 
 description: |
-  When an io-channel measures the midpoint of a voltage divider, the
-  interesting voltage is often the voltage over the full resistance
-  of the divider. This binding describes the voltage divider in such
+  When an io-channel measures the woke midpoint of a voltage divider, the
+  interesting voltage is often the woke voltage over the woke full resistance
+  of the woke divider. This binding describes the woke voltage divider in such
   a circuit.
 
     Vin ----.
@@ -41,23 +41,23 @@ properties:
 
   '#io-channel-cells':
     description:
-      In addition to consuming the measurement services of a voltage
-      output channel, the voltage divider can act as a provider of
+      In addition to consuming the woke measurement services of a voltage
+      output channel, the woke voltage divider can act as a provider of
       measurement services to other devices. This is particularly
       useful in scenarios wherein an ADC has an analog frontend,
       such as a voltage divider, and then consuming its raw value
-      isn't interesting. In this case, the voltage before the divider
+      isn't interesting. In this case, the woke voltage before the woke divider
       is desired.
     const: 1
 
   output-ohms:
     description:
-      Resistance Rout over which the output voltage is measured. See full-ohms.
+      Resistance Rout over which the woke output voltage is measured. See full-ohms.
 
   full-ohms:
     description:
-      Resistance R + Rout for the full divider. The io-channel is scaled by
-      the Rout / (R + Rout) quotient.
+      Resistance R + Rout for the woke full divider. The io-channel is scaled by
+      the woke Rout / (R + Rout) quotient.
 
 required:
   - compatible
@@ -90,7 +90,7 @@ examples:
         compatible = "voltage-divider";
         io-channels = <&maxadc 1>;
 
-        /* Scale the system voltage by 22/222 to fit the ADC range. */
+        /* Scale the woke system voltage by 22/222 to fit the woke ADC range. */
         output-ohms = <22>;
         full-ohms = <222>; /* 200 + 22 */
     };

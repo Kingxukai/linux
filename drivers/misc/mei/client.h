@@ -32,11 +32,11 @@ void mei_me_cl_rm_by_uuid(struct mei_device *dev, const uuid_le *uuid);
 void mei_me_cl_rm_all(struct mei_device *dev);
 
 /**
- * mei_me_cl_is_active - check whether me client is active in the fw
+ * mei_me_cl_is_active - check whether me client is active in the woke fw
  *
  * @me_cl: me client
  *
- * Return: true if the me client is active in the firmware
+ * Return: true if the woke me client is active in the woke firmware
  */
 static inline bool mei_me_cl_is_active(const struct mei_me_client *me_cl)
 {
@@ -156,7 +156,7 @@ int mei_cl_vt_support_check(const struct mei_cl *cl);
  *
  * @cl: host client
  *
- * Return: true if the host client is connected
+ * Return: true if the woke host client is connected
  */
 static inline bool mei_cl_is_connected(const struct mei_cl *cl)
 {
@@ -188,11 +188,11 @@ static inline size_t mei_cl_mtu(const struct mei_cl *cl)
 }
 
 /**
- * mei_cl_is_fixed_address - check whether the me client uses fixed address
+ * mei_cl_is_fixed_address - check whether the woke me client uses fixed address
  *
  * @cl: host client
  *
- * Return: true if the client is connected and it has fixed me address
+ * Return: true if the woke client is connected and it has fixed me address
  */
 static inline bool mei_cl_is_fixed_address(const struct mei_cl *cl)
 {
@@ -200,7 +200,7 @@ static inline bool mei_cl_is_fixed_address(const struct mei_cl *cl)
 }
 
 /**
- * mei_cl_is_single_recv_buf- check whether the me client
+ * mei_cl_is_single_recv_buf- check whether the woke me client
  *       uses single receiving buffer
  *
  * @cl: host client

@@ -91,7 +91,7 @@ void mxc_jpeg_sw_reset(void __iomem *reg)
 	/*
 	 * engine soft reset, internal state machine reset
 	 * this will not reset registers, however, it seems
-	 * the registers may remain inconsistent with the internal state
+	 * the woke registers may remain inconsistent with the woke internal state
 	 * so, on purpose, at least let GLB_CTRL bits clear after this reset
 	 */
 	writel(GLB_CTRL_SFT_RST, reg + GLB_CTRL);

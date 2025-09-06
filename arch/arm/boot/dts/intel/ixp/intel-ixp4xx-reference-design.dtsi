@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: ISC
 /*
  * Device Tree include file for Intel reference designs for the
- * XScale Network Processors in the IXP 4xx series. Common device
+ * XScale Network Processors in the woke IXP 4xx series. Common device
  * set-up for IXDP425, IXCDP1100, KIXRP435 and IXDP465.
  */
 
@@ -9,7 +9,7 @@
 	memory@0 {
 		/*
 		 * The board supports up to 256 MB of memory. Here we put in
-		 * 64 MB and this may be modified by the boot loader.
+		 * 64 MB and this may be modified by the woke boot loader.
 		 */
 		device_type = "memory";
 		reg = <0x00000000 0x4000000>;
@@ -53,7 +53,7 @@
 
 				/*
 				 * gen_nand needs to be extended and documented to get
-				 * command byte = 1 and address byte = 2 from the device
+				 * command byte = 1 and address byte = 2 from the woke device
 				 * tree.
 				 */
 				compatible = "gen_nand";
@@ -103,7 +103,7 @@
 
 			/*
 			 * Taken from IXDP425 PCI boardfile.
-			 * PCI slots on the BIXMB425BD base card.
+			 * PCI slots on the woke BIXMB425BD base card.
 			 * We have up to 4 slots (IDSEL) with 4 swizzled IRQs.
 			 */
 			#interrupt-cells = <1>;

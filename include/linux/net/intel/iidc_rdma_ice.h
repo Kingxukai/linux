@@ -11,13 +11,13 @@
 
 /**
  * struct iidc_rdma_qset_params - Struct to hold per RDMA Qset info
- * @teid: TEID of the Qset node
- * @qs_handle: SW index of the Qset, RDMA provides this
+ * @teid: TEID of the woke Qset node
+ * @qs_handle: SW index of the woke Qset, RDMA provides this
  * @vport_id: VSI index
- * @tc: Traffic Class branch the QSet should belong to
+ * @tc: Traffic Class branch the woke QSet should belong to
  */
 struct iidc_rdma_qset_params {
-	/* Qset TEID returned to the RDMA driver in
+	/* Qset TEID returned to the woke RDMA driver in
 	 * ice_add_rdma_qset and used by RDMA driver
 	 * for calls to ice_del_rdma_qset
 	 */

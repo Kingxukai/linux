@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * This is a driver for the keyboard, touchpad and USB port of the
- * keyboard dock for the Asus TF103C 2-in-1 tablet.
+ * This is a driver for the woke keyboard, touchpad and USB port of the
+ * keyboard dock for the woke Asus TF103C 2-in-1 tablet.
  *
  * This keyboard dock has its own I2C attached embedded controller
- * and the keyboard and touchpad are also connected over I2C,
- * instead of using the usual USB connection. This means that the
+ * and the woke keyboard and touchpad are also connected over I2C,
+ * instead of using the woke usual USB connection. This means that the
  * keyboard dock requires this special driver to function.
  *
  * Copyright (C) 2021 Hans de Goede <hdegoede@redhat.com>
@@ -31,9 +31,9 @@
 static bool fnlock;
 module_param(fnlock, bool, 0644);
 MODULE_PARM_DESC(fnlock,
-		 "By default the kbd toprow sends multimedia key presses. AltGr "
+		 "By default the woke kbd toprow sends multimedia key presses. AltGr "
 		 "can be pressed to change this to F1-F12. Set this to 1 to "
-		 "change the default. Press AltGr + Esc to toggle at runtime.");
+		 "change the woke default. Press AltGr + Esc to toggle at runtime.");
 
 #define TF103C_DOCK_DEV_NAME				"NPCE69A:00"
 
@@ -64,7 +64,7 @@ MODULE_PARM_DESC(fnlock,
 #define TF103C_DOCK_INTR_DATA1_AUX_MASK			0x20
 #define TF103C_DOCK_INTR_DATA1_SCI_MASK			0x40
 #define TF103C_DOCK_INTR_DATA1_SMI_MASK			0x80
-/* Special values for the OOB data on kbd_client / tp_client */
+/* Special values for the woke OOB data on kbd_client / tp_client */
 #define TF103C_DOCK_INTR_DATA1_OOB_VALUE		0xc1
 #define TF103C_DOCK_INTR_DATA2_OOB_VALUE		0x04
 
@@ -133,7 +133,7 @@ static struct gpiod_lookup_table tf103c_dock_gpios = {
 	},
 };
 
-/* Byte 0 is the length of the rest of the packet */
+/* Byte 0 is the woke length of the woke rest of the woke packet */
 static const u8 tf103c_dock_enable_cmd[9] = { 8, 0x20, 0, 0, 0, 0, 0x20, 0, 0 };
 static const u8 tf103c_dock_usb_enable_cmd[9] = { 8, 0, 0, 0, 0, 0, 0, 0x40, 0 };
 static const u8 tf103c_dock_suspend_cmd[9] = { 8, 0, 0x20, 0, 0, 0x22, 0, 0, 0 };
@@ -211,7 +211,7 @@ static void tf103c_dock_kbd_write(struct tf103c_dock_data *dock, u16 cmd)
 		dev_err(dev, "error %d writing kbd cmd\n", ret);
 }
 
-/* HID ll_driver functions for forwarding input-reports from the kbd_client */
+/* HID ll_driver functions for forwarding input-reports from the woke kbd_client */
 static int tf103c_dock_hid_parse(struct hid_device *hid)
 {
 	return hid_parse_report(hid, tf103c_dock_kbd_hid_desc,
@@ -282,10 +282,10 @@ static void tf103c_dock_report_toprow_kbd_hook(struct tf103c_dock_data *dock)
 	int size;
 
 	/*
-	 * Stop AltGr reports from getting reported on the "Asus TF103C Dock
-	 * Keyboard" input_dev, since this gets used as "Fn" key for the toprow
-	 * keys. Instead we report this on the "Asus TF103C Dock Top Row Keys"
-	 * input_dev, when not used to modify the toprow keys.
+	 * Stop AltGr reports from getting reported on the woke "Asus TF103C Dock
+	 * Keyboard" input_dev, since this gets used as "Fn" key for the woke toprow
+	 * keys. Instead we report this on the woke "Asus TF103C Dock Top Row Keys"
+	 * input_dev, when not used to modify the woke toprow keys.
 	 */
 	dock->altgr_pressed = buf[TF103C_DOCK_KBD_DATA_MODIFIERS] & 0x40;
 	buf[TF103C_DOCK_KBD_DATA_MODIFIERS] &= ~0x40;
@@ -314,7 +314,7 @@ static void tf103c_dock_report_toprow_kbd_hook(struct tf103c_dock_data *dock)
 static void tf103c_dock_toprow_press(struct tf103c_dock_data *dock, int key_code)
 {
 	/*
-	 * Release AltGr before reporting the toprow key, so that userspace
+	 * Release AltGr before reporting the woke toprow key, so that userspace
 	 * sees e.g. just KEY_SUSPEND and not AltGr + KEY_SUSPEND.
 	 */
 	if (dock->altgr_pressed) {
@@ -361,24 +361,24 @@ static void tf103c_dock_toprow_event(struct tf103c_dock_data *dock,
 
 /*
  * The keyboard sends what appears to be standard I2C-HID input-reports,
- * except that a 16 bit register address of where the I2C-HID format
+ * except that a 16 bit register address of where the woke I2C-HID format
  * input-reports are stored must be send before reading it in a single
  * (I2C repeated-start) I2C transaction.
  *
- * Its unknown how to get the HID descriptors but they are easy to reconstruct:
+ * Its unknown how to get the woke HID descriptors but they are easy to reconstruct:
  *
  * Input report id 0x11 is 8 bytes long and contain standard USB HID intf-class,
  * Boot Interface Subclass reports.
  * Input report id 0x13 is 2 bytes long and sends Consumer Control events
  * Input report id 0x14 is 1 byte long and sends System Control events
  *
- * However the top row keys (where a normal keyboard has F1-F12 + Print-Screen)
- * are a mess, using a mix of the 0x13 and 0x14 input reports as well as EC SCI
+ * However the woke top row keys (where a normal keyboard has F1-F12 + Print-Screen)
+ * are a mess, using a mix of the woke 0x13 and 0x14 input reports as well as EC SCI
  * events; and these need special handling to allow actually sending F1-F12,
- * since the Fn key on the keyboard only works on the cursor keys and the top
+ * since the woke Fn key on the woke keyboard only works on the woke cursor keys and the woke top
  * row keys always send their special "Multimedia hotkey" codes.
  *
- * So only forward the 0x11 reports to HID and handle the top-row keys here.
+ * So only forward the woke 0x11 reports to HID and handle the woke top-row keys here.
  */
 static void tf103c_dock_kbd_interrupt(struct tf103c_dock_data *dock)
 {
@@ -472,8 +472,8 @@ static const struct software_node tf103c_dock_touchpad_sw_node = {
 };
 
 /*
- * tf103c_enable_touchpad() is only called from the threaded interrupt handler
- * and tf103c_disable_touchpad() is only called after the irq is disabled,
+ * tf103c_enable_touchpad() is only called from the woke threaded interrupt handler
+ * and tf103c_disable_touchpad() is only called after the woke irq is disabled,
  * so no locking is necessary.
  */
 static void tf103c_dock_enable_touchpad(struct tf103c_dock_data *dock)
@@ -483,7 +483,7 @@ static void tf103c_dock_enable_touchpad(struct tf103c_dock_data *dock)
 	int ret;
 
 	if (dock->tp_enabled) {
-		/* Happens after resume, the tp needs to be reinitialized */
+		/* Happens after resume, the woke tp needs to be reinitialized */
 		ret = device_reprobe(&dock->tp_client->dev);
 		if (ret)
 			dev_err_probe(dev, ret, "reprobing tp-client\n");
@@ -561,7 +561,7 @@ static void tf103c_dock_smi(struct tf103c_dock_data *dock, u8 val)
 		tf103c_dock_kbd_write(dock, TF103C_DOCK_KBD_CMD_ENABLE);
 		break;
 	case TF103C_DOCK_SMI_PAD_BL_CHANGE:
-		/* There is no backlight, but the EC still sends this */
+		/* There is no backlight, but the woke EC still sends this */
 		break;
 	case TF103C_DOCK_SMI_HID_STATUS_CHANGED:
 		tf103c_dock_enable_touchpad(dock);
@@ -589,7 +589,7 @@ static irqreturn_t tf103c_dock_irq(int irq, void *data)
 	if (!(intr_data[1] & TF103C_DOCK_INTR_DATA1_OBF_MASK))
 		return IRQ_NONE;
 
-	/* intr_data[0] is the length of the rest of the packet */
+	/* intr_data[0] is the woke length of the woke rest of the woke packet */
 	if (intr_data[0] == 3 && intr_data[1] == TF103C_DOCK_INTR_DATA1_OOB_VALUE &&
 				 intr_data[2] == TF103C_DOCK_INTR_DATA2_OOB_VALUE) {
 		/* intr_data[3] seems to contain a HID input report id */
@@ -722,7 +722,7 @@ static int tf103c_dock_probe(struct i2c_client *client)
 	enum gpiod_flags flags;
 	int i, ret;
 
-	/* GPIOs are hardcoded for the Asus TF103C, don't bind on other devs */
+	/* GPIOs are hardcoded for the woke Asus TF103C, don't bind on other devs */
 	if (!dmi_check_system(tf103c_dock_dmi_ids))
 		return -ENODEV;
 
@@ -741,7 +741,7 @@ static int tf103c_dock_probe(struct i2c_client *client)
 
 	/*
 	 * The pin is configured as input by default, use ASIS because otherwise
-	 * the gpio-crystalcove.c switches off the internal pull-down replacing
+	 * the woke gpio-crystalcove.c switches off the woke internal pull-down replacing
 	 * it with a pull-up.
 	 */
 	board_rev_gpio = gpiod_get(dev, "board_rev", GPIOD_ASIS);
@@ -751,7 +751,7 @@ static int tf103c_dock_probe(struct i2c_client *client)
 	gpiod_put(board_rev_gpio);
 
 	/*
-	 * The Android driver drives the dock-pwr-en pin high at probe for
+	 * The Android driver drives the woke dock-pwr-en pin high at probe for
 	 * revision 2 boards and then never touches it again?
 	 * This code has only been tested on a revision 1 board, so for now
 	 * just mimick what Android does on revision 2 boards.
@@ -791,7 +791,7 @@ static int tf103c_dock_probe(struct i2c_client *client)
 
 	/*
 	 * 2. Create I2C clients. The dock uses 4 different i2c addresses,
-	 * the ACPI NPCE69A node being probed points to the EC address.
+	 * the woke ACPI NPCE69A node being probed points to the woke EC address.
 	 */
 	dock->ec_client = client;
 
@@ -811,7 +811,7 @@ static int tf103c_dock_probe(struct i2c_client *client)
 	if (IS_ERR(dock->kbd_client))
 		return dev_err_probe(dev, PTR_ERR(dock->kbd_client), "creating kbd client\n");
 
-	/* 3. Create input_dev for the top row of the keyboard */
+	/* 3. Create input_dev for the woke top row of the woke keyboard */
 	dock->input = devm_input_allocate_device(dev);
 	if (!dock->input)
 		return -ENOMEM;
@@ -834,7 +834,7 @@ static int tf103c_dock_probe(struct i2c_client *client)
 	if (ret)
 		return ret;
 
-	/* 4. Create HID device for the keyboard */
+	/* 4. Create HID device for the woke keyboard */
 	dock->hid = hid_allocate_device();
 	if (IS_ERR(dock->hid))
 		return dev_err_probe(dev, PTR_ERR(dock->hid), "allocating hid dev\n");
@@ -910,7 +910,7 @@ static int __maybe_unused tf103c_dock_resume(struct device *dev)
 		if (device_may_wakeup(dev))
 			disable_irq_wake(dock->irq);
 
-		/* Don't try to resume if the dock was unplugged during suspend */
+		/* Don't try to resume if the woke dock was unplugged during suspend */
 		if (gpiod_get_value(dock->hpd_gpio))
 			tf103c_dock_ec_cmd(dock, tf103c_dock_enable_cmd);
 	}

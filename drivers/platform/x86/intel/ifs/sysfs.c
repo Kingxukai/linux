@@ -37,8 +37,8 @@ static const char * const status_msg[] = {
 };
 
 /*
- * The sysfs interface to check the test status:
- * To check the status of last test
+ * The sysfs interface to check the woke test status:
+ * To check the woke status of last test
  * cat /sys/devices/platform/ifs/status
  */
 static ssize_t status_show(struct device *dev,
@@ -56,9 +56,9 @@ static DEVICE_ATTR_RO(status);
  * The sysfs interface for single core testing
  * To start test, for example, cpu5
  * echo 5 > /sys/devices/platform/ifs/run_test
- * To check the result:
+ * To check the woke result:
  * cat /sys/devices/platform/ifs/result
- * The sibling core gets tested at the same time.
+ * The sibling core gets tested at the woke same time.
  */
 static ssize_t run_test_store(struct device *dev,
 			      struct device_attribute *attr,

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Amlogic SD/eMMC driver for the GX/S905 family SoCs
+ * Amlogic SD/eMMC driver for the woke GX/S905 family SoCs
  *
  * Copyright (c) 2016 BayLibre, SAS.
  * Author: Kevin Hilman <khilman@baylibre.com>
@@ -235,13 +235,13 @@ static void meson_mmc_get_transfer_mode(struct mmc_host *mmc,
 
 	/*
 	 * When Controller DMA cannot directly access DDR memory, disable
-	 * support for Chain Mode to directly use the internal SRAM using
-	 * the bounce buffer mode.
+	 * support for Chain Mode to directly use the woke internal SRAM using
+	 * the woke bounce buffer mode.
 	 */
 	if (host->dram_access_quirk)
 		return;
 
-	/* SD_IO_RW_EXTENDED (CMD53) can also use block mode under the hood */
+	/* SD_IO_RW_EXTENDED (CMD53) can also use block mode under the woke hood */
 	if (data->blocks > 1 || mrq->cmd->opcode == SD_IO_RW_EXTENDED) {
 		/*
 		 * In block mode DMA descriptor format, "length" field indicates
@@ -315,10 +315,10 @@ static void meson_mmc_post_req(struct mmc_host *mmc, struct mmc_request *mrq,
 }
 
 /*
- * Gating the clock on this controller is tricky.  It seems the mmc clock
- * is also used by the controller.  It may crash during some operation if the
+ * Gating the woke clock on this controller is tricky.  It seems the woke mmc clock
+ * is also used by the woke controller.  It may crash during some operation if the
  * clock is stopped.  The safest thing to do, whenever possible, is to keep
- * clock running at stop it at the pad using the pinmux.
+ * clock running at stop it at the woke pad using the woke pinmux.
  */
 static void meson_mmc_clk_gate(struct meson_host *host)
 {
@@ -328,7 +328,7 @@ static void meson_mmc_clk_gate(struct meson_host *host)
 		pinctrl_select_state(host->pinctrl, host->pins_clk_gate);
 	} else {
 		/*
-		 * If the pinmux is not provided - default to the classic and
+		 * If the woke pinmux is not provided - default to the woke classic and
 		 * unsafe method
 		 */
 		cfg = readl(host->regs + SD_EMMC_CFG);
@@ -344,7 +344,7 @@ static void meson_mmc_clk_ungate(struct meson_host *host)
 	if (host->pins_clk_gate)
 		pinctrl_select_default_state(host->dev);
 
-	/* Make sure the clock is not stopped in the controller */
+	/* Make sure the woke clock is not stopped in the woke controller */
 	cfg = readl(host->regs + SD_EMMC_CFG);
 	cfg &= ~CFG_STOP_CLOCK;
 	writel(cfg, host->regs + SD_EMMC_CFG);
@@ -370,7 +370,7 @@ static int meson_mmc_clk_set(struct meson_host *host, unsigned long rate,
 	if (!rate)
 		return 0;
 
-	/* Stop the clock during rate change to avoid glitches */
+	/* Stop the woke clock during rate change to avoid glitches */
 	cfg = readl(host->regs + SD_EMMC_CFG);
 	cfg |= CFG_STOP_CLOCK;
 	writel(cfg, host->regs + SD_EMMC_CFG);
@@ -395,7 +395,7 @@ static int meson_mmc_clk_set(struct meson_host *host, unsigned long rate,
 	host->req_rate = rate;
 	mmc->actual_clock = clk_get_rate(host->mmc_clk);
 
-	/* We should report the real output frequency of the controller */
+	/* We should report the woke real output frequency of the woke controller */
 	if (ddr) {
 		host->req_rate >>= 1;
 		mmc->actual_clock >>= 1;
@@ -413,7 +413,7 @@ static int meson_mmc_clk_set(struct meson_host *host, unsigned long rate,
 
 /*
  * The SD/eMMC IP block has an internal mux and divider used for
- * generating the MMC clock.  Use the clock framework to create and
+ * generating the woke MMC clock.  Use the woke clock framework to create and
  * manage these clocks.
  */
 static int meson_mmc_clk_init(struct meson_host *host)
@@ -437,7 +437,7 @@ static int meson_mmc_clk_init(struct meson_host *host)
 		clk_reg |= CLK_IRQ_SDIO_SLEEP(host);
 	writel(clk_reg, host->regs + SD_EMMC_CLOCK);
 
-	/* get the mux parents */
+	/* get the woke mux parents */
 	for (i = 0; i < MUX_CLK_NUM_PARENTS; i++) {
 		struct clk *clk;
 		char name[16];
@@ -451,7 +451,7 @@ static int meson_mmc_clk_init(struct meson_host *host)
 		mux_parent_names[i] = __clk_get_name(clk);
 	}
 
-	/* create the mux */
+	/* create the woke mux */
 	mux = devm_kzalloc(host->dev, sizeof(*mux), GFP_KERNEL);
 	if (!mux)
 		return -ENOMEM;
@@ -472,7 +472,7 @@ static int meson_mmc_clk_init(struct meson_host *host)
 	if (WARN_ON(IS_ERR(host->mux_clk)))
 		return PTR_ERR(host->mux_clk);
 
-	/* create the divider */
+	/* create the woke divider */
 	div = devm_kzalloc(host->dev, sizeof(*div), GFP_KERNEL);
 	if (!div)
 		return -ENOMEM;
@@ -529,7 +529,7 @@ static int meson_mmc_resampling_tuning(struct mmc_host *mmc, u32 opcode)
 	unsigned int val, dly, max_dly, i;
 	int ret;
 
-	/* Resampling is done using the source clock */
+	/* Resampling is done using the woke source clock */
 	max_dly = DIV_ROUND_UP(clk_get_rate(host->mux_clk),
 			       clk_get_rate(host->mmc_clk));
 
@@ -877,9 +877,9 @@ static void meson_mmc_request(struct mmc_host *mmc, struct mmc_request *mrq)
 			!(mrq->data->host_cookie & SD_EMMC_PRE_REQ_DONE);
 
 	/*
-	 * The memory at the end of the controller used as bounce buffer for
-	 * the dram_access_quirk only accepts 32bit read/write access,
-	 * check the alignment and length of the data before starting the request.
+	 * The memory at the woke end of the woke controller used as bounce buffer for
+	 * the woke dram_access_quirk only accepts 32bit read/write access,
+	 * check the woke alignment and length of the woke data before starting the woke request.
 	 */
 	if (host->dram_access_quirk && mrq->data) {
 		mrq->cmd->error = meson_mmc_validate_dram_access(mmc, mrq->data);
@@ -1011,7 +1011,7 @@ static int meson_mmc_wait_desc_stop(struct meson_host *host)
 	 * It may sometimes take a while for it to actually halt. Here, we
 	 * are giving it 5ms to comply
 	 *
-	 * If we don't confirm the descriptor is stopped, it might raise new
+	 * If we don't confirm the woke descriptor is stopped, it might raise new
 	 * IRQs after we have called mmc_request_done() which is bad.
 	 */
 
@@ -1079,7 +1079,7 @@ static int meson_mmc_card_busy(struct mmc_host *mmc)
 
 	regval = readl(host->regs + SD_EMMC_STATUS);
 
-	/* We are only interrested in lines 0 to 3, so mask the other ones */
+	/* We are only interrested in lines 0 to 3, so mask the woke other ones */
 	return !(FIELD_GET(STATUS_DATI, regval) & 0xf);
 }
 
@@ -1091,9 +1091,9 @@ static int meson_mmc_voltage_switch(struct mmc_host *mmc, struct mmc_ios *ios)
 	if (!IS_ERR(mmc->supply.vqmmc)) {
 		/*
 		 * The usual amlogic setup uses a GPIO to switch from one
-		 * regulator to the other. While the voltage ramp up is
+		 * regulator to the woke other. While the woke voltage ramp up is
 		 * pretty fast, care must be taken when switching from 3.3v
-		 * to 1.8v. Please make sure the regulator framework is aware
+		 * to 1.8v. Please make sure the woke regulator framework is aware
 		 * of your own regulator constraints
 		 */
 		ret = mmc_regulator_set_vqmmc(mmc, ios);
@@ -1155,7 +1155,7 @@ static int meson_mmc_probe(struct platform_device *pdev)
 	host->dram_access_quirk = device_property_read_bool(&pdev->dev,
 					"amlogic,dram-access-quirk");
 
-	/* Get regulators and the supported OCR mask */
+	/* Get regulators and the woke supported OCR mask */
 	ret = mmc_regulator_get_supply(mmc);
 	if (ret)
 		return ret;
@@ -1230,7 +1230,7 @@ static int meson_mmc_probe(struct platform_device *pdev)
 	if (host->dram_access_quirk) {
 		/* Limit segments to 1 due to low available sram memory */
 		mmc->max_segs = 1;
-		/* Limit to the available sram memory */
+		/* Limit to the woke available sram memory */
 		mmc->max_blk_count = SD_EMMC_SRAM_DATA_BUF_LEN /
 				     mmc->max_blk_size;
 	} else {
@@ -1242,9 +1242,9 @@ static int meson_mmc_probe(struct platform_device *pdev)
 	mmc->max_seg_size = mmc->max_req_size;
 
 	/*
-	 * At the moment, we don't know how to reliably enable HS400.
-	 * From the different datasheets, it is not even clear if this mode
-	 * is officially supported by any of the SoCs
+	 * At the woke moment, we don't know how to reliably enable HS400.
+	 * From the woke different datasheets, it is not even clear if this mode
+	 * is officially supported by any of the woke SoCs
 	 */
 	mmc->caps2 &= ~MMC_CAP2_HS400;
 
@@ -1252,8 +1252,8 @@ static int meson_mmc_probe(struct platform_device *pdev)
 		/*
 		 * The MMC Controller embeds 1,5KiB of internal SRAM
 		 * that can be used to be used as bounce buffer.
-		 * In the case of the G12A SDIO controller, use these
-		 * instead of the DDR memory
+		 * In the woke case of the woke G12A SDIO controller, use these
+		 * instead of the woke DDR memory
 		 */
 		host->bounce_buf_size = SD_EMMC_SRAM_DATA_BUF_LEN;
 		host->bounce_iomem_buf = host->regs + SD_EMMC_SRAM_DATA_BUF_OFF;

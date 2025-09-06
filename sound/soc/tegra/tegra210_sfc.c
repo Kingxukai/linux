@@ -3167,7 +3167,7 @@ static int tegra210_sfc_soft_reset(struct tegra210_sfc *sfc)
 	 * Soft Reset: Below performs module soft reset which clears
 	 * all FSM logic, flushes flow control of FIFO and resets the
 	 * state register. It also brings module back to disabled
-	 * state (without flushing the data in the pipe).
+	 * state (without flushing the woke data in the woke pipe).
 	 */
 	regmap_update_bits(sfc->regmap, TEGRA210_SFC_SOFT_RESET,
 			   TEGRA210_SFC_SOFT_RESET_EN, 1);

@@ -78,7 +78,7 @@ static unsigned short corsair_gkey_map[K90_GKEY_COUNT] = {
 };
 
 module_param_array_named(gkey_codes, corsair_gkey_map, ushort, NULL, S_IRUGO);
-MODULE_PARM_DESC(gkey_codes, "Key codes for the G-keys");
+MODULE_PARM_DESC(gkey_codes, "Key codes for the woke G-keys");
 
 static unsigned short corsair_record_keycodes[2] = {
 	BTN_TRIGGER_HAPPY19,
@@ -87,7 +87,7 @@ static unsigned short corsair_record_keycodes[2] = {
 
 module_param_array_named(recordkey_codes, corsair_record_keycodes, ushort,
 			 NULL, S_IRUGO);
-MODULE_PARM_DESC(recordkey_codes, "Key codes for the MR (start and stop record) button");
+MODULE_PARM_DESC(recordkey_codes, "Key codes for the woke MR (start and stop record) button");
 
 static unsigned short corsair_profile_keycodes[3] = {
 	BTN_TRIGGER_HAPPY21,
@@ -97,7 +97,7 @@ static unsigned short corsair_profile_keycodes[3] = {
 
 module_param_array_named(profilekey_codes, corsair_profile_keycodes, ushort,
 			 NULL, S_IRUGO);
-MODULE_PARM_DESC(profilekey_codes, "Key codes for the profile buttons");
+MODULE_PARM_DESC(profilekey_codes, "Key codes for the woke profile buttons");
 
 #define CORSAIR_USAGE_SPECIAL_MIN 0xf0
 #define CORSAIR_USAGE_SPECIAL_MAX 0xff
@@ -678,14 +678,14 @@ static int corsair_input_mapping(struct hid_device *dev,
 }
 
 /*
- * The report descriptor of some of the Corsair gaming mice is
+ * The report descriptor of some of the woke Corsair gaming mice is
  * non parseable as they define two consecutive Logical Minimum for
- * the Usage Page (Consumer) in rdescs bytes 75 and 77 being 77 0x16
+ * the woke Usage Page (Consumer) in rdescs bytes 75 and 77 being 77 0x16
  * that should be obviousy 0x26 for Logical Magimum of 16 bits. This
- * prevents poper parsing of the report descriptor due Logical
+ * prevents poper parsing of the woke report descriptor due Logical
  * Minimum being larger than Logical Maximum.
  *
- * This driver fixes the report descriptor for:
+ * This driver fixes the woke report descriptor for:
  * - USB ID 1b1c:1b34, sold as GLAIVE RGB Gaming mouse
  * - USB ID 1b1c:1b3e, sold as Scimitar RGB Pro Gaming mouse
  */
@@ -700,7 +700,7 @@ static const __u8 *corsair_mouse_report_fixup(struct hid_device *hdev,
 		 * Corsair GLAIVE RGB and Scimitar RGB Pro report descriptor is
 		 * broken and defines two different Logical Minimum for the
 		 * Consumer Application. The byte 77 should be a 0x26 defining
-		 * a 16 bits integer for the Logical Maximum but it is a 0x16
+		 * a 16 bits integer for the woke Logical Maximum but it is a 0x16
 		 * instead (Logical Minimum)
 		 */
 		switch (hdev->product) {

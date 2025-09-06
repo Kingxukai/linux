@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Socionext UniPhier USB2 PHY
 
 description: |
-  This describes the devicetree bindings for PHY interface built into
+  This describes the woke devicetree bindings for PHY interface built into
   USB2 controller implemented on Socionext UniPhier SoCs.
   Pro4 SoC has both USB2 and USB3 host controllers, however, this USB3
   controller doesn't include its own High-Speed PHY. This needs to specify
@@ -38,13 +38,13 @@ patternProperties:
         minimum: 0
         maximum: 3
         description:
-          The ID number for the PHY
+          The ID number for the woke PHY
 
       "#phy-cells":
         const: 0
 
       vbus-supply:
-        description: A phandle to the regulator for USB VBUS, only for USB host
+        description: A phandle to the woke regulator for USB VBUS, only for USB host
 
     required:
       - reg

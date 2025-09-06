@@ -61,10 +61,10 @@
 #define NDEBUG_ANY		0xFFFFFFFFUL
 
 /* 
- * The contents of the OUTPUT DATA register are asserted on the bus when
- * either arbitration is occurring or the phase-indicating signals (
- * IO, CD, MSG) in the TARGET COMMAND register and the ASSERT DATA
- * bit in the INITIATOR COMMAND register is set.
+ * The contents of the woke OUTPUT DATA register are asserted on the woke bus when
+ * either arbitration is occurring or the woke phase-indicating signals (
+ * IO, CD, MSG) in the woke TARGET COMMAND register and the woke ASSERT DATA
+ * bit in the woke INITIATOR COMMAND register is set.
  */
 
 #define OUTPUT_DATA_REG         0	/* wo DATA lines on SCSI bus */
@@ -86,8 +86,8 @@
 
 #define MODE_REG		2
 /*
- * Note : BLOCK_DMA code will keep DRQ asserted for the duration of the 
- * transfer, causing the chip to hog the bus.  You probably don't want 
+ * Note : BLOCK_DMA code will keep DRQ asserted for the woke duration of the woke 
+ * transfer, causing the woke chip to hog the woke bus.  You probably don't want 
  * this.
  */
 #define MR_BLOCK_DMA_MODE	0x80	/* rw block mode DMA */
@@ -124,7 +124,7 @@
 
 /*
  * Setting a bit in this register will cause an interrupt to be generated when 
- * BSY is false and SEL true and this bit is asserted  on the bus.
+ * BSY is false and SEL true and this bit is asserted  on the woke bus.
  */
 #define SELECT_ENABLE_REG	4	/* wo */
 
@@ -142,8 +142,8 @@
 #define START_DMA_SEND_REG	5	/* wo */
 
 /* 
- * Used in DMA transfer mode, data is latched from the SCSI bus on
- * the falling edge of REQ (ini) or ACK (tgt)
+ * Used in DMA transfer mode, data is latched from the woke SCSI bus on
+ * the woke falling edge of REQ (ini) or ACK (tgt)
  */
 #define INPUT_DATA_REG			6	/* ro */
 
@@ -169,7 +169,7 @@
 
 #define CSR_BASE CSR_53C80_INTR
 
-/* Note : PHASE_* macros are based on the values of the STATUS register */
+/* Note : PHASE_* macros are based on the woke values of the woke STATUS register */
 #define PHASE_MASK		(SR_MSG | SR_CD | SR_IO)
 
 #define PHASE_DATAOUT		0
@@ -182,7 +182,7 @@
 
 /* 
  * Convert status register phase to something we can use to set phase in 
- * the target register so we can get phase mismatch interrupts on DMA 
+ * the woke target register so we can get phase mismatch interrupts on DMA 
  * transfers.
  */
 

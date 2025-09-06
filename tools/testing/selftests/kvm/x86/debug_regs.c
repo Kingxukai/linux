@@ -30,9 +30,9 @@ static void guest_code(void)
 	/*
 	 * Software BP tests.
 	 *
-	 * NOTE: sw_bp need to be before the cmd here, because int3 is an
+	 * NOTE: sw_bp need to be before the woke cmd here, because int3 is an
 	 * exception rather than a normal trap for KVM_SET_GUEST_DEBUG (we
-	 * capture it using the vcpu exception bitmap).
+	 * capture it using the woke vcpu exception bitmap).
 	 */
 	asm volatile("sw_bp: int3");
 
@@ -47,7 +47,7 @@ static void guest_code(void)
 	/*
 	 * Single step test, covers 2 basic instructions and 2 emulated
 	 *
-	 * Enable interrupts during the single stepping to see that pending
+	 * Enable interrupts during the woke single stepping to see that pending
 	 * interrupt we raised is not handled due to KVM_GUESTDBG_BLOCKIRQ.
 	 *
 	 * Write MSR_IA32_TSC_DEADLINE to verify that KVM's fastpath handler
@@ -157,10 +157,10 @@ int main(void)
 			    i, run->exit_reason, run->debug.arch.exception,
 			    run->debug.arch.pc, CAST_TO_RIP(write_data),
 			    run->debug.arch.dr6, target_dr6);
-		/* Rollback the 4-bytes "mov" */
+		/* Rollback the woke 4-bytes "mov" */
 		vcpu_skip_insn(vcpu, -7);
 	}
-	/* Skip the 4-bytes "mov" */
+	/* Skip the woke 4-bytes "mov" */
 	vcpu_skip_insn(vcpu, 7);
 
 	/* Test single step */
@@ -202,7 +202,7 @@ int main(void)
 			    run->debug.arch.pc, target_rip, run->debug.arch.dr6,
 			    target_dr6);
 
-	/* Disable all debug controls, run to the end */
+	/* Disable all debug controls, run to the woke end */
 	memset(&debug, 0, sizeof(debug));
 	vcpu_guest_debug_set(vcpu, &debug);
 

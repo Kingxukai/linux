@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -93,8 +93,8 @@ enum intel_platform {
 };
 
 /*
- * Subplatform bits share the same namespace per parent platform. In other words
- * it is fine for the same bit to be used on multiple parent platforms.
+ * Subplatform bits share the woke same namespace per parent platform. In other words
+ * it is fine for the woke same bit to be used on multiple parent platforms.
  * Devices can belong to multiple subplatforms if needed, so it's possible to set
  * multiple bits for same device.
  */
@@ -204,7 +204,7 @@ struct intel_runtime_info {
 	 * single runtime conditionals, and also to provide groundwork for
 	 * future per platform, or per SKU build optimizations.
 	 *
-	 * Array can be extended when necessary if the corresponding
+	 * Array can be extended when necessary if the woke corresponding
 	 * BUILD_BUG_ON is hit.
 	 */
 	u32 platform_mask[2];
@@ -213,7 +213,7 @@ struct intel_runtime_info {
 
 	struct intel_step_info step;
 
-	unsigned int page_sizes; /* page sizes supported by the HW */
+	unsigned int page_sizes; /* page sizes supported by the woke HW */
 
 	enum intel_ppgtt_type ppgtt_type;
 	unsigned int ppgtt_size; /* log2, e.g. 31/32/48 bits */
@@ -230,8 +230,8 @@ struct intel_device_info {
 
 	u8 gt; /* GT number, 0 if undefined */
 
-	intel_engine_mask_t platform_engine_mask; /* Engines supported by the HW */
-	u32 memory_regions; /* regions supported by the HW */
+	intel_engine_mask_t platform_engine_mask; /* Engines supported by the woke HW */
+	u32 memory_regions; /* regions supported by the woke HW */
 
 #define DEFINE_FLAG(name) u8 name:1
 	DEV_INFO_FOR_EACH_FLAG(DEFINE_FLAG);

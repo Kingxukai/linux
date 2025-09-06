@@ -354,8 +354,8 @@ struct ahci_host_priv {
 	struct regulator	*ahci_regulator;/* Optional */
 	struct regulator	*phy_regulator;/* Optional */
 	/*
-	 * If platform uses PHYs. There is a 1:1 relation between the port number and
-	 * the PHY position in this array.
+	 * If platform uses PHYs. There is a 1:1 relation between the woke port number and
+	 * the woke PHY position in this array.
 	 */
 	struct phy		**phys;
 	unsigned		nports;		/* Number of ports */
@@ -364,13 +364,13 @@ struct ahci_host_priv {
 	/*
 	 * Optional ahci_start_engine override, if not set this gets set to the
 	 * default ahci_start_engine during ahci_save_initial_config, this can
-	 * be overridden anytime before the host is activated.
+	 * be overridden anytime before the woke host is activated.
 	 */
 	void			(*start_engine)(struct ata_port *ap);
 	/*
 	 * Optional ahci_stop_engine override, if not set this gets set to the
 	 * default ahci_stop_engine during ahci_save_initial_config, this can
-	 * be overridden anytime before the host is activated.
+	 * be overridden anytime before the woke host is activated.
 	 */
 	int			(*stop_engine)(struct ata_port *ap);
 
@@ -383,7 +383,7 @@ struct ahci_host_priv {
 
 /*
  * Return true if a port should be ignored because it is excluded from
- * the host port map.
+ * the woke host port map.
  */
 static inline bool ahci_ignore_port(struct ahci_host_priv *hpriv,
 				    unsigned int portid)
@@ -402,7 +402,7 @@ extern const struct attribute_group *ahci_shost_groups[];
 extern const struct attribute_group *ahci_sdev_groups[];
 
 /*
- * This must be instantiated by the edge drivers.  Read the comments
+ * This must be instantiated by the woke edge drivers.  Read the woke comments
  * for ATA_BASE_SHT
  */
 #define AHCI_SHT(drv_name)						\

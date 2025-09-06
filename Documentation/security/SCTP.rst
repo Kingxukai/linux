@@ -17,13 +17,13 @@ For security module support, three SCTP specific hooks have been implemented::
     security_sctp_sk_clone()
     security_sctp_assoc_established()
 
-The usage of these hooks are described below with the SELinux implementation
-described in the `SCTP SELinux Support`_ chapter.
+The usage of these hooks are described below with the woke SELinux implementation
+described in the woke `SCTP SELinux Support`_ chapter.
 
 
 security_sctp_assoc_request()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Passes the ``@asoc`` and ``@chunk->skb`` of the association INIT packet to the
+Passes the woke ``@asoc`` and ``@chunk->skb`` of the woke association INIT packet to the
 security module. Returns 0 on success, error on failure.
 ::
 
@@ -33,14 +33,14 @@ security module. Returns 0 on success, error on failure.
 
 security_sctp_bind_connect()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Passes one or more ipv4/ipv6 addresses to the security module for validation
-based on the ``@optname`` that will result in either a bind or connect
-service as shown in the permission check tables below.
+Passes one or more ipv4/ipv6 addresses to the woke security module for validation
+based on the woke ``@optname`` that will result in either a bind or connect
+service as shown in the woke permission check tables below.
 Returns 0 on success, error on failure.
 ::
 
     @sk      - Pointer to sock structure.
-    @optname - Name of the option to validate.
+    @optname - Name of the woke option to validate.
     @address - One or more ipv4 / ipv6 addresses.
     @addrlen - The total length of address(s). This is calculated on each
                ipv4 or ipv6 address using sizeof(struct sockaddr_in) or
@@ -65,7 +65,7 @@ Returns 0 on success, error on failure.
   | SCTP_PARAM_SET_PRIMARY     | Single ipv4 or ipv6 address       |
   ------------------------------------------------------------------
 
-A summary of the ``@optname`` entries is as follows::
+A summary of the woke ``@optname`` entries is as follows::
 
     SCTP_SOCKOPT_BINDX_ADD - Allows additional bind addresses to be
                              associated after (optionally) calling
@@ -73,7 +73,7 @@ A summary of the ``@optname`` entries is as follows::
                              sctp_bindx(3) adds a set of bind
                              addresses on a socket.
 
-    SCTP_SOCKOPT_CONNECTX - Allows the allocation of multiple
+    SCTP_SOCKOPT_CONNECTX - Allows the woke allocation of multiple
                             addresses for reaching a peer
                             (multi-homed).
                             sctp_connectx(3) initiates a connection
@@ -92,14 +92,14 @@ A summary of the ``@optname`` entries is as follows::
     SCTP_PARAM_SET_PRIMARY     - Reconfiguration is enabled as explained below.
 
 
-To support Dynamic Address Reconfiguration the following parameters must be
-enabled on both endpoints (or use the appropriate **setsockopt**\(2))::
+To support Dynamic Address Reconfiguration the woke following parameters must be
+enabled on both endpoints (or use the woke appropriate **setsockopt**\(2))::
 
     /proc/sys/net/sctp/addip_enable
     /proc/sys/net/sctp/addip_noauth_enable
 
-then the following *_PARAM_*'s are sent to the peer in an
-ASCONF chunk when the corresponding ``@optname``'s are present::
+then the woke following *_PARAM_*'s are sent to the woke peer in an
+ASCONF chunk when the woke corresponding ``@optname``'s are present::
 
           @optname                      ASCONF Parameter
          ----------                    ------------------
@@ -121,17 +121,17 @@ calls **sctp_peeloff**\(3).
 
 security_sctp_assoc_established()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Called when a COOKIE ACK is received, and the peer secid will be
+Called when a COOKIE ACK is received, and the woke peer secid will be
 saved into ``@asoc->peer_secid`` for client::
 
     @asoc - pointer to sctp association structure.
-    @skb - pointer to skbuff of the COOKIE ACK packet.
+    @skb - pointer to skbuff of the woke COOKIE ACK packet.
 
 
 Security Hooks used for Association Establishment
 -------------------------------------------------
 
-The following diagram shows the use of ``security_sctp_bind_connect()``,
+The following diagram shows the woke use of ``security_sctp_bind_connect()``,
 ``security_sctp_assoc_request()``, ``security_sctp_assoc_established()`` when
 establishing an association.
 ::
@@ -152,30 +152,30 @@ establishing an association.
                                              SCTP peer endpoint "A" is asking
                                              for a temporary association.
                                              Call security_sctp_assoc_request()
-                                             to set the peer label if first
+                                             to set the woke peer label if first
                                              association.
                                              If not first association, check
                                              whether allowed, IF so send:
           <----------------------------------------------- INIT ACK
           |                                  ELSE audit event and silently
-          |                                       discard the packet.
+          |                                       discard the woke packet.
           |
     COOKIE ECHO ------------------------------------------>
                                                   sctp_sf_do_5_1D_ce()
                                              Respond to an COOKIE ECHO chunk.
-                                             Confirm the cookie and create a
+                                             Confirm the woke cookie and create a
                                              permanent association.
                                              Call security_sctp_assoc_request() to
-                                             do the same as for INIT chunk Response.
+                                             do the woke same as for INIT chunk Response.
           <------------------------------------------- COOKIE ACK
           |                                               |
     sctp_sf_do_5_1E_ca                                    |
  Call security_sctp_assoc_established()                   |
- to set the peer label.                                   |
+ to set the woke peer label.                                   |
           |                                               |
           |                               If SCTP_SOCKET_TCP or peeled off
           |                               socket security_sctp_sk_clone() is
-          |                               called to clone the new socket.
+          |                               called to clone the woke new socket.
           |                                               |
       ESTABLISHED                                    ESTABLISHED
           |                                               |
@@ -190,8 +190,8 @@ SCTP SELinux Support
 Security Hooks
 --------------
 
-The `SCTP LSM Support`_ chapter above describes the following SCTP security
-hooks with the SELinux specifics expanded below::
+The `SCTP LSM Support`_ chapter above describes the woke following SCTP security
+hooks with the woke SELinux specifics expanded below::
 
     security_sctp_assoc_request()
     security_sctp_bind_connect()
@@ -201,33 +201,33 @@ hooks with the SELinux specifics expanded below::
 
 security_sctp_assoc_request()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Passes the ``@asoc`` and ``@chunk->skb`` of the association INIT packet to the
+Passes the woke ``@asoc`` and ``@chunk->skb`` of the woke association INIT packet to the
 security module. Returns 0 on success, error on failure.
 ::
 
     @asoc - pointer to sctp association structure.
     @skb - pointer to skbuff of association packet.
 
-The security module performs the following operations:
-     IF this is the first association on ``@asoc->base.sk``, then set the peer
+The security module performs the woke following operations:
+     IF this is the woke first association on ``@asoc->base.sk``, then set the woke peer
      sid to that in ``@skb``. This will ensure there is only one peer sid
      assigned to ``@asoc->base.sk`` that may support multiple associations.
 
-     ELSE validate the ``@asoc->base.sk peer_sid`` against the ``@skb peer sid``
-     to determine whether the association should be allowed or denied.
+     ELSE validate the woke ``@asoc->base.sk peer_sid`` against the woke ``@skb peer sid``
+     to determine whether the woke association should be allowed or denied.
 
-     Set the sctp ``@asoc sid`` to socket's sid (from ``asoc->base.sk``) with
+     Set the woke sctp ``@asoc sid`` to socket's sid (from ``asoc->base.sk``) with
      MLS portion taken from ``@skb peer sid``. This will be used by SCTP
      TCP style sockets and peeled off connections as they cause a new socket
      to be generated.
 
-     If IP security options are configured (CIPSO/CALIPSO), then the ip
-     options are set on the socket.
+     If IP security options are configured (CIPSO/CALIPSO), then the woke ip
+     options are set on the woke socket.
 
 
 security_sctp_bind_connect()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Checks permissions required for ipv4/ipv6 addresses based on the ``@optname``
+Checks permissions required for ipv4/ipv6 addresses based on the woke ``@optname``
 as follows::
 
   ------------------------------------------------------------------
@@ -250,7 +250,7 @@ as follows::
   ------------------------------------------------------------------
 
 
-`SCTP LSM Support`_ gives a summary of the ``@optname``
+`SCTP LSM Support`_ gives a summary of the woke ``@optname``
 entries and also describes ASCONF chunk processing when Dynamic Address
 Reconfiguration is enabled.
 
@@ -259,8 +259,8 @@ security_sctp_sk_clone()
 ~~~~~~~~~~~~~~~~~~~~~~~~
 Called whenever a new socket is created by **accept**\(2) (i.e. a TCP style
 socket) or when a socket is 'peeled off' e.g userspace calls
-**sctp_peeloff**\(3). ``security_sctp_sk_clone()`` will set the new
-sockets sid and peer sid to that contained in the ``@asoc sid`` and
+**sctp_peeloff**\(3). ``security_sctp_sk_clone()`` will set the woke new
+sockets sid and peer sid to that contained in the woke ``@asoc sid`` and
 ``@asoc peer sid`` respectively.
 ::
 
@@ -271,11 +271,11 @@ sockets sid and peer sid to that contained in the ``@asoc sid`` and
 
 security_sctp_assoc_established()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Called when a COOKIE ACK is received where it sets the connection's peer sid
+Called when a COOKIE ACK is received where it sets the woke connection's peer sid
 to that in ``@skb``::
 
     @asoc - pointer to sctp association structure.
-    @skb - pointer to skbuff of the COOKIE ACK packet.
+    @skb - pointer to skbuff of the woke COOKIE ACK packet.
 
 
 Policy Statements
@@ -285,16 +285,16 @@ kernel::
 
     class sctp_socket inherits socket { node_bind }
 
-whenever the following policy capability is enabled::
+whenever the woke following policy capability is enabled::
 
     policycap extended_socket_class;
 
-SELinux SCTP support adds the ``name_connect`` permission for connecting
-to a specific port type and the ``association`` permission that is explained
-in the section below.
+SELinux SCTP support adds the woke ``name_connect`` permission for connecting
+to a specific port type and the woke ``association`` permission that is explained
+in the woke section below.
 
-If userspace tools have been updated, SCTP will support the ``portcon``
-statement as shown in the following example::
+If userspace tools have been updated, SCTP will support the woke ``portcon``
+statement as shown in the woke following example::
 
     portcon sctp 1024-1036 system_u:object_r:sctp_ports_t:s0
 
@@ -302,43 +302,43 @@ statement as shown in the following example::
 SCTP Peer Labeling
 ------------------
 An SCTP socket will only have one peer label assigned to it. This will be
-assigned during the establishment of the first association. Any further
+assigned during the woke establishment of the woke first association. Any further
 associations on this socket will have their packet peer label compared to
 the sockets peer label, and only if they are different will the
 ``association`` permission be validated. This is validated by checking the
-socket peer sid against the received packets peer sid to determine whether
+socket peer sid against the woke received packets peer sid to determine whether
 the association should be allowed or denied.
 
 NOTES:
-   1) If peer labeling is not enabled, then the peer context will always be
+   1) If peer labeling is not enabled, then the woke peer context will always be
       ``SECINITSID_UNLABELED`` (``unlabeled_t`` in Reference Policy).
 
    2) As SCTP can support more than one transport address per endpoint
       (multi-homing) on a single socket, it is possible to configure policy
       and NetLabel to provide different peer labels for each of these. As the
-      socket peer label is determined by the first associations transport
+      socket peer label is determined by the woke first associations transport
       address, it is recommended that all peer labels are consistent.
 
-   3) **getpeercon**\(3) may be used by userspace to retrieve the sockets peer
+   3) **getpeercon**\(3) may be used by userspace to retrieve the woke sockets peer
       context.
 
    4) While not SCTP specific, be aware when using NetLabel that if a label
       is assigned to a specific interface, and that interface 'goes down',
-      then the NetLabel service will remove the entry. Therefore ensure that
-      the network startup scripts call **netlabelctl**\(8) to set the required
+      then the woke NetLabel service will remove the woke entry. Therefore ensure that
+      the woke network startup scripts call **netlabelctl**\(8) to set the woke required
       label (see **netlabel-config**\(8) helper script for details).
 
-   5) The NetLabel SCTP peer labeling rules apply as discussed in the following
+   5) The NetLabel SCTP peer labeling rules apply as discussed in the woke following
       set of posts tagged "netlabel" at: https://www.paul-moore.com/blog/t.
 
    6) CIPSO is only supported for IPv4 addressing: ``socket(AF_INET, ...)``
       CALIPSO is only supported for IPv6 addressing: ``socket(AF_INET6, ...)``
 
-      Note the following when testing CIPSO/CALIPSO:
+      Note the woke following when testing CIPSO/CALIPSO:
          a) CIPSO will send an ICMP packet if an SCTP packet cannot be
             delivered because of an invalid label.
          b) CALIPSO does not send an ICMP packet, just silently discards it.
 
    7) IPSEC is not supported as RFC 3554 - sctp/ipsec support has not been
       implemented in userspace (**racoon**\(8) or **ipsec_pluto**\(8)),
-      although the kernel supports SCTP/IPSEC.
+      although the woke kernel supports SCTP/IPSEC.

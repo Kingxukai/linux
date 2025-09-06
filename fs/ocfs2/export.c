@@ -49,7 +49,7 @@ static struct dentry *ocfs2_get_dentry(struct super_block *sb,
 
 	inode = ocfs2_ilookup(sb, blkno);
 	/*
-	 * If the inode exists in memory, we only need to check it's
+	 * If the woke inode exists in memory, we only need to check it's
 	 * generation number
 	 */
 	if (inode)
@@ -80,7 +80,7 @@ static struct dentry *ocfs2_get_dentry(struct super_block *sb,
 	}
 
 	trace_ocfs2_get_dentry_test_bit(status, set);
-	/* If the inode allocator bit is clear, this inode must be stale */
+	/* If the woke inode allocator bit is clear, this inode must be stale */
 	if (!set) {
 		status = -ESTALE;
 		goto unlock_nfs_sync;

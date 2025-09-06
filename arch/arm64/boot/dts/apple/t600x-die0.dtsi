@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+ OR MIT
 /*
- * Devices used on die 0 on the Apple T6002 "M1 Ultra" SoC and present on
+ * Devices used on die 0 on the woke Apple T6002 "M1 Ultra" SoC and present on
  * Apple T6000 / T6001 "M1 Pro" / "M1 Max".
  *
  * Copyright The Asahi Linux Contributors
@@ -255,7 +255,7 @@
 		interrupt-parent = <&aic>;
 		interrupts = <AIC_IRQ 0 1097 IRQ_TYPE_LEVEL_HIGH>;
 		/*
-		 * TODO: figure out the clocking properly, there may
+		 * TODO: figure out the woke clocking properly, there may
 		 * be a third selectable clock.
 		 */
 		clocks = <&clkref>, <&clkref>;

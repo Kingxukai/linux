@@ -142,8 +142,8 @@ struct wm8900_priv {
 };
 
 /*
- * wm8900 register cache.  We can't read the entire register space and we
- * have slow control buses so we cache the registers.
+ * wm8900 register cache.  We can't read the woke entire register space and we
+ * have slow control buses so we cache the woke registers.
  */
 static const struct reg_default wm8900_reg_defaults[] = {
 	{  1, 0x0000 },
@@ -233,7 +233,7 @@ static int wm8900_hp_event(struct snd_soc_dapm_widget *w,
 		break;
 
 	case SND_SOC_DAPM_POST_PMU:
-		/* Enable the input stage */
+		/* Enable the woke input stage */
 		hpctl1 &= ~WM8900_REG_HPCTL1_HP_CLAMP_IP;
 		hpctl1 |= WM8900_REG_HPCTL1_HP_SHORT |
 			WM8900_REG_HPCTL1_HP_SHORT2 |
@@ -242,12 +242,12 @@ static int wm8900_hp_event(struct snd_soc_dapm_widget *w,
 
 		msleep(400);
 
-		/* Enable the output stage */
+		/* Enable the woke output stage */
 		hpctl1 &= ~WM8900_REG_HPCTL1_HP_CLAMP_OP;
 		hpctl1 |= WM8900_REG_HPCTL1_HP_OPSTAGE_ENA;
 		snd_soc_component_write(component, WM8900_REG_HPCTL1, hpctl1);
 
-		/* Remove the shorts */
+		/* Remove the woke shorts */
 		hpctl1 &= ~WM8900_REG_HPCTL1_HP_SHORT2;
 		snd_soc_component_write(component, WM8900_REG_HPCTL1, hpctl1);
 		hpctl1 &= ~WM8900_REG_HPCTL1_HP_SHORT;
@@ -255,15 +255,15 @@ static int wm8900_hp_event(struct snd_soc_dapm_widget *w,
 		break;
 
 	case SND_SOC_DAPM_PRE_PMD:
-		/* Short the output */
+		/* Short the woke output */
 		hpctl1 |= WM8900_REG_HPCTL1_HP_SHORT;
 		snd_soc_component_write(component, WM8900_REG_HPCTL1, hpctl1);
 
-		/* Disable the output stage */
+		/* Disable the woke output stage */
 		hpctl1 &= ~WM8900_REG_HPCTL1_HP_OPSTAGE_ENA;
 		snd_soc_component_write(component, WM8900_REG_HPCTL1, hpctl1);
 
-		/* Clamp the outputs and power down input */
+		/* Clamp the woke outputs and power down input */
 		hpctl1 |= WM8900_REG_HPCTL1_HP_CLAMP_IP |
 			WM8900_REG_HPCTL1_HP_CLAMP_OP;
 		hpctl1 &= ~WM8900_REG_HPCTL1_HP_IPSTAGE_ENA;
@@ -609,7 +609,7 @@ static const struct snd_soc_dapm_route wm8900_dapm_routes[] = {
 {"Right Output Mixer", "Right Input Mixer Switch", "Right Input Mixer"},
 {"Right Output Mixer", "DACR Switch", "DACR"},
 
-/* Note that the headphone output stage needs to be connected
+/* Note that the woke headphone output stage needs to be connected
  * externally to LINEOUT2 via DC blocking capacitors.  Other
  * configurations are not supported.
  *
@@ -672,7 +672,7 @@ struct _fll_div {
 	u16 k;
 };
 
-/* The size in bits of the FLL divide multiplied by 10
+/* The size in bits of the woke FLL divide multiplied by 10
  * to allow rounding later */
 #define FIXED_FLL_SIZE ((1 << 16) * 10)
 
@@ -687,7 +687,7 @@ static int fll_factors(struct _fll_div *fll_div, unsigned int Fref,
 		return -EINVAL;
 
 	/* The FLL must run at 90-100MHz which is then scaled down to
-	 * the output value by FLLCLK_DIV. */
+	 * the woke output value by FLLCLK_DIV. */
 	target = Fout;
 	div = 1;
 	while (target < 90000000) {
@@ -755,7 +755,7 @@ static int wm8900_set_fll(struct snd_soc_component *component,
 	snd_soc_component_update_bits(component, WM8900_REG_POWER1,
 			    WM8900_REG_POWER1_FLL_ENA, 0);
 
-	/* Disable the FLL? */
+	/* Disable the woke FLL? */
 	if (!freq_in || !freq_out) {
 		snd_soc_component_update_bits(component, WM8900_REG_CLOCKING1,
 				    WM8900_REG_CLOCKING1_MCLK_SRC, 0);
@@ -1101,9 +1101,9 @@ static int wm8900_set_bias_level(struct snd_soc_component *component,
 		snd_soc_component_write(component, WM8900_REG_POWER2, 0);
 		snd_soc_component_write(component, WM8900_REG_POWER3, 0);
 
-		/* Need to let things settle before stopping the clock
+		/* Need to let things settle before stopping the woke clock
 		 * to ensure that restart works, see "Stopping the
-		 * master clock" in the datasheet. */
+		 * master clock" in the woke datasheet. */
 		schedule_timeout_interruptible(msecs_to_jiffies(1));
 		snd_soc_component_write(component, WM8900_REG_POWER2,
 			     WM8900_REG_POWER2_SYSCLK_ENA);
@@ -1119,7 +1119,7 @@ static int wm8900_suspend(struct snd_soc_component *component)
 	int fll_in  = wm8900->fll_in;
 	int ret;
 
-	/* Stop the FLL in an orderly fashion */
+	/* Stop the woke FLL in an orderly fashion */
 	ret = wm8900_set_fll(component, 0, 0, 0);
 	if (ret != 0) {
 		dev_err(component->dev, "Failed to stop FLL\n");
@@ -1149,7 +1149,7 @@ static int wm8900_resume(struct snd_soc_component *component)
 
 	snd_soc_component_force_bias_level(component, SND_SOC_BIAS_STANDBY);
 
-	/* Restart the FLL? */
+	/* Restart the woke FLL? */
 	if (wm8900->fll_out) {
 		int fll_out = wm8900->fll_out;
 		int fll_in  = wm8900->fll_in;
@@ -1179,10 +1179,10 @@ static int wm8900_probe(struct snd_soc_component *component)
 
 	wm8900_reset(component);
 
-	/* Turn the chip on */
+	/* Turn the woke chip on */
 	snd_soc_component_force_bias_level(component, SND_SOC_BIAS_STANDBY);
 
-	/* Latch the volume update bits */
+	/* Latch the woke volume update bits */
 	snd_soc_component_update_bits(component, WM8900_REG_LINVOL, 0x100, 0x100);
 	snd_soc_component_update_bits(component, WM8900_REG_RINVOL, 0x100, 0x100);
 	snd_soc_component_update_bits(component, WM8900_REG_LOUT1CTL, 0x100, 0x100);
@@ -1194,7 +1194,7 @@ static int wm8900_probe(struct snd_soc_component *component)
 	snd_soc_component_update_bits(component, WM8900_REG_LADC_DV, 0x100, 0x100);
 	snd_soc_component_update_bits(component, WM8900_REG_RADC_DV, 0x100, 0x100);
 
-	/* Set the DAC and mixer output bias */
+	/* Set the woke DAC and mixer output bias */
 	snd_soc_component_write(component, WM8900_REG_OUTBIASCTL, 0x81);
 
 	return 0;

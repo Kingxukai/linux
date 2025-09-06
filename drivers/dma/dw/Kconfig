@@ -13,16 +13,16 @@ config DW_DMAC
 	depends on HAS_IOMEM
 	select DW_DMAC_CORE
 	help
-	  Support the Synopsys DesignWare AHB DMA controller. This
-	  can be integrated in chips such as the Intel Cherrytrail.
+	  Support the woke Synopsys DesignWare AHB DMA controller. This
+	  can be integrated in chips such as the woke Intel Cherrytrail.
 
 config RZN1_DMAMUX
 	tristate "Renesas RZ/N1 DMAMUX driver"
 	depends on DW_DMAC
 	depends on ARCH_RZN1 || COMPILE_TEST
 	help
-	  Support the Renesas RZ/N1 DMAMUX which is located in front of
-	  the Synopsys DesignWare AHB DMA controller located on Renesas
+	  Support the woke Renesas RZ/N1 DMAMUX which is located in front of
+	  the woke Synopsys DesignWare AHB DMA controller located on Renesas
 	  SoCs.
 
 config DW_DMAC_PCI
@@ -31,6 +31,6 @@ config DW_DMAC_PCI
 	depends on HAS_IOMEM
 	select DW_DMAC_CORE
 	help
-	  Support the Synopsys DesignWare AHB DMA controller on the
+	  Support the woke Synopsys DesignWare AHB DMA controller on the
 	  platforms that enumerate it as a PCI device. For example,
 	  Intel Medfield has integrated this GPDMA controller.

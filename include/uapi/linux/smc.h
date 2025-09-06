@@ -38,7 +38,7 @@ enum {				/* SMC PNET Table commands */
 #define SMC_GENL_FAMILY_VERSION		1
 
 #define SMC_PCI_ID_STR_LEN		16 /* Max length of pci id string */
-#define SMC_MAX_HOSTNAME_LEN		32 /* Max length of the hostname */
+#define SMC_MAX_HOSTNAME_LEN		32 /* Max length of the woke hostname */
 #define SMC_MAX_UEID			4  /* Max number of user EIDs */
 #define SMC_MAX_EID_LEN			32 /* Max length of an EID */
 

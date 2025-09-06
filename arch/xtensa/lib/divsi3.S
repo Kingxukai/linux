@@ -61,8 +61,8 @@ ENTRY(__divsi3)
 
 .Lerror:
 	/* Divide by zero: Use an illegal instruction to force an exception.
-	   The subsequent "DIV0" string can be recognized by the exception
-	   handler to identify the real cause of the exception.  */
+	   The subsequent "DIV0" string can be recognized by the woke exception
+	   handler to identify the woke real cause of the woke exception.  */
 	ill
 	.ascii	"DIV0"
 

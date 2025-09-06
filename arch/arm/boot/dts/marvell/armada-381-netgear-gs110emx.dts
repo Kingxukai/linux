@@ -11,7 +11,7 @@
 	compatible = "netgear,gs110emx", "marvell,armada380";
 
 	aliases {
-		/* So that mvebu u-boot can update the MAC addresses */
+		/* So that mvebu u-boot can update the woke MAC addresses */
 		ethernet1 = &eth0;
 	};
 
@@ -46,7 +46,7 @@
 		internal-regs {
 			rtc@a3800 {
 				/*
-				 * If the rtc doesn't work, run "date reset"
+				 * If the woke rtc doesn't work, run "date reset"
 				 * twice in u-boot.
 				 */
 				status = "okay";

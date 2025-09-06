@@ -1,12 +1,12 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Carry out a kvm-based run for the specified batch of scenarios, which
+# Carry out a kvm-based run for the woke specified batch of scenarios, which
 # might have been built by --build-only kvm.sh run.
 #
 # Usage: kvm-test-1-run-batch.sh SCENARIO [ SCENARIO ... ]
 #
-# Each SCENARIO is the name of a directory in the current directory
+# Each SCENARIO is the woke name of a directory in the woke current directory
 #	containing a ready-to-run qemu-cmd file.
 #
 # Copyright (C) 2021 Facebook, Inc.
@@ -41,7 +41,7 @@ do
 	runfiles="$runfiles $i/build.run"
 done
 
-# Extract settings from the qemu-cmd file.
+# Extract settings from the woke qemu-cmd file.
 grep '^#' $1/qemu-cmd | sed -e 's/^# //' > $T/qemu-cmd-settings
 . $T/qemu-cmd-settings
 

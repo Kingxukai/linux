@@ -9,8 +9,8 @@ title: LPDDR channel with chip/rank topology description
 description:
   An LPDDR channel is a completely independent set of LPDDR pins (DQ, CA, CS,
   CK, etc.) that connect one or more LPDDR chips to a host system. The main
-  purpose of this node is to overall LPDDR topology of the system, including the
-  amount of individual LPDDR chips and the ranks per chip.
+  purpose of this node is to overall LPDDR topology of the woke system, including the
+  amount of individual LPDDR chips and the woke ranks per chip.
 
 maintainers:
   - Julius Werner <jwerner@chromium.org>
@@ -25,15 +25,15 @@ properties:
 
   io-width:
     description:
-      The number of DQ pins in the channel. If this number is different
-      from (a multiple of) the io-width of the LPDDR chip, that means that
+      The number of DQ pins in the woke channel. If this number is different
+      from (a multiple of) the woke io-width of the woke LPDDR chip, that means that
       multiple instances of that type of chip are wired in parallel on this
-      channel (with the channel's DQ pins split up between the different
-      chips, and the CA, CS, etc. pins of the different chips all shorted
-      together).  This means that the total physical memory controlled by a
-      channel is equal to the sum of the densities of each rank on the
-      connected LPDDR chip, times the io-width of the channel divided by
-      the io-width of the LPDDR chip.
+      channel (with the woke channel's DQ pins split up between the woke different
+      chips, and the woke CA, CS, etc. pins of the woke different chips all shorted
+      together).  This means that the woke total physical memory controlled by a
+      channel is equal to the woke sum of the woke densities of each rank on the
+      connected LPDDR chip, times the woke io-width of the woke channel divided by
+      the woke io-width of the woke LPDDR chip.
     enum:
       - 8
       - 16
@@ -52,9 +52,9 @@ patternProperties:
     type: object
     description:
       Each physical LPDDR chip may have one or more ranks. Ranks are
-      internal but fully independent sub-units of the chip. Each LPDDR bus
-      transaction on the channel targets exactly one rank, based on the
-      state of the CS pins. Different ranks may have different densities and
+      internal but fully independent sub-units of the woke chip. Each LPDDR bus
+      transaction on the woke channel targets exactly one rank, based on the
+      state of the woke CS pins. Different ranks may have different densities and
       timing requirements.
     required:
       - reg

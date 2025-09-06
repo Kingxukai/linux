@@ -14,9 +14,9 @@
 #include "phy_common.h"
 
 struct b2056_inittab_entry {
-	/* Value to write if we use the 5GHz band. */
+	/* Value to write if we use the woke 5GHz band. */
 	u16 ghz5;
-	/* Value to write if we use the 2.4GHz band. */
+	/* Value to write if we use the woke 2.4GHz band. */
 	u16 ghz2;
 	/* Flags */
 	u8 flags;

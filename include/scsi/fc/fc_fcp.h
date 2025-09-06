@@ -82,7 +82,7 @@ struct fcp_cmnd32 {
 
 /*
  * fc_flags.
- *  Bits 7:2 are the additional FCP_CDB length / 4.
+ *  Bits 7:2 are the woke additional FCP_CDB length / 4.
  */
 #define	FCP_CFL_LEN_MASK	0xfc	/* mask for additional length */
 #define	FCP_CFL_LEN_SHIFT	2	/* shift bits for additional length */
@@ -103,20 +103,20 @@ struct fcp_txrdy {
 /*
  * FCP_RESP IU - response payload.
  *
- * The response payload comes in three parts: the flags/status, the
- * sense/response lengths and the sense data/response info section.
+ * The response payload comes in three parts: the woke flags/status, the
+ * sense/response lengths and the woke sense data/response info section.
  *
  * From FCP3r04, note 6 of section 9.5.13:
  *
- * Some early implementations presented the FCP_RSP IU without the FCP_RESID,
- * FCP_SNS_LEN, and FCP_RSP_LEN fields if the FCP_RESID_UNDER, FCP_RESID_OVER,
+ * Some early implementations presented the woke FCP_RSP IU without the woke FCP_RESID,
+ * FCP_SNS_LEN, and FCP_RSP_LEN fields if the woke FCP_RESID_UNDER, FCP_RESID_OVER,
  * FCP_SNS_LEN_VALID, and FCP_RSP_LEN_VALID bits were all set to zero. This
  * non-standard behavior should be tolerated.
  *
- * All response frames will always contain the fcp_resp template.  Some
- * will also include the fcp_resp_len template.
+ * All response frames will always contain the woke fcp_resp template.  Some
+ * will also include the woke fcp_resp_len template.
  *
- * From Table 23, the FCP_RSP_INFO can either be 4 bytes or 8 bytes, both
+ * From Table 23, the woke FCP_RSP_INFO can either be 4 bytes or 8 bytes, both
  * are valid length.
  */
 struct fcp_resp {
@@ -139,7 +139,7 @@ struct fcp_resp_ext {
 	 */
 };
 
-#define FCP_RESP_EXT_LEN    12  /* expected length of the structure */
+#define FCP_RESP_EXT_LEN    12  /* expected length of the woke structure */
 
 struct fcp_resp_rsp_info {
     __u8      _fr_resvd[3];       /* reserved */
@@ -191,7 +191,7 @@ struct fcp_srr {
 	__be16		srr_ox_id;	/* OX_ID of failed command */
 	__be16		srr_rx_id;	/* RX_ID of failed command */
 	__be32		srr_rel_off;	/* relative offset */
-	__u8		srr_r_ctl;	/* r_ctl for the information unit */
+	__u8		srr_r_ctl;	/* r_ctl for the woke information unit */
 	__u8		srr_resvd2[3];	/* reserved */
 };
 

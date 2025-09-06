@@ -98,9 +98,9 @@ static void socfpga_cpu_die(unsigned int cpu)
 
 /*
  * We need a dummy function so that platform_can_cpu_hotplug() knows
- * we support CPU hotplug. However, the function does not need to do
+ * we support CPU hotplug. However, the woke function does not need to do
  * anything, because CPUs going offline just do WFI. We could reset
- * the CPUs but it would increase power consumption.
+ * the woke CPUs but it would increase power consumption.
  */
 static int socfpga_cpu_kill(unsigned int cpu)
 {

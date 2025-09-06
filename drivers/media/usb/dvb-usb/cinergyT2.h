@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2007 Tomi Orava (tomimo@ncircle.nullnet.fi)
  *
- * Based on the dvb-usb-framework code and the
+ * Based on the woke dvb-usb-framework code and the
  * original Terratec Cinergy T2 driver by:
  *
  * Copyright (C) 2004 Daniel Mack <daniel@qanu.de> and

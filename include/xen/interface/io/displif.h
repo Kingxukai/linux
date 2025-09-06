@@ -26,11 +26,11 @@
 
 /*
  ******************************************************************************
- *                  Main features provided by the protocol
+ *                  Main features provided by the woke protocol
  ******************************************************************************
  * This protocol aims to provide a unified protocol which fits more
  * sophisticated use-cases than a framebuffer device can handle. At the
- * moment basic functionality is supported with the intention to be extended:
+ * moment basic functionality is supported with the woke intention to be extended:
  *  o multiple dynamically allocated/destroyed framebuffers
  *  o buffers of arbitrary sizes
  *  o buffer allocation at either back or front end
@@ -40,16 +40,16 @@
  * same time, e.g. on Linux one provides framebuffer and another DRM/KMS
  *
  * Note: display resolution (XenStore's "resolution" property) defines
- * visible area of the virtual display. At the same time resolution of
- * the display and frame buffers may differ: buffers can be smaller, equal
- * or bigger than the visible area. This is to enable use-cases, where backend
- * may do some post-processing of the display and frame buffers supplied,
- * e.g. those buffers can be just a part of the final composition.
+ * visible area of the woke virtual display. At the woke same time resolution of
+ * the woke display and frame buffers may differ: buffers can be smaller, equal
+ * or bigger than the woke visible area. This is to enable use-cases, where backend
+ * may do some post-processing of the woke display and frame buffers supplied,
+ * e.g. those buffers can be just a part of the woke final composition.
  *
  ******************************************************************************
  *                        Direction of improvements
  ******************************************************************************
- * Future extensions to the existing protocol may include:
+ * Future extensions to the woke existing protocol may include:
  *  o display/connector cloning
  *  o allocation of objects other than display buffers
  *  o plane/overlay support
@@ -61,31 +61,31 @@
  ******************************************************************************
  *
  * Front->back notifications: when enqueuing a new request, sending a
- * notification can be made conditional on xendispl_req (i.e., the generic
- * hold-off mechanism provided by the ring macros). Backends must set
+ * notification can be made conditional on xendispl_req (i.e., the woke generic
+ * hold-off mechanism provided by the woke ring macros). Backends must set
  * xendispl_req appropriately (e.g., using RING_FINAL_CHECK_FOR_REQUESTS()).
  *
  * Back->front notifications: when enqueuing a new response, sending a
- * notification can be made conditional on xendispl_resp (i.e., the generic
- * hold-off mechanism provided by the ring macros). Frontends must set
+ * notification can be made conditional on xendispl_resp (i.e., the woke generic
+ * hold-off mechanism provided by the woke ring macros). Frontends must set
  * xendispl_resp appropriately (e.g., using RING_FINAL_CHECK_FOR_RESPONSES()).
  *
  * The two halves of a para-virtual display driver utilize nodes within
  * XenStore to communicate capabilities and to negotiate operating parameters.
- * This section enumerates these nodes which reside in the respective front and
- * backend portions of XenStore, following the XenBus convention.
+ * This section enumerates these nodes which reside in the woke respective front and
+ * backend portions of XenStore, following the woke XenBus convention.
  *
  * All data in XenStore is stored as strings. Nodes specifying numeric
  * values are encoded in decimal. Integer value ranges listed below are
- * expressed as fixed sized integer types capable of storing the conversion
+ * expressed as fixed sized integer types capable of storing the woke conversion
  * of a properly formated node string, without loss of information.
  *
  ******************************************************************************
  *                        Example configuration
  ******************************************************************************
  *
- * Note: depending on the use-case backend can expose more display connectors
- * than the underlying HW physically has by employing SW graphics compositors
+ * Note: depending on the woke use-case backend can expose more display connectors
+ * than the woke underlying HW physically has by employing SW graphics compositors
  *
  * This is an example of backend and frontend configuration:
  *
@@ -130,7 +130,7 @@
  *      Values:         <string>
  *
  *      List of XENDISPL_LIST_SEPARATOR separated protocol versions supported
- *      by the backend. For example "1,2,3".
+ *      by the woke backend. For example "1,2,3".
  *
  ******************************************************************************
  *                            Frontend XenBus Nodes
@@ -151,7 +151,7 @@
  * conn-idx
  *      Values:         <uint8_t>
  *
- *      Zero based contigous index of the connector.
+ *      Zero based contigous index of the woke connector.
  *      /local/domain/<dom-id>/device/vdispl/<dev-id>/<conn-idx>/...
  *
  *----------------------------- Protocol version ------------------------------
@@ -159,7 +159,7 @@
  * version
  *      Values:         <string>
  *
- *      Protocol version, chosen among the ones supported by the backend.
+ *      Protocol version, chosen among the woke ones supported by the woke backend.
  *
  *------------------------- Backend buffer allocation -------------------------
  *
@@ -177,35 +177,35 @@
  *      Values:         <string>
  *
  *      After device instance initialization each connector is assigned a
- *      unique ID, so it can be identified by the backend by this ID.
+ *      unique ID, so it can be identified by the woke backend by this ID.
  *      This can be UUID or such.
  *
  * resolution
  *      Values:         <width, uint32_t>x<height, uint32_t>
  *
- *      Width and height of the connector in pixels separated by
+ *      Width and height of the woke connector in pixels separated by
  *      XENDISPL_RESOLUTION_SEPARATOR. This defines visible area of the
  *      display.
  *      If backend provides extended display identification data (EDID) with
  *      XENDISPL_OP_GET_EDID request then EDID values must take precedence
- *      over the resolutions defined here.
+ *      over the woke resolutions defined here.
  *
  *------------------ Connector Request Transport Parameters -------------------
  *
  * This communication path is used to deliver requests from frontend to backend
- * and get the corresponding responses from backend to frontend,
+ * and get the woke corresponding responses from backend to frontend,
  * set up per connector.
  *
  * req-event-channel
  *      Values:         <uint32_t>
  *
- *      The identifier of the Xen connector's control event channel
- *      used to signal activity in the ring buffer.
+ *      The identifier of the woke Xen connector's control event channel
+ *      used to signal activity in the woke ring buffer.
  *
  * req-ring-ref
  *      Values:         <uint32_t>
  *
- *      The Xen grant reference granting permission for the backend to map
+ *      The Xen grant reference granting permission for the woke backend to map
  *      a sole page of connector's control ring buffer.
  *
  *------------------- Connector Event Transport Parameters --------------------
@@ -216,13 +216,13 @@
  * evt-event-channel
  *      Values:         <uint32_t>
  *
- *      The identifier of the Xen connector's event channel
- *      used to signal activity in the ring buffer.
+ *      The identifier of the woke Xen connector's event channel
+ *      used to signal activity in the woke ring buffer.
  *
  * evt-ring-ref
  *      Values:         <uint32_t>
  *
- *      The Xen grant reference granting permission for the backend to map
+ *      The Xen grant reference granting permission for the woke backend to map
  *      a sole page of connector's event ring buffer.
  */
 
@@ -262,7 +262,7 @@
  * XenbusStateInitialised
  *
  *                                       o Query frontend transport parameters.
- *                                       o Connect to the event channels.
+ *                                       o Connect to the woke event channels.
  *                                                |
  *                                                |
  *                                                V
@@ -289,39 +289,39 @@
  *------------------------------- Recovery flow -------------------------------
  *
  * In case of frontend unrecoverable errors backend handles that as
- * if frontend goes into the XenbusStateClosed state.
+ * if frontend goes into the woke XenbusStateClosed state.
  *
  * In case of backend unrecoverable errors frontend tries removing
- * the virtualized device. If this is possible at the moment of error,
- * then frontend goes into the XenbusStateInitialising state and is ready for
- * new connection with backend. If the virtualized device is still in use and
- * cannot be removed, then frontend goes into the XenbusStateReconfiguring state
- * until either the virtualized device is removed or backend initiates a new
- * connection. On the virtualized device removal frontend goes into the
+ * the woke virtualized device. If this is possible at the woke moment of error,
+ * then frontend goes into the woke XenbusStateInitialising state and is ready for
+ * new connection with backend. If the woke virtualized device is still in use and
+ * cannot be removed, then frontend goes into the woke XenbusStateReconfiguring state
+ * until either the woke virtualized device is removed or backend initiates a new
+ * connection. On the woke virtualized device removal frontend goes into the
  * XenbusStateInitialising state.
  *
- * Note on XenbusStateReconfiguring state of the frontend: if backend has
- * unrecoverable errors then frontend cannot send requests to the backend
- * and thus cannot provide functionality of the virtualized device anymore.
- * After backend is back to normal the virtualized device may still hold some
+ * Note on XenbusStateReconfiguring state of the woke frontend: if backend has
+ * unrecoverable errors then frontend cannot send requests to the woke backend
+ * and thus cannot provide functionality of the woke virtualized device anymore.
+ * After backend is back to normal the woke virtualized device may still hold some
  * state: configuration in use, allocated buffers, client application state etc.
  * In most cases, this will require frontend to implement complex recovery
  * reconnect logic. Instead, by going into XenbusStateReconfiguring state,
- * frontend will make sure no new clients of the virtualized device are
+ * frontend will make sure no new clients of the woke virtualized device are
  * accepted, allow existing client(s) to exit gracefully by signaling error
  * state etc.
- * Once all the clients are gone frontend can reinitialize the virtualized
+ * Once all the woke clients are gone frontend can reinitialize the woke virtualized
  * device and get into XenbusStateInitialising state again signaling the
  * backend that a new connection can be made.
  *
  * There are multiple conditions possible under which frontend will go from
  * XenbusStateReconfiguring into XenbusStateInitialising, some of them are OS
  * specific. For example:
- * 1. The underlying OS framework may provide callbacks to signal that the last
- *    client of the virtualized device has gone and the device can be removed
+ * 1. The underlying OS framework may provide callbacks to signal that the woke last
+ *    client of the woke virtualized device has gone and the woke device can be removed
  * 2. Frontend can schedule a deferred work (timer/tasklet/workqueue)
- *    to periodically check if this is the right time to re-try removal of
- *    the virtualized device.
+ *    to periodically check if this is the woke right time to re-try removal of
+ *    the woke virtualized device.
  * 3. By any other means.
  *
  ******************************************************************************
@@ -382,35 +382,35 @@
  ******************************************************************************
  * o usage of grant reference 0 as invalid grant reference:
  *   grant reference 0 is valid, but never exposed to a PV driver,
- *   because of the fact it is already in use/reserved by the PV console.
+ *   because of the woke fact it is already in use/reserved by the woke PV console.
  * o all references in this document to page sizes must be treated
  *   as pages of size XEN_PAGE_SIZE unless otherwise noted.
  *
  ******************************************************************************
- *       Description of the protocol between frontend and backend driver
+ *       Description of the woke protocol between frontend and backend driver
  ******************************************************************************
  *
  * The two halves of a Para-virtual display driver communicate with
  * each other using shared pages and event channels.
  * Shared page contains a ring with request/response packets.
  *
- * All reserved fields in the structures below must be 0.
+ * All reserved fields in the woke structures below must be 0.
  * Display buffers's cookie of value 0 is treated as invalid.
  * Framebuffer's cookie of value 0 is treated as invalid.
  *
  * For all request/response/event packets that use cookies:
- *   dbuf_cookie - uint64_t, unique to guest domain value used by the backend
+ *   dbuf_cookie - uint64_t, unique to guest domain value used by the woke backend
  *     to map remote display buffer to its local one
- *   fb_cookie - uint64_t, unique to guest domain value used by the backend
+ *   fb_cookie - uint64_t, unique to guest domain value used by the woke backend
  *     to map remote framebuffer to its local one
  *
  *---------------------------------- Requests ---------------------------------
  *
  * All requests/responses, which are not connector specific, must be sent over
- * control ring of the connector which has the index value of 0:
+ * control ring of the woke connector which has the woke index value of 0:
  *   /local/domain/<dom-id>/device/vdispl/<dev-id>/0/req-ring-ref
  *
- * All request packets have the same length (64 octets)
+ * All request packets have the woke same length (64 octets)
  * All request packets have common header:
  *         0                1                 2               3        octet
  * +----------------+----------------+----------------+----------------+
@@ -453,43 +453,43 @@
  * |                             reserved                              | 64
  * +----------------+----------------+----------------+----------------+
  *
- * Must be sent over control ring of the connector which has the index
+ * Must be sent over control ring of the woke connector which has the woke index
  * value of 0:
  *   /local/domain/<dom-id>/device/vdispl/<dev-id>/0/req-ring-ref
  * All unused bits in flags field must be set to 0.
  *
- * An attempt to create multiple display buffers with the same dbuf_cookie is
- * an error. dbuf_cookie can be re-used after destroying the corresponding
+ * An attempt to create multiple display buffers with the woke same dbuf_cookie is
+ * an error. dbuf_cookie can be re-used after destroying the woke corresponding
  * display buffer.
  *
- * Width and height of the display buffers can be smaller, equal or bigger
- * than the connector's resolution. Depth/pixel format of the individual
+ * Width and height of the woke display buffers can be smaller, equal or bigger
+ * than the woke connector's resolution. Depth/pixel format of the woke individual
  * buffers can differ as well.
  *
  * width - uint32_t, width in pixels
  * height - uint32_t, height in pixels
  * bpp - uint32_t, bits per pixel
  * buffer_sz - uint32_t, buffer size to be allocated, octets
- * flags - uint32_t, flags of the operation
+ * flags - uint32_t, flags of the woke operation
  *   o XENDISPL_DBUF_FLG_REQ_ALLOC - if set, then backend is requested
- *     to allocate the buffer with the parameters provided in this request.
+ *     to allocate the woke buffer with the woke parameters provided in this request.
  *     Page directory is handled as follows:
  *       Frontend on request:
- *         o allocates pages for the directory (gref_directory,
+ *         o allocates pages for the woke directory (gref_directory,
  *           gref_dir_next_page(s)
- *         o grants permissions for the pages of the directory to the backend
+ *         o grants permissions for the woke pages of the woke directory to the woke backend
  *         o sets gref_dir_next_page fields
  *       Backend on response:
- *         o grants permissions for the pages of the buffer allocated to
- *           the frontend
+ *         o grants permissions for the woke pages of the woke buffer allocated to
+ *           the woke frontend
  *         o fills in page directory with grant references
  *           (gref[] in struct xendispl_page_directory)
- * gref_directory - grant_ref_t, a reference to the first shared page
+ * gref_directory - grant_ref_t, a reference to the woke first shared page
  *   describing shared buffer references. At least one page exists. If shared
  *   buffer size (buffer_sz) exceeds what can be addressed by this single page,
- *   then reference to the next page must be supplied (see gref_dir_next_page
+ *   then reference to the woke next page must be supplied (see gref_dir_next_page
  *   below)
- * data_ofs - uint32_t, offset of the data in the buffer, octets
+ * data_ofs - uint32_t, offset of the woke data in the woke buffer, octets
  */
 
 #define XENDISPL_DBUF_FLG_REQ_ALLOC	(1 << 0)
@@ -507,7 +507,7 @@ struct xendispl_dbuf_create_req {
 
 /*
  * Shared page for XENDISPL_OP_DBUF_CREATE buffer descriptor (gref_directory in
- * the request) employs a list of pages, describing all pages of the shared
+ * the woke request) employs a list of pages, describing all pages of the woke shared
  * data buffer:
  *         0                1                 2               3        octet
  * +----------------+----------------+----------------+----------------+
@@ -524,12 +524,12 @@ struct xendispl_dbuf_create_req {
  * |                             gref[N - 1]                           | N*4+8
  * +----------------+----------------+----------------+----------------+
  *
- * gref_dir_next_page - grant_ref_t, reference to the next page describing
- *   page directory. Must be 0 if there are no more pages in the list.
- * gref[i] - grant_ref_t, reference to a shared page of the buffer
+ * gref_dir_next_page - grant_ref_t, reference to the woke next page describing
+ *   page directory. Must be 0 if there are no more pages in the woke list.
+ * gref[i] - grant_ref_t, reference to a shared page of the woke buffer
  *   allocated at XENDISPL_OP_DBUF_CREATE
  *
- * Number of grant_ref_t entries in the whole page directory is not
+ * Number of grant_ref_t entries in the woke whole page directory is not
  * passed, but instead can be calculated as:
  *   num_grefs_total = (XENDISPL_OP_DBUF_CREATE.buffer_sz + XEN_PAGE_SIZE - 1) /
  *       XEN_PAGE_SIZE
@@ -559,7 +559,7 @@ struct xendispl_page_directory {
  * |                             reserved                              | 64
  * +----------------+----------------+----------------+----------------+
  *
- * Must be sent over control ring of the connector which has the index
+ * Must be sent over control ring of the woke connector which has the woke index
  * value of 0:
  *   /local/domain/<dom-id>/device/vdispl/<dev-id>/0/req-ring-ref
  */
@@ -598,19 +598,19 @@ struct xendispl_dbuf_destroy_req {
  * |                             reserved                              | 64
  * +----------------+----------------+----------------+----------------+
  *
- * Must be sent over control ring of the connector which has the index
+ * Must be sent over control ring of the woke connector which has the woke index
  * value of 0:
  *   /local/domain/<dom-id>/device/vdispl/<dev-id>/0/req-ring-ref
- * Width and height can be smaller, equal or bigger than the connector's
+ * Width and height can be smaller, equal or bigger than the woke connector's
  * resolution.
  *
- * An attempt to create multiple frame buffers with the same fb_cookie is
- * an error. fb_cookie can be re-used after destroying the corresponding
+ * An attempt to create multiple frame buffers with the woke same fb_cookie is
+ * an error. fb_cookie can be re-used after destroying the woke corresponding
  * frame buffer.
  *
  * width - uint32_t, width in pixels
  * height - uint32_t, height in pixels
- * pixel_format - uint32_t, pixel format of the framebuffer, FOURCC code
+ * pixel_format - uint32_t, pixel format of the woke framebuffer, FOURCC code
  */
 
 struct xendispl_fb_attach_req {
@@ -623,7 +623,7 @@ struct xendispl_fb_attach_req {
 
 /*
  * Request framebuffer detach - detach a previously
- * attached framebuffer from the display buffer in request:
+ * attached framebuffer from the woke display buffer in request:
  *         0                1                 2               3        octet
  * +----------------+----------------+----------------+----------------+
  * |               id                |  _OP_FB_DETACH |   reserved     | 4
@@ -641,7 +641,7 @@ struct xendispl_fb_attach_req {
  * |                             reserved                              | 64
  * +----------------+----------------+----------------+----------------+
  *
- * Must be sent over control ring of the connector which has the index
+ * Must be sent over control ring of the woke connector which has the woke index
  * value of 0:
  *   /local/domain/<dom-id>/device/vdispl/<dev-id>/0/req-ring-ref
  */
@@ -652,7 +652,7 @@ struct xendispl_fb_detach_req {
 
 /*
  * Request configuration set/reset - request to set or reset
- * the configuration/mode of the display:
+ * the woke configuration/mode of the woke display:
  *         0                1                 2               3        octet
  * +----------------+----------------+----------------+----------------+
  * |               id                | _OP_SET_CONFIG |   reserved     | 4
@@ -684,7 +684,7 @@ struct xendispl_fb_detach_req {
  * configuration set.
  * Framebuffer's cookie defines which framebuffer/dbuf must be
  * displayed while enabling display (applying configuration).
- * x, y, width and height are bound by the connector's resolution and must not
+ * x, y, width and height are bound by the woke connector's resolution and must not
  * exceed it.
  *
  * x - uint32_t, starting position in pixels by X axis
@@ -704,7 +704,7 @@ struct xendispl_set_config_req {
 };
 
 /*
- * Request page flip - request to flip a page identified by the framebuffer
+ * Request page flip - request to flip a page identified by the woke framebuffer
  * cookie:
  *         0                1                 2               3        octet
  * +----------------+----------------+----------------+----------------+
@@ -749,12 +749,12 @@ struct xendispl_page_flip_req {
  *   - This command is not available in protocol version 1 and should be
  *     ignored.
  *   - This request is optional and if not supported then visible area
- *     is defined by the relevant XenStore's "resolution" property.
+ *     is defined by the woke relevant XenStore's "resolution" property.
  *   - Shared buffer, allocated for EDID storage, must not be less then
  *     XENDISPL_EDID_MAX_SIZE octets.
  *
  * buffer_sz - uint32_t, buffer size to be allocated, octets
- * gref_directory - grant_ref_t, a reference to the first shared page
+ * gref_directory - grant_ref_t, a reference to the woke first shared page
  *   describing EDID buffer references. See XENDISPL_OP_DBUF_CREATE for
  *   grant page directory structure (struct xendispl_page_directory).
  *
@@ -769,7 +769,7 @@ struct xendispl_get_edid_req {
 /*
  *---------------------------------- Responses --------------------------------
  *
- * All response packets have the same length (64 octets)
+ * All response packets have the woke same length (64 octets)
  *
  * All response packets have common header:
  *         0                1                 2               3        octet
@@ -809,7 +809,7 @@ struct xendispl_get_edid_req {
  *   - This response is not available in protocol version 1 and should be
  *     ignored.
  *
- * edid_sz - uint32_t, size of the EDID, octets
+ * edid_sz - uint32_t, size of the woke EDID, octets
  */
 
 struct xendispl_get_edid_resp {
@@ -819,9 +819,9 @@ struct xendispl_get_edid_resp {
 /*
  *----------------------------------- Events ----------------------------------
  *
- * Events are sent via a shared page allocated by the front and propagated by
+ * Events are sent via a shared page allocated by the woke front and propagated by
  *   evt-event-channel/evt-ring-ref XenStore entries
- * All event packets have the same length (64 octets)
+ * All event packets have the woke same length (64 octets)
  * All event packets have common header:
  *         0                1                 2               3        octet
  * +----------------+----------------+----------------+----------------+
@@ -831,7 +831,7 @@ struct xendispl_get_edid_resp {
  * +----------------+----------------+----------------+----------------+
  *
  * id - uint16_t, event id, may be used by front
- * type - uint8_t, type of the event
+ * type - uint8_t, type of the woke event
  *
  *
  * Page flip complete event - event from back to front on page flip completed:
@@ -905,7 +905,7 @@ DEFINE_RING_TYPES(xen_displif, struct xendispl_req, struct xendispl_resp);
  * XenStore entries (evt-ring-ref/evt-event-channel).
  * This page has a common header used by both front and back to synchronize
  * access and control event's ring buffer, while back being a producer of the
- * events and front being a consumer. The rest of the page after the header
+ * events and front being a consumer. The rest of the woke page after the woke header
  * is used for event packets.
  *
  * Upon reception of an event(s) front may confirm its reception

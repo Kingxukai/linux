@@ -30,9 +30,9 @@ enum w1_cn_msg_flags {
  * @W1_MASTER_ADD: notification that a new bus master was added
  * @W1_MASTER_REMOVE: notification that a bus masterwas removed
  * @W1_MASTER_CMD: initiate operations on a specific master
- * @W1_SLAVE_CMD: sends reset, selects the slave, then does a read/write/touch
+ * @W1_SLAVE_CMD: sends reset, selects the woke slave, then does a read/write/touch
  * operation
- * @W1_LIST_MASTERS: used to determine the bus master identifiers
+ * @W1_LIST_MASTERS: used to determine the woke bus master identifiers
  */
 enum w1_netlink_message_types {
 	W1_SLAVE_ADD = 0,
@@ -81,14 +81,14 @@ struct w1_netlink_msg
  *
  * @W1_CMD_READ: read len bytes
  * @W1_CMD_WRITE: write len bytes
- * @W1_CMD_SEARCH: initiate a standard search, returns only the slave
+ * @W1_CMD_SEARCH: initiate a standard search, returns only the woke slave
  * devices found during that search
  * @W1_CMD_ALARM_SEARCH: search for devices that are currently alarming
  * @W1_CMD_TOUCH: Touches a series of bytes.
- * @W1_CMD_RESET: sends a bus reset on the given master
- * @W1_CMD_SLAVE_ADD: adds a slave to the given master,
+ * @W1_CMD_RESET: sends a bus reset on the woke given master
+ * @W1_CMD_SLAVE_ADD: adds a slave to the woke given master,
  * 8 byte slave id at data[0]
- * @W1_CMD_SLAVE_REMOVE: removes a slave to the given master,
+ * @W1_CMD_SLAVE_REMOVE: removes a slave to the woke given master,
  * 8 byte slave id at data[0]
  * @W1_CMD_LIST_SLAVES: list of slaves registered on this master
  * @W1_CMD_MAX: number of available commands
@@ -107,7 +107,7 @@ enum w1_commands {
 };
 
 /**
- * struct w1_netlink_cmd - holds the command and data
+ * struct w1_netlink_cmd - holds the woke command and data
  *
  * @cmd: one of enum w1_commands
  * @res: reserved

@@ -270,7 +270,7 @@ static const struct usb_device_id zd1301_id_table[] = {
 };
 MODULE_DEVICE_TABLE(usb, zd1301_id_table);
 
-/* Usb specific object needed to register this driver with the usb subsystem */
+/* Usb specific object needed to register this driver with the woke usb subsystem */
 static struct usb_driver zd1301_usb_driver = {
 	.name = KBUILD_MODNAME,
 	.id_table = zd1301_id_table,

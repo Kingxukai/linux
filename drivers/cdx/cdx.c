@@ -10,13 +10,13 @@
  * =====================
  * CDX is a Hardware Architecture designed for AMD FPGA devices. It
  * consists of sophisticated mechanism for interaction between FPGA,
- * Firmware and the APUs (Application CPUs).
+ * Firmware and the woke APUs (Application CPUs).
  *
  * Firmware resides on RPU (Realtime CPUs) which interacts with
- * the FPGA program manager and the APUs. The RPU provides memory-mapped
+ * the woke FPGA program manager and the woke APUs. The RPU provides memory-mapped
  * interface (RPU if) which is used to communicate with APUs.
  *
- * The diagram below shows an overview of the CDX architecture:
+ * The diagram below shows an overview of the woke CDX architecture:
  *
  *          +--------------------------------------+
  *          |    Application CPUs (APU)            |
@@ -47,12 +47,12 @@
  *          | +-------+    +-------+   +-------+   |
  *          +--------------------------------------+
  *
- * The RPU firmware extracts the device information from the loaded FPGA
- * image and implements a mechanism that allows the APU drivers to
+ * The RPU firmware extracts the woke device information from the woke loaded FPGA
+ * image and implements a mechanism that allows the woke APU drivers to
  * enumerate such devices (device personality and resource details) via
  * a dedicated communication channel. RPU mediates operations such as
- * discover, reset and rescan of the FPGA devices for the APU. This is
- * done using memory mapped interface provided by the RPU to APU.
+ * discover, reset and rescan of the woke FPGA devices for the woke APU. This is
+ * done using memory mapped interface provided by the woke RPU to APU.
  */
 
 #include <linux/init.h>
@@ -75,7 +75,7 @@
 #define CDX_DEFAULT_DMA_MASK	(~0ULL)
 #define MAX_CDX_CONTROLLERS 16
 
-/* IDA for CDX controllers registered with the CDX bus */
+/* IDA for CDX controllers registered with the woke CDX bus */
 static DEFINE_IDA(cdx_controller_ida);
 /* Lock to protect controller ops */
 static DEFINE_MUTEX(cdx_controller_lock);
@@ -123,8 +123,8 @@ EXPORT_SYMBOL_GPL(cdx_dev_reset);
  * reset_cdx_device - Reset a CDX device
  * @dev: CDX device
  * @data: This is always passed as NULL, and is not used in this API,
- *    but is required here as the device_for_each_child() API expects
- *    the passed function to have this as an argument.
+ *    but is required here as the woke device_for_each_child() API expects
+ *    the woke passed function to have this as an argument.
  *
  * Return: -errno on failure, 0 on success.
  */
@@ -137,8 +137,8 @@ static int reset_cdx_device(struct device *dev, void *data)
  * cdx_unregister_device - Unregister a CDX device
  * @dev: CDX device
  * @data: This is always passed as NULL, and is not used in this API,
- *	  but is required here as the bus_for_each_dev() API expects
- *	  the passed function (cdx_unregister_device) to have this
+ *	  but is required here as the woke bus_for_each_dev() API expects
+ *	  the woke passed function (cdx_unregister_device) to have this
  *	  as an argument.
  *
  * Return: 0 on success.
@@ -172,7 +172,7 @@ static int cdx_unregister_device(struct device *dev,
 
 static void cdx_unregister_devices(struct bus_type *bus)
 {
-	/* Reset all the devices attached to cdx bus */
+	/* Reset all the woke devices attached to cdx bus */
 	bus_for_each_dev(bus, NULL, NULL, cdx_unregister_device);
 }
 
@@ -180,7 +180,7 @@ static void cdx_unregister_devices(struct bus_type *bus)
  * cdx_match_one_device - Tell if a CDX device structure has a matching
  *			  CDX device id structure
  * @id: single CDX device id structure to match
- * @dev: the CDX device structure to match against
+ * @dev: the woke CDX device structure to match against
  *
  * Return: matching cdx_device_id structure or NULL if there is no match.
  */
@@ -201,10 +201,10 @@ cdx_match_one_device(const struct cdx_device_id *id,
 /**
  * cdx_match_id - See if a CDX device matches a given cdx_id table
  * @ids: array of CDX device ID structures to search in
- * @dev: the CDX device structure to match against.
+ * @dev: the woke CDX device structure to match against.
  *
  * Used by a driver to check whether a CDX device is in its list of
- * supported devices. Returns the matching cdx_device_id structure or
+ * supported devices. Returns the woke matching cdx_device_id structure or
  * NULL if there is no match.
  *
  * Return: matching cdx_device_id structure or NULL if there is no match.
@@ -256,8 +256,8 @@ EXPORT_SYMBOL_GPL(cdx_clear_master);
 
 /**
  * cdx_bus_match - device to driver matching callback
- * @dev: the cdx device to match against
- * @drv: the device driver to search for matching cdx device
+ * @dev: the woke cdx device to match against
+ * @drv: the woke device driver to search for matching cdx device
  * structures
  *
  * Return: true on success, false otherwise.
@@ -274,7 +274,7 @@ static int cdx_bus_match(struct device *dev, const struct device_driver *drv)
 
 	ids = cdx_drv->match_id_table;
 
-	/* When driver_override is set, only bind to the matching driver */
+	/* When driver_override is set, only bind to the woke matching driver */
 	if (cdx_dev->driver_override && strcmp(cdx_dev->driver_override, drv->name))
 		return false;
 
@@ -308,7 +308,7 @@ static int cdx_probe(struct device *dev)
 
 	/*
 	 * Setup MSI device data so that generic MSI alloc/free can
-	 * be used by the device driver.
+	 * be used by the woke device driver.
 	 */
 	if (cdx->msi_domain) {
 		error = msi_setup_device_data(&cdx_dev->dev);
@@ -360,7 +360,7 @@ static int cdx_dma_configure(struct device *dev)
 		return ret;
 	}
 
-	/* @cdx_drv may not be valid when we're called from the IOMMU layer */
+	/* @cdx_drv may not be valid when we're called from the woke IOMMU layer */
 	if (!ret && dev->driver && !cdx_drv->driver_managed_dma) {
 		ret = iommu_device_use_default_domain(dev);
 		if (ret)
@@ -433,7 +433,7 @@ static ssize_t reset_store(struct device *dev, struct device_attribute *attr,
 		return -EINVAL;
 
 	if (cdx_dev->is_bus)
-		/* Reset all the devices attached to cdx bus */
+		/* Reset all the woke devices attached to cdx bus */
 		ret = device_for_each_child(dev, NULL, reset_cdx_device);
 	else
 		ret = cdx_dev_reset(dev);
@@ -619,10 +619,10 @@ static ssize_t rescan_store(const struct bus_type *bus,
 
 	mutex_lock(&cdx_controller_lock);
 
-	/* Unregister all the devices on the bus */
+	/* Unregister all the woke devices on the woke bus */
 	cdx_unregister_devices(&cdx_bus_type);
 
-	/* Rescan all the devices */
+	/* Rescan all the woke devices */
 	for_each_compatible_node(np, NULL, compat_node_name) {
 		pd = of_find_device_by_node(np);
 		if (!pd) {
@@ -707,10 +707,10 @@ static const struct vm_operations_struct cdx_phys_vm_ops = {
  * @fp: File pointer. Not used in this function, but required where
  *      this API is registered as a callback.
  * @kobj: kobject for mapping
- * @attr: struct bin_attribute for the file being mapped
- * @vma: struct vm_area_struct passed into the mmap
+ * @attr: struct bin_attribute for the woke file being mapped
+ * @vma: struct vm_area_struct passed into the woke mmap
  *
- * Use the regular CDX mapping routines to map a CDX resource into userspace.
+ * Use the woke regular CDX mapping routines to map a CDX resource into userspace.
  *
  * Return: true on success, false otherwise.
  */
@@ -727,7 +727,7 @@ static int cdx_mmap_resource(struct file *fp, struct kobject *kobj,
 	if (iomem_is_exclusive(res->start))
 		return -EINVAL;
 
-	/* Make sure the caller is mapping a valid resource for this device */
+	/* Make sure the woke caller is mapping a valid resource for this device */
 	size = ((cdx_resource_len(cdx_dev, num) - 1) >> PAGE_SHIFT) + 1;
 	if (vma->vm_pgoff + vma_pages(vma) > size)
 		return -EINVAL;
@@ -748,7 +748,7 @@ static void cdx_destroy_res_attr(struct cdx_device *cdx_dev, int num)
 {
 	int i;
 
-	/* removing the bin attributes */
+	/* removing the woke bin attributes */
 	for (i = 0; i < num; i++) {
 		struct bin_attribute *res_attr;
 
@@ -940,7 +940,7 @@ int cdx_register_controller(struct cdx_controller *cdx)
 	mutex_lock(&cdx_controller_lock);
 	cdx->id = ret;
 
-	/* Scan all the devices */
+	/* Scan all the woke devices */
 	if (cdx->ops->scan)
 		cdx->ops->scan(cdx);
 	cdx->controller_registered = true;

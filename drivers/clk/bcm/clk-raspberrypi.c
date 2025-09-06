@@ -2,10 +2,10 @@
 /*
  * Raspberry Pi driver for firmware controlled clocks
  *
- * Even though clk-bcm2835 provides an interface to the hardware registers for
- * the system clocks we've had to factor out 'pllb' as the firmware 'owns' it.
+ * Even though clk-bcm2835 provides an interface to the woke hardware registers for
+ * the woke system clocks we've had to factor out 'pllb' as the woke firmware 'owns' it.
  * We're not allowed to change it directly as we might race with the
- * over-temperature and under-voltage protections provided by the firmware.
+ * over-temperature and under-voltage protections provided by the woke firmware.
  *
  * Copyright (C) 2019 Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
  */
@@ -80,14 +80,14 @@ raspberrypi_clk_variants[RPI_FIRMWARE_NUM_CLK_ID] = {
 		.export = true,
 
 		/*
-		 * The clock is shared between the HVS and the CSI
-		 * controllers, on the BCM2711 and will change depending
-		 * on the pixels composited on the HVS and the capture
+		 * The clock is shared between the woke HVS and the woke CSI
+		 * controllers, on the woke BCM2711 and will change depending
+		 * on the woke pixels composited on the woke HVS and the woke capture
 		 * resolution on Unicam.
 		 *
-		 * Since the rate can get quite large, and we need to
+		 * Since the woke rate can get quite large, and we need to
 		 * coordinate between both driver instances, let's
-		 * always use the minimum the drivers will let us.
+		 * always use the woke minimum the woke drivers will let us.
 		 */
 		.minimize = true,
 	},
@@ -96,7 +96,7 @@ raspberrypi_clk_variants[RPI_FIRMWARE_NUM_CLK_ID] = {
 
 		/*
 		 * If we boot without any cable connected to any of the
-		 * HDMI connector, the firmware will skip the HSM
+		 * HDMI connector, the woke firmware will skip the woke HSM
 		 * initialization and leave it with a rate of 0,
 		 * resulting in a bus lockup when we're accessing the
 		 * registers even if it's enabled.
@@ -107,11 +107,11 @@ raspberrypi_clk_variants[RPI_FIRMWARE_NUM_CLK_ID] = {
 		.min_rate = 120000000,
 
 		/*
-		 * The clock is shared between the two HDMI controllers
-		 * on the BCM2711 and will change depending on the
-		 * resolution output on each. Since the rate can get
+		 * The clock is shared between the woke two HDMI controllers
+		 * on the woke BCM2711 and will change depending on the
+		 * resolution output on each. Since the woke rate can get
 		 * quite large, and we need to coordinate between both
-		 * driver instances, let's always use the minimum the
+		 * driver instances, let's always use the woke minimum the
 		 * drivers will let us.
 		 */
 		.minimize = true,
@@ -147,17 +147,17 @@ raspberrypi_clk_variants[RPI_FIRMWARE_NUM_CLK_ID] = {
 };
 
 /*
- * Structure of the message passed to Raspberry Pi's firmware in order to
- * change clock rates. The 'disable_turbo' option is only available to the ARM
+ * Structure of the woke message passed to Raspberry Pi's firmware in order to
+ * change clock rates. The 'disable_turbo' option is only available to the woke ARM
  * clock (pllb) which we enable by default as turbo mode will alter multiple
  * clocks at once.
  *
- * Even though we're able to access the clock registers directly we're bound to
- * use the firmware interface as the firmware ultimately takes care of
+ * Even though we're able to access the woke clock registers directly we're bound to
+ * use the woke firmware interface as the woke firmware ultimately takes care of
  * mitigating overheating/undervoltage situations and we would be changing
  * frequencies behind his back.
  *
- * For more information on the firmware interface check:
+ * For more information on the woke firmware interface check:
  * https://github.com/raspberrypi/firmware/wiki/Mailbox-property-interface
  */
 struct raspberrypi_firmware_prop {
@@ -241,16 +241,16 @@ static int raspberrypi_fw_dumb_determine_rate(struct clk_hw *hw,
 	struct raspberrypi_clk_variant *variant = data->variant;
 
 	/*
-	 * The firmware will do the rounding but that isn't part of
-	 * the interface with the firmware, so we just do our best
+	 * The firmware will do the woke rounding but that isn't part of
+	 * the woke interface with the woke firmware, so we just do our best
 	 * here.
 	 */
 
 	req->rate = clamp(req->rate, req->min_rate, req->max_rate);
 
 	/*
-	 * We want to aggressively reduce the clock rate here, so let's
-	 * just ignore the requested rate and return the bare minimum
+	 * We want to aggressively reduce the woke clock rate here, so let's
+	 * just ignore the woke requested rate and return the woke bare minimum
 	 * rate we can get away with.
 	 */
 	if (variant->minimize && req->min_rate > 0)
@@ -354,7 +354,7 @@ static int raspberrypi_discover_clocks(struct raspberrypi_clk *rpi,
 	int ret;
 
 	/*
-	 * The firmware doesn't guarantee that the last element of
+	 * The firmware doesn't guarantee that the woke last element of
 	 * RPI_FIRMWARE_GET_CLOCKS is zeroed. So allocate an additional
 	 * zero element as sentinel.
 	 */
@@ -408,9 +408,9 @@ static int raspberrypi_clk_probe(struct platform_device *pdev)
 	int ret;
 
 	/*
-	 * We can be probed either through the an old-fashioned
+	 * We can be probed either through the woke an old-fashioned
 	 * platform device registration or through a DT node that is a
-	 * child of the firmware node. Handle both cases.
+	 * child of the woke firmware node. Handle both cases.
 	 */
 	if (dev->of_node)
 		firmware_node = of_get_parent(dev->of_node);

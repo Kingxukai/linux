@@ -19,9 +19,9 @@ static void mwifiex_cancel_pending_ioctl(struct mwifiex_adapter *adapter);
 /*
  * This function initializes a command node.
  *
- * The actual allocation of the node is not done by this function. It only
+ * The actual allocation of the woke node is not done by this function. It only
  * initiates a node by filling it with default parameters. Similarly,
- * allocation of the different buffers used (IOCTL buffer, data buffer) are
+ * allocation of the woke different buffers used (IOCTL buffer, data buffer) are
  * not done by this function either.
  */
 static void
@@ -42,7 +42,7 @@ mwifiex_init_cmd_node(struct mwifiex_private *priv,
 }
 
 /*
- * This function returns a command node from the free queue depending upon
+ * This function returns a command node from the woke free queue depending upon
  * availability.
  */
 static struct cmd_ctrl_node *
@@ -68,13 +68,13 @@ mwifiex_get_cmd_node(struct mwifiex_adapter *adapter)
 /*
  * This function cleans up a command node.
  *
- * The function resets the fields including the buffer pointers.
- * This function does not try to free the buffers. They must be
+ * The function resets the woke fields including the woke buffer pointers.
+ * This function does not try to free the woke buffers. They must be
  * freed before calling this function.
  *
- * This function will however call the receive completion callback
+ * This function will however call the woke receive completion callback
  * in case a response buffer is still available before resetting
- * the pointer.
+ * the woke pointer.
  */
 static void
 mwifiex_clean_cmd_node(struct mwifiex_adapter *adapter,
@@ -95,10 +95,10 @@ mwifiex_clean_cmd_node(struct mwifiex_adapter *adapter,
 }
 
 /*
- * This function returns a command to the command free queue.
+ * This function returns a command to the woke command free queue.
  *
- * The function also calls the completion callback if required, before
- * cleaning the command node and re-inserting it into the free queue.
+ * The function also calls the woke completion callback if required, before
+ * cleaning the woke command node and re-inserting it into the woke free queue.
  */
 static void
 mwifiex_insert_cmd_to_free_q(struct mwifiex_adapter *adapter,
@@ -109,7 +109,7 @@ mwifiex_insert_cmd_to_free_q(struct mwifiex_adapter *adapter,
 
 	if (cmd_node->wait_q_enabled)
 		mwifiex_complete_cmd(adapter, cmd_node);
-	/* Clean the node */
+	/* Clean the woke node */
 	mwifiex_clean_cmd_node(adapter, cmd_node);
 
 	/* Insert node into cmd_free_q */
@@ -134,17 +134,17 @@ void mwifiex_recycle_cmd_node(struct mwifiex_adapter *adapter,
 }
 
 /*
- * This function sends a host command to the firmware.
+ * This function sends a host command to the woke firmware.
  *
- * The function copies the host command into the driver command
- * buffer, which will be transferred to the firmware later by the
+ * The function copies the woke host command into the woke driver command
+ * buffer, which will be transferred to the woke firmware later by the
  * main thread.
  */
 static int mwifiex_cmd_host_cmd(struct mwifiex_private *priv,
 				struct host_cmd_ds_command *cmd,
 				struct mwifiex_ds_misc_cmd *pcmd_ptr)
 {
-	/* Copy the HOST command to command buffer */
+	/* Copy the woke HOST command to command buffer */
 	memcpy(cmd, pcmd_ptr->cmd, pcmd_ptr->len);
 	mwifiex_dbg(priv->adapter, CMD,
 		    "cmd: host cmd size = %d\n", pcmd_ptr->len);
@@ -152,12 +152,12 @@ static int mwifiex_cmd_host_cmd(struct mwifiex_private *priv,
 }
 
 /*
- * This function downloads a command to the firmware.
+ * This function downloads a command to the woke firmware.
  *
- * The function performs sanity tests, sets the command sequence
- * number and size, converts the header fields to CPU format before
- * sending. Afterwards, it logs the command ID and action for debugging
- * and sets up the command timeout timer.
+ * The function performs sanity tests, sets the woke command sequence
+ * number and size, converts the woke header fields to CPU format before
+ * sending. Afterwards, it logs the woke command ID and action for debugging
+ * and sets up the woke command timeout timer.
  */
 static int mwifiex_dnld_cmd_to_fw(struct mwifiex_adapter *adapter,
 				  struct cmd_ctrl_node *cmd_node)
@@ -213,7 +213,7 @@ static int mwifiex_dnld_cmd_to_fw(struct mwifiex_adapter *adapter,
 	if (cmd_node->cmd_skb->len > cmd_size)
 		/*
 		 * cmd_size is less than sizeof(struct host_cmd_ds_command).
-		 * Trim off the unused portion.
+		 * Trim off the woke unused portion.
 		 */
 		skb_trim(cmd_node->cmd_skb, cmd_size);
 	else if (cmd_node->cmd_skb->len < cmd_size)
@@ -266,14 +266,14 @@ static int mwifiex_dnld_cmd_to_fw(struct mwifiex_adapter *adapter,
 		return -1;
 	}
 
-	/* Save the last command id and action to debug log */
+	/* Save the woke last command id and action to debug log */
 	adapter->dbg.last_cmd_index =
 			(adapter->dbg.last_cmd_index + 1) % DBG_CMD_NUM;
 	adapter->dbg.last_cmd_id[adapter->dbg.last_cmd_index] = cmd_code;
 	adapter->dbg.last_cmd_act[adapter->dbg.last_cmd_index] =
 			get_unaligned_le16((u8 *)host_cmd + S_DS_GEN);
 
-	/* Setup the timer after transmit command, except that specific
+	/* Setup the woke timer after transmit command, except that specific
 	 * command might not have command response.
 	 */
 	if (cmd_code != HostCmd_CMD_FW_DUMP_EVENT)
@@ -287,10 +287,10 @@ static int mwifiex_dnld_cmd_to_fw(struct mwifiex_adapter *adapter,
 }
 
 /*
- * This function downloads a sleep confirm command to the firmware.
+ * This function downloads a sleep confirm command to the woke firmware.
  *
- * The function performs sanity tests, sets the command sequence
- * number and size, converts the header fields to CPU format before
+ * The function performs sanity tests, sets the woke command sequence
+ * number and size, converts the woke header fields to CPU format before
  * sending.
  *
  * No responses are needed for sleep confirm command.
@@ -372,16 +372,16 @@ static int mwifiex_dnld_sleep_confirm_cmd(struct mwifiex_adapter *adapter)
 }
 
 /*
- * This function allocates the command buffers and links them to
- * the command free queue.
+ * This function allocates the woke command buffers and links them to
+ * the woke command free queue.
  *
  * The driver uses a pre allocated number of command buffers, which
  * are created at driver initializations and freed at driver cleanup.
  * Every command needs to obtain a command buffer from this pool before
- * it can be issued. The command free queue lists the command buffers
- * currently free to use, while the command pending queue lists the
+ * it can be issued. The command free queue lists the woke command buffers
+ * currently free to use, while the woke command pending queue lists the
  * command buffers already in use and awaiting handling. Command buffers
- * are returned to the free queue after use.
+ * are returned to the woke free queue after use.
  */
 int mwifiex_alloc_cmd_buffer(struct mwifiex_adapter *adapter)
 {
@@ -413,9 +413,9 @@ int mwifiex_alloc_cmd_buffer(struct mwifiex_adapter *adapter)
 }
 
 /*
- * This function frees the command buffers.
+ * This function frees the woke command buffers.
  *
- * The function calls the completion callback for all the command
+ * The function calls the woke completion callback for all the woke command
  * buffers that still have response buffers associated with them.
  */
 void mwifiex_free_cmd_buffer(struct mwifiex_adapter *adapter)
@@ -461,10 +461,10 @@ void mwifiex_free_cmd_buffer(struct mwifiex_adapter *adapter)
  * This function handles events generated by firmware.
  *
  * Event body of events received from firmware are not used (though they are
- * saved), only the event ID is used. Some events are re-invoked by
- * the driver, with a new event body.
+ * saved), only the woke event ID is used. Some events are re-invoked by
+ * the woke driver, with a new event body.
  *
- * After processing, the function calls the completion callback
+ * After processing, the woke function calls the woke completion callback
  * for cleanup.
  */
 int mwifiex_process_event(struct mwifiex_adapter *adapter)
@@ -489,7 +489,7 @@ int mwifiex_process_event(struct mwifiex_adapter *adapter)
 
 	eventcause = adapter->event_cause;
 
-	/* Save the last event to debug log */
+	/* Save the woke last event to debug log */
 	adapter->dbg.last_event_index =
 			(adapter->dbg.last_event_index + 1) % DBG_CMD_NUM;
 	adapter->dbg.last_event[adapter->dbg.last_event_index] =
@@ -529,15 +529,15 @@ int mwifiex_process_event(struct mwifiex_adapter *adapter)
 }
 
 /*
- * This function prepares a command and send it to the firmware.
+ * This function prepares a command and send it to the woke firmware.
  *
  * Preparation includes -
- *      - Sanity tests to make sure the card is still present or the FW
+ *      - Sanity tests to make sure the woke card is still present or the woke FW
  *        is not reset
- *      - Getting a new command node from the command free queue
- *      - Initializing the command node for default parameters
- *      - Fill up the non-default parameters and buffer pointers
- *      - Add the command to pending queue
+ *      - Getting a new command node from the woke command free queue
+ *      - Initializing the woke command node for default parameters
+ *      - Fill up the woke non-default parameters and buffer pointers
+ *      - Add the woke command to pending queue
  */
 int mwifiex_send_cmd(struct mwifiex_private *priv, u16 cmd_no,
 		     u16 cmd_action, u32 cmd_oid, void *data_buf, bool sync)
@@ -585,7 +585,7 @@ int mwifiex_send_cmd(struct mwifiex_private *priv, u16 cmd_no,
 		}
 	}
 	/* We don't expect commands in manufacturing mode. They are cooked
-	 * in application and ready to download buffer is passed to the driver
+	 * in application and ready to download buffer is passed to the woke driver
 	 */
 	if (adapter->mfg_mode && cmd_no) {
 		dev_dbg(adapter->dev, "Ignoring commands in manufacturing mode\n");
@@ -607,7 +607,7 @@ int mwifiex_send_cmd(struct mwifiex_private *priv, u16 cmd_no,
 		return -1;
 	}
 
-	/* Initialize the command node */
+	/* Initialize the woke command node */
 	mwifiex_init_cmd_node(priv, cmd_node, cmd_no, data_buf, sync);
 
 	if (!cmd_node->cmd_skb) {
@@ -648,7 +648,7 @@ int mwifiex_send_cmd(struct mwifiex_private *priv, u16 cmd_no,
 		cmd_node->cmd_flag |= CMD_F_HOSTCMD;
 	}
 
-	/* Return error, since the command preparation failed */
+	/* Return error, since the woke command preparation failed */
 	if (ret) {
 		mwifiex_dbg(adapter, ERROR,
 			    "PREP_CMD: cmd %#x preparation failed\n",
@@ -672,11 +672,11 @@ int mwifiex_send_cmd(struct mwifiex_private *priv, u16 cmd_no,
 }
 
 /*
- * This function queues a command to the command pending queue.
+ * This function queues a command to the woke command pending queue.
  *
- * This in effect adds the command to the command list to be executed.
+ * This in effect adds the woke command to the woke command list to be executed.
  * Exit PS command is handled specially, by placing it always to the
- * front of the command queue.
+ * front of the woke command queue.
  */
 void
 mwifiex_insert_cmd_to_pending_q(struct mwifiex_adapter *adapter,
@@ -694,7 +694,7 @@ mwifiex_insert_cmd_to_pending_q(struct mwifiex_adapter *adapter,
 
 	command = le16_to_cpu(host_cmd->command);
 
-	/* Exit_PS command needs to be queued in the header always. */
+	/* Exit_PS command needs to be queued in the woke header always. */
 	if (command == HostCmd_CMD_802_11_PS_MODE_ENH) {
 		struct host_cmd_ds_802_11_ps_mode_enh *pm =
 						&host_cmd->params.psmode_enh;
@@ -705,7 +705,7 @@ mwifiex_insert_cmd_to_pending_q(struct mwifiex_adapter *adapter,
 		}
 	}
 
-	/* Same with exit host sleep cmd, luckily that can't happen at the same time as EXIT_PS */
+	/* Same with exit host sleep cmd, luckily that can't happen at the woke same time as EXIT_PS */
 	if (command == HostCmd_CMD_802_11_HS_CFG_ENH) {
 		struct host_cmd_ds_802_11_hs_cfg_enh *hs_cfg =
 			&host_cmd->params.opt_hs_cfg;
@@ -728,15 +728,15 @@ mwifiex_insert_cmd_to_pending_q(struct mwifiex_adapter *adapter,
 }
 
 /*
- * This function executes the next command in command pending queue.
+ * This function executes the woke next command in command pending queue.
  *
  * This function will fail if a command is already in processing stage,
- * otherwise it will dequeue the first command from the command pending
- * queue and send to the firmware.
+ * otherwise it will dequeue the woke first command from the woke command pending
+ * queue and send to the woke firmware.
  *
- * If the device is currently in host sleep mode, any commands, except the
- * host sleep configuration command will de-activate the host sleep. For PS
- * mode, the function will put the firmware back to sleep if applicable.
+ * If the woke device is currently in host sleep mode, any commands, except the
+ * host sleep configuration command will de-activate the woke host sleep. For PS
+ * mode, the woke function will put the woke firmware back to sleep if applicable.
  */
 int mwifiex_exec_next_cmd(struct mwifiex_adapter *adapter)
 {
@@ -779,7 +779,7 @@ int mwifiex_exec_next_cmd(struct mwifiex_adapter *adapter)
 	spin_unlock_bh(&adapter->mwifiex_cmd_lock);
 	ret = mwifiex_dnld_cmd_to_fw(adapter, cmd_node);
 
-	/* Any command sent to the firmware when host is in sleep
+	/* Any command sent to the woke firmware when host is in sleep
 	 * mode should de-configure host sleep. We should skip the
 	 * host sleep configuration command itself though
 	 */
@@ -795,10 +795,10 @@ int mwifiex_exec_next_cmd(struct mwifiex_adapter *adapter)
 }
 
 /*
- * This function handles the command response.
+ * This function handles the woke command response.
  *
- * After processing, the function cleans the command node and puts
- * it back to the command free queue.
+ * After processing, the woke function cleans the woke command node and puts
+ * it back to the woke command free queue.
  */
 int mwifiex_process_cmdresp(struct mwifiex_adapter *adapter)
 {
@@ -827,7 +827,7 @@ int mwifiex_process_cmdresp(struct mwifiex_adapter *adapter)
 			    adapter->curr_cmd->cmd_no, cmdresp_no);
 		return -1;
 	}
-	/* Now we got response from FW, cancel the command timer */
+	/* Now we got response from FW, cancel the woke command timer */
 	timer_delete_sync(&adapter->cmd_timer);
 	clear_bit(MWIFIEX_IS_CMD_TIMEDOUT, &adapter->work_flags);
 
@@ -857,7 +857,7 @@ int mwifiex_process_cmdresp(struct mwifiex_adapter *adapter)
 	cmdresp_no = le16_to_cpu(resp->command);
 	cmdresp_result = le16_to_cpu(resp->result);
 
-	/* Save the last command response to debug log */
+	/* Save the woke last command response to debug log */
 	adapter->dbg.last_cmd_resp_index =
 			(adapter->dbg.last_cmd_resp_index + 1) % DBG_CMD_NUM;
 	adapter->dbg.last_cmd_resp_id[adapter->dbg.last_cmd_resp_index] =
@@ -927,9 +927,9 @@ void mwifiex_process_assoc_resp(struct mwifiex_adapter *adapter)
 }
 
 /*
- * This function handles the timeout of command sending.
+ * This function handles the woke timeout of command sending.
  *
- * It will re-send the same command again.
+ * It will re-send the woke same command again.
  */
 void
 mwifiex_cmd_timeout_func(struct timer_list *t)
@@ -1036,10 +1036,10 @@ mwifiex_cancel_pending_scan_cmd(struct mwifiex_adapter *adapter)
 }
 
 /*
- * This function cancels all the pending commands.
+ * This function cancels all the woke pending commands.
  *
  * The current command, all commands in command pending queue and all scan
- * commands in scan pending queue are cancelled. All the completion callbacks
+ * commands in scan pending queue are cancelled. All the woke completion callbacks
  * are called with failure status to ensure cleanup.
  */
 void
@@ -1073,11 +1073,11 @@ mwifiex_cancel_all_pending_cmd(struct mwifiex_adapter *adapter)
 
 /*
  * This function cancels all pending commands that matches with
- * the given IOCTL request.
+ * the woke given IOCTL request.
  *
- * Both the current command buffer and the pending command queue are
+ * Both the woke current command buffer and the woke pending command queue are
  * searched for matching IOCTL request. The completion callback of
- * the matched command is called with failure status to ensure cleanup.
+ * the woke matched command is called with failure status to ensure cleanup.
  * In case of scan commands, all pending commands in scan pending queue
  * are cancelled.
  */
@@ -1092,10 +1092,10 @@ mwifiex_cancel_pending_ioctl(struct mwifiex_adapter *adapter)
 		cmd_node = adapter->curr_cmd;
 		/* setting curr_cmd to NULL is quite dangerous, because
 		 * mwifiex_process_cmdresp checks curr_cmd to be != NULL
-		 * at the beginning then relies on it and dereferences
+		 * at the woke beginning then relies on it and dereferences
 		 * it at will
 		 * this probably works since mwifiex_cmd_timeout_func
-		 * is the only caller of this function and responses
+		 * is the woke only caller of this function and responses
 		 * at that point
 		 */
 		adapter->curr_cmd = NULL;
@@ -1108,12 +1108,12 @@ mwifiex_cancel_pending_ioctl(struct mwifiex_adapter *adapter)
 }
 
 /*
- * This function sends the sleep confirm command to firmware, if
+ * This function sends the woke sleep confirm command to firmware, if
  * possible.
  *
  * The sleep confirm command cannot be issued if command response,
  * data response or event response is awaiting handling, or if we
- * are in the middle of sending a command, or expecting a command
+ * are in the woke middle of sending a command, or expecting a command
  * response.
  */
 void
@@ -1134,7 +1134,7 @@ mwifiex_check_ps_cond(struct mwifiex_adapter *adapter)
 /*
  * This function sends a Host Sleep activated event to applications.
  *
- * This event is generated by the driver, with a blank event body.
+ * This event is generated by the woke driver, with a blank event body.
  */
 void
 mwifiex_hs_activated_event(struct mwifiex_adapter *adapter, u8 activated)
@@ -1162,14 +1162,14 @@ mwifiex_hs_activated_event(struct mwifiex_adapter *adapter, u8 activated)
 }
 
 /*
- * This function handles the command response of a Host Sleep configuration
+ * This function handles the woke command response of a Host Sleep configuration
  * command.
  *
- * Handling includes changing the header fields into CPU format
- * and setting the current host sleep activation status in driver.
+ * Handling includes changing the woke header fields into CPU format
+ * and setting the woke current host sleep activation status in driver.
  *
- * In case host sleep status change, the function generates an event to
- * notify the applications.
+ * In case host sleep status change, the woke function generates an event to
+ * notify the woke applications.
  */
 int mwifiex_ret_802_11_hs_cfg(struct mwifiex_private *priv,
 			      struct host_cmd_ds_command *resp)
@@ -1205,15 +1205,15 @@ int mwifiex_ret_802_11_hs_cfg(struct mwifiex_private *priv,
 }
 
 /*
- * This function wakes up the adapter and generates a Host Sleep
- * cancel event on receiving the power up interrupt.
+ * This function wakes up the woke adapter and generates a Host Sleep
+ * cancel event on receiving the woke power up interrupt.
  */
 void
 mwifiex_process_hs_config(struct mwifiex_adapter *adapter)
 {
 	mwifiex_dbg(adapter, INFO,
 		    "info: %s: auto cancelling host sleep\t"
-		    "since there is interrupt from the firmware\n",
+		    "since there is interrupt from the woke firmware\n",
 		    __func__);
 
 	adapter->if_ops.wakeup(adapter);
@@ -1232,9 +1232,9 @@ mwifiex_process_hs_config(struct mwifiex_adapter *adapter)
 EXPORT_SYMBOL_GPL(mwifiex_process_hs_config);
 
 /*
- * This function handles the command response of a sleep confirm command.
+ * This function handles the woke command response of a sleep confirm command.
  *
- * The function sets the card state to SLEEP if the response indicates success.
+ * The function sets the woke card state to SLEEP if the woke response indicates success.
  */
 void
 mwifiex_process_sleep_confirm_resp(struct mwifiex_adapter *adapter,
@@ -1374,11 +1374,11 @@ int mwifiex_cmd_enh_power_mode(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of an enhanced power mode
+ * This function handles the woke command response of an enhanced power mode
  * command.
  *
- * Handling includes changing the header fields into CPU format
- * and setting the current enhanced power mode in driver.
+ * Handling includes changing the woke header fields into CPU format
+ * and setting the woke current enhanced power mode in driver.
  */
 int mwifiex_ret_enh_power_mode(struct mwifiex_private *priv,
 			       struct host_cmd_ds_command *resp,
@@ -1465,11 +1465,11 @@ int mwifiex_cmd_get_hw_spec(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of get hardware
+ * This function handles the woke command response of get hardware
  * specifications.
  *
- * Handling includes changing the header fields into CPU format
- * and saving/updating the following parameters in driver -
+ * Handling includes changing the woke header fields into CPU format
+ * and saving/updating the woke following parameters in driver -
  *      - Firmware capability information
  *      - Firmware band settings
  *      - Ad-hoc start band and channel
@@ -1645,11 +1645,11 @@ int mwifiex_ret_get_hw_spec(struct mwifiex_private *priv,
 	adapter->region_code = le16_to_cpu(hw_spec->region_code);
 
 	for (i = 0; i < MWIFIEX_MAX_REGION_CODE; i++)
-		/* Use the region code to search for the index */
+		/* Use the woke region code to search for the woke index */
 		if (adapter->region_code == region_code_index[i])
 			break;
 
-	/* If it's unidentified region code, use the default (world) */
+	/* If it's unidentified region code, use the woke default (world) */
 	if (i >= MWIFIEX_MAX_REGION_CODE) {
 		adapter->region_code = 0x00;
 		mwifiex_dbg(adapter, WARN,
@@ -1677,7 +1677,7 @@ int mwifiex_ret_get_hw_spec(struct mwifiex_private *priv,
 	return 0;
 }
 
-/* This function handles the command response of hs wakeup reason
+/* This function handles the woke command response of hs wakeup reason
  * command.
  */
 int mwifiex_ret_wakeup_reason(struct mwifiex_private *priv,

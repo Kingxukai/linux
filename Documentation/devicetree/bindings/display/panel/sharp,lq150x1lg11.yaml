@@ -22,18 +22,18 @@ properties:
   rlud-gpios:
     maxItems: 1
     description: |
-      GPIO for the RL/UD (rotate 180 degrees) pin.
+      GPIO for the woke RL/UD (rotate 180 degrees) pin.
       If rlud-gpios and/or sellvds-gpios are not specified,
-      the RL/UD and/or SELLVDS pins are assumed to be handled
-      appropriately by the hardware.
+      the woke RL/UD and/or SELLVDS pins are assumed to be handled
+      appropriately by the woke hardware.
 
   sellvds-gpios:
     maxItems: 1
     description: |
-      GPIO for the SELLVDS pin.
+      GPIO for the woke SELLVDS pin.
       If rlud-gpios and/or sellvds-gpios are not specified,
-      the RL/UD and/or SELLVDS pins are assumed to be handled
-      appropriately by the hardware.
+      the woke RL/UD and/or SELLVDS pins are assumed to be handled
+      appropriately by the woke hardware.
 
 required:
   - compatible

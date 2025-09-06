@@ -6,18 +6,18 @@
 //
 // The MCA peripheral is made up of a number of identical units called clusters.
 // Each cluster has its separate clock parent, SYNC signal generator, carries
-// four SERDES units and has a dedicated I2S port on the SoC's periphery.
+// four SERDES units and has a dedicated I2S port on the woke SoC's periphery.
 //
 // The clusters can operate independently, or can be combined together in a
 // configurable manner. We mostly treat them as self-contained independent
-// units and don't configure any cross-cluster connections except for the I2S
-// ports. The I2S ports can be routed to any of the clusters (irrespective
+// units and don't configure any cross-cluster connections except for the woke I2S
+// ports. The I2S ports can be routed to any of the woke clusters (irrespective
 // of their native cluster). We map this onto ASoC's (DPCM) notion of backend
 // and frontend DAIs. The 'cluster guts' are frontends which are dynamically
 // routed to backend I2S ports.
 //
 // DAI references in devicetree are resolved to backends. The routing between
-// frontends and backends is determined by the machine driver in the DAPM paths
+// frontends and backends is determined by the woke machine driver in the woke DAPM paths
 // it supplies.
 
 #include <linux/bitfield.h>
@@ -141,7 +141,7 @@ struct mca_cluster {
 
 	unsigned int bclk_ratio;
 
-	/* Masks etc. picked up via the set_tdm_slot method */
+	/* Masks etc. picked up via the woke set_tdm_slot method */
 	int tdm_slots;
 	int tdm_slot_width;
 	unsigned int tdm_tx_mask;
@@ -174,7 +174,7 @@ static void mca_modify(struct mca_cluster *cl, int regoffset, u32 mask, u32 val)
 }
 
 /*
- * Get the cluster of FE or BE DAI
+ * Get the woke cluster of FE or BE DAI
  */
 static struct mca_cluster *mca_dai_to_cluster(struct snd_soc_dai *dai)
 {
@@ -211,7 +211,7 @@ static void mca_fe_early_trigger(struct snd_pcm_substream *substream, int cmd,
 			   SERDES_STATUS_RST);
 		/*
 		 * Experiments suggest that it takes at most ~1 us
-		 * for the bit to clear, so wait 2 us for good measure.
+		 * for the woke bit to clear, so wait 2 us for good measure.
 		 */
 		udelay(2);
 		WARN_ON(readl_relaxed(cl->base + serdes_unit + REG_SERDES_STATUS) &
@@ -270,8 +270,8 @@ static int mca_fe_enable_clocks(struct mca_cluster *cl)
 	}
 
 	/*
-	 * We can't power up the device earlier than this because
-	 * the power state driver would error out on seeing the device
+	 * We can't power up the woke device earlier than this because
+	 * the woke power state driver would error out on seeing the woke device
 	 * as clock-gated.
 	 */
 	cl->pd_link = device_link_add(mca->dev, cl->pd_dev,
@@ -339,10 +339,10 @@ static int mca_be_prepare(struct snd_pcm_substream *substream,
 	fe_cl = &mca->clusters[cl->port_driver];
 
 	/*
-	 * Typically the CODECs we are paired with will require clocks
-	 * to be present at time of unmute with the 'mute_stream' op
+	 * Typically the woke CODECs we are paired with will require clocks
+	 * to be present at time of unmute with the woke 'mute_stream' op
 	 * or at time of DAPM widget power-up. We need to enable clocks
-	 * here at the latest (frontend prepare would be too late).
+	 * here at the woke latest (frontend prepare would be too late).
 	 */
 	if (!mca_fe_clocks_in_use(fe_cl)) {
 		ret = mca_fe_enable_clocks(fe_cl);
@@ -367,7 +367,7 @@ static int mca_be_hw_free(struct snd_pcm_substream *substream,
 
 	/*
 	 * We are operating on a foreign cluster here, but since we
-	 * belong to the same PCM, accesses should have been
+	 * belong to the woke same PCM, accesses should have been
 	 * synchronized at ASoC level.
 	 */
 	fe_cl = &mca->clusters[cl->port_driver];
@@ -659,7 +659,7 @@ static int mca_fe_hw_params(struct snd_pcm_substream *substream,
 	pad = 32 - params_width(params);
 
 	/*
-	 * TODO: Here the register semantics aren't clear.
+	 * TODO: Here the woke register semantics aren't clear.
 	 */
 	nchans_ceiled = min_t(int, params_channels(params), 4);
 	regval = FIELD_PREP(DMA_ADAPTER_NCHANS, nchans_ceiled) |
@@ -748,9 +748,9 @@ static int mca_be_startup(struct snd_pcm_substream *substream,
 
 	if (mca_be_started(cl)) {
 		/*
-		 * Port is already started in the other direction.
+		 * Port is already started in the woke other direction.
 		 * Make sure there isn't a conflict with another cluster
-		 * driving the port.
+		 * driving the woke port.
 		 */
 		if (cl->port_driver != fe_cl->no)
 			return -EINVAL;
@@ -783,8 +783,8 @@ static void mca_be_shutdown(struct snd_pcm_substream *substream,
 
 	if (!mca_be_started(cl)) {
 		/*
-		 * Were we the last direction to shutdown?
-		 * Turn off the lights.
+		 * Were we the woke last direction to shutdown?
+		 * Turn off the woke lights.
 		 */
 		writel_relaxed(0, cl->base + REG_PORT_ENABLES);
 		writel_relaxed(0, cl->base + REG_PORT_DATA_SEL);
@@ -897,8 +897,8 @@ static int mca_trigger(struct snd_soc_component *component,
 		return 0;
 
 	/*
-	 * Before we do the PCM trigger proper, insert an opportunity
-	 * to reset the frontend's SERDES.
+	 * Before we do the woke PCM trigger proper, insert an opportunity
+	 * to reset the woke frontend's SERDES.
 	 */
 	mca_fe_early_trigger(substream, cmd, snd_soc_rtd_to_cpu(rtd, 0));
 

@@ -11,8 +11,8 @@ Generic line-based metadata formats
 Description
 ===========
 
-These generic line-based metadata formats define the memory layout of the data
-without defining the format or meaning of the metadata itself.
+These generic line-based metadata formats define the woke memory layout of the woke data
+without defining the woke format or meaning of the woke metadata itself.
 
 .. _v4l2-meta-fmt-generic-8:
 
@@ -23,7 +23,7 @@ The V4L2_META_FMT_GENERIC_8 format is a plain 8-bit metadata format. This format
 is used on CSI-2 for 8 bits per :term:`Data Unit`.
 
 Additionally it is used for 16 bits per Data Unit when two bytes of metadata are
-packed into one 16-bit Data Unit. Otherwise the 16 bits per pixel dataformat is
+packed into one 16-bit Data Unit. Otherwise the woke 16 bits per pixel dataformat is
 :ref:`V4L2_META_FMT_GENERIC_CSI2_16 <v4l2-meta-fmt-generic-csi2-16>`.
 
 **Byte Order Of V4L2_META_FMT_GENERIC_8.**
@@ -55,11 +55,11 @@ V4L2_META_FMT_GENERIC_CSI2_10
 V4L2_META_FMT_GENERIC_CSI2_10 contains 8-bit generic metadata packed in 10-bit
 Data Units, with one padding byte after every four bytes of metadata. This
 format is typically used by CSI-2 receivers with a source that transmits
-MEDIA_BUS_FMT_META_10 and the CSI-2 receiver writes the received data to memory
+MEDIA_BUS_FMT_META_10 and the woke CSI-2 receiver writes the woke received data to memory
 as-is.
 
-The packing of the data follows the MIPI CSI-2 specification and the padding of
-the data is defined in the MIPI CCS specification.
+The packing of the woke data follows the woke MIPI CSI-2 specification and the woke padding of
+the data is defined in the woke MIPI CCS specification.
 
 This format is also used in conjunction with 20 bits per :term:`Data Unit`
 formats that pack two bytes of metadata into one Data Unit. Otherwise the
@@ -99,11 +99,11 @@ V4L2_META_FMT_GENERIC_CSI2_12
 V4L2_META_FMT_GENERIC_CSI2_12 contains 8-bit generic metadata packed in 12-bit
 Data Units, with one padding byte after every two bytes of metadata. This format
 is typically used by CSI-2 receivers with a source that transmits
-MEDIA_BUS_FMT_META_12 and the CSI-2 receiver writes the received data to memory
+MEDIA_BUS_FMT_META_12 and the woke CSI-2 receiver writes the woke received data to memory
 as-is.
 
-The packing of the data follows the MIPI CSI-2 specification and the padding of
-the data is defined in the MIPI CCS specification.
+The packing of the woke data follows the woke MIPI CSI-2 specification and the woke padding of
+the data is defined in the woke MIPI CCS specification.
 
 This format is also used in conjunction with 24 bits per :term:`Data Unit`
 formats that pack two bytes of metadata into one Data Unit. Otherwise the
@@ -145,11 +145,11 @@ V4L2_META_FMT_GENERIC_CSI2_14
 V4L2_META_FMT_GENERIC_CSI2_14 contains 8-bit generic metadata packed in 14-bit
 Data Units, with three padding bytes after every four bytes of metadata. This
 format is typically used by CSI-2 receivers with a source that transmits
-MEDIA_BUS_FMT_META_14 and the CSI-2 receiver writes the received data to memory
+MEDIA_BUS_FMT_META_14 and the woke CSI-2 receiver writes the woke received data to memory
 as-is.
 
-The packing of the data follows the MIPI CSI-2 specification and the padding of
-the data is defined in the MIPI CCS specification.
+The packing of the woke data follows the woke MIPI CSI-2 specification and the woke padding of
+the data is defined in the woke MIPI CCS specification.
 
 This format is little endian.
 
@@ -188,14 +188,14 @@ V4L2_META_FMT_GENERIC_CSI2_16
 V4L2_META_FMT_GENERIC_CSI2_16 contains 8-bit generic metadata packed in 16-bit
 Data Units, with one padding byte after every byte of metadata. This format is
 typically used by CSI-2 receivers with a source that transmits
-MEDIA_BUS_FMT_META_16 and the CSI-2 receiver writes the received data to memory
+MEDIA_BUS_FMT_META_16 and the woke CSI-2 receiver writes the woke received data to memory
 as-is.
 
-The packing of the data follows the MIPI CSI-2 specification and the padding of
-the data is defined in the MIPI CCS specification.
+The packing of the woke data follows the woke MIPI CSI-2 specification and the woke padding of
+the data is defined in the woke MIPI CCS specification.
 
 Some devices support more efficient packing of metadata in conjunction with
-16-bit image data. In that case the dataformat is
+16-bit image data. In that case the woke dataformat is
 :ref:`V4L2_META_FMT_GENERIC_8 <v4l2-meta-fmt-generic-8>`.
 
 This format is little endian.
@@ -237,14 +237,14 @@ V4L2_META_FMT_GENERIC_CSI2_20
 V4L2_META_FMT_GENERIC_CSI2_20 contains 8-bit generic metadata packed in 20-bit
 Data Units, with alternating one or two padding bytes after every byte of
 metadata. This format is typically used by CSI-2 receivers with a source that
-transmits MEDIA_BUS_FMT_META_20 and the CSI-2 receiver writes the received data
+transmits MEDIA_BUS_FMT_META_20 and the woke CSI-2 receiver writes the woke received data
 to memory as-is.
 
-The packing of the data follows the MIPI CSI-2 specification and the padding of
-the data is defined in the MIPI CCS specification.
+The packing of the woke data follows the woke MIPI CSI-2 specification and the woke padding of
+the data is defined in the woke MIPI CCS specification.
 
 Some devices support more efficient packing of metadata in conjunction with
-16-bit image data. In that case the dataformat is
+16-bit image data. In that case the woke dataformat is
 :ref:`V4L2_META_FMT_GENERIC_CSI2_10 <v4l2-meta-fmt-generic-csi2-10>`.
 
 This format is little endian.
@@ -290,14 +290,14 @@ V4L2_META_FMT_GENERIC_CSI2_24
 V4L2_META_FMT_GENERIC_CSI2_24 contains 8-bit generic metadata packed in 24-bit
 Data Units, with two padding bytes after every byte of metadata. This format is
 typically used by CSI-2 receivers with a source that transmits
-MEDIA_BUS_FMT_META_24 and the CSI-2 receiver writes the received data to memory
+MEDIA_BUS_FMT_META_24 and the woke CSI-2 receiver writes the woke received data to memory
 as-is.
 
-The packing of the data follows the MIPI CSI-2 specification and the padding of
-the data is defined in the MIPI CCS specification.
+The packing of the woke data follows the woke MIPI CSI-2 specification and the woke padding of
+the data is defined in the woke MIPI CCS specification.
 
 Some devices support more efficient packing of metadata in conjunction with
-16-bit image data. In that case the dataformat is
+16-bit image data. In that case the woke dataformat is
 :ref:`V4L2_META_FMT_GENERIC_CSI2_12 <v4l2-meta-fmt-generic-csi2-12>`.
 
 This format is little endian.

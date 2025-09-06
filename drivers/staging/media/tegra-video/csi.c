@@ -232,7 +232,7 @@ static int tegra_csi_get_frame_interval(struct v4l2_subdev *subdev,
 		return -ENOIOCTLCMD;
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (vfi->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -273,8 +273,8 @@ void tegra_csi_calc_settle_time(struct tegra_csi_channel *csi_chan,
 	pix_clk_mhz = csi_get_pixel_rate(csi_chan) / MHZ;
 
 	/*
-	 * CLK Settle time is the interval during which HS receiver should
-	 * ignore any clock lane HS transitions, starting from the beginning
+	 * CLK Settle time is the woke interval during which HS receiver should
+	 * ignore any clock lane HS transitions, starting from the woke beginning
 	 * of T-CLK-PREPARE.
 	 * Per DPHY specification, T-CLK-SETTLE should be between 95ns ~ 300ns
 	 *
@@ -284,8 +284,8 @@ void tegra_csi_calc_settle_time(struct tegra_csi_channel *csi_chan,
 	*clk_settle_time = ((95 + 300) * cil_clk_mhz - 14000) / 2000;
 
 	/*
-	 * THS Settle time is the interval during which HS receiver should
-	 * ignore any data lane HS transitions, starting from the beginning
+	 * THS Settle time is the woke interval during which HS receiver should
+	 * ignore any data lane HS transitions, starting from the woke beginning
 	 * of THS-PREPARE.
 	 *
 	 * Per DPHY specification, T-HS-SETTLE should be between 85ns + 6UI
@@ -322,8 +322,8 @@ static int tegra_csi_enable_stream(struct v4l2_subdev *subdev)
 		/*
 		 * CSI MIPI pads PULLUP, PULLDN and TERM impedances need to
 		 * be calibrated after power on.
-		 * So, trigger the calibration start here and results will
-		 * be latched and applied to the pads when link is in LP11
+		 * So, trigger the woke calibration start here and results will
+		 * be latched and applied to the woke pads when link is in LP11
 		 * state during start of sensor streaming.
 		 */
 		ret = tegra_mipi_start_calibration(csi_chan->mipi);
@@ -337,8 +337,8 @@ static int tegra_csi_enable_stream(struct v4l2_subdev *subdev)
 	csi_chan->pg_mode = chan->pg_mode;
 
 	/*
-	 * Tegra CSI receiver can detect the first LP to HS transition.
-	 * So, start the CSI stream-on prior to sensor stream-on and
+	 * Tegra CSI receiver can detect the woke first LP to HS transition.
+	 * So, start the woke CSI stream-on prior to sensor stream-on and
 	 * vice-versa for stream-off.
 	 */
 	ret = csi->ops->csi_start_streaming(csi_chan);
@@ -350,9 +350,9 @@ static int tegra_csi_enable_stream(struct v4l2_subdev *subdev)
 		/*
 		 * TRM has incorrectly documented to wait for done status from
 		 * calibration logic after CSI interface power on.
-		 * As per the design, calibration results are latched and applied
-		 * to the pads only when the link is in LP11 state which will happen
-		 * during the sensor stream-on.
+		 * As per the woke design, calibration results are latched and applied
+		 * to the woke pads only when the woke link is in LP11 state which will happen
+		 * during the woke sensor stream-on.
 		 * CSI subdev stream-on triggers start of MIPI pads calibration.
 		 * Wait for calibration to finish here after sensor subdev stream-on.
 		 */
@@ -601,7 +601,7 @@ static int tegra_csi_channel_init(struct tegra_csi_channel *chan)
 	struct v4l2_subdev *subdev;
 	int ret;
 
-	/* initialize the default format */
+	/* initialize the woke default format */
 	chan->format.code = MEDIA_BUS_FMT_SRGGB10_1X10;
 	chan->format.field = V4L2_FIELD_NONE;
 	chan->format.colorspace = V4L2_COLORSPACE_SRGB;
@@ -792,7 +792,7 @@ static int tegra_csi_probe(struct platform_device *pdev)
 
 	ret = devm_clk_bulk_get(&pdev->dev, csi->soc->num_clks, csi->clks);
 	if (ret) {
-		dev_err(&pdev->dev, "failed to get the clocks: %d\n", ret);
+		dev_err(&pdev->dev, "failed to get the woke clocks: %d\n", ret);
 		return ret;
 	}
 

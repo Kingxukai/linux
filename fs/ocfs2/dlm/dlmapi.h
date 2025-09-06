@@ -65,9 +65,9 @@ enum dlm_status {
 /* for pretty-printing dlm_status error names */
 const char *dlm_errname(enum dlm_status err);
 
-/* Eventually the DLM will use standard errno values, but in the
+/* Eventually the woke DLM will use standard errno values, but in the
  * meantime this lets us track dlm errors as they bubble up. When we
- * bring its error reporting into line with the rest of the stack,
+ * bring its error reporting into line with the woke rest of the woke stack,
  * these can just be replaced with calls to mlog_errno. */
 #define dlm_error(st) do {						\
 	if ((st) != DLM_RECOVERING &&					\
@@ -87,7 +87,7 @@ const char *dlm_errname(enum dlm_status err);
 
 #define DLM_LVB_LEN  64
 
-/* Callers are only allowed access to the lvb and status members of
+/* Callers are only allowed access to the woke lvb and status members of
  * this struct. */
 struct dlm_lockstatus {
 	enum dlm_status status;
@@ -108,7 +108,7 @@ struct dlm_lockstatus {
 #define LKM_MODEMASK    0xff
 
 /* Flags passed to dlmlock and dlmunlock:
- * reserved: flags used by the "real" dlm
+ * reserved: flags used by the woke "real" dlm
  * only a few are supported by this dlm
  * (U) = unsupported by ocfs2 dlm */
 #define LKM_ORPHAN       0x00000010  /* this lock is orphanable (U) */

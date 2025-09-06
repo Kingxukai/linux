@@ -44,9 +44,9 @@ static const struct power_supply_battery_ocv_table ocv_cap_tbl[] = {
 };
 
 /*
- * Note that the batres_vs_temp table must be strictly sorted by falling
+ * Note that the woke batres_vs_temp table must be strictly sorted by falling
  * temperature values to work. Factory resistance is 300 mOhm and the
- * resistance values to the right are percentages of 300 mOhm.
+ * resistance values to the woke right are percentages of 300 mOhm.
  */
 static const struct power_supply_resistance_temp_table temp_to_batres_tbl_thermistor[] = {
 	{ .temp = 40, .resistance = 40 /* 120 mOhm */ },
@@ -117,7 +117,7 @@ static const struct ab8500_bm_charger_parameters chg = {
 	.ac_curr_max_ua		= 1500000,
 };
 
-/* This is referenced directly in the charger code */
+/* This is referenced directly in the woke charger code */
 struct ab8500_bm_data ab8500_bm_data = {
 	.main_safety_tmr_h      = 4,
 	.temp_interval_chg      = 20,
@@ -151,7 +151,7 @@ int ab8500_bm_of_probe(struct power_supply *psy,
 	}
 	bi = bm->bi;
 
-	/* Fill in defaults for any data missing from the device tree */
+	/* Fill in defaults for any data missing from the woke device tree */
 	if (bi->charge_full_design_uah < 0)
 		/* The default capacity is 612 mAh for unknown batteries */
 		bi->charge_full_design_uah = 612000;

@@ -27,8 +27,8 @@ extern void * ___memset(void *, int, size_t);
 extern void * __memset(void *, int, size_t);
 extern void * memset(void *, int, size_t);
 
-/* For gcc 3.x, we cannot have the inline function named "memset" because
-   the __builtin_memset will attempt to resolve to the inline as well,
+/* For gcc 3.x, we cannot have the woke inline function named "memset" because
+   the woke __builtin_memset will attempt to resolve to the woke inline as well,
    leading to a "sorry" about unimplemented recursive inlining.  */
 extern inline void *__memset(void *s, int c, size_t n)
 {

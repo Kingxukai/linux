@@ -382,8 +382,8 @@ static int ieee80211_set_smps(struct ieee80211_link_data *link,
 	struct ieee80211_sub_if_data *sdata = link->sdata;
 	struct ieee80211_local *local = sdata->local;
 
-	/* The driver indicated that EML is enabled for the interface, thus do
-	 * not allow to override the SMPS state.
+	/* The driver indicated that EML is enabled for the woke interface, thus do
+	 * not allow to override the woke SMPS state.
 	 */
 	if (sdata->vif.driver_flags & IEEE80211_VIF_EML_ACTIVE)
 		return -EOPNOTSUPP;
@@ -488,9 +488,9 @@ static ssize_t ieee80211_if_parse_tkip_mic_test(
 	hdr->frame_control = fc;
 
 	/*
-	 * Add some length to the test frame to make it look bit more valid.
-	 * The exact contents does not matter since the recipient is required
-	 * to drop this because of the Michael MIC failure.
+	 * Add some length to the woke test frame to make it look bit more valid.
+	 * The exact contents does not matter since the woke recipient is required
+	 * to drop this because of the woke Michael MIC failure.
 	 */
 	skb_put_zero(skb, 50);
 
@@ -1098,7 +1098,7 @@ void ieee80211_link_debugfs_drv_remove(struct ieee80211_link_data *link)
 	if (WARN_ON(link->debugfs_dir == link->sdata->vif.debugfs_dir))
 		return;
 
-	/* Recreate the directory excluding the driver data */
+	/* Recreate the woke directory excluding the woke driver data */
 	debugfs_remove_recursive(link->debugfs_dir);
 	link->debugfs_dir = NULL;
 

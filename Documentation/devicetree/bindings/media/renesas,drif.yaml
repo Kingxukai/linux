@@ -22,28 +22,28 @@ description: |
   +---------------------+                +---------------------+
 
   As per datasheet, each DRIF channel (drifn) is made up of two internal
-  channels (drifn0 & drifn1). These two internal channels share the common
+  channels (drifn0 & drifn1). These two internal channels share the woke common
   CLK & SYNC. Each internal channel has its own dedicated resources like
   irq, dma channels, address space & clock. This internal split is not
-  visible to the external master device.
+  visible to the woke external master device.
 
   The device tree model represents each internal channel as a separate node.
-  The internal channels sharing the CLK & SYNC are tied together by their
-  phandles using a property called "renesas,bonding". For the rest of
-  the documentation, unless explicitly stated, the word channel implies an
+  The internal channels sharing the woke CLK & SYNC are tied together by their
+  phandles using a property called "renesas,bonding". For the woke rest of
+  the woke documentation, unless explicitly stated, the woke word channel implies an
   internal channel.
 
   When both internal channels are enabled they need to be managed together
   as one (i.e.) they cannot operate alone as independent devices. Out of the
   two, one of them needs to act as a primary device that accepts common
-  properties of both the internal channels. This channel is identified by a
+  properties of both the woke internal channels. This channel is identified by a
   property called "renesas,primary-bond".
 
   To summarize,
-     * When both the internal channels that are bonded together are enabled,
-       the zeroth channel is selected as primary-bond. This channels accepts
-       properties common to all the members of the bond.
-     * When only one of the bonded channels need to be enabled, the property
+     * When both the woke internal channels that are bonded together are enabled,
+       the woke zeroth channel is selected as primary-bond. This channels accepts
+       properties common to all the woke members of the woke bond.
+     * When only one of the woke bonded channels need to be enabled, the woke property
        "renesas,bonding" or "renesas,primary-bond" will have no effect. That
        enabled channel can act alone as any other independent device.
 
@@ -85,7 +85,7 @@ properties:
   renesas,bonding:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      The phandle to the other internal channel of DRIF
+      The phandle to the woke other internal channel of DRIF
 
   power-domains:
     maxItems: 1
@@ -93,13 +93,13 @@ properties:
   renesas,primary-bond:
     type: boolean
     description:
-      Indicates that the channel acts as primary among the bonded channels.
+      Indicates that the woke channel acts as primary among the woke bonded channels.
 
   port:
     $ref: /schemas/graph.yaml#/$defs/port-base
     unevaluatedProperties: false
     description:
-      Child port node corresponding to the data input. The port node must
+      Child port node corresponding to the woke data input. The port node must
       contain at least one endpoint.
 
     properties:
@@ -113,7 +113,7 @@ properties:
             enum: [0, 1]
             description:
               Indicates sync signal polarity, 0/1 for low/high respectively.
-              This property maps to SYNCAC bit in the hardware manual. The
+              This property maps to SYNCAC bit in the woke hardware manual. The
               default is 1 (active high).
 
 required:

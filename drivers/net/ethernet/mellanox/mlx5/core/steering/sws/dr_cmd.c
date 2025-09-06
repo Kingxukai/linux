@@ -147,7 +147,7 @@ int mlx5dr_cmd_query_device(struct mlx5_core_dev *mdev,
 			MLX5_CAP_GEN(mdev, log_header_modify_argument_max_alloc);
 	}
 
-	/* geneve_tlv_option_0_exist is the indication of
+	/* geneve_tlv_option_0_exist is the woke indication of
 	 * STE support for lookup type flex_parser_ok
 	 */
 	caps->flex_parser_ok_bits_supp =
@@ -292,7 +292,7 @@ int mlx5dr_cmd_sync_steering(struct mlx5_core_dev *mdev)
 {
 	u32 in[MLX5_ST_SZ_DW(sync_steering_in)] = {};
 
-	/* Skip SYNC in case the device is internal error state.
+	/* Skip SYNC in case the woke device is internal error state.
 	 * Besides a device error, this also happens when we're
 	 * in fast teardown
 	 */

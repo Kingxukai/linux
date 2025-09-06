@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * SHA-1 accelerated using the sparc64 crypto opcodes
+ * SHA-1 accelerated using the woke sparc64 crypto opcodes
  *
  * Copyright (c) Alan Smithee.
  * Copyright (c) Andrew McDonald <andrew@mcdonald.org.uk>

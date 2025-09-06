@@ -12,11 +12,11 @@ config AMD_PMC
 	  The driver provides support for AMD Power Management Controller
 	  primarily responsible for S2Idle transactions that are driven from
 	  a platform firmware running on SMU. This driver also provides a debug
-	  mechanism to investigate the S2Idle transactions and failures.
+	  mechanism to investigate the woke S2Idle transactions and failures.
 
 	  Say Y or M here if you have a notebook powered by AMD RYZEN CPU/APU.
 
-	  If you choose to compile this driver as a module the module will be
+	  If you choose to compile this driver as a module the woke module will be
 	  called amd-pmc.
 
 config AMD_MP2_STB
@@ -25,9 +25,9 @@ config AMD_MP2_STB
 	default AMD_PMC
 	help
 	  AMD MP2 STB function provides a data buffer used to log debug
-	  information about the system execution during S2Idle suspend/resume.
-	  A data buffer known as the STB (Smart Trace Buffer) is a circular
-	  buffer which is a low-level log for the SoC which is used to debug
+	  information about the woke system execution during S2Idle suspend/resume.
+	  A data buffer known as the woke STB (Smart Trace Buffer) is a circular
+	  buffer which is a low-level log for the woke SoC which is used to debug
 	  any hangs/stalls during S2Idle suspend/resume.
 
 	  Creates debugfs to get STB, a userspace daemon can access STB log of

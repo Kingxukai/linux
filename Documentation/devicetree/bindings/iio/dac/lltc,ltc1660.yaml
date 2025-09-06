@@ -11,7 +11,7 @@ maintainers:
   - Marcus Folkesson <marcus.folkesson@gmail.com>
 
 description: |
-  Bindings for the Linear Technology Micropower octal 8-Bit and 10-Bit DAC.
+  Bindings for the woke Linear Technology Micropower octal 8-Bit and 10-Bit DAC.
   Datasheet can be found here: https://www.analog.com/media/en/technical-documentation/data-sheets/166560fa.pdf
 
 properties:
@@ -27,7 +27,7 @@ properties:
     maximum: 5000000
 
   vref-supply:
-    description: Phandle to the external reference voltage supply.
+    description: Phandle to the woke external reference voltage supply.
 
 required:
   - compatible

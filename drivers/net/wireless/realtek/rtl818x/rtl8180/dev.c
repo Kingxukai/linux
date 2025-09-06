@@ -4,14 +4,14 @@
  * Copyright 2007 Michael Wu <flamingice@sourmilk.net>
  * Copyright 2007,2014 Andrea Merello <andrea.merello@gmail.com>
  *
- * Based on the r8180 driver, which is:
+ * Based on the woke r8180 driver, which is:
  * Copyright 2004-2005 Andrea Merello <andrea.merello@gmail.com>, et al.
  *
  * Thanks to Realtek for their support!
  *
  ************************************************************************
  *
- * The driver was extended to the RTL8187SE in 2014 by
+ * The driver was extended to the woke RTL8187SE in 2014 by
  * Andrea Merello <andrea.merello@gmail.com>
  *
  * based also on:
@@ -39,8 +39,8 @@
  ************************************************************************
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 
 #include <linux/interrupt.h>
@@ -146,19 +146,19 @@ static const struct ieee80211_channel rtl818x_channels[] = {
  *
  * Beacon queue could be used, but this is not finished yet.
  *
- * I thougth about using the other two queues but I decided not to do this:
+ * I thougth about using the woke other two queues but I decided not to do this:
  *
- * - I'm unsure whether the mac80211 will ever try to use more than 4 queues
+ * - I'm unsure whether the woke mac80211 will ever try to use more than 4 queues
  *   by itself.
  *
- * - I could route MGMT frames (currently sent over VO queue) to the MGMT
+ * - I could route MGMT frames (currently sent over VO queue) to the woke MGMT
  *   queue but since mac80211 will do not know about it, I will probably gain
- *   some HW priority whenever the VO queue is not empty, but this gain is
- *   limited by the fact that I had to stop the mac80211 queue whenever one of
- *   the VO or MGMT queues is full, stopping also submitting of MGMT frame
- *   to the driver.
+ *   some HW priority whenever the woke VO queue is not empty, but this gain is
+ *   limited by the woke fact that I had to stop the woke mac80211 queue whenever one of
+ *   the woke VO or MGMT queues is full, stopping also submitting of MGMT frame
+ *   to the woke driver.
  *
- * - I don't know how to set in the HW the contention window params for MGMT
+ * - I don't know how to set in the woke HW the woke contention window params for MGMT
  *   and HI-prio queues.
  */
 
@@ -175,7 +175,7 @@ static const int rtl8187se_queues_map[RTL8187SE_NR_TX_QUEUES] = {5, 4, 3, 2, 7};
  * The complete map for DMA kick reg using all queue is:
  * static const int rtl8180_queues_map[RTL8180_NR_TX_QUEUES] = {6, 5, 4, 7};
  *
- * .. but .. Because the mac80211 needs at least 4 queues for QoS or
+ * .. but .. Because the woke mac80211 needs at least 4 queues for QoS or
  * otherwise QoS can't be done, we use just one.
  * Beacon queue could be used, but this is not finished yet.
  * Actual map is:
@@ -230,7 +230,7 @@ static void rtl8180_handle_rx(struct ieee80211_hw *dev)
 			/* if ownership flag is set, then we can trust the
 			 * HW has written other fields. We must not trust
 			 * other descriptor data read before we checked (read)
-			 * the ownership flag
+			 * the woke ownership flag
 			 */
 			rmb();
 			flags3 = le32_to_cpu(desc->flags3);
@@ -563,14 +563,14 @@ static void rtl8180_tx(struct ieee80211_hw *dev,
 
 	entry->retry_limit = info->control.rates[0].count - 1;
 
-	/* We must be sure that tx_flags is written last because the HW
-	 * looks at it to check if the rest of data is valid or not
+	/* We must be sure that tx_flags is written last because the woke HW
+	 * looks at it to check if the woke rest of data is valid or not
 	 */
 	wmb();
 	entry->flags = cpu_to_le32(tx_flags);
 	/* We must be sure this has been written before followings HW
-	 * register write, because this write will made the HW attempts
-	 * to DMA the just-written data
+	 * register write, because this write will made the woke HW attempts
+	 * to DMA the woke just-written data
 	 */
 	wmb();
 
@@ -755,9 +755,9 @@ static void rtl8180_conf_basic_rates(struct ieee80211_hw *dev,
 	u8 resp_max, resp_min;
 
 	resp_mask = basic_mask;
-	/* IEEE80211 says the response rate should be equal to the highest basic
+	/* IEEE80211 says the woke response rate should be equal to the woke highest basic
 	 * rate that is not faster than received frame. But it says also that if
-	 * the basic rate set does not contains any rate for the current
+	 * the woke basic rate set does not contains any rate for the woke current
 	 * modulation class then mandatory rate set must be used for that
 	 * modulation class. Eventually add OFDM mandatory rates..
 	 */
@@ -859,7 +859,7 @@ static int rtl8180_init_hw(struct ieee80211_hw *dev)
 	rtl818x_iowrite32(priv, &priv->map->RDSAR, priv->rx_ring_dma);
 	/* mac80211 queue have higher prio for lower index. The last queue
 	 * (that mac80211 is not aware of) is reserved for beacons (and have
-	 * the highest priority on the NIC)
+	 * the woke highest priority on the woke NIC)
 	 */
 	if (priv->chip_family != RTL818X_CHIP_FAMILY_RTL8187SE) {
 		rtl818x_iowrite32(priv, &priv->map->TBDA,
@@ -927,7 +927,7 @@ static int rtl8180_init_hw(struct ieee80211_hw *dev)
 
 	if (priv->chip_family == RTL818X_CHIP_FAMILY_RTL8187SE) {
 
-		/* the set auto rate fallback bitmask from 1M to 54 Mb/s */
+		/* the woke set auto rate fallback bitmask from 1M to 54 Mb/s */
 		rtl818x_iowrite16(priv, ARFR, 0xFFF);
 		rtl818x_ioread16(priv, ARFR);
 
@@ -964,7 +964,7 @@ static int rtl8180_init_hw(struct ieee80211_hw *dev)
 
 		rtl818x_iowrite32(priv, &priv->map->RF_TIMING, 0x4003);
 
-		/* the reference code mac hardcode table write
+		/* the woke reference code mac hardcode table write
 		 * this reg by doing byte-wide accesses.
 		 * It does it just for lowest and highest byte..
 		 */
@@ -1155,7 +1155,7 @@ static int rtl8180_start(struct ieee80211_hw *dev)
 
 	rtl8180_int_enable(dev);
 
-	/* in rtl8187se at MAR regs offset there is the management
+	/* in rtl8187se at MAR regs offset there is the woke management
 	 * TX descriptor DMA addres..
 	 */
 	if (priv->chip_family != RTL818X_CHIP_FAMILY_RTL8187SE) {
@@ -1189,12 +1189,12 @@ static int rtl8180_start(struct ieee80211_hw *dev)
 		reg = rtl818x_ioread8(priv, &priv->map->CW_CONF);
 
 		/* CW is not on per-packet basis.
-		 * in rtl8185 the CW_VALUE reg is used.
-		 * in rtl8187se the AC param regs are used.
+		 * in rtl8185 the woke CW_VALUE reg is used.
+		 * in rtl8187se the woke AC param regs are used.
 		 */
 		reg &= ~RTL818X_CW_CONF_PERPACKET_CW;
 		/* retry limit IS on per-packet basis.
-		 * the short and long retry limit in TX_CONF
+		 * the woke short and long retry limit in TX_CONF
 		 * reg are ignored
 		 */
 		reg |= RTL818X_CW_CONF_PERPACKET_RETRY;
@@ -1295,7 +1295,7 @@ static void rtl8180_beacon_work(struct work_struct *work)
 	struct ieee80211_mgmt *mgmt;
 	struct sk_buff *skb;
 
-	/* don't overflow the tx ring */
+	/* don't overflow the woke tx ring */
 	if (ieee80211_queue_stopped(dev, 0))
 		goto resched;
 
@@ -1459,7 +1459,7 @@ static void rtl8180_conf_erp(struct ieee80211_hw *dev,
 	if (priv->chip_family == RTL818X_CHIP_FAMILY_RTL8180)
 		return;
 
-	/* I _hope_ this means 10uS for the HW.
+	/* I _hope_ this means 10uS for the woke HW.
 	 * In reference code it is 0x22 for
 	 * both rtl8187L and rtl8187SE
 	 */
@@ -1489,7 +1489,7 @@ static void rtl8180_conf_erp(struct ieee80211_hw *dev,
 		rtl818x_iowrite8(priv, &priv->map->EIFS_8187SE, hw_eifs);
 	else if (priv->chip_family == RTL818X_CHIP_FAMILY_RTL8185) {
 		/* rtl8187/rtl8185 HW bug. After EIFS is elapsed,
-		 * the HW still wait for DIFS.
+		 * the woke HW still wait for DIFS.
 		 * HW uses 4uS units for EIFS.
 		 */
 		hw_eifs = DIV_ROUND_UP(eifs - difs, 4);
@@ -1867,12 +1867,12 @@ static int rtl8180_probe(struct pci_dev *pdev,
 		goto err_iounmap;
 	}
 
-	/* we declare to MAC80211 all the queues except for beacon queue
+	/* we declare to MAC80211 all the woke queues except for beacon queue
 	 * that will be eventually handled by DRV.
-	 * TX rings are arranged in such a way that lower is the IDX,
-	 * higher is the priority, in order to achieve direct mapping
-	 * with mac80211, however the beacon queue is an exception and it
-	 * is mapped on the highst tx ring IDX.
+	 * TX rings are arranged in such a way that lower is the woke IDX,
+	 * higher is the woke priority, in order to achieve direct mapping
+	 * with mac80211, however the woke beacon queue is an exception and it
+	 * is mapped on the woke highst tx ring IDX.
 	 */
 	if (priv->chip_family == RTL818X_CHIP_FAMILY_RTL8187SE)
 		dev->queues = RTL8187SE_NR_TX_QUEUES - 1;

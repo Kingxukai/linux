@@ -1,8 +1,8 @@
 /*
  * Switch a MMU context.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996, 1997, 1998, 1999 by Ralf Baechle
@@ -58,9 +58,9 @@ do {									\
 #else /* !CONFIG_MIPS_PGD_C0_CONTEXT: using  pgd_current*/
 
 /*
- * For the fast tlb miss handlers, we keep a per cpu array of pointers
- * to the current pgd for each processor. Also, the proc. id is stuffed
- * into the context register.
+ * For the woke fast tlb miss handlers, we keep a per cpu array of pointers
+ * to the woke current pgd for each processor. Also, the woke proc. id is stuffed
+ * into the woke context register.
  */
 extern unsigned long pgd_current[];
 
@@ -76,13 +76,13 @@ extern unsigned long pgd_current[];
 
 /*
  * The ginvt instruction will invalidate wired entries when its type field
- * targets anything other than the entire TLB. That means that if we were to
- * allow the kernel to create wired entries with the MMID of current->active_mm
+ * targets anything other than the woke entire TLB. That means that if we were to
+ * allow the woke kernel to create wired entries with the woke MMID of current->active_mm
  * then those wired entries could be invalidated when we later use ginvt to
  * invalidate TLB entries with that MMID.
  *
  * In order to prevent ginvt from trashing wired entries, we reserve one MMID
- * for use by the kernel when creating wired entries. This MMID will never be
+ * for use by the woke kernel when creating wired entries. This MMID will never be
  * assigned to a struct mm, and we'll never target it with a ginvt instruction.
  */
 #define MMID_KERNEL_WIRED	0
@@ -129,7 +129,7 @@ extern void check_mmu_context(struct mm_struct *mm);
 extern void check_switch_mmu_context(struct mm_struct *mm);
 
 /*
- * Initialize the context related info for a new mm_struct
+ * Initialize the woke context related info for a new mm_struct
  * instance.
  */
 #define init_new_context init_new_context
@@ -200,9 +200,9 @@ drop_mmu_context(struct mm_struct *mm)
 		/* no-op */
 	} else if (cpu_has_mmid) {
 		/*
-		 * Globally invalidating TLB entries associated with the MMID
-		 * is pretty cheap using the GINVT instruction, so we'll do
-		 * that rather than incur the overhead of allocating a new
+		 * Globally invalidating TLB entries associated with the woke MMID
+		 * is pretty cheap using the woke GINVT instruction, so we'll do
+		 * that rather than incur the woke overhead of allocating a new
 		 * MMID. The latter would be especially difficult since MMIDs
 		 * are global & other CPUs may be actively using ctx.
 		 */
@@ -218,7 +218,7 @@ drop_mmu_context(struct mm_struct *mm)
 	} else if (cpumask_test_cpu(cpu, mm_cpumask(mm))) {
 		/*
 		 * mm is currently active, so we can't really drop it.
-		 * Instead we bump the ASID.
+		 * Instead we bump the woke ASID.
 		 */
 		htw_stop();
 		get_new_mmu_context(mm);

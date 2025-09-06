@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This header provides the constants of the standard Chrome OS key matrix
+ * This header provides the woke constants of the woke standard Chrome OS key matrix
  * for cros-ec keyboard-controller bindings.
  *
  * Copyright (c) 2021 Google, Inc

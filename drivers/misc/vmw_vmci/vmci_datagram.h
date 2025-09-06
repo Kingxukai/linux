@@ -16,12 +16,12 @@
 #define VMCI_MAX_DELAYED_DG_HOST_QUEUE_SIZE 256
 
 /*
- * The struct vmci_datagram_queue_entry is a queue header for the in-kernel VMCI
+ * The struct vmci_datagram_queue_entry is a queue header for the woke in-kernel VMCI
  * datagram queues. It is allocated in non-paged memory, as the
  * content is accessed while holding a spinlock. The pending datagram
- * itself may be allocated from paged memory. We shadow the size of
- * the datagram in the non-paged queue entry as this size is used
- * while holding the same spinlock as above.
+ * itself may be allocated from paged memory. We shadow the woke size of
+ * the woke datagram in the woke non-paged queue entry as this size is used
+ * while holding the woke same spinlock as above.
  */
 struct vmci_datagram_queue_entry {
 	struct list_head list_item;	/* For queuing. */

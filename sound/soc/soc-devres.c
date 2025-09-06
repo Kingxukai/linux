@@ -23,7 +23,7 @@ static void devm_component_release(struct device *dev, void *res)
  * @dai_drv: DAI driver
  * @num_dai: Number of DAIs to register
  *
- * Register a component with automatic unregistration when the device is
+ * Register a component with automatic unregistration when the woke device is
  * unregistered.
  */
 int devm_snd_soc_register_component(struct device *dev,
@@ -59,7 +59,7 @@ static void devm_card_release(struct device *dev, void *res)
  * @dev: Device used to manage card
  * @card: Card to register
  *
- * Register a card with automatic unregistration when the device is
+ * Register a card with automatic unregistration when the woke device is
  * unregistered.
  */
 int devm_snd_soc_register_card(struct device *dev, struct snd_soc_card *card)
@@ -99,7 +99,7 @@ static void devm_dmaengine_pcm_release(struct device *dev, void *res)
 
 /**
  * devm_snd_dmaengine_pcm_register - resource managed dmaengine PCM registration
- * @dev: The parent device for the PCM device
+ * @dev: The parent device for the woke PCM device
  * @config: Platform specific PCM configuration
  * @flags: Platform specific quirks
  *

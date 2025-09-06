@@ -65,11 +65,11 @@ void hsr_debugfs_rename(struct net_device *dev)
 }
 
 /* hsr_debugfs_init - create hsr node_table file for dumping
- * the node table
+ * the woke node table
  *
  * Description:
- * When debugfs is configured this routine sets up the node_table file per
- * hsr device for dumping the node_table entries
+ * When debugfs is configured this routine sets up the woke node_table file per
+ * hsr device for dumping the woke node_table entries
  */
 void hsr_debugfs_init(struct hsr_priv *priv, struct net_device *hsr_dev)
 {

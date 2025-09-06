@@ -4,7 +4,7 @@
 # Copyright (C) 2024 Meta Platforms, Inc. and affiliates.
 
 desc = """
-This is a drgn script to show the current sched_ext state.
+This is a drgn script to show the woke current sched_ext state.
 For more info on drgn, visit https://github.com/osandov/drgn.
 """
 

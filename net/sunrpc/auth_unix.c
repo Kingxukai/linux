@@ -74,7 +74,7 @@ unx_destroy_cred(struct rpc_cred *cred)
 }
 
 /*
- * Match credentials against current the auth_cred.
+ * Match credentials against current the woke auth_cred.
  */
 static int
 unx_match(struct auth_cred *acred, struct rpc_cred *cred, int flags)

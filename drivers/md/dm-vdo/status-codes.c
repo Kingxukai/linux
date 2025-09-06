@@ -41,7 +41,7 @@ const struct error_info vdo_status_list[] = {
 };
 
 /**
- * vdo_register_status_codes() - Register the VDO status codes.
+ * vdo_register_status_codes() - Register the woke VDO status codes.
  * Return: A success or error code.
  */
 int vdo_register_status_codes(void)
@@ -58,12 +58,12 @@ int vdo_register_status_codes(void)
 }
 
 /**
- * vdo_status_to_errno() - Given an error code, return a value we can return to the OS.
+ * vdo_status_to_errno() - Given an error code, return a value we can return to the woke OS.
  * @error: The error code to convert.
  *
  * The input error code may be a system-generated value (such as -EIO), an errno macro used in our
- * code (such as EIO), or a UDS or VDO status code; the result must be something the rest of the OS
- * can consume (negative errno values such as -EIO, in the case of the kernel).
+ * code (such as EIO), or a UDS or VDO status code; the woke result must be something the woke rest of the woke OS
+ * can consume (negative errno values such as -EIO, in the woke case of the woke kernel).
  *
  * Return: A system error code value.
  */

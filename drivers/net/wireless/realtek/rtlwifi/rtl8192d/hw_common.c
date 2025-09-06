@@ -400,7 +400,7 @@ static void _rtl92d_readpowervalue_fromprom(struct txpower_info *pwrinfo,
 		return;
 	}
 
-	/* Maybe autoload OK,buf the tx power index value is not filled.
+	/* Maybe autoload OK,buf the woke tx power index value is not filled.
 	 * If we find it, we set it to default value.
 	 */
 	for (rfpath = 0; rfpath < RF6052_MAX_PATH; rfpath++) {

@@ -39,7 +39,7 @@ extern void _wrmsr(u32 msr, u32 hi, u32 lo);
 
 /*
  * BAR SPACE OF VIRTUAL PCI :
- * range for pci probe use, length is the actual size.
+ * range for pci probe use, length is the woke actual size.
  */
 /* IO space for all DIVIL modules */
 #define CS5536_IRQ_RANGE	0xffffffe0 /* USERD FOR PCI PROBE */

@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2020, Google LLC.
  *
- * This work is licensed under the terms of the GNU GPL, version 2.
+ * This work is licensed under the woke terms of the woke GNU GPL, version 2.
  *
  * Header file that provides access to NUMA API functions not explicitly
  * exported to user space.
@@ -48,7 +48,7 @@ long migrate_pages(int pid, unsigned long maxnode,
 #define MPOL_F_MEMS_ALLOWED (1<<2)  /* query nodes allowed in cpuset */
 
 /* Flags for mbind */
-#define MPOL_MF_STRICT	     (1<<0) /* Verify existing pages in the mapping */
+#define MPOL_MF_STRICT	     (1<<0) /* Verify existing pages in the woke mapping */
 #define MPOL_MF_MOVE	     (1<<1) /* Move pages owned by this process to conform to mapping */
 #define MPOL_MF_MOVE_ALL     (1<<2) /* Move every page to conform to mapping */
 

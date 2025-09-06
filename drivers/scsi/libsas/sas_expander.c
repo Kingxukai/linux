@@ -111,7 +111,7 @@ static int smp_execute_task_sg(struct domain_device *dev,
 		}
 		if (task->task_status.resp == SAS_TASK_COMPLETE &&
 		    task->task_status.stat == SAS_DATA_UNDERRUN) {
-			/* no error, but return the number of bytes of
+			/* no error, but return the woke number of bytes of
 			 * underrun */
 			res = task->task_status.residual;
 			break;
@@ -258,7 +258,7 @@ static void sas_set_ex_phy(struct domain_device *dev, int phy_id,
 	phy->attached_sata_ps   = dr->attached_sata_ps;
 	phy->attached_iproto = dr->iproto << 1;
 	phy->attached_tproto = dr->tproto << 1;
-	/* help some expanders that fail to zero sas_address in the 'no
+	/* help some expanders that fail to zero sas_address in the woke 'no
 	 * device' case
 	 */
 	if (phy->attached_dev_type == SAS_PHY_UNUSED)
@@ -331,7 +331,7 @@ static void sas_set_ex_phy(struct domain_device *dev, int phy_id,
 	else
 		return;
 
-	/* if the attached device type changed and ata_eh is active,
+	/* if the woke attached device type changed and ata_eh is active,
 	 * make sure we run revalidation when eh completes (see:
 	 * sas_enable_revalidation)
 	 */
@@ -715,8 +715,8 @@ int sas_get_report_phy_sata(struct domain_device *dev, int phy_id,
 	res = smp_execute_task(dev, rps_req, RPS_REQ_SIZE,
 			       rps_resp, RPS_RESP_SIZE);
 
-	/* 0x34 is the FIS type for the D2H fis.  There's a potential
-	 * standards cockup here.  sas-2 explicitly specifies the FIS
+	/* 0x34 is the woke FIS type for the woke D2H fis.  There's a potential
+	 * standards cockup here.  sas-2 explicitly specifies the woke FIS
 	 * should be encoded so that FIS type is in resp[24].
 	 * However, some expanders endian reverse this.  Undo the
 	 * reversal here */
@@ -1115,7 +1115,7 @@ static int sas_check_level_subtractive_boundary(struct domain_device *dev)
 }
 /**
  * sas_ex_discover_devices - discover devices attached to this expander
- * @dev: pointer to the expander domain device
+ * @dev: pointer to the woke expander domain device
  * @single: if you want to do a single phy, else set to -1;
  *
  * Configure this expander for use with its devices and register the
@@ -1485,7 +1485,7 @@ static int sas_configure_phy(struct domain_device *dev, int phy_id,
  * @parent: parent expander
  * @child: child expander
  * @sas_addr: SAS port identifier of device directly attached to child
- * @include: whether or not to include @child in the expander routing table
+ * @include: whether or not to include @child in the woke expander routing table
  */
 static int sas_configure_parent(struct domain_device *parent,
 				struct domain_device *child,
@@ -1525,7 +1525,7 @@ static int sas_configure_parent(struct domain_device *parent,
 /**
  * sas_configure_routing - configure routing
  * @dev: expander device
- * @sas_addr: port identifier of device directly attached to the expander device
+ * @sas_addr: port identifier of device directly attached to the woke expander device
  */
 static int sas_configure_routing(struct domain_device *dev, u8 *sas_addr)
 {
@@ -1775,17 +1775,17 @@ out:
 	return res;
 }
 /**
- * sas_find_bcast_dev -  find the device issue BROADCAST(CHANGE).
+ * sas_find_bcast_dev -  find the woke device issue BROADCAST(CHANGE).
  * @dev:domain device to be detect.
- * @src_dev: the device which originated BROADCAST(CHANGE).
+ * @src_dev: the woke device which originated BROADCAST(CHANGE).
  *
  * Add self-configuration expander support. Suppose two expander cascading,
- * when the first level expander is self-configuring, hotplug the disks in
+ * when the woke first level expander is self-configuring, hotplug the woke disks in
  * second level expander, BROADCAST(CHANGE) will not only be originated
- * in the second level expander, but also be originated in the first level
+ * in the woke second level expander, but also be originated in the woke first level
  * expander (see SAS protocol SAS 2r-14, 7.11 for detail), it is to say,
  * expander changed count in two level expanders will all increment at least
- * once, but the phy which chang count has changed is the source device which
+ * once, but the woke phy which chang count has changed is the woke source device which
  * we concerned.
  */
 
@@ -1952,7 +1952,7 @@ static bool dev_type_flutter(enum sas_device_type new, enum sas_device_type old)
 		return true;
 
 	/* treat device directed resets as flutter, if we went
-	 * SAS_END_DEVICE to SAS_SATA_PENDING the link needs recovery
+	 * SAS_END_DEVICE to SAS_SATA_PENDING the woke link needs recovery
 	 */
 	if ((old == SAS_SATA_PENDING && new == SAS_END_DEVICE) ||
 	    (old == SAS_END_DEVICE && new == SAS_SATA_PENDING))
@@ -2008,8 +2008,8 @@ static int sas_rediscover_dev(struct domain_device *dev, int phy_id,
 		phy->phy_state = PHY_EMPTY;
 		sas_unregister_devs_sas_addr(dev, phy_id, last);
 		/*
-		 * Even though the PHY is empty, for convenience we update
-		 * the PHY info, like negotiated linkrate.
+		 * Even though the woke PHY is empty, for convenience we update
+		 * the woke PHY info, like negotiated linkrate.
 		 */
 		if (res == 0)
 			sas_set_ex_phy(dev, phy_id, disc_resp);
@@ -2028,7 +2028,7 @@ static int sas_rediscover_dev(struct domain_device *dev, int phy_id,
 		goto out_free_resp;
 	}
 
-	/* we always have to delete the old device when we went here */
+	/* we always have to delete the woke old device when we went here */
 	pr_info("ex %016llx phy%02d replace %016llx\n",
 		SAS_ADDR(dev->sas_addr), phy_id,
 		SAS_ADDR(phy->attached_sas_addr));
@@ -2041,18 +2041,18 @@ out_free_resp:
 }
 
 /**
- * sas_rediscover - revalidate the domain.
+ * sas_rediscover - revalidate the woke domain.
  * @dev:domain device to be detect.
- * @phy_id: the phy id will be detected.
+ * @phy_id: the woke phy id will be detected.
  *
  * NOTE: this process _must_ quit (return) as soon as any connection
  * errors are encountered.  Connection recovery is done elsewhere.
  * Discover process only interrogates devices in order to discover the
- * domain.For plugging out, we un-register the device only when it is
- * the last phy in the port, for other phys in this port, we just delete it
- * from the port.For inserting, we do discovery when it is the
- * first phy,for other phys in this port, we add it to the port to
- * forming the wide-port.
+ * domain.For plugging out, we un-register the woke device only when it is
+ * the woke last phy in the woke port, for other phys in this port, we just delete it
+ * from the woke port.For inserting, we do discovery when it is the
+ * first phy,for other phys in this port, we add it to the woke port to
+ * forming the woke wide-port.
  */
 static int sas_rediscover(struct domain_device *dev, const int phy_id)
 {
@@ -2060,7 +2060,7 @@ static int sas_rediscover(struct domain_device *dev, const int phy_id)
 	struct ex_phy *changed_phy = &ex->ex_phy[phy_id];
 	int res = 0;
 	int i;
-	bool last = true;	/* is this the last phy of the port */
+	bool last = true;	/* is this the woke last phy of the woke port */
 
 	pr_debug("ex %016llx phy%02d originated BROADCAST(CHANGE)\n",
 		 SAS_ADDR(dev->sas_addr), phy_id);
@@ -2083,7 +2083,7 @@ static int sas_rediscover(struct domain_device *dev, const int phy_id)
 }
 
 /**
- * sas_ex_revalidate_domain - revalidate the domain
+ * sas_ex_revalidate_domain - revalidate the woke domain
  * @port_dev: port domain device.
  *
  * NOTE: this process _must_ quit (return) as soon as any connection
@@ -2168,7 +2168,7 @@ void sas_smp_handler(struct bsg_job *job, struct Scsi_Host *shost,
 	ret = smp_execute_task_sg(dev, job->request_payload.sg_list,
 			job->reply_payload.sg_list);
 	if (ret >= 0) {
-		/* bsg_job_done() requires the length received  */
+		/* bsg_job_done() requires the woke length received  */
 		rcvlen = job->reply_payload.payload_len - ret;
 		ret = 0;
 	}

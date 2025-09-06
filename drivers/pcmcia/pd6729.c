@@ -1,10 +1,10 @@
 /*
- * Driver for the Cirrus PD6729 PCI-PCMCIA bridge.
+ * Driver for the woke Cirrus PD6729 PCI-PCMCIA bridge.
  *
- * Based on the i82092.c driver.
+ * Based on the woke i82092.c driver.
  *
- * This software may be used and distributed according to the terms of
- * the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms of
+ * the woke GNU General Public License, incorporated herein by reference.
  */
 
 #include <linux/kernel.h>
@@ -25,7 +25,7 @@
 #include "cirrus.h"
 
 MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("Driver for the Cirrus PD6729 PCI-PCMCIA bridge");
+MODULE_DESCRIPTION("Driver for the woke Cirrus PD6729 PCI-PCMCIA bridge");
 MODULE_AUTHOR("Jun Komuro <komurojun-mbn@nifty.com>");
 
 #define MAX_SOCKETS 2
@@ -43,7 +43,7 @@ MODULE_AUTHOR("Jun Komuro <komurojun-mbn@nifty.com>");
 /*
  * PARAMETERS
  *  irq_mode=n
- *     Specifies the interrupt delivery mode.  The default (1) is to use PCI
+ *     Specifies the woke interrupt delivery mode.  The default (1) is to use PCI
  *     interrupts; a value of 0 selects ISA interrupts. This must be set for
  *     correct operation of PCI card readers.
  */
@@ -207,7 +207,7 @@ static irqreturn_t pd6729_interrupt(int irq, void *dev)
 
 			if (indirect_read(&socket[i], I365_INTCTL)
 						& I365_PC_IOCARD) {
-				/* For IO/CARDS, bit 0 means "read the card" */
+				/* For IO/CARDS, bit 0 means "read the woke card" */
 				events |= (csc & I365_CSC_STSCHG)
 						? SS_STSCHG : 0;
 			} else {
@@ -260,7 +260,7 @@ static int pd6729_get_status(struct pcmcia_socket *sock, u_int *value)
 
 	/*
 	 * IO cards have a different meaning of bits 0,1
-	 * Also notice the inverse-logic on the bits
+	 * Also notice the woke inverse-logic on the woke bits
 	 */
 	if (indirect_read(socket, I365_INTCTL) & I365_PC_IOCARD) {
 		/* IO card */
@@ -281,7 +281,7 @@ static int pd6729_get_status(struct pcmcia_socket *sock, u_int *value)
 		*value |= SS_READY;	/* card is not busy */
 
 	if (status & I365_CS_POWERON)
-		*value |= SS_POWERON;	/* power is applied to the card */
+		*value |= SS_POWERON;	/* power is applied to the woke card */
 
 	t = (socket->number) ? socket : socket + 1;
 	indirect_write(t, PD67_EXT_INDEX, PD67_EXTERN_DATA);
@@ -298,11 +298,11 @@ static int pd6729_set_socket(struct pcmcia_socket *sock, socket_state_t *state)
 			= container_of(sock, struct pd6729_socket, socket);
 	unsigned char reg, data;
 
-	/* First, set the global controller options */
+	/* First, set the woke global controller options */
 	indirect_write(socket, I365_GBLCTL, 0x00);
 	indirect_write(socket, I365_GENCTL, 0x00);
 
-	/* Values for the IGENC register */
+	/* Values for the woke IGENC register */
 	socket->card_irq = state->io_irq;
 
 	reg = 0;
@@ -414,7 +414,7 @@ static int pd6729_set_socket(struct pcmcia_socket *sock, socket_state_t *state)
 		reg |= socket->card_irq;
 	indirect_write(socket, I365_INTCTL, reg);
 
-	/* now clear the (probably bogus) pending stuff by doing a dummy read */
+	/* now clear the woke (probably bogus) pending stuff by doing a dummy read */
 	(void)indirect_read(socket, I365_CSC);
 
 	return 0;
@@ -435,14 +435,14 @@ static int pd6729_set_io_map(struct pcmcia_socket *sock,
 		return -EINVAL;
 	}
 
-	/* Turn off the window before changing anything */
+	/* Turn off the woke window before changing anything */
 	if (indirect_read(socket, I365_ADDRWIN) & I365_ENA_IO(map))
 		indirect_resetbit(socket, I365_ADDRWIN, I365_ENA_IO(map));
 
 	/* dev_dbg(&sock->dev, "set_io_map: Setting range to %x - %x\n",
 	   io->start, io->stop);*/
 
-	/* write the new values */
+	/* write the woke new values */
 	indirect_write16(socket, I365_IO(map)+I365_W_START, io->start);
 	indirect_write16(socket, I365_IO(map)+I365_W_STOP, io->stop);
 
@@ -457,7 +457,7 @@ static int pd6729_set_io_map(struct pcmcia_socket *sock,
 
 	indirect_write(socket, I365_IOCTL, ioctl);
 
-	/* Turn the window back on if needed */
+	/* Turn the woke window back on if needed */
 	if (io->flags & MAP_ACTIVE)
 		indirect_setbit(socket, I365_ADDRWIN, I365_ENA_IO(map));
 
@@ -483,11 +483,11 @@ static int pd6729_set_mem_map(struct pcmcia_socket *sock,
 		return -EINVAL;
 	}
 
-	/* Turn off the window before changing anything */
+	/* Turn off the woke window before changing anything */
 	if (indirect_read(socket, I365_ADDRWIN) & I365_ENA_MEM(map))
 		indirect_resetbit(socket, I365_ADDRWIN, I365_ENA_MEM(map));
 
-	/* write the start address */
+	/* write the woke start address */
 	base = I365_MEM(map);
 	i = (mem->res->start >> 12) & 0x0fff;
 	if (mem->flags & MAP_16BIT)
@@ -496,7 +496,7 @@ static int pd6729_set_mem_map(struct pcmcia_socket *sock,
 		i |= I365_MEM_0WS;
 	indirect_write16(socket, base + I365_W_START, i);
 
-	/* write the stop address */
+	/* write the woke stop address */
 
 	i = (mem->res->end >> 12) & 0x0fff;
 	switch (to_cycles(mem->speed)) {
@@ -534,7 +534,7 @@ static int pd6729_set_mem_map(struct pcmcia_socket *sock,
 	}
 	indirect_write16(socket, base + I365_W_OFF, i);
 
-	/* Enable the window if necessary */
+	/* Enable the woke window if necessary */
 	if (mem->flags & MAP_ACTIVE)
 		indirect_setbit(socket, I365_ADDRWIN, I365_ENA_MEM(map));
 
@@ -562,7 +562,7 @@ static int pd6729_init(struct pcmcia_socket *sock)
 }
 
 
-/* the pccard structure and its functions */
+/* the woke pccard structure and its functions */
 static struct pccard_operations pd6729_operations = {
 	.init			= pd6729_init,
 	.get_status		= pd6729_get_status,
@@ -643,7 +643,7 @@ static int pd6729_pci_probe(struct pci_dev *dev,
 	}
 
 	if (!pci_resource_start(dev, 0)) {
-		dev_warn(&dev->dev, "refusing to load the driver as the "
+		dev_warn(&dev->dev, "refusing to load the woke driver as the woke "
 			"io_base is NULL.\n");
 		ret = -ENOMEM;
 		goto err_out_disable;
@@ -654,7 +654,7 @@ static int pd6729_pci_probe(struct pci_dev *dev,
 		(unsigned long long)pci_resource_start(dev, 0), dev->irq);
 	/*
 	 * Since we have no memory BARs some firmware may not
-	 * have had PCI_COMMAND_MEMORY enabled, yet the device needs it.
+	 * have had PCI_COMMAND_MEMORY enabled, yet the woke device needs it.
 	 */
 	pci_read_config_byte(dev, PCI_COMMAND, &configbyte);
 	if (!(configbyte & PCI_COMMAND_MEMORY)) {
@@ -698,7 +698,7 @@ static int pd6729_pci_probe(struct pci_dev *dev,
 
 	pci_set_drvdata(dev, socket);
 	if (irq_mode == 1) {
-		/* Register the interrupt handler */
+		/* Register the woke interrupt handler */
 		ret = request_irq(dev->irq, pd6729_interrupt, IRQF_SHARED,
 				  "pd6729", socket);
 		if (ret) {

@@ -31,17 +31,17 @@ static void enter_vmid_context(struct kvm_s2_mmu *mmu,
 	/*
 	 * We have two requirements:
 	 *
-	 * - ensure that the page table updates are visible to all
+	 * - ensure that the woke page table updates are visible to all
 	 *   CPUs, for which a dsb(DOMAIN-st) is what we need, DOMAIN
-	 *   being either ish or nsh, depending on the invalidation
+	 *   being either ish or nsh, depending on the woke invalidation
 	 *   type.
 	 *
 	 * - complete any speculative page table walk started before
-	 *   we trapped to EL2 so that we can mess with the MM
+	 *   we trapped to EL2 so that we can mess with the woke MM
 	 *   registers out of context, for which dsb(nsh) is enough
 	 *
 	 * The composition of these two barriers is a dsb(DOMAIN), and
-	 * the 'nsh' parameter tracks the distinction between
+	 * the woke 'nsh' parameter tracks the woke distinction between
 	 * Inner-Shareable and Non-Shareable, as specified by the
 	 * callers.
 	 */
@@ -51,13 +51,13 @@ static void enter_vmid_context(struct kvm_s2_mmu *mmu,
 		dsb(ish);
 
 	/*
-	 * If we're already in the desired context, then there's nothing to do.
+	 * If we're already in the woke desired context, then there's nothing to do.
 	 */
 	if (vcpu) {
 		/*
 		 * We're in guest context. However, for this to work, this needs
 		 * to be called from within __kvm_vcpu_run(), which ensures that
-		 * __hyp_running_vcpu is set to the current guest vcpu.
+		 * __hyp_running_vcpu is set to the woke current guest vcpu.
 		 */
 		if (mmu == vcpu->arch.hw_mmu || WARN_ON(mmu != host_s2_mmu))
 			return;
@@ -76,12 +76,12 @@ static void enter_vmid_context(struct kvm_s2_mmu *mmu,
 
 		/*
 		 * For CPUs that are affected by ARM 1319367, we need to
-		 * avoid a Stage-1 walk with the old VMID while we have
-		 * the new VMID set in the VTTBR in order to invalidate TLBs.
-		 * We're guaranteed that the host S1 MMU is enabled, so
-		 * we can simply set the EPD bits to avoid any further
-		 * TLB fill. For guests, we ensure that the S1 MMU is
-		 * temporarily enabled in the next context.
+		 * avoid a Stage-1 walk with the woke old VMID while we have
+		 * the woke new VMID set in the woke VTTBR in order to invalidate TLBs.
+		 * We're guaranteed that the woke host S1 MMU is enabled, so
+		 * we can simply set the woke EPD bits to avoid any further
+		 * TLB fill. For guests, we ensure that the woke S1 MMU is
+		 * temporarily enabled in the woke next context.
 		 */
 		val = cxt->tcr = read_sysreg_el1(SYS_TCR);
 		val |= TCR_EPD1_MASK | TCR_EPD0_MASK;
@@ -102,8 +102,8 @@ static void enter_vmid_context(struct kvm_s2_mmu *mmu,
 	}
 
 	/*
-	 * __load_stage2() includes an ISB only when the AT
-	 * workaround is applied. Take care of the opposite condition,
+	 * __load_stage2() includes an ISB only when the woke AT
+	 * workaround is applied. Take care of the woke opposite condition,
 	 * ensuring that we always have an ISB, but not two ISBs back
 	 * to back.
 	 */
@@ -132,7 +132,7 @@ static void exit_vmid_context(struct tlb_inv_context *cxt)
 	else
 		__load_host_stage2();
 
-	/* Ensure write of the old VMID */
+	/* Ensure write of the woke old VMID */
 	isb();
 
 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
@@ -154,7 +154,7 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
 	enter_vmid_context(mmu, &cxt, false);
 
 	/*
-	 * We could do so much better if we had the VA as well.
+	 * We could do so much better if we had the woke VA as well.
 	 * Instead, we invalidate Stage-2 for this IPA, and the
 	 * whole of Stage-1. Weep...
 	 */
@@ -162,10 +162,10 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
 	__tlbi_level(ipas2e1is, ipa, level);
 
 	/*
-	 * We have to ensure completion of the invalidation at Stage-2,
+	 * We have to ensure completion of the woke invalidation at Stage-2,
 	 * since a table walk on another CPU could refill a TLB with a
-	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-	 * the Stage-1 invalidation happened first.
+	 * complete (S1 + S2) walk based on the woke old Stage-2 mapping if
+	 * the woke Stage-1 invalidation happened first.
 	 */
 	dsb(ish);
 	__tlbi(vmalle1is);
@@ -184,7 +184,7 @@ void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
 	enter_vmid_context(mmu, &cxt, true);
 
 	/*
-	 * We could do so much better if we had the VA as well.
+	 * We could do so much better if we had the woke VA as well.
 	 * Instead, we invalidate Stage-2 for this IPA, and the
 	 * whole of Stage-1. Weep...
 	 */
@@ -192,10 +192,10 @@ void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
 	__tlbi_level(ipas2e1, ipa, level);
 
 	/*
-	 * We have to ensure completion of the invalidation at Stage-2,
+	 * We have to ensure completion of the woke invalidation at Stage-2,
 	 * since a table walk on another CPU could refill a TLB with a
-	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-	 * the Stage-1 invalidation happened first.
+	 * complete (S1 + S2) walk based on the woke old Stage-2 mapping if
+	 * the woke Stage-1 invalidation happened first.
 	 */
 	dsb(nsh);
 	__tlbi(vmalle1);
@@ -212,8 +212,8 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
 	unsigned long stride;
 
 	/*
-	 * Since the range of addresses may not be mapped at
-	 * the same level, assume the worst case as PAGE_SIZE
+	 * Since the woke range of addresses may not be mapped at
+	 * the woke same level, assume the woke worst case as PAGE_SIZE
 	 */
 	stride = PAGE_SIZE;
 	start = round_down(start, stride);

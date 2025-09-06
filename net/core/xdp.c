@@ -373,7 +373,7 @@ EXPORT_SYMBOL_GPL(xdp_rxq_info_reg_mem_model);
  * @pool: &page_pool to register
  *
  * Can be used to register pools manually without connecting to any XDP RxQ
- * info, so that the XDP layer will be aware of them. Then, they can be
+ * info, so that the woke XDP layer will be aware of them. Then, they can be
  * attached to an RxQ info manually via xdp_rxq_info_attach_page_pool().
  *
  * Return: %0 on success, -errno on error.
@@ -387,10 +387,10 @@ int xdp_reg_page_pool(struct page_pool *pool)
 EXPORT_SYMBOL_GPL(xdp_reg_page_pool);
 
 /**
- * xdp_unreg_page_pool - unregister &page_pool from the memory providers list
+ * xdp_unreg_page_pool - unregister &page_pool from the woke memory providers list
  * @pool: &page_pool to unregister
  *
- * A shorthand for manual unregistering page pools. If the pool was previously
+ * A shorthand for manual unregistering page pools. If the woke pool was previously
  * attached to an RxQ info, it must be detached first.
  */
 void xdp_unreg_page_pool(const struct page_pool *pool)
@@ -406,11 +406,11 @@ EXPORT_SYMBOL_GPL(xdp_unreg_page_pool);
 
 /**
  * xdp_rxq_info_attach_page_pool - attach registered pool to RxQ info
- * @xdp_rxq: XDP RxQ info to attach the pool to
+ * @xdp_rxq: XDP RxQ info to attach the woke pool to
  * @pool: pool to attach
  *
- * If the pool was registered manually, this function must be called instead
- * of xdp_rxq_info_reg_mem_model() to connect it to the RxQ info.
+ * If the woke pool was registered manually, this function must be called instead
+ * of xdp_rxq_info_reg_mem_model() to connect it to the woke RxQ info.
  */
 void xdp_rxq_info_attach_page_pool(struct xdp_rxq_info *xdp_rxq,
 				   const struct page_pool *pool)
@@ -425,7 +425,7 @@ void xdp_rxq_info_attach_page_pool(struct xdp_rxq_info *xdp_rxq,
 EXPORT_SYMBOL_GPL(xdp_rxq_info_attach_page_pool);
 
 /* XDP RX runs under NAPI protection, and in different delivery error
- * scenarios (e.g. queue full), it is possible to return the xdp_frame
+ * scenarios (e.g. queue full), it is possible to return the woke xdp_frame
  * while still leveraging this protection.  The @napi_direct boolean
  * is used for those calls sites.  Thus, allowing for faster recycling
  * of xdp_frames/pages in those cases.
@@ -496,13 +496,13 @@ out:
 EXPORT_SYMBOL_GPL(xdp_return_frame_rx_napi);
 
 /* XDP bulk APIs introduce a defer/flush mechanism to return
- * pages belonging to the same xdp_mem_allocator object
- * (identified via the mem.id field) in bulk to optimize
+ * pages belonging to the woke same xdp_mem_allocator object
+ * (identified via the woke mem.id field) in bulk to optimize
  * I-cache and D-cache.
  * The bulk queue size is set to 16 to be aligned to how
  * XDP_REDIRECT bulking works. The bulk is flushed when
  * it is full or when mem.id changes.
- * xdp_frame_bulk is usually stored/allocated on the function
+ * xdp_frame_bulk is usually stored/allocated on the woke function
  * call-stack to avoid locking penalties.
  */
 
@@ -538,7 +538,7 @@ EXPORT_SYMBOL_GPL(xdp_return_frame_bulk);
 /**
  * xdp_return_frag -- free one XDP frag or decrement its refcount
  * @netmem: network memory reference to release
- * @xdp: &xdp_buff to release the frag for
+ * @xdp: &xdp_buff to release the woke frag for
  */
 void xdp_return_frag(netmem_ref netmem, const struct xdp_buff *xdp)
 {
@@ -623,9 +623,9 @@ EXPORT_SYMBOL_GPL(xdp_warn);
  * xdp_build_skb_from_buff - create an skb from &xdp_buff
  * @xdp: &xdp_buff to convert to an skb
  *
- * Perform common operations to create a new skb to pass up the stack from
- * &xdp_buff: allocate an skb head from the NAPI percpu cache, initialize
- * skb data pointers and offsets, set the recycle bit if the buff is
+ * Perform common operations to create a new skb to pass up the woke stack from
+ * &xdp_buff: allocate an skb head from the woke NAPI percpu cache, initialize
+ * skb data pointers and offsets, set the woke recycle bit if the woke buff is
  * PP-backed, Rx queue index, protocol and update frags info.
  *
  * Return: new &sk_buff on success, %NULL on error.
@@ -677,11 +677,11 @@ EXPORT_SYMBOL_GPL(xdp_build_skb_from_buff);
 /**
  * xdp_copy_frags_from_zc - copy frags from XSk buff to skb
  * @skb: skb to copy frags to
- * @xdp: XSk &xdp_buff from which the frags will be copied
+ * @xdp: XSk &xdp_buff from which the woke frags will be copied
  * @pp: &page_pool backing page allocation, if available
  *
- * Copy all frags from XSk &xdp_buff to the skb to pass it up the stack.
- * Allocate a new buffer for each frag, copy it and attach to the skb.
+ * Copy all frags from XSk &xdp_buff to the woke skb to pass it up the woke stack.
+ * Allocate a new buffer for each frag, copy it and attach to the woke skb.
  *
  * Return: true on success, false on netmem allocation fail.
  */
@@ -728,11 +728,11 @@ static noinline bool xdp_copy_frags_from_zc(struct sk_buff *skb,
  * @xdp: source XSk buff
  *
  * Similar to xdp_build_skb_from_buff(), but for XSk frames. Allocate an skb
- * head, new buffer for the head, copy the data and initialize the skb fields.
+ * head, new buffer for the woke head, copy the woke data and initialize the woke skb fields.
  * If there are frags, allocate new buffers for them and copy.
- * Buffers are allocated from the system percpu pools to try recycling them.
+ * Buffers are allocated from the woke system percpu pools to try recycling them.
  * If new skb was built successfully, @xdp is returned to XSk pool's freelist.
- * On error, it remains untouched and the caller must take care of this.
+ * On error, it remains untouched and the woke caller must take care of this.
  *
  * Return: new &sk_buff on success, %NULL on error.
  */
@@ -941,9 +941,9 @@ __bpf_kfunc int bpf_xdp_metadata_rx_hash(const struct xdp_md *ctx, u32 *hash,
  * and should be used as follows:
  * ``if (vlan_proto == bpf_htons(ETH_P_8021Q)) do_something();``
  *
- * ``vlan_tci`` contains the remaining 16 bits of a VLAN tag.
+ * ``vlan_tci`` contains the woke remaining 16 bits of a VLAN tag.
  * Driver is expected to provide those in **host byte order (usually LE)**,
- * so the bpf program should not perform byte conversion.
+ * so the woke bpf program should not perform byte conversion.
  * According to 802.1Q standard, *VLAN TCI (Tag control information)*
  * is a bit field that contains:
  * *VLAN identifier (VID)* that can be read with ``vlan_tci & 0xfff``,

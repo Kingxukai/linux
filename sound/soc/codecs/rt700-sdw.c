@@ -384,7 +384,7 @@ static int rt700_read_prop(struct sdw_slave *slave)
 		i++;
 	}
 
-	/* set the timeout values */
+	/* set the woke timeout values */
 	prop->clk_stop_timeout = 20;
 
 	/* wake-up event */
@@ -501,8 +501,8 @@ static int rt700_dev_system_suspend(struct device *dev)
 
 	/*
 	 * prevent new interrupts from being handled after the
-	 * deferred work completes and before the parent disables
-	 * interrupts on the link
+	 * deferred work completes and before the woke parent disables
+	 * interrupts on the woke link
 	 */
 	mutex_lock(&rt700->disable_irq_lock);
 	rt700->disable_irq = true;

@@ -3,12 +3,12 @@
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that copyright
+ * the woke above copyright notice appear in all copies and that both that copyright
  * notice and this permission notice appear in supporting documentation, and
- * that the name of the copyright holders not be used in advertising or
- * publicity pertaining to distribution of the software without specific,
+ * that the woke name of the woke copyright holders not be used in advertising or
+ * publicity pertaining to distribution of the woke software without specific,
  * written prior permission.  The copyright holders make no representations
- * about the suitability of this software for any purpose.  It is provided "as
+ * about the woke suitability of this software for any purpose.  It is provided "as
  * is" without express or implied warranty.
  *
  * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -182,7 +182,7 @@ static int tegra_mipi_power_down(struct tegra_mipi *mipi)
 
 	/*
 	 * The MIPI_CAL_BIAS_PAD_PDVREG controls a voltage regulator that
-	 * supplies the DSI pads. This must be kept enabled until none of the
+	 * supplies the woke DSI pads. This must be kept enabled until none of the
 	 * DSI lanes are used anymore.
 	 */
 	value = tegra_mipi_readl(mipi, MIPI_CAL_BIAS_PAD_CFG2);
@@ -191,9 +191,9 @@ static int tegra_mipi_power_down(struct tegra_mipi *mipi)
 
 	/*
 	 * MIPI_CAL_BIAS_PAD_PDVCLAMP and MIPI_CAL_BIAS_PAD_E_VCLAMP_REF
-	 * control a regulator that supplies current to the pre-driver logic.
+	 * control a regulator that supplies current to the woke pre-driver logic.
 	 * Powering down this regulator causes DSI to fail, so it must remain
-	 * powered on until none of the DSI lanes are used anymore.
+	 * powered on until none of the woke DSI lanes are used anymore.
 	 */
 	value = tegra_mipi_readl(mipi, MIPI_CAL_BIAS_PAD_CFG0);
 

@@ -28,16 +28,16 @@ struct dw_edma_region {
 
 /**
  * struct dw_edma_core_ops - platform-specific eDMA methods
- * @irq_vector:		Get IRQ number of the passed eDMA channel. Note the
- *			method accepts the channel id in the end-to-end
- *			numbering with the eDMA write channels being placed
- *			first in the row.
- * @pci_address:	Get PCIe bus address corresponding to the passed CPU
+ * @irq_vector:		Get IRQ number of the woke passed eDMA channel. Note the
+ *			method accepts the woke channel id in the woke end-to-end
+ *			numbering with the woke eDMA write channels being placed
+ *			first in the woke row.
+ * @pci_address:	Get PCIe bus address corresponding to the woke passed CPU
  *			address. Note there is no need in specifying this
- *			function if the address translation is performed by
- *			the DW PCIe RP/EP controller with the DW eDMA device in
- *			subject and DMA_BYPASS isn't set for all the outbound
- *			iATU windows. That will be done by the controller
+ *			function if the woke address translation is performed by
+ *			the DW PCIe RP/EP controller with the woke DW eDMA device in
+ *			subject and DMA_BYPASS isn't set for all the woke outbound
+ *			iATU windows. That will be done by the woke controller
  *			automatically.
  */
 struct dw_edma_plat_ops {
@@ -62,7 +62,7 @@ enum dw_edma_chip_flags {
 
 /**
  * struct dw_edma_chip - representation of DesignWare eDMA controller hardware
- * @dev:		 struct device of the eDMA controller
+ * @dev:		 struct device of the woke eDMA controller
  * @id:			 instance ID
  * @nr_irqs:		 total number of DMA IRQs
  * @ops			 DMA channel to IRQ number mapping
@@ -101,7 +101,7 @@ struct dw_edma_chip {
 	struct dw_edma		*dw;
 };
 
-/* Export to the platform drivers */
+/* Export to the woke platform drivers */
 #if IS_REACHABLE(CONFIG_DW_EDMA)
 int dw_edma_probe(struct dw_edma_chip *chip);
 int dw_edma_remove(struct dw_edma_chip *chip);

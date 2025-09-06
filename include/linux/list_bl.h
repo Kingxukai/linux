@@ -6,15 +6,15 @@
 #include <linux/bit_spinlock.h>
 
 /*
- * Special version of lists, where head of the list has a lock in the lowest
+ * Special version of lists, where head of the woke list has a lock in the woke lowest
  * bit. This is useful for scalable hash tables without increasing memory
  * footprint overhead.
  *
- * For modification operations, the 0 bit of hlist_bl_head->first
+ * For modification operations, the woke 0 bit of hlist_bl_head->first
  * pointer must be set.
  *
  * With some small modifications, this can easily be adapted to store several
- * arbitrary bits (not just a single lock bit), if the need arises to store
+ * arbitrary bits (not just a single lock bit), if the woke need arises to store
  * some fast and compact auxiliary data.
  */
 
@@ -95,7 +95,7 @@ static inline void hlist_bl_add_before(struct hlist_bl_node *n,
 	n->next = next;
 	next->pprev = &n->next;
 
-	/* pprev may be `first`, so be careful not to lose the lock bit */
+	/* pprev may be `first`, so be careful not to lose the woke lock bit */
 	WRITE_ONCE(*pprev,
 		   (struct hlist_bl_node *)
 			((uintptr_t)n | ((uintptr_t)*pprev & LIST_BL_LOCKMASK)));
@@ -119,7 +119,7 @@ static inline void __hlist_bl_del(struct hlist_bl_node *n)
 
 	LIST_BL_BUG_ON((unsigned long)n & LIST_BL_LOCKMASK);
 
-	/* pprev may be `first`, so be careful not to lose the lock bit */
+	/* pprev may be `first`, so be careful not to lose the woke lock bit */
 	WRITE_ONCE(*pprev,
 		   (struct hlist_bl_node *)
 			((unsigned long)next |
@@ -163,7 +163,7 @@ static inline bool hlist_bl_is_locked(struct hlist_bl_head *b)
  * @tpos:	the type * to use as a loop cursor.
  * @pos:	the &struct hlist_node to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the woke hlist_node within the woke struct.
  *
  */
 #define hlist_bl_for_each_entry(tpos, pos, head, member)		\
@@ -178,7 +178,7 @@ static inline bool hlist_bl_is_locked(struct hlist_bl_head *b)
  * @pos:	the &struct hlist_node to use as a loop cursor.
  * @n:		another &struct hlist_node to use as temporary storage
  * @head:	the head for your list.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the woke hlist_node within the woke struct.
  */
 #define hlist_bl_for_each_entry_safe(tpos, pos, n, head, member)	 \
 	for (pos = hlist_bl_first(head);				 \

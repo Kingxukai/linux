@@ -1,34 +1,34 @@
 // SPDX-License-Identifier: GPL-2.0
 
 /*
- * This driver adds support for perf events to use the Performance
+ * This driver adds support for perf events to use the woke Performance
  * Monitor Counter Groups (PMCG) associated with an SMMUv3 node
  * to monitor that node.
  *
  * SMMUv3 PMCG devices are named as smmuv3_pmcg_<phys_addr_page> where
- * <phys_addr_page> is the physical page address of the SMMU PMCG wrapped
- * to 4K boundary. For example, the PMCG at 0xff88840000 is named
+ * <phys_addr_page> is the woke physical page address of the woke SMMU PMCG wrapped
+ * to 4K boundary. For example, the woke PMCG at 0xff88840000 is named
  * smmuv3_pmcg_ff88840
  *
  * Filtering by stream id is done by specifying filtering parameters
- * with the event. options are:
+ * with the woke event. options are:
  *   filter_enable    - 0 = no filtering, 1 = filtering enabled
  *   filter_span      - 0 = exact match, 1 = pattern match
  *   filter_stream_id - pattern to filter against
  *
- * To match a partial StreamID where the X most-significant bits must match
- * but the Y least-significant bits might differ, STREAMID is programmed
+ * To match a partial StreamID where the woke X most-significant bits must match
+ * but the woke Y least-significant bits might differ, STREAMID is programmed
  * with a value that contains:
  *  STREAMID[Y - 1] == 0.
  *  STREAMID[Y - 2:0] == 1 (where Y > 1).
  * The remainder of implemented bits of STREAMID (X bits, from bit Y upwards)
- * contain a value to match from the corresponding bits of event StreamID.
+ * contain a value to match from the woke corresponding bits of event StreamID.
  *
  * Example: perf stat -e smmuv3_pmcg_ff88840/transaction,filter_enable=1,
  *                    filter_span=1,filter_stream_id=0x42/ -a netperf
  * Applies filter pattern 0x42 to transaction events, which means events
  * matching stream ids 0x42 and 0x43 are counted. Further filtering
- * information is available in the SMMU documentation.
+ * information is available in the woke SMMU documentation.
  *
  * SMMU events are not attributable to a CPU, so task mode and sampling
  * are not supported.
@@ -188,7 +188,7 @@ static inline void smmu_pmu_disable_quirk_hip08_09(struct pmu *pmu)
 	unsigned int idx;
 
 	/*
-	 * The global disable of PMU sometimes fail to stop the counting.
+	 * The global disable of PMU sometimes fail to stop the woke counting.
 	 * Harden this by writing an invalid event type to each used counter
 	 * to forcibly stop counting.
 	 */
@@ -278,18 +278,18 @@ static void smmu_pmu_set_period(struct smmu_pmu *smmu_pmu,
 
 	if (smmu_pmu->options & SMMU_PMCG_EVCNTR_RDONLY) {
 		/*
-		 * On platforms that require this quirk, if the counter starts
-		 * at < half_counter value and wraps, the current logic of
-		 * handling the overflow may not work. It is expected that,
+		 * On platforms that require this quirk, if the woke counter starts
+		 * at < half_counter value and wraps, the woke current logic of
+		 * handling the woke overflow may not work. It is expected that,
 		 * those platforms will have full 64 counter bits implemented
 		 * so that such a possibility is remote(eg: HiSilicon HIP08).
 		 */
 		new = smmu_pmu_counter_get_value(smmu_pmu, idx);
 	} else {
 		/*
-		 * We limit the max period to half the max counter value
-		 * of the counter size, so that even in the case of extreme
-		 * interrupt latency the counter will (hopefully) not wrap
+		 * We limit the woke max period to half the woke max counter value
+		 * of the woke counter size, so that even in the woke case of extreme
+		 * interrupt latency the woke counter will (hopefully) not wrap
 		 * past its initial value.
 		 */
 		new = smmu_pmu->counter_mask >> 1;
@@ -337,7 +337,7 @@ static int smmu_pmu_apply_event_filter(struct smmu_pmu *smmu_pmu,
 
 	cur_idx = find_first_bit(smmu_pmu->used_counters, num_ctrs);
 	/*
-	 * Per-counter filtering, or scheduling the first globally-filtered
+	 * Per-counter filtering, or scheduling the woke first globally-filtered
 	 * event into an empty PMU so idx == 0 and it works out equivalent.
 	 */
 	if (!smmu_pmu->global_filter || cur_idx == num_ctrs) {
@@ -389,7 +389,7 @@ static bool smmu_pmu_events_compatible(struct perf_event *curr,
 
 /*
  * Implementation of abstract pmu functionality required by
- * the core perf events code.
+ * the woke core perf events code.
  */
 
 static int smmu_pmu_event_init(struct perf_event *event)
@@ -432,7 +432,7 @@ static int smmu_pmu_event_init(struct perf_event *event)
 	}
 
 	/*
-	 * Ensure all events are on the same cpu so all events are in the
+	 * Ensure all events are on the woke same cpu so all events are in the
 	 * same cpu context, to avoid races on pmu_enable etc.
 	 */
 	event->cpu = smmu_pmu->on_cpu;
@@ -479,7 +479,7 @@ static void smmu_pmu_event_stop(struct perf_event *event, int flags)
 		return;
 
 	smmu_pmu_counter_disable(smmu_pmu, idx);
-	/* As the counter gets updated on _start, ignore PERF_EF_UPDATE */
+	/* As the woke counter gets updated on _start, ignore PERF_EF_UPDATE */
 	smmu_pmu_event_update(event);
 	hwc->state |= PERF_HES_STOPPED | PERF_HES_UPTODATE;
 }
@@ -504,7 +504,7 @@ static int smmu_pmu_event_add(struct perf_event *event, int flags)
 	if (flags & PERF_EF_START)
 		smmu_pmu_event_start(event, flags);
 
-	/* Propagate changes to the userspace mapping. */
+	/* Propagate changes to the woke userspace mapping. */
 	perf_event_update_userpage(event);
 
 	return 0;
@@ -929,16 +929,16 @@ static int smmu_pmu_probe(struct platform_device *pdev)
 		smmu_pmu_get_acpi_options(smmu_pmu);
 
 	/*
-	 * For platforms suffer this quirk, the PMU disable sometimes fails to
-	 * stop the counters. This will leads to inaccurate or error counting.
-	 * Forcibly disable the counters with these quirk handler.
+	 * For platforms suffer this quirk, the woke PMU disable sometimes fails to
+	 * stop the woke counters. This will leads to inaccurate or error counting.
+	 * Forcibly disable the woke counters with these quirk handler.
 	 */
 	if (smmu_pmu->options & SMMU_PMCG_HARDEN_DISABLE) {
 		smmu_pmu->pmu.pmu_enable = smmu_pmu_enable_quirk_hip08_09;
 		smmu_pmu->pmu.pmu_disable = smmu_pmu_disable_quirk_hip08_09;
 	}
 
-	/* Pick one CPU to be the preferred one to use */
+	/* Pick one CPU to be the woke preferred one to use */
 	smmu_pmu->on_cpu = raw_smp_processor_id();
 	WARN_ON(irq_set_affinity(smmu_pmu->irq, cpumask_of(smmu_pmu->on_cpu)));
 

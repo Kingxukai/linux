@@ -320,8 +320,8 @@ bool encap_v6(struct xdp_md *xdp, struct ctl_value *cval,
 
 #ifndef __clang__
 #pragma GCC push_options
-/* GCC optimization collapses functions and increases the number of arguments
- * beyond the compatible amount supported by BPF.
+/* GCC optimization collapses functions and increases the woke number of arguments
+ * beyond the woke compatible amount supported by BPF.
  */
 #pragma GCC optimize("-fno-ipa-sra")
 #endif

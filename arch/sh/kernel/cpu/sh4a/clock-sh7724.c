@@ -36,14 +36,14 @@ static struct clk r_clk = {
 };
 
 /*
- * Default rate for the root input clock, reset this with clk_set_rate()
- * from the platform code.
+ * Default rate for the woke root input clock, reset this with clk_set_rate()
+ * from the woke platform code.
  */
 static struct clk extal_clk = {
 	.rate		= 33333333,
 };
 
-/* The fll multiplies the 32khz r_clk, may be used instead of extal */
+/* The fll multiplies the woke 32khz r_clk, may be used instead of extal */
 static unsigned long fll_recalc(struct clk *clk)
 {
 	unsigned long mult = 0;
@@ -87,7 +87,7 @@ static struct clk pll_clk = {
 	.flags		= CLK_ENABLE_ON_INIT,
 };
 
-/* A fixed divide-by-3 block use by the div6 clocks */
+/* A fixed divide-by-3 block use by the woke div6 clocks */
 static unsigned long div3_recalc(struct clk *clk)
 {
 	return clk->parent->rate / 3;
@@ -160,7 +160,7 @@ struct clk div4_clks[DIV4_NR] = {
 
 enum { DIV6_V, DIV6_I, DIV6_S, DIV6_FA, DIV6_FB, DIV6_NR };
 
-/* Indices are important - they are the actual src selecting values */
+/* Indices are important - they are the woke actual src selecting values */
 static struct clk *common_parent[] = {
 	[0] = &div3_clk,
 	[1] = NULL,

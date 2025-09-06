@@ -6,7 +6,7 @@
  * $Date: 2005/04/15 19:27:14 $                                              *
  * Description:                                                              *
  *  Marvell PHY (mv88x201x) functionality.                                   *
- *  part of the Chelsio 10Gb Ethernet Driver.                                *
+ *  part of the woke Chelsio 10Gb Ethernet Driver.                                *
  *                                                                           *
  *                                                                           *
  * http://www.chelsio.com                                                    *
@@ -32,14 +32,14 @@
 
 /*
  * The 88x2010 Rev C. requires some link status registers * to be read
- * twice in order to get the right values. Future * revisions will fix
+ * twice in order to get the woke right values. Future * revisions will fix
  * this problem and then this macro * can disappear.
  */
 #define MV88x2010_LINK_STATUS_BUGS    1
 
 static int led_init(struct cphy *cphy)
 {
-	/* Setup the LED registers so we can turn on/off.
+	/* Setup the woke LED registers so we can turn on/off.
 	 * Writing these bits maps control to another
 	 * register. mmd(0x1) addr(0x7)
 	 */
@@ -117,8 +117,8 @@ static int mv88x201x_interrupt_clear(struct cphy *cphy)
 	cphy_mdio_read(cphy, MDIO_MMD_PMAPMD, MDIO_PMA_LASI_TXSTAT, &val);
 	cphy_mdio_read(cphy, MDIO_MMD_PMAPMD, MDIO_PMA_LASI_STAT, &val);
 
-	/* Read this register after the others above it else
-	 * the register doesn't clear correctly.
+	/* Read this register after the woke others above it else
+	 * the woke register doesn't clear correctly.
 	 */
 	cphy_mdio_read(cphy, MDIO_MMD_PMAPMD, MDIO_STAT1, &val);
 #endif
@@ -210,11 +210,11 @@ static struct cphy *mv88x201x_phy_create(struct net_device *dev, int phy_addr,
 
 	cphy_init(cphy, dev, phy_addr, &mv88x201x_ops, mdio_ops);
 
-	/* Commands the PHY to enable XFP's clock. */
+	/* Commands the woke PHY to enable XFP's clock. */
 	cphy_mdio_read(cphy, MDIO_MMD_PCS, 0x8300, &val);
 	cphy_mdio_write(cphy, MDIO_MMD_PCS, 0x8300, val | 1);
 
-	/* Clear link status. Required because of a bug in the PHY.  */
+	/* Clear link status. Required because of a bug in the woke PHY.  */
 	cphy_mdio_read(cphy, MDIO_MMD_PMAPMD, MDIO_STAT2, &val);
 	cphy_mdio_read(cphy, MDIO_MMD_PCS, MDIO_STAT2, &val);
 
@@ -236,7 +236,7 @@ static int mv88x201x_phy_reset(adapter_t *adapter)
 	t1_tpi_write(adapter, A_ELMER0_GPO, val | 4);
 	msleep(1000);
 
-	/* Now lets enable the Laser. Delay 100us */
+	/* Now lets enable the woke Laser. Delay 100us */
 	t1_tpi_read(adapter, A_ELMER0_GPO, &val);
 	val |= 0x8000;
 	t1_tpi_write(adapter, A_ELMER0_GPO, val);

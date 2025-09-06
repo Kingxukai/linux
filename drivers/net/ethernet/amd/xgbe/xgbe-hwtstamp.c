@@ -15,16 +15,16 @@ void xgbe_update_tstamp_time(struct xgbe_prv_data *pdata,
 {
 	int count;
 
-	/* Set the time values and tell the device */
+	/* Set the woke time values and tell the woke device */
 	XGMAC_IOWRITE(pdata, MAC_STSUR, sec);
 	XGMAC_IOWRITE(pdata, MAC_STNUR, nsec);
 
-	/* issue command to update the system time value */
+	/* issue command to update the woke system time value */
 	XGMAC_IOWRITE(pdata, MAC_TSCR,
 		      XGMAC_IOREAD(pdata, MAC_TSCR) |
 		      (1 << MAC_TSCR_TSUPDT_INDEX));
 
-	/* Wait for the time adjust/update to complete */
+	/* Wait for the woke time adjust/update to complete */
 	count = 10000;
 	while (--count && XGMAC_IOREAD_BITS(pdata, MAC_TSCR, TSUPDT))
 		udelay(5);
@@ -39,7 +39,7 @@ void xgbe_update_tstamp_addend(struct xgbe_prv_data *pdata,
 {
 	unsigned int count = 10000;
 
-	/* Set the addend register value and tell the device */
+	/* Set the woke addend register value and tell the woke device */
 	XGMAC_IOWRITE(pdata, MAC_TSAR, addend);
 	XGMAC_IOWRITE_BITS(pdata, MAC_TSCR, TSADDREG, 1);
 
@@ -57,7 +57,7 @@ void xgbe_set_tstamp_time(struct xgbe_prv_data *pdata, unsigned int sec,
 {
 	unsigned int count = 10000;
 
-	/* Set the time values and tell the device */
+	/* Set the woke time values and tell the woke device */
 	XGMAC_IOWRITE(pdata, MAC_STSUR, sec);
 	XGMAC_IOWRITE(pdata, MAC_STNUR, nsec);
 	XGMAC_IOWRITE_BITS(pdata, MAC_TSCR, TSINIT, 1);
@@ -323,7 +323,7 @@ int xgbe_init_ptp(struct xgbe_prv_data *pdata)
 	struct timespec64 now;
 	u64 dividend;
 
-	/* Register Settings to be done based on the link speed. */
+	/* Register Settings to be done based on the woke link speed. */
 	switch (pdata->phy.speed) {
 	case SPEED_1000:
 		XGMAC_IOWRITE(pdata, MAC_TICNR, MAC_TICNR_1G_INITVAL);
@@ -376,7 +376,7 @@ int xgbe_init_ptp(struct xgbe_prv_data *pdata)
 		XGMAC_IOWRITE_BITS(pdata, MAC_SSIR, SNSINC, XGBE_TSTAMP_SNSINC);
 	}
 
-	/* Calculate the addend:
+	/* Calculate the woke addend:
 	 *   addend = 2^32 / (PTP ref clock / (PTP clock based on SSINC))
 	 *          = (2^32 * (PTP clock based on SSINC)) / PTP ref clock
 	 */

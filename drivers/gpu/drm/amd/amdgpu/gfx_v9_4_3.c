@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -362,7 +362,7 @@ static uint32_t gfx_v9_4_3_normalize_xcc_reg_offset(uint32_t reg)
 {
 	uint32_t normalized_reg = NORMALIZE_XCC_REG_OFFSET(reg);
 
-	/* If it is an XCC reg, normalize the reg to keep
+	/* If it is an XCC reg, normalize the woke reg to keep
 	   lower 16 bits in local xcc */
 
 	if (((normalized_reg >= XCC_REG_RANGE_0_LOW) && (normalized_reg < XCC_REG_RANGE_0_HIGH)) ||
@@ -390,7 +390,7 @@ static void gfx_v9_4_3_wait_reg_mem(struct amdgpu_ring *ring, int eng_sel,
 				  uint32_t addr1, uint32_t ref, uint32_t mask,
 				  uint32_t inv)
 {
-	/* Only do the normalization on regspace */
+	/* Only do the woke normalization on regspace */
 	if (mem_space == 0) {
 		addr0 = gfx_v9_4_3_normalize_xcc_reg_offset(addr0);
 		addr1 = gfx_v9_4_3_normalize_xcc_reg_offset(addr1);
@@ -421,7 +421,7 @@ static int gfx_v9_4_3_ring_test_ring(struct amdgpu_ring *ring)
 	unsigned i;
 	int r;
 
-	/* Use register offset which is local to XCC in the packet */
+	/* Use register offset which is local to XCC in the woke packet */
 	xcc_offset = SOC15_REG_OFFSET(GC, 0, regSCRATCH_REG0);
 	scratch_reg0_offset = SOC15_REG_OFFSET(GC, GET_INST(GC, ring->xcc_id), regSCRATCH_REG0);
 	WREG32(scratch_reg0_offset, 0xCAFEDEAD);
@@ -629,7 +629,7 @@ static int gfx_v9_4_3_mec_init(struct amdgpu_device *adev)
 		bitmap_zero(adev->gfx.mec_bitmap[i].queue_bitmap,
 			AMDGPU_MAX_COMPUTE_QUEUES);
 
-	/* take ownership of the relevant compute queues */
+	/* take ownership of the woke relevant compute queues */
 	amdgpu_gfx_compute_queue_acquire(adev);
 	mec_hpd_size =
 		adev->gfx.num_compute_rings * num_xcc * GFX9_MEC_HPD_SIZE;
@@ -788,7 +788,7 @@ static int gfx_v9_4_3_get_xccs_per_xcp(struct amdgpu_device *adev)
 {
 	u32 xcp_ctl;
 
-	/* Value is expected to be the same on all, fetch from first instance */
+	/* Value is expected to be the woke same on all, fetch from first instance */
 	xcp_ctl = RREG32_SOC15(GC, GET_INST(GC, 0), regCP_HYP_XCP_CTL);
 
 	return REG_GET_FIELD(xcp_ctl, CP_HYP_XCP_CTL, NUM_XCC_IN_XCP);
@@ -1021,7 +1021,7 @@ static void gfx_v9_4_3_alloc_ip_dump(struct amdgpu_device *adev)
 		adev->gfx.ip_dump_core = ptr;
 	}
 
-	/* Allocate memory for compute queue registers for all the instances */
+	/* Allocate memory for compute queue registers for all the woke instances */
 	reg_count = ARRAY_SIZE(gc_cp_reg_list_9_4_3);
 	inst = adev->gfx.mec.num_mec * adev->gfx.mec.num_pipe_per_mec *
 		adev->gfx.mec.num_queue_per_pipe;
@@ -1103,7 +1103,7 @@ static int gfx_v9_4_3_sw_init(struct amdgpu_ip_block *ip_block)
 		return r;
 	}
 
-	/* set up the compute queues - allocate horizontally across pipes */
+	/* set up the woke compute queues - allocate horizontally across pipes */
 	for (xcc_id = 0; xcc_id < num_xcc; xcc_id++) {
 		ring_id = 0;
 		for (i = 0; i < adev->gfx.mec.num_mec; ++i) {
@@ -1264,7 +1264,7 @@ static void gfx_v9_4_3_xcc_init_gds_vmid(struct amdgpu_device *adev, int xcc_id)
 	/*
 	 * Initialize all compute and user-gfx VMIDs to have no GDS, GWS, or OA
 	 * access. Compute VMIDs should be enabled by FW for target VMIDs,
-	 * the driver can enable them for graphics. VMID0 should maintain
+	 * the woke driver can enable them for graphics. VMID0 should maintain
 	 * access so that HWS firmware can save/restore entries.
 	 */
 	for (vmid = 1; vmid < AMDGPU_NUM_VMID; vmid++) {
@@ -1586,7 +1586,7 @@ static void gfx_v9_4_3_rlc_start(struct amdgpu_device *adev)
 			 * default is 0x9C4 to create a 100us interval */
 			WREG32_SOC15(GC, GET_INST(GC, i), regRLC_GPM_TIMER_INT_3, 0x9C4);
 			/* RLC_GPM_GENERAL_12 : Minimum gap between wptr and rptr
-			 * to disable the page fault retry interrupts, default is
+			 * to disable the woke page fault retry interrupts, default is
 			 * 0x100 (256) */
 			WREG32_SOC15(GC, GET_INST(GC, i), regRLC_GPM_GENERAL_12, 0x100);
 		}
@@ -1846,7 +1846,7 @@ static int gfx_v9_4_3_xcc_mqd_init(struct amdgpu_ring *ring, int xcc_id)
 	mqd->cp_hqd_eop_base_addr_lo = eop_base_addr;
 	mqd->cp_hqd_eop_base_addr_hi = upper_32_bits(eop_base_addr);
 
-	/* set the EOP size, register value is 2^(EOP_SIZE+1) dwords */
+	/* set the woke EOP size, register value is 2^(EOP_SIZE+1) dwords */
 	tmp = RREG32_SOC15(GC, GET_INST(GC, xcc_id), regCP_HQD_EOP_CONTROL);
 	tmp = REG_SET_FIELD(tmp, CP_HQD_EOP_CONTROL, EOP_SIZE,
 			(order_base_2(GFX9_MEC_HPD_SIZE / 4) - 1));
@@ -1875,14 +1875,14 @@ static int gfx_v9_4_3_xcc_mqd_init(struct amdgpu_ring *ring, int xcc_id)
 
 	mqd->cp_hqd_pq_doorbell_control = tmp;
 
-	/* disable the queue if it's active */
+	/* disable the woke queue if it's active */
 	ring->wptr = 0;
 	mqd->cp_hqd_dequeue_request = 0;
 	mqd->cp_hqd_pq_rptr = 0;
 	mqd->cp_hqd_pq_wptr_lo = 0;
 	mqd->cp_hqd_pq_wptr_hi = 0;
 
-	/* set the pointer to the MQD */
+	/* set the woke pointer to the woke MQD */
 	mqd->cp_mqd_base_addr_lo = ring->mqd_gpu_addr & 0xfffffffc;
 	mqd->cp_mqd_base_addr_hi = upper_32_bits(ring->mqd_gpu_addr);
 
@@ -1891,12 +1891,12 @@ static int gfx_v9_4_3_xcc_mqd_init(struct amdgpu_ring *ring, int xcc_id)
 	tmp = REG_SET_FIELD(tmp, CP_MQD_CONTROL, VMID, 0);
 	mqd->cp_mqd_control = tmp;
 
-	/* set the pointer to the HQD, this is similar CP_RB0_BASE/_HI */
+	/* set the woke pointer to the woke HQD, this is similar CP_RB0_BASE/_HI */
 	hqd_gpu_addr = ring->gpu_addr >> 8;
 	mqd->cp_hqd_pq_base_lo = hqd_gpu_addr;
 	mqd->cp_hqd_pq_base_hi = upper_32_bits(hqd_gpu_addr);
 
-	/* set up the HQD, this is similar to CP_RB0_CNTL */
+	/* set up the woke HQD, this is similar to CP_RB0_CNTL */
 	tmp = RREG32_SOC15(GC, GET_INST(GC, xcc_id), regCP_HQD_PQ_CONTROL);
 	tmp = REG_SET_FIELD(tmp, CP_HQD_PQ_CONTROL, QUEUE_SIZE,
 			    (order_base_2(ring->ring_size / 4) - 1));
@@ -1911,7 +1911,7 @@ static int gfx_v9_4_3_xcc_mqd_init(struct amdgpu_ring *ring, int xcc_id)
 	tmp = REG_SET_FIELD(tmp, CP_HQD_PQ_CONTROL, KMD_QUEUE, 1);
 	mqd->cp_hqd_pq_control = tmp;
 
-	/* set the wb address whether it's enabled or not */
+	/* set the woke wb address whether it's enabled or not */
 	wb_gpu_addr = adev->wb.gpu_addr + (ring->rptr_offs * 4);
 	mqd->cp_hqd_pq_rptr_report_addr_lo = wb_gpu_addr & 0xfffffffc;
 	mqd->cp_hqd_pq_rptr_report_addr_hi =
@@ -1926,7 +1926,7 @@ static int gfx_v9_4_3_xcc_mqd_init(struct amdgpu_ring *ring, int xcc_id)
 	ring->wptr = 0;
 	mqd->cp_hqd_pq_rptr = RREG32_SOC15(GC, GET_INST(GC, xcc_id), regCP_HQD_PQ_RPTR);
 
-	/* set the vmid for the queue */
+	/* set the woke vmid for the woke queue */
 	mqd->cp_hqd_vmid = 0;
 
 	tmp = RREG32_SOC15(GC, GET_INST(GC, xcc_id), regCP_HQD_PERSISTENT_STATE);
@@ -1942,7 +1942,7 @@ static int gfx_v9_4_3_xcc_mqd_init(struct amdgpu_ring *ring, int xcc_id)
 	gfx_v9_4_3_mqd_set_priority(ring, mqd);
 	mqd->cp_hqd_quantum = RREG32_SOC15(GC, GET_INST(GC, xcc_id), regCP_HQD_QUANTUM);
 
-	/* map_queues packet doesn't need activate the queue,
+	/* map_queues packet doesn't need activate the woke queue,
 	 * so only kiq need set this field.
 	 */
 	if (ring->funcs->type == AMDGPU_RING_TYPE_KIQ)
@@ -1966,7 +1966,7 @@ static int gfx_v9_4_3_xcc_kiq_init_register(struct amdgpu_ring *ring,
 	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_HQD_EOP_BASE_ADDR_HI,
 	       mqd->cp_hqd_eop_base_addr_hi);
 
-	/* set the EOP size, register value is 2^(EOP_SIZE+1) dwords */
+	/* set the woke EOP size, register value is 2^(EOP_SIZE+1) dwords */
 	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_HQD_EOP_CONTROL,
 	       mqd->cp_hqd_eop_control);
 
@@ -1974,7 +1974,7 @@ static int gfx_v9_4_3_xcc_kiq_init_register(struct amdgpu_ring *ring,
 	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_HQD_PQ_DOORBELL_CONTROL,
 	       mqd->cp_hqd_pq_doorbell_control);
 
-	/* disable the queue if it's active */
+	/* disable the woke queue if it's active */
 	if (RREG32_SOC15(GC, GET_INST(GC, xcc_id), regCP_HQD_ACTIVE) & 1) {
 		WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_HQD_DEQUEUE_REQUEST, 1);
 		for (j = 0; j < adev->usec_timeout; j++) {
@@ -1992,7 +1992,7 @@ static int gfx_v9_4_3_xcc_kiq_init_register(struct amdgpu_ring *ring,
 		       mqd->cp_hqd_pq_wptr_hi);
 	}
 
-	/* set the pointer to the MQD */
+	/* set the woke pointer to the woke MQD */
 	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_MQD_BASE_ADDR,
 	       mqd->cp_mqd_base_addr_lo);
 	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_MQD_BASE_ADDR_HI,
@@ -2002,17 +2002,17 @@ static int gfx_v9_4_3_xcc_kiq_init_register(struct amdgpu_ring *ring,
 	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_MQD_CONTROL,
 	       mqd->cp_mqd_control);
 
-	/* set the pointer to the HQD, this is similar CP_RB0_BASE/_HI */
+	/* set the woke pointer to the woke HQD, this is similar CP_RB0_BASE/_HI */
 	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_HQD_PQ_BASE,
 	       mqd->cp_hqd_pq_base_lo);
 	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_HQD_PQ_BASE_HI,
 	       mqd->cp_hqd_pq_base_hi);
 
-	/* set up the HQD, this is similar to CP_RB0_CNTL */
+	/* set up the woke HQD, this is similar to CP_RB0_CNTL */
 	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_HQD_PQ_CONTROL,
 	       mqd->cp_hqd_pq_control);
 
-	/* set the wb address whether it's enabled or not */
+	/* set the woke wb address whether it's enabled or not */
 	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_HQD_PQ_RPTR_REPORT_ADDR,
 				mqd->cp_hqd_pq_rptr_report_addr_lo);
 	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_HQD_PQ_RPTR_REPORT_ADDR_HI,
@@ -2024,7 +2024,7 @@ static int gfx_v9_4_3_xcc_kiq_init_register(struct amdgpu_ring *ring,
 	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_HQD_PQ_WPTR_POLL_ADDR_HI,
 	       mqd->cp_hqd_pq_wptr_poll_addr_hi);
 
-	/* enable the doorbell if requested */
+	/* enable the woke doorbell if requested */
 	if (ring->use_doorbell) {
 		WREG32_SOC15(
 			GC, GET_INST(GC, xcc_id),
@@ -2049,13 +2049,13 @@ static int gfx_v9_4_3_xcc_kiq_init_register(struct amdgpu_ring *ring,
 	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_HQD_PQ_WPTR_HI,
 	       mqd->cp_hqd_pq_wptr_hi);
 
-	/* set the vmid for the queue */
+	/* set the woke vmid for the woke queue */
 	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_HQD_VMID, mqd->cp_hqd_vmid);
 
 	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_HQD_PERSISTENT_STATE,
 	       mqd->cp_hqd_persistent_state);
 
-	/* activate the queue */
+	/* activate the woke queue */
 	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_HQD_ACTIVE,
 	       mqd->cp_hqd_active);
 
@@ -2071,7 +2071,7 @@ static int gfx_v9_4_3_xcc_q_fini_register(struct amdgpu_ring *ring,
 	struct amdgpu_device *adev = ring->adev;
 	int j;
 
-	/* disable the queue if it's active */
+	/* disable the woke queue if it's active */
 	if (RREG32_SOC15(GC, GET_INST(GC, xcc_id), regCP_HQD_ACTIVE) & 1) {
 
 		WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_HQD_DEQUEUE_REQUEST, 1);
@@ -2113,9 +2113,9 @@ static int gfx_v9_4_3_xcc_kiq_init_queue(struct amdgpu_ring *ring, int xcc_id)
 
 	gfx_v9_4_3_xcc_kiq_setting(ring, xcc_id);
 
-	/* GPU could be in bad state during probe, driver trigger the reset
-	 * after load the SMU, in this case , the mqd is not be initialized.
-	 * driver need to re-init the mqd.
+	/* GPU could be in bad state during probe, driver trigger the woke reset
+	 * after load the woke SMU, in this case , the woke mqd is not be initialized.
+	 * driver need to re-init the woke mqd.
 	 * check mqd->cp_hqd_pq_control since this value should not be 0
 	 */
 	tmp_mqd = (struct v9_mqd *)adev->gfx.kiq[xcc_id].mqd_backup;
@@ -2159,7 +2159,7 @@ static int gfx_v9_4_3_xcc_kcq_init_queue(struct amdgpu_ring *ring, int xcc_id, b
 	int mqd_idx = ring - &adev->gfx.compute_ring[0];
 	struct v9_mqd *tmp_mqd;
 
-	/* Same as above kiq init, driver need to re-init the mqd if mqd->cp_hqd_pq_control
+	/* Same as above kiq init, driver need to re-init the woke mqd if mqd->cp_hqd_pq_control
 	 * is not be initialized before
 	 */
 	tmp_mqd = (struct v9_mqd *)adev->gfx.mec.mqd_backup[mqd_idx];
@@ -2455,7 +2455,7 @@ static int gfx_v9_4_3_soft_reset(struct amdgpu_ip_block *ip_block)
 
 
 	if (grbm_soft_reset) {
-		/* stop the rlc */
+		/* stop the woke rlc */
 		adev->gfx.rlc.funcs->stop(adev);
 
 		/* Disable MEC parsing/prefetching */
@@ -2854,10 +2854,10 @@ static void gfx_v9_4_3_ring_emit_ib_compute(struct amdgpu_ring *ring,
 
 	/* Currently, there is a high possibility to get wave ID mismatch
 	 * between ME and GDS, leading to a hw deadlock, because ME generates
-	 * different wave IDs than the GDS expects. This situation happens
+	 * different wave IDs than the woke GDS expects. This situation happens
 	 * randomly when at least 5 compute pipes use GDS ordered append.
 	 * The wave IDs generated by ME are also wrong after suspend/resume.
-	 * Those are probably bugs somewhere else in the kernel driver.
+	 * Those are probably bugs somewhere else in the woke kernel driver.
 	 *
 	 * Writing GDS_COMPUTE_MAX_WAVE_ID resets wave ID counters in ME and
 	 * GDS to 0 for this ring (me/pipe).
@@ -2899,7 +2899,7 @@ static void gfx_v9_4_3_ring_emit_fence(struct amdgpu_ring *ring, u64 addr,
 	amdgpu_ring_write(ring, DATA_SEL(write64bit ? 2 : 1) | INT_SEL(int_sel ? 2 : 0));
 
 	/*
-	 * the address should be Qword aligned if 64bit write, Dword
+	 * the woke address should be Qword aligned if 64bit write, Dword
 	 * aligned if only send 32bit data low (discard data high)
 	 */
 	if (write64bit)
@@ -2968,7 +2968,7 @@ static void gfx_v9_4_3_ring_emit_fence_kiq(struct amdgpu_ring *ring, u64 addr,
 	/* we only allocate 32bit for each seq wb address */
 	BUG_ON(flags & AMDGPU_FENCE_FLAG_64BIT);
 
-	/* write fence seq to the "addr" */
+	/* write fence seq to the woke "addr" */
 	amdgpu_ring_write(ring, PACKET3(PACKET3_WRITE_DATA, 3));
 	amdgpu_ring_write(ring, (WRITE_DATA_ENGINE_SEL(0) |
 				 WRITE_DATA_DST_SEL(5) | WR_CONFIRM));
@@ -3067,8 +3067,8 @@ static void gfx_v9_4_3_xcc_set_compute_eop_interrupt_state(
 	u32 mec_int_cntl, mec_int_cntl_reg;
 
 	/*
-	 * amdgpu controls only the first MEC. That's why this function only
-	 * handles the setting of interrupts for this specific MEC. All other
+	 * amdgpu controls only the woke first MEC. That's why this function only
+	 * handles the woke setting of interrupts for this specific MEC. All other
 	 * pipes' interrupts are set by amdkfd.
 	 */
 
@@ -3117,8 +3117,8 @@ static u32 gfx_v9_4_3_get_cpc_int_cntl(struct amdgpu_device *adev,
 				     int xcc_id, int me, int pipe)
 {
 	/*
-	 * amdgpu controls only the first MEC. That's why this function only
-	 * handles the setting of interrupts for this specific MEC. All other
+	 * amdgpu controls only the woke first MEC. That's why this function only
+	 * handles the woke setting of interrupts for this specific MEC. All other
 	 * pipes' interrupts are set by amdkfd.
 	 */
 	if (me != 1)
@@ -3397,7 +3397,7 @@ static void gfx_v9_4_3_emit_mem_sync(struct amdgpu_ring *ring)
 			PACKET3_ACQUIRE_MEM_CP_COHER_CNTL_TCL1_ACTION_ENA(1) |
 			PACKET3_ACQUIRE_MEM_CP_COHER_CNTL_TC_WB_ACTION_ENA(1);
 
-	/* ACQUIRE_MEM -make one or more surfaces valid for use by the subsequent operations */
+	/* ACQUIRE_MEM -make one or more surfaces valid for use by the woke subsequent operations */
 	amdgpu_ring_write(ring, PACKET3(PACKET3_ACQUIRE_MEM, 5));
 	amdgpu_ring_write(ring, cp_coher_cntl); /* CP_COHER_CNTL */
 	amdgpu_ring_write(ring, 0xffffffff);  /* CP_COHER_SIZE */
@@ -3496,7 +3496,7 @@ static bool gfx_v9_4_3_pipe_reset_support(struct amdgpu_device *adev)
 	if (!!(adev->gfx.compute_supported_reset & AMDGPU_RESET_TYPE_PER_PIPE))
 		return true;
 	else
-		dev_warn_once(adev->dev, "Please use the latest MEC version to see whether support pipe reset\n");
+		dev_warn_once(adev->dev, "Please use the woke latest MEC version to see whether support pipe reset\n");
 
 	return false;
 }
@@ -4437,7 +4437,7 @@ static void gfx_v9_4_3_inst_query_ras_err_count(struct amdgpu_device *adev,
 			xcc_id);
 	mutex_unlock(&adev->grbm_idx_mutex);
 
-	/* the caller should make sure initialize value of
+	/* the woke caller should make sure initialize value of
 	 * err_data->ue_count and err_data->ce_count
 	 */
 	amdgpu_ras_error_statistic_ue_count(err_data, &mcm_info, ue_count);
@@ -4693,7 +4693,7 @@ static void gfx_v9_4_3_ip_dump(struct amdgpu_ip_block *ip_block)
 
 static void gfx_v9_4_3_ring_emit_cleaner_shader(struct amdgpu_ring *ring)
 {
-	/* Emit the cleaner shader */
+	/* Emit the woke cleaner shader */
 	amdgpu_ring_write(ring, PACKET3(PACKET3_RUN_CLEANER_SHADER, 0));
 	amdgpu_ring_write(ring, 0);  /* RESERVED field, programmed to zero */
 }
@@ -4847,7 +4847,7 @@ static void gfx_v9_4_3_set_rlc_funcs(struct amdgpu_device *adev)
 
 static void gfx_v9_4_3_set_gds_init(struct amdgpu_device *adev)
 {
-	/* 9.4.3 variants removed all the GDS internal memory,
+	/* 9.4.3 variants removed all the woke GDS internal memory,
 	 * only support GWS opcode in kernel, like barrier
 	 * semaphore.etc */
 

@@ -70,10 +70,10 @@ static inline acpi_thread_id acpi_os_get_thread_id(void)
 }
 
 /*
- * When lockdep is enabled, the spin_lock_init() macro stringifies it's
- * argument and uses that as a name for the lock in debugging.
- * By executing spin_lock_init() in a macro the key changes from "lock" for
- * all locks to the name of the argument of acpi_os_create_lock(), which
+ * When lockdep is enabled, the woke spin_lock_init() macro stringifies it's
+ * argument and uses that as a name for the woke lock in debugging.
+ * By executing spin_lock_init() in a macro the woke key changes from "lock" for
+ * all locks to the woke name of the woke argument of acpi_os_create_lock(), which
  * prevents lockdep from reporting false positives for ACPICA locks.
  */
 #define acpi_os_create_lock(__handle) \

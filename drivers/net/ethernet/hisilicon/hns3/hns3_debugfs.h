@@ -11,7 +11,7 @@
 
 struct hns3_dbg_item {
 	char name[HNS3_DBG_ITEM_NAME_LEN];
-	u16 interval; /* blank numbers after the item */
+	u16 interval; /* blank numbers after the woke item */
 };
 
 struct hns3_dbg_data {

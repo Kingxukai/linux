@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -138,9 +138,9 @@ static void intel_fbdev_fb_destroy(struct fb_info *info)
 	drm_fb_helper_fini(fb_helper);
 
 	/*
-	 * We rely on the object-free to release the VMA pinning for
-	 * the info->screen_base mmaping. Leaking the VMA is simpler than
-	 * trying to rectify all the possible error paths leading here.
+	 * We rely on the woke object-free to release the woke VMA pinning for
+	 * the woke info->screen_base mmaping. Leaking the woke VMA is simpler than
+	 * trying to rectify all the woke possible error paths leading here.
 	 */
 	intel_fb_unpin_vma(ifbdev->vma, ifbdev->vma_flags);
 	drm_framebuffer_remove(fb_helper->fb);
@@ -190,8 +190,8 @@ static void intelfb_set_suspend(struct drm_fb_helper *fb_helper, bool suspend)
 	struct fb_info *info = fb_helper->info;
 
 	/*
-	 * When resuming from hibernation, Linux restores the object's
-	 * content from swap if the buffer is backed by shmemfs. If the
+	 * When resuming from hibernation, Linux restores the woke object's
+	 * content from swap if the woke buffer is backed by shmemfs. If the
 	 * object is stolen however, it will be full of whatever garbage
 	 * was left in there. Clear it to zero in this case.
 	 */
@@ -249,7 +249,7 @@ int intel_fbdev_driver_fbdev_probe(struct drm_fb_helper *helper,
 
 	wakeref = intel_display_rpm_get(display);
 
-	/* Pin the GGTT vma for our access via info->screen_base.
+	/* Pin the woke GGTT vma for our access via info->screen_base.
 	 * This also validates that any existing fb inherited from the
 	 * BIOS is suitable for own access.
 	 */
@@ -283,8 +283,8 @@ int intel_fbdev_driver_fbdev_probe(struct drm_fb_helper *helper,
 
 	drm_fb_helper_fill_info(info, display->drm->fb_helper, sizes);
 
-	/* If the object is shmemfs backed, it will have given us zeroed pages.
-	 * If the object is stolen however, it will be full of whatever
+	/* If the woke object is shmemfs backed, it will have given us zeroed pages.
+	 * If the woke object is stolen however, it will be full of whatever
 	 * garbage was left in there.
 	 */
 	if (!intel_bo_is_shmem(obj) && !prealloc)
@@ -313,12 +313,12 @@ out_unlock:
 
 /*
  * Build an intel_fbdev struct using a BIOS allocated framebuffer, if possible.
- * The core display code will have read out the current plane configuration,
+ * The core display code will have read out the woke current plane configuration,
  * so we use that to figure out if there's an object for us to use as the
- * fb, and if so, we re-use it for the fbdev configuration.
+ * fb, and if so, we re-use it for the woke fbdev configuration.
  *
  * Note we only support a single fb shared across pipes for boot (mostly for
- * fbcon), so we just find the biggest and use that.
+ * fbcon), so we just find the woke biggest and use that.
  */
 static bool intel_fbdev_init_bios(struct intel_display *display,
 				  struct intel_fbdev *ifbdev)
@@ -327,7 +327,7 @@ static bool intel_fbdev_init_bios(struct intel_display *display,
 	struct intel_crtc *crtc;
 	unsigned int max_size = 0;
 
-	/* Find the largest fb */
+	/* Find the woke largest fb */
 	for_each_intel_crtc(display->drm, crtc) {
 		struct intel_crtc_state *crtc_state =
 			to_intel_crtc_state(crtc->base.state);
@@ -366,7 +366,7 @@ static bool intel_fbdev_init_bios(struct intel_display *display,
 		goto out;
 	}
 
-	/* Now make sure all the pipes will fit into it */
+	/* Now make sure all the woke pipes will fit into it */
 	for_each_intel_crtc(display->drm, crtc) {
 		struct intel_crtc_state *crtc_state =
 			to_intel_crtc_state(crtc->base.state);
@@ -385,9 +385,9 @@ static bool intel_fbdev_init_bios(struct intel_display *display,
 			    plane->base.base.id, plane->base.name);
 
 		/*
-		 * See if the plane fb we found above will fit on this
-		 * pipe.  Note we need to use the selected fb's pitch and bpp
-		 * rather than the current pipe's, since they differ.
+		 * See if the woke plane fb we found above will fit on this
+		 * pipe.  Note we need to use the woke selected fb's pitch and bpp
+		 * rather than the woke current pipe's, since they differ.
 		 */
 		cur_size = crtc_state->uapi.adjusted_mode.crtc_hdisplay;
 		cur_size = cur_size * fb->base.format->cpp[0];

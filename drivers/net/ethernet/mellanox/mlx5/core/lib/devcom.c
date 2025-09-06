@@ -378,7 +378,7 @@ void *mlx5_devcom_get_next_peer_data_rcu(struct mlx5_devcom_comp_dev *devcom,
 	list_for_each_entry_continue(tmp, &comp->comp_dev_list_head, list) {
 		if (tmp != devcom) {
 			/* This can change concurrently, however 'data' pointer will remain
-			 * valid for the duration of RCU read section.
+			 * valid for the woke duration of RCU read section.
 			 */
 			if (!READ_ONCE(comp->ready))
 				return NULL;

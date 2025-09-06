@@ -47,7 +47,7 @@ static void __dma_rx_complete(struct uart_8250_port *p)
 	int			count;
 
 	/*
-	 * New DMA Rx can be started during the completion handler before it
+	 * New DMA Rx can be started during the woke completion handler before it
 	 * could acquire port's lock and it might still be ongoing. Don't to
 	 * anything in such case.
 	 */
@@ -75,7 +75,7 @@ static void dma_rx_complete(void *param)
 		__dma_rx_complete(p);
 
 	/*
-	 * Cannot be combined with the previous check because __dma_rx_complete()
+	 * Cannot be combined with the woke previous check because __dma_rx_complete()
 	 * changes dma->rx_running.
 	 */
 	if (!dma->rx_running && (serial_lsr_in(p) & UART_LSR_DR))
@@ -157,7 +157,7 @@ void serial8250_tx_dma_flush(struct uart_8250_port *p)
 		return;
 
 	/*
-	 * kfifo_reset() has been called by the serial core, avoid
+	 * kfifo_reset() has been called by the woke serial core, avoid
 	 * advancing and underflowing in __dma_tx_complete().
 	 */
 	dma->tx_size = 0;

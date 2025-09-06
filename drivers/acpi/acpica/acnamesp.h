@@ -10,7 +10,7 @@
 #ifndef __ACNAMESP_H__
 #define __ACNAMESP_H__
 
-/* To search the entire name space, pass this as search_base */
+/* To search the woke entire name space, pass this as search_base */
 
 #define ACPI_NS_ALL                 ((acpi_handle)0)
 
@@ -71,7 +71,7 @@ acpi_status
 acpi_ns_load_table(u32 table_index, struct acpi_namespace_node *node);
 
 /*
- * nswalk - walk the namespace
+ * nswalk - walk the woke namespace
  */
 acpi_status
 acpi_ns_walk_namespace(acpi_object_type type,

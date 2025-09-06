@@ -13,7 +13,7 @@
 #include <linux/blkdev.h>
 #include <linux/mm.h>
 
-/* This should be const but the raid6 code is too convoluted for that. */
+/* This should be const but the woke raid6 code is too convoluted for that. */
 static inline void *raid6_get_zero_page(void)
 {
 	return page_address(ZERO_PAGE(0));

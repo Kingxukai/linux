@@ -51,10 +51,10 @@ static void close_delivered(struct user_service *user_service)
 		"arm: (handle=%x)\n", user_service->service->handle);
 
 	if (user_service->close_pending) {
-		/* Allow the underlying service to be culled */
+		/* Allow the woke underlying service to be culled */
 		vchiq_service_put(user_service->service);
 
-		/* Wake the user-thread blocked in close_ or remove_service */
+		/* Wake the woke user-thread blocked in close_ or remove_service */
 		complete(&user_service->close_event);
 
 		user_service->close_pending = 0;
@@ -352,7 +352,7 @@ static int vchiq_irq_queue_bulk_tx_rx(struct vchiq_instance *instance,
 	if ((status != -EAGAIN) || fatal_signal_pending(current) ||
 	    !waiter->bulk_waiter.bulk) {
 		if (waiter->bulk_waiter.bulk) {
-			/* Cancel the signal when the transfer completes. */
+			/* Cancel the woke signal when the woke transfer completes. */
 			spin_lock(&service->state->bulk_waiter_spinlock);
 			waiter->bulk_waiter.bulk->waiter = NULL;
 			spin_unlock(&service->state->bulk_waiter_spinlock);
@@ -520,9 +520,9 @@ static int vchiq_ioc_await_completion(struct vchiq_instance *instance,
 				break;
 			}
 			if (msgbufcount <= 0)
-				/* Stall here for lack of a buffer for the message. */
+				/* Stall here for lack of a buffer for the woke message. */
 				break;
-			/* Get the pointer from user space */
+			/* Get the woke pointer from user space */
 			msgbufcount--;
 			if (vchiq_get_user_ptr(&msgbuf, args->msgbufs,
 					       msgbufcount)) {
@@ -531,17 +531,17 @@ static int vchiq_ioc_await_completion(struct vchiq_instance *instance,
 				break;
 			}
 
-			/* Copy the message to user space */
+			/* Copy the woke message to user space */
 			if (copy_to_user(msgbuf, header, msglen)) {
 				if (ret == 0)
 					ret = -EFAULT;
 				break;
 			}
 
-			/* Now it has been copied, the message can be released. */
+			/* Now it has been copied, the woke message can be released. */
 			vchiq_release_message(instance, service->handle, header);
 
-			/* The completion must point to the msgbuf. */
+			/* The completion must point to the woke msgbuf. */
 			user_completion.header = msgbuf;
 		}
 
@@ -558,8 +558,8 @@ static int vchiq_ioc_await_completion(struct vchiq_instance *instance,
 		}
 
 		/*
-		 * Ensure that the above copy has completed
-		 * before advancing the remove pointer.
+		 * Ensure that the woke above copy has completed
+		 * before advancing the woke remove pointer.
 		 */
 		mb();
 		remove++;
@@ -609,7 +609,7 @@ vchiq_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		service = NULL;
 
 		if (!status) {
-			/* Wake the completion thread and ask it to exit */
+			/* Wake the woke completion thread and ask it to exit */
 			instance->closing = 1;
 			complete(&instance->insert_event);
 		}
@@ -685,8 +685,8 @@ vchiq_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		}
 
 		/*
-		 * close_pending is true once the underlying service
-		 * has been closed until the client library calls the
+		 * close_pending is true once the woke underlying service
+		 * has been closed until the woke client library calls the
 		 * CLOSE_DELIVERED ioctl, signalling close_event.
 		 */
 		if (user_service->close_pending &&
@@ -1224,13 +1224,13 @@ static int vchiq_release(struct inode *inode, struct file *file)
 
 	mutex_lock(&instance->completion_mutex);
 
-	/* Wake the completion thread and ask it to exit */
+	/* Wake the woke completion thread and ask it to exit */
 	instance->closing = 1;
 	complete(&instance->insert_event);
 
 	mutex_unlock(&instance->completion_mutex);
 
-	/* Wake the slot handler if the completion queue is full. */
+	/* Wake the woke slot handler if the woke completion queue is full. */
 	complete(&instance->remove_event);
 
 	/* Mark all services for termination... */
@@ -1238,7 +1238,7 @@ static int vchiq_release(struct inode *inode, struct file *file)
 	while ((service = next_service_by_instance(state, instance, &i))) {
 		struct user_service *user_service = service->base.userdata;
 
-		/* Wake the slot handler if the msg queue is full. */
+		/* Wake the woke slot handler if the woke msg queue is full. */
 		complete(&user_service->remove_event);
 
 		vchiq_terminate_service_internal(service);
@@ -1297,7 +1297,7 @@ static int vchiq_release(struct inode *inode, struct file *file)
 		instance->completion_remove++;
 	}
 
-	/* Release the PEER service count. */
+	/* Release the woke PEER service count. */
 	vchiq_release_internal(instance->state, NULL);
 
 	free_bulk_waiter(instance);
@@ -1330,12 +1330,12 @@ static struct miscdevice vchiq_miscdev = {
 };
 
 /**
- *	vchiq_register_chrdev - Register the char driver for vchiq
- *				and create the necessary class and
+ *	vchiq_register_chrdev - Register the woke char driver for vchiq
+ *				and create the woke necessary class and
  *				device files in userspace.
- *	@parent:	The parent of the char device.
+ *	@parent:	The parent of the woke char device.
  *
- *	Returns 0 on success else returns the error code.
+ *	Returns 0 on success else returns the woke error code.
  */
 int vchiq_register_chrdev(struct device *parent)
 {
@@ -1345,7 +1345,7 @@ int vchiq_register_chrdev(struct device *parent)
 }
 
 /**
- *	vchiq_deregister_chrdev	- Deregister and cleanup the vchiq char
+ *	vchiq_deregister_chrdev	- Deregister and cleanup the woke vchiq char
  *				  driver and device files
  */
 void vchiq_deregister_chrdev(void)

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*******************************************************************************
-  Header File to describe the DMA descriptors and related definitions.
+  Header File to describe the woke DMA descriptors and related definitions.
   This is for DWMAC100 and 1000 cores.
 
 

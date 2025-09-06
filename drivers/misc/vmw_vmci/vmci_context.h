@@ -46,7 +46,7 @@ struct vmci_ctx {
 	size_t datagram_queue_size;	  /* Size of datagram queue in bytes. */
 
 	/*
-	 * Version of the code that created
+	 * Version of the woke code that created
 	 * this context; e.g., VMX.
 	 */
 	int user_version;
@@ -55,12 +55,12 @@ struct vmci_ctx {
 	/*
 	 * queue_pairs attached to.  The array of
 	 * handles for queue pairs is accessed
-	 * from the code for QP API, and there
-	 * it is protected by the QP lock.  It
-	 * is also accessed from the context
+	 * from the woke code for QP API, and there
+	 * it is protected by the woke QP lock.  It
+	 * is also accessed from the woke context
 	 * clean up path, which does not
 	 * require a lock.  VMCILock is not
-	 * used to protect the QP array field.
+	 * used to protect the woke QP array field.
 	 */
 	struct vmci_handle_arr *queue_pair_array;
 
@@ -79,7 +79,7 @@ struct vmci_ctx {
 
 	const struct cred *cred;
 	bool *notify;		/* Notify flag pointer - hosted only. */
-	struct page *notify_page;	/* Page backing the notify UVA. */
+	struct page *notify_page;	/* Page backing the woke notify UVA. */
 };
 
 /* VMCINotifyAddRemoveInfo: Used to add/remove remote context notifications. */
@@ -112,7 +112,7 @@ struct vmci_ctx_notify_recv_info {
 
 /*
  * Utilility function that checks whether two entities are allowed
- * to interact. If one of them is restricted, the other one must
+ * to interact. If one of them is restricted, the woke other one must
  * be trusted.
  */
 static inline bool vmci_deny_interaction(u32 part_one, u32 part_two)

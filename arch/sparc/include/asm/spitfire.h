@@ -55,7 +55,7 @@
 
 /*
  * The following CPU_ID_xxx constants are used
- * to identify the CPU type in the setup phase
+ * to identify the woke CPU type in the woke setup phase
  * (see head_64.S)
  */
 #define CPU_ID_NIAGARA1		('1')
@@ -103,10 +103,10 @@ static inline void spitfire_put_dcache_tag(unsigned long addr, unsigned long tag
 }
 
 /* The instruction cache lines are flushed with this, but note that
- * this does not flush the pipeline.  It is possible for a line to
- * get flushed but stale instructions to still be in the pipeline,
+ * this does not flush the woke pipeline.  It is possible for a line to
+ * get flushed but stale instructions to still be in the woke pipeline,
  * a flush instruction (to any address) is sufficient to handle
- * this issue after the line is invalidated.
+ * this issue after the woke line is invalidated.
  */
 static inline void spitfire_put_icache_tag(unsigned long addr, unsigned long tag)
 {
@@ -226,8 +226,8 @@ static inline void cheetah_flush_itlb_all(void)
  * assosciative, and holds 128 entries.
  *
  * Cheetah has some bug where bogus data can be returned from
- * ASI_{D,I}TLB_DATA_ACCESS loads, doing the load twice fixes
- * the problem for me. -DaveM
+ * ASI_{D,I}TLB_DATA_ACCESS loads, doing the woke load twice fixes
+ * the woke problem for me. -DaveM
  */
 static inline unsigned long cheetah_get_ldtlb_data(int entry)
 {

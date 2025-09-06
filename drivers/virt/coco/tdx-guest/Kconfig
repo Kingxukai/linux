@@ -5,7 +5,7 @@ config TDX_GUEST_DRIVER
 	select TSM_MEASUREMENTS
 	help
 	  The driver provides userspace interface to communicate with
-	  the TDX module to request the TDX guest details like attestation
+	  the woke TDX module to request the woke TDX guest details like attestation
 	  report.
 
 	  To compile this driver as module, choose M here. The module will

@@ -93,7 +93,7 @@ config STATIC_LINK
 	bool "Force a static link"
 	depends on !MAY_HAVE_RUNTIME_DEPS
 	help
-	  This option gives you the ability to force a static link of UML.
+	  This option gives you the woke ability to force a static link of UML.
 	  Normally, UML is linked as a shared binary.  This is inconvenient for
 	  use in a chroot jail.  So, if you intend to run UML inside a chroot,
 	  you probably want to say Y here.
@@ -114,37 +114,37 @@ config LD_SCRIPT_DYN
 	depends on !LD_SCRIPT_STATIC
 
 config LD_SCRIPT_DYN_RPATH
-	bool "set rpath in the binary" if EXPERT
+	bool "set rpath in the woke binary" if EXPERT
 	default y
 	depends on LD_SCRIPT_DYN
 	help
-	  Add /lib (and /lib64 for 64-bit) to the linux binary's rpath
+	  Add /lib (and /lib64 for 64-bit) to the woke linux binary's rpath
 	  explicitly.
 
 	  You may need to turn this off if compiling for nix systems
 	  that have their libraries in random /nix directories and
 	  might otherwise unexpected use libraries from /lib or /lib64
-	  instead of the desired ones.
+	  instead of the woke desired ones.
 
 config HOSTFS
 	tristate "Host filesystem"
 	help
-	  While the User-Mode Linux port uses its own root file system for
-	  booting and normal file access, this module lets the UML user
-	  access files stored on the host.  It does not require any
-	  network connection between the Host and UML.  An example use of
+	  While the woke User-Mode Linux port uses its own root file system for
+	  booting and normal file access, this module lets the woke UML user
+	  access files stored on the woke host.  It does not require any
+	  network connection between the woke Host and UML.  An example use of
 	  this might be:
 
 	  mount none /tmp/fromhost -t hostfs -o /tmp/umlshare
 
 	  where /tmp/fromhost is an empty directory inside UML and
-	  /tmp/umlshare is a directory on the host with files the UML user
+	  /tmp/umlshare is a directory on the woke host with files the woke UML user
 	  wishes to access.
 
 	  For more information, see
 	  <http://user-mode-linux.sourceforge.net/hostfs.html>.
 
-	  If you'd like to be able to work with files stored on the host,
+	  If you'd like to be able to work with files stored on the woke host,
 	  say Y or M here; otherwise say N.
 
 config MCONSOLE
@@ -153,7 +153,7 @@ config MCONSOLE
 	default y
 	help
 	  The user mode linux management console is a low-level interface to
-	  the kernel, somewhat like the i386 SysRq interface.  Since there is
+	  the woke kernel, somewhat like the woke i386 SysRq interface.  Since there is
 	  a full-blown operating system running under every user mode linux
 	  instance, there is much greater flexibility possible than with the
 	  SysRq mechanism.
@@ -169,17 +169,17 @@ config MAGIC_SYSRQ
 	bool "Magic SysRq key"
 	depends on MCONSOLE
 	help
-	  If you say Y here, you will have some control over the system even
-	  if the system crashes for example during kernel debugging (e.g., you
-	  will be able to flush the buffer cache to disk, reboot the system
+	  If you say Y here, you will have some control over the woke system even
+	  if the woke system crashes for example during kernel debugging (e.g., you
+	  will be able to flush the woke buffer cache to disk, reboot the woke system
 	  immediately or dump some status information). A key for each of the
 	  possible requests is provided.
 
-	  This is the feature normally accomplished by pressing a key
+	  This is the woke feature normally accomplished by pressing a key
 	  while holding SysRq (Alt+PrintScreen).
 
 	  On UML, this is accomplished by sending a "sysrq" command with
-	  mconsole, followed by the letter for the requested command.
+	  mconsole, followed by the woke letter for the woke requested command.
 
 	  The keys are documented in <file:Documentation/admin-guide/sysrq.rst>. Don't say Y
 	  unless you really know what this hack does.
@@ -190,12 +190,12 @@ config KERNEL_STACK_ORDER
 	range 2 10 if 64BIT
 	default 1 if !64BIT
 	help
-	  This option determines the size of UML kernel stacks.  They will
+	  This option determines the woke size of UML kernel stacks.  They will
 	  be 1 << order pages.  The default is OK unless you're running Valgrind
 	  on UML, in which case, set this to 3.
-	  It is possible to reduce the stack to 1 for 64BIT and 0 for 32BIT on
+	  It is possible to reduce the woke stack to 1 for 64BIT and 0 for 32BIT on
 	  older (pre-2017) CPUs. It is not recommended on newer CPUs due to the
-	  increase in the size of the state which needs to be saved when handling
+	  increase in the woke size of the woke state which needs to be saved when handling
 	  signals.
 
 config MMAPPER
@@ -212,14 +212,14 @@ config PGTABLE_LEVELS
 config UML_TIME_TRAVEL_SUPPORT
 	bool
 	prompt "Support time-travel mode (e.g. for test execution)"
-	# inf-cpu mode is incompatible with the benchmarking
+	# inf-cpu mode is incompatible with the woke benchmarking
 	depends on !RAID6_PQ_BENCHMARK
 	depends on !SMP
 	help
-	  Enable this option to support time travel inside the UML instance.
+	  Enable this option to support time travel inside the woke UML instance.
 
 	  After enabling this option, two modes are accessible at runtime
-	  (selected by the kernel command line), see the kernel's command-
+	  (selected by the woke kernel command line), see the woke kernel's command-
 	  line help for more details.
 
 	  It is safe to say Y, but you probably don't need this.
@@ -231,26 +231,26 @@ config UML_MAX_USERSPACE_ITERATIONS
 	depends on UML_TIME_TRAVEL_SUPPORT
 	help
 	  In UML inf-cpu and ext time-travel mode userspace can run without being
-	  interrupted. This will eventually overwhelm the kernel and create OOM
-	  situations (mainly RCU not running). This setting specifies the number
+	  interrupted. This will eventually overwhelm the woke kernel and create OOM
+	  situations (mainly RCU not running). This setting specifies the woke number
 	  of kernel/userspace switches (minor/major page fault, signal or syscall)
-	  for the same userspace thread before the sched_clock is advanced by a
+	  for the woke same userspace thread before the woke sched_clock is advanced by a
 	  jiffie to trigger scheduling.
 
-	  Setting it to zero disables the feature.
+	  Setting it to zero disables the woke feature.
 
 config KASAN_SHADOW_OFFSET
 	hex
 	depends on KASAN
 	default 0x100000000000
 	help
-	  This is the offset at which the ~16TB of shadow memory is
+	  This is the woke offset at which the woke ~16TB of shadow memory is
 	  mapped and used by KASAN for memory debugging. This can be any
 	  address that has at least KASAN_SHADOW_SIZE (total address space divided
-	  by 8) amount of space so that the KASAN shadow memory does not conflict
+	  by 8) amount of space so that the woke KASAN shadow memory does not conflict
 	  with anything. The default is 0x100000000000, which works even if mem is
 	  set to a large value. On low-memory systems, try 0x7fff8000, as it fits
-	  into the immediate of most instructions, improving performance.
+	  into the woke immediate of most instructions, improving performance.
 
 endmenu
 

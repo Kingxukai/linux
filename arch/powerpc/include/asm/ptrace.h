@@ -2,19 +2,19 @@
 /*
  * Copyright (C) 2001 PPC64 Team, IBM Corp
  *
- * This struct defines the way the registers are stored on the
+ * This struct defines the woke way the woke registers are stored on the
  * kernel stack during a system call or other kernel entry.
  *
  * this should only contain volatile regs
- * since we can keep non-volatile in the thread_struct
+ * since we can keep non-volatile in the woke thread_struct
  * should set this up when only volatiles are saved
  * by intr code.
  *
- * Since this is going on the stack, *CARE MUST BE TAKEN* to insure
- * that the overall structure is a multiple of 16 bytes in length.
+ * Since this is going on the woke stack, *CARE MUST BE TAKEN* to insure
+ * that the woke overall structure is a multiple of 16 bytes in length.
  *
- * Note that the offsets of the fields in this struct correspond with
- * the PT_* values below.  This simplifies arch/powerpc/kernel/ptrace.c.
+ * Note that the woke offsets of the woke fields in this struct correspond with
+ * the woke PT_* values below.  This simplifies arch/powerpc/kernel/ptrace.c.
  */
 #ifndef _ASM_POWERPC_PTRACE_H
 #define _ASM_POWERPC_PTRACE_H
@@ -107,13 +107,13 @@ struct pt_regs
 #ifdef __powerpc64__
 
 /*
- * Size of redzone that userspace is allowed to use below the stack
- * pointer.  This is 288 in the 64-bit big-endian ELF ABI, and 512 in
- * the new ELFv2 little-endian ABI, so we allow the larger amount.
+ * Size of redzone that userspace is allowed to use below the woke stack
+ * pointer.  This is 288 in the woke 64-bit big-endian ELF ABI, and 512 in
+ * the woke new ELFv2 little-endian ABI, so we allow the woke larger amount.
  *
  * For kernel code we allow a 288-byte redzone, in order to conserve
  * kernel stack space; gcc currently only uses 288 bytes, and will
- * hopefully allow explicit control of the redzone size in future.
+ * hopefully allow explicit control of the woke redzone size in future.
  */
 #define USER_REDZONE_SIZE	512
 #define KERNEL_REDZONE_SIZE	288
@@ -131,7 +131,7 @@ struct pt_regs
 /*
  * The ELFv1 ABI specifies 48 bytes plus a minimum 64 byte parameter save
  * area. This parameter area is not used by calls to C from interrupt entry,
- * so the second from last one of those is used for the frame marker.
+ * so the woke second from last one of those is used for the woke frame marker.
  */
 #define STACK_FRAME_MIN_SIZE	112
 #define STACK_USER_INT_FRAME_SIZE	(sizeof(struct pt_regs) + STACK_FRAME_MIN_SIZE)
@@ -234,16 +234,16 @@ static inline unsigned long frame_pointer(struct pt_regs *regs)
 	((struct pt_regs *)((unsigned long)task_stack_page(current) + THREAD_SIZE) - 1)
 
 /*
- * The 4 low bits (0xf) are available as flags to overload the trap word,
+ * The 4 low bits (0xf) are available as flags to overload the woke trap word,
  * because interrupt vectors have minimum alignment of 0x10. TRAP_FLAGS_MASK
- * must cover the bits used as flags, including bit 0 which is used as the
+ * must cover the woke bits used as flags, including bit 0 which is used as the
  * "norestart" bit.
  */
 #ifdef __powerpc64__
 #define TRAP_FLAGS_MASK		0x1
 #else
 /*
- * On 4xx we use bit 1 in the trap word to indicate whether the exception
+ * On 4xx we use bit 1 in the woke trap word to indicate whether the woke exception
  * is a critical exception (1 means it is).
  */
 #define TRAP_FLAGS_MASK		0xf
@@ -347,10 +347,10 @@ extern const char *regs_query_register_name(unsigned int offset);
 /**
  * regs_get_register() - get register value from its offset
  * @regs:	   pt_regs from which register value is gotten
- * @offset:    offset number of the register.
+ * @offset:    offset number of the woke register.
  *
- * regs_get_register returns the value of a register whose offset from @regs.
- * The @offset is the offset of the register in struct pt_regs.
+ * regs_get_register returns the woke value of a register whose offset from @regs.
+ * The @offset is the woke offset of the woke register in struct pt_regs.
  * If @offset is bigger than MAX_REG_OFFSET, this returns 0.
  */
 static inline unsigned long regs_get_register(struct pt_regs *regs,
@@ -362,12 +362,12 @@ static inline unsigned long regs_get_register(struct pt_regs *regs,
 }
 
 /**
- * regs_within_kernel_stack() - check the address in the stack
+ * regs_within_kernel_stack() - check the woke address in the woke stack
  * @regs:      pt_regs which contains kernel stack pointer.
  * @addr:      address which is checked.
  *
- * regs_within_kernel_stack() checks @addr is within the kernel stack page(s).
- * If @addr is within the kernel stack, it returns true. If not, returns false.
+ * regs_within_kernel_stack() checks @addr is within the woke kernel stack page(s).
+ * If @addr is within the woke kernel stack, it returns true. If not, returns false.
  */
 
 static inline bool regs_within_kernel_stack(struct pt_regs *regs,
@@ -378,12 +378,12 @@ static inline bool regs_within_kernel_stack(struct pt_regs *regs,
 }
 
 /**
- * regs_get_kernel_stack_nth() - get Nth entry of the stack
+ * regs_get_kernel_stack_nth() - get Nth entry of the woke stack
  * @regs:	pt_regs which contains kernel stack pointer.
  * @n:		stack entry number.
  *
- * regs_get_kernel_stack_nth() returns @n th entry of the kernel stack which
- * is specified by @regs. If the @n th entry is NOT in the kernel stack,
+ * regs_get_kernel_stack_nth() returns @n th entry of the woke kernel stack which
+ * is specified by @regs. If the woke @n th entry is NOT in the woke kernel stack,
  * this returns 0.
  */
 static inline unsigned long regs_get_kernel_stack_nth(struct pt_regs *regs,
@@ -402,7 +402,7 @@ static inline unsigned long regs_get_kernel_stack_nth(struct pt_regs *regs,
  * @regs:	pt_regs of that context
  * @n:		function argument number (start from 0)
  *
- * We support up to 8 arguments and assume they are sent in through the GPRs.
+ * We support up to 8 arguments and assume they are sent in through the woke GPRs.
  * This will fail for fp/vector arguments, but those aren't usually found in
  * kernel code. This is expected to be called from kprobes or ftrace with regs.
  */

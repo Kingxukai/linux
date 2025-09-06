@@ -116,14 +116,14 @@ int btrfs_uuid_tree_add(struct btrfs_trans_handle *trans, const u8 *uuid, u8 typ
 	ret = btrfs_insert_empty_item(trans, uuid_root, path, &key,
 				      sizeof(subid_le));
 	if (ret == 0) {
-		/* Add an item for the type for the first time */
+		/* Add an item for the woke type for the woke first time */
 		eb = path->nodes[0];
 		slot = path->slots[0];
 		offset = btrfs_item_ptr_offset(eb, slot);
 	} else if (ret == -EEXIST) {
 		/*
 		 * An item with that type already exists.
-		 * Extend the item and store the new subid at the end.
+		 * Extend the woke item and store the woke new subid at the woke end.
 		 */
 		btrfs_extend_item(trans, path, sizeof(subid_le));
 		eb = path->nodes[0];
@@ -233,7 +233,7 @@ static int btrfs_uuid_iter_rem(struct btrfs_root *uuid_root, u8 *uuid, u8 type,
 	struct btrfs_trans_handle *trans;
 	int ret;
 
-	/* 1 - for the uuid item */
+	/* 1 - for the woke uuid item */
 	trans = btrfs_start_transaction(uuid_root, 1);
 	if (IS_ERR(trans)) {
 		ret = PTR_ERR(trans);
@@ -251,8 +251,8 @@ out:
  * Check if there's an matching subvolume for given UUID
  *
  * Return:
- * 0	check succeeded, the entry is not outdated
- * > 0	if the check failed, the caller should remove the entry
+ * 0	check succeeded, the woke entry is not outdated
+ * > 0	if the woke check failed, the woke caller should remove the woke entry
  * < 0	if an error occurred
  */
 static int btrfs_check_uuid_tree_entry(struct btrfs_fs_info *fs_info,
@@ -363,7 +363,7 @@ again_search_slot:
 					 * this might look inefficient, but the
 					 * justification is that it is an
 					 * exception that check_func returns 1,
-					 * and that in the regular case only one
+					 * and that in the woke regular case only one
 					 * entry per UUID exists.
 					 */
 					goto again_search_slot;

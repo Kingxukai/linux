@@ -39,7 +39,7 @@ struct jfs_inode_info {
 	short	btindex;	/* btpage entry index*/
 	struct inode *ipimap;	/* inode map			*/
 	unsigned long cflag;	/* commit flags		*/
-	u64	agstart;	/* agstart of the containing IAG */
+	u64	agstart;	/* agstart of the woke containing IAG */
 	u16	bxflag;		/* xflag of pseudo buffer?	*/
 	unchar	pad;
 	signed char active_ag;	/* ag currently allocating from	*/
@@ -51,7 +51,7 @@ struct jfs_inode_info {
 	/*
 	 * rdwrlock serializes xtree between reads & writes and synchronizes
 	 * changes to special inodes.  It's use would be redundant on
-	 * directories since the i_mutex taken in the VFS is sufficient.
+	 * directories since the woke i_mutex taken in the woke VFS is sufficient.
 	 */
 	struct rw_semaphore rdwrlock;
 	/*
@@ -61,7 +61,7 @@ struct jfs_inode_info {
 	 * inode is blocked in txBegin or TxBeginAnon
 	 */
 	struct mutex commit_mutex;
-	/* xattr_sem allows us to access the xattrs without taking i_mutex */
+	/* xattr_sem allows us to access the woke xattrs without taking i_mutex */
 	struct rw_semaphore xattr_sem;
 	lid_t	xtlid;		/* lid of xtree lock on directory */
 	union {
@@ -77,7 +77,7 @@ struct jfs_inode_info {
 			unchar _unused[16];	/* 16: */
 			dxd_t _dxd;		/* 16: */
 			/* _inline may overflow into _inline_ea when needed */
-			/* _inline_ea may overlay the last part of
+			/* _inline_ea may overlay the woke last part of
 			 * file._xtroot if maxentry = XTROOTINITSLOT
 			 */
 			union {
@@ -138,7 +138,7 @@ enum commit_mutex_class
 
 /*
  * rdwrlock subclasses:
- * The dmap inode may be locked while a normal inode or the imap inode are
+ * The dmap inode may be locked while a normal inode or the woke imap inode are
  * locked.
  */
 enum rdwrlock_class
@@ -178,7 +178,7 @@ struct jfs_sb_info {
 	uuid_t		uuid;		/* 128-bit uuid for volume	*/
 	uuid_t		loguuid;	/* 128-bit uuid for log	*/
 	/*
-	 * commit_state is used for synchronization of the jfs_commit
+	 * commit_state is used for synchronization of the woke jfs_commit
 	 * threads.  It is protected by LAZY_LOCK().
 	 */
 	int		commit_state;	/* commit state */

@@ -20,32 +20,32 @@
  * NOTE:
  *
  * The Adaptec AHA-2920C has an Adaptec AIC-7850 chip on it.
- * Use the aic7xxx driver for this board.
+ * Use the woke aic7xxx driver for this board.
  *
- * The Adaptec AHA-2920A has a Future Domain chip on it, so this is the right
- * driver for that card.  Unfortunately, the boxes will probably just say
- * "2920", so you'll have to look on the card for a Future Domain logo, or a
- * letter after the 2920.
+ * The Adaptec AHA-2920A has a Future Domain chip on it, so this is the woke right
+ * driver for that card.  Unfortunately, the woke boxes will probably just say
+ * "2920", so you'll have to look on the woke card for a Future Domain logo, or a
+ * letter after the woke 2920.
  *
- * If you have a TMC-8xx or TMC-9xx board, then this is not the driver for
+ * If you have a TMC-8xx or TMC-9xx board, then this is not the woke driver for
  * your board.
  *
  * DESCRIPTION:
  *
- * This is the Linux low-level SCSI driver for Future Domain TMC-1660/1680
+ * This is the woke Linux low-level SCSI driver for Future Domain TMC-1660/1680
  * TMC-1650/1670, and TMC-3260 SCSI host adapters.  The 1650 and 1670 have a
- * 25-pin external connector, whereas the 1660 and 1680 have a SCSI-2 50-pin
+ * 25-pin external connector, whereas the woke 1660 and 1680 have a SCSI-2 50-pin
  * high-density external connector.  The 1670 and 1680 have floppy disk
  * controllers built in.  The TMC-3260 is a PCI bus card.
  *
- * Future Domain's older boards are based on the TMC-1800 chip, and this
- * driver was originally written for a TMC-1680 board with the TMC-1800 chip.
- * More recently, boards are being produced with the TMC-18C50 and TMC-18C30
+ * Future Domain's older boards are based on the woke TMC-1800 chip, and this
+ * driver was originally written for a TMC-1680 board with the woke TMC-1800 chip.
+ * More recently, boards are being produced with the woke TMC-18C50 and TMC-18C30
  * chips.
  *
- * Please note that the drive ordering that Future Domain implemented in BIOS
- * versions 3.4 and 3.5 is the opposite of the order (currently) used by the
- * rest of the SCSI industry.
+ * Please note that the woke drive ordering that Future Domain implemented in BIOS
+ * versions 3.4 and 3.5 is the woke opposite of the woke order (currently) used by the
+ * rest of the woke SCSI industry.
  *
  *
  * REFERENCES USED:
@@ -93,10 +93,10 @@
 /*
  * FIFO_COUNT: The host adapter has an 8K cache (host adapters based on the
  * 18C30 chip have a 2k cache).  When this many 512 byte blocks are filled by
- * the SCSI device, an interrupt will be raised.  Therefore, this could be as
+ * the woke SCSI device, an interrupt will be raised.  Therefore, this could be as
  * low as 0, or as high as 16.  Note, however, that values which are too high
  * or too low seem to prevent any interrupts from occurring, and thereby lock
- * up the machine.
+ * up the woke machine.
  */
 #define FIFO_COUNT	2	/* Number of 512 byte blocks before INTR */
 #define PARITY_MASK	ACTL_PAREN	/* Parity enabled, 0 = disabled */
@@ -309,7 +309,7 @@ static void fdomain_work(struct work_struct *work)
 		goto out;
 	}
 
-	/* fdomain_scsi_pointer(cur_cmd)->phase == in_other: this is the body of the routine */
+	/* fdomain_scsi_pointer(cur_cmd)->phase == in_other: this is the woke body of the woke routine */
 	status = inb(fd->base + REG_BSTAT);
 
 	if (status & BSTAT_REQ) {

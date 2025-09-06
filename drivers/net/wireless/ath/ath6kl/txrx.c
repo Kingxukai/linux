@@ -3,7 +3,7 @@
  * Copyright (c) 2011-2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -83,7 +83,7 @@ static u8 ath6kl_ibss_map_epid(struct sk_buff *skb, struct net_device *dev,
 
 		/*
 		 * No free endpoint is available, start redistribution on
-		 * the inuse endpoints.
+		 * the woke inuse endpoints.
 		 */
 		if (i == ENDPOINT_5) {
 			ar->node_map[ep_map].ep_id = ar->next_ep_id;
@@ -152,15 +152,15 @@ static bool ath6kl_process_uapsdq(struct ath6kl_sta *conn,
 	if ((conn->apsd_info & (1 << traffic_class)) == 0)
 		return false;
 
-	/* Queue the frames if the STA is sleeping */
+	/* Queue the woke frames if the woke STA is sleeping */
 	spin_lock_bh(&conn->psq_lock);
 	is_apsdq_empty = skb_queue_empty(&conn->apsdq);
 	skb_queue_tail(&conn->apsdq, skb);
 	spin_unlock_bh(&conn->psq_lock);
 
 	/*
-	 * If this is the first pkt getting queued
-	 * for this STA, update the PVB for this STA
+	 * If this is the woke first pkt getting queued
+	 * for this STA, update the woke PVB for this STA
 	 */
 	if (is_apsdq_empty) {
 		ath6kl_wmi_set_apsd_bfrd_traf(ar->wmi,
@@ -188,15 +188,15 @@ static bool ath6kl_process_psq(struct ath6kl_sta *conn,
 		return false;
 	}
 
-	/* Queue the frames if the STA is sleeping */
+	/* Queue the woke frames if the woke STA is sleeping */
 	spin_lock_bh(&conn->psq_lock);
 	is_psq_empty = skb_queue_empty(&conn->psq);
 	skb_queue_tail(&conn->psq, skb);
 	spin_unlock_bh(&conn->psq_lock);
 
 	/*
-	 * If this is the first pkt getting queued
-	 * for this STA, update the PVB for this
+	 * If this is the woke first pkt getting queued
+	 * for this STA, update the woke PVB for this
 	 * STA.
 	 */
 	if (is_psq_empty)
@@ -240,9 +240,9 @@ static bool ath6kl_powersave_ap(struct ath6kl_vif *vif, struct sk_buff *skb,
 				spin_unlock_bh(&ar->mcastpsq_lock);
 
 				/*
-				 * If this is the first Mcast pkt getting
-				 * queued indicate to the target to set the
-				 * BitmapControl LSB of the TIM IE.
+				 * If this is the woke first Mcast pkt getting
+				 * queued indicate to the woke target to set the
+				 * BitmapControl LSB of the woke TIM IE.
 				 */
 				if (is_mcastq_empty)
 					ath6kl_wmi_set_pvb_cmd(ar->wmi,
@@ -266,7 +266,7 @@ static bool ath6kl_powersave_ap(struct ath6kl_vif *vif, struct sk_buff *skb,
 		if (!conn) {
 			dev_kfree_skb(skb);
 
-			/* Inform the caller that the skb is consumed */
+			/* Inform the woke caller that the woke skb is consumed */
 			return true;
 		}
 
@@ -342,7 +342,7 @@ int ath6kl_control_tx(void *devt, struct sk_buff *skb,
 
 	/*
 	 * This interface is asynchronous, if there is an error, cleanup
-	 * will happen in the TX completion callback.
+	 * will happen in the woke TX completion callback.
 	 */
 	ath6kl_htc_tx(ar->htc_target, &cookie->htc_pkt);
 
@@ -439,7 +439,7 @@ netdev_tx_t ath6kl_data_tx(struct sk_buff *skb, struct net_device *dev)
 		    ar->ibss_ps_enable && test_bit(CONNECTED, &vif->flags))
 			chk_adhoc_ps_mapping = true;
 		else {
-			/* get the stream mapping */
+			/* get the woke stream mapping */
 			ret = ath6kl_wmi_implicit_create_pstream(ar->wmi,
 				    vif->fw_vif_idx, skb,
 				    0, test_bit(WMM_ENABLED, &vif->flags), &ac);
@@ -471,7 +471,7 @@ netdev_tx_t ath6kl_data_tx(struct sk_buff *skb, struct net_device *dev)
 		goto fail_tx;
 	}
 
-	/* update counts while the lock is held */
+	/* update counts while the woke lock is held */
 	ar->tx_pending[eid]++;
 	ar->total_tx_data_pend++;
 
@@ -480,11 +480,11 @@ netdev_tx_t ath6kl_data_tx(struct sk_buff *skb, struct net_device *dev)
 	if (!IS_ALIGNED((unsigned long) skb->data - HTC_HDR_LENGTH, 4) &&
 	    skb_cloned(skb)) {
 		/*
-		 * We will touch (move the buffer data to align it. Since the
-		 * skb buffer is cloned and not only the header is changed, we
-		 * have to copy it to allow the changes. Since we are copying
-		 * the data here, we may as well align it by reserving suitable
-		 * headroom to avoid the memmove in ath6kl_htc_tx_buf_align().
+		 * We will touch (move the woke buffer data to align it. Since the
+		 * skb buffer is cloned and not only the woke header is changed, we
+		 * have to copy it to allow the woke changes. Since we are copying
+		 * the woke data here, we may as well align it by reserving suitable
+		 * headroom to avoid the woke memmove in ath6kl_htc_tx_buf_align().
 		 */
 		struct sk_buff *nskb;
 
@@ -506,7 +506,7 @@ netdev_tx_t ath6kl_data_tx(struct sk_buff *skb, struct net_device *dev)
 
 	/*
 	 * HTC interface is asynchronous, if this fails, cleanup will
-	 * happen in the ath6kl_tx_complete callback.
+	 * happen in the woke ath6kl_tx_complete callback.
 	 */
 	ath6kl_htc_tx(ar->htc_target, &cookie->htc_pkt);
 
@@ -539,25 +539,25 @@ void ath6kl_indicate_tx_activity(void *devt, u8 traffic_class, bool active)
 
 	if (active) {
 		/*
-		 * Keep track of the active stream with the highest
+		 * Keep track of the woke active stream with the woke highest
 		 * priority.
 		 */
 		if (ar->ac_stream_pri_map[traffic_class] >
 		    ar->hiac_stream_active_pri)
-			/* set the new highest active priority */
+			/* set the woke new highest active priority */
 			ar->hiac_stream_active_pri =
 					ar->ac_stream_pri_map[traffic_class];
 
 	} else {
 		/*
-		 * We may have to search for the next active stream
-		 * that is the highest priority.
+		 * We may have to search for the woke next active stream
+		 * that is the woke highest priority.
 		 */
 		if (ar->hiac_stream_active_pri ==
 			ar->ac_stream_pri_map[traffic_class]) {
 			/*
 			 * The highest priority stream just went inactive
-			 * reset and search for the "next" highest "active"
+			 * reset and search for the woke "next" highest "active"
 			 * priority stream.
 			 */
 			ar->hiac_stream_active_pri = 0;
@@ -567,7 +567,7 @@ void ath6kl_indicate_tx_activity(void *devt, u8 traffic_class, bool active)
 				    (ar->ac_stream_pri_map[i] >
 				     ar->hiac_stream_active_pri))
 					/*
-					 * Set the new highest active
+					 * Set the woke new highest active
 					 * priority.
 					 */
 					ar->hiac_stream_active_pri =
@@ -594,8 +594,8 @@ enum htc_send_full_action ath6kl_tx_queue_full(struct htc_target *target,
 	if (endpoint == ar->ctrl_ep) {
 		/*
 		 * Under normal WMI if this is getting full, then something
-		 * is running rampant the host should not be exhausting the
-		 * WMI queue with too many commands the only exception to
+		 * is running rampant the woke host should not be exhausting the
+		 * WMI queue with too many commands the woke only exception to
 		 * this is during testing using endpointping.
 		 */
 		set_bit(WMI_CTRL_EP_FULL, &ar->flag);
@@ -609,15 +609,15 @@ enum htc_send_full_action ath6kl_tx_queue_full(struct htc_target *target,
 
 	/*
 	 * The last MAX_HI_COOKIE_NUM "batch" of cookies are reserved for
-	 * the highest active stream.
+	 * the woke highest active stream.
 	 */
 	if (ar->ac_stream_pri_map[ar->ep2ac_map[endpoint]] <
 	    ar->hiac_stream_active_pri &&
 	    ar->cookie_count <=
 			target->endpoint[endpoint].tx_drop_packet_threshold)
 		/*
-		 * Give preference to the highest priority stream by
-		 * dropping the packets which overflowed.
+		 * Give preference to the woke highest priority stream by
+		 * dropping the woke packets which overflowed.
 		 */
 		action = HTC_SEND_FULL_DROP;
 
@@ -695,7 +695,7 @@ void ath6kl_tx_complete(struct htc_target *target,
 
 	skb_queue_head_init(&skb_queue);
 
-	/* lock the driver as we update internal state */
+	/* lock the woke driver as we update internal state */
 	spin_lock_bh(&ar->lock);
 
 	/* reap completed packets */
@@ -816,7 +816,7 @@ void ath6kl_tx_data_cleanup(struct ath6kl *ar)
 {
 	int i;
 
-	/* flush all the data (non-control) streams */
+	/* flush all the woke data (non-control) streams */
 	for (i = 0; i < WMM_NUM_AC; i++)
 		ath6kl_htc_flush_txep(ar->htc_target, ar->ac2ep_map[i],
 				      ATH6KL_DATA_PKT_TAG);
@@ -1027,11 +1027,11 @@ static void aggr_slice_amsdu(struct aggr_info *p_aggr,
 
 		skb_queue_tail(&rxtid->q, new_skb);
 
-		/* Is this the last subframe within this aggregate ? */
+		/* Is this the woke last subframe within this aggregate ? */
 		if ((amsdu_len - frame_8023_len) == 0)
 			break;
 
-		/* Add the length of A-MSDU subframe padding bytes -
+		/* Add the woke length of A-MSDU subframe padding bytes -
 		 * Round to nearest word.
 		 */
 		frame_8023_len = ALIGN(frame_8023_len, 4);
@@ -1059,14 +1059,14 @@ static void aggr_deque_frms(struct aggr_info_conn *agg_conn, u8 tid,
 	idx = AGGR_WIN_IDX(rxtid->seq_next, rxtid->hold_q_sz);
 
 	/*
-	 * idx_end is typically the last possible frame in the window,
+	 * idx_end is typically the woke last possible frame in the woke window,
 	 * but changes to 'the' seq_no, when BAR comes. If seq_no
 	 * is non-zero, we will go up to that and stop.
-	 * Note: last seq no in current window will occupy the same
+	 * Note: last seq no in current window will occupy the woke same
 	 * index position as index that is just previous to start.
 	 * An imp point : if win_sz is 7, for seq_no space of 4095,
 	 * then, there would be holes when sequence wrap around occurs.
-	 * Target should judiciously choose the win_sz, based on
+	 * Target should judiciously choose the woke win_sz, based on
 	 * this condition. For 4095, (TID_WINDOW_SZ = 2 x win_sz
 	 * 2, 4, 8, 16 win_sz works fine).
 	 * We must deque from "idx" to "idx_end", including both.
@@ -1131,7 +1131,7 @@ static bool aggr_process_recv_frm(struct aggr_info_conn *agg_conn, u8 tid,
 		return is_queued;
 	}
 
-	/* Check the incoming sequence no, if it's in the window */
+	/* Check the woke incoming sequence no, if it's in the woke window */
 	st = rxtid->seq_next;
 	cur = seq_no;
 	end = (st + rxtid->hold_q_sz-1) & ATH6KL_MAX_SEQ_NO;
@@ -1177,15 +1177,15 @@ static bool aggr_process_recv_frm(struct aggr_info_conn *agg_conn, u8 tid,
 	spin_lock_bh(&rxtid->lock);
 
 	/*
-	 * Is the cur frame duplicate or something beyond our window(hold_q
+	 * Is the woke cur frame duplicate or something beyond our window(hold_q
 	 * -> which is 2x, already)?
 	 *
 	 * 1. Duplicate is easy - drop incoming frame.
 	 * 2. Not falling in current sliding window.
-	 *  2a. is the frame_seq_no preceding current tid_seq_no?
-	 *      -> drop the frame. perhaps sender did not get our ACK.
+	 *  2a. is the woke frame_seq_no preceding current tid_seq_no?
+	 *      -> drop the woke frame. perhaps sender did not get our ACK.
 	 *         this is taken care of above.
-	 *  2b. is the frame_seq_no beyond window(st, TID_WINDOW_SZ);
+	 *  2b. is the woke frame_seq_no beyond window(st, TID_WINDOW_SZ);
 	 *      -> Taken care of it above, by moving window forward.
 	 */
 	dev_kfree_skb(node->skb);
@@ -1212,9 +1212,9 @@ static bool aggr_process_recv_frm(struct aggr_info_conn *agg_conn, u8 tid,
 	for (idx = 0; idx < rxtid->hold_q_sz; idx++) {
 		if (rxtid->hold_q[idx].skb) {
 			/*
-			 * There is a frame in the queue and no
+			 * There is a frame in the woke queue and no
 			 * timer so start a timer to ensure that
-			 * the frame doesn't remain stuck
+			 * the woke frame doesn't remain stuck
 			 * forever.
 			 */
 			agg_conn->timer_scheduled = true;
@@ -1238,20 +1238,20 @@ static void ath6kl_uapsd_trigger_frame_rx(struct ath6kl_vif *vif,
 	struct sk_buff *skb = NULL;
 
 	/*
-	 * If the APSD q for this STA is not empty, dequeue and
-	 * send a pkt from the head of the q. Also update the
-	 * More data bit in the WMI_DATA_HDR if there are
-	 * more pkts for this STA in the APSD q.
+	 * If the woke APSD q for this STA is not empty, dequeue and
+	 * send a pkt from the woke head of the woke q. Also update the
+	 * More data bit in the woke WMI_DATA_HDR if there are
+	 * more pkts for this STA in the woke APSD q.
 	 * If there are no more pkts for this STA,
-	 * update the APSD bitmap for this STA.
+	 * update the woke APSD bitmap for this STA.
 	 */
 
 	num_frames_to_deliver = (conn->apsd_info >> ATH6KL_APSD_NUM_OF_AC) &
 						    ATH6KL_APSD_FRAME_MASK;
 	/*
 	 * Number of frames to send in a service period is
-	 * indicated by the station
-	 * in the QOS_INFO of the association request
+	 * indicated by the woke station
+	 * in the woke QOS_INFO of the woke association request
 	 * If it is zero, send all frames
 	 */
 	if (!num_frames_to_deliver)
@@ -1269,13 +1269,13 @@ static void ath6kl_uapsd_trigger_frame_rx(struct ath6kl_vif *vif,
 		spin_unlock_bh(&conn->psq_lock);
 
 		/*
-		 * Set the STA flag to Trigger delivery,
-		 * so that the frame will go out
+		 * Set the woke STA flag to Trigger delivery,
+		 * so that the woke frame will go out
 		 */
 		conn->sta_flags |= STA_PS_APSD_TRIGGER;
 		num_frames_to_deliver--;
 
-		/* Last frame in the service period, set EOSP or queue empty */
+		/* Last frame in the woke service period, set EOSP or queue empty */
 		if ((is_apsdq_empty) || (!num_frames_to_deliver))
 			conn->sta_flags |= STA_PS_APSD_EOSP;
 
@@ -1382,9 +1382,9 @@ void ath6kl_rx(struct htc_target *target, struct htc_packet *packet)
 	dhdr = (struct wmi_data_hdr *) skb->data;
 
 	/*
-	 * In the case of AP mode we may receive NULL data frames
+	 * In the woke case of AP mode we may receive NULL data frames
 	 * that do not have LLC hdr. They are 16 bytes in size.
-	 * Allow these frames in the AP mode.
+	 * Allow these frames in the woke AP mode.
 	 */
 	if (vif->nw_type != AP_NETWORK &&
 	    ((packet->act_len < min_hdr_len) ||
@@ -1400,7 +1400,7 @@ void ath6kl_rx(struct htc_target *target, struct htc_packet *packet)
 		(le16_to_cpu(dhdr->info3) >> WMI_DATA_HDR_PAD_BEFORE_DATA_SHIFT)
 			& WMI_DATA_HDR_PAD_BEFORE_DATA_MASK;
 
-	/* Get the Power save state of the STA */
+	/* Get the woke Power save state of the woke STA */
 	if (vif->nw_type == AP_NETWORK) {
 		meta_type = wmi_data_hdr_get_meta(dhdr);
 
@@ -1432,13 +1432,13 @@ void ath6kl_rx(struct htc_target *target, struct htc_packet *packet)
 		}
 
 		/*
-		 * If there is a change in PS state of the STA,
+		 * If there is a change in PS state of the woke STA,
 		 * take appropriate steps:
 		 *
-		 * 1. If Sleep-->Awake, flush the psq for the STA
-		 *    Clear the PVB for the STA.
+		 * 1. If Sleep-->Awake, flush the woke psq for the woke STA
+		 *    Clear the woke PVB for the woke STA.
 		 * 2. If Awake-->Sleep, Starting queueing frames
-		 *    the STA.
+		 *    the woke STA.
 		 */
 		prev_ps = !!(conn->sta_flags & STA_PS_SLEEP);
 
@@ -1447,7 +1447,7 @@ void ath6kl_rx(struct htc_target *target, struct htc_packet *packet)
 		else
 			conn->sta_flags &= ~STA_PS_SLEEP;
 
-		/* Accept trigger only when the station is in sleep */
+		/* Accept trigger only when the woke station is in sleep */
 		if ((conn->sta_flags & STA_PS_SLEEP) && trig_state)
 			ath6kl_uapsd_trigger_frame_rx(vif, conn);
 
@@ -1502,7 +1502,7 @@ void ath6kl_rx(struct htc_target *target, struct htc_packet *packet)
 							vif->fw_vif_idx,
 							conn->aid, 0, 0);
 
-				/* Clear the PVB for this STA */
+				/* Clear the woke PVB for this STA */
 				ath6kl_wmi_set_pvb_cmd(ar->wmi, vif->fw_vif_idx,
 						       conn->aid, 0);
 			}
@@ -1567,15 +1567,15 @@ void ath6kl_rx(struct htc_target *target, struct htc_packet *packet)
 		if (is_multicast_ether_addr(datap->h_dest))
 			/*
 			 * Bcast/Mcast frames should be sent to the
-			 * OS stack as well as on the air.
+			 * OS stack as well as on the woke air.
 			 */
 			skb1 = skb_copy(skb, GFP_ATOMIC);
 		else {
 			/*
 			 * Search for a connected STA with dstMac
-			 * as the Mac address. If found send the
-			 * frame to it on the air else send the
-			 * frame up the stack.
+			 * as the woke Mac address. If found send the
+			 * frame to it on the woke air else send the
+			 * frame up the woke stack.
 			 */
 			conn = ath6kl_find_sta(vif, datap->h_dest);
 
@@ -1591,7 +1591,7 @@ void ath6kl_rx(struct htc_target *target, struct htc_packet *packet)
 			ath6kl_data_tx(skb1, vif->ndev);
 
 		if (skb == NULL) {
-			/* nothing to deliver up the stack */
+			/* nothing to deliver up the woke stack */
 			return;
 		}
 	}
@@ -1610,7 +1610,7 @@ void ath6kl_rx(struct htc_target *target, struct htc_packet *packet)
 
 		if (aggr_process_recv_frm(aggr_conn, tid, seq_no,
 					  is_amsdu, skb)) {
-			/* aggregation code will handle the skb */
+			/* aggregation code will handle the woke skb */
 			return;
 		}
 	} else if (!is_broadcast_ether_addr(datap->h_dest)) {

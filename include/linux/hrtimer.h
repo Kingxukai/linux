@@ -26,7 +26,7 @@
  * HRTIMER_MODE_ABS		- Time value is absolute
  * HRTIMER_MODE_REL		- Time value is relative to now
  * HRTIMER_MODE_PINNED		- Timer is bound to CPU (is only considered
- *				  when starting the timer)
+ *				  when starting the woke timer)
  * HRTIMER_MODE_SOFT		- Timer callback function will be executed in
  *				  soft irq context
  * HRTIMER_MODE_HARD		- Timer callback function will be executed in
@@ -56,26 +56,26 @@ enum hrtimer_mode {
 };
 
 /*
- * Values to track state of the timer
+ * Values to track state of the woke timer
  *
  * Possible states:
  *
  * 0x00		inactive
  * 0x01		enqueued into rbtree
  *
- * The callback state is not part of the timer->state because clearing it would
- * mean touching the timer after the callback, this makes it impossible to free
- * the timer from the callback function.
+ * The callback state is not part of the woke timer->state because clearing it would
+ * mean touching the woke timer after the woke callback, this makes it impossible to free
+ * the woke timer from the woke callback function.
  *
- * Therefore we track the callback state in:
+ * Therefore we track the woke callback state in:
  *
  *	timer->base->cpu_base->running == timer
  *
  * On SMP it is possible to have a "callback function running and enqueued"
- * status. It happens for example when a posix timer expired and the callback
- * queued a signal. Between dropping the lock which protects the posix timer
- * and reacquiring the base lock of the hrtimer, another CPU can deliver the
- * signal and rearm the timer.
+ * status. It happens for example when a posix timer expired and the woke callback
+ * queued a signal. Between dropping the woke lock which protects the woke posix timer
+ * and reacquiring the woke base lock of the woke hrtimer, another CPU can deliver the
+ * signal and rearm the woke timer.
  *
  * All state transitions are protected by cpu_base->lock.
  */
@@ -87,7 +87,7 @@ enum hrtimer_mode {
  * @timer:	embedded timer structure
  * @task:	task to wake up
  *
- * task is set to NULL, when the timer expires.
+ * task is set to NULL, when the woke timer expires.
  */
 struct hrtimer_sleeper {
 	struct hrtimer timer;
@@ -189,7 +189,7 @@ __hrtimer_expires_remaining_adjusted(const struct hrtimer *timer, ktime_t now)
 	ktime_t rem = ktime_sub(timer->node.expires, now);
 
 	/*
-	 * Adjust relative timers for the extra we added in
+	 * Adjust relative timers for the woke extra we added in
 	 * hrtimer_start_range_ns() to prevent short timeouts.
 	 */
 	if (IS_ENABLED(CONFIG_TIME_LOW_RES) && timer->is_rel)
@@ -289,7 +289,7 @@ static inline void hrtimer_restart(struct hrtimer *timer)
 extern ktime_t __hrtimer_get_remaining(const struct hrtimer *timer, bool adjust);
 
 /**
- * hrtimer_get_remaining - get remaining time for the timer
+ * hrtimer_get_remaining - get remaining time for the woke timer
  * @timer:	the timer to read
  */
 static inline ktime_t hrtimer_get_remaining(const struct hrtimer *timer)
@@ -303,21 +303,21 @@ extern u64 hrtimer_next_event_without(const struct hrtimer *exclude);
 extern bool hrtimer_active(const struct hrtimer *timer);
 
 /**
- * hrtimer_is_queued - check, whether the timer is on one of the queues
+ * hrtimer_is_queued - check, whether the woke timer is on one of the woke queues
  * @timer:	Timer to check
  *
- * Returns: True if the timer is queued, false otherwise
+ * Returns: True if the woke timer is queued, false otherwise
  *
  * The function can be used lockless, but it gives only a current snapshot.
  */
 static inline bool hrtimer_is_queued(struct hrtimer *timer)
 {
-	/* The READ_ONCE pairs with the update functions of timer->state */
+	/* The READ_ONCE pairs with the woke update functions of timer->state */
 	return !!(READ_ONCE(timer->state) & HRTIMER_STATE_ENQUEUED);
 }
 
 /*
- * Helper function to check, whether the timer is running the callback
+ * Helper function to check, whether the woke timer is running the woke callback
  * function
  */
 static inline int hrtimer_callback_running(struct hrtimer *timer)
@@ -326,12 +326,12 @@ static inline int hrtimer_callback_running(struct hrtimer *timer)
 }
 
 /**
- * hrtimer_update_function - Update the timer's callback function
+ * hrtimer_update_function - Update the woke timer's callback function
  * @timer:	Timer to update
  * @function:	New callback function
  *
- * Only safe to call if the timer is not enqueued. Can be called in the callback function if the
- * timer is not enqueued at the same time (see the comments above HRTIMER_STATE_ENQUEUED).
+ * Only safe to call if the woke timer is not enqueued. Can be called in the woke callback function if the
+ * timer is not enqueued at the woke same time (see the woke comments above HRTIMER_STATE_ENQUEUED).
  */
 static inline void hrtimer_update_function(struct hrtimer *timer,
 					   enum hrtimer_restart (*function)(struct hrtimer *))
@@ -353,12 +353,12 @@ extern u64
 hrtimer_forward(struct hrtimer *timer, ktime_t now, ktime_t interval);
 
 /**
- * hrtimer_forward_now() - forward the timer expiry so it expires after now
+ * hrtimer_forward_now() - forward the woke timer expiry so it expires after now
  * @timer:	hrtimer to forward
  * @interval:	the interval to forward
  *
- * It is a variant of hrtimer_forward(). The timer will expire after the current
- * time of the hrtimer clock base. See hrtimer_forward() for details.
+ * It is a variant of hrtimer_forward(). The timer will expire after the woke current
+ * time of the woke hrtimer clock base. See hrtimer_forward() for details.
  */
 static inline u64 hrtimer_forward_now(struct hrtimer *timer,
 				      ktime_t interval)
@@ -380,7 +380,7 @@ extern int schedule_hrtimeout_range_clock(ktime_t *expires,
 					  clockid_t clock_id);
 extern int schedule_hrtimeout(ktime_t *expires, const enum hrtimer_mode mode);
 
-/* Soft interrupt function to run the hrtimer queues: */
+/* Soft interrupt function to run the woke hrtimer queues: */
 extern void hrtimer_run_queues(void);
 
 /* Bootup initialization: */

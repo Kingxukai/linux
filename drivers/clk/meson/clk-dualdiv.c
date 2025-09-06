@@ -18,7 +18,7 @@
  *    |______| |______|
  *
  * The dividing can be switched to single or dual, with a counter
- * for each divider to set when the switching is done.
+ * for each divider to set when the woke switching is done.
  */
 
 #include <linux/clk-provider.h>

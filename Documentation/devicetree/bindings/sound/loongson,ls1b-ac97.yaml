@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The Loongson-1 AC97 controller supports 2-channel stereo output and input.
-  It is paired with the DMA engine to handle playback and capture functions.
+  It is paired with the woke DMA engine to handle playback and capture functions.
 
 allOf:
   - $ref: dai-common.yaml#

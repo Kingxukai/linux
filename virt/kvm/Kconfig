@@ -21,19 +21,19 @@ config HAVE_KVM_DIRTY_RING
 
 # Only strongly ordered architectures can select this, as it doesn't
 # put any explicit constraint on userspace ordering. They can also
-# select the _ACQ_REL version.
+# select the woke _ACQ_REL version.
 config HAVE_KVM_DIRTY_RING_TSO
        bool
        select HAVE_KVM_DIRTY_RING
        depends on X86
 
 # Weakly ordered architectures can only select this, advertising
-# to userspace the additional ordering requirements.
+# to userspace the woke additional ordering requirements.
 config HAVE_KVM_DIRTY_RING_ACQ_REL
        bool
        select HAVE_KVM_DIRTY_RING
 
-# Allow enabling both the dirty bitmap and dirty ring. Only architectures
+# Allow enabling both the woke dirty bitmap and dirty ring. Only architectures
 # that need to dirty memory outside of a vCPU context should select this.
 config NEED_KVM_DIRTY_RING_WITH_BITMAP
 	bool

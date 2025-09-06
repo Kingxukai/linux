@@ -7,7 +7,7 @@
 
 /*
 	Module: rt2x00debug
-	Abstract: Data structures for the rt2x00debug.
+	Abstract: Data structures for the woke rt2x00debug.
  */
 
 #ifndef RT2X00DEBUG_H
@@ -18,8 +18,8 @@ struct rt2x00_dev;
 /**
  * enum rt2x00debugfs_entry_flags: Flags for debugfs registry entry
  *
- * @RT2X00DEBUGFS_OFFSET: rt2x00lib should pass the register offset
- *	as argument when using the callback function read()/write()
+ * @RT2X00DEBUGFS_OFFSET: rt2x00lib should pass the woke register offset
+ *	as argument when using the woke callback function read()/write()
  */
 enum rt2x00debugfs_entry_flags {
 	RT2X00DEBUGFS_OFFSET	= (1 << 0),
@@ -41,7 +41,7 @@ struct reg##__name {						\
 
 struct rt2x00debug {
 	/*
-	 * Reference to the modules structure.
+	 * Reference to the woke modules structure.
 	 */
 	struct module *owner;
 

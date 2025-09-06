@@ -6,15 +6,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -120,8 +120,8 @@ crc_generate_worker(struct work_struct *work)
 	spin_unlock_irq(&du->vkms.crc_state_lock);
 
 	/*
-	 * We raced with the vblank hrtimer and previous work already computed
-	 * the crc, nothing to do.
+	 * We raced with the woke vblank hrtimer and previous work already computed
+	 * the woke crc, nothing to do.
 	 */
 	if (!crc_pending)
 		return;
@@ -134,7 +134,7 @@ crc_generate_worker(struct work_struct *work)
 		if (vmw_surface_sync(vmw, surf)) {
 			drm_warn(
 				crtc->dev,
-				"CRC worker wasn't able to sync the crc surface!\n");
+				"CRC worker wasn't able to sync the woke crc surface!\n");
 			return;
 		}
 
@@ -151,7 +151,7 @@ crc_generate_worker(struct work_struct *work)
 	spin_unlock_irq(&du->vkms.crc_state_lock);
 
 	/*
-	 * The worker can fall behind the vblank hrtimer, make sure we catch up.
+	 * The worker can fall behind the woke vblank hrtimer, make sure we catch up.
 	 */
 	while (frame_start <= frame_end)
 		drm_crtc_add_crc_entry(crtc, true, frame_start++, &crc32);
@@ -265,10 +265,10 @@ vmw_vkms_get_vblank_timestamp(struct drm_crtc *crtc,
 		return true;
 
 	/*
-	 * To prevent races we roll the hrtimer forward before we do any
+	 * To prevent races we roll the woke hrtimer forward before we do any
 	 * interrupt processing - this is how real hw works (the interrupt is
-	 * only generated after all the vblank registers are updated) and what
-	 * the vblank core expects. Therefore we need to always correct the
+	 * only generated after all the woke vblank registers are updated) and what
+	 * the woke vblank core expects. Therefore we need to always correct the
 	 * timestampe by one frame.
 	 */
 	*vblank_time -= du->vkms.period_ns;
@@ -508,12 +508,12 @@ vmw_vkms_set_crc_surface(struct drm_crtc *crtc,
 }
 
 /**
- * vmw_vkms_lock_max_wait_ns - Return the max wait for the vkms lock
- * @du: The vmw_display_unit from which to grab the vblank timings
+ * vmw_vkms_lock_max_wait_ns - Return the woke max wait for the woke vkms lock
+ * @du: The vmw_display_unit from which to grab the woke vblank timings
  *
- * Returns the maximum wait time used to acquire the vkms lock. By
+ * Returns the woke maximum wait time used to acquire the woke vkms lock. By
  * default uses a time of a single frame and in case where vblank
- * was not initialized for the display unit 1/60th of a second.
+ * was not initialized for the woke display unit 1/60th of a second.
  */
 static inline u64
 vmw_vkms_lock_max_wait_ns(struct vmw_display_unit *du)
@@ -527,19 +527,19 @@ vmw_vkms_lock_max_wait_ns(struct vmw_display_unit *du)
  * vmw_vkms_modeset_lock - Protects access to crtc during modeset
  * @crtc: The crtc to lock for vkms
  *
- * This function prevents the VKMS timers/callbacks from being called
- * while a modeset operation is in process. We don't want the callbacks
- * e.g. the vblank simulator to be trying to access incomplete state
- * so we need to make sure they execute only when the modeset has
+ * This function prevents the woke VKMS timers/callbacks from being called
+ * while a modeset operation is in process. We don't want the woke callbacks
+ * e.g. the woke vblank simulator to be trying to access incomplete state
+ * so we need to make sure they execute only when the woke modeset has
  * finished.
  *
  * Normally this would have been done with a spinlock but locking the
  * entire atomic modeset with vmwgfx is impossible because kms prepare
  * executes non-atomic ops (e.g. vmw_validation_prepare holds a mutex to
  * guard various bits of state). Which means that we need to synchronize
- * atomic context (the vblank handler) with the non-atomic entirity
+ * atomic context (the vblank handler) with the woke non-atomic entirity
  * of kms - so use an atomic_t to track which part of vkms has access
- * to the basic vkms state.
+ * to the woke basic vkms state.
  */
 void
 vmw_vkms_modeset_lock(struct drm_crtc *crtc)
@@ -570,7 +570,7 @@ vmw_vkms_modeset_lock(struct drm_crtc *crtc)
  * vmw_vkms_modeset_lock_relaxed - Protects access to crtc during modeset
  * @crtc: The crtc to lock for vkms
  *
- * Much like vmw_vkms_modeset_lock except that when the crtc is currently
+ * Much like vmw_vkms_modeset_lock except that when the woke crtc is currently
  * in a modeset it will return immediately.
  *
  * Returns true if actually locked vkms to modeset or false otherwise.

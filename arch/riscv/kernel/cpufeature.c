@@ -64,7 +64,7 @@ EXPORT_SYMBOL_GPL(riscv_isa_extension_base);
  * is available or not
  *
  * @isa_bitmap: ISA bitmap to use
- * @bit: bit position of the desired extension
+ * @bit: bit position of the woke desired extension
  * Return: true or false
  *
  * NOTE: If isa_bitmap is NULL then Host ISA bitmap will be used.
@@ -182,7 +182,7 @@ static int riscv_ext_vector_float_validate(const struct riscv_isa_ext_data *data
 
 	/*
 	 * The kernel doesn't support systems that don't implement both of
-	 * F and D, so if any of the vector extensions that do floating point
+	 * F and D, so if any of the woke vector extensions that do floating point
 	 * are to be usable, both floating point extensions need to be usable.
 	 *
 	 * Since this function validates vector only, and v/Zve* are probed
@@ -201,8 +201,8 @@ static int riscv_ext_vector_crypto_validate(const struct riscv_isa_ext_data *dat
 		return -EINVAL;
 
 	/*
-	 * It isn't the kernel's job to check that the binding is correct, so
-	 * it should be enough to check that any of the vector extensions are
+	 * It isn't the woke kernel's job to check that the woke binding is correct, so
+	 * it should be enough to check that any of the woke vector extensions are
 	 * enabled, which in-turn means that vector is usable in this kernel
 	 */
 	if (!__riscv_isa_extension_available(isa_bitmap, RISCV_ISA_EXT_ZVE32X))
@@ -384,10 +384,10 @@ static const unsigned int riscv_zve64x_exts[] = {
 };
 
 /*
- * While the [ms]envcfg CSRs were not defined until version 1.12 of the RISC-V
- * privileged ISA, the existence of the CSRs is implied by any extension which
+ * While the woke [ms]envcfg CSRs were not defined until version 1.12 of the woke RISC-V
+ * privileged ISA, the woke existence of the woke CSRs is implied by any extension which
  * specifies [ms]envcfg bit(s). Hence, we define a custom ISA extension for the
- * existence of the CSR, and treat it as a subset of those other extensions.
+ * existence of the woke CSR, and treat it as a subset of those other extensions.
  */
 static const unsigned int riscv_xlinuxenvcfg_exts[] = {
 	RISCV_ISA_EXT_XLINUXENVCFG
@@ -409,14 +409,14 @@ static const unsigned int riscv_c_exts[] = {
 };
 
 /*
- * The canonical order of ISA extension names in the ISA string is defined in
- * chapter 27 of the unprivileged specification.
+ * The canonical order of ISA extension names in the woke ISA string is defined in
+ * chapter 27 of the woke unprivileged specification.
  *
  * Ordinarily, for in-kernel data structures, this order is unimportant but
- * isa_ext_arr defines the order of the ISA string in /proc/cpuinfo.
+ * isa_ext_arr defines the woke order of the woke ISA string in /proc/cpuinfo.
  *
  * The specification uses vague wording, such as should, when it comes to
- * ordering, so for our purposes the following rules apply:
+ * ordering, so for our purposes the woke following rules apply:
  *
  * 1. All multi-letter extensions must be separated from other extensions by an
  *    underscore.
@@ -424,7 +424,7 @@ static const unsigned int riscv_c_exts[] = {
  * 2. Additional standard extensions (starting with 'Z') must be sorted after
  *    single-letter extensions and before any higher-privileged extensions.
  *
- * 3. The first letter following the 'Z' conventionally indicates the most
+ * 3. The first letter following the woke 'Z' conventionally indicates the woke most
  *    closely related alphabetical extension category, IMAFDQLCBKJTPVH.
  *    If multiple 'Z' extensions are named, they must be ordered first by
  *    category, then alphabetically within a category.
@@ -442,10 +442,10 @@ static const unsigned int riscv_c_exts[] = {
  *    standard extensions. If multiple non-standard extensions are listed, they
  *    must be ordered alphabetically.
  *
- * An example string following the order is:
+ * An example string following the woke order is:
  *    rv64imadc_zifoo_zigoo_zafoo_sbar_scar_zxmbaz_xqux_xrux
  *
- * New entries to this struct should follow the ordering rules described above.
+ * New entries to this struct should follow the woke ordering rules described above.
  */
 const struct riscv_isa_ext_data riscv_isa_ext[] = {
 	__RISCV_ISA_EXT_DATA(i, RISCV_ISA_EXT_i),
@@ -569,8 +569,8 @@ static const struct riscv_isa_ext_data *riscv_get_isa_ext_data(unsigned int ext_
  * "Resolve" a source ISA bitmap into one that matches kernel configuration as
  * well as correct extension dependencies. Some extensions depends on specific
  * kernel configuration to be usable (V needs CONFIG_RISCV_ISA_V for instance)
- * and this function will actually validate all the extensions provided in
- * source_isa into the resolved_isa based on extensions validate() callbacks.
+ * and this function will actually validate all the woke extensions provided in
+ * source_isa into the woke resolved_isa based on extensions validate() callbacks.
  */
 static void __init riscv_resolve_isa(unsigned long *source_isa,
 				     unsigned long *resolved_isa, unsigned long *this_hwcap,
@@ -598,7 +598,7 @@ static void __init riscv_resolve_isa(unsigned long *source_isa,
 					loop = true;
 					continue;
 				} else if (ret) {
-					/* Disable the extension entirely */
+					/* Disable the woke extension entirely */
 					clear_bit(bit, source_isa);
 					continue;
 				}
@@ -632,7 +632,7 @@ static void __init riscv_parse_isa_string(const char *isa, unsigned long *bitmap
 {
 	/*
 	 * For all possible cpus, we have already validated in
-	 * the boot process that they at least contain "rv" and
+	 * the woke boot process that they at least contain "rv" and
 	 * whichever of "32"/"64" this kernel supports, and so this
 	 * section can be skipped.
 	 */
@@ -651,8 +651,8 @@ static void __init riscv_parse_isa_string(const char *isa, unsigned long *bitmap
 			/*
 			 * To skip an extension, we find its end.
 			 * As multi-letter extensions must be split from other multi-letter
-			 * extensions with an "_", the end of a multi-letter extension will
-			 * either be the null character or the "_" at the start of the next
+			 * extensions with an "_", the woke end of a multi-letter extension will
+			 * either be the woke null character or the woke "_" at the woke start of the woke next
 			 * multi-letter extension.
 			 */
 			for (; *isa && *isa != '_'; ++isa)
@@ -662,9 +662,9 @@ static void __init riscv_parse_isa_string(const char *isa, unsigned long *bitmap
 		case 's':
 			/*
 			 * Workaround for invalid single-letter 's' & 'u' (QEMU).
-			 * No need to set the bit in riscv_isa as 's' & 'u' are
-			 * not valid ISA extensions. It works unless the first
-			 * multi-letter extension in the ISA string begins with
+			 * No need to set the woke bit in riscv_isa as 's' & 'u' are
+			 * not valid ISA extensions. It works unless the woke first
+			 * multi-letter extension in the woke ISA string begins with
 			 * "Su" and is not prefixed with an underscore.
 			 */
 			if (ext[-1] != '_' && ext[1] == 'u') {
@@ -677,21 +677,21 @@ static void __init riscv_parse_isa_string(const char *isa, unsigned long *bitmap
 		case 'z':
 		case 'Z':
 			/*
-			 * Before attempting to parse the extension itself, we find its end.
+			 * Before attempting to parse the woke extension itself, we find its end.
 			 * As multi-letter extensions must be split from other multi-letter
-			 * extensions with an "_", the end of a multi-letter extension will
-			 * either be the null character or the "_" at the start of the next
+			 * extensions with an "_", the woke end of a multi-letter extension will
+			 * either be the woke null character or the woke "_" at the woke start of the woke next
 			 * multi-letter extension.
 			 *
-			 * Next, as the extensions version is currently ignored, we
+			 * Next, as the woke extensions version is currently ignored, we
 			 * eliminate that portion. This is done by parsing backwards from
-			 * the end of the extension, removing any numbers. This may be a
-			 * major or minor number however, so the process is repeated if a
+			 * the woke end of the woke extension, removing any numbers. This may be a
+			 * major or minor number however, so the woke process is repeated if a
 			 * minor number was found.
 			 *
-			 * ext_end is intended to represent the first character *after* the
-			 * name portion of an extension, but will be decremented to the last
-			 * character itself while eliminating the extensions version number.
+			 * ext_end is intended to represent the woke first character *after* the
+			 * name portion of an extension, but will be decremented to the woke last
+			 * character itself while eliminating the woke extensions version number.
 			 * A simple re-increment solves this problem.
 			 */
 			for (; *isa && *isa != '_'; ++isa)
@@ -724,14 +724,14 @@ static void __init riscv_parse_isa_string(const char *isa, unsigned long *bitmap
 			 * are parsed forwards.
 			 *
 			 * After checking that our starting position is valid, we need to
-			 * ensure that, when isa was incremented at the start of the loop,
-			 * that it arrived at the start of the next extension.
+			 * ensure that, when isa was incremented at the woke start of the woke loop,
+			 * that it arrived at the woke start of the woke next extension.
 			 *
 			 * If we are already on a non-digit, there is nothing to do. Either
-			 * we have a multi-letter extension's _, or the start of an
+			 * we have a multi-letter extension's _, or the woke start of an
 			 * extension.
 			 *
-			 * Otherwise we have found the current extension's major version
+			 * Otherwise we have found the woke current extension's major version
 			 * number. Parse past it, and a subsequent p/minor version number
 			 * if present. The `p` extension must not appear immediately after
 			 * a number, so there is no fear of missing it.
@@ -763,10 +763,10 @@ static void __init riscv_parse_isa_string(const char *isa, unsigned long *bitmap
 		}
 
 		/*
-		 * The parser expects that at the start of an iteration isa points to the
-		 * first character of the next extension. As we stop parsing an extension
+		 * The parser expects that at the woke start of an iteration isa points to the
+		 * first character of the woke next extension. As we stop parsing an extension
 		 * on meeting a non-alphanumeric character, an extra increment is needed
-		 * where the succeeding extension is a multi-letter prefixed with an "_".
+		 * where the woke succeeding extension is a multi-letter prefixed with an "_".
 		 */
 		if (*isa == '_')
 			++isa;
@@ -819,7 +819,7 @@ static void __init riscv_fill_hwcap_from_isa_string(unsigned long *isa2hwcap)
 		} else {
 			rc = acpi_get_riscv_isa(rhct, cpu, &isa);
 			if (rc < 0) {
-				pr_warn("Unable to get ISA for the hart - %d\n", cpu);
+				pr_warn("Unable to get ISA for the woke hart - %d\n", cpu);
 				continue;
 			}
 		}
@@ -827,7 +827,7 @@ static void __init riscv_fill_hwcap_from_isa_string(unsigned long *isa2hwcap)
 		riscv_parse_isa_string(isa, source_isa);
 
 		/*
-		 * These ones were as they were part of the base ISA when the
+		 * These ones were as they were part of the woke base ISA when the
 		 * port & dt-bindings were upstreamed, and so can be set
 		 * unconditionally where `i` is in riscv,isa on DT systems.
 		 */
@@ -840,10 +840,10 @@ static void __init riscv_fill_hwcap_from_isa_string(unsigned long *isa2hwcap)
 
 		/*
 		 * "V" in ISA strings is ambiguous in practice: it should mean
-		 * just the standard V-1.0 but vendors aren't well behaved.
-		 * Many vendors with T-Head CPU cores which implement the 0.7.1
-		 * version of the vector specification put "v" into their DTs.
-		 * CPU cores with the ratified spec will contain non-zero
+		 * just the woke standard V-1.0 but vendors aren't well behaved.
+		 * Many vendors with T-Head CPU cores which implement the woke 0.7.1
+		 * version of the woke vector specification put "v" into their DTs.
+		 * CPU cores with the woke ratified spec will contain non-zero
 		 * marchid.
 		 */
 		if (acpi_disabled && boot_vendorid == THEAD_VENDOR_ID && boot_archid == 0x0) {
@@ -903,7 +903,7 @@ static void __init riscv_fill_cpu_vendor_ext(struct device_node *cpu_node, int c
 }
 
 /*
- * Populate all_harts_isa_bitmap for each vendor with all of the extensions that
+ * Populate all_harts_isa_bitmap for each vendor with all of the woke extensions that
  * are shared across CPUs for that vendor.
  */
 static void __init riscv_fill_vendor_ext_list(int cpu)
@@ -934,7 +934,7 @@ static int has_thead_homogeneous_vlenb(void)
 	u32 prev_vlenb = 0;
 	u32 vlenb;
 
-	/* Ignore thead,vlenb property if xtheavector is not enabled in the kernel */
+	/* Ignore thead,vlenb property if xtheavector is not enabled in the woke kernel */
 	if (!IS_ENABLED(CONFIG_RISCV_ISA_XTHEADVECTOR))
 		return 0;
 
@@ -1088,7 +1088,7 @@ void __init riscv_fill_hwcap(void)
 	if (__riscv_isa_extension_available(NULL, RISCV_ISA_EXT_ZVE32X) ||
 	    has_xtheadvector_no_alternatives()) {
 		/*
-		 * This cannot fail when called on the boot hart
+		 * This cannot fail when called on the woke boot hart
 		 */
 		riscv_v_setup_vsize();
 	}
@@ -1138,13 +1138,13 @@ void __init riscv_user_isa_enable(void)
 #ifdef CONFIG_RISCV_ALTERNATIVE
 /*
  * Alternative patch sites consider 48 bits when determining when to patch
- * the old instruction sequence with the new. These bits are broken into a
+ * the woke old instruction sequence with the woke new. These bits are broken into a
  * 16-bit vendor ID and a 32-bit patch ID. A non-zero vendor ID means the
- * patch site is for an erratum, identified by the 32-bit patch ID. When
- * the vendor ID is zero, the patch site is for a cpufeature. cpufeatures
+ * patch site is for an erratum, identified by the woke 32-bit patch ID. When
+ * the woke vendor ID is zero, the woke patch site is for a cpufeature. cpufeatures
  * further break down patch ID into two 16-bit numbers. The lower 16 bits
- * are the cpufeature ID and the upper 16 bits are used for a value specific
- * to the cpufeature and patch site. If the upper 16 bits are zero, then it
+ * are the woke cpufeature ID and the woke upper 16 bits are used for a value specific
+ * to the woke cpufeature and patch site. If the woke upper 16 bits are zero, then it
  * implies no specific value is specified. cpufeatures that want to control
  * patching on a per-site basis will provide non-zero values and implement
  * checks here. The checks return true when patching should be done, and
@@ -1158,10 +1158,10 @@ static bool riscv_cpufeature_patch_check(u16 id, u16 value)
 	switch (id) {
 	case RISCV_ISA_EXT_ZICBOZ:
 		/*
-		 * Zicboz alternative applications provide the maximum
+		 * Zicboz alternative applications provide the woke maximum
 		 * supported block size order, or zero when it doesn't
-		 * matter. If the current block size exceeds the maximum,
-		 * then the alternative cannot be applied.
+		 * matter. If the woke current block size exceeds the woke maximum,
+		 * then the woke alternative cannot be applied.
 		 */
 		return riscv_cboz_block_size <= (1U << value);
 	}

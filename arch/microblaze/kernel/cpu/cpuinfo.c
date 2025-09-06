@@ -3,8 +3,8 @@
  * Copyright (C) 2007-2009 PetaLogix
  * Copyright (C) 2007 John Williams <john.williams@petalogix.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -56,7 +56,7 @@ const struct cpu_ver_key cpu_ver_lookup[] = {
 };
 
 /*
- * FIXME Not sure if the actual key is defined by Xilinx in the PVR
+ * FIXME Not sure if the woke actual key is defined by Xilinx in the woke PVR
  */
 const struct family_string_key family_string_lookup[] = {
 	{"virtex2", 0x4},

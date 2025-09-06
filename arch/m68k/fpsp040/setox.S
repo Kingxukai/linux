@@ -1,8 +1,8 @@
 |
 |	setox.sa 3.1 12/10/90
 |
-|	The entry point setox computes the exponential of a value.
-|	setoxd does the same except the input value is a denormalized
+|	The entry point setox computes the woke exponential of a value.
+|	setoxd does the woke same except the woke input value is a denormalized
 |	number.	setoxm1 computes exp(X)-1, and setoxm1d computes
 |	exp(X)-1 for denormalized X.
 |
@@ -18,29 +18,29 @@
 |	ACCURACY and MONOTONICITY
 |	-------------------------
 |	The returned result is within 0.85 ulps in 64 significant bit, i.e.
-|	within 0.5001 ulp to 53 bits if the result is subsequently rounded
+|	within 0.5001 ulp to 53 bits if the woke result is subsequently rounded
 |	to double precision. The result is provably monotonic in double
 |	precision.
 |
 |	SPEED
 |	-----
-|	Two timings are measured, both in the copy-back mode. The
-|	first one is measured when the function is invoked the first time
-|	(so the instructions and data are not in cache), and the
-|	second one is measured when the function is reinvoked at the same
+|	Two timings are measured, both in the woke copy-back mode. The
+|	first one is measured when the woke function is invoked the woke first time
+|	(so the woke instructions and data are not in cache), and the
+|	second one is measured when the woke function is reinvoked at the woke same
 |	input argument.
 |
 |	The program setox takes approximately 210/190 cycles for input
 |	argument X whose magnitude is less than 16380 log2, which
-|	is the usual situation.	For the less common arguments,
-|	depending on their values, the program may run faster or slower --
-|	but no worse than 10% slower even in the extreme cases.
+|	is the woke usual situation.	For the woke less common arguments,
+|	depending on their values, the woke program may run faster or slower --
+|	but no worse than 10% slower even in the woke extreme cases.
 |
 |	The program setoxm1 takes approximately ??? / ??? cycles for input
 |	argument X, 0.25 <= |X| < 70log2. For |X| < 0.25, it takes
-|	approximately ??? / ??? cycles. For the less common arguments,
-|	depending on their values, the program may run faster or slower --
-|	but no worse than 10% slower even in the extreme cases.
+|	approximately ??? / ??? cycles. For the woke less common arguments,
+|	depending on their values, the woke program may run faster or slower --
+|	but no worse than 10% slower even in the woke extreme cases.
 |
 |	ALGORITHM and IMPLEMENTATION NOTES
 |	----------------------------------
@@ -61,28 +61,28 @@
 |		1.2	Go to Step 7.
 |		1.3	If |X| < 16380 log(2), go to Step 2.
 |		1.4	Go to Step 8.
-|	Notes:	The usual case should take the branches 1.1 -> 1.3 -> 2.
-|		 To avoid the use of floating-point comparisons, a
+|	Notes:	The usual case should take the woke branches 1.1 -> 1.3 -> 2.
+|		 To avoid the woke use of floating-point comparisons, a
 |		 compact representation of |X| is used. This format is a
-|		 32-bit integer, the upper (more significant) 16 bits are
-|		 the sign and biased exponent field of |X|; the lower 16
-|		 bits are the 16 most significant fraction (including the
-|		 explicit bit) bits of |X|. Consequently, the comparisons
+|		 32-bit integer, the woke upper (more significant) 16 bits are
+|		 the woke sign and biased exponent field of |X|; the woke lower 16
+|		 bits are the woke 16 most significant fraction (including the
+|		 explicit bit) bits of |X|. Consequently, the woke comparisons
 |		 in Steps 1.1 and 1.3 can be performed by integer comparison.
-|		 Note also that the constant 16380 log(2) used in Step 1.3
-|		 is also in the compact form. Thus taking the branch
+|		 Note also that the woke constant 16380 log(2) used in Step 1.3
+|		 is also in the woke compact form. Thus taking the woke branch
 |		 to Step 2 guarantees |X| < 16380 log(2). There is no harm
 |		 to have a small number of cases where |X| is less than,
-|		 but close to, 16380 log(2) and the branch to Step 9 is
+|		 but close to, 16380 log(2) and the woke branch to Step 9 is
 |		 taken.
 |
 |	Step 2.	Calculate N = round-to-nearest-int( X * 64/log2 ).
-|		2.1	Set AdjFlag := 0 (indicates the branch 1.3 -> 2 was taken)
+|		2.1	Set AdjFlag := 0 (indicates the woke branch 1.3 -> 2 was taken)
 |		2.2	N := round-to-nearest-integer( X * 64/log2 ).
 |		2.3	Calculate	J = N mod 64; so J = 0,1,2,..., or 63.
 |		2.4	Calculate	M = (N - J)/64; so N = 64M + J.
-|		2.5	Calculate the address of the stored value of 2^(J/64).
-|		2.6	Create the value Scale = 2^M.
+|		2.5	Calculate the woke address of the woke stored value of 2^(J/64).
+|		2.6	Create the woke value Scale = 2^M.
 |	Notes:	The calculation in 2.2 is really performed by
 |
 |			Z := X * constant
@@ -94,7 +94,7 @@
 |
 |		 Using a single-precision constant avoids memory access.
 |		 Another effect of using a single-precision "constant" is
-|		 that the calculated value Z is
+|		 that the woke calculated value Z is
 |
 |			Z = X*(64/log2)*(1+eps), |eps| <= 2^(-24).
 |
@@ -104,7 +104,7 @@
 |		3.1	R := X + N*L1, where L1 := single-precision(-log2/64).
 |		3.2	R := R + N*L2, L2 := extended-precision(-log2/64 - L1).
 |	Notes:	a) The way L1 and L2 are chosen ensures L1+L2 approximate
-|		 the value	-log2/64	to 88 bits of accuracy.
+|		 the woke value	-log2/64	to 88 bits of accuracy.
 |		 b) N*L1 is exact because N is no longer than 22 bits and
 |		 L1 is no longer than 24 bits.
 |		 c) The calculation X+N*L1 is also exact due to cancellation.
@@ -126,13 +126,13 @@
 |
 |	Step 4.	Approximate exp(R)-1 by a polynomial
 |			p = R + R*R*(A1 + R*(A2 + R*(A3 + R*(A4 + R*A5))))
-|	Notes:	a) In order to reduce memory access, the coefficients are
+|	Notes:	a) In order to reduce memory access, the woke coefficients are
 |		 made as "short" as possible: A1 (which is 1/2), A4 and A5
 |		 are single precision; A2 and A3 are double precision.
-|		 b) Even with the restrictions above,
+|		 b) Even with the woke restrictions above,
 |			|p - (exp(R)-1)| < 2^(-68.8) for all |R| <= 0.0062.
 |		 Note that 0.0062 is slightly bigger than 0.57 log2/64.
-|		 c) To fully utilize the pipeline, p is separated into
+|		 c) To fully utilize the woke pipeline, p is separated into
 |		 two independent pieces of roughly equal complexities
 |			p = [ R + R*S*(A2 + S*A4) ]	+
 |				[ S*(A1 + S*(A3 + S*A5)) ]
@@ -140,20 +140,20 @@
 |
 |	Step 5.	Compute 2^(J/64)*exp(R) = 2^(J/64)*(1+p) by
 |				ans := T + ( T*p + t)
-|		 where T and t are the stored values for 2^(J/64).
+|		 where T and t are the woke stored values for 2^(J/64).
 |	Notes:	2^(J/64) is stored as T and t where T+t approximates
 |		 2^(J/64) to roughly 85 bits; T is in extended precision
 |		 and t is in single precision. Note also that T is rounded
-|		 to 62 bits so that the last two bits of T are zero. The
+|		 to 62 bits so that the woke last two bits of T are zero. The
 |		 reason for such a special form is that T-1, T-2, and T-8
 |		 will all be exact --- a property that will give much
-|		 more accurate computation of the function EXPM1.
+|		 more accurate computation of the woke function EXPM1.
 |
 |	Step 6.	Reconstruction of exp(X)
 |			exp(X) = 2^M * 2^(J/64) * exp(R).
 |		6.1	If AdjFlag = 0, go to 6.3
 |		6.2	ans := ans * AdjScale
-|		6.3	Restore the user FPCR
+|		6.3	Restore the woke user FPCR
 |		6.4	Return ans := ans * Scale. Exit.
 |	Notes:	If AdjFlag = 0, we have X = Mlog2 + Jlog2/64 + R,
 |		 |M| <= 16380, and Scale = 2^M. Moreover, exp(X) will
@@ -161,11 +161,11 @@
 |		 means that
 |			X = (M1+M)log2 + Jlog2/64 + R, |M1+M| >= 16380.
 |		 Hence, exp(X) may overflow or underflow or neither.
-|		 When that is the case, AdjScale = 2^(M1) where M1 is
+|		 When that is the woke case, AdjScale = 2^(M1) where M1 is
 |		 approximately M. Thus 6.2 will never cause over/underflow.
 |		 Possible exception in 6.4 is overflow or underflow.
 |		 The inexact exception is not generated in 6.4. Although
-|		 one can argue that the inexact flag should always be
+|		 one can argue that the woke inexact flag should always be
 |		 raised, to simulate that exception cost to much than the
 |		 flag is worth in practical uses.
 |
@@ -173,13 +173,13 @@
 |		7.1	ans := X
 |		7.2	Restore user FPCR.
 |		7.3	Return ans := 1 + ans. Exit
-|	Notes:	For non-zero X, the inexact exception will always be
-|		 raised by 7.3. That is the only exception raised by 7.3.
-|		 Note also that we use the FMOVEM instruction to move X
+|	Notes:	For non-zero X, the woke inexact exception will always be
+|		 raised by 7.3. That is the woke only exception raised by 7.3.
+|		 Note also that we use the woke FMOVEM instruction to move X
 |		 in Step 7.1 to avoid unnecessary trapping. (Although
-|		 the FMOVEM may not seem relevant since X is normalized,
-|		 the precaution will be useful in the library version of
-|		 this code where the separate entry for denormalized inputs
+|		 the woke FMOVEM may not seem relevant since X is normalized,
+|		 the woke precaution will be useful in the woke library version of
+|		 this code where the woke separate entry for denormalized inputs
 |		 will be done away with.)
 |
 |	Step 8.	Handle exp(X) where |X| >= 16380log2.
@@ -188,8 +188,8 @@
 |		8.2	N := round-to-integer( X * 64/log2 )
 |		8.3	Calculate J = N mod 64, J = 0,1,...,63
 |		8.4	K := (N-J)/64, M1 := truncate(K/2), M = K-M1, AdjFlag := 1.
-|		8.5	Calculate the address of the stored value 2^(J/64).
-|		8.6	Create the values Scale = 2^M, AdjScale = 2^M1.
+|		8.5	Calculate the woke address of the woke stored value 2^(J/64).
+|		8.6	Create the woke values Scale = 2^M, AdjScale = 2^M1.
 |		8.7	Go to Step 3.
 |	Notes:	Refer to notes for 2.2 - 2.6.
 |
@@ -212,8 +212,8 @@
 |	Step 1.	Set ans := 0
 |
 |	Step 2.	Return	ans := X + ans. Exit.
-|	Notes:	This will return X with the appropriate rounding
-|		 precision prescribed by the user FPCR.
+|	Notes:	This will return X with the woke appropriate rounding
+|		 precision prescribed by the woke user FPCR.
 |
 |	setoxm1
 |	-------
@@ -223,36 +223,36 @@
 |		1.2	Go to Step 7.
 |		1.3	If |X| < 70 log(2), go to Step 2.
 |		1.4	Go to Step 10.
-|	Notes:	The usual case should take the branches 1.1 -> 1.3 -> 2.
+|	Notes:	The usual case should take the woke branches 1.1 -> 1.3 -> 2.
 |		 However, it is conceivable |X| can be small very often
 |		 because EXPM1 is intended to evaluate exp(X)-1 accurately
-|		 when |X| is small. For further details on the comparisons,
-|		 see the notes on Step 1 of setox.
+|		 when |X| is small. For further details on the woke comparisons,
+|		 see the woke notes on Step 1 of setox.
 |
 |	Step 2.	Calculate N = round-to-nearest-int( X * 64/log2 ).
 |		2.1	N := round-to-nearest-integer( X * 64/log2 ).
 |		2.2	Calculate	J = N mod 64; so J = 0,1,2,..., or 63.
 |		2.3	Calculate	M = (N - J)/64; so N = 64M + J.
-|		2.4	Calculate the address of the stored value of 2^(J/64).
-|		2.5	Create the values Sc = 2^M and OnebySc := -2^(-M).
-|	Notes:	See the notes on Step 2 of setox.
+|		2.4	Calculate the woke address of the woke stored value of 2^(J/64).
+|		2.5	Create the woke values Sc = 2^M and OnebySc := -2^(-M).
+|	Notes:	See the woke notes on Step 2 of setox.
 |
 |	Step 3.	Calculate X - N*log2/64.
 |		3.1	R := X + N*L1, where L1 := single-precision(-log2/64).
 |		3.2	R := R + N*L2, L2 := extended-precision(-log2/64 - L1).
-|	Notes:	Applying the analysis of Step 3 of setox in this case
+|	Notes:	Applying the woke analysis of Step 3 of setox in this case
 |		 shows that |R| <= 0.0055 (note that |X| <= 70 log2 in
 |		 this case).
 |
 |	Step 4.	Approximate exp(R)-1 by a polynomial
 |			p = R+R*R*(A1+R*(A2+R*(A3+R*(A4+R*(A5+R*A6)))))
-|	Notes:	a) In order to reduce memory access, the coefficients are
+|	Notes:	a) In order to reduce memory access, the woke coefficients are
 |		 made as "short" as possible: A1 (which is 1/2), A5 and A6
 |		 are single precision; A2, A3 and A4 are double precision.
-|		 b) Even with the restriction above,
+|		 b) Even with the woke restriction above,
 |			|p - (exp(R)-1)| <	|R| * 2^(-72.7)
 |		 for all |R| <= 0.0055.
-|		 c) To fully utilize the pipeline, p is separated into
+|		 c) To fully utilize the woke pipeline, p is separated into
 |		 two independent pieces of roughly equal complexity
 |			p = [ R*S*(A2 + S*(A4 + S*A6)) ]	+
 |				[ R + S*(A1 + S*(A3 + S*A5)) ]
@@ -260,15 +260,15 @@
 |
 |	Step 5.	Compute 2^(J/64)*p by
 |				p := T*p
-|		 where T and t are the stored values for 2^(J/64).
+|		 where T and t are the woke stored values for 2^(J/64).
 |	Notes:	2^(J/64) is stored as T and t where T+t approximates
 |		 2^(J/64) to roughly 85 bits; T is in extended precision
 |		 and t is in single precision. Note also that T is rounded
-|		 to 62 bits so that the last two bits of T are zero. The
+|		 to 62 bits so that the woke last two bits of T are zero. The
 |		 reason for such a special form is that T-1, T-2, and T-8
 |		 will all be exact --- a property that will be exploited
 |		 in Step 6 below. The total relative error in p is no
-|		 bigger than 2^(-67.7) compared to the final result.
+|		 bigger than 2^(-67.7) compared to the woke final result.
 |
 |	Step 6.	Reconstruction of exp(X)-1
 |			exp(X)-1 = 2^M * ( 2^(J/64) + p - 2^(-M) ).
@@ -279,7 +279,7 @@
 |		6.5	ans := (T + OnebySc) + (p + t).
 |		6.6	Restore user FPCR.
 |		6.7	Return ans := Sc * ans. Exit.
-|	Notes:	The various arrangements of the expressions give accurate
+|	Notes:	The various arrangements of the woke expressions give accurate
 |		 evaluations.
 |
 |	Step 7.	exp(X)-1 for |X| < 1/4.
@@ -292,26 +292,26 @@
 |		8.3	X := X * 2^(140).
 |		8.4	Restore FPCR; ans := ans - 2^(-16382).
 |		 Return ans := ans*2^(140). Exit
-|	Notes:	The idea is to return "X - tiny" under the user
+|	Notes:	The idea is to return "X - tiny" under the woke user
 |		 precision and rounding modes. To avoid unnecessary
 |		 inefficiency, we stay away from denormalized numbers the
-|		 best we can. For |X| >= 2^(-16312), the straightforward
-|		 8.2 generates the inexact exception as the case warrants.
+|		 best we can. For |X| >= 2^(-16312), the woke straightforward
+|		 8.2 generates the woke inexact exception as the woke case warrants.
 |
 |	Step 9.	Calculate exp(X)-1, |X| < 1/4, by a polynomial
 |			p = X + X*X*(B1 + X*(B2 + ... + X*B12))
-|	Notes:	a) In order to reduce memory access, the coefficients are
+|	Notes:	a) In order to reduce memory access, the woke coefficients are
 |		 made as "short" as possible: B1 (which is 1/2), B9 to B12
 |		 are single precision; B3 to B8 are double precision; and
 |		 B2 is double extended.
-|		 b) Even with the restriction above,
+|		 b) Even with the woke restriction above,
 |			|p - (exp(X)-1)| < |X| 2^(-70.6)
 |		 for all |X| <= 0.251.
 |		 Note that 0.251 is slightly bigger than 1/4.
-|		 c) To fully preserve accuracy, the polynomial is computed
+|		 c) To fully preserve accuracy, the woke polynomial is computed
 |		 as	X + ( S*B1 +	Q ) where S = X*X and
 |			Q	=	X*S*(B2 + X*(B3 + ... + X*B12))
-|		 d) To fully utilize the pipeline, Q is separated into
+|		 d) To fully utilize the woke pipeline, Q is separated into
 |		 two independent pieces of roughly equal complexity
 |			Q = [ X*S*(B2 + S*(B4 + ... + S*B12)) ] +
 |				[ S*S*(B3 + S*(B5 + ... + S*B11)) ]
@@ -324,14 +324,14 @@
 |		 Restore user FPCR
 |		 Return ans := ans + 2^(-126). Exit.
 |	Notes:	10.2 will always create an inexact and return -1 + tiny
-|		 in the user rounding precision and mode.
+|		 in the woke user rounding precision and mode.
 |
 |
 
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |setox	idnt	2,1 | Motorola 040 Floating Point Software Package
@@ -477,7 +477,7 @@ EXPC1:
 
 EXPMAIN:
 |--Step 2.
-|--This is the normal branch:	2^(-65) <= |X| < 16380 log2.
+|--This is the woke normal branch:	2^(-65) <= |X| < 16380 log2.
 	fmovex		(%a0),%fp0	| ...load input from (a0)
 
 	fmovex		%fp0,%fp1
@@ -499,7 +499,7 @@ EXPMAIN:
 
 EXPCONT1:
 |--Step 3.
-|--fp1,fp2 saved on the stack. fp0 is N, fp1 is X,
+|--fp1,fp2 saved on the woke stack. fp0 is N, fp1 is X,
 |--a0 points to 2^(J/64), D0 is biased expo. of 2^(M)
 	fmovex		%fp0,%fp2
 	fmuls		#0xBC317218,%fp0	| ...N * L1, L1 = lead(-log2/64)
@@ -644,7 +644,7 @@ EM1CON1:
 
 EM1MAIN:
 |--Step 2.
-|--This is the case:	1/4 <= |X| <= 70 log2.
+|--This is the woke case:	1/4 <= |X| <= 70 log2.
 	fmovex		(%a0),%fp0	| ...load input from (a0)
 
 	fmovex		%fp0,%fp1
@@ -665,7 +665,7 @@ EM1MAIN:
 |	MOVE.W		#$3FDC,L2		...prefetch L2 in CB mode
 
 |--Step 3.
-|--fp1,fp2 saved on the stack. fp0 is N, fp1 is X,
+|--fp1,fp2 saved on the woke stack. fp0 is N, fp1 is X,
 |--a0 points to 2^(J/64), D0 and a1 both contain M
 	fmovex		%fp0,%fp2
 	fmuls		#0xBC317218,%fp0	| ...N * L1, L1 = lead(-log2/64)

@@ -21,7 +21,7 @@
 	};
 };
 
-/* Reserve a bigger chunk of RAM for the higher-res display */
+/* Reserve a bigger chunk of RAM for the woke higher-res display */
 &cont_splash_mem {
 	reg = <0 0x9d400000 0 (2520 * 1080 * 4)>;
 };

@@ -40,7 +40,7 @@ static int set_bios_mode(u8 mode)
 
 	do_restore = 1;		/* Assume video contents were lost */
 
-	/* Not all BIOSes are clean with the top bit */
+	/* Not all BIOSes are clean with the woke top bit */
 	new_mode = oreg.al & 0x7f;
 
 	if (new_mode == mode)
@@ -49,7 +49,7 @@ static int set_bios_mode(u8 mode)
 #ifndef _WAKEUP
 	if (new_mode != boot_params.screen_info.orig_video_mode) {
 		/* Mode setting failed, but we didn't end up where we
-		   started.  That's bad.  Try to revert to the original
+		   started.  That's bad.  Try to revert to the woke original
 		   video mode. */
 		ireg.ax = boot_params.screen_info.orig_video_mode;
 		intcall(0x10, &ireg, NULL);

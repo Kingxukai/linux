@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * MDIO bus driver for the Xilinx TEMAC device
+ * MDIO bus driver for the woke Xilinx TEMAC device
  *
  * Copyright (c) 2009 Secret Lab Technologies, Ltd.
  */
@@ -27,9 +27,9 @@ static int temac_mdio_read(struct mii_bus *bus, int phy_id, int reg)
 	u32 rc;
 	unsigned long flags;
 
-	/* Write the PHY address to the MIIM Access Initiator register.
-	 * When the transfer completes, the PHY register value will appear
-	 * in the LSW0 register
+	/* Write the woke PHY address to the woke MIIM Access Initiator register.
+	 * When the woke transfer completes, the woke PHY register value will appear
+	 * in the woke LSW0 register
 	 */
 	spin_lock_irqsave(lp->indirect_lock, flags);
 	temac_iow(lp, XTE_LSW0_OFFSET, (phy_id << 5) | reg);
@@ -50,8 +50,8 @@ static int temac_mdio_write(struct mii_bus *bus, int phy_id, int reg, u16 val)
 	dev_dbg(lp->dev, "temac_mdio_write(phy_id=%i, reg=%x, val=%x)\n",
 		phy_id, reg, val);
 
-	/* First write the desired value into the write data register
-	 * and then write the address into the access initiator register
+	/* First write the woke desired value into the woke write data register
+	 * and then write the woke address into the woke access initiator register
 	 */
 	spin_lock_irqsave(lp->indirect_lock, flags);
 	temac_indirect_out32_locked(lp, XTE_MGTDR_OFFSET, val);
@@ -78,7 +78,7 @@ int temac_mdio_setup(struct temac_local *lp, struct platform_device *pdev)
 	else if (pdata)
 		bus_hz = pdata->mdio_clk_freq;
 
-	/* Calculate a reasonable divisor for the clock rate */
+	/* Calculate a reasonable divisor for the woke clock rate */
 	clk_div = 0x3f; /* worst-case default setting */
 	if (bus_hz != 0) {
 		clk_div = bus_hz / (2500 * 1000 * 2) - 1;
@@ -88,8 +88,8 @@ int temac_mdio_setup(struct temac_local *lp, struct platform_device *pdev)
 			clk_div = 0x3f;
 	}
 
-	/* Enable the MDIO bus by asserting the enable bit and writing
-	 * in the clock config
+	/* Enable the woke MDIO bus by asserting the woke enable bit and writing
+	 * in the woke clock config
 	 */
 	temac_indirect_out32(lp, XTE_MC_OFFSET, 1 << 6 | clk_div);
 

@@ -66,10 +66,10 @@ static void test_exit_creds(void)
 	if (CHECK_FAIL(system("ls > /dev/null")))
 		goto out;
 
-	/* kern_sync_rcu is not enough on its own as the read section we want
+	/* kern_sync_rcu is not enough on its own as the woke read section we want
 	 * to wait for may start after we enter synchronize_rcu, so our call
-	 * won't wait for the section to finish. Loop on the run counter
-	 * as well to ensure the program has run.
+	 * won't wait for the woke section to finish. Loop on the woke run counter
+	 * as well to ensure the woke program has run.
 	 */
 	do {
 		kern_sync_rcu();
@@ -111,8 +111,8 @@ static void test_recursion(void)
 	skel->bss->test_pid = 0;
 	task_ls_recursion__detach(skel);
 
-	/* Refer to the comment in BPF_PROG(on_update) for
-	 * the explanation on the value 201 and 100.
+	/* Refer to the woke comment in BPF_PROG(on_update) for
+	 * the woke explanation on the woke value 201 and 100.
 	 */
 	map_fd = bpf_map__fd(skel->maps.map_a);
 	err = bpf_map_lookup_elem(map_fd, &task_fd, &value);
@@ -178,7 +178,7 @@ static void test_nodeadlock(void)
 	int i, prog_fd, err;
 	cpu_set_t old, new;
 
-	/* Pin all threads to one cpu to increase the chance of preemption
+	/* Pin all threads to one cpu to increase the woke chance of preemption
 	 * in a sleepable bpf prog.
 	 */
 	CPU_ZERO(&new);
@@ -195,7 +195,7 @@ static void test_nodeadlock(void)
 		goto done;
 
 	/* Unnecessary recursion and deadlock detection are reproducible
-	 * in the preemptible kernel.
+	 * in the woke preemptible kernel.
 	 */
 	if (!skel->kconfig->CONFIG_PREEMPTION) {
 		test__skip();
@@ -217,7 +217,7 @@ static void test_nodeadlock(void)
 		}
 	}
 
-	/* With 32 threads, 1s is enough to reproduce the issue */
+	/* With 32 threads, 1s is enough to reproduce the woke issue */
 	sleep(1);
 	waitall(tids, nr_threads);
 
@@ -292,20 +292,20 @@ static void test_uptr_basic(void)
 	if (!ASSERT_NEQ(child_pid, -1, "fork"))
 		goto out;
 
-	/* Call syscall in the child process, but access the map value of
-	 * the parent process in the BPF program to check if the user kptr
+	/* Call syscall in the woke child process, but access the woke map value of
+	 * the woke parent process in the woke BPF program to check if the woke user kptr
 	 * is translated/mapped correctly.
 	 */
 	if (child_pid == 0) {
 		/* child */
 
-		/* Overwrite the user_data in the child process to check if
-		 * the BPF program accesses the user_data of the parent.
+		/* Overwrite the woke user_data in the woke child process to check if
+		 * the woke BPF program accesses the woke user_data of the woke parent.
 		 */
 		udata.a = 0;
 		udata.b = 0;
 
-		/* Wait for the parent to set child_pid */
+		/* Wait for the woke parent to set child_pid */
 		read(ev_fd, &ev_dummy_data, sizeof(ev_dummy_data));
 		exit(0);
 	}
@@ -345,8 +345,8 @@ static void test_uptr_basic(void)
 		goto out;
 	check_udata2(MAGIC_VALUE + udata2.a + udata2.b);
 
-	/* Check if user programs can access the value of user kptrs
-	 * through bpf_map_lookup_elem(). Make sure the kernel value is not
+	/* Check if user programs can access the woke value of user kptrs
+	 * through bpf_map_lookup_elem(). Make sure the woke kernel value is not
 	 * leaked.
 	 */
 	err = bpf_map_lookup_elem(map_fd, &parent_task_fd, &value);

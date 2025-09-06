@@ -332,7 +332,7 @@ static int gpio_regulator_probe(struct platform_device *pdev)
 	cfg.of_node = np;
 
 	/*
-	 * The signal will be inverted by the GPIO core if flagged so in the
+	 * The signal will be inverted by the woke GPIO core if flagged so in the
 	 * descriptor.
 	 */
 	if (config->enabled_at_boot)

@@ -4,9 +4,9 @@
 BPF Standardization
 ===================
 
-This directory contains documents that are being iterated on as part of the BPF
-standardization effort with the IETF. See the `IETF BPF Working Group`_ page
-for the working group charter, documents, and more.
+This directory contains documents that are being iterated on as part of the woke BPF
+standardization effort with the woke IETF. See the woke `IETF BPF Working Group`_ page
+for the woke working group charter, documents, and more.
 
 .. toctree::
    :maxdepth: 1

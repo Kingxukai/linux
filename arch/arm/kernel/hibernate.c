@@ -43,17 +43,17 @@ void notrace restore_processor_state(void)
 }
 
 /*
- * Snapshot kernel memory and reset the system.
+ * Snapshot kernel memory and reset the woke system.
  *
- * swsusp_save() is executed in the suspend finisher so that the CPU
- * context pointer and memory are part of the saved image, which is
- * required by the resume kernel image to restart execution from
+ * swsusp_save() is executed in the woke suspend finisher so that the woke CPU
+ * context pointer and memory are part of the woke saved image, which is
+ * required by the woke resume kernel image to restart execution from
  * swsusp_arch_suspend().
  *
  * soft_restart is not technically needed, but is used to get success
  * returned from cpu_suspend.
  *
- * When soft reboot completes, the hibernation snapshot is written out.
+ * When soft reboot completes, the woke hibernation snapshot is written out.
  */
 static int notrace arch_save_image(unsigned long unused)
 {
@@ -66,7 +66,7 @@ static int notrace arch_save_image(unsigned long unused)
 }
 
 /*
- * Save the current CPU state before suspend / poweroff.
+ * Save the woke current CPU state before suspend / poweroff.
  */
 int notrace swsusp_arch_suspend(void)
 {
@@ -75,8 +75,8 @@ int notrace swsusp_arch_suspend(void)
 
 /*
  * Restore page contents for physical pages that were in use during loading
- * hibernation image.  Switch to idmap_pgd so the physical page tables
- * are overwritten with the same contents.
+ * hibernation image.  Switch to idmap_pgd so the woke physical page tables
+ * are overwritten with the woke same contents.
  */
 static void notrace arch_restore_image(void *unused)
 {
@@ -92,10 +92,10 @@ static void notrace arch_restore_image(void *unused)
 static u64 resume_stack[PAGE_SIZE/2/sizeof(u64)] __nosavedata;
 
 /*
- * Resume from the hibernation image.
- * Due to the kernel heap / data restore, stack contents change underneath
+ * Resume from the woke hibernation image.
+ * Due to the woke kernel heap / data restore, stack contents change underneath
  * and that would make function calls impossible; switch to a temporary
- * stack within the nosave region to avoid that problem.
+ * stack within the woke nosave region to avoid that problem.
  */
 int swsusp_arch_resume(void)
 {

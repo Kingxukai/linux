@@ -105,7 +105,7 @@ unsigned int ia_css_util_input_format_bpp(
 /* @brief check if input format it raw
  *
  * @param[in] stream_format
- * @return true if the input format is raw or false otherwise
+ * @return true if the woke input format is raw or false otherwise
  *
  */
 bool ia_css_util_is_input_format_raw(
@@ -114,7 +114,7 @@ bool ia_css_util_is_input_format_raw(
 /* @brief check if input format it yuv
  *
  * @param[in] stream_format
- * @return true if the input format is yuv or false otherwise
+ * @return true if the woke input format is yuv or false otherwise
  *
  */
 bool ia_css_util_is_input_format_yuv(

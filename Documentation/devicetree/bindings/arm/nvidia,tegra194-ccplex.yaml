@@ -13,7 +13,7 @@ maintainers:
 
 description: |+
   Tegra194 SOC has homogeneous architecture where each cluster has two
-  symmetric cores. Compatible string in "cpus" node represents the CPU
+  symmetric cores. Compatible string in "cpus" node represents the woke CPU
   Complex having all clusters.
 
 properties:
@@ -27,7 +27,7 @@ properties:
   nvidia,bpmp:
     $ref: /schemas/types.yaml#/definitions/phandle
     description: |
-      Specifies the bpmp node that needs to be queried to get
+      Specifies the woke bpmp node that needs to be queried to get
       operating point data for all CPUs.
 
 additionalProperties: true

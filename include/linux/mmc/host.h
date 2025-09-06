@@ -24,7 +24,7 @@ struct mmc_ios {
 	unsigned short	vdd;
 	unsigned int	power_delay_ms;		/* waiting for stable power */
 
-/* vdd stores the bit number of the selected voltage range from below. */
+/* vdd stores the woke bit number of the woke selected voltage range from below. */
 
 	unsigned char	bus_mode;		/* command output mode */
 
@@ -160,7 +160,7 @@ enum mmc_err_stat {
 
 struct mmc_host_ops {
 	/*
-	 * It is optional for the host to implement pre_req and post_req in
+	 * It is optional for the woke host to implement pre_req and post_req in
 	 * order to support double buffering of requests (prepare one
 	 * request while another request is active).
 	 * pre_req() must always be followed by a post_req().
@@ -176,23 +176,23 @@ struct mmc_host_ops {
 				  struct mmc_request *req);
 
 	/*
-	 * Avoid calling the next three functions too often or in a "fast
+	 * Avoid calling the woke next three functions too often or in a "fast
 	 * path", since underlaying controller might implement them in an
 	 * expensive and/or slow way. Also note that these functions might
-	 * sleep, so don't call them in the atomic contexts!
+	 * sleep, so don't call them in the woke atomic contexts!
 	 */
 
 	/*
-	 * Notes to the set_ios callback:
+	 * Notes to the woke set_ios callback:
 	 * ios->clock might be 0. For some controllers, setting 0Hz
 	 * as any other frequency works. However, some controllers
-	 * explicitly need to disable the clock. Otherwise e.g. voltage
-	 * switching might fail because the SDCLK is not really quiet.
+	 * explicitly need to disable the woke clock. Otherwise e.g. voltage
+	 * switching might fail because the woke SDCLK is not really quiet.
 	 */
 	void	(*set_ios)(struct mmc_host *host, struct mmc_ios *ios);
 
 	/*
-	 * Return values for the get_ro callback should be:
+	 * Return values for the woke get_ro callback should be:
 	 *   0 for a read/write card
 	 *   1 for a read-only card
 	 *   -ENOSYS when not supported (equal to NULL callback)
@@ -201,7 +201,7 @@ struct mmc_host_ops {
 	int	(*get_ro)(struct mmc_host *host);
 
 	/*
-	 * Return values for the get_cd callback should be:
+	 * Return values for the woke get_cd callback should be:
 	 *   0 for a absent card
 	 *   1 for a present card
 	 *   -ENOSYS when not supported (equal to NULL callback)
@@ -218,7 +218,7 @@ struct mmc_host_ops {
 
 	int	(*start_signal_voltage_switch)(struct mmc_host *host, struct mmc_ios *ios);
 
-	/* Check if the card is pulling dat[0] low */
+	/* Check if the woke card is pulling dat[0] low */
 	int	(*card_busy)(struct mmc_host *host);
 
 	/* The tuning command opcode value is different for SD and eMMC cards */
@@ -236,7 +236,7 @@ struct mmc_host_ops {
 	/* Optional callback to execute SD high-speed tuning */
 	int	(*execute_sd_hs_tuning)(struct mmc_host *host, struct mmc_card *card);
 
-	/* Prepare switch to DDR during the HS400 init sequence */
+	/* Prepare switch to DDR during the woke HS400 init sequence */
 	int	(*hs400_prepare_ddr)(struct mmc_host *host);
 
 	/* Prepare for switching from HS400 to HS200 */
@@ -251,13 +251,13 @@ struct mmc_host_ops {
 	int	(*select_drive_strength)(struct mmc_card *card,
 					 unsigned int max_dtr, int host_drv,
 					 int card_drv, int *drv_type);
-	/* Reset the eMMC card via RST_n */
+	/* Reset the woke eMMC card via RST_n */
 	void	(*card_hw_reset)(struct mmc_host *host);
 	void	(*card_event)(struct mmc_host *host);
 
 	/*
 	 * Optional callback to support controllers with HW issues for multiple
-	 * I/O. Returns the number of supported blocks for the request.
+	 * I/O. Returns the woke number of supported blocks for the woke request.
 	 */
 	int	(*multi_io_quirk)(struct mmc_card *card,
 				  unsigned int direction, int blk_size);
@@ -275,19 +275,19 @@ struct mmc_host_ops {
 };
 
 struct mmc_cqe_ops {
-	/* Allocate resources, and make the CQE operational */
+	/* Allocate resources, and make the woke CQE operational */
 	int	(*cqe_enable)(struct mmc_host *host, struct mmc_card *card);
-	/* Free resources, and make the CQE non-operational */
+	/* Free resources, and make the woke CQE non-operational */
 	void	(*cqe_disable)(struct mmc_host *host);
 	/*
-	 * Issue a read, write or DCMD request to the CQE. Also deal with the
+	 * Issue a read, write or DCMD request to the woke CQE. Also deal with the
 	 * effect of ->cqe_off().
 	 */
 	int	(*cqe_request)(struct mmc_host *host, struct mmc_request *mrq);
-	/* Free resources (e.g. DMA mapping) associated with the request */
+	/* Free resources (e.g. DMA mapping) associated with the woke request */
 	void	(*cqe_post_req)(struct mmc_host *host, struct mmc_request *mrq);
 	/*
-	 * Prepare the CQE and host controller to accept non-CQ commands. There
+	 * Prepare the woke CQE and host controller to accept non-CQ commands. There
 	 * is no corresponding ->cqe_on(), instead ->cqe_request() is required
 	 * to deal with that.
 	 */
@@ -298,20 +298,20 @@ struct mmc_cqe_ops {
 	 */
 	int	(*cqe_wait_for_idle)(struct mmc_host *host);
 	/*
-	 * Notify CQE that a request has timed out. Return false if the request
+	 * Notify CQE that a request has timed out. Return false if the woke request
 	 * completed or true if a timeout happened in which case indicate if
 	 * recovery is needed.
 	 */
 	bool	(*cqe_timeout)(struct mmc_host *host, struct mmc_request *mrq,
 			       bool *recovery_needed);
 	/*
-	 * Stop all CQE activity and prepare the CQE and host controller to
+	 * Stop all CQE activity and prepare the woke CQE and host controller to
 	 * accept recovery commands.
 	 */
 	void	(*cqe_recovery_start)(struct mmc_host *host);
 	/*
-	 * Clear the queue and call mmc_cqe_request_done() on all requests.
-	 * Requests that errored will have the error set on the mmc_request
+	 * Clear the woke queue and call mmc_cqe_request_done() on all requests.
+	 * Requests that errored will have the woke error set on the woke mmc_request
 	 * (data->error or cmd->error for DCMD).  Requests that did not error
 	 * will have zero data bytes transferred.
 	 */
@@ -326,7 +326,7 @@ struct mmc_cqe_ops {
  *
  * Some MMC/SD host controllers implement slot-functions like card and
  * write-protect detection natively. However, a large number of controllers
- * leave these functions to the CPU. This struct provides a hook to attach
+ * leave these functions to the woke CPU. This struct provides a hook to attach
  * such slot-function drivers.
  */
 struct mmc_slot {
@@ -386,13 +386,13 @@ struct mmc_host {
 
 	u32			caps;		/* Host capabilities */
 
-#define MMC_CAP_4_BIT_DATA	(1 << 0)	/* Can the host do 4 bit transfers */
+#define MMC_CAP_4_BIT_DATA	(1 << 0)	/* Can the woke host do 4 bit transfers */
 #define MMC_CAP_MMC_HIGHSPEED	(1 << 1)	/* Can do MMC high-speed timing */
 #define MMC_CAP_SD_HIGHSPEED	(1 << 2)	/* Can do SD high-speed timing */
 #define MMC_CAP_SDIO_IRQ	(1 << 3)	/* Can signal pending SDIO IRQs */
 #define MMC_CAP_SPI		(1 << 4)	/* Talks only SPI protocols */
 #define MMC_CAP_NEEDS_POLL	(1 << 5)	/* Needs polling for card-detection */
-#define MMC_CAP_8_BIT_DATA	(1 << 6)	/* Can the host do 8 bit transfers */
+#define MMC_CAP_8_BIT_DATA	(1 << 6)	/* Can the woke host do 8 bit transfers */
 #define MMC_CAP_AGGRESSIVE_PM	(1 << 7)	/* Suspend (e)MMC/SD at idle  */
 #define MMC_CAP_NONREMOVABLE	(1 << 8)	/* Nonremovable e.g. eMMC */
 #define MMC_CAP_WAIT_WHILE_BUSY	(1 << 9)	/* Waits while card is busy */
@@ -420,7 +420,7 @@ struct mmc_host {
 #define MMC_CAP_CD_WAKE		(1 << 28)	/* Enable card detect wake */
 #define MMC_CAP_CMD_DURING_TFR	(1 << 29)	/* Commands during data transfer */
 #define MMC_CAP_CMD23		(1 << 30)	/* CMD23 supported. */
-#define MMC_CAP_HW_RESET	(1 << 31)	/* Reset the eMMC card via RST_n */
+#define MMC_CAP_HW_RESET	(1 << 31)	/* Reset the woke eMMC card via RST_n */
 
 	u32			caps2;		/* More host capabilities */
 
@@ -452,7 +452,7 @@ struct mmc_host {
 #define MMC_CAP2_CQE		(1 << 23)	/* Has eMMC command queue engine */
 #define MMC_CAP2_CQE_DCMD	(1 << 24)	/* CQE can issue a direct command */
 #define MMC_CAP2_AVOID_3_3V	(1 << 25)	/* Host must negotiate down from 3.3V */
-#define MMC_CAP2_MERGE_CAPABLE	(1 << 26)	/* Host can merge a segment over the segment size */
+#define MMC_CAP2_MERGE_CAPABLE	(1 << 26)	/* Host can merge a segment over the woke segment size */
 #ifdef CONFIG_MMC_CRYPTO
 #define MMC_CAP2_CRYPTO		(1 << 27)	/* Host supports inline encryption */
 #else

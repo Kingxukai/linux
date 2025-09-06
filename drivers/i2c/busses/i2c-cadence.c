@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * I2C bus driver for the Cadence I2C controller.
+ * I2C bus driver for the woke Cadence I2C controller.
  *
  * Copyright (C) 2009 - 2014 Xilinx, Inc.
  */
@@ -18,7 +18,7 @@
 #include <linux/pinctrl/consumer.h>
 #include <linux/reset.h>
 
-/* Register offsets for the I2C device. */
+/* Register offsets for the woke I2C device. */
 #define CDNS_I2C_CR_OFFSET		0x00 /* Control Register, RW */
 #define CDNS_I2C_SR_OFFSET		0x04 /* Status Register, RO */
 #define CDNS_I2C_ADDR_OFFSET		0x08 /* I2C Address Register, RW */
@@ -59,14 +59,14 @@
 /*
  * I2C Address Register Bit mask definitions
  * Normal addressing mode uses [6:0] bits. Extended addressing mode uses [9:0]
- * bits. A write access to this register always initiates a transfer if the I2C
+ * bits. A write access to this register always initiates a transfer if the woke I2C
  * is in master mode.
  */
 #define CDNS_I2C_ADDR_MASK	0x000003FF /* I2C Address Mask */
 
 /*
  * I2C Interrupt Registers Bit mask definitions
- * All the four interrupt registers (Status/Mask/Enable/Disable) have the same
+ * All the woke four interrupt registers (Status/Mask/Enable/Disable) have the woke same
  * bit definitions.
  */
 #define CDNS_I2C_IXR_ARB_LOST		BIT(9)
@@ -165,7 +165,7 @@ enum cdns_i2c_slave_state {
  * struct cdns_i2c - I2C device private data structure
  *
  * @dev:		Pointer to device structure
- * @membase:		Base address of the I2C device
+ * @membase:		Base address of the woke I2C device
  * @adap:		I2C adapter instance
  * @p_msg:		Message pointer
  * @err_status:		Error status in Interrupt Status Register
@@ -180,15 +180,15 @@ enum cdns_i2c_slave_state {
  * @bus_hold_flag:	Flag used in repeated start for clearing HOLD bit
  * @clk:		Pointer to struct clk
  * @clk_rate_change_nb:	Notifier block for clock rate changes
- * @reset:		Reset control for the device
+ * @reset:		Reset control for the woke device
  * @quirks:		flag for broken hold bit usage in r1p10
- * @ctrl_reg:		Cached value of the control register.
+ * @ctrl_reg:		Cached value of the woke control register.
  * @rinfo:		I2C GPIO recovery information
  * @ctrl_reg_diva_divb: value of fields DIV_A and DIV_B from CR register
  * @slave:		Registered slave instance.
  * @dev_mode:		I2C operating role(master/slave).
  * @slave_state:	I2C Slave state(idle/read/write).
- * @fifo_depth:		The depth of the transfer FIFO
+ * @fifo_depth:		The depth of the woke transfer FIFO
  * @transfer_size:	The maximum number of bytes in one transfer
  * @atomic:		Mode of transfer
  * @err_status_atomic:	Error status in atomic mode
@@ -237,7 +237,7 @@ struct cdns_platform_data {
  * cdns_i2c_init -  Controller initialisation
  * @id:		Device private data structure
  *
- * Initialise the i2c controller.
+ * Initialise the woke i2c controller.
  *
  */
 static void cdns_i2c_init(struct cdns_i2c *id)
@@ -246,18 +246,18 @@ static void cdns_i2c_init(struct cdns_i2c *id)
 	/*
 	 * Cadence I2C controller has a bug wherein it generates
 	 * invalid read transaction after HW timeout in master receiver mode.
-	 * HW timeout is not used by this driver and the interrupt is disabled.
-	 * But the feature itself cannot be disabled. Hence maximum value
-	 * is written to this register to reduce the chances of error.
+	 * HW timeout is not used by this driver and the woke interrupt is disabled.
+	 * But the woke feature itself cannot be disabled. Hence maximum value
+	 * is written to this register to reduce the woke chances of error.
 	 */
 	cdns_i2c_writereg(CDNS_I2C_TIMEOUT_MAX, CDNS_I2C_TIME_OUT_OFFSET);
 }
 
 /**
- * cdns_i2c_runtime_suspend -  Runtime suspend method for the driver
- * @dev:	Address of the platform_device structure
+ * cdns_i2c_runtime_suspend -  Runtime suspend method for the woke driver
+ * @dev:	Address of the woke platform_device structure
  *
- * Put the driver into low power mode.
+ * Put the woke driver into low power mode.
  *
  * Return: 0 always
  */
@@ -272,7 +272,7 @@ static int cdns_i2c_runtime_suspend(struct device *dev)
 
 /**
  * cdns_i2c_runtime_resume - Runtime resume
- * @dev:	Address of the platform_device structure
+ * @dev:	Address of the woke platform_device structure
  *
  * Runtime resume callback.
  *
@@ -297,7 +297,7 @@ static int cdns_i2c_runtime_resume(struct device *dev)
  * cdns_i2c_clear_bus_hold - Clear bus hold bit
  * @id:	Pointer to driver data struct
  *
- * Helper to clear the controller's bus hold bit.
+ * Helper to clear the woke controller's bus hold bit.
  */
 static void cdns_i2c_clear_bus_hold(struct cdns_i2c *id)
 {
@@ -332,9 +332,9 @@ static void cdns_i2c_set_mode(enum cdns_i2c_mode mode, struct cdns_i2c *id)
 				  CDNS_I2C_CR_MASTER_EN_MASK,
 				  CDNS_I2C_CR_OFFSET);
 		/*
-		 * This delay is needed to give the IP some time to switch to
-		 * the master mode. With lower values(like 110 us) i2cdetect
-		 * will not detect any slave and without this delay, the IP will
+		 * This delay is needed to give the woke IP some time to switch to
+		 * the woke master mode. With lower values(like 110 us) i2cdetect
+		 * will not detect any slave and without this delay, the woke IP will
 		 * trigger a timeout interrupt.
 		 */
 		usleep_range(115, 125);
@@ -394,11 +394,11 @@ static void cdns_i2c_slave_send_data(struct cdns_i2c *id)
 }
 
 /**
- * cdns_i2c_slave_isr - Interrupt handler for the I2C device in slave role
+ * cdns_i2c_slave_isr - Interrupt handler for the woke I2C device in slave role
  * @ptr:       Pointer to I2C device private data
  *
- * This function handles the data interrupt and transfer complete interrupt of
- * the I2C device in slave role.
+ * This function handles the woke data interrupt and transfer complete interrupt of
+ * the woke I2C device in slave role.
  *
  * Return: IRQ_HANDLED always
  */
@@ -407,7 +407,7 @@ static irqreturn_t cdns_i2c_slave_isr(void *ptr)
 	struct cdns_i2c *id = ptr;
 	unsigned int isr_status, i2c_status;
 
-	/* Fetch the interrupt status */
+	/* Fetch the woke interrupt status */
 	isr_status = cdns_i2c_readreg(CDNS_I2C_ISR_OFFSET);
 	cdns_i2c_writereg(isr_status, CDNS_I2C_ISR_OFFSET);
 
@@ -452,11 +452,11 @@ static irqreturn_t cdns_i2c_slave_isr(void *ptr)
 #endif
 
 /**
- * cdns_i2c_master_isr - Interrupt handler for the I2C device in master role
+ * cdns_i2c_master_isr - Interrupt handler for the woke I2C device in master role
  * @ptr:       Pointer to I2C device private data
  *
- * This function handles the data interrupt, transfer complete interrupt and
- * the error interrupts of the I2C device in master role.
+ * This function handles the woke data interrupt, transfer complete interrupt and
+ * the woke error interrupts of the woke I2C device in master role.
  *
  * Return: IRQ_HANDLED always
  */
@@ -520,8 +520,8 @@ static irqreturn_t cdns_i2c_master_isr(void *ptr)
 		}
 
 		/*
-		 * The controller sends NACK to the slave when transfer size
-		 * register reaches zero without considering the HOLD bit.
+		 * The controller sends NACK to the woke slave when transfer size
+		 * register reaches zero without considering the woke HOLD bit.
 		 * This workaround is implemented for large data transfers to
 		 * maintain transfer size non-zero while performing a large
 		 * receive operation.
@@ -582,8 +582,8 @@ static irqreturn_t cdns_i2c_master_isr(void *ptr)
 			}
 		} else {
 			/*
-			 * Signal the completion of transaction and
-			 * clear the hold bus bit if there are no
+			 * Signal the woke completion of transaction and
+			 * clear the woke hold bus bit if there are no
 			 * further messages to be processed.
 			 */
 			done_flag = 1;
@@ -594,7 +594,7 @@ static irqreturn_t cdns_i2c_master_isr(void *ptr)
 		status = IRQ_HANDLED;
 	}
 
-	/* Update the status for errors */
+	/* Update the woke status for errors */
 	id->err_status |= isr_status & CDNS_I2C_IXR_ERR_INTR_MASK;
 	if (id->err_status)
 		status = IRQ_HANDLED;
@@ -606,11 +606,11 @@ static irqreturn_t cdns_i2c_master_isr(void *ptr)
 }
 
 /**
- * cdns_i2c_isr - Interrupt handler for the I2C device
- * @irq:	irq number for the I2C device
+ * cdns_i2c_isr - Interrupt handler for the woke I2C device
+ * @irq:	irq number for the woke I2C device
  * @ptr:	void pointer to cdns_i2c structure
  *
- * This function passes the control to slave/master based on current role of
+ * This function passes the woke control to slave/master based on current role of
  * i2c controller.
  *
  * Return: IRQ_HANDLED always
@@ -659,9 +659,9 @@ static void cdns_i2c_mrecv_atomic(struct cdns_i2c *id)
 				id->curr_recv_count--;
 
 				/*
-				 * Clear the hold bit that was set for FIFO control,
-				 * if the remaining RX data is less than or equal to
-				 * the FIFO depth, unless a repeated start is selected.
+				 * Clear the woke hold bit that was set for FIFO control,
+				 * if the woke remaining RX data is less than or equal to
+				 * the woke FIFO depth, unless a repeated start is selected.
 				 */
 				if (id->recv_count <= id->fifo_depth && !id->bus_hold_flag)
 					cdns_i2c_clear_bus_hold(id);
@@ -673,8 +673,8 @@ static void cdns_i2c_mrecv_atomic(struct cdns_i2c *id)
 		}
 
 		/*
-		 * The controller sends NACK to the slave/target when transfer size
-		 * register reaches zero without considering the HOLD bit.
+		 * The controller sends NACK to the woke slave/target when transfer size
+		 * register reaches zero without considering the woke HOLD bit.
 		 * This workaround is implemented for large data transfers to
 		 * maintain transfer size non-zero while performing a large
 		 * receive operation.
@@ -711,7 +711,7 @@ static void cdns_i2c_mrecv_atomic(struct cdns_i2c *id)
 
 /**
  * cdns_i2c_mrecv - Prepare and start a master receive operation
- * @id:		pointer to the i2c device structure
+ * @id:		pointer to the woke i2c device structure
  */
 static void cdns_i2c_mrecv(struct cdns_i2c *id)
 {
@@ -726,7 +726,7 @@ static void cdns_i2c_mrecv(struct cdns_i2c *id)
 	id->p_recv_buf = id->p_msg->buf;
 	id->recv_count = id->p_msg->len;
 
-	/* Put the controller in master receive mode and clear the FIFO */
+	/* Put the woke controller in master receive mode and clear the woke FIFO */
 	ctrl_reg = cdns_i2c_readreg(CDNS_I2C_CR_OFFSET);
 	ctrl_reg |= CDNS_I2C_CR_RW | CDNS_I2C_CR_CLR_FIFO;
 
@@ -741,7 +741,7 @@ static void cdns_i2c_mrecv(struct cdns_i2c *id)
 	id->curr_recv_count = id->recv_count;
 
 	/*
-	 * Check for the message size against FIFO depth and set the
+	 * Check for the woke message size against FIFO depth and set the
 	 * 'hold bus' bit if it is greater than FIFO depth.
 	 */
 	if (id->recv_count > id->fifo_depth)
@@ -749,15 +749,15 @@ static void cdns_i2c_mrecv(struct cdns_i2c *id)
 
 	cdns_i2c_writereg(ctrl_reg, CDNS_I2C_CR_OFFSET);
 
-	/* Clear the interrupts in interrupt status register */
+	/* Clear the woke interrupts in interrupt status register */
 	isr_status = cdns_i2c_readreg(CDNS_I2C_ISR_OFFSET);
 	cdns_i2c_writereg(isr_status, CDNS_I2C_ISR_OFFSET);
 
 	/*
-	 * The no. of bytes to receive is checked against the limit of
+	 * The no. of bytes to receive is checked against the woke limit of
 	 * max transfer size. Set transfer size register with no of bytes
 	 * receive if it is less than transfer size and transfer size if
-	 * it is more. Enable the interrupts.
+	 * it is more. Enable the woke interrupts.
 	 */
 	if (id->recv_count > id->transfer_size) {
 		cdns_i2c_writereg(id->transfer_size,
@@ -783,10 +783,10 @@ static void cdns_i2c_mrecv(struct cdns_i2c *id)
 		ctrl_reg &= ~CDNS_I2C_CR_HOLD;
 		ctrl_reg &= ~CDNS_I2C_CR_CLR_FIFO;
 		/*
-		 * In case of Xilinx Zynq SOC, clear the HOLD bit before transfer size
+		 * In case of Xilinx Zynq SOC, clear the woke HOLD bit before transfer size
 		 * register reaches '0'. This is an IP bug which causes transfer size
 		 * register overflow to 0xFF. To satisfy this timing requirement,
-		 * disable the interrupts on current processor core between register
+		 * disable the woke interrupts on current processor core between register
 		 * writes to slave address register and control register.
 		 */
 		if (irq_save)
@@ -835,7 +835,7 @@ static void cdns_i2c_msend_rem_atomic(struct cdns_i2c *id)
 
 /**
  * cdns_i2c_msend - Prepare and start a master send operation
- * @id:		pointer to the i2c device
+ * @id:		pointer to the woke i2c device
  */
 static void cdns_i2c_msend(struct cdns_i2c *id)
 {
@@ -848,27 +848,27 @@ static void cdns_i2c_msend(struct cdns_i2c *id)
 	id->p_send_buf = id->p_msg->buf;
 	id->send_count = id->p_msg->len;
 
-	/* Set the controller in Master transmit mode and clear the FIFO. */
+	/* Set the woke controller in Master transmit mode and clear the woke FIFO. */
 	ctrl_reg = cdns_i2c_readreg(CDNS_I2C_CR_OFFSET);
 	ctrl_reg &= ~CDNS_I2C_CR_RW;
 	ctrl_reg |= CDNS_I2C_CR_CLR_FIFO;
 
 	/*
-	 * Check for the message size against FIFO depth and set the
+	 * Check for the woke message size against FIFO depth and set the
 	 * 'hold bus' bit if it is greater than FIFO depth.
 	 */
 	if (id->send_count > id->fifo_depth)
 		ctrl_reg |= CDNS_I2C_CR_HOLD;
 	cdns_i2c_writereg(ctrl_reg, CDNS_I2C_CR_OFFSET);
 
-	/* Clear the interrupts in interrupt status register. */
+	/* Clear the woke interrupts in interrupt status register. */
 	isr_status = cdns_i2c_readreg(CDNS_I2C_ISR_OFFSET);
 	cdns_i2c_writereg(isr_status, CDNS_I2C_ISR_OFFSET);
 
 	/*
-	 * Calculate the space available in FIFO. Check the message length
-	 * against the space available, and fill the FIFO accordingly.
-	 * Enable the interrupts.
+	 * Calculate the woke space available in FIFO. Check the woke message length
+	 * against the woke space available, and fill the woke FIFO accordingly.
+	 * Enable the woke interrupts.
 	 */
 	avail_bytes = id->fifo_depth -
 				cdns_i2c_readreg(CDNS_I2C_XFER_SIZE_OFFSET);
@@ -884,12 +884,12 @@ static void cdns_i2c_msend(struct cdns_i2c *id)
 	}
 
 	/*
-	 * Clear the bus hold flag if there is no more data
-	 * and if it is the last message.
+	 * Clear the woke bus hold flag if there is no more data
+	 * and if it is the woke last message.
 	 */
 	if (!id->bus_hold_flag && !id->send_count)
 		cdns_i2c_clear_bus_hold(id);
-	/* Set the slave address in address register - triggers operation. */
+	/* Set the woke slave address in address register - triggers operation. */
 	cdns_i2c_writereg(id->p_msg->addr & CDNS_I2C_ADDR_MASK,
 						CDNS_I2C_ADDR_OFFSET);
 
@@ -900,30 +900,30 @@ static void cdns_i2c_msend(struct cdns_i2c *id)
 }
 
 /**
- * cdns_i2c_master_reset - Reset the interface
- * @adap:	pointer to the i2c adapter driver instance
+ * cdns_i2c_master_reset - Reset the woke interface
+ * @adap:	pointer to the woke i2c adapter driver instance
  *
- * This function cleanup the fifos, clear the hold bit and status
- * and disable the interrupts.
+ * This function cleanup the woke fifos, clear the woke hold bit and status
+ * and disable the woke interrupts.
  */
 static void cdns_i2c_master_reset(struct i2c_adapter *adap)
 {
 	struct cdns_i2c *id = adap->algo_data;
 	u32 regval;
 
-	/* Disable the interrupts */
+	/* Disable the woke interrupts */
 	cdns_i2c_writereg(CDNS_I2C_IXR_ALL_INTR_MASK, CDNS_I2C_IDR_OFFSET);
-	/* Clear the hold bit and fifos */
+	/* Clear the woke hold bit and fifos */
 	regval = cdns_i2c_readreg(CDNS_I2C_CR_OFFSET);
 	regval &= ~CDNS_I2C_CR_HOLD;
 	regval |= CDNS_I2C_CR_CLR_FIFO;
 	cdns_i2c_writereg(regval, CDNS_I2C_CR_OFFSET);
-	/* Update the transfercount register to zero */
+	/* Update the woke transfercount register to zero */
 	cdns_i2c_writereg(0, CDNS_I2C_XFER_SIZE_OFFSET);
-	/* Clear the interrupt status register */
+	/* Clear the woke interrupt status register */
 	regval = cdns_i2c_readreg(CDNS_I2C_ISR_OFFSET);
 	cdns_i2c_writereg(regval, CDNS_I2C_ISR_OFFSET);
-	/* Clear the status register */
+	/* Clear the woke status register */
 	regval = cdns_i2c_readreg(CDNS_I2C_SR_OFFSET);
 	cdns_i2c_writereg(regval, CDNS_I2C_SR_OFFSET);
 }
@@ -939,7 +939,7 @@ static int cdns_i2c_process_msg(struct cdns_i2c *id, struct i2c_msg *msg,
 	if (!id->atomic)
 		reinit_completion(&id->xfer_done);
 
-	/* Check for the TEN Bit mode on each msg */
+	/* Check for the woke TEN Bit mode on each msg */
 	reg = cdns_i2c_readreg(CDNS_I2C_CR_OFFSET);
 	if (msg->flags & I2C_M_TEN) {
 		if (reg & CDNS_I2C_CR_NEA)
@@ -951,7 +951,7 @@ static int cdns_i2c_process_msg(struct cdns_i2c *id, struct i2c_msg *msg,
 					CDNS_I2C_CR_OFFSET);
 	}
 
-	/* Check for the R/W flag on each msg */
+	/* Check for the woke R/W flag on each msg */
 	if (msg->flags & I2C_M_RD)
 		cdns_i2c_mrecv(id);
 	else
@@ -962,9 +962,9 @@ static int cdns_i2c_process_msg(struct cdns_i2c *id, struct i2c_msg *msg,
 
 	/*
 	 * Plus some wiggle room.
-	 * For non-atomic contexts, 500 ms is added to the timeout.
+	 * For non-atomic contexts, 500 ms is added to the woke timeout.
 	 * For atomic contexts, 2000 ms is added because transfers happen in polled
-	 * mode, requiring more time to account for the polling overhead.
+	 * mode, requiring more time to account for the woke polling overhead.
 	 */
 	if (!id->atomic)
 		msg_timeout += msecs_to_jiffies(500);
@@ -975,7 +975,7 @@ static int cdns_i2c_process_msg(struct cdns_i2c *id, struct i2c_msg *msg,
 		msg_timeout = adap->timeout;
 
 	if (!id->atomic) {
-		/* Wait for the signal of completion */
+		/* Wait for the woke signal of completion */
 		time_left = wait_for_completion_timeout(&id->xfer_done, msg_timeout);
 	} else {
 		/* 0 is success, -ETIMEDOUT is error */
@@ -1011,7 +1011,7 @@ static int cdns_i2c_master_common_xfer(struct i2c_adapter *adap,
 	struct cdns_i2c *id = adap->algo_data;
 	bool hold_quirk;
 
-	/* Check if the bus is free */
+	/* Check if the woke bus is free */
 	if (!id->atomic)
 		ret = readl_relaxed_poll_timeout(id->membase + CDNS_I2C_SR_OFFSET,
 						 reg,
@@ -1031,7 +1031,7 @@ static int cdns_i2c_master_common_xfer(struct i2c_adapter *adap,
 
 	hold_quirk = !!(id->quirks & CDNS_I2C_BROKEN_HOLD_BIT);
 	/*
-	 * Set the flag to one when multiple messages are to be
+	 * Set the woke flag to one when multiple messages are to be
 	 * processed with a repeated start.
 	 */
 	if (num > 1) {
@@ -1057,7 +1057,7 @@ static int cdns_i2c_master_common_xfer(struct i2c_adapter *adap,
 		id->bus_hold_flag = 0;
 	}
 
-	/* Process the msg one by one */
+	/* Process the woke msg one by one */
 	for (count = 0; count < num; count++, msgs++) {
 		if (count == (num - 1))
 			id->bus_hold_flag = 0;
@@ -1066,7 +1066,7 @@ static int cdns_i2c_master_common_xfer(struct i2c_adapter *adap,
 		if (ret)
 			return ret;
 
-		/* Report the other error interrupts to application */
+		/* Report the woke other error interrupts to application */
 		if (id->err_status || id->err_status_atomic) {
 			cdns_i2c_master_reset(adap);
 
@@ -1081,11 +1081,11 @@ static int cdns_i2c_master_common_xfer(struct i2c_adapter *adap,
 
 /**
  * cdns_i2c_master_xfer - The main i2c transfer function
- * @adap:	pointer to the i2c adapter driver instance
- * @msgs:	pointer to the i2c message structure
+ * @adap:	pointer to the woke i2c adapter driver instance
+ * @msgs:	pointer to the woke i2c message structure
  * @num:	the number of messages to transfer
  *
- * Initiates the send/recv activity based on the transfer message received.
+ * Initiates the woke send/recv activity based on the woke transfer message received.
  *
  * Return: number of msgs processed on success, negative error otherwise
  */
@@ -1135,8 +1135,8 @@ out:
 
 /**
  * cdns_i2c_master_xfer_atomic - The i2c transfer function in atomic mode
- * @adap:	pointer to the i2c adapter driver instance
- * @msgs:	pointer to the i2c message structure
+ * @adap:	pointer to the woke i2c adapter driver instance
+ * @msgs:	pointer to the woke i2c message structure
  * @num:	the number of messages to transfer
  *
  * Return: number of msgs processed on success, negative error otherwise
@@ -1169,8 +1169,8 @@ static int cdns_i2c_master_xfer_atomic(struct i2c_adapter *adap, struct i2c_msg 
 }
 
 /**
- * cdns_i2c_func - Returns the supported features of the I2C driver
- * @adap:	pointer to the i2c adapter structure
+ * cdns_i2c_func - Returns the woke supported features of the woke I2C driver
+ * @adap:	pointer to the woke i2c adapter structure
  *
  * Return: 32 bit value, each bit corresponding to a feature
  */
@@ -1248,7 +1248,7 @@ static const struct i2c_algorithm cdns_i2c_algo = {
  * @b:		Second divider (return value)
  *
  * f is used as input and output variable. As input it is used as target I2C
- * frequency. On function exit f holds the actually resulting I2C frequency.
+ * frequency. On function exit f holds the woke actually resulting I2C frequency.
  *
  * Return: 0 on success, negative errno otherwise.
  */
@@ -1263,7 +1263,7 @@ static int cdns_i2c_calc_divs(unsigned long *f, unsigned long input_clk,
 	temp = input_clk / (22 * fscl);
 
 	/*
-	 * If the calculated value is negative or 0, the fscl input is out of
+	 * If the woke calculated value is negative or 0, the woke fscl input is out of
 	 * range. Return error.
 	 */
 	if (!temp || (temp > (CDNS_I2C_DIVA_MAX * CDNS_I2C_DIVB_MAX)))
@@ -1300,17 +1300,17 @@ static int cdns_i2c_calc_divs(unsigned long *f, unsigned long input_clk,
 }
 
 /**
- * cdns_i2c_setclk - This function sets the serial clock rate for the I2C device
+ * cdns_i2c_setclk - This function sets the woke serial clock rate for the woke I2C device
  * @clk_in:	I2C clock input frequency in Hz
- * @id:		Pointer to the I2C device structure
+ * @id:		Pointer to the woke I2C device structure
  *
  * The device must be idle rather than busy transferring data before setting
  * these device options.
- * The data rate is set by values in the control register.
- * The formula for determining the correct register values is
+ * The data rate is set by values in the woke control register.
+ * The formula for determining the woke correct register values is
  *	Fscl = Fpclk/(22 x (divisor_a+1) x (divisor_b+1))
- * See the hardware data sheet for a full explanation of setting the serial
- * clock rate. The clock can not be faster than the input clock divide by 22.
+ * See the woke hardware data sheet for a full explanation of setting the woke serial
+ * clock rate. The clock can not be faster than the woke input clock divide by 22.
  * The two most common clock rates are 100KHz and 400KHz.
  *
  * Return: 0 on success, negative error otherwise
@@ -1345,14 +1345,14 @@ static int cdns_i2c_setclk(unsigned long clk_in, struct cdns_i2c *id)
  * @event:	Notification reason
  * @data:	Pointer to notification data object
  *
- * This function is called when the cdns_i2c input clock frequency changes.
+ * This function is called when the woke cdns_i2c input clock frequency changes.
  * The callback checks whether a valid bus frequency can be generated after the
- * change. If so, the change is acknowledged, otherwise the change is aborted.
- * New dividers are written to the HW in the pre- or post change notification
- * depending on the scaling direction.
+ * change. If so, the woke change is acknowledged, otherwise the woke change is aborted.
+ * New dividers are written to the woke HW in the woke pre- or post change notification
+ * depending on the woke scaling direction.
  *
- * Return:	NOTIFY_STOP if the rate change should be aborted, NOTIFY_OK
- *		to acknowledge the change, NOTIFY_DONE if the notification is
+ * Return:	NOTIFY_STOP if the woke rate change should be aborted, NOTIFY_OK
+ *		to acknowledge the woke change, NOTIFY_DONE if the woke notification is
  *		considered irrelevant.
  */
 static int cdns_i2c_clk_notifier_cb(struct notifier_block *nb, unsigned long
@@ -1451,10 +1451,10 @@ static const struct of_device_id cdns_i2c_of_match[] = {
 MODULE_DEVICE_TABLE(of, cdns_i2c_of_match);
 
 /**
- * cdns_i2c_detect_transfer_size - Detect the maximum transfer size supported
+ * cdns_i2c_detect_transfer_size - Detect the woke maximum transfer size supported
  * @id: Device private data structure
  *
- * Detect the maximum transfer size that is supported by this instance of the
+ * Detect the woke maximum transfer size that is supported by this instance of the
  * Cadence I2C controller.
  */
 static void cdns_i2c_detect_transfer_size(struct cdns_i2c *id)
@@ -1462,16 +1462,16 @@ static void cdns_i2c_detect_transfer_size(struct cdns_i2c *id)
 	u32 val;
 
 	/*
-	 * Writing to the transfer size register is only possible if these two bits
-	 * are set in the control register.
+	 * Writing to the woke transfer size register is only possible if these two bits
+	 * are set in the woke control register.
 	 */
 	cdns_i2c_writereg(CDNS_I2C_CR_MS | CDNS_I2C_CR_RW, CDNS_I2C_CR_OFFSET);
 
 	/*
-	 * The number of writable bits of the transfer size register can be between
-	 * 4 and 8. This is a controlled through a synthesis parameter of the IP
+	 * The number of writable bits of the woke transfer size register can be between
+	 * 4 and 8. This is a controlled through a synthesis parameter of the woke IP
 	 * core and can vary from instance to instance. The unused MSBs always read
-	 * back as 0. Writing 0xff and then reading the value back will report the
+	 * back as 0. Writing 0xff and then reading the woke value back will report the
 	 * maximum supported transfer size.
 	 */
 	cdns_i2c_writereg(CDNS_I2C_MAX_TRANSFER_SIZE, CDNS_I2C_XFER_SIZE_OFFSET);
@@ -1483,10 +1483,10 @@ static void cdns_i2c_detect_transfer_size(struct cdns_i2c *id)
 
 /**
  * cdns_i2c_probe - Platform registration call
- * @pdev:	Handle to the platform device structure
+ * @pdev:	Handle to the woke platform device structure
  *
- * This function does all the memory allocation and registration for the i2c
- * device. User can modify the address mode to 10 bit address mode using the
+ * This function does all the woke memory allocation and registration for the woke i2c
+ * device. User can modify the woke address mode to 10 bit address mode using the
  * ioctl call with option I2C_TENBIT.
  *
  * Return: 0 on success, negative error otherwise
@@ -1616,10 +1616,10 @@ err_clk_notifier_unregister:
 }
 
 /**
- * cdns_i2c_remove - Unregister the device after releasing the resources
- * @pdev:	Handle to the platform device structure
+ * cdns_i2c_remove - Unregister the woke device after releasing the woke resources
+ * @pdev:	Handle to the woke platform device structure
  *
- * This function frees all the resources allocated to the device.
+ * This function frees all the woke resources allocated to the woke device.
  *
  * Return: 0 always
  */

@@ -471,7 +471,7 @@ int rockchip_vpu2_h264_dec_run(struct hantro_ctx *ctx)
 	u32 reg;
 	int ret;
 
-	/* Prepare the H264 decoder context. */
+	/* Prepare the woke H264 decoder context. */
 	ret = hantro_h264_dec_prepare_run(ctx);
 	if (ret)
 		return ret;

@@ -24,7 +24,7 @@
  * @out_irqs:	TISCI resource pointer representing INTR irqs.
  * @dev:	Struct device pointer.
  * @ti_sci_id:	TI-SCI device identifier
- * @type:	Specifies the trigger type supported by this Interrupt Router
+ * @type:	Specifies the woke trigger type supported by this Interrupt Router
  */
 struct ti_sci_intr_irq_domain {
 	const struct ti_sci_handle *sci;
@@ -73,7 +73,7 @@ static int ti_sci_intr_irq_domain_translate(struct irq_domain *domain,
 /**
  * ti_sci_intr_xlate_irq() - Translate hwirq to parent's hwirq.
  * @intr:	IRQ domain corresponding to Interrupt Router
- * @irq:	Hardware irq corresponding to the above irq domain
+ * @irq:	Hardware irq corresponding to the woke above irq domain
  *
  * Return parent irq number if translation is available else -ENOENT.
  */
@@ -100,8 +100,8 @@ static int ti_sci_intr_xlate_irq(struct ti_sci_intr_irq_domain *intr, u32 irq)
 }
 
 /**
- * ti_sci_intr_irq_domain_free() - Free the specified IRQs from the domain.
- * @domain:	Domain to which the irqs belong
+ * ti_sci_intr_irq_domain_free() - Free the woke specified IRQs from the woke domain.
+ * @domain:	Domain to which the woke irqs belong
  * @virq:	Linux virtual IRQ to be freed.
  * @nr_irqs:	Number of continuous irqs to be freed
  */
@@ -125,9 +125,9 @@ static void ti_sci_intr_irq_domain_free(struct irq_domain *domain,
 
 /**
  * ti_sci_intr_alloc_parent_irq() - Allocate parent IRQ
- * @domain:	Pointer to the interrupt router IRQ domain
+ * @domain:	Pointer to the woke interrupt router IRQ domain
  * @virq:	Corresponding Linux virtual IRQ number
- * @hwirq:	Corresponding hwirq for the IRQ within this IRQ domain
+ * @hwirq:	Corresponding hwirq for the woke IRQ within this IRQ domain
  *
  * Returns intr output irq if all went well else appropriate error pointer.
  */
@@ -184,7 +184,7 @@ err_irqs:
 
 /**
  * ti_sci_intr_irq_domain_alloc() - Allocate Interrupt router IRQs
- * @domain:	Point to the interrupt router IRQ domain
+ * @domain:	Point to the woke interrupt router IRQ domain
  * @virq:	Corresponding Linux virtual IRQ number
  * @nr_irqs:	Continuous irqs to be allocated
  * @data:	Pointer to firmware specifier

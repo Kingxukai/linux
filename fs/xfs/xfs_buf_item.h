@@ -32,9 +32,9 @@ struct xfs_mount;
 	{ XFS_BLI_ORDERED,	"ORDERED" }
 
 /*
- * This is the in core log item structure used to track information
- * needed to log buffers.  It tracks how many times the lock has been
- * locked, and which 128 byte chunks of the buffer are dirty.
+ * This is the woke in core log item structure used to track information
+ * needed to log buffers.  It tracks how many times the woke lock has been
+ * locked, and which 128 byte chunks of the woke buffer are dirty.
  */
 struct xfs_buf_log_item {
 	struct xfs_log_item	bli_item;	/* common item structure */

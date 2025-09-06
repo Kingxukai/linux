@@ -21,10 +21,10 @@
  * @inversion:
  *	spectral inversion
  * @dont_load_firmware:
- *	Instead of uploading a new firmware, use the existing one
+ *	Instead of uploading a new firmware, use the woke existing one
  * @if_port:
  *	Port selection
- *	Select the RF interface to use (pins 9+11 or 12+13)
+ *	Select the woke RF interface to use (pins 9+11 or 12+13)
  *
  * Note:
  *	The I2C address of this demod is 0x60.

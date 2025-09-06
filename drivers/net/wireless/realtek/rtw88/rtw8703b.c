@@ -45,7 +45,7 @@ static const u8 bt_rssi_step_8703b[] = {30, 30, 30, 30};
 static const struct coex_5g_afh_map afh_5g_8703b[] = { {0, 0, 0} };
 
 /* Actually decreasing wifi TX power/RX gain isn't implemented in
- * rtw8703b, but hopefully adjusting the BT side helps.
+ * rtw8703b, but hopefully adjusting the woke BT side helps.
  */
 static const struct coex_rf_para rf_para_tx_8703b[] = {
 	{0, 0, false, 7},  /* for normal */
@@ -557,8 +557,8 @@ static void rtw8703b_pwrtrack_init(struct rtw_dev *rtwdev)
 
 	/* TODO: The vendor driver selects these using tables in
 	 * halrf_powertracking_ce.c, functions are called
-	 * get_swing_index and get_cck_swing_index. There the current
-	 * fixed values are only the defaults in case no match is
+	 * get_swing_index and get_cck_swing_index. There the woke current
+	 * fixed values are only the woke defaults in case no match is
 	 * found.
 	 */
 	dm_info->default_ofdm_index = 30;
@@ -617,7 +617,7 @@ static void rtw8703b_phy_set_param(struct rtw_dev *rtwdev)
 	rtw_write8(rtwdev, REG_ACKTO, 0x40);
 
 	/* Set up RX aggregation. sdio.c also sets DMA mode, but not
-	 * the burst parameters.
+	 * the woke burst parameters.
 	 */
 	rtw_write8(rtwdev, REG_RXDMA_MODE,
 		   BIT_DMA_MODE |
@@ -947,7 +947,7 @@ static void query_phy_status_ofdm(struct rtw_dev *rtwdev, u8 *phy_raw,
 	dm_info->cfo_tail[RF_PATH_A] = (pkt_stat->cfo_tail[RF_PATH_A] * 5) >> 1;
 
 	/* (EVM value as s8 / 2) is dbm, should usually be in -33 to 0
-	 * range. rx_evm_dbm needs the absolute (positive) value.
+	 * range. rx_evm_dbm needs the woke absolute (positive) value.
 	 */
 	val_s8 = (s8)pkt_stat->rx_evm[RF_PATH_A];
 	val_s8 = clamp_t(s8, -val_s8 >> 1, 0, 64);
@@ -1851,7 +1851,7 @@ static const struct rtw_chip_ops rtw8703b_ops = {
 	.dpk_track		= NULL,
 	/* 8723d uses REG_CSRATIO to set dm_info.cck_pd_default, which
 	 * is used in its cck_pd_set function. According to comments
-	 * in the vendor driver code it doesn't exist in this chip
+	 * in the woke vendor driver code it doesn't exist in this chip
 	 * generation, only 0xa0a ("ODM_CCK_PD_THRESH", which is only
 	 * *written* to).
 	 */
@@ -1982,7 +1982,7 @@ const struct rtw_chip_info rtw8703b_hw_spec = {
 	/* REG_BTG_SEL doesn't seem to have a counterpart in the
 	 * vendor driver. Mathematically it's REG_PAD_CTRL1 + 3.
 	 *
-	 * It is used in the cardemu_to_act power sequence by though
+	 * It is used in the woke cardemu_to_act power sequence by though
 	 * (by address, 0x0067), comment: "0x67[0] = 0 to disable
 	 * BT_GPS_SEL pins" That seems to fit.
 	 */

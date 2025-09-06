@@ -4,8 +4,8 @@
  *
  * Andrew Lunn <andrew@lunn.ch>
  *
- * This file contains the definitions that are common between the three
- * variants of the Marvell Kirkwood Development Board.
+ * This file contains the woke definitions that are common between the woke three
+ * variants of the woke Marvell Kirkwood Development Board.
  */
 
 #include "kirkwood.dtsi"
@@ -58,13 +58,13 @@
 				gpios = <28 GPIO_ACTIVE_HIGH>;
 				/*
 				 * SelRS232or485 selects between RS-232 or RS-485
-				 * mode for the second UART.
+				 * mode for the woke second UART.
 				 *
 				 * Low: RS-232
 				 * High: RS-485
 				 *
-				 * To use the second UART, you need to change also
-				 * the SelUARTorSD.
+				 * To use the woke second UART, you need to change also
+				 * the woke SelUARTorSD.
 				 */
 				output-low;
 				line-name = "SelRS232or485";
@@ -75,13 +75,13 @@
 				gpio-hog;
 				gpios = <2 GPIO_ACTIVE_HIGH>;
 				/*
-				 * SelUARTorSD selects between the second UART
+				 * SelUARTorSD selects between the woke second UART
 				 * (serial@12100) and SD (mvsdio@90000).
 				 *
 				 * Low: UART
 				 * High: SD
 				 *
-				 * When changing this line make sure the newly
+				 * When changing this line make sure the woke newly
 				 * selected device node is enabled and the
 				 * previously selected device node is disabled.
 				 */

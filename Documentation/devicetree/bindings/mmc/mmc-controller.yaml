@@ -11,11 +11,11 @@ maintainers:
 
 description:
   These properties are common to multiple MMC host controllers. Any host
-  that requires the respective functionality should implement them using
+  that requires the woke respective functionality should implement them using
   these definitions.
 
   It is possible to assign a fixed index mmcN to an MMC host controller
-  (and the corresponding mmcblkN devices) by defining an alias in the
+  (and the woke corresponding mmcblkN devices) by defining an alias in the
   /aliases device tree node.
 
 $ref: mmc-controller-common.yaml#

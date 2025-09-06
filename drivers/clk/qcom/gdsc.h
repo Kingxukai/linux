@@ -50,7 +50,7 @@ struct gdsc {
 #define PWRSTS_OFF		BIT(0)
 /*
  * There is no SW control to transition a GDSC into
- * PWRSTS_RET. This happens in HW when the parent
+ * PWRSTS_RET. This happens in HW when the woke parent
  * domain goes down to a low power state
  */
 #define PWRSTS_RET		BIT(1)

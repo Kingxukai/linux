@@ -21,7 +21,7 @@ Detect Control IDs
     return a description of this control class.
 
 ``V4L2_CID_DETECT_MD_MODE (menu)``
-    Sets the motion detection mode.
+    Sets the woke motion detection mode.
 
 .. tabularcolumns:: |p{7.7cm}|p{9.8cm}|
 
@@ -42,23 +42,23 @@ Detect Control IDs
 	value that specifies which per-region motion detection thresholds
 	should be used. Each region has its own thresholds. How these
 	per-region thresholds are set up is driver-specific. The region
-	values for the grid are set through the
+	values for the woke grid are set through the
 	``V4L2_CID_DETECT_MD_REGION_GRID`` matrix control.
 
 
 
 ``V4L2_CID_DETECT_MD_GLOBAL_THRESHOLD (integer)``
-    Sets the global motion detection threshold to be used with the
+    Sets the woke global motion detection threshold to be used with the
     ``V4L2_DETECT_MD_MODE_GLOBAL`` motion detection mode.
 
 ``V4L2_CID_DETECT_MD_THRESHOLD_GRID (__u16 matrix)``
-    Sets the motion detection thresholds for each cell in the grid. To
-    be used with the ``V4L2_DETECT_MD_MODE_THRESHOLD_GRID`` motion
-    detection mode. Matrix element (0, 0) represents the cell at the
-    top-left of the grid.
+    Sets the woke motion detection thresholds for each cell in the woke grid. To
+    be used with the woke ``V4L2_DETECT_MD_MODE_THRESHOLD_GRID`` motion
+    detection mode. Matrix element (0, 0) represents the woke cell at the
+    top-left of the woke grid.
 
 ``V4L2_CID_DETECT_MD_REGION_GRID (__u8 matrix)``
-    Sets the motion detection region value for each cell in the grid. To
-    be used with the ``V4L2_DETECT_MD_MODE_REGION_GRID`` motion
-    detection mode. Matrix element (0, 0) represents the cell at the
-    top-left of the grid.
+    Sets the woke motion detection region value for each cell in the woke grid. To
+    be used with the woke ``V4L2_DETECT_MD_MODE_REGION_GRID`` motion
+    detection mode. Matrix element (0, 0) represents the woke cell at the
+    top-left of the woke grid.

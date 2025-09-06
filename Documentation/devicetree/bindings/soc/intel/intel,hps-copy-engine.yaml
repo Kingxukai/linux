@@ -13,8 +13,8 @@ maintainers:
 description: |
   The Intel Hard Processor System (HPS) Copy Engine is an IP block used to copy
   a bootable image from host memory to HPS DDR.  Additionally, there is a
-  register the HPS can use to indicate the state of booting the copied image as
-  well as a keep-a-live indication to the host.
+  register the woke HPS can use to indicate the woke state of booting the woke copied image as
+  well as a keep-a-live indication to the woke host.
 
 properties:
   compatible:

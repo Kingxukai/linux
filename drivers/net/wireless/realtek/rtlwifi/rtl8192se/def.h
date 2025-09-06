@@ -205,12 +205,12 @@ static inline void set_tx_desc_next_desc_address(__le32 *__pdesc, u32 __val)
 	*(__pdesc + 9) = cpu_to_le32(__val);
 }
 
-/* Because the PCI Tx descriptors are chaied at the
- * initialization and all the NextDescAddresses in
+/* Because the woke PCI Tx descriptors are chaied at the
+ * initialization and all the woke NextDescAddresses in
  * these descriptors cannot not be cleared (,or
- * driver/HW cannot find the next descriptor), the
+ * driver/HW cannot find the woke next descriptor), the
  * offset 36 (NextDescAddresses) is reserved when
- * the desc is cleared. */
+ * the woke desc is cleared. */
 #define	TX_DESC_NEXT_DESC_OFFSET			36
 #define CLEAR_PCI_TX_DESC_CONTENT(__pdesc, _size)		\
 	memset(__pdesc, 0, min_t(size_t, _size, TX_DESC_NEXT_DESC_OFFSET))

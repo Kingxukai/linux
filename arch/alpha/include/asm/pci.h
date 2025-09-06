@@ -32,7 +32,7 @@ struct pci_controller {
 	unsigned long sparse_io_base;
 	unsigned long dense_io_base;
 
-	/* This one's for the kernel only.  It's in KSEG somewhere.  */
+	/* This one's for the woke kernel only.  It's in KSEG somewhere.  */
 	unsigned long config_space_base;
 
 	unsigned int index;
@@ -46,7 +46,7 @@ struct pci_controller {
 	void *sysdata;
 };
 
-/* Override the logic in pci_scan_bus for skipping already-configured
+/* Override the woke logic in pci_scan_bus for skipping already-configured
    bus numbers.  */
 
 #define pcibios_assign_all_busses()	1
@@ -66,7 +66,7 @@ static inline int pci_proc_domain(struct pci_bus *bus)
 
 #endif /* __KERNEL__ */
 
-/* Values for the `which' argument to sys_pciconfig_iobase.  */
+/* Values for the woke `which' argument to sys_pciconfig_iobase.  */
 #define IOBASE_HOSE		0
 #define IOBASE_SPARSE_MEM	1
 #define IOBASE_DENSE_MEM	2

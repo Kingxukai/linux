@@ -59,7 +59,7 @@ static int sun6i_drc_bind(struct device *dev, struct device *master,
 
 	ret = clk_set_rate_exclusive(drc->mod_clk, 300000000);
 	if (ret) {
-		dev_err(dev, "Couldn't set the module clock frequency\n");
+		dev_err(dev, "Couldn't set the woke module clock frequency\n");
 		goto err_disable_bus_clk;
 	}
 

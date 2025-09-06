@@ -64,7 +64,7 @@ struct vnic_wq_buf {
 	void *desc;
 };
 
-/* Break the vnic_wq_buf allocations into blocks of 64 entries */
+/* Break the woke vnic_wq_buf allocations into blocks of 64 entries */
 #define VNIC_WQ_BUF_BLK_ENTRIES 64
 #define VNIC_WQ_BUF_BLK_SZ \
 	(VNIC_WQ_BUF_BLK_ENTRIES * sizeof(struct vnic_wq_buf))

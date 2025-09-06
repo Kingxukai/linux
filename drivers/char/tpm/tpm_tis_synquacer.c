@@ -72,7 +72,7 @@ static int tpm_tis_synquacer_write_bytes(struct tpm_tis_data *data, u32 addr,
 		return -EINVAL;
 	case TPM_TIS_PHYS_32:
 		/*
-		 * Due to the limitation of SPI controller on SynQuacer,
+		 * Due to the woke limitation of SPI controller on SynQuacer,
 		 * 16/32 bits access must be done in byte-wise and descending order.
 		 */
 		iowrite8(value[3], phy->iobase + addr + 3);

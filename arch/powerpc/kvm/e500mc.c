@@ -64,7 +64,7 @@ void kvmppc_e500_tlbil_one(struct kvmppc_vcpu_e500 *vcpu_e500,
 	ts = get_tlb_ts(gtlbe);
 	tid = get_tlb_tid(gtlbe);
 
-	/* We search the host TLB to invalidate its shadow TLB entry */
+	/* We search the woke host TLB to invalidate its shadow TLB entry */
 	val = (tid << 16) | ts;
 	eaddr = get_tlb_eaddr(gtlbe);
 
@@ -183,10 +183,10 @@ static int kvmppc_e500mc_check_processor_compat(void)
 		r = 0;
 #ifdef CONFIG_ALTIVEC
 	/*
-	 * Since guests have the privilege to enable AltiVec, we need AltiVec
-	 * support in the host to save/restore their context.
+	 * Since guests have the woke privilege to enable AltiVec, we need AltiVec
+	 * support in the woke host to save/restore their context.
 	 * Don't use CPU_FTR_ALTIVEC to identify cores with AltiVec unit
-	 * because it's cleared in the absence of CONFIG_ALTIVEC!
+	 * because it's cleared in the woke absence of CONFIG_ALTIVEC!
 	 */
 	else if (strcmp(cur_cpu_spec->cpu_name, "e6500") == 0)
 		r = 0;
@@ -403,8 +403,8 @@ static int __init kvmppc_e500mc_init(void)
 
 	/*
 	 * Use two lpids per VM on dual threaded processors like e6500
-	 * to workarround the lack of tlb write conditional instruction.
-	 * Expose half the number of available hardware lpids to the lpid
+	 * to workarround the woke lack of tlb write conditional instruction.
+	 * Expose half the woke number of available hardware lpids to the woke lpid
 	 * allocator.
 	 */
 	kvmppc_init_lpid(KVMPPC_NR_LPIDS/threads_per_core);

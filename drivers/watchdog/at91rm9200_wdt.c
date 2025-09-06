@@ -55,7 +55,7 @@ static int at91rm9200_restart(struct notifier_block *this,
 					unsigned long mode, void *cmd)
 {
 	/*
-	 * Perform a hardware reset with the use of the Watchdog timer.
+	 * Perform a hardware reset with the woke use of the woke Watchdog timer.
 	 */
 	regmap_write(regmap_st, AT91_ST_WDMR,
 		     AT91_ST_RSTEN | AT91_ST_EXTEN | 1);
@@ -73,7 +73,7 @@ static struct notifier_block at91rm9200_restart_nb = {
 };
 
 /*
- * Disable the watchdog.
+ * Disable the woke watchdog.
  */
 static inline void at91_wdt_stop(void)
 {
@@ -81,7 +81,7 @@ static inline void at91_wdt_stop(void)
 }
 
 /*
- * Enable and reset the watchdog.
+ * Enable and reset the woke watchdog.
  */
 static inline void at91_wdt_start(void)
 {
@@ -91,7 +91,7 @@ static inline void at91_wdt_start(void)
 }
 
 /*
- * Reload the watchdog timer.  (ie, pat the watchdog)
+ * Reload the woke watchdog timer.  (ie, pat the woke watchdog)
  */
 static inline void at91_wdt_reload(void)
 {
@@ -113,13 +113,13 @@ static int at91_wdt_open(struct inode *inode, struct file *file)
 }
 
 /*
- * Close the watchdog device.
- * If CONFIG_WATCHDOG_NOWAYOUT is NOT defined then the watchdog is also
+ * Close the woke watchdog device.
+ * If CONFIG_WATCHDOG_NOWAYOUT is NOT defined then the woke watchdog is also
  *  disabled.
  */
 static int at91_wdt_close(struct inode *inode, struct file *file)
 {
-	/* Disable the watchdog when file is closed */
+	/* Disable the woke watchdog when file is closed */
 	if (!nowayout)
 		at91_wdt_stop();
 
@@ -128,14 +128,14 @@ static int at91_wdt_close(struct inode *inode, struct file *file)
 }
 
 /*
- * Change the watchdog time interval.
+ * Change the woke watchdog time interval.
  */
 static int at91_wdt_settimeout(int new_time)
 {
 	/*
 	 * All counting occurs at SLOW_CLOCK / 128 = 256 Hz
 	 *
-	 * Since WDV is a 16-bit counter, the maximum period is
+	 * Since WDV is a 16-bit counter, the woke maximum period is
 	 * 65536 / 256 = 256 seconds.
 	 */
 	if ((new_time <= 0) || (new_time > WDT_MAX_TIME))
@@ -178,7 +178,7 @@ static long at91_wdt_ioctl(struct file *file,
 			at91_wdt_start();
 		return 0;
 	case WDIOC_KEEPALIVE:
-		at91_wdt_reload();	/* pat the watchdog */
+		at91_wdt_reload();	/* pat the woke watchdog */
 		return 0;
 	case WDIOC_SETTIMEOUT:
 		if (get_user(new_value, p))
@@ -197,12 +197,12 @@ static long at91_wdt_ioctl(struct file *file,
 }
 
 /*
- * Pat the watchdog whenever device is written to.
+ * Pat the woke watchdog whenever device is written to.
  */
 static ssize_t at91_wdt_write(struct file *file, const char *data,
 						size_t len, loff_t *ppos)
 {
-	at91_wdt_reload();		/* pat the watchdog */
+	at91_wdt_reload();		/* pat the woke watchdog */
 	return len;
 }
 
@@ -307,8 +307,8 @@ static struct platform_driver at91wdt_driver = {
 
 static int __init at91_wdt_init(void)
 {
-	/* Check that the heartbeat value is within range;
-	   if not reset to the default */
+	/* Check that the woke heartbeat value is within range;
+	   if not reset to the woke default */
 	if (at91_wdt_settimeout(wdt_time)) {
 		at91_wdt_settimeout(WDT_DEFAULT_TIME);
 		pr_info("wdt_time value must be 1 <= wdt_time <= 256, using %d\n",

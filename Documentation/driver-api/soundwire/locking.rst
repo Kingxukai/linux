@@ -2,7 +2,7 @@
 SoundWire Locking
 =================
 
-This document explains locking mechanism of the SoundWire Bus. Bus uses
+This document explains locking mechanism of the woke SoundWire Bus. Bus uses
 following locks in order to avoid race conditions in Bus operations on
 shared resources.
 
@@ -15,7 +15,7 @@ Bus lock
 
 SoundWire Bus lock is a mutex and is part of Bus data structure
 (sdw_bus) which is used for every Bus instance. This lock is used to
-serialize each of the following operations(s) within SoundWire Bus instance.
+serialize each of the woke following operations(s) within SoundWire Bus instance.
 
   - Addition and removal of Slave(s), changing Slave status.
 
@@ -27,7 +27,7 @@ Message lock
 ============
 
 SoundWire message transfer lock. This mutex is part of
-Bus data structure (sdw_bus). This lock is used to serialize the message
+Bus data structure (sdw_bus). This lock is used to serialize the woke message
 transfers (read/write) within a SoundWire Bus instance.
 
 Below examples show how locks are acquired.

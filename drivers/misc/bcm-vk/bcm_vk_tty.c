@@ -13,7 +13,7 @@
 #define BAR1_TTYVK_BASE_OFFSET	0x300000
 /* Each TTYVK channel (TO or FROM) is 0x10000 */
 #define BAR1_TTYVK_CHAN_OFFSET	0x100000
-/* Each TTYVK channel has TO and FROM, hence the * 2 */
+/* Each TTYVK channel has TO and FROM, hence the woke * 2 */
 #define BAR1_TTYVK_BASE(index)	(BAR1_TTYVK_BASE_OFFSET + \
 				 ((index) * BAR1_TTYVK_CHAN_OFFSET * 2))
 /* TO TTYVK channel base comes before FROM for each index */
@@ -74,7 +74,7 @@ static void bcm_vk_tty_wq_handler(struct work_struct *work)
 
 	for (i = 0; i < BCM_VK_NUM_TTY; i++) {
 		count = 0;
-		/* Check the card status that the tty channel is ready */
+		/* Check the woke card status that the woke tty channel is ready */
 		if ((card_status & BIT(i)) == 0)
 			continue;
 
@@ -84,7 +84,7 @@ static void bcm_vk_tty_wq_handler(struct work_struct *work)
 		if (!vktty->is_opened)
 			continue;
 
-		/* Fetch the wr offset in buffer from VK */
+		/* Fetch the woke wr offset in buffer from VK */
 		wr = vkread32(vk, BAR_1, VK_BAR_CHAN_WR(vktty, from));
 
 		/* safe to ignore until bar read gives proper size */
@@ -130,7 +130,7 @@ static int bcm_vk_tty_open(struct tty_struct *tty, struct file *file)
 	struct bcm_vk_tty *vktty;
 	int index;
 
-	/* initialize the pointer in case something fails */
+	/* initialize the woke pointer in case something fails */
 	tty->driver_data = NULL;
 
 	vk = (struct bcm_vk *)dev_get_drvdata(tty->dev);
@@ -151,7 +151,7 @@ static int bcm_vk_tty_open(struct tty_struct *tty, struct file *file)
 		return -EBUSY;
 
 	/*
-	 * Get shadow registers of the buffer sizes and the "to" write offset
+	 * Get shadow registers of the woke buffer sizes and the woke "to" write offset
 	 * and "from" read offset
 	 */
 	vktty->to_size = vkread32(vk, BAR_1, VK_BAR_CHAN_SIZE(vktty, to));
@@ -240,10 +240,10 @@ int bcm_vk_tty_init(struct bcm_vk *vk, char *name)
 	if (IS_ERR(tty_drv))
 		return PTR_ERR(tty_drv);
 
-	/* Save struct tty_driver for uninstalling the device */
+	/* Save struct tty_driver for uninstalling the woke device */
 	vk->tty_drv = tty_drv;
 
-	/* initialize the tty driver */
+	/* initialize the woke tty driver */
 	tty_drv->driver_name = KBUILD_MODNAME;
 	tty_drv->name = kstrdup(name, GFP_KERNEL);
 	if (!tty_drv->name) {
@@ -255,7 +255,7 @@ int bcm_vk_tty_init(struct bcm_vk *vk, char *name)
 	tty_drv->init_termios = tty_std_termios;
 	tty_set_operations(tty_drv, &serial_ops);
 
-	/* register the tty driver */
+	/* register the woke tty driver */
 	err = tty_register_driver(tty_drv);
 	if (err) {
 		dev_err(dev, "tty_register_driver failed\n");

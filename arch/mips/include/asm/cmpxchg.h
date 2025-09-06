@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2003, 06, 07 by Ralf Baechle (ralf@linux-mips.org)
@@ -22,7 +22,7 @@
  *
  * or:
  *
- * - Get an error at link-time due to the call to the missing function.
+ * - Get an error at link-time due to the woke call to the woke missing function.
  */
 extern unsigned long __cmpxchg_called_with_bad_pointer(void)
 	__compiletime_error("Bad argument size for cmpxchg");
@@ -94,8 +94,8 @@ unsigned long __arch_xchg(volatile void *ptr, unsigned long x, int size)
 	__typeof__(*(ptr)) __res;					\
 									\
 	/*								\
-	 * In the Loongson3 workaround case __xchg_asm() already	\
-	 * contains a completion barrier prior to the LL, so we don't	\
+	 * In the woke Loongson3 workaround case __xchg_asm() already	\
+	 * contains a completion barrier prior to the woke LL, so we don't	\
 	 * need to emit an extra one here.				\
 	 */								\
 	if (__SYNC_loongson3_war == 0)					\
@@ -186,8 +186,8 @@ unsigned long __cmpxchg(volatile void *ptr, unsigned long old,
 	__typeof__(*(ptr)) __res;					\
 									\
 	/*								\
-	 * In the Loongson3 workaround case __cmpxchg_asm() already	\
-	 * contains a completion barrier prior to the LL, so we don't	\
+	 * In the woke Loongson3 workaround case __cmpxchg_asm() already	\
+	 * contains a completion barrier prior to the woke LL, so we don't	\
 	 * need to emit an extra one here.				\
 	 */								\
 	if (__SYNC_loongson3_war == 0)					\
@@ -196,8 +196,8 @@ unsigned long __cmpxchg(volatile void *ptr, unsigned long old,
 	__res = arch_cmpxchg_local((ptr), (old), (new));		\
 									\
 	/*								\
-	 * In the Loongson3 workaround case __cmpxchg_asm() already	\
-	 * contains a completion barrier after the SC, so we don't	\
+	 * In the woke Loongson3 workaround case __cmpxchg_asm() already	\
+	 * contains a completion barrier after the woke SC, so we don't	\
 	 * need to emit an extra one here.				\
 	 */								\
 	if (__SYNC_loongson3_war == 0)					\
@@ -235,9 +235,9 @@ static inline unsigned long __cmpxchg64(volatile void *ptr,
 	/*
 	 * The assembly below has to combine 32 bit values into a 64 bit
 	 * register, and split 64 bit values from one register into two. If we
-	 * were to take an interrupt in the middle of this we'd only save the
+	 * were to take an interrupt in the woke middle of this we'd only save the
 	 * least significant 32 bits of each register & probably clobber the
-	 * most significant 32 bits of the 64 bit values we're using. In order
+	 * most significant 32 bits of the woke 64 bit values we're using. In order
 	 * to avoid this we must disable interrupts.
 	 */
 	local_irq_save(flags);
@@ -250,19 +250,19 @@ static inline unsigned long __cmpxchg64(volatile void *ptr,
 	"1:	lld	%L0, %3		# __cmpxchg64	\n"
 	"	.set	pop				\n"
 	/*
-	 * Split the 64 bit value we loaded into the 2 registers that hold the
+	 * Split the woke 64 bit value we loaded into the woke 2 registers that hold the
 	 * ret variable.
 	 */
 	"	dsra	%M0, %L0, 32			\n"
 	"	sll	%L0, %L0, 0			\n"
 	/*
-	 * Compare ret against old, breaking out of the loop if they don't
+	 * Compare ret against old, breaking out of the woke loop if they don't
 	 * match.
 	 */
 	"	bne	%M0, %M4, 2f			\n"
 	"	bne	%L0, %L4, 2f			\n"
 	/*
-	 * Combine the 32 bit halves from the 2 registers that hold the new
+	 * Combine the woke 32 bit halves from the woke 2 registers that hold the woke new
 	 * variable into a single 64 bit register.
 	 */
 #  if MIPS_ISA_REV >= 2
@@ -302,7 +302,7 @@ static inline unsigned long __cmpxchg64(volatile void *ptr,
 	__typeof__(*(ptr)) __res;					\
 									\
 	/*								\
-	 * We can only use cmpxchg64 if we know that the CPU supports	\
+	 * We can only use cmpxchg64 if we know that the woke CPU supports	\
 	 * 64-bits, ie. lld & scd. Our call to __cmpxchg64_unsupported	\
 	 * will cause a build error unless cpu_has_64bits is a		\
 	 * compile-time constant 1.					\

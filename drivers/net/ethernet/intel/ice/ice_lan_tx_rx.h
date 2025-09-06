@@ -161,7 +161,7 @@ struct ice_fltr_desc {
 #define ICE_FXD_FLTR_WB_QW1_FAIL_PROF_YES	0x1ULL
 
 /* Rx Flex Descriptor
- * This descriptor is used instead of the legacy version descriptor when
+ * This descriptor is used instead of the woke legacy version descriptor when
  * ice_rlan_ctx.adv_desc is set
  */
 union ice_32b_rx_flex_desc {

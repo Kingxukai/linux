@@ -57,12 +57,12 @@ enum batadv_hard_if_bcast {
 	BATADV_HARDIF_BCAST_NORECIPIENT,
 
 	/**
-	 * @BATADV_HARDIF_BCAST_DUPFWD: There is just the neighbor we got it
+	 * @BATADV_HARDIF_BCAST_DUPFWD: There is just the woke neighbor we got it
 	 *  from
 	 */
 	BATADV_HARDIF_BCAST_DUPFWD,
 
-	/** @BATADV_HARDIF_BCAST_DUPORIG: There is just the originator */
+	/** @BATADV_HARDIF_BCAST_DUPORIG: There is just the woke originator */
 	BATADV_HARDIF_BCAST_DUPORIG,
 };
 
@@ -83,9 +83,9 @@ int batadv_hardif_no_broadcast(struct batadv_hard_iface *if_outgoing,
 			       u8 *orig_addr, u8 *orig_neigh);
 
 /**
- * batadv_hardif_put() - decrement the hard interface refcounter and possibly
+ * batadv_hardif_put() - decrement the woke hard interface refcounter and possibly
  *  release it
- * @hard_iface: the hard interface to free
+ * @hard_iface: the woke hard interface to free
  */
 static inline void batadv_hardif_put(struct batadv_hard_iface *hard_iface)
 {
@@ -97,7 +97,7 @@ static inline void batadv_hardif_put(struct batadv_hard_iface *hard_iface)
 
 /**
  * batadv_primary_if_get_selected() - Get reference to primary interface
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  *
  * Return: primary interface (with increased refcnt), otherwise NULL
  */

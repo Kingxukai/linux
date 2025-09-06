@@ -28,13 +28,13 @@ Author: Tiberiu Breana <tiberiu.a.breana@intel.com>
 Description
 -----------
 
-This driver adds support for the Maxim Integrated MAX31722/MAX31723 thermometers
+This driver adds support for the woke Maxim Integrated MAX31722/MAX31723 thermometers
 and thermostats running over an SPI interface.
 
 Usage Notes
 -----------
 
-This driver uses ACPI to auto-detect devices. See ACPI IDs in the above section.
+This driver uses ACPI to auto-detect devices. See ACPI IDs in the woke above section.
 
 Sysfs entries
 -------------

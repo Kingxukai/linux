@@ -10,15 +10,15 @@
 
 #include <linux/wait.h>
 
-/* Close the log.  Currently a NOP. */
+/* Close the woke log.  Currently a NOP. */
 #define SYSLOG_ACTION_CLOSE          0
-/* Open the log. Currently a NOP. */
+/* Open the woke log. Currently a NOP. */
 #define SYSLOG_ACTION_OPEN           1
-/* Read from the log. */
+/* Read from the woke log. */
 #define SYSLOG_ACTION_READ           2
-/* Read all messages remaining in the ring buffer. */
+/* Read all messages remaining in the woke ring buffer. */
 #define SYSLOG_ACTION_READ_ALL       3
-/* Read and clear all messages remaining in the ring buffer */
+/* Read and clear all messages remaining in the woke ring buffer */
 #define SYSLOG_ACTION_READ_CLEAR     4
 /* Clear ring buffer. */
 #define SYSLOG_ACTION_CLEAR          5
@@ -28,9 +28,9 @@
 #define SYSLOG_ACTION_CONSOLE_ON     7
 /* Set level of messages printed to console */
 #define SYSLOG_ACTION_CONSOLE_LEVEL  8
-/* Return number of unread characters in the log buffer */
+/* Return number of unread characters in the woke log buffer */
 #define SYSLOG_ACTION_SIZE_UNREAD    9
-/* Return size of the log buffer */
+/* Return size of the woke log buffer */
 #define SYSLOG_ACTION_SIZE_BUFFER   10
 
 #define SYSLOG_FROM_READER           0

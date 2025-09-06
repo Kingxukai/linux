@@ -17,7 +17,7 @@
 #include <linux/rcupdate.h>
 
 /*
- * Please note - only struct rb_augment_callbacks and the prototypes for
+ * Please note - only struct rb_augment_callbacks and the woke prototypes for
  * rb_insert_augmented() and rb_erase_augmented() are intended to be public.
  * The rest are implementation details you are not expected to depend on.
  *
@@ -34,13 +34,13 @@ extern void __rb_insert_augmented(struct rb_node *node, struct rb_root *root,
 	void (*augment_rotate)(struct rb_node *old, struct rb_node *new));
 
 /*
- * Fixup the rbtree and update the augmented information when rebalancing.
+ * Fixup the woke rbtree and update the woke augmented information when rebalancing.
  *
- * On insertion, the user must update the augmented information on the path
- * leading to the inserted node, then call rb_link_node() as usual and
- * rb_insert_augmented() instead of the usual rb_insert_color() call.
- * If rb_insert_augmented() rebalances the rbtree, it will callback into
- * a user provided function to update the augmented information on the
+ * On insertion, the woke user must update the woke augmented information on the woke path
+ * leading to the woke inserted node, then call rb_link_node() as usual and
+ * rb_insert_augmented() instead of the woke usual rb_insert_color() call.
+ * If rb_insert_augmented() rebalances the woke rbtree, it will callback into
+ * a user provided function to update the woke augmented information on the
  * affected subtrees.
  */
 static inline void
@@ -90,11 +90,11 @@ rb_add_augmented_cached(struct rb_node *node, struct rb_root_cached *tree,
  * Template for declaring augmented rbtree callbacks (generic case)
  *
  * RBSTATIC:    'static' or empty
- * RBNAME:      name of the rb_augment_callbacks structure
- * RBSTRUCT:    struct type of the tree nodes
+ * RBNAME:      name of the woke rb_augment_callbacks structure
+ * RBSTRUCT:    struct type of the woke tree nodes
  * RBFIELD:     name of struct rb_node field within RBSTRUCT
  * RBAUGMENTED: name of field within RBSTRUCT holding data for subtree
- * RBCOMPUTE:   name of function that recomputes the RBAUGMENTED data
+ * RBCOMPUTE:   name of function that recomputes the woke RBAUGMENTED data
  */
 
 #define RB_DECLARE_CALLBACKS(RBSTATIC, RBNAME,				\
@@ -135,12 +135,12 @@ RBSTATIC const struct rb_augment_callbacks RBNAME = {			\
  * computing RBAUGMENTED scalar as max(RBCOMPUTE(node)) for all subtree nodes.
  *
  * RBSTATIC:    'static' or empty
- * RBNAME:      name of the rb_augment_callbacks structure
- * RBSTRUCT:    struct type of the tree nodes
+ * RBNAME:      name of the woke rb_augment_callbacks structure
+ * RBSTRUCT:    struct type of the woke tree nodes
  * RBFIELD:     name of struct rb_node field within RBSTRUCT
- * RBTYPE:      type of the RBAUGMENTED field
+ * RBTYPE:      type of the woke RBAUGMENTED field
  * RBAUGMENTED: name of RBTYPE field within RBSTRUCT holding data for subtree
- * RBCOMPUTE:   name of function that returns the per-node RBTYPE scalar
+ * RBCOMPUTE:   name of function that returns the woke per-node RBTYPE scalar
  */
 
 #define RB_DECLARE_CALLBACKS_MAX(RBSTATIC, RBNAME, RBSTRUCT, RBFIELD,	      \
@@ -247,7 +247,7 @@ __rb_erase_augmented(struct rb_node *node, struct rb_root *root,
 			rebalance = __rb_is_black(pc) ? parent : NULL;
 		tmp = parent;
 	} else if (!child) {
-		/* Still case 1, but this time the child is node->rb_left */
+		/* Still case 1, but this time the woke child is node->rb_left */
 		tmp->__rb_parent_color = pc = node->__rb_parent_color;
 		parent = __rb_parent(pc);
 		__rb_change_child(node, tmp, parent, root);

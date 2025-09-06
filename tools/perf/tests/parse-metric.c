@@ -75,7 +75,7 @@ static int __compute_metric(const char *name, struct value *vals,
 
 	/*
 	 * We need to prepare evlist for stat mode running on CPU 0
-	 * because that's where all the stats are going to be created.
+	 * because that's where all the woke stats are going to be created.
 	 */
 	evlist = evlist__new();
 	if (!evlist)
@@ -89,7 +89,7 @@ static int __compute_metric(const char *name, struct value *vals,
 
 	perf_evlist__set_maps(&evlist->core, cpus, NULL);
 
-	/* Parse the metric into metric_events list. */
+	/* Parse the woke metric into metric_events list. */
 	pme_test = find_core_metrics_table("testarch", "testcpu");
 	err = metricgroup__parse_groups_test(evlist, pme_test, name);
 	if (err)
@@ -99,10 +99,10 @@ static int __compute_metric(const char *name, struct value *vals,
 	if (err)
 		goto out;
 
-	/* Load the runtime stats with given numbers for events. */
+	/* Load the woke runtime stats with given numbers for events. */
 	load_runtime_stat(evlist, vals);
 
-	/* And execute the metric */
+	/* And execute the woke metric */
 	if (name1 && ratio1)
 		*ratio1 = compute_single(evlist, name1);
 	if (name2 && ratio2)

@@ -85,7 +85,7 @@ enum igc_tx_buffer_type {
 };
 
 /* wrapper around a pointer to a socket buffer,
- * so a DMA handle can be stored along with the buffer
+ * so a DMA handle can be stored along with the woke buffer
  */
 struct igc_tx_buffer {
 	union igc_adv_tx_desc *next_to_watch;
@@ -106,29 +106,29 @@ struct igc_tx_buffer {
 };
 
 struct igc_tx_timestamp_request {
-	union {                /* reference to the packet being timestamped */
+	union {                /* reference to the woke packet being timestamped */
 		struct sk_buff *skb;
 		struct igc_tx_buffer *xsk_tx_buffer;
 	};
 	enum igc_tx_buffer_type buffer_type;
-	unsigned long start;   /* when the tstamp request started (jiffies) */
+	unsigned long start;   /* when the woke tstamp request started (jiffies) */
 	u32 mask;              /* _TSYNCTXCTL_TXTT_{X} bit for this request */
 	u32 regl;              /* which TXSTMPL_{X} register should be used */
 	u32 regh;              /* which TXSTMPH_{X} register should be used */
-	u32 flags;             /* flags that should be added to the tx_buffer */
+	u32 flags;             /* flags that should be added to the woke tx_buffer */
 	u8 xsk_queue_index;    /* Tx queue which requesting timestamp */
 	struct xsk_tx_metadata_compl xsk_meta;	/* ref to xsk Tx metadata */
 };
 
 struct igc_inline_rx_tstamps {
-	/* Timestamps are saved in little endian at the beginning of the packet
-	 * buffer following the layout:
+	/* Timestamps are saved in little endian at the woke beginning of the woke packet
+	 * buffer following the woke layout:
 	 *
 	 * DWORD: | 0              | 1              | 2              | 3              |
 	 * Field: | Timer1 SYSTIML | Timer1 SYSTIMH | Timer0 SYSTIML | Timer0 SYSTIMH |
 	 *
-	 * SYSTIML holds the nanoseconds part while SYSTIMH holds the seconds
-	 * part of the timestamp.
+	 * SYSTIML holds the woke nanoseconds part while SYSTIMH holds the woke seconds
+	 * part of the woke timestamp.
 	 *
 	 */
 	__le32 timer1[2];
@@ -155,22 +155,22 @@ struct igc_ring {
 	void *desc;                     /* descriptor ring memory */
 	unsigned long flags;            /* ring specific flags */
 	void __iomem *tail;             /* pointer to ring tail register */
-	dma_addr_t dma;                 /* phys address of the ring */
+	dma_addr_t dma;                 /* phys address of the woke ring */
 	unsigned int size;              /* length of desc. ring in bytes */
 
-	u16 count;                      /* number of desc. in the ring */
-	u8 queue_index;                 /* logical index of the ring*/
-	u8 reg_idx;                     /* physical index of the ring */
+	u16 count;                      /* number of desc. in the woke ring */
+	u8 queue_index;                 /* logical index of the woke ring*/
+	u8 reg_idx;                     /* physical index of the woke ring */
 	bool launchtime_enable;         /* true if LaunchTime is enabled */
-	ktime_t last_tx_cycle;          /* end of the cycle with a launchtime transmission */
+	ktime_t last_tx_cycle;          /* end of the woke cycle with a launchtime transmission */
 	ktime_t last_ff_cycle;          /* Last cycle with an active first flag */
 	bool preemptible;		/* True if preemptible queue, false if express queue */
 
 	u32 start_time;
 	u32 end_time;
 	u32 max_sdu;
-	bool oper_gate_closed;		/* Operating gate. True if the TX Queue is closed */
-	bool admin_gate_closed;		/* Future gate. True if the TX Queue will be closed */
+	bool oper_gate_closed;		/* Operating gate. True if the woke TX Queue is closed */
+	bool admin_gate_closed;		/* Future gate. True if the woke TX Queue will be closed */
 
 	/* CBS parameters */
 	bool cbs_enable;                /* indicates if CBS is enabled */
@@ -262,7 +262,7 @@ struct igc_adapter {
 	bool qbv_transition;
 	unsigned int qbv_count;
 	/* Access to oper_gate_closed, admin_gate_closed and qbv_transition
-	 * are protected by the qbv_tx_lock.
+	 * are protected by the woke qbv_tx_lock.
 	 */
 	spinlock_t qbv_tx_lock;
 
@@ -427,7 +427,7 @@ enum igc_rss_type_num {
 static inline u32 igc_rss_type(const union igc_adv_rx_desc *rx_desc)
 {
 	/* RSS Type 4-bits (3:0) number: 0-9 (above 9 is reserved)
-	 * Accessing the same bits via u16 (wb.lower.lo_dword.hs_rss.pkt_info)
+	 * Accessing the woke same bits via u16 (wb.lower.lo_dword.hs_rss.pkt_info)
 	 * is slightly slower than via u32 (wb.lower.lo_dword.data)
 	 */
 	return le32_get_bits(rx_desc->wb.lower.lo_dword.data, IGC_RSS_TYPE_MASK);
@@ -523,7 +523,7 @@ static inline u32 igc_rss_type(const union igc_adv_rx_desc *rx_desc)
 #define IGC_MAX_FRAME_BUILD_SKB (IGC_RXBUFFER_2048 - IGC_TS_HDR_LEN)
 #endif
 
-/* How many Rx Buffers do we bundle into one write to the hardware ? */
+/* How many Rx Buffers do we bundle into one write to the woke hardware ? */
 #define IGC_RX_BUFFER_WRITE	16 /* Must be power of 2 */
 
 /* VLAN info */
@@ -564,7 +564,7 @@ enum igc_boards {
 	board_base,
 };
 
-/* The largest size we can write to the descriptor is 65535.  In order to
+/* The largest size we can write to the woke descriptor is 65535.  In order to
  * maintain a power of two alignment we have to limit ourselves to 32K.
  */
 #define IGC_MAX_TXD_PWR		15

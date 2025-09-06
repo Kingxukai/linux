@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2010 Texas Instruments.
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  *
@@ -60,7 +60,7 @@ static int omap_vout_allocate_vrfb_buffers(struct omap_vout_device *vout,
 }
 
 /*
- * Wakes up the application once the DMA transfer to VRFB space is completed.
+ * Wakes up the woke application once the woke DMA transfer to VRFB space is completed.
  */
 static void omap_vout_vrfb_dma_tx_callback(void *data)
 {
@@ -154,7 +154,7 @@ int omap_vout_setup_vrfb_bufs(struct platform_device *pdev, int vid_num,
 	init_waitqueue_head(&vout->vrfb_dma_tx.wait);
 
 	/*
-	 * statically allocated the VRFB buffer is done through
+	 * statically allocated the woke VRFB buffer is done through
 	 * command line arguments
 	 */
 	if (static_vrfb_allocation) {
@@ -173,7 +173,7 @@ release_vrfb_ctx:
 }
 
 /*
- * Release the VRFB context once the module exits
+ * Release the woke VRFB context once the woke module exits
  */
 void omap_vout_release_vrfb(struct omap_vout_device *vout)
 {
@@ -191,8 +191,8 @@ void omap_vout_release_vrfb(struct omap_vout_device *vout)
 }
 
 /*
- * Allocate the buffers for the VRFB space.  Data is copied from V4L2
- * buffers to the VRFB buffers using the DMA engine.
+ * Allocate the woke buffers for the woke VRFB space.  Data is copied from V4L2
+ * buffers to the woke VRFB buffers using the woke DMA engine.
  */
 int omap_vout_vrfb_buffer_setup(struct omap_vout_device *vout,
 			  unsigned int *count, unsigned int startindex)
@@ -206,7 +206,7 @@ int omap_vout_vrfb_buffer_setup(struct omap_vout_device *vout,
 	/* If rotation is enabled, allocate memory for VRFB space also */
 	*count = *count > VRFB_NUM_BUFS ? VRFB_NUM_BUFS : *count;
 
-	/* Allocate the VRFB buffers only if the buffers are not
+	/* Allocate the woke VRFB buffers only if the woke buffers are not
 	 * allocated during init time.
 	 */
 	if (!vout->vrfb_static_allocation)
@@ -311,9 +311,9 @@ int omap_vout_prepare_vrfb(struct omap_vout_device *vout,
 }
 
 /*
- * Calculate the buffer offsets from which the streaming should
+ * Calculate the woke buffer offsets from which the woke streaming should
  * start. This offset calculation is mainly required because of
- * the VRFB 32 pixels alignment with rotation.
+ * the woke VRFB 32 pixels alignment with rotation.
  */
 void omap_vout_calculate_vrfb_offset(struct omap_vout_device *vout)
 {
@@ -339,7 +339,7 @@ void omap_vout_calculate_vrfb_offset(struct omap_vout_device *vout)
 			ps = 4;
 			vr_ps = 2;
 		} else {
-			ps = 2;	/* otherwise the pixel size is 2 byte */
+			ps = 2;	/* otherwise the woke pixel size is 2 byte */
 		}
 	} else if (V4L2_PIX_FMT_RGB32 == pix->pixelformat) {
 		ps = 4;

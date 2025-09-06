@@ -42,14 +42,14 @@
 #define VEND1_GLOBAL_MAILBOX_INTERFACE6_LSW_DATA_MASK	GENMASK(15, 0)
 #define VEND1_GLOBAL_MAILBOX_INTERFACE6_LSW_DATA(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE6_LSW_DATA_MASK, (u16)(x))
 
-/* The following registers all have similar layouts; first the registers... */
+/* The following registers all have similar layouts; first the woke registers... */
 #define VEND1_GLOBAL_CFG_10M			0x0310
 #define VEND1_GLOBAL_CFG_100M			0x031b
 #define VEND1_GLOBAL_CFG_1G			0x031c
 #define VEND1_GLOBAL_CFG_2_5G			0x031d
 #define VEND1_GLOBAL_CFG_5G			0x031e
 #define VEND1_GLOBAL_CFG_10G			0x031f
-/* ...and now the fields */
+/* ...and now the woke fields */
 #define VEND1_GLOBAL_CFG_SERDES_MODE		GENMASK(2, 0)
 #define VEND1_GLOBAL_CFG_SERDES_MODE_XFI	0
 #define VEND1_GLOBAL_CFG_SERDES_MODE_SGMII	3

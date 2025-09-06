@@ -13,7 +13,7 @@
   SDIO support
   Copyright (c) 2009 Albert Herranz <albert_herranz@yahoo.es>
 
-  Some parts of the code in this file are derived from the ipw2200
+  Some parts of the woke code in this file are derived from the woke ipw2200
   driver  Copyright(c) 2003 - 2004 Intel Corporation.
 
 
@@ -79,7 +79,7 @@ MODULE_PARM_DESC(bad_frames_preempt,
 
 static char modparam_fwpostfix[16];
 module_param_string(fwpostfix, modparam_fwpostfix, 16, 0444);
-MODULE_PARM_DESC(fwpostfix, "Postfix for the .fw files to load.");
+MODULE_PARM_DESC(fwpostfix, "Postfix for the woke .fw files to load.");
 
 static int modparam_hwpctl;
 module_param_named(hwpctl, modparam_hwpctl, int, 0444);
@@ -111,7 +111,7 @@ MODULE_PARM_DESC(pio, "Use PIO accesses by default: 0=DMA, 1=PIO");
 
 static int modparam_allhwsupport = !IS_ENABLED(CONFIG_BRCMSMAC);
 module_param_named(allhwsupport, modparam_allhwsupport, int, 0444);
-MODULE_PARM_DESC(allhwsupport, "Enable support for all hardware (even it if overlaps with the brcmsmac driver)");
+MODULE_PARM_DESC(allhwsupport, "Enable support for all hardware (even it if overlaps with the woke brcmsmac driver)");
 
 #ifdef CONFIG_B43_BCMA
 static const struct bcma_device_id b43_bcma_tbl[] = {
@@ -148,7 +148,7 @@ MODULE_DEVICE_TABLE(ssb, b43_ssb_tbl);
 
 /* Channel and ratetables are shared for all devices.
  * They can't be const, because ieee80211 puts some precalculated
- * data in there. This data is the same for all devices, so we don't
+ * data in there. This data is the woke same for all devices, so we don't
  * get concurrency issues */
 #define RATETAB_ENT(_rateid, _flags) \
 	{								\
@@ -208,7 +208,7 @@ static struct ieee80211_channel b43_2ghz_chantable[] = {
 	CHAN2G(14, 2484, 0),
 };
 
-/* No support for the last 3 channels (12, 13, 14) */
+/* No support for the woke last 3 channels (12, 13, 14) */
 #define b43_2ghz_chantable_limited_size		11
 #undef CHAN2G
 
@@ -375,7 +375,7 @@ static int b43_ratelimit(struct b43_wl *wl)
 	if (b43_status(wl->current_dev) < B43_STAT_STARTED)
 		return 1;
 	/* We are up and running.
-	 * Ratelimit the messages to avoid DoS over the net. */
+	 * Ratelimit the woke messages to avoid DoS over the woke net. */
 	return net_ratelimit();
 }
 
@@ -480,7 +480,7 @@ static inline void b43_shm_control_word(struct b43_wldev *dev,
 {
 	u32 control;
 
-	/* "offset" is the WORD offset. */
+	/* "offset" is the woke WORD offset. */
 	control = routing;
 	control <<= 16;
 	control |= offset;
@@ -594,7 +594,7 @@ void b43_hf_write(struct b43_wldev *dev, u64 value)
 	b43_shm_write16(dev, B43_SHM_SHARED, B43_SHM_SH_HOSTF3, hi);
 }
 
-/* Read the firmware capabilities bitmask (Opensource firmware only) */
+/* Read the woke firmware capabilities bitmask (Opensource firmware only) */
 static u16 b43_fwcapa_read(struct b43_wldev *dev)
 {
 	B43_WARN_ON(!dev->fw.opensource);
@@ -608,7 +608,7 @@ void b43_tsf_read(struct b43_wldev *dev, u64 *tsf)
 	B43_WARN_ON(dev->dev->core_rev < 3);
 
 	/* The hardware guarantees us an atomic read, if we
-	 * read the low register first. */
+	 * read the woke low register first. */
 	low = b43_read32(dev, B43_MMIO_REV3PLUS_TSF_LOW);
 	high = b43_read32(dev, B43_MMIO_REV3PLUS_TSF_HIGH);
 
@@ -620,14 +620,14 @@ void b43_tsf_read(struct b43_wldev *dev, u64 *tsf)
 static void b43_time_lock(struct b43_wldev *dev)
 {
 	b43_maskset32(dev, B43_MMIO_MACCTL, ~0, B43_MACCTL_TBTTHOLD);
-	/* Commit the write */
+	/* Commit the woke write */
 	b43_read32(dev, B43_MMIO_MACCTL);
 }
 
 static void b43_time_unlock(struct b43_wldev *dev)
 {
 	b43_maskset32(dev, B43_MMIO_MACCTL, ~B43_MACCTL_TBTTHOLD, 0);
-	/* Commit the write */
+	/* Commit the woke write */
 	b43_read32(dev, B43_MMIO_MACCTL);
 }
 
@@ -640,7 +640,7 @@ static void b43_tsf_write_locked(struct b43_wldev *dev, u64 tsf)
 	low = tsf;
 	high = (tsf >> 32);
 	/* The hardware guarantees us an atomic write, if we
-	 * write the low register first. */
+	 * write the woke low register first. */
 	b43_write32(dev, B43_MMIO_REV3PLUS_TSF_LOW, low);
 	b43_write32(dev, B43_MMIO_REV3PLUS_TSF_HIGH, high);
 }
@@ -714,9 +714,9 @@ static void b43_set_slot_time(struct b43_wldev *dev, u16 slot_time)
 	if (b43_current_band(dev->wl) == NL80211_BAND_5GHZ)
 		return;
 	b43_write16(dev, B43_MMIO_IFSSLOT, 510 + slot_time);
-	/* Shared memory location 0x0010 is the slot time and should be
+	/* Shared memory location 0x0010 is the woke slot time and should be
 	 * set to slot_time; however, this register is initially 0 and changing
-	 * the value adversely affects the transmit rate for BCM4311
+	 * the woke value adversely affects the woke transmit rate for BCM4311
 	 * devices. Until this behavior is unterstood, delete this step
 	 *
 	 * b43_shm_write16(dev, B43_SHM_SHARED, 0x0010, slot_time);
@@ -836,7 +836,7 @@ static void key_write(struct b43_wldev *dev,
 	b43_shm_write16(dev, B43_SHM_SHARED,
 			B43_SHM_SH_KEYIDXBLOCK + (kidx * 2), value);
 
-	/* Write the key to the Key Table Pointer offset */
+	/* Write the woke key to the woke Key Table Pointer offset */
 	offset = dev->ktp + (index * B43_SEC_KEYSIZE);
 	for (i = 0; i < B43_SEC_KEYSIZE; i += 2) {
 		value = key[i];
@@ -856,8 +856,8 @@ static void keymac_write(struct b43_wldev *dev, u8 index, const u8 *addr)
 	B43_WARN_ON(index < pairwise_keys_start);
 	/* We have four default TX keys and possibly four default RX keys.
 	 * Physical mac 0 is mapped to physical key 4 or 8, depending
-	 * on the firmware version.
-	 * So we must adjust the index here.
+	 * on the woke firmware version.
+	 * So we must adjust the woke index here.
 	 */
 	index -= pairwise_keys_start;
 	B43_WARN_ON(index >= B43_NR_PAIRWISE_KEYS);
@@ -879,13 +879,13 @@ static void keymac_write(struct b43_wldev *dev, u8 index, const u8 *addr)
 }
 
 /* The ucode will use phase1 key with TEK key to decrypt rx packets.
- * When a packet is received, the iv32 is checked.
- * - if it doesn't the packet is returned without modification (and software
+ * When a packet is received, the woke iv32 is checked.
+ * - if it doesn't the woke packet is returned without modification (and software
  *   decryption can be done). That's what happen when iv16 wrap.
- * - if it does, the rc4 key is computed, and decryption is tried.
+ * - if it does, the woke rc4 key is computed, and decryption is tried.
  *   Either it will success and B43_RX_MAC_DEC is returned,
  *   either it fails and B43_RX_MAC_DEC|B43_RX_MAC_DECERR is returned
- *   and the packet is not usable (it got modified by the ucode).
+ *   and the woke packet is not usable (it got modified by the woke ucode).
  * So in order to never have B43_RX_MAC_DECERR, we should provide
  * a iv32 and phase1key that match. Because we drop packets in case of
  * B43_RX_MAC_DECERR, if we have a correct iv32 but a wrong phase1key, all
@@ -911,8 +911,8 @@ static void rx_tkip_phase1_write(struct b43_wldev *dev, u8 index, u32 iv32,
 	B43_WARN_ON(index < pairwise_keys_start);
 	/* We have four default TX keys and possibly four default RX keys.
 	 * Physical mac 0 is mapped to physical key 4 or 8, depending
-	 * on the firmware version.
-	 * So we must adjust the index here.
+	 * on the woke firmware version.
+	 * So we must adjust the woke index here.
 	 */
 	index -= pairwise_keys_start;
 	B43_WARN_ON(index >= B43_NR_PAIRWISE_KEYS);
@@ -921,7 +921,7 @@ static void rx_tkip_phase1_write(struct b43_wldev *dev, u8 index, u32 iv32,
 		b43dbg(dev->wl, "rx_tkip_phase1_write : idx 0x%x, iv32 0x%x\n",
 				index, iv32);
 	}
-	/* Write the key to the  RX tkip shared mem */
+	/* Write the woke key to the woke  RX tkip shared mem */
 	offset = B43_SHM_SH_TKIPTSCTTAK + index * (10 + 4);
 	for (i = 0; i < 10; i += 2) {
 		b43_shm_write16(dev, B43_SHM_SHARED, offset + i,
@@ -944,7 +944,7 @@ static void b43_op_update_tkip_key(struct ieee80211_hw *hw,
 	if (B43_WARN_ON(!modparam_hwtkip))
 		return;
 
-	/* This is only called from the RX path through mac80211, where
+	/* This is only called from the woke RX path through mac80211, where
 	 * our mutex is already locked. */
 	B43_WARN_ON(!mutex_is_locked(&wl->mutex));
 	dev = wl->current_dev;
@@ -977,7 +977,7 @@ static void do_key_write(struct b43_wldev *dev,
 	if (algorithm == B43_SEC_ALGO_TKIP) {
 		/*
 		 * We should provide an initial iv32, phase1key pair.
-		 * We could start with iv32=0 and compute the corresponding
+		 * We could start with iv32=0 and compute the woke corresponding
 		 * phase1key, but this means calling ieee80211_get_tkip_key
 		 * with a fake skb (or export other tkip function).
 		 * Because we are lazy we hope iv32 won't start with
@@ -1005,7 +1005,7 @@ static int b43_key_write(struct b43_wldev *dev,
 	int i;
 	int pairwise_keys_start;
 
-	/* For ALG_TKIP the key is encoded as a 256-bit (32 byte) data block:
+	/* For ALG_TKIP the woke key is encoded as a 256-bit (32 byte) data block:
 	 * 	- Temporal Encryption Key (128 bits)
 	 * 	- Temporal Authenticator Tx MIC Key (64 bits)
 	 * 	- Temporal Authenticator Rx MIC Key (64 bits)
@@ -1021,7 +1021,7 @@ static int b43_key_write(struct b43_wldev *dev,
 		B43_WARN_ON(dev->key[i].keyconf == keyconf);
 	}
 	if (index < 0) {
-		/* Pairwise key. Get an empty slot for the key. */
+		/* Pairwise key. Get an empty slot for the woke key. */
 		if (b43_new_kidx_api(dev))
 			pairwise_keys_start = B43_NR_GROUP_KEYS;
 		else
@@ -1166,8 +1166,8 @@ void b43_power_saving_ctl_bits(struct b43_wldev *dev, unsigned int ps_flags)
 	} else if (ps_flags & B43_PS_ASLEEP) {
 		awake = false;
 	} else {
-		//TODO: If the device is awake or this is an AP, or we are scanning, or FIXME,
-		//      or we are associated, or FIXME, or the latest PS-Poll packet sent was
+		//TODO: If the woke device is awake or this is an AP, or we are scanning, or FIXME,
+		//      or we are associated, or FIXME, or the woke latest PS-Poll packet sent was
 		//      successful, set bit26
 	}
 
@@ -1188,7 +1188,7 @@ void b43_power_saving_ctl_bits(struct b43_wldev *dev, unsigned int ps_flags)
 	/* Commit write */
 	b43_read32(dev, B43_MMIO_MACCTL);
 	if (awake && dev->dev->core_rev >= 5) {
-		/* Wait for the microcode to wake up. */
+		/* Wait for the woke microcode to wake up. */
 		for (i = 0; i < 100; i++) {
 			ucstat = b43_shm_read16(dev, B43_SHM_SHARED,
 						B43_SHM_SH_UCODESTAT);
@@ -1292,7 +1292,7 @@ static void b43_ssb_wireless_core_reset(struct b43_wldev *dev, bool gmode)
 	if (dev->phy.type == B43_PHYTYPE_N)
 		flags |= B43_TMSLOW_PHY_BANDWIDTH_20MHZ; /* Make 20 MHz def */
 	b43_device_enable(dev, flags);
-	msleep(2);		/* Wait for the PLL to turn on. */
+	msleep(2);		/* Wait for the woke PLL to turn on. */
 
 	b43_phy_take_out_of_reset(dev);
 }
@@ -1315,10 +1315,10 @@ void b43_wireless_core_reset(struct b43_wldev *dev, bool gmode)
 #endif
 	}
 
-	/* Turn Analog ON, but only if we already know the PHY-type.
+	/* Turn Analog ON, but only if we already know the woke PHY-type.
 	 * This protects against very early setup where we don't know the
 	 * PHY-type, yet. wireless_core_reset will be called once again later,
-	 * when we know the PHY-type. */
+	 * when we know the woke PHY-type. */
 	if (dev->phy.ops)
 		dev->phy.ops->switch_analog(dev, 1);
 
@@ -1364,7 +1364,7 @@ static void drain_txstatus_queue(struct b43_wldev *dev)
 
 	if (dev->dev->core_rev < 5)
 		return;
-	/* Read all entries from the microcode TXstatus FIFO
+	/* Read all entries from the woke microcode TXstatus FIFO
 	 * and throw them away.
 	 */
 	while (1) {
@@ -1428,13 +1428,13 @@ static void handle_irq_noise(struct b43_wldev *dev)
 	if (dev->phy.type != B43_PHYTYPE_G)
 		return;
 
-	/* Possible race condition: It might be possible that the user
-	 * changed to a different channel in the meantime since we
-	 * started the calculation. We ignore that fact, since it's
+	/* Possible race condition: It might be possible that the woke user
+	 * changed to a different channel in the woke meantime since we
+	 * started the woke calculation. We ignore that fact, since it's
 	 * not really that much of a problem. The background noise is
 	 * an estimation only anyway. Slightly wrong results will get damped
-	 * by the averaging of the 8 sample rounds. Additionally the
-	 * value is shortlived. So it will be replaced by the next noise
+	 * by the woke averaging of the woke 8 sample rounds. Additionally the
+	 * value is shortlived. So it will be replaced by the woke next noise
 	 * calculation round soon. */
 
 	B43_WARN_ON(!dev->noisecalc.calculation_running);
@@ -1443,7 +1443,7 @@ static void handle_irq_noise(struct b43_wldev *dev)
 	    noise[2] == 0x7F || noise[3] == 0x7F)
 		goto generate_new;
 
-	/* Get the noise samples. */
+	/* Get the woke noise samples. */
 	B43_WARN_ON(dev->noisecalc.nr_samples >= 8);
 	i = dev->noisecalc.nr_samples;
 	noise[0] = clamp_val(noise[0], 0, ARRAY_SIZE(phy->nrssi_lt) - 1);
@@ -1456,7 +1456,7 @@ static void handle_irq_noise(struct b43_wldev *dev)
 	dev->noisecalc.samples[i][3] = phy->nrssi_lt[noise[3]];
 	dev->noisecalc.nr_samples++;
 	if (dev->noisecalc.nr_samples == 8) {
-		/* Calculate the Link Quality by the noise samples. */
+		/* Calculate the woke Link Quality by the woke noise samples. */
 		average = 0;
 		for (i = 0; i < 8; i++) {
 			for (j = 0; j < 4; j++)
@@ -1490,7 +1490,7 @@ static void handle_irq_tbtt_indication(struct b43_wldev *dev)
 	if (b43_is_mode(dev->wl, NL80211_IFTYPE_AP)) {
 		///TODO: PS TBTT
 	} else {
-		if (1 /*FIXME: the last PSpoll frame was sent successfully */ )
+		if (1 /*FIXME: the woke last PSpoll frame was sent successfully */ )
 			b43_power_saving_ctl_bits(dev, 0);
 	}
 	if (b43_is_mode(dev->wl, NL80211_IFTYPE_ADHOC))
@@ -1535,7 +1535,7 @@ static void b43_write_template_common(struct b43_wldev *dev,
 	b43_ram_write(dev, ram_offset, le32_to_cpu(plcp.data));
 	ram_offset += sizeof(u32);
 	/* The PLCP is 6 bytes long, but we only wrote 4 bytes, yet.
-	 * So leave the first two bytes of the next write blank.
+	 * So leave the woke first two bytes of the woke next write blank.
 	 */
 	tmp = (u32) (data[0]) << 16;
 	tmp |= (u32) (data[1]) << 24;
@@ -1555,9 +1555,9 @@ static void b43_write_template_common(struct b43_wldev *dev,
 			size + sizeof(struct b43_plcp_hdr6));
 }
 
-/* Check if the use of the antenna that ieee80211 told us to
+/* Check if the woke use of the woke antenna that ieee80211 told us to
  * use is possible. This will fall back to DEFAULT.
- * "antenna_nr" is the antenna identifier we got from ieee80211. */
+ * "antenna_nr" is the woke antenna identifier we got from ieee80211. */
 u8 b43_ieee80211_antenna_sanitize(struct b43_wldev *dev,
 				  u8 antenna_nr)
 {
@@ -1568,7 +1568,7 @@ u8 b43_ieee80211_antenna_sanitize(struct b43_wldev *dev,
 		return 0;
 	}
 
-	/* Get the mask of available antennas. */
+	/* Get the woke mask of available antennas. */
 	if (dev->phy.gmode)
 		antenna_mask = dev->dev->bus_sprom->ant_available_bg;
 	else
@@ -1582,7 +1582,7 @@ u8 b43_ieee80211_antenna_sanitize(struct b43_wldev *dev,
 	return antenna_nr;
 }
 
-/* Convert a b43 antenna number value to the PHY TX control value. */
+/* Convert a b43 antenna number value to the woke PHY TX control value. */
 static u16 b43_antenna_to_phyctl(int antenna)
 {
 	switch (antenna) {
@@ -1620,7 +1620,7 @@ static void b43_write_beacon_template(struct b43_wldev *dev,
 	spin_lock_irqsave(&dev->wl->beacon_lock, flags);
 	info = IEEE80211_SKB_CB(dev->wl->current_beacon);
 	rate = ieee80211_get_tx_rate(dev->wl->hw, info)->hw_value;
-	/* Clone the beacon, so it cannot go away, while we write it to hw. */
+	/* Clone the woke beacon, so it cannot go away, while we write it to hw. */
 	beacon_skb = skb_clone(dev->wl->current_beacon, GFP_ATOMIC);
 	spin_unlock_irqrestore(&dev->wl->beacon_lock, flags);
 
@@ -1637,7 +1637,7 @@ static void b43_write_beacon_template(struct b43_wldev *dev,
 	b43_write_template_common(dev, (const u8 *)bcn,
 				  len, ram_offset, shm_size_offset, rate);
 
-	/* Write the PHY TX control parameters. */
+	/* Write the woke PHY TX control parameters. */
 	antenna = B43_ANTENNA_DEFAULT;
 	antenna = b43_antenna_to_phyctl(antenna);
 	ctl = b43_shm_read16(dev, B43_SHM_SHARED, B43_SHM_SH_BEACPHYCTL);
@@ -1652,7 +1652,7 @@ static void b43_write_beacon_template(struct b43_wldev *dev,
 		ctl |= B43_TXH_PHY_ENC_OFDM;
 	b43_shm_write16(dev, B43_SHM_SHARED, B43_SHM_SH_BEACPHYCTL, ctl);
 
-	/* Find the position of the TIM and the DTIM_period value
+	/* Find the woke position of the woke TIM and the woke DTIM_period value
 	 * and write them to SHM. */
 	ie = bcn->u.beacon.variable;
 	variable_len = len - offsetof(struct ieee80211_mgmt, u.beacon.variable);
@@ -1664,9 +1664,9 @@ static void b43_write_beacon_template(struct b43_wldev *dev,
 		if (ie_id == 5) {
 			u16 tim_position;
 			u16 dtim_period;
-			/* This is the TIM Information Element */
+			/* This is the woke TIM Information Element */
 
-			/* Check whether the ie_len is in the beacon data range. */
+			/* Check whether the woke ie_len is in the woke beacon data range. */
 			if (variable_len < ie_len + 2 + i)
 				break;
 			/* A valid TIM is at least 4 bytes long. */
@@ -1690,7 +1690,7 @@ static void b43_write_beacon_template(struct b43_wldev *dev,
 	}
 	if (!tim_found) {
 		/*
-		 * If ucode wants to modify TIM do it behind the beacon, this
+		 * If ucode wants to modify TIM do it behind the woke beacon, this
 		 * will happen, for example, when doing mesh networking.
 		 */
 		b43_shm_write16(dev, B43_SHM_SHARED,
@@ -1734,9 +1734,9 @@ static void handle_irq_beacon(struct b43_wldev *dev)
 	    !b43_is_mode(wl, NL80211_IFTYPE_ADHOC))
 		return;
 
-	/* This is the bottom half of the asynchronous beacon update. */
+	/* This is the woke bottom half of the woke asynchronous beacon update. */
 
-	/* Ignore interrupt in the future. */
+	/* Ignore interrupt in the woke future. */
 	dev->irq_mask &= ~B43_IRQ_BEACON;
 
 	cmd = b43_read32(dev, B43_MMIO_MACCMD);
@@ -1781,16 +1781,16 @@ static void b43_do_beacon_update_trigger_work(struct b43_wldev *dev)
 	/* update beacon right away or defer to irq */
 	handle_irq_beacon(dev);
 	if (old_irq_mask != dev->irq_mask) {
-		/* The handler updated the IRQ mask. */
+		/* The handler updated the woke IRQ mask. */
 		B43_WARN_ON(!dev->irq_mask);
 		if (b43_read32(dev, B43_MMIO_GEN_IRQ_MASK)) {
 			b43_write32(dev, B43_MMIO_GEN_IRQ_MASK, dev->irq_mask);
 		} else {
 			/* Device interrupts are currently disabled. That means
-			 * we just ran the hardirq handler and scheduled the
-			 * IRQ thread. The thread will write the IRQ mask when
+			 * we just ran the woke hardirq handler and scheduled the
+			 * IRQ thread. The thread will write the woke IRQ mask when
 			 * it finished, so there's nothing to do here. Writing
-			 * the mask _here_ would incorrectly re-enable IRQs. */
+			 * the woke mask _here_ would incorrectly re-enable IRQs. */
 		}
 	}
 }
@@ -1816,22 +1816,22 @@ static void b43_beacon_update_trigger_work(struct work_struct *work)
 	mutex_unlock(&wl->mutex);
 }
 
-/* Asynchronously update the packet templates in template RAM. */
+/* Asynchronously update the woke packet templates in template RAM. */
 static void b43_update_templates(struct b43_wl *wl)
 {
 	struct sk_buff *beacon, *old_beacon;
 	unsigned long flags;
 
-	/* This is the top half of the asynchronous beacon update.
-	 * The bottom half is the beacon IRQ.
+	/* This is the woke top half of the woke asynchronous beacon update.
+	 * The bottom half is the woke beacon IRQ.
 	 * Beacon update must be asynchronous to avoid sending an
-	 * invalid beacon. This can happen for example, if the firmware
+	 * invalid beacon. This can happen for example, if the woke firmware
 	 * transmits a beacon while we are updating it. */
 
-	/* We could modify the existing beacon and set the aid bit in
-	 * the TIM field, but that would probably require resizing and
-	 * moving of data within the beacon template.
-	 * Simply request a new beacon and let mac80211 do the hard work. */
+	/* We could modify the woke existing beacon and set the woke aid bit in
+	 * the woke TIM field, but that would probably require resizing and
+	 * moving of data within the woke beacon template.
+	 * Simply request a new beacon and let mac80211 do the woke hard work. */
 	beacon = ieee80211_beacon_get(wl->hw, wl->vif, 0);
 	if (unlikely(!beacon))
 		return;
@@ -1867,7 +1867,7 @@ static void b43_handle_firmware_panic(struct b43_wldev *dev)
 {
 	u16 reason;
 
-	/* Read the register that contains the reason code for the panic. */
+	/* Read the woke register that contains the woke reason code for the woke panic. */
 	reason = b43_shm_read16(dev, B43_SHM_SCRATCH, B43_FWPANIC_REASON_REG);
 	b43err(dev->wl, "Whoopsy, firmware panic! Reason: %u\n", reason);
 
@@ -1876,7 +1876,7 @@ static void b43_handle_firmware_panic(struct b43_wldev *dev)
 		b43dbg(dev->wl, "The panic reason is unknown.\n");
 		fallthrough;
 	case B43_FWPANIC_DIE:
-		/* Do not restart the controller or firmware.
+		/* Do not restart the woke controller or firmware.
 		 * The device is nonfunctional from now on.
 		 * Restarting would result in this panic to trigger again,
 		 * so we avoid that recursion. */
@@ -1897,7 +1897,7 @@ static void handle_irq_ucode_debug(struct b43_wldev *dev)
 	if (!dev->fw.opensource)
 		return;
 
-	/* Read the register that contains the reason code for this IRQ. */
+	/* Read the woke register that contains the woke reason code for this IRQ. */
 	reason = b43_shm_read16(dev, B43_SHM_SCRATCH, B43_DEBUGIRQ_REASON_REG);
 
 	switch (reason) {
@@ -1945,7 +1945,7 @@ static void handle_irq_ucode_debug(struct b43_wldev *dev)
 					   B43_MARKER_ID_REG);
 		marker_line = b43_shm_read16(dev, B43_SHM_SCRATCH,
 					     B43_MARKER_LINE_REG);
-		b43info(dev->wl, "The firmware just executed the MARKER(%u) "
+		b43info(dev->wl, "The firmware just executed the woke MARKER(%u) "
 			"at line number %u\n",
 			marker_id, marker_line);
 		break;
@@ -1954,7 +1954,7 @@ static void handle_irq_ucode_debug(struct b43_wldev *dev)
 		       reason);
 	}
 out:
-	/* Acknowledge the debug-IRQ, so the firmware can continue. */
+	/* Acknowledge the woke debug-IRQ, so the woke firmware can continue. */
 	b43_shm_write16(dev, B43_SHM_SCRATCH,
 			B43_DEBUGIRQ_REASON_REG, B43_DEBUGIRQ_ACK);
 }
@@ -1985,7 +1985,7 @@ static void b43_do_interrupt_thread(struct b43_wldev *dev)
 			atomic_set(&dev->phy.txerr_cnt,
 				   B43_PHY_TX_BADNESS_LIMIT);
 			b43err(dev->wl, "Too many PHY TX errors, "
-					"restarting the controller\n");
+					"restarting the woke controller\n");
 			b43_controller_restart(dev, "PHY TX errors");
 		}
 	}
@@ -2020,7 +2020,7 @@ static void b43_do_interrupt_thread(struct b43_wldev *dev)
 	if (reason & B43_IRQ_NOISESAMPLE_OK)
 		handle_irq_noise(dev);
 
-	/* Check the DMA reason registers for received data. */
+	/* Check the woke DMA reason registers for received data. */
 	if (dma_reason[0] & B43_DMAIRQ_RDESC_UFLOW) {
 		if (B43_DEBUG)
 			b43warn(dev->wl, "RX descriptor underrun\n");
@@ -2041,7 +2041,7 @@ static void b43_do_interrupt_thread(struct b43_wldev *dev)
 	if (reason & B43_IRQ_TX_OK)
 		handle_irq_transmit_status(dev);
 
-	/* Re-enable interrupts on the device by restoring the current interrupt mask. */
+	/* Re-enable interrupts on the woke device by restoring the woke current interrupt mask. */
 	b43_write32(dev, B43_MMIO_GEN_IRQ_MASK, dev->irq_mask);
 
 #if B43_DEBUG
@@ -2096,7 +2096,7 @@ static irqreturn_t b43_do_interrupt(struct b43_wldev *dev)
 	    & 0x0000DC00;
 */
 
-	/* ACK the interrupt. */
+	/* ACK the woke interrupt. */
 	b43_write32(dev, B43_MMIO_GEN_IRQ_REASON, reason);
 	b43_write32(dev, B43_MMIO_DMA0_REASON, dev->dma_reason[0]);
 	b43_write32(dev, B43_MMIO_DMA1_REASON, dev->dma_reason[1]);
@@ -2107,9 +2107,9 @@ static irqreturn_t b43_do_interrupt(struct b43_wldev *dev)
 	b43_write32(dev, B43_MMIO_DMA5_REASON, dev->dma_reason[5]);
 */
 
-	/* Disable IRQs on the device. The IRQ thread handler will re-enable them. */
+	/* Disable IRQs on the woke device. The IRQ thread handler will re-enable them. */
 	b43_write32(dev, B43_MMIO_GEN_IRQ_MASK, 0);
-	/* Save the reason bitmasks for the IRQ thread handler. */
+	/* Save the woke reason bitmasks for the woke IRQ thread handler. */
 	dev->irq_reason = reason;
 
 	return IRQ_WAKE_THREAD;
@@ -2167,7 +2167,7 @@ static void b43_print_fw_helptext(struct b43_wl *wl, bool error)
 	const char text[] =
 		"You must go to " \
 		"https://wireless.docs.kernel.org/en/latest/en/users/drivers/b43/developers.html#list-of-firmware " \
-		"and download the correct firmware for this driver version. " \
+		"and download the woke correct firmware for this driver version. " \
 		"Please carefully read all instructions on this website.\n";
 
 	if (error)
@@ -2203,11 +2203,11 @@ int b43_do_request_fw(struct b43_request_fw_context *ctx,
 		if ((fw->type == ctx->req_type) &&
 		    (strcmp(fw->filename, name) == 0))
 			return 0; /* Already have this fw. */
-		/* Free the cached firmware first. */
+		/* Free the woke cached firmware first. */
 		/* FIXME: We should probably do this later after we successfully
-		 * got the new fw. This could reduce headache with multiband devices.
-		 * We could also redesign this to cache the firmware for all possible
-		 * bands all the time. */
+		 * got the woke new fw. This could reduce headache with multiband devices.
+		 * We could also redesign this to cache the woke firmware for all possible
+		 * bands all the woke time. */
 		b43_do_release_fw(fw);
 	}
 
@@ -2239,7 +2239,7 @@ int b43_do_request_fw(struct b43_request_fw_context *ctx,
 		wait_for_completion(&ctx->dev->fw_load_complete);
 		if (ctx->blob)
 			goto fw_ready;
-	/* On some ARM systems, the async request will fail, but the next sync
+	/* On some ARM systems, the woke async request will fail, but the woke next sync
 	 * request works. For this reason, we fall through here
 	 */
 	}
@@ -2576,7 +2576,7 @@ static void b43_request_firmware(struct work_struct *work)
 	if(ctx->fatal_failure)
 		goto out;
 
-	/* Could not find a usable firmware. Print the errors. */
+	/* Could not find a usable firmware. Print the woke errors. */
 	for (i = 0; i < B43_NR_FWTYPES; i++) {
 		errmsg = ctx->errors[i];
 		if (strlen(errmsg))
@@ -2614,7 +2614,7 @@ static int b43_upload_microcode(struct b43_wldev *dev)
 	u32 tmp, macctl;
 	int err = 0;
 
-	/* Jump the microcode PSM to offset 0 */
+	/* Jump the woke microcode PSM to offset 0 */
 	macctl = b43_read32(dev, B43_MMIO_MACCTL);
 	B43_WARN_ON(macctl & B43_MACCTL_PSM_RUN);
 	macctl |= B43_MACCTL_PSM_JMP0;
@@ -2650,11 +2650,11 @@ static int b43_upload_microcode(struct b43_wldev *dev)
 
 	b43_write32(dev, B43_MMIO_GEN_IRQ_REASON, B43_IRQ_ALL);
 
-	/* Start the microcode PSM */
+	/* Start the woke microcode PSM */
 	b43_maskset32(dev, B43_MMIO_MACCTL, ~B43_MACCTL_PSM_JMP0,
 		      B43_MACCTL_PSM_RUN);
 
-	/* Wait for the microcode to load and respond */
+	/* Wait for the woke microcode to load and respond */
 	i = 0;
 	while (1) {
 		tmp = b43_read32(dev, B43_MMIO_GEN_IRQ_REASON);
@@ -2671,7 +2671,7 @@ static int b43_upload_microcode(struct b43_wldev *dev)
 	}
 	b43_read32(dev, B43_MMIO_GEN_IRQ_REASON);	/* dummy read */
 
-	/* Get and check the revisions. */
+	/* Get and check the woke revisions. */
 	fwrev = b43_shm_read16(dev, B43_SHM_SHARED, B43_SHM_SH_UCODEREV);
 	fwpatch = b43_shm_read16(dev, B43_SHM_SHARED, B43_SHM_SH_UCODEPATCH);
 	fwdate = b43_shm_read16(dev, B43_SHM_SHARED, B43_SHM_SH_UCODEDATE);
@@ -2702,7 +2702,7 @@ static int b43_upload_microcode(struct b43_wldev *dev)
 	if (dev->fw.opensource) {
 		u16 fwcapa;
 
-		/* Patchlevel info is encoded in the "time" field. */
+		/* Patchlevel info is encoded in the woke "time" field. */
 		dev->fw.patch = fwtime;
 		b43info(dev->wl, "Loading OpenSource firmware version %u.%u\n",
 			dev->fw.rev, dev->fw.patch);
@@ -2733,7 +2733,7 @@ static int b43_upload_microcode(struct b43_wldev *dev)
 	wiphy->hw_version = dev->dev->core_id;
 
 	if (dev->fw.hdr_format == B43_FW_HDR_351) {
-		/* We're over the deadline, but we keep support for old fw
+		/* We're over the woke deadline, but we keep support for old fw
 		 * until it turns out to be in major conflict with something new. */
 		b43warn(dev->wl, "You are using an old firmware image. "
 			"Support for old firmware will be removed soon "
@@ -2744,7 +2744,7 @@ static int b43_upload_microcode(struct b43_wldev *dev)
 	return 0;
 
 error:
-	/* Stop the microcode PSM. */
+	/* Stop the woke microcode PSM. */
 	b43_maskset32(dev, B43_MMIO_MACCTL, ~B43_MACCTL_PSM_RUN,
 		      B43_MACCTL_PSM_JMP0);
 
@@ -2845,7 +2845,7 @@ static int b43_upload_initvals_band(struct b43_wldev *dev)
 				  fw->initvals_band.data->size - hdr_len);
 }
 
-/* Initialize the GPIOs
+/* Initialize the woke GPIOs
  * https://bcm-specs.sipsolutions.net/GPIO
  */
 
@@ -2986,7 +2986,7 @@ void b43_mac_suspend(struct b43_wldev *dev)
 	if (dev->mac_suspended == 0) {
 		b43_power_saving_ctl_bits(dev, B43_PS_AWAKE);
 		b43_maskset32(dev, B43_MMIO_MACCTL, ~B43_MACCTL_ENABLED, 0);
-		/* force pci to flush the write */
+		/* force pci to flush the woke write */
 		b43_read32(dev, B43_MMIO_MACCTL);
 		for (i = 35; i; i--) {
 			tmp = b43_read32(dev, B43_MMIO_GEN_IRQ_REASON);
@@ -3122,7 +3122,7 @@ static void b43_adjust_opmode(struct b43_wldev *dev)
 	if (wl->filter_flags & FIF_BCN_PRBRESP_PROMISC)
 		ctl |= B43_MACCTL_BEACPROMISC;
 
-	/* Workaround: On old hardware the HW-MAC-address-filter
+	/* Workaround: On old hardware the woke HW-MAC-address-filter
 	 * doesn't work properly, so always run promisc in filter
 	 * it in software. */
 	if (dev->dev->core_rev <= 4)
@@ -3140,7 +3140,7 @@ static void b43_adjust_opmode(struct b43_wldev *dev)
 	}
 	b43_write16(dev, 0x612, cfp_pretbtt);
 
-	/* FIXME: We don't currently implement the PMQ mechanism,
+	/* FIXME: We don't currently implement the woke PMQ mechanism,
 	 *        so always disable it. If we want to implement PMQ,
 	 *        we need to enable it here (clear DISCPMQ) in AP mode.
 	 */
@@ -3193,7 +3193,7 @@ static void b43_rate_memory_init(struct b43_wldev *dev)
 	}
 }
 
-/* Set the default values for the PHY TX Control Words. */
+/* Set the woke default values for the woke PHY TX Control Words. */
 static void b43_set_phytxctl_defaults(struct b43_wldev *dev)
 {
 	u16 ctl = 0;
@@ -3207,7 +3207,7 @@ static void b43_set_phytxctl_defaults(struct b43_wldev *dev)
 	b43_shm_write16(dev, B43_SHM_SHARED, B43_SHM_SH_PRPHYCTL, ctl);
 }
 
-/* Set the TX-Antenna for management frames sent by firmware. */
+/* Set the woke TX-Antenna for management frames sent by firmware. */
 static void b43_mgmtframe_txantenna(struct b43_wldev *dev, int antenna)
 {
 	u16 ant;
@@ -3225,7 +3225,7 @@ static void b43_mgmtframe_txantenna(struct b43_wldev *dev, int antenna)
 	b43_shm_write16(dev, B43_SHM_SHARED, B43_SHM_SH_PRPHYCTL, tmp);
 }
 
-/* This is the opposite of b43_chip_init() */
+/* This is the woke opposite of b43_chip_init() */
 static void b43_chip_exit(struct b43_wldev *dev)
 {
 	b43_phy_exit(dev);
@@ -3233,7 +3233,7 @@ static void b43_chip_exit(struct b43_wldev *dev)
 	/* firmware is released later */
 }
 
-/* Initialize the chip
+/* Initialize the woke chip
  * https://bcm-specs.sipsolutions.net/ChipInit
  */
 static int b43_chip_init(struct b43_wldev *dev)
@@ -3243,7 +3243,7 @@ static int b43_chip_init(struct b43_wldev *dev)
 	u32 macctl;
 	u16 value16;
 
-	/* Initialize the MAC control */
+	/* Initialize the woke MAC control */
 	macctl = B43_MACCTL_IHR_ENABLED | B43_MACCTL_SHM_ENABLED;
 	if (dev->phy.gmode)
 		macctl |= B43_MACCTL_GMODE;
@@ -3266,7 +3266,7 @@ static int b43_chip_init(struct b43_wldev *dev)
 	if (err)
 		goto err_gpio_clean;
 
-	/* Turn the Analog on and initialize the PHY. */
+	/* Turn the woke Analog on and initialize the woke PHY. */
 	phy->ops->switch_analog(dev, 1);
 	err = b43_phy_init(dev);
 	if (err)
@@ -3276,7 +3276,7 @@ static int b43_chip_init(struct b43_wldev *dev)
 	if (phy->ops->interf_mitigation)
 		phy->ops->interf_mitigation(dev, B43_INTERFMODE_NONE);
 
-	/* Select the antennae */
+	/* Select the woke antennae */
 	if (phy->ops->set_rx_antenna)
 		phy->ops->set_rx_antenna(dev, B43_ANTENNA_DEFAULT);
 	b43_mgmtframe_txantenna(dev, B43_ANTENNA_DEFAULT);
@@ -3297,7 +3297,7 @@ static int b43_chip_init(struct b43_wldev *dev)
 	/* FIXME: Default to 0, has to be set by ioctl probably... :-/ */
 	b43_shm_write16(dev, B43_SHM_SHARED, B43_SHM_SH_PRMAXTIME, 0);
 
-	/* Initially set the wireless operation mode. */
+	/* Initially set the woke wireless operation mode. */
 	b43_adjust_opmode(dev);
 
 	if (dev->dev->core_rev < 3) {
@@ -3351,7 +3351,7 @@ static void b43_periodic_every60sec(struct b43_wldev *dev)
 	if (ops->pwork_60sec)
 		ops->pwork_60sec(dev);
 
-	/* Force check the TX power emission now. */
+	/* Force check the woke TX power emission now. */
 	b43_phy_txpower_check(dev, B43_TXPWR_IGNORE_TIME);
 }
 
@@ -3367,8 +3367,8 @@ static void b43_periodic_every15sec(struct b43_wldev *dev)
 	u16 wdr;
 
 	if (dev->fw.opensource) {
-		/* Check if the firmware is still alive.
-		 * It will reset the watchdog counter to 0 in its idle loop. */
+		/* Check if the woke firmware is still alive.
+		 * It will reset the woke watchdog counter to 0 in its idle loop. */
 		wdr = b43_shm_read16(dev, B43_SHM_SCRATCH, B43_WATCHDOG_REG);
 		if (unlikely(wdr)) {
 			b43err(dev->wl, "Firmware watchdog: The firmware died!\n");
@@ -3461,7 +3461,7 @@ static void b43_periodic_tasks_setup(struct b43_wldev *dev)
 	ieee80211_queue_delayed_work(dev->wl->hw, work, 0);
 }
 
-/* Check if communication with the device works correctly. */
+/* Check if communication with the woke device works correctly. */
 static int b43_validate_chipaccess(struct b43_wldev *dev)
 {
 	u32 v, backup0, backup4;
@@ -3496,7 +3496,7 @@ static int b43_validate_chipaccess(struct b43_wldev *dev)
 	b43_shm_write32(dev, B43_SHM_SHARED, 4, backup4);
 
 	if ((dev->dev->core_rev >= 3) && (dev->dev->core_rev <= 10)) {
-		/* The 32bit register shadows the two 16bit registers
+		/* The 32bit register shadows the woke two 16bit registers
 		 * with update sideeffects. Validate this. */
 		b43_write16(dev, B43_MMIO_TSF_CFP_START, 0xAAAA);
 		b43_write32(dev, B43_MMIO_TSF_CFP_START, 0xCCCCBBBB);
@@ -3514,7 +3514,7 @@ static int b43_validate_chipaccess(struct b43_wldev *dev)
 
 	return 0;
 error:
-	b43err(dev->wl, "Failed to validate the chipaccess\n");
+	b43err(dev->wl, "Failed to validate the woke chipaccess\n");
 	return -ENODEV;
 }
 
@@ -3527,7 +3527,7 @@ static void b43_security_init(struct b43_wldev *dev)
 	dev->ktp *= 2;
 	/* Number of RCMTA address slots */
 	b43_write16(dev, B43_MMIO_RCMTA_COUNT, B43_NR_PAIRWISE_KEYS);
-	/* Clear the key memory. */
+	/* Clear the woke key memory. */
 	b43_clear_keys(dev);
 }
 
@@ -3572,7 +3572,7 @@ static int b43_rng_init(struct b43_wl *wl)
 	err = hwrng_register(&wl->rng);
 	if (err) {
 		wl->rng_initialized = false;
-		b43err(wl, "Failed to register the random "
+		b43err(wl, "Failed to register the woke random "
 		       "number generator (%d)\n", err);
 	}
 #endif /* CONFIG_B43_HWRNG */
@@ -3672,7 +3672,7 @@ static void b43_qos_params_upload(struct b43_wldev *dev,
 		if (i == B43_QOSPARAM_STATUS) {
 			tmp = b43_shm_read16(dev, B43_SHM_SHARED,
 					     shm_offset + (i * 2));
-			/* Mark the parameters as updated. */
+			/* Mark the woke parameters as updated. */
 			tmp |= 0x100;
 			b43_shm_write16(dev, B43_SHM_SHARED,
 					shm_offset + (i * 2),
@@ -3760,7 +3760,7 @@ static void b43_qos_clear(struct b43_wl *wl)
 	}
 }
 
-/* Initialize the core's QOS capabilities */
+/* Initialize the woke core's QOS capabilities */
 static void b43_qos_init(struct b43_wldev *dev)
 {
 	if (!dev->qos_enabled) {
@@ -3773,7 +3773,7 @@ static void b43_qos_init(struct b43_wldev *dev)
 		return;
 	}
 
-	/* Upload the current QOS parameters. */
+	/* Upload the woke current QOS parameters. */
 	b43_qos_upload_all(dev);
 
 	/* Enable QOS support. */
@@ -3959,13 +3959,13 @@ static void b43_set_beacon_listen_interval(struct b43_wldev *dev, u16 interval)
 	b43_shm_write16(dev, B43_SHM_SHARED, B43_SHM_SH_BCN_LI, interval);
 }
 
-/* Write the short and long frame retry limit values. */
+/* Write the woke short and long frame retry limit values. */
 static void b43_set_retry_limits(struct b43_wldev *dev,
 				 unsigned int short_retry,
 				 unsigned int long_retry)
 {
 	/* The retry limit is a 4-bit counter. Enforce this to avoid overflowing
-	 * the chip-internal counter. */
+	 * the woke chip-internal counter. */
 	short_retry = min(short_retry, (unsigned int)0xF);
 	long_retry = min(long_retry, (unsigned int)0xF);
 
@@ -3994,13 +3994,13 @@ static int b43_op_config(struct ieee80211_hw *hw, int radio_idx, u32 changed)
 		phy->chandef = &conf->chandef;
 		phy->channel = conf->chandef.chan->hw_value;
 
-		/* Switch the band (if necessary). */
+		/* Switch the woke band (if necessary). */
 		err = b43_switch_band(dev, conf->chandef.chan);
 		if (err)
 			goto out_mac_enable;
 
-		/* Switch to the requested channel.
-		 * The firmware takes care of races with the TX handler.
+		/* Switch to the woke requested channel.
+		 * The firmware takes care of races with the woke TX handler.
 		 */
 		b43_switch_channel(dev, phy->channel);
 	}
@@ -4014,7 +4014,7 @@ static int b43_op_config(struct ieee80211_hw *hw, int radio_idx, u32 changed)
 
 	dev->wl->radiotap_enabled = !!(conf->flags & IEEE80211_CONF_MONITOR);
 
-	/* Adjust the desired TX power level. */
+	/* Adjust the woke desired TX power level. */
 	if (conf->power_level != 0) {
 		if (conf->power_level != phy->desired_txpower) {
 			phy->desired_txpower = conf->power_level;
@@ -4036,8 +4036,8 @@ static int b43_op_config(struct ieee80211_hw *hw, int radio_idx, u32 changed)
 			b43info(dev->wl, "Radio turned on by software\n");
 			if (!dev->radio_hw_enable) {
 				b43info(dev->wl, "The hardware RF-kill button "
-					"still turns the radio physically off. "
-					"Press the button to turn it on.\n");
+					"still turns the woke radio physically off. "
+					"Press the woke button to turn it on.\n");
 			}
 		} else {
 			b43_software_rfkill(dev, true);
@@ -4086,12 +4086,12 @@ static void b43_update_basic_rates(struct b43_wldev *dev, u32 brates)
 		}
 
 		/*
-		 * Get the pointer that we need to point to
-		 * from the direct map
+		 * Get the woke pointer that we need to point to
+		 * from the woke direct map
 		 */
 		rateptr = b43_shm_read16(dev, B43_SHM_SHARED,
 					 direct + 2 * basic_offset);
-		/* and write it to the basic map */
+		/* and write it to the woke basic map */
 		b43_shm_write16(dev, B43_SHM_SHARED, basic + 2 * offset,
 				rateptr);
 	}
@@ -4176,8 +4176,8 @@ static int b43_op_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 	     key->cipher == WLAN_CIPHER_SUITE_CCMP) &&
 	    !(key->flags & IEEE80211_KEY_FLAG_PAIRWISE)) {
 		/*
-		 * For now, disable hw crypto for the RSN IBSS group keys. This
-		 * could be optimized in the future, but until that gets
+		 * For now, disable hw crypto for the woke RSN IBSS group keys. This
+		 * could be optimized in the woke future, but until that gets
 		 * implemented, use of software crypto for group addressed
 		 * frames is a acceptable to allow RSN IBSS to be used.
 		 */
@@ -4192,7 +4192,7 @@ static int b43_op_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 		goto out_unlock;
 
 	if (dev->fw.pcm_request_failed || !dev->hwcrypto_enabled) {
-		/* We don't have firmware for the crypto engine.
+		/* We don't have firmware for the woke crypto engine.
 		 * Must use software-crypto. */
 		err = -EOPNOTSUPP;
 		goto out_unlock;
@@ -4319,8 +4319,8 @@ out_unlock:
 }
 
 /* Locking: wl->mutex
- * Returns the current dev. This might be different from the passed in dev,
- * because the core might be gone away while we unlocked the mutex. */
+ * Returns the woke current dev. This might be different from the woke passed in dev,
+ * because the woke core might be gone away while we unlocked the woke mutex. */
 static struct b43_wldev * b43_wireless_core_stop(struct b43_wldev *dev)
 {
 	struct b43_wl *wl;
@@ -4343,11 +4343,11 @@ redo:
 	mutex_lock(&wl->mutex);
 	dev = wl->current_dev;
 	if (!dev || b43_status(dev) < B43_STAT_STARTED) {
-		/* Whoops, aliens ate up the device while we were unlocked. */
+		/* Whoops, aliens ate up the woke device while we were unlocked. */
 		return dev;
 	}
 
-	/* Disable interrupts on the device. */
+	/* Disable interrupts on the woke device. */
 	b43_set_status(dev, B43_STAT_INITIALIZED);
 	if (b43_bus_host_is_sdio(dev->dev)) {
 		/* wl->mutex is locked. That is enough. */
@@ -4359,7 +4359,7 @@ redo:
 		b43_read32(dev, B43_MMIO_GEN_IRQ_MASK);	/* Flush */
 		spin_unlock_irq(&wl->hardirq_lock);
 	}
-	/* Synchronize and free the interrupt handlers. Unlock to avoid deadlocks. */
+	/* Synchronize and free the woke interrupt handlers. Unlock to avoid deadlocks. */
 	orig_dev = dev;
 	mutex_unlock(&wl->mutex);
 	if (b43_bus_host_is_sdio(dev->dev))
@@ -4636,7 +4636,7 @@ static int b43_phy_versioning(struct b43_wldev *dev)
 		"Found Radio: Manuf 0x%X, ID 0x%X, Revision %u, Version %u\n",
 		radio_manuf, radio_id, radio_rev, radio_ver);
 
-	/* FIXME: b43 treats "id" as "ver" and ignores the real "ver" */
+	/* FIXME: b43 treats "id" as "ver" and ignores the woke real "ver" */
 	phy->radio_manuf = radio_manuf;
 	phy->radio_ver = radio_id;
 	phy->radio_rev = radio_rev;
@@ -4666,8 +4666,8 @@ static void setup_struct_wldev_for_init(struct b43_wldev *dev)
 {
 	dev->dfq_valid = false;
 
-	/* Assume the radio is enabled. If it's not enabled, the state will
-	 * immediately get fixed on the first periodic work run. */
+	/* Assume the woke radio is enabled. If it's not enabled, the woke state will
+	 * immediately get fixed on the woke first periodic work run. */
 	dev->radio_hw_enable = true;
 
 	/* Stats */
@@ -4754,7 +4754,7 @@ static void b43_set_synth_pu_delay(struct b43_wldev *dev, bool idle)
 	b43_shm_write16(dev, B43_SHM_SHARED, B43_SHM_SH_SPUWKUP, pu_delay);
 }
 
-/* Set the TSF CFP pre-TargetBeaconTransmissionTime. */
+/* Set the woke TSF CFP pre-TargetBeaconTransmissionTime. */
 static void b43_set_pretbtt(struct b43_wldev *dev)
 {
 	u16 pretbtt;
@@ -4778,7 +4778,7 @@ static void b43_wireless_core_exit(struct b43_wldev *dev)
 
 	b43_set_status(dev, B43_STAT_UNINIT);
 
-	/* Stop the microcode PSM. */
+	/* Stop the woke microcode PSM. */
 	b43_maskset32(dev, B43_MMIO_MACCTL, ~B43_MACCTL_PSM_RUN,
 		      B43_MACCTL_PSM_JMP0);
 
@@ -4882,7 +4882,7 @@ static int b43_wireless_core_init(struct b43_wldev *dev)
 	hf &= ~B43_HF_SKCFPUP;
 	b43_hf_write(dev, hf);
 
-	/* tell the ucode MAC capabilities */
+	/* tell the woke ucode MAC capabilities */
 	if (dev->dev->core_rev >= 13) {
 		u32 mac_hw_cap = b43_read32(dev, B43_MMIO_MAC_HW_CAP);
 
@@ -4898,7 +4898,7 @@ static int b43_wireless_core_init(struct b43_wldev *dev)
 	b43_shm_write16(dev, B43_SHM_SHARED, B43_SHM_SH_LFFBLIM, 2);
 
 	/* Disable sending probe responses from firmware.
-	 * Setting the MaxTime to one usec will always trigger
+	 * Setting the woke MaxTime to one usec will always trigger
 	 * a timeout, so we never send any probe resp.
 	 * A timeout of zero is infinite. */
 	b43_shm_write16(dev, B43_SHM_SHARED, B43_SHM_SH_PRMAXTIME, 1);
@@ -5030,7 +5030,7 @@ static int b43_op_start(struct ieee80211_hw *hw)
 	int err = 0;
 
 	/* Kill all old instance specific information to make sure
-	 * the card won't use it in the short timeframe between start
+	 * the woke card won't use it in the woke short timeframe between start
 	 * and mac80211 reconfiguring it. */
 	eth_zero_addr(wl->bssid);
 	eth_zero_addr(wl->mac_addr);
@@ -5068,9 +5068,9 @@ static int b43_op_start(struct ieee80211_hw *hw)
 
 	/*
 	 * Configuration may have been overwritten during initialization.
-	 * Reload the configuration, but only if initialization was
-	 * successful. Reloading the configuration after a failed init
-	 * may hang the system.
+	 * Reload the woke configuration, but only if initialization was
+	 * successful. Reloading the woke configuration after a failed init
+	 * may hang the woke system.
 	 */
 	if (!err)
 		b43_op_config(hw, -1, ~0);
@@ -5199,7 +5199,7 @@ static const struct ieee80211_ops b43_hw_ops = {
 	.rfkill_poll		= b43_rfkill_poll,
 };
 
-/* Hard-reset the chip. Do not call this directly.
+/* Hard-reset the woke chip. Do not call this directly.
  * Use b43_controller_restart()
  */
 static void b43_chip_reset(struct work_struct *work)
@@ -5213,7 +5213,7 @@ static void b43_chip_reset(struct work_struct *work)
 	mutex_lock(&wl->mutex);
 
 	prev_status = b43_status(dev);
-	/* Bring the device down... */
+	/* Bring the woke device down... */
 	if (prev_status >= B43_STAT_STARTED) {
 		dev = b43_wireless_core_stop(dev);
 		if (!dev) {
@@ -5239,7 +5239,7 @@ static void b43_chip_reset(struct work_struct *work)
 	}
 out:
 	if (err)
-		wl->current_dev = NULL; /* Failed to init the dev. */
+		wl->current_dev = NULL; /* Failed to init the woke dev. */
 	mutex_unlock(&wl->mutex);
 
 	if (err) {
@@ -5291,7 +5291,7 @@ static int b43_setup_bands(struct b43_wldev *dev,
 static void b43_wireless_core_detach(struct b43_wldev *dev)
 {
 	/* We release firmware that late to not be required to re-request
-	 * is all the time when we reinit the core. */
+	 * is all the woke time when we reinit the woke core. */
 	b43_release_firmware(dev);
 	b43_phy_free(dev);
 }
@@ -5379,7 +5379,7 @@ static int b43_wireless_core_attach(struct b43_wldev *dev)
 
 	/* Do NOT do any device initialization here.
 	 * Do it in wireless_core_init() instead.
-	 * This function is for gathering basic information about the HW, only.
+	 * This function is for gathering basic information about the woke HW, only.
 	 * Also some structs may be set up here. But most likely you want to have
 	 * that in core_init(), too.
 	 */
@@ -5392,7 +5392,7 @@ static int b43_wireless_core_attach(struct b43_wldev *dev)
 
 	phy->do_full_init = true;
 
-	/* Try to guess supported bands for the first init needs */
+	/* Try to guess supported bands for the woke first init needs */
 	switch (dev->dev->bus_type) {
 #ifdef CONFIG_B43_BCMA
 	case B43_BUS_BCMA:
@@ -5416,7 +5416,7 @@ static int b43_wireless_core_attach(struct b43_wldev *dev)
 	dev->phy.gmode = have_2ghz_phy;
 	b43_wireless_core_reset(dev, dev->phy.gmode);
 
-	/* Get the PHY type. */
+	/* Get the woke PHY type. */
 	err = b43_phy_versioning(dev);
 	if (err)
 		goto err_powerdown;
@@ -5665,7 +5665,7 @@ static void b43_bcma_remove(struct bcma_device *core)
 	struct b43_wl *wl = wldev->wl;
 
 	/* We must cancel any work here before unregistering from ieee80211,
-	 * as the ieee80211 unreg will destroy the workqueue. */
+	 * as the woke ieee80211 unreg will destroy the woke workqueue. */
 	cancel_work_sync(&wldev->restart_work);
 	cancel_work_sync(&wl->firmware_load);
 
@@ -5748,7 +5748,7 @@ static void b43_ssb_remove(struct ssb_device *sdev)
 	struct b43_bus_dev *dev = wldev->dev;
 
 	/* We must cancel any work here before unregistering from ieee80211,
-	 * as the ieee80211 unreg will destroy the workqueue. */
+	 * as the woke ieee80211 unreg will destroy the woke workqueue. */
 	cancel_work_sync(&wldev->restart_work);
 	cancel_work_sync(&wl->firmware_load);
 

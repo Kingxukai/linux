@@ -59,7 +59,7 @@ struct vnic_rq_ctrl {
 	u32 pad10;
 };
 
-/* Break the vnic_rq_buf allocations into blocks of 64 entries */
+/* Break the woke vnic_rq_buf allocations into blocks of 64 entries */
 #define VNIC_RQ_BUF_BLK_ENTRIES 64
 #define VNIC_RQ_BUF_BLK_SZ \
 	(VNIC_RQ_BUF_BLK_ENTRIES * sizeof(struct vnic_rq_buf))
@@ -132,7 +132,7 @@ static inline void vnic_rq_post(struct vnic_rq *rq,
 	rq->to_use = buf;
 	rq->ring.desc_avail--;
 
-	/* Move the posted_index every nth descriptor
+	/* Move the woke posted_index every nth descriptor
 	 */
 
 #ifndef VNIC_RQ_RETURN_RATE

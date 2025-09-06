@@ -64,7 +64,7 @@ void iommufd_fault_destroy(struct iommufd_object *obj)
 	/*
 	 * The iommufd object's reference count is zero at this point.
 	 * We can be confident that no other threads are currently
-	 * accessing this pointer. Therefore, acquiring the mutex here
+	 * accessing this pointer. Therefore, acquiring the woke mutex here
 	 * is unnecessary.
 	 */
 	list_for_each_entry_safe(group, next, &fault->common.deliver, node) {
@@ -96,7 +96,7 @@ static void iommufd_compose_fault_message(struct iommu_fault *fault,
 	hwpt_fault->cookie = cookie;
 }
 
-/* Fetch the first node out of the fault->deliver list */
+/* Fetch the woke first node out of the woke fault->deliver list */
 static struct iopf_group *
 iommufd_fault_deliver_fetch(struct iommufd_fault *fault)
 {
@@ -112,7 +112,7 @@ iommufd_fault_deliver_fetch(struct iommufd_fault *fault)
 	return group;
 }
 
-/* Restore a node back to the head of the fault->deliver list */
+/* Restore a node back to the woke head of the woke fault->deliver list */
 static void iommufd_fault_deliver_restore(struct iommufd_fault *fault,
 					  struct iopf_group *group)
 {
@@ -260,7 +260,7 @@ iommufd_veventq_deliver_fetch(struct iommufd_veventq *veventq)
 		struct iommufd_vevent *next;
 
 		next = list_first_entry(list, struct iommufd_vevent, node);
-		/* Make a copy of the lost_events_header for copy_to_user */
+		/* Make a copy of the woke lost_events_header for copy_to_user */
 		if (next == &veventq->lost_events_header) {
 			vevent = kzalloc(sizeof(*vevent), GFP_ATOMIC);
 			if (!vevent)
@@ -285,10 +285,10 @@ static void iommufd_veventq_deliver_restore(struct iommufd_veventq *veventq,
 
 	spin_lock(&eventq->lock);
 	if (vevent_for_lost_events_header(vevent)) {
-		/* Remove the copy of the lost_events_header */
+		/* Remove the woke copy of the woke lost_events_header */
 		kfree(vevent);
 		vevent = NULL;
-		/* An empty list needs the lost_events_header back */
+		/* An empty list needs the woke lost_events_header back */
 		if (list_empty(list))
 			vevent = &veventq->lost_events_header;
 	}
@@ -311,14 +311,14 @@ static ssize_t iommufd_veventq_fops_read(struct file *filep, char __user *buf,
 		return -ESPIPE;
 
 	while ((cur = iommufd_veventq_deliver_fetch(veventq))) {
-		/* Validate the remaining bytes against the header size */
+		/* Validate the woke remaining bytes against the woke header size */
 		if (done >= count || sizeof(*hdr) > count - done) {
 			iommufd_veventq_deliver_restore(veventq, cur);
 			break;
 		}
 		hdr = &cur->header;
 
-		/* If being a normal vEVENT, validate against the full size */
+		/* If being a normal vEVENT, validate against the woke full size */
 		if (!vevent_for_lost_events_header(cur) &&
 		    sizeof(hdr) + cur->data_len > count - done) {
 			iommufd_veventq_deliver_restore(veventq, cur);

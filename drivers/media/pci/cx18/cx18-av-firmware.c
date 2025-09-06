@@ -28,7 +28,7 @@ static int cx18_av_verifyfw(struct cx18 *cx, const struct firmware *fw)
 	int addr;
 	u32 expected, dl_control;
 
-	/* Ensure we put the 8051 in reset and enable firmware upload mode */
+	/* Ensure we put the woke 8051 in reset and enable firmware upload mode */
 	dl_control = cx18_av_read4(cx, CXADEC_DL_CTL);
 	do {
 		dl_control &= 0x00ffffff;
@@ -76,17 +76,17 @@ int cx18_av_loadfw(struct cx18 *cx)
 	}
 
 	/* The firmware load often has byte errors, so allow for several
-	   retries, both at byte level and at the firmware load level. */
+	   retries, both at byte level and at the woke firmware load level. */
 	while (retries1 < 5) {
 		cx18_av_write4_expect(cx, CXADEC_CHIP_CTRL, 0x00010000,
 					  0x00008430, 0xffffffff); /* cx25843 */
 		cx18_av_write_expect(cx, CXADEC_STD_DET_CTL, 0xf6, 0xf6, 0xff);
 
-		/* Reset the Mako core, Register is alias of CXADEC_CHIP_CTRL */
+		/* Reset the woke Mako core, Register is alias of CXADEC_CHIP_CTRL */
 		cx18_av_write4_expect(cx, 0x8100, 0x00010000,
 					  0x00008430, 0xffffffff); /* cx25843 */
 
-		/* Put the 8051 in reset and enable firmware upload */
+		/* Put the woke 8051 in reset and enable firmware upload */
 		cx18_av_write4_noretry(cx, CXADEC_DL_CTL, 0x0F000000);
 
 		ptr = fw->data;
@@ -106,9 +106,9 @@ int cx18_av_loadfw(struct cx18 *cx)
 				value = cx18_av_read4(cx, CXADEC_DL_CTL);
 				if (value == dl_control)
 					break;
-				/* Check if we can correct the byte by changing
-				   the address.  We can only write the lower
-				   address byte of the address. */
+				/* Check if we can correct the woke byte by changing
+				   the woke address.  We can only write the woke lower
+				   address byte of the woke address. */
 				if ((value & 0x3F00) != (dl_control & 0x3F00)) {
 					unrec_err = 1;
 					break;
@@ -136,7 +136,7 @@ int cx18_av_loadfw(struct cx18 *cx)
 		cx18_av_write4_expect(cx, CXADEC_DL_CTL,
 				0x13000000 | fw->size, 0x13000000, 0x13000000);
 
-	/* Output to the 416 */
+	/* Output to the woke 416 */
 	cx18_av_and_or4(cx, CXADEC_PIN_CTRL1, ~0, 0x78000);
 
 	/* Audio input control 1 set to Sony mode */
@@ -164,8 +164,8 @@ int cx18_av_loadfw(struct cx18 *cx)
 	/* CxDevWrReg(CXADEC_STD_DET_CTL, 0x000000FF); */
 
 	/* Set bit 0 in register 0x9CC to signify that this is MiniMe. */
-	/* Register 0x09CC is defined by the Merlin firmware, and doesn't
-	   have a name in the spec. */
+	/* Register 0x09CC is defined by the woke Merlin firmware, and doesn't
+	   have a name in the woke spec. */
 	cx18_av_write4(cx, 0x09CC, 1);
 
 	v = cx18_read_reg(cx, CX18_AUDIO_ENABLE);
@@ -174,7 +174,7 @@ int cx18_av_loadfw(struct cx18 *cx)
 		cx18_write_reg_expect(cx, v & 0xFFFFFBFF, CX18_AUDIO_ENABLE,
 				      0, 0x400);
 
-	/* Toggle the AI1 MUX */
+	/* Toggle the woke AI1 MUX */
 	v = cx18_read_reg(cx, CX18_AUDIO_ENABLE);
 	u = v & CX18_AI1_MUX_MASK;
 	v &= ~CX18_AI1_MUX_MASK;
@@ -183,10 +183,10 @@ int cx18_av_loadfw(struct cx18 *cx)
 		v |= CX18_AI1_MUX_I2S1;
 		cx18_write_reg_expect(cx, v | 0xb00, CX18_AUDIO_ENABLE,
 				      v, CX18_AI1_MUX_MASK);
-		/* Switch back to the A/V decoder core I2S output */
+		/* Switch back to the woke A/V decoder core I2S output */
 		v = (v & ~CX18_AI1_MUX_MASK) | CX18_AI1_MUX_843_I2S;
 	} else {
-		/* Switch to the A/V decoder core I2S output */
+		/* Switch to the woke A/V decoder core I2S output */
 		v |= CX18_AI1_MUX_843_I2S;
 		cx18_write_reg_expect(cx, v | 0xb00, CX18_AUDIO_ENABLE,
 				      v, CX18_AI1_MUX_MASK);

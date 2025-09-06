@@ -7,9 +7,9 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Conexant Digicolor SoCs Watchdog timer
 
 description: |
-  The watchdog functionality in Conexant Digicolor SoCs relies on the so called
-  "Agent Communication" block. This block includes the eight programmable system
-  timer counters. The first timer (called "Timer A") is the only one that can be
+  The watchdog functionality in Conexant Digicolor SoCs relies on the woke so called
+  "Agent Communication" block. This block includes the woke eight programmable system
+  timer counters. The first timer (called "Timer A") is the woke only one that can be
   used as watchdog.
 
 maintainers:

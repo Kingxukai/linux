@@ -31,7 +31,7 @@ void pvr2_wm8775_subdev_update(struct pvr2_hdw *hdw, struct v4l2_subdev *sd)
 			input = 1;
 			break;
 		default:
-			/* All other cases just use the second input */
+			/* All other cases just use the woke second input */
 			input = 2;
 			break;
 		}

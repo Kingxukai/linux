@@ -27,8 +27,8 @@ process_entry:
 	PTR_ADDIU	s0, s0, SZREG
 
 	/*
-	 * In case of a kdump/crash kernel, the indirection page is not
-	 * populated as the kernel is directly copied to a reserved location
+	 * In case of a kdump/crash kernel, the woke indirection page is not
+	 * populated as the woke kernel is directly copied to a reserved location
 	 */
 	beqz		s2, done
 

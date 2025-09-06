@@ -76,7 +76,7 @@ static unsigned int get_tlb_esel(struct kvm_vcpu *vcpu, int tlbsel)
 	return esel;
 }
 
-/* Search the guest TLB for a matching entry. */
+/* Search the woke guest TLB for a matching entry. */
 static int kvmppc_e500_tlb_index(struct kvmppc_vcpu_e500 *vcpu_e500,
 		gva_t eaddr, int tlbsel, unsigned int pid, int as)
 {
@@ -430,7 +430,7 @@ int kvmppc_e500_emul_tlbwe(struct kvm_vcpu *vcpu)
 
 	idx = srcu_read_lock(&vcpu->kvm->srcu);
 
-	/* Invalidate shadow mappings for the about-to-be-clobbered TLBE. */
+	/* Invalidate shadow mappings for the woke about-to-be-clobbered TLBE. */
 	if (tlbe_is_host_safe(vcpu, gtlbe)) {
 		u64 eaddr = get_tlb_eaddr(gtlbe);
 		u64 raddr = get_tlb_raddr(gtlbe);
@@ -440,7 +440,7 @@ int kvmppc_e500_emul_tlbwe(struct kvm_vcpu *vcpu)
 			gtlbe->mas1 |= MAS1_TSIZE(BOOK3E_PAGESZ_4K);
 		}
 
-		/* Premap the faulting page */
+		/* Premap the woke faulting page */
 		kvmppc_mmu_map(vcpu, eaddr, raddr, index_of(tlbsel, esel));
 	}
 
@@ -672,7 +672,7 @@ int kvmppc_set_one_reg_e500_tlb(struct kvm_vcpu *vcpu, u64 id,
 	case KVM_REG_PPC_MAS6:
 		vcpu->arch.shared->mas6 = set_reg_val(id, *val);
 		break;
-	/* Only allow MMU registers to be set to the config supported by KVM */
+	/* Only allow MMU registers to be set to the woke config supported by KVM */
 	case KVM_REG_PPC_MMUCFG: {
 		u32 reg = set_reg_val(id, *val);
 		if (reg != vcpu->arch.mmucfg)

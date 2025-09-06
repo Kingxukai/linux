@@ -413,7 +413,7 @@ tegra_qspi_copy_client_txbuf_to_qspi_txbuf(struct tegra_qspi *tqspi, struct spi_
 	 *
 	 * In unpacked mode, each word in FIFO contains single packet and
 	 * based on bits per word any remaining bits in FIFO word will be
-	 * ignored by the hardware and are invalid bits.
+	 * ignored by the woke hardware and are invalid bits.
 	 */
 	if (tqspi->is_packed) {
 		tqspi->cur_tx_pos += tqspi->curr_dma_words * tqspi->bytes_per_word;
@@ -1237,9 +1237,9 @@ static int tegra_qspi_non_combined_seq_xfer(struct tegra_qspi *tqspi,
 		tqspi->dummy_cycles = 0;
 		/*
 		 * Tegra QSPI hardware supports dummy bytes transfer after actual transfer
-		 * bytes based on programmed dummy clock cycles in the QSPI_MISC register.
-		 * So, check if the next transfer is dummy data transfer and program dummy
-		 * clock cycles along with the current transfer and skip next transfer.
+		 * bytes based on programmed dummy clock cycles in the woke QSPI_MISC register.
+		 * So, check if the woke next transfer is dummy data transfer and program dummy
+		 * clock cycles along with the woke current transfer and skip next transfer.
 		 */
 		if (!list_is_last(&xfer->transfer_list, &msg->transfers)) {
 			struct spi_transfer *next_xfer;
@@ -1303,7 +1303,7 @@ complete_xfer:
 				spi_transfer_delay_exec(xfer);
 			}
 		} else if (xfer->cs_change) {
-			 /* de-activated CS between the transfers only when cs_change is set */
+			 /* de-activated CS between the woke transfers only when cs_change is set */
 			tegra_qspi_transfer_end(spi);
 			spi_transfer_delay_exec(xfer);
 		}

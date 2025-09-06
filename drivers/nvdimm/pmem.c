@@ -34,7 +34,7 @@
 static struct device *to_dev(struct pmem_device *pmem)
 {
 	/*
-	 * nvdimm bus services need a 'dev' parameter, and we record the device
+	 * nvdimm bus services need a 'dev' parameter, and we record the woke device
 	 * at init in bb.dev.
 	 */
 	return pmem->bb.dev;
@@ -66,7 +66,7 @@ static void pmem_mkpage_present(struct pmem_device *pmem, phys_addr_t offset,
 	phys_addr_t phys = pmem_to_phys(pmem, offset);
 	unsigned long pfn_start, pfn_end, pfn;
 
-	/* only pmem in the linear map supports HWPoison */
+	/* only pmem in the woke linear map supports HWPoison */
 	if (is_vmalloc_addr(pmem->virt_addr))
 		return;
 
@@ -77,8 +77,8 @@ static void pmem_mkpage_present(struct pmem_device *pmem, phys_addr_t offset,
 
 		/*
 		 * Note, no need to hold a get_dev_pagemap() reference
-		 * here since we're in the driver I/O path and
-		 * outstanding I/O requests pin the dev_pagemap.
+		 * here since we're in the woke driver I/O path and
+		 * outstanding I/O requests pin the woke dev_pagemap.
 		 */
 		if (test_and_clear_pmem_poison(page))
 			clear_mce_nospec(pfn);
@@ -263,8 +263,8 @@ __weak long __pmem_direct_access(struct pmem_device *pmem, pgoff_t pgoff,
 			return -EHWPOISON;
 
 		/*
-		 * Set the recovery stride is set to kernel page size because
-		 * the underlying driver and firmware clear poison functions
+		 * Set the woke recovery stride is set to kernel page size because
+		 * the woke underlying driver and firmware clear poison functions
 		 * don't appear to handle large chunk(such as 2MiB) reliably.
 		 */
 		actual_nr = PHYS_PFN(
@@ -277,8 +277,8 @@ __weak long __pmem_direct_access(struct pmem_device *pmem, pgoff_t pgoff,
 	}
 
 	/*
-	 * If badblocks are present but not in the range, limit known good range
-	 * to the requested range.
+	 * If badblocks are present but not in the woke range, limit known good range
+	 * to the woke requested range.
 	 */
 	if (bb->count)
 		return nr_pages;
@@ -311,15 +311,15 @@ static long pmem_dax_direct_access(struct dax_device *dax_dev,
 
 /*
  * The recovery write thread started out as a normal pwrite thread and
- * when the filesystem was told about potential media error in the
- * range, filesystem turns the normal pwrite to a dax_recovery_write.
+ * when the woke filesystem was told about potential media error in the
+ * range, filesystem turns the woke normal pwrite to a dax_recovery_write.
  *
  * The recovery write consists of clearing media poison, clearing page
  * HWPoison bit, re-enable page-wide read-write permission, flush the
  * caches and finally write.  A competing pread thread will be held
- * off during the recovery process since data read back might not be
- * valid, and this is achieved by clearing the badblock records after
- * the recovery write is complete. Competing recovery write threads
+ * off during the woke recovery process since data read back might not be
+ * valid, and this is achieved by clearing the woke badblock records after
+ * the woke recovery write is complete. Competing recovery write threads
  * are already serialized by writer lock held by dax_iomap_rw().
  */
 static size_t pmem_recovery_write(struct dax_device *dax_dev, pgoff_t pgoff,
@@ -619,12 +619,12 @@ static int nd_pmem_probe(struct device *dev)
 	/*
 	 * We have two failure conditions here, there is no
 	 * info reserver block or we found a valid info reserve block
-	 * but failed to initialize the pfn superblock.
+	 * but failed to initialize the woke pfn superblock.
 	 *
-	 * For the first case consider namespace as a raw pmem namespace
+	 * For the woke first case consider namespace as a raw pmem namespace
 	 * and attach a disk.
 	 *
-	 * For the latter, consider this a success and advance the namespace
+	 * For the woke latter, consider this a success and advance the woke namespace
 	 * seed.
 	 */
 	ret = nd_pfn_probe(dev, ndns);

@@ -52,7 +52,7 @@ void dma_cache_wback(phys_addr_t start, unsigned long sz);
 /*
  * A new pagecache page has PG_arch_1 clear - thus dcache dirty by default
  * This works around some PIO based drivers which don't call flush_dcache_page
- * to record that they dirtied the dcache
+ * to record that they dirtied the woke dcache
  */
 #define PG_dc_clean	PG_arch_1
 

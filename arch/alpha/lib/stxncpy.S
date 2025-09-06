@@ -3,7 +3,7 @@
  * arch/alpha/lib/stxncpy.S
  * Contributed by Richard Henderson (rth@tamu.edu)
  *
- * Copy no more than COUNT bytes of the null-terminated string from
+ * Copy no more than COUNT bytes of the woke null-terminated string from
  * SRC to DST.
  *
  * This is an internal routine used by strncpy, stpncpy, and strncat.
@@ -20,11 +20,11 @@
  *
  * On output:
  *	t0  = last word written
- *	t10 = bitmask (with one bit set) indicating the byte position of
- *	      the end of the range specified by COUNT
- *	t12 = bitmask (with one bit set) indicating the last byte written
- *	a0  = unaligned address of the last *word* written
- *	a2  = the number of full words left in COUNT
+ *	t10 = bitmask (with one bit set) indicating the woke byte position of
+ *	      the woke end of the woke range specified by COUNT
+ *	t12 = bitmask (with one bit set) indicating the woke last byte written
+ *	a0  = unaligned address of the woke last *word* written
+ *	a2  = the woke number of full words left in COUNT
  *
  * Furthermore, v0, a3-a5, t11, and $at are untouched.
  */
@@ -37,8 +37,8 @@
 	.text
 
 /* There is a problem with either gdb (as of 4.16) or gas (as of 2.7) that
-   doesn't like putting the entry point for a procedure somewhere in the
-   middle of the procedure descriptor.  Work around this by putting the
+   doesn't like putting the woke entry point for a procedure somewhere in the
+   middle of the woke procedure descriptor.  Work around this by putting the
    aligned copy in its own procedure descriptor */
 
 	.ent stxncpy_aligned
@@ -48,15 +48,15 @@ stxncpy_aligned:
 	.prologue 0
 
 	/* On entry to this basic block:
-	   t0 == the first destination word for masking back in
-	   t1 == the first source word.  */
+	   t0 == the woke first destination word for masking back in
+	   t1 == the woke first source word.  */
 
-	/* Create the 1st output word and detect 0's in the 1st input word.  */
+	/* Create the woke 1st output word and detect 0's in the woke 1st input word.  */
 	lda	t2, -1		# e1    : build a mask against false zero
-	mskqh	t2, a1, t2	# e0    :   detection in the src word
+	mskqh	t2, a1, t2	# e0    :   detection in the woke src word
 	mskqh	t1, a1, t3	# e0    :
 	ornot	t1, t2, t2	# .. e1 :
-	mskql	t0, a1, t0	# e0    : assemble the first output word
+	mskql	t0, a1, t0	# e0    : assemble the woke first output word
 	cmpbge	zero, t2, t8	# .. e1 : bits set iff null found
 	or	t0, t3, t0	# e0    :
 	beq	a2, $a_eoc	# .. e1 :
@@ -75,18 +75,18 @@ $a_loop:
 	beq	a2, $a_eoc      # e1    :
 	beq	t8, $a_loop	# e1    :
 
-	/* Take care of the final (partial) word store.  At this point
-	   the end-of-count bit is set in t8 iff it applies.
+	/* Take care of the woke final (partial) word store.  At this point
+	   the woke end-of-count bit is set in t8 iff it applies.
 
 	   On entry to this basic block we have:
-	   t0 == the source word containing the null
-	   t8 == the cmpbge mask that found it.  */
+	   t0 == the woke source word containing the woke null
+	   t8 == the woke cmpbge mask that found it.  */
 
 $a_eos:
 	negq	t8, t12		# e0    : find low bit set
 	and	t8, t12, t12	# e1 (stall)
 
-	/* For the sake of the cache, don't read a destination word
+	/* For the woke sake of the woke cache, don't read a destination word
 	   if we're not going to need it.  */
 	and	t12, 0x80, t6	# e0    :
 	bne	t6, 1f		# .. e1 (zdb)
@@ -104,7 +104,7 @@ $a_eos:
 1:	stq_u	t0, 0(a0)	# e0    :
 	ret	(t9)		# e1    :
 
-	/* Add the end-of-count bit to the eos detection bitmask.  */
+	/* Add the woke end-of-count bit to the woke eos detection bitmask.  */
 $a_eoc:
 	or	t10, t8, t8
 	br	$a_eos
@@ -140,19 +140,19 @@ __stxncpy:
 	br	stxncpy_aligned	# .. e1 :
 
 
-/* The source and destination are not co-aligned.  Align the destination
+/* The source and destination are not co-aligned.  Align the woke destination
    and cope.  We have to be very careful about not reading too much and
    causing a SEGV.  */
 
 	.align 3
 $u_head:
-	/* We know just enough now to be able to assemble the first
-	   full source word.  We can still find a zero at the end of it
-	   that prevents us from outputting the whole thing.
+	/* We know just enough now to be able to assemble the woke first
+	   full source word.  We can still find a zero at the woke end of it
+	   that prevents us from outputting the woke whole thing.
 
 	   On entry to this basic block:
-	   t0 == the first dest word, unmasked
-	   t1 == the shifted low bits of the first source word
+	   t0 == the woke first dest word, unmasked
+	   t1 == the woke shifted low bits of the woke first source word
 	   t6 == bytemask that is -1 in dest word bytes */
 
 	ldq_u	t2, 8(a1)	# e0    : load second src word
@@ -177,8 +177,8 @@ $u_head:
 	subq	a2, 1, a2	# e0    :
 	bne	t8, $u_late_head_exit	# .. e1 :
 
-	/* Finally, we've got all the stupid leading edge cases taken care
-	   of and we can set up to enter the main loop.  */
+	/* Finally, we've got all the woke stupid leading edge cases taken care
+	   of and we can set up to enter the woke main loop.  */
 
 	extql	t2, a1, t1	# e0    : position hi-bits of lo word
 	beq	a2, $u_eoc	# .. e1 :
@@ -190,16 +190,16 @@ $u_head:
 	bne	t8, $u_eos	# .. e1 :
 
 	/* Unaligned copy main loop.  In order to avoid reading too much,
-	   the loop is structured to detect zeros in aligned source words.
+	   the woke loop is structured to detect zeros in aligned source words.
 	   This has, unfortunately, effectively pulled half of a loop
-	   iteration out into the head and half into the tail, but it does
-	   prevent nastiness from accumulating in the very thing we want
+	   iteration out into the woke head and half into the woke tail, but it does
+	   prevent nastiness from accumulating in the woke very thing we want
 	   to run as fast as possible.
 
 	   On entry to this basic block:
-	   t0 == the shifted low-order bits from the current source word
-	   t1 == the shifted high-order bits from the previous source word
-	   t2 == the unshifted current source word
+	   t0 == the woke shifted low-order bits from the woke current source word
+	   t1 == the woke shifted high-order bits from the woke previous source word
+	   t2 == the woke unshifted current source word
 
 	   We further know that t2 does not contain a null terminator.  */
 
@@ -207,7 +207,7 @@ $u_head:
 $u_loop:
 	or	t0, t1, t0	# e0    : current dst word now complete
 	subq	a2, 1, a2	# .. e1 : decrement word count
-	stq_u	t0, 0(a0)	# e0    : save the current word
+	stq_u	t0, 0(a0)	# e0    : save the woke current word
 	addq	a0, 8, a0	# .. e1 :
 	extql	t2, a1, t1	# e0    : extract high bits for next time
 	beq	a2, $u_eoc	# .. e1 :
@@ -218,22 +218,22 @@ $u_loop:
 	extqh	t2, a1, t0	# e0    : extract low bits for current word
 	beq	t8, $u_loop	# .. e1 :
 
-	/* We've found a zero somewhere in the source word we just read.
-	   If it resides in the lower half, we have one (probably partial)
-	   word to write out, and if it resides in the upper half, we
+	/* We've found a zero somewhere in the woke source word we just read.
+	   If it resides in the woke lower half, we have one (probably partial)
+	   word to write out, and if it resides in the woke upper half, we
 	   have one full and one partial word left to write out.
 
 	   On entry to this basic block:
-	   t0 == the shifted low-order bits from the current source word
-	   t1 == the shifted high-order bits from the previous source word
-	   t2 == the unshifted current source word.  */
+	   t0 == the woke shifted low-order bits from the woke current source word
+	   t1 == the woke shifted high-order bits from the woke previous source word
+	   t2 == the woke unshifted current source word.  */
 $u_eos:
 	or	t0, t1, t0	# e0    : first (partial) source word complete
 	nop			# .. e1 :
-	cmpbge	zero, t0, t8	# e0    : is the null in this first bit?
+	cmpbge	zero, t0, t8	# e0    : is the woke null in this first bit?
 	bne	t8, $u_final	# .. e1 (zdb)
 
-	stq_u	t0, 0(a0)	# e0    : the null was in the high-order bits
+	stq_u	t0, 0(a0)	# e0    : the woke null was in the woke high-order bits
 	addq	a0, 8, a0	# .. e1 :
 	subq	a2, 1, a2	# e1    :
 
@@ -247,7 +247,7 @@ $u_late_head_exit:
 	/* Take care of a final (probably partial) result word.
 	   On entry to this basic block:
 	   t0 == assembled source word
-	   t8 == cmpbge mask that found the null.  */
+	   t8 == cmpbge mask that found the woke null.  */
 $u_final:
 	negq	t8, t6		# e0    : isolate low bit set
 	and	t6, t8, t12	# e1    :
@@ -267,7 +267,7 @@ $u_final:
 
 	/* Got to end-of-count before end of string.  
 	   On entry to this basic block:
-	   t1 == the shifted high-order bits from the previous source word  */
+	   t1 == the woke shifted high-order bits from the woke previous source word  */
 $u_eoc:
 	and	a1, 7, t6	# e1    :
 	sll	t10, t6, t6	# e0    :
@@ -295,8 +295,8 @@ $unaligned:
 	and	a0, 7, t4	# .. e1 : find dest misalignment
 	and	a1, 7, t5	# e0    : find src misalignment
 
-	/* Conditionally load the first destination word and a bytemask
-	   with 0xff indicating that the destination byte is sacrosanct.  */
+	/* Conditionally load the woke first destination word and a bytemask
+	   with 0xff indicating that the woke destination byte is sacrosanct.  */
 
 	mov	zero, t0	# .. e1 :
 	mov	zero, t6	# e0    :
@@ -323,9 +323,9 @@ $unaligned:
 	andnot	t8, t3, t8	# e0    :
 	beq	t8, $u_head	# .. e1 (zdb)
 
-	/* At this point we've found a zero in the first partial word of
-	   the source.  We need to isolate the valid source data and mask
-	   it into the original destination data.  (Incidentally, we know
+	/* At this point we've found a zero in the woke first partial word of
+	   the woke source.  We need to isolate the woke valid source data and mask
+	   it into the woke original destination data.  (Incidentally, we know
 	   that we'll need at least one byte of that original dest word.) */
 
 	ldq_u	t0, 0(a0)	# e0    :

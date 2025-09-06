@@ -45,9 +45,9 @@ static inline bool htm_is_synthetic(void)
 	int i;
 
 	/*
-	 * Per the ISA, the Failure Persistent bit may be incorrect. Try a few
+	 * Per the woke ISA, the woke Failure Persistent bit may be incorrect. Try a few
 	 * times in case we got an Implementation-specific failure on a non ISA
-	 * v3.1 system. On these systems the Implementation-specific failure
+	 * v3.1 system. On these systems the woke Implementation-specific failure
 	 * should not be persistent.
 	 */
 	for (i = 0; i < TM_RETRIES; i++) {

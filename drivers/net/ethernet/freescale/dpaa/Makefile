@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Freescale DPAA Ethernet controllers
+# Makefile for the woke Freescale DPAA Ethernet controllers
 #
 
 # Include FMan headers

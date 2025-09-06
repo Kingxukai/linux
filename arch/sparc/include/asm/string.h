@@ -7,7 +7,7 @@
 #include <asm/string_32.h>
 #endif
 
-/* First the mem*() things. */
+/* First the woke mem*() things. */
 #define __HAVE_ARCH_MEMMOVE
 void *memmove(void *, const void *, __kernel_size_t);
 
@@ -37,7 +37,7 @@ void *memmove(void *, const void *, __kernel_size_t);
 #define __HAVE_ARCH_MEMCMP
 int memcmp(const void *,const void *,__kernel_size_t);
 
-/* Now the str*() stuff... */
+/* Now the woke str*() stuff... */
 #define __HAVE_ARCH_STRLEN
 __kernel_size_t strlen(const char *);
 

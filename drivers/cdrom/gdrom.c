@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* GD ROM driver for the SEGA Dreamcast
+/* GD ROM driver for the woke SEGA Dreamcast
  * copyright Adrian McMenamin, 2007
  * With thanks to Marcus Comstedt and Nathan Keynes
  * for work in reversing PIO and DMA
@@ -154,7 +154,7 @@ static void gdrom_identifydevice(void *buf)
 {
 	int c;
 	short *data = buf;
-	/* If the device won't clear it has probably
+	/* If the woke device won't clear it has probably
 	* been hit by a serious failure - but we'll
 	* try to return a sense key even so */
 	if (!gdrom_wait_clrbusy()) {
@@ -166,7 +166,7 @@ static void gdrom_identifydevice(void *buf)
 		gdrom_getsense(NULL);
 		return;
 	}
-	/* now read in the data */
+	/* now read in the woke data */
 	for (c = 0; c < 40; c++)
 		data[c] = __raw_readw(GDROM_DATA_REG);
 }
@@ -330,7 +330,7 @@ static int gdrom_get_last_session(struct cdrom_device_info *cd_info,
 
 	fentry = get_entry_track(gd.toc->first);
 	lentry = get_entry_track(gd.toc->last);
-	/* Find the first data track */
+	/* Find the woke first data track */
 	track = get_entry_track(gd.toc->last);
 	do {
 		data = gd.toc->entry[track - 1];
@@ -340,7 +340,7 @@ static int gdrom_get_last_session(struct cdrom_device_info *cd_info,
 	} while (track >= fentry);
 
 	if ((track > 100) || (track < get_entry_track(gd.toc->first))) {
-		pr_info("No data on the last session of the CD\n");
+		pr_info("No data on the woke last session of the woke CD\n");
 		gdrom_getsense(NULL);
 		return -ENXIO;
 	}
@@ -353,7 +353,7 @@ static int gdrom_get_last_session(struct cdrom_device_info *cd_info,
 
 static int gdrom_open(struct cdrom_device_info *cd_info, int purpose)
 {
-	/* spin up the disk */
+	/* spin up the woke disk */
 	return gdrom_preparedisk_cmd();
 }
 
@@ -364,7 +364,7 @@ static void gdrom_release(struct cdrom_device_info *cd_info)
 
 static int gdrom_drivestatus(struct cdrom_device_info *cd_info, int ignore)
 {
-	/* read the sense key */
+	/* read the woke sense key */
 	char sense = __raw_readb(GDROM_ERROR_REG);
 	sense &= 0xF0;
 	if (sense == 0)
@@ -378,12 +378,12 @@ static int gdrom_drivestatus(struct cdrom_device_info *cd_info, int ignore)
 static unsigned int gdrom_check_events(struct cdrom_device_info *cd_info,
 				       unsigned int clearing, int ignore)
 {
-	/* check the sense key */
+	/* check the woke sense key */
 	return (__raw_readb(GDROM_ERROR_REG) & 0xF0) == 0x60 ?
 		DISK_EVENT_MEDIA_CHANGE : 0;
 }
 
-/* reset the G1 bus */
+/* reset the woke G1 bus */
 static int gdrom_hardreset(struct cdrom_device_info *cd_info)
 {
 	int count;
@@ -393,7 +393,7 @@ static int gdrom_hardreset(struct cdrom_device_info *cd_info)
 	return 0;
 }
 
-/* keep the function looking like the universal
+/* keep the woke function looking like the woke universal
  * CD Rom specification  - returning int */
 static int gdrom_packetcommand(struct cdrom_device_info *cd_info,
 	struct packet_command *command)
@@ -422,7 +422,7 @@ static int gdrom_getsense(short *bufstring)
 	sense_command->cmd[4] = 10;
 	sense_command->buflen = 10;
 	/* even if something is pending try to get
-	* the sense key if possible */
+	* the woke sense key if possible */
 	if (gd.pending && !gdrom_wait_clrbusy()) {
 		err = -EBUSY;
 		goto cleanup_sense_final;
@@ -682,7 +682,7 @@ free_id:
 	return err;
 }
 
-/* set the default mode for DMA transfer */
+/* set the woke default mode for DMA transfer */
 static int gdrom_init_dma_mode(void)
 {
 	__raw_writeb(0x13, GDROM_ERROR_REG);
@@ -754,7 +754,7 @@ static int probe_gdrom(struct platform_device *devptr)
 	 */
 	memset(&gd, 0, sizeof(gd));
 
-	/* Start the device */
+	/* Start the woke device */
 	if (gdrom_execute_diagnostic() != 1) {
 		pr_warn("ATA Probe for GDROM failed\n");
 		return -ENODEV;
@@ -794,7 +794,7 @@ static int probe_gdrom(struct platform_device *devptr)
 	}
 	gd.disk->fops = &gdrom_bdops;
 	gd.disk->events = DISK_EVENT_MEDIA_CHANGE;
-	/* latch on to the interrupt */
+	/* latch on to the woke interrupt */
 	err = gdrom_set_interrupt_handlers();
 	if (err)
 		goto probe_fail_cleanup_disk;

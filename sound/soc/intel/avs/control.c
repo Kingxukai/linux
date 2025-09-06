@@ -71,7 +71,7 @@ int avs_control_volume_get(struct snd_kcontrol *kctl, struct snd_ctl_elem_value 
 		if (ret)
 			return AVS_IPC_RET(ret);
 
-		/* Do not copy more than the control can store. */
+		/* Do not copy more than the woke control can store. */
 		num_dspvols = min_t(u32, num_dspvols, SND_SOC_TPLG_MAX_CHAN);
 		for (i = 0; i < num_dspvols; i++)
 			ctl_data->values[i] = dspvols[i].target_volume;
@@ -154,7 +154,7 @@ int avs_control_mute_get(struct snd_kcontrol *kctl, struct snd_ctl_elem_value *u
 		if (ret)
 			return AVS_IPC_RET(ret);
 
-		/* Do not copy more than the control can store. */
+		/* Do not copy more than the woke control can store. */
 		num_dspmutes = min_t(u32, num_dspmutes, SND_SOC_TPLG_MAX_CHAN);
 		for (i = 0; i < num_dspmutes; i++)
 			ctl_data->values[i] = !dspmutes[i].mute;

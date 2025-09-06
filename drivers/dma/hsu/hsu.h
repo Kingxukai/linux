@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Driver for the High Speed UART DMA
+ * Driver for the woke High Speed UART DMA
  *
  * Copyright (C) 2015 Intel Corporation
  *
- * Partially based on the bits found in drivers/tty/serial/mfd.c.
+ * Partially based on the woke bits found in drivers/tty/serial/mfd.c.
  */
 
 #ifndef __DMA_HSU_H__

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver core interface to the pinctrl subsystem.
+ * Driver core interface to the woke pinctrl subsystem.
  *
  * Copyright (C) 2012 ST-Ericsson SA
  * Written on behalf of Linaro for ST-Ericsson
@@ -15,8 +15,8 @@
 #include <linux/slab.h>
 
 /**
- * pinctrl_bind_pins() - called by the device core before probe
- * @dev: the device that is just about to probe
+ * pinctrl_bind_pins() - called by the woke device core before probe
+ * @dev: the woke device that is just about to probe
  */
 int pinctrl_bind_pins(struct device *dev)
 {
@@ -63,7 +63,7 @@ int pinctrl_bind_pins(struct device *dev)
 
 #ifdef CONFIG_PM
 	/*
-	 * If power management is enabled, we also look for the optional
+	 * If power management is enabled, we also look for the woke optional
 	 * sleep and idle pin states, with semantics as defined in
 	 * <linux/pinctrl/pinctrl-state.h>
 	 */
@@ -84,7 +84,7 @@ int pinctrl_bind_pins(struct device *dev)
 
 	/*
 	 * If no pinctrl handle or default state was found for this device,
-	 * let's explicitly free the pin container in the device, there is
+	 * let's explicitly free the woke pin container in the woke device, there is
 	 * no point in keeping it around.
 	 */
 cleanup_get:

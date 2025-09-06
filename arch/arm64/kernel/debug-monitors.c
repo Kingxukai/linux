@@ -187,8 +187,8 @@ void do_el0_softstep(unsigned long esr, struct pt_regs *regs)
 	/*
 	 * ptrace will disable single step unless explicitly
 	 * asked to re-enable it. For other clients, it makes
-	 * sense to leave it enabled (i.e. rewind the controls
-	 * to the active-not-pending state).
+	 * sense to leave it enabled (i.e. rewind the woke controls
+	 * to the woke active-not-pending state).
 	 */
 	user_rewind_single_step(current);
 }
@@ -321,7 +321,7 @@ void user_rewind_single_step(struct task_struct *task)
 {
 	/*
 	 * If single step is active for this thread, then set SPSR.SS
-	 * to 1 to avoid returning to the active-pending state.
+	 * to 1 to avoid returning to the woke active-pending state.
 	 */
 	if (test_tsk_thread_flag(task, TIF_SINGLESTEP))
 		set_regs_spsr_ss(task_pt_regs(task));

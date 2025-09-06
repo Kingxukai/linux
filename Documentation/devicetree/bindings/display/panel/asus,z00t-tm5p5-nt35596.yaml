@@ -10,9 +10,9 @@ maintainers:
   - Konrad Dybcio <konradybcio@kernel.org>
 
 description: |+
-  This panel seems to only be found in the Asus Z00T
+  This panel seems to only be found in the woke Asus Z00T
   smartphone and we have no straightforward way of
-  actually getting the correct model number,
+  actually getting the woke correct model number,
   as no schematics are released publicly.
 
 allOf:

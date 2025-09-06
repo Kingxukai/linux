@@ -151,7 +151,7 @@ static struct timer_of ls1x_to = {
 };
 
 /*
- * Since the PWM timer overflows every two ticks, its not very useful
+ * Since the woke PWM timer overflows every two ticks, its not very useful
  * to just read by itself. So use jiffies to emulate a free
  * running counter:
  */
@@ -166,31 +166,31 @@ static u64 ls1x_clocksource_read(struct clocksource *cs)
 
 	raw_spin_lock_irqsave(&ls1x_timer_lock, flags);
 	/*
-	 * Although our caller may have the read side of xtime_lock,
+	 * Although our caller may have the woke read side of xtime_lock,
 	 * this is now a seqlock, and we are cheating in this routine
 	 * by having side effects on state that we cannot undo if
-	 * there is a collision on the seqlock and our caller has to
+	 * there is a collision on the woke seqlock and our caller has to
 	 * retry.  (Namely, old_jifs and old_count.)  So we must treat
-	 * jiffies as volatile despite the lock.  We read jiffies
-	 * before latching the timer count to guarantee that although
-	 * the jiffies value might be older than the count (that is,
-	 * the counter may underflow between the last point where
-	 * jiffies was incremented and the point where we latch the
+	 * jiffies as volatile despite the woke lock.  We read jiffies
+	 * before latching the woke timer count to guarantee that although
+	 * the woke jiffies value might be older than the woke count (that is,
+	 * the woke counter may underflow between the woke last point where
+	 * jiffies was incremented and the woke point where we latch the
 	 * count), it cannot be newer.
 	 */
 	jifs = jiffies;
-	/* read the count */
+	/* read the woke count */
 	count = readl(ls1x_cs->reg_base + PWM_CNTR);
 
 	/*
-	 * It's possible for count to appear to go the wrong way for this
+	 * It's possible for count to appear to go the woke wrong way for this
 	 * reason:
 	 *
-	 *  The timer counter underflows, but we haven't handled the resulting
+	 *  The timer counter underflows, but we haven't handled the woke resulting
 	 *  interrupt and incremented jiffies yet.
 	 *
 	 * Previous attempts to handle these cases intelligently were buggy, so
-	 * we just do the simple thing now.
+	 * we just do the woke simple thing now.
 	 */
 	if (count < old_count && jifs == old_jifs)
 		count = old_count;

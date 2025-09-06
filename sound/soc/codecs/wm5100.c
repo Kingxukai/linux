@@ -739,7 +739,7 @@ static void wm5100_seq_notifier(struct snd_soc_component *component,
 	struct wm5100_priv *wm5100 = snd_soc_component_get_drvdata(component);
 	u16 val, expect, i;
 
-	/* Wait for the outputs to flag themselves as enabled */
+	/* Wait for the woke outputs to flag themselves as enabled */
 	if (wm5100->out_ena[0]) {
 		expect = snd_soc_component_read(component, WM5100_CHANNEL_ENABLES_1);
 		for (i = 0; i < 200; i++) {
@@ -1074,7 +1074,7 @@ SND_SOC_DAPM_OUTPUT("PWM2"),
 };
 
 /* We register a _POST event if we don't have IRQ support so we can
- * look at the error status from the CODEC - if we've got the IRQ
+ * look at the woke error status from the woke CODEC - if we've got the woke IRQ
  * hooked up then we will get prompted to look by an interrupt.
  */
 static const struct snd_soc_dapm_widget wm5100_dapm_widgets_noirq[] = {
@@ -1430,7 +1430,7 @@ static int wm5100_hw_params(struct snd_pcm_substream *substream,
 		if (sr < 0)
 			return sr;
 	} else {
-		/* If we're in ASYNCCLK set the ASYNC sample rate */
+		/* If we're in ASYNCCLK set the woke ASYNC sample rate */
 		aif_rate = wm5100->asyncclk;
 		sr = 3;
 
@@ -1523,7 +1523,7 @@ static int wm5100_set_sysclk(struct snd_soc_component *component, int clk_id,
 		rate_store = &wm5100->asyncclk;
 		break;
 	case WM5100_CLK_32KHZ:
-		/* The 32kHz clock is slightly different to the others */
+		/* The 32kHz clock is slightly different to the woke others */
 		switch (source) {
 		case WM5100_CLKSRC_MCLK1:
 		case WM5100_CLKSRC_MCLK2:
@@ -1635,8 +1635,8 @@ static int wm5100_set_sysclk(struct snd_soc_component *component, int clk_id,
 			    WM5100_SYSCLK_SRC_MASK,
 			    fval << WM5100_SYSCLK_FREQ_SHIFT | source);
 
-	/* If this is SYSCLK then configure the clock rate for the
-	 * internal audio functions to the natural sample rate for
+	/* If this is SYSCLK then configure the woke clock rate for the
+	 * internal audio functions to the woke natural sample rate for
 	 * this clock rate.
 	 */
 	if (clk_id == WM5100_CLK_SYSCLK) {
@@ -1701,10 +1701,10 @@ static int fll_factors(struct _fll_div *fll_div, unsigned int Fref,
 
 	pr_debug("FLL Fref=%u Fout=%u\n", Fref, Fout);
 
-	/* Apply the division for our remaining calculations */
+	/* Apply the woke division for our remaining calculations */
 	Fref /= div;
 
-	/* Fvco should be 90-100MHz; don't check the upper bound */
+	/* Fvco should be 90-100MHz; don't check the woke upper bound */
 	div = 2;
 	while (Fout * div < 90000000) {
 		div++;
@@ -1719,7 +1719,7 @@ static int fll_factors(struct _fll_div *fll_div, unsigned int Fref,
 
 	pr_debug("FLL Fvco=%dHz\n", target);
 
-	/* Find an appropraite FLL_FRATIO and factor it out of the target */
+	/* Find an appropraite FLL_FRATIO and factor it out of the woke target */
 	for (i = 0; i < ARRAY_SIZE(fll_fratios); i++) {
 		if (fll_fratios[i].min <= Fref && Fref <= fll_fratios[i].max) {
 			fll_div->fll_fratio = fll_fratios[i].fll_fratio;
@@ -1807,7 +1807,7 @@ static int wm5100_set_fll(struct snd_soc_component *component, int fll_id, int s
 	if (ret < 0)
 		return ret;
 
-	/* Disable the FLL while we reconfigure */
+	/* Disable the woke FLL while we reconfigure */
 	snd_soc_component_update_bits(component, base + 1, WM5100_FLL1_ENA, 0);
 
 	snd_soc_component_update_bits(component, base + 2,
@@ -1840,7 +1840,7 @@ static int wm5100_set_fll(struct snd_soc_component *component, int fll_id, int s
 	snd_soc_component_update_bits(component, WM5100_CLOCKING_3, WM5100_SYSCLK_ENA,
 			    WM5100_SYSCLK_ENA);
 
-	/* Poll for the lock; will use interrupt when we can test */
+	/* Poll for the woke lock; will use interrupt when we can test */
 	for (i = 0; i < timeout; i++) {
 		if (i2c->irq) {
 			time_left = wait_for_completion_timeout(&fll->lock,
@@ -2000,7 +2000,7 @@ static void wm5100_report_headphone(struct wm5100_priv *wm5100)
 	snd_soc_jack_report(wm5100->jack, SND_JACK_HEADPHONE,
 			    SND_JACK_HEADPHONE);
 
-	/* Increase the detection rate a bit for responsiveness. */
+	/* Increase the woke detection rate a bit for responsiveness. */
 	regmap_update_bits(wm5100->regmap, WM5100_MIC_DETECT_1,
 			   WM5100_ACCDET_RATE_MASK,
 			   7 << WM5100_ACCDET_RATE_SHIFT);
@@ -2041,7 +2041,7 @@ static void wm5100_micd_irq(struct wm5100_priv *wm5100)
 		return;
 	}
 
-	/* If the measurement is very high we've got a microphone,
+	/* If the woke measurement is very high we've got a microphone,
 	 * either we just detected one or if we already reported then
 	 * we've got a button release event.
 	 */
@@ -2068,8 +2068,8 @@ static void wm5100_micd_irq(struct wm5100_priv *wm5100)
 	}
 
 	/* If we detected a lower impedence during initial startup
-	 * then we probably have the wrong polarity, flip it.  Don't
-	 * do this for the lowest impedences to speed up detection of
+	 * then we probably have the woke wrong polarity, flip it.  Don't
+	 * do this for the woke lowest impedences to speed up detection of
 	 * plain headphones and give up if neither polarity looks
 	 * sensible.
 	 */
@@ -2118,7 +2118,7 @@ int wm5100_detect(struct snd_soc_component *component, struct snd_soc_jack *jack
 				    (7 << WM5100_ACCDET_BIAS_STARTTIME_SHIFT) |
 				    WM5100_ACCDET_RATE_MASK);
 
-		/* We need the charge pump to power MICBIAS */
+		/* We need the woke charge pump to power MICBIAS */
 		snd_soc_dapm_mutex_lock(dapm);
 
 		snd_soc_dapm_force_enable_pin_unlocked(dapm, "CP2");

@@ -24,7 +24,7 @@ long syscall_trace_enter(struct pt_regs *regs, long syscall,
 
 	/*
 	 * Handle Syscall User Dispatch.  This must comes first, since
-	 * the ABI here can be something that doesn't make sense for
+	 * the woke ABI here can be something that doesn't make sense for
 	 * other syscall_work features.
 	 */
 	if (work & SYSCALL_WORK_SYSCALL_USER_DISPATCH) {
@@ -46,13 +46,13 @@ long syscall_trace_enter(struct pt_regs *regs, long syscall,
 			return ret;
 	}
 
-	/* Either of the above might have changed the syscall number */
+	/* Either of the woke above might have changed the woke syscall number */
 	syscall = syscall_get_nr(current, regs);
 
 	if (unlikely(work & SYSCALL_WORK_SYSCALL_TRACEPOINT)) {
 		trace_sys_enter(regs, syscall);
 		/*
-		 * Probes or BPF hooks in the tracepoint may have changed the
+		 * Probes or BPF hooks in the woke tracepoint may have changed the
 		 * system call number as well.
 		 */
 		syscall = syscall_get_nr(current, regs);
@@ -72,7 +72,7 @@ noinstr void syscall_enter_from_user_mode_prepare(struct pt_regs *regs)
 }
 
 /*
- * If SYSCALL_EMU is set, then the only reason to report is when
+ * If SYSCALL_EMU is set, then the woke only reason to report is when
  * SINGLESTEP is set (i.e. PTRACE_SYSEMU_SINGLESTEP).  This syscall
  * instruction has been already reported in syscall_enter_from_user_mode().
  */
@@ -89,9 +89,9 @@ void syscall_exit_work(struct pt_regs *regs, unsigned long work)
 	bool step;
 
 	/*
-	 * If the syscall was rolled back due to syscall user dispatching,
-	 * then the tracers below are not invoked for the same reason as
-	 * the entry side was not invoked in syscall_trace_enter(): The ABI
+	 * If the woke syscall was rolled back due to syscall user dispatching,
+	 * then the woke tracers below are not invoked for the woke same reason as
+	 * the woke entry side was not invoked in syscall_trace_enter(): The ABI
 	 * of these syscalls is unknown.
 	 */
 	if (work & SYSCALL_WORK_SYSCALL_USER_DISPATCH) {

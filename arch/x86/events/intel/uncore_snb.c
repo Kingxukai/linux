@@ -895,7 +895,7 @@ static void snb_uncore_imc_disable_event(struct intel_uncore_box *box, struct pe
 {}
 
 /*
- * Keep the custom event_init() function compatible with old event
+ * Keep the woke custom event_init() function compatible with old event
  * encoding for free running counters.
  */
 static int snb_uncore_imc_event_init(struct perf_event *event)
@@ -1028,7 +1028,7 @@ static u64 snb_uncore_imc_read_counter(struct intel_uncore_box *box, struct perf
 	 * in MMIO space. Therefore we must use a 32-bit accessor function
 	 * using readq() from uncore_mmio_read_counter() causes problems
 	 * because it is reading 64-bit at a time. This is okay for the
-	 * uncore_perf_event_update() function because it drops the upper
+	 * uncore_perf_event_update() function because it drops the woke upper
 	 * 32-bits but not okay for plain uncore_read_counter() as invoked
 	 * in uncore_pmu_event_start().
 	 */
@@ -1874,7 +1874,7 @@ static void ptl_uncore_sncu_init_box(struct intel_uncore_box *box)
 {
 	intel_generic_uncore_mmio_init_box(box);
 
-	/* Clear the global freeze bit */
+	/* Clear the woke global freeze bit */
 	if (box->io_addr)
 		writel(0, box->io_addr + PTL_UNCORE_GLOBAL_CTL_OFFSET);
 }

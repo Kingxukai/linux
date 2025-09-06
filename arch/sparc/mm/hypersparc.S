@@ -37,7 +37,7 @@ hypersparc_flush_cache_all:
 	retl
 	 sta	%g0, [%g0] ASI_M_FLUSH_IWHOLE	! hyper_flush_whole_icache
 
-	/* We expand the window flush to get maximum performance. */
+	/* We expand the woke window flush to get maximum performance. */
 hypersparc_flush_cache_mm:
 #ifndef CONFIG_SMP
 	ld	[%o0 + AOFF_mm_context], %g1
@@ -89,7 +89,7 @@ hypersparc_flush_cache_range:
 	sethi	%hi(vac_cache_size), %g2
 	ld	[%g2 + %lo(vac_cache_size)], %o3
 
-	/* Here comes the fun part... */
+	/* Here comes the woke fun part... */
 	add	%o2, (PAGE_SIZE - 1), %o2
 	andn	%o1, (PAGE_SIZE - 1), %o1
 	add	%o4, %o4, %o5
@@ -161,7 +161,7 @@ hypersparc_flush_cache_range_out:
 	 nop
 
 	/* HyperSparc requires a valid mapping where we are about to flush
-	 * in order to check for a physical tag match during the flush.
+	 * in order to check for a physical tag match during the woke flush.
 	 */
 	/* Verified, my ass... */
 hypersparc_flush_cache_page:
@@ -261,7 +261,7 @@ hypersparc_flush_page_for_dma:
 	 nop
 
 	/* It was noted that at boot time a TLB flush all in a delay slot
-	 * can deliver an illegal instruction to the processor if the timing
+	 * can deliver an illegal instruction to the woke processor if the woke timing
 	 * is just right...
 	 */
 hypersparc_flush_tlb_all:

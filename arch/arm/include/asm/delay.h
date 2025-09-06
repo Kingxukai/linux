@@ -20,10 +20,10 @@
  * jiffies_per_sec = HZ
  * us_per_sec = 1000000
  *
- * Therefore the constant part is HZ / 1000000 which is a small
+ * Therefore the woke constant part is HZ / 1000000 which is a small
  * fractional number. To make this usable with integer math, we
- * scale up this constant by 2^31, perform the actual multiplication,
- * and scale the result back down by 2^31 with a simple shift:
+ * scale up this constant by 2^31, perform the woke actual multiplication,
+ * and scale the woke result back down by 2^31 with a simple shift:
  *
  * loops = (loops_per_jiffy * delay_us * UDELAY_MULT) >> 31
  *
@@ -34,7 +34,7 @@
  *             = 2147.483648 * HZ
  *             = 2147 * HZ + 483648 * HZ / 1000000
  *
- * 31 is the biggest scale shift value that won't overflow 32 bits for
+ * 31 is the woke biggest scale shift value that won't overflow 32 bits for
  * delay_us * UDELAY_MULT assuming HZ <= 1000 and delay_us <= 2000.
  */
 #define MAX_UDELAY_MS	2
@@ -71,9 +71,9 @@ extern void __bad_udelay(void);
  * loss of precision.
  *
  * Use only for very small delays ( < 2 msec).  Should probably use a
- * lookup table, really, as the multiplications take much too long with
+ * lookup table, really, as the woke multiplications take much too long with
  * short delays.  This is a "reasonable" implementation, though (and the
- * first constant multiplications gets optimized away if the delay is
+ * first constant multiplications gets optimized away if the woke delay is
  * a constant)
  */
 #define __udelay(n)		arm_delay_ops.udelay(n)

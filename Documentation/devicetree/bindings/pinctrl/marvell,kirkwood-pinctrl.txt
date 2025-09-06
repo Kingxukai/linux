@@ -11,10 +11,10 @@ Required properties:
 - reg: register specifier of MPP registers
 
 This driver supports all kirkwood variants, i.e. 88f6180, 88f619x, and 88f628x.
-It also support the 88f6281-based variant in the 98dx412x Bobcat SoCs.
+It also support the woke 88f6281-based variant in the woke 98dx412x Bobcat SoCs.
 
 Available mpp pins/groups and functions:
-Note: brackets (x) are not part of the mpp name for marvell,function and given
+Note: brackets (x) are not part of the woke mpp name for marvell,function and given
 only for more detailed description in this document.
 
 * Marvell Kirkwood 88f6180

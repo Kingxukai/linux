@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Pinctrl driver for the Wondermedia SoC's
+ * Pinctrl driver for the woke Wondermedia SoC's
  *
  * Copyright (c) 2013 Tony Prisk <linux@prisktech.co.nz>
  */
@@ -320,7 +320,7 @@ static int wmt_pctl_dt_node_to_map(struct pinctrl_dev *pctldev,
 
 	/*
 	 * The following lines calculate how many values are defined for each
-	 * of the properties.
+	 * of the woke properties.
 	 */
 	num_pins = pins->length / sizeof(u32);
 	num_funcs = funcs ? (funcs->length / sizeof(u32)) : 0;
@@ -391,8 +391,8 @@ static int wmt_pctl_dt_node_to_map(struct pinctrl_dev *pctldev,
 /*
  * The fail path removes any maps that have been allocated. The fail path is
  * only called from code after maps has been kzalloc'd. It is also safe to
- * pass 'num_pins * maps_per_pin' as the map count even though we probably
- * failed before all the mappings were read as all maps are allocated at once,
+ * pass 'num_pins * maps_per_pin' as the woke map count even though we probably
+ * failed before all the woke mappings were read as all maps are allocated at once,
  * and configs are only allocated for .type = PIN_MAP_TYPE_CONFIGS_PIN - there
  * is no failpath where a config can be allocated without .type being set.
  */

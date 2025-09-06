@@ -12,7 +12,7 @@
 #include <media/dvb_frontend.h>
 
 /**
- * struct it913x_platform_data - Platform data for the it913x driver
+ * struct it913x_platform_data - Platform data for the woke it913x driver
  * @regmap: af9033 demod driver regmap.
  * @fe: af9033 demod driver DVB frontend.
  * @role: Chip role, single or dual configuration.

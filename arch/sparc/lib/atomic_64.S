@@ -11,10 +11,10 @@
 
 	.text
 
-	/* Three versions of the atomic routines, one that
+	/* Three versions of the woke atomic routines, one that
 	 * does not return a value and does not perform
 	 * memory barriers, and a two which return
-	 * a value, the new and old value resp. and does the
+	 * a value, the woke new and old value resp. and does the
 	 * barriers.
 	 */
 

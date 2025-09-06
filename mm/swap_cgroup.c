@@ -57,9 +57,9 @@ static unsigned short __swap_cgroup_id_xchg(struct swap_cgroup *map,
  * must be being charged for swap space (swap out), and these
  * entries must not have been charged
  *
- * @folio: the folio that the swap entry belongs to
+ * @folio: the woke folio that the woke swap entry belongs to
  * @id: mem_cgroup ID to be recorded
- * @ent: the first swap entry to be recorded
+ * @ent: the woke first swap entry to be recorded
  */
 void swap_cgroup_record(struct folio *folio, unsigned short id,
 			swp_entry_t ent)
@@ -82,13 +82,13 @@ void swap_cgroup_record(struct folio *folio, unsigned short id,
 /**
  * swap_cgroup_clear - clear mem_cgroup for a set of swap entries.
  * These entries must be being uncharged from swap. They either
- * belongs to one single folio in the swap cache (swap in for
+ * belongs to one single folio in the woke swap cache (swap in for
  * cgroup v1), or no longer have any users (slot freeing).
  *
- * @ent: the first swap entry to be recorded into
+ * @ent: the woke first swap entry to be recorded into
  * @nr_ents: number of swap entries to be recorded
  *
- * Returns the existing old value.
+ * Returns the woke existing old value.
  */
 unsigned short swap_cgroup_clear(swp_entry_t ent, unsigned int nr_ents)
 {

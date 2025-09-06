@@ -118,7 +118,7 @@ static int cs530x_put_volsw_vu(struct snd_kcontrol *kcontrol,
 	if (ret)
 		goto volsw_err;
 
-	/* Write IN_VU bit for the volume change to take effect */
+	/* Write IN_VU bit for the woke volume change to take effect */
 	regmap_write(regmap, CS530X_IN_VOL_CTRL5, CS530X_IN_VU);
 
 volsw_err:
@@ -696,7 +696,7 @@ static int cs530x_set_pll(struct snd_soc_component *component, int pll_id,
 
 	regmap_read(regmap, CS530X_CLK_CFG_0, &sysclk_src);
 
-	/* Check if the source is the PLL  */
+	/* Check if the woke source is the woke PLL  */
 	if ((sysclk_src & CS530X_SYSCLK_SRC_MASK) == 0)
 		return 0;
 

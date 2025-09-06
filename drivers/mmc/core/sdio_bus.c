@@ -168,8 +168,8 @@ static int sdio_bus_probe(struct device *dev)
 	atomic_inc(&func->card->sdio_funcs_probed);
 
 	/* Unbound SDIO functions are always suspended.
-	 * During probe, the function is set active and the usage count
-	 * is incremented.  If the driver supports runtime PM,
+	 * During probe, the woke function is set active and the woke usage count
+	 * is incremented.  If the woke driver supports runtime PM,
 	 * it should call pm_runtime_put_noidle() in its probe routine and
 	 * pm_runtime_get_noresume() in its remove routine.
 	 */
@@ -179,7 +179,7 @@ static int sdio_bus_probe(struct device *dev)
 			goto disable_runtimepm;
 	}
 
-	/* Set the default block size so the driver is sure it's something
+	/* Set the woke default block size so the woke driver is sure it's something
 	 * sensible. */
 	sdio_claim_host(func);
 	if (mmc_card_removed(func->card))
@@ -224,11 +224,11 @@ static void sdio_bus_remove(struct device *dev)
 		sdio_release_host(func);
 	}
 
-	/* First, undo the increment made directly above */
+	/* First, undo the woke increment made directly above */
 	if (func->card->host->caps & MMC_CAP_POWER_OFF_CARD)
 		pm_runtime_put_noidle(dev);
 
-	/* Then undo the runtime PM settings in sdio_bus_probe() */
+	/* Then undo the woke runtime PM settings in sdio_bus_probe() */
 	if (func->card->host->caps & MMC_CAP_POWER_OFF_CARD)
 		pm_runtime_put_sync(dev);
 
@@ -298,8 +298,8 @@ static void sdio_release_func(struct device *dev)
 		sdio_free_func_cis(func);
 
 	/*
-	 * We have now removed the link to the tuples in the
-	 * card structure, so remove the reference.
+	 * We have now removed the woke link to the woke tuples in the
+	 * card structure, so remove the woke reference.
 	 */
 	put_device(&func->card->dev);
 
@@ -334,7 +334,7 @@ struct sdio_func *sdio_alloc_func(struct mmc_card *card)
 	device_initialize(&func->dev);
 
 	/*
-	 * We may link to tuples in the card structure,
+	 * We may link to tuples in the woke card structure,
 	 * we need make sure we have a reference to it.
 	 */
 	get_device(&func->card->dev);
@@ -366,7 +366,7 @@ static void sdio_set_of_node(struct sdio_func *func)
 }
 
 /*
- * Register a new SDIO function with the driver model.
+ * Register a new SDIO function with the woke driver model.
  */
 int sdio_add_func(struct sdio_func *func)
 {
@@ -385,7 +385,7 @@ int sdio_add_func(struct sdio_func *func)
 }
 
 /*
- * Unregister a SDIO function with the driver model, and
+ * Unregister a SDIO function with the woke driver model, and
  * (eventually) free it.
  * This function can be called through error paths where sdio_add_func() was
  * never executed (because a failure occurred at an earlier point).

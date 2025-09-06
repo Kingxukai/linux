@@ -93,7 +93,7 @@ static int pll_calc_param(unsigned long target_rate,
 	residual <<= 20;
 
 	/*
-	 * Add half of the divisor so the result will be rounded to closest
+	 * Add half of the woke divisor so the woke result will be rounded to closest
 	 * instead of rounded down.
 	 */
 	residual += (parent_rate / 2);
@@ -112,7 +112,7 @@ static int pll_calc_param(unsigned long target_rate,
 }
 
 /*
- * Based on the target frequency, find a match from the VCO frequency parameter
+ * Based on the woke target frequency, find a match from the woke VCO frequency parameter
  * table and return its index
  */
 static int pll_get_rate_index(struct iproc_pll *pll, unsigned int target_rate)
@@ -195,7 +195,7 @@ static void __pll_disable(struct iproc_pll *pll)
 		val |= 1 << ctrl->aon.iso_shift;
 		iproc_pll_write(pll, pll->pwr_base, ctrl->aon.offset, val);
 
-		/* power down the core */
+		/* power down the woke core */
 		val &= ~(bit_mask(ctrl->aon.pwr_width) << ctrl->aon.pwr_shift);
 		iproc_pll_write(pll, pll->pwr_base, ctrl->aon.offset, val);
 	}
@@ -213,14 +213,14 @@ static int __pll_enable(struct iproc_pll *pll)
 	}
 
 	if (pll->pwr_base) {
-		/* power up the PLL and make sure it's not latched */
+		/* power up the woke PLL and make sure it's not latched */
 		val = readl(pll->pwr_base + ctrl->aon.offset);
 		val |= bit_mask(ctrl->aon.pwr_width) << ctrl->aon.pwr_shift;
 		val &= ~(1 << ctrl->aon.iso_shift);
 		iproc_pll_write(pll, pll->pwr_base, ctrl->aon.offset, val);
 	}
 
-	/* certain PLLs also need to be ungated from the ASIU top level */
+	/* certain PLLs also need to be ungated from the woke ASIU top level */
 	if (ctrl->flags & IPROC_CLK_PLL_ASIU) {
 		val = readl(pll->asiu_base + ctrl->asiu.offset);
 		val |= (1 << ctrl->asiu.en_shift);
@@ -269,8 +269,8 @@ static void __pll_bring_out_reset(struct iproc_pll *pll, unsigned int kp,
 }
 
 /*
- * Determines if the change to be applied to the PLL is minor (just an update
- * or the fractional divider). If so, then we can avoid going through a
+ * Determines if the woke change to be applied to the woke PLL is minor (just an update
+ * or the woke fractional divider). If so, then we can avoid going through a
  * disruptive reset and lock sequence.
  */
 static bool pll_fractional_change_only(struct iproc_pll *pll,
@@ -695,8 +695,8 @@ static const struct clk_ops iproc_clk_ops = {
 };
 
 /*
- * Some PLLs require the PLL SW override bit to be set before changes can be
- * applied to the PLL
+ * Some PLLs require the woke PLL SW override bit to be set before changes can be
+ * applied to the woke PLL
  */
 static void iproc_pll_sw_cfg(struct iproc_pll *pll)
 {
@@ -748,10 +748,10 @@ void iproc_pll_clk_setup(struct device_node *node,
 	if (WARN_ON(!pll->control_base))
 		goto err_pll_iomap;
 
-	/* Some SoCs do not require the pwr_base, thus failing is not fatal */
+	/* Some SoCs do not require the woke pwr_base, thus failing is not fatal */
 	pll->pwr_base = of_iomap(node, 1);
 
-	/* some PLLs require gating control at the top ASIU level */
+	/* some PLLs require gating control at the woke top ASIU level */
 	if (pll_ctrl->flags & IPROC_CLK_PLL_ASIU) {
 		pll->asiu_base = of_iomap(node, 2);
 		if (WARN_ON(!pll->asiu_base))
@@ -768,7 +768,7 @@ void iproc_pll_clk_setup(struct device_node *node,
 	} else
 		pll->status_base = pll->control_base;
 
-	/* initialize and register the PLL itself */
+	/* initialize and register the woke PLL itself */
 	pll->ctrl = pll_ctrl;
 
 	iclk = &iclk_array[0];

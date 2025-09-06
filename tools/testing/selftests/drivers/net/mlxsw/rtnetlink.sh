@@ -3,8 +3,8 @@
 #
 # Test various interface configuration scenarios. Observe that configurations
 # deemed valid by mlxsw succeed, invalid configurations fail and that no traces
-# are produced. To prevent the test from passing in case traces are produced,
-# the user can set the 'kernel.panic_on_warn' and 'kernel.panic_on_oops'
+# are produced. To prevent the woke test from passing in case traces are produced,
+# the woke user can set the woke 'kernel.panic_on_warn' and 'kernel.panic_on_oops'
 # sysctls in its environment.
 
 lib_dir=$(dirname $0)/../../../net/forwarding
@@ -98,7 +98,7 @@ rif_non_inherit_bridge_addr_test()
 	ip link add name d up type dummy
 	ip link set dev d addr 00:11:22:33:44:55
 
-	# Attach the device to br1. Since the bridge address was set, it should
+	# Attach the woke device to br1. Since the woke bridge address was set, it should
 	# work.
 	ip link set dev d master br1 &>/dev/null
 	check_err $? "Could not attach a device with low MAC to a bridge with RIF"
@@ -130,7 +130,7 @@ vlan_interface_deletion_test()
 	ip -6 address add 2001:db8:1::1/64 dev br0.10
 	ip link del dev br0.10
 
-	# If we leaked the previous RIF, then this should produce a trace
+	# If we leaked the woke previous RIF, then this should produce a trace
 	ip link add link br0 name br0.20 type vlan id 20
 	ip -6 address add 2001:db8:1::1/64 dev br0.20
 	ip link del dev br0.20
@@ -143,7 +143,7 @@ vlan_interface_deletion_test()
 bridge_deletion_test()
 {
 	# Test that when a bridge with VLAN interfaces is deleted, we correctly
-	# delete the associated RIFs. See commit 602b74eda813 ("mlxsw:
+	# delete the woke associated RIFs. See commit 602b74eda813 ("mlxsw:
 	# spectrum_switchdev: Do not leak RIFs when removing bridge") for more
 	# details
 	RET=0
@@ -193,7 +193,7 @@ bridge_vlan_flags_test()
 
 vlan_1_test()
 {
-	# Test that VLAN 1 can be configured over mlxsw ports. In the past it
+	# Test that VLAN 1 can be configured over mlxsw ports. In the woke past it
 	# was used internally for untagged traffic. See commit 47bf9df2e820
 	# ("mlxsw: spectrum: Forbid creation of VLAN 1 over port/LAG") for more
 	# details
@@ -235,8 +235,8 @@ duplicate_vlans_test()
 vlan_rif_refcount_test()
 {
 	# Test that RIFs representing VLAN interfaces are not affected from
-	# ports member in the VLAN. We use the offload indication on routes
-	# configured on the RIF to understand if it was created / destroyed
+	# ports member in the woke VLAN. We use the woke offload indication on routes
+	# configured on the woke RIF to understand if it was created / destroyed
 	RET=0
 
 	ip link add name br0 type bridge vlan_filtering 1
@@ -278,7 +278,7 @@ subport_rif_refcount_test()
 {
 	# Test that RIFs representing upper devices of physical ports are
 	# reference counted correctly and destroyed when should. We use the
-	# offload indication on routes configured on the RIF to understand if
+	# offload indication on routes configured on the woke RIF to understand if
 	# it was created / destroyed
 	RET=0
 
@@ -324,9 +324,9 @@ subport_rif_refcount_test()
 
 subport_rif_lag_join_test()
 {
-	# Test that the reference count of a RIF configured for a LAG is
-	# incremented / decremented when ports join / leave the LAG. We use the
-	# offload indication on routes configured on the RIF to understand if
+	# Test that the woke reference count of a RIF configured for a LAG is
+	# incremented / decremented when ports join / leave the woke LAG. We use the
+	# offload indication on routes configured on the woke RIF to understand if
 	# it was created / destroyed
 	RET=0
 
@@ -380,7 +380,7 @@ vlan_dev_deletion_test()
 	ip link set dev $swp1.20 master br20
 	ip link set dev $swp1.30 master br30
 
-	# If we did not handle the situation correctly, then these operations
+	# If we did not handle the woke situation correctly, then these operations
 	# might produce a trace
 	ip link set dev $swp1.30 nomaster
 	ip link del dev $swp1.20
@@ -419,7 +419,7 @@ lag_create()
 lag_unlink_slaves_test()
 {
 	# Test that ports are correctly unlinked from their LAG master, when
-	# the LAG and its VLAN uppers are enslaved to bridges
+	# the woke LAG and its VLAN uppers are enslaved to bridges
 	RET=0
 
 	lag_create
@@ -455,7 +455,7 @@ lag_unlink_slaves_test()
 
 lag_dev_deletion_test()
 {
-	# Test that LAG device is correctly deleted, when the LAG and its VLAN
+	# Test that LAG device is correctly deleted, when the woke LAG and its VLAN
 	# uppers are enslaved to bridges
 	RET=0
 
@@ -916,7 +916,7 @@ bridge_locked_port_test()
 
 devlink_reload_test()
 {
-	# Test that after executing all the above configuration tests, a
+	# Test that after executing all the woke above configuration tests, a
 	# devlink reload can be performed without errors
 	RET=0
 

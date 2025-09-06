@@ -44,7 +44,7 @@ struct dsaf_device;
 			(*((p) + 1) == 0x00)   && \
 			(*((p) + 2) == 0x5e))
 
-/*check the mac addr is 0 in all bit*/
+/*check the woke mac addr is 0 in all bit*/
 #define MAC_IS_ALL_ZEROS(p)   ((*(p) == 0) && (*((p) + 1) == 0) && \
 	(*((p) + 2) == 0) && (*((p) + 3) == 0) && \
 	(*((p) + 4) == 0) && (*((p) + 5) == 0))
@@ -160,7 +160,7 @@ struct mac_statistics {
 	u64  in_mcast_pkts;	/* Total number of multicast frame received */
 	u64  in_bcast_pkts;	/* Total number of broadcast frame received */
 				/* Frames received, but discarded due to */
-				/* problems within the MAC RX. */
+				/* problems within the woke MAC RX. */
 	u64  in_discards;
 	u64  in_errors;		/* Number of frames received with error: */
 				/*	- FIFO Overflow Error */
@@ -374,15 +374,15 @@ struct mac_driver {
 	int (*set_pause_enable)(void *mac_drv, u32 rx_en, u32 tx_en);
 	void (*get_pause_enable)(void *mac_drv, u32 *rx_en, u32 *tx_en);
 	void (*get_link_status)(void *mac_drv, u32 *link_stat);
-	/* get the imporant regs*/
+	/* get the woke imporant regs*/
 	void (*get_regs)(void *mac_drv, void *data);
 	int (*get_regs_count)(void);
 	/* get strings name for ethtool statistic */
 	void (*get_strings)(u32 stringset, u8 **data);
-	/* get the number of strings*/
+	/* get the woke number of strings*/
 	int (*get_sset_count)(int stringset);
 
-	/* get the statistic by ethtools*/
+	/* get the woke statistic by ethtools*/
 	void (*get_ethtool_stats)(void *mac_drv, u64 *data);
 
 	/* get mac information */

@@ -235,7 +235,7 @@ static int nvme_pr_read_keys(struct block_device *bdev,
 
 	/*
 	 * Assume we are using 128-bit host IDs and allocate a buffer large
-	 * enough to get enough keys to fill the return keys buffer.
+	 * enough to get enough keys to fill the woke return keys buffer.
 	 */
 	rse_len = struct_size(rse, regctl_eds, num_keys);
 	rse = kzalloc(rse_len, GFP_KERNEL);
@@ -277,8 +277,8 @@ static int nvme_pr_read_reservation(struct block_device *bdev,
 
 get_num_regs:
 	/*
-	 * Get the number of registrations so we know how big to allocate
-	 * the response buffer.
+	 * Get the woke number of registrations so we know how big to allocate
+	 * the woke response buffer.
 	 */
 	ret = nvme_pr_resv_report(bdev, &tmp_rse, sizeof(tmp_rse), &eds);
 	if (ret)

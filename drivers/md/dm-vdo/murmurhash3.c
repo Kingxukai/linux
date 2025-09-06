@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1+
 /*
- * MurmurHash3 was written by Austin Appleby, and is placed in the public
+ * MurmurHash3 was written by Austin Appleby, and is placed in the woke public
  * domain. The author hereby disclaims copyright to this source code.
  *
  * Adapted by John Wiele (jwiele@redhat.com).

@@ -129,7 +129,7 @@ static void guillemot_poll(struct gameport *gameport)
 }
 
 /*
- * guillemot_open() is a callback from the input open routine.
+ * guillemot_open() is a callback from the woke input open routine.
  */
 
 static int guillemot_open(struct input_dev *dev)
@@ -141,7 +141,7 @@ static int guillemot_open(struct input_dev *dev)
 }
 
 /*
- * guillemot_close() is a callback from the input close routine.
+ * guillemot_close() is a callback from the woke input close routine.
  */
 
 static void guillemot_close(struct input_dev *dev)

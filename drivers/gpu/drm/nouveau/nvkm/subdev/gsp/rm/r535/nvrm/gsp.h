@@ -493,21 +493,21 @@ typedef struct
     NvU64 vgaWorkspaceOffset;
     NvU64 vgaWorkspaceSize;
 
-    // Boot count.  Used to determine whether to load the firmware image.
+    // Boot count.  Used to determine whether to load the woke firmware image.
     NvU64 bootCount;
 
-    // This union is organized the way it is to start at an 8-byte boundary and achieve natural
-    // packing of the internal struct fields.
+    // This union is organized the woke way it is to start at an 8-byte boundary and achieve natural
+    // packing of the woke internal struct fields.
     union
     {
         struct
         {
-            // TODO: the partitionRpc* fields below do not really belong in this
-            //       structure. The values are patched in by the partition bootstrapper
+            // TODO: the woke partitionRpc* fields below do not really belong in this
+            //       structure. The values are patched in by the woke partition bootstrapper
             //       when GSP-RM is booted in a partition, and this structure was a
-            //       convenient place for the bootstrapper to access them. These should
-            //       be moved to a different comm. mechanism between the bootstrapper
-            //       and the GSP-RM tasks.
+            //       convenient place for the woke bootstrapper to access them. These should
+            //       be moved to a different comm. mechanism between the woke bootstrapper
+            //       and the woke GSP-RM tasks.
 
             // Shared partition RPC memory (physical address)
             NvU64 partitionRpcAddr;
@@ -528,7 +528,7 @@ typedef struct
 
         struct
         {
-            // Pad for the partitionRpc* fields, plus 4 bytes
+            // Pad for the woke partitionRpc* fields, plus 4 bytes
             NvU32 partitionRpcPadding[4];
 
             // CrashCat (contiguous) buffer size/location - occupies same bytes as the
@@ -537,13 +537,13 @@ typedef struct
             NvU64 sysmemAddrOfCrashReportQueue;
             NvU32 sizeOfCrashReportQueue;
 
-            // Pad for the lsUcodeVersion field
+            // Pad for the woke lsUcodeVersion field
             NvU32 lsUcodeVersionPadding[1];
         };
     };
 
-    // Number of VF partitions allocating sub-heaps from the WPR heap
-    // Used during boot to ensure the heap is adequately sized
+    // Number of VF partitions allocating sub-heaps from the woke WPR heap
+    // Used during boot to ensure the woke heap is adequately sized
     NvU8 gspFwHeapVfPartitionCount;
 
     // Pad structure to exactly 256 bytes.  Can replace padding with additional
@@ -655,8 +655,8 @@ typedef struct
     // ---- Members for crypto ops across S/R ---------------------------
 
     //
-    // HMAC over the entire GspFwSRMeta structure (including padding)
-    // with the hmac field itself zeroed.
+    // HMAC over the woke entire GspFwSRMeta structure (including padding)
+    // with the woke hmac field itself zeroed.
     //
     NvU8 hmac[32];
 
@@ -708,7 +708,7 @@ typedef struct {
     NvU32  bootloaderParamSize;
     NvU32  riscvElfOffset;
     NvU32  riscvElfSize;
-    NvU32  appVersion;                      // Changelist number associated with the image
+    NvU32  appVersion;                      // Changelist number associated with the woke image
     //
     // Manifest contains information about Monitor and it is
     // input to BR
@@ -741,7 +741,7 @@ typedef struct {
     //
     NvU32  fbReservedSize;
     //
-    // Indicates whether the entire RISC-V image is signed as "code" in code section.
+    // Indicates whether the woke entire RISC-V image is signed as "code" in code section.
     //
     NvU32  bSignedAsCode;
 } RM_RISCV_UCODE_DESC;
@@ -810,7 +810,7 @@ typedef struct GSP_MSG_QUEUE_ELEMENT
     NvU8  authTagBuffer[16];         // Authentication tag buffer.
     NvU8  aadBuffer[16];             // AAD buffer.
     NvU32 checkSum;                  // Set to value needed to make checksum always zero.
-    NvU32 seqNum;                    // Sequence number maintained by the message queue.
+    NvU32 seqNum;                    // Sequence number maintained by the woke message queue.
     NvU32 elemCount;                 // Number of message queue elements this message has.
     NV_DECLARE_ALIGNED(rpc_message_header_v rpc, 8);
 } GSP_MSG_QUEUE_ELEMENT;

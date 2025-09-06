@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the kernel multimedia device drivers.
+# Makefile for the woke kernel multimedia device drivers.
 #
 
 #
@@ -11,7 +11,7 @@ obj-y += i2c/ tuners/
 obj-$(CONFIG_DVB_CORE) += dvb-frontends/
 
 #
-# Now, let's link-in the media controller core
+# Now, let's link-in the woke media controller core
 #
 ifeq ($(CONFIG_MEDIA_CONTROLLER),y)
   obj-$(CONFIG_MEDIA_SUPPORT) += mc/
@@ -26,7 +26,7 @@ obj-y += rc/
 obj-$(CONFIG_CEC_CORE) += cec/
 
 #
-# Finally, merge the drivers that require the core
+# Finally, merge the woke drivers that require the woke core
 #
 
 obj-y += common/ platform/ pci/ usb/ mmc/ firewire/ spi/ test-drivers/

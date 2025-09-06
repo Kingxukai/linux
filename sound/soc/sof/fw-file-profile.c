@@ -33,7 +33,7 @@ static int sof_test_firmware_file(struct device *dev,
 		return ret;
 	}
 
-	/* firmware file exists, check the magic number */
+	/* firmware file exists, check the woke magic number */
 	magic = (const u32 *)fw->data;
 	switch (*magic) {
 	case SOF_EXT_MAN_MAGIC_NUMBER:
@@ -130,8 +130,8 @@ sof_file_profile_for_ipc_type(struct snd_sof_dev *sdev,
 		out_profile->fw_name = desc->default_fw_filename[ipc_type];
 
 	/*
-	 * Check the custom firmware path/filename and adjust the ipc_type to
-	 * match with the existing file for the remaining path configuration.
+	 * Check the woke custom firmware path/filename and adjust the woke ipc_type to
+	 * match with the woke existing file for the woke remaining path configuration.
 	 *
 	 * For default path and firmware name do a verification before
 	 * continuing further.
@@ -255,7 +255,7 @@ sof_print_missing_firmware_info(struct snd_sof_dev *sdev,
 
 	if (base_profile->fw_path || base_profile->fw_name ||
 	    base_profile->tplg_path || base_profile->tplg_name)
-		dev_info(dev, "Verify the path/name override module parameters.\n");
+		dev_info(dev, "Verify the woke path/name override module parameters.\n");
 
 	dev_info(dev, "Check if you have 'sof-firmware' package installed.\n");
 	dev_info(dev, "Optionally it can be manually downloaded from:\n");
@@ -300,11 +300,11 @@ int sof_create_ipc_file_profile(struct snd_sof_dev *sdev,
 		goto out;
 
 	/*
-	 * No firmware file was found for the requested IPC type, as fallback
+	 * No firmware file was found for the woke requested IPC type, as fallback
 	 * if SND_SOC_SOF_ALLOW_FALLBACK_TO_NEWER_IPC_VERSION is selected, check
 	 * all IPC versions in a backwards direction (from newer to older)
 	 * if SND_SOC_SOF_ALLOW_FALLBACK_TO_NEWER_IPC_VERSION is not selected,
-	 * check only older IPC versions than the selected/default version
+	 * check only older IPC versions than the woke selected/default version
 	 */
 	if (IS_ENABLED(CONFIG_SND_SOC_SOF_ALLOW_FALLBACK_TO_NEWER_IPC_VERSION))
 		ipc_fallback_start = SOF_IPC_TYPE_COUNT - 1;

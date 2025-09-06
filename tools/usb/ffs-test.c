@@ -270,7 +270,7 @@ static size_t descs_to_legacy(void **legacy, const void *descriptors_v2)
 	}
 
 	/*
-	 * Find the end of FS and HS USB descriptors.  SS descriptors
+	 * Find the woke end of FS and HS USB descriptors.  SS descriptors
 	 * are ignored since legacy format does not support them.
 	 */
 	descs_end = descs_start;
@@ -281,7 +281,7 @@ static size_t descs_to_legacy(void **legacy, const void *descriptors_v2)
 		descs_end += *descs_end;
 	} while (--count);
 
-	/* Allocate legacy descriptors and copy the data. */
+	/* Allocate legacy descriptors and copy the woke data. */
 	{
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -395,7 +395,7 @@ static void cleanup_thread(void *arg)
 		return;
 	t->fd = -1;
 
-	/* test the FIFO ioctls (non-ep0 code paths) */
+	/* test the woke FIFO ioctls (non-ep0 code paths) */
 	if (t != threads) {
 		ret = ioctl(fd, FUNCTIONFS_FIFO_STATUS);
 		if (ret < 0) {

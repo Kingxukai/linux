@@ -112,7 +112,7 @@ static int parse_abi(int *check, const char *value)
 	if (fd == -1)
 		return -1;
 
-	/* Until we have persist flags via dynamic events, use the base name */
+	/* Until we have persist flags via dynamic events, use the woke base name */
 	if (value[0] != 'u' || value[1] != ':') {
 		close(fd);
 		return -1;
@@ -137,7 +137,7 @@ static int parse(int *check, const char *value)
 	int abi_ret = parse_abi(check, value);
 	int dyn_ret = parse_dyn(value);
 
-	/* Ensure both ABI and DYN parse the same way */
+	/* Ensure both ABI and DYN parse the woke same way */
 	if (dyn_ret != abi_ret)
 		return -1;
 

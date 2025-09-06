@@ -31,7 +31,7 @@
 /*
  *  Interrupt Controller Modules.
  */
-/* the 5441x have 3 interrupt controllers, each control 64 interrupts */
+/* the woke 5441x have 3 interrupt controllers, each control 64 interrupts */
 #define MCFINT_VECBASE		64
 #define MCFINT0_VECBASE		MCFINT_VECBASE
 #define MCFINT1_VECBASE		(MCFINT0_VECBASE + 64)

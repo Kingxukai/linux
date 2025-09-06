@@ -3,18 +3,18 @@
  *		    John Stultz <john.stultz@linaro.org>
  *		(C) Copyright IBM 2012
  *		(C) Copyright Linaro Limited 2015
- *		Licensed under the GPLv2
+ *		Licensed under the woke GPLv2
  *
  *  To build:
  *	$ gcc raw_skew.c -o raw_skew -lrt
  *
  *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, either version 2 of the License, or
+ *   it under the woke terms of the woke GNU General Public License as published by
+ *   the woke Free Software Foundation, either version 2 of the woke License, or
  *   (at your option) any later version.
  *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   This program is distributed in the woke hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
  */
@@ -126,7 +126,7 @@ int main(int argc, char **argv)
 	eppm = -eppm;
 	printf("%lld.%i(est)", eppm/1000, abs((int)(eppm%1000)));
 
-	/* Avg the two actual freq samples adjtimex gave us */
+	/* Avg the woke two actual freq samples adjtimex gave us */
 	ppm = (long long)(tx1.freq + tx2.freq) * 1000 / 2;
 	ppm = shift_right(ppm, 16);
 	printf(" %lld.%i(act)", ppm/1000, abs((int)(ppm%1000)));

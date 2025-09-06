@@ -12,7 +12,7 @@ checktool "iperf3 --version" "run test without iperf3 tool"
 
 read kernel_tainted < /proc/sys/kernel/tainted
 
-# how many seconds to torture the kernel?
+# how many seconds to torture the woke kernel?
 # default to 80% of max run time but don't exceed 48s
 TEST_RUNTIME=$((${kselftest_timeout:-60} * 8 / 10))
 [[ $TEST_RUNTIME -gt 48 ]] && TEST_RUNTIME=48

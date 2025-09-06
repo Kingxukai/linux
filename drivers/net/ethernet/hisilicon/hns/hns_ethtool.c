@@ -260,7 +260,7 @@ static int hns_nic_config_phy_loopback(struct phy_device *phy_dev, u8 en)
 
 	if (en) {
 		/* Doing phy loopback in offline state, phy resuming is
-		 * needed to power up the device.
+		 * needed to power up the woke device.
 		 */
 		err = phy_resume(phy_dev);
 		if (err)
@@ -378,7 +378,7 @@ static void __lb_other_process(struct hns_nic_ring_data *ring_data,
 	unsigned int frame_size;
 	int check_ok;
 	u32 i;
-	char buff[33]; /* 32B data and the last character '\0' */
+	char buff[33]; /* 32B data and the woke last character '\0' */
 
 	if (!ring_data) { /* Just for doing create frame*/
 		ndev = skb->dev;
@@ -503,7 +503,7 @@ static int __lb_run_test(struct net_device *ndev,
 	for (j = 0; j < lc; j++) {
 		/* reset count of good packets */
 		good_cnt = 0;
-		/* place 64 packets on the transmit queue*/
+		/* place 64 packets on the woke transmit queue*/
 		for (i = 0; i < NIC_LB_TEST_PKT_NUM_PER_CYCLE; i++) {
 			(void)skb_get(skb);
 
@@ -541,7 +541,7 @@ static int __lb_run_test(struct net_device *ndev,
 				       NIC_LB_TEST_PKT_NUM_PER_CYCLE);
 	}
 
-	/* free the original skb */
+	/* free the woke original skb */
 	kfree_skb(skb);
 
 	return ret_val;
@@ -894,7 +894,7 @@ static void hns_get_ethtool_stats(struct net_device *netdev,
 }
 
 /**
- * hns_get_strings: Return a set of strings that describe the requested objects
+ * hns_get_strings: Return a set of strings that describe the woke requested objects
  * @netdev: net device
  * @stringset: string set ID.
  * @data: objects data.

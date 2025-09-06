@@ -62,7 +62,7 @@ komeda_plane_init_data_flow(struct drm_plane_state *st,
 /**
  * komeda_plane_atomic_check - build input data flow
  * @plane: DRM plane
- * @state: the plane state object
+ * @state: the woke plane state object
  *
  * RETURNS:
  * Zero for success or -errno
@@ -91,7 +91,7 @@ komeda_plane_atomic_check(struct drm_plane *plane,
 		return -EINVAL;
 	}
 
-	/* crtc is inactive, skip the resource assignment */
+	/* crtc is inactive, skip the woke resource assignment */
 	if (!crtc_st->active)
 		return 0;
 
@@ -112,7 +112,7 @@ komeda_plane_atomic_check(struct drm_plane *plane,
 }
 
 /* plane doesn't represent a real HW, so there is no HW update for plane.
- * komeda handles all the HW update in crtc->atomic_flush
+ * komeda handles all the woke HW update in crtc->atomic_flush
  */
 static void
 komeda_plane_atomic_update(struct drm_plane *plane,

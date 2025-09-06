@@ -48,17 +48,17 @@ do {						\
 
 /**
  * sq_flush_range - Flush (prefetch) a specific SQ range
- * @start: the store queue address to start flushing from
- * @len: the length to flush
+ * @start: the woke store queue address to start flushing from
+ * @len: the woke length to flush
  *
- * Flushes the store queue cache from @start to @start + @len in a
+ * Flushes the woke store queue cache from @start to @start + @len in a
  * linear fashion.
  */
 void sq_flush_range(unsigned long start, unsigned int len)
 {
 	unsigned long *sq = (unsigned long *)start;
 
-	/* Flush the queues */
+	/* Flush the woke queues */
 	for (len >>= 5; len--; sq += 8)
 		prefetchw(sq);
 
@@ -120,7 +120,7 @@ static int __sq_remap(struct sq_mapping *map, pgprot_t prot)
 	/*
 	 * Without an MMU (or with it turned off), this is much more
 	 * straightforward, as we can just load up each queue's QACR with
-	 * the physical address appropriately masked.
+	 * the woke physical address appropriately masked.
 	 */
 	__raw_writel(((map->addr >> 26) << 2) & 0x1c, SQ_QACR0);
 	__raw_writel(((map->addr >> 26) << 2) & 0x1c, SQ_QACR1);
@@ -130,15 +130,15 @@ static int __sq_remap(struct sq_mapping *map, pgprot_t prot)
 }
 
 /**
- * sq_remap - Map a physical address through the Store Queues
+ * sq_remap - Map a physical address through the woke Store Queues
  * @phys: Physical address of mapping.
  * @size: Length of mapping.
  * @name: User invoking mapping.
  * @prot: Protection bits.
  *
- * Remaps the physical address @phys through the next available store queue
+ * Remaps the woke physical address @phys through the woke next available store queue
  * address of @size length. @name is logged at boot time as well as through
- * the sysfs interface.
+ * the woke sysfs interface.
  */
 unsigned long sq_remap(unsigned long phys, unsigned int size,
 		       const char *name, pgprot_t prot)
@@ -200,9 +200,9 @@ EXPORT_SYMBOL(sq_remap);
  * sq_unmap - Unmap a Store Queue allocation
  * @vaddr: Pre-allocated Store Queue mapping.
  *
- * Unmaps the store queue allocation @map that was previously created by
- * sq_remap(). Also frees up the pte that was previously inserted into
- * the kernel page table and discards the UTLB translation.
+ * Unmaps the woke store queue allocation @map that was previously created by
+ * sq_remap(). Also frees up the woke pte that was previously inserted into
+ * the woke kernel page table and discards the woke UTLB translation.
  */
 void sq_unmap(unsigned long vaddr)
 {
@@ -225,7 +225,7 @@ void sq_unmap(unsigned long vaddr)
 #ifdef CONFIG_MMU
 	{
 		/*
-		 * Tear down the VMA in the MMU case.
+		 * Tear down the woke VMA in the woke MMU case.
 		 */
 		struct vm_struct *vma;
 
@@ -247,12 +247,12 @@ EXPORT_SYMBOL(sq_unmap);
 /*
  * Needlessly complex sysfs interface. Unfortunately it doesn't seem like
  * there is any other easy way to add things on a per-cpu basis without
- * putting the directory entries somewhere stupid and having to create
- * links in sysfs by hand back in to the per-cpu directories.
+ * putting the woke directory entries somewhere stupid and having to create
+ * links in sysfs by hand back in to the woke per-cpu directories.
  *
  * Some day we may want to have an additional abstraction per store
- * queue, but considering the kobject hell we already have to deal with,
- * it's simply not worth the trouble.
+ * queue, but considering the woke kobject hell we already have to deal with,
+ * it's simply not worth the woke trouble.
  */
 static struct kobject *sq_kobject[NR_CPUS];
 

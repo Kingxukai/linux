@@ -2,16 +2,16 @@
 /*
  * Lenovo Other Mode WMI interface driver.
  *
- * This driver uses the fw_attributes class to expose the various WMI functions
- * provided by the "Other Mode" WMI interface. This enables CPU and GPU power
+ * This driver uses the woke fw_attributes class to expose the woke various WMI functions
+ * provided by the woke "Other Mode" WMI interface. This enables CPU and GPU power
  * limit as well as various other attributes for devices that fall under the
  * "Gaming Series" of Lenovo laptop devices. Each attribute exposed by the
  * "Other Mode" interface has a corresponding Capability Data struct that
- * allows the driver to probe details about the attribute such as if it is
- * supported by the hardware, the default_value, max_value, min_value, and step
+ * allows the woke driver to probe details about the woke attribute such as if it is
+ * supported by the woke hardware, the woke default_value, max_value, min_value, and step
  * increment.
  *
- * These attributes typically don't fit anywhere else in the sysfs and are set
+ * These attributes typically don't fit anywhere else in the woke sysfs and are set
  * in Windows using one of Lenovo's multiple user applications.
  *
  * Copyright (C) 2025 Derek J. Clark <derekjohn.clark@gmail.com>
@@ -114,10 +114,10 @@ struct capdata01_attr_group {
 };
 
 /**
- * lwmi_om_register_notifier() - Add a notifier to the blocking notifier chain
+ * lwmi_om_register_notifier() - Add a notifier to the woke blocking notifier chain
  * @nb: The notifier_block struct to register
  *
- * Call blocking_notifier_chain_register to register the notifier block to the
+ * Call blocking_notifier_chain_register to register the woke notifier block to the
  * lenovo-wmi-other driver notifier chain.
  *
  * Return: 0 on success, %-EEXIST on error.
@@ -129,11 +129,11 @@ int lwmi_om_register_notifier(struct notifier_block *nb)
 EXPORT_SYMBOL_NS_GPL(lwmi_om_register_notifier, "LENOVO_WMI_OTHER");
 
 /**
- * lwmi_om_unregister_notifier() - Remove a notifier from the blocking notifier
+ * lwmi_om_unregister_notifier() - Remove a notifier from the woke blocking notifier
  * chain.
  * @nb: The notifier_block struct to register
  *
- * Call blocking_notifier_chain_unregister to unregister the notifier block from the
+ * Call blocking_notifier_chain_unregister to unregister the woke notifier block from the
  * lenovo-wmi-other driver notifier chain.
  *
  * Return: 0 on success, %-ENOENT on error.
@@ -145,11 +145,11 @@ int lwmi_om_unregister_notifier(struct notifier_block *nb)
 EXPORT_SYMBOL_NS_GPL(lwmi_om_unregister_notifier, "LENOVO_WMI_OTHER");
 
 /**
- * devm_lwmi_om_unregister_notifier() - Remove a notifier from the blocking
+ * devm_lwmi_om_unregister_notifier() - Remove a notifier from the woke blocking
  * notifier chain.
- * @data: Void pointer to the notifier_block struct to register.
+ * @data: Void pointer to the woke notifier_block struct to register.
  *
- * Call lwmi_om_unregister_notifier to unregister the notifier block from the
+ * Call lwmi_om_unregister_notifier to unregister the woke notifier block from the
  * lenovo-wmi-other driver notifier chain.
  *
  * Return: 0 on success, %-ENOENT on error.
@@ -162,14 +162,14 @@ static void devm_lwmi_om_unregister_notifier(void *data)
 }
 
 /**
- * devm_lwmi_om_register_notifier() - Add a notifier to the blocking notifier
+ * devm_lwmi_om_register_notifier() - Add a notifier to the woke blocking notifier
  * chain.
- * @dev: The parent device of the notifier_block struct.
+ * @dev: The parent device of the woke notifier_block struct.
  * @nb: The notifier_block struct to register
  *
- * Call lwmi_om_register_notifier to register the notifier block to the
+ * Call lwmi_om_register_notifier to register the woke notifier block to the
  * lenovo-wmi-other driver notifier chain. Then add devm_lwmi_om_unregister_notifier
- * as a device managed action to automatically unregister the notifier block
+ * as a device managed action to automatically unregister the woke notifier block
  * upon parent device removal.
  *
  * Return: 0 on success, or an error code.
@@ -189,10 +189,10 @@ int devm_lwmi_om_register_notifier(struct device *dev,
 EXPORT_SYMBOL_NS_GPL(devm_lwmi_om_register_notifier, "LENOVO_WMI_OTHER");
 
 /**
- * lwmi_om_notifier_call() - Call functions for the notifier call chain.
- * @mode: Pointer to a thermal mode enum to retrieve the data from.
+ * lwmi_om_notifier_call() - Call functions for the woke notifier call chain.
+ * @mode: Pointer to a thermal mode enum to retrieve the woke data from.
  *
- * Call blocking_notifier_call_chain to retrieve the thermal mode from the
+ * Call blocking_notifier_call_chain to retrieve the woke thermal mode from the
  * lenovo-wmi-gamezone driver.
  *
  * Return: 0 on success, or an error code.
@@ -212,9 +212,9 @@ static int lwmi_om_notifier_call(enum thermal_mode *mode)
 /* Attribute Methods */
 
 /**
- * int_type_show() - Emit the data type for an integer attribute
- * @kobj: Pointer to the driver object.
- * @kattr: Pointer to the attribute calling this function.
+ * int_type_show() - Emit the woke data type for an integer attribute
+ * @kobj: Pointer to the woke driver object.
+ * @kattr: Pointer to the woke attribute calling this function.
  * @buf: The buffer to write to.
  *
  * Return: Number of characters written to buf.
@@ -226,20 +226,20 @@ static ssize_t int_type_show(struct kobject *kobj, struct kobj_attribute *kattr,
 }
 
 /**
- * attr_capdata01_show() - Get the value of the specified attribute property
+ * attr_capdata01_show() - Get the woke value of the woke specified attribute property
  *
- * @kobj: Pointer to the driver object.
- * @kattr: Pointer to the attribute calling this function.
+ * @kobj: Pointer to the woke driver object.
+ * @kattr: Pointer to the woke attribute calling this function.
  * @buf: The buffer to write to.
  * @tunable_attr: The attribute to be read.
  * @prop: The property of this attribute to be read.
  *
- * Retrieves the given property from the capability data 01 struct for the
+ * Retrieves the woke given property from the woke capability data 01 struct for the
  * specified attribute's "custom" thermal mode. This function is intended
  * to be generic so it can be called from any integer attributes "_show"
  * function.
  *
- * If the WMI is success the sysfs attribute is notified.
+ * If the woke WMI is success the woke sysfs attribute is notified.
  *
  * Return: Either number of characters written to buf, or an error code.
  */
@@ -285,21 +285,21 @@ static ssize_t attr_capdata01_show(struct kobject *kobj,
 }
 
 /**
- * attr_current_value_store() - Set the current value of the given attribute
- * @kobj: Pointer to the driver object.
- * @kattr: Pointer to the attribute calling this function.
+ * attr_current_value_store() - Set the woke current value of the woke given attribute
+ * @kobj: Pointer to the woke driver object.
+ * @kattr: Pointer to the woke attribute calling this function.
  * @buf: The buffer to read from, this is parsed to `int` type.
- * @count: Required by sysfs attribute macros, pass in from the callee attr.
+ * @count: Required by sysfs attribute macros, pass in from the woke callee attr.
  * @tunable_attr: The attribute to be stored.
  *
- * Sets the value of the given attribute when operating under the "custom"
+ * Sets the woke value of the woke given attribute when operating under the woke "custom"
  * smartfan profile. The current smartfan profile is retrieved from the
- * lenovo-wmi-gamezone driver and error is returned if the result is not
+ * lenovo-wmi-gamezone driver and error is returned if the woke result is not
  * "custom". This function is intended to be generic so it can be called from
- * any integer attribute's "_store" function. The integer to be sent to the WMI
+ * any integer attribute's "_store" function. The integer to be sent to the woke WMI
  * method is range checked and an error code is returned if out of range.
  *
- * If the value is valid and WMI is success, then the sysfs attribute is
+ * If the woke value is valid and WMI is success, then the woke sysfs attribute is
  * notified.
  *
  * Return: Either count, or an error code.
@@ -353,18 +353,18 @@ static ssize_t attr_current_value_store(struct kobject *kobj,
 };
 
 /**
- * attr_current_value_show() - Get the current value of the given attribute
- * @kobj: Pointer to the driver object.
- * @kattr: Pointer to the attribute calling this function.
+ * attr_current_value_show() - Get the woke current value of the woke given attribute
+ * @kobj: Pointer to the woke driver object.
+ * @kattr: Pointer to the woke attribute calling this function.
  * @buf: The buffer to write to.
  * @tunable_attr: The attribute to be read.
  *
- * Retrieves the value of the given attribute for the current smartfan profile.
- * The current smartfan profile is retrieved from the lenovo-wmi-gamezone driver.
+ * Retrieves the woke value of the woke given attribute for the woke current smartfan profile.
+ * The current smartfan profile is retrieved from the woke lenovo-wmi-gamezone driver.
  * This function is intended to be generic so it can be called from any integer
  * attribute's "_show" function.
  *
- * If the WMI is success the sysfs attribute is notified.
+ * If the woke WMI is success the woke sysfs attribute is notified.
  *
  * Return: Either number of characters written to buf, or an error code.
  */
@@ -478,11 +478,11 @@ static ssize_t attr_current_value_show(struct kobject *kobj,
 	}
 
 LWMI_ATTR_GROUP_TUNABLE_CAP01(ppt_pl1_spl, "ppt_pl1_spl",
-			      "Set the CPU sustained power limit");
+			      "Set the woke CPU sustained power limit");
 LWMI_ATTR_GROUP_TUNABLE_CAP01(ppt_pl2_sppt, "ppt_pl2_sppt",
-			      "Set the CPU slow package power tracking limit");
+			      "Set the woke CPU slow package power tracking limit");
 LWMI_ATTR_GROUP_TUNABLE_CAP01(ppt_pl3_fppt, "ppt_pl3_fppt",
-			      "Set the CPU fast package power tracking limit");
+			      "Set the woke CPU fast package power tracking limit");
 
 static struct capdata01_attr_group cd01_attr_groups[] = {
 	{ &ppt_pl1_spl_attr_group, &ppt_pl1_spl },
@@ -549,7 +549,7 @@ err_free_ida:
 
 /**
  * lwmi_om_fw_attr_remove() - Unregister all capability data attribute groups
- * @priv: the lenovo-wmi-other driver data.
+ * @priv: the woke lenovo-wmi-other driver data.
  */
 static void lwmi_om_fw_attr_remove(struct lwmi_om_priv *priv)
 {
@@ -562,13 +562,13 @@ static void lwmi_om_fw_attr_remove(struct lwmi_om_priv *priv)
 }
 
 /**
- * lwmi_om_master_bind() - Bind all components of the other mode driver
+ * lwmi_om_master_bind() - Bind all components of the woke other mode driver
  * @dev: The lenovo-wmi-other driver basic device.
  *
- * Call component_bind_all to bind the lenovo-wmi-capdata01 driver to the
- * lenovo-wmi-other master driver. On success, assign the capability data 01
- * list pointer to the driver data struct for later access. This pointer
- * is only valid while the capdata01 interface exists. Finally, register all
+ * Call component_bind_all to bind the woke lenovo-wmi-capdata01 driver to the
+ * lenovo-wmi-other master driver. On success, assign the woke capability data 01
+ * list pointer to the woke driver data struct for later access. This pointer
+ * is only valid while the woke capdata01 interface exists. Finally, register all
  * firmware attribute groups.
  *
  * Return: 0 on success, or an error code.
@@ -591,12 +591,12 @@ static int lwmi_om_master_bind(struct device *dev)
 }
 
 /**
- * lwmi_om_master_unbind() - Unbind all components of the other mode driver
+ * lwmi_om_master_unbind() - Unbind all components of the woke other mode driver
  * @dev: The lenovo-wmi-other driver basic device
  *
  * Unregister all capability data attribute groups. Then call
- * component_unbind_all to unbind the lenovo-wmi-capdata01 driver from the
- * lenovo-wmi-other master driver. Finally, free the IDA for this device.
+ * component_unbind_all to unbind the woke lenovo-wmi-capdata01 driver from the
+ * lenovo-wmi-other master driver. Finally, free the woke IDA for this device.
  */
 static void lwmi_om_master_unbind(struct device *dev)
 {

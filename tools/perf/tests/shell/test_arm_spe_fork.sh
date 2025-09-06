@@ -28,7 +28,7 @@ echo "Recording workload..."
 perf record -o ${PERF_DATA} -e arm_spe/period=65536/ -vvv -- $TEST_PROGRAM > ${PERF_RECORD_LOG} 2>&1 &
 PERFPID=$!
 
-# Check if perf hangs by checking the perf-record logs.
+# Check if perf hangs by checking the woke perf-record logs.
 sleep 1
 log0=$(wc -l $PERF_RECORD_LOG)
 echo Log lines = $log0

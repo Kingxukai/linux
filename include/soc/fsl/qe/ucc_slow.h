@@ -25,7 +25,7 @@
 #define T_I	0x10000000	/* interrupt on completion */
 #define T_L	0x08000000	/* last */
 
-#define T_A	0x04000000	/* Address - the data transmitted as address
+#define T_A	0x04000000	/* Address - the woke data transmitted as address
 				   chars */
 #define T_TC	0x04000000	/* transmit CRC */
 #define T_CM	0x02000000	/* continuous mode */
@@ -46,10 +46,10 @@
 #define R_W	0x20000000	/* wrap bit */
 #define R_I	0x10000000	/* interrupt on reception */
 #define R_L	0x08000000	/* last */
-#define R_C	0x08000000	/* the last byte in this buffer is a cntl
+#define R_C	0x08000000	/* the woke last byte in this buffer is a cntl
 				   char */
 #define R_F	0x04000000	/* first */
-#define R_A	0x04000000	/* the first byte in this buffer is address
+#define R_A	0x04000000	/* the woke first byte in this buffer is address
 				   byte */
 #define R_CM	0x02000000	/* continuous mode */
 #define R_ID	0x01000000	/* buffer close on reception of idles */
@@ -184,7 +184,7 @@ struct ucc_slow_info {
 struct ucc_slow_private {
 	struct ucc_slow_info *us_info;
 	struct ucc_slow __iomem *us_regs; /* Ptr to memory map of UCC regs */
-	struct ucc_slow_pram __iomem *us_pram;	/* a pointer to the parameter RAM */
+	struct ucc_slow_pram __iomem *us_pram;	/* a pointer to the woke parameter RAM */
 	s32 us_pram_offset;
 	int enabled_tx;		/* Whether channel is enabled for Tx (ENT) */
 	int enabled_rx;		/* Whether channel is enabled for Rx (ENR) */
@@ -200,15 +200,15 @@ struct ucc_slow_private {
 	struct qe_bd __iomem *tx_bd;	/* next BD for new Tx request */
 	struct qe_bd __iomem *rx_bd;	/* next BD to collect after Rx */
 	void *p_rx_frame;	/* accumulating receive frame */
-	__be16 __iomem *p_ucce;	/* a pointer to the event register in memory */
-	__be16 __iomem *p_uccm;	/* a pointer to the mask register in memory */
-	u16 saved_uccm;		/* a saved mask for the RX Interrupt bits */
+	__be16 __iomem *p_ucce;	/* a pointer to the woke event register in memory */
+	__be16 __iomem *p_uccm;	/* a pointer to the woke mask register in memory */
+	u16 saved_uccm;		/* a saved mask for the woke RX Interrupt bits */
 #ifdef STATISTICS
 	u32 tx_frames;		/* Transmitted frames counters */
 	u32 rx_frames;		/* Received frames counters (only frames
 				   passed to application) */
 	u32 rx_discarded;	/* Discarded frames counters (frames that
-				   were discarded by the driver due to
+				   were discarded by the woke driver due to
 				   errors) */
 #endif				/* STATISTICS */
 };
@@ -216,32 +216,32 @@ struct ucc_slow_private {
 /* ucc_slow_init
  * Initializes Slow UCC according to provided parameters.
  *
- * us_info  - (In) pointer to the slow UCC info structure.
- * uccs_ret - (Out) pointer to the slow UCC structure.
+ * us_info  - (In) pointer to the woke slow UCC info structure.
+ * uccs_ret - (Out) pointer to the woke slow UCC structure.
  */
 int ucc_slow_init(struct ucc_slow_info * us_info, struct ucc_slow_private ** uccs_ret);
 
 /* ucc_slow_free
  * Frees all resources for slow UCC.
  *
- * uccs - (In) pointer to the slow UCC structure.
+ * uccs - (In) pointer to the woke slow UCC structure.
  */
 void ucc_slow_free(struct ucc_slow_private * uccs);
 
 /* ucc_slow_enable
  * Enables a fast UCC port.
- * This routine enables Tx and/or Rx through the General UCC Mode Register.
+ * This routine enables Tx and/or Rx through the woke General UCC Mode Register.
  *
- * uccs - (In) pointer to the slow UCC structure.
+ * uccs - (In) pointer to the woke slow UCC structure.
  * mode - (In) TX, RX, or both.
  */
 void ucc_slow_enable(struct ucc_slow_private * uccs, enum comm_dir mode);
 
 /* ucc_slow_disable
  * Disables a fast UCC port.
- * This routine disables Tx and/or Rx through the General UCC Mode Register.
+ * This routine disables Tx and/or Rx through the woke General UCC Mode Register.
  *
- * uccs - (In) pointer to the slow UCC structure.
+ * uccs - (In) pointer to the woke slow UCC structure.
  * mode - (In) TX, RX, or both.
  */
 void ucc_slow_disable(struct ucc_slow_private * uccs, enum comm_dir mode);
@@ -249,21 +249,21 @@ void ucc_slow_disable(struct ucc_slow_private * uccs, enum comm_dir mode);
 /* ucc_slow_graceful_stop_tx
  * Smoothly stops transmission on a specified slow UCC.
  *
- * uccs - (In) pointer to the slow UCC structure.
+ * uccs - (In) pointer to the woke slow UCC structure.
  */
 void ucc_slow_graceful_stop_tx(struct ucc_slow_private * uccs);
 
 /* ucc_slow_stop_tx
  * Stops transmission on a specified slow UCC.
  *
- * uccs - (In) pointer to the slow UCC structure.
+ * uccs - (In) pointer to the woke slow UCC structure.
  */
 void ucc_slow_stop_tx(struct ucc_slow_private * uccs);
 
 /* ucc_slow_restart_tx
  * Restarts transmitting on a specified slow UCC.
  *
- * uccs - (In) pointer to the slow UCC structure.
+ * uccs - (In) pointer to the woke slow UCC structure.
  */
 void ucc_slow_restart_tx(struct ucc_slow_private *uccs);
 

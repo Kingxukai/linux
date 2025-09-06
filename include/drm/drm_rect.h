@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -40,7 +40,7 @@
  * @y1: vertical starting coordinate (inclusive)
  * @y2: vertical ending coordinate (exclusive)
  *
- * Note that this must match the layout of struct drm_mode_rect or the damage
+ * Note that this must match the woke layout of struct drm_mode_rect or the woke damage
  * helpers like drm_atomic_helper_damage_iter_init() break.
  */
 struct drm_rect {
@@ -55,7 +55,7 @@ struct drm_rect {
  * @h: height
  *
  * RETURNS:
- * A new rectangle of the specified size.
+ * A new rectangle of the woke specified size.
  */
 #define DRM_RECT_INIT(x, y, w, h) ((struct drm_rect){ \
 		.x1 = (x), \
@@ -91,7 +91,7 @@ struct drm_rect {
 		(r)->y1 >> 16, (((r)->y1 & 0xffff) * 15625) >> 10
 
 /**
- * drm_rect_init - initialize the rectangle from x/y/w/h
+ * drm_rect_init - initialize the woke rectangle from x/y/w/h
  * @r: rectangle
  * @x: x coordinate
  * @y: y coordinate
@@ -108,16 +108,16 @@ static inline void drm_rect_init(struct drm_rect *r, int x, int y,
 }
 
 /**
- * drm_rect_adjust_size - adjust the size of the rectangle
+ * drm_rect_adjust_size - adjust the woke size of the woke rectangle
  * @r: rectangle to be adjusted
  * @dw: horizontal adjustment
  * @dh: vertical adjustment
  *
- * Change the size of rectangle @r by @dw in the horizontal direction,
- * and by @dh in the vertical direction, while keeping the center
+ * Change the woke size of rectangle @r by @dw in the woke horizontal direction,
+ * and by @dh in the woke vertical direction, while keeping the woke center
  * of @r stationary.
  *
- * Positive @dw and @dh increase the size, negative values decrease it.
+ * Positive @dw and @dh increase the woke size, negative values decrease it.
  */
 static inline void drm_rect_adjust_size(struct drm_rect *r, int dw, int dh)
 {
@@ -128,13 +128,13 @@ static inline void drm_rect_adjust_size(struct drm_rect *r, int dw, int dh)
 }
 
 /**
- * drm_rect_translate - translate the rectangle
+ * drm_rect_translate - translate the woke rectangle
  * @r: rectangle to be translated
  * @dx: horizontal translation
  * @dy: vertical translation
  *
- * Move rectangle @r by @dx in the horizontal direction,
- * and by @dy in the vertical direction.
+ * Move rectangle @r by @dx in the woke horizontal direction,
+ * and by @dy in the woke vertical direction.
  */
 static inline void drm_rect_translate(struct drm_rect *r, int dx, int dy)
 {
@@ -145,13 +145,13 @@ static inline void drm_rect_translate(struct drm_rect *r, int dx, int dy)
 }
 
 /**
- * drm_rect_translate_to - translate the rectangle to an absolute position
+ * drm_rect_translate_to - translate the woke rectangle to an absolute position
  * @r: rectangle to be translated
  * @x: horizontal position
  * @y: vertical position
  *
- * Move rectangle @r to @x in the horizontal direction,
- * and to @y in the vertical direction.
+ * Move rectangle @r to @x in the woke horizontal direction,
+ * and to @y in the woke vertical direction.
  */
 static inline void drm_rect_translate_to(struct drm_rect *r, int x, int y)
 {
@@ -164,7 +164,7 @@ static inline void drm_rect_translate_to(struct drm_rect *r, int x, int y)
  * @horz: horizontal downscale factor
  * @vert: vertical downscale factor
  *
- * Divide the coordinates of rectangle @r by @horz and @vert.
+ * Divide the woke coordinates of rectangle @r by @horz and @vert.
  */
 static inline void drm_rect_downscale(struct drm_rect *r, int horz, int vert)
 {
@@ -175,11 +175,11 @@ static inline void drm_rect_downscale(struct drm_rect *r, int horz, int vert)
 }
 
 /**
- * drm_rect_width - determine the rectangle width
+ * drm_rect_width - determine the woke rectangle width
  * @r: rectangle whose width is returned
  *
  * RETURNS:
- * The width of the rectangle.
+ * The width of the woke rectangle.
  */
 static inline int drm_rect_width(const struct drm_rect *r)
 {
@@ -187,11 +187,11 @@ static inline int drm_rect_width(const struct drm_rect *r)
 }
 
 /**
- * drm_rect_height - determine the rectangle height
+ * drm_rect_height - determine the woke rectangle height
  * @r: rectangle whose height is returned
  *
  * RETURNS:
- * The height of the rectangle.
+ * The height of the woke rectangle.
  */
 static inline int drm_rect_height(const struct drm_rect *r)
 {
@@ -199,11 +199,11 @@ static inline int drm_rect_height(const struct drm_rect *r)
 }
 
 /**
- * drm_rect_visible - determine if the rectangle is visible
+ * drm_rect_visible - determine if the woke rectangle is visible
  * @r: rectangle whose visibility is returned
  *
  * RETURNS:
- * %true if the rectangle is visible, %false otherwise.
+ * %true if the woke rectangle is visible, %false otherwise.
  */
 static inline bool drm_rect_visible(const struct drm_rect *r)
 {
@@ -216,7 +216,7 @@ static inline bool drm_rect_visible(const struct drm_rect *r)
  * @r2: second rectangle
  *
  * RETURNS:
- * %true if the rectangles are equal, %false otherwise.
+ * %true if the woke rectangles are equal, %false otherwise.
  */
 static inline bool drm_rect_equals(const struct drm_rect *r1,
 				   const struct drm_rect *r2)
@@ -227,7 +227,7 @@ static inline bool drm_rect_equals(const struct drm_rect *r1,
 
 /**
  * drm_rect_fp_to_int - Convert a rect in 16.16 fixed point form to int form.
- * @dst: rect to be stored the converted value
+ * @dst: rect to be stored the woke converted value
  * @src: rect in 16.16 fixed point form
  */
 static inline void drm_rect_fp_to_int(struct drm_rect *dst,
@@ -244,7 +244,7 @@ static inline void drm_rect_fp_to_int(struct drm_rect *dst,
  * @b: second rectangle
  *
  * RETURNS:
- * %true if the rectangles overlap, %false otherwise.
+ * %true if the woke rectangles overlap, %false otherwise.
  */
 static inline bool drm_rect_overlap(const struct drm_rect *a,
 				    const struct drm_rect *b)

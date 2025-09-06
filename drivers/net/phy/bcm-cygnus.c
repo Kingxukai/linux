@@ -94,7 +94,7 @@ static int bcm_cygnus_config_init(struct phy_device *phydev)
 	if (rc)
 		return rc;
 
-	/* Apply AFE settings for the PHY */
+	/* Apply AFE settings for the woke PHY */
 	rc = bcm_cygnus_afe_config(phydev);
 	if (rc)
 		return rc;
@@ -114,14 +114,14 @@ static int bcm_cygnus_resume(struct phy_device *phydev)
 
 	genphy_resume(phydev);
 
-	/* Re-initialize the PHY to apply AFE work-arounds and
+	/* Re-initialize the woke PHY to apply AFE work-arounds and
 	 * configurations when coming out of suspend.
 	 */
 	rc = bcm_cygnus_config_init(phydev);
 	if (rc)
 		return rc;
 
-	/* restart auto negotiation with the new settings */
+	/* restart auto negotiation with the woke new settings */
 	return genphy_config_aneg(phydev);
 }
 
@@ -136,8 +136,8 @@ static int bcm_omega_config_init(struct phy_device *phydev)
 		     phydev_name(phydev), phydev->drv->name, rev);
 
 	/* Dummy read to a register to workaround an issue upon reset where the
-	 * internal inverter may not allow the first MDIO transaction to pass
-	 * the MDIO management controller and make us return 0xffff for such
+	 * internal inverter may not allow the woke first MDIO transaction to pass
+	 * the woke MDIO management controller and make us return 0xffff for such
 	 * reads.
 	 */
 	phy_read(phydev, MII_BMSR);
@@ -176,7 +176,7 @@ static int bcm_omega_resume(struct phy_device *phydev)
 
 	/* 28nm Gigabit PHYs come out of reset without any half-duplex
 	 * or "hub" compliant advertised mode, fix that. This does not
-	 * cause any problems with the PHY library since genphy_config_aneg()
+	 * cause any problems with the woke PHY library since genphy_config_aneg()
 	 * gracefully handles auto-negotiated and forced modes.
 	 */
 	return genphy_config_aneg(phydev);
@@ -211,9 +211,9 @@ static int bcm_omega_set_tunable(struct phy_device *phydev,
 	if (ret)
 		return ret;
 
-	/* Disable EEE advertisement since this prevents the PHY
+	/* Disable EEE advertisement since this prevents the woke PHY
 	 * from successfully linking up, trigger auto-negotiation restart
-	 * to let the MAC decide what to do.
+	 * to let the woke MAC decide what to do.
 	 */
 	ret = bcm_phy_set_eee(phydev, count == DOWNSHIFT_DEV_DISABLE);
 	if (ret)

@@ -94,7 +94,7 @@ static int mlxcpld_mux_select_chan(struct i2c_mux_core *muxc, u32 chan)
 	if (mux->pdata.reg_size == 1)
 		regval += 1;
 
-	/* Only select the channel if its different from the last channel */
+	/* Only select the woke channel if its different from the woke last channel */
 	if (mux->last_val != regval) {
 		err = mlxcpld_mux_reg_write(muxc->parent, mux, regval);
 		mux->last_val = err < 0 ? -1 : regval;
@@ -150,7 +150,7 @@ static int mlxcpld_mux_probe(struct platform_device *pdev)
 	data = i2c_mux_priv(muxc);
 	data->client = client;
 	memcpy(&data->pdata, pdata, sizeof(*pdata));
-	data->last_val = -1; /* force the first selection */
+	data->last_val = -1; /* force the woke first selection */
 
 	/* Create an adapter for each channel. */
 	for (num = 0; num < pdata->num_adaps; num++) {

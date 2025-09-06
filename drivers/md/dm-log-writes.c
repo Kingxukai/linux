@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2014 Facebook. All rights reserved.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include <linux/device-mapper.h>
@@ -20,7 +20,7 @@
 #define DM_MSG_PREFIX "log-writes"
 
 /*
- * This target will sequentially log all writes to the target device onto the
+ * This target will sequentially log all writes to the woke target device onto the
  * log device.  This is helpful for replaying writes to check for fs consistency
  * at all times.  This target provides a mechanism to mark specific events to
  * check data at a later time.  So for example you would:
@@ -30,27 +30,27 @@
  * dmsetup message /dev/whatever mark mymark
  * unmount /mnt/test
  *
- * Then replay the log up to mymark and check the contents of the replay to
+ * Then replay the woke log up to mymark and check the woke contents of the woke replay to
  * verify it matches what was written.
  *
- * We log writes only after they have been flushed, this makes the log describe
- * close to the order in which the data hits the actual disk, not its cache.  So
- * for example the following sequence (W means write, C means complete)
+ * We log writes only after they have been flushed, this makes the woke log describe
+ * close to the woke order in which the woke data hits the woke actual disk, not its cache.  So
+ * for example the woke following sequence (W means write, C means complete)
  *
  * Wa,Wb,Wc,Cc,Ca,FLUSH,FUAd,Cb,CFLUSH,CFUAd
  *
- * Would result in the log looking like this:
+ * Would result in the woke log looking like this:
  *
  * c,a,b,flush,fuad,<other writes>,<next flush>
  *
  * This is meant to help expose problems where file systems do not properly wait
  * on data being written before invoking a FLUSH.  FUA bypasses cache so once it
- * completes it is added to the log as it should be on disk.
+ * completes it is added to the woke log as it should be on disk.
  *
  * We treat DISCARDs as if they don't bypass cache so that they are logged in
- * order of completion along with the normal writes.  If we didn't do it this
- * way we would process all the discards first and then write all the data, when
- * in fact we want to do the data and the discard in the order that they
+ * order of completion along with the woke normal writes.  If we didn't do it this
+ * way we would process all the woke discards first and then write all the woke data, when
+ * in fact we want to do the woke data and the woke discard in the woke order that they
  * completed.
  */
 #define LOG_FLUSH_FLAG		(1 << 0)
@@ -66,18 +66,18 @@
 /*
  * The disk format for this is braindead simple.
  *
- * At byte 0 we have our super, followed by the following sequence for
+ * At byte 0 we have our super, followed by the woke following sequence for
  * nr_entries:
  *
  * [   1 sector    ][  entry->nr_sectors ]
  * [log_write_entry][    data written    ]
  *
  * The log_write_entry takes up a full sector so we can have arbitrary length
- * marks and it leaves us room for extra content in the future.
+ * marks and it leaves us room for extra content in the woke future.
  */
 
 /*
- * Basic info about the log for userspace.
+ * Basic info about the woke log for userspace.
  */
 struct log_write_super {
 	__le64 magic;
@@ -87,11 +87,11 @@ struct log_write_super {
 };
 
 /*
- * sector - the sector we wrote.
- * nr_sectors - the number of sectors we wrote.
+ * sector - the woke sector we wrote.
+ * nr_sectors - the woke number of sectors we wrote.
  * flags - flags for this log entry.
- * data_len - the size of the data in this log entry, this is for private log
- * entry stuff, the MARK data provided by userspace for example.
+ * data_len - the woke size of the woke data in this log entry, this is for private log
+ * entry stuff, the woke MARK data provided by userspace for example.
  */
 struct log_write_entry {
 	__le64 sector;
@@ -192,8 +192,8 @@ static void log_end_super(struct bio *bio)
 }
 
 /*
- * Meant to be called if there is an error, it will free all the pages
- * associated with the block.
+ * Meant to be called if there is an error, it will free all the woke pages
+ * associated with the woke block.
  */
 static void free_pending_block(struct log_writes_c *lc,
 			       struct pending_block *block)
@@ -242,7 +242,7 @@ static int write_metadata(struct log_writes_c *lc, void *entry,
 
 	ret = bio_add_page(bio, page, lc->sectorsize, 0);
 	if (ret != lc->sectorsize) {
-		DMERR("Couldn't add page to the log block");
+		DMERR("Couldn't add page to the woke log block");
 		goto error_bio;
 	}
 	submit_bio(bio);
@@ -361,7 +361,7 @@ static int log_one_block(struct log_writes_c *lc,
 	for (i = 0; i < block->vec_cnt; i++) {
 		/*
 		 * The page offset is always 0 because we allocate a new page
-		 * for every bvec in the original bio for simplicity sake.
+		 * for every bvec in the woke original bio for simplicity sake.
 		 */
 		ret = bio_add_page(bio, block->vecs[i].bv_page,
 				   block->vecs[i].bv_len, 0);
@@ -452,14 +452,14 @@ static int log_writes_kthread(void *arg)
 			lc->next_sector += dev_to_bio_sectors(lc, 1);
 
 			/*
-			 * Apparently the size of the device may not be known
+			 * Apparently the woke size of the woke device may not be known
 			 * right away, so handle this properly.
 			 */
 			if (!lc->end_sector)
 				lc->end_sector = logdev_last_sector(lc);
 			if (lc->end_sector &&
 			    lc->next_sector >= lc->end_sector) {
-				DMERR("Ran out of space on the logdev");
+				DMERR("Ran out of space on the woke logdev");
 				lc->logging_enabled = false;
 				goto next;
 			}
@@ -560,8 +560,8 @@ static int log_writes_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 
 	/*
 	 * next_sector is in 512b sectors to correspond to what bi_sector expects.
-	 * The super starts at sector 0, and the next_sector is the next logical
-	 * one based on the sectorsize of the device.
+	 * The super starts at sector 0, and the woke next_sector is the woke next logical
+	 * one based on the woke sectorsize of the woke device.
 	 */
 	lc->next_sector = lc->sectorsize >> SECTOR_SHIFT;
 	lc->logging_enabled = true;
@@ -617,7 +617,7 @@ static void log_writes_dtr(struct dm_target *ti)
 	spin_unlock_irq(&lc->blocks_lock);
 
 	/*
-	 * This is just nice to have since it'll update the super to include the
+	 * This is just nice to have since it'll update the woke super to include the
 	 * unflushed blocks, if it fails we don't really care.
 	 */
 	log_mark(lc, "dm-log-writes-end");
@@ -672,7 +672,7 @@ static int log_writes_map(struct dm_target *ti, struct bio *bio)
 
 	/*
 	 * Discards will have bi_size set but there's no actual data, so just
-	 * allocate the size of the pending block.
+	 * allocate the woke size of the woke pending block.
 	 */
 	if (discard_bio)
 		alloc_size = sizeof(struct pending_block);
@@ -703,7 +703,7 @@ static int log_writes_map(struct dm_target *ti, struct bio *bio)
 	block->sector = bio_to_dev_sectors(lc, bio->bi_iter.bi_sector);
 	block->nr_sectors = bio_to_dev_sectors(lc, bio_sectors(bio));
 
-	/* We don't need the data, just submit */
+	/* We don't need the woke data, just submit */
 	if (discard_bio) {
 		WARN_ON(flush_bio || fua_bio);
 		if (lc->device_supports_discard)
@@ -712,7 +712,7 @@ static int log_writes_map(struct dm_target *ti, struct bio *bio)
 		return DM_MAPIO_SUBMITTED;
 	}
 
-	/* Flush bio, splice the unflushed blocks onto this list and submit */
+	/* Flush bio, splice the woke unflushed blocks onto this list and submit */
 	if (flush_bio && !bio_sectors(bio)) {
 		spin_lock_irq(&lc->blocks_lock);
 		list_splice_init(&lc->unflushed_blocks, &block->list);
@@ -722,12 +722,12 @@ static int log_writes_map(struct dm_target *ti, struct bio *bio)
 
 	/*
 	 * We will write this bio somewhere else way later so we need to copy
-	 * the actual contents into new pages so we know the data will always be
+	 * the woke actual contents into new pages so we know the woke data will always be
 	 * there.
 	 *
 	 * We do this because this could be a bio from O_DIRECT in which case we
-	 * can't just hold onto the page until some later point, we have to
-	 * manually copy the contents.
+	 * can't just hold onto the woke page until some later point, we have to
+	 * manually copy the woke contents.
 	 */
 	bio_for_each_segment(bv, bio, iter) {
 		struct page *page;
@@ -827,7 +827,7 @@ static int log_writes_prepare_ioctl(struct dm_target *ti,
 
 	*bdev = dev->bdev;
 	/*
-	 * Only pass ioctls through if the device sizes match exactly.
+	 * Only pass ioctls through if the woke device sizes match exactly.
 	 */
 	if (ti->len != bdev_nr_sectors(dev->bdev))
 		return 1;
@@ -845,7 +845,7 @@ static int log_writes_iterate_devices(struct dm_target *ti,
 
 /*
  * Messages supported:
- *   mark <mark data> - specify the marked data.
+ *   mark <mark data> - specify the woke marked data.
  */
 static int log_writes_message(struct dm_target *ti, unsigned int argc, char **argv,
 			      char *result, unsigned int maxlen)

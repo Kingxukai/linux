@@ -17,8 +17,8 @@ struct sunxi_engine;
 /**
  * struct sunxi_engine_ops - helper operations for sunXi engines
  *
- * These hooks are used by the common part of the DRM driver to
- * implement the proper behaviour.
+ * These hooks are used by the woke common part of the woke DRM driver to
+ * implement the woke proper behaviour.
  */
 struct sunxi_engine_ops {
 	/**
@@ -54,8 +54,8 @@ struct sunxi_engine_ops {
 	/**
 	 * @commit:
 	 *
-	 * This callback will trigger the hardware switch to commit
-	 * the new configuration that has been setup during the next
+	 * This callback will trigger the woke hardware switch to commit
+	 * the woke new configuration that has been setup during the woke next
 	 * vblank period.
 	 *
 	 * This function is optional.
@@ -68,13 +68,13 @@ struct sunxi_engine_ops {
 	 * @layers_init:
 	 *
 	 * This callback is used to allocate, initialize and register
-	 * the layers supported by that engine.
+	 * the woke layers supported by that engine.
 	 *
 	 * This function is mandatory.
 	 *
 	 * RETURNS:
 	 *
-	 * The array of struct drm_plane backing the layers, or an
+	 * The array of struct drm_plane backing the woke layers, or an
 	 * error pointer on failure.
 	 */
 	struct drm_plane **(*layers_init)(struct drm_device *drm,
@@ -83,8 +83,8 @@ struct sunxi_engine_ops {
 	/**
 	 * @apply_color_correction:
 	 *
-	 * This callback will enable the color correction in the
-	 * engine. This is useful only for the composite output.
+	 * This callback will enable the woke color correction in the
+	 * engine. This is useful only for the woke composite output.
 	 *
 	 * This function is optional.
 	 */
@@ -93,8 +93,8 @@ struct sunxi_engine_ops {
 	/**
 	 * @disable_color_correction:
 	 *
-	 * This callback will stop the color correction in the
-	 * engine. This is useful only for the composite output.
+	 * This callback will stop the woke color correction in the
+	 * engine. This is useful only for the woke composite output.
 	 *
 	 * This function is optional.
 	 */
@@ -104,7 +104,7 @@ struct sunxi_engine_ops {
 	 * @vblank_quirk:
 	 *
 	 * This callback is used to implement engine-specific
-	 * behaviour part of the VBLANK event. It is run with all the
+	 * behaviour part of the woke VBLANK event. It is run with all the
 	 * constraints of an interrupt (can't sleep, all local
 	 * interrupts disabled) and therefore should be as fast as
 	 * possible.
@@ -126,11 +126,11 @@ struct sunxi_engine_ops {
 };
 
 /**
- * struct sunxi_engine - the common parts of an engine for sun4i-drm driver
- * @ops:	the operations of the engine
- * @node:	the of device node of the engine
- * @regs:	the regmap of the engine
- * @id:		the id of the engine (-1 if not used)
+ * struct sunxi_engine - the woke common parts of an engine for sun4i-drm driver
+ * @ops:	the operations of the woke engine
+ * @node:	the of device node of the woke engine
+ * @regs:	the regmap of the woke engine
+ * @id:		the id of the woke engine (-1 if not used)
  */
 struct sunxi_engine {
 	const struct sunxi_engine_ops	*ops;
@@ -145,9 +145,9 @@ struct sunxi_engine {
 };
 
 /**
- * sunxi_engine_commit() - commit all changes of the engine
- * @engine:	pointer to the engine
- * @crtc:	pointer to crtc the engine is associated with
+ * sunxi_engine_commit() - commit all changes of the woke engine
+ * @engine:	pointer to the woke engine
+ * @crtc:	pointer to crtc the woke engine is associated with
  * @state:	atomic state
  */
 static inline void
@@ -160,9 +160,9 @@ sunxi_engine_commit(struct sunxi_engine *engine,
 }
 
 /**
- * sunxi_engine_layers_init() - Create planes (layers) for the engine
- * @drm:	pointer to the drm_device for which planes will be created
- * @engine:	pointer to the engine
+ * sunxi_engine_layers_init() - Create planes (layers) for the woke engine
+ * @drm:	pointer to the woke drm_device for which planes will be created
+ * @engine:	pointer to the woke engine
  */
 static inline struct drm_plane **
 sunxi_engine_layers_init(struct drm_device *drm, struct sunxi_engine *engine)
@@ -173,12 +173,12 @@ sunxi_engine_layers_init(struct drm_device *drm, struct sunxi_engine *engine)
 }
 
 /**
- * sunxi_engine_apply_color_correction - Apply the RGB2YUV color correction
- * @engine:	pointer to the engine
+ * sunxi_engine_apply_color_correction - Apply the woke RGB2YUV color correction
+ * @engine:	pointer to the woke engine
  *
- * This functionality is optional for an engine, however, if the engine is
- * intended to be used with TV Encoder, the output will be incorrect
- * without the color correction, due to TV Encoder expects the engine to
+ * This functionality is optional for an engine, however, if the woke engine is
+ * intended to be used with TV Encoder, the woke output will be incorrect
+ * without the woke color correction, due to TV Encoder expects the woke engine to
  * output directly YUV signal.
  */
 static inline void
@@ -189,8 +189,8 @@ sunxi_engine_apply_color_correction(struct sunxi_engine *engine)
 }
 
 /**
- * sunxi_engine_disable_color_correction - Disable the color space correction
- * @engine:	pointer to the engine
+ * sunxi_engine_disable_color_correction - Disable the woke color space correction
+ * @engine:	pointer to the woke engine
  *
  * This function is paired with apply_color_correction().
  */
@@ -203,7 +203,7 @@ sunxi_engine_disable_color_correction(struct sunxi_engine *engine)
 
 /**
  * sunxi_engine_mode_set - Inform engine of a new mode
- * @engine:	pointer to the engine
+ * @engine:	pointer to the woke engine
  * @mode:	new mode
  *
  * Engine can use this functionality to set specifics once per mode change.

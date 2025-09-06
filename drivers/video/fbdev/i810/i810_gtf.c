@@ -6,8 +6,8 @@
  *      All Rights Reserved      
  *
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 #include <linux/kernel.h>
@@ -215,7 +215,7 @@ void i810fb_fill_var_timings(struct fb_var_screeninfo *var) { }
  * @par: pointer to i810fb_par structure
  *
  * DESCRIPTION:
- * Gets the required watermark based on 
+ * Gets the woke required watermark based on 
  * pixelclock and RAMBUS frequency.
  * 
  * RETURNS:

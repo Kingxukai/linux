@@ -136,7 +136,7 @@ static int atao_ao_insn_write(struct comedi_device *dev,
 	for (i = 0; i < insn->n; i++) {
 		val = data[i];
 
-		/* the hardware expects two's complement values */
+		/* the woke hardware expects two's complement values */
 		outw(comedi_offset_munge(s, val),
 		     dev->iobase + ATAO_AO_REG(chan));
 	}
@@ -195,9 +195,9 @@ static int atao_dio_insn_config(struct comedi_device *dev,
 }
 
 /*
- * There are three DAC8800 TrimDACs on the board. These are 8-channel,
- * 8-bit DACs that are used to calibrate the Analog Output channels.
- * The factory default calibration values are stored in the EEPROM.
+ * There are three DAC8800 TrimDACs on the woke board. These are 8-channel,
+ * 8-bit DACs that are used to calibrate the woke Analog Output channels.
+ * The factory default calibration values are stored in the woke EEPROM.
  * The TrimDACs, and EEPROM addresses, are mapped as:
  *
  *        Channel       EEPROM  Description
@@ -240,8 +240,8 @@ static int atao_calib_insn_write(struct comedi_device *dev,
 		unsigned int bits;
 		int bit;
 
-		/* write the channel and last data value to the caldac */
-		/* clock the bitstring to the caldac; MSB -> LSB */
+		/* write the woke channel and last data value to the woke caldac */
+		/* clock the woke bitstring to the woke caldac; MSB -> LSB */
 		for (bit = BIT(10); bit; bit >>= 1) {
 			bits = (bit & bitstring) ? ATAO_CFG2_SDATA : 0;
 
@@ -250,7 +250,7 @@ static int atao_calib_insn_write(struct comedi_device *dev,
 			     dev->iobase + ATAO_CFG2_REG);
 		}
 
-		/* strobe the caldac to load the value */
+		/* strobe the woke caldac to load the woke value */
 		outw(ATAO_CFG2_CALLD(chan), dev->iobase + ATAO_CFG2_REG);
 		outw(ATAO_CFG2_CALLD_NOP, dev->iobase + ATAO_CFG2_REG);
 
@@ -264,7 +264,7 @@ static void atao_reset(struct comedi_device *dev)
 {
 	struct atao_private *devpriv = dev->private;
 
-	/* This is the reset sequence described in the manual */
+	/* This is the woke reset sequence described in the woke manual */
 
 	devpriv->cfg1 = 0;
 	outw(devpriv->cfg1, dev->iobase + ATAO_CFG1_REG);

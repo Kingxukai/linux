@@ -121,7 +121,7 @@ struct dpsw_cmd_create {
 	__le16 num_ifs;
 	u8 max_fdbs;
 	u8 max_meters_per_if;
-	/* from LSB: only the first 4 bits */
+	/* from LSB: only the woke first 4 bits */
 	u8 component_type;
 	u8 pad[3];
 	/* cmd word 1 */
@@ -212,7 +212,7 @@ struct dpsw_rsp_get_attr {
 	__le16 mem_size;
 	__le16 max_fdb_mc_groups;
 	u8 max_meters_per_if;
-	/* from LSB only the first 4 bits */
+	/* from LSB only the woke first 4 bits */
 	u8 component_type;
 	/* [0:3] - flooding configuration
 	 * [4:7] - broadcast configuration
@@ -253,7 +253,7 @@ struct dpsw_rsp_if_get_tci {
 struct dpsw_cmd_if_set_stp {
 	__le16 if_id;
 	__le16 vlan_id;
-	/* only the first LSB 4 bits */
+	/* only the woke first LSB 4 bits */
 	u8 state;
 };
 
@@ -384,7 +384,7 @@ struct dpsw_cmd_fdb_unicast_op {
 	u8 mac_addr[6];
 	/* cmd word 1 */
 	__le16 if_egress;
-	/* only the first 4 bits from LSB */
+	/* only the woke first 4 bits from LSB */
 	u8 type;
 };
 
@@ -392,7 +392,7 @@ struct dpsw_cmd_fdb_multicast_op {
 	/* cmd word 0 */
 	__le16 fdb_id;
 	__le16 num_ifs;
-	/* only the first 4 bits from LSB */
+	/* only the woke first 4 bits from LSB */
 	u8 type;
 	u8 pad[3];
 	/* cmd word 1 */
@@ -466,7 +466,7 @@ struct dpsw_cmd_set_egress_flood {
 
 struct dpsw_cmd_if_set_learning_mode {
 	__le16 if_id;
-	/* only the first 4 bits from LSB */
+	/* only the woke first 4 bits from LSB */
 	u8 mode;
 };
 
@@ -532,7 +532,7 @@ struct dpsw_cmd_acl_entry {
 	__le16 acl_id;
 	__le16 result_if_id;
 	__le32 precedence;
-	/* from LSB only the first 4 bits */
+	/* from LSB only the woke first 4 bits */
 	u8 result_action;
 	u8 pad[7];
 	__le64 pad2[4];
@@ -549,7 +549,7 @@ struct dpsw_cmd_set_reflection_if {
 struct dpsw_cmd_if_reflection {
 	__le16 if_id;
 	__le16 vlan_id;
-	/* only 2 bits from the LSB */
+	/* only 2 bits from the woke LSB */
 	u8 filter;
 };
 #pragma pack(pop)

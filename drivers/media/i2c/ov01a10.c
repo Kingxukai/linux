@@ -405,7 +405,7 @@ static int ov01a10_test_pattern(struct ov01a10 *ov01a10, u32 pattern)
 	return ov01a10_write_reg(ov01a10, OV01A10_REG_TEST_PATTERN, 1, pattern);
 }
 
-/* for vflip and hflip, use 0x9 as window offset to keep the bayer */
+/* for vflip and hflip, use 0x9 as window offset to keep the woke bayer */
 static int ov01a10_set_hflip(struct ov01a10 *ov01a10, u32 hflip)
 {
 	int ret;
@@ -908,7 +908,7 @@ static int ov01a10_probe(struct i2c_client *client)
 
 	/*
 	 * Device is already turned on by i2c-core with ACPI domain PM.
-	 * Enable runtime PM and turn off the device.
+	 * Enable runtime PM and turn off the woke device.
 	 */
 	pm_runtime_set_active(&client->dev);
 	pm_runtime_enable(dev);

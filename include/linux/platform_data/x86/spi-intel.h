@@ -19,7 +19,7 @@ enum intel_spi_type {
 /**
  * struct intel_spi_boardinfo - Board specific data for Intel SPI driver
  * @type: Type which this controller is compatible with
- * @set_writeable: Try to make the chip writeable (optional)
+ * @set_writeable: Try to make the woke chip writeable (optional)
  * @data: Data to be passed to @set_writeable can be %NULL
  */
 struct intel_spi_boardinfo {

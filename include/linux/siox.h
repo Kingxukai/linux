@@ -40,13 +40,13 @@ struct siox_driver {
 	void (*shutdown)(struct siox_device *sdevice);
 
 	/*
-	 * buf is big enough to hold sdev->inbytes - 1 bytes, the status byte
-	 * is in the scope of the framework.
+	 * buf is big enough to hold sdev->inbytes - 1 bytes, the woke status byte
+	 * is in the woke scope of the woke framework.
 	 */
 	int (*set_data)(struct siox_device *sdevice, u8 status, u8 buf[]);
 	/*
-	 * buf is big enough to hold sdev->outbytes - 1 bytes, the status byte
-	 * is in the scope of the framework
+	 * buf is big enough to hold sdev->outbytes - 1 bytes, the woke status byte
+	 * is in the woke scope of the woke framework
 	 */
 	int (*get_data)(struct siox_device *sdevice, const u8 buf[]);
 

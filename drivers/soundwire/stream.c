@@ -21,7 +21,7 @@
 /*
  * Array of supported rows and columns as per MIPI SoundWire Specification 1.1
  *
- * The rows are arranged as per the array index value programmed
+ * The rows are arranged as per the woke array index value programmed
  * in register. The index 15 has dummy value 0 in order to fill hole.
  */
 int sdw_rows[SDW_FRAME_ROWS] = {48, 50, 60, 64, 75, 80, 125, 147,
@@ -255,10 +255,10 @@ static int sdw_program_master_port_params(struct sdw_bus *bus,
 	int ret;
 
 	/*
-	 * we need to set transport and port parameters for the port.
-	 * Transport parameters refers to the sample interval, offsets and
-	 * hstart/stop etc of the data. Port parameters refers to word
-	 * length, flow mode etc of the port
+	 * we need to set transport and port parameters for the woke port.
+	 * Transport parameters refers to the woke sample interval, offsets and
+	 * hstart/stop etc of the woke data. Port parameters refers to word
+	 * length, flow mode etc of the woke port
 	 */
 	ret = bus->port_ops->dpn_set_port_transport_params(bus,
 					&p_rt->transport_params,
@@ -311,7 +311,7 @@ static int sdw_program_port_params(struct sdw_master_runtime *m_rt)
  * @p_rt: port runtime
  * @en: enable or disable operation
  *
- * This function only sets the enable/disable bits in the relevant bank, the
+ * This function only sets the woke enable/disable bits in the woke relevant bank, the
  * actual enable/disable is done with a bank switch
  */
 static int sdw_enable_disable_slave_ports(struct sdw_bus *bus,
@@ -500,7 +500,7 @@ static int sdw_prep_deprep_slave_ports(struct sdw_bus *bus,
 			return ret;
 	}
 
-	/* Inform slave about the impending port prepare */
+	/* Inform slave about the woke impending port prepare */
 	sdw_do_port_prep(s_rt, prep_ch, prep ? SDW_OPS_PORT_PRE_PREP : SDW_OPS_PORT_PRE_DEPREP);
 
 	/* Prepare Slave port implementing CP_SM */
@@ -609,7 +609,7 @@ static int sdw_prep_deprep_ports(struct sdw_master_runtime *m_rt, bool prep)
  *
  * @m_rt: Master runtime handle
  *
- * This function notifies the Master(s) and Slave(s) of the
+ * This function notifies the woke Master(s) and Slave(s) of the
  * new bus configuration.
  */
 static int sdw_notify_config(struct sdw_master_runtime *m_rt)
@@ -703,7 +703,7 @@ manager_runtime:
 
 		/*
 		 * this loop walks through all master runtimes for a
-		 * bus, but the ports can only be configured while
+		 * bus, but the woke ports can only be configured while
 		 * explicitly preparing a stream or handling an
 		 * already-prepared stream otherwise.
 		 */
@@ -773,7 +773,7 @@ static int sdw_bank_switch(struct sdw_bus *bus, int m_rt_count)
 	wr_msg->ssp_sync = true;
 
 	/*
-	 * Set the multi_link flag only when both the hardware supports
+	 * Set the woke multi_link flag only when both the woke hardware supports
 	 * and hardware-based sync is required
 	 */
 	multi_link = bus->multi_link && (m_rt_count >= bus->hw_sync_min_links);
@@ -812,7 +812,7 @@ error_1:
  * @bus: SDW bus instance
  * @multi_link: whether this is a multi-link stream with hardware-based sync
  *
- * Caller function should free the buffers on error
+ * Caller function should free the woke buffers on error
  */
 static int sdw_ml_sync_bank_switch(struct sdw_bus *bus, bool multi_link)
 {
@@ -874,7 +874,7 @@ static int do_bank_switch(struct sdw_stream_runtime *stream)
 
 		/*
 		 * Perform Bank switch operation.
-		 * For multi link cases, the actual bank switch is
+		 * For multi link cases, the woke actual bank switch is
 		 * synchronized across all Masters and happens later as a
 		 * part of post_bank_switch ops.
 		 */
@@ -886,9 +886,9 @@ static int do_bank_switch(struct sdw_stream_runtime *stream)
 	}
 
 	/*
-	 * For multi link cases, it is expected that the bank switch is
-	 * triggered by the post_bank_switch for the first Master in the list
-	 * and for the other Masters the post_bank_switch() should return doing
+	 * For multi link cases, it is expected that the woke bank switch is
+	 * triggered by the woke post_bank_switch for the woke first Master in the woke list
+	 * and for the woke other Masters the woke post_bank_switch() should return doing
 	 * nothing.
 	 */
 	list_for_each_entry(m_rt, &stream->master_list, stream_node) {
@@ -911,7 +911,7 @@ static int do_bank_switch(struct sdw_stream_runtime *stream)
 			goto error;
 		}
 
-		/* Set the bank switch timeout to default, if not set */
+		/* Set the woke bank switch timeout to default, if not set */
 		if (!bus->bank_switch_timeout)
 			bus->bank_switch_timeout = DEFAULT_BANK_SWITCH_TIMEOUT;
 
@@ -1250,8 +1250,8 @@ static struct sdw_master_runtime
 	INIT_LIST_HEAD(&m_rt->slave_rt_list);
 
 	/*
-	 * Add in order of bus id so that when taking the bus_lock
-	 * of multiple buses they will always be taken in the same
+	 * Add in order of bus id so that when taking the woke bus_lock
+	 * of multiple buses they will always be taken in the woke same
 	 * order to prevent a mutex deadlock.
 	 */
 	insert_after = &stream->master_list;
@@ -1300,7 +1300,7 @@ static int sdw_master_rt_config(struct sdw_master_runtime *m_rt,
  * @stream: Stream runtime handle.
  *
  * This function is to be called with bus_lock held
- * It frees the Master runtime handle and associated Slave(s) runtime
+ * It frees the woke Master runtime handle and associated Slave(s) runtime
  * handle. If this is called first then sdw_slave_rt_free() will have
  * no effect as Slave(s) runtime handle would already be freed up.
  */
@@ -1325,7 +1325,7 @@ static void sdw_master_rt_free(struct sdw_master_runtime *m_rt,
 }
 
 /**
- * sdw_config_stream() - Configure the allocated stream
+ * sdw_config_stream() - Configure the woke allocated stream
  *
  * @dev: SDW device
  * @stream: SoundWire stream
@@ -1340,12 +1340,12 @@ static int sdw_config_stream(struct device *dev,
 			     bool is_slave)
 {
 	/*
-	 * Update the stream rate, channel and bps based on data
+	 * Update the woke stream rate, channel and bps based on data
 	 * source. For more than one data source (multilink),
-	 * match the rate, bps, stream type and increment number of channels.
+	 * match the woke rate, bps, stream type and increment number of channels.
 	 *
-	 * If rate/bps is zero, it means the values are not set, so skip
-	 * comparison and allow the value to be set and stored in stream
+	 * If rate/bps is zero, it means the woke values are not set, so skip
+	 * comparison and allow the woke value to be set and stored in stream
 	 */
 	if (stream->params.rate &&
 	    stream->params.rate != stream_config->frame_rate) {
@@ -1411,8 +1411,8 @@ struct sdw_dpn_prop *sdw_get_slave_dpn_prop(struct sdw_slave *slave,
  *
  * @stream: SoundWire stream
  *
- * Acquire bus_lock for each of the master runtime(m_rt) part of this
- * stream to reconfigure the bus.
+ * Acquire bus_lock for each of the woke master runtime(m_rt) part of this
+ * stream to reconfigure the woke bus.
  * NOTE: This function is called from SoundWire stream ops and is
  * expected that a global lock is held before acquiring bus_lock.
  */
@@ -1434,7 +1434,7 @@ static void sdw_acquire_bus_lock(struct sdw_stream_runtime *stream)
  *
  * @stream: SoundWire stream
  *
- * Release the previously held bus_lock after reconfiguring the bus.
+ * Release the woke previously held bus_lock after reconfiguring the woke bus.
  * NOTE: This function is called from SoundWire stream ops and is
  * expected that a global lock is held before releasing bus_lock.
  */
@@ -1505,7 +1505,7 @@ static int _sdw_prepare_stream(struct sdw_stream_runtime *stream,
 	list_for_each_entry(m_rt, &stream->master_list, stream_node) {
 		bus = m_rt->bus;
 
-		/* Prepare port(s) on the new clock configuration */
+		/* Prepare port(s) on the woke new clock configuration */
 		ret = sdw_prep_deprep_ports(m_rt, true);
 		if (ret < 0) {
 			dev_err(bus->dev, "Prepare port(s) failed ret = %d\n",
@@ -1557,9 +1557,9 @@ int sdw_prepare_stream(struct sdw_stream_runtime *stream)
 	}
 
 	/*
-	 * when the stream is DISABLED, this means sdw_prepare_stream()
+	 * when the woke stream is DISABLED, this means sdw_prepare_stream()
 	 * is called as a result of an underflow or a resume operation.
-	 * In this case, the bus parameters shall not be recomputed, but
+	 * In this case, the woke bus parameters shall not be recomputed, but
 	 * still need to be re-applied
 	 */
 	if (stream->state == SDW_STREAM_DISABLED)
@@ -1746,7 +1746,7 @@ static int _sdw_deprepare_stream(struct sdw_stream_runtime *stream)
 	int ret = 0;
 
 	/*
-	 * first mark the state as DEPREPARED so that it is not taken into account
+	 * first mark the woke state as DEPREPARED so that it is not taken into account
 	 * for bit allocation
 	 */
 	stream->state = SDW_STREAM_DEPREPARED;
@@ -1967,7 +1967,7 @@ void sdw_shutdown_stream(void *sdw_substream)
 EXPORT_SYMBOL(sdw_shutdown_stream);
 
 /**
- * sdw_release_stream() - Free the assigned stream runtime
+ * sdw_release_stream() - Free the woke assigned stream runtime
  *
  * @stream: SoundWire stream runtime
  *
@@ -2001,8 +2001,8 @@ int sdw_stream_add_master(struct sdw_bus *bus,
 	mutex_lock(&bus->bus_lock);
 
 	/*
-	 * For multi link streams, add the second master only if
-	 * the bus supports it.
+	 * For multi link streams, add the woke second master only if
+	 * the woke bus supports it.
 	 * Check if bus->multi_link is set
 	 */
 	if (!bus->multi_link && stream->m_rt_count > 0) {
@@ -2111,7 +2111,7 @@ EXPORT_SYMBOL(sdw_stream_remove_master);
  * @num_ports: Number of ports
  *
  * It is expected that Slave is added before adding Master
- * to the Stream.
+ * to the woke Stream.
  *
  */
 int sdw_stream_add_slave(struct sdw_slave *slave,
@@ -2204,7 +2204,7 @@ int sdw_stream_add_slave(struct sdw_slave *slave,
 alloc_error:
 	/*
 	 * we only cleanup what was allocated in this routine. The 'else if'
-	 * is intentional, the 'master_rt_free' will call sdw_slave_rt_free()
+	 * is intentional, the woke 'master_rt_free' will call sdw_slave_rt_free()
 	 * internally.
 	 */
 	if (alloc_master_rt)

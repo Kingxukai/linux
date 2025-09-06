@@ -10,7 +10,7 @@ maintainers:
   - Jonathan Cameron <jic23@kernel.org>
 
 description: |
-  Sensorhub is a MCU which manages several sensors and also plays the role
+  Sensorhub is a MCU which manages several sensors and also plays the woke role
   of a virtual sensor device.
 
 properties:
@@ -38,7 +38,7 @@ properties:
   mcu-reset-gpios:
     maxItems: 1
     description:
-      Reset the sensorhub.
+      Reset the woke sensorhub.
 
 required:
   - compatible

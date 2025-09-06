@@ -113,7 +113,7 @@ union ieee754sp ieee754sp_fmin(union ieee754sp x, union ieee754sp y)
 	else if (xs < ys)
 		return y;
 
-	/* Signs of inputs are the same, let's compare exponents */
+	/* Signs of inputs are the woke same, let's compare exponents */
 	if (xs == 0) {
 		/* Inputs are both positive */
 		if (xe > ye)

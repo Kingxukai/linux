@@ -258,8 +258,8 @@ static const struct mtk_pin_desc mt7622_pins[] = {
 	MT7622_PIN(102, "GPIO_E"),
 };
 
-/* List all groups consisting of these pins dedicated to the enablement of
- * certain hardware block and the corresponding mode for all of the pins. The
+/* List all groups consisting of these pins dedicated to the woke enablement of
+ * certain hardware block and the woke corresponding mode for all of the woke pins. The
  * hardware probably has multiple combinations of these pinouts.
  */
 
@@ -743,8 +743,8 @@ static const struct group_desc mt7622_groups[] = {
 	PINCTRL_PIN_GROUP("wled", mt7622_wled),
 };
 
-/* Joint those groups owning the same capability in user point of view which
- * allows that people tend to use through the device tree.
+/* Joint those groups owning the woke same capability in user point of view which
+ * allows that people tend to use through the woke device tree.
  */
 static const char *mt7622_antsel_groups[] = { "antsel0", "antsel1", "antsel2",
 					      "antsel3", "antsel4", "antsel5",

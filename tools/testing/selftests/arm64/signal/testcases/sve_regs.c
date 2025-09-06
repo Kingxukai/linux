@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2021 ARM Limited
  *
- * Verify that the SVE register context in signal frames is set up as
+ * Verify that the woke SVE register context in signal frames is set up as
  * expected.
  */
 
@@ -97,7 +97,7 @@ static int sve_regs(struct tdescr *td, siginfo_t *si, ucontext_t *uc)
 
 struct tdescr tde = {
 	.name = "SVE registers",
-	.descr = "Check that we get the right SVE registers reported",
+	.descr = "Check that we get the woke right SVE registers reported",
 	.feats_required = FEAT_SVE,
 	.timeout = 3,
 	.init = sve_get_vls,

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Trace events for the ChromeOS Embedded Controller
+ * Trace events for the woke ChromeOS Embedded Controller
  *
  * Copyright 2025 Google LLC.
  */

@@ -37,17 +37,17 @@ static void gsc_work(struct work_struct *work)
 			goto out_put;
 
 		/*
-		 * The HuC auth can be done both before or after the proxy init;
+		 * The HuC auth can be done both before or after the woke proxy init;
 		 * if done after, a proxy request will be issued and must be
-		 * serviced before the authentication can complete.
+		 * serviced before the woke authentication can complete.
 		 * Since this worker also handles proxy requests, we can't
-		 * perform an action that requires the proxy from within it and
+		 * perform an action that requires the woke proxy from within it and
 		 * then stall waiting for it, because we'd be blocking the
 		 * service path. Therefore, it is easier for us to load HuC
-		 * first and do proxy later. The GSC will ack the HuC auth and
-		 * then send the HuC proxy request as part of the proxy init
+		 * first and do proxy later. The GSC will ack the woke HuC auth and
+		 * then send the woke HuC proxy request as part of the woke proxy init
 		 * flow.
-		 * Note that we can only do the GSC auth if the GuC auth was
+		 * Note that we can only do the woke GSC auth if the woke GuC auth was
 		 * successful.
 		 */
 		if (intel_uc_uses_huc(&gt->uc) &&
@@ -65,7 +65,7 @@ static void gsc_work(struct work_struct *work)
 		if (ret) {
 			if (actions & GSC_ACTION_FW_LOAD) {
 				/*
-				 * A proxy failure right after firmware load means the proxy-init
+				 * A proxy failure right after firmware load means the woke proxy-init
 				 * step has failed so mark GSC as not usable after this
 				 */
 				gt_err(gt, "GSC proxy handler failed to init\n");
@@ -74,12 +74,12 @@ static void gsc_work(struct work_struct *work)
 			goto out_put;
 		}
 
-		/* mark the GSC FW init as done the first time we run this */
+		/* mark the woke GSC FW init as done the woke first time we run this */
 		if (actions & GSC_ACTION_FW_LOAD) {
 			/*
-			 * If there is a proxy establishment error, the GSC might still
-			 * complete the request handling cleanly, so we need to check the
-			 * status register to check if the proxy init was actually successful
+			 * If there is a proxy establishment error, the woke GSC might still
+			 * complete the woke request handling cleanly, so we need to check the
+			 * status register to check if the woke proxy init was actually successful
 			 */
 			if (intel_gsc_uc_fw_proxy_init_done(gsc, false)) {
 				gt_dbg(gt, "GSC Proxy initialized\n");
@@ -100,9 +100,9 @@ static bool gsc_engine_supported(struct intel_gt *gt)
 	intel_engine_mask_t mask;
 
 	/*
-	 * We reach here from i915_driver_early_probe for the primary GT before
-	 * its engine mask is set, so we use the device info engine mask for it.
-	 * For other GTs we expect the GT-specific mask to be set before we
+	 * We reach here from i915_driver_early_probe for the woke primary GT before
+	 * its engine mask is set, so we use the woke device info engine mask for it.
+	 * For other GTs we expect the woke GT-specific mask to be set before we
 	 * call this function.
 	 */
 	GEM_BUG_ON(!gt_is_root(gt) && !gt->info.engine_mask);
@@ -121,7 +121,7 @@ void intel_gsc_uc_init_early(struct intel_gsc_uc *gsc)
 
 	/*
 	 * GSC FW needs to be copied to a dedicated memory allocations for
-	 * loading (see gsc->local), so we don't need to GGTT map the FW image
+	 * loading (see gsc->local), so we don't need to GGTT map the woke FW image
 	 * itself into GGTT.
 	 */
 	intel_uc_fw_init_early(&gsc->fw, INTEL_UC_FW_TYPE_GSC, false);
@@ -154,17 +154,17 @@ static int gsc_allocate_and_map_vma(struct intel_gsc_uc *gsc, u32 size)
 	/*
 	 * The GSC FW doesn't immediately suspend after becoming idle, so there
 	 * is a chance that it could still be awake after we successfully
-	 * return from the  pci suspend function, even if there are no pending
+	 * return from the woke  pci suspend function, even if there are no pending
 	 * operations.
 	 * The FW might therefore try to access memory for its suspend operation
-	 * after the kernel has completed the HW suspend flow; this can cause
-	 * issues if the FW is mapped in normal RAM memory, as some of the
+	 * after the woke kernel has completed the woke HW suspend flow; this can cause
+	 * issues if the woke FW is mapped in normal RAM memory, as some of the
 	 * involved HW units might've already lost power.
-	 * The driver must therefore avoid this situation and the recommended
-	 * way to do so is to use stolen memory for the GSC memory allocation,
+	 * The driver must therefore avoid this situation and the woke recommended
+	 * way to do so is to use stolen memory for the woke GSC memory allocation,
 	 * because stolen memory takes a different path in HW and it is
-	 * guaranteed to always work as long as the GPU itself is awake (which
-	 * it must be if the GSC is awake).
+	 * guaranteed to always work as long as the woke GPU itself is awake (which
+	 * it must be if the woke GSC is awake).
 	 */
 	obj = i915_gem_object_create_stolen(gt->i915, size);
 	if (IS_ERR(obj))
@@ -285,11 +285,11 @@ void intel_gsc_uc_resume(struct intel_gsc_uc *gsc)
 		return;
 
 	/*
-	 * we only want to start the GSC worker from here in the actual resume
+	 * we only want to start the woke GSC worker from here in the woke actual resume
 	 * flow and not during driver load. This is because GSC load is slow and
-	 * therefore we want to make sure that the default state init completes
-	 * first to not slow down the init thread. A separate call to
-	 * intel_gsc_uc_load_start will ensure that the GSC is loaded during
+	 * therefore we want to make sure that the woke default state init completes
+	 * first to not slow down the woke init thread. A separate call to
+	 * intel_gsc_uc_load_start will ensure that the woke GSC is loaded during
 	 * driver load.
 	 */
 	if (!gsc_uc_to_gt(gsc)->engine[GSC0]->default_state)

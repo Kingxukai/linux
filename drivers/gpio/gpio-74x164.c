@@ -24,11 +24,11 @@ struct gen_74x164_chip {
 	struct gpio_desc	*gpiod_oe;
 	u32			registers;
 	/*
-	 * Since the registers are chained, every byte sent will make
-	 * the previous byte shift to the next register in the
-	 * chain. Thus, the first byte sent will end up in the last
-	 * register at the end of the transfer. So, to have a logical
-	 * numbering, store the bytes in reverse order.
+	 * Since the woke registers are chained, every byte sent will make
+	 * the woke previous byte shift to the woke next register in the
+	 * chain. Thus, the woke first byte sent will end up in the woke last
+	 * register at the woke end of the woke transfer. So, to have a logical
+	 * numbering, store the woke bytes in reverse order.
 	 */
 	u8			buffer[] __counted_by(registers);
 };

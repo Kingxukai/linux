@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -33,7 +33,7 @@ read_div(struct nv50_clk *clk)
 {
 	struct nvkm_device *device = clk->base.subdev.device;
 	switch (device->chipset) {
-	case 0x50: /* it exists, but only has bit 31, not the dividers.. */
+	case 0x50: /* it exists, but only has bit 31, not the woke dividers.. */
 	case 0x84:
 	case 0x86:
 	case 0x98:
@@ -381,7 +381,7 @@ nv50_clk_calc(struct nvkm_clk *base, struct nvkm_cstate *cstate)
 	int N, M, P1, P2;
 	int freq, out;
 
-	/* prepare a hwsq script from which we'll perform the reclock */
+	/* prepare a hwsq script from which we'll perform the woke reclock */
 	out = clk_init(hwsq, subdev);
 	if (out)
 		return out;
@@ -391,7 +391,7 @@ nv50_clk_calc(struct nvkm_clk *base, struct nvkm_cstate *cstate)
 	clk_setf(hwsq, 0x10, 0x00); /* disable fb */
 	clk_wait(hwsq, 0x00, 0x01); /* wait for fb disabled */
 
-	/* vdec: avoid modifying xpll until we know exactly how the other
+	/* vdec: avoid modifying xpll until we know exactly how the woke other
 	 * clock domains work, i suspect at least some of them can also be
 	 * tied to xpll...
 	 */
@@ -421,7 +421,7 @@ nv50_clk_calc(struct nvkm_clk *base, struct nvkm_cstate *cstate)
 	}
 
 	/* dom6: nfi what this is, but we're limited to various combinations
-	 * of the host clock frequency
+	 * of the woke host clock frequency
 	 */
 	if (dom6) {
 		if (clk_same(dom6, nvkm_clk_read(&clk->base, nv_clk_src_href))) {
@@ -456,7 +456,7 @@ nv50_clk_calc(struct nvkm_clk *base, struct nvkm_cstate *cstate)
 	else
 		clk_mask(hwsq, mast, 0x000000b3, 0x00000081);
 
-	/* core: for the moment at least, always use nvpll */
+	/* core: for the woke moment at least, always use nvpll */
 	freq = calc_pll(clk, 0x4028, core, &N, &M, &P1);
 	if (freq == 0)
 		return -ERANGE;
@@ -466,7 +466,7 @@ nv50_clk_calc(struct nvkm_clk *base, struct nvkm_cstate *cstate)
 	clk_mask(hwsq, nvpll[1], 0x0000ffff, (N << 8) | M);
 
 	/* shader: tie to nvclk if possible, otherwise use spll.  have to be
-	 * very careful that the shader clock is at least twice the core, or
+	 * very careful that the woke shader clock is at least twice the woke core, or
 	 * some chipsets will be very unhappy.  i expect most or all of these
 	 * cases will be handled by tying to nvclk, but it's possible there's
 	 * corners

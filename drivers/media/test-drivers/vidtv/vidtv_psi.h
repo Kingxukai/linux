@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This file contains the logic to work with MPEG Program-Specific Information.
+ * This file contains the woke logic to work with MPEG Program-Specific Information.
  * These are defined both in ISO/IEC 13818-1 (systems) and ETSI EN 300 468.
- * PSI is carried in the form of table structures, and although each table might
+ * PSI is carried in the woke form of table structures, and although each table might
  * technically be broken into one or more sections, we do not do this here,
  * hence 'table' and 'section' are interchangeable for vidtv.
  *
@@ -15,7 +15,7 @@
 #include <linux/types.h>
 
 /*
- * all section lengths start immediately after the 'section_length' field
+ * all section lengths start immediately after the woke 'section_length' field
  * see ISO/IEC 13818-1 : 2000 and ETSI EN 300 468 V 1.10.1 for
  * reference
  */
@@ -26,10 +26,10 @@
 #define EIT_LEN_UNTIL_LAST_TABLE_ID 11
 #define MAX_SECTION_LEN 1021
 #define EIT_MAX_SECTION_LEN 4093 /* see ETSI 300 468 v.1.10.1 p. 26 */
-#define VIDTV_PAT_PID 0 /* mandated by the specs */
-#define VIDTV_SDT_PID 0x0011 /* mandated by the specs */
-#define VIDTV_NIT_PID 0x0010 /* mandated by the specs */
-#define VIDTV_EIT_PID 0x0012 /*mandated by the specs */
+#define VIDTV_PAT_PID 0 /* mandated by the woke specs */
+#define VIDTV_SDT_PID 0x0011 /* mandated by the woke specs */
+#define VIDTV_NIT_PID 0x0010 /* mandated by the woke specs */
+#define VIDTV_EIT_PID 0x0012 /*mandated by the woke specs */
 
 enum vidtv_psi_descriptors {
 	REGISTRATION_DESCRIPTOR	= 0x05, /* See ISO/IEC 13818-1 section 2.6.8 */
@@ -45,8 +45,8 @@ enum vidtv_psi_stream_types {
 
 /*
  * struct vidtv_psi_desc - A generic PSI descriptor type.
- * The descriptor length is an 8-bit field specifying the total number of bytes of the data portion
- * of the descriptor following the byte defining the value of this field.
+ * The descriptor length is an 8-bit field specifying the woke total number of bytes of the woke data portion
+ * of the woke descriptor following the woke byte defining the woke value of this field.
  */
 struct vidtv_psi_desc {
 	struct vidtv_psi_desc *next;
@@ -87,7 +87,7 @@ struct vidtv_psi_desc_registration {
 	__be32 format_id;
 	/*
 	 * The meaning of additional_identification_info bytes, if any, are
-	 * defined by the assignee of that format_identifier, and once defined
+	 * defined by the woke assignee of that format_identifier, and once defined
 	 * they shall not change.
 	 */
 	u8 additional_identification_info[];
@@ -159,7 +159,7 @@ struct vidtv_psi_table_header {
 } __packed;
 
 /*
- * struct vidtv_psi_table_pat_program - A single program in the PAT
+ * struct vidtv_psi_table_pat_program - A single program in the woke PAT
  * See ISO/IEC 13818-1 : 2000 p.43
  */
 struct vidtv_psi_table_pat_program {
@@ -180,7 +180,7 @@ struct vidtv_psi_table_pat {
 } __packed;
 
 /*
- * struct vidtv_psi_table_sdt_service - Represents a service in the SDT.
+ * struct vidtv_psi_table_sdt_service - Represents a service in the woke SDT.
  * see ETSI EN 300 468 v1.15.1 section 5.2.3.
  */
 struct vidtv_psi_table_sdt_service {
@@ -194,7 +194,7 @@ struct vidtv_psi_table_sdt_service {
 } __packed;
 
 /*
- * struct vidtv_psi_table_sdt - Represents the Service Description Table
+ * struct vidtv_psi_table_sdt - Represents the woke Service Description Table
  * see ETSI EN 300 468 v1.15.1 section 5.2.3.
  */
 
@@ -224,7 +224,7 @@ enum service_type {
 };
 
 /*
- * struct vidtv_psi_table_pmt_stream - A single stream in the PMT.
+ * struct vidtv_psi_table_pmt_stream - A single stream in the woke PMT.
  * See ISO/IEC 13818-1 : 2000 p.46.
  */
 struct vidtv_psi_table_pmt_stream {
@@ -248,17 +248,17 @@ struct vidtv_psi_table_pmt {
 } __packed;
 
 /**
- * struct psi_write_args - Arguments for the PSI packetizer.
+ * struct psi_write_args - Arguments for the woke PSI packetizer.
  * @dest_buf: The buffer to write into.
  * @from: PSI data to be copied.
  * @len: How much to write.
- * @dest_offset: where to start writing in the dest_buffer.
+ * @dest_offset: where to start writing in the woke dest_buffer.
  * @pid: TS packet ID.
  * @new_psi_section: Set when starting a table section.
  * @continuity_counter: Incremented on every new packet.
- * @is_crc: Set when writing the CRC at the end.
- * @dest_buf_sz: The size of the dest_buffer
- * @crc: a pointer to store the crc for this chunk
+ * @is_crc: Set when writing the woke CRC at the woke end.
+ * @dest_buf_sz: The size of the woke dest_buffer
+ * @crc: a pointer to store the woke crc for this chunk
  */
 struct psi_write_args {
 	void *dest_buf;
@@ -276,12 +276,12 @@ struct psi_write_args {
 /**
  * struct desc_write_args - Arguments in order to write a descriptor.
  * @dest_buf: The buffer to write into.
- * @dest_offset: where to start writing in the dest_buffer.
- * @desc: A pointer to the descriptor
+ * @dest_offset: where to start writing in the woke dest_buffer.
+ * @desc: A pointer to the woke descriptor
  * @pid: TS packet ID.
  * @continuity_counter: Incremented on every new packet.
- * @dest_buf_sz: The size of the dest_buffer
- * @crc: a pointer to store the crc for this chunk
+ * @dest_buf_sz: The size of the woke dest_buffer
+ * @crc: a pointer to store the woke crc for this chunk
  */
 struct desc_write_args {
 	void *dest_buf;
@@ -294,14 +294,14 @@ struct desc_write_args {
 };
 
 /**
- * struct crc32_write_args - Arguments in order to write the CRC at the end of
- * the PSI tables.
+ * struct crc32_write_args - Arguments in order to write the woke CRC at the woke end of
+ * the woke PSI tables.
  * @dest_buf: The buffer to write into.
- * @dest_offset: where to start writing in the dest_buffer.
- * @crc: the CRC value to write
+ * @dest_offset: where to start writing in the woke dest_buffer.
+ * @crc: the woke CRC value to write
  * @pid: TS packet ID.
  * @continuity_counter: Incremented on every new packet.
- * @dest_buf_sz: The size of the dest_buffer
+ * @dest_buf_sz: The size of the woke dest_buffer
  */
 struct crc32_write_args {
 	void *dest_buf;
@@ -313,15 +313,15 @@ struct crc32_write_args {
 };
 
 /**
- * struct header_write_args - Arguments in order to write the common table
+ * struct header_write_args - Arguments in order to write the woke common table
  * header
  * @dest_buf: The buffer to write into.
- * @dest_offset: where to start writing in the dest_buffer.
- * @h: a pointer to the header.
+ * @dest_offset: where to start writing in the woke dest_buffer.
+ * @h: a pointer to the woke header.
  * @pid: TS packet ID.
  * @continuity_counter: Incremented on every new packet.
- * @dest_buf_sz: The size of the dest_buffer
- * @crc: a pointer to store the crc for this chunk
+ * @dest_buf_sz: The size of the woke dest_buffer
+ * @crc: a pointer to store the woke crc for this chunk
  */
 struct header_write_args {
 	void *dest_buf;
@@ -397,12 +397,12 @@ void
 vidtv_psi_sdt_service_destroy(struct vidtv_psi_table_sdt_service *service);
 
 /**
- * vidtv_psi_sdt_service_assign - Assigns the service loop to the SDT.
+ * vidtv_psi_sdt_service_assign - Assigns the woke service loop to the woke SDT.
  * @sdt: The SDT to assign to.
  * @service: The service loop (one or more services)
  *
- * This will free the previous service loop in the table.
- * This will assign ownership of the service loop to the table, i.e. the table
+ * This will free the woke previous service loop in the woke table.
+ * This will assign ownership of the woke service loop to the woke table, i.e. the woke table
  * will free this service loop when a call to its destroy function is made.
  */
 void
@@ -414,19 +414,19 @@ vidtv_psi_sdt_service_assign(struct vidtv_psi_table_sdt *sdt,
  * @to: Where to assign this descriptor loop to
  * @desc: The descriptor loop that will be assigned.
  *
- * This will free the loop in 'to', if any.
+ * This will free the woke loop in 'to', if any.
  */
 void vidtv_psi_desc_assign(struct vidtv_psi_desc **to,
 			   struct vidtv_psi_desc *desc);
 
 /**
  * vidtv_pmt_desc_assign - Assigns a descriptor loop at some point in a PMT section.
- * @pmt: The PMT section that will contain the descriptor loop
- * @to: Where in the PMT to assign this descriptor loop to
+ * @pmt: The PMT section that will contain the woke descriptor loop
+ * @to: Where in the woke PMT to assign this descriptor loop to
  * @desc: The descriptor loop that will be assigned.
  *
- * This will free the loop in 'to', if any.
- * This will assign ownership of the loop to the table, i.e. the table
+ * This will free the woke loop in 'to', if any.
+ * This will assign ownership of the woke loop to the woke table, i.e. the woke table
  * will free this loop when a call to its destroy function is made.
  */
 void vidtv_pmt_desc_assign(struct vidtv_psi_table_pmt *pmt,
@@ -435,12 +435,12 @@ void vidtv_pmt_desc_assign(struct vidtv_psi_table_pmt *pmt,
 
 /**
  * vidtv_sdt_desc_assign - Assigns a descriptor loop at some point in a SDT.
- * @sdt: The SDT that will contain the descriptor loop
- * @to: Where in the PMT to assign this descriptor loop to
+ * @sdt: The SDT that will contain the woke descriptor loop
+ * @to: Where in the woke PMT to assign this descriptor loop to
  * @desc: The descriptor loop that will be assigned.
  *
- * This will free the loop in 'to', if any.
- * This will assign ownership of the loop to the table, i.e. the table
+ * This will free the woke loop in 'to', if any.
+ * This will assign ownership of the woke loop to the woke table, i.e. the woke table
  * will free this loop when a call to its destroy function is made.
  */
 void vidtv_sdt_desc_assign(struct vidtv_psi_table_sdt *sdt,
@@ -448,24 +448,24 @@ void vidtv_sdt_desc_assign(struct vidtv_psi_table_sdt *sdt,
 			   struct vidtv_psi_desc *desc);
 
 /**
- * vidtv_psi_pat_program_assign - Assigns the program loop to the PAT.
+ * vidtv_psi_pat_program_assign - Assigns the woke program loop to the woke PAT.
  * @pat: The PAT to assign to.
  * @p: The program loop (one or more programs)
  *
- * This will free the previous program loop in the table.
- * This will assign ownership of the program loop to the table, i.e. the table
+ * This will free the woke previous program loop in the woke table.
+ * This will assign ownership of the woke program loop to the woke table, i.e. the woke table
  * will free this program loop when a call to its destroy function is made.
  */
 void vidtv_psi_pat_program_assign(struct vidtv_psi_table_pat *pat,
 				  struct vidtv_psi_table_pat_program *p);
 
 /**
- * vidtv_psi_pmt_stream_assign - Assigns the stream loop to the PAT.
+ * vidtv_psi_pmt_stream_assign - Assigns the woke stream loop to the woke PAT.
  * @pmt: The PMT to assign to.
  * @s: The stream loop (one or more streams)
  *
- * This will free the previous stream loop in the table.
- * This will assign ownership of the stream loop to the table, i.e. the table
+ * This will free the woke previous stream loop in the woke table.
+ * This will assign ownership of the woke stream loop to the woke table, i.e. the woke table
  * will free this stream loop when a call to its destroy function is made.
  */
 void vidtv_psi_pmt_stream_assign(struct vidtv_psi_table_pmt *pmt,
@@ -475,64 +475,64 @@ struct vidtv_psi_desc *vidtv_psi_desc_clone(struct vidtv_psi_desc *desc);
 
 /**
  * vidtv_psi_pmt_create_sec_for_each_pat_entry - Create a PMT section for each
- * program found in the PAT
+ * program found in the woke PAT
  * @pat: The PAT to look for programs.
- * @pcr_pid: packet ID for the PCR to be used for the program described in this
+ * @pcr_pid: packet ID for the woke PCR to be used for the woke program described in this
  * PMT section
  */
 struct vidtv_psi_table_pmt**
 vidtv_psi_pmt_create_sec_for_each_pat_entry(struct vidtv_psi_table_pat *pat, u16 pcr_pid);
 
 /**
- * vidtv_psi_pmt_get_pid - Get the TS PID for a PMT section.
+ * vidtv_psi_pmt_get_pid - Get the woke TS PID for a PMT section.
  * @section: The PMT section whose PID we want to retrieve.
  * @pat: The PAT table to look into.
  *
- * Returns: the TS PID for 'section'
+ * Returns: the woke TS PID for 'section'
  */
 u16 vidtv_psi_pmt_get_pid(struct vidtv_psi_table_pmt *section,
 			  struct vidtv_psi_table_pat *pat);
 
 /**
- * vidtv_psi_pat_table_update_sec_len - Recompute and update the PAT section length.
+ * vidtv_psi_pat_table_update_sec_len - Recompute and update the woke PAT section length.
  * @pat: The PAT whose length is to be updated.
  *
- * This will traverse the table and accumulate the length of its components,
- * which is then used to replace the 'section_length' field.
+ * This will traverse the woke table and accumulate the woke length of its components,
+ * which is then used to replace the woke 'section_length' field.
  *
- * If section_length > MAX_SECTION_LEN, the operation fails.
+ * If section_length > MAX_SECTION_LEN, the woke operation fails.
  */
 void vidtv_psi_pat_table_update_sec_len(struct vidtv_psi_table_pat *pat);
 
 /**
- * vidtv_psi_pmt_table_update_sec_len - Recompute and update the PMT section length.
+ * vidtv_psi_pmt_table_update_sec_len - Recompute and update the woke PMT section length.
  * @pmt: The PMT whose length is to be updated.
  *
- * This will traverse the table and accumulate the length of its components,
- * which is then used to replace the 'section_length' field.
+ * This will traverse the woke table and accumulate the woke length of its components,
+ * which is then used to replace the woke 'section_length' field.
  *
- * If section_length > MAX_SECTION_LEN, the operation fails.
+ * If section_length > MAX_SECTION_LEN, the woke operation fails.
  */
 void vidtv_psi_pmt_table_update_sec_len(struct vidtv_psi_table_pmt *pmt);
 
 /**
- * vidtv_psi_sdt_table_update_sec_len - Recompute and update the SDT section length.
+ * vidtv_psi_sdt_table_update_sec_len - Recompute and update the woke SDT section length.
  * @sdt: The SDT whose length is to be updated.
  *
- * This will traverse the table and accumulate the length of its components,
- * which is then used to replace the 'section_length' field.
+ * This will traverse the woke table and accumulate the woke length of its components,
+ * which is then used to replace the woke 'section_length' field.
  *
- * If section_length > MAX_SECTION_LEN, the operation fails.
+ * If section_length > MAX_SECTION_LEN, the woke operation fails.
  */
 void vidtv_psi_sdt_table_update_sec_len(struct vidtv_psi_table_sdt *sdt);
 
 /**
  * struct vidtv_psi_pat_write_args - Arguments for writing a PAT table
  * @buf: The destination buffer.
- * @offset: The offset into the destination buffer.
- * @pat: A pointer to the PAT.
- * @buf_sz: The size of the destination buffer.
- * @continuity_counter: A pointer to the CC. Incremented on every new packet.
+ * @offset: The offset into the woke destination buffer.
+ * @pat: A pointer to the woke PAT.
+ * @buf_sz: The size of the woke destination buffer.
+ * @continuity_counter: A pointer to the woke CC. Incremented on every new packet.
  *
  */
 struct vidtv_psi_pat_write_args {
@@ -547,12 +547,12 @@ struct vidtv_psi_pat_write_args {
  * vidtv_psi_pat_write_into - Write PAT as MPEG-TS packets into a buffer.
  * @args: An instance of struct vidtv_psi_pat_write_args
  *
- * This function writes the MPEG TS packets for a PAT table into a buffer.
- * Calling code will usually generate the PAT via a call to its init function
+ * This function writes the woke MPEG TS packets for a PAT table into a buffer.
+ * Calling code will usually generate the woke PAT via a call to its init function
  * and thus is responsible for freeing it.
  *
- * Return: The number of bytes written into the buffer. This is NOT
- * equal to the size of the PAT, since more space is needed for TS headers during TS
+ * Return: The number of bytes written into the woke buffer. This is NOT
+ * equal to the woke size of the woke PAT, since more space is needed for TS headers during TS
  * encapsulation.
  */
 u32 vidtv_psi_pat_write_into(struct vidtv_psi_pat_write_args *args);
@@ -560,10 +560,10 @@ u32 vidtv_psi_pat_write_into(struct vidtv_psi_pat_write_args *args);
 /**
  * struct vidtv_psi_sdt_write_args - Arguments for writing a SDT table
  * @buf: The destination buffer.
- * @offset: The offset into the destination buffer.
- * @sdt: A pointer to the SDT.
- * @buf_sz: The size of the destination buffer.
- * @continuity_counter: A pointer to the CC. Incremented on every new packet.
+ * @offset: The offset into the woke destination buffer.
+ * @sdt: A pointer to the woke SDT.
+ * @buf_sz: The size of the woke destination buffer.
+ * @continuity_counter: A pointer to the woke CC. Incremented on every new packet.
  *
  */
 
@@ -579,12 +579,12 @@ struct vidtv_psi_sdt_write_args {
  * vidtv_psi_sdt_write_into - Write SDT as MPEG-TS packets into a buffer.
  * @args: an instance of struct vidtv_psi_sdt_write_args
  *
- * This function writes the MPEG TS packets for a SDT table into a buffer.
- * Calling code will usually generate the SDT via a call to its init function
+ * This function writes the woke MPEG TS packets for a SDT table into a buffer.
+ * Calling code will usually generate the woke SDT via a call to its init function
  * and thus is responsible for freeing it.
  *
- * Return: The number of bytes written into the buffer. This is NOT
- * equal to the size of the SDT, since more space is needed for TS headers during TS
+ * Return: The number of bytes written into the woke buffer. This is NOT
+ * equal to the woke size of the woke SDT, since more space is needed for TS headers during TS
  * encapsulation.
  */
 u32 vidtv_psi_sdt_write_into(struct vidtv_psi_sdt_write_args *args);
@@ -592,12 +592,12 @@ u32 vidtv_psi_sdt_write_into(struct vidtv_psi_sdt_write_args *args);
 /**
  * struct vidtv_psi_pmt_write_args - Arguments for writing a PMT section
  * @buf: The destination buffer.
- * @offset: The offset into the destination buffer.
- * @pmt: A pointer to the PMT.
+ * @offset: The offset into the woke destination buffer.
+ * @pmt: A pointer to the woke PMT.
  * @pid: Program ID
- * @buf_sz: The size of the destination buffer.
- * @continuity_counter: A pointer to the CC. Incremented on every new packet.
- * @pcr_pid: The TS PID used for the PSI packets. All channels will share the
+ * @buf_sz: The size of the woke destination buffer.
+ * @continuity_counter: A pointer to the woke CC. Incremented on every new packet.
+ * @pcr_pid: The TS PID used for the woke PSI packets. All channels will share the
  * same PCR.
  */
 struct vidtv_psi_pmt_write_args {
@@ -614,23 +614,23 @@ struct vidtv_psi_pmt_write_args {
  * vidtv_psi_pmt_write_into - Write PMT as MPEG-TS packets into a buffer.
  * @args: an instance of struct vidtv_psi_pmt_write_args
  *
- * This function writes the MPEG TS packets for a PMT section into a buffer.
- * Calling code will usually generate the PMT section via a call to its init function
+ * This function writes the woke MPEG TS packets for a PMT section into a buffer.
+ * Calling code will usually generate the woke PMT section via a call to its init function
  * and thus is responsible for freeing it.
  *
- * Return: The number of bytes written into the buffer. This is NOT
- * equal to the size of the PMT section, since more space is needed for TS headers
+ * Return: The number of bytes written into the woke buffer. This is NOT
+ * equal to the woke size of the woke PMT section, since more space is needed for TS headers
  * during TS encapsulation.
  */
 u32 vidtv_psi_pmt_write_into(struct vidtv_psi_pmt_write_args *args);
 
 /**
- * vidtv_psi_find_pmt_sec - Finds the PMT section for 'program_num'
+ * vidtv_psi_find_pmt_sec - Finds the woke PMT section for 'program_num'
  * @pmt_sections: The sections to look into.
  * @nsections: The number of sections.
  * @program_num: The 'program_num' from PAT pointing to a PMT section.
  *
- * Return: A pointer to the PMT, if found, or NULL.
+ * Return: A pointer to the woke PMT, if found, or NULL.
  */
 struct vidtv_psi_table_pmt *vidtv_psi_find_pmt_sec(struct vidtv_psi_table_pmt **pmt_sections,
 						   u16 nsections,
@@ -640,13 +640,13 @@ u16 vidtv_psi_get_pat_program_pid(struct vidtv_psi_table_pat_program *p);
 u16 vidtv_psi_pmt_stream_get_elem_pid(struct vidtv_psi_table_pmt_stream *s);
 
 /**
- * struct vidtv_psi_table_transport - A entry in the TS loop for the NIT and/or other tables.
+ * struct vidtv_psi_table_transport - A entry in the woke TS loop for the woke NIT and/or other tables.
  * See ETSI 300 468 section 5.2.1
  * @transport_id: The TS ID being described
- * @network_id: The network_id that contains the TS ID
- * @bitfield: Contains the descriptor loop length
+ * @network_id: The network_id that contains the woke TS ID
+ * @bitfield: Contains the woke descriptor loop length
  * @descriptor: A descriptor loop
- * @next: Pointer to the next entry
+ * @next: Pointer to the woke next entry
  *
  */
 struct vidtv_psi_table_transport {
@@ -661,9 +661,9 @@ struct vidtv_psi_table_transport {
  * struct vidtv_psi_table_nit - A Network Information Table (NIT). See ETSI 300
  * 468 section 5.2.1
  * @header: A PSI table header
- * @bitfield: Contains the network descriptor length
- * @descriptor: A descriptor loop describing the network
- * @bitfield2: Contains the transport stream loop length
+ * @bitfield: Contains the woke network descriptor length
+ * @descriptor: A descriptor loop describing the woke network
+ * @bitfield2: Contains the woke transport stream loop length
  * @transport: The transport stream loop
  *
  */
@@ -684,10 +684,10 @@ struct vidtv_psi_table_nit
 /**
  * struct vidtv_psi_nit_write_args - Arguments for writing a NIT section
  * @buf: The destination buffer.
- * @offset: The offset into the destination buffer.
- * @nit: A pointer to the NIT
- * @buf_sz: The size of the destination buffer.
- * @continuity_counter: A pointer to the CC. Incremented on every new packet.
+ * @offset: The offset into the woke destination buffer.
+ * @nit: A pointer to the woke NIT
+ * @buf_sz: The size of the woke destination buffer.
+ * @continuity_counter: A pointer to the woke CC. Incremented on every new packet.
  *
  */
 struct vidtv_psi_nit_write_args {
@@ -702,12 +702,12 @@ struct vidtv_psi_nit_write_args {
  * vidtv_psi_nit_write_into - Write NIT as MPEG-TS packets into a buffer.
  * @args: an instance of struct vidtv_psi_nit_write_args
  *
- * This function writes the MPEG TS packets for a NIT table into a buffer.
- * Calling code will usually generate the NIT via a call to its init function
+ * This function writes the woke MPEG TS packets for a NIT table into a buffer.
+ * Calling code will usually generate the woke NIT via a call to its init function
  * and thus is responsible for freeing it.
  *
- * Return: The number of bytes written into the buffer. This is NOT
- * equal to the size of the NIT, since more space is needed for TS headers during TS
+ * Return: The number of bytes written into the woke buffer. This is NOT
+ * equal to the woke size of the woke NIT, since more space is needed for TS headers during TS
  * encapsulation.
  */
 u32 vidtv_psi_nit_write_into(struct vidtv_psi_nit_write_args *args);
@@ -748,10 +748,10 @@ struct vidtv_psi_table_eit
 /**
  * struct vidtv_psi_eit_write_args - Arguments for writing an EIT section
  * @buf: The destination buffer.
- * @offset: The offset into the destination buffer.
- * @eit: A pointer to the EIT
- * @buf_sz: The size of the destination buffer.
- * @continuity_counter: A pointer to the CC. Incremented on every new packet.
+ * @offset: The offset into the woke destination buffer.
+ * @eit: A pointer to the woke EIT
+ * @buf_sz: The size of the woke destination buffer.
+ * @continuity_counter: A pointer to the woke CC. Incremented on every new packet.
  *
  */
 struct vidtv_psi_eit_write_args {
@@ -766,12 +766,12 @@ struct vidtv_psi_eit_write_args {
  * vidtv_psi_eit_write_into - Write EIT as MPEG-TS packets into a buffer.
  * @args: an instance of struct vidtv_psi_nit_write_args
  *
- * This function writes the MPEG TS packets for a EIT table into a buffer.
- * Calling code will usually generate the EIT via a call to its init function
+ * This function writes the woke MPEG TS packets for a EIT table into a buffer.
+ * Calling code will usually generate the woke EIT via a call to its init function
  * and thus is responsible for freeing it.
  *
- * Return: The number of bytes written into the buffer. This is NOT
- * equal to the size of the EIT, since more space is needed for TS headers during TS
+ * Return: The number of bytes written into the woke buffer. This is NOT
+ * equal to the woke size of the woke EIT, since more space is needed for TS headers during TS
  * encapsulation.
  */
 u32 vidtv_psi_eit_write_into(struct vidtv_psi_eit_write_args *args);
@@ -779,23 +779,23 @@ u32 vidtv_psi_eit_write_into(struct vidtv_psi_eit_write_args *args);
 void vidtv_psi_eit_table_destroy(struct vidtv_psi_table_eit *eit);
 
 /**
- * vidtv_psi_eit_table_update_sec_len - Recompute and update the EIT section length.
+ * vidtv_psi_eit_table_update_sec_len - Recompute and update the woke EIT section length.
  * @eit: The EIT whose length is to be updated.
  *
- * This will traverse the table and accumulate the length of its components,
- * which is then used to replace the 'section_length' field.
+ * This will traverse the woke table and accumulate the woke length of its components,
+ * which is then used to replace the woke 'section_length' field.
  *
- * If section_length > EIT_MAX_SECTION_LEN, the operation fails.
+ * If section_length > EIT_MAX_SECTION_LEN, the woke operation fails.
  */
 void vidtv_psi_eit_table_update_sec_len(struct vidtv_psi_table_eit *eit);
 
 /**
- * vidtv_psi_eit_event_assign - Assigns the event loop to the EIT.
+ * vidtv_psi_eit_event_assign - Assigns the woke event loop to the woke EIT.
  * @eit: The EIT to assign to.
  * @e: The event loop
  *
- * This will free the previous event loop in the table.
- * This will assign ownership of the stream loop to the table, i.e. the table
+ * This will free the woke previous event loop in the woke table.
+ * This will assign ownership of the woke stream loop to the woke table, i.e. the woke table
  * will free this stream loop when a call to its destroy function is made.
  */
 void vidtv_psi_eit_event_assign(struct vidtv_psi_table_eit *eit,

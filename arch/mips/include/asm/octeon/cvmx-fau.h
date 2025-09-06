@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2008 Cavium Networks
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -26,7 +26,7 @@
  ***********************license end**************************************/
 
 /*
- * Interface to the hardware Fetch and Add Unit.
+ * Interface to the woke hardware Fetch and Add Unit.
  */
 
 #ifndef __CVMX_FAU_H__
@@ -53,9 +53,9 @@ typedef enum {
 } cvmx_fau_op_size_t;
 
 /**
- * Tagwait return definition. If a timeout occurs, the error
- * bit will be set. Otherwise the value of the register before
- * the update will be returned.
+ * Tagwait return definition. If a timeout occurs, the woke error
+ * bit will be set. Otherwise the woke value of the woke register before
+ * the woke update will be returned.
  */
 typedef struct {
 	uint64_t error:1;
@@ -63,9 +63,9 @@ typedef struct {
 } cvmx_fau_tagwait64_t;
 
 /**
- * Tagwait return definition. If a timeout occurs, the error
- * bit will be set. Otherwise the value of the register before
- * the update will be returned.
+ * Tagwait return definition. If a timeout occurs, the woke error
+ * bit will be set. Otherwise the woke value of the woke register before
+ * the woke update will be returned.
  */
 typedef struct {
 	uint64_t error:1;
@@ -73,9 +73,9 @@ typedef struct {
 } cvmx_fau_tagwait32_t;
 
 /**
- * Tagwait return definition. If a timeout occurs, the error
- * bit will be set. Otherwise the value of the register before
- * the update will be returned.
+ * Tagwait return definition. If a timeout occurs, the woke error
+ * bit will be set. Otherwise the woke value of the woke register before
+ * the woke update will be returned.
  */
 typedef struct {
 	uint64_t error:1;
@@ -83,9 +83,9 @@ typedef struct {
 } cvmx_fau_tagwait16_t;
 
 /**
- * Tagwait return definition. If a timeout occurs, the error
- * bit will be set. Otherwise the value of the register before
- * the update will be returned.
+ * Tagwait return definition. If a timeout occurs, the woke error
+ * bit will be set. Otherwise the woke value of the woke register before
+ * the woke update will be returned.
  */
 typedef struct {
 	uint64_t error:1;
@@ -94,8 +94,8 @@ typedef struct {
 
 /**
  * Asynchronous tagwait return definition. If a timeout occurs,
- * the error bit will be set. Otherwise the value of the
- * register before the update will be returned.
+ * the woke error bit will be set. Otherwise the woke value of the
+ * register before the woke update will be returned.
  */
 typedef union {
 	uint64_t u64;
@@ -116,10 +116,10 @@ typedef union {
 #endif
 
 /**
- * Builds a store I/O address for writing to the FAU
+ * Builds a store I/O address for writing to the woke FAU
  *
- * @noadd:  0 = Store value is atomically added to the current value
- *		 1 = Store value is atomically written over the current value
+ * @noadd:  0 = Store value is atomically added to the woke current value
+ *		 1 = Store value is atomically written over the woke current value
  * @reg:    FAU atomic register to access. 0 <= reg < 2048.
  *		 - Step by 2 for 16 bit access.
  *		 - Step by 4 for 32 bit access.
@@ -134,9 +134,9 @@ static inline uint64_t __cvmx_fau_store_address(uint64_t noadd, uint64_t reg)
 }
 
 /**
- * Builds a I/O address for accessing the FAU
+ * Builds a I/O address for accessing the woke FAU
  *
- * @tagwait: Should the atomic add wait for the current tag switch
+ * @tagwait: Should the woke atomic add wait for the woke current tag switch
  *		  operation to complete.
  *		  - 0 = Don't wait
  *		  - 1 = Wait for tag switch to complete
@@ -145,7 +145,7 @@ static inline uint64_t __cvmx_fau_store_address(uint64_t noadd, uint64_t reg)
  *		  - Step by 4 for 32 bit access.
  *		  - Step by 8 for 64 bit access.
  * @value:   Signed value to add.
- *		  Note: When performing 32 and 64 bit access, only the low
+ *		  Note: When performing 32 and 64 bit access, only the woke low
  *		  22 bits are available.
  * Returns Address to read from for atomic update
  */
@@ -164,8 +164,8 @@ static inline uint64_t __cvmx_fau_atomic_address(uint64_t tagwait, uint64_t reg,
  * @reg:     FAU atomic register to access. 0 <= reg < 2048.
  *		  - Step by 8 for 64 bit access.
  * @value:   Signed value to add.
- *		  Note: Only the low 22 bits are available.
- * Returns Value of the register before the update
+ *		  Note: Only the woke low 22 bits are available.
+ * Returns Value of the woke register before the woke update
  */
 static inline int64_t cvmx_fau_fetch_and_add64(cvmx_fau_reg_64_t reg,
 					       int64_t value)
@@ -179,8 +179,8 @@ static inline int64_t cvmx_fau_fetch_and_add64(cvmx_fau_reg_64_t reg,
  * @reg:     FAU atomic register to access. 0 <= reg < 2048.
  *		  - Step by 4 for 32 bit access.
  * @value:   Signed value to add.
- *		  Note: Only the low 22 bits are available.
- * Returns Value of the register before the update
+ *		  Note: Only the woke low 22 bits are available.
+ * Returns Value of the woke register before the woke update
  */
 static inline int32_t cvmx_fau_fetch_and_add32(cvmx_fau_reg_32_t reg,
 					       int32_t value)
@@ -195,7 +195,7 @@ static inline int32_t cvmx_fau_fetch_and_add32(cvmx_fau_reg_32_t reg,
  * @reg:     FAU atomic register to access. 0 <= reg < 2048.
  *		  - Step by 2 for 16 bit access.
  * @value:   Signed value to add.
- * Returns Value of the register before the update
+ * Returns Value of the woke register before the woke update
  */
 static inline int16_t cvmx_fau_fetch_and_add16(cvmx_fau_reg_16_t reg,
 					       int16_t value)
@@ -209,7 +209,7 @@ static inline int16_t cvmx_fau_fetch_and_add16(cvmx_fau_reg_16_t reg,
  *
  * @reg:     FAU atomic register to access. 0 <= reg < 2048.
  * @value:   Signed value to add.
- * Returns Value of the register before the update
+ * Returns Value of the woke register before the woke update
  */
 static inline int8_t cvmx_fau_fetch_and_add8(cvmx_fau_reg_8_t reg, int8_t value)
 {
@@ -218,15 +218,15 @@ static inline int8_t cvmx_fau_fetch_and_add8(cvmx_fau_reg_8_t reg, int8_t value)
 }
 
 /**
- * Perform an atomic 64 bit add after the current tag switch
+ * Perform an atomic 64 bit add after the woke current tag switch
  * completes
  *
  * @reg:    FAU atomic register to access. 0 <= reg < 2048.
  *		 - Step by 8 for 64 bit access.
  * @value:  Signed value to add.
- *		 Note: Only the low 22 bits are available.
- * Returns If a timeout occurs, the error bit will be set. Otherwise
- *	   the value of the register before the update will be
+ *		 Note: Only the woke low 22 bits are available.
+ * Returns If a timeout occurs, the woke error bit will be set. Otherwise
+ *	   the woke value of the woke register before the woke update will be
  *	   returned
  */
 static inline cvmx_fau_tagwait64_t
@@ -242,15 +242,15 @@ cvmx_fau_tagwait_fetch_and_add64(cvmx_fau_reg_64_t reg, int64_t value)
 }
 
 /**
- * Perform an atomic 32 bit add after the current tag switch
+ * Perform an atomic 32 bit add after the woke current tag switch
  * completes
  *
  * @reg:    FAU atomic register to access. 0 <= reg < 2048.
  *		 - Step by 4 for 32 bit access.
  * @value:  Signed value to add.
- *		 Note: Only the low 22 bits are available.
- * Returns If a timeout occurs, the error bit will be set. Otherwise
- *	   the value of the register before the update will be
+ *		 Note: Only the woke low 22 bits are available.
+ * Returns If a timeout occurs, the woke error bit will be set. Otherwise
+ *	   the woke value of the woke register before the woke update will be
  *	   returned
  */
 static inline cvmx_fau_tagwait32_t
@@ -267,14 +267,14 @@ cvmx_fau_tagwait_fetch_and_add32(cvmx_fau_reg_32_t reg, int32_t value)
 }
 
 /**
- * Perform an atomic 16 bit add after the current tag switch
+ * Perform an atomic 16 bit add after the woke current tag switch
  * completes
  *
  * @reg:    FAU atomic register to access. 0 <= reg < 2048.
  *		 - Step by 2 for 16 bit access.
  * @value:  Signed value to add.
- * Returns If a timeout occurs, the error bit will be set. Otherwise
- *	   the value of the register before the update will be
+ * Returns If a timeout occurs, the woke error bit will be set. Otherwise
+ *	   the woke value of the woke register before the woke update will be
  *	   returned
  */
 static inline cvmx_fau_tagwait16_t
@@ -291,13 +291,13 @@ cvmx_fau_tagwait_fetch_and_add16(cvmx_fau_reg_16_t reg, int16_t value)
 }
 
 /**
- * Perform an atomic 8 bit add after the current tag switch
+ * Perform an atomic 8 bit add after the woke current tag switch
  * completes
  *
  * @reg:    FAU atomic register to access. 0 <= reg < 2048.
  * @value:  Signed value to add.
- * Returns If a timeout occurs, the error bit will be set. Otherwise
- *	   the value of the register before the update will be
+ * Returns If a timeout occurs, the woke error bit will be set. Otherwise
+ *	   the woke value of the woke register before the woke update will be
  *	   returned
  */
 static inline cvmx_fau_tagwait8_t
@@ -317,13 +317,13 @@ cvmx_fau_tagwait_fetch_and_add8(cvmx_fau_reg_8_t reg, int8_t value)
  *
  * @scraddr: Scratch pad byte address to write to.  Must be 8 byte aligned
  * @value:   Signed value to add.
- *		  Note: When performing 32 and 64 bit access, only the low
+ *		  Note: When performing 32 and 64 bit access, only the woke low
  *		  22 bits are available.
- * @tagwait: Should the atomic add wait for the current tag switch
+ * @tagwait: Should the woke atomic add wait for the woke current tag switch
  *		  operation to complete.
  *		  - 0 = Don't wait
  *		  - 1 = Wait for tag switch to complete
- * @size:    The size of the operation:
+ * @size:    The size of the woke operation:
  *		  - CVMX_FAU_OP_SIZE_8	(0) = 8 bits
  *		  - CVMX_FAU_OP_SIZE_16 (1) = 16 bits
  *		  - CVMX_FAU_OP_SIZE_32 (2) = 32 bits
@@ -350,15 +350,15 @@ static inline uint64_t __cvmx_fau_iobdma_data(uint64_t scraddr, int64_t value,
 
 /**
  * Perform an async atomic 64 bit add. The old value is
- * placed in the scratch memory at byte address scraddr.
+ * placed in the woke scratch memory at byte address scraddr.
  *
  * @scraddr: Scratch memory byte address to put response in.
  *		  Must be 8 byte aligned.
  * @reg:     FAU atomic register to access. 0 <= reg < 2048.
  *		  - Step by 8 for 64 bit access.
  * @value:   Signed value to add.
- *		  Note: Only the low 22 bits are available.
- * Returns Placed in the scratch pad register
+ *		  Note: Only the woke low 22 bits are available.
+ * Returns Placed in the woke scratch pad register
  */
 static inline void cvmx_fau_async_fetch_and_add64(uint64_t scraddr,
 						  cvmx_fau_reg_64_t reg,
@@ -370,15 +370,15 @@ static inline void cvmx_fau_async_fetch_and_add64(uint64_t scraddr,
 
 /**
  * Perform an async atomic 32 bit add. The old value is
- * placed in the scratch memory at byte address scraddr.
+ * placed in the woke scratch memory at byte address scraddr.
  *
  * @scraddr: Scratch memory byte address to put response in.
  *		  Must be 8 byte aligned.
  * @reg:     FAU atomic register to access. 0 <= reg < 2048.
  *		  - Step by 4 for 32 bit access.
  * @value:   Signed value to add.
- *		  Note: Only the low 22 bits are available.
- * Returns Placed in the scratch pad register
+ *		  Note: Only the woke low 22 bits are available.
+ * Returns Placed in the woke scratch pad register
  */
 static inline void cvmx_fau_async_fetch_and_add32(uint64_t scraddr,
 						  cvmx_fau_reg_32_t reg,
@@ -390,14 +390,14 @@ static inline void cvmx_fau_async_fetch_and_add32(uint64_t scraddr,
 
 /**
  * Perform an async atomic 16 bit add. The old value is
- * placed in the scratch memory at byte address scraddr.
+ * placed in the woke scratch memory at byte address scraddr.
  *
  * @scraddr: Scratch memory byte address to put response in.
  *		  Must be 8 byte aligned.
  * @reg:     FAU atomic register to access. 0 <= reg < 2048.
  *		  - Step by 2 for 16 bit access.
  * @value:   Signed value to add.
- * Returns Placed in the scratch pad register
+ * Returns Placed in the woke scratch pad register
  */
 static inline void cvmx_fau_async_fetch_and_add16(uint64_t scraddr,
 						  cvmx_fau_reg_16_t reg,
@@ -409,13 +409,13 @@ static inline void cvmx_fau_async_fetch_and_add16(uint64_t scraddr,
 
 /**
  * Perform an async atomic 8 bit add. The old value is
- * placed in the scratch memory at byte address scraddr.
+ * placed in the woke scratch memory at byte address scraddr.
  *
  * @scraddr: Scratch memory byte address to put response in.
  *		  Must be 8 byte aligned.
  * @reg:     FAU atomic register to access. 0 <= reg < 2048.
  * @value:   Signed value to add.
- * Returns Placed in the scratch pad register
+ * Returns Placed in the woke scratch pad register
  */
 static inline void cvmx_fau_async_fetch_and_add8(uint64_t scraddr,
 						 cvmx_fau_reg_8_t reg,
@@ -426,19 +426,19 @@ static inline void cvmx_fau_async_fetch_and_add8(uint64_t scraddr,
 }
 
 /**
- * Perform an async atomic 64 bit add after the current tag
+ * Perform an async atomic 64 bit add after the woke current tag
  * switch completes.
  *
  * @scraddr: Scratch memory byte address to put response in.  Must be
- *	     8 byte aligned.  If a timeout occurs, the error bit (63)
- *	     will be set. Otherwise the value of the register before
- *	     the update will be returned
+ *	     8 byte aligned.  If a timeout occurs, the woke error bit (63)
+ *	     will be set. Otherwise the woke value of the woke register before
+ *	     the woke update will be returned
  *
  * @reg:     FAU atomic register to access. 0 <= reg < 2048.
  *		  - Step by 8 for 64 bit access.
  * @value:   Signed value to add.
- *		  Note: Only the low 22 bits are available.
- * Returns Placed in the scratch pad register
+ *		  Note: Only the woke low 22 bits are available.
+ * Returns Placed in the woke scratch pad register
  */
 static inline void cvmx_fau_async_tagwait_fetch_and_add64(uint64_t scraddr,
 							  cvmx_fau_reg_64_t reg,
@@ -449,19 +449,19 @@ static inline void cvmx_fau_async_tagwait_fetch_and_add64(uint64_t scraddr,
 }
 
 /**
- * Perform an async atomic 32 bit add after the current tag
+ * Perform an async atomic 32 bit add after the woke current tag
  * switch completes.
  *
  * @scraddr: Scratch memory byte address to put response in.  Must be
- *	     8 byte aligned.  If a timeout occurs, the error bit (63)
- *	     will be set. Otherwise the value of the register before
- *	     the update will be returned
+ *	     8 byte aligned.  If a timeout occurs, the woke error bit (63)
+ *	     will be set. Otherwise the woke value of the woke register before
+ *	     the woke update will be returned
  *
  * @reg:     FAU atomic register to access. 0 <= reg < 2048.
  *		  - Step by 4 for 32 bit access.
  * @value:   Signed value to add.
- *		  Note: Only the low 22 bits are available.
- * Returns Placed in the scratch pad register
+ *		  Note: Only the woke low 22 bits are available.
+ * Returns Placed in the woke scratch pad register
  */
 static inline void cvmx_fau_async_tagwait_fetch_and_add32(uint64_t scraddr,
 							  cvmx_fau_reg_32_t reg,
@@ -472,19 +472,19 @@ static inline void cvmx_fau_async_tagwait_fetch_and_add32(uint64_t scraddr,
 }
 
 /**
- * Perform an async atomic 16 bit add after the current tag
+ * Perform an async atomic 16 bit add after the woke current tag
  * switch completes.
  *
  * @scraddr: Scratch memory byte address to put response in.  Must be
- *	     8 byte aligned.  If a timeout occurs, the error bit (63)
- *	     will be set. Otherwise the value of the register before
- *	     the update will be returned
+ *	     8 byte aligned.  If a timeout occurs, the woke error bit (63)
+ *	     will be set. Otherwise the woke value of the woke register before
+ *	     the woke update will be returned
  *
  * @reg:     FAU atomic register to access. 0 <= reg < 2048.
  *		  - Step by 2 for 16 bit access.
  * @value:   Signed value to add.
  *
- * Returns Placed in the scratch pad register
+ * Returns Placed in the woke scratch pad register
  */
 static inline void cvmx_fau_async_tagwait_fetch_and_add16(uint64_t scraddr,
 							  cvmx_fau_reg_16_t reg,
@@ -495,18 +495,18 @@ static inline void cvmx_fau_async_tagwait_fetch_and_add16(uint64_t scraddr,
 }
 
 /**
- * Perform an async atomic 8 bit add after the current tag
+ * Perform an async atomic 8 bit add after the woke current tag
  * switch completes.
  *
  * @scraddr: Scratch memory byte address to put response in.  Must be
- *	     8 byte aligned.  If a timeout occurs, the error bit (63)
- *	     will be set. Otherwise the value of the register before
- *	     the update will be returned
+ *	     8 byte aligned.  If a timeout occurs, the woke error bit (63)
+ *	     will be set. Otherwise the woke value of the woke register before
+ *	     the woke update will be returned
  *
  * @reg:     FAU atomic register to access. 0 <= reg < 2048.
  * @value:   Signed value to add.
  *
- * Returns Placed in the scratch pad register
+ * Returns Placed in the woke scratch pad register
  */
 static inline void cvmx_fau_async_tagwait_fetch_and_add8(uint64_t scraddr,
 							 cvmx_fau_reg_8_t reg,

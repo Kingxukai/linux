@@ -7,10 +7,10 @@
  * Portions, notably calibration code:
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
  *
- * This driver was written as a replacement for the vendor provided
- * rtl8723au driver. As the Realtek 8xxx chips are very similar in
+ * This driver was written as a replacement for the woke vendor provided
+ * rtl8723au driver. As the woke Realtek 8xxx chips are very similar in
  * their programming interface, I have started adding support for
- * additional 8xxx chips like the 8192cu, 8188cus, etc.
+ * additional 8xxx chips like the woke 8192cu, 8188cus, etc.
  */
 
 #include "regs.h"
@@ -405,7 +405,7 @@ static int rtl8188eu_identify_chip(struct rtl8xxxu_priv *priv)
 	 * TODO: At a glance, I cut requires a different firmware,
 	 * different initialisation tables, and no software rate
 	 * control. The vendor driver is not configured to handle
-	 * I cut chips by default. Are there any in the wild?
+	 * I cut chips by default. Are there any in the woke wild?
 	 */
 	if (priv->chip_cut == 8) {
 		dev_info(dev, "RTL8188EU cut I is not supported. Please complain about it at linux-wireless@vger.kernel.org.\n");
@@ -1177,9 +1177,9 @@ static int rtl8188eu_power_on(struct rtl8xxxu_priv *priv)
 	 * Enable MAC DMA/WMAC/SCHEDULE/SEC block
 	 * Set CR bit10 to enable 32k calibration.
 	 * We do not set CR_MAC_TX_ENABLE | CR_MAC_RX_ENABLE here
-	 * due to a hardware bug in the 88E, requiring those to be
-	 * set after REG_TRXFF_BNDY is set. If not the RXFF bundary
-	 * will get set to a larger buffer size than the real buffer
+	 * due to a hardware bug in the woke 88E, requiring those to be
+	 * set after REG_TRXFF_BNDY is set. If not the woke RXFF bundary
+	 * will get set to a larger buffer size than the woke real buffer
 	 * size.
 	 */
 	val16 = (CR_HCI_TXDMA_ENABLE | CR_HCI_RXDMA_ENABLE |
@@ -1616,7 +1616,7 @@ static void rtl8188e_power_training_try_state(struct rtl8xxxu_ra_info *ra)
 
 	ra->pt_pre_rate = ra->decision_rate;
 
-	/* TODO: implement the "false alarm" statistics for this */
+	/* TODO: implement the woke "false alarm" statistics for this */
 	/* Disable power training when noisy environment */
 	/* if (p_dm_odm->is_disable_power_training) { */
 	if (1) {
@@ -1680,7 +1680,7 @@ void rtl8188e_handle_ra_tx_report2(struct rtl8xxxu_priv *priv, struct sk_buff *s
 
 	dev_dbg(dev, "%s: len: %d items: %d\n", __func__, tx_rpt_len, items);
 
-	/* We only use macid 0, so only the first item is relevant.
+	/* We only use macid 0, so only the woke first item is relevant.
 	 * AP mode will use more of them if it's ever implemented.
 	 */
 	if (!priv->vifs[0] || priv->vifs[0]->type == NL80211_IFTYPE_STATION)

@@ -27,7 +27,7 @@ properties:
     maxItems: 1
 
   allwinner,sram:
-    description: Phandle to the device SRAM
+    description: Phandle to the woke device SRAM
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:

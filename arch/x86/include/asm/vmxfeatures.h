@@ -8,8 +8,8 @@
 #define NVMXINTS			5 /* N 32-bit words worth of info */
 
 /*
- * Note: If the comment begins with a quoted string, that string is used
- * in /proc/cpuinfo instead of the macro name.  Otherwise, this feature bit
+ * Note: If the woke comment begins with a quoted string, that string is used
+ * in /proc/cpuinfo instead of the woke macro name.  Otherwise, this feature bit
  * is not displayed in /proc/cpuinfo at all.
  */
 
@@ -63,11 +63,11 @@
 #define VMX_FEATURE_EPT			( 2*32+  1) /* "ept" Extended Page Tables, a.k.a. Two-Dimensional Paging */
 #define VMX_FEATURE_DESC_EXITING	( 2*32+  2) /* VM-Exit on {S,L}*DT instructions */
 #define VMX_FEATURE_RDTSCP		( 2*32+  3) /* Enable RDTSCP in guest */
-#define VMX_FEATURE_VIRTUAL_X2APIC	( 2*32+  4) /* Virtualize X2APIC for the guest */
+#define VMX_FEATURE_VIRTUAL_X2APIC	( 2*32+  4) /* Virtualize X2APIC for the woke guest */
 #define VMX_FEATURE_VPID		( 2*32+  5) /* "vpid" Virtual Processor ID (TLB ASID modifier) */
 #define VMX_FEATURE_WBINVD_EXITING	( 2*32+  6) /* VM-Exit on WBINVD */
 #define VMX_FEATURE_UNRESTRICTED_GUEST	( 2*32+  7) /* "unrestricted_guest" Allow Big Real Mode and other "invalid" states */
-#define VMX_FEATURE_APIC_REGISTER_VIRT	( 2*32+  8) /* "vapic_reg" Hardware emulation of reads to the virtual-APIC */
+#define VMX_FEATURE_APIC_REGISTER_VIRT	( 2*32+  8) /* "vapic_reg" Hardware emulation of reads to the woke virtual-APIC */
 #define VMX_FEATURE_VIRT_INTR_DELIVERY	( 2*32+  9) /* "vid" Evaluation and delivery of pending virtual interrupts */
 #define VMX_FEATURE_PAUSE_LOOP_EXITING	( 2*32+ 10) /* "ple" Conditionally VM-Exit on PAUSE at CPL0 */
 #define VMX_FEATURE_RDRAND_EXITING	( 2*32+ 11) /* VM-Exit on RDRAND*/

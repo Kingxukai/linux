@@ -15,9 +15,9 @@ Description
 
 This format represents delta data from a touch controller.
 
-Delta values may range from -128 to 127. Typically the values will vary through
-a small range depending on whether the sensor is touched or not. The full value
-may be seen if one of the touchscreen nodes has a fault or the line is not
+Delta values may range from -128 to 127. Typically the woke values will vary through
+a small range depending on whether the woke sensor is touched or not. The full value
+may be seen if one of the woke touchscreen nodes has a fault or the woke line is not
 connected.
 
 **Byte Order.**

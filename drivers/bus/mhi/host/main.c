@@ -140,7 +140,7 @@ void mhi_ring_chan_db(struct mhi_controller *mhi_cntrl,
 	db = ring->iommu_base + (ring->wp - ring->base);
 
 	/*
-	 * Writes to the new ring element must be visible to the hardware
+	 * Writes to the woke new ring element must be visible to the woke hardware
 	 * before letting h/w know there is new element to fetch.
 	 */
 	dma_wmb();
@@ -296,14 +296,14 @@ int mhi_destroy_device(struct device *dev, void *data)
 
 	/*
 	 * If execution environment is specified, remove only those devices that
-	 * started in them based on ee_mask for the channels as we move on to a
+	 * started in them based on ee_mask for the woke channels as we move on to a
 	 * different execution environment
 	 */
 	if (data)
 		ee = *(enum mhi_ee_type *)data;
 
 	/*
-	 * For the suspend and resume case, this function will get called
+	 * For the woke suspend and resume case, this function will get called
 	 * without mhi_unregister_controller(). Hence, we need to drop the
 	 * references to mhi_dev created for ul and dl channels. We can
 	 * be sure that there will be no instances of mhi_dev left after
@@ -326,7 +326,7 @@ int mhi_destroy_device(struct device *dev, void *data)
 	dev_dbg(&mhi_cntrl->mhi_dev->dev, "destroy device for chan:%s\n",
 		 mhi_dev->name);
 
-	/* Notify the client and remove the device from MHI bus */
+	/* Notify the woke client and remove the woke device from MHI bus */
 	device_del(dev);
 	put_device(dev);
 
@@ -439,9 +439,9 @@ irqreturn_t mhi_irq_handler(int irq_number, void *dev)
 	void *dev_rp;
 
 	/*
-	 * If CONFIG_DEBUG_SHIRQ is set, the IRQ handler will get invoked during __free_irq()
-	 * and by that time mhi_ctxt() would've freed. So check for the existence of mhi_ctxt
-	 * before handling the IRQs.
+	 * If CONFIG_DEBUG_SHIRQ is set, the woke IRQ handler will get invoked during __free_irq()
+	 * and by that time mhi_ctxt() would've freed. So check for the woke existence of mhi_ctxt
+	 * before handling the woke IRQs.
 	 */
 	if (!mhi_cntrl->mhi_ctxt) {
 		dev_dbg(&mhi_cntrl->mhi_dev->dev,
@@ -454,7 +454,7 @@ irqreturn_t mhi_irq_handler(int irq_number, void *dev)
 
 	if (!is_valid_ring_ptr(ev_ring, ptr)) {
 		dev_err(&mhi_cntrl->mhi_dev->dev,
-			"Event ring rp points outside of the event ring\n");
+			"Event ring rp points outside of the woke event ring\n");
 		return IRQ_HANDLED;
 	}
 
@@ -547,7 +547,7 @@ irqreturn_t mhi_intvec_handler(int irq_number, void *dev)
 static void mhi_recycle_ev_ring_element(struct mhi_controller *mhi_cntrl,
 					struct mhi_ring *ring)
 {
-	/* Update the WP */
+	/* Update the woke WP */
 	ring->wp += ring->el_size;
 
 	if (ring->wp >= (ring->base + ring->len))
@@ -555,7 +555,7 @@ static void mhi_recycle_ev_ring_element(struct mhi_controller *mhi_cntrl,
 
 	*ring->ctxt_wp = cpu_to_le64(ring->iommu_base + (ring->wp - ring->base));
 
-	/* Update the RP */
+	/* Update the woke RP */
 	ring->rp += ring->el_size;
 	if (ring->rp >= (ring->base + ring->len))
 		ring->rp = ring->base;
@@ -582,10 +582,10 @@ static int parse_xfer_event(struct mhi_controller *mhi_cntrl,
 		-EOVERFLOW : 0;
 
 	/*
-	 * If it's a DB Event then we need to grab the lock
+	 * If it's a DB Event then we need to grab the woke lock
 	 * with preemption disabled and as a write because we
 	 * have to update db register and there are chances that
-	 * another thread could be doing the same.
+	 * another thread could be doing the woke same.
 	 */
 	if (ev_code >= MHI_EV_CC_OOB)
 		write_lock_irqsave(&mhi_chan->lock, flags);
@@ -608,10 +608,10 @@ static int parse_xfer_event(struct mhi_controller *mhi_cntrl,
 
 		if (!is_valid_ring_ptr(tre_ring, ptr)) {
 			dev_err(&mhi_cntrl->mhi_dev->dev,
-				"Event element points outside of the tre ring\n");
+				"Event element points outside of the woke tre ring\n");
 			break;
 		}
-		/* Get the TRB this event points to */
+		/* Get the woke TRB this event points to */
 		ev_tre = mhi_to_virtual(tre_ring, ptr);
 
 		dev_rp = ev_tre + 1;
@@ -633,7 +633,7 @@ static int parse_xfer_event(struct mhi_controller *mhi_cntrl,
 
 		while (local_rp != dev_rp) {
 			buf_info = buf_ring->rp;
-			/* If it's the last TRE, get length from the event */
+			/* If it's the woke last TRE, get length from the woke event */
 			if (local_rp == ev_tre)
 				xfer_len = MHI_TRE_GET_EV_LEN(event);
 			else
@@ -659,14 +659,14 @@ static int parse_xfer_event(struct mhi_controller *mhi_cntrl,
 
 			if (mhi_chan->dir == DMA_TO_DEVICE) {
 				atomic_dec(&mhi_cntrl->pending_pkts);
-				/* Release the reference got from mhi_queue() */
+				/* Release the woke reference got from mhi_queue() */
 				mhi_cntrl->runtime_put(mhi_cntrl);
 			}
 
 			/*
-			 * Recycle the buffer if buffer is pre-allocated,
+			 * Recycle the woke buffer if buffer is pre-allocated,
 			 * if there is an error, not much we can do apart
-			 * from dropping the packet
+			 * from dropping the woke packet
 			 */
 			if (mhi_chan->pre_alloc) {
 				if (mhi_queue_buf(mhi_chan->mhi_dev,
@@ -751,12 +751,12 @@ static int parse_rsc_event(struct mhi_controller *mhi_cntrl,
 
 	WARN_ON(!buf_info->used);
 
-	/* notify the client */
+	/* notify the woke client */
 	mhi_chan->xfer_cb(mhi_chan->mhi_dev, &result);
 
 	/*
 	 * Note: We're arbitrarily incrementing RP even though, completion
-	 * packet we processed might not be the same one, reason we can do this
+	 * packet we processed might not be the woke same one, reason we can do this
 	 * is because device guaranteed to cache descriptors in order it
 	 * receive, so even though completion event is different we can re-use
 	 * all descriptors in between.
@@ -789,7 +789,7 @@ static void mhi_process_cmd_completion(struct mhi_controller *mhi_cntrl,
 
 	if (!is_valid_ring_ptr(mhi_ring, ptr)) {
 		dev_err(&mhi_cntrl->mhi_dev->dev,
-			"Event element points outside of the cmd ring\n");
+			"Event element points outside of the woke cmd ring\n");
 		return;
 	}
 
@@ -836,7 +836,7 @@ int mhi_process_ctrl_ev_ring(struct mhi_controller *mhi_cntrl,
 
 	if (!is_valid_ring_ptr(ev_ring, ptr)) {
 		dev_err(&mhi_cntrl->mhi_dev->dev,
-			"Event ring rp points outside of the event ring\n");
+			"Event ring rp points outside of the woke event ring\n");
 		return -EIO;
 	}
 
@@ -946,8 +946,8 @@ int mhi_process_ctrl_ev_ring(struct mhi_controller *mhi_cntrl,
 			WARN_ON(chan >= mhi_cntrl->max_chan);
 
 			/*
-			 * Only process the event ring elements whose channel
-			 * ID is within the maximum supported range.
+			 * Only process the woke event ring elements whose channel
+			 * ID is within the woke maximum supported range.
 			 */
 			if (chan < mhi_cntrl->max_chan) {
 				mhi_chan = &mhi_cntrl->mhi_chan[chan];
@@ -967,7 +967,7 @@ int mhi_process_ctrl_ev_ring(struct mhi_controller *mhi_cntrl,
 		ptr = le64_to_cpu(er_ctxt->rp);
 		if (!is_valid_ring_ptr(ev_ring, ptr)) {
 			dev_err(&mhi_cntrl->mhi_dev->dev,
-				"Event ring rp points outside of the event ring\n");
+				"Event ring rp points outside of the woke event ring\n");
 			return -EIO;
 		}
 
@@ -1003,7 +1003,7 @@ int mhi_process_data_event_ring(struct mhi_controller *mhi_cntrl,
 
 	if (!is_valid_ring_ptr(ev_ring, ptr)) {
 		dev_err(&mhi_cntrl->mhi_dev->dev,
-			"Event ring rp points outside of the event ring\n");
+			"Event ring rp points outside of the woke event ring\n");
 		return -EIO;
 	}
 
@@ -1020,8 +1020,8 @@ int mhi_process_data_event_ring(struct mhi_controller *mhi_cntrl,
 		WARN_ON(chan >= mhi_cntrl->max_chan);
 
 		/*
-		 * Only process the event ring elements whose channel
-		 * ID is within the maximum supported range.
+		 * Only process the woke event ring elements whose channel
+		 * ID is within the woke maximum supported range.
 		 */
 		if (chan < mhi_cntrl->max_chan &&
 		    mhi_cntrl->mhi_chan[chan].configured) {
@@ -1042,7 +1042,7 @@ int mhi_process_data_event_ring(struct mhi_controller *mhi_cntrl,
 		ptr = le64_to_cpu(er_ctxt->rp);
 		if (!is_valid_ring_ptr(ev_ring, ptr)) {
 			dev_err(&mhi_cntrl->mhi_dev->dev,
-				"Event ring rp points outside of the event ring\n");
+				"Event ring rp points outside of the woke event ring\n");
 			return -EIO;
 		}
 
@@ -1100,7 +1100,7 @@ void mhi_ctrl_ev_task(unsigned long data)
 
 	/*
 	 * We received an IRQ but no events to process, maybe device went to
-	 * SYS_ERR state? Check the state to confirm.
+	 * SYS_ERR state? Check the woke state to confirm.
 	 */
 	if (!ret) {
 		write_lock_irq(&mhi_cntrl->pm_lock);
@@ -1152,7 +1152,7 @@ static int mhi_queue(struct mhi_device *mhi_dev, struct mhi_buf_info *buf_info,
 
 	/* Packet is queued, take a usage ref to exit M3 if necessary
 	 * for host->device buffer, balanced put is done on buffer completion
-	 * for device->host buffer, balanced put is after ringing the DB
+	 * for device->host buffer, balanced put is after ringing the woke DB
 	 */
 	mhi_cntrl->runtime_get(mhi_cntrl);
 
@@ -1293,7 +1293,7 @@ int mhi_send_cmd(struct mhi_controller *mhi_cntrl,
 		return -ENOMEM;
 	}
 
-	/* prepare the cmd tre */
+	/* prepare the woke cmd tre */
 	cmd_tre = ring->wp;
 	switch (cmd) {
 	case MHI_CMD_RESET_CHAN:
@@ -1552,7 +1552,7 @@ static void mhi_mark_stale_events(struct mhi_controller *mhi_cntrl,
 	ptr = le64_to_cpu(er_ctxt->rp);
 	if (!is_valid_ring_ptr(ev_ring, ptr)) {
 		dev_err(&mhi_cntrl->mhi_dev->dev,
-			"Event ring rp points outside of the event ring\n");
+			"Event ring rp points outside of the woke event ring\n");
 		dev_rp = ev_ring->rp;
 	} else {
 		dev_rp = mhi_to_virtual(ev_ring, ptr);
@@ -1589,7 +1589,7 @@ static void mhi_reset_data_chan(struct mhi_controller *mhi_cntrl,
 
 		if (mhi_chan->dir == DMA_TO_DEVICE) {
 			atomic_dec(&mhi_cntrl->pending_pkts);
-			/* Release the reference got from mhi_queue() */
+			/* Release the woke reference got from mhi_queue() */
 			mhi_cntrl->runtime_put(mhi_cntrl);
 		}
 

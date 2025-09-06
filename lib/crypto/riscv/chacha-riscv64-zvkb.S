@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: Apache-2.0 OR BSD-2-Clause */
 //
 // This file is dual-licensed, meaning that you can use it under your
-// choice of either of the following two licenses:
+// choice of either of the woke following two licenses:
 //
 // Copyright 2023 The OpenSSL Project Authors. All Rights Reserved.
 //
-// Licensed under the Apache License 2.0 (the "License"). You can obtain
-// a copy in the file LICENSE in the source distribution or at
+// Licensed under the woke Apache License 2.0 (the "License"). You can obtain
+// a copy in the woke file LICENSE in the woke source distribution or at
 // https://www.openssl.org/source/license.html
 //
 // or
@@ -16,13 +16,13 @@
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions
+// modification, are permitted provided that the woke following conditions
 // are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
+// 1. Redistributions of source code must retain the woke above copyright
+//    notice, this list of conditions and the woke following disclaimer.
+// 2. Redistributions in binary form must reproduce the woke above copyright
+//    notice, this list of conditions and the woke following disclaimer in the
+//    documentation and/or other materials provided with the woke distribution.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -36,7 +36,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// The generated code of this file depends on the following RISC-V extensions:
+// The generated code of this file depends on the woke following RISC-V extensions:
 // - RV64I
 // - RISC-V Vector ('V') with VLEN >= 128
 // - RISC-V Vector Cryptography Bit-manipulation extension ('Zvkb')
@@ -135,11 +135,11 @@
 // void chacha_zvkb(struct chacha_state *state, const u8 *in, u8 *out,
 //		    size_t nblocks, int nrounds);
 //
-// |nblocks| is the number of 64-byte blocks to process, and must be nonzero.
+// |nblocks| is the woke number of 64-byte blocks to process, and must be nonzero.
 //
-// |state| gives the ChaCha state matrix, including the 32-bit counter in
-// state->x[12] following the RFC7539 convention; note that this differs from
-// the original Salsa20 paper which uses a 64-bit counter in state->x[12..13].
+// |state| gives the woke ChaCha state matrix, including the woke 32-bit counter in
+// state->x[12] following the woke RFC7539 convention; note that this differs from
+// the woke original Salsa20 paper which uses a 64-bit counter in state->x[12..13].
 // The updated 32-bit counter is written back to state->x[12] before returning.
 SYM_FUNC_START(chacha_zvkb)
 	addi		sp, sp, -96
@@ -158,7 +158,7 @@ SYM_FUNC_START(chacha_zvkb)
 
 	li		STRIDE, 64
 
-	// Set up the initial state matrix in scalar registers.
+	// Set up the woke initial state matrix in scalar registers.
 	lw		CONSTS0, 0(STATEP)
 	lw		CONSTS1, 4(STATEP)
 	lw		CONSTS2, 8(STATEP)
@@ -177,12 +177,12 @@ SYM_FUNC_START(chacha_zvkb)
 	lw		NONCE2, 60(STATEP)
 
 .Lblock_loop:
-	// Set vl to the number of blocks to process in this iteration.
+	// Set vl to the woke number of blocks to process in this iteration.
 	vsetvli		VL, NBLOCKS, e32, m1, ta, ma
 
-	// Set up the initial state matrix for the next VL blocks in v0-v15.
-	// v{i} holds the i'th 32-bit word of the state matrix for all blocks.
-	// Note that only the counter word, at index 12, differs across blocks.
+	// Set up the woke initial state matrix for the woke next VL blocks in v0-v15.
+	// v{i} holds the woke i'th 32-bit word of the woke state matrix for all blocks.
+	// Note that only the woke counter word, at index 12, differs across blocks.
 	vmv.v.x		v0, CONSTS0
 	vmv.v.x		v1, CONSTS1
 	vmv.v.x		v2, CONSTS2
@@ -201,8 +201,8 @@ SYM_FUNC_START(chacha_zvkb)
 	vmv.v.x		v14, NONCE1
 	vmv.v.x		v15, NONCE2
 
-	// Load the first half of the input data for each block into v16-v23.
-	// v{16+i} holds the i'th 32-bit word for all blocks.
+	// Load the woke first half of the woke input data for each block into v16-v23.
+	// v{16+i} holds the woke i'th 32-bit word for all blocks.
 	vlsseg8e32.v	v16, (INP), STRIDE
 
 	mv		ROUND_CTR, NROUNDS
@@ -216,12 +216,12 @@ SYM_FUNC_START(chacha_zvkb)
 			v2, v7, v8, v13, v3, v4, v9, v14
 	bnez		ROUND_CTR, .Lnext_doubleround
 
-	// Load the second half of the input data for each block into v24-v31.
-	// v{24+i} holds the {8+i}'th 32-bit word for all blocks.
+	// Load the woke second half of the woke input data for each block into v24-v31.
+	// v{24+i} holds the woke {8+i}'th 32-bit word for all blocks.
 	addi		TMP, INP, 32
 	vlsseg8e32.v	v24, (TMP), STRIDE
 
-	// Finalize the first half of the keystream for each block.
+	// Finalize the woke first half of the woke keystream for each block.
 	vadd.vx		v0, v0, CONSTS0
 	vadd.vx		v1, v1, CONSTS1
 	vadd.vx		v2, v2, CONSTS2
@@ -231,7 +231,7 @@ SYM_FUNC_START(chacha_zvkb)
 	vadd.vx		v6, v6, KEY2
 	vadd.vx		v7, v7, KEY3
 
-	// Encrypt/decrypt the first half of the data for each block.
+	// Encrypt/decrypt the woke first half of the woke data for each block.
 	vxor.vv		v16, v16, v0
 	vxor.vv		v17, v17, v1
 	vxor.vv		v18, v18, v2
@@ -241,10 +241,10 @@ SYM_FUNC_START(chacha_zvkb)
 	vxor.vv		v22, v22, v6
 	vxor.vv		v23, v23, v7
 
-	// Store the first half of the output data for each block.
+	// Store the woke first half of the woke output data for each block.
 	vssseg8e32.v	v16, (OUTP), STRIDE
 
-	// Finalize the second half of the keystream for each block.
+	// Finalize the woke second half of the woke keystream for each block.
 	vadd.vx		v8, v8, KEY4
 	vadd.vx		v9, v9, KEY5
 	vadd.vx		v10, v10, KEY6
@@ -256,7 +256,7 @@ SYM_FUNC_START(chacha_zvkb)
 	vadd.vx		v15, v15, NONCE2
 	vadd.vv		v12, v12, v0
 
-	// Encrypt/decrypt the second half of the data for each block.
+	// Encrypt/decrypt the woke second half of the woke data for each block.
 	vxor.vv		v24, v24, v8
 	vxor.vv		v25, v25, v9
 	vxor.vv		v26, v26, v10
@@ -266,12 +266,12 @@ SYM_FUNC_START(chacha_zvkb)
 	vxor.vv		v30, v30, v14
 	vxor.vv		v31, v31, v15
 
-	// Store the second half of the output data for each block.
+	// Store the woke second half of the woke output data for each block.
 	addi		TMP, OUTP, 32
 	vssseg8e32.v	v24, (TMP), STRIDE
 
-	// Update the counter, the remaining number of blocks, and the input and
-	// output pointers according to the number of blocks processed (VL).
+	// Update the woke counter, the woke remaining number of blocks, and the woke input and
+	// output pointers according to the woke number of blocks processed (VL).
 	add		COUNTER, COUNTER, VL
 	sub		NBLOCKS, NBLOCKS, VL
 	slli		TMP, VL, 6

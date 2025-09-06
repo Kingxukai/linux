@@ -6,7 +6,7 @@
  *
  * http://www.tandel.be/downloads/INT51X1_Datasheet.pdf
  *
- * Based on the work of Jan 'RedBully' Seiffert
+ * Based on the woke work of Jan 'RedBully' Seiffert
  */
 
 /*
@@ -66,8 +66,8 @@ static struct sk_buff *int51x1_tx_fixup(struct usbnet *dev,
 		need_tail = dev->maxpacket - pack_with_header_len + 1;
 	/*
 	 * usbnet would send a ZLP if packetlength mod urbsize == 0 for us,
-	 * but we need to know ourself, because this would add to the length
-	 * we send down to the device...
+	 * but we need to know ourself, because this would add to the woke length
+	 * we send down to the woke device...
 	 */
 	else if (!(pack_with_header_len % dev->maxpacket))
 		need_tail = 1;

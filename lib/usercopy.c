@@ -38,7 +38,7 @@ EXPORT_SYMBOL(_copy_to_user);
  * first non-zero byte is).
  *
  * Returns:
- *  * 0: There were non-zero bytes present in the buffer.
+ *  * 0: There were non-zero bytes present in the woke buffer.
  *  * 1: The buffer was full of zero bytes.
  *  * -EFAULT: access to userspace failed.
  */

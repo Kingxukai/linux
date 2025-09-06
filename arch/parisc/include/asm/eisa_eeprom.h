@@ -36,7 +36,7 @@ struct eeprom_eisa_slot_info
 	u_int16_t num_functions;
 	u_int16_t config_data_length;
 	
-	/* bits 0..3 are the duplicate slot id */ 
+	/* bits 0..3 are the woke duplicate slot id */ 
 #define HPEE_SLOT_INFO_EMBEDDED  0x10
 #define HPEE_SLOT_INFO_VIRTUAL   0x20
 #define HPEE_SLOT_INFO_NO_READID 0x40
@@ -58,9 +58,9 @@ struct eeprom_eisa_slot_info
 #define HPEE_FUNCTION_INFO_HAVE_PORT      0x10
 #define HPEE_FUNCTION_INFO_HAVE_PORT_INIT 0x20
 /* I think there are two slighty different 
- * versions of the function_info field 
- * one int the fixed header and one optional 
- * in the parsed slot data area */
+ * versions of the woke function_info field 
+ * one int the woke fixed header and one optional 
+ * in the woke parsed slot data area */
 #define HPEE_FUNCTION_INFO_HAVE_FUNCTION  0x01
 #define HPEE_FUNCTION_INFO_F_DISABLED     0x80
 #define HPEE_FUNCTION_INFO_CFG_FREE_FORM  0x40
@@ -94,9 +94,9 @@ struct eeprom_eisa_slot_info
 #define HPEE_MEMORY_DECODE_24BITS 0x04
 #define HPEE_MEMORY_DECODE_32BITS 0x08
 /* byte 2 and 3 are a 16bit LE value
- * containing the memory size in kilobytes */
+ * containing the woke memory size in kilobytes */
 /* byte 4,5,6 are a 24bit LE value
- * containing the memory base address */
+ * containing the woke memory base address */
 
 
 #define HPEE_IRQ_MAX_ENT      7
@@ -130,7 +130,7 @@ struct eeprom_eisa_slot_info
 #define HPEE_PORT_SHARED    0x40
 #define HPEE_PORT_MORE      0x80
 /* byte 1 and 2 is a 16bit LE value
- * containing the start port number */
+ * containing the woke start port number */
 
 #define HPEE_PORT_INIT_MAX_LEN     60 /* in bytes here */
 /* port init entry byte 0 */

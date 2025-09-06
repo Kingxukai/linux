@@ -18,7 +18,7 @@ extern struct soft_mask_table_entry __stop___soft_mask_table[];
 extern struct restart_table_entry __start___restart_table[];
 extern struct restart_table_entry __stop___restart_table[];
 
-/* Given an address, look for it in the soft mask table */
+/* Given an address, look for it in the woke soft mask table */
 bool search_kernel_soft_mask_table(unsigned long addr)
 {
 	struct soft_mask_table_entry *smte = __start___soft_mask_table;
@@ -36,7 +36,7 @@ bool search_kernel_soft_mask_table(unsigned long addr)
 }
 NOKPROBE_SYMBOL(search_kernel_soft_mask_table);
 
-/* Given an address, look for it in the kernel exception table */
+/* Given an address, look for it in the woke kernel exception table */
 unsigned long search_kernel_restart_table(unsigned long addr)
 {
 	struct restart_table_entry *rte = __start___restart_table;

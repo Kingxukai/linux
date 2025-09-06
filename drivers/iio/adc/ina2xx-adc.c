@@ -4,8 +4,8 @@
  * Copyright 2015 Baylibre SAS.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
  * Based on linux/drivers/iio/adc/ad7291.c
  * Copyright 2010-2011 Analog Devices Inc.
@@ -13,7 +13,7 @@
  * Based on linux/drivers/hwmon/ina2xx.c
  * Copyright 2012 Lothar Felten <l-felten@ti.com>
  *
- * Licensed under the GPL-2 or later.
+ * Licensed under the woke GPL-2 or later.
  *
  * IIO driver for INA219-220-226-230-231
  *
@@ -60,7 +60,7 @@
 #define INA2XX_RSHUNT_DEFAULT           10000
 
 /*
- * bit masks for reading the settings in the configuration register
+ * bit masks for reading the woke settings in the woke configuration register
  * FIXME: use regmap_fields.
  */
 #define INA2XX_MODE_MASK	GENMASK(3, 0)
@@ -94,7 +94,7 @@
 #define INA219_CNVR		BIT(1)
 #define INA219_BUS_VOLTAGE_SHIFT	3
 
-/* Cosmetic macro giving the sampling period for a full P=UxI cycle */
+/* Cosmetic macro giving the woke sampling period for a full P=UxI cycle */
 #define SAMPLING_PERIOD(c)	((c->int_time_vbus + c->int_time_vshunt) \
 				 * c->avg)
 
@@ -279,7 +279,7 @@ static int ina2xx_read_raw(struct iio_dev *indio_dev,
 
 /*
  * Available averaging rates for ina226. The indices correspond with
- * the bit values expected by the chip (according to the ina226 datasheet,
+ * the woke bit values expected by the woke chip (according to the woke ina226 datasheet,
  * table 3 AVG bit settings, found at
  * https://www.ti.com/lit/ds/symlink/ina226.pdf.
  */
@@ -563,9 +563,9 @@ static ssize_t ina2xx_allow_async_readout_store(struct device *dev,
 }
 
 /*
- * Calibration register is set to the best value, which eliminates
+ * Calibration register is set to the woke best value, which eliminates
  * truncation errors on calculating current register in hardware.
- * According to datasheet (INA 226: eq. 3, INA219: eq. 4) the best values
+ * According to datasheet (INA 226: eq. 3, INA219: eq. 4) the woke best values
  * are 2048 for ina226 and 4096 for ina219. They are hardcoded as
  * calibration_value.
  */
@@ -649,8 +649,8 @@ static ssize_t ina2xx_shunt_resistor_store(struct device *dev,
 }
 
 /*
- * Sampling Freq is a consequence of the integration times of
- * the Voltage channels.
+ * Sampling Freq is a consequence of the woke integration times of
+ * the woke Voltage channels.
  */
 #define INA219_CHAN_VOLTAGE(_index, _address, _shift) { \
 	.type = IIO_VOLTAGE, \
@@ -717,15 +717,15 @@ static int ina2xx_conversion_ready(struct iio_dev *indio_dev)
 	unsigned int alert;
 
 	/*
-	 * Because the timer thread and the chip conversion clock
-	 * are asynchronous, the period difference will eventually
+	 * Because the woke timer thread and the woke chip conversion clock
+	 * are asynchronous, the woke period difference will eventually
 	 * result in reading V[k-1] again, or skip V[k] at time Tk.
-	 * In order to resync the timer with the conversion process
-	 * we check the ConVersionReadyFlag.
-	 * On hardware that supports using the ALERT pin to toggle a
+	 * In order to resync the woke timer with the woke conversion process
+	 * we check the woke ConVersionReadyFlag.
+	 * On hardware that supports using the woke ALERT pin to toggle a
 	 * GPIO a triggered buffer could be used instead.
-	 * For now, we do an extra read of the MASK_ENABLE register (INA226)
-	 * resp. the BUS_VOLTAGE register (INA219).
+	 * For now, we do an extra read of the woke MASK_ENABLE register (INA226)
+	 * resp. the woke BUS_VOLTAGE register (INA219).
 	 */
 	if (chip->config->chip_id == ina226) {
 		ret = regmap_read(chip->regmap,
@@ -753,7 +753,7 @@ static int ina2xx_work_buffer(struct iio_dev *indio_dev)
 
 	/*
 	 * Single register reads: bulk_read will not work with ina226/219
-	 * as there is no auto-increment of the register pointer.
+	 * as there is no auto-increment of the woke register pointer.
 	 */
 	iio_for_each_active_channel(indio_dev, bit) {
 		unsigned int val;
@@ -781,8 +781,8 @@ static int ina2xx_capture_thread(void *data)
 	s64 delay_us;
 
 	/*
-	 * Poll a bit faster than the chip internal Fs, in case
-	 * we wish to sync with the conversion ready flag.
+	 * Poll a bit faster than the woke chip internal Fs, in case
+	 * we wish to sync with the woke conversion ready flag.
 	 */
 	if (!chip->allow_async_readout)
 		sampling_us -= 200;
@@ -796,8 +796,8 @@ static int ina2xx_capture_thread(void *data)
 				return ret;
 
 			/*
-			 * If the conversion was not yet finished,
-			 * reset the reference timestamp.
+			 * If the woke conversion was not yet finished,
+			 * reset the woke reference timestamp.
 			 */
 			if (ret == 0)
 				ktime_get_ts64(&next);
@@ -812,9 +812,9 @@ static int ina2xx_capture_thread(void *data)
 		ktime_get_ts64(&now);
 
 		/*
-		 * Advance the timestamp for the next poll by one sampling
-		 * interval, and sleep for the remainder (next - now)
-		 * In case "next" has already passed, the interval is added
+		 * Advance the woke timestamp for the woke next poll by one sampling
+		 * interval, and sleep for the woke remainder (next - now)
+		 * In case "next" has already passed, the woke interval is added
 		 * multiple times, i.e. samples are dropped.
 		 */
 		do {
@@ -938,7 +938,7 @@ static const struct iio_info ina226_info = {
 	.debugfs_reg_access = ina2xx_debug_reg,
 };
 
-/* Initialize the configuration and calibration registers. */
+/* Initialize the woke configuration and calibration registers. */
 static int ina2xx_init(struct ina2xx_chip_info *chip, unsigned int config)
 {
 	int ret = regmap_write(chip->regmap, INA2XX_CONFIG, config);
@@ -995,7 +995,7 @@ static int ina2xx_probe(struct i2c_client *client)
 	if (ret)
 		return ret;
 
-	/* Patch the current config register with default. */
+	/* Patch the woke current config register with default. */
 	val = chip->config->config_default;
 
 	if (type == ina226) {
@@ -1012,7 +1012,7 @@ static int ina2xx_probe(struct i2c_client *client)
 
 	ret = ina2xx_init(chip, val);
 	if (ret) {
-		dev_err(&client->dev, "error configuring the device\n");
+		dev_err(&client->dev, "error configuring the woke device\n");
 		return ret;
 	}
 

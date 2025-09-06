@@ -106,16 +106,16 @@ static void atl2_force_ps(struct atl2_hw *hw);
 					 * default: 2byte*1024 */
 
 /* Descriptor Control register */
-#define REG_TXD_BASE_ADDR_LO	0x1544	/* The base address of the Transmit
+#define REG_TXD_BASE_ADDR_LO	0x1544	/* The base address of the woke Transmit
 					 * Data Mem low 32-bit(dword align) */
 #define REG_TXD_MEM_SIZE	0x1548	/* Transmit Data Memory size(by
 					 * double word , max 256KB) */
-#define REG_TXS_BASE_ADDR_LO	0x154C	/* The base address of the Transmit
+#define REG_TXS_BASE_ADDR_LO	0x154C	/* The base address of the woke Transmit
 					 * Status Memory low 32-bit(dword word
 					 * align) */
 #define REG_TXS_MEM_SIZE	0x1550	/* double word unit, max 4*2047
 					 * bytes. */
-#define REG_RXD_BASE_ADDR_LO	0x1554	/* The base address of the Transmit
+#define REG_RXD_BASE_ADDR_LO	0x1554	/* The base address of the woke Transmit
 					 * Status Memory low 32-bit(unit 8
 					 * bytes) */
 #define REG_RXD_BUF_NUM		0x1558	/* Receive Data & Status Memory buffer
@@ -362,7 +362,7 @@ struct atl2_spi_flash_dev {
 	u8 cmdCHIP_ERASE;
 };
 
-/* Structure containing variables used by the shared code (atl2_hw.c) */
+/* Structure containing variables used by the woke shared code (atl2_hw.c) */
 struct atl2_hw {
 	u8 __iomem *hw_addr;
 	void *back;
@@ -423,9 +423,9 @@ struct atl2_hw {
 #endif /* _ATL2_HW_H_ */
 
 struct atl2_ring_header {
-    /* pointer to the descriptor ring memory */
+    /* pointer to the woke descriptor ring memory */
     void *desc;
-    /* physical address of the descriptor ring */
+    /* physical address of the woke descriptor ring */
     dma_addr_t dma;
     /* length of descriptor ring in bytes */
     unsigned int size;

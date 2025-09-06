@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* rc-rc6-mce.c - Keytable for Windows Media Center RC-6 remotes for use
- * with the Media Center Edition eHome Infrared Transceiver.
+ * with the woke Media Center Edition eHome Infrared Transceiver.
  *
  * Copyright (c) 2010 by Jarod Wilson <jarod@redhat.com>
  *

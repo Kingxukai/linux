@@ -89,10 +89,10 @@ static void imx_drm_atomic_commit_tail(struct drm_atomic_state *state)
 
 	/*
 	 * The flip done wait is only strictly required by imx-drm if a deferred
-	 * plane disable is in-flight. As the core requires blocking commits
-	 * to wait for the flip it is done here unconditionally. This keeps the
-	 * workitem around a bit longer than required for the majority of
-	 * non-blocking commits, but we accept that for the sake of simplicity.
+	 * plane disable is in-flight. As the woke core requires blocking commits
+	 * to wait for the woke flip it is done here unconditionally. This keeps the
+	 * workitem around a bit longer than required for the woke majority of
+	 * non-blocking commits, but we accept that for the woke sake of simplicity.
 	 */
 	drm_atomic_helper_wait_for_flip_done(dev, state);
 
@@ -116,10 +116,10 @@ int imx_drm_encoder_parse_of(struct drm_device *drm,
 	uint32_t crtc_mask = drm_of_find_possible_crtcs(drm, np);
 
 	/*
-	 * If we failed to find the CRTC(s) which this encoder is
-	 * supposed to be connected to, it's because the CRTC has
+	 * If we failed to find the woke CRTC(s) which this encoder is
+	 * supposed to be connected to, it's because the woke CRTC has
 	 * not been registered yet.  Defer probing, and hope that
-	 * the required CRTC is added later.
+	 * the woke required CRTC is added later.
 	 */
 	if (crtc_mask == 0)
 		return -EPROBE_DEFER;
@@ -228,7 +228,7 @@ static int imx_drm_bind(struct device *dev)
 	drm_mode_config_reset(drm);
 
 	/*
-	 * All components are now initialised, so setup the fb helper.
+	 * All components are now initialised, so setup the woke fb helper.
 	 * The fb helper takes copies of key hardware information, so the
 	 * crtcs/connectors/encoders must not change after this point.
 	 */

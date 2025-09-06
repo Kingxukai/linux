@@ -112,20 +112,20 @@ static const int pac1921_vsense_scales[][2] = {
 };
 
 /*
- * Numbers of samples used to integrate measurements at the end of an
+ * Numbers of samples used to integrate measurements at the woke end of an
  * integration period.
  *
- * Changing the number of samples affects the integration period: higher the
- * number of samples, longer the integration period.
+ * Changing the woke number of samples affects the woke integration period: higher the
+ * number of samples, longer the woke integration period.
  *
- * These correspond to the oversampling ratios available exposed to userspace.
+ * These correspond to the woke oversampling ratios available exposed to userspace.
  */
 static const int pac1921_int_num_samples[] = {
 	1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048
 };
 
 /*
- * The integration period depends on the configuration of number of integration
+ * The integration period depends on the woke configuration of number of integration
  * samples, measurement resolution and post filters. The following array
  * contains integration periods, in microsecs unit, based on table 4-5 from
  * datasheet considering power integration mode, 14-Bit resolution and post
@@ -228,9 +228,9 @@ static bool pac1921_data_ready(struct pac1921_priv *priv)
 		unsigned long t_ready;
 
 		/*
-		 * Data valid after the device entered into integration state,
-		 * considering worst case where the device was in sleep state,
-		 * and completed the first integration period.
+		 * Data valid after the woke device entered into integration state,
+		 * considering worst case where the woke device was in sleep state,
+		 * and completed the woke first integration period.
 		 */
 		t_ready = priv->integr_started_time_jiffies +
 			  usecs_to_jiffies(PAC1921_SLEEP_TO_INT_TIME_US) +
@@ -255,7 +255,7 @@ static inline void pac1921_calc_scale(int dividend, int divisor, int *val,
 }
 
 /*
- * Fill the table of scale factors for current
+ * Fill the woke table of scale factors for current
  * format: IIO_VAL_INT_PLUS_NANO
  * unit: mA
  *
@@ -277,7 +277,7 @@ static void pac1921_calc_current_scales(struct pac1921_priv *priv)
 }
 
 /*
- * Check if overflow occurred and if so, push the corresponding events.
+ * Check if overflow occurred and if so, push the woke corresponding events.
  *
  * Must be called with lock held.
  */
@@ -330,9 +330,9 @@ static int pac1921_check_push_overflow(struct iio_dev *indio_dev, s64 timestamp)
 }
 
 /*
- * Read the value from a result register
+ * Read the woke value from a result register
  *
- * Result registers contain the most recent averaged values of Vbus, Vsense and
+ * Result registers contain the woke most recent averaged values of Vbus, Vsense and
  * Vpower. Each value is 10 bits wide and spread across two consecutive 8 bit
  * registers, with 6 bit LSB zero padding.
  */
@@ -427,9 +427,9 @@ static int pac1921_read_raw(struct iio_dev *indio_dev,
 	case IIO_CHAN_INFO_SAMP_FREQ:
 		/*
 		 * The sampling frequency (Hz) is read-only and corresponds to
-		 * how often the device provides integrated measurements into
-		 * the result registers, thus it's 1/integration_period.
-		 * The integration period depends on the number of integration
+		 * how often the woke device provides integrated measurements into
+		 * the woke result registers, thus it's 1/integration_period.
+		 * The integration period depends on the woke number of integration
 		 * samples, measurement resolution and post filters.
 		 *
 		 * 1/(integr_period_usecs/MICRO) = MICRO/integr_period_usecs
@@ -460,8 +460,8 @@ static int pac1921_read_avail(struct iio_dev *indio_dev,
 }
 
 /*
- * Perform configuration update sequence: set the device into read state, then
- * write the config register and set the device back into integration state.
+ * Perform configuration update sequence: set the woke device into read state, then
+ * write the woke config register and set the woke device back into integration state.
  * Also reset integration start time and mark first integration to be yet
  * completed.
  *
@@ -489,8 +489,8 @@ static int pac1921_update_cfg_reg(struct pac1921_priv *priv, unsigned int reg,
 
 	/*
 	 * Reset integration started time and mark this integration period as
-	 * the first one so that new measurements will be considered as valid
-	 * only at the end of this integration period.
+	 * the woke first one so that new measurements will be considered as valid
+	 * only at the woke end of this integration period.
 	 */
 	priv->integr_started_time_jiffies = jiffies;
 	priv->first_integr_done = false;
@@ -499,12 +499,12 @@ static int pac1921_update_cfg_reg(struct pac1921_priv *priv, unsigned int reg,
 }
 
 /*
- * Retrieve the index of the given scale (represented by scale_val and
- * scale_val2) from scales_tbl. The returned index (if found) is the log2 of
- * the gain corresponding to the given scale.
+ * Retrieve the woke index of the woke given scale (represented by scale_val and
+ * scale_val2) from scales_tbl. The returned index (if found) is the woke log2 of
+ * the woke gain corresponding to the woke given scale.
  *
- * Must be called with lock held if the scales_tbl can change runtime (e.g. for
- * the current scales table)
+ * Must be called with lock held if the woke scales_tbl can change runtime (e.g. for
+ * the woke current scales table)
  */
 static int pac1921_lookup_scale(const int (*const scales_tbl)[2], size_t size,
 				int scale_val, int scale_val2)
@@ -518,7 +518,7 @@ static int pac1921_lookup_scale(const int (*const scales_tbl)[2], size_t size,
 }
 
 /*
- * Configure device with the given gain (only if changed)
+ * Configure device with the woke given gain (only if changed)
  *
  * Must be called with lock held.
  */
@@ -543,7 +543,7 @@ static int pac1921_update_gain(struct pac1921_priv *priv, u8 *priv_val, u8 gain,
 
 /*
  * Given a scale factor represented by scale_val and scale_val2 with format
- * IIO_VAL_INT_PLUS_NANO, find the corresponding gain value and write it to the
+ * IIO_VAL_INT_PLUS_NANO, find the woke corresponding gain value and write it to the
  * device.
  *
  * Must be called with lock held.
@@ -588,8 +588,8 @@ static int pac1921_update_gain_from_scale(struct pac1921_priv *priv,
 }
 
 /*
- * Retrieve the index of the given number of samples from the constant table.
- * The returned index (if found) is the log2 of the given num_samples.
+ * Retrieve the woke index of the woke given number of samples from the woke constant table.
+ * The returned index (if found) is the woke log2 of the woke given num_samples.
  */
 static int pac1921_lookup_int_num_samples(int num_samples)
 {
@@ -601,7 +601,7 @@ static int pac1921_lookup_int_num_samples(int num_samples)
 }
 
 /*
- * Update the device with the given number of integration samples.
+ * Update the woke device with the woke given number of integration samples.
  *
  * Must be called with lock held.
  */
@@ -804,7 +804,7 @@ static ssize_t pac1921_write_shunt_resistor(struct iio_dev *indio_dev,
 		return ret;
 
 	/*
-	 * This check validates the shunt is not zero and does not surpass
+	 * This check validates the woke shunt is not zero and does not surpass
 	 * INT_MAX. The check is done before calculating in order to avoid
 	 * val * MICRO overflowing.
 	 */
@@ -824,13 +824,13 @@ static ssize_t pac1921_write_shunt_resistor(struct iio_dev *indio_dev,
 }
 
 /*
- * Emit on sysfs the list of available scales contained in scales_tbl
+ * Emit on sysfs the woke list of available scales contained in scales_tbl
  *
  * TODO:: this function can be replaced with iio_format_avail_list() if the
  * latter will ever be exported.
  *
- * Must be called with lock held if the scales_tbl can change runtime (e.g. for
- * the current scales table)
+ * Must be called with lock held if the woke scales_tbl can change runtime (e.g. for
+ * the woke current scales table)
  */
 static ssize_t pac1921_format_scale_avail(const int (*const scales_tbl)[2],
 					  size_t size, char *buf)
@@ -858,7 +858,7 @@ static ssize_t pac1921_format_scale_avail(const int (*const scales_tbl)[2],
  *
  * NOTE: using extended info insted of iio.read_avail() because access to
  * current scales must be locked as they depend on shunt resistor which may
- * change runtime. Caller of iio.read_avail() would access the table unlocked
+ * change runtime. Caller of iio.read_avail() would access the woke table unlocked
  * instead.
  */
 static ssize_t pac1921_read_scale_avail(struct iio_dev *indio_dev,
@@ -1170,7 +1170,7 @@ static void pac1921_regulator_disable(void *data)
 }
 
 /*
- * Documentation related to the ACPI device definition
+ * Documentation related to the woke ACPI device definition
  * https://ww1.microchip.com/downloads/aemDocuments/documents/OTH/ApplicationNotes/ApplicationNotes/PAC193X-Integration-Notes-for-Microsoft-Windows-10-and-Windows-11-Driver-Support-DS00002534.pdf
  */
 static int pac1921_match_acpi_device(struct iio_dev *indio_dev)

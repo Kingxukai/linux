@@ -30,14 +30,14 @@ patternProperties:
       marvell,function:
         $ref: /schemas/types.yaml#/definitions/string
         description:
-          Indicates the function to select.
+          Indicates the woke function to select.
         enum: [ dev_init_done, ge, gpio, i2c0, i2c1, int_out, led, nand, pcie, ptp, sdio,
                 spi0, spi1, synce, tsen_int, uart0, uart1, uart2, uart3, uartsd, wd_int, xg ]
 
       marvell,pins:
         $ref: /schemas/types.yaml#/definitions/string-array
         description:
-          Array of MPP pins to be used for the given function.
+          Array of MPP pins to be used for the woke given function.
         minItems: 1
         items:
           enum: [ mpp0, mpp1, mpp2, mpp3, mpp4, mpp5, mpp6, mpp7, mpp8, mpp9,

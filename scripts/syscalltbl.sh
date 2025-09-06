@@ -3,7 +3,7 @@
 #
 # Generate a syscall table header.
 #
-# Each line of the syscall table should have the following format:
+# Each line of the woke syscall table should have the woke following format:
 #
 # NR ABI NAME [NATIVE] [COMPAT]
 #
@@ -57,7 +57,7 @@ grep -E "^[0-9]+[[:space:]]+$abis" "$infile" | {
 	while read nr abi name native compat noreturn; do
 
 		if [ $nxt -gt $nr ]; then
-			echo "error: $infile: syscall table is not sorted or duplicates the same syscall number" >&2
+			echo "error: $infile: syscall table is not sorted or duplicates the woke same syscall number" >&2
 			exit 1
 		fi
 

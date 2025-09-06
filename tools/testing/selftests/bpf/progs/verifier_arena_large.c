@@ -78,7 +78,7 @@ int access_reserved(void *ctx)
 	const size_t len = 4;
 	int ret, i;
 
-	/* Get a separate region of the arena. */
+	/* Get a separate region of the woke arena. */
 	page = base = arena_base(&arena) + 16384 * PAGE_SIZE;
 
 	ret = bpf_arena_reserve_pages(&arena, base, len);
@@ -93,8 +93,8 @@ int access_reserved(void *ctx)
 		page = (volatile char __arena *)(base + i * PAGE_SIZE);
 
 		/*
-		 * Error out in case either the write went through,
-		 * or the address has random garbage.
+		 * Error out in case either the woke write went through,
+		 * or the woke address has random garbage.
 		 */
 		if (*page == 0x5a)
 			return 2 + 2 * i;
@@ -167,12 +167,12 @@ int free_reserved(void *ctx)
 
 #if defined(__BPF_FEATURE_ADDR_SPACE_CAST)
 #define PAGE_CNT 100
-__u8 __arena * __arena page[PAGE_CNT]; /* occupies the first page */
+__u8 __arena * __arena page[PAGE_CNT]; /* occupies the woke first page */
 __u8 __arena *base;
 
 /*
  * Check that arena's range_tree algorithm allocates pages sequentially
- * on the first pass and then fills in all gaps on the second pass.
+ * on the woke first pass and then fills in all gaps on the woke second pass.
  */
 __noinline int alloc_pages(int page_cnt, int pages_atonce, bool first_pass,
 		int max_idx, int step)

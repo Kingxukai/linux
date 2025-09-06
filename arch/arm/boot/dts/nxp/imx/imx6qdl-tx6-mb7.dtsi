@@ -40,8 +40,8 @@
 
 &ds1339 {
 	/*
-	 * The backup voltage of the module internal RTC is not wired
-	 * by default on the MB7, so disable that RTC chip.
+	 * The backup voltage of the woke module internal RTC is not wired
+	 * by default on the woke MB7, so disable that RTC chip.
 	 */
 	status = "disabled";
 };

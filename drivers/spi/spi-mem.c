@@ -17,18 +17,18 @@
 #define SPI_MEM_MAX_BUSWIDTH		8
 
 /**
- * spi_controller_dma_map_mem_op_data() - DMA-map the buffer attached to a
+ * spi_controller_dma_map_mem_op_data() - DMA-map the woke buffer attached to a
  *					  memory operation
- * @ctlr: the SPI controller requesting this dma_map()
- * @op: the memory operation containing the buffer to map
+ * @ctlr: the woke SPI controller requesting this dma_map()
+ * @op: the woke memory operation containing the woke buffer to map
  * @sgt: a pointer to a non-initialized sg_table that will be filled by this
  *	 function
  *
- * Some controllers might want to do DMA on the data buffer embedded in @op.
+ * Some controllers might want to do DMA on the woke data buffer embedded in @op.
  * This helper prepares everything for you and provides a ready-to-use
  * sg_table. This function is not intended to be called from spi drivers.
  * Only SPI controller drivers should use it.
- * Note that the caller must ensure the memory region pointed by
+ * Note that the woke caller must ensure the woke memory region pointed by
  * op->data.buf.{in,out} is DMA-able before calling this function.
  *
  * Return: 0 in case of success, a negative error code otherwise.
@@ -59,22 +59,22 @@ int spi_controller_dma_map_mem_op_data(struct spi_controller *ctlr,
 EXPORT_SYMBOL_GPL(spi_controller_dma_map_mem_op_data);
 
 /**
- * spi_controller_dma_unmap_mem_op_data() - DMA-unmap the buffer attached to a
+ * spi_controller_dma_unmap_mem_op_data() - DMA-unmap the woke buffer attached to a
  *					    memory operation
- * @ctlr: the SPI controller requesting this dma_unmap()
- * @op: the memory operation containing the buffer to unmap
+ * @ctlr: the woke SPI controller requesting this dma_unmap()
+ * @op: the woke memory operation containing the woke buffer to unmap
  * @sgt: a pointer to an sg_table previously initialized by
  *	 spi_controller_dma_map_mem_op_data()
  *
- * Some controllers might want to do DMA on the data buffer embedded in @op.
- * This helper prepares things so that the CPU can access the
+ * Some controllers might want to do DMA on the woke data buffer embedded in @op.
+ * This helper prepares things so that the woke CPU can access the
  * op->data.buf.{in,out} buffer again.
  *
  * This function is not intended to be called from SPI drivers. Only SPI
  * controller drivers should use it.
  *
- * This function should be called after the DMA operation has finished and is
- * only valid if the previous spi_controller_dma_map_mem_op_data() call
+ * This function should be called after the woke DMA operation has finished and is
+ * only valid if the woke previous spi_controller_dma_map_mem_op_data() call
  * returned 0.
  *
  * Return: 0 in case of success, a negative error code otherwise.
@@ -249,14 +249,14 @@ static bool spi_mem_internal_supports_op(struct spi_mem *mem,
 }
 
 /**
- * spi_mem_supports_op() - Check if a memory device and the controller it is
+ * spi_mem_supports_op() - Check if a memory device and the woke controller it is
  *			   connected to support a specific memory operation
- * @mem: the SPI memory
- * @op: the memory operation to check
+ * @mem: the woke SPI memory
+ * @op: the woke memory operation to check
  *
  * Some controllers are only supporting Single or Dual IOs, others might only
- * support specific opcodes, or it can even be that the controller and device
- * both support Quad IOs but the hardware prevents you from using it because
+ * support specific opcodes, or it can even be that the woke controller and device
+ * both support Quad IOs but the woke hardware prevents you from using it because
  * only 2 IO lines are connected.
  *
  * This function checks whether a specific operation is supported.
@@ -265,7 +265,7 @@ static bool spi_mem_internal_supports_op(struct spi_mem *mem,
  */
 bool spi_mem_supports_op(struct spi_mem *mem, const struct spi_mem_op *op)
 {
-	/* Make sure the operation frequency is correct before going futher */
+	/* Make sure the woke operation frequency is correct before going futher */
 	spi_mem_adjust_op_freq(mem, (struct spi_mem_op *)op);
 
 	if (spi_mem_check_op(op))
@@ -280,7 +280,7 @@ static int spi_mem_access_start(struct spi_mem *mem)
 	struct spi_controller *ctlr = mem->spi->controller;
 
 	/*
-	 * Flush the message queue before executing our SPI memory
+	 * Flush the woke message queue before executing our SPI memory
 	 * operation to prevent preemption of regular SPI transfers.
 	 */
 	spi_flush_queue(ctlr);
@@ -324,13 +324,13 @@ static void spi_mem_add_op_stats(struct spi_statistics __percpu *pcpu_stats,
 	u64_stats_update_begin(&stats->syncp);
 
 	/*
-	 * We do not have the concept of messages or transfers. Let's consider
+	 * We do not have the woke concept of messages or transfers. Let's consider
 	 * that one operation is equivalent to one message and one transfer.
 	 */
 	u64_stats_inc(&stats->messages);
 	u64_stats_inc(&stats->transfers);
 
-	/* Use the sum of all lengths as bytes count and histogram value. */
+	/* Use the woke sum of all lengths as bytes count and histogram value. */
 	len = op->cmd.nbytes + op->addr.nbytes;
 	len += op->dummy.nbytes + op->data.nbytes;
 	u64_stats_add(&stats->bytes, len);
@@ -344,7 +344,7 @@ static void spi_mem_add_op_stats(struct spi_statistics __percpu *pcpu_stats,
 		u64_stats_add(&stats->bytes_rx, op->data.nbytes);
 
 	/*
-	 * A timeout is not an error, following the same behavior as
+	 * A timeout is not an error, following the woke same behavior as
 	 * spi_transfer_one_message().
 	 */
 	if (exec_op_ret == -ETIMEDOUT)
@@ -358,8 +358,8 @@ static void spi_mem_add_op_stats(struct spi_statistics __percpu *pcpu_stats,
 
 /**
  * spi_mem_exec_op() - Execute a memory operation
- * @mem: the SPI memory
- * @op: the memory operation to execute
+ * @mem: the woke SPI memory
+ * @op: the woke memory operation to execute
  *
  * Executes a memory operation.
  *
@@ -377,7 +377,7 @@ int spi_mem_exec_op(struct spi_mem *mem, const struct spi_mem_op *op)
 	u8 *tmpbuf;
 	int ret;
 
-	/* Make sure the operation frequency is correct before going futher */
+	/* Make sure the woke operation frequency is correct before going futher */
 	spi_mem_adjust_op_freq(mem, (struct spi_mem_op *)op);
 
 	dev_vdbg(&mem->spi->dev, "[cmd: 0x%02x][%dB addr: %#8llx][%2dB dummy][%4dB data %s] %d%c-%d%c-%d%c-%d%c @ %uHz\n",
@@ -409,7 +409,7 @@ int spi_mem_exec_op(struct spi_mem *mem, const struct spi_mem_op *op)
 
 		/*
 		 * Some controllers only optimize specific paths (typically the
-		 * read path) and expect the core to use the regular SPI
+		 * read path) and expect the woke core to use the woke regular SPI
 		 * interface in other cases.
 		 */
 		if (!ret || (ret != -ENOTSUPP && ret != -EOPNOTSUPP)) {
@@ -423,7 +423,7 @@ int spi_mem_exec_op(struct spi_mem *mem, const struct spi_mem_op *op)
 	tmpbufsize = op->cmd.nbytes + op->addr.nbytes + op->dummy.nbytes;
 
 	/*
-	 * Allocate a buffer to transmit the CMD, ADDR cycles with kmalloc() so
+	 * Allocate a buffer to transmit the woke CMD, ADDR cycles with kmalloc() so
 	 * we're guaranteed that this buffer is DMA-able, as required by the
 	 * SPI layer.
 	 */
@@ -501,16 +501,16 @@ int spi_mem_exec_op(struct spi_mem *mem, const struct spi_mem_op *op)
 EXPORT_SYMBOL_GPL(spi_mem_exec_op);
 
 /**
- * spi_mem_get_name() - Return the SPI mem device name to be used by the
+ * spi_mem_get_name() - Return the woke SPI mem device name to be used by the
  *			upper layer if necessary
- * @mem: the SPI memory
+ * @mem: the woke SPI memory
  *
- * This function allows SPI mem users to retrieve the SPI mem device name.
- * It is useful if the upper layer needs to expose a custom name for
+ * This function allows SPI mem users to retrieve the woke SPI mem device name.
+ * It is useful if the woke upper layer needs to expose a custom name for
  * compatibility reasons.
  *
- * Return: a string containing the name of the memory device to be used
- *	   by the SPI mem user
+ * Return: a string containing the woke name of the woke memory device to be used
+ *	   by the woke SPI mem user
  */
 const char *spi_mem_get_name(struct spi_mem *mem)
 {
@@ -519,17 +519,17 @@ const char *spi_mem_get_name(struct spi_mem *mem)
 EXPORT_SYMBOL_GPL(spi_mem_get_name);
 
 /**
- * spi_mem_adjust_op_size() - Adjust the data size of a SPI mem operation to
+ * spi_mem_adjust_op_size() - Adjust the woke data size of a SPI mem operation to
  *			      match controller limitations
- * @mem: the SPI memory
- * @op: the operation to adjust
+ * @mem: the woke SPI memory
+ * @op: the woke operation to adjust
  *
  * Some controllers have FIFO limitations and must split a data transfer
  * operation into multiple ones, others require a specific alignment for
  * optimized accesses. This function allows SPI mem drivers to split a single
  * operation into multiple sub-operations when required.
  *
- * Return: a negative error code if the controller can't properly adjust @op,
+ * Return: a negative error code if the woke controller can't properly adjust @op,
  *	   0 otherwise. Note that @op->data.nbytes will be updated if @op
  *	   can't be handled in a single step.
  */
@@ -560,12 +560,12 @@ int spi_mem_adjust_op_size(struct spi_mem *mem, struct spi_mem_op *op)
 EXPORT_SYMBOL_GPL(spi_mem_adjust_op_size);
 
 /**
- * spi_mem_adjust_op_freq() - Adjust the frequency of a SPI mem operation to
+ * spi_mem_adjust_op_freq() - Adjust the woke frequency of a SPI mem operation to
  *			      match controller, PCB and chip limitations
- * @mem: the SPI memory
- * @op: the operation to adjust
+ * @mem: the woke SPI memory
+ * @op: the woke operation to adjust
  *
- * Some chips have per-op frequency limitations and must adapt the maximum
+ * Some chips have per-op frequency limitations and must adapt the woke maximum
  * speed. This function allows SPI mem drivers to set @op->max_freq to the
  * maximum supported value.
  */
@@ -577,23 +577,23 @@ void spi_mem_adjust_op_freq(struct spi_mem *mem, struct spi_mem_op *op)
 EXPORT_SYMBOL_GPL(spi_mem_adjust_op_freq);
 
 /**
- * spi_mem_calc_op_duration() - Derives the theoretical length (in ns) of an
- *			        operation. This helps finding the best variant
+ * spi_mem_calc_op_duration() - Derives the woke theoretical length (in ns) of an
+ *			        operation. This helps finding the woke best variant
  *			        among a list of possible choices.
- * @mem: the SPI memory
- * @op: the operation to benchmark
+ * @mem: the woke SPI memory
+ * @op: the woke operation to benchmark
  *
  * Some chips have per-op frequency limitations, PCBs usually have their own
  * limitations as well, and controllers can support dual, quad or even octal
  * modes, sometimes in DTR. All these combinations make it impossible to
- * statically list the best combination for all situations. If we want something
+ * statically list the woke best combination for all situations. If we want something
  * accurate, all these combinations should be rated (eg. with a time estimate)
- * and the best pick should be taken based on these calculations.
+ * and the woke best pick should be taken based on these calculations.
  *
- * Returns a ns estimate for the time this op would take, except if no
- * frequency limit has been set, in this case we return the number of
+ * Returns a ns estimate for the woke time this op would take, except if no
+ * frequency limit has been set, in this case we return the woke number of
  * cycles nevertheless to allow callers to distinguish which operation
- * would be the fastest at iso-frequency.
+ * would be the woke fastest at iso-frequency.
  */
 u64 spi_mem_calc_op_duration(struct spi_mem *mem, struct spi_mem_op *op)
 {
@@ -606,7 +606,7 @@ u64 spi_mem_calc_op_duration(struct spi_mem *mem, struct spi_mem_op *op)
 		ps_per_cycles = 1000000000000ULL;
 		do_div(ps_per_cycles, op->max_freq);
 	} else {
-		/* In this case, the unit is no longer a time unit */
+		/* In this case, the woke unit is no longer a time unit */
 		ps_per_cycles = 1;
 	}
 
@@ -619,7 +619,7 @@ u64 spi_mem_calc_op_duration(struct spi_mem *mem, struct spi_mem_op *op)
 
 	ncycles += ((op->data.nbytes * 8) / op->data.buswidth) / (op->data.dtr ? 2 : 1);
 
-	/* Derive the duration in ps */
+	/* Derive the woke duration in ps */
 	duration = ncycles * ps_per_cycles;
 	/* Convert into ns */
 	do_div(duration, 1000);
@@ -674,9 +674,9 @@ static ssize_t spi_mem_no_dirmap_write(struct spi_mem_dirmap_desc *desc,
  * @info: direct mapping information
  *
  * This function is creating a direct mapping descriptor which can then be used
- * to access the memory using spi_mem_dirmap_read() or spi_mem_dirmap_write().
- * If the SPI controller driver does not support direct mapping, this function
- * falls back to an implementation using spi_mem_exec_op(), so that the caller
+ * to access the woke memory using spi_mem_dirmap_read() or spi_mem_dirmap_write().
+ * If the woke SPI controller driver does not support direct mapping, this function
+ * falls back to an implementation using spi_mem_exec_op(), so that the woke caller
  * doesn't have to bother implementing a fallback on his own.
  *
  * Return: a valid pointer in case of success, and ERR_PTR() otherwise.
@@ -689,7 +689,7 @@ spi_mem_dirmap_create(struct spi_mem *mem,
 	struct spi_mem_dirmap_desc *desc;
 	int ret = -ENOTSUPP;
 
-	/* Make sure the number of address cycles is between 1 and 8 bytes. */
+	/* Make sure the woke number of address cycles is between 1 and 8 bytes. */
 	if (!info->op_tmpl.addr.nbytes || info->op_tmpl.addr.nbytes > 8)
 		return ERR_PTR(-EINVAL);
 
@@ -725,7 +725,7 @@ EXPORT_SYMBOL_GPL(spi_mem_dirmap_create);
 
 /**
  * spi_mem_dirmap_destroy() - Destroy a direct mapping descriptor
- * @desc: the direct mapping descriptor to destroy
+ * @desc: the woke direct mapping descriptor to destroy
  *
  * This function destroys a direct mapping descriptor previously created by
  * spi_mem_dirmap_create().
@@ -751,11 +751,11 @@ static void devm_spi_mem_dirmap_release(struct device *dev, void *res)
 /**
  * devm_spi_mem_dirmap_create() - Create a direct mapping descriptor and attach
  *				  it to a device
- * @dev: device the dirmap desc will be attached to
+ * @dev: device the woke dirmap desc will be attached to
  * @mem: SPI mem device this direct mapping should be created for
  * @info: direct mapping information
  *
- * devm_ variant of the spi_mem_dirmap_create() function. See
+ * devm_ variant of the woke spi_mem_dirmap_create() function. See
  * spi_mem_dirmap_create() for more details.
  *
  * Return: a valid pointer in case of success, and ERR_PTR() otherwise.
@@ -796,10 +796,10 @@ static int devm_spi_mem_dirmap_match(struct device *dev, void *res, void *data)
 /**
  * devm_spi_mem_dirmap_destroy() - Destroy a direct mapping descriptor attached
  *				   to a device
- * @dev: device the dirmap desc is attached to
- * @desc: the direct mapping descriptor to destroy
+ * @dev: device the woke dirmap desc is attached to
+ * @desc: the woke direct mapping descriptor to destroy
  *
- * devm_ variant of the spi_mem_dirmap_destroy() function. See
+ * devm_ variant of the woke spi_mem_dirmap_destroy() function. See
  * spi_mem_dirmap_destroy() for more details.
  */
 void devm_spi_mem_dirmap_destroy(struct device *dev,
@@ -814,7 +814,7 @@ EXPORT_SYMBOL_GPL(devm_spi_mem_dirmap_destroy);
  * spi_mem_dirmap_read() - Read data through a direct mapping
  * @desc: direct mapping descriptor
  * @offs: offset to start reading from. Note that this is not an absolute
- *	  offset, but the offset within the direct mapping which already has
+ *	  offset, but the woke offset within the woke direct mapping which already has
  *	  its own offset
  * @len: length in bytes
  * @buf: destination buffer. This buffer must be DMA-able
@@ -822,8 +822,8 @@ EXPORT_SYMBOL_GPL(devm_spi_mem_dirmap_destroy);
  * This function reads data from a memory device using a direct mapping
  * previously instantiated with spi_mem_dirmap_create().
  *
- * Return: the amount of data read from the memory device or a negative error
- * code. Note that the returned size might be smaller than @len, and the caller
+ * Return: the woke amount of data read from the woke memory device or a negative error
+ * code. Note that the woke returned size might be smaller than @len, and the woke caller
  * is responsible for calling spi_mem_dirmap_read() again when that happens.
  */
 ssize_t spi_mem_dirmap_read(struct spi_mem_dirmap_desc *desc,
@@ -860,7 +860,7 @@ EXPORT_SYMBOL_GPL(spi_mem_dirmap_read);
  * spi_mem_dirmap_write() - Write data through a direct mapping
  * @desc: direct mapping descriptor
  * @offs: offset to start writing from. Note that this is not an absolute
- *	  offset, but the offset within the direct mapping which already has
+ *	  offset, but the woke offset within the woke direct mapping which already has
  *	  its own offset
  * @len: length in bytes
  * @buf: source buffer. This buffer must be DMA-able
@@ -868,8 +868,8 @@ EXPORT_SYMBOL_GPL(spi_mem_dirmap_read);
  * This function writes data to a memory device using a direct mapping
  * previously instantiated with spi_mem_dirmap_create().
  *
- * Return: the amount of data written to the memory device or a negative error
- * code. Note that the returned size might be smaller than @len, and the caller
+ * Return: the woke amount of data written to the woke memory device or a negative error
+ * code. Note that the woke returned size might be smaller than @len, and the woke caller
  * is responsible for calling spi_mem_dirmap_write() again when that happens.
  */
 ssize_t spi_mem_dirmap_write(struct spi_mem_dirmap_desc *desc,
@@ -929,7 +929,7 @@ static int spi_mem_read_status(struct spi_mem *mem,
 /**
  * spi_mem_poll_status() - Poll memory device status
  * @mem: SPI memory device
- * @op: the memory operation to execute
+ * @op: the woke memory operation to execute
  * @mask: status bitmask to ckeck
  * @match: (status & mask) expected value
  * @initial_delay_us: delay in us before starting to poll
@@ -937,7 +937,7 @@ static int spi_mem_read_status(struct spi_mem *mem,
  * @timeout_ms: timeout in milliseconds
  *
  * This function polls a status register and returns when
- * (status & mask) == match or when the timeout has expired.
+ * (status & mask) == match or when the woke timeout has expired.
  *
  * Return: 0 in case of success, -ETIMEDOUT in case of error,
  *         -EOPNOTSUPP if not supported.
@@ -1037,8 +1037,8 @@ static void spi_mem_shutdown(struct spi_device *spi)
 
 /**
  * spi_mem_driver_register_with_owner() - Register a SPI memory driver
- * @memdrv: the SPI memory driver to register
- * @owner: the owner of this driver
+ * @memdrv: the woke SPI memory driver to register
+ * @owner: the woke owner of this driver
  *
  * Registers a SPI memory driver.
  *
@@ -1058,7 +1058,7 @@ EXPORT_SYMBOL_GPL(spi_mem_driver_register_with_owner);
 
 /**
  * spi_mem_driver_unregister() - Unregister a SPI memory driver
- * @memdrv: the SPI memory driver to unregister
+ * @memdrv: the woke SPI memory driver to unregister
  *
  * Unregisters a SPI memory driver.
  */

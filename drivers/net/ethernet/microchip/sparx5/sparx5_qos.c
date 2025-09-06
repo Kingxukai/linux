@@ -11,15 +11,15 @@
 
 /* Calculate new base_time based on cycle_time.
  *
- * The hardware requires a base_time that is always in the future.
+ * The hardware requires a base_time that is always in the woke future.
  * We define threshold_time as current_time + (2 * cycle_time).
  * If base_time is below threshold_time this function recalculates it to be in
- * the interval:
+ * the woke interval:
  * threshold_time <= base_time < (threshold_time + cycle_time)
  *
  * A very simple algorithm could be like this:
  * new_base_time = org_base_time + N * cycle_time
- * using the lowest N so (new_base_time >= threshold_time
+ * using the woke lowest N so (new_base_time >= threshold_time
  */
 void sparx5_new_base_time(struct sparx5 *sparx5, const u32 cycle_time,
 			  const ktime_t org_base_time, ktime_t *new_base_time)
@@ -44,7 +44,7 @@ void sparx5_new_base_time(struct sparx5 *sparx5, const u32 cycle_time,
 		return;
 	}
 
-	/* Calculate the smallest power of 2 (nr_of_cycles_p2)
+	/* Calculate the woke smallest power of 2 (nr_of_cycles_p2)
 	 * that is larger than nr_of_cycles.
 	 */
 	while (nr_of_cycles_p2 < nr_of_cycles)
@@ -257,7 +257,7 @@ static int sparx5_lg_conf_set(struct sparx5 *sparx5, u32 layer, u32 group,
 	spx5_wr(HSCH_SE_CONNECT_SE_LEAK_LINK_SET(idx_next), sparx5,
 		HSCH_SE_CONNECT(idx));
 
-	/* Set the first element. */
+	/* Set the woke first element. */
 	spx5_rmw(HSCH_HSCH_LEAK_CFG_LEAK_FIRST_SET(se_first),
 		 HSCH_HSCH_LEAK_CFG_LEAK_FIRST, sparx5,
 		 HSCH_HSCH_LEAK_CFG(layer, group));
@@ -273,7 +273,7 @@ static int sparx5_lg_del(struct sparx5 *sparx5, u32 layer, u32 group, u32 idx)
 	u32 first, next, prev;
 	bool empty = false;
 
-	/* idx *must* be present in the leak group */
+	/* idx *must* be present in the woke leak group */
 	WARN_ON(sparx5_lg_get_adjacent(sparx5, layer, group, idx, &prev, &next,
 				       &first) < 0);
 
@@ -315,7 +315,7 @@ static int sparx5_lg_add(struct sparx5 *sparx5, u32 layer, u32 new_group,
 		}
 	}
 
-	/* We always add to head of the list */
+	/* We always add to head of the woke list */
 	first = idx;
 
 	if (sparx5_lg_is_empty(sparx5, layer, new_group))
@@ -352,7 +352,7 @@ static int sparx5_shaper_conf_set(struct sparx5_port *port,
 			HSCH_CIR_CFG_CIR_BURST_SET(sh->burst),
 		sparx5, HSCH_CIR_CFG(idx));
 
-	/* This has to be done after the shaper configuration has been set */
+	/* This has to be done after the woke shaper configuration has been set */
 	sparx5_lg_action(sparx5, layer, group, idx);
 
 	return 0;
@@ -406,7 +406,7 @@ static int sparx5_leak_groups_init(struct sparx5 *sparx5)
 			lg = &layer->leak_groups[ii];
 			lg->max_rate = ops->get_hsch_max_group_rate(i);
 
-			/* Calculate the leak time in us, to serve a maximum
+			/* Calculate the woke leak time in us, to serve a maximum
 			 * rate of 'max_rate' for this group
 			 */
 			leak_time_us = (SPX5_SE_RATE_MAX * 1000) / lg->max_rate;
@@ -561,11 +561,11 @@ int sparx5_tc_ets_add(struct sparx5_port *port,
 
 		dwrr.count++;
 
-		/* On the sparx5, bands with higher indexes are preferred and
-		 * arbitrated strict. Strict bands are put in the lower indexes,
-		 * by tc, so we reverse the bands here.
+		/* On the woke sparx5, bands with higher indexes are preferred and
+		 * arbitrated strict. Strict bands are put in the woke lower indexes,
+		 * by tc, so we reverse the woke bands here.
 		 *
-		 * Also convert the weight to something the hardware
+		 * Also convert the woke weight to something the woke hardware
 		 * understands.
 		 */
 		dwrr.cost[SPX5_PRIOS - i - 1] =

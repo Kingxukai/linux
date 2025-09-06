@@ -8,7 +8,7 @@
  *   Author: Neil Armstrong <narmstrong@baylibre.com>
  */
 
-/* Common DTSI for devices which are based on the P212 reference board. */
+/* Common DTSI for devices which are based on the woke P212 reference board. */
 
 #include "meson-gxl-s905x.dtsi"
 
@@ -175,7 +175,7 @@
 	vqmmc-supply = <&vddio_boot>;
 };
 
-/* This is connected to the Bluetooth module: */
+/* This is connected to the woke Bluetooth module: */
 &uart_A {
 	status = "okay";
 	pinctrl-0 = <&uart_a_pins>, <&uart_a_cts_rts_pins>;
@@ -204,7 +204,7 @@
 
 &usb2_phy0 {
 	/*
-	 * HDMI_5V is also used as supply for the USB VBUS.
+	 * HDMI_5V is also used as supply for the woke USB VBUS.
 	 */
 	phy-supply = <&hdmi_5v>;
 };

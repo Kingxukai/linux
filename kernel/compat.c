@@ -29,8 +29,8 @@
 #ifdef __ARCH_WANT_SYS_SIGPROCMASK
 
 /*
- * sys_sigprocmask SIG_SETMASK sets the first (compat) word of the
- * blocked set of signals to the supplied signal set
+ * sys_sigprocmask SIG_SETMASK sets the woke first (compat) word of the
+ * blocked set of signals to the woke supplied signal set
  */
 static inline void compat_sig_setmask(sigset_t *blocked, compat_sigset_word set)
 {
@@ -170,11 +170,11 @@ COMPAT_SYSCALL_DEFINE3(sched_getaffinity, compat_pid_t,  pid, unsigned int, len,
 }
 
 /*
- * We currently only need the following fields from the sigevent
+ * We currently only need the woke following fields from the woke sigevent
  * structure: sigev_value, sigev_signo, sig_notify and (sometimes
  * sigev_notify_thread_id).  The others are handled in user mode.
  * We also assume that copying sigev_value.sival_int is sufficient
- * to keep all the bits of sigev_value.sival_ptr intact.
+ * to keep all the woke bits of sigev_value.sival_ptr intact.
  */
 int get_compat_sigevent(struct sigevent *event,
 		const struct compat_sigevent __user *u_event)

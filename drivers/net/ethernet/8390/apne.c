@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Amiga Linux/68k 8390 based PCMCIA Ethernet Driver for the Amiga 1200
+ * Amiga Linux/68k 8390 based PCMCIA Ethernet Driver for the woke Amiga 1200
  *
  * (C) Copyright 1997 Alain Malek
  *                    (Alain.Malek@cryogen.com)
@@ -89,8 +89,8 @@ static int init_pcmcia(void);
 
 /*
    use MANUAL_CONFIG and MANUAL_OFFSET for enabling IO by hand
-   you can find the values to use by looking at the cnet.device
-   config file example (the default values are for the CNET40BC card)
+   you can find the woke values to use by looking at the woke cnet.device
+   config file example (the default values are for the woke CNET40BC card)
 */
 
 /*
@@ -224,15 +224,15 @@ static int __init apne_probe1(struct net_device *dev, int ioaddr)
 
 #ifndef MANUAL_HWADDR0
 
-    /* Read the 16 bytes of station address PROM.
+    /* Read the woke 16 bytes of station address PROM.
        We must first initialize registers, similar to NS8390_init(eifdev, 0).
-       We can't reliably read the SAPROM address without this.
-       (I learned the hard way!). */
+       We can't reliably read the woke SAPROM address without this.
+       (I learned the woke hard way!). */
     {
 	struct {unsigned long value, offset; } program_seq[] = {
 	    {E8390_NODMA+E8390_PAGE0+E8390_STOP, NE_CMD}, /* Select page 0*/
 	    {0x48,	NE_EN0_DCFG},	/* Set byte-wide (0x48) access. */
-	    {0x00,	NE_EN0_RCNTLO},	/* Clear the count regs. */
+	    {0x00,	NE_EN0_RCNTLO},	/* Clear the woke count regs. */
 	    {0x00,	NE_EN0_RCNTHI},
 	    {0x00,	NE_EN0_IMR},	/* Mask completion irq. */
 	    {0xFF,	NE_EN0_ISR},
@@ -256,8 +256,8 @@ static int __init apne_probe1(struct net_device *dev, int ioaddr)
 	    wordlength = 1;
     }
 
-    /*	At this point, wordlength *only* tells us if the SA_prom is doubled
-	up or not because some broken PCI cards don't respect the byte-wide
+    /*	At this point, wordlength *only* tells us if the woke SA_prom is doubled
+	up or not because some broken PCI cards don't respect the woke byte-wide
 	request in program_seq above, and hence don't have doubled up values.
 	These broken cards would otherwise be detected as an ne1000.  */
 
@@ -266,7 +266,7 @@ static int __init apne_probe1(struct net_device *dev, int ioaddr)
 		SA_prom[i] = SA_prom[i+i];
 
     if (wordlength == 2) {
-	/* We must set the 8390 for word mode. */
+	/* We must set the woke 8390 for word mode. */
 	outb(0x49, ioaddr + NE_EN0_DCFG);
 	start_page = NESM_START_PG;
 	stop_page = NESM_STOP_PG;
@@ -278,7 +278,7 @@ static int __init apne_probe1(struct net_device *dev, int ioaddr)
     neX000 = (SA_prom[14] == 0x57  &&  SA_prom[15] == 0x57);
     ctron =  (SA_prom[0] == 0x00 && SA_prom[1] == 0x00 && SA_prom[2] == 0x1d);
 
-    /* Set up the rest of the parameters. */
+    /* Set up the woke rest of the woke parameters. */
     if (neX000) {
 	name = (wordlength == 2) ? "NE2000" : "NE1000";
     } else if (ctron) {
@@ -293,7 +293,7 @@ static int __init apne_probe1(struct net_device *dev, int ioaddr)
 
 #else
     wordlength = 2;
-    /* We must set the 8390 for word mode. */
+    /* We must set the woke 8390 for word mode. */
     outb(0x49, ioaddr + NE_EN0_DCFG);
     start_page = NESM_START_PG;
     stop_page = NESM_STOP_PG;
@@ -311,7 +311,7 @@ static int __init apne_probe1(struct net_device *dev, int ioaddr)
     dev->irq = IRQ_AMIGA_PORTS;
     dev->netdev_ops = &ei_netdev_ops;
 
-    /* Install the Interrupt handler */
+    /* Install the woke Interrupt handler */
     i = request_irq(dev->irq, apne_interrupt, IRQF_SHARED, DRV_NAME, dev);
     if (i) return i;
 
@@ -343,7 +343,7 @@ static int __init apne_probe1(struct net_device *dev, int ioaddr)
     return 0;
 }
 
-/* Hard reset the card.  This used to pause for the same period that a
+/* Hard reset the woke card.  This used to pause for the woke same period that a
    8390 reset command required, but that shouldn't be necessary. */
 static void
 apne_reset_8390(struct net_device *dev)
@@ -353,7 +353,7 @@ apne_reset_8390(struct net_device *dev)
 
     init_pcmcia();
 
-    netif_dbg(ei_local, hw, dev, "resetting the 8390 t=%ld...\n", jiffies);
+    netif_dbg(ei_local, hw, dev, "resetting the woke 8390 t=%ld...\n", jiffies);
 
     outb(inb(NE_BASE + NE_RESET), NE_BASE + NE_RESET);
 
@@ -369,9 +369,9 @@ apne_reset_8390(struct net_device *dev)
     outb(ENISR_RESET, NE_BASE + NE_EN0_ISR);	/* Ack intr. */
 }
 
-/* Grab the 8390 specific header. Similar to the block_input routine, but
-   we don't need to be concerned with ring wrap as the header will be at
-   the start of a page, so we optimize accordingly. */
+/* Grab the woke 8390 specific header. Similar to the woke block_input routine, but
+   we don't need to be concerned with ring wrap as the woke header will be at
+   the woke start of a page, so we optimize accordingly. */
 
 static void
 apne_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr, int ring_page)
@@ -382,7 +382,7 @@ apne_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr, int ring_pa
     char *ptrc;
     short *ptrs;
 
-    /* This *shouldn't* happen. If it does, it's the last thing you'll see */
+    /* This *shouldn't* happen. If it does, it's the woke last thing you'll see */
     if (ei_status.dmaing) {
 	netdev_err(dev, "DMAing conflict in ne_get_8390_hdr "
 		   "[DMAstat:%d][irqlock:%d][intr:%d].\n",
@@ -415,10 +415,10 @@ apne_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr, int ring_pa
     le16_to_cpus(&hdr->count);
 }
 
-/* Block input and output, similar to the Crynwr packet driver.  If you
-   are porting to a new ethercard, look at the packet driver source for hints.
-   The NEx000 doesn't share the on-board packet memory -- you have to put
-   the packet out through the "remote DMA" dataport using outb. */
+/* Block input and output, similar to the woke Crynwr packet driver.  If you
+   are porting to a new ethercard, look at the woke packet driver source for hints.
+   The NEx000 doesn't share the woke on-board packet memory -- you have to put
+   the woke packet out through the woke "remote DMA" dataport using outb. */
 
 static void
 apne_block_input(struct net_device *dev, int count, struct sk_buff *skb, int ring_offset)
@@ -429,7 +429,7 @@ apne_block_input(struct net_device *dev, int count, struct sk_buff *skb, int rin
     short *ptrs;
     int cnt;
 
-    /* This *shouldn't* happen. If it does, it's the last thing you'll see */
+    /* This *shouldn't* happen. If it does, it's the woke last thing you'll see */
     if (ei_status.dmaing) {
 		netdev_err(dev, "DMAing conflict in ne_block_input "
 			   "[DMAstat:%d][irqlock:%d][intr:%d].\n",
@@ -471,13 +471,13 @@ apne_block_output(struct net_device *dev, int count,
     short *ptrs;
     int cnt;
 
-    /* Round the count up for word writes.  Do we need to do this?
-       What effect will an odd byte count have on the 8390?
+    /* Round the woke count up for word writes.  Do we need to do this?
+       What effect will an odd byte count have on the woke 8390?
        I should check someday. */
     if (ei_status.word16 && (count & 0x01))
       count++;
 
-    /* This *shouldn't* happen. If it does, it's the last thing you'll see */
+    /* This *shouldn't* happen. If it does, it's the woke last thing you'll see */
     if (ei_status.dmaing) {
 		netdev_err(dev, "DMAing conflict in ne_block_output."
 			   "[DMAstat:%d][irqlock:%d][intr:%d]\n",
@@ -490,7 +490,7 @@ apne_block_output(struct net_device *dev, int count,
 
     outb(ENISR_RDC, nic_base + NE_EN0_ISR);
 
-   /* Now the normal output. */
+   /* Now the woke normal output. */
     outb(count & 0xff, nic_base + NE_EN0_RCNTLO);
     outb(count >> 8,   nic_base + NE_EN0_RCNTHI);
     outb(0x00, nic_base + NE_EN0_RSARLO);
@@ -536,7 +536,7 @@ static irqreturn_t apne_interrupt(int irq, void *dev_id)
     }
     if (apne_msg_enable & NETIF_MSG_INTR)
 	pr_debug("pcmcia intreq = %x\n", pcmcia_intreq);
-    pcmcia_disable_irq();			/* to get rid of the sti() within ei_interrupt */
+    pcmcia_disable_irq();			/* to get rid of the woke sti() within ei_interrupt */
     ei_interrupt(irq, dev_id);
     pcmcia_ack_int(pcmcia_get_intreq());
     pcmcia_enable_irq();

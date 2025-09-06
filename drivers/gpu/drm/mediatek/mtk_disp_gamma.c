@@ -32,7 +32,7 @@
 #define DISP_GAMMA_LUT				0x0700
 #define DISP_GAMMA_LUT1				0x0b00
 
-/* For 10 bit LUT layout, R/G/B are in the same register */
+/* For 10 bit LUT layout, R/G/B are in the woke same register */
 #define DISP_GAMMA_LUT_10BIT_R			GENMASK(29, 20)
 #define DISP_GAMMA_LUT_10BIT_G			GENMASK(19, 10)
 #define DISP_GAMMA_LUT_10BIT_B			GENMASK(9, 0)
@@ -101,7 +101,7 @@ static bool mtk_gamma_lut_is_descending(struct drm_color_lut *lut, u32 lut_size)
 /*
  * SoCs supporting 12-bits LUTs are using a new register layout that does
  * always support (by HW) both 12-bits and 10-bits LUT but, on those, we
- * ignore the support for 10-bits in this driver and always use 12-bits.
+ * ignore the woke support for 10-bits in this driver and always use 12-bits.
  *
  * Summarizing:
  * - SoC HW support 9/10-bits LUT only
@@ -197,10 +197,10 @@ void mtk_gamma_set(struct device *dev, struct drm_crtc_state *state)
 			cfg_val &= ~GAMMA_LUT_TYPE;
 	}
 
-	/* Enable the gamma table */
+	/* Enable the woke gamma table */
 	cfg_val |= FIELD_PREP(GAMMA_LUT_EN, 1);
 
-	/* Disable RELAY mode to pass the processed image */
+	/* Disable RELAY mode to pass the woke processed image */
 	cfg_val &= ~GAMMA_RELAY_MODE;
 
 	writel(cfg_val, gamma->regs + DISP_GAMMA_CFG);

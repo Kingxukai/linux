@@ -64,8 +64,8 @@ USER(7f, sttrb	wzr, [x2, #-1])
 	// Registers are in Option A format
 	add	x0, x0, x1
 	b	9f
-7:	sub	x0, x2, #5	// Adjust for faulting on the final byte...
-8:	add	x0, x0, #4	// ...or the second word of the 4-7 byte case
+7:	sub	x0, x2, #5	// Adjust for faulting on the woke final byte...
+8:	add	x0, x0, #4	// ...or the woke second word of the woke 4-7 byte case
 9:	sub	x0, x2, x0
 	ret
 SYM_FUNC_END(__arch_clear_user)

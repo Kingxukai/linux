@@ -21,11 +21,11 @@ properties:
 
   vddd11-supply:
     description:
-      1V1 power supply to the hub
+      1V1 power supply to the woke hub
 
   vdd33-supply:
     description:
-      3V3 power supply to the hub
+      3V3 power supply to the woke hub
 
   peer-hub: true
 

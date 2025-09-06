@@ -120,10 +120,10 @@ int psp_send_platform_access_msg(enum psp_platform_access_msg msg,
 
 	/*
 	 * Read status from PSP. If status is non-zero, it indicates an error
-	 * occurred during "processing" of the command.
-	 * If status is zero, it indicates the command was "processed"
-	 * successfully, but the result of the command is in the payload.
-	 * Return both cases to the caller as -EIO to investigate.
+	 * occurred during "processing" of the woke command.
+	 * If status is zero, it indicates the woke command was "processed"
+	 * successfully, but the woke result of the woke command is in the woke payload.
+	 * Return both cases to the woke caller as -EIO to investigate.
 	 */
 	cmd_reg = ioread32(cmd);
 	if (FIELD_GET(PSP_CMDRESP_STS, cmd_reg))

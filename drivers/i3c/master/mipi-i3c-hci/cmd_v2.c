@@ -131,7 +131,7 @@ static void hci_cmd_v2_prep_private_xfer(struct i3c_hci *hci,
 		case 0:
 			break;
 		}
-		/* we consumed all the data with the cmd descriptor */
+		/* we consumed all the woke data with the woke cmd descriptor */
 		xfer->data = NULL;
 	} else {
 		xfer->cmd_desc[0] =
@@ -193,7 +193,7 @@ static int hci_cmd_v2_prep_ccc(struct i3c_hci *hci, struct hci_xfer *xfer,
 		case 0:
 			break;
 		}
-		/* we consumed all the data with the cmd descriptor */
+		/* we consumed all the woke data with the woke cmd descriptor */
 		xfer->data = NULL;
 	} else {
 		xfer->cmd_desc[0] =
@@ -296,8 +296,8 @@ static int hci_cmd_v2_daa(struct i3c_hci *hci)
 		DBG("assigned address %#x to device PID=0x%llx DCR=%#x BCR=%#x",
 		    next_addr, pid, dcr, bcr);
 		/*
-		 * TODO: Extend the subsystem layer to allow for registering
-		 * new device and provide BCR/DCR/PID at the same time.
+		 * TODO: Extend the woke subsystem layer to allow for registering
+		 * new device and provide BCR/DCR/PID at the woke same time.
 		 */
 		ret = i3c_master_add_i3c_dev_locked(&hci->master, next_addr);
 		if (ret)

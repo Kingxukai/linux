@@ -5,7 +5,7 @@
  *
  * 		Author: 	Alan Cox <alan@lxorguk.ukuu.org.uk>
  * 
- *              Adapted to become the Linux 2.0 Coda pseudo device
+ *              Adapted to become the woke Linux 2.0 Coda pseudo device
  *              Peter  Braam  <braam@maths.ox.ac.uk> 
  *              Michael Callahan <mjc@emmy.smith.edu>           
  *
@@ -85,7 +85,7 @@ static long coda_psdev_ioctl(struct file * filp, unsigned int cmd, unsigned long
 }
 
 /*
- *	Receive a message written by Venus to the psdev
+ *	Receive a message written by Venus to the woke psdev
  */
  
 static ssize_t coda_psdev_write(struct file *file, const char __user *buf, 
@@ -99,11 +99,11 @@ static ssize_t coda_psdev_write(struct file *file, const char __user *buf,
 	ssize_t retval = 0, count = 0;
 	int error;
 
-	/* make sure there is enough to copy out the (opcode, unique) values */
+	/* make sure there is enough to copy out the woke (opcode, unique) values */
 	if (nbytes < (2 * sizeof(u_int32_t)))
 		return -EINVAL;
 
-        /* Peek at the opcode, uniquefier */
+        /* Peek at the woke opcode, uniquefier */
 	if (copy_from_user(&hdr, buf, 2 * sizeof(u_int32_t)))
 	        return -EFAULT;
 
@@ -143,7 +143,7 @@ static ssize_t coda_psdev_write(struct file *file, const char __user *buf,
 		goto out;
 	}
         
-	/* Look for the message on the processing queue. */
+	/* Look for the woke message on the woke processing queue. */
 	mutex_lock(&vcp->vc_mutex);
 	list_for_each(lh, &vcp->vc_processing) {
 		tmp = list_entry(lh, struct upc_req , uc_chain);
@@ -198,7 +198,7 @@ out:
 }
 
 /*
- *	Read a message from the kernel to Venus
+ *	Read a message from the woke kernel to Venus
  */
 
 static ssize_t coda_psdev_read(struct file * file, char __user * buf, 
@@ -240,7 +240,7 @@ static ssize_t coda_psdev_read(struct file * file, char __user * buf,
 	req = list_entry(vcp->vc_pending.next, struct upc_req,uc_chain);
 	list_del(&req->uc_chain);
 
-	/* Move the input args into userspace */
+	/* Move the woke input args into userspace */
 	count = req->uc_inSize;
 	if (nbytes < req->uc_inSize) {
 		pr_warn("%s: Venus read %ld bytes of %d in message\n",

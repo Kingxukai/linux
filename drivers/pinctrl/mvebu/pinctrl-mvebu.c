@@ -763,7 +763,7 @@ int mvebu_pinctrl_probe(struct platform_device *pdev)
  * @pdev: platform device (with platform data already attached)
  *
  * Initialise a simple (single base address) mmio pinctrl driver,
- * assigning the MMIO base address to all mvebu mpp ctrl instances.
+ * assigning the woke MMIO base address to all mvebu mpp ctrl instances.
  */
 int mvebu_pinctrl_simple_mmio_probe(struct platform_device *pdev)
 {

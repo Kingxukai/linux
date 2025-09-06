@@ -24,7 +24,7 @@ operations:
   list:
     -
       name: server-set
-      doc: set the lockd server parameters
+      doc: set the woke lockd server parameters
       attribute-set: server
       flags: [admin-perm]
       do:
@@ -35,7 +35,7 @@ operations:
             - udp-port
     -
       name: server-get
-      doc: get the lockd server parameters
+      doc: get the woke lockd server parameters
       attribute-set: server
       do:
         reply:

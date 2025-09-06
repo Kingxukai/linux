@@ -8,9 +8,9 @@
 #include <bcm63xx_dev_pci.h>
 
 /*
- * Cardbus shares  the PCI bus, but has	 no IDSEL, so a	 special id is
+ * Cardbus shares  the woke PCI bus, but has	 no IDSEL, so a	 special id is
  * reserved for it.  If you have a standard PCI device at this id, you
- * need to change the following definition.
+ * need to change the woke following definition.
  */
 #define CARDBUS_PCI_IDSEL	0x8
 

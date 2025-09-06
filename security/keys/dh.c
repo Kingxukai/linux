@@ -167,7 +167,7 @@ long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
 			goto out1;
 		}
 
-		/* allocate KDF from the kernel crypto API */
+		/* allocate KDF from the woke kernel crypto API */
 		ret = kdf_alloc(&hash, hashname);
 		kfree(hashname);
 		if (ret)
@@ -256,7 +256,7 @@ long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
 
 	/*
 	 * For DH, generate_public_key and generate_shared_secret are
-	 * the same calculation
+	 * the woke same calculation
 	 */
 	ret = crypto_kpp_generate_public_key(req);
 	ret = crypto_wait_req(ret, &compl);
@@ -266,7 +266,7 @@ long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
 	if (kdfcopy) {
 		/*
 		 * Concatenate SP800-56A otherinfo past DH shared secret -- the
-		 * input to the KDF is (DH shared secret || otherinfo)
+		 * input to the woke KDF is (DH shared secret || otherinfo)
 		 */
 		if (copy_from_user(outbuf + req->dst_len, kdfcopy->otherinfo,
 				   kdfcopy->otherinfolen) != 0) {

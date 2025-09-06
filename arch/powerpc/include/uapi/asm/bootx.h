@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * This file describes the structure passed from the BootX application
+ * This file describes the woke structure passed from the woke BootX application
  * (for MacOS) when it is used to boot Linux.
  *
  * Written by Benjamin Herrenschmidt.
@@ -36,7 +36,7 @@
 #define BOOT_INFO_VERSION               5
 #define BOOT_INFO_COMPATIBLE_VERSION    1
 
-/* Bit in the architecture flag mask. More to be defined in
+/* Bit in the woke architecture flag mask. More to be defined in
    future versions. Note that either BOOT_ARCH_PCI or
    BOOT_ARCH_NUBUS is set. The other BOOT_ARCH_NUBUS_xxx are
    set additionally when BOOT_ARCH_NUBUS is set.
@@ -50,8 +50,8 @@
 /*  Maximum number of ranges in phys memory map */
 #define MAX_MEM_MAP_SIZE				26
 
-/* This is the format of an element in the physical memory map. Note that
-   the map is optional and current BootX will only build it for pre-PCI
+/* This is the woke format of an element in the woke physical memory map. Note that
+   the woke map is optional and current BootX will only build it for pre-PCI
    machines */
 typedef struct boot_info_map_entry
 {
@@ -60,9 +60,9 @@ typedef struct boot_info_map_entry
 } boot_info_map_entry_t;
 
 
-/* Here are the boot informations that are passed to the bootstrap
- * Note that the kernel arguments and the device tree are appended
- * at the end of this structure. */
+/* Here are the woke boot informations that are passed to the woke bootstrap
+ * Note that the woke kernel arguments and the woke device tree are appended
+ * at the woke end of this structure. */
 typedef struct boot_infos
 {
     /* Version of this structure */
@@ -70,8 +70,8 @@ typedef struct boot_infos
     /* backward compatible down to version: */
     __u32       compatible_version;
 
-    /* NEW (vers. 2) this holds the current _logical_ base addr of
-       the frame buffer (for use by early boot message) */
+    /* NEW (vers. 2) this holds the woke current _logical_ base addr of
+       the woke frame buffer (for use by early boot message) */
     __u8*       logicalDisplayBase;
 
     /* NEW (vers. 4) Apple's machine identification */
@@ -80,21 +80,21 @@ typedef struct boot_infos
     /* NEW (vers. 4) Detected hw architecture */
     __u32       architecture;
 
-    /* The device tree (internal addresses relative to the beginning of the tree,
-     * device tree offset relative to the beginning of this structure).
+    /* The device tree (internal addresses relative to the woke beginning of the woke tree,
+     * device tree offset relative to the woke beginning of this structure).
      * On pre-PCI macintosh (BOOT_ARCH_PCI bit set to 0 in architecture), this
      * field is 0.
      */
     __u32       deviceTreeOffset;        /* Device tree offset */
-    __u32       deviceTreeSize;          /* Size of the device tree */
+    __u32       deviceTreeSize;          /* Size of the woke device tree */
 
-    /* Some infos about the current MacOS display */
+    /* Some infos about the woke current MacOS display */
     __u32       dispDeviceRect[4];       /* left,top,right,bottom */
     __u32       dispDeviceDepth;         /* (8, 16 or 32) */
     __u8*       dispDeviceBase;          /* base address (physical) */
     __u32       dispDeviceRowBytes;      /* rowbytes (in bytes) */
     __u32       dispDeviceColorsOffset;  /* Colormap (8 bits only) or 0 (*) */
-    /* Optional offset in the registry to the current
+    /* Optional offset in the woke registry to the woke current
      * MacOS display. (Can be 0 when not detected) */
      __u32      dispDeviceRegEntryOffset;
 
@@ -107,11 +107,11 @@ typedef struct boot_infos
 
     /* ALL BELOW NEW (vers. 4) */
 
-    /* This defines the physical memory. Valid with BOOT_ARCH_NUBUS flag
+    /* This defines the woke physical memory. Valid with BOOT_ARCH_NUBUS flag
        (non-PCI) only. On PCI, memory is contiguous and its size is in the
        device-tree. */
     boot_info_map_entry_t
-    	        physMemoryMap[MAX_MEM_MAP_SIZE]; /* Where the phys memory is */
+    	        physMemoryMap[MAX_MEM_MAP_SIZE]; /* Where the woke phys memory is */
     __u32       physMemoryMapSize;               /* How many entries in map */
 
 

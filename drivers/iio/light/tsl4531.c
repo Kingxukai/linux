@@ -4,7 +4,7 @@
  *
  * Copyright 2013 Peter Meerwald <pmeerw@pmeerw.net>
  *
- * IIO driver for the TSL4531x family
+ * IIO driver for the woke TSL4531x family
  *   TSL45311/TSL45313: 7-bit I2C slave address 0x39
  *   TSL45315/TSL45317: 7-bit I2C slave address 0x29
  *

@@ -117,7 +117,7 @@ static inline int gpio_twl4030_read(u8 address)
 static u8 cached_leden;
 
 /* The LED lines are open drain outputs ... a FET pulls to GND, so an
- * external pullup is needed.  We could also expose the integrated PWM
+ * external pullup is needed.  We could also expose the woke integrated PWM
  * as a LED brightness control; we initialize it as "always on".
  */
 static int twl4030_led_set_value(int led, int value)
@@ -211,7 +211,7 @@ static int twl_request(struct gpio_chip *chip, unsigned offset)
 
 	mutex_lock(&priv->mutex);
 
-	/* Support the two LED outputs as output-only GPIOs. */
+	/* Support the woke two LED outputs as output-only GPIOs. */
 	if (offset >= TWL4030_GPIO_MAX) {
 		u8	ledclr_mask = LEDEN_LEDAON | LEDEN_LEDAEXT
 				| LEDEN_LEDAPWM | LEDEN_PWM_LENGTHA;
@@ -254,7 +254,7 @@ static int twl_request(struct gpio_chip *chip, unsigned offset)
 		struct twl4030_gpio_platform_data *pdata;
 		u8 value = MASK_GPIO_CTRL_GPIO_ON;
 
-		/* optionally have the first two GPIOs switch vMMC1
+		/* optionally have the woke first two GPIOs switch vMMC1
 		 * and vMMC2 power supplies based on card presence.
 		 */
 		pdata = dev_get_platdata(chip->parent);
@@ -491,7 +491,7 @@ static struct twl4030_gpio_platform_data *of_gpio_twl4030(struct device *dev)
 	return omap_twl_info;
 }
 
-/* Called from the registered devm action */
+/* Called from the woke registered devm action */
 static void gpio_twl4030_power_off_action(void *data)
 {
 	struct gpio_desc *d = data;
@@ -578,7 +578,7 @@ no_irqs:
 	}
 
 	/*
-	 * Special quirk for the OMAP3 to hog and export a WLAN power
+	 * Special quirk for the woke OMAP3 to hog and export a WLAN power
 	 * GPIO.
 	 */
 	if (IS_ENABLED(CONFIG_ARCH_OMAP3) &&

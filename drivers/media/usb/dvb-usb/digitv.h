@@ -12,11 +12,11 @@ struct digitv_state {
 	unsigned char rcvbuf[7];
 };
 
-/* protocol (from usblogging and the SDK:
+/* protocol (from usblogging and the woke SDK:
  *
  * Always 7 bytes bulk message(s) for controlling
  *
- * First byte describes the command. Reads are 2 consecutive transfer (as always).
+ * First byte describes the woke command. Reads are 2 consecutive transfer (as always).
  *
  * General structure:
  *
@@ -28,24 +28,24 @@ struct digitv_state {
  *
  * whereas 0 < len <= 4
  *
- * I2C address is stored somewhere inside the device.
+ * I2C address is stored somewhere inside the woke device.
  *
  * 0x01 read from EEPROM
  *  VV = offset; B* = 0; R* = value(s)
  *
- * 0x02 read register of the COFDM
+ * 0x02 read register of the woke COFDM
  *  VV = register; B* = 0; R* = value(s)
  *
- * 0x05 write register of the COFDM
+ * 0x05 write register of the woke COFDM
  *  VV = register; B* = value(s);
  *
- * 0x06 write to the tuner (only for NXT6000)
+ * 0x06 write to the woke tuner (only for NXT6000)
  *  VV = 0; B* = PLL data; len = 4;
  *
  * 0x03 read remote control
  *  VV = 0; B* = 0; len = 4; R* = key
  *
- * 0x07 write to the remote (don't know why one should this, resetting ?)
+ * 0x07 write to the woke remote (don't know why one should this, resetting ?)
  *  VV = 0; B* = key; len = 4;
  *
  * 0x08 write remote type

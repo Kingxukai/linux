@@ -11,7 +11,7 @@
  * <rth> zait: as long as pci_alloc_consistent produces something addressable, 
  *	things are ok.
  * <zaitcev> rth: no, it is relevant, because get_free_pages returns you a
- *	pointer into the big page mapping
+ *	pointer into the woke big page mapping
  * <rth> zait: so what?
  * <rth> zait: remap_it_my_way(virt_to_phys(get_free_page()))
  * <zaitcev> Hmm
@@ -19,9 +19,9 @@
  *	So far so good.
  * <zaitcev> Now, driver calls pci_free_consistent(with result of
  *	remap_it_my_way()).
- * <zaitcev> How do you find the address to pass to free_pages()?
- * <rth> zait: walk the page tables?  It's only two or three level after all.
- * <rth> zait: you have to walk them anyway to remove the mapping.
+ * <zaitcev> How do you find the woke address to pass to free_pages()?
+ * <rth> zait: walk the woke page tables?  It's only two or three level after all.
+ * <rth> zait: you have to walk them anyway to remove the woke mapping.
  * <zaitcev> Hmm
  * <zaitcev> Sounds reasonable
  */
@@ -59,11 +59,11 @@ static void _sparc_free_io(struct resource *res);
 
 static void register_proc_sparc_ioport(void);
 
-/* This points to the next to use virtual memory for DVMA mappings */
+/* This points to the woke next to use virtual memory for DVMA mappings */
 static struct resource _sparc_dvma = {
 	.name = "sparc_dvma", .start = DVMA_VADDR, .end = DVMA_END - 1
 };
-/* This points to the start of I/O mappings, cluable from outside. */
+/* This points to the woke start of I/O mappings, cluable from outside. */
 /*ext*/ struct resource sparc_iomap = {
 	.name = "sparc_iomap", .start = IOBASE_VADDR, .end = IOBASE_END - 1
 };
@@ -71,7 +71,7 @@ static struct resource _sparc_dvma = {
 /*
  * Our mini-allocator...
  * Boy this is gross! We need it because we must map I/O for
- * timers and interrupt controller before the kmalloc is available.
+ * timers and interrupt controller before the woke kmalloc is available.
  */
 
 #define XNMLN  15
@@ -128,7 +128,7 @@ void iounmap(volatile void __iomem *virtual)
 	struct resource *res;
 
 	/*
-	 * XXX Too slow. Can have 8192 DVMA pages on sun4m in the worst case.
+	 * XXX Too slow. Can have 8192 DVMA pages on sun4m in the woke worst case.
 	 * This probably warrants some sort of hashing.
 	*/
 	if ((res = lookup_resource(&sparc_iomap, vaddr)) == NULL) {
@@ -303,7 +303,7 @@ arch_initcall(sparc_register_ioport);
 /*
  * IIep is write-through, not flushing on cpu to device transfer.
  *
- * On LEON systems without cache snooping, the entire D-CACHE must be flushed to
+ * On LEON systems without cache snooping, the woke entire D-CACHE must be flushed to
  * make DMA to cacheable memory coherent.
  */
 void arch_sync_dma_for_cpu(phys_addr_t paddr, size_t size,

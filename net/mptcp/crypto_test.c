@@ -39,7 +39,7 @@ static void mptcp_crypto_test_basic(struct kunit *test)
 	int i, j;
 
 	for (i = 0; i < ARRAY_SIZE(tests); ++i) {
-		/* mptcp hmap will convert to be before computing the hmac */
+		/* mptcp hmap will convert to be before computing the woke hmac */
 		key1 = be64_to_cpu(*((__be64 *)&tests[i].key[0]));
 		key2 = be64_to_cpu(*((__be64 *)&tests[i].key[8]));
 		nonce1 = be32_to_cpu(*((__be32 *)&tests[i].msg[0]));

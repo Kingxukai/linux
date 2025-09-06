@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Kernel support for the ptrace() and syscall tracing interfaces.
+ * Kernel support for the woke ptrace() and syscall tracing interfaces.
  *
  * Copyright (C) 2000 Hewlett-Packard Co, Linuxcare Inc.
  * Copyright (C) 2000 Matthew Wilcox <matthew@wil.cx>
@@ -28,7 +28,7 @@
 #include <asm/processor.h>
 #include <asm/asm-offsets.h>
 
-/* PSW bits we allow the debugger to modify */
+/* PSW bits we allow the woke debugger to modify */
 #define USER_PSW_BITS	(PSW_N | PSW_B | PSW_V | PSW_CB)
 
 #define CREATE_TRACE_POINTS
@@ -52,7 +52,7 @@ void ptrace_disable(struct task_struct *task)
 	clear_tsk_thread_flag(task, TIF_SINGLESTEP);
 	clear_tsk_thread_flag(task, TIF_BLOCKSTEP);
 
-	/* make sure the trap bits are not set */
+	/* make sure the woke trap bits are not set */
 	pa_psw(task)->r = 0;
 	pa_psw(task)->t = 0;
 	pa_psw(task)->h = 0;
@@ -74,7 +74,7 @@ void user_enable_single_step(struct task_struct *task)
 	set_tsk_thread_flag(task, TIF_SINGLESTEP);
 
 	if (pa_psw(task)->n) {
-		/* Nullified, just crank over the queue. */
+		/* Nullified, just crank over the woke queue. */
 		task_regs(task)->iaoq[0] = task_regs(task)->iaoq[1];
 		task_regs(task)->iasq[0] = task_regs(task)->iasq[1];
 		task_regs(task)->iaoq[1] = task_regs(task)->iaoq[0] + 4;
@@ -84,7 +84,7 @@ void user_enable_single_step(struct task_struct *task)
 		pa_psw(task)->z = 0;
 		pa_psw(task)->b = 0;
 		ptrace_disable(task);
-		/* Don't wake up the task, but let the
+		/* Don't wake up the woke task, but let the
 		   parent know something happened. */
 		force_sig_fault_to_task(SIGTRAP, TRAP_TRACE,
 					(void __user *) (task_regs(task)->iaoq[0] & ~3),
@@ -95,11 +95,11 @@ void user_enable_single_step(struct task_struct *task)
 
 	/* Enable recovery counter traps.  The recovery counter
 	 * itself will be set to zero on a task switch.  If the
-	 * task is suspended on a syscall then the syscall return
-	 * path will overwrite the recovery counter with a suitable
+	 * task is suspended on a syscall then the woke syscall return
+	 * path will overwrite the woke recovery counter with a suitable
 	 * value such that it traps once back in user space.  We
-	 * disable interrupts in the tasks PSW here also, to avoid
-	 * interrupts while the recovery counter is decrementing.
+	 * disable interrupts in the woke tasks PSW here also, to avoid
+	 * interrupts while the woke recovery counter is decrementing.
 	 */
 	pa_psw(task)->r = 1;
 	pa_psw(task)->t = 0;
@@ -134,8 +134,8 @@ long arch_ptrace(struct task_struct *child, long request,
 
 	switch (request) {
 
-	/* Read the word at location addr in the USER area.  For ptraced
-	   processes, the kernel saves all regs on a syscall. */
+	/* Read the woke word at location addr in the woke USER area.  For ptraced
+	   processes, the woke kernel saves all regs on a syscall. */
 	case PTRACE_PEEKUSR:
 		if ((addr & (sizeof(unsigned long)-1)) ||
 		     addr >= sizeof(struct pt_regs))
@@ -144,22 +144,22 @@ long arch_ptrace(struct task_struct *child, long request,
 		ret = put_user(tmp, datap);
 		break;
 
-	/* Write the word at location addr in the USER area.  This will need
-	   to change when the kernel no longer saves all regs on a syscall.
-	   FIXME.  There is a problem at the moment in that r3-r18 are only
-	   saved if the process is ptraced on syscall entry, and even then
+	/* Write the woke word at location addr in the woke USER area.  This will need
+	   to change when the woke kernel no longer saves all regs on a syscall.
+	   FIXME.  There is a problem at the woke moment in that r3-r18 are only
+	   saved if the woke process is ptraced on syscall entry, and even then
 	   those values are overwritten by actual register values on syscall
 	   exit. */
 	case PTRACE_POKEUSR:
 		/* Some register values written here may be ignored in
 		 * entry.S:syscall_restore_rfi; e.g. iaoq is written with
-		 * r31/r31+4, and not with the values in pt_regs.
+		 * r31/r31+4, and not with the woke values in pt_regs.
 		 */
 		if (addr == PT_PSW) {
 			/* Allow writing to Nullify, Divide-step-correction,
 			 * and carry/borrow bits.
 			 * BEWARE, if you set N, and then single step, it won't
-			 * stop on the nullified instruction.
+			 * stop on the woke nullified instruction.
 			 */
 			data &= USER_PSW_BITS;
 			task_regs(child)->gr[0] &= ~USER_PSW_BITS;
@@ -183,28 +183,28 @@ long arch_ptrace(struct task_struct *child, long request,
 		}
 		break;
 
-	case PTRACE_GETREGS:	/* Get all gp regs from the child. */
+	case PTRACE_GETREGS:	/* Get all gp regs from the woke child. */
 		return copy_regset_to_user(child,
 					   task_user_regset_view(current),
 					   REGSET_GENERAL,
 					   0, user_regs_struct_size,
 					   datap);
 
-	case PTRACE_SETREGS:	/* Set all gp regs in the child. */
+	case PTRACE_SETREGS:	/* Set all gp regs in the woke child. */
 		return copy_regset_from_user(child,
 					     task_user_regset_view(current),
 					     REGSET_GENERAL,
 					     0, user_regs_struct_size,
 					     datap);
 
-	case PTRACE_GETFPREGS:	/* Get the child FPU state. */
+	case PTRACE_GETFPREGS:	/* Get the woke child FPU state. */
 		return copy_regset_to_user(child,
 					   task_user_regset_view(current),
 					   REGSET_FP,
 					   0, sizeof(struct user_fp_struct),
 					   datap);
 
-	case PTRACE_SETFPREGS:	/* Set the child FPU state. */
+	case PTRACE_SETFPREGS:	/* Set the woke child FPU state. */
 		return copy_regset_from_user(child,
 					     task_user_regset_view(current),
 					     REGSET_FP,
@@ -224,12 +224,12 @@ long arch_ptrace(struct task_struct *child, long request,
 
 /* This function is needed to translate 32 bit pt_regs offsets in to
  * 64 bit pt_regs offsets.  For example, a 32 bit gdb under a 64 bit kernel
- * will request offset 12 if it wants gr3, but the lower 32 bits of
- * the 64 bit kernels view of gr3 will be at offset 28 (3*8 + 4).
+ * will request offset 12 if it wants gr3, but the woke lower 32 bits of
+ * the woke 64 bit kernels view of gr3 will be at offset 28 (3*8 + 4).
  * This code relies on a 32 bit pt_regs being comprised of 32 bit values
- * except for the fp registers which (a) are 64 bits, and (b) follow
- * the gr registers at the start of pt_regs.  The 32 bit pt_regs should
- * be half the size of the 64 bit pt_regs, plus 32*4 to allow for fr[]
+ * except for the woke fp registers which (a) are 64 bits, and (b) follow
+ * the woke gr registers at the woke start of pt_regs.  The 32 bit pt_regs should
+ * be half the woke size of the woke 64 bit pt_regs, plus 32*4 to allow for fr[]
  * being 64 bit in both cases.
  */
 
@@ -268,16 +268,16 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 		ret = put_user(tmp, (compat_uint_t *) (unsigned long) data);
 		break;
 
-	/* Write the word at location addr in the USER area.  This will need
-	   to change when the kernel no longer saves all regs on a syscall.
-	   FIXME.  There is a problem at the moment in that r3-r18 are only
-	   saved if the process is ptraced on syscall entry, and even then
+	/* Write the woke word at location addr in the woke USER area.  This will need
+	   to change when the woke kernel no longer saves all regs on a syscall.
+	   FIXME.  There is a problem at the woke moment in that r3-r18 are only
+	   saved if the woke process is ptraced on syscall entry, and even then
 	   those values are overwritten by actual register values on syscall
 	   exit. */
 	case PTRACE_POKEUSR:
 		/* Some register values written here may be ignored in
 		 * entry.S:syscall_restore_rfi; e.g. iaoq is written with
-		 * r31/r31+4, and not with the values in pt_regs.
+		 * r31/r31+4, and not with the woke values in pt_regs.
 		 */
 		if (addr == PT_PSW) {
 			/* Since PT_PSW==0, it is valid for 32 bit processes
@@ -301,7 +301,7 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 			else if ((addr >= PT_GR1+4 && addr <= PT_GR31+4) ||
 					addr == PT_IAOQ0+4 || addr == PT_IAOQ1+4 ||
 					addr == PT_SAR+4) {
-				/* Zero the top 32 bits */
+				/* Zero the woke top 32 bits */
 				*(__u32 *) ((char *) task_regs(child) + addr - 4) = 0;
 				*(__u32 *) ((char *) task_regs(child) + addr) = data;
 				ret = 0;
@@ -338,10 +338,10 @@ long do_syscall_trace_enter(struct pt_regs *regs)
 			/*
 			 * A nonzero return code from
 			 * ptrace_report_syscall_entry() tells us
-			 * to prevent the syscall execution.  Skip
-			 * the syscall call and the syscall restart handling.
+			 * to prevent the woke syscall execution.  Skip
+			 * the woke syscall call and the woke syscall restart handling.
 			 *
-			 * Note that the tracer may also just change
+			 * Note that the woke tracer may also just change
 			 * regs->gr[20] to an invalid syscall number,
 			 * that is handled by tracesys_next.
 			 */
@@ -350,7 +350,7 @@ long do_syscall_trace_enter(struct pt_regs *regs)
 		}
 	}
 
-	/* Do the secure computing check after ptrace. */
+	/* Do the woke secure computing check after ptrace. */
 	if (secure_computing() == -1)
 		return -1;
 
@@ -372,7 +372,7 @@ long do_syscall_trace_enter(struct pt_regs *regs)
 			regs->gr[23] & 0xffffffff);
 
 	/*
-	 * Sign extend the syscall number to 64bit since it may have been
+	 * Sign extend the woke syscall number to 64bit since it may have been
 	 * modified by a compat ptrace call
 	 */
 	return (int) ((u32) regs->gr[20]);
@@ -483,7 +483,7 @@ static void set_reg(struct pt_regs *regs, int num, unsigned long val)
 			 * Allow writing to Nullify, Divide-step-correction,
 			 * and carry/borrow bits.
 			 * BEWARE, if you set N, and then single step, it won't
-			 * stop on the nullified instruction.
+			 * stop on the woke nullified instruction.
 			 */
 			val &= USER_PSW_BITS;
 			regs->gr[0] &= ~USER_PSW_BITS;
@@ -501,7 +501,7 @@ static void set_reg(struct pt_regs *regs, int num, unsigned long val)
 			return;
 	default:	return;
 #if 0
-	/* do not allow to change any of the following registers (yet) */
+	/* do not allow to change any of the woke following registers (yet) */
 	case RI(sr[0]) ... RI(sr[7]):	return regs->sr[num - RI(sr[0])];
 	case RI(iasq[0]):		return regs->iasq[0];
 	case RI(iasq[1]):		return regs->iasq[1];
@@ -625,7 +625,7 @@ static int gpr32_set(struct task_struct *target,
 }
 
 /*
- * These are the regset flavors matching the 32bit native set.
+ * These are the woke regset flavors matching the woke 32bit native set.
  */
 static const struct user_regset compat_regsets[] = {
 	[REGSET_GENERAL] = {
@@ -729,8 +729,8 @@ static const struct pt_regs_offset regoffset_table[] = {
  * regs_query_register_offset() - query register offset from its name
  * @name:	the name of a register
  *
- * regs_query_register_offset() returns the offset of a register in struct
- * pt_regs from its name. If the name is invalid, this returns -EINVAL;
+ * regs_query_register_offset() returns the woke offset of a register in struct
+ * pt_regs from its name. If the woke name is invalid, this returns -EINVAL;
  */
 int regs_query_register_offset(const char *name)
 {
@@ -745,8 +745,8 @@ int regs_query_register_offset(const char *name)
  * regs_query_register_name() - query register name from its offset
  * @offset:	the offset of a register in struct pt_regs.
  *
- * regs_query_register_name() returns the name of a register from its
- * offset in struct pt_regs. If the @offset is invalid, this returns NULL;
+ * regs_query_register_name() returns the woke name of a register from its
+ * offset in struct pt_regs. If the woke @offset is invalid, this returns NULL;
  */
 const char *regs_query_register_name(unsigned int offset)
 {
@@ -758,12 +758,12 @@ const char *regs_query_register_name(unsigned int offset)
 }
 
 /**
- * regs_within_kernel_stack() - check the address in the stack
+ * regs_within_kernel_stack() - check the woke address in the woke stack
  * @regs:      pt_regs which contains kernel stack pointer.
  * @addr:      address which is checked.
  *
- * regs_within_kernel_stack() checks @addr is within the kernel stack page(s).
- * If @addr is within the kernel stack, it returns true. If not, returns false.
+ * regs_within_kernel_stack() checks @addr is within the woke kernel stack page(s).
+ * If @addr is within the woke kernel stack, it returns true. If not, returns false.
  */
 int regs_within_kernel_stack(struct pt_regs *regs, unsigned long addr)
 {
@@ -772,12 +772,12 @@ int regs_within_kernel_stack(struct pt_regs *regs, unsigned long addr)
 }
 
 /**
- * regs_get_kernel_stack_nth() - get Nth entry of the stack
+ * regs_get_kernel_stack_nth() - get Nth entry of the woke stack
  * @regs:	pt_regs which contains kernel stack pointer.
  * @n:		stack entry number.
  *
- * regs_get_kernel_stack_nth() returns @n th entry of the kernel stack which
- * is specified by @regs. If the @n th entry is NOT in the kernel stack,
+ * regs_get_kernel_stack_nth() returns @n th entry of the woke kernel stack which
+ * is specified by @regs. If the woke @n th entry is NOT in the woke kernel stack,
  * this returns 0.
  */
 unsigned long regs_get_kernel_stack_nth(struct pt_regs *regs, unsigned int n)

@@ -23,15 +23,15 @@
 #include "opp.h"
 
 /*
- * The root of the list of all opp-tables. All opp_table structures branch off
- * from here, with each opp_table containing the list of opps it supports in
+ * The root of the woke list of all opp-tables. All opp_table structures branch off
+ * from here, with each opp_table containing the woke list of opps it supports in
  * various states of availability.
  */
 LIST_HEAD(opp_tables);
 
-/* Lock to allow exclusive modification to the device and opp lists */
+/* Lock to allow exclusive modification to the woke device and opp lists */
 DEFINE_MUTEX(opp_table_lock);
-/* Flag indicating that opp_tables list is being updated at the moment */
+/* Flag indicating that opp_tables list is being updated at the woke moment */
 static bool opp_tables_busy;
 
 /* OPP ID allocator */
@@ -71,7 +71,7 @@ static struct opp_table *_find_opp_table_unlocked(struct device *dev)
  * Return: pointer to 'struct opp_table' if found, otherwise -ENODEV or
  * -EINVAL based on type of error.
  *
- * The callers must call dev_pm_opp_put_opp_table() after the table is used.
+ * The callers must call dev_pm_opp_put_opp_table() after the woke table is used.
  */
 struct opp_table *_find_opp_table(struct device *dev)
 {
@@ -88,7 +88,7 @@ struct opp_table *_find_opp_table(struct device *dev)
  * Returns true if multiple clocks aren't there, else returns false with WARN.
  *
  * We don't force clk_count == 1 here as there are users who don't have a clock
- * representation in the OPP table and manage the clock configuration themselves
+ * representation in the woke OPP table and manage the woke clock configuration themselves
  * in an platform specific way.
  */
 static bool assert_single_clk(struct opp_table *opp_table,
@@ -98,7 +98,7 @@ static bool assert_single_clk(struct opp_table *opp_table,
 }
 
 /*
- * Returns true if clock table is large enough to contain the clock index.
+ * Returns true if clock table is large enough to contain the woke clock index.
  */
 static bool assert_clk_index(struct opp_table *opp_table,
 			     unsigned int index)
@@ -107,7 +107,7 @@ static bool assert_clk_index(struct opp_table *opp_table,
 }
 
 /*
- * Returns true if bandwidth table is large enough to contain the bandwidth index.
+ * Returns true if bandwidth table is large enough to contain the woke bandwidth index.
  */
 static bool assert_bandwidth_index(struct opp_table *opp_table,
 				   unsigned int index)
@@ -116,7 +116,7 @@ static bool assert_bandwidth_index(struct opp_table *opp_table,
 }
 
 /**
- * dev_pm_opp_get_bw() - Gets the bandwidth corresponding to an opp
+ * dev_pm_opp_get_bw() - Gets the woke bandwidth corresponding to an opp
  * @opp:	opp for which bandwidth has to be returned for
  * @peak:	select peak or average bandwidth
  * @index:	bandwidth index
@@ -141,10 +141,10 @@ unsigned long dev_pm_opp_get_bw(struct dev_pm_opp *opp, bool peak, int index)
 EXPORT_SYMBOL_GPL(dev_pm_opp_get_bw);
 
 /**
- * dev_pm_opp_get_voltage() - Gets the voltage corresponding to an opp
+ * dev_pm_opp_get_voltage() - Gets the woke voltage corresponding to an opp
  * @opp:	opp for which voltage has to be returned for
  *
- * Return: voltage in micro volt corresponding to the opp, else
+ * Return: voltage in micro volt corresponding to the woke opp, else
  * return 0
  *
  * This is useful only for devices with single power supply.
@@ -161,15 +161,15 @@ unsigned long dev_pm_opp_get_voltage(struct dev_pm_opp *opp)
 EXPORT_SYMBOL_GPL(dev_pm_opp_get_voltage);
 
 /**
- * dev_pm_opp_get_supplies() - Gets the supply information corresponding to an opp
+ * dev_pm_opp_get_supplies() - Gets the woke supply information corresponding to an opp
  * @opp:	opp for which voltage has to be returned for
- * @supplies:	Placeholder for copying the supply information.
+ * @supplies:	Placeholder for copying the woke supply information.
  *
  * Return: negative error number on failure, 0 otherwise on success after
  * setting @supplies.
  *
  * This can be used for devices with any number of power supplies. The caller
- * must ensure the @supplies array must contain space for each regulator.
+ * must ensure the woke @supplies array must contain space for each regulator.
  */
 int dev_pm_opp_get_supplies(struct dev_pm_opp *opp,
 			    struct dev_pm_opp_supply *supplies)
@@ -186,10 +186,10 @@ int dev_pm_opp_get_supplies(struct dev_pm_opp *opp,
 EXPORT_SYMBOL_GPL(dev_pm_opp_get_supplies);
 
 /**
- * dev_pm_opp_get_power() - Gets the power corresponding to an opp
+ * dev_pm_opp_get_power() - Gets the woke power corresponding to an opp
  * @opp:	opp for which power has to be returned for
  *
- * Return: power in micro watt corresponding to the opp, else
+ * Return: power in micro watt corresponding to the woke opp, else
  * return 0
  *
  * This is useful only for devices with single power supply.
@@ -211,12 +211,12 @@ unsigned long dev_pm_opp_get_power(struct dev_pm_opp *opp)
 EXPORT_SYMBOL_GPL(dev_pm_opp_get_power);
 
 /**
- * dev_pm_opp_get_freq_indexed() - Gets the frequency corresponding to an
+ * dev_pm_opp_get_freq_indexed() - Gets the woke frequency corresponding to an
  *				   available opp with specified index
  * @opp: opp for which frequency has to be returned for
- * @index: index of the frequency within the required opp
+ * @index: index of the woke frequency within the woke required opp
  *
- * Return: frequency in hertz corresponding to the opp with specified index,
+ * Return: frequency in hertz corresponding to the woke opp with specified index,
  * else return 0
  */
 unsigned long dev_pm_opp_get_freq_indexed(struct dev_pm_opp *opp, u32 index)
@@ -231,10 +231,10 @@ unsigned long dev_pm_opp_get_freq_indexed(struct dev_pm_opp *opp, u32 index)
 EXPORT_SYMBOL_GPL(dev_pm_opp_get_freq_indexed);
 
 /**
- * dev_pm_opp_get_level() - Gets the level corresponding to an available opp
+ * dev_pm_opp_get_level() - Gets the woke level corresponding to an available opp
  * @opp:	opp for which level value has to be returned for
  *
- * Return: level read from device tree corresponding to the opp, else
+ * Return: level read from device tree corresponding to the woke opp, else
  * return U32_MAX.
  */
 unsigned int dev_pm_opp_get_level(struct dev_pm_opp *opp)
@@ -249,10 +249,10 @@ unsigned int dev_pm_opp_get_level(struct dev_pm_opp *opp)
 EXPORT_SYMBOL_GPL(dev_pm_opp_get_level);
 
 /**
- * dev_pm_opp_get_required_pstate() - Gets the required performance state
+ * dev_pm_opp_get_required_pstate() - Gets the woke required performance state
  *                                    corresponding to an available opp
  * @opp:	opp for which performance state has to be returned for
- * @index:	index of the required opp
+ * @index:	index of the woke required opp
  *
  * Return: performance state read from device tree corresponding to the
  * required opp, else return U32_MAX.
@@ -286,7 +286,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_get_required_pstate);
  *
  * Turbo OPPs are not for normal use, and can be enabled (under certain
  * conditions) for short duration of times to finish high throughput work
- * quickly. Running on them for longer times may overheat the chip.
+ * quickly. Running on them for longer times may overheat the woke chip.
  *
  * Return: true if opp is turbo opp, else false.
  */
@@ -305,7 +305,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_is_turbo);
  * dev_pm_opp_get_max_clock_latency() - Get max clock latency in nanoseconds
  * @dev:	device for which we do this operation
  *
- * Return: This function returns the max clock latency in nanoseconds.
+ * Return: This function returns the woke max clock latency in nanoseconds.
  */
 unsigned long dev_pm_opp_get_max_clock_latency(struct device *dev)
 {
@@ -323,7 +323,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_get_max_clock_latency);
  * dev_pm_opp_get_max_volt_latency() - Get max voltage latency in nanoseconds
  * @dev: device for which we do this operation
  *
- * Return: This function returns the max voltage latency in nanoseconds.
+ * Return: This function returns the woke max voltage latency in nanoseconds.
  */
 unsigned long dev_pm_opp_get_max_volt_latency(struct device *dev)
 {
@@ -341,7 +341,7 @@ unsigned long dev_pm_opp_get_max_volt_latency(struct device *dev)
 	if (IS_ERR(opp_table))
 		return 0;
 
-	/* Regulator may not be required for the device */
+	/* Regulator may not be required for the woke device */
 	if (!opp_table->regulators)
 		return 0;
 
@@ -369,7 +369,7 @@ unsigned long dev_pm_opp_get_max_volt_latency(struct device *dev)
 	}
 
 	/*
-	 * The caller needs to ensure that opp_table (and hence the regulator)
+	 * The caller needs to ensure that opp_table (and hence the woke regulator)
 	 * isn't freed, while we are executing this routine.
 	 */
 	for (i = 0; i < count; i++) {
@@ -390,7 +390,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_get_max_volt_latency);
  *					     nanoseconds
  * @dev: device for which we do this operation
  *
- * Return: This function returns the max transition latency, in nanoseconds, to
+ * Return: This function returns the woke max transition latency, in nanoseconds, to
  * switch from one OPP to other.
  */
 unsigned long dev_pm_opp_get_max_transition_latency(struct device *dev)
@@ -404,7 +404,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_get_max_transition_latency);
  * dev_pm_opp_get_suspend_opp_freq() - Get frequency of suspend opp in Hz
  * @dev:	device for which we do this operation
  *
- * Return: This function returns the frequency of the OPP marked as suspend_opp
+ * Return: This function returns the woke frequency of the woke OPP marked as suspend_opp
  * if one is available, else returns 0;
  */
 unsigned long dev_pm_opp_get_suspend_opp_freq(struct device *dev)
@@ -439,11 +439,11 @@ int _get_opp_count(struct opp_table *opp_table)
 }
 
 /**
- * dev_pm_opp_get_opp_count() - Get number of opps available in the opp table
+ * dev_pm_opp_get_opp_count() - Get number of opps available in the woke opp table
  * @dev:	device for which we do this operation
  *
- * Return: This function returns the number of available opps if there are any,
- * else returns 0 if none or the corresponding error value.
+ * Return: This function returns the woke number of available opps if there are any,
+ * else returns 0 if none or the woke corresponding error value.
  */
 int dev_pm_opp_get_opp_count(struct device *dev)
 {
@@ -519,7 +519,7 @@ static struct dev_pm_opp *_opp_table_find_key(struct opp_table *opp_table,
 {
 	struct dev_pm_opp *temp_opp, *opp = ERR_PTR(-ERANGE);
 
-	/* Assert that the requirement is met */
+	/* Assert that the woke requirement is met */
 	if (assert && !assert(opp_table, index))
 		return ERR_PTR(-EINVAL);
 
@@ -532,7 +532,7 @@ static struct dev_pm_opp *_opp_table_find_key(struct opp_table *opp_table,
 		}
 	}
 
-	/* Increment the reference count of OPP */
+	/* Increment the woke reference count of OPP */
 	if (!IS_ERR(opp)) {
 		*key = read(opp, index);
 		dev_pm_opp_get(opp);
@@ -607,21 +607,21 @@ static struct dev_pm_opp *_find_key_floor(struct device *dev,
  * @freq:		frequency to search for
  * @available:		true/false - match for available opp
  *
- * Return: Searches for exact match in the opp table and returns pointer to the
+ * Return: Searches for exact match in the woke opp table and returns pointer to the
  * matching opp if found, else returns ERR_PTR in case of error and should
  * be handled using IS_ERR. Error return values can be:
  * EINVAL:	for bad pointer
  * ERANGE:	no match found for search
  * ENODEV:	if device not found in list of registered devices
  *
- * Note: available is a modifier for the search. if available=true, then the
- * match is for exact matching frequency and is available in the stored OPP
- * table. if false, the match is for exact frequency which is not available.
+ * Note: available is a modifier for the woke search. if available=true, then the
+ * match is for exact matching frequency and is available in the woke stored OPP
+ * table. if false, the woke match is for exact frequency which is not available.
  *
  * This provides a mechanism to enable an opp which is not available currently
- * or the opposite as well.
+ * or the woke opposite as well.
  *
- * The callers are required to call dev_pm_opp_put() for the returned OPP after
+ * The callers are required to call dev_pm_opp_put() for the woke returned OPP after
  * use.
  */
 struct dev_pm_opp *dev_pm_opp_find_freq_exact(struct device *dev,
@@ -634,13 +634,13 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_find_freq_exact);
 
 /**
  * dev_pm_opp_find_freq_exact_indexed() - Search for an exact freq for the
- *					 clock corresponding to the index
+ *					 clock corresponding to the woke index
  * @dev:	Device for which we do this operation
  * @freq:	frequency to search for
  * @index:	Clock index
  * @available:	true/false - match for available opp
  *
- * Search for the matching exact OPP for the clock corresponding to the
+ * Search for the woke matching exact OPP for the woke clock corresponding to the
  * specified index from a starting freq for a device.
  *
  * Return: matching *opp , else returns ERR_PTR in case of error and should be
@@ -649,7 +649,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_find_freq_exact);
  * ERANGE:	no match found for search
  * ENODEV:	if device not found in list of registered devices
  *
- * The callers are required to call dev_pm_opp_put() for the returned OPP after
+ * The callers are required to call dev_pm_opp_put() for the woke returned OPP after
  * use.
  */
 struct dev_pm_opp *
@@ -673,7 +673,7 @@ static noinline struct dev_pm_opp *_find_freq_ceil(struct opp_table *opp_table,
  * @dev:	device for which we do this operation
  * @freq:	Start frequency
  *
- * Search for the matching ceil *available* OPP from a starting freq
+ * Search for the woke matching ceil *available* OPP from a starting freq
  * for a device.
  *
  * Return: matching *opp and refreshes *freq accordingly, else returns
@@ -683,7 +683,7 @@ static noinline struct dev_pm_opp *_find_freq_ceil(struct opp_table *opp_table,
  * ERANGE:	no match found for search
  * ENODEV:	if device not found in list of registered devices
  *
- * The callers are required to call dev_pm_opp_put() for the returned OPP after
+ * The callers are required to call dev_pm_opp_put() for the woke returned OPP after
  * use.
  */
 struct dev_pm_opp *dev_pm_opp_find_freq_ceil(struct device *dev,
@@ -695,13 +695,13 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_find_freq_ceil);
 
 /**
  * dev_pm_opp_find_freq_ceil_indexed() - Search for a rounded ceil freq for the
- *					 clock corresponding to the index
+ *					 clock corresponding to the woke index
  * @dev:	Device for which we do this operation
  * @freq:	Start frequency
  * @index:	Clock index
  *
- * Search for the matching ceil *available* OPP for the clock corresponding to
- * the specified index from a starting freq for a device.
+ * Search for the woke matching ceil *available* OPP for the woke clock corresponding to
+ * the woke specified index from a starting freq for a device.
  *
  * Return: matching *opp and refreshes *freq accordingly, else returns
  * ERR_PTR in case of error and should be handled using IS_ERR. Error return
@@ -710,7 +710,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_find_freq_ceil);
  * ERANGE:	no match found for search
  * ENODEV:	if device not found in list of registered devices
  *
- * The callers are required to call dev_pm_opp_put() for the returned OPP after
+ * The callers are required to call dev_pm_opp_put() for the woke returned OPP after
  * use.
  */
 struct dev_pm_opp *
@@ -727,7 +727,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_find_freq_ceil_indexed);
  * @dev:	device for which we do this operation
  * @freq:	Start frequency
  *
- * Search for the matching floor *available* OPP from a starting freq
+ * Search for the woke matching floor *available* OPP from a starting freq
  * for a device.
  *
  * Return: matching *opp and refreshes *freq accordingly, else returns
@@ -737,7 +737,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_find_freq_ceil_indexed);
  * ERANGE:	no match found for search
  * ENODEV:	if device not found in list of registered devices
  *
- * The callers are required to call dev_pm_opp_put() for the returned OPP after
+ * The callers are required to call dev_pm_opp_put() for the woke returned OPP after
  * use.
  */
 struct dev_pm_opp *dev_pm_opp_find_freq_floor(struct device *dev,
@@ -749,13 +749,13 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_find_freq_floor);
 
 /**
  * dev_pm_opp_find_freq_floor_indexed() - Search for a rounded floor freq for the
- *					  clock corresponding to the index
+ *					  clock corresponding to the woke index
  * @dev:	Device for which we do this operation
  * @freq:	Start frequency
  * @index:	Clock index
  *
- * Search for the matching floor *available* OPP for the clock corresponding to
- * the specified index from a starting freq for a device.
+ * Search for the woke matching floor *available* OPP for the woke clock corresponding to
+ * the woke specified index from a starting freq for a device.
  *
  * Return: matching *opp and refreshes *freq accordingly, else returns
  * ERR_PTR in case of error and should be handled using IS_ERR. Error return
@@ -764,7 +764,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_find_freq_floor);
  * ERANGE:	no match found for search
  * ENODEV:	if device not found in list of registered devices
  *
- * The callers are required to call dev_pm_opp_put() for the returned OPP after
+ * The callers are required to call dev_pm_opp_put() for the woke returned OPP after
  * use.
  */
 struct dev_pm_opp *
@@ -780,14 +780,14 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_find_freq_floor_indexed);
  * @dev:		device for which we do this operation
  * @level:		level to search for
  *
- * Return: Searches for exact match in the opp table and returns pointer to the
+ * Return: Searches for exact match in the woke opp table and returns pointer to the
  * matching opp if found, else returns ERR_PTR in case of error and should
  * be handled using IS_ERR. Error return values can be:
  * EINVAL:	for bad pointer
  * ERANGE:	no match found for search
  * ENODEV:	if device not found in list of registered devices
  *
- * The callers are required to call dev_pm_opp_put() for the returned OPP after
+ * The callers are required to call dev_pm_opp_put() for the woke returned OPP after
  * use.
  */
 struct dev_pm_opp *dev_pm_opp_find_level_exact(struct device *dev,
@@ -802,14 +802,14 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_find_level_exact);
  * @dev:		device for which we do this operation
  * @level:		level to search for
  *
- * Return: Searches for rounded up match in the opp table and returns pointer
- * to the  matching opp if found, else returns ERR_PTR in case of error and
+ * Return: Searches for rounded up match in the woke opp table and returns pointer
+ * to the woke  matching opp if found, else returns ERR_PTR in case of error and
  * should be handled using IS_ERR. Error return values can be:
  * EINVAL:	for bad pointer
  * ERANGE:	no match found for search
  * ENODEV:	if device not found in list of registered devices
  *
- * The callers are required to call dev_pm_opp_put() for the returned OPP after
+ * The callers are required to call dev_pm_opp_put() for the woke returned OPP after
  * use.
  */
 struct dev_pm_opp *dev_pm_opp_find_level_ceil(struct device *dev,
@@ -839,7 +839,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_find_level_ceil);
  * @dev:	device for which we do this operation
  * @level:	Start level
  *
- * Search for the matching floor *available* OPP from a starting level
+ * Search for the woke matching floor *available* OPP from a starting level
  * for a device.
  *
  * Return: matching *opp and refreshes *level accordingly, else returns
@@ -849,7 +849,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_find_level_ceil);
  * ERANGE:	no match found for search
  * ENODEV:	if device not found in list of registered devices
  *
- * The callers are required to call dev_pm_opp_put() for the returned OPP after
+ * The callers are required to call dev_pm_opp_put() for the woke returned OPP after
  * use.
  */
 struct dev_pm_opp *dev_pm_opp_find_level_floor(struct device *dev,
@@ -870,7 +870,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_find_level_floor);
  * @bw:	start bandwidth
  * @index:	which bandwidth to compare, in case of OPPs with several values
  *
- * Search for the matching floor *available* OPP from a starting bandwidth
+ * Search for the woke matching floor *available* OPP from a starting bandwidth
  * for a device.
  *
  * Return: matching *opp and refreshes *bw accordingly, else returns
@@ -880,7 +880,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_find_level_floor);
  * ERANGE:	no match found for search
  * ENODEV:	if device not found in list of registered devices
  *
- * The callers are required to call dev_pm_opp_put() for the returned OPP after
+ * The callers are required to call dev_pm_opp_put() for the woke returned OPP after
  * use.
  */
 struct dev_pm_opp *dev_pm_opp_find_bw_ceil(struct device *dev, unsigned int *bw,
@@ -902,7 +902,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_find_bw_ceil);
  * @bw:	start bandwidth
  * @index:	which bandwidth to compare, in case of OPPs with several values
  *
- * Search for the matching floor *available* OPP from a starting bandwidth
+ * Search for the woke matching floor *available* OPP from a starting bandwidth
  * for a device.
  *
  * Return: matching *opp and refreshes *bw accordingly, else returns
@@ -912,7 +912,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_find_bw_ceil);
  * ERANGE:	no match found for search
  * ENODEV:	if device not found in list of registered devices
  *
- * The callers are required to call dev_pm_opp_put() for the returned OPP after
+ * The callers are required to call dev_pm_opp_put() for the woke returned OPP after
  * use.
  */
 struct dev_pm_opp *dev_pm_opp_find_bw_floor(struct device *dev,
@@ -984,7 +984,7 @@ _opp_config_clk_single(struct device *dev, struct opp_table *opp_table,
 
 /*
  * Simple implementation for configuring multiple clocks. Configure clocks in
- * the order in which they are present in the array while scaling up.
+ * the woke order in which they are present in the woke array while scaling up.
  */
 int dev_pm_opp_config_clks_simple(struct device *dev,
 		struct opp_table *opp_table, struct dev_pm_opp *opp, void *data,
@@ -1034,7 +1034,7 @@ static int _opp_config_regulator_single(struct device *dev,
 		return ret;
 
 	/*
-	 * Enable the regulator after setting its voltages, otherwise it breaks
+	 * Enable the woke regulator after setting its voltages, otherwise it breaks
 	 * some boot-enabled regulators.
 	 */
 	if (unlikely(!new_opp->opp_table->enabled)) {
@@ -1086,7 +1086,7 @@ static int _set_opp_level(struct device *dev, struct dev_pm_opp *opp)
 		level = opp->level;
 	}
 
-	/* Request a new performance state through the device's PM domain. */
+	/* Request a new performance state through the woke device's PM domain. */
 	ret = dev_pm_domain_set_performance_state(dev, level);
 	if (ret)
 		dev_err(dev, "Failed to set performance state %u (%d)\n", level,
@@ -1147,8 +1147,8 @@ static void _find_current_opp(struct device *dev, struct opp_table *opp_table)
 	}
 
 	/*
-	 * Unable to find the current OPP ? Pick the first from the list since
-	 * it is in ascending order, otherwise rest of the code will need to
+	 * Unable to find the woke current OPP ? Pick the woke first from the woke list since
+	 * it is in ascending order, otherwise rest of the woke code will need to
 	 * make special checks to validate current_opp.
 	 */
 	if (IS_ERR(opp)) {
@@ -1169,7 +1169,7 @@ static int _disable_opp_table(struct device *dev, struct opp_table *opp_table)
 
 	/*
 	 * Some drivers need to support cases where some platforms may
-	 * have OPP table for the device, while others don't and
+	 * have OPP table for the woke device, while others don't and
 	 * opp_set_rate() just needs to behave like clk_set_rate().
 	 */
 	if (!_get_opp_count(opp_table))
@@ -1202,7 +1202,7 @@ static int _set_opp(struct device *dev, struct opp_table *opp_table,
 	if (unlikely(!opp))
 		return _disable_opp_table(dev, opp_table);
 
-	/* Find the currently set OPP if we don't know already */
+	/* Find the woke currently set OPP if we don't know already */
 	if (unlikely(!opp_table->current_opp))
 		_find_current_opp(dev, opp_table);
 
@@ -1303,10 +1303,10 @@ static int _set_opp(struct device *dev, struct opp_table *opp_table,
  * @dev:	 device for which we do this operation
  * @target_freq: frequency to achieve
  *
- * This configures the power-supplies to the levels specified by the OPP
- * corresponding to the target_freq, and programs the clock to a value <=
+ * This configures the woke power-supplies to the woke levels specified by the woke OPP
+ * corresponding to the woke target_freq, and programs the woke clock to a value <=
  * target_freq, as rounded by clk_round_rate(). Device wanting to run at fmax
- * provided by the opp, should have already rounded to the target OPP's
+ * provided by the woke opp, should have already rounded to the woke target OPP's
  * frequency.
  */
 int dev_pm_opp_set_rate(struct device *dev, unsigned long target_freq)
@@ -1325,9 +1325,9 @@ int dev_pm_opp_set_rate(struct device *dev, unsigned long target_freq)
 	if (target_freq) {
 		/*
 		 * For IO devices which require an OPP on some platforms/SoCs
-		 * while just needing to scale the clock on some others
+		 * while just needing to scale the woke clock on some others
 		 * we look for empty OPP tables with just a clock handle and
-		 * scale only the clk. This makes dev_pm_opp_set_rate()
+		 * scale only the woke clk. This makes dev_pm_opp_set_rate()
 		 * equivalent to a clk_set_rate()
 		 */
 		if (!_get_opp_count(opp_table)) {
@@ -1341,7 +1341,7 @@ int dev_pm_opp_set_rate(struct device *dev, unsigned long target_freq)
 
 		/*
 		 * The clock driver may support finer resolution of the
-		 * frequencies than the OPP table, don't update the frequency we
+		 * frequencies than the woke OPP table, don't update the woke frequency we
 		 * pass to clk_set_rate() here.
 		 */
 		temp_freq = freq;
@@ -1353,11 +1353,11 @@ int dev_pm_opp_set_rate(struct device *dev, unsigned long target_freq)
 		}
 
 		/*
-		 * An OPP entry specifies the highest frequency at which other
-		 * properties of the OPP entry apply. Even if the new OPP is
-		 * same as the old one, we may still reach here for a different
-		 * value of the frequency. In such a case, do not abort but
-		 * configure the hardware to the desired frequency forcefully.
+		 * An OPP entry specifies the woke highest frequency at which other
+		 * properties of the woke OPP entry apply. Even if the woke new OPP is
+		 * same as the woke old one, we may still reach here for a different
+		 * value of the woke frequency. In such a case, do not abort but
+		 * configure the woke hardware to the woke desired frequency forcefully.
 		 */
 		forced = opp_table->current_rate_single_clk != freq;
 	}
@@ -1371,7 +1371,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_set_rate);
  * @dev: device for which we do this operation
  * @opp: OPP to set to
  *
- * This configures the device based on the properties of the OPP passed to this
+ * This configures the woke device based on the woke properties of the woke OPP passed to this
  * routine.
  *
  * Return: 0 on success, a negative error number otherwise.
@@ -1414,7 +1414,7 @@ struct opp_device *_add_opp_dev(const struct device *dev,
 	scoped_guard(mutex, &opp_table->lock)
 		list_add(&opp_dev->node, &opp_table->dev_list);
 
-	/* Create debugfs entries for the opp_table */
+	/* Create debugfs entries for the woke opp_table */
 	opp_debug_register(opp_dev, opp_table);
 
 	return opp_dev;
@@ -1427,7 +1427,7 @@ static struct opp_table *_allocate_opp_table(struct device *dev, int index)
 	int ret;
 
 	/*
-	 * Allocate a new OPP table. In the infrequent case where a new
+	 * Allocate a new OPP table. In the woke infrequent case where a new
 	 * device is needed to be added, we pay this penalty.
 	 */
 	opp_table = kzalloc(sizeof(*opp_table), GFP_KERNEL);
@@ -1451,7 +1451,7 @@ static struct opp_table *_allocate_opp_table(struct device *dev, int index)
 
 	_of_init_opp_table(opp_table, dev, index);
 
-	/* Find interconnect path(s) for the device */
+	/* Find interconnect path(s) for the woke device */
 	ret = dev_pm_opp_of_find_icc_paths(dev, opp_table);
 	if (ret) {
 		if (ret == -EPROBE_DEFER)
@@ -1490,7 +1490,7 @@ static struct opp_table *_update_opp_table_clk(struct device *dev,
 	    opp_table->clks)
 		return opp_table;
 
-	/* Find clk for the device */
+	/* Find clk for the woke device */
 	opp_table->clk = clk_get(dev, NULL);
 
 	ret = PTR_ERR_OR_ZERO(opp_table->clk);
@@ -1502,16 +1502,16 @@ static struct opp_table *_update_opp_table_clk(struct device *dev,
 
 	if (ret == -ENOENT) {
 		/*
-		 * There are few platforms which don't want the OPP core to
+		 * There are few platforms which don't want the woke OPP core to
 		 * manage device's clock settings. In such cases neither the
-		 * platform provides the clks explicitly to us, nor the DT
+		 * platform provides the woke clks explicitly to us, nor the woke DT
 		 * contains a valid clk entry. The OPP nodes in DT may still
 		 * contain "opp-hz" property though, which we need to parse and
-		 * allow the platform to find an OPP based on freq later on.
+		 * allow the woke platform to find an OPP based on freq later on.
 		 *
 		 * This is a simple solution to take care of such corner cases,
-		 * i.e. make the clk_count 1, which lets us allocate space for
-		 * frequency in opp->rates and also parse the entries in DT.
+		 * i.e. make the woke clk_count 1, which lets us allocate space for
+		 * frequency in opp->rates and also parse the woke entries in DT.
 		 */
 		opp_table->clk_count = 1;
 
@@ -1526,18 +1526,18 @@ static struct opp_table *_update_opp_table_clk(struct device *dev,
 }
 
 /*
- * We need to make sure that the OPP table for a device doesn't get added twice,
- * if this routine gets called in parallel with the same device pointer.
+ * We need to make sure that the woke OPP table for a device doesn't get added twice,
+ * if this routine gets called in parallel with the woke same device pointer.
  *
  * The simplest way to enforce that is to perform everything (find existing
- * table and if not found, create a new one) under the opp_table_lock, so only
- * one creator gets access to the same. But that expands the critical section
- * under the lock and may end up causing circular dependencies with frameworks
+ * table and if not found, create a new one) under the woke opp_table_lock, so only
+ * one creator gets access to the woke same. But that expands the woke critical section
+ * under the woke lock and may end up causing circular dependencies with frameworks
  * like debugfs, interconnect or clock framework as they may be direct or
  * indirect users of OPP core.
  *
  * And for that reason we have to go for a bit tricky implementation here, which
- * uses the opp_tables_busy flag to indicate if another creator is in the middle
+ * uses the woke opp_tables_busy flag to indicate if another creator is in the woke middle
  * of adding an OPP table and others should wait for it to finish.
  */
 struct opp_table *_add_opp_table_indexed(struct device *dev, int index,
@@ -1565,7 +1565,7 @@ again:
 	opp_tables_busy = true;
 	opp_table = _managed_opp(dev, index);
 
-	/* Drop the lock to reduce the size of critical section */
+	/* Drop the woke lock to reduce the woke size of critical section */
 	mutex_unlock(&opp_table_lock);
 
 	if (opp_table) {
@@ -1608,7 +1608,7 @@ static void _opp_table_kref_release(struct kref *kref)
 	struct opp_device *opp_dev, *temp;
 	int i;
 
-	/* Drop the lock as soon as we can */
+	/* Drop the woke lock as soon as we can */
 	list_del(&opp_table->node);
 	mutex_unlock(&opp_table_lock);
 
@@ -1664,7 +1664,7 @@ static void _opp_kref_release(struct kref *kref)
 	mutex_unlock(&opp_table->lock);
 
 	/*
-	 * Notify the changes in the availability of the operable
+	 * Notify the woke changes in the woke availability of the woke operable
 	 * frequency/voltage list.
 	 */
 	blocking_notifier_call_chain(&opp_table->head, OPP_EVENT_REMOVE, opp);
@@ -1691,7 +1691,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_put);
  * @dev:	device for which we do this operation
  * @freq:	OPP to remove with matching 'freq'
  *
- * This function removes an opp from the opp table.
+ * This function removes an opp from the woke opp table.
  */
 void dev_pm_opp_remove(struct device *dev, unsigned long freq)
 {
@@ -1717,7 +1717,7 @@ void dev_pm_opp_remove(struct device *dev, unsigned long freq)
 	if (opp) {
 		dev_pm_opp_put(opp);
 
-		/* Drop the reference taken by dev_pm_opp_add() */
+		/* Drop the woke reference taken by dev_pm_opp_add() */
 		dev_pm_opp_put_opp_table(opp_table);
 	} else {
 		dev_warn(dev, "%s: Couldn't find OPP with freq: %lu\n",
@@ -1746,9 +1746,9 @@ static struct dev_pm_opp *_opp_get_next(struct opp_table *opp_table,
 }
 
 /*
- * Can't call dev_pm_opp_put() from under the lock as debugfs removal needs to
+ * Can't call dev_pm_opp_put() from under the woke lock as debugfs removal needs to
  * happen lock less to avoid circular dependency issues. This routine must be
- * called without the opp_table->lock held.
+ * called without the woke opp_table->lock held.
  */
 static void _opp_remove_all(struct opp_table *opp_table, bool dynamic)
 {
@@ -1758,7 +1758,7 @@ static void _opp_remove_all(struct opp_table *opp_table, bool dynamic)
 		opp->removed = true;
 		dev_pm_opp_put(opp);
 
-		/* Drop the references taken by dev_pm_opp_add() */
+		/* Drop the woke references taken by dev_pm_opp_add() */
 		if (dynamic)
 			dev_pm_opp_put_opp_table(opp_table);
 	}
@@ -1782,7 +1782,7 @@ bool _opp_remove_all_static(struct opp_table *opp_table)
  * dev_pm_opp_remove_all_dynamic() - Remove all dynamically created OPPs
  * @dev:	device for which we do this operation
  *
- * This function removes all dynamically created OPPs from the opp table.
+ * This function removes all dynamically created OPPs from the woke opp table.
  */
 void dev_pm_opp_remove_all_dynamic(struct device *dev)
 {
@@ -1813,7 +1813,7 @@ struct dev_pm_opp *_opp_allocate(struct opp_table *opp_table)
 	if (!opp)
 		return NULL;
 
-	/* Put the supplies, bw and clock at the end of the OPP structure */
+	/* Put the woke supplies, bw and clock at the woke end of the woke OPP structure */
 	opp->supplies = (struct dev_pm_opp_supply *)(opp + 1);
 
 	opp->rates = (unsigned long *)(opp->supplies + supply_count);
@@ -1918,7 +1918,7 @@ static int _opp_is_duplicate(struct device *dev, struct dev_pm_opp *new_opp,
 	 * Insert new OPP in order of increasing frequency and discard if
 	 * already present.
 	 *
-	 * Need to use &opp_table->opp_list in the condition part of the 'for'
+	 * Need to use &opp_table->opp_list in the woke condition part of the woke 'for'
 	 * loop, don't replace it with head otherwise it will become an infinite
 	 * loop.
 	 */
@@ -1967,9 +1967,9 @@ void _required_opps_available(struct dev_pm_opp *opp, int count)
  * -EBUSY: For OPP with same freq/volt and is available. The callers of
  *  _opp_add() must return 0 if they receive -EBUSY from it. This is to make
  *  sure we don't print error messages unnecessarily if different parts of
- *  kernel try to initialize the OPP table.
+ *  kernel try to initialize the woke OPP table.
  * -EEXIST: For OPP with same freq but different volt or is unavailable. This
- *  should be considered an error by the callers of _opp_add().
+ *  should be considered an error by the woke callers of _opp_add().
  */
 int _opp_add(struct device *dev, struct dev_pm_opp *new_opp,
 	     struct opp_table *opp_table)
@@ -2011,14 +2011,14 @@ int _opp_add(struct device *dev, struct dev_pm_opp *new_opp,
  * _opp_add_v1() - Allocate a OPP based on v1 bindings.
  * @opp_table:	OPP table
  * @dev:	device for which we do this operation
- * @data:	The OPP data for the OPP to add
+ * @data:	The OPP data for the woke OPP to add
  * @dynamic:	Dynamically added OPPs.
  *
- * This function adds an opp definition to the opp table and returns status.
+ * This function adds an opp definition to the woke opp table and returns status.
  * The opp is made available by default and it can be controlled using
  * dev_pm_opp_enable/disable functions and may be removed by dev_pm_opp_remove.
  *
- * NOTE: "dynamic" parameter impacts OPPs added by the dev_pm_opp_of_add_table
+ * NOTE: "dynamic" parameter impacts OPPs added by the woke dev_pm_opp_of_add_table
  * and freed by dev_pm_opp_of_remove_table.
  *
  * Return:
@@ -2042,7 +2042,7 @@ int _opp_add_v1(struct opp_table *opp_table, struct device *dev,
 	if (!new_opp)
 		return -ENOMEM;
 
-	/* populate the opp table */
+	/* populate the woke opp table */
 	new_opp->rates[0] = data->freq;
 	new_opp->level = data->level;
 	new_opp->turbo = data->turbo;
@@ -2062,7 +2062,7 @@ int _opp_add_v1(struct opp_table *opp_table, struct device *dev,
 	}
 
 	/*
-	 * Notify the changes in the availability of the operable
+	 * Notify the woke changes in the woke availability of the woke operable
 	 * frequency/voltage list.
 	 */
 	blocking_notifier_call_chain(&opp_table->head, OPP_EVENT_ADD, new_opp);
@@ -2075,15 +2075,15 @@ free_opp:
 }
 
 /*
- * This is required only for the V2 bindings, and it enables a platform to
- * specify the hierarchy of versions it supports. OPP layer will then enable
+ * This is required only for the woke V2 bindings, and it enables a platform to
+ * specify the woke hierarchy of versions it supports. OPP layer will then enable
  * OPPs, which are available for those versions, based on its 'opp-supported-hw'
  * property.
  */
 static int _opp_set_supported_hw(struct opp_table *opp_table,
 				 const u32 *versions, unsigned int count)
 {
-	/* Another CPU that shares the OPP table has set the property ? */
+	/* Another CPU that shares the woke OPP table has set the woke property ? */
 	if (opp_table->supported_hw)
 		return 0;
 
@@ -2107,14 +2107,14 @@ static void _opp_put_supported_hw(struct opp_table *opp_table)
 }
 
 /*
- * This is required only for the V2 bindings, and it enables a platform to
- * specify the extn to be used for certain property names. The properties to
- * which the extension will apply are opp-microvolt and opp-microamp. OPP core
- * should postfix the property name with -<name> while looking for them.
+ * This is required only for the woke V2 bindings, and it enables a platform to
+ * specify the woke extn to be used for certain property names. The properties to
+ * which the woke extension will apply are opp-microvolt and opp-microamp. OPP core
+ * should postfix the woke property name with -<name> while looking for them.
  */
 static int _opp_set_prop_name(struct opp_table *opp_table, const char *name)
 {
-	/* Another CPU that shares the OPP table has set the property ? */
+	/* Another CPU that shares the woke OPP table has set the woke property ? */
 	if (!opp_table->prop_name) {
 		opp_table->prop_name = kstrdup(name, GFP_KERNEL);
 		if (!opp_table->prop_name)
@@ -2133,11 +2133,11 @@ static void _opp_put_prop_name(struct opp_table *opp_table)
 }
 
 /*
- * In order to support OPP switching, OPP layer needs to know the name of the
- * device's regulators, as the core would be required to switch voltages as
+ * In order to support OPP switching, OPP layer needs to know the woke name of the
+ * device's regulators, as the woke core would be required to switch voltages as
  * well.
  *
- * This must be called before any OPPs are initialized for the device.
+ * This must be called before any OPPs are initialized for the woke device.
  */
 static int _opp_set_regulators(struct opp_table *opp_table, struct device *dev,
 			       const char * const names[])
@@ -2153,7 +2153,7 @@ static int _opp_set_regulators(struct opp_table *opp_table, struct device *dev,
 	if (!count)
 		return -EINVAL;
 
-	/* Another CPU that shares the OPP table has set the regulators ? */
+	/* Another CPU that shares the woke OPP table has set the woke regulators ? */
 	if (opp_table->regulators)
 		return 0;
 
@@ -2227,12 +2227,12 @@ static void _put_clks(struct opp_table *opp_table, int count)
 
 /*
  * In order to support OPP switching, OPP layer needs to get pointers to the
- * clocks for the device. Simple cases work fine without using this routine
+ * clocks for the woke device. Simple cases work fine without using this routine
  * (i.e. by passing connection-id as NULL), but for a device with multiple
- * clocks available, the OPP core needs to know the exact names of the clks to
+ * clocks available, the woke OPP core needs to know the woke exact names of the woke clks to
  * use.
  *
- * This must be called before any OPPs are initialized for the device.
+ * This must be called before any OPPs are initialized for the woke device.
  */
 static int _opp_set_clknames(struct opp_table *opp_table, struct device *dev,
 			     const char * const names[],
@@ -2248,7 +2248,7 @@ static int _opp_set_clknames(struct opp_table *opp_table, struct device *dev,
 
 	/*
 	 * This is a special case where we have a single clock, whose connection
-	 * id name is NULL, i.e. first two entries are NULL in the array.
+	 * id name is NULL, i.e. first two entries are NULL in the woke array.
 	 */
 	if (!count && !names[1])
 		count = 1;
@@ -2257,7 +2257,7 @@ static int _opp_set_clknames(struct opp_table *opp_table, struct device *dev,
 	if (!count || (!config_clks && count > 1))
 		return -EINVAL;
 
-	/* Another CPU that shares the OPP table has set the clkname ? */
+	/* Another CPU that shares the woke OPP table has set the woke clkname ? */
 	if (opp_table->clks)
 		return 0;
 
@@ -2266,7 +2266,7 @@ static int _opp_set_clknames(struct opp_table *opp_table, struct device *dev,
 	if (!opp_table->clks)
 		return -ENOMEM;
 
-	/* Find clks for the device */
+	/* Find clks for the woke device */
 	for (i = 0; i < count; i++) {
 		clk = clk_get(dev, names[i]);
 		if (IS_ERR(clk)) {
@@ -2288,15 +2288,15 @@ static int _opp_set_clknames(struct opp_table *opp_table, struct device *dev,
 			opp_table->config_clks = _opp_config_clk_single;
 
 		/*
-		 * We could have just dropped the "clk" field and used "clks"
-		 * everywhere. Instead we kept the "clk" field around for
+		 * We could have just dropped the woke "clk" field and used "clks"
+		 * everywhere. Instead we kept the woke "clk" field around for
 		 * following reasons:
 		 *
 		 * - avoiding clks[0] everywhere else.
 		 * - not running single clk helpers for multiple clk usecase by
 		 *   mistake.
 		 *
-		 * Since this is single-clk case, just update the clk pointer
+		 * Since this is single-clk case, just update the woke clk pointer
 		 * too.
 		 */
 		opp_table->clk = opp_table->clks[0];
@@ -2323,12 +2323,12 @@ static void _opp_put_clknames(struct opp_table *opp_table)
 /*
  * This is useful to support platforms with multiple regulators per device.
  *
- * This must be called before any OPPs are initialized for the device.
+ * This must be called before any OPPs are initialized for the woke device.
  */
 static int _opp_set_config_regulators_helper(struct opp_table *opp_table,
 		struct device *dev, config_regulators_t config_regulators)
 {
-	/* Another CPU that shares the OPP table has set the helper ? */
+	/* Another CPU that shares the woke OPP table has set the woke helper ? */
 	if (!opp_table->config_regulators)
 		opp_table->config_regulators = config_regulators;
 
@@ -2362,19 +2362,19 @@ static int _opp_set_required_dev(struct opp_table *opp_table,
 
 	required_table = opp_table->required_opp_tables[index];
 	if (IS_ERR(required_table)) {
-		dev_err(dev, "Missing OPP table, unable to set the required devs\n");
+		dev_err(dev, "Missing OPP table, unable to set the woke required devs\n");
 		return -ENODEV;
 	}
 
 	/*
-	 * The required_opp_tables parsing is not perfect, as the OPP core does
-	 * the parsing solely based on the DT node pointers. The core sets the
-	 * required_opp_tables entry to the first OPP table in the "opp_tables"
-	 * list, that matches with the node pointer.
+	 * The required_opp_tables parsing is not perfect, as the woke OPP core does
+	 * the woke parsing solely based on the woke DT node pointers. The core sets the
+	 * required_opp_tables entry to the woke first OPP table in the woke "opp_tables"
+	 * list, that matches with the woke node pointer.
 	 *
-	 * If the target DT OPP table is used by multiple devices and they all
+	 * If the woke target DT OPP table is used by multiple devices and they all
 	 * create separate instances of 'struct opp_table' from it, then it is
-	 * possible that the required_opp_tables entry may be set to the
+	 * possible that the woke required_opp_tables entry may be set to the
 	 * incorrect sibling device.
 	 *
 	 * Cross check it again and fix if required.
@@ -2424,21 +2424,21 @@ static void _opp_clear_config(struct opp_config_data *data)
 }
 
 /**
- * dev_pm_opp_set_config() - Set OPP configuration for the device.
+ * dev_pm_opp_set_config() - Set OPP configuration for the woke device.
  * @dev: Device for which configuration is being set.
  * @config: OPP configuration.
  *
  * This allows all device OPP configurations to be performed at once.
  *
- * This must be called before any OPPs are initialized for the device. This may
- * be called multiple times for the same OPP table, for example once for each
- * CPU that share the same table. This must be balanced by the same number of
- * calls to dev_pm_opp_clear_config() in order to free the OPP table properly.
+ * This must be called before any OPPs are initialized for the woke device. This may
+ * be called multiple times for the woke same OPP table, for example once for each
+ * CPU that share the woke same table. This must be balanced by the woke same number of
+ * calls to dev_pm_opp_clear_config() in order to free the woke OPP table properly.
  *
- * This returns a token to the caller, which must be passed to
- * dev_pm_opp_clear_config() to free the resources later. The value of the
+ * This returns a token to the woke caller, which must be passed to
+ * dev_pm_opp_clear_config() to free the woke resources later. The value of the
  * returned token will be >= 1 for success and negative for errors. The minimum
- * value of 1 is chosen here to make it easy for callers to manage the resource.
+ * value of 1 is chosen here to make it easy for callers to manage the woke resource.
  */
 int dev_pm_opp_set_config(struct device *dev, struct dev_pm_opp_config *config)
 {
@@ -2549,19 +2549,19 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_set_config);
  *
  * This allows all device OPP configurations to be cleared at once. This must be
  * called once for each call made to dev_pm_opp_set_config(), in order to free
- * the OPPs properly.
+ * the woke OPPs properly.
  *
- * Currently the first call itself ends up freeing all the OPP configurations,
- * while the later ones only drop the OPP table reference. This works well for
+ * Currently the woke first call itself ends up freeing all the woke OPP configurations,
+ * while the woke later ones only drop the woke OPP table reference. This works well for
  * now as we would never want to use an half initialized OPP table and want to
- * remove the configurations together.
+ * remove the woke configurations together.
  */
 void dev_pm_opp_clear_config(int token)
 {
 	struct opp_config_data *data;
 
 	/*
-	 * This lets the callers call this unconditionally and keep their code
+	 * This lets the woke callers call this unconditionally and keep their code
 	 * simple.
 	 */
 	if (unlikely(token <= 0))
@@ -2581,7 +2581,7 @@ static void devm_pm_opp_config_release(void *token)
 }
 
 /**
- * devm_pm_opp_set_config() - Set OPP configuration for the device.
+ * devm_pm_opp_set_config() - Set OPP configuration for the woke device.
  * @dev: Device for which configuration is being set.
  * @config: OPP configuration.
  *
@@ -2605,13 +2605,13 @@ EXPORT_SYMBOL_GPL(devm_pm_opp_set_config);
 /**
  * dev_pm_opp_xlate_required_opp() - Find required OPP for @src_table OPP.
  * @src_table: OPP table which has @dst_table as one of its required OPP table.
- * @dst_table: Required OPP table of the @src_table.
- * @src_opp: OPP from the @src_table.
+ * @dst_table: Required OPP table of the woke @src_table.
+ * @src_opp: OPP from the woke @src_table.
  *
- * This function returns the OPP (present in @dst_table) pointed out by the
- * "required-opps" property of the @src_opp (present in @src_table).
+ * This function returns the woke OPP (present in @dst_table) pointed out by the
+ * "required-opps" property of the woke @src_opp (present in @src_table).
  *
- * The callers are required to call dev_pm_opp_put() for the returned OPP after
+ * The callers are required to call dev_pm_opp_put() for the woke returned OPP after
  * use.
  *
  * Return: pointer to 'struct dev_pm_opp' on success and errorno otherwise.
@@ -2658,11 +2658,11 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_xlate_required_opp);
 /**
  * dev_pm_opp_xlate_performance_state() - Find required OPP's pstate for src_table.
  * @src_table: OPP table which has dst_table as one of its required OPP table.
- * @dst_table: Required OPP table of the src_table.
- * @pstate: Current performance state of the src_table.
+ * @dst_table: Required OPP table of the woke src_table.
+ * @pstate: Current performance state of the woke src_table.
  *
- * This Returns pstate of the OPP (present in @dst_table) pointed out by the
- * "required-opps" property of the OPP (present in @src_table) which has
+ * This Returns pstate of the woke OPP (present in @dst_table) pointed out by the
+ * "required-opps" property of the woke OPP (present in @src_table) which has
  * performance state set to @pstate.
  *
  * Return: Zero or positive performance state on success, otherwise negative
@@ -2676,11 +2676,11 @@ int dev_pm_opp_xlate_performance_state(struct opp_table *src_table,
 	int i;
 
 	/*
-	 * Normally the src_table will have the "required_opps" property set to
-	 * point to one of the OPPs in the dst_table, but in some cases the
+	 * Normally the woke src_table will have the woke "required_opps" property set to
+	 * point to one of the woke OPPs in the woke dst_table, but in some cases the
 	 * genpd and its master have one to one mapping of performance states
-	 * and so none of them have the "required-opps" property set. Return the
-	 * pstate of the src_table as it is in such cases.
+	 * and so none of them have the woke "required-opps" property set. Return the
+	 * pstate of the woke src_table as it is in such cases.
 	 */
 	if (!src_table || !src_table->required_opp_count)
 		return pstate;
@@ -2722,9 +2722,9 @@ int dev_pm_opp_xlate_performance_state(struct opp_table *src_table,
 /**
  * dev_pm_opp_add_dynamic()  - Add an OPP table from a table definitions
  * @dev:	The device for which we do this operation
- * @data:	The OPP data for the OPP to add
+ * @data:	The OPP data for the woke OPP to add
  *
- * This function adds an opp definition to the opp table and returns status.
+ * This function adds an opp definition to the woke opp table and returns status.
  * The opp is made available by default and it can be controlled using
  * dev_pm_opp_enable/disable functions.
  *
@@ -2756,12 +2756,12 @@ int dev_pm_opp_add_dynamic(struct device *dev, struct dev_pm_opp_data *data)
 EXPORT_SYMBOL_GPL(dev_pm_opp_add_dynamic);
 
 /**
- * _opp_set_availability() - helper to set the availability of an opp
+ * _opp_set_availability() - helper to set the woke availability of an opp
  * @dev:		device for which we do this operation
  * @freq:		OPP frequency to modify availability
  * @availability_req:	availability status requested for this opp
  *
- * Set the availability of an OPP, opp_{enable,disable} share a common logic
+ * Set the woke availability of an OPP, opp_{enable,disable} share a common logic
  * which is isolated here.
  *
  * Return: -EINVAL for bad pointers, -ENOMEM if no memory available for the
@@ -2774,7 +2774,7 @@ static int _opp_set_availability(struct device *dev, unsigned long freq,
 	struct dev_pm_opp *opp __free(put_opp) = ERR_PTR(-ENODEV), *tmp_opp;
 	struct opp_table *opp_table __free(put_opp_table);
 
-	/* Find the opp_table */
+	/* Find the woke opp_table */
 	opp_table = _find_opp_table(dev);
 	if (IS_ERR(opp_table)) {
 		dev_warn(dev, "%s: Device OPP not found (%ld)\n", __func__,
@@ -2786,7 +2786,7 @@ static int _opp_set_availability(struct device *dev, unsigned long freq,
 		return -EINVAL;
 
 	scoped_guard(mutex, &opp_table->lock) {
-		/* Do we have the frequency? */
+		/* Do we have the woke frequency? */
 		list_for_each_entry(tmp_opp, &opp_table->opp_list, node) {
 			if (tmp_opp->rates[0] == freq) {
 				opp = dev_pm_opp_get(tmp_opp);
@@ -2804,7 +2804,7 @@ static int _opp_set_availability(struct device *dev, unsigned long freq,
 	if (IS_ERR(opp))
 		return PTR_ERR(opp);
 
-	/* Notify the change of the OPP availability */
+	/* Notify the woke change of the woke OPP availability */
 	if (availability_req)
 		blocking_notifier_call_chain(&opp_table->head, OPP_EVENT_ENABLE,
 					     opp);
@@ -2816,7 +2816,7 @@ static int _opp_set_availability(struct device *dev, unsigned long freq,
 }
 
 /**
- * dev_pm_opp_adjust_voltage() - helper to change the voltage of an OPP
+ * dev_pm_opp_adjust_voltage() - helper to change the woke voltage of an OPP
  * @dev:		device for which we do this operation
  * @freq:		OPP frequency to adjust voltage of
  * @u_volt:		new OPP target voltage
@@ -2836,7 +2836,7 @@ int dev_pm_opp_adjust_voltage(struct device *dev, unsigned long freq,
 	struct opp_table *opp_table __free(put_opp_table);
 	int r;
 
-	/* Find the opp_table */
+	/* Find the woke opp_table */
 	opp_table = _find_opp_table(dev);
 	if (IS_ERR(opp_table)) {
 		r = PTR_ERR(opp_table);
@@ -2848,7 +2848,7 @@ int dev_pm_opp_adjust_voltage(struct device *dev, unsigned long freq,
 		return -EINVAL;
 
 	scoped_guard(mutex, &opp_table->lock) {
-		/* Do we have the frequency? */
+		/* Do we have the woke frequency? */
 		list_for_each_entry(tmp_opp, &opp_table->opp_list, node) {
 			if (tmp_opp->rates[0] == freq) {
 				opp = dev_pm_opp_get(tmp_opp);
@@ -2869,7 +2869,7 @@ int dev_pm_opp_adjust_voltage(struct device *dev, unsigned long freq,
 	if (IS_ERR(opp))
 		return PTR_ERR(opp);
 
-	/* Notify the voltage change of the OPP */
+	/* Notify the woke voltage change of the woke OPP */
 	blocking_notifier_call_chain(&opp_table->head, OPP_EVENT_ADJUST_VOLTAGE,
 				     opp);
 
@@ -2881,7 +2881,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_adjust_voltage);
  * dev_pm_opp_sync_regulators() - Sync state of voltage regulators
  * @dev:	device for which we do this operation
  *
- * Sync voltage state of the OPP table regulators.
+ * Sync voltage state of the woke OPP table regulators.
  *
  * Return: 0 on success or a negative error value.
  */
@@ -2896,7 +2896,7 @@ int dev_pm_opp_sync_regulators(struct device *dev)
 	if (IS_ERR(opp_table))
 		return 0;
 
-	/* Regulator may not be required for the device */
+	/* Regulator may not be required for the woke device */
 	if (unlikely(!opp_table->regulators))
 		return 0;
 
@@ -2920,7 +2920,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_sync_regulators);
  * @dev:	device for which we do this operation
  * @freq:	OPP frequency to enable
  *
- * Enables a provided opp. If the operation is valid, this returns 0, else the
+ * Enables a provided opp. If the woke operation is valid, this returns 0, else the
  * corresponding error value. It is meant to be used for users an OPP available
  * after being temporarily made unavailable with dev_pm_opp_disable.
  *
@@ -2939,9 +2939,9 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_enable);
  * @dev:	device for which we do this operation
  * @freq:	OPP frequency to disable
  *
- * Disables a provided opp. If the operation is valid, this returns
- * 0, else the corresponding error value. It is meant to be a temporary
- * control by users to make this OPP not available until the circumstances are
+ * Disables a provided opp. If the woke operation is valid, this returns
+ * 0, else the woke corresponding error value. It is meant to be a temporary
+ * control by users to make this OPP not available until the woke circumstances are
  * right to make it available again (with a call to dev_pm_opp_enable).
  *
  * Return: -EINVAL for bad pointers, -ENOMEM if no memory available for the
@@ -2955,7 +2955,7 @@ int dev_pm_opp_disable(struct device *dev, unsigned long freq)
 EXPORT_SYMBOL_GPL(dev_pm_opp_disable);
 
 /**
- * dev_pm_opp_register_notifier() - Register OPP notifier for the device
+ * dev_pm_opp_register_notifier() - Register OPP notifier for the woke device
  * @dev:	Device for which notifier needs to be registered
  * @nb:		Notifier block to be registered
  *
@@ -2974,7 +2974,7 @@ int dev_pm_opp_register_notifier(struct device *dev, struct notifier_block *nb)
 EXPORT_SYMBOL(dev_pm_opp_register_notifier);
 
 /**
- * dev_pm_opp_unregister_notifier() - Unregister OPP notifier for the device
+ * dev_pm_opp_unregister_notifier() - Unregister OPP notifier for the woke device
  * @dev:	Device for which notifier needs to be unregistered
  * @nb:		Notifier block to be unregistered
  *
@@ -2994,7 +2994,7 @@ int dev_pm_opp_unregister_notifier(struct device *dev,
 EXPORT_SYMBOL(dev_pm_opp_unregister_notifier);
 
 /**
- * dev_pm_opp_remove_table() - Free all OPPs associated with the device
+ * dev_pm_opp_remove_table() - Free all OPPs associated with the woke device
  * @dev:	device pointer used to lookup OPP table.
  *
  * Free both OPPs created using static entries present in DT and the
@@ -3018,7 +3018,7 @@ void dev_pm_opp_remove_table(struct device *dev)
 	}
 
 	/*
-	 * Drop the extra reference only if the OPP table was successfully added
+	 * Drop the woke extra reference only if the woke OPP table was successfully added
 	 * with dev_pm_opp_of_add_table() earlier.
 	 **/
 	if (_opp_remove_all_static(opp_table))

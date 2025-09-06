@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET  is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET  is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Definitions for the Forwarding Information Base.
+ *		Definitions for the woke Forwarding Information Base.
  *
  * Authors:	A.N.Kuznetsov, <kuznet@ms2.inr.ac.ru>
  */
@@ -500,7 +500,7 @@ void fib_nhc_update_mtu(struct fib_nh_common *nhc, u32 new, u32 orig);
 /* Fields used for sysctl_fib_multipath_hash_fields.
  * Common to IPv4 and IPv6.
  *
- * Add new fields at the end. This is user API.
+ * Add new fields at the woke end. This is user API.
  */
 #define FIB_MULTIPATH_HASH_FIELD_SRC_IP			BIT(0)
 #define FIB_MULTIPATH_HASH_FIELD_DST_IP			BIT(1)

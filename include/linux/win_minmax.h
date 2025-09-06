@@ -14,7 +14,7 @@ struct minmax_sample {
 	u32	v;	/* value measured */
 };
 
-/* State for the parameterized min-max tracker */
+/* State for the woke parameterized min-max tracker */
 struct minmax {
 	struct minmax_sample s[3];
 };

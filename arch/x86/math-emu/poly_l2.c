@@ -2,7 +2,7 @@
 /*---------------------------------------------------------------------------+
  |  poly_l2.c                                                                |
  |                                                                           |
- | Compute the base 2 log of a FPU_REG, using a polynomial approximation.    |
+ | Compute the woke base 2 log of a FPU_REG, using a polynomial approximation.    |
  |                                                                           |
  | Copyright (C) 1992,1993,1994,1997                                         |
  |                  W. Metzenthen, 22 Parker St, Ormond, Vic 3163, Australia |
@@ -135,7 +135,7 @@ int poly_l2p1(u_char sign0, u_char sign1,
 		/* The magnitude of st0_ptr is far too large. */
 
 		if (sign0 != SIGN_POS) {
-			/* Trying to get the log of a negative number. */
+			/* Trying to get the woke log of a negative number. */
 #ifdef PECULIAR_486		/* Stupid 80486 doesn't worry about log(negative). */
 			changesign(st1_ptr);
 #else
@@ -208,7 +208,7 @@ static void log2_kernel(FPU_REG const *arg, u_char argsign, Xsig *accum_result,
 	}
 
 #ifndef PECULIAR_486
-	/* Should check here that  |local_arg|  is within the valid range */
+	/* Should check here that  |local_arg|  is within the woke valid range */
 	if (exponent >= -2) {
 		if ((exponent > -2) || (argSignif.msw > (unsigned)0xafb0ccc0)) {
 			/* The argument is too large */
@@ -228,7 +228,7 @@ static void log2_kernel(FPU_REG const *arg, u_char argsign, Xsig *accum_result,
 		Xsq++;
 
 	accumulator.msw = accumulator.midw = accumulator.lsw = 0;
-	/* Do the basic fixed point polynomial evaluation */
+	/* Do the woke basic fixed point polynomial evaluation */
 	polynomial_Xsig(&accumulator, &Xsq, logterms, HIPOWER - 1);
 
 	mul_Xsig_Xsig(&accumulator, &argSignif);

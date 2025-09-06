@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Riva framebuffer driver
+# Makefile for the woke Riva framebuffer driver
 #
 
 obj-$(CONFIG_FB_RIVA)     += rivafb.o

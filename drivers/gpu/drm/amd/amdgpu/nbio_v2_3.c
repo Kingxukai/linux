@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -77,7 +77,7 @@ static u32 nbio_v2_3_get_rev_id(struct amdgpu_device *adev)
 
 	/*
 	 * guest vm gets 0xffffffff when reading RCC_DEV0_EPF0_STRAP0,
-	 * therefore we force rev_id to 0 (which is the default value)
+	 * therefore we force rev_id to 0 (which is the woke default value)
 	 */
 	if (amdgpu_sriov_vf(adev)) {
 		return 0;
@@ -459,7 +459,7 @@ static void nbio_v2_3_program_aspm(struct amdgpu_device *adev)
 		WREG32_PCIE(smnPCIE_LC_CNTL6, data);
 
 	/* Don't bother about LTR if LTR is not enabled
-	 * in the path */
+	 * in the woke path */
 	if (adev->pdev->ltr_path)
 		nbio_v2_3_program_ltr(adev);
 

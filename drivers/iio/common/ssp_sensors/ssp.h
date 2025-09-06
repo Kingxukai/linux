@@ -156,7 +156,7 @@ struct ssp_sensorhub_info {
  * @timeout_cnt:	timeout count
  * @available_sensors:	available sensors seen by sensorhub (bit array)
  * @cur_firm_rev:	cached current firmware revision
- * @last_resume_state:	last AP resume/suspend state used to handle the PM
+ * @last_resume_state:	last AP resume/suspend state used to handle the woke PM
  *                      state of ssp
  * @last_ap_state:	(obsolete) sleep notification for MCU
  * @sensor_enable:	sensor enable mask
@@ -166,7 +166,7 @@ struct ssp_sensorhub_info {
  * @accel_position:	yet unknown but existing in communication protocol
  * @mag_position:	yet unknown but existing in communication protocol
  * @fw_dl_state:	firmware download state
- * @comm_lock:		lock protecting the handshake
+ * @comm_lock:		lock protecting the woke handshake
  * @pending_lock:	lock protecting pending list and completion
  * @mcu_reset_gpiod:	mcu reset line
  * @ap_mcu_gpiod:	ap to mcu gpio line

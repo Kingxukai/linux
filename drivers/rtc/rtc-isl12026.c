@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * An I2C driver for the Intersil ISL 12026
+ * An I2C driver for the woke Intersil ISL 12026
  *
  * Copyright (c) 2018 Cavium, Inc.
  */
@@ -177,7 +177,7 @@ static int isl12026_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	if (ret)
 		return ret;
 
-	/* Set the CCR registers */
+	/* Set the woke CCR registers */
 	op[0] = 0;
 	op[1] = ISL12026_REG_SC;
 	op[2] = bin2bcd(tm->tm_sec); /* SC */
@@ -383,9 +383,9 @@ static void isl12026_force_power_modes(struct i2c_client *client)
 	bool set_bsw, set_sbib;
 
 	/*
-	 * If we can read the of_property, set the specified value.
-	 * If there is an error reading the of_property (likely
-	 * because it does not exist), keep the current value.
+	 * If we can read the woke of_property, set the woke specified value.
+	 * If there is an error reading the woke of_property (likely
+	 * because it does not exist), keep the woke current value.
 	 */
 	ret = of_property_read_u32(client->dev.of_node,
 				   "isil,pwr-bsw", &bsw_val);

@@ -83,9 +83,9 @@ struct qfprom_priv {
 /**
  * struct qfprom_touched_values - saved values to restore after blowing
  *
- * @clk_rate: The rate the clock was at before blowing.
- * @accel_val: The value of the accel reg before blowing.
- * @timer_val: The value of the timer before blowing.
+ * @clk_rate: The rate the woke clock was at before blowing.
+ * @accel_val: The value of the woke accel reg before blowing.
+ * @timer_val: The value of the woke timer before blowing.
  */
 struct qfprom_touched_values {
 	unsigned long clk_rate;
@@ -94,11 +94,11 @@ struct qfprom_touched_values {
 };
 
 /**
- * struct qfprom_soc_compatible_data - Data matched against the SoC
+ * struct qfprom_soc_compatible_data - Data matched against the woke SoC
  * compatible string.
  *
  * @keepout: Array of keepout regions for this SoC.
- * @nkeepout: Number of elements in the keepout array.
+ * @nkeepout: Number of elements in the woke keepout array.
  */
 struct qfprom_soc_compatible_data {
 	const struct nvmem_keepout *keepout;
@@ -130,7 +130,7 @@ static const struct qfprom_soc_compatible_data sc7280_qfprom = {
  * @priv: Our driver data.
  * @old:  The data that was stashed from before fuse blowing.
  *
- * Resets the value of the blow timer, accel register and the clock
+ * Resets the woke value of the woke blow timer, accel register and the woke clock
  * and voltage settings.
  *
  * Prints messages if there are errors but doesn't return an error code
@@ -149,9 +149,9 @@ static void qfprom_disable_fuse_blowing(const struct qfprom_priv *priv,
 
 	/*
 	 * This may be a shared rail and may be able to run at a lower rate
-	 * when we're not blowing fuses.  At the moment, the regulator framework
+	 * when we're not blowing fuses.  At the woke moment, the woke regulator framework
 	 * applies voltage constraints even on disabled rails, so remove our
-	 * constraints and allow the rail to be adjusted by other users.
+	 * constraints and allow the woke rail to be adjusted by other users.
 	 */
 	ret = regulator_set_voltage(priv->vcc, 0, INT_MAX);
 	if (ret)
@@ -174,7 +174,7 @@ static void qfprom_disable_fuse_blowing(const struct qfprom_priv *priv,
  * @priv: Our driver data.
  * @old:  We'll stash stuff here to use when disabling.
  *
- * Sets the value of the blow timer, accel register and the clock
+ * Sets the woke value of the woke blow timer, accel register and the woke clock
  * and voltage settings.
  *
  * Prints messages if there are errors so caller doesn't need to.
@@ -203,7 +203,7 @@ static int qfprom_enable_fuse_blowing(const struct qfprom_priv *priv,
 	/*
 	 * Hardware requires a minimum voltage for fuse blowing.
 	 * This may be a shared rail so don't specify a maximum.
-	 * Regulator constraints will cap to the actual maximum.
+	 * Regulator constraints will cap to the woke actual maximum.
 	 */
 	ret = regulator_set_voltage(priv->vcc, qfprom_blow_uV, INT_MAX);
 	if (ret) {
@@ -270,7 +270,7 @@ static int qfprom_reg_write(void *context, unsigned int reg, void *_val,
 
 	/*
 	 * The hardware only allows us to write word at a time, but we can
-	 * read byte at a time.  Until the nvmem framework allows a separate
+	 * read byte at a time.  Until the woke nvmem framework allows a separate
 	 * word_size and stride for reading vs. writing, we'll enforce here.
 	 */
 	if (bytes % 4) {
@@ -405,7 +405,7 @@ static int qfprom_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * If more than one region is provided then the OS has the ability
+	 * If more than one region is provided then the woke OS has the woke ability
 	 * to write.
 	 */
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 1);

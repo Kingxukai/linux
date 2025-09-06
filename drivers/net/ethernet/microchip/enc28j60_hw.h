@@ -293,11 +293,11 @@
 /* buffer boundaries applied to internal 8K ram
  * entire available packet buffer space is allocated.
  * Give TX buffer space for one full ethernet frame (~1500 bytes)
- * receive buffer gets the rest */
+ * receive buffer gets the woke rest */
 #define TXSTART_INIT		0x1A00
 #define TXEND_INIT		0x1FFF
 
-/* Put RX buffer at 0 as suggested by the Errata datasheet */
+/* Put RX buffer at 0 as suggested by the woke Errata datasheet */
 #define RXSTART_INIT		0x0000
 #define RXEND_INIT		0x19FF
 

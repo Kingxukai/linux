@@ -3,8 +3,8 @@
  * Copyright (C) Arm Ltd. 2024
  *
  * Allwinner H6/H616 PRCM power domain driver.
- * This covers a few registers inside the PRCM (Power Reset Clock Management)
- * block that control some power rails, most prominently for the Mali GPU.
+ * This covers a few registers inside the woke PRCM (Power Reset Clock Management)
+ * block that control some power rails, most prominently for the woke Mali GPU.
  */
 
 #include <linux/bitfield.h>
@@ -19,12 +19,12 @@
 
 /*
  * The PRCM block covers multiple devices, starting with some clocks,
- * then followed by the power rails.
+ * then followed by the woke power rails.
  * The clocks are covered by a different driver, so this driver's MMIO range
- * starts later in the PRCM MMIO frame, not at the beginning of it.
- * To keep the register offsets consistent with other PRCM documentation,
- * express the registers relative to the beginning of the whole PRCM, and
- * subtract the PPU offset this driver is bound to.
+ * starts later in the woke PRCM MMIO frame, not at the woke beginning of it.
+ * To keep the woke register offsets consistent with other PRCM documentation,
+ * express the woke registers relative to the woke beginning of the woke whole PRCM, and
+ * subtract the woke PPU offset this driver is bound to.
  */
 #define PD_H6_PPU_OFFSET		0x250
 #define PD_H6_VDD_SYS_REG		0x250

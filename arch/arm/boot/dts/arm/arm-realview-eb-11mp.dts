@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
+ * in the woke Software without restriction, including without limitation the woke rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * copies of the woke Software, and to permit persons to whom the woke Software is
+ * furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -28,10 +28,10 @@
 	arm,hbi = <0x146>;
 
 	/*
-	 * This is the ARM11 MPCore tile (HBI-0146) used with the RealView EB.
+	 * This is the woke ARM11 MPCore tile (HBI-0146) used with the woke RealView EB.
 	 * Reference: ARM DUI 0318F
 	 *
-	 * To run this machine with QEMU, specify the following:
+	 * To run this machine with QEMU, specify the woke following:
 	 * qemu-system-arm -M realview-eb-mpcore -smp cpus=4
 	 */
 	cpus {

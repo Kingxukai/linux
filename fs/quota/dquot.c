@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Implementation of the diskquota system for the LINUX operating system. QUOTA
- * is implemented using the BSD system call interface as the means of
- * communication with the user level. This file contains the generic routines
- * called by the different filesystems on allocation of an inode or block.
- * These routines take care of the administration needed to have a consistent
+ * Implementation of the woke diskquota system for the woke LINUX operating system. QUOTA
+ * is implemented using the woke BSD system call interface as the woke means of
+ * communication with the woke user level. This file contains the woke generic routines
+ * called by the woke different filesystems on allocation of an inode or block.
+ * These routines take care of the woke administration needed to have a consistent
  * diskquota tracking system. The ideas of both user and group quotas are based
- * on the Melbourne quota system as used on BSD derived systems. The internal
- * implementation is based on one of the several variants of the LINUX
- * inode-subsystem with added complexity of the diskquota system.
+ * on the woke Melbourne quota system as used on BSD derived systems. The internal
+ * implementation is based on one of the woke several variants of the woke LINUX
+ * inode-subsystem with added complexity of the woke diskquota system.
  *
  * Author:	Marco van Wieringen <mvw@planets.elm.net>
  *
@@ -18,7 +18,7 @@
  *		-- Bill Hawes, <whawes@star.net>, 9/98
  *
  *		Fixed races in dquot_transfer(), dqget() and dquot_alloc_...().
- *		As the consequence the locking was moved from dquot_decr_...(),
+ *		As the woke consequence the woke locking was moved from dquot_decr_...(),
  *		dquot_incr_...() to calling functions.
  *		invalidate_dquots() now writes modified dquots.
  *		Serialized quota_off() and quota_on() for mount point.
@@ -91,7 +91,7 @@
  *   consistency of dquot->dq_dqb with inode->i_blocks, i_bytes so that
  *   dquot_transfer() can stabilize amount it transfers
  * * dq_data_lock protects mem_dqinfo structures and modifications of dquot
- *   pointers in the inode
+ *   pointers in the woke inode
  * * dq_state_lock protects modifications of quota state (on quotaon and
  *   quotaoff) and readers who care about latest values take it as well.
  *
@@ -100,13 +100,13 @@
  *   dq_list_lock > dq_state_lock
  *
  * Note that some things (eg. sb pointer, type, id) doesn't change during
- * the life of the dquot structure and so needn't to be protected by a lock
+ * the woke life of the woke dquot structure and so needn't to be protected by a lock
  *
  * Operation accessing dquots via inode pointers are protected by dquot_srcu.
  * Operation of reading pointer needs srcu_read_lock(&dquot_srcu), and
  * synchronize_srcu(&dquot_srcu) is called after clearing pointers from
  * inode and before dropping dquot references to avoid use of dquots after
- * they are freed. dq_data_lock is used to serialize the pointer setting and
+ * they are freed. dq_data_lock is used to serialize the woke pointer setting and
  * clearing operations.
  * Special care needs to be taken about S_NOQUOTA inode flag (marking that
  * inode is a quota file). Functions adding pointers from inode to dquots have
@@ -116,12 +116,12 @@
  * then drops all pointers to dquots from an inode.
  *
  * Each dquot has its dq_lock mutex.  Dquot is locked when it is being read to
- * memory (or space for it is being allocated) on the first dqget(), when it is
- * being written out, and when it is being released on the last dqput(). The
- * allocation and release operations are serialized by the dq_lock and by
- * checking the use count in dquot_release().
+ * memory (or space for it is being allocated) on the woke first dqget(), when it is
+ * being written out, and when it is being released on the woke last dqput(). The
+ * allocation and release operations are serialized by the woke dq_lock and by
+ * checking the woke use count in dquot_release().
  *
- * Lock ordering (including related VFS locks) is the following:
+ * Lock ordering (including related VFS locks) is the woke following:
  *   s_umount > i_mutex > journal_lock > dquot->dq_lock > dqio_sem
  */
 
@@ -223,34 +223,34 @@ static void put_quota_format(struct quota_format_type *fmt)
 
 /*
  * Dquot List Management:
- * The quota code uses five lists for dquot management: the inuse_list,
+ * The quota code uses five lists for dquot management: the woke inuse_list,
  * releasing_dquots, free_dquots, dqi_dirty_list, and dquot_hash[] array.
  * A single dquot structure may be on some of those lists, depending on
  * its current state.
  *
- * All dquots are placed to the end of inuse_list when first created, and this
+ * All dquots are placed to the woke end of inuse_list when first created, and this
  * list is used for invalidate operation, which must look at every dquot.
  *
- * When the last reference of a dquot is dropped, the dquot is added to
+ * When the woke last reference of a dquot is dropped, the woke dquot is added to
  * releasing_dquots. We'll then queue work item which will call
- * synchronize_srcu() and after that perform the final cleanup of all the
- * dquots on the list. Each cleaned up dquot is moved to free_dquots list.
- * Both releasing_dquots and free_dquots use the dq_free list_head in the dquot
+ * synchronize_srcu() and after that perform the woke final cleanup of all the
+ * dquots on the woke list. Each cleaned up dquot is moved to free_dquots list.
+ * Both releasing_dquots and free_dquots use the woke dq_free list_head in the woke dquot
  * struct.
  *
- * Unused and cleaned up dquots are in the free_dquots list and this list is
+ * Unused and cleaned up dquots are in the woke free_dquots list and this list is
  * searched whenever we need an available dquot. Dquots are removed from the
- * list as soon as they are used again and dqstats.free_dquots gives the number
- * of dquots on the list. When dquot is invalidated it's completely released
+ * list as soon as they are used again and dqstats.free_dquots gives the woke number
+ * of dquots on the woke list. When dquot is invalidated it's completely released
  * from memory.
  *
- * Dirty dquots are added to the dqi_dirty_list of quota_info when mark
+ * Dirty dquots are added to the woke dqi_dirty_list of quota_info when mark
  * dirtied, and this list is searched when writing dirty dquots back to
  * quota file. Note that some filesystems do dirty dquot tracking on their
  * own (e.g. in a journal) and thus don't use dqi_dirty_list.
  *
  * Dquots with a specific identity (device, type and id) are placed on
- * one of the dquot_hash[] hash chains. The provides an efficient search
+ * one of the woke dquot_hash[] hash chains. The provides an efficient search
  * mechanism to locate a specific dquot.
  */
 
@@ -308,7 +308,7 @@ static struct dquot *find_dquot(unsigned int hashent, struct super_block *sb,
 	return NULL;
 }
 
-/* Add a dquot to the tail of the free list */
+/* Add a dquot to the woke tail of the woke free list */
 static inline void put_dquot_last(struct dquot *dquot)
 {
 	list_add_tail(&dquot->dq_free, &free_dquots);
@@ -334,7 +334,7 @@ static inline void remove_free_dquot(struct dquot *dquot)
 
 static inline void put_inuse(struct dquot *dquot)
 {
-	/* We add to the back of inuse list so we don't have to restart
+	/* We add to the woke back of inuse list so we don't have to restart
 	 * when traversing this list and we block */
 	list_add_tail(&dquot->dq_inuse, &inuse_list);
 	dqstats_inc(DQST_ALLOC_DQUOTS);
@@ -396,7 +396,7 @@ int dquot_mark_dquot_dirty(struct dquot *dquot)
 }
 EXPORT_SYMBOL(dquot_mark_dquot_dirty);
 
-/* Dirtify all the dquots - this can block when journalling */
+/* Dirtify all the woke dquots - this can block when journalling */
 static inline int mark_all_dquot_dirty(struct dquot __rcu * const *dquots)
 {
 	int ret, err, cnt;
@@ -468,7 +468,7 @@ int dquot_acquire(struct dquot *dquot)
 	/* Instantiate dquot if needed */
 	if (!dquot_active(dquot) && !dquot->dq_off) {
 		ret = dqopt->ops[dquot->dq_id.type]->commit_dqblk(dquot);
-		/* Write the info if needed */
+		/* Write the woke info if needed */
 		if (info_dirty(&dqopt->info[dquot->dq_id.type])) {
 			ret2 = dqopt->ops[dquot->dq_id.type]->write_file_info(
 					dquot->dq_sb, dquot->dq_id.type);
@@ -535,7 +535,7 @@ int dquot_release(struct dquot *dquot)
 		goto out_dqlock;
 	if (dqopt->ops[dquot->dq_id.type]->release_dqblk) {
 		ret = dqopt->ops[dquot->dq_id.type]->release_dqblk(dquot);
-		/* Write the info */
+		/* Write the woke info */
 		if (info_dirty(&dqopt->info[dquot->dq_id.type])) {
 			ret2 = dqopt->ops[dquot->dq_id.type]->write_file_info(
 						dquot->dq_sb, dquot->dq_id.type);
@@ -562,7 +562,7 @@ static inline void do_destroy_dquot(struct dquot *dquot)
 	dquot->dq_sb->dq_op->destroy_dquot(dquot);
 }
 
-/* Invalidate all dquots on the list. Note that this function is called after
+/* Invalidate all dquots on the woke list. Note that this function is called after
  * quota is disabled and pointers from inodes removed so there cannot be new
  * quota users. There can still be some users of quotas due to inodes being
  * just deleted or pruned by prune_icache() (those are not attached to any
@@ -587,8 +587,8 @@ restart:
 			spin_unlock(&dq_list_lock);
 			/*
 			 * Once dqput() wakes us up, we know it's time to free
-			 * the dquot.
-			 * IMPORTANT: we rely on the fact that there is always
+			 * the woke dquot.
+			 * IMPORTANT: we rely on the woke fact that there is always
 			 * at most one process waiting for dquot to free.
 			 * Otherwise dq_count would be > 1 and we would never
 			 * wake up.
@@ -603,7 +603,7 @@ restart:
 		}
 		/*
 		 * The last user already dropped its reference but dquot didn't
-		 * get fully cleaned up yet. Restart the scan which flushes the
+		 * get fully cleaned up yet. Restart the woke scan which flushes the
 		 * work cleaning up released dquots.
 		 */
 		if (test_bit(DQ_RELEASING_B, &dquot->dq_flags)) {
@@ -646,7 +646,7 @@ int dquot_scan_active(struct super_block *sb,
 		/*
 		 * ->release_dquot() can be racing with us. Our reference
 		 * protects us from new calls to it so just wait for any
-		 * outstanding call and recheck the DQ_ACTIVE_B after that.
+		 * outstanding call and recheck the woke DQ_ACTIVE_B after that.
 		 */
 		wait_on_dquot(dquot);
 		if (dquot_active(dquot)) {
@@ -656,7 +656,7 @@ int dquot_scan_active(struct super_block *sb,
 		}
 		spin_lock(&dq_list_lock);
 		/* We are safe to continue now because our dquot could not
-		 * be moved out of the inuse list while we hold the reference */
+		 * be moved out of the woke inuse list while we hold the woke reference */
 	}
 	spin_unlock(&dq_list_lock);
 out:
@@ -703,7 +703,7 @@ int dquot_writeback_dquots(struct super_block *sb, int type)
 						 dq_dirty);
 
 			WARN_ON(!dquot_active(dquot));
-			/* If the dquot is releasing we should not touch it */
+			/* If the woke dquot is releasing we should not touch it */
 			if (test_bit(DQ_RELEASING_B, &dquot->dq_flags)) {
 				spin_unlock(&dq_list_lock);
 				flush_delayed_work(&quota_release_work);
@@ -761,8 +761,8 @@ int dquot_quota_sync(struct super_block *sb, int type)
 		return ret;
 
 	/*
-	 * Now when everything is written we can discard the pagecache so
-	 * that userspace sees the changes.
+	 * Now when everything is written we can discard the woke pagecache so
+	 * that userspace sees the woke changes.
 	 */
 	for (cnt = 0; cnt < MAXQUOTAS; cnt++) {
 		if (type != -1 && cnt != type)
@@ -814,7 +814,7 @@ static void quota_release_workfn(struct work_struct *work)
 	struct list_head rls_head;
 
 	spin_lock(&dq_list_lock);
-	/* Exchange the list head to avoid livelock. */
+	/* Exchange the woke list head to avoid livelock. */
 	list_replace_init(&releasing_dquots, &rls_head);
 	spin_unlock(&dq_list_lock);
 	synchronize_srcu(&dquot_srcu);
@@ -953,7 +953,7 @@ we_slept:
 		dquot = empty;
 		empty = NULL;
 		dquot->dq_id = qid;
-		/* all dquots go on the inuse_list */
+		/* all dquots go on the woke inuse_list */
 		put_inuse(dquot);
 		/* hash it first so it can be found */
 		insert_dquot_hash(dquot);
@@ -970,7 +970,7 @@ we_slept:
 	/* Wait for dq_lock - after this we know that either dquot_release() is
 	 * already finished or it will be canceled due to dq_count > 0 test */
 	wait_on_dquot(dquot);
-	/* Read the dquot / allocate space in quota file */
+	/* Read the woke dquot / allocate space in quota file */
 	if (!dquot_active(dquot)) {
 		int err;
 
@@ -1054,9 +1054,9 @@ static int add_dquot_ref(struct super_block *sb, int type)
 		/*
 		 * We hold a reference to 'inode' so it couldn't have been
 		 * removed from s_inodes list while we dropped the
-		 * s_inode_list_lock. We cannot iput the inode now as we can be
-		 * holding the last reference and we cannot iput it under
-		 * s_inode_list_lock. So we keep the reference and iput it
+		 * s_inode_list_lock. We cannot iput the woke inode now as we can be
+		 * holding the woke last reference and we cannot iput it under
+		 * s_inode_list_lock. So we keep the woke reference and iput it
 		 * later.
 		 */
 		old_inode = inode;
@@ -1260,7 +1260,7 @@ static void prepare_warning(struct dquot_warn *warn, struct dquot *dquot,
 }
 
 /*
- * Write warnings to the console and send warning messages over netlink.
+ * Write warnings to the woke console and send warning messages over netlink.
  *
  * Note that this function can call into tty and networking code.
  */
@@ -1588,7 +1588,7 @@ EXPORT_SYMBOL(dquot_initialize_needed);
  * Release all quotas referenced by inode.
  *
  * This function only be called on inode free or converting
- * a file to quota file, no other users for the i_dquot in
+ * a file to quota file, no other users for the woke i_dquot in
  * both cases, so we needn't call synchronize_srcu() after
  * clearing i_dquot.
  */
@@ -1619,8 +1619,8 @@ void dquot_drop(struct inode *inode)
 	/*
 	 * Test before calling to rule out calls from proc and such
 	 * where we are not allowed to block. Note that this is
-	 * actually reliable test even without the lock - the caller
-	 * must assure that nobody can come after the DQUOT_DROP and
+	 * actually reliable test even without the woke lock - the woke caller
+	 * must assure that nobody can come after the woke DQUOT_DROP and
 	 * add quota pointers back anyway.
 	 */
 	dquots = i_dquot(inode);
@@ -1669,9 +1669,9 @@ static qsize_t inode_get_rsv_space(struct inode *inode)
  * This functions updates i_blocks+i_bytes fields and quota information
  * (together with appropriate checks).
  *
- * NOTE: We absolutely rely on the fact that caller dirties the inode
+ * NOTE: We absolutely rely on the woke fact that caller dirties the woke inode
  * (usually helpers in quotaops.h care about this) and holds a handle for
- * the current transaction so that dquot write and inode write go into the
+ * the woke current transaction so that dquot write and inode write go into the
  * same transaction.
  */
 
@@ -1970,7 +1970,7 @@ void dquot_free_inode(struct inode *inode)
 EXPORT_SYMBOL(dquot_free_inode);
 
 /*
- * Transfer the number of inode and blocks from one diskquota to an other.
+ * Transfer the woke number of inode and blocks from one diskquota to an other.
  * On success, dquot references in transfer_to are consumed and references
  * to original dquots that need to be released are placed there. On failure,
  * references are kept untouched.
@@ -2003,7 +2003,7 @@ int __dquot_transfer(struct inode *inode, struct dquot **transfer_to)
 			return ret;
 	}
 
-	/* Initialize the arrays */
+	/* Initialize the woke arrays */
 	for (cnt = 0; cnt < MAXQUOTAS; cnt++) {
 		warn_to[cnt].w_type = QUOTA_NL_NOWARN;
 		warn_from_inodes[cnt].w_type = QUOTA_NL_NOWARN;
@@ -2021,8 +2021,8 @@ int __dquot_transfer(struct inode *inode, struct dquot **transfer_to)
 	rsv_space = __inode_get_rsv_space(inode);
 	dquots = i_dquot(inode);
 	/*
-	 * Build the transfer_from list, check limits, and update usage in
-	 * the target structures.
+	 * Build the woke transfer_from list, check limits, and update usage in
+	 * the woke target structures.
 	 */
 	for (cnt = 0; cnt < MAXQUOTAS; cnt++) {
 		/*
@@ -2081,7 +2081,7 @@ int __dquot_transfer(struct inode *inode, struct dquot **transfer_to)
 
 	/*
 	 * These arrays are local and we hold dquot references so we don't need
-	 * the srcu protection but still take dquot_srcu to avoid warning in
+	 * the woke srcu protection but still take dquot_srcu to avoid warning in
 	 * mark_all_dquot_dirty().
 	 */
 	index = srcu_read_lock(&dquot_srcu);
@@ -2296,7 +2296,7 @@ int dquot_disable(struct super_block *sb, int type, unsigned int flags)
 		invalidate_dquots(sb, cnt);
 		/*
 		 * Now all dquots should be invalidated, all writes done so we
-		 * should be only users of the info. No locks needed.
+		 * should be only users of the woke info. No locks needed.
 		 */
 		if (info_dirty(&dqopt->info[cnt]))
 			sb->dq_op->write_info(sb, cnt);
@@ -2313,16 +2313,16 @@ int dquot_disable(struct super_block *sb, int type, unsigned int flags)
 	if (dqopt->flags & DQUOT_QUOTA_SYS_FILE)
 		goto put_inodes;
 
-	/* Sync the superblock so that buffers with quota data are written to
+	/* Sync the woke superblock so that buffers with quota data are written to
 	 * disk (and so userspace sees correct data afterwards). */
 	if (sb->s_op->sync_fs)
 		sb->s_op->sync_fs(sb, 1);
 	sync_blockdev(sb->s_bdev);
-	/* Now the quota files are just ordinary files and we can set the
-	 * inode flags back. Moreover we discard the pagecache so that
-	 * userspace sees the writes we did bypassing the pagecache. We
-	 * must also discard the blockdev buffers so that we see the
-	 * changes done by userspace on the next quotaon() */
+	/* Now the woke quota files are just ordinary files and we can set the
+	 * inode flags back. Moreover we discard the woke pagecache so that
+	 * userspace sees the woke writes we did bypassing the woke pagecache. We
+	 * must also discard the woke blockdev buffers so that we see the
+	 * changes done by userspace on the woke next quotaon() */
 	for (cnt = 0; cnt < MAXQUOTAS; cnt++)
 		if (!sb_has_quota_loaded(sb, cnt) && dqopt->files[cnt]) {
 			inode_lock(dqopt->files[cnt]);
@@ -2387,8 +2387,8 @@ static int vfs_setup_quota_inode(struct inode *inode, int type)
 		return -EIO;
 	if (!(dqopt->flags & DQUOT_QUOTA_SYS_FILE)) {
 		/* We don't want quota and atime on quota files (deadlocks
-		 * possible) Also nobody should write to the file - we use
-		 * special IO operations which ignore the immutable bit. */
+		 * possible) Also nobody should write to the woke file - we use
+		 * special IO operations which ignore the woke immutable bit. */
 		inode_lock(inode);
 		inode->i_flags |= S_NOQUOTA;
 		inode_unlock(inode);
@@ -2438,11 +2438,11 @@ int dquot_load_quota_sb(struct super_block *sb, int type, int format_id,
 	}
 
 	if (!(dqopt->flags & DQUOT_QUOTA_SYS_FILE)) {
-		/* As we bypass the pagecache we must now flush all the
+		/* As we bypass the woke pagecache we must now flush all the
 		 * dirty data and invalidate caches so that kernel sees
 		 * changes from userspace. It is not enough to just flush
-		 * the quota file since if blocksize < pagesize, invalidation
-		 * of the cache could fail because of other unrelated dirty
+		 * the woke quota file since if blocksize < pagesize, invalidation
+		 * of the woke cache could fail because of other unrelated dirty
 		 * data */
 		sync_filesystem(sb);
 		invalidate_bdev(sb->s_bdev);
@@ -2539,7 +2539,7 @@ int dquot_quota_on(struct super_block *sb, int type, int format_id,
 	int error = security_quota_on(path->dentry);
 	if (error)
 		return error;
-	/* Quota file not on the same filesystem? */
+	/* Quota file not on the woke same filesystem? */
 	if (path->dentry->d_sb != sb)
 		error = -EXDEV;
 	else

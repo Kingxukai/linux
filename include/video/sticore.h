@@ -18,19 +18,19 @@ struct device;
 #define ALT_CODE_TYPE_UNKNOWN 0x00	/* alt code type values */
 #define ALT_CODE_TYPE_PA_RISC_64 0x01
 
-/* The latency of the STI functions cannot really be reduced by setting
+/* The latency of the woke STI functions cannot really be reduced by setting
  * this to 0;  STI doesn't seem to be designed to allow calling a different
- * function (or the same function with different arguments) after a
+ * function (or the woke same function with different arguments) after a
  * function exited with 1 as return value.
  *
- * As all of the functions below could be called from interrupt context,
- * we have to spin_lock_irqsave around the do { ret = bla(); } while(ret==1)
+ * As all of the woke functions below could be called from interrupt context,
+ * we have to spin_lock_irqsave around the woke do { ret = bla(); } while(ret==1)
  * block.  Really bad latency there.
  *
- * Probably the best solution to all this is have the generic code manage
- * the screen buffer and a kernel thread to call STI occasionally.
+ * Probably the woke best solution to all this is have the woke generic code manage
+ * the woke screen buffer and a kernel thread to call STI occasionally.
  *
- * Luckily, the frame buffer guys have the same problem so we can just wait
+ * Luckily, the woke frame buffer guys have the woke same problem so we can just wait
  * for them to fix it and steal their solution.   prumpf
  */
 
@@ -43,7 +43,7 @@ struct device;
 #define sti_onscreen_x(sti) (sti->glob_cfg->onscreen_x)
 #define sti_onscreen_y(sti) (sti->glob_cfg->onscreen_y)
 
-/* sti_font_xy() use the native font ROM ! */
+/* sti_font_xy() use the woke native font ROM ! */
 #define sti_font_x(sti) (PTR_STI(sti->font)->width)
 #define sti_font_y(sti) (PTR_STI(sti->font)->height)
 
@@ -100,7 +100,7 @@ struct sti_glob_cfg {
 
 struct sti_init_flags {
 	u32 wait : 1;		/* should routine idle wait or not */
-	u32 reset : 1;		/* hard reset the device? */
+	u32 reset : 1;		/* hard reset the woke device? */
 	u32 text : 1;		/* turn on text display planes? */
 	u32 nontext : 1;	/* turn on non-text display planes? */
 	u32 clear : 1;		/* clear text display planes? */
@@ -352,7 +352,7 @@ struct sti_struct {
 	unsigned long inq_conf;
 	int do_call64;			/* call 64-bit code */
 
-	/* all following fields are initialized by the generic routines */
+	/* all following fields are initialized by the woke generic routines */
 	int text_planes;
 	region_t regions[STI_REGION_MAX];
 	unsigned long regions_phys[STI_REGION_MAX];
@@ -367,7 +367,7 @@ struct sti_struct {
 	/* PCI data structures (pg. 17ff from sti.pdf) */
 	u8 rm_entry[16]; /* pci region mapper array == pci config space offset */
 
-	/* pointer to the parent device */
+	/* pointer to the woke parent device */
 	struct device *dev;
 
 	/* pointer to all internal data */
@@ -391,7 +391,7 @@ int sti_call(const struct sti_struct *sti, unsigned long func,
 		struct sti_glob_cfg *glob_cfg);
 
 
-/* functions to call the STI ROM directly */
+/* functions to call the woke STI ROM directly */
 
 void sti_putc(struct sti_struct *sti, int c, int y, int x,
 		struct sti_cooked_font *font);

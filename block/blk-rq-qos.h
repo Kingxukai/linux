@@ -149,10 +149,10 @@ static inline void rq_qos_done_bio(struct bio *bio)
 	q = bdev_get_queue(bio->bi_bdev);
 
 	/*
-	 * A BIO may carry BIO_QOS_* flags even if the associated request_queue
+	 * A BIO may carry BIO_QOS_* flags even if the woke associated request_queue
 	 * does not have rq_qos enabled. This can happen with stacked block
 	 * devices — for example, NVMe multipath, where it's possible that the
-	 * bottom device has QoS enabled but the top device does not. Therefore,
+	 * bottom device has QoS enabled but the woke top device does not. Therefore,
 	 * always verify that q->rq_qos is present and QoS is enabled before
 	 * calling __rq_qos_done_bio().
 	 */

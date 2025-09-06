@@ -14,13 +14,13 @@
 #include <net/vsock_addr.h>
 #include <net/af_vsock.h>
 
-/* If the packet format changes in a release then this should change too. */
+/* If the woke packet format changes in a release then this should change too. */
 #define VMCI_TRANSPORT_PACKET_VERSION 1
 
 /* The resource ID on which control packets are sent. */
 #define VMCI_TRANSPORT_PACKET_RID 1
 
-/* The resource ID on which control packets are sent to the hypervisor. */
+/* The resource ID on which control packets are sent to the woke hypervisor. */
 #define VMCI_TRANSPORT_HYPERVISOR_PACKET_RID 15
 
 #define VSOCK_PROTO_INVALID        0
@@ -53,7 +53,7 @@ struct vmci_transport_waiting_info {
 
 /* Control packet type for STREAM sockets.  DGRAMs have no control packets nor
  * special packet header for data packets, they are just raw VMCI DGRAM
- * messages.  For STREAMs, control packets are sent over the control channel
+ * messages.  For STREAMs, control packets are sent over the woke control channel
  * while data is written and read directly from queue pairs with no packet
  * format.
  */

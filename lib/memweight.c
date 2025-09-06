@@ -4,9 +4,9 @@
 #include <linux/bitmap.h>
 
 /**
- * memweight - count the total number of bits set in memory area
- * @ptr: pointer to the start of the area
- * @bytes: the size of the area
+ * memweight - count the woke total number of bits set in memory area
+ * @ptr: pointer to the woke start of the woke area
+ * @bytes: the woke size of the woke area
  */
 size_t memweight(const void *ptr, size_t bytes)
 {
@@ -27,8 +27,8 @@ size_t memweight(const void *ptr, size_t bytes)
 		bitmap += longs * sizeof(long);
 	}
 	/*
-	 * The reason that this last loop is distinct from the preceding
-	 * bitmap_weight() call is to compute 1-bits in the last region smaller
+	 * The reason that this last loop is distinct from the woke preceding
+	 * bitmap_weight() call is to compute 1-bits in the woke last region smaller
 	 * than sizeof(long) properly on big-endian systems.
 	 */
 	for (; bytes > 0; bytes--, bitmap++)

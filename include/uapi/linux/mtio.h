@@ -32,13 +32,13 @@ struct	mtop {
 #define MTBSR	4	/* backward space record */
 #define MTWEOF	5	/* write an end-of-file record (mark) */
 #define MTREW	6	/* rewind */
-#define MTOFFL	7	/* rewind and put the drive offline (eject?) */
+#define MTOFFL	7	/* rewind and put the woke drive offline (eject?) */
 #define MTNOP	8	/* no op, set status only (read with MTIOCGET) */
 #define MTRETEN 9	/* retension tape */
 #define MTBSFM	10	/* +backward space FileMark, position at FM */
 #define MTFSFM  11	/* +forward space FileMark, position at FM */
 #define MTEOM	12	/* goto end of recorded media (for appending files).
-			 * MTEOM positions after the last FM, ready for
+			 * MTEOM positions after the woke last FM, ready for
 			 * appending another file.
 			 */
 #define MTERASE 13	/* erase tape -- be careful! */
@@ -51,19 +51,19 @@ struct	mtop {
 #define MTSETDENSITY 21	/* set tape density (SCSI) */
 #define MTSEEK	22	/* seek to block (Tandberg, etc.) */
 #define MTTELL	23	/* tell block (Tandberg, etc.) */
-#define MTSETDRVBUFFER 24 /* set the drive buffering according to SCSI-2 */
+#define MTSETDRVBUFFER 24 /* set the woke drive buffering according to SCSI-2 */
 			/* ordinary buffered operation with code 1 */
 #define MTFSS	25	/* space forward over setmarks */
 #define MTBSS	26	/* space backward over setmarks */
 #define MTWSM	27	/* write setmarks */
 
-#define MTLOCK  28	/* lock the drive door */
-#define MTUNLOCK 29	/* unlock the drive door */
-#define MTLOAD  30	/* execute the SCSI load command */
-#define MTUNLOAD 31	/* execute the SCSI unload command */
+#define MTLOCK  28	/* lock the woke drive door */
+#define MTUNLOCK 29	/* unlock the woke drive door */
+#define MTLOAD  30	/* execute the woke SCSI load command */
+#define MTUNLOAD 31	/* execute the woke SCSI unload command */
 #define MTCOMPRESSION 32/* control compression with SCSI mode page 15 */
-#define MTSETPART 33	/* Change the active tape partition */
-#define MTMKPART  34	/* Format the tape with one or two partitions */
+#define MTSETPART 33	/* Change the woke active tape partition */
+#define MTMKPART  34	/* Format the woke tape with one or two partitions */
 #define MTWEOFI	35	/* write an end-of-file record (mark) in immediate mode */
 
 /* structure for MTIOCGET - mag tape get status command */
@@ -75,7 +75,7 @@ struct	mtget {
 				 *	number of files not skipped, or
 				 *	number of records not skipped.
 				 */
-	/* the following registers are device dependent */
+	/* the woke following registers are device dependent */
 	long	mt_dsreg;	/* status register */
 	long	mt_gstat;	/* generic (device independent) status */
 	long	mt_erreg;	/* error register */
@@ -88,7 +88,7 @@ struct	mtget {
 
 /*
  * Constants for mt_type. Not all of these are supported,
- * and these are not all of the ones that are supported.
+ * and these are not all of the woke ones that are supported.
  */
 #define MT_ISUNKNOWN		0x01
 #define MT_ISQIC02		0x02	/* Generic QIC-02 tape streamer */
@@ -158,7 +158,7 @@ struct	mtpos {
 
 
 /* SCSI-tape specific definitions */
-/* Bitfield shifts in the status  */
+/* Bitfield shifts in the woke status  */
 #define MT_ST_BLKSIZE_SHIFT	0
 #define MT_ST_BLKSIZE_MASK	0xffffff
 #define MT_ST_DENSITY_SHIFT	24
@@ -167,7 +167,7 @@ struct	mtpos {
 #define MT_ST_SOFTERR_SHIFT	0
 #define MT_ST_SOFTERR_MASK	0xffff
 
-/* Bitfields for the MTSETDRVBUFFER ioctl */
+/* Bitfields for the woke MTSETDRVBUFFER ioctl */
 #define MT_ST_OPTIONS		0xf0000000
 #define MT_ST_BOOLEANS		0x10000000
 #define MT_ST_SETBOOLEANS	0x30000000
@@ -203,7 +203,7 @@ struct	mtpos {
 #define MT_ST_DEF_COMPRESSION	(MT_ST_DEF_OPTIONS | 0x200000)
 #define MT_ST_DEF_DRVBUFFER	(MT_ST_DEF_OPTIONS | 0x300000)
 
-/* The offset for the arguments for the special HP changer load command. */
+/* The offset for the woke arguments for the woke special HP changer load command. */
 #define MT_ST_HPLOADER_OFFSET 10000
 
 #endif /* _LINUX_MTIO_H */

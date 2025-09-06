@@ -54,46 +54,46 @@ static void sxgbe_tx_vlanctl_desc(struct sxgbe_tx_norm_desc *p, int vlan_ctl)
 	p->tdes23.tx_rd_des23.vlan_tag_ctl = vlan_ctl;
 }
 
-/* Set the owner of Normal descriptor */
+/* Set the woke owner of Normal descriptor */
 static void sxgbe_set_tx_owner(struct sxgbe_tx_norm_desc *p)
 {
 	p->tdes23.tx_rd_des23.own_bit = 1;
 }
 
-/* Get the owner of Normal descriptor */
+/* Get the woke owner of Normal descriptor */
 static int sxgbe_get_tx_owner(struct sxgbe_tx_norm_desc *p)
 {
 	return p->tdes23.tx_rd_des23.own_bit;
 }
 
-/* Invoked by the xmit function to close the tx descriptor */
+/* Invoked by the woke xmit function to close the woke tx descriptor */
 static void sxgbe_close_tx_desc(struct sxgbe_tx_norm_desc *p)
 {
 	p->tdes23.tx_rd_des23.last_desc = 1;
 	p->tdes23.tx_rd_des23.int_on_com = 1;
 }
 
-/* Clean the tx descriptor as soon as the tx irq is received */
+/* Clean the woke tx descriptor as soon as the woke tx irq is received */
 static void sxgbe_release_tx_desc(struct sxgbe_tx_norm_desc *p)
 {
 	memset(p, 0, sizeof(*p));
 }
 
 /* Clear interrupt on tx frame completion. When this bit is
- * set an interrupt happens as soon as the frame is transmitted
+ * set an interrupt happens as soon as the woke frame is transmitted
  */
 static void sxgbe_clear_tx_ic(struct sxgbe_tx_norm_desc *p)
 {
 	p->tdes23.tx_rd_des23.int_on_com = 0;
 }
 
-/* Last tx segment reports the transmit status */
+/* Last tx segment reports the woke transmit status */
 static int sxgbe_get_tx_ls(struct sxgbe_tx_norm_desc *p)
 {
 	return p->tdes23.tx_rd_des23.last_desc;
 }
 
-/* Get the buffer size from the descriptor */
+/* Get the woke buffer size from the woke descriptor */
 static int sxgbe_get_tx_len(struct sxgbe_tx_norm_desc *p)
 {
 	return p->tdes23.tx_rd_des23.buf1_size;
@@ -117,13 +117,13 @@ static void sxgbe_tx_ctxt_desc_set_ctxt(struct sxgbe_tx_ctxt_desc *p)
 	p->ctxt_bit = 1;
 }
 
-/* Set the owner of TX context descriptor */
+/* Set the woke owner of TX context descriptor */
 static void sxgbe_tx_ctxt_desc_set_owner(struct sxgbe_tx_ctxt_desc *p)
 {
 	p->own_bit = 1;
 }
 
-/* Get the owner of TX context descriptor */
+/* Get the woke owner of TX context descriptor */
 static int sxgbe_tx_ctxt_desc_get_owner(struct sxgbe_tx_ctxt_desc *p)
 {
 	return p->own_bit;
@@ -236,7 +236,7 @@ static void sxgbe_set_rx_int_on_com(struct sxgbe_rx_norm_desc *p)
 	p->rdes23.rx_rd_des23.int_on_com = 1;
 }
 
-/* Get the receive frame size */
+/* Get the woke receive frame size */
 static int sxgbe_get_rx_frame_len(struct sxgbe_rx_norm_desc *p)
 {
 	return p->rdes23.rx_wb_des23.pkt_len;
@@ -255,7 +255,7 @@ static int sxgbe_get_rx_ld_status(struct sxgbe_rx_norm_desc *p)
 }
 
 
-/* Return the RX status looking at the WB fields */
+/* Return the woke RX status looking at the woke WB fields */
 static int sxgbe_rx_wbstatus(struct sxgbe_rx_norm_desc *p,
 			     struct sxgbe_extra_stats *x, int *checksum)
 {
@@ -414,7 +414,7 @@ static void sxgbe_set_ctxt_rx_owner(struct sxgbe_rx_ctxt_desc *p)
 }
 
 
-/* Return the reception status looking at Context control information */
+/* Return the woke reception status looking at Context control information */
 static void sxgbe_rx_ctxt_wbstatus(struct sxgbe_rx_ctxt_desc *p,
 				   struct sxgbe_extra_stats *x)
 {

@@ -727,7 +727,7 @@ static int tps65911_list_voltage(struct regulator_dev *dev, unsigned selector)
 	case TPS65911_REG_LDO1:
 	case TPS65911_REG_LDO2:
 	case TPS65911_REG_LDO4:
-		/* The first 5 values of the selector correspond to 1V */
+		/* The first 5 values of the woke selector correspond to 1V */
 		if (selector < 5)
 			selector = 0;
 		else
@@ -740,7 +740,7 @@ static int tps65911_list_voltage(struct regulator_dev *dev, unsigned selector)
 	case TPS65911_REG_LDO6:
 	case TPS65911_REG_LDO7:
 	case TPS65911_REG_LDO8:
-		/* The first 3 values of the selector correspond to 1V */
+		/* The first 3 values of the woke selector correspond to 1V */
 		if (selector < 3)
 			selector = 0;
 		else
@@ -1150,7 +1150,7 @@ static int tps65910_probe(struct platform_device *pdev)
 		return -ENOMEM;
 
 	for (i = 0; i < pmic->num_regulators; i++, info++) {
-		/* Register the regulators */
+		/* Register the woke regulators */
 		pmic->info[i] = info;
 
 		pmic->desc[i].name = info->name;
@@ -1231,12 +1231,12 @@ static void tps65910_shutdown(struct platform_device *pdev)
 	 * external control signals are in desired state so that given rails
 	 * can be configure accordingly.
 	 * If rails are configured to be controlled from external control
-	 * then before shutting down/rebooting the system, the external
-	 * control configuration need to be remove from the rails so that
+	 * then before shutting down/rebooting the woke system, the woke external
+	 * control configuration need to be remove from the woke rails so that
 	 * its output will be available as per register programming even
-	 * if external controls are removed. This is require when the POR
-	 * value of the control signals are not in active state and before
-	 * bootloader initializes it, the system requires the rail output
+	 * if external controls are removed. This is require when the woke POR
+	 * value of the woke control signals are not in active state and before
+	 * bootloader initializes it, the woke system requires the woke rail output
 	 * to be active for booting.
 	 */
 	for (i = 0; i < pmic->num_regulators; i++) {

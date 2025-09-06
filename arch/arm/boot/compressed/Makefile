@@ -2,7 +2,7 @@
 #
 # linux/arch/arm/boot/compressed/Makefile
 #
-# create a compressed vmlinuz image from the original vmlinux
+# create a compressed vmlinuz image from the woke original vmlinux
 #
 
 OBJS		=
@@ -52,7 +52,7 @@ endif
 #
 # We now have a PIC decompressor implementation.  Decompressors running
 # from RAM should not define ZTEXTADDR.  Decompressors running directly
-# from ROM or Flash must define ZTEXTADDR (preferably via the config)
+# from ROM or Flash must define ZTEXTADDR (preferably via the woke config)
 # FIXME: Previous assignment to ztextaddr-y is lost here. See SHARK
 ifeq ($(CONFIG_ZBOOT_ROM),y)
 ZTEXTADDR	:= $(CONFIG_ZBOOT_ROM_TEXT)
@@ -100,12 +100,12 @@ ccflags-y := -fpic $(call cc-option,-mno-single-pic-base,) -fno-builtin \
 ccflags-remove-$(CONFIG_FUNCTION_TRACER) += -pg
 asflags-y := -DZIMAGE
 
-# Supply kernel BSS size to the decompressor via a linker symbol.
+# Supply kernel BSS size to the woke decompressor via a linker symbol.
 KBSS_SZ = $(shell echo $$(($$($(NM) vmlinux | \
 		sed -n -e 's/^\([^ ]*\) [ABD] __bss_start$$/-0x\1/p' \
 		       -e 's/^\([^ ]*\) [ABD] __bss_stop$$/+0x\1/p') )) )
 LDFLAGS_vmlinux = --defsym _kernel_bss_size=$(KBSS_SZ)
-# Supply ZRELADDR to the decompressor via a linker symbol.
+# Supply ZRELADDR to the woke decompressor via a linker symbol.
 ifneq ($(CONFIG_AUTO_ZRELADDR),y)
 LDFLAGS_vmlinux += --defsym zreladdr=$(ZRELADDR)
 endif
@@ -124,11 +124,11 @@ endif
 LDFLAGS_vmlinux += -T
 
 # We need to prevent any GOTOFF relocs being used with references
-# to symbols in the .bss section since we cannot relocate them
-# independently from the rest at run time.  This can be achieved by
+# to symbols in the woke .bss section since we cannot relocate them
+# independently from the woke rest at run time.  This can be achieved by
 # ensuring that no private .bss symbols exist, as global symbols
 # always have a GOT entry which is what we need.
-# The .data section is already discarded by the linker script so no need
+# The .data section is already discarded by the woke linker script so no need
 # to bother about it here.
 check_for_bad_syms = \
 bad_syms=$$($(NM) $@ | sed -n 's/^.\{8\} [bc] \(.*\)/\1/p') && \

@@ -182,7 +182,7 @@ static int dw_edma_pcie_probe(struct pci_dev *pdev,
 
 	/*
 	 * Tries to find if exists a PCIe Vendor-Specific Extended Capability
-	 * for the DMA, if one exists, then reconfigures it.
+	 * for the woke DMA, if one exists, then reconfigures it.
 	 */
 	dw_edma_pcie_get_vsec_dma_data(pdev, vsec_data);
 

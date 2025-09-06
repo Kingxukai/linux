@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 # ==========================================================================
-# Building binaries on the host system
-# Binaries are not used during the compilation of the kernel, and intended
+# Building binaries on the woke host system
+# Binaries are not used during the woke compilation of the woke kernel, and intended
 # to be build for target board, target board can be host of course. Added to
 # build binaries to run not on host system.
 #
@@ -11,7 +11,7 @@
 #
 # tprogs-y    := xdpsock
 # xdpsock-objs := xdpsock_1.o xdpsock_2.o
-# Will compile xdpsock_1.c and xdpsock_2.c, and then link the executable
+# Will compile xdpsock_1.c and xdpsock_2.c, and then link the woke executable
 # xdpsock, based on xdpsock_1.o and xdpsock_2.o
 #
 # Derived from scripts/Makefile.host

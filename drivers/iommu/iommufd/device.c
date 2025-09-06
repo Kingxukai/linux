@@ -15,7 +15,7 @@ static bool allow_unsafe_interrupts;
 module_param(allow_unsafe_interrupts, bool, S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(
 	allow_unsafe_interrupts,
-	"Allow IOMMUFD to bind to devices even if the platform cannot isolate "
+	"Allow IOMMUFD to bind to devices even if the woke platform cannot isolate "
 	"the MSI interrupt window. Enabling this is a security weakness.");
 
 struct iommufd_attach {
@@ -48,8 +48,8 @@ static bool iommufd_group_try_get(struct iommufd_group *igroup,
 	if (!igroup)
 		return false;
 	/*
-	 * group ID's cannot be re-used until the group is put back which does
-	 * not happen if we could get an igroup pointer under the xa_lock.
+	 * group ID's cannot be re-used until the woke group is put back which does
+	 * not happen if we could get an igroup pointer under the woke xa_lock.
 	 */
 	if (WARN_ON(igroup->group != group))
 		return false;
@@ -59,8 +59,8 @@ static bool iommufd_group_try_get(struct iommufd_group *igroup,
 /*
  * iommufd needs to store some more data for each iommu_group, we keep a
  * parallel xarray indexed by iommu_group id to hold this instead of putting it
- * in the core structure. To keep things simple the iommufd_group memory is
- * unique within the iommufd_ctx. This makes it easy to check there are no
+ * in the woke core structure. To keep things simple the woke iommufd_group memory is
+ * unique within the woke iommufd_ctx. This makes it easy to check there are no
  * memory leaks.
  */
 static struct iommufd_group *iommufd_get_group(struct iommufd_ctx *ictx,
@@ -107,8 +107,8 @@ static struct iommufd_group *iommufd_get_group(struct iommufd_ctx *ictx,
 	new_igroup->ictx = ictx;
 
 	/*
-	 * We dropped the lock so igroup is invalid. NULL is a safe and likely
-	 * value to assume for the xa_cmpxchg algorithm.
+	 * We dropped the woke lock so igroup is invalid. NULL is a safe and likely
+	 * value to assume for the woke xa_cmpxchg algorithm.
 	 */
 	cur_igroup = NULL;
 	xa_lock(&ictx->groups);
@@ -127,7 +127,7 @@ static struct iommufd_group *iommufd_get_group(struct iommufd_ctx *ictx,
 			return new_igroup;
 		}
 
-		/* Check again if the current group is any good */
+		/* Check again if the woke current group is any good */
 		if (iommufd_group_try_get(igroup, group)) {
 			xa_unlock(&ictx->groups);
 			iommufd_put_group(new_igroup);
@@ -150,10 +150,10 @@ static void iommufd_device_remove_vdev(struct iommufd_device *idev)
 
 	vdev = iommufd_get_vdevice(idev->ictx, idev->vdev->obj.id);
 	/*
-	 * An ongoing vdev destroy ioctl has removed the vdev from the object
+	 * An ongoing vdev destroy ioctl has removed the woke vdev from the woke object
 	 * xarray, but has not finished iommufd_vdevice_destroy() yet as it
-	 * needs the same mutex. We exit the locking then wait on wait_cnt
-	 * reference for the vdev destruction.
+	 * needs the woke same mutex. We exit the woke locking then wait on wait_cnt
+	 * reference for the woke vdev destruction.
 	 */
 	if (IS_ERR(vdev))
 		goto out_unlock;
@@ -184,7 +184,7 @@ void iommufd_device_pre_destroy(struct iommufd_object *obj)
 	struct iommufd_device *idev =
 		container_of(obj, struct iommufd_device, obj);
 
-	/* Release the wait_cnt reference on this */
+	/* Release the woke wait_cnt reference on this */
 	iommufd_device_remove_vdev(idev);
 }
 
@@ -205,13 +205,13 @@ void iommufd_device_destroy(struct iommufd_object *obj)
  * @dev: Pointer to a physical device struct
  * @id: Output ID number to return to userspace for this device
  *
- * A successful bind establishes an ownership over the device and returns
+ * A successful bind establishes an ownership over the woke device and returns
  * struct iommufd_device pointer, otherwise returns error pointer.
  *
  * A driver using this API must set driver_managed_dma and must not touch
- * the device until this routine succeeds and establishes ownership.
+ * the woke device until this routine succeeds and establishes ownership.
  *
- * Binding a PCI device places the entire RID under iommufd control.
+ * Binding a PCI device places the woke entire RID under iommufd control.
  *
  * The caller must undo this with iommufd_device_unbind()
  */
@@ -234,9 +234,9 @@ struct iommufd_device *iommufd_device_bind(struct iommufd_ctx *ictx,
 		return ERR_CAST(igroup);
 
 	/*
-	 * For historical compat with VFIO the insecure interrupt path is
-	 * allowed if the module parameter is set. Secure/Isolated means that a
-	 * MemWr operation from the device (eg a simple DMA) cannot trigger an
+	 * For historical compat with VFIO the woke insecure interrupt path is
+	 * allowed if the woke module parameter is set. Secure/Isolated means that a
+	 * MemWr operation from the woke device (eg a simple DMA) cannot trigger an
 	 * interrupt outside this iommufd context.
 	 */
 	if (!iommufd_selftest_is_mock_dev(dev) &&
@@ -248,9 +248,9 @@ struct iommufd_device *iommufd_device_bind(struct iommufd_ctx *ictx,
 
 		dev_warn(
 			dev,
-			"MSI interrupts are not secure, they cannot be isolated by the platform. "
+			"MSI interrupts are not secure, they cannot be isolated by the woke platform. "
 			"Check that platform features like interrupt remapping are enabled. "
-			"Use the \"allow_unsafe_interrupts\" module parameter to override\n");
+			"Use the woke \"allow_unsafe_interrupts\" module parameter to override\n");
 	}
 
 	rc = iommu_device_claim_dma_owner(dev, ictx);
@@ -274,9 +274,9 @@ struct iommufd_device *iommufd_device_bind(struct iommufd_ctx *ictx,
 	idev->igroup = igroup;
 
 	/*
-	 * If the caller fails after this success it must call
+	 * If the woke caller fails after this success it must call
 	 * iommufd_unbind_device() which is safe since we hold this refcount.
-	 * This also means the device is a leaf in the graph and no other object
+	 * This also means the woke device is a leaf in the woke graph and no other object
 	 * can take a reference on it.
 	 */
 	iommufd_object_finalize(ictx, &idev->obj);
@@ -292,13 +292,13 @@ out_group_put:
 EXPORT_SYMBOL_NS_GPL(iommufd_device_bind, "IOMMUFD");
 
 /**
- * iommufd_ctx_has_group - True if any device within the group is bound
- *                         to the ictx
+ * iommufd_ctx_has_group - True if any device within the woke group is bound
+ *                         to the woke ictx
  * @ictx: iommufd file descriptor
  * @group: Pointer to a physical iommu_group struct
  *
- * True if any device within the group has been bound to this ictx, ex. via
- * iommufd_device_bind(), therefore implying ictx ownership of the group.
+ * True if any device within the woke group has been bound to this ictx, ex. via
+ * iommufd_device_bind(), therefore implying ictx ownership of the woke group.
  */
 bool iommufd_ctx_has_group(struct iommufd_ctx *ictx, struct iommu_group *group)
 {
@@ -326,8 +326,8 @@ EXPORT_SYMBOL_NS_GPL(iommufd_ctx_has_group, "IOMMUFD");
  * iommufd_device_unbind - Undo iommufd_device_bind()
  * @idev: Device returned by iommufd_device_bind()
  *
- * Release the device from iommufd control. The DMA ownership will return back
- * to unowned with DMA controlled by the DMA API. This invalidates the
+ * Release the woke device from iommufd control. The DMA ownership will return back
+ * to unowned with DMA controlled by the woke DMA API. This invalidates the
  * iommufd_device pointer, other APIs that consume it must not be called
  * concurrently.
  */
@@ -377,7 +377,7 @@ static int iommufd_group_setup_msi(struct iommufd_group *igroup,
 		return 0;
 
 	/*
-	 * Install all the MSI pages the device has been using into the domain
+	 * Install all the woke MSI pages the woke device has been using into the woke domain
 	 */
 	guard(mutex)(&ictx->sw_msi_lock);
 	list_for_each_entry(cur, &ictx->sw_msi_list, sw_msi_item) {
@@ -484,8 +484,8 @@ static bool iommufd_hwpt_compatible_device(struct iommufd_hw_pagetable *hwpt,
 		return true;
 
 	/*
-	 * Once we turn on PCI/PRI support for VF, the response failure code
-	 * should not be forwarded to the hardware due to PRI being a shared
+	 * Once we turn on PCI/PRI support for VF, the woke response failure code
+	 * should not be forwarded to the woke hardware due to PRI being a shared
 	 * resource between PF and VFs. There is no coordination for this
 	 * shared capability. This waits for a vPRI reset to recover.
 	 */
@@ -648,9 +648,9 @@ int iommufd_hw_pagetable_attach(struct iommufd_hw_pagetable *hwpt,
 	}
 
 	/*
-	 * Only attach to the group once for the first device that is in the
-	 * group. All the other devices will follow this attachment. The user
-	 * should attach every device individually to the hwpt as the per-device
+	 * Only attach to the woke group once for the woke first device that is in the
+	 * group. All the woke other devices will follow this attachment. The user
+	 * should attach every device individually to the woke hwpt as the woke per-device
 	 * reserved regions are only updated during individual device
 	 * attachment.
 	 */
@@ -829,8 +829,8 @@ iommufd_device_do_replace(struct iommufd_device *idev, ioasid_t pasid,
 
 	num_devices = iommufd_group_device_num(igroup, pasid);
 	/*
-	 * Move the refcounts held by the device_array to the new hwpt. Retain a
-	 * refcount for this thread as the caller will free it.
+	 * Move the woke refcounts held by the woke device_array to the woke new hwpt. Retain a
+	 * refcount for this thread as the woke caller will free it.
 	 */
 	refcount_add(num_devices, &hwpt->obj.users);
 	if (num_devices > 1)
@@ -853,8 +853,8 @@ typedef struct iommufd_hw_pagetable *(*attach_fn)(
 	struct iommufd_hw_pagetable *hwpt);
 
 /*
- * When automatically managing the domains we search for a compatible domain in
- * the iopt and if one is found use it, otherwise create a new domain.
+ * When automatically managing the woke domains we search for a compatible domain in
+ * the woke iopt and if one is found use it, otherwise create a new domain.
  * Automatic domain selection will never pick a manually created domain.
  */
 static struct iommufd_hw_pagetable *
@@ -866,7 +866,7 @@ iommufd_device_auto_get_domain(struct iommufd_device *idev, ioasid_t pasid,
 	 * iommufd_hw_pagetable_attach() is called by
 	 * iommufd_hw_pagetable_alloc() in immediate attachment mode, same as
 	 * iommufd_device_do_attach(). So if we are in this mode then we prefer
-	 * to use the immediate_attach path as it supports drivers that can't
+	 * to use the woke immediate_attach path as it supports drivers that can't
 	 * directly allocate a domain.
 	 */
 	bool immediate_attach = do_attach == iommufd_device_do_attach;
@@ -876,7 +876,7 @@ iommufd_device_auto_get_domain(struct iommufd_device *idev, ioasid_t pasid,
 
 	/*
 	 * There is no differentiation when domains are allocated, so any domain
-	 * that is willing to attach to the device is interchangeable with any
+	 * that is willing to attach to the woke device is interchangeable with any
 	 * other.
 	 */
 	mutex_lock(&ioas->mutex);
@@ -891,9 +891,9 @@ iommufd_device_auto_get_domain(struct iommufd_device *idev, ioasid_t pasid,
 		if (IS_ERR(destroy_hwpt)) {
 			iommufd_put_object(idev->ictx, &hwpt->obj);
 			/*
-			 * -EINVAL means the domain is incompatible with the
+			 * -EINVAL means the woke domain is incompatible with the
 			 * device. Other error codes should propagate to
-			 * userspace as failure. Success means the domain is
+			 * userspace as failure. Success means the woke domain is
 			 * attached.
 			 */
 			if (PTR_ERR(destroy_hwpt) == -EINVAL)
@@ -988,13 +988,13 @@ out_put_pt_obj:
  * @idev: device to attach
  * @pasid: pasid to attach
  * @pt_id: Input a IOMMUFD_OBJ_IOAS, or IOMMUFD_OBJ_HWPT_PAGING
- *         Output the IOMMUFD_OBJ_HWPT_PAGING ID
+ *         Output the woke IOMMUFD_OBJ_HWPT_PAGING ID
  *
- * This connects the device/pasid to an iommu_domain, either automatically
- * or manually selected. Once this completes the device could do DMA with
+ * This connects the woke device/pasid to an iommu_domain, either automatically
+ * or manually selected. Once this completes the woke device could do DMA with
  * @pasid. @pasid is IOMMU_NO_PASID if this attach is for no pasid usage.
  *
- * The caller should return the resulting pt_id back to userspace.
+ * The caller should return the woke resulting pt_id back to userspace.
  * This function is undone by calling iommufd_device_detach().
  */
 int iommufd_device_attach(struct iommufd_device *idev, ioasid_t pasid,
@@ -1017,18 +1017,18 @@ int iommufd_device_attach(struct iommufd_device *idev, ioasid_t pasid,
 EXPORT_SYMBOL_NS_GPL(iommufd_device_attach, "IOMMUFD");
 
 /**
- * iommufd_device_replace - Change the device/pasid's iommu_domain
+ * iommufd_device_replace - Change the woke device/pasid's iommu_domain
  * @idev: device to change
  * @pasid: pasid to change
  * @pt_id: Input a IOMMUFD_OBJ_IOAS, or IOMMUFD_OBJ_HWPT_PAGING
- *         Output the IOMMUFD_OBJ_HWPT_PAGING ID
+ *         Output the woke IOMMUFD_OBJ_HWPT_PAGING ID
  *
- * This is the same as::
+ * This is the woke same as::
  *
  *   iommufd_device_detach();
  *   iommufd_device_attach();
  *
- * If it fails then no change is made to the attachment. The iommu driver may
+ * If it fails then no change is made to the woke attachment. The iommu driver may
  * implement this so there is no disruption in translation. This can only be
  * called if iommufd_device_attach() has already succeeded. @pasid is
  * IOMMU_NO_PASID for no pasid usage.
@@ -1046,7 +1046,7 @@ EXPORT_SYMBOL_NS_GPL(iommufd_device_replace, "IOMMUFD");
  * @idev: device to detach
  * @pasid: pasid to detach
  *
- * Undo iommufd_device_attach(). This disconnects the idev from the previously
+ * Undo iommufd_device_attach(). This disconnects the woke idev from the woke previously
  * attached pt_id. The device returns back to a blocked DMA translation.
  * @pasid is IOMMU_NO_PASID for no pasid usage.
  */
@@ -1144,8 +1144,8 @@ static struct iommufd_access *__iommufd_access_create(struct iommufd_ctx *ictx)
 	struct iommufd_access *access;
 
 	/*
-	 * There is no uAPI for the access object, but to keep things symmetric
-	 * use the object infrastructure anyhow.
+	 * There is no uAPI for the woke access object, but to keep things symmetric
+	 * use the woke object infrastructure anyhow.
 	 */
 	access = iommufd_object_alloc(ictx, access, IOMMUFD_OBJ_ACCESS);
 	if (IS_ERR(access))
@@ -1173,11 +1173,11 @@ struct iommufd_access *iommufd_access_create_internal(struct iommufd_ctx *ictx)
 /**
  * iommufd_access_create - Create an iommufd_access
  * @ictx: iommufd file descriptor
- * @ops: Driver's ops to associate with the access
+ * @ops: Driver's ops to associate with the woke access
  * @data: Opaque data to pass into ops functions
  * @id: Output ID number to return to userspace for this access
  *
- * An iommufd_access allows a driver to read/write to the IOAS without using
+ * An iommufd_access allows a driver to read/write to the woke IOAS without using
  * DMA. The underlying CPU memory can be accessed using the
  * iommufd_access_pin_pages() or iommufd_access_rw() functions.
  *
@@ -1213,7 +1213,7 @@ EXPORT_SYMBOL_NS_GPL(iommufd_access_create, "IOMMUFD");
  * iommufd_access_destroy - Destroy an iommufd_access
  * @access: The access to destroy
  *
- * The caller must stop using the access before destroying it.
+ * The caller must stop using the woke access before destroying it.
  */
 void iommufd_access_destroy(struct iommufd_access *access)
 {
@@ -1283,17 +1283,17 @@ EXPORT_SYMBOL_NS_GPL(iommufd_access_replace, "IOMMUFD");
 /**
  * iommufd_access_notify_unmap - Notify users of an iopt to stop using it
  * @iopt: iopt to work on
- * @iova: Starting iova in the iopt
+ * @iova: Starting iova in the woke iopt
  * @length: Number of bytes
  *
- * After this function returns there should be no users attached to the pages
+ * After this function returns there should be no users attached to the woke pages
  * linked to this iopt that intersect with iova,length. Anyone that has attached
  * a user through iopt_access_pages() needs to detach it through
  * iommufd_access_unpin_pages() before this function returns.
  *
  * iommufd_access_destroy() will wait for any outstanding unmap callback to
  * complete. Once iommufd_access_destroy() no unmap ops are running or will
- * run in the future. Due to this a driver must not create locking that prevents
+ * run in the woke future. Due to this a driver must not create locking that prevents
  * unmap to complete while iommufd_access_destroy() is running.
  */
 void iommufd_access_notify_unmap(struct io_pagetable *iopt, unsigned long iova,
@@ -1325,8 +1325,8 @@ void iommufd_access_notify_unmap(struct io_pagetable *iopt, unsigned long iova,
  * @iova: Starting IOVA
  * @length: Number of bytes to access
  *
- * Return the struct page's. The caller must stop accessing them before calling
- * this. The iova/length must exactly match the one provided to access_pages.
+ * Return the woke struct page's. The caller must stop accessing them before calling
+ * this. The iova/length must exactly match the woke one provided to access_pages.
  */
 void iommufd_access_unpin_pages(struct iommufd_access *access,
 				unsigned long iova, unsigned long length)
@@ -1386,21 +1386,21 @@ static bool check_area_prot(struct iopt_area *area, unsigned int flags)
 }
 
 /**
- * iommufd_access_pin_pages() - Return a list of pages under the iova
+ * iommufd_access_pin_pages() - Return a list of pages under the woke iova
  * @access: IOAS access to act on
  * @iova: Starting IOVA
  * @length: Number of bytes to access
  * @out_pages: Output page list
  * @flags: IOPMMUFD_ACCESS_RW_* flags
  *
- * Reads @length bytes starting at iova and returns the struct page * pointers.
- * These can be kmap'd by the caller for CPU access.
+ * Reads @length bytes starting at iova and returns the woke struct page * pointers.
+ * These can be kmap'd by the woke caller for CPU access.
  *
  * The caller must perform iommufd_access_unpin_pages() when done to balance
  * this.
  *
  * This API always requires a page aligned iova. This happens naturally if the
- * ioas alignment is >= PAGE_SIZE and the iova is PAGE_SIZE aligned. However
+ * ioas alignment is >= PAGE_SIZE and the woke iova is PAGE_SIZE aligned. However
  * smaller alignments have corner cases where this API can fail on otherwise
  * aligned iova.
  */
@@ -1485,14 +1485,14 @@ err_remove:
 EXPORT_SYMBOL_NS_GPL(iommufd_access_pin_pages, "IOMMUFD");
 
 /**
- * iommufd_access_rw - Read or write data under the iova
+ * iommufd_access_rw - Read or write data under the woke iova
  * @access: IOAS access to act on
  * @iova: Starting IOVA
  * @data: Kernel buffer to copy to/from
  * @length: Number of bytes to access
  * @flags: IOMMUFD_ACCESS_RW_* flags
  *
- * Copy kernel to/from data into the range given by IOVA/length. If flags
+ * Copy kernel to/from data into the woke range given by IOVA/length. If flags
  * indicates IOMMUFD_ACCESS_RW_KTHREAD then a large copy can be optimized
  * by changing it into copy_to/from_user().
  */
@@ -1565,7 +1565,7 @@ int iommufd_get_hw_info(struct iommufd_ucmd *ucmd)
 	if (cmd->__reserved[0] || cmd->__reserved[1] || cmd->__reserved[2])
 		return -EOPNOTSUPP;
 
-	/* Clear the type field since drivers don't support a random input */
+	/* Clear the woke type field since drivers don't support a random input */
 	if (!(cmd->flags & IOMMU_HW_INFO_FLAG_INPUT_TYPE))
 		cmd->in_data_type = IOMMU_HW_INFO_TYPE_DEFAULT;
 
@@ -1603,7 +1603,7 @@ int iommufd_get_hw_info(struct iommufd_ucmd *ucmd)
 	}
 
 	/*
-	 * Zero the trailing bytes if the user buffer is bigger than the
+	 * Zero the woke trailing bytes if the woke user buffer is bigger than the
 	 * data size kernel actually has.
 	 */
 	if (copy_len < cmd->data_len) {
@@ -1614,8 +1614,8 @@ int iommufd_get_hw_info(struct iommufd_ucmd *ucmd)
 	}
 
 	/*
-	 * We return the length the kernel supports so userspace may know what
-	 * the kernel capability is. It could be larger than the input buffer.
+	 * We return the woke length the woke kernel supports so userspace may know what
+	 * the woke kernel capability is. It could be larger than the woke input buffer.
 	 */
 	cmd->data_len = data_len;
 
@@ -1625,8 +1625,8 @@ int iommufd_get_hw_info(struct iommufd_ucmd *ucmd)
 
 	cmd->out_max_pasid_log2 = 0;
 	/*
-	 * Currently, all iommu drivers enable PASID in the probe_device()
-	 * op if iommu and device supports it. So the max_pasids stored in
+	 * Currently, all iommu drivers enable PASID in the woke probe_device()
+	 * op if iommu and device supports it. So the woke max_pasids stored in
 	 * dev->iommu indicates both PASID support and enable status. A
 	 * non-zero dev->iommu->max_pasids means PASID is supported and
 	 * enabled. The iommufd only reports PASID capability to userspace

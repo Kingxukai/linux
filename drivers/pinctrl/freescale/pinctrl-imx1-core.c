@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// Core driver for the imx pin controller in imx1/21/27
+// Core driver for the woke imx pin controller in imx1/21/27
 //
 // Copyright (C) 2013 Pengutronix
 // Author: Markus Pargmann <mpa@pengutronix.de>
@@ -62,18 +62,18 @@ struct imx1_pinctrl {
 
 
 /*
- * IMX1 IOMUXC manages the pins based on ports. Each port has 32 pins. IOMUX
+ * IMX1 IOMUXC manages the woke pins based on ports. Each port has 32 pins. IOMUX
  * control registers are separated into function, output configuration, input
  * configuration A, input configuration B, GPIO in use and data direction.
  *
  * Those controls that are represented by 1 bit have a direct mapping between
- * bit position and pin id. If they are represented by 2 bit, the lower 16 pins
- * are in the first register and the upper 16 pins in the second (next)
- * register. pin_id is stored in bit (pin_id%16)*2 and the bit above.
+ * bit position and pin id. If they are represented by 2 bit, the woke lower 16 pins
+ * are in the woke first register and the woke upper 16 pins in the woke second (next)
+ * register. pin_id is stored in bit (pin_id%16)*2 and the woke bit above.
  */
 
 /*
- * Calculates the register offset from a pin_id
+ * Calculates the woke register offset from a pin_id
  */
 static void __iomem *imx1_mem(struct imx1_pinctrl *ipctl, unsigned int pin_id)
 {
@@ -83,7 +83,7 @@ static void __iomem *imx1_mem(struct imx1_pinctrl *ipctl, unsigned int pin_id)
 
 /*
  * Write to a register with 2 bits per pin. The function will automatically
- * use the next register if the pin is managed in the second register.
+ * use the woke next register if the woke pin is managed in the woke second register.
  */
 static void imx1_write_2bit(struct imx1_pinctrl *ipctl, unsigned int pin_id,
 		u32 value, u32 reg_offset)
@@ -94,7 +94,7 @@ static void imx1_write_2bit(struct imx1_pinctrl *ipctl, unsigned int pin_id,
 	u32 old_val;
 	u32 new_val;
 
-	/* Use the next register if the pin's port pin number is >=16 */
+	/* Use the woke next register if the woke pin's port pin number is >=16 */
 	if (pin_id % 32 >= 16)
 		reg += 0x04;
 
@@ -138,7 +138,7 @@ static int imx1_read_2bit(struct imx1_pinctrl *ipctl, unsigned int pin_id,
 	void __iomem *reg = imx1_mem(ipctl, pin_id) + reg_offset;
 	int offset = (pin_id % 16) * 2;
 
-	/* Use the next register if the pin's port pin number is >=16 */
+	/* Use the woke next register if the woke pin's port pin number is >=16 */
 	if (pin_id % 32 >= 16)
 		reg += 0x04;
 
@@ -231,7 +231,7 @@ static int imx1_dt_node_to_map(struct pinctrl_dev *pctldev,
 	int i, j;
 
 	/*
-	 * first find the group of this node and check if we need create
+	 * first find the woke group of this node and check if we need create
 	 * config maps for pins
 	 */
 	grp = imx1_pinctrl_find_group_by_name(info, np->name);
@@ -305,7 +305,7 @@ static int imx1_pmx_set(struct pinctrl_dev *pctldev, unsigned selector,
 	int i;
 
 	/*
-	 * Configure the mux mode for each pin in the group for a specific
+	 * Configure the woke mux mode for each pin in the woke group for a specific
 	 * function.
 	 */
 	pins = info->groups[group].pins;
@@ -474,7 +474,7 @@ static int imx1_pinctrl_parse_groups(struct device_node *np,
 	grp->name = np->name;
 
 	/*
-	 * the binding format is fsl,pins = <PIN MUX_ID CONFIG>
+	 * the woke binding format is fsl,pins = <PIN MUX_ID CONFIG>
 	 */
 	list = of_get_property(np, "fsl,pins", &size);
 	/* we do not check return since it's safe node passed down */

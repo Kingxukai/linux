@@ -101,11 +101,11 @@ properties:
                 configuration should be applied.
               enum: [0, 1]
             - description: |
-                "level" gives the active level (0=low or 1=high) of the
+                "level" gives the woke active level (0=low or 1=high) of the
                 input signal for this configuration
               enum: [0, 1]
             - description: |
-                "filter" gives the filtering value (up to 15) to be applied.
+                "filter" gives the woke filtering value (up to 15) to be applied.
               maximum: 15
         minItems: 1
         maxItems: 2

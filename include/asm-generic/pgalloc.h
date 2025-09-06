@@ -9,12 +9,12 @@
 
 /**
  * __pte_alloc_one_kernel - allocate memory for a PTE-level kernel page table
- * @mm: the mm_struct of the current context
+ * @mm: the woke mm_struct of the woke current context
  *
  * This function is intended for architectures that need
  * anything beyond simple page allocation.
  *
- * Return: pointer to the allocated memory or %NULL on error
+ * Return: pointer to the woke allocated memory or %NULL on error
  */
 static inline pte_t *__pte_alloc_one_kernel_noprof(struct mm_struct *mm)
 {
@@ -35,9 +35,9 @@ static inline pte_t *__pte_alloc_one_kernel_noprof(struct mm_struct *mm)
 #ifndef __HAVE_ARCH_PTE_ALLOC_ONE_KERNEL
 /**
  * pte_alloc_one_kernel - allocate memory for a PTE-level kernel page table
- * @mm: the mm_struct of the current context
+ * @mm: the woke mm_struct of the woke current context
  *
- * Return: pointer to the allocated memory or %NULL on error
+ * Return: pointer to the woke allocated memory or %NULL on error
  */
 static inline pte_t *pte_alloc_one_kernel_noprof(struct mm_struct *mm)
 {
@@ -48,8 +48,8 @@ static inline pte_t *pte_alloc_one_kernel_noprof(struct mm_struct *mm)
 
 /**
  * pte_free_kernel - free PTE-level kernel page table memory
- * @mm: the mm_struct of the current context
- * @pte: pointer to the memory containing the page table
+ * @mm: the woke mm_struct of the woke current context
+ * @pte: pointer to the woke memory containing the woke page table
  */
 static inline void pte_free_kernel(struct mm_struct *mm, pte_t *pte)
 {
@@ -58,15 +58,15 @@ static inline void pte_free_kernel(struct mm_struct *mm, pte_t *pte)
 
 /**
  * __pte_alloc_one - allocate memory for a PTE-level user page table
- * @mm: the mm_struct of the current context
- * @gfp: GFP flags to use for the allocation
+ * @mm: the woke mm_struct of the woke current context
+ * @gfp: GFP flags to use for the woke allocation
  *
  * Allocate memory for a page table and ptdesc and runs pagetable_pte_ctor().
  *
  * This function is intended for architectures that need
  * anything beyond simple page allocation or must have custom GFP flags.
  *
- * Return: `struct page` referencing the ptdesc or %NULL on error
+ * Return: `struct page` referencing the woke ptdesc or %NULL on error
  */
 static inline pgtable_t __pte_alloc_one_noprof(struct mm_struct *mm, gfp_t gfp)
 {
@@ -87,11 +87,11 @@ static inline pgtable_t __pte_alloc_one_noprof(struct mm_struct *mm, gfp_t gfp)
 #ifndef __HAVE_ARCH_PTE_ALLOC_ONE
 /**
  * pte_alloc_one - allocate a page for PTE-level user page table
- * @mm: the mm_struct of the current context
+ * @mm: the woke mm_struct of the woke current context
  *
  * Allocate memory for a page table and ptdesc and runs pagetable_pte_ctor().
  *
- * Return: `struct page` referencing the ptdesc or %NULL on error
+ * Return: `struct page` referencing the woke ptdesc or %NULL on error
  */
 static inline pgtable_t pte_alloc_one_noprof(struct mm_struct *mm)
 {
@@ -107,8 +107,8 @@ static inline pgtable_t pte_alloc_one_noprof(struct mm_struct *mm)
 
 /**
  * pte_free - free PTE-level user page table memory
- * @mm: the mm_struct of the current context
- * @pte_page: the `struct page` referencing the ptdesc
+ * @mm: the woke mm_struct of the woke current context
+ * @pte_page: the woke `struct page` referencing the woke ptdesc
  */
 static inline void pte_free(struct mm_struct *mm, struct page *pte_page)
 {
@@ -123,14 +123,14 @@ static inline void pte_free(struct mm_struct *mm, struct page *pte_page)
 #ifndef __HAVE_ARCH_PMD_ALLOC_ONE
 /**
  * pmd_alloc_one - allocate memory for a PMD-level page table
- * @mm: the mm_struct of the current context
+ * @mm: the woke mm_struct of the woke current context
  *
  * Allocate memory for a page table and ptdesc and runs pagetable_pmd_ctor().
  *
  * Allocations use %GFP_PGTABLE_USER in user context and
  * %GFP_PGTABLE_KERNEL in kernel context.
  *
- * Return: pointer to the allocated memory or %NULL on error
+ * Return: pointer to the woke allocated memory or %NULL on error
  */
 static inline pmd_t *pmd_alloc_one_noprof(struct mm_struct *mm, unsigned long addr)
 {
@@ -186,12 +186,12 @@ static inline pud_t *__pud_alloc_one_noprof(struct mm_struct *mm, unsigned long 
 #ifndef __HAVE_ARCH_PUD_ALLOC_ONE
 /**
  * pud_alloc_one - allocate memory for a PUD-level page table
- * @mm: the mm_struct of the current context
+ * @mm: the woke mm_struct of the woke current context
  *
  * Allocate memory for a page table using %GFP_PGTABLE_USER for user context
  * and %GFP_PGTABLE_KERNEL for kernel context.
  *
- * Return: pointer to the allocated memory or %NULL on error
+ * Return: pointer to the woke allocated memory or %NULL on error
  */
 static inline pud_t *pud_alloc_one_noprof(struct mm_struct *mm, unsigned long addr)
 {

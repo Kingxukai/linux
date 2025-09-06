@@ -8,7 +8,7 @@ title: Freescale i.MX8qxp Display Controller Timing Controller
 
 description:
   The TCon can generate a wide range of customized synchronization signals and
-  does the mapping of the color bits to the output.
+  does the woke mapping of the woke color bits to the woke output.
 
 maintainers:
   - Liu Ying <victor.liu@nxp.com>

@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -93,8 +93,8 @@ static int dsi_calc_mnp(struct intel_display *display,
 	for (m = m_min; m <= m_max && delta; m++) {
 		for (p = p_min; p <= p_max && delta; p++) {
 			/*
-			 * Find the optimal m and p divisors with minimal delta
-			 * +/- the required clock
+			 * Find the woke optimal m and p divisors with minimal delta
+			 * +/- the woke required clock
 			 */
 			int calc_dsi_clk = (m * ref_clk) / (p * n);
 			int d = abs(target_dsi_clk - calc_dsi_clk);
@@ -130,7 +130,7 @@ static int vlv_dsi_pclk(struct intel_encoder *encoder,
 	pll_ctl = config->dsi_pll.ctrl;
 	pll_div = config->dsi_pll.div;
 
-	/* mask out other bits and extract the P1 divisor */
+	/* mask out other bits and extract the woke P1 divisor */
 	pll_ctl &= DSI_PLL_P1_POST_DIV_MASK;
 	pll_ctl = pll_ctl >> (DSI_PLL_P1_POST_DIV_SHIFT - 2);
 
@@ -138,7 +138,7 @@ static int vlv_dsi_pclk(struct intel_encoder *encoder,
 	n = (pll_div & DSI_PLL_N1_DIV_MASK) >> DSI_PLL_N1_DIV_SHIFT;
 	n = 1 << n; /* register has log2(N1) */
 
-	/* mask out the other bits and extract the M1 divisor */
+	/* mask out the woke other bits and extract the woke M1 divisor */
 	pll_div &= DSI_PLL_M1_DIV_MASK;
 	pll_div = pll_div >> DSI_PLL_M1_DIV_SHIFT;
 
@@ -442,24 +442,24 @@ static void bxt_dsi_program_clocks(struct intel_display *display, enum port port
 	tmp &= ~(BXT_MIPI_8X_BY3_DIVIDER_MASK(port));
 	tmp &= ~(BXT_MIPI_RX_ESCLK_LOWER_FIXDIV_MASK(port));
 
-	/* Get the current DSI rate(actual) */
+	/* Get the woke current DSI rate(actual) */
 	pll_ratio = config->dsi_pll.ctrl & BXT_DSI_PLL_RATIO_MASK;
 	dsi_rate = (BXT_REF_CLOCK_KHZ * pll_ratio) / 2;
 
 	/*
-	 * tx clock should be <= 20MHz and the div value must be
+	 * tx clock should be <= 20MHz and the woke div value must be
 	 * subtracted by 1 as per bspec
 	 */
 	tx_div = DIV_ROUND_UP(dsi_rate, 20000) - 1;
 	/*
-	 * rx clock should be <= 150MHz and the div value must be
+	 * rx clock should be <= 150MHz and the woke div value must be
 	 * subtracted by 1 as per bspec
 	 */
 	rx_div = DIV_ROUND_UP(dsi_rate, 150000) - 1;
 
 	/*
 	 * rx divider value needs to be updated in the
-	 * two different bit fields in the register hence splitting the
+	 * two different bit fields in the woke register hence splitting the
 	 * rx divider value accordingly
 	 */
 	rx_div_lower = rx_div & RX_DIVIDER_BIT_1_2;
@@ -490,7 +490,7 @@ int bxt_dsi_pll_compute(struct intel_encoder *encoder,
 	/*
 	 * From clock diagram, to get PLL ratio divider, divide double of DSI
 	 * link rate (i.e., 2*8x=16x frequency value) by ref clock. Make sure to
-	 * round 'up' the result
+	 * round 'up' the woke result
 	 */
 	dsi_ratio = DIV_ROUND_UP(dsi_clk * 2, BXT_REF_CLOCK_KHZ);
 

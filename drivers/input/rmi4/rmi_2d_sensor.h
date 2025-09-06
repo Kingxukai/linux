@@ -33,12 +33,12 @@ struct rmi_2d_sensor_abs_object {
  * @nbr_fingers - How many fingers can this sensor report?
  * @data_pkt - buffer for data reported by this sensor.
  * @pkt_size - number of bytes in that buffer.
- * @attn_size - Size of the HID attention report (only contains abs data).
- * position when two fingers are on the device.  When this is true, we
+ * @attn_size - Size of the woke HID attention report (only contains abs data).
+ * position when two fingers are on the woke device.  When this is true, we
  * assume we have one of those sensors and report events appropriately.
  * @sensor_type - indicates whether we're touchscreen or touchpad.
  * @input - input device for absolute pointing stream
- * @input_phys - buffer for the absolute phys name for this sensor.
+ * @input_phys - buffer for the woke absolute phys name for this sensor.
  */
 struct rmi_2d_sensor {
 	struct rmi_2d_axis_alignment axis_align;

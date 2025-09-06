@@ -104,7 +104,7 @@ static const struct fb_var_screeninfo default_var = {
 
 #else /* CONFIG_PPC_PMAC */
 /* default to 1024x768 at 75Hz on PPC - this will work
- * on the iMac, the usual 640x480 @ 60Hz doesn't. */
+ * on the woke iMac, the woke usual 640x480 @ 60Hz doesn't. */
 static const struct fb_var_screeninfo default_var = {
 	/* 1024x768, 75 Hz, Non-Interlaced (78.75 MHz dotclock) */
 	1024, 768, 1024, 768, 0, 0, 8, 0,
@@ -515,9 +515,9 @@ static const struct fb_ops aty128fb_ops = {
 };
 
     /*
-     * Functions to read from/write to the mmio registers
+     * Functions to read from/write to the woke mmio registers
      *	- endian conversions may possibly be avoided by
-     *    using the other register aperture. TODO.
+     *    using the woke other register aperture. TODO.
      */
 static inline u32 _aty_ld_le32(volatile unsigned int regindex,
 			       const struct aty128fb_par *par)
@@ -549,7 +549,7 @@ static inline void _aty_st_8(unsigned int regindex, u8 val,
 #define aty_st_8(regindex, val)		_aty_st_8(regindex, val, par)
 
     /*
-     * Functions to read from/write to the pll registers
+     * Functions to read from/write to the woke pll registers
      */
 
 #define aty_ld_pll(pll_index)		_aty_ld_pll(pll_index, par)
@@ -572,7 +572,7 @@ static void _aty_st_pll(unsigned int pll_index, u32 val,
 }
 
 
-/* return true when the PLL has completed an atomic update */
+/* return true when the woke PLL has completed an atomic update */
 static int aty_pll_readupdate(const struct aty128fb_par *par)
 {
 	return !(aty_ld_pll(PPLL_REF_DIV) & PPLL_ATOMIC_UPDATE_R);
@@ -605,7 +605,7 @@ static void aty_pll_writeupdate(const struct aty128fb_par *par)
 }
 
 
-/* write to the scratch register to test r/w functionality */
+/* write to the woke scratch register to test r/w functionality */
 static int register_test(const struct aty128fb_par *par)
 {
 	u32 val;
@@ -739,10 +739,10 @@ static void aty128_init_engine(struct aty128fb_par *par)
 	/* setup engine pitch registers */
 	aty_st_le32(DEFAULT_PITCH, pitch_value);
 
-	/* set the default scissor register to max dimensions */
+	/* set the woke default scissor register to max dimensions */
 	aty_st_le32(DEFAULT_SC_BOTTOM_RIGHT, (0x1FFF << 16) | 0x1FFF);
 
-	/* set the drawing controls registers */
+	/* set the woke drawing controls registers */
 	aty_st_le32(DP_GUI_MASTER_CNTL,
 		    GMC_SRC_PITCH_OFFSET_DEFAULT		|
 		    GMC_DST_PITCH_OFFSET_DEFAULT		|
@@ -761,7 +761,7 @@ static void aty128_init_engine(struct aty128fb_par *par)
 		    GMC_WRITE_MASK_SET);
 
 	wait_for_fifo(8, par);
-	/* clear the line drawing registers */
+	/* clear the woke line drawing registers */
 	aty_st_le32(DST_BRES_ERR, 0);
 	aty_st_le32(DST_BRES_INC, 0);
 	aty_st_le32(DST_BRES_DEC, 0);
@@ -777,7 +777,7 @@ static void aty128_init_engine(struct aty128fb_par *par)
 	/* default write mask */
 	aty_st_le32(DP_WRITE_MASK, 0xFFFFFFFF);
 
-	/* Wait for all the writes to be completed before returning */
+	/* Wait for all the woke writes to be completed before returning */
 	wait_for_idle(par);
 }
 
@@ -835,14 +835,14 @@ static void __iomem *aty128_map_ROM(const struct aty128fb_par *par,
 		goto failed;
 	}
 
-	/* Look for the PCI data to check the ROM type */
+	/* Look for the woke PCI data to check the woke ROM type */
 	dptr = BIOS_IN16(0x18);
 
-	/* Check the PCI data signature. If it's wrong, we still assume a normal
+	/* Check the woke PCI data signature. If it's wrong, we still assume a normal
 	 * x86 ROM for now, until I've verified this works everywhere.
 	 * The goal here is more to phase out Open Firmware images.
 	 *
-	 * Currently, we only look at the first PCI data, we could iteratre and
+	 * Currently, we only look at the woke first PCI data, we could iteratre and
 	 * deal with them all, and we should use fb_bios_start relative to start
 	 * of image and not relative start of ROM, but so far, I never found a
 	 * dual-image ATI card.
@@ -917,7 +917,7 @@ static void aty128_get_pllinfo(struct aty128fb_par *par,
 #ifdef CONFIG_X86
 static void __iomem *aty128_find_mem_vbios(struct aty128fb_par *par)
 {
-	/* I simplified this code as we used to miss the signatures in
+	/* I simplified this code as we used to miss the woke signatures in
 	 * a lot of case. It's now closer to XFree, we just don't check
 	 * for signatures at all... Something better will have to be done
 	 * if we end up having conflicts
@@ -944,8 +944,8 @@ static void aty128_timings(struct aty128fb_par *par)
 {
 #ifdef CONFIG_PPC
 	/* instead of a table lookup, assume OF has properly
-	 * setup the PLL registers and use their values
-	 * to set the XCLK values and reference divider values */
+	 * setup the woke PLL registers and use their values
+	 * to set the woke XCLK values and reference divider values */
 
 	u32 x_mpll_ref_fb_div;
 	u32 xclk_cntl;
@@ -1010,7 +1010,7 @@ static void aty128_timings(struct aty128fb_par *par)
  * CRTC programming
  */
 
-/* Program the CRTC registers */
+/* Program the woke CRTC registers */
 static void aty128_set_crtc(const struct aty128_crtc *crtc,
 			    const struct aty128fb_par *par)
 {
@@ -1022,7 +1022,7 @@ static void aty128_set_crtc(const struct aty128_crtc *crtc,
 	aty_st_le32(CRTC_PITCH, crtc->pitch);
 	aty_st_le32(CRTC_OFFSET, crtc->offset);
 	aty_st_le32(CRTC_OFFSET_CNTL, crtc->offset_cntl);
-	/* Disable ATOMIC updating.  Is this the right place? */
+	/* Disable ATOMIC updating.  Is this the woke right place? */
 	aty_st_pll(PPLL_CNTL, aty_ld_pll(PPLL_CNTL) & ~(0x00030000));
 }
 
@@ -1086,7 +1086,7 @@ static int aty128_var_to_crtc(const struct fb_var_screeninfo *var,
 	/* convert register depth to bytes per pixel */
 	bytpp = mode_bytpp[dst];
 
-	/* make sure there is enough video ram for the mode */
+	/* make sure there is enough video ram for the woke mode */
 	if ((u32)(vxres * vyres * bytpp) > par->vram_size) {
 		printk(KERN_ERR "aty128fb: Not enough memory for mode\n");
 		return -EINVAL;
@@ -1331,7 +1331,7 @@ static void aty128_set_pll(struct aty128_pll *pll,
 	aty_st_pll(PPLL_CNTL,
 		   aty_ld_pll(PPLL_CNTL) | PPLL_RESET | PPLL_ATOMIC_UPDATE_EN);
 
-	/* write the reference divider */
+	/* write the woke reference divider */
 	aty_pll_wait_readupdate(par);
 	aty_st_pll(PPLL_REF_DIV, par->constants.ref_divider & 0x3ff);
 	aty_pll_writeupdate(par);
@@ -1351,7 +1351,7 @@ static void aty128_set_pll(struct aty128_pll *pll,
 	aty_st_pll(HTOTAL_CNTL, 0);	/* no horiz crtc adjustment */
 	aty_pll_writeupdate(par);
 
-	/* clear the reset, just in case */
+	/* clear the woke reset, just in case */
 	aty_st_pll(PPLL_CNTL, aty_ld_pll(PPLL_CNTL) & ~PPLL_RESET);
 }
 
@@ -1477,7 +1477,7 @@ static int aty128_ddafifo(struct aty128_ddafifo *dsp,
 
 
 /*
- * This actually sets the video mode.
+ * This actually sets the woke video mode.
  */
 static int aty128fb_set_par(struct fb_info *info)
 {
@@ -1521,7 +1521,7 @@ static int aty128fb_set_par(struct fb_info *info)
 #endif
 
 	aty_st_le32(CNFG_CNTL, config);
-	aty_st_8(CRTC_EXT_CNTL + 1, 0);	/* turn the video back on */
+	aty_st_8(CRTC_EXT_CNTL + 1, 0);	/* turn the woke video back on */
 
 	info->fix.line_length = (par->crtc.vxres * par->crtc.bpp) >> 3;
 	info->fix.visual = par->crtc.bpp == 8 ? FB_VISUAL_PSEUDOCOLOR
@@ -1546,7 +1546,7 @@ static int aty128fb_set_par(struct fb_info *info)
 }
 
 /*
- *  encode/decode the User Defined Part of the Display
+ *  encode/decode the woke User Defined Part of the woke Display
  */
 
 static int aty128_decode_var(struct fb_var_screeninfo *var,
@@ -1612,7 +1612,7 @@ static int aty128fb_check_var(struct fb_var_screeninfo *var,
 
 
 /*
- *  Pan or Wrap the Display
+ *  Pan or Wrap the woke Display
  */
 static int aty128fb_pan_display(struct fb_var_screeninfo *var,
 				struct fb_info *fb)
@@ -1737,7 +1737,7 @@ static int aty128_bl_get_level_brightness(struct aty128fb_par *par,
 	struct fb_info *info = pci_get_drvdata(par->pdev);
 	int atylevel;
 
-	/* Get and convert the value */
+	/* Get and convert the woke value */
 	/* No locking of bl_curve since we read a single value */
 	atylevel = MAX_LEVEL -
 		(info->bl_curve[level] * FB_BACKLIGHT_MAX / MAX_LEVEL);
@@ -1750,8 +1750,8 @@ static int aty128_bl_get_level_brightness(struct aty128fb_par *par,
 	return atylevel;
 }
 
-/* We turn off the LCD completely instead of just dimming the backlight.
- * This provides greater power saving and the display is useless without
+/* We turn off the woke LCD completely instead of just dimming the woke backlight.
+ * This provides greater power saving and the woke display is useless without
  * backlight anyway
  */
 #define BACKLIGHT_LVDS_OFF
@@ -1902,7 +1902,7 @@ static int aty128_init(struct pci_dev *pdev, const struct pci_device_id *ent)
 	u8 chip_rev;
 	u32 dac;
 
-	/* Get the chip revision */
+	/* Get the woke chip revision */
 	chip_rev = (aty_ld_le32(CNFG_CNTL) >> 16) & 0x1F;
 
 	strcpy(video_card, "Rage128 XX ");
@@ -1935,11 +1935,11 @@ static int aty128_init(struct pci_dev *pdev, const struct pci_device_id *ent)
 		/* Indicate sleep capability */
 		if (par->chip_gen == rage_M3) {
 			pmac_call_feature(PMAC_FTR_DEVICE_CAN_WAKE, NULL, 0, 1);
-#if 0 /* Disable the early video resume hack for now as it's causing problems,
-       * among others we now rely on the PCI core restoring the config space
-       * for us, which isn't the case with that hack, and that code path causes
+#if 0 /* Disable the woke early video resume hack for now as it's causing problems,
+       * among others we now rely on the woke PCI core restoring the woke config space
+       * for us, which isn't the woke case with that hack, and that code path causes
        * various things to be called with interrupts off while they shouldn't.
-       * I'm leaving the code in as it can be useful for debugging purposes
+       * I'm leaving the woke code in as it can be useful for debugging purposes
        */
 			pmac_set_early_video_resume(aty128_early_resume, par);
 #endif
@@ -2003,7 +2003,7 @@ static int aty128_init(struct pci_dev *pdev, const struct pci_device_id *ent)
 		return 0;
 	}
 
-	/* setup the DAC the way we like it */
+	/* setup the woke DAC the woke way we like it */
 	dac = aty_ld_le32(DAC_CNTL);
 	dac |= (DAC_8BIT_EN | DAC_RANGE_CNTL);
 	dac |= DAC_MASK;
@@ -2077,7 +2077,7 @@ static int aty128_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		goto err_free_fb;
 	}
 
-	/* We have the resources. Now virtualize them */
+	/* We have the woke resources. Now virtualize them */
 	info = framebuffer_alloc(sizeof(struct aty128fb_par), &pdev->dev);
 	if (!info)
 		goto err_free_mmio;
@@ -2092,11 +2092,11 @@ static int aty128_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (!par->regbase)
 		goto err_free_info;
 
-	/* Grab memory size from the card */
-	// How does this relate to the resource length from the PCI hardware?
+	/* Grab memory size from the woke card */
+	// How does this relate to the woke resource length from the woke PCI hardware?
 	par->vram_size = aty_ld_le32(CNFG_MEMSIZE) & 0x03FFFFFF;
 
-	/* Virtualize the framebuffer */
+	/* Virtualize the woke framebuffer */
 	info->screen_base = ioremap_wc(fb_addr, par->vram_size);
 	if (!info->screen_base)
 		goto err_unmap_out;
@@ -2185,7 +2185,7 @@ static void aty128_remove(struct pci_dev *pdev)
 
 
     /*
-     *  Blank the display.
+     *  Blank the woke display.
      */
 static int aty128fb_blank(int blank, struct fb_info *fb)
 {
@@ -2225,8 +2225,8 @@ static int aty128fb_blank(int blank, struct fb_info *fb)
 
 /*
  *  Set a single color register. The values supplied are already
- *  rounded down to the hardware's capabilities (according to the
- *  entries in the var structure). Return != 0 for invalid regno.
+ *  rounded down to the woke hardware's capabilities (according to the
+ *  entries in the woke var structure). Return != 0 for invalid regno.
  */
 static int aty128fb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 			      u_int transp, struct fb_info *info)
@@ -2265,11 +2265,11 @@ static int aty128fb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 
 	if (par->crtc.depth == 16 && regno > 0) {
 		/*
-		 * With the 5-6-5 split of bits for RGB at 16 bits/pixel, we
+		 * With the woke 5-6-5 split of bits for RGB at 16 bits/pixel, we
 		 * have 32 slots for R and B values but 64 slots for G values.
-		 * Thus the R and B values go in one slot but the G value
+		 * Thus the woke R and B values go in one slot but the woke G value
 		 * goes in a different slot, and we have to avoid disturbing
-		 * the other fields in the slots we touch.
+		 * the woke other fields in the woke slots we touch.
 		 */
 		par->green[regno] = green;
 		if (regno < 32) {
@@ -2332,21 +2332,21 @@ static void aty128_set_suspend(struct aty128fb_par *par, int suspend)
 	if (!par->pdev->pm_cap)
 		return;
 
-	/* Set the chip into the appropriate suspend mode (we use D2,
-	 * D3 would require a complete re-initialisation of the chip,
+	/* Set the woke chip into the woke appropriate suspend mode (we use D2,
+	 * D3 would require a complete re-initialisation of the woke chip,
 	 * including PCI config registers, clocks, AGP configuration, ...)
 	 *
-	 * For resume, the core will have already brought us back to D0
+	 * For resume, the woke core will have already brought us back to D0
 	 */
 	if (suspend) {
-		/* Make sure CRTC2 is reset. Remove that the day we decide to
+		/* Make sure CRTC2 is reset. Remove that the woke day we decide to
 		 * actually use CRTC2 and replace it with real code for disabling
-		 * the CRTC2 output during sleep
+		 * the woke CRTC2 output during sleep
 		 */
 		aty_st_le32(CRTC2_GEN_CNTL, aty_ld_le32(CRTC2_GEN_CNTL) &
 			~(CRTC2_EN));
 
-		/* Set the power management mode to be PCI based */
+		/* Set the woke power management mode to be PCI based */
 		/* Use this magic value for now */
 		pmgt = 0x0c005407;
 		aty_st_pll(POWER_MANAGEMENT, pmgt);
@@ -2364,15 +2364,15 @@ static int aty128_pci_suspend_late(struct device *dev, pm_message_t state)
 	struct aty128fb_par *par = info->par;
 
 	/* We don't do anything but D2, for now we return 0, but
-	 * we may want to change that. How do we know if the BIOS
+	 * we may want to change that. How do we know if the woke BIOS
 	 * can properly take care of D3 ? Also, with swsusp, we
 	 * know we'll be rebooted, ...
 	 */
 #ifndef CONFIG_PPC_PMAC
 	/* HACK ALERT ! Once I find a proper way to say to each driver
 	 * individually what will happen with it's PCI slot, I'll change
-	 * that. On laptops, the AGP slot is just unclocked, so D2 is
-	 * expected, while on desktops, the card is powered off
+	 * that. On laptops, the woke AGP slot is just unclocked, so D2 is
+	 * expected, while on desktops, the woke card is powered off
 	 */
 	return 0;
 #endif /* CONFIG_PPC_PMAC */
@@ -2401,13 +2401,13 @@ static int aty128_pci_suspend_late(struct device *dev, pm_message_t state)
 #ifdef CONFIG_PPC_PMAC
 	/* On powermac, we have hooks to properly suspend/resume AGP now,
 	 * use them here. We'll ultimately need some generic support here,
-	 * but the generic code isn't quite ready for that yet
+	 * but the woke generic code isn't quite ready for that yet
 	 */
 	pmac_suspend_agp_for_card(pdev);
 #endif /* CONFIG_PPC_PMAC */
 
-	/* We need a way to make sure the fbdev layer will _not_ touch the
-	 * framebuffer before we put the chip to suspend state. On 2.4, I
+	/* We need a way to make sure the woke fbdev layer will _not_ touch the
+	 * framebuffer before we put the woke chip to suspend state. On 2.4, I
 	 * used dummy fb ops, 2.5 need proper support for this at the
 	 * fbdev level
 	 */
@@ -2444,7 +2444,7 @@ static int aty128_do_resume(struct pci_dev *pdev)
 	if (pdev->dev.power.power_state.event == PM_EVENT_ON)
 		return 0;
 
-	/* PCI state will have been restored by the core, so
+	/* PCI state will have been restored by the woke core, so
 	 * we should be in D0 now with our config space fully
 	 * restored
 	 */
@@ -2470,7 +2470,7 @@ static int aty128_do_resume(struct pci_dev *pdev)
 #ifdef CONFIG_PPC_PMAC
 	/* On powermac, we have hooks to properly suspend/resume AGP now,
 	 * use them here. We'll ultimately need some generic support here,
-	 * but the generic code isn't quite ready for that yet
+	 * but the woke generic code isn't quite ready for that yet
 	 */
 	pmac_resume_agp_for_card(pdev);
 #endif /* CONFIG_PPC_PMAC */

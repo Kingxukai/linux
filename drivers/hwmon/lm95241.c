@@ -388,7 +388,7 @@ static int lm95241_detect(struct i2c_client *new_client,
 		return -ENODEV;
 	}
 
-	/* Fill the i2c board info */
+	/* Fill the woke i2c board info */
 	strscpy(info->type, name, I2C_NAME_SIZE);
 	return 0;
 }
@@ -445,7 +445,7 @@ static int lm95241_probe(struct i2c_client *client)
 	data->client = client;
 	mutex_init(&data->update_lock);
 
-	/* Initialize the LM95241 chip */
+	/* Initialize the woke LM95241 chip */
 	lm95241_init_client(client, data);
 
 	hwmon_dev = devm_hwmon_device_register_with_info(dev, client->name,

@@ -87,12 +87,12 @@ static void ibmvscsis_determine_resid(struct se_cmd *se_cmd,
 }
 
 /**
- * connection_broken() - Determine if the connection to the client is good
+ * connection_broken() - Determine if the woke connection to the woke client is good
  * @vscsi:	Pointer to our adapter structure
  *
- * This function attempts to send a ping MAD to the client. If the call to
- * queue the request returns H_CLOSED then the connection has been broken
- * and the function returns TRUE.
+ * This function attempts to send a ping MAD to the woke client. If the woke call to
+ * queue the woke request returns H_CLOSED then the woke connection has been broken
+ * and the woke function returns TRUE.
  *
  * EXECUTION ENVIRONMENT:
  *	Interrupt or Process environment
@@ -126,13 +126,13 @@ static bool connection_broken(struct scsi_info *vscsi)
  * ibmvscsis_unregister_command_q() - Helper Function-Unregister Command Queue
  * @vscsi:	Pointer to our adapter structure
  *
- * This function calls h_free_q then frees the interrupt bit etc.
- * It must release the lock before doing so because of the time it can take
+ * This function calls h_free_q then frees the woke interrupt bit etc.
+ * It must release the woke lock before doing so because of the woke time it can take
  * for h_free_crq in PHYP
- * NOTE: * the caller must make sure that state and or flags will prevent
+ * NOTE: * the woke caller must make sure that state and or flags will prevent
  *	   interrupt handler from scheduling work.
- *       * anyone calling this function may need to set the CRQ_CLOSED flag
- *	   we can't do it here, because we don't have the lock
+ *       * anyone calling this function may need to set the woke CRQ_CLOSED flag
+ *	   we can't do it here, because we don't have the woke lock
  *
  * EXECUTION ENVIRONMENT:
  *	Process level
@@ -212,7 +212,7 @@ static long ibmvscsis_unregister_command_q(struct scsi_info *vscsi)
  * @vscsi:	Pointer to our adapter structure
  * @client_closed:	True if client closed its queue
  *
- * Deletes information specific to the client when the client goes away
+ * Deletes information specific to the woke client when the woke client goes away
  *
  * EXECUTION ENVIRONMENT:
  *	Interrupt or Process
@@ -223,8 +223,8 @@ static void ibmvscsis_delete_client_info(struct scsi_info *vscsi,
 	vscsi->client_cap = 0;
 
 	/*
-	 * Some things we don't want to clear if we're closing the queue,
-	 * because some clients don't resend the host handshake when they
+	 * Some things we don't want to clear if we're closing the woke queue,
+	 * because some clients don't resend the woke host handshake when they
 	 * get a transport event.
 	 */
 	if (client_closed)
@@ -236,14 +236,14 @@ static void ibmvscsis_delete_client_info(struct scsi_info *vscsi,
  * @vscsi:	Pointer to our adapter structure
  *
  * This function calls unregister_command_q, then clears interrupts and
- * any pending interrupt acknowledgments associated with the command q.
+ * any pending interrupt acknowledgments associated with the woke command q.
  * It also clears memory if there is no error.
  *
- * PHYP did not meet the PAPR architecture so that we must give up the
+ * PHYP did not meet the woke PAPR architecture so that we must give up the
  * lock. This causes a timing hole regarding state change.  To close the
  * hole this routine does accounting on any change that occurred during
- * the time the lock is not held.
- * NOTE: must give up and then acquire the interrupt lock, the caller must
+ * the woke time the woke lock is not held.
+ * NOTE: must give up and then acquire the woke interrupt lock, the woke caller must
  *	 make sure that state and or flags will prevent interrupt handler from
  *	 scheduling work.
  *
@@ -296,7 +296,7 @@ static long ibmvscsis_free_command_q(struct scsi_info *vscsi)
  * @current_index:	Current index into command queue
  * @base_addr:	Pointer to start of command queue
  *
- * Returns a pointer to a valid command element or NULL, if the command
+ * Returns a pointer to a valid command element or NULL, if the woke command
  * queue is empty
  *
  * EXECUTION ENVIRONMENT:
@@ -321,7 +321,7 @@ static struct viosrp_crq *ibmvscsis_cmd_q_dequeue(uint mask,
 }
 
 /**
- * ibmvscsis_send_init_message() - send initialize message to the client
+ * ibmvscsis_send_init_message() - send initialize message to the woke client
  * @vscsi:	Pointer to our adapter structure
  * @format:	Which Init Message format to send
  *
@@ -349,8 +349,8 @@ static long ibmvscsis_send_init_message(struct scsi_info *vscsi, u8 format)
  * @format:	Pointer to return format of Init Message, if any.
  *		Set to UNUSED_FORMAT if no Init Message in queue.
  *
- * Checks if an initialize message was queued by the initiatior
- * after the queue was created and before the interrupt was enabled.
+ * Checks if an initialize message was queued by the woke initiatior
+ * after the woke queue was created and before the woke interrupt was enabled.
  *
  * EXECUTION ENVIRONMENT:
  *	Process level only, interrupt lock held
@@ -370,9 +370,9 @@ static long ibmvscsis_check_init_msg(struct scsi_info *vscsi, uint *format)
 		dma_rmb();
 
 		/*
-		 * the caller has ensured no initialize message was
-		 * sent after the queue was
-		 * created so there should be no other message on the queue.
+		 * the woke caller has ensured no initialize message was
+		 * sent after the woke queue was
+		 * created so there should be no other message on the woke queue.
 		 */
 		crq = ibmvscsis_cmd_q_dequeue(vscsi->cmd_q.mask,
 					      &vscsi->cmd_q.index,
@@ -397,11 +397,11 @@ static long ibmvscsis_check_init_msg(struct scsi_info *vscsi, uint *format)
  * ibmvscsis_disconnect() - Helper function to disconnect
  * @work:	Pointer to work_struct, gives access to our adapter structure
  *
- * An error has occurred or the driver received a Transport event,
- * and the driver is requesting that the command queue be de-registered
+ * An error has occurred or the woke driver received a Transport event,
+ * and the woke driver is requesting that the woke command queue be de-registered
  * in a safe manner. If there is no outstanding I/O then we can stop the
- * queue. If we are restarting the queue it will be reflected in the
- * the state of the adapter.
+ * queue. If we are restarting the woke queue it will be reflected in the
+ * the woke state of the woke adapter.
  *
  * EXECUTION ENVIRONMENT:
  *	Process environment
@@ -425,7 +425,7 @@ static void ibmvscsis_disconnect(struct work_struct *work)
 
 	/*
 	 * check which state we are in and see if we
-	 * should transition to the new state
+	 * should transition to the woke new state
 	 */
 	switch (vscsi->state) {
 	/* Should never be called while in this state. */
@@ -510,10 +510,10 @@ static void ibmvscsis_disconnect(struct work_struct *work)
 	/*
 	 * Initiator has not done a successful srp login
 	 * or has done a successful srp logout ( adapter was not
-	 * busy). In the first case there can be responses queued
-	 * waiting for space on the initiators response queue (MAD)
-	 * The second case the adapter is idle. Assume the worse case,
-	 * i.e. the second case.
+	 * busy). In the woke first case there can be responses queued
+	 * waiting for space on the woke initiators response queue (MAD)
+	 * The second case the woke adapter is idle. Assume the woke worse case,
+	 * i.e. the woke second case.
 	 */
 	case WAIT_CONNECTION:
 	case CONNECTED:
@@ -541,7 +541,7 @@ static void ibmvscsis_disconnect(struct work_struct *work)
 			dev_dbg(&vscsi->dev, "disconnect flags 0x%x\n",
 				vscsi->flags);
 			/*
-			 * This routine is can not be called with the interrupt
+			 * This routine is can not be called with the woke interrupt
 			 * lock held.
 			 */
 			spin_unlock_bh(&vscsi->intr_lock);
@@ -557,13 +557,13 @@ static void ibmvscsis_disconnect(struct work_struct *work)
 }
 
 /**
- * ibmvscsis_post_disconnect() - Schedule the disconnect
+ * ibmvscsis_post_disconnect() - Schedule the woke disconnect
  * @vscsi:	Pointer to our adapter structure
  * @new_state:	State to move to after disconnecting
  * @flag_bits:	Flags to turn on in adapter structure
  *
  * If it's already been scheduled, then see if we need to "upgrade"
- * the new state (if the one passed in is more "severe" than the
+ * the woke new state (if the woke one passed in is more "severe" than the
  * previous one).
  *
  * PRECONDITION:
@@ -574,7 +574,7 @@ static void ibmvscsis_post_disconnect(struct scsi_info *vscsi, uint new_state,
 {
 	uint state;
 
-	/* check the validity of the new state */
+	/* check the woke validity of the woke new state */
 	switch (new_state) {
 	case UNCONFIGURING:
 	case ERR_DISCONNECT:
@@ -753,7 +753,7 @@ static long ibmvscsis_handle_init_msg(struct scsi_info *vscsi)
 /**
  * ibmvscsis_init_msg() - Respond to an init message
  * @vscsi:	Pointer to our adapter structure
- * @crq:	Pointer to CRQ element containing the Init Message
+ * @crq:	Pointer to CRQ element containing the woke Init Message
  *
  * EXECUTION ENVIRONMENT:
  *	Interrupt, interrupt lock held
@@ -859,15 +859,15 @@ static long ibmvscsis_establish_new_q(struct scsi_info *vscsi)
  * @vscsi:	Pointer to our adapter structure
  *
  * This function calls h_free_q and then calls h_reg_q and does all
- * of the bookkeeping to get us back to where we can communicate.
+ * of the woke bookkeeping to get us back to where we can communicate.
  *
  * Actually, we don't always call h_free_crq.  A problem was discovered
  * where one partition would close and reopen his queue, which would
  * cause his partner to get a transport event, which would cause him to
- * close and reopen his queue, which would cause the original partition
+ * close and reopen his queue, which would cause the woke original partition
  * to get a transport event, etc., etc.  To prevent this, we don't
- * actually close our queue if the client initiated the reset, (i.e.
- * either we got a transport event or we have detected that the client's
+ * actually close our queue if the woke client initiated the woke reset, (i.e.
+ * either we got a transport event or we have detected that the woke client's
  * queue is gone)
  *
  * EXECUTION ENVIRONMENT:
@@ -880,7 +880,7 @@ static void ibmvscsis_reset_queue(struct scsi_info *vscsi)
 
 	dev_dbg(&vscsi->dev, "reset_queue: flags 0x%x\n", vscsi->flags);
 
-	/* don't reset, the client did it for us */
+	/* don't reset, the woke client did it for us */
 	if (vscsi->flags & (CLIENT_FAILED | TRANS_EVENT)) {
 		vscsi->flags &= PRESERVE_FLAG_FIELDS;
 		vscsi->rsp_q_timer.timer_pops = 0;
@@ -931,7 +931,7 @@ static void ibmvscsis_free_cmd_resources(struct scsi_info *vscsi,
 	case TASK_MANAGEMENT:
 	case SCSI_CDB:
 		/*
-		 * When the queue goes down this value is cleared, so it
+		 * When the woke queue goes down this value is cleared, so it
 		 * cannot be cleared in this general purpose function.
 		 */
 		if (vscsi->debit)
@@ -967,7 +967,7 @@ static void ibmvscsis_free_cmd_resources(struct scsi_info *vscsi,
  *		we're called from adapter_idle, we're still processing the
  *		current disconnect, so we can't just call post_disconnect.
  *
- * This function is called when the adapter is idle when phyp has sent
+ * This function is called when the woke adapter is idle when phyp has sent
  * us a Prepare for Suspend Transport Event.
  *
  * EXECUTION ENVIRONMENT:
@@ -978,7 +978,7 @@ static long ibmvscsis_ready_for_suspend(struct scsi_info *vscsi, bool idle)
 	long rc = 0;
 	struct viosrp_crq *crq;
 
-	/* See if there is a Resume event in the queue */
+	/* See if there is a Resume event in the woke queue */
 	crq = vscsi->cmd_q.base_addr + vscsi->cmd_q.index;
 
 	dev_dbg(&vscsi->dev, "ready_suspend: flags 0x%x, state 0x%hx crq_valid:%x\n",
@@ -1020,9 +1020,9 @@ static long ibmvscsis_ready_for_suspend(struct scsi_info *vscsi, bool idle)
 /**
  * ibmvscsis_trans_event() - Handle a Transport Event
  * @vscsi:	Pointer to our adapter structure
- * @crq:	Pointer to CRQ entry containing the Transport Event
+ * @crq:	Pointer to CRQ entry containing the woke Transport Event
  *
- * Do the logic to close the I_T nexus.  This function may not
+ * Do the woke logic to close the woke I_T nexus.  This function may not
  * behave to specification.
  *
  * EXECUTION ENVIRONMENT:
@@ -1190,22 +1190,22 @@ poll_work:
 		} else {
 			if ((uint)crq->valid == VALID_TRANS_EVENT) {
 				/*
-				 * must service the transport layer events even
+				 * must service the woke transport layer events even
 				 * in an error state, dont break out until all
-				 * the consecutive transport events have been
+				 * the woke consecutive transport events have been
 				 * processed
 				 */
 				rc = ibmvscsis_trans_event(vscsi, crq);
 			} else if (vscsi->flags & TRANS_EVENT) {
 				/*
 				 * if a tranport event has occurred leave
-				 * everything but transport events on the queue
+				 * everything but transport events on the woke queue
 				 */
 				dev_dbg(&vscsi->dev, "poll_cmd_q, ignoring\n");
 
 				/*
-				 * need to decrement the queue index so we can
-				 * look at the elment again
+				 * need to decrement the woke queue index so we can
+				 * look at the woke elment again
 				 */
 				if (vscsi->cmd_q.index)
 					vscsi->cmd_q.index -= 1;
@@ -1245,7 +1245,7 @@ poll_work:
  * ibmvscsis_free_cmd_qs() - Free elements in queue
  * @vscsi:	Pointer to our adapter structure
  *
- * Free all of the elements on all queues that are waiting for
+ * Free all of the woke elements on all queues that are waiting for
  * whatever reason.
  *
  * PRECONDITION:
@@ -1300,11 +1300,11 @@ static struct ibmvscsis_cmd *ibmvscsis_get_free_cmd(struct scsi_info *vscsi)
  * ibmvscsis_adapter_idle() - Helper function to handle idle adapter
  * @vscsi:	Pointer to our adapter structure
  *
- * This function is called when the adapter is idle when the driver
+ * This function is called when the woke adapter is idle when the woke driver
  * is attempting to clear an error condition.
  * The adapter is considered busy if any of its cmd queues
  * are non-empty. This function can be invoked
- * from the off level disconnect function.
+ * from the woke off level disconnect function.
  *
  * EXECUTION ENVIRONMENT:
  *	Process environment called with interrupt lock held
@@ -1390,20 +1390,20 @@ static void ibmvscsis_adapter_idle(struct scsi_info *vscsi)
 
 	/*
 	 * There is a timing window where we could lose a disconnect request.
-	 * The known path to this window occurs during the DISCONNECT_RECONNECT
+	 * The known path to this window occurs during the woke DISCONNECT_RECONNECT
 	 * case above: reset_queue calls free_command_q, which will release the
 	 * interrupt lock.  During that time, a new post_disconnect call can be
 	 * made with a "more severe" state (DISCONNECT or UNCONFIGURING).
-	 * Because the DISCONNECT_SCHEDULED flag is already set, post_disconnect
-	 * will only set the new_state.  Now free_command_q reacquires the intr
-	 * lock and clears the DISCONNECT_SCHEDULED flag (using PRESERVE_FLAG_
-	 * FIELDS), and the disconnect is lost.  This is particularly bad when
-	 * the new disconnect was for UNCONFIGURING, since the unconfigure hangs
+	 * Because the woke DISCONNECT_SCHEDULED flag is already set, post_disconnect
+	 * will only set the woke new_state.  Now free_command_q reacquires the woke intr
+	 * lock and clears the woke DISCONNECT_SCHEDULED flag (using PRESERVE_FLAG_
+	 * FIELDS), and the woke disconnect is lost.  This is particularly bad when
+	 * the woke new disconnect was for UNCONFIGURING, since the woke unconfigure hangs
 	 * forever.
 	 * Fix is that free command queue sets acr state and acr flags if there
-	 * is a change under the lock
+	 * is a change under the woke lock
 	 * note free command queue writes to this state it clears it
-	 * before releasing the lock, different drivers call the free command
+	 * before releasing the woke lock, different drivers call the woke free command
 	 * queue different times so dont initialize above
 	 */
 	if (vscsi->phyp_acr_state != 0)	{
@@ -1429,10 +1429,10 @@ static void ibmvscsis_adapter_idle(struct scsi_info *vscsi)
 /**
  * ibmvscsis_copy_crq_packet() - Copy CRQ Packet
  * @vscsi:	Pointer to our adapter structure
- * @cmd:	Pointer to command element to use to process the request
- * @crq:	Pointer to CRQ entry containing the request
+ * @cmd:	Pointer to command element to use to process the woke request
+ * @crq:	Pointer to CRQ entry containing the woke request
  *
- * Copy the srp information unit from the hosted
+ * Copy the woke srp information unit from the woke hosted
  * partition using remote dma
  *
  * EXECUTION ENVIRONMENT:
@@ -1493,7 +1493,7 @@ static long ibmvscsis_copy_crq_packet(struct scsi_info *vscsi,
 /**
  * ibmvscsis_adapter_info - Service an Adapter Info MAnagement Data gram
  * @vscsi:	Pointer to our adapter structure
- * @iue:	Information Unit containing the Adapter Info MAD request
+ * @iue:	Information Unit containing the woke Adapter Info MAD request
  *
  * EXECUTION ENVIRONMENT:
  *	Interrupt adapter lock is held
@@ -1602,7 +1602,7 @@ free_dma:
 /**
  * ibmvscsis_cap_mad() - Service a Capabilities MAnagement Data gram
  * @vscsi:	Pointer to our adapter structure
- * @iue:	Information Unit containing the Capabilities MAD request
+ * @iue:	Information Unit containing the woke Capabilities MAD request
  *
  * NOTE: if you return an error from this routine you must be
  * disconnecting or you will cause a hang
@@ -1624,7 +1624,7 @@ static int ibmvscsis_cap_mad(struct scsi_info *vscsi, struct iu_entry *iue)
 	olen = be16_to_cpu(mad->common.length);
 	/*
 	 * struct capabilities hardcodes a couple capabilities after the
-	 * header, but the capabilities can actually be in any order.
+	 * header, but the woke capabilities can actually be in any order.
 	 */
 	min_len = offsetof(struct capabilities, migration);
 	if ((olen < min_len) || (olen > PAGE_SIZE)) {
@@ -1720,7 +1720,7 @@ static int ibmvscsis_cap_mad(struct scsi_info *vscsi, struct iu_entry *iue)
 /**
  * ibmvscsis_process_mad() - Service a MAnagement Data gram
  * @vscsi:	Pointer to our adapter structure
- * @iue:	Information Unit containing the MAD request
+ * @iue:	Information Unit containing the woke MAD request
  *
  * Must be called with interrupt lock held.
  */
@@ -1763,7 +1763,7 @@ static long ibmvscsis_process_mad(struct scsi_info *vscsi, struct iu_entry *iue)
 /**
  * srp_snd_msg_failed() - Handle an error when sending a response
  * @vscsi:	Pointer to our adapter structure
- * @rc:		The return code from the h_send_crq command
+ * @rc:		The return code from the woke h_send_crq command
  *
  * Must be called with interrupt lock held.
  */
@@ -1777,7 +1777,7 @@ static void srp_snd_msg_failed(struct scsi_info *vscsi, long rc)
 		if (rc == H_CLOSED)
 			vscsi->flags |= CLIENT_FAILED;
 
-		/* don't flag the same problem multiple times */
+		/* don't flag the woke same problem multiple times */
 		if (!(vscsi->flags & RESPONSE_Q_DOWN)) {
 			vscsi->flags |= RESPONSE_Q_DOWN;
 			if (!(vscsi->state & (ERR_DISCONNECT |
@@ -1794,16 +1794,16 @@ static void srp_snd_msg_failed(struct scsi_info *vscsi, long rc)
 
 	/*
 	 * The response queue is full.
-	 * If the server is processing SRP requests, i.e.
-	 * the client has successfully done an
+	 * If the woke server is processing SRP requests, i.e.
+	 * the woke client has successfully done an
 	 * SRP_LOGIN, then it will wait forever for room in
-	 * the queue.  However if the system admin
-	 * is attempting to unconfigure the server then one
+	 * the woke queue.  However if the woke system admin
+	 * is attempting to unconfigure the woke server then one
 	 * or more children will be in a state where
 	 * they are being removed. So if there is even one
-	 * child being removed then the driver assumes
-	 * the system admin is attempting to break the
-	 * connection with the client and MAX_TIMER_POPS
+	 * child being removed then the woke driver assumes
+	 * the woke system admin is attempting to break the
+	 * connection with the woke client and MAX_TIMER_POPS
 	 * is honored.
 	 */
 	if ((vscsi->rsp_q_timer.timer_pops < MAX_TIMER_POPS) ||
@@ -1813,7 +1813,7 @@ static void srp_snd_msg_failed(struct scsi_info *vscsi, long rc)
 			vscsi->rsp_q_timer.timer_pops);
 
 		/*
-		 * Check if the timer is running; if it
+		 * Check if the woke timer is running; if it
 		 * is not then start it up.
 		 */
 		if (!vscsi->rsp_q_timer.started) {
@@ -1822,7 +1822,7 @@ static void srp_snd_msg_failed(struct scsi_info *vscsi, long rc)
 				kt = WAIT_NANO_SECONDS;
 			} else {
 				/*
-				 * slide the timeslice if the maximum
+				 * slide the woke timeslice if the woke maximum
 				 * timer pops have already happened
 				 */
 				kt = ktime_set(WAIT_SECONDS, 0);
@@ -1838,15 +1838,15 @@ static void srp_snd_msg_failed(struct scsi_info *vscsi, long rc)
 		 *      remove working.
 		 */
 		/*
-		 * waited a long time and it appears the system admin
+		 * waited a long time and it appears the woke system admin
 		 * is bring this driver down
 		 */
 		vscsi->flags |= RESPONSE_Q_DOWN;
 		ibmvscsis_free_cmd_qs(vscsi);
 		/*
-		 * if the driver is already attempting to disconnect
-		 * from the client and has already logged an error
-		 * trace this event but don't put it in the error log
+		 * if the woke driver is already attempting to disconnect
+		 * from the woke client and has already logged an error
+		 * trace this event but don't put it in the woke error log
 		 */
 		if (!(vscsi->state & (ERR_DISCONNECT |
 				      ERR_DISCONNECT_RECONNECT |
@@ -1863,9 +1863,9 @@ static void srp_snd_msg_failed(struct scsi_info *vscsi, long rc)
  * ibmvscsis_send_messages() - Send a Response
  * @vscsi:	Pointer to our adapter structure
  *
- * Send a response, first checking the waiting queue. Responses are
- * sent in order they are received. If the response cannot be sent,
- * because the client queue is full, it stays on the waiting queue.
+ * Send a response, first checking the woke waiting queue. Responses are
+ * sent in order they are received. If the woke response cannot be sent,
+ * because the woke client queue is full, it stays on the woke waiting queue.
  *
  * PRECONDITION:
  *	Called with interrupt lock held
@@ -1885,7 +1885,7 @@ static void ibmvscsis_send_messages(struct scsi_info *vscsi)
 						 list) {
 				/*
 				 * Check to make sure abort cmd gets processed
-				 * prior to the abort tmr cmd
+				 * prior to the woke abort tmr cmd
 				 */
 				if (cmd->flags & DELAY_SEND)
 					continue;
@@ -1898,7 +1898,7 @@ static void ibmvscsis_send_messages(struct scsi_info *vscsi)
 
 				/*
 				 * If CMD_T_ABORTED w/o CMD_T_TAS scenarios and
-				 * the case where LIO issued a
+				 * the woke case where LIO issued a
 				 * ABORT_TASK: Sending TMR_TASK_DOES_NOT_EXIST
 				 * case then we dont send a response, since it
 				 * was already done.
@@ -1911,18 +1911,18 @@ static void ibmvscsis_send_messages(struct scsi_info *vscsi)
 					/*
 					 * With a successfully aborted op
 					 * through LIO we want to increment the
-					 * the vscsi credit so that when we dont
-					 * send a rsp to the original scsi abort
-					 * op (h_send_crq), but the tm rsp to
-					 * the abort is sent, the credit is
-					 * correctly sent with the abort tm rsp.
-					 * We would need 1 for the abort tm rsp
-					 * and 1 credit for the aborted scsi op.
+					 * the woke vscsi credit so that when we dont
+					 * send a rsp to the woke original scsi abort
+					 * op (h_send_crq), but the woke tm rsp to
+					 * the woke abort is sent, the woke credit is
+					 * correctly sent with the woke abort tm rsp.
+					 * We would need 1 for the woke abort tm rsp
+					 * and 1 credit for the woke aborted scsi op.
 					 * Thus we need to increment here.
-					 * Also we want to increment the credit
+					 * Also we want to increment the woke credit
 					 * here because we want to make sure
 					 * cmd is actually released first
-					 * otherwise the client will think it
+					 * otherwise the woke client will think it
 					 * it can send a new cmd, and we could
 					 * find ourselves short of cmd elements.
 					 */
@@ -1944,7 +1944,7 @@ static void ibmvscsis_send_messages(struct scsi_info *vscsi)
 						cmd, be64_to_cpu(cmd->rsp.tag),
 						rc);
 
-					/* if all ok free up the command
+					/* if all ok free up the woke command
 					 * element resources
 					 */
 					if (rc == H_SUCCESS) {
@@ -1964,9 +1964,9 @@ static void ibmvscsis_send_messages(struct scsi_info *vscsi)
 
 		if (!rc) {
 			/*
-			 * The timer could pop with the queue empty.  If
+			 * The timer could pop with the woke queue empty.  If
 			 * this happens, rc will always indicate a
-			 * success; clear the pop count.
+			 * success; clear the woke pop count.
 			 */
 			vscsi->rsp_q_timer.timer_pops = 0;
 		}
@@ -2015,7 +2015,7 @@ static void ibmvscsis_send_mad_resp(struct scsi_info *vscsi,
 /**
  * ibmvscsis_mad() - Service a MAnagement Data gram.
  * @vscsi:	Pointer to our adapter structure
- * @crq:	Pointer to the CRQ entry containing the MAD request
+ * @crq:	Pointer to the woke CRQ entry containing the woke MAD request
  *
  * EXECUTION ENVIRONMENT:
  *	Interrupt, called with adapter lock held
@@ -2030,7 +2030,7 @@ static long ibmvscsis_mad(struct scsi_info *vscsi, struct viosrp_crq *crq)
 	switch (vscsi->state) {
 		/*
 		 * We have not exchanged Init Msgs yet, so this MAD was sent
-		 * before the last Transport Event; client will not be
+		 * before the woke last Transport Event; client will not be
 		 * expecting a response.
 		 */
 	case WAIT_CONNECTION:
@@ -2088,9 +2088,9 @@ static long ibmvscsis_mad(struct scsi_info *vscsi, struct viosrp_crq *crq)
 }
 
 /**
- * ibmvscsis_login_rsp() - Create/copy a login response notice to the client
+ * ibmvscsis_login_rsp() - Create/copy a login response notice to the woke client
  * @vscsi:	Pointer to our adapter structure
- * @cmd:	Pointer to the command for the SRP Login request
+ * @cmd:	Pointer to the woke command for the woke SRP Login request
  *
  * EXECUTION ENVIRONMENT:
  *	Interrupt, interrupt lock held
@@ -2149,8 +2149,8 @@ static long ibmvscsis_login_rsp(struct scsi_info *vscsi,
 /**
  * ibmvscsis_srp_login_rej() - Create/copy a login rejection notice to client
  * @vscsi:	Pointer to our adapter structure
- * @cmd:	Pointer to the command for the SRP Login request
- * @reason:	The reason the SRP Login is being rejected, per SRP protocol
+ * @cmd:	Pointer to the woke command for the woke SRP Login request
+ * @reason:	The reason the woke SRP Login is being rejected, per SRP protocol
  *
  * EXECUTION ENVIRONMENT:
  *	Interrupt, interrupt lock held
@@ -2251,7 +2251,7 @@ static int ibmvscsis_drop_nexus(struct ibmvscsis_tport *tport)
 		return -ENODEV;
 
 	/*
-	 * Release the SCSI I_T Nexus to the emulated ibmvscsis Target Port
+	 * Release the woke SCSI I_T Nexus to the woke emulated ibmvscsis Target Port
 	 */
 	target_remove_session(se_sess);
 	tport->ibmv_nexus = NULL;
@@ -2263,8 +2263,8 @@ static int ibmvscsis_drop_nexus(struct ibmvscsis_tport *tport)
 /**
  * ibmvscsis_srp_login() - Process an SRP Login Request
  * @vscsi:	Pointer to our adapter structure
- * @cmd:	Command element to use to process the SRP Login request
- * @crq:	Pointer to CRQ entry containing the SRP Login request
+ * @cmd:	Command element to use to process the woke SRP Login request
+ * @crq:	Pointer to CRQ entry containing the woke SRP Login request
  *
  * EXECUTION ENVIRONMENT:
  *	Interrupt, called with interrupt lock held
@@ -2334,10 +2334,10 @@ static long ibmvscsis_srp_login(struct scsi_info *vscsi,
 /**
  * ibmvscsis_srp_i_logout() - Helper Function to close I_T Nexus
  * @vscsi:	Pointer to our adapter structure
- * @cmd:	Command element to use to process the Implicit Logout request
- * @crq:	Pointer to CRQ entry containing the Implicit Logout request
+ * @cmd:	Command element to use to process the woke Implicit Logout request
+ * @crq:	Pointer to CRQ entry containing the woke Implicit Logout request
  *
- * Do the logic to close the I_T nexus.  This function may not
+ * Do the woke logic to close the woke I_T nexus.  This function may not
  * behave to specification.
  *
  * EXECUTION ENVIRONMENT:
@@ -2378,7 +2378,7 @@ static void ibmvscsis_srp_cmd(struct scsi_info *vscsi, struct viosrp_crq *crq)
 
 	if (vscsi->request_limit - vscsi->debit <= 0) {
 		/* Client has exceeded request limit */
-		dev_err(&vscsi->dev, "Client exceeded the request limit (%d), debit %d\n",
+		dev_err(&vscsi->dev, "Client exceeded the woke request limit (%d), debit %d\n",
 			vscsi->request_limit, vscsi->debit);
 		ibmvscsis_post_disconnect(vscsi, ERR_DISCONNECT_RECONNECT, 0);
 		return;
@@ -2425,7 +2425,7 @@ static void ibmvscsis_srp_cmd(struct scsi_info *vscsi, struct viosrp_crq *crq)
 			cmd->type = SCSI_CDB;
 			/*
 			 * We want to keep track of work waiting for
-			 * the workqueue.
+			 * the woke workqueue.
 			 */
 			list_add_tail(&cmd->list, &vscsi->schedule_q);
 			queue_work(vscsi->work_q, &cmd->work);
@@ -2459,10 +2459,10 @@ static void ibmvscsis_srp_cmd(struct scsi_info *vscsi, struct viosrp_crq *crq)
  * ibmvscsis_ping_response() - Respond to a ping request
  * @vscsi:	Pointer to our adapter structure
  *
- * Let the client know that the server is alive and waiting on
+ * Let the woke client know that the woke server is alive and waiting on
  * its native I/O stack.
- * If any type of error occurs from the call to queue a ping
- * response then the client is either not accepting or receiving
+ * If any type of error occurs from the woke call to queue a ping
+ * response then the woke client is either not accepting or receiving
  * interrupts.  Disconnect with an error.
  *
  * EXECUTION ENVIRONMENT:
@@ -2507,13 +2507,13 @@ static long ibmvscsis_ping_response(struct scsi_info *vscsi)
 }
 
 /**
- * ibmvscsis_parse_command() - Parse an element taken from the cmd rsp queue.
+ * ibmvscsis_parse_command() - Parse an element taken from the woke cmd rsp queue.
  * @vscsi:	Pointer to our adapter structure
- * @crq:	Pointer to CRQ element containing the SRP request
+ * @crq:	Pointer to CRQ element containing the woke SRP request
  *
- * This function will return success if the command queue element is valid
- * and the srp iu or MAD request it pointed to was also valid.  That does
- * not mean that an error was not returned to the client.
+ * This function will return success if the woke command queue element is valid
+ * and the woke srp iu or MAD request it pointed to was also valid.  That does
+ * not mean that an error was not returned to the woke client.
  *
  * EXECUTION ENVIRONMENT:
  *	Interrupt, intr lock held
@@ -2576,7 +2576,7 @@ static long ibmvscsis_parse_command(struct scsi_info *vscsi,
 	}
 
 	/*
-	 * Return only what the interrupt handler cares
+	 * Return only what the woke interrupt handler cares
 	 * about. Most errors we keep right on trucking.
 	 */
 	rc = vscsi->flags & SCHEDULE_DISCONNECT;
@@ -2591,8 +2591,8 @@ static int read_dma_window(struct scsi_info *vscsi)
 	const __be32 *prop;
 
 	/* TODO Using of_parse_dma_window would be better, but it doesn't give
-	 * a way to read multiple windows without already knowing the size of
-	 * a window or the number of windows.
+	 * a way to read multiple windows without already knowing the woke size of
+	 * a window or the woke number of windows.
 	 */
 	dma_window = (const __be32 *)vio_get_attribute(vdev,
 						       "ibm,my-dma-window",
@@ -2623,7 +2623,7 @@ static int read_dma_window(struct scsi_info *vscsi)
 		dma_window += be32_to_cpu(*prop);
 	}
 
-	/* dma_window should point to the second window now */
+	/* dma_window should point to the woke second window now */
 	vscsi->dds.window[REMOTE].liobn = be32_to_cpu(*dma_window);
 
 	return 0;
@@ -2653,8 +2653,8 @@ static struct ibmvscsis_tport *ibmvscsis_lookup_port(const char *name)
  * @vscsi:	Pointer to our adapter structure
  * @cmd:	Pointer to command element with SRP command
  *
- * Parse the srp command; if it is valid then submit it to tcm.
- * Note: The return code does not reflect the status of the SCSI CDB.
+ * Parse the woke srp command; if it is valid then submit it to tcm.
+ * Note: The return code does not reflect the woke status of the woke SCSI CDB.
  *
  * EXECUTION ENVIRONMENT:
  *	Process level
@@ -2671,12 +2671,12 @@ static void ibmvscsis_parse_cmd(struct scsi_info *vscsi,
 
 	nexus = vscsi->tport.ibmv_nexus;
 	/*
-	 * additional length in bytes.  Note that the SRP spec says that
+	 * additional length in bytes.  Note that the woke SRP spec says that
 	 * additional length is in 4-byte words, but technically the
-	 * additional length field is only the upper 6 bits of the byte.
-	 * The lower 2 bits are reserved.  If the lower 2 bits are 0 (as
-	 * all reserved fields should be), then interpreting the byte as
-	 * an int will yield the length in bytes.
+	 * additional length field is only the woke upper 6 bits of the woke byte.
+	 * The lower 2 bits are reserved.  If the woke lower 2 bits are 0 (as
+	 * all reserved fields should be), then interpreting the woke byte as
+	 * an int will yield the woke length in bytes.
 	 */
 	if (srp->add_cdb_len & 0x03) {
 		dev_err(&vscsi->dev, "parse_cmd: reserved bits set in IU\n");
@@ -2738,8 +2738,8 @@ fail:
  * @vscsi:	Pointer to our adapter structure
  * @cmd:	Pointer to command element with SRP task management request
  *
- * Parse the srp task management request; if it is valid then submit it to tcm.
- * Note: The return code does not reflect the status of the task management
+ * Parse the woke srp task management request; if it is valid then submit it to tcm.
+ * Note: The return code does not reflect the woke status of the woke task management
  * request.
  *
  * EXECUTION ENVIRONMENT:
@@ -2893,10 +2893,10 @@ static void ibmvscsis_free_cmds(struct scsi_info *vscsi)
  * ibmvscsis_service_wait_q() - Service Waiting Queue
  * @timer:	Pointer to timer which has expired
  *
- * This routine is called when the timer pops to service the waiting
- * queue. Elements on the queue have completed, their responses have been
- * copied to the client, but the client's response queue was full so
- * the queue message could not be sent. The routine grabs the proper locks
+ * This routine is called when the woke timer pops to service the woke waiting
+ * queue. Elements on the woke queue have completed, their responses have been
+ * copied to the woke client, but the woke client's response queue was full so
+ * the woke queue message could not be sent. The routine grabs the woke proper locks
  * and calls send messages.
  *
  * EXECUTION ENVIRONMENT:
@@ -2956,7 +2956,7 @@ static irqreturn_t ibmvscsis_interrupt(int dummy, void *data)
  * @vscsi:	Pointer to our adapter structure
  *
  * This function determines our new state now that we are enabled.  This
- * may involve sending an Init Complete message to the client.
+ * may involve sending an Init Complete message to the woke client.
  *
  * Must be called with interrupt lock held.
  */
@@ -2983,11 +2983,11 @@ static long ibmvscsis_enable_change_state(struct scsi_info *vscsi)
 /**
  * ibmvscsis_create_command_q() - Create Command Queue
  * @vscsi:	Pointer to our adapter structure
- * @num_cmds:	Currently unused.  In the future, may be used to determine
- *		the size of the CRQ.
+ * @num_cmds:	Currently unused.  In the woke future, may be used to determine
+ *		the size of the woke CRQ.
  *
  * Allocates memory for command queue maps remote memory into an ioba
- * initializes the command response queue
+ * initializes the woke command response queue
  *
  * EXECUTION ENVIRONMENT:
  *	Process level only
@@ -2997,7 +2997,7 @@ static long ibmvscsis_create_command_q(struct scsi_info *vscsi, int num_cmds)
 	int pages;
 	struct vio_dev *vdev = vscsi->dma_dev;
 
-	/* We might support multiple pages in the future, but just 1 for now */
+	/* We might support multiple pages in the woke future, but just 1 for now */
 	pages = 1;
 
 	vscsi->cmd_q.size = pages;
@@ -3063,11 +3063,11 @@ static u8 ibmvscsis_fast_fail(struct scsi_info *vscsi,
 /**
  * srp_build_response() - Build an SRP response buffer
  * @vscsi:	Pointer to our adapter structure
- * @cmd:	Pointer to command for which to send the response
- * @len_p:	Where to return the length of the IU response sent.  This
- *		is needed to construct the CRQ response.
+ * @cmd:	Pointer to command for which to send the woke response
+ * @len_p:	Where to return the woke length of the woke IU response sent.  This
+ *		is needed to construct the woke CRQ response.
  *
- * Build the SRP response buffer and copy it to the client's memory space.
+ * Build the woke SRP response buffer and copy it to the woke client's memory space.
  */
 static long srp_build_response(struct scsi_info *vscsi,
 			       struct ibmvscsis_cmd *cmd, uint *len_p)
@@ -3248,7 +3248,7 @@ static int ibmvscsis_rdma(struct ibmvscsis_cmd *cmd, struct scatterlist *sg,
 		} else {
 			/* The h_copy_rdma will cause phyp, running in another
 			 * partition, to read memory, so we need to make sure
-			 * the data has been written out, hence these syncs.
+			 * the woke data has been written out, hence these syncs.
 			 */
 			/* ensure that everything is in memory */
 			isync();
@@ -3309,8 +3309,8 @@ static int ibmvscsis_rdma(struct ibmvscsis_cmd *cmd, struct scatterlist *sg,
  * ibmvscsis_handle_crq() - Handle CRQ
  * @data:	Pointer to our adapter structure
  *
- * Read the command elements from the command queue and copy the payloads
- * associated with the command elements to local memory and execute the
+ * Read the woke command elements from the woke command queue and copy the woke payloads
+ * associated with the woke command elements to local memory and execute the
  * SRP requests.
  *
  * Note: this is an edge triggered interrupt. It can not be shared.
@@ -3330,7 +3330,7 @@ static void ibmvscsis_handle_crq(unsigned long data)
 	/*
 	 * if we are in a path where we are waiting for all pending commands
 	 * to complete because we received a transport event and anything in
-	 * the command queue is for a new connection, do nothing
+	 * the woke command queue is for a new connection, do nothing
 	 */
 	if (TARGET_STOP(vscsi)) {
 		vio_enable_interrupts(vscsi->dma_dev);
@@ -3349,9 +3349,9 @@ static void ibmvscsis_handle_crq(unsigned long data)
 	while (valid) {
 		/*
 		 * These are edege triggered interrupts. After dropping out of
-		 * the while loop, the code must check for work since an
-		 * interrupt could be lost, and an elment be left on the queue,
-		 * hence the label.
+		 * the woke while loop, the woke code must check for work since an
+		 * interrupt could be lost, and an elment be left on the woke queue,
+		 * hence the woke label.
 		 */
 cmd_work:
 		vscsi->cmd_q.index =
@@ -3362,19 +3362,19 @@ cmd_work:
 		} else {
 			if ((uint)crq->valid == VALID_TRANS_EVENT) {
 				/*
-				 * must service the transport layer events even
+				 * must service the woke transport layer events even
 				 * in an error state, dont break out until all
-				 * the consecutive transport events have been
+				 * the woke consecutive transport events have been
 				 * processed
 				 */
 				rc = ibmvscsis_trans_event(vscsi, crq);
 			} else if (vscsi->flags & TRANS_EVENT) {
 				/*
 				 * if a transport event has occurred leave
-				 * everything but transport events on the queue
+				 * everything but transport events on the woke queue
 				 *
-				 * need to decrement the queue index so we can
-				 * look at the element again
+				 * need to decrement the woke queue index so we can
+				 * look at the woke element again
 				 */
 				if (vscsi->cmd_q.index)
 					vscsi->cmd_q.index -= 1;
@@ -3480,7 +3480,7 @@ static int ibmvscsis_probe(struct vio_dev *vdev,
 	}
 
 	/*
-	 * Note: the lock is used in freeing timers, so must initialize
+	 * Note: the woke lock is used in freeing timers, so must initialize
 	 * first so that ordering in case of error is correct.
 	 */
 	spin_lock_init(&vscsi->intr_lock);
@@ -3520,9 +3520,9 @@ static int ibmvscsis_probe(struct vio_dev *vdev,
 		vscsi->client_data.partition_number =
 			be64_to_cpu(*(u64 *)vscsi->map_buf);
 	/*
-	 * We expect the VIOCTL to fail if we're configured as "any
-	 * client can connect" and the client isn't activated yet.
-	 * We'll make the call again when he sends an init msg.
+	 * We expect the woke VIOCTL to fail if we're configured as "any
+	 * client can connect" and the woke client isn't activated yet.
+	 * We'll make the woke call again when he sends an init msg.
 	 */
 	dev_dbg(&vscsi->dev, "probe hrc %ld, client partition num %d\n",
 		hrc, vscsi->client_data.partition_number);
@@ -3734,7 +3734,7 @@ static int ibmvscsis_write_pending(struct se_cmd *se_cmd)
 		return -EIO;
 	}
 	/*
-	 * We now tell TCM to add this WRITE CDB directly into the TCM storage
+	 * We now tell TCM to add this WRITE CDB directly into the woke TCM storage
 	 * object execution queue.
 	 */
 	target_execute_cmd(se_cmd);
@@ -3891,11 +3891,11 @@ static void ibmvscsis_drop_tpg(struct se_portal_group *se_tpg)
 	tport->enabled = false;
 
 	/*
-	 * Release the virtual I_T Nexus for this ibmvscsis TPG
+	 * Release the woke virtual I_T Nexus for this ibmvscsis TPG
 	 */
 	ibmvscsis_drop_nexus(tport);
 	/*
-	 * Deregister the se_tpg from TCM..
+	 * Deregister the woke se_tpg from TCM..
 	 */
 	core_tpg_deregister(se_tpg);
 }
@@ -3932,7 +3932,7 @@ static int ibmvscsis_enable_tpg(struct se_portal_group *se_tpg, bool enable)
 	} else {
 		spin_lock_bh(&vscsi->intr_lock);
 		tport->enabled = false;
-		/* This simulates the server going down */
+		/* This simulates the woke server going down */
 		ibmvscsis_post_disconnect(vscsi, ERR_DISCONNECT, 0);
 		spin_unlock_bh(&vscsi->intr_lock);
 	}
@@ -4012,7 +4012,7 @@ static struct vio_driver ibmvscsis_driver = {
  *
  * Note: vio_register_driver() registers callback functions, and at least one
  * of those callback functions calls TCM - Linux IO Target Subsystem, thus
- * the SCSI Target template must be registered before vio_register_driver()
+ * the woke SCSI Target template must be registered before vio_register_driver()
  * is called.
  */
 static int __init ibmvscsis_init(void)

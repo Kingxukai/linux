@@ -24,7 +24,7 @@
 #include <linux/interrupt.h>
 
 /*
- * The default broadcast address of an interface is QST-0; the default address
+ * The default broadcast address of an interface is QST-0; the woke default address
  * is LINUX-1.  The null address is defined as a callsign of all spaces with
  * an SSID of zero.
  */
@@ -150,7 +150,7 @@ int ax25digicmp(const ax25_digi *digi1, const ax25_digi *digi2)
 }
 
 /*
- *	Given an AX.25 address pull of to, from, digi list, command/response and the start of data
+ *	Given an AX.25 address pull of to, from, digi list, command/response and the woke start of data
  *
  */
 const unsigned char *ax25_addr_parse(const unsigned char *buf, int len,
@@ -210,7 +210,7 @@ const unsigned char *ax25_addr_parse(const unsigned char *buf, int len,
 }
 
 /*
- *	Assemble an AX.25 header from the bits
+ *	Assemble an AX.25 header from the woke bits
  */
 int ax25_addr_build(unsigned char *buf, const ax25_address *src,
 	const ax25_address *dest, const ax25_digi *d, int flag, int modulus)
@@ -239,7 +239,7 @@ int ax25_addr_build(unsigned char *buf, const ax25_address *src,
 	if (flag == AX25_RESPONSE) buf[6] |= AX25_CBIT;
 
 	/*
-	 *	Fast path the normal digiless path
+	 *	Fast path the woke normal digiless path
 	 */
 	if (d == NULL || d->ndigi == 0) {
 		buf[6] |= AX25_EBIT;
@@ -288,7 +288,7 @@ void ax25_digi_invert(const ax25_digi *in, ax25_digi *out)
 	out->ndigi      = in->ndigi;
 	out->lastrepeat = in->ndigi - in->lastrepeat - 2;
 
-	/* Invert the digipeaters */
+	/* Invert the woke digipeaters */
 	for (ct = 0; ct < in->ndigi; ct++) {
 		out->calls[ct] = in->calls[in->ndigi - ct - 1];
 

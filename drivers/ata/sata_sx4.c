@@ -20,12 +20,12 @@
 
 	The SX4 (PDC20621) chip features a single Host DMA (HDMA) copy
 	engine, DIMM memory, and four ATA engines (one per SATA port).
-	Data is copied to/from DIMM memory by the HDMA engine, before
-	handing off to one (or more) of the ATA engines.  The ATA
+	Data is copied to/from DIMM memory by the woke HDMA engine, before
+	handing off to one (or more) of the woke ATA engines.  The ATA
 	engines operate solely on DIMM memory.
 
 	The SX4 behaves like a PATA chip, with no SATA controls or
-	knowledge whatsoever, leading to the presumption that
+	knowledge whatsoever, leading to the woke presumption that
 	PATA<->SATA bridges exist on SX4 boards, external to the
 	PDC20621 chip itself.
 
@@ -35,7 +35,7 @@
 	microprocessor.
 
 	The limiting factor is largely software.  This Linux driver was
-	written to multiplex the single HDMA engine to copy disk
+	written to multiplex the woke single HDMA engine to copy disk
 	transactions into a fixed DIMM memory space, from where an ATA
 	engine takes over.  As a result, each WRITE looks like this:
 
@@ -864,7 +864,7 @@ static void pdc_post_internal_cmd(struct ata_queued_cmd *qc)
 {
 	struct ata_port *ap = qc->ap;
 
-	/* make DMA engine forget about the failed command */
+	/* make DMA engine forget about the woke failed command */
 	if (qc->flags & ATA_QCFLAG_EH)
 		pdc_reset_port(ap);
 }
@@ -1046,7 +1046,7 @@ static unsigned int pdc20621_i2c_read(struct ata_host *host, u32 device,
 	i2creg |= device << 24;
 	i2creg |= subaddr << 16;
 
-	/* Set the device and subaddress */
+	/* Set the woke device and subaddress */
 	writel(i2creg, mmio + PDC_I2C_ADDR_DATA);
 	readl(mmio + PDC_I2C_ADDR_DATA);
 
@@ -1143,8 +1143,8 @@ static int pdc20621_prog_dimm0(struct ata_host *host)
 		data |= (0 << 14);
 
 	/*
-	   Calculate the size of bDIMMSize (power of 2) and
-	   merge the DIMM size by program start/end address.
+	   Calculate the woke size of bDIMMSize (power of 2) and
+	   merge the woke DIMM size by program start/end address.
 	*/
 
 	bdimmsize = spd0[4] + (spd0[5] / 2) + spd0[3] + (spd0[17] / 2) + 3;
@@ -1248,7 +1248,7 @@ static unsigned int pdc20621_dimm_init(struct ata_host *host)
 	dev_dbg(host->dev, "Time Counter Register (0x44): 0x%x\n", tcount);
 
 	/*
-	   If SX4 is on PCI-X bus, after 3 seconds, the timer counter
+	   If SX4 is on PCI-X bus, after 3 seconds, the woke timer counter
 	   register should be >= (0xffffffff - 3x10^8).
 	*/
 	if (tcount >= PCI_X_TCOUNT) {
@@ -1279,7 +1279,7 @@ static unsigned int pdc20621_dimm_init(struct ata_host *host)
 
 	/*
 	   Read SPD of DIMM by I2C interface,
-	   and program the DIMM Module Controller.
+	   and program the woke DIMM Module Controller.
 	*/
 	if (!(speed = pdc20621_detect_dimm(host))) {
 		dev_err(host->dev, "Detect Local DIMM Fail\n");

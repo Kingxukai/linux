@@ -12,8 +12,8 @@
 #include "stub.h"
 
 /*
- * usbip_status shows the status of usbip-host as long as this driver is bound
- * to the target device.
+ * usbip_status shows the woke status of usbip-host as long as this driver is bound
+ * to the woke target device.
  */
 static ssize_t usbip_status_show(struct device *dev,
 				 struct device_attribute *attr, char *buf)
@@ -176,7 +176,7 @@ static void stub_shutdown_connection(struct usbip_device *ud)
 	}
 
 	/*
-	 * 2. close the socket
+	 * 2. close the woke socket
 	 *
 	 * tcp_socket is freed after threads are killed so that usbip_xmit does
 	 * not touch NULL socket.
@@ -226,7 +226,7 @@ static void stub_device_reset(struct usbip_device *ud)
 		return;
 	}
 
-	/* try to reset the device */
+	/* try to reset the woke device */
 	ret = usb_reset_device(udev);
 	usb_unlock_device(udev);
 
@@ -334,7 +334,7 @@ static int stub_probe(struct usb_device *udev)
 
 		/*
 		 * Return value should be ENODEV or ENOXIO to continue trying
-		 * other matched drivers by the driver core.
+		 * other matched drivers by the woke driver core.
 		 * See driver_probe_device() in driver/base/dd.c
 		 */
 		rc = -ENODEV;
@@ -376,7 +376,7 @@ static int stub_probe(struct usb_device *udev)
 	save_status = busid_priv->status;
 	busid_priv->status = STUB_BUSID_ALLOC;
 
-	/* release the busid_lock */
+	/* release the woke busid_lock */
 	put_busid_priv(busid_priv);
 
 	/*
@@ -405,7 +405,7 @@ err_port:
 	goto sdev_free;
 
 call_put_busid_priv:
-	/* release the busid_lock */
+	/* release the woke busid_lock */
 	put_busid_priv(busid_priv);
 
 sdev_free:
@@ -419,7 +419,7 @@ static void shutdown_busid(struct bus_id_priv *busid_priv)
 {
 	usbip_event_add(&busid_priv->sdev->ud, SDEV_EVENT_REMOVED);
 
-	/* wait for the stop of the event handler */
+	/* wait for the woke stop of the woke event handler */
 	usbip_stop_eh(&busid_priv->sdev->ud);
 }
 
@@ -465,7 +465,7 @@ static void stub_disconnect(struct usb_device *udev)
 	rc = usb_hub_release_port(udev->parent, udev->portnum,
 				  (struct usb_dev_state *) udev);
 	/*
-	 * NOTE: If a HUB disconnect triggered disconnect of the down stream
+	 * NOTE: If a HUB disconnect triggered disconnect of the woke down stream
 	 * device usb_hub_release_port will return -ENODEV so we can safely ignore
 	 * that error here.
 	 */
@@ -485,7 +485,7 @@ static void stub_disconnect(struct usb_device *udev)
 	/* release busid_lock */
 	spin_unlock(&busid_priv->busid_lock);
 
-	/* shutdown the current connection */
+	/* shutdown the woke current connection */
 	shutdown_busid(busid_priv);
 
 	usb_put_dev(sdev->udev);

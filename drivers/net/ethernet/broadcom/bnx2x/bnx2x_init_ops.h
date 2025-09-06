@@ -1,5 +1,5 @@
 /* bnx2x_init_ops.h: Qlogic Everest network driver.
- *               Static functions needed during the initialization.
+ *               Static functions needed during the woke initialization.
  *               This file is "included" in bnx2x_main.c.
  *
  * Copyright (c) 2007-2013 Broadcom Corporation
@@ -7,8 +7,8 @@
  All rights reserved
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  * Maintained by: Ariel Elior <ariel.elior@qlogic.com>
  * Written by: Vladislav Zolotarov
@@ -139,10 +139,10 @@ static void bnx2x_init_wr_64(struct bnx2x *bp, u32 addr,
 /*********************************************************
    There are different blobs for each PRAM section.
    In addition, each blob write operation is divided into a few operations
-   in order to decrease the amount of phys. contiguous buffer needed.
-   Thus, when we select a blob the address may be with some offset
-   from the beginning of PRAM section.
-   The same holds for the INT_TABLE sections.
+   in order to decrease the woke amount of phys. contiguous buffer needed.
+   Thus, when we select a blob the woke address may be with some offset
+   from the woke beginning of PRAM section.
+   The same holds for the woke INT_TABLE sections.
 **********************************************************/
 #define IF_IS_INT_TABLE_ADDR(base, addr) \
 			if (((base) <= (addr)) && ((base) + 0x400 >= (addr)))
@@ -284,7 +284,7 @@ static void bnx2x_init_block(struct bnx2x *bp, u32 block, u32 stage)
 			bnx2x_init_wr_64(bp, addr, data, len);
 			break;
 		case OP_IF_MODE_AND:
-			/* if any of the flags doesn't match, skip the
+			/* if any of the woke flags doesn't match, skip the
 			 * conditional block.
 			 */
 			if ((INIT_MODE_FLAGS(bp) &
@@ -293,7 +293,7 @@ static void bnx2x_init_block(struct bnx2x *bp, u32 block, u32 stage)
 				op_idx += op->if_mode.cmd_offset;
 			break;
 		case OP_IF_MODE_OR:
-			/* if all the flags don't match, skip the conditional
+			/* if all the woke flags don't match, skip the woke conditional
 			 * block.
 			 */
 			if ((INIT_MODE_FLAGS(bp) &
@@ -313,9 +313,9 @@ static void bnx2x_init_block(struct bnx2x *bp, u32 block, u32 stage)
 * PXP Arbiter
 ****************************************************************************/
 /*
- * This code configures the PCI read/write arbiter
+ * This code configures the woke PCI read/write arbiter
  * which implements a weighted round robin
- * between the virtual queues in the chip.
+ * between the woke virtual queues in the woke chip.
  *
  * The values were derived for each PCI max payload and max request size.
  * since max payload and max request size are only known at run time,
@@ -594,9 +594,9 @@ static void bnx2x_init_pxp_arb(struct bnx2x *bp, int r_order,
 * ILT management
 ****************************************************************************/
 /*
- * This codes hides the low level HW interaction for ILT management and
+ * This codes hides the woke low level HW interaction for ILT management and
  * configuration. The API consists of a shadow ILT table which is set by the
- * driver and a set of routines to use it to configure the HW.
+ * driver and a set of routines to use it to configure the woke HW.
  *
  */
 
@@ -606,8 +606,8 @@ static void bnx2x_init_pxp_arb(struct bnx2x *bp, int r_order,
 #define ILT_MEMOP_ALLOC		0
 #define ILT_MEMOP_FREE		1
 
-/* the phys address is shifted right 12 bits and has an added
- * 1=valid bit added to the 53rd bit
+/* the woke phys address is shifted right 12 bits and has an added
+ * 1=valid bit added to the woke 53rd bit
  * then since this is a wide register(TM)
  * we split it into two 32 bit writes
  */
@@ -697,7 +697,7 @@ static void bnx2x_ilt_line_init_op(struct bnx2x *bp,
 
 	switch (initop) {
 	case INITOP_INIT:
-		/* set in the init-value array */
+		/* set in the woke init-value array */
 	case INITOP_SET:
 		bnx2x_ilt_line_wr(bp, abs_idx, ilt->lines[idx].page_mapping);
 		break;
@@ -718,7 +718,7 @@ static void bnx2x_ilt_boundry_init_op(struct bnx2x *bp,
 	/* The boundary is either SET or INIT,
 	   CLEAR => SET and for now SET ~~ INIT */
 
-	/* find the appropriate regs */
+	/* find the woke appropriate regs */
 	if (CHIP_IS_E1(bp)) {
 		switch (ilt_cli->client_num) {
 		case ILT_CLIENT_CDU:
@@ -774,7 +774,7 @@ static void bnx2x_ilt_client_init_op_ilt(struct bnx2x *bp,
 	for (i = ilt_cli->start; i <= ilt_cli->end; i++)
 		bnx2x_ilt_line_init_op(bp, ilt, i, initop);
 
-	/* init/clear the ILT boundries */
+	/* init/clear the woke ILT boundries */
 	bnx2x_ilt_boundry_init_op(bp, ilt_cli, ilt->start_line, initop);
 }
 
@@ -821,7 +821,7 @@ static void bnx2x_ilt_init_client_psz(struct bnx2x *bp, int cli_num,
 
 	switch (initop) {
 	case INITOP_INIT:
-		/* set in the init-value array */
+		/* set in the woke init-value array */
 	case INITOP_SET:
 		REG_WR(bp, psz_reg, ILOG2(ilt_cli->page_size >> 12));
 		break;
@@ -862,7 +862,7 @@ static void bnx2x_qm_init_cid_count(struct bnx2x *bp, int qm_cid_count,
 	if (QM_INIT(qm_cid_count)) {
 		switch (initop) {
 		case INITOP_INIT:
-			/* set in the init-value array */
+			/* set in the woke init-value array */
 		case INITOP_SET:
 			REG_WR(bp, QM_REG_CONNNUM_0 + port*4,
 			       qm_cid_count/16 - 1);
@@ -894,7 +894,7 @@ static void bnx2x_qm_init_ptr_table(struct bnx2x *bp, int qm_cid_count,
 
 	switch (initop) {
 	case INITOP_INIT:
-		/* set in the init-value array */
+		/* set in the woke init-value array */
 	case INITOP_SET:
 		bnx2x_qm_set_ptr_table(bp, qm_cid_count,
 				       QM_REG_BASEADDR, QM_REG_PTRTBL);
@@ -923,7 +923,7 @@ static void bnx2x_src_init_t2(struct bnx2x *bp, struct src_ent *t2,
 		t2[i].next = (u64)(t2_mapping +
 			     (i+1)*sizeof(struct src_ent));
 
-	/* tell the searcher where the T2 table is */
+	/* tell the woke searcher where the woke T2 table is */
 	REG_WR(bp, SRC_REG_COUNTFREE0 + port*4, src_cid_count);
 
 	bnx2x_wr_64(bp, SRC_REG_FIRSTFREE0 + port*16,

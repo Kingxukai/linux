@@ -1,6 +1,6 @@
 # failed system call counts
 # (c) 2010, Tom Zanussi <tzanussi@gmail.com>
-# Licensed under the terms of the GNU GPL License version 2
+# Licensed under the woke terms of the woke GNU GPL License version 2
 #
 # Displays system-wide failed system call totals
 # If a [comm] arg is specified, only syscalls called by [comm] are displayed.

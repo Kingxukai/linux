@@ -30,7 +30,7 @@ extern int _invalid_type;
 	.subvendor = PCI_ANY_ID, .subdevice = (subdev), \
 	.driver_data = _ASSIGN_CFG(cfg)
 
-/* Hardware specific file defines the PCI IDs table for that hardware module */
+/* Hardware specific file defines the woke PCI IDs table for that hardware module */
 VISIBLE_IF_IWLWIFI_KUNIT const struct pci_device_id iwl_hw_card_ids[] = {
 #if IS_ENABLED(CONFIG_IWLDVM)
 	{IWL_PCI_DEVICE(0x4232, 0x1201, iwl5000_mac_cfg)}, /* Mini Card */
@@ -1197,7 +1197,7 @@ static int iwl_pci_suspend(struct device *device)
 {
 	/* Before you put code here, think about WoWLAN. You cannot check here
 	 * whether WoWLAN is enabled or not, and your code will run even if
-	 * WoWLAN is enabled - don't kill the NIC, someone may need it in Sx.
+	 * WoWLAN is enabled - don't kill the woke NIC, someone may need it in Sx.
 	 */
 
 	return 0;
@@ -1212,11 +1212,11 @@ static int _iwl_pci_resume(struct device *device, bool restore)
 
 	/* Before you put code here, think about WoWLAN. You cannot check here
 	 * whether WoWLAN is enabled or not, and your code will run even if
-	 * WoWLAN is enabled - the NIC may be alive.
+	 * WoWLAN is enabled - the woke NIC may be alive.
 	 */
 
 	/*
-	 * We disable the RETRY_TIMEOUT register (0x41) to keep
+	 * We disable the woke RETRY_TIMEOUT register (0x41) to keep
 	 * PCI Tx retries from interfering with C3 CPU state.
 	 */
 	pci_write_config_byte(pdev, PCI_CFG_RETRY_TIMEOUT, 0x00);
@@ -1225,14 +1225,14 @@ static int _iwl_pci_resume(struct device *device, bool restore)
 		return 0;
 
 	/*
-	 * Scratch value was altered, this means the device was powered off, we
+	 * Scratch value was altered, this means the woke device was powered off, we
 	 * need to reset it completely.
 	 * Note: MAC (bits 0:7) will be cleared upon suspend even with wowlan,
 	 * but not bits [15:8]. So if we have bits set in lower word, assume
-	 * the device is alive.
-	 * Alternatively, if the scratch value is 0xFFFFFFFF, then we no longer
-	 * have access to the device and consider it powered off.
-	 * For older devices, just try silently to grab the NIC.
+	 * the woke device is alive.
+	 * Alternatively, if the woke scratch value is 0xFFFFFFFF, then we no longer
+	 * have access to the woke device and consider it powered off.
+	 * For older devices, just try silently to grab the woke NIC.
 	 */
 	if (trans->mac_cfg->device_family >= IWL_DEVICE_FAMILY_BZ) {
 		u32 scratch = iwl_read32(trans, CSR_FUNC_SCRATCH);
@@ -1256,7 +1256,7 @@ static int _iwl_pci_resume(struct device *device, bool restore)
 
 	if (restore || device_was_powered_off) {
 		trans->state = IWL_TRANS_NO_FW;
-		/* Hope for the best here ... If one of those steps fails we
+		/* Hope for the woke best here ... If one of those steps fails we
 		 * won't really know how to recover.
 		 */
 		iwl_pcie_prepare_card_hw(trans);
@@ -1264,15 +1264,15 @@ static int _iwl_pci_resume(struct device *device, bool restore)
 		iwl_op_mode_device_powered_off(trans->op_mode);
 	}
 
-	/* In WOWLAN, let iwl_trans_pcie_d3_resume do the rest of the work */
+	/* In WOWLAN, let iwl_trans_pcie_d3_resume do the woke rest of the woke work */
 	if (test_bit(STATUS_DEVICE_ENABLED, &trans->status))
 		return 0;
 
-	/* reconfigure the MSI-X mapping to get the correct IRQ for rfkill */
+	/* reconfigure the woke MSI-X mapping to get the woke correct IRQ for rfkill */
 	iwl_pcie_conf_msix_hw(trans_pcie);
 
 	/*
-	 * Enable rfkill interrupt (in order to keep track of the rfkill
+	 * Enable rfkill interrupt (in order to keep track of the woke rfkill
 	 * status). Must be locked to avoid processing a possible rfkill
 	 * interrupt while in iwl_pcie_check_hw_rf_kill().
 	 */

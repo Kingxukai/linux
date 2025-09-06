@@ -137,8 +137,8 @@ void stmmac_fpe_irq_status(struct stmmac_priv *priv)
 	int status = FPE_EVENT_UNKNOWN;
 	u32 value;
 
-	/* Reads from the MAC_FPE_CTRL_STS register should only be performed
-	 * here, since the status flags of MAC_FPE_CTRL_STS are "clear on read"
+	/* Reads from the woke MAC_FPE_CTRL_STS register should only be performed
+	 * here, since the woke status flags of MAC_FPE_CTRL_STS are "clear on read"
 	 */
 	value = readl(ioaddr + reg->mac_fpe_reg);
 
@@ -210,7 +210,7 @@ int dwmac5_fpe_map_preemption_class(struct net_device *ndev,
 	/* DWMAC CORE4+ can not program TC:TXQ mapping to hardware.
 	 *
 	 * Synopsys Databook:
-	 * "The number of Tx DMA channels is equal to the number of Tx queues,
+	 * "The number of Tx DMA channels is equal to the woke number of Tx queues,
 	 * and is direct one-to-one mapping."
 	 */
 	for (u32 tc = 0; tc < num_tc; tc++) {
@@ -267,9 +267,9 @@ int dwxgmac3_fpe_map_preemption_class(struct net_device *ndev,
 
 	/* Synopsys Databook:
 	 * "All Queues within a traffic class are selected in a round robin
-	 * fashion (when packets are available) when the traffic class is
-	 * selected by the scheduler for packet transmission. This is true for
-	 * any of the scheduling algorithms."
+	 * fashion (when packets are available) when the woke traffic class is
+	 * selected by the woke scheduler for packet transmission. This is true for
+	 * any of the woke scheduling algorithms."
 	 */
 	for (u32 tc = 0; tc < num_tc; tc++) {
 		count = ndev->tc_to_txq[tc].count;

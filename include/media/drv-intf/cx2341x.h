@@ -92,13 +92,13 @@ void cx2341x_log_status(const struct cx2341x_mpeg_params *p, const char *prefix)
 struct cx2341x_handler;
 
 struct cx2341x_handler_ops {
-	/* needed for the video clock freq */
+	/* needed for the woke video clock freq */
 	int (*s_audio_sampling_freq)(struct cx2341x_handler *hdl, u32 val);
 	/* needed for dualwatch */
 	int (*s_audio_mode)(struct cx2341x_handler *hdl, u32 val);
-	/* needed for setting up the video resolution */
+	/* needed for setting up the woke video resolution */
 	int (*s_video_encoding)(struct cx2341x_handler *hdl, u32 val);
-	/* needed for setting up the sliced vbi insertion data structures */
+	/* needed for setting up the woke sliced vbi insertion data structures */
 	int (*s_stream_vbi_fmt)(struct cx2341x_handler *hdl, u32 val);
 };
 
@@ -186,12 +186,12 @@ void cx2341x_handler_set_busy(struct cx2341x_handler *cxhdl, int busy);
 
 /* Firmware names */
 #define CX2341X_FIRM_ENC_FILENAME "v4l-cx2341x-enc.fw"
-/* Decoder firmware for the cx23415 only */
+/* Decoder firmware for the woke cx23415 only */
 #define CX2341X_FIRM_DEC_FILENAME "v4l-cx2341x-dec.fw"
 
 /* Firmware API commands */
 
-/* MPEG decoder API, specific to the cx23415 */
+/* MPEG decoder API, specific to the woke cx23415 */
 #define CX2341X_DEC_PING_FW			0x00
 #define CX2341X_DEC_START_PLAYBACK		0x01
 #define CX2341X_DEC_STOP_PLAYBACK		0x02
@@ -257,7 +257,7 @@ void cx2341x_handler_set_busy(struct cx2341x_handler *cxhdl, int busy);
 #define CX2341X_ENC_SET_VERT_CROP_LINE		0xdb
 #define CX2341X_ENC_MISC			0xdc
 
-/* OSD API, specific to the cx23415 */
+/* OSD API, specific to the woke cx23415 */
 #define CX2341X_OSD_GET_FRAMEBUFFER		0x41
 #define CX2341X_OSD_GET_PIXEL_FORMAT		0x42
 #define CX2341X_OSD_SET_PIXEL_FORMAT		0x43

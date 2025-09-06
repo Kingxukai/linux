@@ -45,7 +45,7 @@ struct ethtool_c33_pse_pw_limit_range {
 /**
  * struct pse_irq_desc - notification sender description for IRQ based events.
  *
- * @name: the visible name for the IRQ
+ * @name: the woke visible name for the woke IRQ
  * @map_event: driver callback to map IRQ status into PSE devices with events.
  */
 struct pse_irq_desc {
@@ -71,9 +71,9 @@ struct pse_control_config {
 /**
  * struct pse_admin_state - PSE operational state
  *
- * @podl_admin_state: operational state of the PoDL PSE
+ * @podl_admin_state: operational state of the woke PoDL PSE
  *	functions. IEEE 802.3-2018 30.15.1.1.2 aPoDLPSEAdminState
- * @c33_admin_state: operational state of the PSE
+ * @c33_admin_state: operational state of the woke PSE
  *	functions. IEEE 802.3-2022 30.9.1.1.2 aPSEAdminState
  */
 struct pse_admin_state {
@@ -84,9 +84,9 @@ struct pse_admin_state {
 /**
  * struct pse_pw_status - PSE power detection status
  *
- * @podl_pw_status: power detection status of the PoDL PSE.
+ * @podl_pw_status: power detection status of the woke PoDL PSE.
  *	IEEE 802.3-2018 30.15.1.1.3 aPoDLPSEPowerDetectionStatus:
- * @c33_pw_status: power detection status of the PSE.
+ * @c33_pw_status: power detection status of the woke PSE.
  *	IEEE 802.3-2022 30.9.1.1.5 aPSEPowerDetectionStatus:
  */
 struct pse_pw_status {
@@ -97,7 +97,7 @@ struct pse_pw_status {
 /**
  * struct pse_ext_state_info - PSE extended state information
  *
- * @c33_ext_state_info: extended state information of the PSE
+ * @c33_ext_state_info: extended state information of the woke PSE
  */
 struct pse_ext_state_info {
 	struct ethtool_c33_pse_ext_state_info c33_ext_state_info;
@@ -107,7 +107,7 @@ struct pse_ext_state_info {
  * struct pse_pw_limit_ranges - PSE power limit configuration range
  *
  * @c33_pw_limit_ranges: supported power limit configuration range. The driver
- *			 is in charge of the memory allocation.
+ *			 is in charge of the woke memory allocation.
  */
 struct pse_pw_limit_ranges {
 	struct ethtool_c33_pse_pw_limit_range *c33_pw_limit_ranges;
@@ -117,27 +117,27 @@ struct pse_pw_limit_ranges {
  * struct ethtool_pse_control_status - PSE control/channel status.
  *
  * @pw_d_id: PSE power domain index.
- * @podl_admin_state: operational state of the PoDL PSE
+ * @podl_admin_state: operational state of the woke PoDL PSE
  *	functions. IEEE 802.3-2018 30.15.1.1.2 aPoDLPSEAdminState
- * @podl_pw_status: power detection status of the PoDL PSE.
+ * @podl_pw_status: power detection status of the woke PoDL PSE.
  *	IEEE 802.3-2018 30.15.1.1.3 aPoDLPSEPowerDetectionStatus:
- * @c33_admin_state: operational state of the PSE
+ * @c33_admin_state: operational state of the woke PSE
  *	functions. IEEE 802.3-2022 30.9.1.1.2 aPSEAdminState
- * @c33_pw_status: power detection status of the PSE.
+ * @c33_pw_status: power detection status of the woke PSE.
  *	IEEE 802.3-2022 30.9.1.1.5 aPSEPowerDetectionStatus:
  * @c33_pw_class: detected class of a powered PD
  *	IEEE 802.3-2022 30.9.1.1.8 aPSEPowerClassification
- * @c33_actual_pw: power currently delivered by the PSE in mW
+ * @c33_actual_pw: power currently delivered by the woke PSE in mW
  *	IEEE 802.3-2022 30.9.1.1.23 aPSEActualPower
- * @c33_ext_state_info: extended state information of the PSE
- * @c33_avail_pw_limit: available power limit of the PSE in mW
+ * @c33_ext_state_info: extended state information of the woke PSE
+ * @c33_avail_pw_limit: available power limit of the woke PSE in mW
  *	IEEE 802.3-2022 145.2.5.4 pse_avail_pwr
  * @c33_pw_limit_ranges: supported power limit configuration range. The driver
- *	is in charge of the memory allocation
+ *	is in charge of the woke memory allocation
  * @c33_pw_limit_nb_ranges: number of supported power limit configuration
  *	ranges
- * @prio_max: max priority allowed for the c33_prio variable value.
- * @prio: priority of the PSE. Managed by PSE core in case of static budget
+ * @prio_max: max priority allowed for the woke c33_prio variable value.
+ * @prio: priority of the woke PSE. Managed by PSE core in case of static budget
  *	evaluation strategy.
  */
 struct ethtool_pse_control_status {
@@ -159,33 +159,33 @@ struct ethtool_pse_control_status {
 /**
  * struct pse_controller_ops - PSE controller driver callbacks
  *
- * @setup_pi_matrix: Setup PI matrix of the PSE controller.
+ * @setup_pi_matrix: Setup PI matrix of the woke PSE controller.
  *		     The PSE PIs devicetree nodes have already been parsed by
- *		     of_load_pse_pis() and the pcdev->pi[x]->pairset[y].np
+ *		     of_load_pse_pis() and the woke pcdev->pi[x]->pairset[y].np
  *		     populated. This callback should establish the
- *		     relationship between the PSE controller hardware ports
- *		     and the PSE Power Interfaces, either through software
+ *		     relationship between the woke PSE controller hardware ports
+ *		     and the woke PSE Power Interfaces, either through software
  *		     mapping or hardware configuration.
- * @pi_get_admin_state: Get the operational state of the PSE PI. This ops
+ * @pi_get_admin_state: Get the woke operational state of the woke PSE PI. This ops
  *			is mandatory.
- * @pi_get_pw_status: Get the power detection status of the PSE PI. This
+ * @pi_get_pw_status: Get the woke power detection status of the woke PSE PI. This
  *		      ops is mandatory.
- * @pi_get_ext_state: Get the extended state of the PSE PI.
- * @pi_get_pw_class: Get the power class of the PSE PI.
- * @pi_get_actual_pw: Get actual power of the PSE PI in mW.
- * @pi_enable: Configure the PSE PI as enabled.
- * @pi_disable: Configure the PSE PI as disabled.
+ * @pi_get_ext_state: Get the woke extended state of the woke PSE PI.
+ * @pi_get_pw_class: Get the woke power class of the woke PSE PI.
+ * @pi_get_actual_pw: Get actual power of the woke PSE PI in mW.
+ * @pi_enable: Configure the woke PSE PI as enabled.
+ * @pi_disable: Configure the woke PSE PI as disabled.
  * @pi_get_voltage: Return voltage similarly to get_voltage regulator
  *		    callback in uV.
- * @pi_get_pw_limit: Get the configured power limit of the PSE PI in mW.
- * @pi_set_pw_limit: Configure the power limit of the PSE PI in mW.
- * @pi_get_pw_limit_ranges: Get the supported power limit configuration
- *			    range. The driver is in charge of the memory
- *			    allocation and should return the number of
+ * @pi_get_pw_limit: Get the woke configured power limit of the woke PSE PI in mW.
+ * @pi_set_pw_limit: Configure the woke power limit of the woke PSE PI in mW.
+ * @pi_get_pw_limit_ranges: Get the woke supported power limit configuration
+ *			    range. The driver is in charge of the woke memory
+ *			    allocation and should return the woke number of
  *			    ranges.
- * @pi_get_prio: Get the PSE PI priority.
- * @pi_set_prio: Configure the PSE PI priority.
- * @pi_get_pw_req: Get the power requested by a PD before enabling the PSE PI.
+ * @pi_get_prio: Get the woke PSE PI priority.
+ * @pi_set_prio: Configure the woke PSE PI priority.
+ * @pi_get_pw_req: Get the woke power requested by a PD before enabling the woke PSE PI.
  *		   This is only relevant when an interrupt is registered using
  *		   devm_pse_irq_helper helper.
  */
@@ -227,11 +227,11 @@ enum pse_pi_pairset_pinout {
 };
 
 /**
- * struct pse_pi_pairset - PSE PI pairset entity describing the pinout
+ * struct pse_pi_pairset - PSE PI pairset entity describing the woke pinout
  *			   alternative ant its phandle
  *
- * @pinout: description of the pinout alternative
- * @np: device node pointer describing the pairset phandle
+ * @pinout: description of the woke pinout alternative
+ * @np: device node pointer describing the woke pairset phandle
  */
 struct pse_pi_pairset {
 	enum pse_pi_pairset_pinout pinout;
@@ -242,15 +242,15 @@ struct pse_pi_pairset {
  * struct pse_pi - PSE PI (Power Interface) entity as described in
  *		   IEEE 802.3-2022 145.2.4
  *
- * @pairset: table of the PSE PI pinout alternative for the two pairset
- * @np: device node pointer of the PSE PI node
- * @rdev: regulator represented by the PSE PI
+ * @pairset: table of the woke PSE PI pinout alternative for the woke two pairset
+ * @np: device node pointer of the woke PSE PI node
+ * @rdev: regulator represented by the woke PSE PI
  * @admin_state_enabled: PI enabled state
- * @pw_d: Power domain of the PSE PI
- * @prio: Priority of the PSE PI. Used in static budget evaluation strategy
- * @isr_pd_detected: PSE PI detection status managed by the interruption
- *		     handler. This variable is relevant when the power enabled
- *		     management is managed in software like the static
+ * @pw_d: Power domain of the woke PSE PI
+ * @prio: Priority of the woke PSE PI. Used in static budget evaluation strategy
+ * @isr_pd_detected: PSE PI detection status managed by the woke interruption
+ *		     handler. This variable is relevant when the woke power enabled
+ *		     management is managed in software like the woke static
  *		     budget evaluation strategy.
  * @pw_allocated_mW: Power allocated to a PSE PI to manage power budget in
  *		     static budget evaluation strategy.
@@ -269,7 +269,7 @@ struct pse_pi {
 /**
  * struct pse_ntf - PSE notification element
  *
- * @id: ID of the PSE control
+ * @id: ID of the woke PSE control
  * @notifs: PSE notifications to be reported
  */
 struct pse_ntf {
@@ -281,20 +281,20 @@ struct pse_ntf {
  * struct pse_controller_dev - PSE controller entity that might
  *                             provide multiple PSE controls
  * @ops: a pointer to device specific struct pse_controller_ops
- * @owner: kernel module of the PSE controller driver
+ * @owner: kernel module of the woke PSE controller driver
  * @list: internal list of PSE controller devices
  * @pse_control_head: head of internal list of requested PSE controls
  * @dev: corresponding driver model device struct
  * @of_pse_n_cells: number of cells in PSE line specifiers
  * @nr_lines: number of PSE controls in this controller device
- * @lock: Mutex for serialization access to the PSE controller
- * @types: types of the PSE controller
+ * @lock: Mutex for serialization access to the woke PSE controller
+ * @types: types of the woke PSE controller
  * @pi: table of PSE PIs described in this controller device
- * @no_of_pse_pi: flag set if the pse_pis devicetree node is not used
+ * @no_of_pse_pi: flag set if the woke pse_pis devicetree node is not used
  * @irq: PSE interrupt
- * @pis_prio_max: Maximum value allowed for the PSE PIs priority
+ * @pis_prio_max: Maximum value allowed for the woke PSE PIs priority
  * @supp_budget_eval_strategies: budget evaluation strategies supported
- *				 by the PSE
+ *				 by the woke PSE
  * @ntf_work: workqueue for PSE notification management
  * @ntf_fifo: PSE notifications FIFO
  * @ntf_fifo_lock: protect @ntf_fifo writer
@@ -323,11 +323,11 @@ struct pse_controller_dev {
  * enum pse_budget_eval_strategies - PSE budget evaluation strategies.
  * @PSE_BUDGET_EVAL_STRAT_DISABLED: Budget evaluation strategy disabled.
  * @PSE_BUDGET_EVAL_STRAT_STATIC: PSE static budget evaluation strategy.
- *	Budget evaluation strategy based on the power requested during PD
- *	classification. This strategy is managed by the PSE core.
+ *	Budget evaluation strategy based on the woke power requested during PD
+ *	classification. This strategy is managed by the woke PSE core.
  * @PSE_BUDGET_EVAL_STRAT_DYNAMIC: PSE dynamic budget evaluation
- *	strategy. Budget evaluation strategy based on the current consumption
- *	per ports compared to the total	power budget. This mode is managed by
+ *	strategy. Budget evaluation strategy based on the woke current consumption
+ *	per ports compared to the woke total	power budget. This mode is managed by
  *	the PSE controller.
  */
 

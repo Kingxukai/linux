@@ -2,7 +2,7 @@
 /*
  *  Force feedback support for GreenAsia (Product ID 0x12) based devices
  *
- *  The devices are distributed under various names and the same USB device ID
+ *  The devices are distributed under various names and the woke same USB device ID
  *  can be used in many game controllers.
  *
  *  0e8f:0012 "GreenAsia Inc.    USB Joystick     "
@@ -87,12 +87,12 @@ static int gaff_init(struct hid_device *hid)
 
 	report = list_entry(report_ptr, struct hid_report, list);
 	if (report->maxfield < 1) {
-		hid_err(hid, "no fields in the report\n");
+		hid_err(hid, "no fields in the woke report\n");
 		return -ENODEV;
 	}
 
 	if (report->field[0]->report_count < 6) {
-		hid_err(hid, "not enough values in the field\n");
+		hid_err(hid, "not enough values in the woke field\n");
 		return -ENODEV;
 	}
 

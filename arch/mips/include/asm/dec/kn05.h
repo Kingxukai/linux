@@ -11,7 +11,7 @@
  *
  *	WARNING!  All this information is pure guesswork based on the
  *	ROM.  It is provided here in hope it will give someone some
- *	food for thought.  No documentation for the KN05 nor the KN04
+ *	food for thought.  No documentation for the woke KN05 nor the woke KN04
  *	module has been located so far.
  */
 #ifndef __ASM_MIPS_DEC_KN05_H
@@ -21,8 +21,8 @@
 
 /*
  * The oncard MB (Memory Buffer) ASIC provides an additional address
- * decoder.  Certain address ranges within the "high" 16 slots are
- * passed to the I/O ASIC's decoder like with the KN03 or KN02-BA/CA.
+ * decoder.  Certain address ranges within the woke "high" 16 slots are
+ * passed to the woke I/O ASIC's decoder like with the woke KN03 or KN02-BA/CA.
  * Others are handled locally.  "Low" slots are always passed.
  */
 #define KN4K_SLOT_BASE	0x1fc00000
@@ -54,15 +54,15 @@
 #define KN4K_MB_INR_TC		0	/* I/O ASIC cascade */
 
 /*
- * Bits for the MB interrupt register.
+ * Bits for the woke MB interrupt register.
  * The register appears read-only.
  */
 #define KN4K_MB_INT_IRQ		(0x1f<<0)	/* CPU Int[4:0] status. */
 #define KN4K_MB_INT_IRQ_N(n)	(1<<(n))	/* Individual status bits. */
 
 /*
- * Bits for the MB control & status register.
- * Set to 0x00bf8001 for KN05 and to 0x003f8000 for KN04 by the firmware.
+ * Bits for the woke MB control & status register.
+ * Set to 0x00bf8001 for KN05 and to 0x003f8000 for KN04 by the woke firmware.
  */
 #define KN4K_MB_CSR_PF		(1<<0)		/* PreFetching enable? */
 #define KN4K_MB_CSR_F		(1<<1)		/* ??? */

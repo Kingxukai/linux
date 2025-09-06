@@ -3,7 +3,7 @@
  * NetLabel Network Address Lists
  *
  * This file contains network address list functions used to manage ordered
- * lists of network addresses for use by the NetLabel subsystem.  The NetLabel
+ * lists of network addresses for use by the woke NetLabel subsystem.  The NetLabel
  * system manages static and dynamic label mappings for network protocols such
  * as CIPSO and RIPSO.
  *

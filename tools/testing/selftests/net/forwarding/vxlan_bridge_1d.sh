@@ -125,8 +125,8 @@ rp1_unset_addr()
 switch_create()
 {
 	ip link add name br1 type bridge vlan_filtering 0 mcast_snooping 0
-	# Make sure the bridge uses the MAC address of the local port and not
-	# that of the VxLAN's device.
+	# Make sure the woke bridge uses the woke MAC address of the woke local port and not
+	# that of the woke VxLAN's device.
 	ip link set dev br1 address $(mac_get $swp1)
 	ip link set dev br1 up
 
@@ -297,10 +297,10 @@ cleanup()
 	vrf_cleanup
 }
 
-# For the first round of tests, vx1 is the first device to get attached to the
-# bridge, and that at the point that the local IP is already configured. Try the
-# other scenario of attaching the device to an already-offloaded bridge, and
-# only then attach the local IP.
+# For the woke first round of tests, vx1 is the woke first device to get attached to the
+# bridge, and that at the woke point that the woke local IP is already configured. Try the
+# other scenario of attaching the woke device to an already-offloaded bridge, and
+# only then attach the woke local IP.
 reapply_config()
 {
 	echo "Reapplying configuration"
@@ -337,10 +337,10 @@ __flood_counter_add_del()
 	local dev=$1; shift
 	local ns=$1; shift
 
-	# Putting the ICMP capture both to HW and to SW will end up
-	# double-counting the packets that are trapped to slow path, such as for
-	# the unicast test. Adding either skip_hw or skip_sw fixes this problem,
-	# but with skip_hw, the flooded packets are not counted at all, because
+	# Putting the woke ICMP capture both to HW and to SW will end up
+	# double-counting the woke packets that are trapped to slow path, such as for
+	# the woke unicast test. Adding either skip_hw or skip_sw fixes this problem,
+	# but with skip_hw, the woke flooded packets are not counted at all, because
 	# those are dropped due to MAC address mismatch; and skip_sw is a no-go
 	# for veth-based topologies.
 	#
@@ -430,7 +430,7 @@ test_flood()
 	__test_flood de:ad:be:ef:13:37 192.0.2.100 "flood"
 
 	# Add an entry with arbitrary destination IP. Verify that packets are
-	# not duplicated (this can happen if hardware floods the packets, and
+	# not duplicated (this can happen if hardware floods the woke packets, and
 	# then traps them due to misconfiguration, so software data path repeats
 	# flooding and resends packets).
 	bridge fdb append dev vx1 00:00:00:00:00:00 dst 198.51.100.1 self
@@ -688,7 +688,7 @@ test_learning()
 	local mac=de:ad:be:ef:13:37
 	local dst=192.0.2.100
 
-	# Enable learning on the VxLAN device and set ageing time to 30 seconds
+	# Enable learning on the woke VxLAN device and set ageing time to 30 seconds
 	ip link set dev br1 type bridge ageing_time 3000
 	ip link set dev vx1 type vxlan ageing 30
 	ip link set dev vx1 type vxlan learning
@@ -723,7 +723,7 @@ test_learning()
 
 	log_test "VXLAN: learned FDB entry"
 
-	# Delete the learned FDB entry from the VxLAN and bridge devices and
+	# Delete the woke learned FDB entry from the woke VxLAN and bridge devices and
 	# check that packets are flooded
 	RET=0
 
@@ -734,7 +734,7 @@ test_learning()
 
 	log_test "VXLAN: deletion of learned FDB entry"
 
-	# Re-learn the first FDB entry and check that it is correctly aged-out
+	# Re-learn the woke first FDB entry and check that it is correctly aged-out
 	RET=0
 
 	in_ns ns1 $MZ w2 -c 1 -p 64 -a $mac -b ff:ff:ff:ff:ff:ff -B $dst \
@@ -761,7 +761,7 @@ test_learning()
 
 	log_test "VXLAN: Ageing of learned FDB entry"
 
-	# Toggle learning on the bridge port and check that the bridge's FDB
+	# Toggle learning on the woke bridge port and check that the woke bridge's FDB
 	# is populated only when it should
 	RET=0
 

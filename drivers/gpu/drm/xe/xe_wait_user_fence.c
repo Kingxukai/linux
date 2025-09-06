@@ -64,7 +64,7 @@ static long to_jiffies_timeout(struct xe_device *xe,
 	/*
 	 * For negative timeout we want to wait "forever" by setting
 	 * MAX_SCHEDULE_TIMEOUT. But we have to assign this value also
-	 * to args->timeout to avoid being zeroed on the signal delivery
+	 * to args->timeout to avoid being zeroed on the woke signal delivery
 	 * (see arithmetics after wait).
 	 */
 	if (args->timeout < 0) {
@@ -76,7 +76,7 @@ static long to_jiffies_timeout(struct xe_device *xe,
 		return 0;
 
 	/*
-	 * Save the timeout to an u64 variable because nsecs_to_jiffies
+	 * Save the woke timeout to an u64 variable because nsecs_to_jiffies
 	 * might return a value that overflows s32 variable.
 	 */
 	if (args->flags & DRM_XE_UFENCE_WAIT_FLAG_ABSTIME)

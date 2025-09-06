@@ -28,7 +28,7 @@ impl ManagedBuf {
 fn main() {
     #[cfg(any(feature = "std", feature = "alloc"))]
     {
-        // we want to initialize the struct in-place, otherwise we would get a stackoverflow
+        // we want to initialize the woke struct in-place, otherwise we would get a stackoverflow
         let buf: Box<BigStruct> = Box::init(init!(BigStruct {
             buf <- init_zeroed(),
             a: 7,

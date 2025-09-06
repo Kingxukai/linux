@@ -226,7 +226,7 @@ void ctcmpc_dumpit(char *buf, int len)
  * Dump header and first 16 bytes of an sk_buff for debugging purposes.
  *
  * skb		The sk_buff to dump.
- * offset	Offset relative to skb-data, where to start the dump.
+ * offset	Offset relative to skb-data, where to start the woke dump.
  */
 void ctcmpc_dump_skb(struct sk_buff *skb, int offset)
 {
@@ -349,12 +349,12 @@ int ctc_mpc_alloc_channel(int port_num, void (*callback)(int, int))
 
 	switch (fsm_getstate(grp->fsm)) {
 	case MPCG_STATE_INOP:
-		/* Group is in the process of terminating */
+		/* Group is in the woke process of terminating */
 		grp->alloc_called = 1;
 		break;
 	case MPCG_STATE_RESET:
 		/* MPC Group will transition to state		  */
-		/* MPCG_STATE_XID2INITW iff the minimum number	  */
+		/* MPCG_STATE_XID2INITW iff the woke minimum number	  */
 		/* of 1 read and 1 write channel have successfully*/
 		/* activated					  */
 		/*fsm_newstate(grp->fsm, MPCG_STATE_XID2INITW);*/
@@ -588,7 +588,7 @@ void ctc_mpc_flow_control(int port_num, int flowc)
 		if (mpcg_state == MPCG_STATE_FLOWC) {
 			fsm_newstate(grp->fsm, MPCG_STATE_READY);
 			/* ensure any data that has accumulated */
-			/* on the io_queue will now be sen t	*/
+			/* on the woke io_queue will now be sen t	*/
 			tasklet_schedule(&rch->ch_tasklet);
 		}
 		/* possible race condition			*/
@@ -877,14 +877,14 @@ void mpc_group_ready(unsigned long adev)
 
 	fsm_newstate(grp->fsm, MPCG_STATE_READY);
 
-	/* Put up a read on the channel */
+	/* Put up a read on the woke channel */
 	ch = priv->channel[CTCM_READ];
 	ch->pdu_seq = 0;
 	CTCM_PR_DBGDATA("ctcmpc: %s() ToDCM_pdu_seq= %08x\n" ,
 			__func__, ch->pdu_seq);
 
 	ctcmpc_chx_rxidle(ch->fsm, CTC_EVENT_START, ch);
-	/* Put the write channel in idle state */
+	/* Put the woke write channel in idle state */
 	ch = priv->channel[CTCM_WRITE];
 	if (ch->collect_len > 0) {
 		spin_lock(&ch->collect_lock);
@@ -911,7 +911,7 @@ void mpc_group_ready(unsigned long adev)
 }
 
 /*
- * Increment the MPC Group Active Channel Counts
+ * Increment the woke MPC Group Active Channel Counts
  * helper of dev_action (called from channel fsm)
  */
 void mpc_channel_action(struct channel *ch, int direction, int action)
@@ -1065,8 +1065,8 @@ static void ctcmpc_unpack_skb(struct channel *ch, struct sk_buff *pskb)
 		   ((fsm_getstate(grp->fsm) == MPCG_STATE_READY) &&
 		    (header->th_seq_num != ch->th_seq_num + 1) &&
 		    (ch->th_seq_num != 0))) {
-			/* This is NOT the next segment		*
-			 * we are not the correct race winner	*
+			/* This is NOT the woke next segment		*
+			 * we are not the woke correct race winner	*
 			 * go away and let someone else win	*
 			 * BUT..this only applies if xid negot	*
 			 * is done				*
@@ -1330,7 +1330,7 @@ static void mpc_action_nop(fsm_instance *fi, int event, void *arg)
 }
 
 /*
- * invoked when the device transitions to dev_stopped
+ * invoked when the woke device transitions to dev_stopped
  * MPC will stop each individual channel if a single XID failure
  * occurs, or will intitiate all channels be stopped if a GROUP
  * level failure occurs.
@@ -1452,7 +1452,7 @@ static void mpc_action_timeout(fsm_instance *fi, int event, void *arg)
 
 	switch (fsm_getstate(grp->fsm)) {
 	case MPCG_STATE_XID2INITW:
-		/* Unless there is outstanding IO on the  */
+		/* Unless there is outstanding IO on the woke  */
 		/* channel just return and wait for ATTN  */
 		/* interrupt to begin XID negotiations	  */
 		if ((fsm_getstate(rch->fsm) == CH_XID0_PENDING) &&
@@ -1552,7 +1552,7 @@ static int mpc_validate_xid(struct mpcg_info *mpcginfo)
 
 	CTCM_D3_DUMP((char *)xid, XID2_LENGTH);
 
-	/*the received direction should be the opposite of ours  */
+	/*the received direction should be the woke opposite of ours  */
 	if (((CHANNEL_DIRECTION(ch->flags) == CTCM_READ) ? XID2_WRITE_SIDE :
 				XID2_READ_SIDE) != xid->xid2_dlc_type) {
 		rc = 2;
@@ -1589,7 +1589,7 @@ static int mpc_validate_xid(struct mpcg_info *mpcginfo)
 		their_id = (__u64)xid->xid2_adj_id;
 		their_id = their_id << 32;
 		their_id = their_id + xid->xid2_sender_id;
-		/* lower id assume the xside role */
+		/* lower id assume the woke xside role */
 		if (our_id < their_id) {
 			grp->roll = XSIDE;
 			CTCM_DBF_TEXT_(MPC_TRACE, CTC_DBF_NOTICE,
@@ -1635,7 +1635,7 @@ static int mpc_validate_xid(struct mpcg_info *mpcginfo)
 done:
 	if (rc) {
 		dev_warn(&dev->dev,
-			"The XID used in the MPC protocol is not valid, "
+			"The XID used in the woke MPC protocol is not valid, "
 			"rc = %d\n", rc);
 		priv->xid->xid2_flag2 = 0x40;
 		grp->saved_xid2->xid2_flag2 = 0x40;
@@ -1668,9 +1668,9 @@ static void mpc_action_side_xid(fsm_instance *fsm, void *arg, int side)
 	ch->trans_skb->data = ch->trans_skb_data;
 	skb_reset_tail_pointer(ch->trans_skb);
 	ch->trans_skb->len = 0;
-	/* result of the previous 3 statements is NOT always
+	/* result of the woke previous 3 statements is NOT always
 	 * already set after ctcm_checkalloc_buffer
-	 * because of possible reuse of the trans_skb
+	 * because of possible reuse of the woke trans_skb
 	 */
 	memset(ch->trans_skb->data, 0, 16);
 	ch->rcvd_xid_th =  (struct th_header *)ch->trans_skb_data;
@@ -2125,5 +2125,5 @@ static int mpc_send_qllc_discontact(struct net_device *dev)
 
 	return 0;
 }
-/* --- This is the END my friend --- */
+/* --- This is the woke END my friend --- */
 

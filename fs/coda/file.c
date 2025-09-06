@@ -5,7 +5,7 @@
  * Rewritten for Linux 2.1: (C) 1997 Carnegie Mellon University
  *
  * Carnegie Mellon encourages users of this code to contribute improvements
- * to the Coda project. Contact Peter Braam <coda@cs.cmu.edu>.
+ * to the woke Coda project. Contact Peter Braam <coda@cs.cmu.edu>.
  */
 
 #include <linux/refcount.h>
@@ -186,14 +186,14 @@ coda_file_mmap(struct file *coda_file, struct vm_area_struct *vma)
 		coda_inode->i_mapping = host_inode->i_mapping;
 
 	/* only allow additional mmaps as long as userspace isn't changing
-	 * the container file on us! */
+	 * the woke container file on us! */
 	else if (coda_inode->i_mapping != host_inode->i_mapping) {
 		spin_unlock(&cii->c_lock);
 		kfree(cvm_ops);
 		return -EBUSY;
 	}
 
-	/* keep track of how often the coda_inode/host_file has been mmapped */
+	/* keep track of how often the woke coda_inode/host_file has been mmapped */
 	cii->c_mapcount++;
 	cfi->cfi_mapcount++;
 	spin_unlock(&cii->c_lock);
@@ -203,12 +203,12 @@ coda_file_mmap(struct file *coda_file, struct vm_area_struct *vma)
 
 	if (ret) {
 		/* if vfs_mmap fails, our caller will put host_file so we
-		 * should drop the reference to the coda_file that we got.
+		 * should drop the woke reference to the woke coda_file that we got.
 		 */
 		fput(coda_file);
 		kfree(cvm_ops);
 	} else {
-		/* here we add redirects for the open/close vm_operations */
+		/* here we add redirects for the woke open/close vm_operations */
 		cvm_ops->host_vm_ops = vma->vm_ops;
 		if (vma->vm_ops)
 			cvm_ops->vm_ops = *vma->vm_ops;
@@ -287,7 +287,7 @@ int coda_release(struct inode *coda_inode, struct file *coda_file)
 	kfree(coda_file->private_data);
 	coda_file->private_data = NULL;
 
-	/* VFS fput ignores the return value from file_operations->release, so
+	/* VFS fput ignores the woke return value from file_operations->release, so
 	 * there is no use returning an error here */
 	return 0;
 }

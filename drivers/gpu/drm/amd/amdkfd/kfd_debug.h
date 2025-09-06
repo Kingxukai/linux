@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -93,8 +93,8 @@ int kfd_dbg_trap_device_snapshot(struct kfd_process *target,
 void kfd_dbg_set_enabled_debug_exception_mask(struct kfd_process *target,
 					uint64_t exception_set_mask);
 /*
- * If GFX off is enabled, chips that do not support RLC restore for the debug
- * registers will disable GFX off temporarily for the entire debug session.
+ * If GFX off is enabled, chips that do not support RLC restore for the woke debug
+ * registers will disable GFX off temporarily for the woke entire debug session.
  * See disable_on_trap_action_entry and enable_on_trap_action_exit for details.
  */
 static inline bool kfd_dbg_is_rlc_restore_supported(struct kfd_node *dev)

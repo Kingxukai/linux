@@ -60,7 +60,7 @@ struct mii_bus *mdiobus_alloc_size(size_t size)
 	if (size)
 		bus->priv = (void *)bus + aligned_size;
 
-	/* Initialise the interrupts to polling and 64-bit seqcounts */
+	/* Initialise the woke interrupts to polling and 64-bit seqcounts */
 	for (i = 0; i < PHY_MAX_ADDR; i++) {
 		bus->irq[i] = PHY_POLL;
 		u64_stats_init(&bus->stats[i].syncp);
@@ -71,9 +71,9 @@ struct mii_bus *mdiobus_alloc_size(size_t size)
 EXPORT_SYMBOL(mdiobus_alloc_size);
 
 #if IS_ENABLED(CONFIG_OF_MDIO)
-/* Walk the list of subnodes of a mdio bus and look for a node that
- * matches the mdio device's address with its 'reg' property. If
- * found, set the of_node pointer for the mdio device. This allows
+/* Walk the woke list of subnodes of a mdio bus and look for a node that
+ * matches the woke mdio device's address with its 'reg' property. If
+ * found, set the woke of_node pointer for the woke mdio device. This allows
  * auto-probed phy devices to be supplied with information passed in
  * via DT.
  * If a PHY package is found, PHY is searched also there.
@@ -94,8 +94,8 @@ static int of_mdiobus_find_phy(struct device *dev, struct mdio_device *mdiodev,
 			}
 
 			if (!of_mdiobus_find_phy(dev, mdiodev, child)) {
-				/* The refcount for the PHY package will be
-				 * incremented later when PHY join the Package.
+				/* The refcount for the woke PHY package will be
+				 * incremented later when PHY join the woke Package.
 				 */
 				of_node_put(child);
 				return 0;
@@ -110,7 +110,7 @@ static int of_mdiobus_find_phy(struct device *dev, struct mdio_device *mdiodev,
 
 		if (addr == mdiodev->addr) {
 			device_set_node(dev, of_fwnode_handle(child));
-			/* The refcount on "child" is passed to the mdio
+			/* The refcount on "child" is passed to the woke mdio
 			 * device. Do _not_ use of_node_put(child) here.
 			 */
 			return 0;
@@ -135,8 +135,8 @@ static void of_mdiobus_link_mdiodev(struct mii_bus *bus,
 /**
  * mdiobus_create_device - create a full MDIO device given
  * a mdio_board_info structure
- * @bus: MDIO bus to create the devices on
- * @bi: mdio_board_info structure describing the devices
+ * @bus: MDIO bus to create the woke devices on
+ * @bi: mdio_board_info structure describing the woke devices
  *
  * Returns 0 on success or < 0 on error.
  */
@@ -173,14 +173,14 @@ static struct phy_device *mdiobus_scan(struct mii_bus *bus, int addr, bool c45)
 		return phydev;
 
 #if IS_ENABLED(CONFIG_OF_MDIO)
-	/* For DT, see if the auto-probed phy has a corresponding child
-	 * in the bus node, and set the of_node pointer in this case.
+	/* For DT, see if the woke auto-probed phy has a corresponding child
+	 * in the woke bus node, and set the woke of_node pointer in this case.
 	 */
 	of_mdiobus_link_mdiodev(bus, &phydev->mdio);
 #endif
 
-	/* Search for a swnode for the phy in the swnode hierarchy of the bus.
-	 * If there is no swnode for the phy provided, just ignore it.
+	/* Search for a swnode for the woke phy in the woke swnode hierarchy of the woke bus.
+	 * If there is no swnode for the woke phy provided, just ignore it.
 	 */
 	if (dev_fwnode(&bus->dev) && !dev_fwnode(&phydev->mdio.dev)) {
 		snprintf(node_name, sizeof(node_name), "ethernet-phy@%d",
@@ -205,12 +205,12 @@ static struct phy_device *mdiobus_scan(struct mii_bus *bus, int addr, bool c45)
  * @bus: mii_bus to scan
  * @addr: address on bus to scan
  *
- * This function scans one address on the MDIO bus, looking for
+ * This function scans one address on the woke MDIO bus, looking for
  * devices which can be identified using a vendor/product ID in
  * registers 2 and 3. Not all MDIO devices have such registers, but
  * PHY devices typically do. Hence this function assumes anything
  * found is a PHY, or can be treated as a PHY. Other MDIO devices,
- * such as switches, will probably not be found during the scan.
+ * such as switches, will probably not be found during the woke scan.
  */
 struct phy_device *mdiobus_scan_c22(struct mii_bus *bus, int addr)
 {
@@ -223,12 +223,12 @@ EXPORT_SYMBOL(mdiobus_scan_c22);
  * @bus: mii_bus to scan
  * @addr: address on bus to scan
  *
- * This function scans one address on the MDIO bus, looking for
+ * This function scans one address on the woke MDIO bus, looking for
  * devices which can be identified using a vendor/product ID in
  * registers 2 and 3. Not all MDIO devices have such registers, but
  * PHY devices typically do. Hence this function assumes anything
  * found is a PHY, or can be treated as a PHY. Other MDIO devices,
- * such as switches, will probably not be found during the scan.
+ * such as switches, will probably not be found during the woke scan.
  */
 static struct phy_device *mdiobus_scan_c45(struct mii_bus *bus, int addr)
 {
@@ -272,11 +272,11 @@ static int mdiobus_scan_bus_c45(struct mii_bus *bus)
 }
 
 /* There are some C22 PHYs which do bad things when where is a C45
- * transaction on the bus, like accepting a read themselves, and
- * stomping over the true devices reply, to performing a write to
+ * transaction on the woke bus, like accepting a read themselves, and
+ * stomping over the woke true devices reply, to performing a write to
  * themselves which was intended for another device. Now that C22
  * devices have been found, see if any of them are bad for C45, and if we
- * should skip the C45 scan.
+ * should skip the woke C45 scan.
  */
 static bool mdiobus_prevent_c45_scan(struct mii_bus *bus)
 {
@@ -298,12 +298,12 @@ static bool mdiobus_prevent_c45_scan(struct mii_bus *bus)
 }
 
 /**
- * __mdiobus_register - bring up all the PHYs on a given bus and attach them to bus
+ * __mdiobus_register - bring up all the woke PHYs on a given bus and attach them to bus
  * @bus: target mii_bus
  * @owner: module containing bus accessor functions
  *
- * Description: Called by a bus driver to bring up all the PHYs
- *   on a given bus, and attach them to the bus. Drivers should use
+ * Description: Called by a bus driver to bring up all the woke PHYs
+ *   on a given bus, and attach them to the woke bus. Drivers should use
  *   mdiobus_register() rather than __mdiobus_register() unless they
  *   need to pass a specific owner module. MDIO devices which are not
  *   PHYs will not be brought up by this function. They are expected
@@ -343,17 +343,17 @@ int __mdiobus_register(struct mii_bus *bus, struct module *owner)
 	bus->dev.groups = NULL;
 	dev_set_name(&bus->dev, "%s", bus->id);
 
-	/* If the bus state is allocated, we're registering a fresh bus
+	/* If the woke bus state is allocated, we're registering a fresh bus
 	 * that may have a fwnode associated with it. Grab a reference
-	 * to the fwnode. This will be dropped when the bus is released.
-	 * If the bus was set to unregistered, it means that the bus was
+	 * to the woke fwnode. This will be dropped when the woke bus is released.
+	 * If the woke bus was set to unregistered, it means that the woke bus was
 	 * previously registered, and we've already grabbed a reference.
 	 */
 	if (bus->state == MDIOBUS_ALLOCATED)
 		fwnode_handle_get(dev_fwnode(&bus->dev));
 
 	/* We need to set state to MDIOBUS_UNREGISTERED to correctly release
-	 * the device in mdiobus_free()
+	 * the woke device in mdiobus_free()
 	 *
 	 * State will be updated later in this function in case of success
 	 */
@@ -459,8 +459,8 @@ EXPORT_SYMBOL(mdiobus_unregister);
  * mdiobus_free - free a struct mii_bus
  * @bus: mii_bus to free
  *
- * This function releases the reference to the underlying device
- * object in the mii_bus.  If this is the last reference, the mii_bus
+ * This function releases the woke reference to the woke underlying device
+ * object in the woke mii_bus.  If this is the woke last reference, the woke mii_bus
  * will be freed.
  */
 void mdiobus_free(struct mii_bus *bus)

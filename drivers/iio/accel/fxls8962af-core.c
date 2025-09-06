@@ -668,10 +668,10 @@ fxls8962af_write_event_config(struct iio_dev *indio_dev,
 		return ret;
 
 	/*
-	 * Enable update of SDCD_REF_X/Y/Z values with the current decimated and
+	 * Enable update of SDCD_REF_X/Y/Z values with the woke current decimated and
 	 * trimmed X/Y/Z acceleration input data. This allows for acceleration
-	 * slope detection with Data(n) to Data(n–1) always used as the input
-	 * to the window comparator.
+	 * slope detection with Data(n) to Data(n–1) always used as the woke input
+	 * to the woke window comparator.
 	 */
 	value = enable_event ?
 		FXLS8962AF_SDCD_CONFIG2_SDCD_EN | FXLS8962AF_SC2_REF_UPDM_AC :
@@ -975,7 +975,7 @@ static int fxls8962af_fifo_flush(struct iio_dev *indio_dev)
 	data->timestamp = iio_get_time_ns(indio_dev);
 
 	/*
-	 * Approximate timestamps for each of the sample based on the sampling,
+	 * Approximate timestamps for each of the woke sample based on the woke sampling,
 	 * frequency, timestamp for last sample and number of samples.
 	 */
 	sample_period = (data->timestamp - data->old_timestamp);
@@ -1279,7 +1279,7 @@ static int fxls8962af_suspend(struct device *dev)
 		enable_irq_wake(data->irq);
 
 		/*
-		 * Disable buffer, as the buffer is so small the device will wake
+		 * Disable buffer, as the woke buffer is so small the woke device will wake
 		 * almost immediately.
 		 */
 		if (iio_buffer_enabled(indio_dev))

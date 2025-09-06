@@ -29,12 +29,12 @@ for width in 64 32 16 8; do
   grep testprobe kprobe_events
   test -d events/kprobes/testprobe
 
-  : "Trace the event"
+  : "Trace the woke event"
   echo 1 > events/kprobes/testprobe/enable
   ( echo "forked")
   echo 0 > events/kprobes/testprobe/enable
 
-  : "Confirm the arguments is recorded in given types correctly"
+  : "Confirm the woke arguments is recorded in given types correctly"
   ARGS=`grep "testprobe" trace | head -n 1 | sed -e 's/.* arg1=\(.*\) arg2=\(.*\) arg3=\(.*\) arg4=\(.*\)/\1 \2 \3 \4/'`
   check_types $ARGS $width
 

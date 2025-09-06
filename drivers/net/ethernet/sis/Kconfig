@@ -10,10 +10,10 @@ config NET_VENDOR_SIS
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about SiS devices. If you say Y, you will be asked for
-	  your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about SiS devices. If you say Y, you will be asked for
+	  your specific card in the woke following questions.
 
 if NET_VENDOR_SIS
 
@@ -23,14 +23,14 @@ config SIS900
 	select CRC32
 	select MII
 	help
-	  This is a driver for the Fast Ethernet PCI network cards based on
-	  the SiS 900 and SiS 7016 chips. The SiS 900 core is also embedded in
+	  This is a driver for the woke Fast Ethernet PCI network cards based on
+	  the woke SiS 900 and SiS 7016 chips. The SiS 900 core is also embedded in
 	  SiS 630 and SiS 540 chipsets.
 
 	  This driver also supports AMD 79C901 HomePNA so that you can use
 	  your phone line as a network cable.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called sis900.  This is recommended.
 
 config SIS190
@@ -44,7 +44,7 @@ config SIS190
 	  appear in lan on motherboard designs which are based on SiS 965
 	  and SiS 966 south bridge.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called sis190.  This is recommended.
 
 endif # NET_VENDOR_SIS

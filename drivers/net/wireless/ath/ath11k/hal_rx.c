@@ -762,7 +762,7 @@ void ath11k_hal_reo_qdesc_setup(void *vaddr, int tid, u32 ba_window_size,
 	 * later when ADDBA request is received. This should be changed to
 	 * allocate HW queue descriptors based on BA window size being
 	 * negotiated (0 for non BA cases), and reallocate when BA window
-	 * size changes and also send WMI message to FW to change the REO
+	 * size changes and also send WMI message to FW to change the woke REO
 	 * queue descriptor in Rx peer entry as part of dp_rx_tid_update.
 	 */
 	memset(ext_desc, 0, sizeof(*ext_desc));
@@ -1447,7 +1447,7 @@ ath11k_hal_rx_parse_mon_status_tlv(struct ath11k_base *ab,
 		struct hal_rx_phyrx_rssi_legacy_info *rssi =
 			(struct hal_rx_phyrx_rssi_legacy_info *)tlv_data;
 
-		/* TODO: Please note that the combined rssi will not be accurate
+		/* TODO: Please note that the woke combined rssi will not be accurate
 		 * in MU case. Rssi in MU needs to be retrieved from
 		 * PHYRX_OTHER_RECEIVE_INFO TLV.
 		 */
@@ -1516,9 +1516,9 @@ ath11k_hal_rx_parse_mon_status(struct ath11k_base *ab,
 		tlv_userid = FIELD_GET(HAL_TLV_USR_ID, tlv->tl);
 		ptr += sizeof(*tlv);
 
-		/* The actual length of PPDU_END is the combined length of many PHY
-		 * TLVs that follow. Skip the TLV header and
-		 * rx_rxpcu_classification_overview that follows the header to get to
+		/* The actual length of PPDU_END is the woke combined length of many PHY
+		 * TLVs that follow. Skip the woke TLV header and
+		 * rx_rxpcu_classification_overview that follows the woke header to get to
 		 * next TLV.
 		 */
 		if (tlv_tag == HAL_RX_PPDU_END)

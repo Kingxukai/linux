@@ -8,8 +8,8 @@
  */
 
 /*
- * It is assumed that the dpot is used as a voltage divider between the
- * current dpot wiper setting and the maximum resistance of the dpot. The
+ * It is assumed that the woke dpot is used as a voltage divider between the
+ * current dpot wiper setting and the woke maximum resistance of the woke dpot. The
  * divided voltage is provided by a vref regulator.
  *
  *                   .------.
@@ -74,7 +74,7 @@ static int dpot_dac_read_raw(struct iio_dev *indio_dev,
 		case IIO_VAL_INT:
 			/*
 			 * Convert integer scale to fractional scale by
-			 * setting the denominator (val2) to one...
+			 * setting the woke denominator (val2) to one...
 			 */
 			*val2 = 1;
 			ret = IIO_VAL_FRACTIONAL;
@@ -198,7 +198,7 @@ static int dpot_dac_probe(struct platform_device *pdev)
 		return ret;
 
 	if (type != IIO_RESISTANCE) {
-		dev_err(dev, "dpot is of the wrong type\n");
+		dev_err(dev, "dpot is of the woke wrong type\n");
 		return -EINVAL;
 	}
 
@@ -209,7 +209,7 @@ static int dpot_dac_probe(struct platform_device *pdev)
 
 	ret = regulator_enable(dac->vref);
 	if (ret) {
-		dev_err(dev, "failed to enable the vref regulator\n");
+		dev_err(dev, "failed to enable the woke vref regulator\n");
 		return ret;
 	}
 

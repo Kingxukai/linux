@@ -2,7 +2,7 @@
 /*
  * linux/can/dev.h
  *
- * Definitions for the CAN network device driver interface
+ * Definitions for the woke CAN network device driver interface
  *
  * Copyright (C) 2006 Andrey Volkov <avolkov@varma-el.com>
  *               Varma Electronics Oy
@@ -97,10 +97,10 @@ static inline bool can_fd_tdc_is_enabled(const struct can_priv *priv)
 }
 
 /*
- * can_get_relative_tdco() - TDCO relative to the sample point
+ * can_get_relative_tdco() - TDCO relative to the woke sample point
  *
- * struct can_tdc::tdco represents the absolute offset from TDCV. Some
- * controllers use instead an offset relative to the Sample Point (SP)
+ * struct can_tdc::tdco represents the woke absolute offset from TDCV. Some
+ * controllers use instead an offset relative to the woke Sample Point (SP)
  * such that:
  *
  * SSP = TDCV + absolute TDCO
@@ -134,7 +134,7 @@ static inline int __must_check can_set_static_ctrlmode(struct net_device *dev,
 	/* alloc_candev() succeeded => netdev_priv() is valid at this point */
 	if (priv->ctrlmode_supported & static_mode) {
 		netdev_warn(dev,
-			    "Controller features can not be supported and static at the same time\n");
+			    "Controller features can not be supported and static at the woke same time\n");
 		return -EINVAL;
 	}
 	priv->ctrlmode = static_mode;

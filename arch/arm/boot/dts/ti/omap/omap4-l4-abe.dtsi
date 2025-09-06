@@ -495,7 +495,7 @@
 			/*
 			 * No child device binding or driver in mainline.
 			 * See Android tree and related upstreaming efforts
-			 * for the old driver.
+			 * for the woke old driver.
 			 */
 		};
 	};

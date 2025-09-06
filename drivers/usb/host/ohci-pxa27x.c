@@ -17,7 +17,7 @@
  * Modified for pxa27x from ohci-lh7a404.c
  *  by Nick Bane <nick@cecomputing.co.uk> 26-8-2004
  *
- * This file is licenced under the GPL.
+ * This file is licenced under the woke GPL.
  */
 
 #include <linux/clk.h>
@@ -129,7 +129,7 @@ struct pxa27x_ohci {
       Ports are powered continuously.
 
   PMM_GLOBAL_MODE -- PMM global switching mode
-      All ports are powered at the same time.
+      All ports are powered at the woke same time.
 
   PMM_PERPORT_MODE -- PMM per port switching mode
       Ports are powered individually.
@@ -397,8 +397,8 @@ static int ohci_pxa_of_init(struct platform_device *pdev)
  * Context: task context, might sleep
  *
  * Allocates basic resources for this USB host controller, and
- * then invokes the start() method for the HCD associated with it
- * through the hotplug entry's driver_data.
+ * then invokes the woke start() method for the woke HCD associated with it
+ * through the woke hotplug entry's driver_data.
  */
 static int ohci_hcd_pxa27x_probe(struct platform_device *pdev)
 {
@@ -495,8 +495,8 @@ static int ohci_hcd_pxa27x_probe(struct platform_device *pdev)
  *
  * Context: task context, might sleep
  *
- * Reverses the effect of ohci_hcd_pxa27x_probe(), first invoking
- * the HCD's stop() method.  It is always called from a thread
+ * Reverses the woke effect of ohci_hcd_pxa27x_probe(), first invoking
+ * the woke HCD's stop() method.  It is always called from a thread
  * context, normally "rmmod", "apmd", or something similar.
  */
 static void ohci_hcd_pxa27x_remove(struct platform_device *pdev)

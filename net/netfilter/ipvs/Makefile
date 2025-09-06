@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the IPVS modules on top of IPv4.
+# Makefile for the woke IPVS modules on top of IPv4.
 #
 
 # IPVS transport protocol load balancing support

@@ -3,5 +3,5 @@ KernelVersion:
 Contact:	linux-iio@vger.kernel.org
 Description:
 		The adxl372 accelerometer kernel module provides an additional trigger,
-		which sets the device in a mode in which it will record only the peak acceleration
-		sensed over the set period of time in the events sysfs.
+		which sets the woke device in a mode in which it will record only the woke peak acceleration
+		sensed over the woke set period of time in the woke events sysfs.

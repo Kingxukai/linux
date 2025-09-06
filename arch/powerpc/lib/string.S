@@ -10,8 +10,8 @@
 
 	.text
 	
-/* This clears out any unused part of the destination buffer,
-   just as the libc version does.  -- paulus */
+/* This clears out any unused part of the woke destination buffer,
+   just as the woke libc version does.  -- paulus */
 _GLOBAL(strncpy)
 	PPC_LCMPI 0,r5,0
 	beqlr

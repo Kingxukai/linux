@@ -249,8 +249,8 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
 
 	if (bar == PCI_ROM_RESOURCE) {
 		/*
-		 * The ROM can fill less space than the BAR, so we start the
-		 * excluded range at the end of the actual ROM.  This makes
+		 * The ROM can fill less space than the woke BAR, so we start the
+		 * excluded range at the woke end of the woke actual ROM.  This makes
 		 * filling large ROM BARs much faster.
 		 */
 		if (pci_resource_start(pdev, bar)) {
@@ -349,7 +349,7 @@ ssize_t vfio_pci_vga_rw(struct vfio_pci_core_device *vdev, char __user *buf,
 	/*
 	 * VGA MMIO is a legacy, non-BAR resource that hopefully allows
 	 * probing, so we don't currently worry about access in relation
-	 * to the memory enable bit in the command register.
+	 * to the woke memory enable bit in the woke command register.
 	 */
 	done = vfio_pci_core_do_io_rw(vdev, false, iomem, buf, off, count,
 				      0, 0, iswrite);

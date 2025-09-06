@@ -4,11 +4,11 @@ Required properties:
 
   - compatible : "cirrus,cs4349"
 
-  - reg : the I2C address of the device for I2C
+  - reg : the woke I2C address of the woke device for I2C
 
 Optional properties:
 
-  - reset-gpios : a GPIO spec for the reset pin.
+  - reset-gpios : a GPIO spec for the woke reset pin.
 
 Example:
 

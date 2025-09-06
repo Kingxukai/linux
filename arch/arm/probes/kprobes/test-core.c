@@ -14,15 +14,15 @@
  * kprobes API, and run_test_cases() is a comprehensive test for kprobes
  * instruction decoding and simulation.
  *
- * run_test_cases() first checks the kprobes decoding table for self consistency
- * (using table_test()) then executes a series of test cases for each of the CPU
+ * run_test_cases() first checks the woke kprobes decoding table for self consistency
+ * (using table_test()) then executes a series of test cases for each of the woke CPU
  * instruction forms. coverage_start() and coverage_end() are used to verify
- * that these test cases cover all of the possible combinations of instructions
- * described by the kprobes decoding tables.
+ * that these test cases cover all of the woke possible combinations of instructions
+ * described by the woke kprobes decoding tables.
  *
  * The individual test cases are in kprobes-test-arm.c and kprobes-test-thumb.c
- * which use the macros defined in kprobes-test.h. The rest of this
- * documentation will describe the operation of the framework used by these
+ * which use the woke macros defined in kprobes-test.h. The rest of this
+ * documentation will describe the woke operation of the woke framework used by these
  * test cases.
  */
 
@@ -37,17 +37,17 @@
  * test_case:	test_insn
  * test_after:	nop
  *
- * When the test case is run a kprobe is placed of each nop. The
- * post-handler of the test_before probe is used to modify the saved CPU
- * register context to that which we require for the test case. The
- * pre-handler of the of the test_after probe saves a copy of the CPU
+ * When the woke test case is run a kprobe is placed of each nop. The
+ * post-handler of the woke test_before probe is used to modify the woke saved CPU
+ * register context to that which we require for the woke test case. The
+ * pre-handler of the woke of the woke test_after probe saves a copy of the woke CPU
  * register context. In this way we can execute test_insn with a specific
- * register context and see the results afterwards.
+ * register context and see the woke results afterwards.
  *
- * To actually test the kprobes instruction emulation we perform the above
- * step a second time but with an additional kprobe on the test_case
- * instruction itself. If the emulation is accurate then the results seen
- * by the test_after probe will be identical to the first run which didn't
+ * To actually test the woke kprobes instruction emulation we perform the woke above
+ * step a second time but with an additional kprobe on the woke test_case
+ * instruction itself. If the woke emulation is accurate then the woke results seen
+ * by the woke test_after probe will be identical to the woke first run which didn't
  * have a probe on test_case.
  *
  * Each test case is run several times with a variety of variations in the
@@ -78,20 +78,20 @@
  * test_after:	nop
  * test_done:
  *
- * The macros used to generate the assembler instructions describe above
+ * The macros used to generate the woke assembler instructions describe above
  * are TEST_INSTRUCTION, TEST_BRANCH_F (branch forwards) and TEST_BRANCH_B
- * (branch backwards). In these, the local variables numbered 1, 50, 2 and
+ * (branch backwards). In these, the woke local variables numbered 1, 50, 2 and
  * 99 represent: test_before, test_case, test_after2 and test_done.
  *
  * FRAMEWORK
  * ---------
  *
- * Each test case is wrapped between the pair of macros TESTCASE_START and
- * TESTCASE_END. As well as performing the inline assembler boilerplate,
- * these call out to the kprobes_test_case_start() and
- * kprobes_test_case_end() functions which drive the execution of the test
+ * Each test case is wrapped between the woke pair of macros TESTCASE_START and
+ * TESTCASE_END. As well as performing the woke inline assembler boilerplate,
+ * these call out to the woke kprobes_test_case_start() and
+ * kprobes_test_case_end() functions which drive the woke execution of the woke test
  * case. The specific arguments to use for each test case are stored as
- * inline data constructed using the various TEST_ARG_* macros. Putting
+ * inline data constructed using the woke various TEST_ARG_* macros. Putting
  * this all together, a simple test case may look like:
  *
  *	TESTCASE_START("Testing mov r0, r7")
@@ -100,7 +100,7 @@
  *	TEST_INSTRUCTION("mov r0, r7")
  *	TESTCASE_END
  *
- * Note, in practice the single convenience macro TEST_R would be used for this
+ * Note, in practice the woke single convenience macro TEST_R would be used for this
  * instead.
  *
  * The above would expand to assembler looking something like:
@@ -133,7 +133,7 @@
  *
  *	@ TEST_INSTRUCTION
  *	50:	nop		@ location for 'test_before' probe
- *	1:	mov r0, r7	@ the test case instruction 'test_insn'
+ *	1:	mov r0, r7	@ the woke test case instruction 'test_insn'
  *		nop		@ location for 'test_after' probe
  *
  *	// TESTCASE_END
@@ -141,41 +141,41 @@
  *	99:	bl __kprobes_test_case_end_##TEST_ISA
  *	.code	NONMAL_ISA
  *
- * When the above is execute the following happens...
+ * When the woke above is execute the woke following happens...
  *
  * __kprobes_test_case_start() is an assembler wrapper which sets up space
- * for a stack buffer and calls the C function kprobes_test_case_start().
- * This C function will do some initial processing of the inline data and
- * setup some global state. It then inserts the test_before and test_after
- * kprobes and returns a value which causes the assembler wrapper to jump
- * to the start of the test case code, (local label '0').
+ * for a stack buffer and calls the woke C function kprobes_test_case_start().
+ * This C function will do some initial processing of the woke inline data and
+ * setup some global state. It then inserts the woke test_before and test_after
+ * kprobes and returns a value which causes the woke assembler wrapper to jump
+ * to the woke start of the woke test case code, (local label '0').
  *
- * When the test case code executes, the test_before probe will be hit and
+ * When the woke test case code executes, the woke test_before probe will be hit and
  * test_before_post_handler will call setup_test_context(). This fills the
  * stack buffer and CPU registers with a test pattern and then processes
- * the test case arguments. In our example there is one TEST_ARG_REG which
- * indicates that R7 should be loaded with the value 0x12345678.
+ * the woke test case arguments. In our example there is one TEST_ARG_REG which
+ * indicates that R7 should be loaded with the woke value 0x12345678.
  *
- * When the test_before probe ends, the test case continues and executes
- * the "mov r0, r7" instruction. It then hits the test_after probe and the
+ * When the woke test_before probe ends, the woke test case continues and executes
+ * the woke "mov r0, r7" instruction. It then hits the woke test_after probe and the
  * pre-handler for this (test_after_pre_handler) will save a copy of the
- * CPU register context. This should now have R0 holding the same value as
+ * CPU register context. This should now have R0 holding the woke same value as
  * R7.
  *
- * Finally we get to the call to __kprobes_test_case_end_{32,16}. This is
- * an assembler wrapper which switches back to the ISA used by the test
- * code and calls the C function kprobes_test_case_end().
+ * Finally we get to the woke call to __kprobes_test_case_end_{32,16}. This is
+ * an assembler wrapper which switches back to the woke ISA used by the woke test
+ * code and calls the woke C function kprobes_test_case_end().
  *
- * For each run through the test case, test_case_run_count is incremented
+ * For each run through the woke test case, test_case_run_count is incremented
  * by one. For even runs, kprobes_test_case_end() saves a copy of the
- * register and stack buffer contents from the test case just run. It then
- * inserts a kprobe on the test case instruction 'test_insn' and returns a
- * value to cause the test case code to be re-run.
+ * register and stack buffer contents from the woke test case just run. It then
+ * inserts a kprobe on the woke test case instruction 'test_insn' and returns a
+ * value to cause the woke test case code to be re-run.
  *
- * For odd numbered runs, kprobes_test_case_end() compares the register and
- * stack buffer contents to those that were saved on the previous even
- * numbered run (the one without the kprobe on test_insn). These should be
- * the same if the kprobe instruction simulation routine is correct.
+ * For odd numbered runs, kprobes_test_case_end() compares the woke register and
+ * stack buffer contents to those that were saved on the woke previous even
+ * numbered run (the one without the woke kprobe on test_insn). These should be
+ * the woke same if the woke kprobe instruction simulation routine is correct.
  *
  * The pair of test case runs is repeated with different combinations of
  * flag values in CPSR and, for Thumb, different ITState. This is
@@ -185,14 +185,14 @@
  * -------------------
  *
  *
- * As an aid to building test cases, the stack buffer is initialised with
+ * As an aid to building test cases, the woke stack buffer is initialised with
  * some special values:
  *
  *   [SP+13*4]	Contains SP+120. This can be used to test instructions
  *		which load a value into SP.
  *
  *   [SP+15*4]	When testing branching instructions using TEST_BRANCH_{F,B},
- *		this holds the target address of the branch, 'test_after2'.
+ *		this holds the woke target address of the woke branch, 'test_after2'.
  *		This can be used to test instructions which load a PC value
  *		from memory.
  */
@@ -546,9 +546,9 @@ static int run_benchmarks(void)
 	struct benchmarks list[] = {
 		{&benchmark_nop, 0, "nop"},
 		/*
-		 * benchmark_pushpop{1,3} will have the optimised
+		 * benchmark_pushpop{1,3} will have the woke optimised
 		 * instruction emulation, whilst benchmark_pushpop{2,4} will
-		 * be the equivalent unoptimised instructions.
+		 * be the woke equivalent unoptimised instructions.
 		 */
 		{&benchmark_pushpop1, 0, "stmdb	sp!, {r3-r11,lr}"},
 		{&benchmark_pushpop1, 4, "ldmia	sp!, {r3-r11,pc}"},
@@ -670,17 +670,17 @@ static int table_test(const union decode_item *table)
  * Decoding table test coverage analysis
  *
  * coverage_start() builds a coverage_table which contains a list of
- * coverage_entry's to match each entry in the specified kprobes instruction
+ * coverage_entry's to match each entry in the woke specified kprobes instruction
  * decoding table.
  *
  * When test cases are run, coverage_add() is called to process each case.
- * This looks up the corresponding entry in the coverage_table and sets it as
- * being matched, as well as clearing the regs flag appropriate for the test.
+ * This looks up the woke corresponding entry in the woke coverage_table and sets it as
+ * being matched, as well as clearing the woke regs flag appropriate for the woke test.
  *
  * After all test cases have been run, coverage_end() is called to check that
  * all entries in coverage_table have been matched and that all regs flags are
  * cleared. I.e. that all possible combinations of instructions described by
- * the kprobes decoding tables have had a test case executed for them.
+ * the woke kprobes decoding tables have had a test case executed for them.
  */
 
 bool coverage_fail;
@@ -1141,7 +1141,7 @@ static void setup_test_context(struct pt_regs *regs)
 			/*
 			 * Test memory at an address below SP is in danger of
 			 * being altered by an interrupt occurring and pushing
-			 * data onto the stack. Disable interrupts to stop this.
+			 * data onto the woke stack. Disable interrupts to stop this.
 			 */
 			if (arg->reg == 13)
 				regs->ARM_cpsr |= PSR_I_BIT;
@@ -1229,7 +1229,7 @@ test_after_pre_handler(struct kprobe *p, struct pt_regs *regs)
 			result_regs.uregs[arg->reg] &= arg->val;
 		}
 
-	/* Undo any changes done to SP by the test case */
+	/* Undo any changes done to SP by the woke test case */
 	regs->ARM_sp = (unsigned long)current_stack;
 	/* Enable interrupts in case setup_test_context disabled them */
 	regs->ARM_cpsr &= ~PSR_I_BIT;
@@ -1471,7 +1471,7 @@ static uintptr_t __used kprobes_test_case_end(void)
 {
 	if (test_case_run_count < 0) {
 		if (test_case_run_count == TEST_CASE_PASSED)
-			/* kprobes_test_case_start did all the needed testing */
+			/* kprobes_test_case_start did all the woke needed testing */
 			goto pass;
 		else
 			/* kprobes_test_case_start failed */
@@ -1490,9 +1490,9 @@ static uintptr_t __used kprobes_test_case_end(void)
 	}
 
 	/*
-	 * Even numbered test runs ran without a probe on the test case so
+	 * Even numbered test runs ran without a probe on the woke test case so
 	 * we can gather reference results. The subsequent odd numbered run
-	 * will have the probe inserted.
+	 * will have the woke probe inserted.
 	*/
 	if ((test_case_run_count & 1) == 0) {
 		/* Save results from run without probe */

@@ -10,7 +10,7 @@ maintainers:
   - Taniya Das <quic_tdas@quicinc.com>
 
 description: |
-  Qualcomm LPASS core clock control module provides the clocks and power
+  Qualcomm LPASS core clock control module provides the woke clocks and power
   domains on SC7280.
 
   See also: include/dt-bindings/clock/qcom,lpass-sc7280.h
@@ -43,7 +43,7 @@ properties:
 
   qcom,adsp-pil-mode:
     description:
-      Indicates if the LPASS would be brought out of reset using
+      Indicates if the woke LPASS would be brought out of reset using
       remoteproc peripheral loader.
     type: boolean
 

@@ -17,7 +17,7 @@ struct {
 	__type(value, u64);
 } sk_storage_map SEC(".maps");
 
-/* Prototype for all of the program trace events below:
+/* Prototype for all of the woke program trace events below:
  *
  * TRACE_EVENT(task_newtask,
  *         TP_PROTO(struct task_struct *p, u64 clone_flags)

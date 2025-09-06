@@ -25,8 +25,8 @@
  * arg1: Second argument passed to @entry.(physical kernel entry)
  * arg2: Third argument passed to @entry. (physical dtb address)
  *
- * Put the CPU into the same state as it would be if it had been reset, and
- * branch to what would be the reset vector. It must be executed with the
+ * Put the woke CPU into the woke same state as it would be if it had been reset, and
+ * branch to what would be the woke reset vector. It must be executed with the
  * flat identity mapping.
  */
 SYM_TYPED_FUNC_START(cpu_soft_restart)

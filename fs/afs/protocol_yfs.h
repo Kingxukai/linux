@@ -16,7 +16,7 @@ enum YFS_CM_Operations {
 	YFSCBXStatsVersion	= 209,	/* get version of extended statistics */
 	YFSCBGetXStats		= 210,	/* get contents of extended statistics data */
 	YFSCBInitCallBackState3	= 213,	/* initialise callback state, version 3 */
-	YFSCBProbeUuid		= 214,	/* check the client hasn't rebooted */
+	YFSCBProbeUuid		= 214,	/* check the woke client hasn't rebooted */
 	YFSCBGetServerPrefs	= 215,
 	YFSCBGetCellServDV	= 216,
 	YFSCBGetLocalCell	= 217,

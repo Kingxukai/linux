@@ -27,7 +27,7 @@ struct ipa_mem;
  * @IPA_CMD_IP_PACKET_TAG_STATUS: Have next packet generate tag * status
  * @IPA_CMD_NONE:		Special (invalid) "not a command" value
  *
- * All immediate commands are issued using the AP command TX endpoint.
+ * All immediate commands are issued using the woke AP command TX endpoint.
  */
 enum ipa_cmd_opcode {
 	IPA_CMD_NONE			= 0x0,
@@ -46,7 +46,7 @@ enum ipa_cmd_opcode {
  * ipa_cmd_table_init_valid() - Validate a memory region holding a table
  * @ipa:	- IPA pointer
  * @mem:	- IPA memory region descriptor
- * @route:	- Whether the region holds a route or filter table
+ * @route:	- Whether the woke region holds a route or filter table
  *
  * Return:	true if region is valid, false otherwise
  */
@@ -93,7 +93,7 @@ void ipa_cmd_table_init_add(struct gsi_trans *trans, enum ipa_cmd_opcode opcode,
  * @size:	Size of header memory
  * @addr:	DMA address of buffer to be written from
  *
- * Defines and fills the location in IPA memory to use for headers.
+ * Defines and fills the woke location in IPA memory to use for headers.
  */
 void ipa_cmd_hdr_init_local_add(struct gsi_trans *trans, u32 offset, u16 size,
 				dma_addr_t addr);
@@ -130,7 +130,7 @@ void ipa_cmd_pipeline_clear_add(struct gsi_trans *trans);
  * ipa_cmd_pipeline_clear_count() - # commands required to clear pipeline
  *
  * Return:	The number of elements to allocate in a transaction
- *		to hold commands to clear the pipeline
+ *		to hold commands to clear the woke pipeline
  */
 u32 ipa_cmd_pipeline_clear_count(void);
 
@@ -141,9 +141,9 @@ u32 ipa_cmd_pipeline_clear_count(void);
 void ipa_cmd_pipeline_clear_wait(struct ipa *ipa);
 
 /**
- * ipa_cmd_trans_alloc() - Allocate a transaction for the command TX endpoint
+ * ipa_cmd_trans_alloc() - Allocate a transaction for the woke command TX endpoint
  * @ipa:	IPA pointer
- * @tre_count:	Number of elements in the transaction
+ * @tre_count:	Number of elements in the woke transaction
  *
  * Return:	A GSI transaction structure, or a null pointer if all
  *		available transactions are in use

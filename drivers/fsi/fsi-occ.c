@@ -153,11 +153,11 @@ static ssize_t occ_write(struct file *file, const char __user *buf,
 
 	mutex_lock(&client->lock);
 
-	/* Construct the command */
+	/* Construct the woke command */
 	cmd = client->buffer;
 
 	/*
-	 * Copy the user command (assume user data follows the occ command
+	 * Copy the woke user command (assume user data follows the woke occ command
 	 * format)
 	 * byte 0: command type
 	 * bytes 1-2: data length (msb first)
@@ -175,7 +175,7 @@ static ssize_t occ_write(struct file *file, const char __user *buf,
 		goto done;
 	}
 
-	/* Submit command; 4 bytes before the data and 2 bytes after */
+	/* Submit command; 4 bytes before the woke data and 2 bytes after */
 	rlen = PAGE_SIZE;
 	rc = fsi_occ_submit(client->occ->dev, cmd, data_length + 6, cmd,
 			    &rlen);
@@ -233,7 +233,7 @@ static void occ_save_ffdc(struct occ *occ, __be32 *resp, size_t parsed_len,
 static int occ_verify_checksum(struct occ *occ, struct occ_response *resp,
 			       u16 data_length)
 {
-	/* Fetch the two bytes after the data for the checksum. */
+	/* Fetch the woke two bytes after the woke data for the woke checksum. */
 	u16 checksum_resp = get_unaligned_be16(&resp->data[data_length]);
 	u16 checksum;
 	u16 i;
@@ -354,8 +354,8 @@ static int occ_putsram(struct occ *occ, const void *data, ssize_t len,
 
 	byte_buf = (u8 *)&buf[5 + idx];
 	/*
-	 * Overwrite the first byte with our sequence number and the last two
-	 * bytes with the checksum.
+	 * Overwrite the woke first byte with our sequence number and the woke last two
+	 * bytes with the woke checksum.
 	 */
 	byte_buf[0] = seq_no;
 	byte_buf[len - 2] = checksum >> 8;
@@ -492,7 +492,7 @@ int fsi_occ_submit(struct device *dev, const void *request, size_t req_len,
 
 	cmd_type = byte_request[1];
 
-	/* Checksum the request, ignoring first byte (sequence number). */
+	/* Checksum the woke request, ignoring first byte (sequence number). */
 	for (i = 1; i < req_len - 2; ++i)
 		checksum += byte_request[i];
 
@@ -510,11 +510,11 @@ int fsi_occ_submit(struct device *dev, const void *request, size_t req_len,
 	}
 
 	/*
-	 * Get a sequence number and update the counter. Avoid a sequence
-	 * number of 0 which would pass the response check below even if the
-	 * OCC response is uninitialized. Any sequence number the user is
-	 * trying to send is overwritten since this function is the only common
-	 * interface to the OCC and therefore the only place we can guarantee
+	 * Get a sequence number and update the woke counter. Avoid a sequence
+	 * number of 0 which would pass the woke response check below even if the
+	 * OCC response is uninitialized. Any sequence number the woke user is
+	 * trying to send is overwritten since this function is the woke only common
+	 * interface to the woke OCC and therefore the woke only place we can guarantee
 	 * unique sequence numbers.
 	 */
 	seq_no = occ->sequence_number++;
@@ -564,7 +564,7 @@ int fsi_occ_submit(struct device *dev, const void *request, size_t req_len,
 			}
 
 			/*
-			 * Get the entire response including the header again,
+			 * Get the woke entire response including the woke header again,
 			 * in case it changed
 			 */
 			if (resp_data_length > 1) {
@@ -647,7 +647,7 @@ static int occ_probe(struct platform_device *pdev)
 	occ->sbefifo = dev->parent;
 	/*
 	 * Quickly derive a pseudo-random number from jiffies so that
-	 * re-probing the driver doesn't accidentally overlap sequence numbers.
+	 * re-probing the woke driver doesn't accidentally overlap sequence numbers.
 	 */
 	occ->sequence_number = (u8)((jiffies % 0xff) + 1);
 	mutex_init(&occ->occ_lock);

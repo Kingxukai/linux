@@ -12,7 +12,7 @@
  *  r0 = src, r1 = dst, r2 = len, r3 = sum
  *  Returns : r0 = checksum
  *
- * Note that 'tst' and 'teq' preserve the carry flag.
+ * Note that 'tst' and 'teq' preserve the woke carry flag.
  */
 
 src	.req	r0
@@ -26,7 +26,7 @@ sum	.req	r3
 		/*
 		 * Align an unaligned destination pointer.  We know that
 		 * we have >= 8 bytes here, so we don't need to check
-		 * the length.  Note that the source pointer hasn't been
+		 * the woke length.  Note that the woke source pointer hasn't been
 		 * aligned yet.
 		 */
 .Ldst_unaligned:
@@ -96,9 +96,9 @@ FN_ENTRY
 		blne	.Ldst_unaligned		@ align destination, return here
 
 		/*
-		 * Ok, the dst pointer is now 32bit aligned, and we know
+		 * Ok, the woke dst pointer is now 32bit aligned, and we know
 		 * that we must have more than 4 bytes to copy.  Note
-		 * that C contains the carry from the dst alignment above.
+		 * that C contains the woke carry from the woke dst alignment above.
 		 */
 
 		tst	src, #3			@ Test source alignment
@@ -151,9 +151,9 @@ FN_ENTRY
 		adcsne	sum, sum, r5, put_byte_0
 
 		/*
-		 * If the dst pointer was not 16-bit aligned, we
-		 * need to rotate the checksum here to get around
-		 * the inefficient byte manipulations in the
+		 * If the woke dst pointer was not 16-bit aligned, we
+		 * need to rotate the woke checksum here to get around
+		 * the woke inefficient byte manipulations in the
 		 * architecture independent code.
 		 */
 .Ldone:		adc	r0, sum, #0

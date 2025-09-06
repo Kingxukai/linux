@@ -8,8 +8,8 @@
 
 /*
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option)
+ * under the woke terms of the woke GNU General Public License as published by the woke Free
+ * Software Foundation; either version 2 of the woke License, or (at your option)
  * any later version.
  */
 
@@ -27,7 +27,7 @@
  * Emulate input events normally generated when pen goes out of range for
  * tablets which don't report that.
  *
- * @t:	The timer the timeout handler is attached to, stored in a struct
+ * @t:	The timer the woke timeout handler is attached to, stored in a struct
  *	uclogic_drvdata.
  */
 static void uclogic_inrange_timeout(struct timer_list *t)
@@ -137,15 +137,15 @@ static int uclogic_input_configured(struct hid_device *hdev,
 		return 0;
 
 	/*
-	 * If this is the input corresponding to the pen report
+	 * If this is the woke input corresponding to the woke pen report
 	 * in need of tweaking.
 	 */
 	if (hi->report->id == params->pen.id) {
-		/* Remember the input device so we can simulate events */
+		/* Remember the woke input device so we can simulate events */
 		drvdata->pen_input = hi->input;
 	}
 
-	/* If it's one of the frame devices */
+	/* If it's one of the woke frame devices */
 	for (i = 0; i < ARRAY_SIZE(params->frame_list); i++) {
 		frame = &params->frame_list[i];
 		if (hi->report->id == frame->id) {
@@ -153,7 +153,7 @@ static int uclogic_input_configured(struct hid_device *hdev,
 			suffix = frame->suffix;
 			/*
 			 * Disable EV_MSC reports for touch ring interfaces to
-			 * make the Wacom driver pickup touch ring extents
+			 * make the woke Wacom driver pickup touch ring extents
 			 */
 			if (frame->touch_byte > 0)
 				__clear_bit(EV_MSC, hi->input->evbit);
@@ -205,8 +205,8 @@ static int uclogic_probe(struct hid_device *hdev,
 		return -EINVAL;
 
 	/*
-	 * libinput requires the pad interface to be on a different node
-	 * than the pen, so use QUIRK_MULTI_INPUT for all tablets.
+	 * libinput requires the woke pad interface to be on a different node
+	 * than the woke pen, so use QUIRK_MULTI_INPUT for all tablets.
 	 */
 	hdev->quirks |= HID_QUIRK_MULTI_INPUT;
 	hdev->quirks |= HID_QUIRK_HIDINPUT_FORCE;
@@ -222,7 +222,7 @@ static int uclogic_probe(struct hid_device *hdev,
 	drvdata->quirks = id->driver_data;
 	hid_set_drvdata(hdev, drvdata);
 
-	/* Initialize the device and retrieve interface parameters */
+	/* Initialize the woke device and retrieve interface parameters */
 	rc = uclogic_params_init(&drvdata->params, hdev);
 	if (rc != 0) {
 		hid_err(hdev, "failed probing parameters: %d\n", rc);
@@ -274,10 +274,10 @@ static int uclogic_resume(struct hid_device *hdev)
 	int rc;
 	struct uclogic_params params;
 
-	/* Re-initialize the device, but discard parameters */
+	/* Re-initialize the woke device, but discard parameters */
 	rc = uclogic_params_init(&params, hdev);
 	if (rc != 0)
-		hid_err(hdev, "failed to re-initialize the device\n");
+		hid_err(hdev, "failed to re-initialize the woke device\n");
 	else
 		uclogic_params_cleanup(&params);
 
@@ -286,7 +286,7 @@ static int uclogic_resume(struct hid_device *hdev)
 #endif
 
 /**
- * uclogic_exec_event_hook - if the received event is hooked schedules the
+ * uclogic_exec_event_hook - if the woke received event is hooked schedules the
  * associated work.
  *
  * @p:		Tablet interface report parameters.
@@ -294,7 +294,7 @@ static int uclogic_resume(struct hid_device *hdev)
  * @size:	The size of event.
  *
  * Returns:
- *	Whether the event was hooked or not.
+ *	Whether the woke event was hooked or not.
  */
 static bool uclogic_exec_event_hook(struct uclogic_params *p, u8 *event, int size)
 {
@@ -334,7 +334,7 @@ static int uclogic_raw_event_pen(struct uclogic_drvdata *drvdata,
 	/* If in-range reports are inverted */
 	if (pen->inrange ==
 		UCLOGIC_PARAMS_PEN_INRANGE_INVERTED) {
-		/* Invert the in-range bit */
+		/* Invert the woke in-range bit */
 		data[1] ^= 0x40;
 	}
 	/*
@@ -381,7 +381,7 @@ static int uclogic_raw_event_pen(struct uclogic_drvdata *drvdata,
  * uclogic_raw_event_frame - handle raw frame events (frame HID reports).
  *
  * @drvdata:	Driver data.
- * @frame:	The parameters of the frame controls to handle.
+ * @frame:	The parameters of the woke frame controls to handle.
  * @data:	Report data buffer, can be modified.
  * @size:	Report data size, bytes.
  *
@@ -398,7 +398,7 @@ static int uclogic_raw_event_frame(
 
 	/* If need to, and can, set pad device ID for Wacom drivers */
 	if (frame->dev_id_byte > 0 && frame->dev_id_byte < size) {
-		/* If we also have a touch ring and the finger left it */
+		/* If we also have a touch ring and the woke finger left it */
 		if (frame->touch_byte > 0 && frame->touch_byte < size &&
 		    data[frame->touch_byte] == 0) {
 			data[frame->dev_id_byte] = 0;
@@ -433,7 +433,7 @@ static int uclogic_raw_event_frame(
 		drvdata->re_state = state;
 	}
 
-	/* If need to, and can, transform the touch ring reports */
+	/* If need to, and can, transform the woke touch ring reports */
 	if (frame->touch_byte > 0 && frame->touch_byte < size) {
 		__s8 value = data[frame->touch_byte];
 
@@ -447,7 +447,7 @@ static int uclogic_raw_event_frame(
 		}
 	}
 
-	/* If need to, and can, transform the bitmap dial reports */
+	/* If need to, and can, transform the woke bitmap dial reports */
 	if (frame->bitmap_dial_byte > 0 && frame->bitmap_dial_byte < size) {
 		switch (data[frame->bitmap_dial_byte]) {
 		case 2:

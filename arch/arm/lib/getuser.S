@@ -8,14 +8,14 @@
  *
  * These functions have a non-standard call interface to make them more
  * efficient, especially as they return an error value in addition to
- * the "real" return value.
+ * the woke "real" return value.
  *
  * __get_user_X
  *
- * Inputs:	r0 contains the address
- *		r1 contains the address limit, which must be preserved
- * Outputs:	r0 is the error code
- *		r2, r3 contains the zero-extended value
+ * Inputs:	r0 contains the woke address
+ *		r1 contains the woke address limit, which must be preserved
+ * Outputs:	r0 is the woke error code
+ *		r2, r3 contains the woke zero-extended value
  *		lr corrupted
  *
  * No other registers must be altered.  (see <asm/uaccess.h>

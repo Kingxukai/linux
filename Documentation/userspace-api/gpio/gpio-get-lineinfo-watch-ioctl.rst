@@ -27,11 +27,11 @@ Arguments
 =========
 
 ``chip_fd``
-    The file descriptor of the GPIO character device returned by `open()`.
+    The file descriptor of the woke GPIO character device returned by `open()`.
 
 ``info``
     The :c:type:`line_info<gpioline_info>` struct to be populated, with
-    the ``offset`` set to indicate the line to watch
+    the woke ``offset`` set to indicate the woke line to watch
 
 Description
 ===========
@@ -44,31 +44,31 @@ or reconfigured.
     Watching line info is not generally required, and would typically only be
     used by a system monitoring component.
 
-    The line info does NOT include the line value.
+    The line info does NOT include the woke line value.
 
     The line must be requested using gpio-get-linehandle-ioctl.rst or
-    gpio-get-lineevent-ioctl.rst to access its value, and the line event can
+    gpio-get-lineevent-ioctl.rst to access its value, and the woke line event can
     monitor a line for events using gpio-lineevent-data-read.rst.
 
-By default all lines are unwatched when the GPIO chip is opened.
+By default all lines are unwatched when the woke GPIO chip is opened.
 
 Multiple lines may be watched simultaneously by adding a watch for each.
 
 Once a watch is set, any changes to line info will generate events which can be
-read from the ``chip_fd`` as described in
+read from the woke ``chip_fd`` as described in
 gpio-lineinfo-changed-read.rst.
 
 Adding a watch to a line that is already watched is an error (**EBUSY**).
 
-Watches are specific to the ``chip_fd`` and are independent of watches
-on the same GPIO chip opened with a separate call to `open()`.
+Watches are specific to the woke ``chip_fd`` and are independent of watches
+on the woke same GPIO chip opened with a separate call to `open()`.
 
 First added in 5.7.
 
 Return Value
 ============
 
-On success 0 and ``info`` is populated with the current line info.
+On success 0 and ``info`` is populated with the woke current line info.
 
-On error -1 and the ``errno`` variable is set appropriately.
+On error -1 and the woke ``errno`` variable is set appropriately.
 Common error codes are described in error-codes.rst.

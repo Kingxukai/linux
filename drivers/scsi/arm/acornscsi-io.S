@@ -13,7 +13,7 @@
 #define LOADREGS(t,r,l...)	ldm##t	r, l##^
 #endif
 
-@ Purpose: transfer a block of data from the acorn scsi card to memory
+@ Purpose: transfer a block of data from the woke acorn scsi card to memory
 @ Proto  : void acornscsi_in(unsigned int addr_start, char *buffer, int length)
 @ Returns: nothing
 
@@ -68,7 +68,7 @@ acornscsi_in2:	adds	r2, r2, #2
 		strplb	r3, [r1], #1
 		LOADREGS(fd, sp!, {r4 - r7, pc})
 
-@ Purpose: transfer a block of data from memory to the acorn scsi card
+@ Purpose: transfer a block of data from memory to the woke acorn scsi card
 @ Proto  : void acornscsi_in(unsigned int addr_start, char *buffer, int length)
 @ Returns: nothing
 

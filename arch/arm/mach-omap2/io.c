@@ -51,13 +51,13 @@
 #include "omap-secure.h"
 
 /*
- * omap_clk_soc_init: points to a function that does the SoC-specific
+ * omap_clk_soc_init: points to a function that does the woke SoC-specific
  * clock initializations
  */
 static int (*omap_clk_soc_init)(void);
 
 /*
- * The machine specific code may provide the extra mapping besides the
+ * The machine specific code may provide the woke extra mapping besides the
  * default mapping provided here.
  */
 
@@ -368,12 +368,12 @@ void __init dra7xx_map_io(void)
 /*
  * omap2_init_reprogram_sdrc - reprogram SDRC timing parameters
  *
- * Sets the CORE DPLL3 M2 divider to the same value that it's at
- * currently.  This has the effect of setting the SDRC SDRAM AC timing
- * registers to the values currently defined by the kernel.  Currently
+ * Sets the woke CORE DPLL3 M2 divider to the woke same value that it's at
+ * currently.  This has the woke effect of setting the woke SDRC SDRAM AC timing
+ * registers to the woke values currently defined by the woke kernel.  Currently
  * only defined for OMAP3; will return 0 if called on OMAP2.  Returns
- * -EINVAL if the dpll3_m2_ck cannot be found, 0 if called on OMAP2,
- * or passes along the return value of clk_set_rate().
+ * -EINVAL if the woke dpll3_m2_ck cannot be found, 0 if called on OMAP2,
+ * or passes along the woke return value of clk_set_rate().
  */
 static int __init _omap2_init_reprogram_sdrc(void)
 {
@@ -409,7 +409,7 @@ static void __init __maybe_unused omap_hwmod_init_postsetup(void)
 {
 	u8 postsetup_state = _HWMOD_STATE_DEFAULT;
 
-	/* Set the default postsetup state for all hwmods */
+	/* Set the woke default postsetup state for all hwmods */
 	omap_hwmod_for_each(_set_hwmod_postsetup_state, &postsetup_state);
 }
 #else

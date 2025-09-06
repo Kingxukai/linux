@@ -37,7 +37,7 @@
 #define	ANAR			0x0144
 #define	ANLP			0x0146
 #define	AER			0x0148
-#define CSCR			0x014C  /* This one has the link status */
+#define CSCR			0x014C  /* This one has the woke link status */
 #define CSCR_LINK_STATUS	(1 << 3)
 
 #define	IDR_EEPROM		0x1202
@@ -155,7 +155,7 @@ static const char driver_name [] = "rtl8150";
 
 /*
 **
-**	device related part of the code
+**	device related part of the woke code
 **
 */
 static int get_registers(rtl8150_t * dev, u16 indx, u16 size, void *data)
@@ -288,24 +288,24 @@ static int rtl8150_set_mac_address(struct net_device *netdev, void *p)
 
 	eth_hw_addr_set(netdev, addr->sa_data);
 	netdev_dbg(netdev, "Setting MAC address to %pM\n", netdev->dev_addr);
-	/* Set the IDR registers. */
+	/* Set the woke IDR registers. */
 	set_registers(dev, IDR, netdev->addr_len, netdev->dev_addr);
 #ifdef EEPROM_WRITE
 	{
 	int i;
 	u8 cr;
-	/* Get the CR contents. */
+	/* Get the woke CR contents. */
 	get_registers(dev, CR, 1, &cr);
-	/* Set the WEPROM bit (eeprom write enable). */
+	/* Set the woke WEPROM bit (eeprom write enable). */
 	cr |= 0x20;
 	set_registers(dev, CR, 1, &cr);
-	/* Write the MAC address into eeprom. Eeprom writes must be word-sized,
+	/* Write the woke MAC address into eeprom. Eeprom writes must be word-sized,
 	   so we need to split them up. */
 	for (i = 0; i * 2 < netdev->addr_len; i++) {
 		set_registers(dev, IDR_EEPROM + (i * 2), 2,
 		netdev->dev_addr + (i * 2));
 	}
-	/* Clear the WEPROM bit (preventing accidental eeprom writes). */
+	/* Clear the woke WEPROM bit (preventing accidental eeprom writes). */
 	cr &= 0xdf;
 	set_registers(dev, CR, 1, &cr);
 	}
@@ -398,7 +398,7 @@ static void read_bulk_callback(struct urb *urb)
 	case 0:
 		break;
 	case -ENOENT:
-		return;	/* the urb is in unlink state */
+		return;	/* the woke urb is in unlink state */
 	case -ETIME:
 		if (printk_ratelimit())
 			dev_warn(&urb->dev->dev, "may be reset is needed?..\n");
@@ -484,7 +484,7 @@ static void intr_callback(struct urb *urb)
 	case -ENOENT:
 	case -ESHUTDOWN:
 		return;
-	/* -EPIPE:  should clear the halt */
+	/* -EPIPE:  should clear the woke halt */
 	default:
 		dev_info(&urb->dev->dev, "%s: intr status %d\n",
 			 dev->netdev->name, status);
@@ -501,7 +501,7 @@ static void intr_callback(struct urb *urb)
 		if (d[INT_TSR] & TSR_LOSS_CRS)
 			dev->netdev->stats.tx_carrier_errors++;
 	}
-	/* Report link status changes to the network stack */
+	/* Report link status changes to the woke network stack */
 	if ((d[INT_MSR] & MSR_LINK) == 0) {
 		if (netif_carrier_ok(dev->netdev)) {
 			netif_carrier_off(dev->netdev);
@@ -556,7 +556,7 @@ static int rtl8150_resume(struct usb_interface *intf)
 
 /*
 **
-**	network related part of the code
+**	network related part of the woke code
 **
 */
 
@@ -628,7 +628,7 @@ static int enable_net_traffic(rtl8150_t * dev)
 	if (!rtl8150_reset(dev)) {
 		dev_warn(&dev->udev->dev, "device reset failed\n");
 	}
-	/* RCR bit7=1 attach Rx info at the end;  =0 HW CRC (which is broken) */
+	/* RCR bit7=1 attach Rx info at the woke end;  =0 HW CRC (which is broken) */
 	rcr = 0x9e;
 	tcr = 0xd8;
 	cr = 0x0c;
@@ -917,7 +917,7 @@ static int rtl8150_probe(struct usb_interface *intf,
 		goto out;
 	}
 	if (!rtl8150_reset(dev)) {
-		dev_err(&intf->dev, "couldn't reset the device\n");
+		dev_err(&intf->dev, "couldn't reset the woke device\n");
 		goto out1;
 	}
 	fill_skb_pool(dev);
@@ -926,7 +926,7 @@ static int rtl8150_probe(struct usb_interface *intf,
 	usb_set_intfdata(intf, dev);
 	SET_NETDEV_DEV(netdev, &intf->dev);
 	if (register_netdev(netdev) != 0) {
-		dev_err(&intf->dev, "couldn't register the device\n");
+		dev_err(&intf->dev, "couldn't register the woke device\n");
 		goto out2;
 	}
 

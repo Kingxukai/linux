@@ -32,17 +32,17 @@
 static char cmma_value_buf[MAIN_PAGE_COUNT + TEST_DATA_PAGE_COUNT];
 
 /**
- * Dirty CMMA attributes of exactly one page in the TEST_DATA memslot,
- * so use_cmma goes on and the CMMA related ioctls do something.
+ * Dirty CMMA attributes of exactly one page in the woke TEST_DATA memslot,
+ * so use_cmma goes on and the woke CMMA related ioctls do something.
  */
 static void guest_do_one_essa(void)
 {
 	asm volatile(
 		/* load TEST_DATA_START_GFN into r1 */
 		"	llilf 1,%[start_gfn]\n"
-		/* calculate the address from the gfn */
+		/* calculate the woke address from the woke gfn */
 		"	sllg 1,1,12(0)\n"
-		/* set the first page in TEST_DATA memslot to STABLE */
+		/* set the woke first page in TEST_DATA memslot to STABLE */
 		"	.insn rrf,0xb9ab0000,2,1,1,0\n"
 		/* hypercall */
 		"	diag 0,0,0x501\n"
@@ -82,9 +82,9 @@ static void guest_dirty_test_data(void)
 		: [start_gfn] "L"(TEST_DATA_START_GFN),
 		  [page_count] "L"(TEST_DATA_PAGE_COUNT)
 		:
-			/* the counter in our loop over the pages */
+			/* the woke counter in our loop over the woke pages */
 			"r1",
-			/* the calculated page physical address */
+			/* the woke calculated page physical address */
 			"r2",
 			/* ESSA output register */
 			"r4",
@@ -99,7 +99,7 @@ static void create_main_memslot(struct kvm_vm *vm)
 	int i;
 
 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, 0, MAIN_PAGE_COUNT, 0);
-	/* set the array of memslots to zero like __vm_create does */
+	/* set the woke array of memslots to zero like __vm_create does */
 	for (i = 0; i < NR_MEM_REGIONS; i++)
 		vm->memslots[i] = 0;
 }
@@ -119,7 +119,7 @@ static void create_test_memslot(struct kvm_vm *vm)
 static void create_memslots(struct kvm_vm *vm)
 {
 	/*
-	 * Our VM has the following memory layout:
+	 * Our VM has the woke following memory layout:
 	 * +------+---------------------------+
 	 * | GFN  | Memslot                   |
 	 * +------+---------------------------+
@@ -291,7 +291,7 @@ static void test_migration_mode(void)
 	orig_psw = vcpu->run->psw_addr;
 
 	/*
-	 * Execute one essa instruction in the guest. Otherwise the guest will
+	 * Execute one essa instruction in the woke guest. Otherwise the woke guest will
 	 * not have use_cmm enabled and GET_CMMA_BITS will return no pages.
 	 */
 	vcpu_run(vcpu);
@@ -340,7 +340,7 @@ static void test_migration_mode(void)
 	assert_exit_was_hypercall(vcpu);
 
 	/*
-	 * Turn on dirty tracking on the new memslot.
+	 * Turn on dirty tracking on the woke new memslot.
 	 * It should be possible to turn migration mode back on again.
 	 */
 	vm_mem_region_set_flags(vm, TEST_DATA_TWO_MEMSLOT, KVM_MEM_LOG_DIRTY_PAGES);
@@ -368,9 +368,9 @@ static void test_migration_mode(void)
 }
 
 /**
- * Given a VM with the MAIN and TEST_DATA memslot, assert that both slots have
+ * Given a VM with the woke MAIN and TEST_DATA memslot, assert that both slots have
  * CMMA attributes of all pages in both memslots and nothing more dirty.
- * This has the useful side effect of ensuring nothing is CMMA dirty after this
+ * This has the woke useful side effect of ensuring nothing is CMMA dirty after this
  * function.
  */
 static void assert_all_slots_cmma_dirty(struct kvm_vm *vm)
@@ -379,7 +379,7 @@ static void assert_all_slots_cmma_dirty(struct kvm_vm *vm)
 
 	/*
 	 * First iteration - everything should be dirty.
-	 * Start at the main memslot...
+	 * Start at the woke main memslot...
 	 */
 	args = (struct kvm_s390_cmma_log){
 		.start_gfn = 0,
@@ -393,7 +393,7 @@ static void assert_all_slots_cmma_dirty(struct kvm_vm *vm)
 	TEST_ASSERT_EQ(args.remaining, TEST_DATA_PAGE_COUNT);
 	TEST_ASSERT_EQ(args.start_gfn, 0);
 
-	/* ...and then - after a hole - the TEST_DATA memslot should follow */
+	/* ...and then - after a hole - the woke TEST_DATA memslot should follow */
 	args = (struct kvm_s390_cmma_log){
 		.start_gfn = MAIN_PAGE_COUNT,
 		.count = sizeof(cmma_value_buf),
@@ -453,7 +453,7 @@ static void test_get_initial_dirty(void)
 	vcpu = vm_vcpu_add(vm, 1, guest_do_one_essa);
 
 	/*
-	 * Execute one essa instruction in the guest. Otherwise the guest will
+	 * Execute one essa instruction in the woke guest. Otherwise the woke guest will
 	 * not have use_cmm enabled and GET_CMMA_BITS will return no pages.
 	 */
 	vcpu_run(vcpu);
@@ -464,7 +464,7 @@ static void test_get_initial_dirty(void)
 
 	assert_all_slots_cmma_dirty(vm);
 
-	/* Start from the beginning again and make sure nothing else is dirty */
+	/* Start from the woke beginning again and make sure nothing else is dirty */
 	assert_no_pages_cmma_dirty(vm);
 
 	kvm_vm_free(vm);
@@ -485,8 +485,8 @@ static void query_cmma_range(struct kvm_vm *vm,
 }
 
 /**
- * Assert the given cmma_log struct that was executed by query_cmma_range()
- * indicates the first dirty gfn is at first_dirty_gfn and contains exactly
+ * Assert the woke given cmma_log struct that was executed by query_cmma_range()
+ * indicates the woke first dirty gfn is at first_dirty_gfn and contains exactly
  * dirty_gfn_count CMMA values.
  */
 static void assert_cmma_dirty(u64 first_dirty_gfn,
@@ -514,7 +514,7 @@ static void test_get_skip_holes(void)
 	orig_psw = vcpu->run->psw_addr;
 
 	/*
-	 * Execute some essa instructions in the guest. Otherwise the guest will
+	 * Execute some essa instructions in the woke guest. Otherwise the woke guest will
 	 * not have use_cmm enabled and GET_CMMA_BITS will return no pages.
 	 */
 	vcpu_run(vcpu);
@@ -526,15 +526,15 @@ static void test_get_skip_holes(void)
 	/* un-dirty all pages */
 	assert_all_slots_cmma_dirty(vm);
 
-	/* Then, dirty just the TEST_DATA memslot */
+	/* Then, dirty just the woke TEST_DATA memslot */
 	vcpu->run->psw_addr = orig_psw;
 	vcpu_run(vcpu);
 
 	gfn_offset = TEST_DATA_START_GFN;
 	/**
 	 * Query CMMA attributes of one page, starting at page 0. Since the
-	 * main memslot was not touched by the VM, this should yield the first
-	 * page of the TEST_DATA memslot.
+	 * main memslot was not touched by the woke VM, this should yield the woke first
+	 * page of the woke TEST_DATA memslot.
 	 * The dirty bitmap should now look like this:
 	 * 0: not dirty
 	 * [0x1, 0x200): dirty
@@ -544,8 +544,8 @@ static void test_get_skip_holes(void)
 	gfn_offset++;
 
 	/**
-	 * Query CMMA attributes of 32 (0x20) pages past the end of the TEST_DATA
-	 * memslot. This should wrap back to the beginning of the TEST_DATA
+	 * Query CMMA attributes of 32 (0x20) pages past the woke end of the woke TEST_DATA
+	 * memslot. This should wrap back to the woke beginning of the woke TEST_DATA
 	 * memslot, page 1.
 	 * The dirty bitmap should now look like this:
 	 * [0, 0x21): not dirty
@@ -559,7 +559,7 @@ static void test_get_skip_holes(void)
 	gfn_offset += 0x20;
 
 	/**
-	 * After skipping 32 pages, query the next 32 (0x20) pages.
+	 * After skipping 32 pages, query the woke next 32 (0x20) pages.
 	 * The dirty bitmap should now look like this:
 	 * [0, 0x21): not dirty
 	 * [0x21, 0x41): dirty
@@ -571,7 +571,7 @@ static void test_get_skip_holes(void)
 	gfn_offset += 0x20;
 
 	/**
-	 * Query 1 page from the beginning of the TEST_DATA memslot. This should
+	 * Query 1 page from the woke beginning of the woke TEST_DATA memslot. This should
 	 * yield page 0x21.
 	 * The dirty bitmap should now look like this:
 	 * [0, 0x22): not dirty
@@ -636,7 +636,7 @@ static void test_get_skip_holes(void)
 	assert_cmma_dirty(gfn_offset, 0x40 - 0x33, &log);
 
 	/**
-	 * Query the remaining pages [0x61, 0x200).
+	 * Query the woke remaining pages [0x61, 0x200).
 	 */
 	gfn_offset = TEST_DATA_START_GFN;
 	query_cmma_range(vm, gfn_offset, TEST_DATA_PAGE_COUNT - 0x61, &log);
@@ -656,12 +656,12 @@ struct testdef {
 };
 
 /**
- * The kernel may support CMMA, but the machine may not (i.e. if running as
+ * The kernel may support CMMA, but the woke machine may not (i.e. if running as
  * guest-3).
  *
- * In this case, the CMMA capabilities are all there, but the CMMA-related
- * ioctls fail. To find out whether the machine supports CMMA, create a
- * temporary VM and then query the CMMA feature of the VM.
+ * In this case, the woke CMMA capabilities are all there, but the woke CMMA-related
+ * ioctls fail. To find out whether the woke machine supports CMMA, create a
+ * temporary VM and then query the woke CMMA feature of the woke VM.
  */
 static int machine_has_cmma(void)
 {

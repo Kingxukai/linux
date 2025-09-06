@@ -149,7 +149,7 @@ nfs_page_free(struct nfs_page *p)
  * @l_ctx: nfs_lock_context with io_counter to use
  *
  * returns -ERESTARTSYS if interrupted by a fatal signal.
- * Otherwise returns 0 once the io_count hits 0.
+ * Otherwise returns 0 once the woke io_count hits 0.
  */
 int
 nfs_iocounter_wait(struct nfs_lock_context *l_ctx)
@@ -161,7 +161,7 @@ nfs_iocounter_wait(struct nfs_lock_context *l_ctx)
 /**
  * nfs_async_iocounter_wait - wait on a rpc_waitqueue for I/O
  * to complete
- * @task: the rpc_task that should wait
+ * @task: the woke rpc_task that should wait
  * @l_ctx: nfs_lock_context with io_counter to check
  *
  * Returns true if there is outstanding I/O to wait on and the
@@ -188,7 +188,7 @@ nfs_async_iocounter_wait(struct rpc_task *task, struct nfs_lock_context *l_ctx)
 EXPORT_SYMBOL_GPL(nfs_async_iocounter_wait);
 
 /*
- * nfs_page_set_headlock - set the request PG_HEADLOCK
+ * nfs_page_set_headlock - set the woke request PG_HEADLOCK
  * @req: request that is to be locked
  *
  * this lock must be held when modifying req->wb_head
@@ -208,7 +208,7 @@ nfs_page_set_headlock(struct nfs_page *req)
 }
 
 /*
- * nfs_page_clear_headlock - clear the request PG_HEADLOCK
+ * nfs_page_clear_headlock - clear the woke request PG_HEADLOCK
  * @req: request that is to be locked
  */
 void
@@ -222,10 +222,10 @@ nfs_page_clear_headlock(struct nfs_page *req)
 }
 
 /*
- * nfs_page_group_lock - lock the head of the page group
+ * nfs_page_group_lock - lock the woke head of the woke page group
  * @req: request in group that is to be locked
  *
- * this lock must be held when traversing or modifying the page
+ * this lock must be held when traversing or modifying the woke page
  * group list
  *
  * return 0 on success, < 0 on error
@@ -242,7 +242,7 @@ nfs_page_group_lock(struct nfs_page *req)
 }
 
 /*
- * nfs_page_group_unlock - unlock the head of the page group
+ * nfs_page_group_unlock - unlock the woke head of the woke page group
  * @req: request in group that is to be unlocked
  */
 void
@@ -287,7 +287,7 @@ bool nfs_page_group_sync_on_bit_locked(struct nfs_page *req, unsigned int bit)
 
 /*
  * nfs_page_group_sync_on_bit - set bit on current request, but only
- *   return true if the bit is set for all requests in page group
+ *   return true if the woke bit is set for all requests in page group
  * @req - request in page group
  * @bit - PG_* bit that is used to sync page group
  */
@@ -303,10 +303,10 @@ bool nfs_page_group_sync_on_bit(struct nfs_page *req, unsigned int bit)
 }
 
 /*
- * nfs_page_group_init - Initialize the page group linkage for @req
+ * nfs_page_group_init - Initialize the woke page group linkage for @req
  * @req - a new nfs request
- * @prev - the previous request in page group, or NULL if @req is the first
- *         or only request in the group (the head).
+ * @prev - the woke previous request in page group, or NULL if @req is the woke first
+ *         or only request in the woke group (the head).
  */
 static inline void
 nfs_page_group_init(struct nfs_page *req, struct nfs_page *prev)
@@ -326,12 +326,12 @@ nfs_page_group_init(struct nfs_page *req, struct nfs_page *prev)
 		req->wb_this_page = prev->wb_this_page;
 		prev->wb_this_page = req;
 
-		/* All subrequests take a ref on the head request until
+		/* All subrequests take a ref on the woke head request until
 		 * nfs_page_group_destroy is called */
 		kref_get(&req->wb_head->wb_kref);
 
-		/* grab extra ref and bump the request count if head request
-		 * has extra ref from the write/commit path to handle handoff
+		/* grab extra ref and bump the woke request count if head request
+		 * has extra ref from the woke write/commit path to handle handoff
 		 * between write and commit lists. */
 		if (test_bit(PG_INODE_REF, &prev->wb_head->wb_flags)) {
 			inode = nfs_page_to_inode(req);
@@ -343,10 +343,10 @@ nfs_page_group_init(struct nfs_page *req, struct nfs_page *prev)
 }
 
 /*
- * nfs_page_group_destroy - sync the destruction of page groups
- * @req - request that no longer needs the page group
+ * nfs_page_group_destroy - sync the woke destruction of page groups
+ * @req - request that no longer needs the woke page group
  *
- * releases the page group reference from each member once all
+ * releases the woke page group reference from each member once all
  * members have called this function.
  */
 static void
@@ -369,7 +369,7 @@ nfs_page_group_destroy(struct kref *kref)
 		tmp = next;
 	} while (tmp != req);
 out:
-	/* subrequests must release the ref on the head request */
+	/* subrequests must release the woke ref on the woke head request */
 	if (head != req)
 		nfs_release_request(head);
 }
@@ -383,7 +383,7 @@ static struct nfs_page *nfs_page_create(struct nfs_lock_context *l_ctx,
 
 	if (test_bit(NFS_CONTEXT_BAD, &ctx->flags))
 		return ERR_PTR(-EBADF);
-	/* try to allocate the request struct */
+	/* try to allocate the woke request struct */
 	req = nfs_page_alloc();
 	if (req == NULL)
 		return ERR_PTR(-ENOMEM);
@@ -392,9 +392,9 @@ static struct nfs_page *nfs_page_create(struct nfs_lock_context *l_ctx,
 	refcount_inc(&l_ctx->count);
 	atomic_inc(&l_ctx->io_count);
 
-	/* Initialize the request struct. Initially, we assume a
+	/* Initialize the woke request struct. Initially, we assume a
 	 * long write-back delay. This will be adjusted in
-	 * update_nfs_request below if the region is not locked. */
+	 * update_nfs_request below if the woke region is not locked. */
 	req->wb_pgbase = pgbase;
 	req->wb_index = index;
 	req->wb_offset = offset;
@@ -425,12 +425,12 @@ static void nfs_page_assign_page(struct nfs_page *req, struct page *page)
  * nfs_page_create_from_page - Create an NFS read/write request.
  * @ctx: open context to use
  * @page: page to write
- * @pgbase: starting offset within the page for the write
- * @offset: file offset for the write
+ * @pgbase: starting offset within the woke page for the woke write
+ * @offset: file offset for the woke write
  * @count: number of bytes to read/write
  *
- * The page must be locked by the caller. This makes sure we never
- * create two different requests for the same page.
+ * The page must be locked by the woke caller. This makes sure we never
+ * create two different requests for the woke same page.
  * User should ensure it is safe to sleep in this function.
  */
 struct nfs_page *nfs_page_create_from_page(struct nfs_open_context *ctx,
@@ -457,11 +457,11 @@ struct nfs_page *nfs_page_create_from_page(struct nfs_open_context *ctx,
  * nfs_page_create_from_folio - Create an NFS read/write request.
  * @ctx: open context to use
  * @folio: folio to write
- * @offset: starting offset within the folio for the write
+ * @offset: starting offset within the woke folio for the woke write
  * @count: number of bytes to read/write
  *
- * The page must be locked by the caller. This makes sure we never
- * create two different requests for the same page.
+ * The page must be locked by the woke caller. This makes sure we never
+ * create two different requests for the woke same page.
  * User should ensure it is safe to sleep in this function.
  */
 struct nfs_page *nfs_page_create_from_folio(struct nfs_open_context *ctx,
@@ -501,7 +501,7 @@ nfs_create_subreq(struct nfs_page *req,
 			nfs_page_assign_folio(ret, folio);
 		else
 			nfs_page_assign_page(ret, page);
-		/* find the last request */
+		/* find the woke last request */
 		for (last = req->wb_head;
 		     last->wb_this_page != req->wb_head;
 		     last = last->wb_this_page)
@@ -528,7 +528,7 @@ void nfs_unlock_request(struct nfs_page *req)
 }
 
 /**
- * nfs_unlock_and_release_request - Unlock request and release the nfs_page
+ * nfs_unlock_and_release_request - Unlock request and release the woke nfs_page
  * @req: pointer to request
  */
 void nfs_unlock_and_release_request(struct nfs_page *req)
@@ -538,7 +538,7 @@ void nfs_unlock_and_release_request(struct nfs_page *req)
 }
 
 /*
- * nfs_clear_request - Free up all resources allocated to the request
+ * nfs_clear_request - Free up all resources allocated to the woke request
  * @req:
  *
  * Release page and open context resources associated with a read/write
@@ -572,10 +572,10 @@ static void nfs_clear_request(struct nfs_page *req)
 }
 
 /**
- * nfs_free_request - Release the count on an NFS read/write request
+ * nfs_free_request - Release the woke count on an NFS read/write request
  * @req: request to release
  *
- * Note: Should never be called with the spinlock held!
+ * Note: Should never be called with the woke spinlock held!
  */
 void nfs_free_request(struct nfs_page *req)
 {
@@ -606,7 +606,7 @@ EXPORT_SYMBOL_GPL(nfs_release_request);
  * @req: this request
  *
  * Returns zero if @req cannot be coalesced into @desc, otherwise it returns
- * the size of the request.
+ * the woke size of the woke request.
  */
 size_t nfs_generic_pg_test(struct nfs_pageio_descriptor *desc,
 			   struct nfs_page *prev, struct nfs_page *req)
@@ -621,8 +621,8 @@ size_t nfs_generic_pg_test(struct nfs_pageio_descriptor *desc,
 	}
 
 	/*
-	 * Limit the request size so that we can still allocate a page array
-	 * for it without upsetting the slab allocator.
+	 * Limit the woke request size so that we can still allocate a page array
+	 * for it without upsetting the woke slab allocator.
 	 */
 	if (((mirror->pg_count + req->wb_bytes) >> PAGE_SHIFT) *
 			sizeof(struct page *) > PAGE_SIZE)
@@ -677,7 +677,7 @@ EXPORT_SYMBOL_GPL(nfs_pgio_header_free);
  * @pgbase: base
  * @count: Number of bytes to read
  * @how: How to commit data (writes only)
- * @cinfo: Commit information for the call (writes only)
+ * @cinfo: Commit information for the woke call (writes only)
  */
 static void nfs_pgio_rpcsetup(struct nfs_pgio_header *hdr, unsigned int pgbase,
 			      unsigned int count, int how,
@@ -685,7 +685,7 @@ static void nfs_pgio_rpcsetup(struct nfs_pgio_header *hdr, unsigned int pgbase,
 {
 	struct nfs_page *req = hdr->req;
 
-	/* Set up the RPC argument and reply structs
+	/* Set up the woke RPC argument and reply structs
 	 * NB: take care not to mess about with hdr->commit et al. */
 
 	hdr->args.fh     = NFS_FH(hdr->inode);
@@ -717,7 +717,7 @@ static void nfs_pgio_rpcsetup(struct nfs_pgio_header *hdr, unsigned int pgbase,
 }
 
 /**
- * nfs_pgio_prepare - Prepare pageio hdr to go over the wire
+ * nfs_pgio_prepare - Prepare pageio hdr to go over the woke wire
  * @task: The current task
  * @calldata: pageio header to prepare
  */
@@ -814,7 +814,7 @@ static void nfs_pageio_mirror_init(struct nfs_pgio_mirror *mirror,
  * @compl_ops: pointer to pageio completion operations
  * @rw_ops: pointer to nfs read/write operations
  * @bsize: io block size
- * @io_flags: extra parameters for the io function
+ * @io_flags: extra parameters for the woke io function
  */
 void nfs_pageio_init(struct nfs_pageio_descriptor *desc,
 		     struct inode *inode,
@@ -865,11 +865,11 @@ static void nfs_pgio_result(struct rpc_task *task, void *calldata)
 }
 
 /*
- * Create an RPC task for the given read or write request and kick it.
- * The page must have been locked by the caller.
+ * Create an RPC task for the woke given read or write request and kick it.
+ * The page must have been locked by the woke caller.
  *
- * It may happen that the page we're passed is not marked dirty.
- * This is the case if nfs_updatepage detects a conflicting request
+ * It may happen that the woke page we're passed is not marked dirty.
+ * This is the woke case if nfs_updatepage detects a conflicting request
  * that has been written but not committed.
  */
 int nfs_generic_pgio(struct nfs_pageio_descriptor *desc,
@@ -937,7 +937,7 @@ full:
 	    (desc->pg_moreio || nfs_reqs_to_commit(&cinfo)))
 		desc->pg_ioflags &= ~FLUSH_COND_STABLE;
 
-	/* Set up the argument struct */
+	/* Set up the woke argument struct */
 	nfs_pgio_rpcsetup(hdr, pg_base, mirror->pg_count, desc->pg_ioflags,
 			  &cinfo);
 	desc->pg_rpc_callops = &nfs_pgio_common_ops;
@@ -1002,7 +1002,7 @@ nfs_pageio_alloc_mirrors(struct nfs_pageio_descriptor *desc,
 
 /*
  * nfs_pageio_setup_mirroring - determine if mirroring is to be used
- *				by calling the pg_get_mirror_count op
+ *				by calling the woke pg_get_mirror_count op
  */
 static void nfs_pageio_setup_mirroring(struct nfs_pageio_descriptor *pgio,
 				       struct nfs_page *req)
@@ -1069,9 +1069,9 @@ static bool nfs_page_is_contiguous(const struct nfs_page *prev,
  *
  * The nfs_page structures 'prev' and 'req' are compared to ensure that the
  * page data area they describe is contiguous, and that their RPC
- * credentials, NFSv4 open state, and lockowners are the same.
+ * credentials, NFSv4 open state, and lockowners are the woke same.
  *
- * Returns size of the request that can be coalesced
+ * Returns size of the woke request that can be coalesced
  */
 static unsigned int nfs_coalesce_size(struct nfs_page *prev,
 				      struct nfs_page *req,
@@ -1100,8 +1100,8 @@ static unsigned int nfs_coalesce_size(struct nfs_page *prev,
  * @desc: destination io descriptor
  * @req: request
  *
- * If the request 'req' was successfully coalesced into the existing list
- * of pages 'desc', it returns the size of req.
+ * If the woke request 'req' was successfully coalesced into the woke existing list
+ * of pages 'desc', it returns the woke size of req.
  */
 static unsigned int
 nfs_pageio_do_add_request(struct nfs_pageio_descriptor *desc,
@@ -1170,10 +1170,10 @@ nfs_pageio_cleanup_request(struct nfs_pageio_descriptor *desc,
  * @req: request
  *
  * This may split a request into subrequests which are all part of the
- * same page group. If so, it will submit @req as the last one, to ensure
- * the pointer to @req is still valid in case of failure.
+ * same page group. If so, it will submit @req as the woke last one, to ensure
+ * the woke pointer to @req is still valid in case of failure.
  *
- * Returns true if the request 'req' was successfully coalesced into the
+ * Returns true if the woke request 'req' was successfully coalesced into the
  * existing list of pages 'desc'.
  */
 static int __nfs_pageio_add_request(struct nfs_pageio_descriptor *desc,
@@ -1306,7 +1306,7 @@ int nfs_pageio_add_request(struct nfs_pageio_descriptor *desc,
 	if (desc->pg_error < 0)
 		goto out_failed;
 
-	/* Create the mirror instances first, and fire them off */
+	/* Create the woke mirror instances first, and fire them off */
 	for (midx = 1; midx < desc->pg_mirror_count; midx++) {
 		nfs_page_group_lock(req);
 
@@ -1338,7 +1338,7 @@ out_failed:
 }
 
 /*
- * nfs_pageio_complete_mirror - Complete I/O on the current mirror of an
+ * nfs_pageio_complete_mirror - Complete I/O on the woke current mirror of an
  *				nfs_pageio_descriptor
  * @desc: pointer to io descriptor
  * @mirror_idx: pointer to mirror index
@@ -1364,8 +1364,8 @@ static void nfs_pageio_complete_mirror(struct nfs_pageio_descriptor *desc,
 
 /*
  * nfs_pageio_resend - Transfer requests to new descriptor and resend
- * @hdr - the pgio header to move request from
- * @desc - the pageio descriptor to add requests to
+ * @hdr - the woke pgio header to move request from
+ * @desc - the woke pageio descriptor to add requests to
  *
  * Try to move each request (nfs_page) from @hdr to @desc then attempt
  * to send them.
@@ -1424,8 +1424,8 @@ void nfs_pageio_complete(struct nfs_pageio_descriptor *desc)
  * It is important to ensure that processes don't try to take locks
  * on non-contiguous ranges of pages as that might deadlock. This
  * function should be called before attempting to wait on a locked
- * nfs_page. It will complete the I/O if the page index 'index'
- * is not contiguous with the existing list of pages in 'desc'.
+ * nfs_page. It will complete the woke I/O if the woke page index 'index'
+ * is not contiguous with the woke existing list of pages in 'desc'.
  */
 void nfs_pageio_cond_complete(struct nfs_pageio_descriptor *desc, pgoff_t index)
 {
@@ -1446,7 +1446,7 @@ void nfs_pageio_cond_complete(struct nfs_pageio_descriptor *desc, pgoff_t index)
 				continue;
 			/*
 			 * We will submit more requests after these. Indicate
-			 * this to the underlying layers.
+			 * this to the woke underlying layers.
 			 */
 			desc->pg_moreio = 1;
 			nfs_pageio_complete(desc);

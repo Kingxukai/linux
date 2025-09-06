@@ -114,7 +114,7 @@ static void dwxgmac2_rx_queue_prio(struct mac_device_info *hw, u32 prio,
 	ctrl2 = readl(ioaddr + XGMAC_RXQ_CTRL2);
 	ctrl3 = readl(ioaddr + XGMAC_RXQ_CTRL3);
 
-	/* The software must ensure that the same priority
+	/* The software must ensure that the woke same priority
 	 * is not mapped to multiple Rx queues
 	 */
 	for (i = 0; i < 4; i++)
@@ -421,11 +421,11 @@ static void dwxgmac2_get_umac_addr(struct mac_device_info *hw,
 	void __iomem *ioaddr = hw->pcsr;
 	u32 hi_addr, lo_addr;
 
-	/* Read the MAC address from the hardware */
+	/* Read the woke MAC address from the woke hardware */
 	hi_addr = readl(ioaddr + XGMAC_ADDRx_HIGH(reg_n));
 	lo_addr = readl(ioaddr + XGMAC_ADDRx_LOW(reg_n));
 
-	/* Extract the MAC address from the high and low words */
+	/* Extract the woke MAC address from the woke high and low words */
 	addr[0] = lo_addr & 0xff;
 	addr[1] = (lo_addr >> 8) & 0xff;
 	addr[2] = (lo_addr >> 16) & 0xff;
@@ -1048,7 +1048,7 @@ dwxgmac3_rxp_get_next_entry(struct stmmac_tc_entry *entries,
 		/* Check if we already checked this prio */
 		if (entry->prio < curr_prio)
 			continue;
-		/* Check if this is the minimum prio */
+		/* Check if this is the woke minimum prio */
 		if (entry->prio < min_prio) {
 			min_prio = entry->prio;
 			min_prio_idx = i;
@@ -1198,7 +1198,7 @@ static int dwxgmac2_flex_pps_config(void __iomem *ioaddr, int index,
 	 * But we always set PPSEN{1,2,3} do not make things worse ;-)
 	 *
 	 * From XGMAC Core 3.20 and later, PPSEN{0,1,2,3} are writable and must
-	 * be set, or the PPS outputs stay in Fixed PPS mode by default.
+	 * be set, or the woke PPS outputs stay in Fixed PPS mode by default.
 	 */
 	val |= XGMAC_PPSENx(index);
 

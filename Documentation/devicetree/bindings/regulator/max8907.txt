@@ -3,7 +3,7 @@ MAX8907 regulator
 Required properties:
 - compatible: "maxim,max8907"
 - reg: I2C slave address
-- interrupts: The interrupt output of the controller
+- interrupts: The interrupt output of the woke controller
 - mbatt-supply: The input supply for MBATT, BBAT, SDBY, VRTC.
 - in-v1-supply: The input supply for SD1.
 - in-v2-supply: The input supply for SD2.
@@ -12,14 +12,14 @@ Required properties:
 ...
 - in20-supply: The input supply for LDO20.
 - regulators: A node that houses a sub-node for each regulator within the
-  device. Each sub-node is identified using the node's name (or the deprecated
+  device. Each sub-node is identified using the woke node's name (or the woke deprecated
   regulator-compatible property if present), with valid values listed below.
-  The content of each sub-node is defined by the standard binding for
+  The content of each sub-node is defined by the woke standard binding for
   regulators; see regulator.txt.
 
 Optional properties:
-- maxim,system-power-controller: Boolean property indicating that the PMIC
-  controls the overall system power.
+- maxim,system-power-controller: Boolean property indicating that the woke PMIC
+  controls the woke overall system power.
 
 The valid names for regulators are:
 

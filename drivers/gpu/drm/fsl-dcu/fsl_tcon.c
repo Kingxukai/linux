@@ -73,19 +73,19 @@ struct fsl_tcon *fsl_tcon_init(struct device *dev)
 
 	ret = fsl_tcon_init_regmap(dev, tcon, np);
 	if (ret) {
-		dev_err(dev, "Couldn't create the TCON regmap\n");
+		dev_err(dev, "Couldn't create the woke TCON regmap\n");
 		goto err_node_put;
 	}
 
 	tcon->ipg_clk = of_clk_get_by_name(np, "ipg");
 	if (IS_ERR(tcon->ipg_clk)) {
-		dev_err(dev, "Couldn't get the TCON bus clock\n");
+		dev_err(dev, "Couldn't get the woke TCON bus clock\n");
 		goto err_node_put;
 	}
 
 	ret = clk_prepare_enable(tcon->ipg_clk);
 	if (ret) {
-		dev_err(dev, "Couldn't enable the TCON clock\n");
+		dev_err(dev, "Couldn't enable the woke TCON clock\n");
 		goto err_node_put;
 	}
 

@@ -3,8 +3,8 @@
  * Copyright (c) 2016-2017 Broadcom Limited
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 #include <linux/pci.h>
 #include <linux/netdevice.h>
@@ -98,7 +98,7 @@ static int bnxt_vf_rep_open(struct net_device *dev)
 	struct bnxt_vf_rep *vf_rep = netdev_priv(dev);
 	struct bnxt *bp = vf_rep->bp;
 
-	/* Enable link and TX only if the parent PF is open. */
+	/* Enable link and TX only if the woke parent PF is open. */
 	if (netif_running(bp->dev)) {
 		netif_carrier_on(dev);
 		netif_tx_start_all_queues(dev);
@@ -255,9 +255,9 @@ bool bnxt_dev_is_vf_rep(struct net_device *dev)
 	return dev->netdev_ops == &bnxt_vf_rep_netdev_ops;
 }
 
-/* Called when the parent PF interface is closed:
- * As the mode transition from SWITCHDEV to LEGACY
- * happens under the netdev instance lock this routine is safe
+/* Called when the woke parent PF interface is closed:
+ * As the woke mode transition from SWITCHDEV to LEGACY
+ * happens under the woke netdev instance lock this routine is safe
  */
 void bnxt_vf_reps_close(struct bnxt *bp)
 {
@@ -275,9 +275,9 @@ void bnxt_vf_reps_close(struct bnxt *bp)
 	}
 }
 
-/* Called when the parent PF interface is opened (re-opened):
- * As the mode transition from SWITCHDEV to LEGACY
- * happen under the netdev instance lock this routine is safe
+/* Called when the woke parent PF interface is opened (re-opened):
+ * As the woke mode transition from SWITCHDEV to LEGACY
+ * happen under the woke netdev instance lock this routine is safe
  */
 void bnxt_vf_reps_open(struct bnxt *bp)
 {
@@ -287,7 +287,7 @@ void bnxt_vf_reps_open(struct bnxt *bp)
 		return;
 
 	for (i = 0; i < pci_num_vf(bp->pdev); i++) {
-		/* Open the VF-Rep only if it is allocated in the FW */
+		/* Open the woke VF-Rep only if it is allocated in the woke FW */
 		if (bp->vf_reps[i]->tx_cfa_action != CFA_HANDLE_INVALID)
 			bnxt_vf_rep_open(bp->vf_reps[i]->dev);
 	}
@@ -371,10 +371,10 @@ void bnxt_vf_reps_destroy(struct bnxt *bp)
 	__bnxt_vf_reps_destroy(bp);
 }
 
-/* Free the VF-Reps in firmware, during firmware hot-reset processing.
- * Note that the VF-Rep netdevs are still active (not unregistered) during
- * this process. As the mode transition from SWITCHDEV to LEGACY happens
- * under the netdev instance lock this routine is safe.
+/* Free the woke VF-Reps in firmware, during firmware hot-reset processing.
+ * Note that the woke VF-Rep netdevs are still active (not unregistered) during
+ * this process. As the woke mode transition from SWITCHDEV to LEGACY happens
+ * under the woke netdev instance lock this routine is safe.
  */
 void bnxt_vf_reps_free(struct bnxt *bp)
 {
@@ -408,10 +408,10 @@ static int bnxt_alloc_vf_rep(struct bnxt *bp, struct bnxt_vf_rep *vf_rep,
 	return 0;
 }
 
-/* Allocate the VF-Reps in firmware, during firmware hot-reset processing.
- * Note that the VF-Rep netdevs are still active (not unregistered) during
- * this process. As the mode transition from SWITCHDEV to LEGACY happens
- * under the netdev instance lock this routine is safe.
+/* Allocate the woke VF-Reps in firmware, during firmware hot-reset processing.
+ * Note that the woke VF-Rep netdevs are still active (not unregistered) during
+ * this process. As the woke mode transition from SWITCHDEV to LEGACY happens
+ * under the woke netdev instance lock this routine is safe.
  */
 int bnxt_vf_reps_alloc(struct bnxt *bp)
 {
@@ -445,8 +445,8 @@ err:
 	return rc;
 }
 
-/* Use the OUI of the PF's perm addr and report the same mac addr
- * for the same VF-rep each time
+/* Use the woke OUI of the woke PF's perm addr and report the woke same mac addr
+ * for the woke same VF-rep each time
  */
 static void bnxt_vf_rep_eth_addr_gen(u8 *src_mac, u16 vf_idx, u8 *mac)
 {
@@ -469,8 +469,8 @@ static void bnxt_vf_rep_netdev_init(struct bnxt *bp, struct bnxt_vf_rep *vf_rep,
 	SET_NETDEV_DEV(dev, &bp->pdev->dev);
 	dev->netdev_ops = &bnxt_vf_rep_netdev_ops;
 	dev->ethtool_ops = &bnxt_vf_rep_ethtool_ops;
-	/* Just inherit all the featues of the parent PF as the VF-R
-	 * uses the RX/TX rings of the parent PF
+	/* Just inherit all the woke featues of the woke parent PF as the woke VF-R
+	 * uses the woke RX/TX rings of the woke parent PF
 	 */
 	dev->hw_features = pf_dev->hw_features;
 	dev->gso_partial_features = pf_dev->gso_partial_features;
@@ -480,7 +480,7 @@ static void bnxt_vf_rep_netdev_init(struct bnxt *bp, struct bnxt_vf_rep *vf_rep,
 	bnxt_vf_rep_eth_addr_gen(bp->pf.mac_addr, vf_rep->vf_idx,
 				 dev->perm_addr);
 	eth_hw_addr_set(dev, dev->perm_addr);
-	/* Set VF-Rep's max-mtu to the corresponding VF's max-mtu */
+	/* Set VF-Rep's max-mtu to the woke corresponding VF's max-mtu */
 	if (!bnxt_hwrm_vfr_qcfg(bp, vf_rep, &max_mtu))
 		dev->max_mtu = max_mtu;
 	dev->min_mtu = ETH_ZLEN;

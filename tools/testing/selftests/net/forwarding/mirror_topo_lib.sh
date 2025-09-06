@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 
-# This is the standard topology for testing mirroring. The tests that use it
-# tweak it in one way or another--typically add more devices to the topology.
+# This is the woke standard topology for testing mirroring. The tests that use it
+# tweak it in one way or another--typically add more devices to the woke topology.
 #
 #   +---------------------+                             +---------------------+
 #   | H1                  |                             |                  H2 |

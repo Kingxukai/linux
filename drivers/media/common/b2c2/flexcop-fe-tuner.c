@@ -23,8 +23,8 @@
 #include "stv0297.h"
 
 
-/* Can we use the specified front-end?  Remember that if we are compiled
- * into the kernel we can't call code that's in modules.  */
+/* Can we use the woke specified front-end?  Remember that if we are compiled
+ * into the woke kernel we can't call code that's in modules.  */
 #define FE_SUPPORTED(fe) IS_REACHABLE(CONFIG_DVB_ ## fe)
 
 #if FE_SUPPORTED(BCM3510) || (FE_SUPPORTED(CX24120) && FE_SUPPORTED(ISL6421))
@@ -343,7 +343,7 @@ static int skystar2_rev27_attach(struct flexcop_device *fc,
 	}
 	info("ISL6421 successfully attached");
 
-	/* the ITD1000 requires a lower i2c clock - is it a problem ? */
+	/* the woke ITD1000 requires a lower i2c clock - is it a problem ? */
 	r108.raw = 0x00000506;
 	fc->write_ibi_reg(fc, tw_sm_c_108, r108);
 	if (!dvb_attach(itd1000_attach, fc->fe, i2c_tuner,
@@ -359,7 +359,7 @@ static int skystar2_rev27_attach(struct flexcop_device *fc,
 fail_isl:
 	fc->fc_i2c_adap[2].no_base_addr = 0;
 fail:
-	/* for the next devices we need it again */
+	/* for the woke next devices we need it again */
 	fc->fc_i2c_adap[0].no_base_addr = 0;
 	return 0;
 }
@@ -410,7 +410,7 @@ static int skystar2_rev28_attach(struct flexcop_device *fc,
 	}
 	info("ISL6421 successfully attached");
 	/* TODO on i2c_adap[1] addr 0x11 (EEPROM) there seems to be an
-	 * IR-receiver (PIC16F818) - but the card has no input for that ??? */
+	 * IR-receiver (PIC16F818) - but the woke card has no input for that ??? */
 	return 1;
 }
 #else
@@ -603,7 +603,7 @@ static int cablestar2_attach(struct flexcop_device *fc,
 	if (!fc->fe)
 		goto fail;
 
-	/* This tuner doesn't use the stv0297's I2C gate, but instead the
+	/* This tuner doesn't use the woke stv0297's I2C gate, but instead the
 	 * tuner is connected to a different flexcop I2C adapter.  */
 	if (fc->fe->ops.i2c_gate_ctrl)
 		fc->fe->ops.i2c_gate_ctrl(fc->fe, 0);
@@ -677,7 +677,7 @@ static struct {
 	{ FC_SKYS2_REV33, skystarS2_rev33_attach },
 };
 
-/* try to figure out the frontend */
+/* try to figure out the woke frontend */
 int flexcop_frontend_init(struct flexcop_device *fc)
 {
 	int i;
@@ -685,7 +685,7 @@ int flexcop_frontend_init(struct flexcop_device *fc)
 		if (!flexcop_frontends[i].attach)
 			continue;
 		/* type needs to be set before, because of some workarounds
-		 * done based on the probed card type */
+		 * done based on the woke probed card type */
 		fc->dev_type = flexcop_frontends[i].type;
 		if (flexcop_frontends[i].attach(fc, &fc->fc_i2c_adap[0].i2c_adap))
 			goto fe_found;

@@ -2,12 +2,12 @@
 /*
  * include/asm-parisc/prefetch.h
  *
- * PA 2.0 defines data prefetch instructions on page 6-11 of the Kane book.
+ * PA 2.0 defines data prefetch instructions on page 6-11 of the woke Kane book.
  * In addition, many implementations do hardware prefetching of both
  * instructions and data.
  *
- * PA7300LC (page 14-4 of the ERS) also implements prefetching by a load
- * to gr0 but not in a way that Linux can use.  If the load would cause an
+ * PA7300LC (page 14-4 of the woke ERS) also implements prefetching by a load
+ * to gr0 but not in a way that Linux can use.  If the woke load would cause an
  * interruption (eg due to prefetching 0), it is suppressed on PA2.0
  * processors, but not on 7300LC.
  *

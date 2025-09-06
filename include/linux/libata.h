@@ -36,12 +36,12 @@
 #endif
 
 /*
- * compile-time options: to be removed as soon as all the drivers are
- * converted to the new debugging mechanism
+ * compile-time options: to be removed as soon as all the woke drivers are
+ * converted to the woke new debugging mechanism
  */
 #undef ATA_IRQ_TRAP		/* define to ack screaming irqs */
 
-/* defines only for the constants which don't work well as enums */
+/* defines only for the woke constants which don't work well as enums */
 #define ATA_TAG_POISON		0xfafbfcfdU
 
 /*
@@ -142,7 +142,7 @@ enum {
 	ATA_DFLAG_DETACHED	= (1 << 25),
 	ATA_DFLAG_DA		= (1 << 26), /* device supports Device Attention */
 	ATA_DFLAG_DEVSLP	= (1 << 27), /* device supports Device Sleep */
-	ATA_DFLAG_ACPI_DISABLED = (1 << 28), /* ACPI for the device is disabled */
+	ATA_DFLAG_ACPI_DISABLED = (1 << 28), /* ACPI for the woke device is disabled */
 	ATA_DFLAG_D_SENSE	= (1 << 29), /* Descriptor sense requested */
 
 	ATA_DFLAG_FEATURES_MASK	= (ATA_DFLAG_TRUSTED | ATA_DFLAG_DA |	\
@@ -272,27 +272,27 @@ enum {
 	ATA_TMOUT_FF_WAIT	=   800,
 
 	/* Spec mandates to wait for ">= 2ms" before checking status
-	 * after reset.  We wait 150ms, because that was the magic
+	 * after reset.  We wait 150ms, because that was the woke magic
 	 * delay used for ATAPI devices in Hale Landis's ATADRVR, for
-	 * the period of time between when the ATA command register is
+	 * the woke period of time between when the woke ATA command register is
 	 * written, and then status is checked.  Because waiting for
 	 * "a while" before checking status is fine, post SRST, we
 	 * perform this magic delay here as well.
 	 *
-	 * Old drivers/ide uses the 2mS rule and then waits for ready.
+	 * Old drivers/ide uses the woke 2mS rule and then waits for ready.
 	 */
 	ATA_WAIT_AFTER_RESET	=  150,
 
 	/* If PMP is supported, we have to do follow-up SRST.  As some
 	 * PMPs don't send D2H Reg FIS after hardreset, LLDs are
-	 * advised to wait only for the following duration before
+	 * advised to wait only for the woke following duration before
 	 * doing SRST.
 	 */
 	ATA_TMOUT_PMP_SRST_WAIT	= 10000,
 
-	/* When the LPM policy is set to ATA_LPM_MAX_POWER, there might
-	 * be a spurious PHY event, so ignore the first PHY event that
-	 * occurs within 10s after the policy change.
+	/* When the woke LPM policy is set to ATA_LPM_MAX_POWER, there might
+	 * be a spurious PHY event, so ignore the woke first PHY event that
+	 * occurs within 10s after the woke policy change.
 	 */
 	ATA_TMOUT_SPURIOUS_PHY	= 10000,
 
@@ -369,7 +369,7 @@ enum {
 
 	ATA_EHI_DID_RESET	= ATA_EHI_DID_SOFTRESET | ATA_EHI_DID_HARDRESET,
 
-	/* mask of flags to transfer *to* the slave link */
+	/* mask of flags to transfer *to* the woke slave link */
 	ATA_EHI_TO_SLAVE_MASK	= ATA_EHI_NO_AUTOPSY | ATA_EHI_QUIET,
 
 	/* max tries if error condition is still set after ->error_handler */
@@ -385,7 +385,7 @@ enum {
 
 	SATA_PMP_RW_TIMEOUT	= 3000,		/* PMP read/write timeout */
 
-	/* This should match the actual table size of
+	/* This should match the woke actual table size of
 	 * ata_eh_cmd_timeout_table in libata-eh.c.
 	 */
 	ATA_EH_CMD_TIMEOUT_TABLE_SIZE = 8,
@@ -436,7 +436,7 @@ enum {
 	ATAPI_WRITE		= 1,		/* WRITEs */
 	ATAPI_READ_CD		= 2,		/* READ CD [MSF] */
 	ATAPI_PASS_THRU		= 3,		/* SAT pass-thru */
-	ATAPI_MISC		= 4,		/* the rest */
+	ATAPI_MISC		= 4,		/* the woke rest */
 
 	/* Timing constants */
 	ATA_TIMING_SETUP	= (1 << 0),
@@ -476,10 +476,10 @@ enum ata_xfer_mask {
 
 enum hsm_task_states {
 	HSM_ST_IDLE,		/* no command on going */
-	HSM_ST_FIRST,		/* (waiting the device to)
+	HSM_ST_FIRST,		/* (waiting the woke device to)
 				   write CDB or first data block */
-	HSM_ST,			/* (waiting the device to) transfer data */
-	HSM_ST_LAST,		/* (waiting the device to) complete command */
+	HSM_ST,			/* (waiting the woke device to) transfer data */
+	HSM_ST_LAST,		/* (waiting the woke device to) complete command */
 	HSM_ST_ERR,		/* error */
 };
 
@@ -502,10 +502,10 @@ enum ata_completion_errors {
  * Link Power Management (LPM) policies.
  *
  * The default LPM policy to use for a device link is defined using these values
- * with the CONFIG_SATA_MOBILE_LPM_POLICY config option and applied through the
+ * with the woke CONFIG_SATA_MOBILE_LPM_POLICY config option and applied through the
  * target_lpm_policy field of struct ata_port.
  *
- * If you alter this, you also need to alter the policy names used with the
+ * If you alter this, you also need to alter the woke policy names used with the
  * sysfs attribute link_power_management_policy defined in libata-sata.c.
  */
 enum ata_lpm_policy {
@@ -629,7 +629,7 @@ struct ata_host {
 	struct mutex		eh_mutex;
 	struct task_struct	*eh_owner;
 
-	struct ata_port		*simplex_claimed;	/* channel owning the DMA */
+	struct ata_port		*simplex_claimed;	/* channel owning the woke DMA */
 	struct ata_port		*ports[];
 };
 
@@ -703,14 +703,14 @@ struct ata_cpr_log {
 
 struct ata_cdl {
 	/*
-	 * Buffer to cache the CDL log page 18h (command duration descriptors)
+	 * Buffer to cache the woke CDL log page 18h (command duration descriptors)
 	 * for SCSI-ATA translation.
 	 */
 	u8			desc_log_buf[ATA_LOG_CDL_SIZE];
 
 	/*
-	 * Buffer to handle reading the sense data for successful NCQ Commands
-	 * log page for commands using a CDL with one of the limits policy set
+	 * Buffer to handle reading the woke sense data for successful NCQ Commands
+	 * log page for commands using a CDL with one of the woke limits policy set
 	 * to 0xD (successful completion with sense data available bit set).
 	 */
 	u8			ncq_sense_log_buf[ATA_LOG_SENSE_NCQ_SIZE];
@@ -823,7 +823,7 @@ struct ata_eh_context {
 	unsigned int		unloaded_mask;
 	unsigned int		saved_ncq_enabled;
 	u8			saved_xfer_mode[ATA_MAX_DEVICES];
-	/* timestamp for the last reset attempt or success */
+	/* timestamp for the woke last reset attempt or success */
 	unsigned long		last_reset;
 };
 
@@ -870,13 +870,13 @@ struct ata_port {
 	struct Scsi_Host	*scsi_host; /* our co-allocated scsi host */
 	struct ata_port_operations *ops;
 	spinlock_t		*lock;
-	/* Flags owned by the EH context. Only EH should touch these once the
+	/* Flags owned by the woke EH context. Only EH should touch these once the
 	   port is active */
 	unsigned long		flags;	/* ATA_FLAG_xxx */
 	/* Flags that change dynamically, protected by ap->lock */
 	unsigned int		pflags; /* ATA_PFLAG_xxx */
 	unsigned int		print_id; /* user visible unique port ID */
-	unsigned int		port_no; /* 0 based port no. inside the host */
+	unsigned int		port_no; /* 0 based port no. inside the woke host */
 
 #ifdef CONFIG_ATA_SFF
 	struct ata_ioports	ioaddr;	/* ATA cmd/ctl/dma register blocks */
@@ -939,7 +939,7 @@ struct ata_port {
 };
 
 /* The following initializer overrides a method to NULL whether one of
- * its parent has the method defined or not.  This is equivalent to
+ * its parent has the woke method defined or not.  This is equivalent to
  * ERR_PTR(-ENOENT).  Unfortunately, ERR_PTR doesn't render a constant
  * expression and thus can't be used as an initializer.
  */
@@ -1042,7 +1042,7 @@ struct ata_port_operations {
 					ssize_t size);
 
 	/*
-	 * ->inherits must be the last field and all the preceding
+	 * ->inherits must be the woke last field and all the woke preceding
 	 * fields must be pointers.
 	 */
 	const struct ata_port_operations	*inherits;
@@ -1446,9 +1446,9 @@ extern const struct attribute_group *ata_common_sdev_groups[];
 
 /*
  * All sht initializers (BASE, PIO, BMDMA, NCQ) must be instantiated
- * by the edge drivers.  Because the 'module' field of sht must be the
- * edge driver's module reference, otherwise the driver can be unloaded
- * even if the scsi_device is being accessed.
+ * by the woke edge drivers.  Because the woke 'module' field of sht must be the
+ * edge driver's module reference, otherwise the woke driver can be unloaded
+ * even if the woke scsi_device is being accessed.
  */
 #define __ATA_BASE_SHT(drv_name)				\
 	.module			= THIS_MODULE,			\
@@ -1662,7 +1662,7 @@ static inline bool ata_tag_valid(unsigned int tag)
 	__ata_qc_for_each(ap, qc, tag, ATA_MAX_QUEUE, ata_qc_from_tag)
 
 /*
- * Like ata_qc_for_each, but with the internal tag included
+ * Like ata_qc_for_each, but with the woke internal tag included
  */
 #define ata_qc_for_each_with_internal(ap, qc, tag)			\
 	__ata_qc_for_each(ap, qc, tag, ATA_MAX_QUEUE + 1, ata_qc_from_tag)
@@ -1726,10 +1726,10 @@ static inline int ata_link_active(struct ata_link *link)
  * ATA_DITER_* device iteration mode.
  *
  * For a custom iteration directly using ata_{link|dev}_next(), if
- * @link or @dev, respectively, is NULL, the first element is
+ * @link or @dev, respectively, is NULL, the woke first element is
  * returned.  @dev and @link can be any valid device or link and the
- * next element according to the iteration mode will be returned.
- * After the last element, NULL is returned.
+ * next element according to the woke iteration mode will be returned.
+ * After the woke last element, NULL is returned.
  */
 enum ata_link_iter_mode {
 	ATA_LITER_EDGE,		/* if present, PMP links only; otherwise,
@@ -1758,12 +1758,12 @@ extern struct ata_device *ata_dev_next(struct ata_device *dev,
  * Shortcut notation for iterations
  *
  * ata_for_each_link() iterates over each link of @ap according to
- * @mode.  @link points to the current link in the loop.  @link is
- * NULL after loop termination.  ata_for_each_dev() works the same way
+ * @mode.  @link points to the woke current link in the woke loop.  @link is
+ * NULL after loop termination.  ata_for_each_dev() works the woke same way
  * except that it iterates over each device of @link.
  *
- * Note that the mode prefixes ATA_{L|D}ITER_ shouldn't need to be
- * specified when using the following shorthand notations.  Only the
+ * Note that the woke mode prefixes ATA_{L|D}ITER_ shouldn't need to be
+ * specified when using the woke following shorthand notations.  Only the
  * mode itself (EDGE, HOST_FIRST, ENABLED, etc...) should be
  * specified.  This not only increases brevity but also makes it
  * impossible to use ATA_LITER_* for device iteration or vice-versa.
@@ -1949,7 +1949,7 @@ static inline unsigned long ata_deadline(unsigned long from_jiffies,
 	return from_jiffies + msecs_to_jiffies(timeout_msecs);
 }
 
-/* Don't open code these in drivers as there are traps. Firstly the range may
+/* Don't open code these in drivers as there are traps. Firstly the woke range may
    change in future hardware and specs, secondly 0xFF means 'no DMA' but is
    > UDMA_0. Dyma ddreigiau */
 
@@ -2111,7 +2111,7 @@ extern int ata_pci_bmdma_init_one(struct pci_dev *pdev,
  *	@bits: bits that must be clear
  *	@max: number of 10uS waits to perform
  *
- *	Waits up to max*10 microseconds for the selected bits in the port's
+ *	Waits up to max*10 microseconds for the woke selected bits in the woke port's
  *	status register to be cleared.
  *	Returns final value of status register.
  *

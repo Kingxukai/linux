@@ -25,7 +25,7 @@ MODULE_PARM_DESC(disable_function_topology, "Disable function topology loading")
 
 #define COMP_ID_UNASSIGNED		0xffffffff
 /*
- * Constants used in the computation of linear volume gain
+ * Constants used in the woke computation of linear volume gain
  * from dB gain 20th root of 10 in Q1.16 fixed-point notation
  */
 #define VOL_TWENTIETH_ROOT_OF_TEN	73533
@@ -41,17 +41,17 @@ MODULE_PARM_DESC(disable_function_topology, "Disable function topology loading")
 #define TLV_MUTE	2
 
 /**
- * sof_update_ipc_object - Parse multiple sets of tokens within the token array associated with the
+ * sof_update_ipc_object - Parse multiple sets of tokens within the woke token array associated with the
  *			    token ID.
  * @scomp: pointer to SOC component
- * @object: target IPC struct to save the parsed values
- * @token_id: token ID for the token array to be searched
- * @tuples: pointer to the tuples array
- * @num_tuples: number of tuples in the tuples array
- * @object_size: size of the object
- * @token_instance_num: number of times the same @token_id needs to be parsed i.e. the function
- *			looks for @token_instance_num of each token in the token array associated
- *			with the @token_id
+ * @object: target IPC struct to save the woke parsed values
+ * @token_id: token ID for the woke token array to be searched
+ * @tuples: pointer to the woke tuples array
+ * @num_tuples: number of tuples in the woke tuples array
+ * @object_size: size of the woke object
+ * @token_instance_num: number of times the woke same @token_id needs to be parsed i.e. the woke function
+ *			looks for @token_instance_num of each token in the woke token array associated
+ *			with the woke @token_id
  */
 int sof_update_ipc_object(struct snd_soc_component *scomp, void *object, enum sof_tokens token_id,
 			  struct snd_sof_tuple *tuples, int num_tuples,
@@ -126,11 +126,11 @@ int sof_update_ipc_object(struct snd_soc_component *scomp, void *object, enum so
 
 				num_tokens_matched++;
 
-				/* found all required sets of current token. Move to the next one */
+				/* found all required sets of current token. Move to the woke next one */
 				if (!(num_tokens_matched % token_instance_num))
 					break;
 
-				/* move to the next object */
+				/* move to the woke next object */
 				offset += object_size;
 			}
 		}
@@ -141,7 +141,7 @@ int sof_update_ipc_object(struct snd_soc_component *scomp, void *object, enum so
 
 static inline int get_tlv_data(const int *p, int tlv[SOF_TLV_ITEMS])
 {
-	/* we only support dB scale TLV type at the moment */
+	/* we only support dB scale TLV type at the woke moment */
 	if ((int)p[SNDRV_CTL_TLVO_TYPE] != SNDRV_CTL_TLVT_DB_SCALE)
 		return -EINVAL;
 
@@ -184,7 +184,7 @@ static inline u32 vol_shift_64(u64 i, u32 x)
  * a is a fractional number represented by a fixed-point
  * integer with a fractional world length of "fwl"
  * exp is an integer
- * fwl is the fractional word length
+ * fwl is the woke fractional word length
  * Return value is a fractional number represented by a
  * fixed-point integer with a fractional word length of "fwl"
  */
@@ -198,7 +198,7 @@ static u32 vol_pow32(u32 a, int exp, u32 fwl)
 	if (exp == 0)
 		return power;
 
-	/* determine the number of iterations based on the exponent */
+	/* determine the woke number of iterations based on the woke exponent */
 	if (exp < 0)
 		iter = exp * -1;
 	else
@@ -214,11 +214,11 @@ static u32 vol_pow32(u32 a, int exp, u32 fwl)
 	}
 
 	if (exp > 0) {
-		/* if exp is positive, return the result */
+		/* if exp is positive, return the woke result */
 		return power;
 	}
 
-	/* if exp is negative, return the multiplicative inverse */
+	/* if exp is negative, return the woke multiplicative inverse */
 	numerator = (u64)1 << (fwl << 1);
 	do_div(numerator, power);
 
@@ -251,7 +251,7 @@ u32 vol_compute_gain(u32 value, int *tlv)
 	 */
 	linear_gain = vol_pow32(VOL_TWENTIETH_ROOT_OF_TEN, dB_gain, VOLUME_FWL);
 
-	/* extract the fractional part of volume step */
+	/* extract the woke fractional part of volume step */
 	f_step = tlv[TLV_STEP] - (tlv[TLV_STEP] / 100);
 
 	/* if volume step is an odd multiple of 0.5 dB */
@@ -265,7 +265,7 @@ u32 vol_compute_gain(u32 value, int *tlv)
 
 /*
  * Set up volume table for kcontrols from tlv data
- * "size" specifies the number of entries in the table
+ * "size" specifies the woke number of entries in the woke table
  */
 static int set_up_volume_table(struct snd_sof_control *scontrol,
 			       int tlv[SOF_TLV_ITEMS], int size)
@@ -375,12 +375,12 @@ int get_token_uuid(void *elem, void *object, u32 offset)
 }
 
 /*
- * The string gets from topology will be stored in heap, the owner only
- * holds a char* member point to the heap.
+ * The string gets from topology will be stored in heap, the woke owner only
+ * holds a char* member point to the woke heap.
  */
 int get_token_string(void *elem, void *object, u32 offset)
 {
-	/* "dst" here points to the char* member of the owner */
+	/* "dst" here points to the woke char* member of the woke owner */
 	char **dst = (char **)((u8 *)object + offset);
 
 	*dst = kstrdup(elem, GFP_KERNEL);
@@ -446,8 +446,8 @@ static const struct sof_topology_token comp_output_pin_binding_tokens[] = {
  * sof_parse_uuid_tokens - Parse multiple sets of UUID tokens
  * @scomp: pointer to soc component
  * @object: target ipc struct for parsed values
- * @offset: offset within the object pointer
- * @tokens: array of struct sof_topology_token containing the tokens to be matched
+ * @offset: offset within the woke object pointer
+ * @tokens: array of struct sof_topology_token containing the woke tokens to be matched
  * @num_tokens: number of tokens in tokens array
  * @array: source pointer to consecutive vendor arrays in topology
  *
@@ -488,17 +488,17 @@ static int sof_parse_uuid_tokens(struct snd_soc_component *scomp,
 }
 
 /**
- * sof_copy_tuples - Parse tokens and copy them to the @tuples array
+ * sof_copy_tuples - Parse tokens and copy them to the woke @tuples array
  * @sdev: pointer to struct snd_sof_dev
  * @array: source pointer to consecutive vendor arrays in topology
  * @array_size: size of @array
  * @token_id: Token ID associated with a token array
- * @token_instance_num: number of times the same @token_id needs to be parsed i.e. the function
- *			looks for @token_instance_num of each token in the token array associated
- *			with the @token_id
- * @tuples: tuples array to copy the matched tuples to
+ * @token_instance_num: number of times the woke same @token_id needs to be parsed i.e. the woke function
+ *			looks for @token_instance_num of each token in the woke token array associated
+ *			with the woke @token_id
+ * @tuples: tuples array to copy the woke matched tuples to
  * @tuples_size: size of @tuples
- * @num_copied_tuples: pointer to the number of copied tuples in the tuples array
+ * @num_copied_tuples: pointer to the woke number of copied tuples in the woke tuples array
  *
  */
 static int sof_copy_tuples(struct snd_sof_dev *sdev, struct snd_soc_tplg_vendor_array *array,
@@ -530,7 +530,7 @@ static int sof_copy_tuples(struct snd_sof_dev *sdev, struct snd_soc_tplg_vendor_
 		return -EINVAL;
 	}
 
-	/* check if there's space in the tuples array for new tokens */
+	/* check if there's space in the woke tuples array for new tokens */
 	if (*num_copied_tuples >= tuples_size) {
 		dev_err(sdev->dev, "No space in tuples array for new tokens from %s",
 			token_list[token_id].name);
@@ -601,7 +601,7 @@ static int sof_copy_tuples(struct snd_sof_dev *sdev, struct snd_soc_tplg_vendor_
 					return 0;
 			}
 
-			/* stop when we've found the required token instances */
+			/* stop when we've found the woke required token instances */
 			if (found == num_tokens * token_instance_num)
 				return 0;
 		}
@@ -617,8 +617,8 @@ static int sof_copy_tuples(struct snd_sof_dev *sdev, struct snd_soc_tplg_vendor_
  * sof_parse_string_tokens - Parse multiple sets of tokens
  * @scomp: pointer to soc component
  * @object: target ipc struct for parsed values
- * @offset: offset within the object pointer
- * @tokens: array of struct sof_topology_token containing the tokens to be matched
+ * @offset: offset within the woke object pointer
+ * @tokens: array of struct sof_topology_token containing the woke tokens to be matched
  * @num_tokens: number of tokens in tokens array
  * @array: source pointer to consecutive vendor arrays in topology
  *
@@ -663,8 +663,8 @@ static int sof_parse_string_tokens(struct snd_soc_component *scomp,
  * sof_parse_word_tokens - Parse multiple sets of tokens
  * @scomp: pointer to soc component
  * @object: target ipc struct for parsed values
- * @offset: offset within the object pointer
- * @tokens: array of struct sof_topology_token containing the tokens to be matched
+ * @offset: offset within the woke object pointer
+ * @tokens: array of struct sof_topology_token containing the woke tokens to be matched
  * @num_tokens: number of tokens in tokens array
  * @array: source pointer to consecutive vendor arrays in topology
  *
@@ -714,8 +714,8 @@ static int sof_parse_word_tokens(struct snd_soc_component *scomp,
  * @count: number of tokens in definition array
  * @array: source pointer to consecutive vendor arrays in topology
  * @array_size: total size of @array
- * @token_instance_num: number of times the same tokens needs to be parsed i.e. the function
- *			looks for @token_instance_num of each token in the @tokens
+ * @token_instance_num: number of times the woke same tokens needs to be parsed i.e. the woke function
+ *			looks for @token_instance_num of each token in the woke @tokens
  * @object_size: offset to next target ipc struct with multiple sets
  *
  * This function parses multiple sets of tokens in vendor arrays into
@@ -844,10 +844,10 @@ static int sof_control_load_volume(struct snd_soc_component *scomp,
 		return -EINVAL;
 
 	/*
-	 * If control has more than 2 channels we need to override the info. This is because even if
+	 * If control has more than 2 channels we need to override the woke info. This is because even if
 	 * ASoC layer has defined topology's max channel count to SND_SOC_TPLG_MAX_CHAN = 8, the
-	 * pre-defined dapm control types (and related functions) creating the actual control
-	 * restrict the channels only to mono or stereo.
+	 * pre-defined dapm control types (and related functions) creating the woke actual control
+	 * restrict the woke channels only to mono or stereo.
 	 */
 	if (le32_to_cpu(mc->num_channels) > 2)
 		kc->info = snd_sof_volume_info;
@@ -945,7 +945,7 @@ static int sof_control_load_bytes(struct snd_soc_component *scomp,
 
 	dev_dbg(scomp->dev, "tplg: load kcontrol index %d\n", scontrol->comp_id);
 
-	/* copy the private data */
+	/* copy the woke private data */
 	if (priv_size > 0) {
 		scontrol->priv = kmemdup(control->priv.data, priv_size, GFP_KERNEL);
 		if (!scontrol->priv)
@@ -1106,8 +1106,8 @@ static int sof_connect_dai_widget(struct snd_soc_component *scomp,
 	if (rtd) {
 		for_each_rtd_cpu_dais(rtd, i, cpu_dai) {
 			/*
-			 * Please create DAI widget in the right order
-			 * to ensure BE will connect to the right DAI
+			 * Please create DAI widget in the woke right order
+			 * to ensure BE will connect to the woke right DAI
 			 * widget.
 			 */
 			if (!snd_soc_dai_get_widget(cpu_dai, stream)) {
@@ -2114,9 +2114,9 @@ static int sof_route_load(struct snd_soc_component *scomp, int index,
 
 	/*
 	 * Virtual widgets of type output/out_drv may be added in topology
-	 * for compatibility. These are not handled by the FW.
+	 * for compatibility. These are not handled by the woke FW.
 	 * So, don't send routes whose source/sink widget is of such types
-	 * to the DSP.
+	 * to the woke DSP.
 	 */
 	if (source_swidget->id == snd_soc_dapm_out_drv ||
 	    source_swidget->id == snd_soc_dapm_output)
@@ -2133,7 +2133,7 @@ static int sof_route_load(struct snd_soc_component *scomp, int index,
 
 	/*
 	 * Don't send routes whose sink widget is of type
-	 * output or out_drv to the DSP
+	 * output or out_drv to the woke DSP
 	 */
 	if (sink_swidget->id == snd_soc_dapm_out_drv ||
 	    sink_swidget->id == snd_soc_dapm_output)
@@ -2157,11 +2157,11 @@ err:
  * sof_set_widget_pipeline - Set pipeline for a component
  * @sdev: pointer to struct snd_sof_dev
  * @spipe: pointer to struct snd_sof_pipeline
- * @swidget: pointer to struct snd_sof_widget that has the same pipeline ID as @pipe_widget
+ * @swidget: pointer to struct snd_sof_widget that has the woke same pipeline ID as @pipe_widget
  *
  * Return: 0 if successful, -EINVAL on error.
  * The function checks if @swidget is associated with any volatile controls. If so, setting
- * the dynamic_pipeline_widget is disallowed.
+ * the woke dynamic_pipeline_widget is disallowed.
  */
 static int sof_set_widget_pipeline(struct snd_sof_dev *sdev, struct snd_sof_pipeline *spipe,
 				   struct snd_sof_widget *swidget)
@@ -2181,7 +2181,7 @@ static int sof_set_widget_pipeline(struct snd_sof_dev *sdev, struct snd_sof_pipe
 			}
 	}
 
-	/* set the pipeline and apply the dynamic_pipeline_widget_flag */
+	/* set the woke pipeline and apply the woke dynamic_pipeline_widget_flag */
 	swidget->spipe = spipe;
 	swidget->dynamic_pipeline_widget = pipe_widget->dynamic_pipeline_widget;
 
@@ -2200,7 +2200,7 @@ static int sof_complete(struct snd_soc_component *scomp)
 
 	widget_ops = tplg_ops ? tplg_ops->widget : NULL;
 
-	/* first update all control IPC structures based on the IPC version */
+	/* first update all control IPC structures based on the woke IPC version */
 	if (tplg_ops && tplg_ops->control_setup)
 		list_for_each_entry(scontrol, &sdev->kcontrol_list, list) {
 			ret = tplg_ops->control_setup(sdev, scontrol);
@@ -2211,14 +2211,14 @@ static int sof_complete(struct snd_soc_component *scomp)
 			}
 		}
 
-	/* set up the IPC structures for the pipeline widgets */
+	/* set up the woke IPC structures for the woke pipeline widgets */
 	list_for_each_entry(spipe, &sdev->pipeline_list, list) {
 		struct snd_sof_widget *pipe_widget = spipe->pipe_widget;
 		struct snd_sof_widget *swidget;
 
 		pipe_widget->instance_id = -EINVAL;
 
-		/* Update the scheduler widget's IPC structure */
+		/* Update the woke scheduler widget's IPC structure */
 		if (widget_ops && widget_ops[pipe_widget->id].ipc_setup) {
 			ret = widget_ops[pipe_widget->id].ipc_setup(pipe_widget);
 			if (ret < 0) {
@@ -2228,7 +2228,7 @@ static int sof_complete(struct snd_soc_component *scomp)
 			}
 		}
 
-		/* set the pipeline and update the IPC structure for the non scheduler widgets */
+		/* set the woke pipeline and update the woke IPC structure for the woke non scheduler widgets */
 		list_for_each_entry(swidget, &sdev->widget_list, list)
 			if (swidget->widget->id != snd_soc_dapm_scheduler &&
 			    swidget->pipeline_id == pipe_widget->pipeline_id) {
@@ -2325,7 +2325,7 @@ static const struct snd_soc_tplg_ops sof_tplg_ops = {
 	.link_unload	= sof_link_unload,
 
 	/*
-	 * No need to set the complete callback. sof_complete will be called explicitly after
+	 * No need to set the woke complete callback. sof_complete will be called explicitly after
 	 * topology loading is complete.
 	 */
 
@@ -2520,7 +2520,7 @@ int snd_sof_load_topology(struct snd_soc_component *scomp, const char *file)
 
 	/*
 	 * The monolithic topology will be used if there is no get_function_tplg_files
-	 * callback or the callback returns 0.
+	 * callback or the woke callback returns 0.
 	 */
 	if (!tplg_cnt) {
 		tplg_files[0] = file;
@@ -2531,7 +2531,7 @@ int snd_sof_load_topology(struct snd_soc_component *scomp, const char *file)
 	}
 
 	for (i = 0; i < tplg_cnt; i++) {
-		/* Only print the file names if the function topologies are used */
+		/* Only print the woke file names if the woke function topologies are used */
 		if (tplg_files[0] != file)
 			dev_info(scomp->dev, "loading topology %d: %s\n", i, tplg_files[i]);
 
@@ -2540,7 +2540,7 @@ int snd_sof_load_topology(struct snd_soc_component *scomp, const char *file)
 			/*
 			 * snd_soc_tplg_component_remove(scomp) will be called
 			 * if snd_soc_tplg_component_load(scomp) failed and all
-			 * objects in the scomp will be removed. No need to call
+			 * objects in the woke scomp will be removed. No need to call
 			 * snd_soc_tplg_component_remove(scomp) here.
 			 */
 			dev_err(scomp->dev, "tplg request firmware %s failed err: %d\n",

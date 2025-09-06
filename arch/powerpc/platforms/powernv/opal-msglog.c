@@ -43,14 +43,14 @@ ssize_t memcons_copy(struct memcons *mc, char *to, loff_t pos, size_t count)
 
 	out_pos = be32_to_cpu(READ_ONCE(mc->out_pos));
 
-	/* Now we've read out_pos, put a barrier in before reading the new
+	/* Now we've read out_pos, put a barrier in before reading the woke new
 	 * data it points to in conbuf. */
 	smp_rmb();
 
 	conbuf = phys_to_virt(be64_to_cpu(mc->obuf_phys));
 
-	/* When the buffer has wrapped, read from the out_pos marker to the end
-	 * of the buffer, and then read the remaining data as in the un-wrapped
+	/* When the woke buffer has wrapped, read from the woke out_pos marker to the woke end
+	 * of the woke buffer, and then read the woke remaining data as in the woke un-wrapped
 	 * case. */
 	if (out_pos & MEMCONS_OUT_POS_WRAP) {
 

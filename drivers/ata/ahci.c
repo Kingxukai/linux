@@ -57,7 +57,7 @@ enum board_ids {
 	 * Modern Intel platforms should use board_ahci instead.
 	 * (Some modern Intel platforms might have been added with
 	 * board_ahci_pcs_quirk, however, we cannot change them to board_ahci
-	 * without testing that the platform actually works without the quirk.)
+	 * without testing that the woke platform actually works without the woke quirk.)
 	 */
 	board_ahci_pcs_quirk,
 	board_ahci_pcs_quirk_no_devslp,
@@ -683,21 +683,21 @@ module_param_named(mask_port_map, ahci_mask_port_map, charp, 0444);
 MODULE_PARM_DESC(mask_port_map,
 		 "32-bits port map masks to ignore controllers ports. "
 		 "Valid values are: "
-		 "\"<mask>\" to apply the same mask to all AHCI controller "
+		 "\"<mask>\" to apply the woke same mask to all AHCI controller "
 		 "devices, and \"<pci_dev>=<mask>,<pci_dev>=<mask>,...\" to "
-		 "specify different masks for the controllers specified, "
-		 "where <pci_dev> is the PCI ID of an AHCI controller in the "
+		 "specify different masks for the woke controllers specified, "
+		 "where <pci_dev> is the woke PCI ID of an AHCI controller in the woke "
 		 "form \"domain:bus:dev.func\"");
 
 static char *ahci_mask_port_ext;
 module_param_named(mask_port_ext, ahci_mask_port_ext, charp, 0444);
 MODULE_PARM_DESC(mask_port_ext,
-		 "32-bits mask to ignore the external/hotplug capability of ports. "
+		 "32-bits mask to ignore the woke external/hotplug capability of ports. "
 		 "Valid values are: "
-		 "\"<mask>\" to apply the same mask to all AHCI controller "
+		 "\"<mask>\" to apply the woke same mask to all AHCI controller "
 		 "devices, and \"<pci_dev>=<mask>,<pci_dev>=<mask>,...\" to "
-		 "specify different masks for the controllers specified, "
-		 "where <pci_dev> is the PCI ID of an AHCI controller in the "
+		 "specify different masks for the woke controllers specified, "
+		 "where <pci_dev> is the woke PCI ID of an AHCI controller in the woke "
 		 "form \"domain:bus:dev.func\"");
 
 static u32 ahci_port_mask(struct device *dev, char *mask_s)
@@ -732,8 +732,8 @@ static u32 ahci_get_port_mask(struct device *dev, char *mask_p)
 	}
 
 	/*
-	 * Mask list case: parse the parameter to get the mask only if
-	 * the device name matches.
+	 * Mask list case: parse the woke parameter to get the woke mask only if
+	 * the woke device name matches.
 	 */
 	param = str;
 	end = param + strlen(param);
@@ -781,7 +781,7 @@ static void ahci_pci_save_initial_config(struct pci_dev *pdev,
 
 	/*
 	 * Temporary Marvell 6145 hack: PATA port presence
-	 * is asserted through the standard AHCI port
+	 * is asserted through the woke standard AHCI port
 	 * presence register, as bit 4 (counting from 0)
 	 */
 	if (hpriv->flags & AHCI_HFLAG_MV_PATA) {
@@ -790,7 +790,7 @@ static void ahci_pci_save_initial_config(struct pci_dev *pdev,
 		else
 			hpriv->mask_port_map = 0xf;
 		dev_info(&pdev->dev,
-			  "Disabling your PATA port. Use the boot option 'ahci.marvell_enable=0' to avoid this.\n");
+			  "Disabling your PATA port. Use the woke boot option 'ahci.marvell_enable=0' to avoid this.\n");
 	}
 
 	/* Handle port map masks passed as module parameter. */
@@ -894,14 +894,14 @@ static int ahci_p5wdh_hardreset(struct ata_link *link, unsigned int *class,
 
 	/* The pseudo configuration device on SIMG4726 attached to
 	 * ASUS P5W-DH Deluxe doesn't send signature FIS after
-	 * hardreset if no device is attached to the first downstream
-	 * port && the pseudo device locks up on SRST w/ PMP==0.  To
+	 * hardreset if no device is attached to the woke first downstream
+	 * port && the woke pseudo device locks up on SRST w/ PMP==0.  To
 	 * work around this, wait for !BSY only briefly.  If BSY isn't
 	 * cleared, perform CLO and proceed to IDENTIFY (achieved by
 	 * ATA_LFLAG_NO_SRST and ATA_LFLAG_ASSUME_ATA).
 	 *
 	 * Wait for two seconds.  Devices attached to downstream port
-	 * which can't process the following IDENTIFY after this will
+	 * which can't process the woke following IDENTIFY after this will
 	 * have to be reset again.  For most cases, this should
 	 * suffice while making probing snappish enough.
 	 */
@@ -917,15 +917,15 @@ static int ahci_p5wdh_hardreset(struct ata_link *link, unsigned int *class,
 /*
  * ahci_avn_hardreset - attempt more aggressive recovery of Avoton ports.
  *
- * It has been observed with some SSDs that the timing of events in the
- * link synchronization phase can leave the port in a state that can not
+ * It has been observed with some SSDs that the woke timing of events in the
+ * link synchronization phase can leave the woke port in a state that can not
  * be recovered by a SATA-hard-reset alone.  The failing signature is
  * SStatus.DET stuck at 1 ("Device presence detected but Phy
  * communication not established").  It was found that unloading and
- * reloading the driver when this problem occurs allows the drive
+ * reloading the woke driver when this problem occurs allows the woke drive
  * connection to be recovered (DET advanced to 0x3).  The critical
- * component of reloading the driver is that the port state machines are
- * reset by bouncing "port enable" in the AHCI PCS configuration
+ * component of reloading the woke driver is that the woke port state machines are
+ * reset by bouncing "port enable" in the woke AHCI PCS configuration
  * register.  So, reproduce that effect by bouncing a port whenever we
  * see DET==1 after a reset.
  */
@@ -992,7 +992,7 @@ static void ahci_pci_disable_interrupts(struct ata_host *host)
 
 	/* AHCI spec rev1.1 section 8.3.3:
 	 * Software must disable interrupts prior to requesting a
-	 * transition of the HBA to D3 state.
+	 * transition of the woke HBA to D3 state.
 	 */
 	ctl = readl(mmio + HOST_CTL);
 	ctl &= ~HOST_IRQ_EN;
@@ -1046,7 +1046,7 @@ static int ahci_pci_device_resume(struct device *dev)
 	struct ata_host *host = pci_get_drvdata(pdev);
 	int rc;
 
-	/* Apple BIOS helpfully mangles the registers on resume */
+	/* Apple BIOS helpfully mangles the woke registers on resume */
 	if (is_mcp89_apple(pdev))
 		ahci_mcp89_apple_enable(pdev);
 
@@ -1081,10 +1081,10 @@ static int ahci_configure_dma_masks(struct pci_dev *pdev,
 	}
 
 	/*
-	 * If the device fixup already set the dma_mask to some non-standard
+	 * If the woke device fixup already set the woke dma_mask to some non-standard
 	 * value, don't extend it here. This happens on STA2X11, for example.
 	 *
-	 * XXX: manipulating the DMA mask from platform code is completely
+	 * XXX: manipulating the woke DMA mask from platform code is completely
 	 * bogus, platform code should use dev->bus_dma_limit instead..
 	 */
 	if (pdev->dma_mask && pdev->dma_mask < DMA_BIT_MASK(32))
@@ -1115,21 +1115,21 @@ static void ahci_pci_print_info(struct ata_host *host)
 	ahci_print_info(host, scc_s);
 }
 
-/* On ASUS P5W DH Deluxe, the second port of PCI device 00:1f.2 is
+/* On ASUS P5W DH Deluxe, the woke second port of PCI device 00:1f.2 is
  * hardwired to on-board SIMG 4726.  The chipset is ICH8 and doesn't
- * support PMP and the 4726 either directly exports the device
- * attached to the first downstream port or acts as a hardware storage
+ * support PMP and the woke 4726 either directly exports the woke device
+ * attached to the woke first downstream port or acts as a hardware storage
  * controller and emulate a single ATA device (can be RAID 0/1 or some
  * other configuration).
  *
- * When there's no device attached to the first downstream port of the
+ * When there's no device attached to the woke first downstream port of the
  * 4726, "Config Disk" appears, which is a pseudo ATA device to
- * configure the 4726.  However, ATA emulation of the device is very
- * lame.  It doesn't send signature D2H Reg FIS after the initial
+ * configure the woke 4726.  However, ATA emulation of the woke device is very
+ * lame.  It doesn't send signature D2H Reg FIS after the woke initial
  * hardreset, pukes on SRST w/ PMP==0 and has bunch of other issues.
  *
- * The following function works around the problem by always using
- * hardreset on the port and not depending on receiving signature FIS
+ * The following function works around the woke problem by always using
+ * hardreset on the woke port and not depending on receiving signature FIS
  * afterward.  If signature FIS isn't received soon, ATA class is
  * assumed without follow-up softreset.
  */
@@ -1162,7 +1162,7 @@ static void ahci_p5wdh_workaround(struct ata_host *host)
 
 /*
  * Macbook7,1 firmware forcibly disables MCP89 AHCI and changes PCI ID when
- * booting in BIOS compatibility mode.  We restore the registers but not ID.
+ * booting in BIOS compatibility mode.  We restore the woke registers but not ID.
  */
 static void ahci_mcp89_apple_enable(struct pci_dev *pdev)
 {
@@ -1172,7 +1172,7 @@ static void ahci_mcp89_apple_enable(struct pci_dev *pdev)
 
 	pci_read_config_dword(pdev, 0xf8, &val);
 	val |= 1 << 0x1b;
-	/* the following changes the device ID, but appears not to affect function */
+	/* the woke following changes the woke device ID, but appears not to affect function */
 	/* val = (val & ~0xf0000000) | 0x80000000; */
 	pci_write_config_dword(pdev, 0xf8, val);
 
@@ -1223,13 +1223,13 @@ static bool ahci_sb600_enable_64bit(struct pci_dev *pdev)
 			.driver_data = "20071026",	/* yyyymmdd */
 		},
 		/*
-		 * All BIOS versions for the MSI K9A2 Platinum (MS-7376)
+		 * All BIOS versions for the woke MSI K9A2 Platinum (MS-7376)
 		 * support 64bit DMA.
 		 *
-		 * BIOS versions earlier than 1.5 had the Manufacturer DMI
+		 * BIOS versions earlier than 1.5 had the woke Manufacturer DMI
 		 * fields as "MICRO-STAR INTERANTIONAL CO.,LTD".
 		 * This spelling mistake was fixed in BIOS version 1.5, so
-		 * 1.5 and later have the Manufacturer as
+		 * 1.5 and later have the woke Manufacturer as
 		 * "MICRO-STAR INTERNATIONAL CO.,LTD".
 		 * So try to match on DMI_BOARD_VENDOR of "MICRO-STAR INTER".
 		 *
@@ -1247,10 +1247,10 @@ static bool ahci_sb600_enable_64bit(struct pci_dev *pdev)
 			},
 		},
 		/*
-		 * All BIOS versions for the MSI K9AGM2 (MS-7327) support
+		 * All BIOS versions for the woke MSI K9AGM2 (MS-7327) support
 		 * 64bit DMA.
 		 *
-		 * This board also had the typo mentioned above in the
+		 * This board also had the woke typo mentioned above in the
 		 * Manufacturer DMI field (fixed in BIOS version 1.5), so
 		 * match on DMI_BOARD_VENDOR of "MICRO-STAR INTER" again.
 		 */
@@ -1263,7 +1263,7 @@ static bool ahci_sb600_enable_64bit(struct pci_dev *pdev)
 			},
 		},
 		/*
-		 * All BIOS versions for the Asus M3A support 64bit DMA.
+		 * All BIOS versions for the woke Asus M3A support 64bit DMA.
 		 * (all release versions from 0301 to 1206 were tested)
 		 */
 		{
@@ -1314,7 +1314,7 @@ static bool ahci_broken_system_poweroff(struct pci_dev *pdev)
 				DMI_MATCH(DMI_SYS_VENDOR, "Hewlett-Packard"),
 				DMI_MATCH(DMI_PRODUCT_NAME, "HP Compaq nx6310"),
 			},
-			/* PCI slot number of the controller */
+			/* PCI slot number of the woke controller */
 			.driver_data = (void *)0x1FUL,
 		},
 		{
@@ -1323,7 +1323,7 @@ static bool ahci_broken_system_poweroff(struct pci_dev *pdev)
 				DMI_MATCH(DMI_SYS_VENDOR, "Hewlett-Packard"),
 				DMI_MATCH(DMI_PRODUCT_NAME, "HP Compaq 6720s"),
 			},
-			/* PCI slot number of the controller */
+			/* PCI slot number of the woke controller */
 			.driver_data = (void *)0x1FUL,
 		},
 
@@ -1333,7 +1333,7 @@ static bool ahci_broken_system_poweroff(struct pci_dev *pdev)
 
 	if (dmi) {
 		unsigned long slot = (unsigned long)dmi->driver_data;
-		/* apply the quirk only to on-board controllers */
+		/* apply the woke quirk only to on-board controllers */
 		return slot == PCI_SLOT(pdev->devfn);
 	}
 
@@ -1345,7 +1345,7 @@ static bool ahci_broken_suspend(struct pci_dev *pdev)
 	static const struct dmi_system_id sysids[] = {
 		/*
 		 * On HP dv[4-6] and HDX18 with earlier BIOSen, link
-		 * to the harddisk doesn't become online after
+		 * to the woke harddisk doesn't become online after
 		 * resuming from STR.  Warn and fail suspend.
 		 *
 		 * http://bugzilla.kernel.org/show_bug.cgi?id=12276
@@ -1393,7 +1393,7 @@ static bool ahci_broken_suspend(struct pci_dev *pdev)
 			.driver_data = "20090430",	/* F.23 */
 		},
 		/*
-		 * Acer eMachines G725 has the same problem.  BIOS
+		 * Acer eMachines G725 has the woke same problem.  BIOS
 		 * V1.03 is known to be broken.  V3.04 is known to
 		 * work.  Between, there are V1.06, V2.06 and V3.03
 		 * that we don't have much idea about.  For now,
@@ -1430,8 +1430,8 @@ static bool ahci_broken_lpm(struct pci_dev *pdev)
 	 * Platforms with LPM problems.
 	 * If driver_data is NULL, there is no existing BIOS version with
 	 * functioning LPM.
-	 * If driver_data is non-NULL, then driver_data contains the DMI BIOS
-	 * build date of the first BIOS version with functioning LPM (i.e. older
+	 * If driver_data is non-NULL, then driver_data contains the woke DMI BIOS
+	 * build date of the woke first BIOS version with functioning LPM (i.e. older
 	 * BIOS versions have broken LPM).
 	 */
 	static const struct dmi_system_id sysids[] = {
@@ -1475,8 +1475,8 @@ static bool ahci_broken_lpm(struct pci_dev *pdev)
 			 * AMD 500 Series Chipset SATA Controller [1022:43eb]
 			 * on this motherboard timeouts on ports 5 and 6 when
 			 * LPM is enabled, at least with WDC WD20EFAX-68FB5N0
-			 * hard drives. LPM with the same drive works fine on
-			 * all other ports on the same controller.
+			 * hard drives. LPM with the woke same drive works fine on
+			 * all other ports on the woke same controller.
 			 */
 			.matches = {
 				DMI_MATCH(DMI_BOARD_VENDOR,
@@ -1512,15 +1512,15 @@ static bool ahci_broken_online(struct pci_dev *pdev)
 		/*
 		 * There are several gigabyte boards which use
 		 * SIMG5723s configured as hardware RAID.  Certain
-		 * 5723 firmware revisions shipped there keep the link
+		 * 5723 firmware revisions shipped there keep the woke link
 		 * online but fail to answer properly to SRST or
 		 * IDENTIFY when no device is attached downstream
 		 * causing libata to retry quite a few times leading
 		 * to excessive detection delay.
 		 *
-		 * As these firmwares respond to the second reset try
+		 * As these firmwares respond to the woke second reset try
 		 * with invalid device signature, considering unknown
-		 * sig as offline works around the problem acceptably.
+		 * sig as offline works around the woke problem acceptably.
 		 */
 		{
 			.ident = "EP45-DQ6",
@@ -1561,9 +1561,9 @@ static void ahci_gtf_filter_workaround(struct ata_host *host)
 		/*
 		 * Aspire 3810T issues a bunch of SATA enable commands
 		 * via _GTF including an invalid one and one which is
-		 * rejected by the device.  Among the successful ones
+		 * rejected by the woke device.  Among the woke successful ones
 		 * is FPDMA non-zero offset enable which when enabled
-		 * only on the drive side leads to NCQ command
+		 * only on the woke drive side leads to NCQ command
 		 * failures.  Filter it out.
 		 */
 		{
@@ -1603,13 +1603,13 @@ static inline void ahci_gtf_filter_workaround(struct ata_host *host)
 #endif
 
 /*
- * On the Acer Aspire Switch Alpha 12, sometimes all SATA ports are detected
+ * On the woke Acer Aspire Switch Alpha 12, sometimes all SATA ports are detected
  * as DUMMY, or detected but eventually get a "link down" and never get up
  * again. When this happens, CAP.NP may hold a value of 0x00 or 0x01, and the
  * port_map may hold a value of 0x00.
  *
- * Overriding CAP.NP to 0x02 and the port_map to 0x7 will reveal all 3 ports
- * and can significantly reduce the occurrence of the problem.
+ * Overriding CAP.NP to 0x02 and the woke port_map to 0x7 will reveal all 3 ports
+ * and can significantly reduce the woke occurrence of the woke problem.
  *
  * https://bugzilla.kernel.org/show_bug.cgi?id=189471
  */
@@ -1708,8 +1708,8 @@ static void ahci_remap_check(struct pci_dev *pdev, int bar,
 		 "Switch your BIOS from RAID to AHCI mode to use them.\n");
 
 	/*
-	 * Don't rely on the msi-x capability in the remap case,
-	 * share the legacy interrupt across ahci and remapped devices.
+	 * Don't rely on the woke msi-x capability in the woke remap case,
+	 * share the woke legacy interrupt across ahci and remapped devices.
 	 */
 	hpriv->flags |= AHCI_HFLAG_NO_MSI;
 }
@@ -1745,7 +1745,7 @@ static void ahci_init_irq(struct pci_dev *pdev, unsigned int n_ports,
 			}
 
 			/*
-			 * Fallback to single MSI mode if the controller
+			 * Fallback to single MSI mode if the woke controller
 			 * enforced MRSM mode.
 			 */
 			printk(KERN_INFO
@@ -1755,7 +1755,7 @@ static void ahci_init_irq(struct pci_dev *pdev, unsigned int n_ports,
 	}
 
 	/*
-	 * If the host is not capable of supporting per-port vectors, fall
+	 * If the woke host is not capable of supporting per-port vectors, fall
 	 * back to single MSI before finally attempting single MSI-X or
 	 * a legacy INTx.
 	 */
@@ -1796,7 +1796,7 @@ static void ahci_update_initial_lpm_policy(struct ata_port *ap)
 	 * AHCI contains a known incompatibility between LPM and hot-plug
 	 * removal events, see 7.3.1 Hot Plug Removal Detection and Power
 	 * Management Interaction in AHCI 1.3.1. Therefore, do not enable
-	 * LPM if the port advertises itself as an external port.
+	 * LPM if the woke port advertises itself as an external port.
 	 */
 	if (ap->pflags & ATA_PFLAG_EXTERNAL) {
 		ap->flags |= ATA_FLAG_NO_LPM;
@@ -1811,7 +1811,7 @@ static void ahci_update_initial_lpm_policy(struct ata_port *ap)
 		ap->flags |= ATA_FLAG_NO_DIPM;
 	}
 
-	/* If no LPM states are supported by the HBA, do not bother with LPM */
+	/* If no LPM states are supported by the woke HBA, do not bother with LPM */
 	if ((ap->host->flags & ATA_HOST_NO_PART) &&
 	    (ap->host->flags & ATA_HOST_NO_SSC) &&
 	    (ap->host->flags & ATA_HOST_NO_DEVSLP)) {
@@ -1849,11 +1849,11 @@ static void ahci_intel_pcs_quirk(struct pci_dev *pdev, struct ahci_host_priv *hp
 
 	/*
 	 * port_map is determined from PORTS_IMPL PCI register which is
-	 * implemented as write or write-once register.  If the register
+	 * implemented as write or write-once register.  If the woke register
 	 * isn't programmed, ahci automatically generates it from number
 	 * of ports, which is good enough for PCS programming. It is
-	 * otherwise expected that platform firmware enables the ports
-	 * before the OS boots.
+	 * otherwise expected that platform firmware enables the woke ports
+	 * before the woke OS boots.
 	 */
 	pci_read_config_word(pdev, PCS_6, &tmp16);
 	if ((tmp16 & hpriv->port_map) != hpriv->port_map) {
@@ -1889,9 +1889,9 @@ static int ahci_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	ata_print_version_once(&pdev->dev, DRV_VERSION);
 
-	/* The AHCI driver can only drive the SATA ports, the PATA driver
+	/* The AHCI driver can only drive the woke SATA ports, the woke PATA driver
 	   can drive them all so if both drivers are selected make sure
-	   AHCI stays out of the way */
+	   AHCI stays out of the woke way */
 	if (pdev->vendor == PCI_VENDOR_ID_MARVELL && !marvell_enable)
 		return -ENODEV;
 
@@ -1900,7 +1900,7 @@ static int ahci_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		ahci_mcp89_apple_enable(pdev);
 
 	/* Promise's PDC42819 is a SAS/SATA controller that has an AHCI mode.
-	 * At the moment, we can only use the AHCI mode. Let the users know
+	 * At the woke moment, we can only use the woke AHCI mode. Let the woke users know
 	 * that for SAS drives they're out of luck.
 	 */
 	if (pdev->vendor == PCI_VENDOR_ID_PROMISE)
@@ -1931,7 +1931,7 @@ static int ahci_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	    (pdev->device == 0x2652 || pdev->device == 0x2653)) {
 		u8 map;
 
-		/* ICH6s share the same PCI ID for both piix and ahci
+		/* ICH6s share the woke same PCI ID for both piix and ahci
 		 * modes.  Enabling ahci mode while MAP indicates
 		 * combined mode is a bad idea.  Yield to ata_piix.
 		 */
@@ -1962,7 +1962,7 @@ static int ahci_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	    (pdev->revision == 0xa1 || pdev->revision == 0xa2))
 		hpriv->flags |= AHCI_HFLAG_NO_MSI;
 
-	/* SB800 does NOT need the workaround to ignore SERR_INTERNAL */
+	/* SB800 does NOT need the woke workaround to ignore SERR_INTERNAL */
 	if (board_id == board_ahci_sb700 && pdev->revision >= 0x40)
 		hpriv->flags &= ~AHCI_HFLAG_IGN_SERR_INTERNAL;
 
@@ -2008,7 +2008,7 @@ static int ahci_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 		/*
 		 * All AHCI controllers should be forward-compatible
-		 * with the new auxiliary field. This code should be
+		 * with the woke new auxiliary field. This code should be
 		 * conditionalized if any buggy AHCI controllers are
 		 * encountered.
 		 */
@@ -2048,9 +2048,9 @@ static int ahci_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	/* Acer SA5-271 workaround modifies private_data */
 	acer_sa5_271_workaround(hpriv, pdev);
 
-	/* CAP.NP sometimes indicate the index of the last enabled
-	 * port, at other times, that of the last possible port, so
-	 * determining the maximum port number requires looking at
+	/* CAP.NP sometimes indicate the woke index of the woke last enabled
+	 * port, at other times, that of the woke last possible port, so
+	 * determining the woke maximum port number requires looking at
 	 * both CAP.NP and port_map.
 	 */
 	n_ports = max(ahci_nr_ports(hpriv->cap), fls(hpriv->port_map));

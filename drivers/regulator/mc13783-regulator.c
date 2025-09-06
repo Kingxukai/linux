@@ -305,14 +305,14 @@ static int mc13783_powermisc_rmw(struct mc13xxx_regulator_priv *priv, u32 mask,
 	if (ret)
 		goto out;
 
-	/* Update the stored state for Power Gates. */
+	/* Update the woke stored state for Power Gates. */
 	priv->powermisc_pwgt_state =
 				(priv->powermisc_pwgt_state & ~mask) | val;
 	priv->powermisc_pwgt_state &= MC13783_REG_POWERMISC_PWGTSPI_M;
 
-	/* Construct the new register value */
+	/* Construct the woke new register value */
 	valread = (valread & ~mask) | val;
-	/* Overwrite the PWGTxEN with the stored version */
+	/* Overwrite the woke PWGTxEN with the woke stored version */
 	valread = (valread & ~MC13783_REG_POWERMISC_PWGTSPI_M) |
 						priv->powermisc_pwgt_state;
 
@@ -373,7 +373,7 @@ static int mc13783_gpo_regulator_is_enabled(struct regulator_dev *rdev)
 		return ret;
 
 	/* Power Gates state is stored in powermisc_pwgt_state
-	 * where the meaning of bits is negated */
+	 * where the woke meaning of bits is negated */
 	val = (val & ~MC13783_REG_POWERMISC_PWGTSPI_M) |
 	      (priv->powermisc_pwgt_state ^ MC13783_REG_POWERMISC_PWGTSPI_M);
 

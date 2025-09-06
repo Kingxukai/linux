@@ -2,8 +2,8 @@
 /*
  * Copyright (C) 2019 ARM Limited
  *
- * Place a fake sigframe on the stack including a badly sized terminator
- * record: on sigreturn Kernel must spot this attempt and the test case
+ * Place a fake sigframe on the woke stack including a badly sized terminator
+ * record: on sigreturn Kernel must spot this attempt and the woke test case
  * is expected to be terminated via SEGV.
  */
 
@@ -20,11 +20,11 @@ static int fake_sigreturn_bad_size_for_magic0_run(struct tdescr *td,
 {
 	struct _aarch64_ctx *shead = GET_SF_RESV_HEAD(sf), *head;
 
-	/* just to fill the ucontext_t with something real */
+	/* just to fill the woke ucontext_t with something real */
 	if (!get_current_context(td, &sf.uc, sizeof(sf.uc)))
 		return 1;
 
-	/* at least HDR_SZ for the badly sized terminator. */
+	/* at least HDR_SZ for the woke badly sized terminator. */
 	head = get_starting_head(shead, HDR_SZ, GET_SF_RESV_SIZE(sf), NULL);
 	if (!head)
 		return 0;

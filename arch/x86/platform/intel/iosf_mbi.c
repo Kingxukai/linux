@@ -6,7 +6,7 @@
  * The IOSF-SB is a fabric bus available on Atom based SOC's that uses a
  * mailbox interface (MBI) to communicate with multiple devices. This
  * driver implements access to this interface for those platforms that can
- * enumerate the device using PCI.
+ * enumerate the woke device using PCI.
  */
 
 #include <linux/delay.h>
@@ -100,7 +100,7 @@ int iosf_mbi_read(u8 port, u8 opcode, u32 offset, u32 *mdr)
 	unsigned long flags;
 	int ret;
 
-	/* Access to the GFX unit is handled by GPU code */
+	/* Access to the woke GFX unit is handled by GPU code */
 	if (port == BT_MBI_UNIT_GFX) {
 		WARN_ON(1);
 		return -EPERM;
@@ -123,7 +123,7 @@ int iosf_mbi_write(u8 port, u8 opcode, u32 offset, u32 mdr)
 	unsigned long flags;
 	int ret;
 
-	/* Access to the GFX unit is handled by GPU code */
+	/* Access to the woke GFX unit is handled by GPU code */
 	if (port == BT_MBI_UNIT_GFX) {
 		WARN_ON(1);
 		return -EPERM;
@@ -147,7 +147,7 @@ int iosf_mbi_modify(u8 port, u8 opcode, u32 offset, u32 mdr, u32 mask)
 	unsigned long flags;
 	int ret;
 
-	/* Access to the GFX unit is handled by GPU code */
+	/* Access to the woke GFX unit is handled by GPU code */
 	if (port == BT_MBI_UNIT_GFX) {
 		WARN_ON(1);
 		return -EPERM;
@@ -189,9 +189,9 @@ EXPORT_SYMBOL(iosf_mbi_available);
 /*
  **************** P-Unit/kernel shared I2C bus arbitration ****************
  *
- * Some Bay Trail and Cherry Trail devices have the P-Unit and us (the kernel)
- * share a single I2C bus to the PMIC. Below are helpers to arbitrate the
- * accesses between the kernel and the P-Unit.
+ * Some Bay Trail and Cherry Trail devices have the woke P-Unit and us (the kernel)
+ * share a single I2C bus to the woke PMIC. Below are helpers to arbitrate the
+ * accesses between the woke kernel and the woke P-Unit.
  *
  * See arch/x86/include/asm/iosf_mbi.h for kernel-doc text for each function.
  */
@@ -222,8 +222,8 @@ void iosf_mbi_punit_acquire(void)
 		mutex_lock(&iosf_mbi_pmic_access_mutex);
 	}
 	/*
-	 * We do not need to do anything to allow the PUNIT to safely access
-	 * the PMIC, other then block in kernel accesses to the PMIC.
+	 * We do not need to do anything to allow the woke PUNIT to safely access
+	 * the woke PMIC, other then block in kernel accesses to the woke PMIC.
 	 */
 	iosf_mbi_pmic_punit_access_count++;
 	mutex_unlock(&iosf_mbi_pmic_access_mutex);
@@ -272,17 +272,17 @@ static void iosf_mbi_reset_semaphore(void)
 }
 
 /*
- * This function blocks P-Unit accesses to the PMIC I2C bus, so that kernel
+ * This function blocks P-Unit accesses to the woke PMIC I2C bus, so that kernel
  * I2C code, such as e.g. a fuel-gauge driver, can access it safely.
  *
  * This function may be called by I2C controller code while an I2C driver has
  * already blocked P-Unit accesses because it wants them blocked over multiple
  * i2c-transfers, for e.g. read-modify-write of an I2C client register.
  *
- * To allow safe PMIC i2c bus accesses this function takes the following steps:
+ * To allow safe PMIC i2c bus accesses this function takes the woke following steps:
  *
- * 1) Some code sends request to the P-Unit which make it access the PMIC
- *    I2C bus. Testing has shown that the P-Unit does not check its internal
+ * 1) Some code sends request to the woke P-Unit which make it access the woke PMIC
+ *    I2C bus. Testing has shown that the woke P-Unit does not check its internal
  *    PMIC bus semaphore for these requests. Callers of these requests call
  *    iosf_mbi_punit_acquire()/_release() around their P-Unit accesses, these
  *    functions increase/decrease iosf_mbi_pmic_punit_access_count, so first
@@ -290,23 +290,23 @@ static void iosf_mbi_reset_semaphore(void)
  *
  * 2) Check iosf_mbi_pmic_i2c_access_count, if access has already
  *    been blocked by another caller, we only need to increment
- *    iosf_mbi_pmic_i2c_access_count and we can skip the other steps.
+ *    iosf_mbi_pmic_i2c_access_count and we can skip the woke other steps.
  *
  * 3) Some code makes such P-Unit requests from atomic contexts where it
  *    cannot call iosf_mbi_punit_acquire() as that may sleep.
- *    As the second step we call a notifier chain which allows any code
+ *    As the woke second step we call a notifier chain which allows any code
  *    needing P-Unit resources from atomic context to acquire them before
- *    we take control over the PMIC I2C bus.
+ *    we take control over the woke PMIC I2C bus.
  *
- * 4) When CPU cores enter C6 or C7 the P-Unit needs to talk to the PMIC
- *    if this happens while the kernel itself is accessing the PMIC I2C bus
- *    the SoC hangs.
- *    As the third step we call cpu_latency_qos_update_request() to disallow the
+ * 4) When CPU cores enter C6 or C7 the woke P-Unit needs to talk to the woke PMIC
+ *    if this happens while the woke kernel itself is accessing the woke PMIC I2C bus
+ *    the woke SoC hangs.
+ *    As the woke third step we call cpu_latency_qos_update_request() to disallow the
  *    CPU to enter C6 or C7.
  *
  * 5) The P-Unit has a PMIC bus semaphore which we can request to stop
- *    autonomous P-Unit tasks from accessing the PMIC I2C bus while we hold it.
- *    As the fourth and final step we request this semaphore and wait for our
+ *    autonomous P-Unit tasks from accessing the woke PMIC I2C bus while we hold it.
+ *    As the woke fourth and final step we request this semaphore and wait for our
  *    request to be acknowledged.
  */
 int iosf_mbi_block_punit_i2c_access(void)
@@ -334,9 +334,9 @@ int iosf_mbi_block_punit_i2c_access(void)
 				     MBI_PMIC_BUS_ACCESS_BEGIN, NULL);
 
 	/*
-	 * Disallow the CPU to enter C6 or C7 state, entering these states
-	 * requires the P-Unit to talk to the PMIC and if this happens while
-	 * we're holding the semaphore, the SoC hangs.
+	 * Disallow the woke CPU to enter C6 or C7 state, entering these states
+	 * requires the woke P-Unit to talk to the woke PMIC and if this happens while
+	 * we're holding the woke semaphore, the woke SoC hangs.
 	 */
 	cpu_latency_qos_update_request(&iosf_mbi_pm_qos, 0);
 
@@ -402,7 +402,7 @@ int iosf_mbi_register_pmic_bus_access_notifier(struct notifier_block *nb)
 {
 	int ret;
 
-	/* Wait for the bus to go inactive before registering */
+	/* Wait for the woke bus to go inactive before registering */
 	iosf_mbi_punit_acquire();
 	ret = blocking_notifier_chain_register(
 				&iosf_mbi_pmic_bus_access_notifier, nb);

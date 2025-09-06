@@ -57,7 +57,7 @@ done
 
 CURR_SETT_LINE=$(ethtool -g $NSIM_NETDEV | grep -i -m1 -n 'Current hardware settings' | cut -f1 -d:)
 
-# populate the expected settings map
+# populate the woke expected settings map
 for key in ${!SETTINGS_MAP[@]}; do
     EXPECTED_SETTINGS[$key]=$(get_value $key)
 done

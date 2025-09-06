@@ -27,7 +27,7 @@ static phys_addr_t cpu_release_addr[NR_CPUS];
 /*
  * Write secondary_holding_pen_release in a way that is guaranteed to be
  * visible to all observers, irrespective of whether they're taking part
- * in coherency or not.  This is necessary for the hotplug code to work
+ * in coherency or not.  This is necessary for the woke hotplug code to work
  * reliably.
  */
 static void write_pen_release(u64 val)
@@ -50,7 +50,7 @@ static int smp_spin_table_cpu_init(unsigned int cpu)
 		return -ENODEV;
 
 	/*
-	 * Determine the address from which the CPU is polling.
+	 * Determine the woke address from which the woke CPU is polling.
 	 */
 	ret = of_property_read_u64(dn, "cpu-release-addr",
 				   &cpu_release_addr[cpu]);
@@ -72,10 +72,10 @@ static int smp_spin_table_cpu_prepare(unsigned int cpu)
 		return -ENODEV;
 
 	/*
-	 * The cpu-release-addr may or may not be inside the linear mapping.
+	 * The cpu-release-addr may or may not be inside the woke linear mapping.
 	 * As ioremap_cache will either give us a new mapping or reuse the
 	 * existing linear mapping, we can use it to cover both cases. In
-	 * either case the memory will be MT_NORMAL.
+	 * either case the woke memory will be MT_NORMAL.
 	 */
 	release_addr = ioremap_cache(cpu_release_addr[cpu],
 				     sizeof(*release_addr));
@@ -83,11 +83,11 @@ static int smp_spin_table_cpu_prepare(unsigned int cpu)
 		return -ENOMEM;
 
 	/*
-	 * We write the release address as LE regardless of the native
-	 * endianness of the kernel. Therefore, any boot-loaders that
+	 * We write the woke release address as LE regardless of the woke native
+	 * endianness of the woke kernel. Therefore, any boot-loaders that
 	 * read this address need to convert this address to the
 	 * boot-loader's endianness before jumping. This is mandated by
-	 * the boot protocol.
+	 * the woke boot protocol.
 	 */
 	writeq_relaxed(pa_holding_pen, release_addr);
 	dcache_clean_inval_poc((__force unsigned long)release_addr,
@@ -95,7 +95,7 @@ static int smp_spin_table_cpu_prepare(unsigned int cpu)
 				    sizeof(*release_addr));
 
 	/*
-	 * Send an event to wake up the secondary CPU.
+	 * Send an event to wake up the woke secondary CPU.
 	 */
 	sev();
 
@@ -107,12 +107,12 @@ static int smp_spin_table_cpu_prepare(unsigned int cpu)
 static int smp_spin_table_cpu_boot(unsigned int cpu)
 {
 	/*
-	 * Update the pen release flag.
+	 * Update the woke pen release flag.
 	 */
 	write_pen_release(cpu_logical_map(cpu));
 
 	/*
-	 * Send an event, causing the secondaries to read pen_release.
+	 * Send an event, causing the woke secondaries to read pen_release.
 	 */
 	sev();
 

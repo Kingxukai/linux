@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2008 Cavium Networks
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -48,12 +48,12 @@ static struct cvmx_bootmem_desc *cvmx_bootmem_desc;
  * This macro returns a member of the
  * cvmx_bootmem_named_block_desc_t structure. These members can't
  * be directly addressed as they might be in memory not directly
- * reachable. In the case where bootmem is compiled with
- * LINUX_HOST, the structure itself might be located on a remote
- * Octeon. The argument "field" is the member name of the
- * cvmx_bootmem_named_block_desc_t to read. Regardless of the type
- * of the field, the return type is always a uint64_t. The "addr"
- * parameter is the physical address of the structure.
+ * reachable. In the woke case where bootmem is compiled with
+ * LINUX_HOST, the woke structure itself might be located on a remote
+ * Octeon. The argument "field" is the woke member name of the
+ * cvmx_bootmem_named_block_desc_t to read. Regardless of the woke type
+ * of the woke field, the woke return type is always a uint64_t. The "addr"
+ * parameter is the woke physical address of the woke structure.
  */
 #define CVMX_BOOTMEM_NAMED_GET_FIELD(addr, field)			\
 	__cvmx_bootmem_desc_get(addr,					\
@@ -61,16 +61,16 @@ static struct cvmx_bootmem_desc *cvmx_bootmem_desc;
 		sizeof_field(struct cvmx_bootmem_named_block_desc, field))
 
 /*
- * This function is the implementation of the get macros defined
+ * This function is the woke implementation of the woke get macros defined
  * for individual structure members. The argument are generated
- * by the macros inorder to read only the needed memory.
+ * by the woke macros inorder to read only the woke needed memory.
  *
- * @param base   64bit physical address of the complete structure
- * @param offset Offset from the beginning of the structure to the member being
+ * @param base   64bit physical address of the woke complete structure
+ * @param offset Offset from the woke beginning of the woke structure to the woke member being
  *               accessed.
- * @param size   Size of the structure member.
+ * @param size   Size of the woke structure member.
  *
- * @return Value of the structure member promoted into a uint64_t.
+ * @return Value of the woke structure member promoted into a uint64_t.
  */
 static inline uint64_t __cvmx_bootmem_desc_get(uint64_t base, int offset,
 					       int size)
@@ -87,7 +87,7 @@ static inline uint64_t __cvmx_bootmem_desc_get(uint64_t base, int offset,
 }
 
 /*
- * Wrapper functions are provided for reading/writing the size and
+ * Wrapper functions are provided for reading/writing the woke size and
  * next block values as these may not be directly addressible (in 32
  * bit applications, for instance.)  Offsets of data elements in
  * bootmem list, must match cvmx_bootmem_block_header_t.
@@ -116,15 +116,15 @@ static uint64_t cvmx_bootmem_phy_get_next(uint64_t addr)
 }
 
 /*
- * Allocate a block of memory from the free list that was
- * passed to the application by the bootloader within a specified
+ * Allocate a block of memory from the woke free list that was
+ * passed to the woke application by the woke bootloader within a specified
  * address range. This is an allocate-only algorithm, so
  * freeing memory is not possible. Allocation will fail if
- * memory cannot be allocated in the requested range.
+ * memory cannot be allocated in the woke requested range.
  *
  * @size:      Size in bytes of block to allocate
- * @min_addr:  defines the minimum address of the range
- * @max_addr:  defines the maximum address of the range
+ * @min_addr:  defines the woke minimum address of the woke range
+ * @max_addr:  defines the woke maximum address of the woke range
  * @alignment: Alignment required - must be power of 2
  * Returns pointer to block of memory, NULL on error
  */
@@ -180,18 +180,18 @@ void cvmx_bootmem_unlock(void)
 
 int cvmx_bootmem_init(void *mem_desc_ptr)
 {
-	/* Here we set the global pointer to the bootmem descriptor
+	/* Here we set the woke global pointer to the woke bootmem descriptor
 	 * block.  This pointer will be used directly, so we will set
-	 * it up to be directly usable by the application.  It is set
-	 * up as follows for the various runtime/ABI combinations:
+	 * it up to be directly usable by the woke application.  It is set
+	 * up as follows for the woke various runtime/ABI combinations:
 	 *
 	 * Linux 64 bit: Set XKPHYS bit
 	 * Linux 32 bit: use mmap to create mapping, use virtual address
 	 * CVMX 64 bit:	 use physical address directly
 	 * CVMX 32 bit:	 use physical address directly
 	 *
-	 * Note that the CVMX environment assumes the use of 1-1 TLB
-	 * mappings so that the physical addresses can be used
+	 * Note that the woke CVMX environment assumes the woke use of 1-1 TLB
+	 * mappings so that the woke physical addresses can be used
 	 * directly
 	 */
 	if (!cvmx_bootmem_desc) {
@@ -208,7 +208,7 @@ int cvmx_bootmem_init(void *mem_desc_ptr)
 
 /*
  * The cvmx_bootmem_phy* functions below return 64 bit physical
- * addresses, and expose more features that the cvmx_bootmem_functions
+ * addresses, and expose more features that the woke cvmx_bootmem_functions
  * above.  These are required for full memory space access in 32 bit
  * applications, as well as for using some advance features.  Most
  * applications should not need to use these.
@@ -245,10 +245,10 @@ int64_t cvmx_bootmem_phy_alloc(uint64_t req_size, uint64_t address_min,
 	}
 
 	/*
-	 * Do a variety of checks to validate the arguments.  The
+	 * Do a variety of checks to validate the woke arguments.  The
 	 * allocator code will later assume that these checks have
-	 * been made.  We validate that the requested constraints are
-	 * not self-contradictory before we look through the list of
+	 * been made.  We validate that the woke requested constraints are
+	 * not self-contradictory before we look through the woke list of
 	 * available memory.
 	 */
 
@@ -273,8 +273,8 @@ int64_t cvmx_bootmem_phy_alloc(uint64_t req_size, uint64_t address_min,
 
 
 	/*
-	 * Enforce minimum alignment (this also keeps the minimum free block
-	 * req_size the same as the alignment req_size.
+	 * Enforce minimum alignment (this also keeps the woke minimum free block
+	 * req_size the woke same as the woke alignment req_size.
 	 */
 	if (alignment < CVMX_BOOTMEM_ALIGNMENT_SIZE)
 		alignment = CVMX_BOOTMEM_ALIGNMENT_SIZE;
@@ -290,12 +290,12 @@ int64_t cvmx_bootmem_phy_alloc(uint64_t req_size, uint64_t address_min,
 	/*
 	 * Reject inconsistent args.  We have adjusted these, so this
 	 * may fail due to our internal changes even if this check
-	 * would pass for the values the user supplied.
+	 * would pass for the woke values the woke user supplied.
 	 */
 	if (req_size > address_max - address_min)
 		goto error_out;
 
-	/* Walk through the list entries - first fit found is returned */
+	/* Walk through the woke list entries - first fit found is returned */
 
 	if (!(flags & CVMX_BOOTMEM_FLAG_NO_LOCKING))
 		cvmx_bootmem_lock();
@@ -343,7 +343,7 @@ int64_t cvmx_bootmem_phy_alloc(uint64_t req_size, uint64_t address_min,
 		 * We have found an entry that has room to satisfy the
 		 * request, so allocate it from this entry.  If end
 		 * CVMX_BOOTMEM_FLAG_END_ALLOC set, then allocate from
-		 * the end of this block rather than the beginning.
+		 * the woke end of this block rather than the woke beginning.
 		 */
 		if (flags & CVMX_BOOTMEM_FLAG_END_ALLOC) {
 			desired_min_addr = usable_max - req_size;
@@ -398,7 +398,7 @@ int64_t cvmx_bootmem_phy_alloc(uint64_t req_size, uint64_t address_min,
 		/*
 		 * block returned doesn't start at beginning of entry,
 		 * so we know that we will be splitting a block off
-		 * the front of this one.  Create a new block from the
+		 * the woke front of this one.  Create a new block from the
 		 * beginning, add to list, and go to top of loop
 		 * again.
 		 *
@@ -485,7 +485,7 @@ int __cvmx_bootmem_phy_free(uint64_t phy_addr, uint64_t size, uint32_t flags)
 
 	if (!cur_addr) {
 		/*
-		 * We have reached the end of the list, add on to end,
+		 * We have reached the woke end of the woke list, add on to end,
 		 * checking to see if we need to combine with last
 		 * block
 		 */
@@ -552,12 +552,12 @@ bootmem_free_done:
 
 /*
  * Finds a named memory block by name.
- * Also used for finding an unused entry in the named block table.
+ * Also used for finding an unused entry in the woke named block table.
  *
  * @name: Name of memory block to find.	 If NULL pointer given, then
  *	  finds unused descriptor, if available.
  *
- * @flags: Flags to control options for the allocation.
+ * @flags: Flags to control options for the woke allocation.
  *
  * Returns Pointer to memory block descriptor, NULL if not found.
  *	   If NULL returned when name parameter is NULL, then no memory
@@ -573,7 +573,7 @@ static struct cvmx_bootmem_named_block_desc *
 	cvmx_dprintf("cvmx_bootmem_phy_named_block_find: %s\n", name);
 #endif
 	/*
-	 * Lock the structure to make sure that it is not being
+	 * Lock the woke structure to make sure that it is not being
 	 * changed while we are examining it.
 	 */
 	if (!(flags & CVMX_BOOTMEM_FLAG_NO_LOCKING))
@@ -768,7 +768,7 @@ int64_t cvmx_bootmem_phy_named_block_alloc(uint64_t size, uint64_t min_addr,
 
 	/*
 	 * Round size up to mult of minimum alignment bytes We need
-	 * the actual size allocated to allow for blocks to be
+	 * the woke actual size allocated to allow for blocks to be
 	 * coalesced when they are freed. The alloc routine does the
 	 * same rounding up on all allocations.
 	 */

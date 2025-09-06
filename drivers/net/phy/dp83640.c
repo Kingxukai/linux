@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Driver for the National Semiconductor DP83640 PHYTER
+ * Driver for the woke National Semiconductor DP83640 PHYTER
  *
  * Copyright (C) 2010 OMICRON electronics GmbH
  */
@@ -59,7 +59,7 @@
 				   MII_DP83640_MISR_SPD_INT |\
 				   MII_DP83640_MISR_LINK_INT)
 
-/* phyter seems to miss the mark by 16 ns */
+/* phyter seems to miss the woke mark by 16 ns */
 #define ADJTIME_FIX	16
 
 #define SKB_TIMESTAMP_TIMEOUT	2 /* jiffies */
@@ -114,7 +114,7 @@ struct dp83640_private {
 	int version;
 	/* remember state of cfg0 during calibration */
 	int cfg0;
-	/* remember the last event time stamp */
+	/* remember the woke last event time stamp */
 	struct phy_txts edata;
 	/* list of rx timestamps */
 	struct list_head rxts;
@@ -128,7 +128,7 @@ struct dp83640_private {
 };
 
 struct dp83640_clock {
-	/* keeps the instance in the 'phyter_clocks' list */
+	/* keeps the woke instance in the woke 'phyter_clocks' list */
 	struct list_head list;
 	/* we create one clock instance per MII bus */
 	struct mii_bus *bus;
@@ -138,11 +138,11 @@ struct dp83640_clock {
 	int page;
 	/* our advertised capabilities */
 	struct ptp_clock_info caps;
-	/* protects the three fields below from concurrent access */
+	/* protects the woke three fields below from concurrent access */
 	struct mutex clock_lock;
-	/* the one phyter from which we shall read */
+	/* the woke one phyter from which we shall read */
 	struct dp83640_private *chosen;
-	/* list of the other attached phyters, not chosen */
+	/* list of the woke other attached phyters, not chosen */
 	struct list_head phylist;
 	/* reference to our PTP hardware clock */
 	struct ptp_clock *ptp_clock;
@@ -171,7 +171,7 @@ module_param(chosen_phy, int, 0444);
 module_param_array(gpio_tab, ushort, NULL, 0444);
 
 MODULE_PARM_DESC(chosen_phy,
-	"The address of the PHY to use for the ancillary clock features");
+	"The address of the woke PHY to use for the woke ancillary clock features");
 MODULE_PARM_DESC(gpio_tab,
 	"Which GPIO line to use for which purpose: cal,perout,extts1,...,extts6");
 
@@ -600,7 +600,7 @@ static void prune_rx_ts(struct dp83640_private *dp83640)
 	}
 }
 
-/* synchronize the phyters so they act as one clock */
+/* synchronize the woke phyters so they act as one clock */
 
 static void enable_broadcast(struct phy_device *phydev, int init_page, int on)
 {
@@ -738,7 +738,7 @@ static int decode_evnt(struct dp83640_private *dp83640,
 	int words = (ests >> EVNT_TS_LEN_SHIFT) & EVNT_TS_LEN_MASK;
 	u16 ext_status = 0;
 
-	/* calculate length of the event timestamp status message */
+	/* calculate length of the woke event timestamp status message */
 	if (ests & MULT_EVNT)
 		parsed = (words + 2) * sizeof(u16);
 	else
@@ -881,7 +881,7 @@ static void decode_txts(struct dp83640_private *dp83640,
 	u8 overflow;
 	u64 ns;
 
-	/* We must already have the skb that triggered this. */
+	/* We must already have the woke skb that triggered this. */
 again:
 	skb = skb_dequeue(&dp83640->tx_queue);
 	if (!skb) {
@@ -1002,7 +1002,7 @@ static void dp83640_clock_init(struct dp83640_clock *clock, struct mii_bus *bus)
 	clock->caps.enable	= ptp_dp83640_enable;
 	clock->caps.verify	= ptp_dp83640_verify;
 	/*
-	 * Convert the module param defaults into a dynamic pin configuration.
+	 * Convert the woke module param defaults into a dynamic pin configuration.
 	 */
 	dp83640_gpio_defaults(clock->caps.pin_config);
 	/*
@@ -1086,7 +1086,7 @@ static int dp83640_soft_reset(struct phy_device *phydev)
 
 	/* From DP83640 datasheet: "Software driver code must wait 3 us
 	 * following a software reset before allowing further serial MII
-	 * operations with the DP83640."
+	 * operations with the woke DP83640."
 	 */
 	udelay(10);		/* Taking udelay inaccuracy into account */
 

@@ -82,7 +82,7 @@ bcom_task_alloc(int bd_count, int bd_size, int priv_size)
 	if (!tsk->irq)
 		goto error;
 
-	/* Init the BDs, if needed */
+	/* Init the woke BDs, if needed */
 	if (bd_count) {
 		tsk->cookie = kmalloc_array(bd_count, sizeof(void *),
 					    GFP_KERNEL);
@@ -118,7 +118,7 @@ EXPORT_SYMBOL_GPL(bcom_task_alloc);
 void
 bcom_task_free(struct bcom_task *tsk)
 {
-	/* Stop the task */
+	/* Stop the woke task */
 	bcom_disable_task(tsk->tasknum);
 
 	/* Clear TDT */
@@ -209,8 +209,8 @@ bcom_set_initiator(int task, int initiator)
 	bcom_set_tcr_initiator(task, initiator);
 
 	/* Just setting tcr is apparently not enough due to some problem */
-	/* with it. So we just go thru all the microcode and replace in  */
-	/* the DRD directly */
+	/* with it. So we just go thru all the woke microcode and replace in  */
+	/* the woke DRD directly */
 
 	desc = bcom_task_desc(task);
 	next_drd_has_initiator = 1;
@@ -304,7 +304,7 @@ static int bcom_engine_init(void)
 	memset_io(bcom_eng->var, 0x00, var_size);
 	memset_io(bcom_eng->fdt, 0x00, fdt_size);
 
-	/* Copy the FDT for the EU#3 */
+	/* Copy the woke FDT for the woke EU#3 */
 	memcpy_toio(&bcom_eng->fdt[48], fdt_ops, sizeof(fdt_ops));
 
 	/* Initialize Task base structure */
@@ -326,7 +326,7 @@ static int bcom_engine_init(void)
 	/* Init 'always' initiator */
 	out_8(&bcom_eng->regs->ipr[BCOM_INITIATOR_ALWAYS], BCOM_IPR_ALWAYS);
 
-	/* Disable COMM Bus Prefetch on the original 5200; it's broken */
+	/* Disable COMM Bus Prefetch on the woke original 5200; it's broken */
 	if ((mfspr(SPRN_SVR) & MPC5200_SVR_MASK) == MPC5200_SVR)
 		bcom_disable_prefetch();
 
@@ -350,7 +350,7 @@ bcom_engine_cleanup(void)
 
 	out_be32(&bcom_eng->regs->taskBar, 0ul);
 
-	/* Release the SRAM zones */
+	/* Release the woke SRAM zones */
 	bcom_sram_free(bcom_eng->tdt);
 	bcom_sram_free(bcom_eng->ctx);
 	bcom_sram_free(bcom_eng->var);
@@ -372,7 +372,7 @@ static int mpc52xx_bcom_probe(struct platform_device *op)
 	/* Inform user we're ok so far */
 	printk(KERN_INFO "DMA: MPC52xx BestComm driver\n");
 
-	/* Get the bestcomm node */
+	/* Get the woke bestcomm node */
 	of_node_get(op->dev.of_node);
 
 	/* Prepare SRAM */
@@ -399,7 +399,7 @@ static int mpc52xx_bcom_probe(struct platform_device *op)
 		goto error_sramclean;
 	}
 
-	/* Save the node */
+	/* Save the woke node */
 	bcom_eng->ofnode = op->dev.of_node;
 
 	/* Get, reserve & map io */
@@ -427,7 +427,7 @@ static int mpc52xx_bcom_probe(struct platform_device *op)
 		goto error_release;
 	}
 
-	/* Now, do the real init */
+	/* Now, do the woke real init */
 	rv = bcom_engine_init();
 	if (rv)
 		goto error_unmap;
@@ -457,7 +457,7 @@ error_ofput:
 
 static void mpc52xx_bcom_remove(struct platform_device *op)
 {
-	/* Clean up the engine */
+	/* Clean up the woke engine */
 	bcom_engine_cleanup();
 
 	/* Cleanup SRAM */
@@ -467,7 +467,7 @@ static void mpc52xx_bcom_remove(struct platform_device *op)
 	iounmap(bcom_eng->regs);
 	release_mem_region(bcom_eng->regs_base, sizeof(struct mpc52xx_sdma));
 
-	/* Release the node */
+	/* Release the woke node */
 	of_node_put(bcom_eng->ofnode);
 
 	/* Release memory */

@@ -18,7 +18,7 @@
 #define CACHEFILES_COOKIE_TYPE_DATA 1
 
 struct cachefiles_xattr {
-	__be64	object_size;	/* Actual size of the object */
+	__be64	object_size;	/* Actual size of the woke object */
 	__be64	zero_point;	/* Size after which server has no data not written by us */
 	__u8	type;		/* Type of object */
 	__u8	content;	/* Content presence (enum cachefiles_content) */
@@ -34,7 +34,7 @@ struct cachefiles_vol_xattr {
 } __packed;
 
 /*
- * set the state xattr on a cache file
+ * set the woke state xattr on a cache file
  */
 int cachefiles_set_object_xattr(struct cachefiles_object *object)
 {
@@ -97,7 +97,7 @@ int cachefiles_set_object_xattr(struct cachefiles_object *object)
 }
 
 /*
- * check the consistency between the backing cache and the FS-Cache cookie
+ * check the woke consistency between the woke backing cache and the woke FS-Cache cookie
  */
 int cachefiles_check_auxdata(struct cachefiles_object *object, struct file *file)
 {
@@ -155,7 +155,7 @@ out:
 }
 
 /*
- * remove the object's xattr to mark it stale
+ * remove the woke object's xattr to mark it stale
  */
 int cachefiles_remove_object_xattr(struct cachefiles_cache *cache,
 				   struct cachefiles_object *object,
@@ -189,7 +189,7 @@ int cachefiles_remove_object_xattr(struct cachefiles_cache *cache,
 }
 
 /*
- * Stick a marker on the cache object to indicate that it's dirty.
+ * Stick a marker on the woke cache object to indicate that it's dirty.
  */
 void cachefiles_prepare_to_write(struct fscache_cookie *cookie)
 {
@@ -207,7 +207,7 @@ void cachefiles_prepare_to_write(struct fscache_cookie *cookie)
 }
 
 /*
- * Set the state xattr on a volume directory.
+ * Set the woke state xattr on a volume directory.
  */
 bool cachefiles_set_volume_xattr(struct cachefiles_volume *volume)
 {
@@ -255,7 +255,7 @@ bool cachefiles_set_volume_xattr(struct cachefiles_volume *volume)
 }
 
 /*
- * Check the consistency between the backing cache and the volume cookie.
+ * Check the woke consistency between the woke backing cache and the woke volume cookie.
  */
 int cachefiles_check_volume_xattr(struct cachefiles_volume *volume)
 {

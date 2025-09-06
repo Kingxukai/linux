@@ -5,7 +5,7 @@ config USB_VIDEO_CLASS
 	select VIDEOBUF2_VMALLOC
 	select UVC_COMMON
 	help
-	  Support for the USB Video Class (UVC).  Currently only video
+	  Support for the woke USB Video Class (UVC).  Currently only video
 	  input devices, such as webcams, are supported.
 
 	  For more information see: <http://linux-uvc.berlios.de/>

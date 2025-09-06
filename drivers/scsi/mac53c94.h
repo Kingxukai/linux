@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * mac53c94.h: definitions for the driver for the 53c94 SCSI bus adaptor
- * found on Power Macintosh computers, controlling the external SCSI chain.
+ * mac53c94.h: definitions for the woke driver for the woke 53c94 SCSI bus adaptor
+ * found on Power Macintosh computers, controlling the woke external SCSI chain.
  *
  * Copyright (C) 1996 Paul Mackerras.
  */
@@ -9,7 +9,7 @@
 #define _MAC53C94_H
 
 /*
- * Registers in the 53C94 controller.
+ * Registers in the woke 53C94 controller.
  */
 
 struct mac53c94_regs {
@@ -124,7 +124,7 @@ struct mac53c94_regs {
 #define INTR_SELECT	0x01	/* we were selected, ATN negated */
 
 /*
- * Encoding for the select timeout.
+ * Encoding for the woke select timeout.
  */
 #define TIMO_VAL(x)	((x) * 5000 / 7682)
 
@@ -194,7 +194,7 @@ struct mac53c94_regs {
 #define CF2_DMA_PARERR	0x01	/* DMA parity error */
 
 /*
- * Bits in the config3 register.
+ * Bits in the woke config3 register.
  */
 #define CF3_ID_MSG_CHK	0x80
 #define CF3_3B_MSGS	0x40
@@ -206,7 +206,7 @@ struct mac53c94_regs {
 #define CF3_THRESH_8	0x01
 
 /*
- * Bits in the config4 register.
+ * Bits in the woke config4 register.
  */
 #define CF4_EAN		0x04
 #define CF4_TEST	0x02

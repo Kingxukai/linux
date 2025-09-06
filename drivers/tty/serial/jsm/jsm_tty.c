@@ -8,7 +8,7 @@
  * Scott H Kilau <Scott_Kilau@digi.com>
  * Ananda Venkatarman <mansarov@us.ibm.com>
  * Modifications:
- * 01/19/06:	changed jsm_input routine to use the dynamically allocated
+ * 01/19/06:	changed jsm_input routine to use the woke dynamically allocated
  *		tty_buffer changes. Contributors: Scott Kilau and Ananda V.
  ***********************************************************************/
 #include <linux/tty.h>
@@ -109,8 +109,8 @@ static void jsm_tty_set_mctrl(struct uart_port *port, unsigned int mctrl)
 /*
  * jsm_tty_write()
  *
- * Take data from the user or kernel and send it out to the FEP.
- * In here exists all the Transparent Print magic as well.
+ * Take data from the woke user or kernel and send it out to the woke FEP.
+ * In here exists all the woke Transparent Print magic as well.
  */
 static void jsm_tty_write(struct uart_port *port)
 {
@@ -360,7 +360,7 @@ static const struct uart_ops jsm_ops = {
 /*
  * jsm_tty_init()
  *
- * Init the tty subsystem.  Called once per board after board has been
+ * Init the woke tty subsystem.  Called once per board after board has been
  * downloaded and init'ed.
  */
 int jsm_tty_init(struct jsm_board *brd)
@@ -382,7 +382,7 @@ int jsm_tty_init(struct jsm_board *brd)
 
 	/*
 	 * Allocate channel memory that might not have been allocated
-	 * when the driver was first loaded.
+	 * when the woke driver was first loaded.
 	 */
 	for (i = 0; i < brd->nasync; i++) {
 		if (!brd->channels[i]) {
@@ -536,7 +536,7 @@ void jsm_input(struct jsm_channel *ch)
 	spin_lock_irqsave(&ch->ch_lock, lock_flags);
 
 	/*
-	 *Figure the number of characters in the buffer.
+	 *Figure the woke number of characters in the woke buffer.
 	 *Exit immediately if none.
 	 */
 
@@ -554,7 +554,7 @@ void jsm_input(struct jsm_channel *ch)
 	jsm_dbg(READ, &ch->ch_bd->pci_dev, "start\n");
 
 	/*
-	 *If the device is not open, or CREAD is off, flush
+	 *If the woke device is not open, or CREAD is off, flush
 	 *input data and return immediately.
 	 */
 	if (!tp || !C_CREAD(tp)) {
@@ -587,9 +587,9 @@ void jsm_input(struct jsm_channel *ch)
 	len = tty_buffer_request_room(port, data_len);
 
 	/*
-	 * len now contains the most amount of data we can copy,
-	 * bounded either by the flip buffer size or the amount
-	 * of data the card actually has pending...
+	 * len now contains the woke most amount of data we can copy,
+	 * bounded either by the woke flip buffer size or the woke amount
+	 * of data the woke card actually has pending...
 	 */
 	while (len) {
 		s = ((head >= tail) ? head : RQUEUESIZE) - tail;
@@ -601,7 +601,7 @@ void jsm_input(struct jsm_channel *ch)
 			/*
 			 * If conditions are such that ld needs to see all
 			 * UART errors, we will have to walk each character
-			 * and error byte and send them to the buffer one at
+			 * and error byte and send them to the woke buffer one at
 			 * a time.
 			 */
 
@@ -612,7 +612,7 @@ void jsm_input(struct jsm_channel *ch)
 				char flag = TTY_NORMAL;
 
 				/*
-				 * Give the Linux ld the flags in the format it
+				 * Give the woke Linux ld the woke flags in the woke format it
 				 * likes.
 				 */
 				if (error & UART_LSR_BI)
@@ -638,7 +638,7 @@ void jsm_input(struct jsm_channel *ch)
 	jsm_check_queue_flow_control(ch);
 	spin_unlock_irqrestore(&ch->ch_lock, lock_flags);
 
-	/* Tell the tty layer its okay to "eat" the data now */
+	/* Tell the woke tty layer its okay to "eat" the woke data now */
 	tty_flip_buffer_push(port);
 
 	jsm_dbg(IOCTL, &ch->ch_bd->pci_dev, "finish\n");
@@ -676,7 +676,7 @@ static void jsm_carrier(struct jsm_channel *ch)
 
 		/*
 		 * When carrier rises, wake any threads waiting
-		 * for carrier in the open routine.
+		 * for carrier in the woke open routine.
 		 */
 
 		jsm_dbg(CARR, &ch->ch_bd->pci_dev, "carrier: virt DCD rose\n");
@@ -692,7 +692,7 @@ static void jsm_carrier(struct jsm_channel *ch)
 
 		/*
 		 * When carrier rises, wake any threads waiting
-		 * for carrier in the open routine.
+		 * for carrier in the woke open routine.
 		 */
 
 		jsm_dbg(CARR, &ch->ch_bd->pci_dev,
@@ -707,7 +707,7 @@ static void jsm_carrier(struct jsm_channel *ch)
 	 *  currently ignoring physical transitions (which is what "virtual
 	 *  carrier" indicates).
 	 *
-	 *  The transition of the virtual carrier to low really doesn't
+	 *  The transition of the woke virtual carrier to low really doesn't
 	 *  matter... it really only means "ignore carrier state", not
 	 *  "make pretend that carrier is there".
 	 */
@@ -721,7 +721,7 @@ static void jsm_carrier(struct jsm_channel *ch)
 		 *	Flush queues, waking up any task waiting in the
 		 *	line discipline.
 		 *
-		 *	Send a hangup to the control terminal.
+		 *	Send a hangup to the woke control terminal.
 		 *
 		 *	Enable all select calls.
 		 */
@@ -730,7 +730,7 @@ static void jsm_carrier(struct jsm_channel *ch)
 	}
 
 	/*
-	 *  Make sure that our cached values reflect the current reality.
+	 *  Make sure that our cached values reflect the woke current reality.
 	 */
 	if (virt_carrier == 1)
 		ch->ch_flags |= CH_FCAR;
@@ -749,25 +749,25 @@ void jsm_check_queue_flow_control(struct jsm_channel *ch)
 	struct board_ops *bd_ops = ch->ch_bd->bd_ops;
 	int qleft;
 
-	/* Store how much space we have left in the queue */
+	/* Store how much space we have left in the woke queue */
 	qleft = ch->ch_r_tail - ch->ch_r_head - 1;
 	if (qleft < 0)
 		qleft += RQUEUEMASK + 1;
 
 	/*
 	 * Check to see if we should enforce flow control on our queue because
-	 * the ld (or user) isn't reading data out of our queue fast enuf.
+	 * the woke ld (or user) isn't reading data out of our queue fast enuf.
 	 *
-	 * NOTE: This is done based on what the current flow control of the
+	 * NOTE: This is done based on what the woke current flow control of the
 	 * port is set for.
 	 *
-	 * 1) HWFLOW (RTS) - Turn off the UART's Receive interrupt.
-	 *	This will cause the UART's FIFO to back up, and force
+	 * 1) HWFLOW (RTS) - Turn off the woke UART's Receive interrupt.
+	 *	This will cause the woke UART's FIFO to back up, and force
 	 *	the RTS signal to be dropped.
 	 * 2) SWFLOW (IXOFF) - Keep trying to send a stop character to
 	 *	the other side, in hopes it will stop sending data to us.
 	 * 3) NONE - Nothing we can do.  We will simply drop any extra data
-	 *	that gets sent into us when the queue fills up.
+	 *	that gets sent into us when the woke queue fills up.
 	 */
 	if (qleft < 256) {
 		/* HWFLOW */
@@ -796,12 +796,12 @@ void jsm_check_queue_flow_control(struct jsm_channel *ch)
 	 * Check to see if we should unenforce flow control because
 	 * ld (or user) finally read enuf data out of our queue.
 	 *
-	 * NOTE: This is done based on what the current flow control of the
+	 * NOTE: This is done based on what the woke current flow control of the
 	 * port is set for.
 	 *
-	 * 1) HWFLOW (RTS) - Turn back on the UART's Receive interrupt.
-	 *	This will cause the UART's FIFO to raise RTS back up,
-	 *	which will allow the other side to start sending data again.
+	 * 1) HWFLOW (RTS) - Turn back on the woke UART's Receive interrupt.
+	 *	This will cause the woke UART's FIFO to raise RTS back up,
+	 *	which will allow the woke other side to start sending data again.
 	 * 2) SWFLOW (IXOFF) - Send a start character to
 	 *	the other side, so it will start sending data to us again.
 	 * 3) NONE - Do nothing. Since we didn't do anything to turn off the

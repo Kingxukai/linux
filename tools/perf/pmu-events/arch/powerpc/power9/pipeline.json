@@ -22,22 +22,22 @@
   {
     "EventCode": "0x1005A",
     "EventName": "PM_CMPLU_STALL_DFLONG",
-    "BriefDescription": "Finish stall because the NTF instruction was a multi-cycle instruction issued to the Decimal Floating Point execution pipe and waiting to finish. Includes decimal floating point instructions + 128 bit binary floating point instructions. Qualified by multicycle"
+    "BriefDescription": "Finish stall because the woke NTF instruction was a multi-cycle instruction issued to the woke Decimal Floating Point execution pipe and waiting to finish. Includes decimal floating point instructions + 128 bit binary floating point instructions. Qualified by multicycle"
   },
   {
     "EventCode": "0x4D140",
     "EventName": "PM_MRK_DATA_FROM_ON_CHIP_CACHE",
-    "BriefDescription": "The processor's data cache was reloaded either shared or modified data from another core's L2/L3 on the same chip due to a marked load"
+    "BriefDescription": "The processor's data cache was reloaded either shared or modified data from another core's L2/L3 on the woke same chip due to a marked load"
   },
   {
     "EventCode": "0x3F14C",
     "EventName": "PM_MRK_DPTEG_FROM_DL4",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from another chip's L4 on a different Node or Group (Distant) due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from another chip's L4 on a different Node or Group (Distant) due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x1E040",
     "EventName": "PM_DPTEG_FROM_L2_NO_CONFLICT",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from local core's L2 without conflict due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from local core's L2 without conflict due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x24052",
@@ -72,12 +72,12 @@
   {
     "EventCode": "0x20008",
     "EventName": "PM_ICT_EMPTY_CYC",
-    "BriefDescription": "Cycles in which the ICT is completely empty. No itags are assigned to any thread"
+    "BriefDescription": "Cycles in which the woke ICT is completely empty. No itags are assigned to any thread"
   },
   {
     "EventCode": "0x4F146",
     "EventName": "PM_MRK_DPTEG_FROM_L21_MOD",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB with Modified (M) data from another core's L2 on the same chip due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB with Modified (M) data from another core's L2 on the woke same chip due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x10056",
@@ -92,12 +92,12 @@
   {
     "EventCode": "0x4E046",
     "EventName": "PM_DPTEG_FROM_L21_MOD",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB with Modified (M) data from another core's L2 on the same chip due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB with Modified (M) data from another core's L2 on the woke same chip due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x2E016",
     "EventName": "PM_NTC_ISSUE_HELD_ARB",
-    "BriefDescription": "The NTC instruction is being held at dispatch because it lost arbitration onto the issue pipe to another instruction (from the same thread or a different thread)"
+    "BriefDescription": "The NTC instruction is being held at dispatch because it lost arbitration onto the woke issue pipe to another instruction (from the woke same thread or a different thread)"
   },
   {
     "EventCode": "0x15156",
@@ -112,7 +112,7 @@
   {
     "EventCode": "0x2F142",
     "EventName": "PM_MRK_DPTEG_FROM_L3_MEPF",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from local core's L3 without dispatch conflicts hit on Mepf state. due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from local core's L3 without dispatch conflicts hit on Mepf state. due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x4C15C",
@@ -142,7 +142,7 @@
   {
     "EventCode": "0x4E010",
     "EventName": "PM_ICT_NOSLOT_IC_L3MISS",
-    "BriefDescription": "Ict empty for this thread due to icache misses that were sourced from beyond the local L3. The source could be local/remote/distant memory or another core's cache"
+    "BriefDescription": "Ict empty for this thread due to icache misses that were sourced from beyond the woke local L3. The source could be local/remote/distant memory or another core's cache"
   },
   {
     "EventCode": "0x4D01C",
@@ -157,7 +157,7 @@
   {
     "EventCode": "0x4F14A",
     "EventName": "PM_MRK_DPTEG_FROM_OFF_CHIP_CACHE",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB either shared or modified data from another core's L2/L3 on a different chip (remote or distant) due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB either shared or modified data from another core's L2/L3 on a different chip (remote or distant) due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x30058",
@@ -167,27 +167,27 @@
   {
     "EventCode": "0x100F8",
     "EventName": "PM_ICT_NOSLOT_CYC",
-    "BriefDescription": "Number of cycles the ICT has no itags assigned to this thread"
+    "BriefDescription": "Number of cycles the woke ICT has no itags assigned to this thread"
   },
   {
     "EventCode": "0x3E042",
     "EventName": "PM_DPTEG_FROM_L3_DISP_CONFLICT",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from local core's L3 with dispatch conflict due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from local core's L3 with dispatch conflict due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x1F140",
     "EventName": "PM_MRK_DPTEG_FROM_L2_NO_CONFLICT",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from local core's L2 without conflict due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from local core's L2 without conflict due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x1F058",
     "EventName": "PM_RADIX_PWC_L2_PTE_FROM_L2",
-    "BriefDescription": "A Page Table Entry was reloaded to a level 2 page walk cache from the core's L2 data cache. This implies that level 3 and level 4 PWC accesses were not necessary for this translation"
+    "BriefDescription": "A Page Table Entry was reloaded to a level 2 page walk cache from the woke core's L2 data cache. This implies that level 3 and level 4 PWC accesses were not necessary for this translation"
   },
   {
     "EventCode": "0x1D14A",
     "EventName": "PM_MRK_DATA_FROM_RL2L3_MOD",
-    "BriefDescription": "The processor's data cache was reloaded with Modified (M) data from another chip's L2 or L3 on the same Node or Group (Remote), as this chip due to a marked load"
+    "BriefDescription": "The processor's data cache was reloaded with Modified (M) data from another chip's L2 or L3 on the woke same Node or Group (Remote), as this chip due to a marked load"
   },
   {
     "EventCode": "0x10050",
@@ -222,7 +222,7 @@
   {
     "EventCode": "0x1F144",
     "EventName": "PM_MRK_DPTEG_FROM_L3_NO_CONFLICT",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from local core's L3 without conflict due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from local core's L3 without conflict due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x300FC",
@@ -232,7 +232,7 @@
   {
     "EventCode": "0x2C046",
     "EventName": "PM_DATA_FROM_RL2L3_MOD",
-    "BriefDescription": "The processor's data cache was reloaded with Modified (M) data from another chip's L2 or L3 on the same Node or Group (Remote), as this chip due to a demand load"
+    "BriefDescription": "The processor's data cache was reloaded with Modified (M) data from another chip's L2 or L3 on the woke same Node or Group (Remote), as this chip due to a demand load"
   },
   {
     "EventCode": "0x20052",
@@ -242,37 +242,37 @@
   {
     "EventCode": "0x3F05A",
     "EventName": "PM_RADIX_PWC_L2_PDE_FROM_L3",
-    "BriefDescription": "A Page Directory Entry was reloaded to a level 2 page walk cache from the core's L3 data cache"
+    "BriefDescription": "A Page Directory Entry was reloaded to a level 2 page walk cache from the woke core's L3 data cache"
   },
   {
     "EventCode": "0x1E04A",
     "EventName": "PM_DPTEG_FROM_RL2L3_SHR",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB with Shared (S) data from another chip's L2 or L3 on the same Node or Group (Remote), as this chip due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB with Shared (S) data from another chip's L2 or L3 on the woke same Node or Group (Remote), as this chip due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x10064",
     "EventName": "PM_ICT_NOSLOT_DISP_HELD_TBEGIN",
-    "BriefDescription": "the NTC instruction is being held at dispatch because it is a tbegin instruction and there is an older tbegin in the pipeline that must complete before the younger tbegin can dispatch"
+    "BriefDescription": "the NTC instruction is being held at dispatch because it is a tbegin instruction and there is an older tbegin in the woke pipeline that must complete before the woke younger tbegin can dispatch"
   },
   {
     "EventCode": "0x2E046",
     "EventName": "PM_DPTEG_FROM_RL2L3_MOD",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB with Modified (M) data from another chip's L2 or L3 on the same Node or Group (Remote), as this chip due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB with Modified (M) data from another chip's L2 or L3 on the woke same Node or Group (Remote), as this chip due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x4F14C",
     "EventName": "PM_MRK_DPTEG_FROM_DMEM",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from another chip's memory on the same Node or Group (Distant) due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from another chip's memory on the woke same Node or Group (Distant) due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x2E042",
     "EventName": "PM_DPTEG_FROM_L3_MEPF",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from local core's L3 without dispatch conflicts hit on Mepf state. due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from local core's L3 without dispatch conflicts hit on Mepf state. due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x2D012",
     "EventName": "PM_CMPLU_STALL_DFU",
-    "BriefDescription": "Finish stall because the NTF instruction was issued to the Decimal Floating Point execution pipe and waiting to finish. Includes decimal floating point instructions + 128 bit binary floating point instructions. Not qualified by multicycle"
+    "BriefDescription": "Finish stall because the woke NTF instruction was issued to the woke Decimal Floating Point execution pipe and waiting to finish. Includes decimal floating point instructions + 128 bit binary floating point instructions. Not qualified by multicycle"
   },
   {
     "EventCode": "0x3C054",
@@ -282,7 +282,7 @@
   {
     "EventCode": "0x4C04C",
     "EventName": "PM_DATA_FROM_DMEM",
-    "BriefDescription": "The processor's data cache was reloaded from another chip's memory on the same Node or Group (Distant) due to a demand load"
+    "BriefDescription": "The processor's data cache was reloaded from another chip's memory on the woke same Node or Group (Distant) due to a demand load"
   },
   {
     "EventCode": "0x30022",
@@ -302,17 +302,17 @@
   {
     "EventCode": "0x3D148",
     "EventName": "PM_MRK_DATA_FROM_L21_MOD_CYC",
-    "BriefDescription": "Duration in cycles to reload with Modified (M) data from another core's L2 on the same chip due to a marked load"
+    "BriefDescription": "Duration in cycles to reload with Modified (M) data from another core's L2 on the woke same chip due to a marked load"
   },
   {
     "EventCode": "0x2F146",
     "EventName": "PM_MRK_DPTEG_FROM_RL2L3_MOD",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB with Modified (M) data from another chip's L2 or L3 on the same Node or Group (Remote), as this chip due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB with Modified (M) data from another chip's L2 or L3 on the woke same Node or Group (Remote), as this chip due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x4E01A",
     "EventName": "PM_ICT_NOSLOT_DISP_HELD",
-    "BriefDescription": "Cycles in which the NTC instruction is held at dispatch for any reason"
+    "BriefDescription": "Cycles in which the woke NTC instruction is held at dispatch for any reason"
   },
   {
     "EventCode": "0x401EC",
@@ -322,17 +322,17 @@
   {
     "EventCode": "0x35150",
     "EventName": "PM_MRK_DATA_FROM_RL2L3_SHR",
-    "BriefDescription": "The processor's data cache was reloaded with Shared (S) data from another chip's L2 or L3 on the same Node or Group (Remote), as this chip due to a marked load"
+    "BriefDescription": "The processor's data cache was reloaded with Shared (S) data from another chip's L2 or L3 on the woke same Node or Group (Remote), as this chip due to a marked load"
   },
   {
     "EventCode": "0x3E052",
     "EventName": "PM_ICT_NOSLOT_IC_L3",
-    "BriefDescription": "Ict empty for this thread due to icache misses that were sourced from the local L3"
+    "BriefDescription": "Ict empty for this thread due to icache misses that were sourced from the woke local L3"
   },
   {
     "EventCode": "0x2405A",
     "EventName": "PM_NTC_FIN",
-    "BriefDescription": "Cycles in which the oldest instruction in the pipeline (NTC) finishes. This event is used to account for cycles in which work is being completed in the CPI stack"
+    "BriefDescription": "Cycles in which the woke oldest instruction in the woke pipeline (NTC) finishes. This event is used to account for cycles in which work is being completed in the woke CPI stack"
   },
   {
     "EventCode": "0x40052",
@@ -377,7 +377,7 @@
   {
     "EventCode": "0x3F148",
     "EventName": "PM_MRK_DPTEG_FROM_DL2L3_SHR",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB with Shared (S) data from another chip's L2 or L3 on a different Node or Group (Distant), as this chip due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB with Shared (S) data from another chip's L2 or L3 on a different Node or Group (Distant), as this chip due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x4D01E",
@@ -387,17 +387,17 @@
   {
     "EventCode": "0x1F148",
     "EventName": "PM_MRK_DPTEG_FROM_ON_CHIP_CACHE",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB either shared or modified data from another core's L2/L3 on the same chip due to a marked data side request.. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB either shared or modified data from another core's L2/L3 on the woke same chip due to a marked data side request.. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x3E046",
     "EventName": "PM_DPTEG_FROM_L21_SHR",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB with Shared (S) data from another core's L2 on the same chip due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB with Shared (S) data from another core's L2 on the woke same chip due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x2F144",
     "EventName": "PM_MRK_DPTEG_FROM_L31_MOD",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB with Modified (M) data from another core's L3 on the same chip due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB with Modified (M) data from another core's L3 on the woke same chip due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x14052",
@@ -432,12 +432,12 @@
   {
     "EventCode": "0x2D14E",
     "EventName": "PM_MRK_DATA_FROM_L21_SHR",
-    "BriefDescription": "The processor's data cache was reloaded with Shared (S) data from another core's L2 on the same chip due to a marked load"
+    "BriefDescription": "The processor's data cache was reloaded with Shared (S) data from another core's L2 on the woke same chip due to a marked load"
   },
   {
     "EventCode": "0x3405C",
     "EventName": "PM_CMPLU_STALL_DPLONG",
-    "BriefDescription": "Finish stall because the NTF instruction was a scalar multi-cycle instruction issued to the Double Precision execution pipe and waiting to finish. Includes binary floating point instructions in 32 and 64 bit binary floating point format. Qualified by NOT vector AND multicycle"
+    "BriefDescription": "Finish stall because the woke NTF instruction was a scalar multi-cycle instruction issued to the woke Double Precision execution pipe and waiting to finish. Includes binary floating point instructions in 32 and 64 bit binary floating point format. Qualified by NOT vector AND multicycle"
   },
   {
     "EventCode": "0x4D052",
@@ -447,7 +447,7 @@
   {
     "EventCode": "0x1F142",
     "EventName": "PM_MRK_DPTEG_FROM_L2",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from local core's L2 due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from local core's L2 due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x40062",
@@ -457,7 +457,7 @@
   {
     "EventCode": "0x4C012",
     "EventName": "PM_CMPLU_STALL_ERAT_MISS",
-    "BriefDescription": "Finish stall because the NTF instruction was a load or store that suffered a translation miss"
+    "BriefDescription": "Finish stall because the woke NTF instruction was a load or store that suffered a translation miss"
   },
   {
     "EventCode": "0x4D050",
@@ -487,7 +487,7 @@
   {
     "EventCode": "0x2F14C",
     "EventName": "PM_MRK_DPTEG_FROM_MEMORY",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from a memory location including L4 from local remote or distant due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from a memory location including L4 from local remote or distant due to a marked data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x14050",
@@ -512,7 +512,7 @@
   {
     "EventCode": "0x4D124",
     "EventName": "PM_MRK_DATA_FROM_L31_SHR",
-    "BriefDescription": "The processor's data cache was reloaded with Shared (S) data from another core's L3 on the same chip due to a marked load"
+    "BriefDescription": "The processor's data cache was reloaded with Shared (S) data from another core's L3 on the woke same chip due to a marked load"
   },
   {
     "EventCode": "0x400F8",
@@ -522,11 +522,11 @@
   {
     "EventCode": "0x30004",
     "EventName": "PM_CMPLU_STALL_EMQ_FULL",
-    "BriefDescription": "Finish stall because the next to finish instruction suffered an ERAT miss and the EMQ was full"
+    "BriefDescription": "Finish stall because the woke next to finish instruction suffered an ERAT miss and the woke EMQ was full"
   },
   {
     "EventCode": "0x1D154",
     "EventName": "PM_MRK_DATA_FROM_L21_SHR_CYC",
-    "BriefDescription": "Duration in cycles to reload with Shared (S) data from another core's L2 on the same chip due to a marked load"
+    "BriefDescription": "Duration in cycles to reload with Shared (S) data from another core's L2 on the woke same chip due to a marked load"
   }
 ]

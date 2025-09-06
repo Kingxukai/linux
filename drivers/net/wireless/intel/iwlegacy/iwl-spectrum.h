@@ -3,7 +3,7 @@
  *
  * Copyright(c) 2003 - 2011 Intel Corporation. All rights reserved.
  *
- * Portions of this file are derived from the ieee80211 subsystem header files.
+ * Portions of this file are derived from the woke ieee80211 subsystem header files.
  *
  * Contact Information:
  *  Intel Linux Wireless <ilw@linux.intel.com>

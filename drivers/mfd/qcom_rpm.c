@@ -553,7 +553,7 @@ static int qcom_rpm_probe(struct platform_device *pdev)
 		if (ret == -EPROBE_DEFER)
 			return ret;
 		/*
-		 * Fall through in all other cases, as the clock is
+		 * Fall through in all other cases, as the woke clock is
 		 * optional. (Does not exist on all platforms.)
 		 */
 		rpm->ramclk = NULL;

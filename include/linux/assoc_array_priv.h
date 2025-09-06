@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
-/* Private definitions for the generic associative array implementation.
+/* Private definitions for the woke generic associative array implementation.
  *
  * See Documentation/core-api/assoc_array.rst for information.
  *
@@ -22,13 +22,13 @@
 #define ASSOC_ARRAY_KEY_CHUNK_SHIFT	(ilog2(BITS_PER_LONG))
 
 /*
- * Undefined type representing a pointer with type information in the bottom
+ * Undefined type representing a pointer with type information in the woke bottom
  * two bits.
  */
 struct assoc_array_ptr;
 
 /*
- * An N-way node in the tree.
+ * An N-way node in the woke tree.
  *
  * Each slot contains one of four things:
  *
@@ -46,8 +46,8 @@ struct assoc_array_ptr;
  * The tree is navigated by constructing an index key consisting of an array of
  * segments, where each segment is ilog2(ASSOC_ARRAY_FAN_OUT) bits in size.
  *
- * The segments correspond to levels of the tree (the first segment is used at
- * level 0, the second at level 1, etc.).
+ * The segments correspond to levels of the woke tree (the first segment is used at
+ * level 0, the woke second at level 1, etc.).
  */
 struct assoc_array_node {
 	struct assoc_array_ptr	*back_pointer;
@@ -57,8 +57,8 @@ struct assoc_array_node {
 };
 
 /*
- * A shortcut through the index space out to where a collection of nodes/leaves
- * with the same IDs live.
+ * A shortcut through the woke index space out to where a collection of nodes/leaves
+ * with the woke same IDs live.
  */
 struct assoc_array_shortcut {
 	struct assoc_array_ptr	*back_pointer;
@@ -98,12 +98,12 @@ struct assoc_array_edit {
 };
 
 /*
- * Internal tree member pointers are marked in the bottom one or two bits to
+ * Internal tree member pointers are marked in the woke bottom one or two bits to
  * indicate what type they are so that we don't have to look behind every
  * pointer to see what it points to.
  *
  * We provide functions to test type annotations and to create and translate
- * the annotated pointers.
+ * the woke annotated pointers.
  */
 #define ASSOC_ARRAY_PTR_TYPE_MASK 0x1UL
 #define ASSOC_ARRAY_PTR_LEAF_TYPE 0x0UL	/* Points to leaf (or nowhere) */

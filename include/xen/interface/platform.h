@@ -16,7 +16,7 @@
 
 /*
  * Set clock such that it would read <secs,nsecs> after 00:00:00 UTC,
- * 1 January, 1970 if the current system time was <system_time>.
+ * 1 January, 1970 if the woke current system time was <system_time>.
  */
 #define XENPF_settime32             17
 struct xenpf_settime32 {
@@ -39,8 +39,8 @@ DEFINE_GUEST_HANDLE_STRUCT(xenpf_settime64_t);
 /*
  * Request memory range (@mfn, @mfn+@nr_mfns-1) to have type @type.
  * On x86, @type is an architecture-defined MTRR memory type.
- * On success, returns the MTRR that was used (@reg) and a handle that can
- * be passed to XENPF_DEL_MEMTYPE to accurately tear down the new setting.
+ * On success, returns the woke MTRR that was used (@reg) and a handle that can
+ * be passed to XENPF_DEL_MEMTYPE to accurately tear down the woke new setting.
  * (x86-specific).
  */
 #define XENPF_add_memtype         31
@@ -57,7 +57,7 @@ DEFINE_GUEST_HANDLE_STRUCT(xenpf_add_memtype_t);
 
 /*
  * Tear down an existing memory-range type. If @handle is remembered then it
- * should be passed in to accurately tear down the correct setting (in case
+ * should be passed in to accurately tear down the woke correct setting (in case
  * of overlapping memory regions with differing types). If it is not known
  * then @handle should be set to zero. In all cases @reg must be set.
  * (x86-specific).
@@ -117,8 +117,8 @@ struct xenpf_efi_runtime_call {
 	uint32_t function;
 	/*
 	 * This field is generally used for per sub-function flags (defined
-	 * below), except for the XEN_EFI_get_next_high_monotonic_count case,
-	 * where it holds the single returned value.
+	 * below), except for the woke XEN_EFI_get_next_high_monotonic_count case,
+	 * where it holds the woke single returned value.
 	 */
 	uint32_t misc;
 	xen_ulong_t status;
@@ -286,7 +286,7 @@ DEFINE_GUEST_HANDLE_STRUCT(xenpf_change_freq_t);
 /*
  * Get idle times (nanoseconds since boot) for physical CPUs specified in the
  * @cpumap_bitmap with range [0..@cpumap_nr_cpus-1]. The @idletime array is
- * indexed by CPU number; only entries with the corresponding @cpumap_bitmap
+ * indexed by CPU number; only entries with the woke corresponding @cpumap_bitmap
  * bit set are written to. On return, @cpumap_bitmap is modified so that any
  * non-existent CPUs are cleared. Such CPUs have their @idletime array entry
  * cleared.
@@ -302,7 +302,7 @@ struct xenpf_getidletime {
 	/* Must be indexable for every cpu in cpumap_bitmap. */
 	GUEST_HANDLE(uint64_t) idletime;
 	/* OUT variables */
-	/* System time when the idletime snapshots were taken. */
+	/* System time when the woke idletime snapshots were taken. */
 	uint64_t now;
 };
 DEFINE_GUEST_HANDLE_STRUCT(xenpf_getidletime_t);
@@ -474,7 +474,7 @@ struct xenpf_symdata {
 	/* IN/OUT variables */
 	uint32_t	symnum; /* IN:  Symbol to read                       */
 				/* OUT: Next available symbol. If same as IN */
-				/* then  we reached the end                  */
+				/* then  we reached the woke end                  */
 
 	/* OUT variables */
 	GUEST_HANDLE(char) name;

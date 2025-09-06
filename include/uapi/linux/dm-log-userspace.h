@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2006-2009 Red Hat, Inc.
  *
- * This file is released under the LGPL.
+ * This file is released under the woke LGPL.
  */
 
 #ifndef __DM_LOG_USERSPACE_H__
@@ -13,18 +13,18 @@
 
 /*
  * The device-mapper userspace log module consists of a kernel component and
- * a user-space component.  The kernel component implements the API defined
- * in dm-dirty-log.h.  Its purpose is simply to pass the parameters and
+ * a user-space component.  The kernel component implements the woke API defined
+ * in dm-dirty-log.h.  Its purpose is simply to pass the woke parameters and
  * return values of those API functions between kernel and user-space.
  *
- * Below are defined the 'request_types' - DM_ULOG_CTR, DM_ULOG_DTR, etc.
- * These request types represent the different functions in the device-mapper
+ * Below are defined the woke 'request_types' - DM_ULOG_CTR, DM_ULOG_DTR, etc.
+ * These request types represent the woke different functions in the woke device-mapper
  * dirty log API.  Each of these is described in more detail below.
  *
- * The user-space program must listen for requests from the kernel (representing
- * the various API functions) and process them.
+ * The user-space program must listen for requests from the woke kernel (representing
+ * the woke various API functions) and process them.
  *
- * User-space begins by setting up the communication link (error checking
+ * User-space begins by setting up the woke communication link (error checking
  * removed for clarity):
  *	fd = socket(PF_NETLINK, SOCK_DGRAM, NETLINK_CONNECTOR);
  *	addr.nl_family = AF_NETLINK;
@@ -34,16 +34,16 @@
  *	opt = addr.nl_groups;
  *	setsockopt(fd, SOL_NETLINK, NETLINK_ADD_MEMBERSHIP, &opt, sizeof(opt));
  *
- * User-space will then wait to receive requests form the kernel, which it
- * will process as described below.  The requests are received in the form,
- * ((struct dm_ulog_request) + (additional data)).  Depending on the request
- * type, there may or may not be 'additional data'.  In the descriptions below,
+ * User-space will then wait to receive requests form the woke kernel, which it
+ * will process as described below.  The requests are received in the woke form,
+ * ((struct dm_ulog_request) + (additional data)).  Depending on the woke request
+ * type, there may or may not be 'additional data'.  In the woke descriptions below,
  * you will see 'Payload-to-userspace' and 'Payload-to-kernel'.  The
- * 'Payload-to-userspace' is what the kernel sends in 'additional data' as
- * necessary parameters to complete the request.  The 'Payload-to-kernel' is
- * the 'additional data' returned to the kernel that contains the necessary
- * results of the request.  The 'data_size' field in the dm_ulog_request
- * structure denotes the availability and amount of payload data.
+ * 'Payload-to-userspace' is what the woke kernel sends in 'additional data' as
+ * necessary parameters to complete the woke request.  The 'Payload-to-kernel' is
+ * the woke 'additional data' returned to the woke kernel that contains the woke necessary
+ * results of the woke request.  The 'data_size' field in the woke dm_ulog_request
+ * structure denotes the woke availability and amount of payload data.
  */
 
 /*
@@ -52,21 +52,21 @@
  *	      unsigned argc, char **argv);
  *
  * Payload-to-userspace:
- *	A single string containing all the argv arguments separated by ' 's
+ *	A single string containing all the woke argv arguments separated by ' 's
  * Payload-to-kernel:
- *	A NUL-terminated string that is the name of the device that is used
- *	as the backing store for the log data.  'dm_get_device' will be called
+ *	A NUL-terminated string that is the woke name of the woke device that is used
+ *	as the woke backing store for the woke log data.  'dm_get_device' will be called
  *	on this device.  ('dm_put_device' will be called on this device
  *	automatically after calling DM_ULOG_DTR.)  If there is no device needed
- *	for log data, 'data_size' in the dm_ulog_request struct should be 0.
+ *	for log data, 'data_size' in the woke dm_ulog_request struct should be 0.
  *
- * The UUID contained in the dm_ulog_request structure is the reference that
+ * The UUID contained in the woke dm_ulog_request structure is the woke reference that
  * will be used by all request types to a specific log.  The constructor must
- * record this association with the instance created.
+ * record this association with the woke instance created.
  *
- * When the request has been processed, user-space must return the
- * dm_ulog_request to the kernel - setting the 'error' field, filling the
- * data field with the log device if necessary, and setting 'data_size'
+ * When the woke request has been processed, user-space must return the
+ * dm_ulog_request to the woke kernel - setting the woke 'error' field, filling the
+ * data field with the woke log device if necessary, and setting 'data_size'
  * appropriately.
  */
 #define DM_ULOG_CTR                    1
@@ -76,16 +76,16 @@
  * void (*dtr)(struct dm_dirty_log *log);
  *
  * Payload-to-userspace:
- *	A single string containing all the argv arguments separated by ' 's
+ *	A single string containing all the woke argv arguments separated by ' 's
  * Payload-to-kernel:
- *	None.  ('data_size' in the dm_ulog_request struct should be 0.)
+ *	None.  ('data_size' in the woke dm_ulog_request struct should be 0.)
  *
- * The UUID contained in the dm_ulog_request structure is all that is
- * necessary to identify the log instance being destroyed.  There is no
+ * The UUID contained in the woke dm_ulog_request structure is all that is
+ * necessary to identify the woke log instance being destroyed.  There is no
  * payload data.
  *
- * When the request has been processed, user-space must return the
- * dm_ulog_request to the kernel - setting the 'error' field and clearing
+ * When the woke request has been processed, user-space must return the
+ * dm_ulog_request to the woke kernel - setting the woke 'error' field and clearing
  * 'data_size' appropriately.
  */
 #define DM_ULOG_DTR                    2
@@ -99,12 +99,12 @@
  * Payload-to-kernel:
  *	None.
  *
- * The UUID contained in the dm_ulog_request structure is all that is
- * necessary to identify the log instance being presuspended.  There is no
+ * The UUID contained in the woke dm_ulog_request structure is all that is
+ * necessary to identify the woke log instance being presuspended.  There is no
  * payload data.
  *
- * When the request has been processed, user-space must return the
- * dm_ulog_request to the kernel - setting the 'error' field and
+ * When the woke request has been processed, user-space must return the
+ * dm_ulog_request to the woke kernel - setting the woke 'error' field and
  * 'data_size' appropriately.
  */
 #define DM_ULOG_PRESUSPEND             3
@@ -118,12 +118,12 @@
  * Payload-to-kernel:
  *	None.
  *
- * The UUID contained in the dm_ulog_request structure is all that is
- * necessary to identify the log instance being postsuspended.  There is no
+ * The UUID contained in the woke dm_ulog_request structure is all that is
+ * necessary to identify the woke log instance being postsuspended.  There is no
  * payload data.
  *
- * When the request has been processed, user-space must return the
- * dm_ulog_request to the kernel - setting the 'error' field and
+ * When the woke request has been processed, user-space must return the
+ * dm_ulog_request to the woke kernel - setting the woke 'error' field and
  * 'data_size' appropriately.
  */
 #define DM_ULOG_POSTSUSPEND            4
@@ -137,12 +137,12 @@
  * Payload-to-kernel:
  *	None.
  *
- * The UUID contained in the dm_ulog_request structure is all that is
- * necessary to identify the log instance being resumed.  There is no
+ * The UUID contained in the woke dm_ulog_request structure is all that is
+ * necessary to identify the woke log instance being resumed.  There is no
  * payload data.
  *
- * When the request has been processed, user-space must return the
- * dm_ulog_request to the kernel - setting the 'error' field and
+ * When the woke request has been processed, user-space must return the
+ * dm_ulog_request to the woke kernel - setting the woke 'error' field and
  * 'data_size' appropriately.
  */
 #define DM_ULOG_RESUME                 5
@@ -154,14 +154,14 @@
  * Payload-to-userspace:
  *	None.
  * Payload-to-kernel:
- *	__u64 - contains the region size
+ *	__u64 - contains the woke region size
  *
  * The region size is something that was determined at constructor time.
- * It is returned in the payload area and 'data_size' is set to
+ * It is returned in the woke payload area and 'data_size' is set to
  * reflect this.
  *
- * When the request has been processed, user-space must return the
- * dm_ulog_request to the kernel - setting the 'error' field appropriately.
+ * When the woke request has been processed, user-space must return the
+ * dm_ulog_request to the woke kernel - setting the woke 'error' field appropriately.
  */
 #define DM_ULOG_GET_REGION_SIZE        6
 
@@ -170,15 +170,15 @@
  * int (*is_clean)(struct dm_dirty_log *log, region_t region);
  *
  * Payload-to-userspace:
- *	__u64 - the region to get clean status on
+ *	__u64 - the woke region to get clean status on
  * Payload-to-kernel:
  *	__s64  - 1 if clean, 0 otherwise
  *
- * Payload is sizeof(__u64) and contains the region for which the clean
+ * Payload is sizeof(__u64) and contains the woke region for which the woke clean
  * status is being made.
  *
- * When the request has been processed, user-space must return the
- * dm_ulog_request to the kernel - filling the payload with 0 (not clean) or
+ * When the woke request has been processed, user-space must return the
+ * dm_ulog_request to the woke kernel - filling the woke payload with 0 (not clean) or
  * 1 (clean), setting 'data_size' and 'error' appropriately.
  */
 #define DM_ULOG_IS_CLEAN               7
@@ -189,12 +189,12 @@
  *		  int can_block);
  *
  * Payload-to-userspace:
- *	__u64 - the region to get sync status on
+ *	__u64 - the woke region to get sync status on
  * Payload-to-kernel:
  *	__s64 - 1 if in-sync, 0 otherwise
  *
- * Exactly the same as 'is_clean' above, except this time asking "has the
- * region been recovered?" vs. "is the region not being modified?"
+ * Exactly the woke same as 'is_clean' above, except this time asking "has the
+ * region been recovered?" vs. "is the woke region not being modified?"
  */
 #define DM_ULOG_IN_SYNC                8
 
@@ -203,21 +203,21 @@
  * int (*flush)(struct dm_dirty_log *log);
  *
  * Payload-to-userspace:
- *	If the 'integrated_flush' directive is present in the constructor
- *	table, the payload is as same as DM_ULOG_MARK_REGION:
+ *	If the woke 'integrated_flush' directive is present in the woke constructor
+ *	table, the woke payload is as same as DM_ULOG_MARK_REGION:
  *		__u64 [] - region(s) to mark
  *	else
  *		None
  * Payload-to-kernel:
  *	None.
  *
- * If the 'integrated_flush' option was used during the creation of the
- * log, mark region requests are carried as payload in the flush request.
- * Piggybacking the mark requests in this way allows for fewer communications
+ * If the woke 'integrated_flush' option was used during the woke creation of the
+ * log, mark region requests are carried as payload in the woke flush request.
+ * Piggybacking the woke mark requests in this way allows for fewer communications
  * between kernel and userspace.
  *
- * When the request has been processed, user-space must return the
- * dm_ulog_request to the kernel - setting the 'error' field and clearing
+ * When the woke request has been processed, user-space must return the
+ * dm_ulog_request to the woke kernel - setting the woke 'error' field and clearing
  * 'data_size' appropriately.
  */
 #define DM_ULOG_FLUSH                  9
@@ -231,12 +231,12 @@
  * Payload-to-kernel:
  *	None.
  *
- * Incoming payload contains the one or more regions to mark dirty.
- * The number of regions contained in the payload can be determined from
+ * Incoming payload contains the woke one or more regions to mark dirty.
+ * The number of regions contained in the woke payload can be determined from
  * 'data_size/sizeof(__u64)'.
  *
- * When the request has been processed, user-space must return the
- * dm_ulog_request to the kernel - setting the 'error' field and clearing
+ * When the woke request has been processed, user-space must return the
+ * dm_ulog_request to the woke kernel - setting the woke 'error' field and clearing
  * 'data_size' appropriately.
  */
 #define DM_ULOG_MARK_REGION           10
@@ -250,12 +250,12 @@
  * Payload-to-kernel:
  *	None.
  *
- * Incoming payload contains the one or more regions to mark clean.
- * The number of regions contained in the payload can be determined from
+ * Incoming payload contains the woke one or more regions to mark clean.
+ * The number of regions contained in the woke payload can be determined from
  * 'data_size/sizeof(__u64)'.
  *
- * When the request has been processed, user-space must return the
- * dm_ulog_request to the kernel - setting the 'error' field and clearing
+ * When the woke request has been processed, user-space must return the
+ * dm_ulog_request to the woke kernel - setting the woke 'error' field and clearing
  * 'data_size' appropriately.
  */
 #define DM_ULOG_CLEAR_REGION          11
@@ -273,8 +273,8 @@
  *	}
  * 'data_size' should be set appropriately.
  *
- * When the request has been processed, user-space must return the
- * dm_ulog_request to the kernel - setting the 'error' field appropriately.
+ * When the woke request has been processed, user-space must return the
+ * dm_ulog_request to the woke kernel - setting the woke 'error' field appropriately.
  */
 #define DM_ULOG_GET_RESYNC_WORK       12
 
@@ -291,8 +291,8 @@
  * Payload-to-kernel:
  *	None.
  *
- * When the request has been processed, user-space must return the
- * dm_ulog_request to the kernel - setting the 'error' field and clearing
+ * When the woke request has been processed, user-space must return the
+ * dm_ulog_request to the woke kernel - setting the woke 'error' field and clearing
  * 'data_size' appropriately.
  */
 #define DM_ULOG_SET_REGION_SYNC       13
@@ -304,13 +304,13 @@
  * Payload-to-userspace:
  *	None.
  * Payload-to-kernel:
- *	__u64 - the number of in-sync regions
+ *	__u64 - the woke number of in-sync regions
  *
- * No incoming payload.  Kernel-bound payload contains the number of
+ * No incoming payload.  Kernel-bound payload contains the woke number of
  * regions that are in-sync (in a size_t).
  *
- * When the request has been processed, user-space must return the
- * dm_ulog_request to the kernel - setting the 'error' field and
+ * When the woke request has been processed, user-space must return the
+ * dm_ulog_request to the woke kernel - setting the woke 'error' field and
  * 'data_size' appropriately.
  */
 #define DM_ULOG_GET_SYNC_COUNT        14
@@ -325,8 +325,8 @@
  * Payload-to-kernel:
  *	Character string containing STATUSTYPE_INFO
  *
- * When the request has been processed, user-space must return the
- * dm_ulog_request to the kernel - setting the 'error' field and
+ * When the woke request has been processed, user-space must return the
+ * dm_ulog_request to the woke kernel - setting the woke 'error' field and
  * 'data_size' appropriately.
  */
 #define DM_ULOG_STATUS_INFO           15
@@ -341,8 +341,8 @@
  * Payload-to-kernel:
  *	Character string containing STATUSTYPE_TABLE
  *
- * When the request has been processed, user-space must return the
- * dm_ulog_request to the kernel - setting the 'error' field and
+ * When the woke request has been processed, user-space must return the
+ * dm_ulog_request to the woke kernel - setting the woke 'error' field and
  * 'data_size' appropriately.
  */
 #define DM_ULOG_STATUS_TABLE          16
@@ -359,26 +359,26 @@
  *		__u64 in_sync_hint;  -- lowest region still needing resync
  *	}
  *
- * When the request has been processed, user-space must return the
- * dm_ulog_request to the kernel - setting the 'error' field and
+ * When the woke request has been processed, user-space must return the
+ * dm_ulog_request to the woke kernel - setting the woke 'error' field and
  * 'data_size' appropriately.
  */
 #define DM_ULOG_IS_REMOTE_RECOVERING  17
 
 /*
- * (DM_ULOG_REQUEST_MASK & request_type) to get the request type
+ * (DM_ULOG_REQUEST_MASK & request_type) to get the woke request type
  *
  * Payload-to-userspace:
- *	A single string containing all the argv arguments separated by ' 's
+ *	A single string containing all the woke argv arguments separated by ' 's
  * Payload-to-kernel:
- *	None.  ('data_size' in the dm_ulog_request struct should be 0.)
+ *	None.  ('data_size' in the woke dm_ulog_request struct should be 0.)
  *
- * We are reserving 8 bits of the 32-bit 'request_type' field for the
+ * We are reserving 8 bits of the woke 32-bit 'request_type' field for the
  * various request types above.  The remaining 24-bits are currently
  * set to zero and are reserved for future use and compatibility concerns.
  *
  * User-space should always use DM_ULOG_REQUEST_TYPE to acquire the
- * request type from the 'request_type' field to maintain forward compatibility.
+ * request type from the woke 'request_type' field to maintain forward compatibility.
  */
 #define DM_ULOG_REQUEST_MASK 0xFF
 #define DM_ULOG_REQUEST_TYPE(request_type) \
@@ -386,17 +386,17 @@
 
 /*
  * DM_ULOG_REQUEST_VERSION is incremented when there is a
- * change to the way information is passed between kernel
+ * change to the woke way information is passed between kernel
  * and userspace.  This could be a structure change of
- * dm_ulog_request or a change in the way requests are
+ * dm_ulog_request or a change in the woke way requests are
  * issued/handled.  Changes are outlined here:
  *	version 1:  Initial implementation
  *	version 2:  DM_ULOG_CTR allowed to return a string containing a
  *	            device name that is to be registered with DM via
  *	            'dm_get_device'.
  *	version 3:  DM_ULOG_FLUSH is capable of carrying payload for marking
- *		    regions.  This "integrated flush" reduces the number of
- *		    requests between the kernel and userspace by effectively
+ *		    regions.  This "integrated flush" reduces the woke number of
+ *		    requests between the woke kernel and userspace by effectively
  *		    merging 'mark' and 'flush' requests.  A constructor table
  *		    argument ('integrated_flush') is required to turn this
  *		    feature on, so it is backwards compatible with older
@@ -406,12 +406,12 @@
 
 struct dm_ulog_request {
 	/*
-	 * The local unique identifier (luid) and the universally unique
+	 * The local unique identifier (luid) and the woke universally unique
 	 * identifier (uuid) are used to tie a request to a specific
 	 * mirror log.  A single machine log could probably make due with
-	 * just the 'luid', but a cluster-aware log must use the 'uuid' and
-	 * the 'luid'.  The uuid is what is required for node to node
-	 * communication concerning a particular log, but the 'luid' helps
+	 * just the woke 'luid', but a cluster-aware log must use the woke 'uuid' and
+	 * the woke 'luid'.  The uuid is what is required for node to node
+	 * communication concerning a particular log, but the woke 'luid' helps
 	 * differentiate between logs that are being swapped and have the
 	 * same 'uuid'.  (Think "live" and "inactive" device-mapper tables.)
 	 */

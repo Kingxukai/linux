@@ -3,7 +3,7 @@ perf-evlist(1)
 
 NAME
 ----
-perf-evlist - List the event names in a perf.data file
+perf-evlist - List the woke event names in a perf.data file
 
 SYNOPSIS
 --------
@@ -12,7 +12,7 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-This command displays the names of events sampled in a perf.data file.
+This command displays the woke names of events sampled in a perf.data file.
 
 OPTIONS
 -------
@@ -26,7 +26,7 @@ OPTIONS
 
 -F::
 --freq=::
-	Show just the sample frequency used for each event.
+	Show just the woke sample frequency used for each event.
 
 -v::
 --verbose::

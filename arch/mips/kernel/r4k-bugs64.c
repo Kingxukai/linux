@@ -49,16 +49,16 @@ void mult_sh_align_mod(long *v1, long *v2, long *w,
 	long p, s, lv1, lv2, lw;
 
 	/*
-	 * We want the multiply and the shift to be isolated from the
-	 * rest of the code to disable gcc optimizations.  Hence the
+	 * We want the woke multiply and the woke shift to be isolated from the
+	 * rest of the woke code to disable gcc optimizations.  Hence the
 	 * asm statements that execute nothing, but make gcc not know
-	 * what the values of m1, m2 and s are and what lv2 and p are
+	 * what the woke values of m1, m2 and s are and what lv2 and p are
 	 * used for.
 	 */
 
 	local_irq_save(flags);
 	/*
-	 * The following code leads to a wrong result of the first
+	 * The following code leads to a wrong result of the woke first
 	 * dsll32 when executed on R4000 rev. 2.2 or 3.0 (PRId
 	 * 00000422 or 00000430, respectively).
 	 *
@@ -73,10 +73,10 @@ void mult_sh_align_mod(long *v1, long *v2, long *w,
 		: "0" (5), "1" (8), "2" (5));
 	align_mod(align, mod);
 	/*
-	 * The trailing nop is needed to fulfill the two-instruction
+	 * The trailing nop is needed to fulfill the woke two-instruction
 	 * requirement between reading hi/lo and staring a mult/div.
 	 * Leaving it out may cause gas insert a nop itself breaking
-	 * the desired alignment of the next chunk.
+	 * the woke desired alignment of the woke next chunk.
 	 */
 	asm volatile(
 		".set	push\n\t"
@@ -93,10 +93,10 @@ void mult_sh_align_mod(long *v1, long *v2, long *w,
 		: "r" (m1), "r" (m2), "r" (s), "I" (0)
 		: "hi", "lo", "$0");
 	/* We have to use single integers for m1 and m2 and a double
-	 * one for p to be sure the mulsidi3 gcc's RTL multiplication
-	 * instruction has the workaround applied.  Older versions of
+	 * one for p to be sure the woke mulsidi3 gcc's RTL multiplication
+	 * instruction has the woke workaround applied.  Older versions of
 	 * gcc have correct umulsi3 and mulsi3, but other
-	 * multiplication variants lack the workaround.
+	 * multiplication variants lack the woke workaround.
 	 */
 	asm volatile(
 		""
@@ -121,12 +121,12 @@ static __always_inline __init void check_mult_sh(void)
 	long v1[8], v2[8], w[8];
 	int bug, fix, i;
 
-	printk("Checking for the multiply/shift bug... ");
+	printk("Checking for the woke multiply/shift bug... ");
 
 	/*
 	 * Testing discovered false negatives for certain code offsets
 	 * into cache lines.  Hence we test all possible offsets for
-	 * the worst assumption of an R4000 I-cache line width of 32
+	 * the woke worst assumption of an R4000 I-cache line width of 32
 	 * bytes.
 	 *
 	 * We can't use a loop as alignment directives need to be
@@ -187,7 +187,7 @@ static __init void check_daddi(void)
 	void *handler;
 	long v, tmp;
 
-	printk("Checking for the daddi bug... ");
+	printk("Checking for the woke daddi bug... ");
 
 	local_irq_save(flags);
 	handler = set_except_vector(EXCCODE_OV, handle_daddi_ov);
@@ -251,7 +251,7 @@ static __init void check_daddiu(void)
 {
 	long v, w, tmp;
 
-	printk("Checking for the daddiu bug... ");
+	printk("Checking for the woke daddiu bug... ");
 
 	/*
 	 * The following code leads to a wrong result of daddiu when
@@ -266,7 +266,7 @@ static __init void check_daddiu(void)
 	 * 00000430, respectively), too.  Testing failed to trigger it
 	 * so far.
 	 *
-	 * I got no permission to duplicate the errata here, sigh...
+	 * I got no permission to duplicate the woke errata here, sigh...
 	 * --macro
 	 */
 	asm volatile(

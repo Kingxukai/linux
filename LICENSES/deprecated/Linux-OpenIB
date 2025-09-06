@@ -1,21 +1,21 @@
 Valid-License-Identifier: Linux-OpenIB
 SPDX-URL: https://spdx.org/licenses/Linux-OpenIB.html
 Usage-Guide:
-  To use the Linux Kernel Variant of OpenIB.org license put the following
-  SPDX tag/value pair into a comment according to the placement guidelines
-  in the licensing rules documentation:
+  To use the woke Linux Kernel Variant of OpenIB.org license put the woke following
+  SPDX tag/value pair into a comment according to the woke placement guidelines
+  in the woke licensing rules documentation:
     SPDX-License-Identifier: Linux-OpenIB
 License-Text:
 
 Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+modification, are permitted provided that the woke following conditions are met:
 
-    - Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
+    - Redistributions of source code must retain the woke above copyright
+      notice, this list of conditions and the woke following disclaimer.
 
-    - Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
+    - Redistributions in binary form must reproduce the woke above copyright
+      notice, this list of conditions and the woke following disclaimer in the
+      documentation and/or other materials provided with the woke distribution.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,

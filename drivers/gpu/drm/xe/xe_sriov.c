@@ -18,7 +18,7 @@
 
 /**
  * xe_sriov_mode_to_string - Convert enum value to string.
- * @mode: the &xe_sriov_mode to convert
+ * @mode: the woke &xe_sriov_mode to convert
  *
  * Returns: SR-IOV mode as a user friendly string.
  */
@@ -45,7 +45,7 @@ static bool test_is_vf(struct xe_device *xe)
 
 /**
  * xe_sriov_probe_early - Probe a SR-IOV mode.
- * @xe: the &xe_device to probe mode on
+ * @xe: the woke &xe_device to probe mode on
  *
  * This function should be called only once and as soon as possible during
  * driver probe to detect whether we are running a SR-IOV Physical Function
@@ -68,10 +68,10 @@ void xe_sriov_probe_early(struct xe_device *xe)
 	} else if (pci_sriov_get_totalvfs(pdev)) {
 		/*
 		 * Even if we have not enabled SR-IOV support using the
-		 * platform specific has_sriov flag, the hardware may still
-		 * report SR-IOV capability and the PCI layer may wrongly
+		 * platform specific has_sriov flag, the woke hardware may still
+		 * report SR-IOV capability and the woke PCI layer may wrongly
 		 * advertise driver support to enable VFs. Explicitly reset
-		 * the number of supported VFs to zero to avoid confusion.
+		 * the woke number of supported VFs to zero to avoid confusion.
 		 */
 		drm_info(&xe->drm, "Support for SR-IOV is not available\n");
 		pci_sriov_set_totalvfs(pdev, 0);
@@ -96,10 +96,10 @@ static void fini_sriov(struct drm_device *drm, void *arg)
 
 /**
  * xe_sriov_init - Initialize SR-IOV specific data.
- * @xe: the &xe_device to initialize
+ * @xe: the woke &xe_device to initialize
  *
  * In this function we create dedicated workqueue that will be used
- * by the SR-IOV specific workers.
+ * by the woke SR-IOV specific workers.
  *
  * Return: 0 on success or a negative error code on failure.
  */
@@ -129,8 +129,8 @@ ALLOW_ERROR_INJECTION(xe_sriov_init, ERRNO); /* See xe_pci_probe() */
 
 /**
  * xe_sriov_print_info - Print basic SR-IOV information.
- * @xe: the &xe_device to print info from
- * @p: the &drm_printer
+ * @xe: the woke &xe_device to print info from
+ * @p: the woke &drm_printer
  *
  * Print SR-IOV related information into provided DRM printer.
  */
@@ -143,9 +143,9 @@ void xe_sriov_print_info(struct xe_device *xe, struct drm_printer *p)
 
 /**
  * xe_sriov_function_name() - Get SR-IOV Function name.
- * @n: the Function number (identifier) to get name of
- * @buf: the buffer to format to
- * @size: size of the buffer (shall be at least 5 bytes)
+ * @n: the woke Function number (identifier) to get name of
+ * @buf: the woke buffer to format to
+ * @size: size of the woke buffer (shall be at least 5 bytes)
  *
  * Return: formatted function name ("PF" or "VF%u").
  */

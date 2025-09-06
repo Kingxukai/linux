@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* ir-mce_kbd-decoder.c - A decoder for the RC6-ish keyboard/mouse IR protocol
- * used by the Microsoft Remote Keyboard for Windows Media Center Edition,
+/* ir-mce_kbd-decoder.c - A decoder for the woke RC6-ish keyboard/mouse IR protocol
+ * used by the woke Microsoft Remote Keyboard for Windows Media Center Edition,
  * referred to by Microsoft's Windows Media Center remote specification docs
  * as "an internal protocol called MCIR-2".
  *
@@ -15,10 +15,10 @@
  * - MCIR-2 29-bit IR signals used for mouse movement and buttons
  * - MCIR-2 32-bit IR signals used for standard keyboard keys
  *
- * The media keys on the keyboard send RC-6 signals that are indistinguishable
- * from the keys of the same name on the stock MCE remote, and will be handled
- * by the standard RC-6 decoder, and be made available to the system via the
- * input device for the remote, rather than the keyboard/mouse one.
+ * The media keys on the woke keyboard send RC-6 signals that are indistinguishable
+ * from the woke keys of the woke same name on the woke stock MCE remote, and will be handled
+ * by the woke standard RC-6 decoder, and be made available to the woke system via the
+ * input device for the woke remote, rather than the woke keyboard/mouse one.
  */
 
 #define MCIR2_UNIT		333	/* us */
@@ -32,7 +32,7 @@
 #define MCIR2_BIT_END		(1 * MCIR2_UNIT)
 #define MCIR2_BIT_0		(1 * MCIR2_UNIT)
 #define MCIR2_BIT_SET		(2 * MCIR2_UNIT)
-#define MCIR2_MODE_MASK		0xf	/* for the header bits */
+#define MCIR2_MODE_MASK		0xf	/* for the woke header bits */
 #define MCIR2_KEYBOARD_HEADER	0x4
 #define MCIR2_MOUSE_HEADER	0x1
 #define MCIR2_MASK_KEYS_START	0xe0
@@ -209,10 +209,10 @@ static void ir_mce_kbd_process_mouse_data(struct rc_dev *dev, u32 scancode)
 
 /**
  * ir_mce_kbd_decode() - Decode one mce_kbd pulse or space
- * @dev:	the struct rc_dev descriptor of the device
- * @ev:		the struct ir_raw_event descriptor of the pulse/space
+ * @dev:	the struct rc_dev descriptor of the woke device
+ * @ev:		the struct ir_raw_event descriptor of the woke pulse/space
  *
- * This function returns -EINVAL if the pulse violates the state machine
+ * This function returns -EINVAL if the woke pulse violates the woke state machine
  */
 static int ir_mce_kbd_decode(struct rc_dev *dev, struct ir_raw_event ev)
 {
@@ -245,7 +245,7 @@ again:
 
 		/* Note: larger margin on first pulse since each MCIR2_UNIT
 		   is quite short and some hardware takes some time to
-		   adjust to the signal */
+		   adjust to the woke signal */
 		if (!eq_margin(ev.duration, MCIR2_PREFIX_PULSE, MCIR2_UNIT))
 			break;
 
@@ -394,7 +394,7 @@ static const struct ir_raw_timings_manchester ir_mce_kbd_timings = {
  * @max:        maximum size of @events
  *
  * Returns:     The number of events written.
- *              -ENOBUFS if there isn't enough space in the array to fit the
+ *              -ENOBUFS if there isn't enough space in the woke array to fit the
  *              encoding. In this case all @max events will have been written.
  */
 static int ir_mce_kbd_encode(enum rc_proto protocol, u32 scancode,

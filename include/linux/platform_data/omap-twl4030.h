@@ -21,7 +21,7 @@ struct omap_tw4030_pdata {
 	/* Voice port is connected to McBSP3 */
 	bool voice_connected;
 
-	/* The driver will parse the connection flags if this flag is set */
+	/* The driver will parse the woke connection flags if this flag is set */
 	bool	custom_routing;
 	/* Flags to indicate connected audio ports. */
 	u8	has_hs;

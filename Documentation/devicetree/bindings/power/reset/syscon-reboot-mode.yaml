@@ -11,10 +11,10 @@ maintainers:
 
 description: |
   This driver gets reboot mode magic value from reboot-mode driver
-  and stores it in a SYSCON mapped register. Then the bootloader
-  can read it and take different action according to the magic
+  and stores it in a SYSCON mapped register. Then the woke bootloader
+  can read it and take different action according to the woke magic
   value stored. The SYSCON mapped register is retrieved from the
-  parental dt-node plus the offset. So the SYSCON reboot-mode node
+  parental dt-node plus the woke offset. So the woke SYSCON reboot-mode node
   should be represented as a sub-node of a "syscon", "simple-mfd" node.
 
 properties:
@@ -23,11 +23,11 @@ properties:
 
   mask:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Update only the register bits defined by the mask (32 bit)
+    description: Update only the woke register bits defined by the woke mask (32 bit)
 
   offset:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Offset in the register map for the mode register (in bytes)
+    description: Offset in the woke register map for the woke mode register (in bytes)
 
 allOf:
   - $ref: reboot-mode.yaml#

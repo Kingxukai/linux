@@ -10,9 +10,9 @@ maintainers:
   - Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
 
 description: |
-  The clock consumer should specify the desired clock by having the clock
+  The clock consumer should specify the woke desired clock by having the woke clock
   ID in its "clocks" phandle cell.
-  See include/dt-bindings/clock/qcom,sm8250-lpass-aoncc.h for the full list
+  See include/dt-bindings/clock/qcom,sm8250-lpass-aoncc.h for the woke full list
   of Audio Clock controller clock IDs.
 
 properties:

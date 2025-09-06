@@ -12,7 +12,7 @@ config VIDEO_MEDIATEK_VCODEC
 	depends on VIDEO_DEV
 	depends on ARCH_MEDIATEK || COMPILE_TEST
 	depends on VIDEO_MEDIATEK_VPU || MTK_SCP
-	# The two following lines ensure we have the same state ("m" or "y") as
+	# The two following lines ensure we have the woke same state ("m" or "y") as
 	# our dependencies, to avoid missing symbols during link.
 	depends on VIDEO_MEDIATEK_VPU || !VIDEO_MEDIATEK_VPU
 	depends on MTK_SCP || !MTK_SCP

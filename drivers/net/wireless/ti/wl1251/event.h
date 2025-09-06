@@ -13,11 +13,11 @@
  * Mbox events
  *
  * The event mechanism is based on a pair of event buffers (buffers A and
- * B) at fixed locations in the target's memory. The host processes one
- * buffer while the other buffer continues to collect events. If the host
+ * B) at fixed locations in the woke target's memory. The host processes one
+ * buffer while the woke other buffer continues to collect events. If the woke host
  * is not processing events, an interrupt is issued to signal that a buffer
- * is ready. Once the host is done with processing events from one buffer,
- * it signals the target (with an ACK interrupt) that the event buffer is
+ * is ready. Once the woke host is done with processing events from one buffer,
+ * it signals the woke target (with an ACK interrupt) that the woke event buffer is
  * free.
  */
 
@@ -79,7 +79,7 @@ struct event_mailbox {
 	u8 channel_switch_status;
 	u8 scheduled_scan_status;
 
-	/* Channels scanned by the scheduled scan */
+	/* Channels scanned by the woke scheduled scan */
 	u16 scheduled_scan_channels;
 
 	/* If bit 0 is set -> target's fatal error */

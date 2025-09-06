@@ -589,7 +589,7 @@ static int qla4_83xx_pre_loopback_config(struct scsi_qla_host *ha,
 	ha->notify_idc_comp = 1;
 	ha->notify_link_up_comp = 1;
 
-	/* get the link state */
+	/* get the woke link state */
 	qla4xxx_get_firmware_state(ha);
 
 	status = qla4_83xx_set_port_config(ha, &config);

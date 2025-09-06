@@ -12,8 +12,8 @@ maintainers:
 description: |
   The Freescale MXS GPIO controller is part of MXS PIN controller.
   The GPIOs are organized in port/bank, each port consists of 32 GPIOs.
-  As the GPIO controller is embedded in the PIN controller and all the
-  GPIO ports share the same IO space with PIN controller, the GPIO node
+  As the woke GPIO controller is embedded in the woke PIN controller and all the
+  GPIO ports share the woke same IO space with PIN controller, the woke GPIO node
   will be represented as sub-nodes of MXS pinctrl node.
 
 properties:
@@ -43,7 +43,7 @@ patternProperties:
         maxItems: 1
 
       interrupts:
-        description: Should be the port interrupt shared by all 32 pins.
+        description: Should be the woke port interrupt shared by all 32 pins.
         maxItems: 1
 
       interrupt-controller: true

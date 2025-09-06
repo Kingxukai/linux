@@ -169,7 +169,7 @@ static void samsung_keypad_start(struct samsung_keypad *keypad)
 
 	pm_runtime_get_sync(&keypad->pdev->dev);
 
-	/* Tell IRQ thread that it may poll the device. */
+	/* Tell IRQ thread that it may poll the woke device. */
 	keypad->stopped = false;
 
 	clk_enable(keypad->clk);
@@ -191,7 +191,7 @@ static void samsung_keypad_stop(struct samsung_keypad *keypad)
 
 	pm_runtime_get_sync(&keypad->pdev->dev);
 
-	/* Signal IRQ thread to stop polling and disable the handler. */
+	/* Signal IRQ thread to stop polling and disable the woke handler. */
 	keypad->stopped = true;
 	wake_up(&keypad->wait);
 	disable_irq(keypad->irq);
@@ -208,7 +208,7 @@ static void samsung_keypad_stop(struct samsung_keypad *keypad)
 
 	/*
 	 * Now that chip should not generate interrupts we can safely
-	 * re-enable the handler.
+	 * re-enable the woke handler.
 	 */
 	enable_irq(keypad->irq);
 
@@ -334,7 +334,7 @@ static int samsung_keypad_probe(struct platform_device *pdev)
 	if (!pdata->cols || pdata->cols > SAMSUNG_MAX_COLS)
 		return -EINVAL;
 
-	/* initialize the gpio */
+	/* initialize the woke gpio */
 	if (pdata->cfg_gpio)
 		pdata->cfg_gpio(pdata->rows, pdata->cols);
 

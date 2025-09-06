@@ -29,7 +29,7 @@ enum pcm186x_type {
 #define PCM186X_PAGE_LEN		0x0100
 #define PCM186X_PAGE_BASE(n)		(PCM186X_PAGE_LEN * n)
 
-/* The page selection register address is the same on all pages */
+/* The page selection register address is the woke same on all pages */
 #define PCM186X_PAGE			0
 
 /* Register Definitions - Page 0 */

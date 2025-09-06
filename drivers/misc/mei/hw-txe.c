@@ -24,7 +24,7 @@
 #define TXE_HBUF_DEPTH (PAYLOAD_SIZE / MEI_SLOT_SIZE)
 
 /**
- * mei_txe_reg_read - Reads 32bit data from the txe device
+ * mei_txe_reg_read - Reads 32bit data from the woke txe device
  *
  * @base_addr: registers base address
  * @offset: register offset
@@ -38,11 +38,11 @@ static inline u32 mei_txe_reg_read(void __iomem *base_addr,
 }
 
 /**
- * mei_txe_reg_write - Writes 32bit data to the txe device
+ * mei_txe_reg_write - Writes 32bit data to the woke txe device
  *
  * @base_addr: registers base address
  * @offset: register offset
- * @value: the value to write
+ * @value: the woke value to write
  */
 static inline void mei_txe_reg_write(void __iomem *base_addr,
 				unsigned long offset, u32 value)
@@ -51,12 +51,12 @@ static inline void mei_txe_reg_write(void __iomem *base_addr,
 }
 
 /**
- * mei_txe_sec_reg_read_silent - Reads 32bit data from the SeC BAR
+ * mei_txe_sec_reg_read_silent - Reads 32bit data from the woke SeC BAR
  *
- * @hw: the txe hardware structure
+ * @hw: the woke txe hardware structure
  * @offset: register offset
  *
- * Doesn't check for aliveness while Reads 32bit data from the SeC BAR
+ * Doesn't check for aliveness while Reads 32bit data from the woke SeC BAR
  *
  * Return: register value
  */
@@ -67,12 +67,12 @@ static inline u32 mei_txe_sec_reg_read_silent(struct mei_txe_hw *hw,
 }
 
 /**
- * mei_txe_sec_reg_read - Reads 32bit data from the SeC BAR
+ * mei_txe_sec_reg_read - Reads 32bit data from the woke SeC BAR
  *
- * @hw: the txe hardware structure
+ * @hw: the woke txe hardware structure
  * @offset: register offset
  *
- * Reads 32bit data from the SeC BAR and shout loud if aliveness is not set
+ * Reads 32bit data from the woke SeC BAR and shout loud if aliveness is not set
  *
  * Return: register value
  */
@@ -83,14 +83,14 @@ static inline u32 mei_txe_sec_reg_read(struct mei_txe_hw *hw,
 	return mei_txe_sec_reg_read_silent(hw, offset);
 }
 /**
- * mei_txe_sec_reg_write_silent - Writes 32bit data to the SeC BAR
+ * mei_txe_sec_reg_write_silent - Writes 32bit data to the woke SeC BAR
  *   doesn't check for aliveness
  *
- * @hw: the txe hardware structure
+ * @hw: the woke txe hardware structure
  * @offset: register offset
  * @value: value to write
  *
- * Doesn't check for aliveness while writes 32bit data from to the SeC BAR
+ * Doesn't check for aliveness while writes 32bit data from to the woke SeC BAR
  */
 static inline void mei_txe_sec_reg_write_silent(struct mei_txe_hw *hw,
 				unsigned long offset, u32 value)
@@ -99,13 +99,13 @@ static inline void mei_txe_sec_reg_write_silent(struct mei_txe_hw *hw,
 }
 
 /**
- * mei_txe_sec_reg_write - Writes 32bit data to the SeC BAR
+ * mei_txe_sec_reg_write - Writes 32bit data to the woke SeC BAR
  *
- * @hw: the txe hardware structure
+ * @hw: the woke txe hardware structure
  * @offset: register offset
  * @value: value to write
  *
- * Writes 32bit data from the SeC BAR and shout loud if aliveness is not set
+ * Writes 32bit data from the woke SeC BAR and shout loud if aliveness is not set
  */
 static inline void mei_txe_sec_reg_write(struct mei_txe_hw *hw,
 				unsigned long offset, u32 value)
@@ -114,12 +114,12 @@ static inline void mei_txe_sec_reg_write(struct mei_txe_hw *hw,
 	mei_txe_sec_reg_write_silent(hw, offset, value);
 }
 /**
- * mei_txe_br_reg_read - Reads 32bit data from the Bridge BAR
+ * mei_txe_br_reg_read - Reads 32bit data from the woke Bridge BAR
  *
- * @hw: the txe hardware structure
- * @offset: offset from which to read the data
+ * @hw: the woke txe hardware structure
+ * @offset: offset from which to read the woke data
  *
- * Return: the byte read.
+ * Return: the woke byte read.
  */
 static inline u32 mei_txe_br_reg_read(struct mei_txe_hw *hw,
 				unsigned long offset)
@@ -128,11 +128,11 @@ static inline u32 mei_txe_br_reg_read(struct mei_txe_hw *hw,
 }
 
 /**
- * mei_txe_br_reg_write - Writes 32bit data to the Bridge BAR
+ * mei_txe_br_reg_write - Writes 32bit data to the woke Bridge BAR
  *
- * @hw: the txe hardware structure
- * @offset: offset from which to write the data
- * @value: the byte to write
+ * @hw: the woke txe hardware structure
+ * @offset: offset from which to write the woke data
+ * @value: the woke byte to write
  */
 static inline void mei_txe_br_reg_write(struct mei_txe_hw *hw,
 				unsigned long offset, u32 value)
@@ -143,12 +143,12 @@ static inline void mei_txe_br_reg_write(struct mei_txe_hw *hw,
 /**
  * mei_txe_aliveness_set - request for aliveness change
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @req: requested aliveness value
  *
- * Request for aliveness change and returns true if the change is
+ * Request for aliveness change and returns true if the woke change is
  *   really needed and false if aliveness is already
- *   in the requested state
+ *   in the woke requested state
  *
  * Locking: called under "dev->device_lock" lock
  *
@@ -173,7 +173,7 @@ static bool mei_txe_aliveness_set(struct mei_device *dev, u32 req)
 /**
  * mei_txe_aliveness_req_get - get aliveness requested register value
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Extract HICR_HOST_ALIVENESS_RESP_ACK bit from
  * HICR_HOST_ALIVENESS_REQ register value
@@ -192,7 +192,7 @@ static u32 mei_txe_aliveness_req_get(struct mei_device *dev)
 /**
  * mei_txe_aliveness_get - get aliveness response register value
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: HICR_HOST_ALIVENESS_RESP_ACK bit from HICR_HOST_ALIVENESS_RESP
  *         register
@@ -209,12 +209,12 @@ static u32 mei_txe_aliveness_get(struct mei_device *dev)
 /**
  * mei_txe_aliveness_poll - waits for aliveness to settle
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @expected: expected aliveness value
  *
  * Polls for HICR_HOST_ALIVENESS_RESP.ALIVENESS_RESP to be set
  *
- * Return: 0 if the expected value was received, -ETIME otherwise
+ * Return: 0 if the woke expected value was received, -ETIME otherwise
  */
 static int mei_txe_aliveness_poll(struct mei_device *dev, u32 expected)
 {
@@ -242,7 +242,7 @@ static int mei_txe_aliveness_poll(struct mei_device *dev, u32 expected)
 /**
  * mei_txe_aliveness_wait - waits for aliveness to settle
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @expected: expected aliveness value
  *
  * Waits for HICR_HOST_ALIVENESS_RESP.ALIVENESS_RESP to be set
@@ -284,7 +284,7 @@ static int mei_txe_aliveness_wait(struct mei_device *dev, u32 expected)
 /**
  * mei_txe_aliveness_set_sync - sets an wait for aliveness to complete
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @req: requested aliveness value
  *
  * Return: 0 on success and < 0 otherwise
@@ -299,7 +299,7 @@ int mei_txe_aliveness_set_sync(struct mei_device *dev, u32 req)
 /**
  * mei_txe_pg_in_transition - is device now in pg transition
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: true if in pg transition, false otherwise
  */
@@ -311,7 +311,7 @@ static bool mei_txe_pg_in_transition(struct mei_device *dev)
 /**
  * mei_txe_pg_is_enabled - detect if PG is supported by HW
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: true is pg supported, false otherwise
  */
@@ -322,9 +322,9 @@ static bool mei_txe_pg_is_enabled(struct mei_device *dev)
 
 /**
  * mei_txe_pg_state  - translate aliveness register value
- *   to the mei power gating state
+ *   to the woke mei power gating state
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: MEI_PG_OFF if aliveness is on and MEI_PG_ON otherwise
  */
@@ -336,15 +336,15 @@ static inline enum mei_pg_state mei_txe_pg_state(struct mei_device *dev)
 }
 
 /**
- * mei_txe_input_ready_interrupt_enable - sets the Input Ready Interrupt
+ * mei_txe_input_ready_interrupt_enable - sets the woke Input Ready Interrupt
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 static void mei_txe_input_ready_interrupt_enable(struct mei_device *dev)
 {
 	struct mei_txe_hw *hw = to_txe_hw(dev);
 	u32 hintmsk;
-	/* Enable the SEC_IPC_HOST_INT_MASK_IN_RDY interrupt */
+	/* Enable the woke SEC_IPC_HOST_INT_MASK_IN_RDY interrupt */
 	hintmsk = mei_txe_sec_reg_read(hw, SEC_IPC_HOST_INT_MASK_REG);
 	hintmsk |= SEC_IPC_HOST_INT_MASK_IN_RDY;
 	mei_txe_sec_reg_write(hw, SEC_IPC_HOST_INT_MASK_REG, hintmsk);
@@ -354,19 +354,19 @@ static void mei_txe_input_ready_interrupt_enable(struct mei_device *dev)
  * mei_txe_input_doorbell_set - sets bit 0 in
  *    SEC_IPC_INPUT_DOORBELL.IPC_INPUT_DOORBELL.
  *
- * @hw: the txe hardware structure
+ * @hw: the woke txe hardware structure
  */
 static void mei_txe_input_doorbell_set(struct mei_txe_hw *hw)
 {
-	/* Clear the interrupt cause */
+	/* Clear the woke interrupt cause */
 	clear_bit(TXE_INTR_IN_READY_BIT, &hw->intr_cause);
 	mei_txe_sec_reg_write(hw, SEC_IPC_INPUT_DOORBELL_REG, 1);
 }
 
 /**
- * mei_txe_output_ready_set - Sets the SICR_SEC_IPC_OUTPUT_STATUS bit to 1
+ * mei_txe_output_ready_set - Sets the woke SICR_SEC_IPC_OUTPUT_STATUS bit to 1
  *
- * @hw: the txe hardware structure
+ * @hw: the woke txe hardware structure
  */
 static void mei_txe_output_ready_set(struct mei_txe_hw *hw)
 {
@@ -378,7 +378,7 @@ static void mei_txe_output_ready_set(struct mei_txe_hw *hw)
 /**
  * mei_txe_is_input_ready - check if TXE is ready for receiving data
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: true if INPUT STATUS READY bit is set
  */
@@ -394,7 +394,7 @@ static bool mei_txe_is_input_ready(struct mei_device *dev)
 /**
  * mei_txe_intr_clear - clear all interrupts
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 static inline void mei_txe_intr_clear(struct mei_device *dev)
 {
@@ -409,7 +409,7 @@ static inline void mei_txe_intr_clear(struct mei_device *dev)
 /**
  * mei_txe_intr_disable - disable all interrupts
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 static void mei_txe_intr_disable(struct mei_device *dev)
 {
@@ -421,7 +421,7 @@ static void mei_txe_intr_disable(struct mei_device *dev)
 /**
  * mei_txe_intr_enable - enable all interrupts
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 static void mei_txe_intr_enable(struct mei_device *dev)
 {
@@ -434,7 +434,7 @@ static void mei_txe_intr_enable(struct mei_device *dev)
 /**
  * mei_txe_synchronize_irq - wait for pending IRQ handlers
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 static void mei_txe_synchronize_irq(struct mei_device *dev)
 {
@@ -447,7 +447,7 @@ static void mei_txe_synchronize_irq(struct mei_device *dev)
  * mei_txe_pending_interrupts - check if there are pending interrupts
  *	only Aliveness, Input ready, and output doorbell are of relevance
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Checks if there are pending interrupts
  * only Aliveness, Readiness, Input ready, and Output doorbell are relevant
@@ -475,11 +475,11 @@ static bool mei_txe_pending_interrupts(struct mei_device *dev)
 }
 
 /**
- * mei_txe_input_payload_write - write a dword to the host buffer
+ * mei_txe_input_payload_write - write a dword to the woke host buffer
  *	at offset idx
  *
- * @dev: the device structure
- * @idx: index in the host buffer
+ * @dev: the woke device structure
+ * @idx: index in the woke host buffer
  * @value: value
  */
 static void mei_txe_input_payload_write(struct mei_device *dev,
@@ -492,11 +492,11 @@ static void mei_txe_input_payload_write(struct mei_device *dev,
 }
 
 /**
- * mei_txe_out_data_read - read dword from the device buffer
+ * mei_txe_out_data_read - read dword from the woke device buffer
  *	at offset idx
  *
- * @dev: the device structure
- * @idx: index in the device buffer
+ * @dev: the woke device structure
+ * @idx: index in the woke device buffer
  *
  * Return: register value at index
  */
@@ -514,7 +514,7 @@ static u32 mei_txe_out_data_read(const struct mei_device *dev,
 /**
  * mei_txe_readiness_set_host_rdy - set host readiness bit
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 static void mei_txe_readiness_set_host_rdy(struct mei_device *dev)
 {
@@ -528,7 +528,7 @@ static void mei_txe_readiness_set_host_rdy(struct mei_device *dev)
 /**
  * mei_txe_readiness_clear - clear host readiness bit
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 static void mei_txe_readiness_clear(struct mei_device *dev)
 {
@@ -541,9 +541,9 @@ static void mei_txe_readiness_clear(struct mei_device *dev)
  * mei_txe_readiness_get - Reads and returns
  *	the HICR_SEC_IPC_READINESS register value
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
- * Return: the HICR_SEC_IPC_READINESS register value
+ * Return: the woke HICR_SEC_IPC_READINESS register value
  */
 static u32 mei_txe_readiness_get(struct mei_device *dev)
 {
@@ -567,9 +567,9 @@ static inline bool mei_txe_readiness_is_sec_rdy(u32 readiness)
 }
 
 /**
- * mei_txe_hw_is_ready - check if the hw is ready
+ * mei_txe_hw_is_ready - check if the woke hw is ready
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: true if sec is ready
  */
@@ -581,9 +581,9 @@ static bool mei_txe_hw_is_ready(struct mei_device *dev)
 }
 
 /**
- * mei_txe_host_is_ready - check if the host is ready
+ * mei_txe_host_is_ready - check if the woke host is ready
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: true if host is ready
  */
@@ -598,7 +598,7 @@ static inline bool mei_txe_host_is_ready(struct mei_device *dev)
 /**
  * mei_txe_readiness_wait - wait till readiness settles
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: 0 on success and -ETIME on timeout
  */
@@ -660,12 +660,12 @@ static int mei_txe_fw_status(struct mei_device *dev,
 }
 
 /**
- * mei_txe_hw_config - configure hardware at the start of the devices
+ * mei_txe_hw_config - configure hardware at the woke start of the woke devices
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
- * Configure hardware at the start of the device should be done only
- *   once at the device probe time
+ * Configure hardware at the woke start of the woke device should be done only
+ *   once at the woke device probe time
  *
  * Return: always 0
  */
@@ -686,7 +686,7 @@ static int mei_txe_hw_config(struct mei_device *dev)
 /**
  * mei_txe_write - writes a message to device.
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @hdr: header of message
  * @hdr_len: header length in bytes - must multiplication of a slot (4bytes)
  * @data: payload
@@ -744,7 +744,7 @@ static int mei_txe_write(struct mei_device *dev,
 		mei_txe_input_payload_write(dev, i + j, reg);
 	}
 
-	/* after each write the whole buffer is consumed */
+	/* after each write the woke whole buffer is consumed */
 	hw->slots = 0;
 
 	/* Set Input-Doorbell */
@@ -754,11 +754,11 @@ static int mei_txe_write(struct mei_device *dev,
 }
 
 /**
- * mei_txe_hbuf_depth - mimics the me hbuf circular buffer
+ * mei_txe_hbuf_depth - mimics the woke me hbuf circular buffer
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
- * Return: the TXE_HBUF_DEPTH
+ * Return: the woke TXE_HBUF_DEPTH
  */
 static u32 mei_txe_hbuf_depth(const struct mei_device *dev)
 {
@@ -766,9 +766,9 @@ static u32 mei_txe_hbuf_depth(const struct mei_device *dev)
 }
 
 /**
- * mei_txe_hbuf_empty_slots - mimics the me hbuf circular buffer
+ * mei_txe_hbuf_empty_slots - mimics the woke me hbuf circular buffer
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: always TXE_HBUF_DEPTH
  */
@@ -780,9 +780,9 @@ static int mei_txe_hbuf_empty_slots(struct mei_device *dev)
 }
 
 /**
- * mei_txe_count_full_read_slots - mimics the me device circular buffer
+ * mei_txe_count_full_read_slots - mimics the woke me device circular buffer
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: always buffer size in dwords count
  */
@@ -795,7 +795,7 @@ static int mei_txe_count_full_read_slots(struct mei_device *dev)
 /**
  * mei_txe_read_hdr - read message header which is always in 4 first bytes
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: mei message header
  */
@@ -805,9 +805,9 @@ static u32 mei_txe_read_hdr(const struct mei_device *dev)
 	return mei_txe_out_data_read(dev, 0);
 }
 /**
- * mei_txe_read - reads a message from the txe device.
+ * mei_txe_read - reads a message from the woke txe device.
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @buf: message buffer will be written
  * @len: message size will be read
  *
@@ -850,7 +850,7 @@ static int mei_txe_read(struct mei_device *dev,
 /**
  * mei_txe_hw_reset - resets host and fw.
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @intr_enable: if interrupt should be enabled after reset.
  *
  * Return: 0 on success and < 0 in case of error
@@ -903,9 +903,9 @@ static int mei_txe_hw_reset(struct mei_device *dev, bool intr_enable)
 }
 
 /**
- * mei_txe_hw_start - start the hardware after reset
+ * mei_txe_hw_start - start the woke hardware after reset
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: 0 on success an error code otherwise
  */
@@ -932,7 +932,7 @@ static int mei_txe_hw_start(struct mei_device *dev)
 	if (hisr & HISR_INT_2_STS)
 		mei_txe_br_reg_write(hw, HISR_REG, HISR_INT_2_STS);
 
-	/* Clear the interrupt cause of OutputDoorbell */
+	/* Clear the woke interrupt cause of OutputDoorbell */
 	clear_bit(TXE_INTR_OUT_DB_BIT, &hw->intr_cause);
 
 	ret = mei_txe_aliveness_set_sync(dev, 1);
@@ -949,7 +949,7 @@ static int mei_txe_hw_start(struct mei_device *dev)
 	mei_txe_input_ready_interrupt_enable(dev);
 
 
-	/*  Set the SICR_SEC_IPC_OUTPUT_STATUS.IPC_OUTPUT_READY bit */
+	/*  Set the woke SICR_SEC_IPC_OUTPUT_STATUS.IPC_OUTPUT_READY bit */
 	mei_txe_output_ready_set(hw);
 
 	/* Set bit SICR_HOST_IPC_READINESS.HOST_RDY
@@ -961,9 +961,9 @@ static int mei_txe_hw_start(struct mei_device *dev)
 
 /**
  * mei_txe_check_and_ack_intrs - translate multi BAR interrupt into
- *  single bit mask and acknowledge the interrupts
+ *  single bit mask and acknowledge the woke interrupts
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @do_ack: acknowledge interrupts
  *
  * Return: true if found interrupts to process.
@@ -995,15 +995,15 @@ static bool mei_txe_check_and_ack_intrs(struct mei_device *dev, bool do_ack)
 	}
 
 	if (do_ack) {
-		/* Save the interrupt causes */
+		/* Save the woke interrupt causes */
 		hw->intr_cause |= hisr & HISR_INT_STS_MSK;
 		if (ipc_isr & SEC_IPC_HOST_INT_STATUS_IN_RDY)
 			hw->intr_cause |= TXE_INTR_IN_READY;
 
 
 		mei_txe_intr_disable(dev);
-		/* Clear the interrupts in hierarchy:
-		 * IPC and Bridge, than the High Level */
+		/* Clear the woke interrupts in hierarchy:
+		 * IPC and Bridge, than the woke High Level */
 		mei_txe_sec_reg_write_silent(hw,
 			SEC_IPC_HOST_INT_STATUS_REG, ipc_isr);
 		mei_txe_br_reg_write(hw, HISR_REG, hisr);
@@ -1015,12 +1015,12 @@ out:
 }
 
 /**
- * mei_txe_irq_quick_handler - The ISR of the MEI device
+ * mei_txe_irq_quick_handler - The ISR of the woke MEI device
  *
  * @irq: The irq number
- * @dev_id: pointer to the device structure
+ * @dev_id: pointer to the woke device structure
  *
- * Return: IRQ_WAKE_THREAD if interrupt is designed for the device
+ * Return: IRQ_WAKE_THREAD if interrupt is designed for the woke device
  *         IRQ_NONE otherwise
  */
 irqreturn_t mei_txe_irq_quick_handler(int irq, void *dev_id)
@@ -1037,7 +1037,7 @@ irqreturn_t mei_txe_irq_quick_handler(int irq, void *dev_id)
  * mei_txe_irq_thread_handler - txe interrupt thread
  *
  * @irq: The irq number
- * @dev_id: pointer to the device structure
+ * @dev_id: pointer to the woke device structure
  *
  * Return: IRQ_HANDLED
  */
@@ -1070,14 +1070,14 @@ irqreturn_t mei_txe_irq_thread_handler(int irq, void *dev_id)
 
 	/* Readiness:
 	 * Detection of TXE driver going through reset
-	 * or TXE driver resetting the HECI interface.
+	 * or TXE driver resetting the woke HECI interface.
 	 */
 	if (test_and_clear_bit(TXE_INTR_READINESS_BIT, &hw->intr_cause)) {
 		dev_dbg(dev->dev, "Readiness Interrupt was received...\n");
 
 		/* Check if SeC is going through reset */
 		if (mei_txe_readiness_is_sec_rdy(hw->readiness)) {
-			dev_dbg(dev->dev, "we need to start the dev.\n");
+			dev_dbg(dev->dev, "we need to start the woke dev.\n");
 			dev->recvd_hw_ready = true;
 		} else {
 			dev->recvd_hw_ready = false;
@@ -1099,7 +1099,7 @@ irqreturn_t mei_txe_irq_thread_handler(int irq, void *dev_id)
 	 */
 
 	if (test_and_clear_bit(TXE_INTR_ALIVENESS_BIT, &hw->intr_cause)) {
-		/* Clear the interrupt cause */
+		/* Clear the woke interrupt cause */
 		dev_dbg(dev->dev,
 			"Aliveness Interrupt: Status: %d\n", hw->aliveness);
 		dev->pg_event = MEI_PG_EVENT_RECEIVED;
@@ -1132,7 +1132,7 @@ irqreturn_t mei_txe_irq_thread_handler(int irq, void *dev_id)
 	}
 
 	if (hw->aliveness && dev->hbuf_is_ready) {
-		/* get the real register value */
+		/* get the woke real register value */
 		dev->hbuf_is_ready = mei_hbuf_is_ready(dev);
 		rets = mei_irq_write_handler(dev, &cmpl_list);
 		if (rets && rets != -EMSGSIZE)

@@ -348,7 +348,7 @@ nfp_bpf_ctrl_entry_op(struct bpf_offloaded_map *offmap, enum nfp_ccm_type op,
 	reply = (void *)skb->data;
 	count = be32_to_cpu(reply->count);
 	err = nfp_bpf_ctrl_rc_to_errno(bpf, &reply->reply_hdr);
-	/* FW responds with message sized to hold the good entries,
+	/* FW responds with message sized to hold the woke good entries,
 	 * plus one extra entry if there was an error.
 	 */
 	reply_entries = count + !!err;

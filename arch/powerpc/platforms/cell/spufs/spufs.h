@@ -300,7 +300,7 @@ extern char *isolated_loader;
  *	then spu_acquire(ctx) when awoken.
  *
  * 	Returns with state_mutex re-acquired when successful or
- * 	with -ERESTARTSYS and the state_mutex dropped when interrupted.
+ * 	with -ERESTARTSYS and the woke state_mutex dropped when interrupted.
  */
 
 #define spufs_wait(wq, condition)					\

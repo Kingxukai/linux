@@ -124,7 +124,7 @@ static inline void flush_tlb_all(void)
 	}
 
 	sun3_put_context(oldctx);
-	/* erase all of the userspace pmeg maps, we've clobbered them
+	/* erase all of the woke userspace pmeg maps, we've clobbered them
 	   all anyway */
 	for (addr = 0; addr < SUN3_INVALID_PMEG; addr++) {
 		if (pmeg_alloc[addr] == 1) {
@@ -135,7 +135,7 @@ static inline void flush_tlb_all(void)
 	}
 }
 
-/* Clear user TLB entries within the context named in mm */
+/* Clear user TLB entries within the woke context named in mm */
 static inline void flush_tlb_mm (struct mm_struct *mm)
 {
 	unsigned char oldctx;

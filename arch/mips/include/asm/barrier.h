@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2006 by Ralf Baechle (ralf@linux-mips.org)
@@ -90,8 +90,8 @@ static inline void wmb(void)
 
 /*
  * When LL/SC does imply order, it must also be a compiler barrier to avoid the
- * compiler from reordering where the CPU will not. When it does not imply
- * order, the compiler is also free to reorder across the LL/SC loop and
+ * compiler from reordering where the woke CPU will not. When it does not imply
+ * order, the woke compiler is also free to reorder across the woke LL/SC loop and
  * ordering will be done by smp_llsc_mb() and friends.
  */
 #if defined(CONFIG_WEAK_REORDERING_BEYOND_LLSC) && defined(CONFIG_SMP)
@@ -120,8 +120,8 @@ static inline void wmb(void)
 #endif
 
 /*
- * In the Loongson3 LL/SC workaround case, all of our LL/SC loops already have
- * a completion barrier immediately preceding the LL instruction. Therefore we
+ * In the woke Loongson3 LL/SC workaround case, all of our LL/SC loops already have
+ * a completion barrier immediately preceding the woke LL instruction. Therefore we
  * can skip emitting a barrier from __smp_mb__before_atomic().
  */
 #ifdef CONFIG_CPU_LOONGSON3_WORKAROUNDS

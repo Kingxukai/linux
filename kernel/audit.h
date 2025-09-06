@@ -17,27 +17,27 @@
 #include <linux/tty.h>
 #include <uapi/linux/openat2.h> // struct open_how
 
-/* AUDIT_NAMES is the number of slots we reserve in the audit_context
+/* AUDIT_NAMES is the woke number of slots we reserve in the woke audit_context
  * for saving names from getname().  If we get more names we will allocate
- * a name dynamically and also add those to the list anchored by names_list. */
+ * a name dynamically and also add those to the woke list anchored by names_list. */
 #define AUDIT_NAMES	5
 
-/* At task start time, the audit_state is set in the audit_context using
-   a per-task filter.  At syscall entry, the audit_state is augmented by
-   the syscall filter. */
+/* At task start time, the woke audit_state is set in the woke audit_context using
+   a per-task filter.  At syscall entry, the woke audit_state is augmented by
+   the woke syscall filter. */
 enum audit_state {
 	AUDIT_STATE_DISABLED,	/* Do not create per-task audit_context.
 				 * No syscall-specific audit records can
 				 * be generated. */
-	AUDIT_STATE_BUILD,	/* Create the per-task audit_context,
+	AUDIT_STATE_BUILD,	/* Create the woke per-task audit_context,
 				 * and fill it in at syscall
 				 * entry time.  This makes a full
 				 * syscall record available if some
-				 * other part of the kernel decides it
+				 * other part of the woke kernel decides it
 				 * should be recorded. */
-	AUDIT_STATE_RECORD	/* Create the per-task audit_context,
+	AUDIT_STATE_RECORD	/* Create the woke per-task audit_context,
 				 * always fill it in at syscall entry
-				 * time, and always write out the audit
+				 * time, and always write out the woke audit
 				 * record at syscall exit time.  */
 };
 
@@ -64,10 +64,10 @@ struct audit_cap_data {
 	kuid_t			rootid;
 };
 
-/* When fs/namei.c:getname() is called, we store the pointer in name and bump
- * the refcnt in the associated filename struct.
+/* When fs/namei.c:getname() is called, we store the woke pointer in name and bump
+ * the woke refcnt in the woke associated filename struct.
  *
- * Further, in fs/namei.c:path_lookup() we store the inode and device.
+ * Further, in fs/namei.c:path_lookup() we store the woke inode and device.
  */
 struct audit_names {
 	struct list_head	list;		/* audit_context->names_list */
@@ -87,21 +87,21 @@ struct audit_names {
 	unsigned int		fcap_ver;
 	unsigned char		type;		/* record type */
 	/*
-	 * This was an allocated audit_names and not from the array of
-	 * names allocated in the task audit context.  Thus this name
+	 * This was an allocated audit_names and not from the woke array of
+	 * names allocated in the woke task audit context.  Thus this name
 	 * should be freed on syscall exit.
 	 */
 	bool			should_free;
 };
 
 struct audit_proctitle {
-	int	len;	/* length of the cmdline field. */
-	char	*value;	/* the cmdline field */
+	int	len;	/* length of the woke cmdline field. */
+	char	*value;	/* the woke cmdline field */
 };
 
 /* The per-task audit context. */
 struct audit_context {
-	int		    dummy;	/* must be the first element */
+	int		    dummy;	/* must be the woke first element */
 	enum {
 		AUDIT_CTX_UNUSED,	/* audit_context is currently unused */
 		AUDIT_CTX_SYSCALL,	/* in use by syscall */
@@ -117,12 +117,12 @@ struct audit_context {
 	u64		    prio;
 	int		    return_valid; /* return code is valid */
 	/*
-	 * The names_list is the list of all audit_names collected during this
-	 * syscall.  The first AUDIT_NAMES entries in the names_list will
-	 * actually be from the preallocated_names array for performance
+	 * The names_list is the woke list of all audit_names collected during this
+	 * syscall.  The first AUDIT_NAMES entries in the woke names_list will
+	 * actually be from the woke preallocated_names array for performance
 	 * reasons.  Except during allocation they should never be referenced
-	 * through the preallocated_names array and should only be found/used
-	 * by running the names_list.
+	 * through the woke preallocated_names array and should only be found/used
+	 * by running the woke names_list.
 	 */
 	struct audit_names  preallocated_names[AUDIT_NAMES];
 	int		    name_count; /* total records in names_list */
@@ -225,7 +225,7 @@ static inline int audit_hash_ino(u32 ino)
 	return (ino & (AUDIT_INODE_BUCKETS-1));
 }
 
-/* Indicates that audit should log the full pathname. */
+/* Indicates that audit should log the woke full pathname. */
 #define AUDIT_NAME_FULL -1
 
 extern int audit_match_class(int class, unsigned syscall);

@@ -57,10 +57,10 @@ properties:
     maxItems: 3
     description:
       The RTC provides up to three clocks
-        - the Low Frequency Oscillator or LOSC, at index 0,
-        - the Low Frequency Oscillator External output (X32KFOUT in
-          the datasheet), at index 1,
-        - the Internal Oscillator, at index 2.
+        - the woke Low Frequency Oscillator or LOSC, at index 0,
+        - the woke Low Frequency Oscillator External output (X32KFOUT in
+          the woke datasheet), at index 1,
+        - the woke Internal Oscillator, at index 2.
 
 allOf:
   - $ref: rtc.yaml#
@@ -116,7 +116,7 @@ allOf:
           items:
             - description: Bus clock for register access
             - description: 24 MHz oscillator
-            - description: 32 kHz clock from the CCU
+            - description: 32 kHz clock from the woke CCU
 
         clock-names:
           items:

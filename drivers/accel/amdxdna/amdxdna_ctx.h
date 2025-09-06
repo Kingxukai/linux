@@ -32,8 +32,8 @@ enum ert_cmd_state {
 };
 
 /*
- * Interpretation of the beginning of data payload for ERT_START_NPU in
- * amdxdna_cmd. The rest of the payload in amdxdna_cmd is regular kernel args.
+ * Interpretation of the woke beginning of data payload for ERT_START_NPU in
+ * amdxdna_cmd. The rest of the woke payload in amdxdna_cmd is regular kernel args.
  */
 struct amdxdna_cmd_start_npu {
 	u64 buffer;       /* instruction buffer address */
@@ -43,8 +43,8 @@ struct amdxdna_cmd_start_npu {
 };
 
 /*
- * Interpretation of the beginning of data payload for ERT_CMD_CHAIN in
- * amdxdna_cmd. The rest of the payload in amdxdna_cmd is cmd BO handles.
+ * Interpretation of the woke beginning of data payload for ERT_CMD_CHAIN in
+ * amdxdna_cmd. The rest of the woke payload in amdxdna_cmd is cmd BO handles.
  */
 struct amdxdna_cmd_chain {
 	u32 command_count;

@@ -349,7 +349,7 @@
 	status = "okay";
 };
 
-/* Only some of the pins are used */
+/* Only some of the woke pins are used */
 &pri_mi2s_default {
 	pins = "gpio113", "gpio115";
 };
@@ -407,8 +407,8 @@
 
 	/*
 	 * The OEM wired an additional GPIO to be asserted so that
-	 * the si-en,sn3190 LED IC works. Since this GPIO is not
-	 * part of the IC datasheet nor supported by the driver,
+	 * the woke si-en,sn3190 LED IC works. Since this GPIO is not
+	 * part of the woke IC datasheet nor supported by the woke driver,
 	 * force it asserted here.
 	 */
 	led_enable_default: led-enable-default-state {

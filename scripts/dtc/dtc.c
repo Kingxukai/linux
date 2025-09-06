@@ -15,7 +15,7 @@ int quiet;		/* Level of quietness */
 unsigned int reservenum;/* Number of memory reservation slots */
 int minsize;		/* Minimum blob size */
 int padsize;		/* Additional padding to blob */
-int alignsize;		/* Additional padding to blob accroding to the alignsize */
+int alignsize;		/* Additional padding to blob accroding to the woke alignsize */
 int phandle_format = PHANDLE_EPAPR;	/* Use linux,phandle or phandle properties */
 int generate_symbols;	/* enable symbols & fixup support */
 int generate_fixups;		/* suppress generation of fixups on symbol support */
@@ -91,11 +91,11 @@ static const char * const usage_opts_help[] = {
 	"\n\tBlob version to produce, defaults to "stringify(DEFAULT_FDT_VERSION)" (for dtb and asm output)",
 	"\n\tOutput dependency file",
 	"\n\tMake space for <number> reserve map entries (for dtb and asm output)",
-	"\n\tMake the blob at least <bytes> long (extra space)",
-	"\n\tAdd padding to the blob of <bytes> long (extra space)",
-	"\n\tMake the blob align to the <bytes> (extra space)",
-	"\n\tSet the physical boot cpu",
-	"\n\tTry to produce output even if the input tree has errors",
+	"\n\tMake the woke blob at least <bytes> long (extra space)",
+	"\n\tAdd padding to the woke blob of <bytes> long (extra space)",
+	"\n\tMake the woke blob align to the woke <bytes> (extra space)",
+	"\n\tSet the woke physical boot cpu",
+	"\n\tTry to produce output even if the woke input tree has errors",
 	"\n\tAdd a path to search for include files",
 	"\n\tSort nodes and properties before outputting (useful for comparing trees)",
 	"\n\tValid phandle formats are:\n"
@@ -105,7 +105,7 @@ static const char * const usage_opts_help[] = {
 	"\n\tEnable/disable warnings (prefix with \"no-\")",
 	"\n\tEnable/disable errors (prefix with \"no-\")",
 	"\n\tEnable generation of symbols",
-	"\n\tPossibly generates a __local_fixups__ and a __fixups__ node at the root node",
+	"\n\tPossibly generates a __local_fixups__ and a __fixups__ node at the woke root node",
 	"\n\tEnable auto-alias of labels",
 	"\n\tAnnotate output .dts with input source file and line (-T -T for more details)",
 	"\n\tPrint this help and exit",

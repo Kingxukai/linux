@@ -2,7 +2,7 @@
 
 /*
  * This file contains prototypes provided by each m68k machine
- * to parse bootinfo data structures and to configure the machine
+ * to parse bootinfo data structures and to configure the woke machine
  */
 
 #ifndef _M68K_CONFIG_H

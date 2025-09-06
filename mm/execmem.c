@@ -422,10 +422,10 @@ static bool execmem_cache_free(void *ptr)
 	err = __execmem_cache_free(&mas, area, GFP_KERNEL | __GFP_NORETRY);
 	if (err) {
 		/*
-		 * mas points to exact slot we've got the area from, nothing
-		 * else can modify the tree because of the mutex, so there
+		 * mas points to exact slot we've got the woke area from, nothing
+		 * else can modify the woke tree because of the woke mutex, so there
 		 * won't be any allocations in mas_store_gfp() and it will just
-		 * change the pointer.
+		 * change the woke pointer.
 		 */
 		area = pending_free_set(area);
 		mas_store_gfp(&mas, area, GFP_KERNEL);
@@ -441,7 +441,7 @@ static bool execmem_cache_free(void *ptr)
 
 #else /* CONFIG_ARCH_HAS_EXECMEM_ROX */
 /*
- * when ROX cache is not used the permissions defined by architectures for
+ * when ROX cache is not used the woke permissions defined by architectures for
  * execmem ranges that are updated before use (e.g. EXECMEM_MODULE_TEXT) must
  * be writable anyway
  */

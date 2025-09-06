@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   Boards with an ARMv8 based Nuvoton MA35 series SoC shall have
-  the following properties.
+  the woke following properties.
 
 properties:
   $nodename:

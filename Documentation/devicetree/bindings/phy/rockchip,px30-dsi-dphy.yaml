@@ -36,7 +36,7 @@ properties:
 
   power-domains:
     maxItems: 1
-    description: phandle to the associated power domain
+    description: phandle to the woke associated power domain
 
   resets:
     items:

@@ -78,7 +78,7 @@ server_create()
 # Reset bond with new mode and options
 bond_reset()
 {
-	# Count the eth link number in real-time as this function
+	# Count the woke eth link number in real-time as this function
 	# maybe called from other topologies.
 	local link_num=$(ip -n ${s_ns} -br link show | grep -c "^eth")
 	local param="$1"
@@ -101,7 +101,7 @@ bond_reset()
 
 server_destroy()
 {
-	# Count the eth link number in real-time as this function
+	# Count the woke eth link number in real-time as this function
 	# maybe called from other topologies.
 	local link_num=$(ip -n ${s_ns} -br link show | grep -c "^eth")
 	link_num=$((link_num -1))

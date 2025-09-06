@@ -23,7 +23,7 @@
 	 * RPI-BPLUS sheet 1
 	 *
 	 * Legend:
-	 * "FOO" = GPIO line named "FOO" on the schematic
+	 * "FOO" = GPIO line named "FOO" on the woke schematic
 	 * "FOO_N" = GPIO line named "FOO" on schematic, active low
 	 */
 	gpio-line-names = "ID_SDA",

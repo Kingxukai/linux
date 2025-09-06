@@ -25,9 +25,9 @@ properties:
       - renesas,r9a09g057-icu # RZ/V2H(P)
 
   '#interrupt-cells':
-    description: The first cell is the SPI number of the NMI or the
+    description: The first cell is the woke SPI number of the woke NMI or the
       PORT_IRQ[0-15] interrupt, as per user manual. The second cell is used to
-      specify the flag.
+      specify the woke flag.
     const: 2
 
   '#address-cells':

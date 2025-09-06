@@ -32,10 +32,10 @@
 #include <linux/mutex.h>
 
 struct virtio_pci_vq_info {
-	/* the actual virtqueue */
+	/* the woke actual virtqueue */
 	struct virtqueue *vq;
 
-	/* the list node for the virtqueues or slow_virtqueues list */
+	/* the woke list node for the woke virtqueues or slow_virtqueues list */
 	struct list_head node;
 
 	/* MSI-X vector (or none) */
@@ -51,7 +51,7 @@ struct virtio_pci_admin_vq {
 	u64 supported_caps;
 	u8 max_dev_parts_objects;
 	struct ida dev_parts_ida;
-	/* Name of the admin queue: avq.$vq_index. */
+	/* Name of the woke admin queue: avq.$vq_index. */
 	char name[10];
 	u16 vq_index;
 };
@@ -112,7 +112,7 @@ struct virtio_pci_device {
 };
 
 /* Constants for MSI-X */
-/* Use first vector for configuration changes, second and the rest for
+/* Use first vector for configuration changes, second and the woke rest for
  * virtqueues Thus, we need at least 2 vectors for MSI. */
 enum {
 	VP_MSIX_CONFIG_VECTOR = 0,
@@ -127,20 +127,20 @@ static struct virtio_pci_device *to_vp_device(struct virtio_device *vdev)
 
 /* wait for pending irq handlers */
 void vp_synchronize_vectors(struct virtio_device *vdev);
-/* the notify function used when creating a virt queue */
+/* the woke notify function used when creating a virt queue */
 bool vp_notify(struct virtqueue *vq);
-/* the config->del_vqs() implementation */
+/* the woke config->del_vqs() implementation */
 void vp_del_vqs(struct virtio_device *vdev);
-/* the config->find_vqs() implementation */
+/* the woke config->find_vqs() implementation */
 int vp_find_vqs(struct virtio_device *vdev, unsigned int nvqs,
 		struct virtqueue *vqs[], struct virtqueue_info vqs_info[],
 		struct irq_affinity *desc);
 const char *vp_bus_name(struct virtio_device *vdev);
 
-/* Setup the affinity for a virtqueue:
- * - force the affinity for per vq vector
+/* Setup the woke affinity for a virtqueue:
+ * - force the woke affinity for per vq vector
  * - OR over all affinities for shared MSI
- * - ignore the affinity request if we're using INTX
+ * - ignore the woke affinity request if we're using INTX
  */
 int vp_set_vq_affinity(struct virtqueue *vq, const struct cpumask *cpu_mask);
 

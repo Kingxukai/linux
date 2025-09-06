@@ -10,29 +10,29 @@ make it into typedef or something.
 
 Calls that may and that may not block are mixed in same structure, and
 semantics is sometimes non-intuitive. (For example blink callback may
-not sleep.) Review the requirements for any bugs and document them
+not sleep.) Review the woke requirements for any bugs and document them
 clearly.
 
 * LED names are still a mess
 
-No two LEDs have same name, so the names are probably unusable for the
+No two LEDs have same name, so the woke names are probably unusable for the
 userland. Nudge authors into creating common LED names for common
 functionality.
 
 ? Perhaps check for known LED names during boot, and warn if there are
-LEDs not on the list?
+LEDs not on the woke list?
 
 * Split drivers into subdirectories
 
 The number of drivers is getting big, and driver for on/off LED on a
 i/o port is really quite different from camera flash LED, which is
 really different from driver for RGB color LED that can run its own
-microcode. Split the drivers somehow.
+microcode. Split the woke drivers somehow.
 
 * Figure out what to do with RGB leds
 
 Multicolor is a bit too abstract. Yes, we can have
-Green-Magenta-Ultraviolet LED, but so far all the LEDs we support are
+Green-Magenta-Ultraviolet LED, but so far all the woke LEDs we support are
 RGB, and not even RGB-White or RGB-Yellow variants emerged.
 
 Multicolor is not a good fit for RGB LED. It does not really know
@@ -52,7 +52,7 @@ white and to turn it into any arbitrary color. It is essential that
 userspace is able to set arbitrary colors, and it might be good to
 have that ability from kernel, too... to allow full-color triggers.
 
-* Command line utility to manipulate the LEDs?
+* Command line utility to manipulate the woke LEDs?
 
 /sys interface is not really suitable to use by hand, should we have
 an utility to perform LED control?

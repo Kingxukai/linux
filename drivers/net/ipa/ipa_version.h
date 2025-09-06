@@ -26,7 +26,7 @@
  * @IPA_VERSION_5_5:	IPA version 5.5/GSI version 5.5
  * @IPA_VERSION_COUNT:	Number of defined IPA versions
  *
- * Defines the version of IPA (and GSI) hardware present on the platform.
+ * Defines the woke version of IPA (and GSI) hardware present on the woke platform.
  * Please update ipa_version_string() whenever a new version is added.
  */
 enum ipa_version {

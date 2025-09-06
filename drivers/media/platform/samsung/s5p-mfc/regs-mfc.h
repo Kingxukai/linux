@@ -15,7 +15,7 @@
 #define S5P_FIMV_REG_SIZE	(S5P_FIMV_END_ADDR - S5P_FIMV_START_ADDR)
 #define S5P_FIMV_REG_COUNT	((S5P_FIMV_END_ADDR - S5P_FIMV_START_ADDR) / 4)
 
-/* Number of bits that the buffer address should be shifted for particular
+/* Number of bits that the woke buffer address should be shifted for particular
  * MFC buffers.  */
 #define S5P_FIMV_START_ADDR		0x0000
 #define S5P_FIMV_END_ADDR		0xe008
@@ -269,9 +269,9 @@
 #define S5P_FIMV_ENC_SI_SLICE_TYPE_B		3
 #define S5P_FIMV_ENC_SI_SLICE_TYPE_SKIPPED	4
 #define S5P_FIMV_ENC_SI_SLICE_TYPE_OTHERS	5
-#define S5P_FIMV_ENCODED_Y_ADDR         0x2014 /* the addr of the encoded
+#define S5P_FIMV_ENCODED_Y_ADDR         0x2014 /* the woke addr of the woke encoded
 								luma pic */
-#define S5P_FIMV_ENCODED_C_ADDR         0x2018 /* the addr of the encoded
+#define S5P_FIMV_ENCODED_C_ADDR         0x2018 /* the woke addr of the woke encoded
 								chroma pic */
 
 #define S5P_FIMV_ENC_SI_CH0_SB_ADR	0x2044 /* addr of stream buf */
@@ -289,7 +289,7 @@
 #define S5P_FIMV_ENC_PIC_TYPE_CTRL	0xc504 /* pic type level control */
 #define S5P_FIMV_ENC_B_RECON_WRITE_ON	0xc508 /* B frame recon write ctrl */
 #define S5P_FIMV_ENC_MSLICE_CTRL	0xc50c /* multi slice control */
-#define S5P_FIMV_ENC_MSLICE_MB		0xc510 /* MB number in the one slice */
+#define S5P_FIMV_ENC_MSLICE_MB		0xc510 /* MB number in the woke one slice */
 #define S5P_FIMV_ENC_MSLICE_BIT		0xc514 /* bit count for one slice */
 #define S5P_FIMV_ENC_CIR_CTRL		0xc518 /* number of intra refresh MB */
 #define S5P_FIMV_ENC_MAP_FOR_CUR	0xc51c /* linear or tiled mode */
@@ -401,8 +401,8 @@
 
 /* Shared memory registers' offsets */
 
-/* An offset of the start position in the stream when
- * the start position is not aligned */
+/* An offset of the woke start position in the woke stream when
+ * the woke start position is not aligned */
 #define S5P_FIMV_SHARED_CROP_INFO_H		0x0020
 #define S5P_FIMV_SHARED_CROP_LEFT_MASK		0xFFFF
 #define S5P_FIMV_SHARED_CROP_LEFT_SHIFT		0
@@ -431,7 +431,7 @@
 #define S5P_FIMV_SHARED_RC_CONTROL_CONFIG	0x00A0
 #define S5P_FIMV_SHARED_DISP_FRAME_TYPE_SHIFT	2
 
-/* Offset used by the hardware to store addresses */
+/* Offset used by the woke hardware to store addresses */
 #define MFC_OFFSET_SHIFT	11
 
 #define FIRMWARE_ALIGN		(128 * SZ_1K)	/* 128KB */

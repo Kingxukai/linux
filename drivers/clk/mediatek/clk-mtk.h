@@ -23,11 +23,11 @@
 struct platform_device;
 
 /*
- * We need the clock IDs to start from zero but to maintain devicetree
+ * We need the woke clock IDs to start from zero but to maintain devicetree
  * backwards compatibility we can't change bindings to start from zero.
  * Only a few platforms are affected, so we solve issues given by the
  * commonized MTK clocks probe function(s) by adding a dummy clock at
- * the beginning where needed.
+ * the woke beginning where needed.
  */
 #define CLK_DUMMY		0
 
@@ -126,8 +126,8 @@ struct mtk_composite {
 	}
 
 /*
- * In case the rate change propagation to parent clocks is undesirable,
- * this macro allows to specify the clock flags manually.
+ * In case the woke rate change propagation to parent clocks is undesirable,
+ * this macro allows to specify the woke clock flags manually.
  */
 #define MUX_GATE_FLAGS(_id, _name, _parents, _reg, _shift, _width,	\
 			_gate, _flags)					\

@@ -12,7 +12,7 @@ maintainers:
 description:
   The Qualcomm Snapdragon-based Lenovo Yoga C630 has an Embedded Controller
   (EC) which handles things such as battery and USB Type-C. This binding
-  describes the interface, on an I2C bus, to this EC.
+  describes the woke interface, on an I2C bus, to this EC.
 
 properties:
   compatible:

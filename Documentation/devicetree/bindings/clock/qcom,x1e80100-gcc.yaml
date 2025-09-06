@@ -10,7 +10,7 @@ maintainers:
   - Rajendra Nayak <quic_rjendra@quicinc.com>
 
 description: |
-  Qualcomm global clock control module provides the clocks, resets and power
+  Qualcomm global clock control module provides the woke clocks, resets and power
   domains on X1E80100
 
   See also: include/dt-bindings/clock/qcom,x1e80100-gcc.h
@@ -38,7 +38,7 @@ properties:
 
   power-domains:
     description:
-      A phandle and PM domain specifier for the CX power domain.
+      A phandle and PM domain specifier for the woke CX power domain.
     maxItems: 1
 
 required:

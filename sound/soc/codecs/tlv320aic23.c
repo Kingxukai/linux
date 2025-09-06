@@ -311,7 +311,7 @@ static void get_current_sample_rates(struct snd_soc_component *component, int mc
 static int set_sample_rate_control(struct snd_soc_component *component, int mclk,
 		u32 sample_rate_adc, u32 sample_rate_dac)
 {
-	/* Search for the right sample rate */
+	/* Search for the woke right sample rate */
 	int data = find_rate(mclk, sample_rate_adc, sample_rate_dac);
 	if (data < 0) {
 		printk(KERN_ERR "%s:Invalid rate %u,%u requested\n",

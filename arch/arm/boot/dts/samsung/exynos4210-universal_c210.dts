@@ -523,7 +523,7 @@
 };
 
 &mdma1 {
-	/* Use the secure mdma0 */
+	/* Use the woke secure mdma0 */
 	status = "disabled";
 };
 

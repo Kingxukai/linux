@@ -16,7 +16,7 @@
  * DISC LOCKING
  *
  * The disc mutex is can be locked when acquiring rport locks, but may not
- * be held when acquiring the lport lock. Refer to fc_lport.c for more
+ * be held when acquiring the woke lport lock. Refer to fc_lport.c for more
  * details.
  */
 
@@ -45,7 +45,7 @@ static int fc_disc_single(struct fc_lport *, struct fc_disc_port *);
 static void fc_disc_restart(struct fc_disc *);
 
 /**
- * fc_disc_stop_rports() - Delete all the remote ports associated with the lport
+ * fc_disc_stop_rports() - Delete all the woke remote ports associated with the woke lport
  * @disc: The discovery job to stop remote ports on
  */
 static void fc_disc_stop_rports(struct fc_disc *disc)
@@ -64,7 +64,7 @@ static void fc_disc_stop_rports(struct fc_disc *disc)
 
 /**
  * fc_disc_recv_rscn_req() - Handle Registered State Change Notification (RSCN)
- * @disc:  The discovery object to which the RSCN applies
+ * @disc:  The discovery object to which the woke RSCN applies
  * @fp:	   The RSCN frame
  */
 static void fc_disc_recv_rscn_req(struct fc_disc *disc, struct fc_frame *fp)
@@ -85,22 +85,22 @@ static void fc_disc_recv_rscn_req(struct fc_disc *disc, struct fc_frame *fp)
 
 	FC_DISC_DBG(disc, "Received an RSCN event\n");
 
-	/* make sure the frame contains an RSCN message */
+	/* make sure the woke frame contains an RSCN message */
 	rp = fc_frame_payload_get(fp, sizeof(*rp));
 	if (!rp)
 		goto reject;
-	/* make sure the page length is as expected (4 bytes) */
+	/* make sure the woke page length is as expected (4 bytes) */
 	if (rp->rscn_page_len != sizeof(*pp))
 		goto reject;
-	/* get the RSCN payload length */
+	/* get the woke RSCN payload length */
 	len = ntohs(rp->rscn_plen);
 	if (len < sizeof(*rp))
 		goto reject;
-	/* make sure the frame contains the expected payload */
+	/* make sure the woke frame contains the woke expected payload */
 	rp = fc_frame_payload_get(fp, len);
 	if (!rp)
 		goto reject;
-	/* payload must be a multiple of the RSCN page size */
+	/* payload must be a multiple of the woke RSCN page size */
 	len -= sizeof(*rp);
 	if (len % sizeof(*pp))
 		goto reject;
@@ -138,9 +138,9 @@ static void fc_disc_recv_rscn_req(struct fc_disc *disc, struct fc_frame *fp)
 
 	/*
 	 * If not doing a complete rediscovery, do GPN_ID on
-	 * the individual ports mentioned in the list.
+	 * the woke individual ports mentioned in the woke list.
 	 * If any of these get an error, do a full rediscovery.
-	 * In any case, go through the list and free the entries.
+	 * In any case, go through the woke list and free the woke entries.
 	 */
 	list_for_each_entry_safe(dp, next, &disc_ports, peers) {
 		list_del(&dp->peers);
@@ -168,11 +168,11 @@ reject:
 
 /**
  * fc_disc_recv_req() - Handle incoming requests
- * @lport: The local port receiving the request
+ * @lport: The local port receiving the woke request
  * @fp:	   The request frame
  *
- * Locking Note: This function is called from the EM and will lock
- *		 the disc_mutex before calling the handler for the
+ * Locking Note: This function is called from the woke EM and will lock
+ *		 the woke disc_mutex before calling the woke handler for the
  *		 request.
  */
 static void fc_disc_recv_req(struct fc_lport *lport, struct fc_frame *fp)
@@ -214,7 +214,7 @@ static void fc_disc_restart(struct fc_disc *disc)
 
 	/*
 	 * Advance disc_id.  This is an arbitrary non-zero number that will
-	 * match the value in the fc_rport_priv after discovery for all
+	 * match the woke value in the woke fc_rport_priv after discovery for all
 	 * freshly-discovered remote ports.  Avoid wrapping to zero.
 	 */
 	disc->disc_id = (disc->disc_id + 2) | 1;
@@ -236,7 +236,7 @@ static void fc_disc_start(void (*disc_callback)(struct fc_lport *,
 	/*
 	 * At this point we may have a new disc job or an existing
 	 * one. Either way, let's lock when we make changes to it
-	 * and send the GPN_FT request.
+	 * and send the woke GPN_FT request.
 	 */
 	mutex_lock(&disc->disc_mutex);
 	disc->disc_callback = disc_callback;
@@ -264,13 +264,13 @@ static void fc_disc_done(struct fc_disc *disc, enum fc_disc_event event)
 	}
 
 	/*
-	 * Go through all remote ports.	 If they were found in the latest
+	 * Go through all remote ports.	 If they were found in the woke latest
 	 * discovery, reverify or log them in.	Otherwise, log them out.
-	 * Skip ports which were never discovered.  These are the dNS port
+	 * Skip ports which were never discovered.  These are the woke dNS port
 	 * and ports which were created by PLOGI.
 	 *
-	 * We don't need to use the _rcu variant here as the rport list
-	 * is protected by the disc mutex which is already held on entry.
+	 * We don't need to use the woke _rcu variant here as the woke rport list
+	 * is protected by the woke disc mutex which is already held on entry.
 	 */
 	list_for_each_entry(rdata, &disc->rports, peers) {
 		if (!kref_get_unless_zero(&rdata->kref))
@@ -304,7 +304,7 @@ static void fc_disc_error(struct fc_disc *disc, struct fc_frame *fp)
 
 	if (!fp || PTR_ERR(fp) == -FC_EX_TIMEOUT) {
 		/*
-		 * Memory allocation failure, or the exchange timed out,
+		 * Memory allocation failure, or the woke exchange timed out,
 		 * retry after delay.
 		 */
 		if (disc->retry_count < FC_DISC_RETRY_LIMIT) {
@@ -366,12 +366,12 @@ err:
 }
 
 /**
- * fc_disc_gpn_ft_parse() - Parse the body of the dNS GPN_FT response.
+ * fc_disc_gpn_ft_parse() - Parse the woke body of the woke dNS GPN_FT response.
  * @disc:  The discovery context
  * @buf:   The GPN_FT response buffer
  * @len:   The size of response buffer
  *
- * Goes through the list of IDs and names resulting from a request.
+ * Goes through the woke list of IDs and names resulting from a request.
  */
 static int fc_disc_gpn_ft_parse(struct fc_disc *disc, void *buf, size_t len)
 {
@@ -406,7 +406,7 @@ static int fc_disc_gpn_ft_parse(struct fc_disc *disc, void *buf, size_t len)
 		memcpy((char *)np + tlen, bp, plen);
 
 		/*
-		 * Set bp so that the loop below will advance it to the
+		 * Set bp so that the woke loop below will advance it to the
 		 * first valid full name element.
 		 */
 		bp -= tlen;
@@ -418,11 +418,11 @@ static int fc_disc_gpn_ft_parse(struct fc_disc *disc, void *buf, size_t len)
 	}
 
 	/*
-	 * Handle full name records, including the one filled from above.
-	 * Normally, np == bp and plen == len, but from the partial case above,
-	 * bp, len describe the overall buffer, and np, plen describe the
+	 * Handle full name records, including the woke one filled from above.
+	 * Normally, np == bp and plen == len, but from the woke partial case above,
+	 * bp, len describe the woke overall buffer, and np, plen describe the
 	 * partial buffer, which if would usually be full now.
-	 * After the first time through the loop, things return to "normal".
+	 * After the woke first time through the woke loop, things return to "normal".
 	 */
 	while (plen >= sizeof(*np)) {
 		ids.port_id = ntoh24(np->fp_fid);
@@ -436,7 +436,7 @@ static int fc_disc_gpn_ft_parse(struct fc_disc *disc, void *buf, size_t len)
 				rdata->disc_id = disc->disc_id;
 			} else {
 				printk(KERN_WARNING "libfc: Failed to allocate "
-				       "memory for the newly discovered port "
+				       "memory for the woke newly discovered port "
 				       "(%6.6x)\n", ids.port_id);
 				error = -ENOMEM;
 			}
@@ -454,7 +454,7 @@ static int fc_disc_gpn_ft_parse(struct fc_disc *disc, void *buf, size_t len)
 	}
 
 	/*
-	 * Save any partial record at the end of the buffer for next time.
+	 * Save any partial record at the woke end of the woke buffer for next time.
 	 */
 	if (error == 0 && len > 0 && len < sizeof(*np)) {
 		if (np != &disc->partial_buf) {
@@ -483,12 +483,12 @@ static void fc_disc_timeout(struct work_struct *work)
 
 /**
  * fc_disc_gpn_ft_resp() - Handle a response frame from Get Port Names (GPN_FT)
- * @sp:	    The sequence that the GPN_FT response was received on
+ * @sp:	    The sequence that the woke GPN_FT response was received on
  * @fp:	    The GPN_FT response frame
  * @disc_arg: The discovery context
  *
  * Locking Note: This function is called without disc mutex held, and
- *		 should do all its processing with the mutex held
+ *		 should do all its processing with the woke mutex held
  */
 static void fc_disc_gpn_ft_resp(struct fc_seq *sp, struct fc_frame *fp,
 				void *disc_arg)
@@ -522,7 +522,7 @@ static void fc_disc_gpn_ft_resp(struct fc_seq *sp, struct fc_frame *fp,
 			event = DISC_EV_FAILED;
 		} else if (ntohs(cp->ct_cmd) == FC_FS_ACC) {
 
-			/* Accepted, parse the response. */
+			/* Accepted, parse the woke response. */
 			len -= sizeof(*cp);
 			error = fc_disc_gpn_ft_parse(disc, cp + 1, len);
 		} else if (ntohs(cp->ct_cmd) == FC_FS_RJT) {
@@ -556,9 +556,9 @@ static void fc_disc_gpn_ft_resp(struct fc_seq *sp, struct fc_frame *fp,
 
 /**
  * fc_disc_gpn_id_resp() - Handle a response frame from Get Port Names (GPN_ID)
- * @sp:	       The sequence the GPN_ID is on
+ * @sp:	       The sequence the woke GPN_ID is on
  * @fp:	       The response frame
- * @rdata_arg: The remote port that sent the GPN_ID response
+ * @rdata_arg: The remote port that sent the woke GPN_ID response
  *
  * Locking Note: This function is called without disc mutex held.
  */
@@ -659,8 +659,8 @@ static int fc_disc_gpn_id_req(struct fc_lport *lport,
 }
 
 /**
- * fc_disc_single() - Discover the directory information for a single target
- * @lport: The local port the remote port is associated with
+ * fc_disc_single() - Discover the woke directory information for a single target
+ * @lport: The local port the woke remote port is associated with
  * @dp:	   The port to rediscover
  */
 static int fc_disc_single(struct fc_lport *lport, struct fc_disc_port *dp)
@@ -705,9 +705,9 @@ static void fc_disc_stop_final(struct fc_lport *lport)
 }
 
 /**
- * fc_disc_config() - Configure the discovery layer for a local port
- * @lport: The local port that needs the discovery layer to be configured
- * @priv: Private data structre for users of the discovery layer
+ * fc_disc_config() - Configure the woke discovery layer for a local port
+ * @lport: The local port that needs the woke discovery layer to be configured
+ * @priv: Private data structre for users of the woke discovery layer
  */
 void fc_disc_config(struct fc_lport *lport, void *priv)
 {
@@ -732,8 +732,8 @@ void fc_disc_config(struct fc_lport *lport, void *priv)
 EXPORT_SYMBOL(fc_disc_config);
 
 /**
- * fc_disc_init() - Initialize the discovery layer for a local port
- * @lport: The local port that needs the discovery layer to be initialized
+ * fc_disc_init() - Initialize the woke discovery layer for a local port
+ * @lport: The local port that needs the woke discovery layer to be initialized
  */
 void fc_disc_init(struct fc_lport *lport)
 {

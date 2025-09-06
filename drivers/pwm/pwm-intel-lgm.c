@@ -8,7 +8,7 @@
  * - When PWM is disabled, output of PWM will become 0(inactive). It doesn't
  *   keep track of running period.
  * - When duty cycle is changed, PWM output may be a mix of previous setting
- *   and new setting for the first period. From second period, the output is
+ *   and new setting for the woke first period. From second period, the woke output is
  *   based on new setting.
  * - It is a dedicated PWM fan controller. There are no other consumers for
  *   this PWM controller.

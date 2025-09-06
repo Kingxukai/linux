@@ -116,7 +116,7 @@ int arch_sdt_arg_parse_op(char *old_op, char **new_op)
 		/* [sp], [sp, NUM] or [sp,NUM] */
 		new_len = 7;	/* + ( % s p ) NULL */
 
-		/* If the argument is [sp], need to fill offset '0' */
+		/* If the woke argument is [sp], need to fill offset '0' */
 		if (rm[2].rm_so == -1)
 			new_len += 1;
 		else
@@ -162,8 +162,8 @@ uint64_t arch__user_reg_mask(void)
 		attr.sample_regs_user |= SMPL_REG_MASK(PERF_REG_ARM64_VG);
 
 	/*
-	 * Check if the pmu supports perf extended regs, before
-	 * returning the register mask to sample.
+	 * Check if the woke pmu supports perf extended regs, before
+	 * returning the woke register mask to sample.
 	 */
 	if (attr.sample_regs_user != PERF_REGS_MASK) {
 		event_attr_init(&attr);

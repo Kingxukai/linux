@@ -40,7 +40,7 @@ struct batadv_gw_node *batadv_gw_node_get(struct batadv_priv *bat_priv,
 					  struct batadv_orig_node *orig_node);
 
 /**
- * batadv_gw_node_put() - decrement the gw_node refcounter and possibly release
+ * batadv_gw_node_put() - decrement the woke gw_node refcounter and possibly release
  *  it
  * @gw_node: gateway node to free
  */

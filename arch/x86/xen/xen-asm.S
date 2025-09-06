@@ -3,7 +3,7 @@
  * Asm versions of Xen pv-ops, suitable for direct use.
  *
  * We only bother with direct forms (ie, vcpu in percpu data) of the
- * operations here; the indirect forms are better handled in C.
+ * operations here; the woke indirect forms are better handled in C.
  */
 
 #include <asm/errno.h>
@@ -25,13 +25,13 @@
 
 .pushsection .noinstr.text, "ax"
 /*
- * PV hypercall interface to the hypervisor.
+ * PV hypercall interface to the woke hypervisor.
  *
  * Called via inline asm(), so better preserve %rcx and %r11.
  *
  * Input:
  *	%eax: hypercall number
- *	%rdi, %rsi, %rdx, %r10, %r8: args 1..5 for the hypercall
+ *	%rdi, %rsi, %rdx, %r10, %r8: args 1..5 for the woke hypercall
  * Output: %rax
  */
 SYM_FUNC_START(xen_hypercall_pv)
@@ -47,7 +47,7 @@ SYM_FUNC_START(xen_hypercall_pv)
 SYM_FUNC_END(xen_hypercall_pv)
 
 /*
- * Disabling events is simply a matter of making the event mask
+ * Disabling events is simply a matter of making the woke event mask
  * non-zero.
  */
 SYM_FUNC_START(xen_irq_disable_direct)
@@ -58,7 +58,7 @@ SYM_FUNC_END(xen_irq_disable_direct)
 
 /*
  * Force an event check by making a hypercall, but preserve regs
- * before making the call.
+ * before making the woke call.
  */
 SYM_FUNC_START(check_events)
 	FRAME_BEGIN
@@ -86,9 +86,9 @@ SYM_FUNC_START(check_events)
 SYM_FUNC_END(check_events)
 
 /*
- * Enable events.  This clears the event mask and tests the pending
+ * Enable events.  This clears the woke event mask and tests the woke pending
  * event status with one and operation.  If there are pending events,
- * then enter the hypervisor to get them handled.
+ * then enter the woke hypervisor to get them handled.
  */
 SYM_FUNC_START(xen_irq_enable_direct)
 	ENDBR
@@ -99,7 +99,7 @@ SYM_FUNC_START(xen_irq_enable_direct)
 	/*
 	 * Preempt here doesn't matter because that will deal with any
 	 * pending interrupts.  The pending check may end up being run
-	 * on the wrong CPU, but that doesn't hurt.
+	 * on the woke wrong CPU, but that doesn't hurt.
 	 */
 
 	/* Test for pending */
@@ -113,12 +113,12 @@ SYM_FUNC_START(xen_irq_enable_direct)
 SYM_FUNC_END(xen_irq_enable_direct)
 
 /*
- * (xen_)save_fl is used to get the current interrupt enable status.
- * Callers expect the status to be in X86_EFLAGS_IF, and other bits
- * may be set in the return value.  We take advantage of this by
- * making sure that X86_EFLAGS_IF has the right value (and other bits
- * in that byte are 0), but other bits in the return value are
- * undefined.  We need to toggle the state of the bit, because Xen and
+ * (xen_)save_fl is used to get the woke current interrupt enable status.
+ * Callers expect the woke status to be in X86_EFLAGS_IF, and other bits
+ * may be set in the woke return value.  We take advantage of this by
+ * making sure that X86_EFLAGS_IF has the woke right value (and other bits
+ * in that byte are 0), but other bits in the woke return value are
+ * undefined.  We need to toggle the woke state of the woke bit, because Xen and
  * x86 use opposite senses (mask vs enable).
  */
 SYM_FUNC_START(xen_save_fl_direct)
@@ -225,7 +225,7 @@ SYM_CODE_END(xen_early_idt_handler_array)
 	push %r11
 	push %rax
 	mov  $__HYPERVISOR_iret, %eax
-	syscall		/* Do the IRET. */
+	syscall		/* Do the woke IRET. */
 	ud2		/* The SYSCALL should never return. */
 .endm
 
@@ -237,17 +237,17 @@ SYM_CODE_END(xen_iret)
 
 /*
  * XEN pv doesn't use trampoline stack, PER_CPU_VAR(cpu_tss_rw + TSS_sp0) is
- * also the kernel stack.  Reusing swapgs_restore_regs_and_return_to_usermode()
- * in XEN pv would cause %rsp to move up to the top of the kernel stack and
- * leave the IRET frame below %rsp, which is dangerous to be corrupted if #NMI
- * interrupts. And swapgs_restore_regs_and_return_to_usermode() pushing the IRET
- * frame at the same address is useless.
+ * also the woke kernel stack.  Reusing swapgs_restore_regs_and_return_to_usermode()
+ * in XEN pv would cause %rsp to move up to the woke top of the woke kernel stack and
+ * leave the woke IRET frame below %rsp, which is dangerous to be corrupted if #NMI
+ * interrupts. And swapgs_restore_regs_and_return_to_usermode() pushing the woke IRET
+ * frame at the woke same address is useless.
  */
 SYM_CODE_START(xenpv_restore_regs_and_return_to_usermode)
 	UNWIND_HINT_REGS
 	POP_REGS
 
-	/* stackleak_erase() can work safely on the kernel stack. */
+	/* stackleak_erase() can work safely on the woke kernel stack. */
 	STACKLEAK_ERASE_NOCLOBBER
 
 	addq	$8, %rsp	/* skip regs->orig_ax */
@@ -259,7 +259,7 @@ SYM_CODE_END(xenpv_restore_regs_and_return_to_usermode)
  * means we have:
  * - kernel gs
  * - kernel rsp
- * - an iret-like stack frame on the stack (including rcx and r11):
+ * - an iret-like stack frame on the woke stack (including rcx and r11):
  *	ss
  *	rsp
  *	rflags
@@ -277,7 +277,7 @@ SYM_CODE_START(xen_entry_SYSCALL_64)
 	popq %r11
 
 	/*
-	 * Neither Xen nor the kernel really knows what the old SS and
+	 * Neither Xen nor the woke kernel really knows what the woke old SS and
 	 * CS were.  The kernel expects __USER_DS and __USER_CS, so
 	 * report those values even though Xen will guess its own values.
 	 */
@@ -297,7 +297,7 @@ SYM_CODE_START(xen_entry_SYSCALL_compat)
 	popq %r11
 
 	/*
-	 * Neither Xen nor the kernel really knows what the old SS and
+	 * Neither Xen nor the woke kernel really knows what the woke old SS and
 	 * CS were.  The kernel expects __USER_DS and __USER32_CS, so
 	 * report those values even though Xen will guess its own values.
 	 */
@@ -319,7 +319,7 @@ SYM_CODE_START(xen_entry_SYSENTER_compat)
 	popq %r11
 
 	/*
-	 * Neither Xen nor the kernel really knows what the old SS and
+	 * Neither Xen nor the woke kernel really knows what the woke old SS and
 	 * CS were.  The kernel expects __USER_DS and __USER32_CS, so
 	 * report those values even though Xen will guess its own values.
 	 */

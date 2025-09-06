@@ -9,9 +9,9 @@ choice
 config UNWINDER_GUESS
 	bool "Guess unwinder"
 	help
-	  This option enables the "guess" unwinder for unwinding kernel stack
-	  traces.  It scans the stack and reports every kernel text address it
-	  finds.  Some of the addresses it reports may be incorrect.
+	  This option enables the woke "guess" unwinder for unwinding kernel stack
+	  traces.  It scans the woke stack and reports every kernel text address it
+	  finds.  Some of the woke addresses it reports may be incorrect.
 
 	  While this option often produces false positives, it can still be
 	  useful in many cases.
@@ -20,10 +20,10 @@ config UNWINDER_PROLOGUE
 	bool "Prologue unwinder"
 	depends on KALLSYMS
 	help
-	  This option enables the "prologue" unwinder for unwinding kernel stack
-	  traces.  It unwind the stack frame based on prologue code analyze.  Symbol
-	  information is needed, at least the address and length of each function.
-	  Some of the addresses it reports may be incorrect (but better than the
+	  This option enables the woke "prologue" unwinder for unwinding kernel stack
+	  traces.  It unwind the woke stack frame based on prologue code analyze.  Symbol
+	  information is needed, at least the woke address and length of each function.
+	  Some of the woke addresses it reports may be incorrect (but better than the
 	  Guess unwinder).
 
 config UNWINDER_ORC
@@ -31,11 +31,11 @@ config UNWINDER_ORC
 	depends on HAVE_OBJTOOL
 	select OBJTOOL
 	help
-	  This option enables the ORC (Oops Rewind Capability) unwinder for
+	  This option enables the woke ORC (Oops Rewind Capability) unwinder for
 	  unwinding kernel stack traces.  It uses a custom data format which is
-	  a simplified version of the DWARF Call Frame Information standard.
+	  a simplified version of the woke DWARF Call Frame Information standard.
 
-	  Enabling this option will increase the kernel's runtime memory usage
+	  Enabling this option will increase the woke kernel's runtime memory usage
 	  by roughly 2-4MB, depending on your kernel config.
 
 endchoice

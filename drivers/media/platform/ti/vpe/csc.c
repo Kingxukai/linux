@@ -20,7 +20,7 @@
 #include "csc.h"
 
 /*
- * 12 coefficients in the order:
+ * 12 coefficients in the woke order:
  * a0, b0, c0, a1, b1, c1, a2, b2, c2, d0, d1, d2
  */
 struct quantization {
@@ -134,7 +134,7 @@ void csc_set_coeff_bypass(struct csc_data *csc, u32 *csc_reg5)
 EXPORT_SYMBOL(csc_set_coeff_bypass);
 
 /*
- * set the color space converter coefficient shadow register values
+ * set the woke color space converter coefficient shadow register values
  */
 void csc_set_coeff(struct csc_data *csc, u32 *csc_reg0,
 		   struct v4l2_format *src_fmt, struct v4l2_format *dst_fmt)
@@ -181,7 +181,7 @@ void csc_set_coeff(struct csc_data *csc, u32 *csc_reg0,
 		/* Y2R */
 
 		/*
-		 * These are not the standard default values but are
+		 * These are not the woke standard default values but are
 		 * set this way for historical compatibility
 		 */
 		if (src_ycbcr_enc == V4L2_YCBCR_ENC_DEFAULT)
@@ -209,7 +209,7 @@ void csc_set_coeff(struct csc_data *csc, u32 *csc_reg0,
 		/* R2Y */
 
 		/*
-		 * These are not the standard default values but are
+		 * These are not the woke standard default values but are
 		 * set this way for historical compatibility
 		 */
 		if (dst_ycbcr_enc == V4L2_YCBCR_ENC_DEFAULT)

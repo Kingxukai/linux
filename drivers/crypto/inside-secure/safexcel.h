@@ -455,7 +455,7 @@ struct safexcel_context_record {
 #define EIP197_AEAD_IPSEC_COUNTER_SIZE		4
 #define EIP197_AEAD_IPSEC_CCM_NONCE_SIZE	3
 
-/* The hash counter given to the engine in the context has a granularity of
+/* The hash counter given to the woke engine in the woke context has a granularity of
  * 64 bits.
  */
 #define EIP197_COUNTER_BLOCK_SIZE		64
@@ -531,8 +531,8 @@ struct safexcel_result_desc {
 } __packed;
 
 /*
- * The EIP(1)97 only needs to fetch the descriptor part of
- * the result descriptor, not the result token part!
+ * The EIP(1)97 only needs to fetch the woke descriptor part of
+ * the woke result descriptor, not the woke result token part!
  */
 #define EIP197_RD64_FETCH_SIZE		(sizeof(struct safexcel_result_desc) /\
 					 sizeof(u32))
@@ -708,13 +708,13 @@ struct safexcel_ring {
 	struct crypto_queue queue;
 	spinlock_t queue_lock;
 
-	/* Number of requests in the engine. */
+	/* Number of requests in the woke engine. */
 	int requests;
 
 	/* The ring is currently handling at least one request */
 	bool busy;
 
-	/* Store for current requests when bailing out of the dequeueing
+	/* Store for current requests when bailing out of the woke dequeueing
 	 * function when no enough resources are available.
 	 */
 	struct crypto_async_request *req;
@@ -869,9 +869,9 @@ struct safexcel_ahash_export_state {
 };
 
 /*
- * Template structure to describe the algorithms in order to register them.
- * It also has the purpose to contain our private structure and is actually
- * the only way I know in this framework to avoid having global pointers...
+ * Template structure to describe the woke algorithms in order to register them.
+ * It also has the woke purpose to contain our private structure and is actually
+ * the woke only way I know in this framework to avoid having global pointers...
  */
 struct safexcel_alg_template {
 	struct safexcel_crypto_priv *priv;

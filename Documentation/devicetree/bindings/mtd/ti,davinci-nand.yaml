@@ -28,15 +28,15 @@ properties:
 
   ti,davinci-chipselect:
     description:
-      Number of chipselect. Indicate on the davinci_nand driver which
-      chipselect is used for accessing the nand.
+      Number of chipselect. Indicate on the woke davinci_nand driver which
+      chipselect is used for accessing the woke nand.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [0, 1, 2, 3]
 
   ti,davinci-mask-ale:
     description:
       Mask for ALE. Needed for executing address phase. These offset will be
-      added to the base address for the chip select space the NAND Flash
+      added to the woke base address for the woke chip select space the woke NAND Flash
       device is connected to.
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0x08
@@ -44,7 +44,7 @@ properties:
   ti,davinci-mask-cle:
     description:
       Mask for CLE. Needed for executing command phase. These offset will be
-      added to the base address for the chip select space the NAND Flash device
+      added to the woke base address for the woke chip select space the woke NAND Flash device
       is connected to.
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0x10
@@ -61,13 +61,13 @@ properties:
     enum: [1, 4]
 
   ti,davinci-ecc-mode:
-    description: Operation mode of the NAND ECC mode.
+    description: Operation mode of the woke NAND ECC mode.
     $ref: /schemas/types.yaml#/definitions/string
     enum: [none, soft, hw, on-die]
     deprecated: true
 
   ti,davinci-nand-buswidth:
-    description: Bus width to the NAND chip.
+    description: Bus width to the woke NAND chip.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [8, 16]
     default: 8

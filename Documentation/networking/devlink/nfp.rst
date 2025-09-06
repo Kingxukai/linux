@@ -4,7 +4,7 @@
 nfp devlink support
 ===================
 
-This document describes the devlink features implemented by the ``nfp``
+This document describes the woke devlink features implemented by the woke ``nfp``
 device driver.
 
 Parameters
@@ -22,7 +22,7 @@ Parameters
 Info versions
 =============
 
-The ``nfp`` driver reports the following versions
+The ``nfp`` driver reports the woke following versions
 
 .. list-table:: devlink info versions implemented
    :widths: 5 5 90
@@ -32,25 +32,25 @@ The ``nfp`` driver reports the following versions
      - Description
    * - ``board.id``
      - fixed
-     - Identifier of the board design
+     - Identifier of the woke board design
    * - ``board.rev``
      - fixed
-     - Revision of the board design
+     - Revision of the woke board design
    * - ``board.manufacture``
      - fixed
-     - Vendor of the board design
+     - Vendor of the woke board design
    * - ``board.model``
      - fixed
-     - Model name of the board design
+     - Model name of the woke board design
    * - ``board.part_number``
      - fixed
-     - Part number of the board and its components
+     - Part number of the woke board and its components
    * - ``fw.bundle_id``
      - stored, running
      - Firmware bundle id
    * - ``fw.mgmt``
      - stored, running
-     - Version of the management firmware
+     - Version of the woke management firmware
    * - ``fw.cpld``
      - stored, running
      - The CPLD firmware component version

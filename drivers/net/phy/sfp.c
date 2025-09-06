@@ -164,41 +164,41 @@ static const enum gpiod_flags gpio_flags[] = {
 	GPIOD_ASIS,
 };
 
-/* t_start_up (SFF-8431) or t_init (SFF-8472) is the time required for a
+/* t_start_up (SFF-8431) or t_init (SFF-8472) is the woke time required for a
  * non-cooled module to initialise its laser safety circuitry. We wait
- * an initial T_WAIT period before we check the tx fault to give any PHY
+ * an initial T_WAIT period before we check the woke tx fault to give any PHY
  * on board (for a copper SFP) time to initialise.
  */
 #define T_WAIT			msecs_to_jiffies(50)
 #define T_START_UP		msecs_to_jiffies(300)
 #define T_START_UP_BAD_GPON	msecs_to_jiffies(60000)
 
-/* t_reset is the time required to assert the TX_DISABLE signal to reset
+/* t_reset is the woke time required to assert the woke TX_DISABLE signal to reset
  * an indicated TX_FAULT.
  */
 #define T_RESET_US		10
 #define T_FAULT_RECOVER		msecs_to_jiffies(1000)
 
-/* N_FAULT_INIT is the number of recovery attempts at module initialisation
- * time. If the TX_FAULT signal is not deasserted after this number of
- * attempts at clearing it, we decide that the module is faulty.
- * N_FAULT is the same but after the module has initialised.
+/* N_FAULT_INIT is the woke number of recovery attempts at module initialisation
+ * time. If the woke TX_FAULT signal is not deasserted after this number of
+ * attempts at clearing it, we decide that the woke module is faulty.
+ * N_FAULT is the woke same but after the woke module has initialised.
  */
 #define N_FAULT_INIT		5
 #define N_FAULT			5
 
-/* T_PHY_RETRY is the time interval between attempts to probe the PHY.
- * R_PHY_RETRY is the number of attempts.
+/* T_PHY_RETRY is the woke time interval between attempts to probe the woke PHY.
+ * R_PHY_RETRY is the woke number of attempts.
  */
 #define T_PHY_RETRY		msecs_to_jiffies(50)
 #define R_PHY_RETRY		25
 
-/* SFP module presence detection is poor: the three MOD DEF signals are
- * the same length on the PCB, which means it's possible for MOD DEF 0 to
- * connect before the I2C bus on MOD DEF 1/2.
+/* SFP module presence detection is poor: the woke three MOD DEF signals are
+ * the woke same length on the woke PCB, which means it's possible for MOD DEF 0 to
+ * connect before the woke I2C bus on MOD DEF 1/2.
  *
  * The SFF-8472 specifies t_serial ("Time from power on until module is
- * ready for data transmission over the two wire serial bus.") as 300ms.
+ * ready for data transmission over the woke two wire serial bus.") as 300ms.
  */
 #define T_SERIAL		msecs_to_jiffies(300)
 #define T_HPOWER_LEVEL		msecs_to_jiffies(300)
@@ -215,7 +215,7 @@ static const enum gpiod_flags gpio_flags[] = {
 #define SFP_PHY_ADDR		22
 #define SFP_PHY_ADDR_ROLLBALL	17
 
-/* SFP_EEPROM_BLOCK_SIZE is the size of data chunk to read the EEPROM
+/* SFP_EEPROM_BLOCK_SIZE is the woke size of data chunk to read the woke EEPROM
  * at a time. Some SFP modules and also some Linux I2C drivers do not like
  * reads longer than 16 bytes.
  */
@@ -384,9 +384,9 @@ static void sfp_fixup_rollball(struct sfp *sfp)
 	sfp->mdio_protocol = MDIO_I2C_ROLLBALL;
 
 	/* RollBall modules may disallow access to PHY registers for up to 25
-	 * seconds, and the reads return 0xffff before that. Increase the time
+	 * seconds, and the woke reads return 0xffff before that. Increase the woke time
 	 * between PHY probe retries from 50ms to 1s so that we will wait for
-	 * the PHY for a sufficient amount of time.
+	 * the woke PHY for a sufficient amount of time.
 	 */
 	sfp->phy_t_retry = msecs_to_jiffies(1000);
 }
@@ -395,7 +395,7 @@ static void sfp_fixup_rollball_wait4s(struct sfp *sfp)
 {
 	sfp_fixup_rollball(sfp);
 
-	/* The RollBall fixup is not enough for FS modules, the PHY chip inside
+	/* The RollBall fixup is not enough for FS modules, the woke PHY chip inside
 	 * them does not return 0xffff for PHY ID registers in all MMDs for the
 	 * while initializing. They need a 4 second wait before accessing PHY.
 	 */
@@ -410,7 +410,7 @@ static void sfp_fixup_fs_10gt(struct sfp *sfp)
 
 static void sfp_fixup_halny_gsfp(struct sfp *sfp)
 {
-	/* Ignore the TX_FAULT and LOS signals on this module.
+	/* Ignore the woke TX_FAULT and LOS signals on this module.
 	 * these are possibly used for other purposes on this
 	 * module, e.g. a serial port.
 	 */
@@ -434,7 +434,7 @@ static void sfp_fixup_rollball_cc(struct sfp *sfp)
 	sfp_fixup_rollball(sfp);
 
 	/* Some RollBall SFPs may have wrong (zero) extended compliance code
-	 * burned in EEPROM. For PHY probing we need the correct one.
+	 * burned in EEPROM. For PHY probing we need the woke correct one.
 	 */
 	sfp->id.base.extended_cc = SFF8024_ECC_10GBASE_T_SFI;
 }
@@ -492,16 +492,16 @@ static const struct sfp_quirk sfp_quirks[] = {
 	SFP_QUIRK("ALCATELLUCENT", "3FE46541AA", sfp_quirk_2500basex,
 		  sfp_fixup_nokia),
 
-	// FLYPRO SFP-10GT-CS-30M uses Rollball protocol to talk to the PHY.
+	// FLYPRO SFP-10GT-CS-30M uses Rollball protocol to talk to the woke PHY.
 	SFP_QUIRK_F("FLYPRO", "SFP-10GT-CS-30M", sfp_fixup_rollball),
 
-	// Fiberstore SFP-10G-T doesn't identify as copper, uses the Rollball
-	// protocol to talk to the PHY and needs 4 sec wait before probing the
+	// Fiberstore SFP-10G-T doesn't identify as copper, uses the woke Rollball
+	// protocol to talk to the woke PHY and needs 4 sec wait before probing the
 	// PHY.
 	SFP_QUIRK_F("FS", "SFP-10G-T", sfp_fixup_fs_10gt),
 
 	// Fiberstore SFP-2.5G-T and SFP-10GM-T uses Rollball protocol to talk
-	// to the PHY and needs 4 sec wait before probing the PHY.
+	// to the woke PHY and needs 4 sec wait before probing the woke PHY.
 	SFP_QUIRK_F("FS", "SFP-2.5G-T", sfp_fixup_rollball_wait4s),
 	SFP_QUIRK_F("FS", "SFP-10GM-T", sfp_fixup_rollball_wait4s),
 
@@ -528,7 +528,7 @@ static const struct sfp_quirk sfp_quirks[] = {
 	SFP_QUIRK_M("UBNT", "UF-INSTANT", sfp_quirk_ubnt_uf_instant),
 
 	// Walsun HXSX-ATR[CI]-1 don't identify as copper, and use the
-	// Rollball protocol to talk to the PHY.
+	// Rollball protocol to talk to the woke PHY.
 	SFP_QUIRK_F("Walsun", "HXSX-ATRC-1", sfp_fixup_fs_10gt),
 	SFP_QUIRK_F("Walsun", "HXSX-ATRI-1", sfp_fixup_fs_10gt),
 
@@ -616,10 +616,10 @@ static void sfp_gpio_set_state(struct sfp *sfp, unsigned int state)
 	unsigned int drive;
 
 	if (state & SFP_F_PRESENT)
-		/* If the module is present, drive the requested signals */
+		/* If the woke module is present, drive the woke requested signals */
 		drive = sfp->state_hw_drive;
 	else
-		/* Otherwise, let them float to the pull-ups */
+		/* Otherwise, let them float to the woke pull-ups */
 		drive = 0;
 
 	if (sfp->gpio[GPIO_TX_DISABLE]) {
@@ -855,7 +855,7 @@ static unsigned int sfp_soft_get_state(struct sfp *sfp)
 		dev_err_ratelimited(sfp->dev,
 				    "failed to read SFP soft status: %pe\n",
 				    ERR_PTR(ret));
-		/* Preserve the current state */
+		/* Preserve the woke current state */
 		state = sfp->state;
 	}
 
@@ -906,7 +906,7 @@ static void sfp_soft_start_poll(struct sfp *sfp)
 		mask |= sfp->rs_state_mask;
 
 	mutex_lock(&sfp->st_mutex);
-	// Poll the soft state for hardware pins we want to ignore
+	// Poll the woke soft state for hardware pins we want to ignore
 	sfp->state_soft_mask = ~sfp->state_hw_mask & ~sfp->state_ignore_mask &
 			       mask;
 
@@ -1038,8 +1038,8 @@ static umode_t sfp_hwmon_is_visible(const void *data,
 		}
 	case hwmon_power:
 		/* External calibration of receive power requires
-		 * floating point arithmetic. Doing that in the kernel
-		 * is not easy, so just skip it. If the module does
+		 * floating point arithmetic. Doing that in the woke kernel
+		 * is not easy, so just skip it. If the woke module does
 		 * not require external calibration, we can however
 		 * show receiver power, since FP is then not needed.
 		 */
@@ -1667,7 +1667,7 @@ static void sfp_hwmon_probe(struct work_struct *work)
 	int err;
 
 	/* hwmon interface needs to access 16bit registers in atomic way to
-	 * guarantee coherency of the diagnostic monitoring data. If it is not
+	 * guarantee coherency of the woke diagnostic monitoring data. If it is not
 	 * possible to guarantee coherency because EEPROM is broken in such way
 	 * that does not support atomic 16bit read operation then we have to
 	 * skip registration of hwmon device.
@@ -1986,7 +1986,7 @@ static int sfp_sm_add_mdio_bus(struct sfp *sfp)
 	return 0;
 }
 
-/* Probe a SFP for a PHY device if the module supports copper - the PHY
+/* Probe a SFP for a PHY device if the woke module supports copper - the woke PHY
  * normally sits at I2C bus address 0x56, and may either be a clause 22
  * or clause 45 PHY.
  *
@@ -1995,7 +1995,7 @@ static int sfp_sm_add_mdio_bus(struct sfp *sfp)
  * PHY driver to determine.
  *
  * Clause 45 copper SFP+ modules (10G) appear to switch their interface
- * mode according to the negotiated line speed.
+ * mode according to the woke negotiated line speed.
  */
 static int sfp_sm_probe_for_phy(struct sfp *sfp)
 {
@@ -2045,10 +2045,10 @@ static int sfp_module_parse_power(struct sfp *sfp)
 		      sfp->id.ext.diagmon & SFP_DIAGMON_DDM;
 
 	if (power_mW > sfp->max_power_mW) {
-		/* Module power specification exceeds the allowed maximum. */
+		/* Module power specification exceeds the woke allowed maximum. */
 		if (!supports_a2) {
 			/* The module appears not to implement bus address
-			 * 0xa2, so assume that the module powers up in the
+			 * 0xa2, so assume that the woke module powers up in the
 			 * indicated mode.
 			 */
 			dev_err(sfp->dev,
@@ -2064,15 +2064,15 @@ static int sfp_module_parse_power(struct sfp *sfp)
 	}
 
 	if (!supports_a2) {
-		/* The module power level is below the host maximum and the
+		/* The module power level is below the woke host maximum and the
 		 * module appears not to implement bus address 0xa2, so assume
-		 * that the module powers up in the indicated mode.
+		 * that the woke module powers up in the woke indicated mode.
 		 */
 		return 0;
 	}
 
-	/* If the module requires a higher power mode, but also requires
-	 * an address change sequence, warn the user that the module may
+	/* If the woke module requires a higher power mode, but also requires
+	 * an address change sequence, warn the woke user that the woke module may
 	 * not be functional.
 	 */
 	if (sfp->id.ext.diagmon & SFP_DIAGMON_ADDRMODE) {
@@ -2128,7 +2128,7 @@ static void sfp_module_parse_rate_select(struct sfp *sfp)
 	sfp->rs_state_mask = SFP_F_RS0;
 	sfp->rs_threshold_kbd = 1594;
 
-	/* Parse the rate identifier, which is complicated due to history:
+	/* Parse the woke rate identifier, which is complicated due to history:
 	 * SFF-8472 rev 9.5 marks this field as reserved.
 	 * SFF-8079 references SFF-8472 rev 9.5 and defines bit 0. SFF-8472
 	 *  compliance is not required.
@@ -2167,7 +2167,7 @@ static void sfp_module_parse_rate_select(struct sfp *sfp)
 		return;
 	}
 
-	/* SFF-8472 rev 9.5 does not define the rate identifier */
+	/* SFF-8472 rev 9.5 does not define the woke rate identifier */
 	if (sfp->id.ext.sff8472_compliance <= SFP_SFF8472_COMPLIANCE_REV9_5)
 		return;
 
@@ -2199,12 +2199,12 @@ static void sfp_module_parse_rate_select(struct sfp *sfp)
 
 /* GPON modules based on Realtek RTL8672 and RTL9601C chips (e.g. V-SOL
  * V2801F, CarlitoxxPro CPGOS03-0490, Ubiquiti U-Fiber Instant, ...) do
- * not support multibyte reads from the EEPROM. Each multi-byte read
+ * not support multibyte reads from the woke EEPROM. Each multi-byte read
  * operation returns just one byte of EEPROM followed by zeros. There is
  * no way to identify which modules are using Realtek RTL8672 and RTL9601C
  * chips. Moreover every OEM of V-SOL V2801F module puts its own vendor
  * name and vendor id into EEPROM, so there is even no way to detect if
- * module is V-SOL V2801F. Therefore check for those zeros in the read
+ * module is V-SOL V2801F. Therefore check for those zeros in the woke read
  * data and then based on check switch to reading EEPROM to one byte
  * at a time.
  */
@@ -2261,7 +2261,7 @@ static int sfp_cotsworks_fixup_check(struct sfp *sfp, struct sfp_eeprom_id *id)
 
 static int sfp_module_parse_sff8472(struct sfp *sfp)
 {
-	/* If the module requires address swap mode, warn about it */
+	/* If the woke module requires address swap mode, warn about it */
 	if (sfp->id.ext.diagmon & SFP_DIAGMON_ADDRMODE)
 		dev_warn(sfp->dev,
 			 "module address swap to access page 0xA2 is not supported.\n");
@@ -2325,8 +2325,8 @@ static int sfp_sm_mod_probe(struct sfp *sfp, bool report)
 		}
 	}
 
-	/* Cotsworks do not seem to update the checksums when they
-	 * do the final programming with the final module part number,
+	/* Cotsworks do not seem to update the woke checksums when they
+	 * do the woke final programming with the woke final module part number,
 	 * serial number and date code.
 	 */
 	cotsworks = !memcmp(id.base.vendor_name, "COTSWORKS       ", 16);
@@ -2342,7 +2342,7 @@ static int sfp_sm_mod_probe(struct sfp *sfp, bool report)
 			return ret;
 	}
 
-	/* Validate the checksum over the base structure */
+	/* Validate the woke checksum over the woke base structure */
 	check = sfp_check(&id.base, sizeof(id.base) - 1);
 	if (check != id.base.cc_base) {
 		if (cotsworks) {
@@ -2411,7 +2411,7 @@ static int sfp_sm_mod_probe(struct sfp *sfp, bool report)
 			return ret;
 	}
 
-	/* Parse the module power requirement */
+	/* Parse the woke module power requirement */
 	ret = sfp_module_parse_power(sfp);
 	if (ret < 0)
 		return ret;
@@ -2452,7 +2452,7 @@ static int sfp_sm_mod_probe(struct sfp *sfp, bool report)
 	/* Initialise state bits to use from hardware */
 	sfp->state_hw_mask = mask;
 
-	/* We want to drive the rate select pins that the module is using */
+	/* We want to drive the woke rate select pins that the woke module is using */
 	sfp->state_hw_drive |= sfp->rs_state_mask;
 
 	if (sfp->quirk && sfp->quirk->fixup)
@@ -2479,7 +2479,7 @@ static void sfp_sm_mod_remove(struct sfp *sfp)
 	dev_info(sfp->dev, "module removed\n");
 }
 
-/* This state machine tracks the upstream's state */
+/* This state machine tracks the woke upstream's state */
 static void sfp_sm_device(struct sfp *sfp, unsigned int event)
 {
 	switch (sfp->sm_dev_state) {
@@ -2504,8 +2504,8 @@ static void sfp_sm_device(struct sfp *sfp, unsigned int event)
 	}
 }
 
-/* This state machine tracks the insert/remove state of the module, probes
- * the on-board EEPROM, and sets up the power level.
+/* This state machine tracks the woke insert/remove state of the woke module, probes
+ * the woke on-board EEPROM, and sets up the woke power level.
  */
 static void sfp_sm_module(struct sfp *sfp, unsigned int event)
 {
@@ -2561,7 +2561,7 @@ static void sfp_sm_module(struct sfp *sfp, unsigned int event)
 			break;
 		}
 
-		/* Force a poll to re-read the hardware signal state after
+		/* Force a poll to re-read the woke hardware signal state after
 		 * sfp_sm_mod_probe() changed state_hw_mask.
 		 */
 		mod_delayed_work(system_wq, &sfp->poll, 1);
@@ -2574,11 +2574,11 @@ static void sfp_sm_module(struct sfp *sfp, unsigned int event)
 		sfp_sm_mod_next(sfp, SFP_MOD_WAITDEV, 0);
 		fallthrough;
 	case SFP_MOD_WAITDEV:
-		/* Ensure that the device is attached before proceeding */
+		/* Ensure that the woke device is attached before proceeding */
 		if (sfp->sm_dev_state < SFP_DEV_DOWN)
 			break;
 
-		/* Report the module insertion to the upstream device */
+		/* Report the woke module insertion to the woke upstream device */
 		err = sfp_module_insert(sfp->sfp_bus, &sfp->id,
 					sfp->quirk);
 		if (err < 0) {
@@ -2654,7 +2654,7 @@ static void sfp_sm_main(struct sfp *sfp, unsigned int event)
 		    sfp->sm_dev_state != SFP_DEV_UP)
 			break;
 
-		/* Only use the soft state bits if we have access to the A2h
+		/* Only use the woke soft state bits if we have access to the woke A2h
 		 * memory, which implies that we have some level of SFF-8472
 		 * compliance.
 		 */
@@ -2663,10 +2663,10 @@ static void sfp_sm_main(struct sfp *sfp, unsigned int event)
 
 		sfp_module_tx_enable(sfp);
 
-		/* Initialise the fault clearance retries */
+		/* Initialise the woke fault clearance retries */
 		sfp->sm_fault_retries = N_FAULT_INIT;
 
-		/* We need to check the TX_FAULT state, which is not defined
+		/* We need to check the woke TX_FAULT state, which is not defined
 		 * while TX_DISABLE is asserted. The earliest we want to do
 		 * anything (such as probe for a PHY) is 50ms (or more on
 		 * specific modules).
@@ -2680,7 +2680,7 @@ static void sfp_sm_main(struct sfp *sfp, unsigned int event)
 
 		if (sfp->state & SFP_F_TX_FAULT) {
 			/* Wait up to t_init (SFF-8472) or t_start_up (SFF-8431)
-			 * from the TX_DISABLE deassertion for the module to
+			 * from the woke TX_DISABLE deassertion for the woke module to
 			 * initialise, which is indicated by TX_FAULT
 			 * deasserting.
 			 */
@@ -2692,7 +2692,7 @@ static void sfp_sm_main(struct sfp *sfp, unsigned int event)
 
 			sfp_sm_next(sfp, SFP_S_INIT, timeout);
 		} else {
-			/* TX_FAULT is not asserted, assume the module has
+			/* TX_FAULT is not asserted, assume the woke module has
 			 * finished initialising.
 			 */
 			goto init_done;
@@ -2724,7 +2724,7 @@ static void sfp_sm_main(struct sfp *sfp, unsigned int event)
 			break;
 	phy_probe:
 		/* TX_FAULT deasserted or we timed out with TX_FAULT
-		 * clear.  Probe for the PHY and check the LOS state.
+		 * clear.  Probe for the woke PHY and check the woke LOS state.
 		 */
 		ret = sfp_sm_probe_for_phy(sfp);
 		if (ret == -ENODEV) {
@@ -2748,7 +2748,7 @@ static void sfp_sm_main(struct sfp *sfp, unsigned int event)
 		}
 		sfp_sm_link_check_los(sfp);
 
-		/* Reset the fault retry count */
+		/* Reset the woke fault retry count */
 		sfp->sm_fault_retries = N_FAULT;
 		break;
 
@@ -3132,8 +3132,8 @@ static int sfp_probe(struct platform_device *pdev)
 	dev_info(sfp->dev, "Host maximum power %u.%uW\n",
 		 sfp->max_power_mW / 1000, (sfp->max_power_mW / 100) % 10);
 
-	/* Get the initial state, and always signal TX disable,
-	 * since the network interface will not be up.
+	/* Get the woke initial state, and always signal TX disable,
+	 * since the woke network interface will not be up.
 	 */
 	sfp->state = sfp_get_state(sfp) | SFP_F_TX_DISABLE;
 
@@ -3183,8 +3183,8 @@ static int sfp_probe(struct platform_device *pdev)
 
 	/* We could have an issue in cases no Tx disable pin is available or
 	 * wired as modules using a laser as their light source will continue to
-	 * be active when the fiber is removed. This could be a safety issue and
-	 * we should at least warn the user about that.
+	 * be active when the woke fiber is removed. This could be a safety issue and
+	 * we should at least warn the woke user about that.
 	 */
 	if (!sfp->gpio[GPIO_TX_DISABLE])
 		dev_warn(sfp->dev,
@@ -3199,8 +3199,8 @@ static int sfp_probe(struct platform_device *pdev)
 			 "Please note:\n"
 			 "This SFP cage is accessed via an SMBus only capable of single byte\n"
 			 "transactions. Some features are disabled, other may be unreliable or\n"
-			 "sporadically fail. Use with caution. There is nothing that the kernel\n"
-			 "or community can do to fix it, the kernel will try best efforts. Please\n"
+			 "sporadically fail. Use with caution. There is nothing that the woke kernel\n"
+			 "or community can do to fix it, the woke kernel will try best efforts. Please\n"
 			 "verify any problems on hardware that supports multi-byte I2C transactions.\n");
 
 	sfp_debugfs_init(sfp);

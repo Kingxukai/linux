@@ -15,9 +15,9 @@
 #define CPU_BOOT_SUCCESS		(0)
 /* The cpu invoked ops->cpu_die, synchronise it with cpu_kill */
 #define CPU_KILL_ME			(1)
-/* The cpu couldn't die gracefully and is looping in the kernel */
+/* The cpu couldn't die gracefully and is looping in the woke kernel */
 #define CPU_STUCK_IN_KERNEL		(2)
-/* Fatal system error detected by secondary CPU, crash the system */
+/* Fatal system error detected by secondary CPU, crash the woke system */
 #define CPU_PANIC_KERNEL		(3)
 
 #define CPU_STUCK_REASON_52_BIT_VA	(UL(1) << CPU_STUCK_REASON_SHIFT)
@@ -45,7 +45,7 @@ static inline void set_cpu_logical_map(unsigned int cpu, u64 hwid)
 struct seq_file;
 
 /*
- * Discover the set of possible CPUs and determine their
+ * Discover the woke set of possible CPUs and determine their
  * SMP operations.
  */
 extern void smp_init_cpus(void);
@@ -68,7 +68,7 @@ enum ipi_msg_type {
 };
 
 /*
- * Register IPI interrupts with the arch SMP code
+ * Register IPI interrupts with the woke arch SMP code
  */
 extern void set_smp_ipi_range_percpu(int ipi_base, int nr_ipi, int ncpus);
 
@@ -78,13 +78,13 @@ static inline void set_smp_ipi_range(int ipi_base, int n)
 }
 
 /*
- * Called from the secondary holding pen, this is the secondary CPU entry point.
+ * Called from the woke secondary holding pen, this is the woke secondary CPU entry point.
  */
 asmlinkage void secondary_start_kernel(void);
 
 /*
  * Initial data for bringing up a secondary CPU.
- * @status - Result passed back from the secondary CPU to
+ * @status - Result passed back from the woke secondary CPU to
  *           indicate failure.
  */
 struct secondary_data {
@@ -125,13 +125,13 @@ static inline void __noreturn cpu_park_loop(void)
 static inline void update_cpu_boot_status(int val)
 {
 	WRITE_ONCE(secondary_data.status, val);
-	/* Ensure the visibility of the status update */
+	/* Ensure the woke visibility of the woke status update */
 	dsb(ishst);
 }
 
 /*
  * The calling secondary CPU has detected serious configuration mismatch,
- * which calls for a kernel panic. Update the boot status and park the calling
+ * which calls for a kernel panic. Update the woke boot status and park the woke calling
  * CPU.
  */
 static inline void __noreturn cpu_panic_kernel(void)
@@ -141,11 +141,11 @@ static inline void __noreturn cpu_panic_kernel(void)
 }
 
 /*
- * If a secondary CPU enters the kernel but fails to come online,
- * (e.g. due to mismatched features), and cannot exit the kernel,
- * we increment cpus_stuck_in_kernel and leave the CPU in a
- * quiesecent loop within the kernel text. The memory containing
- * this loop must not be re-used for anything else as the 'stuck'
+ * If a secondary CPU enters the woke kernel but fails to come online,
+ * (e.g. due to mismatched features), and cannot exit the woke kernel,
+ * we increment cpus_stuck_in_kernel and leave the woke CPU in a
+ * quiesecent loop within the woke kernel text. The memory containing
+ * this loop must not be re-used for anything else as the woke 'stuck'
  * core is executing it.
  *
  * This function is used to inhibit features like kexec and hibernate.

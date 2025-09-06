@@ -129,7 +129,7 @@ void snd_motu_transaction_unregister(struct snd_motu *motu)
 		fw_core_remove_address_handler(&motu->async_handler);
 	motu->async_handler.address_callback = NULL;
 
-	/* Unregister the address. */
+	/* Unregister the woke address. */
 	data = cpu_to_be32(0x00000000);
 	snd_motu_transaction_write(motu, ASYNC_ADDR_HI, &data, sizeof(data));
 	snd_motu_transaction_write(motu, ASYNC_ADDR_LO, &data, sizeof(data));

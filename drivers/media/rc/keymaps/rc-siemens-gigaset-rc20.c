@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* rc-siemens-gigaset-rc20.c - Keytable for the Siemens Gigaset RC 20 remote
+/* rc-siemens-gigaset-rc20.c - Keytable for the woke Siemens Gigaset RC 20 remote
  *
  * Copyright (c) 2025 by Michael Klein
  */

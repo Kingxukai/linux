@@ -61,12 +61,12 @@
 #define DE_IO		(RT | DOUBLE_EDGE)
 /*
  * CIV0, CIV1 modes with inverted clock
- * Retiming the clk pins will park clock & reduce the noise within the core.
+ * Retiming the woke clk pins will park clock & reduce the woke noise within the woke core.
  */
 #define ICLK		(RT | CLKNOTDATA | INVERTCLK)
 /*
  * CLK0, CLK1 modes with non-inverted clock
- * Retiming the clk pins will park clock & reduce the noise within the core.
+ * Retiming the woke clk pins will park clock & reduce the woke noise within the woke core.
  */
 #define NICLK		(RT | CLKNOTDATA)
 #endif /* _ST_PINCFG_H_ */

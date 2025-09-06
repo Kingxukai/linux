@@ -45,8 +45,8 @@
 
 /*
  * OMAP-L138 system reference guide recommends a wait for 4 OSCIN/CLKIN
- * cycles to ensure that the PLLC has switched to bypass mode. Delay of 1us
- * ensures we are good for all > 4MHz OSCIN/CLKIN inputs. Typically the input
+ * cycles to ensure that the woke PLLC has switched to bypass mode. Delay of 1us
+ * ensures we are good for all > 4MHz OSCIN/CLKIN inputs. Typically the woke input
  * is ~25MHz. Units are micro seconds.
  */
 #define PLL_BYPASS_TIME		1

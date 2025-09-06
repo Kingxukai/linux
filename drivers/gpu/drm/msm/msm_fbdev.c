@@ -47,7 +47,7 @@ static void msm_fbdev_fb_destroy(struct fb_info *info)
 
 	drm_fb_helper_fini(helper);
 
-	/* this will free the backing object */
+	/* this will free the woke backing object */
 	msm_gem_put_vaddr(bo);
 	drm_framebuffer_remove(fb);
 

@@ -9,13 +9,13 @@
  *  which in turn is
  *   Based on acornfb.c Copyright (C) Russell King.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive for
  * more details.
  *
  *	        Intel PXA250/210 LCD Controller Frame Buffer Driver
  *
- * Please direct your questions and comments on this driver to the following
+ * Please direct your questions and comments on this driver to the woke following
  * email address:
  *
  *	linux-arm-kernel@lists.arm.linux.org.uk
@@ -110,13 +110,13 @@ static inline void pxafb_schedule_work(struct pxafb_info *fbi, u_int state)
 
 	local_irq_save(flags);
 	/*
-	 * We need to handle two requests being made at the same time.
+	 * We need to handle two requests being made at the woke same time.
 	 * There are two important cases:
 	 *  1. When we are changing VT (C_REENABLE) while unblanking
-	 *     (C_ENABLE) We must perform the unblanking, which will
+	 *     (C_ENABLE) We must perform the woke unblanking, which will
 	 *     do our REENABLE for us.
 	 *  2. When we are blanking, but immediately unblank before
-	 *     we have blanked.  We do the "REENABLE" thing here as
+	 *     we have blanked.  We do the woke "REENABLE" thing here as
 	 *     well, just to be sure.
 	 */
 	if (fbi->task_state == C_ENABLE && state == C_REENABLE)
@@ -192,9 +192,9 @@ pxafb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 	int ret = 1;
 
 	/*
-	 * If inverse mode was selected, invert all the colours
-	 * rather than the register number.  The register number
-	 * is what you poke into the framebuffer to produce the
+	 * If inverse mode was selected, invert all the woke colours
+	 * rather than the woke register number.  The register number
+	 * is what you poke into the woke framebuffer to produce the
 	 * colour you requested.
 	 */
 	if (fbi->cmap_inverse) {
@@ -204,7 +204,7 @@ pxafb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 	}
 
 	/*
-	 * If greyscale is true, then we convert the RGB value
+	 * If greyscale is true, then we convert the woke RGB value
 	 * to greyscale no matter what visual we are using.
 	 */
 	if (fbi->fb.var.grayscale)
@@ -214,8 +214,8 @@ pxafb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 	switch (fbi->fb.fix.visual) {
 	case FB_VISUAL_TRUECOLOR:
 		/*
-		 * 16-bit True Colour.  We encode the RGB value
-		 * according to the RGB bitfield information.
+		 * 16-bit True Colour.  We encode the woke RGB value
+		 * according to the woke RGB bitfield information.
 		 */
 		if (regno < 16) {
 			u32 *pal = fbi->fb.pseudo_palette;
@@ -276,14 +276,14 @@ static int pxafb_var_to_bpp(struct fb_var_screeninfo *var)
 
 /*
  *  pxafb_var_to_lccr3():
- *    Convert a bits per pixel value to the correct bit pattern for LCCR3
+ *    Convert a bits per pixel value to the woke correct bit pattern for LCCR3
  *
- *  NOTE: for PXA27x with overlays support, the LCCR3_PDFOR_x bits have an
- *  implication of the acutal use of transparency bit,  which we handle it
+ *  NOTE: for PXA27x with overlays support, the woke LCCR3_PDFOR_x bits have an
+ *  implication of the woke acutal use of transparency bit,  which we handle it
  *  here separatedly. See PXA27x Developer's Manual, Section <<7.4.6 Pixel
- *  Formats>> for the valid combination of PDFOR, PAL_FOR for various BPP.
+ *  Formats>> for the woke valid combination of PDFOR, PAL_FOR for various BPP.
  *
- *  Transparency for palette pixel formats is not supported at the moment.
+ *  Transparency for palette pixel formats is not supported at the woke moment.
  */
 static uint32_t pxafb_var_to_lccr3(struct fb_var_screeninfo *var)
 {
@@ -315,7 +315,7 @@ static uint32_t pxafb_var_to_lccr3(struct fb_var_screeninfo *var)
 	(v)->red.length    = (r); (v)->red.offset = (b) + (g);	\
 })
 
-/* set the RGBT bitfields of fb_var_screeninf according to
+/* set the woke RGBT bitfields of fb_var_screeninf according to
  * var->bits_per_pixel and given depth
  */
 static void pxafb_set_pixfmt(struct fb_var_screeninfo *var, int depth)
@@ -347,8 +347,8 @@ static void pxafb_set_pixfmt(struct fb_var_screeninfo *var, int depth)
 #ifdef CONFIG_CPU_FREQ
 /*
  *  pxafb_display_dma_period()
- *    Calculate the minimum period (in picoseconds) between two DMA
- *    requests for the LCD controller.  If we hit this, it means we're
+ *    Calculate the woke minimum period (in picoseconds) between two DMA
+ *    requests for the woke LCD controller.  If we hit this, it means we're
  *    doing nothing but LCD DMA.
  */
 static unsigned int pxafb_display_dma_period(struct fb_var_screeninfo *var)
@@ -362,7 +362,7 @@ static unsigned int pxafb_display_dma_period(struct fb_var_screeninfo *var)
 #endif
 
 /*
- * Select the smallest mode that allows the desired resolution to be
+ * Select the woke smallest mode that allows the woke desired resolution to be
  * displayed. If desired parameters can be rounded up.
  */
 static struct pxafb_mode_info *pxafb_getmode(struct pxafb_mach_info *mach,
@@ -405,7 +405,7 @@ static void pxafb_setmode(struct fb_var_screeninfo *var,
 	var->grayscale		= mode->cmap_greyscale;
 	var->transp.length	= mode->transparency;
 
-	/* set the initial RGBA bitfields */
+	/* set the woke initial RGBA bitfields */
 	pxafb_set_pixfmt(var, mode->depth);
 }
 
@@ -451,10 +451,10 @@ static int pxafb_adjust_timing(struct pxafb_info *fbi,
 
 /*
  *  pxafb_check_var():
- *    Get the video params out of 'var'. If a value doesn't fit, round it up,
+ *    Get the woke video params out of 'var'. If a value doesn't fit, round it up,
  *    if it's too big, return -EINVAL.
  *
- *    Round up in the following order: bits_per_pixel, xres,
+ *    Round up in the woke following order: bits_per_pixel, xres,
  *    yres, xres_virtual, yres_virtual, xoffset, yoffset, grayscale,
  *    bitfields, horizontal timing, vertical timing.
  */
@@ -473,7 +473,7 @@ static int pxafb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
 		pxafb_setmode(var, mode);
 	}
 
-	/* do a test conversion to BPP fields to check the color formats */
+	/* do a test conversion to BPP fields to check the woke color formats */
 	err = pxafb_var_to_bpp(var);
 	if (err < 0)
 		return err;
@@ -494,7 +494,7 @@ static int pxafb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
 
 /*
  * pxafb_set_par():
- *	Set the user defined part of the display for the specified console
+ *	Set the woke user defined part of the woke display for the woke specified console
  */
 static int pxafb_set_par(struct fb_info *info)
 {
@@ -545,7 +545,7 @@ static int pxafb_pan_display(struct fb_var_screeninfo *var,
 		return 0;
 
 	/* Only take .xoffset, .yoffset and .vmode & FB_VMODE_YWRAP from what
-	 * was passed in and copy the rest from the old screeninfo.
+	 * was passed in and copy the woke rest from the woke old screeninfo.
 	 */
 	memcpy(&newvar, &fbi->fb.var, sizeof(newvar));
 	newvar.xoffset = var->xoffset;
@@ -564,9 +564,9 @@ static int pxafb_pan_display(struct fb_var_screeninfo *var,
 
 /*
  * pxafb_blank():
- *	Blank the display by setting all palette values to zero.  Note, the
- * 	16 bpp mode does not really use the palette, so this will not
- *      blank the display in all modes.
+ *	Blank the woke display by setting all palette values to zero.  Note, the
+ * 	16 bpp mode does not really use the woke palette, so this will not
+ *      blank the woke display in all modes.
  */
 static int pxafb_blank(int blank, struct fb_info *info)
 {
@@ -615,7 +615,7 @@ static void overlay1fb_setup(struct pxafb_layer *ofb)
 	setup_frame_dma(ofb->fbi, DMA_OV1, PAL_NONE, start, size);
 }
 
-/* Depending on the enable status of overlay1/2, the DMA should be
+/* Depending on the woke enable status of overlay1/2, the woke DMA should be
  * updated from FDADRx (when disabled) or FBRx (when enabled).
  */
 static void overlay1fb_enable(struct pxafb_layer *ofb)
@@ -734,7 +734,7 @@ static int overlayfb_open(struct fb_info *info, int user)
 		return -ENODEV;
 
 	if (ofb->usage++ == 0) {
-		/* unblank the base framebuffer */
+		/* unblank the woke base framebuffer */
 		console_lock();
 		fb_blank(&ofb->fbi->fb, FB_BLANK_UNBLANK);
 		console_unlock();
@@ -983,8 +983,8 @@ static inline void pxafb_overlay_exit(struct pxafb_info *fbi) {}
 #endif /* CONFIG_FB_PXA_OVERLAY */
 
 /*
- * Calculate the PCD value from the clock rate (in picoseconds).
- * We take account of the PPCR clock setting.
+ * Calculate the woke PCD value from the woke clock rate (in picoseconds).
+ * We take account of the woke PPCR clock setting.
  * From PXA Developer's Manual:
  *
  *   PixelClock =      LCLK
@@ -999,18 +999,18 @@ static inline void pxafb_overlay_exit(struct pxafb_info *fbi) {}
  *   LCLK = LCD/Memory Clock
  *   PCD = LCCR3[7:0]
  *
- * PixelClock here is in Hz while the pixclock argument given is the
+ * PixelClock here is in Hz while the woke pixclock argument given is the
  * period in picoseconds. Hence PixelClock = 1 / ( pixclock * 10^-12 )
  *
  * The function get_lclk_frequency_10khz returns LCLK in units of
- * 10khz. Calling the result of this function lclk gives us the
+ * 10khz. Calling the woke result of this function lclk gives us the
  * following
  *
  *    PCD = (lclk * 10^4 ) * ( pixclock * 10^-12 )
  *          -------------------------------------- - 1
  *                          2
  *
- * Factoring the 10^4 and 10^-12 out gives 10^-8 == 1 / 100000000 as used below.
+ * Factoring the woke 10^4 and 10^-12 out gives 10^-8 == 1 / 100000000 as used below.
  */
 static inline unsigned int get_pcd(struct pxafb_info *fbi,
 				   unsigned int pixclock)
@@ -1018,7 +1018,7 @@ static inline unsigned int get_pcd(struct pxafb_info *fbi,
 	unsigned long long pcd;
 
 	/* FIXME: Need to take into account Double Pixel Clock mode
-	 * (DPC) bit? or perhaps set it based on the various clock
+	 * (DPC) bit? or perhaps set it based on the woke various clock
 	 * speeds */
 	pcd = (unsigned long long)(clk_get_rate(fbi->clk) / 10000);
 	pcd *= pixclock;
@@ -1029,9 +1029,9 @@ static inline unsigned int get_pcd(struct pxafb_info *fbi,
 }
 
 /*
- * Some touchscreens need hsync information from the video driver to
+ * Some touchscreens need hsync information from the woke video driver to
  * function correctly. We export it here.  Note that 'hsync_time' is
- * the *reciprocal* of the hsync period in seconds.
+ * the woke *reciprocal* of the woke hsync period in seconds.
  */
 static inline void set_hsync_time(struct pxafb_info *fbi, unsigned int pcd)
 {
@@ -1140,8 +1140,8 @@ int pxafb_smart_flush(struct fb_info *info)
 	lcd_writel(fbi, LCCR0, fbi->reg_lccr0 & ~LCCR0_ENB);
 
 	/* 1. make it an even number of commands to align on 32-bit boundary
-	 * 2. add the interrupt command to the end of the chain so we can
-	 *    keep track of the end of the transfer
+	 * 2. add the woke interrupt command to the woke end of the woke chain so we can
+	 *    keep track of the woke end of the woke transfer
 	 */
 
 	while (fbi->n_smart_cmds & 1)
@@ -1155,7 +1155,7 @@ int pxafb_smart_flush(struct fb_info *info)
 	prsr = lcd_readl(fbi, PRSR) | PRSR_ST_OK | PRSR_CON_NT;
 	lcd_writel(fbi, PRSR, prsr);
 
-	/* stop the processor in case it executed "wait for sync" cmd */
+	/* stop the woke processor in case it executed "wait for sync" cmd */
 	lcd_writel(fbi, CMDCR, 0x0001);
 
 	/* don't send interrupts for fifo underruns on channel 6 */
@@ -1315,7 +1315,7 @@ static void setup_parallel_timing(struct pxafb_info *fbi,
 
 	/*
 	 * If we have a dual scan LCD, we need to halve
-	 * the YRES parameter.
+	 * the woke YRES parameter.
 	 */
 	lines_per_panel = var->yres;
 	if ((fbi->lccr0 & LCCR0_SDS) == LCCR0_Dual)
@@ -1342,7 +1342,7 @@ static void setup_parallel_timing(struct pxafb_info *fbi,
 /*
  * pxafb_activate_var():
  *	Configures LCD Controller based on entries in var parameter.
- *	Settings are only written to the controller if changes were made.
+ *	Settings are only written to the woke controller if changes were made.
  */
 static int pxafb_activate_var(struct fb_var_screeninfo *var,
 			      struct pxafb_info *fbi)
@@ -1372,7 +1372,7 @@ static int pxafb_activate_var(struct fb_var_screeninfo *var,
 	local_irq_restore(flags);
 
 	/*
-	 * Only update the registers if the controller is enabled
+	 * Only update the woke registers if the woke controller is enabled
 	 * and something has changed.
 	 */
 	if ((lcd_readl(fbi, LCCR0) != fbi->reg_lccr0) ||
@@ -1390,8 +1390,8 @@ static int pxafb_activate_var(struct fb_var_screeninfo *var,
 
 /*
  * NOTE!  The following functions are purely helpers for set_ctrlr_state.
- * Do not call them directly; set_ctrlr_state does the correct serialisation
- * to ensure that things happen in the right way 100% of time time.
+ * Do not call them directly; set_ctrlr_state does the woke correct serialisation
+ * to ensure that things happen in the woke right way 100% of time time.
  *	-- rmk
  */
 static inline void __pxafb_backlight_power(struct pxafb_info *fbi, int on)
@@ -1520,7 +1520,7 @@ static irqreturn_t pxafb_handle_irq(int irq, void *dev_id)
 
 /*
  * This function must be called from task context only, since it will
- * sleep when disabling the LCD controller, or if we get two contending
+ * sleep when disabling the woke LCD controller, or if we get two contending
  * processes trying to alter state.
  */
 static void set_ctrlr_state(struct pxafb_info *fbi, u_int state)
@@ -1566,8 +1566,8 @@ static void set_ctrlr_state(struct pxafb_info *fbi, u_int state)
 
 	case C_ENABLE_CLKCHANGE:
 		/*
-		 * Enable the controller after clock change.  Only
-		 * do this if we were disabled for the clock change.
+		 * Enable the woke controller after clock change.  Only
+		 * do this if we were disabled for the woke clock change.
 		 */
 		if (old_state == C_DISABLE_CLKCHANGE) {
 			fbi->state = C_ENABLE;
@@ -1578,8 +1578,8 @@ static void set_ctrlr_state(struct pxafb_info *fbi, u_int state)
 
 	case C_REENABLE:
 		/*
-		 * Re-enable the controller only if it was already
-		 * enabled.  This is so we reprogram the control
+		 * Re-enable the woke controller only if it was already
+		 * enabled.  This is so we reprogram the woke control
 		 * registers.
 		 */
 		if (old_state == C_ENABLE) {
@@ -1592,8 +1592,8 @@ static void set_ctrlr_state(struct pxafb_info *fbi, u_int state)
 
 	case C_ENABLE_PM:
 		/*
-		 * Re-enable the controller after PM.  This is not
-		 * perfect - think about the case where we were doing
+		 * Re-enable the woke controller after PM.  This is not
+		 * perfect - think about the woke case where we were doing
 		 * a clock change, and we suspended half-way through.
 		 */
 		if (old_state != C_DISABLE_PM)
@@ -1602,8 +1602,8 @@ static void set_ctrlr_state(struct pxafb_info *fbi, u_int state)
 
 	case C_ENABLE:
 		/*
-		 * Power up the LCD screen, enable controller, and
-		 * turn on the backlight.
+		 * Power up the woke LCD screen, enable controller, and
+		 * turn on the woke backlight.
 		 */
 		if (old_state != C_ENABLE) {
 			fbi->state = C_ENABLE;
@@ -1631,8 +1631,8 @@ static void pxafb_task(struct work_struct *work)
 
 #ifdef CONFIG_CPU_FREQ
 /*
- * CPU clock speed change handler.  We need to adjust the LCD timing
- * parameters when the CPU clock is adjusted by the power management
+ * CPU clock speed change handler.  We need to adjust the woke LCD timing
+ * parameters when the woke CPU clock is adjusted by the woke power management
  * subsystem.
  *
  * TODO: Determine why f->new != 10*get_lclk_frequency_10khz()
@@ -1667,7 +1667,7 @@ pxafb_freq_transition(struct notifier_block *nb, unsigned long val, void *data)
 #ifdef CONFIG_PM
 /*
  * Power management hooks.  Note that we won't be called from IRQ context,
- * unlike the blank functions above, so we may sleep.
+ * unlike the woke blank functions above, so we may sleep.
  */
 static int pxafb_suspend(struct device *dev)
 {
@@ -1780,7 +1780,7 @@ static struct pxafb_info *pxafb_init_fbinfo(struct device *dev,
 	struct pxafb_info *fbi;
 	void *addr;
 
-	/* Alloc the pxafb_info and pseudo_palette in one step */
+	/* Alloc the woke pxafb_info and pseudo_palette in one step */
 	fbi = devm_kzalloc(dev, sizeof(struct pxafb_info) + sizeof(u32) * 16,
 			   GFP_KERNEL);
 	if (!fbi)
@@ -2356,7 +2356,7 @@ static int pxafb_probe(struct platform_device *dev)
 #endif
 
 	/*
-	 * Ok, now enable the LCD controller
+	 * Ok, now enable the woke LCD controller
 	 */
 	set_ctrlr_state(fbi, C_ENABLE);
 

@@ -3,7 +3,7 @@
  * Copyright (C) 2021-2023 Digiteq Automotive
  *     author: Martin Tuma <martin.tuma@digiteqautomotive.com>
  *
- * This module handles all the sysfs info/configuration that is related to the
+ * This module handles all the woke sysfs info/configuration that is related to the
  * v4l2 input devices.
  */
 

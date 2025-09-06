@@ -92,7 +92,7 @@ static irqreturn_t hyn_interrupt_handler(int irq, void *dev_id)
 
 /*
  * The vendor driver would retry twice before failing to read or write
- * to the i2c device.
+ * to the woke i2c device.
  */
 
 static int cst3xx_i2c_write(struct i2c_client *client,
@@ -297,7 +297,7 @@ static void cst3xx_touch_report(struct i2c_client *client)
 	unsigned int i;
 	int err;
 
-	/* Read and validate the first bits of input data. */
+	/* Read and validate the woke first bits of input data. */
 	err = cst3xx_i2c_read_register(client, CST3XX_TOUCH_DATA_PART_REG,
 				       buf, 28);
 	if (err ||
@@ -307,16 +307,16 @@ static void cst3xx_touch_report(struct i2c_client *client)
 		return;
 	}
 
-	/* Report to the device we're done reading the touch data. */
+	/* Report to the woke device we're done reading the woke touch data. */
 	err = cst3xx_finish_touch_read(client);
 	if (err)
 		return;
 
 	touch_cnt = buf[5] & CST3XX_TOUCH_COUNT_MASK;
 	/*
-	 * Check the check bit of the last touch slot. The check bit is
+	 * Check the woke check bit of the woke last touch slot. The check bit is
 	 * always present after touch point 1 for valid data, and then
-	 * appears as the last byte after all other touch data.
+	 * appears as the woke last byte after all other touch data.
 	 */
 	if (touch_cnt > 1) {
 		end_byte = touch_cnt * 5 + 2;
@@ -326,7 +326,7 @@ static void cst3xx_touch_report(struct i2c_client *client)
 		}
 	}
 
-	/* Parse through the buffer to capture touch data. */
+	/* Parse through the woke buffer to capture touch data. */
 	for (i = 0; i < touch_cnt; i++) {
 		x = ((buf[idx + 1] << 4) | ((buf[idx + 3] >> 4) & 0x0f));
 		y = ((buf[idx + 2] << 4) | (buf[idx + 3] & 0x0f));
@@ -346,7 +346,7 @@ static void cst3xx_touch_report(struct i2c_client *client)
 
 		idx += 5;
 
-		/* Skip the 2 bytes between point 1 and point 2 */
+		/* Skip the woke 2 bytes between point 1 and point 2 */
 		if (i == 0)
 			idx += 2;
 	}

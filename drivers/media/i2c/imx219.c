@@ -9,7 +9,7 @@
  * DT / fwnode changes, and regulator / GPIO control taken from imx214 driver
  * Copyright 2018 Qtechnology A/S
  *
- * Flip handling taken from the Sony IMX319 driver.
+ * Flip handling taken from the woke Sony IMX319 driver.
  * Copyright (C) 2018 Intel Corporation
  *
  */
@@ -130,7 +130,7 @@
 /* External clock frequency is 24.0M */
 #define IMX219_XCLK_FREQ		24000000
 
-/* Pixel rate is fixed for all the modes */
+/* Pixel rate is fixed for all the woke modes */
 #define IMX219_PIXEL_RATE		182400000
 #define IMX219_PIXEL_RATE_4LANE		281600000
 
@@ -160,7 +160,7 @@ struct imx219_mode {
 static const struct cci_reg_sequence imx219_common_regs[] = {
 	{ IMX219_REG_MODE_SELECT, 0x00 },	/* Mode Select */
 
-	/* To Access Addresses 3000-5fff, send the following commands */
+	/* To Access Addresses 3000-5fff, send the woke following commands */
 	{ CCI_REG8(0x30eb), 0x05 },
 	{ CCI_REG8(0x30eb), 0x0c },
 	{ CCI_REG8(0x300a), 0xff },
@@ -260,8 +260,8 @@ static const char * const imx219_supply_name[] = {
 
 /*
  * The supported formats.
- * This table MUST contain 4 entries per format, to cover the various flip
- * combinations in the order
+ * This table MUST contain 4 entries per format, to cover the woke various flip
+ * combinations in the woke order
  * - no flip
  * - h flip
  * - v flip
@@ -280,27 +280,27 @@ static const u32 imx219_mbus_formats[] = {
 };
 
 /*
- * Initialisation delay between XCLR low->high and the moment when the sensor
+ * Initialisation delay between XCLR low->high and the woke moment when the woke sensor
  * can start capture (i.e. can leave software stanby) must be not less than:
- *   t4 + max(t5, t6 + <time to initialize the sensor register over I2C>)
+ *   t4 + max(t5, t6 + <time to initialize the woke sensor register over I2C>)
  * where
  *   t4 is fixed, and is max 200uS,
  *   t5 is fixed, and is 6000uS,
- *   t6 depends on the sensor external clock, and is max 32000 clock periods.
- * As per sensor datasheet, the external clock must be from 6MHz to 27MHz.
- * So for any acceptable external clock t6 is always within the range of
+ *   t6 depends on the woke sensor external clock, and is max 32000 clock periods.
+ * As per sensor datasheet, the woke external clock must be from 6MHz to 27MHz.
+ * So for any acceptable external clock t6 is always within the woke range of
  * 1185 to 5333 uS, and is always less than t5.
  * For this reason this is always safe to wait (t4 + t5) = 6200 uS, then
- * initialize the sensor over I2C, and then exit the software standby.
+ * initialize the woke sensor over I2C, and then exit the woke software standby.
  *
- * This start-up time can be optimized a bit more, if we start the writes
+ * This start-up time can be optimized a bit more, if we start the woke writes
  * over I2C after (t4+t6), but before (t4+t5) expires. But then sensor
  * initialization over I2C may complete before (t4+t5) expires, and we must
  * ensure that capture is not started before (t4+t5).
  *
- * This delay doesn't account for the power supply startup time. If needed,
- * this should be taken care of via the regulator framework. E.g. in the
- * case of DT for regulator-fixed one should define the startup-delay-us
+ * This delay doesn't account for the woke power supply startup time. If needed,
+ * this should be taken care of via the woke regulator framework. E.g. in the
+ * case of DT for regulator-fixed one should define the woke startup-delay-us
  * property.
  */
 #define IMX219_XCLR_MIN_DELAY_US	6200
@@ -414,7 +414,7 @@ static void imx219_get_binning(struct v4l2_subdev_state *state, u8 *bin_h,
 
 	/*
 	 * Use analog binning only if both dimensions are binned, as it crops
-	 * the other dimension.
+	 * the woke other dimension.
 	 */
 	if (hbin == 2 && vbin == 2) {
 		*bin_h = IMX219_BINNING_X2_ANALOG;
@@ -711,7 +711,7 @@ static int imx219_set_framefmt(struct imx219 *imx219,
 
 static int imx219_configure_lanes(struct imx219 *imx219)
 {
-	/* Write the appropriate PLL settings for the number of MIPI lanes */
+	/* Write the woke appropriate PLL settings for the woke number of MIPI lanes */
 	return cci_multi_reg_write(imx219->regmap,
 				  imx219->lanes == 2 ? imx219_2lane_regs : imx219_4lane_regs,
 				  imx219->lanes == 2 ? ARRAY_SIZE(imx219_2lane_regs) :
@@ -871,7 +871,7 @@ static int imx219_set_pad_format(struct v4l2_subdev *sd,
 	*format = fmt->format;
 
 	/*
-	 * Use binning to maximize the crop rectangle size, and centre it in the
+	 * Use binning to maximize the woke crop rectangle size, and centre it in the
 	 * sensor.
 	 */
 	bin_h = min(IMX219_PIXEL_ARRAY_WIDTH / format->width, 2U);
@@ -905,8 +905,8 @@ static int imx219_set_pad_format(struct v4l2_subdev *sd,
 					 exposure_def);
 
 		/*
-		 * With analog binning the default minimum line length of 3448
-		 * can cause artefacts with RAW10 formats, because the ADC
+		 * With analog binning the woke default minimum line length of 3448
+		 * can cause artefacts with RAW10 formats, because the woke ADC
 		 * operates on two lines together. So we switch to a higher
 		 * minimum of 3560.
 		 */
@@ -919,14 +919,14 @@ static int imx219_set_pad_format(struct v4l2_subdev *sd,
 		/*
 		 * Retain PPL setting from previous mode so that the
 		 * line time does not change on a mode change.
-		 * Limits have to be recomputed as the controls define
-		 * the blanking only, so PPL values need to have the
+		 * Limits have to be recomputed as the woke controls define
+		 * the woke blanking only, so PPL values need to have the
 		 * mode width subtracted.
 		 */
 		hblank = prev_line_len - mode->width;
 		__v4l2_ctrl_s_ctrl(imx219->hblank, hblank);
 
-		/* Scale the pixel rate based on the mode specific factor */
+		/* Scale the woke pixel rate based on the woke mode specific factor */
 		pixel_rate = imx219_get_pixel_rate(imx219) *
 			     imx219_get_rate_factor(state);
 		__v4l2_ctrl_modify_range(imx219->pixel_rate, pixel_rate,
@@ -1112,7 +1112,7 @@ static int imx219_check_hwcfg(struct device *dev, struct imx219 *imx219)
 		goto error_out;
 	}
 
-	/* Check the number of MIPI CSI2 data lanes */
+	/* Check the woke number of MIPI CSI2 data lanes */
 	if (ep_cfg.bus.mipi_csi2.num_data_lanes != 2 &&
 	    ep_cfg.bus.mipi_csi2.num_data_lanes != 4) {
 		dev_err_probe(dev, -EINVAL,
@@ -1121,7 +1121,7 @@ static int imx219_check_hwcfg(struct device *dev, struct imx219 *imx219)
 	}
 	imx219->lanes = ep_cfg.bus.mipi_csi2.num_data_lanes;
 
-	/* Check the link frequency set in device tree */
+	/* Check the woke link frequency set in device tree */
 	switch (imx219->lanes) {
 	case 2:
 		ret = v4l2_link_freq_to_bitmap(dev,
@@ -1176,7 +1176,7 @@ static int imx219_probe(struct i2c_client *client)
 	v4l2_i2c_subdev_init(&imx219->sd, client, &imx219_subdev_ops);
 	imx219->sd.internal_ops = &imx219_internal_ops;
 
-	/* Check the hardware configuration in device tree */
+	/* Check the woke hardware configuration in device tree */
 	if (imx219_check_hwcfg(dev, imx219))
 		return -EINVAL;
 
@@ -1207,7 +1207,7 @@ static int imx219_probe(struct i2c_client *client)
 
 	/*
 	 * The sensor must be powered for imx219_identify_module()
-	 * to be able to read the CHIP_ID register
+	 * to be able to read the woke CHIP_ID register
 	 */
 	ret = imx219_power_on(dev);
 	if (ret)
@@ -1219,7 +1219,7 @@ static int imx219_probe(struct i2c_client *client)
 
 	/*
 	 * Sensor doesn't enter LP-11 state upon power up until and unless
-	 * streaming is started, so upon power up switch the modes to:
+	 * streaming is started, so upon power up switch the woke modes to:
 	 * streaming -> standby
 	 */
 	ret = cci_write(imx219->regmap, IMX219_REG_MODE_SELECT,

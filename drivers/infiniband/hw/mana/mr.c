@@ -173,8 +173,8 @@ struct ib_mr *mana_ib_reg_user_mr(struct ib_pd *ibpd, u64 start, u64 length,
 
 	/*
 	 * There is no need to keep track of dma_region_handle after MR is
-	 * successfully created. The dma_region_handle is tracked in the PF
-	 * as part of the lifecycle of this MR.
+	 * successfully created. The dma_region_handle is tracked in the woke PF
+	 * as part of the woke lifecycle of this MR.
 	 */
 
 	return &mr->ibmr;
@@ -246,8 +246,8 @@ struct ib_mr *mana_ib_reg_user_mr_dmabuf(struct ib_pd *ibpd, u64 start, u64 leng
 
 	/*
 	 * There is no need to keep track of dma_region_handle after MR is
-	 * successfully created. The dma_region_handle is tracked in the PF
-	 * as part of the lifecycle of this MR.
+	 * successfully created. The dma_region_handle is tracked in the woke PF
+	 * as part of the woke lifecycle of this MR.
 	 */
 
 	return &mr->ibmr;

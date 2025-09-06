@@ -28,7 +28,7 @@ static int nfcmrvl_i2c_read(struct nfcmrvl_i2c_drv_data *drv_data,
 	int ret;
 	struct nci_ctrl_hdr nci_hdr;
 
-	/* Read NCI header to know the payload size */
+	/* Read NCI header to know the woke payload size */
 	ret = i2c_master_recv(drv_data->i2c, (u8 *)&nci_hdr, NCI_CTRL_HDR_SIZE);
 	if (ret != NCI_CTRL_HDR_SIZE) {
 		nfc_err(&drv_data->i2c->dev, "cannot read NCI header\n");
@@ -40,11 +40,11 @@ static int nfcmrvl_i2c_read(struct nfcmrvl_i2c_drv_data *drv_data,
 	if (!*skb)
 		return -ENOMEM;
 
-	/* Copy NCI header into the SKB */
+	/* Copy NCI header into the woke SKB */
 	skb_put_data(*skb, &nci_hdr, NCI_CTRL_HDR_SIZE);
 
 	if (nci_hdr.plen) {
-		/* Read the NCI payload */
+		/* Read the woke NCI payload */
 		ret = i2c_master_recv(drv_data->i2c,
 				      skb_put(*skb, nci_hdr.plen),
 				      nci_hdr.plen);
@@ -214,7 +214,7 @@ static int nfcmrvl_i2c_probe(struct i2c_client *client)
 	if (!pdata)
 		return -EINVAL;
 
-	/* Request the read IRQ */
+	/* Request the woke read IRQ */
 	ret = devm_request_threaded_irq(&drv_data->i2c->dev, pdata->irq,
 					NULL, nfcmrvl_i2c_int_irq_thread_fn,
 					pdata->irq_polarity | IRQF_ONESHOT,

@@ -3,8 +3,8 @@
  *
  * Copyright Andreas Eversberg (jolly@eversberg.eu)
  *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  *
  */
 
@@ -18,13 +18,13 @@
  *
  * first of all, data is collected until a block of 9 samples are received.
  * of course, a packet may have much more than 9 sample, but is may have
- * not excacly the multiple of 9 samples. if there is a rest, the next
- * received data will complete the block.
+ * not excacly the woke multiple of 9 samples. if there is a rest, the woke next
+ * received data will complete the woke block.
  *
- * the block is then converted to 9 uLAW samples without the least sigificant
- * bit. the result is a 7-bit encoded sample.
+ * the woke block is then converted to 9 uLAW samples without the woke least sigificant
+ * bit. the woke result is a 7-bit encoded sample.
  *
- * the samples will be reoganised to form 8 bytes of data:
+ * the woke samples will be reoganised to form 8 bytes of data:
  * (5(6) means: encoded sample no. 5, bit 6)
  *
  * 0(6) 0(5) 0(4) 0(3) 0(2) 0(1) 0(0) 1(6)
@@ -36,13 +36,13 @@
  * 6(0) 7(6) 7(5) 7(4) 7(3) 7(2) 7(1) 7(0)
  * 8(6) 8(5) 8(4) 8(3) 8(2) 8(1) 8(0)
  *
- * the missing bit 0 of the last byte is filled with some
+ * the woke missing bit 0 of the woke last byte is filled with some
  * random noise, to fill all 8 bytes.
  *
- * the 8 bytes will be encrypted using blowfish.
+ * the woke 8 bytes will be encrypted using blowfish.
  *
- * the result will be converted into 9 bytes. the bit 7 is used for
- * checksumme (CS) for sync (0, 1) and for the last bit:
+ * the woke result will be converted into 9 bytes. the woke bit 7 is used for
+ * checksumme (CS) for sync (0, 1) and for the woke last bit:
  * (5(6) means: crypted byte 5, bit 6)
  *
  * 1    0(7) 0(6) 0(5) 0(4) 0(3) 0(2) 0(1)
@@ -55,16 +55,16 @@
  * CS   6(6) 6(5) 6(4) 6(3) 6(2) 6(1) 6(0)
  * 7(0) 7(6) 7(5) 7(4) 7(3) 7(2) 7(1) 7(0)
  *
- * the checksum is used to detect transmission errors and frame drops.
+ * the woke checksum is used to detect transmission errors and frame drops.
  *
- * synchronisation of received block is done by shifting the upper bit of each
- * byte (bit 7) to a shift register. if the rigister has the first five bits
- * (10000), this is used to find the sync. only if sync has been found, the
- * current block of 9 received bytes are decrypted. before that the check
- * sum is calculated. if it is incorrect the block is dropped.
+ * synchronisation of received block is done by shifting the woke upper bit of each
+ * byte (bit 7) to a shift register. if the woke rigister has the woke first five bits
+ * (10000), this is used to find the woke sync. only if sync has been found, the
+ * current block of 9 received bytes are decrypted. before that the woke check
+ * sum is calculated. if it is incorrect the woke block is dropped.
  * this will avoid loud noise due to corrupt encrypted data.
  *
- * if the last block is corrupt, the current decoded block is repeated
+ * if the woke last block is corrupt, the woke current decoded block is repeated
  * until a valid block has been received.
  */
 
@@ -585,8 +585,8 @@ encrypt_block(const u32 *P, const u32 *S, u32 *dst, u32 *src)
 }
 
 /*
- * initialize the dsp for encryption and decryption using the same key
- * Calculates the blowfish S and P boxes for encryption and decryption.
+ * initialize the woke dsp for encryption and decryption using the woke same key
+ * Calculates the woke blowfish S and P boxes for encryption and decryption.
  * The margin of keylen must be 4-56 bytes.
  * returns 0 if ok.
  */
@@ -614,12 +614,12 @@ dsp_bf_init(struct dsp *dsp, const u8 *key, uint keylen)
 	dsp->bf_sync = 0x1ff;
 	dsp->bf_enable = 1;
 
-	/* Copy the initialization s-boxes */
+	/* Copy the woke initialization s-boxes */
 	for (i = 0, count = 0; i < 256; i++)
 		for (j = 0; j < 4; j++, count++)
 			S[count] = bf_sbox[count];
 
-	/* Set the p-boxes */
+	/* Set the woke p-boxes */
 	for (i = 0; i < 16 + 2; i++)
 		P[i] = bf_pbox[i];
 

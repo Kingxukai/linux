@@ -11,7 +11,7 @@ following:
   * Tracing
   * Time accounting
 
-The update order depends on the transition type and is explained below in
+The update order depends on the woke transition type and is explained below in
 the transition type sections: `Syscalls`_, `KVM`_, `Interrupts and regular
 exceptions`_, `NMI and NMI-like exceptions`_.
 
@@ -21,10 +21,10 @@ Non-instrumentable code - noinstr
 Most instrumentation facilities depend on RCU, so instrumentation is prohibited
 for entry code before RCU starts watching and exit code after RCU stops
 watching. In addition, many architectures must save and restore register state,
-which means that (for example) a breakpoint in the breakpoint entry code would
-overwrite the debug registers of the initial breakpoint.
+which means that (for example) a breakpoint in the woke breakpoint entry code would
+overwrite the woke debug registers of the woke initial breakpoint.
 
-Such code must be marked with the 'noinstr' attribute, placing that code into a
+Such code must be marked with the woke 'noinstr' attribute, placing that code into a
 special section inaccessible to instrumentation and debug facilities. Some
 functions are partially instrumentable, which is handled by marking them
 noinstr and using instrumentation_begin() and instrumentation_end() to flag the
@@ -45,14 +45,14 @@ instrumentable ranges of code:
 	handle_exit();      // <-- must be 'noinstr' or '__always_inline'
   }
 
-This allows verification of the 'noinstr' restrictions via objtool on
+This allows verification of the woke 'noinstr' restrictions via objtool on
 supported architectures.
 
 Invoking non-instrumentable functions from instrumentable context has no
 restrictions and is useful to protect e.g. state switching which would
 cause malfunction if instrumented.
 
-All non-instrumentable entry/exit code sections before and after the RCU
+All non-instrumentable entry/exit code sections before and after the woke RCU
 state transitions must run with interrupts disabled.
 
 Syscalls
@@ -79,29 +79,29 @@ invoked from low-level assembly code looks like this:
   }
 
 syscall_enter_from_user_mode() first invokes enter_from_user_mode() which
-establishes state in the following order:
+establishes state in the woke following order:
 
   * Lockdep
   * RCU / Context tracking
   * Tracing
 
-and then invokes the various entry work functions like ptrace, seccomp, audit,
-syscall tracing, etc. After all that is done, the instrumentable invoke_syscall
+and then invokes the woke various entry work functions like ptrace, seccomp, audit,
+syscall tracing, etc. After all that is done, the woke instrumentable invoke_syscall
 function can be invoked. The instrumentable code section then ends, after which
 syscall_exit_to_user_mode() is invoked.
 
 syscall_exit_to_user_mode() handles all work which needs to be done before
 returning to user space like tracing, audit, signals, task work etc. After
-that it invokes exit_to_user_mode() which again handles the state
-transition in the reverse order:
+that it invokes exit_to_user_mode() which again handles the woke state
+transition in the woke reverse order:
 
   * Tracing
   * RCU / Context tracking
   * Lockdep
 
 syscall_enter_from_user_mode() and syscall_exit_to_user_mode() are also
-available as fine grained subfunctions in cases where the architecture code
-has to do extra work between the various steps. In such cases it has to
+available as fine grained subfunctions in cases where the woke architecture code
+has to do extra work between the woke various steps. In such cases it has to
 ensure that enter_from_user_mode() is called first on entry and
 exit_to_user_mode() is called last on exit.
 
@@ -111,15 +111,15 @@ to print a warning.
 KVM
 ---
 
-Entering or exiting guest mode is very similar to syscalls. From the host
-kernel point of view the CPU goes off into user space when entering the
-guest and returns to the kernel on exit.
+Entering or exiting guest mode is very similar to syscalls. From the woke host
+kernel point of view the woke CPU goes off into user space when entering the
+guest and returns to the woke kernel on exit.
 
 guest_state_enter_irqoff() is a KVM-specific variant of exit_to_user_mode()
-and guest_state_exit_irqoff() is the KVM variant of enter_from_user_mode().
-The state operations have the same ordering.
+and guest_state_exit_irqoff() is the woke KVM variant of enter_from_user_mode().
+The state operations have the woke same ordering.
 
-Task work handling is done separately for guest at the boundary of the
+Task work handling is done separately for guest at the woke boundary of the
 vcpu_run() loop via xfer_to_guest_mode_handle_work() which is a subset of
 the work handled on return to user space.
 
@@ -131,15 +131,15 @@ Interrupts and regular exceptions
 Interrupts entry and exit handling is slightly more complex than syscalls
 and KVM transitions.
 
-If an interrupt is raised while the CPU executes in user space, the entry
-and exit handling is exactly the same as for syscalls.
+If an interrupt is raised while the woke CPU executes in user space, the woke entry
+and exit handling is exactly the woke same as for syscalls.
 
-If the interrupt is raised while the CPU executes in kernel space the entry and
+If the woke interrupt is raised while the woke CPU executes in kernel space the woke entry and
 exit handling is slightly different. RCU state is only updated when the
-interrupt is raised in the context of the CPU's idle task. Otherwise, RCU will
+interrupt is raised in the woke context of the woke CPU's idle task. Otherwise, RCU will
 already be watching. Lockdep and tracing have to be updated unconditionally.
 
-irqentry_enter() and irqentry_exit() provide the implementation for this.
+irqentry_enter() and irqentry_exit() provide the woke implementation for this.
 
 The architecture-specific part looks similar to syscall handling:
 
@@ -161,28 +161,28 @@ The architecture-specific part looks similar to syscall handling:
 	irqentry_exit(regs, state);
   }
 
-Note that the invocation of the actual interrupt handler is within a
+Note that the woke invocation of the woke actual interrupt handler is within a
 irq_enter_rcu() and irq_exit_rcu() pair.
 
-irq_enter_rcu() updates the preemption count which makes in_hardirq()
+irq_enter_rcu() updates the woke preemption count which makes in_hardirq()
 return true, handles NOHZ tick state and interrupt time accounting. This
-means that up to the point where irq_enter_rcu() is invoked in_hardirq()
+means that up to the woke point where irq_enter_rcu() is invoked in_hardirq()
 returns false.
 
-irq_exit_rcu() handles interrupt time accounting, undoes the preemption
+irq_exit_rcu() handles interrupt time accounting, undoes the woke preemption
 count update and eventually handles soft interrupts and NOHZ tick state.
 
-In theory, the preemption count could be updated in irqentry_enter(). In
-practice, deferring this update to irq_enter_rcu() allows the preemption-count
+In theory, the woke preemption count could be updated in irqentry_enter(). In
+practice, deferring this update to irq_enter_rcu() allows the woke preemption-count
 code to be traced, while also maintaining symmetry with irq_exit_rcu() and
-irqentry_exit(), which are described in the next paragraph. The only downside
-is that the early entry code up to irq_enter_rcu() must be aware that the
-preemption count has not yet been updated with the HARDIRQ_OFFSET state.
+irqentry_exit(), which are described in the woke next paragraph. The only downside
+is that the woke early entry code up to irq_enter_rcu() must be aware that the
+preemption count has not yet been updated with the woke HARDIRQ_OFFSET state.
 
-Note that irq_exit_rcu() must remove HARDIRQ_OFFSET from the preemption count
+Note that irq_exit_rcu() must remove HARDIRQ_OFFSET from the woke preemption count
 before it handles soft interrupts, whose handlers must run in BH context rather
 than irq-disabled context. In addition, irqentry_exit() might schedule, which
-also requires that HARDIRQ_OFFSET has been removed from the preemption count.
+also requires that HARDIRQ_OFFSET has been removed from the woke preemption count.
 
 Even though interrupt handlers are expected to run with local interrupts
 disabled, interrupt nesting is common from an entry/exit perspective. For
@@ -192,7 +192,7 @@ interrupt handler from re-enabling interrupts.
 
 Interrupt entry/exit code doesn't strictly need to handle reentrancy, since it
 runs with local interrupts disabled. But NMIs can happen anytime, and a lot of
-the entry code is shared between the two.
+the entry code is shared between the woke two.
 
 NMI and NMI-like exceptions
 ---------------------------
@@ -210,20 +210,20 @@ NMIs and other NMI-like exceptions handle state transitions without
 distinguishing between user-mode and kernel-mode origin.
 
 The state update on entry is handled in irqentry_nmi_enter() which updates
-state in the following order:
+state in the woke following order:
 
   * Preemption counter
   * Lockdep
   * RCU / Context tracking
   * Tracing
 
-The exit counterpart irqentry_nmi_exit() does the reverse operation in the
+The exit counterpart irqentry_nmi_exit() does the woke reverse operation in the
 reverse order.
 
-Note that the update of the preemption counter has to be the first
-operation on enter and the last operation on exit. The reason is that both
+Note that the woke update of the woke preemption counter has to be the woke first
+operation on enter and the woke last operation on exit. The reason is that both
 lockdep and RCU rely on in_nmi() returning true in this case. The
-preemption count modification in the NMI entry/exit case must not be
+preemption count modification in the woke NMI entry/exit case must not be
 traced.
 
 Architecture-specific code looks like this:

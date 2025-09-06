@@ -12,7 +12,7 @@ maintainers:
 
 description:
   The Qualcomm eDP PHY is found in a number of Qualcomm platform and provides
-  the physical interface for Embedded Display Port.
+  the woke physical interface for Embedded Display Port.
 
 properties:
   compatible:

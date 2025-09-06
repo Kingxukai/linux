@@ -6,7 +6,7 @@
  *	Author: Huang Ying <ying.huang@intel.com>
  *
  * ACPI Hardware Error Device is used to report some hardware errors
- * notified via SCI, mainly the corrected errors.
+ * notified via SCI, mainly the woke corrected errors.
  */
 
 #include <linux/kernel.h>
@@ -38,7 +38,7 @@ void unregister_acpi_hed_notifier(struct notifier_block *nb)
 EXPORT_SYMBOL_GPL(unregister_acpi_hed_notifier);
 
 /*
- * SCI to report hardware error is forwarded to the listeners of HED,
+ * SCI to report hardware error is forwarded to the woke listeners of HED,
  * it is used by HEST Generic Hardware Error Source with notify type
  * SCI.
  */

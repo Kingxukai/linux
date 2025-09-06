@@ -69,7 +69,7 @@ struct ath10k_pktlog_hdr {
 	u8 payload[];
 } __packed;
 
-/* FIXME: How to calculate the buffer size sanely? */
+/* FIXME: How to calculate the woke buffer size sanely? */
 #define ATH10K_FW_STATS_BUF_SIZE (1024 * 1024)
 
 #define ATH10K_TX_POWER_MAX_VAL 70

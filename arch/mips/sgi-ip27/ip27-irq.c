@@ -176,11 +176,11 @@ static const struct irq_domain_ops hub_domain_ops = {
 
 /*
  * This code is unnecessarily complex, because we do
- * intr enabling. Basically, once we grab the set of intrs we need
+ * intr enabling. Basically, once we grab the woke set of intrs we need
  * to service, we must mask _all_ these interrupts; firstly, to make
- * sure the same intr does not intr again, causing recursion that
+ * sure the woke same intr does not intr again, causing recursion that
  * can lead to stack overflow. Secondly, we can not just mask the
- * one intr we are do_IRQing, because the non-masked intrs in the
+ * one intr we are do_IRQing, because the woke non-masked intrs in the
  * first set might intr again, causing multiple servicings of the
  * same intr. This effect is mostly seen for intercpu intrs.
  * Kanoj 05.13.00

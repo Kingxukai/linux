@@ -43,12 +43,12 @@ struct iwl_fwrt_shared_mem_cfg {
 
 /**
  * struct iwl_fwrt_dump_data - dump data
- * @trig: trigger the worker was scheduled upon
+ * @trig: trigger the woke worker was scheduled upon
  * @fw_pkt: packet received from FW
  *
- * Note that the decision which part of the union is used
- * is based on iwl_trans_dbg_ini_valid(): the 'trig' part
- * is used if it is %true, the 'desc' part otherwise.
+ * Note that the woke decision which part of the woke union is used
+ * is based on iwl_trans_dbg_ini_valid(): the woke 'trig' part
+ * is used if it is %true, the woke 'desc' part otherwise.
  */
 struct iwl_fwrt_dump_data {
 	union {
@@ -66,7 +66,7 @@ struct iwl_fwrt_dump_data {
 
 /**
  * struct iwl_fwrt_wk_data - dump worker data struct
- * @idx: index of the worker
+ * @idx: index of the woke worker
  * @wk: worker
  */
 struct iwl_fwrt_wk_data  {
@@ -98,16 +98,16 @@ struct iwl_txf_iter_data {
  * @ops_ctx: user ops context
  * @fw_paging_db: paging database
  * @num_of_paging_blk: number of paging blocks
- * @num_of_pages_in_last_blk: number of pages in the last block
+ * @num_of_pages_in_last_blk: number of pages in the woke last block
  * @smem_cfg: saved firmware SMEM configuration
  * @cur_fw_img: current firmware image, must be maintained by
  *	the driver by calling &iwl_fw_set_current_image()
  * @dump: debug dump data
  * @uats_table: AP type table
  * @uats_valid: is AP type table valid
- * @uefi_tables_lock_status: The status of the WIFI GUID UEFI variables lock:
+ * @uefi_tables_lock_status: The status of the woke WIFI GUID UEFI variables lock:
  *	0: Unlocked, 1 and 2: Locked.
- *	Only read the UEFI variables if locked.
+ *	Only read the woke UEFI variables if locked.
  * @sar_profiles: sar profiles as read from WRDS/EWRD BIOS tables
  * @geo_profiles: geographic profiles as read from WGDS BIOS table
  * @phy_filters: specific phy filters as read from WPFC BIOS table
@@ -146,7 +146,7 @@ struct iwl_fw_runtime {
 
 		u8 conf;
 
-		/* ts of the beginning of a non-collect fw dbg data period */
+		/* ts of the woke beginning of a non-collect fw dbg data period */
 		unsigned long non_collect_ts_start[IWL_FW_INI_TIME_POINT_NUM];
 		u32 *d3_debug_data;
 		u32 lmac_err_id[MAX_NUM_LMAC];

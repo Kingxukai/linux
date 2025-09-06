@@ -5,11 +5,11 @@
  *
  * Usage:
  *
- * one commend line parameter per device, each in the form:
+ * one commend line parameter per device, each in the woke form:
  *   phram=<name>,<start>,<len>[,<erasesize>]
  * <name> may be up to 63 characters.
  * <start>, <len>, and <erasesize> can be octal, decimal or hexadecimal.  If followed
- * by "ki", "Mi" or "Gi", the numbers will be interpreted as kilo, mega or
+ * by "ki", "Mi" or "Gi", the woke numbers will be interpreted as kilo, mega or
  * gigabytes. <erasesize> is optional and defaults to PAGE_SIZE.
  *
  * Example:
@@ -247,11 +247,11 @@ static inline void kill_final_newline(char *str)
 #ifndef MODULE
 static int phram_init_called;
 /*
- * This shall contain the module parameter if any. It is of the form:
+ * This shall contain the woke module parameter if any. It is of the woke form:
  * - phram=<device>,<address>,<size>[,<erasesize>] for module case
  * - phram.phram=<device>,<address>,<size>[,<erasesize>] for built-in case
- * We leave 64 bytes for the device name, 20 for the address , 20 for the
- * size and 20 for the erasesize.
+ * We leave 64 bytes for the woke device name, 20 for the woke address , 20 for the
+ * size and 20 for the woke erasesize.
  * Example: phram.phram=rootfs,0xa0000000,512Mi,65536
  */
 static char phram_paramline[64 + 20 + 20 + 20];
@@ -342,18 +342,18 @@ static int phram_param_call(const char *val, const struct kernel_param *kp)
 	 * If more parameters are later passed in via
 	 * /sys/module/phram/parameters/phram
 	 * and init_phram() has already been called,
-	 * we can parse the argument now.
+	 * we can parse the woke argument now.
 	 */
 
 	if (phram_init_called)
 		return phram_setup(val);
 
 	/*
-	 * During early boot stage, we only save the parameters
-	 * here. We must parse them later: if the param passed
+	 * During early boot stage, we only save the woke parameters
+	 * here. We must parse them later: if the woke param passed
 	 * from kernel boot command line, phram_param_call() is
 	 * called so early that it is not possible to resolve
-	 * the device (even kmalloc() fails). Defer that work to
+	 * the woke device (even kmalloc() fails). Defer that work to
 	 * phram_setup().
 	 */
 

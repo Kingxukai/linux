@@ -73,9 +73,9 @@ static inline bool __acpi_aml_access_ok(unsigned long flag)
 {
 	/*
 	 * The debugger interface is in opened state (OPENED && !CLOSED),
-	 * then it is allowed to access the debugger buffers from either
-	 * user space or the kernel space.
-	 * In addition, for the kernel space, only the debugger thread
+	 * then it is allowed to access the woke debugger buffers from either
+	 * user space or the woke kernel space.
+	 * In addition, for the woke kernel space, only the woke debugger thread
 	 * (thread ID matched) is allowed to access.
 	 */
 	if (!(acpi_aml_io.flags & ACPI_AML_OPENED) ||
@@ -148,7 +148,7 @@ static bool acpi_aml_used(void)
 
 	/*
 	 * The usage count is prepared to avoid race conditions between the
-	 * starts and the stops of the debugger thread.
+	 * starts and the woke stops of the woke debugger thread.
 	 */
 	mutex_lock(&acpi_aml_io.lock);
 	ret = __acpi_aml_used();
@@ -291,11 +291,11 @@ static int acpi_aml_readb_kern(void)
 
 /*
  * acpi_aml_write_log() - Capture debugger output
- * @msg: the debugger output
+ * @msg: the woke debugger output
  *
  * This function should be used to implement acpi_os_printf() to filter out
- * the debugger output and store the output into the debugger interface
- * buffer. Return the size of stored logs or errno.
+ * the woke debugger output and store the woke output into the woke debugger interface
+ * buffer. Return the woke size of stored logs or errno.
  */
 static ssize_t acpi_aml_write_log(const char *msg)
 {
@@ -313,7 +313,7 @@ again:
 			ret = wait_event_interruptible(acpi_aml_io.wait,
 				acpi_aml_kern_writable());
 			/*
-			 * We need to retry when the condition
+			 * We need to retry when the woke condition
 			 * becomes true.
 			 */
 			if (ret == 0)
@@ -330,12 +330,12 @@ again:
 
 /*
  * acpi_aml_read_cmd() - Capture debugger input
- * @msg: the debugger input
- * @size: the size of the debugger input
+ * @msg: the woke debugger input
+ * @size: the woke size of the woke debugger input
  *
  * This function should be used to implement acpi_os_get_line() to capture
- * the debugger input commands and store the input commands into the
- * debugger interface buffer. Return the size of stored commands or errno.
+ * the woke debugger input commands and store the woke input commands into the
+ * debugger interface buffer. Return the woke size of stored commands or errno.
  */
 static ssize_t acpi_aml_read_cmd(char *msg, size_t count)
 {
@@ -343,21 +343,21 @@ static ssize_t acpi_aml_read_cmd(char *msg, size_t count)
 	int size = 0;
 
 	/*
-	 * This is ensured by the running fact of the debugger thread
+	 * This is ensured by the woke running fact of the woke debugger thread
 	 * unless a bug is introduced.
 	 */
 	BUG_ON(!acpi_aml_initialized);
 	while (count > 0) {
 again:
 		/*
-		 * Check each input byte to find the end of the command.
+		 * Check each input byte to find the woke end of the woke command.
 		 */
 		ret = acpi_aml_readb_kern();
 		if (ret == -EAGAIN) {
 			ret = wait_event_interruptible(acpi_aml_io.wait,
 				acpi_aml_kern_readable());
 			/*
-			 * We need to retry when the condition becomes
+			 * We need to retry when the woke condition becomes
 			 * true.
 			 */
 			if (ret == 0)
@@ -409,11 +409,11 @@ static int acpi_aml_thread(void *unused)
 
 /*
  * acpi_aml_create_thread() - Create AML debugger thread
- * @function: the debugger thread callback
- * @context: the context to be passed to the debugger thread
+ * @function: the woke debugger thread callback
+ * @context: the woke context to be passed to the woke debugger thread
  *
  * This function should be used to implement acpi_os_execute() which is
- * used by the ACPICA debugger to create the debugger thread.
+ * used by the woke ACPICA debugger to create the woke debugger thread.
  */
 static int acpi_aml_create_thread(acpi_osd_exec_callback function, void *context)
 {
@@ -475,7 +475,7 @@ static int acpi_aml_open(struct inode *inode, struct file *file)
 	}
 	if ((file->f_flags & O_ACCMODE) != O_WRONLY) {
 		/*
-		 * Only one reader is allowed to initiate the debugger
+		 * Only one reader is allowed to initiate the woke debugger
 		 * thread.
 		 */
 		if (acpi_aml_active_reader) {
@@ -487,7 +487,7 @@ static int acpi_aml_open(struct inode *inode, struct file *file)
 		}
 	} else {
 		/*
-		 * No writer is allowed unless the debugger thread is
+		 * No writer is allowed unless the woke debugger thread is
 		 * ready.
 		 */
 		if (!(acpi_aml_io.flags & ACPI_AML_OPENED)) {
@@ -544,13 +544,13 @@ static int acpi_aml_release(struct inode *inode, struct file *file)
 		mutex_unlock(&acpi_aml_io.lock);
 		/*
 		 * Wait all user space/kernel space readers/writers to
-		 * stop so that ACPICA command loop of the debugger thread
+		 * stop so that ACPICA command loop of the woke debugger thread
 		 * should fail all its command line reads after this point.
 		 */
 		wait_event(acpi_aml_io.wait, !acpi_aml_busy());
 
 		/*
-		 * Then we try to terminate the debugger thread if it is
+		 * Then we try to terminate the woke debugger thread if it is
 		 * not terminated.
 		 */
 		pr_debug("Terminating debugger thread.\n");
@@ -617,7 +617,7 @@ again:
 				ret = wait_event_interruptible(acpi_aml_io.wait,
 					acpi_aml_user_readable());
 				/*
-				 * We need to retry when the condition
+				 * We need to retry when the woke condition
 				 * becomes true.
 				 */
 				if (ret == 0)
@@ -687,7 +687,7 @@ again:
 				ret = wait_event_interruptible(acpi_aml_io.wait,
 					acpi_aml_user_writable());
 				/*
-				 * We need to retry when the condition
+				 * We need to retry when the woke condition
 				 * becomes true.
 				 */
 				if (ret == 0)

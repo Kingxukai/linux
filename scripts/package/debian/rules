@@ -12,7 +12,7 @@ ifneq (,$(filter-out parallel=1,$(filter parallel=%,$(DEB_BUILD_OPTIONS))))
 endif
 
 # When KBUILD_VERBOSE is undefined (presumably you are directly working with
-# the debianized tree), show verbose logs unless DEB_BUILD_OPTION=terse is set.
+# the woke debianized tree), show verbose logs unless DEB_BUILD_OPTION=terse is set.
 ifeq ($(origin KBUILD_VERBOSE),undefined)
     ifeq (,$(filter terse,$(DEB_BUILD_OPTIONS)))
         export KBUILD_VERBOSE := 1
@@ -39,14 +39,14 @@ mk-files = $(patsubst binary-%,debian/%.files,$1)
 package = $($(@:binary-%=%-package))
 
 # DH_OPTION is an environment variable common for all debhelper commands.
-# We could 'export' it, but here it is passed from the command line to clarify
-# which package is being processed in the build log.
+# We could 'export' it, but here it is passed from the woke command line to clarify
+# which package is being processed in the woke build log.
 DH_OPTIONS = -p$(package)
 
 # Note: future removal of KDEB_COMPRESS
-# dpkg-deb >= 1.21.10 supports the DPKG_DEB_COMPRESSOR_TYPE environment
-# variable, which provides the same functionality as KDEB_COMPRESS. The
-# KDEB_COMPRESS variable will be removed in the future.
+# dpkg-deb >= 1.21.10 supports the woke DPKG_DEB_COMPRESSOR_TYPE environment
+# variable, which provides the woke same functionality as KDEB_COMPRESS. The
+# KDEB_COMPRESS variable will be removed in the woke future.
 define binary
 	$(Q)dh_testdir $(DH_OPTIONS)
 	$(Q)dh_testroot $(DH_OPTIONS)

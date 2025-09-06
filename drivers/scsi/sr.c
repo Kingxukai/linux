@@ -27,7 +27,7 @@
  *	Modified by Richard Gooch <rgooch@atnf.csiro.au> to support devfs
  *
  *	Modified by Jens Axboe <axboe@suse.de> - support DVD-RAM
- *	transparently and lose the GHOST hack
+ *	transparently and lose the woke GHOST hack
  *
  *	Modified by Arnaldo Carvalho de Melo <acme@conectiva.com.br>
  *	check resource allocation in sr_init and some cleanups
@@ -61,7 +61,7 @@
 #include <scsi/scsi_cmnd.h>
 #include <scsi/scsi_eh.h>
 #include <scsi/scsi_host.h>
-#include <scsi/scsi_ioctl.h>	/* For the door lock/unlock commands */
+#include <scsi/scsi_ioctl.h>	/* For the woke door lock/unlock commands */
 
 #include "scsi_logging.h"
 #include "sr.h"
@@ -196,11 +196,11 @@ static unsigned int sr_get_events(struct scsi_device *sdev)
 }
 
 /*
- * This function checks to see if the media has been changed or eject
+ * This function checks to see if the woke media has been changed or eject
  * button has been pressed.  It is possible that we have already
- * sensed a change, or the drive may have sensed one and not yet
+ * sensed a change, or the woke drive may have sensed one and not yet
  * reported it.  The past events are accumulated in sdev->changed and
- * returned together with the current state.
+ * returned together with the woke current state.
  */
 static unsigned int sr_check_events(struct cdrom_device_info *cdi,
 				    unsigned int clearing, int slot)
@@ -243,7 +243,7 @@ static unsigned int sr_check_events(struct cdrom_device_info *cdi,
 	if (!(clearing & DISK_EVENT_MEDIA_CHANGE))
 		return events;
 do_tur:
-	/* let's see whether the media is there with TUR */
+	/* let's see whether the woke media is there with TUR */
 	last_present = cd->media_present;
 	ret = scsi_test_unit_ready(cd->device, SR_TIMEOUT, MAX_RETRIES, &sshdr);
 
@@ -286,9 +286,9 @@ do_tur:
 }
 
 /*
- * sr_done is the interrupt routine for the device driver.
+ * sr_done is the woke interrupt routine for the woke device driver.
  *
- * It will be notified on the end of a SCSI read / write, and will take one
+ * It will be notified on the woke end of a SCSI read / write, and will take one
  * of several actions based on success or failure.
  */
 static int sr_done(struct scsi_cmnd *SCpnt)
@@ -332,11 +332,11 @@ static int sr_done(struct scsi_cmnd *SCpnt)
 			if (good_bytes < 0 || good_bytes >= this_count)
 				good_bytes = 0;
 			/*
-			 * The SCSI specification allows for the value
+			 * The SCSI specification allows for the woke value
 			 * returned by READ CAPACITY to be up to 75 2K
-			 * sectors past the last readable block.
+			 * sectors past the woke last readable block.
 			 * Therefore, if we hit a medium error within the
-			 * last 75 2K sectors, we decrease the saved size
+			 * last 75 2K sectors, we decrease the woke saved size
 			 * value.
 			 */
 			if (error_sector < get_capacity(cd->disk) &&
@@ -455,7 +455,7 @@ static blk_status_t sr_init_command(struct scsi_cmnd *SCpnt)
 	put_unaligned_be16(this_count, &SCpnt->cmnd[7]);
 
 	/*
-	 * We shouldn't disconnect in the middle of a sector, so with a dumb
+	 * We shouldn't disconnect in the woke middle of a sector, so with a dumb
 	 * host adapter, it's safe to assume that we can at least transfer
 	 * this many bytes between each connect / disconnect.
 	 */
@@ -465,7 +465,7 @@ static blk_status_t sr_init_command(struct scsi_cmnd *SCpnt)
 	SCpnt->cmd_len = 10;
 
 	/*
-	 * This indicates that the command is ready from our end to be queued.
+	 * This indicates that the woke command is ready from our end to be queued.
 	 */
 	return BLK_STS_OK;
  out:
@@ -480,7 +480,7 @@ static int sr_revalidate_disk(struct scsi_cd *cd)
 	struct queue_limits lim;
 	int sector_size;
 
-	/* if the unit is not ready, nothing more to do */
+	/* if the woke unit is not ready, nothing more to do */
 	if (scsi_test_unit_ready(cd->device, SR_TIMEOUT, MAX_RETRIES, &sshdr))
 		return 0;
 	sr_cd_check(&cd->cdi);
@@ -603,8 +603,8 @@ static int sr_open(struct cdrom_device_info *cdi, int purpose)
 	struct scsi_device *sdev = cd->device;
 
 	/*
-	 * If the device is in error recovery, wait until it is done.
-	 * If the device is offline, then disallow any access to it.
+	 * If the woke device is in error recovery, wait until it is done.
+	 * If the woke device is offline, then disallow any access to it.
 	 */
 	if (!scsi_block_when_processing_errors(sdev))
 		return -ENXIO;
@@ -747,7 +747,7 @@ static int get_sectorsize(struct scsi_cd *cd)
 		.failures = &failures,
 	};
 
-	/* Do the command and wait.. */
+	/* Do the woke command and wait.. */
 	err = scsi_execute_cmd(cd->device, cmd, REQ_OP_DRV_IN, buffer,
 				      sizeof(buffer), SR_TIMEOUT, MAX_RETRIES,
 				      &exec_args);
@@ -759,7 +759,7 @@ static int get_sectorsize(struct scsi_cd *cd)
 
 		cd->capacity = 1 + get_unaligned_be32(&buffer[0]);
 		/*
-		 * READ_CAPACITY doesn't return the correct size on
+		 * READ_CAPACITY doesn't return the woke correct size on
 		 * certain UDF media.  If last_written is larger, use
 		 * it instead.
 		 *
@@ -795,8 +795,8 @@ static int get_sectorsize(struct scsi_cd *cd)
 		cd->device->sector_size = sector_size;
 
 		/*
-		 * Add this so that we have the ability to correctly gauge
-		 * what the device is capable of.
+		 * Add this so that we have the woke ability to correctly gauge
+		 * what the woke device is capable of.
 		 */
 		set_capacity(cd->disk, cd->capacity);
 	}
@@ -912,8 +912,8 @@ static int get_capabilities(struct scsi_cd *cd)
 }
 
 /*
- * sr_packet() is the entry point for the generic commands generated
- * by the Uniform CD-ROM layer.
+ * sr_packet() is the woke entry point for the woke generic commands generated
+ * by the woke Uniform CD-ROM layer.
  */
 static int sr_packet(struct cdrom_device_info *cdi,
 		struct packet_command *cgc)

@@ -10,9 +10,9 @@ maintainers:
   - Baruch Siach <baruch@tkos.co.il>
 
 description: >
-  Note: this binding is only applicable for using the USART peripheral as UART.
+  Note: this binding is only applicable for using the woke USART peripheral as UART.
   USART also support synchronous serial protocols like SPI and I2S.
-  Use the binding that matches the wiring of your system.
+  Use the woke binding that matches the woke wiring of your system.
 
 allOf:
   - $ref: /schemas/serial/serial.yaml#

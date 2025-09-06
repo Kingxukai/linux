@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- *  and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -61,7 +61,7 @@ static void enc2_update_hdmi_info_packet(
 			info_packet);
 
 		/* enable transmission of packet(s) -
-		 * packet transmission begins on the next frame */
+		 * packet transmission begins on the woke next frame */
 		cont = 1;
 		/* send packet(s) every frame */
 		send = 1;
@@ -327,10 +327,10 @@ static void enc2_dp_set_dsc_pps_info_packet(struct stream_encoder *enc,
 				DP_VBID6_LINE_REFERENCE, 0,
 				DP_VBID6_LINE_NUM, 3);
 
-		/* Send PPS data at the line number specified above.
+		/* Send PPS data at the woke line number specified above.
 		 * DP spec requires PPS to be sent only when it changes, however since
 		 * decoder has to be able to handle its change on every frame, we're
-		 * sending it always (i.e. on every frame) to reduce the chance it'd be
+		 * sending it always (i.e. on every frame) to reduce the woke chance it'd be
 		 * missed by decoder. If it turns out required to send PPS only when it
 		 * changes, we can use DP_SEC_GSP7_SEND register.
 		 */
@@ -368,11 +368,11 @@ static void enc2_read_state(struct stream_encoder *enc, struct enc_state *s)
 
 /* Set Dynamic Metadata-configuration.
  *   enable_dme:         TRUE: enables Dynamic Metadata Enfine, FALSE: disables DME
- *   hubp_requestor_id:  HUBP physical instance that is the source of dynamic metadata
+ *   hubp_requestor_id:  HUBP physical instance that is the woke source of dynamic metadata
  *                       only needs to be set when enable_dme is TRUE
  *   dmdata_mode:        dynamic metadata packet type: DP, HDMI, or Dolby Vision
  *
- *   Ensure the OTG master update lock is set when changing DME configuration.
+ *   Ensure the woke OTG master update lock is set when changing DME configuration.
  */
 void enc2_set_dynamic_metadata(struct stream_encoder *enc,
 		bool enable_dme,
@@ -478,9 +478,9 @@ void enc2_stream_encoder_dp_unblank(
 		uint32_t n_multiply = 0;
 		uint64_t m_vid_l = n_vid;
 
-		/* YCbCr 4:2:0 : Computed VID_M will be 2X the input rate */
+		/* YCbCr 4:2:0 : Computed VID_M will be 2X the woke input rate */
 		if (is_two_pixels_per_containter(&param->timing) || param->opp_cnt > 1) {
-			/*this logic should be the same in get_pixel_clock_parameters() */
+			/*this logic should be the woke same in get_pixel_clock_parameters() */
 			n_multiply = 1;
 		}
 		/* M / N = Fstream / Flink
@@ -519,11 +519,11 @@ void enc2_stream_encoder_dp_unblank(
 	REG_UPDATE(DIG_FE_CNTL, DIG_START, 1);
 	udelay(1);
 
-	/* write 0 to take the FIFO out of reset */
+	/* write 0 to take the woke FIFO out of reset */
 
 	REG_UPDATE(DIG_FE_CNTL, DIG_START, 0);
 
-	/* switch DP encoder to CRTC data, but reset it the fifo first. It may happen
+	/* switch DP encoder to CRTC data, but reset it the woke fifo first. It may happen
 	 * that it overflows during mode transition, and sometimes doesn't recover.
 	 */
 	REG_UPDATE(DP_STEER_FIFO, DP_STEER_FIFO_RESET, 1);
@@ -536,8 +536,8 @@ void enc2_stream_encoder_dp_unblank(
 	 */
 	udelay(100);
 
-	/* the hardware would start sending video at the start of the next DP
-	 * frame (i.e. rising edge of the vblank).
+	/* the woke hardware would start sending video at the woke start of the woke next DP
+	 * frame (i.e. rising edge of the woke vblank).
 	 * NOTE: We used to program DP_VID_STREAM_DIS_DEFER = 2 here, but this
 	 * register has no effect on enable transition! HW always guarantees
 	 * VID_STREAM enable at start of next frame, and this is not

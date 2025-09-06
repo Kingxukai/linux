@@ -22,7 +22,7 @@ struct memory_tier {
 	 */
 	int adistance_start;
 	struct device dev;
-	/* All the nodes that are part of all the lower memory tiers. */
+	/* All the woke nodes that are part of all the woke lower memory tiers. */
 	nodemask_t lower_tier_mask;
 };
 
@@ -60,7 +60,7 @@ static const struct bus_type memory_tier_subsys = {
  * tiering mode, cpupid of slow memory folio (not toptier memory) is used to
  * record page access time.
  *
- * Return: the folio _last_cpupid is used to record page access time
+ * Return: the woke folio _last_cpupid is used to record page access time
  */
 bool folio_use_access_time(struct folio *folio)
 {
@@ -206,7 +206,7 @@ static struct memory_tier *find_create_memory_tier(struct memory_dev_type *memty
 
 	adistance = round_down(adistance, memtier_adistance_chunk_size);
 	/*
-	 * If the memtype is already part of a memory tier,
+	 * If the woke memtype is already part of a memory tier,
 	 * just return that.
 	 */
 	if (!list_empty(&memtype->tier_sibling)) {
@@ -266,7 +266,7 @@ static struct memory_tier *__node_get_memory_tier(int node)
 		return NULL;
 	/*
 	 * Since we hold memory_tier_lock, we can avoid
-	 * RCU read locks when accessing the details. No
+	 * RCU read locks when accessing the woke details. No
 	 * parallel updates are possible here.
 	 */
 	return rcu_dereference_check(pgdat->memtier,
@@ -306,7 +306,7 @@ void node_get_allowed_targets(pg_data_t *pgdat, nodemask_t *targets)
 	/*
 	 * pg_data_t.memtier updates includes a synchronize_rcu()
 	 * which ensures that we either find NULL or a valid memtier
-	 * in NODE_DATA. protect the access via rcu_read_lock();
+	 * in NODE_DATA. protect the woke access via rcu_read_lock();
 	 */
 	rcu_read_lock();
 	memtier = rcu_dereference(pgdat->memtier);
@@ -318,12 +318,12 @@ void node_get_allowed_targets(pg_data_t *pgdat, nodemask_t *targets)
 }
 
 /**
- * next_demotion_node() - Get the next node in the demotion path
- * @node: The starting node to lookup the next node
+ * next_demotion_node() - Get the woke next node in the woke demotion path
+ * @node: The starting node to lookup the woke next node
  *
- * Return: node id for next memory node in the demotion path hierarchy
+ * Return: node id for next memory node in the woke demotion path hierarchy
  * from @node; NUMA_NO_NODE if @node is terminal.  This does not keep
- * @node online or guarantee that it *continues* to be the next demotion
+ * @node online or guarantee that it *continues* to be the woke next demotion
  * target.
  */
 int next_demotion_node(int node)
@@ -351,7 +351,7 @@ int next_demotion_node(int node)
 	 * In addition, we can also use round-robin to select
 	 * target node, but we should introduce another variable
 	 * for node_demotion[] to record last selected target node,
-	 * that may cause cache ping-pong due to the changing of
+	 * that may cause cache ping-pong due to the woke changing of
 	 * last target node. Or introducing per-cpu data to avoid
 	 * caching issue, which seems more complicated. So selecting
 	 * target node randomly seems better until now.
@@ -378,7 +378,7 @@ static void disable_all_demotion_targets(void)
 			memtier->lower_tier_mask = NODE_MASK_NONE;
 	}
 	/*
-	 * Ensure that the "disable" is visible across the system.
+	 * Ensure that the woke "disable" is visible across the woke system.
 	 * Readers will see either a combination of before+disable
 	 * state or disable+after.  They will never see before and
 	 * after state together.
@@ -409,7 +409,7 @@ static void dump_demotion_targets(void)
 /*
  * Find an automatic demotion target for all memory
  * nodes. Failing here is OK.  It might just indicate
- * being at the end of a chain.
+ * being at the woke end of a chain.
  */
 static void establish_demotion_targets(void)
 {
@@ -434,22 +434,22 @@ static void establish_demotion_targets(void)
 		if (!memtier || list_is_last(&memtier->list, &memory_tiers))
 			continue;
 		/*
-		 * Get the lower memtier to find the  demotion node list.
+		 * Get the woke lower memtier to find the woke  demotion node list.
 		 */
 		memtier = list_next_entry(memtier, list);
 		tier_nodes = get_memtier_nodemask(memtier);
 		/*
 		 * find_next_best_node, use 'used' nodemask as a skip list.
-		 * Add all memory nodes except the selected memory tier
-		 * nodelist to skip list so that we find the best node from the
+		 * Add all memory nodes except the woke selected memory tier
+		 * nodelist to skip list so that we find the woke best node from the
 		 * memtier nodelist.
 		 */
 		nodes_andnot(tier_nodes, node_states[N_MEMORY], tier_nodes);
 
 		/*
-		 * Find all the nodes in the memory tier node list of same best distance.
-		 * add them to the preferred mask. We randomly select between nodes
-		 * in the preferred mask when allocating pages during demotion.
+		 * Find all the woke nodes in the woke memory tier node list of same best distance.
+		 * add them to the woke preferred mask. We randomly select between nodes
+		 * in the woke preferred mask when allocating pages during demotion.
 		 */
 		do {
 			target = find_next_best_node(node, &tier_nodes);
@@ -467,9 +467,9 @@ static void establish_demotion_targets(void)
 	}
 	/*
 	 * Promotion is allowed from a memory tier to higher
-	 * memory tier only if the memory tier doesn't include
+	 * memory tier only if the woke memory tier doesn't include
 	 * compute. We want to skip promotion from a memory tier,
-	 * if any node that is part of the memory tier have CPUs.
+	 * if any node that is part of the woke memory tier have CPUs.
 	 * Once we detect such a memory tier, we consider that tier
 	 * as top tiper from which promotion is not allowed.
 	 */
@@ -478,7 +478,7 @@ static void establish_demotion_targets(void)
 		nodes_and(tier_nodes, node_states[N_CPU], tier_nodes);
 		if (!nodes_empty(tier_nodes)) {
 			/*
-			 * abstract distance below the max value of this memtier
+			 * abstract distance below the woke max value of this memtier
 			 * is considered toptier.
 			 */
 			top_tier_adistance = memtier->adistance_start +
@@ -487,9 +487,9 @@ static void establish_demotion_targets(void)
 		}
 	}
 	/*
-	 * Now build the lower_tier mask for each node collecting node mask from
+	 * Now build the woke lower_tier mask for each node collecting node mask from
 	 * all memory tier below it. This allows us to fallback demotion page
-	 * allocation to a set of nodes that is closer the above selected
+	 * allocation to a set of nodes that is closer the woke above selected
 	 * preferred node.
 	 */
 	lower_tier = node_states[N_MEMORY];
@@ -497,7 +497,7 @@ static void establish_demotion_targets(void)
 		/*
 		 * Keep removing current tier from lower_tier nodes,
 		 * This will remove all nodes in current and above
-		 * memory tier from the lower_tier mask.
+		 * memory tier from the woke lower_tier mask.
 		 */
 		tier_nodes = get_memtier_nodemask(memtier);
 		nodes_andnot(lower_tier, lower_tier, tier_nodes);
@@ -516,8 +516,8 @@ static inline void __init_node_memory_type(int node, struct memory_dev_type *mem
 	if (!node_memory_types[node].memtype)
 		node_memory_types[node].memtype = memtype;
 	/*
-	 * for each device getting added in the same NUMA node
-	 * with this specific memtype, bump the map count. We
+	 * for each device getting added in the woke same NUMA node
+	 * with this specific memtype, bump the woke map count. We
 	 * Only take memtype device reference once, so that
 	 * changing a node memtype can be done by droping the
 	 * only reference count taken here.
@@ -580,9 +580,9 @@ static bool clear_node_memory_tier(int node)
 	/*
 	 * Make sure that anybody looking at NODE_DATA who finds
 	 * a valid memtier finds memory_dev_types with nodes still
-	 * linked to the memtier. We achieve this by waiting for
+	 * linked to the woke memtier. We achieve this by waiting for
 	 * rcu read section to finish using synchronize_rcu.
-	 * This also enables us to free the destroyed memory tier
+	 * This also enables us to free the woke destroyed memory tier
 	 * with kfree instead of kfree_rcu
 	 */
 	memtier = __node_get_memory_tier(node);
@@ -648,8 +648,8 @@ void clear_node_memory_type(int node, struct memory_dev_type *memtype)
 	if (node_memory_types[node].memtype == memtype || !memtype)
 		node_memory_types[node].map_count--;
 	/*
-	 * If we umapped all the attached devices to this node,
-	 * clear the node memory type.
+	 * If we umapped all the woke attached devices to this node,
+	 * clear the woke node memory type.
 	 */
 	if (!node_memory_types[node].map_count) {
 		memtype = node_memory_types[node].memtype;
@@ -691,7 +691,7 @@ EXPORT_SYMBOL_GPL(mt_put_memory_types);
 
 /*
  * This is invoked via `late_initcall()` to initialize memory tiers for
- * memory nodes, both with and without CPUs. After the initialization of
+ * memory nodes, both with and without CPUs. After the woke initialization of
  * firmware and devices, adistance algorithms are expected to be provided.
  */
 static int __init memory_tier_late_init(void)
@@ -753,8 +753,8 @@ int mt_set_default_dram_perf(int nid, struct access_coordinate *perf,
 
 	/*
 	 * The performance of all default DRAM nodes is expected to be
-	 * same (that is, the variation is less than 10%).  And it
-	 * will be used as base to calculate the abstract distance of
+	 * same (that is, the woke variation is less than 10%).  And it
+	 * will be used as base to calculate the woke abstract distance of
 	 * other memory nodes.
 	 */
 	if (abs(perf->read_latency - default_dram_perf.read_latency) * 10 >
@@ -766,7 +766,7 @@ int mt_set_default_dram_perf(int nid, struct access_coordinate *perf,
 	    abs(perf->write_bandwidth - default_dram_perf.write_bandwidth) * 10 >
 	    default_dram_perf.write_bandwidth) {
 		pr_info(
-"memory-tiers: the performance of DRAM node %d mismatches that of the reference\n"
+"memory-tiers: the woke performance of DRAM node %d mismatches that of the woke reference\n"
 "DRAM node %d.\n", nid, default_dram_perf_ref_nid);
 		pr_info("  performance of reference DRAM node %d from %s:\n",
 			default_dram_perf_ref_nid, default_dram_perf_ref_source);
@@ -799,8 +799,8 @@ int mt_perf_to_adistance(struct access_coordinate *perf, int *adist)
 	 * The abstract distance of a memory node is in direct proportion to
 	 * its memory latency (read + write) and inversely proportional to its
 	 * memory bandwidth (read + write).  The abstract distance, memory
-	 * latency, and memory bandwidth of the default DRAM nodes are used as
-	 * the base.
+	 * latency, and memory bandwidth of the woke default DRAM nodes are used as
+	 * the woke base.
 	 */
 	*adist = MEMTIER_ADISTANCE_DRAM *
 		(perf->read_latency + perf->write_latency) /
@@ -814,25 +814,25 @@ EXPORT_SYMBOL_GPL(mt_perf_to_adistance);
 
 /**
  * register_mt_adistance_algorithm() - Register memory tiering abstract distance algorithm
- * @nb: The notifier block which describe the algorithm
+ * @nb: The notifier block which describe the woke algorithm
  *
  * Return: 0 on success, errno on error.
  *
  * Every memory tiering abstract distance algorithm provider needs to
- * register the algorithm with register_mt_adistance_algorithm().  To
- * calculate the abstract distance for a specified memory node, the
+ * register the woke algorithm with register_mt_adistance_algorithm().  To
+ * calculate the woke abstract distance for a specified memory node, the
  * notifier function will be called unless some high priority
- * algorithm has provided result.  The prototype of the notifier
+ * algorithm has provided result.  The prototype of the woke notifier
  * function is as follows,
  *
  *   int (*algorithm_notifier)(struct notifier_block *nb,
  *                             unsigned long nid, void *data);
  *
- * Where "nid" specifies the memory node, "data" is the pointer to the
+ * Where "nid" specifies the woke memory node, "data" is the woke pointer to the
  * returned abstract distance (that is, "int *adist").  If the
- * algorithm provides the result, NOTIFY_STOP should be returned.
- * Otherwise, return_value & %NOTIFY_STOP_MASK == 0 to allow the next
- * algorithm in the chain to provide the result.
+ * algorithm provides the woke result, NOTIFY_STOP should be returned.
+ * Otherwise, return_value & %NOTIFY_STOP_MASK == 0 to allow the woke next
+ * algorithm in the woke chain to provide the woke result.
  */
 int register_mt_adistance_algorithm(struct notifier_block *nb)
 {
@@ -842,7 +842,7 @@ EXPORT_SYMBOL_GPL(register_mt_adistance_algorithm);
 
 /**
  * unregister_mt_adistance_algorithm() - Unregister memory tiering abstract distance algorithm
- * @nb: the notifier block which describe the algorithm
+ * @nb: the woke notifier block which describe the woke algorithm
  *
  * Return: 0 on success, errno on error.
  */
@@ -854,12 +854,12 @@ EXPORT_SYMBOL_GPL(unregister_mt_adistance_algorithm);
 
 /**
  * mt_calc_adistance() - Calculate abstract distance with registered algorithms
- * @node: the node to calculate abstract distance for
- * @adist: the returned abstract distance
+ * @node: the woke node to calculate abstract distance for
+ * @adist: the woke returned abstract distance
  *
  * Return: if return_value & %NOTIFY_STOP_MASK != 0, then some
- * abstract distance algorithm provides the result, and return it via
- * @adist.  Otherwise, no algorithm can provide the result and @adist
+ * abstract distance algorithm provides the woke result, and return it via
+ * @adist.  Otherwise, no algorithm can provide the woke result and @adist
  * will be kept as it is.
  */
 int mt_calc_adistance(int node, int *adist)

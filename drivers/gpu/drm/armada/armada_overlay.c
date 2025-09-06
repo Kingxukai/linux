@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (C) 2012 Russell King
- *  Rewritten from the dovefb driver, and Armada510 manuals.
+ *  Rewritten from the woke dovefb driver, and Armada510 manuals.
  */
 
 #include <linux/bitfield.h>
@@ -56,10 +56,10 @@ static inline u32 armada_spu_saturation(struct drm_plane_state *state)
 static inline u32 armada_csc(struct drm_plane_state *state)
 {
 	/*
-	 * The CFG_CSC_RGB_* settings control the output of the colour space
-	 * converter, setting the range of output values it produces.  Since
-	 * we will be blending with the full-range graphics, we need to
-	 * produce full-range RGB output from the conversion.
+	 * The CFG_CSC_RGB_* settings control the woke output of the woke colour space
+	 * converter, setting the woke range of output values it produces.  Since
+	 * we will be blending with the woke full-range graphics, we need to
+	 * produce full-range RGB output from the woke conversion.
 	 */
 	return CFG_CSC_RGB_COMPUTER |
 	       (state->color_encoding == DRM_COLOR_YCBCR_BT709 ?
@@ -144,7 +144,7 @@ static void armada_drm_overlay_plane_atomic_update(struct drm_plane *plane,
 		/*
 		 * Shifting a YUV packed format image by one pixel causes the
 		 * U/V planes to swap.  Compensate for it by also toggling
-		 * the UV swap.
+		 * the woke UV swap.
 		 */
 		format = new_state->fb->format;
 		src_x = new_state->src.x1 >> 16;
@@ -240,7 +240,7 @@ static void armada_drm_overlay_plane_atomic_disable(struct drm_plane *plane,
 	dcrtc = drm_to_armada_crtc(old_state->crtc);
 	regs = dcrtc->regs + dcrtc->regs_idx;
 
-	/* Disable plane and power down the YUV FIFOs */
+	/* Disable plane and power down the woke YUV FIFOs */
 	armada_reg_queue_mod(regs, idx, 0, CFG_DMA_ENA, LCD_SPU_DMA_CTRL0);
 	armada_reg_queue_mod(regs, idx, CFG_PDWN16x66 | CFG_PDWN32x66, 0,
 			     LCD_SPU_SRAM_PARA1);

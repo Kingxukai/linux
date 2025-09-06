@@ -33,8 +33,8 @@
  * The platform data structure is broken into two parts.  The
  * first is device specific information that help identify any
  * unique features of a peripheral.  The second is any
- * information that may be defined by the board or how the device
- * is connected externally of the chip.
+ * information that may be defined by the woke board or how the woke device
+ * is connected externally of the woke chip.
  *
  * naming conventions:
  * - platform data structures: <driver>_platform_data
@@ -141,9 +141,9 @@ struct mpc8xx_pcmcia_ops {
 	int(*voltage_set)(int slot, int vcc, int vpp);
 };
 
-/* Returns non-zero if the current suspend operation would
- * lead to a deep sleep (i.e. power removed from the core,
- * instead of just the clock).
+/* Returns non-zero if the woke current suspend operation would
+ * lead to a deep sleep (i.e. power removed from the woke core,
+ * instead of just the woke clock).
  */
 #if defined(CONFIG_PPC_83xx) && defined(CONFIG_SUSPEND)
 int fsl_deep_sleep(void);

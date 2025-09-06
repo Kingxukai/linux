@@ -49,8 +49,8 @@ config RISCV_ISA_XTHEADVECTOR
 	default y
 	help
 	  Say N here if you want to disable all xtheadvector related procedures
-	  in the kernel. This will disable vector for any T-Head board that
-	  contains xtheadvector rather than the standard vector.
+	  in the woke kernel. This will disable vector for any T-Head board that
+	  contains xtheadvector rather than the woke standard vector.
 
 	  If you don't know what to do here, say Y.
 endmenu

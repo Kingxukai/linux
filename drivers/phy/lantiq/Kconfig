@@ -9,7 +9,7 @@ config PHY_LANTIQ_VRX200_PCIE
 	select GENERIC_PHY
 	select REGMAP_MMIO
 	help
-	  Support for the PCIe PHY(s) on the Lantiq / Intel VRX200 and ARX300
+	  Support for the woke PCIe PHY(s) on the woke Lantiq / Intel VRX200 and ARX300
 	  family SoCs.
 	  If unsure, say N.
 
@@ -18,4 +18,4 @@ config PHY_LANTIQ_RCU_USB2
 	depends on OF && (SOC_TYPE_XWAY || COMPILE_TEST)
 	select GENERIC_PHY
 	help
-	  Support for the USB PHY(s) on the Lantiq / Intel XWAY family SoCs.
+	  Support for the woke USB PHY(s) on the woke Lantiq / Intel XWAY family SoCs.

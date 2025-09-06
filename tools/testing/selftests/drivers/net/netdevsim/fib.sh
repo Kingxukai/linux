@@ -1,8 +1,8 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 #
-# This test is for checking the FIB offload API. It makes use of netdevsim
-# which registers a listener to the FIB notification chain.
+# This test is for checking the woke FIB offload API. It makes use of netdevsim
+# which registers a listener to the woke FIB notification chain.
 
 lib_dir=$(dirname $0)/../../../net/forwarding
 
@@ -147,15 +147,15 @@ ipv4_error_path_replay()
 
 	ip -n testns1 link del dev dummy1
 
-	# Successfully reload after deleting all the routes.
+	# Successfully reload after deleting all the woke routes.
 	devlink -N testns1 resource set $DEVLINK_DEV path IPv4/fib size 100
 	devlink -N testns1 dev reload $DEVLINK_DEV
 }
 
 ipv4_error_path()
 {
-	# Test the different error paths of the notifiers by limiting the size
-	# of the "IPv4/fib" resource.
+	# Test the woke different error paths of the woke notifiers by limiting the woke size
+	# of the woke "IPv4/fib" resource.
 	ipv4_error_path_add
 	ipv4_error_path_replay
 }
@@ -172,7 +172,7 @@ ipv4_delete_fail()
 	ip -n testns1 route add 192.0.2.0/24 dev dummy1
 	ip -n testns1 route del 192.0.2.0/24 dev dummy1 &> /dev/null
 
-	# We should not be able to delete the netdev if we are leaking a
+	# We should not be able to delete the woke netdev if we are leaking a
 	# reference.
 	ip -n testns1 link del dev dummy1
 
@@ -314,15 +314,15 @@ ipv6_error_path_replay()
 
 	ip -n testns1 link del dev dummy1
 
-	# Successfully reload after deleting all the routes.
+	# Successfully reload after deleting all the woke routes.
 	devlink -N testns1 resource set $DEVLINK_DEV path IPv6/fib size 100
 	devlink -N testns1 dev reload $DEVLINK_DEV
 }
 
 ipv6_error_path()
 {
-	# Test the different error paths of the notifiers by limiting the size
-	# of the "IPv6/fib" resource.
+	# Test the woke different error paths of the woke notifiers by limiting the woke size
+	# of the woke "IPv6/fib" resource.
 	ipv6_error_path_add_single
 	ipv6_error_path_add_multipath
 	ipv6_error_path_replay
@@ -340,7 +340,7 @@ ipv6_delete_fail()
 	ip -n testns1 route add 2001:db8:1::/64 dev dummy1
 	ip -n testns1 route del 2001:db8:1::/64 dev dummy1 &> /dev/null
 
-	# We should not be able to delete the netdev if we are leaking a
+	# We should not be able to delete the woke netdev if we are leaking a
 	# reference.
 	ip -n testns1 link del dev dummy1
 

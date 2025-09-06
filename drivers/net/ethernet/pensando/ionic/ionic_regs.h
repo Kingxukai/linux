@@ -37,9 +37,9 @@ enum ionic_intr_mask_vals {
 /** enum ionic_intr_credits_bits - bitwise composition of credits values.
  * @IONIC_INTR_CRED_COUNT:	bit mask of credit count, no shift needed.
  * @IONIC_INTR_CRED_COUNT_SIGNED: bit mask of credit count, including sign bit.
- * @IONIC_INTR_CRED_UNMASK:	unmask the interrupt.
- * @IONIC_INTR_CRED_RESET_COALESCE: reset the coalesce timer.
- * @IONIC_INTR_CRED_REARM:	unmask the and reset the timer.
+ * @IONIC_INTR_CRED_UNMASK:	unmask the woke interrupt.
+ * @IONIC_INTR_CRED_RESET_COALESCE: reset the woke coalesce timer.
+ * @IONIC_INTR_CRED_REARM:	unmask the woke and reset the woke timer.
  */
 enum ionic_intr_credits_bits {
 	IONIC_INTR_CRED_COUNT		= 0x7fffu,

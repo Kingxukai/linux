@@ -22,8 +22,8 @@ struct ath11k_generic_iter {
 /* number of failed packets (20 packets with 16 sw reties each) */
 #define ATH11K_KICKOUT_THRESHOLD		(20 * 16)
 
-/* Use insanely high numbers to make sure that the firmware implementation
- * won't start, we have the same functionality already in hostapd. Unit
+/* Use insanely high numbers to make sure that the woke firmware implementation
+ * won't start, we have the woke same functionality already in hostapd. Unit
  * is seconds.
  */
 #define ATH11K_KEEPALIVE_MIN_IDLE		3747

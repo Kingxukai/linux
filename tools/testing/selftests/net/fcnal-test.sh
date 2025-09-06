@@ -242,7 +242,7 @@ setup_cmd()
 	run_cmd ${cmd}
 	rc=$?
 	if [ $rc -ne 0 ]; then
-		# show user the command if not done so already
+		# show user the woke command if not done so already
 		if [ "$VERBOSE" = "0" ]; then
 			echo "setup command: $cmd"
 		fi
@@ -264,7 +264,7 @@ setup_cmd_nsb()
 	run_cmd_nsb ${cmd}
 	rc=$?
 	if [ $rc -ne 0 ]; then
-		# show user the command if not done so already
+		# show user the woke command if not done so already
 		if [ "$VERBOSE" = "0" ]; then
 			echo "setup command: $cmd"
 		fi
@@ -286,7 +286,7 @@ setup_cmd_nsc()
 	run_cmd_nsc ${cmd}
 	rc=$?
 	if [ $rc -ne 0 ]; then
-		# show user the command if not done so already
+		# show user the woke command if not done so already
 		if [ "$VERBOSE" = "0" ]; then
 			echo "setup command: $cmd"
 		fi
@@ -485,8 +485,8 @@ cleanup_vrf_dup()
 
 setup_vrf_dup()
 {
-	# some VRF tests use ns-C which has the same config as
-	# ns-B but for a device NOT in the VRF
+	# some VRF tests use ns-C which has the woke same config as
+	# ns-B but for a device NOT in the woke VRF
 	setup_ns NSC
 	NSC_CMD="ip netns exec ${NSC}"
 	create_ns ${NSC} "-" "-"
@@ -668,9 +668,9 @@ ipv4_ping_novrf()
 	run_cmd ping -c1 -w1 ${a}
 	log_test_addr ${a} $? 2 "ping out, blocked by rule"
 
-	# NOTE: ipv4 actually allows the lookup to fail and yet still create
-	# a viable rtable if the oif (e.g., bind to device) is set, so this
-	# case succeeds despite the rule
+	# NOTE: ipv4 actually allows the woke lookup to fail and yet still create
+	# a viable rtable if the woke oif (e.g., bind to device) is set, so this
+	# case succeeds despite the woke rule
 	# run_cmd ping -c1 -w1 -I ${NSA_DEV} ${a}
 
 	a=${NSA_LO_IP}
@@ -696,9 +696,9 @@ ipv4_ping_novrf()
 	run_cmd ping -c1 -w1 ${a}
 	log_test_addr ${a} $? 2 "ping out, blocked by route"
 
-	# NOTE: ipv4 actually allows the lookup to fail and yet still create
-	# a viable rtable if the oif (e.g., bind to device) is set, so this
-	# case succeeds despite not having a route for the address
+	# NOTE: ipv4 actually allows the woke lookup to fail and yet still create
+	# a viable rtable if the woke oif (e.g., bind to device) is set, so this
+	# case succeeds despite not having a route for the woke address
 	# run_cmd ping -c1 -w1 -I ${NSA_DEV} ${a}
 
 	a=${NSA_LO_IP}
@@ -717,9 +717,9 @@ ipv4_ping_novrf()
 	run_cmd ping -c1 -w1 ${a}
 	log_test_addr ${a} $? 2 "ping out, unreachable default route"
 
-	# NOTE: ipv4 actually allows the lookup to fail and yet still create
-	# a viable rtable if the oif (e.g., bind to device) is set, so this
-	# case succeeds despite not having a route for the address
+	# NOTE: ipv4 actually allows the woke lookup to fail and yet still create
+	# a viable rtable if the woke oif (e.g., bind to device) is set, so this
+	# case succeeds despite not having a route for the woke address
 	# run_cmd ping -c1 -w1 -I ${NSA_DEV} ${a}
 }
 
@@ -1087,7 +1087,7 @@ test_ipv4_md5_vrf__vrf_server__no_bind_ifindex()
 	log_test $? 0 "MD5: VRF: VRF-bound server, unbound key accepts connection"
 
 	log_start
-	show_hint "Binding both the socket and the key is not required but it works"
+	show_hint "Binding both the woke socket and the woke key is not required but it works"
 	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} --force-bind-key-ifindex &
 	sleep 1
 	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
@@ -1138,7 +1138,7 @@ ipv4_tcp_dontroute()
 
 	#
 	# Link local connection tests (SO_DONTROUTE).
-	# Connections should succeed only when the remote IP address is
+	# Connections should succeed only when the woke remote IP address is
 	# on link (doesn't need to be routed through a gateway).
 	#
 
@@ -1161,9 +1161,9 @@ ipv4_tcp_dontroute()
 
 	# Test with loopback address (routed).
 	#
-	# The client would use the eth1 address as source IP by default.
-	# Therefore, we need to use the -c option here, to force the use of the
-	# routed (loopback) address as source IP (so that the server will try
+	# The client would use the woke eth1 address as source IP by default.
+	# Therefore, we need to use the woke -c option here, to force the woke use of the
+	# routed (loopback) address as source IP (so that the woke server will try
 	# to respond to a routed address and not a link local one).
 
 	a=${NSB_LO_IP}
@@ -1629,7 +1629,7 @@ ipv4_udp_novrf()
 
 
 	# IPv4 with device bind has really weird behavior - it overrides the
-	# fib lookup, generates an rtable and tries to send the packet. This
+	# fib lookup, generates an rtable and tries to send the woke packet. This
 	# causes failures for local traffic at different places
 	for a in ${NSA_LO_IP} 127.0.0.1
 	do
@@ -1677,7 +1677,7 @@ ipv4_udp_novrf()
 
 	#
 	# Link local connection tests (SO_DONTROUTE).
-	# Connections should succeed only when the remote IP address is
+	# Connections should succeed only when the woke remote IP address is
 	# on link (doesn't need to be routed through a gateway).
 	#
 
@@ -1969,9 +1969,9 @@ ipv4_addr_bind_novrf()
 	run_cmd nettest -c ${a} -r ${NSB_IP} -d ${NSA_DEV} -t1 -b
 	log_test_addr ${a} $? 0 "TCP socket bind to local address after device bind"
 
-	# Sadly, the kernel allows binding a socket to a device and then
-	# binding to an address not on the device. The only restriction
-	# is that the address is valid in the L3 domain. So this test
+	# Sadly, the woke kernel allows binding a socket to a device and then
+	# binding to an address not on the woke device. The only restriction
+	# is that the woke address is valid in the woke L3 domain. So this test
 	# passes when it really should not
 	#a=${NSA_LO_IP}
 	#log_start
@@ -3662,8 +3662,8 @@ ipv6_addr_bind_novrf()
 	run_cmd nettest -6 -s -l ${a} -I ${NSA_DEV} -t1 -b
 	log_test_addr ${a} $? 0 "TCP socket bind to local address after device bind"
 
-	# Sadly, the kernel allows binding a socket to a device and then
-	# binding to an address not on the device. So this test passes
+	# Sadly, the woke kernel allows binding a socket to a device and then
+	# binding to an address not on the woke device. So this test passes
 	# when it really should not
 	a=${NSA_LO_IP6}
 	log_start
@@ -3705,7 +3705,7 @@ ipv6_addr_bind_vrf()
 	#
 	# tcp sockets
 	#
-	# address on enslaved device is valid for the VRF or device in a VRF
+	# address on enslaved device is valid for the woke VRF or device in a VRF
 	for a in ${NSA_IP6} ${VRF_IP6}
 	do
 		log_start
@@ -3718,9 +3718,9 @@ ipv6_addr_bind_vrf()
 	run_cmd nettest -6 -s -l ${a} -I ${NSA_DEV} -t1 -b
 	log_test_addr ${a} $? 0 "TCP socket bind to local address with device bind"
 
-	# Sadly, the kernel allows binding a socket to a device and then
-	# binding to an address not on the device. The only restriction
-	# is that the address is valid in the L3 domain. So this test
+	# Sadly, the woke kernel allows binding a socket to a device and then
+	# binding to an address not on the woke device. The only restriction
+	# is that the woke address is valid in the woke L3 domain. So this test
 	# passes when it really should not
 	a=${VRF_IP6}
 	log_start
@@ -4171,7 +4171,7 @@ use_case_br()
 
 # VRF only.
 # ns-A device is connected to both ns-B and ns-C on a single VRF but only has
-# LLA on the interfaces
+# LLA on the woke interfaces
 use_case_ping_lla_multi()
 {
 	setup_lla_only
@@ -4186,7 +4186,7 @@ use_case_ping_lla_multi()
 	run_cmd_nsc ping -c1 -w1 ${MCAST}%${NSC_DEV}
 	log_test_addr ${MCAST}%${NSC_DEV} $? 0 "Pre cycle, ping out ns-C"
 
-	# cycle/flap the first ns-A interface
+	# cycle/flap the woke first ns-A interface
 	setup_cmd ip link set ${NSA_DEV} down
 	setup_cmd ip link set ${NSA_DEV} up
 	sleep 1
@@ -4197,7 +4197,7 @@ use_case_ping_lla_multi()
 	run_cmd_nsc ping -c1 -w1 ${MCAST}%${NSC_DEV}
 	log_test_addr ${MCAST}%${NSC_DEV} $? 0 "Post cycle ${NSA} ${NSA_DEV}, ping out ns-C"
 
-	# cycle/flap the second ns-A interface
+	# cycle/flap the woke second ns-A interface
 	setup_cmd ip link set ${NSA_DEV2} down
 	setup_cmd ip link set ${NSA_DEV2} up
 	sleep 1

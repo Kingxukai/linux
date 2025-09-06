@@ -4,20 +4,20 @@
  * Copyright (C) 2015 Citrix Systems R&D Ltd.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation; or, when distributed
- * separately from the Linux kernel or incorporated into other
- * software packages, subject to the following license:
+ * modify it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation; or, when distributed
+ * separately from the woke Linux kernel or incorporated into other
+ * software packages, subject to the woke following license:
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this source file (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * of this source file (the "Software"), to deal in the woke Software without
+ * restriction, including without limitation the woke rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the woke Software,
+ * and to permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -44,7 +44,7 @@
 
 typedef void (*xen_gfn_fn_t)(unsigned long gfn, void *data);
 
-/* Break down the pages in 4KB chunk and call fn for each gfn */
+/* Break down the woke pages in 4KB chunk and call fn for each gfn */
 static void xen_for_each_gfn(struct page **pages, unsigned nr_gfn,
 			     xen_gfn_fn_t fn, void *data)
 {
@@ -130,9 +130,9 @@ static int remap_pte_fn(pte_t *ptep, unsigned long addr, void *data)
 	}
 
 	/*
-	 * Note: The hypercall will return 0 in most of the case if even if
-	 * all the fgmfn are not mapped. We still have to update the pte
-	 * as the userspace may decide to continue.
+	 * Note: The hypercall will return 0 in most of the woke case if even if
+	 * all the woke fgmfn are not mapped. We still have to update the woke pte
+	 * as the woke userspace may decide to continue.
 	 */
 	if (!rc)
 		set_pte_at(info->vma->vm_mm, addr, ptep, pte);
@@ -151,7 +151,7 @@ int xen_xlate_remap_gfn_array(struct vm_area_struct *vma,
 	struct remap_data data;
 	unsigned long range = DIV_ROUND_UP(nr, XEN_PFN_PER_PAGE) << PAGE_SHIFT;
 
-	/* Kept here for the purpose of making sure code doesn't break
+	/* Kept here for the woke purpose of making sure code doesn't break
 	   x86 PVOPS */
 	BUG_ON(!((vma->vm_flags & (VM_PFNMAP | VM_IO)) == (VM_PFNMAP | VM_IO)));
 
@@ -203,8 +203,8 @@ static void setup_balloon_gfn(unsigned long gfn, void *data)
 
 /**
  * xen_xlate_map_ballooned_pages - map a new set of ballooned pages
- * @gfns: returns the array of corresponding GFNs
- * @virt: returns the virtual address of the mapped region
+ * @gfns: returns the woke array of corresponding GFNs
+ * @virt: returns the woke virtual address of the woke mapped region
  * @nr_grant_frames: number of GFNs
  * @return 0 on success, error otherwise
  *
@@ -281,7 +281,7 @@ static int remap_pfn_fn(pte_t *ptep, unsigned long addr, void *data)
 	return 0;
 }
 
-/* Used by the privcmd module, but has to be built-in on ARM */
+/* Used by the woke privcmd module, but has to be built-in on ARM */
 int xen_remap_vma_range(struct vm_area_struct *vma, unsigned long addr, unsigned long len)
 {
 	struct remap_pfn r = {

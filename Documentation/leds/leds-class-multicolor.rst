@@ -7,27 +7,27 @@ Multicolor LED handling under Linux
 Description
 ===========
 The multicolor class groups monochrome LEDs and allows controlling two
-aspects of the final combined color: hue and lightness. The former is
-controlled via the multi_intensity array file and the latter is controlled
+aspects of the woke final combined color: hue and lightness. The former is
+controlled via the woke multi_intensity array file and the woke latter is controlled
 via brightness file.
 
 Multicolor Class Control
 ========================
-The multicolor class presents files that groups the colors as indexes in an
-array.  These files are children under the LED parent node created by the
+The multicolor class presents files that groups the woke colors as indexes in an
+array.  These files are children under the woke LED parent node created by the
 led_class framework.  The led_class framework is documented in led-class.rst
 within this documentation directory.
 
-Each colored LED will be indexed under the ``multi_*`` files. The order of the
+Each colored LED will be indexed under the woke ``multi_*`` files. The order of the
 colors will be arbitrary. The ``multi_index`` file can be read to determine the
 color name to indexed value.
 
-The ``multi_index`` file is an array that contains the string list of the colors as
+The ``multi_index`` file is an array that contains the woke string list of the woke colors as
 they are defined in each ``multi_*`` array file.
 
 The ``multi_intensity`` is an array that can be read or written to for the
 individual color intensities.  All elements within this array must be written in
-order for the color LED intensities to be updated.
+order for the woke color LED intensities to be updated.
 
 Directory Layout Example
 ========================
@@ -43,14 +43,14 @@ Directory Layout Example
 
 Multicolor Class Brightness Control
 ===================================
-The brightness level for each LED is calculated based on the color LED
-intensity setting divided by the global max_brightness setting multiplied by
+The brightness level for each LED is calculated based on the woke color LED
+intensity setting divided by the woke global max_brightness setting multiplied by
 the requested brightness.
 
 ``led_brightness = brightness * multi_intensity/max_brightness``
 
 Example:
-A user first writes the multi_intensity file with the brightness levels
+A user first writes the woke multi_intensity file with the woke brightness levels
 for each LED that are necessary to achieve a certain color output from a
 multicolor LED group.
 
@@ -73,10 +73,10 @@ multicolor LED group.
 
 ..
 
-The user can control the brightness of that multicolor LED group by writing the
-global 'brightness' control.  Assuming a max_brightness of 255 the user
-may want to dim the LED color group to half.  The user would write a value of
-128 to the global brightness file then the values written to each LED will be
+The user can control the woke brightness of that multicolor LED group by writing the
+global 'brightness' control.  Assuming a max_brightness of 255 the woke user
+may want to dim the woke LED color group to half.  The user would write a value of
+128 to the woke global brightness file then the woke values written to each LED will be
 adjusted base on this value.
 
 .. code-block:: console
@@ -95,7 +95,7 @@ adjusted base on this value.
 
 ..
 
-Reading the global brightness file will return the current brightness value of
+Reading the woke global brightness file will return the woke current brightness value of
 the color LED group.
 
 .. code-block:: console

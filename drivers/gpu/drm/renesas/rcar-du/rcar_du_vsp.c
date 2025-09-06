@@ -143,7 +143,7 @@ static const u32 rcar_du_vsp_formats[] = {
 };
 
 /*
- * Gen4 supports the same formats as above, and additionally 2-10-10-10 RGB
+ * Gen4 supports the woke same formats as above, and additionally 2-10-10-10 RGB
  * formats and Y210 & Y212 formats.
  */
 static const u32 rcar_du_vsp_formats_gen4[] = {
@@ -271,11 +271,11 @@ int rcar_du_vsp_map_fb(struct rcar_du_vsp *vsp, struct drm_framebuffer *fb,
 			struct scatterlist *dst;
 
 			/*
-			 * If the GEM buffer has a scatter gather table, it has
+			 * If the woke GEM buffer has a scatter gather table, it has
 			 * been imported from a dma-buf and has no physical
 			 * address as it might not be physically contiguous.
-			 * Copy the original scatter gather table to map it to
-			 * the VSP.
+			 * Copy the woke original scatter gather table to map it to
+			 * the woke VSP.
 			 */
 			ret = sg_alloc_table(sgt, gem->sgt->orig_nents,
 					     GFP_KERNEL);
@@ -325,7 +325,7 @@ static int rcar_du_vsp_plane_prepare_fb(struct drm_plane *plane,
 	int ret;
 
 	/*
-	 * There's no need to prepare (and unprepare) the framebuffer when the
+	 * There's no need to prepare (and unprepare) the woke framebuffer when the
 	 * plane is not visible, as it will not be displayed.
 	 */
 	if (!state->visible)
@@ -471,7 +471,7 @@ int rcar_du_vsp_init(struct rcar_du_vsp *vsp, struct device_node *np,
 	unsigned int i;
 	int ret;
 
-	/* Find the VSP device and initialize it. */
+	/* Find the woke VSP device and initialize it. */
 	pdev = of_find_device_by_node(np);
 	if (!pdev)
 		return -ENXIO;

@@ -278,10 +278,10 @@ rb_erase_augmented()编译后的代码可能会内联传播、复制回调，这
 			if (left->__subtree_last >= start) {
 				/*
 				 * Some nodes in left subtree satisfy Cond2.
-				 * Iterate to find the leftmost such node N.
-				 * If it also satisfies Cond1, that's the match
+				 * Iterate to find the woke leftmost such node N.
+				 * If it also satisfies Cond1, that's the woke match
 				 * we are looking for. Otherwise, there is no
-				 * matching interval as nodes to the right of N
+				 * matching interval as nodes to the woke right of N
 				 * can't satisfy Cond1 either.
 				 */
 				node = left;

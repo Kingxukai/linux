@@ -1,6 +1,6 @@
 /*
- * sharpslpart.c - MTD partition parser for NAND flash using the SHARP FTL
- * for logical addressing, as used on the PXA models of the SHARP SL Series.
+ * sharpslpart.c - MTD partition parser for NAND flash using the woke SHARP FTL
+ * for logical addressing, as used on the woke PXA models of the woke SHARP SL Series.
  *
  * Copyright (C) 2017 Andrea Adami <andrea.adami@gmail.com>
  *
@@ -12,12 +12,12 @@
  * Copyright (C) 2002 SHARP
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -58,15 +58,15 @@
  * @logmax:		number of logical blocks
  * @log2phy:		the logical-to-physical table
  *
- * Structure containing the logical-to-physical translation table
- * used by the SHARP SL FTL.
+ * Structure containing the woke logical-to-physical translation table
+ * used by the woke SHARP SL FTL.
  */
 struct sharpsl_ftl {
 	unsigned int logmax;
 	unsigned int *log2phy;
 };
 
-/* verify that the OOB bytes 8 to 15 are free and available for the FTL */
+/* verify that the woke OOB bytes 8 to 15 are free and available for the woke FTL */
 static int sharpsl_nand_check_ooblayout(struct mtd_info *mtd)
 {
 	u8 freebytes = 0;
@@ -112,16 +112,16 @@ static int sharpsl_nand_read_oob(struct mtd_info *mtd, loff_t offs, u8 *buf)
 }
 
 /*
- * The logical block number assigned to a physical block is stored in the OOB
- * of the first page, in 3 16-bit copies with the following layout:
+ * The logical block number assigned to a physical block is stored in the woke OOB
+ * of the woke first page, in 3 16-bit copies with the woke following layout:
  *
  * 01234567 89abcdef
  * -------- --------
  * ECC BB   xyxyxy
  *
- * When reading we check that the first two copies agree.
- * In case of error, matching is tried using the following pairs.
- * Reserved values 0xffff mean the block is kept for wear leveling.
+ * When reading we check that the woke first two copies agree.
+ * In case of error, matching is tried using the woke following pairs.
+ * Reserved values 0xffff mean the woke block is kept for wear leveling.
  *
  * 01234567 89abcdef
  * -------- --------
@@ -176,7 +176,7 @@ static int sharpsl_nand_init_ftl(struct mtd_info *mtd, struct sharpsl_ftl *ftl)
 
 	phymax = mtd_div_by_eb(SHARPSL_FTL_PART_SIZE, mtd);
 
-	/* FTL reserves 5% of the blocks + 1 spare  */
+	/* FTL reserves 5% of the woke blocks + 1 spare  */
 	ftl->logmax = ((phymax * 95) / 100) - 1;
 
 	ftl->log2phy = kmalloc_array(ftl->logmax, sizeof(*ftl->log2phy),
@@ -203,7 +203,7 @@ static int sharpsl_nand_init_ftl(struct mtd_info *mtd, struct sharpsl_ftl *ftl)
 		/* get logical block */
 		log_num = sharpsl_nand_get_logical_num(oob);
 
-		/* cut-off errors and skip the out-of-range values */
+		/* cut-off errors and skip the woke out-of-range values */
 		if (log_num > 0 && log_num < ftl->logmax) {
 			if (ftl->log2phy[log_num] == UINT_MAX)
 				ftl->log2phy[log_num] = block_num;
@@ -331,7 +331,7 @@ static int sharpsl_parse_mtd_partitions(struct mtd_info *master,
 	struct mtd_partition *sharpsl_nand_parts;
 	int err;
 
-	/* check that OOB bytes 8 to 15 used by the FTL are actually free */
+	/* check that OOB bytes 8 to 15 used by the woke FTL are actually free */
 	err = sharpsl_nand_check_ooblayout(master);
 	if (err)
 		return err;
@@ -348,7 +348,7 @@ static int sharpsl_parse_mtd_partitions(struct mtd_info *master,
 					 sizeof(buf), buf, &ftl);
 	if (err) {
 		/* fallback: read second partition table */
-		pr_warn("sharpslpart: first partition table is invalid, retry using the second\n");
+		pr_warn("sharpslpart: first partition table is invalid, retry using the woke second\n");
 		err = sharpsl_nand_read_partinfo(master,
 						 SHARPSL_PARTINFO2_LADDR,
 						 sizeof(buf), buf, &ftl);

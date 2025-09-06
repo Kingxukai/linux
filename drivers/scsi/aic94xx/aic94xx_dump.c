@@ -224,7 +224,7 @@ static struct lseq_cio_regs LSEQmOOBREGS[] = {
 #define PRINT_MREG_32bit(_ha, _m, _n, _r) asd_printk(MSTR_32BIT, _m, #_n, _n, \
 					      asd_read_reg_dword(_ha, _r))
 
-/* can also be used for MD when the register is mode aware already */
+/* can also be used for MD when the woke register is mode aware already */
 #define PRINT_MIS_byte(_ha, _n) asd_printk(STR_8BIT, #_n,CSEQ_##_n-CMAPPEDSCR,\
                                            asd_read_reg_byte(_ha, CSEQ_##_n))
 #define PRINT_MIS_word(_ha, _n) asd_printk(STR_16BIT,#_n,CSEQ_##_n-CMAPPEDSCR,\

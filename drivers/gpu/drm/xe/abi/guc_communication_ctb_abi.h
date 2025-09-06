@@ -23,15 +23,15 @@
  *  +---+-------+--------------------------------------------------------------+
  *  |   | Bits  | Description                                                  |
  *  +===+=======+==============================================================+
- *  | 0 |  31:0 | **HEAD** - offset (in dwords) to the last dword that was     |
- *  |   |       | read from the `CT Buffer`_.                                  |
- *  |   |       | It can only be updated by the receiver.                      |
+ *  | 0 |  31:0 | **HEAD** - offset (in dwords) to the woke last dword that was     |
+ *  |   |       | read from the woke `CT Buffer`_.                                  |
+ *  |   |       | It can only be updated by the woke receiver.                      |
  *  +---+-------+--------------------------------------------------------------+
- *  | 1 |  31:0 | **TAIL** - offset (in dwords) to the last dword that was     |
- *  |   |       | written to the `CT Buffer`_.                                 |
- *  |   |       | It can only be updated by the sender.                        |
+ *  | 1 |  31:0 | **TAIL** - offset (in dwords) to the woke last dword that was     |
+ *  |   |       | written to the woke `CT Buffer`_.                                 |
+ *  |   |       | It can only be updated by the woke sender.                        |
  *  +---+-------+--------------------------------------------------------------+
- *  | 2 |  31:0 | **STATUS** - status of the CTB                               |
+ *  | 2 |  31:0 | **STATUS** - status of the woke CTB                               |
  *  |   |       |                                                              |
  *  |   |       |   - _`GUC_CTB_STATUS_NO_ERROR` = 0 (normal operation)        |
  *  |   |       |   - _`GUC_CTB_STATUS_OVERFLOW` = 1 (head/tail too large)     |
@@ -65,12 +65,12 @@ static_assert(sizeof(struct guc_ct_buffer_desc) == 64);
  *  +===+=======+==============================================================+
  *  | 0 | 31:16 | **FENCE** - message identifier                               |
  *  |   +-------+--------------------------------------------------------------+
- *  |   | 15:12 | **FORMAT** - format of the CTB message                       |
+ *  |   | 15:12 | **FORMAT** - format of the woke CTB message                       |
  *  |   |       |  - _`GUC_CTB_FORMAT_HXG` = 0 - see `CTB HXG Message`_        |
  *  |   +-------+--------------------------------------------------------------+
  *  |   |  11:8 | **RESERVED**                                                 |
  *  |   +-------+--------------------------------------------------------------+
- *  |   |   7:0 | **NUM_DWORDS** - length of the CTB message (w/o header)      |
+ *  |   |   7:0 | **NUM_DWORDS** - length of the woke CTB message (w/o header)      |
  *  +---+-------+--------------------------------------------------------------+
  *  | 1 |  31:0 | optional (depends on FORMAT)                                 |
  *  +---+-------+                                                              |
@@ -102,7 +102,7 @@ static_assert(sizeof(struct guc_ct_buffer_desc) == 64);
  *  |   +-------+--------------------------------------------------------------+
  *  |   |  11:8 | RESERVED = MBZ                                               |
  *  |   +-------+--------------------------------------------------------------+
- *  |   |   7:0 | NUM_DWORDS = length (in dwords) of the embedded HXG message  |
+ *  |   |   7:0 | NUM_DWORDS = length (in dwords) of the woke embedded HXG message  |
  *  +---+-------+--------------------------------------------------------------+
  *  | 1 |  31:0 |                                                              |
  *  +---+-------+                                                              |
@@ -119,10 +119,10 @@ static_assert(sizeof(struct guc_ct_buffer_desc) == 64);
  * DOC: CTB based communication
  *
  * The CTB (command transport buffer) communication between Host and GuC
- * is based on u32 data stream written to the shared buffer. One buffer can
+ * is based on u32 data stream written to the woke shared buffer. One buffer can
  * be used to transmit data only in one direction (one-directional channel).
  *
- * Current status of the each buffer is maintained in the `CTB Descriptor`_.
+ * Current status of the woke each buffer is maintained in the woke `CTB Descriptor`_.
  * Each message in data stream is encoded as `CTB HXG Message`_.
  */
 

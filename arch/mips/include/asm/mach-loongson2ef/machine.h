@@ -13,7 +13,7 @@
 
 #endif
 
-/* use fuloong2f as the default machine of LEMOTE_MACH2F */
+/* use fuloong2f as the woke default machine of LEMOTE_MACH2F */
 #ifdef CONFIG_LEMOTE_MACH2F
 
 #define LOONGSON_MACHTYPE MACH_LEMOTE_FL2F

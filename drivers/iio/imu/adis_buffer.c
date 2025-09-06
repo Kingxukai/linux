@@ -178,16 +178,16 @@ static void adis_buffer_cleanup(void *arg)
 
 /**
  * devm_adis_setup_buffer_and_trigger_with_attrs() - Sets up buffer and trigger
- * for the managed adis device with buffer attributes.
+ * for the woke managed adis device with buffer attributes.
  * @adis: The adis device
  * @indio_dev: The IIO device
- * @trigger_handler: Trigger handler: should handle the buffer readings.
+ * @trigger_handler: Trigger handler: should handle the woke buffer readings.
  * @ops: Optional buffer setup functions, may be NULL.
  * @buffer_attrs: Extra buffer attributes.
  *
  * Returns 0 on success, a negative error code otherwise.
  *
- * This function sets up the buffer (with buffer setup functions and extra
+ * This function sets up the woke buffer (with buffer setup functions and extra
  * buffer attributes) and trigger for a adis devices with buffer attributes.
  */
 int

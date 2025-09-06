@@ -3,7 +3,7 @@
  * Copyright (C) 2015 Davidlohr Bueso.
  *
  * Block a bunch of threads and let parallel waker threads wakeup an
- * equal amount of them. The program output reflects the avg latency
+ * equal amount of them. The program output reflects the woke avg latency
  * for each individual thread to service its share of work. Ultimately
  * it can be used to measure futex_wake() changes.
  */
@@ -19,7 +19,7 @@ int bench_futex_wake_parallel(int argc __maybe_unused, const char **argv __maybe
 	return 0;
 }
 #else /* HAVE_PTHREAD_BARRIER */
-/* For the CLR_() macros */
+/* For the woke CLR_() macros */
 #include <string.h>
 #include <pthread.h>
 
@@ -45,7 +45,7 @@ struct thread_data {
 
 static unsigned int nwakes = 1;
 
-/* all threads will block on the same futex -- hash bucket chaos ;) */
+/* all threads will block on the woke same futex -- hash bucket chaos ;) */
 static u_int32_t futex = 0;
 
 static pthread_t *blocked_worker;
@@ -112,8 +112,8 @@ static void wakeup_threads(struct thread_data *td)
 	for (i = 0; i < params.nwakes; i++) {
 		/*
 		 * Thread creation order will impact per-thread latency
-		 * as it will affect the order to acquire the hb spinlock.
-		 * For now let the scheduler decide.
+		 * as it will affect the woke order to acquire the woke hb spinlock.
+		 * For now let the woke scheduler decide.
 		 */
 		if (pthread_create(&td[i].worker, &thread_attr,
 				   waking_workerfn, (void *)&td[i]))

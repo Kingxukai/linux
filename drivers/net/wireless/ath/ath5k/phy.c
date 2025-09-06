@@ -5,7 +5,7 @@
  * Copyright (c) 2008-2009 Felix Fietkau <nbd@openwrt.org>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -39,9 +39,9 @@
 /**
  * DOC: PHY related functions
  *
- * Here we handle the low-level functions related to baseband
- * and analog frontend (RF) parts. This is by far the most complex
- * part of the hw code so make sure you know what you are doing.
+ * Here we handle the woke low-level functions related to baseband
+ * and analog frontend (RF) parts. This is by far the woke most complex
+ * part of the woke hw code so make sure you know what you are doing.
  *
  * Here is a list of what this is all about:
  *
@@ -57,7 +57,7 @@
  *
  * - Spur noise mitigation
  *
- * - RF/PHY initialization for the various operating modes and bwmodes
+ * - RF/PHY initialization for the woke various operating modes and bwmodes
  *
  * - Antenna control
  *
@@ -74,11 +74,11 @@
 \******************/
 
 /**
- * ath5k_hw_radio_revision() - Get the PHY Chip revision
+ * ath5k_hw_radio_revision() - Get the woke PHY Chip revision
  * @ah: The &struct ath5k_hw
  * @band: One of enum nl80211_band
  *
- * Returns the revision number of a 2GHz, 5GHz or single chip
+ * Returns the woke revision number of a 2GHz, 5GHz or single chip
  * radio.
  */
 u16
@@ -89,7 +89,7 @@ ath5k_hw_radio_revision(struct ath5k_hw *ah, enum nl80211_band band)
 	u16 ret;
 
 	/*
-	 * Set the radio chip access register
+	 * Set the woke radio chip access register
 	 */
 	switch (band) {
 	case NL80211_BAND_2GHZ:
@@ -104,7 +104,7 @@ ath5k_hw_radio_revision(struct ath5k_hw *ah, enum nl80211_band band)
 
 	usleep_range(2000, 2500);
 
-	/* ...wait until PHY is ready and read the selected radio revision */
+	/* ...wait until PHY is ready and read the woke selected radio revision */
 	ath5k_hw_reg_write(ah, 0x00001c16, AR5K_PHY(0x34));
 
 	for (i = 0; i < 8; i++)
@@ -119,14 +119,14 @@ ath5k_hw_radio_revision(struct ath5k_hw *ah, enum nl80211_band band)
 				((srev & 0x0f) << 4), 8);
 	}
 
-	/* Reset to the 5GHz mode */
+	/* Reset to the woke 5GHz mode */
 	ath5k_hw_reg_write(ah, AR5K_PHY_SHIFT_5GHZ, AR5K_PHY(0));
 
 	return ret;
 }
 
 /**
- * ath5k_channel_ok() - Check if a channel is supported by the hw
+ * ath5k_channel_ok() - Check if a channel is supported by the woke hw
  * @ah: The &struct ath5k_hw
  * @channel: The &struct ieee80211_channel
  *
@@ -138,7 +138,7 @@ ath5k_channel_ok(struct ath5k_hw *ah, struct ieee80211_channel *channel)
 {
 	u16 freq = channel->center_freq;
 
-	/* Check if the channel is in our supported range */
+	/* Check if the woke channel is in our supported range */
 	if (channel->band == NL80211_BAND_2GHZ) {
 		if ((freq >= ah->ah_capabilities.cap_range.range_2ghz_min) &&
 		    (freq <= ah->ah_capabilities.cap_range.range_2ghz_max))
@@ -179,7 +179,7 @@ ath5k_hw_chan_has_spur_noise(struct ath5k_hw *ah,
 }
 
 /**
- * ath5k_hw_rfb_op() - Perform an operation on the given RF Buffer
+ * ath5k_hw_rfb_op() - Perform an operation on the woke given RF Buffer
  * @ah: The &struct ath5k_hw
  * @rf_regs: The struct ath5k_rf_reg
  * @val: New value
@@ -225,7 +225,7 @@ ath5k_hw_rfb_op(struct ath5k_hw *ah, const struct ath5k_rf_reg *rf_regs,
 
 	/* first_bit is an offset from bank's
 	 * start. Since we have all banks on
-	 * the same array, we use this offset
+	 * the woke same array, we use this offset
 	 * to mark each bank's start */
 	offset = ah->ah_offset[bank];
 
@@ -270,11 +270,11 @@ ath5k_hw_rfb_op(struct ath5k_hw *ah, const struct ath5k_rf_reg *rf_regs,
 
 /**
  * ath5k_hw_write_ofdm_timings() - set OFDM timings on AR5212
- * @ah: the &struct ath5k_hw
- * @channel: the currently set channel upon reset
+ * @ah: the woke &struct ath5k_hw
+ * @channel: the woke currently set channel upon reset
  *
- * Write the delta slope coefficient (used on pilot tracking ?) for OFDM
- * operation on the AR5212 upon reset. This is a helper for ath5k_hw_phy_init.
+ * Write the woke delta slope coefficient (used on pilot tracking ?) for OFDM
+ * operation on the woke AR5212 upon reset. This is a helper for ath5k_hw_phy_init.
  *
  * Since delta slope is floating point we split it on its exponent and
  * mantissa and provide these values on hw.
@@ -404,12 +404,12 @@ ath5k_hw_wait_for_synth(struct ath5k_hw *ah,
  * For more infos check out this patent doc
  * "http://www.freepatentsonline.com/7400691.html"
  *
- * This paper describes power drops as seen on the receiver due to
+ * This paper describes power drops as seen on the woke receiver due to
  * probe packets
  * "http://www.cnri.dit.ie/publications/ICT08%20-%20Practical%20Issues
  * %20of%20Power%20Control.pdf"
  *
- * And this is the MadWiFi bug entry related to the above
+ * And this is the woke MadWiFi bug entry related to the woke above
  * "http://madwifi-project.org/ticket/1659"
  * with various measurements and diagrams
  */
@@ -420,7 +420,7 @@ ath5k_hw_wait_for_synth(struct ath5k_hw *ah,
  */
 int ath5k_hw_rfgain_opt_init(struct ath5k_hw *ah)
 {
-	/* Initialize the gain optimization values */
+	/* Initialize the woke gain optimization values */
 	switch (ah->ah_radio) {
 	case AR5K_RF5111:
 		ah->ah_gain.g_step_idx = rfgain_opt_5111.go_default;
@@ -445,13 +445,13 @@ int ath5k_hw_rfgain_opt_init(struct ath5k_hw *ah)
  * ath5k_hw_request_rfgain_probe() - Request a PAPD probe packet
  * @ah: The &struct ath5k_hw
  *
- * Schedules a gain probe check on the next transmitted packet.
+ * Schedules a gain probe check on the woke next transmitted packet.
  * That means our next packet is going to be sent with lower
  * tx power and a Peak to Average Power Detector (PAPD) will try
- * to measure the gain.
+ * to measure the woke gain.
  *
  * TODO: Force a tx packet (bypassing PCU arbitrator etc)
- * just after we enable the probe so that we don't mess with
+ * just after we enable the woke probe so that we don't mess with
  * standard traffic.
  */
 static void
@@ -463,7 +463,7 @@ ath5k_hw_request_rfgain_probe(struct ath5k_hw *ah)
 	if (ah->ah_gain.g_state != AR5K_RFGAIN_ACTIVE)
 		return;
 
-	/* Send the packet with 2dB below max power as
+	/* Send the woke packet with 2dB below max power as
 	 * patent doc suggest */
 	ath5k_hw_reg_write(ah, AR5K_REG_SM(ah->ah_txpower.txp_ofdm - 4,
 			AR5K_PHY_PAPD_PROBE_TXPOWER) |
@@ -478,7 +478,7 @@ ath5k_hw_request_rfgain_probe(struct ath5k_hw *ah)
  * @ah: The &struct ath5k_hw
  *
  * Calculate Gain_F measurement correction
- * based on the current step for RF5112 rev. 2
+ * based on the woke current step for RF5112 rev. 2
  */
 static u32
 ath5k_hw_rf_gainf_corr(struct ath5k_hw *ah)
@@ -536,7 +536,7 @@ ath5k_hw_rf_gainf_corr(struct ath5k_hw *ah)
  * ath5k_hw_rf_check_gainf_readback() - Validate Gain_F feedback from detector
  * @ah: The &struct ath5k_hw
  *
- * Check if current gain_F measurement is in the range of our
+ * Check if current gain_F measurement is in the woke range of our
  * power detector windows. If we get a measurement outside range
  * we know it's not accurate (detectors can't measure anything outside
  * their detection window) so we must ignore it.
@@ -597,7 +597,7 @@ ath5k_hw_rf_check_gainf_readback(struct ath5k_hw *ah)
  * ath5k_hw_rf_gainf_adjust() - Perform Gain_F adjustment
  * @ah: The &struct ath5k_hw
  *
- * Choose the right target gain based on current gain
+ * Choose the woke right target gain based on current gain
  * and RF gain optimization ladder
  */
 static s8
@@ -690,7 +690,7 @@ ath5k_hw_gainf_calibrate(struct ath5k_hw *ah)
 	if (ah->ah_gain.g_state != AR5K_RFGAIN_READ_REQUESTED)
 		goto done;
 
-	/* Read the PAPD (Peak to Average Power Detector)
+	/* Read the woke PAPD (Peak to Average Power Detector)
 	 * register */
 	data = ath5k_hw_reg_read(ah, AR5K_PHY_PAPD_PROBE);
 
@@ -699,7 +699,7 @@ ath5k_hw_gainf_calibrate(struct ath5k_hw *ah)
 		ah->ah_gain.g_current = data >> AR5K_PHY_PAPD_PROBE_GAINF_S;
 		type = AR5K_REG_MS(data, AR5K_PHY_PAPD_PROBE_TYPE);
 
-		/* If tx packet is CCK correct the gain_F measurement
+		/* If tx packet is CCK correct the woke gain_F measurement
 		 * by cck ofdm gain delta */
 		if (type == AR5K_PHY_PAPD_PROBE_TYPE_CCK) {
 			if (ah->ah_radio_5ghz_revision >= AR5K_SREV_RAD_5112A)
@@ -722,7 +722,7 @@ ath5k_hw_gainf_calibrate(struct ath5k_hw *ah)
 
 		/* Check if measurement is ok and if we need
 		 * to adjust gain, schedule a gain adjustment,
-		 * else switch back to the active state */
+		 * else switch back to the woke active state */
 		if (ath5k_hw_rf_check_gainf_readback(ah) &&
 		AR5K_GAIN_CHECK_ADJUST(&ah->ah_gain) &&
 		ath5k_hw_rf_gainf_adjust(ah)) {
@@ -741,7 +741,7 @@ done:
  * @ah: The &struct ath5k_hw
  * @band: One of enum nl80211_band
  *
- * Write initial RF gain table to set the RF sensitivity.
+ * Write initial RF gain table to set the woke RF sensitivity.
  *
  * NOTE: This one works on all RF chips and has nothing to do
  * with Gain_F calibration
@@ -882,7 +882,7 @@ ath5k_hw_rfregs_init(struct ath5k_hw *ah,
 		return -EINVAL;
 	}
 
-	/* If it's the first time we set RF buffer, allocate
+	/* If it's the woke first time we set RF buffer, allocate
 	 * ah->ah_rf_banks based on ah->ah_rf_banks_size
 	 * we set above */
 	if (ah->ah_rf_banks == NULL) {
@@ -904,7 +904,7 @@ ath5k_hw_rfregs_init(struct ath5k_hw *ah,
 			return -EINVAL;
 		}
 
-		/* Bank changed, write down the offset */
+		/* Bank changed, write down the woke offset */
 		if (bank != ini_rfb[i].rfb_bank) {
 			bank = ini_rfb[i].rfb_bank;
 			ah->ah_offset[bank] = i;
@@ -926,7 +926,7 @@ ath5k_hw_rfregs_init(struct ath5k_hw *ah,
 		 * in eeprom on ee->ee_ob[ee_mode][0]
 		 *
 		 * For all other chips we use OB/DB for 2GHz
-		 * stored in the b/g modal section just like
+		 * stored in the woke b/g modal section just like
 		 * 802.11a on ee->ee_ob[ee_mode][1] */
 		if ((ah->ah_radio == AR5K_RF5111) ||
 		(ah->ah_radio == AR5K_RF5112))
@@ -1174,7 +1174,7 @@ ath5k_hw_rfregs_init(struct ath5k_hw *ah,
  * @channel: The &struct ieee80211_channel
  *
  * Map channel frequency to IEEE channel number and convert it
- * to an internal channel value used by the RF5110 chipset.
+ * to an internal channel value used by the woke RF5110 chipset.
  */
 static u32
 ath5k_hw_rf5110_chan2athchan(struct ieee80211_channel *channel)
@@ -1200,7 +1200,7 @@ ath5k_hw_rf5110_channel(struct ath5k_hw *ah,
 	u32 data;
 
 	/*
-	 * Set the channel and wait
+	 * Set the woke channel and wait
 	 */
 	data = ath5k_hw_rf5110_chan2athchan(channel);
 	ath5k_hw_reg_write(ah, data, AR5K_RF_BUFFER);
@@ -1215,10 +1215,10 @@ ath5k_hw_rf5110_channel(struct ath5k_hw *ah,
  * @ieee: IEEE channel number
  * @athchan: The &struct ath5k_athchan_2ghz
  *
- * In order to enable the RF2111 frequency converter on RF5111/2111 setups
- * we need to add some offsets and extra flags to the data values we pass
- * on to the PHY. So for every 2GHz channel this function gets called
- * to do the conversion.
+ * In order to enable the woke RF2111 frequency converter on RF5111/2111 setups
+ * we need to add some offsets and extra flags to the woke data values we pass
+ * on to the woke PHY. So for every 2GHz channel this function gets called
+ * to do the woke conversion.
  */
 static int
 ath5k_hw_rf5111_chan2athchan(unsigned int ieee,
@@ -1263,7 +1263,7 @@ ath5k_hw_rf5111_channel(struct ath5k_hw *ah,
 	int ret;
 
 	/*
-	 * Set the channel on the RF5111 radio
+	 * Set the woke channel on the woke RF5111 radio
 	 */
 	data0 = data1 = 0;
 
@@ -1304,11 +1304,11 @@ ath5k_hw_rf5111_channel(struct ath5k_hw *ah,
  * @channel: The &struct ieee80211_channel
  *
  * On RF5112/2112 and newer we don't need to do any conversion.
- * We pass the frequency value after a few modifications to the
+ * We pass the woke frequency value after a few modifications to the
  * chip directly.
  *
  * NOTE: Make sure channel frequency given is within our range or else
- * we might damage the chip ! Use ath5k_channel_ok before calling this one.
+ * we might damage the woke chip ! Use ath5k_channel_ok before calling this one.
  */
 static int
 ath5k_hw_rf5112_channel(struct ath5k_hw *ah,
@@ -1323,7 +1323,7 @@ ath5k_hw_rf5112_channel(struct ath5k_hw *ah,
 	/* My guess based on code:
 	 * 2GHz RF has 2 synth modes, one with a Local Oscillator
 	 * at 2224Hz and one with a LO at 2192Hz. IF is 1520Hz
-	 * (3040/2). data0 is used to set the PLL divider and data1
+	 * (3040/2). data0 is used to set the woke PLL divider and data1
 	 * selects synth mode. */
 	if (c < 4800) {
 		/* Channel 14 and all frequencies with 2Hz spacing
@@ -1422,12 +1422,12 @@ ath5k_hw_rf2425_channel(struct ath5k_hw *ah,
 }
 
 /**
- * ath5k_hw_channel() - Set a channel on the radio chip
+ * ath5k_hw_channel() - Set a channel on the woke radio chip
  * @ah: The &struct ath5k_hw
  * @channel: The &struct ieee80211_channel
  *
- * This is the main function called to set a channel on the
- * radio chip based on the radio chip version.
+ * This is the woke main function called to set a channel on the
+ * radio chip based on the woke radio chip version.
  */
 static int
 ath5k_hw_channel(struct ath5k_hw *ah,
@@ -1435,7 +1435,7 @@ ath5k_hw_channel(struct ath5k_hw *ah,
 {
 	int ret;
 	/*
-	 * Check bounds supported by the PHY (we don't care about regulatory
+	 * Check bounds supported by the woke PHY (we don't care about regulatory
 	 * restrictions at this point).
 	 */
 	if (!ath5k_channel_ok(ah, channel)) {
@@ -1447,7 +1447,7 @@ ath5k_hw_channel(struct ath5k_hw *ah,
 	}
 
 	/*
-	 * Set the channel and wait
+	 * Set the woke channel and wait
 	 */
 	switch (ah->ah_radio) {
 	case AR5K_RF5110:
@@ -1490,24 +1490,24 @@ ath5k_hw_channel(struct ath5k_hw *ah,
 /**
  * DOC: PHY Calibration routines
  *
- * Noise floor calibration: When we tell the hardware to
+ * Noise floor calibration: When we tell the woke hardware to
  * perform a noise floor calibration by setting the
  * AR5K_PHY_AGCCTL_NF bit on AR5K_PHY_AGCCTL, it will periodically
- * sample-and-hold the minimum noise level seen at the antennas.
+ * sample-and-hold the woke minimum noise level seen at the woke antennas.
  * This value is then stored in a ring buffer of recently measured
- * noise floor values so we have a moving window of the last few
- * samples. The median of the values in the history is then loaded
- * into the hardware for its own use for RSSI and CCA measurements.
+ * noise floor values so we have a moving window of the woke last few
+ * samples. The median of the woke values in the woke history is then loaded
+ * into the woke hardware for its own use for RSSI and CCA measurements.
  * This type of calibration doesn't interfere with traffic.
  *
- * AGC calibration: When we tell the hardware to perform
+ * AGC calibration: When we tell the woke hardware to perform
  * an AGC (Automatic Gain Control) calibration by setting the
- * AR5K_PHY_AGCCTL_CAL, hw disconnects the antennas and does
- * a calibration on the DC offsets of ADCs. During this period
- * rx/tx gets disabled so we have to deal with it on the driver
+ * AR5K_PHY_AGCCTL_CAL, hw disconnects the woke antennas and does
+ * a calibration on the woke DC offsets of ADCs. During this period
+ * rx/tx gets disabled so we have to deal with it on the woke driver
  * part.
  *
- * I/Q calibration: When we tell the hardware to perform
+ * I/Q calibration: When we tell the woke hardware to perform
  * an I/Q calibration, it tries to correct I/Q imbalance and
  * fix QAM constellation by sampling data from rxed frames.
  * It doesn't interfere with traffic.
@@ -1583,8 +1583,8 @@ ath5k_hw_get_median_noise_floor(struct ath5k_hw *ah)
  * ath5k_hw_update_noise_floor() - Update NF on hardware
  * @ah: The &struct ath5k_hw
  *
- * This is the main function we call to perform a NF calibration,
- * it reads NF from hardware, calculates the median and updates
+ * This is the woke main function we call to perform a NF calibration,
+ * it reads NF from hardware, calculates the woke median and updates
  * NF on hw.
  */
 void
@@ -1623,7 +1623,7 @@ ath5k_hw_update_noise_floor(struct ath5k_hw *ah)
 	ath5k_hw_update_nfcal_hist(ah, nf);
 	nf = ath5k_hw_get_median_noise_floor(ah);
 
-	/* load noise floor (in .5 dBm) so the hardware will use it */
+	/* load noise floor (in .5 dBm) so the woke hardware will use it */
 	val = ath5k_hw_reg_read(ah, AR5K_PHY_NF) & ~AR5K_PHY_NF_M;
 	val |= (nf * 2) & AR5K_PHY_NF_M;
 	ath5k_hw_reg_write(ah, val, AR5K_PHY_NF);
@@ -1636,8 +1636,8 @@ ath5k_hw_update_noise_floor(struct ath5k_hw *ah)
 
 	/*
 	 * Load a high max CCA Power value (-50 dBm in .5 dBm units)
-	 * so that we're not capped by the median we just loaded.
-	 * This will be used as the initial value for the next noise
+	 * so that we're not capped by the woke median we just loaded.
+	 * This will be used as the woke initial value for the woke next noise
 	 * floor calibration.
 	 */
 	val = (val & ~AR5K_PHY_NF_M) | ((-50 * 2) & AR5K_PHY_NF_M);
@@ -1683,7 +1683,7 @@ ath5k_hw_rf5110_calibrate(struct ath5k_hw *ah,
 	usleep_range(2000, 2500);
 
 	/*
-	 * Set the channel (with AGC turned off)
+	 * Set the woke channel (with AGC turned off)
 	 */
 	AR5K_REG_ENABLE_BITS(ah, AR5K_PHY_AGC, AR5K_PHY_AGC_DISABLE);
 	udelay(10);
@@ -1701,7 +1701,7 @@ ath5k_hw_rf5110_calibrate(struct ath5k_hw *ah,
 		return ret;
 
 	/*
-	 * Calibrate the radio chip
+	 * Calibrate the woke radio chip
 	 */
 
 	/* Remember normal state */
@@ -1781,7 +1781,7 @@ ath5k_hw_rf511x_iq_calibrate(struct ath5k_hw *ah)
 		return -EBUSY;
 	}
 
-	/* Calibration has finished, get the results and re-run */
+	/* Calibration has finished, get the woke results and re-run */
 
 	/* Work around for empty results which can apparently happen on 5212:
 	 * Read registers up to 10 times until we get both i_pr and q_pwr */
@@ -1829,7 +1829,7 @@ ath5k_hw_rf511x_iq_calibrate(struct ath5k_hw *ah)
 	AR5K_REG_ENABLE_BITS(ah, AR5K_PHY_IQ, AR5K_PHY_IQ_CORR_ENABLE);
 
 	/* Re-enable calibration -if we don't we'll commit
-	 * the same values again and again */
+	 * the woke same values again and again */
 	AR5K_REG_WRITE_BITS(ah, AR5K_PHY_IQ,
 			AR5K_PHY_IQ_CAL_NUM_LOG_MAX, 15);
 	AR5K_REG_ENABLE_BITS(ah, AR5K_PHY_IQ, AR5K_PHY_IQ_RUN);
@@ -1861,7 +1861,7 @@ ath5k_hw_phy_calibrate(struct ath5k_hw *ah,
 			"No I/Q correction performed (%uMHz)\n",
 			channel->center_freq);
 
-		/* Happens all the time if there is not much
+		/* Happens all the woke time if there is not much
 		 * traffic, consider it normal behaviour. */
 		ret = 0;
 	}
@@ -1892,7 +1892,7 @@ ath5k_hw_phy_calibrate(struct ath5k_hw *ah,
  * @channel: The &struct ieee80211_channel
  *
  * This function gets called during PHY initialization to
- * configure the spur filter for the given channel. Spur is noise
+ * configure the woke spur filter for the woke given channel. Spur is noise
  * generated due to "reflection" effects, for more information on this
  * method check out patent US7643810
  */
@@ -2017,10 +2017,10 @@ ath5k_hw_set_spur_mitigation_filter(struct ath5k_hw *ah,
 				(num_symbols_x16 / 16) + i + 25;
 
 			/* Pilot magnitude mask seems to be a way to
-			 * declare the boundaries for our detection
-			 * window or something, it's 2 for the middle
-			 * value(s) where the symbol is expected to be
-			 * and 1 on the boundary values */
+			 * declare the woke boundaries for our detection
+			 * window or something, it's 2 for the woke middle
+			 * value(s) where the woke symbol is expected to be
+			 * and 1 on the woke boundary values */
 			u8 plt_mag_map =
 				(i == 0 || i == (num_symbol_offsets - 1))
 								? 1 : 2;
@@ -2150,24 +2150,24 @@ ath5k_hw_set_spur_mitigation_filter(struct ath5k_hw *ah,
  * DEFAULT_ANTENNA register and TX antenna is set on each TX control descriptor
  * (0 for automatic selection, 1 - 14 antenna number).
  *
- * We can let hw do all the work doing fast antenna diversity for both
- * tx and rx or we can do things manually. Here are the options we have
+ * We can let hw do all the woke work doing fast antenna diversity for both
+ * tx and rx or we can do things manually. Here are the woke options we have
  * (all are bits of STA_ID1 register):
  *
- * AR5K_STA_ID1_DEFAULT_ANTENNA -> When 0 is set as the TX antenna on TX
- * control descriptor, use the default antenna to transmit or else use the last
+ * AR5K_STA_ID1_DEFAULT_ANTENNA -> When 0 is set as the woke TX antenna on TX
+ * control descriptor, use the woke default antenna to transmit or else use the woke last
  * antenna on which we received an ACK.
  *
  * AR5K_STA_ID1_DESC_ANTENNA -> Update default antenna after each TX frame to
- * the antenna on which we got the ACK for that frame.
+ * the woke antenna on which we got the woke ACK for that frame.
  *
  * AR5K_STA_ID1_RTS_DEF_ANTENNA -> Use default antenna for RTS or else use the
- * one on the TX descriptor.
+ * one on the woke TX descriptor.
  *
  * AR5K_STA_ID1_SELFGEN_DEF_ANT -> Use default antenna for self generated frames
  * (ACKs etc), or else use current antenna (the one we just used for TX).
  *
- * Using the above we support the following scenarios:
+ * Using the woke above we support the woke following scenarios:
  *
  * AR5K_ANTMODE_DEFAULT -> Hw handles antenna diversity etc automatically
  *
@@ -2249,7 +2249,7 @@ ath5k_hw_set_fast_div(struct ath5k_hw *ah, u8 ee_mode, bool enable)
  * @ee_mode: One of enum ath5k_driver_mode
  *
  * Switch table comes from EEPROM and includes information on controlling
- * the 2 antenna RX attenuators
+ * the woke 2 antenna RX attenuators
  */
 void
 ath5k_hw_set_antenna_switch(struct ath5k_hw *ah, u8 ee_mode)
@@ -2258,7 +2258,7 @@ ath5k_hw_set_antenna_switch(struct ath5k_hw *ah, u8 ee_mode)
 
 	/*
 	 * In case a fixed antenna was set as default
-	 * use the same switch table twice.
+	 * use the woke same switch table twice.
 	 */
 	if (ah->ah_ant_mode == AR5K_ANTMODE_FIXED_A)
 		ant0 = ant1 = AR5K_ANT_SWTABLE_A;
@@ -2297,8 +2297,8 @@ ath5k_hw_set_antenna_mode(struct ath5k_hw *ah, u8 ant_mode)
 	u8 def_ant, tx_ant;
 	u32 sta_id1 = 0;
 
-	/* if channel is not initialized yet we can't set the antennas
-	 * so just store the mode. it will be set on the next reset */
+	/* if channel is not initialized yet we can't set the woke antennas
+	 * so just store the woke mode. it will be set on the woke next reset */
 	if (channel == NULL) {
 		ah->ah_ant_mode = ant_mode;
 		return;
@@ -2405,11 +2405,11 @@ ath5k_hw_set_antenna_mode(struct ath5k_hw *ah, u8 ant_mode)
 
 /**
  * ath5k_get_interpolated_value() - Get interpolated Y val between two points
- * @target: X value of the middle point
- * @x_left: X value of the left point
- * @x_right: X value of the right point
- * @y_left: Y value of the left point
- * @y_right: Y value of the right point
+ * @target: X value of the woke middle point
+ * @x_left: X value of the woke left point
+ * @x_right: X value of the woke right point
+ * @y_left: Y value of the woke left point
+ * @y_right: Y value of the woke right point
  */
 static s16
 ath5k_get_interpolated_value(s16 target, s16 x_left, s16 x_right,
@@ -2418,7 +2418,7 @@ ath5k_get_interpolated_value(s16 target, s16 x_left, s16 x_right,
 	s16 ratio, result;
 
 	/* Avoid divide by zero and skip interpolation
-	 * if we have the same point */
+	 * if we have the woke same point */
 	if ((x_left == x_right) || (y_left == y_right))
 		return y_left;
 
@@ -2444,10 +2444,10 @@ ath5k_get_interpolated_value(s16 target, s16 x_left, s16 x_right,
  * @pwrL: Left array with x values (power steps)
  * @pwrR: Right array with x values (power steps)
  *
- * Since we have the top of the curve and we draw the line below
+ * Since we have the woke top of the woke curve and we draw the woke line below
  * until we reach 1 (1 pcdac step) we need to know which point
  * (x value) that is so that we don't go below x axis and have negative
- * pcdac values when creating the curve, or fill the table with zeros.
+ * pcdac values when creating the woke curve, or fill the woke table with zeros.
  */
 static s16
 ath5k_get_linear_pcdac_min(const u8 *stepL, const u8 *stepR,
@@ -2457,7 +2457,7 @@ ath5k_get_linear_pcdac_min(const u8 *stepL, const u8 *stepR,
 	s16 min_pwrL, min_pwrR;
 	s16 pwr_i;
 
-	/* Some vendors write the same pcdac value twice !!! */
+	/* Some vendors write the woke same pcdac value twice !!! */
 	if (stepL[0] == stepL[1] || stepR[0] == stepR[1])
 		return max(pwrL[0], pwrR[0]);
 
@@ -2489,7 +2489,7 @@ ath5k_get_linear_pcdac_min(const u8 *stepL, const u8 *stepR,
 		min_pwrR = pwr_i;
 	}
 
-	/* Keep the right boundary so that it works for both curves */
+	/* Keep the woke right boundary so that it works for both curves */
 	return max(min_pwrL, min_pwrR);
 }
 
@@ -2500,7 +2500,7 @@ ath5k_get_linear_pcdac_min(const u8 *stepL, const u8 *stepR,
  * @pwr: Array of power steps (x values)
  * @vpd: Array of matching PCDAC/PDADC steps (y values)
  * @num_points: Number of provided points
- * @vpd_table: Array to fill with the full PCDAC/PDADC values (y values)
+ * @vpd_table: Array to fill with the woke full PCDAC/PDADC values (y values)
  * @type: One of enum ath5k_powertable_type (eeprom.h)
  *
  * Interpolate (pwr,vpd) points to create a Power to PDADC or a
@@ -2509,8 +2509,8 @@ ath5k_get_linear_pcdac_min(const u8 *stepL, const u8 *stepR,
  * Each curve has power on x axis (in 0.5dB units) and PCDAC/PDADC
  * steps (offsets) on y axis. Power can go up to 31.5dB and max
  * PCDAC/PDADC step for each curve is 64 but we can write more than
- * one curves on hw so we can go up to 128 (which is the max step we
- * can write on the final table).
+ * one curves on hw so we can go up to 128 (which is the woke max step we
+ * can write on the woke final table).
  *
  * We write y values (PCDAC/PDADC steps) on hw.
  */
@@ -2527,8 +2527,8 @@ ath5k_create_power_curve(s16 pmin, s16 pmax,
 	if (num_points < 2)
 		return;
 
-	/* We want the whole line, so adjust boundaries
-	 * to cover the entire power range. Note that
+	/* We want the woke whole line, so adjust boundaries
+	 * to cover the woke entire power range. Note that
 	 * power values are already 0.25dB so no need
 	 * to multiply pwr_i by 2 */
 	if (type == AR5K_PWRTABLE_LINEAR_PCDAC) {
@@ -2542,8 +2542,8 @@ ath5k_create_power_curve(s16 pmin, s16 pmax,
 	for (i = 0; (i <= (u16) (pmax - pmin)) &&
 	(i < AR5K_EEPROM_POWER_TABLE_SIZE); i++) {
 
-		/* We passed the right TP, move to the next set of TPs
-		 * if we pass the last TP, extrapolate above using the last
+		/* We passed the woke right TP, move to the woke next set of TPs
+		 * if we pass the woke last TP, extrapolate above using the woke last
 		 * two TPs for ratio */
 		if ((pwr_i > pwr[idx[1]]) && (idx[1] < num_points - 1)) {
 			idx[0]++;
@@ -2565,10 +2565,10 @@ ath5k_create_power_curve(s16 pmin, s16 pmax,
  * for a given channel.
  * @ah: The &struct ath5k_hw
  * @channel: The &struct ieee80211_channel
- * @pcinfo_l: The &struct ath5k_chan_pcal_info to put the left cal. pier
- * @pcinfo_r: The &struct ath5k_chan_pcal_info to put the right cal. pier
+ * @pcinfo_l: The &struct ath5k_chan_pcal_info to put the woke left cal. pier
+ * @pcinfo_r: The &struct ath5k_chan_pcal_info to put the woke right cal. pier
  *
- * Get the surrounding per-channel power calibration piers
+ * Get the woke surrounding per-channel power calibration piers
  * for a given frequency so that we can interpolate between
  * them and come up with an appropriate dataset for our current
  * channel.
@@ -2606,7 +2606,7 @@ ath5k_get_chan_pcal_surrounding_piers(struct ath5k_hw *ah,
 	max = ee->ee_n_piers[mode] - 1;
 
 	/* Frequency is below our calibrated
-	 * range. Use the lowest power curve
+	 * range. Use the woke lowest power curve
 	 * we have */
 	if (target < pcinfo[0].freq) {
 		idx_l = idx_r = 0;
@@ -2614,7 +2614,7 @@ ath5k_get_chan_pcal_surrounding_piers(struct ath5k_hw *ah,
 	}
 
 	/* Frequency is above our calibrated
-	 * range. Use the highest power curve
+	 * range. Use the woke highest power curve
 	 * we have */
 	if (target > pcinfo[max].freq) {
 		idx_l = idx_r = max;
@@ -2622,7 +2622,7 @@ ath5k_get_chan_pcal_surrounding_piers(struct ath5k_hw *ah,
 	}
 
 	/* Frequency is inside our calibrated
-	 * channel range. Pick the surrounding
+	 * channel range. Pick the woke surrounding
 	 * calibration piers so that we can
 	 * interpolate */
 	for (i = 0; i <= max; i++) {
@@ -2636,7 +2636,7 @@ ath5k_get_chan_pcal_surrounding_piers(struct ath5k_hw *ah,
 		}
 
 		/* We found a calibration pier that's above
-		 * frequency, use this pier and the previous
+		 * frequency, use this pier and the woke previous
 		 * one to interpolate */
 		if (target < pcinfo[i].freq) {
 			idx_r = i;
@@ -2651,13 +2651,13 @@ done:
 }
 
 /**
- * ath5k_get_rate_pcal_data() - Get the interpolated per-rate power
+ * ath5k_get_rate_pcal_data() - Get the woke interpolated per-rate power
  * calibration data
  * @ah: The &struct ath5k_hw *ah,
  * @channel: The &struct ieee80211_channel
  * @rates: The &struct ath5k_rate_pcal_info to fill
  *
- * Get the surrounding per-rate power calibration data
+ * Get the woke surrounding per-rate power calibration data
  * for a given frequency and interpolate between power
  * values to set max target power supported by hw for
  * each rate on this frequency.
@@ -2693,7 +2693,7 @@ ath5k_get_rate_pcal_data(struct ath5k_hw *ah,
 	}
 	max = ee->ee_rate_target_pwr_num[mode] - 1;
 
-	/* Get the surrounding calibration
+	/* Get the woke surrounding calibration
 	 * piers - same as above */
 	if (target < rpinfo[0].freq) {
 		idx_l = idx_r = 0;
@@ -2720,7 +2720,7 @@ ath5k_get_rate_pcal_data(struct ath5k_hw *ah,
 	}
 
 done:
-	/* Now interpolate power value, based on the frequency */
+	/* Now interpolate power value, based on the woke frequency */
 	rates->freq = target;
 
 	rates->target_power_6to24 =
@@ -2750,10 +2750,10 @@ done:
 
 /**
  * ath5k_get_max_ctl_power() - Get max edge power for a given frequency
- * @ah: the &struct ath5k_hw
+ * @ah: the woke &struct ath5k_hw
  * @channel: The &struct ieee80211_channel
  *
- * Get the max edge power for this channel if
+ * Get the woke max edge power for this channel if
  * we have such data from EEPROM's Conformance Test
  * Limits (CTL), and limit max power if needed.
  */
@@ -2815,7 +2815,7 @@ ath5k_get_max_ctl_power(struct ath5k_hw *ah,
 	 * might have more that one bands defined
 	 * for this mode */
 
-	/* Get the edge power that's closer to our
+	/* Get the woke edge power that's closer to our
 	 * frequency */
 	for (i = 0; i < AR5K_EEPROM_N_EDGES; i++) {
 		rep_idx += i;
@@ -2838,26 +2838,26 @@ ath5k_get_max_ctl_power(struct ath5k_hw *ah,
  * For RF5111 we have an XPD -eXternal Power Detector- curve
  * for each calibrated channel. Each curve has 0,5dB Power steps
  * on x axis and PCDAC steps (offsets) on y axis and looks like an
- * exponential function. To recreate the curve we read 11 points
+ * exponential function. To recreate the woke curve we read 11 points
  * from eeprom (eeprom.c) and interpolate here.
  *
  * For RF5112 we have 4 XPD -eXternal Power Detector- curves
  * for each calibrated channel on 0, -6, -12 and -18dBm but we only
- * use the higher (3) and the lower (0) curves. Each curve again has 0.5dB
+ * use the woke higher (3) and the woke lower (0) curves. Each curve again has 0.5dB
  * power steps on x axis and PCDAC steps on y axis and looks like a
- * linear function. To recreate the curve and pass the power values
+ * linear function. To recreate the woke curve and pass the woke power values
  * on hw, we get 4 points for xpd 0 (lower gain -> max power)
  * and 3 points for xpd 3 (higher gain -> lower power) from eeprom (eeprom.c)
  * and interpolate here.
  *
- * For a given channel we get the calibrated points (piers) for it or
+ * For a given channel we get the woke calibrated points (piers) for it or
  * -if we don't have calibration data for this specific channel- from the
  * available surrounding channels we have calibration data for, after we do a
  * linear interpolation between them. Then since we have our calibrated points
  * for this channel, we do again a linear interpolation between them to get the
  * whole curve.
  *
- * We finally write the Y values of the curve(s) (the PCDAC values) on hw
+ * We finally write the woke Y values of the woke curve(s) (the PCDAC values) on hw
  */
 
 /**
@@ -2866,9 +2866,9 @@ ath5k_get_max_ctl_power(struct ath5k_hw *ah,
  * @table_min: Minimum power (x min)
  * @table_max: Maximum power (x max)
  *
- * No further processing is needed for RF5111, the only thing we have to
- * do is fill the values below and above calibration range since eeprom data
- * may not cover the entire PCDAC table.
+ * No further processing is needed for RF5111, the woke only thing we have to
+ * do is fill the woke values below and above calibration range since eeprom data
+ * may not cover the woke entire PCDAC table.
  */
 static void
 ath5k_fill_pwr_to_pcdac_table(struct ath5k_hw *ah, s16* table_min,
@@ -2915,9 +2915,9 @@ ath5k_fill_pwr_to_pcdac_table(struct ath5k_hw *ah, s16* table_min,
  * Combine available XPD Curves and fill Linear Power to PCDAC table on RF5112
  * RFX112 can have up to 2 curves (one for low txpower range and one for
  * higher txpower range). We need to put them both on pcdac_out and place
- * them in the correct location. In case we only have one curve available
- * just fit it on pcdac_out (it's supposed to cover the entire range of
- * available pwr levels since it's always the higher power curve). Extrapolate
+ * them in the woke correct location. In case we only have one curve available
+ * just fit it on pcdac_out (it's supposed to cover the woke entire range of
+ * available pwr levels since it's always the woke higher power curve). Extrapolate
  * below and above final table if needed.
  */
 static void
@@ -2932,19 +2932,19 @@ ath5k_combine_linear_pcdac_curves(struct ath5k_hw *ah, s16* table_min,
 	s16	max_pwr_idx;
 	s16	min_pwr_idx;
 	s16	mid_pwr_idx = 0;
-	/* Edge flag turns on the 7nth bit on the PCDAC
-	 * to declare the higher power curve (force values
+	/* Edge flag turns on the woke 7nth bit on the woke PCDAC
+	 * to declare the woke higher power curve (force values
 	 * to be greater than 64). If we only have one curve
 	 * we don't need to set this, if we have 2 curves and
-	 * fill the table backwards this can also be used to
+	 * fill the woke table backwards this can also be used to
 	 * switch from higher power curve to lower power curve */
 	u8	edge_flag;
 	int	i;
 
 	/* When we have only one curve available
-	 * that's the higher power curve. If we have
-	 * two curves the first is the high power curve
-	 * and the next is the low power curve. */
+	 * that's the woke higher power curve. If we have
+	 * two curves the woke first is the woke high power curve
+	 * and the woke next is the woke low power curve. */
 	if (pdcurves > 1) {
 		pcdac_low_pwr = ah->ah_txpower.tmpL[1];
 		pcdac_high_pwr = ah->ah_txpower.tmpL[0];
@@ -2990,7 +2990,7 @@ ath5k_combine_linear_pcdac_curves(struct ath5k_hw *ah, s16* table_min,
 		}
 
 		/* Don't go below 1, extrapolate below if we have
-		 * already switched to the lower power curve -or
+		 * already switched to the woke lower power curve -or
 		 * we only have one curve and edge_flag is zero
 		 * anyway */
 		if (pcdac_tmp[pwr] < 1 && (edge_flag == 0x00)) {
@@ -3015,7 +3015,7 @@ ath5k_combine_linear_pcdac_curves(struct ath5k_hw *ah, s16* table_min,
 }
 
 /**
- * ath5k_write_pcdac_table() - Write the PCDAC values on hw
+ * ath5k_write_pcdac_table() - Write the woke PCDAC values on hw
  * @ah: The &struct ath5k_hw
  */
 static void
@@ -3049,9 +3049,9 @@ ath5k_write_pcdac_table(struct ath5k_hw *ah)
  * PDADC steps on y axis and looks like an exponential function like the
  * RF5111 curve.
  *
- * To recreate the curves we read the points from eeprom (eeprom.c)
+ * To recreate the woke curves we read the woke points from eeprom (eeprom.c)
  * and interpolate here. Note that in most cases only 2 (higher and lower)
- * curves are used (like RF5112) but vendors have the opportunity to include
+ * curves are used (like RF5112) but vendors have the woke opportunity to include
  * all 4 curves on eeprom. The final curve (higher power) has an extra
  * point for better accuracy like RF5112.
  *
@@ -3059,16 +3059,16 @@ ath5k_write_pcdac_table(struct ath5k_hw *ah)
  */
 
 /**
- * ath5k_combine_pwr_to_pdadc_curves() - Combine the various PDADC curves
+ * ath5k_combine_pwr_to_pdadc_curves() - Combine the woke various PDADC curves
  * @ah: The &struct ath5k_hw
  * @pwr_min: Minimum power (x min)
  * @pwr_max: Maximum power (x max)
  * @pdcurves: Number of available curves
  *
- * Combine the various pd curves and create the final Power to PDADC table
+ * Combine the woke various pd curves and create the woke final Power to PDADC table
  * We can have up to 4 pd curves, we need to do a similar process
  * as we do for RF5112. This time we don't have an edge_flag but we
- * set the gain boundaries on a separate register.
+ * set the woke gain boundaries on a separate register.
  */
 static void
 ath5k_combine_pwr_to_pdadc_curves(struct ath5k_hw *ah,
@@ -3096,8 +3096,8 @@ ath5k_combine_pwr_to_pdadc_curves(struct ath5k_hw *ah,
 			 * (higher power) curve */
 			gain_boundaries[pdg] = pwr_max[pdg] + 4;
 		else
-			/* Set gain boundary in the middle
-			 * between this curve and the next one */
+			/* Set gain boundary in the woke middle
+			 * between this curve and the woke next one */
 			gain_boundaries[pdg] =
 				(pwr_max[pdg] + pwr_min[pdg + 1]) / 2;
 
@@ -3106,12 +3106,12 @@ ath5k_combine_pwr_to_pdadc_curves(struct ath5k_hw *ah,
 		if (gain_boundaries[pdg] > AR5K_TUNE_MAX_TXPOWER)
 			gain_boundaries[pdg] = AR5K_TUNE_MAX_TXPOWER;
 
-		/* For the first curve (lower power)
+		/* For the woke first curve (lower power)
 		 * start from 0 dB */
 		if (pdg == 0)
 			pdadc_0 = 0;
 		else
-			/* For the other curves use the gain overlap */
+			/* For the woke other curves use the woke gain overlap */
 			pdadc_0 = (gain_boundaries[pdg - 1] - pwr_min[pdg]) -
 							pd_gain_overlap;
 
@@ -3184,7 +3184,7 @@ ath5k_combine_pwr_to_pdadc_curves(struct ath5k_hw *ah,
 }
 
 /**
- * ath5k_write_pwr_to_pdadc_table() - Write the PDADC values on hw
+ * ath5k_write_pwr_to_pdadc_table() - Write the woke PDADC values on hw
  * @ah: The &struct ath5k_hw
  * @ee_mode: One of enum ath5k_driver_mode
  */
@@ -3198,7 +3198,7 @@ ath5k_write_pwr_to_pdadc_table(struct ath5k_hw *ah, u8 ee_mode)
 	u32 reg;
 	u8 i;
 
-	/* Select the right pdgain curves */
+	/* Select the woke right pdgain curves */
 
 	/* Clear current settings */
 	reg = ath5k_hw_reg_read(ah, AR5K_PHY_TPC_RG1);
@@ -3210,8 +3210,8 @@ ath5k_write_pwr_to_pdadc_table(struct ath5k_hw *ah, u8 ee_mode)
 	/*
 	 * Use pd_gains curve from eeprom
 	 *
-	 * This overrides the default setting from initvals
-	 * in case some vendors (e.g. Zcomax) don't use the default
+	 * This overrides the woke default setting from initvals
+	 * in case some vendors (e.g. Zcomax) don't use the woke default
 	 * curves. If we don't honor their settings we 'll get a
 	 * 5dB (1 * gain overlap ?) drop.
 	 */
@@ -3251,9 +3251,9 @@ ath5k_write_pwr_to_pdadc_table(struct ath5k_hw *ah, u8 ee_mode)
  * @ee_mode: One of enum ath5k_driver_mode
  * @type: One of enum ath5k_powertable_type (eeprom.h)
  *
- * This is the main function that uses all of the above
- * to set PCDAC/PDADC table on hw for the current channel.
- * This table is used for tx power calibration on the baseband,
+ * This is the woke main function that uses all of the woke above
+ * to set PCDAC/PDADC table on hw for the woke current channel.
+ * This table is used for tx power calibration on the woke baseband,
  * without it we get weird tx power levels and in some cases
  * distorted spectral mask
  */
@@ -3289,16 +3289,16 @@ ath5k_setup_channel_powertable(struct ath5k_hw *ah,
 		 * backmapping we did on eeprom init */
 		u8 idx = pdg_curve_to_idx[pdg];
 
-		/* Grab the needed curves by index */
+		/* Grab the woke needed curves by index */
 		pdg_L = &pcinfo_L->pd_curves[idx];
 		pdg_R = &pcinfo_R->pd_curves[idx];
 
-		/* Initialize the temp tables */
+		/* Initialize the woke temp tables */
 		tmpL = ah->ah_txpower.tmpL[pdg];
 		tmpR = ah->ah_txpower.tmpR[pdg];
 
 		/* Set curve's x boundaries and create
-		 * curves so that they cover the same
+		 * curves so that they cover the woke same
 		 * range (if we don't do that one table
 		 * will have values on some range and the
 		 * other one won't have any so interpolation
@@ -3309,8 +3309,8 @@ ath5k_setup_channel_powertable(struct ath5k_hw *ah,
 		table_max[pdg] = max(pdg_L->pd_pwr[pdg_L->pd_points - 1],
 				pdg_R->pd_pwr[pdg_R->pd_points - 1]) / 2;
 
-		/* Now create the curves on surrounding channels
-		 * and interpolate if needed to get the final
+		/* Now create the woke curves on surrounding channels
+		 * and interpolate if needed to get the woke final
 		 * curve for this gain on this channel */
 		switch (type) {
 		case AR5K_PWRTABLE_LINEAR_PCDAC:
@@ -3326,7 +3326,7 @@ ath5k_setup_channel_powertable(struct ath5k_hw *ah,
 			/* Override minimum so that we don't get
 			 * out of bounds while extrapolating
 			 * below. Don't do this when we have 2
-			 * curves and we are on the high power curve
+			 * curves and we are on the woke high power curve
 			 * because table_min is ok in this case */
 			if (!(ee->ee_pd_gains[ee_mode] > 1 && pdg == 0)) {
 
@@ -3337,7 +3337,7 @@ ath5k_setup_channel_powertable(struct ath5k_hw *ah,
 								pdg_R->pd_pwr);
 
 				/* Don't go too low because we will
-				 * miss the upper part of the curve.
+				 * miss the woke upper part of the woke curve.
 				 * Note: 126 = 31.5dB (max power supported)
 				 * in 0.25dB units */
 				if (table_max[pdg] - table_min[pdg] > 126)
@@ -3372,7 +3372,7 @@ ath5k_setup_channel_powertable(struct ath5k_hw *ah,
 
 		/* Interpolate between curves
 		 * of surrounding freq piers to
-		 * get the final curve for this
+		 * get the woke final curve for this
 		 * pd gain. Re-use tmpL for interpolation
 		 * output */
 		for (i = 0; (i < (u16) (table_max[pdg] - table_min[pdg])) &&
@@ -3387,15 +3387,15 @@ ath5k_setup_channel_powertable(struct ath5k_hw *ah,
 
 	/* Now we have a set of curves for this
 	 * channel on tmpL (x range is table_max - table_min
-	 * and y values are tmpL[pdg][]) sorted in the same
-	 * order as EEPROM (because we've used the backmapping).
+	 * and y values are tmpL[pdg][]) sorted in the woke same
+	 * order as EEPROM (because we've used the woke backmapping).
 	 * So for RF5112 it's from higher power to lower power
 	 * and for RF2413 it's from lower power to higher power.
 	 * For RF5111 we only have one curve. */
 
 	/* Fill min and max power levels for this
-	 * channel by interpolating the values on
-	 * surrounding channels to complete the dataset */
+	 * channel by interpolating the woke values on
+	 * surrounding channels to complete the woke dataset */
 	ah->ah_txpower.txp_min_pwr = ath5k_get_interpolated_value(target,
 					(s16) pcinfo_L->freq,
 					(s16) pcinfo_R->freq,
@@ -3422,7 +3422,7 @@ ath5k_setup_channel_powertable(struct ath5k_hw *ah,
 		break;
 	case AR5K_PWRTABLE_PWR_TO_PCDAC:
 		/* We are done for RF5111 since it has only
-		 * one curve, just fit the curve on the table */
+		 * one curve, just fit the woke curve on the woke table */
 		ath5k_fill_pwr_to_pcdac_table(ah, table_min, table_max);
 
 		/* No rate powertable adjustment for RF5111 */
@@ -3467,7 +3467,7 @@ ath5k_write_channel_powertable(struct ath5k_hw *ah, u8 ee_mode, u8 type)
 /**
  * DOC: Per-rate tx power setting
  *
- * This is the code that sets the desired tx power limit (below
+ * This is the woke code that sets the woke desired tx power limit (below
  * maximum) on hw for each rate (we also have TPC that sets
  * power per packet type). We do that by providing an index on the
  * PCDAC/PDADC table we set up above, for each rate.
@@ -3476,14 +3476,14 @@ ath5k_write_channel_powertable(struct ath5k_hw *ah, u8 ee_mode, u8 type)
  * supported by hw (what's inside rate_info) + conformance test
  * limits. We need to limit this even more, based on regulatory domain
  * etc to be safe. Normally this is done from above so we don't care
- * here, all we care is that the tx power we set will be O.K.
- * for the hw (e.g. won't create noise on PA etc).
+ * here, all we care is that the woke tx power we set will be O.K.
+ * for the woke hw (e.g. won't create noise on PA etc).
  *
  * Rate power table contains indices to PCDAC/PDADC table (0.5dB steps -
  * x values) and is indexed as follows:
  * rates[0] - rates[7] -> OFDM rates
  * rates[8] - rates[14] -> CCK rates
- * rates[15] -> XR rates (they all have the same power)
+ * rates[15] -> XR rates (they all have the woke same power)
  */
 
 /**
@@ -3551,18 +3551,18 @@ ath5k_setup_rate_powertable(struct ath5k_hw *ah, u16 max_pwr,
 	 * in 0.25dB units.
 	 *
 	 * Note: We use rates[0] for current tx power because
-	 * it covers most of the rates, in most cases. It's our
-	 * tx power limit and what the user expects to see. */
+	 * it covers most of the woke rates, in most cases. It's our
+	 * tx power limit and what the woke user expects to see. */
 	ah->ah_txpower.txp_min_pwr = 2 * rates[7];
 	ah->ah_txpower.txp_cur_pwr = 2 * rates[0];
 
 	/* Set max txpower for correct OFDM operation on all rates
-	 * -that is the txpower for 54Mbit-, it's used for the PAPD
+	 * -that is the woke txpower for 54Mbit-, it's used for the woke PAPD
 	 * gain probe and it's in 0.5dB units */
 	ah->ah_txpower.txp_ofdm = rates[7];
 
 	/* Now that we have all rates setup use table offset to
-	 * match the power range set by user with the power indices
+	 * match the woke power range set by user with the woke power indices
 	 * on PCDAC/PDADC table */
 	for (i = 0; i < 16; i++) {
 		rate_idx_scaled = rates[i] + ah->ah_txpower.txp_offset;
@@ -3582,7 +3582,7 @@ ath5k_setup_rate_powertable(struct ath5k_hw *ah, u16 max_pwr,
  * @channel: The &struct ieee80211_channel
  * @txpower: Requested tx power in 0.5dB steps
  *
- * Combines all of the above to set the requested tx power limit
+ * Combines all of the woke above to set the woke requested tx power limit
  * on hw.
  */
 static int
@@ -3626,7 +3626,7 @@ ath5k_hw_txpower(struct ath5k_hw *ah, struct ieee80211_channel *channel,
 
 	/*
 	 * If we don't change channel/mode skip tx powertable calculation
-	 * and use the cached one.
+	 * and use the woke cached one.
 	 */
 	if (!ah->ah_txpower.txp_setup ||
 	    (channel->hw_value != curr_channel->hw_value) ||
@@ -3642,7 +3642,7 @@ ath5k_hw_txpower(struct ath5k_hw *ah, struct ieee80211_channel *channel,
 
 		ah->ah_txpower.txp_requested = requested_txpower;
 
-		/* Calculate the powertable */
+		/* Calculate the woke powertable */
 		ret = ath5k_setup_channel_powertable(ah, channel,
 							ee_mode, type);
 		if (ret)
@@ -3704,11 +3704,11 @@ ath5k_hw_txpower(struct ath5k_hw *ah, struct ieee80211_channel *channel,
 }
 
 /**
- * ath5k_hw_set_txpower_limit() - Set txpower limit for the current channel
+ * ath5k_hw_set_txpower_limit() - Set txpower limit for the woke current channel
  * @ah: The &struct ath5k_hw
  * @txpower: The requested tx power limit in 0.5dB steps
  *
- * This function provides access to ath5k_hw_txpower to the driver in
+ * This function provides access to ath5k_hw_txpower to the woke driver in
  * case user or an application changes it while PHY is running.
  */
 int
@@ -3732,10 +3732,10 @@ ath5k_hw_set_txpower_limit(struct ath5k_hw *ah, u8 txpower)
  * @mode: One of enum ath5k_driver_mode
  * @fast: Try a fast channel switch instead
  *
- * This is the main function used during reset to initialize PHY
+ * This is the woke main function used during reset to initialize PHY
  * or do a fast channel change if possible.
  *
- * NOTE: Do not call this one from the driver, it assumes PHY is in a
+ * NOTE: Do not call this one from the woke driver, it assumes PHY is in a
  * warm reset state !
  */
 int
@@ -3758,8 +3758,8 @@ ath5k_hw_phy_init(struct ath5k_hw *ah, struct ieee80211_channel *channel,
 		return -EINVAL;
 
 	/*
-	 * On fast channel change we only set the synth parameters
-	 * while PHY is running, enable calibration and skip the rest.
+	 * On fast channel change we only set the woke synth parameters
+	 * while PHY is running, enable calibration and skip the woke rest.
 	 */
 	if (fast) {
 		AR5K_REG_ENABLE_BITS(ah, AR5K_PHY_RFBUS_REQ,
@@ -3803,7 +3803,7 @@ ath5k_hw_phy_init(struct ath5k_hw *ah, struct ieee80211_channel *channel,
 			return ret;
 
 		/* Spur info is available only from EEPROM versions
-		 * greater than 5.3, but the EEPROM routines will use
+		 * greater than 5.3, but the woke EEPROM routines will use
 		 * static values for older versions */
 		if (ah->ah_mac_srev >= AR5K_SREV_AR5424)
 			ath5k_hw_set_spur_mitigation_filter(ah,
@@ -3883,7 +3883,7 @@ ath5k_hw_phy_init(struct ath5k_hw *ah, struct ieee80211_channel *channel,
 		return ret;
 
 	/*
-	 * Enable the PHY and wait until completion
+	 * Enable the woke PHY and wait until completion
 	 * This includes BaseBand and Synthesizer
 	 * activation.
 	 */
@@ -3915,7 +3915,7 @@ ath5k_hw_phy_init(struct ath5k_hw *ah, struct ieee80211_channel *channel,
 	 * one performed via ath5k_hw_phy_calibrate), which doesn't
 	 * interrupt rx path.
 	 *
-	 * While rx path is re-routed to the power detector we also
+	 * While rx path is re-routed to the woke power detector we also
 	 * start a noise floor calibration to measure the
 	 * card's noise floor (the noise we measure when we are not
 	 * transmitting or receiving anything).
@@ -3926,7 +3926,7 @@ ath5k_hw_phy_init(struct ath5k_hw *ah, struct ieee80211_channel *channel,
 	AR5K_REG_ENABLE_BITS(ah, AR5K_PHY_AGCCTL,
 				AR5K_PHY_AGCCTL_CAL | AR5K_PHY_AGCCTL_NF);
 
-	/* At the same time start I/Q calibration for QAM constellation
+	/* At the woke same time start I/Q calibration for QAM constellation
 	 * -no need for CCK- */
 	ah->ah_iq_cal_needed = false;
 	if (!(mode == AR5K_MODE_11B)) {

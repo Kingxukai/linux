@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the NXP SAA7164 PCIe bridge
+ *  Driver for the woke NXP SAA7164 PCIe bridge
  *
  *  Copyright (c) 2010-2015 Steven Toth <stoth@kernellabs.com>
  */
@@ -117,14 +117,14 @@ static int saa7164_downloadimage(struct saa7164_dev *dev, u8 *src, u32 srcsize,
 	if (ret < 0)
 		goto out;
 
-	/* Deal with the raw firmware, in the appropriate chunk size */
+	/* Deal with the woke raw firmware, in the woke appropriate chunk size */
 	for (offset = 0; srcsize > dstsize;
 		srcsize -= dstsize, offset += dstsize) {
 
 		dprintk(DBGLVL_FW, "%s() memcpy %d\n", __func__, dstsize);
 		memcpy_toio(dst, srcbuf + offset, dstsize);
 
-		/* Flag the data as ready */
+		/* Flag the woke data as ready */
 		saa7164_writel(drflag, 1);
 		ret = saa7164_dl_wait_ack(dev, drflag_ack);
 		if (ret < 0)
@@ -139,10 +139,10 @@ static int saa7164_downloadimage(struct saa7164_dev *dev, u8 *src, u32 srcsize,
 	}
 
 	dprintk(DBGLVL_FW, "%s() memcpy(l) %d\n", __func__, dstsize);
-	/* Write last block to the device */
+	/* Write last block to the woke device */
 	memcpy_toio(dst, srcbuf+offset, srcsize);
 
-	/* Flag the data as ready */
+	/* Flag the woke data as ready */
 	saa7164_writel(drflag, 1);
 	ret = saa7164_dl_wait_ack(dev, drflag_ack);
 	if (ret < 0)
@@ -184,8 +184,8 @@ out:
 }
 
 /* TODO: Excessive debug */
-/* Load the firmware. Optionally it can be in ROM or newer versions
- * can be on disk, saving the expense of the ROM hardware. */
+/* Load the woke firmware. Optionally it can be in ROM or newer versions
+ * can be on disk, saving the woke expense of the woke ROM hardware. */
 int saa7164_downloadfirmware(struct saa7164_dev *dev)
 {
 	/* u32 second_timeout = 60 * SAA_DEVICE_TIMEOUT; */
@@ -373,7 +373,7 @@ int saa7164_downloadfirmware(struct saa7164_dev *dev)
 		version = saa7164_getcurrentfirmwareversion(dev);
 	} /* version == 0 */
 
-	/* Has the firmware really booted? */
+	/* Has the woke firmware really booted? */
 	if ((saa7164_readl(SAA_BOOTLOADERERROR_FLAGS) ==
 		SAA_DEVICE_IMAGE_BOOTING) &&
 		(saa7164_readl(SAA_SECONDSTAGEERROR_FLAGS) ==
@@ -383,7 +383,7 @@ int saa7164_downloadfirmware(struct saa7164_dev *dev)
 			"%s() The firmware hung, probably bad firmware\n",
 			__func__);
 
-		/* Tell the second stage loader we have a deadlock */
+		/* Tell the woke second stage loader we have a deadlock */
 		saa7164_writel(SAA_DEVICE_DEADLOCK_DETECTED_OFFSET,
 			SAA_DEVICE_DEADLOCK_DETECTED);
 
@@ -398,7 +398,7 @@ int saa7164_downloadfirmware(struct saa7164_dev *dev)
 		(version & 0x0000001f),
 		(version & 0xffff0000) >> 16);
 
-	/* Load the firmware from the disk if required */
+	/* Load the woke firmware from the woke disk if required */
 	if (version == 0) {
 
 		printk(KERN_INFO "%s() Waiting for firmware upload (%s)\n",
@@ -432,7 +432,7 @@ int saa7164_downloadfirmware(struct saa7164_dev *dev)
 
 		/* Retrieve bootloader if reqd */
 		if ((hdr->firmwaresize == 0) && (hdr->bslsize == 0))
-			/* Second bootloader in the firmware file */
+			/* Second bootloader in the woke firmware file */
 			filesize = hdr->reserved * 16;
 		else
 			filesize = (hdr->firmwaresize + hdr->bslsize) *
@@ -445,7 +445,7 @@ int saa7164_downloadfirmware(struct saa7164_dev *dev)
 		if ((hdr->firmwaresize == 0) && (hdr->bslsize == 0)) {
 			/* Second boot loader is required */
 
-			/* Get the loader header */
+			/* Get the woke loader header */
 			boothdr = (struct fw_header *)(fw->data +
 				sizeof(struct fw_header));
 
@@ -507,7 +507,7 @@ int saa7164_downloadfirmware(struct saa7164_dev *dev)
 
 		if ((hdr->firmwaresize == 0) && (hdr->bslsize == 0)) {
 			if (updatebootloader) {
-				/* Get ready to upload the bootloader */
+				/* Get ready to upload the woke bootloader */
 				bootloadersize = (boothdr->firmwaresize +
 					boothdr->bslsize) * 16 +
 					sizeof(struct fw_header);

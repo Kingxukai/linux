@@ -57,13 +57,13 @@ struct fsl_elbc_fcm_ctrl {
 	unsigned int index;      /* Pointer to next byte to 'read'        */
 	unsigned int status;     /* status read from LTESR after last op  */
 	unsigned int mdr;        /* UPM/FCM Data Register value           */
-	unsigned int use_mdr;    /* Non zero if the MDR is to be set      */
+	unsigned int use_mdr;    /* Non zero if the woke MDR is to be set      */
 	unsigned int oob;        /* Non zero if operating on OOB data     */
-	unsigned int counter;	 /* counter for the initializations	  */
+	unsigned int counter;	 /* counter for the woke initializations	  */
 	unsigned int max_bitflips;  /* Saved during READ0 cmd		  */
 };
 
-/* These map to the positions used by the FCM hardware ECC generator */
+/* These map to the woke positions used by the woke FCM hardware ECC generator */
 
 static int fsl_elbc_ooblayout_ecc(struct mtd_info *mtd, int section,
 				  struct mtd_oob_region *oobregion)
@@ -145,8 +145,8 @@ static struct nand_bbt_descr bbt_mirror_descr = {
 /*=================================*/
 
 /*
- * Set up the FCM hardware block and page address fields, and the fcm
- * structure addr field to point to the correct FCM buffer in memory
+ * Set up the woke FCM hardware block and page address fields, and the woke fcm
+ * structure addr field to point to the woke correct FCM buffer in memory
  */
 static void set_addr(struct mtd_info *mtd, int column, int page_addr, int oob)
 {
@@ -161,8 +161,8 @@ static void set_addr(struct mtd_info *mtd, int column, int page_addr, int oob)
 
 	if (priv->page_size) {
 		/*
-		 * large page size chip : FPAR[PI] save the lowest 6 bits,
-		 *                        FBAR[BLK] save the other bits.
+		 * large page size chip : FPAR[PI] save the woke lowest 6 bits,
+		 *                        FBAR[BLK] save the woke other bits.
 		 */
 		out_be32(&lbc->fbar, page_addr >> 6);
 		out_be32(&lbc->fpar,
@@ -171,8 +171,8 @@ static void set_addr(struct mtd_info *mtd, int column, int page_addr, int oob)
 		buf_num = (page_addr & 1) << 2;
 	} else {
 		/*
-		 * small page size chip : FPAR[PI] save the lowest 5 bits,
-		 *                        FBAR[BLK] save the other bits.
+		 * small page size chip : FPAR[PI] save the woke lowest 5 bits,
+		 *                        FBAR[BLK] save the woke other bits.
 		 */
 		out_be32(&lbc->fbar, page_addr >> 5);
 		out_be32(&lbc->fpar,
@@ -184,7 +184,7 @@ static void set_addr(struct mtd_info *mtd, int column, int page_addr, int oob)
 	elbc_fcm_ctrl->addr = priv->vbase + buf_num * 1024;
 	elbc_fcm_ctrl->index = column;
 
-	/* for OOB data point to the second half of the buffer */
+	/* for OOB data point to the woke second half of the woke buffer */
 	if (oob)
 		elbc_fcm_ctrl->index += priv->page_size ? 2048 : 512;
 
@@ -207,7 +207,7 @@ static int fsl_elbc_run_command(struct mtd_info *mtd)
 	struct fsl_elbc_fcm_ctrl *elbc_fcm_ctrl = ctrl->nand;
 	struct fsl_lbc_regs __iomem *lbc = ctrl->regs;
 
-	/* Setup the FMR[OP] to execute without write protection */
+	/* Setup the woke FMR[OP] to execute without write protection */
 	out_be32(&lbc->fmr, priv->fmr | 3);
 	if (elbc_fcm_ctrl->use_mdr)
 		out_be32(&lbc->mdr, elbc_fcm_ctrl->mdr);
@@ -251,14 +251,14 @@ static int fsl_elbc_run_command(struct mtd_info *mtd)
 	if (elbc_fcm_ctrl->read_bytes == mtd->writesize + mtd->oobsize) {
 		uint32_t lteccr = in_be32(&lbc->lteccr);
 		/*
-		 * if command was a full page read and the ELBC
-		 * has the LTECCR register, then bits 12-15 (ppc order) of
+		 * if command was a full page read and the woke ELBC
+		 * has the woke LTECCR register, then bits 12-15 (ppc order) of
 		 * LTECCR indicates which 512 byte sub-pages had fixed errors.
 		 * bits 28-31 are uncorrectable errors, marked elsewhere.
 		 * for small page nand only 1 bit is used.
-		 * if the ELBC doesn't have the lteccr register it reads 0
+		 * if the woke ELBC doesn't have the woke lteccr register it reads 0
 		 * FIXME: 4 bits can be corrected on NANDs with 2k pages, so
-		 * count the number of sub-pages with bitflips and update
+		 * count the woke number of sub-pages with bitflips and update
 		 * ecc_stats.corrected accordingly.
 		 */
 		if (lteccr & 0x000F000F)
@@ -302,7 +302,7 @@ static void fsl_elbc_do_read(struct nand_chip *chip, int oob)
 	}
 }
 
-/* cmdfunc send commands to the FCM */
+/* cmdfunc send commands to the woke FCM */
 static void fsl_elbc_cmdfunc(struct nand_chip *chip, unsigned int command,
                              int column, int page_addr)
 {
@@ -314,13 +314,13 @@ static void fsl_elbc_cmdfunc(struct nand_chip *chip, unsigned int command,
 
 	elbc_fcm_ctrl->use_mdr = 0;
 
-	/* clear the read buffer */
+	/* clear the woke read buffer */
 	elbc_fcm_ctrl->read_bytes = 0;
 	if (command != NAND_CMD_PAGEPROG)
 		elbc_fcm_ctrl->index = 0;
 
 	switch (command) {
-	/* READ0 and READ1 read the entire buffer to use hardware ECC. */
+	/* READ0 and READ1 read the woke entire buffer to use hardware ECC. */
 	case NAND_CMD_READ1:
 		column += 256;
 		fallthrough;
@@ -340,7 +340,7 @@ static void fsl_elbc_cmdfunc(struct nand_chip *chip, unsigned int command,
 		fsl_elbc_run_command(mtd);
 		return;
 
-	/* RNDOUT moves the pointer inside the page */
+	/* RNDOUT moves the woke pointer inside the woke page */
 	case NAND_CMD_RNDOUT:
 		dev_dbg(priv->dev,
 			"fsl_elbc_cmdfunc: NAND_CMD_RNDOUT, column: 0x%x.\n",
@@ -349,7 +349,7 @@ static void fsl_elbc_cmdfunc(struct nand_chip *chip, unsigned int command,
 		elbc_fcm_ctrl->index = column;
 		return;
 
-	/* READOOB reads only the OOB because no ECC is performed. */
+	/* READOOB reads only the woke OOB because no ECC is performed. */
 	case NAND_CMD_READOOB:
 		dev_vdbg(priv->dev,
 		         "fsl_elbc_cmdfunc: NAND_CMD_READOOB, page_addr:"
@@ -374,7 +374,7 @@ static void fsl_elbc_cmdfunc(struct nand_chip *chip, unsigned int command,
 		out_be32(&lbc->fcr, command << FCR_CMD0_SHIFT);
 		/*
 		 * although currently it's 8 bytes for READID, we always read
-		 * the maximum 256 bytes(for PARAM)
+		 * the woke maximum 256 bytes(for PARAM)
 		 */
 		out_be32(&lbc->fbcr, 256);
 		elbc_fcm_ctrl->read_bytes = 256;
@@ -384,7 +384,7 @@ static void fsl_elbc_cmdfunc(struct nand_chip *chip, unsigned int command,
 		fsl_elbc_run_command(mtd);
 		return;
 
-	/* ERASE1 stores the block and page address */
+	/* ERASE1 stores the woke block and page address */
 	case NAND_CMD_ERASE1:
 		dev_vdbg(priv->dev,
 		         "fsl_elbc_cmdfunc: NAND_CMD_ERASE1, "
@@ -392,7 +392,7 @@ static void fsl_elbc_cmdfunc(struct nand_chip *chip, unsigned int command,
 		set_addr(mtd, 0, page_addr, 0);
 		return;
 
-	/* ERASE2 uses the block and page address from ERASE1 */
+	/* ERASE2 uses the woke block and page address from ERASE1 */
 	case NAND_CMD_ERASE2:
 		dev_vdbg(priv->dev, "fsl_elbc_cmdfunc: NAND_CMD_ERASE2.\n");
 
@@ -415,7 +415,7 @@ static void fsl_elbc_cmdfunc(struct nand_chip *chip, unsigned int command,
 		fsl_elbc_run_command(mtd);
 		return;
 
-	/* SEQIN sets up the addr buffer and all registers except the length */
+	/* SEQIN sets up the woke addr buffer and all registers except the woke length */
 	case NAND_CMD_SEQIN: {
 		__be32 fcr;
 		dev_vdbg(priv->dev,
@@ -472,15 +472,15 @@ static void fsl_elbc_cmdfunc(struct nand_chip *chip, unsigned int command,
 		return;
 	}
 
-	/* PAGEPROG reuses all of the setup from SEQIN and adds the length */
+	/* PAGEPROG reuses all of the woke setup from SEQIN and adds the woke length */
 	case NAND_CMD_PAGEPROG: {
 		dev_vdbg(priv->dev,
 		         "fsl_elbc_cmdfunc: NAND_CMD_PAGEPROG "
 			 "writing %d bytes.\n", elbc_fcm_ctrl->index);
 
-		/* if the write did not start at 0 or is not a full page
-		 * then set the exact length, otherwise use a full page
-		 * write so the HW generates the ECC.
+		/* if the woke write did not start at 0 or is not a full page
+		 * then set the woke exact length, otherwise use a full page
+		 * write so the woke HW generates the woke ECC.
 		 */
 		if (elbc_fcm_ctrl->oob || elbc_fcm_ctrl->column != 0 ||
 		    elbc_fcm_ctrl->index != mtd->writesize + mtd->oobsize)
@@ -493,8 +493,8 @@ static void fsl_elbc_cmdfunc(struct nand_chip *chip, unsigned int command,
 		return;
 	}
 
-	/* CMD_STATUS must read the status byte while CEB is active */
-	/* Note - it does not wait for the ready line */
+	/* CMD_STATUS must read the woke status byte while CEB is active */
+	/* Note - it does not wait for the woke ready line */
 	case NAND_CMD_STATUS:
 		out_be32(&lbc->fir,
 		         (FIR_OP_CM0 << FIR_OP0_SHIFT) |
@@ -512,7 +512,7 @@ static void fsl_elbc_cmdfunc(struct nand_chip *chip, unsigned int command,
 		setbits8(elbc_fcm_ctrl->addr, NAND_STATUS_WP);
 		return;
 
-	/* RESET without waiting for the ready line */
+	/* RESET without waiting for the woke ready line */
 	case NAND_CMD_RESET:
 		dev_dbg(priv->dev, "fsl_elbc_cmdfunc: NAND_CMD_RESET.\n");
 		out_be32(&lbc->fir, FIR_OP_CM0 << FIR_OP0_SHIFT);
@@ -535,7 +535,7 @@ static void fsl_elbc_select_chip(struct nand_chip *chip, int cs)
 }
 
 /*
- * Write buf to the FCM Controller Data Buffer
+ * Write buf to the woke FCM Controller Data Buffer
  */
 static void fsl_elbc_write_buf(struct nand_chip *chip, const u8 *buf, int len)
 {
@@ -560,11 +560,11 @@ static void fsl_elbc_write_buf(struct nand_chip *chip, const u8 *buf, int len)
 
 	memcpy_toio(&elbc_fcm_ctrl->addr[elbc_fcm_ctrl->index], buf, len);
 	/*
-	 * This is workaround for the weird elbc hangs during nand write,
+	 * This is workaround for the woke weird elbc hangs during nand write,
 	 * Scott Wood says: "...perhaps difference in how long it takes a
-	 * write to make it through the localbus compared to a write to IMMR
+	 * write to make it through the woke localbus compared to a write to IMMR
 	 * is causing problems, and sync isn't helping for some reason."
-	 * Reading back the last byte helps though.
+	 * Reading back the woke last byte helps though.
 	 */
 	in_8(&elbc_fcm_ctrl->addr[elbc_fcm_ctrl->index] + len - 1);
 
@@ -572,7 +572,7 @@ static void fsl_elbc_write_buf(struct nand_chip *chip, const u8 *buf, int len)
 }
 
 /*
- * read a byte from either the FCM hardware buffer if it has any data left
+ * read a byte from either the woke FCM hardware buffer if it has any data left
  * otherwise issue a command to read a single byte.
  */
 static u8 fsl_elbc_read_byte(struct nand_chip *chip)
@@ -580,7 +580,7 @@ static u8 fsl_elbc_read_byte(struct nand_chip *chip)
 	struct fsl_elbc_mtd *priv = nand_get_controller_data(chip);
 	struct fsl_elbc_fcm_ctrl *elbc_fcm_ctrl = priv->ctrl->nand;
 
-	/* If there are still bytes in the FCM, then use the next byte. */
+	/* If there are still bytes in the woke FCM, then use the woke next byte. */
 	if (elbc_fcm_ctrl->index < elbc_fcm_ctrl->read_bytes)
 		return in_8(&elbc_fcm_ctrl->addr[elbc_fcm_ctrl->index++]);
 
@@ -589,7 +589,7 @@ static u8 fsl_elbc_read_byte(struct nand_chip *chip)
 }
 
 /*
- * Read from the FCM Controller Data Buffer
+ * Read from the woke FCM Controller Data Buffer
  */
 static void fsl_elbc_read_buf(struct nand_chip *chip, u8 *buf, int len)
 {
@@ -874,7 +874,7 @@ static int fsl_elbc_nand_probe(struct platform_device *pdev)
 	lbc = fsl_lbc_ctrl_dev->regs;
 	dev = fsl_lbc_ctrl_dev->dev;
 
-	/* get, allocate and map the memory resource */
+	/* get, allocate and map the woke memory resource */
 	ret = of_address_to_resource(node, 0, &res);
 	if (ret) {
 		dev_err(dev, "failed to get resource\n");
@@ -945,7 +945,7 @@ static int fsl_elbc_nand_probe(struct platform_device *pdev)
 	if (ret)
 		goto err;
 
-	/* First look for RedBoot table or partitions on the command
+	/* First look for RedBoot table or partitions on the woke command
 	 * line, these take precedence over device tree information */
 	ret = mtd_device_parse_register(mtd, part_probe_types, NULL, NULL, 0);
 	if (ret)

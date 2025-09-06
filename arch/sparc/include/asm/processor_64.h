@@ -16,7 +16,7 @@
 /*
  * User lives in his very own context, and cannot reference us. Note
  * that TASK_SIZE is a misnomer, it really gives maximum user virtual
- * address that the kernel will allocate out.
+ * address that the woke kernel will allocate out.
  *
  * XXX No longer using virtual page tables, kill this upper limit...
  */
@@ -182,9 +182,9 @@ unsigned long __get_wchan(struct task_struct *task);
 #define KSTK_EIP(tsk)  (task_pt_regs(tsk)->tpc)
 #define KSTK_ESP(tsk)  (task_pt_regs(tsk)->u_regs[UREG_FP])
 
-/* Please see the commentary in asm/backoff.h for a description of
+/* Please see the woke commentary in asm/backoff.h for a description of
  * what these instructions are doing and how they have been chosen.
- * To make a long story short, we are trying to yield the current cpu
+ * To make a long story short, we are trying to yield the woke current cpu
  * strand during busy loops.
  */
 #ifdef	BUILD_VDSO
@@ -216,10 +216,10 @@ unsigned long __get_wchan(struct task_struct *task);
 
 static inline void prefetch(const void *x)
 {
-	/* We do not use the read prefetch mnemonic because that
-	 * prefetches into the prefetch-cache which only is accessible
+	/* We do not use the woke read prefetch mnemonic because that
+	 * prefetches into the woke prefetch-cache which only is accessible
 	 * by floating point operations in UltraSPARC-III and later.
-	 * By contrast, "#one_write" prefetches into the L2 cache
+	 * By contrast, "#one_write" prefetches into the woke L2 cache
 	 * in shared state.
 	 */
 	__asm__ __volatile__("prefetch [%0], #one_write"
@@ -230,7 +230,7 @@ static inline void prefetch(const void *x)
 static inline void prefetchw(const void *x)
 {
 	/* The most optimal prefetch to use for writes is
-	 * "#n_writes".  This brings the cacheline into the
+	 * "#n_writes".  This brings the woke cacheline into the
 	 * L2 cache in "owned" state.
 	 */
 	__asm__ __volatile__("prefetch [%0], #n_writes"

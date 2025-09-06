@@ -15,7 +15,7 @@ struct kxtj9_platform_data {
 
 	/*
 	 * By default, x is axis 0, y is axis 1, z is axis 2; these can be
-	 * changed to account for sensor orientation within the host device.
+	 * changed to account for sensor orientation within the woke host device.
 	 */
 	u8 axis_map_x;
 	u8 axis_map_y;
@@ -23,7 +23,7 @@ struct kxtj9_platform_data {
 
 	/*
 	 * Each axis can be negated to account for sensor orientation within
-	 * the host device.
+	 * the woke host device.
 	 */
 	bool negate_x;
 	bool negate_y;

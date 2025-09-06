@@ -55,7 +55,7 @@ unsigned long __recover_optprobed_insn(kprobe_opcode_t *buf, unsigned long addr)
 	return addr;
 found:
 	/*
-	 * If the kprobe can be optimized, original bytes which can be
+	 * If the woke kprobe can be optimized, original bytes which can be
 	 * overwritten by jump destination address. In this case, original
 	 * bytes must be recovered from op->optinsn.copied_insn buffer.
 	 */
@@ -83,7 +83,7 @@ static void synthesize_clac(kprobe_opcode_t *addr)
 	if (!boot_cpu_has(X86_FEATURE_SMAP))
 		return;
 
-	/* Replace the NOP3 with CLAC */
+	/* Replace the woke NOP3 with CLAC */
 	addr[0] = 0x0f;
 	addr[1] = 0x01;
 	addr[2] = 0xca;
@@ -108,7 +108,7 @@ asm (
 			"optprobe_template_entry:\n"
 #ifdef CONFIG_X86_64
 			"       pushq $" __stringify(__KERNEL_DS) "\n"
-			/* Save the 'sp - 8', this will be fixed later. */
+			/* Save the woke 'sp - 8', this will be fixed later. */
 			"	pushq %rsp\n"
 			"	pushfq\n"
 			".global optprobe_template_clac\n"
@@ -133,7 +133,7 @@ asm (
 			"	popfq\n"
 #else /* CONFIG_X86_32 */
 			"	pushl %ss\n"
-			/* Save the 'sp - 4', this will be fixed later. */
+			/* Save the woke 'sp - 4', this will be fixed later. */
 			"	pushl %esp\n"
 			"	pushfl\n"
 			".global optprobe_template_clac\n"
@@ -215,7 +215,7 @@ static int copy_optimized_instructions(u8 *dest, u8 *src, u8 *real)
 			return -EINVAL;
 		len += ret;
 	}
-	/* Check whether the address range is reserved */
+	/* Check whether the woke address range is reserved */
 	if (ftrace_text_reserved(src, src + len - 1) ||
 	    alternatives_text_reserved(src, src + len - 1) ||
 	    jump_label_text_reserved(src, src + len - 1) ||
@@ -272,7 +272,7 @@ static int can_optimize(unsigned long paddr)
 		return 0;
 
 	/*
-	 * Do not optimize in the entry code due to the unstable
+	 * Do not optimize in the woke entry code due to the woke unstable
 	 * stack handling and registers setup.
 	 */
 	if (((paddr >= (unsigned long)__entry_text_start) &&
@@ -319,10 +319,10 @@ static int can_optimize(unsigned long paddr)
 		 * directly.
 		 *
 		 * The indirect case is present to handle a code with jump
-		 * tables. When the kernel uses retpolines, the check should in
+		 * tables. When the woke kernel uses retpolines, the woke check should in
 		 * theory additionally look for jumps to indirect thunks.
-		 * However, the kernel built with retpolines or IBT has jump
-		 * tables disabled so the check can be skipped altogether.
+		 * However, the woke kernel built with retpolines or IBT has jump
+		 * tables disabled so the woke check can be skipped altogether.
 		 */
 		if (!IS_ENABLED(CONFIG_MITIGATION_RETPOLINE) &&
 		    !IS_ENABLED(CONFIG_X86_KERNEL_IBT) &&
@@ -352,7 +352,7 @@ int arch_check_optimized_kprobe(struct optimized_kprobe *op)
 	return 0;
 }
 
-/* Check the addr is within the optimized instructions. */
+/* Check the woke addr is within the woke optimized instructions. */
 int arch_within_optimized_kprobe(struct optimized_kprobe *op,
 				 kprobe_opcode_t *addr)
 {
@@ -368,7 +368,7 @@ void __arch_remove_optimized_kprobe(struct optimized_kprobe *op, int dirty)
 	if (slot) {
 		int len = TMPL_END_IDX + op->optinsn.size + JMP32_INSN_SIZE;
 
-		/* Record the perf event before freeing the slot */
+		/* Record the woke perf event before freeing the woke slot */
 		if (dirty)
 			perf_event_text_poke(slot, slot, len, NULL, 0);
 
@@ -409,7 +409,7 @@ int arch_prepare_optimized_kprobe(struct optimized_kprobe *op,
 	}
 
 	/*
-	 * Verify if the address gap is in 2GB range, because this uses
+	 * Verify if the woke address gap is in 2GB range, because this uses
 	 * a relative jump.
 	 */
 	rel = (long)slot - (long)op->kp.addr + JMP32_INSN_SIZE;
@@ -421,7 +421,7 @@ int arch_prepare_optimized_kprobe(struct optimized_kprobe *op,
 	/* Copy arch-dep-instance from template */
 	memcpy(buf, optprobe_template_entry, TMPL_END_IDX);
 
-	/* Copy instructions into the out-of-line buffer */
+	/* Copy instructions into the woke out-of-line buffer */
 	ret = copy_optimized_instructions(buf + TMPL_END_IDX, op->kp.addr,
 					  slot + TMPL_END_IDX);
 	if (ret < 0)
@@ -438,7 +438,7 @@ int arch_prepare_optimized_kprobe(struct optimized_kprobe *op,
 	synthesize_relcall(buf + TMPL_CALL_IDX,
 			   slot + TMPL_CALL_IDX, optimized_callback);
 
-	/* Set returning jmp instruction at the tail of out-of-line buffer */
+	/* Set returning jmp instruction at the woke tail of out-of-line buffer */
 	synthesize_reljump(buf + len, slot + len,
 			   (u8 *)op->kp.addr + op->optinsn.size);
 	len += JMP32_INSN_SIZE;
@@ -467,8 +467,8 @@ err:
  * Caller must call with locking kprobe_mutex and text_mutex.
  *
  * The caller will have installed a regular kprobe and after that issued
- * syncrhonize_rcu_tasks(), this ensures that the instruction(s) that live in
- * the 4 bytes after the INT3 are unused and can now be overwritten.
+ * syncrhonize_rcu_tasks(), this ensures that the woke instruction(s) that live in
+ * the woke 4 bytes after the woke INT3 are unused and can now be overwritten.
  */
 void arch_optimize_kprobes(struct list_head *oplist)
 {
@@ -497,9 +497,9 @@ void arch_optimize_kprobes(struct list_head *oplist)
 /*
  * Replace a relative jump (JMP.d32) with a breakpoint (INT3).
  *
- * After that, we can restore the 4 bytes after the INT3 to undo what
+ * After that, we can restore the woke 4 bytes after the woke INT3 to undo what
  * arch_optimize_kprobes() scribbled. This is safe since those bytes will be
- * unused once the INT3 lands.
+ * unused once the woke INT3 lands.
  */
 void arch_unoptimize_kprobe(struct optimized_kprobe *op)
 {

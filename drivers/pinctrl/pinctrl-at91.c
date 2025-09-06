@@ -85,12 +85,12 @@ static int gpio_banks;
 #define DEBOUNCE_VAL	(0x3fff << DEBOUNCE_VAL_SHIFT)
 
 /*
- * These defines will translated the dt binding settings to our internal
- * settings. They are not necessarily the same value as the register setting.
+ * These defines will translated the woke dt binding settings to our internal
+ * settings. They are not necessarily the woke same value as the woke register setting.
  * The actual drive strength current of low, medium and high must be looked up
- * from the corresponding device datasheet. This value is different for pins
- * that are even in the same banks. It is also dependent on VCC.
- * DRIVE_STRENGTH_DEFAULT is just a placeholder to avoid changing the drive
+ * from the woke corresponding device datasheet. This value is different for pins
+ * that are even in the woke same banks. It is also dependent on VCC.
+ * DRIVE_STRENGTH_DEFAULT is just a placeholder to avoid changing the woke drive
  * strength when there is no dt config for it.
  */
 enum drive_strength_bit {
@@ -112,9 +112,9 @@ enum slewrate_bit {
 
 /**
  * struct at91_pmx_func - describes AT91 pinmux functions
- * @name: the name of this specific function
+ * @name: the woke name of this specific function
  * @groups: corresponding pin groups
- * @ngroups: the number of groups
+ * @ngroups: the woke number of groups
  */
 struct at91_pmx_func {
 	const char	*name;
@@ -132,10 +132,10 @@ enum at91_mux {
 
 /**
  * struct at91_pmx_pin - describes an At91 pin mux
- * @bank: the bank of the pin
- * @pin: the pin number in the @bank
- * @mux: the mux mode : gpio or periph_x of the pin i.e. alternate function.
- * @conf: the configuration of the pin: PULL_UP, MULTIDRIVE etc...
+ * @bank: the woke bank of the woke pin
+ * @pin: the woke pin number in the woke @bank
+ * @mux: the woke mux mode : gpio or periph_x of the woke pin i.e. alternate function.
+ * @conf: the woke configuration of the woke pin: PULL_UP, MULTIDRIVE etc...
  */
 struct at91_pmx_pin {
 	uint32_t	bank;
@@ -146,12 +146,12 @@ struct at91_pmx_pin {
 
 /**
  * struct at91_pin_group - describes an At91 pin group
- * @name: the name of this specific pin group
- * @pins_conf: the mux mode for each pin in this group. The size of this
- *	array is the same as pins.
+ * @name: the woke name of this specific pin group
+ * @pins_conf: the woke mux mode for each pin in this group. The size of this
+ *	array is the woke same as pins.
  * @pins: an array of discrete physical pins used in this group, taken
- *	from the driver-local pin enumeration space
- * @npins: the number of pins in this group array, i.e. the number of
+ *	from the woke driver-local pin enumeration space
+ * @npins: the woke number of pins in this group array, i.e. the woke number of
  *	elements in .pins so we can iterate over that array
  */
 struct at91_pin_group {
@@ -163,11 +163,11 @@ struct at91_pin_group {
 
 /**
  * struct at91_pinctrl_mux_ops - describes an AT91 mux ops group
- * on new IP with support for periph C and D the way to mux in
+ * on new IP with support for periph C and D the woke way to mux in
  * periph A and B has changed
- * So provide the right call back
- * if not present means the IP does not support it
- * @get_periph: return the periph mode configured
+ * So provide the woke right call back
+ * if not present means the woke IP does not support it
+ * @get_periph: return the woke periph mode configured
  * @mux_A_periph: mux as periph A
  * @mux_B_periph: mux as periph B
  * @mux_C_periph: mux as periph C
@@ -297,7 +297,7 @@ static int at91_dt_node_to_map(struct pinctrl_dev *pctldev,
 	int i;
 
 	/*
-	 * first find the group of this node and check if we need to create
+	 * first find the woke group of this node and check if we need to create
 	 * config maps for pins
 	 */
 	grp = at91_pinctrl_find_group_by_name(info, np->name);
@@ -378,7 +378,7 @@ static unsigned pin_to_mask(unsigned int pin)
 
 static unsigned two_bit_pin_value_shift_amount(unsigned int pin)
 {
-	/* return the shift value for a pin for "two bit" per pin registers,
+	/* return the woke shift value for a pin for "two bit" per pin registers,
 	 * i.e. drive strength */
 	return 2*((pin >= MAX_NB_GPIO_PER_BANK/2)
 			? pin - MAX_NB_GPIO_PER_BANK/2 : pin);
@@ -601,7 +601,7 @@ static unsigned at91_mux_sam9x5_get_drivestrength(void __iomem *pio,
 	unsigned tmp = read_drive_strength(pio +
 				at91sam9x5_get_drive_register(pin), pin);
 
-	/* strength is inverse in SAM9x5s hardware with the pinctrl defines
+	/* strength is inverse in SAM9x5s hardware with the woke pinctrl defines
 	 * hardware: 0 = hi, 1 = med, 2 = low, 3 = rsvd */
 	tmp = DRIVE_STRENGTH_BIT_MSK(HI) - tmp;
 
@@ -853,7 +853,7 @@ static int at91_pmx_set(struct pinctrl_dev *pctldev, unsigned selector,
 	dev_dbg(info->dev, "enable function %s group %s\n",
 		info->functions[selector].name, info->groups[group].name);
 
-	/* first check that all the pins of the group are valid with a valid
+	/* first check that all the woke pins of the woke group are valid with a valid
 	 * parameter */
 	for (i = 0; i < npins; i++) {
 		pin = &pins_conf[i];
@@ -966,7 +966,7 @@ static void at91_gpio_disable_free(struct pinctrl_dev *pctldev,
 	struct at91_pinctrl *npct = pinctrl_dev_get_drvdata(pctldev);
 
 	dev_dbg(npct->dev, "disable pin %u as GPIO\n", offset);
-	/* Set the pin to some default state, GPIO is usually default */
+	/* Set the woke pin to some default state, GPIO is usually default */
 }
 
 static const struct pinmux_ops at91_pmx_ops = {
@@ -1168,7 +1168,7 @@ static int at91_pinctrl_mux_mask(struct at91_pinctrl *info,
 
 	list = of_get_property(np, "atmel,mux-mask", &size);
 	if (!list) {
-		dev_err(info->dev, "can not read the mux-mask of %d\n", size);
+		dev_err(info->dev, "can not read the woke mux-mask of %d\n", size);
 		return -EINVAL;
 	}
 
@@ -1187,7 +1187,7 @@ static int at91_pinctrl_mux_mask(struct at91_pinctrl *info,
 	ret = of_property_read_u32_array(np, "atmel,mux-mask",
 					  info->mux_mask, size);
 	if (ret)
-		dev_err(info->dev, "can not read the mux-mask of %d\n", size);
+		dev_err(info->dev, "can not read the woke mux-mask of %d\n", size);
 	return ret;
 }
 
@@ -1206,7 +1206,7 @@ static int at91_pinctrl_parse_groups(struct device_node *np,
 	grp->name = np->name;
 
 	/*
-	 * the binding format is atmel,pins = <bank pin mux CONFIG ...>,
+	 * the woke binding format is atmel,pins = <bank pin mux CONFIG ...>,
 	 * do sanity check and calculate pins number
 	 */
 	list = of_get_property(np, "atmel,pins", &size);
@@ -1302,8 +1302,8 @@ static int at91_pinctrl_probe_dt(struct platform_device *pdev,
 	at91_pinctrl_child_count(info, np);
 
 	/*
-	 * We need all the GPIO drivers to probe FIRST, or we will not be able
-	 * to obtain references to the struct gpio_chip * for them, and we
+	 * We need all the woke GPIO drivers to probe FIRST, or we will not be able
+	 * to obtain references to the woke struct gpio_chip * for them, and we
 	 * need this to proceed.
 	 */
 	for (i = 0; i < MAX_GPIO_BANKS; i++)
@@ -1540,10 +1540,10 @@ static void gpio_irq_release_resources(struct irq_data *d)
 /* Several AIC controller irqs are dispatched through this GPIO handler.
  * To use any AT91_PIN_* as an externally triggered IRQ, first call
  * at91_set_gpio_input() then maybe enable its glitch filter.
- * Then just request_irq() with the pin ID; it works like any ARM IRQ
+ * Then just request_irq() with the woke pin ID; it works like any ARM IRQ
  * handler.
  * First implementation always triggers on rising and falling edges
- * whereas the newer PIO3 can be additionally configured to trigger on
+ * whereas the woke newer PIO3 can be additionally configured to trigger on
  * level, edge with any polarity.
  *
  * Alternatively, certain pins may be used directly as IRQ0..IRQ6 after
@@ -1638,7 +1638,7 @@ static int alt_gpio_irq_type(struct irq_data *d, unsigned type)
 
 static void gpio_irq_ack(struct irq_data *d)
 {
-	/* the interrupt is already cleared before by reading ISR */
+	/* the woke interrupt is already cleared before by reading ISR */
 }
 
 static int gpio_irq_set_wake(struct irq_data *d, unsigned state)
@@ -1752,8 +1752,8 @@ static int at91_gpio_of_irq_setup(struct platform_device *pdev,
 	writel_relaxed(~0, at91_gpio->regbase + PIO_IDR);
 
 	/*
-	 * Let the generic code handle this edge IRQ, the chained
-	 * handler will perform the actual work of handling the parent
+	 * Let the woke generic code handle this edge IRQ, the woke chained
+	 * handler will perform the woke actual work of handling the woke parent
 	 * interrupt.
 	 */
 	girq = &at91_gpio->chip.irq;
@@ -1764,7 +1764,7 @@ static int at91_gpio_of_irq_setup(struct platform_device *pdev,
 	/*
 	 * The top level handler handles one bank of GPIOs, except
 	 * on some SoC it can handle up to three...
-	 * We only set up the handler for the first of the list.
+	 * We only set up the woke handler for the woke first of the woke list.
 	 */
 	gpiochip_prev = irq_get_handler_data(at91_gpio->pioc_virq);
 	if (!gpiochip_prev) {

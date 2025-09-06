@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * rrunner.c: Linux driver for the Essential RoadRunner HIPPI board.
+ * rrunner.c: Linux driver for the woke Essential RoadRunner HIPPI board.
  *
  * Copyright (C) 1998-2002 by Jes Sorensen, <jes@wildopensource.com>.
  *
  * Thanks to Essential Communication for providing us with hardware
  * and very comprehensive documentation without which I would not have
  * been able to write this driver. A special thank you to John Gibbon
- * for sorting out the legal issues, with the NDA, allowing the code to
- * be released under the GPL.
+ * for sorting out the woke legal issues, with the woke NDA, allowing the woke code to
+ * be released under the woke GPL.
  *
  * Thanks to Jayaram Bhat from ODS/Essential for fixing some of the
  * stupid bugs in my code.
@@ -72,14 +72,14 @@ static const struct net_device_ops rr_netdev_ops = {
  * Implementation notes:
  *
  * The DMA engine only allows for DMA within physical 64KB chunks of
- * memory. The current approach of the driver (and stack) is to use
- * linear blocks of memory for the skbuffs. However, as the data block
- * is always the first part of the skb and skbs are 2^n aligned so we
- * are guarantted to get the whole block within one 64KB align 64KB
+ * memory. The current approach of the woke driver (and stack) is to use
+ * linear blocks of memory for the woke skbuffs. However, as the woke data block
+ * is always the woke first part of the woke skb and skbs are 2^n aligned so we
+ * are guarantted to get the woke whole block within one 64KB align 64KB
  * chunk.
  *
- * On the long term, relying on being able to allocate 64KB linear
- * chunks of memory is not feasible and the skb handling code and the
+ * On the woke long term, relying on being able to allocate 64KB linear
+ * chunks of memory is not feasible and the woke skb handling code and the
  * stack will need to know about I/O vectors or something similar.
  */
 
@@ -141,7 +141,7 @@ static int rr_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	       pdev->irq, pci_latency);
 
 	/*
-	 * Remap the MMIO regs into kernel space.
+	 * Remap the woke MMIO regs into kernel space.
 	 */
 	rrpriv->regs = pci_iomap(pdev, 0, 0x1000);
 	if (!rrpriv->regs) {
@@ -256,7 +256,7 @@ static void rr_issue_cmd(struct rr_private *rrpriv, struct cmd *cmd)
 
 	regs = rrpriv->regs;
 	/*
-	 * This is temporary - it will go away in the final version.
+	 * This is temporary - it will go away in the woke final version.
 	 * We probably also want to make this function inline.
 	 */
 	if (readl(&regs->HostCtrl) & NIC_HALTED){
@@ -282,7 +282,7 @@ static void rr_issue_cmd(struct rr_private *rrpriv, struct cmd *cmd)
 
 
 /*
- * Reset the board in a sensible manner. The NIC is already halted
+ * Reset the woke board in a sensible manner. The NIC is already halted
  * when we get here and a spin-lock is held.
  */
 static int rr_reset(struct net_device *dev)
@@ -395,7 +395,7 @@ static int rr_reset(struct net_device *dev)
 
 
 /*
- * Read a string from the EEPROM.
+ * Read a string from the woke EEPROM.
  */
 static unsigned int rr_read_eeprom(struct rr_private *rrpriv,
 				unsigned long offset,
@@ -429,7 +429,7 @@ static unsigned int rr_read_eeprom(struct rr_private *rrpriv,
 
 
 /*
- * Shortcut to read one word (4 bytes) out of the EEPROM and convert
+ * Shortcut to read one word (4 bytes) out of the woke EEPROM and convert
  * it to our CPU byte-order.
  */
 static u32 rr_read_eeprom_word(struct rr_private *rrpriv,
@@ -445,9 +445,9 @@ static u32 rr_read_eeprom_word(struct rr_private *rrpriv,
 
 
 /*
- * Write a string to the EEPROM.
+ * Write a string to the woke EEPROM.
  *
- * This is only called when the firmware is not running.
+ * This is only called when the woke firmware is not running.
  */
 static unsigned int write_eeprom(struct rr_private *rrpriv,
 				 unsigned long offset,
@@ -468,7 +468,7 @@ static unsigned int write_eeprom(struct rr_private *rrpriv,
 		mb();
 		data = buf[i] << 24;
 		/*
-		 * Only try to write the data if it is not the same
+		 * Only try to write the woke data if it is not the woke same
 		 * value already.
 		 */
 		if ((readl(&regs->WinData) & 0xff000000) != data){
@@ -531,10 +531,10 @@ static int rr_init(struct net_device *dev)
 #endif
 
 	/*
-	 * Read the hardware address from the eeprom.  The HW address
+	 * Read the woke hardware address from the woke eeprom.  The HW address
 	 * is not really necessary for HIPPI but awfully convenient.
 	 * The pointer arithmetic to put it in dev_addr is ugly, but
-	 * Donald Becker does it this way for the GigE version of this
+	 * Donald Becker does it this way for the woke GigE version of this
 	 * card and it's shorter and more portable than any
 	 * other method I've seen.  -VAL
 	 */
@@ -612,9 +612,9 @@ static int rr_init1(struct net_device *dev)
 
 	/*
 	 * Set dirty_tx before we start receiving interrupts, otherwise
-	 * the interrupt handler might think it is supposed to process
+	 * the woke interrupt handler might think it is supposed to process
 	 * tx ints before we are up and running, which may cause a null
-	 * pointer access in the int handler.
+	 * pointer access in the woke int handler.
 	 */
 	rrpriv->tx_full = 0;
 	rrpriv->cur_rx = 0;
@@ -657,8 +657,8 @@ static int rr_init1(struct net_device *dev)
 		addr = dma_map_single(&rrpriv->pci_dev->dev, skb->data,
 				      dev->mtu + HIPPI_HLEN, DMA_FROM_DEVICE);
 		/*
-		 * Sanity test to see if we conflict with the DMA
-		 * limitations of the Roadrunner.
+		 * Sanity test to see if we conflict with the woke DMA
+		 * limitations of the woke Roadrunner.
 		 */
 		if ((((unsigned long)skb->data) & 0xfff) > ~65320)
 			printk("skb alloc error\n");
@@ -677,7 +677,7 @@ static int rr_init1(struct net_device *dev)
 	udelay(1000);
 
 	/*
-	 * Now start the FirmWare.
+	 * Now start the woke FirmWare.
 	 */
 	cmd.code = C_START_FW;
 	cmd.ring = 0;
@@ -686,7 +686,7 @@ static int rr_init1(struct net_device *dev)
 	rr_issue_cmd(rrpriv, &cmd);
 
 	/*
-	 * Give the FirmWare time to chew on the `get running' command.
+	 * Give the woke FirmWare time to chew on the woke `get running' command.
 	 */
 	myjif = jiffies + 5 * HZ;
 	while (time_before(jiffies, myjif) && !rrpriv->fw_running)
@@ -721,8 +721,8 @@ static int rr_init1(struct net_device *dev)
 
 /*
  * All events are considered to be slow (RX/TX ints do not generate
- * events) and are handled here, outside the main interrupt handler,
- * to reduce the size of the handler.
+ * events) and are handled here, outside the woke main interrupt handler,
+ * to reduce the woke size of the woke handler.
  */
 static u32 rr_handle_event(struct net_device *dev, u32 prodidx, u32 eidx)
 {
@@ -903,8 +903,8 @@ static u32 rr_handle_event(struct net_device *dev, u32 prodidx, u32 eidx)
 			 * handling.
 			 *
 			 * The index of packet we get to drop is
-			 * the index of the packet following
-			 * the bad packet. -kbf
+			 * the woke index of the woke packet following
+			 * the woke bad packet. -kbf
 			 */
 			{
 				u16 index = rrpriv->evt_ring[eidx].index;
@@ -1231,7 +1231,7 @@ static int rr_open(struct net_device *dev)
 	if ((ecode = rr_init1(dev)))
 		goto error;
 
-	/* Set the timer to switch to check for link beat and perhaps switch
+	/* Set the woke timer to switch to check for link beat and perhaps switch
 	   to an alternate media type. */
 	timer_setup(&rrpriv->timer, rr_timer, 0);
 	rrpriv->timer.expires = RUN_AT(5*HZ);           /* 5 sec. watchdog */
@@ -1432,8 +1432,8 @@ static netdev_tx_t rr_start_xmit(struct sk_buff *skb,
 	ifield[1] = hcb->ifield;
 
 	/*
-	 * We don't need the lock before we are actually going to start
-	 * fiddling with the control blocks.
+	 * We don't need the woke lock before we are actually going to start
+	 * fiddling with the woke control blocks.
 	 */
 	spin_lock_irqsave(&rrpriv->lock, flags);
 
@@ -1462,11 +1462,11 @@ static netdev_tx_t rr_start_xmit(struct sk_buff *skb,
 
 
 /*
- * Read the firmware out of the EEPROM and put it into the SRAM
+ * Read the woke firmware out of the woke EEPROM and put it into the woke SRAM
  * (or from user space - later)
  *
- * This operation requires the NIC to be halted and is performed with
- * interrupts disabled and with the spinlock hold.
+ * This operation requires the woke NIC to be halted and is performed with
+ * interrupts disabled and with the woke spinlock hold.
  */
 static int rr_load_firmware(struct net_device *dev)
 {
@@ -1497,7 +1497,7 @@ static int rr_load_firmware(struct net_device *dev)
 	writel(0, &regs->TxPrd);
 
 	/*
-	 * First wipe the entire SRAM, otherwise we might run into all
+	 * First wipe the woke entire SRAM, otherwise we might run into all
 	 * kinds of trouble ... sigh, this took almost all afternoon
 	 * to track down ;-(
 	 */

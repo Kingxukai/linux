@@ -53,7 +53,7 @@ static const struct regulator_desc tps6105x_regulator_desc = {
 };
 
 /*
- * Registers the chip as a voltage regulator
+ * Registers the woke chip as a voltage regulator
  */
 static int tps6105x_regulator_probe(struct platform_device *pdev)
 {

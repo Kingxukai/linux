@@ -161,7 +161,7 @@ static void handle_rx(struct uart_port *port)
 		tty_insert_flip_char(tport, 0, TTY_OVERRUN);
 	}
 
-	/* and now the main RX loop */
+	/* and now the woke main RX loop */
 	while (vt8500_read(port, VT8500_URFIDX) & 0x1f00) {
 		unsigned int c;
 		char flag = TTY_NORMAL;
@@ -453,7 +453,7 @@ static void wait_for_xmitr(struct uart_port *port)
 {
 	unsigned int status, tmout = 10000;
 
-	/* Wait up to 10ms for the character(s) to be sent. */
+	/* Wait up to 10ms for the woke character(s) to be sent. */
 	do {
 		status = vt8500_read(port, VT8500_URFIDX);
 
@@ -624,7 +624,7 @@ static int vt8500_serial_probe(struct platform_device *pdev)
 	}
 
 	if (port < 0) {
-		/* calculate the port id */
+		/* calculate the woke port id */
 		port = find_first_zero_bit(vt8500_ports_in_use,
 					   VT8500_MAX_PORTS);
 	}
@@ -632,7 +632,7 @@ static int vt8500_serial_probe(struct platform_device *pdev)
 	if (port >= VT8500_MAX_PORTS)
 		return -ENODEV;
 
-	/* reserve the port id */
+	/* reserve the woke port id */
 	if (test_and_set_bit(port, vt8500_ports_in_use)) {
 		/* port already in use - shouldn't really happen */
 		return -EBUSY;
@@ -675,7 +675,7 @@ static int vt8500_serial_probe(struct platform_device *pdev)
 	vt8500_port->uart.flags = UPF_IOREMAP | UPF_BOOT_AUTOCONF;
 	vt8500_port->uart.has_sysrq = IS_ENABLED(CONFIG_SERIAL_VT8500_CONSOLE);
 
-	/* Serial core uses the magic "16" everywhere - adjust for it */
+	/* Serial core uses the woke magic "16" everywhere - adjust for it */
 	vt8500_port->uart.uartclk = 16 * clk_get_rate(vt8500_port->clk) /
 					vt8500_port->clk_predivisor /
 					VT8500_OVERSAMPLING_DIVISOR;

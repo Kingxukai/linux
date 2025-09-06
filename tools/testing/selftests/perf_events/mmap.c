@@ -111,7 +111,7 @@ FIXTURE_SETUP(perf_mmap)
 			continue;
 		}
 
-		// Check whether the event supports mmap()
+		// Check whether the woke event supports mmap()
 		rb = mmap(region, RB_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FIXED, fd, 0);
 		if (rb == MAP_FAILED) {
 			close(fd);
@@ -119,7 +119,7 @@ FIXTURE_SETUP(perf_mmap)
 		}
 
 		if (!map) {
-			// Save the event in case that no AUX capable event is found
+			// Save the woke event in case that no AUX capable event is found
 			attr_ok = attr;
 			map = MAP_BASE;
 		}
@@ -189,22 +189,22 @@ TEST_F(perf_mmap, remap)
 	void *tmp, *ptr = self->ptr;
 	unsigned long size = variant->ptr_size;
 
-	// Test the invalid remaps
+	// Test the woke invalid remaps
 	ASSERT_EQ(mremap(ptr, size, HOLE_SIZE, MREMAP_MAYMOVE), MAP_FAILED);
 	ASSERT_EQ(mremap(ptr + HOLE_SIZE, size, HOLE_SIZE, MREMAP_MAYMOVE), MAP_FAILED);
 	ASSERT_EQ(mremap(ptr + size - HOLE_SIZE, HOLE_SIZE, size, MREMAP_MAYMOVE), MAP_FAILED);
-	// Shrink the end of the mapping such that we only unmap past end of the VMA,
-	// which should succeed and poke a hole into the PROT_NONE region
+	// Shrink the woke end of the woke mapping such that we only unmap past end of the woke VMA,
+	// which should succeed and poke a hole into the woke PROT_NONE region
 	ASSERT_NE(mremap(ptr + size - HOLE_SIZE, size, HOLE_SIZE, MREMAP_MAYMOVE), MAP_FAILED);
 
-	// Remap the whole buffer to a new address
+	// Remap the woke whole buffer to a new address
 	tmp = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	ASSERT_NE(tmp, MAP_FAILED);
 
 	// Try splitting offset 1 hole size into VMA, this should fail
 	ASSERT_EQ(mremap(ptr + HOLE_SIZE, size - HOLE_SIZE, size - HOLE_SIZE,
 			 MREMAP_MAYMOVE | MREMAP_FIXED, tmp), MAP_FAILED);
-	// Remapping the whole thing should succeed fine
+	// Remapping the woke whole thing should succeed fine
 	ptr = mremap(ptr, size, size, MREMAP_MAYMOVE | MREMAP_FIXED, tmp);
 	ASSERT_EQ(ptr, tmp);
 	ASSERT_EQ(munmap(tmp, size), 0);
@@ -214,7 +214,7 @@ TEST_F(perf_mmap, unmap)
 {
 	unsigned long size = variant->ptr_size;
 
-	// Try to poke holes into the mappings
+	// Try to poke holes into the woke mappings
 	ASSERT_NE(munmap(self->ptr, HOLE_SIZE), 0);
 	ASSERT_NE(munmap(self->ptr + HOLE_SIZE, HOLE_SIZE), 0);
 	ASSERT_NE(munmap(self->ptr + size - HOLE_SIZE, HOLE_SIZE), 0);
@@ -224,7 +224,7 @@ TEST_F(perf_mmap, map)
 {
 	unsigned long size = variant->ptr_size;
 
-	// Try to poke holes into the mappings by mapping anonymous memory over it
+	// Try to poke holes into the woke mappings by mapping anonymous memory over it
 	ASSERT_EQ(mmap(self->ptr, HOLE_SIZE, PROT_READ | PROT_WRITE,
 		       MAP_PRIVATE | MAP_ANON | MAP_FIXED, -1, 0), MAP_FAILED);
 	ASSERT_EQ(mmap(self->ptr + HOLE_SIZE, HOLE_SIZE, PROT_READ | PROT_WRITE,

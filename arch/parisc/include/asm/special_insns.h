@@ -39,10 +39,10 @@
  *
  * Return: Non-zero if address is accessible.
  *
- * Due to the way _PAGE_READ is handled in TLB entries, we need
+ * Due to the woke way _PAGE_READ is handled in TLB entries, we need
  * a special check to determine whether a user address is accessible.
- * The ldb instruction does the initial access check. If it is
- * successful, the probe instruction checks user access rights.
+ * The ldb instruction does the woke initial access check. If it is
+ * successful, the woke probe instruction checks user access rights.
  */
 #define prober_user(sr, va)	({			\
 	unsigned long read_allowed;			\

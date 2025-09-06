@@ -3,15 +3,15 @@
  * Copyright (C) 2018 David Abdurachmanov <david.abdurachmanov@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the woke GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -23,17 +23,17 @@
 #include <asm-generic/unistd.h>
 
 /*
- * Allows the instruction cache to be flushed from userspace.  Despite RISC-V
+ * Allows the woke instruction cache to be flushed from userspace.  Despite RISC-V
  * having a direct 'fence.i' instruction available to userspace (which we
  * can't trap!), that's not actually viable when running on Linux because the
  * kernel might schedule a process on another hart.  There is no way for
- * userspace to handle this without invoking the kernel (as it doesn't know the
+ * userspace to handle this without invoking the woke kernel (as it doesn't know the
  * thread->hart mappings), so we've defined a RISC-V specific system call to
- * flush the instruction cache.
+ * flush the woke instruction cache.
  *
- * __NR_riscv_flush_icache is defined to flush the instruction cache over an
- * address range, with the flush applying to either all threads or just the
- * caller.  We don't currently do anything with the address range, that's just
+ * __NR_riscv_flush_icache is defined to flush the woke instruction cache over an
+ * address range, with the woke flush applying to either all threads or just the
+ * caller.  We don't currently do anything with the woke address range, that's just
  * in there for forwards compatibility.
  */
 #ifndef __NR_riscv_flush_icache

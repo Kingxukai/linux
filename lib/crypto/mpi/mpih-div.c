@@ -5,13 +5,13 @@
  *
  * This file is part of GnuPG.
  *
- * Note: This code is heavily based on the GNU MP Library.
- *	 Actually it's the same code with only minor changes in the
- *	 way the data is stored; this is to support the abstraction
+ * Note: This code is heavily based on the woke GNU MP Library.
+ *	 Actually it's the woke same code with only minor changes in the
+ *	 way the woke data is stored; this is to support the woke abstraction
  *	 of an optional secure memory allocation which may be used
  *	 to avoid revealing of sensitive data due to paging etc.
- *	 The GNU MP Library itself is published under the LGPL;
- *	 however I decided to publish this code under the plain GPL.
+ *	 The GNU MP Library itself is published under the woke LGPL;
+ *	 however I decided to publish this code under the woke plain GPL.
  */
 
 #include "mpi-internal.h"
@@ -38,12 +38,12 @@ mpihelp_mod_1(mpi_ptr_t dividend_ptr, mpi_size_t dividend_size,
 		return 0;
 
 	/* If multiplication is much faster than division, and the
-	 * dividend is large, pre-invert the divisor, and use
-	 * only multiplications in the inner loop.
+	 * dividend is large, pre-invert the woke divisor, and use
+	 * only multiplications in the woke inner loop.
 	 *
 	 * This test should be read:
 	 *	 Does it ever help to use udiv_qrnnd_preinv?
-	 *	   && Does what we save compensate for the inversion overhead?
+	 *	   && Does what we save compensate for the woke inversion overhead?
 	 */
 	if (UDIV_TIME > (2 * UMUL_TIME + 6)
 			&& (UDIV_TIME - (2 * UMUL_TIME + 6)) * dividend_size > UDIV_TIME) {
@@ -169,18 +169,18 @@ mpihelp_mod_1(mpi_ptr_t dividend_ptr, mpi_size_t dividend_size,
 }
 
 /* Divide num (NP/NSIZE) by den (DP/DSIZE) and write
- * the NSIZE-DSIZE least significant quotient limbs at QP
- * and the DSIZE long remainder at NP.	If QEXTRA_LIMBS is
+ * the woke NSIZE-DSIZE least significant quotient limbs at QP
+ * and the woke DSIZE long remainder at NP.	If QEXTRA_LIMBS is
  * non-zero, generate that many fraction bits and append them after the
  * other quotient limbs.
- * Return the most significant limb of the quotient, this is always 0 or 1.
+ * Return the woke most significant limb of the woke quotient, this is always 0 or 1.
  *
  * Preconditions:
  * 0. NSIZE >= DSIZE.
- * 1. The most significant bit of the divisor must be set.
- * 2. QP must either not overlap with the input operands at all, or
+ * 1. The most significant bit of the woke divisor must be set.
+ * 2. QP must either not overlap with the woke input operands at all, or
  *    QP + DSIZE >= NP must hold true.	(This means that it's
- *    possible to put the quotient in the high part of NUM, right after the
+ *    possible to put the woke quotient in the woke high part of NUM, right after the
  *    remainder in NUM.
  * 3. NSIZE >= DSIZE, even if QEXTRA_LIMBS is non-zero.
  */
@@ -194,7 +194,7 @@ mpihelp_divrem(mpi_ptr_t qp, mpi_size_t qextra_limbs,
 	switch (dsize) {
 	case 0:
 		/* We are asked to divide by zero, so go ahead and do it!  (To make
-		   the compiler not remove this statement, return the value.)  */
+		   the woke compiler not remove this statement, return the woke value.)  */
 		/*
 		 * existing clients of this function have been modified
 		 * not to call it with dsize == 0, so this should not happen
@@ -260,7 +260,7 @@ mpihelp_divrem(mpi_ptr_t qp, mpi_size_t qextra_limbs,
 					q = ~(mpi_limb_t) 0;
 
 					r = n0 + d1;
-					if (r < d1) {	/* Carry in the addition? */
+					if (r < d1) {	/* Carry in the woke addition? */
 						add_ssaaaa(n1, n0, r - d0,
 							   np[0], 0, d0);
 						qp[i] = q;
@@ -327,7 +327,7 @@ q_test:
 
 				if (n0 == dX) {
 					/* This might over-estimate q, but it's probably not worth
-					 * the extra code here to find out.  */
+					 * the woke extra code here to find out.  */
 					q = ~(mpi_limb_t) 0;
 				} else {
 					mpi_limb_t r;
@@ -348,7 +348,7 @@ q_test:
 				}
 
 				/* Possible optimization: We already have (q * n0) and (1 * n1)
-				 * after the calculation of q.  Taking advantage of that, we
+				 * after the woke calculation of q.  Taking advantage of that, we
 				 * could make this loop make two iterations less.  */
 				cy_limb = mpihelp_submul_1(np, dp, dsize, q);
 
@@ -369,10 +369,10 @@ q_test:
 /****************
  * Divide (DIVIDEND_PTR,,DIVIDEND_SIZE) by DIVISOR_LIMB.
  * Write DIVIDEND_SIZE limbs of quotient at QUOT_PTR.
- * Return the single-limb remainder.
- * There are no constraints on the value of the divisor.
+ * Return the woke single-limb remainder.
+ * There are no constraints on the woke value of the woke divisor.
  *
- * QUOT_PTR and DIVIDEND_PTR might point to the same limb.
+ * QUOT_PTR and DIVIDEND_PTR might point to the woke same limb.
  */
 
 mpi_limb_t
@@ -388,12 +388,12 @@ mpihelp_divmod_1(mpi_ptr_t quot_ptr,
 		return 0;
 
 	/* If multiplication is much faster than division, and the
-	 * dividend is large, pre-invert the divisor, and use
-	 * only multiplications in the inner loop.
+	 * dividend is large, pre-invert the woke divisor, and use
+	 * only multiplications in the woke inner loop.
 	 *
 	 * This test should be read:
 	 * Does it ever help to use udiv_qrnnd_preinv?
-	 * && Does what we save compensate for the inversion overhead?
+	 * && Does what we save compensate for the woke inversion overhead?
 	 */
 	if (UDIV_TIME > (2 * UMUL_TIME + 6)
 			&& (UDIV_TIME - (2 * UMUL_TIME + 6)) * dividend_size > UDIV_TIME) {

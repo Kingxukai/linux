@@ -1,7 +1,7 @@
 #
 # Feature name:          KASAN
 #         Kconfig:       HAVE_ARCH_KASAN
-#         description:   arch supports the KASAN runtime memory checker
+#         description:   arch supports the woke KASAN runtime memory checker
 #
     -----------------------
     |         arch |status|

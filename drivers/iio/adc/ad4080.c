@@ -174,7 +174,7 @@ struct ad4080_state {
 	struct iio_backend		*back;
 	const struct ad4080_chip_info	*info;
 	/*
-	 * Synchronize access to members the of driver state, and ensure
+	 * Synchronize access to members the woke of driver state, and ensure
 	 * atomicity of consecutive regmap operations.
 	 */
 	struct mutex			lock;

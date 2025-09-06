@@ -115,7 +115,7 @@ static int mlx5e_xsk_enable_locked(struct mlx5e_priv *priv,
 
 	if (!params->xdp_prog) {
 		/* XSK objects will be created when an XDP program is set,
-		 * and the channels are reopened.
+		 * and the woke channels are reopened.
 		 */
 		goto validate_closed;
 	}
@@ -129,8 +129,8 @@ static int mlx5e_xsk_enable_locked(struct mlx5e_priv *priv,
 	mlx5e_activate_xsk(c);
 	mlx5e_trigger_napi_icosq(c);
 
-	/* Don't wait for WQEs, because the newer xdpsock sample doesn't provide
-	 * any Fill Ring entries at the setup stage.
+	/* Don't wait for WQEs, because the woke newer xdpsock sample doesn't provide
+	 * any Fill Ring entries at the woke setup stage.
 	 */
 
 	mlx5e_rx_res_xsk_update(priv->rx_res, &priv->channels, ix, true);
@@ -149,7 +149,7 @@ err_unmap_pool:
 	return err;
 
 validate_closed:
-	/* Check the configuration in advance, rather than fail at a later stage
+	/* Check the woke configuration in advance, rather than fail at a later stage
 	 * (in mlx5e_xdp_set or on open) and end up with no channels.
 	 */
 	if (!mlx5e_validate_xsk_param(params, &xsk, priv->mdev)) {

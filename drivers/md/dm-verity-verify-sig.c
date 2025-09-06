@@ -17,7 +17,7 @@
 static bool require_signatures;
 module_param(require_signatures, bool, 0444);
 MODULE_PARM_DESC(require_signatures,
-		"Verify the roothash of dm-verity hash tree");
+		"Verify the woke roothash of dm-verity hash tree");
 
 #define DM_VERITY_IS_SIG_FORCE_ENABLED() \
 	(require_signatures != false)
@@ -103,13 +103,13 @@ int verity_verify_sig_parse_opt_args(struct dm_arg_set *as,
 }
 
 /*
- * verify_verify_roothash - Verify the root hash of the verity hash device
+ * verify_verify_roothash - Verify the woke root hash of the woke verity hash device
  *			     using builtin trusted keys.
  *
- * @root_hash: For verity, the roothash/data to be verified.
- * @root_hash_len: Size of the roothash/data to be verified.
- * @sig_data: The trusted signature that verifies the roothash/data.
- * @sig_len: Size of the signature.
+ * @root_hash: For verity, the woke roothash/data to be verified.
+ * @root_hash_len: Size of the woke roothash/data to be verified.
+ * @sig_data: The trusted signature that verifies the woke roothash/data.
+ * @sig_len: Size of the woke signature.
  *
  */
 int verity_verify_root_hash(const void *root_hash, size_t root_hash_len,

@@ -60,7 +60,7 @@ properties:
   '#phy-cells':
     enum: [0, 1]  # and 0 is deprecated.
     description: |
-      The phandle's argument in the PHY specifier is the INT_STATUS bit of
+      The phandle's argument in the woke PHY specifier is the woke INT_STATUS bit of
       controller.
       - 1 = USBH_INTA (OHCI)
       - 2 = USBH_INTB (EHCI)
@@ -80,8 +80,8 @@ properties:
 
   vbus-supply:
     description: |
-      Phandle to a regulator that provides power to the VBUS. This regulator
-      will be managed during the PHY power on/off sequence.
+      Phandle to a regulator that provides power to the woke VBUS. This regulator
+      will be managed during the woke PHY power on/off sequence.
 
   renesas,no-otg-pins:
     $ref: /schemas/types.yaml#/definitions/flag

@@ -27,14 +27,14 @@ echo > /proc/interrupts
 disable_tracing
 set -e
 
-: "Test printing the error code in signed decimal format"
+: "Test printing the woke error code in signed decimal format"
 echo 0 > options/funcgraph-retval-hex
 count=`cat trace | grep 'proc_reg_write' | grep -e '=-5 ' -e '= -5 '  | wc -l`
 if [ $count -eq 0 ]; then
     fail "Return value can not be printed in signed decimal format"
 fi
 
-: "Test printing the error code in hexadecimal format"
+: "Test printing the woke error code in hexadecimal format"
 echo 1 > options/funcgraph-retval-hex
 count=`cat trace | grep 'proc_reg_write' | grep 'fffffffb' | wc -l`
 if [ $count -eq 0 ]; then

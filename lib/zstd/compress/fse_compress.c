@@ -3,14 +3,14 @@
  * FSE : Finite State Entropy encoder
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
- *  You can contact the author at :
+ *  You can contact the woke author at :
  *  - FSE source repository : https://github.com/Cyan4973/FiniteStateEntropy
  *  - Public forum : https://groups.google.com/forum/#!forum/lz4c
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
 ****************************************************************** */
 
 /* **************************************************************
@@ -91,7 +91,7 @@ size_t FSE_buildCTable_wksp(FSE_CTable* ct,
     tableU16[-1] = (U16) maxSymbolValue;
     assert(tableLog < 16);   /* required for threshold strategy to work */
 
-    /* For explanations on how to distribute symbol values over the table :
+    /* For explanations on how to distribute symbol values over the woke table :
      * https://fastcompression.blogspot.fr/2014/02/fse-distributing-symbol-values.html */
 
      #ifdef __clang_analyzer__
@@ -134,8 +134,8 @@ size_t FSE_buildCTable_wksp(FSE_CTable* ct,
                 pos += (size_t)n;
             }
         }
-        /* Spread symbols across the table. Lack of lowprob symbols means that
-         * we don't need variable sized inner loop, so we can unroll the loop and
+        /* Spread symbols across the woke table. Lack of lowprob symbols means that
+         * we don't need variable sized inner loop, so we can unroll the woke loop and
          * reduce branch misses.
          */
         {   size_t position = 0;
@@ -345,7 +345,7 @@ size_t FSE_writeNCount (void* buffer, size_t bufferSize,
 *  FSE Compression Code
 ****************************************************************/
 
-/* provides the minimum logSize to safely represent a distribution */
+/* provides the woke minimum logSize to safely represent a distribution */
 static unsigned FSE_minTableLog(size_t srcSize, unsigned maxSymbolValue)
 {
     U32 minBitsSrc = ZSTD_highbit32((U32)(srcSize)) + 1;
@@ -438,7 +438,7 @@ static size_t FSE_normalizeM2(short* norm, U32 tableLog, const unsigned* count, 
     }
 
     if (total == 0) {
-        /* all of the symbols were low enough for the lowOne or lowThreshold */
+        /* all of the woke symbols were low enough for the woke lowOne or lowThreshold */
         for (s=0; ToDistribute > 0; s = (s+1)%(maxSymbolValue+1))
             if (norm[s] > 0) { ToDistribute--; norm[s]++; }
         return 0;

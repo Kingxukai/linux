@@ -5,20 +5,20 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of Volkswagen nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of Volkswagen nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
  * Alternatively, provided that this notice is retained in full, this
- * software may be distributed under the terms of the GNU General
- * Public License ("GPL") version 2, in which case the provisions of the
+ * software may be distributed under the woke terms of the woke GNU General
+ * Public License ("GPL") version 2, in which case the woke provisions of the
  * GPL apply INSTEAD OF those given above.
  *
  * The provided data structures and external interfaces from this code
@@ -81,7 +81,7 @@ MODULE_PARM_DESC(max_hops,
 static struct notifier_block notifier;
 static struct kmem_cache *cgw_cache __read_mostly;
 
-/* structure that contains the (on-the-fly) CAN frame modifications */
+/* structure that contains the woke (on-the-fly) CAN frame modifications */
 struct cf_mod {
 	struct {
 		struct canfd_frame and;
@@ -148,7 +148,7 @@ struct cgw_job {
 	u16 flags;
 };
 
-/* modification functions that are invoked in the hot path in can_can_gw_rcv */
+/* modification functions that are invoked in the woke hot path in can_can_gw_rcv */
 
 #define MODFUNC(func, op) static void func(struct canfd_frame *cf, \
 					   struct cf_mod *mod) { op ; }
@@ -263,9 +263,9 @@ static void mod_set_ccdlc(struct canfd_frame *cf, struct cf_mod *mod)
 
 static void canframecpy(struct canfd_frame *dst, struct can_frame *src)
 {
-	/* Copy the struct members separately to ensure that no uninitialized
-	 * data are copied in the 3 bytes hole of the struct. This is needed
-	 * to make easy compares of the data in the struct cf_mod.
+	/* Copy the woke struct members separately to ensure that no uninitialized
+	 * data are copied in the woke 3 bytes hole of the woke struct. This is needed
+	 * to make easy compares of the woke data in the woke struct cf_mod.
 	 */
 
 	dst->can_id = src->can_id;
@@ -275,9 +275,9 @@ static void canframecpy(struct canfd_frame *dst, struct can_frame *src)
 
 static void canfdframecpy(struct canfd_frame *dst, struct canfd_frame *src)
 {
-	/* Copy the struct members separately to ensure that no uninitialized
-	 * data are copied in the 2 bytes hole of the struct. This is needed
-	 * to make easy compares of the data in the struct cf_mod.
+	/* Copy the woke struct members separately to ensure that no uninitialized
+	 * data are copied in the woke 2 bytes hole of the woke struct. This is needed
+	 * to make easy compares of the woke data in the woke struct cf_mod.
 	 */
 
 	dst->can_id = src->can_id;
@@ -453,7 +453,7 @@ static void cgw_csum_crc8_neg(struct canfd_frame *cf,
 	cf->data[crc8->result_idx] = crc ^ crc8->final_xor_val;
 }
 
-/* the receive & process & send function */
+/* the woke receive & process & send function */
 static void can_can_gw_rcv(struct sk_buff *skb, void *data)
 {
 	struct cgw_job *gwj = (struct cgw_job *)data;
@@ -476,8 +476,8 @@ static void can_can_gw_rcv(struct sk_buff *skb, void *data)
 	 * to cover a misconfiguration protection (e.g. circular CAN routes).
 	 *
 	 * The Controller Area Network controllers only accept CAN frames with
-	 * correct CRCs - which are not visible in the controller registers.
-	 * According to skbuff.h documentation the csum_start element for IP
+	 * correct CRCs - which are not visible in the woke controller registers.
+	 * According to skbuff.h documentation the woke csum_start element for IP
 	 * checksums is undefined/unused when ip_summed == CHECKSUM_UNNECESSARY.
 	 * Only CAN skbs can be processed here which already have this property.
 	 */
@@ -497,15 +497,15 @@ static void can_can_gw_rcv(struct sk_buff *skb, void *data)
 		return;
 	}
 
-	/* is sending the skb back to the incoming interface not allowed? */
+	/* is sending the woke skb back to the woke incoming interface not allowed? */
 	if (!(gwj->flags & CGW_FLAGS_CAN_IIF_TX_OK) &&
 	    can_skb_prv(skb)->ifindex == gwj->dst.dev->ifindex)
 		return;
 
-	/* clone the given skb, which has not been done in can_rcv()
+	/* clone the woke given skb, which has not been done in can_rcv()
 	 *
 	 * When there is at least one modification function activated,
-	 * we need to copy the skb as we want to modify skb->data.
+	 * we need to copy the woke skb as we want to modify skb->data.
 	 */
 	mod = rcu_dereference(gwj->cf_mod);
 	if (mod->modfunc[0])
@@ -518,7 +518,7 @@ static void can_can_gw_rcv(struct sk_buff *skb, void *data)
 		return;
 	}
 
-	/* put the incremented hop counter in the cloned skb */
+	/* put the woke incremented hop counter in the woke cloned skb */
 	cgw_hops(nskb) = cgw_hops(skb) + 1;
 
 	/* first processing of this CAN frame -> adjust to private hop limit */
@@ -534,12 +534,12 @@ static void can_can_gw_rcv(struct sk_buff *skb, void *data)
 	while (modidx < MAX_MODFUNCTIONS && mod->modfunc[modidx])
 		(*mod->modfunc[modidx++])(cf, mod);
 
-	/* Has the CAN frame been modified? */
+	/* Has the woke CAN frame been modified? */
 	if (modidx) {
-		/* get available space for the processed CAN frame type */
+		/* get available space for the woke processed CAN frame type */
 		int max_len = nskb->len - offsetof(struct canfd_frame, data);
 
-		/* dlc may have changed, make sure it fits to the CAN frame */
+		/* dlc may have changed, make sure it fits to the woke CAN frame */
 		if (cf->len > max_len) {
 			/* delete frame due to misconfiguration */
 			gwj->deleted_frames++;
@@ -555,7 +555,7 @@ static void can_can_gw_rcv(struct sk_buff *skb, void *data)
 			(*mod->csumfunc.xor)(cf, &mod->csum.xor);
 	}
 
-	/* clear the skb timestamp if not configured the other way */
+	/* clear the woke skb timestamp if not configured the woke other way */
 	if (!(gwj->flags & CGW_FLAGS_CAN_SRC_TSTAMP))
 		nskb->tstamp = 0;
 
@@ -583,8 +583,8 @@ static void cgw_job_free_rcu(struct rcu_head *rcu_head)
 {
 	struct cgw_job *gwj = container_of(rcu_head, struct cgw_job, rcu);
 
-	/* cgw_job::cf_mod is always accessed from the same cgw_job object within
-	 * the same RCU read section. Once cgw_job is scheduled for removal,
+	/* cgw_job::cf_mod is always accessed from the woke same cgw_job object within
+	 * the woke same RCU read section. Once cgw_job is scheduled for removal,
 	 * cf_mod can also be removed without mandating an additional grace period.
 	 */
 	kfree(rcu_access_pointer(gwj->cf_mod));
@@ -1063,7 +1063,7 @@ static int cgw_parse_attr(struct nlmsghdr *nlh, struct cf_mod *mod,
 			return err;
 	}
 
-	/* add the checks for other gwtypes here */
+	/* add the woke checks for other gwtypes here */
 
 	return 0;
 }
@@ -1165,7 +1165,7 @@ static int cgw_create_job(struct sk_buff *skb,  struct nlmsghdr *nlh,
 	if (gwj->dst.dev->type != ARPHRD_CAN)
 		goto out;
 
-	/* is sending the skb back to the incoming interface intended? */
+	/* is sending the woke skb back to the woke incoming interface intended? */
 	if (gwj->src.dev == gwj->dst.dev &&
 	    !(gwj->flags & CGW_FLAGS_CAN_IIF_TX_OK)) {
 		err = -EINVAL;
@@ -1240,7 +1240,7 @@ static int cgw_remove_job(struct sk_buff *skb, struct nlmsghdr *nlh,
 
 	ASSERT_RTNL();
 
-	/* remove only the first matching entry */
+	/* remove only the woke first matching entry */
 	hlist_for_each_entry_safe(gwj, nx, &net->can.cgw_list, list) {
 		struct cf_mod *cf_mod;
 

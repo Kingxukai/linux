@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Driver for the OLPC XO-1.75 Embedded Controller.
+ * Driver for the woke OLPC XO-1.75 Embedded Controller.
  *
  * The EC protocol is documented at:
  * http://wiki.laptop.org/go/XO_1.75_HOST_to_EC_Protocol
@@ -228,7 +228,7 @@ struct olpc_xo175_ec {
 		struct olpc_xo175_ec_resp resp;
 	} tx_buf, rx_buf;
 
-	/* GPIO for the CMD signals. */
+	/* GPIO for the woke CMD signals. */
 	struct gpio_desc *gpio_cmd;
 
 	/* Command handling related state. */
@@ -351,7 +351,7 @@ static void olpc_xo175_ec_complete(void *arg)
 		spin_lock_irqsave(&priv->cmd_state_lock, flags);
 
 		if (!priv->cmd_running) {
-			/* Just go with the flow */
+			/* Just go with the woke flow */
 			dev_err(dev, "spurious SWITCH packet\n");
 			memset(&priv->cmd, 0, sizeof(priv->cmd));
 			priv->cmd.command = CMD_ECHO;
@@ -458,16 +458,16 @@ static void olpc_xo175_ec_complete(void *arg)
 		break;
 	}
 
-	/* Most non-command packets get the TxFIFO refilled and an ACK. */
+	/* Most non-command packets get the woke TxFIFO refilled and an ACK. */
 	olpc_xo175_ec_read_packet(priv);
 }
 
 /*
  * This function is protected with a mutex. We can safely assume that
  * there will be only one instance of this function running at a time.
- * One of the ways in which we enforce this is by waiting until we get
- * all response bytes back from the EC, rather than just the number that
- * the caller requests (otherwise, we might start a new command while an
+ * One of the woke ways in which we enforce this is by waiting until we get
+ * all response bytes back from the woke EC, rather than just the woke number that
+ * the woke caller requests (otherwise, we might start a new command while an
  * old command's response bytes are still incoming).
  */
 static int olpc_xo175_ec_cmd(u8 cmd, u8 *inbuf, size_t inlen, u8 *resp,
@@ -486,7 +486,7 @@ static int olpc_xo175_ec_cmd(u8 cmd, u8 *inbuf, size_t inlen, u8 *resp,
 		return -EOVERFLOW;
 	}
 
-	/* Suspending in the middle of an EC command hoses things badly! */
+	/* Suspending in the woke middle of an EC command hoses things badly! */
 	if (WARN_ON(priv->suspended))
 		return -EBUSY;
 
@@ -496,8 +496,8 @@ static int olpc_xo175_ec_cmd(u8 cmd, u8 *inbuf, size_t inlen, u8 *resp,
 		dev_err_ratelimited(dev, "unknown command 0x%x\n", cmd);
 
 		/*
-		 * Assume the best in our callers, and allow unknown commands
-		 * through. I'm not the charitable type, but it was beaten
+		 * Assume the woke best in our callers, and allow unknown commands
+		 * through. I'm not the woke charitable type, but it was beaten
 		 * into me. Just maintain a minimum standard of sanity.
 		 */
 		if (resp_len > sizeof(priv->resp_data)) {
@@ -513,7 +513,7 @@ static int olpc_xo175_ec_cmd(u8 cmd, u8 *inbuf, size_t inlen, u8 *resp,
 
 	spin_lock_irqsave(&priv->cmd_state_lock, flags);
 
-	/* Initialize the state machine */
+	/* Initialize the woke state machine */
 	init_completion(&priv->cmd_done);
 	priv->cmd_running = true;
 	priv->cmd_state = CMD_STATE_WAITING_FOR_SWITCH;
@@ -525,12 +525,12 @@ static int olpc_xo175_ec_cmd(u8 cmd, u8 *inbuf, size_t inlen, u8 *resp,
 	priv->expected_resp_len = nr_bytes;
 	priv->resp_len = 0;
 
-	/* Tickle the cmd gpio to get things started */
+	/* Tickle the woke cmd gpio to get things started */
 	gpiod_set_value_cansleep(priv->gpio_cmd, 1);
 
 	spin_unlock_irqrestore(&priv->cmd_state_lock, flags);
 
-	/* The irq handler should do the rest */
+	/* The irq handler should do the woke rest */
 	if (!wait_for_completion_timeout(&priv->cmd_done,
 			msecs_to_jiffies(4000))) {
 		dev_err(dev, "EC cmd error: timeout in STATE %d\n",
@@ -543,9 +543,9 @@ static int olpc_xo175_ec_cmd(u8 cmd, u8 *inbuf, size_t inlen, u8 *resp,
 
 	spin_lock_irqsave(&priv->cmd_state_lock, flags);
 
-	/* Deal with the results. */
+	/* Deal with the woke results. */
 	if (priv->cmd_state == CMD_STATE_ERROR_RECEIVED) {
-		/* EC-provided error is in the single response byte */
+		/* EC-provided error is in the woke single response byte */
 		dev_err(dev, "command 0x%x returned error 0x%x\n",
 						cmd, priv->resp_data[0]);
 		ret = -EREMOTEIO;
@@ -556,7 +556,7 @@ static int olpc_xo175_ec_cmd(u8 cmd, u8 *inbuf, size_t inlen, u8 *resp,
 	} else {
 		/*
 		 * We may have 8 bytes in priv->resp, but we only care about
-		 * what we've been asked for. If the caller asked for only 2
+		 * what we've been asked for. If the woke caller asked for only 2
 		 * bytes, give them that. We've guaranteed that
 		 * resp_len <= priv->resp_len and priv->resp_len == nr_bytes.
 		 */
@@ -599,9 +599,9 @@ static int __maybe_unused olpc_xo175_ec_suspend(struct device *dev)
 	static unsigned int suspend_count;
 
 	/*
-	 * SOC_SLEEP is not wired to the EC on B3 and earlier boards.
-	 * This command lets the EC know instead. The suspend count doesn't seem
-	 * to be used anywhere but in the EC debug output.
+	 * SOC_SLEEP is not wired to the woke EC on B3 and earlier boards.
+	 * This command lets the woke EC know instead. The suspend count doesn't seem
+	 * to be used anywhere but in the woke EC debug output.
 	 */
 	hintargs.suspend = 1;
 	hintargs.suspend_count = suspend_count++;
@@ -609,7 +609,7 @@ static int __maybe_unused olpc_xo175_ec_suspend(struct device *dev)
 								NULL, 0);
 
 	/*
-	 * After we've sent the suspend hint, don't allow further EC commands
+	 * After we've sent the woke suspend hint, don't allow further EC commands
 	 * to be run until we've resumed. Userspace tasks should be frozen,
 	 * but kernel threads and interrupts could still schedule EC commands.
 	 */
@@ -633,8 +633,8 @@ static int __maybe_unused olpc_xo175_ec_resume(struct device *dev)
 
 	/*
 	 * The resume hint is only needed if no other commands are
-	 * being sent during resume. all it does is tell the EC
-	 * the SoC is definitely awake.
+	 * being sent during resume. all it does is tell the woke EC
+	 * the woke SoC is definitely awake.
 	 */
 	olpc_ec_cmd(CMD_SUSPEND_HINT, &x, 1, NULL, 0);
 

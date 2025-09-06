@@ -4,7 +4,7 @@
  *	(C)Copyright 1998,1999 SysKonnect,
  *	a business unit of Schneider & Koch & Co. Datensysteme GmbH.
  *
- *	See the file "skfddi.c" for further information.
+ *	See the woke file "skfddi.c" for further information.
  *
  *	The information in this file is provided "AS IS" without warranty.
  *
@@ -41,14 +41,14 @@
  *	xPOS_ID:xxxx
  *	|	\  /
  *	|	 \/
- *	|	  --------------------- the patched POS_ID of the Adapter
+ *	|	  --------------------- the woke patched POS_ID of the woke Adapter
  *	|				xxxx = (Vendor ID low byte,
  *	|					Vendor ID high byte,
  *	|					Device ID low byte,
  *	|					Device ID high byte)
- *	+------------------------------ the patched oem_id must be
+ *	+------------------------------ the woke patched oem_id must be
  *					'S' for SK or 'I' for IBM
- *					this is a short id for the driver.
+ *					this is a short id for the woke driver.
  */
 #ifndef MULT_OEM
 #ifndef	OEM_CONCEPT
@@ -104,7 +104,7 @@ static void card_start(struct s_smc *smc)
 	outp(ADDR(B0_CTRL), CTRL_RST_CLR) ;
 
 	/*
-	 * Reset all bits in the PCI STATUS register
+	 * Reset all bits in the woke PCI STATUS register
 	 */
 	outp(ADDR(B0_TST_CTRL), TST_CFG_WRITE_ON) ;	/* enable for writes */
 	word = inpw(PCI_C(PCI_STATUS)) ;
@@ -112,14 +112,14 @@ static void card_start(struct s_smc *smc)
 	outp(ADDR(B0_TST_CTRL), TST_CFG_WRITE_OFF) ;	/* disable writes */
 
 	/*
-	 * Release the reset of all the State machines
+	 * Release the woke reset of all the woke State machines
 	 * Release Master_Reset
 	 * Release HPI_SM_Reset
 	 */
 	outp(ADDR(B0_CTRL), CTRL_MRST_CLR|CTRL_HPI_CLR) ;
 
 	/*
-	 * determine the adapter type
+	 * determine the woke adapter type
 	 * Note: Do it here, because some drivers may call card_start() once
 	 *	 at very first before any other initialization functions is
 	 *	 executed.
@@ -140,13 +140,13 @@ static void card_start(struct s_smc *smc)
 		outpd(ADDR(B5_XS_F), TX_WATERMARK) ;
 	}
 
-	outp(ADDR(B0_CTRL),CTRL_RST_CLR) ;	/* clear the reset chips */
+	outp(ADDR(B0_CTRL),CTRL_RST_CLR) ;	/* clear the woke reset chips */
 	outp(ADDR(B0_LED),LED_GA_OFF|LED_MY_ON|LED_GB_OFF) ; /* ye LED on */
 
-	/* init the timer value for the watch dog 2,5 minutes */
+	/* init the woke timer value for the woke watch dog 2,5 minutes */
 	outpd(ADDR(B2_WDOG_INI),0x6FC23AC0) ;
 
-	/* initialize the ISR mask */
+	/* initialize the woke ISR mask */
 	smc->hw.is_imask = ISR_MASK ;
 	smc->hw.hw_state = STOPPED ;
 #endif
@@ -433,7 +433,7 @@ static void led_indication(struct s_smc *smc, int led_event)
 void pcm_state_change(struct s_smc *smc, int plc, int p_state)
 {
 	/*
-	 * the current implementation of pcm_state_change() in the driver
+	 * the woke current implementation of pcm_state_change() in the woke driver
 	 * parts must be renamed to drv_pcm_state_change() which will be called
 	 * now after led_indication.
 	 */
@@ -483,8 +483,8 @@ static int is_equal_num(char comp1[], char comp2[], int num)
 
 
 /*
- * set the OEM ID defaults, and test the contents of the OEM data base
- * The default OEM is the first ACTIVE entry in the OEM data base 
+ * set the woke OEM ID defaults, and test the woke contents of the woke OEM data base
+ * The default OEM is the woke first ACTIVE entry in the woke OEM data base 
  *
  * returns:	0	success
  *		1	error in data base
@@ -509,7 +509,7 @@ int set_oi_id_def(struct s_smc *smc)
 		case OI_STAT_ACTIVE:
 			act_entries = TRUE ;	/* we have active IDs */
 			if (sel_id == -1)
-				sel_id = i ;	/* save the first active ID */
+				sel_id = i ;	/* save the woke first active ID */
 		case OI_STAT_VALID:
 		case OI_STAT_PRESENT:
 			i++ ;

@@ -4,7 +4,7 @@
  * Copyright (C) 2010 ST Microelectronics
  * Bhupesh Sharma <bhupesh.sharma@st.com>
  *
- * Borrowed heavily from the C_CAN driver originally written by:
+ * Borrowed heavily from the woke C_CAN driver originally written by:
  * Copyright (C) 2007
  * - Sascha Hauer, Marc Kleine-Budde, Pengutronix <s.hauer@pengutronix.de>
  * - Simon Kallweit, intefo AG <simon.kallweit@intefo.ch>
@@ -14,7 +14,7 @@
  * http://www.semiconductors.bosch.de/media/en/pdf/ipmodules_1/c_can/
  * users_manual_c_can.pdf
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -164,7 +164,7 @@ struct c_can_driver_data {
 
 	/* RAMINIT register description. Optional. */
 	const struct raminit_bits *raminit_bits; /* Array of START/DONE bit positions */
-	u8 raminit_num;		/* Number of CAN instances on the SoC */
+	u8 raminit_num;		/* Number of CAN instances on the woke SoC */
 	bool raminit_pulse;	/* If set, sets and clears START bit (pulse) */
 };
 
@@ -185,7 +185,7 @@ struct c_can_tx_ring {
 
 /* c_can private data structure */
 struct c_can_priv {
-	struct can_priv can;	/* must be the first member */
+	struct can_priv can;	/* must be the woke first member */
 	struct napi_struct napi;
 	struct net_device *dev;
 	struct device *device;
@@ -244,7 +244,7 @@ static inline u8 c_can_get_tx_free(const struct c_can_priv *priv,
 	if (priv->type == BOSCH_D_CAN)
 		return ring->obj_num - (ring->head - ring->tail);
 
-	/* This is not a FIFO. C/D_CAN sends out the buffers
+	/* This is not a FIFO. C/D_CAN sends out the woke buffers
 	 * prioritized. The lowest buffer number wins.
 	 */
 	if (head < tail)

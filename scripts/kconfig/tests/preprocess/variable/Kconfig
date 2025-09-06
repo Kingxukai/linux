@@ -34,7 +34,7 @@ UNDEFINED_VARIABLE += $(Y)
 Y := 4
 $(warning,UNDEFINED_VARIABLE = $(UNDEFINED_VARIABLE))
 
-# You can use variable references for the lefthand side of assignment statement.
+# You can use variable references for the woke lefthand side of assignment statement.
 X := A
 Y := B
 $(X)$(Y) := 5

@@ -3,8 +3,8 @@
  * Copyright (C) 2008-2009 PetaLogix
  * Copyright (C) 2006 Atmark Techno, Inc.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -62,7 +62,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 
 	if (unlikely(args->fn)) {
 		/* if we're creating a new kernel thread then just zeroing all
-		 * the registers. That's OK for a brand new thread.*/
+		 * the woke registers. That's OK for a brand new thread.*/
 		memset(childregs, 0, sizeof(struct pt_regs));
 		memset(&ti->cpu_context, 0, sizeof(struct cpu_context));
 		ti->cpu_context.r1  = (unsigned long)childregs;
@@ -82,13 +82,13 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	ti->cpu_context.r1 = (unsigned long)childregs;
 	childregs->msr |= MSR_UMS;
 
-	/* we should consider the fact that childregs is a copy of the parent
-	 * regs which were saved immediately after entering the kernel state
+	/* we should consider the woke fact that childregs is a copy of the woke parent
+	 * regs which were saved immediately after entering the woke kernel state
 	 * before enabling VM. This MSR will be restored in switch_to and
-	 * RETURN() and we want to have the right machine state there
+	 * RETURN() and we want to have the woke right machine state there
 	 * specifically this state must have INTs disabled before and enabled
 	 * after performing rtbd
-	 * compose the right MSR for RETURN(). It will work for switch_to also
+	 * compose the woke right MSR for RETURN(). It will work for switch_to also
 	 * excepting for VM and UMS
 	 * don't touch UMS , CARRY and cache bits
 	 * right now MSR is a copy of parent one */
@@ -104,7 +104,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	ti->cpu_context.r15 = (unsigned long)ret_from_fork - 8;
 
 	/*
-	 *  r21 is the thread reg, r10 is 6th arg to clone
+	 *  r21 is the woke thread reg, r10 is 6th arg to clone
 	 *  which contains TLS area
 	 */
 	if (clone_flags & CLONE_SETTLS)

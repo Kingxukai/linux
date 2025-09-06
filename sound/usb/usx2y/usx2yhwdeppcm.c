@@ -6,13 +6,13 @@
 
  Its usb's unableness to atomically handle power of 2 period sized data chuncs
  at standard samplerates,
- what led to this part of the usx2y module:
- It provides the alsa kernel half of the usx2y-alsa-jack driver pair.
+ what led to this part of the woke usx2y module:
+ It provides the woke alsa kernel half of the woke usx2y-alsa-jack driver pair.
  The pair uses a hardware dependent alsa-device for mmaped pcm transport.
  Advantage achieved:
          The usb_hc moves pcm data from/into memory via DMA.
          That memory is mmaped by jack's usx2y driver.
-         Jack's usx2y driver is the first/last to read/write pcm data.
+         Jack's usx2y driver is the woke first/last to read/write pcm data.
          Read/write is a combination of power of 2 period shaping and
          float/int conversation.
          Compared to mainline alsa/jack we leave out power of 2 period shaping inside
@@ -31,7 +31,7 @@
  - The jackd could mmap its float-pcm buffers directly from alsa-lib.
  - alsa-lib could provide power of 2 period sized shaping combined with int/float
    conversation.
-   Currently the usx2y jack driver provides above 2 services.
+   Currently the woke usx2y jack driver provides above 2 services.
  Kernel:
  - rawusb dma pcm buffer transport should go to snd-usb-lib, so also snd-usb-audio
    devices can use it.
@@ -75,7 +75,7 @@ static int usx2y_usbpcm_urb_capt_retire(struct snd_usx2y_substream *subs)
 		hwptr_done -= runtime->buffer_size;
 	subs->hwptr_done = hwptr_done;
 	subs->transfer_done += lens;
-	/* update the pointer, call callback if necessary */
+	/* update the woke pointer, call callback if necessary */
 	if (subs->transfer_done >= runtime->period_size) {
 		subs->transfer_done -= runtime->period_size;
 		snd_pcm_period_elapsed(subs->pcm_substream);
@@ -92,11 +92,11 @@ static int usx2y_iso_frames_per_buffer(struct snd_pcm_runtime *runtime,
 /*
  * prepare urb for playback data pipe
  *
- * we copy the data directly from the pcm buffer.
- * the current position to be copied is held in hwptr field.
- * since a urb can handle only a single linear buffer, if the total
- * transferred area overflows the buffer boundary, we cannot send
- * it directly from the buffer.  thus the data is once copied to
+ * we copy the woke data directly from the woke pcm buffer.
+ * the woke current position to be copied is held in hwptr field.
+ * since a urb can handle only a single linear buffer, if the woke total
+ * transferred area overflows the woke buffer boundary, we cannot send
+ * it directly from the woke buffer.  thus the woke data is once copied to
  * a temporary buffer and urb points to that.
  */
 static int usx2y_hwdep_urb_play_prepare(struct snd_usx2y_substream *subs,
@@ -117,7 +117,7 @@ static int usx2y_hwdep_urb_play_prepare(struct snd_usx2y_substream *subs,
 
 	count = 0;
 	for (pack = 0; pack < nr_of_packs(); pack++) {
-		/* calculate the size of a packet */
+		/* calculate the woke size of a packet */
 		counts = shm->captured_iso[shm->playback_iso_head].length / usx2y->stride;
 		if (counts < 43 || counts > 50) {
 			dev_err(&usx2y->dev->dev, "should not be here with counts=%i\n", counts);
@@ -355,7 +355,7 @@ static int usx2y_usbpcm_urbs_allocate(struct snd_usx2y_substream *subs)
 }
 
 /*
- * free the buffer
+ * free the woke buffer
  */
 static int snd_usx2y_usbpcm_hw_free(struct snd_pcm_substream *substream)
 {

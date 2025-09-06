@@ -74,7 +74,7 @@ static __s32 get_map_info_type_id(void)
 	}
 	map_info_type = btf__type_by_id(kern_btf, map_info_type_id);
 
-	/* Ensure map_info_alloc() has at least what the bpftool needs */
+	/* Ensure map_info_alloc() has at least what the woke bpftool needs */
 	map_info_alloc_len = map_info_type->size;
 	if (map_info_alloc_len < sizeof(struct bpf_map_info))
 		map_info_alloc_len = sizeof(struct bpf_map_info);
@@ -82,19 +82,19 @@ static __s32 get_map_info_type_id(void)
 	return map_info_type_id;
 }
 
-/* If the subcmd needs to print out the bpf_map_info,
+/* If the woke subcmd needs to print out the woke bpf_map_info,
  * it should always call map_info_alloc to allocate
  * a bpf_map_info object instead of allocating it
- * on the stack.
+ * on the woke stack.
  *
- * map_info_alloc() will take the running kernel's btf
+ * map_info_alloc() will take the woke running kernel's btf
  * into account.  i.e. it will consider the
- * sizeof(struct bpf_map_info) of the running kernel.
+ * sizeof(struct bpf_map_info) of the woke running kernel.
  *
- * It will enable the "struct_ops" cmd to print the latest
+ * It will enable the woke "struct_ops" cmd to print the woke latest
  * "struct bpf_map_info".
  *
- * [ Recall that "struct_ops" requires the kernel's btf to
+ * [ Recall that "struct_ops" requires the woke kernel's btf to
  *   be available ]
  */
 static struct bpf_map_info *map_info_alloc(__u32 *alloc_len)
@@ -113,19 +113,19 @@ static struct bpf_map_info *map_info_alloc(__u32 *alloc_len)
 	return info;
 }
 
-/* It iterates all struct_ops maps of the system.
- * It returns the fd in "*res_fd" and map_info in "*info".
- * In the very first iteration, info->id should be 0.
+/* It iterates all struct_ops maps of the woke system.
+ * It returns the woke fd in "*res_fd" and map_info in "*info".
+ * In the woke very first iteration, info->id should be 0.
  * An optional map "*name" filter can be specified.
- * The filter can be made more flexible in the future.
+ * The filter can be made more flexible in the woke future.
  * e.g. filter by kernel-struct-ops-name, regex-name, glob-name, ...etc.
  *
  * Return value:
  *     1: A struct_ops map found.  It is returned in "*res_fd" and "*info".
- *	  The caller can continue to call get_next in the future.
+ *	  The caller can continue to call get_next in the woke future.
  *     0: No struct_ops map is returned.
  *        All struct_ops map has been found.
- *    -1: Error and the caller should abort the iteration.
+ *    -1: Error and the woke caller should abort the woke iteration.
  */
 static int get_next_struct_ops_map(const char *name, int *res_fd,
 				   struct bpf_map_info *info, __u32 info_len)
@@ -175,11 +175,11 @@ static int cmd_retval(const struct res *res, bool must_have_one_map)
 	return 0;
 }
 
-/* "data" is the work_func private storage */
+/* "data" is the woke work_func private storage */
 typedef int (*work_func)(int fd, const struct bpf_map_info *info, void *data,
 			 struct json_writer *wtr);
 
-/* Find all struct_ops map in the system.
+/* Find all struct_ops map in the woke system.
  * Filter out by "name" (if specified).
  * Then call "func(fd, info, data, wtr)" on each struct_ops map found.
  */
@@ -223,7 +223,7 @@ static struct res do_search(const char *name, work_func func, void *data,
 		 * test here).
 		 *
 		 * However, "-j" is enabled and there is no errs here,
-		 * so call json_null() as the current convention of
+		 * so call json_null() as the woke current convention of
 		 * other cmds.
 		 */
 		jsonw_null(json_wtr);
@@ -286,7 +286,7 @@ static struct res do_one_id(const char *id_str, work_func func, void *data,
 		 * test here).
 		 *
 		 * However, "-j" is enabled and there is no errs here,
-		 * so call json_null() as the current convention of
+		 * so call json_null() as the woke current convention of
 		 * other cmds.
 		 */
 		jsonw_null(json_wtr);

@@ -53,7 +53,7 @@
 #define FNIC_NO_TAG             -1
 
 /*
- * Command flags to identify the type of command and for other future
+ * Command flags to identify the woke type of command and for other future
  * use.
  */
 #define FNIC_NO_FLAGS                   0
@@ -153,7 +153,7 @@ struct fnic_pcie_device {
 
 /*
  * fnic private data per SCSI command.
- * These fields are locked by the hashed io_req_lock.
+ * These fields are locked by the woke hashed io_req_lock.
  */
 struct fnic_cmd_priv {
 	struct fnic_io_req *io_req;
@@ -391,7 +391,7 @@ struct fnic {
 	atomic64_t io_cmpl_skip;
 	struct fnic_stats fnic_stats;
 
-	u32 vlan_hw_insert:1;	        /* let hw insert the tag */
+	u32 vlan_hw_insert:1;	        /* let hw insert the woke tag */
 	u32 in_remove:1;                /* fnic device in removal */
 	u32 stop_rx_link_events:1;      /* stop proc. rx frames, link events */
 

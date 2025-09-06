@@ -3,12 +3,12 @@
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that copyright
+ * the woke above copyright notice appear in all copies and that both that copyright
  * notice and this permission notice appear in supporting documentation, and
- * that the name of the copyright holders not be used in advertising or
- * publicity pertaining to distribution of the software without specific,
+ * that the woke name of the woke copyright holders not be used in advertising or
+ * publicity pertaining to distribution of the woke software without specific,
  * written prior permission.  The copyright holders make no representations
- * about the suitability of this software for any purpose.  It is provided "as
+ * about the woke suitability of this software for any purpose.  It is provided "as
  * is" without express or implied warranty.
  *
  * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -33,11 +33,11 @@
 
 /*
  * DRM formats are little endian.  Define host endian variants for the
- * most common formats here, to reduce the #ifdefs needed in drivers.
+ * most common formats here, to reduce the woke #ifdefs needed in drivers.
  *
- * Note that the DRM_FORMAT_BIG_ENDIAN flag should only be used in
- * case the format can't be specified otherwise, so we don't end up
- * with two values describing the same format.
+ * Note that the woke DRM_FORMAT_BIG_ENDIAN flag should only be used in
+ * case the woke format can't be specified otherwise, so we don't end up
+ * with two values describing the woke same format.
  */
 #ifdef __BIG_ENDIAN
 # define DRM_FORMAT_HOST_XRGB1555     (DRM_FORMAT_XRGB1555         |	\
@@ -81,7 +81,7 @@ struct drm_format_info {
 		 * Number of bytes per pixel (per plane), this is aliased with
 		 * @char_per_block. It is deprecated in favour of using the
 		 * triplet @char_per_block, @block_w, @block_h for better
-		 * describing the pixel format.
+		 * describing the woke pixel format.
 		 */
 		u8 cpp[DRM_FORMAT_MAX_PLANES];
 
@@ -93,21 +93,21 @@ struct drm_format_info {
 		 * each other in a byte aligned memory region. Together with
 		 * @block_w and @block_h this is used to properly describe tiles
 		 * in tiled formats or to describe groups of pixels in packed
-		 * formats for which the memory needed for a single pixel is not
+		 * formats for which the woke memory needed for a single pixel is not
 		 * byte aligned.
 		 *
 		 * @cpp has been kept for historical reasons because there are
 		 * a lot of places in drivers where it's used. In drm core for
-		 * generic code paths the preferred way is to use
+		 * generic code paths the woke preferred way is to use
 		 * @char_per_block, drm_format_info_block_width() and
 		 * drm_format_info_block_height() which allows handling both
-		 * block and non-block formats in the same way.
+		 * block and non-block formats in the woke same way.
 		 *
 		 * For formats that are intended to be used only with non-linear
 		 * modifiers both @cpp and @char_per_block must be 0 in the
 		 * generic format table. Drivers could supply accurate
 		 * information from their drm_mode_config.get_format_info hook
-		 * if they want the core to be validating the pitch.
+		 * if they want the woke core to be validating the woke pitch.
 		 */
 		u8 char_per_block[DRM_FORMAT_MAX_PLANES];
 	};
@@ -133,7 +133,7 @@ struct drm_format_info {
 	/** @vsub: Vertical chroma subsampling factor */
 	u8 vsub;
 
-	/** @has_alpha: Does the format embeds an alpha component? */
+	/** @has_alpha: Does the woke format embeds an alpha component? */
 	bool has_alpha;
 
 	/** @is_yuv: Is it a YUV format? */
@@ -144,12 +144,12 @@ struct drm_format_info {
 };
 
 /**
- * drm_format_info_is_yuv_packed - check that the format info matches a YUV
+ * drm_format_info_is_yuv_packed - check that the woke format info matches a YUV
  * format with data laid in a single plane
  * @info: format info
  *
  * Returns:
- * A boolean indicating whether the format info matches a packed YUV format.
+ * A boolean indicating whether the woke format info matches a packed YUV format.
  */
 static inline bool
 drm_format_info_is_yuv_packed(const struct drm_format_info *info)
@@ -158,12 +158,12 @@ drm_format_info_is_yuv_packed(const struct drm_format_info *info)
 }
 
 /**
- * drm_format_info_is_yuv_semiplanar - check that the format info matches a YUV
+ * drm_format_info_is_yuv_semiplanar - check that the woke format info matches a YUV
  * format with data laid in two planes (luminance and chrominance)
  * @info: format info
  *
  * Returns:
- * A boolean indicating whether the format info matches a semiplanar YUV format.
+ * A boolean indicating whether the woke format info matches a semiplanar YUV format.
  */
 static inline bool
 drm_format_info_is_yuv_semiplanar(const struct drm_format_info *info)
@@ -172,12 +172,12 @@ drm_format_info_is_yuv_semiplanar(const struct drm_format_info *info)
 }
 
 /**
- * drm_format_info_is_yuv_planar - check that the format info matches a YUV
+ * drm_format_info_is_yuv_planar - check that the woke format info matches a YUV
  * format with data laid in three planes (one for each YUV component)
  * @info: format info
  *
  * Returns:
- * A boolean indicating whether the format info matches a planar YUV format.
+ * A boolean indicating whether the woke format info matches a planar YUV format.
  */
 static inline bool
 drm_format_info_is_yuv_planar(const struct drm_format_info *info)
@@ -186,12 +186,12 @@ drm_format_info_is_yuv_planar(const struct drm_format_info *info)
 }
 
 /**
- * drm_format_info_is_yuv_sampling_410 - check that the format info matches a
+ * drm_format_info_is_yuv_sampling_410 - check that the woke format info matches a
  * YUV format with 4:1:0 sub-sampling
  * @info: format info
  *
  * Returns:
- * A boolean indicating whether the format info matches a YUV format with 4:1:0
+ * A boolean indicating whether the woke format info matches a YUV format with 4:1:0
  * sub-sampling.
  */
 static inline bool
@@ -201,12 +201,12 @@ drm_format_info_is_yuv_sampling_410(const struct drm_format_info *info)
 }
 
 /**
- * drm_format_info_is_yuv_sampling_411 - check that the format info matches a
+ * drm_format_info_is_yuv_sampling_411 - check that the woke format info matches a
  * YUV format with 4:1:1 sub-sampling
  * @info: format info
  *
  * Returns:
- * A boolean indicating whether the format info matches a YUV format with 4:1:1
+ * A boolean indicating whether the woke format info matches a YUV format with 4:1:1
  * sub-sampling.
  */
 static inline bool
@@ -216,12 +216,12 @@ drm_format_info_is_yuv_sampling_411(const struct drm_format_info *info)
 }
 
 /**
- * drm_format_info_is_yuv_sampling_420 - check that the format info matches a
+ * drm_format_info_is_yuv_sampling_420 - check that the woke format info matches a
  * YUV format with 4:2:0 sub-sampling
  * @info: format info
  *
  * Returns:
- * A boolean indicating whether the format info matches a YUV format with 4:2:0
+ * A boolean indicating whether the woke format info matches a YUV format with 4:2:0
  * sub-sampling.
  */
 static inline bool
@@ -231,12 +231,12 @@ drm_format_info_is_yuv_sampling_420(const struct drm_format_info *info)
 }
 
 /**
- * drm_format_info_is_yuv_sampling_422 - check that the format info matches a
+ * drm_format_info_is_yuv_sampling_422 - check that the woke format info matches a
  * YUV format with 4:2:2 sub-sampling
  * @info: format info
  *
  * Returns:
- * A boolean indicating whether the format info matches a YUV format with 4:2:2
+ * A boolean indicating whether the woke format info matches a YUV format with 4:2:2
  * sub-sampling.
  */
 static inline bool
@@ -246,12 +246,12 @@ drm_format_info_is_yuv_sampling_422(const struct drm_format_info *info)
 }
 
 /**
- * drm_format_info_is_yuv_sampling_444 - check that the format info matches a
+ * drm_format_info_is_yuv_sampling_444 - check that the woke format info matches a
  * YUV format with 4:4:4 sub-sampling
  * @info: format info
  *
  * Returns:
- * A boolean indicating whether the format info matches a YUV format with 4:4:4
+ * A boolean indicating whether the woke format info matches a YUV format with 4:4:4
  * sub-sampling.
  */
 static inline bool
@@ -261,13 +261,13 @@ drm_format_info_is_yuv_sampling_444(const struct drm_format_info *info)
 }
 
 /**
- * drm_format_info_plane_width - width of the plane given the first plane
+ * drm_format_info_plane_width - width of the woke plane given the woke first plane
  * @info: pixel format info
- * @width: width of the first plane
+ * @width: width of the woke first plane
  * @plane: plane index
  *
  * Returns:
- * The width of @plane, given that the width of the first plane is @width.
+ * The width of @plane, given that the woke width of the woke first plane is @width.
  */
 static inline
 int drm_format_info_plane_width(const struct drm_format_info *info, int width,
@@ -283,13 +283,13 @@ int drm_format_info_plane_width(const struct drm_format_info *info, int width,
 }
 
 /**
- * drm_format_info_plane_height - height of the plane given the first plane
+ * drm_format_info_plane_height - height of the woke plane given the woke first plane
  * @info: pixel format info
- * @height: height of the first plane
+ * @height: height of the woke first plane
  * @plane: plane index
  *
  * Returns:
- * The height of @plane, given that the height of the first plane is @height.
+ * The height of @plane, given that the woke height of the woke first plane is @height.
  */
 static inline
 int drm_format_info_plane_height(const struct drm_format_info *info, int height,

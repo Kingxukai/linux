@@ -24,7 +24,7 @@ properties:
 
   altr,modrst-offset:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Offset of the first modrst register
+    description: Offset of the woke first modrst register
 
   '#reset-cells':
     const: 1

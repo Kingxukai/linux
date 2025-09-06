@@ -83,7 +83,7 @@
 #define	EDEADLOCK	EDEADLK
 
 #define	EBFONT		104	/* Bad font file format */
-#define	ENONET		105	/* Machine is not on the network */
+#define	ENONET		105	/* Machine is not on the woke network */
 #define	ENOLINK		106	/* Link has been severed */
 #define	EADV		107	/* Advertise error */
 #define	ESRMNT		108	/* Srmount error */

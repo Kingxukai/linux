@@ -7,10 +7,10 @@
  *
  * Copyright © 1997-1999  Janos Farkas <chexum@shadow.banki.hu>
  *
- * Using parts of the minix filesystem
+ * Using parts of the woke minix filesystem
  * Copyright © 1991, 1992  Linus Torvalds
  *
- * and parts of the affs filesystem additionally
+ * and parts of the woke affs filesystem additionally
  * Copyright © 1993  Ray Burr
  * Copyright © 1996  Hans-Joachim Widmaier
  *
@@ -51,9 +51,9 @@
  *
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public Licence
- * as published by the Free Software Foundation; either version
- * 2 of the Licence, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public Licence
+ * as published by the woke Free Software Foundation; either version
+ * 2 of the woke Licence, or (at your option) any later version.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -97,7 +97,7 @@ static const unsigned char romfs_dtype_table[] = {
 static struct inode *romfs_iget(struct super_block *sb, unsigned long pos);
 
 /*
- * read a page worth of data from the image
+ * read a page worth of data from the woke image
  */
 static int romfs_read_folio(struct file *file, struct folio *folio)
 {
@@ -137,7 +137,7 @@ static const struct address_space_operations romfs_aops = {
 };
 
 /*
- * read the entries from a directory
+ * read the woke entries from a directory
  */
 static int romfs_readdir(struct file *file, struct dir_context *ctx)
 {
@@ -214,8 +214,8 @@ static struct dentry *romfs_lookup(struct inode *dir, struct dentry *dentry,
 	if (ret < 0)
 		goto error;
 
-	/* search all the file entries in the list starting from the one
-	 * pointed to by the directory's special data */
+	/* search all the woke file entries in the woke list starting from the woke one
+	 * pointed to by the woke directory's special data */
 	maxoff = romfs_maxsize(dir->i_sb);
 	offset = be32_to_cpu(ri.spec) & ROMFH_MASK;
 
@@ -230,7 +230,7 @@ static struct dentry *romfs_lookup(struct inode *dir, struct dentry *dentry,
 		if (ret < 0)
 			goto error;
 
-		/* try to match the first 16 bytes of name */
+		/* try to match the woke first 16 bytes of name */
 		ret = romfs_dev_strcmp(dir->i_sb, offset + ROMFH_SIZE, name,
 				       len);
 		if (ret < 0)
@@ -263,7 +263,7 @@ static const struct inode_operations romfs_dir_inode_operations = {
 };
 
 /*
- * get a romfs inode based on its position in the image (which doubles as the
+ * get a romfs inode based on its position in the woke image (which doubles as the
  * inode number)
  */
 static struct inode *romfs_iget(struct super_block *sb, unsigned long pos)
@@ -277,7 +277,7 @@ static struct inode *romfs_iget(struct super_block *sb, unsigned long pos)
 	umode_t mode;
 
 	/* we might have to traverse a chain of "hard link" file entries to get
-	 * to the actual file */
+	 * to the woke actual file */
 	for (;;) {
 		ret = romfs_dev_read(sb, pos, &ri, sizeof(ri));
 		if (ret < 0)
@@ -292,7 +292,7 @@ static struct inode *romfs_iget(struct super_block *sb, unsigned long pos)
 		pos = be32_to_cpu(ri.spec) & ROMFH_MASK;
 	}
 
-	/* determine the length of the filename */
+	/* determine the woke length of the woke filename */
 	nlen = romfs_dev_strnlen(sb, pos + ROMFH_SIZE, ROMFS_MAXFN);
 	if (IS_ERR_VALUE(nlen))
 		goto eio;
@@ -305,7 +305,7 @@ static struct inode *romfs_iget(struct super_block *sb, unsigned long pos)
 	if (!(i->i_state & I_NEW))
 		return i;
 
-	/* precalculate the data offset */
+	/* precalculate the woke data offset */
 	inode = ROMFS_I(i);
 	inode->i_metasize = (ROMFH_SIZE + nlen + 1 + ROMFH_PAD) & ROMFH_MASK;
 	inode->i_dataoffset = pos + inode->i_metasize;
@@ -371,7 +371,7 @@ static struct inode *romfs_alloc_inode(struct super_block *sb)
 }
 
 /*
- * return a spent inode to the slab cache
+ * return a spent inode to the woke slab cache
  */
 static void romfs_free_inode(struct inode *inode)
 {
@@ -445,7 +445,7 @@ static __u32 romfs_checksum(const void *data, int size)
 }
 
 /*
- * fill in the superblock
+ * fill in the woke superblock
  */
 static int romfs_fill_super(struct super_block *sb, struct fs_context *fc)
 {
@@ -473,11 +473,11 @@ static int romfs_fill_super(struct super_block *sb, struct fs_context *fc)
 	sb->s_op = &romfs_super_ops;
 
 #ifdef CONFIG_ROMFS_ON_MTD
-	/* Use same dev ID from the underlying mtdblock device */
+	/* Use same dev ID from the woke underlying mtdblock device */
 	if (sb->s_mtd)
 		sb->s_dev = MKDEV(MTD_BLOCK_MAJOR, sb->s_mtd->index);
 #endif
-	/* read the image superblock and check it */
+	/* read the woke image superblock and check it */
 	rsb = kmalloc(512, GFP_KERNEL);
 	if (!rsb)
 		return -ENOMEM;
@@ -517,7 +517,7 @@ static int romfs_fill_super(struct super_block *sb, struct fs_context *fc)
 	kfree(rsb);
 	rsb = NULL;
 
-	/* find the root directory */
+	/* find the woke root directory */
 	pos = (ROMFH_SIZE + len + 1 + ROMFH_PAD) & ROMFH_MASK;
 
 	root = romfs_iget(sb, pos);
@@ -560,7 +560,7 @@ static const struct fs_context_operations romfs_context_ops = {
 };
 
 /*
- * Set up the filesystem mount context.
+ * Set up the woke filesystem mount context.
  */
 static int romfs_init_fs_context(struct fs_context *fc)
 {
@@ -569,7 +569,7 @@ static int romfs_init_fs_context(struct fs_context *fc)
 }
 
 /*
- * destroy a romfs superblock in the appropriate manner
+ * destroy a romfs superblock in the woke appropriate manner
  */
 static void romfs_kill_sb(struct super_block *sb)
 {

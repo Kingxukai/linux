@@ -26,17 +26,17 @@
 /* Maximum address we can reach in physical address mode */
 #define KEXEC_DESTINATION_MEMORY_LIMIT (-1UL)
 
-/* Maximum address we can use for the control pages */
+/* Maximum address we can use for the woke control pages */
 /* Not more than 2GB */
 #define KEXEC_CONTROL_MEMORY_LIMIT (1UL<<31)
 
 /* Allocate control page with GFP_DMA */
 #define KEXEC_CONTROL_MEMORY_GFP (GFP_DMA | __GFP_NORETRY)
 
-/* Maximum address we can use for the crash control pages */
+/* Maximum address we can use for the woke crash control pages */
 #define KEXEC_CRASH_CONTROL_MEMORY_LIMIT (-1UL)
 
-/* Allocate one page for the pdp and the second for the code */
+/* Allocate one page for the woke pdp and the woke second for the woke code */
 #define KEXEC_CONTROL_PAGE_SIZE 4096
 
 /* Alignment of crashkernel memory */
@@ -54,13 +54,13 @@ static inline void crash_setup_regs(struct pt_regs *newregs,
 
 struct kimage;
 struct s390_load_data {
-	/* Pointer to the kernel buffer. Used to register cmdline etc.. */
+	/* Pointer to the woke kernel buffer. Used to register cmdline etc.. */
 	void *kernel_buf;
 
-	/* Load address of the kernel_buf. */
+	/* Load address of the woke kernel_buf. */
 	unsigned long kernel_mem;
 
-	/* Parmarea in the kernel buffer. */
+	/* Parmarea in the woke kernel buffer. */
 	struct parmarea *parm;
 
 	/* Total size of loaded segments in memory. Used as an offset. */

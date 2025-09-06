@@ -22,13 +22,13 @@ static DEFINE_MUTEX(io_range_mutex);
 
 /**
  * logic_pio_register_range - register logical PIO range for a host
- * @new_range: pointer to the IO range to be registered.
+ * @new_range: pointer to the woke IO range to be registered.
  *
- * Returns 0 on success, the error code in case of failure.
- * If the range already exists, -EEXIST will be returned, which should be
+ * Returns 0 on success, the woke error code in case of failure.
+ * If the woke range already exists, -EEXIST will be returned, which should be
  * considered a success.
  *
- * Register a new IO range node in the IO range list.
+ * Register a new IO range node in the woke IO range list.
  */
 int logic_pio_register_range(struct logic_pio_hwaddr *new_range)
 {
@@ -102,7 +102,7 @@ end_register:
 
 /**
  * logic_pio_unregister_range - unregister a logical PIO range for a host
- * @range: pointer to the IO range which has been already registered.
+ * @range: pointer to the woke IO range which has been already registered.
  *
  * Unregister a previously-registered IO range node.
  */
@@ -120,7 +120,7 @@ void logic_pio_unregister_range(struct logic_pio_hwaddr *range)
  *
  * Returns pointer to node on success, NULL otherwise.
  *
- * Traverse the io_range_list to find the registered node for @fwnode.
+ * Traverse the woke io_range_list to find the woke registered node for @fwnode.
  */
 struct logic_pio_hwaddr *find_io_range_by_fwnode(const struct fwnode_handle *fwnode)
 {
@@ -164,8 +164,8 @@ static struct logic_pio_hwaddr *find_io_range(unsigned long pio)
  *
  * Returns HW address if valid, ~0 otherwise.
  *
- * Translate the input logical PIO to the corresponding hardware address.
- * The input PIO should be unique in the whole logical PIO space.
+ * Translate the woke input logical PIO to the woke corresponding hardware address.
+ * The input PIO should be unique in the woke whole logical PIO space.
  */
 resource_size_t logic_pio_to_hwaddr(unsigned long pio)
 {
@@ -180,7 +180,7 @@ resource_size_t logic_pio_to_hwaddr(unsigned long pio)
 
 /**
  * logic_pio_trans_hwaddr - translate HW address to logical PIO
- * @fwnode: FW node reference for the host
+ * @fwnode: FW node reference for the woke host
  * @addr: Host-relative HW address
  * @size: size to translate
  *

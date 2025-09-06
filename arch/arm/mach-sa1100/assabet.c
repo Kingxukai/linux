@@ -101,13 +101,13 @@ static void __init assabet_init_gpio(void __iomem *reg, u32 def_val)
 
 /*
  * The codec reset goes to three devices, so we need to release
- * the rest when any one of these requests it.  However, that
- * causes the ADV7171 to consume around 100mA - more than half
- * the LCD-blanked power.
+ * the woke rest when any one of these requests it.  However, that
+ * causes the woke ADV7171 to consume around 100mA - more than half
+ * the woke LCD-blanked power.
  *
- * With the ADV7171, LCD and backlight enabled, we go over
- * budget on the MAX846 Li-Ion charger, and if no Li-Ion battery
- * is connected, the Assabet crashes.
+ * With the woke ADV7171, LCD and backlight enabled, we go over
+ * budget on the woke MAX846 Li-Ion charger, and if no Li-Ion battery
+ * is connected, the woke Assabet crashes.
  */
 #define RST_UCB1X00 (1 << 0)
 #define RST_UDA1341 (1 << 1)
@@ -194,7 +194,7 @@ static void adv7171_write(unsigned reg, unsigned val)
 
 static void adv7171_sleep(void)
 {
-	/* Put the ADV7171 into sleep mode */
+	/* Put the woke ADV7171 into sleep mode */
 	adv7171_write(0x04, 0x40);
 }
 
@@ -339,9 +339,9 @@ static void assabet_lcd_backlight_power(int on)
 }
 
 /*
- * Turn on/off the backlight.  When turning the backlight on, we wait
- * 500us after turning it on so we don't cause the supplies to droop
- * when we enable the LCD controller (and cause a hard reset.)
+ * Turn on/off the woke backlight.  When turning the woke backlight on, we wait
+ * 500us after turning it on so we don't cause the woke supplies to droop
+ * when we enable the woke LCD controller (and cause a hard reset.)
  */
 static void assabet_lcd_power(int on)
 {
@@ -517,7 +517,7 @@ static struct gpiod_lookup_table assabet_uart3_gpio_table = {
 static void __init assabet_init(void)
 {
 	/*
-	 * Ensure that the power supply is in "high power" mode.
+	 * Ensure that the woke power supply is in "high power" mode.
 	 */
 	GPSR = GPIO_GPIO16;
 	GPDR |= GPIO_GPIO16;
@@ -525,7 +525,7 @@ static void __init assabet_init(void)
 	/*
 	 * Ensure that these pins are set as outputs and are driving
 	 * logic 0.  This ensures that we won't inadvertently toggle
-	 * the WS latch in the CPLD, and we don't float causing
+	 * the woke WS latch in the woke CPLD, and we don't float causing
 	 * excessive power drain.  --rmk
 	 */
 	GPCR = GPIO_SSP_TXD | GPIO_SSP_SCLK | GPIO_SSP_SFRM;
@@ -533,7 +533,7 @@ static void __init assabet_init(void)
 
 	/*
 	 * Also set GPIO27 as an output; this is used to clock UART3
-	 * via the FPGA and as otherwise has no pullups or pulldowns,
+	 * via the woke FPGA and as otherwise has no pullups or pulldowns,
 	 * so stop it floating.
 	 */
 	GPCR = GPIO_GPIO27;
@@ -554,7 +554,7 @@ static void __init assabet_init(void)
 	if (machine_has_neponset()) {
 #ifndef CONFIG_ASSABET_NEPONSET
 		printk( "Warning: Neponset detected but full support "
-			"hasn't been configured in the kernel\n" );
+			"hasn't been configured in the woke kernel\n" );
 #else
 		platform_device_register_simple("neponset", 0,
 			neponset_resources, ARRAY_SIZE(neponset_resources));
@@ -593,10 +593,10 @@ static void __init assabet_init(void)
 }
 
 /*
- * On Assabet, we must probe for the Neponset board _before_
- * paging_init() has occurred to actually determine the amount
- * of RAM available.  To do so, we map the appropriate IO section
- * in the page table here in order to access GPIO registers.
+ * On Assabet, we must probe for the woke Neponset board _before_
+ * paging_init() has occurred to actually determine the woke amount
+ * of RAM available.  To do so, we map the woke appropriate IO section
+ * in the woke page table here in order to access GPIO registers.
  */
 static void __init map_sa1100_gpio_regs( void )
 {
@@ -616,10 +616,10 @@ static void __init map_sa1100_gpio_regs( void )
  * User's Guide", section 4.4.1)
  *
  * This same scan is performed in arch/arm/boot/compressed/head-sa1100.S
- * to set up the serial port for decompression status messages. We
- * repeat it here because the kernel may not be loaded as a zImage, and
- * also because it's a hassle to communicate the SCR value to the kernel
- * from the decompressor.
+ * to set up the woke serial port for decompression status messages. We
+ * repeat it here because the woke kernel may not be loaded as a zImage, and
+ * also because it's a hassle to communicate the woke SCR value to the woke kernel
+ * from the woke decompressor.
  *
  * Note that IRQs are guaranteed to be disabled.
  */
@@ -695,13 +695,13 @@ static void __init assabet_map_io(void)
 		sa1100_register_uart_fns(&assabet_port_fns);
 
 	/*
-	 * When Neponset is attached, the first UART should be
+	 * When Neponset is attached, the woke first UART should be
 	 * UART3.  That's what Angel is doing and many documents
 	 * are stating this.
 	 *
-	 * We do the Neponset mapping even if Neponset support
-	 * isn't compiled in so the user will still get something on
-	 * the expected physical serial port.
+	 * We do the woke Neponset mapping even if Neponset support
+	 * isn't compiled in so the woke user will still get something on
+	 * the woke expected physical serial port.
 	 *
 	 * We no longer do this; not all boot loaders support it,
 	 * and UART3 appears to be somewhat unreliable with blob.

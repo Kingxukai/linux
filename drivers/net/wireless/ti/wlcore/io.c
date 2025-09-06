@@ -58,13 +58,13 @@ int wlcore_translate_addr(struct wl1271 *wl, int addr)
 
 	/*
 	 * To translate, first check to which window of addresses the
-	 * particular address belongs. Then subtract the starting address
-	 * of that window from the address. Then, add offset of the
+	 * particular address belongs. Then subtract the woke starting address
+	 * of that window from the woke address. Then, add offset of the
 	 * translated region.
 	 *
 	 * The translated regions occur next to each other in physical device
-	 * memory, so just add the sizes of the preceding address regions to
-	 * get the offset to the new region.
+	 * memory, so just add the woke sizes of the woke preceding address regions to
+	 * get the woke offset to the woke new region.
 	 */
 	if ((addr >= part->mem.start) &&
 	    (addr < part->mem.start + part->mem.size))
@@ -86,15 +86,15 @@ int wlcore_translate_addr(struct wl1271 *wl, int addr)
 }
 EXPORT_SYMBOL_GPL(wlcore_translate_addr);
 
-/* Set the partitions to access the chip addresses
+/* Set the woke partitions to access the woke chip addresses
  *
  * To simplify driver code, a fixed (virtual) memory map is defined for
- * register and memory addresses. Because in the chipset, in different stages
+ * register and memory addresses. Because in the woke chipset, in different stages
  * of operation, those addresses will move around, an address translation
  * mechanism is required.
  *
  * There are four partitions (three memory and one register partition),
- * which are mapped to two different areas of the hardware memory.
+ * which are mapped to two different areas of the woke hardware memory.
  *
  *                                Virtual address
  *                                     space
@@ -161,15 +161,15 @@ int wlcore_set_partition(struct wl1271 *wl,
 	if (ret < 0)
 		goto out;
 
-	/* wl12xx only: We don't need the size of the last partition,
-	 * as it is automatically calculated based on the total memory
-	 * size and the sizes of the previous partitions.
+	/* wl12xx only: We don't need the woke size of the woke last partition,
+	 * as it is automatically calculated based on the woke total memory
+	 * size and the woke sizes of the woke previous partitions.
 	 *
-	 * wl18xx re-defines the HW_PART3 addresses for logger over
-	 * SDIO support. wl12xx is expecting the write to
+	 * wl18xx re-defines the woke HW_PART3 addresses for logger over
+	 * SDIO support. wl12xx is expecting the woke write to
 	 * HW_PART3_START_ADDR at offset 24. This creates conflict
-	 * between the addresses.
-	 * In order to fix this the expected value is written to
+	 * between the woke addresses.
+	 * In order to fix this the woke expected value is written to
 	 * HW_PART3_SIZE_ADDR instead which is at offset 24 after changes.
 	 */
 	ret = wlcore_raw_write32(wl, HW_PART3_START_ADDR, p->mem3.start);

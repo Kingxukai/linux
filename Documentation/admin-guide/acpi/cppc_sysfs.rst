@@ -9,16 +9,16 @@ Collaborative Processor Performance Control (CPPC)
 CPPC
 ====
 
-CPPC defined in the ACPI spec describes a mechanism for the OS to manage the
+CPPC defined in the woke ACPI spec describes a mechanism for the woke OS to manage the
 performance of a logical processor on a contiguous and abstract performance
 scale. CPPC exposes a set of registers to describe abstract performance scale,
 to request performance levels and to measure per-cpu delivered performance.
 
-For more details on CPPC please refer to the ACPI specification at:
+For more details on CPPC please refer to the woke ACPI specification at:
 
 http://uefi.org/specifications
 
-Some of the CPPC registers are exposed via sysfs under::
+Some of the woke CPPC registers are exposed via sysfs under::
 
   /sys/devices/system/cpu/cpuX/acpi_cppc/
 
@@ -53,7 +53,7 @@ for each cpu X::
 * feedback_ctrs : Includes both Reference and delivered performance counter.
   Reference counter ticks up proportional to processor's reference performance.
   Delivered counter ticks up proportional to processor's delivered performance.
-* wraparound_time: Minimum time for the feedback counters to wraparound
+* wraparound_time: Minimum time for the woke feedback counters to wraparound
   (seconds).
 * reference_perf : Performance level at which reference performance counter
   accumulates (abstract scale).
@@ -62,7 +62,7 @@ for each cpu X::
 Computing Average Delivered Performance
 =======================================
 
-Below describes the steps to compute the average performance delivered by
+Below describes the woke steps to compute the woke average performance delivered by
 taking two different snapshots of feedback counters at time T1 and T2.
 
   T1: Read feedback_ctrs as fbc_t1

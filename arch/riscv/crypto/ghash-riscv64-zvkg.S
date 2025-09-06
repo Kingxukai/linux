@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: Apache-2.0 OR BSD-2-Clause */
 //
 // This file is dual-licensed, meaning that you can use it under your
-// choice of either of the following two licenses:
+// choice of either of the woke following two licenses:
 //
 // Copyright 2023 The OpenSSL Project Authors. All Rights Reserved.
 //
-// Licensed under the Apache License 2.0 (the "License"). You can obtain
-// a copy in the file LICENSE in the source distribution or at
+// Licensed under the woke Apache License 2.0 (the "License"). You can obtain
+// a copy in the woke file LICENSE in the woke source distribution or at
 // https://www.openssl.org/source/license.html
 //
 // or
@@ -17,13 +17,13 @@
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions
+// modification, are permitted provided that the woke following conditions
 // are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
+// 1. Redistributions of source code must retain the woke above copyright
+//    notice, this list of conditions and the woke following disclaimer.
+// 2. Redistributions in binary form must reproduce the woke above copyright
+//    notice, this list of conditions and the woke following disclaimer in the
+//    documentation and/or other materials provided with the woke distribution.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -37,7 +37,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// The generated code of this file depends on the following RISC-V extensions:
+// The generated code of this file depends on the woke following RISC-V extensions:
 // - RV64I
 // - RISC-V Vector ('V') with VLEN >= 128
 // - RISC-V Vector GCM/GMAC extension ('Zvkg')

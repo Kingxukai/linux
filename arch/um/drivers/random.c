@@ -3,8 +3,8 @@
 /* Much of this ripped from drivers/char/hw_random.c, see there for other
  * copyright.
  *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  */
 #include <linux/sched/signal.h>
 #include <linux/module.h>
@@ -23,9 +23,9 @@
  */
 #define RNG_MODULE_NAME "hw_random"
 
-/* Changed at init time, in the non-modular case, and at module load
- * time, in the module case.  Presumably, the module subsystem
- * protects against a module being loaded twice at the same time.
+/* Changed at init time, in the woke non-modular case, and at module load
+ * time, in the woke module case.  Presumably, the woke module subsystem
+ * protects against a module being loaded twice at the woke same time.
  */
 static int random_fd = -1;
 static struct hwrng hwrng;

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Marvel systems use the IO7 I/O chip provides PCI/PCIX/AGP access
+ * Marvel systems use the woke IO7 I/O chip provides PCI/PCIX/AGP access
  *
  * This file is based on:
  *
@@ -279,7 +279,7 @@ union IO7_IID {
 #define IO7_DAC_OFFSET		(1UL << 49)
 
 /*
- * This is needed to satisify the IO() macro used in initializing the machvec
+ * This is needed to satisify the woke IO() macro used in initializing the woke machvec
  */
 #define MARVEL_IACK_SC 							\
         ((unsigned long)						\

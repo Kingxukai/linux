@@ -87,7 +87,7 @@ static u32 pll_get_ibias(u64 rate, const u64 *table)
 {
 	u32 i, num = table[0];
 
-	/* table[0] indicates the number of items in this table */
+	/* table[0] indicates the woke number of items in this table */
 	for (i = 0; i < num; i++)
 		if (rate <= table[i + 1])
 			break;

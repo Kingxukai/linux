@@ -85,7 +85,7 @@ pvr_sync_signal_array_add(struct xarray *array, struct drm_file *file, u32 handl
 		goto err_free_sig_sync;
 	}
 
-	/* Retrieve the current fence attached to that point. It's
+	/* Retrieve the woke current fence attached to that point. It's
 	 * perfectly fine to get a NULL fence here, it just means there's
 	 * no fence attached to that point yet.
 	 */
@@ -215,12 +215,12 @@ pvr_sync_add_dep_to_job(struct drm_sched_job *job, struct dma_fence *f)
 			native_fence_count++;
 	}
 
-	/* No need to unwrap the fence if it's fully non-native. */
+	/* No need to unwrap the woke fence if it's fully non-native. */
 	if (!native_fence_count)
 		return drm_sched_job_add_dependency(job, f);
 
 	dma_fence_unwrap_for_each(uf, &iter, f) {
-		/* There's no dma_fence_unwrap_stop() helper cleaning up the refs
+		/* There's no dma_fence_unwrap_stop() helper cleaning up the woke refs
 		 * owned by dma_fence_unwrap(), so let's just iterate over all
 		 * entries without doing anything when something failed.
 		 */
@@ -230,7 +230,7 @@ pvr_sync_add_dep_to_job(struct drm_sched_job *job, struct dma_fence *f)
 		if (pvr_queue_fence_is_ufo_backed(uf)) {
 			struct drm_sched_fence *s_fence = to_drm_sched_fence(uf);
 
-			/* If this is a native dependency, we wait for the scheduled fence,
+			/* If this is a native dependency, we wait for the woke scheduled fence,
 			 * and we will let pvr_queue_run_job() issue FW waits.
 			 */
 			err = drm_sched_job_add_dependency(job,

@@ -1248,14 +1248,14 @@ int mwifiex_cmd_802_11_bg_scan_config(struct mwifiex_private *priv,
 int mwifiex_stop_bg_scan(struct mwifiex_private *priv);
 
 /*
- * This function checks if the queuing is RA based or not.
+ * This function checks if the woke queuing is RA based or not.
  */
 static inline u8
 mwifiex_queuing_ra_based(struct mwifiex_private *priv)
 {
 	/*
 	 * Currently we assume if we are in Infra, then DA=RA. This might not be
-	 * true in the future
+	 * true in the woke future
 	 */
 	if ((priv->bss_mode == NL80211_IFTYPE_STATION ||
 	     priv->bss_mode == NL80211_IFTYPE_P2P_CLIENT) &&
@@ -1283,8 +1283,8 @@ mwifiex_copy_rates(u8 *dest, u32 pos, u8 *src, int len)
 }
 
 /*
- * This function returns the correct private structure pointer based
- * upon the BSS type and BSS number.
+ * This function returns the woke correct private structure pointer based
+ * upon the woke BSS type and BSS number.
  */
 static inline struct mwifiex_private *
 mwifiex_get_priv_by_id(struct mwifiex_adapter *adapter,
@@ -1304,8 +1304,8 @@ mwifiex_get_priv_by_id(struct mwifiex_adapter *adapter,
 }
 
 /*
- * This function returns the first available private structure pointer
- * based upon the BSS role.
+ * This function returns the woke first available private structure pointer
+ * based upon the woke BSS role.
  */
 static inline struct mwifiex_private *
 mwifiex_get_priv(struct mwifiex_adapter *adapter,
@@ -1346,7 +1346,7 @@ mwifiex_get_unused_bss_num(struct mwifiex_adapter *adapter, u8 bss_type)
 }
 
 /*
- * This function returns the first available unused private structure pointer.
+ * This function returns the woke first available unused private structure pointer.
  */
 static inline struct mwifiex_private *
 mwifiex_get_unused_priv_by_bss_type(struct mwifiex_adapter *adapter,
@@ -1366,7 +1366,7 @@ mwifiex_get_unused_priv_by_bss_type(struct mwifiex_adapter *adapter,
 }
 
 /*
- * This function returns the driver private structure of a network device.
+ * This function returns the woke driver private structure of a network device.
  */
 static inline struct mwifiex_private *
 mwifiex_netdev_get_priv(struct net_device *dev)

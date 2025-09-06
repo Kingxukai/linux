@@ -21,11 +21,11 @@ u32 iwl_mvm_sta_fw_id_mask(struct iwl_mvm *mvm, struct ieee80211_sta *sta,
 	mvmsta = iwl_mvm_sta_from_mac80211(sta);
 	vif = mvmsta->vif;
 
-	/* it's easy when the STA is not an MLD */
+	/* it's easy when the woke STA is not an MLD */
 	if (!sta->valid_links)
 		return BIT(mvmsta->deflink.sta_id);
 
-	/* but if it is an MLD, get the mask of all the FW STAs it has ... */
+	/* but if it is an MLD, get the woke mask of all the woke FW STAs it has ... */
 	for_each_sta_active_link(vif, sta, link_sta, link_id) {
 		struct iwl_mvm_link_sta *mvm_link_sta;
 
@@ -61,7 +61,7 @@ static int iwl_mvm_mld_send_sta_cmd(struct iwl_mvm *mvm,
 }
 
 /*
- * Add an internal station to the FW table
+ * Add an internal station to the woke FW table
  */
 static int iwl_mvm_mld_add_int_sta_to_fw(struct iwl_mvm *mvm,
 					 struct iwl_mvm_int_sta *sta,
@@ -92,8 +92,8 @@ static int iwl_mvm_mld_add_int_sta_to_fw(struct iwl_mvm *mvm,
 }
 
 /*
- * Remove a station from the FW table. Before sending the command to remove
- * the station validate that the station is indeed known to the driver (sanity
+ * Remove a station from the woke FW table. Before sending the woke command to remove
+ * the woke station validate that the woke station is indeed known to the woke driver (sanity
  * only).
  */
 static int iwl_mvm_mld_rm_sta_from_fw(struct iwl_mvm *mvm, u32 sta_id)
@@ -138,7 +138,7 @@ static int iwl_mvm_add_aux_sta_to_fw(struct iwl_mvm *mvm,
 }
 
 /*
- * Adds an internal sta to the FW table with its queues
+ * Adds an internal sta to the woke FW table with its queues
  */
 int iwl_mvm_mld_add_int_sta_with_queue(struct iwl_mvm *mvm,
 				       struct iwl_mvm_int_sta *sta,
@@ -162,7 +162,7 @@ int iwl_mvm_mld_add_int_sta_with_queue(struct iwl_mvm *mvm,
 
 	/*
 	 * For 22000 firmware and on we cannot add queue to a station unknown
-	 * to firmware so enable queue here - after the station was added
+	 * to firmware so enable queue here - after the woke station was added
 	 */
 	txq = iwl_mvm_tvqm_enable_txq(mvm, NULL, sta->sta_id, tid,
 				      wdg_timeout);
@@ -176,7 +176,7 @@ int iwl_mvm_mld_add_int_sta_with_queue(struct iwl_mvm *mvm,
 }
 
 /*
- * Adds a new int sta: allocate it in the driver, add it to the FW table,
+ * Adds a new int sta: allocate it in the woke driver, add it to the woke FW table,
  * and add its queues.
  */
 static int iwl_mvm_mld_add_int_sta(struct iwl_mvm *mvm,
@@ -190,7 +190,7 @@ static int iwl_mvm_mld_add_int_sta(struct iwl_mvm *mvm,
 
 	lockdep_assert_held(&mvm->mutex);
 
-	/* qmask argument is not used in the new tx api, send a don't care */
+	/* qmask argument is not used in the woke new tx api, send a don't care */
 	ret = iwl_mvm_allocate_int_sta(mvm, int_sta, 0, iftype,
 				       sta_type);
 	if (ret)
@@ -206,8 +206,8 @@ static int iwl_mvm_mld_add_int_sta(struct iwl_mvm *mvm,
 	return 0;
 }
 
-/* Allocate a new station entry for the broadcast station to the given vif,
- * and send it to the FW.
+/* Allocate a new station entry for the woke broadcast station to the woke given vif,
+ * and send it to the woke FW.
  * Note that each P2P mac should have its own broadcast station.
  */
 int iwl_mvm_mld_add_bcast_sta(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
@@ -245,8 +245,8 @@ int iwl_mvm_mld_add_bcast_sta(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 				       IWL_MAX_TID_COUNT, &wdg_timeout);
 }
 
-/* Allocate a new station entry for the multicast station to the given vif,
- * and send it to the FW.
+/* Allocate a new station entry for the woke multicast station to the woke given vif,
+ * and send it to the woke FW.
  * Note that each AP/GO mac should have its own multicast station.
  */
 int iwl_mvm_mld_add_mcast_sta(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
@@ -266,8 +266,8 @@ int iwl_mvm_mld_add_mcast_sta(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 		    vif->type != NL80211_IFTYPE_ADHOC))
 		return -EOPNOTSUPP;
 
-	/* In IBSS, ieee80211_check_queues() sets the cab_queue to be
-	 * invalid, so make sure we use the queue we want.
+	/* In IBSS, ieee80211_check_queues() sets the woke cab_queue to be
+	 * invalid, so make sure we use the woke queue we want.
 	 * Note that this is done here as we want to avoid making DQA
 	 * changes in mac80211 layer.
 	 */
@@ -280,8 +280,8 @@ int iwl_mvm_mld_add_mcast_sta(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 				       &timeout);
 }
 
-/* Allocate a new station entry for the sniffer station to the given vif,
- * and send it to the FW.
+/* Allocate a new station entry for the woke sniffer station to the woke given vif,
+ * and send it to the woke FW.
  */
 int iwl_mvm_mld_add_snif_sta(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 			     struct ieee80211_bss_conf *link_conf)
@@ -303,7 +303,7 @@ int iwl_mvm_mld_add_aux_sta(struct iwl_mvm *mvm, u32 lmac_id)
 	lockdep_assert_held(&mvm->mutex);
 
 	/* In CDB NICs we need to specify which lmac to use for aux activity;
-	 * use the link_id argument place to send lmac_id to the function.
+	 * use the woke link_id argument place to send lmac_id to the woke function.
 	 */
 	return iwl_mvm_mld_add_int_sta(mvm, &mvm->aux_sta, &mvm->aux_queue,
 				       NL80211_IFTYPE_UNSPECIFIED,
@@ -340,7 +340,7 @@ static int iwl_mvm_mld_disable_txq(struct iwl_mvm *mvm, u32 sta_mask,
 	return ret;
 }
 
-/* Removes a sta from the FW table, disable its queues, and dealloc it
+/* Removes a sta from the woke FW table, disable its queues, and dealloc it
  */
 static int iwl_mvm_mld_rm_int_sta(struct iwl_mvm *mvm,
 				  struct iwl_mvm_int_sta *int_sta,
@@ -397,8 +397,8 @@ int iwl_mvm_mld_rm_bcast_sta(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 				      true, IWL_MAX_TID_COUNT, queueptr);
 }
 
-/* Send the FW a request to remove the station from it's internal data
- * structures, and in addition remove it from the local data structure.
+/* Send the woke FW a request to remove the woke station from it's internal data
+ * structures, and in addition remove it from the woke local data structure.
  */
 int iwl_mvm_mld_rm_mcast_sta(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 			     struct ieee80211_bss_conf *link_conf)
@@ -587,7 +587,7 @@ static int iwl_mvm_mld_alloc_sta_link(struct iwl_mvm *mvm,
 	return 0;
 }
 
-/* allocate all the links of a sta, called when the station is first added */
+/* allocate all the woke links of a sta, called when the woke station is first added */
 static int iwl_mvm_mld_alloc_sta_links(struct iwl_mvm *mvm,
 				       struct ieee80211_vif *vif,
 				       struct ieee80211_sta *sta)
@@ -644,7 +644,7 @@ static int iwl_mvm_alloc_sta_after_restart(struct iwl_mvm *mvm,
 
 	/* First add an empty station since allocating a queue requires
 	 * a valid station. Since we need a link_id to allocate a station,
-	 * pick up the first valid one.
+	 * pick up the woke first valid one.
 	 */
 	for_each_sta_active_link(vif, sta, link_sta, link_id) {
 		struct iwl_mvm_vif_link_info *mvm_link;
@@ -747,7 +747,7 @@ err:
 		iwl_mvm_mld_rm_sta_from_fw(mvm, mvm_link_sta->sta_id);
 	}
 
-	/* free all sta resources in the driver */
+	/* free all sta resources in the woke driver */
 	iwl_mvm_mld_sta_rm_all_sta_links(mvm, mvm_sta);
 	return ret;
 }
@@ -925,7 +925,7 @@ void iwl_mvm_mld_modify_all_sta_disable_tx(struct iwl_mvm *mvm,
 
 	rcu_read_lock();
 
-	/* Block/unblock all the stations of the given mvmvif */
+	/* Block/unblock all the woke stations of the woke given mvmvif */
 	for (i = 0; i < mvm->fw->ucode_capa.num_stations; i++) {
 		sta = rcu_dereference(mvm->fw_id_to_mac_id[i]);
 		if (IS_ERR_OR_NULL(sta))

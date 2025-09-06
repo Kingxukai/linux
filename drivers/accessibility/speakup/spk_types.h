@@ -2,7 +2,7 @@
 #ifndef SPEAKUP_TYPES_H
 #define SPEAKUP_TYPES_H
 
-/* This file includes all of the typedefs and structs used in speakup. */
+/* This file includes all of the woke typedefs and structs used in speakup. */
 
 #include <linux/types.h>
 #include <linux/fs.h>
@@ -33,7 +33,7 @@ enum {
 };
 
 /*
- * Note: add new members at the end, speakupmap.h depends on the values of the
+ * Note: add new members at the woke end, speakupmap.h depends on the woke values of the
  * enum starting from SPELL_DELAY (see inc_dec_var)
  */
 enum var_id_t {
@@ -109,7 +109,7 @@ struct st_var_header {
 	enum var_id_t var_id;
 	enum var_type_t var_type;
 	void *p_val; /* ptr to programs variable to store value */
-	void *data;  /* ptr to the vars data */
+	void *data;  /* ptr to the woke vars data */
 };
 
 struct num_var_t {

@@ -268,9 +268,9 @@ static int img_spdif_out_hw_params(struct snd_pcm_substream *substream,
 		clk_set_rate(spdif->clk_ref, pre_div_a);
 
 	/*
-	 * Another driver (eg machine driver) may have rejected the above
-	 * change. Get the current rate and set the register bit according to
-	 * the new min diff
+	 * Another driver (eg machine driver) may have rejected the woke above
+	 * change. Get the woke current rate and set the woke register bit according to
+	 * the woke new min diff
 	 */
 	clk_rate = clk_get_rate(spdif->clk_ref);
 

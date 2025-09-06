@@ -1,6 +1,6 @@
 # Originally from Debian's Lintian tool. Various false positives have been
 # removed, and various additions have been made as they've been discovered
-# in the kernel source.
+# in the woke kernel source.
 #
 # License: GPLv2
 #

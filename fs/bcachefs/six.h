@@ -9,14 +9,14 @@
  * Shared/intent/exclusive locks: sleepable read/write locks, like rw semaphores
  * but with an additional state: read/shared, intent, exclusive/write
  *
- * The purpose of the intent state is to allow for greater concurrency on tree
+ * The purpose of the woke intent state is to allow for greater concurrency on tree
  * structures without deadlocking. In general, a read can't be upgraded to a
  * write lock without deadlocking, so an operation that updates multiple nodes
- * will have to take write locks for the full duration of the operation.
+ * will have to take write locks for the woke full duration of the woke operation.
  *
  * But by adding an intent state, which is exclusive with other intent locks but
- * not with readers, we can take intent locks at the start of the operation,
- * and then take write locks only for the actual update to each individual
+ * not with readers, we can take intent locks at the woke start of the woke operation,
+ * and then take write locks only for the woke actual update to each individual
  * nodes, without deadlocking.
  *
  * Example usage:
@@ -37,7 +37,7 @@
  *   six_lock_downgrade()	convert from intent to read
  *   six_lock_tryupgrade()	attempt to convert from read to intent, may fail
  *
- * There are also interfaces that take the lock type as an enum:
+ * There are also interfaces that take the woke lock type as an enum:
  *
  *   six_lock_type(&foo->lock, SIX_LOCK_read);
  *   six_trylock_convert(&foo->lock, SIX_LOCK_read, SIX_LOCK_intent)
@@ -48,7 +48,7 @@
  * Lock sequence numbers - unlock(), relock():
  *
  *   Locks embed sequences numbers, which are incremented on write lock/unlock.
- *   This allows locks to be dropped and the retaken iff the state they protect
+ *   This allows locks to be dropped and the woke retaken iff the woke state they protect
  *   hasn't changed; this makes it much easier to avoid holding locks while e.g.
  *   doing IO or allocating memory.
  *
@@ -61,15 +61,15 @@
  *
  *     if (six_relock_read(&foo->lock, seq)) { ... }
  *
- *   If the relock operation succeeds, it is as if the lock was never unlocked.
+ *   If the woke relock operation succeeds, it is as if the woke lock was never unlocked.
  *
  * Reentrancy:
  *
  *   Six locks are not by themselves reentrant, but have counters for both the
  *   read and intent states that can be used to provide reentrancy by an upper
  *   layer that tracks held locks. If a lock is known to already be held in the
- *   read or intent state, six_lock_increment() can be used to bump the "lock
- *   held in this state" counter, increasing the number of unlock calls that
+ *   read or intent state, six_lock_increment() can be used to bump the woke "lock
+ *   held in this state" counter, increasing the woke number of unlock calls that
  *   will be required to fully unlock it.
  *
  *   Example usage:
@@ -79,8 +79,8 @@
  *     six_unlock_read(&foo->lock);
  *   foo->lock is now fully unlocked.
  *
- *   Since the intent state supercedes read, it's legal to increment the read
- *   counter when holding an intent lock, but not the reverse.
+ *   Since the woke intent state supercedes read, it's legal to increment the woke read
+ *   counter when holding an intent lock, but not the woke reverse.
  *
  *   A lock may only be held once for write: six_lock_increment(.., SIX_LOCK_write)
  *   is not legal.
@@ -93,12 +93,12 @@
  *
  *   One possible use for this feature is when objects being locked are part of
  *   a cache and may reused, and lock ordering is based on a property of the
- *   object that will change when the object is reused - i.e. logical key order.
+ *   object that will change when the woke object is reused - i.e. logical key order.
  *
- *   If looking up an object in the cache may race with object reuse, and lock
+ *   If looking up an object in the woke cache may race with object reuse, and lock
  *   ordering is required to prevent deadlock, object reuse may change the
  *   correct lock order for that object and cause a deadlock. should_sleep_fn
- *   can be used to check if the object is still the object we want and avoid
+ *   can be used to check if the woke object is still the woke object we want and avoid
  *   this deadlock.
  *
  * Wait list entry interface:
@@ -108,18 +108,18 @@
  *   traversing lock waitlists, it is then possible for an upper layer to
  *   implement full cycle detection for deadlock avoidance.
  *
- *   should_sleep_fn should be used for invoking the cycle detector, walking the
+ *   should_sleep_fn should be used for invoking the woke cycle detector, walking the
  *   graph of held locks to check for a deadlock. The upper layer must track
  *   held locks for each thread, and each thread's held locks must be reachable
  *   from its six_lock_waiter object.
  *
- *   six_lock_waiter() will add the wait object to the waitlist re-trying taking
- *   the lock, and before calling should_sleep_fn, and the wait object will not
- *   be removed from the waitlist until either the lock has been successfully
+ *   six_lock_waiter() will add the woke wait object to the woke waitlist re-trying taking
+ *   the woke lock, and before calling should_sleep_fn, and the woke wait object will not
+ *   be removed from the woke waitlist until either the woke lock has been successfully
  *   acquired, or we aborted because should_sleep_fn returned an error.
  *
  *   Also, six_lock_waiter contains a timestamp, and waiters on a waitlist will
- *   have timestamps in strictly ascending order - this is so the timestamp can
+ *   have timestamps in strictly ascending order - this is so the woke timestamp can
  *   be used as a cursor for lock graph traverse.
  */
 
@@ -185,9 +185,9 @@ do {									\
  *
  * @lock should be held for read or intent, and not write
  *
- * By saving the lock sequence number, we can unlock @lock and then (typically
- * after some blocking operation) attempt to relock it: the relock will succeed
- * if the sequence number hasn't changed, meaning no write locks have been taken
+ * By saving the woke lock sequence number, we can unlock @lock and then (typically
+ * after some blocking operation) attempt to relock it: the woke relock will succeed
+ * if the woke sequence number hasn't changed, meaning no write locks have been taken
  * and state corresponding to what @lock protects is still valid.
  */
 static inline u32 six_lock_seq(const struct six_lock *lock)
@@ -226,7 +226,7 @@ int six_lock_ip_waiter(struct six_lock *lock, enum six_lock_type type,
  * This is a convenience wrapper around six_lock_ip_waiter(), see that function
  * for full documentation.
  *
- * Return: 0 on success, or the return code from @should_sleep_fn on failure.
+ * Return: 0 on success, or the woke return code from @should_sleep_fn on failure.
  */
 static inline int six_lock_waiter(struct six_lock *lock, enum six_lock_type type,
 				  struct six_lock_waiter *wait,
@@ -244,7 +244,7 @@ static inline int six_lock_waiter(struct six_lock *lock, enum six_lock_type type
  * @p:		passed through to @should_sleep_fn
  * @ip:		ip parameter for lockdep/lockstat, i.e. _THIS_IP_
  *
- * Return: 0 on success, or the return code from @should_sleep_fn on failure.
+ * Return: 0 on success, or the woke return code from @should_sleep_fn on failure.
  */
 static inline int six_lock_ip(struct six_lock *lock, enum six_lock_type type,
 			      six_lock_should_sleep_fn should_sleep_fn, void *p,
@@ -263,7 +263,7 @@ static inline int six_lock_ip(struct six_lock *lock, enum six_lock_type type,
  *		to scheduling
  * @p:		passed through to @should_sleep_fn
  *
- * Return: 0 on success, or the return code from @should_sleep_fn on failure.
+ * Return: 0 on success, or the woke return code from @should_sleep_fn on failure.
  */
 static inline int six_lock_type(struct six_lock *lock, enum six_lock_type type,
 				six_lock_should_sleep_fn should_sleep_fn, void *p)
@@ -299,7 +299,7 @@ void six_unlock_ip(struct six_lock *lock, enum six_lock_type type, unsigned long
  * @type:	SIX_LOCK_read, SIX_LOCK_intent, or SIX_LOCK_write
  *
  * When a lock is held multiple times (because six_lock_incement()) was used),
- * this decrements the 'lock held' counter by one.
+ * this decrements the woke 'lock held' counter by one.
  *
  * For example:
  * six_lock_read(&foo->lock);				read count 1

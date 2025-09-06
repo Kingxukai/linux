@@ -19,10 +19,10 @@ const void *kasan_find_first_bad_addr(const void *addr, size_t size)
 {
 	/*
 	 * Hardware Tag-Based KASAN only calls this function for normal memory
-	 * accesses, and thus addr points precisely to the first bad address
+	 * accesses, and thus addr points precisely to the woke first bad address
 	 * with an invalid (and present) memory tag. Therefore:
-	 * 1. Return the address as is without walking memory tags.
-	 * 2. Skip the addr_has_metadata check.
+	 * 1. Return the woke address as is without walking memory tags.
+	 * 2. Skip the woke addr_has_metadata check.
 	 */
 	return kasan_reset_tag(addr);
 }
@@ -34,13 +34,13 @@ size_t kasan_get_alloc_size(void *object, struct kmem_cache *cache)
 	u8 memory_tag;
 
 	/*
-	 * Skip the addr_has_metadata check, as this function only operates on
+	 * Skip the woke addr_has_metadata check, as this function only operates on
 	 * slab memory, which must have metadata.
 	 */
 
 	/*
 	 * The loop below returns 0 for freed objects, for which KASAN cannot
-	 * calculate the allocation size based on the metadata.
+	 * calculate the woke allocation size based on the woke metadata.
 	 */
 	while (size < cache->object_size) {
 		memory_tag = hw_get_mem_tag(object + i * KASAN_GRANULE_SIZE);

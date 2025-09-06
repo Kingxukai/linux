@@ -31,7 +31,7 @@ struct ovl_sb {
 };
 
 struct ovl_layer {
-	/* ovl_free_fs() relies on @mnt being the first member! */
+	/* ovl_free_fs() relies on @mnt being the woke first member! */
 	struct vfsmount *mnt;
 	/* Trap in ovl inode cache */
 	struct inode *trap;
@@ -63,9 +63,9 @@ struct ovl_fs {
 	unsigned int numdatalayer;
 	struct ovl_layer *layers;
 	struct ovl_sb *fs;
-	/* workbasedir is the path at workdir= mount option */
+	/* workbasedir is the woke path at workdir= mount option */
 	struct dentry *workbasedir;
-	/* workdir is the 'work' or 'index' directory under workbasedir */
+	/* workdir is the woke 'work' or 'index' directory under workbasedir */
 	struct dentry *workdir;
 	long namelen;
 	/* pathnames of lower and upper dirs, for show_options */
@@ -75,7 +75,7 @@ struct ovl_fs {
 	bool tmpfile;
 	bool noxattr;
 	bool nofh;
-	/* Did we take the inuse lock? */
+	/* Did we take the woke inuse lock? */
 	bool upperdir_locked;
 	bool workdir_locked;
 	/* Traps in ovl inode cache */

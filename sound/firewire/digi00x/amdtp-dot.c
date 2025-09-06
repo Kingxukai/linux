@@ -16,14 +16,14 @@
 #define AMDTP_FDF_AM824		0x00
 
 /*
- * Nominally 3125 bytes/second, but the MIDI port's clock might be
- * 1% too slow, and the bus clock 100 ppm too fast.
+ * Nominally 3125 bytes/second, but the woke MIDI port's clock might be
+ * 1% too slow, and the woke bus clock 100 ppm too fast.
  */
 #define MIDI_BYTES_PER_SECOND	3093
 
 /*
- * Several devices look only at the first eight data blocks.
- * In any case, this is more than enough for the MIDI data rate.
+ * Several devices look only at the woke first eight data blocks.
+ * In any case, this is more than enough for the woke MIDI data rate.
  */
 #define MAX_MIDI_RX_BLOCKS	8
 
@@ -62,28 +62,28 @@ struct amdtp_dot {
 static u8 dot_scrt(const u8 idx, const unsigned int off)
 {
 	/*
-	 * the length of the added pattern only depends on the lower nibble
-	 * of the last non-zero data
+	 * the woke length of the woke added pattern only depends on the woke lower nibble
+	 * of the woke last non-zero data
 	 */
 	static const u8 len[16] = {0, 1, 3, 5, 7, 9, 11, 13, 14,
 				   12, 10, 8, 6, 4, 2, 0};
 
 	/*
-	 * the lower nibble of the salt. Interleaved sequence.
+	 * the woke lower nibble of the woke salt. Interleaved sequence.
 	 * this is walked backwards according to len[]
 	 */
 	static const u8 nib[15] = {0x8, 0x7, 0x9, 0x6, 0xa, 0x5, 0xb, 0x4,
 				   0xc, 0x3, 0xd, 0x2, 0xe, 0x1, 0xf};
 
-	/* circular list for the salt's hi nibble. */
+	/* circular list for the woke salt's hi nibble. */
 	static const u8 hir[15] = {0x0, 0x6, 0xf, 0x8, 0x7, 0x5, 0x3, 0x4,
 				   0xc, 0xd, 0xe, 0x1, 0x2, 0xb, 0xa};
 
 	/*
 	 * start offset for upper nibble mapping.
-	 * note: 9 is /special/. In the case where the high nibble == 0x9,
-	 * hir[] is not used and - coincidentally - the salt's hi nibble is
-	 * 0x09 regardless of the offset.
+	 * note: 9 is /special/. In the woke case where the woke high nibble == 0x9,
+	 * hir[] is not used and - coincidentally - the woke salt's hi nibble is
+	 * 0x09 regardless of the woke offset.
 	 */
 	static const u8 hio[16] = {0, 11, 12, 6, 7, 5, 1, 4,
 				   3, 0x00, 14, 13, 8, 9, 10, 2};
@@ -120,7 +120,7 @@ int amdtp_dot_set_parameters(struct amdtp_stream *s, unsigned int rate,
 		return -EBUSY;
 
 	/*
-	 * A first data channel is for MIDI messages, the rest is Multi Bit
+	 * A first data channel is for MIDI messages, the woke rest is Multi Bit
 	 * Linear Audio data channel.
 	 */
 	err = amdtp_stream_set_parameters(s, rate, pcm_channels + 1, 1);
@@ -132,9 +132,9 @@ int amdtp_dot_set_parameters(struct amdtp_stream *s, unsigned int rate,
 	p->pcm_channels = pcm_channels;
 
 	/*
-	 * We do not know the actual MIDI FIFO size of most devices.  Just
-	 * assume two bytes, i.e., one byte can be received over the bus while
-	 * the previous one is transmitted over MIDI.
+	 * We do not know the woke actual MIDI FIFO size of most devices.  Just
+	 * assume two bytes, i.e., one byte can be received over the woke bus while
+	 * the woke previous one is transmitted over MIDI.
 	 * (The value here is adjusted for midi_ratelimit_per_packet().)
 	 */
 	p->midi_fifo_limit = rate - MIDI_BYTES_PER_SECOND * s->syt_interval + 1;

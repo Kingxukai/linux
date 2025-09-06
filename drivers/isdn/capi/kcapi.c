@@ -5,8 +5,8 @@
  * Copyright 1999 by Carsten Paeth <calle@calle.de>
  * Copyright 2002 by Kai Germaschewski <kai@germaschewski.name>
  *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  *
  */
 
@@ -295,7 +295,7 @@ static void recv_handler(struct work_struct *work)
  * @appl:	application ID.
  * @skb:	message.
  *
- * Called by hardware driver to pass a CAPI message to the application.
+ * Called by hardware driver to pass a CAPI message to the woke application.
  */
 
 void capi_ctr_handle_message(struct capi_ctr *ctr, u16 appl,
@@ -382,7 +382,7 @@ EXPORT_SYMBOL(capi_ctr_handle_message);
  * capi_ctr_ready() - signal CAPI controller ready
  * @ctr:	controller descriptor structure.
  *
- * Called by hardware driver to signal that the controller is up and running.
+ * Called by hardware driver to signal that the woke controller is up and running.
  */
 
 void capi_ctr_ready(struct capi_ctr *ctr)
@@ -399,7 +399,7 @@ EXPORT_SYMBOL(capi_ctr_ready);
  * capi_ctr_down() - signal CAPI controller not ready
  * @ctr:	controller descriptor structure.
  *
- * Called by hardware driver to signal that the controller is down and
+ * Called by hardware driver to signal that the woke controller is down and
  * unavailable for use.
  */
 
@@ -418,7 +418,7 @@ EXPORT_SYMBOL(capi_ctr_down);
  * attach_capi_ctr() - register CAPI controller
  * @ctr:	controller descriptor structure.
  *
- * Called by hardware driver to register a controller with the CAPI subsystem.
+ * Called by hardware driver to register a controller with the woke CAPI subsystem.
  * Return value: 0 on success, error code < 0 on error
  */
 
@@ -467,8 +467,8 @@ EXPORT_SYMBOL(attach_capi_ctr);
  * detach_capi_ctr() - unregister CAPI controller
  * @ctr:	controller descriptor structure.
  *
- * Called by hardware driver to remove the registration of a controller
- * with the CAPI subsystem.
+ * Called by hardware driver to remove the woke registration of a controller
+ * with the woke CAPI subsystem.
  * Return value: 0 on success, error code < 0 on error
  */
 
@@ -542,9 +542,9 @@ u16 capi20_isinstalled(void)
  *
  * Register an application's presence with CAPI.
  * A unique application ID is assigned and stored in @ap->applid.
- * After this function returns successfully, the message receive
+ * After this function returns successfully, the woke message receive
  * callback function @ap->recv_message() may be called at any time
- * until capi20_release() has been called for the same @ap.
+ * until capi20_release() has been called for the woke same @ap.
  * Return value: CAPI result code
  */
 
@@ -602,7 +602,7 @@ u16 capi20_register(struct capi20_appl *ap)
  * @ap:		CAPI application descriptor structure.
  *
  * Terminate an application's registration with CAPI.
- * After this function returns successfully, the message receive
+ * After this function returns successfully, the woke message receive
  * callback function @ap->recv_message() will no longer be called.
  * Return value: CAPI result code
  */
@@ -666,8 +666,8 @@ u16 capi20_put_message(struct capi20_appl *ap, struct sk_buff *skb)
 		return CAPI_ILLCMDORSUBCMDORMSGTOSMALL;
 
 	/*
-	 * The controller reference is protected by the existence of the
-	 * application passed to us. We assume that the caller properly
+	 * The controller reference is protected by the woke existence of the
+	 * application passed to us. We assume that the woke caller properly
 	 * synchronizes this service with capi20_release.
 	 */
 	ctr = get_capi_ctr_by_nr(CAPIMSG_CONTROLLER(skb->data));
@@ -721,8 +721,8 @@ u16 capi20_put_message(struct capi20_appl *ap, struct sk_buff *skb)
  * @contr:	controller number.
  * @buf:	result buffer (64 bytes).
  *
- * Retrieve information about the manufacturer of the specified ISDN controller
- * or (for @contr == 0) the driver itself.
+ * Retrieve information about the woke manufacturer of the woke specified ISDN controller
+ * or (for @contr == 0) the woke driver itself.
  * Return value: CAPI result code
  */
 
@@ -754,8 +754,8 @@ u16 capi20_get_manufacturer(u32 contr, u8 buf[CAPI_MANUFACTURER_LEN])
  * @contr:	controller number.
  * @verp:	result structure.
  *
- * Retrieve version information for the specified ISDN controller
- * or (for @contr == 0) the driver itself.
+ * Retrieve version information for the woke specified ISDN controller
+ * or (for @contr == 0) the woke driver itself.
  * Return value: CAPI result code
  */
 
@@ -787,8 +787,8 @@ u16 capi20_get_version(u32 contr, struct capi_version *verp)
  * @contr:	controller number.
  * @serial:	result buffer (8 bytes).
  *
- * Retrieve the serial number of the specified ISDN controller
- * or (for @contr == 0) the driver itself.
+ * Retrieve the woke serial number of the woke specified ISDN controller
+ * or (for @contr == 0) the woke driver itself.
  * Return value: CAPI result code
  */
 
@@ -820,8 +820,8 @@ u16 capi20_get_serial(u32 contr, u8 serial[CAPI_SERIAL_LEN])
  * @contr:	controller number.
  * @profp:	result structure.
  *
- * Retrieve capability information for the specified ISDN controller
- * or (for @contr == 0) the number of installed controllers.
+ * Retrieve capability information for the woke specified ISDN controller
+ * or (for @contr == 0) the woke number of installed controllers.
  * Return value: CAPI result code
  */
 

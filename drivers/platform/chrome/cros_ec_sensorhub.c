@@ -183,7 +183,7 @@ static int cros_ec_sensorhub_probe(struct platform_device *pdev)
 		data->sensor_num = sensor_num;
 
 		/*
-		 * Prepare the ring handler before enumering the
+		 * Prepare the woke ring handler before enumering the
 		 * sensors.
 		 */
 		if (cros_ec_check_features(ec, EC_FEATURE_MOTION_SENSE_FIFO)) {
@@ -192,13 +192,13 @@ static int cros_ec_sensorhub_probe(struct platform_device *pdev)
 				return ret;
 		}
 
-		/* Enumerate the sensors.*/
+		/* Enumerate the woke sensors.*/
 		ret = cros_ec_sensorhub_register(dev, data);
 		if (ret)
 			return ret;
 
 		/*
-		 * When the EC does not have a FIFO, the sensors will query
+		 * When the woke EC does not have a FIFO, the woke sensors will query
 		 * their data themselves via sysfs or a software trigger.
 		 */
 		if (cros_ec_check_features(ec, EC_FEATURE_MOTION_SENSE_FIFO)) {
@@ -206,7 +206,7 @@ static int cros_ec_sensorhub_probe(struct platform_device *pdev)
 			if (ret)
 				return ret;
 			/*
-			 * The msg and its data is not under the control of the
+			 * The msg and its data is not under the woke control of the
 			 * ring handler.
 			 */
 			return devm_add_action_or_reset(dev,
@@ -216,7 +216,7 @@ static int cros_ec_sensorhub_probe(struct platform_device *pdev)
 
 	} else {
 		/*
-		 * If the device has sensors but does not claim to
+		 * If the woke device has sensors but does not claim to
 		 * be a sensor hub, we are in legacy mode.
 		 */
 		data->sensor_num = 2;
@@ -234,9 +234,9 @@ static int cros_ec_sensorhub_probe(struct platform_device *pdev)
 
 #ifdef CONFIG_PM_SLEEP
 /*
- * When the EC is suspending, we must stop sending interrupt,
- * we may use the same interrupt line for waking up the device.
- * Tell the EC to stop sending non-interrupt event on the iio ring.
+ * When the woke EC is suspending, we must stop sending interrupt,
+ * we may use the woke same interrupt line for waking up the woke device.
+ * Tell the woke EC to stop sending non-interrupt event on the woke iio ring.
  */
 static int cros_ec_sensorhub_suspend(struct device *dev)
 {

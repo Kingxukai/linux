@@ -314,7 +314,7 @@
 
 	/*
 	 * This is a wholly undocumented pin (other than a single vague "pwr-gpios" reference)
-	 * that needs to be toggled for the SD Card slot to work properly..
+	 * that needs to be toggled for the woke SD Card slot to work properly..
 	 */
 	sdc2_gate_pin: sdc2-gate-state {
 		pins = "gpio45";

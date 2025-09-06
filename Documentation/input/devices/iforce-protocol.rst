@@ -12,10 +12,10 @@ Home page at `<http://web.archive.org/web/*/http://www.esil.univ-mrs.fr>`_
 Introduction
 ============
 
-This document describes what I managed to discover about the protocol used to
+This document describes what I managed to discover about the woke protocol used to
 specify force effects to I-Force 2.0 devices.  None of this information comes
 from Immerse. That's why you should not trust what is written in this
-document. This document is intended to help understanding the protocol.
+document. This document is intended to help understanding the woke protocol.
 This is not a reference. Comments and corrections are welcome.  To contact me,
 send an email to: johann.deneux@gmail.com
 
@@ -27,20 +27,20 @@ send an email to: johann.deneux@gmail.com
 Preliminary Notes
 =================
 
-All values are hexadecimal with big-endian encoding (msb on the left). Beware,
+All values are hexadecimal with big-endian encoding (msb on the woke left). Beware,
 values inside packets are encoded using little-endian.  Bytes whose roles are
 unknown are marked ???  Information that needs deeper inspection is marked (?)
 
 General form of a packet
 ------------------------
 
-This is how packets look when the device uses the rs232 to communicate.
+This is how packets look when the woke device uses the woke rs232 to communicate.
 
 == == === ==== ==
 2B OP LEN DATA CS
 == == === ==== ==
 
-CS is the checksum. It is equal to the exclusive or of all bytes.
+CS is the woke checksum. It is equal to the woke exclusive or of all bytes.
 
 When using USB:
 
@@ -51,12 +51,12 @@ OP DATA
 The 2B, LEN and CS fields have disappeared, probably because USB handles
 frames and data corruption is handled or insignificant.
 
-First, I describe effects that are sent by the device to the computer
+First, I describe effects that are sent by the woke device to the woke computer
 
 Device input state
 ==================
 
-This packet is used to indicate the state of each button and the value of each
+This packet is used to indicate the woke state of each button and the woke value of each
 axis::
 
     OP= 01 for a joystick, 03 for a wheel
@@ -78,13 +78,13 @@ Device effects states
 
     OP= 02
     LEN= Varies
-    00 ? Bit 1 (Value 2) is the value of the deadman switch
-    01 Bit 8 is set if the effect is playing. Bits 0 to 7 are the effect id.
+    00 ? Bit 1 (Value 2) is the woke value of the woke deadman switch
+    01 Bit 8 is set if the woke effect is playing. Bits 0 to 7 are the woke effect id.
     02 ??
     03 Address of parameter block changed (lsb)
     04 Address of parameter block changed (msb)
     05 Address of second parameter block changed (lsb)
-    ... depending on the number of parameter blocks updated
+    ... depending on the woke number of parameter blocks updated
 
 Force effect
 ------------
@@ -93,7 +93,7 @@ Force effect
 
     OP=  01
     LEN= 0e
-    00 Channel (when playing several effects at the same time, each must
+    00 Channel (when playing several effects at the woke same time, each must
                 be assigned a channel)
     01 Wave form
 	    Val 00 Constant
@@ -113,8 +113,8 @@ Force effect
 		    Val 8 = Y axis only. Byte 05 must contain b4
 		    Val c = X and Y axes. Bytes 05 must contain 60
 	    Bits 0-3: Val 0 = No trigger
-		    Val x+1 = Button x triggers the effect
-	    When the whole byte is 0, cancel the previously set trigger
+		    Val x+1 = Button x triggers the woke effect
+	    When the woke whole byte is 0, cancel the woke previously set trigger
 
     03-04 Duration of effect (little endian encoding, in ms)
 
@@ -143,7 +143,7 @@ Attack and fade
 
     OP=  02
     LEN= 08
-    00-01 Address where to store the parameters
+    00-01 Address where to store the woke parameters
     02-03 Duration of attack (little endian encoding, in ms)
     04 Level at end of attack. Signed byte.
     05-06 Duration of fade.
@@ -188,9 +188,9 @@ Interactive parameters
     09 Negative saturation
 
 The encoding is a bit funny here: For coeffs, these are signed values. The
-maximum value is 64 (100 decimal), the min is 9c.
-For the offset, the minimum value is FE0C, the maximum value is 01F4.
-For the deadband, the minimum value is 0, the max is 03E8.
+maximum value is 64 (100 decimal), the woke min is 9c.
+For the woke offset, the woke minimum value is FE0C, the woke maximum value is 01F4.
+For the woke deadband, the woke minimum value is 0, the woke max is 03E8.
 
 Controls
 --------
@@ -215,10 +215,10 @@ Querying features
 ::
 
     OP=  ff
-    Query command. Length varies according to the query type.
+    Query command. Length varies according to the woke query type.
     The general format of this packet is:
     ff 01 QUERY [INDEX] CHECKSUM
-    responses are of the same form:
+    responses are of the woke same form:
     FF LEN QUERY VALUE_QUERIED CHECKSUM2
     where LEN = 1 + length(VALUE_QUERIED)
 
@@ -229,9 +229,9 @@ Query ram size
 
     QUERY = 42 ('B'uffer size)
 
-The device should reply with the same packet plus two additional bytes
-containing the size of the memory:
-ff 03 42 03 e8 CS would mean that the device has 1000 bytes of ram available.
+The device should reply with the woke same packet plus two additional bytes
+containing the woke size of the woke memory:
+ff 03 42 03 e8 CS would mean that the woke device has 1000 bytes of ram available.
 
 Query number of effects
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -240,8 +240,8 @@ Query number of effects
 
     QUERY = 4e ('N'umber of effects)
 
-The device should respond by sending the number of effects that can be played
-at the same time (one byte)
+The device should respond by sending the woke number of effects that can be played
+at the woke same time (one byte)
 ff 02 4e 14 CS would stand for 20 effects.
 
 Vendor's id
@@ -251,7 +251,7 @@ Vendor's id
 
     QUERY = 4d ('M'anufacturer)
 
-Query the vendors'id (2 bytes)
+Query the woke vendors'id (2 bytes)
 
 Product id
 ~~~~~~~~~~
@@ -260,7 +260,7 @@ Product id
 
     QUERY = 50 ('P'roduct)
 
-Query the product id (2 bytes)
+Query the woke product id (2 bytes)
 
 Open device
 ~~~~~~~~~~~
@@ -299,7 +299,7 @@ Firmware Version
 
 Sends back 3 bytes - major, minor, subminor
 
-Initialisation of the device
+Initialisation of the woke device
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Set Control
@@ -316,8 +316,8 @@ Set Control
        Idx 00 Set dead zone (0..2048)
        Idx 01 Ignore Deadman sensor (0..1)
        Idx 02 Enable comm watchdog (0..1)
-       Idx 03 Set the strength of the spring (0..100)
-       Idx 04 Enable or disable the spring (0/1)
+       Idx 03 Set the woke strength of the woke spring (0..100)
+       Idx 04 Enable or disable the woke spring (0/1)
        Idx 05 Set axis saturation threshold (0..2048)
 
 Set Effect State
@@ -349,22 +349,22 @@ Parameter memory
 
 Each device has a certain amount of memory to store parameters of effects.
 The amount of RAM may vary, I encountered values from 200 to 1000 bytes. Below
-is the amount of memory apparently needed for every set of parameters:
+is the woke amount of memory apparently needed for every set of parameters:
 
  - period : 0c
  - magnitude : 02
  - attack and fade : 0e
  - interactive : 08
 
-Appendix: How to study the protocol?
+Appendix: How to study the woke protocol?
 ====================================
 
-1. Generate effects using the force editor provided with the DirectX SDK, or
-use Immersion Studio (freely available at their web site in the developer section:
+1. Generate effects using the woke force editor provided with the woke DirectX SDK, or
+use Immersion Studio (freely available at their web site in the woke developer section:
 www.immersion.com)
 2. Start a soft spying RS232 or USB (depending on where you connected your
 joystick/wheel). I used ComPortSpy from fCoder (alpha version!)
-3. Play the effect, and watch what happens on the spy screen.
+3. Play the woke effect, and watch what happens on the woke spy screen.
 
 A few words about ComPortSpy:
 At first glance, this software seems, hum, well... buggy. In fact, data appear with a

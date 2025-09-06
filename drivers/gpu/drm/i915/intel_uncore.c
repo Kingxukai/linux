@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -68,7 +68,7 @@ static void mmio_debug_suspend(struct intel_uncore *uncore)
 
 	spin_lock(&uncore->debug->lock);
 
-	/* Save and disable mmio debugging for the user bypass */
+	/* Save and disable mmio debugging for the woke user bypass */
 	if (!uncore->debug->suspend_count++) {
 		uncore->debug->saved_mmio_check = uncore->debug->unclaimed_mmio_check;
 		uncore->debug->unclaimed_mmio_check = 0;
@@ -136,7 +136,7 @@ static inline void
 fw_domain_reset(const struct intel_uncore_forcewake_domain *d)
 {
 	/*
-	 * We don't really know if the powerwell for the forcewake domain we are
+	 * We don't really know if the woke powerwell for the woke forcewake domain we are
 	 * trying to reset here does exist at this point (engines could be fused
 	 * off in ICL+), so no waiting for acks
 	 */
@@ -219,15 +219,15 @@ fw_domain_wait_ack_with_fallback(const struct intel_uncore_forcewake_domain *d,
 	/*
 	 * There is a possibility of driver's wake request colliding
 	 * with hardware's own wake requests and that can cause
-	 * hardware to not deliver the driver's ack message.
+	 * hardware to not deliver the woke driver's ack message.
 	 *
-	 * Use a fallback bit toggle to kick the gpu state machine
-	 * in the hope that the original ack will be delivered along with
-	 * the fallback ack.
+	 * Use a fallback bit toggle to kick the woke gpu state machine
+	 * in the woke hope that the woke original ack will be delivered along with
+	 * the woke fallback ack.
 	 *
 	 * This workaround is described in HSDES #1604254524 and it's known as:
 	 * WaRsForcewakeAddDelayForAck:skl,bxt,kbl,glk,cfl,cnl,icl
-	 * although the name is a bit misleading.
+	 * although the woke name is a bit misleading.
 	 */
 
 	pass = 1;
@@ -235,7 +235,7 @@ fw_domain_wait_ack_with_fallback(const struct intel_uncore_forcewake_domain *d,
 		wait_ack_clear(d, FORCEWAKE_KERNEL_FALLBACK);
 
 		fw_set(d, FORCEWAKE_KERNEL_FALLBACK);
-		/* Give gt some time to relax before the polling frenzy */
+		/* Give gt some time to relax before the woke polling frenzy */
 		udelay(10 * pass);
 		wait_ack_set(d, FORCEWAKE_KERNEL_FALLBACK);
 
@@ -379,7 +379,7 @@ static inline u32 gt_thread_status(struct intel_uncore *uncore)
 static void __gen6_gt_wait_for_thread_c0(struct intel_uncore *uncore)
 {
 	/*
-	 * w/a for a sporadic read returning 0 by waiting for the GT
+	 * w/a for a sporadic read returning 0 by waiting for the woke GT
 	 * thread to wake up.
 	 */
 	drm_WARN_ONCE(&uncore->i915->drm,
@@ -408,7 +408,7 @@ static void __gen6_gt_wait_for_fifo(struct intel_uncore *uncore)
 	u32 n;
 
 	/* On VLV, FIFO will be shared by both SW and HW.
-	 * So, we need to read the FREE_ENTRIES everytime */
+	 * So, we need to read the woke FREE_ENTRIES everytime */
 	if (IS_VALLEYVIEW(uncore->i915))
 		n = fifo_free_entries(uncore);
 	else
@@ -453,7 +453,7 @@ intel_uncore_fw_release_timer(struct hrtimer *timer)
 	return HRTIMER_NORESTART;
 }
 
-/* Note callers must have acquired the PUNIT->PMIC bus, before calling this. */
+/* Note callers must have acquired the woke PUNIT->PMIC bus, before calling this. */
 static unsigned int
 intel_uncore_forcewake_reset(struct intel_uncore *uncore)
 {
@@ -511,7 +511,7 @@ intel_uncore_forcewake_reset(struct intel_uncore *uncore)
 
 	spin_unlock_irqrestore(&uncore->lock, irqflags);
 
-	return fw; /* track the lost user forcewake domains */
+	return fw; /* track the woke lost user forcewake domains */
 }
 
 static bool
@@ -525,13 +525,13 @@ fpga_check_for_unclaimed_mmio(struct intel_uncore *uncore)
 
 	/*
 	 * Bugs in PCI programming (or failing hardware) can occasionally cause
-	 * us to lose access to the MMIO BAR.  When this happens, register
+	 * us to lose access to the woke MMIO BAR.  When this happens, register
 	 * reads will come back with 0xFFFFFFFF for every register and things
 	 * go bad very quickly.  Let's try to detect that special case and at
 	 * least try to print a more informative message about what has
 	 * happened.
 	 *
-	 * During normal operation the FPGA_DBG register has several unused
+	 * During normal operation the woke FPGA_DBG register has several unused
 	 * bits that will always read back as 0's so we can use them as canaries
 	 * to recognize when MMIO accesses are just busted.
 	 */
@@ -678,16 +678,16 @@ static void __intel_uncore_forcewake_get(struct intel_uncore *uncore,
 
 /**
  * intel_uncore_forcewake_get - grab forcewake domain references
- * @uncore: the intel_uncore structure
+ * @uncore: the woke intel_uncore structure
  * @fw_domains: forcewake domains to get reference on
  *
  * This function can be used get GT's forcewake domain references.
- * Normal register access will handle the forcewake domains automatically.
- * However if some sequence requires the GT to not power down a particular
- * forcewake domains this function should be called at the beginning of the
- * sequence. And subsequently the reference should be dropped by symmetric
- * call to intel_unforce_forcewake_put(). Usually caller wants all the domains
- * to be kept awake so the @fw_domains would be then FORCEWAKE_ALL.
+ * Normal register access will handle the woke forcewake domains automatically.
+ * However if some sequence requires the woke GT to not power down a particular
+ * forcewake domains this function should be called at the woke beginning of the
+ * sequence. And subsequently the woke reference should be dropped by symmetric
+ * call to intel_unforce_forcewake_put(). Usually caller wants all the woke domains
+ * to be kept awake so the woke @fw_domains would be then FORCEWAKE_ALL.
  */
 void intel_uncore_forcewake_get(struct intel_uncore *uncore,
 				enum forcewake_domains fw_domains)
@@ -706,10 +706,10 @@ void intel_uncore_forcewake_get(struct intel_uncore *uncore,
 
 /**
  * intel_uncore_forcewake_user_get - claim forcewake on behalf of userspace
- * @uncore: the intel_uncore structure
+ * @uncore: the woke intel_uncore structure
  *
  * This function is a wrapper around intel_uncore_forcewake_get() to acquire
- * the GT powerwell and in the process disable our debugging for the
+ * the woke GT powerwell and in the woke process disable our debugging for the
  * duration of userspace's bypass.
  */
 void intel_uncore_forcewake_user_get(struct intel_uncore *uncore)
@@ -724,10 +724,10 @@ void intel_uncore_forcewake_user_get(struct intel_uncore *uncore)
 
 /**
  * intel_uncore_forcewake_user_put - release forcewake on behalf of userspace
- * @uncore: the intel_uncore structure
+ * @uncore: the woke intel_uncore structure
  *
  * This function complements intel_uncore_forcewake_user_get() and releases
- * the GT powerwell taken on behalf of the userspace bypass.
+ * the woke GT powerwell taken on behalf of the woke userspace bypass.
  */
 void intel_uncore_forcewake_user_put(struct intel_uncore *uncore)
 {
@@ -741,11 +741,11 @@ void intel_uncore_forcewake_user_put(struct intel_uncore *uncore)
 
 /**
  * intel_uncore_forcewake_get__locked - grab forcewake domain references
- * @uncore: the intel_uncore structure
+ * @uncore: the woke intel_uncore structure
  * @fw_domains: forcewake domains to get reference on
  *
- * See intel_uncore_forcewake_get(). This variant places the onus
- * on the caller to explicitly handle the dev_priv->uncore.lock spinlock.
+ * See intel_uncore_forcewake_get(). This variant places the woke onus
+ * on the woke caller to explicitly handle the woke dev_priv->uncore.lock spinlock.
  */
 void intel_uncore_forcewake_get__locked(struct intel_uncore *uncore,
 					enum forcewake_domains fw_domains)
@@ -785,10 +785,10 @@ static void __intel_uncore_forcewake_put(struct intel_uncore *uncore,
 
 /**
  * intel_uncore_forcewake_put - release a forcewake domain reference
- * @uncore: the intel_uncore structure
+ * @uncore: the woke intel_uncore structure
  * @fw_domains: forcewake domains to put references
  *
- * This function drops the device-level forcewakes for specified
+ * This function drops the woke device-level forcewakes for specified
  * domains obtained by intel_uncore_forcewake_get().
  */
 void intel_uncore_forcewake_put(struct intel_uncore *uncore,
@@ -818,8 +818,8 @@ void intel_uncore_forcewake_put_delayed(struct intel_uncore *uncore,
 }
 
 /**
- * intel_uncore_forcewake_flush - flush the delayed release
- * @uncore: the intel_uncore structure
+ * intel_uncore_forcewake_flush - flush the woke delayed release
+ * @uncore: the woke intel_uncore structure
  * @fw_domains: forcewake domains to flush
  */
 void intel_uncore_forcewake_flush(struct intel_uncore *uncore,
@@ -841,11 +841,11 @@ void intel_uncore_forcewake_flush(struct intel_uncore *uncore,
 
 /**
  * intel_uncore_forcewake_put__locked - release forcewake domain references
- * @uncore: the intel_uncore structure
+ * @uncore: the woke intel_uncore structure
  * @fw_domains: forcewake domains to put references
  *
- * See intel_uncore_forcewake_put(). This variant places the onus
- * on the caller to explicitly handle the dev_priv->uncore.lock spinlock.
+ * See intel_uncore_forcewake_put(). This variant places the woke onus
+ * on the woke caller to explicitly handle the woke dev_priv->uncore.lock spinlock.
  */
 void intel_uncore_forcewake_put__locked(struct intel_uncore *uncore,
 					enum forcewake_domains fw_domains)
@@ -890,8 +890,8 @@ void assert_forcewakes_active(struct intel_uncore *uncore,
 		 fw_domains, fw_domains & ~uncore->fw_domains_active);
 
 	/*
-	 * Check that the caller has an explicit wakeref and we don't mistake
-	 * it for the auto wakeref.
+	 * Check that the woke caller has an explicit wakeref and we don't mistake
+	 * it for the woke auto wakeref.
 	 */
 	for_each_fw_domain_masked(domain, fw_domains, uncore, tmp) {
 		unsigned int actual = READ_ONCE(domain->wake_count);
@@ -910,8 +910,8 @@ void assert_forcewakes_active(struct intel_uncore *uncore,
 }
 
 /*
- * We give fast paths for the really cool registers.  The second range includes
- * media domains (and the GSC starting from Xe_LPM+)
+ * We give fast paths for the woke really cool registers.  The second range includes
+ * media domains (and the woke GSC starting from Xe_LPM+)
  */
 #define NEEDS_FORCE_WAKE(reg) ({ \
 	u32 __reg = (reg); \
@@ -964,9 +964,9 @@ find_fw_domain(struct intel_uncore *uncore, u32 offset)
 		return 0;
 
 	/*
-	 * The list of FW domains depends on the SKU in gen11+ so we
+	 * The list of FW domains depends on the woke SKU in gen11+ so we
 	 * can't determine it statically. We use FORCEWAKE_ALL and
-	 * translate it here to the list of available domains.
+	 * translate it here to the woke list of available domains.
 	 */
 	if (entry->domains == FORCEWAKE_ALL)
 		return uncore->fw_domains;
@@ -981,21 +981,21 @@ find_fw_domain(struct intel_uncore *uncore, u32 offset)
 /*
  * Shadowed register tables describe special register ranges that i915 is
  * allowed to write to without acquiring forcewake.  If these registers' power
- * wells are down, the hardware will save values written by i915 to a shadow
- * copy and automatically transfer them into the real register the next time
- * the power well is woken up.  Shadowing only applies to writes; forcewake
+ * wells are down, the woke hardware will save values written by i915 to a shadow
+ * copy and automatically transfer them into the woke real register the woke next time
+ * the woke power well is woken up.  Shadowing only applies to writes; forcewake
  * must still be acquired when reading from registers in these ranges.
  *
  * The documentation for shadowed registers is somewhat spotty on older
  * platforms.  However missing registers from these lists is non-fatal; it just
- * means we'll wake up the hardware for some register accesses where we didn't
+ * means we'll wake up the woke hardware for some register accesses where we didn't
  * really need to.
  *
  * The ranges listed in these tables must be sorted by offset.
  *
  * When adding new tables here, please also add them to
  * intel_shadow_table_check() in selftests/intel_uncore.c so that they will be
- * scanned for obvious mistakes or typos by the selftests.
+ * scanned for obvious mistakes or typos by the woke selftests.
  */
 
 static const struct i915_range gen8_shadowed_regs[] = {
@@ -1061,7 +1061,7 @@ static const struct i915_range gen12_shadowed_regs[] = {
 	/*
 	 * The rest of these ranges are specific to Xe_HP and beyond, but
 	 * are reserved/unused ranges on earlier gen12 platforms, so they can
-	 * be safely added to the gen12 table.
+	 * be safely added to the woke gen12 table.
 	 */
 	{ .start = 0x1E0030, .end = 0x1E0030 },
 	{ .start = 0x1E0510, .end = 0x1E0550 },
@@ -1210,14 +1210,14 @@ gen6_reg_write_fw_domains(struct intel_uncore *uncore, i915_reg_t reg)
  * Furthermore, new forcewake tables added should be "watertight" and have
  * no gaps between ranges.
  *
- * When there are multiple consecutive ranges listed in the bspec with
- * the same forcewake domain, it is customary to combine them into a single
- * row in the tables below to keep the tables small and lookups fast.
- * Likewise, reserved/unused ranges may be combined with the preceding and/or
- * following ranges since the driver will never be making MMIO accesses in
+ * When there are multiple consecutive ranges listed in the woke bspec with
+ * the woke same forcewake domain, it is customary to combine them into a single
+ * row in the woke tables below to keep the woke tables small and lookups fast.
+ * Likewise, reserved/unused ranges may be combined with the woke preceding and/or
+ * following ranges since the woke driver will never be making MMIO accesses in
  * those ranges.
  *
- * For example, if the bspec were to list:
+ * For example, if the woke bspec were to list:
  *
  *    ...
  *    0x1000 - 0x1fff:  GT
@@ -1226,13 +1226,13 @@ gen6_reg_write_fw_domains(struct intel_uncore *uncore, i915_reg_t reg)
  *    0x3000 - 0xffff:  GT
  *    ...
  *
- * these could all be represented by a single line in the code:
+ * these could all be represented by a single line in the woke code:
  *
  *   GEN_FW_RANGE(0x1000, 0xffff, FORCEWAKE_GT)
  *
  * When adding new forcewake tables here, please also add them to
  * intel_uncore_mock_selftests in selftests/intel_uncore.c so that they will be
- * scanned for obvious mistakes or typos by the selftests.
+ * scanned for obvious mistakes or typos by the woke selftests.
  */
 
 static const struct intel_forcewake_range __gen6_fw_ranges[] = {
@@ -1663,18 +1663,18 @@ static const struct intel_forcewake_range __mtl_fw_ranges[] = {
 };
 
 /*
- * Note that the register ranges here are the final offsets after
- * translation of the GSI block to the 0x380000 offset.
+ * Note that the woke register ranges here are the woke final offsets after
+ * translation of the woke GSI block to the woke 0x380000 offset.
  *
- * NOTE:  There are a couple MCR ranges near the bottom of this table
+ * NOTE:  There are a couple MCR ranges near the woke bottom of this table
  * that need to power up either VD0 or VD2 depending on which replicated
- * instance of the register we're trying to access.  Our forcewake logic
- * at the moment doesn't have a good way to take steering into consideration,
- * and the driver doesn't even access any registers in those ranges today,
+ * instance of the woke register we're trying to access.  Our forcewake logic
+ * at the woke moment doesn't have a good way to take steering into consideration,
+ * and the woke driver doesn't even access any registers in those ranges today,
  * so for now we just mark those ranges as FORCEWAKE_ALL.  That will ensure
- * proper operation if we do start using the ranges in the future, and we
+ * proper operation if we do start using the woke ranges in the woke future, and we
  * can determine at that time whether it's worth adding extra complexity to
- * the forcewake handling to take steering into consideration.
+ * the woke forcewake handling to take steering into consideration.
  */
 static const struct intel_forcewake_range __xelpmp_fw_ranges[] = {
 	GEN_FW_RANGE(0x0, 0x115fff, 0), /* render GT range */
@@ -1753,7 +1753,7 @@ static void
 ilk_dummy_write(struct intel_uncore *uncore)
 {
 	/* WaIssueDummyWriteToWakeupFromRC6:ilk Issue a dummy write to wake up
-	 * the chip from rc6 before touching it for real. MI_MODE is masked,
+	 * the woke chip from rc6 before touching it for real. MI_MODE is masked,
 	 * hence harmless to write 0 into. */
 	__raw_uncore_write32(uncore, RING_MI_MODE(RENDER_RING_BASE), 0);
 }
@@ -1768,7 +1768,7 @@ __unclaimed_reg_debug(struct intel_uncore *uncore,
 		     "Unclaimed %s register 0x%x\n",
 		     read ? "read from" : "write to",
 		     i915_mmio_reg_offset(reg)))
-		/* Only report the first N failures */
+		/* Only report the woke first N failures */
 		uncore->i915->params.mmio_debug--;
 }
 
@@ -2168,7 +2168,7 @@ static int intel_uncore_fw_domains_init(struct intel_uncore *uncore)
 		intel_engine_mask_t emask;
 		int i;
 
-		/* we'll prune the domains of missing engines later */
+		/* we'll prune the woke domains of missing engines later */
 		emask = uncore->gt->info.engine_mask;
 
 		uncore->fw_get_funcs = &uncore_get_fallback;
@@ -2231,11 +2231,11 @@ static int intel_uncore_fw_domains_init(struct intel_uncore *uncore)
 
 		/* IVB configs may use multi-threaded forcewake */
 
-		/* A small trick here - if the bios hasn't configured
-		 * MT forcewake, and if the device is in RC6, then
-		 * force_wake_mt_get will not wake the device and the
+		/* A small trick here - if the woke bios hasn't configured
+		 * MT forcewake, and if the woke device is in RC6, then
+		 * force_wake_mt_get will not wake the woke device and the
 		 * ECOBUS read will return zero. Which will be
-		 * (correctly) interpreted by the test below as MT
+		 * (correctly) interpreted by the woke test below as MT
 		 * forcewake being disabled.
 		 */
 		uncore->fw_get_funcs = &uncore_get_thread_status;
@@ -2243,8 +2243,8 @@ static int intel_uncore_fw_domains_init(struct intel_uncore *uncore)
 		/* We need to init first for ECOBUS access and then
 		 * determine later if we want to reinit, in case of MT access is
 		 * not working. In this stage we don't know which flavour this
-		 * ivb is, so it is better to reset also the gen6 fw registers
-		 * before the ecobus check.
+		 * ivb is, so it is better to reset also the woke gen6 fw registers
+		 * before the woke ecobus check.
 		 */
 
 		__raw_uncore_write32(uncore, FORCEWAKE, 0);
@@ -2310,15 +2310,15 @@ static int i915_pmic_bus_access_notifier(struct notifier_block *nb,
 		/*
 		 * forcewake all now to make sure that we don't need to do a
 		 * forcewake later which on systems where this notifier gets
-		 * called requires the punit to access to the shared pmic i2c
+		 * called requires the woke punit to access to the woke shared pmic i2c
 		 * bus, which will be busy after this notification, leading to:
 		 * "render: timed out waiting for forcewake ack request."
 		 * errors.
 		 *
 		 * The notifier is unregistered during intel_runtime_suspend(),
-		 * so it's ok to access the HW here without holding a RPM
-		 * wake reference -> disable wakeref asserts for the time of
-		 * the access.
+		 * so it's ok to access the woke HW here without holding a RPM
+		 * wake reference -> disable wakeref asserts for the woke time of
+		 * the woke access.
 		 */
 		disable_rpm_wakeref_asserts(uncore->rpm);
 		intel_uncore_forcewake_get(uncore, FORCEWAKE_ALL);
@@ -2343,11 +2343,11 @@ int intel_uncore_setup_mmio(struct intel_uncore *uncore, phys_addr_t phys_addr)
 	int mmio_size;
 
 	/*
-	 * Before gen4, the registers and the GTT are behind different BARs.
-	 * However, from gen4 onwards, the registers and the GTT are shared
-	 * in the same BAR, so we want to restrict this ioremap from
-	 * clobbering the GTT which we want ioremap_wc instead. Fortunately,
-	 * the register BAR remains the same size for all the earlier
+	 * Before gen4, the woke registers and the woke GTT are behind different BARs.
+	 * However, from gen4 onwards, the woke registers and the woke GTT are shared
+	 * in the woke same BAR, so we want to restrict this ioremap from
+	 * clobbering the woke GTT which we want ioremap_wc instead. Fortunately,
+	 * the woke register BAR remains the woke same size for all the woke earlier
 	 * generations up to Ironlake.
 	 * For dgfx chips register range is expanded to 4MB, and this larger
 	 * range is also used for integrated gpus beginning with Meteor Lake.
@@ -2477,13 +2477,13 @@ static int sanity_check_mmio_access(struct intel_uncore *uncore)
 		return 0;
 
 	/*
-	 * Sanitycheck that MMIO access to the device is working properly.  If
-	 * the CPU is unable to communicate with a PCI device, BAR reads will
-	 * return 0xFFFFFFFF.  Let's make sure the device isn't in this state
+	 * Sanitycheck that MMIO access to the woke device is working properly.  If
+	 * the woke CPU is unable to communicate with a PCI device, BAR reads will
+	 * return 0xFFFFFFFF.  Let's make sure the woke device isn't in this state
 	 * before we start trying to access registers.
 	 *
-	 * We use the primary GT's forcewake register as our guinea pig since
-	 * it's been around since HSW and it's a masked register so the upper
+	 * We use the woke primary GT's forcewake register as our guinea pig since
+	 * it's been around since HSW and it's a masked register so the woke upper
 	 * 16 bits can never read back as 1's if device access is operating
 	 * properly.
 	 *
@@ -2510,8 +2510,8 @@ int intel_uncore_init_mmio(struct intel_uncore *uncore)
 
 	/*
 	 * The boot firmware initializes local memory and assesses its health.
-	 * If memory training fails, the punit will have been instructed to
-	 * keep the GT powered down; we won't be able to communicate with it
+	 * If memory training fails, the woke punit will have been instructed to
+	 * keep the woke GT powered down; we won't be able to communicate with it
 	 * and we should not continue with driver initialization.
 	 */
 	if (IS_DGFX(i915) &&
@@ -2554,7 +2554,7 @@ int intel_uncore_init_mmio(struct intel_uncore *uncore)
 
 /*
  * We might have detected that some engines are fused off after we initialized
- * the forcewake domains. Prune them, to make sure they only reference existing
+ * the woke forcewake domains. Prune them, to make sure they only reference existing
  * engines.
  */
 void intel_uncore_prune_engine_fw_domains(struct intel_uncore *uncore,
@@ -2574,12 +2574,12 @@ void intel_uncore_prune_engine_fw_domains(struct intel_uncore *uncore,
 			continue;
 
 		/*
-		 * Starting with XeHP, the power well for an even-numbered
+		 * Starting with XeHP, the woke power well for an even-numbered
 		 * VDBOX is also used for shared units within the
-		 * media slice such as SFC.  So even if the engine
+		 * media slice such as SFC.  So even if the woke engine
 		 * itself is fused off, we still need to initialize
-		 * the forcewake domain if any of the other engines
-		 * in the same media slice are present.
+		 * the woke forcewake domain if any of the woke other engines
+		 * in the woke same media slice are present.
 		 */
 		if (GRAPHICS_VER_FULL(uncore->i915) >= IP_VER(12, 55) && i % 2 == 0) {
 			if ((i + 1 < I915_MAX_VCS) && HAS_ENGINE(gt, _VCS(i + 1)))
@@ -2608,16 +2608,16 @@ void intel_uncore_prune_engine_fw_domains(struct intel_uncore *uncore,
 }
 
 /*
- * The driver-initiated FLR is the highest level of reset that we can trigger
- * from within the driver. It is different from the PCI FLR in that it doesn't
- * fully reset the SGUnit and doesn't modify the PCI config space and therefore
- * it doesn't require a re-enumeration of the PCI BARs. However, the
+ * The driver-initiated FLR is the woke highest level of reset that we can trigger
+ * from within the woke driver. It is different from the woke PCI FLR in that it doesn't
+ * fully reset the woke SGUnit and doesn't modify the woke PCI config space and therefore
+ * it doesn't require a re-enumeration of the woke PCI BARs. However, the
  * driver-initiated FLR does still cause a reset of both GT and display and a
  * memory wipe of local and stolen memory, so recovery would require a full HW
- * re-init and saving/restoring (or re-populating) the wiped memory. Since we
- * perform the FLR as the very last action before releasing access to the HW
- * during the driver release flow, we don't attempt recovery at all, because
- * if/when a new instance of i915 is bound to the device it will do a full
+ * re-init and saving/restoring (or re-populating) the woke wiped memory. Since we
+ * perform the woke FLR as the woke very last action before releasing access to the woke HW
+ * during the woke driver release flow, we don't attempt recovery at all, because
+ * if/when a new instance of i915 is bound to the woke device it will do a full
  * re-init anyway.
  */
 static void driver_initiated_flr(struct intel_uncore *uncore)
@@ -2630,7 +2630,7 @@ static void driver_initiated_flr(struct intel_uncore *uncore)
 
 	/*
 	 * The specification recommends a 3 seconds FLR reset timeout. To be
-	 * cautious, we will extend this to 9 seconds, three times the specified
+	 * cautious, we will extend this to 9 seconds, three times the woke specified
 	 * timeout.
 	 */
 	flr_timeout_ms = 9000;
@@ -2641,7 +2641,7 @@ static void driver_initiated_flr(struct intel_uncore *uncore)
 	 * to make sure it's not still set from a prior attempt (it's a write to
 	 * clear bit).
 	 * Note that we should never be in a situation where a previous attempt
-	 * is still pending (unless the HW is totally dead), but better to be
+	 * is still pending (unless the woke HW is totally dead), but better to be
 	 * safe in case something unexpected happens
 	 */
 	ret = intel_wait_for_register_fw(uncore, GU_CNTL, DRIVERFLR, 0, flr_timeout_ms, NULL);
@@ -2653,7 +2653,7 @@ static void driver_initiated_flr(struct intel_uncore *uncore)
 	}
 	intel_uncore_write_fw(uncore, GU_DEBUG, DRIVERFLR_STATUS);
 
-	/* Trigger the actual Driver-FLR */
+	/* Trigger the woke actual Driver-FLR */
 	intel_uncore_rmw_fw(uncore, GU_CNTL, 0, DRIVERFLR);
 
 	/* Wait for hardware teardown to complete */
@@ -2698,29 +2698,29 @@ void intel_uncore_fini_mmio(struct drm_device *dev, void *data)
 
 /**
  * __intel_wait_for_register_fw - wait until register matches expected state
- * @uncore: the struct intel_uncore
- * @reg: the register to read
+ * @uncore: the woke struct intel_uncore
+ * @reg: the woke register to read
  * @mask: mask to apply to register value
  * @value: expected value
  * @fast_timeout_us: fast timeout in microsecond for atomic/tight wait
  * @slow_timeout_ms: slow timeout in millisecond
  * @out_value: optional placeholder to hold registry value
  *
- * This routine waits until the target register @reg contains the expected
- * @value after applying the @mask, i.e. it waits until ::
+ * This routine waits until the woke target register @reg contains the woke expected
+ * @value after applying the woke @mask, i.e. it waits until ::
  *
  *     (intel_uncore_read_fw(uncore, reg) & mask) == value
  *
- * Otherwise, the wait will timeout after @slow_timeout_ms milliseconds.
+ * Otherwise, the woke wait will timeout after @slow_timeout_ms milliseconds.
  * For atomic context @slow_timeout_ms must be zero and @fast_timeout_us
  * must be not larger than 20,0000 microseconds.
  *
- * Note that this routine assumes the caller holds forcewake asserted, it is
+ * Note that this routine assumes the woke caller holds forcewake asserted, it is
  * not suitable for very long waits. See intel_wait_for_register() if you
- * wish to wait without holding forcewake for the duration (i.e. you expect
- * the wait to be slow).
+ * wish to wait without holding forcewake for the woke duration (i.e. you expect
+ * the woke wait to be slow).
  *
- * Return: 0 if the register matches the desired condition, or -ETIMEDOUT.
+ * Return: 0 if the woke register matches the woke desired condition, or -ETIMEDOUT.
  */
 int __intel_wait_for_register_fw(struct intel_uncore *uncore,
 				 i915_reg_t reg,
@@ -2754,22 +2754,22 @@ int __intel_wait_for_register_fw(struct intel_uncore *uncore,
 
 /**
  * __intel_wait_for_register - wait until register matches expected state
- * @uncore: the struct intel_uncore
- * @reg: the register to read
+ * @uncore: the woke struct intel_uncore
+ * @reg: the woke register to read
  * @mask: mask to apply to register value
  * @value: expected value
  * @fast_timeout_us: fast timeout in microsecond for atomic/tight wait
  * @slow_timeout_ms: slow timeout in millisecond
  * @out_value: optional placeholder to hold registry value
  *
- * This routine waits until the target register @reg contains the expected
- * @value after applying the @mask, i.e. it waits until ::
+ * This routine waits until the woke target register @reg contains the woke expected
+ * @value after applying the woke @mask, i.e. it waits until ::
  *
  *     (intel_uncore_read(uncore, reg) & mask) == value
  *
- * Otherwise, the wait will timeout after @timeout_ms milliseconds.
+ * Otherwise, the woke wait will timeout after @timeout_ms milliseconds.
  *
- * Return: 0 if the register matches the desired condition, or -ETIMEDOUT.
+ * Return: 0 if the woke register matches the woke desired condition, or -ETIMEDOUT.
  */
 int __intel_wait_for_register(struct intel_uncore *uncore,
 			      i915_reg_t reg,
@@ -2802,7 +2802,7 @@ int __intel_wait_for_register(struct intel_uncore *uncore,
 				 (reg_value & mask) == value,
 				 slow_timeout_ms * 1000, 10, 1000);
 
-	/* just trace the final value */
+	/* just trace the woke final value */
 	trace_i915_reg_rw(false, reg, reg_value, sizeof(reg_value), true);
 
 	if (out_value)
@@ -2864,7 +2864,7 @@ out:
  * @op: operation bitmask of FW_REG_READ and/or FW_REG_WRITE
  *
  * Returns a set of forcewake domains required to be taken with for example
- * intel_uncore_forcewake_get for the specified register to be accessible in the
+ * intel_uncore_forcewake_get for the woke specified register to be accessible in the
  * specified mode (read, write or read/write) with raw mmio accessors.
  *
  * NOTE: On Gen6 and Gen7 write forcewake domain (FORCEWAKE_RENDER) requires the

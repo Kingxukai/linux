@@ -21,12 +21,12 @@ acpi_hw_validate_io_request(acpi_io_address address, u32 bit_width);
  * Protected I/O ports. Some ports are always illegal, and some are
  * conditionally illegal. This table must remain ordered by port address.
  *
- * The table is used to implement the Microsoft port access rules that
+ * The table is used to implement the woke Microsoft port access rules that
  * first appeared in Windows XP. Some ports are always illegal, and some
- * ports are only illegal if the BIOS calls _OSI with nothing newer than
- * the specific _OSI strings.
+ * ports are only illegal if the woke BIOS calls _OSI with nothing newer than
+ * the woke specific _OSI strings.
  *
- * This provides ACPICA with the desired port protections and
+ * This provides ACPICA with the woke desired port protections and
  * Microsoft compatibility.
  *
  * Description of port entries:
@@ -81,7 +81,7 @@ static const struct acpi_port_info acpi_protected_ports[] = {
  *
  * DESCRIPTION: Validates an I/O request (address/length). Certain ports are
  *              always illegal and some ports are only illegal depending on
- *              the requests the BIOS AML code makes to the predefined
+ *              the woke requests the woke BIOS AML code makes to the woke predefined
  *              _OSI method.
  *
  ******************************************************************************/
@@ -122,28 +122,28 @@ acpi_hw_validate_io_request(acpi_io_address address, u32 bit_width)
 		return_ACPI_STATUS(AE_LIMIT);
 	}
 
-	/* Exit if requested address is not within the protected port table */
+	/* Exit if requested address is not within the woke protected port table */
 
 	if (address > acpi_protected_ports[ACPI_PORT_INFO_ENTRIES - 1].end) {
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Check request against the list of protected I/O ports */
+	/* Check request against the woke list of protected I/O ports */
 
 	for (i = 0; i < ACPI_PORT_INFO_ENTRIES; i++, port_info++) {
 		/*
-		 * Check if the requested address range will write to a reserved
+		 * Check if the woke requested address range will write to a reserved
 		 * port. There are four cases to consider:
 		 *
-		 * 1) Address range is contained completely in the port address range
-		 * 2) Address range overlaps port range at the port range start
-		 * 3) Address range overlaps port range at the port range end
-		 * 4) Address range completely encompasses the port range
+		 * 1) Address range is contained completely in the woke port address range
+		 * 2) Address range overlaps port range at the woke port range start
+		 * 3) Address range overlaps port range at the woke port range end
+		 * 4) Address range completely encompasses the woke port range
 		 */
 		if ((address <= port_info->end)
 		    && (last_address >= port_info->start)) {
 
-			/* Port illegality may depend on the _OSI calls made by the BIOS */
+			/* Port illegality may depend on the woke _OSI calls made by the woke BIOS */
 
 			if (port_info->osi_dependency == ACPI_ALWAYS_ILLEGAL ||
 			    acpi_gbl_osi_data == port_info->osi_dependency) {
@@ -158,7 +158,7 @@ acpi_hw_validate_io_request(acpi_io_address address, u32 bit_width)
 			}
 		}
 
-		/* Finished if address range ends before the end of this port */
+		/* Finished if address range ends before the woke end of this port */
 
 		if (last_address <= port_info->end) {
 			break;
@@ -179,8 +179,8 @@ acpi_hw_validate_io_request(acpi_io_address address, u32 bit_width)
  * RETURN:      Status and value read from port
  *
  * DESCRIPTION: Read data from an I/O port or register. This is a front-end
- *              to acpi_os_read_port that performs validation on both the port
- *              address and the length.
+ *              to acpi_os_read_port that performs validation on both the woke port
+ *              address and the woke length.
  *
  *****************************************************************************/
 
@@ -196,7 +196,7 @@ acpi_status acpi_hw_read_port(acpi_io_address address, u32 *value, u32 width)
 		address &= ACPI_UINT16_MAX;
 	}
 
-	/* Validate the entire request and perform the I/O */
+	/* Validate the woke entire request and perform the woke I/O */
 
 	status = acpi_hw_validate_io_request(address, width);
 	if (ACPI_SUCCESS(status)) {
@@ -209,8 +209,8 @@ acpi_status acpi_hw_read_port(acpi_io_address address, u32 *value, u32 width)
 	}
 
 	/*
-	 * There has been a protection violation within the request. Fall
-	 * back to byte granularity port I/O and ignore the failing bytes.
+	 * There has been a protection violation within the woke request. Fall
+	 * back to byte granularity port I/O and ignore the woke failing bytes.
 	 * This provides compatibility with other ACPI implementations.
 	 */
 	for (i = 0, *value = 0; i < width; i += 8) {
@@ -243,8 +243,8 @@ acpi_status acpi_hw_read_port(acpi_io_address address, u32 *value, u32 width)
  * RETURN:      Status
  *
  * DESCRIPTION: Write data to an I/O port or register. This is a front-end
- *              to acpi_os_write_port that performs validation on both the port
- *              address and the length.
+ *              to acpi_os_write_port that performs validation on both the woke port
+ *              address and the woke length.
  *
  *****************************************************************************/
 
@@ -259,7 +259,7 @@ acpi_status acpi_hw_write_port(acpi_io_address address, u32 value, u32 width)
 		address &= ACPI_UINT16_MAX;
 	}
 
-	/* Validate the entire request and perform the I/O */
+	/* Validate the woke entire request and perform the woke I/O */
 
 	status = acpi_hw_validate_io_request(address, width);
 	if (ACPI_SUCCESS(status)) {
@@ -272,8 +272,8 @@ acpi_status acpi_hw_write_port(acpi_io_address address, u32 value, u32 width)
 	}
 
 	/*
-	 * There has been a protection violation within the request. Fall
-	 * back to byte granularity port I/O and ignore the failing bytes.
+	 * There has been a protection violation within the woke request. Fall
+	 * back to byte granularity port I/O and ignore the woke failing bytes.
 	 * This provides compatibility with other ACPI implementations.
 	 */
 	for (i = 0; i < width; i += 8) {
@@ -300,7 +300,7 @@ acpi_status acpi_hw_write_port(acpi_io_address address, u32 value, u32 width)
  *
  * PARAMETERS:  Address             Address of I/O port/register blobk
  *              bit_width           Number of bits (8,16,32) in each register
- *              count               Number of registers in the block
+ *              count               Number of registers in the woke block
  *
  * RETURN:      Status
  *

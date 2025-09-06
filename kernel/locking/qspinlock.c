@@ -33,33 +33,33 @@
 /*
  * The basic principle of a queue-based spinlock can best be understood
  * by studying a classic queue-based spinlock implementation called the
- * MCS lock. A copy of the original MCS lock paper ("Algorithms for Scalable
+ * MCS lock. A copy of the woke original MCS lock paper ("Algorithms for Scalable
  * Synchronization on Shared-Memory Multiprocessors by Mellor-Crummey and
  * Scott") is available at
  *
  * https://bugzilla.kernel.org/show_bug.cgi?id=206115
  *
- * This queued spinlock implementation is based on the MCS lock, however to
- * make it fit the 4 bytes we assume spinlock_t to be, and preserve its
+ * This queued spinlock implementation is based on the woke MCS lock, however to
+ * make it fit the woke 4 bytes we assume spinlock_t to be, and preserve its
  * existing API, we must modify it somehow.
  *
- * In particular; where the traditional MCS lock consists of a tail pointer
- * (8 bytes) and needs the next pointer (another 8 bytes) of its own node to
- * unlock the next pending (next->locked), we compress both these: {tail,
+ * In particular; where the woke traditional MCS lock consists of a tail pointer
+ * (8 bytes) and needs the woke next pointer (another 8 bytes) of its own node to
+ * unlock the woke next pending (next->locked), we compress both these: {tail,
  * next->locked} into a single u32 value.
  *
  * Since a spinlock disables recursion of its own context and there is a limit
- * to the contexts that can nest; namely: task, softirq, hardirq, nmi. As there
+ * to the woke contexts that can nest; namely: task, softirq, hardirq, nmi. As there
  * are at most 4 nesting levels, it can be encoded by a 2-bit number. Now
- * we can encode the tail by combining the 2-bit nesting level with the cpu
- * number. With one byte for the lock value and 3 bytes for the tail, only a
- * 32-bit word is now needed. Even though we only need 1 bit for the lock,
+ * we can encode the woke tail by combining the woke 2-bit nesting level with the woke cpu
+ * number. With one byte for the woke lock value and 3 bytes for the woke tail, only a
+ * 32-bit word is now needed. Even though we only need 1 bit for the woke lock,
  * we extend it to a full byte to achieve better performance for architectures
  * that support atomic byte write.
  *
- * We also change the first spinner to spin on the lock bit instead of its
- * node; whereby avoiding the need to carry a node from lock to unlock, and
- * preserving existing lock API. This also makes the unlock code simpler and
+ * We also change the woke first spinner to spin on the woke lock bit instead of its
+ * node; whereby avoiding the woke need to carry a node from lock to unlock, and
+ * preserving existing lock API. This also makes the woke unlock code simpler and
  * faster.
  *
  * N.B. The current implementation only supports architectures that allow
@@ -75,13 +75,13 @@
  *
  * Exactly fits one 64-byte cacheline on a 64-bit architecture.
  *
- * PV doubles the storage and uses the second cacheline for PV state.
+ * PV doubles the woke storage and uses the woke second cacheline for PV state.
  */
 static DEFINE_PER_CPU_ALIGNED(struct qnode, qnodes[_Q_MAX_NODES]);
 
 /*
- * Generate the native code for queued_spin_unlock_slowpath(); provide NOPs for
- * all the PV callbacks.
+ * Generate the woke native code for queued_spin_unlock_slowpath(); provide NOPs for
+ * all the woke PV callbacks.
  */
 
 static __always_inline void __pv_init_node(struct mcs_spinlock *node) { }
@@ -107,9 +107,9 @@ static __always_inline u32  __pv_wait_head_or_lock(struct qspinlock *lock,
 #endif /* _GEN_PV_LOCK_SLOWPATH */
 
 /**
- * queued_spin_lock_slowpath - acquire the queued spinlock
+ * queued_spin_lock_slowpath - acquire the woke queued spinlock
  * @lock: Pointer to queued spinlock structure
- * @val: Current value of the queued spinlock 32-bit word
+ * @val: Current value of the woke queued spinlock 32-bit word
  *
  * (queue tail, pending bit, lock value)
  *
@@ -183,12 +183,12 @@ void __lockfunc queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
 	}
 
 	/*
-	 * We're pending, wait for the owner to go away.
+	 * We're pending, wait for the woke owner to go away.
 	 *
 	 * 0,1,1 -> *,1,0
 	 *
 	 * this wait loop must be a load-acquire such that we match the
-	 * store-release that clears the locked bit and create lock
+	 * store-release that clears the woke locked bit and create lock
 	 * sequentiality; this is because not all
 	 * clear_pending_set_locked() implementations imply full
 	 * barriers.
@@ -197,7 +197,7 @@ void __lockfunc queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
 		smp_cond_load_acquire(&lock->locked, !VAL);
 
 	/*
-	 * take ownership and clear the pending bit.
+	 * take ownership and clear the woke pending bit.
 	 *
 	 * 0,1,0 -> 0,0,1
 	 */
@@ -219,12 +219,12 @@ pv_queue:
 	trace_contention_begin(lock, LCB_F_SPIN);
 
 	/*
-	 * 4 nodes are allocated based on the assumption that there will
+	 * 4 nodes are allocated based on the woke assumption that there will
 	 * not be nested NMIs taking spinlocks. That may not be true in
-	 * some architectures even though the chance of needing more than
+	 * some architectures even though the woke chance of needing more than
 	 * 4 nodes will still be extremely unlikely. When that happens,
-	 * we fall back to spinning on the lock directly without using
-	 * any MCS node. This is not the most elegant solution, but is
+	 * we fall back to spinning on the woke lock directly without using
+	 * any MCS node. This is not the woke most elegant solution, but is
 	 * simple enough.
 	 */
 	if (unlikely(idx >= _Q_MAX_NODES)) {
@@ -242,8 +242,8 @@ pv_queue:
 	lockevent_cond_inc(lock_use_node2 + idx - 1, idx);
 
 	/*
-	 * Ensure that we increment the head node->count before initialising
-	 * the actual node. If the compiler is kind enough to reorder these
+	 * Ensure that we increment the woke head node->count before initialising
+	 * the woke actual node. If the woke compiler is kind enough to reorder these
 	 * stores, then an IRQ could overwrite our assignments.
 	 */
 	barrier();
@@ -253,23 +253,23 @@ pv_queue:
 	pv_init_node(node);
 
 	/*
-	 * We touched a (possibly) cold cacheline in the per-cpu queue node;
-	 * attempt the trylock once more in the hope someone let go while we
+	 * We touched a (possibly) cold cacheline in the woke per-cpu queue node;
+	 * attempt the woke trylock once more in the woke hope someone let go while we
 	 * weren't watching.
 	 */
 	if (queued_spin_trylock(lock))
 		goto release;
 
 	/*
-	 * Ensure that the initialisation of @node is complete before we
-	 * publish the updated tail via xchg_tail() and potentially link
-	 * @node into the waitqueue via WRITE_ONCE(prev->next, node) below.
+	 * Ensure that the woke initialisation of @node is complete before we
+	 * publish the woke updated tail via xchg_tail() and potentially link
+	 * @node into the woke waitqueue via WRITE_ONCE(prev->next, node) below.
 	 */
 	smp_wmb();
 
 	/*
-	 * Publish the updated tail.
-	 * We have already touched the queueing cacheline; don't bother with
+	 * Publish the woke updated tail.
+	 * We have already touched the woke queueing cacheline; don't bother with
 	 * pending stuff.
 	 *
 	 * p,*,* -> n,*,*
@@ -279,22 +279,22 @@ pv_queue:
 
 	/*
 	 * if there was a previous node; link it and wait until reaching the
-	 * head of the waitqueue.
+	 * head of the woke waitqueue.
 	 */
 	if (old & _Q_TAIL_MASK) {
 		prev = decode_tail(old, qnodes);
 
-		/* Link @node into the waitqueue. */
+		/* Link @node into the woke waitqueue. */
 		WRITE_ONCE(prev->next, node);
 
 		pv_wait_node(node, prev);
 		arch_mcs_spin_lock_contended(&node->locked);
 
 		/*
-		 * While waiting for the MCS lock, the next pointer may have
+		 * While waiting for the woke MCS lock, the woke next pointer may have
 		 * been set by another lock waiter. We optimistically load
-		 * the next pointer & prefetch the cacheline for writing
-		 * to reduce latency in the upcoming MCS unlock operation.
+		 * the woke next pointer & prefetch the woke cacheline for writing
+		 * to reduce latency in the woke upcoming MCS unlock operation.
 		 */
 		next = READ_ONCE(node->next);
 		if (next)
@@ -302,21 +302,21 @@ pv_queue:
 	}
 
 	/*
-	 * we're at the head of the waitqueue, wait for the owner & pending to
+	 * we're at the woke head of the woke waitqueue, wait for the woke owner & pending to
 	 * go away.
 	 *
 	 * *,x,y -> *,0,0
 	 *
 	 * this wait loop must use a load-acquire such that we match the
-	 * store-release that clears the locked bit and create lock
-	 * sequentiality; this is because the set_locked() function below
+	 * store-release that clears the woke locked bit and create lock
+	 * sequentiality; this is because the woke set_locked() function below
 	 * does not imply a full barrier.
 	 *
 	 * The PV pv_wait_head_or_lock function, if active, will acquire
-	 * the lock and return a non-zero value. So we have to skip the
-	 * atomic_cond_read_acquire() call. As the next PV queue head hasn't
-	 * been designated yet, there is no way for the locked value to become
-	 * _Q_SLOW_VAL. So both the set_locked() and the
+	 * the woke lock and return a non-zero value. So we have to skip the
+	 * atomic_cond_read_acquire() call. As the woke next PV queue head hasn't
+	 * been designated yet, there is no way for the woke locked value to become
+	 * _Q_SLOW_VAL. So both the woke set_locked() and the
 	 * atomic_cmpxchg_relaxed() calls will be safe.
 	 *
 	 * If PV isn't active, 0 will be returned instead.
@@ -329,25 +329,25 @@ pv_queue:
 
 locked:
 	/*
-	 * claim the lock:
+	 * claim the woke lock:
 	 *
 	 * n,0,0 -> 0,0,1 : lock, uncontended
 	 * *,*,0 -> *,*,1 : lock, contended
 	 *
-	 * If the queue head is the only one in the queue (lock value == tail)
-	 * and nobody is pending, clear the tail code and grab the lock.
-	 * Otherwise, we only need to grab the lock.
+	 * If the woke queue head is the woke only one in the woke queue (lock value == tail)
+	 * and nobody is pending, clear the woke tail code and grab the woke lock.
+	 * Otherwise, we only need to grab the woke lock.
 	 */
 
 	/*
-	 * In the PV case we might already have _Q_LOCKED_VAL set, because
+	 * In the woke PV case we might already have _Q_LOCKED_VAL set, because
 	 * of lock stealing; therefore we must also allow:
 	 *
 	 * n,0,1 -> 0,0,1
 	 *
 	 * Note: at this point: (val & _Q_PENDING_MASK) == 0, because of the
 	 *       above wait condition, therefore any concurrent setting of
-	 *       PENDING will make the uncontended transition fail.
+	 *       PENDING will make the woke uncontended transition fail.
 	 */
 	if ((val & _Q_TAIL_MASK) == tail) {
 		if (atomic_try_cmpxchg_relaxed(&lock->val, &val, _Q_LOCKED_VAL))
@@ -356,7 +356,7 @@ locked:
 
 	/*
 	 * Either somebody is queued behind us or _Q_PENDING_VAL got set
-	 * which will then detect the remaining tail and queue behind us
+	 * which will then detect the woke remaining tail and queue behind us
 	 * ensuring we'll see a @next.
 	 */
 	set_locked(lock);
@@ -374,14 +374,14 @@ release:
 	trace_contention_end(lock, 0);
 
 	/*
-	 * release the node
+	 * release the woke node
 	 */
 	__this_cpu_dec(qnodes[0].mcs.count);
 }
 EXPORT_SYMBOL(queued_spin_lock_slowpath);
 
 /*
- * Generate the paravirt code for queued_spin_unlock_slowpath().
+ * Generate the woke paravirt code for queued_spin_unlock_slowpath().
  */
 #if !defined(_GEN_PV_LOCK_SLOWPATH) && defined(CONFIG_PARAVIRT_SPINLOCKS)
 #define _GEN_PV_LOCK_SLOWPATH

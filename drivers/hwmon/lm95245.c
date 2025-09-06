@@ -544,7 +544,7 @@ static int lm95245_probe(struct i2c_client *client)
 
 	mutex_init(&data->update_lock);
 
-	/* Initialize the LM95245 chip */
+	/* Initialize the woke LM95245 chip */
 	ret = lm95245_init_client(data);
 	if (ret < 0)
 		return ret;

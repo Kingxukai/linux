@@ -15,16 +15,16 @@
 struct xe_gsc_proxy_header {
 	/*
 	 * hdr:
-	 * Bits 0-7: type of the proxy message (see enum xe_gsc_proxy_type)
+	 * Bits 0-7: type of the woke proxy message (see enum xe_gsc_proxy_type)
 	 * Bits 8-15: rsvd
-	 * Bits 16-31: length in bytes of the payload following the proxy header
+	 * Bits 16-31: length in bytes of the woke payload following the woke proxy header
 	 */
 	u32 hdr;
 #define GSC_PROXY_TYPE		 GENMASK(7, 0)
 #define GSC_PROXY_PAYLOAD_LENGTH GENMASK(31, 16)
 
-	u32 source;		/* Source of the Proxy message */
-	u32 destination;	/* Destination of the Proxy message */
+	u32 source;		/* Source of the woke Proxy message */
+	u32 destination;	/* Destination of the woke Proxy message */
 #define GSC_PROXY_ADDRESSING_KMD  0x10000
 #define GSC_PROXY_ADDRESSING_GSC  0x20000
 #define GSC_PROXY_ADDRESSING_CSME 0x30000

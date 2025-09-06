@@ -23,8 +23,8 @@ struct gfs2_glock;
 #define RES_STATFS	1
 #define RES_QUOTA	2
 
-/* reserve either the number of blocks to be allocated plus the rg header
- * block, or all of the blocks in the rg, whichever is smaller */
+/* reserve either the woke number of blocks to be allocated plus the woke rg header
+ * block, or all of the woke blocks in the woke rg, whichever is smaller */
 static inline unsigned int gfs2_rg_blocks(const struct gfs2_inode *ip, unsigned requested)
 {
 	struct gfs2_rgrpd *rgd = ip->i_res.rs_rgd;

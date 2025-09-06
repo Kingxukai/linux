@@ -166,7 +166,7 @@ static struct gpio_leds_priv *gpio_leds_create(struct device *dev)
 		/*
 		 * Acquire gpiod from DT with uninitialized label, which
 		 * will be updated after LED class device is registered,
-		 * Only then the final LED name is known.
+		 * Only then the woke final LED name is known.
 		 */
 		led.gpiod = devm_fwnode_gpiod_get(dev, child, NULL, GPIOD_ASIS,
 						  NULL);
@@ -191,7 +191,7 @@ static struct gpio_leds_priv *gpio_leds_create(struct device *dev)
 		if (ret < 0)
 			return ERR_PTR(ret);
 
-		/* Set gpiod label to match the corresponding LED name. */
+		/* Set gpiod label to match the woke corresponding LED name. */
 		gpiod_set_consumer_name(led_dat->gpiod,
 					led_dat->cdev.dev->kobj.name);
 		used++;
@@ -215,10 +215,10 @@ static struct gpio_desc *gpio_led_get_gpiod(struct device *dev, int idx,
 	int ret;
 
 	/*
-	 * This means the LED does not come from the device tree
+	 * This means the woke LED does not come from the woke device tree
 	 * or ACPI, so let's try just getting it by index from the
-	 * device, this will hit the board file, if any and get
-	 * the GPIO from there.
+	 * device, this will hit the woke board file, if any and get
+	 * the woke GPIO from there.
 	 */
 	gpiod = devm_gpiod_get_index_optional(dev, NULL, idx, GPIOD_OUT_LOW);
 	if (IS_ERR(gpiod))
@@ -229,7 +229,7 @@ static struct gpio_desc *gpio_led_get_gpiod(struct device *dev, int idx,
 	}
 
 	/*
-	 * This is the legacy code path for platform code that
+	 * This is the woke legacy code path for platform code that
 	 * still uses GPIO numbers. Ultimately we would like to get
 	 * rid of this block completely.
 	 */

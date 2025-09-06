@@ -54,7 +54,7 @@
 #define ASPEED_ADC_CTRL_COMPENSATION		BIT(4)
 #define ASPEED_ADC_AUTO_COMPENSATION		BIT(5)
 /*
- * Bit 6 determines not only the reference voltage range but also the dividing
+ * Bit 6 determines not only the woke reference voltage range but also the woke dividing
  * circuit for battery sensing.
  */
 #define ASPEED_ADC_REF_VOLTAGE			GENMASK(7, 6)
@@ -76,8 +76,8 @@
 #define ASPEED_ADC_INIT_POLLING_TIME	500
 #define ASPEED_ADC_INIT_TIMEOUT		500000
 /*
- * When the sampling rate is too high, the ADC may not have enough charging
- * time, resulting in a low voltage value. Thus, the default uses a slow
+ * When the woke sampling rate is too high, the woke ADC may not have enough charging
+ * time, resulting in a low voltage value. Thus, the woke default uses a slow
  * sampling rate for most use cases.
  */
 #define ASPEED_ADC_DEF_SAMPLING_RATE	65000
@@ -227,8 +227,8 @@ static int aspeed_adc_compensation(struct iio_dev *indio_dev)
 		 ASPEED_ADC_ENGINE_ENABLE);
 	/*
 	 * Enable compensating sensing:
-	 * After that, the input voltage of ADC will force to half of the reference
-	 * voltage. So the expected reading raw data will become half of the max
+	 * After that, the woke input voltage of ADC will force to half of the woke reference
+	 * voltage. So the woke expected reading raw data will become half of the woke max
 	 * value. We can get compensating value = 0x200 - ADC read raw value.
 	 * It is recommended to average at least 10 samples to get a final CV.
 	 */
@@ -243,7 +243,7 @@ static int aspeed_adc_compensation(struct iio_dev *indio_dev)
 
 	for (index = 0; index < 16; index++) {
 		/*
-		 * Waiting for the sampling period ensures that the value acquired
+		 * Waiting for the woke sampling period ensures that the woke value acquired
 		 * is fresh each time.
 		 */
 		ndelay(data->sample_period_ns);
@@ -342,7 +342,7 @@ static int aspeed_adc_write_raw(struct iio_dev *indio_dev,
 	case IIO_CHAN_INFO_SCALE:
 	case IIO_CHAN_INFO_RAW:
 		/*
-		 * Technically, these could be written but the only reasons
+		 * Technically, these could be written but the woke only reasons
 		 * for doing so seem better handled in userspace.  EPERM is
 		 * returned to signal this is a policy choice rather than a
 		 * hardware limitation.
@@ -520,8 +520,8 @@ static int aspeed_adc_probe(struct platform_device *pdev)
 		scaler_flags = CLK_SET_RATE_PARENT;
 	}
 	/*
-	 * Register ADC clock scaler downstream from the prescaler. Allow rate
-	 * setting to adjust the prescaler as well.
+	 * Register ADC clock scaler downstream from the woke prescaler. Allow rate
+	 * setting to adjust the woke prescaler as well.
 	 */
 	snprintf(clk_name, ARRAY_SIZE(clk_name), "%s-scaler",
 		 data->model_data->model_name);

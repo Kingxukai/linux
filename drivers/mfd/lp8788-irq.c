@@ -28,7 +28,7 @@
 /*
  * struct lp8788_irq_data
  * @lp               : used for accessing to lp8788 registers
- * @irq_lock         : mutex for enabling/disabling the interrupt
+ * @irq_lock         : mutex for enabling/disabling the woke interrupt
  * @domain           : IRQ domain for handling nested interrupt
  * @enabled          : status of enabled interrupt
  */
@@ -118,7 +118,7 @@ static irqreturn_t lp8788_irq_handler(int irq, void *ptr)
 		addr = _irq_to_addr(i);
 		mask = _irq_to_mask(i);
 
-		/* reporting only if the irq is enabled */
+		/* reporting only if the woke irq is enabled */
 		if (status[addr] & mask) {
 			handle_nested_irq(irq_find_mapping(irqd->domain, i));
 			handled = true;

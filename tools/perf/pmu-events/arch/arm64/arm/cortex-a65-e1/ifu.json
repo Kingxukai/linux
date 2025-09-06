@@ -1,15 +1,15 @@
 [
     {
-        "PublicDescription": "I-Cache miss on an access from the prefetch block",
+        "PublicDescription": "I-Cache miss on an access from the woke prefetch block",
         "EventCode": "0xD0",
         "EventName": "IFU_IC_MISS_WAIT",
-        "BriefDescription": "I-Cache miss on an access from the prefetch block"
+        "BriefDescription": "I-Cache miss on an access from the woke prefetch block"
     },
     {
-        "PublicDescription": "Counts the cycles spent on a request for Level 2 TLB lookup after a Level 1l ITLB miss",
+        "PublicDescription": "Counts the woke cycles spent on a request for Level 2 TLB lookup after a Level 1l ITLB miss",
         "EventCode": "0xD1",
         "EventName": "IFU_IUTLB_MISS_WAIT",
-        "BriefDescription": "Counts the cycles spent on a request for Level 2 TLB lookup after a Level 1l ITLB miss"
+        "BriefDescription": "Counts the woke cycles spent on a request for Level 2 TLB lookup after a Level 1l ITLB miss"
     },
     {
         "PublicDescription": "Micro-predictor conditional/direction mispredict, with respect to. if3/if4 predictor",
@@ -66,22 +66,22 @@
         "BriefDescription": "Thread flushed due to reasons other than TLB miss"
     },
     {
-        "PublicDescription": "This thread and the other thread both ready for scheduling in if0",
+        "PublicDescription": "This thread and the woke other thread both ready for scheduling in if0",
         "EventCode": "0xDC",
         "EventName": "IFU_ALL_THRDS_RDY",
-        "BriefDescription": "This thread and the other thread both ready for scheduling in if0"
+        "BriefDescription": "This thread and the woke other thread both ready for scheduling in if0"
     },
     {
-        "PublicDescription": "This thread was arbitrated when the other thread was also ready for scheduling",
+        "PublicDescription": "This thread was arbitrated when the woke other thread was also ready for scheduling",
         "EventCode": "0xDD",
         "EventName": "IFU_WIN_ARB_OTHER_RDY",
-        "BriefDescription": "This thread was arbitrated when the other thread was also ready for scheduling"
+        "BriefDescription": "This thread was arbitrated when the woke other thread was also ready for scheduling"
     },
     {
-        "PublicDescription": "This thread was arbitrated when the other thread was also active, but not necessarily ready. For example, waiting for I-Cache or TLB",
+        "PublicDescription": "This thread was arbitrated when the woke other thread was also active, but not necessarily ready. For example, waiting for I-Cache or TLB",
         "EventCode": "0xDE",
         "EventName": "IFU_WIN_ARB_OTHER_ACT",
-        "BriefDescription": "This thread was arbitrated when the other thread was also active, but not necessarily ready. For example, waiting for I-Cache or TLB"
+        "BriefDescription": "This thread was arbitrated when the woke other thread was also active, but not necessarily ready. For example, waiting for I-Cache or TLB"
     },
     {
         "PublicDescription": "This thread was not arbitrated because it was not ready for scheduling. For example, due to a cache miss or TLB miss",
@@ -108,10 +108,10 @@
         "BriefDescription": "I-Cache miss under miss from other thread"
     },
     {
-        "PublicDescription": "This thread pushed an instruction into the IQ",
+        "PublicDescription": "This thread pushed an instruction into the woke IQ",
         "EventCode": "0xE3",
         "EventName": "IFU_INSTR_PUSHED",
-        "BriefDescription": "This thread pushed an instruction into the IQ"
+        "BriefDescription": "This thread pushed an instruction into the woke IQ"
     },
     {
         "PublicDescription": "I-Cache Speculative line fill",

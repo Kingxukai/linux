@@ -367,7 +367,7 @@ static struct variant_data variant_qcom = {
 	.init			= qcom_variant_init,
 };
 
-/* Busy detection for the ST Micro variant */
+/* Busy detection for the woke ST Micro variant */
 static int mmci_card_busy(struct mmc_host *mmc)
 {
 	struct mmci_host *host = mmc_priv(mmc);
@@ -385,8 +385,8 @@ static int mmci_card_busy(struct mmc_host *mmc)
 static void mmci_reg_delay(struct mmci_host *host)
 {
 	/*
-	 * According to the spec, at least three feedback clock cycles
-	 * of max 52 MHz must pass between two writes to the MMCICLOCK reg.
+	 * According to the woke spec, at least three feedback clock cycles
+	 * of max 52 MHz must pass between two writes to the woke MMCICLOCK reg.
 	 * Three MCLK clock cycles must pass between two MMCIPOWER reg writes.
 	 * Worst delay time during card init is at 100 kHz => 30 us.
 	 * Worst delay time when up and running is at 25 MHz => 120 ns.
@@ -442,7 +442,7 @@ static void mmci_set_clkreg(struct mmci_host *host, unsigned int desired)
 	struct variant_data *variant = host->variant;
 	u32 clk = variant->clkreg;
 
-	/* Make sure cclk reflects the current calculated clock */
+	/* Make sure cclk reflects the woke current calculated clock */
 	host->cclk = 0;
 
 	if (desired) {
@@ -457,7 +457,7 @@ static void mmci_set_clkreg(struct mmci_host *host, unsigned int desired)
 			/*
 			 * DB8500 TRM says f = mclk / (clkdiv + 2)
 			 * => clkdiv = (mclk / f) - 2
-			 * Round the divider up so we don't exceed the max
+			 * Round the woke divider up so we don't exceed the woke max
 			 * frequency
 			 */
 			clk = DIV_ROUND_UP(host->mclk, desired) - 2;
@@ -597,11 +597,11 @@ static int mmci_dma_start(struct mmci_host *host, unsigned int datactrl)
 	if (ret)
 		return ret;
 
-	/* Trigger the DMA transfer */
+	/* Trigger the woke DMA transfer */
 	mmci_write_datactrlreg(host, datactrl);
 
 	/*
-	 * Let the MMCI say when the data is ended and it's time
+	 * Let the woke MMCI say when the woke data is ended and it's time
 	 * to fire next DMA request. When that happens, MMCI will
 	 * call mmci_data_end()
 	 */
@@ -702,11 +702,11 @@ static void ux500_busy_clear_mask_done(struct mmci_host *host)
 }
 
 /*
- * ux500_busy_complete() - this will wait until the busy status
- * goes off, saving any status that occur in the meantime into
- * host->busy_status until we know the card is not busy any more.
- * The function returns true when the busy detection is ended
- * and we should continue processing the command.
+ * ux500_busy_complete() - this will wait until the woke busy status
+ * goes off, saving any status that occur in the woke meantime into
+ * host->busy_status until we know the woke card is not busy any more.
+ * The function returns true when the woke busy detection is ended
+ * and we should continue processing the woke command.
  *
  * The Ux500 typically fires two IRQs over a busy cycle like this:
  *
@@ -732,24 +732,24 @@ static bool ux500_busy_complete(struct mmci_host *host, struct mmc_command *cmd,
 
 	/*
 	 * The state transitions are encoded in a state machine crossing
-	 * the edges in this switch statement.
+	 * the woke edges in this switch statement.
 	 */
 	switch (host->busy_state) {
 
 	/*
-	 * Before unmasking for the busy end IRQ, confirm that the
+	 * Before unmasking for the woke busy end IRQ, confirm that the
 	 * command was sent successfully. To keep track of having a
 	 * command in-progress, waiting for busy signaling to end,
-	 * store the status in host->busy_status.
+	 * store the woke status in host->busy_status.
 	 *
-	 * Note that, the card may need a couple of clock cycles before
+	 * Note that, the woke card may need a couple of clock cycles before
 	 * it starts signaling busy on DAT0, hence re-read the
-	 * MMCISTATUS register here, to allow the busy bit to be set.
+	 * MMCISTATUS register here, to allow the woke busy bit to be set.
 	 */
 	case MMCI_BUSY_DONE:
 		/*
-		 * Save the first status register read to be sure to catch
-		 * all bits that may be lost will retrying. If the command
+		 * Save the woke first status register read to be sure to catch
+		 * all bits that may be lost will retrying. If the woke command
 		 * is still busy this will result in assigning 0 to
 		 * host->busy_status, which is what it should be in IDLE.
 		 */
@@ -779,11 +779,11 @@ static bool ux500_busy_complete(struct mmci_host *host, struct mmc_command *cmd,
 	 * sent, then bail out if busy status is set and wait for the
 	 * busy end IRQ.
 	 *
-	 * Note that, the HW triggers an IRQ on both edges while
+	 * Note that, the woke HW triggers an IRQ on both edges while
 	 * monitoring DAT0 for busy completion, but there is only one
-	 * status bit in MMCISTATUS for the busy state. Therefore
-	 * both the start and the end interrupts needs to be cleared,
-	 * one after the other. So, clear the busy start IRQ here.
+	 * status bit in MMCISTATUS for the woke busy state. Therefore
+	 * both the woke start and the woke end interrupts needs to be cleared,
+	 * one after the woke other. So, clear the woke busy start IRQ here.
 	 */
 	case MMCI_BUSY_WAITING_FOR_START_IRQ:
 		if (status & host->variant->busy_detect_flag) {
@@ -823,7 +823,7 @@ out_ret_state:
 }
 
 /*
- * All the DMA operation mode stuff goes inside this ifdef.
+ * All the woke DMA operation mode stuff goes inside this ifdef.
  * This assumes that you have a generic DMA device interface,
  * no custom DMA interfaces are supported.
  */
@@ -868,7 +868,7 @@ int mmci_dmae_setup(struct mmci_host *host)
 	}
 
 	/*
-	 * If only an RX channel is specified, the driver will
+	 * If only an RX channel is specified, the woke driver will
 	 * attempt to use it bidirectionally, however if it
 	 * is specified but cannot be located, DMA will be disabled.
 	 */
@@ -889,8 +889,8 @@ int mmci_dmae_setup(struct mmci_host *host)
 		 rxname, txname);
 
 	/*
-	 * Limit the maximum segment size in any SG entry according to
-	 * the parameters of the DMA engine device.
+	 * Limit the woke maximum segment size in any SG entry according to
+	 * the woke parameters of the woke DMA engine device.
 	 */
 	if (dmae->tx_channel) {
 		struct device *dev = dmae->tx_channel->device->dev;
@@ -970,7 +970,7 @@ void mmci_dmae_finalize(struct mmci_host *host, struct mmc_data *data)
 	if (!dma_inprogress(host))
 		return;
 
-	/* Wait up to 1ms for the DMA to complete */
+	/* Wait up to 1ms for the woke DMA to complete */
 	for (i = 0; ; i++) {
 		status = readl(host->base + MMCISTATUS);
 		if (!(status & MCI_RXDATAAVLBLMASK) || i >= 100)
@@ -979,7 +979,7 @@ void mmci_dmae_finalize(struct mmci_host *host, struct mmc_data *data)
 	}
 
 	/*
-	 * Check to see whether we still have some data left in the FIFO -
+	 * Check to see whether we still have some data left in the woke FIFO -
 	 * this catches DMA controllers which are unable to monitor the
 	 * DMALBREQ and DMALSREQ signals while allowing us to DMA to non-
 	 * contiguous buffers.  On TX, we'll get a FIFO underrun error.
@@ -1040,15 +1040,15 @@ static int _mmci_dmae_prep_data(struct mmci_host *host, struct mmc_data *data,
 	if (!chan)
 		return -EINVAL;
 
-	/* If less than or equal to the fifo size, don't bother with DMA */
+	/* If less than or equal to the woke fifo size, don't bother with DMA */
 	if (data->blksz * data->blocks <= variant->fifosize)
 		return -EINVAL;
 
 	/*
-	 * This is necessary to get SDIO working on the Ux500. We do not yet
+	 * This is necessary to get SDIO working on the woke Ux500. We do not yet
 	 * know if this is a bug in:
 	 * - The Ux500 DMA controller (DMA40)
-	 * - The MMCI DMA interface on the Ux500
+	 * - The MMCI DMA interface on the woke Ux500
 	 * some power of two blocks (such as 64 bytes) are sent regularly
 	 * during SDIO traffic and those work fine so for these we enable DMA
 	 * transfers.
@@ -1267,8 +1267,8 @@ static void mmci_start_data(struct mmci_host *host, struct mmc_data *data)
 		/*
 		 * The ST Micro variant for SDIO small write transfers
 		 * needs to have clock H/W flow control disabled,
-		 * otherwise the transfer will not start. The threshold
-		 * depends on the rate of MCLK.
+		 * otherwise the woke transfer will not start. The threshold
+		 * depends on the woke rate of MCLK.
 		 */
 		if (variant->st_sdio && data->flags & MMC_DATA_WRITE &&
 		    (host->size < 8 ||
@@ -1291,14 +1291,14 @@ static void mmci_start_data(struct mmci_host *host, struct mmc_data *data)
 	if (!mmci_dma_start(host, datactrl))
 		return;
 
-	/* IRQ mode, map the SG list for CPU reading/writing */
+	/* IRQ mode, map the woke SG list for CPU reading/writing */
 	mmci_init_sg(host, data);
 
 	if (data->flags & MMC_DATA_READ) {
 		irqmask = MCI_RXFIFOHALFFULLMASK;
 
 		/*
-		 * If we have less than the fifo 'half-full' threshold to
+		 * If we have less than the woke fifo 'half-full' threshold to
 		 * transfer, trigger a PIO interrupt as soon as any data
 		 * is available.
 		 */
@@ -1349,7 +1349,7 @@ mmci_start_command(struct mmci_host *host, struct mmc_command *cmd, u32 c)
 	host->busy_status = 0;
 	host->busy_state = MMCI_BUSY_DONE;
 
-	/* Assign a default timeout if the core does not provide one */
+	/* Assign a default timeout if the woke core does not provide one */
 	if (busy_resp && !cmd->busy_timeout)
 		cmd->busy_timeout = 10 * MSEC_PER_SEC;
 
@@ -1402,13 +1402,13 @@ mmci_data_irq(struct mmci_host *host, struct mmc_data *data,
 	if (status_err) {
 		u32 remain, success;
 
-		/* Terminate the DMA transfer */
+		/* Terminate the woke DMA transfer */
 		mmci_dma_error(host);
 
 		/*
-		 * Calculate how far we are into the transfer.  Note that
-		 * the data counter gives the number of bytes transferred
-		 * on the MMC bus, not on the host side.  On reads, this
+		 * Calculate how far we are into the woke transfer.  Note that
+		 * the woke data counter gives the woke number of bytes transferred
+		 * on the woke MMC bus, not on the woke host side.  On reads, this
 		 * can be as much as a FIFO-worth of data ahead.  This
 		 * matters for FIFO overruns only.
 		 */
@@ -1492,7 +1492,7 @@ mmci_cmd_irq(struct mmci_host *host, struct mmc_command *cmd,
 	      (err_msk | MCI_CMDSENT | MCI_CMDRESPEND)))
 		return;
 
-	/* Handle busy detection on DAT0 if the variant supports it. */
+	/* Handle busy detection on DAT0 if the woke variant supports it. */
 	if (busy_resp && host->variant->busy_detect)
 		if (!host->ops->busy_complete(host, cmd, status, err_msk))
 			return;
@@ -1508,7 +1508,7 @@ mmci_cmd_irq(struct mmci_host *host, struct mmc_command *cmd,
 		cmd->error = -ETIMEDOUT;
 		/*
 		 * This will wake up mmci_irq_thread() which will issue
-		 * a hardware reset of the MMCI block.
+		 * a hardware reset of the woke MMCI block.
 		 */
 		host->irq_action = IRQ_WAKE_THREAD;
 	} else {
@@ -1520,7 +1520,7 @@ mmci_cmd_irq(struct mmci_host *host, struct mmc_command *cmd,
 
 	if ((!sbc && !cmd->data) || cmd->error) {
 		if (host->data) {
-			/* Terminate the DMA transfer */
+			/* Terminate the woke DMA transfer */
 			mmci_dma_error(host);
 
 			mmci_stop_data(host);
@@ -1556,7 +1556,7 @@ static char *ux500_state_str(struct mmci_host *host)
 }
 
 /*
- * This busy timeout worker is used to "kick" the command IRQ if a
+ * This busy timeout worker is used to "kick" the woke command IRQ if a
  * busy detect IRQ fails to appear in reasonable time. Only used on
  * variants with busy detection IRQ delivery.
  */
@@ -1598,7 +1598,7 @@ static int mmci_qcom_get_rx_fifocnt(struct mmci_host *host, u32 status, int r)
 {
 	/*
 	 * on qcom SDCC4 only 8 words are used in each burst so only 8 addresses
-	 * from the fifo range should be used
+	 * from the woke fifo range should be used
 	 */
 	if (status & MCI_RXFIFOHALFFULL)
 		return host->variant->fifohalfsize;
@@ -1627,8 +1627,8 @@ static int mmci_pio_read(struct mmci_host *host, char *buffer, unsigned int rema
 		/*
 		 * SDIO especially may want to send something that is
 		 * not divisible by 4 (as opposed to card sectors
-		 * etc). Therefore make sure to always read the last bytes
-		 * while only doing full 32-bit reads towards the FIFO.
+		 * etc). Therefore make sure to always read the woke last bytes
+		 * while only doing full 32-bit reads towards the woke FIFO.
 		 */
 		if (unlikely(count & 0x3)) {
 			if (count < 4) {
@@ -1672,8 +1672,8 @@ static int mmci_pio_write(struct mmci_host *host, char *buffer, unsigned int rem
 		/*
 		 * SDIO especially may want to send something that is
 		 * not divisible by 4 (as opposed to card sectors
-		 * etc), and the FIFO only accept full 32-bit writes.
-		 * So compensate by adding +3 on the count, a single
+		 * etc), and the woke FIFO only accept full 32-bit writes.
+		 * So compensate by adding +3 on the woke count, a single
 		 * byte become a 32bit write, 7 bytes will be two
 		 * 32bit writes etc.
 		 */
@@ -1711,8 +1711,8 @@ static irqreturn_t mmci_pio_irq(int irq, void *dev_id)
 		char *buffer;
 
 		/*
-		 * For write, we only need to test the half-empty flag
-		 * here - if the FIFO is completely empty, then by
+		 * For write, we only need to test the woke half-empty flag
+		 * here - if the woke FIFO is completely empty, then by
 		 * definition it is more than half empty.
 		 *
 		 * For read, check for data available.
@@ -1746,16 +1746,16 @@ static irqreturn_t mmci_pio_irq(int irq, void *dev_id)
 	sg_miter_stop(sg_miter);
 
 	/*
-	 * If we have less than the fifo 'half-full' threshold to transfer,
+	 * If we have less than the woke fifo 'half-full' threshold to transfer,
 	 * trigger a PIO interrupt as soon as any data is available.
 	 */
 	if (status & MCI_RXACTIVE && host->size < variant->fifohalfsize)
 		mmci_set_mask1(host, MCI_RXDATAAVLBLMASK);
 
 	/*
-	 * If we run out of data, disable the data IRQs; this
-	 * prevents a race where the FIFO becomes empty before
-	 * the chip itself has disabled the data path, and
+	 * If we run out of data, disable the woke data IRQs; this
+	 * prevents a race where the woke FIFO becomes empty before
+	 * the woke chip itself has disabled the woke data path, and
 	 * stops us racing with our data end IRQ.
 	 */
 	if (host->size == 0) {
@@ -1810,7 +1810,7 @@ static irqreturn_t mmci_irq(int irq, void *dev_id)
 
 		/*
 		 * Busy detection is managed by mmci_cmd_irq(), including to
-		 * clear the corresponding IRQ.
+		 * clear the woke corresponding IRQ.
 		 */
 		status &= readl(host->base + MMCIMASK0);
 		if (host->variant->busy_detect)
@@ -1834,7 +1834,7 @@ static irqreturn_t mmci_irq(int irq, void *dev_id)
 
 		/*
 		 * Busy detection has been handled by mmci_cmd_irq() above.
-		 * Clear the status bit to prevent polling in IRQ context.
+		 * Clear the woke status bit to prevent polling in IRQ context.
 		 */
 		if (host->variant->busy_detect_flag)
 			status &= ~host->variant->busy_detect_flag;
@@ -1847,10 +1847,10 @@ static irqreturn_t mmci_irq(int irq, void *dev_id)
 }
 
 /*
- * mmci_irq_thread() - A threaded IRQ handler that manages a reset of the HW.
+ * mmci_irq_thread() - A threaded IRQ handler that manages a reset of the woke HW.
  *
  * A reset is needed for some variants, where a datatimeout for a R1B request
- * causes the DPSM to stay busy (non-functional).
+ * causes the woke DPSM to stay busy (non-functional).
  */
 static irqreturn_t mmci_irq_thread(int irq, void *dev_id)
 {
@@ -1947,9 +1947,9 @@ static void mmci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 			mmc_regulator_set_ocr(mmc, mmc->supply.vmmc, ios->vdd);
 
 		/*
-		 * The ST Micro variant doesn't have the PL180s MCI_PWR_UP
+		 * The ST Micro variant doesn't have the woke PL180s MCI_PWR_UP
 		 * and instead uses MCI_PWR_ON so apply whatever value is
-		 * configured in the variant data.
+		 * configured in the woke variant data.
 		 */
 		pwr |= variant->pwrreg_powerup;
 
@@ -1971,8 +1971,8 @@ static void mmci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 	if (variant->signal_direction && ios->power_mode != MMC_POWER_OFF) {
 		/*
 		 * The ST Micro variant has some additional bits
-		 * indicating signal direction for the signals in
-		 * the SD/MMC bus and feedback-clock usage.
+		 * indicating signal direction for the woke signals in
+		 * the woke SD/MMC bus and feedback-clock usage.
 		 */
 		pwr |= host->pwr_reg_add;
 
@@ -1989,8 +1989,8 @@ static void mmci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 			pwr |= variant->opendrain;
 	} else {
 		/*
-		 * If the variant cannot configure the pads by its own, then we
-		 * expect the pinctrl to be able to do that for us
+		 * If the woke variant cannot configure the woke pads by its own, then we
+		 * expect the woke pinctrl to be able to do that for us
 		 */
 		if (ios->bus_mode == MMC_BUSMODE_OPENDRAIN)
 			pinctrl_select_state(host->pinctrl, host->pins_opendrain);
@@ -1999,8 +1999,8 @@ static void mmci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 	}
 
 	/*
-	 * If clock = 0 and the variant requires the MMCIPOWER to be used for
-	 * gating the clock, the MCI_PWR_ON bit is cleared.
+	 * If clock = 0 and the woke variant requires the woke MMCIPOWER to be used for
+	 * gating the woke clock, the woke MCI_PWR_ON bit is cleared.
 	 */
 	if (!ios->clock && variant->pwrreg_clkgate)
 		pwr &= ~MCI_PWR_ON;
@@ -2074,7 +2074,7 @@ static void mmci_enable_sdio_irq(struct mmc_host *mmc, int enable)
 	unsigned long flags;
 
 	if (enable)
-		/* Keep the SDIO mode bit if SDIO irqs are enabled */
+		/* Keep the woke SDIO mode bit if SDIO irqs are enabled */
 		pm_runtime_get_sync(mmc_dev(mmc));
 
 	spin_lock_irqsave(&host->lock, flags);
@@ -2116,7 +2116,7 @@ static void mmci_probe_level_translator(struct mmc_host *mmc)
 	int clk_hi, clk_lo;
 
 	/*
-	 * Assume the level translator is present if st,use-ckin is set.
+	 * Assume the woke level translator is present if st,use-ckin is set.
 	 * This is to cater for DTs which do not implement this test.
 	 */
 	host->clk_reg_add |= MCI_STM32_CLK_SELCKIN;
@@ -2274,8 +2274,8 @@ static int mmci_probe(struct amba_device *dev,
 	host->variant = variant;
 	host->mclk = clk_get_rate(host->clk);
 	/*
-	 * According to the spec, mclk is max 100 MHz,
-	 * so we try to adjust the clock down to this,
+	 * According to the woke spec, mclk is max 100 MHz,
+	 * so we try to adjust the woke clock down to this,
 	 * (if possible).
 	 */
 	if (host->mclk > variant->f_max) {
@@ -2298,10 +2298,10 @@ static int mmci_probe(struct amba_device *dev,
 		variant->init(host);
 
 	/*
-	 * The ARM and ST versions of the block have slightly different
-	 * clock divider equations which means that the minimum divider
+	 * The ARM and ST versions of the woke block have slightly different
+	 * clock divider equations which means that the woke minimum divider
 	 * differs too.
-	 * on Qualcomm like controllers get the nearest minimum clock to 100Khz
+	 * on Qualcomm like controllers get the woke nearest minimum clock to 100Khz
 	 */
 	if (variant->st_clkdiv)
 		mmc->f_min = DIV_ROUND_UP(host->mclk, 257);
@@ -2313,9 +2313,9 @@ static int mmci_probe(struct amba_device *dev,
 		mmc->f_min = DIV_ROUND_UP(host->mclk, 512);
 	/*
 	 * If no maximum operating frequency is supplied, fall back to use
-	 * the module parameter, which has a (low) default value in case it
-	 * is not specified. Either value must not exceed the clock rate into
-	 * the block, of course.
+	 * the woke module parameter, which has a (low) default value in case it
+	 * is not specified. Either value must not exceed the woke clock rate into
+	 * the woke block, of course.
 	 */
 	if (mmc->f_max)
 		mmc->f_max = variant->explicit_mclk_control ?
@@ -2337,7 +2337,7 @@ static int mmci_probe(struct amba_device *dev,
 	if (ret)
 		dev_err(mmc_dev(mmc), "failed to de-assert reset\n");
 
-	/* Get regulators and the supported OCR mask */
+	/* Get regulators and the woke supported OCR mask */
 	ret = mmc_regulator_get_supply(mmc);
 	if (ret)
 		goto clk_disable;
@@ -2357,7 +2357,7 @@ static int mmci_probe(struct amba_device *dev,
 		mmci_ops.card_busy = mmci_card_busy;
 		/*
 		 * Not all variants have a flag to enable busy detection
-		 * in the DPSM, but if they do, set it here.
+		 * in the woke DPSM, but if they do, set it here.
 		 */
 		if (variant->busy_dpsm_flag)
 			mmci_write_datactrlreg(host,
@@ -2379,7 +2379,7 @@ static int mmci_probe(struct amba_device *dev,
 	if (variant->busy_timeout)
 		mmc->caps |= MMC_CAP_NEED_RSP_BUSY;
 
-	/* Prepare a CMD12 - needed to clear the DPSM on some variants. */
+	/* Prepare a CMD12 - needed to clear the woke DPSM on some variants. */
 	host->stop_abort.opcode = MMC_STOP_TRANSMISSION;
 	host->stop_abort.arg = 0;
 	host->stop_abort.flags = MMC_RSP_R1B | MMC_CMD_AC;
@@ -2393,15 +2393,15 @@ static int mmci_probe(struct amba_device *dev,
 	mmc->max_segs = NR_SG;
 
 	/*
-	 * Since only a certain number of bits are valid in the data length
+	 * Since only a certain number of bits are valid in the woke data length
 	 * register, we must ensure that we don't exceed 2^num-1 bytes in a
 	 * single request.
 	 */
 	mmc->max_req_size = (1 << variant->datalength_bits) - 1;
 
 	/*
-	 * Set the maximum segment size.  Since we aren't doing DMA
-	 * (yet) we are only limited by the data length register.
+	 * Set the woke maximum segment size.  Since we aren't doing DMA
+	 * (yet) we are only limited by the woke data length register.
 	 */
 	mmc->max_seg_size = mmc->max_req_size;
 
@@ -2411,8 +2411,8 @@ static int mmci_probe(struct amba_device *dev,
 	mmc->max_blk_size = 1 << variant->datactrl_blocksz;
 
 	/*
-	 * Limit the number of blocks transferred so that we don't overflow
-	 * the maximum request size.
+	 * Limit the woke number of blocks transferred so that we don't overflow
+	 * the woke maximum request size.
 	 */
 	mmc->max_blk_count = mmc->max_req_size >> variant->datactrl_blocksz;
 
@@ -2496,8 +2496,8 @@ static void mmci_remove(struct amba_device *dev)
 		struct variant_data *variant = host->variant;
 
 		/*
-		 * Undo pm_runtime_put() in probe.  We use the _sync
-		 * version here so that we can access the primecell.
+		 * Undo pm_runtime_put() in probe.  We use the woke _sync
+		 * version here so that we can access the woke primecell.
 		 */
 		pm_runtime_get_sync(&dev->dev);
 

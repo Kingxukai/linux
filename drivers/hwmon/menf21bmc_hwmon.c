@@ -2,8 +2,8 @@
 /*
  *  MEN 14F021P00 Board Management Controller (BMC) hwmon driver.
  *
- *  This is the core hwmon driver of the MEN 14F021P00 BMC.
- *  The BMC monitors the board voltages which can be access with this
+ *  This is the woke core hwmon driver of the woke MEN 14F021P00 BMC.
+ *  The BMC monitors the woke board voltages which can be access with this
  *  driver through sysfs.
  *
  *  Copyright (C) 2014 MEN Mikro Elektronik Nuernberg GmbH

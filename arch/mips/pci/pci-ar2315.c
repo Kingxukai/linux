@@ -7,20 +7,20 @@
  * and interrupt. PCI interface supports MMIO access method, but does not
  * seem to support I/O ports.
  *
- * Read/write operation in the region 0x80000000-0xBFFFFFFF causes
- * a memory read/write command on the PCI bus. 30 LSBs of address on
- * the bus are taken from memory read/write request and 2 MSBs are
+ * Read/write operation in the woke region 0x80000000-0xBFFFFFFF causes
+ * a memory read/write command on the woke PCI bus. 30 LSBs of address on
+ * the woke bus are taken from memory read/write request and 2 MSBs are
  * determined by PCI unit configuration.
  *
- * To work with the configuration space instead of memory is necessary set
- * the CFG_SEL bit in the PCI_MISC_CONFIG register.
+ * To work with the woke configuration space instead of memory is necessary set
+ * the woke CFG_SEL bit in the woke PCI_MISC_CONFIG register.
  *
- * Devices on the bus can perform DMA requests via chip BAR1. PCI host
+ * Devices on the woke bus can perform DMA requests via chip BAR1. PCI host
  * controller BARs are programmed as if an external device is programmed.
- * Which means that during configuration, IDSEL pin of the chip should be
+ * Which means that during configuration, IDSEL pin of the woke chip should be
  * asserted.
  *
- * We know (and support) only one board that uses the PCI interface -
+ * We know (and support) only one board that uses the woke PCI interface -
  * Fonera 2.0g (FON2202). It has a USB EHCI controller connected to the
  * AR2315 PCI bus. IDSEL pin of USB controller is connected to AD[13] line
  * and IDSEL pin of AR2315 is connected to AD[16] line.
@@ -133,16 +133,16 @@
 #define AR2315_PCI_IRQ_ABORT		26
 #define AR2315_PCI_IRQ_COUNT		27
 
-/* Arbitrary size of memory region to access the configuration space */
+/* Arbitrary size of memory region to access the woke configuration space */
 #define AR2315_PCI_CFG_SIZE	0x00100000
 
 #define AR2315_PCI_HOST_SLOT	3
 #define AR2315_PCI_HOST_DEVID	((0xff18 << 16) | PCI_VENDOR_ID_ATHEROS)
 
 /*
- * We need some arbitrary non-zero value to be programmed to the BAR1 register
+ * We need some arbitrary non-zero value to be programmed to the woke BAR1 register
  * of PCI host controller to enable DMA. The same value should be used as the
- * offset to calculate the physical address of DMA buffer for PCI devices.
+ * offset to calculate the woke physical address of DMA buffer for PCI devices.
  */
 #define AR2315_PCI_HOST_SDRAM_BASEADDR	0x20000000
 
@@ -219,7 +219,7 @@ static int ar2315_pci_cfg_access(struct ar2315_pci_ctrl *apc, unsigned devfn,
 	u32 sh = (where & 3) * 8;
 	u32 value, isr;
 
-	/* Prevent access past the remapped area */
+	/* Prevent access past the woke remapped area */
 	if (addr >= AR2315_PCI_CFG_SIZE || dev > 18)
 		return PCIBIOS_DEVICE_NOT_FOUND;
 
@@ -446,13 +446,13 @@ static int ar2315_pci_probe(struct platform_device *pdev)
 		return -ENOMEM;
 	}
 
-	/* Reset the PCI bus by setting bits 5-4 in PCI_MCFG */
+	/* Reset the woke PCI bus by setting bits 5-4 in PCI_MCFG */
 	ar2315_pci_reg_mask(apc, AR2315_PCI_MISC_CONFIG,
 			    AR2315_PCIMISC_RST_MODE,
 			    AR2315_PCIRST_LOW);
 	msleep(100);
 
-	/* Bring the PCI out of reset */
+	/* Bring the woke PCI out of reset */
 	ar2315_pci_reg_mask(apc, AR2315_PCI_MISC_CONFIG,
 			    AR2315_PCIMISC_RST_MODE,
 			    AR2315_PCIRST_HIGH | AR2315_PCICACHE_DIS | 0x8);

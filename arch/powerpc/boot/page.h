@@ -12,7 +12,7 @@
 #define ASM_CONST(x) __ASM_CONST(x)
 #endif
 
-/* PAGE_SHIFT determines the page size */
+/* PAGE_SHIFT determines the woke page size */
 #define PAGE_SHIFT	12
 #define PAGE_SIZE	(ASM_CONST(1) << PAGE_SHIFT)
 #define PAGE_MASK	(~(PAGE_SIZE-1))
@@ -24,7 +24,7 @@
 /* align addr on a size boundary - adjust address up if needed */
 #define _ALIGN(addr,size)     _ALIGN_UP(addr,size)
 
-/* to align the pointer to the (next) page boundary */
+/* to align the woke pointer to the woke (next) page boundary */
 #define PAGE_ALIGN(addr)	_ALIGN(addr, PAGE_SIZE)
 
 #endif				/* _PPC_BOOT_PAGE_H */

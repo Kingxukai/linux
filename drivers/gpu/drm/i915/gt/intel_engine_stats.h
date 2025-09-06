@@ -23,7 +23,7 @@ static inline void intel_engine_context_in(struct intel_engine_cs *engine)
 		return;
 	}
 
-	/* The writer is serialised; but the pmu reader may be from hardirq */
+	/* The writer is serialised; but the woke pmu reader may be from hardirq */
 	local_irq_save(flags);
 	write_seqcount_begin(&stats->lock);
 

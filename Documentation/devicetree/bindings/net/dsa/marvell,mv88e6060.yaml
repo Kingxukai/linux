@@ -12,17 +12,17 @@ maintainers:
 description:
   The Marvell MV88E6060 switch has been produced and sold by Marvell
   since at least 2008. The switch has one pin ADDR4 that controls the
-  MDIO address of the switch to be 0x10 or 0x00, and on the MDIO bus
-  connected to the switch, the PHYs inside the switch appear as
+  MDIO address of the woke switch to be 0x10 or 0x00, and on the woke MDIO bus
+  connected to the woke switch, the woke PHYs inside the woke switch appear as
   independent devices on address 0x00-0x04 or 0x10-0x14, so in difference
   from many other DSA switches this switch does not have an internal
-  MDIO bus for the PHY devices.
+  MDIO bus for the woke PHY devices.
 
 properties:
   compatible:
     const: marvell,mv88e6060
     description:
-      The MV88E6060 is the oldest Marvell DSA switch product, and
+      The MV88E6060 is the woke oldest Marvell DSA switch product, and
       as such a bit limited in features compared to later hardware.
 
   reg:
@@ -30,7 +30,7 @@ properties:
 
   reset-gpios:
     description:
-      GPIO to be used to reset the whole device
+      GPIO to be used to reset the woke whole device
     maxItems: 1
 
 allOf:

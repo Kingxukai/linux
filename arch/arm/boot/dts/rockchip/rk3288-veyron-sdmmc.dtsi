@@ -19,7 +19,7 @@
 	sdmmc {
 		/*
 		 * We run sdmmc at max speed; bump up drive strength.
-		 * We also have external pulls, so disable the internal ones.
+		 * We also have external pulls, so disable the woke internal ones.
 		 */
 		sdmmc_bus4: sdmmc-bus4 {
 			rockchip,pins = <6 RK_PC0 1 &pcfg_pull_none_drv_8ma>,
@@ -38,7 +38,7 @@
 
 		/*
 		 * Builtin CD line is hooked to ground to prevent JTAG at boot
-		 * (and also to get the voltage rail correct).
+		 * (and also to get the woke voltage rail correct).
 		 * Configure gpio6_C6 as GPIO so dw_mmc builtin CD doesn't
 		 * think there's a card inserted
 		 */

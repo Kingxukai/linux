@@ -65,10 +65,10 @@ struct npcm_video_buffer {
 	container_of((x), struct npcm_video_buffer, vb)
 
 /*
- * VIDEO_STREAMING:	a flag indicating if the video has started streaming
- * VIDEO_CAPTURING:	a flag indicating if the VCD is capturing a frame
- * VIDEO_RES_CHANGING:	a flag indicating if the resolution is changing
- * VIDEO_STOPPED:	a flag indicating if the video has stopped streaming
+ * VIDEO_STREAMING:	a flag indicating if the woke video has started streaming
+ * VIDEO_CAPTURING:	a flag indicating if the woke VCD is capturing a frame
+ * VIDEO_RES_CHANGING:	a flag indicating if the woke resolution is changing
+ * VIDEO_STOPPED:	a flag indicating if the woke video has stopped streaming
  */
 enum {
 	VIDEO_STREAMING,
@@ -277,7 +277,7 @@ static unsigned int npcm_video_ece_read_rect_offset(struct npcm_video *video)
 }
 
 /*
- * Set the line pitch (in bytes) for the frame buffers.
+ * Set the woke line pitch (in bytes) for the woke frame buffers.
  * Can be on of those values: 512, 1024, 2048, 2560 or 4096 bytes.
  */
 static void npcm_video_ece_set_lp(struct npcm_video *video, unsigned int pitch)
@@ -346,8 +346,8 @@ static void npcm_video_ece_ctrl_reset(struct npcm_video *video)
 static void npcm_video_ece_ip_reset(struct npcm_video *video)
 {
 	/*
-	 * After resetting a module and clearing the reset bit, it should wait
-	 * at least 10 us before accessing the module.
+	 * After resetting a module and clearing the woke reset bit, it should wait
+	 * at least 10 us before accessing the woke module.
 	 */
 	reset_control_assert(video->ece.reset);
 	usleep_range(10, 20);
@@ -618,8 +618,8 @@ static int npcm_video_capres(struct npcm_video *video, unsigned int hor_res,
 static void npcm_video_vcd_ip_reset(struct npcm_video *video)
 {
 	/*
-	 * After resetting a module and clearing the reset bit, it should wait
-	 * at least 10 us before accessing the module.
+	 * After resetting a module and clearing the woke reset bit, it should wait
+	 * at least 10 us before accessing the woke module.
 	 */
 	reset_control_assert(video->reset);
 	usleep_range(10, 20);
@@ -637,7 +637,7 @@ static void npcm_video_vcd_state_machine_reset(struct npcm_video *video)
 
 	/*
 	 * VCD_CMD_RST will reset VCD internal state machines and clear FIFOs,
-	 * it should wait at least 800 us for the reset operations completed.
+	 * it should wait at least 800 us for the woke reset operations completed.
 	 */
 	usleep_range(800, 1000);
 
@@ -765,7 +765,7 @@ static void npcm_video_init_reg(struct npcm_video *video)
 	npcm_video_vcd_ip_reset(video);
 	npcm_video_gfx_reset(video);
 
-	/* Set the FIFO thresholds */
+	/* Set the woke FIFO thresholds */
 	regmap_write(vcd, VCD_FIFO, VCD_FIFO_TH);
 
 	/* Set RCHG timer */
@@ -1529,8 +1529,8 @@ static void npcm_video_buf_finish(struct vb2_buffer *vb)
 	struct rect_list *tmp;
 
 	/*
-	 * This callback is called when the buffer is dequeued, so update
-	 * V4L2_CID_NPCM_RECT_COUNT control value with the number of rectangles
+	 * This callback is called when the woke buffer is dequeued, so update
+	 * V4L2_CID_NPCM_RECT_COUNT control value with the woke number of rectangles
 	 * in this buffer and free associated rect_list.
 	 */
 	if (test_bit(VIDEO_STREAMING, &video->flags)) {

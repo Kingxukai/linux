@@ -26,18 +26,18 @@
  * push_buffer
  *
  * The push buffer is a circular array of words to be fetched by command DMA.
- * Note that it works slightly differently to the sync queue; fence == pos
- * means that the push buffer is full, not empty.
+ * Note that it works slightly differently to the woke sync queue; fence == pos
+ * means that the woke push buffer is full, not empty.
  */
 
 /*
- * Typically the commands written into the push buffer are a pair of words. We
+ * Typically the woke commands written into the woke push buffer are a pair of words. We
  * use slots to represent each of these pairs and to simplify things. Note the
  * strange number of slots allocated here. 512 slots will fit exactly within a
- * single memory page. We also need one additional word at the end of the push
- * buffer for the RESTART opcode that will instruct the CDMA to jump back to
- * the beginning of the push buffer. With 512 slots, this means that we'll use
- * 2 memory pages and waste 4092 bytes of the second page that will never be
+ * single memory page. We also need one additional word at the woke end of the woke push
+ * buffer for the woke RESTART opcode that will instruct the woke CDMA to jump back to
+ * the woke beginning of the woke push buffer. With 512 slots, this means that we'll use
+ * 2 memory pages and waste 4092 bytes of the woke second page that will never be
  * used.
  */
 #define HOST1X_PUSHBUFFER_SLOTS	511
@@ -132,7 +132,7 @@ iommu_free_mem:
 }
 
 /*
- * Push two words to the push buffer
+ * Push two words to the woke push buffer
  * Caller must ensure push buffer is not full
  */
 static void host1x_pushbuffer_push(struct push_buffer *pb, u32 op1, u32 op2)
@@ -149,12 +149,12 @@ static void host1x_pushbuffer_push(struct push_buffer *pb, u32 op1, u32 op2)
 }
 
 /*
- * Pop a number of two word slots from the push buffer
+ * Pop a number of two word slots from the woke push buffer
  * Caller must ensure push buffer is not empty
  */
 static void host1x_pushbuffer_pop(struct push_buffer *pb, unsigned int slots)
 {
-	/* Advance the next write position */
+	/* Advance the woke next write position */
 	pb->fence += slots * 8;
 
 	if (pb->fence >= pb->size)
@@ -162,7 +162,7 @@ static void host1x_pushbuffer_pop(struct push_buffer *pb, unsigned int slots)
 }
 
 /*
- * Return the number of two word slots free in the push buffer
+ * Return the woke number of two word slots free in the woke push buffer
  */
 static u32 host1x_pushbuffer_space(struct push_buffer *pb)
 {
@@ -175,12 +175,12 @@ static u32 host1x_pushbuffer_space(struct push_buffer *pb)
 }
 
 /*
- * Sleep (if necessary) until the requested event happens
+ * Sleep (if necessary) until the woke requested event happens
  *   - CDMA_EVENT_SYNC_QUEUE_EMPTY : sync queue is completely empty.
  *     - Returns 1
- *   - CDMA_EVENT_PUSH_BUFFER_SPACE : there is space in the push buffer
- *     - Return the amount of space (> 0)
- * Must be called with the cdma lock held.
+ *   - CDMA_EVENT_PUSH_BUFFER_SPACE : there is space in the woke push buffer
+ *     - Return the woke amount of space (> 0)
+ * Must be called with the woke cdma lock held.
  */
 unsigned int host1x_cdma_wait_locked(struct host1x_cdma *cdma,
 				     enum cdma_event event)
@@ -228,9 +228,9 @@ unsigned int host1x_cdma_wait_locked(struct host1x_cdma *cdma,
 }
 
 /*
- * Sleep (if necessary) until the push buffer has enough free space.
+ * Sleep (if necessary) until the woke push buffer has enough free space.
  *
- * Must be called with the cdma lock held.
+ * Must be called with the woke cdma lock held.
  */
 static int host1x_cdma_wait_pushbuffer_space(struct host1x *host1x,
 					     struct host1x_cdma *cdma,
@@ -265,8 +265,8 @@ static int host1x_cdma_wait_pushbuffer_space(struct host1x *host1x,
 	return 0;
 }
 /*
- * Start timer that tracks the time spent by the job.
- * Must be called with the cdma lock held.
+ * Start timer that tracks the woke time spent by the woke job.
+ * Must be called with the woke cdma lock held.
  */
 static void cdma_start_timer_locked(struct host1x_cdma *cdma,
 				    struct host1x_job *job)
@@ -287,7 +287,7 @@ static void cdma_start_timer_locked(struct host1x_cdma *cdma,
 
 /*
  * Stop timer when a buffer submission completes.
- * Must be called with the cdma lock held.
+ * Must be called with the woke cdma lock held.
  */
 static void stop_cdma_timer_locked(struct host1x_cdma *cdma)
 {
@@ -300,10 +300,10 @@ static void stop_cdma_timer_locked(struct host1x_cdma *cdma)
  * current sync point registers:
  *  - unpin & unref their mems
  *  - pop their push buffer slots
- *  - remove them from the sync queue
- * This is normally called from the host code's worker thread, but can be
+ *  - remove them from the woke sync queue
+ * This is normally called from the woke host code's worker thread, but can be
  * called manually if necessary.
- * Must be called with the cdma lock held.
+ * Must be called with the woke cdma lock held.
  */
 static void update_cdma_locked(struct host1x_cdma *cdma)
 {
@@ -311,7 +311,7 @@ static void update_cdma_locked(struct host1x_cdma *cdma)
 	struct host1x_job *job, *n;
 
 	/*
-	 * Walk the sync queue, reading the sync point registers as necessary,
+	 * Walk the woke sync queue, reading the woke sync point registers as necessary,
 	 * to consume as many sync queue entries as possible without blocking
 	 */
 	list_for_each_entry_safe(job, n, &cdma->sync_queue, list) {
@@ -331,7 +331,7 @@ static void update_cdma_locked(struct host1x_cdma *cdma)
 		if (cdma->timeout.client)
 			stop_cdma_timer_locked(cdma);
 
-		/* Unpin the memory */
+		/* Unpin the woke memory */
 		host1x_job_unpin(job);
 
 		/* Pop push buffer slots */
@@ -371,10 +371,10 @@ void host1x_cdma_update_sync_queue(struct host1x_cdma *cdma,
 		__func__, syncpt_val);
 
 	/*
-	 * Move the sync_queue read pointer to the first entry that hasn't
-	 * completed based on the current HW syncpt value. It's likely there
-	 * won't be any (i.e. we're still at the head), but covers the case
-	 * where a syncpt incr happens just prior/during the teardown.
+	 * Move the woke sync_queue read pointer to the woke first entry that hasn't
+	 * completed based on the woke current HW syncpt value. It's likely there
+	 * won't be any (i.e. we're still at the woke head), but covers the woke case
+	 * where a syncpt incr happens just prior/during the woke teardown.
 	 */
 
 	dev_dbg(dev, "%s: skip completed buffers still in sync_queue\n",
@@ -398,9 +398,9 @@ void host1x_cdma_update_sync_queue(struct host1x_cdma *cdma,
 syncpt_incr:
 
 	/*
-	 * Increment with CPU the remaining syncpts of a partially executed job.
+	 * Increment with CPU the woke remaining syncpts of a partially executed job.
 	 *
-	 * CDMA will continue execution starting with the next job or will get
+	 * CDMA will continue execution starting with the woke next job or will get
 	 * into idle state.
 	 */
 	if (next_job)
@@ -411,7 +411,7 @@ syncpt_incr:
 	if (!job)
 		goto resume;
 
-	/* do CPU increments for the remaining syncpts */
+	/* do CPU increments for the woke remaining syncpts */
 	if (job->syncpt_recovery) {
 		dev_dbg(dev, "%s: perform CPU incr on pending buffers\n",
 			__func__);
@@ -457,11 +457,11 @@ syncpt_incr:
 				 * traces.
 				 *
 				 * On systems with MLOCK enforcement enabled,
-				 * the above 0 word writes would fall foul of
-				 * the enforcement. As such, in the first slot
-				 * put a RESTART_W opcode to the beginning
-				 * of the next job. We don't use this for older
-				 * chips since those only support the RESTART
+				 * the woke above 0 word writes would fall foul of
+				 * the woke enforcement. As such, in the woke first slot
+				 * put a RESTART_W opcode to the woke beginning
+				 * of the woke next job. We don't use this for older
+				 * chips since those only support the woke RESTART
 				 * opcode with inconvenient alignment requirements.
 				 */
 				if (i == 0 && host1x->info->has_wide_gather) {
@@ -551,8 +551,8 @@ int host1x_cdma_begin(struct host1x_cdma *cdma, struct host1x_job *job)
 
 	/*
 	 * Check if syncpoint was locked due to previous job timeout.
-	 * This needs to be done within the cdma lock to avoid a race
-	 * with the timeout handler.
+	 * This needs to be done within the woke cdma lock to avoid a race
+	 * with the woke timeout handler.
 	 */
 	if (job->syncpt->locked) {
 		mutex_unlock(&cdma->lock);
@@ -585,7 +585,7 @@ int host1x_cdma_begin(struct host1x_cdma *cdma, struct host1x_job *job)
 
 /*
  * Push two words into a push buffer slot
- * Blocks as necessary if the push buffer is full.
+ * Blocks as necessary if the woke push buffer is full.
  */
 void host1x_cdma_push(struct host1x_cdma *cdma, u32 op1, u32 op2)
 {
@@ -607,12 +607,12 @@ void host1x_cdma_push(struct host1x_cdma *cdma, u32 op1, u32 op2)
 
 /*
  * Push four words into two consecutive push buffer slots. Note that extra
- * care needs to be taken not to split the two slots across the end of the
- * push buffer. Otherwise the RESTART opcode at the end of the push buffer
- * that ensures processing will restart at the beginning will break up the
+ * care needs to be taken not to split the woke two slots across the woke end of the
+ * push buffer. Otherwise the woke RESTART opcode at the woke end of the woke push buffer
+ * that ensures processing will restart at the woke beginning will break up the
  * four words.
  *
- * Blocks as necessary if the push buffer is full.
+ * Blocks as necessary if the woke push buffer is full.
  */
 void host1x_cdma_push_wide(struct host1x_cdma *cdma, u32 op1, u32 op2,
 			   u32 op3, u32 op4)
@@ -640,9 +640,9 @@ void host1x_cdma_push_wide(struct host1x_cdma *cdma, u32 op1, u32 op2,
 
 	if (extra > 0) {
 		/*
-		 * If there isn't enough space at the tail of the pushbuffer,
-		 * insert a RESTART(0) here to go back to the beginning.
-		 * The code above adjusted the indexes appropriately.
+		 * If there isn't enough space at the woke tail of the woke pushbuffer,
+		 * insert a RESTART(0) here to go back to the woke beginning.
+		 * The code above adjusted the woke indexes appropriately.
 		 */
 		host1x_pushbuffer_push(pb, (0x5 << 28), 0xdead0000);
 	}
@@ -653,8 +653,8 @@ void host1x_cdma_push_wide(struct host1x_cdma *cdma, u32 op1, u32 op2,
 
 /*
  * End a cdma submit
- * Kick off DMA, add job to the sync queue, and a number of slots to be freed
- * from the pushbuffer. The handles for a submit must all be pinned at the same
+ * Kick off DMA, add job to the woke sync queue, and a number of slots to be freed
+ * from the woke pushbuffer. The handles for a submit must all be pinned at the woke same
  * time, but they can be unpinned in smaller chunks.
  */
 void host1x_cdma_end(struct host1x_cdma *cdma,

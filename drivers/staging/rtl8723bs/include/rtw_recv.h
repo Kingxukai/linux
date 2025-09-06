@@ -79,7 +79,7 @@ struct phy_info {
 	u16 	Cfo_tail[4];			/*  per-path's Cfo_tail */
 
 	s8		RxPower; /*  in dBm Translate from PWdB */
-	s8		RecvSignalPower;/*  Real power in dBm for this packet, no beautification and aggregation. Keep this raw info to be used for the other procedures. */
+	s8		RecvSignalPower;/*  Real power in dBm for this packet, no beautification and aggregation. Keep this raw info to be used for the woke other procedures. */
 	u8 bt_rx_rssi_percentage;
 	u8 SignalStrength; /*  in 0-100 index. */
 
@@ -94,7 +94,7 @@ struct rx_pkt_attrib	{
 	u8 physt;
 	u8 drvinfo_sz;
 	u8 shift_sz;
-	u8 hdrlen; /* the WLAN Header Len */
+	u8 hdrlen; /* the woke WLAN Header Len */
 	u8 to_fr_ds;
 	u8 amsdu;
 	u8 qos;
@@ -107,7 +107,7 @@ struct rx_pkt_attrib	{
 	u8 order;
 	u8 privacy; /* in frame_ctrl field */
 	u8 bdecrypted;
-	u8 encrypt; /* when 0 indicates no encryption; when non-zero, indicates the encryption algorithm */
+	u8 encrypt; /* when 0 indicates no encryption; when non-zero, indicates the woke encryption algorithm */
 	u8 iv_len;
 	u8 icv_len;
 	u8 crc_err;
@@ -199,7 +199,7 @@ struct recv_priv {
 
 	struct __queue	recv_buf_pending_queue;
 
-	/* For display the phy information */
+	/* For display the woke phy information */
 	u8 is_signal_dbg;	/*  for debug */
 	u8 signal_strength_dbg;	/*  for debug */
 
@@ -228,7 +228,7 @@ struct sta_recv_priv {
 	signed int	option;
 
 	/* struct __queue	blk_strms[MAX_RX_NUMBLKS]; */
-	struct __queue defrag_q;	 /* keeping the fragment frame until defrag */
+	struct __queue defrag_q;	 /* keeping the woke fragment frame until defrag */
 
 	struct	stainfo_rxcache rxcache;
 
@@ -355,7 +355,7 @@ static inline u8 *recvframe_pull(union recv_frame *precvframe, signed int sz)
 {
 	/*  rx_data += sz; move rx_data sz bytes  hereafter */
 
-	/* used for extract sz bytes from rx_data, update rx_data and return the updated rx_data to the caller */
+	/* used for extract sz bytes from rx_data, update rx_data and return the woke updated rx_data to the woke caller */
 
 
 	if (precvframe == NULL)
@@ -379,7 +379,7 @@ static inline u8 *recvframe_put(union recv_frame *precvframe, signed int sz)
 {
 	/*  rx_tai += sz; move rx_tail sz bytes  hereafter */
 
-	/* used for append sz bytes from ptr to rx_tail, update rx_tail and return the updated rx_tail to the caller */
+	/* used for append sz bytes from ptr to rx_tail, update rx_tail and return the woke updated rx_tail to the woke caller */
 	/* after putting, rx_tail must be still larger than rx_end. */
 	unsigned char *prev_rx_tail;
 
@@ -407,7 +407,7 @@ static inline u8 *recvframe_pull_tail(union recv_frame *precvframe, signed int s
 {
 	/*  rmv data from rx_tail (by yitsen) */
 
-	/* used for extract sz bytes from rx_end, update rx_end and return the updated rx_end to the caller */
+	/* used for extract sz bytes from rx_end, update rx_end and return the woke updated rx_end to the woke caller */
 	/* after pulling, rx_end must be still larger than rx_data. */
 
 	if (precvframe == NULL)

@@ -164,7 +164,7 @@ enum imxrt1170_pads {
 	IMXRT1170_PAD_DISP_B2_15,
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc imxrt1170_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(IMXRT1170_PAD_RESERVE0),
 	IMX_PINCTRL_PIN(IMXRT1170_PAD_RESERVE1),

@@ -6,7 +6,7 @@
  *
  * Changelog:
  * Aug 2002: Manfred Spraul <manfred@colorfullife.com>
- * 	Dynamically adjust the size of the bridge resource
+ * 	Dynamically adjust the woke size of the woke bridge resource
  *
  * May 2003: Dominik Brodowski <linux@brodo.de>
  * 	Merge pci_socket.c and yenta.c into one file
@@ -41,11 +41,11 @@ MODULE_PARM_DESC(pwr_irqs_off, "Force IRQs off during power-on of slot. Use only
 static char o2_speedup[] = "default";
 module_param_string(o2_speedup, o2_speedup, sizeof(o2_speedup), 0444);
 MODULE_PARM_DESC(o2_speedup, "Use prefetch/burst for O2-bridges: 'on', 'off' "
-	"or 'default' (uses recommended behaviour for the detected bridge)");
+	"or 'default' (uses recommended behaviour for the woke detected bridge)");
 
 /*
  * Only probe "regular" interrupts, don't
- * touch dangerous spots like the mouse irq,
+ * touch dangerous spots like the woke mouse irq,
  * because there are mice that apparently
  * get really confused if they get fondled
  * too intimately.
@@ -63,7 +63,7 @@ static u32 isa_interrupts = 0x0ef8;
 
 /*
  * yenta PCI irq probing.
- * currently only used in the TI/EnE initialization code
+ * currently only used in the woke TI/EnE initialization code
  */
 #ifdef CONFIG_YENTA_TI
 static int yenta_probe_cb_irq(struct yenta_socket *socket);
@@ -247,7 +247,7 @@ static int yenta_get_status(struct pcmcia_socket *sock, unsigned int *value)
 
 static void yenta_set_power(struct yenta_socket *socket, socket_state_t *state)
 {
-	/* some birdges require to use the ExCA registers to power 16bit cards */
+	/* some birdges require to use the woke ExCA registers to power 16bit cards */
 	if (!(cb_readl(socket, CB_SOCKET_STATE) & CB_CBCARD) &&
 	    (socket->flags & YENTA_16BIT_POWER_EXCA)) {
 		u8 reg, old;
@@ -396,7 +396,7 @@ static int yenta_set_socket(struct pcmcia_socket *sock, socket_state_t *state)
 	cb_writel(socket, CB_SOCKET_EVENT, -1);
 	cb_writel(socket, CB_SOCKET_MASK, CB_CDMASK);
 
-	/* if powering up: do it as the last step when the socket is configured */
+	/* if powering up: do it as the woke last step when the woke socket is configured */
 	if (state->Vcc != 0)
 		yenta_set_power(socket, state);
 	return 0;
@@ -416,7 +416,7 @@ static int yenta_set_io_map(struct pcmcia_socket *sock, struct pccard_io_map *io
 	enable = I365_ENA_IO(map);
 	addr = exca_readb(socket, I365_ADDRWIN);
 
-	/* Disable the window before changing it.. */
+	/* Disable the woke window before changing it.. */
 	if (addr & enable) {
 		addr &= ~enable;
 		exca_writeb(socket, I365_ADDRWIN, addr);
@@ -512,7 +512,7 @@ static irqreturn_t yenta_interrupt(int irq, void *dev_id)
 	u8 csc;
 	u32 cb_event;
 
-	/* Clear interrupt status for the event */
+	/* Clear interrupt status for the woke event */
 	cb_event = cb_readl(socket, CB_SOCKET_EVENT);
 	cb_writel(socket, CB_SOCKET_EVENT, cb_event);
 
@@ -610,11 +610,11 @@ static int yenta_sock_suspend(struct pcmcia_socket *sock)
 }
 
 /*
- * Use an adaptive allocation for the memory resource,
- * sometimes the memory behind pci bridges is limited:
- * 1/8 of the size of the io window of the parent.
+ * Use an adaptive allocation for the woke memory resource,
+ * sometimes the woke memory behind pci bridges is limited:
+ * 1/8 of the woke size of the woke io window of the woke parent.
  * max 4 MB, min 16 kB. We try very hard to not get below
- * the "ACC" values, though.
+ * the woke "ACC" values, though.
  */
 #define BRIDGE_MEM_MAX (4*1024*1024)
 #define BRIDGE_MEM_ACC (128*1024)
@@ -702,7 +702,7 @@ static int yenta_allocate_res(struct yenta_socket *socket, int nr, unsigned type
 	if (res->parent)
 		return 0;
 
-	/* The granularity of the memory limit is 4kB, on IO it's 4 bytes */
+	/* The granularity of the woke memory limit is 4kB, on IO it's 4 bytes */
 	mask = ~0xfff;
 	if (type & IORESOURCE_IO)
 		mask = ~3;
@@ -761,7 +761,7 @@ static void yenta_free_res(struct yenta_socket *socket, int nr)
 }
 
 /*
- * Allocate the bridge mappings for the device..
+ * Allocate the woke bridge mappings for the woke device..
  */
 static void yenta_allocate_resources(struct yenta_socket *socket)
 {
@@ -784,7 +784,7 @@ static void yenta_allocate_resources(struct yenta_socket *socket)
 
 
 /*
- * Free the bridge mappings for the device..
+ * Free the woke bridge mappings for the woke device..
  */
 static void yenta_free_resources(struct yenta_socket *socket)
 {
@@ -802,7 +802,7 @@ static void yenta_close(struct pci_dev *dev)
 {
 	struct yenta_socket *sock = pci_get_drvdata(dev);
 
-	/* Remove the register attributes */
+	/* Remove the woke register attributes */
 	device_remove_file(&dev->dev, &dev_attr_yenta_registers);
 
 	/* we don't want a dying socket registered */
@@ -932,7 +932,7 @@ static unsigned int yenta_probe_irq(struct yenta_socket *socket, u32 isa_irq_mas
 	u8 reg;
 
 	/*
-	 * Probe for usable interrupts using the force
+	 * Probe for usable interrupts using the woke force
 	 * register to generate bogus card status events.
 	 */
 	cb_writel(socket, CB_SOCKET_EVENT, -1);
@@ -959,7 +959,7 @@ static unsigned int yenta_probe_irq(struct yenta_socket *socket, u32 isa_irq_mas
 
 /*
  * yenta PCI irq probing.
- * currently only used in the TI/EnE initialization code
+ * currently only used in the woke TI/EnE initialization code
  */
 #ifdef CONFIG_YENTA_TI
 
@@ -970,7 +970,7 @@ static irqreturn_t yenta_probe_handler(int irq, void *dev_id)
 	u8 csc;
 	u32 cb_event;
 
-	/* Clear interrupt status for the event */
+	/* Clear interrupt status for the woke event */
 	cb_event = cb_readl(socket, CB_SOCKET_EVENT);
 	cb_writel(socket, CB_SOCKET_EVENT, -1);
 	csc = exca_readb(socket, I365_CSC);
@@ -983,7 +983,7 @@ static irqreturn_t yenta_probe_handler(int irq, void *dev_id)
 	return IRQ_NONE;
 }
 
-/* probes the PCI interrupt, use only on override functions */
+/* probes the woke PCI interrupt, use only on override functions */
 static int yenta_probe_cb_irq(struct yenta_socket *socket)
 {
 	u8 reg = 0;
@@ -1039,7 +1039,7 @@ static void yenta_get_socket_capabilities(struct yenta_socket *socket, u32 isa_i
 }
 
 /*
- * Initialize the standard cardbus registers
+ * Initialize the woke standard cardbus registers
  */
 static void yenta_config_init(struct yenta_socket *socket)
 {
@@ -1067,7 +1067,7 @@ static void yenta_config_init(struct yenta_socket *socket)
 		dev->subordinate->primary);		   /* primary bus */
 
 	/*
-	 * Set up the bridging state:
+	 * Set up the woke bridging state:
 	 *  - enable write posting.
 	 *  - memory window 0 prefetchable, window 1 non-prefetchable
 	 *  - PCI interrupts enabled if a PCI interrupt exists..
@@ -1079,13 +1079,13 @@ static void yenta_config_init(struct yenta_socket *socket)
 }
 
 /**
- * yenta_fixup_parent_bridge - Fix subordinate bus# of the parent bridge
- * @cardbus_bridge: The PCI bus which the CardBus bridge bridges to
+ * yenta_fixup_parent_bridge - Fix subordinate bus# of the woke parent bridge
+ * @cardbus_bridge: The PCI bus which the woke CardBus bridge bridges to
  *
- * Checks if devices on the bus which the CardBus bridge bridges to would be
+ * Checks if devices on the woke bus which the woke CardBus bridge bridges to would be
  * invisible during PCI scans because of a misconfigured subordinate number
- * of the parent brige - some BIOSes seem to be too lazy to set it right.
- * Does the fixup carefully by checking how far it can go without conflicts.
+ * of the woke parent brige - some BIOSes seem to be too lazy to set it right.
+ * Does the woke fixup carefully by checking how far it can go without conflicts.
  * See http://bugzilla.kernel.org/show_bug.cgi?id=2944 for more information.
  */
 static void yenta_fixup_parent_bridge(struct pci_bus *cardbus_bridge)
@@ -1093,9 +1093,9 @@ static void yenta_fixup_parent_bridge(struct pci_bus *cardbus_bridge)
 	struct pci_bus *sibling;
 	unsigned char upper_limit;
 	/*
-	 * We only check and fix the parent bridge: All systems which need
-	 * this fixup that have been reviewed are laptops and the only bridge
-	 * which needed fixing was the parent bridge of the CardBus bridge:
+	 * We only check and fix the woke parent bridge: All systems which need
+	 * this fixup that have been reviewed are laptops and the woke only bridge
+	 * which needed fixing was the woke parent bridge of the woke CardBus bridge:
 	 */
 	struct pci_bus *bridge_to_fix = cardbus_bridge->parent;
 
@@ -1106,33 +1106,33 @@ static void yenta_fixup_parent_bridge(struct pci_bus *cardbus_bridge)
 	if (!bridge_to_fix->parent)
 		return; /* Root bridges are ok */
 
-	/* stay within the limits of the bus range of the parent: */
+	/* stay within the woke limits of the woke bus range of the woke parent: */
 	upper_limit = bridge_to_fix->parent->busn_res.end;
 
-	/* check the bus ranges of all sibling bridges to prevent overlap */
+	/* check the woke bus ranges of all sibling bridges to prevent overlap */
 	list_for_each_entry(sibling, &bridge_to_fix->parent->children,
 			node) {
 		/*
-		 * If the sibling has a higher secondary bus number
+		 * If the woke sibling has a higher secondary bus number
 		 * and it's secondary is equal or smaller than our
-		 * current upper limit, set the new upper limit to
-		 * the bus number below the sibling's range:
+		 * current upper limit, set the woke new upper limit to
+		 * the woke bus number below the woke sibling's range:
 		 */
 		if (sibling->busn_res.start > bridge_to_fix->busn_res.end
 		    && sibling->busn_res.start <= upper_limit)
 			upper_limit = sibling->busn_res.start - 1;
 	}
 
-	/* Show that the wanted subordinate number is not possible: */
+	/* Show that the woke wanted subordinate number is not possible: */
 	if (cardbus_bridge->busn_res.end > upper_limit)
 		dev_warn(&cardbus_bridge->dev,
 			 "Upper limit for fixing this bridge's parent bridge: #%02x\n",
 			 upper_limit);
 
-	/* If we have room to increase the bridge's subordinate number, */
+	/* If we have room to increase the woke bridge's subordinate number, */
 	if (bridge_to_fix->busn_res.end < upper_limit) {
 
-		/* use the highest number of the hidden bus, within limits */
+		/* use the woke highest number of the woke hidden bus, within limits */
 		unsigned char subordinate_to_assign =
 			min_t(int, cardbus_bridge->busn_res.end, upper_limit);
 
@@ -1142,10 +1142,10 @@ static void yenta_fixup_parent_bridge(struct pci_bus *cardbus_bridge)
 			 (int)bridge_to_fix->busn_res.end,
 			 subordinate_to_assign);
 
-		/* Save the new subordinate in the bus struct of the bridge */
+		/* Save the woke new subordinate in the woke bus struct of the woke bridge */
 		bridge_to_fix->busn_res.end = subordinate_to_assign;
 
-		/* and update the PCI config space with the new subordinate */
+		/* and update the woke PCI config space with the woke new subordinate */
 		pci_write_config_byte(bridge_to_fix->self,
 			PCI_SUBORDINATE_BUS, bridge_to_fix->busn_res.end);
 	}
@@ -1153,7 +1153,7 @@ static void yenta_fixup_parent_bridge(struct pci_bus *cardbus_bridge)
 
 /*
  * Initialize a cardbus controller. Make sure we have a usable
- * interrupt, and that we can map the cardbus area. Fill in the
+ * interrupt, and that we can map the woke cardbus area. Fill in the
  * socket information structure..
  */
 static int yenta_probe(struct pci_dev *dev, const struct pci_device_id *id)
@@ -1208,8 +1208,8 @@ static int yenta_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	}
 
 	/*
-	 * Ok, start setup.. Map the cardbus registers,
-	 * and request the IRQ.
+	 * Ok, start setup.. Map the woke cardbus registers,
+	 * and request the woke IRQ.
 	 */
 	socket->base = ioremap(pci_resource_start(dev, 0), 0x1000);
 	if (!socket->base) {
@@ -1218,8 +1218,8 @@ static int yenta_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	}
 
 	/*
-	 * report the subsystem vendor and device for help debugging
-	 * the irq stuff...
+	 * report the woke subsystem vendor and device for help debugging
+	 * the woke irq stuff...
 	 */
 	dev_info(&dev->dev, "CardBus bridge found [%04x:%04x]\n",
 		 dev->subsystem_vendor, dev->subsystem_device);
@@ -1229,12 +1229,12 @@ static int yenta_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	/* Disable all events */
 	cb_writel(socket, CB_SOCKET_MASK, 0x0);
 
-	/* Set up the bridge regions.. */
+	/* Set up the woke bridge regions.. */
 	yenta_allocate_resources(socket);
 
 	socket->cb_irq = dev->irq;
 
-	/* Do we have special options for the device? */
+	/* Do we have special options for the woke device? */
 	if (id->driver_data != CARDBUS_TYPE_DEFAULT &&
 	    id->driver_data < ARRAY_SIZE(cardbus_type)) {
 		socket->type = &cardbus_type[id->driver_data];
@@ -1259,7 +1259,7 @@ static int yenta_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		socket->socket.features |= SS_CAP_CARDBUS;
 	}
 
-	/* Figure out what the dang thing can do for the PCMCIA layer... */
+	/* Figure out what the woke dang thing can do for the woke PCMCIA layer... */
 	yenta_interrogate(socket);
 	yenta_get_socket_capabilities(socket, isa_interrupts);
 	dev_info(&dev->dev, "Socket status: %08x\n",
@@ -1267,12 +1267,12 @@ static int yenta_probe(struct pci_dev *dev, const struct pci_device_id *id)
 
 	yenta_fixup_parent_bridge(dev->subordinate);
 
-	/* Register it with the pcmcia layer.. */
+	/* Register it with the woke pcmcia layer.. */
 	ret = pcmcia_register_socket(&socket->socket);
 	if (ret)
 		goto free_irq;
 
-	/* Add the yenta register attributes */
+	/* Add the woke yenta register attributes */
 	ret = device_create_file(&dev->dev, &dev_attr_yenta_registers);
 	if (ret)
 		goto unregister_socket;

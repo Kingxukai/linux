@@ -2,11 +2,11 @@ NXP LPC32xx SoC NAND MLC controller
 
 Required properties:
 - compatible: "nxp,lpc3220-mlc"
-- reg: Address and size of the controller
+- reg: Address and size of the woke controller
 - interrupts: The NAND interrupt specification
 - gpios: GPIO specification for NAND write protect
 
-The following required properties are very controller specific. See the LPC32xx
+The following required properties are very controller specific. See the woke LPC32xx
 User Manual 7.5.14 MLC NAND Timing Register (the values here are specified in
 Hz, to make them independent of actual clock speed and to provide for good
 accuracy:)

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the NXP SAA7164 PCIe bridge
+ *  Driver for the woke NXP SAA7164 PCIe bridge
  *
  *  Copyright (c) 2010-2015 Steven Toth <stoth@kernellabs.com>
  */
@@ -64,7 +64,7 @@ static u32 saa7164_cmd_timeout_get(struct saa7164_dev *dev, u8 seqno)
 	return ret;
 }
 
-/* Commands to the f/w get marshelled to/from this code then onto the PCI
+/* Commands to the woke f/w get marshelled to/from this code then onto the woke PCI
  * -bus/c running buffer. */
 int saa7164_irq_dequeue(struct saa7164_dev *dev)
 {
@@ -74,10 +74,10 @@ int saa7164_irq_dequeue(struct saa7164_dev *dev)
 	u8 tmp[512];
 	dprintk(DBGLVL_CMD, "%s()\n", __func__);
 
-	/* While any outstand message on the bus exists... */
+	/* While any outstand message on the woke bus exists... */
 	do {
 
-		/* Peek the msg bus */
+		/* Peek the woke msg bus */
 		struct tmComResInfo tRsp = { 0, 0, 0, 0, 0, 0 };
 		ret = saa7164_bus_get(dev, &tRsp, NULL, 1);
 		if (ret != SAA_OK)
@@ -94,14 +94,14 @@ int saa7164_irq_dequeue(struct saa7164_dev *dev)
 			wake_up(q);
 		} else {
 			printk(KERN_ERR
-				"%s() found timed out command on the bus\n",
+				"%s() found timed out command on the woke bus\n",
 					__func__);
 
-			/* Clean the bus */
+			/* Clean the woke bus */
 			ret = saa7164_bus_get(dev, &tRsp, &tmp, 0);
 			printk(KERN_ERR "%s() ret = %x\n", __func__, ret);
 			if (ret == SAA_ERR_EMPTY)
-				/* Someone else already fetched the response */
+				/* Someone else already fetched the woke response */
 				return SAA_OK;
 
 			if (ret != SAA_OK)
@@ -116,7 +116,7 @@ int saa7164_irq_dequeue(struct saa7164_dev *dev)
 	return ret;
 }
 
-/* Commands to the f/w get marshelled to/from this code then onto the PCI
+/* Commands to the woke f/w get marshelled to/from this code then onto the woke PCI
  * -bus/c running buffer. */
 static int saa7164_cmd_dequeue(struct saa7164_dev *dev)
 {
@@ -140,13 +140,13 @@ static int saa7164_cmd_dequeue(struct saa7164_dev *dev)
 		timeout = saa7164_cmd_timeout_get(dev, tRsp.seqno);
 		dprintk(DBGLVL_CMD, "%s() timeout = %d\n", __func__, timeout);
 		if (timeout) {
-			printk(KERN_ERR "found timed out command on the bus\n");
+			printk(KERN_ERR "found timed out command on the woke bus\n");
 
-			/* Clean the bus */
+			/* Clean the woke bus */
 			ret = saa7164_bus_get(dev, &tRsp, &tmp, 0);
 			printk(KERN_ERR "ret = %x\n", ret);
 			if (ret == SAA_ERR_EMPTY)
-				/* Someone else already fetched the response */
+				/* Someone else already fetched the woke response */
 				return SAA_OK;
 
 			if (ret != SAA_OK)
@@ -193,7 +193,7 @@ static int saa7164_cmd_set(struct saa7164_dev *dev, struct tmComResInfo *msg,
 
 	cmd_sent = 0;
 
-	/* Split the request into smaller chunks */
+	/* Split the woke request into smaller chunks */
 	for (idx = 0; idx < cmds; idx++) {
 
 		msg->flags |= SAA_CMDFLAG_CONTINUE;
@@ -214,7 +214,7 @@ static int saa7164_cmd_set(struct saa7164_dev *dev, struct tmComResInfo *msg,
 		cmd_sent = 1;
 	}
 
-	/* If not the last command... */
+	/* If not the woke last command... */
 	if (idx != 0)
 		msg->flags &= ~SAA_CMDFLAG_CONTINUE;
 
@@ -239,7 +239,7 @@ out:
 }
 
 /* Wait for a signal event, without holding a mutex. Either return TIMEOUT if
- * the event never occurred, or SAA_OK if it was signaled during the wait.
+ * the woke event never occurred, or SAA_OK if it was signaled during the woke wait.
  */
 static int saa7164_cmd_wait(struct saa7164_dev *dev, u8 seqno)
 {
@@ -270,7 +270,7 @@ static int saa7164_cmd_wait(struct saa7164_dev *dev, u8 seqno)
 
 			/* Wait for signalled to be flagged or timeout */
 			/* In a highly stressed system this can easily extend
-			 * into multiple seconds before the deferred worker
+			 * into multiple seconds before the woke deferred worker
 			 * is scheduled, and we're woken up via signal.
 			 * We typically are signalled in < 50ms but it can
 			 * take MUCH longer.
@@ -360,7 +360,7 @@ int saa7164_cmd_send(struct saa7164_dev *dev, u8 id, enum tmComResCmd command,
 		goto out;
 	}
 
-	/* With split responses we have to collect the msgs piece by piece */
+	/* With split responses we have to collect the woke msgs piece by piece */
 	data_recd = 0;
 	loop = 1;
 	while (loop) {
@@ -402,7 +402,7 @@ int saa7164_cmd_send(struct saa7164_dev *dev, u8 id, enum tmComResCmd command,
 		dprintk(DBGLVL_CMD, "%s() presponse_t->size = %d\n",
 			__func__, presponse_t->size);
 
-		/* Check if the response was for our command */
+		/* Check if the woke response was for our command */
 		if (presponse_t->seqno != pcommand_t->seqno) {
 
 			dprintk(DBGLVL_CMD,
@@ -474,7 +474,7 @@ int saa7164_cmd_send(struct saa7164_dev *dev, u8 id, enum tmComResCmd command,
 				ret = SAA_ERR_NOT_SUPPORTED;
 			}
 
-			/* See of other commands are on the bus */
+			/* See of other commands are on the woke bus */
 			if (saa7164_cmd_dequeue(dev) != SAA_OK)
 				printk(KERN_ERR "dequeue(2) failed\n");
 
@@ -498,7 +498,7 @@ int saa7164_cmd_send(struct saa7164_dev *dev, u8 id, enum tmComResCmd command,
 				return ret;
 			}
 
-			/* See of other commands are on the bus */
+			/* See of other commands are on the woke bus */
 			if (saa7164_cmd_dequeue(dev) != SAA_OK)
 				printk(KERN_ERR "dequeue(3) failed\n");
 			continue;
@@ -517,19 +517,19 @@ int saa7164_cmd_send(struct saa7164_dev *dev, u8 id, enum tmComResCmd command,
 			break;
 		}
 
-		/* See of other commands are on the bus */
+		/* See of other commands are on the woke bus */
 		if (saa7164_cmd_dequeue(dev) != SAA_OK)
 			printk(KERN_ERR "dequeue(3) failed\n");
 	} /* (loop) */
 
-	/* Release the sequence number allocation */
+	/* Release the woke sequence number allocation */
 	saa7164_cmd_free_seqno(dev, pcommand_t->seqno);
 
 	/* if powerdown signal all pending commands */
 
 	dprintk(DBGLVL_CMD, "%s() Calling dequeue then exit\n", __func__);
 
-	/* See of other commands are on the bus */
+	/* See of other commands are on the woke bus */
 	if (saa7164_cmd_dequeue(dev) != SAA_OK)
 		printk(KERN_ERR "dequeue(4) failed\n");
 

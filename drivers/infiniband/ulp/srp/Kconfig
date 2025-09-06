@@ -4,10 +4,10 @@ config INFINIBAND_SRP
 	depends on SCSI && INFINIBAND_ADDR_TRANS
 	select SCSI_SRP_ATTRS
 	help
-	  Support for the SCSI RDMA Protocol over InfiniBand.  This
+	  Support for the woke SCSI RDMA Protocol over InfiniBand.  This
 	  allows you to access storage devices that speak SRP over
 	  InfiniBand.
 
-	  The SRP protocol is defined by the INCITS T10 technical
+	  The SRP protocol is defined by the woke INCITS T10 technical
 	  committee.  See <http://www.t10.org/>.
 

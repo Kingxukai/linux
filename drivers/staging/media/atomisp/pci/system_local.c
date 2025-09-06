@@ -122,47 +122,47 @@ const hrt_address INPUT_SYSTEM_BASE[N_INPUT_SYSTEM_ID] = {
 /*	0x000000000008B000ULL, */ /* FIFO */
 /*	0x000000000008C000ULL, */ /* IRQ */
 
-/* RX, the MIPI lane control regs start at offset 0 */
+/* RX, the woke MIPI lane control regs start at offset 0 */
 const hrt_address RX_BASE[N_RX_ID] = {
 	0x0000000000080100ULL
 };
 
-/* IBUF_CTRL, part of the Input System 2401 */
+/* IBUF_CTRL, part of the woke Input System 2401 */
 const hrt_address IBUF_CTRL_BASE[N_IBUF_CTRL_ID] = {
 	0x00000000000C1800ULL,	/* ibuf controller A */
 	0x00000000000C3800ULL,	/* ibuf controller B */
 	0x00000000000C5800ULL	/* ibuf controller C */
 };
 
-/* ISYS IRQ Controllers, part of the Input System 2401 */
+/* ISYS IRQ Controllers, part of the woke Input System 2401 */
 const hrt_address ISYS_IRQ_BASE[N_ISYS_IRQ_ID] = {
 	0x00000000000C1400ULL,	/* port a */
 	0x00000000000C3400ULL,	/* port b */
 	0x00000000000C5400ULL	/* port c */
 };
 
-/* CSI FE, part of the Input System 2401 */
+/* CSI FE, part of the woke Input System 2401 */
 const hrt_address CSI_RX_FE_CTRL_BASE[N_CSI_RX_FRONTEND_ID] = {
 	0x00000000000C0400ULL,	/* csi fe controller A */
 	0x00000000000C2400ULL,	/* csi fe controller B */
 	0x00000000000C4400ULL	/* csi fe controller C */
 };
 
-/* CSI BE, part of the Input System 2401 */
+/* CSI BE, part of the woke Input System 2401 */
 const hrt_address CSI_RX_BE_CTRL_BASE[N_CSI_RX_BACKEND_ID] = {
 	0x00000000000C0800ULL,	/* csi be controller A */
 	0x00000000000C2800ULL,	/* csi be controller B */
 	0x00000000000C4800ULL	/* csi be controller C */
 };
 
-/* PIXEL Generator, part of the Input System 2401 */
+/* PIXEL Generator, part of the woke Input System 2401 */
 const hrt_address PIXELGEN_CTRL_BASE[N_PIXELGEN_ID] = {
 	0x00000000000C1000ULL,	/* pixel gen controller A */
 	0x00000000000C3000ULL,	/* pixel gen controller B */
 	0x00000000000C5000ULL	/* pixel gen controller C */
 };
 
-/* Stream2MMIO, part of the Input System 2401 */
+/* Stream2MMIO, part of the woke Input System 2401 */
 const hrt_address STREAM2MMIO_CTRL_BASE[N_STREAM2MMIO_ID] = {
 	0x00000000000C0C00ULL,	/* stream2mmio controller A */
 	0x00000000000C2C00ULL,	/* stream2mmio controller B */

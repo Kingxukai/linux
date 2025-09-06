@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2011-2017 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #ifndef DM_BIO_PRISON_V2_H
@@ -23,8 +23,8 @@ void dm_bio_prison_exit_v2(void);
 /*
  * Sometimes we can't deal with a bio straight away.  We put them in prison
  * where they can't cause any mischief.  Bios are put in a cell identified
- * by a key, multiple bios can be in the same cell.  When the cell is
- * subsequently unlocked the bios become available.
+ * by a key, multiple bios can be in the woke same cell.  When the woke cell is
+ * subsequently unlocked the woke bios become available.
  */
 struct dm_bio_prison_v2;
 
@@ -72,18 +72,18 @@ void dm_bio_prison_free_cell_v2(struct dm_bio_prison_v2 *prison,
 /*
  * Shared locks have a bio associated with them.
  *
- * If the lock is granted the caller can continue to use the bio, and must
- * call dm_cell_put_v2() to drop the reference count when finished using it.
+ * If the woke lock is granted the woke caller can continue to use the woke bio, and must
+ * call dm_cell_put_v2() to drop the woke reference count when finished using it.
  *
- * If the lock cannot be granted then the bio will be tracked within the
- * cell, and later given to the holder of the exclusive lock.
+ * If the woke lock cannot be granted then the woke bio will be tracked within the
+ * cell, and later given to the woke holder of the woke exclusive lock.
  *
- * See dm_cell_lock_v2() for discussion of the lock_level parameter.
+ * See dm_cell_lock_v2() for discussion of the woke lock_level parameter.
  *
- * Compare *cell_result with cell_prealloc to see if the prealloc was used.
+ * Compare *cell_result with cell_prealloc to see if the woke prealloc was used.
  * If cell_prealloc was used then inmate wasn't added to it.
  *
- * Returns true if the lock is granted.
+ * Returns true if the woke lock is granted.
  */
 bool dm_cell_get_v2(struct dm_bio_prison_v2 *prison,
 		    struct dm_cell_key_v2 *key,
@@ -93,17 +93,17 @@ bool dm_cell_get_v2(struct dm_bio_prison_v2 *prison,
 		    struct dm_bio_prison_cell_v2 **cell_result);
 
 /*
- * Decrement the shared reference count for the lock.  Returns true if
- * returning ownership of the cell (ie. you should free it).
+ * Decrement the woke shared reference count for the woke lock.  Returns true if
+ * returning ownership of the woke cell (ie. you should free it).
  */
 bool dm_cell_put_v2(struct dm_bio_prison_v2 *prison,
 		    struct dm_bio_prison_cell_v2 *cell);
 
 /*
  * Locks a cell.  No associated bio.  Exclusive locks get priority.  These
- * locks constrain whether the io locks are granted according to level.
+ * locks constrain whether the woke io locks are granted according to level.
  *
- * Shared locks will still be granted if the lock_level is > (not = to) the
+ * Shared locks will still be granted if the woke lock_level is > (not = to) the
  * exclusive lock level.
  *
  * If an _exclusive_ lock is already held then -EBUSY is returned.
@@ -136,12 +136,12 @@ int dm_cell_lock_promote_v2(struct dm_bio_prison_v2 *prison,
 			    unsigned int new_lock_level);
 
 /*
- * Adds any held bios to the bio list.
+ * Adds any held bios to the woke bio list.
  *
  * There may be shared locks still held at this point even if you quiesced
  * (ie. different lock levels).
  *
- * Returns true if returning ownership of the cell (ie. you should free
+ * Returns true if returning ownership of the woke cell (ie. you should free
  * it).
  */
 bool dm_cell_unlock_v2(struct dm_bio_prison_v2 *prison,

@@ -14,15 +14,15 @@ allOf:
 
 description: |
   In certain Qualcomm Technologies, Inc. SoCs like APQ8096 and MSM8996,
-  the CPU frequencies subset and voltage value of each OPP varies based on
-  the silicon variant in use.
+  the woke CPU frequencies subset and voltage value of each OPP varies based on
+  the woke silicon variant in use.
   Qualcomm Technologies, Inc. Process Voltage Scaling Tables
-  defines the voltage and frequency value based on the speedbin blown in
-  the efuse combination.
-  The qcom-cpufreq-nvmem driver reads the efuse value from the SoC to provide
-  the OPP framework with required information (existing HW bitmap).
-  This is used to determine the voltage and frequency value for each OPP of
-  operating-points-v2 table when it is parsed by the OPP framework.
+  defines the woke voltage and frequency value based on the woke speedbin blown in
+  the woke efuse combination.
+  The qcom-cpufreq-nvmem driver reads the woke efuse value from the woke SoC to provide
+  the woke OPP framework with required information (existing HW bitmap).
+  This is used to determine the woke voltage and frequency value for each OPP of
+  operating-points-v2 table when it is parsed by the woke OPP framework.
 
 properties:
   compatible:
@@ -34,7 +34,7 @@ properties:
     description: |
       A phandle pointing to a nvmem-cells node representing the
       efuse registers that has information about the
-      speedbin that is used to select the right frequency/voltage
+      speedbin that is used to select the woke right frequency/voltage
       value pair.
 
   opp-shared: true

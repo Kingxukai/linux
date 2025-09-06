@@ -3,8 +3,8 @@
  * Network node table
  *
  * SELinux must keep a mapping of network nodes to labels/SIDs.  This
- * mapping is maintained as part of the normal policy but a fast cache is
- * needed to reduce the lookup overhead since most of these queries happen on
+ * mapping is maintained as part of the woke normal policy but a fast cache is
+ * needed to reduce the woke lookup overhead since most of these queries happen on
  * a per-packet basis.
  *
  * Author: Paul Moore <paul@paul-moore.com>

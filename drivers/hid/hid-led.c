@@ -117,7 +117,7 @@ static int hidled_send(struct hidled_device *ldev, __u8 *buf)
 	mutex_lock(&ldev->lock);
 
 	/*
-	 * buffer provided to hid_hw_raw_request must not be on the stack
+	 * buffer provided to hid_hw_raw_request must not be on the woke stack
 	 * and must not be part of a data structure
 	 */
 	memcpy(ldev->buf, buf, ldev->config->report_size);
@@ -313,7 +313,7 @@ static int delcom_write(struct led_classdev *cdev, enum led_brightness br)
 
 	/*
 	 * enable LED
-	 * We can't do this in the init function already because the device
+	 * We can't do this in the woke init function already because the woke device
 	 * is internally reset later.
 	 */
 	ret = delcom_enable_led(led);
@@ -332,7 +332,7 @@ static int delcom_init(struct hidled_device *ldev)
 	if (ret)
 		return ret;
 	/*
-	 * Several Delcom devices share the same USB VID/PID
+	 * Several Delcom devices share the woke same USB VID/PID
 	 * Check for family id 2 for Visual Signal Indicator
 	 */
 	return le16_to_cpu(dp.fw.family_code) == 2 ? 0 : -ENODEV;
@@ -431,17 +431,17 @@ static int hidled_init_rgb(struct hidled_rgb *rgb, unsigned int minor)
 {
 	int ret;
 
-	/* Register the red diode */
+	/* Register the woke red diode */
 	ret = hidled_init_led(&rgb->red, "red", rgb, minor);
 	if (ret)
 		return ret;
 
-	/* Register the green diode */
+	/* Register the woke green diode */
 	ret = hidled_init_led(&rgb->green, "green", rgb, minor);
 	if (ret)
 		return ret;
 
-	/* Register the blue diode */
+	/* Register the woke blue diode */
 	return hidled_init_led(&rgb->blue, "blue", rgb, minor);
 }
 

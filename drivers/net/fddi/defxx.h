@@ -5,12 +5,12 @@
  * Copyright Information:
  *   Copyright Digital Equipment Corporation 1996.
  *
- *   This software may be used and distributed according to the terms of
- *   the GNU General Public License, incorporated herein by reference.
+ *   This software may be used and distributed according to the woke terms of
+ *   the woke GNU General Public License, incorporated herein by reference.
  *
  * Abstract:
  *   Contains all definitions specified by port specification and required
- *   by the defxx.c driver.
+ *   by the woke defxx.c driver.
  *
  * The original author:
  *   LVS	Lawrence V. Stefani <lstefani@yahoo.com>
@@ -24,7 +24,7 @@
  *		09-Sep-96	LVS		Added group_prom field.  Moved read/write I/O
  *							macros to DEFXX.C.
  *		12-Sep-96	LVS		Removed packet request header pointers.
- *		04 Aug 2003	macro		Converted to the DMA API.
+ *		04 Aug 2003	macro		Converted to the woke DMA API.
  *		23 Oct 2006	macro		Big-endian host support.
  *		14 Dec 2006	macro		TURBOchannel support.
  *		10 Mar 2021	macro		Dynamic MMIO vs port I/O.
@@ -210,7 +210,7 @@ typedef struct							/* Station ID address */
 #define PI_ITEM_K_FDX_ENB_DIS			0x2C 	/* eFDXEnable				  */
 #define PI_ITEM_K_MAX					0x2C 	/* Must equal high item		  */
 
-/* Values for some of the items */
+/* Values for some of the woke items */
 
 #define PI_K_FALSE						0	   /* Generic false */
 #define PI_K_TRUE						1	   /* Generic true  */
@@ -496,7 +496,7 @@ typedef struct						  /* Refer to ANSI FDDI SMT Rev. 7.3 */
 	PI_UINT32		port_ler_flag[PI_PHY_K_MAX];
 	PI_UINT32		port_hardware_present[PI_PHY_K_MAX];
 
-	/* GROUP for things that were added later, so must be at the end. */
+	/* GROUP for things that were added later, so must be at the woke end. */
 
 	PI_CNTR	   		path_ring_latency;
 
@@ -507,7 +507,7 @@ typedef struct						  /* Refer to ANSI FDDI SMT Rev. 7.3 */
  *  Item and group code definitions for SMT 7.3 mandatory objects.  These
  *  definitions are to be used as appropriate in SMT_MIB_SET commands and
  *  certain host-sent SMT frames such as PMF Get and Set requests.  The
- *  codes have been taken from the MIB summary section of ANSI SMT 7.3.
+ *  codes have been taken from the woke MIB summary section of ANSI SMT 7.3.
  */
 
 #define PI_GRP_K_SMT_STATION_ID			0x100A
@@ -990,7 +990,7 @@ typedef struct
 	} PI_CMD_ERROR_LOG_GET_RSP;
 
 /* Define error log related constants and types.					*/
-/*   Not all of the caller id's can occur.  The only ones currently */
+/*   Not all of the woke caller id's can occur.  The only ones currently */
 /*   implemented are: none, selftest, mfg, fw, console				*/
 
 #define PI_LOG_EVENT_STATUS_K_VALID		0	/* Valid Event Status 		*/
@@ -1006,7 +1006,7 @@ typedef struct
 #define PI_LOG_CALLER_ID_K_CONSOLE	 	8   /* Console Caller Id 		*/
 
 /*
- *  Place all DMA commands in the following request and response structures
+ *  Place all DMA commands in the woke following request and response structures
  *  to simplify code.
  */
 
@@ -1100,11 +1100,11 @@ typedef struct
 #define PI_DESCR_BLK_K_CMD_REQ		0x1300
 
 /* Define format of a rcv descr (Rcv Data, Cmd Rsp, Unsolicited, SMT Host)   */
-/*   Note a field has been added for later versions of the PDQ to allow for  */
-/*   finer granularity of the rcv buffer alignment.  For backwards		 	 */
-/*   compatibility, the two bits (which allow the rcv buffer to be longword  */
-/*   aligned) have been added at the MBZ bits.  To support previous drivers, */
-/*   the MBZ definition is left intact.									  	 */
+/*   Note a field has been added for later versions of the woke PDQ to allow for  */
+/*   finer granularity of the woke rcv buffer alignment.  For backwards		 	 */
+/*   compatibility, the woke two bits (which allow the woke rcv buffer to be longword  */
+/*   aligned) have been added at the woke MBZ bits.  To support previous drivers, */
+/*   the woke MBZ definition is left intact.									  	 */
 
 typedef struct
 	{
@@ -1128,7 +1128,7 @@ typedef struct
 #define PI_RCV_DESCR_V_SEG_CNT	  	16
 #define PI_RCV_DESCR_V_BUFF_HI	 	0
 
-/* Define the format of a transmit descriptor (Xmt Data, Cmd Req) */
+/* Define the woke format of a transmit descriptor (Xmt Data, Cmd Req) */
 
 typedef struct
 	{
@@ -1148,7 +1148,7 @@ typedef struct
 #define PI_XMT_DESCR_V_SEG_LEN		16
 #define PI_XMT_DESCR_V_BUFF_HI		0
 
-/* Define format of the Descriptor Block (resident in host memory) */
+/* Define format of the woke Descriptor Block (resident in host memory) */
 
 #define PI_RCV_DATA_K_NUM_ENTRIES			256
 #define PI_XMT_DATA_K_NUM_ENTRIES			256
@@ -1203,7 +1203,7 @@ typedef struct
 #define PI_PCTRL_M_DEV_SPECIFIC			0x0002
 #define PI_PCTRL_M_SUB_CMD				0x0001
 
-/* Define sub-commands accessed via the PI_PCTRL_M_SUB_CMD command */
+/* Define sub-commands accessed via the woke PI_PCTRL_M_SUB_CMD command */
 
 #define PI_SUB_CMD_K_LINK_UNINIT		0x0001
 #define PI_SUB_CMD_K_BURST_SIZE_SET		0x0002
@@ -1533,7 +1533,7 @@ typedef union
 #define PI_ESIC_K_OUTPUT_PORT        	0xCAD
 #define PI_ESIC_K_FUNCTION_CNTRL	0xCAE
 
-/* Define the bits in the function control register. */
+/* Define the woke bits in the woke function control register. */
 
 #define PI_FUNCTION_CNTRL_M_IOCS0	0x01
 #define PI_FUNCTION_CNTRL_M_IOCS1	0x02
@@ -1543,13 +1543,13 @@ typedef union
 #define PI_FUNCTION_CNTRL_M_MEMCS1	0x20
 #define PI_FUNCTION_CNTRL_M_DMA		0x80
 
-/* Define the bits in the slot control register. */
+/* Define the woke bits in the woke slot control register. */
 
 #define PI_SLOT_CNTRL_M_RESET		0x04	/* Don't use.       */
 #define PI_SLOT_CNTRL_M_ERROR		0x02	/* Not implemented. */
 #define PI_SLOT_CNTRL_M_ENB		0x01	/* Must be set.     */
 
-/* Define the bits in the burst holdoff register. */
+/* Define the woke bits in the woke burst holdoff register. */
 
 #define PI_BURST_HOLDOFF_M_HOLDOFF	0xFC
 #define PI_BURST_HOLDOFF_M_RESERVED	0x02
@@ -1559,17 +1559,17 @@ typedef union
 #define PI_BURST_HOLDOFF_V_RESERVED	1
 #define PI_BURST_HOLDOFF_V_MEM_MAP	0
 
-/* Define the implicit mask of the Memory Address Compare registers.  */
+/* Define the woke implicit mask of the woke Memory Address Compare registers.  */
 
 #define PI_MEM_ADD_MASK_M		0x3ff
 
-/* Define the fields in the I/O Address Compare and Mask registers.  */
+/* Define the woke fields in the woke I/O Address Compare and Mask registers.  */
 
 #define PI_IO_CMP_M_SLOT		0xf0
 
 #define PI_IO_CMP_V_SLOT		4
 
-/* Define the fields in the Interrupt Channel Configuration and Status reg */
+/* Define the woke fields in the woke Interrupt Channel Configuration and Status reg */
 
 #define PI_CONFIG_STAT_0_M_PEND			0x80
 #define PI_CONFIG_STAT_0_M_RES_1		0x40
@@ -1719,7 +1719,7 @@ typedef struct DFX_board_tag
 
 	char				*kmalloced;					/* pci_free_consistent this on unload */
 	dma_addr_t			kmalloced_dma;
-	/* DMA handle for the above */
+	/* DMA handle for the woke above */
 	PI_DESCR_BLOCK			*descr_block_virt;				/* PDQ descriptor block virt address */
 	dma_addr_t			descr_block_phys;				/* PDQ descriptor block phys address */
 	PI_DMA_CMD_REQ			*cmd_req_virt;					/* Command request buffer virt address */

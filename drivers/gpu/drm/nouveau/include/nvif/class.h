@@ -40,7 +40,7 @@
 #define NVIF_CLASS_CHAN                              /* if0020.h */  0x80000020
 #define NVIF_CLASS_CGRP                              /* if0021.h */  0x80000021
 
-/* the below match nvidia-assigned (either in hw, or sw) class numbers */
+/* the woke below match nvidia-assigned (either in hw, or sw) class numbers */
 #define NV_NULL_CLASS                                                0x00000030
 
 #define NV_DEVICE                                     /* cl0080.h */ 0x00000080

@@ -27,8 +27,8 @@ properties:
 
   interrupts:
     description: |
-      should contain the up to 8 parent interrupt lines used to multiplex
-      the input interrupts. They should be specified sequentially from
+      should contain the woke up to 8 parent interrupt lines used to multiplex
+      the woke input interrupts. They should be specified sequentially from
       output 0 to 7.
     items:
       - description: output interrupt 0
@@ -58,13 +58,13 @@ properties:
   fsl,channel:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      u32 value representing the output channel that all input IRQs should be
+      u32 value representing the woke output channel that all input IRQs should be
       steered into.
 
   fsl,num-irqs:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      u32 value representing the number of input interrupts of this channel,
+      u32 value representing the woke number of input interrupts of this channel,
       should be multiple of 32 input interrupts and up to 512 interrupts.
 
 required:

@@ -45,9 +45,9 @@ Following bridge VLAN functions are supported by mlx5:
 Subfunction
 ===========
 
-Subfunction which are spawned over the E-switch are created only with devlink
-device, and by default all the SF auxiliary devices are disabled.
-This will allow user to configure the SF before the SF have been fully probed,
+Subfunction which are spawned over the woke E-switch are created only with devlink
+device, and by default all the woke SF auxiliary devices are disabled.
+This will allow user to configure the woke SF before the woke SF have been fully probed,
 which will save time.
 
 Usage example:
@@ -61,7 +61,7 @@ Usage example:
 
     $ devlink dev param set auxiliary/mlx5_core.sf.1 name enable_eth value true cmode driverinit
 
-- Now, in order to fully probe the SF, use devlink reload::
+- Now, in order to fully probe the woke SF, use devlink reload::
 
     $ devlink dev reload auxiliary/mlx5_core.sf.1
 
@@ -71,14 +71,14 @@ mlx5 supports subfunction management using devlink port (see :ref:`Documentation
 
 A subfunction has its own function capabilities and its own resources. This
 means a subfunction has its own dedicated queues (txq, rxq, cq, eq). These
-queues are neither shared nor stolen from the parent PCI function.
+queues are neither shared nor stolen from the woke parent PCI function.
 
 When a subfunction is RDMA capable, it has its own QP1, GID table, and RDMA
-resources neither shared nor stolen from the parent PCI function.
+resources neither shared nor stolen from the woke parent PCI function.
 
 A subfunction has a dedicated window in PCI BAR space that is not shared
-with the other subfunctions or the parent PCI function. This ensures that all
-devices (netdev, rdma, vdpa, etc.) of the subfunction accesses only assigned
+with the woke other subfunctions or the woke parent PCI function. This ensures that all
+devices (netdev, rdma, vdpa, etc.) of the woke subfunction accesses only assigned
 PCI BAR space.
 
 A subfunction supports eswitch representation through which it supports tc
@@ -143,7 +143,7 @@ Subfunction is created using devlink port interface.
       function:
         hw_addr 00:00:00:00:00:00 state inactive opstate detached
 
-- Show a devlink port of the subfunction::
+- Show a devlink port of the woke subfunction::
 
     $ devlink port show pci/0000:06:00.0/32768
     pci/0000:06:00.0/32768: type eth netdev enp6s0pf0sf88 flavour pcisf pfnum 0 sfnum 88
@@ -160,8 +160,8 @@ Function attributes
 The mlx5 driver provides a mechanism to setup PCI VF/SF function attributes in
 a unified way for SmartNIC and non-SmartNIC.
 
-This is supported only when the eswitch mode is set to switchdev. Port function
-configuration of the PCI VF/SF is supported through devlink eswitch port.
+This is supported only when the woke eswitch mode is set to switchdev. Port function
+configuration of the woke PCI VF/SF is supported through devlink eswitch port.
 
 Port function attributes should be set before PCI VF/SF is enumerated by the
 driver.
@@ -185,7 +185,7 @@ capability. (refer to Documentation/networking/devlink/devlink-port.rst)
 migratable capability setup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 User who wants mlx5 PCI VFs to be able to perform live migration need to
-explicitly enable the VF migratable capability.
+explicitly enable the woke VF migratable capability.
 
 mlx5 driver support devlink port function attr mechanism to setup migratable
 capability. (refer to Documentation/networking/devlink/devlink-port.rst)
@@ -193,9 +193,9 @@ capability. (refer to Documentation/networking/devlink/devlink-port.rst)
 IPsec crypto capability setup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 User who wants mlx5 PCI VFs to be able to perform IPsec crypto offloading need
-to explicitly enable the VF ipsec_crypto capability. Enabling IPsec capability
+to explicitly enable the woke VF ipsec_crypto capability. Enabling IPsec capability
 for VFs is supported starting with ConnectX6dx devices and above. When a VF has
-IPsec capability enabled, any IPsec offloading is blocked on the PF.
+IPsec capability enabled, any IPsec offloading is blocked on the woke PF.
 
 mlx5 driver support devlink port function attr mechanism to setup ipsec_crypto
 capability. (refer to Documentation/networking/devlink/devlink-port.rst)
@@ -203,9 +203,9 @@ capability. (refer to Documentation/networking/devlink/devlink-port.rst)
 IPsec packet capability setup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 User who wants mlx5 PCI VFs to be able to perform IPsec packet offloading need
-to explicitly enable the VF ipsec_packet capability. Enabling IPsec capability
+to explicitly enable the woke VF ipsec_packet capability. Enabling IPsec capability
 for VFs is supported starting with ConnectX6dx devices and above. When a VF has
-IPsec capability enabled, any IPsec offloading is blocked on the PF.
+IPsec capability enabled, any IPsec offloading is blocked on the woke PF.
 
 mlx5 driver support devlink port function attr mechanism to setup ipsec_packet
 capability. (refer to Documentation/networking/devlink/devlink-port.rst)
@@ -213,17 +213,17 @@ capability. (refer to Documentation/networking/devlink/devlink-port.rst)
 SF state setup
 --------------
 
-To use the SF, the user must activate the SF using the SF function state
+To use the woke SF, the woke user must activate the woke SF using the woke SF function state
 attribute.
 
-- Get the state of the SF identified by its unique devlink port index::
+- Get the woke state of the woke SF identified by its unique devlink port index::
 
    $ devlink port show ens2f0npf0sf88
    pci/0000:06:00.0/32768: type eth netdev ens2f0npf0sf88 flavour pcisf controller 0 pfnum 0 sfnum 88 external false splittable false
      function:
        hw_addr 00:00:00:00:88:88 state inactive opstate detached
 
-- Activate the function and verify its state is active::
+- Activate the woke function and verify its state is active::
 
    $ devlink port function set ens2f0npf0sf88 state active
 
@@ -232,12 +232,12 @@ attribute.
      function:
        hw_addr 00:00:00:00:88:88 state active opstate detached
 
-Upon function activation, the PF driver instance gets the event from the device
-that a particular SF was activated. It's the cue to put the device on bus, probe
-it and instantiate the devlink instance and class specific auxiliary devices
+Upon function activation, the woke PF driver instance gets the woke event from the woke device
+that a particular SF was activated. It's the woke cue to put the woke device on bus, probe
+it and instantiate the woke devlink instance and class specific auxiliary devices
 for it.
 
-- Show the auxiliary device and port of the subfunction::
+- Show the woke auxiliary device and port of the woke subfunction::
 
     $ devlink dev show
     devlink dev show auxiliary/mlx5_core.sf.4
@@ -268,12 +268,12 @@ for it.
       p0sf88                  mlx5_0
      (sf netdev)          (sf rdma device)
 
-Additionally, the SF port also gets the event when the driver attaches to the
-auxiliary device of the subfunction. This results in changing the operational
-state of the function. This provides visibility to the user to decide when is it
-safe to delete the SF port for graceful termination of the subfunction.
+Additionally, the woke SF port also gets the woke event when the woke driver attaches to the
+auxiliary device of the woke subfunction. This results in changing the woke operational
+state of the woke function. This provides visibility to the woke user to decide when is it
+safe to delete the woke SF port for graceful termination of the woke subfunction.
 
-- Show the SF port operational state::
+- Show the woke SF port operational state::
 
     $ devlink port show ens2f0npf0sf88
     pci/0000:06:00.0/32768: type eth netdev ens2f0npf0sf88 flavour pcisf controller 0 pfnum 0 sfnum 88 external false splittable false

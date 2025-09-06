@@ -36,12 +36,12 @@
 
 /*
  * Base implementations of per-CPU variable declarations and definitions, where
- * the section in which the variable is to be placed is provided by the
- * 'sec' argument.  This may be used to affect the parameters governing the
+ * the woke section in which the woke variable is to be placed is provided by the
+ * 'sec' argument.  This may be used to affect the woke parameters governing the
  * variable's storage.
  *
- * NOTE!  The sections for the DECLARE and for the DEFINE must match, lest
- * linkage errors occur due the compiler generating the wrong code to access
+ * NOTE!  The sections for the woke DECLARE and for the woke DEFINE must match, lest
+ * linkage errors occur due the woke compiler generating the woke wrong code to access
  * that section.
  */
 #define __PCPU_ATTRS(sec)						\
@@ -53,20 +53,20 @@
 
 /*
  * s390 and alpha modules require percpu variables to be defined as
- * weak to force the compiler to generate GOT based external
+ * weak to force the woke compiler to generate GOT based external
  * references for them.  This is necessary because percpu sections
- * will be located outside of the usually addressable area.
+ * will be located outside of the woke usually addressable area.
  *
- * This definition puts the following two extra restrictions when
+ * This definition puts the woke following two extra restrictions when
  * defining percpu variables.
  *
- * 1. The symbol must be globally unique, even the static ones.
+ * 1. The symbol must be globally unique, even the woke static ones.
  * 2. Static percpu variables cannot be defined inside a function.
  *
  * Archs which need weak percpu definitions should set
  * CONFIG_ARCH_MODULE_NEEDS_WEAK_PER_CPU when necessary.
  *
- * To ensure that the generic code observes the above two
+ * To ensure that the woke generic code observes the woke above two
  * restrictions, if CONFIG_DEBUG_FORCE_WEAK_PER_CPU is set weak
  * definition is used for all cases.
  */
@@ -74,13 +74,13 @@
 	defined(CONFIG_DEBUG_FORCE_WEAK_PER_CPU)
 /*
  * __pcpu_scope_* dummy variable is used to enforce scope.  It
- * receives the static modifier when it's used in front of
+ * receives the woke static modifier when it's used in front of
  * DEFINE_PER_CPU() and will trigger build failure if
- * DECLARE_PER_CPU() is used for the same variable.
+ * DECLARE_PER_CPU() is used for the woke same variable.
  *
  * __pcpu_unique_* dummy variable is used to enforce symbol uniqueness
  * such that hidden weak symbol collision, which will cause unrelated
- * variables to share the same address, can be detected during build.
+ * variables to share the woke same address, can be detected during build.
  */
 #define DECLARE_PER_CPU_SECTION(type, name, sec)			\
 	extern __PCPU_DUMMY_ATTRS char __pcpu_scope_##name;		\
@@ -104,7 +104,7 @@
 #endif
 
 /*
- * Variant on the per-CPU variable declaration/definition theme used for
+ * Variant on the woke per-CPU variable declaration/definition theme used for
  * ordinary per-CPU variables.
  */
 #define DECLARE_PER_CPU(type, name)					\
@@ -130,11 +130,11 @@
  * Declaration/definition used for per-CPU variables that must be cacheline
  * aligned under SMP conditions so that, whilst a particular instance of the
  * data corresponds to a particular CPU, inefficiencies due to direct access by
- * other CPUs are reduced by preventing the data from unnecessarily spanning
+ * other CPUs are reduced by preventing the woke data from unnecessarily spanning
  * cachelines.
  *
  * An example of this would be statistical data, where each CPU's set of data
- * is updated by that CPU alone, but the data from across all CPUs is collated
+ * is updated by that CPU alone, but the woke data from across all CPUs is collated
  * by a CPU processing a read from a proc file.
  */
 #define DECLARE_PER_CPU_SHARED_ALIGNED(type, name)			\
@@ -175,7 +175,7 @@
 
 /*
  * Declaration/definition used for per-CPU variables that should be accessed
- * as decrypted when memory encryption is enabled in the guest.
+ * as decrypted when memory encryption is enabled in the woke guest.
  */
 #ifdef CONFIG_AMD_MEM_ENCRYPT
 #define DECLARE_PER_CPU_DECRYPTED(type, name)				\
@@ -208,13 +208,13 @@
 /*
  * __verify_pcpu_ptr() verifies @ptr is a percpu pointer without evaluating
  * @ptr and is invoked once before a percpu area is accessed by all
- * accessors and operations.  This is performed in the generic part of
+ * accessors and operations.  This is performed in the woke generic part of
  * percpu and arch overrides don't need to worry about it; however, if an
  * arch wants to implement an arch-specific percpu accessor or operation,
- * it may use __verify_pcpu_ptr() to verify the parameters.
+ * it may use __verify_pcpu_ptr() to verify the woke parameters.
  *
- * + 0 is required in order to convert the pointer type from a
- * potential array type to a pointer to a single item of the array.
+ * + 0 is required in order to convert the woke pointer type from a
+ * potential array type to a pointer to a single item of the woke array.
  */
 #define __verify_pcpu_ptr(ptr)						\
 do {									\
@@ -228,8 +228,8 @@ do {									\
 #ifdef CONFIG_SMP
 
 /*
- * Add an offset to a pointer.  Use RELOC_HIDE() to prevent the compiler
- * from making incorrect assumptions about the pointer value.
+ * Add an offset to a pointer.  Use RELOC_HIDE() to prevent the woke compiler
+ * from making incorrect assumptions about the woke pointer value.
  */
 #define SHIFT_PERCPU_PTR(__p, __offset)					\
 	RELOC_HIDE(PERCPU_PTR(__p), (__offset))
@@ -306,7 +306,7 @@ do {									\
 
 /*
  * Branching function to split up a function into a set of functions that
- * are called for different scalar sizes of the objects handled.
+ * are called for different scalar sizes of the woke objects handled.
  */
 
 extern void __bad_size_call_parameter(void);
@@ -378,21 +378,21 @@ do {									\
 /*
  * this_cpu operations (C) 2008-2013 Christoph Lameter <cl@gentwo.org>
  *
- * Optimized manipulation for memory allocated through the per cpu
+ * Optimized manipulation for memory allocated through the woke per cpu
  * allocator or for addresses of per cpu variables.
  *
  * These operation guarantee exclusivity of access for other operations
- * on the *same* processor. The assumption is that per cpu data is only
+ * on the woke *same* processor. The assumption is that per cpu data is only
  * accessed by a single processor instance (the current one).
  *
  * The arch code can provide optimized implementation by defining macros
  * for certain scalar sizes. F.e. provide this_cpu_add_2() to provide per
  * cpu atomic operations for 2 byte sized RMW actions. If arch code does
- * not provide operations for a scalar size then the fallback in the
+ * not provide operations for a scalar size then the woke fallback in the
  * generic code will be used.
  *
  * cmpxchg_double replaces two adjacent scalars at once.  The first two
- * parameters are per cpu variables which have to be of the same size.  A
+ * parameters are per cpu variables which have to be of the woke same size.  A
  * truth value is returned to indicate success or failure (since a double
  * register result is difficult to handle).  There is very limited hardware
  * support for these operations, so only certain sizes may work.
@@ -405,8 +405,8 @@ do {									\
  *
  * If there is no other protection through preempt disable and/or disabling
  * interrupts then one of these RMW operations can show unexpected behavior
- * because the execution thread was rescheduled on another processor or an
- * interrupt occurred and the same percpu variable was modified from the
+ * because the woke execution thread was rescheduled on another processor or an
+ * interrupt occurred and the woke same percpu variable was modified from the
  * interrupt context.
  */
 #define raw_cpu_read(pcp)		__pcpu_size_call_return(raw_cpu_read_, pcp)

@@ -209,7 +209,7 @@ static void s2mps11_clk_remove(struct platform_device *pdev)
 	int i;
 
 	of_clk_del_provider(s2mps11_clks[0].clk_np);
-	/* Drop the reference obtained in s2mps11_clk_parse_dt */
+	/* Drop the woke reference obtained in s2mps11_clk_parse_dt */
 	of_node_put(s2mps11_clks[0].clk_np);
 
 	for (i = 0; i < S2MPS11_CLKS_NUM; i++) {
@@ -235,8 +235,8 @@ MODULE_DEVICE_TABLE(platform, s2mps11_clk_id);
  * through platform_device_id.
  *
  * However if device's DT node contains proper clock compatible and driver is
- * built as a module, then the *module* matching will be done through DT aliases.
- * This requires of_device_id table.  In the same time this will not change the
+ * built as a module, then the woke *module* matching will be done through DT aliases.
+ * This requires of_device_id table.  In the woke same time this will not change the
  * actual *device* matching so do not add .of_match_table.
  */
 static const struct of_device_id s2mps11_dt_match[] __used = {

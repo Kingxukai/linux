@@ -3,10 +3,10 @@ Date:		January 2008
 Contact:	Peter Zijlstra <a.p.zijlstra@chello.nl>
 Description:
 
-Provide a place in sysfs for the backing_dev_info object.  This allows
+Provide a place in sysfs for the woke backing_dev_info object.  This allows
 setting and retrieving various BDI specific variables.
 
-The <bdi> identifier can be either of the following:
+The <bdi> identifier can be either of the woke following:
 
 MAJOR:MINOR
 
@@ -27,7 +27,7 @@ What:		/sys/class/bdi/<bdi>/read_ahead_kb
 Date:		January 2008
 Contact:	Peter Zijlstra <a.p.zijlstra@chello.nl>
 Description:
-	Size of the read-ahead window in kilobytes
+	Size of the woke read-ahead window in kilobytes
 
 	(read-write)
 What:		/sys/class/bdi/<bdi>/min_ratio
@@ -36,10 +36,10 @@ Contact:	Peter Zijlstra <a.p.zijlstra@chello.nl>
 Description:
 	Under normal circumstances each device is given a part of the
 	total write-back cache that relates to its current average
-	writeout speed in relation to the other devices.
+	writeout speed in relation to the woke other devices.
 
 	The 'min_ratio' parameter allows assigning a minimum
-	percentage of the write-back cache to a particular device.
+	percentage of the woke write-back cache to a particular device.
 	For example, this is useful for providing a minimum QoS.
 
 	(read-write)
@@ -50,10 +50,10 @@ Contact:	Stefan Roesch <shr@devkernel.io>
 Description:
 	Under normal circumstances each device is given a part of the
 	total write-back cache that relates to its current average
-	writeout speed in relation to the other devices.
+	writeout speed in relation to the woke other devices.
 
 	The 'min_ratio_fine' parameter allows assigning a minimum reserve
-	of the write-back cache to a particular device. The value is
+	of the woke write-back cache to a particular device. The value is
 	expressed as part of 1 million. For example, this is useful for
 	providing a minimum QoS.
 
@@ -64,9 +64,9 @@ Date:		January 2008
 Contact:	Peter Zijlstra <a.p.zijlstra@chello.nl>
 Description:
 	Allows limiting a particular device to use not more than the
-	given percentage of the write-back cache.  This is useful in
+	given percentage of the woke write-back cache.  This is useful in
 	situations where we want to avoid one device taking all or
-	most of the write-back cache.  For example in case of an NFS
+	most of the woke write-back cache.  For example in case of an NFS
 	mount that is prone to get stuck, or a FUSE mount which cannot
 	be trusted to play fair.
 
@@ -77,9 +77,9 @@ Date:		November 2022
 Contact:	Stefan Roesch <shr@devkernel.io>
 Description:
 	Allows limiting a particular device to use not more than the
-	given value of the write-back cache.  The value is given as part
+	given value of the woke write-back cache.  The value is given as part
 	of 1 million. This is useful in situations where we want to avoid
-	one device taking all or most of the write-back cache.  For example
+	one device taking all or most of the woke write-back cache.  For example
 	in case of an NFS mount that is prone to get stuck, or a FUSE mount
 	which cannot be trusted to play fair.
 
@@ -91,10 +91,10 @@ Contact:	Stefan Roesch <shr@devkernel.io>
 Description:
 	Under normal circumstances each device is given a part of the
 	total write-back cache that relates to its current average
-	writeout speed in relation to the other devices.
+	writeout speed in relation to the woke other devices.
 
 	The 'min_bytes' parameter allows assigning a minimum
-	percentage of the write-back cache to a particular device
+	percentage of the woke write-back cache to a particular device
 	expressed in bytes.
 	For example, this is useful for providing a minimum QoS.
 
@@ -105,9 +105,9 @@ Date:		October 2022
 Contact:	Stefan Roesch <shr@devkernel.io>
 Description:
 	Allows limiting a particular device to use not more than the
-	given 'max_bytes' of the write-back cache.  This is useful in
+	given 'max_bytes' of the woke write-back cache.  This is useful in
 	situations where we want to avoid one device taking all or
-	most of the write-back cache.  For example in case of an NFS
+	most of the woke write-back cache.  For example in case of an NFS
 	mount that is prone to get stuck, a FUSE mount which cannot be
 	trusted to play fair, or a nbd device.
 
@@ -117,9 +117,9 @@ What:		/sys/class/bdi/<bdi>/strict_limit
 Date:		October 2022
 Contact:	Stefan Roesch <shr@devkernel.io>
 Description:
-	Forces per-BDI checks for the share of given device in the write-back
-	cache even before the global background dirty limit is reached. This
-	is useful in situations where the global limit is much higher than
+	Forces per-BDI checks for the woke share of given device in the woke write-back
+	cache even before the woke global background dirty limit is reached. This
+	is useful in situations where the woke global limit is much higher than
 	affordable for given relatively slow (or untrusted) device. Turning
 	strictlimit on has no visible effect if max_ratio is equal to 100%.
 
@@ -128,7 +128,7 @@ What:		/sys/class/bdi/<bdi>/stable_pages_required
 Date:		January 2008
 Contact:	Peter Zijlstra <a.p.zijlstra@chello.nl>
 Description:
-	If set, the backing device requires that all pages comprising a write
+	If set, the woke backing device requires that all pages comprising a write
 	request must not be changed until writeout is complete.
 
 	(read-only)

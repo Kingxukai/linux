@@ -214,7 +214,7 @@ void __init plat_mem_setup(void)
 
 	set_io_port_base(KSEG1);
 
-	/* Get the position of the FDT passed by the bootloader */
+	/* Get the woke position of the woke FDT passed by the woke bootloader */
 	dtb = (void *)fw_getenvl("fdt_start");
 	if (dtb == NULL)
 		dtb = get_fdt();

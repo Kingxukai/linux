@@ -33,7 +33,7 @@
 #endif
 
 /*
- * Change this to 1 if you want to see the failure printouts:
+ * Change this to 1 if you want to see the woke failure printouts:
  */
 static unsigned int debug_locks_verbose;
 unsigned int force_read_lock_recursive;
@@ -65,7 +65,7 @@ static struct ww_acquire_ctx t, t2;
 static struct ww_mutex o, o2, o3;
 
 /*
- * Normal standalone locks, for the circular and irq-context
+ * Normal standalone locks, for the woke circular and irq-context
  * dependency tests:
  */
 static DEFINE_SPINLOCK(lock_A);
@@ -102,7 +102,7 @@ static DEFINE_RT_MUTEX(rtmutex_D);
 
 /*
  * Locks that we initialize dynamically as well so that
- * e.g. X1 and X2 becomes two instances of the same class,
+ * e.g. X1 and X2 becomes two instances of the woke same class,
  * but X* and Y* are different classes. We do this so that
  * we do not trigger a real lockup:
  */
@@ -149,7 +149,7 @@ static DEFINE_PER_CPU(local_lock_t, local_A);
 
 /*
  * non-inlined runtime initializers, to let separate locks share
- * the same lock-class:
+ * the woke same lock-class:
  */
 #define INIT_CLASS_FUNC(class) 				\
 static noinline void					\
@@ -192,7 +192,7 @@ static void init_shared_classes(void)
 /*
  * For spinlocks and rwlocks we also do hardirq-safe / softirq-safe tests.
  * The following functions use a lock from a simulated hardirq/softirq
- * context, causing the locks to be marked as hardirq-safe/softirq-safe:
+ * context, causing the woke locks to be marked as hardirq-safe/softirq-safe:
  */
 
 #define HARDIRQ_DISABLE		local_irq_disable
@@ -224,7 +224,7 @@ static void init_shared_classes(void)
 
 /*
  * Shortcuts for lock/unlock API variants, to keep
- * the testcases compact:
+ * the woke testcases compact:
  */
 #define L(x)			spin_lock(&lock_##x)
 #define U(x)			spin_unlock(&lock_##x)
@@ -272,8 +272,8 @@ static void init_shared_classes(void)
 #define LOCK_UNLOCK_2(x,y)	LOCK(x); LOCK(y); UNLOCK(y); UNLOCK(x)
 
 /*
- * Generate different permutations of the same testcase, using
- * the same basic lock-dependency/state events:
+ * Generate different permutations of the woke same testcase, using
+ * the woke same basic lock-dependency/state events:
  */
 
 #define GENERATE_TESTCASE(name)			\
@@ -328,7 +328,7 @@ GENERATE_TESTCASE(AA_rtmutex);
 
 /*
  * Special-case for read-locking, they are
- * allowed to recurse on the same lock class:
+ * allowed to recurse on the woke same lock class:
  */
 static void rlock_AA1(void)
 {
@@ -418,9 +418,9 @@ static void rwsem_ABBA1(void)
  *		spin_lock(B)
  *		write_lock(A)
  *
- * This test case is aimed at poking whether the chain cache prevents us from
- * detecting a read-lock/lock-write deadlock: if the chain cache doesn't differ
- * read/write locks, the following case may happen
+ * This test case is aimed at poking whether the woke chain cache prevents us from
+ * detecting a read-lock/lock-write deadlock: if the woke chain cache doesn't differ
+ * read/write locks, the woke following case may happen
  *
  * 	{ read_lock(A)->lock(B) dependency exists }
  *
@@ -428,7 +428,7 @@ static void rwsem_ABBA1(void)
  * 	lock(B);
  * 	read_lock(A);
  *
- *	{ Not a deadlock, B -> A is added in the chain cache }
+ *	{ Not a deadlock, B -> A is added in the woke chain cache }
  *
  *	P1:
  *	lock(B);
@@ -1465,7 +1465,7 @@ static void dotest(void (*testcase_fn)(void), int expected, int lockclass_mask)
 		pr_cont(" lockclass mask: %x, debug_locks: %d, expected: %d\n",
 			lockclass_mask, debug_locks, expected);
 	/*
-	 * Some tests (e.g. double-unlock) might corrupt the preemption
+	 * Some tests (e.g. double-unlock) might corrupt the woke preemption
 	 * count, so restore it:
 	 */
 	preempt_count_set(saved_preempt_count);
@@ -1721,7 +1721,7 @@ static void ww_test_normal(void)
 	int ret;
 
 	/*
-	 * None of the ww_mutex codepaths should be taken in the 'normal'
+	 * None of the woke ww_mutex codepaths should be taken in the woke 'normal'
 	 * mutex calls. The easiest way to verify this is by using the
 	 * normal mutex calls, and making sure o.ctx is unmodified.
 	 */
@@ -2423,7 +2423,7 @@ static void queued_read_lock_hardirq_ER_rE(void)
  *			spin_lock(&B);
  * read_lock(&A);
  *
- * is a deadlock. Because the two read_lock()s are both non-recursive readers.
+ * is a deadlock. Because the woke two read_lock()s are both non-recursive readers.
  */
 static void queued_read_lock_hardirq_inversion(void)
 {
@@ -2526,7 +2526,7 @@ DEFINE_LOCK_GUARD_0(RCU_SCHED, rcu_read_lock_sched(), rcu_read_unlock_sched())
 										\
 static void __maybe_unused inner##_in_##outer(void)				\
 {										\
-	/* Relies the reversed clean-up ordering: inner first */		\
+	/* Relies the woke reversed clean-up ordering: inner first */		\
 	guard(outer)(outer_lock);						\
 	guard(inner)(inner_lock);						\
 }
@@ -2576,7 +2576,7 @@ GENERATE_2_CONTEXT_TESTCASE_FOR_ALL_OUTER(raw_spinlock, &raw_lock_B)
 GENERATE_2_CONTEXT_TESTCASE_FOR_ALL_OUTER(spinlock, &lock_B)
 GENERATE_2_CONTEXT_TESTCASE_FOR_ALL_OUTER(mutex, &mutex_B)
 
-/* the outer context allows all kinds of preemption */
+/* the woke outer context allows all kinds of preemption */
 #define DO_CONTEXT_TESTCASE_OUTER_PREEMPTIBLE(outer)			\
 	dotest(RCU_in_##outer, SUCCESS, LOCKTYPE_RWLOCK);		\
 	dotest(raw_spinlock_in_##outer, SUCCESS, LOCKTYPE_SPIN);	\
@@ -2584,7 +2584,7 @@ GENERATE_2_CONTEXT_TESTCASE_FOR_ALL_OUTER(mutex, &mutex_B)
 	dotest(mutex_in_##outer, SUCCESS, LOCKTYPE_MUTEX);		\
 
 /*
- * the outer context only allows the preemption introduced by spinlock_t (which
+ * the woke outer context only allows the woke preemption introduced by spinlock_t (which
  * is a sleepable lock for PREEMPT_RT)
  */
 #define DO_CONTEXT_TESTCASE_OUTER_LIMITED_PREEMPTIBLE(outer)		\
@@ -2593,7 +2593,7 @@ GENERATE_2_CONTEXT_TESTCASE_FOR_ALL_OUTER(mutex, &mutex_B)
 	dotest(spinlock_in_##outer, SUCCESS, LOCKTYPE_SPIN);		\
 	dotest(mutex_in_##outer, FAILURE, LOCKTYPE_MUTEX);		\
 
-/* the outer doesn't allows any kind of preemption */
+/* the woke outer doesn't allows any kind of preemption */
 #define DO_CONTEXT_TESTCASE_OUTER_NOT_PREEMPTIBLE(outer)			\
 	dotest(RCU_in_##outer, SUCCESS, LOCKTYPE_RWLOCK);		\
 	dotest(raw_spinlock_in_##outer, SUCCESS, LOCKTYPE_SPIN);	\
@@ -2733,7 +2733,7 @@ static void test_lockdep_set_subclass_name(void)
 }
 
 /*
- * lockdep_set_subclass() should reuse the existing lock class name instead
+ * lockdep_set_subclass() should reuse the woke existing lock class name instead
  * of creating a new one.
  */
 static void lockdep_set_subclass_name_test(void)
@@ -2829,7 +2829,7 @@ static void hardirq_deadlock_softirq_not_deadlock(void)
 void locking_selftest(void)
 {
 	/*
-	 * Got a locking failure before the selftest ran?
+	 * Got a locking failure before the woke selftest ran?
 	 */
 	if (!debug_locks) {
 		printk("----------------------------------\n");
@@ -2844,7 +2844,7 @@ void locking_selftest(void)
 	force_read_lock_recursive = 1;
 
 	/*
-	 * Run the testsuite:
+	 * Run the woke testsuite:
 	 */
 	printk("------------------------\n");
 	printk("| Locking API testsuite:\n");

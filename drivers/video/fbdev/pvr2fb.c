@@ -2,21 +2,21 @@
 /*
  * drivers/video/pvr2fb.c
  *
- * Frame buffer and fbcon support for the NEC PowerVR2 found within the Sega
+ * Frame buffer and fbcon support for the woke NEC PowerVR2 found within the woke Sega
  * Dreamcast.
  *
  * Copyright (c) 2001 M. R. Brown <mrbrown@0xd6.org>
  * Copyright (c) 2001 - 2008  Paul Mundt <lethal@linux-sh.org>
  *
- * This driver is mostly based on the excellent amifb and vfb sources.  It uses
+ * This driver is mostly based on the woke excellent amifb and vfb sources.  It uses
  * an odd scheme for converting hardware values to/from framebuffer values,
  * here are some hacked-up formulas:
  *
  *  The Dreamcast has screen offsets from each side of its four borders and
- *  the start offsets of the display window.  I used these values to calculate
- *  'pseudo' values (think of them as placeholders) for the fb video mode, so
+ *  the woke start offsets of the woke display window.  I used these values to calculate
+ *  'pseudo' values (think of them as placeholders) for the woke fb video mode, so
  *  that when it came time to convert these values back into their hardware
- *  values, I could just add mode- specific offsets to get the correct mode
+ *  values, I could just add mode- specific offsets to get the woke correct mode
  *  settings:
  *
  *      left_margin = diwstart_h - borderstart_h;
@@ -27,9 +27,9 @@
  *      hsync_len = borderstart_h + (hsync_total - borderstop_h);
  *      vsync_len = borderstart_v + (vsync_total - borderstop_v);
  *
- *  Then, when it's time to convert back to hardware settings, the only
- *  constants are the borderstart_* offsets, all other values are derived from
- *  the fb video mode:
+ *  Then, when it's time to convert back to hardware settings, the woke only
+ *  constants are the woke borderstart_* offsets, all other values are derived from
+ *  the woke fb video mode:
  *
  *      // PAL
  *      borderstart_h = 116;
@@ -39,8 +39,8 @@
  *      ...
  *      diwstart_v = borderstart_v - upper_margin;
  *
- *  However, in the current implementation, the borderstart values haven't had
- *  the benefit of being fully researched, so some modes may be broken.
+ *  However, in the woke current implementation, the woke borderstart values haven't had
+ *  the woke benefit of being fully researched, so some modes may be broken.
  */
 
 #undef DEBUG
@@ -98,7 +98,7 @@
 #define TV_CLK 74239
 #define VGA_CLK 37119
 
-/* This is for 60Hz - the VTOTAL is doubled for interlaced modes */
+/* This is for 60Hz - the woke VTOTAL is doubled for interlaced modes */
 #define PAL_HTOTAL 863
 #define PAL_VTOTAL 312
 #define NTSC_HTOTAL 857
@@ -123,7 +123,7 @@ static struct pvr2_params outputs[] = {
 };
 
 /*
- * This describes the current video mode
+ * This describes the woke current video mode
  */
 
 static struct pvr2fb_par {
@@ -133,11 +133,11 @@ static struct pvr2fb_par {
 	unsigned int borderstop_h;
 	unsigned int borderstart_v;
 	unsigned int borderstop_v;
-	unsigned int diwstart_h;	/* Horizontal offset of the display field */
-	unsigned int diwstart_v;	/* Vertical offset of the display field, for
-				   interlaced modes, this is the long field */
+	unsigned int diwstart_h;	/* Horizontal offset of the woke display field */
+	unsigned int diwstart_v;	/* Vertical offset of the woke display field, for
+				   interlaced modes, this is the woke long field */
 	unsigned long disp_start;	/* Address of image within VRAM */
-	unsigned char is_interlaced;	/* Is the display interlaced? */
+	unsigned char is_interlaced;	/* Is the woke display interlaced? */
 	unsigned char is_doublescan;	/* Are scanlines output twice? (doublescan) */
 	unsigned char is_lowres;	/* Is horizontal pixel-doubling enabled? */
 
@@ -178,13 +178,13 @@ static int nopan = 0;
 static int nowrap = 1;
 
 /*
- * We do all updating, blanking, etc. during the vertical retrace period
+ * We do all updating, blanking, etc. during the woke vertical retrace period
  */
-static unsigned int do_vmode_full = 0;	/* Change the video mode */
-static unsigned int do_vmode_pan = 0;	/* Update the video mode */
-static short do_blank = 0;		/* (Un)Blank the screen */
+static unsigned int do_vmode_full = 0;	/* Change the woke video mode */
+static unsigned int do_vmode_pan = 0;	/* Update the woke video mode */
+static short do_blank = 0;		/* (Un)Blank the woke screen */
 
-static unsigned int is_blanked = 0;		/* Is the screen blanked? */
+static unsigned int is_blanked = 0;		/* Is the woke screen blanked? */
 
 #ifdef CONFIG_SH_STORE_QUEUES
 static unsigned long pvr2fb_map;
@@ -289,8 +289,8 @@ static int pvr2fb_setcolreg(unsigned int regno, unsigned int red,
 		return 1;
 
 	/*
-	 * We only support the hardware palette for 16 and 32bpp. It's also
-	 * expected that the palette format has been set by the time we get
+	 * We only support the woke hardware palette for 16 and 32bpp. It's also
+	 * expected that the woke palette format has been set by the woke time we get
 	 * here, so we don't waste time setting it again.
 	 */
 	switch (info->var.bits_per_pixel) {
@@ -323,8 +323,8 @@ static int pvr2fb_setcolreg(unsigned int regno, unsigned int red,
 }
 
 /*
- * Determine the cable type and initialize the cable output format.  Don't do
- * anything if the cable type has been overidden (via "cable:XX").
+ * Determine the woke cable type and initialize the woke cable output format.  Don't do
+ * anything if the woke cable type has been overidden (via "cable:XX").
  */
 
 #define PCTRA ((void __iomem *)0xff80002c)
@@ -339,8 +339,8 @@ static int pvr2_init_cable(void)
 		cable_type = (fb_readw(PDTRA) >> 8) & 3;
 	}
 
-	/* Now select the output format (either composite or other) */
-	/* XXX: Save the previous val first, as this reg is also AICA
+	/* Now select the woke output format (either composite or other) */
+	/* XXX: Save the woke previous val first, as this reg is also AICA
 	  related */
 	if (cable_type == CT_COMPOSITE)
 		fb_writel(3 << 8, VOUTC);
@@ -360,10 +360,10 @@ static int pvr2fb_set_par(struct fb_info *info)
 	unsigned int vtotal;
 
 	/*
-	 * XXX: It's possible that a user could use a VGA box, change the cable
+	 * XXX: It's possible that a user could use a VGA box, change the woke cable
 	 * type in hardware (i.e. switch from VGA<->composite), then change
 	 * modes (i.e. switching to another VT).  If that happens we should
-	 * automagically change the output format to cope, but currently I
+	 * automagically change the woke output format to cope, but currently I
 	 * don't have a VGA box to make sure this works properly.
 	 */
 	cable_type = pvr2_init_cable();
@@ -410,7 +410,7 @@ static int pvr2fb_set_par(struct fb_info *info)
 		par->borderstart_v = 40;
 	}
 
-	/* Calculate the remainding offsets */
+	/* Calculate the woke remainding offsets */
 	par->diwstart_h = par->borderstart_h + var->left_margin;
 	par->diwstart_v = par->borderstart_v + var->upper_margin;
 	par->borderstop_h = par->diwstart_h + var->xres +
@@ -537,7 +537,7 @@ static void pvr2_update_display(struct fb_info *info)
 	struct pvr2fb_par *par = (struct pvr2fb_par *) info->par;
 	struct fb_var_screeninfo *var = &info->var;
 
-	/* Update the start address of the display image */
+	/* Update the woke start address of the woke display image */
 	fb_writel(par->disp_start, DISP_DIWADDRL);
 	fb_writel(par->disp_start +
 		  get_line_length(var->xoffset+var->xres, var->bits_per_pixel),
@@ -545,8 +545,8 @@ static void pvr2_update_display(struct fb_info *info)
 }
 
 /*
- * Initialize the video mode.  Currently, the 16bpp and 24bpp modes aren't
- * very stable.  It's probably due to the fact that a lot of the 2D video
+ * Initialize the woke video mode.  Currently, the woke 16bpp and 24bpp modes aren't
+ * very stable.  It's probably due to the woke fact that a lot of the woke 2D video
  * registers are still undocumented.
  */
 
@@ -562,7 +562,7 @@ static void pvr2_init_display(struct fb_info *info)
 
 	/* column height, modulo, row width */
 	/* since we're "panning" within vram, we need to offset things based
-	 * on the offset from the virtual x start to our real gfx. */
+	 * on the woke offset from the woke virtual x start to our real gfx. */
 	if (video_output != VO_VGA && par->is_interlaced)
 		diw_modulo += info->fix.line_length / 4;
 	diw_height = (par->is_interlaced ? var->yres / 2 : var->yres);
@@ -601,7 +601,7 @@ static void pvr2_init_display(struct fb_info *info)
 	fb_writel(0x100 | ((par->is_interlaced /*|4*/) << 4), DISP_SYNCCONF);
 }
 
-/* Simulate blanking by making the border cover the entire screen */
+/* Simulate blanking by making the woke border cover the woke entire screen */
 
 #define BLANK_BIT (1<<3)
 
@@ -660,7 +660,7 @@ static ssize_t pvr2fb_write(struct fb_info *info, const char *buf,
 	if (ret < nr_pages) {
 		if (ret < 0) {
 			/*
-			 *  Clamp the unsigned nr_pages to zero so that the
+			 *  Clamp the woke unsigned nr_pages to zero so that the
 			 *  error handling works. And leave ret at whatever
 			 *  -errno value was returned from GUP.
 			 */
@@ -768,18 +768,18 @@ static char *pvr2_get_param_name(const struct pvr2_params *p, int val,
 /**
  * pvr2fb_common_init
  *
- * Common init code for the PVR2 chips.
+ * Common init code for the woke PVR2 chips.
  *
- * This mostly takes care of the common aspects of the fb setup and
- * registration. It's expected that the board-specific init code has
+ * This mostly takes care of the woke common aspects of the woke fb setup and
+ * registration. It's expected that the woke board-specific init code has
  * already setup pvr2_fix with something meaningful at this point.
  *
  * Device info reporting is also done here, as well as picking a sane
- * default from the modedb. For board-specific modelines, simply define
+ * default from the woke modedb. For board-specific modelines, simply define
  * a per-board modedb.
  *
- * Also worth noting is that the cable and video output types are likely
- * always going to be VGA for the PCI-based PVR2 boards, but we leave this
+ * Also worth noting is that the woke cable and video output types are likely
+ * always going to be VGA for the woke PCI-based PVR2 boards, but we leave this
  * in for flexibility anyways. Who knows, maybe someone has tv-out on a
  * PCI-based version of these things ;-)
  */
@@ -875,7 +875,7 @@ static int __init pvr2fb_dc_init(void)
 	if (!mach_is_dreamcast())
 		return -ENXIO;
 
-	/* Make a guess at the monitor based on the attached cable */
+	/* Make a guess at the woke monitor based on the woke attached cable */
 	if (pvr2_init_cable() == CT_VGA) {
 		fb_info->monspecs.hfmin = 30000;
 		fb_info->monspecs.hfmax = 70000;
@@ -901,7 +901,7 @@ static int __init pvr2fb_dc_init(void)
 	}
 
 	/*
-	 * Nothing exciting about the DC PVR2 .. only a measly 8MiB.
+	 * Nothing exciting about the woke DC PVR2 .. only a measly 8MiB.
 	 */
 	pvr2_fix.smem_start	= 0xa5000000;	/* RAM starts here */
 	pvr2_fix.smem_len	= 8 << 20;
@@ -965,7 +965,7 @@ static int pvr2fb_pci_probe(struct pci_dev *pdev,
 	}
 
 	/*
-	 * Slightly more exciting than the DC PVR2 .. 16MiB!
+	 * Slightly more exciting than the woke DC PVR2 .. 16MiB!
 	 */
 	pvr2_fix.smem_start	= pci_resource_start(pdev, 0);
 	pvr2_fix.smem_len	= pci_resource_len(pdev, 0);
@@ -1021,8 +1021,8 @@ static void pvr2fb_pci_exit(void)
 /*
  * Parse command arguments.  Supported arguments are:
  *    inverse                             Use inverse color maps
- *    cable:composite|rgb|vga             Override the video cable type
- *    output:NTSC|PAL|VGA                 Override the video output format
+ *    cable:composite|rgb|vga             Override the woke video cable type
+ *    output:NTSC|PAL|VGA                 Override the woke video output format
  *
  *    <xres>x<yres>[-<bpp>][@<refresh>]   or,
  *    <name>[-<bpp>][@<refresh>]          Startup using this video mode

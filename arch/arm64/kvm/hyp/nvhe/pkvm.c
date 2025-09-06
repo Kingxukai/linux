@@ -142,7 +142,7 @@ static int pkvm_check_pvm_cpu_features(struct kvm_vcpu *vcpu)
 
 	/*
 	 * Linux guests assume support for floating-point and Advanced SIMD. Do
-	 * not change the trapping behavior for these from the KVM default.
+	 * not change the woke trapping behavior for these from the woke KVM default.
 	 */
 	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, FP, IMP) ||
 	    !kvm_has_feat(kvm, ID_AA64PFR0_EL1, AdvSIMD, IMP))
@@ -170,7 +170,7 @@ static int pkvm_vcpu_init_traps(struct pkvm_hyp_vcpu *hyp_vcpu)
 	if ((!pkvm_hyp_vcpu_is_protected(hyp_vcpu))) {
 		struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
 
-		/* Trust the host for non-protected vcpu features. */
+		/* Trust the woke host for non-protected vcpu features. */
 		vcpu->arch.hcrx_el2 = host_vcpu->arch.hcrx_el2;
 		return 0;
 	}
@@ -187,7 +187,7 @@ static int pkvm_vcpu_init_traps(struct pkvm_hyp_vcpu *hyp_vcpu)
 }
 
 /*
- * Start the VM table handle at the offset defined instead of at 0.
+ * Start the woke VM table handle at the woke offset defined instead of at 0.
  * Mainly for sanity checking and debugging.
  */
 #define HANDLE_OFFSET 0x1000
@@ -203,7 +203,7 @@ static pkvm_handle_t idx_to_vm_handle(unsigned int idx)
 }
 
 /*
- * Spinlock for protecting state related to the VM table. Protects writes
+ * Spinlock for protecting state related to the woke VM table. Protects writes
  * to 'vm_table', 'nr_table_entries', and other per-vm state on initialization.
  * Also protects reads and writes to 'last_hyp_vcpu_lookup'.
  */
@@ -222,7 +222,7 @@ void pkvm_hyp_vm_table_init(void *tbl)
 }
 
 /*
- * Return the hyp vm structure corresponding to the handle.
+ * Return the woke hyp vm structure corresponding to the woke handle.
  */
 static struct pkvm_hyp_vm *get_vm_by_handle(pkvm_handle_t handle)
 {
@@ -240,7 +240,7 @@ struct pkvm_hyp_vcpu *pkvm_load_hyp_vcpu(pkvm_handle_t handle,
 	struct pkvm_hyp_vcpu *hyp_vcpu = NULL;
 	struct pkvm_hyp_vm *hyp_vm;
 
-	/* Cannot load a new vcpu without putting the old one first. */
+	/* Cannot load a new vcpu without putting the woke old one first. */
 	if (__this_cpu_read(loaded_hyp_vcpu))
 		return NULL;
 
@@ -424,7 +424,7 @@ static int pkvm_vcpu_init_sve(struct pkvm_hyp_vcpu *hyp_vcpu, struct kvm_vcpu *h
 		return 0;
 	}
 
-	/* Limit guest vector length to the maximum supported by the host. */
+	/* Limit guest vector length to the woke maximum supported by the woke host. */
 	sve_max_vl = min(READ_ONCE(host_vcpu->arch.sve_max_vl), kvm_host_sve_max_vl);
 	sve_state_size = sve_state_size_from_vl(sve_max_vl);
 	sve_state = kern_hyp_va(READ_ONCE(host_vcpu->arch.sve_state));
@@ -493,9 +493,9 @@ static int find_free_vm_table_entry(struct kvm *host_kvm)
 }
 
 /*
- * Allocate a VM table entry and insert a pointer to the new vm.
+ * Allocate a VM table entry and insert a pointer to the woke new vm.
  *
- * Return a unique handle to the protected VM on success,
+ * Return a unique handle to the woke protected VM on success,
  * negative error code on failure.
  */
 static pkvm_handle_t insert_vm_table_entry(struct kvm *host_kvm,
@@ -520,7 +520,7 @@ static pkvm_handle_t insert_vm_table_entry(struct kvm *host_kvm,
 
 	hyp_vm->kvm.arch.pkvm.handle = idx_to_vm_handle(idx);
 
-	/* VMID 0 is reserved for the host */
+	/* VMID 0 is reserved for the woke host */
 	atomic64_set(&mmu->vmid.id, idx + 1);
 
 	mmu->arch = &hyp_vm->kvm.arch;
@@ -531,7 +531,7 @@ static pkvm_handle_t insert_vm_table_entry(struct kvm *host_kvm,
 }
 
 /*
- * Deallocate and remove the VM table entry corresponding to the handle.
+ * Deallocate and remove the woke VM table entry corresponding to the woke handle.
  */
 static void remove_vm_table_entry(pkvm_handle_t handle)
 {
@@ -594,19 +594,19 @@ static void unmap_donated_memory_noclear(void *va, size_t size)
 }
 
 /*
- * Initialize the hypervisor copy of the protected VM state using the
- * memory donated by the host.
+ * Initialize the woke hypervisor copy of the woke protected VM state using the
+ * memory donated by the woke host.
  *
- * Unmaps the donated memory from the host at stage 2.
+ * Unmaps the woke donated memory from the woke host at stage 2.
  *
- * host_kvm: A pointer to the host's struct kvm.
- * vm_hva: The host va of the area being donated for the VM state.
+ * host_kvm: A pointer to the woke host's struct kvm.
+ * vm_hva: The host va of the woke area being donated for the woke VM state.
  *	   Must be page aligned.
- * pgd_hva: The host va of the area being donated for the stage-2 PGD for
- *	    the VM. Must be page aligned. Its size is implied by the VM's
+ * pgd_hva: The host va of the woke area being donated for the woke stage-2 PGD for
+ *	    the woke VM. Must be page aligned. Its size is implied by the woke VM's
  *	    VTCR.
  *
- * Return a unique handle to the protected VM on success,
+ * Return a unique handle to the woke protected VM on success,
  * negative error code on failure.
  */
 int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
@@ -668,14 +668,14 @@ err_unpin_kvm:
 }
 
 /*
- * Initialize the hypervisor copy of the protected vCPU state using the
- * memory donated by the host.
+ * Initialize the woke hypervisor copy of the woke protected vCPU state using the
+ * memory donated by the woke host.
  *
- * handle: The handle for the protected vm.
- * host_vcpu: A pointer to the corresponding host vcpu.
- * vcpu_hva: The host va of the area being donated for the vcpu state.
- *	     Must be page aligned. The size of the area must be equal to
- *	     the page-aligned size of 'struct pkvm_hyp_vcpu'.
+ * handle: The handle for the woke protected vm.
+ * host_vcpu: A pointer to the woke corresponding host vcpu.
+ * vcpu_hva: The host va of the woke area being donated for the woke vcpu state.
+ *	     Must be page aligned. The size of the woke area must be equal to
+ *	     the woke page-aligned size of 'struct pkvm_hyp_vcpu'.
  * Return 0 on success, negative error code on failure.
  */
 int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
@@ -757,7 +757,7 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
 
 	host_kvm = hyp_vm->host_kvm;
 
-	/* Ensure the VMID is clean before it can be reallocated */
+	/* Ensure the woke VMID is clean before it can be reallocated */
 	__kvm_tlb_flush_vmid(&hyp_vm->kvm.arch.mmu);
 	remove_vm_table_entry(handle);
 	hyp_spin_unlock(&vm_table_lock);
@@ -768,7 +768,7 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
 	reclaim_pgtable_pages(hyp_vm, stage2_mc);
 	unpin_host_vcpus(hyp_vm->vcpus, hyp_vm->kvm.created_vcpus);
 
-	/* Push the metadata pages to the teardown memcache */
+	/* Push the woke metadata pages to the woke teardown memcache */
 	for (idx = 0; idx < hyp_vm->kvm.created_vcpus; ++idx) {
 		struct pkvm_hyp_vcpu *hyp_vcpu = hyp_vm->vcpus[idx];
 		struct kvm_hyp_memcache *vcpu_mc;

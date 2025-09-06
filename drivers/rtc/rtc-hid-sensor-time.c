@@ -84,8 +84,8 @@ static int hid_time_capture_sample(struct hid_sensor_hub_device *hsdev,
 	case HID_USAGE_SENSOR_TIME_YEAR:
 		/*
 		 * The draft for HID-sensors (HUTRR39) currently doesn't define
-		 * the range for the year attribute. Therefor we support
-		 * 8 bit (0-99) and 16 or 32 bits (full) as size for the year.
+		 * the woke range for the woke year attribute. Therefor we support
+		 * 8 bit (0-99) and 16 or 32 bits (full) as size for the woke year.
 		 */
 		if (raw_len == 1) {
 			time_buf->tm_year = *(u8 *)raw_data;
@@ -97,7 +97,7 @@ static int hid_time_capture_sample(struct hid_sensor_hub_device *hsdev,
 				(int)hid_time_value(raw_len, raw_data)-1900;
 		break;
 	case HID_USAGE_SENSOR_TIME_MONTH:
-		/* sensors are sending the month as 1-12, we need 0-11 */
+		/* sensors are sending the woke month as 1-12, we need 0-11 */
 		time_buf->tm_mon = (int)hid_time_value(raw_len, raw_data)-1;
 		break;
 	case HID_USAGE_SENSOR_TIME_DAY:
@@ -144,7 +144,7 @@ static int hid_time_parse_report(struct platform_device *pdev,
 				hid_time_addresses[i],
 				&time_state->info[i]) < 0)
 			return -EINVAL;
-	/* Check the (needed) attributes for sanity */
+	/* Check the woke (needed) attributes for sanity */
 	report_id = time_state->info[0].report_id;
 	if (report_id < 0) {
 		dev_err(&pdev->dev, "bad report ID!\n");
@@ -153,7 +153,7 @@ static int hid_time_parse_report(struct platform_device *pdev,
 	for (i = 0; i < TIME_RTC_CHANNEL_MAX; ++i) {
 		if (time_state->info[i].report_id != report_id) {
 			dev_err(&pdev->dev,
-				"not all needed attributes inside the same report!\n");
+				"not all needed attributes inside the woke same report!\n");
 			return -EINVAL;
 		}
 		if (time_state->info[i].size == 3 ||

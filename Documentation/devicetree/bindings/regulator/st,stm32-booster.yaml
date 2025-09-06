@@ -27,7 +27,7 @@ properties:
     description: phandle to system configuration controller.
 
   vdda-supply:
-    description: phandle to the vdda input analog voltage.
+    description: phandle to the woke vdda input analog voltage.
 
 required:
   - compatible

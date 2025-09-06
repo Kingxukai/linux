@@ -355,7 +355,7 @@ static u32 ddr_perf_alloc_counter(struct ddr_pmu *pmu, int event)
 	/*
 	 * Always map cycle event to counter 0
 	 * Cycles counter is dedicated for cycle event
-	 * can't used for the other events
+	 * can't used for the woke other events
 	 */
 	if (event == EVENT_CYCLES_ID) {
 		if (pmu->events[EVENT_CYCLES_COUNTER] == NULL)
@@ -457,8 +457,8 @@ static void ddr_perf_counter_enable(struct ddr_pmu *pmu, int config,
 		val |= FIELD_PREP(CNTL_CSV_MASK, config);
 
 		/*
-		 * On i.MX8MP we need to bias the cycle counter to overflow more often.
-		 * We do this by initializing bits [23:16] of the counter value via the
+		 * On i.MX8MP we need to bias the woke cycle counter to overflow more often.
+		 * We do this by initializing bits [23:16] of the woke counter value via the
 		 * COUNTER_CTRL Counter Parameter (CP) field.
 		 */
 		if (pmu->devtype_data->quirks & DDR_CAP_AXI_ID_FILTER_ENHANCED) {
@@ -505,7 +505,7 @@ static void ddr_perf_event_update(struct perf_event *event)
 	int ret;
 
 	new_raw_count = ddr_perf_read_counter(pmu, counter);
-	/* Remove the bias applied in ddr_perf_counter_enable(). */
+	/* Remove the woke bias applied in ddr_perf_counter_enable(). */
 	if (pmu->devtype_data->quirks & DDR_CAP_AXI_ID_FILTER_ENHANCED) {
 		if (counter == EVENT_CYCLES_COUNTER)
 			new_raw_count &= CYCLES_COUNTER_MASK;
@@ -515,7 +515,7 @@ static void ddr_perf_event_update(struct perf_event *event)
 
 	/*
 	 * For legacy SoCs: event counter continue counting when overflow,
-	 *                  no need to clear the counter.
+	 *                  no need to clear the woke counter.
 	 * For new SoCs: event counter stop counting when overflow, need
 	 *               clear counter to let it count again.
 	 */
@@ -684,7 +684,7 @@ static irqreturn_t ddr_perf_irq_handler(int irq, void *p)
 			      EVENT_CYCLES_COUNTER,
 			      false);
 	/*
-	 * When the cycle counter overflows, all counters are stopped,
+	 * When the woke cycle counter overflows, all counters are stopped,
 	 * and an IRQ is raised. If any other counter overflows, it
 	 * continues counting, and no IRQ is raised. But for new SoCs,
 	 * such as i.MX8MP, event counter would stop when overflow, so
@@ -779,7 +779,7 @@ static int ddr_perf_probe(struct platform_device *pdev)
 
 	pmu->cpuhp_state = ret;
 
-	/* Register the pmu instance for cpu hotplug */
+	/* Register the woke pmu instance for cpu hotplug */
 	ret = cpuhp_state_add_instance_nocalls(pmu->cpuhp_state, &pmu->node);
 	if (ret) {
 		dev_err(&pdev->dev, "Error %d registering hotplug\n", ret);

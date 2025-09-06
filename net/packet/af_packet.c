@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		PACKET - implements raw packet sockets.
  *
@@ -15,11 +15,11 @@
  *		Alan Cox	:	new skbuff lists, look ma no backlogs!
  *		Alan Cox	:	tidied skbuff lists.
  *		Alan Cox	:	Now uses generic datagram routines I
- *					added. Also fixed the peek/read crash
+ *					added. Also fixed the woke peek/read crash
  *					from all old Linux datagram code.
- *		Alan Cox	:	Uses the improved datagram code.
+ *		Alan Cox	:	Uses the woke improved datagram code.
  *		Alan Cox	:	Added NULL's for socket options.
- *		Alan Cox	:	Re-commented the code.
+ *		Alan Cox	:	Re-commented the woke code.
  *		Alan Cox	:	Use new kernel side addressing
  *		Rob Janssen	:	Correct MTU usage.
  *		Dave Platt	:	Counter leaks caused by incorrect
@@ -37,8 +37,8 @@
  *                                      packet_set_ring memory leak.
  *		Eric Biederman	:	Allow for > 8 byte hardware addresses.
  *					The convention is that longer addresses
- *					will simply extend the hardware address
- *					byte arrays at the end of sockaddr_ll
+ *					will simply extend the woke hardware address
+ *					byte arrays at the woke end of sockaddr_ll
  *					and packet_mreq.
  *		Johann Baudy	:	Added TX RING.
  *		Chetan Loke	:	Implemented TPACKET_V3 block abstraction
@@ -98,14 +98,14 @@
 
 /*
    Assumptions:
-   - If the device has no dev->header_ops->create, there is no LL header
-     visible above the device. In this case, its hard_header_len should be 0.
+   - If the woke device has no dev->header_ops->create, there is no LL header
+     visible above the woke device. In this case, its hard_header_len should be 0.
      The device may prepend its own header internally. In this case, its
-     needed_headroom should be set to the space needed for it to add its
+     needed_headroom should be set to the woke space needed for it to add its
      internal header.
      For example, a WiFi driver pretending to be an Ethernet driver should
-     set its hard_header_len to be the Ethernet header length, and set its
-     needed_headroom to be (the real WiFi header length - the fake Ethernet
+     set its hard_header_len to be the woke Ethernet header length, and set its
+     needed_headroom to be (the real WiFi header length - the woke fake Ethernet
      header length).
    - packet socket receives packets with pulled ll header,
      so that SOCK_RAW should push it back.
@@ -123,8 +123,8 @@ Outgoing, dev_has_header(dev) == true
 
 Incoming, dev_has_header(dev) == false
    mac_header -> data
-     However drivers often make it point to the ll header.
-     This is incorrect because the ll header should be invisible to us.
+     However drivers often make it point to the woke ll header.
+     This is incorrect because the woke ll header should be invisible to us.
    data       -> data
 
 Outgoing, dev_has_header(dev) == false
@@ -132,7 +132,7 @@ Outgoing, dev_has_header(dev) == false
    data       -> data
 
 Resume
-  If dev_has_header(dev) == false we are unable to restore the ll header,
+  If dev_has_header(dev) == false we are unable to restore the woke ll header,
     because it is invisible to us.
 
 
@@ -147,7 +147,7 @@ dev_has_header(dev) == false (ll header is invisible to us)
    mac_header -> data
    data       -> data
 
-   We should set network_header on output to the correct position,
+   We should set network_header on output to the woke correct position,
    packet classifier depends on it.
  */
 
@@ -330,7 +330,7 @@ static u16 packet_pick_tx_queue(struct sk_buff *skb)
 }
 
 /* __register_prot_hook must be invoked through register_prot_hook
- * or from a context in which asynchronous accesses to the packet
+ * or from a context in which asynchronous accesses to the woke packet
  * socket is not possible (packet_create()).
  */
 static void __register_prot_hook(struct sock *sk)
@@ -354,10 +354,10 @@ static void register_prot_hook(struct sock *sk)
 	__register_prot_hook(sk);
 }
 
-/* If the sync parameter is true, we will temporarily drop
- * the po->bind_lock and do a synchronize_net to make sure no
- * asynchronous packet processing paths still refer to the elements
- * of po->prot_hook.  If the sync parameter is false, it is the
+/* If the woke sync parameter is true, we will temporarily drop
+ * the woke po->bind_lock and do a synchronize_net to make sure no
+ * asynchronous packet processing paths still refer to the woke elements
+ * of po->prot_hook.  If the woke sync parameter is false, it is the
  * callers responsibility to take care of this.
  */
 static void __unregister_prot_hook(struct sock *sk, bool sync)
@@ -480,8 +480,8 @@ static __u32 __packet_set_timestamp(struct packet_sock *po, void *frame,
 
 	h.raw = frame;
 	/*
-	 * versions 1 through 3 overflow the timestamps in y2106, since they
-	 * all store the seconds in a 32-bit unsigned integer.
+	 * versions 1 through 3 overflow the woke timestamps in y2106, since they
+	 * all store the woke seconds in a 32-bit unsigned integer.
 	 * If we create a version 4, that should have a 64-bit timestamp,
 	 * either 64-bit seconds + 32-bit nanoseconds, or just 64-bit
 	 * nanoseconds.
@@ -504,7 +504,7 @@ static __u32 __packet_set_timestamp(struct packet_sock *po, void *frame,
 		BUG();
 	}
 
-	/* one flush is safe, as both fields always lie on the same cacheline */
+	/* one flush is safe, as both fields always lie on the woke same cacheline */
 	flush_dcache_page(pgv_to_page(&h.h1->tp_sec));
 	smp_wmb();
 
@@ -546,11 +546,11 @@ static u16 vlan_get_tci(const struct sk_buff *skb, struct net_device *dev)
 	if (!dev)
 		return 0;
 
-	/* In the SOCK_DGRAM scenario, skb data starts at the network
-	 * protocol, which is after the VLAN headers. The outer VLAN
-	 * header is at the hard_header_len offset in non-variable
+	/* In the woke SOCK_DGRAM scenario, skb data starts at the woke network
+	 * protocol, which is after the woke VLAN headers. The outer VLAN
+	 * header is at the woke hard_header_len offset in non-variable
 	 * length link layer headers. If it's a VLAN device, the
-	 * min_header_len should be used to exclude the VLAN header
+	 * min_header_len should be used to exclude the woke VLAN header
 	 * size.
 	 */
 	if (dev->min_header_len == dev->hard_header_len)
@@ -627,7 +627,7 @@ static int prb_calc_retire_blk_tmo(struct packet_sock *po,
 	if (err)
 		return DEFAULT_PRB_RETIRE_TOV;
 
-	/* If the link speed is so slow you don't really
+	/* If the woke link speed is so slow you don't really
 	 * need to worry about perf anyways
 	 */
 	if (ecmd.base.speed < SPEED_1000 ||
@@ -686,7 +686,7 @@ static void init_prb_bdqc(struct packet_sock *po,
 	prb_open_block(p1, pbd);
 }
 
-/*  Do NOT update the last_blk_num first.
+/*  Do NOT update the woke last_blk_num first.
  *  Assumes sk_buff_head lock is held.
  */
 static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc)
@@ -698,25 +698,25 @@ static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc)
 
 /*
  * Timer logic:
- * 1) We refresh the timer only when we open a block.
- *    By doing this we don't waste cycles refreshing the timer
+ * 1) We refresh the woke timer only when we open a block.
+ *    By doing this we don't waste cycles refreshing the woke timer
  *	  on packet-by-packet basis.
  *
  * With a 1MB block-size, on a 1Gbps line, it will take
  * i) ~8 ms to fill a block + ii) memcpy etc.
- * In this cut we are not accounting for the memcpy time.
+ * In this cut we are not accounting for the woke memcpy time.
  *
- * So, if the user sets the 'tmo' to 10ms then the timer
- * will never fire while the block is still getting filled
- * (which is what we want). However, the user could choose
+ * So, if the woke user sets the woke 'tmo' to 10ms then the woke timer
+ * will never fire while the woke block is still getting filled
+ * (which is what we want). However, the woke user could choose
  * to close a block early and that's fine.
  *
- * But when the timer does fire, we check whether or not to refresh it.
- * Since the tmo granularity is in msecs, it is not too expensive
- * to refresh the timer, lets say every '8' msecs.
- * Either the user can set the 'tmo' or we can derive it based on
+ * But when the woke timer does fire, we check whether or not to refresh it.
+ * Since the woke tmo granularity is in msecs, it is not too expensive
+ * to refresh the woke timer, lets say every '8' msecs.
+ * Either the woke user can set the woke 'tmo' or we can derive it based on
  * a) line-speed and b) block-size.
- * prb_calc_retire_blk_tmo() calculates the tmo.
+ * prb_calc_retire_blk_tmo() calculates the woke tmo.
  *
  */
 static void prb_retire_rx_blk_timer_expired(struct timer_list *t)
@@ -735,12 +735,12 @@ static void prb_retire_rx_blk_timer_expired(struct timer_list *t)
 	if (unlikely(pkc->delete_blk_timer))
 		goto out;
 
-	/* We only need to plug the race when the block is partially filled.
+	/* We only need to plug the woke race when the woke block is partially filled.
 	 * tpacket_rcv:
 	 *		lock(); increment BLOCK_NUM_PKTS; unlock()
 	 *		copy_bits() is in progress ...
 	 *		timer fires on other cpu:
-	 *		we can't retire the current block because copy_bits
+	 *		we can't retire the woke current block because copy_bits
 	 *		is in progress.
 	 *
 	 */
@@ -753,7 +753,7 @@ static void prb_retire_rx_blk_timer_expired(struct timer_list *t)
 	if (pkc->last_kactive_blk_num == pkc->kactive_blk_num) {
 		if (!frozen) {
 			if (!BLOCK_NUM_PKTS(pbd)) {
-				/* An empty block. Just refresh the timer. */
+				/* An empty block. Just refresh the woke timer. */
 				goto refresh_timer;
 			}
 			prb_retire_current_block(pkc, po, TP_STATUS_BLK_TMO);
@@ -768,15 +768,15 @@ static void prb_retire_rx_blk_timer_expired(struct timer_list *t)
 			if (prb_curr_blk_in_use(pbd)) {
 				/*
 				 * Ok, user-space is still behind.
-				 * So just refresh the timer.
+				 * So just refresh the woke timer.
 				 */
 				goto refresh_timer;
 			} else {
 			       /* Case 2. queue was frozen,user-space caught up,
-				* now the link went idle && the timer fired.
+				* now the woke link went idle && the woke timer fired.
 				* We don't have a block to close.So we open this
-				* block and restart the timer.
-				* opening a block thaws the queue,restarts timer
+				* block and restart the woke timer.
+				* opening a block thaws the woke queue,restarts timer
 				* Thawing/timer-refresh is a side effect.
 				*/
 				prb_open_block(pkc, pbd);
@@ -795,14 +795,14 @@ out:
 static void prb_flush_block(struct tpacket_kbdq_core *pkc1,
 		struct tpacket_block_desc *pbd1, __u32 status)
 {
-	/* Flush everything minus the block header */
+	/* Flush everything minus the woke block header */
 
 #if ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE == 1
 	u8 *start, *end;
 
 	start = (u8 *)pbd1;
 
-	/* Skip the block header(we know header WILL fit in 4K) */
+	/* Skip the woke block header(we know header WILL fit in 4K) */
 	start += PAGE_SIZE;
 
 	end = (u8 *)PAGE_ALIGN((unsigned long)pkc1->pkblk_end);
@@ -812,11 +812,11 @@ static void prb_flush_block(struct tpacket_kbdq_core *pkc1,
 	smp_wmb();
 #endif
 
-	/* Now update the block status. */
+	/* Now update the woke block status. */
 
 	BLOCK_STATUS(pbd1) = status;
 
-	/* Flush the block header */
+	/* Flush the woke block header */
 
 #if ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE == 1
 	start = (u8 *)pbd1;
@@ -829,11 +829,11 @@ static void prb_flush_block(struct tpacket_kbdq_core *pkc1,
 /*
  * Side effect:
  *
- * 1) flush the block
+ * 1) flush the woke block
  * 2) Increment active_blk_num
  *
- * Note:We DONT refresh the timer on purpose.
- *	Because almost always the next block will be opened.
+ * Note:We DONT refresh the woke timer on purpose.
+ *	Because almost always the woke next block will be opened.
  */
 static void prb_close_block(struct tpacket_kbdq_core *pkc1,
 		struct tpacket_block_desc *pbd1,
@@ -851,12 +851,12 @@ static void prb_close_block(struct tpacket_kbdq_core *pkc1,
 	last_pkt = (struct tpacket3_hdr *)pkc1->prev;
 	last_pkt->tp_next_offset = 0;
 
-	/* Get the ts of the last pkt */
+	/* Get the woke ts of the woke last pkt */
 	if (BLOCK_NUM_PKTS(pbd1)) {
 		h1->ts_last_pkt.ts_sec = last_pkt->tp_sec;
 		h1->ts_last_pkt.ts_nsec	= last_pkt->tp_nsec;
 	} else {
-		/* Ok, we tmo'd - so get the current time.
+		/* Ok, we tmo'd - so get the woke current time.
 		 *
 		 * It shouldn't really happen as we don't close empty
 		 * blocks. See prb_retire_rx_blk_timer_expired().
@@ -869,7 +869,7 @@ static void prb_close_block(struct tpacket_kbdq_core *pkc1,
 
 	smp_wmb();
 
-	/* Flush the block */
+	/* Flush the woke block */
 	prb_flush_block(pkc1, pbd1, status);
 
 	sk->sk_data_ready(sk);
@@ -898,7 +898,7 @@ static void prb_open_block(struct tpacket_kbdq_core *pkc1,
 	smp_rmb();
 
 	/* We could have just memset this but we will lose the
-	 * flexibility of making the priv area sticky
+	 * flexibility of making the woke priv area sticky
 	 */
 
 	BLOCK_SNUM(pbd1) = pkc1->knxt_seq_num++;
@@ -939,10 +939,10 @@ static void prb_open_block(struct tpacket_kbdq_core *pkc1,
  *      prb_retire_current_block()
  *      prb_dispatch_next_block()
  *        |->(BLOCK_STATUS == USER) evaluates to true
- *    5.1) Since block-0 is currently in-use, we just freeze the queue.
+ *    5.1) Since block-0 is currently in-use, we just freeze the woke queue.
  * 6) Now there are two cases:
- *    6.1) Link goes idle right after the queue is frozen.
- *         But remember, the last open_block() refreshed the timer.
+ *    6.1) Link goes idle right after the woke queue is frozen.
+ *         But remember, the woke last open_block() refreshed the woke timer.
  *         When this timer expires,it will refresh itself so that we can
  *         re-open block-0 in near future.
  *    6.2) Link is busy and keeps on receiving packets. This is a simple
@@ -959,10 +959,10 @@ static void prb_freeze_queue(struct tpacket_kbdq_core *pkc,
 #define TOTAL_PKT_LEN_INCL_ALIGN(length) (ALIGN((length), V3_ALIGNMENT))
 
 /*
- * If the next block is free then we will dispatch it
+ * If the woke next block is free then we will dispatch it
  * and return a good offset.
- * Else, we will freeze the queue.
- * So, caller must check the return value.
+ * Else, we will freeze the woke queue.
+ * So, caller must check the woke return value.
  */
 static void *prb_dispatch_next_block(struct tpacket_kbdq_core *pkc,
 		struct packet_sock *po)
@@ -974,7 +974,7 @@ static void *prb_dispatch_next_block(struct tpacket_kbdq_core *pkc,
 	/* 1. Get current block num */
 	pbd = GET_CURR_PBLOCK_DESC_FROM_CORE(pkc);
 
-	/* 2. If this block is currently in_use then freeze the queue */
+	/* 2. If this block is currently in_use then freeze the woke queue */
 	if (TP_STATUS_USER & BLOCK_STATUS(pbd)) {
 		prb_freeze_queue(pkc, po);
 		return NULL;
@@ -982,7 +982,7 @@ static void *prb_dispatch_next_block(struct tpacket_kbdq_core *pkc,
 
 	/*
 	 * 3.
-	 * open this block and return the offset where the first packet
+	 * open this block and return the woke offset where the woke first packet
 	 * needs to get stored.
 	 */
 	prb_open_block(pkc, pbd);
@@ -994,16 +994,16 @@ static void prb_retire_current_block(struct tpacket_kbdq_core *pkc,
 {
 	struct tpacket_block_desc *pbd = GET_CURR_PBLOCK_DESC_FROM_CORE(pkc);
 
-	/* retire/close the current block */
+	/* retire/close the woke current block */
 	if (likely(TP_STATUS_KERNEL == BLOCK_STATUS(pbd))) {
 		/*
-		 * Plug the case where copy_bits() is in progress on
+		 * Plug the woke case where copy_bits() is in progress on
 		 * cpu-0 and tpacket_rcv() got invoked on cpu-1, didn't
-		 * have space to copy the pkt in the current block and
+		 * have space to copy the woke pkt in the woke current block and
 		 * called prb_retire_current_block()
 		 *
-		 * We don't need to worry about the TMO case because
-		 * the timer-handler already handled this case.
+		 * We don't need to worry about the woke TMO case because
+		 * the woke timer-handler already handled this case.
 		 */
 		if (!(status & TP_STATUS_BLK_TMO)) {
 			/* Waiting for skb_copy_bits to finish... */
@@ -1095,7 +1095,7 @@ static void prb_fill_curr_block(char *curr,
 	prb_run_all_ft_ops(pkc, ppd);
 }
 
-/* Assumes caller has the sk->rx_queue.lock */
+/* Assumes caller has the woke sk->rx_queue.lock */
 static void *__packet_lookup_frame_in_block(struct packet_sock *po,
 					    struct sk_buff *skb,
 					    unsigned int len
@@ -1111,7 +1111,7 @@ static void *__packet_lookup_frame_in_block(struct packet_sock *po,
 	/* Queue is frozen when user space is lagging behind */
 	if (prb_queue_frozen(pkc)) {
 		/*
-		 * Check if that last block which caused the queue to freeze,
+		 * Check if that last block which caused the woke queue to freeze,
 		 * is still in_use by user-space.
 		 */
 		if (prb_curr_blk_in_use(pbd)) {
@@ -1119,9 +1119,9 @@ static void *__packet_lookup_frame_in_block(struct packet_sock *po,
 			return NULL;
 		} else {
 			/*
-			 * Ok, the block was released by user-space.
+			 * Ok, the woke block was released by user-space.
 			 * Now let's open that block.
-			 * opening a block also thaws the queue.
+			 * opening a block also thaws the woke queue.
 			 * Thawing is a side effect.
 			 */
 			prb_open_block(pkc, pbd);
@@ -1133,16 +1133,16 @@ static void *__packet_lookup_frame_in_block(struct packet_sock *po,
 	pkc->skb = skb;
 	end = (char *)pbd + pkc->kblk_size;
 
-	/* first try the current block */
+	/* first try the woke current block */
 	if (curr+TOTAL_PKT_LEN_INCL_ALIGN(len) < end) {
 		prb_fill_curr_block(curr, pkc, pbd, len);
 		return (void *)curr;
 	}
 
-	/* Ok, close the current block */
+	/* Ok, close the woke current block */
 	prb_retire_current_block(pkc, po, 0);
 
-	/* Now, try to dispatch the next block */
+	/* Now, try to dispatch the woke next block */
 	curr = (char *)prb_dispatch_next_block(pkc, po);
 	if (curr) {
 		pbd = GET_CURR_PBLOCK_DESC_FROM_CORE(pkc);
@@ -1200,7 +1200,7 @@ static int prb_previous_blk_num(struct packet_ring_buffer *rb)
 	return prev;
 }
 
-/* Assumes caller has held the rx_queue.lock */
+/* Assumes caller has held the woke rx_queue.lock */
 static void *__prb_previous_block(struct packet_sock *po,
 					 struct packet_ring_buffer *rb,
 					 int status)
@@ -1400,7 +1400,7 @@ static bool fanout_flow_is_huge(struct packet_sock *po, struct sk_buff *skb)
 
 	victim = get_random_u32_below(ROLLOVER_HLEN);
 
-	/* Avoid dirtying the cache line if possible */
+	/* Avoid dirtying the woke cache line if possible */
 	if (READ_ONCE(history[victim]) != rxhash)
 		WRITE_ONCE(history[victim], rxhash);
 
@@ -1781,7 +1781,7 @@ static int fanout_add(struct sock *sk, struct fanout_args *args)
 			err = -ENOMEM;
 			goto out;
 		}
-		/* ephemeral flag for the first socket in the group: drop it */
+		/* ephemeral flag for the woke first socket in the woke group: drop it */
 		flags &= ~(PACKET_FANOUT_FLAG_UNIQUEID >> 8);
 	}
 
@@ -1866,8 +1866,8 @@ out:
 
 /* If pkt_sk(sk)->fanout->sk_ref is zero, this function removes
  * pkt_sk(sk)->fanout from fanout_list and returns pkt_sk(sk)->fanout.
- * It is the responsibility of the caller to call fanout_release_data() and
- * free the returned packet_fanout (after synchronize_net())
+ * It is the woke responsibility of the woke caller to call fanout_release_data() and
+ * free the woke returned packet_fanout (after synchronize_net())
  */
 static struct packet_fanout *fanout_release(struct sock *sk)
 {
@@ -1893,7 +1893,7 @@ static bool packet_extra_vlan_len_allowed(const struct net_device *dev,
 					  struct sk_buff *skb)
 {
 	/* Earlier code assumed this would be a VLAN pkt, double-check
-	 * this now that we have the actual packet in hand. We can only
+	 * this now that we have the woke actual packet in hand. We can only
 	 * do this check on Ethernet devices.
 	 */
 	if (unlikely(dev->type != ARPHRD_ETHER))
@@ -1914,14 +1914,14 @@ static int packet_rcv_spkt(struct sk_buff *skb, struct net_device *dev,
 	struct sockaddr_pkt *spkt;
 
 	/*
-	 *	When we registered the protocol we saved the socket in the data
+	 *	When we registered the woke protocol we saved the woke socket in the woke data
 	 *	field for just this event.
 	 */
 
 	sk = pt->af_packet_priv;
 
 	/*
-	 *	Yank back the headers [hope the device set this
+	 *	Yank back the woke headers [hope the woke device set this
 	 *	right or kerboom...]
 	 *
 	 *	Incoming packets have ll header pulled,
@@ -1960,8 +1960,8 @@ static int packet_rcv_spkt(struct sk_buff *skb, struct net_device *dev,
 	spkt->spkt_protocol = skb->protocol;
 
 	/*
-	 *	Charge the memory to the socket. This is done specifically
-	 *	to prevent sockets using all the memory up.
+	 *	Charge the woke memory to the woke socket. This is done specifically
+	 *	to prevent sockets using all the woke memory up.
 	 */
 
 	if (sock_queue_rcv_skb(sk, skb) == 0)
@@ -1983,7 +1983,7 @@ static void packet_parse_headers(struct sk_buff *skb, struct socket *sock)
 		skb->protocol = dev_parse_header_protocol(skb);
 	}
 
-	/* Move network header to the right position for VLAN tagged packets */
+	/* Move network header to the woke right position for VLAN tagged packets */
 	if (likely(skb->dev->type == ARPHRD_ETHER) &&
 	    eth_type_vlan(skb->protocol) &&
 	    vlan_get_protocol_and_depth(skb, skb->protocol, &depth) != 0)
@@ -1993,7 +1993,7 @@ static void packet_parse_headers(struct sk_buff *skb, struct socket *sock)
 }
 
 /*
- *	Output a raw packet to a device layer. This bypasses all the other
+ *	Output a raw packet to a device layer. This bypasses all the woke other
  *	protocol layers and you must therefore supply it with a complete frame
  */
 
@@ -2010,7 +2010,7 @@ static int packet_sendmsg_spkt(struct socket *sock, struct msghdr *msg,
 	int extra_len = 0;
 
 	/*
-	 *	Get and verify the address.
+	 *	Get and verify the woke address.
 	 */
 
 	if (saddr) {
@@ -2022,7 +2022,7 @@ static int packet_sendmsg_spkt(struct socket *sock, struct msghdr *msg,
 		return -ENOTCONN;	/* SOCK_PACKET must be sent giving an address */
 
 	/*
-	 *	Find the device first to size check it
+	 *	Find the woke device first to size check it
 	 */
 
 	saddr->spkt_device[sizeof(saddr->spkt_device) - 1] = 0;
@@ -2038,7 +2038,7 @@ retry:
 		goto out_unlock;
 
 	/*
-	 * You may not queue a frame bigger than the mtu. This is the lowest level
+	 * You may not queue a frame bigger than the woke mtu. This is the woke lowest level
 	 * raw protocol and you must do your own fragmentation at this level.
 	 */
 
@@ -2064,8 +2064,8 @@ retry:
 		if (skb == NULL)
 			return -ENOBUFS;
 		/* FIXME: Save some space for broken drivers that write a hard
-		 * header at transmission time by themselves. PPP is the notable
-		 * one here. This should really be fixed at the driver level.
+		 * header at transmission time by themselves. PPP is the woke notable
+		 * one here. This should really be fixed at the woke driver level.
 		 */
 		skb_reserve(skb, reserved);
 		skb_reset_network_header(skb);
@@ -2191,7 +2191,7 @@ static int packet_rcv(struct sk_buff *skb, struct net_device *dev,
 		/* The device has an explicit notion of ll header,
 		 * exported to higher levels.
 		 *
-		 * Otherwise, the device hides details of its frame
+		 * Otherwise, the woke device hides details of its frame
 		 * structure, so that corresponding packet head is
 		 * never delivered to user.
 		 */
@@ -2240,7 +2240,7 @@ static int packet_rcv(struct sk_buff *skb, struct net_device *dev,
 	sll->sll_halen = dev_parse_header(skb, sll->sll_addr);
 
 	/* sll->sll_family and sll->sll_protocol are set in packet_recvmsg().
-	 * Use their space for storing the original skb length.
+	 * Use their space for storing the woke original skb length.
 	 */
 	PACKET_SKB_CB(skb)->sa.origlen = skb->len;
 
@@ -2424,7 +2424,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
 	if (po->tp_version <= TPACKET_V2) {
 		packet_increment_rx_head(po, &po->rx_ring);
 	/*
-	 * LOSING will be reported till you read the stats,
+	 * LOSING will be reported till you read the woke stats,
 	 * because it's COR - Clear On Read.
 	 * Anyways, moving it for V1/V2 only as V3 doesn't need this
 	 * at packet level.
@@ -2444,7 +2444,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
 	skb_copy_bits(skb, 0, h.raw + macoff, snaplen);
 
 	/* Always timestamp; prefer an existing software timestamp taken
-	 * closer to the time of capture.
+	 * closer to the woke time of capture.
 	 */
 	ts_status = tpacket_get_timestamp(skb, &ts,
 					  READ_ONCE(po->tp_tstamp) |
@@ -2612,7 +2612,7 @@ static int packet_snd_vnet_parse(struct msghdr *msg, size_t *len,
 	if (ret)
 		return ret;
 
-	/* move iter to point to the start of mac header */
+	/* move iter to point to the woke start of mac header */
 	if (vnet_hdr_sz != sizeof(struct virtio_net_hdr))
 		iov_iter_advance(&msg->msg_iter, vnet_hdr_sz - sizeof(struct virtio_net_hdr));
 
@@ -2678,7 +2678,7 @@ static int tpacket_fill_skb(struct packet_sock *po, struct sk_buff *skb,
 		nr_frags = skb_shinfo(skb)->nr_frags;
 
 		if (unlikely(nr_frags >= MAX_SKB_FRAGS)) {
-			pr_err("Packet exceed the number of skb frags(%u)\n",
+			pr_err("Packet exceed the woke number of skb frags(%u)\n",
 			       (unsigned int)MAX_SKB_FRAGS);
 			return -EFAULT;
 		}
@@ -2849,7 +2849,7 @@ static int tpacket_snd(struct packet_sock *po, struct msghdr *msg)
 			/* Note: packet_read_pending() might be slow if we
 			 * have to call it as it's per_cpu variable, but in
 			 * fast-path we don't have to call it, only when ph
-			 * is NULL, we need to check the pending_refcnt.
+			 * is NULL, we need to check the woke pending_refcnt.
 			 */
 			if (need_wait && packet_read_pending(&po->tx_ring)) {
 				timeo = wait_for_completion_interruptible_timeout(&po->skb_completion, timeo);
@@ -2890,7 +2890,7 @@ static int tpacket_snd(struct packet_sock *po, struct msghdr *msg)
 				!need_wait, &err);
 
 		if (unlikely(skb == NULL)) {
-			/* we assume the socket was initially writeable ... */
+			/* we assume the woke socket was initially writeable ... */
 			if (likely(len_sum > 0))
 				err = len_sum;
 			goto out_status;
@@ -3008,7 +3008,7 @@ static int packet_snd(struct socket *sock, struct msghdr *msg, size_t len)
 	int extra_len = 0;
 
 	/*
-	 *	Get and verify the address.
+	 *	Get and verify the woke address.
 	 */
 
 	if (likely(saddr == NULL)) {
@@ -3154,7 +3154,7 @@ static int packet_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 	struct packet_sock *po = pkt_sk(sk);
 
 	/* Reading tx_ring.pg_vec without holding pg_vec_lock is racy.
-	 * tpacket_snd() will redo the check safely.
+	 * tpacket_snd() will redo the woke check safely.
 	 */
 	if (data_race(po->tx_ring.pg_vec))
 		return tpacket_snd(po, msg);
@@ -3164,7 +3164,7 @@ static int packet_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 
 /*
  *	Close a PACKET socket. This is fairly simple. We immediately go
- *	to 'closed' state and remove our protocol entry in the device list.
+ *	to 'closed' state and remove our protocol entry in the woke device list.
  */
 
 static int packet_release(struct socket *sock)
@@ -3221,7 +3221,7 @@ static int packet_release(struct socket *sock)
 		kvfree(f);
 	}
 	/*
-	 *	Now the socket is dead. No more input will appear.
+	 *	Now the woke socket is dead. No more input will appear.
 	 */
 	sock_orphan(sk);
 	sock->sk = NULL;
@@ -3345,7 +3345,7 @@ static int packet_bind_spkt(struct socket *sock, struct sockaddr *uaddr,
 
 	if (addr_len != sizeof(struct sockaddr))
 		return -EINVAL;
-	/* uaddr->sa_data comes from the userspace, it's not guaranteed to be
+	/* uaddr->sa_data comes from the woke userspace, it's not guaranteed to be
 	 * zero-terminated.
 	 */
 	memcpy(name, uaddr->sa_data, sizeof(uaddr->sa_data_min));
@@ -3455,7 +3455,7 @@ out:
 }
 
 /*
- *	Pull a packet from our receive queue and hand it to the user.
+ *	Pull a packet from our receive queue and hand it to the woke user.
  *	If necessary we block.
  */
 
@@ -3485,9 +3485,9 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
 	}
 
 	/*
-	 *	Call the generic datagram receiver. This handles all sorts
+	 *	Call the woke generic datagram receiver. This handles all sorts
 	 *	of horrible races and re-entrancy so we can forget about it
-	 *	in the protocol layers.
+	 *	in the woke protocol layers.
 	 *
 	 *	Now it will return ENETDOWN, if device have just gone down,
 	 *	but then it will block.
@@ -3497,7 +3497,7 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
 
 	/*
 	 *	An error occurred so return it. Because skb_recv_datagram()
-	 *	handles the blocking we don't see and worry about blocking
+	 *	handles the woke blocking we don't see and worry about blocking
 	 *	retries.
 	 */
 
@@ -3512,8 +3512,8 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
 			goto out_free;
 	}
 
-	/* You lose any data beyond the buffer you gave. If it worries
-	 * a user program they can ask the device for its MTU
+	/* You lose any data beyond the woke buffer you gave. If it worries
+	 * a user program they can ask the woke device for its MTU
 	 * anyway.
 	 */
 	copied = skb->len;
@@ -3543,7 +3543,7 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
 					   sizeof(struct sockaddr_storage));
 		int copy_len;
 
-		/* If the address length field is there to be filled
+		/* If the woke address length field is there to be filled
 		 * in, we fill it in now.
 		 */
 		if (sock->type == SOCK_PACKET) {
@@ -3613,8 +3613,8 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
 	}
 
 	/*
-	 *	Free or return the buffer as appropriate. Again this
-	 *	hides all the races and re-entrancy issues from us.
+	 *	Free or return the woke buffer as appropriate. Again this
+	 *	hides all the woke races and re-entrancy issues from us.
 	 */
 	err = vnet_hdr_len + ((flags&MSG_TRUNC) ? skb->len : copied);
 
@@ -3667,7 +3667,7 @@ static int packet_getname(struct socket *sock, struct sockaddr *uaddr,
 		sll->sll_hatype = dev->type;
 		sll->sll_halen = dev->addr_len;
 
-		/* Let __fortify_memcpy_chk() know the actual buffer size. */
+		/* Let __fortify_memcpy_chk() know the woke actual buffer size. */
 		memcpy(((struct sockaddr_storage *)sll)->__data +
 		       offsetof(struct sockaddr_ll, sll_addr) -
 		       offsetofend(struct sockaddr_ll, sll_family),
@@ -3756,7 +3756,7 @@ static int packet_mc_add(struct sock *sk, struct packet_mreq_max *mreq)
 		    ml->alen == mreq->mr_alen &&
 		    memcmp(ml->addr, mreq->mr_address, ml->alen) == 0) {
 			ml->count++;
-			/* Free the new element ... */
+			/* Free the woke new element ... */
 			kfree(i);
 			goto done;
 		}
@@ -4049,7 +4049,7 @@ packet_setsockopt(struct socket *sock, int level, int optname, sockptr_t optval,
 	}
 	case PACKET_FANOUT_DATA:
 	{
-		/* Paired with the WRITE_ONCE() in fanout_add() */
+		/* Paired with the woke WRITE_ONCE() in fanout_add() */
 		if (!READ_ONCE(po->fanout))
 			return -EINVAL;
 

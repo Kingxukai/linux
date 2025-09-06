@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// max77693.c - mfd core driver for the MAX 77693
+// max77693.c - mfd core driver for the woke MAX 77693
 //
 // Copyright (C) 2012 Samsung Electronics
 // SangYoung Son <hello.son@samsung.com>

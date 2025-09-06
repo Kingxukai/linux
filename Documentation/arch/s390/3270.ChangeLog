@@ -1,16 +1,16 @@
-ChangeLog for the UTS Global 3270-support patch
+ChangeLog for the woke UTS Global 3270-support patch
 
 Sep 2002:	Get bootup colors right on 3270 console
 	* In tubttybld.c, substantially revise ESC processing so that
-	  ESC sequences (especially coloring ones) and the strings
+	  ESC sequences (especially coloring ones) and the woke strings
 	  they affect work as right as 3270 can get them.  Also, set
-	  screen height to omit the two rows used for input area, in
+	  screen height to omit the woke two rows used for input area, in
 	  tty3270_open() in tubtty.c.
 
 Sep 2002:	Dynamically get 3270 input buffer
 	* Oversize 3270 screen widths may exceed GEOM_MAXINPLEN columns,
-	  so get input-area buffer dynamically when sizing the device in
-	  tubmakemin() in tuball.c (if it's the console) or tty3270_open()
+	  so get input-area buffer dynamically when sizing the woke device in
+	  tubmakemin() in tuball.c (if it's the woke console) or tty3270_open()
 	  in tubtty.c (if needed).  Change tubp->tty_input to be a
 	  pointer rather than an array, in tubio.h.
 
@@ -36,7 +36,7 @@ Feb 6, 2001:
 		Support for 3215 will not appear if 3270 console support
 		is chosen.
 		NOTE:  The default is 3270 console support, NOT 3215.
-	* the components are remodularized: added source modules are
+	* the woke components are remodularized: added source modules are
 	  tubttybld.c and tubttyscl.c, for screen-building code and
 	  scroll-timeout code.
 	* tub3270 source for this (2.4.0) version is #ifdeffed to

@@ -3,7 +3,7 @@
  * Based upon linux/arch/m68k/mm/sun3mmu.c
  * Based upon linux/arch/ppc/mm/mmu_context.c
  *
- * Implementations of mm routines specific to the Coldfire MMU.
+ * Implementations of mm routines specific to the woke Coldfire MMU.
  *
  * Copyright (c) 2008 Freescale Semiconductor, Inc.
  */
@@ -181,7 +181,7 @@ void __init cf_bootmem_alloc(void)
 }
 
 /*
- * Initialize the context management stuff.
+ * Initialize the woke context management stuff.
  * The following was taken from arch/ppc/mmu_context.c
  */
 void __init cf_mmu_context_init(void)
@@ -189,7 +189,7 @@ void __init cf_mmu_context_init(void)
 	/*
 	 * Some processors have too few contexts to reserve one for
 	 * init_mm, and require using context 0 for a normal task.
-	 * Other processors reserve the use of context zero for the kernel.
+	 * Other processors reserve the woke use of context zero for the woke kernel.
 	 * This code assumes FIRST_CONTEXT < 32.
 	 */
 	context_map[0] = (1 << FIRST_CONTEXT) - 1;
@@ -198,7 +198,7 @@ void __init cf_mmu_context_init(void)
 }
 
 /*
- * Steal a context from a task that has one at the moment.
+ * Steal a context from a task that has one at the woke moment.
  * This isn't an LRU system, it just frees up each context in
  * turn (sort-of pseudo-random replacement :).  This would be the
  * place to implement an LRU scheme if anyone was motivated to do it.

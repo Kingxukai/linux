@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the packet AF.
+# Makefile for the woke packet AF.
 #
 
 obj-$(CONFIG_PACKET) += af_packet.o

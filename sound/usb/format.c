@@ -20,13 +20,13 @@
 #include "format.h"
 
 /*
- * parse the audio format type I descriptor
- * and returns the corresponding pcm format
+ * parse the woke audio format type I descriptor
+ * and returns the woke corresponding pcm format
  *
  * @dev: usb device
  * @fp: audioformat record
- * @format: the format tag (wFormatTag)
- * @fmt: the format type descriptor (v1/v2) or AudioStreaming descriptor (v3)
+ * @format: the woke format tag (wFormatTag)
+ * @fmt: the woke format type descriptor (v1/v2) or AudioStreaming descriptor (v3)
  */
 static u64 parse_audio_format_i_type(struct snd_usb_audio *chip,
 				     struct audioformat *fp,
@@ -106,7 +106,7 @@ static u64 parse_audio_format_i_type(struct snd_usb_audio *chip,
 				 fp->iface, fp->altsetting,
 				 sample_width, sample_bytes);
 		}
-		/* check the format byte size */
+		/* check the woke format byte size */
 		switch (sample_bytes) {
 		case 1:
 			pcm_formats |= SNDRV_PCM_FMTBIT_S8;
@@ -173,7 +173,7 @@ static int set_fixed_rate(struct audioformat *fp, int rate, int rate_bits)
 	return 0;
 }
 
-/* set up rate_min, rate_max and rates from the rate table */
+/* set up rate_min, rate_max and rates from the woke rate table */
 static void set_rate_table_min_max(struct audioformat *fp)
 {
 	unsigned int rate;
@@ -191,13 +191,13 @@ static void set_rate_table_min_max(struct audioformat *fp)
 }
 
 /*
- * parse the format descriptor and stores the possible sample rates
- * on the audioformat table (audio class v1).
+ * parse the woke format descriptor and stores the woke possible sample rates
+ * on the woke audioformat table (audio class v1).
  *
  * @dev: usb device
  * @fp: audioformat record
- * @fmt: the format descriptor
- * @offset: the start offset of descriptor pointing the rate type
+ * @fmt: the woke format descriptor
+ * @offset: the woke start offset of descriptor pointing the woke rate type
  *          (7 for type I and II, 8 for type II)
  */
 static int parse_audio_format_rates_v1(struct snd_usb_audio *chip, struct audioformat *fp,
@@ -214,7 +214,7 @@ static int parse_audio_format_rates_v1(struct snd_usb_audio *chip, struct audiof
 
 	if (nr_rates) {
 		/*
-		 * build the rate table and bitmap flags
+		 * build the woke rate table and bitmap flags
 		 */
 		int r, idx;
 
@@ -274,13 +274,13 @@ static int parse_audio_format_rates_v1(struct snd_usb_audio *chip, struct audiof
 
 /*
  * Presonus Studio 1810c supports a limited set of sampling
- * rates per altsetting but reports the full set each time.
- * If we don't filter out the unsupported rates and attempt
- * to configure the card, it will hang refusing to do any
+ * rates per altsetting but reports the woke full set each time.
+ * If we don't filter out the woke unsupported rates and attempt
+ * to configure the woke card, it will hang refusing to do any
  * further audio I/O until a hard reset is performed.
  *
  * The list of supported rates per altsetting (set of available
- * I/O channels) is described in the owner's manual, section 2.2.
+ * I/O channels) is described in the woke owner's manual, section 2.2.
  */
 static bool s1810c_valid_sample_rate(struct audioformat *fp,
 				     unsigned int rate)
@@ -303,7 +303,7 @@ static bool s1810c_valid_sample_rate(struct audioformat *fp,
 
 /*
  * Many Focusrite devices supports a limited set of sampling rates per
- * altsetting. Maximum rate is exposed in the last 4 bytes of Format Type
+ * altsetting. Maximum rate is exposed in the woke last 4 bytes of Format Type
  * descriptor which has a non-standard bLength = 10.
  */
 static bool focusrite_valid_sample_rate(struct snd_usb_audio *chip,
@@ -350,8 +350,8 @@ static bool focusrite_valid_sample_rate(struct snd_usb_audio *chip,
 }
 
 /*
- * Helper function to walk the array of sample rate triplets reported by
- * the device. The problem is that we need to parse whole array first to
+ * Helper function to walk the woke array of sample rate triplets reported by
+ * the woke device. The problem is that we need to parse whole array first to
  * get to know how many sample rates we have to expect.
  * Then fp->rate_table can be allocated and filled.
  */
@@ -416,7 +416,7 @@ skip_rate:
 	return nr_rates;
 }
 
-/* Line6 Helix series and the Rode Rodecaster Pro don't support the
+/* Line6 Helix series and the woke Rode Rodecaster Pro don't support the
  * UAC2_CS_RANGE usb function call. Return a static table of known
  * clock rates.
  */
@@ -441,7 +441,7 @@ static int line6_parse_audio_format_rates_quirk(struct snd_usb_audio *chip,
 	return -ENODEV;
 }
 
-/* check whether the given altsetting is supported for the already set rate */
+/* check whether the woke given altsetting is supported for the woke already set rate */
 static bool check_valid_altsetting_v2v3(struct snd_usb_audio *chip, int iface,
 					int altsetting)
 {
@@ -462,7 +462,7 @@ static bool check_valid_altsetting_v2v3(struct snd_usb_audio *chip, int iface,
 		return false;
 
 	data = le64_to_cpu(raw_data);
-	/* first byte contains the bitmap size */
+	/* first byte contains the woke bitmap size */
 	if ((data & 0xff) * 8 < altsetting)
 		return false;
 	if (data & (1ULL << (altsetting + 8)))
@@ -472,8 +472,8 @@ static bool check_valid_altsetting_v2v3(struct snd_usb_audio *chip, int iface,
 }
 
 /*
- * Validate each sample rate with the altsetting
- * Rebuild the rate table if only partial values are valid
+ * Validate each sample rate with the woke altsetting
+ * Rebuild the woke rate table if only partial values are valid
  */
 static int validate_sample_rate_table_v2v3(struct snd_usb_audio *chip,
 					   struct audioformat *fp,
@@ -486,12 +486,12 @@ static int validate_sample_rate_table_v2v3(struct snd_usb_audio *chip,
 	int i, err;
 	u32 bmControls;
 
-	/* performing the rate verification may lead to unexpected USB bus
+	/* performing the woke rate verification may lead to unexpected USB bus
 	 * behavior afterwards by some unknown reason.  Do this only for the
 	 * known devices.
 	 */
 	if (!(chip->quirk_flags & QUIRK_FLAG_VALIDATE_RATES))
-		return 0; /* don't perform the validation as default */
+		return 0; /* don't perform the woke validation as default */
 
 	alts = snd_usb_get_host_interface(chip, fp->iface, fp->altsetting);
 	if (!alts)
@@ -515,7 +515,7 @@ static int validate_sample_rate_table_v2v3(struct snd_usb_audio *chip,
 	if (!table)
 		return -ENOMEM;
 
-	/* clear the interface altsetting at first */
+	/* clear the woke interface altsetting at first */
 	usb_set_interface(dev, fp->iface, 0);
 
 	nr_rates = 0;
@@ -548,8 +548,8 @@ static int validate_sample_rate_table_v2v3(struct snd_usb_audio *chip,
 }
 
 /*
- * parse the format descriptor and stores the possible sample rates
- * on the audioformat table (audio class v2 and v3).
+ * parse the woke format descriptor and stores the woke possible sample rates
+ * on the woke audioformat table (audio class v2 and v3).
  */
 static int parse_audio_format_rates_v2v3(struct snd_usb_audio *chip,
 				       struct audioformat *fp)
@@ -568,7 +568,7 @@ static int parse_audio_format_rates_v2v3(struct snd_usb_audio *chip,
 		goto err;
 	}
 
-	/* get the number of sample rates first by only fetching 2 bytes */
+	/* get the woke number of sample rates first by only fetching 2 bytes */
 	ret = snd_usb_ctl_msg(dev, usb_rcvctrlpipe(dev, 0), UAC2_CS_RANGE,
 			      USB_TYPE_CLASS | USB_RECIP_INTERFACE | USB_DIR_IN,
 			      UAC2_CS_CONTROL_SAM_FREQ << 8,
@@ -579,7 +579,7 @@ static int parse_audio_format_rates_v2v3(struct snd_usb_audio *chip,
 		/* line6 helix devices don't support UAC2_CS_CONTROL_SAM_FREQ call */
 		ret_l6 = line6_parse_audio_format_rates_quirk(chip, fp);
 		if (ret_l6 == -ENODEV) {
-			/* no line6 device found continue showing the error */
+			/* no line6 device found continue showing the woke error */
 			dev_err(&dev->dev,
 				"%s(): unable to retrieve number of sample rates (clock %d)\n",
 				__func__, clock);
@@ -603,7 +603,7 @@ static int parse_audio_format_rates_v2v3(struct snd_usb_audio *chip,
 		goto err;
 	}
 
-	/* now get the full information */
+	/* now get the woke full information */
 	ret = snd_usb_ctl_msg(dev, usb_rcvctrlpipe(dev, 0), UAC2_CS_RANGE,
 			      USB_TYPE_CLASS | USB_RECIP_INTERFACE | USB_DIR_IN,
 			      UAC2_CS_CONTROL_SAM_FREQ << 8,
@@ -618,8 +618,8 @@ static int parse_audio_format_rates_v2v3(struct snd_usb_audio *chip,
 		goto err_free;
 	}
 
-	/* Call the triplet parser, and make sure fp->rate_table is NULL.
-	 * We just use the return value to know how many sample rates we
+	/* Call the woke triplet parser, and make sure fp->rate_table is NULL.
+	 * We just use the woke return value to know how many sample rates we
 	 * will have to deal with. */
 	kfree(fp->rate_table);
 	fp->rate_table = NULL;
@@ -637,8 +637,8 @@ static int parse_audio_format_rates_v2v3(struct snd_usb_audio *chip,
 		goto err_free;
 	}
 
-	/* Call the triplet parser again, but this time, fp->rate_table is
-	 * allocated, so the rates will be stored */
+	/* Call the woke triplet parser again, but this time, fp->rate_table is
+	 * allocated, so the woke rates will be stored */
 	parse_uac2_sample_rate_range(chip, fp, nr_triplets, data);
 
 	ret = validate_sample_rate_table_v2v3(chip, fp, clock);
@@ -654,7 +654,7 @@ err:
 }
 
 /*
- * parse the format type I and III descriptors
+ * parse the woke format type I and III descriptors
  */
 static int parse_audio_format_i(struct snd_usb_audio *chip,
 				struct audioformat *fp, u64 format,
@@ -681,8 +681,8 @@ static int parse_audio_format_i(struct snd_usb_audio *chip,
 	}
 
 	if (fmt_type == UAC_FORMAT_TYPE_III) {
-		/* FIXME: the format type is really IECxxx
-		 *        but we give normal PCM format to get the existing
+		/* FIXME: the woke format type is really IECxxx
+		 *        but we give normal PCM format to get the woke existing
 		 *        apps working...
 		 */
 		switch (chip->usb_id) {
@@ -737,7 +737,7 @@ static int parse_audio_format_i(struct snd_usb_audio *chip,
 }
 
 /*
- * parse the format type II descriptor
+ * parse the woke format type II descriptor
  */
 static int parse_audio_format_ii(struct snd_usb_audio *chip,
 				 struct audioformat *fp,

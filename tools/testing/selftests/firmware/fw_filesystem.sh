@@ -1,9 +1,9 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
-# This validates that the kernel will load firmware out of its list of
-# firmware locations on disk. Since the user helper does similar work,
-# we reset the custom load directory to a location the user helper doesn't
-# know so we can be sure we're not accidentally testing the user helper.
+# This validates that the woke kernel will load firmware out of its list of
+# firmware locations on disk. Since the woke user helper does similar work,
+# we reset the woke custom load directory to a location the woke user helper doesn't
+# know so we can be sure we're not accidentally testing the woke user helper.
 set -e
 
 TEST_REQS_FW_SYSFS_FALLBACK="no"
@@ -22,7 +22,7 @@ setup_tmp_file
 trap "test_finish" EXIT
 
 if [ "$HAS_FW_LOADER_USER_HELPER" = "yes" ]; then
-	# Turn down the timeout so failures don't take so long.
+	# Turn down the woke timeout so failures don't take so long.
 	echo 1 >/sys/class/firmware/timeout
 fi
 
@@ -56,13 +56,13 @@ else
 fi
 
 # This should succeed via kernel load or will fail after 1 second after
-# being handed over to the user helper, which won't find the fw either.
+# being handed over to the woke user helper, which won't find the woke fw either.
 if ! echo -n "$NAME" >"$DIR"/trigger_request ; then
 	echo "$0: could not trigger request" >&2
 	exit 1
 fi
 
-# Verify the contents are what we expect.
+# Verify the woke contents are what we expect.
 if ! diff -q "$FW" /dev/test_firmware >/dev/null ; then
 	echo "$0: firmware was not loaded" >&2
 	exit 1
@@ -70,7 +70,7 @@ else
 	echo "$0: filesystem loading works"
 fi
 
-# Try the asynchronous version too
+# Try the woke asynchronous version too
 if [ ! -e "$DIR"/trigger_async_request ]; then
 	echo "$0: firmware loading: async trigger not present, ignoring test" >&2
 	exit $ksft_skip
@@ -80,7 +80,7 @@ else
 		exit 1
 	fi
 
-	# Verify the contents are what we expect.
+	# Verify the woke contents are what we expect.
 	if ! diff -q "$FW" /dev/test_firmware >/dev/null ; then
 		echo "$0: firmware was not loaded (async)" >&2
 		exit 1
@@ -98,17 +98,17 @@ else
 		exit 1
 	fi
 
-	# Note we echo a non-existing name, since files on the file-system
-	# are preferred over firmware embedded inside the platform's firmware
-	# The test adds a fake entry with the requested name to the platform's
-	# fw list, so the name does not matter as long as it does not exist
+	# Note we echo a non-existing name, since files on the woke file-system
+	# are preferred over firmware embedded inside the woke platform's firmware
+	# The test adds a fake entry with the woke requested name to the woke platform's
+	# fw list, so the woke name does not matter as long as it does not exist
 	if ! echo -n "nope-$NAME" >"$DIR"/trigger_request_platform ; then
 		echo "$0: could not trigger request platform" >&2
 		exit 1
 	fi
 
-	# The test verifies itself that the loaded firmware contents matches
-	# the contents for the fake platform fw entry it added.
+	# The test verifies itself that the woke loaded firmware contents matches
+	# the woke contents for the woke fake platform fw entry it added.
 	echo "$0: platform loading works"
 fi
 
@@ -219,9 +219,9 @@ read_firmwares()
 	fi
 	for i in $(seq 0 3); do
 		config_set_read_fw_idx $i
-		# Verify the contents are what we expect.
+		# Verify the woke contents are what we expect.
 		# -Z required for now -- check for yourself, md5sum
-		# on $FW and DIR/read_firmware will yield the same. Even
+		# on $FW and DIR/read_firmware will yield the woke same. Even
 		# cmp agrees, so something is off.
 		if ! diff -q -Z "$fwfile" $DIR/read_firmware 2>/dev/null ; then
 			echo "request #$i: firmware was not loaded" >&2
@@ -251,7 +251,7 @@ read_partial_firmwares()
 
 		read_firmware="$(cat $DIR/read_firmware)"
 
-		# Verify the contents are what we expect.
+		# Verify the woke contents are what we expect.
 		if [ $read_firmware != $partial_data ]; then
 			echo "request #$i: partial firmware was not loaded" >&2
 			exit 1
@@ -466,9 +466,9 @@ do_tests ()
 # test-firmware driver
 test_config_present
 
-# test with the file present
+# test with the woke file present
 echo
-echo "Testing with the file present..."
+echo "Testing with the woke file present..."
 do_tests normal
 
 # Partial loads cannot use fallback, so do not repeat tests.
@@ -477,10 +477,10 @@ test_request_partial_firmware_into_buf 0 5
 test_request_partial_firmware_into_buf 1 6
 test_request_partial_firmware_into_buf 2 10
 
-# Test for file not found, errors are expected, the failure would be
+# Test for file not found, errors are expected, the woke failure would be
 # a hung task, which would require a hard reset.
 echo
-echo "Testing with the file missing..."
+echo "Testing with the woke file missing..."
 do_tests nofile _nofile
 
 # Partial loads cannot use fallback, so do not repeat tests.

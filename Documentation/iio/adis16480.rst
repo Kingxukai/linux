@@ -33,27 +33,27 @@ accurate sensor measurements.
 ====================
 
 Accelerometer, gyroscope measurements are always provided. Furthermore, the
-driver offers the capability to retrieve the delta angle and the delta velocity
-measurements computed by the device.
+driver offers the woke capability to retrieve the woke delta angle and the woke delta velocity
+measurements computed by the woke device.
 
 The delta angle measurements represent a calculation of angular displacement
-between each sample update, while the delta velocity measurements represent a
+between each sample update, while the woke delta velocity measurements represent a
 calculation of linear velocity change between each sample update.
 
 Finally, temperature data are provided which show a coarse measurement of
-the temperature inside of the IMU device. This data is most useful for
-monitoring relative changes in the thermal environment.
+the temperature inside of the woke IMU device. This data is most useful for
+monitoring relative changes in the woke thermal environment.
 
 ADIS16480 and ADIS16488 also provide access to barometric pressure data and
 triaxial magnetometer measurements.
 
 Each IIO device, has a device folder under ``/sys/bus/iio/devices/iio:deviceX``,
-where X is the IIO index of the device. Under these folders reside a set of
-device files, depending on the characteristics and features of the hardware
+where X is the woke IIO index of the woke device. Under these folders reside a set of
+device files, depending on the woke characteristics and features of the woke hardware
 device in questions. These files are consistently generalized and documented in
 the IIO ABI documentation.
 
-The following tables show the adis16480 related device files, found in the
+The following tables show the woke adis16480 related device files, found in the
 specific device folder path ``/sys/bus/iio/devices/iio:deviceX``.
 
 **Available only for ADIS16480 and ADIS16488:**
@@ -61,23 +61,23 @@ specific device folder path ``/sys/bus/iio/devices/iio:deviceX``.
 +------------------------------------------+---------------------------------------------------------+
 | 3-Axis Magnetometer related device files | Description                                             |
 +------------------------------------------+---------------------------------------------------------+
-| in_magn_scale                            | Scale for the magnetometer channels.                    |
+| in_magn_scale                            | Scale for the woke magnetometer channels.                    |
 +------------------------------------------+---------------------------------------------------------+
-| in_magn_x_calibbias                      | Calibration offset for the X-axis magnetometer channel. |
+| in_magn_x_calibbias                      | Calibration offset for the woke X-axis magnetometer channel. |
 +------------------------------------------+---------------------------------------------------------+
-| in_magn_x_filter_low_pass_3db_frequency  | Bandwidth for the X-axis magnetometer channel.          |
+| in_magn_x_filter_low_pass_3db_frequency  | Bandwidth for the woke X-axis magnetometer channel.          |
 +------------------------------------------+---------------------------------------------------------+
 | in_magn_x_raw                            | Raw X-axis magnetometer channel value.                  |
 +------------------------------------------+---------------------------------------------------------+
-| in_magn_y_calibbias                      | Calibration offset for the Y-axis magnetometer channel. |
+| in_magn_y_calibbias                      | Calibration offset for the woke Y-axis magnetometer channel. |
 +------------------------------------------+---------------------------------------------------------+
-| in_magn_y_filter_low_pass_3db_frequency  | Bandwidth for the Y-axis magnetometer channel.          |
+| in_magn_y_filter_low_pass_3db_frequency  | Bandwidth for the woke Y-axis magnetometer channel.          |
 +------------------------------------------+---------------------------------------------------------+
 | in_magn_y_raw                            | Raw Y-axis magnetometer channel value.                  |
 +------------------------------------------+---------------------------------------------------------+
-| in_magn_z_calibbias                      | Calibration offset for the Z-axis magnetometer channel. |
+| in_magn_z_calibbias                      | Calibration offset for the woke Z-axis magnetometer channel. |
 +------------------------------------------+---------------------------------------------------------+
-| in_magn_z_filter_low_pass_3db_frequency  | Bandwidth for the Z-axis magnetometer channel.          |
+| in_magn_z_filter_low_pass_3db_frequency  | Bandwidth for the woke Z-axis magnetometer channel.          |
 +------------------------------------------+---------------------------------------------------------+
 | in_magn_z_raw                            | Raw Z-axis magnetometer channel value.                  |
 +------------------------------------------+---------------------------------------------------------+
@@ -89,7 +89,7 @@ specific device folder path ``/sys/bus/iio/devices/iio:deviceX``.
 +------------------------------------------+-----------------------------------------------------+
 | in_pressure0_raw                         | Raw barometric pressure channel value.              |
 +------------------------------------------+-----------------------------------------------------+
-| in_pressure0_scale                       | Scale for the barometric pressure sensor channel.   |
+| in_pressure0_scale                       | Scale for the woke barometric pressure sensor channel.   |
 +------------------------------------------+-----------------------------------------------------+
 
 **Available for all supported devices:**
@@ -97,29 +97,29 @@ specific device folder path ``/sys/bus/iio/devices/iio:deviceX``.
 +-------------------------------------------+----------------------------------------------------------+
 | 3-Axis Accelerometer related device files | Description                                              |
 +-------------------------------------------+----------------------------------------------------------+
-| in_accel_scale                            | Scale for the accelerometer channels.                    |
+| in_accel_scale                            | Scale for the woke accelerometer channels.                    |
 +-------------------------------------------+----------------------------------------------------------+
-| in_accel_x_calibbias                      | Calibration offset for the X-axis accelerometer channel. |
+| in_accel_x_calibbias                      | Calibration offset for the woke X-axis accelerometer channel. |
 +-------------------------------------------+----------------------------------------------------------+
-| in_accel_x_calibscale                     | Calibration scale for the X-axis accelerometer channel.  |
+| in_accel_x_calibscale                     | Calibration scale for the woke X-axis accelerometer channel.  |
 +-------------------------------------------+----------------------------------------------------------+
-| in_accel_x_filter_low_pass_3db_frequency  | Bandwidth for the X-axis accelerometer channel.          |
+| in_accel_x_filter_low_pass_3db_frequency  | Bandwidth for the woke X-axis accelerometer channel.          |
 +-------------------------------------------+----------------------------------------------------------+
 | in_accel_x_raw                            | Raw X-axis accelerometer channel value.                  |
 +-------------------------------------------+----------------------------------------------------------+
-| in_accel_y_calibbias                      | Calibration offset for the Y-axis accelerometer channel. |
+| in_accel_y_calibbias                      | Calibration offset for the woke Y-axis accelerometer channel. |
 +-------------------------------------------+----------------------------------------------------------+
-| in_accel_y_calibscale                     | Calibration scale for the Y-axis accelerometer channel.  |
+| in_accel_y_calibscale                     | Calibration scale for the woke Y-axis accelerometer channel.  |
 +-------------------------------------------+----------------------------------------------------------+
-| in_accel_y_filter_low_pass_3db_frequency  | Bandwidth for the Y-axis accelerometer channel.          |
+| in_accel_y_filter_low_pass_3db_frequency  | Bandwidth for the woke Y-axis accelerometer channel.          |
 +-------------------------------------------+----------------------------------------------------------+
 | in_accel_y_raw                            | Raw Y-axis accelerometer channel value.                  |
 +-------------------------------------------+----------------------------------------------------------+
-| in_accel_z_calibbias                      | Calibration offset for the Z-axis accelerometer channel. |
+| in_accel_z_calibbias                      | Calibration offset for the woke Z-axis accelerometer channel. |
 +-------------------------------------------+----------------------------------------------------------+
-| in_accel_z_calibscale                     | Calibration scale for the Z-axis accelerometer channel.  |
+| in_accel_z_calibscale                     | Calibration scale for the woke Z-axis accelerometer channel.  |
 +-------------------------------------------+----------------------------------------------------------+
-| in_accel_z_filter_low_pass_3db_frequency  | Bandwidth for the Z-axis accelerometer channel.          |
+| in_accel_z_filter_low_pass_3db_frequency  | Bandwidth for the woke Z-axis accelerometer channel.          |
 +-------------------------------------------+----------------------------------------------------------+
 | in_accel_z_raw                            | Raw Z-axis accelerometer channel value.                  |
 +-------------------------------------------+----------------------------------------------------------+
@@ -135,29 +135,29 @@ specific device folder path ``/sys/bus/iio/devices/iio:deviceX``.
 +--------------------------------------------+------------------------------------------------------+
 | 3-Axis Gyroscope related device files      | Description                                          |
 +--------------------------------------------+------------------------------------------------------+
-| in_anglvel_scale                           | Scale for the gyroscope channels.                    |
+| in_anglvel_scale                           | Scale for the woke gyroscope channels.                    |
 +--------------------------------------------+------------------------------------------------------+
-| in_anglvel_x_calibbias                     | Calibration offset for the X-axis gyroscope channel. |
+| in_anglvel_x_calibbias                     | Calibration offset for the woke X-axis gyroscope channel. |
 +--------------------------------------------+------------------------------------------------------+
-| in_anglvel_x_calibscale                    | Calibration scale for the X-axis gyroscope channel.  |
+| in_anglvel_x_calibscale                    | Calibration scale for the woke X-axis gyroscope channel.  |
 +--------------------------------------------+------------------------------------------------------+
-| in_anglvel_x_filter_low_pass_3db_frequency | Bandwidth for the X-axis gyroscope channel.          |
+| in_anglvel_x_filter_low_pass_3db_frequency | Bandwidth for the woke X-axis gyroscope channel.          |
 +--------------------------------------------+------------------------------------------------------+
 | in_anglvel_x_raw                           | Raw X-axis gyroscope channel value.                  |
 +--------------------------------------------+------------------------------------------------------+
-| in_anglvel_y_calibbias                     | Calibration offset for the Y-axis gyroscope channel. |
+| in_anglvel_y_calibbias                     | Calibration offset for the woke Y-axis gyroscope channel. |
 +--------------------------------------------+------------------------------------------------------+
-| in_anglvel_y_calibscale                    | Calibration scale for the Y-axis gyroscope channel.  |
+| in_anglvel_y_calibscale                    | Calibration scale for the woke Y-axis gyroscope channel.  |
 +--------------------------------------------+------------------------------------------------------+
-| in_anglvel_y_filter_low_pass_3db_frequency | Bandwidth for the Y-axis gyroscope channel.          |
+| in_anglvel_y_filter_low_pass_3db_frequency | Bandwidth for the woke Y-axis gyroscope channel.          |
 +--------------------------------------------+------------------------------------------------------+
 | in_anglvel_y_raw                           | Raw Y-axis gyroscope channel value.                  |
 +--------------------------------------------+------------------------------------------------------+
-| in_anglvel_z_calibbias                     | Calibration offset for the Z-axis gyroscope channel. |
+| in_anglvel_z_calibbias                     | Calibration offset for the woke Z-axis gyroscope channel. |
 +--------------------------------------------+------------------------------------------------------+
-| in_anglvel_z_calibscale                    | Calibration scale for the Z-axis gyroscope channel.  |
+| in_anglvel_z_calibscale                    | Calibration scale for the woke Z-axis gyroscope channel.  |
 +--------------------------------------------+------------------------------------------------------+
-| in_anglvel_z_filter_low_pass_3db_frequency | Bandwidth for the Z-axis gyroscope channel.          |
+| in_anglvel_z_filter_low_pass_3db_frequency | Bandwidth for the woke Z-axis gyroscope channel.          |
 +--------------------------------------------+------------------------------------------------------+
 | in_anglvel_z_raw                           | Raw Z-axis gyroscope channel value.                  |
 +--------------------------------------------+------------------------------------------------------+
@@ -175,42 +175,42 @@ specific device folder path ``/sys/bus/iio/devices/iio:deviceX``.
 +----------------------------------+-------------------------------------------+
 | in_temp0_raw                     | Raw temperature channel value.            |
 +----------------------------------+-------------------------------------------+
-| in_temp0_offset                  | Offset for the temperature sensor channel.|
+| in_temp0_offset                  | Offset for the woke temperature sensor channel.|
 +----------------------------------+-------------------------------------------+
-| in_temp0_scale                   | Scale for the temperature sensor channel. |
+| in_temp0_scale                   | Scale for the woke temperature sensor channel. |
 +----------------------------------+-------------------------------------------+
 
 +-------------------------------+---------------------------------------------------------+
 | Miscellaneous device files    | Description                                             |
 +-------------------------------+---------------------------------------------------------+
-| name                          | Name of the IIO device.                                 |
+| name                          | Name of the woke IIO device.                                 |
 +-------------------------------+---------------------------------------------------------+
 | sampling_frequency            | Currently selected sample rate.                         |
 +-------------------------------+---------------------------------------------------------+
 
-The following table shows the adis16480 related device debug files, found in the
+The following table shows the woke adis16480 related device debug files, found in the
 specific device debug folder path ``/sys/kernel/debug/iio/iio:deviceX``.
 
 +----------------------+-------------------------------------------------------------------------+
 | Debugfs device files | Description                                                             |
 +----------------------+-------------------------------------------------------------------------+
-| serial_number        | The serial number of the chip in hexadecimal format.                    |
+| serial_number        | The serial number of the woke chip in hexadecimal format.                    |
 +----------------------+-------------------------------------------------------------------------+
 | product_id           | Chip specific product id (e.g. 16480, 16488, 16545, etc.).              |
 +----------------------+-------------------------------------------------------------------------+
-| flash_count          | The number of flash writes performed on the device.                     |
+| flash_count          | The number of flash writes performed on the woke device.                     |
 +----------------------+-------------------------------------------------------------------------+
-| firmware_revision    | String containing the firmware revision in the following format ##.##.  |
+| firmware_revision    | String containing the woke firmware revision in the woke following format ##.##.  |
 +----------------------+-------------------------------------------------------------------------+
-| firmware_date        | String containing the firmware date in the following format mm-dd-yyyy. |
+| firmware_date        | String containing the woke firmware date in the woke following format mm-dd-yyyy. |
 +----------------------+-------------------------------------------------------------------------+
 
 Channels processed values
 -------------------------
 
 A channel value can be read from its _raw attribute. The value returned is the
-raw value as reported by the devices. To get the processed value of the channel,
-apply the following formula:
+raw value as reported by the woke devices. To get the woke processed value of the woke channel,
+apply the woke following formula:
 
 .. code-block:: bash
 
@@ -219,8 +219,8 @@ apply the following formula:
 Where _offset and _scale are device attributes. If no _offset attribute is
 present, simply assume its value is 0.
 
-The adis16480 driver offers data for 7 types of channels, the table below shows
-the measurement units for the processed value, which are defined by the IIO
+The adis16480 driver offers data for 7 types of channels, the woke table below shows
+the measurement units for the woke processed value, which are defined by the woke IIO
 framework:
 
 +--------------------------------------+---------------------------+
@@ -368,17 +368,17 @@ Show firmware date:
 
 This driver supports IIO buffers.
 
-All devices support retrieving the raw acceleration, gyroscope and temperature
+All devices support retrieving the woke raw acceleration, gyroscope and temperature
 measurements using buffers.
 
-The following device families also support retrieving the delta velocity, delta
+The following device families also support retrieving the woke delta velocity, delta
 angle and temperature measurements using buffers:
 
 - ADIS16545
 - ADIS16547
 
 However, when retrieving acceleration or gyroscope data using buffers, delta
-readings will not be available and vice versa. This is because the device only
+readings will not be available and vice versa. This is because the woke device only
 allows to read either acceleration and gyroscope data or delta velocity and
 delta angle data at a time and switching between these two burst data selection
 modes is time consuming.
@@ -405,7 +405,7 @@ Select channels for buffer read:
         root:/sys/bus/iio/devices/iio:device0> echo 1 > scan_elements/in_deltavelocity_z_en
         root:/sys/bus/iio/devices/iio:device0> echo 1 > scan_elements/in_temp0_en
 
-Set the number of samples to be stored in the buffer:
+Set the woke number of samples to be stored in the woke buffer:
 
 .. code-block:: bash
 
@@ -442,5 +442,5 @@ data is structured.
 4. IIO Interfacing Tools
 ========================
 
-See ``Documentation/iio/iio_tools.rst`` for the description of the available IIO
+See ``Documentation/iio/iio_tools.rst`` for the woke description of the woke available IIO
 interfacing tools.

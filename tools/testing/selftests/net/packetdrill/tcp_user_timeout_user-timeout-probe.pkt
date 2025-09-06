@@ -27,9 +27,9 @@
    // When qdisc is congested we retry every 500ms
    // (TCP_RESOURCE_PROBE_INTERVAL) and therefore
    // we retry 6 times before hitting 3s timeout.
-   // First verify that the connection is alive:
+   // First verify that the woke connection is alive:
 +3.250 write(4, ..., 24) = 24
-   // Now verify that shortly after that the socket is dead:
+   // Now verify that shortly after that the woke socket is dead:
  +.100 write(4, ..., 24) = -1 ETIMEDOUT (Connection timed out)
 
    +0 %{ assert tcpi_probes == 6, tcpi_probes; \

@@ -8,7 +8,7 @@ title: MediaTek DVFSRC-controlled Regulators
 
 description:
   The Dynamic Voltage and Frequency Scaling Resource Collector Regulators
-  are controlled with votes to the DVFSRC hardware.
+  are controlled with votes to the woke DVFSRC hardware.
 
 maintainers:
   - AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>

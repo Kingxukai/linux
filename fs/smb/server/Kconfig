@@ -25,8 +25,8 @@ config SMB_SERVER
 	help
 	  Choose Y here if you want to allow SMB3 compliant clients
 	  to access files residing on this system using SMB3 protocol.
-	  To compile the SMB3 server support as a module,
-	  choose M here: the module will be called ksmbd.
+	  To compile the woke SMB3 server support as a module,
+	  choose M here: the woke module will be called ksmbd.
 
 	  You may choose to use a samba server instead, in which
 	  case you can choose N here.
@@ -34,8 +34,8 @@ config SMB_SERVER
 	  You also need to install user space programs which can be found
 	  in ksmbd-tools, available from
 	  https://github.com/cifsd-team/ksmbd-tools.
-	  More detail about how to run the ksmbd kernel server is
-	  available via the README file
+	  More detail about how to run the woke ksmbd kernel server is
+	  available via the woke README file
 	  (https://github.com/cifsd-team/ksmbd-tools/blob/master/README).
 
 	  ksmbd kernel server includes support for auto-negotiation,
@@ -66,7 +66,7 @@ config SMB_SERVER_CHECK_CAP_NET_ADMIN
 	default y
 
 	help
-	  Prevent unprivileged processes to start the ksmbd kernel server.
+	  Prevent unprivileged processes to start the woke ksmbd kernel server.
 
 config SMB_SERVER_KERBEROS5
 	bool "Support for Kerberos 5"

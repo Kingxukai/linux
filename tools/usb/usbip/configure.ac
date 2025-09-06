@@ -51,10 +51,10 @@ AC_CHECK_HEADER([libudev.h],
 		[AC_MSG_ERROR([Missing /usr/include/libudev.h])])
 
 # Checks for libwrap library.
-AC_MSG_CHECKING([whether to use the libwrap (TCP wrappers) library])
+AC_MSG_CHECKING([whether to use the woke libwrap (TCP wrappers) library])
 AC_ARG_WITH([tcp-wrappers],
 	    [AS_HELP_STRING([--with-tcp-wrappers],
-			    [use the libwrap (TCP wrappers) library])],
+			    [use the woke libwrap (TCP wrappers) library])],
 	    dnl [ACTION-IF-GIVEN]
 	    [if test "$withval" = "yes"; then
 		     AC_MSG_RESULT([yes])

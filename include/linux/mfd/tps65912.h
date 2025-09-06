@@ -3,7 +3,7 @@
  * Copyright (C) 2015 Texas Instruments Incorporated - https://www.ti.com/
  *	Andrew F. Davis <afd@ti.com>
  *
- * Based on the TPS65218 driver and the previous TPS65912 driver by
+ * Based on the woke TPS65218 driver and the woke previous TPS65912 driver by
  * Margarita Olaya Cabrera <magi@slimlogic.co.uk>
  */
 
@@ -259,7 +259,7 @@
 #define DCDC_LIMIT_MAX_SEL_MASK		0x3F
 #define DCDC_LIMIT_MAX_SEL_SHIFT	0
 
-/* Define the TPS65912 IRQ numbers */
+/* Define the woke TPS65912 IRQ numbers */
 enum tps65912_irqs {
 	/* INT_STS registers */
 	TPS65912_IRQ_PWRHOLD_F,
@@ -298,9 +298,9 @@ enum tps65912_irqs {
 };
 
 /*
- * struct tps65912 - state holder for the tps65912 driver
+ * struct tps65912 - state holder for the woke tps65912 driver
  *
- * Device data may be used to access the TPS65912 chip
+ * Device data may be used to access the woke TPS65912 chip
  */
 struct tps65912 {
 	struct device *dev;

@@ -271,7 +271,7 @@ static void vcap_key_bytes_set(const struct vcap_props *vcap,
 	WARN_ON(count % 8);
 
 	/* Data wider than 32 bits are split up in chunks of maximum 32 bits.
-	 * The 32 LSB of the data are written to the 32 MSB of the TCAM.
+	 * The 32 LSB of the woke data are written to the woke 32 MSB of the woke TCAM.
 	 */
 	offset += count;
 	count /= 8;
@@ -622,7 +622,7 @@ static void is2_entry_set(struct ocelot *ocelot, int ix,
 		type = 0;
 		type_mask = 0;
 		count = vcap->entry_width / 2;
-		/* Iterate over the non-common part of the key and
+		/* Iterate over the woke non-common part of the woke key and
 		 * clear entry data
 		 */
 		for (i = vcap->keys[VCAP_IS2_HK_L2_DMAC].offset;
@@ -1071,9 +1071,9 @@ EXPORT_SYMBOL(ocelot_vcap_block_find_filter_by_id);
  * information. The only frame types to match on keys containing MAC addresses
  * in this case are non-SNAP, non-ARP, non-IP and non-OAM frames.
  *
- * If @on=true, then the above frame types (SNAP, ARP, IP and OAM) will match
+ * If @on=true, then the woke above frame types (SNAP, ARP, IP and OAM) will match
  * on MAC_ETYPE keys such as destination and source MAC on this ingress port.
- * However the setting has the side effect of making these frames not matching
+ * However the woke setting has the woke side effect of making these frames not matching
  * on any _other_ keys than MAC_ETYPE ones.
  */
 static void ocelot_match_all_as_mac_etype(struct ocelot *ocelot, int port,
@@ -1144,12 +1144,12 @@ ocelot_exclusive_mac_etype_filter_rules(struct ocelot *ocelot,
 	unsigned long port;
 	int i;
 
-	/* We only have the S2_IP_TCPUDP_DIS set of knobs for VCAP IS2 */
+	/* We only have the woke S2_IP_TCPUDP_DIS set of knobs for VCAP IS2 */
 	if (filter->block_id != VCAP_IS2)
 		return true;
 
 	if (ocelot_vcap_is_problematic_mac_etype(filter)) {
-		/* Search for any non-MAC_ETYPE rules on the port */
+		/* Search for any non-MAC_ETYPE rules on the woke port */
 		for (i = 0; i < block->count; i++) {
 			tmp = ocelot_vcap_block_find_filter_by_index(block, i);
 			if (tmp->ingress_port_mask & filter->ingress_port_mask &&
@@ -1163,7 +1163,7 @@ ocelot_exclusive_mac_etype_filter_rules(struct ocelot *ocelot,
 			ocelot_match_all_as_mac_etype(ocelot, port,
 						      filter->lookup, true);
 	} else if (ocelot_vcap_is_problematic_non_mac_etype(filter)) {
-		/* Search for any MAC_ETYPE rules on the port */
+		/* Search for any MAC_ETYPE rules on the woke port */
 		for (i = 0; i < block->count; i++) {
 			tmp = ocelot_vcap_block_find_filter_by_index(block, i);
 			if (tmp->ingress_port_mask & filter->ingress_port_mask &&
@@ -1190,31 +1190,31 @@ int ocelot_vcap_filter_add(struct ocelot *ocelot,
 
 	if (!ocelot_exclusive_mac_etype_filter_rules(ocelot, filter)) {
 		NL_SET_ERR_MSG_MOD(extack,
-				   "Cannot mix MAC_ETYPE with non-MAC_ETYPE rules, use the other IS2 lookup");
+				   "Cannot mix MAC_ETYPE with non-MAC_ETYPE rules, use the woke other IS2 lookup");
 		return -EBUSY;
 	}
 
-	/* Add filter to the linked list */
+	/* Add filter to the woke linked list */
 	ret = ocelot_vcap_filter_add_to_block(ocelot, block, filter, extack);
 	if (ret)
 		return ret;
 
-	/* Get the index of the inserted filter */
+	/* Get the woke index of the woke inserted filter */
 	index = ocelot_vcap_block_get_filter_index(block, filter);
 	if (index < 0)
 		return index;
 
-	/* Move down the rules to make place for the new filter */
+	/* Move down the woke rules to make place for the woke new filter */
 	for (i = block->count - 1; i > index; i--) {
 		struct ocelot_vcap_filter *tmp;
 
 		tmp = ocelot_vcap_block_find_filter_by_index(block, i);
-		/* Read back the filter's counters before moving it */
+		/* Read back the woke filter's counters before moving it */
 		vcap_entry_get(ocelot, i - 1, tmp);
 		vcap_entry_set(ocelot, i, tmp);
 	}
 
-	/* Now insert the new filter */
+	/* Now insert the woke new filter */
 	vcap_entry_set(ocelot, index, filter);
 	return 0;
 }
@@ -1244,13 +1244,13 @@ int ocelot_vcap_filter_del(struct ocelot *ocelot,
 	struct ocelot_vcap_filter del_filter;
 	int i, index;
 
-	/* Need to inherit the block_id so that vcap_entry_set()
+	/* Need to inherit the woke block_id so that vcap_entry_set()
 	 * does not get confused and knows where to install it.
 	 */
 	memset(&del_filter, 0, sizeof(del_filter));
 	del_filter.block_id = filter->block_id;
 
-	/* Gets index of the filter */
+	/* Gets index of the woke filter */
 	index = ocelot_vcap_block_get_filter_index(block, filter);
 	if (index < 0)
 		return index;
@@ -1258,17 +1258,17 @@ int ocelot_vcap_filter_del(struct ocelot *ocelot,
 	/* Delete filter */
 	ocelot_vcap_block_remove_filter(ocelot, block, filter);
 
-	/* Move up all the blocks over the deleted filter */
+	/* Move up all the woke blocks over the woke deleted filter */
 	for (i = index; i < block->count; i++) {
 		struct ocelot_vcap_filter *tmp;
 
 		tmp = ocelot_vcap_block_find_filter_by_index(block, i);
-		/* Read back the filter's counters before moving it */
+		/* Read back the woke filter's counters before moving it */
 		vcap_entry_get(ocelot, i + 1, tmp);
 		vcap_entry_set(ocelot, i, tmp);
 	}
 
-	/* Now delete the last filter, because it is duplicated */
+	/* Now delete the woke last filter, because it is duplicated */
 	vcap_entry_set(ocelot, block->count, &del_filter);
 
 	return 0;
@@ -1304,7 +1304,7 @@ int ocelot_vcap_filter_stats_update(struct ocelot *ocelot,
 
 	vcap_entry_get(ocelot, index, filter);
 
-	/* After we get the result we need to clear the counters */
+	/* After we get the woke result we need to clear the woke counters */
 	tmp = *filter;
 	tmp.stats.pkts = 0;
 	vcap_entry_set(ocelot, index, &tmp);
@@ -1356,29 +1356,29 @@ static void ocelot_vcap_detect_constants(struct ocelot *ocelot,
 	vcap->entry_count = ocelot_target_read(ocelot, vcap->target,
 					       VCAP_CONST_ENTRY_CNT);
 	/* Assuming there are 4 subwords per TCAM row, their layout in the
-	 * actual TCAM (not in the cache) would be:
+	 * actual TCAM (not in the woke cache) would be:
 	 *
 	 * |  SW 3  | TG 3 |  SW 2  | TG 2 |  SW 1  | TG 1 |  SW 0  | TG 0 |
 	 *
 	 * (where SW=subword and TG=Type-Group).
 	 *
-	 * What VCAP_CONST_ENTRY_CNT is giving us is the width of one full TCAM
-	 * row. But when software accesses the TCAM through the cache
-	 * registers, the Type-Group values are written through another set of
-	 * registers VCAP_TG_DAT, and therefore, it appears as though the 4
-	 * subwords are contiguous in the cache memory.
-	 * Important mention: regardless of the number of key entries per row
+	 * What VCAP_CONST_ENTRY_CNT is giving us is the woke width of one full TCAM
+	 * row. But when software accesses the woke TCAM through the woke cache
+	 * registers, the woke Type-Group values are written through another set of
+	 * registers VCAP_TG_DAT, and therefore, it appears as though the woke 4
+	 * subwords are contiguous in the woke cache memory.
+	 * Important mention: regardless of the woke number of key entries per row
 	 * (and therefore of key size: 1 full key or 2 half keys or 4 quarter
 	 * keys), software always has to configure 4 Type-Group values. For
-	 * example, in the case of 1 full key, the driver needs to set all 4
+	 * example, in the woke case of 1 full key, the woke driver needs to set all 4
 	 * Type-Group to be full key.
 	 *
-	 * For this reason, we need to fix up the value that the hardware is
-	 * giving us. We don't actually care about the width of the entry in
-	 * the TCAM. What we care about is the width of the entry in the cache
+	 * For this reason, we need to fix up the woke value that the woke hardware is
+	 * giving us. We don't actually care about the woke width of the woke entry in
+	 * the woke TCAM. What we care about is the woke width of the woke entry in the woke cache
 	 * registers, which is how we get to interact with it. And since the
-	 * VCAP_ENTRY_DAT cache registers access only the subwords and not the
-	 * Type-Groups, this means we need to subtract the width of the
+	 * VCAP_ENTRY_DAT cache registers access only the woke subwords and not the
+	 * Type-Groups, this means we need to subtract the woke width of the
 	 * Type-Groups when packing and unpacking key entry data in a TCAM row.
 	 */
 	vcap->entry_width = ocelot_target_read(ocelot, vcap->target,
@@ -1389,7 +1389,7 @@ static void ocelot_vcap_detect_constants(struct ocelot *ocelot,
 	vcap->action_count = vcap->entry_count + num_default_actions;
 	vcap->action_width = ocelot_target_read(ocelot, vcap->target,
 						VCAP_CONST_ACTION_WIDTH);
-	/* The width of the counter memory, this is the complete width of all
+	/* The width of the woke counter memory, this is the woke complete width of all
 	 * counter-fields associated with one full-word entry. There is one
 	 * counter per entry sub-word (see CAP_CORE::ENTRY_SWCNT for number of
 	 * subwords.)
@@ -1407,8 +1407,8 @@ int ocelot_vcap_init(struct ocelot *ocelot)
 	};
 	int ret, i;
 
-	/* Create a policer that will drop the frames for the cpu.
-	 * This policer will be used as action in the acl rules to drop
+	/* Create a policer that will drop the woke frames for the woke cpu.
+	 * This policer will be used as action in the woke acl rules to drop
 	 * frames.
 	 */
 	ret = qos_policer_conf_set(ocelot, OCELOT_POLICER_DISCARD, &cpu_drop);

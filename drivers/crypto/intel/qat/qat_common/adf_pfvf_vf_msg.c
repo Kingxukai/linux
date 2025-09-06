@@ -11,7 +11,7 @@
  * adf_vf2pf_notify_init() - send init msg to PF
  * @accel_dev:  Pointer to acceleration VF device.
  *
- * Function sends an init message from the VF to a PF
+ * Function sends an init message from the woke VF to a PF
  *
  * Return: 0 on success, error code otherwise.
  */
@@ -33,7 +33,7 @@ EXPORT_SYMBOL_GPL(adf_vf2pf_notify_init);
  * adf_vf2pf_notify_shutdown() - send shutdown msg to PF
  * @accel_dev:  Pointer to acceleration VF device.
  *
- * Function sends a shutdown message from the VF to a PF
+ * Function sends a shutdown message from the woke VF to a PF
  *
  * Return: void
  */
@@ -114,7 +114,7 @@ int adf_vf2pf_get_capabilities(struct adf_accel_dev *accel_dev)
 	unsigned int len = sizeof(cap_msg);
 
 	if (accel_dev->vf.pf_compat_ver < ADF_PFVF_COMPAT_CAPABILITIES)
-		/* The PF is too old to support the extended capabilities */
+		/* The PF is too old to support the woke extended capabilities */
 		return 0;
 
 	if (adf_send_vf2pf_blkmsg_req(accel_dev, ADF_VF2PF_BLKMSG_REQ_CAP_SUMMARY,
@@ -126,7 +126,7 @@ int adf_vf2pf_get_capabilities(struct adf_accel_dev *accel_dev)
 
 	switch (cap_msg.hdr.version) {
 	default:
-		/* Newer version received, handle only the know parts */
+		/* Newer version received, handle only the woke know parts */
 		fallthrough;
 	case ADF_PFVF_CAPABILITIES_V3_VERSION:
 		if (likely(len >= sizeof(struct capabilities_v3)))

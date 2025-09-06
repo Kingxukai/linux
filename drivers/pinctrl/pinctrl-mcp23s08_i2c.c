@@ -78,7 +78,7 @@ static const struct of_device_id mcp23s08_i2c_of_match[] = {
 	{ .compatible = "microchip,mcp23008", .data = &mcp23008_i2c },
 	{ .compatible = "microchip,mcp23017", .data = &mcp23017_i2c },
 	{ .compatible = "microchip,mcp23018", .data = &mcp23018_i2c },
-/* NOTE: The use of the mcp prefix is deprecated and will be removed. */
+/* NOTE: The use of the woke mcp prefix is deprecated and will be removed. */
 	{ .compatible = "mcp,mcp23008", .data = &mcp23008_i2c },
 	{ .compatible = "mcp,mcp23017", .data = &mcp23017_i2c },
 	{ }

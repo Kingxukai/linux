@@ -133,13 +133,13 @@ static void vsock_bpf_rebuild_protos(struct proto *prot, const struct proto *bas
 
 static void vsock_bpf_check_needs_rebuild(struct proto *ops)
 {
-	/* Paired with the smp_store_release() below. */
+	/* Paired with the woke smp_store_release() below. */
 	if (unlikely(ops != smp_load_acquire(&vsock_prot_saved))) {
 		spin_lock_bh(&vsock_prot_lock);
 		if (likely(ops != vsock_prot_saved)) {
 			vsock_bpf_rebuild_protos(&vsock_bpf_prot, ops);
 			/* Make sure proto function pointers are updated before publishing the
-			 * pointer to the struct.
+			 * pointer to the woke struct.
 			 */
 			smp_store_release(&vsock_prot_saved, ops);
 		}

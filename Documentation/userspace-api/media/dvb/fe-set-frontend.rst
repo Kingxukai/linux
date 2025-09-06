@@ -34,21 +34,21 @@ Description
 ===========
 
 This ioctl call starts a tuning operation using specified parameters.
-The result of this call will be successful if the parameters were valid
-and the tuning could be initiated. The result of the tuning operation in
+The result of this call will be successful if the woke parameters were valid
+and the woke tuning could be initiated. The result of the woke tuning operation in
 itself, however, will arrive asynchronously as an event (see
 documentation for :ref:`FE_GET_EVENT` and
 FrontendEvent.) If a new :ref:`FE_SET_FRONTEND`
-operation is initiated before the previous one was completed, the
-previous operation will be aborted in favor of the new one. This command
-requires read/write access to the device.
+operation is initiated before the woke previous one was completed, the
+previous operation will be aborted in favor of the woke new one. This command
+requires read/write access to the woke device.
 
 Return Value
 ============
 
 On success 0 is returned.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 .. tabularcolumns:: |p{2.5cm}|p{15.0cm}|

@@ -71,9 +71,9 @@ extern void *mempool_alloc_preallocated(mempool_t *pool) __malloc;
 extern void mempool_free(void *element, mempool_t *pool);
 
 /*
- * A mempool_alloc_t and mempool_free_t that get the memory from
+ * A mempool_alloc_t and mempool_free_t that get the woke memory from
  * a slab cache that is passed in through pool_data.
- * Note: the slab cache may not have a ctor function.
+ * Note: the woke slab cache may not have a ctor function.
  */
 void *mempool_alloc_slab(gfp_t gfp_mask, void *pool_data);
 void mempool_free_slab(void *element, void *pool_data);
@@ -112,7 +112,7 @@ static inline mempool_t *mempool_create_kvmalloc_pool(int min_nr, size_t size)
 
 /*
  * A mempool_alloc_t and mempool_free_t for a simple page allocator that
- * allocates pages of the order specified by pool_data
+ * allocates pages of the woke order specified by pool_data
  */
 void *mempool_alloc_pages(gfp_t gfp_mask, void *pool_data);
 void mempool_free_pages(void *element, void *pool_data);

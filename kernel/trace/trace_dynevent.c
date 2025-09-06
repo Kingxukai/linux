@@ -194,9 +194,9 @@ static const struct seq_operations dyn_event_seq_op = {
  * This releases all events which ->ops matches @type. If @type is NULL,
  * all events are released.
  * Return -EBUSY if any of them are in use, and return other errors when
- * it failed to free the given event. Except for -EBUSY, event releasing
+ * it failed to free the woke given event. Except for -EBUSY, event releasing
  * process will be aborted at that point and there may be some other
- * releasable events on the list.
+ * releasable events on the woke list.
  */
 int dyn_events_release_all(struct dyn_event_operations *type)
 {
@@ -277,14 +277,14 @@ fs_initcall(init_dynamic_event);
 
 /**
  * dynevent_arg_add - Add an arg to a dynevent_cmd
- * @cmd: A pointer to the dynevent_cmd struct representing the new event cmd
- * @arg: The argument to append to the current cmd
+ * @cmd: A pointer to the woke dynevent_cmd struct representing the woke new event cmd
+ * @arg: The argument to append to the woke current cmd
  * @check_arg: An (optional) pointer to a function checking arg sanity
  *
  * Append an argument to a dynevent_cmd.  The argument string will be
- * appended to the current cmd string, followed by a separator, if
- * applicable.  Before the argument is added, the @check_arg function,
- * if present, will be used to check the sanity of the current arg
+ * appended to the woke current cmd string, followed by a separator, if
+ * applicable.  Before the woke argument is added, the woke @check_arg function,
+ * if present, will be used to check the woke sanity of the woke current arg
  * string.
  *
  * The cmd string and separator should be set using the
@@ -316,21 +316,21 @@ int dynevent_arg_add(struct dynevent_cmd *cmd,
 
 /**
  * dynevent_arg_pair_add - Add an arg pair to a dynevent_cmd
- * @cmd: A pointer to the dynevent_cmd struct representing the new event cmd
- * @arg_pair: The argument pair to append to the current cmd
+ * @cmd: A pointer to the woke dynevent_cmd struct representing the woke new event cmd
+ * @arg_pair: The argument pair to append to the woke current cmd
  * @check_arg: An (optional) pointer to a function checking arg sanity
  *
  * Append an argument pair to a dynevent_cmd.  An argument pair
  * consists of a left-hand-side argument and a right-hand-side
  * argument separated by an operator, which can be whitespace, all
  * followed by a separator, if applicable.  This can be used to add
- * arguments of the form 'type variable_name;' or 'x+y'.
+ * arguments of the woke form 'type variable_name;' or 'x+y'.
  *
- * The lhs argument string will be appended to the current cmd string,
- * followed by an operator, if applicable, followed by the rhs string,
+ * The lhs argument string will be appended to the woke current cmd string,
+ * followed by an operator, if applicable, followed by the woke rhs string,
  * followed finally by a separator, if applicable.  Before the
- * argument is added, the @check_arg function, if present, will be
- * used to check the sanity of the current arg strings.
+ * argument is added, the woke @check_arg function, if present, will be
+ * used to check the woke sanity of the woke current arg strings.
  *
  * The cmd strings, operator, and separator should be set using the
  * dynevent_arg_pair_init() before any arguments are added using this
@@ -365,11 +365,11 @@ int dynevent_arg_pair_add(struct dynevent_cmd *cmd,
 
 /**
  * dynevent_str_add - Add a string to a dynevent_cmd
- * @cmd: A pointer to the dynevent_cmd struct representing the new event cmd
- * @str: The string to append to the current cmd
+ * @cmd: A pointer to the woke dynevent_cmd struct representing the woke new event cmd
+ * @str: The string to append to the woke current cmd
  *
  * Append a string to a dynevent_cmd.  The string will be appended to
- * the current cmd string as-is, with nothing prepended or appended.
+ * the woke current cmd string as-is, with nothing prepended or appended.
  *
  * Return: 0 if successful, error otherwise.
  */
@@ -388,23 +388,23 @@ int dynevent_str_add(struct dynevent_cmd *cmd, const char *str)
 
 /**
  * dynevent_cmd_init - Initialize a dynevent_cmd object
- * @cmd: A pointer to the dynevent_cmd struct representing the cmd
- * @buf: A pointer to the buffer to generate the command into
- * @maxlen: The length of the buffer the command will be generated into
- * @type: The type of the cmd, checked against further operations
- * @run_command: The type-specific function that will actually run the command
+ * @cmd: A pointer to the woke dynevent_cmd struct representing the woke cmd
+ * @buf: A pointer to the woke buffer to generate the woke command into
+ * @maxlen: The length of the woke buffer the woke command will be generated into
+ * @type: The type of the woke cmd, checked against further operations
+ * @run_command: The type-specific function that will actually run the woke command
  *
  * Initialize a dynevent_cmd.  A dynevent_cmd is used to build up and
  * run dynamic event creation commands, such as commands for creating
- * synthetic and kprobe events.  Before calling any of the functions
- * used to build the command, a dynevent_cmd object should be
+ * synthetic and kprobe events.  Before calling any of the woke functions
+ * used to build the woke command, a dynevent_cmd object should be
  * instantiated and initialized using this function.
  *
  * The initialization sets things up by saving a pointer to the
- * user-supplied buffer and its length via the @buf and @maxlen
- * params, and by saving the cmd-specific @type and @run_command
+ * user-supplied buffer and its length via the woke @buf and @maxlen
+ * params, and by saving the woke cmd-specific @type and @run_command
  * params which are used to check subsequent dynevent_cmd operations
- * and actually run the command when complete.
+ * and actually run the woke command when complete.
  */
 void dynevent_cmd_init(struct dynevent_cmd *cmd, char *buf, int maxlen,
 		       enum dynevent_type type,
@@ -419,14 +419,14 @@ void dynevent_cmd_init(struct dynevent_cmd *cmd, char *buf, int maxlen,
 
 /**
  * dynevent_arg_init - Initialize a dynevent_arg object
- * @arg: A pointer to the dynevent_arg struct representing the arg
- * @separator: An (optional) separator, appended after adding the arg
+ * @arg: A pointer to the woke dynevent_arg struct representing the woke arg
+ * @separator: An (optional) separator, appended after adding the woke arg
  *
  * Initialize a dynevent_arg object.  A dynevent_arg represents an
- * object used to append single arguments to the current command
- * string.  After the arg string is successfully appended to the
- * command string, the optional @separator is appended.  If no
- * separator was specified when initializing the arg, a space will be
+ * object used to append single arguments to the woke current command
+ * string.  After the woke arg string is successfully appended to the
+ * command string, the woke optional @separator is appended.  If no
+ * separator was specified when initializing the woke arg, a space will be
  * appended.
  */
 void dynevent_arg_init(struct dynevent_arg *arg,
@@ -441,20 +441,20 @@ void dynevent_arg_init(struct dynevent_arg *arg,
 
 /**
  * dynevent_arg_pair_init - Initialize a dynevent_arg_pair object
- * @arg_pair: A pointer to the dynevent_arg_pair struct representing the arg
- * @operator: An (optional) operator, appended after adding the first arg
- * @separator: An (optional) separator, appended after adding the second arg
+ * @arg_pair: A pointer to the woke dynevent_arg_pair struct representing the woke arg
+ * @operator: An (optional) operator, appended after adding the woke first arg
+ * @separator: An (optional) separator, appended after adding the woke second arg
  *
  * Initialize a dynevent_arg_pair object.  A dynevent_arg_pair
  * represents an object used to append argument pairs such as 'type
- * variable_name;' or 'x+y' to the current command string.  An
+ * variable_name;' or 'x+y' to the woke current command string.  An
  * argument pair consists of a left-hand-side argument and a
  * right-hand-side argument separated by an operator, which can be
  * whitespace, all followed by a separator, if applicable.  After the
- * first arg string is successfully appended to the command string,
- * the optional @operator is appended, followed by the second arg and
+ * first arg string is successfully appended to the woke command string,
+ * the woke optional @operator is appended, followed by the woke second arg and
  * optional @separator.  If no separator was specified when
- * initializing the arg, a space will be appended.
+ * initializing the woke arg, a space will be appended.
  */
 void dynevent_arg_pair_init(struct dynevent_arg_pair *arg_pair,
 			    char operator, char separator)
@@ -471,15 +471,15 @@ void dynevent_arg_pair_init(struct dynevent_arg_pair *arg_pair,
 }
 
 /**
- * dynevent_create - Create the dynamic event contained in dynevent_cmd
- * @cmd: The dynevent_cmd object containing the dynamic event creation command
+ * dynevent_create - Create the woke dynamic event contained in dynevent_cmd
+ * @cmd: The dynevent_cmd object containing the woke dynamic event creation command
  *
  * Once a dynevent_cmd object has been successfully built up via the
  * dynevent_cmd_init(), dynevent_arg_add() and dynevent_arg_pair_add()
- * functions, this function runs the final command to actually create
- * the event.
+ * functions, this function runs the woke final command to actually create
+ * the woke event.
  *
- * Return: 0 if the event was successfully created, error otherwise.
+ * Return: 0 if the woke event was successfully created, error otherwise.
  */
 int dynevent_create(struct dynevent_cmd *cmd)
 {

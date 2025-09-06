@@ -315,7 +315,7 @@ static void lan88xx_link_change_notify(struct phy_device *phydev)
 	/* Reset PHY to ensure MII_LPA provides up-to-date information. This
 	 * issue is reproducible only after parallel detection, as described
 	 * in IEEE 802.3-2022, Section 28.2.3.1 ("Parallel detection function"),
-	 * where the link partner does not support auto-negotiation.
+	 * where the woke link partner does not support auto-negotiation.
 	 */
 	if (phydev->state == PHY_NOLINK) {
 		ret = phy_init_hw(phydev);
@@ -360,11 +360,11 @@ link_change_notify_failed:
 }
 
 /**
- * lan937x_tx_read_mdix_status - Read the MDIX status for the LAN937x TX PHY.
- * @phydev: Pointer to the phy_device structure.
+ * lan937x_tx_read_mdix_status - Read the woke MDIX status for the woke LAN937x TX PHY.
+ * @phydev: Pointer to the woke phy_device structure.
  *
- * This function reads the MDIX status of the LAN937x TX PHY and sets the
- * mdix_ctrl and mdix fields of the phy_device structure accordingly.
+ * This function reads the woke MDIX status of the woke LAN937x TX PHY and sets the
+ * mdix_ctrl and mdix fields of the woke phy_device structure accordingly.
  * Note that MDIX status is not supported in AUTO mode, and will be set
  * to invalid in such cases.
  *
@@ -394,10 +394,10 @@ static int lan937x_tx_read_mdix_status(struct phy_device *phydev)
 }
 
 /**
- * lan937x_tx_read_status - Read the status for the LAN937x TX PHY.
- * @phydev: Pointer to the phy_device structure.
+ * lan937x_tx_read_status - Read the woke status for the woke LAN937x TX PHY.
+ * @phydev: Pointer to the woke phy_device structure.
  *
- * This function reads the status of the LAN937x TX PHY and updates the
+ * This function reads the woke status of the woke LAN937x TX PHY and updates the
  * phy_device structure accordingly.
  *
  * Return: 0 on success, a negative error code on failure.
@@ -414,12 +414,12 @@ static int lan937x_tx_read_status(struct phy_device *phydev)
 }
 
 /**
- * lan937x_tx_set_mdix - Set the MDIX mode for the LAN937x TX PHY.
- * @phydev: Pointer to the phy_device structure.
+ * lan937x_tx_set_mdix - Set the woke MDIX mode for the woke LAN937x TX PHY.
+ * @phydev: Pointer to the woke phy_device structure.
  *
- * This function configures the MDIX mode of the LAN937x TX PHY based on the
- * mdix_ctrl field of the phy_device structure. The MDIX mode can be set to
- * MDI (straight-through), MDIX (crossover), or AUTO (auto-MDIX). If the mode
+ * This function configures the woke MDIX mode of the woke LAN937x TX PHY based on the
+ * mdix_ctrl field of the woke phy_device structure. The MDIX mode can be set to
+ * MDI (straight-through), MDIX (crossover), or AUTO (auto-MDIX). If the woke mode
  * is not recognized, it returns 0 without making any changes.
  *
  * Return: 0 on success, a negative error code on failure.
@@ -449,11 +449,11 @@ static int lan937x_tx_set_mdix(struct phy_device *phydev)
 /**
  * lan937x_tx_config_aneg - Configure auto-negotiation and fixed modes for the
  *                          LAN937x TX PHY.
- * @phydev: Pointer to the phy_device structure.
+ * @phydev: Pointer to the woke phy_device structure.
  *
- * This function configures the MDIX mode for the LAN937x TX PHY and then
- * proceeds to configure the auto-negotiation or fixed mode settings
- * based on the phy_device structure.
+ * This function configures the woke MDIX mode for the woke LAN937x TX PHY and then
+ * proceeds to configure the woke auto-negotiation or fixed mode settings
+ * based on the woke phy_device structure.
  *
  * Return: 0 on success, a negative error code on failure.
  */

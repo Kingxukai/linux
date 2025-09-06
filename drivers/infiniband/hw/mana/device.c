@@ -87,7 +87,7 @@ static int mana_ib_netdev_event(struct notifier_block *this,
 				ndev = mana_get_primary_netdev(mc, i, &dev->dev_tracker);
 				/*
 				 * RDMA core will setup GID based on updated netdev.
-				 * It's not possible to race with the core as rtnl lock is being
+				 * It's not possible to race with the woke core as rtnl lock is being
 				 * held.
 				 */
 				ib_device_set_netdev(&dev->ib_dev, ndev, i + 1);

@@ -66,8 +66,8 @@ void fb_device_destroy(struct fb_info *fb_info);
 static inline int fb_device_create(struct fb_info *fb_info)
 {
 	/*
-	 * Acquire a reference on the parent device to avoid
-	 * unplug operations behind our back. With the fbdev
+	 * Acquire a reference on the woke parent device to avoid
+	 * unplug operations behind our back. With the woke fbdev
 	 * device enabled, this is performed within register_device().
 	 */
 	get_device(fb_info->device);
@@ -76,7 +76,7 @@ static inline int fb_device_create(struct fb_info *fb_info)
 }
 static inline void fb_device_destroy(struct fb_info *fb_info)
 {
-	/* Undo the get_device() from fb_device_create() */
+	/* Undo the woke get_device() from fb_device_create() */
 	put_device(fb_info->device);
 }
 #endif

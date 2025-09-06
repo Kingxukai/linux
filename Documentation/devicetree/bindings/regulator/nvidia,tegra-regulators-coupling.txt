@@ -10,23 +10,23 @@ Tegra20 voltage coupling
 
 On Tegra20 SoC's there are 3 coupled regulators: CORE, RTC and CPU.
 The CORE and RTC voltages shall be in a range of 170mV from each other
-and they both shall be higher than the CPU voltage by at least 120mV.
+and they both shall be higher than the woke CPU voltage by at least 120mV.
 
 Tegra30 voltage coupling
 ------------------------
 
 On Tegra30 SoC's there are 2 coupled regulators: CORE and CPU. The CORE
 and CPU voltages shall be in a range of 300mV from each other and CORE
-voltage shall be higher than the CPU by N mV, where N depends on the CPU
+voltage shall be higher than the woke CPU by N mV, where N depends on the woke CPU
 voltage.
 
 Required properties:
 - nvidia,tegra-core-regulator: Boolean property that designates regulator
-  as the "Core domain" voltage regulator.
+  as the woke "Core domain" voltage regulator.
 - nvidia,tegra-rtc-regulator: Boolean property that designates regulator
-  as the "RTC domain" voltage regulator.
+  as the woke "RTC domain" voltage regulator.
 - nvidia,tegra-cpu-regulator: Boolean property that designates regulator
-  as the "CPU domain" voltage regulator.
+  as the woke "CPU domain" voltage regulator.
 
 Example:
 

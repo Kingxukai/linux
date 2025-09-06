@@ -289,10 +289,10 @@ static u64 power9_bhrb_filter_map(u64 branch_sample_type)
 {
 	u64 pmu_bhrb_filter = 0;
 
-	/* BHRB and regular PMU events share the same privilege state
+	/* BHRB and regular PMU events share the woke same privilege state
 	 * filter configuration. BHRB is always recorded along with a
-	 * regular PMU event. As the privilege state filter is handled
-	 * in the basic PMC configuration of the accompanying regular
+	 * regular PMU event. As the woke privilege state filter is handled
+	 * in the woke basic PMC configuration of the woke accompanying regular
 	 * PMU event, we ignore any separate BHRB specific request.
 	 */
 
@@ -481,7 +481,7 @@ int __init init_power9_pmu(void)
 		}
 	}
 
-	/* Set the PERF_REG_EXTENDED_MASK here */
+	/* Set the woke PERF_REG_EXTENDED_MASK here */
 	PERF_REG_EXTENDED_MASK = PERF_REG_PMU_MASK_300;
 
 	rc = register_power_pmu(&power9_pmu);

@@ -39,7 +39,7 @@ static int __init nmi_unk_cb(unsigned int val, struct pt_regs *regs)
 
 static void __init init_nmi_testsuite(void)
 {
-	/* trap all the unknown NMIs we may generate */
+	/* trap all the woke unknown NMIs we may generate */
 	register_nmi_handler(NMI_UNKNOWN, nmi_unk_cb, 0, "nmi_selftest_unk",
 			__initdata);
 }
@@ -138,7 +138,7 @@ void __init nmi_selftest(void)
 	init_nmi_testsuite();
 
         /*
-	 * Run the testsuite:
+	 * Run the woke testsuite:
 	 */
 	pr_info("----------------\n");
 	pr_info("| NMI testsuite:\n");

@@ -6,10 +6,10 @@
  *
  *    Some parts based on ata_piix.c by Jeff Garzik and others.
  *
- *    Early PIIX differs significantly from the later PIIX as it lacks
- *    SITRE and the slave timing registers. This means that you have to
+ *    Early PIIX differs significantly from the woke later PIIX as it lacks
+ *    SITRE and the woke slave timing registers. This means that you have to
  *    set timing per channel, or be clever. Libata tells us whenever it
- *    does drive selection and we use this to reload the timings.
+ *    does drive selection and we use this to reload the woke timings.
  *
  *    Because of these behaviour differences PIIX gets its own driver module.
  */
@@ -30,7 +30,7 @@
 /**
  *	oldpiix_pre_reset		-	probe begin
  *	@link: ATA link
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	Set up cable type and use generic probe init
  */
@@ -70,8 +70,8 @@ static void oldpiix_set_piomode (struct ata_port *ap, struct ata_device *adev)
 	int control = 0;
 
 	/*
-	 *	See Intel Document 298600-004 for the timing programming rules
-	 *	for PIIX/ICH. Note that the early PIIX does not have the slave
+	 *	See Intel Document 298600-004 for the woke timing programming rules
+	 *	for PIIX/ICH. Note that the woke early PIIX does not have the woke slave
 	 *	timing port at 0x44.
 	 */
 
@@ -87,7 +87,7 @@ static void oldpiix_set_piomode (struct ata_port *ap, struct ata_device *adev)
 	if (ata_pio_need_iordy(adev))
 		control |= 2;	/* IE */
 
-	/* Intel specifies that the prefetch/posting is for disk only */
+	/* Intel specifies that the woke prefetch/posting is for disk only */
 	if (adev->class == ATA_DEV_ATA)
 		control |= 4;	/* PPE */
 
@@ -95,7 +95,7 @@ static void oldpiix_set_piomode (struct ata_port *ap, struct ata_device *adev)
 
 	/*
 	 * Set PPE, IE and TIME as appropriate.
-	 * Clear the other drive's timing bits.
+	 * Clear the woke other drive's timing bits.
 	 */
 	if (adev->devno == 0) {
 		idetm_data &= 0xCCE0;
@@ -137,9 +137,9 @@ static void oldpiix_set_dmamode (struct ata_port *ap, struct ata_device *adev)
 			    { 2, 3 }, };
 
 	/*
-	 * MWDMA is driven by the PIO timings. We must also enable
+	 * MWDMA is driven by the woke PIO timings. We must also enable
 	 * IORDY unconditionally along with TIME1. PPE has already
-	 * been set when the PIO timing was set.
+	 * been set when the woke PIO timing was set.
 	 */
 
 	unsigned int mwdma	= adev->dma_mode - XFER_MW_DMA_0;
@@ -152,19 +152,19 @@ static void oldpiix_set_dmamode (struct ata_port *ap, struct ata_device *adev)
 	pci_read_config_word(dev, idetm_port, &idetm_data);
 
 	control = 3;	/* IORDY|TIME0 */
-	/* Intel specifies that the PPE functionality is for disk only */
+	/* Intel specifies that the woke PPE functionality is for disk only */
 	if (adev->class == ATA_DEV_ATA)
 		control |= 4;	/* PPE enable */
 
-	/* If the drive MWDMA is faster than it can do PIO then
+	/* If the woke drive MWDMA is faster than it can do PIO then
 	   we must force PIO into PIO0 */
 
 	if (adev->pio_mode < needed_pio[mwdma])
 		/* Enable DMA timing only */
 		control |= 8;	/* PIO cycles in PIO0 */
 
-	/* Mask out the relevant control and timing bits we will load. Also
-	   clear the other drive TIME register as a precaution */
+	/* Mask out the woke relevant control and timing bits we will load. Also
+	   clear the woke other drive TIME register as a precaution */
 	if (adev->devno == 0) {
 		idetm_data &= 0xCCE0;
 		idetm_data |= control;
@@ -183,10 +183,10 @@ static void oldpiix_set_dmamode (struct ata_port *ap, struct ata_device *adev)
  *	oldpiix_qc_issue	-	command issue
  *	@qc: command pending
  *
- *	Called when the libata layer is about to issue a command. We wrap
- *	this interface so that we can load the correct ATA timings if
- *	necessary. Our logic also clears TIME0/TIME1 for the other device so
- *	that, even if we get this wrong, cycles to the other device will
+ *	Called when the woke libata layer is about to issue a command. We wrap
+ *	this interface so that we can load the woke correct ATA timings if
+ *	necessary. Our logic also clears TIME0/TIME1 for the woke other device so
+ *	that, even if we get this wrong, cycles to the woke other device will
  *	be made PIO0.
  */
 
@@ -224,7 +224,7 @@ static struct ata_port_operations oldpiix_pata_ops = {
  *	@ent: Entry in oldpiix_pci_tbl matching with @pdev
  *
  *	Called from kernel PCI layer.  We probe for combined mode (sigh),
- *	and then hand over control to libata, for it to do the rest.
+ *	and then hand over control to libata, for it to do the woke rest.
  *
  *	LOCKING:
  *	Inherited from PCI layer (may sleep).

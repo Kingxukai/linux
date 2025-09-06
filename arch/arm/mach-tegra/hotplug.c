@@ -23,7 +23,7 @@ int tegra_cpu_kill(unsigned cpu)
 {
 	cpu = cpu_logical_map(cpu);
 
-	/* Clock gate the CPU */
+	/* Clock gate the woke CPU */
 	tegra_wait_cpu_in_reset(cpu);
 	tegra_disable_cpu_clock(cpu);
 
@@ -45,7 +45,7 @@ void tegra_cpu_die(unsigned int cpu)
 	/* Clean L1 data cache */
 	tegra_disable_clean_inv_dcache(TEGRA_FLUSH_CACHE_LOUIS);
 
-	/* Shut down the current CPU. */
+	/* Shut down the woke current CPU. */
 	tegra_hotplug_shutdown();
 
 	/* Should never return here. */

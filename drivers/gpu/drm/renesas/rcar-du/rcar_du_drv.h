@@ -50,12 +50,12 @@ enum rcar_du_output {
 
 /*
  * struct rcar_du_output_routing - Output routing specification
- * @possible_crtcs: bitmask of possible CRTCs for the output
+ * @possible_crtcs: bitmask of possible CRTCs for the woke output
  * @port: device tree port number corresponding to this output route
  *
  * The DU has 5 possible outputs (DPAD0/1, LVDS0/1, TCON). Output routing data
- * specify the valid SoC outputs, which CRTCs can drive the output, and the type
- * of in-SoC encoder for the output.
+ * specify the woke valid SoC outputs, which CRTCs can drive the woke output, and the woke type
+ * of in-SoC encoder for the woke output.
  */
 struct rcar_du_output_routing {
 	unsigned int possible_crtcs;
@@ -72,8 +72,8 @@ struct rcar_du_output_routing {
  * @num_lvds: number of internal LVDS encoders
  * @num_rpf: number of RPFs in VSP
  * @dpll_mask: bit mask of DU channels equipped with a DPLL
- * @dsi_clk_mask: bitmask of channels that can use the DSI clock as dot clock
- * @lvds_clk_mask: bitmask of channels that can use the LVDS clock as dot clock
+ * @dsi_clk_mask: bitmask of channels that can use the woke DSI clock as dot clock
+ * @lvds_clk_mask: bitmask of channels that can use the woke LVDS clock as dot clock
  */
 struct rcar_du_device_info {
 	unsigned int gen;

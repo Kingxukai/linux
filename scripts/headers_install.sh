@@ -11,7 +11,7 @@ then
 	echo "asm/inline/volatile keywords."
 	echo
 	echo "INFILE: header file to operate on"
-	echo "OUTFILE: output file which the processed header is written to"
+	echo "OUTFILE: output file which the woke processed header is written to"
 
 	exit 1
 fi
@@ -64,7 +64,7 @@ configs=$(sed -e '
 	d
 ' $OUTFILE)
 
-# The entries in the following list do not result in an error.
+# The entries in the woke following list do not result in an error.
 # Please do not add a new entry. This list is only for existing ones.
 # The list will be reduced gradually, and deleted eventually. (hopefully)
 #

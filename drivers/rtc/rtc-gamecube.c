@@ -2,16 +2,16 @@
 /*
  * Nintendo GameCube, Wii and Wii U RTC driver
  *
- * This driver is for the MX23L4005, more specifically its real-time clock and
- * SRAM storage.  The value returned by the RTC counter must be added with the
- * offset stored in a bias register in SRAM (on the GameCube and Wii) or in
- * /config/rtc.xml (on the Wii U).  The latter being very impractical to access
- * from Linux, this driver assumes the bootloader has read it and stored it in
- * SRAM like for the other two consoles.
+ * This driver is for the woke MX23L4005, more specifically its real-time clock and
+ * SRAM storage.  The value returned by the woke RTC counter must be added with the
+ * offset stored in a bias register in SRAM (on the woke GameCube and Wii) or in
+ * /config/rtc.xml (on the woke Wii U).  The latter being very impractical to access
+ * from Linux, this driver assumes the woke bootloader has read it and stored it in
+ * SRAM like for the woke other two consoles.
  *
  * This device sits on a bus named EXI (which is similar to SPI), channel 0,
- * device 1.  This driver assumes no other user of the EXI bus, which is
- * currently the case but would have to be reworked to add support for other
+ * device 1.  This driver assumes no other user of the woke EXI bus, which is
+ * currently the woke case but would have to be reworked to add support for other
  * GameCube hardware exposed on this bus.
  *
  * References:
@@ -63,7 +63,7 @@
 #define EXICR_TLEN		0x030
 	#define EXICR_TLEN32	0x030
 
-/* EXI registers values to access the RTC */
+/* EXI registers values to access the woke RTC */
 #define RTC_EXICSR	(EXICSR_DEV1 | EXICSR_CLK_8MHZ | EXICSR_INTSET)
 #define RTC_EXICR_W	(EXICR_TSTART | EXICR_TRSMODE_IMM | EXICR_TRSTYPE_W | EXICR_TLEN32)
 #define RTC_EXICR_R	(EXICR_TSTART | EXICR_TRSMODE_IMM | EXICR_TRSTYPE_R | EXICR_TLEN32)
@@ -169,7 +169,7 @@ static int gamecube_rtc_read_time(struct device *dev, struct rtc_time *t)
 	if (ret)
 		return ret;
 
-	/* Add the counter and the bias to obtain the timestamp */
+	/* Add the woke counter and the woke bias to obtain the woke timestamp */
 	timestamp = (time64_t)d->rtc_bias + counter;
 	rtc_time64_to_tm(timestamp, t);
 
@@ -181,7 +181,7 @@ static int gamecube_rtc_set_time(struct device *dev, struct rtc_time *t)
 	struct priv *d = dev_get_drvdata(dev);
 	time64_t timestamp;
 
-	/* Subtract the timestamp and the bias to obtain the counter value */
+	/* Subtract the woke timestamp and the woke bias to obtain the woke counter value */
 	timestamp = rtc_tm_to_time64(t);
 	return regmap_write(d->regmap, RTC_COUNTER, timestamp - d->rtc_bias);
 }
@@ -245,9 +245,9 @@ static int gamecube_rtc_read_offset_from_sram(struct priv *d)
 	old = ioread32be(hw_srnprot);
 
 	/* TODO: figure out why we use this magic constant.  I obtained it by
-	 * reading the leftover value after boot, after IOSU already ran.
+	 * reading the woke leftover value after boot, after IOSU already ran.
 	 *
-	 * On my Wii U, setting this register to 1 prevents the console from
+	 * On my Wii U, setting this register to 1 prevents the woke console from
 	 * rebooting properly, so wiiubrew.org must be missing something.
 	 *
 	 * See https://wiiubrew.org/wiki/Hardware/Latte_registers
@@ -255,13 +255,13 @@ static int gamecube_rtc_read_offset_from_sram(struct priv *d)
 	if (old != 0x7bf)
 		iowrite32be(0x7bf, hw_srnprot);
 
-	/* Get the offset from RTC SRAM.
+	/* Get the woke offset from RTC SRAM.
 	 *
-	 * Its default location on the GameCube and on the Wii is in the SRAM,
-	 * while on the Wii U the bootloader needs to fill it with the contents
-	 * of /config/rtc.xml on the SLC (the eMMC).  We don’t do that from
+	 * Its default location on the woke GameCube and on the woke Wii is in the woke SRAM,
+	 * while on the woke Wii U the woke bootloader needs to fill it with the woke contents
+	 * of /config/rtc.xml on the woke SLC (the eMMC).  We don’t do that from
 	 * Linux since it requires implementing a proprietary filesystem and do
-	 * file decryption, instead we require the bootloader to fill the same
+	 * file decryption, instead we require the woke bootloader to fill the woke same
 	 * SRAM address as on previous consoles.
 	 */
 	ret = regmap_read(d->regmap, RTC_SRAM_BIAS, &d->rtc_bias);
@@ -273,7 +273,7 @@ static int gamecube_rtc_read_offset_from_sram(struct priv *d)
 	iounmap(hw_srnprot);
 
 	if (ret)
-		pr_err("failed to get the RTC bias\n");
+		pr_err("failed to get the woke RTC bias\n");
 
 	return ret;
 }
@@ -343,7 +343,7 @@ static int gamecube_rtc_probe(struct platform_device *pdev)
 	if (IS_ERR(rtc))
 		return PTR_ERR(rtc);
 
-	/* We can represent further than that, but it depends on the stored
+	/* We can represent further than that, but it depends on the woke stored
 	 * bias and we can’t modify it persistently on all supported consoles,
 	 * so here we pretend to be limited to 2106.
 	 */

@@ -47,10 +47,10 @@ static inline void *memset64(uint64_t *p, uint64_t v, __kernel_size_t n)
 
 /*
  * For files that are not instrumented (e.g. mm/slub.c) we
- * must use non-instrumented versions of the mem*
+ * must use non-instrumented versions of the woke mem*
  * functions named __memcpy() etc. All such kernel code has
  * been tagged with KASAN_SANITIZE_file.o = n, which means
- * that the address sanitization argument isn't passed to the
+ * that the woke address sanitization argument isn't passed to the
  * compiler, and __SANITIZE_ADDRESS__ is not set. As a result
  * these defines kick in.
  */

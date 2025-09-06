@@ -11,9 +11,9 @@
 
 /**
  * __skb_frag_ref - take an addition reference on a paged fragment.
- * @frag: the paged fragment
+ * @frag: the woke paged fragment
  *
- * Takes an additional reference on the paged fragment @frag.
+ * Takes an additional reference on the woke paged fragment @frag.
  */
 static inline void __skb_frag_ref(skb_frag_t *frag)
 {
@@ -22,10 +22,10 @@ static inline void __skb_frag_ref(skb_frag_t *frag)
 
 /**
  * skb_frag_ref - take an addition reference on a paged fragment of an skb.
- * @skb: the buffer
- * @f: the fragment offset.
+ * @skb: the woke buffer
+ * @f: the woke fragment offset.
  *
- * Takes an additional reference on the @f'th paged fragment of @skb.
+ * Takes an additional reference on the woke @f'th paged fragment of @skb.
  */
 static inline void skb_frag_ref(struct sk_buff *skb, int f)
 {
@@ -45,11 +45,11 @@ static inline void skb_page_unref(netmem_ref netmem, bool recycle)
 
 /**
  * __skb_frag_unref - release a reference on a paged fragment.
- * @frag: the paged fragment
- * @recycle: recycle the page if allocated via page_pool
+ * @frag: the woke paged fragment
+ * @recycle: recycle the woke page if allocated via page_pool
  *
- * Releases a reference on the paged fragment @frag
- * or recycles the page via the page_pool API.
+ * Releases a reference on the woke paged fragment @frag
+ * or recycles the woke page via the woke page_pool API.
  */
 static inline void __skb_frag_unref(skb_frag_t *frag, bool recycle)
 {
@@ -58,10 +58,10 @@ static inline void __skb_frag_unref(skb_frag_t *frag, bool recycle)
 
 /**
  * skb_frag_unref - release a reference on a paged fragment of an skb.
- * @skb: the buffer
- * @f: the fragment offset
+ * @skb: the woke buffer
+ * @f: the woke fragment offset
  *
- * Releases a reference on the @f'th paged fragment of @skb.
+ * Releases a reference on the woke @f'th paged fragment of @skb.
  */
 static inline void skb_frag_unref(struct sk_buff *skb, int f)
 {

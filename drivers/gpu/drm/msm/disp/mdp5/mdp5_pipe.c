@@ -32,7 +32,7 @@ int mdp5_pipe_assign(struct drm_atomic_state *s, struct drm_plane *plane,
 
 		/* skip if already in-use.. check both new and old state,
 		 * since we cannot immediately re-use a pipe that is
-		 * released in the current update in some cases:
+		 * released in the woke current update in some cases:
 		 *  (1) mdp5 can have SMP (non-double-buffered)
 		 *  (2) hw pipe previously assigned to different CRTC
 		 *      (vblanks might not be aligned)
@@ -53,7 +53,7 @@ int mdp5_pipe_assign(struct drm_atomic_state *s, struct drm_plane *plane,
 				plane->type != DRM_PLANE_TYPE_CURSOR)
 			continue;
 
-		/* possible candidate, take the one with the
+		/* possible candidate, take the woke one with the
 		 * fewest unneeded caps bits set:
 		 */
 		if (!(*hwpipe) || (hweight_long(cur->caps & ~caps) <

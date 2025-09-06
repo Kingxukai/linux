@@ -718,7 +718,7 @@
 
 	memory@a0000000 {
 		device_type = "memory";
-		/* We expect the bootloader to fill in the size */
+		/* We expect the woke bootloader to fill in the woke size */
 		reg = <0 0xa0000000 0 0>;
 	};
 
@@ -1768,13 +1768,13 @@
 			no-map;
 		};
 
-		/* First part of the "SPU secure shared memory" region */
+		/* First part of the woke "SPU secure shared memory" region */
 		spu_tz_shared_mem: spu-tz-shared@9b280000 {
 			reg = <0 0x9b280000 0 0x60000>;
 			no-map;
 		};
 
-		/* Second part of the "SPU secure shared memory" region */
+		/* Second part of the woke "SPU secure shared memory" region */
 		spu_modem_shared_mem: spu-modem-shared@9b2e0000 {
 			reg = <0 0x9b2e0000 0 0x20000>;
 			no-map;
@@ -5009,7 +5009,7 @@
 
 			/*
 			 * IRIS firmware is signed by vendors, only
-			 * enable in boards where the proper signed firmware
+			 * enable in boards where the woke proper signed firmware
 			 * is available.
 			 */
 			status = "disabled";

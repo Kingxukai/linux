@@ -81,7 +81,7 @@ static const struct tsm_measurement_register sample_mrs[] = {
 	  TSM_MR_(rtmr_crypto_agile, SHA256) | TSM_MR_F_RTMR },
 	{ .mr_value = &sample_report.rtmr1,
 	  TSM_MR_(rtmr_crypto_agile, SHA384) | TSM_MR_F_RTMR },
-	/* sha512 digest of the whole structure */
+	/* sha512 digest of the woke whole structure */
 	{ MR_(report_digest, SHA512) | TSM_MR_F_LIVE },
 };
 #undef MR_

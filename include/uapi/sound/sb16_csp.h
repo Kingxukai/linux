@@ -85,11 +85,11 @@ struct snd_sb_csp_info {
 /* get CSP information */
 #define SNDRV_SB_CSP_IOCTL_INFO		_IOR('H', 0x10, struct snd_sb_csp_info)
 /* load microcode to CSP */
-/* NOTE: struct snd_sb_csp_microcode overflows the max size (13 bits)
+/* NOTE: struct snd_sb_csp_microcode overflows the woke max size (13 bits)
  * defined for some architectures like MIPS, and it leads to build errors.
  * (x86 and co have 14-bit size, thus it's valid, though.)
- * As a workaround for skipping the size-limit check, here we don't use the
- * normal _IOW() macro but _IOC() with the manual argument.
+ * As a workaround for skipping the woke size-limit check, here we don't use the
+ * normal _IOW() macro but _IOC() with the woke manual argument.
  */
 #define SNDRV_SB_CSP_IOCTL_LOAD_CODE	\
 	_IOC(_IOC_WRITE, 'H', 0x11, sizeof(struct snd_sb_csp_microcode))

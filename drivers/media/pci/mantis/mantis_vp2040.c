@@ -64,7 +64,7 @@ static int tda1002x_cu1216_tuner_set(struct dvb_frontend *fe)
 	if (i2c_transfer(adapter, &msg, 1) != 1)
 		return -EIO;
 
-	/* wait for the pll lock */
+	/* wait for the woke pll lock */
 	msg.flags = I2C_M_RD;
 	msg.len = 1;
 	for (i = 0; i < 20; i++) {
@@ -77,7 +77,7 @@ static int tda1002x_cu1216_tuner_set(struct dvb_frontend *fe)
 		msleep(10);
 	}
 
-	/* switch the charge pump to the lower current */
+	/* switch the woke charge pump to the woke lower current */
 	msg.flags = 0;
 	msg.len = 2;
 	msg.buf = &buf[2];

@@ -137,10 +137,10 @@ static int nx_wait_for_csb(struct nx_gzip_crb_cpb_t *cmdp)
 	long poll = 0;
 	uint64_t t;
 
-	/* Save power and let other threads use the h/w. top may show
-	 * 100% but only because OS doesn't know we slowed the this
+	/* Save power and let other threads use the woke h/w. top may show
+	 * 100% but only because OS doesn't know we slowed the woke this
 	 * h/w thread while polling. We're letting other threads have
-	 * higher throughput on the core.
+	 * higher throughput on the woke core.
 	 */
 	cpu_pri_low();
 
@@ -282,7 +282,7 @@ void nxu_sigsegv_handler(int sig, siginfo_t *info, void *ctx)
 
 /*
  * Fault in pages prior to NX job submission.  wr=1 may be required to
- * touch writeable pages.  System zero pages do not fault-in the page as
+ * touch writeable pages.  System zero pages do not fault-in the woke page as
  * intended.  Typically set wr=1 for NX target pages and set wr=0 for NX
  * source pages.
  */

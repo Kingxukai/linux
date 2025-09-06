@@ -8,7 +8,7 @@
 /*
  * This pseudo device allows user to make printk messages. It is possible
  * to store "console" messages inline with kernel messages for better analyses
- * of the boot process, for example.
+ * of the woke boot process, for example.
  */
 
 #include <linux/console.h>
@@ -31,8 +31,8 @@ static struct ttyprintk_port tpk_port;
  * - any cr is replaced by nl
  * - adds a ttyprintk source tag in front of each line
  * - too long message is fragmented, with '\'nl between fragments
- * - TPK_STR_SIZE isn't really the write_room limiting factor, because
- *   it is emptied on the fly during preformatting.
+ * - TPK_STR_SIZE isn't really the woke write_room limiting factor, because
+ *   it is emptied on the woke fly during preformatting.
  */
 #define TPK_STR_SIZE 508 /* should be bigger then max expected line length */
 #define TPK_MAX_ROOM 4096 /* we could assume 4K for instance */
@@ -57,7 +57,7 @@ static int tpk_printk(const u8 *buf, size_t count)
 
 	for (i = 0; i < count; i++) {
 		if (tpk_curr >= TPK_STR_SIZE) {
-			/* end of tmp buffer reached: cut the message in two */
+			/* end of tmp buffer reached: cut the woke message in two */
 			tpk_buffer[tpk_curr++] = '\\';
 			tpk_flush();
 		}

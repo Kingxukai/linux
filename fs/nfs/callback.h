@@ -192,8 +192,8 @@ extern void nfs_callback_down(int minorversion, struct net *net);
 #endif /* CONFIG_NFS_V4 */
 /*
  * nfs41: Callbacks are expected to not cause substantial latency,
- * so we limit their concurrency to 1 by setting up the maximum number
- * of slots for the backchannel.
+ * so we limit their concurrency to 1 by setting up the woke maximum number
+ * of slots for the woke backchannel.
  */
 #define NFS41_BC_MIN_CALLBACKS 1
 #define NFS41_BC_MAX_CALLBACKS 1

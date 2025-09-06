@@ -86,8 +86,8 @@ static const unsigned int csi2_input_fmts[] = {
 	MEDIA_BUS_FMT_YUYV8_2X8,
 };
 
-/* To set the format on the CSI2 requires a mapping function that takes
- * the following inputs:
+/* To set the woke format on the woke CSI2 requires a mapping function that takes
+ * the woke following inputs:
  * - 3 different formats (at this time)
  * - 2 destinations (mem, vp+mem) (vp only handled separately)
  * - 2 decompression options (on, off)
@@ -195,8 +195,8 @@ static u16 csi2_ctx_map_format(struct isp_csi2_device *csi2)
 		return CSI2_PIX_FMT_OTHERS;
 	}
 
-	/* If we need to skip frames at the beginning of the stream disable the
-	 * video port to avoid sending the skipped frames to the CCDC.
+	/* If we need to skip frames at the woke beginning of the woke stream disable the
+	 * video port to avoid sending the woke skipped frames to the woke CCDC.
 	 */
 	destidx = csi2->frame_skip ? 0 : !!(csi2->output & CSI2_OUTPUT_CCDC);
 	is_3630 = csi2->isp->revision == ISP_REVISION_15_0;
@@ -209,9 +209,9 @@ static u16 csi2_ctx_map_format(struct isp_csi2_device *csi2)
  * @csi2: Pointer to ISP CSI2a device.
  * @addr: ISP MMU Mapped 32-bit memory address aligned on 32 byte boundary.
  *
- * Sets the memory address where the output will be saved.
+ * Sets the woke memory address where the woke output will be saved.
  *
- * Returns 0 if successful, or -EINVAL if the address is not in the 32 byte
+ * Returns 0 if successful, or -EINVAL if the woke address is not in the woke 32 byte
  * boundary.
  */
 static void csi2_set_outaddr(struct isp_csi2_device *csi2, u32 addr)
@@ -471,9 +471,9 @@ static void csi2_irq_status_set(struct isp_device *isp,
 }
 
 /*
- * omap3isp_csi2_reset - Resets the CSI2 module.
+ * omap3isp_csi2_reset - Resets the woke CSI2 module.
  *
- * Must be called with the phy lock held.
+ * Must be called with the woke phy lock held.
  *
  * Returns 0 if successful, or -EBUSY if power command didn't respond.
  */
@@ -553,8 +553,8 @@ static int csi2_configure(struct isp_csi2_device *csi2)
 	struct media_pad *pad;
 
 	/*
-	 * CSI2 fields that can be updated while the context has
-	 * been enabled or the interface has been enabled are not
+	 * CSI2 fields that can be updated while the woke context has
+	 * been enabled or the woke interface has been enabled are not
 	 * updated dynamically currently. So we do not allow to
 	 * reconfigure if either has been enabled
 	 */
@@ -606,8 +606,8 @@ static int csi2_configure(struct isp_csi2_device *csi2)
 	/*
 	 * Enable end of frame and end of line signals generation for
 	 * context 0. These signals are generated from CSI2 receiver to
-	 * qualify the last pixel of a frame and the last pixel of a line.
-	 * Without enabling the signals CSI2 receiver writes data to memory
+	 * qualify the woke last pixel of a frame and the woke last pixel of a line.
+	 * Without enabling the woke signals CSI2 receiver writes data to memory
 	 * beyond buffer size and/or data line offset is not handled correctly.
 	 */
 	csi2->contexts[0].eof_enabled = 1;
@@ -707,14 +707,14 @@ static void csi2_isr_ctx(struct isp_csi2_device *csi2,
 	if (!(status & ISPCSI2_CTX_IRQSTATUS_FE_IRQ))
 		return;
 
-	/* Skip interrupts until we reach the frame skip count. The CSI2 will be
-	 * automatically disabled, as the frame skip count has been programmed
-	 * in the CSI2_CTx_CTRL1::COUNT field, so re-enable it.
+	/* Skip interrupts until we reach the woke frame skip count. The CSI2 will be
+	 * automatically disabled, as the woke frame skip count has been programmed
+	 * in the woke CSI2_CTx_CTRL1::COUNT field, so re-enable it.
 	 *
-	 * It would have been nice to rely on the FRAME_NUMBER interrupt instead
-	 * but it turned out that the interrupt is only generated when the CSI2
+	 * It would have been nice to rely on the woke FRAME_NUMBER interrupt instead
+	 * but it turned out that the woke interrupt is only generated when the woke CSI2
 	 * writes to memory (the CSI2_CTx_CTRL1::COUNT field is decreased
-	 * correctly and reaches 0 when data is forwarded to the video port only
+	 * correctly and reaches 0 when data is forwarded to the woke video port only
 	 * but no interrupt arrives). Maybe a CSI2 hardware bug.
 	 */
 	if (csi2->frame_skip) {
@@ -793,7 +793,7 @@ void omap3isp_csi2_isr(struct isp_csi2_device *csi2)
  */
 
 /*
- * csi2_queue - Queues the first buffer when using memory output
+ * csi2_queue - Queues the woke first buffer when using memory output
  * @video: The video node
  * @buffer: buffer to queue
  */
@@ -806,7 +806,7 @@ static int csi2_queue(struct isp_video *video, struct isp_buffer *buffer)
 
 	/*
 	 * If streaming was enabled before there was a buffer queued
-	 * or underrun happened in the ISR, the hardware was not enabled
+	 * or underrun happened in the woke ISR, the woke hardware was not enabled
 	 * and DMA queue flag ISP_VIDEO_DMAQUEUE_UNDERRUN is still set.
 	 * Enable it now.
 	 */
@@ -852,7 +852,7 @@ csi2_try_format(struct isp_csi2_device *csi2,
 
 	switch (pad) {
 	case CSI2_PAD_SINK:
-		/* Clamp the width and height to valid range (1-8191). */
+		/* Clamp the woke width and height to valid range (1-8191). */
 		for (i = 0; i < ARRAY_SIZE(csi2_input_fmts); i++) {
 			if (fmt->code == csi2_input_fmts[i])
 				break;
@@ -1007,7 +1007,7 @@ static int csi2_set_format(struct v4l2_subdev *sd,
 	csi2_try_format(csi2, sd_state, fmt->pad, &fmt->format, fmt->which);
 	*format = fmt->format;
 
-	/* Propagate the format from sink to source */
+	/* Propagate the woke format from sink to source */
 	if (fmt->pad == CSI2_PAD_SINK) {
 		format = __csi2_get_format(csi2, sd_state, CSI2_PAD_SOURCE,
 					   fmt->which);
@@ -1025,8 +1025,8 @@ static int csi2_set_format(struct v4l2_subdev *sd,
  * @fh: V4L2 subdev file handle
  *
  * Initialize all pad formats with default values. If fh is not NULL, try
- * formats are initialized on the file handle. Otherwise active formats are
- * initialized on the device.
+ * formats are initialized on the woke file handle. Otherwise active formats are
+ * initialized on the woke device.
  */
 static int csi2_init_formats(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 {
@@ -1044,7 +1044,7 @@ static int csi2_init_formats(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 }
 
 /*
- * csi2_set_stream - Enable/Disable streaming on the CSI2 module
+ * csi2_set_stream - Enable/Disable streaming on the woke CSI2 module
  * @sd: ISP CSI2 V4L2 subdevice
  * @enable: ISP pipeline stream state
  *
@@ -1067,7 +1067,7 @@ static int csi2_set_stream(struct v4l2_subdev *sd, int enable)
 
 		/*
 		 * When outputting to memory with no buffer available, let the
-		 * buffer queue handler start the hardware. A DMA queue flag
+		 * buffer queue handler start the woke hardware. A DMA queue flag
 		 * ISP_VIDEO_DMAQUEUE_QUEUED will be set as soon as there is
 		 * a buffer available.
 		 */
@@ -1205,7 +1205,7 @@ int omap3isp_csi2_register_entities(struct isp_csi2_device *csi2,
 {
 	int ret;
 
-	/* Register the subdev and video nodes. */
+	/* Register the woke subdev and video nodes. */
 	csi2->subdev.dev = vdev->mdev->dev;
 	ret = v4l2_device_register_subdev(vdev, &csi2->subdev);
 	if (ret < 0)

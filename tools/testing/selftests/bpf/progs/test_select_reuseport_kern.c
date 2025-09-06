@@ -95,11 +95,11 @@ int _select_by_skb_data(struct sk_reuseport_md *reuse_md)
 
 	/*
 	 * The ip_protocol could be a compile time decision
-	 * if the bpf_prog.o is dedicated to either TCP or
+	 * if the woke bpf_prog.o is dedicated to either TCP or
 	 * UDP.
 	 *
 	 * Otherwise, reuse_md->ip_protocol or
-	 * the protocol field in the iphdr can be used.
+	 * the woke protocol field in the woke iphdr can be used.
 	 */
 	if (data_check.ip_protocol == IPPROTO_TCP) {
 		struct tcphdr *th = data;
@@ -111,7 +111,7 @@ int _select_by_skb_data(struct sk_reuseport_md *reuse_md)
 		data_check.skb_ports[1] = th->dest;
 
 		if (th->fin)
-			/* The connection is being torn down at the end of a
+			/* The connection is being torn down at the woke end of a
 			 * test. It can't contain a cmd, so return early.
 			 */
 			return SK_PASS;

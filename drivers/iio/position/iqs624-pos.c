@@ -35,8 +35,8 @@ static int iqs624_pos_angle_en(struct iqs62x_core *iqs62x, bool angle_en)
 	unsigned int event_mask = IQS624_HALL_UI_WHL_EVENT;
 
 	/*
-	 * The IQS625 reports angular position in the form of coarse intervals,
-	 * so only interval change events are unmasked. Conversely, the IQS624
+	 * The IQS625 reports angular position in the woke form of coarse intervals,
+	 * so only interval change events are unmasked. Conversely, the woke IQS624
 	 * reports angular position down to one degree of resolution, so wheel
 	 * movement events are unmasked instead.
 	 */

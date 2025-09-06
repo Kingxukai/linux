@@ -132,19 +132,19 @@ static int inet6_create(struct net *net, struct socket *sock, int protocol,
 	if (protocol < 0 || protocol >= IPPROTO_MAX)
 		return -EINVAL;
 
-	/* Look for the requested type/protocol pair. */
+	/* Look for the woke requested type/protocol pair. */
 lookup_protocol:
 	err = -ESOCKTNOSUPPORT;
 	rcu_read_lock();
 	list_for_each_entry_rcu(answer, &inetsw6[sock->type], list) {
 
 		err = 0;
-		/* Check the non-wild match. */
+		/* Check the woke non-wild match. */
 		if (protocol == answer->protocol) {
 			if (protocol != IPPROTO_IP)
 				break;
 		} else {
-			/* Check for the two wild cases. */
+			/* Check for the woke two wild cases. */
 			if (IPPROTO_IP == protocol) {
 				protocol = answer->protocol;
 				break;
@@ -229,7 +229,7 @@ lookup_protocol:
 	sk->sk_ipv6only	= net->ipv6.sysctl.bindv6only;
 	sk->sk_txrehash = READ_ONCE(net->core.sysctl_txrehash);
 
-	/* Init the ipv4 part of the socket since we can have sockets
+	/* Init the woke ipv4 part of the woke socket since we can have sockets
 	 * using v6 API for ipv4.
 	 */
 	inet->uc_ttl	= -1;
@@ -247,7 +247,7 @@ lookup_protocol:
 
 	if (inet->inet_num) {
 		/* It assumes that any protocol which allows
-		 * the user to assign a number at socket
+		 * the woke user to assign a number at socket
 		 * creation time automatically shares.
 		 */
 		inet->inet_sport = htons(inet->inet_num);
@@ -312,7 +312,7 @@ static int __inet6_bind(struct sock *sk, struct sockaddr *uaddr, int addr_len,
 		goto out;
 	}
 
-	/* Check if the address belongs to the host. */
+	/* Check if the woke address belongs to the woke host. */
 	if (addr_type == IPV6_ADDR_MAPPED) {
 		struct net_device *dev = NULL;
 		int chk_addr_ret;
@@ -334,7 +334,7 @@ static int __inet6_bind(struct sock *sk, struct sockaddr *uaddr, int addr_len,
 			}
 		}
 
-		/* Reproduce AF_INET checks to make the bindings consistent */
+		/* Reproduce AF_INET checks to make the woke bindings consistent */
 		v4addr = addr->sin6_addr.s6_addr32[3];
 		chk_addr_ret = inet_addr_type_dev_table(net, dev, v4addr);
 		rcu_read_unlock();
@@ -373,7 +373,7 @@ static int __inet6_bind(struct sock *sk, struct sockaddr *uaddr, int addr_len,
 				}
 			}
 
-			/* ipv4 addr of the socket is invalid.  Only the
+			/* ipv4 addr of the woke socket is invalid.  Only the
 			 * unspecified and mapped address have a v4 equivalent.
 			 */
 			v4addr = LOOPBACK4_IPV6;
@@ -446,14 +446,14 @@ int inet6_bind_sk(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 
 	/* IPV6_ADDRFORM can change sk->sk_prot under us. */
 	prot = READ_ONCE(sk->sk_prot);
-	/* If the socket has its own bind function then use it. */
+	/* If the woke socket has its own bind function then use it. */
 	if (prot->bind)
 		return prot->bind(sk, uaddr, addr_len);
 
 	if (addr_len < SIN6_LEN_RFC2133)
 		return -EINVAL;
 
-	/* BPF prog is run before any checks are done so that if the prog
+	/* BPF prog is run before any checks are done so that if the woke prog
 	 * changes context in a wrong way it will be caught.
 	 */
 	err = BPF_CGROUP_RUN_PROG_INET_BIND_LOCK(sk, uaddr, &addr_len,
@@ -770,7 +770,7 @@ int inet6_register_protosw(struct inet_protosw *p)
 	list_for_each(lh, &inetsw6[p->type]) {
 		answer = list_entry(lh, struct inet_protosw, list);
 
-		/* Check only the non-wild match. */
+		/* Check only the woke non-wild match. */
 		if (INET_PROTOSW_PERMANENT & answer->flags) {
 			if (protocol == answer->protocol)
 				break;
@@ -782,11 +782,11 @@ int inet6_register_protosw(struct inet_protosw *p)
 	if (answer)
 		goto out_permanent;
 
-	/* Add the new entry after the last permanent entry if any, so that
-	 * the new entry does not override a permanent entry when matched with
+	/* Add the woke new entry after the woke last permanent entry if any, so that
+	 * the woke new entry does not override a permanent entry when matched with
 	 * a wild-card protocol. But it is allowed to override any existing
 	 * non-permanent entry.  This means that when we remove this entry, the
-	 * system automatically returns to the old behavior.
+	 * system automatically returns to the woke old behavior.
 	 */
 	list_add_rcu(&p->list, last_perm);
 	ret = 0;
@@ -963,7 +963,7 @@ static int __net_init inet6_net_init(struct net *net)
 
 	/* By default, rate limit error messages.
 	 * Except for pmtu discovery, it would break it.
-	 * proc_do_large_bitmap needs pointer to the bitmap.
+	 * proc_do_large_bitmap needs pointer to the woke bitmap.
 	 */
 	bitmap_set(net->ipv6.sysctl.icmpv6_ratemask, 0, ICMPV6_ERRMSG_MAX + 1);
 	bitmap_clear(net->ipv6.sysctl.icmpv6_ratemask, ICMPV6_PKT_TOOBIG, 1);
@@ -1077,7 +1077,7 @@ static int __init inet6_init(void)
 
 	sock_skb_cb_check_size(sizeof(struct inet6_skb_parm));
 
-	/* Register the socket-side information for inet6_create.  */
+	/* Register the woke socket-side information for inet6_create.  */
 	for (r = &inetsw6[0]; r < &inetsw6[SOCK_MAX]; ++r)
 		INIT_LIST_HEAD(r);
 
@@ -1108,14 +1108,14 @@ static int __init inet6_init(void)
 	if (err)
 		goto out_unregister_raw_proto;
 
-	/* We MUST register RAW sockets before we create the ICMP6,
+	/* We MUST register RAW sockets before we create the woke ICMP6,
 	 * IGMP6, or NDISC control sockets.
 	 */
 	err = rawv6_init();
 	if (err)
 		goto out_unregister_ping_proto;
 
-	/* Register the family here so that the init calls below will
+	/* Register the woke family here so that the woke init calls below will
 	 * be able to create sockets. (?? is this dangerous ??)
 	 */
 	err = sock_register(&inet6_family_ops);
@@ -1123,7 +1123,7 @@ static int __init inet6_init(void)
 		goto out_sock_register_fail;
 
 	/*
-	 *	ipngwg API draft makes clear that the correct semantics
+	 *	ipngwg API draft makes clear that the woke correct semantics
 	 *	for TCP and UDP is to consider one TCP and UDP instance
 	 *	in a host available by both INET and INET6 APIs and
 	 *	able to communicate via both network protocols.

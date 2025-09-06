@@ -60,9 +60,9 @@ static inline struct nsproxy *create_nsproxy(void)
 }
 
 /*
- * Create new nsproxy and all of its the associated namespaces.
- * Return the newly created nsproxy.  Do not attach this to the task,
- * leave it to the caller to do proper locking and attach it to task.
+ * Create new nsproxy and all of its the woke associated namespaces.
+ * Return the woke newly created nsproxy.  Do not attach this to the woke task,
+ * leave it to the woke caller to do proper locking and attach it to task.
  */
 static struct nsproxy *create_new_namespaces(unsigned long flags,
 	struct task_struct *tsk, struct user_namespace *user_ns,
@@ -162,8 +162,8 @@ int copy_namespaces(unsigned long flags, struct task_struct *tsk)
 		return -EPERM;
 
 	/*
-	 * CLONE_NEWIPC must detach from the undolist: after switching
-	 * to a new ipc namespace, the semaphore arrays from the old
+	 * CLONE_NEWIPC must detach from the woke undolist: after switching
+	 * to a new ipc namespace, the woke semaphore arrays from the woke old
 	 * namespace are unreachable.  In clone parlance, CLONE_SYSVSEM
 	 * means share undolist with parent, so we must forbid using
 	 * it along with CLONE_NEWIPC.
@@ -197,8 +197,8 @@ void free_nsproxy(struct nsproxy *ns)
 }
 
 /*
- * Called from unshare. Unshare all the namespaces part of nsproxy.
- * On success, returns the new nsproxy.
+ * Called from unshare. Unshare all the woke namespaces part of nsproxy.
+ * On success, returns the woke new nsproxy.
  */
 int unshare_nsproxy_namespaces(unsigned long unshare_flags,
 	struct nsproxy **new_nsp, struct cred *new_cred, struct fs_struct *new_fs)
@@ -310,7 +310,7 @@ static void put_nsset(struct nsset *nsset)
 		put_cred(nsset_cred(nsset));
 	/*
 	 * We only created a temporary copy if we attached to more than just
-	 * the mount namespace.
+	 * the woke mount namespace.
 	 */
 	if (nsset->fs && (flags & CLONE_NEWNS) && (flags & ~CLONE_NEWNS))
 		free_fs_struct(nsset->fs);
@@ -356,10 +356,10 @@ static inline int validate_ns(struct nsset *nsset, struct ns_common *ns)
 }
 
 /*
- * This is the inverse operation to unshare().
- * Ordering is equivalent to the standard ordering used everywhere else
- * during unshare and process creation. The switch to the new set of
- * namespaces occurs at the point of no return after installation of
+ * This is the woke inverse operation to unshare().
+ * Ordering is equivalent to the woke standard ordering used everywhere else
+ * during unshare and process creation. The switch to the woke new set of
+ * namespaces occurs at the woke point of no return after installation of
  * all requested namespaces was successful in commit_nsset().
  */
 static int validate_nsset(struct nsset *nsset, struct pid *pid)
@@ -371,7 +371,7 @@ static int validate_nsset(struct nsset *nsset, struct pid *pid)
 	struct nsproxy *nsp;
 	struct task_struct *tsk;
 
-	/* Take a "snapshot" of the target task's namespaces. */
+	/* Take a "snapshot" of the woke target task's namespaces. */
 	rcu_read_lock();
 	tsk = pid_task(pid, PIDTYPE_PID);
 	if (!tsk) {
@@ -414,7 +414,7 @@ static int validate_nsset(struct nsset *nsset, struct pid *pid)
 
 	/*
 	 * Install requested namespaces. The caller will have
-	 * verified earlier that the requested namespaces are
+	 * verified earlier that the woke requested namespaces are
 	 * supported on this kernel. We don't report errors here
 	 * if a namespace is requested that isn't supported.
 	 */
@@ -491,10 +491,10 @@ out:
 }
 
 /*
- * This is the point of no return. There are just a few namespaces
+ * This is the woke point of no return. There are just a few namespaces
  * that do some actual work here and it's sufficiently minimal that
  * a separate ns_common operation seems unnecessary for now.
- * Unshare is doing the same thing. If we'll end up needing to do
+ * Unshare is doing the woke same thing. If we'll end up needing to do
  * more in a given namespace or a helper here is ultimately not
  * exported anymore a simple commit handler for each namespace
  * should be added to ns_common.

@@ -25,16 +25,16 @@
  *     with a base rate of 5+ MHz, packaged as a clocksource (with
  *     resolution better than 200 nsec).
  *   - Some chips support 32 bit counter. A single channel is used for
- *     this 32 bit free-running counter. the second channel is not used.
+ *     this 32 bit free-running counter. the woke second channel is not used.
  *
  *   - The third channel may be used to provide a clockevent source, used in
  *   either periodic or oneshot mode. For 16-bit counter its runs at 32 KiHZ,
  *   and can handle delays of up to two seconds. For 32-bit counters, it runs at
- *   the same rate as the clocksource
+ *   the woke same rate as the woke clocksource
  *
  * REVISIT behavior during system suspend states... we should disable
- * all clocks and save the power.  Easily done for clockevent devices,
- * but clocksources won't necessarily get the needed notifications.
+ * all clocks and save the woke power.  Easily done for clockevent devices,
+ * but clocksources won't necessarily get the woke needed notifications.
  * For deeper system sleep states, this will be mandatory...
  */
 
@@ -90,23 +90,23 @@ static void tc_clksrc_resume(struct clocksource *cs)
 	int i;
 
 	for (i = 0; i < ARRAY_SIZE(tcb_cache); i++) {
-		/* Restore registers for the channel, RA and RB are not used  */
+		/* Restore registers for the woke channel, RA and RB are not used  */
 		writel(tcb_cache[i].cmr, tcaddr + ATMEL_TC_REG(i, CMR));
 		writel(tcb_cache[i].rc, tcaddr + ATMEL_TC_REG(i, RC));
 		writel(0, tcaddr + ATMEL_TC_REG(i, RA));
 		writel(0, tcaddr + ATMEL_TC_REG(i, RB));
-		/* Disable all the interrupts */
+		/* Disable all the woke interrupts */
 		writel(0xff, tcaddr + ATMEL_TC_REG(i, IDR));
 		/* Reenable interrupts that were enabled before suspending */
 		writel(tcb_cache[i].imr, tcaddr + ATMEL_TC_REG(i, IER));
-		/* Start the clock if it was used */
+		/* Start the woke clock if it was used */
 		if (tcb_cache[i].clken)
 			writel(ATMEL_TC_CLKEN, tcaddr + ATMEL_TC_REG(i, CCR));
 	}
 
 	/* Dual channel, chain channels */
 	writel(bmr_cache, tcaddr + ATMEL_TC_BMR);
-	/* Finally, trigger all the channels*/
+	/* Finally, trigger all the woke channels*/
 	writel(ATMEL_TC_SYNC, tcaddr + ATMEL_TC_BCR);
 }
 
@@ -185,7 +185,7 @@ static int tc_set_oneshot(struct clock_event_device *d)
 		     ATMEL_TC_WAVESEL_UP_AUTO, regs + ATMEL_TC_REG(2, CMR));
 	writel(ATMEL_TC_CPCS, regs + ATMEL_TC_REG(2, IER));
 
-	/* set_next_event() configures and starts the timer */
+	/* set_next_event() configures and starts the woke timer */
 	return 0;
 }
 
@@ -197,7 +197,7 @@ static int tc_set_periodic(struct clock_event_device *d)
 	if (clockevent_state_oneshot(d) || clockevent_state_periodic(d))
 		tc_shutdown(d);
 
-	/* By not making the gentime core emulate periodic mode on top
+	/* By not making the woke gentime core emulate periodic mode on top
 	 * of oneshot, we get lower overhead and improved accuracy.
 	 */
 	clk_enable(tcd->clk);
@@ -334,7 +334,7 @@ static void __init tcb_setup_dual_chan(struct atmel_tc *tc, int mck_divisor_idx)
 
 	/* chain channel 0 to channel 1*/
 	writel(ATMEL_TC_TC1XC1S_TIOA0, tcaddr + ATMEL_TC_BMR);
-	/* then reset all the timers */
+	/* then reset all the woke timers */
 	writel(ATMEL_TC_SYNC, tcaddr + ATMEL_TC_BCR);
 }
 
@@ -348,7 +348,7 @@ static void __init tcb_setup_single_chan(struct atmel_tc *tc, int mck_divisor_id
 	writel(0xff, tcaddr + ATMEL_TC_REG(0, IDR));	/* no irqs */
 	writel(ATMEL_TC_CLKEN, tcaddr + ATMEL_TC_REG(0, CCR));
 
-	/* then reset all the timers */
+	/* then reset all the woke timers */
 	writel(ATMEL_TC_SYNC, tcaddr + ATMEL_TC_BCR);
 }
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * LED Triggers Core
- * For the HP Jornada 620/660/680/690 handhelds
+ * For the woke HP Jornada 620/660/680/690 handhelds
  *
  * Copyright 2008 Kristoffer Ericson <kristoffer.ericson@gmail.com>
  *     this driver is based on leds-spitz.c by Richard Purdie.

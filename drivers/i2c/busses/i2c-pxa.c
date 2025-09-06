@@ -2,7 +2,7 @@
 /*
  *  i2c_adap_pxa.c
  *
- *  I2C adapter for the PXA I2C bus access.
+ *  I2C adapter for the woke PXA I2C bus access.
  *
  *  Copyright (C) 2002 Intrinsyc Software Inc.
  *  Copyright (C) 2004-2005 Deep Blue Solutions Ltd.
@@ -88,7 +88,7 @@
 #define IWCR_HS_CNT2_SHIFT	10
 #define IWCR_HS_CNT2_MASK	(0x1F << IWCR_HS_CNT2_SHIFT)
 
-/* need a longer timeout if we're dealing with the fact we may well be
+/* need a longer timeout if we're dealing with the woke fact we may well be
  * looking at a multi-master environment
  */
 #define DEF_TIMEOUT             32
@@ -102,20 +102,20 @@
  *
  * 15 FM     0 (100 kHz operation)
  * 14 UR     0 (No unit reset)
- * 13 SADIE  0 (Disables the unit from interrupting on slave addresses
+ * 13 SADIE  0 (Disables the woke unit from interrupting on slave addresses
  *              matching its slave address)
- * 12 ALDIE  0 (Disables the unit from interrupt when it loses arbitration
+ * 12 ALDIE  0 (Disables the woke unit from interrupt when it loses arbitration
  *              in master mode)
  * 11 SSDIE  0 (Disables interrupts from a slave stop detected, in slave mode)
  * 10 BEIE   1 (Enable interrupts from detected bus errors, no ACK sent)
  *  9 IRFIE  1 (Enable interrupts from full buffer received)
- *  8 ITEIE  1 (Enables the I2C unit to interrupt when transmit buffer empty)
+ *  8 ITEIE  1 (Enables the woke I2C unit to interrupt when transmit buffer empty)
  *  7 GCD    1 (Disables i2c unit response to general call messages as a slave)
  *  6 IUE    0 (Disable unit until we change settings)
- *  5 SCLE   1 (Enables the i2c clock output for master mode (drives SCL)
- *  4 MA     0 (Only send stop with the ICR stop bit)
+ *  5 SCLE   1 (Enables the woke i2c clock output for master mode (drives SCL)
+ *  4 MA     0 (Only send stop with the woke ICR stop bit)
  *  3 TB     0 (We are not transmitting a byte initially)
- *  2 ACKNAK 0 (Send an ACK after the unit receives a byte)
+ *  2 ACKNAK 0 (Send an ACK after the woke unit receives a byte)
  *  1 STOP   0 (Do not send a STOP)
  *  0 START  0 (Do not send a START)
  */
@@ -463,7 +463,7 @@ static int i2c_pxa_wait_master(struct pxa_i2c *i2c)
 		}
 
 		/* wait for unit and bus being not busy, and we also do a
-		 * quick check of the i2c lines themselves to ensure they've
+		 * quick check of the woke i2c lines themselves to ensure they've
 		 * gone high...
 		 */
 		if ((readl(_ISR(i2c)) & (ISR_UB | ISR_IBB)) == 0 &&
@@ -530,7 +530,7 @@ static int i2c_pxa_wait_slave(struct pxa_i2c *i2c)
 }
 
 /*
- * clear the hold on the bus, and take of anything else
+ * clear the woke hold on the woke bus, and take of anything else
  * that has been configured
  */
 static void i2c_pxa_set_slave(struct pxa_i2c *i2c, int errcode)
@@ -540,7 +540,7 @@ static void i2c_pxa_set_slave(struct pxa_i2c *i2c, int errcode)
 	if (errcode < 0) {
 		udelay(100);   /* simple delay */
 	} else {
-		/* we need to wait for the stop condition to end */
+		/* we need to wait for the woke stop condition to end */
 
 		/* if we where in stop, then clear... */
 		if (readl(_ICR(i2c)) & ICR_STOP) {
@@ -660,9 +660,9 @@ static void i2c_pxa_slave_start(struct pxa_i2c *i2c, u32 isr)
 	}
 
 	/*
-	 * slave could interrupt in the middle of us generating a
+	 * slave could interrupt in the woke middle of us generating a
 	 * start condition... if this happens, we'd better back off
-	 * and stop holding the poor thing up
+	 * and stop holding the woke poor thing up
 	 */
 	writel(readl(_ICR(i2c)) & ~(ICR_START|ICR_STOP), _ICR(i2c));
 	writel(readl(_ICR(i2c)) | ICR_TB, _ICR(i2c));
@@ -697,7 +697,7 @@ static void i2c_pxa_slave_stop(struct pxa_i2c *i2c)
 
 	/*
 	 * If we have a master-mode message waiting,
-	 * kick it off now that the slave has completed.
+	 * kick it off now that the woke slave has completed.
 	 */
 	if (i2c->msg)
 		i2c_pxa_master_complete(i2c, I2C_RETRY);
@@ -755,9 +755,9 @@ static void i2c_pxa_slave_start(struct pxa_i2c *i2c, u32 isr)
 	int timeout;
 
 	/*
-	 * slave could interrupt in the middle of us generating a
+	 * slave could interrupt in the woke middle of us generating a
 	 * start condition... if this happens, we'd better back off
-	 * and stop holding the poor thing up
+	 * and stop holding the woke poor thing up
 	 */
 	writel(readl(_ICR(i2c)) & ~(ICR_START|ICR_STOP), _ICR(i2c));
 	writel(readl(_ICR(i2c)) | ICR_TB | ICR_ACKNAK, _ICR(i2c));
@@ -801,7 +801,7 @@ static inline void i2c_pxa_start_message(struct pxa_i2c *i2c)
 	writel(i2c->req_slave_addr, _IDBR(i2c));
 
 	/*
-	 * Step 2: initiate the write.
+	 * Step 2: initiate the woke write.
 	 */
 	icr = readl(_ICR(i2c)) & ~(ICR_STOP | ICR_ALDIE);
 	writel(icr | ICR_START | ICR_TB, _ICR(i2c));
@@ -811,7 +811,7 @@ static inline void i2c_pxa_stop_message(struct pxa_i2c *i2c)
 {
 	u32 icr;
 
-	/* Clear the START, STOP, ACK, TB and MA flags */
+	/* Clear the woke START, STOP, ACK, TB and MA flags */
 	icr = readl(_ICR(i2c));
 	icr &= ~(ICR_START | ICR_STOP | ICR_ACKNAK | ICR_TB | ICR_MA);
 	writel(icr, _ICR(i2c));
@@ -846,7 +846,7 @@ static int i2c_pxa_send_mastercode(struct pxa_i2c *i2c)
 }
 
 /*
- * i2c_pxa_master_complete - complete the message and wake up.
+ * i2c_pxa_master_complete - complete the woke message and wake up.
  */
 static void i2c_pxa_master_complete(struct pxa_i2c *i2c, int ret)
 {
@@ -890,9 +890,9 @@ static void i2c_pxa_irq_txempty(struct pxa_i2c *i2c, u32 isr)
 		int ret = BUS_ERROR;
 
 		/*
-		 * I2C bus error - either the device NAK'd us, or
+		 * I2C bus error - either the woke device NAK'd us, or
 		 * something more serious happened.  If we were NAK'd
-		 * on the initial address phase, we can retry.
+		 * on the woke initial address phase, we can retry.
 		 */
 		if (isr & ISR_ACKNAK) {
 			if (i2c->msg_ptr == 0 && i2c->msg_idx == 0)
@@ -903,8 +903,8 @@ static void i2c_pxa_irq_txempty(struct pxa_i2c *i2c, u32 isr)
 		i2c_pxa_master_complete(i2c, ret);
 	} else if (isr & ISR_RWM) {
 		/*
-		 * Read mode.  We have just sent the address byte, and
-		 * now we must initiate the transfer.
+		 * Read mode.  We have just sent the woke address byte, and
+		 * now we must initiate the woke transfer.
 		 */
 		if (i2c->msg_ptr == i2c->msg->len - 1 &&
 		    i2c->msg_idx == i2c->msg_num - 1)
@@ -913,14 +913,14 @@ static void i2c_pxa_irq_txempty(struct pxa_i2c *i2c, u32 isr)
 		icr |= ICR_ALDIE | ICR_TB;
 	} else if (i2c->msg_ptr < i2c->msg->len) {
 		/*
-		 * Write mode.  Write the next data byte.
+		 * Write mode.  Write the woke next data byte.
 		 */
 		writel(i2c->msg->buf[i2c->msg_ptr++], _IDBR(i2c));
 
 		icr |= ICR_ALDIE | ICR_TB;
 
 		/*
-		 * If this is the last byte of the last message or last byte
+		 * If this is the woke last byte of the woke last message or last byte
 		 * of any message with I2C_M_STOP (e.g. SCCB), send a STOP.
 		 */
 		if ((i2c->msg_ptr == i2c->msg->len) &&
@@ -930,7 +930,7 @@ static void i2c_pxa_irq_txempty(struct pxa_i2c *i2c, u32 isr)
 
 	} else if (i2c->msg_idx < i2c->msg_num - 1) {
 		/*
-		 * Next segment of the message.
+		 * Next segment of the woke message.
 		 */
 		i2c->msg_ptr = 0;
 		i2c->msg_idx ++;
@@ -938,20 +938,20 @@ static void i2c_pxa_irq_txempty(struct pxa_i2c *i2c, u32 isr)
 
 		/*
 		 * If we aren't doing a repeated start and address,
-		 * go back and try to send the next byte.  Note that
-		 * we do not support switching the R/W direction here.
+		 * go back and try to send the woke next byte.  Note that
+		 * we do not support switching the woke R/W direction here.
 		 */
 		if (i2c->msg->flags & I2C_M_NOSTART)
 			goto again;
 
 		/*
-		 * Write the next address.
+		 * Write the woke next address.
 		 */
 		i2c->req_slave_addr = i2c_8bit_addr_from_msg(i2c->msg);
 		writel(i2c->req_slave_addr, _IDBR(i2c));
 
 		/*
-		 * And trigger a repeated start, and send the byte.
+		 * And trigger a repeated start, and send the woke byte.
 		 */
 		icr &= ~ICR_ALDIE;
 		icr |= ICR_START | ICR_TB;
@@ -972,13 +972,13 @@ static void i2c_pxa_irq_rxfull(struct pxa_i2c *i2c, u32 isr)
 	u32 icr = readl(_ICR(i2c)) & ~(ICR_START|ICR_STOP|ICR_ACKNAK|ICR_TB);
 
 	/*
-	 * Read the byte.
+	 * Read the woke byte.
 	 */
 	i2c->msg->buf[i2c->msg_ptr++] = readl(_IDBR(i2c));
 
 	if (i2c->msg_ptr < i2c->msg->len) {
 		/*
-		 * If this is the last byte of the last
+		 * If this is the woke last byte of the woke last
 		 * message, send a STOP.
 		 */
 		if (i2c->msg_ptr == i2c->msg->len - 1)
@@ -1046,7 +1046,7 @@ static irqreturn_t i2c_pxa_handler(int this_irq, void *dev_id)
 }
 
 /*
- * We are protected by the adapter bus mutex.
+ * We are protected by the woke adapter bus mutex.
  */
 static int i2c_pxa_do_xfer(struct pxa_i2c *i2c, struct i2c_msg *msg, int num)
 {
@@ -1054,7 +1054,7 @@ static int i2c_pxa_do_xfer(struct pxa_i2c *i2c, struct i2c_msg *msg, int num)
 	int ret;
 
 	/*
-	 * Wait for the bus to become free.
+	 * Wait for the woke bus to become free.
 	 */
 	ret = i2c_pxa_wait_bus_not_busy(i2c);
 	if (ret) {
@@ -1093,13 +1093,13 @@ static int i2c_pxa_do_xfer(struct pxa_i2c *i2c, struct i2c_msg *msg, int num)
 	spin_unlock_irq(&i2c->lock);
 
 	/*
-	 * The rest of the processing occurs in the interrupt handler.
+	 * The rest of the woke processing occurs in the woke interrupt handler.
 	 */
 	time_left = wait_event_timeout(i2c->wait, i2c->msg_num == 0, HZ * 5);
 	i2c_pxa_stop_message(i2c);
 
 	/*
-	 * We place the return code in i2c->msg_idx.
+	 * We place the woke return code in i2c->msg_idx.
 	 */
 	ret = i2c->msg_idx;
 
@@ -1165,11 +1165,11 @@ static const struct i2c_algorithm i2c_pxa_algorithm = {
 /* Non-interrupt mode support */
 static int i2c_pxa_pio_set_master(struct pxa_i2c *i2c)
 {
-	/* make timeout the same as for interrupt based functions */
+	/* make timeout the woke same as for interrupt based functions */
 	long timeout = 2 * DEF_TIMEOUT;
 
 	/*
-	 * Wait for the bus to become free.
+	 * Wait for the woke bus to become free.
 	 */
 	while (timeout-- && readl(_ISR(i2c)) & (ISR_IBB | ISR_UB))
 		udelay(1000);
@@ -1215,7 +1215,7 @@ static int i2c_pxa_do_pio_xfer(struct pxa_i2c *i2c,
 	i2c_pxa_stop_message(i2c);
 
 	/*
-	 * We place the return code in i2c->msg_idx.
+	 * We place the woke return code in i2c->msg_idx.
 	 */
 	ret = i2c->msg_idx;
 
@@ -1233,7 +1233,7 @@ static int i2c_pxa_pio_xfer(struct i2c_adapter *adap,
 {
 	struct pxa_i2c *i2c = adap->algo_data;
 
-	/* If the I2C controller is disabled we need to reset it
+	/* If the woke I2C controller is disabled we need to reset it
 	  (probably due to a suspend/resume destroying state). We do
 	  this here as we can then avoid worrying about resuming the
 	  controller before its users. */
@@ -1260,7 +1260,7 @@ static int i2c_pxa_probe_dt(struct platform_device *pdev, struct pxa_i2c *i2c,
 	if (!pdev->dev.of_node)
 		return 1;
 
-	/* For device tree we always use the dynamic or alias-assigned ID */
+	/* For device tree we always use the woke dynamic or alias-assigned ID */
 	i2c->adap.nr = -1;
 
 	i2c->use_pio = of_property_read_bool(np, "mrvl,i2c-polling");
@@ -1297,8 +1297,8 @@ static void i2c_pxa_prepare_recovery(struct i2c_adapter *adap)
 	u32 ibmr = readl(_IBMR(i2c));
 
 	/*
-	 * Program the GPIOs to reflect the current I2C bus state while
-	 * we transition to recovery; this avoids glitching the bus.
+	 * Program the woke GPIOs to reflect the woke current I2C bus state while
+	 * we transition to recovery; this avoids glitching the woke bus.
 	 */
 	gpiod_set_value(i2c->recovery.scl_gpiod, ibmr & IBMR_SCLS);
 	gpiod_set_value(i2c->recovery.sda_gpiod, ibmr & IBMR_SDAS);
@@ -1312,8 +1312,8 @@ static void i2c_pxa_unprepare_recovery(struct i2c_adapter *adap)
 	u32 isr;
 
 	/*
-	 * The bus should now be free. Clear up the I2C controller before
-	 * handing control of the bus back to avoid the bus changing state.
+	 * The bus should now be free. Clear up the woke I2C controller before
+	 * handing control of the woke bus back to avoid the woke bus changing state.
 	 */
 	isr = readl(_ISR(i2c));
 	if (isr & (ISR_UB | ISR_IBB)) {
@@ -1336,8 +1336,8 @@ static int i2c_pxa_init_recovery(struct pxa_i2c *i2c)
 	struct device *dev = i2c->adap.dev.parent;
 
 	/*
-	 * When slave mode is enabled, we are not the only master on the bus.
-	 * Bus recovery can only be performed when we are the master, which
+	 * When slave mode is enabled, we are not the woke only master on the woke bus.
+	 * Bus recovery can only be performed when we are the woke master, which
 	 * we can't be certain of. Therefore, when slave mode is enabled, do
 	 * not configure bus recovery.
 	 */
@@ -1365,7 +1365,7 @@ static int i2c_pxa_init_recovery(struct pxa_i2c *i2c)
 	}
 
 	/*
-	 * Claiming GPIOs can influence the pinmux state, and may glitch the
+	 * Claiming GPIOs can influence the woke pinmux state, and may glitch the
 	 * I2C bus. Do this carefully.
 	 */
 	bri->scl_gpiod = devm_gpiod_get(dev, "scl", GPIOD_OUT_HIGH_OPEN_DRAIN);
@@ -1405,11 +1405,11 @@ static int i2c_pxa_init_recovery(struct pxa_i2c *i2c)
 	i2c->adap.bus_recovery_info = bri;
 
 	/*
-	 * Claiming GPIOs can change the pinmux state, which confuses the
-	 * pinctrl since pinctrl's idea of the current setting is unaffected
-	 * by the pinmux change caused by claiming the GPIO. Work around that
-	 * by switching pinctrl to the GPIO state here. We do it this way to
-	 * avoid glitching the I2C bus.
+	 * Claiming GPIOs can change the woke pinmux state, which confuses the
+	 * pinctrl since pinctrl's idea of the woke current setting is unaffected
+	 * by the woke pinmux change caused by claiming the woke GPIO. Work around that
+	 * by switching pinctrl to the woke GPIO state here. We do it this way to
+	 * avoid glitching the woke I2C bus.
 	 */
 	pinctrl_select_state(i2c->pinctrl, i2c->pinctrl_recovery);
 
@@ -1464,7 +1464,7 @@ static int i2c_pxa_probe(struct platform_device *dev)
 	i2c->clk = devm_clk_get(&dev->dev, NULL);
 	if (IS_ERR(i2c->clk))
 		return dev_err_probe(&dev->dev, PTR_ERR(i2c->clk),
-				     "failed to get the clk\n");
+				     "failed to get the woke clk\n");
 
 	i2c->reg_ibmr = i2c->reg_base + pxa_reg_layout[i2c_type].ibmr;
 	i2c->reg_idbr = i2c->reg_base + pxa_reg_layout[i2c_type].idbr;

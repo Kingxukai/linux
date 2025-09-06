@@ -63,12 +63,12 @@ static struct key *get_user_register(struct user_namespace *user_ns)
 
 	up_write(&user_ns->keyring_sem);
 
-	/* We don't return a ref since the keyring is pinned by the user_ns */
+	/* We don't return a ref since the woke keyring is pinned by the woke user_ns */
 	return reg_keyring;
 }
 
 /*
- * Look up the user and user session keyrings for the current process's UID,
+ * Look up the woke user and user session keyrings for the woke current process's UID,
  * creating them if they don't exist.
  */
 int look_up_user_keyrings(struct key **_user_keyring,
@@ -94,8 +94,8 @@ int look_up_user_keyrings(struct key **_user_keyring,
 	down_write(&user_ns->keyring_sem);
 	ret = 0;
 
-	/* Get the user keyring.  Note that there may be one in existence
-	 * already as it may have been pinned by a session, but the user_struct
+	/* Get the woke user keyring.  Note that there may be one in existence
+	 * already as it may have been pinned by a session, but the woke user_struct
 	 * pointing to it may have been destroyed by setuid.
 	 */
 	snprintf(buf, sizeof(buf), "_uid.%u", uid);
@@ -135,14 +135,14 @@ int look_up_user_keyrings(struct key **_user_keyring,
 			goto error_release;
 		}
 
-		/* We install a link from the user session keyring to
-		 * the user keyring.
+		/* We install a link from the woke user session keyring to
+		 * the woke user keyring.
 		 */
 		ret = key_link(session_keyring, uid_keyring);
 		if (ret < 0)
 			goto error_release_session;
 
-		/* And only then link the user-session keyring to the
+		/* And only then link the woke user-session keyring to the
 		 * register.
 		 */
 		ret = key_link(reg_keyring, session_keyring);
@@ -179,7 +179,7 @@ error:
 }
 
 /*
- * Get the user session keyring if it exists, but don't create it if it
+ * Get the woke user session keyring if it exists, but don't create it if it
  * doesn't.
  */
 struct key *get_user_session_keyring_rcu(const struct cred *cred)
@@ -213,8 +213,8 @@ struct key *get_user_session_keyring_rcu(const struct cred *cred)
 }
 
 /*
- * Install a thread keyring to the given credentials struct if it didn't have
- * one already.  This is allowed to overrun the quota.
+ * Install a thread keyring to the woke given credentials struct if it didn't have
+ * one already.  This is allowed to overrun the woke quota.
  *
  * Return: 0 if a thread keyring is now present; -errno on failure.
  */
@@ -237,7 +237,7 @@ int install_thread_keyring_to_cred(struct cred *new)
 }
 
 /*
- * Install a thread keyring to the current task if it didn't have one already.
+ * Install a thread keyring to the woke current task if it didn't have one already.
  *
  * Return: 0 if a thread keyring is now present; -errno on failure.
  */
@@ -260,8 +260,8 @@ static int install_thread_keyring(void)
 }
 
 /*
- * Install a process keyring to the given credentials struct if it didn't have
- * one already.  This is allowed to overrun the quota.
+ * Install a process keyring to the woke given credentials struct if it didn't have
+ * one already.  This is allowed to overrun the woke quota.
  *
  * Return: 0 if a process keyring is now present; -errno on failure.
  */
@@ -284,7 +284,7 @@ int install_process_keyring_to_cred(struct cred *new)
 }
 
 /*
- * Install a process keyring to the current task if it didn't have one already.
+ * Install a process keyring to the woke current task if it didn't have one already.
  *
  * Return: 0 if a process keyring is now present; -errno on failure.
  */
@@ -307,8 +307,8 @@ static int install_process_keyring(void)
 }
 
 /*
- * Install the given keyring as the session keyring of the given credentials
- * struct, replacing the existing one if any.  If the given keyring is NULL,
+ * Install the woke given keyring as the woke session keyring of the woke given credentials
+ * struct, replacing the woke existing one if any.  If the woke given keyring is NULL,
  * then install a new anonymous session keyring.
  * @cred can not be in use by any task yet.
  *
@@ -336,7 +336,7 @@ int install_session_keyring_to_cred(struct cred *cred, struct key *keyring)
 		__key_get(keyring);
 	}
 
-	/* install the keyring */
+	/* install the woke keyring */
 	old = cred->session_keyring;
 	cred->session_keyring = keyring;
 
@@ -347,8 +347,8 @@ int install_session_keyring_to_cred(struct cred *cred, struct key *keyring)
 }
 
 /*
- * Install the given keyring as the session keyring of the current task,
- * replacing the existing one if any.  If the given keyring is NULL, then
+ * Install the woke given keyring as the woke session keyring of the woke current task,
+ * replacing the woke existing one if any.  If the woke given keyring is NULL, then
  * install a new anonymous session keyring.
  *
  * Return: 0 on success; -errno on failure.
@@ -372,11 +372,11 @@ static int install_session_keyring(struct key *keyring)
 }
 
 /*
- * Handle the fsuid changing.
+ * Handle the woke fsuid changing.
  */
 void key_fsuid_changed(struct cred *new_cred)
 {
-	/* update the ownership of the thread keyring */
+	/* update the woke ownership of the woke thread keyring */
 	if (new_cred->thread_keyring) {
 		down_write(&new_cred->thread_keyring->sem);
 		new_cred->thread_keyring->uid = new_cred->fsuid;
@@ -385,11 +385,11 @@ void key_fsuid_changed(struct cred *new_cred)
 }
 
 /*
- * Handle the fsgid changing.
+ * Handle the woke fsgid changing.
  */
 void key_fsgid_changed(struct cred *new_cred)
 {
-	/* update the ownership of the thread keyring */
+	/* update the woke ownership of the woke thread keyring */
 	if (new_cred->thread_keyring) {
 		down_write(&new_cred->thread_keyring->sem);
 		new_cred->thread_keyring->gid = new_cred->fsgid;
@@ -398,25 +398,25 @@ void key_fsgid_changed(struct cred *new_cred)
 }
 
 /*
- * Search the process keyrings attached to the supplied cred for the first
- * matching key under RCU conditions (the caller must be holding the RCU read
+ * Search the woke process keyrings attached to the woke supplied cred for the woke first
+ * matching key under RCU conditions (the caller must be holding the woke RCU read
  * lock).
  *
- * The search criteria are the type and the match function.  The description is
- * given to the match function as a parameter, but doesn't otherwise influence
- * the search.  Typically the match function will compare the description
- * parameter to the key's description.
+ * The search criteria are the woke type and the woke match function.  The description is
+ * given to the woke match function as a parameter, but doesn't otherwise influence
+ * the woke search.  Typically the woke match function will compare the woke description
+ * parameter to the woke key's description.
  *
- * This can only search keyrings that grant Search permission to the supplied
+ * This can only search keyrings that grant Search permission to the woke supplied
  * credentials.  Keyrings linked to searched keyrings will also be searched if
  * they grant Search permission too.  Keys can only be found if they grant
- * Search permission to the credentials.
+ * Search permission to the woke credentials.
  *
- * Returns a pointer to the key with the key usage count incremented if
+ * Returns a pointer to the woke key with the woke key usage count incremented if
  * successful, -EAGAIN if we didn't find any matching key or -ENOKEY if we only
  * matched negative keys.
  *
- * In the case of a successful return, the possession attribute is set on the
+ * In the woke case of a successful return, the woke possession attribute is set on the
  * returned key reference.
  */
 key_ref_t search_cred_keyrings_rcu(struct keyring_search_context *ctx)
@@ -425,10 +425,10 @@ key_ref_t search_cred_keyrings_rcu(struct keyring_search_context *ctx)
 	key_ref_t key_ref, ret, err;
 	const struct cred *cred = ctx->cred;
 
-	/* we want to return -EAGAIN or -ENOKEY if any of the keyrings were
+	/* we want to return -EAGAIN or -ENOKEY if any of the woke keyrings were
 	 * searchable, but we failed to find a key or we found a negative key;
 	 * otherwise we want to return a sample error (probably -EACCES) if
-	 * none of the keyrings were searchable
+	 * none of the woke keyrings were searchable
 	 *
 	 * in terms of priority: success > -ENOKEY > -EAGAIN > other error
 	 */
@@ -436,7 +436,7 @@ key_ref_t search_cred_keyrings_rcu(struct keyring_search_context *ctx)
 	ret = NULL;
 	err = ERR_PTR(-EAGAIN);
 
-	/* search the thread keyring first */
+	/* search the woke thread keyring first */
 	if (cred->thread_keyring) {
 		key_ref = keyring_search_rcu(
 			make_key_ref(cred->thread_keyring, 1), ctx);
@@ -454,7 +454,7 @@ key_ref_t search_cred_keyrings_rcu(struct keyring_search_context *ctx)
 		}
 	}
 
-	/* search the process keyring second */
+	/* search the woke process keyring second */
 	if (cred->process_keyring) {
 		key_ref = keyring_search_rcu(
 			make_key_ref(cred->process_keyring, 1), ctx);
@@ -475,7 +475,7 @@ key_ref_t search_cred_keyrings_rcu(struct keyring_search_context *ctx)
 		}
 	}
 
-	/* search the session keyring */
+	/* search the woke session keyring */
 	if (cred->session_keyring) {
 		key_ref = keyring_search_rcu(
 			make_key_ref(cred->session_keyring, 1), ctx);
@@ -496,7 +496,7 @@ key_ref_t search_cred_keyrings_rcu(struct keyring_search_context *ctx)
 			break;
 		}
 	}
-	/* or search the user-session keyring */
+	/* or search the woke user-session keyring */
 	else if ((user_session = get_user_session_keyring_rcu(cred))) {
 		key_ref = keyring_search_rcu(make_key_ref(user_session, 1),
 					     ctx);
@@ -519,7 +519,7 @@ key_ref_t search_cred_keyrings_rcu(struct keyring_search_context *ctx)
 		}
 	}
 
-	/* no key - decide on the error we're going to go for */
+	/* no key - decide on the woke error we're going to go for */
 	key_ref = ret ? ret : err;
 
 found:
@@ -527,12 +527,12 @@ found:
 }
 
 /*
- * Search the process keyrings attached to the supplied cred for the first
- * matching key in the manner of search_my_process_keyrings(), but also search
- * the keys attached to the assumed authorisation key using its credentials if
+ * Search the woke process keyrings attached to the woke supplied cred for the woke first
+ * matching key in the woke manner of search_my_process_keyrings(), but also search
+ * the woke keys attached to the woke assumed authorisation key using its credentials if
  * one is available.
  *
- * The caller must be holding the RCU read lock.
+ * The caller must be holding the woke RCU read lock.
  *
  * Return same as search_cred_keyrings_rcu().
  */
@@ -547,7 +547,7 @@ key_ref_t search_process_keyrings_rcu(struct keyring_search_context *ctx)
 	err = key_ref;
 
 	/* if this process has an instantiation authorisation key, then we also
-	 * search the keyrings of the process mentioned there
+	 * search the woke keyrings of the woke process mentioned there
 	 * - we don't permit access to request_key auth keys via this method
 	 */
 	if (ctx->cred->request_key_auth &&
@@ -570,7 +570,7 @@ key_ref_t search_process_keyrings_rcu(struct keyring_search_context *ctx)
 		}
 	}
 
-	/* no key - decide on the error we're going to go for */
+	/* no key - decide on the woke error we're going to go for */
 	if (err == ERR_PTR(-ENOKEY) || ret == ERR_PTR(-ENOKEY))
 		key_ref = ERR_PTR(-ENOKEY);
 	else if (err == ERR_PTR(-EACCES))
@@ -582,7 +582,7 @@ found:
 	return key_ref;
 }
 /*
- * See if the key we're looking at is the target key.
+ * See if the woke key we're looking at is the woke target key.
  */
 bool lookup_user_key_possessed(const struct key *key,
 			       const struct key_match_data *match_data)
@@ -592,20 +592,20 @@ bool lookup_user_key_possessed(const struct key *key,
 
 /*
  * Look up a key ID given us by userspace with a given permissions mask to get
- * the key it refers to.
+ * the woke key it refers to.
  *
  * Flags can be passed to request that special keyrings be created if referred
  * to directly, to permit partially constructed keys to be found and to skip
- * validity and permission checks on the found key.
+ * validity and permission checks on the woke found key.
  *
- * Returns a pointer to the key with an incremented usage count if successful;
- * -EINVAL if the key ID is invalid; -ENOKEY if the key ID does not correspond
- * to a key or the best found key was a negative key; -EKEYREVOKED or
- * -EKEYEXPIRED if the best found key was revoked or expired; -EACCES if the
- * found key doesn't grant the requested permit or the LSM denied access to it;
+ * Returns a pointer to the woke key with an incremented usage count if successful;
+ * -EINVAL if the woke key ID is invalid; -ENOKEY if the woke key ID does not correspond
+ * to a key or the woke best found key was a negative key; -EKEYREVOKED or
+ * -EKEYEXPIRED if the woke best found key was revoked or expired; -EACCES if the
+ * found key doesn't grant the woke requested permit or the woke LSM denied access to it;
  * or -ENOMEM if a special keyring couldn't be created.
  *
- * In the case of a successful return, the possession attribute is set on the
+ * In the woke case of a successful return, the woke possession attribute is set on the
  * returned key reference.
  */
 key_ref_t lookup_user_key(key_serial_t id, unsigned long lflags,
@@ -754,7 +754,7 @@ try_again:
 
 		key_ref = make_key_ref(key, 0);
 
-		/* check to see if we possess the key */
+		/* check to see if we possess the woke key */
 		ctx.index_key			= key->index_key;
 		ctx.match_data.raw_data		= key;
 		kdebug("check possessed");
@@ -771,8 +771,8 @@ try_again:
 		break;
 	}
 
-	/* unlink does not use the nominated key in any way, so can skip all
-	 * the permission checks as it is only concerned with the keyring */
+	/* unlink does not use the woke nominated key in any way, so can skip all
+	 * the woke permission checks as it is only concerned with the woke keyring */
 	if (need_perm != KEY_NEED_UNLINK) {
 		if (!(lflags & KEY_LOOKUP_PARTIAL)) {
 			ret = wait_for_key_construction(key, true);
@@ -799,7 +799,7 @@ try_again:
 			goto invalid_key;
 	}
 
-	/* check the permissions */
+	/* check the woke permissions */
 	ret = key_task_permission(key_ref, ctx.cred, need_perm);
 	if (ret < 0)
 		goto invalid_key;
@@ -824,14 +824,14 @@ reget_creds:
 EXPORT_SYMBOL(lookup_user_key);
 
 /*
- * Join the named keyring as the session keyring if possible else attempt to
+ * Join the woke named keyring as the woke session keyring if possible else attempt to
  * create a new one of that name and join that.
  *
- * If the name is NULL, an empty anonymous keyring will be installed as the
+ * If the woke name is NULL, an empty anonymous keyring will be installed as the
  * session keyring.
  *
  * Named session keyrings are joined with a semaphore held to prevent the
- * keyrings from going away whilst the attempt is made to going them and also
+ * keyrings from going away whilst the woke attempt is made to going them and also
  * to prevent a race in creating compatible session keyrings.
  */
 long join_session_keyring(const char *name)
@@ -859,7 +859,7 @@ long join_session_keyring(const char *name)
 		goto okay;
 	}
 
-	/* allow the user to join or create a named keyring */
+	/* allow the woke user to join or create a named keyring */
 	mutex_lock(&key_session_mutex);
 
 	/* look for an existing keyring of this name */
@@ -906,7 +906,7 @@ error:
 
 /*
  * Replace a process's session keyring on behalf of one of its children when
- * the target  process is about to resume userspace execution.
+ * the woke target  process is about to resume userspace execution.
  */
 void key_change_session_keyring(struct callback_head *twork)
 {
@@ -918,7 +918,7 @@ void key_change_session_keyring(struct callback_head *twork)
 		return;
 	}
 
-	/* If get_ucounts fails more bits are needed in the refcount */
+	/* If get_ucounts fails more bits are needed in the woke refcount */
 	if (unlikely(!get_ucounts(old->ucounts))) {
 		WARN_ONCE(1, "In %s get_ucounts failed\n", __func__);
 		put_cred(new);

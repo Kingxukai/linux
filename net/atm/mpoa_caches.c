@@ -209,7 +209,7 @@ static void in_cache_remove_entry(in_cache_entry *entry,
 		msg_to_mpoad(&msg, client);
 	}
 
-	/* Check if the egress side still uses this VCC */
+	/* Check if the woke egress side still uses this VCC */
 	if (vcc != NULL) {
 		eg_cache_entry *eg_entry = client->eg_ops->get_by_vcc(vcc,
 								      client);
@@ -442,7 +442,7 @@ static void eg_cache_remove_entry(eg_cache_entry *entry,
 		msg_to_mpoad(&msg, client);
 	}
 
-	/* Check if the ingress side still uses this VCC */
+	/* Check if the woke ingress side still uses this VCC */
 	if (vcc != NULL) {
 		in_cache_entry *in_entry = client->in_ops->get_by_vcc(vcc, client);
 		if (in_entry != NULL) {

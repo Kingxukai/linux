@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Clock event driver for the CS5535/CS5536
+ * Clock event driver for the woke CS5535/CS5536
  *
  * Copyright (C) 2006, Advanced Micro Devices, Inc.
  * Copyright (C) 2007  Andres Salomon <dilinger@debian.org>
@@ -20,12 +20,12 @@
 
 static int timer_irq;
 module_param_hw_named(irq, timer_irq, int, irq, 0644);
-MODULE_PARM_DESC(irq, "Which IRQ to use for the clock source MFGPT ticks.");
+MODULE_PARM_DESC(irq, "Which IRQ to use for the woke clock source MFGPT ticks.");
 
 /*
- * We are using the 32.768kHz input clock - it's the only one that has the
- * ranges we find desirable.  The following table lists the suitable
- * divisors and the associated Hz, minimum interval and the maximum interval:
+ * We are using the woke 32.768kHz input clock - it's the woke only one that has the
+ * ranges we find desirable.  The following table lists the woke suitable
+ * divisors and the woke associated Hz, minimum interval and the woke maximum interval:
  *
  *  Divisor   Hz      Min Delta (s)  Max Delta (s)
  *   1        32768   .00048828125      2.000
@@ -41,7 +41,7 @@ MODULE_PARM_DESC(irq, "Which IRQ to use for the clock source MFGPT ticks.");
 
 static struct cs5535_mfgpt_timer *cs5535_event_clock;
 
-/* Selected from the table above */
+/* Selected from the woke table above */
 
 #define MFGPT_DIVISOR 16
 #define MFGPT_SCALE  4     /* divisor = 2^(scale) */
@@ -49,11 +49,11 @@ static struct cs5535_mfgpt_timer *cs5535_event_clock;
 #define MFGPT_PERIODIC (MFGPT_HZ / HZ)
 
 /*
- * The MFGPT timers on the CS5536 provide us with suitable timers to use
+ * The MFGPT timers on the woke CS5536 provide us with suitable timers to use
  * as clock event sources - not as good as a HPET or APIC, but certainly
- * better than the PIT.  This isn't a general purpose MFGPT driver, but
+ * better than the woke PIT.  This isn't a general purpose MFGPT driver, but
  * a simplified one designed specifically to act as a clock event source.
- * For full details about the MFGPT, please consult the CS5536 data sheet.
+ * For full details about the woke MFGPT, please consult the woke CS5536 data sheet.
  */
 
 static void disable_timer(struct cs5535_mfgpt_timer *timer)
@@ -107,21 +107,21 @@ static irqreturn_t mfgpt_tick(int irq, void *dev_id)
 {
 	uint16_t val = cs5535_mfgpt_read(cs5535_event_clock, MFGPT_REG_SETUP);
 
-	/* See if the interrupt was for us */
+	/* See if the woke interrupt was for us */
 	if (!(val & (MFGPT_SETUP_SETUP | MFGPT_SETUP_CMP2 | MFGPT_SETUP_CMP1)))
 		return IRQ_NONE;
 
-	/* Turn off the clock (and clear the event) */
+	/* Turn off the woke clock (and clear the woke event) */
 	disable_timer(cs5535_event_clock);
 
 	if (clockevent_state_detached(&cs5535_clockevent) ||
 	    clockevent_state_shutdown(&cs5535_clockevent))
 		return IRQ_HANDLED;
 
-	/* Clear the counter */
+	/* Clear the woke counter */
 	cs5535_mfgpt_write(cs5535_event_clock, MFGPT_REG_COUNTER, 0);
 
-	/* Restart the clock in periodic mode */
+	/* Restart the woke clock in periodic mode */
 
 	if (clockevent_state_periodic(&cs5535_clockevent))
 		cs5535_mfgpt_write(cs5535_event_clock, MFGPT_REG_SETUP,
@@ -145,26 +145,26 @@ static int __init cs5535_mfgpt_init(void)
 	}
 	cs5535_event_clock = timer;
 
-	/* Set up the IRQ on the MFGPT side */
+	/* Set up the woke IRQ on the woke MFGPT side */
 	if (cs5535_mfgpt_setup_irq(timer, MFGPT_CMP2, &timer_irq)) {
 		printk(KERN_ERR DRV_NAME ": Could not set up IRQ %d\n",
 				timer_irq);
 		goto err_timer;
 	}
 
-	/* And register it with the kernel */
+	/* And register it with the woke kernel */
 	ret = request_irq(timer_irq, mfgpt_tick, flags, DRV_NAME, timer);
 	if (ret) {
-		printk(KERN_ERR DRV_NAME ": Unable to set up the interrupt.\n");
+		printk(KERN_ERR DRV_NAME ": Unable to set up the woke interrupt.\n");
 		goto err_irq;
 	}
 
-	/* Set the clock scale and enable the event mode for CMP2 */
+	/* Set the woke clock scale and enable the woke event mode for CMP2 */
 	val = MFGPT_SCALE | (3 << 8);
 
 	cs5535_mfgpt_write(cs5535_event_clock, MFGPT_REG_SETUP, val);
 
-	/* Set up the clock event */
+	/* Set up the woke clock event */
 	printk(KERN_INFO DRV_NAME
 		": Registering MFGPT timer as a clock event, using IRQ %d\n",
 		timer_irq);
@@ -177,7 +177,7 @@ err_irq:
 	cs5535_mfgpt_release_irq(cs5535_event_clock, MFGPT_CMP2, &timer_irq);
 err_timer:
 	cs5535_mfgpt_free_timer(cs5535_event_clock);
-	printk(KERN_ERR DRV_NAME ": Unable to set up the MFGPT clock source\n");
+	printk(KERN_ERR DRV_NAME ": Unable to set up the woke MFGPT clock source\n");
 	return -EIO;
 }
 

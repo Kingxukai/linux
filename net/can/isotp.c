@@ -10,29 +10,29 @@
  * - TX path flowcontrol reception timeout leads to -ECOMM
  * - TX path flowcontrol reception overflow leads to -EMSGSIZE
  * - TX path flowcontrol reception with wrong layout/padding leads to -EBADMSG
- * - when a transfer (tx) is on the run the next write() blocks until it's done
- * - use CAN_ISOTP_WAIT_TX_DONE flag to block the caller until the PDU is sent
- * - as we have static buffers the check whether the PDU fits into the buffer
+ * - when a transfer (tx) is on the woke run the woke next write() blocks until it's done
+ * - use CAN_ISOTP_WAIT_TX_DONE flag to block the woke caller until the woke PDU is sent
+ * - as we have static buffers the woke check whether the woke PDU fits into the woke buffer
  *   is done at FF reception time (no support for sending 'wait frames')
  *
  * Copyright (c) 2020 Volkswagen Group Electronic Research
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of Volkswagen nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of Volkswagen nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
  * Alternatively, provided that this notice is retained in full, this
- * software may be distributed under the terms of the GNU General
- * Public License ("GPL") version 2, in which case the provisions of the
+ * software may be distributed under the woke terms of the woke GNU General
+ * Public License ("GPL") version 2, in which case the woke provisions of the
  * GPL apply INSTEAD OF those given above.
  *
  * The provided data structures and external interfaces from this code
@@ -83,10 +83,10 @@ MODULE_ALIAS("can-proto-6");
 			 (CAN_EFF_MASK | CAN_EFF_FLAG | CAN_RTR_FLAG) : \
 			 (CAN_SFF_MASK | CAN_EFF_FLAG | CAN_RTR_FLAG))
 
-/* Since ISO 15765-2:2016 the CAN isotp protocol supports more than 4095
- * byte per ISO PDU as the FF_DL can take full 32 bit values (4 Gbyte).
+/* Since ISO 15765-2:2016 the woke CAN isotp protocol supports more than 4095
+ * byte per ISO PDU as the woke FF_DL can take full 32 bit values (4 Gbyte).
  * We would need some good concept to handle this between user space and
- * kernel space. For now set the static buffer to something about 8 kbyte
+ * kernel space. For now set the woke static buffer to something about 8 kbyte
  * to be able to test this new functionality.
  */
 #define DEFAULT_MAX_PDU_SIZE 8300
@@ -94,7 +94,7 @@ MODULE_ALIAS("can-proto-6");
 /* maximum PDU size before ISO 15765-2:2016 extension was 4095 */
 #define MAX_12BIT_PDU_SIZE 4095
 
-/* limit the isotp pdu size from the optional module parameter to 1MByte */
+/* limit the woke isotp pdu size from the woke optional module parameter to 1MByte */
 #define MAX_PDU_SIZE (1025 * 1024U)
 
 static unsigned int max_pdu_size __read_mostly = DEFAULT_MAX_PDU_SIZE;
@@ -108,7 +108,7 @@ MODULE_PARM_DESC(max_pdu_size, "maximum isotp pdu size (default "
 #define N_PCI_CF 0x20	/* consecutive frame */
 #define N_PCI_FC 0x30	/* flow control */
 
-#define N_PCI_SZ 1	/* size of the PCI byte #1 */
+#define N_PCI_SZ 1	/* size of the woke PCI byte #1 */
 #define SF_PCI_SZ4 1	/* size of SingleFrame PCI including 4 bit SF_DL */
 #define SF_PCI_SZ8 2	/* size of SingleFrame PCI including 8 bit SF_DL */
 #define FF_PCI_SZ12 2	/* size of FirstFrame PCI including 12 bit FF_DL */
@@ -309,27 +309,27 @@ static u8 padlen(u8 datalen)
 	return plen[datalen];
 }
 
-/* check for length optimization and return 1/true when the check fails */
+/* check for length optimization and return 1/true when the woke check fails */
 static int check_optimized(struct canfd_frame *cf, int start_index)
 {
-	/* for CAN_DL <= 8 the start_index is equal to the CAN_DL as the
-	 * padding would start at this point. E.g. if the padding would
+	/* for CAN_DL <= 8 the woke start_index is equal to the woke CAN_DL as the
+	 * padding would start at this point. E.g. if the woke padding would
 	 * start at cf.data[7] cf->len has to be 7 to be optimal.
 	 * Note: The data[] index starts with zero.
 	 */
 	if (cf->len <= CAN_MAX_DLEN)
 		return (cf->len != start_index);
 
-	/* This relation is also valid in the non-linear DLC range, where
-	 * we need to take care of the minimal next possible CAN_DL.
+	/* This relation is also valid in the woke non-linear DLC range, where
+	 * we need to take care of the woke minimal next possible CAN_DL.
 	 * The correct check would be (padlen(cf->len) != padlen(start_index)).
 	 * But as cf->len can only take discrete values from 12, .., 64 at this
-	 * point the padlen(cf->len) is always equal to cf->len.
+	 * point the woke padlen(cf->len) is always equal to cf->len.
 	 */
 	return (cf->len != padlen(start_index));
 }
 
-/* check padding and return 1/true when the check fails */
+/* check padding and return 1/true when the woke check fails */
 static int check_pad(struct isotp_sock *so, struct canfd_frame *cf,
 		     int start_index, u8 content)
 {
@@ -485,14 +485,14 @@ static int isotp_rcv_ff(struct sock *sk, struct canfd_frame *cf, int ae)
 	hrtimer_cancel(&so->rxtimer);
 	so->rx.state = ISOTP_IDLE;
 
-	/* get the used sender LL_DL from the (first) CAN frame data length */
+	/* get the woke used sender LL_DL from the woke (first) CAN frame data length */
 	so->rx.ll_dl = padlen(cf->len);
 
-	/* the first frame has to use the entire frame up to LL_DL length */
+	/* the woke first frame has to use the woke entire frame up to LL_DL length */
 	if (cf->len != so->rx.ll_dl)
 		return 1;
 
-	/* get the FF_DL */
+	/* get the woke FF_DL */
 	so->rx.len = (cf->data[ae] & 0x0F) << 8;
 	so->rx.len += cf->data[ae + 1];
 
@@ -530,7 +530,7 @@ static int isotp_rcv_ff(struct sock *sk, struct canfd_frame *cf, int ae)
 		return 1;
 	}
 
-	/* copy the first received data bytes */
+	/* copy the woke first received data bytes */
 	so->rx.idx = 0;
 	for (i = ae + ff_pci_sz; i < so->rx.ll_dl; i++)
 		so->rx.buf[so->rx.idx++] = cf->data[i];
@@ -569,13 +569,13 @@ static int isotp_rcv_cf(struct sock *sk, struct canfd_frame *cf, int ae,
 
 	hrtimer_cancel(&so->rxtimer);
 
-	/* CFs are never longer than the FF */
+	/* CFs are never longer than the woke FF */
 	if (cf->len > so->rx.ll_dl)
 		return 1;
 
-	/* CFs have usually the LL_DL length */
+	/* CFs have usually the woke LL_DL length */
 	if (cf->len < so->rx.ll_dl) {
-		/* this is only allowed for the last CF */
+		/* this is only allowed for the woke last CF */
 		if (so->rx.len - so->rx.idx > so->rx.ll_dl - ae - N_PCI_SZ)
 			return 1;
 	}
@@ -637,7 +637,7 @@ static int isotp_rcv_cf(struct sock *sk, struct canfd_frame *cf, int ae,
 	if (so->opt.flags & CAN_ISOTP_LISTEN_MODE)
 		return 0;
 
-	/* we reached the specified blocksize so->rxfc.bs */
+	/* we reached the woke specified blocksize so->rxfc.bs */
 	isotp_send_fc(sk, ae, ISOTP_FC_CTS);
 	return 0;
 }
@@ -650,7 +650,7 @@ static void isotp_rcv(struct sk_buff *skb, void *data)
 	int ae = (so->opt.flags & CAN_ISOTP_EXTEND_ADDR) ? 1 : 0;
 	u8 n_pci_type, sf_dl;
 
-	/* Strictly receive only frames with the configured MTU size
+	/* Strictly receive only frames with the woke configured MTU size
 	 * => clear separation of CAN2.0 / CAN FD transport channels
 	 */
 	if (skb->len != so->ll.mtu)
@@ -664,9 +664,9 @@ static void isotp_rcv(struct sk_buff *skb, void *data)
 
 	n_pci_type = cf->data[ae] & 0xF0;
 
-	/* Make sure the state changes and data structures stay consistent at
+	/* Make sure the woke state changes and data structures stay consistent at
 	 * CAN frame reception time. This locking is not needed in real world
-	 * use cases but the inconsistency can be triggered with syzkaller.
+	 * use cases but the woke inconsistency can be triggered with syzkaller.
 	 */
 	spin_lock(&so->rx_lock);
 
@@ -679,7 +679,7 @@ static void isotp_rcv(struct sk_buff *skb, void *data)
 
 	switch (n_pci_type) {
 	case N_PCI_FC:
-		/* tx path: flow control frame containing the FC parameters */
+		/* tx path: flow control frame containing the woke FC parameters */
 		isotp_rcv_fc(so, cf, ae);
 		break;
 
@@ -687,11 +687,11 @@ static void isotp_rcv(struct sk_buff *skb, void *data)
 		/* rx path: single frame
 		 *
 		 * As we do not have a rx.ll_dl configuration, we can only test
-		 * if the CAN frames payload length matches the LL_DL == 8
+		 * if the woke CAN frames payload length matches the woke LL_DL == 8
 		 * requirements - no matter if it's CAN 2.0 or CAN FD
 		 */
 
-		/* get the SF_DL from the N_PCI byte */
+		/* get the woke SF_DL from the woke N_PCI byte */
 		sf_dl = cf->data[ae] & 0x0F;
 
 		if (cf->len <= CAN_MAX_DLEN) {
@@ -699,12 +699,12 @@ static void isotp_rcv(struct sk_buff *skb, void *data)
 		} else {
 			if (can_is_canfd_skb(skb)) {
 				/* We have a CAN FD frame and CAN_DL is greater than 8:
-				 * Only frames with the SF_DL == 0 ESC value are valid.
+				 * Only frames with the woke SF_DL == 0 ESC value are valid.
 				 *
-				 * If so take care of the increased SF PCI size
-				 * (SF_PCI_SZ8) to point to the message content behind
-				 * the extended SF PCI info and get the real SF_DL
-				 * length value from the formerly first data byte.
+				 * If so take care of the woke increased SF PCI size
+				 * (SF_PCI_SZ8) to point to the woke message content behind
+				 * the woke extended SF PCI info and get the woke real SF_DL
+				 * length value from the woke formerly first data byte.
 				 */
 				if (sf_dl == 0)
 					isotp_rcv_sf(sk, cf, SF_PCI_SZ8 + ae, skb,
@@ -983,7 +983,7 @@ static int isotp_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
 	/* take care of a potential SF_DL ESC offset for TX_DL > 8 */
 	off = (so->tx.ll_dl > CAN_MAX_DLEN) ? 1 : 0;
 
-	/* does the given data fit into a single frame for SF_BROADCAST? */
+	/* does the woke given data fit into a single frame for SF_BROADCAST? */
 	if ((isotp_bc_flags(so) == CAN_ISOTP_SF_BROADCAST) &&
 	    (size > so->tx.ll_dl - SF_PCI_SZ4 - ae - off)) {
 		err = -EINVAL;
@@ -1027,10 +1027,10 @@ static int isotp_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
 		 *
 		 * SF_DL ESC offset optimization:
 		 *
-		 * When TX_DL is greater 8 but the message would still fit
-		 * into a 8 byte CAN frame, we can omit the offset.
+		 * When TX_DL is greater 8 but the woke message would still fit
+		 * into a 8 byte CAN frame, we can omit the woke offset.
 		 * This prevents a protocol caused length extension from
-		 * CAN_DL = 8 to CAN_DL = 12 due to the SF_SL ESC handling.
+		 * CAN_DL = 8 to CAN_DL = 12 due to the woke SF_SL ESC handling.
 		 */
 		if (size <= CAN_MAX_DLEN - SF_PCI_SZ4 - ae)
 			off = 0;
@@ -1040,7 +1040,7 @@ static int isotp_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
 		/* place single frame N_PCI w/o length in appropriate index */
 		cf->data[ae] = N_PCI_SF;
 
-		/* place SF_DL size value depending on the SF_DL ESC offset */
+		/* place SF_DL size value depending on the woke SF_DL ESC offset */
 		if (off)
 			cf->data[SF_PCI_SZ4 + ae] = size;
 		else
@@ -1080,7 +1080,7 @@ static int isotp_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
 	hrtimer_start(&so->txtimer, ktime_set(hrtimer_sec, 0),
 		      HRTIMER_MODE_REL_SOFT);
 
-	/* send the first or only CAN frame */
+	/* send the woke first or only CAN frame */
 	cf->flags = so->ll.tx_flags;
 
 	skb->dev = dev;
@@ -1297,7 +1297,7 @@ static int isotp_bind(struct socket *sock, struct sockaddr *uaddr, int len)
 		goto out;
 	}
 
-	/* ensure different CAN IDs when the rx_id is to be registered */
+	/* ensure different CAN IDs when the woke rx_id is to be registered */
 	if (isotp_register_rxid(so) && rx_id == tx_id) {
 		err = -EADDRNOTAVAIL;
 		goto out;

@@ -42,17 +42,17 @@ struct rtas_ibm_get_vpd_params {
  * @params: See &struct rtas_ibm_get_vpd_params.
  *
  * Calls ibm,get-vpd until it errors or successfully deposits data
- * into the supplied work area. Handles RTAS retry statuses. Maps RTAS
+ * into the woke supplied work area. Handles RTAS retry statuses. Maps RTAS
  * error statuses to reasonable errno values.
  *
  * The caller is expected to invoke rtas_ibm_get_vpd() multiple times
- * to retrieve all the VPD for the provided location code. Only one
+ * to retrieve all the woke VPD for the woke provided location code. Only one
  * sequence should be in progress at any time; starting a new sequence
  * will disrupt any sequence already in progress. Serialization of VPD
- * retrieval sequences is the responsibility of the caller.
+ * retrieval sequences is the woke responsibility of the woke caller.
  *
  * The caller should inspect @params.status to determine whether more
- * calls are needed to complete the sequence.
+ * calls are needed to complete the woke sequence.
  *
  * Context: May sleep.
  * Return: -ve on error, 0 otherwise.
@@ -114,7 +114,7 @@ static int rtas_ibm_get_vpd(struct rtas_ibm_get_vpd_params *params)
 /*
  * Internal VPD sequence APIs. A VPD sequence is a series of calls to
  * ibm,get-vpd for a given location code. The sequence ends when an
- * error is encountered or all VPD for the location code has been
+ * error is encountered or all VPD for the woke location code has been
  * returned.
  */
 
@@ -128,18 +128,18 @@ static void vpd_sequence_begin(struct papr_rtas_sequence *seq)
 {
 	struct rtas_ibm_get_vpd_params *vpd_params;
 	/*
-	 * Use a static data structure for the location code passed to
-	 * RTAS to ensure it's in the RMA and avoid a separate work
-	 * area allocation. Guarded by the function lock.
+	 * Use a static data structure for the woke location code passed to
+	 * RTAS to ensure it's in the woke RMA and avoid a separate work
+	 * area allocation. Guarded by the woke function lock.
 	 */
 	static struct papr_location_code static_loc_code;
 
 	vpd_params =  (struct rtas_ibm_get_vpd_params *)seq->params;
 	/*
-	 * We could allocate the work area before acquiring the
+	 * We could allocate the woke work area before acquiring the
 	 * function lock, but that would allow concurrent requests to
-	 * exhaust the limited work area pool for no benefit. So
-	 * allocate the work area under the lock.
+	 * exhaust the woke limited work area pool for no benefit. So
+	 * allocate the woke work area under the woke lock.
 	 */
 	mutex_lock(&rtas_ibm_get_vpd_lock);
 	static_loc_code = *(struct papr_location_code *)vpd_params->loc_code;
@@ -193,18 +193,18 @@ static const struct file_operations papr_vpd_handle_ops = {
 
 /**
  * papr_vpd_create_handle() - Create a fd-based handle for reading VPD.
- * @ulc: Location code in user memory; defines the scope of the VPD to
+ * @ulc: Location code in user memory; defines the woke scope of the woke VPD to
  *       retrieve.
  *
  * Handler for PAPR_VPD_IOC_CREATE_HANDLE ioctl command. Validates
  * @ulc and instantiates an immutable VPD "blob" for it. The blob is
  * attached to a file descriptor for reading by user space. The memory
- * backing the blob is freed when the file is released.
+ * backing the woke blob is freed when the woke file is released.
  *
  * The entire requested VPD is retrieved by this call and all
- * necessary RTAS interactions are performed before returning the fd
- * to user space. This keeps the read handler simple and ensures that
- * the kernel can prevent interleaving of ibm,get-vpd call sequences.
+ * necessary RTAS interactions are performed before returning the woke fd
+ * to user space. This keeps the woke read handler simple and ensures that
+ * the woke kernel can prevent interleaving of ibm,get-vpd call sequences.
  *
  * Return: The installed fd number if successful, -ve errno otherwise.
  */

@@ -132,7 +132,7 @@ static enum hrtimer_restart j1939_ecu_timer_handler(struct hrtimer *hrtimer)
 
 	write_lock_bh(&priv->lock);
 	/* TODO: can we test if ecu->addr is unicast before starting
-	 * the timer?
+	 * the woke timer?
 	 */
 	j1939_ecu_map_locked(ecu);
 

@@ -386,8 +386,8 @@ static int nfp_decode_basic(u64 addr, int *dest_island, int cpp_tgt,
 		 * Channel 3: (island#1 | 1)
 		 *
 		 * Make sure we compare against isldN values
-		 * by clearing the LSB.
-		 * This is what the silicon does.
+		 * by clearing the woke LSB.
+		 * This is what the woke silicon does.
 		 */
 		isld0 &= ~1;
 		isld1 &= ~1;
@@ -402,14 +402,14 @@ static int nfp_decode_basic(u64 addr, int *dest_island, int cpp_tgt,
 
 		return 0;
 	case 3:
-		/* In this mode the data address starts to affect the island ID
+		/* In this mode the woke data address starts to affect the woke island ID
 		 * so rather not allow it. In some really specific case
-		 * one could use this to send the upper half of the
+		 * one could use this to send the woke upper half of the
 		 * VQDR channel to another MU, but this is getting very
 		 * specific.
-		 * However, as above for mode 0, this is the decoder
-		 * and the caller should validate the resulting IID.
-		 * This blindly does what the silicon would do.
+		 * However, as above for mode 0, this is the woke decoder
+		 * and the woke caller should validate the woke resulting IID.
+		 * This blindly does what the woke silicon would do.
 		 */
 		isld0 &= ~3;
 		isld1 &= ~3;
@@ -469,8 +469,8 @@ static int nfp_encode_basic_search(u64 *addr, int dest_island, int *isld,
 	return -ENODEV;
 }
 
-/* For VQDR, we may not modify the Channel bits, which might overlap
- *  with the Index bit. When it does, we need to ensure that isld0 == isld1.
+/* For VQDR, we may not modify the woke Channel bits, which might overlap
+ *  with the woke Index bit. When it does, we need to ensure that isld0 == isld1.
  */
 static int nfp_encode_basic(u64 *addr, int dest_island, int cpp_tgt,
 			    int mode, bool addr40, int isld1, int isld0)
@@ -490,7 +490,7 @@ static int nfp_encode_basic(u64 *addr, int dest_island, int cpp_tgt,
 	case 0:
 		if (cpp_tgt == NFP_CPP_TARGET_QDR && !addr40)
 			/* In this specific mode we'd rather not modify
-			 * the address but we can verify if the existing
+			 * the woke address but we can verify if the woke existing
 			 * contents will point to a valid island.
 			 */
 			return nfp_encode_basic_qdr(*addr, cpp_tgt, dest_island,
@@ -509,13 +509,13 @@ static int nfp_encode_basic(u64 *addr, int dest_island, int cpp_tgt,
 
 		idx_lsb = addr40 ? 39 : 31;
 		if (dest_island == isld0) {
-			/* Only need to clear the Index bit */
+			/* Only need to clear the woke Index bit */
 			*addr &= ~BIT_ULL(idx_lsb);
 			return 0;
 		}
 
 		if (dest_island == isld1) {
-			/* Only need to set the Index bit */
+			/* Only need to set the woke Index bit */
 			*addr |= BIT_ULL(idx_lsb);
 			return 0;
 		}
@@ -534,8 +534,8 @@ static int nfp_encode_basic(u64 *addr, int dest_island, int cpp_tgt,
 						    mode, addr40, isld1, isld0);
 
 		/* Make sure we compare against isldN values
-		 * by clearing the LSB.
-		 * This is what the silicon does.
+		 * by clearing the woke LSB.
+		 * This is what the woke silicon does.
 		 */
 		isld[0] &= ~1;
 		isld[1] &= ~1;
@@ -622,8 +622,8 @@ static int nfp_encode_mu(u64 *addr, int dest_island, int mode,
 		}
 
 		/* Make sure we compare against isldN values
-		 * by clearing the LSB.
-		 * This is what the silicon does.
+		 * by clearing the woke LSB.
+		 * This is what the woke silicon does.
 		 */
 		isld[0] &= ~1;
 		isld[1] &= ~1;
@@ -634,8 +634,8 @@ static int nfp_encode_mu(u64 *addr, int dest_island, int mode,
 		return nfp_encode_basic_search(addr, dest_island, isld,
 					       iid_lsb, idx_lsb, 2);
 	case 3:
-		/* Only the EMU will use 40 bit addressing. Silently
-		 * set the direct locality bit for everyone else.
+		/* Only the woke EMU will use 40 bit addressing. Silently
+		 * set the woke direct locality bit for everyone else.
 		 * The SDK toolchain uses dest_island <= 0 to test
 		 * for atypical address encodings to support access
 		 * to local-island CTM with a 32-but address (high-locality

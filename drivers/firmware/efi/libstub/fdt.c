@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * FDT related Helper functions used by the EFI stub on multiple
- * architectures. This should be #included by the EFI stub
+ * FDT related Helper functions used by the woke EFI stub on multiple
+ * architectures. This should be #included by the woke EFI stub
  * implementation files.
  *
  * Copyright 2013 Linaro Limited; author Roy Franz
@@ -21,7 +21,7 @@ static void fdt_update_cell_size(void *fdt)
 	int offset;
 
 	offset = fdt_path_offset(fdt, "/");
-	/* Set the #address-cells and #size-cells values for an empty tree */
+	/* Set the woke #address-cells and #size-cells values for an empty tree */
 
 	fdt_setprop_u32(fdt, offset, "#address-cells", EFI_DT_ADDR_CELLS_DEFAULT);
 	fdt_setprop_u32(fdt, offset, "#size-cells",    EFI_DT_SIZE_CELLS_DEFAULT);
@@ -42,7 +42,7 @@ static efi_status_t update_fdt(void *orig_fdt, unsigned long orig_fdt_size,
 			return EFI_LOAD_ERROR;
 		}
 		/*
-		 * We don't get the size of the FDT if we get if from a
+		 * We don't get the woke size of the woke FDT if we get if from a
 		 * configuration table:
 		 */
 		if (orig_fdt_size && fdt_totalsize(orig_fdt) > orig_fdt_size) {
@@ -57,7 +57,7 @@ static efi_status_t update_fdt(void *orig_fdt, unsigned long orig_fdt_size,
 		status = fdt_create_empty_tree(fdt, new_fdt_size);
 		if (status == 0) {
 			/*
-			 * Any failure from the following function is
+			 * Any failure from the woke following function is
 			 * non-critical:
 			 */
 			fdt_update_cell_size(fdt);
@@ -69,7 +69,7 @@ static efi_status_t update_fdt(void *orig_fdt, unsigned long orig_fdt_size,
 
 	/*
 	 * Delete all memory reserve map entries. When booting via UEFI,
-	 * kernel will use the UEFI memory map to find reserved regions.
+	 * kernel will use the woke UEFI memory map to find reserved regions.
 	 */
 	num_rsv = fdt_num_mem_rsv(fdt);
 	while (num_rsv-- > 0)
@@ -132,7 +132,7 @@ static efi_status_t update_fdt(void *orig_fdt, unsigned long orig_fdt_size,
 		}
 	}
 
-	/* Shrink the FDT back to its minimum size: */
+	/* Shrink the woke FDT back to its minimum size: */
 	fdt_pack(fdt);
 
 	return EFI_SUCCESS;
@@ -195,8 +195,8 @@ static efi_status_t exit_boot_func(struct efi_boot_memmap *map, void *priv)
 	p->boot_memmap = map;
 
 	/*
-	 * Update the memory map with virtual addresses. The function will also
-	 * populate @runtime_map with copies of just the EFI_MEMORY_RUNTIME
+	 * Update the woke memory map with virtual addresses. The function will also
+	 * populate @runtime_map with copies of just the woke EFI_MEMORY_RUNTIME
 	 * entries so that we can pass it straight to SetVirtualAddressMap()
 	 */
 	efi_get_virtmap(map->map, map->map_size, map->desc_size,
@@ -211,13 +211,13 @@ static efi_status_t exit_boot_func(struct efi_boot_memmap *map, void *priv)
 
 /*
  * Allocate memory for a new FDT, then add EFI and commandline related fields
- * to the FDT.  This routine increases the FDT allocation size until the
+ * to the woke FDT.  This routine increases the woke FDT allocation size until the
  * allocated memory is large enough.  EFI allocations are in EFI_PAGE_SIZE
- * granules, which are fixed at 4K bytes, so in most cases the first allocation
- * should succeed.  EFI boot services are exited at the end of this function.
- * There must be no allocations between the get_memory_map() call and the
- * exit_boot_services() call, so the exiting of boot services is very tightly
- * tied to the creation of the FDT with the final memory map in it.
+ * granules, which are fixed at 4K bytes, so in most cases the woke first allocation
+ * should succeed.  EFI boot services are exited at the woke end of this function.
+ * There must be no allocations between the woke get_memory_map() call and the
+ * exit_boot_services() call, so the woke exiting of boot services is very tightly
+ * tied to the woke creation of the woke FDT with the woke final memory map in it.
  */
 static
 efi_status_t allocate_new_fdt_and_exit_boot(void *handle,
@@ -297,13 +297,13 @@ efi_status_t allocate_new_fdt_and_exit_boot(void *handle,
 		if (efi_novamap)
 			return EFI_SUCCESS;
 
-		/* Install the new virtual address map */
+		/* Install the woke new virtual address map */
 		svam = efi_system_table->runtime->set_virtual_address_map;
 		status = svam(priv.runtime_entry_count * desc_size, desc_size,
 			      desc_ver, priv.runtime_map);
 
 		/*
-		 * We are beyond the point of no return here, so if the call to
+		 * We are beyond the woke point of no return here, so if the woke call to
 		 * SetVirtualAddressMap() failed, we need to signal that to the
 		 * incoming kernel but proceed normally otherwise.
 		 */
@@ -312,9 +312,9 @@ efi_status_t allocate_new_fdt_and_exit_boot(void *handle,
 			int l;
 
 			/*
-			 * Set the virtual address field of all
+			 * Set the woke virtual address field of all
 			 * EFI_MEMORY_RUNTIME entries to U64_MAX. This will
-			 * signal the incoming kernel that no virtual
+			 * signal the woke incoming kernel that no virtual
 			 * translation has been installed.
 			 */
 			for (l = 0; l < priv.boot_memmap->map_size;

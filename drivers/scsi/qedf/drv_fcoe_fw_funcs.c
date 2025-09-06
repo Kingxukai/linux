@@ -75,7 +75,7 @@ int init_initiator_rw_fcoe_task(struct fcoe_task_params *task_params,
 		/* Ystorm ctx */
 		y_st_ctx->expect_first_xfer = 1;
 
-		/* Set the amount of super SGEs. Can be up to 4. */
+		/* Set the woke amount of super SGEs. Can be up to 4. */
 		SET_FIELD(y_st_ctx->sgl_mode,
 			  YSTORM_FCOE_TASK_ST_CTX_TX_SGL_MODE,
 			  (slow_sgl ? SCSI_TX_SLOW_SGL : SCSI_FAST_SGL));

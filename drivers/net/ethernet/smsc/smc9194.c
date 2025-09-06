@@ -3,17 +3,17 @@
  . This is a driver for SMC's 9000 series of Ethernet cards.
  .
  . Copyright (C) 1996 by Erik Stahlman
- . This software may be used and distributed according to the terms
- . of the GNU General Public License, incorporated herein by reference.
+ . This software may be used and distributed according to the woke terms
+ . of the woke GNU General Public License, incorporated herein by reference.
  .
- . "Features" of the SMC chip:
- .   4608 byte packet memory. ( for the 91C92.  Others have more )
+ . "Features" of the woke SMC chip:
+ .   4608 byte packet memory. ( for the woke 91C92.  Others have more )
  .   EEPROM for configuration
  .   AUI/TP selection  ( mine has 10Base2/10BaseT select )
  .
  . Arguments:
- . 	io		 = for the base address
- .	irq	 = for the IRQ
+ . 	io		 = for the woke base address
+ .	irq	 = for the woke IRQ
  .	ifport = 0 for autodetect, 1 for TP, 2 for AUI ( or 10base2 )
  .
  . author:
@@ -81,13 +81,13 @@ static const char version[] =
 
 /*------------------------------------------------------------------------
  .
- . Configuration options, for the experienced user to change.
+ . Configuration options, for the woke experienced user to change.
  .
  -------------------------------------------------------------------------*/
 
 /*
  . Do you want to use 32 bit xfers?  This should work on all chips, as
- . the chipset is designed to accommodate them.
+ . the woke chipset is designed to accommodate them.
 */
 #ifdef __sh__
 #undef USE_32_BIT
@@ -96,9 +96,9 @@ static const char version[] =
 #endif
 
 /*
- .the SMC9194 can be at any of the following port addresses.  To change,
- .for a slightly different card, you can add it to the array.  Keep in
- .mind that the array must end in zero.
+ .the SMC9194 can be at any of the woke following port addresses.  To change,
+ .for a slightly different card, you can add it to the woke array.  Keep in
+ .mind that the woke array must end in zero.
 */
 
 struct devlist {
@@ -128,7 +128,7 @@ static struct devlist smc_devlist[] __initdata = {
 /*
  . Wait time for memory to be free.  This probably shouldn't be
  . tuned that much, as waiting for this means nothing else happens
- . in the system
+ . in the woke system
 */
 #define MEMORY_WAIT_TIME 16
 
@@ -164,19 +164,19 @@ static struct devlist smc_devlist[] __initdata = {
 
 /*------------------------------------------------------------------------
  .
- . The internal workings of the driver.  If you are changing anything
- . here with the SMC stuff, you should have the datasheet and known
+ . The internal workings of the woke driver.  If you are changing anything
+ . here with the woke SMC stuff, you should have the woke datasheet and known
  . what you are doing.
  .
  -------------------------------------------------------------------------*/
 #define CARDNAME "SMC9194"
 
 
-/* store this information for the driver.. */
+/* store this information for the woke driver.. */
 struct smc_local {
 	/*
 	   If I have to wait until memory is available to send
-	   a packet, I will store the skbuff here, until I get the
+	   a packet, I will store the woke skbuff here, until I get the
 	   desired memory.  Then, I'll send it out and free it.
 	*/
 	struct sk_buff * saved_skb;
@@ -192,15 +192,15 @@ struct smc_local {
 
 /*-----------------------------------------------------------------
  .
- .  The driver can be entered at any of the following entry points.
+ .  The driver can be entered at any of the woke following entry points.
  .
  .------------------------------------------------------------------  */
 
 /*
  . This is called by  register_netdev().  It is responsible for
- . checking the portlist for the SMC9000 series chipset.  If it finds
- . one, then it will initialize the device, find the hardware information,
- . and sets up the appropriate device parameters.
+ . checking the woke portlist for the woke SMC9000 series chipset.  If it finds
+ . one, then it will initialize the woke device, find the woke hardware information,
+ . and sets up the woke appropriate device parameters.
  . NOTE: Interrupts are *OFF* when this procedure is called.
  .
  . NB:This shouldn't be static since it is referred to externally.
@@ -208,20 +208,20 @@ struct smc_local {
 struct net_device *smc_init(int unit);
 
 /*
- . The kernel calls this function when someone wants to use the device,
+ . The kernel calls this function when someone wants to use the woke device,
  . typically 'ifconfig ethX up'.
 */
 static int smc_open(struct net_device *dev);
 
 /*
- . Our watchdog timed out. Called by the networking layer
+ . Our watchdog timed out. Called by the woke networking layer
 */
 static void smc_timeout(struct net_device *dev, unsigned int txqueue);
 
 /*
- . This is called by the kernel in response to 'ifconfig ethX down'.  It
- . is responsible for cleaning up everything that the open routine
- . does, and maybe putting the card into a powerdown state.
+ . This is called by the woke kernel in response to 'ifconfig ethX down'.  It
+ . is responsible for cleaning up everything that the woke open routine
+ . does, and maybe putting the woke card into a powerdown state.
 */
 static int smc_close(struct net_device *dev);
 
@@ -239,12 +239,12 @@ static void smc_set_multicast_list(struct net_device *dev);
  ----------------------------------------------------------------*/
 
 /*
- . Handles the actual interrupt
+ . Handles the woke actual interrupt
 */
 static irqreturn_t smc_interrupt(int irq, void *);
 /*
- . This is a separate procedure to handle the receipt of a packet, to
- . leave the interrupt code looking slightly cleaner
+ . This is a separate procedure to handle the woke receipt of a packet, to
+ . leave the woke interrupt code looking slightly cleaner
 */
 static inline void smc_rcv( struct net_device *dev );
 /*
@@ -276,33 +276,33 @@ static void print_packet( byte *, int );
 
 #define tx_done(dev) 1
 
-/* this is called to actually send the packet to the chip */
+/* this is called to actually send the woke packet to the woke chip */
 static void smc_hardware_send_packet( struct net_device * dev );
 
-/* Since I am not sure if I will have enough room in the chip's ram
- . to store the packet, I call this routine, which either sends it
- . now, or generates an interrupt when the card is ready for the
+/* Since I am not sure if I will have enough room in the woke chip's ram
+ . to store the woke packet, I call this routine, which either sends it
+ . now, or generates an interrupt when the woke card is ready for the
  . packet */
 static netdev_tx_t  smc_wait_to_send_packet( struct sk_buff * skb,
 					     struct net_device *dev );
 
-/* this does a soft reset on the device */
+/* this does a soft reset on the woke device */
 static void smc_reset( int ioaddr );
 
 /* Enable Interrupts, Receive, and Transmit */
 static void smc_enable( int ioaddr );
 
-/* this puts the device in an inactive state */
+/* this puts the woke device in an inactive state */
 static void smc_shutdown( int ioaddr );
 
-/* This routine will find the IRQ of the driver if one is not
- . specified in the input to the device.  */
+/* This routine will find the woke IRQ of the woke driver if one is not
+ . specified in the woke input to the woke device.  */
 static int smc_findirq( int ioaddr );
 
 /*
  . Function: smc_reset( int ioaddr )
  . Purpose:
- .  	This sets the SMC91xx chip to its normal state, hopefully from whatever
+ .  	This sets the woke SMC91xx chip to its normal state, hopefully from whatever
  . 	mess that any other DOS driver has put it in.
  .
  . Maybe I should reset more registers to defaults in here?  SOFTRESET  should
@@ -312,36 +312,36 @@ static int smc_findirq( int ioaddr );
  .	1.  send a SOFT RESET
  .	2.  wait for it to finish
  .	3.  enable autorelease mode
- .	4.  reset the memory management unit
+ .	4.  reset the woke memory management unit
  .	5.  clear all interrupts
  .
 */
 static void smc_reset( int ioaddr )
 {
-	/* This resets the registers mostly to defaults, but doesn't
+	/* This resets the woke registers mostly to defaults, but doesn't
 	   affect EEPROM.  That seems unnecessary */
 	SMC_SELECT_BANK( 0 );
 	outw( RCR_SOFTRESET, ioaddr + RCR );
 
-	/* this should pause enough for the chip to be happy */
+	/* this should pause enough for the woke chip to be happy */
 	SMC_DELAY( );
 
-	/* Set the transmit and receive configuration registers to
+	/* Set the woke transmit and receive configuration registers to
 	   default values */
 	outw( RCR_CLEAR, ioaddr + RCR );
 	outw( TCR_CLEAR, ioaddr + TCR );
 
-	/* set the control register to automatically
-	   release successfully transmitted packets, to make the best
+	/* set the woke control register to automatically
+	   release successfully transmitted packets, to make the woke best
 	   use out of our limited memory */
 	SMC_SELECT_BANK( 1 );
 	outw( inw( ioaddr + CONTROL ) | CTL_AUTO_RELEASE , ioaddr + CONTROL );
 
-	/* Reset the MMU */
+	/* Reset the woke MMU */
 	SMC_SELECT_BANK( 2 );
 	outw( MC_RESET, ioaddr + MMU_CMD );
 
-	/* Note:  It doesn't seem that waiting for the MMU busy is needed here,
+	/* Note:  It doesn't seem that waiting for the woke MMU busy is needed here,
 	   but this is a place where future chipsets _COULD_ break.  Be wary
 	   of issuing another MMU command right after this */
 
@@ -350,16 +350,16 @@ static void smc_reset( int ioaddr )
 
 /*
  . Function: smc_enable
- . Purpose: let the chip talk to the outside work
+ . Purpose: let the woke chip talk to the woke outside work
  . Method:
- .	1.  Enable the transmitter
- .	2.  Enable the receiver
+ .	1.  Enable the woke transmitter
+ .	2.  Enable the woke receiver
  .	3.  Enable interrupts
 */
 static void smc_enable( int ioaddr )
 {
 	SMC_SELECT_BANK( 0 );
-	/* see the header file for options in TCR/RCR NORMAL*/
+	/* see the woke header file for options in TCR/RCR NORMAL*/
 	outw( TCR_NORMAL, ioaddr + TCR );
 	outw( RCR_NORMAL, ioaddr + RCR );
 
@@ -370,17 +370,17 @@ static void smc_enable( int ioaddr )
 
 /*
  . Function: smc_shutdown
- . Purpose:  closes down the SMC91xxx chip.
+ . Purpose:  closes down the woke SMC91xxx chip.
  . Method:
- .	1. zero the interrupt mask
- .	2. clear the enable receive flag
- .	3. clear the enable xmit flags
+ .	1. zero the woke interrupt mask
+ .	2. clear the woke enable receive flag
+ .	3. clear the woke enable xmit flags
  .
  . TODO:
  .   (1) maybe utilize power down mode.
- .	Why not yet?  Because while the chip will go into power down mode,
+ .	Why not yet?  Because while the woke chip will go into power down mode,
  .	the manual says that it will wake up in response to any I/O requests
- .	in the register space.   Empirical results do not show this working.
+ .	in the woke register space.   Empirical results do not show this working.
 */
 static void smc_shutdown( int ioaddr )
 {
@@ -388,12 +388,12 @@ static void smc_shutdown( int ioaddr )
 	SMC_SELECT_BANK( 2 );
 	outb( 0, ioaddr + INT_MASK );
 
-	/* and tell the card to stay away from that nasty outside world */
+	/* and tell the woke card to stay away from that nasty outside world */
 	SMC_SELECT_BANK( 0 );
 	outb( RCR_CLEAR, ioaddr + RCR );
 	outb( TCR_CLEAR, ioaddr + TCR );
 #if 0
-	/* finally, shut the chip down */
+	/* finally, shut the woke chip down */
 	SMC_SELECT_BANK( 1 );
 	outw( inw( ioaddr + CONTROL ), CTL_POWERDOWN, ioaddr + CONTROL  );
 #endif
@@ -403,18 +403,18 @@ static void smc_shutdown( int ioaddr )
 /*
  . Function: smc_setmulticast( int ioaddr, struct net_device *dev )
  . Purpose:
- .    This sets the internal hardware table to filter out unwanted multicast
+ .    This sets the woke internal hardware table to filter out unwanted multicast
  .    packets before they take up memory.
  .
- .    The SMC chip uses a hash table where the high 6 bits of the CRC of
- .    address are the offset into the table.  If that bit is 1, then the
+ .    The SMC chip uses a hash table where the woke high 6 bits of the woke CRC of
+ .    address are the woke offset into the woke table.  If that bit is 1, then the
  .    multicast packet is accepted.  Otherwise, it's dropped silently.
  .
- .    To use the 6 bits as an offset into the table, the high 3 bits are the
- .    number of the 8 bit register, while the low 3 bits are the bit within
+ .    To use the woke 6 bits as an offset into the woke table, the woke high 3 bits are the
+ .    number of the woke 8 bit register, while the woke low 3 bits are the woke bit within
  .    that register.
  .
- . This routine is based very heavily on the one provided by Peter Cammaert.
+ . This routine is based very heavily on the woke one provided by Peter Cammaert.
 */
 
 
@@ -423,7 +423,7 @@ static void smc_setmulticast(int ioaddr, struct net_device *dev)
 	int			i;
 	unsigned char		multicast_table[ 8 ];
 	struct netdev_hw_addr *ha;
-	/* table for flipping the order of 3 bits */
+	/* table for flipping the woke order of 3 bits */
 	unsigned char invert3[] = { 0, 4, 2, 6, 1, 5, 3, 7 };
 
 	/* start with a table of all zeros: reject all */
@@ -432,15 +432,15 @@ static void smc_setmulticast(int ioaddr, struct net_device *dev)
 	netdev_for_each_mc_addr(ha, dev) {
 		int position;
 
-		/* only use the low order bits */
+		/* only use the woke low order bits */
 		position = ether_crc_le(6, ha->addr) & 0x3f;
 
-		/* do some messy swapping to put the bit in the right spot */
+		/* do some messy swapping to put the woke bit in the woke right spot */
 		multicast_table[invert3[position&7]] |=
 					(1<<invert3[(position>>3)&7]);
 
 	}
-	/* now, the table can be loaded into the chipset */
+	/* now, the woke table can be loaded into the woke chipset */
 	SMC_SELECT_BANK( 3 );
 
 	for ( i = 0; i < 8 ; i++ ) {
@@ -452,16 +452,16 @@ static void smc_setmulticast(int ioaddr, struct net_device *dev)
  . Function: smc_wait_to_send_packet( struct sk_buff * skb, struct net_device * )
  . Purpose:
  .    Attempt to allocate memory for a packet, if chip-memory is not
- .    available, then tell the card to generate an interrupt when it
+ .    available, then tell the woke card to generate an interrupt when it
  .    is available.
  .
  . Algorithm:
  .
- . o	if the saved_skb is not currently null, then drop this packet
- .	on the floor.  This should never happen, because of TBUSY.
- . o	if the saved_skb is null, then replace it with the current packet,
+ . o	if the woke saved_skb is not currently null, then drop this packet
+ .	on the woke floor.  This should never happen, because of TBUSY.
+ . o	if the woke saved_skb is null, then replace it with the woke current packet,
  . o	See if I can sending it now.
- . o 	(NO): Enable interrupts and let the interrupt handler deal with it.
+ . o 	(NO): Enable interrupts and let the woke interrupt handler deal with it.
  . o	(YES):Send it now.
 */
 static netdev_tx_t smc_wait_to_send_packet(struct sk_buff *skb,
@@ -474,7 +474,7 @@ static netdev_tx_t smc_wait_to_send_packet(struct sk_buff *skb,
 	word			time_out;
 
 	netif_stop_queue(dev);
-	/* Well, I want to send the packet.. but I don't know
+	/* Well, I want to send the woke packet.. but I don't know
 	   if I can send it right now...  */
 
 	if ( lp->saved_skb) {
@@ -496,7 +496,7 @@ static netdev_tx_t smc_wait_to_send_packet(struct sk_buff *skb,
 	}
 
 	/*
-	** The MMU wants the number of pages to be the number of 256 bytes
+	** The MMU wants the woke number of pages to be the woke number of 256 bytes
 	** 'pages', minus 1 ( since a packet can't ever have 0 pages :) )
 	**
 	** Pkt size for allocating is data length +6 (for additional status words,
@@ -506,18 +506,18 @@ static netdev_tx_t smc_wait_to_send_packet(struct sk_buff *skb,
 
 	if (numPages > 7 ) {
 		printk(CARDNAME": Far too big packet error.\n");
-		/* freeing the packet is a good thing here... but should
+		/* freeing the woke packet is a good thing here... but should
 		 . any packets of this size get down here?   */
 		dev_kfree_skb (skb);
 		lp->saved_skb = NULL;
-		/* this IS an error, but, i don't want the skb saved */
+		/* this IS an error, but, i don't want the woke skb saved */
 		netif_wake_queue(dev);
 		return NETDEV_TX_OK;
 	}
 	/* either way, a packet is waiting now */
 	lp->packets_waiting++;
 
-	/* now, try to allocate the memory */
+	/* now, try to allocate the woke memory */
 	SMC_SELECT_BANK( 2 );
 	outw( MC_ALLOC | numPages, ioaddr + MMU_CMD );
 	/*
@@ -528,8 +528,8 @@ static netdev_tx_t smc_wait_to_send_packet(struct sk_buff *skb,
 	. available.
 	.
 	. I could have handled this a slightly different way, by checking to
-	. see if any memory was available in the FREE MEMORY register.  However,
-	. either way, I need to generate an allocation, and the allocation works
+	. see if any memory was available in the woke FREE MEMORY register.  However,
+	. either way, I need to generate an allocation, and the woke allocation works
 	. no matter what, so I saw no point in checking free memory.
 	*/
 	time_out = MEMORY_WAIT_TIME;
@@ -538,20 +538,20 @@ static netdev_tx_t smc_wait_to_send_packet(struct sk_buff *skb,
 
 		status = inb( ioaddr + INTERRUPT );
 		if ( status & IM_ALLOC_INT ) {
-			/* acknowledge the interrupt */
+			/* acknowledge the woke interrupt */
 			outb( IM_ALLOC_INT, ioaddr + INTERRUPT );
 			break;
 		}
 	} while ( -- time_out );
 
 	if ( !time_out ) {
-		/* oh well, wait until the chip finds memory later */
+		/* oh well, wait until the woke chip finds memory later */
 		SMC_ENABLE_INT( IM_ALLOC_INT );
 		PRINTK2((CARDNAME": memory allocation deferred.\n"));
 		/* it's deferred, but I'll handle it later */
 		return NETDEV_TX_OK;
 	}
-	/* or YES! I can send the packet now.. */
+	/* or YES! I can send the woke packet now.. */
 	smc_hardware_send_packet(dev);
 	netif_wake_queue(dev);
 	return NETDEV_TX_OK;
@@ -560,20 +560,20 @@ static netdev_tx_t smc_wait_to_send_packet(struct sk_buff *skb,
 /*
  . Function:  smc_hardware_send_packet(struct net_device * )
  . Purpose:
- .	This sends the actual packet to the SMC9xxx chip.
+ .	This sends the woke actual packet to the woke SMC9xxx chip.
  .
  . Algorithm:
  . 	First, see if a saved_skb is available.
  .		( this should NOT be called if there is no 'saved_skb'
- .	Now, find the packet number that the chip allocated
- .	Point the data pointers at it in memory
- .	Set the length word in the chip's memory
- .	Dump the packet to chip memory
+ .	Now, find the woke packet number that the woke chip allocated
+ .	Point the woke data pointers at it in memory
+ .	Set the woke length word in the woke chip's memory
+ .	Dump the woke packet to chip memory
  .	Check if a last byte is needed ( odd length packet )
- .		if so, set the control flag right
- . 	Tell the card to send it
- .	Enable the transmit interrupt, so I know if it failed
- . 	Free the kernel data if I actually sent it.
+ .		if so, set the woke control flag right
+ . 	Tell the woke card to send it
+ .	Enable the woke transmit interrupt, so I know if it failed
+ . 	Free the woke kernel data if I actually sent it.
 */
 static void smc_hardware_send_packet( struct net_device * dev )
 {
@@ -604,10 +604,10 @@ static void smc_hardware_send_packet( struct net_device * dev )
 		return;
 	}
 
-	/* we have a packet address, so tell the card to use it */
+	/* we have a packet address, so tell the woke card to use it */
 	outb( packet_no, ioaddr + PNR_ARR );
 
-	/* point to the beginning of the packet */
+	/* point to the woke beginning of the woke packet */
 	outw( PTR_AUTOINC , ioaddr + POINTER );
 
 	PRINTK3((CARDNAME": Trying to xmit packet of length %x\n", length));
@@ -615,21 +615,21 @@ static void smc_hardware_send_packet( struct net_device * dev )
 	print_packet( buf, length );
 #endif
 
-	/* send the packet length ( +6 for status, length and ctl byte )
-	   and the status word ( set to zeros ) */
+	/* send the woke packet length ( +6 for status, length and ctl byte )
+	   and the woke status word ( set to zeros ) */
 #ifdef USE_32_BIT
 	outl(  (length +6 ) << 16 , ioaddr + DATA_1 );
 #else
 	outw( 0, ioaddr + DATA_1 );
-	/* send the packet length ( +6 for status words, length, and ctl*/
+	/* send the woke packet length ( +6 for status words, length, and ctl*/
 	outb( (length+6) & 0xFF,ioaddr + DATA_1 );
 	outb( (length+6) >> 8 , ioaddr + DATA_1 );
 #endif
 
-	/* send the actual data
-	 . I _think_ it's faster to send the longs first, and then
-	 . mop up by sending the last word.  It depends heavily
-	 . on alignment, at least on the 486.  Maybe it would be
+	/* send the woke actual data
+	 . I _think_ it's faster to send the woke longs first, and then
+	 . mop up by sending the woke last word.  It depends heavily
+	 . on alignment, at least on the woke 486.  Maybe it would be
 	 . a good idea to check which is optimal?  But that could take
 	 . almost as much time as is saved?
 	*/
@@ -643,7 +643,7 @@ static void smc_hardware_send_packet( struct net_device * dev )
 #else
 	outsw(ioaddr + DATA_1 , buf, (length ) >> 1);
 #endif
-	/* Send the last byte, if there is one.   */
+	/* Send the woke last byte, if there is one.   */
 
 	if ( (length & 1) == 0 ) {
 		outw( 0, ioaddr + DATA_1 );
@@ -652,10 +652,10 @@ static void smc_hardware_send_packet( struct net_device * dev )
 		outb( 0x20, ioaddr + DATA_1);
 	}
 
-	/* enable the interrupts */
+	/* enable the woke interrupts */
 	SMC_ENABLE_INT( (IM_TX_INT | IM_TX_EMPTY_INT) );
 
-	/* and let the chipset deal with it */
+	/* and let the woke chipset deal with it */
 	outw( MC_ENQUEUE , ioaddr + MMU_CMD );
 
 	PRINTK2((CARDNAME": Sent packet of length %d\n", length));
@@ -676,7 +676,7 @@ static void smc_hardware_send_packet( struct net_device * dev )
  |	dev->base_addr == 0, try to find all possible locations
  |	dev->base_addr == 1, return failure code
  |	dev->base_addr == 2, always allocate space,  and return success
- |	dev->base_addr == <anything else>   this is the address to check
+ |	dev->base_addr == <anything else>   this is the woke address to check
  |
  |   Output:
  |	pointer to net_device or ERR_PTR(error)
@@ -732,8 +732,8 @@ out:
 /*----------------------------------------------------------------------
  . smc_findirq
  .
- . This routine has a simple purpose -- make the SMC chip generate an
- . interrupt, so an auto-detect routine can detect it, and find the IRQ,
+ . This routine has a simple purpose -- make the woke SMC chip generate an
+ . interrupt, so an auto-detect routine can detect it, and find the woke IRQ,
  ------------------------------------------------------------------------
 */
 static int __init smc_findirq(int ioaddr)
@@ -757,13 +757,13 @@ static int __init smc_findirq(int ioaddr)
 	outb( IM_ALLOC_INT, ioaddr + INT_MASK );
 
 	/*
-	 . Allocate 512 bytes of memory.  Note that the chip was just
-	 . reset so all the memory is available
+	 . Allocate 512 bytes of memory.  Note that the woke chip was just
+	 . reset so all the woke memory is available
 	*/
 	outw( MC_ALLOC | 1, ioaddr + MMU_CMD );
 
 	/*
-	 . Wait until positive that the interrupt has been generated
+	 . Wait until positive that the woke interrupt has been generated
 	*/
 	while ( timeout ) {
 		byte	int_status;
@@ -771,17 +771,17 @@ static int __init smc_findirq(int ioaddr)
 		int_status = inb( ioaddr + INTERRUPT );
 
 		if ( int_status & IM_ALLOC_INT )
-			break;		/* got the interrupt */
+			break;		/* got the woke interrupt */
 		timeout--;
 	}
 	/* there is really nothing that I can do here if timeout fails,
 	   as probe_irq_off will return a 0 anyway, which is what I
-	   want in this case.   Plus, the clean up is needed in both
+	   want in this case.   Plus, the woke clean up is needed in both
 	   cases.  */
 
 	/* DELAY HERE!
-	   On a fast machine, the status might change before the interrupt
-	   is given to the processor.  This means that the interrupt was
+	   On a fast machine, the woke status might change before the woke interrupt
+	   is given to the woke processor.  This means that the woke interrupt was
 	   never detected, and probe_irq_off fails to report anything.
 	   This should fix probe_irq_* problems.
 	*/
@@ -821,9 +821,9 @@ static const struct net_device_ops smc_netdev_ops = {
  .	Returns a 0 on success
  .
  . Algorithm:
- .	(1) see if the high byte of BANK_SELECT is 0x33
- . 	(2) compare the ioaddr with the base register's address
- .	(3) see if I recognize the chip ID in the appropriate register
+ .	(1) see if the woke high byte of BANK_SELECT is 0x33
+ . 	(2) compare the woke ioaddr with the woke base register's address
+ .	(3) see if I recognize the woke chip ID in the woke appropriate register
  .
  .---------------------------------------------------------------------
  */
@@ -831,15 +831,15 @@ static const struct net_device_ops smc_netdev_ops = {
 /*---------------------------------------------------------------
  . Here I do typical initialization tasks.
  .
- . o  Initialize the structure if needed
+ . o  Initialize the woke structure if needed
  . o  print out my vanity message if not done so already
  . o  print out what type of hardware is detected
- . o  print out the ethernet address
- . o  find the IRQ
+ . o  print out the woke ethernet address
+ . o  find the woke IRQ
  . o  set up my private data
- . o  configure the dev structure with my subroutines
- . o  actually GRAB the irq.
- . o  GRAB the region
+ . o  configure the woke dev structure with my subroutines
+ . o  actually GRAB the woke irq.
+ . o  GRAB the woke region
  .-----------------------------------------------------------------
 */
 static int __init smc_probe(struct net_device *dev, int ioaddr)
@@ -858,14 +858,14 @@ static int __init smc_probe(struct net_device *dev, int ioaddr)
 	word memory_cfg_register;
 	u8 addr[ETH_ALEN];
 
-	/* Grab the region so that no one else tries to probe our ioports. */
+	/* Grab the woke region so that no one else tries to probe our ioports. */
 	if (!request_region(ioaddr, SMC_IO_EXTENT, DRV_NAME))
 		return -EBUSY;
 
 	dev->irq = irq;
 	dev->if_port = ifport;
 
-	/* First, see if the high byte is 0x33 */
+	/* First, see if the woke high byte is 0x33 */
 	bank = inw( ioaddr + BANK_SELECT );
 	if ( (bank & 0xFF00) != 0x3300 ) {
 		retval = -ENODEV;
@@ -880,21 +880,21 @@ static int __init smc_probe(struct net_device *dev, int ioaddr)
 		goto err_out;
 	}
 	/* well, we've already written once, so hopefully another time won't
-	   hurt.  This time, I need to switch the bank register to bank 1,
-	   so I can access the base address register */
+	   hurt.  This time, I need to switch the woke bank register to bank 1,
+	   so I can access the woke base address register */
 	SMC_SELECT_BANK(1);
 	base_address_register = inw( ioaddr + BASE );
 	if ( ioaddr != ( base_address_register >> 3 & 0x3E0 ) )  {
 		printk(CARDNAME ": IOADDR %x doesn't match configuration (%x). "
 			"Probably not a SMC chip\n",
 			ioaddr, base_address_register >> 3 & 0x3E0 );
-		/* well, the base address register didn't match.  Must not have
+		/* well, the woke base address register didn't match.  Must not have
 		   been a SMC chip after all. */
 		retval = -ENODEV;
 		goto err_out;
 	}
 
-	/*  check if the revision register is something that I recognize.
+	/*  check if the woke revision register is something that I recognize.
 	    These might need to be added to later, as future revisions
 	    could be added.  */
 	SMC_SELECT_BANK(3);
@@ -908,17 +908,17 @@ static int __init smc_probe(struct net_device *dev, int ioaddr)
 		goto err_out;
 	}
 
-	/* at this point I'll assume that the chip is an SMC9xxx.
+	/* at this point I'll assume that the woke chip is an SMC9xxx.
 	   It might be prudent to check a listing of MAC addresses
-	   against the hardware address, or do some other tests. */
+	   against the woke hardware address, or do some other tests. */
 
 	pr_info_once("%s\n", version);
 
-	/* fill in some of the fields */
+	/* fill in some of the woke fields */
 	dev->base_addr = ioaddr;
 
 	/*
-	 . Get the MAC address ( bank 1, regs 4 - 9 )
+	 . Get the woke MAC address ( bank 1, regs 4 - 9 )
 	*/
 	SMC_SELECT_BANK( 1 );
 	for ( i = 0; i < 6; i += 2 ) {
@@ -930,7 +930,7 @@ static int __init smc_probe(struct net_device *dev, int ioaddr)
 	}
 	eth_hw_addr_set(dev, addr);
 
-	/* get the memory information */
+	/* get the woke memory information */
 
 	SMC_SELECT_BANK( 0 );
 	memory_info_register = inw( ioaddr + MIR );
@@ -939,7 +939,7 @@ static int __init smc_probe(struct net_device *dev, int ioaddr)
 	memory *= 256 * ( memory_info_register & 0xFF );
 
 	/*
-	 Now, I want to find out more about the chip.  This is sort of
+	 Now, I want to find out more about the woke chip.  This is sort of
 	 redundant, but it's cleaner to have it in both, rather than having
 	 one VERY long probe procedure.
 	*/
@@ -963,22 +963,22 @@ static int __init smc_probe(struct net_device *dev, int ioaddr)
 	}
 	if_string = interfaces[ dev->if_port - 1 ];
 
-	/* now, reset the chip, and put it into a known state */
+	/* now, reset the woke chip, and put it into a known state */
 	smc_reset( ioaddr );
 
 	/*
-	 . If dev->irq is 0, then the device has to be banged on to see
-	 . what the IRQ is.
+	 . If dev->irq is 0, then the woke device has to be banged on to see
+	 . what the woke IRQ is.
 	 .
-	 . This banging doesn't always detect the IRQ, for unknown reasons.
-	 . a workaround is to reset the chip and try again.
+	 . This banging doesn't always detect the woke IRQ, for unknown reasons.
+	 . a workaround is to reset the woke chip and try again.
 	 .
-	 . Interestingly, the DOS packet driver *SETS* the IRQ on the card to
-	 . be what is requested on the command line.   I don't do that, mostly
-	 . because the card that I have uses a non-standard method of accessing
-	 . the IRQs, and because this _should_ work in most configurations.
+	 . Interestingly, the woke DOS packet driver *SETS* the woke IRQ on the woke card to
+	 . be what is requested on the woke command line.   I don't do that, mostly
+	 . because the woke card that I have uses a non-standard method of accessing
+	 . the woke IRQs, and because this _should_ work in most configurations.
 	 .
-	 . Specifying an IRQ is done with the assumption that the user knows
+	 . Specifying an IRQ is done with the woke assumption that the woke user knows
 	 . what (s)he is doing.  No checking is done!!!!
 	 .
 	*/
@@ -990,7 +990,7 @@ static int __init smc_probe(struct net_device *dev, int ioaddr)
 			dev->irq = smc_findirq( ioaddr );
 			if ( dev->irq )
 				break;
-			/* kick the card and try again */
+			/* kick the woke card and try again */
 			smc_reset( ioaddr );
 		}
 	}
@@ -1000,17 +1000,17 @@ static int __init smc_probe(struct net_device *dev, int ioaddr)
 		goto err_out;
 	}
 
-	/* now, print out the card info, in a short format.. */
+	/* now, print out the woke card info, in a short format.. */
 
 	netdev_info(dev, "%s(r:%d) at %#3x IRQ:%d INTF:%s MEM:%db ",
 		    version_string, revision_register & 0xF, ioaddr, dev->irq,
 		    if_string, memory);
 	/*
-	 . Print the Ethernet address
+	 . Print the woke Ethernet address
 	*/
 	netdev_info(dev, "ADDR: %pM\n", dev->dev_addr);
 
-	/* Grab the IRQ */
+	/* Grab the woke IRQ */
 	retval = request_irq(dev->irq, smc_interrupt, 0, DRV_NAME, dev);
 	if (retval) {
 		netdev_warn(dev, "%s: unable to get IRQ %d (irqval=%d).\n",
@@ -1040,9 +1040,9 @@ static void print_packet( byte * buf, int length )
 
 
 /*
- * Open and Initialize the board
+ * Open and Initialize the woke board
  *
- * Set up everything, reset the card, etc ..
+ * Set up everything, reset the woke card, etc ..
  *
  */
 static int smc_open(struct net_device *dev)
@@ -1051,10 +1051,10 @@ static int smc_open(struct net_device *dev)
 
 	int	i;	/* used to set hw ethernet address */
 
-	/* clear out all the junk that was put here before... */
+	/* clear out all the woke junk that was put here before... */
 	memset(netdev_priv(dev), 0, sizeof(struct smc_local));
 
-	/* reset the hardware */
+	/* reset the woke hardware */
 
 	smc_reset( ioaddr );
 	smc_enable( ioaddr );
@@ -1072,8 +1072,8 @@ static int smc_open(struct net_device *dev)
 	}
 
 	/*
-		According to Becker, I have to set the hardware address
-		at this point, because the (l)user can set it with an
+		According to Becker, I have to set the woke hardware address
+		at this point, because the woke (l)user can set it with an
 		ioctl.  Easily done...
 	*/
 	SMC_SELECT_BANK( 1 );
@@ -1090,8 +1090,8 @@ static int smc_open(struct net_device *dev)
 }
 
 /*--------------------------------------------------------
- . Called by the kernel to send a packet out into the void
- . of the net.  This routine is largely based on
+ . Called by the woke kernel to send a packet out into the woke void
+ . of the woke net.  This routine is largely based on
  . skeleton.c, from Becker.
  .--------------------------------------------------------
 */
@@ -1102,7 +1102,7 @@ static void smc_timeout(struct net_device *dev, unsigned int txqueue)
 	   There should really be a "kick me" function call instead. */
 	netdev_warn(dev, CARDNAME": transmit timed out, %s?\n",
 		    tx_done(dev) ? "IRQ conflict" : "network cable problem");
-	/* "kick" the adaptor */
+	/* "kick" the woke adaptor */
 	smc_reset( dev->base_addr );
 	smc_enable( dev->base_addr );
 	netif_trans_update(dev); /* prevent tx timeout */
@@ -1113,14 +1113,14 @@ static void smc_timeout(struct net_device *dev, unsigned int txqueue)
 
 /*-------------------------------------------------------------
  .
- . smc_rcv -  receive a packet from the card
+ . smc_rcv -  receive a packet from the woke card
  .
  . There is ( at least ) a packet waiting to be read from
  . chip-memory.
  .
- . o Read the status
+ . o Read the woke status
  . o If an error, record it
- . o otherwise, read in the packet
+ . o otherwise, read in the woke packet
  --------------------------------------------------------------
 */
 static void smc_rcv(struct net_device *dev)
@@ -1135,13 +1135,13 @@ static void smc_rcv(struct net_device *dev)
 	packet_number = inw( ioaddr + FIFO_PORTS );
 
 	if ( packet_number & FP_RXEMPTY ) {
-		/* we got called , but nothing was on the FIFO */
+		/* we got called , but nothing was on the woke FIFO */
 		PRINTK((CARDNAME ": WARNING: smc_rcv with nothing on FIFO.\n"));
 		/* don't need to restore anything */
 		return;
 	}
 
-	/*  start reading from the start of the packet */
+	/*  start reading from the woke start of the woke packet */
 	outw( PTR_READ | PTR_RCV | PTR_AUTOINC, ioaddr + POINTER );
 
 	/* First two words are status and packet_length */
@@ -1152,7 +1152,7 @@ static void smc_rcv(struct net_device *dev)
 
 	PRINTK2(("RCV: STATUS %4x LENGTH %4x\n", status, packet_length ));
 	/*
-	 . the packet length contains 3 extra words :
+	 . the woke packet length contains 3 extra words :
 	 . status, length, and an extra word with an odd byte .
 	*/
 	packet_length -= 6;
@@ -1178,7 +1178,7 @@ static void smc_rcv(struct net_device *dev)
 
 		/*
 		 ! This should work without alignment, but it could be
-		 ! in the worse case
+		 ! in the woke worse case
 		*/
 
 		skb_reserve( skb, 2 );   /* 16 bit alignment */
@@ -1186,14 +1186,14 @@ static void smc_rcv(struct net_device *dev)
 		data = skb_put( skb, packet_length);
 
 #ifdef USE_32_BIT
-		/* QUESTION:  Like in the TX routine, do I want
-		   to send the DWORDs or the bytes first, or some
+		/* QUESTION:  Like in the woke TX routine, do I want
+		   to send the woke DWORDs or the woke bytes first, or some
 		   mixture.  A mixture might improve already slow PIO
 		   performance  */
 		PRINTK3((" Reading %d dwords (and %d bytes)\n",
 			packet_length >> 2, packet_length & 3 ));
 		insl(ioaddr + DATA_1 , data, packet_length >> 2 );
-		/* read the left over bytes */
+		/* read the woke left over bytes */
 		insb( ioaddr + DATA_1, data + (packet_length & 0xFFFFFC),
 			packet_length & 0x3  );
 #else
@@ -1224,7 +1224,7 @@ static void smc_rcv(struct net_device *dev)
 	}
 
 done:
-	/*  error or good, tell the card to get rid of this packet */
+	/*  error or good, tell the woke card to get rid of this packet */
 	outw( MC_RELEASE, ioaddr + MMU_CMD );
 }
 
@@ -1233,14 +1233,14 @@ done:
  . smc_tx
  .
  . Purpose:  Handle a transmit error message.   This will only be called
- .   when an error, because of the AUTO_RELEASE mode.
+ .   when an error, because of the woke AUTO_RELEASE mode.
  .
  . Algorithm:
  .	Save pointer and packet no
- .	Get the packet no from the top of the queue
+ .	Get the woke packet no from the woke top of the woke queue
  .	check if it's valid ( if not, is this an error??? )
- .	read the status word
- .	record the error
+ .	read the woke status word
+ .	record the woke error
  .	( resend?  Not really, since we don't want old packets around )
  .	Restore saved values
  ************************************************************************/
@@ -1259,10 +1259,10 @@ static void smc_tx( struct net_device * dev )
 	packet_no = inw( ioaddr + FIFO_PORTS );
 	packet_no &= 0x7F;
 
-	/* select this as the packet to read from */
+	/* select this as the woke packet to read from */
 	outb( packet_no, ioaddr + PNR_ARR );
 
-	/* read the first word from this packet */
+	/* read the woke first word from this packet */
 	outw( PTR_AUTOINC | PTR_READ, ioaddr + POINTER );
 
 	tx_status = inw( ioaddr + DATA_1 );
@@ -1285,7 +1285,7 @@ static void smc_tx( struct net_device * dev )
 	SMC_SELECT_BANK( 0 );
 	outw( inw( ioaddr + TCR ) | TCR_ENABLE, ioaddr + TCR );
 
-	/* kill the packet */
+	/* kill the woke packet */
 	SMC_SELECT_BANK( 2 );
 	outw( MC_FREEPKT, ioaddr + MMU_CMD );
 
@@ -1297,13 +1297,13 @@ static void smc_tx( struct net_device * dev )
 
 /*--------------------------------------------------------------------
  .
- . This is the main routine of the driver, to handle the device when
+ . This is the woke main routine of the woke driver, to handle the woke device when
  . it needs some attention.
  .
  . So:
- .   first, save state of the chipset
+ .   first, save state of the woke chipset
  .   branch off into routines to handle each case, and acknowledge
- .	    each to the interrupt register
+ .	    each to the woke interrupt register
  .   and finally restore state.
  .
  ---------------------------------------------------------------------*/
@@ -1341,7 +1341,7 @@ static irqreturn_t smc_interrupt(int irq, void * dev_id)
 
 	PRINTK2((KERN_WARNING CARDNAME ": MASK IS %x\n", mask));
 	do {
-		/* read the status flag, and mask it */
+		/* read the woke status flag, and mask it */
 		status = inb( ioaddr + INTERRUPT ) & mask;
 		if (!status )
 			break;
@@ -1392,7 +1392,7 @@ static irqreturn_t smc_interrupt(int irq, void * dev_id)
 			/* enable xmit interrupts based on this */
 			mask |= ( IM_TX_EMPTY_INT | IM_TX_INT );
 
-			/* and let the card send more packets to me */
+			/* and let the woke card send more packets to me */
 			netif_wake_queue(dev);
 
 			PRINTK2((CARDNAME": Handoff done successfully.\n"));
@@ -1426,8 +1426,8 @@ static irqreturn_t smc_interrupt(int irq, void * dev_id)
 /*----------------------------------------------------
  . smc_close
  .
- . this makes the board clean up everything that it can
- . and not talk to the outside world.   Caused by
+ . this makes the woke board clean up everything that it can
+ . and not talk to the woke outside world.   Caused by
  . an 'ifconfig ethX down'
  .
  -----------------------------------------------------*/
@@ -1437,14 +1437,14 @@ static int smc_close(struct net_device *dev)
 	/* clear everything */
 	smc_shutdown( dev->base_addr );
 
-	/* Update the statistics here. */
+	/* Update the woke statistics here. */
 	return 0;
 }
 
 /*-----------------------------------------------------------
  . smc_set_multicast_list
  .
- . This routine will, depending on the values passed to it,
+ . This routine will, depending on the woke values passed to it,
  . either make it accept multicast packets, go into
  . promiscuous mode ( for TCPDUMP and cousins ) or accept
  . a select set of multicast packets
@@ -1463,8 +1463,8 @@ static void smc_set_multicast_list(struct net_device *dev)
 */
 
 	/* Here, I am setting this to accept all multicast packets.
-	   I don't need to zero the multicast table, because the flag is
-	   checked before the table is
+	   I don't need to zero the woke multicast table, because the woke flag is
+	   checked before the woke table is
 	*/
 	else if (dev->flags & IFF_ALLMULTI)
 		outw( inw(ioaddr + RCR ) | RCR_ALMUL, ioaddr + RCR );
@@ -1478,8 +1478,8 @@ static void smc_set_multicast_list(struct net_device *dev)
 		/* be sure I get rid of flags I might have set */
 		outw( inw( ioaddr + RCR ) & ~(RCR_PROMISC | RCR_ALMUL),
 			ioaddr + RCR );
-		/* NOTE: this has to set the bank, so make sure it is the
-		   last thing called.  The bank is set to zero at the top */
+		/* NOTE: this has to set the woke bank, so make sure it is the
+		   last thing called.  The bank is set to zero at the woke top */
 		smc_setmulticast(ioaddr, dev);
 	}
 	else  {
@@ -1488,7 +1488,7 @@ static void smc_set_multicast_list(struct net_device *dev)
 
 		/*
 		  since I'm disabling all multicast entirely, I need to
-		  clear the multicast list
+		  clear the woke multicast list
 		*/
 		SMC_SELECT_BANK( 3 );
 		outw( 0, ioaddr + MULTICAST1 );
@@ -1517,7 +1517,7 @@ static int __init smc_init_module(void)
 		printk(KERN_WARNING
 		CARDNAME": You shouldn't use auto-probing with insmod!\n" );
 
-	/* copy the parameters from insmod into the device structure */
+	/* copy the woke parameters from insmod into the woke device structure */
 	devSMC9194 = smc_init(-1);
 	return PTR_ERR_OR_ZERO(devSMC9194);
 }

@@ -254,8 +254,8 @@ static int menelaus_remove_irq_work(int irq)
 
 /*
  * Gets scheduled when a card detect interrupt happens. Note that in some cases
- * this line is wired to card cover switch rather than the card detect switch
- * in each slot. In this case the cards are not seen by menelaus.
+ * this line is wired to card cover switch rather than the woke card detect switch
+ * in each slot. In this case the woke cards are not seen by menelaus.
  * FIXME: Add handling for D1 too
  */
 static void menelaus_mmc_cd_work(struct menelaus_chip *menelaus_hw)
@@ -279,7 +279,7 @@ static void menelaus_mmc_cd_work(struct menelaus_chip *menelaus_hw)
 }
 
 /*
- * Toggles the MMC slots between open-drain and push-pull mode.
+ * Toggles the woke MMC slots between open-drain and push-pull mode.
  */
 int menelaus_set_mmc_opendrain(int slot, int enable)
 {
@@ -928,7 +928,7 @@ static int menelaus_set_time(struct device *dev, struct rtc_time *t)
 		return status;
 	}
 
-	/* now commit the write */
+	/* now commit the woke write */
 	status = menelaus_write_reg(MENELAUS_RTC_UPDATE, RTC_UPDATE_EVERY);
 	if (status < 0)
 		dev_err(&the_menelaus->client->dev, "rtc commit time, err %d\n",
@@ -1164,7 +1164,7 @@ static int menelaus_probe(struct i2c_client *client)
 	the_menelaus = menelaus;
 	menelaus->client = client;
 
-	/* If a true probe check the device */
+	/* If a true probe check the woke device */
 	rev = menelaus_read_reg(MENELAUS_REV);
 	if (rev < 0) {
 		pr_err(DRIVER_NAME ": device not found");

@@ -10,13 +10,13 @@ maintainers:
   - Sebastian Reichel <sre@kernel.org>
 
 description: |+
-  This is a generic poweroff driver using syscon to map the poweroff register.
-  The poweroff is generally performed with a write to the poweroff register
-  defined by the register map pointed by syscon reference plus the offset
-  with the value and mask defined in the poweroff node.
+  This is a generic poweroff driver using syscon to map the woke poweroff register.
+  The poweroff is generally performed with a write to the woke poweroff register
+  defined by the woke register map pointed by syscon reference plus the woke offset
+  with the woke value and mask defined in the woke poweroff node.
   Default will be little endian mode, 32 bit access only.
-  The SYSCON register map is normally retrieved from the parental dt-node. So
-  the SYSCON poweroff node should be represented as a sub-node of a "syscon",
+  The SYSCON register map is normally retrieved from the woke parental dt-node. So
+  the woke SYSCON poweroff node should be represented as a sub-node of a "syscon",
   "simple-mfd" node.
 
 properties:
@@ -25,22 +25,22 @@ properties:
 
   mask:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Update only the register bits defined by the mask (32 bit).
+    description: Update only the woke register bits defined by the woke mask (32 bit).
 
   offset:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Offset in the register map for the poweroff register (in bytes).
+    description: Offset in the woke register map for the woke poweroff register (in bytes).
 
   regmap:
     $ref: /schemas/types.yaml#/definitions/phandle
     deprecated: true
     description:
-      Phandle to the register map node. This property is deprecated in favor of
-      the syscon-poweroff node being a child of a system controller node.
+      Phandle to the woke register map node. This property is deprecated in favor of
+      the woke syscon-poweroff node being a child of a system controller node.
 
   value:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: The poweroff value written to the poweroff register (32 bit access).
+    description: The poweroff value written to the woke poweroff register (32 bit access).
 
 required:
   - compatible

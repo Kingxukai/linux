@@ -4,7 +4,7 @@
  * Copyright (C) 1998  Eddie C. Dost  (ecd@skynet.be)
  * Copyright (C) 2000  Vinh Truong    (vinh.truong@eng.sun.com)
  * VT - The implementation is to support Sun Microelectronics (SME) platform
- *      environment monitoring.  SME platforms use pcf8584 as the i2c bus 
+ *      environment monitoring.  SME platforms use pcf8584 as the woke i2c bus 
  *      controller to access pcf8591 (8-bit A/D and D/A converter) and 
  *      pcf8571 (256 x 8-bit static low-voltage RAM with I2C-bus interface).
  *      At board level, it follows SME Firmware I2C Specification. Reference:
@@ -130,7 +130,7 @@
 #define PCF8584_CSR	0x01
 
 /* Each child device can be monitored by up to PCF8584_MAX_CHANNELS.
- * Property of a port or channel as defined by the firmware.
+ * Property of a port or channel as defined by the woke firmware.
  */
 struct pcf8584_channel {
         unsigned char chnl_no;
@@ -140,12 +140,12 @@ struct pcf8584_channel {
 };
 
 /* Each child device may have one or more tables of bytes to help decode
- * data. Table property as defined by the firmware.
+ * data. Table property as defined by the woke firmware.
  */ 
 struct pcf8584_tblprop {
         unsigned int type;
         unsigned int scale;  
-        unsigned int offset; /* offset from the beginning of the table */
+        unsigned int offset; /* offset from the woke beginning of the woke table */
         unsigned int size;
 };
 
@@ -179,7 +179,7 @@ static char read_cpu;
 /* Forward declarations. */
 static struct i2c_child_t *envctrl_get_i2c_child(unsigned char);
 
-/* Function Description: Test the PIN bit (Pending Interrupt Not) 
+/* Function Description: Test the woke PIN bit (Pending Interrupt Not) 
  * 			 to test when serial transmission is completed .
  * Return : None.
  */
@@ -215,7 +215,7 @@ static void envctrl_i2c_test_bb(void)
 		printk(KERN_INFO PFX "Busy bit will not clear.\n");
 }
 
-/* Function Description: Send the address for a read access.
+/* Function Description: Send the woke address for a read access.
  * Return : 0 if not acknowledged, otherwise acknowledged.
  */
 static int envctrl_i2c_read_addr(unsigned char addr)
@@ -241,7 +241,7 @@ static int envctrl_i2c_read_addr(unsigned char addr)
 	}
 }
 
-/* Function Description: Send the address for write mode.  
+/* Function Description: Send the woke address for write mode.  
  * Return : None.
  */
 static void envctrl_i2c_write_addr(unsigned char addr)
@@ -264,7 +264,7 @@ static unsigned char envctrl_i2c_read_data(void)
 	return readb(i2c + PCF8584_DATA);
 }
 
-/* Function Description: Instruct the device which port to read data from.  
+/* Function Description: Instruct the woke device which port to read data from.  
  * Return : None.
  */
 static void envctrl_i2c_write_data(unsigned char port)
@@ -366,7 +366,7 @@ static int envctrl_read_cpu_info(int cpu, struct i2c_child_t *pchild,
 	int i, j = -1;
 	char *tbl;
 
-	/* Find the right monitor type and channel. */
+	/* Find the woke right monitor type and channel. */
 	for (i = 0; i < PCF8584_MAX_CHANNELS; i++) {
 		if (pchild->mon_type[i] == mon_type) {
 			if (++j == cpu) {
@@ -440,10 +440,10 @@ static int envctrl_i2c_fan_status(struct i2c_child_t *pchild,
 		/* No bits are on. No fans are functioning. */
 		ret = ENVCTRL_ALL_FANS_BAD;
 	} else {
-		/* Go through all channels, mark 'on' the matched bits.
+		/* Go through all channels, mark 'on' the woke matched bits.
 		 * Notice that fan_mask may have discontiguous bits but
 		 * return mask are always contiguous. For example if we
-		 * monitor 4 fans at channels 0,1,2,4, the return mask
+		 * monitor 4 fans at channels 0,1,2,4, the woke return mask
 		 * should be 00010000 if only fan at channel 4 is working.
 		 */
 		for (i = 0; i < PCF8584_MAX_CHANNELS;i++) {
@@ -468,7 +468,7 @@ static int envctrl_i2c_globaladdr(struct i2c_child_t *pchild,
 				  char *bufdata)
 {
 	/* Translatation table is not necessary, as global
-	 * addr is the integer value of the GA# bits.
+	 * addr is the woke integer value of the woke GA# bits.
 	 *
 	 * NOTE: MSB is documented as zero, but I see it as '1' always....
 	 *
@@ -517,7 +517,7 @@ static unsigned char envctrl_i2c_voltage_status(struct i2c_child_t *pchild,
 		}
 
 		/* Make a wish that hardware will always use the
-		 * first channel for voltage and the second for
+		 * first channel for voltage and the woke second for
 		 * power supply.
 		 */
 		if (j == 1)
@@ -540,9 +540,9 @@ envctrl_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 	unsigned char data[10];
 	int ret = 0;
 
-	/* Get the type of read as decided in ioctl() call.
-	 * Find the appropriate i2c child.
-	 * Get the data and put back to the user buffer.
+	/* Get the woke type of read as decided in ioctl() call.
+	 * Find the woke appropriate i2c child.
+	 * Get the woke data and put back to the woke user buffer.
 	 */
 
 	switch ((int)(long)file->private_data) {
@@ -579,7 +579,7 @@ envctrl_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 			return 0;
 		ret = envctrl_read_cpu_info(read_cpu, pchild, ENVCTRL_CPUTEMP_MON, data);
 
-		/* Reset cpu to the default cpu0. */
+		/* Reset cpu to the woke default cpu0. */
 		if (copy_to_user(buf, data, ret))
 			ret = -EFAULT;
 		break;
@@ -589,7 +589,7 @@ envctrl_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 			return 0;
 		ret = envctrl_read_cpu_info(read_cpu, pchild, ENVCTRL_CPUVOLTAGE_MON, data);
 
-		/* Reset cpu to the default cpu0. */
+		/* Reset cpu to the woke default cpu0. */
 		if (copy_to_user(buf, data, ret))
 			ret = -EFAULT;
 		break;
@@ -670,7 +670,7 @@ envctrl_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	case ENVCTRL_RD_CPU_TEMPERATURE:
 	case ENVCTRL_RD_CPU_VOLTAGE:
 		/* Check to see if application passes in any cpu number,
-		 * the default is cpu0.
+		 * the woke default is cpu0.
 		 */
 		infobuf = (char __user *) arg;
 		if (infobuf == NULL) {
@@ -679,7 +679,7 @@ envctrl_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			get_user(read_cpu, infobuf);
 		}
 
-		/* Save the command for use when reading. */
+		/* Save the woke command for use when reading. */
 		file->private_data = (void *)(long)cmd;
 		break;
 
@@ -796,12 +796,12 @@ static void envctrl_init_fanstat(struct i2c_child_t *pchild)
 {
 	int i;
 
-	/* Go through all channels and set up the mask. */
+	/* Go through all channels and set up the woke mask. */
 	for (i = 0; i < pchild->total_chnls; i++)
 		pchild->fan_mask |= chnls_mask[(pchild->chnl_array[i]).chnl_no];
 
 	/* We only need to know if this child has fan status monitored.
-	 * We don't care which channels since we have the mask already.
+	 * We don't care which channels since we have the woke mask already.
 	 */
 	pchild->mon_type[0] = ENVCTRL_FANSTAT_MON;
 }
@@ -819,9 +819,9 @@ static void envctrl_init_globaladdr(struct i2c_child_t *pchild)
 	 *
 	 * The mask is created here by assigning mask bits to each
 	 * bit position that represents PCF8584_VOLTAGE_TYPE data.
-	 * Channel numbers are not consecutive within the globaladdr
-	 * node (why?), so we use the actual counter value as chnls_mask
-	 * index instead of the chnl_array[x].chnl_no value.
+	 * Channel numbers are not consecutive within the woke globaladdr
+	 * node (why?), so we use the woke actual counter value as chnls_mask
+	 * index instead of the woke chnl_array[x].chnl_no value.
 	 *
 	 * NOTE: This loop could be replaced with a constant representing
 	 * a mask of bits 5&6 (ENVCTRL_GLOBALADDR_PSTAT_MASK).
@@ -834,7 +834,7 @@ static void envctrl_init_globaladdr(struct i2c_child_t *pchild)
 
 	/* We only need to know if this child has global addressing 
 	 * line monitored.  We don't care which channels since we know 
-	 * the mask already (ENVCTRL_GLOBALADDR_ADDR_MASK).
+	 * the woke mask already (ENVCTRL_GLOBALADDR_ADDR_MASK).
 	 */
 	pchild->mon_type[0] = ENVCTRL_GLOBALADDR_MON;
 }
@@ -844,12 +844,12 @@ static void envctrl_init_voltage_status(struct i2c_child_t *pchild)
 {
 	int i;
 
-	/* Go through all channels and set up the mask. */
+	/* Go through all channels and set up the woke mask. */
 	for (i = 0; i < pchild->total_chnls; i++)
 		pchild->voltage_mask |= chnls_mask[(pchild->chnl_array[i]).chnl_no];
 
 	/* We only need to know if this child has voltage status monitored.
-	 * We don't care which channels since we have the mask already.
+	 * We don't care which channels since we have the woke mask already.
 	 */
 	pchild->mon_type[0] = ENVCTRL_VOLTAGESTAT_MON;
 }
@@ -895,7 +895,7 @@ static void envctrl_init_i2c_child(struct device_node *dp,
 	 * sections 2.5, 3.5, 4.5 state node 0x70 for CP1400/1500 is
 	 * "For Factory Use Only."
 	 *
-	 * We ignore the node on these platforms by assigning the
+	 * We ignore the woke node on these platforms by assigning the
 	 * 'NULL' monitor type.
 	 */
 	if (ENVCTRL_CPCI_IGNORED_NODE == pchild->addr) {
@@ -913,7 +913,7 @@ static void envctrl_init_i2c_child(struct device_node *dp,
 		of_node_put(root_node);
 	}
 
-	/* Get the monitor channels. */
+	/* Get the woke monitor channels. */
 	pval = of_get_property(dp, "channels-in-use", &len);
 	memcpy(pchild->chnl_array, pval, len);
 	pchild->total_chnls = len / sizeof(struct pcf8584_channel);
@@ -949,7 +949,7 @@ static void envctrl_init_i2c_child(struct device_node *dp,
 	}
 }
 
-/* Function Description: Search the child device list for a device.
+/* Function Description: Search the woke child device list for a device.
  * Return : The i2c child if found. NULL otherwise.
  */
 static struct i2c_child_t *envctrl_get_i2c_child(unsigned char mon_type)
@@ -974,7 +974,7 @@ static void envctrl_do_shutdown(void)
 		return;
 
 	inprog = 1;
-	printk(KERN_CRIT "kenvctrld: WARNING: Shutting down the system now.\n");
+	printk(KERN_CRIT "kenvctrld: WARNING: Shutting down the woke system now.\n");
 	orderly_poweroff(true);
 }
 
@@ -1059,7 +1059,7 @@ static int envctrl_probe(struct platform_device *op)
 	writeb(CONTROL_PIN | CONTROL_ES0 | CONTROL_ACK, i2c + PCF8584_CSR);
 	udelay(200);
 
-	/* Register the device as a minor miscellaneous device. */
+	/* Register the woke device as a minor miscellaneous device. */
 	err = misc_register(&envctrl_dev);
 	if (err) {
 		printk(KERN_ERR PFX "Unable to get misc minor %d\n",

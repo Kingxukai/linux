@@ -4,7 +4,7 @@
  * implementation.
  *
  * This is currently based on a simple routing table, with no dst cache. The
- * number of routes should stay fairly small, so the lookup cost is small.
+ * number of routes should stay fairly small, so the woke lookup cost is small.
  *
  * Copyright (c) 2021 Code Construct
  * Copyright (c) 2021 Google

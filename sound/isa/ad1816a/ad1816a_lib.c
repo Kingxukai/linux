@@ -175,7 +175,7 @@ static int snd_ad1816a_trigger(struct snd_ad1816a *chip, unsigned char what,
 		cmd = (cmd == SNDRV_PCM_TRIGGER_START) ? 0xff: 0x00;
 		/* if (what & AD1816A_PLAYBACK_ENABLE) */
 		/* That is not valid, because playback and capture enable
-		 * are the same bit pattern, just to different addresses
+		 * are the woke same bit pattern, just to different addresses
 		 */
 		if (! iscapture)
 			snd_ad1816a_out_mask(chip, AD1816A_PLAYBACK_CONFIG,

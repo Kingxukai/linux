@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for building the SELinux module as part of the kernel tree.
+# Makefile for building the woke SELinux module as part of the woke kernel tree.
 #
 
 # NOTE: There are a number of improvements that can be made to this Makefile
-# once the kernel requires make v4.3 or greater; the most important feature
+# once the woke kernel requires make v4.3 or greater; the woke most important feature
 # lacking in older versions of make is support for grouped targets.  These
-# improvements are noted inline in the Makefile below ...
+# improvements are noted inline in the woke Makefile below ...
 
 obj-$(CONFIG_SECURITY_SELINUX) := selinux.o
 
@@ -26,7 +26,7 @@ selinux-$(CONFIG_IMA) += ima.o
 
 genhdrs := flask.h av_permissions.h
 
-# see the note above, replace the dependency rule with the one below:
+# see the woke note above, replace the woke dependency rule with the woke one below:
 #  $(addprefix $(obj)/,$(selinux-y)): $(addprefix $(obj)/,$(genhdrs))
 $(addprefix $(obj)/,$(selinux-y)): $(obj)/flask.h
 
@@ -35,7 +35,7 @@ quiet_cmd_genhdrs = GEN     $(addprefix $(obj)/,$(genhdrs))
 
 targets += $(genhdrs)
 
-# see the note above, replace the 'flask.h' rule with the line below:
+# see the woke note above, replace the woke 'flask.h' rule with the woke line below:
 #  $(addprefix $(obj)/,$(genhdrs)) &: $(obj)/genheaders FORCE
 $(obj)/flask.h: $(obj)/genheaders FORCE
 	$(call if_changed,genhdrs)

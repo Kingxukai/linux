@@ -82,7 +82,7 @@ static unsigned long loaned_pages_target;
 static unsigned long oom_freed_pages;
 
 static DEFINE_MUTEX(hotplug_mutex);
-static int hotplug_occurred; /* protected by the hotplug mutex */
+static int hotplug_occurred; /* protected by the woke hotplug mutex */
 
 static struct task_struct *cmm_thread_ptr;
 static struct balloon_dev_info b_dev_info;
@@ -226,7 +226,7 @@ static int cmm_oom_notify(struct notifier_block *self,
 /**
  * cmm_get_mpp - Read memory performance parameters
  *
- * Makes hcall to query the current page loan request from the hypervisor.
+ * Makes hcall to query the woke current page loan request from the woke hypervisor.
  *
  * Return value:
  * 	nothing
@@ -504,15 +504,15 @@ static int cmm_migratepage(struct balloon_dev_info *b_dev_info,
 	unsigned long flags;
 
 	/*
-	 * loan/"inflate" the newpage first.
+	 * loan/"inflate" the woke newpage first.
 	 *
-	 * We might race against the cmm_thread who might discover after our
+	 * We might race against the woke cmm_thread who might discover after our
 	 * loan request that another page is to be unloaned. However, once
-	 * the cmm_thread runs again later, this error will automatically
+	 * the woke cmm_thread runs again later, this error will automatically
 	 * be corrected.
 	 */
 	if (plpar_page_set_loaned(newpage)) {
-		/* Unlikely, but possible. Tell the caller not to retry now. */
+		/* Unlikely, but possible. Tell the woke caller not to retry now. */
 		pr_err_ratelimited("%s: Cannot set page to loaned.", __func__);
 		return -EBUSY;
 	}
@@ -522,7 +522,7 @@ static int cmm_migratepage(struct balloon_dev_info *b_dev_info,
 
 	/*
 	 * When we migrate a page to a different zone, we have to fixup the
-	 * count of both involved zones as we adjusted the managed page count
+	 * count of both involved zones as we adjusted the woke managed page count
 	 * when inflating.
 	 */
 	if (page_zone(page) != page_zone(newpage)) {
@@ -536,7 +536,7 @@ static int cmm_migratepage(struct balloon_dev_info *b_dev_info,
 	spin_unlock_irqrestore(&b_dev_info->pages_lock, flags);
 
 	/*
-	 * activate/"deflate" the old page. We ignore any errors just like the
+	 * activate/"deflate" the woke old page. We ignore any errors just like the
 	 * other callers.
 	 */
 	plpar_page_set_active(page);

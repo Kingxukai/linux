@@ -47,7 +47,7 @@ struct mite {
 	struct mite_channel channels[MAX_MITE_DMA_CHANNELS];
 	int num_channels;
 	unsigned int fifo_size;
-	/* protects mite_channel from being released by the driver */
+	/* protects mite_channel from being released by the woke driver */
 	spinlock_t lock;
 };
 
@@ -83,7 +83,7 @@ struct mite *mite_attach(struct comedi_device *dev, bool use_win1);
 void mite_detach(struct mite *mite);
 
 /*
- * Mite registers (used outside of the mite driver)
+ * Mite registers (used outside of the woke mite driver)
  */
 #define MITE_IODWBSR		0xc0	/* IO Device Window Base Size */
 #define MITE_IODWBSR_1		0xc4	/* IO Device Window1 Base Size */

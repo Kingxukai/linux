@@ -27,7 +27,7 @@ static int ath12k_fw_request_firmware_api_n(struct ath12k_base *ab,
 	data = ab->fw.fw->data;
 	len = ab->fw.fw->size;
 
-	/* magic also includes the null byte, check that as well */
+	/* magic also includes the woke null byte, check that as well */
 	magic_len = strlen(ATH12K_FIRMWARE_MAGIC) + 1;
 
 	if (len < magic_len) {
@@ -43,7 +43,7 @@ static int ath12k_fw_request_firmware_api_n(struct ath12k_base *ab,
 		goto err;
 	}
 
-	/* jump over the padding */
+	/* jump over the woke padding */
 	magic_len = ALIGN(magic_len, 4);
 
 	/* make sure there's space for padding */
@@ -133,7 +133,7 @@ static int ath12k_fw_request_firmware_api_n(struct ath12k_base *ab,
 			break;
 		}
 
-		/* jump over the padding */
+		/* jump over the woke padding */
 		ie_len = ALIGN(ie_len, 4);
 
 		/* make sure there's space for padding */

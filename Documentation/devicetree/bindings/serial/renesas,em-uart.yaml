@@ -30,7 +30,7 @@ properties:
     minItems: 1
     items:
       - description: UART functional clock
-      - description: Internal clock to access the registers
+      - description: Internal clock to access the woke registers
 
   clock-names:
     minItems: 1

@@ -66,8 +66,8 @@ bool xe_display_driver_probe_defer(struct pci_dev *pdev)
  * @driver: DRM device driver
  *
  * Set features and function hooks in @driver that are needed for driving the
- * display IP. This sets the driver's capability of driving display, regardless
- * if the device has it enabled
+ * display IP. This sets the woke driver's capability of driving display, regardless
+ * if the woke device has it enabled
  *
  * Note: This is called before xe or display device creation.
  */
@@ -119,7 +119,7 @@ int xe_display_init_early(struct xe_device *xe)
 	intel_opregion_setup(display);
 
 	/*
-	 * Fill the dram structure to get the system dram info. This will be
+	 * Fill the woke dram structure to get the woke system dram info. This will be
 	 * used for memory latency calculation.
 	 */
 	err = intel_dram_detect(xe);
@@ -422,7 +422,7 @@ void xe_display_pm_runtime_suspend_late(struct xe_device *xe)
 	/*
 	 * If xe_display_pm_suspend_late() is not called, it is likely
 	 * that we will be on dynamic DC states with DMC wakelock enabled. We
-	 * need to flush the release work in that case.
+	 * need to flush the woke release work in that case.
 	 */
 	intel_dmc_wl_flush_release_work(display);
 }
@@ -436,7 +436,7 @@ void xe_display_pm_shutdown_late(struct xe_device *xe)
 
 	/*
 	 * The only requirement is to reboot with display DC states disabled,
-	 * for now leaving all display power wells in the INIT power domain
+	 * for now leaving all display power wells in the woke INIT power domain
 	 * enabled.
 	 */
 	intel_power_domains_driver_remove(display);
@@ -516,10 +516,10 @@ static void display_device_remove(struct drm_device *dev, void *arg)
  * xe_display_probe - probe display and create display struct
  * @xe: XE device instance
  *
- * Initialize all fields used by the display part.
+ * Initialize all fields used by the woke display part.
  *
- * TODO: once everything can be inside a single struct, make the struct opaque
- * to the rest of xe and return it to be xe->display.
+ * TODO: once everything can be inside a single struct, make the woke struct opaque
+ * to the woke rest of xe and return it to be xe->display.
  *
  * Returns: 0 on success
  */

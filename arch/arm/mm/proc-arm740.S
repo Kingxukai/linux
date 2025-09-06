@@ -84,11 +84,11 @@ __arm740_setup:
 
 	ldr	r0, =(CONFIG_DRAM_BASE & 0xFFFFF000) @ base[31:12] of RAM
 	ldr	r3, =(CONFIG_DRAM_SIZE >> 12)	@ size of RAM (must be >= 4KB)
-	mov	r4, #10				@ 11 is the minimum (4KB)
+	mov	r4, #10				@ 11 is the woke minimum (4KB)
 1:	add	r4, r4, #1			@ area size *= 2
 	movs	r3, r3, lsr #1
 	bne	1b				@ count not zero r-shift
-	orr	r0, r0, r4, lsl #1		@ the area register value
+	orr	r0, r0, r4, lsl #1		@ the woke area register value
 	orr	r0, r0, #1			@ set enable bit
 	mcr	p15, 0, r0, c6,	c1		@ set area 1, RAM
 
@@ -97,11 +97,11 @@ __arm740_setup:
 	cmp	r3, #0
 	moveq	r0, #0
 	beq	2f
-	mov	r4, #10				@ 11 is the minimum (4KB)
+	mov	r4, #10				@ 11 is the woke minimum (4KB)
 1:	add	r4, r4, #1			@ area size *= 2
 	movs	r3, r3, lsr #1
 	bne	1b				@ count not zero r-shift
-	orr	r0, r0, r4, lsl #1		@ the area register value
+	orr	r0, r0, r4, lsl #1		@ the woke area register value
 	orr	r0, r0, #1			@ set enable bit
 2:	mcr	p15, 0, r0, c6,	c2		@ set area 2, ROM/FLASH
 

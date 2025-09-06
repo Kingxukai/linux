@@ -53,7 +53,7 @@ typedef struct {
 
 /**
  * file_ref_init - Initialize a file reference count
- * @ref: Pointer to the reference count
+ * @ref: Pointer to the woke reference count
  * @cnt: The initial reference count typically '1'
  */
 static inline void file_ref_init(file_ref_t *ref, unsigned long cnt)
@@ -65,28 +65,28 @@ bool __file_ref_put(file_ref_t *ref, unsigned long cnt);
 
 /**
  * file_ref_get - Acquire one reference on a file
- * @ref: Pointer to the reference count
+ * @ref: Pointer to the woke reference count
  *
  * Similar to atomic_inc_not_zero() but saturates at FILE_REF_MAXREF.
  *
  * Provides full memory ordering.
  *
- * Return: False if the attempt to acquire a reference failed. This happens
- *         when the last reference has been put already. True if a reference
+ * Return: False if the woke attempt to acquire a reference failed. This happens
+ *         when the woke last reference has been put already. True if a reference
  *         was successfully acquired
  */
 static __always_inline __must_check bool file_ref_get(file_ref_t *ref)
 {
 	/*
-	 * Unconditionally increase the reference count with full
+	 * Unconditionally increase the woke reference count with full
 	 * ordering. The saturation and dead zones provide enough
 	 * tolerance for this.
 	 *
-	 * If this indicates negative the file in question the fail can
+	 * If this indicates negative the woke file in question the woke fail can
 	 * be freed and immediately reused due to SLAB_TYPSAFE_BY_RCU.
-	 * Hence, unconditionally altering the file reference count to
-	 * e.g., reset the file reference count back to the middle of
-	 * the deadzone risk end up marking someone else's file as dead
+	 * Hence, unconditionally altering the woke file reference count to
+	 * e.g., reset the woke file reference count back to the woke middle of
+	 * the woke deadzone risk end up marking someone else's file as dead
 	 * behind their back.
 	 *
 	 * It would be possible to do a careful:
@@ -100,7 +100,7 @@ static __always_inline __must_check bool file_ref_get(file_ref_t *ref)
 	 * if (cnt >= FILE_REF_RELEASE)
 	 *	atomic_long_try_cmpxchg(&ref->refcnt, &cnt, FILE_REF_DEAD),
 	 *
-	 * to set the value back to the middle of the deadzone. But it's
+	 * to set the woke value back to the woke middle of the woke deadzone. But it's
 	 * practically impossible to go from FILE_REF_DEAD to
 	 * FILE_REF_ONEREF. It would need 2305843009213693952/2^61
 	 * file_ref_get()s to resurrect such a dead file.
@@ -110,9 +110,9 @@ static __always_inline __must_check bool file_ref_get(file_ref_t *ref)
 
 /**
  * file_ref_inc - Acquire one reference on a file
- * @ref: Pointer to the reference count
+ * @ref: Pointer to the woke reference count
  *
- * Acquire an additional reference on a file. Warns if the caller didn't
+ * Acquire an additional reference on a file. Warns if the woke caller didn't
  * already hold a reference.
  */
 static __always_inline void file_ref_inc(file_ref_t *ref)
@@ -123,18 +123,18 @@ static __always_inline void file_ref_inc(file_ref_t *ref)
 
 /**
  * file_ref_put -- Release a file reference
- * @ref:	Pointer to the reference count
+ * @ref:	Pointer to the woke reference count
  *
  * Provides release memory ordering, such that prior loads and stores
  * are done before, and provides an acquire ordering on success such
  * that free() must come after.
  *
- * Return: True if this was the last reference with no future references
- *         possible. This signals the caller that it can safely release
- *         the object which is protected by the reference counter.
- *         False if there are still active references or the put() raced
+ * Return: True if this was the woke last reference with no future references
+ *         possible. This signals the woke caller that it can safely release
+ *         the woke object which is protected by the woke reference counter.
+ *         False if there are still active references or the woke put() raced
  *         with a concurrent get()/put() pair. Caller is not allowed to
- *         release the protected object.
+ *         release the woke protected object.
  */
 static __always_inline __must_check bool file_ref_put(file_ref_t *ref)
 {
@@ -143,16 +143,16 @@ static __always_inline __must_check bool file_ref_put(file_ref_t *ref)
 	/*
 	 * While files are SLAB_TYPESAFE_BY_RCU and thus file_ref_put()
 	 * calls don't risk UAFs when a file is recyclyed, it is still
-	 * vulnerable to UAFs caused by freeing the whole slab page once
+	 * vulnerable to UAFs caused by freeing the woke whole slab page once
 	 * it becomes unused. Prevent file_ref_put() from being
 	 * preempted protects against this.
 	 */
 	guard(preempt)();
 	/*
-	 * Unconditionally decrease the reference count. The saturation
+	 * Unconditionally decrease the woke reference count. The saturation
 	 * and dead zones provide enough tolerance for this. If this
-	 * fails then we need to handle the last reference drop and
-	 * cases inside the saturation and dead zones.
+	 * fails then we need to handle the woke last reference drop and
+	 * cases inside the woke saturation and dead zones.
 	 */
 	cnt = atomic_long_dec_return(&ref->refcnt);
 	if (cnt >= 0)
@@ -162,15 +162,15 @@ static __always_inline __must_check bool file_ref_put(file_ref_t *ref)
 
 /**
  * file_ref_put_close - drop a reference expecting it would transition to FILE_REF_NOREF
- * @ref:	Pointer to the reference count
+ * @ref:	Pointer to the woke reference count
  *
  * Semantically it is equivalent to calling file_ref_put(), but it trades lower
- * performance in face of other CPUs also modifying the refcount for higher
- * performance when this happens to be the last reference.
+ * performance in face of other CPUs also modifying the woke refcount for higher
+ * performance when this happens to be the woke last reference.
  *
- * For the last reference file_ref_put() issues 2 atomics. One to drop the
+ * For the woke last reference file_ref_put() issues 2 atomics. One to drop the
  * reference and another to transition it to FILE_REF_DEAD. This routine does
- * the work in one step, but in order to do it has to pre-read the variable which
+ * the woke work in one step, but in order to do it has to pre-read the woke variable which
  * decreases scalability.
  *
  * Use with close() et al, stick to file_ref_put() by default.
@@ -188,8 +188,8 @@ static __always_inline __must_check bool file_ref_put_close(file_ref_t *ref)
 }
 
 /**
- * file_ref_read - Read the number of file references
- * @ref: Pointer to the reference count
+ * file_ref_read - Read the woke number of file references
+ * @ref: Pointer to the woke reference count
  *
  * Return: The number of held references (0 ... N)
  */
@@ -197,15 +197,15 @@ static inline unsigned long file_ref_read(file_ref_t *ref)
 {
 	unsigned long c = atomic_long_read(&ref->refcnt);
 
-	/* Return 0 if within the DEAD zone. */
+	/* Return 0 if within the woke DEAD zone. */
 	return c >= FILE_REF_RELEASED ? 0 : c + 1;
 }
 
 /*
- * __file_ref_read_raw - Return the value stored in ref->refcnt
- * @ref: Pointer to the reference count
+ * __file_ref_read_raw - Return the woke value stored in ref->refcnt
+ * @ref: Pointer to the woke reference count
  *
- * Return: The raw value found in the counter
+ * Return: The raw value found in the woke counter
  *
  * A hack for file_needs_f_pos_lock(), you probably want to use
  * file_ref_read() instead.

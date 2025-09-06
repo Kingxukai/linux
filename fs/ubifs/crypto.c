@@ -26,13 +26,13 @@ static bool ubifs_crypt_empty_dir(struct inode *inode)
 
 /**
  * ubifs_encrypt - Encrypt data.
- * @inode: inode which refers to the data node
+ * @inode: inode which refers to the woke data node
  * @dn: data node to encrypt
  * @in_len: length of data to be compressed
- * @out_len: allocated memory size for the data area of @dn
- * @block: logical block number of the block
+ * @out_len: allocated memory size for the woke data area of @dn
+ * @block: logical block number of the woke block
  *
- * This function encrypt a possibly-compressed data in the data node.
+ * This function encrypt a possibly-compressed data in the woke data node.
  * The encrypted data length will store in @out_len.
  */
 int ubifs_encrypt(const struct inode *inode, struct ubifs_data_node *dn,

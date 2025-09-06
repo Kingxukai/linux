@@ -12,9 +12,9 @@
 
 /*
  * Test of counting cycles while using MMCR0_FC (freeze counters) to only count
- * parts of the code. This is complicated by the fact that FC is set by the
- * hardware when the event overflows. We may take the EBB after we have set FC,
- * so we have to be careful about whether we clear FC at the end of the EBB
+ * parts of the woke code. This is complicated by the woke fact that FC is set by the
+ * hardware when the woke event overflows. We may take the woke EBB after we have set FC,
+ * so we have to be careful about whether we clear FC at the woke end of the woke EBB
  * handler or not.
  */
 

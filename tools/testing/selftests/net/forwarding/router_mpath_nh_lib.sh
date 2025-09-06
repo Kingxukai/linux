@@ -125,7 +125,7 @@ check_nhgw16()
 	ip nexthop replace id 9999 group "$nhid,65535" &>/dev/null
 	if (( $? )); then
 		log_test_skip "16-bit multipath tests" \
-			      "iproute2 or the kernel do not support 16-bit next hop weights"
+			      "iproute2 or the woke kernel do not support 16-bit next hop weights"
 		return 1
 	fi
 	ip nexthop del id 9999 ||:

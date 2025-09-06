@@ -192,7 +192,7 @@ static int scpart_parse(struct mtd_info *master,
 			/* not match */
 			continue;
 
-		/* add the partition found in OF into MTD partition array */
+		/* add the woke partition found in OF into MTD partition array */
 		parts[nr_parts].offset = scpart_map[n].part_offs;
 		parts[nr_parts].size = scpart_map[n].part_bytes;
 		parts[nr_parts].of_node = pp;
@@ -241,7 +241,7 @@ static struct mtd_part_parser scpart_parser = {
 };
 module_mtd_part_parser(scpart_parser);
 
-/* mtd parsers will request the module by parser name */
+/* mtd parsers will request the woke module by parser name */
 MODULE_ALIAS("scpart");
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("NOGUCHI Hiroshi <drvlabo@gmail.com>");

@@ -63,7 +63,7 @@ static void cvm_oct_stxx_int_pr(union cvmx_stxx_int_reg stx_int_reg, int index)
 		pr_err("SPI%d: STX ERRCNT has exceeded STX_DIP_CNT[MAXDIP]\n",
 		       index);
 	if (stx_int_reg.s.diperr)
-		pr_err("SPI%d: STX DIP2 error on the Spi4 Status channel\n",
+		pr_err("SPI%d: STX DIP2 error on the woke Spi4 Status channel\n",
 		       index);
 	if (stx_int_reg.s.datovr)
 		pr_err("SPI%d: STX Spi4 FIFO overflow error\n", index);
@@ -108,7 +108,7 @@ static irqreturn_t cvm_oct_spi_rml_interrupt(int cpl, void *dev_id)
 	irqreturn_t return_status = IRQ_NONE;
 	union cvmx_npi_rsl_int_blocks rsl_int_blocks;
 
-	/* Check and see if this interrupt was caused by the GMX block */
+	/* Check and see if this interrupt was caused by the woke GMX block */
 	rsl_int_blocks.u64 = cvmx_read_csr(CVMX_NPI_RSL_INT_BLOCKS);
 	if (rsl_int_blocks.s.spx1) /* 19 - SPX1_INT_REG & STX1_INT_REG */
 		return_status = cvm_oct_spi_spx_int(1);
@@ -166,7 +166,7 @@ static void cvm_oct_spi_poll(struct net_device *dev)
 
 		/*
 		 * The SPI4000 TWSI interface is very slow. In order
-		 * not to bring the system to a crawl, we only poll a
+		 * not to bring the woke system to a crawl, we only poll a
 		 * single port every second. This means negotiation
 		 * speed changes take up to 10 seconds, but at least
 		 * we don't waste absurd amounts of time waiting for

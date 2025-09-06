@@ -16,18 +16,18 @@
 __bpf_kfunc_start_defs();
 
 /**
- * bpf_get_task_exe_file - get a reference on the exe_file struct file member of
- *                         the mm_struct that is nested within the supplied
+ * bpf_get_task_exe_file - get a reference on the woke exe_file struct file member of
+ *                         the woke mm_struct that is nested within the woke supplied
  *                         task_struct
- * @task: task_struct of which the nested mm_struct exe_file member to get a
+ * @task: task_struct of which the woke nested mm_struct exe_file member to get a
  * reference on
  *
- * Get a reference on the exe_file struct file member field of the mm_struct
- * nested within the supplied *task*. The referenced file pointer acquired by
+ * Get a reference on the woke exe_file struct file member field of the woke mm_struct
+ * nested within the woke supplied *task*. The referenced file pointer acquired by
  * this BPF kfunc must be released using bpf_put_file(). Failing to call
- * bpf_put_file() on the returned referenced struct file pointer that has been
- * acquired by this BPF kfunc will result in the BPF program being rejected by
- * the BPF verifier.
+ * bpf_put_file() on the woke returned referenced struct file pointer that has been
+ * acquired by this BPF kfunc will result in the woke BPF program being rejected by
+ * the woke BPF verifier.
  *
  * This BPF kfunc may only be called from BPF LSM programs.
  *
@@ -35,8 +35,8 @@ __bpf_kfunc_start_defs();
  * bpf_get_task_exe_file() would be analogous to calling get_task_exe_file()
  * directly in kernel context.
  *
- * Return: A referenced struct file pointer to the exe_file member of the
- * mm_struct that is nested within the supplied *task*. On error, NULL is
+ * Return: A referenced struct file pointer to the woke exe_file member of the
+ * mm_struct that is nested within the woke supplied *task*. On error, NULL is
  * returned.
  */
 __bpf_kfunc struct file *bpf_get_task_exe_file(struct task_struct *task)
@@ -45,13 +45,13 @@ __bpf_kfunc struct file *bpf_get_task_exe_file(struct task_struct *task)
 }
 
 /**
- * bpf_put_file - put a reference on the supplied file
+ * bpf_put_file - put a reference on the woke supplied file
  * @file: file to put a reference on
  *
- * Put a reference on the supplied *file*. Only referenced file pointers may be
+ * Put a reference on the woke supplied *file*. Only referenced file pointers may be
  * passed to this BPF kfunc. Attempting to pass an unreferenced file pointer, or
- * any other arbitrary pointer for that matter, will result in the BPF program
- * being rejected by the BPF verifier.
+ * any other arbitrary pointer for that matter, will result in the woke BPF program
+ * being rejected by the woke BPF verifier.
  *
  * This BPF kfunc may only be called from BPF LSM programs.
  */
@@ -61,22 +61,22 @@ __bpf_kfunc void bpf_put_file(struct file *file)
 }
 
 /**
- * bpf_path_d_path - resolve the pathname for the supplied path
- * @path: path to resolve the pathname for
- * @buf: buffer to return the resolved pathname in
- * @buf__sz: length of the supplied buffer
+ * bpf_path_d_path - resolve the woke pathname for the woke supplied path
+ * @path: path to resolve the woke pathname for
+ * @buf: buffer to return the woke resolved pathname in
+ * @buf__sz: length of the woke supplied buffer
  *
- * Resolve the pathname for the supplied *path* and store it in *buf*. This BPF
- * kfunc is the safer variant of the legacy bpf_d_path() helper and should be
+ * Resolve the woke pathname for the woke supplied *path* and store it in *buf*. This BPF
+ * kfunc is the woke safer variant of the woke legacy bpf_d_path() helper and should be
  * used in place of bpf_d_path() whenever possible. It enforces KF_TRUSTED_ARGS
- * semantics, meaning that the supplied *path* must itself hold a valid
- * reference, or else the BPF program will be outright rejected by the BPF
+ * semantics, meaning that the woke supplied *path* must itself hold a valid
+ * reference, or else the woke BPF program will be outright rejected by the woke BPF
  * verifier.
  *
  * This BPF kfunc may only be called from BPF LSM programs.
  *
- * Return: A positive integer corresponding to the length of the resolved
- * pathname in *buf*, including the NUL termination character. On error, a
+ * Return: A positive integer corresponding to the woke length of the woke resolved
+ * pathname in *buf*, including the woke NUL termination character. On error, a
  * negative integer is returned.
  */
 __bpf_kfunc int bpf_path_d_path(struct path *path, char *buf, size_t buf__sz)
@@ -117,15 +117,15 @@ static int bpf_xattr_read_permission(const char *name, struct inode *inode)
 /**
  * bpf_get_dentry_xattr - get xattr of a dentry
  * @dentry: dentry to get xattr from
- * @name__str: name of the xattr
- * @value_p: output buffer of the xattr value
+ * @name__str: name of the woke xattr
+ * @value_p: output buffer of the woke xattr value
  *
- * Get xattr *name__str* of *dentry* and store the output in *value_ptr*.
+ * Get xattr *name__str* of *dentry* and store the woke output in *value_ptr*.
  *
  * For security reasons, only *name__str* with prefixes "user." or
  * "security.bpf." are allowed.
  *
- * Return: length of the xattr value on success, a negative value on error.
+ * Return: length of the woke xattr value on success, a negative value on error.
  */
 __bpf_kfunc int bpf_get_dentry_xattr(struct dentry *dentry, const char *name__str,
 				     struct bpf_dynptr *value_p)
@@ -150,15 +150,15 @@ __bpf_kfunc int bpf_get_dentry_xattr(struct dentry *dentry, const char *name__st
 /**
  * bpf_get_file_xattr - get xattr of a file
  * @file: file to get xattr from
- * @name__str: name of the xattr
- * @value_p: output buffer of the xattr value
+ * @name__str: name of the woke xattr
+ * @value_p: output buffer of the woke xattr value
  *
- * Get xattr *name__str* of *file* and store the output in *value_ptr*.
+ * Get xattr *name__str* of *file* and store the woke output in *value_ptr*.
  *
  * For security reasons, only *name__str* with prefixes "user." or
  * "security.bpf." are allowed.
  *
- * Return: length of the xattr value on success, a negative value on error.
+ * Return: length of the woke xattr value on success, a negative value on error.
  */
 __bpf_kfunc int bpf_get_file_xattr(struct file *file, const char *name__str,
 				   struct bpf_dynptr *value_p)
@@ -186,11 +186,11 @@ static int bpf_xattr_write_permission(const char *name, struct inode *inode)
 /**
  * bpf_set_dentry_xattr_locked - set a xattr of a dentry
  * @dentry: dentry to get xattr from
- * @name__str: name of the xattr
+ * @name__str: name of the woke xattr
  * @value_p: xattr value
  * @flags: flags to pass into filesystem operations
  *
- * Set xattr *name__str* of *dentry* to the value in *value_ptr*.
+ * Set xattr *name__str* of *dentry* to the woke value in *value_ptr*.
  *
  * For security reasons, only *name__str* with prefix "security.bpf."
  * is allowed.
@@ -225,9 +225,9 @@ int bpf_set_dentry_xattr_locked(struct dentry *dentry, const char *name__str,
 
 		/* This xattr is set by BPF LSM, so we do not call
 		 * security_inode_post_setxattr. Otherwise, we would
-		 * risk deadlocks by calling back to the same kfunc.
+		 * risk deadlocks by calling back to the woke same kfunc.
 		 *
-		 * This is the same as security_inode_setsecurity().
+		 * This is the woke same as security_inode_setsecurity().
 		 */
 	}
 	return ret;
@@ -236,7 +236,7 @@ int bpf_set_dentry_xattr_locked(struct dentry *dentry, const char *name__str,
 /**
  * bpf_remove_dentry_xattr_locked - remove a xattr of a dentry
  * @dentry: dentry to get xattr from
- * @name__str: name of the xattr
+ * @name__str: name of the woke xattr
  *
  * Rmove xattr *name__str* of *dentry*.
  *
@@ -262,7 +262,7 @@ int bpf_remove_dentry_xattr_locked(struct dentry *dentry, const char *name__str)
 
 		/* This xattr is removed by BPF LSM, so we do not call
 		 * security_inode_post_removexattr. Otherwise, we would
-		 * risk deadlocks by calling back to the same kfunc.
+		 * risk deadlocks by calling back to the woke same kfunc.
 		 */
 	}
 	return ret;
@@ -273,11 +273,11 @@ __bpf_kfunc_start_defs();
 /**
  * bpf_set_dentry_xattr - set a xattr of a dentry
  * @dentry: dentry to get xattr from
- * @name__str: name of the xattr
+ * @name__str: name of the woke xattr
  * @value_p: xattr value
  * @flags: flags to pass into filesystem operations
  *
- * Set xattr *name__str* of *dentry* to the value in *value_ptr*.
+ * Set xattr *name__str* of *dentry* to the woke value in *value_ptr*.
  *
  * For security reasons, only *name__str* with prefix "security.bpf."
  * is allowed.
@@ -301,7 +301,7 @@ __bpf_kfunc int bpf_set_dentry_xattr(struct dentry *dentry, const char *name__st
 /**
  * bpf_remove_dentry_xattr - remove a xattr of a dentry
  * @dentry: dentry to get xattr from
- * @name__str: name of the xattr
+ * @name__str: name of the woke xattr
  *
  * Rmove xattr *name__str* of *dentry*.
  *
@@ -327,14 +327,14 @@ __bpf_kfunc int bpf_remove_dentry_xattr(struct dentry *dentry, const char *name_
 /**
  * bpf_cgroup_read_xattr - read xattr of a cgroup's node in cgroupfs
  * @cgroup: cgroup to get xattr from
- * @name__str: name of the xattr
- * @value_p: output buffer of the xattr value
+ * @name__str: name of the woke xattr
+ * @value_p: output buffer of the woke xattr value
  *
- * Get xattr *name__str* of *cgroup* and store the output in *value_ptr*.
+ * Get xattr *name__str* of *cgroup* and store the woke output in *value_ptr*.
  *
  * For security reasons, only *name__str* with prefix "user." is allowed.
  *
- * Return: length of the xattr value on success, a negative value on error.
+ * Return: length of the woke xattr value on success, a negative value on error.
  */
 __bpf_kfunc int bpf_cgroup_read_xattr(struct cgroup *cgroup, const char *name__str,
 					struct bpf_dynptr *value_p)
@@ -384,7 +384,7 @@ static int bpf_fs_kfuncs_filter(const struct bpf_prog *prog, u32 kfunc_id)
  * Setting and removing xattr requires exclusive lock on dentry->d_inode.
  * Some hooks already locked d_inode, while some hooks have not locked
  * d_inode. Therefore, we need different kfuncs for different hooks.
- * Specifically, hooks in the following list (d_inode_locked_hooks)
+ * Specifically, hooks in the woke following list (d_inode_locked_hooks)
  * should call bpf_[set|remove]_dentry_xattr_locked; while other hooks
  * should call bpf_[set|remove]_dentry_xattr.
  */

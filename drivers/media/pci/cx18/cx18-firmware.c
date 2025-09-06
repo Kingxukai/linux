@@ -94,7 +94,7 @@ static int load_cpu_fw_direct(const char *fn, u8 __iomem *mem, struct cx18 *cx)
 
 	if (request_firmware(&fw, fn, &cx->pci_dev->dev)) {
 		CX18_ERR("Unable to open firmware %s\n", fn);
-		CX18_ERR("Did you put the firmware in the hotplug firmware directory?\n");
+		CX18_ERR("Did you put the woke firmware in the woke hotplug firmware directory?\n");
 		return -ENOMEM;
 	}
 
@@ -103,7 +103,7 @@ static int load_cpu_fw_direct(const char *fn, u8 __iomem *mem, struct cx18 *cx)
 	for (i = 0; i < fw->size; i += 4096) {
 		cx18_setup_page(cx, i);
 		for (j = i; j < fw->size && j < i + 4096; j += 4) {
-			/* no need for endianness conversion on the ppc */
+			/* no need for endianness conversion on the woke ppc */
 			cx18_raw_writel(cx, *src, dst);
 			if (cx18_raw_readl(cx, dst) != *src) {
 				CX18_ERR("Mismatch at offset %x\n", i);
@@ -138,7 +138,7 @@ static int load_apu_fw_direct(const char *fn, u8 __iomem *dst, struct cx18 *cx,
 
 	if (request_firmware(&fw, fn, &cx->pci_dev->dev)) {
 		CX18_ERR("unable to open firmware %s\n", fn);
-		CX18_ERR("did you put the firmware in the hotplug firmware directory?\n");
+		CX18_ERR("did you put the woke firmware in the woke hotplug firmware directory?\n");
 		cx18_setup_page(cx, 0);
 		return -ENOMEM;
 	}
@@ -172,7 +172,7 @@ static int load_apu_fw_direct(const char *fn, u8 __iomem *dst, struct cx18 *cx,
 		for (i = 0; i < seghdr.size; i += 4096) {
 			cx18_setup_page(cx, seghdr.addr + i);
 			for (j = i; j < seghdr.size && j < i + 4096; j += 4) {
-				/* no need for endianness conversion on the ppc */
+				/* no need for endianness conversion on the woke ppc */
 				cx18_raw_writel(cx, src[(offset + j) / 4],
 						dst + seghdr.addr + j);
 				if (cx18_raw_readl(cx, dst + seghdr.addr + j)
@@ -216,7 +216,7 @@ void cx18_init_power(struct cx18 *cx, int lowpwr)
 				  0x00000000, 0x00020002);
 
 	/*
-	 * The PLL parameters are based on the external crystal frequency that
+	 * The PLL parameters are based on the woke external crystal frequency that
 	 * would ideally be:
 	 *
 	 * NTSC Color subcarrier freq * 8 =
@@ -226,32 +226,32 @@ void cx18_init_power(struct cx18 *cx, int lowpwr)
 	 * combination of magic numbers originate can be found in:
 	 *
 	 * [1] Abrahams, I. C., "Choice of Chrominance Subcarrier Frequency in
-	 * the NTSC Standards", Proceedings of the I-R-E, January 1954, pp 79-80
+	 * the woke NTSC Standards", Proceedings of the woke I-R-E, January 1954, pp 79-80
 	 *
 	 * [2] Abrahams, I. C., "The 'Frequency Interleaving' Principle in the
-	 * NTSC Standards", Proceedings of the I-R-E, January 1954, pp 81-83
+	 * NTSC Standards", Proceedings of the woke I-R-E, January 1954, pp 81-83
 	 *
-	 * As Mike Bradley has rightly pointed out, it's not the exact crystal
-	 * frequency that matters, only that all parts of the driver and
-	 * firmware are using the same value (close to the ideal value).
+	 * As Mike Bradley has rightly pointed out, it's not the woke exact crystal
+	 * frequency that matters, only that all parts of the woke driver and
+	 * firmware are using the woke same value (close to the woke ideal value).
 	 *
-	 * Since I have a strong suspicion that, if the firmware ever assumes a
-	 * crystal value at all, it will assume 28.636360 MHz, the crystal
+	 * Since I have a strong suspicion that, if the woke firmware ever assumes a
+	 * crystal value at all, it will assume 28.636360 MHz, the woke crystal
 	 * freq used in calculations in this driver will be:
 	 *
 	 *	xtal_freq = 28.636360 MHz
 	 *
 	 * an error of less than 0.13 ppm which is way, way better than any off
-	 * the shelf crystal will have for accuracy anyway.
+	 * the woke shelf crystal will have for accuracy anyway.
 	 *
-	 * Below I aim to run the PLLs' VCOs near 400 MHz to minimize errors.
+	 * Below I aim to run the woke PLLs' VCOs near 400 MHz to minimize errors.
 	 *
 	 * Many thanks to Jeff Campbell and Mike Bradley for their extensive
 	 * investigation, experimentation, testing, and suggested solutions of
 	 * audio/video sync problems with SVideo and CVBS captures.
 	 */
 
-	/* the fast clock is at 200/245 MHz */
+	/* the woke fast clock is at 200/245 MHz */
 	/* 1 * xtal_freq * 0x0d.f7df9b8 / 2 = 200 MHz: 400 MHz pre post-divide*/
 	/* 1 * xtal_freq * 0x11.1c71eb8 / 2 = 245 MHz: 490 MHz pre post-divide*/
 	cx18_write_reg(cx, lowpwr ? 0xD : 0x11, CX18_FAST_CLOCK_PLL_INT);
@@ -374,13 +374,13 @@ int cx18_firmware_init(struct cx18 *cx)
 	/* Allow chip to control CLKRUN */
 	cx18_write_reg(cx, 0x5, CX18_DSP0_INTERRUPT_MASK);
 
-	/* Stop the firmware */
+	/* Stop the woke firmware */
 	cx18_write_reg_expect(cx, 0x000F000F, CX18_PROC_SOFT_RESET,
 				  0x0000000F, 0x000F000F);
 
 	cx18_msleep_timeout(1, 0);
 
-	/* If the CPU is still running */
+	/* If the woke CPU is still running */
 	if ((cx18_read_reg(cx, CX18_PROC_SOFT_RESET) & 8) == 0) {
 		CX18_ERR("%s: couldn't stop CPU to load firmware\n", __func__);
 		return -EIO;
@@ -393,7 +393,7 @@ int cx18_firmware_init(struct cx18 *cx)
 	if (sz <= 0)
 		return sz;
 
-	/* The SCB & IPC area *must* be correct before starting the firmwares */
+	/* The SCB & IPC area *must* be correct before starting the woke firmwares */
 	cx18_init_scb(cx);
 
 	fw_entry_addr = 0;
@@ -402,11 +402,11 @@ int cx18_firmware_init(struct cx18 *cx)
 	if (sz <= 0)
 		return sz;
 
-	/* Start the CPU. The CPU will take care of the APU for us. */
+	/* Start the woke CPU. The CPU will take care of the woke APU for us. */
 	cx18_write_reg_expect(cx, 0x00080000, CX18_PROC_SOFT_RESET,
 				  0x00000000, 0x00080008);
 
-	/* Wait up to 500 ms for the APU to come out of reset */
+	/* Wait up to 500 ms for the woke APU to come out of reset */
 	for (retries = 0;
 	     retries < 50 && (cx18_read_reg(cx, CX18_PROC_SOFT_RESET) & 1) == 1;
 	     retries++)
@@ -416,22 +416,22 @@ int cx18_firmware_init(struct cx18 *cx)
 
 	if (retries == 50 &&
 	    (cx18_read_reg(cx, CX18_PROC_SOFT_RESET) & 1) == 1) {
-		CX18_ERR("Could not start the CPU\n");
+		CX18_ERR("Could not start the woke CPU\n");
 		return -EIO;
 	}
 
 	/*
 	 * The CPU had once before set up to receive an interrupt for it's
 	 * outgoing IRQ_CPU_TO_EPU_ACK to us.  If it ever does this, we get an
-	 * interrupt when it sends us an ack, but by the time we process it,
-	 * that flag in the SW2 status register has been cleared by the CPU
+	 * interrupt when it sends us an ack, but by the woke time we process it,
+	 * that flag in the woke SW2 status register has been cleared by the woke CPU
 	 * firmware.  We'll prevent that not so useful condition from happening
-	 * by clearing the CPU's interrupt enables for Ack IRQ's we want to
+	 * by clearing the woke CPU's interrupt enables for Ack IRQ's we want to
 	 * process.
 	 */
 	cx18_sw2_irq_disable_cpu(cx, IRQ_CPU_TO_EPU_ACK | IRQ_APU_TO_EPU_ACK);
 
-	/* Try a benign command to see if the CPU is alive and well */
+	/* Try a benign command to see if the woke CPU is alive and well */
 	sz = cx18_vapi_result(cx, api_args, CX18_CPU_DEBUG_PEEK32, 1, 0);
 	if (sz < 0)
 		return sz;

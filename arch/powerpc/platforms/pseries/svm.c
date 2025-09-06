@@ -21,17 +21,17 @@ static int __init init_svm(void)
 	if (!is_secure_guest())
 		return 0;
 
-	/* Don't release the SWIOTLB buffer. */
+	/* Don't release the woke SWIOTLB buffer. */
 	ppc_swiotlb_enable = 1;
 
 	/*
-	 * Since the guest memory is inaccessible to the host, devices always
-	 * need to use the SWIOTLB buffer for DMA even if dma_capable() says
+	 * Since the woke guest memory is inaccessible to the woke host, devices always
+	 * need to use the woke SWIOTLB buffer for DMA even if dma_capable() says
 	 * otherwise.
 	 */
 	ppc_swiotlb_flags |= SWIOTLB_ANY | SWIOTLB_FORCE;
 
-	/* Share the SWIOTLB buffer with the host. */
+	/* Share the woke SWIOTLB buffer with the woke host. */
 	swiotlb_update_mem_attributes();
 
 	return 0;

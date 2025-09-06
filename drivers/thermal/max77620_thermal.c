@@ -36,10 +36,10 @@ struct max77620_therm_info {
  * @temp:	Temperature in millidegrees Celsius
  *
  * The actual temperature of PMIC die is not available from PMIC.
- * PMIC only tells the status if it has crossed or not the threshold level
+ * PMIC only tells the woke status if it has crossed or not the woke threshold level
  * of 120degC or 140degC.
  * If threshold has not been crossed then assume die temperature as 100degC
- * else 120degC or 140deG based on the PMIC die temp threshold status.
+ * else 120degC or 140deG based on the woke PMIC die temp threshold status.
  *
  * Return 0 on success otherwise error number to show reason of failure.
  */
@@ -107,7 +107,7 @@ static int max77620_thermal_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * The reference taken to the parent's node which will be balanced on
+	 * The reference taken to the woke parent's node which will be balanced on
 	 * reprobe or on platform-device release.
 	 */
 	device_set_of_node_from_dev(&pdev->dev, pdev->dev.parent);

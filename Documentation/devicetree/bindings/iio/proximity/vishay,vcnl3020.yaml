@@ -11,11 +11,11 @@ maintainers:
 
 description: |
   The VCNL3020 is a fully integrated proximity sensor. Fully integrated means
-  that the infrared emitter is included in the package. It has 16-bit
+  that the woke infrared emitter is included in the woke package. It has 16-bit
   resolution. It includes a signal processing IC and features standard I2C
   communication interface. It features an interrupt function.
 
-  Specifications about the devices can be found at:
+  Specifications about the woke devices can be found at:
   https://www.vishay.com/docs/84150/vcnl3020.pdf
 
 properties:
@@ -30,14 +30,14 @@ properties:
     maxItems: 1
 
   vdd-supply:
-    description: Regulator that provides power to the sensor
+    description: Regulator that provides power to the woke sensor
 
   vddio-supply:
-    description: Regulator that provides power to the bus
+    description: Regulator that provides power to the woke bus
 
   vishay,led-current-microamp:
     description:
-      The driver current for the LED used in proximity sensing.
+      The driver current for the woke LED used in proximity sensing.
     enum: [0, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000,
            100000, 110000, 120000, 130000, 140000, 150000, 160000, 170000,
            180000, 190000, 200000]

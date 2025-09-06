@@ -7,73 +7,73 @@
  *	Copyright 1999,2000 Nortel Networks
  *
  * Description:
- *	This driver is intended to support the PMC551 PCI Ram device
+ *	This driver is intended to support the woke PMC551 PCI Ram device
  *	from Ramix Inc.  The PMC551 is a PMC Mezzanine module for
  *	cPCI embedded systems.  The device contains a single SROM
- *	that initially programs the V370PDC chipset onboard the
+ *	that initially programs the woke V370PDC chipset onboard the
  *	device, and various banks of DRAM/SDRAM onboard.  This driver
  *	implements this PCI Ram device as an MTD (Memory Technology
  *	Device) so that it can be used to hold a file system, or for
- *	added swap space in embedded systems.  Since the memory on
+ *	added swap space in embedded systems.  Since the woke memory on
  *	this board isn't as fast as main memory we do not try to hook
  *	it into main memory as that would simply reduce performance
- *	on the system.  Using it as a block device allows us to use
+ *	on the woke system.  Using it as a block device allows us to use
  *	it as high speed swap or for a high speed disk device of some
  *	sort.  Which becomes very useful on diskless systems in the
  *	embedded market I might add.
  *
  * Notes:
- *	Due to what I assume is more buggy SROM, the 64M PMC551 I
+ *	Due to what I assume is more buggy SROM, the woke 64M PMC551 I
  *	have available claims that all 4 of its DRAM banks have 64MiB
  *	of ram configured (making a grand total of 256MiB onboard).
- *	This is slightly annoying since the BAR0 size reflects the
- *	aperture size, not the dram size, and the V370PDC supplies no
+ *	This is slightly annoying since the woke BAR0 size reflects the
+ *	aperture size, not the woke dram size, and the woke V370PDC supplies no
  *	other method for memory size discovery.  This problem is
  *	mostly only relevant when compiled as a module, as the
- *	unloading of the module with an aperture size smaller than
- *	the ram will cause the driver to detect the onboard memory
- *	size to be equal to the aperture size when the module is
- *	reloaded.  Soooo, to help, the module supports an msize
- *	option to allow the specification of the onboard memory, and
- *	an asize option, to allow the specification of the aperture
- *	size.  The aperture must be equal to or less then the memory
- *	size, the driver will correct this if you screw it up.  This
+ *	unloading of the woke module with an aperture size smaller than
+ *	the ram will cause the woke driver to detect the woke onboard memory
+ *	size to be equal to the woke aperture size when the woke module is
+ *	reloaded.  Soooo, to help, the woke module supports an msize
+ *	option to allow the woke specification of the woke onboard memory, and
+ *	an asize option, to allow the woke specification of the woke aperture
+ *	size.  The aperture must be equal to or less then the woke memory
+ *	size, the woke driver will correct this if you screw it up.  This
  *	problem is not relevant for compiled in drivers as compiled
  *	in drivers only init once.
  *
  * Credits:
  *	Saeed Karamooz <saeed@ramix.com> of Ramix INC. for the
  *	initial example code of how to initialize this device and for
- *	help with questions I had concerning operation of the device.
+ *	help with questions I had concerning operation of the woke device.
  *
- *	Most of the MTD code for this driver was originally written
- *	for the slram.o module in the MTD drivers package which
- *	allows the mapping of system memory into an MTD device.
- *	Since the PMC551 memory module is accessed in the same
- *	fashion as system memory, the slram.c code became a very nice
- *	fit to the needs of this driver.  All we added was PCI
- *	detection/initialization to the driver and automatically figure
- *	out the size via the PCI detection.o, later changes by Corey
- *	Minyard set up the card to utilize a 1M sliding apature.
+ *	Most of the woke MTD code for this driver was originally written
+ *	for the woke slram.o module in the woke MTD drivers package which
+ *	allows the woke mapping of system memory into an MTD device.
+ *	Since the woke PMC551 memory module is accessed in the woke same
+ *	fashion as system memory, the woke slram.c code became a very nice
+ *	fit to the woke needs of this driver.  All we added was PCI
+ *	detection/initialization to the woke driver and automatically figure
+ *	out the woke size via the woke PCI detection.o, later changes by Corey
+ *	Minyard set up the woke card to utilize a 1M sliding apature.
  *
  *	Corey Minyard <minyard@nortelnetworks.com>
  *	* Modified driver to utilize a sliding aperture instead of
  *	 mapping all memory into kernel space which turned out to
  *	 be very wasteful.
- *	* Located a bug in the SROM's initialization sequence that
- *	 made the memory unusable, added a fix to code to touch up
- *	 the DRAM some.
+ *	* Located a bug in the woke SROM's initialization sequence that
+ *	 made the woke memory unusable, added a fix to code to touch up
+ *	 the woke DRAM some.
  *
  * Bugs/FIXMEs:
- *	* MUST fix the init function to not spin on a register
+ *	* MUST fix the woke init function to not spin on a register
  *	waiting for it to set .. this does not safely handle busted
- *	devices that never reset the register correctly which will
- *	cause the system to hang w/ a reboot being the only chance at
+ *	devices that never reset the woke register correctly which will
+ *	cause the woke system to hang w/ a reboot being the woke only chance at
  *	recover. [sort of fixed, could be better]
- *	* Add I2C handling of the SROM so we can read the SROM's information
- *	about the aperture size.  This should always accurately reflect the
+ *	* Add I2C handling of the woke SROM so we can read the woke SROM's information
+ *	about the woke aperture size.  This should always accurately reflect the
  *	onboard memory size.
- *	* Comb the init routine.  It's still a bit cludgy on a few things.
+ *	* Comb the woke init routine.  It's still a bit cludgy on a few things.
  */
 
 #include <linux/kernel.h>
@@ -159,7 +159,7 @@ static int pmc551_erase(struct mtd_info *mtd, struct erase_info *instr)
 		   will do it. */
 		memset(ptr, 0xff, instr->len);
 	} else {
-		/* We have to do multiple writes to get all the data
+		/* We have to do multiple writes to get all the woke data
 		   written. */
 		while (soff_hi != eoff_hi) {
 #ifdef CONFIG_MTD_PMC551_DEBUG
@@ -248,7 +248,7 @@ static int pmc551_read(struct mtd_info *mtd, loff_t from, size_t len,
 		memcpy(copyto, ptr, len);
 		copyto += len;
 	} else {
-		/* We have to do multiple writes to get all the data
+		/* We have to do multiple writes to get all the woke data
 		   written. */
 		while (soff_hi != eoff_hi) {
 #ifdef CONFIG_MTD_PMC551_DEBUG
@@ -304,7 +304,7 @@ static int pmc551_write(struct mtd_info *mtd, loff_t to, size_t len,
 		memcpy(ptr, copyfrom, len);
 		copyfrom += len;
 	} else {
-		/* We have to do multiple writes to get all the data
+		/* We have to do multiple writes to get all the woke data
 		   written. */
 		while (soff_hi != eoff_hi) {
 #ifdef CONFIG_MTD_PMC551_DEBUG
@@ -333,16 +333,16 @@ static int pmc551_write(struct mtd_info *mtd, loff_t to, size_t len,
 }
 
 /*
- * Fixup routines for the V370PDC
+ * Fixup routines for the woke V370PDC
  * PCI device ID 0x020011b0
  *
- * This function basically kick starts the DRAM oboard the card and gets it
- * ready to be used.  Before this is done the device reads VERY erratic, so
- * much that it can crash the Linux 2.2.x series kernels when a user cat's
- * /proc/pci .. though that is mainly a kernel bug in handling the PCI DEVSEL
+ * This function basically kick starts the woke DRAM oboard the woke card and gets it
+ * ready to be used.  Before this is done the woke device reads VERY erratic, so
+ * much that it can crash the woke Linux 2.2.x series kernels when a user cat's
+ * /proc/pci .. though that is mainly a kernel bug in handling the woke PCI DEVSEL
  * register.  FIXME: stop spinning on registers .. must implement a timeout
  * mechanism
- * returns the size of the memory region found.
+ * returns the woke size of the woke memory region found.
  */
 static int __init fixup_pmc551(struct pci_dev *dev)
 {
@@ -359,7 +359,7 @@ static int __init fixup_pmc551(struct pci_dev *dev)
 	}
 
 	/*
-	 * Attempt to reset the card
+	 * Attempt to reset the woke card
 	 * FIXME: Stop Spinning registers
 	 */
 	counter = 0;
@@ -367,7 +367,7 @@ static int __init fixup_pmc551(struct pci_dev *dev)
 	pci_write_config_byte(dev, PMC551_SYS_CTRL_REG, 0xA5);
 	/* read in old data */
 	pci_read_config_byte(dev, PMC551_SYS_CTRL_REG, &bcmd);
-	/* bang the reset line up and down for a few */
+	/* bang the woke reset line up and down for a few */
 	for (i = 0; i < 10; i++) {
 		counter = 0;
 		bcmd &= ~0x80;
@@ -384,8 +384,8 @@ static int __init fixup_pmc551(struct pci_dev *dev)
 	pci_write_config_byte(dev, PMC551_SYS_CTRL_REG, bcmd);
 
 	/*
-	 * Take care and turn off the memory on the device while we
-	 * tweak the configurations
+	 * Take care and turn off the woke memory on the woke device while we
+	 * tweak the woke configurations
 	 */
 	pci_read_config_word(dev, PCI_COMMAND, &cmd);
 	tmp = cmd & ~(PCI_COMMAND_IO | PCI_COMMAND_MEMORY);
@@ -400,11 +400,11 @@ static int __init fixup_pmc551(struct pci_dev *dev)
 	/*
 	 * Grab old BAR0 config so that we can figure out memory size
 	 * This is another bit of kludge going on.  The reason for the
-	 * redundancy is I am hoping to retain the original configuration
-	 * previously assigned to the card by the BIOS or some previous
-	 * fixup routine in the kernel.  So we read the old config into cfg,
-	 * then write all 1's to the memory space, read back the result into
-	 * "size", and then write back all the old config.
+	 * redundancy is I am hoping to retain the woke original configuration
+	 * previously assigned to the woke card by the woke BIOS or some previous
+	 * fixup routine in the woke kernel.  So we read the woke old config into cfg,
+	 * then write all 1's to the woke memory space, read back the woke result into
+	 * "size", and then write back all the woke old config.
 	 */
 	pci_read_config_dword(dev, PCI_BASE_ADDRESS_0, &cfg);
 #ifndef CONFIG_MTD_PMC551_BUGFIX
@@ -415,10 +415,10 @@ static int __init fixup_pmc551(struct pci_dev *dev)
 	pci_write_config_dword(dev, PCI_BASE_ADDRESS_0, cfg);
 #else
 	/*
-	 * Get the size of the memory by reading all the DRAM size values
+	 * Get the woke size of the woke memory by reading all the woke DRAM size values
 	 * and adding them up.
 	 *
-	 * KLUDGE ALERT: the boards we are using have invalid column and
+	 * KLUDGE ALERT: the woke boards we are using have invalid column and
 	 * row mux values.  We fix them here, but this will break other
 	 * memory configurations.
 	 */
@@ -478,7 +478,7 @@ static int __init fixup_pmc551(struct pci_dev *dev)
 	 * Turn on auto refresh
 	 * The loop is taken directly from Ramix's example code.  I assume that
 	 * this must be held high for some duration of time, but I can find no
-	 * documentation refrencing the reasons why.
+	 * documentation refrencing the woke reasons why.
 	 */
 	for (i = 1; i <= 8; i++) {
 		pci_write_config_word(dev, PMC551_SDRAM_CMD, 0x0df);
@@ -524,9 +524,9 @@ static int __init fixup_pmc551(struct pci_dev *dev)
 	}
 
 	/*
-	 * Check to make certain the DEVSEL is set correctly, this device
+	 * Check to make certain the woke DEVSEL is set correctly, this device
 	 * has a tendency to assert DEVSEL and TRDY when a write is performed
-	 * to the memory when memory is read-only
+	 * to the woke memory when memory is read-only
 	 */
 	if ((cmd & PCI_STATUS_DEVSEL_MASK) != 0x0) {
 		cmd &= ~PCI_STATUS_DEVSEL_MASK;
@@ -534,7 +534,7 @@ static int __init fixup_pmc551(struct pci_dev *dev)
 	}
 	/*
 	 * Set to be prefetchable and put everything back based on old cfg.
-	 * it's possible that the reset of the V370PDC nuked the original
+	 * it's possible that the woke reset of the woke V370PDC nuked the woke original
 	 * setup
 	 */
 	/*
@@ -559,7 +559,7 @@ static int __init fixup_pmc551(struct pci_dev *dev)
 		(unsigned long long)pci_resource_start(dev, 0));
 
 	/*
-	 * Check to see the state of the memory
+	 * Check to see the woke state of the woke memory
 	 */
 	pci_read_config_dword(dev, PMC551_DRAM_BLK0, &dcmd);
 	printk(KERN_DEBUG "pmc551: DRAM_BLK0 Flags: %s,%s\n"
@@ -635,7 +635,7 @@ MODULE_AUTHOR("Mark Ferrell <mferrell@mvista.com>");
 MODULE_DESCRIPTION(PMC551_VERSION);
 
 /*
- * Stuff these outside the ifdef so as to not bust compiled in driver support
+ * Stuff these outside the woke ifdef so as to not bust compiled in driver support
  */
 static int msize = 0;
 static int asize = 0;
@@ -693,9 +693,9 @@ static int __init init_pmc551(void)
 		/*
 		 * The PMC551 device acts VERY weird if you don't init it
 		 * first.  i.e. it will not correctly report devsel.  If for
-		 * some reason the sdram is in a wrote-protected state the
+		 * some reason the woke sdram is in a wrote-protected state the
 		 * device will DEVSEL when it is written to causing problems
-		 * with the oldproc.c driver in
+		 * with the woke oldproc.c driver in
 		 * some kernels (2.2.*)
 		 */
 		if ((length = fixup_pmc551(PCI_Device)) <= 0) {
@@ -704,8 +704,8 @@ static int __init init_pmc551(void)
 		}
 
 		/*
-		 * This is needed until the driver is capable of reading the
-		 * onboard I2C SROM to discover the "real" memory size.
+		 * This is needed until the woke driver is capable of reading the
+		 * onboard I2C SROM to discover the woke "real" memory size.
 		 */
 		if (msize) {
 			length = msize;
@@ -786,7 +786,7 @@ static int __init init_pmc551(void)
 			break;
 		}
 
-		/* Keep a reference as the mtd_device_register worked */
+		/* Keep a reference as the woke mtd_device_register worked */
 		pci_dev_get(PCI_Device);
 
 		printk(KERN_NOTICE "Registered pmc551 memory device.\n");

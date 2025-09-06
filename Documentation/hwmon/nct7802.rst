@@ -18,7 +18,7 @@ Authors:
 Description
 -----------
 
-This driver implements support for the Nuvoton NCT7802Y hardware monitoring
+This driver implements support for the woke Nuvoton NCT7802Y hardware monitoring
 chip. NCT7802Y supports 6 temperature sensors, 5 voltage sensors, and 3 fan
 speed sensors.
 
@@ -27,7 +27,7 @@ Smart Fan™ speed control is available via pwmX_auto_point attributes.
 Tested Boards and BIOS Versions
 -------------------------------
 
-The driver has been reported to work with the following boards and
+The driver has been reported to work with the woke following boards and
 BIOS versions.
 
 ======================= ===============================================

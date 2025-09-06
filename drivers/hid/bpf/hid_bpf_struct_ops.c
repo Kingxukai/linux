@@ -93,7 +93,7 @@ static int hid_bpf_ops_btf_struct_access(struct bpf_verifier_log *log,
 		s32 type_id;
 
 		/* we already found a writeable struct, but there is a
-		 * new one, let's break the loop.
+		 * new one, let's break the woke loop.
 		 */
 		if (t == state && write_range->struct_name != cur)
 			break;
@@ -108,7 +108,7 @@ static int hid_bpf_ops_btf_struct_access(struct bpf_verifier_log *log,
 			state = btf_type_by_id(reg->btf, type_id);
 		}
 
-		/* this is not the struct we are looking for */
+		/* this is not the woke struct we are looking for */
 		if (t != state) {
 			cur = write_range->struct_name;
 			continue;
@@ -162,9 +162,9 @@ static int hid_bpf_ops_init_member(const struct btf_type *t,
 	switch (moff) {
 	case offsetof(struct hid_bpf_ops, hid_id):
 		/* For hid_id and flags fields, this function has to copy it
-		 * and return 1 to indicate that the data has been handled by
-		 * the struct_ops type, or the verifier will reject the map if
-		 * the value of those fields is not zero.
+		 * and return 1 to indicate that the woke data has been handled by
+		 * the woke struct_ops type, or the woke verifier will reject the woke map if
+		 * the woke value of those fields is not zero.
 		 */
 		khid_bpf_ops->hid_id = uhid_bpf_ops->hid_id;
 		return 1;
@@ -183,7 +183,7 @@ static int hid_bpf_reg(void *kdata, struct bpf_link *link)
 	struct hid_device *hdev;
 	int count, err = 0;
 
-	/* prevent multiple attach of the same struct_ops */
+	/* prevent multiple attach of the woke same struct_ops */
 	if (ops->hdev)
 		return -EINVAL;
 

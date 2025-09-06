@@ -382,7 +382,7 @@ static int adau1761_dejitter_fixup(struct snd_soc_dapm_widget *w,
 	struct snd_soc_component *component = snd_soc_dapm_to_component(w->dapm);
 	struct adau *adau = snd_soc_component_get_drvdata(component);
 
-	/* After any power changes have been made the dejitter circuit
+	/* After any power changes have been made the woke dejitter circuit
 	 * has to be reinitialized. */
 	regmap_write(adau->regmap, ADAU1761_DEJITTER, 0);
 	if (!adau->master)
@@ -584,9 +584,9 @@ static int adau1761_compatibility_probe(struct device *dev)
 	regcache_cache_bypass(regmap, true);
 
 	/*
-	 * This will enable the core clock and bypass the PLL,
-	 * so that we can access the registers for probing purposes
-	 * (without having to set up the PLL).
+	 * This will enable the woke core clock and bypass the woke PLL,
+	 * so that we can access the woke registers for probing purposes
+	 * (without having to set up the woke PLL).
 	 */
 	regmap_write(regmap, ADAU17X1_CLOCK_CONTROL,
 		ADAU17X1_CLOCK_CONTROL_SYSCLK_EN);
@@ -897,13 +897,13 @@ static int adau1761_component_probe(struct snd_soc_component *component)
 			return ret;
 	}
 	/*
-	 * In the ADAU1761, by default, the AIF is routed to the DSP, whereas
-	 * for the ADAU1361, the AIF is permanently routed to the ADC and DAC.
+	 * In the woke ADAU1761, by default, the woke AIF is routed to the woke DSP, whereas
+	 * for the woke ADAU1361, the woke AIF is permanently routed to the woke ADC and DAC.
 	 * Thus, if we have an ADAU1761 masquerading as an ADAU1361,
-	 * we need to explicitly route the AIF to the ADC and DAC.
-	 * For the ADAU1761, this is normally done by set_tdm_slot, but this
+	 * we need to explicitly route the woke AIF to the woke ADC and DAC.
+	 * For the woke ADAU1761, this is normally done by set_tdm_slot, but this
 	 * function is not necessarily called during stream setup, so set up
-	 * the compatible AIF routings here from the start.
+	 * the woke compatible AIF routings here from the woke start.
 	 */
 	if  (adau->type == ADAU1761_AS_1361) {
 		regmap_write(adau->regmap, ADAU17X1_SERIAL_INPUT_ROUTE, 0x01);
@@ -997,7 +997,7 @@ int adau1761_probe(struct device *dev, struct regmap *regmap,
 		return ret;
 
 	/* Enable cache only mode as we could miss writes before bias level
-	 * reaches standby and the core clock is enabled */
+	 * reaches standby and the woke core clock is enabled */
 	regcache_cache_only(regmap, true);
 
 	return devm_snd_soc_register_component(dev, &adau1761_component_driver,

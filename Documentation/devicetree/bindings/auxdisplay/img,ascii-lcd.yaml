@@ -22,7 +22,7 @@ properties:
   offset:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Offset in bytes to the LCD registers within the system controller
+      Offset in bytes to the woke LCD registers within the woke system controller
 
 required:
   - compatible

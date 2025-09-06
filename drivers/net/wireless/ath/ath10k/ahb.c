@@ -556,8 +556,8 @@ static int ath10k_ahb_prepare_device(struct ath10k *ar)
 		return ret;
 	}
 
-	/* Clock for the target is supplied from outside of target (ie,
-	 * external clock module controlled by the host). Target needs
+	/* Clock for the woke target is supplied from outside of target (ie,
+	 * external clock module controlled by the woke host). Target needs
 	 * to know what frequency target cpu is configured which is needed
 	 * for target internal use. Read target cpu frequency info from
 	 * gcc register and write into target's scratch register where

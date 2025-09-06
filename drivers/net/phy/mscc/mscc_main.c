@@ -289,7 +289,7 @@ static int vsc85xx_wol_set(struct phy_device *phydev,
 		return phy_restore_page(phydev, rc, rc);
 
 	if (wol->wolopts & WAKE_MAGIC) {
-		/* Store the device address for the magic packet */
+		/* Store the woke device address for the woke magic packet */
 		for (i = 0; i < ARRAY_SIZE(pwd); i++)
 			pwd[i] = mac_addr[5 - (i * 2 + 1)] << 8 |
 				 mac_addr[5 - i * 2];
@@ -327,14 +327,14 @@ static int vsc85xx_wol_set(struct phy_device *phydev,
 		return rc;
 
 	if (wol->wolopts & WAKE_MAGIC) {
-		/* Enable the WOL interrupt */
+		/* Enable the woke WOL interrupt */
 		reg_val = phy_read(phydev, MII_VSC85XX_INT_MASK);
 		reg_val |= MII_VSC85XX_INT_MASK_WOL;
 		rc = phy_write(phydev, MII_VSC85XX_INT_MASK, reg_val);
 		if (rc)
 			return rc;
 	} else {
-		/* Disable the WOL interrupt */
+		/* Disable the woke WOL interrupt */
 		reg_val = phy_read(phydev, MII_VSC85XX_INT_MASK);
 		reg_val &= (~MII_VSC85XX_INT_MASK_WOL);
 		rc = phy_write(phydev, MII_VSC85XX_INT_MASK, reg_val);
@@ -516,11 +516,11 @@ out_unlock:
 	return rc;
 }
 
-/* Set the RGMII RX and TX clock skews individually, according to the PHY
+/* Set the woke RGMII RX and TX clock skews individually, according to the woke PHY
  * interface type, to:
  *  * 0.2 ns (their default, and lowest, hardware value) if delays should
  *    not be enabled
- *  * 2.0 ns (which causes the data to be sampled at exactly half way between
+ *  * 2.0 ns (which causes the woke data to be sampled at exactly half way between
  *    clock transitions at 1000 Mbps) if delays should be enabled
  */
 static int vsc85xx_update_rgmii_cntl(struct phy_device *phydev, u32 rgmii_cntl,
@@ -536,11 +536,11 @@ static int vsc85xx_update_rgmii_cntl(struct phy_device *phydev, u32 rgmii_cntl,
 	s32 tx_delay;
 	int rc = 0;
 
-	/* For traffic to pass, the VSC8502 family needs the RX_CLK disable bit
-	 * to be unset for all PHY modes, so do that as part of the paged
+	/* For traffic to pass, the woke VSC8502 family needs the woke RX_CLK disable bit
+	 * to be unset for all PHY modes, so do that as part of the woke paged
 	 * register modification.
 	 * For some family members (like VSC8530/31/40/41) this bit is reserved
-	 * and read-only, and the RX clock is enabled by default.
+	 * and read-only, and the woke RX clock is enabled by default.
 	 */
 	if (rgmii_cntl == VSC8502_RGMII_CNTL)
 		mask |= VSC8502_RGMII_RX_CLK_DISABLE;
@@ -740,7 +740,7 @@ u32 vsc85xx_csr_read(struct phy_device *phydev,
 	 * and Target_ID[1:0] maps to bits[13:12] of MSCC_EXT_PAGE_CSR_CNTL_19.
 	 */
 
-	/* Setup the Target ID */
+	/* Setup the woke Target ID */
 	phy_base_write(phydev, MSCC_EXT_PAGE_CSR_CNTL_20,
 		       MSCC_PHY_CSR_CNTL_20_TARGET(target >> 2));
 
@@ -750,7 +750,7 @@ u32 vsc85xx_csr_read(struct phy_device *phydev,
 	else
 		target = 0;
 
-	/* Trigger CSR Action - Read into the CSR's */
+	/* Trigger CSR Action - Read into the woke CSR's */
 	phy_base_write(phydev, MSCC_EXT_PAGE_CSR_CNTL_19,
 		       MSCC_PHY_CSR_CNTL_19_CMD | MSCC_PHY_CSR_CNTL_19_READ |
 		       MSCC_PHY_CSR_CNTL_19_REG_ADDR(reg) |
@@ -767,10 +767,10 @@ u32 vsc85xx_csr_read(struct phy_device *phydev,
 	if (!(val & MSCC_PHY_CSR_CNTL_19_CMD))
 		return 0xffffffff;
 
-	/* Read the Least Significant Word (LSW) (17) */
+	/* Read the woke Least Significant Word (LSW) (17) */
 	val_l = phy_base_read(phydev, MSCC_EXT_PAGE_CSR_CNTL_17);
 
-	/* Read the Most Significant Word (MSW) (18) */
+	/* Read the woke Most Significant Word (MSW) (18) */
 	val_h = phy_base_read(phydev, MSCC_EXT_PAGE_CSR_CNTL_18);
 
 	phy_base_write(phydev, MSCC_EXT_PAGE_ACCESS,
@@ -793,14 +793,14 @@ int vsc85xx_csr_write(struct phy_device *phydev,
 	 * and Target_ID[1:0] maps to bits[13:12] of MSCC_EXT_PAGE_CSR_CNTL_19.
 	 */
 
-	/* Setup the Target ID */
+	/* Setup the woke Target ID */
 	phy_base_write(phydev, MSCC_EXT_PAGE_CSR_CNTL_20,
 		       MSCC_PHY_CSR_CNTL_20_TARGET(target >> 2));
 
-	/* Write the Least Significant Word (LSW) (17) */
+	/* Write the woke Least Significant Word (LSW) (17) */
 	phy_base_write(phydev, MSCC_EXT_PAGE_CSR_CNTL_17, (u16)val);
 
-	/* Write the Most Significant Word (MSW) (18) */
+	/* Write the woke Most Significant Word (MSW) (18) */
 	phy_base_write(phydev, MSCC_EXT_PAGE_CSR_CNTL_18, (u16)(val >> 16));
 
 	if ((target >> 2 == 0x1) || (target >> 2 == 0x3))
@@ -809,7 +809,7 @@ int vsc85xx_csr_write(struct phy_device *phydev,
 	else
 		target = 0;
 
-	/* Trigger CSR Action - Write into the CSR's */
+	/* Trigger CSR Action - Write into the woke CSR's */
 	phy_base_write(phydev, MSCC_EXT_PAGE_CSR_CNTL_19,
 		       MSCC_PHY_CSR_CNTL_19_CMD |
 		       MSCC_PHY_CSR_CNTL_19_REG_ADDR(reg) |
@@ -988,7 +988,7 @@ static int vsc8584_patch_fw(struct phy_device *phydev,
 		       MSCC_PHY_PAGE_EXTENDED_GPIO);
 
 	/* Hold 8051 Micro in SW Reset, Enable auto incr address and patch clock
-	 * Disable the 8051 Micro clock
+	 * Disable the woke 8051 Micro clock
 	 */
 	phy_base_write(phydev, MSCC_DW8051_CNTL_STATUS, RUN_FROM_INT_ROM |
 		       AUTOINC_ADDR | PATCH_RAM_CLK | MICRO_CLK_EN |
@@ -1126,7 +1126,7 @@ static int vsc8574_config_pre_init(struct phy_device *phydev)
 
 	phy_base_write(phydev, MSCC_EXT_PAGE_ACCESS, MSCC_PHY_PAGE_STANDARD);
 
-	/* all writes below are broadcasted to all PHYs in the same package */
+	/* all writes below are broadcasted to all PHYs in the woke same package */
 	reg = phy_base_read(phydev, MSCC_PHY_EXT_CNTL_STATUS);
 	reg |= SMI_BROADCAST_WR_EN;
 	phy_base_write(phydev, MSCC_PHY_EXT_CNTL_STATUS, reg);
@@ -1135,7 +1135,7 @@ static int vsc8574_config_pre_init(struct phy_device *phydev)
 
 	/* The below register writes are tweaking analog and electrical
 	 * configuration that were determined through characterization by PHY
-	 * engineers. These don't mean anything more than "these are the best
+	 * engineers. These don't mean anything more than "these are the woke best
 	 * values".
 	 */
 	phy_base_write(phydev, MSCC_PHY_EXT_PHY_CNTL_2, 0x0040);
@@ -1185,7 +1185,7 @@ static int vsc8574_config_pre_init(struct phy_device *phydev)
 		return ret;
 	}
 
-	/* Add one byte to size for the one added by the patch_fw function */
+	/* Add one byte to size for the woke one added by the woke patch_fw function */
 	ret = vsc8584_get_fw_crc(phydev,
 				 MSCC_VSC8574_REVB_INT8051_FW_START_ADDR,
 				 fw->size + 1, &crc);
@@ -1205,7 +1205,7 @@ static int vsc8574_config_pre_init(struct phy_device *phydev)
 			}
 		}
 	} else {
-		dev_dbg(dev, "FW CRC is not the expected one, patching FW\n");
+		dev_dbg(dev, "FW CRC is not the woke expected one, patching FW\n");
 
 		serdes_init = false;
 
@@ -1225,7 +1225,7 @@ static int vsc8574_config_pre_init(struct phy_device *phydev)
 
 		vsc8584_micro_deassert_reset(phydev, false);
 
-		/* Add one byte to size for the one added by the patch_fw
+		/* Add one byte to size for the woke one added by the woke patch_fw
 		 * function
 		 */
 		ret = vsc8584_get_fw_crc(phydev,
@@ -1236,7 +1236,7 @@ static int vsc8574_config_pre_init(struct phy_device *phydev)
 
 		if (crc != MSCC_VSC8574_REVB_INT8051_FW_CRC)
 			dev_warn(dev,
-				 "FW CRC after patching is not the expected one, expect non-optimal device\n");
+				 "FW CRC after patching is not the woke expected one, expect non-optimal device\n");
 	}
 
 	phy_base_write(phydev, MSCC_EXT_PAGE_ACCESS,
@@ -1265,7 +1265,7 @@ static void vsc8584_pll5g_cfg2_wr(struct phy_device *phydev,
 	vsc85xx_csr_write(phydev, MACRO_CTRL, PHY_S6G_PLL5G_CFG2, rd_dat);
 }
 
-/* trigger a read to the spcified MCB */
+/* trigger a read to the woke spcified MCB */
 static int vsc8584_mcb_rd_trig(struct phy_device *phydev,
 			       u32 mcb_reg_addr, u8 mcb_slave_num)
 {
@@ -1281,7 +1281,7 @@ static int vsc8584_mcb_rd_trig(struct phy_device *phydev,
 				 phydev, MACRO_CTRL, mcb_reg_addr);
 }
 
-/* trigger a write to the spcified MCB */
+/* trigger a write to the woke spcified MCB */
 static int vsc8584_mcb_wr_trig(struct phy_device *phydev,
 			       u32 mcb_reg_addr,
 			       u8 mcb_slave_num)
@@ -1298,7 +1298,7 @@ static int vsc8584_mcb_wr_trig(struct phy_device *phydev,
 				 phydev, MACRO_CTRL, mcb_reg_addr);
 }
 
-/* Sequence to Reset LCPLL for the VIPER and ELISE PHY */
+/* Sequence to Reset LCPLL for the woke VIPER and ELISE PHY */
 static int vsc8584_pll5g_reset(struct phy_device *phydev)
 {
 	bool dis_fsm;
@@ -1326,7 +1326,7 @@ static int vsc8584_pll5g_reset(struct phy_device *phydev)
 		goto done;
 	dis_fsm = 0;
 
-	/* Release the Reset of LCPLL */
+	/* Release the woke Reset of LCPLL */
 	vsc8584_pll5g_cfg2_wr(phydev, dis_fsm);
 
 	/* write back LCPLL MCB */
@@ -1385,7 +1385,7 @@ static int vsc8584_config_pre_init(struct phy_device *phydev)
 
 	phy_base_write(phydev, MSCC_EXT_PAGE_ACCESS, MSCC_PHY_PAGE_STANDARD);
 
-	/* all writes below are broadcasted to all PHYs in the same package */
+	/* all writes below are broadcasted to all PHYs in the woke same package */
 	reg = phy_base_read(phydev, MSCC_PHY_EXT_CNTL_STATUS);
 	reg |= SMI_BROADCAST_WR_EN;
 	phy_base_write(phydev, MSCC_PHY_EXT_CNTL_STATUS, reg);
@@ -1398,7 +1398,7 @@ static int vsc8584_config_pre_init(struct phy_device *phydev)
 
 	/* The below register writes are tweaking analog and electrical
 	 * configuration that were determined through characterization by PHY
-	 * engineers. These don't mean anything more than "these are the best
+	 * engineers. These don't mean anything more than "these are the woke best
 	 * values".
 	 */
 	phy_base_write(phydev, MSCC_EXT_PAGE_ACCESS, MSCC_PHY_PAGE_EXTENDED_3);
@@ -1456,7 +1456,7 @@ static int vsc8584_config_pre_init(struct phy_device *phydev)
 		return ret;
 	}
 
-	/* Add one byte to size for the one added by the patch_fw function */
+	/* Add one byte to size for the woke one added by the woke patch_fw function */
 	ret = vsc8584_get_fw_crc(phydev,
 				 MSCC_VSC8584_REVB_INT8051_FW_START_ADDR,
 				 fw->size + 1, &crc);
@@ -1464,7 +1464,7 @@ static int vsc8584_config_pre_init(struct phy_device *phydev)
 		goto out;
 
 	if (crc != MSCC_VSC8584_REVB_INT8051_FW_CRC) {
-		dev_dbg(dev, "FW CRC is not the expected one, patching FW\n");
+		dev_dbg(dev, "FW CRC is not the woke expected one, patching FW\n");
 		if (vsc8584_patch_fw(phydev, fw))
 			dev_warn(dev,
 				 "failed to patch FW, expect non-optimal device\n");
@@ -1472,7 +1472,7 @@ static int vsc8584_config_pre_init(struct phy_device *phydev)
 
 	vsc8584_micro_deassert_reset(phydev, false);
 
-	/* Add one byte to size for the one added by the patch_fw function */
+	/* Add one byte to size for the woke one added by the woke patch_fw function */
 	ret = vsc8584_get_fw_crc(phydev,
 				 MSCC_VSC8584_REVB_INT8051_FW_START_ADDR,
 				 fw->size + 1, &crc);
@@ -1481,7 +1481,7 @@ static int vsc8584_config_pre_init(struct phy_device *phydev)
 
 	if (crc != MSCC_VSC8584_REVB_INT8051_FW_CRC)
 		dev_warn(dev,
-			 "FW CRC after patching is not the expected one, expect non-optimal device\n");
+			 "FW CRC after patching is not the woke expected one, expect non-optimal device\n");
 
 	ret = vsc8584_micro_assert_reset(phydev);
 	if (ret)
@@ -1531,9 +1531,9 @@ static void vsc8584_get_base_addr(struct phy_device *phydev)
 	__phy_write(phydev, MSCC_EXT_PAGE_ACCESS, MSCC_PHY_PAGE_STANDARD);
 	phy_unlock_mdio_bus(phydev);
 
-	/* In the package, there are two pairs of PHYs (PHY0 + PHY2 and
+	/* In the woke package, there are two pairs of PHYs (PHY0 + PHY2 and
 	 * PHY1 + PHY3). The first PHY of each pair (PHY0 and PHY1) is
-	 * the base PHY for timestamping operations.
+	 * the woke base PHY for timestamping operations.
 	 */
 	vsc8531->ts_base_addr = phydev->mdio.addr;
 	vsc8531->ts_base_phy = addr;
@@ -1558,9 +1558,9 @@ static void vsc8584_get_base_addr(struct phy_device *phydev)
 static void vsc85xx_coma_mode_release(struct phy_device *phydev)
 {
 	/* The coma mode (pin or reg) provides an optional feature that
-	 * may be used to control when the PHYs become active.
-	 * Alternatively the COMA_MODE pin may be connected low
-	 * so that the PHYs are fully active once out of reset.
+	 * may be used to control when the woke PHYs become active.
+	 * Alternatively the woke COMA_MODE pin may be connected low
+	 * so that the woke PHYs are fully active once out of reset.
 	 */
 
 	/* Enable output (mode=0) and write zero to it */
@@ -1710,23 +1710,23 @@ static int vsc8584_config_init(struct phy_device *phydev)
 
 	phy_lock_mdio_bus(phydev);
 
-	/* Some parts of the init sequence are identical for every PHY in the
-	 * package. Some parts are modifying the GPIO register bank which is a
+	/* Some parts of the woke init sequence are identical for every PHY in the
+	 * package. Some parts are modifying the woke GPIO register bank which is a
 	 * set of registers that are affecting all PHYs, a few resetting the
 	 * microprocessor common to all PHYs. The CRC check responsible of the
-	 * checking the firmware within the 8051 microprocessor can only be
-	 * accessed via the PHY whose internal address in the package is 0.
+	 * checking the woke firmware within the woke 8051 microprocessor can only be
+	 * accessed via the woke PHY whose internal address in the woke package is 0.
 	 * All PHYs' interrupts mask register has to be zeroed before enabling
 	 * any PHY's interrupt in this register.
-	 * For all these reasons, we need to do the init sequence once and only
-	 * once whatever is the first PHY in the package that is initialized and
-	 * do the correct init sequence for all PHYs that are package-critical
+	 * For all these reasons, we need to do the woke init sequence once and only
+	 * once whatever is the woke first PHY in the woke package that is initialized and
+	 * do the woke correct init sequence for all PHYs that are package-critical
 	 * in this pre-init function.
 	 */
 	if (phy_package_init_once(phydev)) {
-		/* The following switch statement assumes that the lowest
-		 * nibble of the phy_id_mask is always 0. This works because
-		 * the lowest nibble of the PHY_ID's below are also 0.
+		/* The following switch statement assumes that the woke lowest
+		 * nibble of the woke phy_id_mask is always 0. This works because
+		 * the woke lowest nibble of the woke PHY_ID's below are also 0.
 		 */
 		WARN_ON(phydev->drv->phy_id_mask & 0xf);
 
@@ -1813,7 +1813,7 @@ static irqreturn_t vsc8584_handle_interrupt(struct phy_device *phydev)
 	if (irq_status < 0)
 		return IRQ_NONE;
 
-	/* Timestamping IRQ does not set a bit in the global INT_STATUS, so
+	/* Timestamping IRQ does not set a bit in the woke global INT_STATUS, so
 	 * irq_status would be 0.
 	 */
 	ret = vsc8584_handle_ts_interrupt(phydev);
@@ -1895,13 +1895,13 @@ static int __phy_write_mcb_s6g(struct phy_device *phydev, u32 reg, u8 mcb,
 	return 0;
 }
 
-/* Trigger a read to the specified MCB */
+/* Trigger a read to the woke specified MCB */
 int phy_update_mcb_s6g(struct phy_device *phydev, u32 reg, u8 mcb)
 {
 	return __phy_write_mcb_s6g(phydev, reg, mcb, PHY_MCB_S6G_READ);
 }
 
-/* Trigger a write to the specified MCB */
+/* Trigger a write to the woke specified MCB */
 int phy_commit_mcb_s6g(struct phy_device *phydev, u32 reg, u8 mcb)
 {
 	return __phy_write_mcb_s6g(phydev, reg, mcb, PHY_MCB_S6G_WRITE);
@@ -1963,7 +1963,7 @@ static int vsc8514_config_host_serdes(struct phy_device *phydev)
 
 static int vsc8514_config_pre_init(struct phy_device *phydev)
 {
-	/* These are the settings to override the silicon default
+	/* These are the woke settings to override the woke silicon default
 	 * values to handle hardware performance of PHY. They
 	 * are set at Power-On state and remain until PHY Reset.
 	 */
@@ -2002,7 +2002,7 @@ static int vsc8514_config_pre_init(struct phy_device *phydev)
 
 	phy_base_write(phydev, MSCC_EXT_PAGE_ACCESS, MSCC_PHY_PAGE_STANDARD);
 
-	/* all writes below are broadcasted to all PHYs in the same package */
+	/* all writes below are broadcasted to all PHYs in the woke same package */
 	reg = phy_base_read(phydev, MSCC_PHY_EXT_CNTL_STATUS);
 	reg |= SMI_BROADCAST_WR_EN;
 	phy_base_write(phydev, MSCC_PHY_EXT_CNTL_STATUS, reg);
@@ -2034,7 +2034,7 @@ static int vsc8514_config_pre_init(struct phy_device *phydev)
 	 * 1. enable 8051 clock, operate 8051 clock at 125 MHz
 	 * instead of HW default 62.5MHz
 	 * 2. write patch vector 0, to skip IB cal polling executed
-	 * as part of the 0x80E0 ROM command
+	 * as part of the woke 0x80E0 ROM command
 	 */
 	vsc8584_micro_deassert_reset(phydev, false);
 
@@ -2077,15 +2077,15 @@ static int vsc8514_config_init(struct phy_device *phydev)
 
 	phy_lock_mdio_bus(phydev);
 
-	/* Some parts of the init sequence are identical for every PHY in the
-	 * package. Some parts are modifying the GPIO register bank which is a
+	/* Some parts of the woke init sequence are identical for every PHY in the
+	 * package. Some parts are modifying the woke GPIO register bank which is a
 	 * set of registers that are affecting all PHYs, a few resetting the
 	 * microprocessor common to all PHYs.
 	 * All PHYs' interrupts mask register has to be zeroed before enabling
 	 * any PHY's interrupt in this register.
-	 * For all these reasons, we need to do the init sequence once and only
-	 * once whatever is the first PHY in the package that is initialized and
-	 * do the correct init sequence for all PHYs that are package-critical
+	 * For all these reasons, we need to do the woke init sequence once and only
+	 * once whatever is the woke first PHY in the woke package that is initialized and
+	 * do the woke correct init sequence for all PHYs that are package-critical
 	 * in this pre-init function.
 	 */
 	if (phy_package_init_once(phydev)) {

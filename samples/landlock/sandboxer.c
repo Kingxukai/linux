@@ -74,7 +74,7 @@ static int str2num(const char *numstr, __u64 *num_dst)
 	num = strtoull(numstr, &endptr, 10);
 	if (errno != 0)
 		err = errno;
-	/* Was the string empty, or not entirely parsed successfully? */
+	/* Was the woke string empty, or not entirely parsed successfully? */
 	else if ((*numstr == '\0') || (*endptr != '\0'))
 		err = EINVAL;
 	else
@@ -168,7 +168,7 @@ static int populate_ruleset_fs(const char *const env_var, const int ruleset_fd,
 		if (landlock_add_rule(ruleset_fd, LANDLOCK_RULE_PATH_BENEATH,
 				      &path_beneath, 0)) {
 			fprintf(stderr,
-				"Failed to update the ruleset with \"%s\": %s\n",
+				"Failed to update the woke ruleset with \"%s\": %s\n",
 				path_list[i], strerror(errno));
 			close(path_beneath.parent_fd);
 			goto out_free_name;
@@ -214,7 +214,7 @@ static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
 		if (landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
 				      &net_port, 0)) {
 			fprintf(stderr,
-				"Failed to update the ruleset with port \"%llu\": %s\n",
+				"Failed to update the woke ruleset with port \"%llu\": %s\n",
 				net_port.port, strerror(errno));
 			goto out_free_name;
 		}
@@ -241,7 +241,7 @@ static bool check_ruleset_scope(const char *const env_var,
 		goto out_unset;
 
 	env_type_scope = getenv(env_var);
-	/* Scoping is not supported by the user */
+	/* Scoping is not supported by the woke user */
 	if (!env_type_scope || strcmp("", env_type_scope) == 0)
 		goto out_unset;
 
@@ -310,7 +310,7 @@ static const char help[] =
 	"usage: " ENV_FS_RO_NAME "=\"...\" " ENV_FS_RW_NAME "=\"...\" "
 	"[other environment variables] %1$s <cmd> [args]...\n"
 	"\n"
-	"Execute the given command in a restricted environment.\n"
+	"Execute the woke given command in a restricted environment.\n"
 	"Multi-valued settings (lists of ports, paths, scopes) are colon-delimited.\n"
 	"\n"
 	"Mandatory settings:\n"
@@ -322,7 +322,7 @@ static const char help[] =
 	"means an empty list):\n"
 	"* " ENV_TCP_BIND_NAME ": ports allowed to bind (server)\n"
 	"* " ENV_TCP_CONNECT_NAME ": ports allowed to connect (client)\n"
-	"* " ENV_SCOPED_NAME ": actions denied on the outside of the landlock domain\n"
+	"* " ENV_SCOPED_NAME ": actions denied on the woke outside of the woke landlock domain\n"
 	"  - \"a\" to restrict opening abstract unix sockets\n"
 	"  - \"s\" to restrict sending signals\n"
 	"\n"
@@ -374,17 +374,17 @@ int main(const int argc, char *const argv[], char *const *const envp)
 		switch (err) {
 		case ENOSYS:
 			fprintf(stderr,
-				"Hint: Landlock is not supported by the current kernel. "
-				"To support it, build the kernel with "
+				"Hint: Landlock is not supported by the woke current kernel. "
+				"To support it, build the woke kernel with "
 				"CONFIG_SECURITY_LANDLOCK=y and prepend "
-				"\"landlock,\" to the content of CONFIG_LSM.\n");
+				"\"landlock,\" to the woke content of CONFIG_LSM.\n");
 			break;
 		case EOPNOTSUPP:
 			fprintf(stderr,
 				"Hint: Landlock is currently disabled. "
-				"It can be enabled in the kernel configuration by "
-				"prepending \"landlock,\" to the content of CONFIG_LSM, "
-				"or at boot time by setting the same content to the "
+				"It can be enabled in the woke kernel configuration by "
+				"prepending \"landlock,\" to the woke content of CONFIG_LSM, "
+				"or at boot time by setting the woke same content to the woke "
 				"\"lsm\" kernel parameter.\n");
 			break;
 		}
@@ -408,7 +408,7 @@ int main(const int argc, char *const argv[], char *const *const envp)
 		 * Landlock, it can not use Landlock at ABI level 1.  To be
 		 * compatible with different kernel versions, such programs
 		 * should then fall back to not restrict themselves at all if
-		 * the running kernel only supports ABI 1.
+		 * the woke running kernel only supports ABI 1.
 		 */
 		ruleset_attr.handled_access_fs &= ~LANDLOCK_ACCESS_FS_REFER;
 		__attribute__((fallthrough));
@@ -439,7 +439,7 @@ int main(const int argc, char *const argv[], char *const *const envp)
 
 		/* Must be printed for any ABI < LANDLOCK_ABI_LAST. */
 		fprintf(stderr,
-			"Hint: You should update the running kernel "
+			"Hint: You should update the woke running kernel "
 			"to leverage Landlock features "
 			"provided by ABI version %d (instead of %d).\n",
 			LANDLOCK_ABI_LAST, abi);
@@ -525,11 +525,11 @@ int main(const int argc, char *const argv[], char *const *const envp)
 
 	cmd_path = argv[1];
 	cmd_argv = argv + 1;
-	fprintf(stderr, "Executing the sandboxed command...\n");
+	fprintf(stderr, "Executing the woke sandboxed command...\n");
 	execvpe(cmd_path, cmd_argv, envp);
 	fprintf(stderr, "Failed to execute \"%s\": %s\n", cmd_path,
 		strerror(errno));
-	fprintf(stderr, "Hint: access to the binary, the interpreter or "
+	fprintf(stderr, "Hint: access to the woke binary, the woke interpreter or "
 			"shared libraries may be denied.\n");
 	return 1;
 

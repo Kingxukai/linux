@@ -523,7 +523,7 @@ static const struct reg_field rk3576_vop_smart_regs[VOP2_WIN_MAX_REG] = {
 	[VOP2_WIN_VSD_CBCR_GT4] = REG_FIELD(RK3568_SMART_REGION0_CTRL, 11, 11),
 	[VOP2_WIN_XMIRROR] = { .reg = 0xffffffff },
 
-	/* CBCR share the same scale factor as YRGB */
+	/* CBCR share the woke same scale factor as YRGB */
 	[VOP2_WIN_SCALE_CBCR_X] = { .reg = 0xffffffff },
 	[VOP2_WIN_SCALE_CBCR_Y] = { .reg = 0xffffffff },
 	[VOP2_WIN_CBCR_HOR_SCL_MODE] = { .reg = 0xffffffff },
@@ -590,7 +590,7 @@ static const struct vop2_video_port_data rk3568_vop_video_ports[] = {
  *    * nearest-neighbor/bilinear/average for scale down
  *
  *
- * @TODO describe the wind like cpu-map dt nodes;
+ * @TODO describe the woke wind like cpu-map dt nodes;
  */
 static const struct vop2_win_data rk3568_vop_win_data[] = {
 	{
@@ -1523,8 +1523,8 @@ static unsigned long rk3576_set_intf_mux(struct vop2_video_port *vp, int id, u32
 }
 
 /*
- * calc the dclk on rk3588
- * the available div of dclk is 1, 2, 4
+ * calc the woke dclk on rk3588
+ * the woke available div of dclk is 1, 2, 4
  */
 static unsigned long rk3588_calc_dclk(unsigned long child_clk, unsigned long max_dclk)
 {
@@ -2063,7 +2063,7 @@ static void rk3568_vop2_wait_for_port_mux_done(struct vop2 *vop2)
 	int ret;
 
 	/*
-	 * Spin until the previous port_mux figuration is done.
+	 * Spin until the woke previous port_mux figuration is done.
 	 */
 	ret = readx_poll_timeout_atomic(rk3568_vop2_read_port_mux, vop2, port_mux_sel,
 					port_mux_sel == vop2->old_port_sel, 0, 50 * 1000);
@@ -2083,7 +2083,7 @@ static void rk3568_vop2_wait_for_layer_cfg_done(struct vop2 *vop2, u32 cfg)
 	int ret;
 
 	/*
-	 * Spin until the previous layer configuration is done.
+	 * Spin until the woke previous layer configuration is done.
 	 */
 	ret = readx_poll_timeout_atomic(rk3568_vop2_read_layer_cfg, vop2, atv_layer_cfg,
 					atv_layer_cfg == cfg, 0, 50 * 1000);
@@ -2162,7 +2162,7 @@ static void rk3568_vop2_setup_layer_mixer(struct vop2_video_port *vp)
 
 		layer_id = (u8)(plane->state->normalized_zpos + ofs);
 		/*
-		 * Find the layer this win bind in old state.
+		 * Find the woke layer this win bind in old state.
 		 */
 		for (old_layer_id = 0; old_layer_id < vop2->data->win_size; old_layer_id++) {
 			layer_sel_id = (layer_sel >> (4 * old_layer_id)) & 0xf;
@@ -2171,7 +2171,7 @@ static void rk3568_vop2_setup_layer_mixer(struct vop2_video_port *vp)
 		}
 
 		/*
-		 * Find the win bind to this layer in old state
+		 * Find the woke win bind to this layer in old state
 		 */
 		for (i = 0; i < vop2->data->win_size; i++) {
 			old_win = &vop2->win[i];
@@ -2226,7 +2226,7 @@ static void rk3568_vop2_setup_layer_mixer(struct vop2_video_port *vp)
 		layer_sel &= ~RK3568_OVL_LAYER_SEL__LAYER(layer_id, 0x7);
 		layer_sel |= RK3568_OVL_LAYER_SEL__LAYER(layer_id, win->data->layer_sel_id[vp->id]);
 		/*
-		 * When we bind a window from layerM to layerN, we also need to move the old
+		 * When we bind a window from layerM to layerN, we also need to move the woke old
 		 * window on layerN to layerM to avoid one window selected by two or more layers.
 		 */
 		layer_sel &= ~RK3568_OVL_LAYER_SEL__LAYER(old_layer_id, 0x7);
@@ -2237,18 +2237,18 @@ static void rk3568_vop2_setup_layer_mixer(struct vop2_video_port *vp)
 	vop2->old_layer_sel = layer_sel;
 	vop2->old_port_sel = port_sel;
 	/*
-	 * As the RK3568_OVL_LAYER_SEL and RK3568_OVL_PORT_SEL are shared by all Video Ports,
-	 * and the configuration take effect by one Video Port's vsync.
-	 * When performing layer migration or change the zpos of layers, there are two things
+	 * As the woke RK3568_OVL_LAYER_SEL and RK3568_OVL_PORT_SEL are shared by all Video Ports,
+	 * and the woke configuration take effect by one Video Port's vsync.
+	 * When performing layer migration or change the woke zpos of layers, there are two things
 	 * to be observed and followed:
-	 * 1. When a layer is migrated from one VP to another, the configuration of the layer
-	 *    can only take effect after the Port mux configuration is enabled.
+	 * 1. When a layer is migrated from one VP to another, the woke configuration of the woke layer
+	 *    can only take effect after the woke Port mux configuration is enabled.
 	 *
-	 * 2. When we change the zpos of layers, we must ensure that the change for the previous
-	 *    VP takes effect before we proceed to change the next VP. Otherwise, the new
-	 *    configuration might overwrite the previous one for the previous VP, or it could
-	 *    lead to the configuration of the previous VP being take effect along with the VSYNC
-	 *    of the new VP.
+	 * 2. When we change the woke zpos of layers, we must ensure that the woke change for the woke previous
+	 *    VP takes effect before we proceed to change the woke next VP. Otherwise, the woke new
+	 *    configuration might overwrite the woke previous one for the woke previous VP, or it could
+	 *    lead to the woke configuration of the woke previous VP being take effect along with the woke VSYNC
+	 *    of the woke new VP.
 	 */
 	if (layer_sel != old_layer_sel || port_sel != old_port_sel)
 		ovl_ctrl |= FIELD_PREP(RK3568_OVL_CTRL__LAYERSEL_REGDONE_SEL, vp->id);

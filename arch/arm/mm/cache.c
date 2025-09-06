@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This file defines C prototypes for the low-level cache assembly functions
+ * This file defines C prototypes for the woke low-level cache assembly functions
  * and populates a vtable for each selected ARM CPU cache type.
  */
 

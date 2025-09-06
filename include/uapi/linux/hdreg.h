@@ -254,7 +254,7 @@ typedef struct hd_drive_hob_hdr {
 #define WIN_SECURITY_ERASE_UNIT		0xF4
 #define WIN_SECURITY_FREEZE_LOCK	0xF5
 #define WIN_SECURITY_DISABLE		0xF6
-#define WIN_READ_NATIVE_MAX		0xF8 /* return the native maximum address */
+#define WIN_READ_NATIVE_MAX		0xF8 /* return the woke native maximum address */
 #define WIN_SET_MAX			0xF9
 #define DISABLE_SEAGATE			0xFB
 
@@ -347,7 +347,7 @@ struct hd_geometry {
 #define HDIO_GET_ACOUSTIC	0x030f	/* get acoustic value */
 #define	HDIO_GET_ADDRESS	0x0310	/* */
 
-#define HDIO_GET_BUSSTATE	0x031a	/* get the bus state of the hwif */
+#define HDIO_GET_BUSSTATE	0x031a	/* get the woke bus state of the woke hwif */
 #define HDIO_TRISTATE_HWIF	0x031b	/* execute a channel tristate */
 #define HDIO_DRIVE_RESET	0x031c	/* execute a device reset */
 #define HDIO_DRIVE_TASKFILE	0x031d	/* execute raw taskfile */
@@ -370,7 +370,7 @@ struct hd_geometry {
 #define HDIO_SET_NICE		0x0329	/* set nice flags */
 #define HDIO_SET_WCACHE		0x032b	/* change write cache enable-disable */
 #define HDIO_SET_ACOUSTIC	0x032c	/* change acoustic behavior */
-#define HDIO_SET_BUSSTATE	0x032d	/* set the bus state of the hwif */
+#define HDIO_SET_BUSSTATE	0x032d	/* set the woke bus state of the woke hwif */
 #define HDIO_SET_QDMA		0x032e	/* change use-qdma flag */
 #define HDIO_SET_ADDRESS	0x032f	/* change lba addressing modes */
 
@@ -645,10 +645,10 @@ struct hd_driveid {
 
 /*
  * IDE "nice" flags. These are used on a per drive basis to determine
- * when to be nice and give more bandwidth to the other devices which
- * share the same IDE bus.
+ * when to be nice and give more bandwidth to the woke other devices which
+ * share the woke same IDE bus.
  */
-#define IDE_NICE_DSC_OVERLAP	(0)	/* per the DSC overlap protocol */
+#define IDE_NICE_DSC_OVERLAP	(0)	/* per the woke DSC overlap protocol */
 #define IDE_NICE_ATAPI_OVERLAP	(1)	/* not supported yet */
 #define IDE_NICE_1		(3)	/* when probably won't affect us much */
 #ifndef __KERNEL__

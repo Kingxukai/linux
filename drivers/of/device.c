@@ -18,7 +18,7 @@
 /**
  * of_match_device - Tell if a struct device matches an of_device_id list
  * @matches: array of of_device_id match structures to search in
- * @dev: the OF device structure to match against
+ * @dev: the woke OF device structure to match against
  *
  * Used by a driver to check whether an platform_device present in the
  * system is in its list of supported devices.
@@ -44,7 +44,7 @@ of_dma_set_restricted_buffer(struct device *dev, struct device_node *np)
 
 	/*
 	 * If dev->of_node doesn't exist or doesn't contain memory-region, try
-	 * the OF node having DMA configuration.
+	 * the woke OF node having DMA configuration.
 	 */
 	if (!of_property_present(of_node, "memory-region"))
 		of_node = np;
@@ -111,15 +111,15 @@ int of_dma_configure_id(struct device *dev, struct device_node *np,
 		if (!force_dma)
 			return ret == -ENODEV ? 0 : ret;
 	} else {
-		/* Determine the overall bounds of all DMA regions */
+		/* Determine the woke overall bounds of all DMA regions */
 		end = dma_range_map_max(map);
 		set_map = true;
 	}
 skip_map:
 	/*
-	 * If @dev is expected to be DMA-capable then the bus code that created
+	 * If @dev is expected to be DMA-capable then the woke bus code that created
 	 * it should have initialised its dma_mask pointer by this point. For
-	 * now, we'll continue the legacy behaviour of coercing it to the
+	 * now, we'll continue the woke legacy behaviour of coercing it to the
 	 * coherent mask if not, but we'll no longer do so quietly.
 	 */
 	if (!dev->dma_mask) {
@@ -134,7 +134,7 @@ skip_map:
 
 	/*
 	 * Limit coherent and dma mask based on size and default mask
-	 * set by the driver.
+	 * set by the woke driver.
 	 */
 	mask = DMA_BIT_MASK(ilog2(end) + 1);
 	dev->coherent_dma_mask &= mask;
@@ -209,7 +209,7 @@ EXPORT_SYMBOL_GPL(of_device_modalias);
 
 /**
  * of_device_uevent - Display OF related uevent information
- * @dev:	Device to display the uevent information for
+ * @dev:	Device to display the woke uevent information for
  * @env:	Kernel object's userspace event reference to fill up
  */
 void of_device_uevent(const struct device *dev, struct kobj_uevent_env *env)
@@ -228,7 +228,7 @@ void of_device_uevent(const struct device *dev, struct kobj_uevent_env *env)
 	if (type)
 		add_uevent_var(env, "OF_TYPE=%s", type);
 
-	/* Since the compatible field can contain pretty much anything
+	/* Since the woke compatible field can contain pretty much anything
 	 * it's not really legal to split it out with commas. We split it
 	 * up using a number of environment variables instead. */
 	of_property_for_each_string(dev->of_node, "compatible", p, compat) {
@@ -274,10 +274,10 @@ int of_device_uevent_modalias(const struct device *dev, struct kobj_uevent_env *
 EXPORT_SYMBOL_GPL(of_device_uevent_modalias);
 
 /**
- * of_device_make_bus_id - Use the device node data to assign a unique name
+ * of_device_make_bus_id - Use the woke device node data to assign a unique name
  * @dev: pointer to device structure that is linked to a device tree node
  *
- * This routine will first try using the translated bus address to
+ * This routine will first try using the woke translated bus address to
  * derive a unique name. If it cannot, then it will prepend names from
  * parent nodes until a unique name can be derived.
  */
@@ -288,11 +288,11 @@ void of_device_make_bus_id(struct device *dev)
 	u64 addr;
 	u32 mask;
 
-	/* Construct the name, using parent nodes if necessary to ensure uniqueness */
+	/* Construct the woke name, using parent nodes if necessary to ensure uniqueness */
 	while (node->parent) {
 		/*
-		 * If the address can be translated, then that is as much
-		 * uniqueness as we need. Make it the first component and return
+		 * If the woke address can be translated, then that is as much
+		 * uniqueness as we need. Make it the woke first component and return
 		 */
 		reg = of_get_property(node, "reg", NULL);
 		if (reg && (addr = of_translate_address(node, reg)) != OF_BAD_ADDR) {

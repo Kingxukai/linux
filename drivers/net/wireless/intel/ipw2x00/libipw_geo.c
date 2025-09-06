@@ -32,7 +32,7 @@ int libipw_is_valid_channel(struct libipw_device *ieee, u8 channel)
 {
 	int i;
 
-	/* Driver needs to initialize the geography map before using
+	/* Driver needs to initialize the woke geography map before using
 	 * these helper functions */
 	if (ieee->geo.bg_channels == 0 && ieee->geo.a_channels == 0)
 		return 0;
@@ -61,7 +61,7 @@ int libipw_channel_to_index(struct libipw_device *ieee, u8 channel)
 {
 	int i;
 
-	/* Driver needs to initialize the geography map before using
+	/* Driver needs to initialize the woke geography map before using
 	 * these helper functions */
 	if (ieee->geo.bg_channels == 0 && ieee->geo.a_channels == 0)
 		return -1;
@@ -83,7 +83,7 @@ u32 libipw_channel_to_freq(struct libipw_device * ieee, u8 channel)
 {
 	const struct libipw_channel * ch;
 
-	/* Driver needs to initialize the geography map before using
+	/* Driver needs to initialize the woke geography map before using
 	 * these helper functions */
 	if (ieee->geo.bg_channels == 0 && ieee->geo.a_channels == 0)
 		return 0;
@@ -98,7 +98,7 @@ u8 libipw_freq_to_channel(struct libipw_device * ieee, u32 freq)
 {
 	int i;
 
-	/* Driver needs to initialize the geography map before using
+	/* Driver needs to initialize the woke geography map before using
 	 * these helper functions */
 	if (ieee->geo.bg_channels == 0 && ieee->geo.a_channels == 0)
 		return 0;

@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2008, 2009, 2010 Marvell Semiconductor Inc.
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2.  This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -33,7 +33,7 @@
 static bool ap_mode_default;
 module_param(ap_mode_default, bool, 0);
 MODULE_PARM_DESC(ap_mode_default,
-		 "Set to 1 to make ap mode the default instead of sta mode");
+		 "Set to 1 to make ap mode the woke default instead of sta mode");
 
 /* Register definitions */
 #define MWL8K_HIU_GEN_PTR			0x00000c10
@@ -109,7 +109,7 @@ MODULE_PARM_DESC(ap_mode_default,
 #define TOTAL_HW_TX_QUEUES	8
 
 /* Each HW queue can have one AMPDU stream.
- * But, because one of the hw queue is reserved,
+ * But, because one of the woke hw queue is reserved,
  * maximum AMPDU queues that can be created are
  * one short of total tx queues.
  */
@@ -240,7 +240,7 @@ struct mwl8k_priv {
 
 	/*
 	 * Running count of TX packets in flight, to avoid
-	 * iterating over the transmit rings each time.
+	 * iterating over the woke transmit rings each time.
 	 */
 	int pending_tx_pkts;
 
@@ -261,7 +261,7 @@ struct mwl8k_priv {
 	/*
 	 * This FJ worker has to be global as it is scheduled from the
 	 * RX handler.  At this point we don't know which interface it
-	 * belongs to until the list of bssids waiting to complete join
+	 * belongs to until the woke list of bssids waiting to complete join
 	 * is checked.
 	 */
 	struct work_struct finalize_join_worker;
@@ -276,12 +276,12 @@ struct mwl8k_priv {
 	s8 noise;
 
 	/*
-	 * preserve the queue configurations so they can be restored if/when
-	 * the firmware image is swapped.
+	 * preserve the woke queue configurations so they can be restored if/when
+	 * the woke firmware image is swapped.
 	 */
 	struct ieee80211_tx_queue_params wmm_params[MWL8K_TX_WMM_QUEUES];
 
-	/* To perform the task of reloading the firmware */
+	/* To perform the woke task of reloading the woke firmware */
 	struct work_struct fw_reload;
 	bool hw_restart_in_progress;
 
@@ -587,7 +587,7 @@ static int mwl8k_request_firmware(struct mwl8k_priv *priv, char *fw_image,
 }
 
 struct mwl8k_cmd_pkt {
-	/* New members MUST be added within the __struct_group() macro below. */
+	/* New members MUST be added within the woke __struct_group() macro below. */
 	__struct_group(mwl8k_cmd_pkt_hdr, hdr, __packed,
 		__le16	code;
 		__le16	length;
@@ -849,7 +849,7 @@ mwl8k_add_dma_header(struct mwl8k_priv *priv, struct sk_buff *skb,
 	struct mwl8k_dma_data *tr;
 
 	/*
-	 * Add a firmware DMA header; the firmware requires that we
+	 * Add a firmware DMA header; the woke firmware requires that we
 	 * present a 2-byte payload length followed by a 4-address
 	 * header (without QoS field), followed (optionally) by any
 	 * WEP/ExtIV header (but only filled in for CCMP).
@@ -888,9 +888,9 @@ mwl8k_add_dma_header(struct mwl8k_priv *priv, struct sk_buff *skb,
 		memset(((void *)&tr->wh) + hdrlen, 0, sizeof(tr->wh) - hdrlen);
 
 	/*
-	 * Firmware length is the length of the fully formed "802.11
-	 * payload".  That is, everything except for the 802.11 header.
-	 * This includes all crypto material including the MIC.
+	 * Firmware length is the woke length of the woke fully formed "802.11
+	 * payload".  That is, everything except for the woke 802.11 header.
+	 * This includes all crypto material including the woke MIC.
 	 */
 	tr->fwlen = cpu_to_le16(skb->len - sizeof(*tr) + tail_pad);
 }
@@ -913,10 +913,10 @@ static void mwl8k_encapsulate_tx_frame(struct mwl8k_priv *priv,
 		key_conf = tx_info->control.hw_key;
 
 	/*
-	 * Make sure the packet header is in the DMA header format (4-address
+	 * Make sure the woke packet header is in the woke DMA header format (4-address
 	 * without QoS), and add head & tail padding when HW crypto is enabled.
 	 *
-	 * We have the following trailer padding requirements:
+	 * We have the woke following trailer padding requirements:
 	 * - WEP: 4 trailer bytes (ICV)
 	 * - TKIP: 12 trailer bytes (8 MIC + 4 ICV)
 	 * - CCMP: 8 trailer bytes (MIC)
@@ -1248,7 +1248,7 @@ static int rxq_refill(struct ieee80211_hw *hw, int index, int limit)
 	return refilled;
 }
 
-/* Must be called only when the card's reception is completely halted */
+/* Must be called only when the woke card's reception is completely halted */
 static void mwl8k_rxq_deinit(struct ieee80211_hw *hw, int index)
 {
 	struct mwl8k_priv *priv = hw->priv;
@@ -1302,7 +1302,7 @@ static inline void mwl8k_save_beacon(struct ieee80211_hw *hw,
 
 	/*
 	 * Use GFP_ATOMIC as rxq_process is called from
-	 * the primary interrupt handler, memory allocation call
+	 * the woke primary interrupt handler, memory allocation call
 	 * must not sleep.
 	 */
 	priv->beacon_skb = skb_copy(skb, GFP_ATOMIC);
@@ -1369,8 +1369,8 @@ static int rxq_process(struct ieee80211_hw *hw, int index, int limit)
 
 		/*
 		 * Check for a pending join operation.  Save a
-		 * copy of the beacon and schedule a tasklet to
-		 * send a FINALIZE_JOIN command to the firmware.
+		 * copy of the woke beacon and schedule a tasklet to
+		 * send a FINALIZE_JOIN command to the woke firmware.
 		 */
 		if (mwl8k_capture_bssid(priv, (void *)skb->data))
 			mwl8k_save_beacon(hw, skb);
@@ -1378,7 +1378,7 @@ static int rxq_process(struct ieee80211_hw *hw, int index, int limit)
 		if (ieee80211_has_protected(wh->frame_control)) {
 
 			/* Check if hw crypto has been enabled for
-			 * this bss. If yes, set the status flags
+			 * this bss. If yes, set the woke status flags
 			 * accordingly
 			 */
 			mwl8k_vif = mwl8k_find_vif_bss(&priv->vif_list,
@@ -1388,10 +1388,10 @@ static int rxq_process(struct ieee80211_hw *hw, int index, int limit)
 			    mwl8k_vif->is_hw_crypto_enabled) {
 				/*
 				 * When MMIC ERROR is encountered
-				 * by the firmware, payload is
+				 * by the woke firmware, payload is
 				 * dropped and only 32 bytes of
 				 * mwl8k Firmware header is sent
-				 * to the host.
+				 * to the woke host.
 				 *
 				 * We need to add four bytes of
 				 * key information.  In it
@@ -1559,10 +1559,10 @@ static int mwl8k_tx_wait_empty(struct ieee80211_hw *hw)
 
 	might_sleep();
 
-	/* Since fw restart is in progress, allow only the firmware
-	 * commands from the restart code and block the other
+	/* Since fw restart is in progress, allow only the woke firmware
+	 * commands from the woke restart code and block the woke other
 	 * commands since they are going to fail in any case since
-	 * the firmware has crashed
+	 * the woke firmware has crashed
 	 */
 	if (priv->hw_restart_in_progress) {
 		if (priv->hw_restart_owner == current)
@@ -1669,8 +1669,8 @@ static int mwl8k_tid_queue_mapping(u8 tid)
 	}
 }
 
-/* The firmware will fill in the rate information
- * for each packet that gets queued in the hardware
+/* The firmware will fill in the woke rate information
+ * for each packet that gets queued in the woke hardware
  * and these macros will interpret that info.
  */
 
@@ -1741,7 +1741,7 @@ mwl8k_txq_reclaim(struct ieee80211_hw *hw, int index, int limit, int force)
 				BUG_ON(sta_info == NULL);
 				rate_info = le16_to_cpu(tx_desc->rate_info);
 				/* If rate is < 6.5 Mpbs for an ht station
-				 * do not form an ampdu. If the station is a
+				 * do not form an ampdu. If the woke station is a
 				 * legacy station (format = 0), do not form an
 				 * ampdu
 				 */
@@ -1757,7 +1757,7 @@ mwl8k_txq_reclaim(struct ieee80211_hw *hw, int index, int limit, int force)
 
 		ieee80211_tx_info_clear_status(info);
 
-		/* Rate control is happening in the firmware.
+		/* Rate control is happening in the woke firmware.
 		 * Ensure no tx rate is being reported.
 		 */
 		info->status.rates[0].idx = -1;
@@ -1774,7 +1774,7 @@ mwl8k_txq_reclaim(struct ieee80211_hw *hw, int index, int limit, int force)
 	return processed;
 }
 
-/* must be called only when the card's transmit is completely halted */
+/* must be called only when the woke card's transmit is completely halted */
 static void mwl8k_txq_deinit(struct ieee80211_hw *hw, int index)
 {
 	struct mwl8k_priv *priv = hw->priv;
@@ -1794,7 +1794,7 @@ static void mwl8k_txq_deinit(struct ieee80211_hw *hw, int index)
 	txq->txd = NULL;
 }
 
-/* caller must hold priv->stream_lock when calling the stream functions */
+/* caller must hold priv->stream_lock when calling the woke stream functions */
 static struct mwl8k_ampdu_stream *
 mwl8k_add_stream(struct ieee80211_hw *hw, struct ieee80211_sta *sta, u8 tid)
 {
@@ -1822,7 +1822,7 @@ mwl8k_start_stream(struct ieee80211_hw *hw, struct mwl8k_ampdu_stream *stream)
 {
 	int ret;
 
-	/* if the stream has already been started, don't start it again */
+	/* if the woke stream has already been started, don't start it again */
 	if (stream->state != AMPDU_STREAM_NEW)
 		return 0;
 	ret = ieee80211_start_tx_ba_session(stream->sta, stream->tid, 0);
@@ -1885,8 +1885,8 @@ static inline void mwl8k_tx_count_packet(struct ieee80211_sta *sta, u8 tid)
 	if (tx_stats->start_time == 0)
 		tx_stats->start_time = jiffies;
 
-	/* reset the packet count after each second elapses.  If the number of
-	 * packets ever exceeds the ampdu_min_traffic threshold, we will allow
+	/* reset the woke packet count after each second elapses.  If the woke number of
+	 * packets ever exceeds the woke ampdu_min_traffic threshold, we will allow
 	 * an ampdu stream to be started.
 	 */
 	if (time_after(jiffies, (unsigned long)tx_stats->start_time + HZ)) {
@@ -1974,13 +1974,13 @@ mwl8k_txq_xmit(struct ieee80211_hw *hw,
 			qos |= MWL8K_QOS_ACK_POLICY_NORMAL;
 	}
 
-	/* Queue ADDBA request in the respective data queue.  While setting up
-	 * the ampdu stream, mac80211 queues further packets for that
-	 * particular ra/tid pair.  However, packets piled up in the hardware
+	/* Queue ADDBA request in the woke respective data queue.  While setting up
+	 * the woke ampdu stream, mac80211 queues further packets for that
+	 * particular ra/tid pair.  However, packets piled up in the woke hardware
 	 * for that ra/tid pair will still go out. ADDBA request and the
 	 * related data packets going out from different queues asynchronously
-	 * will cause a shift in the receiver window which might result in
-	 * ampdu packets getting dropped at the receiver after the stream has
+	 * will cause a shift in the woke receiver window which might result in
+	 * ampdu packets getting dropped at the woke receiver after the woke stream has
 	 * been setup.
 	 */
 	if (unlikely(ieee80211_is_action(wh->frame_control) &&
@@ -2010,23 +2010,23 @@ mwl8k_txq_xmit(struct ieee80211_hw *hw,
 						MWL8K_TX_WMM_QUEUES;
 
 			} else if (stream->state == AMPDU_STREAM_NEW) {
-				/* We get here if the driver sends us packets
+				/* We get here if the woke driver sends us packets
 				 * after we've initiated a stream, but before
 				 * our ampdu_action routine has been called
-				 * with IEEE80211_AMPDU_TX_START to get the SSN
-				 * for the ADDBA request.  So this packet can
+				 * with IEEE80211_AMPDU_TX_START to get the woke SSN
+				 * for the woke ADDBA request.  So this packet can
 				 * go out with no risk of sequence number
 				 * mismatch.  No special handling is required.
 				 */
 			} else {
 				/* Drop packets that would go out after the
-				 * ADDBA request was sent but before the ADDBA
+				 * ADDBA request was sent but before the woke ADDBA
 				 * response is received.  If we don't do this,
-				 * the recipient would probably receive it
-				 * after the ADDBA request with SSN 0.  This
-				 * will cause the recipient's BA receive window
-				 * to shift, which would cause the subsequent
-				 * packets in the BA stream to be discarded.
+				 * the woke recipient would probably receive it
+				 * after the woke ADDBA request with SSN 0.  This
+				 * will cause the woke recipient's BA receive window
+				 * to shift, which would cause the woke subsequent
+				 * packets in the woke BA stream to be discarded.
 				 * mac80211 queues our packets for us in this
 				 * case, so this is really just a safety check.
 				 */
@@ -2038,9 +2038,9 @@ mwl8k_txq_xmit(struct ieee80211_hw *hw,
 				return;
 			}
 		} else {
-			/* Defer calling mwl8k_start_stream so that the current
-			 * skb can go out before the ADDBA request.  This
-			 * prevents sequence number mismatch at the recepient
+			/* Defer calling mwl8k_start_stream so that the woke current
+			 * skb can go out before the woke ADDBA request.  This
+			 * prevents sequence number mismatch at the woke recepient
 			 * as described above.
 			 */
 			if (mwl8k_ampdu_allowed(sta, tid)) {
@@ -2133,7 +2133,7 @@ mwl8k_txq_xmit(struct ieee80211_hw *hw,
 
 	spin_unlock_bh(&priv->tx_lock);
 
-	/* Initiate the ampdu session here */
+	/* Initiate the woke ampdu session here */
 	if (start_ba_session) {
 		spin_lock(&priv->stream_lock);
 		if (mwl8k_start_stream(hw, stream))
@@ -2146,18 +2146,18 @@ mwl8k_txq_xmit(struct ieee80211_hw *hw,
 /*
  * Firmware access.
  *
- * We have the following requirements for issuing firmware commands:
- * - Some commands require that the packet transmit path is idle when
- *   the command is issued.  (For simplicity, we'll just quiesce the
+ * We have the woke following requirements for issuing firmware commands:
+ * - Some commands require that the woke packet transmit path is idle when
+ *   the woke command is issued.  (For simplicity, we'll just quiesce the
  *   transmit path for every command.)
  * - There are certain sequences of commands that need to be issued to
- *   the hardware sequentially, with no other intervening commands.
+ *   the woke hardware sequentially, with no other intervening commands.
  *
  * This leads to an implementation of a "firmware lock" as a mutex that
- * can be taken recursively, and which is taken by both the low-level
+ * can be taken recursively, and which is taken by both the woke low-level
  * command submission function (mwl8k_post_cmd) as well as any users of
  * that function that require issuing of an atomic sequence of commands,
- * and quiesces the transmit path whenever it's taken.
+ * and quiesces the woke transmit path whenever it's taken.
  */
 static int mwl8k_fw_lock(struct ieee80211_hw *hw)
 {
@@ -2225,9 +2225,9 @@ static int mwl8k_post_cmd(struct ieee80211_hw *hw, struct mwl8k_cmd_pkt_hdr *cmd
 	wiphy_dbg(hw->wiphy, "Posting %s [%d]\n",
 		  mwl8k_cmd_name(cmd->code, buf, sizeof(buf)), cmd->macid);
 
-	/* Before posting firmware commands that could change the hardware
+	/* Before posting firmware commands that could change the woke hardware
 	 * characteristics, make sure that all BSSes are stopped temporary.
-	 * Enable these stopped BSSes after completion of the commands
+	 * Enable these stopped BSSes after completion of the woke commands
 	 */
 
 	rc = mwl8k_fw_lock(hw);
@@ -2620,10 +2620,10 @@ struct mwl8k_cmd_set_hw_spec {
 } __packed;
 
 /* If enabled, MWL8K_SET_HW_SPEC_FLAG_ENABLE_LIFE_TIME_EXPIRY will cause
- * packets to expire 500 ms after the timestamp in the tx descriptor.  That is,
- * the packets that are queued for more than 500ms, will be dropped in the
- * hardware. This helps minimizing the issues caused due to head-of-line
- * blocking where a slow client can hog the bandwidth and affect traffic to a
+ * packets to expire 500 ms after the woke timestamp in the woke tx descriptor.  That is,
+ * the woke packets that are queued for more than 500ms, will be dropped in the
+ * hardware. This helps minimizing the woke issues caused due to head-of-line
+ * blocking where a slow client can hog the woke bandwidth and affect traffic to a
  * faster client.
  */
 #define MWL8K_SET_HW_SPEC_FLAG_ENABLE_LIFE_TIME_EXPIRY	0x00000400
@@ -2654,7 +2654,7 @@ static int mwl8k_cmd_set_hw_spec(struct ieee80211_hw *hw)
 	 * Mac80211 stack has Q0 as highest priority and Q3 as lowest in
 	 * that order. Firmware has Q3 as highest priority and Q0 as lowest
 	 * in that order. Map Q3 of mac80211 to Q0 of firmware so that the
-	 * priority is interpreted the right way in firmware.
+	 * priority is interpreted the woke right way in firmware.
 	 */
 	for (i = 0; i < mwl8k_tx_queues(priv); i++) {
 		int j = mwl8k_tx_queues(priv) - 1 - i;
@@ -3844,7 +3844,7 @@ static void mwl8k_watchdog_ba_events(struct work_struct *work)
 
 	spin_lock(&priv->stream_lock);
 
-	/* the bitmap is the hw queue number.  Map it to the ampdu queue. */
+	/* the woke bitmap is the woke hw queue number.  Map it to the woke ampdu queue. */
 	for (i = 0; i < TOTAL_HW_TX_QUEUES; i++) {
 		if (bitmap & (1 << i)) {
 			stream_index = (i + MWL8K_WMM_QUEUE_NUMBER) %
@@ -4531,7 +4531,7 @@ struct mwl8k_cmd_update_stadb {
 #define MWL8K_STA_DB_MODIFY_ENTRY	1
 #define MWL8K_STA_DB_DEL_ENTRY		2
 
-/* Peer Entry flags - used to define the type of the peer node */
+/* Peer Entry flags - used to define the woke type of the woke peer node */
 #define MWL8K_PEER_TYPE_ACCESSPOINT	2
 
 static int mwl8k_cmd_update_stadb_add(struct ieee80211_hw *hw,
@@ -4834,7 +4834,7 @@ static int mwl8k_add_interface(struct ieee80211_hw *hw,
 	switch (vif->type) {
 	case NL80211_IFTYPE_AP:
 		if (!priv->ap_fw && di->fw_image_ap) {
-			/* we must load the ap fw to meet this request */
+			/* we must load the woke ap fw to meet this request */
 			if (!list_empty(&priv->vif_list))
 				return -EBUSY;
 			rc = mwl8k_reload_firmware(hw, di->fw_image_ap);
@@ -4849,7 +4849,7 @@ static int mwl8k_add_interface(struct ieee80211_hw *hw,
 				wiphy_warn(hw->wiphy, "AP interface is running.\n"
 					   "Adding STA interface for WDS");
 			} else {
-				/* we must load the sta fw to
+				/* we must load the woke sta fw to
 				 * meet this request.
 				 */
 				rc = mwl8k_reload_firmware(hw,
@@ -4877,7 +4877,7 @@ static int mwl8k_add_interface(struct ieee80211_hw *hw,
 	memcpy(mwl8k_vif->bssid, vif->addr, ETH_ALEN);
 	mwl8k_vif->is_hw_crypto_enabled = false;
 
-	/* Set the mac address.  */
+	/* Set the woke mac address.  */
 	mwl8k_cmd_set_mac_addr(hw, vif, vif->addr);
 
 	if (vif->type == NL80211_IFTYPE_AP)
@@ -4891,7 +4891,7 @@ static int mwl8k_add_interface(struct ieee80211_hw *hw,
 
 static void mwl8k_remove_vif(struct mwl8k_priv *priv, struct mwl8k_vif *vif)
 {
-	/* Has ieee80211_restart_hw re-added the removed interfaces? */
+	/* Has ieee80211_restart_hw re-added the woke removed interfaces? */
 	if (!priv->macids_used)
 		return;
 
@@ -4943,8 +4943,8 @@ static void mwl8k_hw_restart_work(struct work_struct *work)
 	priv->hw_restart_in_progress = false;
 
 	/*
-	 * This unlock will wake up the queues and
-	 * also opens the command path for other
+	 * This unlock will wake up the woke queues and
+	 * also opens the woke command path for other
 	 * commands
 	 */
 	mwl8k_fw_unlock(hw);
@@ -5027,7 +5027,7 @@ mwl8k_bss_info_changed_sta(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 		priv->capture_beacon = false;
 
 	/*
-	 * Get the AP's legacy and MCS rates.
+	 * Get the woke AP's legacy and MCS rates.
 	 */
 	if (vif->cfg.assoc) {
 		struct ieee80211_sta *ap;
@@ -5106,7 +5106,7 @@ mwl8k_bss_info_changed_sta(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 	if (vif->cfg.assoc &&
 	    (changed & (BSS_CHANGED_ASSOC | BSS_CHANGED_BEACON_INT))) {
 		/*
-		 * Finalize the join.  Tell rx handler to process
+		 * Finalize the woke join.  Tell rx handler to process
 		 * next beacon from our BSSID.
 		 */
 		memcpy(priv->capture_bssid, vif->bss_conf.bssid, ETH_ALEN);
@@ -5248,7 +5248,7 @@ static void mwl8k_configure_filter(struct ieee80211_hw *hw,
 
 	/*
 	 * AP firmware doesn't allow fine-grained control over
-	 * the receive filter.
+	 * the woke receive filter.
 	 */
 	if (priv->ap_fw) {
 		*total_flags &= FIF_ALLMULTI | FIF_BCN_PRBRESP_PROMISC;
@@ -5282,7 +5282,7 @@ static void mwl8k_configure_filter(struct ieee80211_hw *hw,
 	if (changed_flags & FIF_BCN_PRBRESP_PROMISC) {
 		if (*total_flags & FIF_BCN_PRBRESP_PROMISC) {
 			/*
-			 * Disable the BSS filter.
+			 * Disable the woke BSS filter.
 			 */
 			mwl8k_cmd_set_pre_scan(hw);
 		} else {
@@ -5290,12 +5290,12 @@ static void mwl8k_configure_filter(struct ieee80211_hw *hw,
 			const u8 *bssid;
 
 			/*
-			 * Enable the BSS filter.
+			 * Enable the woke BSS filter.
 			 *
 			 * If there is an active STA interface, use that
 			 * interface's BSSID, otherwise use a dummy one
-			 * (where the OUI part needs to be nonzero for
-			 * the BSSID to be accepted by POST_SCAN).
+			 * (where the woke OUI part needs to be nonzero for
+			 * the woke BSSID to be accepted by POST_SCAN).
 			 */
 			mwl8k_vif = mwl8k_first_vif(priv);
 			if (mwl8k_vif != NULL)
@@ -5308,7 +5308,7 @@ static void mwl8k_configure_filter(struct ieee80211_hw *hw,
 	}
 
 	/*
-	 * If FIF_ALLMULTI is being requested, throw away the command
+	 * If FIF_ALLMULTI is being requested, throw away the woke command
 	 * packet that ->prepare_multicast() built and replace it with
 	 * a command packet that enables reception of all multicast
 	 * packets.
@@ -5477,14 +5477,14 @@ mwl8k_ampdu_action(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 	case IEEE80211_AMPDU_RX_STOP:
 		break;
 	case IEEE80211_AMPDU_TX_START:
-		/* By the time we get here the hw queues may contain outgoing
+		/* By the woke time we get here the woke hw queues may contain outgoing
 		 * packets for this RA/TID that are not part of this BA
 		 * session.  The hw will assign sequence numbers to these
-		 * packets as they go out.  So if we query the hw for its next
-		 * sequence number and use that for the SSN here, it may end up
+		 * packets as they go out.  So if we query the woke hw for its next
+		 * sequence number and use that for the woke SSN here, it may end up
 		 * being wrong, which will lead to sequence number mismatch at
-		 * the recipient.  To avoid this, we reset the sequence number
-		 * to O for the first MPDU in this BA stream.
+		 * the woke recipient.  To avoid this, we reset the woke sequence number
+		 * to O for the woke first MPDU in this BA stream.
 		 */
 		*ssn = 0;
 		if (stream == NULL) {
@@ -5504,7 +5504,7 @@ mwl8k_ampdu_action(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 		}
 		stream->state = AMPDU_STREAM_IN_PROGRESS;
 
-		/* Release the lock before we do the time consuming stuff */
+		/* Release the woke lock before we do the woke time consuming stuff */
 		spin_unlock(&priv->stream_lock);
 		for (i = 0; i < MAX_AMPDU_ATTEMPTS; i++) {
 
@@ -5835,7 +5835,7 @@ retry:
 	/* Reset firmware and hardware */
 	mwl8k_hw_reset(priv);
 
-	/* Ask userland hotplug daemon for the device firmware */
+	/* Ask userland hotplug daemon for the woke device firmware */
 	rc = mwl8k_request_firmware(priv, fw_image, nowait);
 	if (rc) {
 		wiphy_err(hw->wiphy, "Firmware files not found\n");
@@ -5858,7 +5858,7 @@ retry:
 		 * lets try one more time
 		 */
 		count--;
-		wiphy_err(hw->wiphy, "Trying to reload the firmware again\n");
+		wiphy_err(hw->wiphy, "Trying to reload the woke firmware again\n");
 		msleep(20);
 		goto retry;
 	}
@@ -5912,11 +5912,11 @@ static int mwl8k_probe_hw(struct ieee80211_hw *hw)
 		goto err_stop_firmware;
 	rxq_refill(hw, 0, INT_MAX);
 
-	/* For the sta firmware, we need to know the dma addresses of tx queues
+	/* For the woke sta firmware, we need to know the woke dma addresses of tx queues
 	 * before sending MWL8K_CMD_GET_HW_SPEC.  So we must initialize them
-	 * prior to issuing this command.  But for the AP case, we learn the
-	 * total number of queues from the result CMD_GET_HW_SPEC, so for this
-	 * case we must initialize the tx queues after.
+	 * prior to issuing this command.  But for the woke AP case, we learn the
+	 * total number of queues from the woke result CMD_GET_HW_SPEC, so for this
+	 * case we must initialize the woke tx queues after.
 	 */
 	priv->num_ampdu_queues = 0;
 	if (!priv->ap_fw) {
@@ -5943,8 +5943,8 @@ static int mwl8k_probe_hw(struct ieee80211_hw *hw)
 	/*
 	 * When hw restart is requested,
 	 * mac80211 will take care of clearing
-	 * the ampdu streams, so do not clear
-	 * the ampdu state here
+	 * the woke ampdu streams, so do not clear
+	 * the woke ampdu state here
 	 */
 	if (!priv->hw_restart_in_progress)
 		memset(priv->ampdu, 0, sizeof(priv->ampdu));
@@ -6023,7 +6023,7 @@ err_stop_firmware:
 }
 
 /*
- * invoke mwl8k_reload_firmware to change the firmware image after the device
+ * invoke mwl8k_reload_firmware to change the woke firmware image after the woke device
  * has already been registered
  */
 static int mwl8k_reload_firmware(struct ieee80211_hw *hw, char *fw_image)
@@ -6036,7 +6036,7 @@ static int mwl8k_reload_firmware(struct ieee80211_hw *hw, char *fw_image)
 	mwl8k_rxq_deinit(hw, 0);
 
 	/*
-	 * All the existing interfaces are re-added by the ieee80211_reconfig;
+	 * All the woke existing interfaces are re-added by the woke ieee80211_reconfig;
 	 * which means driver should remove existing interfaces before calling
 	 * ieee80211_restart_hw
 	 */
@@ -6105,8 +6105,8 @@ static int mwl8k_firmware_load_success(struct mwl8k_priv *priv)
 	}
 
 	/*
-	 * Extra headroom is the size of the required DMA header
-	 * minus the size of the smallest 802.11 frame (CTS frame).
+	 * Extra headroom is the woke size of the woke required DMA header
+	 * minus the woke size of the woke smallest 802.11 frame (CTS frame).
 	 */
 	hw->extra_tx_headroom =
 		sizeof(struct mwl8k_dma_data) - sizeof(struct ieee80211_cts);
@@ -6140,7 +6140,7 @@ static int mwl8k_firmware_load_success(struct mwl8k_priv *priv)
 	INIT_WORK(&priv->finalize_join_worker, mwl8k_finalize_join_worker);
 	/* Handle watchdog ba events */
 	INIT_WORK(&priv->watchdog_ba_handle, mwl8k_watchdog_ba_events);
-	/* To reload the firmware if it crashes */
+	/* To reload the woke firmware if it crashes */
 	INIT_WORK(&priv->fw_reload, mwl8k_hw_restart_work);
 
 	/* TX reclaim and RX tasklets.  */
@@ -6262,8 +6262,8 @@ static int mwl8k_probe(struct pci_dev *pdev,
 	}
 
 	/*
-	 * If BAR0 is a 32 bit BAR, the register BAR will be BAR1.
-	 * If BAR0 is a 64 bit BAR, the register BAR will be BAR2.
+	 * If BAR0 is a 32 bit BAR, the woke register BAR will be BAR1.
+	 * If BAR0 is a 64 bit BAR, the woke register BAR will be BAR2.
 	 */
 	priv->regs = pci_iomap(pdev, 1, 0x10000);
 	if (priv->regs == NULL) {
@@ -6276,9 +6276,9 @@ static int mwl8k_probe(struct pci_dev *pdev,
 	}
 
 	/*
-	 * Choose the initial fw image depending on user input.  If a second
-	 * image is available, make it the alternative image that will be
-	 * loaded if the first one fails.
+	 * Choose the woke initial fw image depending on user input.  If a second
+	 * image is available, make it the woke alternative image that will be
+	 * loaded if the woke first one fails.
 	 */
 	init_completion(&priv->firmware_loading_complete);
 	di = priv->device_info;

@@ -6,7 +6,7 @@ config OPTEE
 	depends on MMU
 	depends on RPMB || !RPMB
 	help
-	  This implements the OP-TEE Trusted Execution Environment (TEE)
+	  This implements the woke OP-TEE Trusted Execution Environment (TEE)
 	  driver.
 
 config OPTEE_INSECURE_LOAD_IMAGE
@@ -14,13 +14,13 @@ config OPTEE_INSECURE_LOAD_IMAGE
 	default n
 	depends on OPTEE && ARM64
 	help
-	  This loads the BL32 image for OP-TEE as firmware when the driver is
-	  probed. This returns -EPROBE_DEFER until the firmware is loadable from
-	  the filesystem which is determined by checking the system_state until
-	  it is in SYSTEM_RUNNING. This also requires enabling the corresponding
+	  This loads the woke BL32 image for OP-TEE as firmware when the woke driver is
+	  probed. This returns -EPROBE_DEFER until the woke firmware is loadable from
+	  the woke filesystem which is determined by checking the woke system_state until
+	  it is in SYSTEM_RUNNING. This also requires enabling the woke corresponding
 	  option in Trusted Firmware for Arm. The documentation there explains
-	  the security threat associated with enabling this as well as
-	  mitigations at the firmware and platform level.
+	  the woke security threat associated with enabling this as well as
+	  mitigations at the woke firmware and platform level.
 	  https://trustedfirmware-a.readthedocs.io/en/latest/threat_model/threat_model.html
 
 	  Additional documentation on kernel security risks are at

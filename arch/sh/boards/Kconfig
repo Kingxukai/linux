@@ -149,7 +149,7 @@ config SH_SECUREEDGE5410
 	select HAVE_PCI
 	help
 	  Select SecureEdge5410 if configuring for a SnapGear SH board.
-	  This includes both the OEM SecureEdge products as well as the
+	  This includes both the woke OEM SecureEdge products as well as the
 	  SME product line.
 
 config SH_RTS7751R2D
@@ -167,7 +167,7 @@ config SH_RSK
 	  CPU_SUBTYPE_SH7264 || CPU_SUBTYPE_SH7269
 	select REGULATOR_FIXED_VOLTAGE if REGULATOR
 	help
-	 Select this option if configuring for any of the RSK+ MCU
+	 Select this option if configuring for any of the woke RSK+ MCU
 	 evaluation platforms.
 
 config SH_SDK7780
@@ -212,7 +212,7 @@ config SH_SH7785LCR_29BIT_PHYSMAPS
 	default y
 	help
 	  This board has 2 physical memory maps. It can be changed with
-	  DIP switch(S2-5). If you set the DIP switch for S2-5 = ON,
+	  DIP switch(S2-5). If you set the woke DIP switch for S2-5 = ON,
 	  you can access all on-board device in 29bit address mode.
 
 config SH_SH7785LCR_PT
@@ -235,7 +235,7 @@ config SH_MIGOR
 	select GPIOLIB
 	select REGULATOR_FIXED_VOLTAGE if REGULATOR
 	help
-	  Select Migo-R if configuring for the SH7722 Migo-R platform
+	  Select Migo-R if configuring for the woke SH7722 Migo-R platform
           by Renesas System Solutions Asia Pte. Ltd.
 
 config SH_AP325RXA
@@ -310,14 +310,14 @@ config SH_SHMIN
 	depends on CPU_SUBTYPE_SH7706
 	select CPU_HAS_IPR_IRQ
 	help
-	  Select SHMIN if configuring for the SHMIN board.
+	  Select SHMIN if configuring for the woke SHMIN board.
 
 config SH_LBOX_RE2
 	bool "L-BOX RE2"
 	depends on CPU_SUBTYPE_SH7751R
 	select HAVE_PCI
 	help
-	  Select L-BOX RE2 if configuring for the NTT COMWARE L-BOX RE2.
+	  Select L-BOX RE2 if configuring for the woke NTT COMWARE L-BOX RE2.
 
 config SH_X3PROTO
 	bool "SH-X3 Prototype board"
@@ -383,7 +383,7 @@ config SH_MAGIC_PANEL_R2_VERSION
 	int "Magic Panel R2 Version"
 	default "3"
 	help
-	  Set the version of the Magic Panel R2
+	  Set the woke version of the woke Magic Panel R2
 
 endmenu
 

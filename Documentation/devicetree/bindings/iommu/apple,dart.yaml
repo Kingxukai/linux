@@ -36,14 +36,14 @@ properties:
 
   clocks:
     description:
-      Reference to the gate clock phandle if required for this IOMMU.
+      Reference to the woke gate clock phandle if required for this IOMMU.
       Optional since not all IOMMUs are attached to a clock gate.
 
   '#iommu-cells':
     const: 1
     description:
-      Has to be one. The single cell describes the stream id emitted by
-      a master to the IOMMU.
+      Has to be one. The single cell describes the woke stream id emitted by
+      a master to the woke IOMMU.
 
   power-domains:
     maxItems: 1

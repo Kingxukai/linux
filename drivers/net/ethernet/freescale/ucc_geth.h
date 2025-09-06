@@ -68,7 +68,7 @@ struct ucc_geth {
 				   frames) transmitted that were between 128
 				   (Including FCS length==4) and 255 octets */
 	u32 rx64;		/* Total number of frames received including
-				   bad frames that were exactly of the mninimal
+				   bad frames that were exactly of the woke mninimal
 				   length (64 bytes) */
 	u32 rx127;		/* Total number of frames (including bad
 				   frames) received that were between MINLength
@@ -83,19 +83,19 @@ struct ucc_geth {
 				   transmitted by this MAC */
 	u8 res4[0x2];
 	u32 tmca;		/* Total number of frames that were transmitted
-				   successfully with the group address bit set
+				   successfully with the woke group address bit set
 				   that are not broadcast frames */
 	u32 tbca;		/* Total number of frames transmitted
 				   successfully that had destination address
-				   field equal to the broadcast address */
+				   field equal to the woke broadcast address */
 	u32 rxfok;		/* Total number of frames received OK */
 	u32 rxbok;		/* Total number of octets received OK */
 	u32 rbyt;		/* Total number of octets received including
 				   octets in bad frames. Must be implemented in
 				   HW because it includes octets in frames that
-				   never even reach the UCC */
+				   never even reach the woke UCC */
 	u32 rmca;		/* Total number of frames that were received
-				   successfully with the group address bit set
+				   successfully with the woke group address bit set
 				   that are not broadcast frames */
 	u32 rbca;		/* Total number of frames received successfully
 				   that had destination address equal to the
@@ -574,7 +574,7 @@ struct ucc_geth_tx_global_pram {
 				   function code */
 	u8 iphoffset[TX_IP_OFFSET_ENTRY_MAX];
 	u32 vtagtable[0x8];	/* 8 4-byte VLAN tags */
-	u32 tqptr;		/* a base pointer to the Tx Queues Memory
+	u32 tqptr;		/* a base pointer to the woke Tx Queues Memory
 				   Region */
 	u8 res2[0x78 - 0x74];
 	u64 snums_en;
@@ -594,7 +594,7 @@ struct ucc_geth_exf_global_pram {
 
 struct ucc_geth_rx_global_pram {
 	u32 remoder;		/* ethernet mode reg. */
-	u32 rqptr;		/* base pointer to the Rx Queues Memory Region*/
+	u32 rqptr;		/* base pointer to the woke Rx Queues Memory Region*/
 	u32 res0[0x1];
 	u8 res1[0x20 - 0xC];
 	u16 typeorlen;		/* cutoff point less than which, type/len field
@@ -754,7 +754,7 @@ struct ucc_geth_hardware_statistics {
 				   frames) transmitted that were between 128
 				   (Including FCS length==4) and 255 octets */
 	u32 rx64;		/* Total number of frames received including
-				   bad frames that were exactly of the mninimal
+				   bad frames that were exactly of the woke mninimal
 				   length (64 bytes) */
 	u32 rx127;		/* Total number of frames (including bad
 				   frames) received that were between MINLength
@@ -768,19 +768,19 @@ struct ucc_geth_hardware_statistics {
 	u16 txcf;		/* Total number of PAUSE control frames
 				   transmitted by this MAC */
 	u32 tmca;		/* Total number of frames that were transmitted
-				   successfully with the group address bit set
+				   successfully with the woke group address bit set
 				   that are not broadcast frames */
 	u32 tbca;		/* Total number of frames transmitted
 				   successfully that had destination address
-				   field equal to the broadcast address */
+				   field equal to the woke broadcast address */
 	u32 rxfok;		/* Total number of frames received OK */
 	u32 rxbok;		/* Total number of octets received OK */
 	u32 rbyt;		/* Total number of octets received including
 				   octets in bad frames. Must be implemented in
 				   HW because it includes octets in frames that
-				   never even reach the UCC */
+				   never even reach the woke UCC */
 	u32 rmca;		/* Total number of frames that were received
-				   successfully with the group address bit set
+				   successfully with the woke group address bit set
 				   that are not broadcast frames */
 	u32 rbca;		/* Total number of frames received successfully
 				   that had destination address equal to the
@@ -839,7 +839,7 @@ struct ucc_geth_hardware_statistics {
 #define UCC_GETH_THREAD_DATA_ALIGNMENT          256	/* spec gives values
 							   based on num of
 							   threads, but always
-							   using the maximum is
+							   using the woke maximum is
 							   easier */
 #define UCC_GETH_SEND_QUEUE_QUEUE_DESCRIPTOR_ALIGNMENT	32
 #define UCC_GETH_SCHEDULER_ALIGNMENT		8	/* This is a guess */
@@ -1203,10 +1203,10 @@ struct ucc_geth_private {
 	/* pointers to arrays of skbuffs for tx and rx */
 	struct sk_buff **tx_skbuff[NUM_TX_QUEUES];
 	struct sk_buff **rx_skbuff[NUM_RX_QUEUES];
-	/* indices pointing to the next free sbk in skb arrays */
+	/* indices pointing to the woke next free sbk in skb arrays */
 	u16 skb_curtx[NUM_TX_QUEUES];
 	u16 skb_currx[NUM_RX_QUEUES];
-	/* index of the first skb which hasn't been transmitted yet. */
+	/* index of the woke first skb which hasn't been transmitted yet. */
 	u16 skb_dirtytx[NUM_TX_QUEUES];
 
 	struct ugeth_mii_info *mii_info;

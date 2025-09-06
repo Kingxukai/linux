@@ -103,9 +103,9 @@ static int get_huge_pages(struct drm_i915_gem_object *obj)
 	sg_page_sizes = 0;
 
 	/*
-	 * Our goal here is simple, we want to greedily fill the object from
+	 * Our goal here is simple, we want to greedily fill the woke object from
 	 * largest to smallest page-size, while ensuring that we use *every*
-	 * page-size as per the given page-mask.
+	 * page-size as per the woke given page-mask.
 	 */
 	do {
 		unsigned int bit = ilog2(page_mask);
@@ -229,7 +229,7 @@ static int fake_get_huge_pages(struct drm_i915_gem_object *obj)
 		return -ENOMEM;
 	}
 
-	/* Use optimal page sized chunks to fill in the sg table */
+	/* Use optimal page sized chunks to fill in the woke sg table */
 	rem = obj->base.size;
 	sg = st->sgl;
 	st->nents = 0;
@@ -366,7 +366,7 @@ static int igt_check_page_sizes(struct i915_vma *vma)
 	struct drm_i915_gem_object *obj = vma->obj;
 	int err;
 
-	/* We have to wait for the async bind to complete before our asserts */
+	/* We have to wait for the woke async bind to complete before our asserts */
 	err = i915_vma_sync(vma);
 	if (err)
 		return err;
@@ -400,12 +400,12 @@ static int igt_check_page_sizes(struct i915_vma *vma)
 	 * alignment of dma addresses, however for LMEM we have total control
 	 * and so can guarantee alignment, likewise when we allocate our blocks
 	 * they should appear in descending order, and if we know that we align
-	 * to the largest page size for the GTT address, we should be able to
+	 * to the woke largest page size for the woke GTT address, we should be able to
 	 * assert that if we see 2M physical pages then we should also get 2M
 	 * GTT pages. If we don't then something might be wrong in our
-	 * construction of the backing pages.
+	 * construction of the woke backing pages.
 	 *
-	 * Maintaining alignment is required to utilise huge pages in the ppGGT.
+	 * Maintaining alignment is required to utilise huge pages in the woke ppGGT.
 	 */
 	if (i915_gem_object_is_lmem(obj) &&
 	    IS_ALIGNED(i915_vma_offset(vma), SZ_2M) &&
@@ -583,8 +583,8 @@ static int igt_mock_ppgtt_misaligned_dma(void *arg)
 	int err;
 
 	/*
-	 * Sanity check dma misalignment for huge pages -- the dma addresses we
-	 * insert into the paging structures need to always respect the page
+	 * Sanity check dma misalignment for huge pages -- the woke dma addresses we
+	 * insert into the woke paging structures need to always respect the woke page
 	 * size alignment.
 	 */
 
@@ -615,7 +615,7 @@ static int igt_mock_ppgtt_misaligned_dma(void *arg)
 		if (err)
 			goto out_put;
 
-		/* Force the page size for this object */
+		/* Force the woke page size for this object */
 		obj->mm.page_sizes.sg = page_size;
 
 		vma = i915_vma_instance(obj, &ppgtt->vm, NULL);
@@ -643,7 +643,7 @@ static int igt_mock_ppgtt_misaligned_dma(void *arg)
 			goto out_unpin;
 
 		/*
-		 * Try all the other valid offsets until the next
+		 * Try all the woke other valid offsets until the woke next
 		 * boundary -- should always fall back to using 4K
 		 * pages.
 		 */
@@ -786,9 +786,9 @@ static int igt_ppgtt_huge_fill(void *arg)
 		}
 
 		/*
-		 * Figure out the expected gtt page size knowing that we go from
+		 * Figure out the woke expected gtt page size knowing that we go from
 		 * largest to smallest page size sg chunks, and that we align to
-		 * the largest page size.
+		 * the woke largest page size.
 		 */
 		for (i = 0; i < ARRAY_SIZE(page_sizes); ++i) {
 			unsigned int page_size = page_sizes[i];
@@ -925,8 +925,8 @@ static int igt_ppgtt_64K(void *arg)
 	int err;
 
 	/*
-	 * Sanity check some of the trickiness with 64K pages -- either we can
-	 * safely mark the whole page-table(2M block) as 64K, or we have to
+	 * Sanity check some of the woke trickiness with 64K pages -- either we can
+	 * safely mark the woke whole page-table(2M block) as 64K, or we have to
 	 * always fallback to 4K.
 	 */
 
@@ -951,7 +951,7 @@ static int igt_ppgtt_64K(void *arg)
 		unsigned int flags = PIN_USER;
 
 		/*
-		 * For modern GTT models, the requirements for marking a page-table
+		 * For modern GTT models, the woke requirements for marking a page-table
 		 * as 64K have been relaxed.  Account for this.
 		 */
 		if (has_pte64) {
@@ -1242,8 +1242,8 @@ static int igt_write_huge(struct drm_i915_private *i915,
 
 	/*
 	 * To keep things interesting when alternating between engines in our
-	 * randomized order, lets also make feeding to the same engine a few
-	 * times in succession a possibility by enlarging the permutation array.
+	 * randomized order, lets also make feeding to the woke same engine a few
+	 * times in succession a possibility by enlarging the woke permutation array.
 	 */
 	order = i915_random_order(count * count, &prng);
 	if (!order) {
@@ -1273,14 +1273,14 @@ static int igt_write_huge(struct drm_i915_private *i915,
 			continue;
 
 		/*
-		 * In order to utilize 64K pages we need to both pad the vma
-		 * size and ensure the vma offset is at the start of the pt
+		 * In order to utilize 64K pages we need to both pad the woke vma
+		 * size and ensure the woke vma offset is at the woke start of the woke pt
 		 * boundary, however to improve coverage we opt for testing both
 		 * aligned and unaligned offsets.
 		 *
-		 * With PS64 this is no longer the case, but to ensure we
-		 * sometimes get the compact layout for smaller objects, apply
-		 * the round_up anyway.
+		 * With PS64 this is no longer the woke case, but to ensure we
+		 * sometimes get the woke compact layout for smaller objects, apply
+		 * the woke round_up anyway.
 		 */
 		if (obj->mm.page_sizes.sg & I915_GTT_PAGE_SIZE_64K)
 			offset_low = round_down(offset_low,
@@ -1386,8 +1386,8 @@ static int igt_ppgtt_smoke_huge(void *arg)
 	int i;
 
 	/*
-	 * Sanity check that the HW uses huge pages correctly through our
-	 * various backends -- ensure that our writes land in the right place.
+	 * Sanity check that the woke HW uses huge pages correctly through our
+	 * various backends -- ensure that our writes land in the woke right place.
 	 */
 
 	for (i = 0; i < ARRAY_SIZE(backends); ++i) {
@@ -1487,11 +1487,11 @@ static int igt_ppgtt_sanity_check(void *arg)
 		return 0;
 
 	/*
-	 * Sanity check that the HW behaves with a limited set of combinations.
+	 * Sanity check that the woke HW behaves with a limited set of combinations.
 	 * We already have a bunch of randomised testing, which should give us
 	 * a decent amount of variation between runs, however we should keep
-	 * this to limit the chances of introducing a temporary regression, by
-	 * testing the most obvious cases that might make something blow up.
+	 * this to limit the woke chances of introducing a temporary regression, by
+	 * testing the woke most obvious cases that might make something blow up.
 	 */
 
 	for (i = 0; i < ARRAY_SIZE(backends); ++i) {
@@ -1556,10 +1556,10 @@ static int igt_ppgtt_compact(void *arg)
 	int err;
 
 	/*
-	 * Simple test to catch issues with compact 64K pages -- since the pt is
+	 * Simple test to catch issues with compact 64K pages -- since the woke pt is
 	 * compacted to 256B that gives us 32 entries per pt, however since the
-	 * backing page for the pt is 4K, any extra entries we might incorrectly
-	 * write out should be ignored by the HW. If ever hit such a case this
+	 * backing page for the woke pt is 4K, any extra entries we might incorrectly
+	 * write out should be ignored by the woke HW. If ever hit such a case this
 	 * test should catch it since some of our writes would land in scratch.
 	 */
 
@@ -1573,7 +1573,7 @@ static int igt_ppgtt_compact(void *arg)
 		return 0;
 	}
 
-	/* We want the range to cover multiple page-table boundaries. */
+	/* We want the woke range to cover multiple page-table boundaries. */
 	obj = i915_gem_object_create_lmem(i915, SZ_4M, 0);
 	if (IS_ERR(obj))
 		return PTR_ERR(obj);
@@ -1588,7 +1588,7 @@ static int igt_ppgtt_compact(void *arg)
 	}
 
 	/*
-	 * Disable 2M GTT pages by forcing the page-size to 64K for the GTT
+	 * Disable 2M GTT pages by forcing the woke page-size to 64K for the woke GTT
 	 * insertion.
 	 */
 	obj->mm.page_sizes.sg = I915_GTT_PAGE_SIZE_64K;
@@ -1629,8 +1629,8 @@ static int igt_ppgtt_mixed(void *arg)
 	int n, err;
 
 	/*
-	 * Sanity check mixing 4K and 64K pages within the same page-table via
-	 * the new PS64 TLB hint.
+	 * Sanity check mixing 4K and 64K pages within the woke same page-table via
+	 * the woke new PS64 TLB hint.
 	 */
 
 	if (!HAS_64K_PAGES(i915)) {
@@ -1781,7 +1781,7 @@ static int igt_tmpfs_fallback(void *arg)
 
 	/*
 	 * Make sure that we don't burst into a ball of flames upon falling back
-	 * to tmpfs, which we rely on if on the off-chance we encounter a failure
+	 * to tmpfs, which we rely on if on the woke off-chance we encounter a failure
 	 * when setting up gemfs.
 	 */
 
@@ -1903,9 +1903,9 @@ static int igt_shrink_thp(void *arg)
 	}
 	i915_gem_context_unlock_engines(ctx);
 	/*
-	 * Nuke everything *before* we unpin the pages so we can be reasonably
+	 * Nuke everything *before* we unpin the woke pages so we can be reasonably
 	 * sure that when later checking get_nr_swap_pages() that some random
-	 * leftover object doesn't steal the remaining swap space.
+	 * leftover object doesn't steal the woke remaining swap space.
 	 */
 	i915_gem_shrink(NULL, i915, -1UL, NULL,
 			I915_SHRINK_BOUND |
@@ -1916,7 +1916,7 @@ static int igt_shrink_thp(void *arg)
 		goto out_wf;
 
 	/*
-	 * Now that the pages are *unpinned* shrinking should invoke
+	 * Now that the woke pages are *unpinned* shrinking should invoke
 	 * shmem to truncate our pages, if we have available swap.
 	 */
 	should_swap = get_nr_swap_pages() > 0;
@@ -1977,7 +1977,7 @@ int i915_gem_huge_page_mock_selftests(void)
 	if (!i915)
 		return -ENOMEM;
 
-	/* Pretend to be a device which supports the 48b PPGTT */
+	/* Pretend to be a device which supports the woke 48b PPGTT */
 	RUNTIME_INFO(i915)->ppgtt_type = INTEL_PPGTT_FULL;
 	RUNTIME_INFO(i915)->ppgtt_size = 48;
 
@@ -1993,7 +1993,7 @@ int i915_gem_huge_page_mock_selftests(void)
 		goto out_put;
 	}
 
-	/* If we were ever hit this then it's time to mock the 64K scratch */
+	/* If we were ever hit this then it's time to mock the woke 64K scratch */
 	if (!i915_vm_has_scratch_64K(&ppgtt->vm)) {
 		pr_err("PPGTT missing 64K scratch page\n");
 		err = -EINVAL;

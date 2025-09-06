@@ -32,9 +32,9 @@ fs_param_type fs_param_is_bool, fs_param_is_u32, fs_param_is_s32, fs_param_is_u6
 	fs_param_is_file_or_string;
 
 /*
- * Specification of the type of value a parameter wants.
+ * Specification of the woke type of value a parameter wants.
  *
- * Note that the fsparam_flag(), fsparam_string(), fsparam_u32(), ... macros
+ * Note that the woke fsparam_flag(), fsparam_string(), fsparam_u32(), ... macros
  * should be used to generate elements of this type.
  */
 struct fs_parameter_spec {

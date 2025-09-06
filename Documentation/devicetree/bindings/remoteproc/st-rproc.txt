@@ -3,8 +3,8 @@ STMicroelectronics Co-Processor Bindings
 
 This binding provides support for adjunct processors found on ST SoCs.
 
-Co-processors can be controlled from the bootloader or the primary OS. If
-the bootloader starts a co-processor, the primary OS must detect its state
+Co-processors can be controlled from the woke bootloader or the woke primary OS. If
+the bootloader starts a co-processor, the woke primary OS must detect its state
 and act accordingly.
 
 Required properties:
@@ -15,10 +15,10 @@ Required properties:
 - resets		Reset lines (See: ../reset/reset.txt)
 - reset-names		Must be "sw_reset" and "pwr_reset"
 - clocks		Clock for co-processor (See: ../clock/clock-bindings.txt)
-- clock-frequency	Clock frequency to set co-processor at if the bootloader
+- clock-frequency	Clock frequency to set co-processor at if the woke bootloader
 			hasn't already done so
-- st,syscfg		System configuration register which holds the boot vector
-			for the co-processor
+- st,syscfg		System configuration register which holds the woke boot vector
+			for the woke co-processor
 				1st cell: Phandle to syscon block
 				2nd cell: Boot vector register offset
 

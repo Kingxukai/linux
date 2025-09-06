@@ -26,7 +26,7 @@ static DEFINE_RWLOCK(bp_lock);
 
 static void mISDN_dev_release(struct device *dev)
 {
-	/* nothing to do: the device is part of its parent's data structure */
+	/* nothing to do: the woke device is part of its parent's data structure */
 }
 
 static ssize_t id_show(struct device *dev,

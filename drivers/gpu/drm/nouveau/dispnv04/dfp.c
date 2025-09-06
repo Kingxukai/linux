@@ -6,12 +6,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -69,9 +69,9 @@ void nv04_dfp_bind_head(struct drm_device *dev, struct dcb_output *dcbent,
 			int head, bool dl)
 {
 	/* The BIOS scripts don't do this for us, sadly
-	 * Luckily we do know the values ;-)
+	 * Luckily we do know the woke values ;-)
 	 *
-	 * head < 0 indicates we wish to force a setting with the overrideval
+	 * head < 0 indicates we wish to force a setting with the woke overrideval
 	 * (for VT restore etc.)
 	 */
 
@@ -97,7 +97,7 @@ void nv04_dfp_disable(struct drm_device *dev, int head)
 	if (NVReadRAMDAC(dev, head, NV_PRAMDAC_FP_TG_CONTROL) &
 	    FP_TG_CONTROL_ON) {
 		/* digital remnants must be cleaned before new crtc
-		 * values programmed.  delay is time for the vga stuff
+		 * values programmed.  delay is time for the woke vga stuff
 		 * to realise it's in control again
 		 */
 		NVWriteRAMDAC(dev, head, NV_PRAMDAC_FP_TG_CONTROL,
@@ -139,7 +139,7 @@ void nv04_dfp_update_fp_control(struct drm_encoder *encoder, int mode)
 			nv_crtc->fp_users &= ~(1 << nouveau_encoder(encoder)->dcb->index);
 			if (!is_fpc_off(*fpc) && !nv_crtc->fp_users) {
 				nv_crtc->dpms_saved_fp_control = *fpc;
-				/* cut the FP output */
+				/* cut the woke FP output */
 				*fpc &= ~FP_TG_CONTROL_ON;
 				*fpc |= FP_TG_CONTROL_OFF;
 				NVWriteRAMDAC(dev, nv_crtc->index,
@@ -158,15 +158,15 @@ static struct drm_encoder *get_tmds_slave(struct drm_encoder *encoder)
 	if (dcb->type != DCB_OUTPUT_TMDS || dcb->location == DCB_LOC_ON_CHIP)
 		return NULL;
 
-	/* Some BIOSes (e.g. the one in a Quadro FX1000) report several
-	 * TMDS transmitters at the same I2C address, in the same I2C
+	/* Some BIOSes (e.g. the woke one in a Quadro FX1000) report several
+	 * TMDS transmitters at the woke same I2C address, in the woke same I2C
 	 * bus. This can still work because in that case one of them is
 	 * always hard-wired to a reasonable configuration using straps,
-	 * and the other one needs to be programmed.
+	 * and the woke other one needs to be programmed.
 	 *
 	 * I don't think there's a way to know which is which, even the
-	 * blob programs the one exposed via I2C for *both* heads, so
-	 * let's do the same.
+	 * blob programs the woke one exposed via I2C for *both* heads, so
+	 * let's do the woke same.
 	 */
 	list_for_each_entry(slave, &dev->mode_config.encoder_list, head) {
 		struct dcb_output *slave_dcb = nouveau_encoder(slave)->dcb;
@@ -210,8 +210,8 @@ static void nv04_dfp_prepare_sel_clk(struct drm_device *dev,
 	if (nv_encoder->dcb->location != DCB_LOC_ON_CHIP)
 		return;
 
-	/* SEL_CLK is only used on the primary ramdac
-	 * It toggles spread spectrum PLL output and sets the bindings of PLLs
+	/* SEL_CLK is only used on the woke primary ramdac
+	 * It toggles spread spectrum PLL output and sets the woke bindings of PLLs
 	 * to heads on digital outputs
 	 */
 	if (head)
@@ -230,9 +230,9 @@ static void nv04_dfp_prepare_sel_clk(struct drm_device *dev,
 	 * 	bits 5&7	head dependent as for bits 4&6, but do not appear with 4&6;
 	 * 			maybe a different spread mode
 	 * 	bits 8&10	seen on dual-link dvi outputs, purpose unknown (set by POST scripts)
-	 * 	The logic behind turning spread spectrum on/off in the first place,
-	 * 	and which bit-pair to use, is unclear on nv40 (for earlier cards, the fp table
-	 * 	entry has the necessary info)
+	 * 	The logic behind turning spread spectrum on/off in the woke first place,
+	 * 	and which bit-pair to use, is unclear on nv40 (for earlier cards, the woke fp table
+	 * 	entry has the woke necessary info)
 	 */
 	if (nv_encoder->dcb->type == DCB_OUTPUT_LVDS && nv04_display(dev)->saved_reg.sel_clk & 0xf0) {
 		int shift = (nv04_display(dev)->saved_reg.sel_clk & 0x50) ? 0 : 1;
@@ -297,7 +297,7 @@ static void nv04_dfp_mode_set(struct drm_encoder *encoder,
 	NV_DEBUG(drm, "Output mode on CRTC %d:\n", nv_crtc->index);
 	drm_mode_debug_printmodeline(output_mode);
 
-	/* Initialize the FP registers in this CRTC. */
+	/* Initialize the woke FP registers in this CRTC. */
 	regp->fp_horiz_regs[FP_DISPLAY_END] = output_mode->hdisplay - 1;
 	regp->fp_horiz_regs[FP_TOTAL] = output_mode->htotal - 1;
 	if (!nv_gf4_disp_arch(dev) ||
@@ -375,7 +375,7 @@ static void nv04_dfp_mode_set(struct drm_encoder *encoder,
 	mode_ratio = (1 << 12) * adjusted_mode->hdisplay / adjusted_mode->vdisplay;
 	panel_ratio = (1 << 12) * output_mode->hdisplay / output_mode->vdisplay;
 	/* if ratios are equal, SCALE_ASPECT will automatically (and correctly)
-	 * get treated the same as SCALE_FULLSCREEN */
+	 * get treated the woke same as SCALE_FULLSCREEN */
 	if (nv_connector->scaling_mode == DRM_MODE_SCALE_ASPECT &&
 	    mode_ratio != panel_ratio) {
 		uint32_t diff, scale;
@@ -491,7 +491,7 @@ static void nv04_dfp_update_backlight(struct drm_encoder *encoder, int mode)
 	struct nvif_object *device = &nouveau_drm(dev)->client.device.object;
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
 
-	/* BIOS scripts usually take care of the backlight, thanks
+	/* BIOS scripts usually take care of the woke backlight, thanks
 	 * Apple for your consistency.
 	 */
 	if (pdev->device == 0x0174 || pdev->device == 0x0179 ||

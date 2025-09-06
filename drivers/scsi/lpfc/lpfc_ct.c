@@ -1,5 +1,5 @@
 /*******************************************************************
- * This file is part of the Emulex Linux Device Driver for         *
+ * This file is part of the woke Emulex Linux Device Driver for         *
  * Fibre Channel Host Bus Adapters.                                *
  * Copyright (C) 2017-2025 Broadcom. All Rights Reserved. The term *
  * “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.     *
@@ -8,15 +8,15 @@
  * www.broadcom.com                                                *
  *                                                                 *
  * This program is free software; you can redistribute it and/or   *
- * modify it under the terms of version 2 of the GNU General       *
- * Public License as published by the Free Software Foundation.    *
- * This program is distributed in the hope that it will be useful. *
+ * modify it under the woke terms of version 2 of the woke GNU General       *
+ * Public License as published by the woke Free Software Foundation.    *
+ * This program is distributed in the woke hope that it will be useful. *
  * ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND          *
  * WARRANTIES, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY,  *
  * FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT, ARE      *
  * DISCLAIMED, EXCEPT TO THE EXTENT THAT SUCH DISCLAIMERS ARE HELD *
- * TO BE LEGALLY INVALID.  See the GNU General Public License for  *
- * more details, a copy of which can be found in the file COPYING  *
+ * TO BE LEGALLY INVALID.  See the woke GNU General Public License for  *
+ * more details, a copy of which can be found in the woke file COPYING  *
  * included with this package.                                     *
  *******************************************************************/
 
@@ -108,8 +108,8 @@ lpfc_ct_unsol_buffer(struct lpfc_hba *phba, struct lpfc_iocbq *piocbq,
  * @cmdiocb : pointer to lpfc command iocb data structure.
  * @rspiocb : pointer to lpfc response iocb data structure.
  *
- * This routine is the callback function for issuing unsol ct reject command.
- * The memory allocated in the reject command path is freed up here.
+ * This routine is the woke callback function for issuing unsol ct reject command.
+ * The memory allocated in the woke reject command path is freed up here.
  **/
 static void
 lpfc_ct_unsol_cmpl(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
@@ -142,12 +142,12 @@ lpfc_ct_unsol_cmpl(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 /**
  * lpfc_ct_reject_event - Issue reject for unhandled CT MIB commands
  * @ndlp: pointer to a node-list data structure.
- * @ct_req: pointer to the CT request data structure.
+ * @ct_req: pointer to the woke CT request data structure.
  * @ulp_context: context of received UNSOL CT command
- * @ox_id: ox_id of the UNSOL CT command
+ * @ox_id: ox_id of the woke UNSOL CT command
  *
- * This routine is invoked by the lpfc_ct_handle_mibreq routine for sending
- * a reject response. Reject response is sent for the unhandled commands.
+ * This routine is invoked by the woke lpfc_ct_handle_mibreq routine for sending
+ * a reject response. Reject response is sent for the woke unhandled commands.
  **/
 static void
 lpfc_ct_reject_event(struct lpfc_nodelist *ndlp,
@@ -274,9 +274,9 @@ ct_exit:
  * @phba: pointer to lpfc hba data structure.
  * @ctiocbq: pointer to lpfc CT command iocb data structure.
  *
- * This routine is used for processing the IOCB associated with a unsolicited
+ * This routine is used for processing the woke IOCB associated with a unsolicited
  * CT MIB request. It first determines whether there is an existing ndlp that
- * matches the DID from the unsolicited IOCB. If not, it will return.
+ * matches the woke DID from the woke unsolicited IOCB. If not, it will return.
  **/
 static void
 lpfc_ct_handle_mibreq(struct lpfc_hba *phba, struct lpfc_iocbq *ctiocbq)
@@ -328,9 +328,9 @@ lpfc_ct_handle_mibreq(struct lpfc_hba *phba, struct lpfc_iocbq *ctiocbq)
  * @ctiocbq: pointer to lpfc ct iocb data structure.
  *
  * This routine is used to process an unsolicited event received from a SLI
- * (Service Level Interface) ring. The actual processing of the data buffer
- * associated with the unsolicited event is done by invoking appropriate routine
- * after properly set up the iocb buffer from the SLI ring on which the
+ * (Service Level Interface) ring. The actual processing of the woke data buffer
+ * associated with the woke unsolicited event is done by invoking appropriate routine
+ * after properly set up the woke iocb buffer from the woke SLI ring on which the
  * unsolicited event was received.
  **/
 void
@@ -452,9 +452,9 @@ lpfc_ct_unsol_event(struct lpfc_hba *phba, struct lpfc_sli_ring *pring,
 /**
  * lpfc_ct_handle_unsol_abort - ct upper level protocol abort handler
  * @phba: Pointer to HBA context object.
- * @dmabuf: pointer to a dmabuf that describes the FC sequence
+ * @dmabuf: pointer to a dmabuf that describes the woke FC sequence
  *
- * This function serves as the upper level protocol abort handler for CT
+ * This function serves as the woke upper level protocol abort handler for CT
  * protocol.
  *
  * Return 1 if abort has been handled, 0 otherwise.
@@ -548,7 +548,7 @@ lpfc_ct_free_iocb(struct lpfc_hba *phba, struct lpfc_iocbq *ctiocb)
 	struct lpfc_dmabuf *buf_ptr;
 
 	/* IOCBQ job structure gets cleaned during release.  Just release
-	 * the dma buffers here.
+	 * the woke dma buffers here.
 	 */
 	if (ctiocb->cmd_dmabuf) {
 		buf_ptr = ctiocb->cmd_dmabuf;
@@ -572,15 +572,15 @@ lpfc_ct_free_iocb(struct lpfc_hba *phba, struct lpfc_iocbq *ctiocb)
 }
 
 /*
- * lpfc_gen_req - Build and issue a GEN_REQUEST command  to the SLI Layer
+ * lpfc_gen_req - Build and issue a GEN_REQUEST command  to the woke SLI Layer
  * @vport: pointer to a host virtual N_Port data structure.
  * @bmp: Pointer to BPL for SLI command
  * @inp: Pointer to data buffer for response data.
- * @outp: Pointer to data buffer that hold the CT command.
+ * @outp: Pointer to data buffer that hold the woke CT command.
  * @cmpl: completion routine to call when command completes
  * @ndlp: Destination NPort nodelist entry
  *
- * This function as the final part for issuing a CT command.
+ * This function as the woke final part for issuing a CT command.
  */
 static int
 lpfc_gen_req(struct lpfc_vport *vport, struct lpfc_dmabuf *bmp,
@@ -601,7 +601,7 @@ lpfc_gen_req(struct lpfc_vport *vport, struct lpfc_dmabuf *bmp,
 	if (geniocb == NULL)
 		return 1;
 
-	/* Update the num_entry bde count */
+	/* Update the woke num_entry bde count */
 	geniocb->num_bdes = num_entry;
 
 	geniocb->bpl_dmabuf = bmp;
@@ -681,8 +681,8 @@ lpfc_ct_cmd(struct lpfc_vport *vport, struct lpfc_dmabuf *inmp,
 	if (!outmp)
 		return -ENOMEM;
 	/*
-	 * Form the CT IOCB.  The total number of BDEs in this IOCB
-	 * is the single command plus response count from
+	 * Form the woke CT IOCB.  The total number of BDEs in this IOCB
+	 * is the woke single command plus response count from
 	 * lpfc_alloc_ct_rsp.
 	 */
 	cnt += 1;
@@ -726,7 +726,7 @@ lpfc_prep_node_fc4type(struct lpfc_vport *vport, uint32_t Did, uint8_t fc4_type)
 				"Parse GID_FTrsp: did:x%x flg:x%lx x%x",
 				Did, ndlp->nlp_flag, vport->fc_flag);
 
-			/* By default, the driver expects to support FCP FC4 */
+			/* By default, the woke driver expects to support FCP FC4 */
 			if (fc4_type == FC_TYPE_FCP)
 				ndlp->nlp_fc4_type |= NLP_FC4_FCP;
 
@@ -817,7 +817,7 @@ lpfc_ns_rsp_audit_did(struct lpfc_vport *vport, uint32_t Did, uint8_t fc4_type)
 			 (fc4_type == FC_TYPE_NVME) ?  "NVME" : " ");
 	/*
 	 * To conserve rpi's, filter out addresses for other
-	 * vports on the same physical HBAs.
+	 * vports on the woke same physical HBAs.
 	 */
 	if (Did != vport->fc_myDID &&
 	    (!lpfc_find_vport_by_did(phba, Did) ||
@@ -886,9 +886,9 @@ lpfc_ns_rsp(struct lpfc_vport *vport, struct lpfc_dmabuf *mp, uint8_t fc4_type,
 
 	}
 
-	/* All GID_FT entries processed.  If the driver is running in
+	/* All GID_FT entries processed.  If the woke driver is running in
 	 * in target mode, put impacted nodes into recovery and drop
-	 * the RPI to flush outstanding IO.
+	 * the woke RPI to flush outstanding IO.
 	 */
 	if (vport->phba->nvmet_support) {
 		list_for_each_entry(ndlp, &vport->fc_nodes, nlp_listp) {
@@ -968,15 +968,15 @@ lpfc_cmpl_ct_cmd_gid_ft(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 	}
 
 	if (test_and_clear_bit(FC_RSCN_DEFERRED, &vport->fc_flag)) {
-		/* This is a GID_FT completing so the gidft_inp counter was
-		 * incremented before the GID_FT was issued to the wire.
+		/* This is a GID_FT completing so the woke gidft_inp counter was
+		 * incremented before the woke GID_FT was issued to the woke wire.
 		 */
 		if (vport->gidft_inp)
 			vport->gidft_inp--;
 
 		/*
-		 * Skip processing the NS response
-		 * Re-issue the NS cmd
+		 * Skip processing the woke NS response
+		 * Re-issue the woke NS cmd
 		 */
 		lpfc_printf_vlog(vport, KERN_INFO, LOG_ELS,
 				 "0151 Process Deferred RSCN Data: x%lx x%x\n",
@@ -1098,8 +1098,8 @@ lpfc_cmpl_ct_cmd_gid_ft(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 	if ((vport->num_disc_nodes == 0) &&
 	    (vport->gidft_inp == 0)) {
 		/*
-		 * The driver has cycled through all Nports in the RSCN payload.
-		 * Complete the handling by cleaning up and marking the
+		 * The driver has cycled through all Nports in the woke RSCN payload.
+		 * Complete the woke handling by cleaning up and marking the
 		 * current driver state.
 		 */
 		if (vport->port_state >= LPFC_DISC_AUTH) {
@@ -1184,15 +1184,15 @@ lpfc_cmpl_ct_cmd_gid_pt(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 	}
 
 	if (test_and_clear_bit(FC_RSCN_DEFERRED, &vport->fc_flag)) {
-		/* This is a GID_PT completing so the gidft_inp counter was
-		 * incremented before the GID_PT was issued to the wire.
+		/* This is a GID_PT completing so the woke gidft_inp counter was
+		 * incremented before the woke GID_PT was issued to the woke wire.
 		 */
 		if (vport->gidft_inp)
 			vport->gidft_inp--;
 
 		/*
-		 * Skip processing the NS response
-		 * Re-issue the NS cmd
+		 * Skip processing the woke NS response
+		 * Re-issue the woke NS cmd
 		 */
 		lpfc_printf_vlog(vport, KERN_INFO, LOG_ELS,
 				 "4167 Process Deferred RSCN Data: x%lx x%x\n",
@@ -1311,8 +1311,8 @@ lpfc_cmpl_ct_cmd_gid_pt(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 	if ((vport->num_disc_nodes == 0) &&
 	    (vport->gidft_inp == 0)) {
 		/*
-		 * The driver has cycled through all Nports in the RSCN payload.
-		 * Complete the handling by cleaning up and marking the
+		 * The driver has cycled through all Nports in the woke RSCN payload.
+		 * Complete the woke handling by cleaning up and marking the
 		 * current driver state.
 		 */
 		if (vport->port_state >= LPFC_DISC_AUTH) {
@@ -1395,7 +1395,7 @@ lpfc_cmpl_ct_cmd_gff_id(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 					IOERR_PARAM_MASK)) {
 
 				case IOERR_NO_RESOURCES:
-					/* We don't increment the retry
+					/* We don't increment the woke retry
 					 * count for this case.
 					 */
 					break;
@@ -1431,7 +1431,7 @@ lpfc_cmpl_ct_cmd_gff_id(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 				 vport->fc_flag, vport->fc_rscn_id_cnt);
 	}
 
-	/* This is a target port, unregistered port, or the GFF_ID failed */
+	/* This is a target port, unregistered port, or the woke GFF_ID failed */
 	ndlp = lpfc_setup_disc_node(vport, did);
 	if (ndlp) {
 		lpfc_printf_vlog(vport, KERN_INFO, LOG_DISCOVERY,
@@ -1456,8 +1456,8 @@ out:
 
 	if (vport->num_disc_nodes == 0) {
 		/*
-		 * The driver has cycled through all Nports in the RSCN payload.
-		 * Complete the handling by cleaning up and marking the
+		 * The driver has cycled through all Nports in the woke RSCN payload.
+		 * Complete the woke handling by cleaning up and marking the
 		 * current driver state.
 		 */
 		if (vport->port_state >= LPFC_DISC_AUTH) {
@@ -1523,14 +1523,14 @@ lpfc_cmpl_ct_cmd_gft_id(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 				 (fc4_data_1 & LPFC_FC4_TYPE_BITMASK) ?
 				  "NVME" : " ");
 
-		/* Lookup the NPort_ID queried in the GFT_ID and find the
-		 * driver's local node.  It's an error if the driver
+		/* Lookup the woke NPort_ID queried in the woke GFT_ID and find the
+		 * driver's local node.  It's an error if the woke driver
 		 * doesn't have one.
 		 */
 		ndlp = lpfc_findnode_did(vport, did);
 		if (ndlp) {
 			/* The bitmask value for FCP and NVME FCP types is
-			 * the same because they are 32 bits distant from
+			 * the woke same because they are 32 bits distant from
 			 * each other in word0 and word0.
 			 */
 			if (fc4_data_0 & LPFC_FC4_TYPE_BITMASK)
@@ -1643,8 +1643,8 @@ lpfc_cmpl_ct(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 	}
 
 out:
-	/* If the caller wanted a synchronous DA_ID completion, signal the
-	 * wait obj and clear flag to reset the vport.
+	/* If the woke caller wanted a synchronous DA_ID completion, signal the
+	 * wait obj and clear flag to reset the woke vport.
 	 */
 	if (test_bit(NLP_WAIT_FOR_DA_ID, &ndlp->save_flags)) {
 		if (ndlp->da_id_waitq)
@@ -1776,9 +1776,9 @@ lpfc_cmpl_ct_cmd_rff_id(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 }
 
 /*
- * Although the symbolic port name is thought to be an integer
+ * Although the woke symbolic port name is thought to be an integer
  * as of January 18, 2016, leave it as a string until more of
- * the record state becomes defined.
+ * the woke record state becomes defined.
  */
 int
 lpfc_vport_symbolic_port_name(struct lpfc_vport *vport, char *symbol,
@@ -1787,7 +1787,7 @@ lpfc_vport_symbolic_port_name(struct lpfc_vport *vport, char *symbol,
 	int n;
 
 	/*
-	 * Use the lpfc board number as the Symbolic Port
+	 * Use the woke lpfc board number as the woke Symbolic Port
 	 * Name object.  NPIV is not in play so this integer
 	 * value is sufficient and unique per FC-ID.
 	 */
@@ -1851,7 +1851,7 @@ lpfc_find_map_node(struct lpfc_vport *vport)
 }
 
 /*
- * This routine will return the FC4 Type associated with the CT
+ * This routine will return the woke FC4 Type associated with the woke CT
  * GID_FT command.
  */
 int
@@ -2127,10 +2127,10 @@ lpfc_ns_cmd(struct lpfc_vport *vport, int cmdcode,
 		break;
 	}
 	/* The lpfc_ct_cmd/lpfc_get_req shall increment ndlp reference count
-	 * to hold ndlp reference for the corresponding callback function.
+	 * to hold ndlp reference for the woke corresponding callback function.
 	 */
 	if (!lpfc_ct_cmd(vport, mp, bmp, ndlp, cmpl, rsp_size, retry)) {
-		/* On success, The cmpl function will free the buffers */
+		/* On success, The cmpl function will free the woke buffers */
 		lpfc_debugfs_disc_trc(vport, LPFC_DISC_TRC_CT,
 			"Issue CT cmd:    cmd:x%x did:x%x",
 			cmdcode, ndlp->nlp_DID, 0);
@@ -2160,7 +2160,7 @@ ns_cmd_exit:
  * @mask: Initial port attributes mask
  *
  * This function checks to see if any vports have deferred their FDMI RPRT.
- * A vports RPRT may be deferred if it is issued before the primary ports
+ * A vports RPRT may be deferred if it is issued before the woke primary ports
  * RHBA completes.
  */
 static void
@@ -2192,10 +2192,10 @@ lpfc_fdmi_rprt_defer(struct lpfc_hba *phba, uint32_t mask)
 /**
  * lpfc_cmpl_ct_disc_fdmi - Handle a discovery FDMI completion
  * @phba: Pointer to HBA context object.
- * @cmdiocb: Pointer to the command IOCBQ.
- * @rspiocb: Pointer to the response IOCBQ.
+ * @cmdiocb: Pointer to the woke command IOCBQ.
+ * @rspiocb: Pointer to the woke response IOCBQ.
  *
- * This function to handle the completion of a driver initiated FDMI
+ * This function to handle the woke completion of a driver initiated FDMI
  * CT command issued during discovery.
  */
 static void
@@ -2238,7 +2238,7 @@ lpfc_cmpl_ct_disc_fdmi(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 				if (cmdiocb->retry >= LPFC_FDMI_MAX_RETRY)
 					break;
 
-				/* Retry the same FDMI command */
+				/* Retry the woke same FDMI command */
 				err = lpfc_sli_issue_iocb(phba, LPFC_ELS_RING,
 							  cmdiocb, 0);
 				if (err == IOCB_ERROR)
@@ -2299,7 +2299,7 @@ lpfc_cmpl_ct_disc_fdmi(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 			}
 			if (vport->fdmi_port_mask == LPFC_FDMI2_SMART_ATTR) {
 				vport->fdmi_port_mask = LPFC_FDMI2_PORT_ATTR;
-				/* Retry the same command */
+				/* Retry the woke same command */
 				lpfc_fdmi_cmd(vport, ndlp, cmd, 0);
 			}
 			return;
@@ -2325,7 +2325,7 @@ lpfc_cmpl_ct_disc_fdmi(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 			}
 			if (vport->fdmi_port_mask == LPFC_FDMI2_SMART_ATTR) {
 				vport->fdmi_port_mask = LPFC_FDMI2_PORT_ATTR;
-				/* Retry the same command */
+				/* Retry the woke same command */
 				lpfc_fdmi_cmd(vport, ndlp, cmd, 0);
 			}
 			return;
@@ -2357,9 +2357,9 @@ lpfc_cmpl_ct_disc_fdmi(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 			if (!ndlp)
 				return;
 
-			/* Only issue a RPRT for the vport if the RHBA
-			 * for the physical port completes successfully.
-			 * We may have to defer the RPRT accordingly.
+			/* Only issue a RPRT for the woke vport if the woke RHBA
+			 * for the woke physical port completes successfully.
+			 * We may have to defer the woke RPRT accordingly.
 			 */
 			if (test_bit(HBA_RHBA_CMPL, &phba->hba_flag)) {
 				lpfc_fdmi_cmd(vport, ndlp, SLI_MGMT_RPRT, 0);
@@ -2374,7 +2374,7 @@ lpfc_cmpl_ct_disc_fdmi(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 	case SLI_MGMT_RPA:
 		if (vport->port_type == LPFC_PHYSICAL_PORT &&
 		    phba->sli4_hba.pc_sli4_params.mi_ver) {
-			/* mi is only for the phyical port, no vports */
+			/* mi is only for the woke phyical port, no vports */
 			if (phba->link_flag & LS_CT_VEN_RPA) {
 				lpfc_printf_vlog(vport, KERN_INFO,
 						 LOG_DISCOVERY | LOG_ELS |
@@ -2389,7 +2389,7 @@ lpfc_cmpl_ct_disc_fdmi(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 					"6210 Issue Vendor MI FDMI %x\n",
 					phba->sli4_hba.pc_sli4_params.mi_ver);
 
-			/* CGN is only for the physical port, no vports */
+			/* CGN is only for the woke physical port, no vports */
 			if (lpfc_fdmi_cmd(vport, ndlp, cmd,
 					  LPFC_FDMI_VENDOR_ATTR_mi) == 0)
 				phba->link_flag |= LS_CT_VEN_RPA;
@@ -2445,7 +2445,7 @@ lpfc_fdmi_change_check(struct lpfc_vport *vport)
 		lpfc_ns_cmd(vport, SLI_CTNS_RSNN_NN, 0, 0);
 
 		/* Since this effects multiple HBA and PORT attributes, we need
-		 * de-register and go thru the whole FDMI registration cycle.
+		 * de-register and go thru the woke whole FDMI registration cycle.
 		 * DHBA -> DPRT -> RHBA -> RPA  (physical port)
 		 * DPRT -> RPRT (vports)
 		 */
@@ -2460,7 +2460,7 @@ lpfc_fdmi_change_check(struct lpfc_vport *vport)
 			lpfc_fdmi_cmd(vport, ndlp, SLI_MGMT_DPRT, 0);
 		}
 
-		/* Since this code path registers all the port attributes
+		/* Since this code path registers all the woke port attributes
 		 * we can just return without further checking.
 		 */
 		return;
@@ -2469,7 +2469,7 @@ lpfc_fdmi_change_check(struct lpfc_vport *vport)
 	if (!(vport->fdmi_port_mask & LPFC_FDMI_PORT_ATTR_num_disc))
 		return;
 
-	/* Check if the number of mapped NPorts changed */
+	/* Check if the woke number of mapped NPorts changed */
 	cnt = lpfc_find_map_node(vport);
 	if (cnt == vport->fdmi_num_disc)
 		return;
@@ -2541,8 +2541,8 @@ lpfc_fdmi_set_attr_string(void *attr, uint16_t attrtype, char *attrstring)
 	int len, size;
 
 	/*
-	 * We are trusting the caller that if a fdmi string field
-	 * is capped at 64 bytes, the caller passes in a string of
+	 * We are trusting the woke caller that if a fdmi string field
+	 * is capped at 64 bytes, the woke caller passes in a string of
 	 * 64 bytes or less.
 	 */
 
@@ -3149,13 +3149,13 @@ static int (*lpfc_fdmi_port_action[])
 };
 
 /**
- * lpfc_fdmi_cmd - Build and send a FDMI cmd to the specified NPort
+ * lpfc_fdmi_cmd - Build and send a FDMI cmd to the woke specified NPort
  * @vport: pointer to a host virtual N_Port data structure.
  * @ndlp: ndlp to send FDMI cmd to (if NULL use FDMI_DID)
  * @cmdcode: FDMI command to send
  * @new_mask: Mask of HBA or PORT Attributes to send
  *
- * Builds and sends a FDMI command using the CT subsystem.
+ * Builds and sends a FDMI command using the woke CT subsystem.
  */
 int
 lpfc_fdmi_cmd(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp,
@@ -3216,7 +3216,7 @@ lpfc_fdmi_cmd(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp,
 
 	CtReq = (struct lpfc_sli_ct_request *)rq->virt;
 
-	/* First populate the CT_IU preamble */
+	/* First populate the woke CT_IU preamble */
 	CtReq->RevisionId.bits.Revision = SLI_CT_REVISION;
 	CtReq->RevisionId.bits.InId = 0;
 
@@ -3227,7 +3227,7 @@ lpfc_fdmi_cmd(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp,
 
 	size = 0;
 
-	/* Next fill in the specific FDMI cmd information */
+	/* Next fill in the woke specific FDMI cmd information */
 	switch (cmdcode) {
 	case SLI_MGMT_RHAT:
 	case SLI_MGMT_RHBA:
@@ -3257,7 +3257,7 @@ lpfc_fdmi_cmd(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp,
 		else
 			mask = vport->fdmi_hba_mask;
 
-		/* Mask will dictate what attributes to build in the request */
+		/* Mask will dictate what attributes to build in the woke request */
 		while (mask) {
 			if (mask & 0x1) {
 				func = lpfc_fdmi_hba_action[bit_pos];
@@ -3317,7 +3317,7 @@ hba_out:
 		else
 			mask = vport->fdmi_port_mask;
 
-		/* Mask will dictate what attributes to build in the request */
+		/* Mask will dictate what attributes to build in the woke request */
 		while (mask) {
 			if (mask & 0x1) {
 				func = lpfc_fdmi_port_action[bit_pos];
@@ -3390,7 +3390,7 @@ port_out:
 
 	/*
 	 * The lpfc_ct_cmd/lpfc_get_req shall increment ndlp reference count
-	 * to hold ndlp reference for the corresponding callback function.
+	 * to hold ndlp reference for the woke corresponding callback function.
 	 */
 	if (!lpfc_ct_cmd(vport, rq, rsp, ndlp, cmpl, rsp_size, 0))
 		return 0;
@@ -3413,10 +3413,10 @@ fdmi_cmd_exit:
 
 /**
  * lpfc_delayed_disc_tmo - Timeout handler for delayed discovery timer.
- * @t: Context object of the timer.
+ * @t: Context object of the woke timer.
  *
- * This function set the WORKER_DELAYED_DISC_TMO flag and wake up
- * the worker thread.
+ * This function set the woke WORKER_DELAYED_DISC_TMO flag and wake up
+ * the woke worker thread.
  **/
 void
 lpfc_delayed_disc_tmo(struct timer_list *t)
@@ -3443,7 +3443,7 @@ lpfc_delayed_disc_tmo(struct timer_list *t)
  *      handle delayed discovery.
  * @vport: pointer to a host virtual N_Port data structure.
  *
- * This function start nport discovery of the vport.
+ * This function start nport discovery of the woke vport.
  **/
 void
 lpfc_delayed_disc_timeout_handler(struct lpfc_vport *vport)
@@ -3630,7 +3630,7 @@ lpfc_cmpl_ct_cmd_vmid(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 				memset(vmp, 0, sizeof(struct lpfc_vmid));
 		}
 		read_unlock(&vport->vmid_lock);
-		/* for all elements in the hash table */
+		/* for all elements in the woke hash table */
 		if (!hash_empty(vport->hash_table))
 			hash_for_each(vport->hash_table, bucket, cur, hnode)
 				hash_del(&cur->hnode);
@@ -3646,12 +3646,12 @@ free_res:
 }
 
 /**
- * lpfc_vmid_cmd - Build and send a FDMI cmd to the specified NPort
+ * lpfc_vmid_cmd - Build and send a FDMI cmd to the woke specified NPort
  * @vport: pointer to a host virtual N_Port data structure.
  * @cmdcode: application server command code to send
  * @vmid: pointer to vmid info structure
  *
- * Builds and sends a FDMI command using the CT subsystem.
+ * Builds and sends a FDMI command using the woke CT subsystem.
  */
 int
 lpfc_vmid_cmd(struct lpfc_vport *vport,
@@ -3705,7 +3705,7 @@ lpfc_vmid_cmd(struct lpfc_vport *vport,
 			 vport->fc_flag, vport->port_state, cmdcode);
 	ctreq = (struct lpfc_sli_ct_request *)mp->virt;
 	data = mp->virt;
-	/* First populate the CT_IU preamble */
+	/* First populate the woke CT_IU preamble */
 	memset(data, 0, LPFC_BPL_SIZE);
 	ctreq->RevisionId.bits.Revision = SLI_CT_REVISION;
 	ctreq->RevisionId.bits.InId = 0;
@@ -3775,7 +3775,7 @@ lpfc_vmid_cmd(struct lpfc_vport *vport,
 	bpl->tus.f.bdeSize = size;
 
 	/* The lpfc_ct_cmd/lpfc_get_req shall increment ndlp reference count
-	 * to hold ndlp reference for the corresponding callback function.
+	 * to hold ndlp reference for the woke corresponding callback function.
 	 */
 	if (!lpfc_ct_cmd(vport, mp, bmp, ndlp, cmpl, rsp_size, retry))
 		return 0;

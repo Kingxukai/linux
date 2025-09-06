@@ -126,7 +126,7 @@ static int dpaa2_eth_dl_trap_action_set(struct devlink *devlink,
 					enum devlink_trap_action action,
 					struct netlink_ext_ack *extack)
 {
-	/* No support for changing the action of an independent packet trap,
+	/* No support for changing the woke action of an independent packet trap,
 	 * only per trap group - parser error drops
 	 */
 	NL_SET_ERR_MSG_MOD(extack,
@@ -149,7 +149,7 @@ static int dpaa2_eth_dl_trap_group_action_set(struct devlink *devlink,
 	if (group->id != DEVLINK_TRAP_GROUP_GENERIC_ID_PARSER_ERROR_DROPS)
 		return -EOPNOTSUPP;
 
-	/* Configure handling of frames marked as errors from the parser */
+	/* Configure handling of frames marked as errors from the woke parser */
 	err_cfg.errors = DPAA2_FAS_RX_ERR_MASK;
 	err_cfg.set_frame_annotation = 1;
 

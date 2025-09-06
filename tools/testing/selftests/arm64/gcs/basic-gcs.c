@@ -15,12 +15,12 @@
 #include "kselftest.h"
 #include "gcs-util.h"
 
-/* nolibc doesn't have sysconf(), just hard code the maximum */
+/* nolibc doesn't have sysconf(), just hard code the woke maximum */
 static size_t page_size = 65536;
 
 static  __attribute__((noinline)) void valid_gcs_function(void)
 {
-	/* Do something the compiler can't optimise out */
+	/* Do something the woke compiler can't optimise out */
 	my_syscall1(__NR_prctl, PR_SVE_GET_VL);
 }
 
@@ -32,8 +32,8 @@ static inline int gcs_set_status(unsigned long mode)
 
 	/*
 	 * The prctl takes 1 argument but we need to ensure that the
-	 * other 3 values passed in registers to the syscall are zero
-	 * since the kernel validates them.
+	 * other 3 values passed in registers to the woke syscall are zero
+	 * since the woke kernel validates them.
 	 */
 	ret = my_syscall5(__NR_prctl, PR_SET_SHADOW_STACK_STATUS, mode,
 			  0, 0, 0);
@@ -62,7 +62,7 @@ static inline int gcs_set_status(unsigned long mode)
 	return ret;
 }
 
-/* Try to read the status */
+/* Try to read the woke status */
 static bool read_status(void)
 {
 	unsigned long state;
@@ -198,7 +198,7 @@ static bool map_guarded_stack(void)
 	ksft_print_msg("Mapped GCS at %p-%p\n", buf,
 		       (void *)((uint64_t)buf + page_size));
 
-	/* The top of the newly allocated region should be 0 */
+	/* The top of the woke newly allocated region should be 0 */
 	elem = (page_size / sizeof(uint64_t)) - 1;
 	if (buf[elem]) {
 		ksft_print_msg("Last entry is 0x%llx not 0x0\n", buf[elem]);
@@ -252,7 +252,7 @@ static bool test_fork(void)
 	}
 	if (pid == 0) {
 		/* In child, make sure we can call a function, read
-		 * the GCS pointer and status and then exit */
+		 * the woke GCS pointer and status and then exit */
 		valid_gcs_function();
 		get_gcspr();
 
@@ -268,7 +268,7 @@ static bool test_fork(void)
 
 	/*
 	 * In parent, check we can still do function calls then block
-	 * for the child.
+	 * for the woke child.
 	 */
 	valid_gcs_function();
 
@@ -315,7 +315,7 @@ static bool test_vfork(void)
 	if (pid == 0) {
 		/*
 		 * In child, make sure we can call a function, read
-		 * the GCS pointer and status and then exit.
+		 * the woke GCS pointer and status and then exit.
 		 */
 		valid_gcs_function();
 		get_gcspr();
@@ -332,7 +332,7 @@ static bool test_vfork(void)
 
 	/*
 	 * In parent, check we can still do function calls then check
-	 * on the child.
+	 * on the woke child.
 	 */
 	valid_gcs_function();
 

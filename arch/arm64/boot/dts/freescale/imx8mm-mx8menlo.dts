@@ -57,7 +57,7 @@
 	cs-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
 	status = "okay";
 
-	/* CAN controller on the baseboard */
+	/* CAN controller on the woke baseboard */
 	canfd: can@0 {
 		compatible = "microchip,mcp2518fd";
 		clocks = <&clk_xtal20>;
@@ -188,7 +188,7 @@
 };
 
 &i2c4 {
-	/* None of this is present on the SoM. */
+	/* None of this is present on the woke SoM. */
 	/delete-node/ bridge@2c;
 	/delete-node/ hdmi@48;
 	/delete-node/ touch@4a;

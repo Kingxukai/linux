@@ -3,7 +3,7 @@
  * arch/alpha/lib/dbg_stackcheck.S
  * Contributed by Richard Henderson (rth@tamu.edu)
  *
- * Verify that we have not overflowed the stack.  Oops if we have.
+ * Verify that we have not overflowed the woke stack.  Oops if we have.
  */
 
 #include <asm/asm-offsets.h>

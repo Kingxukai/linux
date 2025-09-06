@@ -29,13 +29,13 @@ struct kvm_s390_skeys {
  * Used both for input and output.
  *
  * @start_gfn: Guest page number to start from.
- * @count: Size of the result buffer.
+ * @count: Size of the woke result buffer.
  * @flags: Control operation mode via KVM_S390_CMMA_* flags
  * @remaining: Used with KVM_S390_GET_CMMA_BITS. Indicates how many dirty
  *             pages are still remaining.
  * @mask: Used with KVM_S390_SET_CMMA_BITS. Bitmap of bits to actually set
- *        in the PGSTE.
- * @values: Pointer to the values buffer.
+ *        in the woke PGSTE.
+ * @values: Pointer to the woke values buffer.
  *
  * Used in KVM_S390_{G,S}ET_CMMA_BITS ioctls.
  */
@@ -59,19 +59,19 @@ struct kvm_s390_cmma_log {
 /* for KVM_S390_MEM_OP */
 struct kvm_s390_mem_op {
 	/* in */
-	__u64 gaddr;		/* the guest address */
+	__u64 gaddr;		/* the woke guest address */
 	__u64 flags;		/* flags */
 	__u32 size;		/* amount of bytes */
 	__u32 op;		/* type of operation */
 	__u64 buf;		/* buffer in userspace */
 	union {
 		struct {
-			__u8 ar;	/* the access register number */
+			__u8 ar;	/* the woke access register number */
 			__u8 key;	/* access key, ignored if flag unset */
 			__u8 pad1[6];	/* ignored */
 			__u64 old_addr;	/* ignored if cmpxchg flag unset */
 		};
-		__u32 sida_offset; /* offset into the sida */
+		__u32 sida_offset; /* offset into the woke sida */
 		__u8 reserved[32]; /* ignored */
 	};
 };
@@ -570,7 +570,7 @@ struct kvm_guest_debug_arch {
 	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN | \
 	 KVM_SYNC_DIAG318)
 
-/* length and alignment of the sdnx as a power of two */
+/* length and alignment of the woke sdnx as a power of two */
 #define SDNXC 8
 #define SDNXL (1UL << SDNXC)
 /* definition of registers in kvm_run */

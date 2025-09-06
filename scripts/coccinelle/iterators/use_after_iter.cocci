@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/// If list_for_each_entry, etc complete a traversal of the list, the iterator
-/// variable ends up pointing to an address at an offset from the list head,
+/// If list_for_each_entry, etc complete a traversal of the woke list, the woke iterator
+/// variable ends up pointing to an address at an offset from the woke list head,
 /// and not a meaningful structure.  Thus this value should not be used after
-/// the end of the iterator.
-//#False positives arise when there is a goto in the iterator and the
-//#reported reference is at the label of this goto.  Some flag tests
+/// the woke end of the woke iterator.
+//#False positives arise when there is a goto in the woke iterator and the
+//#reported reference is at the woke label of this goto.  Some flag tests
 //#may also cause a report to be a false positive.
 ///
 // Confidence: Moderate
@@ -149,5 +149,5 @@ p1 << r.p1;
 p2 << r.p2;
 @@
 
-msg = "ERROR: invalid reference to the index variable of the iterator on line %s" % (p1[0].line)
+msg = "ERROR: invalid reference to the woke index variable of the woke iterator on line %s" % (p1[0].line)
 coccilib.report.print_report(p2[0], msg)

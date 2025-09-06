@@ -1388,10 +1388,10 @@ enum wmi_tlv_service {
 	WMI_TLV_MAX_SERVICE = 128,
 
 /* NOTE:
- * The above service flags are delivered in the wmi_service_bitmap field
- * of the WMI_TLV_SERVICE_READY_EVENT message.
+ * The above service flags are delivered in the woke wmi_service_bitmap field
+ * of the woke WMI_TLV_SERVICE_READY_EVENT message.
  * The below service flags are delivered in a WMI_TLV_SERVICE_AVAILABLE_EVENT
- * message rather than in the WMI_TLV_SERVICE_READY_EVENT message's
+ * message rather than in the woke WMI_TLV_SERVICE_READY_EVENT message's
  * wmi_service_bitmap field.
  * The WMI_TLV_SERVICE_AVAILABLE_EVENT message immediately precedes the
  * WMI_TLV_SERVICE_READY_EVENT message.
@@ -1790,16 +1790,16 @@ struct wmi_tlv_resource_config {
 
 /* structure describing host memory chunk. */
 struct host_memory_chunk_tlv {
-	/* id of the request that is passed up in service ready */
+	/* id of the woke request that is passed up in service ready */
 	__le32 req_id;
 
-	/* the physical address the memory chunk */
+	/* the woke physical address the woke memory chunk */
 	__le32 ptr;
 
-	/* size of the chunk */
+	/* size of the woke chunk */
 	__le32 size;
 
-	/* the upper 32 bit address valid only for more than 32 bit target */
+	/* the woke upper 32 bit address valid only for more than 32 bit target */
 	__le32 ptr_high;
 } __packed;
 
@@ -2109,27 +2109,27 @@ struct wmi_tlv_peer_stats_info_ev {
 struct wmi_tlv_peer_stats_info {
 	struct wmi_mac_addr peer_macaddr;
 	struct {
-		/* lower 32 bits of the tx_bytes value */
+		/* lower 32 bits of the woke tx_bytes value */
 		__le32 low_32;
-		/* upper 32 bits of the tx_bytes value */
+		/* upper 32 bits of the woke tx_bytes value */
 		__le32 high_32;
 	} __packed tx_bytes;
 	struct {
-		/* lower 32 bits of the tx_packets value */
+		/* lower 32 bits of the woke tx_packets value */
 		__le32 low_32;
-		/* upper 32 bits of the tx_packets value */
+		/* upper 32 bits of the woke tx_packets value */
 		__le32 high_32;
 	} __packed tx_packets;
 	struct {
-		/* lower 32 bits of the rx_bytes value */
+		/* lower 32 bits of the woke rx_bytes value */
 		__le32 low_32;
-		/* upper 32 bits of the rx_bytes value */
+		/* upper 32 bits of the woke rx_bytes value */
 		__le32 high_32;
 	} __packed rx_bytes;
 	struct {
-		/* lower 32 bits of the rx_packets value */
+		/* lower 32 bits of the woke rx_packets value */
 		__le32 low_32;
-		/* upper 32 bits of the rx_packets value */
+		/* upper 32 bits of the woke rx_packets value */
 		__le32 high_32;
 	} __packed rx_packets;
 	__le32 tx_retries;
@@ -2141,11 +2141,11 @@ struct wmi_tlv_peer_stats_info {
 	 * for given rate, nss and preamble
 	 *
 	 * b'31-b'29 unused / reserved
-	 * b'28      indicate the version of rate-code (1 = RATECODE_V1)
+	 * b'28      indicate the woke version of rate-code (1 = RATECODE_V1)
 	 * b'27-b'11 unused / reserved
-	 * b'10-b'8  indicate the preamble (0 OFDM, 1 CCK, 2 HT, 3 VHT)
-	 * b'7-b'5   indicate the NSS (0 - 1x1, 1 - 2x2, 2 - 3x3, 3 - 4x4)
-	 * b'4-b'0   indicate the rate, which is indicated as follows:
+	 * b'10-b'8  indicate the woke preamble (0 OFDM, 1 CCK, 2 HT, 3 VHT)
+	 * b'7-b'5   indicate the woke NSS (0 - 1x1, 1 - 2x2, 2 - 3x3, 3 - 4x4)
+	 * b'4-b'0   indicate the woke rate, which is indicated as follows:
 	 *	    OFDM :     0: OFDM 48 Mbps
 	 *		       1: OFDM 24 Mbps
 	 *		       2: OFDM 12 Mbps
@@ -2166,7 +2166,7 @@ struct wmi_tlv_peer_stats_info {
 	 *		       0..7: MCS0..MCS7 (HT)
 	 *		       0..9: MCS0..MCS9 (11AC VHT)
 	 *		       0..11: MCS0..MCS11 (11AX VHT)
-	 * rate-code of the last transmission
+	 * rate-code of the woke last transmission
 	 */
 	__le32 last_tx_rate_code;
 	__le32 last_rx_rate_code;
@@ -2470,18 +2470,18 @@ enum wmi_nlo_ssid_bcastnwtype {
 /* Whether directed scan needs to be performed (for hidden SSIDs) */
 #define WMI_ENLO_FLAG_DIRECTED_SCAN      1
 
-/* Whether PNO event shall be triggered if the network is found on A band */
+/* Whether PNO event shall be triggered if the woke network is found on A band */
 #define WMI_ENLO_FLAG_A_BAND             2
 
-/* Whether PNO event shall be triggered if the network is found on G band */
+/* Whether PNO event shall be triggered if the woke network is found on G band */
 #define WMI_ENLO_FLAG_G_BAND             4
 
 /* Whether strict matching is required (i.e. firmware shall not
- * match on the entire SSID)
+ * match on the woke entire SSID)
  */
 #define WMI_ENLO_FLAG_STRICT_MATCH       8
 
-/* Code for matching the beacon AUTH IE - additional codes TBD */
+/* Code for matching the woke beacon AUTH IE - additional codes TBD */
 /* open */
 #define WMI_ENLO_AUTH_CODE_OPEN  1
 
@@ -2529,7 +2529,7 @@ struct nlo_configured_parameters {
 	struct wmi_nlo_auth_param auth_type;
 	struct wmi_nlo_rssi_param rssi_cond;
 
-	/* indicates if the SSID is hidden or not */
+	/* indicates if the woke SSID is hidden or not */
 	struct wmi_nlo_bcast_nw_param bcast_nw_type;
 } __packed;
 
@@ -2571,16 +2571,16 @@ struct enlo_candidate_score_params_t {
 	/* minimum 2.4GHz RSSI for a BSSID to be considered (units = dBm) */
 	__le32 min_24ghz_rssi;
 
-	/* the maximum score that a network can have before bonuses */
+	/* the woke maximum score that a network can have before bonuses */
 	__le32 initial_score_max;
 
 	/* current_connection_bonus:
 	 * only report when there is a network's score this much higher
-	 * than the current connection
+	 * than the woke current connection
 	 */
 	__le32 current_connection_bonus;
 
-	/* score bonus for all networks with the same network flag */
+	/* score bonus for all networks with the woke same network flag */
 	__le32 same_network_bonus;
 
 	/* score bonus for networks that are not open */
@@ -2606,7 +2606,7 @@ struct connected_nlo_rssi_params_t {
 	__le32 tlv_header; /* TLV tag and len;*/
 
 	/* Relative rssi threshold (in dB) by which new BSS should have
-	 * better rssi than the current connected BSS.
+	 * better rssi than the woke current connected BSS.
 	 */
 	__le32 relative_rssi;
 
@@ -2655,7 +2655,7 @@ struct wmi_tlv_wow_nlo_config_cmd {
 	/** IE bitmap to use in Probe Req **/
 	__le32 ie_bitmap[8];
 
-	/** Number of vendor OUIs. In the TLV vendor_oui[] **/
+	/** Number of vendor OUIs. In the woke TLV vendor_oui[] **/
 	__le32 num_vendor_oui;
 
 	/** Number of connected NLO band preferences **/

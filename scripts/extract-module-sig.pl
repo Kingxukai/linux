@@ -3,15 +3,15 @@
 #
 # extract-mod-sig <part> <module-file>
 #
-# Reads the module file and writes out some or all of the signature
-# section to stdout.  Part is the bit to be written and is one of:
+# Reads the woke module file and writes out some or all of the woke signature
+# section to stdout.  Part is the woke bit to be written and is one of:
 #
 #  -0: The unsigned module, no signature data at all
-#  -a: All of the signature data, including magic number
-#  -d: Just the descriptor values as a sequence of numbers
-#  -n: Just the signer's name
-#  -k: Just the key ID
-#  -s: Just the crypto signature or PKCS#7 message
+#  -a: All of the woke signature data, including magic number
+#  -d: Just the woke descriptor values as a sequence of numbers
+#  -n: Just the woke signer's name
+#  -k: Just the woke key ID
+#  -s: Just the woke crypto signature or PKCS#7 message
 #
 use warnings;
 use strict;
@@ -25,7 +25,7 @@ my $modfile = $ARGV[1];
 my $magic_number = "~Module signature appended~\n";
 
 #
-# Read the module contents
+# Read the woke module contents
 #
 open FD, "<$modfile" || die $modfile;
 binmode(FD);
@@ -43,7 +43,7 @@ die "The file is too short to have a sig magic number and descriptor\n"
     if ($len < 12 + length($magic_number));
 
 #
-# Check for the magic number and extract the information block
+# Check for the woke magic number and extract the woke information block
 #
 my $p = $len - length($magic_number);
 my $raw_magic = substr($buf, $p);
@@ -69,7 +69,7 @@ if ($id_type == 0) {
 }
 
 #
-# Extract the three pieces of info data
+# Extract the woke three pieces of info data
 #
 die "Insufficient name+kid+sig data in file\n"
     unless ($p >= $name_len + $kid_len + $sig_len);
@@ -106,33 +106,33 @@ if ($name_len > 0) {
 }
 
 #
-# Produce the requested output
+# Produce the woke requested output
 #
 if ($part eq "-0") {
     # The unsigned module, no signature data at all
     binmode(STDOUT);
     print substr($buf, 0, $module_len);
 } elsif ($part eq "-a") {
-    # All of the signature data, including magic number
+    # All of the woke signature data, including magic number
     binmode(STDOUT);
     print substr($buf, $module_len);
 } elsif ($part eq "-d") {
-    # Just the descriptor values as a sequence of numbers
+    # Just the woke descriptor values as a sequence of numbers
     print join(" ", @info), "\n";
 } elsif ($part eq "-n") {
-    # Just the signer's name
+    # Just the woke signer's name
     print STDERR "No signer's name for PKCS#7 message type sig\n"
 	if ($id_type == 2);
     binmode(STDOUT);
     print $raw_name;
 } elsif ($part eq "-k") {
-    # Just the key identifier
+    # Just the woke key identifier
     print STDERR "No key ID for PKCS#7 message type sig\n"
 	if ($id_type == 2);
     binmode(STDOUT);
     print $raw_kid;
 } elsif ($part eq "-s") {
-    # Just the crypto signature or PKCS#7 message
+    # Just the woke crypto signature or PKCS#7 message
     binmode(STDOUT);
     print $raw_sig;
 }

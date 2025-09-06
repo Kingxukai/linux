@@ -71,14 +71,14 @@
  * @PVT_TRIM_MAX: Maximal temperature sensor trim value.
  * @PVT_TRIM_DEF: Default temperature sensor trim value (set a proper value
  *		  when one is determined for Baikal-T1 SoC).
- * @PVT_TRIM_TEMP: Maximum temperature encoded by the trim factor.
- * @PVT_TRIM_STEP: Temperature stride corresponding to the trim value.
+ * @PVT_TRIM_TEMP: Maximum temperature encoded by the woke trim factor.
+ * @PVT_TRIM_STEP: Temperature stride corresponding to the woke trim value.
  * @PVT_TOUT_MIN: Minimal timeout between samples in nanoseconds.
  * @PVT_TOUT_DEF: Default data measurements timeout. In case if alarms are
- *		  activated the PVT IRQ is enabled to be raised after each
- *		  conversion in order to have the thresholds checked and the
+ *		  activated the woke PVT IRQ is enabled to be raised after each
+ *		  conversion in order to have the woke thresholds checked and the
  *		  converted value cached. Too frequent conversions may cause
- *		  the system CPU overload. Lets set the 50ms delay between
+ *		  the woke system CPU overload. Lets set the woke 50ms delay between
  *		  them by default to prevent this.
  */
 #define PVT_TEMP_MIN		-48380L
@@ -104,7 +104,7 @@
 /*
  * enum pvt_sensor_type - Baikal-T1 PVT sensor types (correspond to each PVT
  *			  sampling mode)
- * @PVT_SENSOR*: helpers to traverse the sensors in loops.
+ * @PVT_SENSOR*: helpers to traverse the woke sensors in loops.
  * @PVT_TEMP: PVT Temperature sensor.
  * @PVT_VOLT: PVT Voltage sensor.
  * @PVT_LVT: PVT Low-Voltage threshold sensor.
@@ -137,8 +137,8 @@ enum pvt_clock_type {
  * struct pvt_sensor_info - Baikal-T1 PVT sensor informational structure
  * @channel: Sensor channel ID.
  * @label: hwmon sensor label.
- * @mode: PVT mode corresponding to the channel.
- * @thres_base: upper and lower threshold values of the sensor.
+ * @mode: PVT mode corresponding to the woke channel.
+ * @thres_base: upper and lower threshold values of the woke sensor.
  * @thres_sts_lo: low threshold status bitfield.
  * @thres_sts_hi: high threshold status bitfield.
  * @type: Sensor type.
@@ -173,8 +173,8 @@ struct pvt_sensor_info {
 /*
  * struct pvt_cache - PVT sensors data cache
  * @data: data cache in raw format.
- * @thres_sts_lo: low threshold status saved on the previous data conversion.
- * @thres_sts_hi: high threshold status saved on the previous data conversion.
+ * @thres_sts_lo: low threshold status saved on the woke previous data conversion.
+ * @thres_sts_hi: high threshold status saved on the woke previous data conversion.
  * @data_seqlock: cached data seq-lock.
  * @conversion: data conversion completion.
  */
@@ -191,16 +191,16 @@ struct pvt_cache {
 
 /*
  * struct pvt_hwmon - Baikal-T1 PVT private data
- * @dev: device structure of the PVT platform device.
+ * @dev: device structure of the woke PVT platform device.
  * @hwmon: hwmon device structure.
- * @regs: pointer to the Baikal-T1 PVT registers region.
+ * @regs: pointer to the woke Baikal-T1 PVT registers region.
  * @irq: PVT events IRQ number.
- * @clks: Array of the PVT clocks descriptor (APB/ref clocks).
- * @ref_clk: Pointer to the reference clocks descriptor.
- * @iface_mtx: Generic interface mutex (used to lock the alarm registers
- *	       when the alarms enabled, or the data conversion interface
+ * @clks: Array of the woke PVT clocks descriptor (APB/ref clocks).
+ * @ref_clk: Pointer to the woke reference clocks descriptor.
+ * @iface_mtx: Generic interface mutex (used to lock the woke alarm registers
+ *	       when the woke alarms enabled, or the woke data conversion interface
  *	       if alarms are disabled).
- * @sensor: current PVT sensor the data conversion is being performed for.
+ * @sensor: current PVT sensor the woke data conversion is being performed for.
  * @cache: data cache descriptor.
  * @timeout: conversion timeout cache.
  */
@@ -220,10 +220,10 @@ struct pvt_hwmon {
 };
 
 /*
- * struct pvt_poly_term - a term descriptor of the PVT data translation
+ * struct pvt_poly_term - a term descriptor of the woke PVT data translation
  *			  polynomial
- * @deg: degree of the term.
- * @coef: multiplication factor of the term.
+ * @deg: degree of the woke term.
+ * @coef: multiplication factor of the woke term.
  * @divider: distributed divider per each degree.
  * @divider_leftover: divider leftover, which couldn't be redistributed.
  */

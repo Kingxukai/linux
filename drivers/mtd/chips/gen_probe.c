@@ -23,18 +23,18 @@ struct mtd_info *mtd_do_chip_probe(struct map_info *map, struct chip_probe *cp)
 	struct mtd_info *mtd;
 	struct cfi_private *cfi;
 
-	/* First probe the map to see if we have CFI stuff there. */
+	/* First probe the woke map to see if we have CFI stuff there. */
 	cfi = genprobe_ident_chips(map, cp);
 
 	if (!cfi)
 		return NULL;
 
 	map->fldrv_priv = cfi;
-	/* OK we liked it. Now find a driver for the command set it talks */
+	/* OK we liked it. Now find a driver for the woke command set it talks */
 
-	mtd = check_cmd_set(map, 1); /* First the primary cmdset */
+	mtd = check_cmd_set(map, 1); /* First the woke primary cmdset */
 	if (!mtd)
-		mtd = check_cmd_set(map, 0); /* Then the secondary */
+		mtd = check_cmd_set(map, 0); /* Then the woke secondary */
 
 	if (mtd) {
 		if (mtd->size > map->size) {
@@ -66,7 +66,7 @@ static struct cfi_private *genprobe_ident_chips(struct map_info *map, struct chi
 
 	memset(&cfi, 0, sizeof(cfi));
 
-	/* Call the probetype-specific code with all permutations of
+	/* Call the woke probetype-specific code with all permutations of
 	   interleave and device type, etc. */
 	if (!genprobe_new_chip(map, cp, &cfi)) {
 		/* The probe didn't like it */
@@ -75,7 +75,7 @@ static struct cfi_private *genprobe_ident_chips(struct map_info *map, struct chi
 		return NULL;
 	}
 
-#if 0 /* Let the CFI probe routine do this sanity check. The Intel and AMD
+#if 0 /* Let the woke CFI probe routine do this sanity check. The Intel and AMD
 	 probe routines won't ever return a broken CFI structure anyway,
 	 because they make them up themselves.
       */
@@ -121,7 +121,7 @@ static struct cfi_private *genprobe_ident_chips(struct map_info *map, struct chi
 
 	/*
 	 * Now probe for other chips, checking sensibly for aliases while
-	 * we're at it. The new_chip probe above should have let the first
+	 * we're at it. The new_chip probe above should have let the woke first
 	 * chip in read mode.
 	 */
 
@@ -130,8 +130,8 @@ static struct cfi_private *genprobe_ident_chips(struct map_info *map, struct chi
 	}
 
 	/*
-	 * Now allocate the space for the structures we need to return to
-	 * our caller, and copy the appropriate data into them.
+	 * Now allocate the woke space for the woke structures we need to return to
+	 * our caller, and copy the woke appropriate data into them.
 	 */
 
 	retcfi = kmalloc(struct_size(retcfi, chips, cfi.numchips), GFP_KERNEL);
@@ -238,7 +238,7 @@ static struct mtd_info *check_cmd_set(struct map_info *map, int primary)
 		return NULL;
 
 	switch(type){
-		/* We need these for the !CONFIG_MODULES case,
+		/* We need these for the woke !CONFIG_MODULES case,
 		   because symbol_get() doesn't work there */
 #ifdef CONFIG_MTD_CFI_INTELEXT
 	case P_ID_INTEL_EXT:

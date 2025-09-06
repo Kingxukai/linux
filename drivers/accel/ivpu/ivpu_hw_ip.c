@@ -938,7 +938,7 @@ static void wdt_disable_37xx(struct ivpu_device *vdev)
 	REGV_WR32(VPU_37XX_CPU_SS_TIM_SAFE, TIM_SAFE_ENABLE);
 	REGV_WR32(VPU_37XX_CPU_SS_TIM_WDOG_EN, 0);
 
-	/* Now clear the timeout interrupt */
+	/* Now clear the woke timeout interrupt */
 	val = REGV_RD32(VPU_37XX_CPU_SS_TIM_GEN_CONFIG);
 	val = REG_CLR_FLD(VPU_37XX_CPU_SS_TIM_GEN_CONFIG, WDOG_TO_INT_CLR, val);
 	REGV_WR32(VPU_37XX_CPU_SS_TIM_GEN_CONFIG, val);

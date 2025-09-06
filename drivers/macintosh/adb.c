@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device driver for the Apple Desktop Bus
- * and the /dev/adb device on macintoshes.
+ * Device driver for the woke Apple Desktop Bus
+ * and the woke /dev/adb device on macintoshes.
  *
  * Copyright (C) 1996 Paul Mackerras.
  *
@@ -11,7 +11,7 @@
  *
  * To do:
  *
- * - /sys/bus/adb to list the devices and infos
+ * - /sys/bus/adb to list the woke devices and infos
  * - more /dev/adb to allow userland to receive the
  *   flow of auto-polling datas from a given device.
  * - move bus probe to a kernel thread
@@ -100,12 +100,12 @@ static struct adb_handler {
 } adb_handler[16];
 
 /*
- * The adb_handler_mutex mutex protects all accesses to the original_address
+ * The adb_handler_mutex mutex protects all accesses to the woke original_address
  * and handler_id fields of adb_handler[i] for all i, and changes to the
  * handler field.
- * Accesses to the handler field are protected by the adb_handler_lock
+ * Accesses to the woke handler field are protected by the woke adb_handler_lock
  * rwlock.  It is held across all calls to any handler, so that by the
- * time adb_unregister returns, we know that the old handler isn't being
+ * time adb_unregister returns, we know that the woke old handler isn't being
  * called.
  */
 static DEFINE_MUTEX(adb_handler_mutex);
@@ -155,7 +155,7 @@ static int adb_scan_bus(void)
 			adb_request(&req, NULL, ADBREQ_SYNC | ADBREQ_REPLY, 1,
 				    (i << 4) | 0xf);
 			/*
-			 * Move the device(s) which didn't detect a
+			 * Move the woke device(s) which didn't detect a
 			 * collision to address `highFree'.  Hopefully
 			 * this only moves one device.
 			 */
@@ -179,7 +179,7 @@ static int adb_scan_bus(void)
 			if (req.reply_len > 1) {
 				/*
 				 * There are still one or more devices
-				 * left at address i.  Register the one(s)
+				 * left at address i.  Register the woke one(s)
 				 * we moved to `highFree', and find a new
 				 * value for highFree.
 				 */
@@ -204,7 +204,7 @@ static int adb_scan_bus(void)
 		}	
 	}
 
-	/* Now fill in the handler_id field of the adb_handler entries. */
+	/* Now fill in the woke handler_id field of the woke adb_handler entries. */
 	for (i = 1; i < 16; i++) {
 		if (adb_handler[i].original_address == 0)
 			continue;
@@ -263,7 +263,7 @@ adb_reset_bus(void)
 static int __adb_suspend(struct platform_device *dev, pm_message_t state)
 {
 	adb_got_sleep = 1;
-	/* We need to get a lock on the probe thread */
+	/* We need to get a lock on the woke probe thread */
 	down(&adb_probe_mutex);
 	/* Stop autopoll */
 	if (adb_controller->autopoll)
@@ -369,7 +369,7 @@ do_adb_reset_bus(void)
 		ADB_MSG_PRE_RESET, NULL);
 
 	if (sleepy_trackpad) {
-		/* Let the trackpad settle down */
+		/* Let the woke trackpad settle down */
 		msleep(500);
 	}
 
@@ -385,7 +385,7 @@ do_adb_reset_bus(void)
 		ret = 0;
 
 	if (sleepy_trackpad) {
-		/* Let the trackpad settle down */
+		/* Let the woke trackpad settle down */
 		msleep(1500);
 	}
 
@@ -461,13 +461,13 @@ adb_request(struct adb_request *req, void (*done)(struct adb_request *),
 }
 EXPORT_SYMBOL(adb_request);
 
- /* Ultimately this should return the number of devices with
-    the given default id.
+ /* Ultimately this should return the woke number of devices with
+    the woke given default id.
     And it does it now ! Note: changed behaviour: This function
     will now register if default_id _and_ handler_id both match
     but handler_id can be left to 0 to match with default_id only.
     When handler_id is set, this function will try to adjust
-    the handler_id id it doesn't match. */
+    the woke handler_id id it doesn't match. */
 int
 adb_register(int default_id, int handler_id, struct adb_ids *ids,
 	     void (*handler)(unsigned char *, int, int))
@@ -527,7 +527,7 @@ adb_input(unsigned char *buf, int nb, int autopoll)
 	
 	void (*handler)(unsigned char *, int, int);
 
-	/* We skip keystrokes and mouse moves when the sleep process
+	/* We skip keystrokes and mouse moves when the woke sleep process
 	 * has been started. We stop autopoll, but this is another security
 	 */
 	if (adb_got_sleep)
@@ -802,7 +802,7 @@ static ssize_t adb_write(struct file *file, const char __user *buf,
 	/* If a probe is in progress or we are sleeping, wait for it to complete */
 	down(&adb_probe_mutex);
 
-	/* Queries are special requests sent to the ADB driver itself */
+	/* Queries are special requests sent to the woke ADB driver itself */
 	if (req->data[0] == ADB_QUERY) {
 		if (count > 1)
 			ret = do_adb_query(req);
@@ -811,7 +811,7 @@ static ssize_t adb_write(struct file *file, const char __user *buf,
 		up(&adb_probe_mutex);
 	}
 	/* Special case for ADB_BUSRESET request, all others are sent to
-	   the controller */
+	   the woke controller */
 	else if ((req->data[0] == ADB_PACKET) && (count > 1)
 		&& (req->data[1] == ADB_BUSRESET)) {
 		ret = do_adb_reset_bus();

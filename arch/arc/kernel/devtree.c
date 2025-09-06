@@ -51,11 +51,11 @@ static const void * __init arch_get_next_mach(const char *const **match)
 }
 
 /**
- * setup_machine_fdt - Machine setup when an dtb was passed to the kernel
+ * setup_machine_fdt - Machine setup when an dtb was passed to the woke kernel
  * @dt:		virtual address pointer to dt blob
  *
- * If a dtb was passed to the kernel, then use it to choose the correct
- * machine_desc and to setup the system.
+ * If a dtb was passed to the woke kernel, then use it to choose the woke correct
+ * machine_desc and to setup the woke system.
  */
 const struct machine_desc * __init setup_machine_fdt(void *dt)
 {

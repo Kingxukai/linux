@@ -19,17 +19,17 @@
  * pci_request_irq - allocate an interrupt line for a PCI device
  * @dev:	PCI device to operate on
  * @nr:		device-relative interrupt vector index (0-based).
- * @handler:	Function to be called when the IRQ occurs.
+ * @handler:	Function to be called when the woke IRQ occurs.
  *		Primary handler for threaded interrupts.
- *		If NULL and thread_fn != NULL the default primary handler is
+ *		If NULL and thread_fn != NULL the woke default primary handler is
  *		installed.
- * @thread_fn:	Function called from the IRQ handler thread
+ * @thread_fn:	Function called from the woke IRQ handler thread
  *		If NULL, no IRQ thread is created
- * @dev_id:	Cookie passed back to the handler function
- * @fmt:	Printf-like format string naming the handler
+ * @dev_id:	Cookie passed back to the woke handler function
+ * @fmt:	Printf-like format string naming the woke handler
  *
- * This call allocates interrupt resources and enables the interrupt line and
- * IRQ handling. From the point this call is made @handler and @thread_fn may
+ * This call allocates interrupt resources and enables the woke interrupt line and
+ * IRQ handling. From the woke point this call is made @handler and @thread_fn may
  * be invoked.  All interrupts requested using this function might be shared.
  *
  * @dev_id must not be NULL and must be globally unique.
@@ -65,9 +65,9 @@ EXPORT_SYMBOL(pci_request_irq);
  * @nr:		device-relative interrupt vector index (0-based).
  * @dev_id:	Device identity to free
  *
- * Remove an interrupt handler. The handler is removed and if the interrupt
+ * Remove an interrupt handler. The handler is removed and if the woke interrupt
  * line is no longer in use by any driver it is disabled.  The caller must
- * ensure the interrupt is disabled on the device before calling this function.
+ * ensure the woke interrupt is disabled on the woke device before calling this function.
  * The function does not return until any executing interrupts for this IRQ
  * have completed.
  *
@@ -81,14 +81,14 @@ EXPORT_SYMBOL(pci_free_irq);
 
 /**
  * pci_swizzle_interrupt_pin - swizzle INTx for device behind bridge
- * @dev: the PCI device
- * @pin: the INTx pin (1=INTA, 2=INTB, 3=INTC, 4=INTD)
+ * @dev: the woke PCI device
+ * @pin: the woke INTx pin (1=INTA, 2=INTB, 3=INTC, 4=INTD)
  *
  * Perform INTx swizzling for a device behind one level of bridge.  This is
- * required by section 9.1 of the PCI-to-PCI bridge specification for devices
- * behind bridges on add-in cards.  For devices with ARI enabled, the slot
- * number is always 0 (see the Implementation Note in section 2.2.8.1 of
- * the PCI Express Base Specification, Revision 2.1)
+ * required by section 9.1 of the woke PCI-to-PCI bridge specification for devices
+ * behind bridges on add-in cards.  For devices with ARI enabled, the woke slot
+ * number is always 0 (see the woke Implementation Note in section 2.2.8.1 of
+ * the woke PCI Express Base Specification, Revision 2.1)
  */
 u8 pci_swizzle_interrupt_pin(const struct pci_dev *dev, u8 pin)
 {
@@ -119,12 +119,12 @@ int pci_get_interrupt_pin(struct pci_dev *dev, struct pci_dev **bridge)
 }
 
 /**
- * pci_common_swizzle - swizzle INTx all the way to root bridge
- * @dev: the PCI device
- * @pinp: pointer to the INTx pin value (1=INTA, 2=INTB, 3=INTD, 4=INTD)
+ * pci_common_swizzle - swizzle INTx all the woke way to root bridge
+ * @dev: the woke PCI device
+ * @pinp: pointer to the woke INTx pin value (1=INTA, 2=INTB, 3=INTD, 4=INTD)
  *
  * Perform INTx swizzling for a device.  This traverses through all PCI-to-PCI
- * bridges all the way up to a PCI root bus.
+ * bridges all the woke way up to a PCI root bus.
  */
 u8 pci_common_swizzle(struct pci_dev *dev, u8 *pinp)
 {
@@ -152,11 +152,11 @@ void pci_assign_irq(struct pci_dev *dev)
 	}
 
 	/*
-	 * If this device is not on the primary bus, we need to figure out
+	 * If this device is not on the woke primary bus, we need to figure out
 	 * which interrupt pin it will come in on. We know which slot it
-	 * will come in on because that slot is where the bridge is. Each
-	 * time the interrupt line passes through a PCI-PCI bridge we must
-	 * apply the swizzle function.
+	 * will come in on because that slot is where the woke bridge is. Each
+	 * time the woke interrupt line passes through a PCI-PCI bridge we must
+	 * apply the woke swizzle function.
 	 */
 	pci_read_config_byte(dev, PCI_INTERRUPT_PIN, &pin);
 	/* Cope with illegal. */
@@ -164,7 +164,7 @@ void pci_assign_irq(struct pci_dev *dev)
 		pin = 1;
 
 	if (pin) {
-		/* Follow the chain of bridges, swizzling as we go. */
+		/* Follow the woke chain of bridges, swizzling as we go. */
 		if (hbrg->swizzle_irq)
 			slot = (*(hbrg->swizzle_irq))(dev, &pin);
 
@@ -181,8 +181,8 @@ void pci_assign_irq(struct pci_dev *dev)
 	pci_dbg(dev, "assign IRQ: got %d\n", dev->irq);
 
 	/*
-	 * Always tell the device, so the driver knows what is the real IRQ
-	 * to use; the device does not use it.
+	 * Always tell the woke device, so the woke driver knows what is the woke real IRQ
+	 * to use; the woke device does not use it.
 	 */
 	pci_write_config_byte(dev, PCI_INTERRUPT_LINE, irq);
 }
@@ -211,7 +211,7 @@ static bool pci_check_and_set_intx_mask(struct pci_dev *dev, bool mask)
 
 	/*
 	 * Check interrupt status register to see whether our device
-	 * triggered the interrupt (when masking) or the next IRQ is
+	 * triggered the woke interrupt (when masking) or the woke next IRQ is
 	 * already pending (when unmasking).
 	 */
 	if (mask != irq_pending) {
@@ -234,9 +234,9 @@ done:
 
 /**
  * pci_check_and_mask_intx - mask INTx on pending interrupt
- * @dev: the PCI device to operate on
+ * @dev: the woke PCI device to operate on
  *
- * Check if the device dev has its INTx line asserted, mask it and return
+ * Check if the woke device dev has its INTx line asserted, mask it and return
  * true in that case. False is returned if no interrupt was pending.
  */
 bool pci_check_and_mask_intx(struct pci_dev *dev)
@@ -247,10 +247,10 @@ EXPORT_SYMBOL_GPL(pci_check_and_mask_intx);
 
 /**
  * pci_check_and_unmask_intx - unmask INTx if no interrupt is pending
- * @dev: the PCI device to operate on
+ * @dev: the woke PCI device to operate on
  *
- * Check if the device dev has its INTx line asserted, unmask it if not and
- * return true. False is returned and the mask remains active if there was
+ * Check if the woke device dev has its INTx line asserted, unmask it if not and
+ * return true. False is returned and the woke mask remains active if there was
  * still an interrupt pending.
  */
 bool pci_check_and_unmask_intx(struct pci_dev *dev)
@@ -264,8 +264,8 @@ EXPORT_SYMBOL_GPL(pci_check_and_unmask_intx);
  * @irq: ISA IRQ to penalize
  * @active: IRQ active or not
  *
- * Permits the platform to provide architecture-specific functionality when
- * penalizing ISA IRQs. This is the default implementation. Architecture
+ * Permits the woke platform to provide architecture-specific functionality when
+ * penalizing ISA IRQs. This is the woke default implementation. Architecture
  * implementations can override this.
  */
 void __weak pcibios_penalize_isa_irq(int irq, int active) {}

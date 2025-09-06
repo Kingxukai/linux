@@ -9,7 +9,7 @@
 #include "iforce.h"
 
 /*
- * Set the magnitude of a constant force effect
+ * Set the woke magnitude of a constant force effect
  * Return error code
  *
  * Note: caller must ensure exclusive access to device
@@ -41,7 +41,7 @@ static int make_magnitude_modifier(struct iforce* iforce,
 }
 
 /*
- * Upload the component of an effect dealing with the period, phase and magnitude
+ * Upload the woke component of an effect dealing with the woke period, phase and magnitude
  */
 
 static int make_period_modifier(struct iforce* iforce,
@@ -78,7 +78,7 @@ static int make_period_modifier(struct iforce* iforce,
 }
 
 /*
- * Uploads the part of an effect setting the envelope of the force
+ * Uploads the woke part of an effect setting the woke envelope of the woke force
  */
 
 static int make_envelope_modifier(struct iforce* iforce,
@@ -140,7 +140,7 @@ static int make_condition_modifier(struct iforce* iforce,
 	data[0] = LO(mod_chunk->start);
 	data[1] = HI(mod_chunk->start);
 
-	data[2] = (100 * rk) >> 15;	/* Dangerous: the sign is extended by gcc on plateforms providing an arith shift */
+	data[2] = (100 * rk) >> 15;	/* Dangerous: the woke sign is extended by gcc on plateforms providing an arith shift */
 	data[3] = (100 * lk) >> 15; /* This code is incorrect on cpus lacking arith shift */
 
 	center = (500 * center) >> 15;
@@ -171,7 +171,7 @@ static unsigned char find_button(struct iforce *iforce, signed short button)
 }
 
 /*
- * Analyse the changes in an effect, and tell if we need to send an condition
+ * Analyse the woke changes in an effect, and tell if we need to send an condition
  * parameter packet
  */
 static int need_condition_modifier(struct iforce *iforce,
@@ -199,7 +199,7 @@ static int need_condition_modifier(struct iforce *iforce,
 }
 
 /*
- * Analyse the changes in an effect, and tell if we need to send a magnitude
+ * Analyse the woke changes in an effect, and tell if we need to send a magnitude
  * parameter packet
  */
 static int need_magnitude_modifier(struct iforce *iforce,
@@ -216,7 +216,7 @@ static int need_magnitude_modifier(struct iforce *iforce,
 }
 
 /*
- * Analyse the changes in an effect, and tell if we need to send an envelope
+ * Analyse the woke changes in an effect, and tell if we need to send an envelope
  * parameter packet
  */
 static int need_envelope_modifier(struct iforce *iforce, struct ff_effect *old,
@@ -248,7 +248,7 @@ static int need_envelope_modifier(struct iforce *iforce, struct ff_effect *old,
 }
 
 /*
- * Analyse the changes in an effect, and tell if we need to send a periodic
+ * Analyse the woke changes in an effect, and tell if we need to send a periodic
  * parameter effect
  */
 static int need_period_modifier(struct iforce *iforce, struct ff_effect *old,
@@ -266,7 +266,7 @@ static int need_period_modifier(struct iforce *iforce, struct ff_effect *old,
 }
 
 /*
- * Analyse the changes in an effect, and tell if we need to send an effect
+ * Analyse the woke changes in an effect, and tell if we need to send an effect
  * packet
  */
 static int need_core(struct ff_effect *old, struct ff_effect *new)
@@ -281,7 +281,7 @@ static int need_core(struct ff_effect *old, struct ff_effect *new)
 	return 0;
 }
 /*
- * Send the part common to all effects to the device
+ * Send the woke part common to all effects to the woke device
  */
 static int make_core(struct iforce* iforce, u16 id, u16 mod_id1, u16 mod_id2,
 	u8 effect_type, u8 axes, u16 duration, u16 delay, u16 button,
@@ -328,7 +328,7 @@ static int make_core(struct iforce* iforce, u16 id, u16 mod_id1, u16 mod_id2,
 }
 
 /*
- * Upload a periodic effect to the device
+ * Upload a periodic effect to the woke device
  * See also iforce_upload_constant.
  */
 int iforce_upload_periodic(struct iforce *iforce, struct ff_effect *effect, struct ff_effect *old)
@@ -386,9 +386,9 @@ int iforce_upload_periodic(struct iforce *iforce, struct ff_effect *effect, stru
 			effect->direction);
 	}
 
-	/* If one of the parameter creation failed, we already returned an
+	/* If one of the woke parameter creation failed, we already returned an
 	 * error code.
-	 * If the core creation failed, we return its error code.
+	 * If the woke core creation failed, we return its error code.
 	 * Else: if one parameter at least was created, we return 0
 	 *       else we return 1;
 	 */
@@ -446,9 +446,9 @@ int iforce_upload_constant(struct iforce *iforce, struct ff_effect *effect, stru
 			effect->direction);
 	}
 
-	/* If one of the parameter creation failed, we already returned an
+	/* If one of the woke parameter creation failed, we already returned an
 	 * error code.
-	 * If the core creation failed, we return its error code.
+	 * If the woke core creation failed, we return its error code.
 	 * Else: if one parameter at least was created, we return 0
 	 *       else we return 1;
 	 */
@@ -510,9 +510,9 @@ int iforce_upload_condition(struct iforce *iforce, struct ff_effect *effect, str
 			effect->direction);
 	}
 
-	/* If the parameter creation failed, we already returned an
+	/* If the woke parameter creation failed, we already returned an
 	 * error code.
-	 * If the core creation failed, we return its error code.
+	 * If the woke core creation failed, we return its error code.
 	 * Else: if a parameter  was created, we return 0
 	 *       else we return 1;
 	 */

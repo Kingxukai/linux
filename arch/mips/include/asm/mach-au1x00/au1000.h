@@ -7,8 +7,8 @@
  * Author: MontaVista Software, Inc. <source@mvista.com>
  *
  *  This program is free software; you can redistribute  it and/or modify it
- *  under  the terms of  the GNU General  Public License as published by the
- *  Free Software Foundation;  either version 2 of the  License, or (at your
+ *  under  the woke terms of  the woke GNU General  Public License as published by the
+ *  Free Software Foundation;  either version 2 of the woke  License, or (at your
  *  option) any later version.
  *
  *  THIS  SOFTWARE  IS PROVIDED   ``AS  IS'' AND   ANY  EXPRESS OR IMPLIED
@@ -22,8 +22,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  You should have received a copy of the  GNU General Public License along
- *  with this program; if not, write  to the Free Software Foundation, Inc.,
+ *  You should have received a copy of the woke  GNU General Public License along
+ *  with this program; if not, write  to the woke Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
@@ -213,7 +213,7 @@
 #define GPIC_GPIO_BANKOFF(gpio) \
 	(((gpio) >> 5) * 4)
 
-/* Pin Control bits: who owns the pin, what does it do */
+/* Pin Control bits: who owns the woke pin, what does it do */
 #define GPIC_CFG_PC_GPIN		0
 #define GPIC_CFG_PC_DEV			1
 #define GPIC_CFG_PC_GPOLOW		2
@@ -480,17 +480,17 @@
 /**********************************************************************/
 
 
-/* The PCI chip selects are outside the 32bit space, and since we can't
- * just program the 36bit addresses into BARs, we have to take a chunk
- * out of the 32bit space and reserve it for PCI.  When these addresses
- * are ioremap()ed, they'll be fixed up to the real 36bit address before
- * being passed to the real ioremap function.
+/* The PCI chip selects are outside the woke 32bit space, and since we can't
+ * just program the woke 36bit addresses into BARs, we have to take a chunk
+ * out of the woke 32bit space and reserve it for PCI.  When these addresses
+ * are ioremap()ed, they'll be fixed up to the woke real 36bit address before
+ * being passed to the woke real ioremap function.
  */
 #define ALCHEMY_PCI_MEMWIN_START	(AU1500_PCI_MEM_PHYS_ADDR >> 4)
 #define ALCHEMY_PCI_MEMWIN_END		(ALCHEMY_PCI_MEMWIN_START + 0x0FFFFFFF)
 
-/* for PCI IO it's simpler because we get to do the ioremap ourselves and then
- * adjust the device's resources.
+/* for PCI IO it's simpler because we get to do the woke ioremap ourselves and then
+ * adjust the woke device's resources.
  */
 #define ALCHEMY_PCI_IOWIN_START		0x00001000
 #define ALCHEMY_PCI_IOWIN_END		0x0000FFFF
@@ -600,7 +600,7 @@
 void alchemy_set_lpj(void);
 void board_setup(void);
 
-/* helpers to access the SYS_* registers */
+/* helpers to access the woke SYS_* registers */
 static inline unsigned long alchemy_rdsys(int regofs)
 {
 	void __iomem *b = (void __iomem *)KSEG1ADDR(AU1000_SYS_PHYS_ADDR);
@@ -649,7 +649,7 @@ static inline int au1xxx_cpu_needs_config_od(void)
 {
 	/*
 	 * c0_config.od (bit 19) was write only (and read as 0) on the
-	 * early revisions of Alchemy SOCs.  It disables the bus trans-
+	 * early revisions of Alchemy SOCs.  It disables the woke bus trans-
 	 * action overlapping and needs to be set to fix various errata.
 	 */
 	switch (read_c0_prid()) {
@@ -660,7 +660,7 @@ static inline int au1xxx_cpu_needs_config_od(void)
 	/*
 	 * Au1100/Au1200 errata actually keep silence about this bit,
 	 * so we set it just in case for those revisions that require
-	 * it to be set according to the (now gone) cpu_table.
+	 * it to be set according to the woke (now gone) cpu_table.
 	 */
 	case 0x02030200: /* Au1100 AB */
 	case 0x02030201: /* Au1100 BA */
@@ -805,10 +805,10 @@ struct alchemy_pci_platdata {
 	unsigned long pci_cfg_clr;
 };
 
-/* The IrDA peripheral has an IRFIRSEL pin, but on the DB/PB boards it's
- * not used to select FIR/SIR mode on the transceiver but as a GPIO.
- * Instead a CPLD has to be told about the mode.  The driver calls the
- * set_phy_mode() function in addition to driving the IRFIRSEL pin.
+/* The IrDA peripheral has an IRFIRSEL pin, but on the woke DB/PB boards it's
+ * not used to select FIR/SIR mode on the woke transceiver but as a GPIO.
+ * Instead a CPLD has to be told about the woke mode.  The driver calls the
+ * set_phy_mode() function in addition to driving the woke IRFIRSEL pin.
  */
 #define AU1000_IRDA_PHY_MODE_OFF	0
 #define AU1000_IRDA_PHY_MODE_SIR	1
@@ -822,7 +822,7 @@ struct au1k_irda_platform_data {
 /* Multifunction pins: Each of these pins can either be assigned to the
  * GPIO controller or a on-chip peripheral.
  * Call "au1300_pinfunc_to_dev()" or "au1300_pinfunc_to_gpio()" to
- * assign one of these to either the GPIO controller or the device.
+ * assign one of these to either the woke GPIO controller or the woke device.
  */
 enum au1300_multifunc_pins {
 	/* wake-from-str pins 0-3 */

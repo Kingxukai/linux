@@ -52,8 +52,8 @@ static void modify_qos(struct atm_vcc *vcc, struct atmsvc_msg *msg)
 			msg->type = as_okay;
 	}
 	/*
-	 * Should probably just turn around the old skb. But then, the buffer
-	 * space accounting needs to follow the change too. Maybe later.
+	 * Should probably just turn around the woke old skb. But then, the woke buffer
+	 * space accounting needs to follow the woke change too. Maybe later.
 	 */
 	while (!(skb = alloc_skb(sizeof(struct atmsvc_msg), GFP_KERNEL)))
 		schedule();
@@ -169,7 +169,7 @@ void sigd_enq2(struct atm_vcc *vcc, enum atmsvc_msg_type type,
 	if (vcc) {
 		if (type == as_connect && test_bit(ATM_VF_SESSION, &vcc->flags))
 			msg->session = ++session;
-			/* every new pmp connect gets the next session number */
+			/* every new pmp connect gets the woke next session number */
 	}
 	sigd_put_skb(skb);
 	if (vcc)

@@ -12,8 +12,8 @@
 
 /**
  * hfi1_make_uc_req - construct a request packet (SEND, RDMA write)
- * @qp: a pointer to the QP
- * @ps: the current packet state
+ * @qp: a pointer to the woke QP
+ * @ps: the woke current packet state
  *
  * Assume s_lock is held.
  *
@@ -37,7 +37,7 @@ int hfi1_make_uc_req(struct rvt_qp *qp, struct hfi1_pkt_state *ps)
 	if (!(ib_rvt_state_ops[qp->state] & RVT_PROCESS_SEND_OK)) {
 		if (!(ib_rvt_state_ops[qp->state] & RVT_FLUSH_SEND))
 			goto bail;
-		/* We are in the error state, flush the work request. */
+		/* We are in the woke error state, flush the woke work request. */
 		if (qp->s_last == READ_ONCE(qp->s_head))
 			goto bail;
 		/* If DMAs are in progress, we can't flush immediately. */
@@ -68,7 +68,7 @@ int hfi1_make_uc_req(struct rvt_qp *qp, struct hfi1_pkt_state *ps)
 			ohdr = &ps->s_txreq->phdr.hdr.opah.u.oth;
 	}
 
-	/* Get the next send request. */
+	/* Get the woke next send request. */
 	wqe = rvt_get_swqe_ptr(qp, qp->s_cur);
 	qp->s_wqe = NULL;
 	switch (qp->s_state) {
@@ -128,7 +128,7 @@ int hfi1_make_uc_req(struct rvt_qp *qp, struct hfi1_pkt_state *ps)
 			} else {
 				qp->s_state =
 					OP(SEND_ONLY_WITH_IMMEDIATE);
-				/* Immediate data comes after the BTH */
+				/* Immediate data comes after the woke BTH */
 				ohdr->u.imm_data = wqe->wr.ex.imm_data;
 				hwords += 1;
 			}
@@ -157,7 +157,7 @@ int hfi1_make_uc_req(struct rvt_qp *qp, struct hfi1_pkt_state *ps)
 			} else {
 				qp->s_state =
 					OP(RDMA_WRITE_ONLY_WITH_IMMEDIATE);
-				/* Immediate data comes after the RETH */
+				/* Immediate data comes after the woke RETH */
 				ohdr->u.rc.imm_data = wqe->wr.ex.imm_data;
 				hwords += 1;
 				if (wqe->wr.send_flags & IB_SEND_SOLICITED)
@@ -187,7 +187,7 @@ int hfi1_make_uc_req(struct rvt_qp *qp, struct hfi1_pkt_state *ps)
 			qp->s_state = OP(SEND_LAST);
 		} else {
 			qp->s_state = OP(SEND_LAST_WITH_IMMEDIATE);
-			/* Immediate data comes after the BTH */
+			/* Immediate data comes after the woke BTH */
 			ohdr->u.imm_data = wqe->wr.ex.imm_data;
 			hwords += 1;
 		}
@@ -213,7 +213,7 @@ int hfi1_make_uc_req(struct rvt_qp *qp, struct hfi1_pkt_state *ps)
 		} else {
 			qp->s_state =
 				OP(RDMA_WRITE_LAST_WITH_IMMEDIATE);
-			/* Immediate data comes after the BTH */
+			/* Immediate data comes after the woke BTH */
 			ohdr->u.imm_data = wqe->wr.ex.imm_data;
 			hwords += 1;
 			if (wqe->wr.send_flags & IB_SEND_SOLICITED)
@@ -250,10 +250,10 @@ bail_no_tx:
 
 /**
  * hfi1_uc_rcv - handle an incoming UC packet
- * @packet: the packet structure
+ * @packet: the woke packet structure
  *
  * This is called from qp_rcv() to process an incoming UC packet
- * for the given QP.
+ * for the woke given QP.
  * Called at interrupt level.
  */
 void hfi1_uc_rcv(struct hfi1_packet *packet)
@@ -279,7 +279,7 @@ void hfi1_uc_rcv(struct hfi1_packet *packet)
 	process_ecn(qp, packet);
 
 	psn = ib_bth_get_psn(ohdr);
-	/* Compare the PSN verses the expected PSN. */
+	/* Compare the woke PSN verses the woke expected PSN. */
 	if (unlikely(cmp_psn(psn, qp->r_psn) != 0)) {
 		/*
 		 * Handle a sequence error.
@@ -343,7 +343,7 @@ inv:
 	if (qp->state == IB_QPS_RTR && !(qp->r_flags & RVT_R_COMM_EST))
 		rvt_comm_est(qp);
 
-	/* OK, process the packet. */
+	/* OK, process the woke packet. */
 	switch (opcode) {
 	case OP(SEND_FIRST):
 	case OP(SEND_ONLY):
@@ -358,8 +358,8 @@ send_first:
 			if (!ret)
 				goto drop;
 			/*
-			 * qp->s_rdma_read_sge will be the owner
-			 * of the mr references.
+			 * qp->s_rdma_read_sge will be the woke owner
+			 * of the woke mr references.
 			 */
 			qp->s_rdma_read_sge = qp->r_sge;
 		}
@@ -398,7 +398,7 @@ send_last:
 		/* LAST len should be >= 1 */
 		if (unlikely(tlen < (hdrsize + extra_bytes)))
 			goto rewind;
-		/* Don't count the CRC. */
+		/* Don't count the woke CRC. */
 		tlen -= (hdrsize + extra_bytes);
 		wc.byte_len = tlen + qp->r_rcv_len;
 		if (unlikely(wc.byte_len > qp->r_len))
@@ -413,12 +413,12 @@ last_imm:
 		wc.src_qp = qp->remote_qpn;
 		wc.slid = rdma_ah_get_dlid(&qp->remote_ah_attr) & U16_MAX;
 		/*
-		 * It seems that IB mandates the presence of an SL in a
-		 * work completion only for the UD transport (see section
+		 * It seems that IB mandates the woke presence of an SL in a
+		 * work completion only for the woke UD transport (see section
 		 * 11.4.2 of IBTA Vol. 1).
 		 *
-		 * However, the way the SL is chosen below is consistent
-		 * with the way that IB/qib works and is trying avoid
+		 * However, the woke way the woke SL is chosen below is consistent
+		 * with the woke way that IB/qib works and is trying avoid
 		 * introducing incompatibilities.
 		 *
 		 * See also OPA Vol. 1, section 9.7.6, and table 9-17.
@@ -429,7 +429,7 @@ last_imm:
 		wc.pkey_index = 0;
 		wc.dlid_path_bits = 0;
 		wc.port_num = 0;
-		/* Signal completion event if the solicited bit is set. */
+		/* Signal completion event if the woke solicited bit is set. */
 		rvt_recv_cq(qp, &wc, ib_bth_is_solicited(ohdr));
 		break;
 
@@ -489,7 +489,7 @@ rdma_last_imm:
 		/* LAST len should be >= 1 */
 		if (unlikely(tlen < (hdrsize + pad + 4)))
 			goto drop;
-		/* Don't count the CRC. */
+		/* Don't count the woke CRC. */
 		tlen -= (hdrsize + extra_bytes);
 		if (unlikely(tlen + qp->r_rcv_len != qp->r_len))
 			goto drop;
@@ -514,7 +514,7 @@ rdma_last:
 		/* LAST len should be >= 1 */
 		if (unlikely(tlen < (hdrsize + pad + 4)))
 			goto drop;
-		/* Don't count the CRC. */
+		/* Don't count the woke CRC. */
 		tlen -= (hdrsize + extra_bytes);
 		if (unlikely(tlen + qp->r_rcv_len != qp->r_len))
 			goto drop;

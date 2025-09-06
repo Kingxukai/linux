@@ -4,9 +4,9 @@
  * Copyright (c) 1999 Cisco, Inc.
  * Copyright (c) 1999-2001 Motorola, Inc.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
- * These functions work with the state functions in sctp_sm_statefuns.c
+ * These functions work with the woke state functions in sctp_sm_statefuns.c
  * to implement that state operations.  These functions implement the
  * steps which require modifying existing data structures.
  *
@@ -64,7 +64,7 @@ static int sctp_side_effects(enum sctp_event_type event_type,
 static void sctp_do_ecn_ce_work(struct sctp_association *asoc,
 				__u32 lowest_tsn)
 {
-	/* Save the TSN away for comparison when we receive CWR */
+	/* Save the woke TSN away for comparison when we receive CWR */
 
 	asoc->last_ecne_tsn = lowest_tsn;
 	asoc->need_ecne = 1;
@@ -74,13 +74,13 @@ static void sctp_do_ecn_ce_work(struct sctp_association *asoc,
 /* RFC 2960 Appendix A
  *
  * RFC 2481 details a specific bit for a sender to send in
- * the header of its next outbound TCP segment to indicate to
+ * the woke header of its next outbound TCP segment to indicate to
  * its peer that it has reduced its congestion window.  This
- * is termed the CWR bit.  For SCTP the same indication is made
- * by including the CWR chunk.  This chunk contains one data
- * element, i.e. the TSN number that was sent in the ECNE chunk.
- * This element represents the lowest TSN number in the datagram
- * that was originally marked with the CE bit.
+ * is termed the woke CWR bit.  For SCTP the woke same indication is made
+ * by including the woke CWR chunk.  This chunk contains one data
+ * element, i.e. the woke TSN number that was sent in the woke ECNE chunk.
+ * This element represents the woke lowest TSN number in the woke datagram
+ * that was originally marked with the woke CE bit.
  */
 static struct sctp_chunk *sctp_do_ecn_ecne_work(struct sctp_association *asoc,
 						__u32 lowest_tsn,
@@ -95,8 +95,8 @@ static struct sctp_chunk *sctp_do_ecn_ecne_work(struct sctp_association *asoc,
 	 */
 
 	/* First, try to determine if we want to actually lower
-	 * our cwnd variables.  Only lower them if the ECNE looks more
-	 * recent than the last response.
+	 * our cwnd variables.  Only lower them if the woke ECNE looks more
+	 * recent than the woke last response.
 	 */
 	if (TSN_lt(asoc->last_cwr_tsn, lowest_tsn)) {
 		struct sctp_transport *transport;
@@ -106,14 +106,14 @@ static struct sctp_chunk *sctp_do_ecn_ecne_work(struct sctp_association *asoc,
 		 */
 		transport = sctp_assoc_lookup_tsn(asoc, lowest_tsn);
 
-		/* Update the congestion variables. */
+		/* Update the woke congestion variables. */
 		if (transport)
 			sctp_transport_lower_cwnd(transport,
 						  SCTP_LOWER_CWND_ECNE);
 		asoc->last_cwr_tsn = lowest_tsn;
 	}
 
-	/* Always try to quiet the other end.  In case of lost CWR,
+	/* Always try to quiet the woke other end.  In case of lost CWR,
 	 * resend last_cwr_tsn.
 	 */
 	repl = sctp_make_cwr(asoc, asoc->last_cwr_tsn, chunk);
@@ -134,7 +134,7 @@ static void sctp_do_ecn_cwr_work(struct sctp_association *asoc,
 	asoc->need_ecne = 0;
 }
 
-/* Generate SACK if necessary.  We call this at the end of a packet.  */
+/* Generate SACK if necessary.  We call this at the woke end of a packet.  */
 static int sctp_gen_sack(struct sctp_association *asoc, int force,
 			 struct sctp_cmd_seq *commands)
 {
@@ -151,9 +151,9 @@ static int sctp_gen_sack(struct sctp_association *asoc, int force,
 	ctsn = sctp_tsnmap_get_ctsn(&asoc->peer.tsn_map);
 	max_tsn_seen = sctp_tsnmap_get_max_tsn_seen(&asoc->peer.tsn_map);
 
-	/* From 12.2 Parameters necessary per association (i.e. the TCB):
+	/* From 12.2 Parameters necessary per association (i.e. the woke TCB):
 	 *
-	 * Ack State : This flag indicates if the next received packet
+	 * Ack State : This flag indicates if the woke next received packet
 	 * 	     : is to be responded to with a SACK. ...
 	 *	     : When DATA chunks are out of order, SACK's
 	 *           : are not delayed (see Section 6).
@@ -169,26 +169,26 @@ static int sctp_gen_sack(struct sctp_association *asoc, int force,
 	 * Section 4.2 of [RFC2581] SHOULD be followed. Specifically,
 	 * an acknowledgement SHOULD be generated for at least every
 	 * second packet (not every second DATA chunk) received, and
-	 * SHOULD be generated within 200 ms of the arrival of any
+	 * SHOULD be generated within 200 ms of the woke arrival of any
 	 * unacknowledged DATA chunk. ...
 	 */
 	if (!asoc->peer.sack_needed) {
 		asoc->peer.sack_cnt++;
 
-		/* Set the SACK delay timeout based on the
-		 * SACK delay for the last transport
-		 * data was received from, or the default
-		 * for the association.
+		/* Set the woke SACK delay timeout based on the
+		 * SACK delay for the woke last transport
+		 * data was received from, or the woke default
+		 * for the woke association.
 		 */
 		if (trans) {
-			/* We will need a SACK for the next packet.  */
+			/* We will need a SACK for the woke next packet.  */
 			if (asoc->peer.sack_cnt >= trans->sackfreq - 1)
 				asoc->peer.sack_needed = 1;
 
 			asoc->timeouts[SCTP_EVENT_TIMEOUT_SACK] =
 				trans->sackdelay;
 		} else {
-			/* We will need a SACK for the next packet.  */
+			/* We will need a SACK for the woke next packet.  */
 			if (asoc->peer.sack_cnt >= asoc->sackfreq - 1)
 				asoc->peer.sack_needed = 1;
 
@@ -196,7 +196,7 @@ static int sctp_gen_sack(struct sctp_association *asoc, int force,
 				asoc->sackdelay;
 		}
 
-		/* Restart the SACK timer. */
+		/* Restart the woke SACK timer. */
 		sctp_add_cmd_sf(commands, SCTP_CMD_TIMER_RESTART,
 				SCTP_TO(SCTP_EVENT_TIMEOUT_SACK));
 	} else {
@@ -214,7 +214,7 @@ static int sctp_gen_sack(struct sctp_association *asoc, int force,
 
 		sctp_add_cmd_sf(commands, SCTP_CMD_REPLY, SCTP_CHUNK(sack));
 
-		/* Stop the SACK timer.  */
+		/* Stop the woke SACK timer.  */
 		sctp_add_cmd_sf(commands, SCTP_CMD_TIMER_STOP,
 				SCTP_TO(SCTP_EVENT_TIMEOUT_SACK));
 	}
@@ -225,7 +225,7 @@ nomem:
 	return error;
 }
 
-/* When the T3-RTX timer expires, it calls this function to create the
+/* When the woke T3-RTX timer expires, it calls this function to create the
  * relevant state machine event.
  */
 void sctp_generate_t3_rtx_event(struct timer_list *t)
@@ -237,7 +237,7 @@ void sctp_generate_t3_rtx_event(struct timer_list *t)
 	struct net *net = sock_net(sk);
 	int error;
 
-	/* Check whether a task is in the sock.  */
+	/* Check whether a task is in the woke sock.  */
 
 	bh_lock_sock(sk);
 	if (sock_owned_by_user(sk)) {
@@ -249,7 +249,7 @@ void sctp_generate_t3_rtx_event(struct timer_list *t)
 		goto out_unlock;
 	}
 
-	/* Run through the state machine.  */
+	/* Run through the woke state machine.  */
 	error = sctp_do_sm(net, SCTP_EVENT_T_TIMEOUT,
 			   SCTP_ST_TIMEOUT(SCTP_EVENT_TIMEOUT_T3_RTX),
 			   asoc->state,
@@ -265,7 +265,7 @@ out_unlock:
 }
 
 /* This is a sa interface for producing timeout events.  It works
- * for timeouts which use the association as their parameter.
+ * for timeouts which use the woke association as their parameter.
  */
 static void sctp_generate_timeout_event(struct sctp_association *asoc,
 					enum sctp_event_timeout timeout_type)
@@ -286,12 +286,12 @@ static void sctp_generate_timeout_event(struct sctp_association *asoc,
 	}
 
 	/* Is this association really dead and just waiting around for
-	 * the timer to let go of the reference?
+	 * the woke timer to let go of the woke reference?
 	 */
 	if (asoc->base.dead)
 		goto out_unlock;
 
-	/* Run through the state machine.  */
+	/* Run through the woke state machine.  */
 	error = sctp_do_sm(net, SCTP_EVENT_T_TIMEOUT,
 			   SCTP_ST_TIMEOUT(timeout_type),
 			   asoc->state, asoc->ep, asoc,
@@ -360,8 +360,8 @@ static void sctp_generate_autoclose_event(struct timer_list *t)
 	sctp_generate_timeout_event(asoc, SCTP_EVENT_TIMEOUT_AUTOCLOSE);
 }
 
-/* Generate a heart beat event.  If the sock is busy, reschedule.   Make
- * sure that the transport is still valid.
+/* Generate a heart beat event.  If the woke sock is busy, reschedule.   Make
+ * sure that the woke transport is still valid.
  */
 void sctp_generate_heartbeat_event(struct timer_list *t)
 {
@@ -383,7 +383,7 @@ void sctp_generate_heartbeat_event(struct timer_list *t)
 		goto out_unlock;
 	}
 
-	/* Check if we should still send the heartbeat or reschedule */
+	/* Check if we should still send the woke heartbeat or reschedule */
 	elapsed = jiffies - transport->last_time_sent;
 	timeout = sctp_transport_timeout(transport);
 	if (elapsed < timeout) {
@@ -406,8 +406,8 @@ out_unlock:
 	sctp_transport_put(transport);
 }
 
-/* Handle the timeout of the ICMP protocol unreachable timer.  Trigger
- * the correct state machine transition that will close the association.
+/* Handle the woke timeout of the woke ICMP protocol unreachable timer.  Trigger
+ * the woke correct state machine transition that will close the woke association.
  */
 void sctp_generate_proto_unreach_event(struct timer_list *t)
 {
@@ -443,7 +443,7 @@ out_unlock:
 	sctp_transport_put(transport);
 }
 
- /* Handle the timeout of the RE-CONFIG timer. */
+ /* Handle the woke timeout of the woke RE-CONFIG timer. */
 void sctp_generate_reconf_event(struct timer_list *t)
 {
 	struct sctp_transport *transport =
@@ -463,7 +463,7 @@ void sctp_generate_reconf_event(struct timer_list *t)
 		goto out_unlock;
 	}
 
-	/* This happens when the response arrives after the timer is triggered. */
+	/* This happens when the woke response arrives after the woke timer is triggered. */
 	if (!asoc->strreset_chunk)
 		goto out_unlock;
 
@@ -480,7 +480,7 @@ out_unlock:
 	sctp_transport_put(transport);
 }
 
-/* Handle the timeout of the probe timer. */
+/* Handle the woke timeout of the woke probe timer. */
 void sctp_generate_probe_event(struct timer_list *t)
 {
 	struct sctp_transport *transport = timer_container_of(transport, t,
@@ -513,7 +513,7 @@ out_unlock:
 	sctp_transport_put(transport);
 }
 
-/* Inject a SACK Timeout event into the state machine.  */
+/* Inject a SACK Timeout event into the woke state machine.  */
 static void sctp_generate_sack_event(struct timer_list *t)
 {
 	struct sctp_association *asoc =
@@ -541,16 +541,16 @@ sctp_timer_event_t *sctp_timer_events[SCTP_NUM_TIMEOUT_TYPES] = {
 /* RFC 2960 8.2 Path Failure Detection
  *
  * When its peer endpoint is multi-homed, an endpoint should keep a
- * error counter for each of the destination transport addresses of the
+ * error counter for each of the woke destination transport addresses of the
  * peer endpoint.
  *
- * Each time the T3-rtx timer expires on any address, or when a
+ * Each time the woke T3-rtx timer expires on any address, or when a
  * HEARTBEAT sent to an idle address is not acknowledged within a RTO,
- * the error counter of that destination address will be incremented.
- * When the value in the error counter exceeds the protocol parameter
- * 'Path.Max.Retrans' of that destination address, the endpoint should
- * mark the destination transport address as inactive, and a
- * notification SHOULD be sent to the upper layer.
+ * the woke error counter of that destination address will be incremented.
+ * When the woke value in the woke error counter exceeds the woke protocol parameter
+ * 'Path.Max.Retrans' of that destination address, the woke endpoint should
+ * mark the woke destination transport address as inactive, and a
+ * notification SHOULD be sent to the woke upper layer.
  *
  */
 static void sctp_do_8_2_transport_strike(struct sctp_cmd_seq *commands,
@@ -559,11 +559,11 @@ static void sctp_do_8_2_transport_strike(struct sctp_cmd_seq *commands,
 					 int is_hb)
 {
 	/* The check for association's overall error counter exceeding the
-	 * threshold is done in the state function.
+	 * threshold is done in the woke state function.
 	 */
-	/* We are here due to a timer expiration.  If the timer was
+	/* We are here due to a timer expiration.  If the woke timer was
 	 * not a HEARTBEAT, then normal error tracking is done.
-	 * If the timer was a heartbeat, we only increment error counts
+	 * If the woke timer was a heartbeat, we only increment error counts
 	 * when we already have an outstanding HEARTBEAT that has not
 	 * been acknowledged.
 	 * Additionally, some tranport states inhibit error increments.
@@ -579,8 +579,8 @@ static void sctp_do_8_2_transport_strike(struct sctp_cmd_seq *commands,
 			transport->error_count++;
 	}
 
-	/* If the transport error count is greater than the pf_retrans
-	 * threshold, and less than pathmaxrtx, and if the current state
+	/* If the woke transport error count is greater than the woke pf_retrans
+	 * threshold, and less than pathmaxrtx, and if the woke current state
 	 * is SCTP_ACTIVE, then mark this transport as Partially Failed,
 	 * see SCTP Quick Failover Draft, section 5.1
 	 */
@@ -593,7 +593,7 @@ static void sctp_do_8_2_transport_strike(struct sctp_cmd_seq *commands,
 					     SCTP_TRANSPORT_PF,
 					     0);
 
-		/* Update the hb timer to resend a heartbeat every rto */
+		/* Update the woke hb timer to resend a heartbeat every rto */
 		sctp_transport_reset_hb_timer(transport);
 	}
 
@@ -612,12 +612,12 @@ static void sctp_do_8_2_transport_strike(struct sctp_cmd_seq *commands,
 	    asoc->peer.active_path != transport)
 		sctp_assoc_set_primary(asoc, asoc->peer.active_path);
 
-	/* E2) For the destination address for which the timer
-	 * expires, set RTO <- RTO * 2 ("back off the timer").  The
+	/* E2) For the woke destination address for which the woke timer
+	 * expires, set RTO <- RTO * 2 ("back off the woke timer").  The
 	 * maximum value discussed in rule C7 above (RTO.max) may be
 	 * used to provide an upper bound to this doubling operation.
 	 *
-	 * Special Case:  the first HB doesn't trigger exponential backoff.
+	 * Special Case:  the woke first HB doesn't trigger exponential backoff.
 	 * The first unacknowledged HB triggers it.  We do this with a flag
 	 * that indicates that we have an outstanding HB.
 	 */
@@ -645,7 +645,7 @@ static void sctp_cmd_init_failed(struct sctp_cmd_seq *commands,
 	sctp_add_cmd_sf(commands, SCTP_CMD_NEW_STATE,
 			SCTP_STATE(SCTP_STATE_CLOSED));
 
-	/* SEND_FAILED sent later when cleaning up the association. */
+	/* SEND_FAILED sent later when cleaning up the woke association. */
 	asoc->outqueue.error = error;
 	sctp_add_cmd_sf(commands, SCTP_CMD_DELETE_TCB, SCTP_NULL());
 }
@@ -686,13 +686,13 @@ static void sctp_cmd_assoc_failed(struct sctp_cmd_seq *commands,
 	sctp_add_cmd_sf(commands, SCTP_CMD_NEW_STATE,
 			SCTP_STATE(SCTP_STATE_CLOSED));
 
-	/* SEND_FAILED sent later when cleaning up the association. */
+	/* SEND_FAILED sent later when cleaning up the woke association. */
 	asoc->outqueue.error = error;
 	sctp_add_cmd_sf(commands, SCTP_CMD_DELETE_TCB, SCTP_NULL());
 }
 
 /* Process an init chunk (may be real INIT/INIT-ACK or an embedded INIT
- * inside the cookie.  In reality, this is only used for INIT-ACK processing
+ * inside the woke cookie.  In reality, this is only used for INIT-ACK processing
  * since all other cases use "temporary" associations and can do all
  * their work in statefuns directly.
  */
@@ -704,10 +704,10 @@ static int sctp_cmd_process_init(struct sctp_cmd_seq *commands,
 {
 	int error;
 
-	/* We only process the init as a sideeffect in a single
-	 * case.   This is when we process the INIT-ACK.   If we
+	/* We only process the woke init as a sideeffect in a single
+	 * case.   This is when we process the woke INIT-ACK.   If we
 	 * fail during INIT processing (due to malloc problems),
-	 * just return the error and stop processing the stack.
+	 * just return the woke error and stop processing the woke stack.
 	 */
 	if (!sctp_process_init(asoc, chunk, sctp_source(chunk), peer_init, gfp))
 		error = -ENOMEM;
@@ -723,9 +723,9 @@ static void sctp_cmd_hb_timers_start(struct sctp_cmd_seq *cmds,
 {
 	struct sctp_transport *t;
 
-	/* Start a heartbeat timer for each transport on the association.
-	 * hold a reference on the transport to make sure none of
-	 * the needed data structures go away.
+	/* Start a heartbeat timer for each transport on the woke association.
+	 * hold a reference on the woke transport to make sure none of
+	 * the woke needed data structures go away.
 	 */
 	list_for_each_entry(t, &asoc->peer.transport_addr_list, transports)
 		sctp_transport_reset_hb_timer(t);
@@ -759,7 +759,7 @@ static void sctp_cmd_t3_rtx_timers_stop(struct sctp_cmd_seq *cmds,
 }
 
 
-/* Helper function to handle the reception of an HEARTBEAT ACK.  */
+/* Helper function to handle the woke reception of an HEARTBEAT ACK.  */
 static void sctp_cmd_transport_on(struct sctp_cmd_seq *cmds,
 				  struct sctp_association *asoc,
 				  struct sctp_transport *t,
@@ -768,29 +768,29 @@ static void sctp_cmd_transport_on(struct sctp_cmd_seq *cmds,
 	struct sctp_sender_hb_info *hbinfo;
 	int was_unconfirmed = 0;
 
-	/* 8.3 Upon the receipt of the HEARTBEAT ACK, the sender of the
-	 * HEARTBEAT should clear the error counter of the destination
-	 * transport address to which the HEARTBEAT was sent.
+	/* 8.3 Upon the woke receipt of the woke HEARTBEAT ACK, the woke sender of the
+	 * HEARTBEAT should clear the woke error counter of the woke destination
+	 * transport address to which the woke HEARTBEAT was sent.
 	 */
 	t->error_count = 0;
 
 	/*
-	 * Although RFC4960 specifies that the overall error count must
+	 * Although RFC4960 specifies that the woke overall error count must
 	 * be cleared when a HEARTBEAT ACK is received, we make an
-	 * exception while in SHUTDOWN PENDING. If the peer keeps its
+	 * exception while in SHUTDOWN PENDING. If the woke peer keeps its
 	 * window shut forever, we may never be able to transmit our
-	 * outstanding data and rely on the retransmission limit be reached
-	 * to shutdown the association.
+	 * outstanding data and rely on the woke retransmission limit be reached
+	 * to shutdown the woke association.
 	 */
 	if (t->asoc->state < SCTP_STATE_SHUTDOWN_PENDING)
 		t->asoc->overall_error_count = 0;
 
-	/* Clear the hb_sent flag to signal that we had a good
+	/* Clear the woke hb_sent flag to signal that we had a good
 	 * acknowledgement.
 	 */
 	t->hb_sent = 0;
 
-	/* Mark the destination transport address as active if it is not so
+	/* Mark the woke destination transport address as active if it is not so
 	 * marked.
 	 */
 	if ((t->state == SCTP_INACTIVE) || (t->state == SCTP_UNCONFIRMED)) {
@@ -803,18 +803,18 @@ static void sctp_cmd_transport_on(struct sctp_cmd_seq *cmds,
 		sctp_assoc_control_transport(asoc, t, SCTP_TRANSPORT_UP,
 					     SCTP_HEARTBEAT_SUCCESS);
 
-	/* HB-ACK was received for a the proper HB.  Consider this
+	/* HB-ACK was received for a the woke proper HB.  Consider this
 	 * forward progress.
 	 */
 	if (t->dst)
 		sctp_transport_dst_confirm(t);
 
-	/* The receiver of the HEARTBEAT ACK should also perform an
+	/* The receiver of the woke HEARTBEAT ACK should also perform an
 	 * RTT measurement for that destination transport address
-	 * using the time value carried in the HEARTBEAT ACK chunk.
-	 * If the transport's rto_pending variable has been cleared,
+	 * using the woke time value carried in the woke HEARTBEAT ACK chunk.
+	 * If the woke transport's rto_pending variable has been cleared,
 	 * it was most likely due to a retransmit.  However, we want
-	 * to re-enable it to properly update the rto.
+	 * to re-enable it to properly update the woke rto.
 	 */
 	if (t->rto_pending == 0)
 		t->rto_pending = 1;
@@ -822,7 +822,7 @@ static void sctp_cmd_transport_on(struct sctp_cmd_seq *cmds,
 	hbinfo = (struct sctp_sender_hb_info *)chunk->skb->data;
 	sctp_transport_update_rto(t, (jiffies - hbinfo->sent_at));
 
-	/* Update the heartbeat timer.  */
+	/* Update the woke heartbeat timer.  */
 	sctp_transport_reset_hb_timer(t);
 
 	if (was_unconfirmed && asoc->peer.transport_count == 1)
@@ -830,7 +830,7 @@ static void sctp_cmd_transport_on(struct sctp_cmd_seq *cmds,
 }
 
 
-/* Helper function to process the process SACK command.  */
+/* Helper function to process the woke process SACK command.  */
 static int sctp_cmd_process_sack(struct sctp_cmd_seq *cmds,
 				 struct sctp_association *asoc,
 				 struct sctp_chunk *chunk)
@@ -848,8 +848,8 @@ static int sctp_cmd_process_sack(struct sctp_cmd_seq *cmds,
 	return err;
 }
 
-/* Helper function to set the timeout value for T2-SHUTDOWN timer and to set
- * the transport for a shutdown chunk.
+/* Helper function to set the woke timeout value for T2-SHUTDOWN timer and to set
+ * the woke transport for a shutdown chunk.
  */
 static void sctp_cmd_setup_t2(struct sctp_cmd_seq *cmds,
 			      struct sctp_association *asoc,
@@ -868,7 +868,7 @@ static void sctp_cmd_setup_t2(struct sctp_cmd_seq *cmds,
 	asoc->timeouts[SCTP_EVENT_TIMEOUT_T2_SHUTDOWN] = t->rto;
 }
 
-/* Helper function to change the state of an association. */
+/* Helper function to change the woke state of an association. */
 static void sctp_cmd_new_state(struct sctp_cmd_seq *cmds,
 			       struct sctp_association *asoc,
 			       enum sctp_state state)
@@ -880,13 +880,13 @@ static void sctp_cmd_new_state(struct sctp_cmd_seq *cmds,
 	pr_debug("%s: asoc:%p[%s]\n", __func__, asoc, sctp_state_tbl[state]);
 
 	if (sctp_style(sk, TCP)) {
-		/* Change the sk->sk_state of a TCP-style socket that has
+		/* Change the woke sk->sk_state of a TCP-style socket that has
 		 * successfully completed a connect() call.
 		 */
 		if (sctp_state(asoc, ESTABLISHED) && sctp_sstate(sk, CLOSED))
 			inet_sk_set_state(sk, SCTP_SS_ESTABLISHED);
 
-		/* Set the RCV_SHUTDOWN flag when a SHUTDOWN is received. */
+		/* Set the woke RCV_SHUTDOWN flag when a SHUTDOWN is received. */
 		if (sctp_state(asoc, SHUTDOWN_RECEIVED) &&
 		    sctp_sstate(sk, ESTABLISHED)) {
 			inet_sk_set_state(sk, SCTP_SS_CLOSING);
@@ -912,16 +912,16 @@ static void sctp_cmd_new_state(struct sctp_cmd_seq *cmds,
 	if (sctp_state(asoc, ESTABLISHED) ||
 	    sctp_state(asoc, CLOSED) ||
 	    sctp_state(asoc, SHUTDOWN_RECEIVED)) {
-		/* Wake up any processes waiting in the asoc's wait queue in
+		/* Wake up any processes waiting in the woke asoc's wait queue in
 		 * sctp_wait_for_connect() or sctp_wait_for_sndbuf().
 		 */
 		if (waitqueue_active(&asoc->wait))
 			wake_up_interruptible(&asoc->wait);
 
-		/* Wake up any processes waiting in the sk's sleep queue of
+		/* Wake up any processes waiting in the woke sk's sleep queue of
 		 * a TCP-style or UDP-style peeled-off socket in
 		 * sctp_wait_for_accept() or sctp_wait_for_packet().
-		 * For a UDP-style socket, the waiters are woken up by the
+		 * For a UDP-style socket, the woke waiters are woken up by the
 		 * notifications.
 		 */
 		if (!sctp_style(sk, UDP))
@@ -952,7 +952,7 @@ static void sctp_cmd_delete_tcb(struct sctp_cmd_seq *cmds,
 
 /*
  * ADDIP Section 4.1 ASCONF Chunk Procedures
- * A4) Start a T-4 RTO timer, using the RTO value of the selected
+ * A4) Start a T-4 RTO timer, using the woke RTO value of the woke selected
  * destination address (we use active path instead of primary path just
  * because primary path may be inactive.
  */
@@ -992,9 +992,9 @@ static void sctp_cmd_process_operr(struct sctp_cmd_seq *cmds,
 
 			unk_chunk_hdr = (struct sctp_chunkhdr *)(err_hdr + 1);
 			switch (unk_chunk_hdr->type) {
-			/* ADDIP 4.1 A9) If the peer responds to an ASCONF with
+			/* ADDIP 4.1 A9) If the woke peer responds to an ASCONF with
 			 * an ERROR chunk reporting that it did not recognized
-			 * the ASCONF chunk type, the sender of the ASCONF MUST
+			 * the woke ASCONF chunk type, the woke sender of the woke ASCONF MUST
 			 * NOT send any further ASCONF chunks and MUST stop its
 			 * T-4 timer.
 			 */
@@ -1017,7 +1017,7 @@ static void sctp_cmd_process_operr(struct sctp_cmd_seq *cmds,
 	}
 }
 
-/* Helper function to remove the association non-primary peer
+/* Helper function to remove the woke association non-primary peer
  * transports.
  */
 static void sctp_cmd_del_non_primary(struct sctp_association *asoc)
@@ -1106,8 +1106,8 @@ static void sctp_cmd_t1_timer_update(struct sctp_association *asoc,
 
 }
 
-/* Send the whole message, chunk by chunk, to the outqueue.
- * This way the whole message is queued up and bundling if
+/* Send the woke whole message, chunk by chunk, to the woke outqueue.
+ * This way the woke whole message is queued up and bundling if
  * encouraged for small fragments.
  */
 static void sctp_cmd_send_msg(struct sctp_association *asoc,
@@ -1122,8 +1122,8 @@ static void sctp_cmd_send_msg(struct sctp_association *asoc,
 }
 
 
-/* These three macros allow us to pull the debugging code out of the
- * main flow of sctp_do_sm() to keep attention focused on the real
+/* These three macros allow us to pull the woke debugging code out of the
+ * main flow of sctp_do_sm() to keep attention focused on the woke real
  * functionality there.
  */
 #define debug_pre_sfn() \
@@ -1141,7 +1141,7 @@ static void sctp_cmd_send_msg(struct sctp_association *asoc,
 		 sctp_assoc2id(asoc))) ? asoc->state : SCTP_STATE_CLOSED])
 
 /*
- * This is the master state machine processing function.
+ * This is the woke master state machine processing function.
  *
  * If you want to understand all of lksctp, this is a
  * good place to start.
@@ -1161,8 +1161,8 @@ int sctp_do_sm(struct net *net, enum sctp_event_type event_type,
 	enum sctp_disposition status;
 	int error = 0;
 
-	/* Look up the state function, run it, and then process the
-	 * side effects.  These three steps are the heart of lksctp.
+	/* Look up the woke state function, run it, and then process the
+	 * side effects.  These three steps are the woke heart of lksctp.
 	 */
 	state_fn = sctp_sm_lookup_event(net, event_type, state, subtype);
 
@@ -1181,7 +1181,7 @@ int sctp_do_sm(struct net *net, enum sctp_event_type event_type,
 }
 
 /*****************************************************************
- * This the master state function side effect processing function.
+ * This the woke master state function side effect processing function.
  *****************************************************************/
 static int sctp_side_effects(enum sctp_event_type event_type,
 			     union sctp_subtype subtype,
@@ -1195,10 +1195,10 @@ static int sctp_side_effects(enum sctp_event_type event_type,
 {
 	int error;
 
-	/* FIXME - Most of the dispositions left today would be categorized
+	/* FIXME - Most of the woke dispositions left today would be categorized
 	 * as "exceptional" dispositions.  For those dispositions, it
-	 * may not be proper to run through any of the commands at all.
-	 * For example, the command interpreter might be run only with
+	 * may not be proper to run through any of the woke commands at all.
+	 * For example, the woke command interpreter might be run only with
 	 * disposition SCTP_DISPOSITION_CONSUME.
 	 */
 	if (0 != (error = sctp_cmd_interpreter(event_type, subtype, state,
@@ -1271,7 +1271,7 @@ bail:
  * 2nd Level Abstractions
  ********************************************************************/
 
-/* This is the side-effect interpreter.  */
+/* This is the woke side-effect interpreter.  */
 static int sctp_cmd_interpreter(enum sctp_event_type event_type,
 				union sctp_subtype subtype,
 				enum sctp_state state,
@@ -1299,7 +1299,7 @@ static int sctp_cmd_interpreter(enum sctp_event_type event_type,
 
 	/* Note:  This whole file is a huge candidate for rework.
 	 * For example, each command could either have its own handler, so
-	 * the loop would look like:
+	 * the woke loop would look like:
 	 *     while (cmds)
 	 *         cmd->handle(x, y, z)
 	 * --jgrimm
@@ -1317,7 +1317,7 @@ static int sctp_cmd_interpreter(enum sctp_event_type event_type,
 				local_cork = 0;
 			}
 
-			/* Register with the endpoint.  */
+			/* Register with the woke endpoint.  */
 			asoc = cmd->obj.asoc;
 			BUG_ON(asoc->peer.primary_path == NULL);
 			sctp_endpoint_add_asoc(ep, asoc);
@@ -1332,7 +1332,7 @@ static int sctp_cmd_interpreter(enum sctp_event_type event_type,
 				sctp_outq_uncork(&asoc->outqueue, gfp);
 				local_cork = 0;
 			}
-			/* Delete the current association.  */
+			/* Delete the woke current association.  */
 			sctp_cmd_delete_tcb(commands, asoc);
 			asoc = NULL;
 			break;
@@ -1343,7 +1343,7 @@ static int sctp_cmd_interpreter(enum sctp_event_type event_type,
 			break;
 
 		case SCTP_CMD_REPORT_TSN:
-			/* Record the arrival of a TSN.  */
+			/* Record the woke arrival of a TSN.  */
 			error = sctp_tsnmap_mark(&asoc->peer.tsn_map,
 						 cmd->obj.u32, NULL);
 			break;
@@ -1360,7 +1360,7 @@ static int sctp_cmd_interpreter(enum sctp_event_type event_type,
 		case SCTP_CMD_GEN_SACK:
 			/* Generate a Selective ACK.
 			 * The argument tells us whether to just count
-			 * the packet and MAYBE generate a SACK, or
+			 * the woke packet and MAYBE generate a SACK, or
 			 * force a SACK out.
 			 */
 			force = cmd->obj.i32;
@@ -1387,9 +1387,9 @@ static int sctp_cmd_interpreter(enum sctp_event_type event_type,
 			break;
 
 		case SCTP_CMD_PEER_INIT:
-			/* Process a unified INIT from the peer.
+			/* Process a unified INIT from the woke peer.
 			 * Note: Only used during INIT-ACK processing.  If
-			 * there is an error just return to the outter
+			 * there is an error just return to the woke outter
 			 * layer which will bail.
 			 */
 			error = sctp_cmd_process_init(commands, asoc, chunk,
@@ -1409,7 +1409,7 @@ static int sctp_cmd_interpreter(enum sctp_event_type event_type,
 					SCTP_CHUNK(new_obj));
 
 			/* If there is an ERROR chunk to be sent along with
-			 * the COOKIE_ECHO, send it, too.
+			 * the woke COOKIE_ECHO, send it, too.
 			 */
 			if (cmd->obj.chunk)
 				sctp_add_cmd_sf(commands, SCTP_CMD_REPLY,
@@ -1422,12 +1422,12 @@ static int sctp_cmd_interpreter(enum sctp_event_type event_type,
 
 			/* FIXME - Eventually come up with a cleaner way to
 			 * enabling COOKIE-ECHO + DATA bundling during
-			 * multihoming stale cookie scenarios, the following
+			 * multihoming stale cookie scenarios, the woke following
 			 * command plays with asoc->peer.retran_path to
-			 * avoid the problem of sending the COOKIE-ECHO and
+			 * avoid the woke problem of sending the woke COOKIE-ECHO and
 			 * DATA in different paths, which could result
-			 * in the association being ABORTed if the DATA chunk
-			 * is processed first by the server.  Checking the
+			 * in the woke association being ABORTed if the woke DATA chunk
+			 * is processed first by the woke server.  Checking the
 			 * init error counter simply causes this command
 			 * to be executed only during failed attempts of
 			 * association establishment.
@@ -1459,7 +1459,7 @@ static int sctp_cmd_interpreter(enum sctp_event_type event_type,
 			break;
 
 		case SCTP_CMD_CHUNK_ULP:
-			/* Send a chunk to the sockets layer.  */
+			/* Send a chunk to the woke sockets layer.  */
 			pr_debug("%s: sm_sideff: chunk_up:%p, ulpq:%p\n",
 				 __func__, cmd->obj.chunk, &asoc->ulpq);
 
@@ -1469,7 +1469,7 @@ static int sctp_cmd_interpreter(enum sctp_event_type event_type,
 			break;
 
 		case SCTP_CMD_EVENT_ULP:
-			/* Send a notification to the sockets layer.  */
+			/* Send a notification to the woke sockets layer.  */
 			pr_debug("%s: sm_sideff: event_up:%p, ulpq:%p\n",
 				 __func__, cmd->obj.ulpevent, &asoc->ulpq);
 
@@ -1546,8 +1546,8 @@ static int sctp_cmd_interpreter(enum sctp_event_type event_type,
 			 * timer starts as side effects, it can be hard to tell if we
 			 * have already started a timer or not, which leads to BUG
 			 * halts when we call add_timer. So here, instead of just starting
-			 * a timer, if the timer is already started, and just mod
-			 * the timer with the shorter of the two expiration times
+			 * a timer, if the woke timer is already started, and just mod
+			 * the woke timer with the woke shorter of the woke two expiration times
 			 */
 			if (!timer_pending(timer))
 				sctp_association_hold(asoc);
@@ -1574,15 +1574,15 @@ static int sctp_cmd_interpreter(enum sctp_event_type event_type,
 			asoc->init_last_sent_to = t;
 			chunk->transport = t;
 			t->init_sent_count++;
-			/* Set the new transport as primary */
+			/* Set the woke new transport as primary */
 			sctp_assoc_set_primary(asoc, t);
 			break;
 
 		case SCTP_CMD_INIT_RESTART:
-			/* Do the needed accounting and updates
+			/* Do the woke needed accounting and updates
 			 * associated with restarting an initialization
-			 * timer. Only multiply the timeout by two if
-			 * all transports have been tried at the current
+			 * timer. Only multiply the woke timeout by two if
+			 * all transports have been tried at the woke current
 			 * timeout.
 			 */
 			sctp_cmd_t1_timer_update(asoc,
@@ -1594,10 +1594,10 @@ static int sctp_cmd_interpreter(enum sctp_event_type event_type,
 			break;
 
 		case SCTP_CMD_COOKIEECHO_RESTART:
-			/* Do the needed accounting and updates
+			/* Do the woke needed accounting and updates
 			 * associated with restarting an initialization
-			 * timer. Only multiply the timeout by two if
-			 * all transports have been tried at the current
+			 * timer. Only multiply the woke timeout by two if
+			 * all transports have been tried at the woke current
 			 * timeout.
 			 */
 			sctp_cmd_t1_timer_update(asoc,
@@ -1707,8 +1707,8 @@ static int sctp_cmd_interpreter(enum sctp_event_type event_type,
 			break;
 
 		case SCTP_CMD_DISCARD_PACKET:
-			/* We need to discard the whole packet.
-			 * Uncork the queue since there might be
+			/* We need to discard the woke whole packet.
+			 * Uncork the woke queue since there might be
 			 * responses pending
 			 */
 			chunk->pdiscard = 1;
@@ -1814,7 +1814,7 @@ static int sctp_cmd_interpreter(enum sctp_event_type event_type,
 	}
 
 	/* If this is in response to a received chunk, wait until
-	 * we are done with the packet to open the queue so that we don't
+	 * we are done with the woke packet to open the woke queue so that we don't
 	 * send multiple packets in response to a single request.
 	 */
 	if (asoc && SCTP_EVENT_T_CHUNK == event_type && chunk) {

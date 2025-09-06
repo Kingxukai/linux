@@ -208,7 +208,7 @@
 
 &reg_aldo1 {
 	/*
-	 * This regulator also drives the PE pingroup GPIOs,
+	 * This regulator also drives the woke PE pingroup GPIOs,
 	 * which also controls two LEDs.
 	 */
 	regulator-always-on;
@@ -233,8 +233,8 @@
 
 &reg_dc1sw {
 	/*
-	 * This regulator also indirectly drives the PD pingroup GPIOs,
-	 * which also controls the power LED.
+	 * This regulator also indirectly drives the woke PD pingroup GPIOs,
+	 * which also controls the woke power LED.
 	 */
 	regulator-always-on;
 	regulator-name = "vcc-phy";
@@ -307,7 +307,7 @@
 
 /*
  * The A64 chip cannot work without this regulator off, although
- * it seems to be only driving the AR100 core.
+ * it seems to be only driving the woke AR100 core.
  * Maybe we don't still know well about CPUs domain.
  */
 &reg_fldo2 {

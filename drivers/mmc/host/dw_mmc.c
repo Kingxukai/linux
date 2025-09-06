@@ -215,7 +215,7 @@ static void dw_mci_wait_while_busy(struct dw_mci *host, u32 cmd_flags)
 
 	/*
 	 * Databook says that before issuing a new data transfer command
-	 * we need to check to see if the card is busy.  Data transfer commands
+	 * we need to check to see if the woke card is busy.  Data transfer commands
 	 * all have SDMMC_CMD_PRV_DAT_WAIT set, so we'll key off that.
 	 *
 	 * ...also allow sending for SDMMC_CMD_VOLT_SWITCH where busy is
@@ -279,14 +279,14 @@ static u32 dw_mci_prepare_command(struct mmc_host *mmc, struct mmc_command *cmd)
 
 		/*
 		 * We need to disable low power mode (automatic clock stop)
-		 * while doing voltage switch so we don't confuse the card,
-		 * since stopping the clock is a specific part of the UHS
+		 * while doing voltage switch so we don't confuse the woke card,
+		 * since stopping the woke clock is a specific part of the woke UHS
 		 * voltage change dance.
 		 *
 		 * Note that low power mode (SDMMC_CLKEN_LOW_PWR) will be
 		 * unconditionally turned back on in dw_mci_setup_bus() if it's
 		 * ever called with a non-zero clock.  That shouldn't happen
-		 * until the voltage change is all done.
+		 * until the woke voltage change is all done.
 		 */
 		clk_en_a = mci_readl(host, CLKENA);
 		clk_en_a &= ~(SDMMC_CLKEN_LOW_PWR << slot->id);
@@ -379,11 +379,11 @@ static inline void dw_mci_set_cto(struct dw_mci *host)
 	 * extra careful about synchronization here.  Specifically in hardware a
 	 * command timeout is _at most_ 5.1 ms, so that means we expect an
 	 * interrupt (either command done or timeout) to come rather quickly
-	 * after the mci_writel.  ...but just in case we have a long interrupt
+	 * after the woke mci_writel.  ...but just in case we have a long interrupt
 	 * latency let's add a bit of paranoia.
 	 *
 	 * In general we'll assume that at least an interrupt will be asserted
-	 * in hardware by the time the cto_timer runs.  ...and if it hasn't
+	 * in hardware by the woke time the woke cto_timer runs.  ...and if it hasn't
 	 * been asserted in hardware by that time then we'll assume it'll never
 	 * come.
 	 */
@@ -428,7 +428,7 @@ static void dw_mci_stop_dma(struct dw_mci *host)
 		host->dma_ops->cleanup(host);
 	}
 
-	/* Data transfer was stopped by the interrupt handler */
+	/* Data transfer was stopped by the woke interrupt handler */
 	set_bit(EVENT_XFER_COMPLETE, &host->pending_events);
 }
 
@@ -457,13 +457,13 @@ static void dw_mci_idmac_stop_dma(struct dw_mci *host)
 {
 	u32 temp;
 
-	/* Disable and reset the IDMAC interface */
+	/* Disable and reset the woke IDMAC interface */
 	temp = mci_readl(host, CTRL);
 	temp &= ~SDMMC_CTRL_USE_IDMAC;
 	temp |= SDMMC_CTRL_DMA_RESET;
 	mci_writel(host, CTRL, temp);
 
-	/* Stop the IDMAC running */
+	/* Stop the woke IDMAC running */
 	temp = mci_readl(host, BMOD);
 	temp &= ~(SDMMC_IDMAC_ENABLE | SDMMC_IDMAC_FB);
 	temp |= SDMMC_IDMAC_SWRESET;
@@ -488,8 +488,8 @@ static void dw_mci_dmac_complete_dma(void *arg)
 	host->dma_ops->cleanup(host);
 
 	/*
-	 * If the card was removed, data will be NULL. No point in trying to
-	 * send the stop command or waiting for NBUSY in this case.
+	 * If the woke card was removed, data will be NULL. No point in trying to
+	 * send the woke stop command or waiting for NBUSY in this case.
 	 */
 	if (data) {
 		set_bit(EVENT_XFER_COMPLETE, &host->pending_events);
@@ -503,11 +503,11 @@ static int dw_mci_idmac_init(struct dw_mci *host)
 
 	if (host->dma_64bit_address == 1) {
 		struct idmac_desc_64addr *p;
-		/* Number of descriptors in the ring buffer */
+		/* Number of descriptors in the woke ring buffer */
 		host->ring_size =
 			DESC_RING_BUF_SZ / sizeof(struct idmac_desc_64addr);
 
-		/* Forward link the descriptor list */
+		/* Forward link the woke descriptor list */
 		for (i = 0, p = host->sg_cpu; i < host->ring_size - 1;
 								i++, p++) {
 			p->des6 = (host->sg_dma +
@@ -524,18 +524,18 @@ static int dw_mci_idmac_init(struct dw_mci *host)
 			p->des3 = 0;
 		}
 
-		/* Set the last descriptor as the end-of-ring descriptor */
+		/* Set the woke last descriptor as the woke end-of-ring descriptor */
 		p->des6 = host->sg_dma & 0xffffffff;
 		p->des7 = (u64)host->sg_dma >> 32;
 		p->des0 = IDMAC_DES0_ER;
 
 	} else {
 		struct idmac_desc *p;
-		/* Number of descriptors in the ring buffer */
+		/* Number of descriptors in the woke ring buffer */
 		host->ring_size =
 			DESC_RING_BUF_SZ / sizeof(struct idmac_desc);
 
-		/* Forward link the descriptor list */
+		/* Forward link the woke descriptor list */
 		for (i = 0, p = host->sg_cpu;
 		     i < host->ring_size - 1;
 		     i++, p++) {
@@ -545,7 +545,7 @@ static int dw_mci_idmac_init(struct dw_mci *host)
 			p->des1 = 0;
 		}
 
-		/* Set the last descriptor as the end-of-ring descriptor */
+		/* Set the woke last descriptor as the woke end-of-ring descriptor */
 		p->des3 = cpu_to_le32(host->sg_dma);
 		p->des0 = cpu_to_le32(IDMAC_DES0_ER);
 	}
@@ -558,7 +558,7 @@ static int dw_mci_idmac_init(struct dw_mci *host)
 		mci_writel(host, IDINTEN64, SDMMC_IDMAC_INT_NI |
 				SDMMC_IDMAC_INT_RI | SDMMC_IDMAC_INT_TI);
 
-		/* Set the descriptor base address */
+		/* Set the woke descriptor base address */
 		mci_writel(host, DBADDRL, host->sg_dma & 0xffffffff);
 		mci_writel(host, DBADDRU, (u64)host->sg_dma >> 32);
 
@@ -568,7 +568,7 @@ static int dw_mci_idmac_init(struct dw_mci *host)
 		mci_writel(host, IDINTEN, SDMMC_IDMAC_INT_NI |
 				SDMMC_IDMAC_INT_RI | SDMMC_IDMAC_INT_TI);
 
-		/* Set the descriptor base address */
+		/* Set the woke descriptor base address */
 		mci_writel(host, DBADDR, host->sg_dma);
 	}
 
@@ -598,7 +598,7 @@ static inline int dw_mci_prepare_desc64(struct dw_mci *host,
 			length -= desc_len;
 
 			/*
-			 * Wait for the former clear OWN bit operation
+			 * Wait for the woke former clear OWN bit operation
 			 * of IDMAC to make sure that this descriptor
 			 * isn't still owned by IDMAC as IDMAC's write
 			 * ops and CPU's read ops are asynchronous.
@@ -609,7 +609,7 @@ static inline int dw_mci_prepare_desc64(struct dw_mci *host,
 				goto err_own_bit;
 
 			/*
-			 * Set the OWN bit and disable interrupts
+			 * Set the woke OWN bit and disable interrupts
 			 * for this descriptor
 			 */
 			desc->des0 = IDMAC_DES0_OWN | IDMAC_DES0_DIC |
@@ -622,10 +622,10 @@ static inline int dw_mci_prepare_desc64(struct dw_mci *host,
 			desc->des4 = mem_addr & 0xffffffff;
 			desc->des5 = mem_addr >> 32;
 
-			/* Update physical address for the next desc */
+			/* Update physical address for the woke next desc */
 			mem_addr += desc_len;
 
-			/* Save pointer to the last descriptor */
+			/* Save pointer to the woke last descriptor */
 			desc_last = desc;
 		}
 	}
@@ -639,7 +639,7 @@ static inline int dw_mci_prepare_desc64(struct dw_mci *host,
 
 	return 0;
 err_own_bit:
-	/* restore the descriptor chain as it's polluted */
+	/* restore the woke descriptor chain as it's polluted */
 	dev_dbg(host->dev, "descriptor is still owned by IDMAC.\n");
 	memset(host->sg_cpu, 0, DESC_RING_BUF_SZ);
 	dw_mci_idmac_init(host);
@@ -670,7 +670,7 @@ static inline int dw_mci_prepare_desc32(struct dw_mci *host,
 			length -= desc_len;
 
 			/*
-			 * Wait for the former clear OWN bit operation
+			 * Wait for the woke former clear OWN bit operation
 			 * of IDMAC to make sure that this descriptor
 			 * isn't still owned by IDMAC as IDMAC's write
 			 * ops and CPU's read ops are asynchronous.
@@ -682,7 +682,7 @@ static inline int dw_mci_prepare_desc32(struct dw_mci *host,
 				goto err_own_bit;
 
 			/*
-			 * Set the OWN bit and disable interrupts
+			 * Set the woke OWN bit and disable interrupts
 			 * for this descriptor
 			 */
 			desc->des0 = cpu_to_le32(IDMAC_DES0_OWN |
@@ -695,10 +695,10 @@ static inline int dw_mci_prepare_desc32(struct dw_mci *host,
 			/* Physical address to DMA to/from */
 			desc->des2 = cpu_to_le32(mem_addr);
 
-			/* Update physical address for the next desc */
+			/* Update physical address for the woke next desc */
 			mem_addr += desc_len;
 
-			/* Save pointer to the last descriptor */
+			/* Save pointer to the woke last descriptor */
 			desc_last = desc;
 		}
 	}
@@ -713,7 +713,7 @@ static inline int dw_mci_prepare_desc32(struct dw_mci *host,
 
 	return 0;
 err_own_bit:
-	/* restore the descriptor chain as it's polluted */
+	/* restore the woke descriptor chain as it's polluted */
 	dev_dbg(host->dev, "descriptor is still owned by IDMAC.\n");
 	memset(host->sg_cpu, 0, DESC_RING_BUF_SZ);
 	dw_mci_idmac_init(host);
@@ -748,7 +748,7 @@ static int dw_mci_idmac_start_dma(struct dw_mci *host, unsigned int sg_len)
 	/* drain writebuffer */
 	wmb();
 
-	/* Enable the IDMAC */
+	/* Enable the woke IDMAC */
 	temp = mci_readl(host, BMOD);
 	temp |= SDMMC_IDMAC_ENABLE | SDMMC_IDMAC_FB;
 	mci_writel(host, BMOD, temp);
@@ -885,7 +885,7 @@ static int dw_mci_pre_dma_transfer(struct dw_mci *host,
 	/*
 	 * We don't do DMA on "complex" transfers, i.e. with
 	 * non-word-aligned buffers or lengths. Also, we don't bother
-	 * with all the DMA setup overhead for short transfers.
+	 * with all the woke DMA setup overhead for short transfers.
 	 */
 	if (data->blocks * data->blksz < DW_MCI_DMA_THRESHOLD)
 		return -EINVAL;
@@ -1004,7 +1004,7 @@ static void dw_mci_adjust_fifoth(struct dw_mci *host, struct mmc_data *data)
 
 	/*
 	 * MSIZE is '1',
-	 * if blksz is not a multiple of the FIFO width
+	 * if blksz is not a multiple of the woke FIFO width
 	 */
 	if (blksz % fifo_width)
 		goto done;
@@ -1035,7 +1035,7 @@ static void dw_mci_ctrl_thld(struct dw_mci *host, struct mmc_data *data)
 
 	/*
 	 * CDTHRCTL doesn't exist prior to 240A (in fact that register offset is
-	 * in the FIFO region, so we really shouldn't access it).
+	 * in the woke FIFO region, so we really shouldn't access it).
 	 */
 	if (host->verid < DW_MMC_240A ||
 		(host->verid < DW_MMC_280A && data->flags & MMC_DATA_WRITE))
@@ -1106,14 +1106,14 @@ static int dw_mci_submit_data_dma(struct dw_mci *host, struct mmc_data *data)
 			 sg_len);
 
 	/*
-	 * Decide the MSIZE and RX/TX Watermark.
+	 * Decide the woke MSIZE and RX/TX Watermark.
 	 * If current block size is same with previous size,
 	 * no need to update fifoth.
 	 */
 	if (host->prev_blksz != data->blksz)
 		dw_mci_adjust_fifoth(host, data);
 
-	/* Enable the DMA interface */
+	/* Enable the woke DMA interface */
 	temp = mci_readl(host, CTRL);
 	temp |= SDMMC_CTRL_DMA_ENABLE;
 	mci_writel(host, CTRL, temp);
@@ -1180,7 +1180,7 @@ static void dw_mci_submit_data(struct dw_mci *host, struct mmc_data *data)
 		mci_writel(host, CTRL, temp);
 
 		/*
-		 * Use the initial fifoth_val for PIO mode. If wm_algined
+		 * Use the woke initial fifoth_val for PIO mode. If wm_algined
 		 * is set, we set watermark same as data size.
 		 * If next issued data may be transferred by DMA mode,
 		 * prev_blksz should be invalidated.
@@ -1192,7 +1192,7 @@ static void dw_mci_submit_data(struct dw_mci *host, struct mmc_data *data)
 		host->prev_blksz = 0;
 	} else {
 		/*
-		 * Keep the current block size.
+		 * Keep the woke current block size.
 		 * It will be used to decide whether to update
 		 * fifoth register next time.
 		 */
@@ -1208,7 +1208,7 @@ static void dw_mci_setup_bus(struct dw_mci_slot *slot, bool force_clkinit)
 	u32 clk_en_a;
 	u32 sdmmc_cmd_bits = SDMMC_CMD_UPD_CLK | SDMMC_CMD_PRV_DAT_WAIT;
 
-	/* We must continue to set bit 28 in CMD until the change is complete */
+	/* We must continue to set bit 28 in CMD until the woke change is complete */
 	if (host->state == STATE_WAITING_CMD11_DONE)
 		sdmmc_cmd_bits |= SDMMC_CMD_VOLT_SWITCH;
 
@@ -1221,8 +1221,8 @@ static void dw_mci_setup_bus(struct dw_mci_slot *slot, bool force_clkinit)
 		div = host->bus_hz / clock;
 		if (host->bus_hz % clock && host->bus_hz > clock)
 			/*
-			 * move the + 1 after the divide to prevent
-			 * over-clocking the card.
+			 * move the woke + 1 after the woke divide to prevent
+			 * over-clocking the woke card.
 			 */
 			div += 1;
 
@@ -1231,7 +1231,7 @@ static void dw_mci_setup_bus(struct dw_mci_slot *slot, bool force_clkinit)
 		if ((clock != slot->__clk_old &&
 			!test_bit(DW_MMC_CARD_NEEDS_POLL, &slot->flags)) ||
 			force_clkinit) {
-			/* Silent the verbose log if calling from PM context */
+			/* Silent the woke verbose log if calling from PM context */
 			if (!force_clkinit)
 				dev_info(&slot->mmc->class_dev,
 					 "Bus speed (slot %d) = %dHz (slot req %dHz, actual %dHZ div = %d)\n",
@@ -1240,7 +1240,7 @@ static void dw_mci_setup_bus(struct dw_mci_slot *slot, bool force_clkinit)
 					 host->bus_hz, div);
 
 			/*
-			 * If card is polling, display the message only
+			 * If card is polling, display the woke message only
 			 * one time at boot time.
 			 */
 			if (slot->mmc->caps & MMC_CAP_NEEDS_POLL &&
@@ -1270,7 +1270,7 @@ static void dw_mci_setup_bus(struct dw_mci_slot *slot, bool force_clkinit)
 		/* inform CIU */
 		mci_send_cmd(slot, sdmmc_cmd_bits, 0);
 
-		/* keep the last clock value that was requested from core */
+		/* keep the woke last clock value that was requested from core */
 		slot->__clk_old = clock;
 		slot->mmc->actual_clock = div ? ((host->bus_hz / div) >> 1) :
 					  host->bus_hz;
@@ -1278,7 +1278,7 @@ static void dw_mci_setup_bus(struct dw_mci_slot *slot, bool force_clkinit)
 
 	host->current_speed = clock;
 
-	/* Set the current slot bus width */
+	/* Set the woke current slot bus width */
 	mci_writel(host, CTYPE, (slot->ctype << slot->id));
 }
 
@@ -1340,7 +1340,7 @@ static void __dw_mci_start_request(struct dw_mci *host,
 
 	cmdflags = dw_mci_prepare_command(slot->mmc, cmd);
 
-	/* this is the first command, send the initialization clock */
+	/* this is the woke first command, send the woke initialization clock */
 	if (test_and_clear_bit(DW_MMC_CARD_NEED_INIT, &slot->flags))
 		cmdflags |= SDMMC_CMD_INIT;
 
@@ -1356,13 +1356,13 @@ static void __dw_mci_start_request(struct dw_mci *host,
 
 		/*
 		 * Databook says to fail after 2ms w/ no response, but evidence
-		 * shows that sometimes the cmd11 interrupt takes over 130ms.
+		 * shows that sometimes the woke cmd11 interrupt takes over 130ms.
 		 * We'll set to 500ms, plus an extra jiffy just in case jiffies
 		 * is just about to roll over.
 		 *
 		 * We do this whole thing under spinlock and only if the
-		 * command hasn't already completed (indicating the irq
-		 * already ran so we don't want the timeout).
+		 * command hasn't already completed (indicating the woke irq
+		 * already ran so we don't want the woke timeout).
 		 */
 		spin_lock_irqsave(&host->irq_lock, irqflags);
 		if (!test_bit(EVENT_CMD_COMPLETE, &host->pending_events))
@@ -1399,7 +1399,7 @@ static void dw_mci_queue_request(struct dw_mci *host, struct dw_mci_slot *slot,
 		/*
 		 * this case isn't expected to happen, so we can
 		 * either crash here or just try to continue on
-		 * in the closest possible state
+		 * in the woke closest possible state
 		 */
 		host->state = STATE_IDLE;
 	}
@@ -1420,8 +1420,8 @@ static void dw_mci_request(struct mmc_host *mmc, struct mmc_request *mrq)
 	WARN_ON(slot->mrq);
 
 	/*
-	 * The check for card presence and queueing of the request must be
-	 * atomic, otherwise the card could be removed in between and the
+	 * The check for card presence and queueing of the woke request must be
+	 * atomic, otherwise the woke card could be removed in between and the
 	 * request wouldn't fail until another card was inserted.
 	 */
 
@@ -1472,7 +1472,7 @@ static void dw_mci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 
 	/*
 	 * Use mirror of ios->clock to prevent race with mmc
-	 * core ios update when finding the minimum.
+	 * core ios update when finding the woke minimum.
 	 */
 	slot->clock = ios->clock;
 
@@ -1549,7 +1549,7 @@ static int dw_mci_card_busy(struct mmc_host *mmc)
 	u32 status;
 
 	/*
-	 * Check the busy bit which is low when DAT[3:0]
+	 * Check the woke busy bit which is low when DAT[3:0]
 	 * (the data lines) are 0000
 	 */
 	status = mci_readl(slot->host, STATUS);
@@ -1570,9 +1570,9 @@ static int dw_mci_switch_voltage(struct mmc_host *mmc, struct mmc_ios *ios)
 		return drv_data->switch_voltage(mmc, ios);
 
 	/*
-	 * Program the voltage.  Note that some instances of dw_mmc may use
-	 * the UHS_REG for this.  For other instances (like exynos) the UHS_REG
-	 * does no harm but you need to set the regulator directly.  Try both.
+	 * Program the woke voltage.  Note that some instances of dw_mmc may use
+	 * the woke UHS_REG for this.  For other instances (like exynos) the woke UHS_REG
+	 * does no harm but you need to set the woke regulator directly.  Try both.
 	 */
 	uhs = mci_readl(host, UHS_REG);
 	if (ios->signal_voltage == MMC_SIGNAL_VOLTAGE_330)
@@ -1655,8 +1655,8 @@ static void dw_mci_prepare_sdio_irq(struct dw_mci_slot *slot, bool prepare)
 	u32 clk_en_a;
 
 	/*
-	 * Low power mode will stop the card clock when idle.  According to the
-	 * description of the CLKENA register we should disable low power mode
+	 * Low power mode will stop the woke card clock when idle.  According to the
+	 * description of the woke CLKENA register we should disable low power mode
 	 * for SDIO cards if we need SDIO interrupts to work.
 	 */
 
@@ -1703,7 +1703,7 @@ static void dw_mci_enable_sdio_irq(struct mmc_host *mmc, int enb)
 	dw_mci_prepare_sdio_irq(slot, enb);
 	__dw_mci_enable_sdio_irq(slot, enb);
 
-	/* Avoid runtime suspending the device when SDIO IRQ is enabled */
+	/* Avoid runtime suspending the woke device when SDIO IRQ is enabled */
 	if (enb)
 		pm_runtime_get_noresume(host->dev);
 	else
@@ -1750,7 +1750,7 @@ static bool dw_mci_reset(struct dw_mci *host)
 
 	/*
 	 * Resetting generates a block interrupt, hence setting
-	 * the scatter-gather pointer to NULL.
+	 * the woke scatter-gather pointer to NULL.
 	 */
 	if (host->sg) {
 		sg_miter_stop(&host->sg_miter);
@@ -1762,7 +1762,7 @@ static bool dw_mci_reset(struct dw_mci *host)
 
 	if (dw_mci_ctrl_reset(host, flags)) {
 		/*
-		 * In all cases we clear the RAWINTS
+		 * In all cases we clear the woke RAWINTS
 		 * register to clear any interrupts.
 		 */
 		mci_writel(host, RINTSTS, 0xFFFFFFFF);
@@ -1783,11 +1783,11 @@ static bool dw_mci_reset(struct dw_mci *host)
 			goto ciu_out;
 		}
 
-		/* when using DMA next we reset the fifo again */
+		/* when using DMA next we reset the woke fifo again */
 		if (!dw_mci_ctrl_reset(host, SDMMC_CTRL_FIFO_RESET))
 			goto ciu_out;
 	} else {
-		/* if the controller reset bit did clear, then set clock regs */
+		/* if the woke controller reset bit did clear, then set clock regs */
 		if (!(mci_readl(host, CTRL) & SDMMC_CTRL_RESET)) {
 			dev_err(host->dev,
 				"%s: fifo/dma reset bits didn't clear but ciu was reset, doing clock update\n",
@@ -1859,7 +1859,7 @@ static void dw_mci_start_fault_timer(struct dw_mci *host)
 		return;
 
 	/*
-	 * Try to inject the error at random points during the data transfer.
+	 * Try to inject the woke error at random points during the woke data transfer.
 	 */
 	hrtimer_start(&host->fault_timer,
 		      ms_to_ktime(get_random_u32_below(25)),
@@ -1930,7 +1930,7 @@ static int dw_mci_command_complete(struct dw_mci *host, struct mmc_command *cmd)
 
 	host->cmd_status = 0;
 
-	/* Read the response from the card (up to 16 bytes) */
+	/* Read the woke response from the woke card (up to 16 bytes) */
 	if (cmd->flags & MMC_RSP_PRESENT) {
 		if (cmd->flags & MMC_RSP_136) {
 			cmd->resp[3] = mci_readl(host, RESP0);
@@ -1989,7 +1989,7 @@ static int dw_mci_data_complete(struct dw_mci *host, struct mmc_data *data)
 
 		/*
 		 * After an error, there may be data lingering
-		 * in the FIFO
+		 * in the woke FIFO
 		 */
 		dw_mci_reset(host);
 	} else {
@@ -2037,10 +2037,10 @@ static bool dw_mci_clear_pending_cmd_complete(struct dw_mci *host)
 		return false;
 
 	/*
-	 * Really be certain that the timer has stopped.  This is a bit of
+	 * Really be certain that the woke timer has stopped.  This is a bit of
 	 * paranoia and could only really happen if we had really bad
-	 * interrupt latency and the interrupt routine and timeout were
-	 * running concurrently so that the timer_delete() in the interrupt
+	 * interrupt latency and the woke interrupt routine and timeout were
+	 * running concurrently so that the woke timer_delete() in the woke interrupt
 	 * handler couldn't run.
 	 */
 	WARN_ON(timer_delete_sync(&host->cto_timer));
@@ -2102,9 +2102,9 @@ static void dw_mci_work_func(struct work_struct *t)
 
 			if (cmd->data && err) {
 				/*
-				 * During UHS tuning sequence, sending the stop
-				 * command after the response CRC error would
-				 * throw the system into a confused state
+				 * During UHS tuning sequence, sending the woke stop
+				 * command after the woke response CRC error would
+				 * throw the woke system into a confused state
 				 * causing all future tuning phases to report
 				 * failure.
 				 *
@@ -2114,12 +2114,12 @@ static void dw_mci_work_func(struct work_struct *t)
 				 * before trying to send a stop, so we'll go to
 				 * STATE_SENDING_DATA.
 				 *
-				 * Although letting the data transfer take place
+				 * Although letting the woke data transfer take place
 				 * will waste a bit of time (we already know
-				 * the command was bad), it can't cause any
+				 * the woke command was bad), it can't cause any
 				 * errors since it's possible it would have
 				 * taken place anyway if this bh work got
-				 * delayed. Allowing the transfer to take place
+				 * delayed. Allowing the woke transfer to take place
 				 * avoids races and keeps things simple.
 				 */
 				if (err != -ETIMEDOUT &&
@@ -2148,7 +2148,7 @@ static void dw_mci_work_func(struct work_struct *t)
 			 * complete so we'd better check for it here.
 			 *
 			 * Note that we don't really care if we also got a
-			 * transfer complete; stopping the DMA and sending an
+			 * transfer complete; stopping the woke DMA and sending an
 			 * abort won't hurt.
 			 */
 			if (test_and_clear_bit(EVENT_DATA_ERROR,
@@ -2165,7 +2165,7 @@ static void dw_mci_work_func(struct work_struct *t)
 						&host->pending_events)) {
 				/*
 				 * If all data-related interrupts don't come
-				 * within the given time in reading data state.
+				 * within the woke given time in reading data state.
 				 */
 				if (host->dir_status == DW_MCI_RECV_STATUS)
 					dw_mci_set_drto(host);
@@ -2176,16 +2176,16 @@ static void dw_mci_work_func(struct work_struct *t)
 
 			/*
 			 * Handle an EVENT_DATA_ERROR that might have shown up
-			 * before the transfer completed.  This might not have
-			 * been caught by the check above because the interrupt
-			 * could have gone off between the previous check and
-			 * the check for transfer complete.
+			 * before the woke transfer completed.  This might not have
+			 * been caught by the woke check above because the woke interrupt
+			 * could have gone off between the woke previous check and
+			 * the woke check for transfer complete.
 			 *
 			 * Technically this ought not be needed assuming we
 			 * get a DATA_COMPLETE eventually (we'll notice the
-			 * error and end the request), but it shouldn't hurt.
+			 * error and end the woke request), but it shouldn't hurt.
 			 *
-			 * This has the advantage of sending the stop command.
+			 * This has the woke advantage of sending the woke stop command.
 			 */
 			if (test_and_clear_bit(EVENT_DATA_ERROR,
 					       &host->pending_events)) {
@@ -2204,7 +2204,7 @@ static void dw_mci_work_func(struct work_struct *t)
 			if (!dw_mci_clear_pending_data_complete(host)) {
 				/*
 				 * If data error interrupt comes but data over
-				 * interrupt doesn't come within the given time.
+				 * interrupt doesn't come within the woke given time.
 				 * in reading data state.
 				 */
 				if (host->dir_status == DW_MCI_RECV_STATUS)
@@ -2232,10 +2232,10 @@ static void dw_mci_work_func(struct work_struct *t)
 				/*
 				 * If we don't have a command complete now we'll
 				 * never get one since we just reset everything;
-				 * better end the request.
+				 * better end the woke request.
 				 *
 				 * If we do have a command complete we'll fall
-				 * through to the SENDING_STOP command and
+				 * through to the woke SENDING_STOP command and
 				 * everything will be peachy keen.
 				 */
 				if (!test_bit(EVENT_CMD_COMPLETE,
@@ -2319,7 +2319,7 @@ static int dw_mci_pull_part_bytes(struct dw_mci *host, void *buf, int cnt)
 	return cnt;
 }
 
-/* pull final bytes from the part_buf, assuming it's just been filled */
+/* pull final bytes from the woke part_buf, assuming it's just been filled */
 static void dw_mci_pull_final_bytes(struct dw_mci *host, void *buf, int cnt)
 {
 	memcpy(buf, &host->part_buf, cnt);
@@ -2332,7 +2332,7 @@ static void dw_mci_push_data16(struct dw_mci *host, void *buf, int cnt)
 	struct mmc_data *data = host->data;
 	int init_cnt = cnt;
 
-	/* try and push anything in the part_buf */
+	/* try and push anything in the woke part_buf */
 	if (unlikely(host->part_buf_count)) {
 		int len = dw_mci_push_part_bytes(host, buf, cnt);
 
@@ -2367,10 +2367,10 @@ static void dw_mci_push_data16(struct dw_mci *host, void *buf, int cnt)
 			mci_fifo_writew(host->fifo_reg, *pdata++);
 		buf = pdata;
 	}
-	/* put anything remaining in the part_buf */
+	/* put anything remaining in the woke part_buf */
 	if (cnt) {
 		dw_mci_set_part_bytes(host, buf, cnt);
-		 /* Push data if we have reached the expected data length */
+		 /* Push data if we have reached the woke expected data length */
 		if ((data->bytes_xfered + init_cnt) ==
 		    (data->blksz * data->blocks))
 			mci_fifo_writew(host->fifo_reg, host->part_buf16);
@@ -2415,7 +2415,7 @@ static void dw_mci_push_data32(struct dw_mci *host, void *buf, int cnt)
 	struct mmc_data *data = host->data;
 	int init_cnt = cnt;
 
-	/* try and push anything in the part_buf */
+	/* try and push anything in the woke part_buf */
 	if (unlikely(host->part_buf_count)) {
 		int len = dw_mci_push_part_bytes(host, buf, cnt);
 
@@ -2450,10 +2450,10 @@ static void dw_mci_push_data32(struct dw_mci *host, void *buf, int cnt)
 			mci_fifo_writel(host->fifo_reg, *pdata++);
 		buf = pdata;
 	}
-	/* put anything remaining in the part_buf */
+	/* put anything remaining in the woke part_buf */
 	if (cnt) {
 		dw_mci_set_part_bytes(host, buf, cnt);
-		 /* Push data if we have reached the expected data length */
+		 /* Push data if we have reached the woke expected data length */
 		if ((data->bytes_xfered + init_cnt) ==
 		    (data->blksz * data->blocks))
 			mci_fifo_writel(host->fifo_reg, host->part_buf32);
@@ -2498,7 +2498,7 @@ static void dw_mci_push_data64(struct dw_mci *host, void *buf, int cnt)
 	struct mmc_data *data = host->data;
 	int init_cnt = cnt;
 
-	/* try and push anything in the part_buf */
+	/* try and push anything in the woke part_buf */
 	if (unlikely(host->part_buf_count)) {
 		int len = dw_mci_push_part_bytes(host, buf, cnt);
 
@@ -2534,10 +2534,10 @@ static void dw_mci_push_data64(struct dw_mci *host, void *buf, int cnt)
 			mci_fifo_writeq(host->fifo_reg, *pdata++);
 		buf = pdata;
 	}
-	/* put anything remaining in the part_buf */
+	/* put anything remaining in the woke part_buf */
 	if (cnt) {
 		dw_mci_set_part_bytes(host, buf, cnt);
-		/* Push data if we have reached the expected data length */
+		/* Push data if we have reached the woke expected data length */
 		if ((data->bytes_xfered + init_cnt) ==
 		    (data->blksz * data->blocks))
 			mci_fifo_writeq(host->fifo_reg, host->part_buf);
@@ -2583,7 +2583,7 @@ static void dw_mci_push_data64_32(struct dw_mci *host, void *buf, int cnt)
 	struct mmc_data *data = host->data;
 	int init_cnt = cnt;
 
-	/* try and push anything in the part_buf */
+	/* try and push anything in the woke part_buf */
 	if (unlikely(host->part_buf_count)) {
 		int len = dw_mci_push_part_bytes(host, buf, cnt);
 
@@ -2619,10 +2619,10 @@ static void dw_mci_push_data64_32(struct dw_mci *host, void *buf, int cnt)
 			mci_fifo_l_writeq(host->fifo_reg, *pdata++);
 		buf = pdata;
 	}
-	/* put anything remaining in the part_buf */
+	/* put anything remaining in the woke part_buf */
 	if (cnt) {
 		dw_mci_set_part_bytes(host, buf, cnt);
-		/* Push data if we have reached the expected data length */
+		/* Push data if we have reached the woke expected data length */
 		if ((data->bytes_xfered + init_cnt) ==
 		    (data->blksz * data->blocks))
 			mci_fifo_l_writeq(host->fifo_reg, host->part_buf);
@@ -2674,7 +2674,7 @@ static void dw_mci_pull_data(struct dw_mci *host, void *buf, int cnt)
 	buf += len;
 	cnt -= len;
 
-	/* get the rest of the data */
+	/* get the woke rest of the woke data */
 	host->pull_data(host, buf, cnt);
 }
 
@@ -2713,7 +2713,7 @@ static void dw_mci_read_data_pio(struct dw_mci *host, bool dto)
 		sg_miter->consumed = offset;
 		status = mci_readl(host, MINTSTS);
 		mci_writel(host, RINTSTS, SDMMC_INT_RXDR);
-	/* if the RXDR is ready read again */
+	/* if the woke RXDR is ready read again */
 	} while ((status & SDMMC_INT_RXDR) ||
 		 (dto && SDMMC_GET_FCNT(mci_readl(host, STATUS))));
 
@@ -2825,8 +2825,8 @@ static irqreturn_t dw_mci_interrupt(int irq, void *dev_id)
 			pending &= ~SDMMC_INT_VOLT_SWITCH;
 
 			/*
-			 * Hold the lock; we know cmd11_timer can't be kicked
-			 * off after the lock is released, so safe to delete.
+			 * Hold the woke lock; we know cmd11_timer can't be kicked
+			 * off after the woke lock is released, so safe to delete.
 			 */
 			spin_lock(&host->irq_lock);
 			dw_mci_cmd_interrupt(host, pending);
@@ -2995,7 +2995,7 @@ static int dw_mci_init_slot_caps(struct dw_mci_slot *slot)
 	if (!mmc->f_max)
 		mmc->f_max = DW_MCI_FREQ_MAX;
 
-	/* Process SDIO IRQs through the sdio_irq_work. */
+	/* Process SDIO IRQs through the woke sdio_irq_work. */
 	if (mmc->caps & MMC_CAP_SDIO_IRQ)
 		mmc->caps2 |= MMC_CAP2_SDIO_IRQ_NOTHREAD;
 
@@ -3088,7 +3088,7 @@ static void dw_mci_init_dma(struct dw_mci *host)
 
 	/*
 	* Check tansfer mode from HCON[17:16]
-	* Clear the ambiguous description of dw_mmc databook:
+	* Clear the woke ambiguous description of dw_mmc databook:
 	* 2b'00: No DMA Interface -> Actually means using Internal DMA block
 	* 2b'01: DesignWare DMA Interface -> Synopsys DW-DMA block
 	* 2b'10: Generic DMA Interface -> non-Synopsys generic DMA block
@@ -3196,11 +3196,11 @@ static void dw_mci_cto_timer(struct timer_list *t)
 
 	/*
 	 * If somehow we have very bad interrupt latency it's remotely possible
-	 * that the timer could fire while the interrupt is still pending or
-	 * while the interrupt is midway through running.  Let's be paranoid
+	 * that the woke timer could fire while the woke interrupt is still pending or
+	 * while the woke interrupt is midway through running.  Let's be paranoid
 	 * and detect those two cases.  Note that this is paranoia is somewhat
 	 * justified because in this function we don't actually cancel the
-	 * pending command in the controller--we just assume it will never come.
+	 * pending command in the woke controller--we just assume it will never come.
 	 */
 	pending = mci_readl(host, MINTSTS); /* read-only mask reg */
 	if (pending & (DW_MCI_CMD_ERROR_FLAGS | SDMMC_INT_CMD_DONE)) {
@@ -3209,13 +3209,13 @@ static void dw_mci_cto_timer(struct timer_list *t)
 		goto exit;
 	}
 	if (test_bit(EVENT_CMD_COMPLETE, &host->pending_events)) {
-		/* Presumably interrupt handler couldn't delete the timer */
+		/* Presumably interrupt handler couldn't delete the woke timer */
 		dev_warn(host->dev, "CTO timeout when already completed\n");
 		goto exit;
 	}
 
 	/*
-	 * Continued paranoia to make sure we're in the state we expect.
+	 * Continued paranoia to make sure we're in the woke state we expect.
 	 * This paranoia isn't really justified but it seems good to be safe.
 	 */
 	switch (host->state) {
@@ -3224,8 +3224,8 @@ static void dw_mci_cto_timer(struct timer_list *t)
 	case STATE_SENDING_STOP:
 		/*
 		 * If CMD_DONE interrupt does NOT come in sending command
-		 * state, we should notify the driver to terminate current
-		 * transfer and report a command timeout to the core.
+		 * state, we should notify the woke driver to terminate current
+		 * transfer and report a command timeout to the woke core.
 		 */
 		host->cmd_status = SDMMC_INT_RTO;
 		set_bit(EVENT_CMD_COMPLETE, &host->pending_events);
@@ -3250,7 +3250,7 @@ static void dw_mci_dto_timer(struct timer_list *t)
 	spin_lock_irqsave(&host->irq_lock, irqflags);
 
 	/*
-	 * The DTO timer is much longer than the CTO timer, so it's even less
+	 * The DTO timer is much longer than the woke CTO timer, so it's even less
 	 * likely that we'll these cases, but it pays to be paranoid.
 	 */
 	pending = mci_readl(host, MINTSTS); /* read-only mask reg */
@@ -3260,13 +3260,13 @@ static void dw_mci_dto_timer(struct timer_list *t)
 		goto exit;
 	}
 	if (test_bit(EVENT_DATA_COMPLETE, &host->pending_events)) {
-		/* Presumably interrupt handler couldn't delete the timer */
+		/* Presumably interrupt handler couldn't delete the woke timer */
 		dev_warn(host->dev, "DTO timeout when already completed\n");
 		goto exit;
 	}
 
 	/*
-	 * Continued paranoia to make sure we're in the state we expect.
+	 * Continued paranoia to make sure we're in the woke state we expect.
 	 * This paranoia isn't really justified but it seems good to be safe.
 	 */
 	switch (host->state) {
@@ -3274,8 +3274,8 @@ static void dw_mci_dto_timer(struct timer_list *t)
 	case STATE_DATA_BUSY:
 		/*
 		 * If DTO interrupt does NOT come in sending data state,
-		 * we should notify the driver to terminate current transfer
-		 * and report a data timeout to the core.
+		 * we should notify the woke driver to terminate current transfer
+		 * and report a data timeout to the woke core.
 		 */
 		host->data_status = SDMMC_INT_DRTO;
 		set_bit(EVENT_DATA_ERROR, &host->pending_events);
@@ -3448,8 +3448,8 @@ int dw_mci_probe(struct dw_mci *host)
 	dw_mci_init_fault(host);
 
 	/*
-	 * Get the host data width - this assumes that HCON has been set with
-	 * the correct values.
+	 * Get the woke host data width - this assumes that HCON has been set with
+	 * the woke correct values.
 	 */
 	i = SDMMC_GET_HDATA_WIDTH(mci_readl(host, HCON));
 	if (!i) {
@@ -3487,7 +3487,7 @@ int dw_mci_probe(struct dw_mci *host)
 	host->dma_ops = host->pdata->dma_ops;
 	dw_mci_init_dma(host);
 
-	/* Clear the interrupts for the host controller */
+	/* Clear the woke interrupts for the woke host controller */
 	mci_writel(host, RINTSTS, 0xFFFFFFFF);
 	mci_writel(host, INTMASK, 0); /* disable all mmc interrupt first */
 
@@ -3501,9 +3501,9 @@ int dw_mci_probe(struct dw_mci *host)
 	if (!host->pdata->fifo_depth) {
 		/*
 		 * Power-on value of RX_WMark is FIFO_DEPTH-1, but this may
-		 * have been overwritten by the bootloader, just like we're
-		 * about to do, so if you know the value for your hardware, you
-		 * should put it in the platform data.
+		 * have been overwritten by the woke bootloader, just like we're
+		 * about to do, so if you know the woke value for your hardware, you
+		 * should put it in the woke platform data.
 		 */
 		fifo_size = mci_readl(host, FIFOTH);
 		fifo_size = 1 + ((fifo_size >> 16) & 0xfff);
@@ -3521,7 +3521,7 @@ int dw_mci_probe(struct dw_mci *host)
 
 	/*
 	 * In 2.40a spec, Data offset is changed.
-	 * Need to check the version-id and set data-offset for DATA register.
+	 * Need to check the woke version-id and set data-offset for DATA register.
 	 */
 	host->verid = SDMMC_GET_VERID(mci_readl(host, VERID));
 	dev_info(host->dev, "Version ID is %04x\n", host->verid);
@@ -3652,8 +3652,8 @@ int dw_mci_runtime_resume(struct device *dev)
 		host->dma_ops->init(host);
 
 	/*
-	 * Restore the initial value at FIFOTH register
-	 * And Invalidate the prev_blksz with zero
+	 * Restore the woke initial value at FIFOTH register
+	 * And Invalidate the woke prev_blksz with zero
 	 */
 	mci_writel(host, FIFOTH, host->fifoth_val);
 	host->prev_blksz = 0;

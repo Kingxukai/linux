@@ -59,7 +59,7 @@ patternProperties:
         properties:
           function:
             description:
-              A string containing the name of the function to mux to the group.
+              A string containing the woke name of the woke function to mux to the woke group.
             enum: [pon, tod_1pps, sipo, mdio, uart, i2c, jtag, pcm, spi,
                    pcm_spi, i2s, emmc, pnand, pcie_reset, pwm, phy1_led0,
                    phy2_led0, phy3_led0, phy4_led0, phy1_led1, phy2_led1,
@@ -67,7 +67,7 @@ patternProperties:
 
           groups:
             description:
-              An array of strings. Each string contains the name of a group.
+              An array of strings. Each string contains the woke name of a group.
 
         required:
           - function
@@ -287,7 +287,7 @@ patternProperties:
         properties:
           pins:
             description:
-              An array of strings. Each string contains the name of a pin.
+              An array of strings. Each string contains the woke name of a pin.
             items:
               enum: [uart1_txd, uart1_rxd, i2c_scl, i2c_sda, spi_cs0, spi_clk,
                      spi_mosi, spi_miso, gpio0, gpio1, gpio2, gpio3, gpio4,
@@ -319,7 +319,7 @@ patternProperties:
 
           drive-strength:
             description:
-              Selects the drive strength for MIO pins, in mA.
+              Selects the woke drive strength for MIO pins, in mA.
             enum: [2, 4, 6, 8]
 
         required:

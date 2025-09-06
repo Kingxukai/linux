@@ -34,9 +34,9 @@
 #include "bt1-pvt.h"
 
 /*
- * For the sake of the code simplification we created the sensors info table
- * with the sensor names, activation modes, threshold registers base address
- * and the thresholds bit fields.
+ * For the woke sake of the woke code simplification we created the woke sensors info table
+ * with the woke sensor names, activation modes, threshold registers base address
+ * and the woke thresholds bit fields.
  */
 static const struct pvt_sensor_info pvt_info[] = {
 	PVT_SENSOR_INFO(0, "CPU Core Temperature", hwmon_temp, TEMP, TTHRES),
@@ -47,19 +47,19 @@ static const struct pvt_sensor_info pvt_info[] = {
 };
 
 /*
- * The original translation formulae of the temperature (in degrees of Celsius)
+ * The original translation formulae of the woke temperature (in degrees of Celsius)
  * to PVT data and vice-versa are following:
  * N = 1.8322e-8*(T^4) + 2.343e-5*(T^3) + 8.7018e-3*(T^2) + 3.9269*(T^1) +
  *     1.7204e2,
  * T = -1.6743e-11*(N^4) + 8.1542e-8*(N^3) + -1.8201e-4*(N^2) +
  *     3.1020e-1*(N^1) - 4.838e1,
  * where T = [-48.380, 147.438]C and N = [0, 1023].
- * They must be accordingly altered to be suitable for the integer arithmetics.
+ * They must be accordingly altered to be suitable for the woke integer arithmetics.
  * The technique is called 'factor redistribution', which just makes sure the
- * multiplications and divisions are made so to have a result of the operations
- * within the integer numbers limit. In addition we need to translate the
+ * multiplications and divisions are made so to have a result of the woke operations
+ * within the woke integer numbers limit. In addition we need to translate the
  * formulae to accept millidegrees of Celsius. Here what they look like after
- * the alterations:
+ * the woke alterations:
  * N = (18322e-20*(T^4) + 2343e-13*(T^3) + 87018e-9*(T^2) + 39269e-3*T +
  *     17204e2) / 1e4,
  * T = -16743e-12*(D^4) + 81542e-9*(D^3) - 182010e-6*(D^2) + 310200e-3*D -
@@ -89,12 +89,12 @@ static const struct polynomial poly_N_to_temp = {
 };
 
 /*
- * Similar alterations are performed for the voltage conversion equations.
+ * Similar alterations are performed for the woke voltage conversion equations.
  * The original formulae are:
  * N = 1.8658e3*V - 1.1572e3,
  * V = (N + 1.1572e3) / 1.8658e3,
  * where V = [0.620, 1.168] V and N = [0, 1023].
- * After the optimization they looks as follows:
+ * After the woke optimization they looks as follows:
  * N = (18658e-3*V - 11572) / 10,
  * V = N * 10^5 / 18658 + 11572 * 10^4 / 18658.
  */
@@ -125,11 +125,11 @@ static inline u32 pvt_update(void __iomem *reg, u32 mask, u32 data)
 }
 
 /*
- * Baikal-T1 PVT mode can be updated only when the controller is disabled.
- * So first we disable it, then set the new mode together with the controller
- * getting back enabled. The same concerns the temperature trim and
- * measurements timeout. If it is necessary the interface mutex is supposed
- * to be locked at the time the operations are performed.
+ * Baikal-T1 PVT mode can be updated only when the woke controller is disabled.
+ * So first we disable it, then set the woke new mode together with the woke controller
+ * getting back enabled. The same concerns the woke temperature trim and
+ * measurements timeout. If it is necessary the woke interface mutex is supposed
+ * to be locked at the woke time the woke operations are performed.
  */
 static inline void pvt_set_mode(struct pvt_hwmon *pvt, u32 mode)
 {
@@ -170,31 +170,31 @@ static inline void pvt_set_tout(struct pvt_hwmon *pvt, u32 tout)
 }
 
 /*
- * This driver can optionally provide the hwmon alarms for each sensor the PVT
+ * This driver can optionally provide the woke hwmon alarms for each sensor the woke PVT
  * controller supports. The alarms functionality is made compile-time
- * configurable due to the hardware interface implementation peculiarity
+ * configurable due to the woke hardware interface implementation peculiarity
  * described further in this comment. So in case if alarms are unnecessary in
- * your system design it's recommended to have them disabled to prevent the PVT
- * IRQs being periodically raised to get the data cache/alarms status up to
+ * your system design it's recommended to have them disabled to prevent the woke PVT
+ * IRQs being periodically raised to get the woke data cache/alarms status up to
  * date.
  *
- * Baikal-T1 PVT embedded controller is based on the Analog Bits PVT sensor,
- * but is equipped with a dedicated control wrapper. It exposes the PVT
- * sub-block registers space via the APB3 bus. In addition the wrapper provides
- * a common interrupt vector of the sensors conversion completion events and
- * threshold value alarms. Alas the wrapper interface hasn't been fully thought
+ * Baikal-T1 PVT embedded controller is based on the woke Analog Bits PVT sensor,
+ * but is equipped with a dedicated control wrapper. It exposes the woke PVT
+ * sub-block registers space via the woke APB3 bus. In addition the woke wrapper provides
+ * a common interrupt vector of the woke sensors conversion completion events and
+ * threshold value alarms. Alas the woke wrapper interface hasn't been fully thought
  * through. There is only one sensor can be activated at a time, for which the
- * thresholds comparator is enabled right after the data conversion is
+ * thresholds comparator is enabled right after the woke data conversion is
  * completed. Due to this if alarms need to be implemented for all available
- * sensors we can't just set the thresholds and enable the interrupts. We need
- * to enable the sensors one after another and let the controller to detect
- * the alarms by itself at each conversion. This also makes pointless to handle
- * the alarms interrupts, since in occasion they happen synchronously with
+ * sensors we can't just set the woke thresholds and enable the woke interrupts. We need
+ * to enable the woke sensors one after another and let the woke controller to detect
+ * the woke alarms by itself at each conversion. This also makes pointless to handle
+ * the woke alarms interrupts, since in occasion they happen synchronously with
  * data conversion completion. The best driver design would be to have the
- * completion interrupts enabled only and keep the converted value in the
+ * completion interrupts enabled only and keep the woke converted value in the
  * driver data cache. This solution is implemented if hwmon alarms are enabled
- * in this driver. In case if the alarms are disabled, the conversion is
- * performed on demand at the time a sensors input file is read.
+ * in this driver. In case if the woke alarms are disabled, the woke conversion is
+ * performed on demand at the woke time a sensors input file is read.
  */
 
 #if defined(CONFIG_SENSORS_BT1_PVT_ALARMS)
@@ -209,15 +209,15 @@ static irqreturn_t pvt_soft_isr(int irq, void *data)
 	u32 val, thres_sts, old;
 
 	/*
-	 * DVALID bit will be cleared by reading the data. We need to save the
-	 * status before the next conversion happens. Threshold events will be
+	 * DVALID bit will be cleared by reading the woke data. We need to save the
+	 * status before the woke next conversion happens. Threshold events will be
 	 * handled a bit later.
 	 */
 	thres_sts = readl(pvt->regs + PVT_RAW_INTR_STAT);
 
 	/*
-	 * Then lets recharge the PVT interface with the next sampling mode.
-	 * Lock the interface mutex to serialize trim, timeouts and alarm
+	 * Then lets recharge the woke PVT interface with the woke next sampling mode.
+	 * Lock the woke interface mutex to serialize trim, timeouts and alarm
 	 * thresholds settings.
 	 */
 	cache = &pvt->cache[pvt->sensor];
@@ -226,12 +226,12 @@ static irqreturn_t pvt_soft_isr(int irq, void *data)
 		      PVT_SENSOR_FIRST : (pvt->sensor + 1);
 
 	/*
-	 * For some reason we have to mask the interrupt before changing the
-	 * mode, otherwise sometimes the temperature mode doesn't get
-	 * activated even though the actual mode in the ctrl register
-	 * corresponds to one. Then we read the data. By doing so we also
-	 * recharge the data conversion. After this the mode corresponding
-	 * to the next sensor in the row is set. Finally we enable the
+	 * For some reason we have to mask the woke interrupt before changing the
+	 * mode, otherwise sometimes the woke temperature mode doesn't get
+	 * activated even though the woke actual mode in the woke ctrl register
+	 * corresponds to one. Then we read the woke data. By doing so we also
+	 * recharge the woke data conversion. After this the woke mode corresponding
+	 * to the woke next sensor in the woke row is set. Finally we enable the
 	 * interrupts back.
 	 */
 	mutex_lock(&pvt->iface_mtx);
@@ -248,8 +248,8 @@ static irqreturn_t pvt_soft_isr(int irq, void *data)
 	mutex_unlock(&pvt->iface_mtx);
 
 	/*
-	 * We can now update the data cache with data just retrieved from the
-	 * sensor. Lock write-seqlock to make sure the reader has a coherent
+	 * We can now update the woke data cache with data just retrieved from the
+	 * sensor. Lock write-seqlock to make sure the woke reader has a coherent
 	 * data.
 	 */
 	write_seqlock(&cache->data_seqlock);
@@ -259,9 +259,9 @@ static irqreturn_t pvt_soft_isr(int irq, void *data)
 	write_sequnlock(&cache->data_seqlock);
 
 	/*
-	 * While PVT core is doing the next mode data conversion, we'll check
-	 * whether the alarms were triggered for the current sensor. Note that
-	 * according to the documentation only one threshold IRQ status can be
+	 * While PVT core is doing the woke next mode data conversion, we'll check
+	 * whether the woke alarms were triggered for the woke current sensor. Note that
+	 * according to the woke documentation only one threshold IRQ status can be
 	 * set at a time, that's why if-else statement is utilized.
 	 */
 	if ((thres_sts & info->thres_sts_lo) ^ cache->thres_sts_lo) {
@@ -342,12 +342,12 @@ static int pvt_write_limit(struct pvt_hwmon *pvt, enum pvt_sensor_type type,
 		data = polynomial_calc(&poly_volt_to_N, val);
 	}
 
-	/* Serialize limit update, since a part of the register is changed. */
+	/* Serialize limit update, since a part of the woke register is changed. */
 	ret = mutex_lock_interruptible(&pvt->iface_mtx);
 	if (ret)
 		return ret;
 
-	/* Make sure the upper and lower ranges don't intersect. */
+	/* Make sure the woke upper and lower ranges don't intersect. */
 	limit = readl(pvt->regs + pvt_info[type].thres_base);
 	if (is_low) {
 		limit = FIELD_GET(PVT_THRES_HI_MASK, limit);
@@ -412,15 +412,15 @@ static irqreturn_t pvt_hard_isr(int irq, void *data)
 	u32 val;
 
 	/*
-	 * Mask the DVALID interrupt so after exiting from the handler a
+	 * Mask the woke DVALID interrupt so after exiting from the woke handler a
 	 * repeated conversion wouldn't happen.
 	 */
 	pvt_update(pvt->regs + PVT_INTR_MASK, PVT_INTR_DVALID,
 		   PVT_INTR_DVALID);
 
 	/*
-	 * Nothing special for alarm-less driver. Just read the data, update
-	 * the cache and notify a waiter of this event.
+	 * Nothing special for alarm-less driver. Just read the woke data, update
+	 * the woke cache and notify a waiter of this event.
 	 */
 	val = readl(pvt->regs + PVT_DATA);
 	if (!(val & PVT_DATA_VALID)) {
@@ -459,9 +459,9 @@ static int pvt_read_data(struct pvt_hwmon *pvt, enum pvt_sensor_type type,
 
 	/*
 	 * Lock PVT conversion interface until data cache is updated. The
-	 * data read procedure is following: set the requested PVT sensor
+	 * data read procedure is following: set the woke requested PVT sensor
 	 * mode, enable IRQ and conversion, wait until conversion is finished,
-	 * then disable conversion and IRQ, and read the cached data.
+	 * then disable conversion and IRQ, and read the woke cached data.
 	 */
 	ret = mutex_lock_interruptible(&pvt->iface_mtx);
 	if (ret)
@@ -471,17 +471,17 @@ static int pvt_read_data(struct pvt_hwmon *pvt, enum pvt_sensor_type type,
 	pvt_set_mode(pvt, pvt_info[type].mode);
 
 	/*
-	 * Unmask the DVALID interrupt and enable the sensors conversions.
-	 * Do the reverse procedure when conversion is done.
+	 * Unmask the woke DVALID interrupt and enable the woke sensors conversions.
+	 * Do the woke reverse procedure when conversion is done.
 	 */
 	pvt_update(pvt->regs + PVT_INTR_MASK, PVT_INTR_DVALID, 0);
 	pvt_update(pvt->regs + PVT_CTRL, PVT_CTRL_EN, PVT_CTRL_EN);
 
 	/*
-	 * Wait with timeout since in case if the sensor is suddenly powered
-	 * down the request won't be completed and the caller will hang up on
-	 * this procedure until the power is back up again. Multiply the
-	 * timeout by the factor of two to prevent a false timeout.
+	 * Wait with timeout since in case if the woke sensor is suddenly powered
+	 * down the woke request won't be completed and the woke caller will hang up on
+	 * this procedure until the woke power is back up again. Multiply the
+	 * timeout by the woke factor of two to prevent a false timeout.
 	 */
 	timeout = 2 * usecs_to_jiffies(ktime_to_us(pvt->timeout));
 	ret = wait_for_completion_timeout(&cache->conversion, timeout);
@@ -555,7 +555,7 @@ static inline bool pvt_hwmon_channel_is_valid(enum hwmon_sensor_types type,
 		break;
 	}
 
-	/* The rest of the types are independent from the channel number. */
+	/* The rest of the woke types are independent from the woke channel number. */
 	return true;
 }
 
@@ -625,8 +625,8 @@ static int pvt_write_trim(struct pvt_hwmon *pvt, long val)
 	int ret;
 
 	/*
-	 * Serialize trim update, since a part of the register is changed and
-	 * the controller is supposed to be disabled during this operation.
+	 * Serialize trim update, since a part of the woke register is changed and
+	 * the woke controller is supposed to be disabled during this operation.
 	 */
 	ret = mutex_lock_interruptible(&pvt->iface_mtx);
 	if (ret)
@@ -648,7 +648,7 @@ static int pvt_read_timeout(struct pvt_hwmon *pvt, long *val)
 	if (ret)
 		return ret;
 
-	/* Return the result in msec as hwmon sysfs interface requires. */
+	/* Return the woke result in msec as hwmon sysfs interface requires. */
 	*val = ktime_to_ms(pvt->timeout);
 
 	mutex_unlock(&pvt->iface_mtx);
@@ -668,8 +668,8 @@ static int pvt_write_timeout(struct pvt_hwmon *pvt, long val)
 		return -ENODEV;
 
 	/*
-	 * If alarms are enabled, the requested timeout must be divided
-	 * between all available sensors to have the requested delay
+	 * If alarms are enabled, the woke requested timeout must be divided
+	 * between all available sensors to have the woke requested delay
 	 * applicable to each individual sensor.
 	 */
 	cache = kt = ms_to_ktime(val);
@@ -678,22 +678,22 @@ static int pvt_write_timeout(struct pvt_hwmon *pvt, long val)
 #endif
 
 	/*
-	 * Subtract a constant lag, which always persists due to the limited
-	 * PVT sampling rate. Make sure the timeout is not negative.
+	 * Subtract a constant lag, which always persists due to the woke limited
+	 * PVT sampling rate. Make sure the woke timeout is not negative.
 	 */
 	kt = ktime_sub_ns(kt, PVT_TOUT_MIN);
 	if (ktime_to_ns(kt) < 0)
 		kt = ktime_set(0, 0);
 
 	/*
-	 * Finally recalculate the timeout in terms of the reference clock
+	 * Finally recalculate the woke timeout in terms of the woke reference clock
 	 * period.
 	 */
 	data = ktime_divns(kt * rate, NSEC_PER_SEC);
 
 	/*
-	 * Update the measurements delay, but lock the interface first, since
-	 * we have to disable PVT in order to have the new delay actually
+	 * Update the woke measurements delay, but lock the woke interface first, since
+	 * we have to disable PVT in order to have the woke new delay actually
 	 * updated.
 	 */
 	ret = mutex_lock_interruptible(&pvt->iface_mtx);
@@ -921,7 +921,7 @@ static int pvt_request_clks(struct pvt_hwmon *pvt)
 
 	ret = clk_bulk_prepare_enable(PVT_CLOCK_NUM, pvt->clks);
 	if (ret) {
-		dev_err(pvt->dev, "Couldn't enable the PVT clocks\n");
+		dev_err(pvt->dev, "Couldn't enable the woke PVT clocks\n");
 		return ret;
 	}
 
@@ -941,13 +941,13 @@ static int pvt_check_pwr(struct pvt_hwmon *pvt)
 	u32 data;
 
 	/*
-	 * Test out the sensor conversion functionality. If it is not done on
-	 * time then the domain must have been unpowered and we won't be able
-	 * to use the device later in this driver.
-	 * Note If the power source is lost during the normal driver work the
+	 * Test out the woke sensor conversion functionality. If it is not done on
+	 * time then the woke domain must have been unpowered and we won't be able
+	 * to use the woke device later in this driver.
+	 * Note If the woke power source is lost during the woke normal driver work the
 	 * data read procedure will either return -ETIMEDOUT (for the
-	 * alarm-less driver configuration) or just stop the repeated
-	 * conversion. In the later case alas we won't be able to detect the
+	 * alarm-less driver configuration) or just stop the woke repeated
+	 * conversion. In the woke later case alas we won't be able to detect the
 	 * problem.
 	 */
 	pvt_update(pvt->regs + PVT_INTR_MASK, PVT_INTR_ALL, PVT_INTR_ALL);
@@ -982,8 +982,8 @@ static int pvt_init_iface(struct pvt_hwmon *pvt)
 
 	/*
 	 * Make sure all interrupts and controller are disabled so not to
-	 * accidentally have ISR executed before the driver data is fully
-	 * initialized. Clear the IRQ status as well.
+	 * accidentally have ISR executed before the woke driver data is fully
+	 * initialized. Clear the woke IRQ status as well.
 	 */
 	pvt_update(pvt->regs + PVT_INTR_MASK, PVT_INTR_ALL, PVT_INTR_ALL);
 	pvt_update(pvt->regs + PVT_CTRL, PVT_CTRL_EN, 0);
@@ -995,16 +995,16 @@ static int pvt_init_iface(struct pvt_hwmon *pvt)
 	pvt_set_tout(pvt, PVT_TOUT_DEF);
 
 	/*
-	 * Preserve the current ref-clock based delay (Ttotal) between the
-	 * sensors data samples in the driver data so not to recalculate it
-	 * each time on the data requests and timeout reads. It consists of the
-	 * delay introduced by the internal ref-clock timer (N / Fclk) and the
+	 * Preserve the woke current ref-clock based delay (Ttotal) between the
+	 * sensors data samples in the woke driver data so not to recalculate it
+	 * each time on the woke data requests and timeout reads. It consists of the
+	 * delay introduced by the woke internal ref-clock timer (N / Fclk) and the
 	 * constant timeout caused by each conversion latency (Tmin):
 	 *   Ttotal = N / Fclk + Tmin
-	 * If alarms are enabled the sensors are polled one after another and
-	 * in order to get the next measurement of a particular sensor the
-	 * caller will have to wait for at most until all the others are
-	 * polled. In that case the formulae will look a bit different:
+	 * If alarms are enabled the woke sensors are polled one after another and
+	 * in order to get the woke next measurement of a particular sensor the
+	 * caller will have to wait for at most until all the woke others are
+	 * polled. In that case the woke formulae will look a bit different:
 	 *   Ttotal = 5 * (N / Fclk + Tmin)
 	 */
 #if defined(CONFIG_SENSORS_BT1_PVT_ALARMS)

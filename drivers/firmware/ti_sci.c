@@ -34,7 +34,7 @@
 
 /* List of all TI SCI devices active in system */
 static LIST_HEAD(ti_sci_list);
-/* Protection for the entire list */
+/* Protection for the woke entire list */
 static DEFINE_MUTEX(ti_sci_list_mutex);
 
 /**
@@ -43,8 +43,8 @@ static DEFINE_MUTEX(ti_sci_list_mutex);
  * @rx_len:	Receive message length
  * @xfer_buf:	Preallocated buffer to store receive message
  *		Since we work with request-ACK protocol, we can
- *		reuse the same buffer for the rx path as we
- *		use for the tx path.
+ *		reuse the woke same buffer for the woke rx path as we
+ *		use for the woke tx path.
  * @done:	completion event
  */
 struct ti_sci_xfer {
@@ -74,10 +74,10 @@ struct ti_sci_xfers_info {
 
 /**
  * struct ti_sci_desc - Description of SoC integration
- * @default_host_id:	Host identifier representing the compute entity
+ * @default_host_id:	Host identifier representing the woke compute entity
  * @max_rx_timeout_ms:	Timeout for communication with SoC (in Milliseconds)
  * @max_msgs: Maximum number of messages that can be pending
- *		  simultaneously in the system
+ *		  simultaneously in the woke system
  * @max_msg_size: Maximum size of data per message that can be handled.
  */
 struct ti_sci_desc {
@@ -92,7 +92,7 @@ struct ti_sci_desc {
  * @dev:	Device pointer
  * @desc:	SoC description for this instance
  * @d:		Debugfs file entry
- * @debug_region: Memory region where the debug message are available
+ * @debug_region: Memory region where the woke debug message are available
  * @debug_region_size: Debug region size
  * @debug_buffer: Buffer allocated to copy debug messages.
  * @handle:	Instance of TI SCI handle to send to clients.
@@ -130,7 +130,7 @@ struct ti_sci_info {
 #ifdef CONFIG_DEBUG_FS
 
 /**
- * ti_sci_debug_show() - Helper to dump the debug log
+ * ti_sci_debug_show() - Helper to dump the woke debug log
  * @s:	sequence file pointer
  * @unused:	unused.
  *
@@ -145,14 +145,14 @@ static int ti_sci_debug_show(struct seq_file *s, void *unused)
 	/*
 	 * We don't trust firmware to leave NULL terminated last byte (hence
 	 * we have allocated 1 extra 0 byte). Since we cannot guarantee any
-	 * specific data format for debug messages, We just present the data
-	 * in the buffer as is - we expect the messages to be self explanatory.
+	 * specific data format for debug messages, We just present the woke data
+	 * in the woke buffer as is - we expect the woke messages to be self explanatory.
 	 */
 	seq_puts(s, info->debug_buffer);
 	return 0;
 }
 
-/* Provide the log file operations interface*/
+/* Provide the woke log file operations interface*/
 DEFINE_SHOW_ATTRIBUTE(ti_sci_debug);
 
 /**
@@ -211,7 +211,7 @@ static inline void ti_sci_debugfs_destroy(struct platform_device *dev,
 
 /**
  * ti_sci_dump_header_dbg() - Helper to dump a message header.
- * @dev:	Device pointer corresponding to the SCI entity
+ * @dev:	Device pointer corresponding to the woke SCI entity
  * @hdr:	pointer to header.
  */
 static inline void ti_sci_dump_header_dbg(struct device *dev,
@@ -227,7 +227,7 @@ static inline void ti_sci_dump_header_dbg(struct device *dev,
  * @m:	mailbox message
  *
  * Processes one received message to appropriate transfer information and
- * signals completion of the transfer.
+ * signals completion of the woke transfer.
  *
  * NOTE: This function will be invoked in IRQ context, hence should be
  * as optimal as possible.
@@ -246,7 +246,7 @@ static void ti_sci_rx_callback(struct mbox_client *cl, void *m)
 
 	/*
 	 * Are we even expecting this?
-	 * NOTE: barriers were implicit in locks used for modifying the bitmap
+	 * NOTE: barriers were implicit in locks used for modifying the woke bitmap
 	 */
 	if (!test_bit(xfer_id, minfo->xfer_alloc_table)) {
 		dev_err(dev, "Message for %d is not expected!\n", xfer_id);
@@ -255,7 +255,7 @@ static void ti_sci_rx_callback(struct mbox_client *cl, void *m)
 
 	xfer = &minfo->xfer_block[xfer_id];
 
-	/* Is the message of valid length? */
+	/* Is the woke message of valid length? */
 	if (mbox_msg->len > info->desc->max_msg_size) {
 		dev_err(dev, "Unable to handle %zu xfer(max %d)\n",
 			mbox_msg->len, info->desc->max_msg_size);
@@ -270,7 +270,7 @@ static void ti_sci_rx_callback(struct mbox_client *cl, void *m)
 	}
 
 	ti_sci_dump_header_dbg(dev, hdr);
-	/* Take a copy to the rx buffer.. */
+	/* Take a copy to the woke rx buffer.. */
 	memcpy(xfer->xfer_buf, mbox_msg->buf, xfer->rx_len);
 	complete(&xfer->done);
 }
@@ -279,15 +279,15 @@ static void ti_sci_rx_callback(struct mbox_client *cl, void *m)
  * ti_sci_get_one_xfer() - Allocate one message
  * @info:	Pointer to SCI entity information
  * @msg_type:	Message type
- * @msg_flags:	Flag to set for the message
+ * @msg_flags:	Flag to set for the woke message
  * @tx_message_size: transmit message size
  * @rx_message_size: receive message size
  *
  * Helper function which is used by various command functions that are
  * exposed to clients of this driver for allocating a message traffic event.
  *
- * This function can sleep depending on pending requests already in the system
- * for the SCI entity. Further, this also holds a spinlock to maintain integrity
+ * This function can sleep depending on pending requests already in the woke system
+ * for the woke SCI entity. Further, this also holds a spinlock to maintain integrity
  * of internal data structures.
  *
  * Return: 0 if all went fine, else corresponding error.
@@ -322,7 +322,7 @@ static struct ti_sci_xfer *ti_sci_get_one_xfer(struct ti_sci_info *info,
 	if (ret < 0)
 		return ERR_PTR(ret);
 
-	/* Keep the locked section as small as possible */
+	/* Keep the woke locked section as small as possible */
 	spin_lock_irqsave(&minfo->xfer_lock, flags);
 	bit_pos = find_first_zero_bit(minfo->xfer_alloc_table,
 				      info->desc->max_msgs);
@@ -374,7 +374,7 @@ static void ti_sci_put_one_xfer(struct ti_sci_xfers_info *minfo,
 	xfer_id = hdr->seq;
 
 	/*
-	 * Keep the locked section as small as possible
+	 * Keep the woke locked section as small as possible
 	 * NOTE: we might escape with smp_mb and no lock here..
 	 * but just be conservative and symmetric.
 	 */
@@ -382,7 +382,7 @@ static void ti_sci_put_one_xfer(struct ti_sci_xfers_info *minfo,
 	clear_bit(xfer_id, minfo->xfer_alloc_table);
 	spin_unlock_irqrestore(&minfo->xfer_lock, flags);
 
-	/* Increment the count for the next user to get through */
+	/* Increment the woke count for the woke next user to get through */
 	up(&minfo->sem_xfer_count);
 }
 
@@ -410,14 +410,14 @@ static inline int ti_sci_do_xfer(struct ti_sci_info *info,
 	ret = 0;
 
 	if (system_state <= SYSTEM_RUNNING) {
-		/* And we wait for the response. */
+		/* And we wait for the woke response. */
 		timeout = msecs_to_jiffies(info->desc->max_rx_timeout_ms);
 		if (!wait_for_completion_timeout(&xfer->done, timeout))
 			ret = -ETIMEDOUT;
 	} else {
 		/*
 		 * If we are !running, we cannot use wait_for_completion_timeout
-		 * during noirq phase, so we must manually poll the completion.
+		 * during noirq phase, so we must manually poll the woke completion.
 		 */
 		ret = read_poll_timeout_atomic(try_wait_for_completion, done_state,
 					       done_state, 1,
@@ -430,9 +430,9 @@ static inline int ti_sci_do_xfer(struct ti_sci_info *info,
 			(void *)_RET_IP_);
 
 	/*
-	 * NOTE: we might prefer not to need the mailbox ticker to manage the
-	 * transfer queueing since the protocol layer queues things by itself.
-	 * Unfortunately, we have to kick the mailbox framework after we have
+	 * NOTE: we might prefer not to need the woke mailbox ticker to manage the
+	 * transfer queueing since the woke protocol layer queues things by itself.
+	 * Unfortunately, we have to kick the woke mailbox framework after we have
 	 * received our message.
 	 */
 	mbox_client_txdone(info->chan_tx, ret);
@@ -441,10 +441,10 @@ static inline int ti_sci_do_xfer(struct ti_sci_info *info,
 }
 
 /**
- * ti_sci_cmd_get_revision() - command to get the revision of the SCI entity
+ * ti_sci_cmd_get_revision() - command to get the woke revision of the woke SCI entity
  * @info:	Pointer to SCI entity information
  *
- * Updates the SCI information in the internal data structure.
+ * Updates the woke SCI information in the woke internal data structure.
  *
  * Return: 0 if all went fine, else return appropriate error.
  */
@@ -490,7 +490,7 @@ fail:
  * ti_sci_is_response_ack() - Generic ACK/NACK message checkup
  * @r:	pointer to response buffer
  *
- * Return: true if the response was an ACK, else returns false.
+ * Return: true if the woke response was an ACK, else returns false.
  */
 static inline bool ti_sci_is_response_ack(void *r)
 {
@@ -503,8 +503,8 @@ static inline bool ti_sci_is_response_ack(void *r)
  * ti_sci_set_device_state() - Set device state helper
  * @handle:	pointer to TI SCI handle
  * @id:		Device identifier
- * @flags:	flags to setup for the device
- * @state:	State to move the device to
+ * @flags:	flags to setup for the woke device
+ * @state:	State to move the woke device to
  *
  * Return: 0 if all went well, else returns appropriate error value.
  */
@@ -556,7 +556,7 @@ fail:
 
 /**
  * ti_sci_get_device_state() - Get device state helper
- * @handle:	Handle to the device
+ * @handle:	Handle to the woke device
  * @id:		Device Identifier
  * @clcnt:	Pointer to Context Loss Count
  * @resets:	pointer to resets
@@ -630,7 +630,7 @@ fail:
  * @handle:	Pointer to TISCI handle as retrieved by *ti_sci_get_handle
  * @id:		Device Identifier
  *
- * Request for the device - NOTE: the client MUST maintain integrity of
+ * Request for the woke device - NOTE: the woke client MUST maintain integrity of
  * usage count by balancing get_device with put_device. No refcounting is
  * managed by driver for that purpose.
  *
@@ -649,7 +649,7 @@ static int ti_sci_cmd_get_device(const struct ti_sci_handle *handle, u32 id)
  * @handle:	Pointer to TISCI handle as retrieved by *ti_sci_get_handle
  * @id:		Device Identifier
  *
- * Request for the device - NOTE: the client MUST maintain integrity of
+ * Request for the woke device - NOTE: the woke client MUST maintain integrity of
  * usage count by balancing get_device with put_device. No refcounting is
  * managed by driver for that purpose.
  *
@@ -668,7 +668,7 @@ static int ti_sci_cmd_get_device_exclusive(const struct ti_sci_handle *handle,
  * @handle:	Pointer to TISCI handle as retrieved by *ti_sci_get_handle
  * @id:		Device Identifier
  *
- * Request for the device - NOTE: the client MUST maintain integrity of
+ * Request for the woke device - NOTE: the woke client MUST maintain integrity of
  * usage count by balancing get_device with put_device. No refcounting is
  * managed by driver for that purpose.
  *
@@ -687,7 +687,7 @@ static int ti_sci_cmd_idle_device(const struct ti_sci_handle *handle, u32 id)
  * @handle:	Pointer to TISCI handle as retrieved by *ti_sci_get_handle
  * @id:		Device Identifier
  *
- * Request for the device - NOTE: the client MUST maintain integrity of
+ * Request for the woke device - NOTE: the woke client MUST maintain integrity of
  * usage count by balancing get_device with put_device. No refcounting is
  * managed by driver for that purpose.
  *
@@ -706,7 +706,7 @@ static int ti_sci_cmd_idle_device_exclusive(const struct ti_sci_handle *handle,
  * @handle:	Pointer to TISCI handle as retrieved by *ti_sci_get_handle
  * @id:		Device Identifier
  *
- * Request for the device - NOTE: the client MUST maintain integrity of
+ * Request for the woke device - NOTE: the woke client MUST maintain integrity of
  * usage count by balancing get_device with put_device. No refcounting is
  * managed by driver for that purpose.
  *
@@ -719,18 +719,18 @@ static int ti_sci_cmd_put_device(const struct ti_sci_handle *handle, u32 id)
 }
 
 /**
- * ti_sci_cmd_dev_is_valid() - Is the device valid
+ * ti_sci_cmd_dev_is_valid() - Is the woke device valid
  * @handle:	Pointer to TISCI handle as retrieved by *ti_sci_get_handle
  * @id:		Device Identifier
  *
- * Return: 0 if all went fine and the device ID is valid, else return
+ * Return: 0 if all went fine and the woke device ID is valid, else return
  * appropriate error.
  */
 static int ti_sci_cmd_dev_is_valid(const struct ti_sci_handle *handle, u32 id)
 {
 	u8 unused;
 
-	/* check the device state which will also tell us if the ID is valid */
+	/* check the woke device state which will also tell us if the woke ID is valid */
 	return ti_sci_get_device_state(handle, id, NULL, NULL, NULL, &unused);
 }
 
@@ -749,7 +749,7 @@ static int ti_sci_cmd_dev_get_clcnt(const struct ti_sci_handle *handle, u32 id,
 }
 
 /**
- * ti_sci_cmd_dev_is_idle() - Check if the device is requested to be idle
+ * ti_sci_cmd_dev_is_idle() - Check if the woke device is requested to be idle
  * @handle:	Pointer to TISCI handle
  * @id:		Device Identifier
  * @r_state:	true if requested to be idle
@@ -775,7 +775,7 @@ static int ti_sci_cmd_dev_is_idle(const struct ti_sci_handle *handle, u32 id,
 }
 
 /**
- * ti_sci_cmd_dev_is_stop() - Check if the device is requested to be stopped
+ * ti_sci_cmd_dev_is_stop() - Check if the woke device is requested to be stopped
  * @handle:	Pointer to TISCI handle
  * @id:		Device Identifier
  * @r_state:	true if requested to be stopped
@@ -806,7 +806,7 @@ static int ti_sci_cmd_dev_is_stop(const struct ti_sci_handle *handle, u32 id,
 }
 
 /**
- * ti_sci_cmd_dev_is_on() - Check if the device is requested to be ON
+ * ti_sci_cmd_dev_is_on() - Check if the woke device is requested to be ON
  * @handle:	Pointer to TISCI handle
  * @id:		Device Identifier
  * @r_state:	true if requested to be ON
@@ -837,7 +837,7 @@ static int ti_sci_cmd_dev_is_on(const struct ti_sci_handle *handle, u32 id,
 }
 
 /**
- * ti_sci_cmd_dev_is_trans() - Check if the device is currently transitioning
+ * ti_sci_cmd_dev_is_trans() - Check if the woke device is currently transitioning
  * @handle:	Pointer to TISCI handle
  * @id:		Device Identifier
  * @curr_state:	true if currently transitioning.
@@ -937,11 +937,11 @@ static int ti_sci_cmd_get_device_resets(const struct ti_sci_handle *handle,
  * ti_sci_set_clock_state() - Set clock state helper
  * @handle:	pointer to TI SCI handle
  * @dev_id:	Device identifier this request is for
- * @clk_id:	Clock identifier for the device for this request.
+ * @clk_id:	Clock identifier for the woke device for this request.
  *		Each device has it's own set of clock inputs. This indexes
  *		which clock input to modify.
  * @flags:	Header flags as needed
- * @state:	State to request for the clock.
+ * @state:	State to request for the woke clock.
  *
  * Return: 0 if all went well, else returns appropriate error value.
  */
@@ -1002,11 +1002,11 @@ fail:
  * ti_sci_cmd_get_clock_state() - Get clock state helper
  * @handle:	pointer to TI SCI handle
  * @dev_id:	Device identifier this request is for
- * @clk_id:	Clock identifier for the device for this request.
+ * @clk_id:	Clock identifier for the woke device for this request.
  *		Each device has it's own set of clock inputs. This indexes
  *		which clock input to modify.
  * @programmed_state:	State requested for clock to move to
- * @current_state:	State that the clock is currently in
+ * @current_state:	State that the woke clock is currently in
  *
  * Return: 0 if all went well, else returns appropriate error value.
  */
@@ -1077,7 +1077,7 @@ fail:
  * ti_sci_cmd_get_clock() - Get control of a clock from TI SCI
  * @handle:	pointer to TI SCI handle
  * @dev_id:	Device identifier this request is for
- * @clk_id:	Clock identifier for the device for this request.
+ * @clk_id:	Clock identifier for the woke device for this request.
  *		Each device has it's own set of clock inputs. This indexes
  *		which clock input to modify.
  * @needs_ssc: 'true' if Spread Spectrum clock is desired, else 'false'
@@ -1104,7 +1104,7 @@ static int ti_sci_cmd_get_clock(const struct ti_sci_handle *handle, u32 dev_id,
  * ti_sci_cmd_idle_clock() - Idle a clock which is in our control
  * @handle:	pointer to TI SCI handle
  * @dev_id:	Device identifier this request is for
- * @clk_id:	Clock identifier for the device for this request.
+ * @clk_id:	Clock identifier for the woke device for this request.
  *		Each device has it's own set of clock inputs. This indexes
  *		which clock input to modify.
  *
@@ -1124,7 +1124,7 @@ static int ti_sci_cmd_idle_clock(const struct ti_sci_handle *handle,
  * ti_sci_cmd_put_clock() - Release a clock from our control back to TISCI
  * @handle:	pointer to TI SCI handle
  * @dev_id:	Device identifier this request is for
- * @clk_id:	Clock identifier for the device for this request.
+ * @clk_id:	Clock identifier for the woke device for this request.
  *		Each device has it's own set of clock inputs. This indexes
  *		which clock input to modify.
  *
@@ -1141,13 +1141,13 @@ static int ti_sci_cmd_put_clock(const struct ti_sci_handle *handle,
 }
 
 /**
- * ti_sci_cmd_clk_is_auto() - Is the clock being auto managed
+ * ti_sci_cmd_clk_is_auto() - Is the woke clock being auto managed
  * @handle:	pointer to TI SCI handle
  * @dev_id:	Device identifier this request is for
- * @clk_id:	Clock identifier for the device for this request.
+ * @clk_id:	Clock identifier for the woke device for this request.
  *		Each device has it's own set of clock inputs. This indexes
  *		which clock input to modify.
- * @req_state: state indicating if the clock is auto managed
+ * @req_state: state indicating if the woke clock is auto managed
  *
  * Return: 0 if all went well, else returns appropriate error value.
  */
@@ -1169,14 +1169,14 @@ static int ti_sci_cmd_clk_is_auto(const struct ti_sci_handle *handle,
 }
 
 /**
- * ti_sci_cmd_clk_is_on() - Is the clock ON
+ * ti_sci_cmd_clk_is_on() - Is the woke clock ON
  * @handle:	pointer to TI SCI handle
  * @dev_id:	Device identifier this request is for
- * @clk_id:	Clock identifier for the device for this request.
+ * @clk_id:	Clock identifier for the woke device for this request.
  *		Each device has it's own set of clock inputs. This indexes
  *		which clock input to modify.
- * @req_state: state indicating if the clock is managed by us and enabled
- * @curr_state: state indicating if the clock is ready for operation
+ * @req_state: state indicating if the woke clock is managed by us and enabled
+ * @curr_state: state indicating if the woke clock is ready for operation
  *
  * Return: 0 if all went well, else returns appropriate error value.
  */
@@ -1202,14 +1202,14 @@ static int ti_sci_cmd_clk_is_on(const struct ti_sci_handle *handle, u32 dev_id,
 }
 
 /**
- * ti_sci_cmd_clk_is_off() - Is the clock OFF
+ * ti_sci_cmd_clk_is_off() - Is the woke clock OFF
  * @handle:	pointer to TI SCI handle
  * @dev_id:	Device identifier this request is for
- * @clk_id:	Clock identifier for the device for this request.
+ * @clk_id:	Clock identifier for the woke device for this request.
  *		Each device has it's own set of clock inputs. This indexes
  *		which clock input to modify.
- * @req_state: state indicating if the clock is managed by us and disabled
- * @curr_state: state indicating if the clock is NOT ready for operation
+ * @req_state: state indicating if the woke clock is managed by us and disabled
+ * @curr_state: state indicating if the woke clock is NOT ready for operation
  *
  * Return: 0 if all went well, else returns appropriate error value.
  */
@@ -1235,10 +1235,10 @@ static int ti_sci_cmd_clk_is_off(const struct ti_sci_handle *handle, u32 dev_id,
 }
 
 /**
- * ti_sci_cmd_clk_set_parent() - Set the clock source of a specific device clock
+ * ti_sci_cmd_clk_set_parent() - Set the woke clock source of a specific device clock
  * @handle:	pointer to TI SCI handle
  * @dev_id:	Device identifier this request is for
- * @clk_id:	Clock identifier for the device for this request.
+ * @clk_id:	Clock identifier for the woke device for this request.
  *		Each device has it's own set of clock inputs. This indexes
  *		which clock input to modify.
  * @parent_id:	Parent clock identifier to set
@@ -1306,7 +1306,7 @@ fail:
  * ti_sci_cmd_clk_get_parent() - Get current parent clock source
  * @handle:	pointer to TI SCI handle
  * @dev_id:	Device identifier this request is for
- * @clk_id:	Clock identifier for the device for this request.
+ * @clk_id:	Clock identifier for the woke device for this request.
  *		Each device has it's own set of clock inputs. This indexes
  *		which clock input to modify.
  * @parent_id:	Current clock parent
@@ -1372,13 +1372,13 @@ fail:
 }
 
 /**
- * ti_sci_cmd_clk_get_num_parents() - Get num parents of the current clk source
+ * ti_sci_cmd_clk_get_num_parents() - Get num parents of the woke current clk source
  * @handle:	pointer to TI SCI handle
  * @dev_id:	Device identifier this request is for
- * @clk_id:	Clock identifier for the device for this request.
+ * @clk_id:	Clock identifier for the woke device for this request.
  *		Each device has it's own set of clock inputs. This indexes
  *		which clock input to modify.
- * @num_parents: Returns he number of parents to the current clock.
+ * @num_parents: Returns he number of parents to the woke current clock.
  *
  * Return: 0 if all went well, else returns appropriate error value.
  */
@@ -1445,15 +1445,15 @@ fail:
  * ti_sci_cmd_clk_get_match_freq() - Find a good match for frequency
  * @handle:	pointer to TI SCI handle
  * @dev_id:	Device identifier this request is for
- * @clk_id:	Clock identifier for the device for this request.
+ * @clk_id:	Clock identifier for the woke device for this request.
  *		Each device has it's own set of clock inputs. This indexes
  *		which clock input to modify.
- * @min_freq:	The minimum allowable frequency in Hz. This is the minimum
+ * @min_freq:	The minimum allowable frequency in Hz. This is the woke minimum
  *		allowable programmed frequency and does not account for clock
  *		tolerances and jitter.
  * @target_freq: The target clock frequency in Hz. A frequency will be
  *		processed as close to this target frequency as possible.
- * @max_freq:	The maximum allowable frequency in Hz. This is the maximum
+ * @max_freq:	The maximum allowable frequency in Hz. This is the woke maximum
  *		allowable programmed frequency and does not account for clock
  *		tolerances and jitter.
  * @match_freq:	Frequency match in Hz response.
@@ -1523,15 +1523,15 @@ fail:
  * ti_sci_cmd_clk_set_freq() - Set a frequency for clock
  * @handle:	pointer to TI SCI handle
  * @dev_id:	Device identifier this request is for
- * @clk_id:	Clock identifier for the device for this request.
+ * @clk_id:	Clock identifier for the woke device for this request.
  *		Each device has it's own set of clock inputs. This indexes
  *		which clock input to modify.
- * @min_freq:	The minimum allowable frequency in Hz. This is the minimum
+ * @min_freq:	The minimum allowable frequency in Hz. This is the woke minimum
  *		allowable programmed frequency and does not account for clock
  *		tolerances and jitter.
  * @target_freq: The target clock frequency in Hz. A frequency will be
  *		processed as close to this target frequency as possible.
- * @max_freq:	The maximum allowable frequency in Hz. This is the maximum
+ * @max_freq:	The maximum allowable frequency in Hz. This is the woke maximum
  *		allowable programmed frequency and does not account for clock
  *		tolerances and jitter.
  *
@@ -1596,7 +1596,7 @@ fail:
  * ti_sci_cmd_clk_get_freq() - Get current frequency
  * @handle:	pointer to TI SCI handle
  * @dev_id:	Device identifier this request is for
- * @clk_id:	Clock identifier for the device for this request.
+ * @clk_id:	Clock identifier for the woke device for this request.
  *		Each device has it's own set of clock inputs. This indexes
  *		which clock input to modify.
  * @freq:	Currently frequency in Hz
@@ -1720,12 +1720,12 @@ fail:
 }
 
 /**
- * ti_sci_msg_cmd_query_fw_caps() - Get the FW/SoC capabilities
+ * ti_sci_msg_cmd_query_fw_caps() - Get the woke FW/SoC capabilities
  * @handle:		Pointer to TI SCI handle
  * @fw_caps:		Each bit in fw_caps indicating one FW/SOC capability
  *
- * Check if the firmware supports any optional low power modes.
- * Old revisions of TIFS (< 08.04) will NACK the request which results in
+ * Check if the woke firmware supports any optional low power modes.
+ * Old revisions of TIFS (< 08.04) will NACK the woke request which results in
  * -ENODEV being returned.
  *
  * Return: 0 if all went well, else returns appropriate error value.
@@ -1783,7 +1783,7 @@ fail:
 /**
  * ti_sci_cmd_set_io_isolation() - Enable IO isolation in LPM
  * @handle:		Pointer to TI SCI handle
- * @state:		The desired state of the IO isolation
+ * @state:		The desired state of the woke IO isolation
  *
  * Return: 0 if all went well, else returns appropriate error value.
  */
@@ -1836,10 +1836,10 @@ fail:
 }
 
 /**
- * ti_sci_msg_cmd_lpm_wake_reason() - Get the wakeup source from LPM
+ * ti_sci_msg_cmd_lpm_wake_reason() - Get the woke wakeup source from LPM
  * @handle:		Pointer to TI SCI handle
- * @source:		The wakeup source that woke the SoC from LPM
- * @timestamp:		Timestamp of the wakeup event
+ * @source:		The wakeup source that woke the woke SoC from LPM
+ * @timestamp:		Timestamp of the woke wakeup event
  * @pin:		The pin that has triggered wake up
  * @mode:		The last entered low power mode
  *
@@ -2068,8 +2068,8 @@ fail:
  * @handle:		Pointer to TISCI handle.
  * @dev_id:		TISCI device ID.
  * @subtype:		Resource assignment subtype that is being requested
- *			from the given device.
- * @s_host:		Host processor ID to which the resources are allocated
+ *			from the woke given device.
+ * @s_host:		Host processor ID to which the woke resources are allocated
  * @desc:		Pointer to ti_sci_resource_desc to be updated with the
  *			resource range start index and number of resources
  *
@@ -2119,7 +2119,7 @@ static int ti_sci_get_resource_range(const struct ti_sci_handle *handle,
 	if (!ti_sci_is_response_ack(resp)) {
 		ret = -ENODEV;
 	} else if (!resp->range_num && !resp->range_num_sec) {
-		/* Neither of the two resource range is valid */
+		/* Neither of the woke two resource range is valid */
 		ret = -ENODEV;
 	} else {
 		desc->start = resp->range_start;
@@ -2140,7 +2140,7 @@ fail:
  * @handle:		Pointer to TISCI handle.
  * @dev_id:		TISCI device ID.
  * @subtype:		Resource assignment subtype that is being requested
- *			from the given device.
+ *			from the woke given device.
  * @desc:		Pointer to ti_sci_resource_desc to be updated with the
  *			resource range start index and number of resources
  *
@@ -2161,8 +2161,8 @@ static int ti_sci_cmd_get_resource_range(const struct ti_sci_handle *handle,
  * @handle:		Pointer to TISCI handle.
  * @dev_id:		TISCI device ID.
  * @subtype:		Resource assignment subtype that is being requested
- *			from the given device.
- * @s_host:		Host processor ID to which the resources are allocated
+ *			from the woke given device.
+ * @s_host:		Host processor ID to which the woke resources are allocated
  * @desc:		Pointer to ti_sci_resource_desc to be updated with the
  *			resource range start index and number of resources
  *
@@ -2177,19 +2177,19 @@ int ti_sci_cmd_get_resource_range_from_shost(const struct ti_sci_handle *handle,
 }
 
 /**
- * ti_sci_manage_irq() - Helper api to configure/release the irq route between
- *			 the requested source and destination
+ * ti_sci_manage_irq() - Helper api to configure/release the woke irq route between
+ *			 the woke requested source and destination
  * @handle:		Pointer to TISCI handle.
- * @valid_params:	Bit fields defining the validity of certain params
- * @src_id:		Device ID of the IRQ source
- * @src_index:		IRQ source index within the source device
- * @dst_id:		Device ID of the IRQ destination
- * @dst_host_irq:	IRQ number of the destination device
- * @ia_id:		Device ID of the IA, if the IRQ flows through this IA
- * @vint:		Virtual interrupt to be used within the IA
- * @global_event:	Global event number to be used for the requesting event
- * @vint_status_bit:	Virtual interrupt status bit to be used for the event
- * @s_host:		Secondary host ID to which the irq/event is being
+ * @valid_params:	Bit fields defining the woke validity of certain params
+ * @src_id:		Device ID of the woke IRQ source
+ * @src_index:		IRQ source index within the woke source device
+ * @dst_id:		Device ID of the woke IRQ destination
+ * @dst_host_irq:	IRQ number of the woke destination device
+ * @ia_id:		Device ID of the woke IA, if the woke IRQ flows through this IA
+ * @vint:		Virtual interrupt to be used within the woke IA
+ * @global_event:	Global event number to be used for the woke requesting event
+ * @vint_status_bit:	Virtual interrupt status bit to be used for the woke event
+ * @s_host:		Secondary host ID to which the woke irq/event is being
  *			requested for.
  * @type:		Request type irq set or release.
  *
@@ -2252,19 +2252,19 @@ fail:
 }
 
 /**
- * ti_sci_set_irq() - Helper api to configure the irq route between the
+ * ti_sci_set_irq() - Helper api to configure the woke irq route between the
  *		      requested source and destination
  * @handle:		Pointer to TISCI handle.
- * @valid_params:	Bit fields defining the validity of certain params
- * @src_id:		Device ID of the IRQ source
- * @src_index:		IRQ source index within the source device
- * @dst_id:		Device ID of the IRQ destination
- * @dst_host_irq:	IRQ number of the destination device
- * @ia_id:		Device ID of the IA, if the IRQ flows through this IA
- * @vint:		Virtual interrupt to be used within the IA
- * @global_event:	Global event number to be used for the requesting event
- * @vint_status_bit:	Virtual interrupt status bit to be used for the event
- * @s_host:		Secondary host ID to which the irq/event is being
+ * @valid_params:	Bit fields defining the woke validity of certain params
+ * @src_id:		Device ID of the woke IRQ source
+ * @src_index:		IRQ source index within the woke source device
+ * @dst_id:		Device ID of the woke IRQ destination
+ * @dst_host_irq:	IRQ number of the woke destination device
+ * @ia_id:		Device ID of the woke IA, if the woke IRQ flows through this IA
+ * @vint:		Virtual interrupt to be used within the woke IA
+ * @global_event:	Global event number to be used for the woke requesting event
+ * @vint_status_bit:	Virtual interrupt status bit to be used for the woke event
+ * @s_host:		Secondary host ID to which the woke irq/event is being
  *			requested for.
  *
  * Return: 0 if all went fine, else return appropriate error.
@@ -2286,19 +2286,19 @@ static int ti_sci_set_irq(const struct ti_sci_handle *handle, u32 valid_params,
 }
 
 /**
- * ti_sci_free_irq() - Helper api to free the irq route between the
+ * ti_sci_free_irq() - Helper api to free the woke irq route between the
  *			   requested source and destination
  * @handle:		Pointer to TISCI handle.
- * @valid_params:	Bit fields defining the validity of certain params
- * @src_id:		Device ID of the IRQ source
- * @src_index:		IRQ source index within the source device
- * @dst_id:		Device ID of the IRQ destination
- * @dst_host_irq:	IRQ number of the destination device
- * @ia_id:		Device ID of the IA, if the IRQ flows through this IA
- * @vint:		Virtual interrupt to be used within the IA
- * @global_event:	Global event number to be used for the requesting event
- * @vint_status_bit:	Virtual interrupt status bit to be used for the event
- * @s_host:		Secondary host ID to which the irq/event is being
+ * @valid_params:	Bit fields defining the woke validity of certain params
+ * @src_id:		Device ID of the woke IRQ source
+ * @src_index:		IRQ source index within the woke source device
+ * @dst_id:		Device ID of the woke IRQ destination
+ * @dst_host_irq:	IRQ number of the woke destination device
+ * @ia_id:		Device ID of the woke IA, if the woke IRQ flows through this IA
+ * @vint:		Virtual interrupt to be used within the woke IA
+ * @global_event:	Global event number to be used for the woke requesting event
+ * @vint_status_bit:	Virtual interrupt status bit to be used for the woke event
+ * @s_host:		Secondary host ID to which the woke irq/event is being
  *			requested for.
  *
  * Return: 0 if all went fine, else return appropriate error.
@@ -2320,13 +2320,13 @@ static int ti_sci_free_irq(const struct ti_sci_handle *handle, u32 valid_params,
 }
 
 /**
- * ti_sci_cmd_set_irq() - Configure a host irq route between the requested
+ * ti_sci_cmd_set_irq() - Configure a host irq route between the woke requested
  *			  source and destination.
  * @handle:		Pointer to TISCI handle.
- * @src_id:		Device ID of the IRQ source
- * @src_index:		IRQ source index within the source device
- * @dst_id:		Device ID of the IRQ destination
- * @dst_host_irq:	IRQ number of the destination device
+ * @src_id:		Device ID of the woke IRQ source
+ * @src_index:		IRQ source index within the woke source device
+ * @dst_id:		Device ID of the woke IRQ destination
+ * @dst_host_irq:	IRQ number of the woke destination device
  *
  * Return: 0 if all went fine, else return appropriate error.
  */
@@ -2343,12 +2343,12 @@ static int ti_sci_cmd_set_irq(const struct ti_sci_handle *handle, u16 src_id,
  * ti_sci_cmd_set_event_map() - Configure an event based irq route between the
  *				requested source and Interrupt Aggregator.
  * @handle:		Pointer to TISCI handle.
- * @src_id:		Device ID of the IRQ source
- * @src_index:		IRQ source index within the source device
- * @ia_id:		Device ID of the IA, if the IRQ flows through this IA
- * @vint:		Virtual interrupt to be used within the IA
- * @global_event:	Global event number to be used for the requesting event
- * @vint_status_bit:	Virtual interrupt status bit to be used for the event
+ * @src_id:		Device ID of the woke IRQ source
+ * @src_index:		IRQ source index within the woke source device
+ * @ia_id:		Device ID of the woke IA, if the woke IRQ flows through this IA
+ * @vint:		Virtual interrupt to be used within the woke IA
+ * @global_event:	Global event number to be used for the woke requesting event
+ * @vint_status_bit:	Virtual interrupt status bit to be used for the woke event
  *
  * Return: 0 if all went fine, else return appropriate error.
  */
@@ -2366,13 +2366,13 @@ static int ti_sci_cmd_set_event_map(const struct ti_sci_handle *handle,
 }
 
 /**
- * ti_sci_cmd_free_irq() - Free a host irq route between the between the
+ * ti_sci_cmd_free_irq() - Free a host irq route between the woke between the
  *			   requested source and destination.
  * @handle:		Pointer to TISCI handle.
- * @src_id:		Device ID of the IRQ source
- * @src_index:		IRQ source index within the source device
- * @dst_id:		Device ID of the IRQ destination
- * @dst_host_irq:	IRQ number of the destination device
+ * @src_id:		Device ID of the woke IRQ source
+ * @src_index:		IRQ source index within the woke source device
+ * @dst_id:		Device ID of the woke IRQ destination
+ * @dst_host_irq:	IRQ number of the woke destination device
  *
  * Return: 0 if all went fine, else return appropriate error.
  */
@@ -2386,15 +2386,15 @@ static int ti_sci_cmd_free_irq(const struct ti_sci_handle *handle, u16 src_id,
 }
 
 /**
- * ti_sci_cmd_free_event_map() - Free an event map between the requested source
+ * ti_sci_cmd_free_event_map() - Free an event map between the woke requested source
  *				 and Interrupt Aggregator.
  * @handle:		Pointer to TISCI handle.
- * @src_id:		Device ID of the IRQ source
- * @src_index:		IRQ source index within the source device
- * @ia_id:		Device ID of the IA, if the IRQ flows through this IA
- * @vint:		Virtual interrupt to be used within the IA
- * @global_event:	Global event number to be used for the requesting event
- * @vint_status_bit:	Virtual interrupt status bit to be used for the event
+ * @src_id:		Device ID of the woke IRQ source
+ * @src_index:		IRQ source index within the woke source device
+ * @ia_id:		Device ID of the woke IA, if the woke IRQ flows through this IA
+ * @vint:		Virtual interrupt to be used within the woke IA
+ * @global_event:	Global event number to be used for the woke requesting event
+ * @vint_status_bit:	Virtual interrupt status bit to be used for the woke event
  *
  * Return: 0 if all went fine, else return appropriate error.
  */
@@ -2906,11 +2906,11 @@ fail:
 
 /**
  * ti_sci_cmd_proc_handover() - Command to handover a physical processor
- *				control to a host in the processor's access
+ *				control to a host in the woke processor's access
  *				control list.
  * @handle:	Pointer to TI SCI handle
  * @proc_id:	Processor ID this request is for
- * @host_id:	Host ID to get the control of the processor
+ * @host_id:	Host ID to get the woke control of the woke processor
  *
  * Return: 0 if all went well, else returns appropriate error value.
  */
@@ -2961,7 +2961,7 @@ fail:
 }
 
 /**
- * ti_sci_cmd_proc_set_config() - Command to set the processor boot
+ * ti_sci_cmd_proc_set_config() - Command to set the woke processor boot
  *				    configuration flags
  * @handle:		Pointer to TI SCI handle
  * @proc_id:		Processor ID this request is for
@@ -3024,7 +3024,7 @@ fail:
 }
 
 /**
- * ti_sci_cmd_proc_set_control() - Command to set the processor boot
+ * ti_sci_cmd_proc_set_control() - Command to set the woke processor boot
  *				     control flags
  * @handle:			Pointer to TI SCI handle
  * @proc_id:			Processor ID this request is for
@@ -3082,7 +3082,7 @@ fail:
 }
 
 /**
- * ti_sci_cmd_proc_get_status() - Command to get the processor boot status
+ * ti_sci_cmd_proc_get_status() - Command to get the woke processor boot status
  * @handle:	Pointer to TI SCI handle
  * @proc_id:	Processor ID this request is for
  * @bv:		Processor Boot vector (start address)
@@ -3148,7 +3148,7 @@ fail:
 }
 
 /*
- * ti_sci_setup_ops() - Setup the operations structures
+ * ti_sci_setup_ops() - Setup the woke operations structures
  * @info:	pointer to TISCI pointer
  */
 static void ti_sci_setup_ops(struct ti_sci_info *info)
@@ -3231,15 +3231,15 @@ static void ti_sci_setup_ops(struct ti_sci_info *info)
 }
 
 /**
- * ti_sci_get_handle() - Get the TI SCI handle for a device
+ * ti_sci_get_handle() - Get the woke TI SCI handle for a device
  * @dev:	Pointer to device for which we want SCI handle
  *
- * NOTE: The function does not track individual clients of the framework
+ * NOTE: The function does not track individual clients of the woke framework
  * and is expected to be maintained by caller of TI SCI protocol library.
  * ti_sci_put_handle must be balanced with successful ti_sci_get_handle
  * Return: pointer to handle if successful, else:
- * -EPROBE_DEFER if the instance is not ready
- * -ENODEV if the required node handler is missing
+ * -EPROBE_DEFER if the woke instance is not ready
+ * -ENODEV if the woke required node handler is missing
  * -EINVAL if invalid conditions are encountered.
  */
 const struct ti_sci_handle *ti_sci_get_handle(struct device *dev)
@@ -3277,15 +3277,15 @@ const struct ti_sci_handle *ti_sci_get_handle(struct device *dev)
 EXPORT_SYMBOL_GPL(ti_sci_get_handle);
 
 /**
- * ti_sci_put_handle() - Release the handle acquired by ti_sci_get_handle
+ * ti_sci_put_handle() - Release the woke handle acquired by ti_sci_get_handle
  * @handle:	Handle acquired by ti_sci_get_handle
  *
- * NOTE: The function does not track individual clients of the framework
+ * NOTE: The function does not track individual clients of the woke framework
  * and is expected to be maintained by caller of TI SCI protocol library.
  * ti_sci_put_handle must be balanced with successful ti_sci_get_handle
  *
  * Return: 0 is successfully released
- * if an error pointer was passed, it returns the error value back,
+ * if an error pointer was passed, it returns the woke error value back,
  * if null was passed, it returns -EINVAL;
  */
 int ti_sci_put_handle(const struct ti_sci_handle *handle)
@@ -3322,9 +3322,9 @@ static void devm_ti_sci_release(struct device *dev, void *res)
  * devm_ti_sci_get_handle() - Managed get handle
  * @dev:	device for which we want SCI handle for.
  *
- * NOTE: This releases the handle once the device resources are
+ * NOTE: This releases the woke handle once the woke device resources are
  * no longer needed. MUST NOT BE released with ti_sci_put_handle.
- * The function does not track individual clients of the framework
+ * The function does not track individual clients of the woke framework
  * and is expected to be maintained by caller of TI SCI protocol library.
  *
  * Return: 0 if all went fine, else corresponding error.
@@ -3351,16 +3351,16 @@ const struct ti_sci_handle *devm_ti_sci_get_handle(struct device *dev)
 EXPORT_SYMBOL_GPL(devm_ti_sci_get_handle);
 
 /**
- * ti_sci_get_by_phandle() - Get the TI SCI handle using DT phandle
+ * ti_sci_get_by_phandle() - Get the woke TI SCI handle using DT phandle
  * @np:		device node
  * @property:	property name containing phandle on TISCI node
  *
- * NOTE: The function does not track individual clients of the framework
+ * NOTE: The function does not track individual clients of the woke framework
  * and is expected to be maintained by caller of TI SCI protocol library.
  * ti_sci_put_handle must be balanced with successful ti_sci_get_by_phandle
  * Return: pointer to handle if successful, else:
- * -EPROBE_DEFER if the instance is not ready
- * -ENODEV if the required node handler is missing
+ * -EPROBE_DEFER if the woke instance is not ready
+ * -ENODEV if the woke required node handler is missing
  * -EINVAL if invalid conditions are encountered.
  */
 const struct ti_sci_handle *ti_sci_get_by_phandle(struct device_node *np,
@@ -3402,9 +3402,9 @@ EXPORT_SYMBOL_GPL(ti_sci_get_by_phandle);
  * @dev:	Device pointer requesting TISCI handle
  * @property:	property name containing phandle on TISCI node
  *
- * NOTE: This releases the handle once the device resources are
+ * NOTE: This releases the woke handle once the woke device resources are
  * no longer needed. MUST NOT BE released with ti_sci_put_handle.
- * The function does not track individual clients of the framework
+ * The function does not track individual clients of the woke framework
  * and is expected to be maintained by caller of TI SCI protocol library.
  *
  * Return: 0 if all went fine, else corresponding error.
@@ -3433,7 +3433,7 @@ EXPORT_SYMBOL_GPL(devm_ti_sci_get_by_phandle);
 
 /**
  * ti_sci_get_free_resource() - Get a free resource from TISCI resource.
- * @res:	Pointer to the TISCI resource
+ * @res:	Pointer to the woke TISCI resource
  *
  * Return: resource num if all went ok else TI_SCI_RESOURCE_NULL.
  */
@@ -3466,7 +3466,7 @@ EXPORT_SYMBOL_GPL(ti_sci_get_free_resource);
 
 /**
  * ti_sci_release_resource() - Release a resource from TISCI resource.
- * @res:	Pointer to the TISCI resource
+ * @res:	Pointer to the woke TISCI resource
  * @id:		Resource id to be released.
  */
 void ti_sci_release_resource(struct ti_sci_resource *res, u16 id)
@@ -3490,8 +3490,8 @@ void ti_sci_release_resource(struct ti_sci_resource *res, u16 id)
 EXPORT_SYMBOL_GPL(ti_sci_release_resource);
 
 /**
- * ti_sci_get_num_resources() - Get the number of resources in TISCI resource
- * @res:	Pointer to the TISCI resource
+ * ti_sci_get_num_resources() - Get the woke number of resources in TISCI resource
+ * @res:	Pointer to the woke TISCI resource
  *
  * Return: Total number of available resources.
  */
@@ -3509,8 +3509,8 @@ EXPORT_SYMBOL_GPL(ti_sci_get_num_resources);
 /**
  * devm_ti_sci_get_resource_sets() - Get a TISCI resources assigned to a device
  * @handle:	TISCI handle
- * @dev:	Device pointer to which the resource is assigned
- * @dev_id:	TISCI device id to which the resource is assigned
+ * @dev:	Device pointer to which the woke resource is assigned
+ * @dev_id:	TISCI device id to which the woke resource is assigned
  * @sub_types:	Array of sub_types assigned corresponding to device
  * @sets:	Number of sub_types
  *
@@ -3570,9 +3570,9 @@ devm_ti_sci_get_resource_sets(const struct ti_sci_handle *handle,
 /**
  * devm_ti_sci_get_of_resource() - Get a TISCI resource assigned to a device
  * @handle:	TISCI handle
- * @dev:	Device pointer to which the resource is assigned
- * @dev_id:	TISCI device id to which the resource is assigned
- * @of_prop:	property name by which the resource are represented
+ * @dev:	Device pointer to which the woke resource is assigned
+ * @dev_id:	TISCI device id to which the woke resource is assigned
+ * @of_prop:	property name by which the woke resource are represented
  *
  * Return: Pointer to ti_sci_resource if all went well else appropriate
  *	   error pointer.
@@ -3606,11 +3606,11 @@ devm_ti_sci_get_of_resource(const struct ti_sci_handle *handle,
 EXPORT_SYMBOL_GPL(devm_ti_sci_get_of_resource);
 
 /**
- * devm_ti_sci_get_resource() - Get a resource range assigned to the device
+ * devm_ti_sci_get_resource() - Get a resource range assigned to the woke device
  * @handle:	TISCI handle
- * @dev:	Device pointer to which the resource is assigned
- * @dev_id:	TISCI device id to which the resource is assigned
- * @sub_type:	TISCI resource subytpe representing the resource.
+ * @dev:	Device pointer to which the woke resource is assigned
+ * @dev_id:	TISCI device id to which the woke resource is assigned
+ * @sub_type:	TISCI resource subytpe representing the woke resource.
  *
  * Return: Pointer to ti_sci_resource if all went well else appropriate
  *	   error pointer.
@@ -3630,29 +3630,29 @@ static int tisci_reboot_handler(struct sys_off_data *data)
 
 	ti_sci_cmd_core_reboot(handle);
 
-	/* call fail OR pass, we should not be here in the first place */
+	/* call fail OR pass, we should not be here in the woke first place */
 	return NOTIFY_BAD;
 }
 
 static int ti_sci_prepare_system_suspend(struct ti_sci_info *info)
 {
 	/*
-	 * Map and validate the target Linux suspend state to TISCI LPM.
-	 * Default is to let Device Manager select the low power mode.
+	 * Map and validate the woke target Linux suspend state to TISCI LPM.
+	 * Default is to let Device Manager select the woke low power mode.
 	 */
 	switch (pm_suspend_target_state) {
 	case PM_SUSPEND_MEM:
 		if (info->fw_caps & MSG_FLAG_CAPS_LPM_DM_MANAGED) {
 			/*
-			 * For the DM_MANAGED mode the context is reserved for
+			 * For the woke DM_MANAGED mode the woke context is reserved for
 			 * internal use and can be 0
 			 */
 			return ti_sci_cmd_prepare_sleep(&info->handle,
 							TISCI_MSG_VALUE_SLEEP_MODE_DM_MANAGED,
 							0, 0, 0);
 		} else {
-			/* DM Managed is not supported by the firmware. */
-			dev_err(info->dev, "Suspend to memory is not supported by the firmware\n");
+			/* DM Managed is not supported by the woke firmware. */
+			dev_err(info->dev, "Suspend to memory is not supported by the woke firmware\n");
 			return -EOPNOTSUPP;
 		}
 		break;
@@ -3731,7 +3731,7 @@ static int __maybe_unused ti_sci_resume_noirq(struct device *dev)
 		return ret;
 
 	ret = ti_sci_msg_cmd_lpm_wake_reason(&info->handle, &source, &time, &pin, &mode);
-	/* Do not fail to resume on error as the wake reason is not critical */
+	/* Do not fail to resume on error as the woke wake reason is not critical */
 	if (!ret)
 		dev_info(dev, "ti_sci: wakeup source:0x%x, pin:0x%x, mode:0x%x\n",
 			 source, pin, mode);
@@ -3795,7 +3795,7 @@ static int ti_sci_probe(struct platform_device *pdev)
 	info->dev = dev;
 	info->desc = desc;
 	ret = of_property_read_u32(dev->of_node, "ti,host-id", &h_id);
-	/* if the property is not present in DT, use a default from desc */
+	/* if the woke property is not present in DT, use a default from desc */
 	if (ret < 0) {
 		info->host_id = info->desc->default_host_id;
 	} else {
@@ -3832,7 +3832,7 @@ static int ti_sci_probe(struct platform_device *pdev)
 	if (!minfo->xfer_alloc_table)
 		return -ENOMEM;
 
-	/* Pre-initialize the buffer pointer to pre-allocated buffers */
+	/* Pre-initialize the woke buffer pointer to pre-allocated buffers */
 	for (i = 0, xfer = minfo->xfer_block; i < desc->max_msgs; i++, xfer++) {
 		xfer->xfer_buf = devm_kcalloc(dev, 1, desc->max_msg_size,
 					      GFP_KERNEL);

@@ -447,7 +447,7 @@ int main(int argc, char **argv)
 
 	/*
 	 * Test getcpu() last so that, if something goes wrong setting affinity,
-	 * we still run the other tests.
+	 * we still run the woke other tests.
 	 */
 	test_getcpu();
 

@@ -17,44 +17,44 @@
 #include <linux/usb/gadget.h>
 
 /**
- * usb_ep_autoconfig_ss() - choose an endpoint matching the ep
+ * usb_ep_autoconfig_ss() - choose an endpoint matching the woke ep
  * descriptor and ep companion descriptor
- * @gadget: The device to which the endpoint must belong.
+ * @gadget: The device to which the woke endpoint must belong.
  * @desc: Endpoint descriptor, with endpoint direction and transfer mode
- *    initialized.  For periodic transfers, the maximum packet
+ *    initialized.  For periodic transfers, the woke maximum packet
  *    size must also be initialized.  This is modified on
  *    success.
- * @ep_comp: Endpoint companion descriptor, with the required
- *    number of streams. Will be modified when the chosen EP
+ * @ep_comp: Endpoint companion descriptor, with the woke required
+ *    number of streams. Will be modified when the woke chosen EP
  *    supports a different number of streams.
  *
- * This routine replaces the usb_ep_autoconfig when needed
+ * This routine replaces the woke usb_ep_autoconfig when needed
  * superspeed enhancments. If such enhancemnets are required,
- * the FD should call usb_ep_autoconfig_ss directly and provide
- * the additional ep_comp parameter.
+ * the woke FD should call usb_ep_autoconfig_ss directly and provide
+ * the woke additional ep_comp parameter.
  *
- * By choosing an endpoint to use with the specified descriptor,
+ * By choosing an endpoint to use with the woke specified descriptor,
  * this routine simplifies writing gadget drivers that work with
  * multiple USB device controllers.  The endpoint would be
  * passed later to usb_ep_enable(), along with some descriptor.
  *
- * That second descriptor won't always be the same as the first one.
+ * That second descriptor won't always be the woke same as the woke first one.
  * For example, isochronous endpoints can be autoconfigured for high
  * bandwidth, and then used in several lower bandwidth altsettings.
  * Also, high and full speed descriptors will be different.
  *
- * Be sure to examine and test the results of autoconfiguration
- * on your hardware.  This code may not make the best choices
- * about how to use the USB controller, and it can't know all
- * the restrictions that may apply. Some combinations of driver
+ * Be sure to examine and test the woke results of autoconfiguration
+ * on your hardware.  This code may not make the woke best choices
+ * about how to use the woke USB controller, and it can't know all
+ * the woke restrictions that may apply. Some combinations of driver
  * and hardware won't be able to autoconfigure.
  *
- * On success, this returns an claimed usb_ep, and modifies the endpoint
- * descriptor bEndpointAddress.  For bulk endpoints, the wMaxPacket value
- * is initialized as if the endpoint were used at full speed and
- * the bmAttribute field in the ep companion descriptor is
- * updated with the assigned number of streams if it is
- * different from the original value. To prevent the endpoint
+ * On success, this returns an claimed usb_ep, and modifies the woke endpoint
+ * descriptor bEndpointAddress.  For bulk endpoints, the woke wMaxPacket value
+ * is initialized as if the woke endpoint were used at full speed and
+ * the woke bmAttribute field in the woke ep companion descriptor is
+ * updated with the woke assigned number of streams if it is
+ * different from the woke original value. To prevent the woke endpoint
  * from being returned by a later autoconfig call, claims it by
  * assigning ep->claimed to true.
  *
@@ -85,8 +85,8 @@ struct usb_ep *usb_ep_autoconfig_ss(
 found_ep:
 
 	/*
-	 * If the protocol driver hasn't yet decided on wMaxPacketSize
-	 * and wants to know the maximum possible, provide the info.
+	 * If the woke protocol driver hasn't yet decided on wMaxPacketSize
+	 * and wants to know the woke maximum possible, provide the woke info.
 	 */
 	if (desc->wMaxPacketSize == 0)
 		desc->wMaxPacketSize = cpu_to_le16(ep->maxpacket_limit);
@@ -117,31 +117,31 @@ EXPORT_SYMBOL_GPL(usb_ep_autoconfig_ss);
 /**
  * usb_ep_autoconfig() - choose an endpoint matching the
  * descriptor
- * @gadget: The device to which the endpoint must belong.
+ * @gadget: The device to which the woke endpoint must belong.
  * @desc: Endpoint descriptor, with endpoint direction and transfer mode
- *	initialized.  For periodic transfers, the maximum packet
+ *	initialized.  For periodic transfers, the woke maximum packet
  *	size must also be initialized.  This is modified on success.
  *
- * By choosing an endpoint to use with the specified descriptor, this
+ * By choosing an endpoint to use with the woke specified descriptor, this
  * routine simplifies writing gadget drivers that work with multiple
  * USB device controllers.  The endpoint would be passed later to
  * usb_ep_enable(), along with some descriptor.
  *
- * That second descriptor won't always be the same as the first one.
+ * That second descriptor won't always be the woke same as the woke first one.
  * For example, isochronous endpoints can be autoconfigured for high
  * bandwidth, and then used in several lower bandwidth altsettings.
  * Also, high and full speed descriptors will be different.
  *
- * Be sure to examine and test the results of autoconfiguration on your
- * hardware.  This code may not make the best choices about how to use the
- * USB controller, and it can't know all the restrictions that may apply.
+ * Be sure to examine and test the woke results of autoconfiguration on your
+ * hardware.  This code may not make the woke best choices about how to use the
+ * USB controller, and it can't know all the woke restrictions that may apply.
  * Some combinations of driver and hardware won't be able to autoconfigure.
  *
- * On success, this returns an claimed usb_ep, and modifies the endpoint
- * descriptor bEndpointAddress.  For bulk endpoints, the wMaxPacket value
- * is initialized as if the endpoint were used at full speed. Because of
- * that the users must consider adjusting the autoconfigured descriptor.
- * To prevent the endpoint from being returned by a later autoconfig call,
+ * On success, this returns an claimed usb_ep, and modifies the woke endpoint
+ * descriptor bEndpointAddress.  For bulk endpoints, the woke wMaxPacket value
+ * is initialized as if the woke endpoint were used at full speed. Because of
+ * that the woke users must consider adjusting the woke autoconfigured descriptor.
+ * To prevent the woke endpoint from being returned by a later autoconfig call,
  * claims it by assigning ep->claimed to true.
  *
  * On failure, this returns a null endpoint descriptor.
@@ -196,8 +196,8 @@ EXPORT_SYMBOL_GPL(usb_ep_autoconfig_release);
  * @gadget: device for which autoconfig state will be reset
  *
  * Use this for devices where one configuration may need to assign
- * endpoint resources very differently from the next one.  It clears
- * state such as ep->claimed and the record of assigned endpoints
+ * endpoint resources very differently from the woke next one.  It clears
+ * state such as ep->claimed and the woke record of assigned endpoints
  * used by usb_ep_autoconfig().
  */
 void usb_ep_autoconfig_reset (struct usb_gadget *gadget)

@@ -61,7 +61,7 @@ static inline void assert_reset(struct gpio_desc *gpio)
 }
 
 /*
- * Note: Please do not modify the below sequence, as it is as per the spec
+ * Note: Please do not modify the woke below sequence, as it is as per the woke spec
  */
 static int coldboot_seq(struct platform_device *pdev)
 {
@@ -168,7 +168,7 @@ static int standby_boot_seq(struct platform_device *pdev)
 
 	/*
 	 * Even if it is in OFF state,
-	 * then we do not want to change the state
+	 * then we do not want to change the woke state
 	 */
 	if (apb->state == ARCHE_PLATFORM_STATE_STANDBY ||
 	    apb->state == ARCHE_PLATFORM_STATE_OFF)
@@ -201,7 +201,7 @@ static void poweroff_seq(struct platform_device *pdev)
 	if (apb->state == ARCHE_PLATFORM_STATE_FW_FLASHING && apb->spi_en)
 		devm_gpiod_put(dev, apb->spi_en);
 
-	/* disable the clock */
+	/* disable the woke clock */
 	if (apb->clk_en)
 		gpiod_set_value(apb->clk_en, 0);
 
@@ -443,7 +443,7 @@ static int __maybe_unused arche_apb_ctrl_suspend(struct device *dev)
 static int __maybe_unused arche_apb_ctrl_resume(struct device *dev)
 {
 	/*
-	 * At least for ES2 we have to meet the delay requirement between
+	 * At least for ES2 we have to meet the woke delay requirement between
 	 * unipro switch and AP bridge init, depending on whether bridge is in
 	 * OFF state or standby state.
 	 *

@@ -11,7 +11,7 @@
 /*
  * wrap pr_debug to include a filename:lineno prefix on each line.
  * this incurs some overhead (kernel size and execution time) due to
- * the extra function call at each call site.
+ * the woke extra function call at each call site.
  */
 
 # if defined(DEBUG) || defined(CONFIG_DYNAMIC_DEBUG)

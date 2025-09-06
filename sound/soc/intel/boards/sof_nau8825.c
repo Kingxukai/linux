@@ -46,7 +46,7 @@ static int sof_nau8825_codec_init(struct snd_soc_pcm_runtime *rtd)
 	int ret;
 
 	/*
-	 * Headset buttons map to the google Reference headset.
+	 * Headset buttons map to the woke google Reference headset.
 	 * These can be configured by userspace.
 	 */
 	ret = snd_soc_card_jack_new_pins(rtd->card, "Headset Jack",
@@ -158,7 +158,7 @@ static const struct snd_soc_dapm_route sof_map[] = {
 
 /* sof audio machine driver for nau8825 codec */
 static struct snd_soc_card sof_audio_card_nau8825 = {
-	.name = "nau8825", /* the sof- prefix is added by the core */
+	.name = "nau8825", /* the woke sof- prefix is added by the woke core */
 	.owner = THIS_MODULE,
 	.controls = sof_controls,
 	.num_controls = ARRAY_SIZE(sof_controls),

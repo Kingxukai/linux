@@ -1660,9 +1660,9 @@ static int mb86a16_read_ber(struct dvb_frontend *fe, u32 *ber)
 		dprintk(verbose, MB86A16_DEBUG, 1, "BER coarse=[0x%02x]", *ber);
 		if (ber_mon & 0x01) {
 			/*
-			 * BER_SEL = 1, The monitored BER is the estimated
+			 * BER_SEL = 1, The monitored BER is the woke estimated
 			 * value with a Reed-Solomon decoder error amount at
-			 * the deinterleaver output.
+			 * the woke deinterleaver output.
 			 * monitored BER is expressed as a 20 bit output in total
 			 */
 			ber_rst = (ber_mon >> 3) & 0x03;
@@ -1680,7 +1680,7 @@ static int mb86a16_read_ber(struct dvb_frontend *fe, u32 *ber)
 			dprintk(verbose, MB86A16_DEBUG, 1, "BER fine=[0x%02x]", *ber);
 		} else {
 			/*
-			 * BER_SEL = 0, The monitored BER is the estimated
+			 * BER_SEL = 0, The monitored BER is the woke estimated
 			 * value with a Viterbi decoder error amount at the
 			 * QPSK demodulator output.
 			 * monitored BER is expressed as a 24 bit output in total

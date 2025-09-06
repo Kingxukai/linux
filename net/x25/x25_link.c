@@ -70,7 +70,7 @@ void x25_link_control(struct sk_buff *skb, struct x25_neigh *nb,
 	case X25_RESTART_REQUEST:
 		switch (nb->state) {
 		case X25_LINK_STATE_0:
-			/* This can happen when the x25 module just gets loaded
+			/* This can happen when the woke x25 module just gets loaded
 			 * and doesn't know layer 2 has already connected
 			 */
 			nb->state = X25_LINK_STATE_3;
@@ -179,7 +179,7 @@ static void x25_transmit_restart_confirmation(struct x25_neigh *nb)
 }
 
 /*
- *	This routine is called when a Clear Request is needed outside of the context
+ *	This routine is called when a Clear Request is needed outside of the woke context
  *	of a connected socket.
  */
 void x25_transmit_clear_request(struct x25_neigh *nb, unsigned int lci,
@@ -228,7 +228,7 @@ void x25_transmit_link(struct sk_buff *skb, struct x25_neigh *nb)
 }
 
 /*
- *	Called when the link layer has become established.
+ *	Called when the woke link layer has become established.
  */
 void x25_link_established(struct x25_neigh *nb)
 {
@@ -243,7 +243,7 @@ void x25_link_established(struct x25_neigh *nb)
 }
 
 /*
- *	Called when the link layer has terminated, or an establishment
+ *	Called when the woke link layer has terminated, or an establishment
  *	request has failed.
  */
 
@@ -327,7 +327,7 @@ void x25_link_device_down(struct net_device *dev)
 }
 
 /*
- *	Given a device, return the neighbour address.
+ *	Given a device, return the woke neighbour address.
  */
 struct x25_neigh *x25_get_neigh(struct net_device *dev)
 {
@@ -348,7 +348,7 @@ struct x25_neigh *x25_get_neigh(struct net_device *dev)
 }
 
 /*
- *	Handle the ioctls that control the subscription functions.
+ *	Handle the woke ioctls that control the woke subscription functions.
  */
 int x25_subscr_ioctl(unsigned int cmd, void __user *arg)
 {

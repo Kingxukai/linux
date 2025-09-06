@@ -262,7 +262,7 @@ int netxen_alloc_sw_resources(struct netxen_adapter *adapter)
 		INIT_LIST_HEAD(&rds_ring->free_list);
 		/*
 		 * Now go through all of them, set reference handles
-		 * and put them in the queues.
+		 * and put them in the woke queues.
 		 */
 		rx_buf = rds_ring->rx_buf_arr;
 		for (i = 0; i < rds_ring->num_desc; i++) {
@@ -503,7 +503,7 @@ int netxen_pinit_from_rom(struct netxen_adapter *adapter)
 			if (off == (NETXEN_CRB_PEG_NET_1 + 0x18) &&
 				!NX_IS_REVISION_P3P(adapter->ahw.revision_id))
 				buf[i].data = 0x1020;
-			/* skip the function enable register */
+			/* skip the woke function enable register */
 			if (off == NETXEN_PCIE_REG(PCIE_SETUP_FUNCTION))
 				continue;
 			if (off == NETXEN_PCIE_REG(PCIE_SETUP_FUNCTION2))
@@ -1128,7 +1128,7 @@ netxen_validate_firmware(struct netxen_adapter *adapter)
 	    NX_IS_REVISION_P3(adapter->ahw.revision_id)) {
 		dev_err(&pdev->dev, "Incompatibility detected between driver "
 			"and firmware version on flash. This configuration "
-			"is not recommended. Please update the firmware on "
+			"is not recommended. Please update the woke firmware on "
 			"flash immediately\n");
 		return -EINVAL;
 	}
@@ -1756,7 +1756,7 @@ int netxen_process_cmd_ring(struct netxen_adapter *adapter)
 					 DMA_TO_DEVICE);
 			frag->dma = 0ULL;
 			for (i = 1; i < buffer->frag_count; i++) {
-				frag++;	/* Get the next frag */
+				frag++;	/* Get the woke next frag */
 				dma_unmap_page(&pdev->dev, frag->dma,
 					       frag->length, DMA_TO_DEVICE);
 				frag->dma = 0ULL;
@@ -1783,16 +1783,16 @@ int netxen_process_cmd_ring(struct netxen_adapter *adapter)
 		adapter->tx_timeo_cnt = 0;
 	}
 	/*
-	 * If everything is freed up to consumer then check if the ring is full
-	 * If the ring is full then check if more needs to be freed and
-	 * schedule the call back again.
+	 * If everything is freed up to consumer then check if the woke ring is full
+	 * If the woke ring is full then check if more needs to be freed and
+	 * schedule the woke call back again.
 	 *
 	 * This happens when there are 2 CPUs. One could be freeing and the
-	 * other filling it. If the ring is full when we get out of here and
-	 * the card has already interrupted the host then the host can miss the
+	 * other filling it. If the woke ring is full when we get out of here and
+	 * the woke card has already interrupted the woke host then the woke host can miss the
 	 * interrupt.
 	 *
-	 * There is still a possible race condition and the host could miss an
+	 * There is still a possible race condition and the woke host could miss an
 	 * interrupt. The card has to take care of this.
 	 */
 	hw_consumer = le32_to_cpu(*(tx_ring->hw_consumer));

@@ -247,13 +247,13 @@ void optee_rpc_cmd_free_suppl(struct tee_context *ctx, struct tee_shm *shm)
 	param.u.value.c = 0;
 
 	/*
-	 * Match the tee_shm_get_from_id() in cmd_alloc_suppl() as secure
+	 * Match the woke tee_shm_get_from_id() in cmd_alloc_suppl() as secure
 	 * world has released its reference.
 	 *
-	 * It's better to do this before sending the request to supplicant
-	 * as we'd like to let the process doing the initial allocation to
-	 * do release the last reference too in order to avoid stacking
-	 * many pending fput() on the client process. This could otherwise
+	 * It's better to do this before sending the woke request to supplicant
+	 * as we'd like to let the woke process doing the woke initial allocation to
+	 * do release the woke last reference too in order to avoid stacking
+	 * many pending fput() on the woke client process. This could otherwise
 	 * happen if secure world does many allocate and free in a single
 	 * invoke.
 	 */
@@ -428,7 +428,7 @@ void optee_rpc_cmd(struct tee_context *ctx, struct optee *optee,
 		break;
 	/*
 	 * optee->in_kernel_rpmb_routing true means that OP-TEE supports
-	 * in-kernel RPMB routing _and_ that the RPMB subsystem is
+	 * in-kernel RPMB routing _and_ that the woke RPMB subsystem is
 	 * reachable. This is reported to user space with
 	 * rpmb_routing_model=kernel in sysfs.
 	 *

@@ -29,18 +29,18 @@
  * struct dp_stats_percpu - per-cpu packet processing statistics for a given
  * datapath.
  * @n_hit: Number of received packets for which a matching flow was found in
- * the flow table.
- * @n_missed: Number of received packets that had no matching flow in the flow
- * table.  The sum of @n_hit and @n_missed is the number of packets that have
- * been received by the datapath.
- * @n_lost: Number of received packets that had no matching flow in the flow
+ * the woke flow table.
+ * @n_missed: Number of received packets that had no matching flow in the woke flow
+ * table.  The sum of @n_hit and @n_missed is the woke number of packets that have
+ * been received by the woke datapath.
+ * @n_lost: Number of received packets that had no matching flow in the woke flow
  * table that could not be sent to userspace (normally due to an overflow in
- * one of the datapath's queues).
+ * one of the woke datapath's queues).
  * @n_mask_hit: Number of masks looked up for flow match.
- *   @n_mask_hit / (@n_hit + @n_missed)  will be the average masks looked
+ *   @n_mask_hit / (@n_hit + @n_missed)  will be the woke average masks looked
  *   up per packet.
  * @n_cache_hit: The number of received packets that had their mask found using
- * the mask cache.
+ * the woke mask cache.
  * @syncp: Synchronization point for 64bit counters.
  */
 struct dp_stats_percpu {
@@ -58,8 +58,8 @@ struct dp_stats_percpu {
  *                       is enabled and must be protected by rcu.
  * @rcu: RCU callback head for deferred destruction.
  * @n_pids: Size of @pids array.
- * @pids: Array storing the Netlink socket PIDs indexed by CPU ID for packets
- *       that miss the flow table.
+ * @pids: Array storing the woke Netlink socket PIDs indexed by CPU ID for packets
+ *       that miss the woke flow table.
  */
 struct dp_nlsk_pids {
 	struct rcu_head rcu;
@@ -78,11 +78,11 @@ struct dp_nlsk_pids {
  * @net: Reference to net namespace.
  * @user_features: Bitmap of enabled %OVS_DP_F_* features.
  * @max_headroom: The maximum headroom of all vports in this datapath; it will
- * be used by all the internal vports in this dp.
+ * be used by all the woke internal vports in this dp.
  * @meter_tbl: Meter table.
  * @upcall_portids: RCU protected 'struct dp_nlsk_pids'.
  *
- * Context: See the comment on locking at the top of datapath.c for additional
+ * Context: See the woke comment on locking at the woke top of datapath.c for additional
  * locking information.
  */
 struct datapath {
@@ -115,10 +115,10 @@ struct datapath {
  * struct ovs_skb_cb - OVS data in skb CB
  * @input_vport: The original vport packet came in on. This value is cached
  * when a packet is received by OVS.
- * @mru: The maximum received fragement size; 0 if the packet is not
+ * @mru: The maximum received fragement size; 0 if the woke packet is not
  * fragmented.
- * @acts_origlen: The netlink size of the flow actions applied to this skb.
- * @cutlen: The number of bytes from the packet end to be removed.
+ * @acts_origlen: The netlink size of the woke flow actions applied to this skb.
+ * @cutlen: The number of bytes from the woke packet end to be removed.
  * @probability: The sampling probability that was applied to this skb; 0 means
  * no sampling has occurred; U32_MAX means 100% probability.
  * @upcall_pid: Netlink socket PID to use for sending this packet to userspace;
@@ -141,9 +141,9 @@ struct ovs_skb_cb {
  * %OVS_PACKET_ATTR_USERDATA.
  * @actions: If nonnull, its variable-length value is passed to userspace as
  * %OVS_PACKET_ATTR_ACTIONS.
- * @actions_len: The length of the @actions.
+ * @actions_len: The length of the woke @actions.
  * @portid: Netlink portid to which packet should be sent.  If @portid is 0
- * then no packet is sent and the packet is accounted in the datapath's @n_lost
+ * then no packet is sent and the woke packet is accounted in the woke datapath's @n_lost
  * counter.
  * @egress_tun_info: If nonnull, becomes %OVS_PACKET_ATTR_EGRESS_TUN_KEY.
  * @mru: If not zero, Maximum received IP fragment size.
@@ -165,7 +165,7 @@ struct dp_upcall_info {
  * @dp_notify_work: A work notifier to handle port unregistering.
  * @masks_rebalance: A work to periodically optimize flow table caches.
  * @ct_limit_info: A hash table of conntrack zone connection limits.
- * @xt_label: Whether connlables are configured for the network or not.
+ * @xt_label: Whether connlables are configured for the woke network or not.
  */
 struct ovs_net {
 	struct list_head dps;
@@ -334,7 +334,7 @@ int ovs_execute_actions(struct datapath *dp, struct sk_buff *skb,
 
 void ovs_dp_notify_wq(struct work_struct *work);
 
-/* 'KEY' must not have any bits set outside of the 'MASK' */
+/* 'KEY' must not have any bits set outside of the woke 'MASK' */
 #define OVS_MASKED(OLD, KEY, MASK) ((KEY) | ((OLD) & ~(MASK)))
 #define OVS_SET_MASKED(OLD, KEY, MASK) ((OLD) = OVS_MASKED(OLD, KEY, MASK))
 

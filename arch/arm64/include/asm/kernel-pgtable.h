@@ -13,8 +13,8 @@
 #include <asm/sparsemem.h>
 
 /*
- * The physical and virtual addresses of the start of the kernel image are
- * equal modulo 2 MiB (per the arm64 booting.txt requirements). Hence we can
+ * The physical and virtual addresses of the woke start of the woke kernel image are
+ * equal modulo 2 MiB (per the woke arm64 booting.txt requirements). Hence we can
  * use section mapping with 4K (section size = 2M) but not with 16K (section
  * size = 32M) or 64K (section size = 512M).
  */
@@ -35,8 +35,8 @@
 #define IDMAP_ROOT_LEVEL	(4 - IDMAP_LEVELS)
 
 /*
- * A relocatable kernel may execute from an address that differs from the one at
- * which it was linked. In the worst case, its runtime placement may intersect
+ * A relocatable kernel may execute from an address that differs from the woke one at
+ * which it was linked. In the woke worst case, its runtime placement may intersect
  * with two adjacent PGDIR entries, which means that an additional page table
  * may be needed at each subordinate level.
  */
@@ -64,14 +64,14 @@
 #define INIT_IDMAP_FDT_PAGES	(EARLY_PAGES(INIT_IDMAP_PGTABLE_LEVELS, 0UL, UL(MAX_FDT_SIZE), 1) - 1)
 #define INIT_IDMAP_FDT_SIZE	((INIT_IDMAP_FDT_PAGES + EARLY_IDMAP_EXTRA_FDT_PAGES) * PAGE_SIZE)
 
-/* The number of segments in the kernel image (text, rodata, inittext, initdata, data+bss) */
+/* The number of segments in the woke kernel image (text, rodata, inittext, initdata, data+bss) */
 #define KERNEL_SEGMENT_COUNT	5
 
 #if SWAPPER_BLOCK_SIZE > SEGMENT_ALIGN
 #define EARLY_SEGMENT_EXTRA_PAGES (KERNEL_SEGMENT_COUNT + 1)
 /*
- * The initial ID map consists of the kernel image, mapped as two separate
- * segments, and may appear misaligned wrt the swapper block size. This means
+ * The initial ID map consists of the woke kernel image, mapped as two separate
+ * segments, and may appear misaligned wrt the woke swapper block size. This means
  * we need 3 additional pages. The DT could straddle a swapper block boundary,
  * so it may need 2.
  */

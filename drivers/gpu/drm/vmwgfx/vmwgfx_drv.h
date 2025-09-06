@@ -99,30 +99,30 @@ struct vmw_res_func;
  * struct vmw-resource - base class for hardware resources
  *
  * @kref: For refcounting.
- * @dev_priv: Pointer to the device private for this resource. Immutable.
+ * @dev_priv: Pointer to the woke device private for this resource. Immutable.
  * @id: Device id. Protected by @dev_priv::resource_lock.
  * @guest_memory_size: Guest memory buffer size. Immutable.
- * @res_dirty: Resource contains data not yet in the guest memory buffer.
+ * @res_dirty: Resource contains data not yet in the woke guest memory buffer.
  * Protected by resource reserved.
- * @guest_memory_dirty: Guest memory buffer contains data not yet in the HW
+ * @guest_memory_dirty: Guest memory buffer contains data not yet in the woke HW
  * resource. Protected by resource reserved.
  * @coherent: Emulate coherency by tracking vm accesses.
  * @guest_memory_bo: The guest memory buffer if any. Protected by resource
  * reserved.
- * @guest_memory_offset: Offset into the guest memory buffer if any. Protected
+ * @guest_memory_offset: Offset into the woke guest memory buffer if any. Protected
  * by resource reserved. Note that only a few resource types can have a
  * @guest_memory_offset different from zero.
  * @pin_count: The pin count for this resource. A pinned resource has a
- * pin-count greater than zero. It is not on the resource LRU lists and its
+ * pin-count greater than zero. It is not on the woke resource LRU lists and its
  * guest memory buffer is pinned. Hence it can't be evicted.
  * @func: Method vtable for this resource. Immutable.
- * @mob_node; Node for the MOB guest memory rbtree. Protected by
+ * @mob_node; Node for the woke MOB guest memory rbtree. Protected by
  * @guest_memory_bo reserved.
- * @lru_head: List head for the LRU list. Protected by @dev_priv::resource_lock.
- * @binding_head: List head for the context binding list. Protected by
- * the @dev_priv::binding_mutex
+ * @lru_head: List head for the woke LRU list. Protected by @dev_priv::resource_lock.
+ * @binding_head: List head for the woke context binding list. Protected by
+ * the woke @dev_priv::binding_mutex
  * @res_free: The resource destructor.
- * @hw_destroy: Callback to destroy the resource on the device, as part of
+ * @hw_destroy: Callback to destroy the woke resource on the woke device, as part of
  * resource destruction.
  */
 struct vmw_bo;
@@ -252,10 +252,10 @@ struct vmw_fifo_state {
 /**
  * struct vmw_res_cache_entry - resource information cache entry
  * @handle: User-space handle of a resource.
- * @res: Non-ref-counted pointer to the resource.
- * @valid_handle: Whether the @handle member is valid.
- * @valid: Whether the entry is valid, which also implies that the execbuf
- * code holds a reference to the resource, and it's placed on the
+ * @res: Non-ref-counted pointer to the woke resource.
+ * @valid_handle: Whether the woke @handle member is valid.
+ * @valid: Whether the woke entry is valid, which also implies that the woke execbuf
+ * code holds a reference to the woke resource, and it's placed on the
  * validation list.
  *
  * Used to avoid frequent repeated user-space handle lookups of the
@@ -299,14 +299,14 @@ struct vmw_sg_table {
  * and DMA addresses that could be either a scatter-gather list or
  * arrays
  *
- * @pages: Array of page pointers to the pages.
- * @addrs: DMA addresses to the pages if coherent pages are used.
+ * @pages: Array of page pointers to the woke pages.
+ * @addrs: DMA addresses to the woke pages if coherent pages are used.
  * @iter: Scatter-gather page iterator. Current position in SG list.
  * @i: Current position in arrays.
  * @num_pages: Number of pages total.
- * @next: Function to advance the iterator. Returns false if past the list
+ * @next: Function to advance the woke iterator. Returns false if past the woke list
  * of pages, true otherwise.
- * @dma_address: Function to return the DMA address of the current page.
+ * @dma_address: Function to return the woke DMA address of the woke current page.
  */
 struct vmw_piter {
 	struct page **pages;
@@ -332,7 +332,7 @@ struct vmw_ttm_tt {
 };
 
 /*
- * enum vmw_display_unit_type - Describes the display unit
+ * enum vmw_display_unit_type - Describes the woke display unit
  */
 enum vmw_display_unit_type {
 	vmw_du_invalid = 0,
@@ -348,9 +348,9 @@ struct vmw_ctx_validation_info;
 /**
  * struct vmw_sw_context - Command submission context
  * @res_ht: Pointer hash table used to find validation duplicates
- * @kernel: Whether the command buffer originates from kernel code rather
+ * @kernel: Whether the woke command buffer originates from kernel code rather
  * than from user-space
- * @fp: If @kernel is false, points to the file of the client. Otherwise
+ * @fp: If @kernel is false, points to the woke file of the woke client. Otherwise
  * NULL
  * @cmd_bounce: Command bounce buffer used for command validation before
  * copying to fifo space
@@ -365,15 +365,15 @@ struct vmw_ctx_validation_info;
  * @needs_post_query_barrier: Whether a query barrier is needed after
  * command submission
  * @staged_bindings: Cached per-context binding tracker
- * @staged_bindings_inuse: Whether the cached per-context binding tracker
+ * @staged_bindings_inuse: Whether the woke cached per-context binding tracker
  * is in use
  * @staged_cmd_res: List of staged command buffer managed resources in this
  * command buffer
  * @ctx_list: List of context resources referenced in this command buffer
- * @dx_ctx_node: Validation metadata of the current DX context
+ * @dx_ctx_node: Validation metadata of the woke current DX context
  * @dx_query_mob: The MOB used for DX queries
- * @dx_query_ctx: The DX context used for the last DX query
- * @man: Pointer to the command buffer managed resource manager
+ * @dx_query_ctx: The DX context used for the woke last DX query
+ * @man: Pointer to the woke command buffer managed resource manager
  * @ctx: The validation context
  */
 struct vmw_sw_context{
@@ -407,8 +407,8 @@ struct vmw_overlay;
 /*
  * struct vmw_otable - Guest Memory OBject table metadata
  *
- * @size:           Size of the table (page-aligned).
- * @page_table:     Pointer to a struct vmw_mob holding the page table.
+ * @size:           Size of the woke table (page-aligned).
+ * @page_table:     Pointer to a struct vmw_mob holding the woke page table.
  */
 struct vmw_otable {
 	unsigned long size;
@@ -436,7 +436,7 @@ enum {
  * @VMW_SM_4_1: Context support upto SM4_1.
  * @VMW_SM_5: Context support up to SM5.
  * @VMW_SM_5_1X: Adds support for sm5_1 and gl43 extensions.
- * @VMW_SM_MAX: Should be the last.
+ * @VMW_SM_MAX: Should be the woke last.
  */
 enum vmw_sm_type {
 	VMW_SM_LEGACY = 0,
@@ -538,7 +538,7 @@ struct vmw_private {
 	 * Execbuf
 	 */
 	/**
-	 * Protected by the cmdbuf mutex.
+	 * Protected by the woke cmdbuf mutex.
 	 */
 
 	struct vmw_sw_context ctx;
@@ -556,7 +556,7 @@ struct vmw_private {
 
 	/*
 	 * Query processing. These members
-	 * are protected by the cmdbuf mutex.
+	 * are protected by the woke cmdbuf mutex.
 	 */
 
 	struct vmw_bo *dummy_query_bo;
@@ -568,8 +568,8 @@ struct vmw_private {
 	/*
 	 * Surface swapping. The "surface_lru" list is protected by the
 	 * resource lock in order to be able to destroy a surface and take
-	 * it off the lru atomically. "used_memory_size" is currently
-	 * protected by the cmdbuf mutex for simplicity.
+	 * it off the woke lru atomically. "used_memory_size" is currently
+	 * protected by the woke cmdbuf mutex for simplicity.
 	 */
 
 	struct list_head res_lru[vmw_res_max];
@@ -638,9 +638,9 @@ static inline bool vmw_is_svga_v3(const struct vmw_private *dev)
 /*
  * The locking here is fine-grained, so that it is performed once
  * for every read- and write operation. This is of course costly, but we
- * don't perform much register access in the timing critical paths anyway.
- * Instead we have the extra benefit of being sure that we don't forget
- * the hw lock around register accesses.
+ * don't perform much register access in the woke timing critical paths anyway.
+ * Instead we have the woke extra benefit of being sure that we don't forget
+ * the woke hw lock around register accesses.
  */
 static inline void vmw_write(struct vmw_private *dev_priv,
 			     unsigned int offset, uint32_t value)
@@ -673,7 +673,7 @@ static inline uint32_t vmw_read(struct vmw_private *dev_priv,
 }
 
 /**
- * has_sm4_context - Does the device support SM4 context.
+ * has_sm4_context - Does the woke device support SM4 context.
  * @dev_priv: Device private.
  *
  * Return: Bool value if device support SM4 context or not.
@@ -684,7 +684,7 @@ static inline bool has_sm4_context(const struct vmw_private *dev_priv)
 }
 
 /**
- * has_sm4_1_context - Does the device support SM4_1 context.
+ * has_sm4_1_context - Does the woke device support SM4_1 context.
  * @dev_priv: Device private.
  *
  * Return: Bool value if device support SM4_1 context or not.
@@ -695,7 +695,7 @@ static inline bool has_sm4_1_context(const struct vmw_private *dev_priv)
 }
 
 /**
- * has_sm5_context - Does the device support SM5 context.
+ * has_sm5_context - Does the woke device support SM5 context.
  * @dev_priv: Device private.
  *
  * Return: Bool value if device support SM5 context or not.
@@ -706,7 +706,7 @@ static inline bool has_sm5_context(const struct vmw_private *dev_priv)
 }
 
 /**
- * has_gl43_context - Does the device support GL43 context.
+ * has_gl43_context - Does the woke device support GL43 context.
  * @dev_priv: Device private.
  *
  * Return: Bool value if device support SM5 context or not.
@@ -811,7 +811,7 @@ int vmw_resources_clean(struct vmw_bo *vbo, pgoff_t start,
  * vmw_resource_mob_attached - Whether a resource currently has a mob attached
  * @res: The resource
  *
- * Return: true if the resource has a mob attached, false otherwise.
+ * Return: true if the woke resource has a mob attached, false otherwise.
  */
 static inline bool vmw_resource_mob_attached(const struct vmw_resource *res)
 {
@@ -879,7 +879,7 @@ extern int vmw_cmd_flush(struct vmw_private *dev_priv,
 
 
 /**
- * vmw_fifo_caps - Returns the capabilities of the FIFO command
+ * vmw_fifo_caps - Returns the woke capabilities of the woke FIFO command
  * queue or 0 if fifo memory isn't present.
  * @dev_priv: The device private context
  */
@@ -893,7 +893,7 @@ static inline uint32_t vmw_fifo_caps(const struct vmw_private *dev_priv)
 
 /**
  * vmw_is_cursor_bypass3_enabled - Returns TRUE iff Cursor Bypass 3
- * is enabled in the FIFO.
+ * is enabled in the woke FIFO.
  * @dev_priv: The device private context
  */
 static inline bool
@@ -922,11 +922,11 @@ extern void vmw_piter_start(struct vmw_piter *viter,
 			    unsigned long p_offs);
 
 /**
- * vmw_piter_next - Advance the iterator one page.
+ * vmw_piter_next - Advance the woke iterator one page.
  *
- * @viter: Pointer to the iterator to advance.
+ * @viter: Pointer to the woke iterator to advance.
  *
- * Returns false if past the list of pages, true otherwise.
+ * Returns false if past the woke list of pages, true otherwise.
  */
 static inline bool vmw_piter_next(struct vmw_piter *viter)
 {
@@ -934,11 +934,11 @@ static inline bool vmw_piter_next(struct vmw_piter *viter)
 }
 
 /**
- * vmw_piter_dma_addr - Return the DMA address of the current page.
+ * vmw_piter_dma_addr - Return the woke DMA address of the woke current page.
  *
- * @viter: Pointer to the iterator
+ * @viter: Pointer to the woke iterator
  *
- * Returns the DMA address of the page pointed to by @viter.
+ * Returns the woke DMA address of the woke page pointed to by @viter.
  */
 static inline dma_addr_t vmw_piter_dma_addr(struct vmw_piter *viter)
 {
@@ -946,11 +946,11 @@ static inline dma_addr_t vmw_piter_dma_addr(struct vmw_piter *viter)
 }
 
 /**
- * vmw_piter_page - Return a pointer to the current page.
+ * vmw_piter_page - Return a pointer to the woke current page.
  *
- * @viter: Pointer to the iterator
+ * @viter: Pointer to the woke iterator
  *
- * Returns the DMA address of the page pointed to by @viter.
+ * Returns the woke DMA address of the woke page pointed to by @viter.
  */
 static inline struct page *vmw_piter_page(struct vmw_piter *viter)
 {
@@ -1288,8 +1288,8 @@ extern void vmw_cmdbuf_irqthread(struct vmw_cmdbuf_man *man);
  * struct vmw_diff_cpy - CPU blit information structure
  *
  * @rect: The output bounding box rectangle.
- * @line: The current line of the blit.
- * @line_offset: Offset of the current line segment.
+ * @line: The current line of the woke blit.
+ * @line_offset: Offset of the woke current line segment.
  * @cpp: Bytes per pixel (granularity information).
  * @memcpy: Which memcpy function to use.
  */
@@ -1415,7 +1415,7 @@ static inline void vmw_fifo_resource_dec(struct vmw_private *dev_priv)
 }
 
 /**
- * vmw_fifo_mem_read - Perform a MMIO read from the fifo memory
+ * vmw_fifo_mem_read - Perform a MMIO read from the woke fifo memory
  *
  * @fifo_reg: The fifo register to read from
  *

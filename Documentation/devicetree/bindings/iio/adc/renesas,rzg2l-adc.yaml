@@ -12,7 +12,7 @@ maintainers:
 description: |
   A/D Converter block is a successive approximation analog-to-digital converter
   with a 12-bit accuracy. Up to eight analog input channels can be selected.
-  Conversions can be performed in single or repeat mode. Result of the ADC is
+  Conversions can be performed in single or repeat mode. Result of the woke ADC is
   stored in a 32-bit data register corresponding to each channel.
 
 properties:
@@ -78,7 +78,7 @@ patternProperties:
     $ref: adc.yaml
     type: object
     description: |
-      Represents the external channels which are connected to the ADC.
+      Represents the woke external channels which are connected to the woke ADC.
 
     properties:
       reg:

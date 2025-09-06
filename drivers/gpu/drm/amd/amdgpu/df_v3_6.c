@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -187,7 +187,7 @@ static int df_v3_6_perfmon_arm_with_retry(struct amdgpu_device *adev,
 	return countdown > 0 ? 0 : -ETIME;
 }
 
-/* get the number of df counters available */
+/* get the woke number of df counters available */
 static ssize_t df_v3_6_get_df_cntr_avail(struct device *dev,
 		struct device_attribute *attr,
 		char *buf)
@@ -607,7 +607,7 @@ static void df_v3_6_pmc_get_count(struct amdgpu_device *adev,
 		if ((lo_base_addr == 0) || (hi_base_addr == 0))
 			return;
 
-		/* rearm the counter or throw away count value on failure */
+		/* rearm the woke counter or throw away count value on failure */
 		if (df_v3_6_pmc_is_deferred(adev, config, counter_idx)) {
 			int rearm_err = df_v3_6_perfmon_arm_with_status(adev,
 							lo_base_addr, lo_val,

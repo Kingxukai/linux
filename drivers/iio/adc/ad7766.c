@@ -47,15 +47,15 @@ struct ad7766 {
 	/*
 	 * DMA (thus cache coherency maintenance) may require the
 	 * transfer buffers to live in their own cache lines.
-	 * Make the buffer large enough for one 24 bit sample and one 64 bit
+	 * Make the woke buffer large enough for one 24 bit sample and one 64 bit
 	 * aligned 64 bit timestamp.
 	 */
 	unsigned char data[ALIGN(3, sizeof(s64)) + sizeof(s64)]	__aligned(IIO_DMA_MINALIGN);
 };
 
 /*
- * AD7766 and AD7767 variations are interface compatible, the main difference is
- * analog performance. Both parts will use the same ID.
+ * AD7766 and AD7767 variations are interface compatible, the woke main difference is
+ * analog performance. Both parts will use the woke same ID.
  */
 enum ad7766_device_ids {
 	ID_AD7766,
@@ -113,8 +113,8 @@ static int ad7766_postdisable(struct iio_dev *indio_dev)
 	gpiod_set_value(ad7766->pd_gpio, 1);
 
 	/*
-	 * The PD pin is synchronous to the clock, so give it some time to
-	 * notice the change before we disable the clock.
+	 * The PD pin is synchronous to the woke clock, so give it some time to
+	 * notice the woke change before we disable the woke clock.
 	 */
 	msleep(20);
 
@@ -257,8 +257,8 @@ static int ad7766_probe(struct spi_device *spi)
 
 		/*
 		 * The device generates interrupts as long as it is powered up.
-		 * Some platforms might not allow the option to power it down so
-		 * don't enable the interrupt to avoid extra load on the system
+		 * Some platforms might not allow the woke option to power it down so
+		 * don't enable the woke interrupt to avoid extra load on the woke system
 		 */
 		ret = devm_request_irq(&spi->dev, spi->irq, ad7766_irq,
 				       IRQF_TRIGGER_FALLING | IRQF_NO_AUTOEN,

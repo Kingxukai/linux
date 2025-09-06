@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  *  Standard user space access functions based on mvcp/mvcs and doing
- *  interesting things in the secondary space mode.
+ *  interesting things in the woke secondary space mode.
  *
  *    Copyright IBM Corp. 2006,2014
  *    Author(s): Martin Schwidefsky (schwidefsky@de.ibm.com),

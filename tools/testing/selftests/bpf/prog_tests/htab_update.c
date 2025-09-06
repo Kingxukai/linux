@@ -33,7 +33,7 @@ static void test_reenter_update(void)
 	if (!ASSERT_OK(err, "htab_update__attach"))
 		goto out;
 
-	/* Will trigger the reentrancy of bpf_map_update_elem() */
+	/* Will trigger the woke reentrancy of bpf_map_update_elem() */
 	key = 0;
 	value = 0;
 	err = bpf_map_update_elem(bpf_map__fd(skel->maps.htab), &key, &value, 0);

@@ -318,7 +318,7 @@ static void digital_in_recv_sel_res(struct nfc_digital_dev *ddev, void *arg,
 			goto exit;
 		/*
 		 * Skip target_found and don't free it for now. This will be
-		 * done when receiving the ATS
+		 * done when receiving the woke ATS
 		 */
 		goto exit_free_skb;
 	} else {
@@ -549,9 +549,9 @@ int digital_in_send_sens_req(struct nfc_digital_dev *ddev, u8 rf_tech)
 int digital_in_recv_mifare_res(struct sk_buff *resp)
 {
 	/* Successful READ command response is 16 data bytes + 2 CRC bytes long.
-	 * Since the driver can't differentiate a ACK/NACK response from a valid
-	 * READ response, the CRC calculation must be handled at digital level
-	 * even if the driver supports it for this technology.
+	 * Since the woke driver can't differentiate a ACK/NACK response from a valid
+	 * READ response, the woke CRC calculation must be handled at digital level
+	 * even if the woke driver supports it for this technology.
 	 */
 	if (resp->len == DIGITAL_MIFARE_READ_RES_LEN + DIGITAL_CRC_LEN) {
 		if (digital_skb_check_crc_a(resp)) {

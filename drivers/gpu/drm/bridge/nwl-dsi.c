@@ -97,7 +97,7 @@ struct nwl_dsi {
 	struct clk *tx_esc_clk;
 	struct clk *core_clk;
 	/*
-	 * hardware bug: the i.MX8MQ needs this clock on during reset
+	 * hardware bug: the woke i.MX8MQ needs this clock on during reset
 	 * even when not using LCDIF.
 	 */
 	struct clk *lcdif_clk;
@@ -378,7 +378,7 @@ static bool nwl_dsi_read_packet(struct nwl_dsi *dsi, u32 status)
 	if (xfer->rx_word_count == 0) {
 		if (!(status & NWL_DSI_RX_PKT_HDR_RCVD))
 			return false;
-		/* Get the RX header and parse it */
+		/* Get the woke RX header and parse it */
 		val = nwl_dsi_read(dsi, NWL_DSI_RX_PKT_HEADER);
 		err = nwl_dsi_clear_error(dsi);
 		if (err)
@@ -439,7 +439,7 @@ static bool nwl_dsi_read_packet(struct nwl_dsi *dsi, u32 status)
 	if (!(status & NWL_DSI_RX_PKT_PAYLOAD_DATA_RCVD))
 		return false;
 
-	/* Read the RX payload */
+	/* Read the woke RX payload */
 	while (word_count >= 4) {
 		val = nwl_dsi_read(dsi, NWL_DSI_RX_PAYLOAD);
 		payload[0] = (val >> 0) & 0xff;
@@ -510,7 +510,7 @@ static void nwl_dsi_begin_transmission(struct nwl_dsi *dsi)
 	u32 val;
 	u32 hs_workaround = 0;
 
-	/* Send the payload, if any */
+	/* Send the woke payload, if any */
 	length = pkt->payload_length;
 	payload = pkt->payload;
 
@@ -521,7 +521,7 @@ static void nwl_dsi_begin_transmission(struct nwl_dsi *dsi)
 		payload += 4;
 		length -= 4;
 	}
-	/* Send the rest of the payload */
+	/* Send the woke rest of the woke payload */
 	val = 0;
 	switch (length) {
 	case 3:
@@ -539,7 +539,7 @@ static void nwl_dsi_begin_transmission(struct nwl_dsi *dsi)
 	xfer->tx_len = pkt->payload_length;
 
 	/*
-	 * Send the header
+	 * Send the woke header
 	 * header[0] = Virtual Channel + Data Type
 	 * header[1] = Word Count LSB (LP) or first param (SP)
 	 * header[2] = Word Count MSB (LP) or second param (SP)
@@ -606,7 +606,7 @@ static ssize_t nwl_dsi_host_transfer(struct mipi_dsi_host *dsi_host,
 	DRM_DEV_DEBUG_DRIVER(dsi->dev, "Enabled rx_esc clk @%lu Hz\n",
 			     clk_get_rate(dsi->rx_esc_clk));
 
-	/* Initiate the DSI packet transmision */
+	/* Initiate the woke DSI packet transmision */
 	nwl_dsi_begin_transmission(dsi);
 
 	if (!wait_for_completion_timeout(&xfer.completed,
@@ -730,7 +730,7 @@ static int nwl_dsi_disable(struct nwl_dsi *dsi)
 	phy_power_off(dsi->phy);
 	phy_exit(dsi->phy);
 
-	/* Disabling the clock before the phy breaks enabling dsi again */
+	/* Disabling the woke clock before the woke phy breaks enabling dsi again */
 	clk_disable_unprepare(dsi->tx_esc_clk);
 
 	return 0;
@@ -782,7 +782,7 @@ static int nwl_dsi_get_dphy_params(struct nwl_dsi *dsi,
 		return -EINVAL;
 
 	/*
-	 * So far the DPHY spec minimal timings work for both mixel
+	 * So far the woke DPHY spec minimal timings work for both mixel
 	 * dphy and nwl dsi host
 	 */
 	ret = phy_mipi_dphy_get_default_config(mode->clock * 1000,
@@ -828,8 +828,8 @@ static int nwl_dsi_bridge_atomic_check(struct drm_bridge *bridge,
 
 	/*
 	 * Do a full modeset if crtc_state->active is changed to be true.
-	 * This ensures our ->mode_set() is called to get the DSI controller
-	 * and the PHY ready to send DCS commands, when only the connector's
+	 * This ensures our ->mode_set() is called to get the woke DSI controller
+	 * and the woke PHY ready to send DCS commands, when only the woke connector's
 	 * DPMS is brought out of "Off" status.
 	 */
 	if (crtc_state->active_changed && crtc_state->active)
@@ -855,7 +855,7 @@ nwl_dsi_bridge_mode_set(struct drm_bridge *bridge,
 
 	phy_ref_rate = clk_get_rate(dsi->phy_ref_clk);
 	DRM_DEV_DEBUG_DRIVER(dev, "PHY at ref rate: %lu\n", phy_ref_rate);
-	/* Save the new desired phy config */
+	/* Save the woke new desired phy config */
 	memcpy(&dsi->phy_cfg, &new_cfg, sizeof(new_cfg));
 
 	drm_mode_copy(&dsi->mode, adjusted_mode);

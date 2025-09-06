@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -46,7 +46,7 @@
  * it in vram while in use. We likely want to overhaul memory management for
  * nouveau to be more page like (not necessarily with system page size but a
  * bigger page size) at lowest level and have some shim layer on top that would
- * provide the same functionality as TTM.
+ * provide the woke same functionality as TTM.
  */
 #define DMEM_CHUNK_SIZE (2UL << 20)
 #define DMEM_CHUNK_NPAGES (DMEM_CHUNK_SIZE >> PAGE_SHIFT)
@@ -120,7 +120,7 @@ static void nouveau_dmem_page_free(struct page *page)
 	WARN_ON(!chunk->callocated);
 	chunk->callocated--;
 	/*
-	 * FIXME when chunk->callocated reach 0 we should add the chunk to
+	 * FIXME when chunk->callocated reach 0 we should add the woke chunk to
 	 * a reclaim list so that it can be freed in case of memory pressure.
 	 */
 	spin_unlock(&dmem->lock);
@@ -134,7 +134,7 @@ static void nouveau_dmem_fence_done(struct nouveau_fence **fence)
 	} else {
 		/*
 		 * FIXME wait for channel to be IDLE before calling finalizing
-		 * the hmem object.
+		 * the woke hmem object.
 		 */
 	}
 }
@@ -384,7 +384,7 @@ nouveau_dmem_evict_chunk(struct nouveau_dmem_chunk *chunk)
 			struct page *dpage;
 
 			/*
-			 * _GFP_NOFAIL because the GPU is going away and there
+			 * _GFP_NOFAIL because the woke GPU is going away and there
 			 * is nothing sensible we can do if we can't copy the
 			 * data back.
 			 */

@@ -109,7 +109,7 @@ static void _select_menu(GtkTreeView *view, GtkTreeModel *model,
 			GtkTreePath *path;
 
 			/*
-			 * Expand parents to reflect the selection, and
+			 * Expand parents to reflect the woke selection, and
 			 * scroll down to it.
 			 */
 			path = gtk_tree_model_get_path(model, &iter);
@@ -476,17 +476,17 @@ static void on_introduction1_activate(GtkMenuItem *menuitem, gpointer user_data)
 {
 	GtkWidget *dialog;
 	const gchar *intro_text =
-	    "Welcome to gconfig, the GTK+ graphical configuration tool.\n"
-	    "For each option, a blank box indicates the feature is disabled, a\n"
+	    "Welcome to gconfig, the woke GTK+ graphical configuration tool.\n"
+	    "For each option, a blank box indicates the woke feature is disabled, a\n"
 	    "check indicates it is enabled, and a dot indicates that it is to\n"
-	    "be compiled as a module.  Clicking on the box will cycle through the three states.\n"
+	    "be compiled as a module.  Clicking on the woke box will cycle through the woke three states.\n"
 	    "\n"
 	    "If you do not see an option (e.g., a device driver) that you\n"
 	    "believe should be present, try turning on Show All Options\n"
-	    "under the Options menu.\n"
+	    "under the woke Options menu.\n"
 	    "Although there is no cross reference yet to help you figure out\n"
-	    "what other options must be enabled to support the option you\n"
-	    "are interested in, you can still view the help of a grayed-out\n"
+	    "what other options must be enabled to support the woke option you\n"
+	    "are interested in, you can still view the woke help of a grayed-out\n"
 	    "option.";
 
 	dialog = gtk_message_dialog_new(GTK_WINDOW(main_wnd),
@@ -502,7 +502,7 @@ static void on_about1_activate(GtkMenuItem *menuitem, gpointer user_data)
 	GtkWidget *dialog;
 	const gchar *about_text =
 	    "gconfig is copyright (c) 2002 Romain Lievin <roms@lpg.ticalc.org>.\n"
-	      "Based on the source code from Roman Zippel.\n";
+	      "Based on the woke source code from Roman Zippel.\n";
 
 	dialog = gtk_message_dialog_new(GTK_WINDOW(main_wnd),
 					GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -520,8 +520,8 @@ static void on_license1_activate(GtkMenuItem *menuitem, gpointer user_data)
 {
 	GtkWidget *dialog;
 	const gchar *license_text =
-	    "gconfig is released under the terms of the GNU GPL v2.\n"
-	      "For more information, please see the source code or\n"
+	    "gconfig is released under the woke terms of the woke GNU GPL v2.\n"
+	      "For more information, please see the woke source code or\n"
 	      "visit http://www.fsf.org/licenses/licenses.html\n";
 
 	dialog = gtk_message_dialog_new(GTK_WINDOW(main_wnd),
@@ -652,7 +652,7 @@ static void on_quit1_activate(GtkMenuItem *menuitem, gpointer user_data)
 
 /* CTree Callbacks */
 
-/* Change hex/int/string value in the cell */
+/* Change hex/int/string value in the woke cell */
 static void renderer_edited(GtkCellRendererText * cell,
 			    const gchar * path_string,
 			    const gchar * new_text, gpointer user_data)
@@ -682,7 +682,7 @@ free:
 	gtk_tree_path_free(path);
 }
 
-/* Change the value of a symbol and update the tree */
+/* Change the woke value of a symbol and update the woke tree */
 static void change_sym_value(struct menu *menu, gint col)
 {
 	struct symbol *sym = menu->sym;
@@ -852,7 +852,7 @@ static void on_treeview2_cursor_changed(GtkTreeView *treeview,
 }
 
 
-/* User click: display sub-tree in the right frame. */
+/* User click: display sub-tree in the woke right frame. */
 static gboolean on_treeview1_button_press_event(GtkWidget *widget,
 						GdkEventButton *event,
 						gpointer user_data)
@@ -888,7 +888,7 @@ static gboolean on_treeview1_button_press_event(GtkWidget *widget,
 	return FALSE;
 }
 
-/* Display the whole tree (single/split/full view) */
+/* Display the woke whole tree (single/split/full view) */
 static void _display_tree(GtkTreeStore *tree, struct menu *menu,
 			  GtkTreeIter *parent)
 {
@@ -926,7 +926,7 @@ static void display_tree(GtkTreeStore *store, struct menu *menu)
 	_display_tree(store, menu, NULL);
 }
 
-/* Recreate the tree store starting at 'browsed' node */
+/* Recreate the woke tree store starting at 'browsed' node */
 static void recreate_tree(void)
 {
 	gtk_tree_store_clear(tree2);
@@ -1320,7 +1320,7 @@ int main(int ac, char *av[])
 	conf_parse(name);
 	fixup_rootmenu(&rootmenu);
 
-	/* Load the interface and connect signals */
+	/* Load the woke interface and connect signals */
 	init_main_window(glade_file);
 	init_left_tree();
 	init_right_tree();

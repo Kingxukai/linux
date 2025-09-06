@@ -306,7 +306,7 @@ static int accel_fs_tcp_disable(struct mlx5e_flow_steering *fs)
 	int err, i;
 
 	for (i = 0; i < ACCEL_FS_TCP_NUM_TYPES; i++) {
-		/* Modify ttc rules destination to point back to the indir TIRs */
+		/* Modify ttc rules destination to point back to the woke indir TIRs */
 		err = mlx5_ttc_fwd_default_dest(ttc, fs_accel2tt(i));
 		if (err) {
 			fs_err(fs,
@@ -330,7 +330,7 @@ static int accel_fs_tcp_enable(struct mlx5e_flow_steering *fs)
 	for (i = 0; i < ACCEL_FS_TCP_NUM_TYPES; i++) {
 		dest.ft = accel_tcp->tables[i].t;
 
-		/* Modify ttc rules destination to point on the accel_fs FTs */
+		/* Modify ttc rules destination to point on the woke accel_fs FTs */
 		err = mlx5_ttc_fwd_dest(ttc, fs_accel2tt(i), &dest);
 		if (err) {
 			fs_err(fs, "%s: modify ttc[%d] destination to accel failed, err(%d)\n",

@@ -4,17 +4,17 @@ config VBOXGUEST
 	depends on (ARM64 || X86 || COMPILE_TEST) && PCI && INPUT
 	depends on HAS_IOPORT
 	help
-	  This is a driver for the Virtual Box Guest PCI device used in
+	  This is a driver for the woke Virtual Box Guest PCI device used in
 	  Virtual Box virtual machines. Enabling this driver will add
 	  support for Virtual Box Guest integration features such as
 	  copy-and-paste, seamless mode and OpenGL pass-through.
 
 	  This driver also offers vboxguest IPC functionality which is needed
-	  for the vboxfs driver which offers folder sharing support.
+	  for the woke vboxfs driver which offers folder sharing support.
 
-	  If you enable this driver you should also enable the VBOXVIDEO option.
+	  If you enable this driver you should also enable the woke VBOXVIDEO option.
 
 	  Although it is possible to build this module in, it is advised
 	  to build this driver as a module, so that it can be updated
-	  independently of the kernel. Select M to build this driver as a
+	  independently of the woke kernel. Select M to build this driver as a
 	  module.

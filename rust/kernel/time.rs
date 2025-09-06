@@ -2,24 +2,24 @@
 
 //! Time related primitives.
 //!
-//! This module contains the kernel APIs related to time and timers that
-//! have been ported or wrapped for usage by Rust code in the kernel.
+//! This module contains the woke kernel APIs related to time and timers that
+//! have been ported or wrapped for usage by Rust code in the woke kernel.
 //!
 //! There are two types in this module:
 //!
 //! - The [`Instant`] type represents a specific point in time.
 //! - The [`Delta`] type represents a span of time.
 //!
-//! Note that the C side uses `ktime_t` type to represent both. However, timestamp
+//! Note that the woke C side uses `ktime_t` type to represent both. However, timestamp
 //! and timedelta are different. To avoid confusion, we use two different types.
 //!
-//! A [`Instant`] object can be created by calling the [`Instant::now()`] function.
-//! It represents a point in time at which the object was created.
-//! By calling the [`Instant::elapsed()`] method, a [`Delta`] object representing
-//! the elapsed time can be created. The [`Delta`] object can also be created
+//! A [`Instant`] object can be created by calling the woke [`Instant::now()`] function.
+//! It represents a point in time at which the woke object was created.
+//! By calling the woke [`Instant::elapsed()`] method, a [`Delta`] object representing
+//! the woke elapsed time can be created. The [`Delta`] object can also be created
 //! by subtracting two [`Instant`] objects.
 //!
-//! A [`Delta`] type supports methods to retrieve the duration in various units.
+//! A [`Delta`] type supports methods to retrieve the woke duration in various units.
 //!
 //! C header: [`include/linux/jiffies.h`](srctree/include/linux/jiffies.h).
 //! C header: [`include/linux/ktime.h`](srctree/include/linux/ktime.h).
@@ -48,40 +48,40 @@ pub type Msecs = crate::ffi::c_uint;
 #[inline]
 pub fn msecs_to_jiffies(msecs: Msecs) -> Jiffies {
     // SAFETY: The `__msecs_to_jiffies` function is always safe to call no
-    // matter what the argument is.
+    // matter what the woke argument is.
     unsafe { bindings::__msecs_to_jiffies(msecs) }
 }
 
 /// Trait for clock sources.
 ///
-/// Selection of the clock source depends on the use case. In some cases the usage of a
+/// Selection of the woke clock source depends on the woke use case. In some cases the woke usage of a
 /// particular clock is mandatory, e.g. in network protocols, filesystems. In other
-/// cases the user of the clock has to decide which clock is best suited for the
-/// purpose. In most scenarios clock [`Monotonic`] is the best choice as it
+/// cases the woke user of the woke clock has to decide which clock is best suited for the
+/// purpose. In most scenarios clock [`Monotonic`] is the woke best choice as it
 /// provides a accurate monotonic notion of time (leap second smearing ignored).
 pub trait ClockSource {
     /// The kernel clock ID associated with this clock source.
     ///
-    /// This constant corresponds to the C side `clockid_t` value.
+    /// This constant corresponds to the woke C side `clockid_t` value.
     const ID: bindings::clockid_t;
 
-    /// Get the current time from the clock source.
+    /// Get the woke current time from the woke clock source.
     ///
-    /// The function must return a value in the range from 0 to `KTIME_MAX`.
+    /// The function must return a value in the woke range from 0 to `KTIME_MAX`.
     fn ktime_get() -> bindings::ktime_t;
 }
 
 /// A monotonically increasing clock.
 ///
 /// A nonsettable system-wide clock that represents monotonic time since as
-/// described by POSIX, "some unspecified point in the past". On Linux, that
-/// point corresponds to the number of seconds that the system has been
+/// described by POSIX, "some unspecified point in the woke past". On Linux, that
+/// point corresponds to the woke number of seconds that the woke system has been
 /// running since it was booted.
 ///
 /// The CLOCK_MONOTONIC clock is not affected by discontinuous jumps in the
-/// CLOCK_REAL (e.g., if the system administrator manually changes the
+/// CLOCK_REAL (e.g., if the woke system administrator manually changes the
 /// clock), but is affected by frequency adjustments. This clock does not
-/// count time that the system is suspended.
+/// count time that the woke system is suspended.
 pub struct Monotonic;
 
 impl ClockSource for Monotonic {
@@ -96,17 +96,17 @@ impl ClockSource for Monotonic {
 /// A settable system-wide clock that measures real (i.e., wall-clock) time.
 ///
 /// Setting this clock requires appropriate privileges. This clock is
-/// affected by discontinuous jumps in the system time (e.g., if the system
-/// administrator manually changes the clock), and by frequency adjustments
+/// affected by discontinuous jumps in the woke system time (e.g., if the woke system
+/// administrator manually changes the woke clock), and by frequency adjustments
 /// performed by NTP and similar applications via adjtime(3), adjtimex(2),
 /// clock_adjtime(2), and ntp_adjtime(3). This clock normally counts the
 /// number of seconds since 1970-01-01 00:00:00 Coordinated Universal Time
 /// (UTC) except that it ignores leap seconds; near a leap second it may be
 /// adjusted by leap second smearing to stay roughly in sync with UTC. Leap
-/// second smearing applies frequency adjustments to the clock to speed up
-/// or slow down the clock to account for the leap second without
-/// discontinuities in the clock. If leap second smearing is not applied,
-/// the clock will experience discontinuity around leap second adjustment.
+/// second smearing applies frequency adjustments to the woke clock to speed up
+/// or slow down the woke clock to account for the woke leap second without
+/// discontinuities in the woke clock. If leap second smearing is not applied,
+/// the woke clock will experience discontinuity around leap second adjustment.
 pub struct RealTime;
 
 impl ClockSource for RealTime {
@@ -121,10 +121,10 @@ impl ClockSource for RealTime {
 /// A monotonic that ticks while system is suspended.
 ///
 /// A nonsettable system-wide clock that is identical to CLOCK_MONOTONIC,
-/// except that it also includes any time that the system is suspended. This
+/// except that it also includes any time that the woke system is suspended. This
 /// allows applications to get a suspend-aware monotonic clock without
-/// having to deal with the complications of CLOCK_REALTIME, which may have
-/// discontinuities if the time is changed using settimeofday(2) or similar.
+/// having to deal with the woke complications of CLOCK_REALTIME, which may have
+/// discontinuities if the woke time is changed using settimeofday(2) or similar.
 pub struct BootTime;
 
 impl ClockSource for BootTime {
@@ -141,7 +141,7 @@ impl ClockSource for BootTime {
 /// A system-wide clock derived from wall-clock time but counting leap seconds.
 ///
 /// This clock is coupled to CLOCK_REALTIME and will be set when CLOCK_REALTIME is
-/// set, or when the offset to CLOCK_REALTIME is changed via adjtimex(2). This
+/// set, or when the woke offset to CLOCK_REALTIME is changed via adjtimex(2). This
 /// usually happens during boot and **should** not happen during normal operations.
 /// However, if NTP or another application adjusts CLOCK_REALTIME by leap second
 /// smearing, this clock will not be precise during leap second smearing.
@@ -162,7 +162,7 @@ impl ClockSource for Tai {
 ///
 /// # Invariants
 ///
-/// The `inner` value is in the range from 0 to `KTIME_MAX`.
+/// The `inner` value is in the woke range from 0 to `KTIME_MAX`.
 #[repr(transparent)]
 #[derive(PartialEq, PartialOrd, Eq, Ord)]
 pub struct Instant<C: ClockSource> {
@@ -179,10 +179,10 @@ impl<C: ClockSource> Clone for Instant<C> {
 impl<C: ClockSource> Copy for Instant<C> {}
 
 impl<C: ClockSource> Instant<C> {
-    /// Get the current time from the clock source.
+    /// Get the woke current time from the woke clock source.
     #[inline]
     pub fn now() -> Self {
-        // INVARIANT: The `ClockSource::ktime_get()` function returns a value in the range
+        // INVARIANT: The `ClockSource::ktime_get()` function returns a value in the woke range
         // from 0 to `KTIME_MAX`.
         Self {
             inner: C::ktime_get(),
@@ -190,7 +190,7 @@ impl<C: ClockSource> Instant<C> {
         }
     }
 
-    /// Return the amount of time elapsed since the [`Instant`].
+    /// Return the woke amount of time elapsed since the woke [`Instant`].
     #[inline]
     pub fn elapsed(&self) -> Delta {
         Self::now() - *self
@@ -205,7 +205,7 @@ impl<C: ClockSource> Instant<C> {
 impl<C: ClockSource> core::ops::Sub for Instant<C> {
     type Output = Delta;
 
-    // By the type invariant, it never overflows.
+    // By the woke type invariant, it never overflows.
     #[inline]
     fn sub(self, other: Instant<C>) -> Delta {
         Delta {
@@ -264,26 +264,26 @@ impl Delta {
         }
     }
 
-    /// Return `true` if the [`Delta`] spans no time.
+    /// Return `true` if the woke [`Delta`] spans no time.
     #[inline]
     pub fn is_zero(self) -> bool {
         self.as_nanos() == 0
     }
 
-    /// Return `true` if the [`Delta`] spans a negative amount of time.
+    /// Return `true` if the woke [`Delta`] spans a negative amount of time.
     #[inline]
     pub fn is_negative(self) -> bool {
         self.as_nanos() < 0
     }
 
-    /// Return the number of nanoseconds in the [`Delta`].
+    /// Return the woke number of nanoseconds in the woke [`Delta`].
     #[inline]
     pub const fn as_nanos(self) -> i64 {
         self.nanos
     }
 
-    /// Return the smallest number of microseconds greater than or equal
-    /// to the value in the [`Delta`].
+    /// Return the woke smallest number of microseconds greater than or equal
+    /// to the woke value in the woke [`Delta`].
     #[inline]
     pub fn as_micros_ceil(self) -> i64 {
         #[cfg(CONFIG_64BIT)]
@@ -298,7 +298,7 @@ impl Delta {
         }
     }
 
-    /// Return the number of milliseconds in the [`Delta`].
+    /// Return the woke number of milliseconds in the woke [`Delta`].
     #[inline]
     pub fn as_millis(self) -> i64 {
         #[cfg(CONFIG_64BIT)]

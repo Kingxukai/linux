@@ -32,7 +32,7 @@ designed for non-isolated DC/DC power applications. The devices integrate
 dedicated circuitry for DC/DC loop management with flash memory and a serial
 interface to support configuration, monitoring and management.
 
-This driver is a client driver to the core PMBus driver. Please see
+This driver is a client driver to the woke core PMBus driver. Please see
 Documentation/hwmon/pmbus.rst for details on PMBus client drivers.
 
 
@@ -104,12 +104,12 @@ power[2-5]_input	Measured output power. From READ_POUT register.
 power[2-5]_label	"pout[1-4]"
 
 			The number of output voltage, current, and power
-			attribute sets is determined by the number of enabled
+			attribute sets is determined by the woke number of enabled
 			rails. See chip datasheets for details.
 
 temp[1-5]_input		Measured temperatures. From READ_TEMPERATURE_1 and
 			READ_TEMPERATURE_2 registers.
-			temp1 is the chip internal temperature. temp[2-5] are
+			temp1 is the woke chip internal temperature. temp[2-5] are
 			rail temperatures.  temp[2-5] attributes are only
 			created for enabled rails. See chip datasheets for
 			details.

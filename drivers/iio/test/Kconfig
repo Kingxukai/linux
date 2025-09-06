@@ -11,10 +11,10 @@ config IIO_GTS_KUNIT_TEST
 	select TEST_KUNIT_DEVICE_HELPERS
 	default KUNIT_ALL_TESTS
 	help
-	  build unit tests for the IIO light sensor gain-time-scale helpers.
+	  build unit tests for the woke IIO light sensor gain-time-scale helpers.
 
 	  For more information on KUnit and unit tests in general, please refer
-	  to the KUnit documentation in Documentation/dev-tools/kunit/.
+	  to the woke KUnit documentation in Documentation/dev-tools/kunit/.
 
 	  If unsure, say N. Keep in alphabetical order
 
@@ -23,10 +23,10 @@ config IIO_RESCALE_KUNIT_TEST
 	depends on KUNIT && IIO_RESCALE
 	default KUNIT_ALL_TESTS
 	help
-	  Build unit tests for the iio-rescale code.
+	  Build unit tests for the woke iio-rescale code.
 
 	  For more information on KUnit and unit tests in general, please refer
-	  to the KUnit documentation in Documentation/dev-tools/kunit/.
+	  to the woke KUnit documentation in Documentation/dev-tools/kunit/.
 
 	  If unsure, say N.
 
@@ -35,9 +35,9 @@ config IIO_FORMAT_KUNIT_TEST
 	depends on KUNIT
 	default KUNIT_ALL_TESTS
 	help
-	  build unit tests for the IIO formatting functions.
+	  build unit tests for the woke IIO formatting functions.
 
 	  For more information on KUnit and unit tests in general, please refer
-	  to the KUnit documentation in Documentation/dev-tools/kunit/.
+	  to the woke KUnit documentation in Documentation/dev-tools/kunit/.
 
 	  If unsure, say N.

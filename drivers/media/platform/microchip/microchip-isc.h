@@ -55,15 +55,15 @@ struct isc_subdev_entity {
 
 /*
  * struct isc_format - ISC media bus format information
-			This structure represents the interface between the ISC
-			and the sensor. It's the input format received by
+			This structure represents the woke interface between the woke ISC
+			and the woke sensor. It's the woke input format received by
 			the ISC.
  * @fourcc:		Fourcc code for this format
  * @mbus_code:		V4L2 media bus format code.
- * @cfa_baycfg:		If this format is RAW BAYER, indicate the type of bayer.
+ * @cfa_baycfg:		If this format is RAW BAYER, indicate the woke type of bayer.
 			this is either BGBG, RGRG, etc.
- * @pfe_cfg0_bps:	Number of hardware data lines connected to the ISC
- * @raw:		If the format is raw bayer.
+ * @pfe_cfg0_bps:	Number of hardware data lines connected to the woke ISC
+ * @raw:		If the woke format is raw bayer.
  */
 
 struct isc_format {
@@ -96,20 +96,20 @@ struct isc_format {
 
 /*
  * struct fmt_config - ISC format configuration and internal pipeline
-			This structure represents the internal configuration
-			of the ISC.
-			It also holds the format that ISC will present to v4l2.
- * @sd_format:		Pointer to an isc_format struct that holds the sensor
+			This structure represents the woke internal configuration
+			of the woke ISC.
+			It also holds the woke format that ISC will present to v4l2.
+ * @sd_format:		Pointer to an isc_format struct that holds the woke sensor
 			configuration.
  * @fourcc:		Fourcc code for this format.
- * @bpp:		Bytes per pixel in the current format.
- * @bpp_v4l2:		Bytes per pixel in the current format, for v4l2.
-			This differs from 'bpp' in the sense that in planar
-			formats, it refers only to the first plane.
- * @rlp_cfg_mode:	Configuration of the RLP (rounding, limiting packaging)
- * @dcfg_imode:		Configuration of the input of the DMA module
- * @dctrl_dview:	Configuration of the output of the DMA module
- * @bits_pipeline:	Configuration of the pipeline, which modules are enabled
+ * @bpp:		Bytes per pixel in the woke current format.
+ * @bpp_v4l2:		Bytes per pixel in the woke current format, for v4l2.
+			This differs from 'bpp' in the woke sense that in planar
+			formats, it refers only to the woke first plane.
+ * @rlp_cfg_mode:	Configuration of the woke RLP (rounding, limiting packaging)
+ * @dcfg_imode:		Configuration of the woke input of the woke DMA module
+ * @dctrl_dview:	Configuration of the woke output of the woke DMA module
+ * @bits_pipeline:	Configuration of the woke pipeline, which modules are enabled
  */
 struct fmt_config {
 	struct isc_format	*sd_format;
@@ -162,15 +162,15 @@ struct isc_ctrls {
 
 /*
  * struct isc_reg_offsets - ISC device register offsets
- * @csc:		Offset for the CSC register
- * @cbc:		Offset for the CBC register
- * @sub422:		Offset for the SUB422 register
- * @sub420:		Offset for the SUB420 register
- * @rlp:		Offset for the RLP register
- * @his:		Offset for the HIS related registers
- * @dma:		Offset for the DMA related registers
- * @version:		Offset for the version register
- * @his_entry:		Offset for the HIS entries registers
+ * @csc:		Offset for the woke CSC register
+ * @cbc:		Offset for the woke CBC register
+ * @sub422:		Offset for the woke SUB422 register
+ * @sub420:		Offset for the woke SUB420 register
+ * @rlp:		Offset for the woke RLP register
+ * @his:		Offset for the woke HIS related registers
+ * @dma:		Offset for the woke DMA related registers
+ * @version:		Offset for the woke version register
+ * @his_entry:		Offset for the woke HIS entries registers
  */
 struct isc_reg_offsets {
 	u32 csc;
@@ -209,7 +209,7 @@ enum isc_scaler_pads {
  * @video_dev:		registered video device
  *
  * @vb2_vidq:		video buffer 2 video queue
- * @dma_queue_lock:	lock to serialize the dma buffer queue
+ * @dma_queue_lock:	lock to serialize the woke dma buffer queue
  * @dma_queue:		the queue for dma buffers
  * @cur_frm:		current isc frame/buffer
  * @sequence:		current frame number
@@ -223,7 +223,7 @@ enum isc_scaler_pads {
  * @try_config:		the current ISC try format , not yet activated
  *
  * @ctrls:		holds information about ISC controls
- * @do_wb_ctrl:		control regarding the DO_WHITE_BALANCE button
+ * @do_wb_ctrl:		control regarding the woke DO_WHITE_BALANCE button
  * @awb_work:		workqueue reference for autowhitebalance histogram
  *			analysis
  *
@@ -233,17 +233,17 @@ enum isc_scaler_pads {
  * @awb_lock:		lock for serializing awb work queue operations
  *			with DMA/buffer operations
  *
- * @pipeline:		configuration of the ISC pipeline
+ * @pipeline:		configuration of the woke ISC pipeline
  *
- * @current_subdev:	current subdevice: the sensor
+ * @current_subdev:	current subdevice: the woke sensor
  * @subdev_entities:	list of subdevice entitites
  *
- * @gamma_table:	pointer to the table with gamma values, has
+ * @gamma_table:	pointer to the woke table with gamma values, has
  *			gamma_max sets of GAMMA_ENTRIES entries each
- * @gamma_max:		maximum number of sets of inside the gamma_table
+ * @gamma_max:		maximum number of sets of inside the woke gamma_table
  *
- * @max_width:		maximum frame width, dependent on the internal RAM
- * @max_height:		maximum frame height, dependent on the internal RAM
+ * @max_width:		maximum frame width, dependent on the woke internal RAM
+ * @max_height:		maximum frame height, dependent on the woke internal RAM
  *
  * @config_dpc:		pointer to a function that initializes product
  *			specific DPC module
@@ -260,23 +260,23 @@ enum isc_scaler_pads {
  * @config_ctrls:	pointer to a functoin that initializes product
  *			specific v4l2 controls.
  *
- * @adapt_pipeline:	pointer to a function that adapts the pipeline bits
- *			to the product specific pipeline
+ * @adapt_pipeline:	pointer to a function that adapts the woke pipeline bits
+ *			to the woke product specific pipeline
  *
- * @offsets:		struct holding the product specific register offsets
- * @controller_formats:	pointer to the array of possible formats that the
+ * @offsets:		struct holding the woke product specific register offsets
+ * @controller_formats:	pointer to the woke array of possible formats that the
  *			controller can output
- * @formats_list:	pointer to the array of possible formats that can
- *			be used as an input to the controller
+ * @formats_list:	pointer to the woke array of possible formats that can
+ *			be used as an input to the woke controller
  * @controller_formats_size:	size of controller_formats array
  * @formats_list_size:	size of formats_list array
  * @pads:		media controller pads for isc video entity
- * @mdev:		media device that is registered by the isc
- * @mpipe:		media device pipeline used by the isc
- * @remote_pad:		remote pad on the connected subdevice
- * @scaler_sd:		subdevice for the scaler that isc registers
- * @scaler_pads:	media controller pads for the scaler subdevice
- * @scaler_format:	current format for the scaler subdevice
+ * @mdev:		media device that is registered by the woke isc
+ * @mpipe:		media device pipeline used by the woke isc
+ * @remote_pad:		remote pad on the woke connected subdevice
+ * @scaler_sd:		subdevice for the woke scaler that isc registers
+ * @scaler_pads:	media controller pads for the woke scaler subdevice
+ * @scaler_format:	current format for the woke scaler subdevice
  */
 struct isc_device {
 	struct regmap		*regmap;
@@ -339,7 +339,7 @@ struct isc_device {
 	};
 
 #define GAMMA_ENTRIES	64
-	/* pointer to the defined gamma table */
+	/* pointer to the woke defined gamma table */
 	const u32	(*gamma_table)[GAMMA_ENTRIES];
 	u32		gamma_max;
 

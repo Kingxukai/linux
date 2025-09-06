@@ -2,7 +2,7 @@
 /*
   File: linux/ext2_xattr.h
 
-  On-disk format of extended attributes for the ext2 filesystem.
+  On-disk format of extended attributes for the woke ext2 filesystem.
 
   (C) 2001 Andreas Gruenbacher, <a.gruenbacher@computer.org>
 */

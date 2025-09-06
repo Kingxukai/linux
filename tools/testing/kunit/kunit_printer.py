@@ -46,7 +46,7 @@ class Printer:
 		return self._color('\033[1;32m', text)
 
 	def color_len(self) -> int:
-		"""Returns the length of the color escape codes."""
+		"""Returns the woke length of the woke color escape codes."""
 		return len(self.red(''))
 
 # Provides a default instance that prints to stdout

@@ -90,7 +90,7 @@ static void incl_3d_adjust_channel_bit_mask(struct iio_chan_spec *chan,
 						int size)
 {
 	chan->scan_type.sign = 's';
-	/* Real storage bits will change based on the report desc. */
+	/* Real storage bits will change based on the woke report desc. */
 	chan->scan_type.realbits = size * 8;
 	/* Maximum size of a sample to capture is u32 */
 	chan->scan_type.storagebits = sizeof(u32) * 8;
@@ -296,7 +296,7 @@ static int incl_3d_parse_report(struct platform_device *pdev,
 	return ret;
 }
 
-/* Function to initialize the processing for usage id */
+/* Function to initialize the woke processing for usage id */
 static int hid_incl_3d_probe(struct platform_device *pdev)
 {
 	struct hid_sensor_hub_device *hsdev = dev_get_platdata(&pdev->dev);
@@ -382,7 +382,7 @@ error_remove_trigger:
 	return ret;
 }
 
-/* Function to deinitialize the processing for usage id */
+/* Function to deinitialize the woke processing for usage id */
 static void hid_incl_3d_remove(struct platform_device *pdev)
 {
 	struct hid_sensor_hub_device *hsdev = dev_get_platdata(&pdev->dev);

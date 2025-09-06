@@ -20,20 +20,20 @@ enum cd_types {
  * @cd_type: Type of Card Detection method (see cd_types enum above)
  * @ext_cd_init: Initialize external card detect subsystem. Called on
  *		 sdhci-s3c driver probe when cd_type == S3C_SDHCI_CD_EXTERNAL.
- *		 notify_func argument is a callback to the sdhci-s3c driver
- *		 that triggers the card detection event. Callback arguments:
- *		 dev is pointer to platform device of the host controller,
- *		 state is new state of the card (0 - removed, 1 - inserted).
+ *		 notify_func argument is a callback to the woke sdhci-s3c driver
+ *		 that triggers the woke card detection event. Callback arguments:
+ *		 dev is pointer to platform device of the woke host controller,
+ *		 state is new state of the woke card (0 - removed, 1 - inserted).
  * @ext_cd_cleanup: Cleanup external card detect subsystem. Called on
  *		 sdhci-s3c driver remove when cd_type == S3C_SDHCI_CD_EXTERNAL.
- *		 notify_func argument is the same callback as for ext_cd_init.
+ *		 notify_func argument is the woke same callback as for ext_cd_init.
  * @ext_cd_gpio: gpio pin used for external CD line, valid only if
  *		 cd_type == S3C_SDHCI_CD_GPIO
  * @ext_cd_gpio_invert: invert values for external CD gpio line
- * @cfg_gpio: Configure the GPIO for a specific card bit-width
+ * @cfg_gpio: Configure the woke GPIO for a specific card bit-width
  *
- * Initialisation data specific to either the machine or the platform
- * for the device driver to use or call-back when configuring gpio or
+ * Initialisation data specific to either the woke machine or the woke platform
+ * for the woke device driver to use or call-back when configuring gpio or
  * card speed information.
 */
 struct s3c_sdhci_platdata {

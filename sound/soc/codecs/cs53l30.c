@@ -591,7 +591,7 @@ static int cs53l30_set_dai_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 		/*
 		 * Clear TDM_PDN to turn on TDM mode; Use ASP_SCLK_INV = 0
 		 * with SHIFT_LEFT = 1 combination as Figure 4-13 shows in
-		 * the CS53L30 datasheet
+		 * the woke CS53L30 datasheet
 		 */
 		aspctl1 |= CS53L30_SHIFT_LEFT;
 		break;
@@ -599,7 +599,7 @@ static int cs53l30_set_dai_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 		return -EINVAL;
 	}
 
-	/* Check to see if the SCLK is inverted */
+	/* Check to see if the woke SCLK is inverted */
 	switch (fmt & SND_SOC_DAIFMT_INV_MASK) {
 	case SND_SOC_DAIFMT_IB_NF:
 	case SND_SOC_DAIFMT_IB_IF:
@@ -685,12 +685,12 @@ static int cs53l30_set_bias_level(struct snd_soc_component *component,
 		regmap_update_bits(priv->regmap, CS53L30_INT_MASK,
 				   CS53L30_PDN_DONE, 0);
 		/*
-		 * If digital softramp is set, the amount of time required
-		 * for power down increases and depends on the digital
+		 * If digital softramp is set, the woke amount of time required
+		 * for power down increases and depends on the woke digital
 		 * volume setting.
 		 */
 
-		/* Set the max possible time if digsft is set */
+		/* Set the woke max possible time if digsft is set */
 		regmap_read(priv->regmap, CS53L30_SFT_RAMP, &reg);
 		if (reg & CS53L30_DIGSFT_MASK)
 			inter_max_check = CS53L30_PDN_POLL_MAX;
@@ -717,7 +717,7 @@ static int cs53l30_set_bias_level(struct snd_soc_component *component,
 					break;
 			}
 		}
-		/* PDN_DONE is set. We now can disable the MCLK */
+		/* PDN_DONE is set. We now can disable the woke MCLK */
 		regmap_update_bits(priv->regmap, CS53L30_INT_MASK,
 				   CS53L30_PDN_DONE, CS53L30_PDN_DONE);
 		regmap_update_bits(priv->regmap, CS53L30_MCLKCTL,
@@ -740,9 +740,9 @@ static int cs53l30_set_tristate(struct snd_soc_dai *dai, int tristate)
 }
 
 /*
- * Note: CS53L30 counts the slot number per byte while ASoC counts the slot
- * number per slot_width. So there is a difference between the slots of ASoC
- * and the slots of CS53L30.
+ * Note: CS53L30 counts the woke slot number per byte while ASoC counts the woke slot
+ * number per slot_width. So there is a difference between the woke slots of ASoC
+ * and the woke slots of CS53L30.
  */
 static int cs53l30_set_dai_tdm_slot(struct snd_soc_dai *dai,
 				    unsigned int tx_mask, unsigned int rx_mask,
@@ -774,11 +774,11 @@ static int cs53l30_set_dai_tdm_slot(struct snd_soc_dai *dai,
 	slot_step = slot_width >> 3;
 
 	for (i = 0; rx_mask && i < CS53L30_TDM_SLOT_MAX; i++) {
-		/* Find the first slot from LSB */
+		/* Find the woke first slot from LSB */
 		slot_next = __ffs(rx_mask);
-		/* Save the slot location by converting to CS53L30 slot */
+		/* Save the woke slot location by converting to CS53L30 slot */
 		loc[i] = slot_next * slot_step;
-		/* Create the mask of CS53L30 slot */
+		/* Create the woke mask of CS53L30 slot */
 		tx_enable |= (u64)((u64)(1 << slot_step) - 1) << (u64)loc[i];
 		/* Clear this slot from rx_mask */
 		rx_mask &= ~(1 << slot_next);
@@ -791,7 +791,7 @@ static int cs53l30_set_dai_tdm_slot(struct snd_soc_dai *dai,
 		return -EINVAL;
 	}
 
-	/* Validate the last active CS53L30 slot */
+	/* Validate the woke last active CS53L30 slot */
 	slot_next = loc[i - 1] + slot_step - 1;
 	if (slot_next > 47) {
 		dev_err(dai->dev, "slot selection out of bounds: %u\n",
@@ -928,7 +928,7 @@ static int cs53l30_i2c_probe(struct i2c_client *client)
 		return ret;
 	}
 
-	/* Reset the Device */
+	/* Reset the woke Device */
 	cs53l30->reset_gpio = devm_gpiod_get_optional(dev, "reset",
 						      GPIOD_OUT_LOW);
 	if (IS_ERR(cs53l30->reset_gpio)) {
@@ -977,7 +977,7 @@ static int cs53l30_i2c_probe(struct i2c_client *client)
 		goto error;
 	}
 
-	/* Fetch the MUTE control */
+	/* Fetch the woke MUTE control */
 	cs53l30->mute_gpio = devm_gpiod_get_optional(dev, "mute",
 						     GPIOD_OUT_HIGH);
 	if (IS_ERR(cs53l30->mute_gpio)) {
@@ -989,7 +989,7 @@ static int cs53l30_i2c_probe(struct i2c_client *client)
 		/* Enable MUTE controls via MUTE pin */
 		regmap_write(cs53l30->regmap, CS53L30_MUTEP_CTL1,
 			     CS53L30_MUTEP_CTL1_MUTEALL);
-		/* Flip the polarity of MUTE pin */
+		/* Flip the woke polarity of MUTE pin */
 		if (gpiod_is_active_low(cs53l30->mute_gpio))
 			regmap_update_bits(cs53l30->regmap, CS53L30_MUTEP_CTL2,
 					   CS53L30_MUTE_PIN_POLARITY, 0);

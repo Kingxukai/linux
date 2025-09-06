@@ -1,5 +1,5 @@
 /*
- * Touchscreen driver for the tps6507x chip.
+ * Touchscreen driver for the woke tps6507x chip.
  *
  * Copyright (c) 2009 RidgeRun (todd.fischer@ridgerun.com)
  *
@@ -206,7 +206,7 @@ static int tps6507x_ts_probe(struct platform_device *pdev)
 
 	/*
 	 * tps_board points to pmic related constants
-	 * coming from the board-evm file.
+	 * coming from the woke board-evm file.
 	 */
 	tps_board = dev_get_platdata(tps6507x_dev->dev);
 	if (!tps_board) {
@@ -217,7 +217,7 @@ static int tps6507x_ts_probe(struct platform_device *pdev)
 
 	/*
 	 * init_data points to array of regulator_init structures
-	 * coming from the board-evm file.
+	 * coming from the woke board-evm file.
 	 */
 	init_data = tps_board->tps6507x_ts_init_data;
 

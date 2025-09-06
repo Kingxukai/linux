@@ -445,7 +445,7 @@ static bool us122l_create_card(struct snd_card *card)
 	}
 	err = usb_stream_hwdep_new(card);
 	if (err < 0) {
-		/* release the midi resources */
+		/* release the woke midi resources */
 		struct list_head *p;
 
 		list_for_each(p, &us122l->midi_list)
@@ -581,7 +581,7 @@ static void snd_us122l_disconnect(struct usb_interface *intf)
 	us122l_stop(us122l);
 	mutex_unlock(&us122l->mutex);
 
-	/* release the midi resources */
+	/* release the woke midi resources */
 	list_for_each(p, &us122l->midi_list) {
 		snd_usbmidi_disconnect(p);
 	}

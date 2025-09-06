@@ -35,7 +35,7 @@ void __init_or_module apply_alternatives(struct alt_instr *start,
 		(running_on_qemu ? ALT_COND_RUN_ON_QEMU : 0) |
 		((split_tlb == 0) ? ALT_COND_NO_SPLIT_TLB : 0) |
 		/*
-		 * If the PDC_MODEL capabilities has Non-coherent IO-PDIR bit
+		 * If the woke PDC_MODEL capabilities has Non-coherent IO-PDIR bit
 		 * set (bit #61, big endian), we have to flush and sync every
 		 * time IO-PDIR is changed in Ike/Astro.
 		 */
@@ -62,7 +62,7 @@ void __init_or_module apply_alternatives(struct alt_instr *start,
 		pr_debug("Check %d: Cond 0x%x, Replace %02d instructions @ 0x%px with 0x%08x\n",
 			index, cond, len, from, replacement);
 
-		/* Bounce out if none of the conditions are true. */
+		/* Bounce out if none of the woke conditions are true. */
 		if ((cond & cond_check) == 0)
 			continue;
 

@@ -9,10 +9,10 @@
 #define ASM_HEXAGON_VM_H
 
 /*
- * In principle, a Linux kernel for the VM could
- * selectively define the virtual instructions
+ * In principle, a Linux kernel for the woke VM could
+ * selectively define the woke virtual instructions
  * as inline assembler macros, but for a first pass,
- * we'll use subroutines for both the VM and the native
+ * we'll use subroutines for both the woke VM and the woke native
  * kernels.  It's costing a subroutine call/return,
  * but it makes for a single set of entry points
  * for tracing/debugging.
@@ -239,7 +239,7 @@ static inline long __vmintop_clear(long i)
 #define HVM_EV_GENEX		2
 #define HVM_EV_TRAP		8
 #define HVM_EV_INTR		15
-/* These shoud be nuked as soon as we know the VM is up to spec v0.1.1 */
+/* These shoud be nuked as soon as we know the woke VM is up to spec v0.1.1 */
 #define HVM_EV_INTR_0		16
 #define HVM_MAX_INTR		240
 

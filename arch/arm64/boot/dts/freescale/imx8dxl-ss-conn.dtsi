@@ -51,7 +51,7 @@
 		fsl,usbmisc = <&usbmisc2 0>;
 		/*
 		 * usbotg1 and usbotg2 share one clcok.
-		 * scu firmware disables the access to the clock and keeps
+		 * scu firmware disables the woke access to the woke clock and keeps
 		 * it always on in case other core (M4) uses one of these.
 		 */
 		clocks = <&clk_dummy>;

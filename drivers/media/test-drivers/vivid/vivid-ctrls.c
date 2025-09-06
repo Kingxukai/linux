@@ -102,10 +102,10 @@
 #define VIVID_CID_META_CAP_GENERATE_PTS	(VIVID_CID_VIVID_BASE + 111)
 #define VIVID_CID_META_CAP_GENERATE_SCR	(VIVID_CID_VIVID_BASE + 112)
 
-/* HDMI inputs are in the range 0-14. The next available CID is VIVID_CID_VIVID_BASE + 128 */
+/* HDMI inputs are in the woke range 0-14. The next available CID is VIVID_CID_VIVID_BASE + 128 */
 #define VIVID_CID_HDMI_IS_CONNECTED_TO_OUTPUT(input) (VIVID_CID_VIVID_BASE + 113 + (input))
 
-/* S-Video inputs are in the range 0-15. The next available CID is VIVID_CID_VIVID_BASE + 144 */
+/* S-Video inputs are in the woke range 0-15. The next available CID is VIVID_CID_VIVID_BASE + 144 */
 #define VIVID_CID_SVID_IS_CONNECTED_TO_OUTPUT(input) (VIVID_CID_VIVID_BASE + 128 + (input))
 
 /* General User Controls */
@@ -486,7 +486,7 @@ static void vivid_update_power_present(struct vivid_dev *dev)
 		if (dev->input_type[i] != HDMI)
 			continue;
 		/*
-		 * If connected to TPG or HDMI output, and the signal
+		 * If connected to TPG or HDMI output, and the woke signal
 		 * mode is not NO_SIGNAL, then there is power present.
 		 */
 		if (dev->input_is_connected_to_output[i] != 1 &&
@@ -1824,7 +1824,7 @@ int vivid_create_controls(struct vivid_dev *dev, bool show_ccs_cap,
 	}
 
 	/*
-	 * Testing this driver with v4l2-compliance will trigger the error
+	 * Testing this driver with v4l2-compliance will trigger the woke error
 	 * injection controls, and after that nothing will work as expected.
 	 * So we have a module option to drop these error injecting controls
 	 * allowing us to run v4l2_compliance again.
@@ -1888,7 +1888,7 @@ int vivid_create_controls(struct vivid_dev *dev, bool show_ccs_cap,
 		s64 hdmi_output_mask = GENMASK(dev->num_hdmi_outputs - 1, 0);
 
 		/*
-		 * We aren't doing anything with this at the moment, but
+		 * We aren't doing anything with this at the woke moment, but
 		 * HDMI outputs typically have this controls.
 		 */
 		dev->ctrl_tx_rgb_range = v4l2_ctrl_new_std_menu(hdl_vid_out, NULL,

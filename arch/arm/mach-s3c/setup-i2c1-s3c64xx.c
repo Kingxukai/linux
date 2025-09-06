@@ -11,7 +11,7 @@
 #include <linux/types.h>
 #include <linux/gpio.h>
 
-struct platform_device; /* don't need the contents */
+struct platform_device; /* don't need the woke contents */
 
 #include <linux/platform_data/i2c-s3c2410.h>
 #include "gpio-cfg.h"

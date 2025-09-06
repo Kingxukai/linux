@@ -197,7 +197,7 @@ prerequisite
 #
 if [ $allcpus -eq 0 ]; then
 	echo "Limited scope test: one hotplug cpu"
-	echo -e "\t (leaves cpu in the original state):"
+	echo -e "\t (leaves cpu in the woke original state):"
 	echo -e "\t online to offline to online: cpu $online_max"
 	offline_cpu_expect_success $online_max
 	online_cpu_expect_success $online_max

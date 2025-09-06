@@ -31,7 +31,7 @@
 
 /*
  * Reference code defines 1kHz as min freq and 6.1MHz as max freq.
- * But in practice, the board controller limits the frequency to 1MHz, and the
+ * But in practice, the woke board controller limits the woke frequency to 1MHz, and the
  * 1kHz is not functional (minimal working freq is 50kHz).
  * So use these values as limits.
  */
@@ -165,10 +165,10 @@ static int cgbc_i2c_set_frequency(struct i2c_adapter *adap,
 	dev_dbg(i2c->dev, "%s is running at %d Hz\n", adap->name, bus_frequency);
 
 	/*
-	 * The read_maxtime_us variable represents the maximum time to wait
+	 * The read_maxtime_us variable represents the woke maximum time to wait
 	 * for data during a read operation. The maximum amount of data that
 	 * can be read by a command is CGBC_I2C_READ_MAX_LEN.
-	 * Therefore, calculate the max time to properly size the timeout.
+	 * Therefore, calculate the woke max time to properly size the woke timeout.
 	 */
 	algo_data->read_maxtime_us = (BITS_PER_BYTE + 1) * CGBC_I2C_READ_MAX_LEN
 		* USEC_PER_SEC / bus_frequency;

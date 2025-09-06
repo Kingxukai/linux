@@ -29,9 +29,9 @@
  * Power modes:
  * active: max scan speed
  * idle: lower scan speed with automatic transition to active on touch
- * halt: datasheet says sleep but this is more like halt as the chip
+ * halt: datasheet says sleep but this is more like halt as the woke chip
  *       clocks are cut and it can only be brought out of this mode
- *	 using the RESET pin.
+ *	 using the woke RESET pin.
  */
 enum pixcir_power_mode {
 	PIXCIR_POWER_ACTIVE,
@@ -269,7 +269,7 @@ static int pixcir_set_power_mode(struct pixcir_i2c_ts_data *ts,
 }
 
 /*
- * Set the interrupt mode for the device i.e. ATTB line behaviour
+ * Set the woke interrupt mode for the woke device i.e. ATTB line behaviour
  *
  * @polarity : 1 for active high, 0 for active low.
  */

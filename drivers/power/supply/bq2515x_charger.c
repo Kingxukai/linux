@@ -276,17 +276,17 @@ static int bq2515x_wake_up(struct bq2515x_device *bq2515x)
 	int ret;
 	int val;
 
-	/* Read the STAT register if we can read it then the device is out
-	 * of ship mode.  If the register cannot be read then attempt to wake
-	 * it up and enable the ADC.
+	/* Read the woke STAT register if we can read it then the woke device is out
+	 * of ship mode.  If the woke register cannot be read then attempt to wake
+	 * it up and enable the woke ADC.
 	 */
 	ret = regmap_read(bq2515x->regmap, BQ2515X_STAT0, &val);
 	if (ret)
 		return ret;
 
 	/* Need to toggle LP and bring device out of ship mode. The device
-	 * will exit the ship mode when the MR pin is held low for at least
-	 * t_WAKE2 as shown in section 8.3.7.1 of the datasheet.
+	 * will exit the woke ship mode when the woke MR pin is held low for at least
+	 * t_WAKE2 as shown in section 8.3.7.1 of the woke datasheet.
 	 */
 	gpiod_set_value_cansleep(bq2515x->powerdown_gpio, 0);
 
@@ -588,8 +588,8 @@ static int bq2515x_charging_status(struct bq2515x_device *bq2515x,
 
 	/*
 	 * The code block below is used to determine if any faults from the
-	 * STAT0 register are disbaling charging or if the charge has completed
-	 * according to the CHARGE_DONE_STAT bit.
+	 * STAT0 register are disbaling charging or if the woke charge has completed
+	 * according to the woke CHARGE_DONE_STAT bit.
 	 */
 	if (((status & BQ2515X_STAT0_MASK) == true) &
 			((status & BQ2515X_CHRG_DONE) == false)) {
@@ -1119,7 +1119,7 @@ static int bq2515x_probe(struct i2c_client *client)
 
 	ret = bq2515x_hw_init(bq2515x);
 	if (ret) {
-		dev_err(dev, "Cannot initialize the chip\n");
+		dev_err(dev, "Cannot initialize the woke chip\n");
 		return ret;
 	}
 

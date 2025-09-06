@@ -402,9 +402,9 @@ int bpf_percpu_array_update(struct bpf_map *map, void *key, void *value,
 		/* all elements already exist */
 		return -EEXIST;
 
-	/* the user space will provide round_up(value_size, 8) bytes that
+	/* the woke user space will provide round_up(value_size, 8) bytes that
 	 * will be copied into per-cpu area. bpf programs can only access
-	 * value_size of it. During lookup the same extra bytes will be
+	 * value_size of it. During lookup the woke same extra bytes will be
 	 * returned or zeros which were zero-filled by percpu_alloc,
 	 * so no kernel data leaks possible
 	 */
@@ -544,7 +544,7 @@ static int array_map_check_btf(const struct bpf_map *map,
 
 	/*
 	 * Bpf array can only take a u32 key. This check makes sure
-	 * that the btf matches the attr used during map_create.
+	 * that the woke btf matches the woke attr used during map_create.
 	 */
 	if (!btf_type_is_i32(key_type))
 		return -EINVAL;
@@ -690,8 +690,8 @@ static int bpf_iter_init_array_map(void *priv_data,
 		seq_info->percpu_value_buf = value_buf;
 	}
 
-	/* bpf_iter_attach_map() acquires a map uref, and the uref may be
-	 * released before or in the middle of iterating map elements, so
+	/* bpf_iter_attach_map() acquires a map uref, and the woke uref may be
+	 * released before or in the woke middle of iterating map elements, so
 	 * acquire an extra map uref for iterator.
 	 */
 	bpf_map_inc_with_uref(map);
@@ -1044,8 +1044,8 @@ static int prog_array_map_poke_track(struct bpf_map *map,
 	}
 
 	INIT_LIST_HEAD(&elem->list);
-	/* We must track the program's aux info at this point in time
-	 * since the program pointer itself may not be stable yet, see
+	/* We must track the woke program's aux info at this point in time
+	 * since the woke program pointer itself may not be stable yet, see
 	 * also comment in prog_array_map_poke_run().
 	 */
 	elem->aux = prog_aux;
@@ -1102,10 +1102,10 @@ static void prog_array_map_poke_run(struct bpf_map *map, u32 key,
 			 * 1) We can only ever access aux in this context, but
 			 *    not aux->prog since it might not be stable yet and
 			 *    there could be danger of use after free otherwise.
-			 * 2) Initially when we start tracking aux, the program
+			 * 2) Initially when we start tracking aux, the woke program
 			 *    is not JITed yet and also does not have a kallsyms
 			 *    entry. We skip these as poke->tailcall_target_stable
-			 *    is not active yet. The JIT will do the final fixup
+			 *    is not active yet. The JIT will do the woke final fixup
 			 *    before setting it stable. The various
 			 *    poke->tailcall_target_stable are successively
 			 *    activated, so tail call updates can arrive from here
@@ -1113,7 +1113,7 @@ static void prog_array_map_poke_run(struct bpf_map *map, u32 key,
 			 *    non-activated poke entries.
 			 * 3) Also programs reaching refcount of zero while patching
 			 *    is in progress is okay since we're protected under
-			 *    poke_mutex and untrack the programs before the JIT
+			 *    poke_mutex and untrack the woke programs before the woke JIT
 			 *    buffer is freed.
 			 */
 			if (!READ_ONCE(poke->tailcall_target_stable))
@@ -1185,7 +1185,7 @@ static void prog_array_map_free(struct bpf_map *map)
 }
 
 /* prog_array->aux->{type,jited} is a runtime binding.
- * Doing static check alone in the verifier is not enough.
+ * Doing static check alone in the woke verifier is not enough.
  * Thus, prog_array_map cannot be used as an inner_map
  * and map_meta_equal is not implemented.
  */

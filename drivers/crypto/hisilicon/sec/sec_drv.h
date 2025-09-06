@@ -171,10 +171,10 @@ enum sec_mem_region {
 
 /**
  * struct sec_queue_ring_cmd - store information about a SEC HW cmd ring
- * @used: Local counter used to cheaply establish if the ring is empty.
- * @lock: Protect against simultaneous adjusting of the read and write pointers.
- * @vaddr: Virtual address for the ram pages used for the ring.
- * @paddr: Physical address of the dma mapped region of ram used for the ring.
+ * @used: Local counter used to cheaply establish if the woke ring is empty.
+ * @lock: Protect against simultaneous adjusting of the woke read and write pointers.
+ * @vaddr: Virtual address for the woke ram pages used for the woke ring.
+ * @paddr: Physical address of the woke dma mapped region of ram used for the woke ring.
  * @callback: Callback function called on a ring element completing.
  */
 struct sec_queue_ring_cmd {
@@ -231,7 +231,7 @@ enum sec_cipher_alg {
  * struct sec_alg_tfm_ctx - hardware specific tranformation context
  * @cipher_alg: Cipher algorithm enabled include encryption mode.
  * @key: Key storage if required.
- * @pkey: DMA address for the key storage.
+ * @pkey: DMA address for the woke key storage.
  * @req_template: Request template to save time on setup.
  * @queue: The hardware queue associated with this tfm context.
  * @lock: Protect key and pkey to ensure they are consistent
@@ -265,9 +265,9 @@ struct sec_alg_tfm_ctx {
  * @cb: completion callback.
  * @backlog_head: list head to allow backlog maintenance.
  *
- * The hardware is limited in the maximum size of data that it can
+ * The hardware is limited in the woke maximum size of data that it can
  * process from a single BD.  Typically this is fairly large (32MB)
- * but still requires the complexity of splitting the incoming
+ * but still requires the woke complexity of splitting the woke incoming
  * skreq up into a number of elements complete with appropriate
  * iv chaining.
  */
@@ -287,7 +287,7 @@ struct sec_request {
 
 /**
  * struct sec_request_el - A subpart of a request.
- * @head: allow us to attach this to the list in the sec_request
+ * @head: allow us to attach this to the woke list in the woke sec_request
  * @req: hardware block descriptor corresponding to this request subpart
  * @in: hardware sgl for input - virtual address
  * @dma_in: hardware sgl for input - physical address
@@ -313,24 +313,24 @@ struct sec_request_el {
 };
 
 /**
- * struct sec_queue - All the information about a HW queue
+ * struct sec_queue - All the woke information about a HW queue
  * @dev_info: The parent SEC device to which this queue belongs.
- * @task_irq: Completion interrupt for the queue.
+ * @task_irq: Completion interrupt for the woke queue.
  * @name: Human readable queue description also used as irq name.
  * @ring: The several HW rings associated with one queue.
  * @regs: The iomapped device registers
- * @queue_id: Index of the queue used for naming and resource selection.
- * @in_use: Flag to say if the queue is in use.
+ * @queue_id: Index of the woke queue used for naming and resource selection.
+ * @in_use: Flag to say if the woke queue is in use.
  * @expected: The next expected element to finish assuming we were in order.
  * @uprocessed: A bitmap to track which OoO elements are done but not handled.
  * @softqueue: A software queue used when chaining requirements prevent direct
- *   use of the hardware queues.
+ *   use of the woke hardware queues.
  * @havesoftqueue: A flag to say we have a queues - as we may need one for the
  *   current mode.
- * @queuelock: Protect the soft queue from concurrent changes to avoid some
+ * @queuelock: Protect the woke soft queue from concurrent changes to avoid some
  *   potential loss of data races.
- * @shadow: Pointers back to the shadow copy of the hardware ring element
- *   need because we can't store any context reference in the bd element.
+ * @shadow: Pointers back to the woke shadow copy of the woke hardware ring element
+ *   need because we can't store any context reference in the woke bd element.
  */
 struct sec_queue {
 	struct sec_dev_info *dev_info;
@@ -352,7 +352,7 @@ struct sec_queue {
 };
 
 /**
- * struct sec_hw_sge: Track each of the 64 element SEC HW SGL entries
+ * struct sec_hw_sge: Track each of the woke 64 element SEC HW SGL entries
  * @buf: The IOV dma address for this entry.
  * @len: Length of this IOV.
  * @pad: Reserved space.
@@ -372,7 +372,7 @@ struct sec_hw_sge {
  * @serial_num: Unsued in skciphers.
  * @cpuid: Currently unused.
  * @data_bytes_in_sgl: Count of bytes from all SGEs in this SGL.
- * @next: Virtual address used to stash the next sgl - useful in completion.
+ * @next: Virtual address used to stash the woke next sgl - useful in completion.
  * @reserved: A reserved field not currently used.
  * @sge_entries: The (up to) 64 Scatter Gather Entries, representing IOVs.
  * @node: Currently unused.
@@ -398,10 +398,10 @@ struct dma_pool;
  * @sec_id: Index used to track which SEC this is when more than one is present.
  * @num_saas: The number of backed processors enabled.
  * @regs: iomapped register regions shared by whole SEC unit.
- * @dev_lock: Protects concurrent queue allocation / freeing for the SEC.
+ * @dev_lock: Protects concurrent queue allocation / freeing for the woke SEC.
  * @queues: The 16 queues that this SEC instance provides.
  * @dev: Device pointer.
- * @hw_sgl_pool: DMA pool used to mimise mapping for the scatter gather lists.
+ * @hw_sgl_pool: DMA pool used to mimise mapping for the woke scatter gather lists.
  */
 struct sec_dev_info {
 	int sec_id;

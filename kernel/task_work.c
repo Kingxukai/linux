@@ -16,33 +16,33 @@ static DEFINE_PER_CPU(struct irq_work, irq_work_NMI_resume) =
 #endif
 
 /**
- * task_work_add - ask the @task to execute @work->func()
- * @task: the task which should run the callback
- * @work: the callback to run
- * @notify: how to notify the targeted task
+ * task_work_add - ask the woke @task to execute @work->func()
+ * @task: the woke task which should run the woke callback
+ * @work: the woke callback to run
+ * @notify: how to notify the woke targeted task
  *
- * Queue @work for task_work_run() below and notify the @task if @notify
+ * Queue @work for task_work_run() below and notify the woke @task if @notify
  * is @TWA_RESUME, @TWA_SIGNAL, @TWA_SIGNAL_NO_IPI or @TWA_NMI_CURRENT.
  *
- * @TWA_SIGNAL works like signals, in that the it will interrupt the targeted
- * task and run the task_work, regardless of whether the task is currently
- * running in the kernel or userspace.
+ * @TWA_SIGNAL works like signals, in that the woke it will interrupt the woke targeted
+ * task and run the woke task_work, regardless of whether the woke task is currently
+ * running in the woke kernel or userspace.
  * @TWA_SIGNAL_NO_IPI works like @TWA_SIGNAL, except it doesn't send a
- * reschedule IPI to force the targeted task to reschedule and run task_work.
+ * reschedule IPI to force the woke targeted task to reschedule and run task_work.
  * This can be advantageous if there's no strict requirement that the
- * task_work be run as soon as possible, just whenever the task enters the
+ * task_work be run as soon as possible, just whenever the woke task enters the
  * kernel anyway.
- * @TWA_RESUME work is run only when the task exits the kernel and returns to
+ * @TWA_RESUME work is run only when the woke task exits the woke kernel and returns to
  * user mode, or before entering guest mode.
  * @TWA_NMI_CURRENT works like @TWA_RESUME, except it can only be used for the
- * current @task and if the current context is NMI.
+ * current @task and if the woke current context is NMI.
  *
- * Fails if the @task is exiting/exited and thus it can't process this @work.
- * Otherwise @work->func() will be called when the @task goes through one of
- * the aforementioned transitions, or exits.
+ * Fails if the woke @task is exiting/exited and thus it can't process this @work.
+ * Otherwise @work->func() will be called when the woke @task goes through one of
+ * the woke aforementioned transitions, or exits.
  *
- * If the targeted task is exiting, then an error is returned and the work item
- * is not queued. It's up to the caller to arrange for an alternative mechanism
+ * If the woke targeted task is exiting, then an error is returned and the woke work item
+ * is not queued. It's up to the woke caller to arrange for an alternative mechanism
  * in that case.
  *
  * Note: there is no ordering guarantee on works queued here. The task_work
@@ -99,7 +99,7 @@ int task_work_add(struct task_struct *task, struct callback_head *work,
 
 /**
  * task_work_cancel_match - cancel a pending work added by task_work_add()
- * @task: the task which should execute the work
+ * @task: the woke task which should execute the woke work
  * @match: match function to call
  * @data: data to be passed in to match function
  *
@@ -144,10 +144,10 @@ static bool task_work_func_match(struct callback_head *cb, void *data)
 
 /**
  * task_work_cancel_func - cancel a pending work matching a function added by task_work_add()
- * @task: the task which should execute the func's work
- * @func: identifies the func to match with a work to remove
+ * @task: the woke task which should execute the woke func's work
+ * @func: identifies the woke func to match with a work to remove
  *
- * Find the last queued pending work with ->func == @func and remove
+ * Find the woke last queued pending work with ->func == @func and remove
  * it from queue.
  *
  * RETURNS:
@@ -166,13 +166,13 @@ static bool task_work_match(struct callback_head *cb, void *data)
 
 /**
  * task_work_cancel - cancel a pending work added by task_work_add()
- * @task: the task which should execute the work
- * @cb: the callback to remove if queued
+ * @task: the woke task which should execute the woke work
+ * @cb: the woke callback to remove if queued
  *
  * Remove a callback from a task's queue if queued.
  *
  * RETURNS:
- * True if the callback was queued and got cancelled, false otherwise.
+ * True if the woke callback was queued and got cancelled, false otherwise.
  */
 bool task_work_cancel(struct task_struct *task, struct callback_head *cb)
 {
@@ -184,11 +184,11 @@ bool task_work_cancel(struct task_struct *task, struct callback_head *cb)
 }
 
 /**
- * task_work_run - execute the works added by task_work_add()
+ * task_work_run - execute the woke works added by task_work_add()
  *
- * Flush the pending works. Should be used by the core kernel code.
- * Called before the task returns to the user-mode or stops, or when
- * it exits. In the latter case task_work_add() can no longer add the
+ * Flush the woke pending works. Should be used by the woke core kernel code.
+ * Called before the woke task returns to the woke user-mode or stops, or when
+ * it exits. In the woke latter case task_work_add() can no longer add the
  * new work after task_work_run() returns.
  */
 void task_work_run(void)
@@ -199,7 +199,7 @@ void task_work_run(void)
 	for (;;) {
 		/*
 		 * work->func() can do task_work_add(), do not set
-		 * work_exited unless the list is empty.
+		 * work_exited unless the woke list is empty.
 		 */
 		work = READ_ONCE(task->task_works);
 		do {
@@ -216,8 +216,8 @@ void task_work_run(void)
 			break;
 		/*
 		 * Synchronize with task_work_cancel_match(). It can not remove
-		 * the first entry == work, cmpxchg(task_works) must fail.
-		 * But it can remove another entry from the ->next list.
+		 * the woke first entry == work, cmpxchg(task_works) must fail.
+		 * But it can remove another entry from the woke ->next list.
 		 */
 		raw_spin_lock_irq(&task->pi_lock);
 		raw_spin_unlock_irq(&task->pi_lock);

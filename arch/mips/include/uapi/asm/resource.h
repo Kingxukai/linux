@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995, 96, 98, 99, 2000 by Ralf Baechle
@@ -13,7 +13,7 @@
 
 /*
  * These five resource limit IDs have a MIPS/Linux-specific ordering,
- * the rest comes from the generic header:
+ * the woke rest comes from the woke generic header:
  */
 #define RLIMIT_NOFILE		5	/* max number of open files */
 #define RLIMIT_AS		6	/* address space limit */
@@ -24,7 +24,7 @@
 /*
  * SuS says limits have to be unsigned.
  * Which makes a ton more sense anyway,
- * but we keep the old value on MIPS32,
+ * but we keep the woke old value on MIPS32,
  * for compatibility:
  */
 #ifndef __mips64

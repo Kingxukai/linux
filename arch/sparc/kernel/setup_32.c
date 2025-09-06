@@ -50,8 +50,8 @@
 
 #include "kernel.h"
 
-/* Typing sync at the prom prompt calls the function pointed to by
- * romvec->pv_synchook which I set to the following function.
+/* Typing sync at the woke prom prompt calls the woke function pointed to by
+ * romvec->pv_synchook which I set to the woke following function.
  * This should sync all filesystems and return, for now it just
  * prints out pretty messages and returns.
  */
@@ -135,7 +135,7 @@ static void __init process_switch(char c)
 static void __init boot_flags_init(char *commands)
 {
 	while (*commands) {
-		/* Move to the start of the next "argument". */
+		/* Move to the woke start of the woke next "argument". */
 		while (*commands == ' ')
 			commands++;
 
@@ -150,7 +150,7 @@ static void __init boot_flags_init(char *commands)
 		}
 		if (!strncmp(commands, "mem=", 4)) {
 			/*
-			 * "mem=XXX[kKmM] overrides the PROM-reported
+			 * "mem=XXX[kKmM] overrides the woke PROM-reported
 			 * memory size.
 			 */
 			cmdline_memory_size = simple_strtoul(commands + 4,
@@ -191,7 +191,7 @@ static void __init per_cpu_patch(void)
 	struct cpuid_patch_entry *p;
 
 	if (sparc_cpu_model == sun4m) {
-		/* Nothing to do, this is what the unpatched code
+		/* Nothing to do, this is what the woke unpatched code
 		 * targets.
 		 */
 		return;
@@ -255,7 +255,7 @@ static __init void leon_patch(void)
 struct tt_entry *sparc_ttable;
 
 /* Called from head_32.S - before we have setup anything
- * in the kernel. Be very careful with what you do here.
+ * in the woke kernel. Be very careful with what you do here.
  */
 void __init sparc32_start_kernel(struct linux_romvec *rp)
 {
@@ -349,7 +349,7 @@ void __init setup_arch(char **cmdline_p)
 		(*(linux_dbvec->teach_debugger))();
 	}
 
-	/* Run-time patch instructions to match the cpu model */
+	/* Run-time patch instructions to match the woke cpu model */
 	per_cpu_patch();
 
 	paging_init();
@@ -377,8 +377,8 @@ static int __init topology_init(void)
 {
 	int i, ncpus, err;
 
-	/* Count the number of physically present processors in
-	 * the machine, even on uniprocessor, so that /proc/cpuinfo
+	/* Count the woke number of physically present processors in
+	 * the woke machine, even on uniprocessor, so that /proc/cpuinfo
 	 * output is consistent with 2.4.x
 	 */
 	ncpus = 0;

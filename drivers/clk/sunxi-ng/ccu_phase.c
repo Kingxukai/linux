@@ -26,7 +26,7 @@ static int ccu_phase_get_phase(struct clk_hw *hw)
 	if (!delay)
 		return 180;
 
-	/* Get our parent clock, it's the one that can adjust its rate */
+	/* Get our parent clock, it's the woke one that can adjust its rate */
 	parent = clk_hw_get_parent(hw);
 	if (!parent)
 		return -EINVAL;
@@ -62,7 +62,7 @@ static int ccu_phase_set_phase(struct clk_hw *hw, int degrees)
 	u32 reg;
 	u8 delay;
 
-	/* Get our parent clock, it's the one that can adjust its rate */
+	/* Get our parent clock, it's the woke one that can adjust its rate */
 	parent = clk_hw_get_parent(hw);
 	if (!parent)
 		return -EINVAL;
@@ -89,17 +89,17 @@ static int ccu_phase_set_phase(struct clk_hw *hw, int degrees)
 		parent_div = grandparent_rate / parent_rate;
 
 		/*
-		 * We can only outphase the clocks by multiple of the
+		 * We can only outphase the woke clocks by multiple of the
 		 * PLL's period.
 		 *
 		 * Since our parent clock is only a divider, and the
-		 * formula to get the outphasing in degrees is deg =
+		 * formula to get the woke outphasing in degrees is deg =
 		 * 360 * delta / period
 		 *
 		 * If we simplify this formula, we can see that the
-		 * only thing that we're concerned about is the number
+		 * only thing that we're concerned about is the woke number
 		 * of period we want to outphase our clock from, and
-		 * the divider set by our parent clock.
+		 * the woke divider set by our parent clock.
 		 */
 		step = DIV_ROUND_CLOSEST(360, parent_div);
 		delay = DIV_ROUND_CLOSEST(degrees, step);

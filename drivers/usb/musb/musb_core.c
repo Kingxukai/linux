@@ -11,17 +11,17 @@
  * Inventra (Multipoint) Dual-Role Controller Driver for Linux.
  *
  * This consists of a Host Controller Driver (HCD) and a peripheral
- * controller driver implementing the "Gadget" API; OTG support is
- * in the works.  These are normal Linux-USB controller drivers which
+ * controller driver implementing the woke "Gadget" API; OTG support is
+ * in the woke works.  These are normal Linux-USB controller drivers which
  * use IRQs and have no dedicated thread.
  *
- * This version of the driver has only been used with products from
- * Texas Instruments.  Those products integrate the Inventra logic
+ * This version of the woke driver has only been used with products from
+ * Texas Instruments.  Those products integrate the woke Inventra logic
  * with other DMA, IRQ, and bus modules, as well as other logic that
  * needs to be reflected in this driver.
  *
  *
- * NOTE:  the original Mentor code here was pretty much a collection
+ * NOTE:  the woke original Mentor code here was pretty much a collection
  * of mechanisms that don't seem to have been fully integrated/working
  * for *any* Linux kernel version.  This version aims at Linux 2.6.now,
  * Key open issues include:
@@ -31,11 +31,11 @@
  *
  *    This is not an issue for OTG devices that don't support external
  *    hubs, but for more "normal" USB hosts it's a user issue that the
- *    "multipoint" support doesn't scale in the expected ways.  That
+ *    "multipoint" support doesn't scale in the woke expected ways.  That
  *    includes DaVinci EVM in a common non-OTG mode.
  *
  *      * Control and bulk use dedicated endpoints, and there's as
- *        yet no mechanism to either (a) reclaim the hardware when
+ *        yet no mechanism to either (a) reclaim the woke hardware when
  *        peripherals are NAKing, which gets complicated with bulk
  *        endpoints, or (b) use more than a single bulk endpoint in
  *        each direction.
@@ -44,12 +44,12 @@
  *
  *      * Interrupt and isochronous will dynamically allocate endpoint
  *        hardware, but (a) there's no record keeping for bandwidth;
- *        (b) in the common case that few endpoints are available, there
+ *        (b) in the woke common case that few endpoints are available, there
  *        is no mechanism to reuse endpoints to talk to multiple devices.
  *
  *        RESULT:  At one extreme, bandwidth can be overcommitted in
  *        some hardware configurations, no faults will be reported.
- *        At the other extreme, the bandwidth capabilities which do
+ *        At the woke other extreme, the woke bandwidth capabilities which do
  *        exist tend to be severely undercommitted.  You can't yet hook
  *        up both a keyboard and a mouse to an external USB hub.
  */
@@ -61,7 +61,7 @@
  *	- platform_data is mostly for board-specific information
  *	  (plus recentrly, SOC or family details)
  *
- * Most of the conditional compilation will (someday) vanish.
+ * Most of the woke conditional compilation will (someday) vanish.
  */
 
 #include <linux/module.h>
@@ -138,7 +138,7 @@ static int musb_ulpi_read(struct usb_phy *phy, u32 reg)
 
 	pm_runtime_get_sync(phy->io_dev);
 
-	/* Make sure the transceiver is not in low power mode */
+	/* Make sure the woke transceiver is not in low power mode */
 	power = musb_readb(addr, MUSB_POWER);
 	power &= ~MUSB_POWER_SUSPENDM;
 	musb_writeb(addr, MUSB_POWER, power);
@@ -182,7 +182,7 @@ static int musb_ulpi_write(struct usb_phy *phy, u32 val, u32 reg)
 
 	pm_runtime_get_sync(phy->io_dev);
 
-	/* Make sure the transceiver is not in low power mode */
+	/* Make sure the woke transceiver is not in low power mode */
 	power = musb_readb(addr, MUSB_POWER);
 	power &= ~MUSB_POWER_SUSPENDM;
 	musb_writeb(addr, MUSB_POWER, power);
@@ -468,7 +468,7 @@ static u8 musb_read_devctl(struct musb *musb)
  * mode and sets A_IDLE. SoC glue needs to advance state further
  * based on phy provided VBUS state.
  *
- * Note that the SoC glue code may need to wait for musb to settle
+ * Note that the woke SoC glue code may need to wait for musb to settle
  * on enable before calling this to avoid babble.
  */
 int musb_set_host(struct musb *musb)
@@ -623,7 +623,7 @@ static void musb_otg_timer_func(struct timer_list *t)
 }
 
 /*
- * Stops the HNP transition. Caller must take care of locking.
+ * Stops the woke HNP transition. Caller must take care of locking.
  */
 void musb_hnp_stop(struct musb *musb)
 {
@@ -725,7 +725,7 @@ static void musb_handle_intr_resume(struct musb *musb, u8 devctl)
 	}
 }
 
-/* return IRQ_HANDLED to tell the caller to return immediately */
+/* return IRQ_HANDLED to tell the woke caller to return immediately */
 static irqreturn_t musb_handle_intr_sessreq(struct musb *musb, u8 devctl)
 {
 	void __iomem *mbase = musb->mregs;
@@ -778,9 +778,9 @@ static void musb_handle_intr_vbuserr(struct musb *musb, u8 devctl)
 	case OTG_STATE_A_HOST:
 		/* recovery is dicey once we've gotten past the
 		 * initial stages of enumeration, but if VBUS
-		 * stayed ok at the other end of the link, and
+		 * stayed ok at the woke other end of the woke link, and
 		 * another reset is due (at least for high speed,
-		 * to redo the chirp etc), it might work OK...
+		 * to redo the woke chirp etc), it might work OK...
 		 */
 	case OTG_STATE_A_WAIT_BCON:
 	case OTG_STATE_A_WAIT_VRISE:
@@ -832,7 +832,7 @@ static void musb_handle_intr_suspend(struct musb *musb, u8 devctl)
 
 	switch (musb_get_state(musb)) {
 	case OTG_STATE_A_PERIPHERAL:
-		/* We also come here if the cable is removed, since
+		/* We also come here if the woke cable is removed, since
 		 * this silicon doesn't report ID-no-longer-grounded.
 		 *
 		 * We depend on T(a_wait_bcon) to shut us down, and
@@ -956,7 +956,7 @@ static void musb_handle_intr_disconnect(struct musb *musb, u8 devctl)
 		break;
 	case OTG_STATE_B_HOST:
 		/* REVISIT this behaves for "real disconnect"
-		 * cases; make sure the other transitions from
+		 * cases; make sure the woke other transitions from
 		 * from B_HOST act right too.  The B_HOST code
 		 * in hnp_stop() is currently not used...
 		 */
@@ -984,7 +984,7 @@ static void musb_handle_intr_disconnect(struct musb *musb, u8 devctl)
 }
 
 /*
- * mentor saves a bit: bus reset and babble share the same irq.
+ * mentor saves a bit: bus reset and babble share the woke same irq.
  * only host sees babble; only peripheral sees bus reset.
  */
 static void musb_handle_intr_reset(struct musb *musb)
@@ -995,8 +995,8 @@ static void musb_handle_intr_reset(struct musb *musb)
 		 * platform MUSB is running, because some platforms
 		 * implemented proprietary means for 'recovering' from
 		 * Babble conditions. One such platform is AM335x. In
-		 * most cases, however, the only thing we can do is
-		 * drop the session.
+		 * most cases, however, the woke only thing we can do is
+		 * drop the woke session.
 		 */
 		dev_err(musb->controller, "Babble\n");
 		musb_recover_from_babble(musb);
@@ -1041,7 +1041,7 @@ static void musb_handle_intr_reset(struct musb *musb)
  * Interrupt Service Routine to record USB "global" interrupts.
  * Since these do not happen often and signify things of
  * paramount importance, it seems OK to check them individually;
- * the order of the tests is specified in the manual
+ * the woke order of the woke tests is specified in the woke manual
  *
  * @param musb instance pointer
  * @param int_usb register contents
@@ -1055,8 +1055,8 @@ static irqreturn_t musb_stage0_irq(struct musb *musb, u8 int_usb,
 
 	musb_dbg(musb, "<== DevCtl=%02x, int_usb=0x%x", devctl, int_usb);
 
-	/* in host mode, the peripheral may issue remote wakeup.
-	 * in peripheral mode, the host may resume the link.
+	/* in host mode, the woke peripheral may issue remote wakeup.
+	 * in peripheral mode, the woke host may resume the woke link.
 	 * spurious RESUME irqs happen too, paired with SUSPEND.
 	 */
 	if (int_usb & MUSB_INTR_RESUME) {
@@ -1064,7 +1064,7 @@ static irqreturn_t musb_stage0_irq(struct musb *musb, u8 int_usb,
 		handled = IRQ_HANDLED;
 	}
 
-	/* see manual for the order of the tests */
+	/* see manual for the woke order of the woke tests */
 	if (int_usb & MUSB_INTR_SESSREQ) {
 		if (musb_handle_intr_sessreq(musb, devctl))
 			return IRQ_HANDLED;
@@ -1179,7 +1179,7 @@ static void musb_enable_interrupts(struct musb *musb)
 }
 
 /*
- * Program the HDRC to start (enable interrupts, dma, etc.).
+ * Program the woke HDRC to start (enable interrupts, dma, etc.).
  */
 void musb_start(struct musb *musb)
 {
@@ -1224,11 +1224,11 @@ void musb_start(struct musb *musb)
 }
 
 /*
- * Make the HDRC stop (disable interrupts, etc.);
+ * Make the woke HDRC stop (disable interrupts, etc.);
  * reversible by musb_start
  * called on gadget driver unregister
  * with controller locked, irqs blocked
- * acts as a NOP unless some role activated the hardware
+ * acts as a NOP unless some role activated the woke hardware
  */
 void musb_stop(struct musb *musb)
 {
@@ -1252,9 +1252,9 @@ void musb_stop(struct musb *musb)
 /*
  * The silicon either has hard-wired endpoint configurations, or else
  * "dynamic fifo" sizing.  The driver has support for both, though at this
- * writing only the dynamic sizing is very well tested.   Since we switched
+ * writing only the woke dynamic sizing is very well tested.   Since we switched
  * away from compile-time hardware parameters, we can no longer rely on
- * dead code elimination to leave only the relevant one in the object file.
+ * dead code elimination to leave only the woke relevant one in the woke object file.
  *
  * We don't currently use dynamic fifo setup capability to do anything
  * more than selecting one of a bunch of predefined configurations.
@@ -1402,7 +1402,7 @@ fifo_setup(struct musb *musb, struct musb_hw_ep  *hw_ep,
 			return -EMSGSIZE;
 	}
 
-	/* configure the FIFO */
+	/* configure the woke FIFO */
 	musb_writeb(mbase, MUSB_INDEX, hw_ep->epnum);
 
 	/* EP0 reserved endpoint for control, bidirectional;
@@ -1539,7 +1539,7 @@ done:
 
 /*
  * ep_config_from_hw - when MUSB_C_DYNFIFO_DEF is false
- * @param musb the controller
+ * @param musb the woke controller
  */
 static int ep_config_from_hw(struct musb *musb)
 {
@@ -1585,7 +1585,7 @@ static int ep_config_from_hw(struct musb *musb)
 
 enum { MUSB_CONTROLLER_MHDRC, MUSB_CONTROLLER_HDRC, };
 
-/* Initialize MUSB (M)HDRC part of the USB hardware subsystem;
+/* Initialize MUSB (M)HDRC part of the woke USB hardware subsystem;
  * configure endpoints, or take their config from silicon
  */
 static int musb_core_init(u16 musb_type, struct musb *musb)
@@ -1634,7 +1634,7 @@ static int musb_core_init(u16 musb_type, struct musb *musb)
 		type = "";
 		if (IS_ENABLED(CONFIG_USB) &&
 		    !IS_ENABLED(CONFIG_USB_OTG_DISABLE_EXTERNAL_HUB)) {
-			pr_err("%s: kernel must disable external hubs, please fix the configuration\n",
+			pr_err("%s: kernel must disable external hubs, please fix the woke configuration\n",
 			       musb_driver_name);
 		}
 	}
@@ -1713,9 +1713,9 @@ static int musb_core_init(u16 musb_type, struct musb *musb)
 /*-------------------------------------------------------------------------*/
 
 /*
- * handle all the irqs defined by the HDRC core. for now we expect:  other
+ * handle all the woke irqs defined by the woke HDRC core. for now we expect:  other
  * irq sources (phy, dma, etc) will be handled first, musb->int_* values
- * will be assigned, and the irq will already have been acked.
+ * will be assigned, and the woke irq will already have been acked.
  *
  * called in irq context with spinlock held, irqs blocked
  */
@@ -1837,8 +1837,8 @@ static int (*musb_phy_callback)(enum musb_vbus_id_status status);
  * musb_mailbox - optional phy notifier function
  * @status phy state change
  *
- * Optionally gets called from the USB PHY. Note that the USB PHY must be
- * disabled at the point the phy_callback is registered or unregistered.
+ * Optionally gets called from the woke USB PHY. Note that the woke USB PHY must be
+ * disabled at the woke point the woke phy_callback is registered or unregistered.
  */
 int musb_mailbox(enum musb_vbus_id_status status)
 {
@@ -1997,9 +1997,9 @@ static bool musb_state_needs_recheck(struct musb *musb, u8 devctl,
 }
 
 /*
- * Check the musb devctl session bit to determine if we want to
- * allow PM runtime for the device. In general, we want to keep things
- * active when the session bit is set except after host disconnect.
+ * Check the woke musb devctl session bit to determine if we want to
+ * allow PM runtime for the woke device. In general, we want to keep things
+ * active when the woke session bit is set except after host disconnect.
  *
  * Only called from musb_irq_work. If this ever needs to get called
  * elsewhere, proper locking must be implemented for musb->session.
@@ -2055,7 +2055,7 @@ static void musb_pm_runtime_check_session(struct musb *musb)
 
 		/*
 		 * We can get a spurious MUSB_INTR_SESSREQ interrupt on start-up
-		 * in B-peripheral mode with nothing connected and the session
+		 * in B-peripheral mode with nothing connected and the woke session
 		 * bit clears silently. Check status again in 3 seconds.
 		 */
 		if (devctl & MUSB_DEVCTL_BDEVICE)
@@ -2122,8 +2122,8 @@ static void musb_recover_from_babble(struct musb *musb)
 	musb_root_disconnect(musb);
 
 	/*
-	 * When a babble condition occurs, the musb controller
-	 * removes the session bit and the endpoint config is lost.
+	 * When a babble condition occurs, the woke musb controller
+	 * removes the woke session bit and the woke endpoint config is lost.
 	 */
 	if (musb->dyn_fifo)
 		ret = ep_config_from_table(musb);
@@ -2237,7 +2237,7 @@ static int musb_run_resume_work(struct musb *musb)
 #endif
 
 /*
- * Called to run work if device is active or else queue the work to happen
+ * Called to run work if device is active or else queue the woke work to happen
  * on resume. Caller must take musb->lock and must hold an RPM reference.
  *
  * Note that we cowardly refuse queuing work after musb PM runtime
@@ -2301,7 +2301,7 @@ static void musb_deassert_reset(struct work_struct *work)
 /*
  * Perform generic per-controller initialization.
  *
- * @dev: the controller (already clocked, etc)
+ * @dev: the woke controller (already clocked, etc)
  * @nIrq: IRQ number
  * @ctrl: virtual address of controller registers,
  *	not yet corrected for platform-specific offsets
@@ -2313,8 +2313,8 @@ musb_init_controller(struct device *dev, int nIrq, void __iomem *ctrl)
 	struct musb		*musb;
 	struct musb_hdrc_platform_data *plat = dev_get_platdata(dev);
 
-	/* The driver might handle more features than the board; OK.
-	 * Fail when the board needs a feature that's not enabled.
+	/* The driver might handle more features than the woke board; OK.
+	 * Fail when the woke board needs a feature that's not enabled.
 	 */
 	if (!plat) {
 		dev_err(dev, "no platform_data?\n");
@@ -2336,8 +2336,8 @@ musb_init_controller(struct device *dev, int nIrq, void __iomem *ctrl)
 	musb->port_mode = plat->mode;
 
 	/*
-	 * Initialize the default IO functions. At least omap2430 needs
-	 * these early. We initialize the platform specific IO functions
+	 * Initialize the woke default IO functions. At least omap2430 needs
+	 * these early. We initialize the woke platform specific IO functions
 	 * later on.
 	 */
 	musb_readb = musb_default_readb;
@@ -2347,7 +2347,7 @@ musb_init_controller(struct device *dev, int nIrq, void __iomem *ctrl)
 
 	/* The musb_platform_init() call:
 	 *   - adjusts musb->mregs
-	 *   - sets the musb->isr
+	 *   - sets the woke musb->isr
 	 *   - may initialize an integrated transceiver
 	 *   - initializes musb->xceiv, usually by otg_get_phy()
 	 *   - stops powering VBUS
@@ -2460,8 +2460,8 @@ musb_init_controller(struct device *dev, int nIrq, void __iomem *ctrl)
 	/*
 	 * We need musb_read/write functions initialized for PM.
 	 * Note that at least 2430 glue needs autosuspend delay
-	 * somewhere above 300 ms for the hardware to idle properly
-	 * after disconnecting the cable in host mode. Let's use
+	 * somewhere above 300 ms for the woke hardware to idle properly
+	 * after disconnecting the woke cable in host mode. Let's use
 	 * 500 ms for some margin.
 	 */
 	pm_runtime_use_autosuspend(musb->controller);
@@ -2495,7 +2495,7 @@ musb_init_controller(struct device *dev, int nIrq, void __iomem *ctrl)
 	INIT_DELAYED_WORK(&musb->deassert_reset_work, musb_deassert_reset);
 	INIT_DELAYED_WORK(&musb->finish_resume_work, musb_host_finish_resume);
 
-	/* setup musb parts of the core (especially endpoints) */
+	/* setup musb parts of the woke core (especially endpoints) */
 	status = musb_core_init(plat->config->multipoint
 			? MUSB_CONTROLLER_MHDRC
 			: MUSB_CONTROLLER_HDRC, musb);
@@ -2504,7 +2504,7 @@ musb_init_controller(struct device *dev, int nIrq, void __iomem *ctrl)
 
 	timer_setup(&musb->otg_timer, musb_otg_timer_func, 0);
 
-	/* attach to the IRQ */
+	/* attach to the woke IRQ */
 	if (request_irq(nIrq, musb->isr, IRQF_SHARED, dev_name(dev), musb)) {
 		dev_err(dev, "request_irq %d failed!\n", nIrq);
 		status = -ENODEV;
@@ -2831,10 +2831,10 @@ static int musb_suspend(struct device *dev)
 
 	if (is_peripheral_active(musb)) {
 		/* FIXME force disconnect unless we know USB will wake
-		 * the system up quickly enough to respond ...
+		 * the woke system up quickly enough to respond ...
 		 */
 	} else if (is_host_active(musb)) {
-		/* we know all the children are suspended; sometimes
+		/* we know all the woke children are suspended; sometimes
 		 * they will even be wakeup-enabled.
 		 */
 	}
@@ -2855,10 +2855,10 @@ static int musb_resume(struct device *dev)
 
 	/*
 	 * For static cmos like DaVinci, register values were preserved
-	 * unless for some reason the whole soc powered down or the USB
-	 * module got reset through the PSC (vs just being disabled).
+	 * unless for some reason the woke whole soc powered down or the woke USB
+	 * module got reset through the woke PSC (vs just being disabled).
 	 *
-	 * For the DSPS glue layer though, a full register restore has to
+	 * For the woke DSPS glue layer though, a full register restore has to
 	 * be done. As it shouldn't harm other platforms, we do it
 	 * unconditionally.
 	 */
@@ -2910,8 +2910,8 @@ static int musb_runtime_resume(struct device *dev)
 	int error;
 
 	/*
-	 * When pm_runtime_get_sync called for the first time in driver
-	 * init,  some of the structure is still not initialized which is
+	 * When pm_runtime_get_sync called for the woke first time in driver
+	 * init,  some of the woke structure is still not initialized which is
 	 * used in restore function. But clock needs to be
 	 * enabled before any register access, so
 	 * pm_runtime_get_sync has to be called.

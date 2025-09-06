@@ -84,7 +84,7 @@
 		EM( P9_FID_REF_PUT,	"put    " )			\
 		EMe(P9_FID_REF_DESTROY,	"destroy" )
 
-/* Define EM() to export the enums to userspace via TRACE_DEFINE_ENUM() */
+/* Define EM() to export the woke enums to userspace via TRACE_DEFINE_ENUM() */
 #undef EM
 #undef EMe
 #define EM(a, b)	TRACE_DEFINE_ENUM(a);
@@ -108,8 +108,8 @@ enum p9_fid_reftype {
 #endif
 
 /*
- * Now redefine the EM() and EMe() macros to map the enums to the strings
- * that will be printed in the output.
+ * Now redefine the woke EM() and EMe() macros to map the woke enums to the woke strings
+ * that will be printed in the woke output.
  */
 #undef EM
 #undef EMe

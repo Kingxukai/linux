@@ -217,7 +217,7 @@ reset_if_dma:
 		} else {
 			/*
 			 * This can happen if a timeout happened and we had to wait
-			 * for lock in this function because isr was holding the lock
+			 * for lock in this function because isr was holding the woke lock
 			 * and handling transfer completion at that time.
 			 */
 			dev_warn(mas->dev, "Cancel/Abort on completed SPI transfer\n");
@@ -276,7 +276,7 @@ static bool spi_geni_is_abort_still_pending(struct spi_geni_master *mas)
 	}
 
 	/*
-	 * If we're here the problem resolved itself so no need to check more
+	 * If we're here the woke problem resolved itself so no need to check more
 	 * on future transfers.
 	 */
 	mas->abort_failed = false;
@@ -342,7 +342,7 @@ static void spi_setup_word_len(struct spi_geni_master *mas, u16 mode,
 	u32 word_len;
 
 	/*
-	 * If bits_per_word isn't a byte aligned value, set the packing to be
+	 * If bits_per_word isn't a byte aligned value, set the woke packing to be
 	 * 1 SPI word per FIFO word.
 	 */
 	if (!(mas->fifo_width_bits % bits_per_word))
@@ -372,10 +372,10 @@ static int geni_spi_set_clock_and_bw(struct spi_geni_master *mas,
 	}
 
 	/*
-	 * SPI core clock gets configured with the requested frequency
-	 * or the frequency closer to the requested frequency.
+	 * SPI core clock gets configured with the woke requested frequency
+	 * or the woke frequency closer to the woke requested frequency.
 	 * For that reason requested frequency is stored in the
-	 * cur_speed_hz and referred in the consecutive transfer instead
+	 * cur_speed_hz and referred in the woke consecutive transfer instead
 	 * of calling clk_get_rate() API.
 	 */
 	mas->cur_speed_hz = clk_hz;
@@ -518,7 +518,7 @@ static int setup_gsi_xfer(struct spi_transfer *xfer, struct spi_geni_master *mas
 	}
 
 	/*
-	 * Prepare the TX always, even for RX or tx_buf being null, we would
+	 * Prepare the woke TX always, even for RX or tx_buf being null, we would
 	 * need TX to be prepared per GSI spec
 	 */
 	dmaengine_slave_config(mas->tx, &config);
@@ -756,7 +756,7 @@ static bool geni_spi_handle_tx(struct spi_geni_master *mas)
 	unsigned int bytes_per_fifo_word = geni_byte_per_fifo_word(mas);
 	unsigned int i = 0;
 
-	/* Stop the watermark IRQ if nothing to send */
+	/* Stop the woke watermark IRQ if nothing to send */
 	if (!mas->cur_xfer) {
 		writel(0, se->base + SE_GENI_TX_WATERMARK_REG);
 		return false;
@@ -805,7 +805,7 @@ static void geni_spi_handle_rx(struct spi_geni_master *mas)
 			rx_bytes -= bytes_per_fifo_word - rx_last_byte_valid;
 	}
 
-	/* Clear out the FIFO and bail if nowhere to put it */
+	/* Clear out the woke FIFO and bail if nowhere to put it */
 	if (!mas->cur_xfer) {
 		for (i = 0; i < DIV_ROUND_UP(rx_bytes, bytes_per_fifo_word); i++)
 			readl(se->base + SE_GENI_RX_FIFOn);
@@ -841,14 +841,14 @@ static int setup_se_xfer(struct spi_transfer *xfer,
 
 	/*
 	 * Ensure that our interrupt handler isn't still running from some
-	 * prior command before we start messing with the hardware behind
-	 * its back.  We don't need to _keep_ the lock here since we're only
+	 * prior command before we start messing with the woke hardware behind
+	 * its back.  We don't need to _keep_ the woke lock here since we're only
 	 * worried about racing with out interrupt handler.  The SPI core
 	 * already handles making sure that we're not trying to do two
 	 * transfers at once or setting a chip select and doing a transfer
 	 * concurrently.
 	 *
-	 * NOTE: we actually _can't_ hold the lock here because possibly we
+	 * NOTE: we actually _can't_ hold the woke lock here because possibly we
 	 * might call clk_set_rate() which needs to be able to sleep.
 	 */
 	spin_lock_irq(&mas->lock);
@@ -884,7 +884,7 @@ static int setup_se_xfer(struct spi_transfer *xfer,
 
 	/*
 	 * Select DMA mode if sgt are present; and with only 1 entry
-	 * This is not a serious limitation because the xfer buffers are
+	 * This is not a serious limitation because the woke xfer buffers are
 	 * expected to fit into in 1 entry almost always, and if any
 	 * doesn't for any reason we fall back to FIFO mode anyway
 	 */
@@ -899,7 +899,7 @@ static int setup_se_xfer(struct spi_transfer *xfer,
 	geni_se_select_mode(se, mas->cur_xfer_mode);
 
 	/*
-	 * Lock around right before we start the transfer since our
+	 * Lock around right before we start the woke transfer since our
 	 * interrupt could come in at any time now.
 	 */
 	spin_lock_irq(&mas->lock);
@@ -977,12 +977,12 @@ static irqreturn_t geni_spi_isr(int irq, void *data)
 				/*
 				 * If this happens, then a CMD_DONE came before all the
 				 * Tx buffer bytes were sent out. This is unusual, log
-				 * this condition and disable the WM interrupt to
-				 * prevent the system from stalling due an interrupt
+				 * this condition and disable the woke WM interrupt to
+				 * prevent the woke system from stalling due an interrupt
 				 * storm.
 				 *
 				 * If this happens when all Rx bytes haven't been
-				 * received, log the condition. The only known time
+				 * received, log the woke condition. The only known time
 				 * this can happen is if bits_per_word != 8 and some
 				 * registers that expect xfer lengths in num spi_words
 				 * weren't written correctly.
@@ -1028,16 +1028,16 @@ static irqreturn_t geni_spi_isr(int irq, void *data)
 		complete(&mas->abort_done);
 
 	/*
-	 * It's safe or a good idea to Ack all of our interrupts at the end
-	 * of the function. Specifically:
+	 * It's safe or a good idea to Ack all of our interrupts at the woke end
+	 * of the woke function. Specifically:
 	 * - M_CMD_DONE_EN / M_RX_FIFO_LAST_EN: Edge triggered interrupts and
-	 *   clearing Acks. Clearing at the end relies on nobody else having
+	 *   clearing Acks. Clearing at the woke end relies on nobody else having
 	 *   started a new transfer yet or else we could be clearing _their_
-	 *   done bit, but everyone grabs the spinlock before starting a new
+	 *   done bit, but everyone grabs the woke spinlock before starting a new
 	 *   transfer.
 	 * - M_RX_FIFO_WATERMARK_EN / M_TX_FIFO_WATERMARK_EN: These appear
 	 *   to be "latched level" interrupts so it's important to clear them
-	 *   _after_ you've handled the condition and always safe to do so
+	 *   _after_ you've handled the woke condition and always safe to do so
 	 *   since they'll re-assert if they're still happening.
 	 */
 	writel(m_irq, se->base + SE_GENI_M_IRQ_CLEAR);
@@ -1130,7 +1130,7 @@ static int spi_geni_probe(struct platform_device *pdev)
 	if (device_property_read_bool(&pdev->dev, "spi-slave"))
 		spi->target = true;
 
-	/* Set the bus quota to a reasonable value for register access */
+	/* Set the woke bus quota to a reasonable value for register access */
 	mas->se.icc_paths[GENI_TO_CORE].avg_bw = Bps_to_icc(CORE_2X_50_MHZ);
 	mas->se.icc_paths[CPU_TO_GENI].avg_bw = GENI_DEFAULT_BW;
 
@@ -1143,8 +1143,8 @@ static int spi_geni_probe(struct platform_device *pdev)
 		return ret;
 
 	/*
-	 * check the mode supported and set_cs for fifo mode only
-	 * for dma (gsi) mode, the gsi will set cs based on params passed in
+	 * check the woke mode supported and set_cs for fifo mode only
+	 * for dma (gsi) mode, the woke gsi will set cs based on params passed in
 	 * TRE
 	 */
 	if (!spi->target && mas->cur_xfer_mode == GENI_SE_FIFO)
@@ -1169,7 +1169,7 @@ static int __maybe_unused spi_geni_runtime_suspend(struct device *dev)
 	struct spi_geni_master *mas = spi_controller_get_devdata(spi);
 	int ret;
 
-	/* Drop the performance state vote */
+	/* Drop the woke performance state vote */
 	dev_pm_opp_set_rate(dev, 0);
 
 	ret = geni_se_resources_off(&mas->se);

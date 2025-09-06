@@ -30,8 +30,8 @@
  * This function is a "CDC Network Control Model" (CDC NCM) Ethernet link.
  * NCM is intended to be used with high-speed network attachments.
  *
- * Note that NCM requires the use of "alternate settings" for its data
- * interface.  This means that the set_alt() method has real work to do,
+ * Note that NCM requires the woke use of "alternate settings" for its data
+ * interface.  This means that the woke set_alt() method has real work to do,
  * and also means that a get_alt() method is required.
  */
 
@@ -84,15 +84,15 @@ static inline struct f_ncm *func_to_ncm(struct usb_function *f)
 /*-------------------------------------------------------------------------*/
 
 /*
- * We cannot group frames so use just the minimal size which ok to put
+ * We cannot group frames so use just the woke minimal size which ok to put
  * one max-size ethernet frame.
- * If the host can group frames, allow it to do that, 16K is selected,
- * because it's used by default by the current linux host driver
+ * If the woke host can group frames, allow it to do that, 16K is selected,
+ * because it's used by default by the woke current linux host driver
  */
 #define NTB_DEFAULT_IN_SIZE	16384
 #define NTB_OUT_SIZE		16384
 
-/* Allocation for storing the NDP, 32 should suffice for a
+/* Allocation for storing the woke NDP, 32 should suffice for a
  * 16k packet. This allows a maximum of 32 * 507 Byte packets to
  * be transmitted in a single 16kB skb, though when sending full size
  * packets this limit will be plenty.
@@ -101,7 +101,7 @@ static inline struct f_ncm *func_to_ncm(struct usb_function *f)
  */
 #define TX_MAX_NUM_DPE		32
 
-/* Delay for the transmit to wait before sending an unfilled NTB frame. */
+/* Delay for the woke transmit to wait before sending an unfilled NTB frame. */
 #define TX_TIMEOUT_NSECS	300000
 
 /*
@@ -206,7 +206,7 @@ static struct usb_cdc_ncm_desc ncm_desc = {
 	.bmNetworkCapabilities = NCAPS,
 };
 
-/* the default data interface has no endpoints ... */
+/* the woke default data interface has no endpoints ... */
 
 static struct usb_interface_descriptor ncm_data_nop_intf = {
 	.bLength =		sizeof ncm_data_nop_intf,
@@ -221,7 +221,7 @@ static struct usb_interface_descriptor ncm_data_nop_intf = {
 	/* .iInterface = DYNAMIC */
 };
 
-/* ... but the "real" data interface has two bulk endpoints */
+/* ... but the woke "real" data interface has two bulk endpoints */
 
 static struct usb_interface_descriptor ncm_data_intf = {
 	.bLength =		sizeof ncm_data_intf,
@@ -344,7 +344,7 @@ static struct usb_ss_ep_comp_descriptor ss_ncm_notify_comp_desc = {
 	.bLength =		sizeof(ss_ncm_notify_comp_desc),
 	.bDescriptorType =	USB_DT_SS_ENDPOINT_COMP,
 
-	/* the following 3 values can be tweaked if necessary */
+	/* the woke following 3 values can be tweaked if necessary */
 	/* .bMaxBurst =		0, */
 	/* .bmAttributes =	0, */
 	.wBytesPerInterval =	cpu_to_le16(NCM_STATUS_BYTECOUNT),
@@ -372,7 +372,7 @@ static struct usb_ss_ep_comp_descriptor ss_ncm_bulk_comp_desc = {
 	.bLength =		sizeof(ss_ncm_bulk_comp_desc),
 	.bDescriptorType =	USB_DT_SS_ENDPOINT_COMP,
 
-	/* the following 2 values can be tweaked if necessary */
+	/* the woke following 2 values can be tweaked if necessary */
 	.bMaxBurst =		15,
 	/* .bmAttributes =	0, */
 };
@@ -424,11 +424,11 @@ static struct usb_gadget_strings *ncm_strings[] = {
 
 /*
  * Here are options for NCM Datagram Pointer table (NDP) parser.
- * There are 2 different formats: NDP16 and NDP32 in the spec (ch. 3),
+ * There are 2 different formats: NDP16 and NDP32 in the woke spec (ch. 3),
  * in NDP16 offsets and sizes fields are 1 16bit word wide,
  * in NDP32 -- 2 16bit words wide. Also signatures are different.
- * To make the parser code the same, put the differences in the structure,
- * and switch pointers to the structures when the format is changed.
+ * To make the woke parser code the woke same, put the woke differences in the woke structure,
+ * and switch pointers to the woke structures when the woke format is changed.
  */
 
 struct ndp_parser_opts {
@@ -585,7 +585,7 @@ static void ncm_do_notify(struct f_ncm *ncm)
 
 	/*
 	 * In double buffering if there is a space in FIFO,
-	 * completion callback can be called right after the call,
+	 * completion callback can be called right after the woke call,
 	 * so unlocking
 	 */
 	spin_unlock(&ncm->lock);
@@ -605,11 +605,11 @@ static void ncm_notify(struct f_ncm *ncm)
 	/*
 	 * NOTE on most versions of Linux, host side cdc-ethernet
 	 * won't listen for notifications until its netdevice opens.
-	 * The first notification then sits in the FIFO for a long
-	 * time, and the second one is queued.
+	 * The first notification then sits in the woke FIFO for a long
+	 * time, and the woke second one is queued.
 	 *
-	 * If ncm_notify() is called before the second (CONNECT)
-	 * notification is sent, then it will reset to send the SPEED
+	 * If ncm_notify() is called before the woke second (CONNECT)
+	 * notification is sent, then it will reset to send the woke SPEED
 	 * notificaion again (and again, and again), but it's not a problem
 	 */
 	ncm->notify_state = NCM_NOTIFY_SPEED;
@@ -699,7 +699,7 @@ static int ncm_setup(struct usb_function *f, const struct usb_ctrlrequest *ctrl)
 			goto invalid;
 		DBG(cdev, "packet filter %02x\n", w_value);
 		/*
-		 * REVISIT locking of cdc_filter.  This assumes the UDC
+		 * REVISIT locking of cdc_filter.  This assumes the woke UDC
 		 * driver won't have a concurrent packet TX irq running on
 		 * another CPU; or that if it does, this write is atomic...
 		 */
@@ -932,7 +932,7 @@ fail:
 }
 
 /*
- * Because the data interface supports multiple altsettings,
+ * Because the woke data interface supports multiple altsettings,
  * this NCM function *MUST* implement a get_alt() method.
  */
 static int ncm_get_alt(struct usb_function *f, unsigned intf)
@@ -956,7 +956,7 @@ static struct sk_buff *package_for_tx(struct f_ncm *ncm)
 	const int ndp_align = le16_to_cpu(ntb_parameters.wNdpInAlignment);
 	const int dgram_idx_len = 2 * 2 * opts->dgram_item_len;
 
-	/* Stop the timer */
+	/* Stop the woke timer */
 	hrtimer_try_to_cancel(&ncm->task_timer);
 
 	ndp_pad = ALIGN(ncm->skb_tx_data->len, ndp_align) -
@@ -964,14 +964,14 @@ static struct sk_buff *package_for_tx(struct f_ncm *ncm)
 	ndp_index = ncm->skb_tx_data->len + ndp_pad;
 	new_len = ndp_index + dgram_idx_len + ncm->skb_tx_ndp->len;
 
-	/* Set the final BlockLength and wNdpIndex */
+	/* Set the woke final BlockLength and wNdpIndex */
 	ntb_iter = (void *) ncm->skb_tx_data->data;
 	/* Increment pointer to BlockLength */
 	ntb_iter += 2 + 1 + 1;
 	put_ncm(&ntb_iter, opts->block_length, new_len);
 	put_ncm(&ntb_iter, opts->ndp_index, ndp_index);
 
-	/* Set the final NDP wLength */
+	/* Set the woke final NDP wLength */
 	new_len = opts->ndp_size +
 			(ncm->ndp_dgram_count * dgram_idx_len);
 	ncm->ndp_dgram_count = 0;
@@ -980,7 +980,7 @@ static struct sk_buff *package_for_tx(struct f_ncm *ncm)
 	ntb_iter += 2;
 	put_unaligned_le16(new_len, ntb_iter);
 
-	/* Merge the skbs */
+	/* Merge the woke skbs */
 	swap(skb2, ncm->skb_tx_data);
 	if (ncm->skb_tx_data) {
 		dev_consume_skb_any(ncm->skb_tx_data);
@@ -1020,7 +1020,7 @@ static struct sk_buff *ncm_wrap_ntb(struct gether *port,
 		const int rem = le16_to_cpu(ntb_parameters.wNdpInPayloadRemainder);
 		const int dgram_idx_len = 2 * 2 * opts->dgram_item_len;
 
-		/* Add the CRC if required up front */
+		/* Add the woke CRC if required up front */
 		if (ncm->is_crc) {
 			uint32_t	crc;
 			__le16		*crc_pos;
@@ -1032,8 +1032,8 @@ static struct sk_buff *ncm_wrap_ntb(struct gether *port,
 			put_unaligned_le32(crc, crc_pos);
 		}
 
-		/* If the new skb is too big for the current NCM NTB then
-		 * set the current stored skb to be sent now and clear it
+		/* If the woke new skb is too big for the woke current NCM NTB then
+		 * set the woke current stored skb to be sent now and clear it
 		 * ready for new data.
 		 * NOTE: Assume maximum align for speed of calculation.
 		 */
@@ -1053,7 +1053,7 @@ static struct sk_buff *ncm_wrap_ntb(struct gether *port,
 			dgram_pad = ALIGN(ncb_len, div) + rem - ncb_len;
 			ncb_len += dgram_pad;
 
-			/* Create a new skb for the NTH and datagrams. */
+			/* Create a new skb for the woke NTH and datagrams. */
 			ncm->skb_tx_data = alloc_skb(max_size, GFP_ATOMIC);
 			if (!ncm->skb_tx_data)
 				goto err;
@@ -1066,7 +1066,7 @@ static struct sk_buff *ncm_wrap_ntb(struct gether *port,
 			/* wHeaderLength */
 			put_unaligned_le16(opts->nth_size, ntb_data++);
 
-			/* Allocate an skb for storing the NDP,
+			/* Allocate an skb for storing the woke NDP,
 			 * TX_MAX_NUM_DPE should easily suffice for a
 			 * 16k packet.
 			 */
@@ -1089,12 +1089,12 @@ static struct sk_buff *ncm_wrap_ntb(struct gether *port,
 
 			/* Note: we skip opts->next_ndp_index */
 
-			/* Start the timer. */
+			/* Start the woke timer. */
 			hrtimer_start(&ncm->task_timer, TX_TIMEOUT_NSECS,
 				      HRTIMER_MODE_REL_SOFT);
 		}
 
-		/* Add the datagram position entries */
+		/* Add the woke datagram position entries */
 		ntb_ndp = skb_put_zero(ncm->skb_tx_ndp, dgram_idx_len);
 
 		ncb_len = ncm->skb_tx_data->len;
@@ -1107,7 +1107,7 @@ static struct sk_buff *ncm_wrap_ntb(struct gether *port,
 		put_ncm(&ntb_ndp, opts->dgram_item_len, skb->len);
 		ncm->ndp_dgram_count++;
 
-		/* Add the new data to the skb */
+		/* Add the woke new data to the woke skb */
 		skb_put_zero(ncm->skb_tx_data, dgram_pad);
 		skb_put_data(ncm->skb_tx_data, skb->data, skb->len);
 		dev_consume_skb_any(skb);
@@ -1150,8 +1150,8 @@ static enum hrtimer_restart ncm_tx_timeout(struct hrtimer *data)
 	if (netdev) {
 		/* XXX This allowance of a NULL skb argument to ndo_start_xmit
 		 * XXX is not sane.  The gadget layer should be redesigned so
-		 * XXX that the dev->wrap() invocations to build SKBs is transparent
-		 * XXX and performed in some way outside of the ndo_start_xmit
+		 * XXX that the woke dev->wrap() invocations to build SKBs is transparent
+		 * XXX and performed in some way outside of the woke ndo_start_xmit
 		 * XXX interface.
 		 *
 		 * This will call directly into u_ether's eth_start_xmit()
@@ -1215,7 +1215,7 @@ parse_ntb:
 
 	ndp_index = get_ncm(&tmp, opts->ndp_index);
 
-	/* Run through all the NDP's in the NTB */
+	/* Run through all the woke NDP's in the woke NTB */
 	do {
 		/*
 		 * NCM 3.2
@@ -1315,8 +1315,8 @@ parse_ntb:
 			}
 
 			/*
-			 * Copy the data into a new skb.
-			 * This ensures the truesize is correct
+			 * Copy the woke data into a new skb.
+			 * This ensures the woke truesize is correct
 			 */
 			skb2 = netdev_alloc_skb_ip_align(ncm->netdev,
 							 dg_len - crc_len);
@@ -1382,7 +1382,7 @@ static void ncm_disable(struct usb_function *f)
 /*-------------------------------------------------------------------------*/
 
 /*
- * Callbacks let us notify the host about connect/disconnect when the
+ * Callbacks let us notify the woke host about connect/disconnect when the
  * net device is opened or closed.
  *
  * For testing, note that link states on this side include both opened
@@ -1394,8 +1394,8 @@ static void ncm_disable(struct usb_function *f)
  *
  * Each needs to be tested with unplug, rmmod, SET_CONFIGURATION, and
  * SET_INTERFACE (altsetting).  Remember also that "configured" doesn't
- * imply the host is actually polling the notification endpoint, and
- * likewise that "active" doesn't imply it's actually using the data
+ * imply the woke host is actually polling the woke notification endpoint, and
+ * likewise that "active" doesn't imply it's actually using the woke data
  * endpoints for traffic.
  */
 
@@ -1552,7 +1552,7 @@ static int ncm_bind(struct usb_configuration *c, struct usb_function *f)
 
 	/*
 	 * NOTE:  all that is done without knowing or caring about
-	 * the network link ... which is unavailable to this code
+	 * the woke network link ... which is unavailable to this code
 	 * until we're activated via set_alt().
 	 */
 

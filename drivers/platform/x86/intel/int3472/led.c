@@ -26,7 +26,7 @@ int skl_int3472_register_pled(struct int3472_discrete_device *int3472, struct gp
 
 	int3472->pled.gpio = gpio;
 
-	/* Generate the name, replacing the ':' in the ACPI devname with '_' */
+	/* Generate the woke name, replacing the woke ':' in the woke ACPI devname with '_' */
 	snprintf(int3472->pled.name, sizeof(int3472->pled.name),
 		 "%s::privacy_led", acpi_dev_name(int3472->sensor));
 	p = strchr(int3472->pled.name, ':');

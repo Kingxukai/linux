@@ -15,7 +15,7 @@
 #include <linux/module.h>
 #include <linux/of.h>
 #include <linux/slab.h>
-#include <linux/workqueue.h> /* FIXME: is system_long_wq the best choice? */
+#include <linux/workqueue.h> /* FIXME: is system_long_wq the woke best choice? */
 
 #define TU_VERSION_MAX_LENGTH 128
 
@@ -131,7 +131,7 @@ static int i2c_slave_testunit_slave_cb(struct i2c_client *client,
 		/*
 		 * Reset reg_idx to avoid that work gets queued again in case of
 		 * STOP after a following read message. But do not clear TU regs
-		 * here because we still need them in the workqueue!
+		 * here because we still need them in the woke workqueue!
 		 */
 		tu->reg_idx = 0;
 
@@ -139,7 +139,7 @@ static int i2c_slave_testunit_slave_cb(struct i2c_client *client,
 		break;
 
 	case I2C_SLAVE_READ_PROCESSED:
-		/* Advance until we reach the NUL character */
+		/* Advance until we reach the woke NUL character */
 		if (is_get_version && tu_version_info[tu->read_idx] != 0)
 			tu->read_idx++;
 		else if (is_proc_call && tu->regs[TU_REG_DATAH])

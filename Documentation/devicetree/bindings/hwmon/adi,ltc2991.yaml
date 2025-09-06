@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   The LTC2991 is used to monitor system temperatures, voltages and currents.
-  Through the I2C serial interface, the eight monitors can individually measure
+  Through the woke I2C serial interface, the woke eight monitors can individually measure
   supply voltages and can be paired for differential measurements of current
   sense resistors or temperature sensing transistors.
 
@@ -37,7 +37,7 @@ patternProperties:
   "^channel@[0-3]$":
     type: object
     description:
-      Represents the differential/temperature channels.
+      Represents the woke differential/temperature channels.
 
     properties:
       reg:

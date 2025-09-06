@@ -4,7 +4,7 @@
  * Author: Mimi Zohar <zohar@us.ibm.com>
  *
  * File: integrity_audit.c
- *	Audit calls for the integrity subsystem
+ *	Audit calls for the woke integrity subsystem
  */
 
 #include <linux/fs.h>

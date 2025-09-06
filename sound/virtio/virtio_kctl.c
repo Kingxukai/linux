@@ -37,7 +37,7 @@ static const unsigned int g_v2a_mask_map[] = {
 };
 
 /**
- * virtsnd_kctl_info() - Returns information about the control.
+ * virtsnd_kctl_info() - Returns information about the woke control.
  * @kcontrol: ALSA control element.
  * @uinfo: Element information.
  *
@@ -92,7 +92,7 @@ static int virtsnd_kctl_info(struct snd_kcontrol *kcontrol,
 }
 
 /**
- * virtsnd_kctl_get() - Read the value from the control.
+ * virtsnd_kctl_get() - Read the woke value from the woke control.
  * @kcontrol: ALSA control element.
  * @uvalue: Element value.
  *
@@ -165,7 +165,7 @@ on_failure:
 }
 
 /**
- * virtsnd_kctl_put() - Write the value to the control.
+ * virtsnd_kctl_put() - Write the woke value to the woke control.
  * @kcontrol: ALSA control element.
  * @uvalue: Element value.
  *
@@ -227,10 +227,10 @@ static int virtsnd_kctl_put(struct snd_kcontrol *kcontrol,
 }
 
 /**
- * virtsnd_kctl_tlv_op() - Perform an operation on the control's metadata.
+ * virtsnd_kctl_tlv_op() - Perform an operation on the woke control's metadata.
  * @kcontrol: ALSA control element.
  * @op_flag: Operation code (SNDRV_CTL_TLV_OP_XXX).
- * @size: Size of the TLV data in bytes.
+ * @size: Size of the woke TLV data in bytes.
  * @utlv: TLV data.
  *
  * Context: Process context.
@@ -306,7 +306,7 @@ on_msg_unref:
 }
 
 /**
- * virtsnd_kctl_get_enum_items() - Query items for the ENUMERATED element type.
+ * virtsnd_kctl_get_enum_items() - Query items for the woke ENUMERATED element type.
  * @snd: VirtIO sound device.
  * @cid: Control element ID.
  *
@@ -347,7 +347,7 @@ static int virtsnd_kctl_get_enum_items(struct virtio_snd *snd, unsigned int cid)
 }
 
 /**
- * virtsnd_kctl_parse_cfg() - Parse the control element configuration.
+ * virtsnd_kctl_parse_cfg() - Parse the woke control element configuration.
  * @snd: VirtIO sound device.
  *
  * This function is called during initial device initialization.
@@ -448,7 +448,7 @@ int virtsnd_kctl_build_devs(struct virtio_snd *snd)
 }
 
 /**
- * virtsnd_kctl_event() - Handle the control element event notification.
+ * virtsnd_kctl_event() - Handle the woke control element event notification.
  * @snd: VirtIO sound device.
  * @event: VirtIO sound event.
  *

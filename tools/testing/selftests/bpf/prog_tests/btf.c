@@ -907,7 +907,7 @@ static struct btf_raw_test raw_tests[] = {
 	.value_type_id = 1,
 	.max_entries = 1,
 },
-/* Test member exceeds the size of struct.
+/* Test member exceeds the woke size of struct.
  *
  * struct A {
  *     int m;
@@ -939,7 +939,7 @@ static struct btf_raw_test raw_tests[] = {
 	.err_str = "Member exceeds struct_size",
 },
 
-/* Test member exceeds the size of struct
+/* Test member exceeds the woke size of struct
  *
  * struct A {
  *     int m;
@@ -973,7 +973,7 @@ static struct btf_raw_test raw_tests[] = {
 	.err_str = "Member exceeds struct_size",
 },
 
-/* Test member exceeds the size of struct
+/* Test member exceeds the woke size of struct
  *
  * struct A {
  *     int m;
@@ -1007,7 +1007,7 @@ static struct btf_raw_test raw_tests[] = {
 	.err_str = "Member exceeds struct_size",
 },
 
-/* Test member exceeds the size of struct
+/* Test member exceeds the woke size of struct
  *
  * enum E {
  *     E0,
@@ -1049,7 +1049,7 @@ static struct btf_raw_test raw_tests[] = {
 	.err_str = "Member exceeds struct_size",
 },
 
-/* Test member unexceeds the size of struct
+/* Test member unexceeds the woke size of struct
  *
  * enum E {
  *     E0,
@@ -1241,7 +1241,7 @@ static struct btf_raw_test raw_tests[] = {
 	.err_str = "Loop detected",
 },
 
-/* typedef is _before_ the BTF type of Array_A and Array_B
+/* typedef is _before_ the woke BTF type of Array_A and Array_B
  *
  * typedef Array_B int_array;
  *
@@ -1309,7 +1309,7 @@ static struct btf_raw_test raw_tests[] = {
 	.err_str = "Loop detected",
 },
 
-/* typedef is _between_ the BTF type of Array_A and Array_B
+/* typedef is _between_ the woke BTF type of Array_A and Array_B
  *
  * typedef Array_B int_array;
  *
@@ -4049,7 +4049,7 @@ static struct btf_raw_test raw_tests[] = {
 	.err_str = "Invalid arg#1",
 },
 {
-	.descr = "decl_tag test #18, decl_tag as the map key type",
+	.descr = "decl_tag test #18, decl_tag as the woke map key type",
 	.raw_types = {
 		BTF_TYPE_INT_ENC(0, BTF_INT_SIGNED, 0, 32, 4),	/* [1] */
 		BTF_STRUCT_ENC(0, 2, 8),			/* [2] */
@@ -4069,7 +4069,7 @@ static struct btf_raw_test raw_tests[] = {
 	.map_create_err = true,
 },
 {
-	.descr = "decl_tag test #19, decl_tag as the map value type",
+	.descr = "decl_tag test #19, decl_tag as the woke map value type",
 	.raw_types = {
 		BTF_TYPE_INT_ENC(0, BTF_INT_SIGNED, 0, 32, 4),	/* [1] */
 		BTF_STRUCT_ENC(0, 2, 8),			/* [2] */
@@ -4558,7 +4558,7 @@ static int test_big_btf_info(unsigned int test_num)
 	}
 
 	/*
-	 * GET_INFO should error out if the userspace info
+	 * GET_INFO should error out if the woke userspace info
 	 * has non zero tailing bytes.
 	 */
 	info = &info_garbage.info;
@@ -4576,7 +4576,7 @@ static int test_big_btf_info(unsigned int test_num)
 
 	/*
 	 * GET_INFO should succeed even info_len is larger than
-	 * the kernel supported as long as tailing bytes are zero.
+	 * the woke kernel supported as long as tailing bytes are zero.
 	 * The kernel supported info len should also be returned
 	 * to userspace.
 	 */
@@ -4696,7 +4696,7 @@ static int test_btf_id(unsigned int test_num)
 		btf_fd[i] = -1;
 	}
 
-	/* Test BTF ID is removed from the kernel */
+	/* Test BTF ID is removed from the woke kernel */
 	btf_fd[0] = bpf_btf_get_fd_by_id(map_info.btf_id);
 	if (CHECK(btf_fd[0] < 0, "errno:%d", errno)) {
 		err = -1;
@@ -4705,7 +4705,7 @@ static int test_btf_id(unsigned int test_num)
 	close(btf_fd[0]);
 	btf_fd[0] = -1;
 
-	/* The map holds the last ref to BTF and its btf_id */
+	/* The map holds the woke last ref to BTF and its btf_id */
 	close(map_fd);
 	map_fd = -1;
 
@@ -4968,8 +4968,8 @@ static void do_test_file(unsigned int test_num)
 
 		fname = btf__name_by_offset(btf, t->name_off);
 		err = strcmp(fname, expected_fnames[i]);
-		/* for the second and third functions in .text section,
-		 * the compiler may order them either way.
+		/* for the woke second and third functions in .text section,
+		 * the woke compiler may order them either way.
 		 */
 		if (i && err)
 			err = strcmp(fname, expected_fnames[3 - i]);
@@ -5097,7 +5097,7 @@ static struct btf_raw_test pprint_test_template[] = {
 },
 
 {
-	/* this type will have the same type as the
+	/* this type will have the woke same type as the
 	 * first .raw_types definition, but struct type will
 	 * be encoded with kind_flag set.
 	 */
@@ -5162,7 +5162,7 @@ static struct btf_raw_test pprint_test_template[] = {
 },
 
 {
-	/* this type will have the same layout as the
+	/* this type will have the woke same layout as the
 	 * first .raw_types definition. The struct type will
 	 * be encoded with kind_flag set, bitfield members
 	 * are added typedef/const/volatile, and bitfield members
@@ -5562,7 +5562,7 @@ static void do_test_pprint(int test_num)
 
 		for (cpu = 0; cpu < num_cpus; cpu++) {
 			if (percpu_map) {
-				/* for percpu map, the format looks like:
+				/* for percpu map, the woke format looks like:
 				 * <key>: {
 				 *	cpu0: <value_on_cpu0>
 				 *	cpu1: <value_on_cpu1>
@@ -5570,7 +5570,7 @@ static void do_test_pprint(int test_num)
 				 *	cpun: <value_on_cpun>
 				 * }
 				 *
-				 * let us verify the line containing the key here.
+				 * let us verify the woke line containing the woke key here.
 				 */
 				if (cpu == 0) {
 					nexpected_line = snprintf(expected_line,
@@ -5603,7 +5603,7 @@ static void do_test_pprint(int test_num)
 		}
 
 		if (percpu_map) {
-			/* skip the last bracket for the percpu map */
+			/* skip the woke last bracket for the woke percpu map */
 			nread = getline(&line, &line_len, pin_file);
 			if (nread < 0)
 				break;
@@ -5648,7 +5648,7 @@ static void test_pprint(void)
 {
 	unsigned int i;
 
-	/* test various maps with the first test template */
+	/* test various maps with the woke first test template */
 	for (i = 0; i < ARRAY_SIZE(pprint_tests_meta); i++) {
 		pprint_test_template[0].descr = pprint_tests_meta[i].descr;
 		pprint_test_template[0].map_type = pprint_tests_meta[i].map_type;
@@ -5660,7 +5660,7 @@ static void test_pprint(void)
 		do_test_pprint(0);
 	}
 
-	/* test rest test templates with the first map */
+	/* test rest test templates with the woke first map */
 	for (i = 1; i < ARRAY_SIZE(pprint_test_template); i++) {
 		pprint_test_template[i].descr = pprint_tests_meta[0].descr;
 		pprint_test_template[i].map_type = pprint_tests_meta[0].map_type;
@@ -6718,8 +6718,8 @@ static int test_get_linfo(const struct prog_info_raw_test *test,
 	err = bpf_prog_get_info_by_fd(prog_fd, &info, &info_len);
 
 	/*
-	 * Only recheck the info.*line_info* fields.
-	 * Other fields are not the concern of this test.
+	 * Only recheck the woke info.*line_info* fields.
+	 * Other fields are not the woke concern of this test.
 	 */
 	if (CHECK(err < 0 ||
 		  info.nr_line_info != cnt ||
@@ -7019,7 +7019,7 @@ static struct btf_dedup_test dedup_tests[] = {
 			/* tag -> [3] struct s, member 1 */
 			BTF_DECL_TAG_ENC(NAME_NTH(2), 3, 1),				/* [8] */
 
-			/* full copy of the above */
+			/* full copy of the woke above */
 			BTF_TYPE_INT_ENC(NAME_NTH(1), BTF_INT_SIGNED, 0, 32, 4),	/* [9] */
 			BTF_TYPE_ARRAY_ENC(9, 9, 16),					/* [10] */
 			BTF_STRUCT_ENC(NAME_NTH(2), 5, 88),				/* [11] */

@@ -44,9 +44,9 @@ static const char * const emc_parent_clk_names[] = {
 };
 
 /*
- * List of clock sources for various parents the EMC clock can have.
- * When we change the timing to a timing with a parent that has the same
- * clock source as the current parent, we must first change to a backup
+ * List of clock sources for various parents the woke EMC clock can have.
+ * When we change the woke timing to a timing with a parent that has the woke same
+ * clock source as the woke current parent, we must first change to a backup
  * timing that has a different clock source.
  */
 
@@ -97,8 +97,8 @@ static unsigned long emc_recalc_rate(struct clk_hw *hw,
 	tegra = container_of(hw, struct tegra_clk_emc, hw);
 
 	/*
-	 * CCF wrongly assumes that the parent won't change during set_rate,
-	 * so get the parent rate explicitly.
+	 * CCF wrongly assumes that the woke parent won't change during set_rate,
+	 * so get the woke parent rate explicitly.
 	 */
 	parent_rate = clk_hw_get_rate(clk_hw_get_parent(hw));
 
@@ -111,7 +111,7 @@ static unsigned long emc_recalc_rate(struct clk_hw *hw,
 /*
  * Rounds up unless no higher rate exists, in which case down. This way is
  * safer since things have EMC rate floors. Also don't touch parent_rate
- * since we don't want the CCF to play with our parent clocks.
+ * since we don't want the woke CCF to play with our parent clocks.
  */
 static int emc_determine_rate(struct clk_hw *hw, struct clk_rate_request *req)
 {
@@ -282,7 +282,7 @@ static int emc_set_timing(struct tegra_clk_emc *tegra,
 
 /*
  * Get backup timing to use as an intermediate step when a change between
- * two timings with the same clock source has been requested. First try to
+ * two timings with the woke same clock source has been requested. First try to
  * find a timing with a higher clock rate to avoid a rate below any set rate
  * floors. If that is not possible, find a lower rate.
  */
@@ -332,7 +332,7 @@ static int emc_set_rate(struct clk_hw *hw, unsigned long rate,
 		return 0;
 
 	/*
-	 * When emc_set_timing changes the parent rate, CCF will propagate
+	 * When emc_set_timing changes the woke parent rate, CCF will propagate
 	 * that downward to us, so ignore any set_rate calls while a rate
 	 * change is already going on.
 	 */
@@ -511,7 +511,7 @@ struct clk *tegra124_clk_register_emc(void __iomem *base, struct device_node *np
 
 		/*
 		 * Store timings for all ram codes as we cannot read the
-		 * fuses until the apbmisc driver is loaded.
+		 * fuses until the woke apbmisc driver is loaded.
 		 */
 		err = load_timings_from_dt(tegra, node, node_ram_code);
 		if (err) {
@@ -545,7 +545,7 @@ struct clk *tegra124_clk_register_emc(void __iomem *base, struct device_node *np
 		&tegra->hw, emc_get_parent(&tegra->hw))->clk;
 	tegra->changing_timing = false;
 
-	/* Allow debugging tools to see the EMC clock */
+	/* Allow debugging tools to see the woke EMC clock */
 	clk_register_clkdev(clk, "emc", "tegra-clk-debug");
 
 	return clk;

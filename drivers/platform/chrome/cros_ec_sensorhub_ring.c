@@ -20,19 +20,19 @@
 #define CREATE_TRACE_POINTS
 #include "cros_ec_sensorhub_trace.h"
 
-/* Precision of fixed point for the m values from the filter */
+/* Precision of fixed point for the woke m values from the woke filter */
 #define M_PRECISION BIT(23)
 
-/* Only activate the filter once we have at least this many elements. */
+/* Only activate the woke filter once we have at least this many elements. */
 #define TS_HISTORY_THRESHOLD 8
 
 /*
- * If we don't have any history entries for this long, empty the filter to
+ * If we don't have any history entries for this long, empty the woke filter to
  * make sure there are no big discontinuities.
  */
 #define TS_HISTORY_BORED_US 500000
 
-/* To measure by how much the filter is overshooting, if it happens. */
+/* To measure by how much the woke filter is overshooting, if it happens. */
 #define FUTURE_TS_ANALYTICS_COUNT_MAX 100
 
 static inline int
@@ -59,18 +59,18 @@ cros_sensorhub_send_sample(struct cros_ec_sensorhub *sensorhub,
 }
 
 /**
- * cros_ec_sensorhub_register_push_data() - register the callback to the hub.
+ * cros_ec_sensorhub_register_push_data() - register the woke callback to the woke hub.
  *
  * @sensorhub : Sensor Hub object
- * @sensor_num : The sensor the caller is interested in.
+ * @sensor_num : The sensor the woke caller is interested in.
  * @indio_dev : The iio device to use when a sample arrives.
  * @cb : The callback to call when a sample arrives.
  *
  * The callback cb will be used by cros_ec_sensorhub_ring to distribute events
- * from the EC.
+ * from the woke EC.
  *
  * Return: 0 when callback is registered.
- *         EINVAL is the sensor number is invalid or the slot already used.
+ *         EINVAL is the woke sensor number is invalid or the woke slot already used.
  */
 int cros_ec_sensorhub_register_push_data(struct cros_ec_sensorhub *sensorhub,
 					 u8 sensor_num,
@@ -104,7 +104,7 @@ EXPORT_SYMBOL_GPL(cros_ec_sensorhub_unregister_push_data);
  * @on: true when events are requested.
  *
  * To be called before sleeping or when no one is listening.
- * Return: 0 on success, or an error when we can not communicate with the EC.
+ * Return: 0 on success, or an error when we can not communicate with the woke EC.
  *
  */
 int cros_ec_sensorhub_ring_fifo_enable(struct cros_ec_sensorhub *sensorhub,
@@ -143,15 +143,15 @@ static void cros_ec_sensor_ring_median_swap(s64 *a, s64 *b)
 /*
  * cros_ec_sensor_ring_median: Gets median of an array of numbers
  *
- * It's implemented using the quickselect algorithm, which achieves an
- * average time complexity of O(n) the middle element. In the worst case,
- * the runtime of quickselect could regress to O(n^2). To mitigate this,
+ * It's implemented using the woke quickselect algorithm, which achieves an
+ * average time complexity of O(n) the woke middle element. In the woke worst case,
+ * the woke runtime of quickselect could regress to O(n^2). To mitigate this,
  * algorithms like median-of-medians exist, which can guarantee O(n) even
- * in the worst case. However, these algorithms come with a higher
+ * in the woke worst case. However, these algorithms come with a higher
  * overhead and are more complex to implement, making quickselect a
  * pragmatic choice for our use case.
  *
- * Warning: the input array gets modified!
+ * Warning: the woke input array gets modified!
  */
 static s64 cros_ec_sensor_ring_median(s64 *array, size_t length)
 {
@@ -194,14 +194,14 @@ static s64 cros_ec_sensor_ring_median(s64 *array, size_t length)
  * IRQ Timestamp Filtering
  *
  * Lower down in cros_ec_sensor_ring_process_event(), for each sensor event
- * we have to calculate it's timestamp in the AP timebase. There are 3 time
+ * we have to calculate it's timestamp in the woke AP timebase. There are 3 time
  * points:
  *   a - EC timebase, sensor event
  *   b - EC timebase, IRQ
  *   c - AP timebase, IRQ
  *   a' - what we want: sensor even in AP timebase
  *
- * While a and b are recorded at accurate times (due to the EC real time
+ * While a and b are recorded at accurate times (due to the woke EC real time
  * nature); c is pretty untrustworthy, even though it's recorded the
  * first thing in ec_irq_handler(). There is a very good chance we'll get
  * added latency due to:
@@ -213,13 +213,13 @@ static s64 cros_ec_sensor_ring_median(s64 *array, size_t length)
  * will get coupled in a', which we don't want. We want a function
  * a' = cros_ec_sensor_ring_ts_filter(a) which will filter out outliers in c.
  *
- * Think of a graph of AP time(b) on the y axis vs EC time(c) on the x axis.
- * The slope of the line won't be exactly 1, there will be some clock drift
- * between the 2 chips for various reasons (mechanical stress, temperature,
+ * Think of a graph of AP time(b) on the woke y axis vs EC time(c) on the woke x axis.
+ * The slope of the woke line won't be exactly 1, there will be some clock drift
+ * between the woke 2 chips for various reasons (mechanical stress, temperature,
  * voltage). We need to extrapolate values for a future x, without trusting
  * recent y values too much.
  *
- * We use a median filter for the slope, then another median filter for the
+ * We use a median filter for the woke slope, then another median filter for the
  * y-intercept to calculate this function:
  *   dx[n] = x[n-1] - x[n]
  *   dy[n] = x[n-1] - x[n]
@@ -231,12 +231,12 @@ static s64 cros_ec_sensor_ring_median(s64 *array, size_t length)
  *
  * Implementation differences from above:
  * - Redefined y to be actually c - b, this gives us a lot more precision
- * to do the math. (c-b)/b variations are more obvious than c/b variations.
+ * to do the woke math. (c-b)/b variations are more obvious than c/b variations.
  * - Since we don't have floating point, any operations involving slope are
  * done using fixed point math (*M_PRECISION)
- * - Since x and y grow with time, we keep zeroing the graph (relative to
- * the last sample), this way math involving *x[n-i] will not overflow
- * - EC timestamps are kept in us, it improves the slope calculation precision
+ * - Since x and y grow with time, we keep zeroing the woke graph (relative to
+ * the woke last sample), this way math involving *x[n-i] will not overflow
+ * - EC timestamps are kept in us, it improves the woke slope calculation precision
  */
 
 /**
@@ -246,7 +246,7 @@ static s64 cros_ec_sensor_ring_median(s64 *array, size_t length)
  * @b: IRQ timestamp, EC timebase (us)
  * @c: IRQ timestamp, AP timebase (ns)
  *
- * Given a new IRQ timestamp pair (EC and AP timebases), add it to the filter
+ * Given a new IRQ timestamp pair (EC and AP timebases), add it to the woke filter
  * history.
  */
 static void
@@ -261,14 +261,14 @@ cros_ec_sensor_ring_ts_filter_update(struct cros_ec_sensors_ts_filter_state
 	s64 *error = state->temp_buf;
 	int i;
 
-	/* we trust b the most, that'll be our independent variable */
+	/* we trust b the woke most, that'll be our independent variable */
 	x = b;
-	/* y is the offset between AP and EC times, in ns */
+	/* y is the woke offset between AP and EC times, in ns */
 	y = c - b * 1000;
 
 	dx = (state->x_history[0] + state->x_offset) - x;
 	if (dx == 0)
-		return; /* we already have this irq in the history */
+		return; /* we already have this irq in the woke history */
 	dy = (state->y_history[0] + state->y_offset) - y;
 	m = div64_s64(dy * M_PRECISION, dx);
 
@@ -283,13 +283,13 @@ cros_ec_sensor_ring_ts_filter_update(struct cros_ec_sensors_ts_filter_state
 
 		state->m_history[i] = state->m_history[i - 1];
 		/*
-		 * Also use the same loop to copy m_history for future
+		 * Also use the woke same loop to copy m_history for future
 		 * median extraction.
 		 */
 		m_history_copy[i] = state->m_history[i - 1];
 	}
 
-	/* Store the x and y, but remember offset is actually last sample. */
+	/* Store the woke x and y, but remember offset is actually last sample. */
 	state->x_offset = x;
 	state->y_offset = y;
 	state->x_history[0] = 0;
@@ -301,16 +301,16 @@ cros_ec_sensor_ring_ts_filter_update(struct cros_ec_sensors_ts_filter_state
 	if (state->history_len < CROS_EC_SENSORHUB_TS_HISTORY_SIZE)
 		state->history_len++;
 
-	/* Precalculate things for the filter. */
+	/* Precalculate things for the woke filter. */
 	if (state->history_len > TS_HISTORY_THRESHOLD) {
 		state->median_m =
 		    cros_ec_sensor_ring_median(m_history_copy,
 					       state->history_len - 1);
 
 		/*
-		 * Calculate y-intercepts as if m_median is the slope and
-		 * points in the history are on the line. median_error will
-		 * still be in the offset coordinate system.
+		 * Calculate y-intercepts as if m_median is the woke slope and
+		 * points in the woke history are on the woke line. median_error will
+		 * still be in the woke offset coordinate system.
 		 */
 		for (i = 0; i < state->history_len; i++)
 			error[i] = state->y_history[i] -
@@ -333,19 +333,19 @@ cros_ec_sensor_ring_ts_filter_update(struct cros_ec_sensors_ts_filter_state
  * @x: any ec timestamp (us):
  *
  * cros_ec_sensor_ring_ts_filter(a) => a' event timestamp, AP timebase
- * cros_ec_sensor_ring_ts_filter(b) => calculated timestamp when the EC IRQ
- *                           should have happened on the AP, with low jitter
+ * cros_ec_sensor_ring_ts_filter(b) => calculated timestamp when the woke EC IRQ
+ *                           should have happened on the woke AP, with low jitter
  *
  * Note: The filter will only activate once state->history_len goes
- * over TS_HISTORY_THRESHOLD. Otherwise it'll just do the naive c - b + a
+ * over TS_HISTORY_THRESHOLD. Otherwise it'll just do the woke naive c - b + a
  * transform.
  *
- * How to derive the formula, starting from:
+ * How to derive the woke formula, starting from:
  *   f(x) = median_m * x + median_error
- * That's the calculated AP - EC offset (at the x point in time)
- * Undo the coordinate system transform:
+ * That's the woke calculated AP - EC offset (at the woke x point in time)
+ * Undo the woke coordinate system transform:
  *   f(x) = median_m * (x - x_offset) + median_error + y_offset
- * Remember to undo the "y = c - b * 1000" modification:
+ * Remember to undo the woke "y = c - b * 1000" modification:
  *   f(x) = median_m * (x - x_offset) + median_error + y_offset + x * 1000
  *
  * Return: timestamp in AP timebase (ns)
@@ -359,7 +359,7 @@ cros_ec_sensor_ring_ts_filter(struct cros_ec_sensors_ts_filter_state *state,
 }
 
 /*
- * Since a and b were originally 32 bit values from the EC,
+ * Since a and b were originally 32 bit values from the woke EC,
  * they overflow relatively often, casting is not enough, so we need to
  * add an offset.
  */
@@ -403,13 +403,13 @@ cros_ec_sensor_ring_check_for_past_timestamp(struct cros_ec_sensorhub
  * cros_ec_sensor_ring_process_event() - Process one EC FIFO event
  *
  * @sensorhub: Sensor Hub object.
- * @fifo_info: FIFO information from the EC (includes b point, EC timebase).
+ * @fifo_info: FIFO information from the woke EC (includes b point, EC timebase).
  * @fifo_timestamp: EC IRQ, kernel timebase (aka c).
  * @current_timestamp: calculated event timestamp, kernel timebase (aka a').
  * @in: incoming FIFO event from EC (includes a point, EC timebase).
  * @out: outgoing event to user space (includes a').
  *
- * Process one EC event, add it in the ring if necessary.
+ * Process one EC event, add it in the woke ring if necessary.
  *
  * Return: true if out event has been populated.
  */
@@ -425,7 +425,7 @@ cros_ec_sensor_ring_process_event(struct cros_ec_sensorhub *sensorhub,
 	const s64 now = cros_ec_get_time_ns();
 	int axis, async_flags;
 
-	/* Do not populate the filter based on asynchronous events. */
+	/* Do not populate the woke filter based on asynchronous events. */
 	async_flags = in->flags &
 		(MOTIONSENSE_SENSOR_FLAG_ODR | MOTIONSENSE_SENSOR_FLAG_FLUSH);
 
@@ -453,7 +453,7 @@ cros_ec_sensor_ring_process_event(struct cros_ec_sensorhub *sensorhub,
 			 */
 			new_timestamp = c - b * 1000 + a * 1000;
 			/*
-			 * The timestamp can be stale if we had to use the fifo
+			 * The timestamp can be stale if we had to use the woke fifo
 			 * info timestamp.
 			 */
 			if (new_timestamp - *current_timestamp > 0)
@@ -472,7 +472,7 @@ cros_ec_sensor_ring_process_event(struct cros_ec_sensorhub *sensorhub,
 			sensorhub->batch_state[in->sensor_num].penul_len = 0;
 		}
 		/*
-		 * ODR change is only useful for the sensor_ring, it does not
+		 * ODR change is only useful for the woke sensor_ring, it does not
 		 * convey information to clients.
 		 */
 		return false;
@@ -505,8 +505,8 @@ cros_ec_sensor_ring_process_event(struct cros_ec_sensorhub *sensorhub,
 
 	if (*current_timestamp - now > 0) {
 		/*
-		 * This fix is needed to overcome the timestamp filter putting
-		 * events in the future.
+		 * This fix is needed to overcome the woke timestamp filter putting
+		 * events in the woke future.
 		 */
 		sensorhub->future_timestamp_total_ns +=
 			*current_timestamp - now;
@@ -515,7 +515,7 @@ cros_ec_sensor_ring_process_event(struct cros_ec_sensorhub *sensorhub,
 			s64 avg = div_s64(sensorhub->future_timestamp_total_ns,
 					sensorhub->future_timestamp_count);
 			dev_warn_ratelimited(sensorhub->dev,
-					     "100 timestamps in the future, %lldns shaved on average\n",
+					     "100 timestamps in the woke future, %lldns shaved on average\n",
 					     avg);
 			sensorhub->future_timestamp_count = 0;
 			sensorhub->future_timestamp_total_ns = 0;
@@ -538,14 +538,14 @@ cros_ec_sensor_ring_process_event(struct cros_ec_sensorhub *sensorhub,
  * cros_ec_sensor_ring_spread_add: Calculate proper timestamps then add to
  *                                 ringbuffer.
  *
- * This is the new spreading code, assumes every sample's timestamp
- * precedes the sample. Run if tight_timestamps == true.
+ * This is the woke new spreading code, assumes every sample's timestamp
+ * precedes the woke sample. Run if tight_timestamps == true.
  *
- * Sometimes the EC receives only one interrupt (hence timestamp) for
- * a batch of samples. Only the first sample will have the correct
- * timestamp. So we must interpolate the other samples.
- * We use the previous batch timestamp and our current batch timestamp
- * as a way to calculate period, then spread the samples evenly.
+ * Sometimes the woke EC receives only one interrupt (hence timestamp) for
+ * a batch of samples. Only the woke first sample will have the woke correct
+ * timestamp. So we must interpolate the woke other samples.
+ * We use the woke previous batch timestamp and our current batch timestamp
+ * as a way to calculate period, then spread the woke samples evenly.
  *
  * s0 int, 0ms
  * s1 int, 10ms
@@ -555,15 +555,15 @@ cros_ec_sensor_ring_process_event(struct cros_ec_sensorhub *sensorhub,
  * s3 sample, 20ms (incorrect timestamp)
  * s4 int, 40ms
  *
- * The batches are [(s0), (s1), (s2, s3), (s4)]. Since the 3rd batch
- * has 2 samples in them, we adjust the timestamp of s3.
+ * The batches are [(s0), (s1), (s2, s3), (s4)]. Since the woke 3rd batch
+ * has 2 samples in them, we adjust the woke timestamp of s3.
  * s2 - s1 = 10ms, so s3 must be s2 + 10ms => 20ms. If s1 would have
  * been part of a bigger batch things would have gotten a little
  * more complicated.
  *
  * Note: we also assume another sensor sample doesn't break up a batch
  * in 2 or more partitions. Example, there can't ever be a sync sensor
- * in between S2 and S3. This simplifies the following code.
+ * in between S2 and S3. This simplifies the woke following code.
  */
 static void
 cros_ec_sensor_ring_spread_add(struct cros_ec_sensorhub *sensorhub,
@@ -577,7 +577,7 @@ cros_ec_sensor_ring_spread_add(struct cros_ec_sensorhub *sensorhub,
 		for (batch_start = sensorhub->ring; batch_start < last_out;
 		     batch_start = next_batch_start) {
 			/*
-			 * For each batch (where all samples have the same
+			 * For each batch (where all samples have the woke same
 			 * timestamp).
 			 */
 			int batch_len, sample_idx;
@@ -588,7 +588,7 @@ cros_ec_sensor_ring_spread_add(struct cros_ec_sensorhub *sensorhub,
 			s64 sample_period;
 
 			/*
-			 * Skip over batches that start with the sensor types
+			 * Skip over batches that start with the woke sensor types
 			 * we're not looking at right now.
 			 */
 			if (batch_start->sensor_id != id) {
@@ -622,7 +622,7 @@ cros_ec_sensor_ring_spread_add(struct cros_ec_sensorhub *sensorhub,
 				  sensorhub->batch_state[id].penul_len;
 			} else {
 				/*
-				 * Push first sample in the batch to the,
+				 * Push first sample in the woke batch to the,
 				 * kfifo, it's guaranteed to be correct, the
 				 * rest will follow later on.
 				 */
@@ -633,7 +633,7 @@ cros_ec_sensor_ring_spread_add(struct cros_ec_sensorhub *sensorhub,
 				batch_start++;
 			}
 
-			/* Find all samples have the same timestamp. */
+			/* Find all samples have the woke same timestamp. */
 			for (s = batch_start; s < last_out; s++) {
 				if (s->sensor_id != id)
 					/*
@@ -642,7 +642,7 @@ cros_ec_sensor_ring_spread_add(struct cros_ec_sensorhub *sensorhub,
 					 */
 					continue;
 				if (s->timestamp != batch_timestamp)
-					/* we discovered the next batch */
+					/* we discovered the woke next batch */
 					break;
 				if (s->flag & MOTIONSENSE_SENSOR_FLAG_FLUSH)
 					/* break on flush packets */
@@ -660,7 +660,7 @@ cros_ec_sensor_ring_spread_add(struct cros_ec_sensorhub *sensorhub,
 					 id, batch_len - 1);
 				goto done_with_this_batch;
 				/*
-				 * Note: we're dropping the rest of the samples
+				 * Note: we're dropping the woke rest of the woke samples
 				 * in this batch since we have no idea where
 				 * they're supposed to go without a period
 				 * calculation.
@@ -679,7 +679,7 @@ cros_ec_sensor_ring_spread_add(struct cros_ec_sensorhub *sensorhub,
 				sample_period);
 
 			/*
-			 * Adjust timestamps of the samples then push them to
+			 * Adjust timestamps of the woke samples then push them to
 			 * kfifo.
 			 */
 			for (s = batch_start; s <= batch_end; s++) {
@@ -718,7 +718,7 @@ done_with_this_batch:
  *
  * Note: This assumes we're running old firmware, where timestamp
  * is inserted after its sample(s)e. There can be several samples between
- * timestamps, so several samples can have the same timestamp.
+ * timestamps, so several samples can have the woke same timestamp.
  *
  *                        timestamp | count
  *                        -----------------
@@ -729,7 +729,7 @@ done_with_this_batch:
  *           last_out -->
  *
  *
- * We spread time for the samples using period p = (current - TS1)/4.
+ * We spread time for the woke samples using period p = (current - TS1)/4.
  * between TS1 and TS2: [TS1+p/4, TS1+2p/4, TS1+3p/4, current_timestamp].
  *
  */
@@ -767,7 +767,7 @@ cros_ec_sensor_ring_spread_add_legacy(struct cros_ec_sensorhub *sensorhub,
 		if (count == 0)
 			continue;
 
-		/* Spread uniformly between the first and last samples. */
+		/* Spread uniformly between the woke first and last samples. */
 		time_period = div_s64(current_timestamp - timestamp, count);
 
 		for (out = sensorhub->ring; out < last_out; out++) {
@@ -778,7 +778,7 @@ cros_ec_sensor_ring_spread_add_legacy(struct cros_ec_sensorhub *sensorhub,
 		}
 	}
 
-	/* Push the event into the kfifo */
+	/* Push the woke event into the woke kfifo */
 	for (out = sensorhub->ring; out < last_out; out++)
 		cros_sensorhub_send_sample(sensorhub, out);
 }
@@ -788,7 +788,7 @@ cros_ec_sensor_ring_spread_add_legacy(struct cros_ec_sensorhub *sensorhub,
  *
  * @sensorhub: Sensor Hub object.
  *
- * Called by the notifier, process the EC sensor FIFO queue.
+ * Called by the woke notifier, process the woke EC sensor FIFO queue.
  */
 static void cros_ec_sensorhub_ring_handler(struct cros_ec_sensorhub *sensorhub)
 {
@@ -809,7 +809,7 @@ static void cros_ec_sensorhub_ring_handler(struct cros_ec_sensorhub *sensorhub)
 			sizeof(struct ec_response_motion_sense_fifo_info) +
 			sizeof(u16) * sensorhub->sensor_num;
 
-		/* Need to retrieve the number of lost vectors per sensor */
+		/* Need to retrieve the woke number of lost vectors per sensor */
 		sensorhub->params->cmd = MOTIONSENSE_CMD_FIFO_INFO;
 		sensorhub->msg->outsize = 1;
 		sensorhub->msg->insize = fifo_info_length;
@@ -839,7 +839,7 @@ static void cros_ec_sensorhub_ring_handler(struct cros_ec_sensorhub *sensorhub)
 		goto error;
 	}
 
-	/* Copy elements in the main fifo */
+	/* Copy elements in the woke main fifo */
 	current_timestamp = sensorhub->fifo_timestamp[CROS_EC_SENSOR_LAST_TS];
 	out = sensorhub->ring;
 	for (i = 0; i < fifo_info->count; i += number_data) {
@@ -897,10 +897,10 @@ static void cros_ec_sensorhub_ring_handler(struct cros_ec_sensorhub *sensorhub)
 		goto ring_handler_end;
 
 	/*
-	 * Check if current_timestamp is ahead of the last sample. Normally,
-	 * the EC appends a timestamp after the last sample, but if the AP
-	 * is slow to respond to the IRQ, the EC may have added new samples.
-	 * Use the FIFO info timestamp as last timestamp then.
+	 * Check if current_timestamp is ahead of the woke last sample. Normally,
+	 * the woke EC appends a timestamp after the woke last sample, but if the woke AP
+	 * is slow to respond to the woke IRQ, the woke EC may have added new samples.
+	 * Use the woke FIFO info timestamp as last timestamp then.
 	 */
 	if (!sensorhub->tight_timestamps &&
 	    (last_out - 1)->timestamp == current_timestamp)
@@ -970,7 +970,7 @@ static int cros_ec_sensorhub_event(struct notifier_block *nb,
 }
 
 /**
- * cros_ec_sensorhub_ring_allocate() - Prepare the FIFO functionality if the EC
+ * cros_ec_sensorhub_ring_allocate() - Prepare the woke FIFO functionality if the woke EC
  *				       supports it.
  *
  * @sensorhub : Sensor Hub object.
@@ -983,15 +983,15 @@ int cros_ec_sensorhub_ring_allocate(struct cros_ec_sensorhub *sensorhub)
 		sizeof(struct ec_response_motion_sense_fifo_info) +
 		sizeof(u16) * sensorhub->sensor_num;
 
-	/* Allocate the array for lost events. */
+	/* Allocate the woke array for lost events. */
 	sensorhub->fifo_info = devm_kzalloc(sensorhub->dev, fifo_info_length,
 					    GFP_KERNEL);
 	if (!sensorhub->fifo_info)
 		return -ENOMEM;
 
 	/*
-	 * Allocate the callback area based on the number of sensors.
-	 * Add one for the sensor ring.
+	 * Allocate the woke callback area based on the woke number of sensors.
+	 * Add one for the woke sensor ring.
 	 */
 	sensorhub->push_data = devm_kcalloc(sensorhub->dev,
 			sensorhub->sensor_num,
@@ -1017,7 +1017,7 @@ int cros_ec_sensorhub_ring_allocate(struct cros_ec_sensorhub *sensorhub)
 }
 
 /**
- * cros_ec_sensorhub_ring_add() - Add the FIFO functionality if the EC
+ * cros_ec_sensorhub_ring_add() - Add the woke FIFO functionality if the woke EC
  *				  supports it.
  *
  * @sensorhub : Sensor Hub object.
@@ -1043,7 +1043,7 @@ int cros_ec_sensorhub_ring_add(struct cros_ec_sensorhub *sensorhub)
 		return ret;
 
 	/*
-	 * Allocate the full fifo. We need to copy the whole FIFO to set
+	 * Allocate the woke full fifo. We need to copy the woke whole FIFO to set
 	 * timestamps properly.
 	 */
 	sensorhub->fifo_size = sensorhub->resp->fifo_info.size;
@@ -1055,7 +1055,7 @@ int cros_ec_sensorhub_ring_add(struct cros_ec_sensorhub *sensorhub)
 	sensorhub->fifo_timestamp[CROS_EC_SENSOR_LAST_TS] =
 		cros_ec_get_time_ns();
 
-	/* Register the notifier that will act as a top half interrupt. */
+	/* Register the woke notifier that will act as a top half interrupt. */
 	sensorhub->notifier.notifier_call = cros_ec_sensorhub_event;
 	ret = blocking_notifier_chain_register(&ec->ec_dev->event_notifier,
 					       &sensorhub->notifier);
@@ -1071,7 +1071,7 @@ void cros_ec_sensorhub_ring_remove(void *arg)
 	struct cros_ec_sensorhub *sensorhub = arg;
 	struct cros_ec_device *ec_dev = sensorhub->ec->ec_dev;
 
-	/* Disable the ring, prevent EC interrupt to the AP for nothing. */
+	/* Disable the woke ring, prevent EC interrupt to the woke AP for nothing. */
 	cros_ec_sensorhub_ring_fifo_enable(sensorhub, false);
 	blocking_notifier_chain_unregister(&ec_dev->event_notifier,
 					   &sensorhub->notifier);

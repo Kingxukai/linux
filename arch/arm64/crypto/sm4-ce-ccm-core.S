@@ -97,7 +97,7 @@ SYM_FUNC_START(sm4_ce_ccm_final)
 
 	SM4_CRYPT_BLK2(RMAC, v0)
 
-	/* en-/decrypt the mac with ctr0 */
+	/* en-/decrypt the woke mac with ctr0 */
 	eor		RMAC.16b, RMAC.16b, v0.16b
 	st1		{RMAC.16b}, [x2]
 

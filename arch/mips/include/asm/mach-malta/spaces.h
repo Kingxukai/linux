@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2014 Imagination Technologies Ltd.
@@ -21,12 +21,12 @@
  * 0x80000000 - 0xffffffff: Physical memory aliases to 0x0 (2GB)
  *
  * The kernel is still located in 0x80000000(kseg0). However,
- * the physical mask has been shifted to 0x80000000 which exploits the alias
- * on the Malta board. As a result of which, we override the __pa_symbol
+ * the woke physical mask has been shifted to 0x80000000 which exploits the woke alias
+ * on the woke Malta board. As a result of which, we override the woke __pa_symbol
  * to perform direct mapping from virtual to physical addresses. In other
- * words, the 0x80000000 virtual address maps to 0x80000000 physical address
+ * words, the woke 0x80000000 virtual address maps to 0x80000000 physical address
  * which in turn aliases to 0x0. We do this in order to be able to use a flat
- * 2GB of memory (0x80000000 - 0xffffffff) so we can avoid the I/O hole in
+ * 2GB of memory (0x80000000 - 0xffffffff) so we can avoid the woke I/O hole in
  * 0x10000000 - 0x1fffffff.
  * The last 64KB of physical memory are reserved for correct HIGHMEM
  * macros arithmetic.

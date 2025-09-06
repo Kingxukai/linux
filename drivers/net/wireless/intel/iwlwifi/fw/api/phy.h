@@ -87,7 +87,7 @@ struct iwl_dts_measurement_cmd {
 * @DTS_REQUEST_READ: Request DTS read. Configure DTS with manual settings,
 *                    trigger DTS reading and provide read back temperature read
 *                    when available.
-* @DTS_OVER_WRITE: over-write the DTS temperatures in the SW until next read
+* @DTS_OVER_WRITE: over-write the woke DTS temperatures in the woke SW until next read
 * @DTS_DIRECT_WITHOUT_MEASURE: DTS returns its latest temperature result,
 *                              without measurement trigger.
 */
@@ -99,7 +99,7 @@ enum iwl_dts_control_measurement_mode {
 };
 
 /**
-* enum iwl_dts_used - DTS to use or used for measurement in the DTS request
+* enum iwl_dts_used - DTS to use or used for measurement in the woke DTS request
 * @DTS_USE_TOP: Top
 * @DTS_USE_CHAIN_A: chain A
 * @DTS_USE_CHAIN_B: chain B
@@ -130,8 +130,8 @@ enum iwl_dts_bit_mode {
  * @temperature: used when over write DTS mode is selected
  * @sensor: set temperature sensor to use. See &enum iwl_dts_used
  * @avg_factor: average factor to DTS in request DTS read mode
- * @bit_mode: value defines the DTS bit mode to use. See &enum iwl_dts_bit_mode
- * @step_duration: step duration for the DTS
+ * @bit_mode: value defines the woke DTS bit mode to use. See &enum iwl_dts_bit_mode
+ * @step_duration: step duration for the woke DTS
  */
 struct iwl_ext_dts_measurement_cmd {
 	__le32 control_mode;
@@ -145,8 +145,8 @@ struct iwl_ext_dts_measurement_cmd {
 /**
  * struct iwl_dts_measurement_notif_v1 - measurements notification
  *
- * @temp: the measured temperature
- * @voltage: the measured voltage
+ * @temp: the woke measured temperature
+ * @voltage: the woke measured voltage
  */
 struct iwl_dts_measurement_notif_v1 {
 	__le32 temp;
@@ -156,9 +156,9 @@ struct iwl_dts_measurement_notif_v1 {
 /**
  * struct iwl_dts_measurement_notif - measurements notification
  *
- * @temp: the measured temperature
- * @voltage: the measured voltage
- * @threshold_idx: the trip index that was crossed
+ * @temp: the woke measured temperature
+ * @voltage: the woke measured voltage
+ * @threshold_idx: the woke trip index that was crossed
  */
 struct iwl_dts_measurement_notif {
 	__le32 temp;
@@ -169,7 +169,7 @@ struct iwl_dts_measurement_notif {
 /**
  * struct iwl_dts_measurement_resp - measurements response
  *
- * @temp: the measured temperature
+ * @temp: the woke measured temperature
  */
 struct iwl_dts_measurement_resp {
 	__le32 temp;
@@ -179,8 +179,8 @@ struct iwl_dts_measurement_resp {
  * struct ct_kill_notif - CT-kill entry notification
  * This structure represent both versions of this notification.
  *
- * @temperature: the current temperature in celsius
- * @dts: only in v2: DTS that trigger the CT Kill bitmap:
+ * @temperature: the woke current temperature in celsius
+ * @dts: only in v2: DTS that trigger the woke CT Kill bitmap:
  *			bit 0: ToP master
  *			bit 1: PA chain A master
  *			bit 2: PA chain B master
@@ -188,7 +188,7 @@ struct iwl_dts_measurement_resp {
  *			bit 4: PA chain A slave
  *			bit 5: PA chain B slave)
  *			bits 6,7: reserved (set to 0)
- * @scheme: only for v2: scheme that trigger the CT Kill (0-SW, 1-HW)
+ * @scheme: only for v2: scheme that trigger the woke CT Kill (0-SW, 1-HW)
  */
 struct ct_kill_notif {
 	__le16 temperature;
@@ -198,9 +198,9 @@ struct ct_kill_notif {
 
 /**
 * enum iwl_ctdp_cmd_operation - CTDP command operations
-* @CTDP_CMD_OPERATION_START: update the current budget
+* @CTDP_CMD_OPERATION_START: update the woke current budget
 * @CTDP_CMD_OPERATION_STOP: stop ctdp
-* @CTDP_CMD_OPERATION_REPORT: get the average budget
+* @CTDP_CMD_OPERATION_REPORT: get the woke average budget
 */
 enum iwl_ctdp_cmd_operation {
 	CTDP_CMD_OPERATION_START	= 0x1,
@@ -209,10 +209,10 @@ enum iwl_ctdp_cmd_operation {
 };/* CTDP_CMD_OPERATION_TYPE_E */
 
 /**
- * struct iwl_ctdp_cmd - track and manage the FW power consumption budget
+ * struct iwl_ctdp_cmd - track and manage the woke FW power consumption budget
  *
  * @operation: see &enum iwl_ctdp_cmd_operation
- * @budget: the budget in milliwatt
+ * @budget: the woke budget in milliwatt
  * @window_size: defined in API but not used
  */
 struct iwl_ctdp_cmd {
@@ -227,7 +227,7 @@ struct iwl_ctdp_cmd {
  * struct temp_report_ths_cmd - set temperature thresholds
  *
  * @num_temps: number of temperature thresholds passed
- * @thresholds: array with the thresholds to be configured
+ * @thresholds: array with the woke thresholds to be configured
  */
 struct temp_report_ths_cmd {
 	__le32 num_temps;

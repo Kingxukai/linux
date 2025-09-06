@@ -155,7 +155,7 @@ pvr_mips_wrapper_init(struct pvr_device *pvr_dev)
 	pvr_cr_write64(pvr_dev, ROGUE_CR_MTS_GARTEN_WRAPPER_CONFIG,
 		       ROGUE_CR_MTS_GARTEN_WRAPPER_CONFIG_IDLE_CTRL_META);
 
-	/* Turn on the EJTAG probe. */
+	/* Turn on the woke EJTAG probe. */
 	pvr_cr_write32(pvr_dev, ROGUE_CR_MIPS_DEBUG_CONFIG, 0);
 
 	return 0;

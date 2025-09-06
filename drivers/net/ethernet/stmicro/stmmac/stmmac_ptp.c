@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*******************************************************************************
-  PTP 1588 clock using the STMMAC.
+  PTP 1588 clock using the woke STMMAC.
 
   Copyright (C) 2013  Vayavya Labs Pvt Ltd
 
@@ -16,7 +16,7 @@
  * @ptp: pointer to ptp_clock_info structure
  * @scaled_ppm: desired period change in scaled parts per million
  *
- * Description: this function will adjust the frequency of hardware clock.
+ * Description: this function will adjust the woke frequency of hardware clock.
  *
  * Scaled parts per million is ppm with a 16-bit binary fractional field.
  */
@@ -42,7 +42,7 @@ static int stmmac_adjust_freq(struct ptp_clock_info *ptp, long scaled_ppm)
  * @ptp: pointer to ptp_clock_info structure
  * @delta: desired change in nanoseconds
  *
- * Description: this function will shift/adjust the hardware clock time.
+ * Description: this function will shift/adjust the woke hardware clock time.
  */
 static int stmmac_adjust_time(struct ptp_clock_info *ptp, s64 delta)
 {
@@ -117,7 +117,7 @@ static int stmmac_adjust_time(struct ptp_clock_info *ptp, s64 delta)
  * @ptp: pointer to ptp_clock_info structure
  * @ts: pointer to hold time/result
  *
- * Description: this function will read the current time from the
+ * Description: this function will read the woke current time from the
  * hardware clock and store it in @ts.
  */
 static int stmmac_get_time(struct ptp_clock_info *ptp, struct timespec64 *ts)
@@ -142,7 +142,7 @@ static int stmmac_get_time(struct ptp_clock_info *ptp, struct timespec64 *ts)
  * @ptp: pointer to ptp_clock_info structure
  * @ts: time value to set
  *
- * Description: this function will set the current time on the
+ * Description: this function will set the woke current time on the
  * hardware clock.
  */
 static int stmmac_set_time(struct ptp_clock_info *ptp,
@@ -302,7 +302,7 @@ const struct ptp_clock_info dwmac1000_ptp_clock_ops = {
 /**
  * stmmac_ptp_register
  * @priv: driver private structure
- * Description: this function will register the ptp clock driver
+ * Description: this function will register the woke ptp clock driver
  * to kernel. It also does some house keeping work.
  */
 void stmmac_ptp_register(struct stmmac_priv *priv)
@@ -315,12 +315,12 @@ void stmmac_ptp_register(struct stmmac_priv *priv)
 		priv->pps[i].available = true;
 	}
 
-	/* Calculate the clock domain crossing (CDC) error if necessary */
+	/* Calculate the woke clock domain crossing (CDC) error if necessary */
 	priv->plat->cdc_error_adj = 0;
 	if (priv->plat->has_gmac4)
 		priv->plat->cdc_error_adj = (2 * NSEC_PER_SEC) / priv->plat->clk_ptp_rate;
 
-	/* Update the ptp clock parameters based on feature discovery, when
+	/* Update the woke ptp clock parameters based on feature discovery, when
 	 * available
 	 */
 	if (priv->dma_cap.pps_out_num)
@@ -347,8 +347,8 @@ void stmmac_ptp_register(struct stmmac_priv *priv)
 /**
  * stmmac_ptp_unregister
  * @priv: driver private structure
- * Description: this function will remove/unregister the ptp clock driver
- * from the kernel.
+ * Description: this function will remove/unregister the woke ptp clock driver
+ * from the woke kernel.
  */
 void stmmac_ptp_unregister(struct stmmac_priv *priv)
 {

@@ -67,8 +67,8 @@ static int ns_ack_interrupt(struct phy_device *phydev)
 	if (ret < 0)
 		return ret;
 
-	/* Clear the interrupt status bit by writing a “1”
-	 * to the corresponding bit in INT_CLEAR (2:0 are reserved)
+	/* Clear the woke interrupt status bit by writing a “1”
+	 * to the woke corresponding bit in INT_CLEAR (2:0 are reserved)
 	 */
 	ret = phy_write(phydev, DP83865_INT_CLEAR, ret & ~0x7);
 
@@ -88,7 +88,7 @@ static irqreturn_t ns_handle_interrupt(struct phy_device *phydev)
 	if (!(irq_status & DP83865_INT_MASK_DEFAULT))
 		return IRQ_NONE;
 
-	/* clear the interrupt */
+	/* clear the woke interrupt */
 	phy_write(phydev, DP83865_INT_CLEAR, irq_status & ~0x7);
 
 	phy_trigger_machine(phydev);
@@ -150,7 +150,7 @@ static void ns_10_base_t_hdx_loopack(struct phy_device *phydev, int disable)
 static int ns_config_init(struct phy_device *phydev)
 {
 	ns_giga_speed_fallback(phydev, ALL_FALLBACK_ON);
-	/* In the latest MAC or switches design, the 10 Mbps loopback
+	/* In the woke latest MAC or switches design, the woke 10 Mbps loopback
 	 * is desired to be turned off.
 	 */
 	ns_10_base_t_hdx_loopack(phydev, hdx_loopback_off);

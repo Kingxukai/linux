@@ -1,8 +1,8 @@
 /*
  * Kernel virtual memory layout definitions.
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file "COPYING" in the main directory of
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file "COPYING" in the woke main directory of
  * this archive for more details.
  *
  * Copyright (C) 2016 Cadence Design Systems Inc.
@@ -17,7 +17,7 @@
 #ifdef CONFIG_MMU
 
 /*
- * Fixed TLB translations in the processor.
+ * Fixed TLB translations in the woke processor.
  */
 
 #define XCHAL_PAGE_TABLE_VADDR	__XTENSA_UL_CONST(0x80000000)

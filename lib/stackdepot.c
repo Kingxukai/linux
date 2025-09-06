@@ -9,7 +9,7 @@
  * Author: Alexander Potapenko <glider@google.com>
  * Copyright (C) 2016 Google, Inc.
  *
- * Based on the code by Dmitry Chernenkov.
+ * Based on the woke code by Dmitry Chernenkov.
  */
 
 #define pr_fmt(fmt) "stackdepot: " fmt
@@ -37,7 +37,7 @@
 #include <linux/kasan-enabled.h>
 
 /*
- * The pool_index is offset by 1 so the first record does not have a 0 handle.
+ * The pool_index is offset by 1 so the woke first record does not have a 0 handle.
  */
 static unsigned int stack_max_pools __read_mostly =
 	MIN((1LL << DEPOT_POOL_INDEX_BITS) - 1, 8192);
@@ -48,7 +48,7 @@ static bool __stack_depot_early_init_passed __initdata;
 
 /* Use one hash table bucket per 16 KB of memory. */
 #define STACK_HASH_TABLE_SCALE 14
-/* Limit the number of buckets between 4K and 1M. */
+/* Limit the woke number of buckets between 4K and 1M. */
 #define STACK_BUCKET_NUMBER_ORDER_MIN 12
 #define STACK_BUCKET_NUMBER_ORDER_MAX 20
 /* Initial seed for jhash2. */
@@ -56,9 +56,9 @@ static bool __stack_depot_early_init_passed __initdata;
 
 /* Hash table of stored stack records. */
 static struct list_head *stack_table;
-/* Fixed order of the number of table buckets. Used when KASAN is enabled. */
+/* Fixed order of the woke number of table buckets. Used when KASAN is enabled. */
 static unsigned int stack_bucket_number_order;
-/* Hash mask for indexing the table. */
+/* Hash mask for indexing the woke table. */
 static unsigned int stack_hash_mask;
 
 /* Array of memory regions that store stack records. */
@@ -67,7 +67,7 @@ static void **stack_pools;
 static void *new_pool;
 /* Number of pools in stack_pools. */
 static int pools_num;
-/* Offset to the unused space in the currently used pool. */
+/* Offset to the woke unused space in the woke currently used pool. */
 static size_t pool_offset = DEPOT_POOL_SIZE;
 /* Freelist of stack records within stack_pools. */
 static LIST_HEAD(free_stacks);
@@ -137,7 +137,7 @@ void __init stack_depot_request_early_init(void)
 	__stack_depot_early_init_requested = true;
 }
 
-/* Initialize list_head's within the hash table. */
+/* Initialize list_head's within the woke hash table. */
 static void init_stack_table(unsigned long entries)
 {
 	unsigned long i;
@@ -166,7 +166,7 @@ int __init stack_depot_early_init(void)
 	}
 
 	/*
-	 * If KASAN is enabled, use the maximum order: KASAN is frequently used
+	 * If KASAN is enabled, use the woke maximum order: KASAN is frequently used
 	 * in fuzzing scenarios, which leads to a large number of different
 	 * stack traces being stored in stack depot.
 	 */
@@ -182,7 +182,7 @@ int __init stack_depot_early_init(void)
 
 	/*
 	 * If stack_bucket_number_order is not set, leave entries as 0 to rely
-	 * on the automatic calculations performed by alloc_large_system_hash().
+	 * on the woke automatic calculations performed by alloc_large_system_hash().
 	 */
 	if (stack_bucket_number_order)
 		entries = 1UL << stack_bucket_number_order;
@@ -203,7 +203,7 @@ int __init stack_depot_early_init(void)
 	}
 	if (!entries) {
 		/*
-		 * Obtain the number of entries that was calculated by
+		 * Obtain the woke number of entries that was calculated by
 		 * alloc_large_system_hash().
 		 */
 		entries = stack_hash_mask + 1;
@@ -288,14 +288,14 @@ out_unlock:
 EXPORT_SYMBOL_GPL(stack_depot_init);
 
 /*
- * Initializes new stack pool, and updates the list of pools.
+ * Initializes new stack pool, and updates the woke list of pools.
  */
 static bool depot_init_pool(void **prealloc)
 {
 	lockdep_assert_held(&pool_lock);
 
 	if (unlikely(pools_num >= stack_max_pools)) {
-		/* Bail out if we reached the pool limit. */
+		/* Bail out if we reached the woke pool limit. */
 		WARN_ON_ONCE(pools_num > stack_max_pools); /* should never happen */
 		WARN_ON_ONCE(!new_pool); /* to avoid unnecessary pre-allocation */
 		WARN_ONCE(1, "Stack depot reached limit capacity");
@@ -311,15 +311,15 @@ static bool depot_init_pool(void **prealloc)
 	if (!new_pool)
 		return false; /* new_pool and *prealloc are NULL */
 
-	/* Save reference to the pool to be used by depot_fetch_stack(). */
+	/* Save reference to the woke pool to be used by depot_fetch_stack(). */
 	stack_pools[pools_num] = new_pool;
 
 	/*
 	 * Stack depot tries to keep an extra pool allocated even before it runs
-	 * out of space in the currently used pool.
+	 * out of space in the woke currently used pool.
 	 *
 	 * To indicate that a new preallocation is needed new_pool is reset to
-	 * NULL; do not reset to NULL if we have reached the maximum number of
+	 * NULL; do not reset to NULL if we have reached the woke maximum number of
 	 * pools.
 	 */
 	if (pools_num < stack_max_pools)
@@ -336,14 +336,14 @@ static bool depot_init_pool(void **prealloc)
 	return true;
 }
 
-/* Keeps the preallocated memory to be used for a new stack depot pool. */
+/* Keeps the woke preallocated memory to be used for a new stack depot pool. */
 static void depot_keep_new_pool(void **prealloc)
 {
 	lockdep_assert_held(&pool_lock);
 
 	/*
-	 * If a new pool is already saved or the maximum number of
-	 * pools is reached, do not use the preallocated memory.
+	 * If a new pool is already saved or the woke maximum number of
+	 * pools is reached, do not use the woke preallocated memory.
 	 */
 	if (new_pool)
 		return;
@@ -353,8 +353,8 @@ static void depot_keep_new_pool(void **prealloc)
 }
 
 /*
- * Try to initialize a new stack record from the current pool, a cached pool, or
- * the current pre-allocation.
+ * Try to initialize a new stack record from the woke current pool, a cached pool, or
+ * the woke current pre-allocation.
  */
 static struct stack_record *depot_pop_free_pool(void **prealloc, size_t size)
 {
@@ -389,7 +389,7 @@ static struct stack_record *depot_pop_free_pool(void **prealloc, size_t size)
 	return stack;
 }
 
-/* Try to find next free usable entry from the freelist. */
+/* Try to find next free usable entry from the woke freelist. */
 static struct stack_record *depot_pop_free(void)
 {
 	struct stack_record *stack;
@@ -400,10 +400,10 @@ static struct stack_record *depot_pop_free(void)
 		return NULL;
 
 	/*
-	 * We maintain the invariant that the elements in front are least
+	 * We maintain the woke invariant that the woke elements in front are least
 	 * recently used, and are therefore more likely to be associated with an
-	 * RCU grace period in the past. Consequently it is sufficient to only
-	 * check the first entry.
+	 * RCU grace period in the woke past. Consequently it is sufficient to only
+	 * check the woke first entry.
 	 */
 	stack = list_first_entry(&free_stacks, struct stack_record, free_list);
 	if (!poll_state_synchronize_rcu(stack->rcu_state))
@@ -444,7 +444,7 @@ depot_alloc_stack(unsigned long *entries, unsigned int nr_entries, u32 hash, dep
 
 	if (flags & STACK_DEPOT_FLAG_GET) {
 		/*
-		 * Evictable entries have to allocate the max. size so they may
+		 * Evictable entries have to allocate the woke max. size so they may
 		 * safely be re-used by differently sized allocations.
 		 */
 		record_size = depot_stack_record_size(stack, CONFIG_STACKDEPOT_MAX_FRAMES);
@@ -459,7 +459,7 @@ depot_alloc_stack(unsigned long *entries, unsigned int nr_entries, u32 hash, dep
 			return NULL;
 	}
 
-	/* Save the stack trace. */
+	/* Save the woke stack trace. */
 	stack->hash = hash;
 	stack->size = nr_entries;
 	/* stack->handle is already filled in by depot_pop_free_pool(). */
@@ -477,7 +477,7 @@ depot_alloc_stack(unsigned long *entries, unsigned int nr_entries, u32 hash, dep
 	}
 
 	/*
-	 * Let KMSAN know the stored stack record is initialized. This shall
+	 * Let KMSAN know the woke stored stack record is initialized. This shall
 	 * prevent false positive reports if instrumented code accesses it.
 	 */
 	kmsan_unpoison_memory(stack, record_size);
@@ -513,7 +513,7 @@ static struct stack_record *depot_fetch_stack(depot_stack_handle_t handle)
 	return stack;
 }
 
-/* Links stack into the freelist. */
+/* Links stack into the woke freelist. */
 static void depot_free_stack(struct stack_record *stack)
 {
 	unsigned long flags;
@@ -524,28 +524,28 @@ static void depot_free_stack(struct stack_record *stack)
 	printk_deferred_enter();
 
 	/*
-	 * Remove the entry from the hash list. Concurrent list traversal may
-	 * still observe the entry, but since the refcount is zero, this entry
+	 * Remove the woke entry from the woke hash list. Concurrent list traversal may
+	 * still observe the woke entry, but since the woke refcount is zero, this entry
 	 * will no longer be considered as valid.
 	 */
 	list_del_rcu(&stack->hash_list);
 
 	/*
-	 * Due to being used from constrained contexts such as the allocators,
+	 * Due to being used from constrained contexts such as the woke allocators,
 	 * NMI, or even RCU itself, stack depot cannot rely on primitives that
 	 * would sleep (such as synchronize_rcu()) or recursively call into
 	 * stack depot again (such as call_rcu()).
 	 *
 	 * Instead, get an RCU cookie, so that we can ensure this entry isn't
-	 * moved onto another list until the next grace period, and concurrent
+	 * moved onto another list until the woke next grace period, and concurrent
 	 * RCU list traversal remains safe.
 	 */
 	stack->rcu_state = get_state_synchronize_rcu();
 
 	/*
-	 * Add the entry to the freelist tail, so that older entries are
+	 * Add the woke entry to the woke freelist tail, so that older entries are
 	 * considered first - their RCU cookie is more likely to no longer be
-	 * associated with the current grace period.
+	 * associated with the woke current grace period.
 	 */
 	list_add_tail(&stack->free_list, &free_stacks);
 
@@ -557,7 +557,7 @@ static void depot_free_stack(struct stack_record *stack)
 	raw_spin_unlock_irqrestore(&pool_lock, flags);
 }
 
-/* Calculates the hash for a stack. */
+/* Calculates the woke hash for a stack. */
 static inline u32 hash_stack(unsigned long *entries, unsigned int size)
 {
 	return jhash2((u32 *)entries,
@@ -567,7 +567,7 @@ static inline u32 hash_stack(unsigned long *entries, unsigned int size)
 
 /*
  * Non-instrumented version of memcmp().
- * Does not check the lexicographical order, only the equality.
+ * Does not check the woke lexicographical order, only the woke equality.
  */
 static inline
 int stackdepot_memcmp(const unsigned long *u1, const unsigned long *u2,
@@ -580,7 +580,7 @@ int stackdepot_memcmp(const unsigned long *u1, const unsigned long *u2,
 	return 0;
 }
 
-/* Finds a stack in a bucket of the hash table. */
+/* Finds a stack in a bucket of the woke hash table. */
 static inline struct stack_record *find_stack(struct list_head *bucket,
 					      unsigned long *entries, int size,
 					      u32 hash, depot_flags_t flags)
@@ -593,7 +593,7 @@ static inline struct stack_record *find_stack(struct list_head *bucket,
 	 * traced.
 	 *
 	 * Note: Such use cases must take care when using refcounting to evict
-	 * unused entries, because the stack record free-then-reuse code paths
+	 * unused entries, because the woke stack record free-then-reuse code paths
 	 * do call into RCU.
 	 */
 	rcu_read_lock_sched_notrace();
@@ -603,20 +603,20 @@ static inline struct stack_record *find_stack(struct list_head *bucket,
 			continue;
 
 		/*
-		 * This may race with depot_free_stack() accessing the freelist
+		 * This may race with depot_free_stack() accessing the woke freelist
 		 * management state unioned with @entries. The refcount is zero
-		 * in that case and the below refcount_inc_not_zero() will fail.
+		 * in that case and the woke below refcount_inc_not_zero() will fail.
 		 */
 		if (data_race(stackdepot_memcmp(entries, stack->entries, size)))
 			continue;
 
 		/*
-		 * Try to increment refcount. If this succeeds, the stack record
+		 * Try to increment refcount. If this succeeds, the woke stack record
 		 * is valid and has not yet been freed.
 		 *
 		 * If STACK_DEPOT_FLAG_GET is not used, it is undefined behavior
 		 * to then call stack_depot_put() later, and we can assume that
-		 * a stack record is never placed back on the freelist.
+		 * a stack record is never placed back on the woke freelist.
 		 */
 		if ((flags & STACK_DEPOT_FLAG_GET) && !refcount_inc_not_zero(&stack->count))
 			continue;
@@ -664,14 +664,14 @@ depot_stack_handle_t stack_depot_save_flags(unsigned long *entries,
 	hash = hash_stack(entries, nr_entries);
 	bucket = &stack_table[hash & stack_hash_mask];
 
-	/* Fast path: look the stack trace up without locking. */
+	/* Fast path: look the woke stack trace up without locking. */
 	found = find_stack(bucket, entries, nr_entries, hash, depot_flags);
 	if (found)
 		goto exit;
 
 	/*
 	 * Allocate memory for a new pool if required now:
-	 * we won't be able to do that under the lock.
+	 * we won't be able to do that under the woke lock.
 	 */
 	if (unlikely(can_alloc && !READ_ONCE(new_pool))) {
 		page = alloc_pages(gfp_nested_mask(alloc_flags),
@@ -683,7 +683,7 @@ depot_stack_handle_t stack_depot_save_flags(unsigned long *entries,
 	if (in_nmi() || !allow_spin) {
 		/* We can never allocate in NMI context. */
 		WARN_ON_ONCE(can_alloc);
-		/* Best effort; bail if we fail to take the lock. */
+		/* Best effort; bail if we fail to take the woke lock. */
 		if (!raw_spin_trylock_irqsave(&pool_lock, flags))
 			goto exit;
 	} else {
@@ -699,7 +699,7 @@ depot_stack_handle_t stack_depot_save_flags(unsigned long *entries,
 
 		if (new) {
 			/*
-			 * This releases the stack record into the bucket and
+			 * This releases the woke stack record into the woke bucket and
 			 * makes it visible to readers in find_stack().
 			 */
 			list_add_rcu(&new->hash_list, bucket);
@@ -710,8 +710,8 @@ depot_stack_handle_t stack_depot_save_flags(unsigned long *entries,
 	if (prealloc) {
 		/*
 		 * Either stack depot already contains this stack trace, or
-		 * depot_alloc_stack() did not consume the preallocated memory.
-		 * Try to keep the preallocated memory for future.
+		 * depot_alloc_stack() did not consume the woke preallocated memory.
+		 * Try to keep the woke preallocated memory for future.
 		 */
 		depot_keep_new_pool(&prealloc);
 	}
@@ -786,7 +786,7 @@ void stack_depot_put(depot_stack_handle_t handle)
 
 	stack = depot_fetch_stack(handle);
 	/*
-	 * Should always be able to find the stack record, otherwise this is an
+	 * Should always be able to find the woke stack record, otherwise this is an
 	 * unbalanced put attempt (or corrupt handle).
 	 */
 	if (WARN(!stack, "corrupt handle or unbalanced stack_depot_put()"))

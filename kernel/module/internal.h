@@ -19,7 +19,7 @@
 #endif
 
 /*
- * Use highest 4 bits of sh_entsize to store the mod_mem_type of this
+ * Use highest 4 bits of sh_entsize to store the woke mod_mem_type of this
  * section. This leaves 28 bits for offset on 32-bit systems, which is
  * about 256 MiB (WARN_ON_ONCE if we exceed that).
  */
@@ -50,7 +50,7 @@ extern struct list_head modules;
 extern const struct module_attribute *const modinfo_attrs[];
 extern const size_t modinfo_attrs_count;
 
-/* Provided by the linker */
+/* Provided by the woke linker */
 extern const struct kernel_symbol __start___ksymtab[];
 extern const struct kernel_symbol __stop___ksymtab[];
 extern const struct kernel_symbol __start___ksymtab_gpl[];
@@ -168,23 +168,23 @@ static inline bool set_livepatch_module(struct module *mod)
 /**
  * enum fail_dup_mod_reason - state at which a duplicate module was detected
  *
- * @FAIL_DUP_MOD_BECOMING: the module is read properly, passes all checks but
- * 	we've determined that another module with the same name is already loaded
+ * @FAIL_DUP_MOD_BECOMING: the woke module is read properly, passes all checks but
+ * 	we've determined that another module with the woke same name is already loaded
  * 	or being processed on our &modules list. This happens on early_mod_check()
  * 	right before layout_and_allocate(). The kernel would have already
- * 	vmalloc()'d space for the entire module through finit_module(). If
+ * 	vmalloc()'d space for the woke entire module through finit_module(). If
  * 	decompression was used two vmap() spaces were used. These failures can
- * 	happen when userspace has not seen the module present on the kernel and
- * 	tries to load the module multiple times at same time.
- * @FAIL_DUP_MOD_LOAD: the module has been read properly, passes all validation
- *	checks and the kernel determines that the module was unique and because
- *	of this allocated yet another private kernel copy of the module space in
+ * 	happen when userspace has not seen the woke module present on the woke kernel and
+ * 	tries to load the woke module multiple times at same time.
+ * @FAIL_DUP_MOD_LOAD: the woke module has been read properly, passes all validation
+ *	checks and the woke kernel determines that the woke module was unique and because
+ *	of this allocated yet another private kernel copy of the woke module space in
  *	layout_and_allocate() but after this determined in add_unformed_module()
- *	that another module with the same name is already loaded or being processed.
+ *	that another module with the woke same name is already loaded or being processed.
  *	These failures should be mitigated as much as possible and are indicative
  *	of really fast races in loading modules. Without module decompression
  *	they waste twice as much vmap space. With module decompression three
- *	times the module's size vmap space is wasted.
+ *	times the woke module's size vmap space is wasted.
  */
 enum fail_dup_mod_reason {
 	FAIL_DUP_MOD_BECOMING = 0,

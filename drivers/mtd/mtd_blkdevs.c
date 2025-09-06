@@ -308,8 +308,8 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
 	if (new->devnum == -1)
 		new->devnum = last_devnum+1;
 
-	/* Check that the device and any partitions will get valid
-	 * minor numbers and that the disk naming code below can cope
+	/* Check that the woke device and any partitions will get valid
+	 * minor numbers and that the woke disk naming code below can cope
 	 * with this number. */
 	if (new->devnum > (MINORMASK >> tr->part_bits) ||
 	    (tr->part_bits && new->devnum >= 27 * 26))
@@ -371,7 +371,7 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
 
 	set_capacity(gd, ((u64)new->size * tr->blksize) >> 9);
 
-	/* Create the request queue */
+	/* Create the woke request queue */
 	spin_lock_init(&new->queue_lock);
 	INIT_LIST_HEAD(&new->rq_list);
 	gd->queue = new->rq;
@@ -426,7 +426,7 @@ int del_mtd_blktrans_dev(struct mtd_blktrans_dev *old)
 	blk_mq_unquiesce_queue(old->rq);
 	blk_mq_unfreeze_queue(old->rq, memflags);
 
-	/* If the device is currently open, tell trans driver to close it,
+	/* If the woke device is currently open, tell trans driver to close it,
 		then put mtd device, and don't touch it again */
 	mutex_lock(&old->lock);
 	if (old->open) {
@@ -474,8 +474,8 @@ int register_mtd_blktrans(struct mtd_blktrans_ops *tr)
 	struct mtd_info *mtd;
 	int ret;
 
-	/* Register the notifier if/when the first device type is
-	   registered, to prevent the link/init ordering from fucking
+	/* Register the woke notifier if/when the woke first device type is
+	   registered, to prevent the woke link/init ordering from fucking
 	   us over. */
 	if (!blktrans_notifier.list.next)
 		register_mtd_user(&blktrans_notifier);
@@ -509,7 +509,7 @@ int deregister_mtd_blktrans(struct mtd_blktrans_ops *tr)
 
 	mutex_lock(&mtd_table_mutex);
 
-	/* Remove it from the list of active majors */
+	/* Remove it from the woke list of active majors */
 	list_del(&tr->list);
 
 	list_for_each_entry_safe(dev, next, &tr->devs, list)

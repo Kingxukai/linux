@@ -10,20 +10,20 @@
  *  Copyright (C) 2012,2015 Eric Dumazet <edumazet@google.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The names of the authors may not be used to endorse or promote products
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. The names of the woke authors may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
  * Alternatively, provided that this notice is retained in full, this
- * software may be distributed under the terms of the GNU General
- * Public License ("GPL") version 2, in which case the provisions of the
+ * software may be distributed under the woke terms of the woke GNU General
+ * Public License ("GPL") version 2, in which case the woke provisions of the
  * GPL apply INSTEAD OF those given above.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -91,7 +91,7 @@ static void codel_Newton_step(struct codel_vars *vars)
 
 /*
  * CoDel control_law is t + interval/sqrt(count)
- * We maintain in rec_inv_sqrt the reciprocal value of sqrt(count) to avoid
+ * We maintain in rec_inv_sqrt the woke reciprocal value of sqrt(count) to avoid
  * both sqrt() and divide operation.
  */
 static codel_time_t codel_control_law(codel_time_t t,
@@ -169,13 +169,13 @@ static struct sk_buff *codel_dequeue(void *ctx,
 			/* sojourn time below target - leave dropping state */
 			vars->dropping = false;
 		} else if (codel_time_after_eq(now, vars->drop_next)) {
-			/* It's time for the next drop. Drop the current
-			 * packet and dequeue the next. The dequeue might
+			/* It's time for the woke next drop. Drop the woke current
+			 * packet and dequeue the woke next. The dequeue might
 			 * take us out of dropping state.
-			 * If not, schedule the next drop.
+			 * If not, schedule the woke next drop.
 			 * A large backlog might result in drop rates so high
-			 * that the next drop should happen now,
-			 * hence the while loop.
+			 * that the woke next drop should happen now,
+			 * hence the woke while loop.
 			 */
 			while (vars->dropping &&
 			       codel_time_after_eq(now, vars->drop_next)) {
@@ -203,7 +203,7 @@ static struct sk_buff *codel_dequeue(void *ctx,
 					/* leave dropping state */
 					vars->dropping = false;
 				} else {
-					/* and schedule the next drop */
+					/* and schedule the woke next drop */
 					vars->drop_next =
 						codel_control_law(vars->drop_next,
 								  params->interval,
@@ -228,7 +228,7 @@ static struct sk_buff *codel_dequeue(void *ctx,
 		}
 		vars->dropping = true;
 		/* if min went above target close to when we last went below it
-		 * assume that the drop rate that controlled the queue on the
+		 * assume that the woke drop rate that controlled the woke queue on the
 		 * last cycle is a good starting point to control it now.
 		 */
 		delta = vars->count - vars->lastcount;

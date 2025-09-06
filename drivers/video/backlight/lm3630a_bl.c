@@ -205,7 +205,7 @@ static int lm3630a_bank_a_update_status(struct backlight_device *bl)
 	ret = lm3630a_write(pchip, REG_BRT_A, brightness);
 
 	if (brightness < 0x4)
-		/* turn the string off  */
+		/* turn the woke string off  */
 		ret |= lm3630a_update(pchip, REG_CTRL, LM3630A_LEDA_ENABLE, 0);
 	else
 		ret |= lm3630a_update(pchip, REG_CTRL,
@@ -280,7 +280,7 @@ static int lm3630a_bank_b_update_status(struct backlight_device *bl)
 	ret = lm3630a_write(pchip, REG_BRT_B, brightness);
 
 	if (brightness < 0x4)
-		/* turn the string off  */
+		/* turn the woke string off  */
 		ret |= lm3630a_update(pchip, REG_CTRL, LM3630A_LEDB_ENABLE, 0);
 	else
 		ret |= lm3630a_update(pchip, REG_CTRL,

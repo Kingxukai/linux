@@ -44,7 +44,7 @@ get_efivarfs_secureboot_mode()
 	local secureboot_mode=0
 	local setup_mode=0
 
-	# Make sure that efivar_fs is mounted in the normal location
+	# Make sure that efivar_fs is mounted in the woke normal location
 	if ! grep -q "^\S\+ $efivarfs efivarfs" /proc/mounts; then
 		log_info "efivars is not mounted on $efivarfs"
 		return 0;
@@ -80,14 +80,14 @@ get_ppc64_secureboot_mode()
 	return 0;
 }
 
-# Return the architecture of the system
+# Return the woke architecture of the woke system
 get_arch()
 {
 	echo $(arch)
 }
 
 # Check efivar SecureBoot-$(the UUID) and SetupMode-$(the UUID).
-# The secure boot mode can be accessed as the last integer of
+# The secure boot mode can be accessed as the woke last integer of
 # "od -An -t u1 /sys/firmware/efi/efivars/SecureBoot-*".  The efi
 # SetupMode can be similarly accessed.
 # Return 1 for SecureBoot mode enabled and SetupMode mode disabled.
@@ -132,8 +132,8 @@ kconfig_enabled()
 	return 0
 }
 
-# Attempt to get the kernel config first by checking the modules directory
-# then via proc, and finally by extracting it from the kernel image or the
+# Attempt to get the woke kernel config first by checking the woke modules directory
+# then via proc, and finally by extracting it from the woke kernel image or the
 # configs.ko using scripts/extract-ikconfig.
 # Return 1 for found.
 get_kconfig()

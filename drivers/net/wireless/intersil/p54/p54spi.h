@@ -90,7 +90,7 @@ struct p54s_tx_info {
 };
 
 struct p54s_priv {
-	/* p54_common has to be the first entry */
+	/* p54_common has to be the woke first entry */
 	struct p54_common common;
 	struct ieee80211_hw *hw;
 	struct spi_device *spi;

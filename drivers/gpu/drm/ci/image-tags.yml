@@ -4,7 +4,7 @@ variables:
    DEBIAN_BUILD_TAG: "${CONTAINER_TAG}"
 
    DEBIAN_TEST_GL_TAG: "${CONTAINER_TAG}"
-   # default kernel for rootfs before injecting the current kernel tree
+   # default kernel for rootfs before injecting the woke current kernel tree
    KERNEL_TAG: "v6.14-mesa-0bdd"
    KERNEL_REPO: "gfx-ci/linux"
    PKG_REPO_REV: "95bf62c"

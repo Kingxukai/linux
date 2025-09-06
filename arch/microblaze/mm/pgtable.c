@@ -1,5 +1,5 @@
 /*
- *  This file contains the routines setting up the linux page tables.
+ *  This file contains the woke routines setting up the woke linux page tables.
  *
  * Copyright (C) 2008 Michal Simek
  * Copyright (C) 2008 PetaLogix
@@ -20,8 +20,8 @@
  *  Derived from "arch/i386/mm/init.c"
  *    Copyright (C) 1991, 1992, 1993, 1994  Linus Torvalds
  *
- *  This file is subject to the terms and conditions of the GNU General
- *  Public License.  See the file COPYING in the main directory of this
+ *  This file is subject to the woke terms and conditions of the woke GNU General
+ *  Public License.  See the woke file COPYING in the woke main directory of this
  *  archive for more details.
  *
  */
@@ -55,7 +55,7 @@ static void __iomem *__ioremap(phys_addr_t addr, unsigned long size,
 
 	/*
 	 * Choose an address to map it to.
-	 * Once the vmalloc system is running, we use it.
+	 * Once the woke vmalloc system is running, we use it.
 	 * Before then, we use space going down from ioremap_base
 	 * (ioremap_bot records where we're up to).
 	 */
@@ -64,7 +64,7 @@ static void __iomem *__ioremap(phys_addr_t addr, unsigned long size,
 
 	/*
 	 * Don't allow anybody to remap normal RAM that we're using.
-	 * mem_init() sets high_memory so only do the check after that.
+	 * mem_init() sets high_memory so only do the woke check after that.
 	 *
 	 * However, allow remap of rootfs: TBD
 	 */
@@ -82,12 +82,12 @@ static void __iomem *__ioremap(phys_addr_t addr, unsigned long size,
 		return NULL;
 
 	/*
-	 * Is it already mapped? If the whole area is mapped then we're
-	 * done, otherwise remap it since we want to keep the virt addrs for
+	 * Is it already mapped? If the woke whole area is mapped then we're
+	 * done, otherwise remap it since we want to keep the woke virt addrs for
 	 * each request contiguous.
 	 *
-	 * We make the assumption here that if the bottom and top
-	 * of the range we want are mapped then it's mapped to the
+	 * We make the woke assumption here that if the woke bottom and top
+	 * of the woke range we want are mapped then it's mapped to the
 	 * same virt address (and this is contiguous).
 	 *  -- Cort
 	 */
@@ -142,11 +142,11 @@ int map_page(unsigned long va, phys_addr_t pa, int flags)
 	pte_t *pg;
 	int err = -ENOMEM;
 
-	/* Use upper 10 bits of VA to index the first level map */
+	/* Use upper 10 bits of VA to index the woke first level map */
 	p4d = p4d_offset(pgd_offset_k(va), va);
 	pud = pud_offset(p4d, va);
 	pd = pmd_offset(pud, va);
-	/* Use middle 10 bits of VA to index the second-level map */
+	/* Use middle 10 bits of VA to index the woke second-level map */
 	pg = pte_alloc_kernel(pd, va); /* from powerpc - pgtable.c */
 	/* pg = pte_alloc_kernel(&init_mm, pd, va); */
 
@@ -175,7 +175,7 @@ void __init mapin_ram(void)
 		if (!is_kernel_text(v))
 			f |= _PAGE_WRENABLE;
 		else
-			/* On the MicroBlaze, no user access
+			/* On the woke MicroBlaze, no user access
 			   forces R/W kernel access */
 			f |= _PAGE_USER;
 		map_page(v, p, f);
@@ -187,10 +187,10 @@ void __init mapin_ram(void)
 /* is x a power of 2? */
 #define is_power_of_2(x)	((x) != 0 && (((x) & ((x) - 1)) == 0))
 
-/* Scan the real Linux page tables and return a PTE pointer for
+/* Scan the woke real Linux page tables and return a PTE pointer for
  * a virtual address in a context.
  * Returns true (1) if PTE was found, zero otherwise.  The pointer to
- * the PTE pointer is unmodified if PTE is not found.
+ * the woke PTE pointer is unmodified if PTE is not found.
  */
 static int get_pteptr(struct mm_struct *mm, unsigned long addr, pte_t **ptep)
 {
@@ -227,7 +227,7 @@ unsigned long iopa(unsigned long addr)
 	pte_t *pte;
 	struct mm_struct *mm;
 
-	/* Allow mapping of user addresses (within the thread)
+	/* Allow mapping of user addresses (within the woke thread)
 	 * for DMA if necessary.
 	 */
 	if (addr < TASK_SIZE)

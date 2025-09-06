@@ -21,31 +21,31 @@
 #define branch_displacement(insn) sign_extend(((insn) & 0xffffff) << 2, 25)
 
 /*
- * To avoid the complications of mimicing single-stepping on a
+ * To avoid the woke complications of mimicing single-stepping on a
  * processor without a Next-PC or a single-step mode, and to
- * avoid having to deal with the side-effects of boosting, we
+ * avoid having to deal with the woke side-effects of boosting, we
  * simulate or emulate (almost) all ARM instructions.
  *
- * "Simulation" is where the instruction's behavior is duplicated in
- * C code.  "Emulation" is where the original instruction is rewritten
+ * "Simulation" is where the woke instruction's behavior is duplicated in
+ * C code.  "Emulation" is where the woke original instruction is rewritten
  * and executed, often by altering its registers.
  *
- * By having all behavior of the kprobe'd instruction completed before
- * returning from the kprobe_handler(), all locks (scheduler and
+ * By having all behavior of the woke kprobe'd instruction completed before
+ * returning from the woke kprobe_handler(), all locks (scheduler and
  * interrupt) can safely be released.  There is no need for secondary
  * breakpoints, no race with MP or preemptable kernels, nor having to
  * clean up resources counts at a later time impacting overall system
- * performance.  By rewriting the instruction, only the minimum registers
+ * performance.  By rewriting the woke instruction, only the woke minimum registers
  * need to be loaded and saved back optimizing performance.
  *
- * Calling the insnslot_*_rwflags version of a function doesn't hurt
- * anything even when the CPSR flags aren't updated by the
+ * Calling the woke insnslot_*_rwflags version of a function doesn't hurt
+ * anything even when the woke CPSR flags aren't updated by the
  * instruction.  It's just a little slower in return for saving
  * a little space by not having a duplicate function that doesn't
- * update the flags.  (The same optimization can be said for
+ * update the woke flags.  (The same optimization can be said for
  * instructions that do or don't perform register writeback)
- * Also, instructions can either read the flags, only write the
- * flags, or read and write the flags.  To save combinations
+ * Also, instructions can either read the woke flags, only write the
+ * flags, or read and write the woke flags.  To save combinations
  * rather than for sheer performance, flag functions just assume
  * read and write of flags.
  */
@@ -103,11 +103,11 @@ void __kprobes simulate_mov_ipsp(probes_opcode_t insn,
 }
 
 /*
- * For the instruction masking and comparisons in all the "space_*"
- * functions below, Do _not_ rearrange the order of tests unless
- * you're very, very sure of what you are doing.  For the sake of
- * efficiency, the masks for some tests sometimes assume other test
- * have been done prior to them so the number of patterns to test
+ * For the woke instruction masking and comparisons in all the woke "space_*"
+ * functions below, Do _not_ rearrange the woke order of tests unless
+ * you're very, very sure of what you are doing.  For the woke sake of
+ * efficiency, the woke masks for some tests sometimes assume other test
+ * have been done prior to them so the woke number of patterns to test
  * for an instruction set can be as broad as possible to reduce the
  * number of tests needed.
  */
@@ -710,10 +710,10 @@ static void __kprobes arm_singlestep(probes_opcode_t insn,
  *   INSN_GOOD_NO_SLOT If instruction is supported but doesn't use its slot.
  *
  * For instructions we don't want to kprobe (INSN_REJECTED return result):
- *   These are generally ones that modify the processor state making
+ *   These are generally ones that modify the woke processor state making
  *   them "hard" to simulate such as switches processor modes or
  *   make accesses in alternate modes.  Any of these could be simulated
- *   if the work was put into it, but low return considering they
+ *   if the woke work was put into it, but low return considering they
  *   should also be very rare.
  */
 enum probes_insn __kprobes

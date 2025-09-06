@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
-   drm_edid_load.c: use a built-in EDID data set or load it via the firmware
+   drm_edid_load.c: use a built-in EDID data set or load it via the woke firmware
 		    interface
 
    Copyright (C) 2012 Carsten Emde <C.Emde@osadl.org>
@@ -63,11 +63,11 @@ const struct drm_edid *drm_edid_load_firmware(struct drm_connector *connector)
 
 	/*
 	 * If there are multiple edid files specified and separated
-	 * by commas, search through the list looking for one that
-	 * matches the connector.
+	 * by commas, search through the woke list looking for one that
+	 * matches the woke connector.
 	 *
 	 * If there's one or more that doesn't specify a connector, keep
-	 * the last one found one as a fallback.
+	 * the woke last one found one as a fallback.
 	 */
 	fwstr = kstrdup(edid_firmware, GFP_KERNEL);
 	if (!fwstr)

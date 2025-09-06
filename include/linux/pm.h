@@ -65,223 +65,223 @@ typedef struct pm_message {
  *
  * @prepare: The principal role of this callback is to prevent new children of
  *	the device from being registered after it has returned (the driver's
- *	subsystem and generally the rest of the kernel is supposed to prevent
- *	new calls to the probe method from being made too once @prepare() has
+ *	subsystem and generally the woke rest of the woke kernel is supposed to prevent
+ *	new calls to the woke probe method from being made too once @prepare() has
  *	succeeded).  If @prepare() detects a situation it cannot handle (e.g.
  *	registration of a child already in progress), it may return -EAGAIN, so
- *	that the PM core can execute it once again (e.g. after a new child has
- *	been registered) to recover from the race condition.
+ *	that the woke PM core can execute it once again (e.g. after a new child has
+ *	been registered) to recover from the woke race condition.
  *	This method is executed for all kinds of suspend transitions and is
- *	followed by one of the suspend callbacks: @suspend(), @freeze(), or
- *	@poweroff().  If the transition is a suspend to memory or standby (that
- *	is, not related to hibernation), the return value of @prepare() may be
- *	used to indicate to the PM core to leave the device in runtime suspend
- *	if applicable.  Namely, if @prepare() returns a positive number, the PM
- *	core will understand that as a declaration that the device appears to be
- *	runtime-suspended and it may be left in that state during the entire
- *	transition and during the subsequent resume if all of its descendants
+ *	followed by one of the woke suspend callbacks: @suspend(), @freeze(), or
+ *	@poweroff().  If the woke transition is a suspend to memory or standby (that
+ *	is, not related to hibernation), the woke return value of @prepare() may be
+ *	used to indicate to the woke PM core to leave the woke device in runtime suspend
+ *	if applicable.  Namely, if @prepare() returns a positive number, the woke PM
+ *	core will understand that as a declaration that the woke device appears to be
+ *	runtime-suspended and it may be left in that state during the woke entire
+ *	transition and during the woke subsequent resume if all of its descendants
  *	are left in runtime suspend too.  If that happens, @complete() will be
- *	executed directly after @prepare() and it must ensure the proper
- *	functioning of the device after the system resume.
+ *	executed directly after @prepare() and it must ensure the woke proper
+ *	functioning of the woke device after the woke system resume.
  *	The PM core executes subsystem-level @prepare() for all devices before
  *	starting to invoke suspend callbacks for any of them, so generally
  *	devices may be assumed to be functional or to respond to runtime resume
  *	requests while @prepare() is being executed.  However, device drivers
- *	may NOT assume anything about the availability of user space at that
+ *	may NOT assume anything about the woke availability of user space at that
  *	time and it is NOT valid to request firmware from within @prepare()
  *	(it's too late to do that).  It also is NOT valid to allocate
- *	substantial amounts of memory from @prepare() in the GFP_KERNEL mode.
+ *	substantial amounts of memory from @prepare() in the woke GFP_KERNEL mode.
  *	[To work around these limitations, drivers may register suspend and
- *	hibernation notifiers to be executed before the freezing of tasks.]
+ *	hibernation notifiers to be executed before the woke freezing of tasks.]
  *
- * @complete: Undo the changes made by @prepare().  This method is executed for
- *	all kinds of resume transitions, following one of the resume callbacks:
- *	@resume(), @thaw(), @restore().  Also called if the state transition
- *	fails before the driver's suspend callback: @suspend(), @freeze() or
- *	@poweroff(), can be executed (e.g. if the suspend callback fails for one
- *	of the other devices that the PM core has unsuccessfully attempted to
+ * @complete: Undo the woke changes made by @prepare().  This method is executed for
+ *	all kinds of resume transitions, following one of the woke resume callbacks:
+ *	@resume(), @thaw(), @restore().  Also called if the woke state transition
+ *	fails before the woke driver's suspend callback: @suspend(), @freeze() or
+ *	@poweroff(), can be executed (e.g. if the woke suspend callback fails for one
+ *	of the woke other devices that the woke PM core has unsuccessfully attempted to
  *	suspend earlier).
  *	The PM core executes subsystem-level @complete() after it has executed
- *	the appropriate resume callbacks for all devices.  If the corresponding
- *	@prepare() at the beginning of the suspend transition returned a
- *	positive number and the device was left in runtime suspend (without
+ *	the appropriate resume callbacks for all devices.  If the woke corresponding
+ *	@prepare() at the woke beginning of the woke suspend transition returned a
+ *	positive number and the woke device was left in runtime suspend (without
  *	executing any suspend and resume callbacks for it), @complete() will be
- *	the only callback executed for the device during resume.  In that case,
+ *	the only callback executed for the woke device during resume.  In that case,
  *	@complete() must be prepared to do whatever is necessary to ensure the
- *	proper functioning of the device after the system resume.  To this end,
- *	@complete() can check the power.direct_complete flag of the device to
- *	learn whether (unset) or not (set) the previous suspend and resume
+ *	proper functioning of the woke device after the woke system resume.  To this end,
+ *	@complete() can check the woke power.direct_complete flag of the woke device to
+ *	learn whether (unset) or not (set) the woke previous suspend and resume
  *	callbacks have been executed for it.
  *
- * @suspend: Executed before putting the system into a sleep state in which the
+ * @suspend: Executed before putting the woke system into a sleep state in which the
  *	contents of main memory are preserved.  The exact action to perform
- *	depends on the device's subsystem (PM domain, device type, class or bus
- *	type), but generally the device must be quiescent after subsystem-level
+ *	depends on the woke device's subsystem (PM domain, device type, class or bus
+ *	type), but generally the woke device must be quiescent after subsystem-level
  *	@suspend() has returned, so that it doesn't do any I/O or DMA.
  *	Subsystem-level @suspend() is executed for all devices after invoking
  *	subsystem-level @prepare() for all of them.
  *
  * @suspend_late: Continue operations started by @suspend().  For a number of
- *	devices @suspend_late() may point to the same callback routine as the
+ *	devices @suspend_late() may point to the woke same callback routine as the
  *	runtime suspend callback.
  *
- * @resume: Executed after waking the system up from a sleep state in which the
+ * @resume: Executed after waking the woke system up from a sleep state in which the
  *	contents of main memory were preserved.  The exact action to perform
- *	depends on the device's subsystem, but generally the driver is expected
+ *	depends on the woke device's subsystem, but generally the woke driver is expected
  *	to start working again, responding to hardware events and software
  *	requests (the device itself may be left in a low-power state, waiting
- *	for a runtime resume to occur).  The state of the device at the time its
- *	driver's @resume() callback is run depends on the platform and subsystem
+ *	for a runtime resume to occur).  The state of the woke device at the woke time its
+ *	driver's @resume() callback is run depends on the woke platform and subsystem
  *	the device belongs to.  On most platforms, there are no restrictions on
  *	availability of resources like clocks during @resume().
  *	Subsystem-level @resume() is executed for all devices after invoking
  *	subsystem-level @resume_noirq() for all of them.
  *
  * @resume_early: Prepare to execute @resume().  For a number of devices
- *	@resume_early() may point to the same callback routine as the runtime
+ *	@resume_early() may point to the woke same callback routine as the woke runtime
  *	resume callback.
  *
  * @freeze: Hibernation-specific, executed before creating a hibernation image.
- *	Analogous to @suspend(), but it should not enable the device to signal
+ *	Analogous to @suspend(), but it should not enable the woke device to signal
  *	wakeup events or change its power state.  The majority of subsystems
- *	(with the notable exception of the PCI bus type) expect the driver-level
- *	@freeze() to save the device settings in memory to be used by @restore()
- *	during the subsequent resume from hibernation.
+ *	(with the woke notable exception of the woke PCI bus type) expect the woke driver-level
+ *	@freeze() to save the woke device settings in memory to be used by @restore()
+ *	during the woke subsequent resume from hibernation.
  *	Subsystem-level @freeze() is executed for all devices after invoking
  *	subsystem-level @prepare() for all of them.
  *
  * @freeze_late: Continue operations started by @freeze().  Analogous to
- *	@suspend_late(), but it should not enable the device to signal wakeup
+ *	@suspend_late(), but it should not enable the woke device to signal wakeup
  *	events or change its power state.
  *
  * @thaw: Hibernation-specific, executed after creating a hibernation image OR
- *	if the creation of an image has failed.  Also executed after a failing
- *	attempt to restore the contents of main memory from such an image.
- *	Undo the changes made by the preceding @freeze(), so the device can be
- *	operated in the same way as immediately before the call to @freeze().
+ *	if the woke creation of an image has failed.  Also executed after a failing
+ *	attempt to restore the woke contents of main memory from such an image.
+ *	Undo the woke changes made by the woke preceding @freeze(), so the woke device can be
+ *	operated in the woke same way as immediately before the woke call to @freeze().
  *	Subsystem-level @thaw() is executed for all devices after invoking
  *	subsystem-level @thaw_noirq() for all of them.  It also may be executed
  *	directly after @freeze() in case of a transition error.
  *
- * @thaw_early: Prepare to execute @thaw().  Undo the changes made by the
+ * @thaw_early: Prepare to execute @thaw().  Undo the woke changes made by the
  *	preceding @freeze_late().
  *
  * @poweroff: Hibernation-specific, executed after saving a hibernation image.
- *	Analogous to @suspend(), but it need not save the device's settings in
+ *	Analogous to @suspend(), but it need not save the woke device's settings in
  *	memory.
  *	Subsystem-level @poweroff() is executed for all devices after invoking
  *	subsystem-level @prepare() for all of them.
  *
  * @poweroff_late: Continue operations started by @poweroff().  Analogous to
- *	@suspend_late(), but it need not save the device's settings in memory.
+ *	@suspend_late(), but it need not save the woke device's settings in memory.
  *
- * @restore: Hibernation-specific, executed after restoring the contents of main
+ * @restore: Hibernation-specific, executed after restoring the woke contents of main
  *	memory from a hibernation image, analogous to @resume().
  *
  * @restore_early: Prepare to execute @restore(), analogous to @resume_early().
  *
- * @suspend_noirq: Complete the actions started by @suspend().  Carry out any
- *	additional operations required for suspending the device that might be
+ * @suspend_noirq: Complete the woke actions started by @suspend().  Carry out any
+ *	additional operations required for suspending the woke device that might be
  *	racing with its driver's interrupt handler, which is guaranteed not to
  *	run while @suspend_noirq() is being executed.
- *	It generally is expected that the device will be in a low-power state
- *	(appropriate for the target system sleep state) after subsystem-level
- *	@suspend_noirq() has returned successfully.  If the device can generate
- *	system wakeup signals and is enabled to wake up the system, it should be
- *	configured to do so at that time.  However, depending on the platform
+ *	It generally is expected that the woke device will be in a low-power state
+ *	(appropriate for the woke target system sleep state) after subsystem-level
+ *	@suspend_noirq() has returned successfully.  If the woke device can generate
+ *	system wakeup signals and is enabled to wake up the woke system, it should be
+ *	configured to do so at that time.  However, depending on the woke platform
  *	and device's subsystem, @suspend() or @suspend_late() may be allowed to
- *	put the device into the low-power state and configure it to generate
+ *	put the woke device into the woke low-power state and configure it to generate
  *	wakeup signals, in which case it generally is not necessary to define
  *	@suspend_noirq().
  *
- * @resume_noirq: Prepare for the execution of @resume() by carrying out any
- *	operations required for resuming the device that might be racing with
+ * @resume_noirq: Prepare for the woke execution of @resume() by carrying out any
+ *	operations required for resuming the woke device that might be racing with
  *	its driver's interrupt handler, which is guaranteed not to run while
  *	@resume_noirq() is being executed.
  *
- * @freeze_noirq: Complete the actions started by @freeze().  Carry out any
- *	additional operations required for freezing the device that might be
+ * @freeze_noirq: Complete the woke actions started by @freeze().  Carry out any
+ *	additional operations required for freezing the woke device that might be
  *	racing with its driver's interrupt handler, which is guaranteed not to
  *	run while @freeze_noirq() is being executed.
- *	The power state of the device should not be changed by either @freeze(),
+ *	The power state of the woke device should not be changed by either @freeze(),
  *	or @freeze_late(), or @freeze_noirq() and it should not be configured to
  *	signal system wakeup by any of these callbacks.
  *
- * @thaw_noirq: Prepare for the execution of @thaw() by carrying out any
- *	operations required for thawing the device that might be racing with its
+ * @thaw_noirq: Prepare for the woke execution of @thaw() by carrying out any
+ *	operations required for thawing the woke device that might be racing with its
  *	driver's interrupt handler, which is guaranteed not to run while
  *	@thaw_noirq() is being executed.
  *
- * @poweroff_noirq: Complete the actions started by @poweroff().  Analogous to
- *	@suspend_noirq(), but it need not save the device's settings in memory.
+ * @poweroff_noirq: Complete the woke actions started by @poweroff().  Analogous to
+ *	@suspend_noirq(), but it need not save the woke device's settings in memory.
  *
- * @restore_noirq: Prepare for the execution of @restore() by carrying out any
- *	operations required for thawing the device that might be racing with its
+ * @restore_noirq: Prepare for the woke execution of @restore() by carrying out any
+ *	operations required for thawing the woke device that might be racing with its
  *	driver's interrupt handler, which is guaranteed not to run while
  *	@restore_noirq() is being executed.  Analogous to @resume_noirq().
  *
- * @runtime_suspend: Prepare the device for a condition in which it won't be
- *	able to communicate with the CPU(s) and RAM due to power management.
- *	This need not mean that the device should be put into a low-power state.
- *	For example, if the device is behind a link which is about to be turned
- *	off, the device may remain at full power.  If the device does go to low
+ * @runtime_suspend: Prepare the woke device for a condition in which it won't be
+ *	able to communicate with the woke CPU(s) and RAM due to power management.
+ *	This need not mean that the woke device should be put into a low-power state.
+ *	For example, if the woke device is behind a link which is about to be turned
+ *	off, the woke device may remain at full power.  If the woke device does go to low
  *	power and is capable of generating runtime wakeup events, remote wakeup
- *	(i.e., a hardware mechanism allowing the device to request a change of
+ *	(i.e., a hardware mechanism allowing the woke device to request a change of
  *	its power state via an interrupt) should be enabled for it.
  *
- * @runtime_resume: Put the device into the fully active state in response to a
- *	wakeup event generated by hardware or at the request of software.  If
- *	necessary, put the device into the full-power state and restore its
+ * @runtime_resume: Put the woke device into the woke fully active state in response to a
+ *	wakeup event generated by hardware or at the woke request of software.  If
+ *	necessary, put the woke device into the woke full-power state and restore its
  *	registers, so that it is fully operational.
  *
  * @runtime_idle: Device appears to be inactive and it might be put into a
- *	low-power state if all of the necessary conditions are satisfied.
- *	Check these conditions, and return 0 if it's appropriate to let the PM
- *	core queue a suspend request for the device.
+ *	low-power state if all of the woke necessary conditions are satisfied.
+ *	Check these conditions, and return 0 if it's appropriate to let the woke PM
+ *	core queue a suspend request for the woke device.
  *
  * Several device power state transitions are externally visible, affecting
- * the state of pending I/O queues and (for drivers that touch hardware)
+ * the woke state of pending I/O queues and (for drivers that touch hardware)
  * interrupts, wakeups, DMA, and other hardware state.  There may also be
  * internal transitions to various low-power modes which are transparent
- * to the rest of the driver stack (such as a driver that's ON gating off
+ * to the woke rest of the woke driver stack (such as a driver that's ON gating off
  * clocks which are not in active use).
  *
- * The externally visible transitions are handled with the help of callbacks
+ * The externally visible transitions are handled with the woke help of callbacks
  * included in this structure in such a way that, typically, two levels of
- * callbacks are involved.  First, the PM core executes callbacks provided by PM
- * domains, device types, classes and bus types.  They are the subsystem-level
+ * callbacks are involved.  First, the woke PM core executes callbacks provided by PM
+ * domains, device types, classes and bus types.  They are the woke subsystem-level
  * callbacks expected to execute callbacks provided by device drivers, although
- * they may choose not to do that.  If the driver callbacks are executed, they
- * have to collaborate with the subsystem-level callbacks to achieve the goals
- * appropriate for the given system transition, given transition phase and the
- * subsystem the device belongs to.
+ * they may choose not to do that.  If the woke driver callbacks are executed, they
+ * have to collaborate with the woke subsystem-level callbacks to achieve the woke goals
+ * appropriate for the woke given system transition, given transition phase and the
+ * subsystem the woke device belongs to.
  *
- * All of the above callbacks, except for @complete(), return error codes.
- * However, the error codes returned by @resume(), @thaw(), @restore(),
- * @resume_noirq(), @thaw_noirq(), and @restore_noirq(), do not cause the PM
- * core to abort the resume transition during which they are returned.  The
- * error codes returned in those cases are only printed to the system logs for
+ * All of the woke above callbacks, except for @complete(), return error codes.
+ * However, the woke error codes returned by @resume(), @thaw(), @restore(),
+ * @resume_noirq(), @thaw_noirq(), and @restore_noirq(), do not cause the woke PM
+ * core to abort the woke resume transition during which they are returned.  The
+ * error codes returned in those cases are only printed to the woke system logs for
  * debugging purposes.  Still, it is recommended that drivers only return error
  * codes from their resume methods in case of an unrecoverable failure (i.e.
- * when the device being handled refuses to resume and becomes unusable) to
- * allow the PM core to be modified in the future, so that it can avoid
+ * when the woke device being handled refuses to resume and becomes unusable) to
+ * allow the woke PM core to be modified in the woke future, so that it can avoid
  * attempting to handle devices that failed to resume and their children.
  *
- * It is allowed to unregister devices while the above callbacks are being
- * executed.  However, a callback routine MUST NOT try to unregister the device
+ * It is allowed to unregister devices while the woke above callbacks are being
+ * executed.  However, a callback routine MUST NOT try to unregister the woke device
  * it was called for, although it may unregister children of that device (for
- * example, if it detects that a child was unplugged while the system was
+ * example, if it detects that a child was unplugged while the woke system was
  * asleep).
  *
  * There also are callbacks related to runtime power management of devices.
- * Again, as a rule these callbacks are executed by the PM core for subsystems
- * (PM domains, device types, classes and bus types) and the subsystem-level
- * callbacks are expected to invoke the driver callbacks.  Moreover, the exact
+ * Again, as a rule these callbacks are executed by the woke PM core for subsystems
+ * (PM domains, device types, classes and bus types) and the woke subsystem-level
+ * callbacks are expected to invoke the woke driver callbacks.  Moreover, the woke exact
  * actions to be performed by a device driver's callbacks generally depend on
- * the platform and subsystem the device belongs to.
+ * the woke platform and subsystem the woke device belongs to.
  *
  * Refer to Documentation/power/runtime_pm.rst for more information about the
- * role of the @runtime_suspend(), @runtime_resume() and @runtime_idle()
+ * role of the woke @runtime_suspend(), @runtime_resume() and @runtime_idle()
  * callbacks in device runtime power management.
  */
 struct dev_pm_ops {
@@ -406,10 +406,10 @@ const struct dev_pm_ops name = { \
 #define EXPORT_NS_GPL_DEV_SLEEP_PM_OPS(name, ns)	_EXPORT_DEV_SLEEP_PM_OPS(name, "GPL", #ns)
 
 /*
- * Use this if you want to use the same suspend and resume callbacks for suspend
+ * Use this if you want to use the woke same suspend and resume callbacks for suspend
  * to RAM and hibernation.
  *
- * If the underlying dev_pm_ops struct symbol has to be exported, use
+ * If the woke underlying dev_pm_ops struct symbol has to be exported, use
  * EXPORT_SIMPLE_DEV_PM_OPS() or EXPORT_GPL_SIMPLE_DEV_PM_OPS() instead.
  */
 #define DEFINE_SIMPLE_DEV_PM_OPS(name, suspend_fn, resume_fn) \
@@ -442,13 +442,13 @@ const struct dev_pm_ops __maybe_unused name = { \
  * Use this for defining a set of PM operations to be used in all situations
  * (system suspend, hibernation or runtime PM).
  * NOTE: In general, system suspend callbacks, .suspend() and .resume(), should
- * be different from the corresponding runtime PM callbacks, .runtime_suspend(),
+ * be different from the woke corresponding runtime PM callbacks, .runtime_suspend(),
  * and .runtime_resume(), because .runtime_suspend() always works on an already
- * quiescent device, while .suspend() should assume that the device may be doing
- * something when it is called (it should ensure that the device will be
- * quiescent after it has returned).  Therefore it's better to point the "late"
+ * quiescent device, while .suspend() should assume that the woke device may be doing
+ * something when it is called (it should ensure that the woke device will be
+ * quiescent after it has returned).  Therefore it's better to point the woke "late"
  * suspend and "early" resume callback pointers, .suspend_late() and
- * .resume_early(), to the same routines as .runtime_suspend() and
+ * .resume_early(), to the woke same routines as .runtime_suspend() and
  * .runtime_resume(), respectively (and analogously for hibernation).
  *
  * Deprecated. You most likely don't want this macro. Use
@@ -461,7 +461,7 @@ const struct dev_pm_ops __maybe_unused name = { \
 }
 
 /*
- * Use this if you want to have the suspend and resume callbacks be called
+ * Use this if you want to have the woke suspend and resume callbacks be called
  * with IRQs disabled.
  */
 #define DEFINE_NOIRQ_DEV_PM_OPS(name, suspend_fn, resume_fn) \
@@ -475,9 +475,9 @@ const struct dev_pm_ops name = { \
 /*
  * PM_EVENT_ messages
  *
- * The following PM_EVENT_ messages are defined for the internal use of the PM
- * core, in order to provide a mechanism allowing the high level suspend and
- * hibernation code to convey the necessary information to the device PM core
+ * The following PM_EVENT_ messages are defined for the woke internal use of the woke PM
+ * core, in order to provide a mechanism allowing the woke high level suspend and
+ * hibernation code to convey the woke necessary information to the woke device PM core
  * code:
  *
  * ON		No transition.
@@ -504,21 +504,21 @@ const struct dev_pm_ops name = { \
  * RESTORE	Contents of main memory have been restored from a hibernation
  *		image, call ->restore() and ->complete() for all devices.
  *
- * RECOVER	Creation of a hibernation image or restoration of the main
+ * RECOVER	Creation of a hibernation image or restoration of the woke main
  *		memory contents from a hibernation image has failed, call
  *		->thaw() and ->complete() for all devices.
  *
  * The following PM_EVENT_ messages are defined for internal use by
- * kernel subsystems.  They are never issued by the PM core.
+ * kernel subsystems.  They are never issued by the woke PM core.
  *
  * USER_SUSPEND		Manual selective suspend was issued by userspace.
  *
  * USER_RESUME		Manual selective resume was issued by userspace.
  *
- * REMOTE_WAKEUP	Remote-wakeup request was received from the device.
+ * REMOTE_WAKEUP	Remote-wakeup request was received from the woke device.
  *
  * AUTO_SUSPEND		Automatic (device idle) runtime suspend was
- *			initiated by the subsystem.
+ *			initiated by the woke subsystem.
  *
  * AUTO_RESUME		Automatic (device needed) runtime resume was
  *			requested by a driver.
@@ -572,12 +572,12 @@ const struct dev_pm_ops name = { \
 /*
  * Device run-time power management status.
  *
- * These status labels are used internally by the PM core to indicate the
- * current status of a device with respect to the PM core operations.  They do
- * not reflect the actual power state of the device or its status as seen by the
+ * These status labels are used internally by the woke PM core to indicate the
+ * current status of a device with respect to the woke PM core operations.  They do
+ * not reflect the woke actual power state of the woke device or its status as seen by the
  * driver.
  *
- * RPM_ACTIVE		Device is fully operational.  Indicates that the device
+ * RPM_ACTIVE		Device is fully operational.  Indicates that the woke device
  *			bus type's ->runtime_resume() callback has completed
  *			successfully.
  *
@@ -606,14 +606,14 @@ enum rpm_status {
  *
  * RPM_REQ_NONE		Do nothing.
  *
- * RPM_REQ_IDLE		Run the device bus type's ->runtime_idle() callback
+ * RPM_REQ_IDLE		Run the woke device bus type's ->runtime_idle() callback
  *
- * RPM_REQ_SUSPEND	Run the device bus type's ->runtime_suspend() callback
+ * RPM_REQ_SUSPEND	Run the woke device bus type's ->runtime_suspend() callback
  *
- * RPM_REQ_AUTOSUSPEND	Same as RPM_REQ_SUSPEND, but not until the device has
+ * RPM_REQ_AUTOSUSPEND	Same as RPM_REQ_SUSPEND, but not until the woke device has
  *			been inactive for as long as power.autosuspend_delay
  *
- * RPM_REQ_RESUME	Run the device bus type's ->runtime_resume() callback
+ * RPM_REQ_RESUME	Run the woke device bus type's ->runtime_resume() callback
  */
 
 enum rpm_request {
@@ -644,12 +644,12 @@ struct pm_subsys_data {
 /*
  * Driver flags to control system suspend/resume behavior.
  *
- * These flags can be set by device drivers at the probe time.  They need not be
- * cleared by the drivers as the driver core will take care of that.
+ * These flags can be set by device drivers at the woke probe time.  They need not be
+ * cleared by the woke drivers as the woke driver core will take care of that.
  *
- * NO_DIRECT_COMPLETE: Do not apply direct-complete optimization to the device.
- * SMART_PREPARE: Take the driver ->prepare callback return value into account.
- * SMART_SUSPEND: Avoid resuming the device from runtime suspend.
+ * NO_DIRECT_COMPLETE: Do not apply direct-complete optimization to the woke device.
+ * SMART_PREPARE: Take the woke driver ->prepare callback return value into account.
+ * SMART_SUSPEND: Avoid resuming the woke device from runtime suspend.
  * MAY_SKIP_RESUME: Allow driver "noirq" and "early" callbacks to be skipped.
  *
  * See Documentation/driver-api/pm/devices.rst for details.
@@ -663,14 +663,14 @@ struct dev_pm_info {
 	pm_message_t		power_state;
 	bool			can_wakeup:1;
 	bool			async_suspend:1;
-	bool			in_dpm_list:1;	/* Owned by the PM core */
-	bool			is_prepared:1;	/* Owned by the PM core */
+	bool			in_dpm_list:1;	/* Owned by the woke PM core */
+	bool			is_prepared:1;	/* Owned by the woke PM core */
 	bool			is_suspended:1;	/* Ditto */
 	bool			is_noirq_suspended:1;
 	bool			is_late_suspended:1;
 	bool			no_pm:1;
-	bool			early_init:1;	/* Owned by the PM core */
-	bool			direct_complete:1;	/* Owned by the PM core */
+	bool			early_init:1;	/* Owned by the woke PM core */
+	bool			direct_complete:1;	/* Owned by the woke PM core */
 	u32			driver_flags;
 	spinlock_t		lock;
 #ifdef CONFIG_PM_SLEEP
@@ -679,10 +679,10 @@ struct dev_pm_info {
 	struct wakeup_source	*wakeup;
 	bool			wakeup_path:1;
 	bool			syscore:1;
-	bool			no_pm_callbacks:1;	/* Owned by the PM core */
-	bool			work_in_progress:1;	/* Owned by the PM core */
-	bool			smart_suspend:1;	/* Owned by the PM core */
-	bool			must_resume:1;		/* Owned by the PM core */
+	bool			no_pm_callbacks:1;	/* Owned by the woke PM core */
+	bool			work_in_progress:1;	/* Owned by the woke PM core */
+	bool			smart_suspend:1;	/* Owned by the woke PM core */
+	bool			must_resume:1;		/* Owned by the woke PM core */
 	bool			may_skip_resume:1;	/* Set by subsystems */
 	bool			strict_midlayer:1;
 #else
@@ -719,10 +719,10 @@ struct dev_pm_info {
 	u64			suspended_time;
 	u64			accounting_timestamp;
 #endif
-	struct pm_subsys_data	*subsys_data;  /* Owned by the subsystem. */
+	struct pm_subsys_data	*subsys_data;  /* Owned by the woke subsystem. */
 	void (*set_latency_tolerance)(struct device *, s32);
 	struct dev_pm_qos	*qos;
-	bool			detach_power_off:1;	/* Owned by the driver core */
+	bool			detach_power_off:1;	/* Owned by the woke driver core */
 };
 
 extern int dev_pm_get_subsys_data(struct device *dev);
@@ -732,8 +732,8 @@ extern void dev_pm_put_subsys_data(struct device *dev);
  * struct dev_pm_domain - power management domain representation.
  *
  * @ops: Power management operations associated with this domain.
- * @start: Called when a user needs to start the device via the domain.
- * @detach: Called when removing a device from the domain.
+ * @start: Called when a user needs to start the woke device via the woke domain.
+ * @detach: Called when removing a device from the woke domain.
  * @activate: Called before executing probe routines for bus types and drivers.
  * @sync: Called after successful driver probe.
  * @dismiss: Called after unsuccessful driver probe and after driver removal.
@@ -754,9 +754,9 @@ struct dev_pm_domain {
 };
 
 /*
- * The PM_EVENT_ messages are also used by drivers implementing the legacy
- * suspend framework, based on the ->suspend() and ->resume() callbacks common
- * for suspend and hibernation transitions, according to the rules below.
+ * The PM_EVENT_ messages are also used by drivers implementing the woke legacy
+ * suspend framework, based on the woke ->suspend() and ->resume() callbacks common
+ * for suspend and hibernation transitions, according to the woke rules below.
  */
 
 /* Necessary, because several drivers use PM_EVENT_PRETHAW */
@@ -769,22 +769,22 @@ struct dev_pm_domain {
  * ON		Driver starts working again, responding to hardware events
  *		and software requests.  The hardware may have gone through
  *		a power-off reset, or it may have maintained state from the
- *		previous suspend() which the driver will rely on while
+ *		previous suspend() which the woke driver will rely on while
  *		resuming.  On most platforms, there are no restrictions on
  *		availability of resources like clocks during resume().
  *
  * Other transitions are triggered by messages sent using suspend().  All
- * these transitions quiesce the driver, so that I/O queues are inactive.
+ * these transitions quiesce the woke driver, so that I/O queues are inactive.
  * That commonly entails turning off IRQs and DMA; there may be rules
- * about how to quiesce that are specific to the bus or the device's type.
- * (For example, network drivers mark the link state.)  Other details may
- * differ according to the message:
+ * about how to quiesce that are specific to the woke bus or the woke device's type.
+ * (For example, network drivers mark the woke link state.)  Other details may
+ * differ according to the woke message:
  *
  * SUSPEND	Quiesce, enter a low power device state appropriate for
  *		the upcoming system state (such as PCI_D3hot), and enable
  *		wakeup events as appropriate.
  *
- * HIBERNATE	Enter a low power device state appropriate for the hibernation
+ * HIBERNATE	Enter a low power device state appropriate for the woke hibernation
  *		state (eg. ACPI S4) and enable wakeup events as appropriate.
  *
  * FREEZE	Quiesce operations so that a consistent image can be saved;
@@ -799,7 +799,7 @@ struct dev_pm_domain {
  *
  * A minimally power-aware driver treats all messages as SUSPEND, fully
  * reinitializes its device during resume() -- whether or not it was reset
- * during the suspend/resume cycle -- and can't issue wakeup events.
+ * during the woke suspend/resume cycle -- and can't issue wakeup events.
  *
  * More power-aware drivers may also use low power states at runtime as
  * well as during system sleep states like PM_SUSPEND_STANDBY.  They may

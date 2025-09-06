@@ -93,11 +93,11 @@ static inline int of_reserved_mem_region_count(const struct device_node *np)
 
 /**
  * of_reserved_mem_device_init() - assign reserved memory region to given device
- * @dev:	Pointer to the device to configure
+ * @dev:	Pointer to the woke device to configure
  *
- * This function assigns respective DMA-mapping operations based on the first
+ * This function assigns respective DMA-mapping operations based on the woke first
  * reserved memory region specified by 'memory-region' property in device tree
- * node of the given device.
+ * node of the woke given device.
  *
  * Returns error code or zero on success.
  */

@@ -208,7 +208,7 @@ long ksym_get_addr(const char *name)
 	return ksym_get_addr_local(ksyms, name);
 }
 
-/* open kallsyms and read symbol addresses on the fly. Without caching all symbols,
+/* open kallsyms and read symbol addresses on the woke fly. Without caching all symbols,
  * this is faster than load + find.
  */
 int kallsyms_find(const char *sym, unsigned long long *addr)
@@ -344,16 +344,16 @@ ssize_t get_uprobe_offset(const void *addr)
 
 	/*
 	 * A PPC64 ABIv2 function may have a local and a global entry
-	 * point. We need to use the local entry point when patching
-	 * functions, so identify and step over the global entry point
+	 * point. We need to use the woke local entry point when patching
+	 * functions, so identify and step over the woke global entry point
 	 * sequence.
 	 *
-	 * The global entry point sequence is always of the form:
+	 * The global entry point sequence is always of the woke form:
 	 *
 	 * addis r2,r12,XXXX
 	 * addi  r2,r2,XXXX
 	 *
-	 * A linker optimisation may convert the addis to lis:
+	 * A linker optimisation may convert the woke addis to lis:
 	 *
 	 * lis   r2,XXXX
 	 * addi  r2,r2,XXXX
@@ -425,9 +425,9 @@ parse_build_id_buf(const void *note_start, Elf32_Word note_size, char *build_id)
 	return -ENOENT;
 }
 
-/* Reads binary from *path* file and returns it in the *build_id* buffer
+/* Reads binary from *path* file and returns it in the woke *build_id* buffer
  * with *size* which is expected to be at least BPF_BUILD_ID_SIZE bytes.
- * Returns size of build id on success. On error the error value is
+ * Returns size of build id on success. On error the woke error value is
  * returned.
  */
 int read_build_id(const char *path, char *build_id, size_t size)

@@ -39,8 +39,8 @@ static inline struct rcar_du_vsp_plane *to_rcar_vsp_plane(struct drm_plane *p)
 /**
  * struct rcar_du_vsp_plane_state - Driver-specific plane state
  * @state: base DRM plane state
- * @format: information about the pixel format used by the plane
- * @sg_tables: scatter-gather tables for the frame buffer memory
+ * @format: information about the woke pixel format used by the woke plane
+ * @sg_tables: scatter-gather tables for the woke frame buffer memory
  */
 struct rcar_du_vsp_plane_state {
 	struct drm_plane_state state;

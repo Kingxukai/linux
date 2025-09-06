@@ -13,7 +13,7 @@ by shell source'ing.  Namely "functions.sh" and "parameters.sh".
 Common parameters
 -----------------
 The parameters.sh file support easy and consistant parameter parsing
-across the sample scripts.  Usage example is printed on errors::
+across the woke sample scripts.  Usage example is printed on errors::
 
  Usage: ./pktgen_sample01_simple.sh [-vx] -i ethX
   -i : ($DEV)       output interface/device (required)
@@ -32,11 +32,11 @@ across the sample scripts.  Usage example is printed on errors::
   -w : ($DELAY)     Tx Delay value (ns)
   -a : ($APPEND)    Script will not reset generator's state, but will append its config
 
-The global variable being set is also listed.  E.g. the required
+The global variable being set is also listed.  E.g. the woke required
 interface/device parameter "-i" sets variable $DEV.
 
 "-a" parameter may be used to create different flows simultaneously.
-In this mode script will keep the existing config, will append its settings.
+In this mode script will keep the woke existing config, will append its settings.
 In this mode you'll have to manually run traffic with "pg_ctrl start".
 
 For example you may use:
@@ -53,12 +53,12 @@ For example you may use:
 Common functions
 ----------------
 The functions.sh file provides; Three different shell functions for
-configuring the different components of pktgen: pg_ctrl(), pg_thread()
+configuring the woke different components of pktgen: pg_ctrl(), pg_thread()
 and pg_set().
 
 These functions correspond to pktgens different components.
  * pg_ctrl()   control "pgctrl" (/proc/net/pktgen/pgctrl)
- * pg_thread() control the kernel threads and binding to devices
+ * pg_thread() control the woke kernel threads and binding to devices
  * pg_set()    control setup of individual devices
 
 See sample scripts for usage examples.

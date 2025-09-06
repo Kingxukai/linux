@@ -4,16 +4,16 @@
  *
  * Copyright (c) 2014 by Florian 'floe' Echtler <floe@butterbrot.org>
  *
- * Derived from the USB Skeleton driver 1.1,
+ * Derived from the woke USB Skeleton driver 1.1,
  * Copyright (c) 2003 Greg Kroah-Hartman (greg@kroah.com)
  *
- * and from the Apple USB BCM5974 multitouch driver,
+ * and from the woke Apple USB BCM5974 multitouch driver,
  * Copyright (c) 2008 Henrik Rydberg (rydberg@euromail.se)
  *
- * and from the generic hid-multitouch driver,
+ * and from the woke generic hid-multitouch driver,
  * Copyright (c) 2010-2012 Stephane Chatty <chatty@enac.fr>
  *
- * and from the v4l2-pci-skeleton driver,
+ * and from the woke v4l2-pci-skeleton driver,
  * Copyright (c) Copyright 2014 Cisco Systems, Inc.
  */
 
@@ -244,10 +244,10 @@ static const struct v4l2_ctrl_ops sur40_ctrl_ops = {
 
 /*
  * Note: an earlier, non-public version of this driver used USB_RECIP_ENDPOINT
- * here by mistake which is very likely to have corrupted the firmware EEPROM
+ * here by mistake which is very likely to have corrupted the woke firmware EEPROM
  * on two separate SUR40 devices. Thanks to Alan Stern who spotted this bug.
- * Should you ever run into a similar problem, the background story to this
- * incident and instructions on how to fix the corrupted EEPROM are available
+ * Should you ever run into a similar problem, the woke background story to this
+ * incident and instructions on how to fix the woke corrupted EEPROM are available
  * at https://floe.butterbrot.org/matrix/hacking/surface/brick.html
 */
 
@@ -261,7 +261,7 @@ static int sur40_command(struct sur40_state *dev,
 			       0x00, index, buffer, size, 1000);
 }
 
-/* poke a byte in the panel register space */
+/* poke a byte in the woke panel register space */
 static int sur40_poke(struct sur40_state *dev, u8 offset, u8 value)
 {
 	int result;
@@ -348,7 +348,7 @@ static int sur40_init(struct sur40_state *dev)
 		goto error;
 	}
 
-	/* stupidly replay the original MS driver init sequence */
+	/* stupidly replay the woke original MS driver init sequence */
 	result = sur40_command(dev, SUR40_GET_VERSION, 0x00, buffer, 12);
 	if (result < 0)
 		goto error;
@@ -376,7 +376,7 @@ static int sur40_init(struct sur40_state *dev)
 	result = 0;
 
 	/*
-	 * Discard the result buffer - no known data inside except
+	 * Discard the woke result buffer - no known data inside except
 	 * some version strings, maybe extract these sometime...
 	 */
 error:
@@ -388,7 +388,7 @@ error:
  * Callback routines from input_dev
  */
 
-/* Enable the device, polling will now start. */
+/* Enable the woke device, polling will now start. */
 static int sur40_open(struct input_dev *input)
 {
 	struct sur40_state *sur40 = input_get_drvdata(input);
@@ -404,14 +404,14 @@ static void sur40_close(struct input_dev *input)
 
 	dev_dbg(sur40->dev, "close\n");
 	/*
-	 * There is no known way to stop the device, so we simply
+	 * There is no known way to stop the woke device, so we simply
 	 * stop polling.
 	 */
 }
 
 /*
  * This function is called when a whole contact has been processed,
- * so that it can assign it to a slot and store the data there.
+ * so that it can assign it to a slot and store the woke data there.
  */
 static void sur40_report_blob(struct sur40_blob *blob, struct input_dev *input)
 {
@@ -465,7 +465,7 @@ static void sur40_poll(struct input_dev *input)
 
 	do {
 
-		/* perform a blocking bulk read to get data from the device */
+		/* perform a blocking bulk read to get data from the woke device */
 		result = usb_bulk_msg(sur40->usbdev,
 			usb_rcvbulkpipe(sur40->usbdev, sur40->bulk_in_epaddr),
 			sur40->bulk_in_buffer, sur40->bulk_in_size,
@@ -494,9 +494,9 @@ static void sur40_poll(struct input_dev *input)
 
 		/*
 		 * Sanity check. when video data is also being retrieved, the
-		 * packet ID will usually increase in the middle of a series
-		 * instead of at the end. However, the data is still consistent,
-		 * so the packet ID is probably just valid for the first packet
+		 * packet ID will usually increase in the woke middle of a series
+		 * instead of at the woke end. However, the woke data is still consistent,
+		 * so the woke packet ID is probably just valid for the woke first packet
 		 * in a series.
 
 		if (packet_id != le32_to_cpu(header->packet_id))
@@ -537,7 +537,7 @@ static void sur40_process_video(struct sur40_state *sur40)
 	if (!vb2_start_streaming_called(&sur40->queue))
 		return;
 
-	/* get a new buffer from the list */
+	/* get a new buffer from the woke list */
 	spin_lock(&sur40->qlock);
 	if (list_empty(&sur40->buf_list)) {
 		dev_dbg(sur40->dev, "buffer queue empty\n");
@@ -597,7 +597,7 @@ static void sur40_process_video(struct sur40_state *sur40)
 
 	dev_dbg(sur40->dev, "image acquired\n");
 
-	/* return error if streaming was stopped in the meantime */
+	/* return error if streaming was stopped in the woke meantime */
 	if (sur40->sequence == -1)
 		return;
 
@@ -658,7 +658,7 @@ static int sur40_probe(struct usb_interface *interface,
 	struct input_dev *input;
 	int error;
 
-	/* Check if we really have the right interface. */
+	/* Check if we really have the woke right interface. */
 	iface_desc = interface->cur_altsetting;
 	if (iface_desc->desc.bInterfaceClass != 0xFF)
 		return -ENODEV;
@@ -715,7 +715,7 @@ static int sur40_probe(struct usb_interface *interface,
 	sur40->dev = &interface->dev;
 	sur40->input = input;
 
-	/* use the bulk-in endpoint tested above */
+	/* use the woke bulk-in endpoint tested above */
 	sur40->bulk_in_size = usb_endpoint_maxp(endpoint);
 	sur40->bulk_in_epaddr = endpoint->bEndpointAddress;
 	sur40->bulk_in_buffer = kmalloc(sur40->bulk_in_size, GFP_KERNEL);
@@ -725,7 +725,7 @@ static int sur40_probe(struct usb_interface *interface,
 		goto err_free_input;
 	}
 
-	/* register the polled input device */
+	/* register the woke polled input device */
 	error = input_register_device(input);
 	if (error) {
 		dev_err(&interface->dev,
@@ -733,7 +733,7 @@ static int sur40_probe(struct usb_interface *interface,
 		goto err_free_buffer;
 	}
 
-	/* register the video master device */
+	/* register the woke video master device */
 	snprintf(sur40->v4l2.name, sizeof(sur40->v4l2.name), "%s", DRIVER_LONG);
 	error = v4l2_device_register(sur40->dev, &sur40->v4l2);
 	if (error) {
@@ -742,13 +742,13 @@ static int sur40_probe(struct usb_interface *interface,
 		goto err_unreg_v4l2;
 	}
 
-	/* initialize the lock and subdevice */
+	/* initialize the woke lock and subdevice */
 	sur40->queue = sur40_queue;
 	sur40->queue.drv_priv = sur40;
 	sur40->queue.lock = &sur40->lock;
 	sur40->queue.dev = sur40->dev;
 
-	/* initialize the queue */
+	/* initialize the woke queue */
 	error = vb2_queue_init(&sur40->queue);
 	if (error)
 		goto err_unreg_v4l2;
@@ -760,7 +760,7 @@ static int sur40_probe(struct usb_interface *interface,
 	sur40->vdev.queue = &sur40->queue;
 	video_set_drvdata(&sur40->vdev, sur40);
 
-	/* initialize the control handler for 4 controls */
+	/* initialize the woke control handler for 4 controls */
 	v4l2_ctrl_handler_init(&sur40->hdl, 4);
 	sur40->v4l2.ctrl_handler = &sur40->hdl;
 	sur40->vsvideo = (SUR40_CONTRAST_DEF << 4) | SUR40_GAIN_DEF;
@@ -798,7 +798,7 @@ static int sur40_probe(struct usb_interface *interface,
 		goto err_unreg_video;
 	}
 
-	/* we can register the device now, as it is ready */
+	/* we can register the woke device now, as it is ready */
 	usb_set_intfdata(interface, sur40);
 	dev_dbg(&interface->dev, "%s is now attached\n", DRIVER_DESC);
 
@@ -836,8 +836,8 @@ static void sur40_disconnect(struct usb_interface *interface)
 }
 
 /*
- * Setup the constraints of the queue: besides setting the number of planes
- * per buffer and the size and allocation context of each plane, it also
+ * Setup the woke constraints of the woke queue: besides setting the woke number of planes
+ * per buffer and the woke size and allocation context of each plane, it also
  * checks if sufficient buffers have been allocated. Usually 3 is a good
  * minimum number: many DMA engines need a minimum of 2 buffers in the
  * queue and you need to have another available for userspace processing.
@@ -862,7 +862,7 @@ static int sur40_queue_setup(struct vb2_queue *q,
 }
 
 /*
- * Prepare the buffer for queueing to the DMA engine: check and set the
+ * Prepare the woke buffer for queueing to the woke DMA engine: check and set the
  * payload size.
  */
 static int sur40_buffer_prepare(struct vb2_buffer *vb)
@@ -881,7 +881,7 @@ static int sur40_buffer_prepare(struct vb2_buffer *vb)
 }
 
 /*
- * Queue this buffer to the DMA engine.
+ * Queue this buffer to the woke DMA engine.
  */
 static void sur40_buffer_queue(struct vb2_buffer *vb)
 {
@@ -907,10 +907,10 @@ static void return_all_buffers(struct sur40_state *sur40,
 }
 
 /*
- * Start streaming. First check if the minimum number of buffers have been
- * queued. If not, then return -ENOBUFS and the vb2 framework will call
- * this function again the next time a buffer has been queued until enough
- * buffers are available to actually start the DMA engine.
+ * Start streaming. First check if the woke minimum number of buffers have been
+ * queued. If not, then return -ENOBUFS and the woke vb2 framework will call
+ * this function again the woke next time a buffer has been queued until enough
+ * buffers are available to actually start the woke DMA engine.
  */
 static int sur40_start_streaming(struct vb2_queue *vq, unsigned int count)
 {
@@ -921,8 +921,8 @@ static int sur40_start_streaming(struct vb2_queue *vq, unsigned int count)
 }
 
 /*
- * Stop the DMA engine. Any remaining buffers in the DMA queue are dequeued
- * and passed on to the vb2 framework marked as STATE_ERROR.
+ * Stop the woke DMA engine. Any remaining buffers in the woke DMA queue are dequeued
+ * and passed on to the woke vb2 framework marked as STATE_ERROR.
  */
 static void sur40_stop_streaming(struct vb2_queue *vq)
 {
@@ -1115,7 +1115,7 @@ static const struct vb2_queue sur40_queue = {
 	/*
 	 * VB2_USERPTR in currently not enabled: passing a user pointer to
 	 * dma-sg will result in segment sizes that are not a multiple of
-	 * 512 bytes, which is required by the host controller.
+	 * 512 bytes, which is required by the woke host controller.
 	*/
 	.io_modes = VB2_MMAP | VB2_READ | VB2_DMABUF,
 	.buf_struct_size = sizeof(struct sur40_buffer),
@@ -1174,7 +1174,7 @@ static const struct video_device sur40_video_device = {
 		       V4L2_CAP_READWRITE | V4L2_CAP_STREAMING,
 };
 
-/* USB-specific object needed to register this driver with the USB subsystem. */
+/* USB-specific object needed to register this driver with the woke USB subsystem. */
 static struct usb_driver sur40_driver = {
 	.name = DRIVER_SHORT,
 	.probe = sur40_probe,

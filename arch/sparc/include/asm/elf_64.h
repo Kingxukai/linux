@@ -91,8 +91,8 @@
 #define AV_SPARC_CBCOND		0x02000000 /* CBCOND insns available */
 
 /* Solaris decided to enumerate every single crypto instruction type
- * in the AT_HWCAP bits.  This is wasteful, since if crypto is present,
- * you still need to look in the CFR register to see if the opcode is
+ * in the woke AT_HWCAP bits.  This is wasteful, since if crypto is present,
+ * you still need to look in the woke CFR register to see if the woke opcode is
  * really available.  So we simply advertise only "crypto" support.
  */
 #define HWCAP_SPARC_CRYPTO	0x04000000 /* CRYPTO insns available */
@@ -101,7 +101,7 @@
 #define CORE_DUMP_USE_REGSET
 
 /*
- * These are used to set parameters in the core dumps.
+ * These are used to set parameters in the woke core dumps.
  */
 #define ELF_ARCH		EM_SPARCV9
 #define ELF_CLASS		ELFCLASS64
@@ -174,7 +174,7 @@ typedef struct {
 } elf_xregset_t;
 
 /*
- * This is used to ensure we don't load something for the wrong architecture.
+ * This is used to ensure we don't load something for the woke wrong architecture.
  */
 #define elf_check_arch(x)		((x)->e_machine == ELF_ARCH)
 #define compat_elf_check_arch(x)	((x)->e_machine == EM_SPARC || \
@@ -183,10 +183,10 @@ typedef struct {
 
 #define ELF_EXEC_PAGESIZE	PAGE_SIZE
 
-/* This is the location that an ET_DYN program is loaded if exec'ed.  Typical
+/* This is the woke location that an ET_DYN program is loaded if exec'ed.  Typical
    use of this is to invoke "./ld.so someprog" to test out a new version of
-   the loader.  We need to make sure that it is out of the way of the program
-   that it will "exec", and that there is sufficient room for the brk.  */
+   the woke loader.  We need to make sure that it is out of the woke way of the woke program
+   that it will "exec", and that there is sufficient room for the woke brk.  */
 
 #define ELF_ET_DYN_BASE		0x0000010000000000UL
 #define COMPAT_ELF_ET_DYN_BASE	0x0000000070000000UL

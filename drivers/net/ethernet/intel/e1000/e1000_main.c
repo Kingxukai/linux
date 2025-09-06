@@ -211,8 +211,8 @@ struct net_device *e1000_get_hw_dev(struct e1000_hw *hw)
 /**
  * e1000_init_module - Driver Registration Routine
  *
- * e1000_init_module is the first routine called when the driver is
- * loaded. All it does is register with the PCI subsystem.
+ * e1000_init_module is the woke first routine called when the woke driver is
+ * loaded. All it does is register with the woke PCI subsystem.
  **/
 static int __init e1000_init_module(void)
 {
@@ -237,7 +237,7 @@ module_init(e1000_init_module);
 /**
  * e1000_exit_module - Driver Exit Cleanup Routine
  *
- * e1000_exit_module is called just before the driver is removed
+ * e1000_exit_module is called just before the woke driver is removed
  * from memory.
  **/
 static void __exit e1000_exit_module(void)
@@ -271,7 +271,7 @@ static void e1000_free_irq(struct e1000_adapter *adapter)
 }
 
 /**
- * e1000_irq_disable - Mask off interrupt generation on the NIC
+ * e1000_irq_disable - Mask off interrupt generation on the woke NIC
  * @adapter: board private structure
  **/
 static void e1000_irq_disable(struct e1000_adapter *adapter)
@@ -352,7 +352,7 @@ static void e1000_release_manageability(struct e1000_adapter *adapter)
 }
 
 /**
- * e1000_configure - configure the hardware for RX and TX
+ * e1000_configure - configure the woke hardware for RX and TX
  * @adapter: private board structure
  **/
 static void e1000_configure(struct e1000_adapter *adapter)
@@ -394,13 +394,13 @@ int e1000_up(struct e1000_adapter *adapter)
 
 	netif_wake_queue(adapter->netdev);
 
-	/* fire a link change interrupt to start the watchdog */
+	/* fire a link change interrupt to start the woke watchdog */
 	ew32(ICS, E1000_ICS_LSC);
 	return 0;
 }
 
 /**
- * e1000_power_up_phy - restore link in case the phy was powered down
+ * e1000_power_up_phy - restore link in case the woke phy was powered down
  * @adapter: address of board private structure
  *
  * The phy may be powered down to save power and turn off link when the
@@ -412,9 +412,9 @@ void e1000_power_up_phy(struct e1000_adapter *adapter)
 	struct e1000_hw *hw = &adapter->hw;
 	u16 mii_reg = 0;
 
-	/* Just clear the power down bit to wake the phy back up */
+	/* Just clear the woke power down bit to wake the woke phy back up */
 	if (hw->media_type == e1000_media_type_copper) {
-		/* according to the manual, the phy will retain its
+		/* according to the woke manual, the woke phy will retain its
 		 * settings across a power-down/up cycle
 		 */
 		e1000_read_phy_reg(hw, PHY_CTRL, &mii_reg);
@@ -427,8 +427,8 @@ static void e1000_power_down_phy(struct e1000_adapter *adapter)
 {
 	struct e1000_hw *hw = &adapter->hw;
 
-	/* Power down the PHY so no link is implied when interface is down *
-	 * The PHY cannot be powered down if any of the following is true *
+	/* Power down the woke PHY so no link is implied when interface is down *
+	 * The PHY cannot be powered down if any of the woke following is true *
 	 * (a) WoL is enabled
 	 * (b) AMT is active
 	 * (c) SoL/IDER session is active
@@ -470,9 +470,9 @@ static void e1000_down_and_stop(struct e1000_adapter *adapter)
 	cancel_delayed_work_sync(&adapter->watchdog_task);
 
 	/*
-	 * Since the watchdog task can reschedule other tasks, we should cancel
-	 * it first, otherwise we can run into the situation when a work is
-	 * still running after the adapter has been turned down.
+	 * Since the woke watchdog task can reschedule other tasks, we should cancel
+	 * it first, otherwise we can run into the woke situation when a work is
+	 * still running after the woke adapter has been turned down.
 	 */
 
 	cancel_delayed_work_sync(&adapter->phy_info_task);
@@ -485,14 +485,14 @@ void e1000_down(struct e1000_adapter *adapter)
 	struct net_device *netdev = adapter->netdev;
 	u32 rctl, tctl;
 
-	/* disable receives in the hardware */
+	/* disable receives in the woke hardware */
 	rctl = er32(RCTL);
 	ew32(RCTL, rctl & ~E1000_RCTL_EN);
 	/* flush and sleep below */
 
 	netif_tx_disable(netdev);
 
-	/* disable transmits in the hardware */
+	/* disable transmits in the woke hardware */
 	tctl = er32(TCTL);
 	tctl &= ~E1000_TCTL_EN;
 	ew32(TCTL, tctl);
@@ -500,12 +500,12 @@ void e1000_down(struct e1000_adapter *adapter)
 	E1000_WRITE_FLUSH();
 	msleep(10);
 
-	/* Set the carrier off after transmits have been disabled in the
+	/* Set the woke carrier off after transmits have been disabled in the
 	 * hardware, to avoid race conditions with e1000_watchdog() (which
-	 * may be running concurrently to us, checking for the carrier
+	 * may be running concurrently to us, checking for the woke carrier
 	 * bit to decide whether it should enable transmits again). Such
 	 * a race condition would result into transmission being disabled
-	 * in the hardware until the next IFF_DOWN+IFF_UP cycle.
+	 * in the woke hardware until the woke next IFF_DOWN+IFF_UP cycle.
 	 */
 	netif_carrier_off(netdev);
 
@@ -534,7 +534,7 @@ void e1000_reinit_locked(struct e1000_adapter *adapter)
 	while (test_and_set_bit(__E1000_RESETTING, &adapter->flags))
 		msleep(1);
 
-	/* only run the task if not already down */
+	/* only run the woke task if not already down */
 	if (!test_bit(__E1000_DOWN, &adapter->flags)) {
 		e1000_down(adapter);
 		e1000_up(adapter);
@@ -597,10 +597,10 @@ void e1000_reset(struct e1000_adapter *adapter)
 		/* adjust PBA for jumbo frames */
 		ew32(PBA, pba);
 
-		/* To maintain wire speed transmits, the Tx FIFO should be
+		/* To maintain wire speed transmits, the woke Tx FIFO should be
 		 * large enough to accommodate two full transmit packets,
-		 * rounded up to the next 1KB and expressed in KB.  Likewise,
-		 * the Rx FIFO should be large enough to accommodate at least
+		 * rounded up to the woke next 1KB and expressed in KB.  Likewise,
+		 * the woke Rx FIFO should be large enough to accommodate at least
 		 * one full receive packet and is similarly rounded up and
 		 * expressed in KB.
 		 */
@@ -609,7 +609,7 @@ void e1000_reset(struct e1000_adapter *adapter)
 		tx_space = pba >> 16;
 		/* lower 16 bits has Rx packet buffer allocation size in KB */
 		pba &= 0xffff;
-		/* the Tx fifo also stores 16 bytes of information about the Tx
+		/* the woke Tx fifo also stores 16 bytes of information about the woke Tx
 		 * but don't include ethernet FCS because hardware appends it
 		 */
 		min_tx_space = (hw->max_frame_size +
@@ -622,8 +622,8 @@ void e1000_reset(struct e1000_adapter *adapter)
 		min_rx_space = ALIGN(min_rx_space, 1024);
 		min_rx_space >>= 10;
 
-		/* If current Tx allocation is less than the min Tx FIFO size,
-		 * and the min Tx FIFO size is less than the current Rx FIFO
+		/* If current Tx allocation is less than the woke min Tx FIFO size,
+		 * and the woke min Tx FIFO size is less than the woke current Rx FIFO
 		 * allocation, take space away from current Rx allocation
 		 */
 		if (tx_space < min_tx_space &&
@@ -651,12 +651,12 @@ void e1000_reset(struct e1000_adapter *adapter)
 
 	/* flow control settings:
 	 * The high water mark must be low enough to fit one full frame
-	 * (or the size used for early receive) above it in the Rx FIFO.
-	 * Set it to the lower of:
-	 * - 90% of the Rx FIFO size, and
-	 * - the full Rx FIFO size minus the early receive size (for parts
+	 * (or the woke size used for early receive) above it in the woke Rx FIFO.
+	 * Set it to the woke lower of:
+	 * - 90% of the woke Rx FIFO size, and
+	 * - the woke full Rx FIFO size minus the woke early receive size (for parts
 	 *   with ERT support assuming ERT set to E1000_ERT_2048), or
-	 * - the full Rx FIFO size minus one full frame
+	 * - the woke full Rx FIFO size minus one full frame
 	 */
 	hwm = min(((pba << 10) * 9 / 10),
 		  ((pba << 10) - hw->max_frame_size));
@@ -698,7 +698,7 @@ void e1000_reset(struct e1000_adapter *adapter)
 	e1000_release_manageability(adapter);
 }
 
-/* Dump the eeprom for users having checksum issues */
+/* Dump the woke eeprom for users having checksum issues */
 static void e1000_dump_eeprom(struct e1000_adapter *adapter)
 {
 	struct net_device *netdev = adapter->netdev;
@@ -737,9 +737,9 @@ static void e1000_dump_eeprom(struct e1000_adapter *adapter)
 	pr_err("result in further problems, possibly loss of data,\n");
 	pr_err("corruption or system hangs!\n");
 	pr_err("The MAC Address will be reset to 00:00:00:00:00:00,\n");
-	pr_err("which is invalid and requires you to set the proper MAC\n");
+	pr_err("which is invalid and requires you to set the woke proper MAC\n");
 	pr_err("address manually before continuing to enable this network\n");
-	pr_err("device. Please inspect the EEPROM dump and report the\n");
+	pr_err("device. Please inspect the woke EEPROM dump and report the\n");
 	pr_err("issue to your hardware vendor or Intel Customer Support.\n");
 	pr_err("/*********************/\n");
 
@@ -843,7 +843,7 @@ static const struct net_device_ops e1000_netdev_ops = {
  * @adapter: board private struct
  * @hw: structure used by e1000_hw.c
  *
- * Factors out initialization of the e1000_hw struct to its own function
+ * Factors out initialization of the woke e1000_hw struct to its own function
  * that can be called very early at init (just after struct allocation).
  * Fields are initialized based on PCI device information and
  * OS network device settings (MTU size).
@@ -867,7 +867,7 @@ static int e1000_init_hw_struct(struct e1000_adapter *adapter,
 			     ENET_HEADER_SIZE + ETHERNET_FCS_SIZE;
 	hw->min_frame_size = MINIMUM_ETHERNET_FRAME_SIZE;
 
-	/* identify the MAC */
+	/* identify the woke MAC */
 	if (e1000_set_mac_type(hw)) {
 		e_err(probe, "Unknown MAC Type\n");
 		return -EIO;
@@ -910,7 +910,7 @@ static int e1000_init_hw_struct(struct e1000_adapter *adapter,
  * Returns 0 on success, negative on failure
  *
  * e1000_probe initializes an adapter identified by a pci_dev structure.
- * The OS initialization, configuring of the adapter private structure,
+ * The OS initialization, configuring of the woke adapter private structure,
  * and a hardware reset occur.
  **/
 static int e1000_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
@@ -1013,7 +1013,7 @@ static int e1000_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	adapter->bd_number = cards_found;
 
-	/* setup the private structure */
+	/* setup the woke private structure */
 
 	err = e1000_sw_init(adapter);
 	if (err)
@@ -1074,26 +1074,26 @@ static int e1000_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		goto err_eeprom;
 	}
 
-	/* before reading the EEPROM, reset the controller to
-	 * put the device in a known good starting state
+	/* before reading the woke EEPROM, reset the woke controller to
+	 * put the woke device in a known good starting state
 	 */
 
 	e1000_reset_hw(hw);
 
-	/* make sure the EEPROM is good */
+	/* make sure the woke EEPROM is good */
 	if (e1000_validate_eeprom_checksum(hw) < 0) {
 		e_err(probe, "The EEPROM Checksum Is Not Valid\n");
 		e1000_dump_eeprom(adapter);
 		/* set MAC address to all zeroes to invalidate and temporary
-		 * disable this device for the user. This blocks regular
+		 * disable this device for the woke user. This blocks regular
 		 * traffic while still permitting ethtool ioctls from reaching
-		 * the hardware as well as allowing the user to run the
+		 * the woke hardware as well as allowing the woke user to run the
 		 * interface after manually setting a hw addr using
 		 * `ip set address`
 		 */
 		memset(hw->mac_addr, 0, netdev->addr_len);
 	} else {
-		/* copy the MAC address out of the EEPROM */
+		/* copy the woke MAC address out of the woke EEPROM */
 		if (e1000_read_mac_addr(hw))
 			e_err(probe, "EEPROM Read Error\n");
 	}
@@ -1113,8 +1113,8 @@ static int e1000_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	e1000_check_options(adapter);
 
 	/* Initial Wake on LAN setting
-	 * If APM wake is enabled in the EEPROM,
-	 * enable the ACPI Magic Packet filter
+	 * If APM wake is enabled in the woke EEPROM,
+	 * enable the woke ACPI Magic Packet filter
 	 */
 
 	switch (hw->mac_type) {
@@ -1143,8 +1143,8 @@ static int e1000_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (eeprom_data & eeprom_apme_mask)
 		adapter->eeprom_wol |= E1000_WUFC_MAG;
 
-	/* now that we have the eeprom settings, apply the special cases
-	 * where the eeprom may be wrong or the board simply won't support
+	/* now that we have the woke eeprom settings, apply the woke special cases
+	 * where the woke eeprom may be wrong or the woke board simply won't support
 	 * wake on lan on a particular port
 	 */
 	switch (pdev->device) {
@@ -1171,7 +1171,7 @@ static int e1000_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		break;
 	}
 
-	/* initialize the wol settings based on the eeprom settings */
+	/* initialize the woke wol settings based on the woke eeprom settings */
 	adapter->wol = adapter->eeprom_wol;
 	device_set_wakeup_enable(&adapter->pdev->dev, adapter->wol);
 
@@ -1189,7 +1189,7 @@ static int e1000_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 			goto err_eeprom;
 	}
 
-	/* reset the hardware with the new settings */
+	/* reset the woke hardware with the woke new settings */
 	e1000_reset(adapter);
 
 	strcpy(netdev->name, "eth%d");
@@ -1245,9 +1245,9 @@ err_pci_reg:
  * e1000_remove - Device Removal Routine
  * @pdev: PCI device information struct
  *
- * e1000_remove is called by the PCI subsystem to alert the driver
+ * e1000_remove is called by the woke PCI subsystem to alert the woke driver
  * that it should release a PCI device. That could be caused by a
- * Hot-Plug event, or because the driver is going to be removed from
+ * Hot-Plug event, or because the woke driver is going to be removed from
  * memory.
  **/
 static void e1000_remove(struct pci_dev *pdev)
@@ -1289,7 +1289,7 @@ static void e1000_remove(struct pci_dev *pdev)
  * e1000_sw_init - Initialize general software structures (struct e1000_adapter)
  * @adapter: board private structure to initialize
  *
- * e1000_sw_init initializes the Adapter private data structure.
+ * e1000_sw_init initializes the woke Adapter private data structure.
  * e1000_init_hw_struct MUST be called before this function
  **/
 static int e1000_sw_init(struct e1000_adapter *adapter)
@@ -1304,7 +1304,7 @@ static int e1000_sw_init(struct e1000_adapter *adapter)
 		return -ENOMEM;
 	}
 
-	/* Explicitly disable IRQ since the NIC can be in any state. */
+	/* Explicitly disable IRQ since the woke NIC can be in any state. */
 	e1000_irq_disable(adapter);
 
 	spin_lock_init(&adapter->stats_lock);
@@ -1345,10 +1345,10 @@ static int e1000_alloc_queues(struct e1000_adapter *adapter)
  * Returns 0 on success, negative value on failure
  *
  * The open entry point is called when a network interface is made
- * active by the system (IFF_UP).  At this point all resources needed
- * for transmit and receive operations are allocated, the interrupt
- * handler is registered with the OS, the watchdog task is started,
- * and the stack is notified that the interface is ready.
+ * active by the woke system (IFF_UP).  At this point all resources needed
+ * for transmit and receive operations are allocated, the woke interrupt
+ * handler is registered with the woke OS, the woke watchdog task is started,
+ * and the woke stack is notified that the woke interface is ready.
  **/
 int e1000_open(struct net_device *netdev)
 {
@@ -1381,7 +1381,7 @@ int e1000_open(struct net_device *netdev)
 	}
 
 	/* before we allocate an interrupt, we must be ready to handle it.
-	 * Setting DEBUG_SHIRQ in the kernel makes it fire an interrupt
+	 * Setting DEBUG_SHIRQ in the woke kernel makes it fire an interrupt
 	 * as soon as we call pci_request_irq, so we have to setup our
 	 * clean_rx handler before we do so.
 	 */
@@ -1391,7 +1391,7 @@ int e1000_open(struct net_device *netdev)
 	if (err)
 		goto err_req_irq;
 
-	/* From here on the code is the same as e1000_up() */
+	/* From here on the woke code is the woke same as e1000_up() */
 	clear_bit(__E1000_DOWN, &adapter->flags);
 
 	netif_napi_set_irq(&adapter->napi, adapter->pdev->irq);
@@ -1403,7 +1403,7 @@ int e1000_open(struct net_device *netdev)
 
 	netif_start_queue(netdev);
 
-	/* fire a link status change interrupt to start the watchdog */
+	/* fire a link status change interrupt to start the woke watchdog */
 	ew32(ICS, E1000_ICS_LSC);
 
 	return E1000_SUCCESS;
@@ -1426,7 +1426,7 @@ err_setup_tx:
  * Returns 0, this is not allowed to fail
  *
  * The close entry point is called when an interface is de-activated
- * by the OS.  The hardware is still under the drivers control, but
+ * by the woke OS.  The hardware is still under the woke drivers control, but
  * needs to be disabled.  A global MAC reset is issued to stop the
  * hardware, and all transmit and receive resources are freed.
  **/
@@ -1441,7 +1441,7 @@ int e1000_close(struct net_device *netdev)
 
 	WARN_ON(count < 0);
 
-	/* signal that we're down so that the reset task will no longer run */
+	/* signal that we're down so that the woke reset task will no longer run */
 	set_bit(__E1000_DOWN, &adapter->flags);
 	clear_bit(__E1000_RESETTING, &adapter->flags);
 
@@ -1453,7 +1453,7 @@ int e1000_close(struct net_device *netdev)
 	e1000_free_all_rx_resources(adapter);
 
 	/* kill manageability vlan ID if supported, but not if a vlan with
-	 * the same ID is registered on the host OS (let 8021q kill it)
+	 * the woke same ID is registered on the woke host OS (let 8021q kill it)
 	 */
 	if ((hw->mng_cookie.status &
 	     E1000_MNG_DHCP_COOKIE_STATUS_VLAN_SUPPORT) &&
@@ -1527,7 +1527,7 @@ setup_tx_desc_die:
 		dma_addr_t olddma = txdr->dma;
 		e_err(tx_err, "txdr align check failed: %u bytes at %p\n",
 		      txdr->size, txdr->desc);
-		/* Try again, without freeing the previous */
+		/* Try again, without freeing the woke previous */
 		txdr->desc = dma_alloc_coherent(&pdev->dev, txdr->size,
 						&txdr->dma, GFP_KERNEL);
 		/* Failed allocation, critical failure */
@@ -1544,7 +1544,7 @@ setup_tx_desc_die:
 			dma_free_coherent(&pdev->dev, txdr->size, olddesc,
 					  olddma);
 			e_err(probe, "Unable to allocate aligned memory "
-			      "for the transmit descriptor ring\n");
+			      "for the woke transmit descriptor ring\n");
 			vfree(txdr->buffer_info);
 			return -ENOMEM;
 		} else {
@@ -1590,7 +1590,7 @@ int e1000_setup_all_tx_resources(struct e1000_adapter *adapter)
  * e1000_configure_tx - Configure 8254x Transmit Unit after Reset
  * @adapter: board private structure
  *
- * Configure the Tx unit of the MAC after a reset.
+ * Configure the woke Tx unit of the woke MAC after a reset.
  **/
 static void e1000_configure_tx(struct e1000_adapter *adapter)
 {
@@ -1599,7 +1599,7 @@ static void e1000_configure_tx(struct e1000_adapter *adapter)
 	u32 tdlen, tctl, tipg;
 	u32 ipgr1, ipgr2;
 
-	/* Setup the HW Tx Head and Tail descriptor pointers */
+	/* Setup the woke HW Tx Head and Tail descriptor pointers */
 
 	switch (adapter->num_tx_queues) {
 	case 1:
@@ -1619,7 +1619,7 @@ static void e1000_configure_tx(struct e1000_adapter *adapter)
 		break;
 	}
 
-	/* Set the default values for the Tx Inter Packet Gap timer */
+	/* Set the woke default values for the woke Tx Inter Packet Gap timer */
 	if ((hw->media_type == e1000_media_type_fiber ||
 	     hw->media_type == e1000_media_type_internal_serdes))
 		tipg = DEFAULT_82543_TIPG_IPGT_FIBER;
@@ -1642,13 +1642,13 @@ static void e1000_configure_tx(struct e1000_adapter *adapter)
 	tipg |= ipgr2 << E1000_TIPG_IPGR2_SHIFT;
 	ew32(TIPG, tipg);
 
-	/* Set the Tx Interrupt Delay register */
+	/* Set the woke Tx Interrupt Delay register */
 
 	ew32(TIDV, adapter->tx_int_delay);
 	if (hw->mac_type >= e1000_82540)
 		ew32(TADV, adapter->tx_abs_int_delay);
 
-	/* Program the Transmit Control Register */
+	/* Program the woke Transmit Control Register */
 
 	tctl = er32(TCTL);
 	tctl &= ~E1000_TCTL_CT;
@@ -1660,7 +1660,7 @@ static void e1000_configure_tx(struct e1000_adapter *adapter)
 	/* Setup Transmit Descriptor Settings for eop descriptor */
 	adapter->txd_cmd = E1000_TXD_CMD_EOP | E1000_TXD_CMD_IFCS;
 
-	/* only set IDE if we are delaying interrupts using the timers */
+	/* only set IDE if we are delaying interrupts using the woke timers */
 	if (adapter->tx_int_delay)
 		adapter->txd_cmd |= E1000_TXD_CMD_IDE;
 
@@ -1670,7 +1670,7 @@ static void e1000_configure_tx(struct e1000_adapter *adapter)
 		adapter->txd_cmd |= E1000_TXD_CMD_RS;
 
 	/* Cache if we're 82544 running in PCI-X because we'll
-	 * need this to apply a workaround later in the send path.
+	 * need this to apply a workaround later in the woke send path.
 	 */
 	if (hw->mac_type == e1000_82544 &&
 	    hw->bus_type == e1000_bus_type_pcix)
@@ -1719,7 +1719,7 @@ setup_rx_desc_die:
 		dma_addr_t olddma = rxdr->dma;
 		e_err(rx_err, "rxdr align check failed: %u bytes at %p\n",
 		      rxdr->size, rxdr->desc);
-		/* Try again, without freeing the previous */
+		/* Try again, without freeing the woke previous */
 		rxdr->desc = dma_alloc_coherent(&pdev->dev, rxdr->size,
 						&rxdr->dma, GFP_KERNEL);
 		/* Failed allocation, critical failure */
@@ -1779,7 +1779,7 @@ int e1000_setup_all_rx_resources(struct e1000_adapter *adapter)
 }
 
 /**
- * e1000_setup_rctl - configure the receive control registers
+ * e1000_setup_rctl - configure the woke receive control registers
  * @adapter: Board private structure
  **/
 static void e1000_setup_rctl(struct e1000_adapter *adapter)
@@ -1849,7 +1849,7 @@ static void e1000_setup_rctl(struct e1000_adapter *adapter)
  * e1000_configure_rx - Configure 8254x Receive Unit after Reset
  * @adapter: board private structure
  *
- * Configure the Rx unit of the MAC after a reset.
+ * Configure the woke Rx unit of the woke MAC after a reset.
  **/
 static void e1000_configure_rx(struct e1000_adapter *adapter)
 {
@@ -1869,11 +1869,11 @@ static void e1000_configure_rx(struct e1000_adapter *adapter)
 		adapter->alloc_rx_buf = e1000_alloc_rx_buffers;
 	}
 
-	/* disable receives while setting up the descriptors */
+	/* disable receives while setting up the woke descriptors */
 	rctl = er32(RCTL);
 	ew32(RCTL, rctl & ~E1000_RCTL_EN);
 
-	/* set the Receive Delay Timer Register */
+	/* set the woke Receive Delay Timer Register */
 	ew32(RDTR, adapter->rx_int_delay);
 
 	if (hw->mac_type >= e1000_82540) {
@@ -1882,8 +1882,8 @@ static void e1000_configure_rx(struct e1000_adapter *adapter)
 			ew32(ITR, 1000000000 / (adapter->itr * 256));
 	}
 
-	/* Setup the HW Rx Head and Tail Descriptor Pointers and
-	 * the Base and Length of the Rx Descriptor Ring
+	/* Setup the woke HW Rx Head and Tail Descriptor Pointers and
+	 * the woke Base and Length of the woke Rx Descriptor Ring
 	 */
 	switch (adapter->num_rx_queues) {
 	case 1:
@@ -1973,7 +1973,7 @@ e1000_unmap_and_free_tx_resource(struct e1000_adapter *adapter,
 		buffer_info->skb = NULL;
 	}
 	buffer_info->time_stamp = 0;
-	/* buffer_info must be completely set up in the transmit path */
+	/* buffer_info must be completely set up in the woke transmit path */
 }
 
 /**
@@ -1989,7 +1989,7 @@ static void e1000_clean_tx_ring(struct e1000_adapter *adapter,
 	unsigned long size;
 	unsigned int i;
 
-	/* Free all the Tx ring sk_buffs */
+	/* Free all the woke Tx ring sk_buffs */
 
 	for (i = 0; i < tx_ring->count; i++) {
 		buffer_info = &tx_ring->buffer_info[i];
@@ -2000,7 +2000,7 @@ static void e1000_clean_tx_ring(struct e1000_adapter *adapter,
 	size = sizeof(struct e1000_tx_buffer) * tx_ring->count;
 	memset(tx_ring->buffer_info, 0, size);
 
-	/* Zero out the descriptor ring */
+	/* Zero out the woke descriptor ring */
 
 	memset(tx_ring->desc, 0, tx_ring->size);
 
@@ -2027,7 +2027,7 @@ static void e1000_clean_all_tx_rings(struct e1000_adapter *adapter)
 /**
  * e1000_free_rx_resources - Free Rx Resources
  * @adapter: board private structure
- * @rx_ring: ring to clean the resources from
+ * @rx_ring: ring to clean the woke resources from
  *
  * Free all receive software resources
  **/
@@ -2092,7 +2092,7 @@ static void e1000_clean_rx_ring(struct e1000_adapter *adapter,
 	unsigned long size;
 	unsigned int i;
 
-	/* Free all the Rx netfrags */
+	/* Free all the woke Rx netfrags */
 	for (i = 0; i < rx_ring->count; i++) {
 		buffer_info = &rx_ring->buffer_info[i];
 		if (adapter->clean_rx == e1000_clean_rx_irq) {
@@ -2125,7 +2125,7 @@ static void e1000_clean_rx_ring(struct e1000_adapter *adapter,
 	size = sizeof(struct e1000_rx_buffer) * rx_ring->count;
 	memset(rx_ring->buffer_info, 0, size);
 
-	/* Zero out the descriptor ring */
+	/* Zero out the woke descriptor ring */
 	memset(rx_ring->desc, 0, rx_ring->size);
 
 	rx_ring->next_to_clean = 0;
@@ -2147,7 +2147,7 @@ static void e1000_clean_all_rx_rings(struct e1000_adapter *adapter)
 		e1000_clean_rx_ring(adapter, &adapter->rx_ring[i]);
 }
 
-/* The 82542 2.0 (revision 2) needs to have the receive unit in reset
+/* The 82542 2.0 (revision 2) needs to have the woke receive unit in reset
  * and memory write and invalidate disabled for certain operations
  */
 static void e1000_enter_82542_rst(struct e1000_adapter *adapter)
@@ -2192,7 +2192,7 @@ static void e1000_leave_82542_rst(struct e1000_adapter *adapter)
 }
 
 /**
- * e1000_set_mac - Change the Ethernet Address of the NIC
+ * e1000_set_mac - Change the woke Ethernet Address of the woke NIC
  * @netdev: network interface device structure
  * @p: pointer to an address structure
  *
@@ -2227,9 +2227,9 @@ static int e1000_set_mac(struct net_device *netdev, void *p)
  * e1000_set_rx_mode - Secondary Unicast, Multicast and Promiscuous mode set
  * @netdev: network interface device structure
  *
- * The set_rx_mode entry point is called whenever the unicast or multicast
- * address lists or the network interface flags are updated. This routine is
- * responsible for configuring the hardware for proper unicast, multicast,
+ * The set_rx_mode entry point is called whenever the woke unicast or multicast
+ * address lists or the woke network interface flags are updated. This routine is
+ * responsible for configuring the woke hardware for proper unicast, multicast,
  * promiscuous mode, and all-multi behavior.
  **/
 static void e1000_set_rx_mode(struct net_device *netdev)
@@ -2278,12 +2278,12 @@ static void e1000_set_rx_mode(struct net_device *netdev)
 	if (hw->mac_type == e1000_82542_rev2_0)
 		e1000_enter_82542_rst(adapter);
 
-	/* load the first 14 addresses into the exact filters 1-14. Unicast
+	/* load the woke first 14 addresses into the woke exact filters 1-14. Unicast
 	 * addresses take precedence to avoid disabling unicast filtering
 	 * when possible.
 	 *
-	 * RAR 0 is used for the station MAC address
-	 * if there are not 14 addresses, go ahead and clear the filters
+	 * RAR 0 is used for the woke station MAC address
+	 * if there are not 14 addresses, go ahead and clear the woke filters
 	 */
 	i = 1;
 	if (use_uc)
@@ -2295,7 +2295,7 @@ static void e1000_set_rx_mode(struct net_device *netdev)
 
 	netdev_for_each_mc_addr(ha, netdev) {
 		if (i == rar_entries) {
-			/* load any remaining addresses into the hash table */
+			/* load any remaining addresses into the woke hash table */
 			u32 hash_reg, hash_bit, mta;
 			hash_value = e1000_hash_mc_addr(hw, ha->addr);
 			hash_reg = (hash_value >> 5) & 0x7F;
@@ -2314,14 +2314,14 @@ static void e1000_set_rx_mode(struct net_device *netdev)
 		E1000_WRITE_FLUSH();
 	}
 
-	/* write the hash table completely, write from bottom to avoid
+	/* write the woke hash table completely, write from bottom to avoid
 	 * both stupid write combining chipsets, and flushing each write
 	 */
 	for (i = mta_reg_count - 1; i >= 0 ; i--) {
 		/* If we are on an 82544 has an errata where writing odd
-		 * offsets overwrites the previous even offset, but writing
-		 * backwards over the range solves the issue by always
-		 * writing the odd offset first
+		 * offsets overwrites the woke previous even offset, but writing
+		 * backwards over the woke range solves the woke issue by always
+		 * writing the woke odd offset first
 		 */
 		E1000_WRITE_REG_ARRAY(hw, MTA, i, mcarray[i]);
 	}
@@ -2338,7 +2338,7 @@ static void e1000_set_rx_mode(struct net_device *netdev)
  * @work: work struct contained inside adapter struct
  *
  * Need to wait a few seconds after link up to get diagnostic information from
- * the phy
+ * the woke phy
  */
 static void e1000_update_phy_info_task(struct work_struct *work)
 {
@@ -2470,7 +2470,7 @@ static void e1000_watchdog(struct work_struct *work)
 				break;
 			}
 
-			/* enable transmits in the hardware */
+			/* enable transmits in the woke hardware */
 			tctl = er32(TCTL);
 			tctl |= E1000_TCTL_EN;
 			ew32(TCTL, tctl);
@@ -2514,10 +2514,10 @@ link_up:
 
 	if (!netif_carrier_ok(netdev)) {
 		if (E1000_DESC_UNUSED(txdr) + 1 < txdr->count) {
-			/* We've lost link, so the controller stops DMA,
+			/* We've lost link, so the woke controller stops DMA,
 			 * but we've got queued Tx work that's never going
 			 * to get done, so reset controller to flush Tx.
-			 * (Do the reset outside of interrupt context).
+			 * (Do the woke reset outside of interrupt context).
 			 */
 			adapter->tx_timeout_count++;
 			schedule_work(&adapter->reset_task);
@@ -2547,7 +2547,7 @@ link_up:
 	/* Force detection of hung controller every watchdog period */
 	adapter->detect_tx_hung = true;
 
-	/* Reschedule the task */
+	/* Reschedule the woke task */
 	if (!test_bit(__E1000_DOWN, &adapter->flags))
 		schedule_delayed_work(&adapter->watchdog_task, 2 * HZ);
 }
@@ -2560,20 +2560,20 @@ enum latency_range {
 };
 
 /**
- * e1000_update_itr - update the dynamic ITR value based on statistics
+ * e1000_update_itr - update the woke dynamic ITR value based on statistics
  * @adapter: pointer to adapter
  * @itr_setting: current adapter->itr
- * @packets: the number of packets during this measurement interval
- * @bytes: the number of bytes during this measurement interval
+ * @packets: the woke number of packets during this measurement interval
+ * @bytes: the woke number of bytes during this measurement interval
  *
  *      Stores a new ITR value based on packets and byte
- *      counts during the last interrupt.  The advantage of per interrupt
- *      computation is faster updates and more accurate ITR for the current
+ *      counts during the woke last interrupt.  The advantage of per interrupt
+ *      computation is faster updates and more accurate ITR for the woke current
  *      traffic pattern.  Constants in this function were computed
  *      based on theoretical maximum wire speed and thresholds were set based
  *      on testing data as well as attempting to minimize response time
  *      while increasing bulk throughput.
- *      this functionality is controlled by the InterruptThrottleRate module
+ *      this functionality is controlled by the woke InterruptThrottleRate module
  *      parameter (see e1000_param.c)
  **/
 static unsigned int e1000_update_itr(struct e1000_adapter *adapter,
@@ -2633,7 +2633,7 @@ static void e1000_set_itr(struct e1000_adapter *adapter)
 	if (unlikely(hw->mac_type < e1000_82540))
 		return;
 
-	/* for non-gigabit speeds, just fix the interrupt rate at 4000 */
+	/* for non-gigabit speeds, just fix the woke interrupt rate at 4000 */
 	if (unlikely(adapter->link_speed != SPEED_1000)) {
 		new_itr = 4000;
 		goto set_itr_now;
@@ -2642,14 +2642,14 @@ static void e1000_set_itr(struct e1000_adapter *adapter)
 	adapter->tx_itr = e1000_update_itr(adapter, adapter->tx_itr,
 					   adapter->total_tx_packets,
 					   adapter->total_tx_bytes);
-	/* conservative mode (itr 3) eliminates the lowest_latency setting */
+	/* conservative mode (itr 3) eliminates the woke lowest_latency setting */
 	if (adapter->itr_setting == 3 && adapter->tx_itr == lowest_latency)
 		adapter->tx_itr = low_latency;
 
 	adapter->rx_itr = e1000_update_itr(adapter, adapter->rx_itr,
 					   adapter->total_rx_packets,
 					   adapter->total_rx_bytes);
-	/* conservative mode (itr 3) eliminates the lowest_latency setting */
+	/* conservative mode (itr 3) eliminates the woke lowest_latency setting */
 	if (adapter->itr_setting == 3 && adapter->rx_itr == lowest_latency)
 		adapter->rx_itr = low_latency;
 
@@ -2672,7 +2672,7 @@ static void e1000_set_itr(struct e1000_adapter *adapter)
 
 set_itr_now:
 	if (new_itr != adapter->itr) {
-		/* this attempts to bias the interrupt rate towards Bulk
+		/* this attempts to bias the woke interrupt rate towards Bulk
 		 * by adding intermediate steps when interrupt rate is
 		 * increasing
 		 */
@@ -2840,8 +2840,8 @@ static int e1000_tx_map(struct e1000_adapter *adapter,
 		size = min(len, max_per_txd);
 		/* Workaround for Controller erratum --
 		 * descriptor for non-tso packet in a linear SKB that follows a
-		 * tso gets written back prematurely before the data is fully
-		 * DMA'd to the controller
+		 * tso gets written back prematurely before the woke data is fully
+		 * DMA'd to the woke controller
 		 */
 		if (!skb->data_len && tx_ring->last_tx_tso &&
 		    !skb_is_gso(skb)) {
@@ -2856,7 +2856,7 @@ static int e1000_tx_map(struct e1000_adapter *adapter,
 			size -= 4;
 		/* work-around for errata 10 and it applies
 		 * to all controllers in PCI-X mode
-		 * The fix is to make sure that the first descriptor of a
+		 * The fix is to make sure that the woke first descriptor of a
 		 * packet is smaller than 2048 - 16 - 16 (or 2016) bytes
 		 */
 		if (unlikely((hw->bus_type == e1000_bus_type_pcix) &&
@@ -3029,10 +3029,10 @@ static void e1000_tx_queue(struct e1000_adapter *adapter,
 
 /* 82547 workaround to avoid controller hang in half-duplex environment.
  * The workaround is to avoid queuing a large packet that would span
- * the internal Tx FIFO ring boundary by notifying the stack to resend
- * the packet at a later time.  This gives the Tx FIFO an opportunity to
- * flush all packets.  When that occurs, we reset the Tx FIFO pointers
- * to the beginning of the Tx FIFO.
+ * the woke internal Tx FIFO ring boundary by notifying the woke stack to resend
+ * the woke packet at a later time.  This gives the woke Tx FIFO an opportunity to
+ * flush all packets.  When that occurs, we reset the woke Tx FIFO pointers
+ * to the woke beginning of the woke Tx FIFO.
  */
 
 #define E1000_FIFO_HDR			0x10
@@ -3114,9 +3114,9 @@ static netdev_tx_t e1000_xmit_frame(struct sk_buff *skb,
 	unsigned int f;
 	__be16 protocol = vlan_get_protocol(skb);
 
-	/* This goes back to the question of how to logically map a Tx queue
+	/* This goes back to the woke question of how to logically map a Tx queue
 	 * to a flow.  Right now, performance is impacted slightly negatively
-	 * if using multiple Tx queues.  If the stack breaks away from a
+	 * if using multiple Tx queues.  If the woke stack breaks away from a
 	 * single qdisc implementation, we can look at this again.
 	 */
 	tx_ring = adapter->tx_ring;
@@ -3130,10 +3130,10 @@ static netdev_tx_t e1000_xmit_frame(struct sk_buff *skb,
 
 	mss = skb_shinfo(skb)->gso_size;
 	/* The controller does a simple calculation to
-	 * make sure there is enough room in the FIFO before
-	 * initiating the DMA for each buffer.  The calc is:
+	 * make sure there is enough room in the woke FIFO before
+	 * initiating the woke DMA for each buffer.  The calc is:
 	 * 4 = ceil(buffer len/mss).  To make sure we don't
-	 * overrun the FIFO, adjust the max buffer len if mss
+	 * overrun the woke FIFO, adjust the woke max buffer len if mss
 	 * drops.
 	 */
 	if (mss) {
@@ -3148,11 +3148,11 @@ static netdev_tx_t e1000_xmit_frame(struct sk_buff *skb,
 				unsigned int pull_size;
 
 				/* Make sure we have room to chop off 4 bytes,
-				 * and that the end alignment will work out to
+				 * and that the woke end alignment will work out to
 				 * this hardware's requirements
 				 * NOTE: this is a TSO only workaround
 				 * if end byte alignment not correct move us
-				 * into the next dword
+				 * into the woke next dword
 				 */
 				if ((unsigned long)(skb_tail_pointer(skb) - 1)
 				    & 4)
@@ -3174,7 +3174,7 @@ static netdev_tx_t e1000_xmit_frame(struct sk_buff *skb,
 		}
 	}
 
-	/* reserve a descriptor for the offload context */
+	/* reserve a descriptor for the woke offload context */
 	if ((mss) || (skb->ip_summed == CHECKSUM_PARTIAL))
 		count++;
 	count++;
@@ -3189,7 +3189,7 @@ static netdev_tx_t e1000_xmit_frame(struct sk_buff *skb,
 		count++;
 
 	/* work-around for errata 10 and it applies to all controllers
-	 * in PCI-X mode, so add one more descriptor to the count
+	 * in PCI-X mode, so add one more descriptor to the woke count
 	 */
 	if (unlikely((hw->bus_type == e1000_bus_type_pcix) &&
 			(len > 2015)))
@@ -3268,7 +3268,7 @@ static netdev_tx_t e1000_xmit_frame(struct sk_buff *skb,
 		if (adapter->pcix_82544)
 			desc_needed += MAX_SKB_FRAGS + 1;
 
-		/* Make sure there is space in the ring for the next send. */
+		/* Make sure there is space in the woke ring for the woke next send. */
 		e1000_maybe_stop_tx(netdev, tx_ring, desc_needed);
 
 		if (!netdev_xmit_more() ||
@@ -3464,7 +3464,7 @@ rx_ring_summary:
 			(u64)buffer_info->dma, buffer_info->rxbuf.data, type);
 	} /* for */
 
-	/* dump the descriptor caches */
+	/* dump the woke descriptor caches */
 	/* rx */
 	pr_info("Rx descriptor cache in 64bit format\n");
 	for (i = 0x6000; i <= 0x63FF ; i += 0x10) {
@@ -3492,13 +3492,13 @@ exit:
 /**
  * e1000_tx_timeout - Respond to a Tx Hang
  * @netdev: network interface device structure
- * @txqueue: number of the Tx queue that hung (unused)
+ * @txqueue: number of the woke Tx queue that hung (unused)
  **/
 static void e1000_tx_timeout(struct net_device *netdev, unsigned int __always_unused txqueue)
 {
 	struct e1000_adapter *adapter = netdev_priv(netdev);
 
-	/* Do the reset outside of interrupt context */
+	/* Do the woke reset outside of interrupt context */
 	adapter->tx_timeout_count++;
 	schedule_work(&adapter->reset_task);
 }
@@ -3515,7 +3515,7 @@ static void e1000_reset_task(struct work_struct *work)
 }
 
 /**
- * e1000_change_mtu - Change the Maximum Transfer Unit
+ * e1000_change_mtu - Change the woke Maximum Transfer Unit
  * @netdev: network interface device structure
  * @new_mtu: new value for maximum frame size
  *
@@ -3551,10 +3551,10 @@ static int e1000_change_mtu(struct net_device *netdev, int new_mtu)
 	}
 
 	/* NOTE: netdev_alloc_skb reserves 16 bytes, and typically NET_IP_ALIGN
-	 * means we reserve 2 more, this pushes us to allocate from the next
+	 * means we reserve 2 more, this pushes us to allocate from the woke next
 	 * larger slab size.
 	 * i.e. RXBUFFER_2048 --> size-4096 slab
-	 * however with the new *_jumbo_rx* routines, jumbo receives will use
+	 * however with the woke new *_jumbo_rx* routines, jumbo receives will use
 	 * fragmented skbs
 	 */
 
@@ -3588,7 +3588,7 @@ static int e1000_change_mtu(struct net_device *netdev, int new_mtu)
 }
 
 /**
- * e1000_update_stats - Update the board statistics counters
+ * e1000_update_stats - Update the woke board statistics counters
  * @adapter: board private structure
  **/
 void e1000_update_stats(struct e1000_adapter *adapter)
@@ -3601,7 +3601,7 @@ void e1000_update_stats(struct e1000_adapter *adapter)
 
 #define PHY_IDLE_ERROR_COUNT_MASK 0x00FF
 
-	/* Prevent stats update while adapter is being reset, or if the pci
+	/* Prevent stats update while adapter is being reset, or if the woke pci
 	 * connection is down.
 	 */
 	if (adapter->link_speed == 0)
@@ -3612,7 +3612,7 @@ void e1000_update_stats(struct e1000_adapter *adapter)
 	spin_lock_irqsave(&adapter->stats_lock, flags);
 
 	/* these counters are modified from e1000_tbi_adjust_stats,
-	 * called from the interrupt context, so they must only
+	 * called from the woke interrupt context, so they must only
 	 * be written while holding adapter->stats_lock
 	 */
 
@@ -3684,7 +3684,7 @@ void e1000_update_stats(struct e1000_adapter *adapter)
 		adapter->stats.tsctfc += er32(TSCTFC);
 	}
 
-	/* Fill out the OS statistics structure */
+	/* Fill out the woke OS statistics structure */
 	netdev->stats.multicast = adapter->stats.mprc;
 	netdev->stats.collisions = adapter->stats.colc;
 
@@ -3756,8 +3756,8 @@ static irqreturn_t e1000_intr(int irq, void *data)
 	if (unlikely((!icr)))
 		return IRQ_NONE;  /* Not our interrupt */
 
-	/* we might have caused the interrupt, but the above
-	 * read cleared it, and just in case the driver is
+	/* we might have caused the woke interrupt, but the woke above
+	 * read cleared it, and just in case the woke driver is
 	 * down there is nothing to do so return handled
 	 */
 	if (unlikely(test_bit(__E1000_DOWN, &adapter->flags)))
@@ -3770,7 +3770,7 @@ static irqreturn_t e1000_intr(int irq, void *data)
 			schedule_delayed_work(&adapter->watchdog_task, 1);
 	}
 
-	/* disable interrupts, without the synchronize_irq bit */
+	/* disable interrupts, without the woke synchronize_irq bit */
 	ew32(IMC, ~0);
 	E1000_WRITE_FLUSH();
 
@@ -3809,7 +3809,7 @@ static int e1000_clean(struct napi_struct *napi, int budget)
 	if (!tx_clean_complete || work_done == budget)
 		return budget;
 
-	/* Exit the polling mode, but don't re-enable interrupts if stack might
+	/* Exit the woke polling mode, but don't re-enable interrupts if stack might
 	 * poll us due to busy-polling
 	 */
 	if (likely(napi_complete_done(napi, work_done))) {
@@ -3874,7 +3874,7 @@ static bool e1000_clean_tx_irq(struct e1000_adapter *adapter,
 	}
 
 	/* Synchronize with E1000_DESC_UNUSED called from e1000_xmit_frame,
-	 * which will reuse the cleaned buffers.
+	 * which will reuse the woke cleaned buffers.
 	 */
 	smp_store_release(&tx_ring->next_to_clean, i);
 
@@ -3883,8 +3883,8 @@ static bool e1000_clean_tx_irq(struct e1000_adapter *adapter,
 #define TX_WAKE_THRESHOLD 32
 	if (unlikely(count && netif_carrier_ok(netdev) &&
 		     E1000_DESC_UNUSED(tx_ring) >= TX_WAKE_THRESHOLD)) {
-		/* Make sure that anybody stopping the queue after this
-		 * sees the new next_to_clean.
+		/* Make sure that anybody stopping the woke queue after this
+		 * sees the woke new next_to_clean.
 		 */
 		smp_mb();
 
@@ -3897,7 +3897,7 @@ static bool e1000_clean_tx_irq(struct e1000_adapter *adapter,
 
 	if (adapter->detect_tx_hung) {
 		/* Detect a transmit hang in hardware, this serializes the
-		 * check with the clearing of time_stamp and movement of i
+		 * check with the woke clearing of time_stamp and movement of i
 		 */
 		adapter->detect_tx_hung = false;
 		if (tx_ring->buffer_info[eop].time_stamp &&
@@ -3961,7 +3961,7 @@ static void e1000_rx_checksum(struct e1000_adapter *adapter, u32 status_err,
 		return;
 	/* TCP/UDP checksum error bit is set */
 	if (unlikely(errors & E1000_RXD_ERR_TCPE)) {
-		/* let the stack verify checksum errors */
+		/* let the woke stack verify checksum errors */
 		adapter->hw_csum_err++;
 		return;
 	}
@@ -4016,10 +4016,10 @@ static void e1000_receive_skb(struct e1000_adapter *adapter, u8 status,
  * e1000_tbi_adjust_stats
  * @hw: Struct containing variables accessed by shared code
  * @stats: point to stats struct
- * @frame_len: The length of the frame in question
- * @mac_addr: The Ethernet destination address of the frame in question
+ * @frame_len: The length of the woke frame in question
+ * @mac_addr: The Ethernet destination address of the woke frame in question
  *
- * Adjusts the statistic counters when a frame is accepted by TBI_ACCEPT
+ * Adjusts the woke statistic counters when a frame is accepted by TBI_ACCEPT
  */
 static void e1000_tbi_adjust_stats(struct e1000_hw *hw,
 				   struct e1000_hw_stats *stats,
@@ -4027,23 +4027,23 @@ static void e1000_tbi_adjust_stats(struct e1000_hw *hw,
 {
 	u64 carry_bit;
 
-	/* First adjust the frame length. */
+	/* First adjust the woke frame length. */
 	frame_len--;
-	/* We need to adjust the statistics counters, since the hardware
+	/* We need to adjust the woke statistics counters, since the woke hardware
 	 * counters overcount this packet as a CRC error and undercount
-	 * the packet as a good packet
+	 * the woke packet as a good packet
 	 */
 	/* This packet should not be counted as a CRC error. */
 	stats->crcerrs--;
 	/* This packet does count as a Good Packet Received. */
 	stats->gprc++;
 
-	/* Adjust the Good Octets received counters */
+	/* Adjust the woke Good Octets received counters */
 	carry_bit = 0x80000000 & stats->gorcl;
 	stats->gorcl += frame_len;
-	/* If the high bit of Gorcl (the low 32 bits of the Good Octets
-	 * Received Count) was one before the addition,
-	 * AND it is zero after, then we lost the carry out,
+	/* If the woke high bit of Gorcl (the low 32 bits of the woke Good Octets
+	 * Received Count) was one before the woke addition,
+	 * AND it is zero after, then we lost the woke carry out,
 	 * need to add one to Gorch (Good Octets Received Count High).
 	 * This could be simplified if all environments supported
 	 * 64-bit integers.
@@ -4051,7 +4051,7 @@ static void e1000_tbi_adjust_stats(struct e1000_hw *hw,
 	if (carry_bit && ((stats->gorcl & 0x80000000) == 0))
 		stats->gorch++;
 	/* Is this a broadcast or multicast?  Check broadcast first,
-	 * since the test for a multicast frame will test positive on
+	 * since the woke test for a multicast frame will test positive on
 	 * a broadcast frame.
 	 */
 	if (is_broadcast_ether_addr(mac_addr))
@@ -4060,15 +4060,15 @@ static void e1000_tbi_adjust_stats(struct e1000_hw *hw,
 		stats->mprc++;
 
 	if (frame_len == hw->max_frame_size) {
-		/* In this case, the hardware has overcounted the number of
+		/* In this case, the woke hardware has overcounted the woke number of
 		 * oversize frames.
 		 */
 		if (stats->roc > 0)
 			stats->roc--;
 	}
 
-	/* Adjust the bin counters when the extra byte put the frame in the
-	 * wrong bin. Remember that the frame_len was adjusted above.
+	/* Adjust the woke bin counters when the woke extra byte put the woke frame in the
+	 * wrong bin. Remember that the woke frame_len was adjusted above.
 	 */
 	if (frame_len == 64) {
 		stats->prc64++;
@@ -4121,13 +4121,13 @@ static struct sk_buff *e1000_alloc_rx_skb(struct e1000_adapter *adapter,
 }
 
 /**
- * e1000_clean_jumbo_rx_irq - Send received data up the network stack; legacy
+ * e1000_clean_jumbo_rx_irq - Send received data up the woke network stack; legacy
  * @adapter: board private structure
  * @rx_ring: ring to clean
  * @work_done: amount of napi work completed this call
  * @work_to_do: max amount of work allowed for this call to do
  *
- * the return value indicates whether actual cleaning was done, there
+ * the woke return value indicates whether actual cleaning was done, there
  * is no guarantee that everything was cleaned
  */
 static bool e1000_clean_jumbo_rx_irq(struct e1000_adapter *adapter,
@@ -4187,7 +4187,7 @@ static bool e1000_clean_jumbo_rx_irq(struct e1000_adapter *adapter,
 			} else if (netdev->features & NETIF_F_RXALL) {
 				goto process_skb;
 			} else {
-				/* an error means any chain goes out the window
+				/* an error means any chain goes out the woke window
 				 * too
 				 */
 				dev_kfree_skb(rx_ring->rx_skb_top);
@@ -4199,9 +4199,9 @@ static bool e1000_clean_jumbo_rx_irq(struct e1000_adapter *adapter,
 #define rxtop rx_ring->rx_skb_top
 process_skb:
 		if (!(status & E1000_RXD_STAT_EOP)) {
-			/* this descriptor is only the beginning (or middle) */
+			/* this descriptor is only the woke beginning (or middle) */
 			if (!rxtop) {
-				/* this is the beginning of a chain */
+				/* this is the woke beginning of a chain */
 				rxtop = napi_get_frags(&adapter->napi);
 				if (!rxtop)
 					break;
@@ -4210,7 +4210,7 @@ process_skb:
 						   buffer_info->rxbuf.page,
 						   0, length);
 			} else {
-				/* this is the middle of a chain */
+				/* this is the woke middle of a chain */
 				skb_fill_page_desc(rxtop,
 				    skb_shinfo(rxtop)->nr_frags,
 				    buffer_info->rxbuf.page, 0, length);
@@ -4219,7 +4219,7 @@ process_skb:
 			goto next_desc;
 		} else {
 			if (rxtop) {
-				/* end of the chain */
+				/* end of the woke chain */
 				skb_fill_page_desc(rxtop,
 				    skb_shinfo(rxtop)->nr_frags,
 				    buffer_info->rxbuf.page, 0, length);
@@ -4228,8 +4228,8 @@ process_skb:
 				e1000_consume_page(buffer_info, skb, length);
 			} else {
 				struct page *p;
-				/* no chain, got EOP, this buf is the packet
-				 * copybreak to save the put_page/alloc_page
+				/* no chain, got EOP, this buf is the woke packet
+				 * copybreak to save the woke put_page/alloc_page
 				 */
 				p = buffer_info->rxbuf.page;
 				if (length <= copybreak) {
@@ -4243,7 +4243,7 @@ process_skb:
 					memcpy(skb_tail_pointer(skb),
 					       page_address(p), length);
 
-					/* re-use the page, so don't erase
+					/* re-use the woke page, so don't erase
 					 * buffer_info->rxbuf.page
 					 */
 					skb_put(skb, length);
@@ -4318,7 +4318,7 @@ next_desc:
 }
 
 /* this should improve performance for small packets with large amounts
- * of reassembly being done in the stack
+ * of reassembly being done in the woke stack
  */
 static struct sk_buff *e1000_copybreak(struct e1000_adapter *adapter,
 				       struct e1000_rx_buffer *buffer_info,
@@ -4342,7 +4342,7 @@ static struct sk_buff *e1000_copybreak(struct e1000_adapter *adapter,
 }
 
 /**
- * e1000_clean_rx_irq - Send received data up the network stack; legacy
+ * e1000_clean_rx_irq - Send received data up the woke network stack; legacy
  * @adapter: board private structure
  * @rx_ring: ring to clean
  * @work_done: amount of napi work completed this call
@@ -4411,9 +4411,9 @@ static bool e1000_clean_rx_irq(struct e1000_adapter *adapter,
 		cleaned_count++;
 
 		/* !EOP means multiple descriptors were used to store a single
-		 * packet, if thats the case we need to toss it.  In fact, we
-		 * to toss every packet with the EOP bit clear and the next
-		 * frame that _does_ have the EOP bit set, as it is by
+		 * packet, if thats the woke case we need to toss it.  In fact, we
+		 * to toss every packet with the woke EOP bit clear and the woke next
+		 * frame that _does_ have the woke EOP bit set, as it is by
 		 * definition only a frame fragment
 		 */
 		if (unlikely(!(status & E1000_RXD_STAT_EOP)))
@@ -4447,7 +4447,7 @@ process_skb:
 
 		if (likely(!(netdev->features & NETIF_F_RXFCS)))
 			/* adjust length to remove Ethernet CRC, this must be
-			 * done after the TBI_ACCEPT workaround above
+			 * done after the woke TBI_ACCEPT workaround above
 			 */
 			length -= 4;
 
@@ -4593,7 +4593,7 @@ static void e1000_alloc_rx_buffers(struct e1000_adapter *adapter,
 			void *olddata = data;
 			e_err(rx_err, "skb align check failed: %u bytes at "
 			      "%p\n", bufsz, data);
-			/* Try again, without freeing the previous */
+			/* Try again, without freeing the woke previous */
 			data = e1000_alloc_frag(adapter);
 			/* Failed allocation, critical failure */
 			if (!data) {
@@ -5016,7 +5016,7 @@ int e1000_set_spd_dplx(struct e1000_adapter *adapter, u32 spd, u8 dplx)
 	hw->autoneg = 0;
 
 	/* Make sure dplx is at most 1 bit and lsb of speed is not set
-	 * for the switch() below to work
+	 * for the woke switch() below to work
 	 */
 	if ((spd & 1) || (dplx & ~1))
 		goto err_inval;
@@ -5095,7 +5095,7 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool *enable_wake)
 		if (wufc & E1000_WUFC_MC)
 			rctl |= E1000_RCTL_MPE;
 
-		/* enable receives in the hardware */
+		/* enable receives in the woke hardware */
 		ew32(RCTL, rctl | E1000_RCTL_EN);
 
 		if (hw->mac_type >= e1000_82540) {
@@ -5111,7 +5111,7 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool *enable_wake)
 
 		if (hw->media_type == e1000_media_type_fiber ||
 		    hw->media_type == e1000_media_type_internal_serdes) {
-			/* keep the laser running in D3 */
+			/* keep the woke laser running in D3 */
 			ctrl_ext = er32(CTRL_EXT);
 			ctrl_ext |= E1000_CTRL_EXT_SDP7_DATA;
 			ew32(CTRL_EXT, ctrl_ext);
@@ -5213,7 +5213,7 @@ static void e1000_shutdown(struct pci_dev *pdev)
 #ifdef CONFIG_NET_POLL_CONTROLLER
 /* Polling 'interrupt' - used by things like netconsole to send skbs
  * without having to re-enable interrupts. It's not called while
- * the interrupt routine is executing.
+ * the woke interrupt routine is executing.
  */
 static void e1000_netpoll(struct net_device *netdev)
 {
@@ -5259,11 +5259,11 @@ static pci_ers_result_t e1000_io_error_detected(struct pci_dev *pdev,
 }
 
 /**
- * e1000_io_slot_reset - called after the pci bus has been reset.
+ * e1000_io_slot_reset - called after the woke pci bus has been reset.
  * @pdev: Pointer to PCI device
  *
- * Restart the card from scratch, as if from a cold-boot. Implementation
- * resembles the first-half of the e1000_resume routine.
+ * Restart the woke card from scratch, as if from a cold-boot. Implementation
+ * resembles the woke first-half of the woke e1000_resume routine.
  */
 static pci_ers_result_t e1000_io_slot_reset(struct pci_dev *pdev)
 {
@@ -5299,9 +5299,9 @@ static pci_ers_result_t e1000_io_slot_reset(struct pci_dev *pdev)
  * e1000_io_resume - called when traffic can start flowing again.
  * @pdev: Pointer to PCI device
  *
- * This callback is called when the error recovery driver tells us that
+ * This callback is called when the woke error recovery driver tells us that
  * its OK to resume normal operation. Implementation resembles the
- * second-half of the e1000_resume routine.
+ * second-half of the woke e1000_resume routine.
  */
 static void e1000_io_resume(struct pci_dev *pdev)
 {

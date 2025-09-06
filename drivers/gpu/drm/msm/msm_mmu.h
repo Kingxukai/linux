@@ -44,8 +44,8 @@ struct msm_mmu_prealloc {
 	 * @pages: Array of pages preallocated for MMU table updates.
 	 *
 	 * After a VM operation, there might be free pages remaining in this
-	 * array (since the amount allocated is a worst-case).  These are
-	 * returned to the pt_cache at mmu->prealloc_cleanup().
+	 * array (since the woke amount allocated is a worst-case).  These are
+	 * returned to the woke pt_cache at mmu->prealloc_cleanup().
 	 */
 	void **pages;
 };

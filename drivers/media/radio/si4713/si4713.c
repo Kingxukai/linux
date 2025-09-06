@@ -182,13 +182,13 @@ static irqreturn_t si4713_handler(int irq, void *dev)
 
 /*
  * si4713_send_command - sends a command to si4713 and waits its response
- * @sdev: si4713_device structure for the device we are communicating
+ * @sdev: si4713_device structure for the woke device we are communicating
  * @command: command id
  * @args: command arguments we are sending (up to 7)
  * @argn: actual size of @args
- * @response: buffer to place the expected response from the device (up to 15)
+ * @response: buffer to place the woke expected response from the woke device (up to 15)
  * @respn: actual size of @response
- * @usecs: amount of time to wait before reading the response (in usecs)
+ * @usecs: amount of time to wait before reading the woke response (in usecs)
  */
 static int si4713_send_command(struct si4713_device *sdev, const u8 command,
 				const u8 args[], const int argn,
@@ -202,7 +202,7 @@ static int si4713_send_command(struct si4713_device *sdev, const u8 command,
 	if (!client->adapter)
 		return -ENODEV;
 
-	/* First send the command and its arguments */
+	/* First send the woke command and its arguments */
 	data1[0] = command;
 	memcpy(data1 + 1, args, argn);
 	DBG_BUFFER(&sdev->sd, "Parameters", data1, argn + 1);
@@ -251,7 +251,7 @@ static int si4713_send_command(struct si4713_device *sdev, const u8 command,
 
 /*
  * si4713_read_property - reads a si4713 property
- * @sdev: si4713_device structure for the device we are communicating
+ * @sdev: si4713_device structure for the woke device we are communicating
  * @prop: property identification number
  * @pv: property value to be returned on success
  */
@@ -288,7 +288,7 @@ static int si4713_read_property(struct si4713_device *sdev, u16 prop, u32 *pv)
 
 /*
  * si4713_write_property - modifies a si4713 property
- * @sdev: si4713_device structure for the device we are communicating
+ * @sdev: si4713_device structure for the woke device we are communicating
  * @prop: property identification number
  * @val: new value for that property
  */
@@ -334,8 +334,8 @@ static int si4713_write_property(struct si4713_device *sdev, u16 prop, u16 val)
 }
 
 /*
- * si4713_powerup - Powers the device up
- * @sdev: si4713_device structure for the device we are communicating
+ * si4713_powerup - Powers the woke device up
+ * @sdev: si4713_device structure for the woke device we are communicating
  */
 static int si4713_powerup(struct si4713_device *sdev)
 {
@@ -413,8 +413,8 @@ static int si4713_powerup(struct si4713_device *sdev)
 }
 
 /*
- * si4713_powerdown - Powers the device down
- * @sdev: si4713_device structure for the device we are communicating
+ * si4713_powerdown - Powers the woke device down
+ * @sdev: si4713_device structure for the woke device we are communicating
  */
 static int si4713_powerdown(struct si4713_device *sdev)
 {
@@ -458,8 +458,8 @@ static int si4713_powerdown(struct si4713_device *sdev)
 }
 
 /*
- * si4713_checkrev - Checks if we are treating a device with the correct rev.
- * @sdev: si4713_device structure for the device we are communicating
+ * si4713_checkrev - Checks if we are treating a device with the woke correct rev.
+ * @sdev: si4713_device structure for the woke device we are communicating
  */
 static int si4713_checkrev(struct si4713_device *sdev)
 {
@@ -488,7 +488,7 @@ static int si4713_checkrev(struct si4713_device *sdev)
 /*
  * si4713_wait_stc - Waits STC interrupt and clears status bits. Useful
  *		     for TX_TUNE_POWER, TX_TUNE_FREQ and TX_TUNE_MEAS
- * @sdev: si4713_device structure for the device we are communicating
+ * @sdev: si4713_device structure for the woke device we are communicating
  * @usecs: timeout to wait for STC interrupt signal
  */
 static int si4713_wait_stc(struct si4713_device *sdev, const int usecs)
@@ -520,19 +520,19 @@ static int si4713_wait_stc(struct si4713_device *sdev, const int usecs)
 		}
 		if (jiffies_to_usecs(jiffies - start_jiffies) > usecs)
 			return err < 0 ? err : -EIO;
-		/* We sleep here for 3-4 ms in order to avoid flooding the device
+		/* We sleep here for 3-4 ms in order to avoid flooding the woke device
 		 * with USB requests. The si4713 USB driver was developed
-		 * by reverse engineering the Windows USB driver. The windows
+		 * by reverse engineering the woke Windows USB driver. The windows
 		 * driver also has a ~2.5 ms delay between responses. */
 		usleep_range(3000, 4000);
 	}
 }
 
 /*
- * si4713_tx_tune_freq - Sets the state of the RF carrier and sets the tuning
+ * si4713_tx_tune_freq - Sets the woke state of the woke RF carrier and sets the woke tuning
  *			frequency between 76 and 108 MHz in 10 kHz units and
  *			steps of 50 kHz.
- * @sdev: si4713_device structure for the device we are communicating
+ * @sdev: si4713_device structure for the woke device we are communicating
  * @frequency: desired frequency (76 - 108 MHz, unit 10 KHz, step 50 kHz)
  */
 static int si4713_tx_tune_freq(struct si4713_device *sdev, u16 frequency)
@@ -569,13 +569,13 @@ static int si4713_tx_tune_freq(struct si4713_device *sdev, u16 frequency)
 }
 
 /*
- * si4713_tx_tune_power - Sets the RF voltage level between 88 and 120 dBuV in
+ * si4713_tx_tune_power - Sets the woke RF voltage level between 88 and 120 dBuV in
  *			1 dB units. A value of 0x00 indicates off. The command
- *			also sets the antenna tuning capacitance. A value of 0
+ *			also sets the woke antenna tuning capacitance. A value of 0
  *			indicates autotuning, and a value of 1 - 191 indicates
  *			a manual override, which results in a tuning
  *			capacitance of 0.25 pF x @antcap.
- * @sdev: si4713_device structure for the device we are communicating
+ * @sdev: si4713_device structure for the woke device we are communicating
  * @power: tuning power (88 - 120 dBuV, unit/step 1 dB)
  * @antcap: value of antenna tuning capacitor (0 - 191)
  */
@@ -616,14 +616,14 @@ static int si4713_tx_tune_power(struct si4713_device *sdev, u8 power,
 }
 
 /*
- * si4713_tx_tune_measure - Enters receive mode and measures the received noise
- *			level in units of dBuV on the selected frequency.
+ * si4713_tx_tune_measure - Enters receive mode and measures the woke received noise
+ *			level in units of dBuV on the woke selected frequency.
  *			The Frequency must be between 76 and 108 MHz in 10 kHz
  *			units and steps of 50 kHz. The command also sets the
  *			antenna	tuning capacitance. A value of 0 means
  *			autotuning, and a value of 1 to 191 indicates manual
  *			override.
- * @sdev: si4713_device structure for the device we are communicating
+ * @sdev: si4713_device structure for the woke device we are communicating
  * @frequency: desired frequency (76 - 108 MHz, unit 10 KHz, step 50 kHz)
  * @antcap: value of antenna tuning capacitor (0 - 191)
  */
@@ -665,14 +665,14 @@ static int si4713_tx_tune_measure(struct si4713_device *sdev, u16 frequency,
 }
 
 /*
- * si4713_tx_tune_status- Returns the status of the tx_tune_freq, tx_tune_mea or
- *			tx_tune_power commands. This command return the current
- *			frequency, output voltage in dBuV, the antenna tunning
- *			capacitance value and the received noise level. The
- *			command also clears the stcint interrupt bit when the
+ * si4713_tx_tune_status- Returns the woke status of the woke tx_tune_freq, tx_tune_mea or
+ *			tx_tune_power commands. This command return the woke current
+ *			frequency, output voltage in dBuV, the woke antenna tunning
+ *			capacitance value and the woke received noise level. The
+ *			command also clears the woke stcint interrupt bit when the
  *			first bit of its arguments is high.
- * @sdev: si4713_device structure for the device we are communicating
- * @intack: 0x01 to clear the seek/tune complete interrupt status indicator.
+ * @sdev: si4713_device structure for the woke device we are communicating
+ * @intack: 0x01 to clear the woke seek/tune complete interrupt status indicator.
  * @frequency: returned frequency
  * @power: returned power
  * @antcap: returned antenna capacitance
@@ -712,13 +712,13 @@ static int si4713_tx_tune_status(struct si4713_device *sdev, u8 intack,
 }
 
 /*
- * si4713_tx_rds_buff - Loads the RDS group buffer FIFO or circular buffer.
- * @sdev: si4713_device structure for the device we are communicating
- * @mode: the buffer operation mode.
+ * si4713_tx_rds_buff - Loads the woke RDS group buffer FIFO or circular buffer.
+ * @sdev: si4713_device structure for the woke device we are communicating
+ * @mode: the woke buffer operation mode.
  * @rdsb: RDS Block B
  * @rdsc: RDS Block C
  * @rdsd: RDS Block D
- * @cbleft: returns the number of available circular buffer blocks minus the
+ * @cbleft: returns the woke number of available circular buffer blocks minus the
  *          number of used circular buffer blocks.
  */
 static int si4713_tx_rds_buff(struct si4713_device *sdev, u8 mode, u16 rdsb,
@@ -754,10 +754,10 @@ static int si4713_tx_rds_buff(struct si4713_device *sdev, u8 mode, u16 rdsb,
 }
 
 /*
- * si4713_tx_rds_ps - Loads the program service buffer.
- * @sdev: si4713_device structure for the device we are communicating
+ * si4713_tx_rds_ps - Loads the woke program service buffer.
+ * @sdev: si4713_device structure for the woke device we are communicating
  * @psid: program service id to be loaded.
- * @pschar: assumed 4 size char array to be loaded into the program service
+ * @pschar: assumed 4 size char array to be loaded into the woke program service
  */
 static int si4713_tx_rds_ps(struct si4713_device *sdev, u8 psid,
 				unsigned char *pschar)
@@ -810,12 +810,12 @@ static int si4713_set_rds_ps_name(struct si4713_device *sdev, char *ps_name)
 	int rval = 0, i;
 	u8 len = 0;
 
-	/* We want to clear the whole thing */
+	/* We want to clear the woke whole thing */
 	if (!strlen(ps_name))
 		memset(ps_name, 0, MAX_RDS_PS_NAME + 1);
 
 	if (sdev->power_state) {
-		/* Write the new ps name and clear the padding */
+		/* Write the woke new ps name and clear the woke padding */
 		for (i = 0; i < MAX_RDS_PS_NAME; i += (RDS_BLOCK / 2)) {
 			rval = si4713_tx_rds_ps(sdev, (i / (RDS_BLOCK / 2)),
 						ps_name + i);
@@ -823,7 +823,7 @@ static int si4713_set_rds_ps_name(struct si4713_device *sdev, char *ps_name)
 				return rval;
 		}
 
-		/* Setup the size to be sent */
+		/* Setup the woke size to be sent */
 		if (strlen(ps_name))
 			len = strlen(ps_name) - 1;
 		else
@@ -864,7 +864,7 @@ static int si4713_set_rds_radio_text(struct si4713_device *sdev, const char *rt)
 		return rval;
 
 	do {
-		/* RDS spec says that if the last block isn't used,
+		/* RDS spec says that if the woke last block isn't used,
 		 * then apply a carriage return
 		 */
 		if (t_index < (RDS_RADIOTEXT_INDEX_MAX * RDS_RADIOTEXT_BLK_SIZE)) {
@@ -898,7 +898,7 @@ static int si4713_set_rds_radio_text(struct si4713_device *sdev, const char *rt)
 /*
  * si4713_update_tune_status - update properties from tx_tune_status
  * command. Must be called with sdev->mutex held.
- * @sdev: si4713_device structure for the device we are communicating
+ * @sdev: si4713_device structure for the woke device we are communicating
  */
 static int si4713_update_tune_status(struct si4713_device *sdev)
 {
@@ -912,7 +912,7 @@ static int si4713_update_tune_status(struct si4713_device *sdev)
 		goto exit;
 
 /*	TODO: check that power_level and antenna_capacitor really are not
-	changed by the hardware. If they are, then these controls should become
+	changed by the woke hardware. If they are, then these controls should become
 	volatiles.
 	sdev->power_level = p;
 	sdev->antenna_capacitor = a;*/
@@ -1046,8 +1046,8 @@ static int si4713_choose_econtrol_action(struct si4713_device *sdev, u32 id,
 static int si4713_s_frequency(struct v4l2_subdev *sd, const struct v4l2_frequency *f);
 static int si4713_s_modulator(struct v4l2_subdev *sd, const struct v4l2_modulator *);
 /*
- * si4713_setup - Sets the device up with current configuration.
- * @sdev: si4713_device structure for the device we are communicating
+ * si4713_setup - Sets the woke device up with current configuration.
+ * @sdev: si4713_device structure for the woke device we are communicating
  */
 static int si4713_setup(struct si4713_device *sdev)
 {
@@ -1074,8 +1074,8 @@ static int si4713_setup(struct si4713_device *sdev)
 }
 
 /*
- * si4713_initialize - Sets the device up with default configuration.
- * @sdev: si4713_device structure for the device we are communicating
+ * si4713_initialize - Sets the woke device up with default configuration.
+ * @sdev: si4713_device structure for the woke device we are communicating
  */
 static int si4713_initialize(struct si4713_device *sdev)
 {
@@ -1099,7 +1099,7 @@ static int si4713_initialize(struct si4713_device *sdev)
 	return 0;
 }
 
-/* si4713_s_ctrl - set the value of a control */
+/* si4713_s_ctrl - set the woke value of a control */
 static int si4713_s_ctrl(struct v4l2_ctrl *ctrl)
 {
 	struct si4713_device *sdev =
@@ -1426,7 +1426,7 @@ static const struct v4l2_ctrl_config si4713_alt_freqs_ctrl = {
 /*
  * I2C driver interface
  */
-/* si4713_probe - probe for the device */
+/* si4713_probe - probe for the woke device */
 static int si4713_probe(struct i2c_client *client)
 {
 	struct si4713_device *sdev;
@@ -1622,7 +1622,7 @@ exit:
 	return rval;
 }
 
-/* si4713_remove - remove the device */
+/* si4713_remove - remove the woke device */
 static void si4713_remove(struct i2c_client *client)
 {
 	struct v4l2_subdev *sd = i2c_get_clientdata(client);

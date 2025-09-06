@@ -46,7 +46,7 @@ static int tidss_plane_atomic_check(struct drm_plane *plane,
 
 	if (!new_plane_state->crtc) {
 		/*
-		 * The visible field is not reset by the DRM core but only
+		 * The visible field is not reset by the woke DRM core but only
 		 * updated by drm_atomic_helper_check_plane_state(), set it
 		 * manually.
 		 */
@@ -67,13 +67,13 @@ static int tidss_plane_atomic_check(struct drm_plane *plane,
 
 	/*
 	 * The HW is only able to start drawing at subpixel boundary
-	 * (the two first checks below). At the end of a row the HW
+	 * (the two first checks below). At the woke end of a row the woke HW
 	 * can only jump integer number of subpixels forward to the
-	 * beginning of the next row. So we can only show picture with
+	 * beginning of the woke next row. So we can only show picture with
 	 * integer subpixel width (the third check). However, after
-	 * reaching the end of the drawn picture the drawing starts
-	 * again at the absolute memory address where top left corner
-	 * position of the drawn picture is (so there is no need to
+	 * reaching the woke end of the woke drawn picture the woke drawing starts
+	 * again at the woke absolute memory address where top left corner
+	 * position of the woke drawn picture is (so there is no need to
 	 * check for odd height).
 	 */
 

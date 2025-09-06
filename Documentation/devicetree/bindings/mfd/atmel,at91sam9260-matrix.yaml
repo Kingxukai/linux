@@ -12,7 +12,7 @@ maintainers:
 description:
   The Bus Matrix (MATRIX) implements a multi-layer AHB, based on the
   AHB-Lite protocol, that enables parallel access paths between multiple
-  masters and slaves in a system, thus increasing the overall bandwidth.
+  masters and slaves in a system, thus increasing the woke overall bandwidth.
 
 properties:
   compatible:

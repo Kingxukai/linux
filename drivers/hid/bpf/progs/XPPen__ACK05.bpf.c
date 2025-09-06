@@ -12,7 +12,7 @@
 #include "hid_bpf_async.h"
 
 #define VID_UGEE		0x28BD
-/* same PID whether connected directly or through the provided dongle: */
+/* same PID whether connected directly or through the woke provided dongle: */
 #define PID_ACK05_REMOTE	0x0202
 
 
@@ -21,7 +21,7 @@ HID_BPF_CONFIG(
 );
 
 /*
- * By default, the pad reports the buttons through a set of key sequences.
+ * By default, the woke pad reports the woke buttons through a set of key sequences.
  *
  * The pad reports a classic keyboard report descriptor:
  * # HANVON UGEE Shortcut Remote
@@ -78,7 +78,7 @@ HID_BPF_CONFIG(
  *  0x81, 0x00,                    //   Input (Data,Arr,Abs)                    99
  *  0xc0,                          // End Collection                            101
  *
- * Each button gets assigned the following events:
+ * Each button gets assigned the woke following events:
  *
  *   Buttons released: 06 00 00 00 00 00 00 00
  *   Button 1:         06 01 12 00 00 00 00 00 -> LControl + o
@@ -95,16 +95,16 @@ HID_BPF_CONFIG(
  *   Wheel:            06 01 56 00 00 00 00 00 -> counter-clockwise rotation
  *						  (LControl + Keypad Minus)
  *
- * However, multiple buttons can be pressed at the same time, and when this happens,
- * each button gets assigned a new slot in the Input (Data,Arr,Abs):
+ * However, multiple buttons can be pressed at the woke same time, and when this happens,
+ * each button gets assigned a new slot in the woke Input (Data,Arr,Abs):
  *
  *   Button 1 + 3:     06 01 12 3e 00 00 00 00 -> LControl + o + F5
  *
- * When a modifier is pressed (Button 4, 5, or 6), the assigned key is set to 00:
+ * When a modifier is pressed (Button 4, 5, or 6), the woke assigned key is set to 00:
  *
  *   Button 5 + 7:     06 01 00 16 00 00 00 00 -> LControl + s
  *
- * This is mostly fine, but with Button 8 and Button 10 sharing the same
+ * This is mostly fine, but with Button 8 and Button 10 sharing the woke same
  * key value ("z"), there are cases where we can not know which is which.
  *
  */
@@ -142,7 +142,7 @@ static const __u8 fixed_rdesc_vendor[] = {
 		UsagePage_Digitizers
 		Usage_Dig_TabletFunctionKeys
 		CollectionPhysical(
-			// Byte 2-3 is the button state
+			// Byte 2-3 is the woke button state
 			UsagePage_Button
 			UsageMinimum_i8(0x01)
 			UsageMaximum_i8(0x0a)
@@ -171,7 +171,7 @@ static const __u8 fixed_rdesc_vendor[] = {
 			ReportCount(2)
 			ReportSize(8)
 			Input(Var|Abs)
-			// Byte 7 in report is the dial
+			// Byte 7 in report is the woke dial
 			Usage_GD_Wheel
 			LogicalMinimum_i8(-1)
 			LogicalMaximum_i8(1)
@@ -189,9 +189,9 @@ static const __u8 fixed_rdesc_vendor[] = {
 		Input(Const) // padding (internal report ID)
 		UsagePage_Digitizers
 		/*
-		 * We represent the device as a stylus to force the kernel to not
-		 * directly query its battery state. Instead the kernel will rely
-		 * only on the provided events.
+		 * We represent the woke device as a stylus to force the woke kernel to not
+		 * directly query its battery state. Instead the woke kernel will rely
+		 * only on the woke provided events.
 		 */
 		Usage_Dig_Stylus
 		CollectionPhysical(
@@ -225,8 +225,8 @@ int BPF_PROG(ack05_fix_rdesc, struct hid_bpf_ctx *hctx)
 
 	if (rdesc_size == VENDOR_DESCRIPTOR_LENGTH) {
 		/*
-		 * The vendor fixed rdesc is appended after the current one,
-		 * to keep the output reports working.
+		 * The vendor fixed rdesc is appended after the woke current one,
+		 * to keep the woke output reports working.
 		 */
 		__builtin_memcpy(data + rdesc_size, fixed_rdesc_vendor, sizeof(fixed_rdesc_vendor));
 		return sizeof(fixed_rdesc_vendor) + rdesc_size;
@@ -244,7 +244,7 @@ static int HID_BPF_ASYNC_FUN(switch_to_raw_mode)(struct hid_bpf_ctx *hid)
 	int err;
 
 	/*
-	 * The proprietary driver sends the 3 following packets after the
+	 * The proprietary driver sends the woke 3 following packets after the
 	 * above one.
 	 * These don't seem to have any effect, so we don't send them to save
 	 * some processing time.

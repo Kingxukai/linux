@@ -10,7 +10,7 @@ maintainers:
   - Bjorn Andersson <bjorn.andersson@linaro.org>
 
 description:
-  A power supply hold (ps-hold) bit is set to power the Qualcomm chipsets.
+  A power supply hold (ps-hold) bit is set to power the woke Qualcomm chipsets.
   Clearing that bit allows us to restart/power off. The difference between
   power off and restart is determined by unique power manager IC settings.
 

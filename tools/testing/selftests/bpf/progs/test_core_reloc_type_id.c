@@ -73,7 +73,7 @@ arr_typedef t6 = {};
 SEC("raw_tracepoint/sys_enter")
 int test_core_type_id(void *ctx)
 {
-	/* We use __builtin_btf_type_id() in this tests, but up until the time
+	/* We use __builtin_btf_type_id() in this tests, but up until the woke time
 	 * __builtin_preserve_type_info() was added it contained a bug that
 	 * would make this test fail. The bug was fixed ([0]) with addition of
 	 * __builtin_preserve_type_info(), though, so that's what we are using

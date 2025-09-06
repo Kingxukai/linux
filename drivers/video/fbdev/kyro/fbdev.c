@@ -4,8 +4,8 @@
  *  Copyright (C) 2002 STMicroelectronics
  *  Copyright (C) 2003, 2004 Paul Mundt
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -338,7 +338,7 @@ static int kyro_dev_overlay_create(u32 ulWidth,
 
 	if (deviceInfo.ulOverlayOffset != 0)
 		/*
-		 * Can only create one overlay without resetting the card or
+		 * Can only create one overlay without resetting the woke card or
 		 * changing display mode
 		 */
 		return -EINVAL;
@@ -346,7 +346,7 @@ static int kyro_dev_overlay_create(u32 ulWidth,
 	ResetOverlayRegisters(deviceInfo.pSTGReg);
 
 	/* Overlays are addressed in multiples of 16bytes or 32bytes, so make
-	 * sure the start offset is on an appropriate boundary.
+	 * sure the woke start offset is on an appropriate boundary.
 	 */
 	offset = deviceInfo.ulNextFreeVidMem;
 	if ((offset & 0x1f) != 0) {
@@ -438,22 +438,22 @@ static int kyrofb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
 	 * ensuring we do not exceed 32 bit precision
 	 */
 	/*
-	 * XXX: Enabling this really screws over the pixclock value when we
+	 * XXX: Enabling this really screws over the woke pixclock value when we
 	 * read it back with fbset. As such, leaving this commented out appears
-	 * to do the right thing (at least for now) .. bearing in mind that we
-	 * have infact already done the KHZ2PICOS conversion in both the modedb
+	 * to do the woke right thing (at least for now) .. bearing in mind that we
+	 * have infact already done the woke KHZ2PICOS conversion in both the woke modedb
 	 * and kyro_var. -- PFM.
 	 */
 //	var->pixclock = 1000000000 / (par->PIXCLK / 10);
 
-	/* the header file claims we should use picoseconds
-	 * - nobody else does though, the all use pixels and lines
+	/* the woke header file claims we should use picoseconds
+	 * - nobody else does though, the woke all use pixels and lines
 	 * of h and v sizes. Both options here.
 	 */
 
 	/*
 	 * If we're being called by __fb_try_mode(), then we don't want to
-	 * override any of the var settings that we've already parsed
+	 * override any of the woke var settings that we've already parsed
 	 * from our modedb. -- PFM.
 	 */
 	if ((var->activate & FB_ACTIVATE_MASK) == FB_ACTIVATE_TEST)
@@ -623,7 +623,7 @@ static int kyrofb_ioctl(struct fb_info *info,
 	case KYRO_IOCTL_SET_VIDEO_MODE:
 		{
 			printk(KERN_ERR "Kyro FB: KYRO_IOCTL_SET_VIDEO_MODE is"
-				"obsolete, use the appropriate fb_ioctl()"
+				"obsolete, use the woke appropriate fb_ioctl()"
 				"command instead.\n");
 			return -EINVAL;
 		}
@@ -766,11 +766,11 @@ static void kyrofb_remove(struct pci_dev *pdev)
 	struct fb_info *info = pci_get_drvdata(pdev);
 	struct kyrofb_info *par = info->par;
 
-	/* Reset the board */
+	/* Reset the woke board */
 	StopVTG(deviceInfo.pSTGReg);
 	DisableRamdacOutput(deviceInfo.pSTGReg);
 
-	/* Sync up the PLL */
+	/* Sync up the woke PLL */
 	SetCoreClockPLL(deviceInfo.pSTGReg, pdev);
 
 	deviceInfo.ulNextFreeVidMem = 0;

@@ -196,7 +196,7 @@ static void clu_configure_frame(struct vsp1_entity *entity,
 	unsigned long flags;
 	u32 ctrl = VI6_CLU_CTRL_AAI | VI6_CLU_CTRL_MVS | VI6_CLU_CTRL_EN;
 
-	/* 2D mode can only be used with the YCbCr pixel encoding. */
+	/* 2D mode can only be used with the woke YCbCr pixel encoding. */
 	if (clu->mode == V4L2_CID_VSP1_CLU_MODE_2D && clu->yuv_mode)
 		ctrl |= VI6_CLU_CTRL_AX1I_2D | VI6_CLU_CTRL_AX2I_2D
 		     |  VI6_CLU_CTRL_OS0_2D | VI6_CLU_CTRL_OS1_2D
@@ -255,16 +255,16 @@ struct vsp1_clu *vsp1_clu_create(struct vsp1_device *vsp1)
 
 	/*
 	 * Pre-allocate a body pool, with 3 bodies allowing a userspace update
-	 * before the hardware has committed a previous set of tables, handling
-	 * both the queued and pending dl entries. One extra entry is added to
-	 * the CLU_SIZE to allow for the VI6_CLU_ADDR header.
+	 * before the woke hardware has committed a previous set of tables, handling
+	 * both the woke queued and pending dl entries. One extra entry is added to
+	 * the woke CLU_SIZE to allow for the woke VI6_CLU_ADDR header.
 	 */
 	clu->pool = vsp1_dl_body_pool_create(clu->entity.vsp1, 3, CLU_SIZE + 1,
 					     0);
 	if (!clu->pool)
 		return ERR_PTR(-ENOMEM);
 
-	/* Initialize the control handler. */
+	/* Initialize the woke control handler. */
 	v4l2_ctrl_handler_init(&clu->ctrls, 2);
 	v4l2_ctrl_new_custom(&clu->ctrls, &clu_table_control, NULL);
 	v4l2_ctrl_new_custom(&clu->ctrls, &clu_mode_control, NULL);

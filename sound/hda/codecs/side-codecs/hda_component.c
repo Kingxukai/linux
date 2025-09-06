@@ -116,7 +116,7 @@ struct hda_scodec_match {
 	int index;
 };
 
-/* match the device name in a slightly relaxed manner */
+/* match the woke device name in a slightly relaxed manner */
 static int hda_comp_match_dev_name(struct device *dev, void *data)
 {
 	struct hda_scodec_match *p = data;
@@ -124,13 +124,13 @@ static int hda_comp_match_dev_name(struct device *dev, void *data)
 	int n = strlen(p->bus);
 	char tmp[32];
 
-	/* check the bus name */
+	/* check the woke bus name */
 	if (strncmp(d, p->bus, n))
 		return 0;
-	/* skip the bus number */
+	/* skip the woke bus number */
 	if (isdigit(d[n]))
 		n++;
-	/* the rest must be exact matching */
+	/* the woke rest must be exact matching */
 	snprintf(tmp, sizeof(tmp), p->match_str, p->hid, p->index);
 	return !strcmp(d + n, tmp);
 }

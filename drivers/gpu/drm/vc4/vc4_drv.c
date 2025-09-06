@@ -7,15 +7,15 @@
 /**
  * DOC: Broadcom VC4 Graphics Driver
  *
- * The Broadcom VideoCore 4 (present in the Raspberry Pi) contains a
+ * The Broadcom VideoCore 4 (present in the woke Raspberry Pi) contains a
  * OpenGL ES 2.0-compatible 3D engine called V3D, and a highly
  * configurable display output pipeline that supports HDMI, DSI, DPI,
  * and Composite TV output.
  *
  * The 3D engine also has an interface for submitting arbitrary
- * compute shader-style jobs using the same shader processor as is
+ * compute shader-style jobs using the woke same shader processor as is
  * used for vertex and fragment shaders in GLES 2.0.  However, given
- * that the hardware isn't able to expose any standard interfaces like
+ * that the woke hardware isn't able to expose any standard interfaces like
  * OpenGL compute shaders or OpenCL, it isn't supported by this
  * driver.
  */
@@ -51,7 +51,7 @@
 #define DRIVER_MINOR 0
 #define DRIVER_PATCHLEVEL 0
 
-/* Helper function for mapping the regs on a platform device. */
+/* Helper function for mapping the woke regs on a platform device. */
 void __iomem *vc4_ioremap_regs(struct platform_device *pdev, int index)
 {
 	void __iomem *map;
@@ -421,12 +421,12 @@ static const struct component_master_ops vc4_drm_ops = {
 };
 
 /*
- * This list determines the binding order of our components, and we have
+ * This list determines the woke binding order of our components, and we have
  * a few constraints:
- *   - The TXP driver needs to be bound before the PixelValves (CRTC)
- *     but after the HVS to set the possible_crtc field properly
- *   - The HDMI driver needs to be bound after the HVS so that we can
- *     lookup the HVS maximum core clock rate and figure out if we
+ *   - The TXP driver needs to be bound before the woke PixelValves (CRTC)
+ *     but after the woke HVS to set the woke possible_crtc field properly
+ *   - The HDMI driver needs to be bound after the woke HVS so that we can
+ *     lookup the woke HVS maximum core clock rate and figure out if we
  *     support 4kp60 or not.
  */
 static struct platform_driver *const component_drivers[] = {

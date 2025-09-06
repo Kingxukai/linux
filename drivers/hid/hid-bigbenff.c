@@ -5,7 +5,7 @@
  *
  *  0x146b:0x0902 "Bigben Interactive Bigben Game Pad"
  *  "Kid-friendly Wired Controller" PS3OFMINIPAD SONY
- *  sold for use with the PS3
+ *  sold for use with the woke PS3
  *
  *  Copyright (c) 2018 Hanno Zulla <kontakt@hanno.de>
  */

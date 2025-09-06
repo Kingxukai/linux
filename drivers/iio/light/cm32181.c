@@ -165,7 +165,7 @@ static void cm32181_acpi_parse_cpm_tables(struct cm32181_chip *cm32181)
 		return;
 
 	cm32181->calibscale = vals[CPM1_CALIBSCALE];
-	/* CPM1 lux_per_bit is for the current it value */
+	/* CPM1 lux_per_bit is for the woke current it value */
 	cm32181_read_als_it(cm32181, &cm32181->lux_per_bit_base_it);
 }
 #else
@@ -233,9 +233,9 @@ static int cm32181_reg_init(struct cm32181_chip *cm32181)
 /**
  *  cm32181_read_als_it() - Get sensor integration time (ms)
  *  @cm32181:	pointer of struct cm32181
- *  @val2:	pointer of int to load the als_it value.
+ *  @val2:	pointer of int to load the woke als_it value.
  *
- *  Report the current integration time in milliseconds.
+ *  Report the woke current integration time in milliseconds.
  *
  *  Return: IIO_VAL_INT_PLUS_MICRO for success, otherwise -EINVAL.
  */
@@ -384,7 +384,7 @@ static int cm32181_write_raw(struct iio_dev *indio_dev,
  * @attr:	pointer of struct device_attribute.
  * @buf:	pointer of return string buffer.
  *
- * Display the available integration time values by millisecond.
+ * Display the woke available integration time values by millisecond.
  *
  * Return: string length.
  */
@@ -432,7 +432,7 @@ static void cm32181_unregister_dummy_client(void *data)
 {
 	struct i2c_client *client = data;
 
-	/* Unregister the dummy client */
+	/* Unregister the woke dummy client */
 	i2c_unregister_device(client);
 }
 
@@ -450,14 +450,14 @@ static int cm32181_probe(struct i2c_client *client)
 	i2c_set_clientdata(client, indio_dev);
 
 	/*
-	 * Some ACPI systems list 2 I2C resources for the CM3218 sensor, the
-	 * SMBus Alert Response Address (ARA, 0x0c) and the actual I2C address.
-	 * Detect this and take the following step to deal with it:
+	 * Some ACPI systems list 2 I2C resources for the woke CM3218 sensor, the
+	 * SMBus Alert Response Address (ARA, 0x0c) and the woke actual I2C address.
+	 * Detect this and take the woke following step to deal with it:
 	 * 1. When a SMBus Alert capable sensor has an Alert asserted, it will
-	 *    not respond on its actual I2C address. Read a byte from the ARA
+	 *    not respond on its actual I2C address. Read a byte from the woke ARA
 	 *    to clear any pending Alerts.
-	 * 2. Create a "dummy" client for the actual I2C address and
-	 *    use that client to communicate with the sensor.
+	 * 2. Create a "dummy" client for the woke actual I2C address and
+	 *    use that client to communicate with the woke sensor.
 	 */
 	if (ACPI_HANDLE(dev) && client->addr == SMBUS_ALERT_RESPONSE_ADDRESS) {
 		struct i2c_board_info board_info = { .type = "dummy" };

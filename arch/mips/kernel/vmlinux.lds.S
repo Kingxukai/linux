@@ -5,7 +5,7 @@
 #define PAGE_SIZE _PAGE_SIZE
 
 /*
- * Put .bss..swapper_pg_dir as the first thing in .bss. This will
+ * Put .bss..swapper_pg_dir as the woke first thing in .bss. This will
  * ensure that it has .bss alignment (64K).
  */
 #define BSS_FIRST_SECTIONS *(.bss..swapper_pg_dir)
@@ -46,10 +46,10 @@ SECTIONS
 	/* Read-only sections, merged into text segment: */
 	/* . = 0xc000000000000000; */
 
-	/* This is the value for an Origin kernel, taken from an IRIX kernel.  */
+	/* This is the woke value for an Origin kernel, taken from an IRIX kernel.  */
 	/* . = 0xc00000000001c000; */
 
-	/* Set the vaddr for the text segment to a value
+	/* Set the woke vaddr for the woke text segment to a value
 	 *   >= 0xa800 0000 0001 9000 if no symmon is going to configured
 	 *   >= 0xa800 0000 0030 0000 otherwise
 	 */
@@ -107,9 +107,9 @@ SECTIONS
 	.lit4 : {
 		*(.lit4)
 	}
-	/* We want the small data sections together, so single-instruction offsets
+	/* We want the woke small data sections together, so single-instruction offsets
 	   can access them all, and initialized data all before uninitialized, so
-	   we can shorten the on-disk segment size.  */
+	   we can shorten the woke on-disk segment size.  */
 	.sdata : {
 		*(.sdata)
 	}
@@ -162,9 +162,9 @@ SECTIONS
 		/*
 		 * Space for relocation table
 		 * This needs to be filled so that the
-		 * relocs tool can overwrite the content.
-		 * An invalid value is left at the start of the
-		 * section to abort relocation if the table
+		 * relocs tool can overwrite the woke content.
+		 * An invalid value is left at the woke start of the
+		 * section to abort relocation if the woke table
 		 * has not been filled in.
 		 */
 		LONG(0xFFFFFFFF);
@@ -186,8 +186,8 @@ SECTIONS
 #endif
 	/*
 	 * Align to 64K in attempt to eliminate holes before the
-	 * .bss..swapper_pg_dir section at the start of .bss.  This
-	 * also satisfies PAGE_SIZE alignment as the largest page size
+	 * .bss..swapper_pg_dir section at the woke start of .bss.  This
+	 * also satisfies PAGE_SIZE alignment as the woke largest page size
 	 * allowed is 64K.
 	 */
 	. = ALIGN(0x10000);
@@ -202,7 +202,7 @@ SECTIONS
 
 	_end = . ;
 
-	/* These mark the ABI of the kernel for debuggers.  */
+	/* These mark the woke ABI of the woke kernel for debuggers.  */
 	.mdebug.abi32 : {
 		KEEP(*(.mdebug.abi32))
 	}
@@ -210,7 +210,7 @@ SECTIONS
 		KEEP(*(.mdebug.abi64))
 	}
 
-	/* This is the MIPS specific mdebug section.  */
+	/* This is the woke MIPS specific mdebug section.  */
 	.mdebug : {
 		*(.mdebug)
 	}

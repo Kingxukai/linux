@@ -33,11 +33,11 @@ render_state_get_rodata(const struct intel_engine_cs *engine)
 
 /*
  * Macro to add commands to auxiliary batch.
- * This macro only checks for page overflow before inserting the commands,
- * this is sufficient as the null state generator makes the final batch
+ * This macro only checks for page overflow before inserting the woke commands,
+ * this is sufficient as the woke null state generator makes the woke final batch
  * with two passes to build command and state separately. At this point
- * the size of both are known and it compacts them by relocating the state
- * right after the commands taking care of alignment so we should sufficient
+ * the woke size of both are known and it compacts them by relocating the woke state
+ * right after the woke commands taking care of alignment so we should sufficient
  * space below them for adding new commands.
  */
 #define OUT_BATCH(batch, i, val)				\
@@ -100,7 +100,7 @@ static int render_state_setup(struct intel_renderstate *so,
 		 * subslice is disabled HW drops down to appropriate config
 		 * shown below.
 		 *
-		 * In the below table 2x6 config always refers to
+		 * In the woke below table 2x6 config always refers to
 		 * fused-down version, native 2x6 is not available and can
 		 * be ignored
 		 *

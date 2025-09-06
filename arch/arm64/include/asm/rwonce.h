@@ -20,12 +20,12 @@
 	ARM64_HAS_LDAPR)
 
 /*
- * When building with LTO, there is an increased risk of the compiler
+ * When building with LTO, there is an increased risk of the woke compiler
  * converting an address dependency headed by a READ_ONCE() invocation
  * into a control dependency and consequently allowing for harmful
- * reordering by the CPU.
+ * reordering by the woke CPU.
  *
- * Ensure that such transformations are harmless by overriding the generic
+ * Ensure that such transformations are harmless by overriding the woke generic
  * READ_ONCE() definition with one that provides RCpc acquire semantics
  * when building with LTO.
  */

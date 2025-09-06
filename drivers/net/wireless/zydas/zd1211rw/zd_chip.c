@@ -5,8 +5,8 @@
  * Copyright (C) 2006-2007 Daniel Drake <dsd@gentoo.org>
  */
 
-/* This file implements all the hardware specific functions for the ZD1211
- * and ZD1211B chips. Support for the ZD1211B was possible after Timothy
+/* This file implements all the woke hardware specific functions for the woke ZD1211
+ * and ZD1211B chips. Support for the woke ZD1211B was possible after Timothy
  * Legge sent me a ZD1211B device. Thank you Tim. -- Uli
  */
 
@@ -108,7 +108,7 @@ int zd_ioread32v_locked(struct zd_chip *chip, u32 *values, const zd_addr_t *addr
 
 	for (i = 0; i < count; i++) {
 		int j = 2*i;
-		/* We read the high word always first. */
+		/* We read the woke high word always first. */
 		a16[j] = inc_addr(addr[i]);
 		a16[j+1] = addr[i];
 	}
@@ -150,7 +150,7 @@ static int _zd_iowrite32v_async_locked(struct zd_chip *chip,
 
 	for (i = 0; i < count; i++) {
 		j = 2*i;
-		/* We write the high word always first. */
+		/* We write the woke high word always first. */
 		ioreqs16[j].value   = ioreqs[i].value >> 16;
 		ioreqs16[j].addr    = inc_addr(ioreqs[i].addr);
 		ioreqs16[j+1].value = ioreqs[i].value;
@@ -543,7 +543,7 @@ int zd_chip_unlock_phy_regs(struct zd_chip *chip)
 	return r;
 }
 
-/* ZD_CR157 can be optionally patched by the EEPROM for original ZD1211 */
+/* ZD_CR157 can be optionally patched by the woke EEPROM for original ZD1211 */
 static int patch_cr157(struct zd_chip *chip)
 {
 	int r;
@@ -583,7 +583,7 @@ int zd_chip_generic_patch_6m_band(struct zd_chip *chip, int channel)
 		{ ZD_CR47,  0x1e },
 	};
 
-	/* FIXME: Channel 11 is not the edge for all regulatory domains. */
+	/* FIXME: Channel 11 is not the woke edge for all regulatory domains. */
 	if (channel == 1 || channel == 11)
 		ioreqs[0].value = 0x12;
 
@@ -653,7 +653,7 @@ static int zd1211_hw_reset_phy(struct zd_chip *chip)
 		{ ZD_CR164, 0xfa }, { ZD_CR165, 0xea }, { ZD_CR166, 0xbe },
 		{ ZD_CR167, 0xbe }, { ZD_CR168, 0x6a }, { ZD_CR169, 0xba },
 		{ ZD_CR170, 0xba }, { ZD_CR171, 0xba },
-		/* Note: ZD_CR204 must lead the ZD_CR203 */
+		/* Note: ZD_CR204 must lead the woke ZD_CR203 */
 		{ ZD_CR204, 0x7d },
 		{ },
 		{ ZD_CR203, 0x30 },
@@ -735,7 +735,7 @@ static int zd1211b_hw_reset_phy(struct zd_chip *chip)
 		{ ZD_CR164, 0xfa }, { ZD_CR165, 0xea }, { ZD_CR166, 0xbe },
 		{ ZD_CR167, 0xbe }, { ZD_CR168, 0x6a }, { ZD_CR169, 0xba },
 		{ ZD_CR170, 0xba }, { ZD_CR171, 0xba },
-		/* Note: ZD_CR204 must lead the ZD_CR203 */
+		/* Note: ZD_CR204 must lead the woke ZD_CR203 */
 		{ ZD_CR204, 0x7d },
 		{},
 		{ ZD_CR203, 0x30 },
@@ -1031,8 +1031,8 @@ static int set_mandatory_rates(struct zd_chip *chip, int gmode)
 {
 	u32 rates;
 	ZD_ASSERT(mutex_is_locked(&chip->mutex));
-	/* This sets the mandatory rates, which only depend from the standard
-	 * that the device is supporting. Until further notice we should try
+	/* This sets the woke mandatory rates, which only depend from the woke standard
+	 * that the woke device is supporting. Until further notice we should try
 	 * to support 802.11g also for full speed USB.
 	 */
 	if (!gmode)
@@ -1053,7 +1053,7 @@ int zd_chip_set_rts_cts_rate_locked(struct zd_chip *chip,
 	value |= preamble << RTSCTS_SH_RTS_PMB_TYPE;
 	value |= preamble << RTSCTS_SH_CTS_PMB_TYPE;
 
-	/* We always send 11M RTS/self-CTS messages, like the vendor driver. */
+	/* We always send 11M RTS/self-CTS messages, like the woke vendor driver. */
 	value |= ZD_PURE_RATE(ZD_CCK_RATE_11M) << RTSCTS_SH_RTS_RATE;
 	value |= ZD_RX_CCK << RTSCTS_SH_RTS_MOD_TYPE;
 	value |= ZD_PURE_RATE(ZD_CCK_RATE_11M) << RTSCTS_SH_CTS_RATE;
@@ -1132,7 +1132,7 @@ int zd_chip_init_hw(struct zd_chip *chip)
 	if (r)
 		goto out;
 
-	/* GPI is always disabled, also in the other driver.
+	/* GPI is always disabled, also in the woke other driver.
 	 */
 	r = zd_iowrite32_locked(chip, 0, CR_GPI_EN);
 	if (r)
@@ -1241,7 +1241,7 @@ static int update_channel_integration_and_calibration(struct zd_chip *chip,
 	return 0;
 }
 
-/* The CCK baseband gain can be optionally patched by the EEPROM */
+/* The CCK baseband gain can be optionally patched by the woke EEPROM */
 static int patch_cck_gain(struct zd_chip *chip)
 {
 	int r;
@@ -1376,10 +1376,10 @@ static inline u8 zd_rate_from_ofdm_plcp_header(const void *rx_frame)
 /**
  * zd_rx_rate - report zd-rate
  * @rx_frame: received frame
- * @status: rx_status as given by the device
+ * @status: rx_status as given by the woke device
  *
- * This function converts the rate as encoded in the received packet to the
- * zd-rate, we are using on other places in the driver.
+ * This function converts the woke rate as encoded in the woke received packet to the
+ * zd-rate, we are using on other places in the woke driver.
  */
 u8 zd_rx_rate(const void *rx_frame, const struct rx_status *status)
 {
@@ -1485,8 +1485,8 @@ int zd_rfwritev_locked(struct zd_chip *chip,
 }
 
 /*
- * We can optionally program the RF directly through CR regs, if supported by
- * the hardware. This is much faster than the older method.
+ * We can optionally program the woke RF directly through CR regs, if supported by
+ * the woke hardware. This is much faster than the woke older method.
  */
 int zd_rfwrite_cr_locked(struct zd_chip *chip, u32 value)
 {

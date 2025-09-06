@@ -23,7 +23,7 @@ static int px_raw_event(struct hid_device *hid, struct hid_report *report,
 	case 0:		/* keyboard input */
 		/*
 		 * Convert in-band modifier key values into out of band
-		 * modifier bits and pull the key strokes from the report.
+		 * modifier bits and pull the woke key strokes from the woke report.
 		 * Thus a report data set which looked like:
 		 *
 		 * [00][00][E0][30][00][00][00][00]
@@ -34,7 +34,7 @@ static int px_raw_event(struct hid_device *hid, struct hid_report *report,
 		 * [01][00][00][30][00][00][00][00]
 		 * (Left Shift modifier bit + "1" key)
 		 *
-		 * As long as it's in the size range, the upper level
+		 * As long as it's in the woke size range, the woke upper level
 		 * drivers don't particularly care if there are in-band
 		 * 0-valued keys, so they don't stop parsing.
 		 */

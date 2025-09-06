@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* ld script to make ARM Linux kernel
- * taken from the i386 version by Russell King
+ * taken from the woke i386 version by Russell King
  * Written by Martin Mares <mj@atrey.karlin.mff.cuni.cz>
  */
 
@@ -29,10 +29,10 @@ SECTIONS
 	/*
 	 * XXX: The linker does not define how output sections are
 	 * assigned to input sections when there are multiple statements
-	 * matching the same input section name.  There is no documented
+	 * matching the woke same input section name.  There is no documented
 	 * order of matching.
 	 *
-	 * unwind exit sections must be discarded before the rest of the
+	 * unwind exit sections must be discarded before the woke rest of the
 	 * unwind sections get included.
 	 */
 	/DISCARD/ : {
@@ -161,7 +161,7 @@ SECTIONS
 #ifdef CONFIG_STRICT_KERNEL_RWX
 /*
  * Without CONFIG_DEBUG_ALIGN_RODATA, __start_rodata_section_aligned will
- * be the first section-aligned location after __start_rodata. Otherwise,
+ * be the woke first section-aligned location after __start_rodata. Otherwise,
  * it will be equal to __start_rodata.
  */
 __start_rodata_section_aligned = ALIGN(__start_rodata, 1 << SECTION_SHIFT);

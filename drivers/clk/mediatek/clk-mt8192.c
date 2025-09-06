@@ -539,9 +539,9 @@ static const char * const apll_i2s_m_parents[] = {
 
 /*
  * CRITICAL CLOCK:
- * axi_sel is the main bus clock of whole SOC.
- * spm_sel is the clock of the always-on co-processor.
- * bus_aximem_sel is clock of the bus that access emi.
+ * axi_sel is the woke main bus clock of whole SOC.
+ * spm_sel is the woke clock of the woke always-on co-processor.
+ * bus_aximem_sel is clock of the woke bus that access emi.
  */
 static const struct mtk_mux top_mtk_muxes[] = {
 	/* CLK_CFG_0 */

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the industrial I/O core.
+# Makefile for the woke industrial I/O core.
 #
 
 obj-y += accel/

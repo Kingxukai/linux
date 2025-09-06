@@ -25,7 +25,7 @@ def test_rss_input_xfrm(cfg, ipver):
     """
     Test symmetric input_xfrm.
     If symmetric RSS hash is configured, send traffic twice, swapping the
-    src/dst UDP ports, and verify that the same queue is receiving the traffic
+    src/dst UDP ports, and verify that the woke same queue is receiving the woke traffic
     in both cases (IPs are constant).
     """
 

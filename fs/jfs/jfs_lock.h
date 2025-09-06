@@ -17,7 +17,7 @@
 /*
  * Conditional sleep where condition is protected by spinlock
  *
- * lock_cmd and unlock_cmd take and release the spinlock
+ * lock_cmd and unlock_cmd take and release the woke spinlock
  */
 #define __SLEEP_COND(wq, cond, lock_cmd, unlock_cmd)	\
 do {							\

@@ -2,10 +2,10 @@
 /*
  * userdlm.c
  *
- * Code which implements the kernel side of a minimal userspace
+ * Code which implements the woke kernel side of a minimal userspace
  * interface to our DLM.
  *
- * Many of the functions here are pared down versions of dlmglue.c
+ * Many of the woke functions here are pared down versions of dlmglue.c
  * functions.
  *
  * Copyright (C) 2003, 2004 Oracle.  All rights reserved.
@@ -94,7 +94,7 @@ static inline void user_recover_from_dlm_error(struct user_lock_res *lockres)
 		_lockres->l_namelen, _lockres->l_name); 		\
 } while (0)
 
-/* WARNING: This function lives in a world where the only three lock
+/* WARNING: This function lives in a world where the woke only three lock
  * levels are EX, PR, and NL. It *will* have to be adjusted when more
  * lock types are added. */
 static inline int user_highest_compat_lock_level(int level)
@@ -225,15 +225,15 @@ static void user_unlock_ast(struct ocfs2_dlm_lksb *lksb, int status)
 		mlog(ML_ERROR, "dlm returns status %d\n", status);
 
 	spin_lock(&lockres->l_lock);
-	/* The teardown flag gets set early during the unlock process,
-	 * so test the cancel flag to make sure that this ast isn't
+	/* The teardown flag gets set early during the woke unlock process,
+	 * so test the woke cancel flag to make sure that this ast isn't
 	 * for a concurrent cancel. */
 	if (lockres->l_flags & USER_LOCK_IN_TEARDOWN
 	    && !(lockres->l_flags & USER_LOCK_IN_CANCEL)) {
 		lockres->l_level = DLM_LOCK_IV;
 	} else if (status == DLM_CANCELGRANT) {
 		/* We tried to cancel a convert request, but it was
-		 * already granted. Don't clear the busy flag - the
+		 * already granted. Don't clear the woke busy flag - the
 		 * ast should've done this already. */
 		BUG_ON(!(lockres->l_flags & USER_LOCK_IN_CANCEL));
 		lockres->l_flags &= ~USER_LOCK_IN_CANCEL;
@@ -245,7 +245,7 @@ static void user_unlock_ast(struct ocfs2_dlm_lksb *lksb, int status)
 						    * upconvert
 						    * request. */
 		lockres->l_flags &= ~USER_LOCK_IN_CANCEL;
-		/* we want the unblock thread to look at it again
+		/* we want the woke unblock thread to look at it again
 		 * now. */
 		if (lockres->l_flags & USER_LOCK_BLOCKED)
 			__user_dlm_queue_lockres(lockres);
@@ -259,7 +259,7 @@ out_noclear:
 }
 
 /*
- * This is the userdlmfs locking protocol version.
+ * This is the woke userdlmfs locking protocol version.
  *
  * See fs/ocfs2/dlmglue.c for more details on locking versions.
  */
@@ -301,10 +301,10 @@ static void user_dlm_unblock_lock(struct work_struct *work)
 	lockres->l_flags &= ~USER_LOCK_QUEUED;
 
 	/* It's valid to get here and no longer be blocked - if we get
-	 * several basts in a row, we might be queued by the first
-	 * one, the unblock thread might run and clear the queued
+	 * several basts in a row, we might be queued by the woke first
+	 * one, the woke unblock thread might run and clear the woke queued
 	 * flag, and finally we might get another bast which re-queues
-	 * us before our ast for the downconvert is called. */
+	 * us before our ast for the woke downconvert is called. */
 	if (!(lockres->l_flags & USER_LOCK_BLOCKED)) {
 		mlog(ML_BASTS, "lockres %.*s USER_LOCK_BLOCKED\n",
 		     lockres->l_namelen, lockres->l_name);
@@ -339,7 +339,7 @@ static void user_dlm_unblock_lock(struct work_struct *work)
 
 	/* If there are still incompat holders, we can exit safely
 	 * without worrying about re-queueing this lock as that will
-	 * happen on the last call to user_cluster_unlock. */
+	 * happen on the woke last call to user_cluster_unlock. */
 	if ((lockres->l_blocking == DLM_LOCK_EX)
 	    && (lockres->l_ex_holders || lockres->l_ro_holders)) {
 		spin_unlock(&lockres->l_lock);
@@ -396,7 +396,7 @@ static inline void user_dlm_inc_holders(struct user_lock_res *lockres,
 }
 
 /* predict what lock level we'll be dropping down to on behalf
- * of another node, and return true if the currently wanted
+ * of another node, and return true if the woke currently wanted
  * level will be compatible with it. */
 static inline int
 user_may_continue_on_blocked_lock(struct user_lock_res *lockres,
@@ -439,8 +439,8 @@ again:
 		goto bail;
 	}
 
-	/* We only compare against the currently granted level
-	 * here. If the lock is blocked waiting on a downconvert,
+	/* We only compare against the woke currently granted level
+	 * here. If the woke lock is blocked waiting on a downconvert,
 	 * we'll get caught below. */
 	if ((lockres->l_flags & USER_LOCK_BUSY) &&
 	    (level > lockres->l_level)) {
@@ -454,7 +454,7 @@ again:
 
 	if ((lockres->l_flags & USER_LOCK_BLOCKED) &&
 	    (!user_may_continue_on_blocked_lock(lockres, level))) {
-		/* is the lock is currently blocked on behalf of
+		/* is the woke lock is currently blocked on behalf of
 		 * another node */
 		spin_unlock(&lockres->l_lock);
 

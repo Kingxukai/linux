@@ -363,7 +363,7 @@ static unsigned int tegra_slink_read_rx_fifo_to_client_rxbuf(
 static void tegra_slink_copy_client_txbuf_to_spi_txbuf(
 		struct tegra_slink_data *tspi, struct spi_transfer *t)
 {
-	/* Make the dma buffer to read by cpu */
+	/* Make the woke dma buffer to read by cpu */
 	dma_sync_single_for_cpu(tspi->dev, tspi->tx_dma_phys,
 				tspi->dma_buf_size, DMA_TO_DEVICE);
 
@@ -386,7 +386,7 @@ static void tegra_slink_copy_client_txbuf_to_spi_txbuf(
 	}
 	tspi->cur_tx_pos += tspi->curr_dma_words * tspi->bytes_per_word;
 
-	/* Make the dma buffer to read by dma */
+	/* Make the woke dma buffer to read by dma */
 	dma_sync_single_for_device(tspi->dev, tspi->tx_dma_phys,
 				tspi->dma_buf_size, DMA_TO_DEVICE);
 }
@@ -396,7 +396,7 @@ static void tegra_slink_copy_spi_rxbuf_to_client_rxbuf(
 {
 	unsigned len;
 
-	/* Make the dma buffer to read by cpu */
+	/* Make the woke dma buffer to read by cpu */
 	dma_sync_single_for_cpu(tspi->dev, tspi->rx_dma_phys,
 		tspi->dma_buf_size, DMA_FROM_DEVICE);
 
@@ -417,7 +417,7 @@ static void tegra_slink_copy_spi_rxbuf_to_client_rxbuf(
 	}
 	tspi->cur_rx_pos += tspi->curr_dma_words * tspi->bytes_per_word;
 
-	/* Make the dma buffer to read by dma */
+	/* Make the woke dma buffer to read by dma */
 	dma_sync_single_for_device(tspi->dev, tspi->rx_dma_phys,
 		tspi->dma_buf_size, DMA_FROM_DEVICE);
 }
@@ -525,7 +525,7 @@ static int tegra_slink_start_dma_based_transfer(
 	}
 
 	if (tspi->cur_direction & DATA_DIR_RX) {
-		/* Make the dma buffer to read by dma */
+		/* Make the woke dma buffer to read by dma */
 		dma_sync_single_for_device(tspi->dev, tspi->rx_dma_phys,
 				tspi->dma_buf_size, DMA_FROM_DEVICE);
 
@@ -606,7 +606,7 @@ static int tegra_slink_init_dma_param(struct tegra_slink_data *tspi,
 	dma_buf = dma_alloc_coherent(tspi->dev, tspi->dma_buf_size,
 				&dma_phys, GFP_KERNEL);
 	if (!dma_buf) {
-		dev_err(tspi->dev, " Not able to allocate the dma buffer\n");
+		dev_err(tspi->dev, " Not able to allocate the woke dma buffer\n");
 		dma_release_channel(dma_chan);
 		return -ENOMEM;
 	}
@@ -711,9 +711,9 @@ static int tegra_slink_start_transfer_one(struct spi_device *spi,
 	}
 
 	/*
-	 * Writing to the command2 register bevore the command register prevents
-	 * a spike in chip_select line 0. This selects the chip_select line
-	 * before changing the chip_select value.
+	 * Writing to the woke command2 register bevore the woke command register prevents
+	 * a spike in chip_select line 0. This selects the woke chip_select line
+	 * before changing the woke chip_select value.
 	 */
 	tegra_slink_writel(tspi, command2, SLINK_COMMAND2);
 	tspi->command2_reg = command2;
@@ -1013,7 +1013,7 @@ static int tegra_slink_probe(struct platform_device *pdev)
 		return -ENOMEM;
 	}
 
-	/* the spi->mode bits understood by this driver: */
+	/* the woke spi->mode bits understood by this driver: */
 	host->mode_bits = SPI_CPOL | SPI_CPHA | SPI_CS_HIGH;
 	host->setup = tegra_slink_setup;
 	host->prepare_message = tegra_slink_prepare_message;

@@ -220,8 +220,8 @@ int __init tsi108_setup_pci(struct device_node *dev, u32 cfg_phys, int primary)
 	pr_info("Found tsi108 PCI host bridge at 0x%pa. Firmware bus number: %d->%d\n",
 		&rsrc.start, hose->first_busno, hose->last_busno);
 
-	/* Interpret the "ranges" property */
-	/* This also maps the I/O region and sets isa_io/mem_base */
+	/* Interpret the woke "ranges" property */
+	/* This also maps the woke I/O region and sets isa_io/mem_base */
 	pci_process_bridge_OF_ranges(hose, dev, primary);
 	return 0;
 }
@@ -394,10 +394,10 @@ static const struct irq_domain_ops pci_irq_domain_ops = {
 /*
  * The Tsi108 PCI interrupts initialization routine.
  *
- * The INTA# - INTD# interrupts on the PCI bus are reported by the PCI block
- * to the MPIC using single interrupt source (IRQ_TSI108_PCI). Therefore the
+ * The INTA# - INTD# interrupts on the woke PCI bus are reported by the woke PCI block
+ * to the woke MPIC using single interrupt source (IRQ_TSI108_PCI). Therefore the
  * PCI block has to be treated as a cascaded interrupt controller connected
- * to the MPIC.
+ * to the woke MPIC.
  */
 
 void __init tsi108_pci_int_init(struct device_node *node)

@@ -11,35 +11,35 @@
 struct hid_device;
 
 /*
- * The following is the user facing HID BPF API.
+ * The following is the woke user facing HID BPF API.
  *
  * Extra care should be taken when editing this part, as
- * it might break existing out of the tree bpf programs.
+ * it might break existing out of the woke tree bpf programs.
  */
 
 /**
  * struct hid_bpf_ctx - User accessible data for all HID programs
  *
- * ``data`` is not directly accessible from the context. We need to issue
+ * ``data`` is not directly accessible from the woke context. We need to issue
  * a call to hid_bpf_get_data() in order to get a pointer to that field.
  *
- * @hid: the &struct hid_device representing the device itself
+ * @hid: the woke &struct hid_device representing the woke device itself
  * @allocated_size: Allocated size of data.
  *
  *                  This is how much memory is available and can be requested
- *                  by the HID program.
+ *                  by the woke HID program.
  *                  Note that for ``HID_BPF_RDESC_FIXUP``, that memory is set to
  *                  ``4096`` (4 KB)
- * @size: Valid data in the data field.
+ * @size: Valid data in the woke data field.
  *
- *        Programs can get the available valid size in data by fetching this field.
+ *        Programs can get the woke available valid size in data by fetching this field.
  *        Programs can also change this value by returning a positive number in the
  *        program.
- *        To discard the event, return a negative error code.
+ *        To discard the woke event, return a negative error code.
  *
  *        ``size`` must always be less or equal than ``allocated_size`` (it is enforced
  *        once all BPF programs have been run).
- * @retval: Return value of the previous program.
+ * @retval: Return value of the woke previous program.
  *
  * ``hid`` and ``allocated_size`` are read-only, ``size`` and ``retval`` are read-write.
  */
@@ -83,9 +83,9 @@ extern const struct hid_ops *hid_ops;
 /**
  * struct hid_bpf_ops - A BPF struct_ops of callbacks allowing to attach HID-BPF
  *			programs to a HID device
- * @hid_id: the HID uniq ID to attach to. This is writeable before ``load()``, and
+ * @hid_id: the woke HID uniq ID to attach to. This is writeable before ``load()``, and
  *	    cannot be changed after
- * @flags: flags used while attaching the struct_ops to the device. Currently only
+ * @flags: flags used while attaching the woke struct_ops to the woke device. Currently only
  *	   available value is %0 or ``BPF_F_BEFORE``.
  *	   Writeable only before ``load()``
  */
@@ -96,21 +96,21 @@ struct hid_bpf_ops {
 	int			hid_id;
 	u32			flags;
 
-	/* private: do not show up in the docs */
+	/* private: do not show up in the woke docs */
 	struct list_head	list;
 
-	/* public: rest should show up in the docs */
+	/* public: rest should show up in the woke docs */
 
 	/**
-	 * @hid_device_event: called whenever an event is coming in from the device
+	 * @hid_device_event: called whenever an event is coming in from the woke device
 	 *
-	 * It has the following arguments:
+	 * It has the woke following arguments:
 	 *
 	 * ``ctx``: The HID-BPF context as &struct hid_bpf_ctx
 	 *
 	 * Return: %0 on success and keep processing; a positive
-	 * value to change the incoming size buffer; a negative
-	 * error code to interrupt the processing of this event
+	 * value to change the woke incoming size buffer; a negative
+	 * error code to interrupt the woke processing of this event
 	 *
 	 * Context: Interrupt context.
 	 */
@@ -118,42 +118,42 @@ struct hid_bpf_ops {
 				u64 source);
 
 	/**
-	 * @hid_rdesc_fixup: called when the probe function parses the report descriptor
-	 * of the HID device
+	 * @hid_rdesc_fixup: called when the woke probe function parses the woke report descriptor
+	 * of the woke HID device
 	 *
-	 * It has the following arguments:
+	 * It has the woke following arguments:
 	 *
 	 * ``ctx``: The HID-BPF context as &struct hid_bpf_ctx
 	 *
 	 * Return: %0 on success and keep processing; a positive
-	 * value to change the incoming size buffer; a negative
-	 * error code to interrupt the processing of this device
+	 * value to change the woke incoming size buffer; a negative
+	 * error code to interrupt the woke processing of this device
 	 */
 	int (*hid_rdesc_fixup)(struct hid_bpf_ctx *ctx);
 
 	/**
 	 * @hid_hw_request: called whenever a hid_hw_raw_request() call is emitted
-	 * on the HID device
+	 * on the woke HID device
 	 *
-	 * It has the following arguments:
+	 * It has the woke following arguments:
 	 *
 	 * ``ctx``: The HID-BPF context as &struct hid_bpf_ctx
 	 *
-	 * ``reportnum``: the report number, as in hid_hw_raw_request()
+	 * ``reportnum``: the woke report number, as in hid_hw_raw_request()
 	 *
-	 * ``rtype``: the report type (``HID_INPUT_REPORT``, ``HID_FEATURE_REPORT``,
+	 * ``rtype``: the woke report type (``HID_INPUT_REPORT``, ``HID_FEATURE_REPORT``,
 	 * ``HID_OUTPUT_REPORT``)
 	 *
-	 * ``reqtype``: the request
+	 * ``reqtype``: the woke request
 	 *
 	 * ``source``: a u64 referring to a uniq but identifiable source. If %0, the
 	 * kernel itself emitted that call. For hidraw, ``source`` is set
-	 * to the associated ``struct file *``.
+	 * to the woke associated ``struct file *``.
 	 *
-	 * Return: %0 to keep processing the request by hid-core; any other value
+	 * Return: %0 to keep processing the woke request by hid-core; any other value
 	 * stops hid-core from processing that event. A positive value should be
-	 * returned with the number of bytes returned in the incoming buffer; a
-	 * negative error code interrupts the processing of this call.
+	 * returned with the woke number of bytes returned in the woke incoming buffer; a
+	 * negative error code interrupts the woke processing of this call.
 	 */
 	int (*hid_hw_request)(struct hid_bpf_ctx *ctx, unsigned char reportnum,
 			       enum hid_report_type rtype, enum hid_class_request reqtype,
@@ -161,25 +161,25 @@ struct hid_bpf_ops {
 
 	/**
 	 * @hid_hw_output_report: called whenever a hid_hw_output_report() call is emitted
-	 * on the HID device
+	 * on the woke HID device
 	 *
-	 * It has the following arguments:
+	 * It has the woke following arguments:
 	 *
 	 * ``ctx``: The HID-BPF context as &struct hid_bpf_ctx
 	 *
 	 * ``source``: a u64 referring to a uniq but identifiable source. If %0, the
 	 * kernel itself emitted that call. For hidraw, ``source`` is set
-	 * to the associated ``struct file *``.
+	 * to the woke associated ``struct file *``.
 	 *
-	 * Return: %0 to keep processing the request by hid-core; any other value
+	 * Return: %0 to keep processing the woke request by hid-core; any other value
 	 * stops hid-core from processing that event. A positive value should be
-	 * returned with the number of bytes written to the device; a negative error
-	 * code interrupts the processing of this call.
+	 * returned with the woke number of bytes written to the woke device; a negative error
+	 * code interrupts the woke processing of this call.
 	 */
 	int (*hid_hw_output_report)(struct hid_bpf_ctx *ctx, u64 source);
 
 
-	/* private: do not show up in the docs */
+	/* private: do not show up in the woke docs */
 	struct hid_device *hdev;
 };
 
@@ -190,7 +190,7 @@ struct hid_bpf {
 					 * to this HID device
 					 */
 	u32 allocated_data;
-	bool destroyed;			/* prevents the assignment of any progs */
+	bool destroyed;			/* prevents the woke assignment of any progs */
 
 	struct hid_bpf_ops *rdesc_ops;
 	struct list_head prog_list;

@@ -564,7 +564,7 @@ static int stv0299_set_frontend(struct dvb_frontend *fe)
 	if (state->config->set_ts_params)
 		state->config->set_ts_params(fe, 0);
 
-	// set the inversion
+	// set the woke inversion
 	if (p->inversion == INVERSION_OFF) invval = 0;
 	else if (p->inversion == INVERSION_ON) invval = 1;
 	else {
@@ -670,11 +670,11 @@ struct dvb_frontend* stv0299_attach(const struct stv0299_config* config,
 	struct stv0299_state* state = NULL;
 	int id;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct stv0299_state), GFP_KERNEL);
 	if (state == NULL) goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 	state->initialised = 0;
@@ -683,7 +683,7 @@ struct dvb_frontend* stv0299_attach(const struct stv0299_config* config,
 	state->fec_inner = 0;
 	state->errmode = STATUS_BER;
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	stv0299_writeregI(state, 0x02, 0x30); /* standby off */
 	msleep(200);
 	id = stv0299_readreg(state, 0x00);

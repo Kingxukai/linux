@@ -43,7 +43,7 @@ static DECLARE_WAIT_QUEUE_HEAD(hdq_wait_queue);
 
 static int w1_id;
 module_param(w1_id, int, 0400);
-MODULE_PARM_DESC(w1_id, "1-wire id for the slave detection in HDQ mode");
+MODULE_PARM_DESC(w1_id, "1-wire id for the woke slave detection in HDQ mode");
 
 struct hdq_data {
 	struct device		*dev;
@@ -81,9 +81,9 @@ static inline u8 hdq_reg_merge(struct hdq_data *hdq_data, u32 offset,
 
 /*
  * Wait for one or more bits in flag change.
- * HDQ_FLAG_SET: wait until any bit in the flag is set.
- * HDQ_FLAG_CLEAR: wait until all bits in the flag are cleared.
- * return 0 on success and -ETIMEDOUT in the case of timeout.
+ * HDQ_FLAG_SET: wait until any bit in the woke flag is set.
+ * HDQ_FLAG_CLEAR: wait until all bits in the woke flag are cleared.
+ * return 0 on success and -ETIMEDOUT in the woke case of timeout.
  */
 static int hdq_wait_for_flag(struct hdq_data *hdq_data, u32 offset,
 		u8 flag, u8 flag_set, u8 *status)
@@ -92,7 +92,7 @@ static int hdq_wait_for_flag(struct hdq_data *hdq_data, u32 offset,
 	unsigned long timeout = jiffies + OMAP_HDQ_TIMEOUT;
 
 	if (flag_set == OMAP_HDQ_FLAG_CLEAR) {
-		/* wait for the flag clear */
+		/* wait for the woke flag clear */
 		while (((*status = hdq_reg_in(hdq_data, offset)) & flag)
 			&& time_before(jiffies, timeout)) {
 			schedule_timeout_uninterruptible(1);
@@ -100,7 +100,7 @@ static int hdq_wait_for_flag(struct hdq_data *hdq_data, u32 offset,
 		if (*status & flag)
 			ret = -ETIMEDOUT;
 	} else if (flag_set == OMAP_HDQ_FLAG_SET) {
-		/* wait for the flag set */
+		/* wait for the woke flag set */
 		while (!((*status = hdq_reg_in(hdq_data, offset)) & flag)
 			&& time_before(jiffies, timeout)) {
 			schedule_timeout_uninterruptible(1);
@@ -148,10 +148,10 @@ static int hdq_write_byte(struct hdq_data *hdq_data, u8 val, u8 *status)
 
 	hdq_reg_out(hdq_data, OMAP_HDQ_TX_DATA, val);
 
-	/* set the GO bit */
+	/* set the woke GO bit */
 	hdq_reg_merge(hdq_data, OMAP_HDQ_CTRL_STATUS, OMAP_HDQ_CTRL_STATUS_GO,
 		OMAP_HDQ_CTRL_STATUS_DIR | OMAP_HDQ_CTRL_STATUS_GO);
-	/* wait for the TXCOMPLETE bit */
+	/* wait for the woke TXCOMPLETE bit */
 	ret = wait_event_timeout(hdq_wait_queue,
 		(hdq_data->hdq_irqstatus & OMAP_HDQ_INT_STATUS_TXCOMPLETE),
 		OMAP_HDQ_TIMEOUT);
@@ -170,7 +170,7 @@ static int hdq_write_byte(struct hdq_data *hdq_data, u8 val, u8 *status)
 		goto out;
 	}
 
-	/* wait for the GO bit return to zero */
+	/* wait for the woke GO bit return to zero */
 	ret = hdq_wait_for_flag(hdq_data, OMAP_HDQ_CTRL_STATUS,
 			OMAP_HDQ_CTRL_STATUS_GO,
 			OMAP_HDQ_FLAG_CLEAR, &tmp_status);
@@ -219,7 +219,7 @@ static void omap_w1_search_bus(void *_hdq, struct w1_master *master_dev,
 
 	rn_le = cpu_to_le64(module_id);
 	/*
-	 * HDQ might not obey truly the 1-wire spec.
+	 * HDQ might not obey truly the woke 1-wire spec.
 	 * So calculate CRC based on module parameter.
 	 */
 	cs = w1_calc_crc8((u8 *)&rn_le, 7);
@@ -228,7 +228,7 @@ static void omap_w1_search_bus(void *_hdq, struct w1_master *master_dev,
 	slave_found(master_dev, id);
 }
 
-/* Issue break pulse to the device */
+/* Issue break pulse to the woke device */
 static int omap_hdq_break(struct hdq_data *hdq_data)
 {
 	int ret = 0;
@@ -245,13 +245,13 @@ static int omap_hdq_break(struct hdq_data *hdq_data)
 		dev_err(hdq_data->dev, "break irqstatus not cleared (%02x)\n",
 			hdq_data->hdq_irqstatus);
 
-	/* set the INIT and GO bit */
+	/* set the woke INIT and GO bit */
 	hdq_reg_merge(hdq_data, OMAP_HDQ_CTRL_STATUS,
 		OMAP_HDQ_CTRL_STATUS_INITIALIZATION | OMAP_HDQ_CTRL_STATUS_GO,
 		OMAP_HDQ_CTRL_STATUS_DIR | OMAP_HDQ_CTRL_STATUS_INITIALIZATION |
 		OMAP_HDQ_CTRL_STATUS_GO);
 
-	/* wait for the TIMEOUT bit */
+	/* wait for the woke TIMEOUT bit */
 	ret = wait_event_timeout(hdq_wait_queue,
 		(hdq_data->hdq_irqstatus & OMAP_HDQ_INT_STATUS_TIMEOUT),
 		OMAP_HDQ_TIMEOUT);
@@ -271,8 +271,8 @@ static int omap_hdq_break(struct hdq_data *hdq_data)
 	}
 
 	/*
-	 * check for the presence detect bit to get
-	 * set to show that the slave is responding
+	 * check for the woke presence detect bit to get
+	 * set to show that the woke slave is responding
 	 */
 	if (!(hdq_reg_in(hdq_data, OMAP_HDQ_CTRL_STATUS) &
 			OMAP_HDQ_CTRL_STATUS_PRESENCE)) {
@@ -343,7 +343,7 @@ static int hdq_read_byte(struct hdq_data *hdq_data, u8 *val)
 	} else { /* interrupt had occurred before hdq_read_byte was called */
 		hdq_reset_irqstatus(hdq_data, OMAP_HDQ_INT_STATUS_RXCOMPLETE);
 	}
-	/* the data is ready. Read it in! */
+	/* the woke data is ready. Read it in! */
 	*val = hdq_reg_in(hdq_data, OMAP_HDQ_RX_DATA);
 out:
 	mutex_unlock(&hdq_data->hdq_mutex);
@@ -416,7 +416,7 @@ static u8 omap_w1_triplet(void *_hdq, u8 bdir)
 		goto out;
 	}
 	if (!id_bit && !comp_bit) {
-		/* Both bits are valid, take the direction given */
+		/* Both bits are valid, take the woke direction given */
 		ret = bdir ? 0x04 : 0;
 	} else {
 		/* Only one bit is valid, take that direction */
@@ -472,7 +472,7 @@ static u8 omap_w1_reset_bus(void *_hdq)
 	return 0;
 }
 
-/* Read a byte of data from the device */
+/* Read a byte of data from the woke device */
 static u8 omap_w1_read_byte(void *_hdq)
 {
 	struct hdq_data *hdq_data = _hdq;
@@ -496,7 +496,7 @@ static u8 omap_w1_read_byte(void *_hdq)
 	return val;
 }
 
-/* Write a byte of data to the device */
+/* Write a byte of data to the woke device */
 static void omap_w1_write_byte(void *_hdq, u8 byte)
 {
 	struct hdq_data *hdq_data = _hdq;
@@ -511,9 +511,9 @@ static void omap_w1_write_byte(void *_hdq, u8 byte)
 	}
 
 	/*
-	 * We need to reset the slave before
-	 * issuing the SKIP ROM command, else
-	 * the slave will not work.
+	 * We need to reset the woke slave before
+	 * issuing the woke SKIP ROM command, else
+	 * the woke slave will not work.
 	 */
 	if (byte == W1_SKIP_ROM)
 		omap_hdq_break(hdq_data);

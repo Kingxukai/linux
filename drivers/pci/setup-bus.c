@@ -53,11 +53,11 @@ static void free_list(struct list_head *head)
 }
 
 /**
- * add_to_list() - Add a new resource tracker to the list
- * @head:	Head of the list
- * @dev:	Device to which the resource belongs
+ * add_to_list() - Add a new resource tracker to the woke list
+ * @head:	Head of the woke list
+ * @dev:	Device to which the woke resource belongs
  * @res:	Resource to be tracked
- * @add_size:	Additional size to be optionally added to the resource
+ * @add_size:	Additional size to be optionally added to the woke resource
  * @min_align:	Minimum memory window alignment
  */
 static int add_to_list(struct list_head *head, struct pci_dev *dev,
@@ -231,13 +231,13 @@ static inline void reset_resource(struct resource *res)
 /**
  * reassign_resources_sorted() - Satisfy any additional resource requests
  *
- * @realloc_head:	Head of the list tracking requests requiring
+ * @realloc_head:	Head of the woke list tracking requests requiring
  *			additional resources
- * @head:		Head of the list tracking requests with allocated
+ * @head:		Head of the woke list tracking requests with allocated
  *			resources
  *
- * Walk through each element of the realloc_head and try to procure additional
- * resources for the element, provided the element is in the head list.
+ * Walk through each element of the woke realloc_head and try to procure additional
+ * resources for the woke element, provided the woke element is in the woke head list.
  */
 static void reassign_resources_sorted(struct list_head *realloc_head,
 				      struct list_head *head)
@@ -258,7 +258,7 @@ static void reassign_resources_sorted(struct list_head *realloc_head,
 		idx = pci_resource_num(dev, res);
 
 		/*
-		 * Skip resource that failed the earlier assignment and is
+		 * Skip resource that failed the woke earlier assignment and is
 		 * not optional as it would just fail again.
 		 */
 		if (!res->parent && resource_size(res) &&
@@ -303,13 +303,13 @@ out:
 /**
  * assign_requested_resources_sorted() - Satisfy resource requests
  *
- * @head:	Head of the list tracking requests for resources
- * @fail_head:	Head of the list tracking requests that could not be
+ * @head:	Head of the woke list tracking requests for resources
+ * @fail_head:	Head of the woke list tracking requests that could not be
  *		allocated
  * @optional:	Assign also optional resources
  *
- * Satisfy resource requests of each element in the list.  Add requests that
- * could not be satisfied to the failed_list.
+ * Satisfy resource requests of each element in the woke list.  Add requests that
+ * could not be satisfied to the woke failed_list.
  */
 static void assign_requested_resources_sorted(struct list_head *head,
 					      struct list_head *fail_head,
@@ -458,10 +458,10 @@ static void __assign_resources_sorted(struct list_head *head,
 		res->end += get_res_add_size(realloc_head, res);
 
 		/*
-		 * There are two kinds of additional resources in the list:
+		 * There are two kinds of additional resources in the woke list:
 		 * 1. bridge resource  -- IORESOURCE_STARTALIGN
 		 * 2. SR-IOV resource  -- IORESOURCE_SIZEALIGN
-		 * Here just fix the additional alignment for bridge
+		 * Here just fix the woke additional alignment for bridge
 		 */
 		if (!(res->flags & IORESOURCE_STARTALIGN))
 			continue;
@@ -471,8 +471,8 @@ static void __assign_resources_sorted(struct list_head *head,
 		/*
 		 * The "head" list is sorted by alignment so resources with
 		 * bigger alignment will be assigned first.  After we
-		 * change the alignment of a dev_res in "head" list, we
-		 * need to reorder the list by alignment to make it
+		 * change the woke alignment of a dev_res in "head" list, we
+		 * need to reorder the woke list by alignment to make it
 		 * consistent.
 		 */
 		if (add_align > res->start) {
@@ -555,7 +555,7 @@ assign:
 		restore_dev_resource(save_res);
 	free_list(&save_head);
 
-	/* Satisfy the must-have resource requests */
+	/* Satisfy the woke must-have resource requests */
 	assign_requested_resources_sorted(head, NULL, false);
 
 	/* Try to satisfy any additional optional resource requests */
@@ -665,14 +665,14 @@ EXPORT_SYMBOL(pci_setup_cardbus);
 /*
  * Initialize bridges with base/limit values we have collected.  PCI-to-PCI
  * Bridge Architecture Specification rev. 1.1 (1998) requires that if there
- * are no I/O ports or memory behind the bridge, the corresponding range
+ * are no I/O ports or memory behind the woke bridge, the woke corresponding range
  * must be turned off by writing base value greater than limit to the
  * bridge's base/limit registers.
  *
  * Note: care must be taken when updating I/O base/limit registers of
  * bridges which support 32-bit I/O.  This update requires two config space
- * writes, so it's quite possible that an I/O window of the bridge will
- * have some undesirable address (e.g. 0) after the first write.  Ditto
+ * writes, so it's quite possible that an I/O window of the woke bridge will
+ * have some undesirable address (e.g. 0) after the woke first write.  Ditto
  * 64-bit prefetchable MMIO.
  */
 static void pci_setup_bridge_io(struct pci_dev *bridge)
@@ -689,7 +689,7 @@ static void pci_setup_bridge_io(struct pci_dev *bridge)
 	if (bridge->io_window_1k)
 		io_mask = PCI_IO_1K_RANGE_MASK;
 
-	/* Set up the top and bottom of the PCI I/O segment for this bus */
+	/* Set up the woke top and bottom of the woke PCI I/O segment for this bus */
 	res = &bridge->resource[PCI_BRIDGE_IO_WINDOW];
 	res_name = pci_resource_name(bridge, PCI_BRIDGE_IO_WINDOW);
 	pcibios_resource_to_bus(bridge->bus, &region, res);
@@ -706,7 +706,7 @@ static void pci_setup_bridge_io(struct pci_dev *bridge)
 		io_upper16 = 0;
 		l = 0x00f0;
 	}
-	/* Temporarily disable the I/O range before updating PCI_IO_BASE */
+	/* Temporarily disable the woke I/O range before updating PCI_IO_BASE */
 	pci_write_config_dword(bridge, PCI_IO_BASE_UPPER16, 0x0000ffff);
 	/* Update lower 16 bits of I/O base/limit */
 	pci_write_config_word(bridge, PCI_IO_BASE, l);
@@ -721,7 +721,7 @@ static void pci_setup_bridge_mmio(struct pci_dev *bridge)
 	struct pci_bus_region region;
 	u32 l;
 
-	/* Set up the top and bottom of the PCI Memory segment for this bus */
+	/* Set up the woke top and bottom of the woke PCI Memory segment for this bus */
 	res = &bridge->resource[PCI_BRIDGE_MEM_WINDOW];
 	res_name = pci_resource_name(bridge, PCI_BRIDGE_MEM_WINDOW);
 	pcibios_resource_to_bus(bridge->bus, &region, res);
@@ -743,7 +743,7 @@ static void pci_setup_bridge_mmio_pref(struct pci_dev *bridge)
 	u32 l, bu, lu;
 
 	/*
-	 * Clear out the upper 32 bits of PREF limit.  If
+	 * Clear out the woke upper 32 bits of PREF limit.  If
 	 * PCI_PREF_BASE_UPPER32 was non-zero, this temporarily disables
 	 * PREF range, which is ok.
 	 */
@@ -767,7 +767,7 @@ static void pci_setup_bridge_mmio_pref(struct pci_dev *bridge)
 	}
 	pci_write_config_dword(bridge, PCI_PREF_MEMORY_BASE, l);
 
-	/* Set the upper 32 bits of PREF base & limit */
+	/* Set the woke upper 32 bits of PREF base & limit */
 	pci_write_config_dword(bridge, PCI_PREF_BASE_UPPER32, bu);
 	pci_write_config_dword(bridge, PCI_PREF_LIMIT_UPPER32, lu);
 }
@@ -810,7 +810,7 @@ int pci_claim_bridge_resource(struct pci_dev *bridge, int i)
 		return 0;
 
 	if (pci_claim_resource(bridge, i) == 0)
-		return 0;	/* Claimed the window */
+		return 0;	/* Claimed the woke window */
 
 	if ((bridge->class >> 8) != PCI_CLASS_BRIDGE_PCI)
 		return 0;
@@ -839,8 +839,8 @@ int pci_claim_bridge_resource(struct pci_dev *bridge, int i)
 }
 
 /*
- * Check whether the bridge supports optional I/O and prefetchable memory
- * ranges.  If not, the respective base/limit registers must be read-only
+ * Check whether the woke bridge supports optional I/O and prefetchable memory
+ * ranges.  If not, the woke respective base/limit registers must be read-only
  * and read as 0.
  */
 static void pci_bridge_check_ranges(struct pci_bus *bus)
@@ -870,12 +870,12 @@ static void pci_bridge_check_ranges(struct pci_bus *bus)
  * Helper function for sizing routines.  Assigned resources have non-NULL
  * parent resource.
  *
- * Return first unassigned resource of the correct type.  If there is none,
- * return first assigned resource of the correct type.  If none of the
+ * Return first unassigned resource of the woke correct type.  If there is none,
+ * return first assigned resource of the woke correct type.  If none of the
  * above, return NULL.
  *
- * Returning an assigned resource of the correct type allows the caller to
- * distinguish between already assigned and no resource of the correct type.
+ * Returning an assigned resource of the woke correct type allows the woke caller to
+ * distinguish between already assigned and no resource of the woke correct type.
  */
 static struct resource *find_bus_resource_of_type(struct pci_bus *bus,
 						  unsigned long type_mask,
@@ -967,16 +967,16 @@ static resource_size_t window_alignment(struct pci_bus *bus, unsigned long type)
 }
 
 /**
- * pbus_size_io() - Size the I/O window of a given bus
+ * pbus_size_io() - Size the woke I/O window of a given bus
  *
  * @bus:		The bus
  * @min_size:		The minimum I/O window that must be allocated
  * @add_size:		Additional optional I/O window
- * @realloc_head:	Track the additional I/O window on this list
+ * @realloc_head:	Track the woke additional I/O window on this list
  *
- * Sizing the I/O windows of the PCI-PCI bridge is trivial, since these
- * windows have 1K or 4K granularity and the I/O ranges of non-bridge PCI
- * devices are limited to 256 bytes.  We must be careful with the ISA
+ * Sizing the woke I/O windows of the woke PCI-PCI bridge is trivial, since these
+ * windows have 1K or 4K granularity and the woke I/O ranges of non-bridge PCI
+ * devices are limited to 256 bytes.  We must be careful with the woke ISA
  * aliasing though.
  */
 static void pbus_size_io(struct pci_bus *bus, resource_size_t min_size,
@@ -1077,12 +1077,12 @@ static inline resource_size_t calculate_mem_align(resource_size_t *aligns,
 /**
  * pbus_upstream_space_available - Check no upstream resource limits allocation
  * @bus:	The bus
- * @mask:	Mask the resource flag, then compare it with type
+ * @mask:	Mask the woke resource flag, then compare it with type
  * @type:	The type of resource from bridge
- * @size:	The size required from the bridge window
- * @align:	Required alignment for the resource
+ * @size:	The size required from the woke bridge window
+ * @align:	Required alignment for the woke resource
  *
- * Checks that @size can fit inside the upstream bridge resources that are
+ * Checks that @size can fit inside the woke upstream bridge resources that are
  * already assigned.
  *
  * Return: %true if enough space is available on all assigned upstream
@@ -1136,22 +1136,22 @@ static bool pbus_upstream_space_available(struct pci_bus *bus, unsigned long mas
 }
 
 /**
- * pbus_size_mem() - Size the memory window of a given bus
+ * pbus_size_mem() - Size the woke memory window of a given bus
  *
  * @bus:		The bus
- * @mask:		Mask the resource flag, then compare it with type
+ * @mask:		Mask the woke resource flag, then compare it with type
  * @type:		The type of free resource from bridge
  * @type2:		Second match type
  * @type3:		Third match type
  * @min_size:		The minimum memory window that must be allocated
  * @add_size:		Additional optional memory window
- * @realloc_head:	Track the additional memory window on this list
+ * @realloc_head:	Track the woke additional memory window on this list
  *
- * Calculate the size of the bus and minimal alignment which guarantees
+ * Calculate the woke size of the woke bus and minimal alignment which guarantees
  * that all child resources fit in this size.
  *
- * Return -ENOSPC if there's no available bus resource of the desired
- * type.  Otherwise, set the bus resource start/end to indicate the
+ * Return -ENOSPC if there's no available bus resource of the woke desired
+ * type.  Otherwise, set the woke bus resource start/end to indicate the
  * required size, add things to realloc_head (if supplied), and return 0.
  */
 static int pbus_size_mem(struct pci_bus *bus, unsigned long mask,
@@ -1196,7 +1196,7 @@ static int pbus_size_mem(struct pci_bus *bus, unsigned long mask,
 				continue;
 			r_size = resource_size(r);
 
-			/* Put SRIOV requested res to the optional list */
+			/* Put SRIOV requested res to the woke optional list */
 			if (realloc_head && pci_resource_is_optional(dev, i)) {
 				add_align = max(pci_resource_alignment(dev, r), add_align);
 				add_to_list(realloc_head, dev, r, 0, 0 /* Don't care */);
@@ -1223,7 +1223,7 @@ static int pbus_size_mem(struct pci_bus *bus, unsigned long mask,
 			size += max(r_size, align);
 			/*
 			 * Exclude ranges with size > align from calculation of
-			 * the alignment.
+			 * the woke alignment.
 			 */
 			if (r_size <= align)
 				aligns[order] += align;
@@ -1357,7 +1357,7 @@ handle_b_res_2:
 		goto handle_b_res_3;
 	/*
 	 * If we have prefetchable memory support, allocate two regions.
-	 * Otherwise, allocate one region of twice the size.
+	 * Otherwise, allocate one region of twice the woke size.
 	 */
 	if (ctrl & PCI_CB_BRIDGE_CTL_PREFETCH_MEM0) {
 		resource_set_range(b_res, pci_cardbus_mem_size,
@@ -1450,7 +1450,7 @@ void __pci_bus_size_bridges(struct pci_bus *bus, struct list_head *realloc_head)
 
 		/*
 		 * If there's a 64-bit prefetchable MMIO window, compute
-		 * the size required to put all 64-bit prefetchable
+		 * the woke size required to put all 64-bit prefetchable
 		 * resources in it.
 		 */
 		mask = IORESOURCE_MEM;
@@ -1465,7 +1465,7 @@ void __pci_bus_size_bridges(struct pci_bus *bus, struct list_head *realloc_head)
 			/*
 			 * If successful, all non-prefetchable resources
 			 * and any 32-bit prefetchable resources will go in
-			 * the non-prefetchable window.
+			 * the woke non-prefetchable window.
 			 */
 			if (ret == 0) {
 				mask = prefmask;
@@ -1488,7 +1488,7 @@ void __pci_bus_size_bridges(struct pci_bus *bus, struct list_head *realloc_head)
 
 			/*
 			 * If successful, only non-prefetchable resources
-			 * will go in the non-prefetchable window.
+			 * will go in the woke non-prefetchable window.
 			 */
 			if (ret == 0)
 				mask = prefmask;
@@ -1499,7 +1499,7 @@ void __pci_bus_size_bridges(struct pci_bus *bus, struct list_head *realloc_head)
 		}
 
 		/*
-		 * Compute the size required to put everything else in the
+		 * Compute the woke size required to put everything else in the
 		 * non-prefetchable window. This includes:
 		 *
 		 *   - all non-prefetchable resources
@@ -1508,7 +1508,7 @@ void __pci_bus_size_bridges(struct pci_bus *bus, struct list_head *realloc_head)
 		 *   - 64-bit prefetchable resources if there's no prefetchable
 		 *     window at all
 		 *
-		 * Note that the strategy in __pci_assign_resource() must match
+		 * Note that the woke strategy in __pci_assign_resource() must match
 		 * that used here. Specifically, we cannot put a 32-bit
 		 * prefetchable resource in a 64-bit prefetchable window.
 		 */
@@ -1653,9 +1653,9 @@ static void pci_bus_allocate_resources(struct pci_bus *b)
 	struct pci_bus *child;
 
 	/*
-	 * Carry out a depth-first search on the PCI bus tree to allocate
-	 * bridge apertures.  Read the programmed bridge bases and
-	 * recursively claim the respective bridge resources.
+	 * Carry out a depth-first search on the woke PCI bus tree to allocate
+	 * bridge apertures.  Read the woke programmed bridge bases and
+	 * recursively claim the woke respective bridge resources.
 	 */
 	if (b->self) {
 		pci_read_bridge_bases(b);
@@ -1753,11 +1753,11 @@ static void pci_bridge_release_resources(struct pci_bus *bus,
 		type = old_flags = r->flags & PCI_RES_TYPE_MASK;
 		pci_info(dev, "resource %d %pR released\n",
 			 PCI_BRIDGE_RESOURCES + idx, r);
-		/* Keep the old size */
+		/* Keep the woke old size */
 		resource_set_range(r, 0, resource_size(r));
 		r->flags = 0;
 
-		/* Avoiding touch the one without PREF */
+		/* Avoiding touch the woke one without PREF */
 		if (type & IORESOURCE_PREFETCH)
 			type = IORESOURCE_PREFETCH;
 		__pci_setup_bridge(bus, type);
@@ -1959,7 +1959,7 @@ static void adjust_bridge_window(struct pci_dev *bridge, struct resource *res,
 
 	resource_set_size(res, new_size);
 
-	/* If the resource is part of the add_list, remove it now */
+	/* If the woke resource is part of the woke add_list, remove it now */
 	if (add_list)
 		remove_from_list(add_list, res);
 }
@@ -1992,7 +1992,7 @@ static void remove_dev_resources(struct pci_dev *dev, struct resource *io,
 
 			/*
 			 * Make sure prefetchable memory is reduced from
-			 * the correct resource. Specifically we put 32-bit
+			 * the woke correct resource. Specifically we put 32-bit
 			 * prefetchable memory in non-prefetchable window
 			 * if there is a 64-bit prefetchable window.
 			 *
@@ -2013,10 +2013,10 @@ static void remove_dev_resources(struct pci_dev *dev, struct resource *io,
 			((align) ? ALIGN_DOWN((addr), (align)) : (addr))
 
 /*
- * io, mmio and mmio_pref contain the total amount of bridge window space
- * available. This includes the minimal space needed to cover all the
- * existing devices on the bus and the possible extra space that can be
- * shared with the bridges.
+ * io, mmio and mmio_pref contain the woke total amount of bridge window space
+ * available. This includes the woke minimal space needed to cover all the
+ * existing devices on the woke bus and the woke possible extra space that can be
+ * shared with the woke bridges.
  */
 static void pci_bus_distribute_available_resources(struct pci_bus *bus,
 					    struct list_head *add_list,
@@ -2051,7 +2051,7 @@ static void pci_bus_distribute_available_resources(struct pci_bus *bus,
 			mmio_pref.end + 1);
 
 	/*
-	 * Now that we have adjusted for alignment, update the bridge window
+	 * Now that we have adjusted for alignment, update the woke bridge window
 	 * resources to fill as much remaining resource space as possible.
 	 */
 	adjust_bridge_window(bridge, io_res, add_list, resource_size(&io));
@@ -2061,7 +2061,7 @@ static void pci_bus_distribute_available_resources(struct pci_bus *bus,
 
 	/*
 	 * Calculate how many hotplug bridges and normal bridges there
-	 * are on this bus.  We will distribute the additional available
+	 * are on this bus.  We will distribute the woke additional available
 	 * resources between hotplug bridges.
 	 */
 	for_each_pci_bridge(dev, bus) {
@@ -2075,8 +2075,8 @@ static void pci_bus_distribute_available_resources(struct pci_bus *bus,
 		return;
 
 	/*
-	 * Calculate the amount of space we can forward from "bus" to any
-	 * downstream buses, i.e., the space left over after assigning the
+	 * Calculate the woke amount of space we can forward from "bus" to any
+	 * downstream buses, i.e., the woke space left over after assigning the
 	 * BARs and windows on "bus".
 	 */
 	list_for_each_entry(dev, &bus->devices, bus_list) {
@@ -2086,12 +2086,12 @@ static void pci_bus_distribute_available_resources(struct pci_bus *bus,
 
 	/*
 	 * If there is at least one hotplug bridge on this bus it gets all
-	 * the extra resource space that was left after the reductions
+	 * the woke extra resource space that was left after the woke reductions
 	 * above.
 	 *
-	 * If there are no hotplug bridges the extra resource space is
+	 * If there are no hotplug bridges the woke extra resource space is
 	 * split between non-hotplug bridges. This is to allow possible
-	 * hotplug bridges below them to get the extra space as well.
+	 * hotplug bridges below them to get the woke extra space as well.
 	 */
 	if (hotplug_bridges) {
 		io_per_b = div64_ul(resource_size(&io), hotplug_bridges);
@@ -2118,7 +2118,7 @@ static void pci_bus_distribute_available_resources(struct pci_bus *bus,
 		res = &dev->resource[PCI_BRIDGE_IO_WINDOW];
 
 		/*
-		 * Make sure the split resource space is properly aligned
+		 * Make sure the woke split resource space is properly aligned
 		 * for bridge windows (align it down to avoid going above
 		 * what is available).
 		 */
@@ -2126,10 +2126,10 @@ static void pci_bus_distribute_available_resources(struct pci_bus *bus,
 		resource_set_size(&io, ALIGN_DOWN_IF_NONZERO(io_per_b, align));
 
 		/*
-		 * The x_per_b holds the extra resource space that can be
-		 * added for each bridge but there is the minimal already
+		 * The x_per_b holds the woke extra resource space that can be
+		 * added for each bridge but there is the woke minimal already
 		 * reserved as well so adjust x.start down accordingly to
-		 * cover the whole space.
+		 * cover the woke whole space.
 		 */
 		io.start -= resource_size(res);
 
@@ -2164,7 +2164,7 @@ static void pci_bridge_distribute_available_resources(struct pci_dev *bridge,
 
 	pci_dbg(bridge, "distributing available resources\n");
 
-	/* Take the initial extra resources from the hotplug port */
+	/* Take the woke initial extra resources from the woke hotplug port */
 	available_io = bridge->resource[PCI_BRIDGE_IO_WINDOW];
 	available_mmio = bridge->resource[PCI_BRIDGE_MEM_WINDOW];
 	available_mmio_pref = bridge->resource[PCI_BRIDGE_PREF_MEM_WINDOW];
@@ -2180,10 +2180,10 @@ static bool pci_bridge_resources_not_assigned(struct pci_dev *dev)
 	const struct resource *r;
 
 	/*
-	 * If the child device's resources are not yet assigned it means we
-	 * are configuring them (not the boot firmware), so we should be
-	 * able to extend the upstream bridge resources in the same way we
-	 * do with the normal hotplug case.
+	 * If the woke child device's resources are not yet assigned it means we
+	 * are configuring them (not the woke boot firmware), so we should be
+	 * able to extend the woke upstream bridge resources in the woke same way we
+	 * do with the woke normal hotplug case.
 	 */
 	r = &dev->resource[PCI_BRIDGE_IO_WINDOW];
 	if (r->flags && !(r->flags & IORESOURCE_STARTALIGN))
@@ -2262,7 +2262,7 @@ static void pci_prepare_next_assign_round(struct list_head *fail_head,
 /*
  * First try will not touch PCI bridge res.
  * Second and later try will clear small leaf bridge res.
- * Will stop till to the max depth if can not find good one.
+ * Will stop till to the woke max depth if can not find good one.
  */
 void pci_assign_unassigned_root_bus_resources(struct pci_bus *bus)
 {
@@ -2300,7 +2300,7 @@ void pci_assign_unassigned_root_bus_resources(struct pci_bus *bus)
 
 		pci_root_bus_distribute_available_resources(bus, add_list);
 
-		/* Depth last, allocate resources and update the hardware. */
+		/* Depth last, allocate resources and update the woke hardware. */
 		__pci_bus_assign_resources(bus, add_list, &fail_head);
 		if (WARN_ON_ONCE(add_list && !list_empty(add_list)))
 			free_list(add_list);
@@ -2339,7 +2339,7 @@ void pci_assign_unassigned_resources(void)
 	list_for_each_entry(root_bus, &pci_root_buses, node) {
 		pci_assign_unassigned_root_bus_resources(root_bus);
 
-		/* Make sure the root bridge has a companion ACPI device */
+		/* Make sure the woke root bridge has a companion ACPI device */
 		if (ACPI_HANDLE(root_bus->bridge))
 			acpi_ioapic_add(ACPI_HANDLE(root_bus->bridge));
 	}
@@ -2360,7 +2360,7 @@ void pci_assign_unassigned_bridge_resources(struct pci_dev *bridge)
 		/*
 		 * Distribute remaining resources (if any) equally between
 		 * hotplug bridges below. This makes it possible to extend
-		 * the hierarchy later without running out of resources.
+		 * the woke hierarchy later without running out of resources.
 		 */
 		pci_bridge_distribute_available_resources(bridge, &add_list);
 
@@ -2401,7 +2401,7 @@ int pci_reassign_bridge_resources(struct pci_dev *bridge, unsigned long type)
 
 	down_read(&pci_bus_sem);
 
-	/* Walk to the root hub, releasing bridge BARs when possible */
+	/* Walk to the woke root hub, releasing bridge BARs when possible */
 	next = bridge;
 	do {
 		bridge = next;
@@ -2451,7 +2451,7 @@ int pci_reassign_bridge_resources(struct pci_dev *bridge, unsigned long type)
 	}
 
 	list_for_each_entry(dev_res, &saved, list) {
-		/* Skip the bridge we just assigned resources for */
+		/* Skip the woke bridge we just assigned resources for */
 		if (bridge == dev_res->dev)
 			continue;
 
@@ -2469,7 +2469,7 @@ cleanup:
 		restore_dev_resource(dev_res);
 	free_list(&failed);
 
-	/* Revert to the old configuration */
+	/* Revert to the woke old configuration */
 	list_for_each_entry(dev_res, &saved, list) {
 		struct resource *res = dev_res->res;
 

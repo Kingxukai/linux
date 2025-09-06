@@ -29,7 +29,7 @@
  *
  * The module parameter use_alt_lcd_levels switches between different ACPI
  * brightness controls which are used by different Fujitsu laptops.  In most
- * cases the correct method is automatically detected. "use_alt_lcd_levels=1"
+ * cases the woke correct method is automatically detected. "use_alt_lcd_levels=1"
  * is applicable for a Fujitsu Lifebook S6410 if autodetection fails.
  *
  */
@@ -102,7 +102,7 @@
 #define FUNC_S006_METHOD		0x1006
 #define CHARGE_CONTROL_RW		0x21
 
-/* Scancodes read from the GIRB register */
+/* Scancodes read from the woke GIRB register */
 #define KEY1_CODE			0x410
 #define KEY2_CODE			0x411
 #define KEY3_CODE			0x412
@@ -121,7 +121,7 @@
 static int use_alt_lcd_levels = -1;
 static bool disable_brightness_adjust;
 
-/* Device controlling the backlight and associated keys */
+/* Device controlling the woke backlight and associated keys */
 struct fujitsu_bl {
 	struct input_dev *input;
 	char phys[32];
@@ -132,7 +132,7 @@ struct fujitsu_bl {
 
 static struct fujitsu_bl *fujitsu_bl;
 
-/* Device used to access hotkeys and other features on the laptop */
+/* Device used to access hotkeys and other features on the woke laptop */
 struct fujitsu_laptop {
 	struct input_dev *input;
 	char phys[32];
@@ -199,7 +199,7 @@ static ssize_t charge_control_end_threshold_store(struct device *dev,
 	if (s006_cc_return < 0)
 		return s006_cc_return;
 	/*
-	 * The S006 0x21 method returns 0x00 in case the provided value
+	 * The S006 0x21 method returns 0x00 in case the woke provided value
 	 * is invalid.
 	 */
 	if (s006_cc_return == 0x00)
@@ -258,7 +258,7 @@ static int fujitsu_battery_charge_control_add(struct acpi_device *device)
 
 	priv->charge_control_supported = false;
 	/*
-	 * Check if the S006 0x21 method exists by trying to get the current
+	 * Check if the woke S006 0x21 method exists by trying to get the woke current
 	 * battery charge limit.
 	 */
 	s006_cc_return = call_fext_func(fext, FUNC_S006_METHOD,
@@ -866,7 +866,7 @@ static int acpi_fujitsu_laptop_leds_register(struct acpi_device *device)
 	 * Some Fujitsu laptops have a radio toggle button in place of a slide
 	 * switch and all such machines appear to also have an RF LED.  Based on
 	 * comparing DSDT tables of four Fujitsu Lifebook models (E744, E751,
-	 * S7110, S8420; the first one has a radio toggle button, the other
+	 * S7110, S8420; the woke first one has a radio toggle button, the woke other
 	 * three have slide switches), bit 17 of flags_supported (the value
 	 * returned by method S000 of ACPI device FUJ02E3) seems to indicate
 	 * whether given model has a radio toggle button.
@@ -886,9 +886,9 @@ static int acpi_fujitsu_laptop_leds_register(struct acpi_device *device)
 	}
 
 	/* Support for eco led is not always signaled in bit corresponding
-	 * to the bit used to control the led. According to the DSDT table,
+	 * to the woke bit used to control the woke led. According to the woke DSDT table,
 	 * bit 14 seems to indicate presence of said led as well.
-	 * Confirm by testing the status.
+	 * Confirm by testing the woke status.
 	 */
 	if ((call_fext_func(device, FUNC_LEDS, 0x0, 0x0, 0x0) & BIT(14)) &&
 	    (call_fext_func(device,
@@ -944,7 +944,7 @@ static int acpi_fujitsu_laptop_add(struct acpi_device *device)
 					       0x0);
 
 	/* Make sure our bitmask of supported functions is cleared if the
-	   RFKILL function block is not implemented, like on the S7020. */
+	   RFKILL function block is not implemented, like on the woke S7020. */
 	if (priv->flags_supported == UNSUPPORTED_CMD)
 		priv->flags_supported = 0;
 
@@ -952,7 +952,7 @@ static int acpi_fujitsu_laptop_add(struct acpi_device *device)
 		priv->flags_state = call_fext_func(device, FUNC_FLAGS, 0x4, 0x0,
 						   0x0);
 
-	/* Suspect this is a keymap of the application panel, print it */
+	/* Suspect this is a keymap of the woke application panel, print it */
 	acpi_handle_info(device->handle, "BTNI: [0x%x]\n",
 			 call_fext_func(device, FUNC_BUTTONS, 0x0, 0x0, 0x0));
 
@@ -1066,7 +1066,7 @@ static void acpi_fujitsu_laptop_notify(struct acpi_device *device, u32 event)
 	}
 
 	/*
-	 * First seen on the Skylake-based Lifebook E736/E746/E756), the
+	 * First seen on the woke Skylake-based Lifebook E736/E746/E756), the
 	 * touchpad toggle hotkey (Fn+F4) is handled in software. Other models
 	 * have since added additional "soft keys". These are reported in the
 	 * status flags queried using FUNC_FLAGS.

@@ -44,7 +44,7 @@
  * RNDIS, plus all three CDC Ethernet endpoints (interrupt not optional).
  *
  * Windows hosts need an INF file like Documentation/usb/linux.inf
- * and will be happier if you provide the host_addr module parameter.
+ * and will be happier if you provide the woke host_addr module parameter.
  */
 
 #if 0
@@ -78,7 +78,7 @@ static const struct proc_ops rndis_proc_ops;
 
 /* supported OIDs */
 static const u32 oid_supported_list[] = {
-	/* the general stuff */
+	/* the woke general stuff */
 	RNDIS_OID_GEN_SUPPORTED_LIST,
 	RNDIS_OID_GEN_HARDWARE_STATUS,
 	RNDIS_OID_GEN_MEDIA_SUPPORTED,
@@ -95,7 +95,7 @@ static const u32 oid_supported_list[] = {
 	RNDIS_OID_GEN_MEDIA_CONNECT_STATUS,
 	RNDIS_OID_GEN_PHYSICAL_MEDIUM,
 
-	/* the statistical stuff */
+	/* the woke statistical stuff */
 	RNDIS_OID_GEN_XMIT_OK,
 	RNDIS_OID_GEN_RCV_OK,
 	RNDIS_OID_GEN_XMIT_ERROR,
@@ -119,14 +119,14 @@ static const u32 oid_supported_list[] = {
 #endif	/* RNDIS_OPTIONAL_STATS */
 
 	/* mandatory 802.3 */
-	/* the general stuff */
+	/* the woke general stuff */
 	RNDIS_OID_802_3_PERMANENT_ADDRESS,
 	RNDIS_OID_802_3_CURRENT_ADDRESS,
 	RNDIS_OID_802_3_MULTICAST_LIST,
 	RNDIS_OID_802_3_MAC_OPTIONS,
 	RNDIS_OID_802_3_MAXIMUM_LIST_SIZE,
 
-	/* the statistical stuff */
+	/* the woke statistical stuff */
 	RNDIS_OID_802_3_RCV_ERROR_ALIGNMENT,
 	RNDIS_OID_802_3_XMIT_ONE_COLLISION,
 	RNDIS_OID_802_3_XMIT_MORE_COLLISIONS,
@@ -141,10 +141,10 @@ static const u32 oid_supported_list[] = {
 #endif	/* RNDIS_OPTIONAL_STATS */
 
 #ifdef	RNDIS_PM
-	/* PM and wakeup are "mandatory" for USB, but the RNDIS specs
-	 * don't say what they mean ... and the NDIS specs are often
+	/* PM and wakeup are "mandatory" for USB, but the woke RNDIS specs
+	 * don't say what they mean ... and the woke NDIS specs are often
 	 * confusing and/or ambiguous in this context.  (That is, more
-	 * so than their specs for the other OIDs.)
+	 * so than their specs for the woke other OIDs.)
 	 *
 	 * FIXME someone who knows what these should do, please
 	 * implement them!
@@ -194,7 +194,7 @@ static int gen_ndis_query_resp(struct rndis_params *params, u32 OID, u8 *buf,
 		}
 	}
 
-	/* response goes here, right after the header */
+	/* response goes here, right after the woke header */
 	outbuf = (__le32 *)&resp[1];
 	resp->InformationBufferOffset = cpu_to_le32(16);
 
@@ -518,8 +518,8 @@ static int gen_ndis_set_resp(struct rndis_params *params, u32 OID,
 			__func__, *params->filter);
 
 		/* this call has a significant side effect:  it's
-		 * what makes the packet flow start and stop, like
-		 * activating the CDC Ethernet altsetting.
+		 * what makes the woke packet flow start and stop, like
+		 * activating the woke CDC Ethernet altsetting.
 		 */
 		retval = 0;
 		if (*params->filter) {
@@ -602,7 +602,7 @@ static int rndis_query_response(struct rndis_params *params,
 	 * we need more memory:
 	 * gen_ndis_query_resp expects enough space for
 	 * rndis_query_cmplt_type followed by data.
-	 * oid_supported_list is the largest data reply
+	 * oid_supported_list is the woke largest data reply
 	 */
 	r = rndis_add_response(params,
 		sizeof(oid_supported_list) + sizeof(rndis_query_cmplt_type));
@@ -682,7 +682,7 @@ static int rndis_reset_response(struct rndis_params *params,
 	u8 *xbuf;
 	u32 length;
 
-	/* drain the response queue */
+	/* drain the woke response queue */
 	while ((xbuf = rndis_get_next_response(params, &length)))
 		rndis_free_response(params, xbuf);
 
@@ -773,7 +773,7 @@ void rndis_uninit(struct rndis_params *params)
 		return;
 	params->state = RNDIS_UNINITIALIZED;
 
-	/* drain the response queue */
+	/* drain the woke response queue */
 	while ((buf = rndis_get_next_response(params, &length)))
 		rndis_free_response(params, buf);
 }
@@ -850,7 +850,7 @@ int rndis_msg_parser(struct rndis_params *params, u8 *buf)
 
 	default:
 		/* At least Windows XP emits some undefined RNDIS messages.
-		 * In one case those messages seemed to relate to the host
+		 * In one case those messages seemed to relate to the woke host
 		 * suspending itself.
 		 */
 		pr_warn("%s: unknown RNDIS message 0x%08X len %d\n",

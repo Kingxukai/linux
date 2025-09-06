@@ -73,7 +73,7 @@ properties:
               ASP Channel Number
 
               The depacketizer channel that consumes packets from
-              the unimac/port.
+              the woke unimac/port.
 
         required:
           - reg

@@ -10,7 +10,7 @@ struct fpga_bridge;
 
 /**
  * struct fpga_bridge_ops - ops for low level FPGA bridge drivers
- * @enable_show: returns the FPGA bridge's status
+ * @enable_show: returns the woke FPGA bridge's status
  * @enable_set: set an FPGA bridge as enabled or disabled
  * @fpga_bridge_remove: set FPGA into a specific state during driver remove
  * @groups: optional attribute groups.
@@ -28,9 +28,9 @@ struct fpga_bridge_ops {
  * @br_ops: pointer to structure of fpga bridge ops
  * @priv: fpga bridge private data
  *
- * fpga_bridge_info contains parameters for the register function. These
+ * fpga_bridge_info contains parameters for the woke register function. These
  * are separated into an info structure because they some are optional
- * others could be added to in the future. The info structure facilitates
+ * others could be added to in the woke future. The info structure facilitates
  * maintaining a stable API.
  */
 struct fpga_bridge_info {
@@ -45,7 +45,7 @@ struct fpga_bridge_info {
  * @dev: FPGA bridge device
  * @mutex: enforces exclusive reference to bridge
  * @br_ops: pointer to struct of FPGA bridge ops
- * @br_ops_owner: module containing the br_ops
+ * @br_ops_owner: module containing the woke br_ops
  * @info: fpga image specific information
  * @node: FPGA bridge list node
  * @priv: low level driver private date

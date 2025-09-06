@@ -17,7 +17,7 @@ Description:
 				  write UDC's name found in /sys/class/udc/*
 				  to bind a gadget, empty string "" to unbind.
 
-		max_speed	  maximum speed the driver supports. Valid
+		max_speed	  maximum speed the woke driver supports. Valid
 				  names are super-speed-plus, super-speed,
 				  high-speed, full-speed, and low-speed.
 
@@ -45,7 +45,7 @@ Description:
 
 		================  ======================================
 		bmAttributes	  configuration characteristics
-		MaxPower	  maximum power consumption from the bus
+		MaxPower	  maximum power consumption from the woke bus
 		================  ======================================
 
 What:		/config/usb-gadget/gadget/configs/config/strings
@@ -98,7 +98,7 @@ Description:
 		The attributes:
 
 		=====		===============================================
-		type		value 1..7 for interpreting the data
+		type		value 1..7 for interpreting the woke data
 
 				- 1: unicode string
 				- 2: unicode string with environment variable
@@ -154,5 +154,5 @@ Description:
 		use		flag turning "WebUSB" support on/off
 		bcdVersion	bcd WebUSB specification version number
 		bVendorCode	one-byte value used for custom per-device
-		landingPage	UTF-8 encoded URL of the device's landing page
+		landingPage	UTF-8 encoded URL of the woke device's landing page
 		=============	===============================================

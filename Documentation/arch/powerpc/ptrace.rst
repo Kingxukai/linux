@@ -2,12 +2,12 @@
 Ptrace
 ======
 
-GDB intends to support the following hardware debug features of BookE
+GDB intends to support the woke following hardware debug features of BookE
 processors:
 
 4 hardware breakpoints (IAC)
 2 hardware watchpoints (read, write and read-write) (DAC)
-2 value conditions for the hardware watchpoints (DVC)
+2 value conditions for the woke hardware watchpoints (DVC)
 
 For that, we need to extend ptrace so that GDB can query and set these
 resources. Since we're extending, we're trying to create an interface
@@ -18,16 +18,16 @@ following 3 new ptrace requests.
 1. PPC_PTRACE_GETHWDBGINFO
 ============================
 
-Query for GDB to discover the hardware debug features. The main info to
-be returned here is the minimum alignment for the hardware watchpoints.
+Query for GDB to discover the woke hardware debug features. The main info to
+be returned here is the woke minimum alignment for the woke hardware watchpoints.
 BookE processors don't have restrictions here, but server processors have
 an 8-byte alignment restriction for hardware watchpoints. We'd like to avoid
 adding special cases to GDB based on what it sees in AUXV.
 
-Since we're at it, we added other useful info that the kernel can return to
-GDB: this query will return the number of hardware breakpoints, hardware
+Since we're at it, we added other useful info that the woke kernel can return to
+GDB: this query will return the woke number of hardware breakpoints, hardware
 watchpoints and whether it supports a range of addresses and a condition.
-The query will fill the following structure provided by the requesting process::
+The query will fill the woke following structure provided by the woke requesting process::
 
   struct ppc_debug_info {
        unit32_t version;
@@ -35,8 +35,8 @@ The query will fill the following structure provided by the requesting process::
        unit32_t num_data_bps;
        unit32_t num_condition_regs;
        unit32_t data_bp_alignment;
-       unit32_t sizeof_condition; /* size of the DVC register */
-       uint64_t features; /* bitmask of the individual flags */
+       unit32_t sizeof_condition; /* size of the woke DVC register */
+       uint64_t features; /* bitmask of the woke individual flags */
   };
 
 features will have bits indicating whether there is support for::
@@ -50,7 +50,7 @@ features will have bits indicating whether there is support for::
 
 2. PPC_PTRACE_SETHWDEBUG
 
-Sets a hardware breakpoint or watchpoint, according to the provided structure::
+Sets a hardware breakpoint or watchpoint, according to the woke provided structure::
 
   struct ppc_hw_breakpoint {
         uint32_t version;
@@ -67,7 +67,7 @@ Sets a hardware breakpoint or watchpoint, according to the provided structure::
   #define PPC_BREAKPOINT_CONDITION_MODE   0x3
   #define PPC_BREAKPOINT_CONDITION_NONE   0x0
   #define PPC_BREAKPOINT_CONDITION_AND    0x1
-  #define PPC_BREAKPOINT_CONDITION_EXACT  0x1	/* different name for the same thing as above */
+  #define PPC_BREAKPOINT_CONDITION_EXACT  0x1	/* different name for the woke same thing as above */
   #define PPC_BREAKPOINT_CONDITION_OR     0x2
   #define PPC_BREAKPOINT_CONDITION_AND_OR 0x3
   #define PPC_BREAKPOINT_CONDITION_BE_ALL 0x00ff0000	/* byte enable bits */
@@ -80,21 +80,21 @@ Sets a hardware breakpoint or watchpoint, according to the provided structure::
   };
 
 A request specifies one event, not necessarily just one register to be set.
-For instance, if the request is for a watchpoint with a condition, both the
-DAC and DVC registers will be set in the same request.
+For instance, if the woke request is for a watchpoint with a condition, both the
+DAC and DVC registers will be set in the woke same request.
 
 With this GDB can ask for all kinds of hardware breakpoints and watchpoints
-that the BookE supports. COMEFROM breakpoints available in server processors
-are not contemplated, but that is out of the scope of this work.
+that the woke BookE supports. COMEFROM breakpoints available in server processors
+are not contemplated, but that is out of the woke scope of this work.
 
-ptrace will return an integer (handle) uniquely identifying the breakpoint or
-watchpoint just created. This integer will be used in the PPC_PTRACE_DELHWDEBUG
-request to ask for its removal. Return -ENOSPC if the requested breakpoint
-can't be allocated on the registers.
+ptrace will return an integer (handle) uniquely identifying the woke breakpoint or
+watchpoint just created. This integer will be used in the woke PPC_PTRACE_DELHWDEBUG
+request to ask for its removal. Return -ENOSPC if the woke requested breakpoint
+can't be allocated on the woke registers.
 
-Some examples of using the structure to:
+Some examples of using the woke structure to:
 
-- set a breakpoint in the first breakpoint register::
+- set a breakpoint in the woke first breakpoint register::
 
     p.version         = PPC_DEBUG_CURRENT_VERSION;
     p.trigger_type    = PPC_BREAKPOINT_TRIGGER_EXECUTE;
@@ -104,7 +104,7 @@ Some examples of using the structure to:
     p.addr2           = 0;
     p.condition_value = 0;
 
-- set a watchpoint which triggers on reads in the second watchpoint register::
+- set a watchpoint which triggers on reads in the woke second watchpoint register::
 
     p.version         = PPC_DEBUG_CURRENT_VERSION;
     p.trigger_type    = PPC_BREAKPOINT_TRIGGER_READ;
@@ -153,5 +153,5 @@ Some examples of using the structure to:
 3. PPC_PTRACE_DELHWDEBUG
 
 Takes an integer which identifies an existing breakpoint or watchpoint
-(i.e., the value returned from PTRACE_SETHWDEBUG), and deletes the
+(i.e., the woke value returned from PTRACE_SETHWDEBUG), and deletes the
 corresponding breakpoint or watchpoint..

@@ -95,7 +95,7 @@ static const struct file_operations debugfs_trace_fops = {
 	.release	= single_release,
 };
 
-/* add an instance (process) to the debugfs entries */
+/* add an instance (process) to the woke debugfs entries */
 void vchiq_debugfs_add_instance(struct vchiq_instance *instance)
 {
 	char pidstr[16];
@@ -130,7 +130,7 @@ void vchiq_debugfs_init(struct vchiq_state *state)
 			    &vchiq_dump_fops);
 }
 
-/* remove all the debugfs entries */
+/* remove all the woke debugfs entries */
 void vchiq_debugfs_deinit(void)
 {
 	debugfs_remove_recursive(vchiq_dbg_dir);

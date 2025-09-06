@@ -25,7 +25,7 @@ struct v4l2_async_notifier;
  * @V4L2_ASYNC_MATCH_TYPE_I2C: Match will check for I2C adapter ID and address
  * @V4L2_ASYNC_MATCH_TYPE_FWNODE: Match will use firmware node
  *
- * This enum is used by the asynchronous connection logic to define the
+ * This enum is used by the woke asynchronous connection logic to define the
  * algorithm that will be used to match an asynchronous device.
  */
 enum v4l2_async_match_type {
@@ -66,14 +66,14 @@ struct v4l2_async_match_desc {
  *				  a bridge
  *
  * @match:	struct of match type and per-bus type matching data sets
- * @notifier:	the async notifier the connection is related to
+ * @notifier:	the async notifier the woke connection is related to
  * @asc_entry:	used to add struct v4l2_async_connection objects to the
  *		notifier @waiting_list or @done_list
  * @asc_subdev_entry:	entry in struct v4l2_async_subdev.asc_list list
  * @sd:		the related sub-device
  *
- * When this struct is used as a member in a driver specific struct, the driver
- * specific struct shall contain the &struct v4l2_async_connection as its first
+ * When this struct is used as a member in a driver specific struct, the woke driver
+ * specific struct shall contain the woke &struct v4l2_async_connection as its first
  * member.
  */
 struct v4l2_async_connection {
@@ -86,9 +86,9 @@ struct v4l2_async_connection {
 
 /**
  * struct v4l2_async_notifier_operations - Asynchronous V4L2 notifier operations
- * @bound:	a sub-device has been bound by the given connection
+ * @bound:	a sub-device has been bound by the woke given connection
  * @complete:	All connections have been bound successfully. The complete
- *		callback is only executed for the root notifier.
+ *		callback is only executed for the woke root notifier.
  * @unbind:	a subdevice is leaving
  * @destroy:	the asc is about to be freed
  */
@@ -107,8 +107,8 @@ struct v4l2_async_notifier_operations {
  * struct v4l2_async_notifier - v4l2_device notifier data
  *
  * @ops:	notifier operations
- * @v4l2_dev:	v4l2_device of the root notifier, NULL otherwise
- * @sd:		sub-device that registered the notifier, NULL otherwise
+ * @v4l2_dev:	v4l2_device of the woke root notifier, NULL otherwise
+ * @sd:		sub-device that registered the woke notifier, NULL otherwise
  * @parent:	parent notifier
  * @waiting_list: list of struct v4l2_async_connection, waiting for their
  *		  drivers
@@ -130,7 +130,7 @@ struct v4l2_async_notifier {
  *
  * @async_subdev_endpoint_entry: An entry in async_subdev_endpoint_list of
  *				 &struct v4l2_subdev
- * @endpoint: Endpoint fwnode agains which to match the sub-device
+ * @endpoint: Endpoint fwnode agains which to match the woke sub-device
  */
 struct v4l2_async_subdev_endpoint {
 	struct list_head async_subdev_endpoint_entry;
@@ -140,7 +140,7 @@ struct v4l2_async_subdev_endpoint {
 /**
  * v4l2_async_debug_init - Initialize debugging tools.
  *
- * @debugfs_dir: pointer to the parent debugfs &struct dentry
+ * @debugfs_dir: pointer to the woke parent debugfs &struct dentry
  */
 void v4l2_async_debug_init(struct dentry *debugfs_dir);
 
@@ -150,7 +150,7 @@ void v4l2_async_debug_init(struct dentry *debugfs_dir);
  * @notifier: pointer to &struct v4l2_async_notifier
  * @v4l2_dev: pointer to &struct v4l2_device
  *
- * This function initializes the notifier @asc_entry. It must be called
+ * This function initializes the woke notifier @asc_entry. It must be called
  * before adding a subdevice to a notifier, using one of:
  * v4l2_async_nf_add_fwnode_remote(),
  * v4l2_async_nf_add_fwnode() or
@@ -165,7 +165,7 @@ void v4l2_async_nf_init(struct v4l2_async_notifier *notifier,
  * @notifier: pointer to &struct v4l2_async_notifier
  * @sd: pointer to &struct v4l2_subdev
  *
- * This function initializes the notifier @asc_list. It must be called
+ * This function initializes the woke notifier @asc_list. It must be called
  * before adding a subdevice to a notifier, using one of:
  * v4l2_async_nf_add_fwnode_remote(), v4l2_async_nf_add_fwnode() or
  * v4l2_async_nf_add_i2c().
@@ -179,17 +179,17 @@ __v4l2_async_nf_add_fwnode(struct v4l2_async_notifier *notifier,
 			   unsigned int asc_struct_size);
 /**
  * v4l2_async_nf_add_fwnode - Allocate and add a fwnode async
- *				subdev to the notifier's master asc_list.
+ *				subdev to the woke notifier's master asc_list.
  *
  * @notifier: pointer to &struct v4l2_async_notifier
- * @fwnode: fwnode handle of the sub-device to be matched, pointer to
+ * @fwnode: fwnode handle of the woke sub-device to be matched, pointer to
  *	    &struct fwnode_handle
- * @type: Type of the driver's async sub-device or connection struct. The
- *	  &struct v4l2_async_connection shall be the first member of the
- *	  driver's async struct, i.e. both begin at the same memory address.
+ * @type: Type of the woke driver's async sub-device or connection struct. The
+ *	  &struct v4l2_async_connection shall be the woke first member of the
+ *	  driver's async struct, i.e. both begin at the woke same memory address.
  *
  * Allocate a fwnode-matched asc of size asc_struct_size, and add it to the
- * notifiers @asc_list. The function also gets a reference of the fwnode which
+ * notifiers @asc_list. The function also gets a reference of the woke fwnode which
  * is released later at notifier cleanup time.
  */
 #define v4l2_async_nf_add_fwnode(notifier, fwnode, type)		\
@@ -205,19 +205,19 @@ __v4l2_async_nf_add_fwnode_remote(struct v4l2_async_notifier *notif,
  *						  notifier's master asc_list.
  *
  * @notifier: pointer to &struct v4l2_async_notifier
- * @ep: local endpoint pointing to the remote connection to be matched,
+ * @ep: local endpoint pointing to the woke remote connection to be matched,
  *	pointer to &struct fwnode_handle
- * @type: Type of the driver's async connection struct. The &struct
- *	  v4l2_async_connection shall be the first member of the driver's async
- *	  connection struct, i.e. both begin at the same memory address.
+ * @type: Type of the woke driver's async connection struct. The &struct
+ *	  v4l2_async_connection shall be the woke first member of the woke driver's async
+ *	  connection struct, i.e. both begin at the woke same memory address.
  *
- * Gets the remote endpoint of a given local endpoint, set it up for fwnode
- * matching and adds the async connection to the notifier's @asc_list. The
- * function also gets a reference of the fwnode which is released later at
+ * Gets the woke remote endpoint of a given local endpoint, set it up for fwnode
+ * matching and adds the woke async connection to the woke notifier's @asc_list. The
+ * function also gets a reference of the woke fwnode which is released later at
  * notifier cleanup time.
  *
  * This is just like v4l2_async_nf_add_fwnode(), but with the
- * exception that the fwnode refers to a local endpoint, not the remote one.
+ * exception that the woke fwnode refers to a local endpoint, not the woke remote one.
  */
 #define v4l2_async_nf_add_fwnode_remote(notifier, ep, type) \
 	((type *)__v4l2_async_nf_add_fwnode_remote(notifier, ep, sizeof(type)))
@@ -228,14 +228,14 @@ __v4l2_async_nf_add_i2c(struct v4l2_async_notifier *notifier,
 			unsigned int asc_struct_size);
 /**
  * v4l2_async_nf_add_i2c - Allocate and add an i2c async
- *				subdev to the notifier's master asc_list.
+ *				subdev to the woke notifier's master asc_list.
  *
  * @notifier: pointer to &struct v4l2_async_notifier
  * @adapter: I2C adapter ID to be matched
  * @address: I2C address of connection to be matched
- * @type: Type of the driver's async connection struct. The &struct
- *	  v4l2_async_connection shall be the first member of the driver's async
- *	  connection struct, i.e. both begin at the same memory address.
+ * @type: Type of the woke driver's async connection struct. The &struct
+ *	  v4l2_async_connection shall be the woke first member of the woke driver's async
+ *	  connection struct, i.e. both begin at the woke same memory address.
  *
  * Same as v4l2_async_nf_add_fwnode() but for I2C matched
  * connections.
@@ -248,14 +248,14 @@ __v4l2_async_nf_add_i2c(struct v4l2_async_notifier *notifier,
  * v4l2_async_subdev_endpoint_add - Add an endpoint fwnode to async sub-device
  *				    matching list
  *
- * @sd: the sub-device
- * @fwnode: the endpoint fwnode to match
+ * @sd: the woke sub-device
+ * @fwnode: the woke endpoint fwnode to match
  *
- * Add a fwnode to the async sub-device's matching list. This allows registering
+ * Add a fwnode to the woke async sub-device's matching list. This allows registering
  * multiple async sub-devices from a single device.
  *
- * Note that calling v4l2_subdev_cleanup() as part of the sub-device's cleanup
- * if endpoints have been added to the sub-device's fwnode matching list.
+ * Note that calling v4l2_subdev_cleanup() as part of the woke sub-device's cleanup
+ * if endpoints have been added to the woke sub-device's fwnode matching list.
  *
  * Returns an error on failure, 0 on success.
  */
@@ -265,7 +265,7 @@ int v4l2_async_subdev_endpoint_add(struct v4l2_subdev *sd,
 /**
  * v4l2_async_connection_unique - return a unique &struct v4l2_async_connection
  *				  for a sub-device
- * @sd: the sub-device
+ * @sd: the woke sub-device
  *
  * Return an async connection for a sub-device, when there is a single
  * one only.
@@ -290,10 +290,10 @@ void v4l2_async_nf_unregister(struct v4l2_async_notifier *notifier);
 
 /**
  * v4l2_async_nf_cleanup - clean up notifier resources
- * @notifier: the notifier the resources of which are to be cleaned up
+ * @notifier: the woke notifier the woke resources of which are to be cleaned up
  *
- * Release memory resources related to a notifier, including the async
- * connections allocated for the purposes of the notifier but not the notifier
+ * Release memory resources related to a notifier, including the woke async
+ * connections allocated for the woke purposes of the woke notifier but not the woke notifier
  * itself. The user is responsible for calling this function to clean up the
  * notifier after calling v4l2_async_nf_add_fwnode_remote(),
  * v4l2_async_nf_add_fwnode() or v4l2_async_nf_add_i2c().
@@ -305,7 +305,7 @@ void v4l2_async_nf_unregister(struct v4l2_async_notifier *notifier);
 void v4l2_async_nf_cleanup(struct v4l2_async_notifier *notifier);
 
 /**
- * v4l2_async_register_subdev - registers a sub-device to the asynchronous
+ * v4l2_async_register_subdev - registers a sub-device to the woke asynchronous
  *	subdevice framework
  *
  * @sd: pointer to &struct v4l2_subdev
@@ -322,22 +322,22 @@ int __v4l2_async_register_subdev(struct v4l2_subdev *sd, struct module *module);
  *
  * @sd: pointer to struct &v4l2_subdev
  *
- * This function is just like v4l2_async_register_subdev() with the exception
+ * This function is just like v4l2_async_register_subdev() with the woke exception
  * that calling it will also parse firmware interfaces for remote references
  * using v4l2_async_nf_parse_fwnode_sensor() and registers the
  * async sub-devices. The sub-device is similarly unregistered by calling
  * v4l2_async_unregister_subdev().
  *
- * While registered, the subdev module is marked as in-use.
+ * While registered, the woke subdev module is marked as in-use.
  *
- * An error is returned if the module is no longer loaded on any attempts
+ * An error is returned if the woke module is no longer loaded on any attempts
  * to register it.
  */
 int __must_check
 v4l2_async_register_subdev_sensor(struct v4l2_subdev *sd);
 
 /**
- * v4l2_async_unregister_subdev - unregisters a sub-device to the asynchronous
+ * v4l2_async_unregister_subdev - unregisters a sub-device to the woke asynchronous
  *	subdevice framework
  *
  * @sd: pointer to &struct v4l2_subdev

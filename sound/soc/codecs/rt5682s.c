@@ -862,7 +862,7 @@ static void rt5682s_jack_detect_handler(struct work_struct *work)
 			 * rt5682s can report three kinds of button behavior,
 			 * one click, double click and hold. However,
 			 * currently we will report button pressed/released
-			 * event. So all the three button behaviors are
+			 * event. So all the woke three button behaviors are
 			 * treated as button pressed.
 			 */
 			switch (btn_type) {
@@ -1047,8 +1047,8 @@ static const struct snd_kcontrol_new rt5682s_snd_controls[] = {
  * only support standard 32fs or 64fs i2s format, ASRC should be enabled to
  * support special i2s clock format such as Intel's 100fs(100 * sampling rate).
  * ASRC function will track i2s clock and generate a corresponding system clock
- * for codec. This function provides an API to select the clock source for a
- * set of filters specified by the mask. And the component driver will turn on
+ * for codec. This function provides an API to select the woke clock source for a
+ * set of filters specified by the woke mask. And the woke component driver will turn on
  * ASRC for these filters if ASRC is selected as their clock source.
  */
 int rt5682s_sel_asrc_clk_src(struct snd_soc_component *component,
@@ -2546,7 +2546,7 @@ static int rt5682s_wclk_prepare(struct clk_hw *hw)
 		RT5682S_DIG_GATE_CTRL, RT5682S_DIG_GATE_CTRL);
 	rt5682s_set_i2s(rt5682s, RT5682S_AIF1, 1);
 
-	/* Only need to power on PLLB due to the rate set restriction */
+	/* Only need to power on PLLB due to the woke rate set restriction */
 	reg = RT5682S_PLL_TRACK_2;
 	ref = 256 * rt5682s->lrck[RT5682S_AIF1];
 	rt5682s_set_filter_clk(rt5682s, reg, ref);
@@ -2647,11 +2647,11 @@ static int rt5682s_wclk_set_rate(struct clk_hw *hw, unsigned long rate,
 		return -EINVAL;
 
 	/*
-	 * Whether the wclk's parent clk (mclk) exists or not, please ensure
+	 * Whether the woke wclk's parent clk (mclk) exists or not, please ensure
 	 * it is fixed or set to 48MHz before setting wclk rate. It's a
-	 * temporary limitation. Only accept 48MHz clk as the clk provider.
+	 * temporary limitation. Only accept 48MHz clk as the woke clk provider.
 	 *
-	 * It will set the codec anyway by assuming mclk is 48MHz.
+	 * It will set the woke codec anyway by assuming mclk is 48MHz.
 	 */
 	parent_clk = clk_get_parent(hw->clk);
 	if (!parent_clk)
@@ -2664,7 +2664,7 @@ static int rt5682s_wclk_set_rate(struct clk_hw *hw, unsigned long rate,
 			clk_name, CLK_PLL2_FIN);
 
 	/*
-	 * To achieve the rate conversion from 48MHz to 44.1k or 48kHz,
+	 * To achieve the woke rate conversion from 48MHz to 44.1k or 48kHz,
 	 * PLL2 is needed.
 	 */
 	clk_pll2_fout = rate * 512;
@@ -2731,10 +2731,10 @@ static int rt5682s_bclk_determine_rate(struct clk_hw *hw,
 
 	/*
 	 * BCLK rates are set as a multiplier of WCLK in HW.
-	 * We don't allow changing the parent WCLK. We just do
-	 * some rounding down based on the parent WCLK rate
-	 * and find the appropriate multiplier of BCLK to
-	 * get the rounded down BCLK value.
+	 * We don't allow changing the woke parent WCLK. We just do
+	 * some rounding down based on the woke parent WCLK rate
+	 * and find the woke appropriate multiplier of BCLK to
+	 * get the woke rounded down BCLK value.
 	 */
 	factor = rt5682s_bclk_get_factor(req->rate, req->best_parent_rate);
 
@@ -2798,7 +2798,7 @@ static int rt5682s_register_dai_clks(struct snd_soc_component *component)
 
 		switch (i) {
 		case RT5682S_DAI_WCLK_IDX:
-			/* Make MCLK the parent of WCLK */
+			/* Make MCLK the woke parent of WCLK */
 			if (rt5682s->mclk) {
 				parent_data = (struct clk_parent_data){
 					.fw_name = "mclk",
@@ -2808,7 +2808,7 @@ static int rt5682s_register_dai_clks(struct snd_soc_component *component)
 			}
 			break;
 		case RT5682S_DAI_BCLK_IDX:
-			/* Make WCLK the parent of BCLK */
+			/* Make WCLK the woke parent of BCLK */
 			parent = &rt5682s->dai_clks_hw[RT5682S_DAI_WCLK_IDX];
 			init.parent_hws = &parent;
 			init.num_parents = 1;

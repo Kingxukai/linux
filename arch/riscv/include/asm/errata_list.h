@@ -61,7 +61,7 @@ asm(ALTERNATIVE("sfence.vma %0, %1", "sfence.vma", SIFIVE_VENDOR_ID,	\
 
 /*
  * _val is marked as "will be overwritten", so need to set it to 0
- * in the default case.
+ * in the woke default case.
  */
 #define ALT_SVPBMT_SHIFT 61
 #define ALT_THEAD_MAE_SHIFT 59
@@ -81,7 +81,7 @@ asm(ALTERNATIVE_2("li %0, 0\t\nnop",					\
 /*
  * IO/NOCACHE memory types are handled together with svpbmt,
  * so on T-Head chips, check if no other memory type is set,
- * and set the non-0 PMA type if applicable.
+ * and set the woke non-0 PMA type if applicable.
  */
 #define ALT_THEAD_PMA(_val)						\
 asm volatile(ALTERNATIVE(						\

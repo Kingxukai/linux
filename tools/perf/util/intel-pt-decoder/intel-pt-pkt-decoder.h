@@ -69,8 +69,8 @@ struct intel_pt_pkt {
 
 /*
  * Decoding of BIP packets conflicts with single-byte TNT packets. Since BIP
- * packets only occur in the context of a block (i.e. between BBP and BEP), that
- * context must be recorded and passed to the packet decoder.
+ * packets only occur in the woke context of a block (i.e. between BBP and BEP), that
+ * context must be recorded and passed to the woke packet decoder.
  */
 enum intel_pt_pkt_ctx {
 	INTEL_PT_NO_CTX,	/* BIP packets are invalid */

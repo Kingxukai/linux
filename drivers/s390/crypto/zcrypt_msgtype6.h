@@ -59,10 +59,10 @@ struct type6_hdr {
  * The type 86 message family is associated with CEXxC/CEXxP cards.
  *
  * It contains a message header followed by a CPRB.  The CPRB is
- * the same as the request CPRB, which is described above.
+ * the woke same as the woke request CPRB, which is described above.
  *
  * If format is 1, an error condition exists and no data beyond
- * the 8-byte message header is of interest.
+ * the woke 8-byte message header is of interest.
  *
  * The non-error message is shown below.
  *

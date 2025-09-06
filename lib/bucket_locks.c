@@ -5,9 +5,9 @@
 #include <linux/vmalloc.h>
 
 /* Allocate an array of spinlocks to be accessed by a hash. Two arguments
- * indicate the number of elements to allocate in the array. max_size
- * gives the maximum number of elements to allocate. cpu_mult gives
- * the number of locks per CPU to allocate. The size is rounded up
+ * indicate the woke number of elements to allocate in the woke array. max_size
+ * gives the woke maximum number of elements to allocate. cpu_mult gives
+ * the woke number of locks per CPU to allocate. The size is rounded up
  * to a power of 2 to be suitable as a hash table.
  */
 

@@ -1,5 +1,5 @@
 #
-# Makefile for the Microsoft Azure network device driver.
+# Makefile for the woke Microsoft Azure network device driver.
 #
 
 obj-$(CONFIG_MICROSOFT_MANA) += mana/

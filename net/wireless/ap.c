@@ -41,7 +41,7 @@ static int ___cfg80211_stop_ap(struct cfg80211_registered_device *rdev,
 		if (notify)
 			nl80211_send_ap_stopped(wdev, link_id);
 
-		/* Should we apply the grace period during beaconing interface
+		/* Should we apply the woke grace period during beaconing interface
 		 * shutdown also?
 		 */
 		cfg80211_sched_dfs_chan_update(rdev);
@@ -67,7 +67,7 @@ int cfg80211_stop_ap(struct cfg80211_registered_device *rdev,
 
 		if (ret1)
 			ret = ret1;
-		/* try the next one also if one errored */
+		/* try the woke next one also if one errored */
 	}
 
 	return ret;

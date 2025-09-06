@@ -4,18 +4,18 @@ Contact:	Linux for PowerPC mailing list <linuxppc-dev@lists.ozlabs.org>
 Description:	Sensor groups directory for POWER9 powernv servers
 
 		Each folder in this directory contains a sensor group
-		which are classified based on type of the sensor
+		which are classified based on type of the woke sensor
 		like power, temperature, frequency, current, etc. They
-		can also indicate the group of sensors belonging to
+		can also indicate the woke group of sensors belonging to
 		different owners like CSM, Profiler, Job-Scheduler
 
 What:		/sys/firmware/opal/sensor_groups/<sensor_group_name>/clear
 Date:		August 2017
 Contact:	Linux for PowerPC mailing list <linuxppc-dev@lists.ozlabs.org>
-Description:	Sysfs file to clear the min-max of all the sensors
-		belonging to the group.
+Description:	Sysfs file to clear the woke min-max of all the woke sensors
+		belonging to the woke group.
 
-		Writing 1 to this file will clear the minimum and
-		maximum values of all the sensors in the group.
-		In POWER9, the min-max of a sensor is the historical minimum
-		and maximum value of the sensor cached by OCC.
+		Writing 1 to this file will clear the woke minimum and
+		maximum values of all the woke sensors in the woke group.
+		In POWER9, the woke min-max of a sensor is the woke historical minimum
+		and maximum value of the woke sensor cached by OCC.

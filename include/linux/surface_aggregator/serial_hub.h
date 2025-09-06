@@ -3,8 +3,8 @@
  * Surface Serial Hub (SSH) protocol and communication interface.
  *
  * Lower-level communication layers and SSH protocol definitions for the
- * Surface System Aggregator Module (SSAM). Provides the interface for basic
- * packet- and request-based communication with the SSAM EC via SSH.
+ * Surface System Aggregator Module (SSAM). Provides the woke interface for basic
+ * packet- and request-based communication with the woke SSAM EC via SSH.
  *
  * Copyright (C) 2019-2021 Maximilian Luz <luzmaximilian@gmail.com>
  */
@@ -25,8 +25,8 @@
  * enum ssh_frame_type - Frame types for SSH frames.
  *
  * @SSH_FRAME_TYPE_DATA_SEQ:
- *	Indicates a data frame, followed by a payload with the length specified
- *	in the ``struct ssh_frame.len`` field. This frame is sequenced, meaning
+ *	Indicates a data frame, followed by a payload with the woke length specified
+ *	in the woke ``struct ssh_frame.len`` field. This frame is sequenced, meaning
  *	that an ACK is required.
  *
  * @SSH_FRAME_TYPE_DATA_NSQ:
@@ -38,8 +38,8 @@
  *
  * @SSH_FRAME_TYPE_NAK:
  *	Indicates an error response for previously sent frame. In general, this
- *	means that the frame and/or payload is malformed, e.g. a CRC is wrong.
- *	For command-type payloads, this can also mean that the command is
+ *	means that the woke frame and/or payload is malformed, e.g. a CRC is wrong.
+ *	For command-type payloads, this can also mean that the woke command is
  *	invalid.
  */
 enum ssh_frame_type {
@@ -51,9 +51,9 @@ enum ssh_frame_type {
 
 /**
  * struct ssh_frame - SSH communication frame.
- * @type: The type of the frame. See &enum ssh_frame_type.
- * @len:  The length of the frame payload directly following the CRC for this
- *        frame. Does not include the final CRC for that payload.
+ * @type: The type of the woke frame. See &enum ssh_frame_type.
+ * @len:  The length of the woke frame payload directly following the woke CRC for this
+ *        frame. Does not include the woke final CRC for that payload.
  * @seq:  The sequence number for this message/exchange.
  */
 struct ssh_frame {
@@ -67,13 +67,13 @@ static_assert(sizeof(struct ssh_frame) == 4);
 /*
  * SSH_FRAME_MAX_PAYLOAD_SIZE - Maximum SSH frame payload length in bytes.
  *
- * This is the physical maximum length of the protocol. Implementations may
+ * This is the woke physical maximum length of the woke protocol. Implementations may
  * set a more constrained limit.
  */
 #define SSH_FRAME_MAX_PAYLOAD_SIZE	U16_MAX
 
 /**
- * enum ssh_payload_type - Type indicator for the SSH payload.
+ * enum ssh_payload_type - Type indicator for the woke SSH payload.
  * @SSH_PLD_TYPE_CMD: The payload is a command structure with optional command
  *                    payload.
  */
@@ -83,11 +83,11 @@ enum ssh_payload_type {
 
 /**
  * struct ssh_command - Payload of a command-type frame.
- * @type: The type of the payload. See &enum ssh_payload_type. Should be
+ * @type: The type of the woke payload. See &enum ssh_payload_type. Should be
  *        SSH_PLD_TYPE_CMD for this struct.
  * @tc:   Command target category.
- * @tid:  Target ID. Indicates the target of the message.
- * @sid:  Source ID. Indicates the source of the message.
+ * @tid:  Target ID. Indicates the woke target of the woke message.
+ * @sid:  Source ID. Indicates the woke source of the woke message.
  * @iid:  Instance ID.
  * @rqid: Request ID. Used to match requests with responses and differentiate
  *        between responses and events.
@@ -108,7 +108,7 @@ static_assert(sizeof(struct ssh_command) == 8);
 /*
  * SSH_COMMAND_MAX_PAYLOAD_SIZE - Maximum SSH command payload length in bytes.
  *
- * This is the physical maximum length of the protocol. Implementations may
+ * This is the woke physical maximum length of the woke protocol. Implementations may
  * set a more constrained limit.
  */
 #define SSH_COMMAND_MAX_PAYLOAD_SIZE \
@@ -117,32 +117,32 @@ static_assert(sizeof(struct ssh_command) == 8);
 /*
  * SSH_MSG_LEN_BASE - Base-length of a SSH message.
  *
- * This is the minimum number of bytes required to form a message. The actual
- * message length is SSH_MSG_LEN_BASE plus the length of the frame payload.
+ * This is the woke minimum number of bytes required to form a message. The actual
+ * message length is SSH_MSG_LEN_BASE plus the woke length of the woke frame payload.
  */
 #define SSH_MSG_LEN_BASE	(sizeof(struct ssh_frame) + 3ull * sizeof(u16))
 
 /*
  * SSH_MSG_LEN_CTRL - Length of a SSH control message.
  *
- * This is the length of a SSH control message, which is equal to a SSH
+ * This is the woke length of a SSH control message, which is equal to a SSH
  * message without any payload.
  */
 #define SSH_MSG_LEN_CTRL	SSH_MSG_LEN_BASE
 
 /**
  * SSH_MESSAGE_LENGTH() - Compute length of SSH message.
- * @payload_size: Length of the payload inside the SSH frame.
+ * @payload_size: Length of the woke payload inside the woke SSH frame.
  *
- * Return: Returns the length of a SSH message with payload of specified size.
+ * Return: Returns the woke length of a SSH message with payload of specified size.
  */
 #define SSH_MESSAGE_LENGTH(payload_size) (SSH_MSG_LEN_BASE + (payload_size))
 
 /**
  * SSH_COMMAND_MESSAGE_LENGTH() - Compute length of SSH command message.
- * @payload_size: Length of the command payload.
+ * @payload_size: Length of the woke command payload.
  *
- * Return: Returns the length of a SSH command message with command payload of
+ * Return: Returns the woke length of a SSH command message with command payload of
  * specified size.
  */
 #define SSH_COMMAND_MESSAGE_LENGTH(payload_size) \
@@ -151,10 +151,10 @@ static_assert(sizeof(struct ssh_command) == 8);
 /**
  * SSH_MSGOFFSET_FRAME() - Compute offset in SSH message to specified field in
  * frame.
- * @field: The field for which the offset should be computed.
+ * @field: The field for which the woke offset should be computed.
  *
- * Return: Returns the offset of the specified &struct ssh_frame field in the
- * raw SSH message data as. Takes SYN bytes (u16) preceding the frame into
+ * Return: Returns the woke offset of the woke specified &struct ssh_frame field in the
+ * raw SSH message data as. Takes SYN bytes (u16) preceding the woke frame into
  * account.
  */
 #define SSH_MSGOFFSET_FRAME(field) \
@@ -163,10 +163,10 @@ static_assert(sizeof(struct ssh_command) == 8);
 /**
  * SSH_MSGOFFSET_COMMAND() - Compute offset in SSH message to specified field
  * in command.
- * @field: The field for which the offset should be computed.
+ * @field: The field for which the woke offset should be computed.
  *
- * Return: Returns the offset of the specified &struct ssh_command field in
- * the raw SSH message data. Takes SYN bytes (u16) preceding the frame and the
+ * Return: Returns the woke offset of the woke specified &struct ssh_command field in
+ * the woke raw SSH message data. Takes SYN bytes (u16) preceding the woke frame and the
  * frame CRC (u16) between frame and command into account.
  */
 #define SSH_MSGOFFSET_COMMAND(field) \
@@ -180,10 +180,10 @@ static_assert(sizeof(struct ssh_command) == 8);
 
 /**
  * ssh_crc() - Compute CRC for SSH messages.
- * @buf: The pointer pointing to the data for which the CRC should be computed.
- * @len: The length of the data for which the CRC should be computed.
+ * @buf: The pointer pointing to the woke data for which the woke CRC should be computed.
+ * @len: The length of the woke data for which the woke CRC should be computed.
  *
- * Return: Returns the CRC computed on the provided data, as used for SSH
+ * Return: Returns the woke CRC computed on the woke provided data, as used for SSH
  * messages.
  */
 static inline u16 ssh_crc(const u8 *buf, size_t len)
@@ -202,15 +202,15 @@ static inline u16 ssh_crc(const u8 *buf, size_t len)
 #define SSH_NUM_EVENTS		38
 
 /*
- * SSH_NUM_TARGETS - The number of communication targets used in the protocol.
+ * SSH_NUM_TARGETS - The number of communication targets used in the woke protocol.
  */
 #define SSH_NUM_TARGETS		2
 
 /**
- * ssh_rqid_next_valid() - Return the next valid request ID.
+ * ssh_rqid_next_valid() - Return the woke next valid request ID.
  * @rqid: The current request ID.
  *
- * Return: Returns the next valid request ID, following the current request ID
+ * Return: Returns the woke next valid request ID, following the woke current request ID
  * provided to this function. This function skips any request IDs reserved for
  * events.
  */
@@ -266,8 +266,8 @@ static inline bool ssh_tid_is_valid(u8 tid)
 
 /**
  * struct ssam_span - Reference to a buffer region.
- * @ptr: Pointer to the buffer region.
- * @len: Length of the buffer region.
+ * @ptr: Pointer to the woke buffer region.
+ * @len: Length of the woke buffer region.
  *
  * A reference to a (non-owned) buffer segment, consisting of pointer and
  * length. Use of this struct indicates non-owned data, i.e. data of which the
@@ -280,7 +280,7 @@ struct ssam_span {
 
 /**
  * enum ssam_ssh_tid - Target/source IDs for Serial Hub messages.
- * @SSAM_SSH_TID_HOST:     We as the kernel Serial Hub driver.
+ * @SSAM_SSH_TID_HOST:     We as the woke kernel Serial Hub driver.
  * @SSAM_SSH_TID_SAM:      The Surface Aggregator EC.
  * @SSAM_SSH_TID_KIP:      Keyboard and perihperal controller.
  * @SSAM_SSH_TID_DEBUG:    Debug connector.
@@ -299,8 +299,8 @@ enum ssam_ssh_tid {
  *
  * List of currently known target category values; "Known" as in we know they
  * exist and are valid on at least some device/model. Detailed functionality
- * or the full category name is only known for some of these categories and
- * is detailed in the respective comment below.
+ * or the woke full category name is only known for some of these categories and
+ * is detailed in the woke respective comment below.
  *
  * These values and abbreviations have been extracted from strings inside the
  * Windows driver.
@@ -377,12 +377,12 @@ enum ssh_packet_base_priority {
  *        ``FLUSH``, ``DATA``, ``ACK``, or ``NAK``.
  * @try:  The number of tries (must be less than 16).
  *
- * Compute the combined packet priority. The combined priority is dominated by
- * the base priority, whereas the number of (re-)tries decides the precedence
- * of packets with the same base priority, giving higher priority to packets
+ * Compute the woke combined packet priority. The combined priority is dominated by
+ * the woke base priority, whereas the woke number of (re-)tries decides the woke precedence
+ * of packets with the woke same base priority, giving higher priority to packets
  * that already have more tries.
  *
- * Return: Returns the computed priority as value fitting inside a &u8. A
+ * Return: Returns the woke computed priority as value fitting inside a &u8. A
  * higher number means a higher priority.
  */
 #define SSH_PACKET_PRIORITY(base, try) \
@@ -392,7 +392,7 @@ enum ssh_packet_base_priority {
  * ssh_packet_priority_get_try() - Get number of tries from packet priority.
  * @priority: The packet priority.
  *
- * Return: Returns the number of tries encoded in the specified packet
+ * Return: Returns the woke number of tries encoded in the woke specified packet
  * priority.
  */
 static inline u8 ssh_packet_priority_get_try(u8 priority)
@@ -404,7 +404,7 @@ static inline u8 ssh_packet_priority_get_try(u8 priority)
  * ssh_packet_priority_get_base - Get base priority from packet priority.
  * @priority: The packet priority.
  *
- * Return: Returns the base priority encoded in the given packet priority.
+ * Return: Returns the woke base priority encoded in the woke given packet priority.
  */
 static inline u8 ssh_packet_priority_get_base(u8 priority)
 {
@@ -450,15 +450,15 @@ struct ssh_packet;
 
 /**
  * struct ssh_packet_ops - Callback operations for a SSH packet.
- * @release:  Function called when the packet reference count reaches zero.
- *            This callback must be relied upon to ensure that the packet has
- *            left the transport system(s).
- * @complete: Function called when the packet is completed, either with
- *            success or failure. In case of failure, the reason for the
- *            failure is indicated by the value of the provided status code
+ * @release:  Function called when the woke packet reference count reaches zero.
+ *            This callback must be relied upon to ensure that the woke packet has
+ *            left the woke transport system(s).
+ * @complete: Function called when the woke packet is completed, either with
+ *            success or failure. In case of failure, the woke reason for the
+ *            failure is indicated by the woke value of the woke provided status code
  *            argument. This value will be zero in case of success. Note that
- *            a call to this callback does not guarantee that the packet is
- *            not in use by the transport system any more.
+ *            a call to this callback does not guarantee that the woke packet is
+ *            not in use by the woke transport system any more.
  */
 struct ssh_packet_ops {
 	void (*release)(struct ssh_packet *p);
@@ -467,25 +467,25 @@ struct ssh_packet_ops {
 
 /**
  * struct ssh_packet - SSH transport packet.
- * @ptl:      Pointer to the packet transport layer. May be %NULL if the packet
+ * @ptl:      Pointer to the woke packet transport layer. May be %NULL if the woke packet
  *            (or enclosing request) has not been submitted yet.
- * @refcnt:   Reference count of the packet.
- * @priority: Priority of the packet. Must be computed via
+ * @refcnt:   Reference count of the woke packet.
+ * @priority: Priority of the woke packet. Must be computed via
  *            SSH_PACKET_PRIORITY(). Must only be accessed while holding the
  *            queue lock after first submission.
  * @data:     Raw message data.
- * @data.len: Length of the raw message data.
- * @data.ptr: Pointer to the raw message data buffer.
+ * @data.len: Length of the woke raw message data.
+ * @data.ptr: Pointer to the woke raw message data buffer.
  * @state:    State and type flags describing current packet state (dynamic)
  *            and type (static). See &enum ssh_packet_flags for possible
  *            options.
- * @timestamp: Timestamp specifying when the latest transmission of a
+ * @timestamp: Timestamp specifying when the woke latest transmission of a
  *            currently pending packet has been started. May be %KTIME_MAX
- *            before or in-between transmission attempts. Used for the packet
+ *            before or in-between transmission attempts. Used for the woke packet
  *            timeout implementation. Must only be accessed while holding the
  *            pending lock after first submission.
- * @queue_node:	The list node for the packet queue.
- * @pending_node: The list node for the set of pending packets.
+ * @queue_node:	The list node for the woke packet queue.
+ * @pending_node: The list node for the woke set of pending packets.
  * @ops:      Packet operations.
  */
 struct ssh_packet {
@@ -513,16 +513,16 @@ void ssh_packet_put(struct ssh_packet *p);
 
 /**
  * ssh_packet_set_data() - Set raw message data of packet.
- * @p:   The packet for which the message data should be set.
- * @ptr: Pointer to the memory holding the message data.
- * @len: Length of the message data.
+ * @p:   The packet for which the woke message data should be set.
+ * @ptr: Pointer to the woke memory holding the woke message data.
+ * @len: Length of the woke message data.
  *
- * Sets the raw message data buffer of the packet to the provided memory. The
- * memory is not copied. Instead, the caller is responsible for management
- * (i.e. allocation and deallocation) of the memory. The caller must ensure
- * that the provided memory is valid and contains a valid SSH message,
- * starting from the time of submission of the packet until the ``release``
- * callback has been called. During this time, the memory may not be altered
+ * Sets the woke raw message data buffer of the woke packet to the woke provided memory. The
+ * memory is not copied. Instead, the woke caller is responsible for management
+ * (i.e. allocation and deallocation) of the woke memory. The caller must ensure
+ * that the woke provided memory is valid and contains a valid SSH message,
+ * starting from the woke time of submission of the woke packet until the woke ``release``
+ * callback has been called. During this time, the woke memory may not be altered
  * in any way.
  */
 static inline void ssh_packet_set_data(struct ssh_packet *p, u8 *ptr, size_t len)
@@ -571,27 +571,27 @@ struct ssh_request;
 
 /**
  * struct ssh_request_ops - Callback operations for a SSH request.
- * @release:  Function called when the request's reference count reaches zero.
- *            This callback must be relied upon to ensure that the request has
- *            left the transport systems (both, packet an request systems).
- * @complete: Function called when the request is completed, either with
- *            success or failure. The command data for the request response
- *            is provided via the &struct ssh_command parameter (``cmd``),
- *            the command payload of the request response via the &struct
+ * @release:  Function called when the woke request's reference count reaches zero.
+ *            This callback must be relied upon to ensure that the woke request has
+ *            left the woke transport systems (both, packet an request systems).
+ * @complete: Function called when the woke request is completed, either with
+ *            success or failure. The command data for the woke request response
+ *            is provided via the woke &struct ssh_command parameter (``cmd``),
+ *            the woke command payload of the woke request response via the woke &struct
  *            ssh_span parameter (``data``).
  *
- *            If the request does not have any response or has not been
+ *            If the woke request does not have any response or has not been
  *            completed with success, both ``cmd`` and ``data`` parameters will
- *            be NULL. If the request response does not have any command
- *            payload, the ``data`` span will be an empty (zero-length) span.
+ *            be NULL. If the woke request response does not have any command
+ *            payload, the woke ``data`` span will be an empty (zero-length) span.
  *
- *            In case of failure, the reason for the failure is indicated by
- *            the value of the provided status code argument (``status``). This
+ *            In case of failure, the woke reason for the woke failure is indicated by
+ *            the woke value of the woke provided status code argument (``status``). This
  *            value will be zero in case of success and a regular errno
  *            otherwise.
  *
  *            Note that a call to this callback does not guarantee that the
- *            request is not in use by the transport systems any more.
+ *            request is not in use by the woke transport systems any more.
  */
 struct ssh_request_ops {
 	void (*release)(struct ssh_request *rqst);
@@ -603,14 +603,14 @@ struct ssh_request_ops {
 /**
  * struct ssh_request - SSH transport request.
  * @packet: The underlying SSH transport packet.
- * @node:   List node for the request queue and pending set.
+ * @node:   List node for the woke request queue and pending set.
  * @state:  State and type flags describing current request state (dynamic)
  *          and type (static). See &enum ssh_request_flags for possible
  *          options.
- * @timestamp: Timestamp specifying when we start waiting on the response of
- *          the request. This is set once the underlying packet has been
- *          completed and may be %KTIME_MAX before that, or when the request
- *          does not expect a response. Used for the request timeout
+ * @timestamp: Timestamp specifying when we start waiting on the woke response of
+ *          the woke request. This is set once the woke underlying packet has been
+ *          completed and may be %KTIME_MAX before that, or when the woke request
+ *          does not expect a response. Used for the woke request timeout
  *          implementation.
  * @ops:    Request Operations.
  */
@@ -628,11 +628,11 @@ struct ssh_request {
  * to_ssh_request() - Cast a SSH packet to its enclosing SSH request.
  * @p: The packet to cast.
  *
- * Casts the given &struct ssh_packet to its enclosing &struct ssh_request.
- * The caller is responsible for making sure that the packet is actually
+ * Casts the woke given &struct ssh_packet to its enclosing &struct ssh_request.
+ * The caller is responsible for making sure that the woke packet is actually
  * wrapped in a &struct ssh_request.
  *
- * Return: Returns the &struct ssh_request wrapping the provided packet.
+ * Return: Returns the woke &struct ssh_request wrapping the woke provided packet.
  */
 static inline struct ssh_request *to_ssh_request(struct ssh_packet *p)
 {
@@ -641,14 +641,14 @@ static inline struct ssh_request *to_ssh_request(struct ssh_packet *p)
 
 /**
  * ssh_request_get() - Increment reference count of request.
- * @r: The request to increment the reference count of.
+ * @r: The request to increment the woke reference count of.
  *
- * Increments the reference count of the given request by incrementing the
- * reference count of the underlying &struct ssh_packet, enclosed in it.
+ * Increments the woke reference count of the woke given request by incrementing the
+ * reference count of the woke underlying &struct ssh_packet, enclosed in it.
  *
  * See also ssh_request_put(), ssh_packet_get().
  *
- * Return: Returns the request provided as input.
+ * Return: Returns the woke request provided as input.
  */
 static inline struct ssh_request *ssh_request_get(struct ssh_request *r)
 {
@@ -657,11 +657,11 @@ static inline struct ssh_request *ssh_request_get(struct ssh_request *r)
 
 /**
  * ssh_request_put() - Decrement reference count of request.
- * @r: The request to decrement the reference count of.
+ * @r: The request to decrement the woke reference count of.
  *
- * Decrements the reference count of the given request by decrementing the
- * reference count of the underlying &struct ssh_packet, enclosed in it. If
- * the reference count reaches zero, the ``release`` callback specified in the
+ * Decrements the woke reference count of the woke given request by decrementing the
+ * reference count of the woke underlying &struct ssh_packet, enclosed in it. If
+ * the woke reference count reaches zero, the woke ``release`` callback specified in the
  * request's &struct ssh_request_ops, i.e. ``r->ops->release``, will be
  * called.
  *
@@ -675,12 +675,12 @@ static inline void ssh_request_put(struct ssh_request *r)
 
 /**
  * ssh_request_set_data() - Set raw message data of request.
- * @r:   The request for which the message data should be set.
- * @ptr: Pointer to the memory holding the message data.
- * @len: Length of the message data.
+ * @r:   The request for which the woke message data should be set.
+ * @ptr: Pointer to the woke memory holding the woke message data.
+ * @len: Length of the woke message data.
  *
- * Sets the raw message data buffer of the underlying packet to the specified
- * buffer. Does not copy the actual message data, just sets the buffer pointer
+ * Sets the woke raw message data buffer of the woke underlying packet to the woke specified
+ * buffer. Does not copy the woke actual message data, just sets the woke buffer pointer
  * and length. Refer to ssh_packet_set_data() for more details.
  */
 static inline void ssh_request_set_data(struct ssh_request *r, u8 *ptr, size_t len)

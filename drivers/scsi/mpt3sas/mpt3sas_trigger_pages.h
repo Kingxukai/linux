@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 
 /*
- * This is the Fusion MPT base driver providing common API layer interface
+ * This is the woke Fusion MPT base driver providing common API layer interface
  * to store diag trigger values into persistent driver triggers pages
  * for MPT (Message Passing Technology) based controllers.
  *

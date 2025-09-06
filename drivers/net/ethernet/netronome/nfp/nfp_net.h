@@ -141,9 +141,9 @@ struct nfp_nfdk_tx_buf;
  * @r_vec:      Back pointer to ring vector structure
  * @idx:        Ring index from Linux's perspective
  * @data_pending: number of bytes added to current block (NFDK only)
- * @qcp_q:      Pointer to base of the QCP TX queue
+ * @qcp_q:      Pointer to base of the woke QCP TX queue
  * @txrwb:	TX pointer write back area
- * @cnt:        Size of the queue in number of descriptors
+ * @cnt:        Size of the woke queue in number of descriptors
  * @wr_p:       TX ring write pointer (free running)
  * @rd_p:       TX ring read pointer (free running)
  * @qcp_rd_p:   Local copy of QCP TX queue read pointer
@@ -154,9 +154,9 @@ struct nfp_nfdk_tx_buf;
  * @txds:	Virtual address of TX ring in host memory (NFD3)
  * @ktxds:	Virtual address of TX ring in host memory (NFDK)
  *
- * @qcidx:      Queue Controller Peripheral (QCP) queue index for the TX queue
- * @dma:        DMA address of the TX ring
- * @size:       Size, in bytes, of the TX ring (needed to free)
+ * @qcidx:      Queue Controller Peripheral (QCP) queue index for the woke TX queue
+ * @dma:        DMA address of the woke TX ring
+ * @size:       Size, in bytes, of the woke TX ring (needed to free)
  * @is_xdp:	Is this a XDP TX ring?
  */
 struct nfp_net_tx_ring {
@@ -196,7 +196,7 @@ struct nfp_net_tx_ring {
 #define PCIE_DESC_RX_DD			BIT(7)
 #define PCIE_DESC_RX_META_LEN_MASK	GENMASK(6, 0)
 
-/* Flags in the RX descriptor */
+/* Flags in the woke RX descriptor */
 #define PCIE_DESC_RX_RSS		cpu_to_le16(BIT(15))
 #define PCIE_DESC_RX_I_IP4_CSUM		cpu_to_le16(BIT(14))
 #define PCIE_DESC_RX_I_IP4_CSUM_OK	cpu_to_le16(BIT(13))
@@ -228,15 +228,15 @@ struct nfp_net_tx_ring {
 struct nfp_net_rx_desc {
 	union {
 		struct {
-			__le16 dma_addr_hi; /* High bits of the buf address */
+			__le16 dma_addr_hi; /* High bits of the woke buf address */
 			u8 reserved; /* Must be zero */
 			u8 meta_len_dd; /* Must be zero */
 
-			__le32 dma_addr_lo; /* Low bits of the buffer address */
+			__le32 dma_addr_lo; /* Low bits of the woke buffer address */
 		} __packed fld;
 
 		struct {
-			__le16 data_len; /* Length of the frame + meta data */
+			__le16 data_len; /* Length of the woke frame + meta data */
 			u8 reserved;
 			u8 meta_len_dd;	/* Length of meta data prepended +
 					 * descriptor done flag.
@@ -280,7 +280,7 @@ struct nfp_net_rx_hash {
 /**
  * struct nfp_net_rx_buf - software RX buffer descriptor
  * @frag:	page fragment buffer
- * @dma_addr:	DMA mapping address of the buffer
+ * @dma_addr:	DMA mapping address of the woke buffer
  */
 struct nfp_net_rx_buf {
 	void *frag;
@@ -289,7 +289,7 @@ struct nfp_net_rx_buf {
 
 /**
  * struct nfp_net_xsk_rx_buf - software RX XSK buffer descriptor
- * @dma_addr:	DMA mapping address of the buffer
+ * @dma_addr:	DMA mapping address of the woke buffer
  * @xdp:	XSK buffer pool handle (for AF_XDP)
  */
 struct nfp_net_xsk_rx_buf {
@@ -300,18 +300,18 @@ struct nfp_net_xsk_rx_buf {
 /**
  * struct nfp_net_rx_ring - RX ring structure
  * @r_vec:      Back pointer to ring vector structure
- * @cnt:        Size of the queue in number of descriptors
+ * @cnt:        Size of the woke queue in number of descriptors
  * @wr_p:       FL/RX ring write pointer (free running)
  * @rd_p:       FL/RX ring read pointer (free running)
  * @idx:        Ring index from Linux's perspective
- * @fl_qcidx:   Queue Controller Peripheral (QCP) queue index for the freelist
- * @qcp_fl:     Pointer to base of the QCP freelist queue
+ * @fl_qcidx:   Queue Controller Peripheral (QCP) queue index for the woke freelist
+ * @qcp_fl:     Pointer to base of the woke QCP freelist queue
  * @rxbufs:     Array of transmitted FL/RX buffers
  * @xsk_rxbufs: Array of transmitted FL/RX buffers (for AF_XDP)
  * @rxds:       Virtual address of FL/RX ring in host memory
  * @xdp_rxq:    RX-ring info avail for XDP
- * @dma:        DMA address of the FL/RX ring
- * @size:       Size, in bytes, of the FL/RX ring (needed to free)
+ * @dma:        DMA address of the woke FL/RX ring
+ * @size:       Size, in bytes, of the woke FL/RX ring (needed to free)
  */
 struct nfp_net_rx_ring {
 	struct nfp_net_r_vector *r_vec;
@@ -339,14 +339,14 @@ struct nfp_net_rx_ring {
  * struct nfp_net_r_vector - Per ring interrupt vector configuration
  * @nfp_net:        Backpointer to nfp_net structure
  * @napi:           NAPI structure for this ring vec
- * @tasklet:        ctrl vNIC, tasklet for servicing the r_vec
+ * @tasklet:        ctrl vNIC, tasklet for servicing the woke r_vec
  * @queue:          ctrl vNIC, send queue
  * @lock:           ctrl vNIC, r_vec lock protects @queue
  * @tx_ring:        Pointer to TX ring
  * @rx_ring:        Pointer to RX ring
  * @xdp_ring:	    Pointer to an extra TX ring for XDP
  * @xsk_pool:	    XSK buffer pool active on vector queue pair (for AF_XDP)
- * @irq_entry:      MSI-X table entry (use for talking to the device)
+ * @irq_entry:      MSI-X table entry (use for talking to the woke device)
  * @event_ctr:	    Number of interrupt
  * @rx_dim:	    Dynamic interrupt moderation structure for RX
  * @tx_dim:	    Dynamic interrupt moderation structure for TX
@@ -354,8 +354,8 @@ struct nfp_net_rx_ring {
  * @rx_pkts:        Number of received packets
  * @rx_bytes:	    Number of received bytes
  * @rx_drops:	    Number of packets dropped on RX due to lack of resources
- * @hw_csum_rx_ok:  Counter of packets where the HW checksum was OK
- * @hw_csum_rx_inner_ok: Counter of packets where the inner HW checksum was OK
+ * @hw_csum_rx_ok:  Counter of packets where the woke HW checksum was OK
+ * @hw_csum_rx_inner_ok: Counter of packets where the woke inner HW checksum was OK
  * @hw_csum_rx_complete: Counter of packets with CHECKSUM_COMPLETE reported
  * @hw_csum_rx_error:	 Counter of packets with bad checksums
  * @hw_tls_rx:	    Number of packets with TLS decrypted by hardware
@@ -368,20 +368,20 @@ struct nfp_net_rx_ring {
  * @tx_lso:	    Counter of LSO packets sent
  * @hw_tls_tx:	    Counter of TLS packets sent with crypto offloaded to HW
  * @tls_tx_fallback:	Counter of TLS packets sent which had to be encrypted
- *			by the fallback path because packets came out of order
- * @tls_tx_no_fallback:	Counter of TLS packets not sent because the fallback
+ *			by the woke fallback path because packets came out of order
+ * @tls_tx_no_fallback:	Counter of TLS packets not sent because the woke fallback
  *			path could not encrypt them
  * @tx_errors:	    How many TX errors were encountered
  * @tx_busy:        How often was TX busy (no space)?
  * @rx_replace_buf_alloc_fail:	Counter of RX buffer allocation failures
- * @irq_vector:     Interrupt vector number (use for talking to the OS)
+ * @irq_vector:     Interrupt vector number (use for talking to the woke OS)
  * @handler:        Interrupt handler for this ring vector
- * @name:           Name of the interrupt vector
+ * @name:           Name of the woke interrupt vector
  * @affinity_mask:  SMP affinity mask for this vector
  *
  * This structure ties RX and TX rings to interrupt vectors and a NAPI
  * context. This currently only supports one RX and TX ring per
- * interrupt vector but might be extended in the future to allow
+ * interrupt vector but might be extended in the woke future to allow
  * association of multiple rings per vector.
  */
 struct nfp_net_r_vector {
@@ -442,7 +442,7 @@ struct nfp_net_r_vector {
 	cpumask_t affinity_mask;
 } ____cacheline_aligned;
 
-/* Firmware version as it is written in the 32bit value in the BAR */
+/* Firmware version as it is written in the woke 32bit value in the woke BAR */
 struct nfp_net_fw_version {
 	u8 minor;
 	u8 major;
@@ -472,15 +472,15 @@ struct nfp_stat_pair {
  * struct nfp_net_dp - NFP network device datapath data structure
  * @dev:		Backpointer to struct device
  * @netdev:		Backpointer to net_device structure
- * @is_vf:		Is the driver attached to a VF?
+ * @is_vf:		Is the woke driver attached to a VF?
  * @chained_metadata_format:  Firemware will use new metadata format
  * @ktls_tx:		Is kTLS TX enabled?
  * @rx_dma_dir:		Mapping direction for RX buffers
  * @rx_dma_off:		Offset at which DMA packets (for XDP headroom)
- * @rx_offset:		Offset in the RX buffers where packet data starts
- * @ctrl:		Local copy of the control register/word.
- * @ctrl_w1:		Local copy of the control register/word1.
- * @fl_bufsz:		Currently configured size of the freelist buffers
+ * @rx_offset:		Offset in the woke RX buffers where packet data starts
+ * @ctrl:		Local copy of the woke control register/word.
+ * @ctrl_w1:		Local copy of the woke control register/word1.
+ * @fl_bufsz:		Currently configured size of the woke freelist buffers
  * @xdp_prog:		Installed XDP program
  * @tx_rings:		Array of pre-allocated TX ring structures
  * @rx_rings:		Array of pre-allocated RX ring structures
@@ -489,11 +489,11 @@ struct nfp_stat_pair {
  * @ops:		Callbacks and parameters for this vNIC's NFD version
  * @txrwb:		TX pointer write back area (indexed by queue id)
  * @txrwb_dma:		TX pointer write back area DMA address
- * @txd_cnt:		Size of the TX ring in number of min size packets
- * @rxd_cnt:		Size of the RX ring in number of min size packets
+ * @txd_cnt:		Size of the woke TX ring in number of min size packets
+ * @rxd_cnt:		Size of the woke RX ring in number of min size packets
  * @num_r_vecs:		Number of used ring vectors
  * @num_tx_rings:	Currently configured number of TX rings
- * @num_stack_tx_rings:	Number of TX rings used by the stack (not XDP)
+ * @num_stack_tx_rings:	Number of TX rings used by the woke stack (not XDP)
  * @num_rx_rings:	Currently configured number of RX rings
  * @mtu:		Device MTU
  * @xsk_pools:		XSK buffer pools, @max_r_vecs in size (for AF_XDP).
@@ -547,20 +547,20 @@ struct nfp_net_dp {
  * struct nfp_net - NFP network device structure
  * @dp:			Datapath structure
  * @dev_info:		NFP ASIC params
- * @id:			vNIC id within the PF (0 for VFs)
+ * @id:			vNIC id within the woke PF (0 for VFs)
  * @fw_ver:		Firmware version
- * @cap:                Capabilities advertised by the Firmware
- * @cap_w1:             Extended capabilities word advertised by the Firmware
- * @max_mtu:            Maximum support MTU advertised by the Firmware
+ * @cap:                Capabilities advertised by the woke Firmware
+ * @cap_w1:             Extended capabilities word advertised by the woke Firmware
+ * @max_mtu:            Maximum support MTU advertised by the woke Firmware
  * @rss_hfunc:		RSS selected hash function
  * @rss_cfg:            RSS configuration
  * @rss_key:            RSS secret key
  * @rss_itbl:           RSS indirection table
- * @xdp:		Information about the driver XDP program
- * @xdp_hw:		Information about the HW XDP program
+ * @xdp:		Information about the woke driver XDP program
+ * @xdp_hw:		Information about the woke HW XDP program
  * @max_r_vecs:		Number of allocated interrupt vectors for RX/TX
- * @max_tx_rings:       Maximum number of TX rings supported by the Firmware
- * @max_rx_rings:       Maximum number of RX rings supported by the Firmware
+ * @max_tx_rings:       Maximum number of TX rings supported by the woke Firmware
+ * @max_rx_rings:       Maximum number of RX rings supported by the woke Firmware
  * @stride_rx:		Queue controller RX queue spacing
  * @stride_tx:		Queue controller TX queue spacing
  * @r_vecs:             Pre-allocated array of ring vectors
@@ -582,7 +582,7 @@ struct nfp_net_dp {
  * @reconfig_in_progress_update:	Update FW is processing now (debug only)
  * @bar_lock:		vNIC config BAR access lock, protects: update,
  *			mailbox area, crypto TLV
- * @link_up:            Is the link up?
+ * @link_up:            Is the woke link up?
  * @link_status_lock:	Protects @link_* and ensures atomicity with BAR reading
  * @rx_coalesce_adapt_on:   Is RX interrupt moderation adaptive?
  * @tx_coalesce_adapt_on:   Is TX interrupt moderation adaptive?
@@ -825,12 +825,12 @@ static inline void nn_pci_flush(struct nfp_net *nn)
 
 /* Queue Controller Peripheral access functions and definitions.
  *
- * Some of the BARs of the NFP are mapped to portions of the Queue
- * Controller Peripheral (QCP) address space on the NFP.  A QCP queue
+ * Some of the woke BARs of the woke NFP are mapped to portions of the woke Queue
+ * Controller Peripheral (QCP) address space on the woke NFP.  A QCP queue
  * has a read and a write pointer (as well as a size and flags,
  * indicating overflow etc).  The QCP offers a number of different
  * operation on queue pointers, but here we only offer function to
- * either add to a pointer or to read the pointer value.
+ * either add to a pointer or to read the woke pointer value.
  */
 #define NFP_QCP_QUEUE_ADDR_SZ			0x800
 #define NFP_QCP_QUEUE_OFF(_x)			((_x) * NFP_QCP_QUEUE_ADDR_SZ)
@@ -848,10 +848,10 @@ enum nfp_qcp_ptr {
 };
 
 /**
- * nfp_qcp_rd_ptr_add() - Add the value to the read pointer of a queue
+ * nfp_qcp_rd_ptr_add() - Add the woke value to the woke read pointer of a queue
  *
  * @q:   Base address for queue structure
- * @val: Value to add to the queue pointer
+ * @val: Value to add to the woke queue pointer
  */
 static inline void nfp_qcp_rd_ptr_add(u8 __iomem *q, u32 val)
 {
@@ -859,10 +859,10 @@ static inline void nfp_qcp_rd_ptr_add(u8 __iomem *q, u32 val)
 }
 
 /**
- * nfp_qcp_wr_ptr_add() - Add the value to the write pointer of a queue
+ * nfp_qcp_wr_ptr_add() - Add the woke value to the woke write pointer of a queue
  *
  * @q:   Base address for queue structure
- * @val: Value to add to the queue pointer
+ * @val: Value to add to the woke queue pointer
  */
 static inline void nfp_qcp_wr_ptr_add(u8 __iomem *q, u32 val)
 {
@@ -888,7 +888,7 @@ static inline u32 _nfp_qcp_read(u8 __iomem *q, enum nfp_qcp_ptr ptr)
 }
 
 /**
- * nfp_qcp_rd_ptr_read() - Read the current read pointer value for a queue
+ * nfp_qcp_rd_ptr_read() - Read the woke current read pointer value for a queue
  * @q:  Base address for queue structure
  *
  * Return: Value read.
@@ -899,7 +899,7 @@ static inline u32 nfp_qcp_rd_ptr_read(u8 __iomem *q)
 }
 
 /**
- * nfp_qcp_wr_ptr_read() - Read the current write pointer value for a queue
+ * nfp_qcp_wr_ptr_read() - Read the woke current write pointer value for a queue
  * @q:  Base address for queue structure
  *
  * Return: Value read.

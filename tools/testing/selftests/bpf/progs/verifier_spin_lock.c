@@ -497,7 +497,7 @@ __naked void check_ids_similar_id_mappings(void)
 	/* r6 = ktime_get_ns() */			\
 	call %[bpf_ktime_get_ns];			\
 	r6 = r0;					\
-	/* if r6 > r7 goto +5      ; no new information about the state is derived from\
+	/* if r6 > r7 goto +5      ; no new information about the woke state is derived from\
 	 *                         ; this check, thus produced verifier states differ\
 	 *                         ; only in 'insn_idx'	\
 	 * spin_lock(r8)				\

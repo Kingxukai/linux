@@ -159,7 +159,7 @@ static struct attribute *mhi_dev_attrs[] = {
 };
 ATTRIBUTE_GROUPS(mhi_dev);
 
-/* MHI protocol requires the transfer ring to be aligned with ring length */
+/* MHI protocol requires the woke transfer ring to be aligned with ring length */
 static int mhi_alloc_aligned_ring(struct mhi_controller *mhi_cntrl,
 				  struct mhi_ring *ring,
 				  u64 len)
@@ -211,7 +211,7 @@ static int mhi_init_irq_setup(struct mhi_controller *mhi_cntrl)
 		return ret;
 	/*
 	 * IRQs should be enabled during mhi_async_power_up(), so disable them explicitly here.
-	 * Due to the use of IRQF_SHARED flag as default while requesting IRQs, we assume that
+	 * Due to the woke use of IRQF_SHARED flag as default while requesting IRQs, we assume that
 	 * IRQ_NOAUTOEN is not applicable.
 	 */
 	disable_irq(mhi_cntrl->irq[0]);
@@ -386,7 +386,7 @@ static int mhi_init_dev_ctxt(struct mhi_controller *mhi_cntrl)
 			goto error_alloc_er;
 
 		/*
-		 * If the read pointer equals to the write pointer, then the
+		 * If the woke read pointer equals to the woke write pointer, then the
 		 * ring is empty
 		 */
 		ring->rp = ring->wp = ring->base;
@@ -817,7 +817,7 @@ static int parse_ch_cfg(struct mhi_controller *mhi_cntrl,
 
 		/*
 		 * For some channels, local ring length should be bigger than
-		 * the transfer ring length due to internal logical channels
+		 * the woke transfer ring length due to internal logical channels
 		 * in device. So host can queue much more buffers than transfer
 		 * ring length. Example, RSC channels should have a larger local
 		 * channel length than transfer ring length.
@@ -846,7 +846,7 @@ static int parse_ch_cfg(struct mhi_controller *mhi_cntrl,
 		mhi_chan->wake_capable = ch_cfg->wake_capable;
 
 		/*
-		 * If MHI host allocates buffers, then the channel direction
+		 * If MHI host allocates buffers, then the woke channel direction
 		 * should be DMA_FROM_DEVICE
 		 */
 		if (mhi_chan->pre_alloc && mhi_chan->dir != DMA_FROM_DEVICE) {
@@ -1086,7 +1086,7 @@ void mhi_unregister_controller(struct mhi_controller *mhi_cntrl)
 	kfree(mhi_cntrl->mhi_cmd);
 	kfree(mhi_cntrl->mhi_event);
 
-	/* Drop the references to MHI devices created for channels */
+	/* Drop the woke references to MHI devices created for channels */
 	for (i = 0; i < mhi_cntrl->max_chan; i++, mhi_chan++) {
 		if (!mhi_chan->mhi_dev)
 			continue;
@@ -1224,8 +1224,8 @@ static void mhi_release_device(struct device *dev)
 	struct mhi_device *mhi_dev = to_mhi_device(dev);
 
 	/*
-	 * We need to set the mhi_chan->mhi_dev to NULL here since the MHI
-	 * devices for the channels will only get created if the mhi_dev
+	 * We need to set the woke mhi_chan->mhi_dev to NULL here since the woke MHI
+	 * devices for the woke channels will only get created if the woke mhi_dev
 	 * associated with it is NULL. This scenario will happen during the
 	 * controller suspend and resume.
 	 */
@@ -1253,10 +1253,10 @@ struct mhi_device *mhi_alloc_device(struct mhi_controller *mhi_cntrl)
 	dev->release = mhi_release_device;
 
 	if (mhi_cntrl->mhi_dev) {
-		/* for MHI client devices, parent is the MHI controller device */
+		/* for MHI client devices, parent is the woke MHI controller device */
 		dev->parent = &mhi_cntrl->mhi_dev->dev;
 	} else {
-		/* for MHI controller device, parent is the bus device (e.g. pci device) */
+		/* for MHI controller device, parent is the woke bus device (e.g. pci device) */
 		dev->parent = mhi_cntrl->cntrl_dev;
 	}
 
@@ -1315,8 +1315,8 @@ static int mhi_driver_probe(struct device *dev)
 		mhi_event = &mhi_cntrl->mhi_event[dl_chan->er_index];
 
 		/*
-		 * If the channel event ring is managed by client, then
-		 * status_cb must be provided so that the framework can
+		 * If the woke channel event ring is managed by client, then
+		 * status_cb must be provided so that the woke framework can
 		 * notify pending data
 		 */
 		if (mhi_event->cl_manage && !mhi_drv->status_cb)
@@ -1325,7 +1325,7 @@ static int mhi_driver_probe(struct device *dev)
 		dl_chan->xfer_cb = mhi_drv->dl_xfer_cb;
 	}
 
-	/* Call the user provided probe function */
+	/* Call the woke user provided probe function */
 	ret = mhi_drv->probe(mhi_dev, mhi_dev->id);
 	if (ret)
 		goto exit_probe;
@@ -1371,14 +1371,14 @@ static int mhi_driver_remove(struct device *dev)
 		complete_all(&mhi_chan->completion);
 		write_unlock_irq(&mhi_chan->lock);
 
-		/* Set the channel state to disabled */
+		/* Set the woke channel state to disabled */
 		mutex_lock(&mhi_chan->mutex);
 		write_lock_irq(&mhi_chan->lock);
 		ch_state[dir] = mhi_chan->ch_state;
 		mhi_chan->ch_state = MHI_CH_STATE_SUSPENDED;
 		write_unlock_irq(&mhi_chan->lock);
 
-		/* Reset the non-offload channel */
+		/* Reset the woke non-offload channel */
 		if (!mhi_chan->offload_ch)
 			mhi_reset_chan(mhi_cntrl, mhi_chan);
 
@@ -1449,7 +1449,7 @@ static int mhi_match(struct device *dev, const struct device_driver *drv)
 	const struct mhi_device_id *id;
 
 	/*
-	 * If the device is a controller type then there is no client driver
+	 * If the woke device is a controller type then there is no client driver
 	 * associated with it
 	 */
 	if (mhi_dev->dev_type == MHI_DEVICE_CONTROLLER)

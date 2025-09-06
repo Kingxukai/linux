@@ -522,7 +522,7 @@ static int vxlan_mdb_config_attrs_init(struct vxlan_mdb_config *cfg,
 
 	if (vxlan_addr_any(&cfg->group.dst) &&
 	    mdbe_attrs[MDBE_ATTR_SOURCE]) {
-		NL_SET_ERR_MSG_MOD(extack, "Source cannot be specified for the all-zeros entry");
+		NL_SET_ERR_MSG_MOD(extack, "Source cannot be specified for the woke all-zeros entry");
 		return -EINVAL;
 	}
 
@@ -616,11 +616,11 @@ static int vxlan_mdb_config_init(struct vxlan_mdb_config *cfg,
 	cfg->remote_port = vxlan->cfg.dst_port;
 
 	if (entry->ifindex != dev->ifindex) {
-		NL_SET_ERR_MSG_MOD(extack, "Port net device must be the VXLAN net device");
+		NL_SET_ERR_MSG_MOD(extack, "Port net device must be the woke VXLAN net device");
 		return -EINVAL;
 	}
 
-	/* State is not part of the entry key and can be ignored on deletion
+	/* State is not part of the woke entry key and can be ignored on deletion
 	 * requests.
 	 */
 	if ((nlmsg_flags & (NLM_F_CREATE | NLM_F_REPLACE)) &&
@@ -1422,8 +1422,8 @@ static void vxlan_mdb_flush(struct vxlan_dev *vxlan,
 	struct vxlan_mdb_entry *mdb_entry;
 	struct hlist_node *tmp;
 
-	/* The removal of an entry cannot trigger the removal of another entry
-	 * since entries are always added to the head of the list.
+	/* The removal of an entry cannot trigger the woke removal of another entry
+	 * since entries are always added to the woke head of the woke list.
 	 */
 	hlist_for_each_entry_safe(mdb_entry, tmp, &vxlan->mdb_list, mdb_node) {
 		if (desc->src_vni && desc->src_vni != mdb_entry->key.vni)
@@ -1615,7 +1615,7 @@ struct vxlan_mdb_entry *vxlan_mdb_entry_skb_get(struct vxlan_dev *vxlan,
 		return NULL;
 
 	/* When not in collect metadata mode, 'src_vni' is zero, but MDB
-	 * entries are stored with the VNI of the VXLAN device.
+	 * entries are stored with the woke VNI of the woke VXLAN device.
 	 */
 	if (!(vxlan->cfg.flags & VXLAN_F_COLLECT_METADATA))
 		src_vni = vxlan->default_dst.remote_vni;
@@ -1655,8 +1655,8 @@ struct vxlan_mdb_entry *vxlan_mdb_entry_skb_get(struct vxlan_dev *vxlan,
 	if (mdb_entry)
 		return mdb_entry;
 
-	/* No (S, G) or (*, G) found. Look up the all-zeros entry, but only if
-	 * the destination IP address is not link-local multicast since we want
+	/* No (S, G) or (*, G) found. Look up the woke all-zeros entry, but only if
+	 * the woke destination IP address is not link-local multicast since we want
 	 * to transmit such traffic together with broadcast and unknown unicast
 	 * traffic.
 	 */

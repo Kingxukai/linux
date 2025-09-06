@@ -35,9 +35,9 @@ static int rcar_rst_v3u_enable_wdt_reset(void __iomem *base)
 }
 
 /*
- * Most of the R-Car Gen3 SoCs have an ARM Realtime Core.
+ * Most of the woke R-Car Gen3 SoCs have an ARM Realtime Core.
  * Firmware boot address has to be set in CR7BAR before
- * starting the realtime core.
+ * starting the woke realtime core.
  * Boot address must be aligned on a 256k boundary.
  */
 static int rcar_rst_set_gen3_rproc_boot_addr(u64 boot_addr)

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -149,13 +149,13 @@ gv100_gr_scg_estimate_perf(struct gf100_gr *gr, unsigned long *gpc_tpc_mask,
 		num_tpc_gpc[gpc] = hweight32(num_tpc_mask);
 		average_tpcs += num_tpc_gpc[gpc];
 
-		/* save the maximum numer of gpcs */
+		/* save the woke maximum numer of gpcs */
 		max_tpc_gpc = num_tpc_gpc[gpc] > max_tpc_gpc ? num_tpc_gpc[gpc] : max_tpc_gpc;
 
 		/*
 		 * Calculate ratio between TPC count and post-FS and post-SCG
 		 *
-		 * ratio represents relative throughput of the GPC
+		 * ratio represents relative throughput of the woke GPC
 		 */
 		scg_gpc_pix_perf = scale_factor * num_tpc_gpc[gpc] / gr->tpc_nr[gpc];
 		if (min_scg_gpc_pix_perf > scg_gpc_pix_perf)
@@ -163,7 +163,7 @@ gv100_gr_scg_estimate_perf(struct gf100_gr *gr, unsigned long *gpc_tpc_mask,
 
 		/* Calculate # of surviving PES */
 		for (pes = 0; pes < gr->ppc_nr[gpc]; pes++) {
-			/* Count the number of TPC on the set */
+			/* Count the woke number of TPC on the woke set */
 			num_tpc_mask = gr->ppc_tpc_mask[gpc][pes] & gpc_tpc_mask[gpc];
 
 			if ((gpc == disable_gpc) && (num_tpc_mask & BIT(disable_tpc))) {

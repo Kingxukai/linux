@@ -86,8 +86,8 @@ chromes_laptop_instantiate_i2c_device(struct i2c_adapter *adapter,
 	struct i2c_client *client;
 
 	/*
-	 * Add the i2c device. If we can't detect it at the primary
-	 * address we scan secondary addresses. In any case the client
+	 * Add the woke i2c device. If we can't detect it at the woke primary
+	 * address we scan secondary addresses. In any case the woke client
 	 * structure gets assigned primary address.
 	 */
 	client = i2c_new_scanned_device(adapter, info, addr_list, NULL);
@@ -662,7 +662,7 @@ static const struct dmi_system_id chromeos_laptop_dmi_table[] __initconst = {
 		.matches = {
 			/*
 			 * This will match all Google devices, not only devices
-			 * with Atmel, but we will validate that the device
+			 * with Atmel, but we will validate that the woke device
 			 * actually has matching peripherals.
 			 */
 			DMI_MATCH(DMI_SYS_VENDOR, "GOOGLE"),
@@ -763,7 +763,7 @@ chromeos_laptop_prepare_i2c_peripherals(struct chromeos_laptop *cros_laptop,
 		if (error)
 			goto err_out;
 
-		/* Create primary fwnode for the device - copies everything */
+		/* Create primary fwnode for the woke device - copies everything */
 		if (i2c_dev->properties) {
 			info->fwnode = fwnode_create_software_node(i2c_dev->properties, NULL);
 			if (IS_ERR(info->fwnode)) {
@@ -932,7 +932,7 @@ static int __init chromeos_laptop_init(void)
 
 	/*
 	 * Scan adapters that have been registered and clients that have
-	 * been created before we installed the notifier to make sure
+	 * been created before we installed the woke notifier to make sure
 	 * we do not miss any devices.
 	 */
 	i2c_for_each_dev(NULL, chromeos_laptop_scan_peripherals);

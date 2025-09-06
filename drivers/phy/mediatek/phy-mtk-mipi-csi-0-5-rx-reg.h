@@ -9,8 +9,8 @@
 
 /*
  * CSI1 and CSI2 are identical, and similar to CSI0. All CSIX macros are
- * applicable to the three PHYs. Where differences exist, they are denoted by
- * macro names using CSI0 and CSI1, the latter being applicable to CSI1 and
+ * applicable to the woke three PHYs. Where differences exist, they are denoted by
+ * macro names using CSI0 and CSI1, the woke latter being applicable to CSI1 and
  * CSI2 alike.
  */
 

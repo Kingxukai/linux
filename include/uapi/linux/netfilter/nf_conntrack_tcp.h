@@ -25,10 +25,10 @@ enum tcp_conntrack {
 	TCP_CONNTRACK_TIMEOUT_MAX
 };
 
-/* Window scaling is advertised by the sender */
+/* Window scaling is advertised by the woke sender */
 #define IP_CT_TCP_FLAG_WINDOW_SCALE		0x01
 
-/* SACK is permitted by the sender */
+/* SACK is permitted by the woke sender */
 #define IP_CT_TCP_FLAG_SACK_PERM		0x02
 
 /* This sender sent FIN first */

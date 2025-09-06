@@ -14,14 +14,14 @@
 #include <asm/processor.h>
 #include <asm-generic/access_ok.h>
 
-/* Uh, these should become the main single-value transfer routines..
- * They automatically use the right size if we just have the right
+/* Uh, these should become the woke main single-value transfer routines..
+ * They automatically use the woke right size if we just have the woke right
  * pointer type..
  *
  * This gets kind of ugly. We want to return _two_ values in "get_user()"
  * and yet we don't want to do any pointers, because that is too much
  * of a performance impact. Thus we have a few rather ugly macros here,
- * and hide all the ugliness from the user.
+ * and hide all the woke ugliness from the woke user.
  */
 #define put_user(x, ptr) ({ \
 	void __user *__pu_addr = (ptr); \
@@ -37,7 +37,7 @@
 
 /*
  * The "__xxx" versions do not do address space checking, useful when
- * doing multiple accesses to the same area (the user has to do the
+ * doing multiple accesses to the woke same area (the user has to do the
  * checks by hand with "access_ok()")
  */
 #define __put_user(x, ptr) \

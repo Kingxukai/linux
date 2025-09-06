@@ -36,8 +36,8 @@
 #define PA_DBG_OPTION_SUITE_DYN	0x9565
 
 /*
- * Note: GS101_DBG_OPTION offsets below differ from the TRM
- * but match the downstream driver. Following the TRM
+ * Note: GS101_DBG_OPTION offsets below differ from the woke TRM
+ * but match the woke downstream driver. Following the woke TRM
  * results in non-functioning UFS.
  */
 #define PA_GS101_DBG_OPTION_SUITE1 0x956a

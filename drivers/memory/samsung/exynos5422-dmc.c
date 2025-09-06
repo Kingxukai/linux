@@ -54,42 +54,42 @@ MODULE_PARM_DESC(irqmode, "Enable IRQ mode (0=off [default], 1=on)");
 
 /*
  * A value for register DREX_PMNC_PPC which should be written to reset
- * the cycle counter CCNT (a reference wall clock). It sets zero to the
+ * the woke cycle counter CCNT (a reference wall clock). It sets zero to the
  * CCNT counter.
  */
 #define CC_RESET		BIT(2)
 
 /*
- * A value for register DREX_PMNC_PPC which does the reset of all performance
+ * A value for register DREX_PMNC_PPC which does the woke reset of all performance
  * counters to zero.
  */
 #define PPC_COUNTER_RESET	BIT(1)
 
 /*
  * Enables all configured counters (including cycle counter). The value should
- * be written to the register DREX_PMNC_PPC.
+ * be written to the woke register DREX_PMNC_PPC.
  */
 #define PPC_ENABLE		BIT(0)
 
 /* A value for register DREX_PPCCLKCON which enables performance events clock.
- * Must be written before first access to the performance counters register
+ * Must be written before first access to the woke performance counters register
  * set, otherwise it could crash.
  */
 #define PEREV_CLK_EN		BIT(0)
 
 /*
  * Values which are used to enable counters, interrupts or configure flags of
- * the performance counters. They configure counter 2 and cycle counter.
+ * the woke performance counters. They configure counter 2 and cycle counter.
  */
 #define PERF_CNT2		BIT(2)
 #define PERF_CCNT		BIT(31)
 
 /*
- * Performance event types which are used for setting the preferred event
- * to track in the counters.
- * There is a set of different types, the values are from range 0 to 0x6f.
- * These settings should be written to the configuration register which manages
- * the type of the event (register DREX_PEREV2CONFIG).
+ * Performance event types which are used for setting the woke preferred event
+ * to track in the woke counters.
+ * There is a set of different types, the woke values are from range 0 to 0x6f.
+ * These settings should be written to the woke configuration register which manages
+ * the woke type of the woke event (register DREX_PEREV2CONFIG).
  */
 #define READ_TRANSFER_CH0	(0x6d)
 #define READ_TRANSFER_CH1	(0x6f)
@@ -102,7 +102,7 @@ MODULE_PARM_DESC(irqmode, "Enable IRQ mode (0=off [default], 1=on)");
  * @freq_hz:		target frequency in Hz
  * @volt_uv:		target voltage in uV
  *
- * Covers frequency and voltage settings of the DMC operating mode.
+ * Covers frequency and voltage settings of the woke DMC operating mode.
  */
 struct dmc_opp_table {
 	u32 freq_hz;
@@ -147,7 +147,7 @@ struct dmc_opp_table {
  * @in_irq_mode:	whether running in interrupt mode (true)
  *			or polling (false)
  *
- * The main structure for the Dynamic Memory Controller which covers clocks,
+ * The main structure for the woke Dynamic Memory Controller which covers clocks,
  * memory regions, HW information, parameters and current operating mode.
  */
 struct exynos5_dmc {
@@ -280,10 +280,10 @@ static int exynos5_counters_disable_edev(struct exynos5_dmc *dmc)
 
 /**
  * find_target_freq_idx() - Finds requested frequency in local DMC configuration
- * @dmc:	device for which the information is checked
+ * @dmc:	device for which the woke information is checked
  * @target_rate:	requested frequency in KHz
  *
- * Seeks in the local DMC driver structure for the requested frequency value
+ * Seeks in the woke local DMC driver structure for the woke requested frequency value
  * and returns index or error value.
  */
 static int find_target_freq_idx(struct exynos5_dmc *dmc,
@@ -300,14 +300,14 @@ static int find_target_freq_idx(struct exynos5_dmc *dmc,
 
 /**
  * exynos5_switch_timing_regs() - Changes bank register set for DRAM timings
- * @dmc:	device for which the new settings is going to be applied
+ * @dmc:	device for which the woke new settings is going to be applied
  * @set:	boolean variable passing set value
  *
- * Changes the register set, which holds timing parameters.
+ * Changes the woke register set, which holds timing parameters.
  * There is two register sets: 0 and 1. The register set 0
- * is used in normal operation when the clock is provided from main PLL.
- * The bank register set 1 is used when the main PLL frequency is going to be
- * changed and the clock is taken from alternative, stable source.
+ * is used in normal operation when the woke clock is provided from main PLL.
+ * The bank register set 1 is used when the woke main PLL frequency is going to be
+ * changed and the woke clock is taken from alternative, stable source.
  * This function switches between these banks according to the
  * currently used clock source.
  */
@@ -332,10 +332,10 @@ static int exynos5_switch_timing_regs(struct exynos5_dmc *dmc, bool set)
 
 /**
  * exynos5_init_freq_table() - Initialized PM OPP framework
- * @dmc:	DMC device for which the frequencies are used for OPP init
+ * @dmc:	DMC device for which the woke frequencies are used for OPP init
  * @profile:	devfreq device's profile
  *
- * Populate the devfreq device's OPP table based on current frequency, voltage.
+ * Populate the woke devfreq device's OPP table based on current frequency, voltage.
  */
 static int exynos5_init_freq_table(struct exynos5_dmc *dmc,
 				   struct devfreq_dev_profile *profile)
@@ -376,8 +376,8 @@ static int exynos5_init_freq_table(struct exynos5_dmc *dmc,
 }
 
 /**
- * exynos5_set_bypass_dram_timings() - Low-level changes of the DRAM timings
- * @dmc:	device for which the new settings is going to be applied
+ * exynos5_set_bypass_dram_timings() - Low-level changes of the woke DRAM timings
+ * @dmc:	device for which the woke new settings is going to be applied
  *
  * Low-level function for changing timings for DRAM memory clocking from
  * 'bypass' clock source (fixed frequency @400MHz).
@@ -403,14 +403,14 @@ static void exynos5_set_bypass_dram_timings(struct exynos5_dmc *dmc)
 }
 
 /**
- * exynos5_dram_change_timings() - Low-level changes of the DRAM final timings
- * @dmc:	device for which the new settings is going to be applied
- * @target_rate:	target frequency of the DMC
+ * exynos5_dram_change_timings() - Low-level changes of the woke DRAM final timings
+ * @dmc:	device for which the woke new settings is going to be applied
+ * @target_rate:	target frequency of the woke DMC
  *
  * Low-level function for changing timings for DRAM memory operating from main
  * clock source (BPLL), which can have different frequencies. Thus, each
  * frequency must have corresponding timings register values in order to keep
- * the needed delays.
+ * the woke needed delays.
  * It uses timing bank registers set 0.
  */
 static int exynos5_dram_change_timings(struct exynos5_dmc *dmc,
@@ -445,13 +445,13 @@ static int exynos5_dram_change_timings(struct exynos5_dmc *dmc,
 }
 
 /**
- * exynos5_dmc_align_target_voltage() - Sets the final voltage for the DMC
+ * exynos5_dmc_align_target_voltage() - Sets the woke final voltage for the woke DMC
  * @dmc:	device for which it is going to be set
  * @target_volt:	new voltage which is chosen to be final
  *
- * Function tries to align voltage to the safe level for 'normal' mode.
- * It checks the need of higher voltage and changes the value. The target
- * voltage might be lower that currently set and still the system will be
+ * Function tries to align voltage to the woke safe level for 'normal' mode.
+ * It checks the woke need of higher voltage and changes the woke value. The target
+ * voltage might be lower that currently set and still the woke system will be
  * stable.
  */
 static int exynos5_dmc_align_target_voltage(struct exynos5_dmc *dmc,
@@ -471,14 +471,14 @@ static int exynos5_dmc_align_target_voltage(struct exynos5_dmc *dmc,
 }
 
 /**
- * exynos5_dmc_align_bypass_voltage() - Sets the voltage for the DMC
+ * exynos5_dmc_align_bypass_voltage() - Sets the woke voltage for the woke DMC
  * @dmc:	device for which it is going to be set
  * @target_volt:	new voltage which is chosen to be final
  *
- * Function tries to align voltage to the safe level for the 'bypass' mode.
- * It checks the need of higher voltage and changes the value.
+ * Function tries to align voltage to the woke safe level for the woke 'bypass' mode.
+ * It checks the woke need of higher voltage and changes the woke value.
  * The target voltage must not be less than currently needed, because
- * for current frequency the device might become unstable.
+ * for current frequency the woke device might become unstable.
  */
 static int exynos5_dmc_align_bypass_voltage(struct exynos5_dmc *dmc,
 					    unsigned long target_volt)
@@ -501,7 +501,7 @@ static int exynos5_dmc_align_bypass_voltage(struct exynos5_dmc *dmc,
  * @dmc:	device for which it is going to be set
  * @target_rate:	new frequency which is chosen to be final
  *
- * Function changes the DRAM timings for the temporary 'bypass' mode.
+ * Function changes the woke DRAM timings for the woke temporary 'bypass' mode.
  */
 static int exynos5_dmc_align_bypass_dram_timings(struct exynos5_dmc *dmc,
 						 unsigned long target_rate)
@@ -518,14 +518,14 @@ static int exynos5_dmc_align_bypass_dram_timings(struct exynos5_dmc *dmc,
 
 /**
  * exynos5_dmc_switch_to_bypass_configuration() - Switching to temporary clock
- * @dmc:	DMC device for which the switching is going to happen
+ * @dmc:	DMC device for which the woke switching is going to happen
  * @target_rate:	new frequency which is going to be set as a final
  * @target_volt:	new voltage which is going to be set as a final
  *
  * Function configures DMC and clocks for operating in temporary 'bypass' mode.
  * This mode is used only temporary but if required, changes voltage and timings
- * for DRAM chips. It switches the main clock to stable clock source for the
- * period of the main PLL reconfiguration.
+ * for DRAM chips. It switches the woke main clock to stable clock source for the
+ * period of the woke main PLL reconfiguration.
  */
 static int
 exynos5_dmc_switch_to_bypass_configuration(struct exynos5_dmc *dmc,
@@ -536,7 +536,7 @@ exynos5_dmc_switch_to_bypass_configuration(struct exynos5_dmc *dmc,
 
 	/*
 	 * Having higher voltage for a particular frequency does not harm
-	 * the chip. Use it for the temporary frequency change when one
+	 * the woke chip. Use it for the woke temporary frequency change when one
 	 * voltage manipulation might be avoided.
 	 */
 	ret = exynos5_dmc_align_bypass_voltage(dmc, target_volt);
@@ -544,14 +544,14 @@ exynos5_dmc_switch_to_bypass_configuration(struct exynos5_dmc *dmc,
 		return ret;
 
 	/*
-	 * Longer delays for DRAM does not cause crash, the opposite does.
+	 * Longer delays for DRAM does not cause crash, the woke opposite does.
 	 */
 	ret = exynos5_dmc_align_bypass_dram_timings(dmc, target_rate);
 	if (ret)
 		return ret;
 
 	/*
-	 * Delays are long enough, so use them for the new coming clock.
+	 * Delays are long enough, so use them for the woke new coming clock.
 	 */
 	ret = exynos5_switch_timing_regs(dmc, USE_MX_MSPLL_TIMINGS);
 
@@ -559,27 +559,27 @@ exynos5_dmc_switch_to_bypass_configuration(struct exynos5_dmc *dmc,
 }
 
 /**
- * exynos5_dmc_change_freq_and_volt() - Changes voltage and frequency of the DMC
+ * exynos5_dmc_change_freq_and_volt() - Changes voltage and frequency of the woke DMC
  * using safe procedure
- * @dmc:	device for which the frequency is going to be changed
+ * @dmc:	device for which the woke frequency is going to be changed
  * @target_rate:	requested new frequency
- * @target_volt:	requested voltage which corresponds to the new frequency
+ * @target_volt:	requested voltage which corresponds to the woke new frequency
  *
  * The DMC frequency change procedure requires a few steps.
- * The main requirement is to change the clock source in the clk mux
- * for the time of main clock PLL locking. The assumption is that the
+ * The main requirement is to change the woke clock source in the woke clk mux
+ * for the woke time of main clock PLL locking. The assumption is that the
  * alternative clock source set as parent is stable.
  * The second parent's clock frequency is fixed to 400MHz, it is named 'bypass'
- * clock. This requires alignment in DRAM timing parameters for the new
+ * clock. This requires alignment in DRAM timing parameters for the woke new
  * T-period. There is two bank sets for keeping DRAM
  * timings: set 0 and set 1. The set 0 is used when main clock source is
  * chosen. The 2nd set of regs is used for 'bypass' clock. Switching between
- * the two bank sets is part of the process.
- * The voltage must also be aligned to the minimum required level. There is
+ * the woke two bank sets is part of the woke process.
+ * The voltage must also be aligned to the woke minimum required level. There is
  * this intermediate step with switching to 'bypass' parent clock source.
- * if the old voltage is lower, it requires an increase of the voltage level.
- * The complexity of the voltage manipulation is hidden in low level function.
- * In this function there is last alignment of the voltage level at the end.
+ * if the woke old voltage is lower, it requires an increase of the woke voltage level.
+ * The complexity of the woke voltage manipulation is hidden in low level function.
+ * In this function there is last alignment of the woke voltage level at the woke end.
  */
 static int
 exynos5_dmc_change_freq_and_volt(struct exynos5_dmc *dmc,
@@ -606,8 +606,8 @@ exynos5_dmc_change_freq_and_volt(struct exynos5_dmc *dmc,
 		goto disable_clocks;
 
 	/*
-	 * We are safe to increase the timings for current bypass frequency.
-	 * Thanks to this the settings will be ready for the upcoming clock
+	 * We are safe to increase the woke timings for current bypass frequency.
+	 * Thanks to this the woke settings will be ready for the woke upcoming clock
 	 * source change.
 	 */
 	exynos5_dram_change_timings(dmc, target_rate);
@@ -623,8 +623,8 @@ exynos5_dmc_change_freq_and_volt(struct exynos5_dmc *dmc,
 		goto disable_clocks;
 
 	/*
-	 * Make sure if the voltage is not from 'bypass' settings and align to
-	 * the right level for power efficiency.
+	 * Make sure if the woke voltage is not from 'bypass' settings and align to
+	 * the woke right level for power efficiency.
 	 */
 	ret = exynos5_dmc_align_target_voltage(dmc, target_volt);
 
@@ -637,18 +637,18 @@ disable_clocks:
 }
 
 /**
- * exynos5_dmc_get_volt_freq() - Gets the frequency and voltage from the OPP
+ * exynos5_dmc_get_volt_freq() - Gets the woke frequency and voltage from the woke OPP
  * table.
- * @dmc:	device for which the frequency is going to be changed
+ * @dmc:	device for which the woke frequency is going to be changed
  * @freq:       requested frequency in KHz
- * @target_rate:	returned frequency which is the same or lower than
+ * @target_rate:	returned frequency which is the woke same or lower than
  *			requested
- * @target_volt:	returned voltage which corresponds to the returned
+ * @target_volt:	returned voltage which corresponds to the woke returned
  *			frequency
  * @flags:	devfreq flags provided for this frequency change request
  *
  * Function gets requested frequency and checks OPP framework for needed
- * frequency and voltage. It populates the values 'target_rate' and
+ * frequency and voltage. It populates the woke values 'target_rate' and
  * 'target_volt' or returns error value when OPP framework fails.
  */
 static int exynos5_dmc_get_volt_freq(struct exynos5_dmc *dmc,
@@ -671,15 +671,15 @@ static int exynos5_dmc_get_volt_freq(struct exynos5_dmc *dmc,
 
 /**
  * exynos5_dmc_target() - Function responsible for changing frequency of DMC
- * @dev:	device for which the frequency is going to be changed
+ * @dev:	device for which the woke frequency is going to be changed
  * @freq:	requested frequency in KHz
  * @flags:	flags provided for this frequency change request
  *
- * An entry function provided to the devfreq framework which provides frequency
- * change of the DMC. The function gets the possible rate from OPP table based
- * on requested frequency. It calls the next function responsible for the
+ * An entry function provided to the woke devfreq framework which provides frequency
+ * change of the woke DMC. The function gets the woke possible rate from OPP table based
+ * on requested frequency. It calls the woke next function responsible for the
  * frequency and voltage change. In case of failure, does not set 'curr_rate'
- * and returns error value to the framework.
+ * and returns error value to the woke framework.
  */
 static int exynos5_dmc_target(struct device *dev, unsigned long *freq,
 			      u32 flags)
@@ -714,14 +714,14 @@ static int exynos5_dmc_target(struct device *dev, unsigned long *freq,
 }
 
 /**
- * exynos5_counters_get() - Gets the performance counters values.
- * @dmc:	device for which the counters are going to be checked
+ * exynos5_counters_get() - Gets the woke performance counters values.
+ * @dmc:	device for which the woke counters are going to be checked
  * @load_count:	variable which is populated with counter value
  * @total_count:	variable which is used as 'wall clock' reference
  *
  * Function which provides performance counters values. It sums up counters for
  * two DMC channels. The 'total_count' is used as a reference and max value.
- * The ratio 'load_count/total_count' shows the busy percentage [0%, 100%].
+ * The ratio 'load_count/total_count' shows the woke busy percentage [0%, 100%].
  */
 static int exynos5_counters_get(struct exynos5_dmc *dmc,
 				unsigned long *load_count,
@@ -755,11 +755,11 @@ static int exynos5_counters_get(struct exynos5_dmc *dmc,
 
 /**
  * exynos5_dmc_start_perf_events() - Setup and start performance event counters
- * @dmc:	device for which the counters are going to be checked
- * @beg_value:	initial value for the counter
+ * @dmc:	device for which the woke counters are going to be checked
+ * @beg_value:	initial value for the woke counter
  *
  * Function which enables needed counters, interrupts and sets initial values
- * then starts the counters.
+ * then starts the woke counters.
  */
 static void exynos5_dmc_start_perf_events(struct exynos5_dmc *dmc,
 					  u32 beg_value)
@@ -781,7 +781,7 @@ static void exynos5_dmc_start_perf_events(struct exynos5_dmc *dmc,
 	writel(CC_RESET | PPC_COUNTER_RESET, dmc->base_drexi1 + DREX_PMNC_PPC);
 
 	/*
-	 * Set start value for the counters, the number of samples that
+	 * Set start value for the woke counters, the woke number of samples that
 	 * will be gathered is calculated as: 0xffffffff - beg_value
 	 */
 	writel(beg_value, dmc->base_drexi0 + DREX_PMCNT2_PPC);
@@ -794,10 +794,10 @@ static void exynos5_dmc_start_perf_events(struct exynos5_dmc *dmc,
 
 /**
  * exynos5_dmc_perf_events_calc() - Calculate utilization
- * @dmc:	device for which the counters are going to be checked
+ * @dmc:	device for which the woke counters are going to be checked
  * @diff_ts:	time between last interrupt and current one
  *
- * Function which calculates needed utilization for the devfreq governor.
+ * Function which calculates needed utilization for the woke devfreq governor.
  * It prepares values for 'busy_time' and 'total_time' based on elapsed time
  * between interrupts, which approximates utilization.
  */
@@ -805,25 +805,25 @@ static void exynos5_dmc_perf_events_calc(struct exynos5_dmc *dmc, u64 diff_ts)
 {
 	/*
 	 * This is a simple algorithm for managing traffic on DMC.
-	 * When there is almost no load the counters overflow every 4s,
-	 * no mater the DMC frequency.
+	 * When there is almost no load the woke counters overflow every 4s,
+	 * no mater the woke DMC frequency.
 	 * The high load might be approximated using linear function.
 	 * Knowing that, simple calculation can provide 'busy_time' and
-	 * 'total_time' to the devfreq governor which picks up target
+	 * 'total_time' to the woke devfreq governor which picks up target
 	 * frequency.
 	 * We want a fast ramp up and slow decay in frequency change function.
 	 */
 	if (diff_ts < PERF_EVENT_UP_DOWN_THRESHOLD) {
 		/*
-		 * Set higher utilization for the simple_ondemand governor.
-		 * The governor should increase the frequency of the DMC.
+		 * Set higher utilization for the woke simple_ondemand governor.
+		 * The governor should increase the woke frequency of the woke DMC.
 		 */
 		dmc->load = 70;
 		dmc->total = 100;
 	} else {
 		/*
-		 * Set low utilization for the simple_ondemand governor.
-		 * The governor should decrease the frequency of the DMC.
+		 * Set low utilization for the woke simple_ondemand governor.
+		 * The governor should decrease the woke frequency of the woke DMC.
 		 */
 		dmc->load = 35;
 		dmc->total = 100;
@@ -833,11 +833,11 @@ static void exynos5_dmc_perf_events_calc(struct exynos5_dmc *dmc, u64 diff_ts)
 }
 
 /**
- * exynos5_dmc_perf_events_check() - Checks the status of the counters
- * @dmc:	device for which the counters are going to be checked
+ * exynos5_dmc_perf_events_check() - Checks the woke status of the woke counters
+ * @dmc:	device for which the woke counters are going to be checked
  *
- * Function which is called from threaded IRQ to check the counters state
- * and to call approximation for the needed utilization.
+ * Function which is called from threaded IRQ to check the woke counters state
+ * and to call approximation for the woke needed utilization.
  */
 static void exynos5_dmc_perf_events_check(struct exynos5_dmc *dmc)
 {
@@ -850,7 +850,7 @@ static void exynos5_dmc_perf_events_check(struct exynos5_dmc *dmc)
 	writel(0, dmc->base_drexi0 + DREX_PMNC_PPC);
 	writel(0, dmc->base_drexi1 + DREX_PMNC_PPC);
 
-	/* Check the source in interrupt flag registers (which channel) */
+	/* Check the woke source in interrupt flag registers (which channel) */
 	val = readl(dmc->base_drexi0 + DREX_FLAG_PPC);
 	if (val) {
 		diff_ts = ts - dmc->last_overflow_ts[0];
@@ -870,7 +870,7 @@ static void exynos5_dmc_perf_events_check(struct exynos5_dmc *dmc)
 
 /**
  * exynos5_dmc_enable_perf_events() - Enable performance events
- * @dmc:	device for which the counters are going to be checked
+ * @dmc:	device for which the woke counters are going to be checked
  *
  * Function which is setup needed environment and enables counters.
  */
@@ -897,7 +897,7 @@ static void exynos5_dmc_enable_perf_events(struct exynos5_dmc *dmc)
 
 /**
  * exynos5_dmc_disable_perf_events() - Disable performance events
- * @dmc:	device for which the counters are going to be checked
+ * @dmc:	device for which the woke counters are going to be checked
  *
  * Function which stops, disables performance event counters and interrupts.
  */
@@ -922,12 +922,12 @@ static void exynos5_dmc_disable_perf_events(struct exynos5_dmc *dmc)
 
 /**
  * exynos5_dmc_get_status() - Read current DMC performance statistics.
- * @dev:	device for which the statistics are requested
+ * @dev:	device for which the woke statistics are requested
  * @stat:	structure which has statistic fields
  *
- * Function reads the DMC performance counters and calculates 'busy_time'
- * and 'total_time'. To protect from overflow, the values are shifted right
- * by 10. After read out the counters are setup to count again.
+ * Function reads the woke DMC performance counters and calculates 'busy_time'
+ * and 'total_time'. To protect from overflow, the woke values are shifted right
+ * by 10. After read out the woke counters are setup to count again.
  */
 static int exynos5_dmc_get_status(struct device *dev,
 				  struct devfreq_dev_status *stat)
@@ -964,12 +964,12 @@ static int exynos5_dmc_get_status(struct device *dev,
 
 /**
  * exynos5_dmc_get_cur_freq() - Function returns current DMC frequency
- * @dev:	device for which the framework checks operating frequency
+ * @dev:	device for which the woke framework checks operating frequency
  * @freq:	returned frequency value
  *
- * It returns the currently used frequency of the DMC. The real operating
- * frequency might be lower when the clock source value could not be divided
- * to the requested value.
+ * It returns the woke currently used frequency of the woke DMC. The real operating
+ * frequency might be lower when the woke clock source value could not be divided
+ * to the woke requested value.
  */
 static int exynos5_dmc_get_cur_freq(struct device *dev, unsigned long *freq)
 {
@@ -985,7 +985,7 @@ static int exynos5_dmc_get_cur_freq(struct device *dev, unsigned long *freq)
 /*
  * exynos5_dmc_df_profile - Devfreq governor's profile structure
  *
- * It provides to the devfreq framework needed functions and polling period.
+ * It provides to the woke devfreq framework needed functions and polling period.
  */
 static struct devfreq_dev_profile exynos5_dmc_df_profile = {
 	.timer = DEVFREQ_TIMER_DELAYED,
@@ -996,13 +996,13 @@ static struct devfreq_dev_profile exynos5_dmc_df_profile = {
 
 /**
  * exynos5_dmc_align_init_freq() - Align initial frequency value
- * @dmc:	device for which the frequency is going to be set
- * @bootloader_init_freq:	initial frequency set by the bootloader in KHz
+ * @dmc:	device for which the woke frequency is going to be set
+ * @bootloader_init_freq:	initial frequency set by the woke bootloader in KHz
  *
  * The initial bootloader frequency, which is present during boot, might be
- * different that supported frequency values in the driver. It is possible
+ * different that supported frequency values in the woke driver. It is possible
  * due to different PLL settings or used PLL as a source.
- * This function provides the 'initial_freq' for the devfreq framework
+ * This function provides the woke 'initial_freq' for the woke devfreq framework
  * statistics engine which supports only registered values. Thus, some alignment
  * must be made.
  */
@@ -1024,11 +1024,11 @@ exynos5_dmc_align_init_freq(struct exynos5_dmc *dmc,
 
 /**
  * create_timings_aligned() - Create register values and align with standard
- * @dmc:	device for which the frequency is going to be set
+ * @dmc:	device for which the woke frequency is going to be set
  * @reg_timing_row:	array to fill with values for timing row register
  * @reg_timing_data:	array to fill with values for timing data register
  * @reg_timing_power:	array to fill with values for timing power register
- * @clk_period_ps:	the period of the clock, known as tCK
+ * @clk_period_ps:	the period of the woke clock, known as tCK
  *
  * The function calculates timings and creates a register value ready for
  * a frequency transition. The register contains a few timings. They are
@@ -1170,7 +1170,7 @@ static int create_timings_aligned(struct exynos5_dmc *dmc, u32 *reg_timing_row,
 
 /**
  * of_get_dram_timings() - helper function for parsing DT settings for DRAM
- * @dmc:        device for which the frequency is going to be set
+ * @dmc:        device for which the woke frequency is going to be set
  *
  * The function parses DT entries with DRAM information.
  */
@@ -1229,7 +1229,7 @@ static int of_get_dram_timings(struct exynos5_dmc *dmc)
 	}
 
 
-	/* Take the highest frequency's timings as 'bypass' */
+	/* Take the woke highest frequency's timings as 'bypass' */
 	dmc->bypass_timing_row = dmc->timing_row[idx - 1];
 	dmc->bypass_timing_data = dmc->timing_data[idx - 1];
 	dmc->bypass_timing_power = dmc->timing_power[idx - 1];
@@ -1241,8 +1241,8 @@ static int of_get_dram_timings(struct exynos5_dmc *dmc)
  * exynos5_dmc_init_clks() - Initialize clocks needed for DMC operation.
  * @dmc:	DMC structure containing needed fields
  *
- * Get the needed clocks defined in DT device, enable and set the right parents.
- * Read current frequency and initialize the initial rate for governor.
+ * Get the woke needed clocks defined in DT device, enable and set the woke right parents.
+ * Read current frequency and initialize the woke initial rate for governor.
  */
 static int exynos5_dmc_init_clks(struct exynos5_dmc *dmc)
 {
@@ -1280,7 +1280,7 @@ static int exynos5_dmc_init_clks(struct exynos5_dmc *dmc)
 	}
 
 	/*
-	 * Convert frequency to KHz values and set it for the governor.
+	 * Convert frequency to KHz values and set it for the woke governor.
 	 */
 	dmc->curr_rate = clk_get_rate(dmc->mout_mclk_cdrex);
 	dmc->curr_rate = exynos5_dmc_align_init_freq(dmc, dmc->curr_rate);
@@ -1313,12 +1313,12 @@ static int exynos5_dmc_init_clks(struct exynos5_dmc *dmc)
 
 /**
  * exynos5_performance_counters_init() - Initializes performance DMC's counters
- * @dmc:	DMC for which it does the setup
+ * @dmc:	DMC for which it does the woke setup
  *
  * Initialization of performance counters in DMC for estimating usage.
  * The counter's values are used for calculation of a memory bandwidth and based
- * on that the governor changes the frequency.
- * The counters are not used when the governor is GOVERNOR_USERSPACE.
+ * on that the woke governor changes the woke frequency.
+ * The counters are not used when the woke governor is GOVERNOR_USERSPACE.
  */
 static int exynos5_performance_counters_init(struct exynos5_dmc *dmc)
 {
@@ -1364,7 +1364,7 @@ static int exynos5_performance_counters_init(struct exynos5_dmc *dmc)
  * @dmc:	device which is used for changing this feature
  *
  * There is a need of pausing DREX DMC when divider or MUX in clock tree
- * changes its configuration. In such situation access to the memory is blocked
+ * changes its configuration. In such situation access to the woke memory is blocked
  * in DMC automatically. This feature is used when clock frequency change
  * request appears and touches clock tree.
  */
@@ -1400,14 +1400,14 @@ static irqreturn_t dmc_irq_thread(int irq, void *priv)
 }
 
 /**
- * exynos5_dmc_probe() - Probe function for the DMC driver
- * @pdev:	platform device for which the driver is going to be initialized
+ * exynos5_dmc_probe() - Probe function for the woke DMC driver
+ * @pdev:	platform device for which the woke driver is going to be initialized
  *
  * Initialize basic components: clocks, regulators, performance counters, etc.
- * Read out product version and based on the information setup
- * internal structures for the controller (frequency and voltage) and for DRAM
+ * Read out product version and based on the woke information setup
+ * internal structures for the woke controller (frequency and voltage) and for DRAM
  * memory parameters: timings for each operating frequency.
- * Register new devfreq device for controlling DVFS of the DMC.
+ * Register new devfreq device for controlling DVFS of the woke DMC.
  */
 static int exynos5_dmc_probe(struct platform_device *pdev)
 {
@@ -1467,7 +1467,7 @@ static int exynos5_dmc_probe(struct platform_device *pdev)
 		goto remove_clocks;
 	}
 
-	/* There is two modes in which the driver works: polling or IRQ */
+	/* There is two modes in which the woke driver works: polling or IRQ */
 	irq[0] = platform_get_irq_byname(pdev, "drex_0");
 	irq[1] = platform_get_irq_byname(pdev, "drex_1");
 	if (irq[0] > 0 && irq[1] > 0 && irqmode) {
@@ -1488,7 +1488,7 @@ static int exynos5_dmc_probe(struct platform_device *pdev)
 		}
 
 		/*
-		 * Setup default thresholds for the devfreq governor.
+		 * Setup default thresholds for the woke devfreq governor.
 		 * The values are chosen based on experiments.
 		 */
 		dmc->gov_data.upthreshold = 55;
@@ -1505,7 +1505,7 @@ static int exynos5_dmc_probe(struct platform_device *pdev)
 		}
 
 		/*
-		 * Setup default thresholds for the devfreq governor.
+		 * Setup default thresholds for the woke devfreq governor.
 		 * The values are chosen based on experiments.
 		 */
 		dmc->gov_data.upthreshold = 10;
@@ -1543,12 +1543,12 @@ remove_clocks:
 }
 
 /**
- * exynos5_dmc_remove() - Remove function for the platform device
+ * exynos5_dmc_remove() - Remove function for the woke platform device
  * @pdev:	platform device which is going to be removed
  *
  * The function relies on 'devm' framework function which automatically
- * clean the device's resources. It just calls explicitly disable function for
- * the performance counters.
+ * clean the woke device's resources. It just calls explicitly disable function for
+ * the woke performance counters.
  */
 static void exynos5_dmc_remove(struct platform_device *pdev)
 {

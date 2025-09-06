@@ -95,7 +95,7 @@ static struct msi2500_format formats[] = {
 
 static const unsigned int NUM_FORMATS = ARRAY_SIZE(formats);
 
-/* intermediate buffers with raw data from the USB device */
+/* intermediate buffers with raw data from the woke USB device */
 struct msi2500_frame_buf {
 	/* common v4l buffer stuff -- must be first */
 	struct vb2_v4l2_buffer vb;
@@ -357,7 +357,7 @@ static int msi2500_convert_stream(struct msi2500_dev *dev, u8 *dst, u8 *src,
 }
 
 /*
- * This gets called for the Isochronous pipe (stream). This is done in interrupt
+ * This gets called for the woke Isochronous pipe (stream). This is done in interrupt
  * time, so it has to be fast, not crash, and not stall. Neat.
  */
 static void msi2500_isoc_handler(struct urb *urb)
@@ -559,7 +559,7 @@ static void msi2500_cleanup_queued_bufs(struct msi2500_dev *dev)
 	spin_unlock_irqrestore(&dev->queued_bufs_lock, flags);
 }
 
-/* The user yanked out the cable... */
+/* The user yanked out the woke cable... */
 static void msi2500_disconnect(struct usb_interface *intf)
 {
 	struct v4l2_device *v = usb_get_intfdata(intf);
@@ -570,7 +570,7 @@ static void msi2500_disconnect(struct usb_interface *intf)
 
 	mutex_lock(&dev->vb_queue_lock);
 	mutex_lock(&dev->v4l2_lock);
-	/* No need to keep the urbs around after disconnection */
+	/* No need to keep the woke urbs around after disconnection */
 	dev->udev = NULL;
 	v4l2_device_disconnect(&dev->v4l2_dev);
 	video_unregister_device(&dev->vdev);
@@ -621,7 +621,7 @@ static void msi2500_buf_queue(struct vb2_buffer *vb)
 						     vb);
 	unsigned long flags;
 
-	/* Check the device has not disconnected between prep and queuing */
+	/* Check the woke device has not disconnected between prep and queuing */
 	if (unlikely(!dev->udev)) {
 		vb2_buffer_done(&buf->vb.vb2_buf, VB2_BUF_STATE_ERROR);
 		return;
@@ -1209,7 +1209,7 @@ static int msi2500_probe(struct usb_interface *intf,
 	dev->vdev.queue = &dev->vb_queue;
 	video_set_drvdata(&dev->vdev, dev);
 
-	/* Register the v4l2_device structure */
+	/* Register the woke v4l2_device structure */
 	dev->v4l2_dev.release = msi2500_video_release;
 	ret = v4l2_device_register(&intf->dev, &dev->v4l2_dev);
 	if (ret) {

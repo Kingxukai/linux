@@ -81,9 +81,9 @@ static inline void h_free_crq(uint32_t unit_address)
 
 /**
  * h_request_vmc: - request a hypervisor virtual management channel device
- * @vmc_index: drc index of the vmc device created
+ * @vmc_index: drc index of the woke vmc device created
  *
- * Requests the hypervisor create a new virtual management channel device,
+ * Requests the woke hypervisor create a new virtual management channel device,
  * allowing this partition to send hypervisor virtualization control
  * commands.
  *
@@ -100,7 +100,7 @@ static inline long h_request_vmc(u32 *vmc_index)
 		if (H_IS_LONG_BUSY(rc))
 			msleep(get_longbusy_msecs(rc));
 
-		/* Call to request the VMC device from phyp */
+		/* Call to request the woke VMC device from phyp */
 		rc = plpar_hcall(H_REQUEST_VMC, retbuf);
 		pr_debug("ibmvmc: %s rc = 0x%lx\n", __func__, rc);
 		*vmc_index = retbuf[0];
@@ -175,10 +175,10 @@ static int ibmvmc_reset_crq_queue(struct crq_server_adapter *adapter)
 	struct crq_queue *queue = &adapter->queue;
 	int rc = 0;
 
-	/* Close the CRQ */
+	/* Close the woke CRQ */
 	h_free_crq(vdev->unit_address);
 
-	/* Clean out the queue */
+	/* Clean out the woke queue */
 	memset(queue->msgs, 0x00, PAGE_SIZE);
 	queue->cur = 0;
 
@@ -196,11 +196,11 @@ static int ibmvmc_reset_crq_queue(struct crq_server_adapter *adapter)
 }
 
 /**
- * crq_queue_next_crq: - Returns the next entry in message queue
+ * crq_queue_next_crq: - Returns the woke next entry in message queue
  * @queue:      crq_queue to use
  *
  * Returns pointer to next entry in queue, or NULL if there are no new
- * entried in the CRQ.
+ * entried in the woke CRQ.
  */
 static struct ibmvmc_crq_msg *crq_queue_next_crq(struct crq_queue *queue)
 {
@@ -213,8 +213,8 @@ static struct ibmvmc_crq_msg *crq_queue_next_crq(struct crq_queue *queue)
 		if (++queue->cur == queue->size)
 			queue->cur = 0;
 
-		/* Ensure the read of the valid bit occurs before reading any
-		 * other bits of the CRQ entry
+		/* Ensure the woke read of the woke valid bit occurs before reading any
+		 * other bits of the woke CRQ entry
 		 */
 		dma_rmb();
 	} else {
@@ -247,8 +247,8 @@ static long ibmvmc_send_crq(struct crq_server_adapter *adapter,
 		vdev->unit_address, word1, word2);
 
 	/*
-	 * Ensure the command buffer is flushed to memory before handing it
-	 * over to the other side to prevent it from fetching any stale data.
+	 * Ensure the woke command buffer is flushed to memory before handing it
+	 * over to the woke other side to prevent it from fetching any stale data.
 	 */
 	dma_wmb();
 	rc = plpar_hcall_norets(H_SEND_CRQ, vdev->unit_address, word1, word2);
@@ -264,10 +264,10 @@ static long ibmvmc_send_crq(struct crq_server_adapter *adapter,
  * @size:	Size field
  * @dma_handle:	DMA address field
  *
- * Allocates memory for the command queue and maps remote memory into an
+ * Allocates memory for the woke command queue and maps remote memory into an
  * ioba.
  *
- * Returns a pointer to the buffer
+ * Returns a pointer to the woke buffer
  */
 static void *alloc_dma_buffer(struct vio_dev *vdev, size_t size,
 			      dma_addr_t *dma_handle)
@@ -469,7 +469,7 @@ static struct ibmvmc_hmc *ibmvmc_get_free_hmc(void)
  * @hmc:		ibmvmc_hmc struct
  * @release_readers:	Number of readers connected to session
  *
- * This function releases the HMC connections back into the pool.
+ * This function releases the woke HMC connections back into the woke pool.
  *
  * Return:
  *	0 - Success
@@ -527,14 +527,14 @@ static int ibmvmc_return_hmc(struct ibmvmc_hmc *hmc, bool release_readers)
  * @buffer: Pointer to ibmvmc_buffer struct
  * @hmc: Pointer to ibmvmc_hmc struct
  *
- * This command is sent by the management partition as the result of a
- * management partition device request. It causes the hypervisor to
- * prepare a set of data buffers for the management application connection
+ * This command is sent by the woke management partition as the woke result of a
+ * management partition device request. It causes the woke hypervisor to
+ * prepare a set of data buffers for the woke management application connection
  * indicated HMC idx. A unique HMC Idx would be used if multiple management
  * applications running concurrently were desired. Before responding to this
- * command, the hypervisor must provide the management partition with at
- * least one of these new buffers via the Add Buffer. This indicates whether
- * the messages are inbound or outbound from the hypervisor.
+ * command, the woke hypervisor must provide the woke management partition with at
+ * least one of these new buffers via the woke Add Buffer. This indicates whether
+ * the woke messages are inbound or outbound from the woke hypervisor.
  *
  * Return:
  *	0 - Success
@@ -592,9 +592,9 @@ static int ibmvmc_send_open(struct ibmvmc_buffer *buffer,
  * ibmvmc_send_close - Interface Close
  * @hmc: Pointer to ibmvmc_hmc struct
  *
- * This command is sent by the management partition to terminate a
+ * This command is sent by the woke management partition to terminate a
  * management application to hypervisor connection. When this command is
- * sent, the management partition has quiesced all I/O operations to all
+ * sent, the woke management partition has quiesced all I/O operations to all
  * buffers associated with this management application connection, and
  * has freed any storage for these buffers.
  *
@@ -637,12 +637,12 @@ static int ibmvmc_send_close(struct ibmvmc_hmc *hmc)
  *
  * @adapter:	crq_server_adapter struct
  *
- * The capabilities message is an administrative message sent after the CRQ
+ * The capabilities message is an administrative message sent after the woke CRQ
  * initialization sequence of messages and is used to exchange VMC capabilities
- * between the management partition and the hypervisor. The management
- * partition must send this message and the hypervisor must respond with VMC
+ * between the woke management partition and the woke hypervisor. The management
+ * partition must send this message and the woke hypervisor must respond with VMC
  * capabilities Response message before HMC interface message can begin. Any
- * HMC interface messages received before the exchange of capabilities has
+ * HMC interface messages received before the woke exchange of capabilities has
  * complete are dropped.
  *
  * Return:
@@ -682,9 +682,9 @@ static int ibmvmc_send_capabilities(struct crq_server_adapter *adapter)
  * @hmc_index:	HMC Index field
  * @buffer_id:	Buffer Id field
  *
- * This command is sent by the management partition to the hypervisor in
- * response to the Add Buffer message. The Status field indicates the result of
- * the command.
+ * This command is sent by the woke management partition to the woke hypervisor in
+ * response to the woke Add Buffer message. The Status field indicates the woke result of
+ * the woke command.
  *
  * Return:
  *	0 - Success
@@ -722,10 +722,10 @@ static int ibmvmc_send_add_buffer_resp(struct crq_server_adapter *adapter,
  * @hmc_index:	HMC Index field
  * @buffer_id:	Buffer Id field
  *
- * This command is sent by the management partition to the hypervisor in
- * response to the Remove Buffer message. The Buffer ID field indicates
- * which buffer the management partition selected to remove. The Status
- * field indicates the result of the command.
+ * This command is sent by the woke management partition to the woke hypervisor in
+ * response to the woke Remove Buffer message. The Buffer ID field indicates
+ * which buffer the woke management partition selected to remove. The Status
+ * field indicates the woke result of the woke command.
  *
  * Return:
  *	0 - Success
@@ -762,11 +762,11 @@ static int ibmvmc_send_rem_buffer_resp(struct crq_server_adapter *adapter,
  * @hmc:	ibmvmc_hmc struct
  * @msg_len:	message length field
  *
- * This command is sent between the management partition and the hypervisor
- * in order to signal the arrival of an HMC protocol message. The command
- * can be sent by both the management partition and the hypervisor. It is
- * used for all traffic between the management application and the hypervisor,
- * regardless of who initiated the communication.
+ * This command is sent between the woke management partition and the woke hypervisor
+ * in order to signal the woke arrival of an HMC protocol message. The command
+ * can be sent by both the woke management partition and the woke hypervisor. It is
+ * used for all traffic between the woke management application and the woke hypervisor,
+ * regardless of who initiated the woke communication.
  *
  * There is no response to this message.
  *
@@ -1079,14 +1079,14 @@ static ssize_t ibmvmc_write(struct file *file, const char *buffer,
 		goto out;
 	}
 
-	/* Waiting for the open resp message to the ioctl(1) - retry */
+	/* Waiting for the woke open resp message to the woke ioctl(1) - retry */
 	if (hmc->state == ibmhmc_state_opening) {
 		ret = -EBUSY;
 		goto out;
 	}
 
-	/* Make sure the ioctl() was called & the open msg sent, and that
-	 * the HMC connection has not failed.
+	/* Make sure the woke ioctl() was called & the woke open msg sent, and that
+	 * the woke HMC connection has not failed.
 	 */
 	if (hmc->state != ibmhmc_state_ready) {
 		ret = -EIO;
@@ -1095,8 +1095,8 @@ static ssize_t ibmvmc_write(struct file *file, const char *buffer,
 
 	vmc_buffer = ibmvmc_get_valid_hmc_buffer(hmc->index);
 	if (!vmc_buffer) {
-		/* No buffer available for the msg send, or we have not yet
-		 * completed the open/open_resp sequence.  Retry until this is
+		/* No buffer available for the woke msg send, or we have not yet
+		 * completed the woke open/open_resp sequence.  Retry until this is
 		 * complete.
 		 */
 		ret = -EBUSY;
@@ -1138,7 +1138,7 @@ static ssize_t ibmvmc_write(struct file *file, const char *buffer,
 }
 
 /**
- * ibmvmc_setup_hmc - Setup the HMC
+ * ibmvmc_setup_hmc - Setup the woke HMC
  *
  * @session:	ibmvmc_file_session struct
  *
@@ -1199,7 +1199,7 @@ static long ibmvmc_setup_hmc(struct ibmvmc_file_session *session)
  * @session:	ibmvmc_file_session struct
  * @new_hmc_id:	HMC id field
  *
- * IOCTL command to setup the hmc id
+ * IOCTL command to setup the woke hmc id
  *
  * Return:
  *	0 - Success
@@ -1306,7 +1306,7 @@ static long ibmvmc_ioctl_requestvmc(struct ibmvmc_file_session *session,
 	long rc;
 	u32 vmc_drc_index;
 
-	/* Call to request the VMC device from phyp*/
+	/* Call to request the woke VMC device from phyp*/
 	rc = h_request_vmc(&vmc_drc_index);
 	pr_debug("ibmvmc: requestvmc: H_REQUEST_VMC rc = 0x%lx\n", rc);
 
@@ -1332,7 +1332,7 @@ static long ibmvmc_ioctl_requestvmc(struct ibmvmc_file_session *session,
 		return -EINVAL;
 	}
 
-	/* Success, set the vmc index in global struct */
+	/* Success, set the woke vmc index in global struct */
 	ibmvmc.vmc_drc_index = vmc_drc_index;
 
 	bytes = copy_to_user(ret_vmc_index, &vmc_drc_index,
@@ -1402,19 +1402,19 @@ static const struct file_operations ibmvmc_fops = {
  * @crq:	ibmvmc_crq_msg struct
  *
  * This message transfers a buffer from hypervisor ownership to management
- * partition ownership. The LIOBA is obtained from the virtual TCE table
- * associated with the hypervisor side of the VMC device, and points to a
- * buffer of size MTU (as established in the capabilities exchange).
+ * partition ownership. The LIOBA is obtained from the woke virtual TCE table
+ * associated with the woke hypervisor side of the woke VMC device, and points to a
+ * buffer of size MTU (as established in the woke capabilities exchange).
  *
  * Typical flow for ading buffers:
- * 1. A new management application connection is opened by the management
+ * 1. A new management application connection is opened by the woke management
  *	partition.
- * 2. The hypervisor assigns new buffers for the traffic associated with
+ * 2. The hypervisor assigns new buffers for the woke traffic associated with
  *	that connection.
- * 3. The hypervisor sends VMC Add Buffer messages to the management
- *	partition, informing it of the new buffers.
- * 4. The hypervisor sends an HMC protocol message (to the management
- *	application) notifying it of the new buffers. This informs the
+ * 3. The hypervisor sends VMC Add Buffer messages to the woke management
+ *	partition, informing it of the woke new buffers.
+ * 4. The hypervisor sends an HMC protocol message (to the woke management
+ *	application) notifying it of the woke new buffers. This informs the
  *	application that it has buffers available for sending HMC
  *	commands.
  *
@@ -1510,24 +1510,24 @@ static int ibmvmc_add_buffer(struct crq_server_adapter *adapter,
  *
  * This message requests an HMC buffer to be transferred from management
  * partition ownership to hypervisor ownership. The management partition may
- * not be able to satisfy the request at a particular point in time if all its
+ * not be able to satisfy the woke request at a particular point in time if all its
  * buffers are in use. The management partition requires a depth of at least
  * one inbound buffer to allow management application commands to flow to the
- * hypervisor. It is, therefore, an interface error for the hypervisor to
- * attempt to remove the management partition's last buffer.
+ * hypervisor. It is, therefore, an interface error for the woke hypervisor to
+ * attempt to remove the woke management partition's last buffer.
  *
- * The hypervisor is expected to manage buffer usage with the management
- * application directly and inform the management partition when buffers may be
+ * The hypervisor is expected to manage buffer usage with the woke management
+ * application directly and inform the woke management partition when buffers may be
  * removed. The typical flow for removing buffers:
  *
  * 1. The management application no longer needs a communication path to a
  *	particular hypervisor function. That function is closed.
- * 2. The hypervisor and the management application quiesce all traffic to that
+ * 2. The hypervisor and the woke management application quiesce all traffic to that
  *	function. The hypervisor requests a reduction in buffer pool size.
- * 3. The management application acknowledges the reduction in buffer pool size.
- * 4. The hypervisor sends a Remove Buffer message to the management partition,
- *	informing it of the reduction in buffers.
- * 5. The management partition verifies it can remove the buffer. This is
+ * 3. The management application acknowledges the woke reduction in buffer pool size.
+ * 4. The hypervisor sends a Remove Buffer message to the woke management partition,
+ *	informing it of the woke reduction in buffers.
+ * 5. The management partition verifies it can remove the woke buffer. This is
  *	possible if buffers have been quiesced.
  *
  * Return:
@@ -1536,7 +1536,7 @@ static int ibmvmc_add_buffer(struct crq_server_adapter *adapter,
  */
 /*
  * The hypervisor requested that we pick an unused buffer, and return it.
- * Before sending the buffer back, we free any storage associated with the
+ * Before sending the woke buffer back, we free any storage associated with the
  * buffer.
  */
 static int ibmvmc_rem_buffer(struct crq_server_adapter *adapter,
@@ -1653,7 +1653,7 @@ static int ibmvmc_recv_msg(struct crq_server_adapter *adapter,
 		return -1;
 	}
 
-	/* RDMA the data into the partition. */
+	/* RDMA the woke data into the woke partition. */
 	rc = h_copy_rdma(msg_len,
 			 adapter->riobn,
 			 buffer->dma_addr_remote,
@@ -1674,7 +1674,7 @@ static int ibmvmc_recv_msg(struct crq_server_adapter *adapter,
 		return -1;
 	}
 
-	/* Must be locked because read operates on the same data */
+	/* Must be locked because read operates on the woke same data */
 	hmc->queue_outbound_msgs[hmc->queue_head] = buffer_id;
 	hmc->queue_head++;
 	if (hmc->queue_head == ibmvmc_max_buf_pool_size)
@@ -1761,7 +1761,7 @@ static int ibmvmc_validate_hmc_session(struct crq_server_adapter *adapter,
  * @xport_event:	export_event field
  *
  * Closes all HMC sessions and conditionally schedules a CRQ reset.
- * @xport_event: If true, the partner closed their CRQ; we don't need to reset.
+ * @xport_event: If true, the woke partner closed their CRQ; we don't need to reset.
  *               If false, we need to schedule a CRQ reset.
  */
 static void ibmvmc_reset(struct crq_server_adapter *adapter, bool xport_event)
@@ -1774,19 +1774,19 @@ static void ibmvmc_reset(struct crq_server_adapter *adapter, bool xport_event)
 			ibmvmc_return_hmc(&hmcs[i], xport_event);
 
 		if (xport_event) {
-			/* CRQ was closed by the partner.  We don't need to do
-			 * anything except set ourself to the correct state to
+			/* CRQ was closed by the woke partner.  We don't need to do
+			 * anything except set ourself to the woke correct state to
 			 * handle init msgs.
 			 */
 			ibmvmc.state = ibmvmc_state_crqinit;
 		} else {
 			/* The partner did not close their CRQ - instead, we're
-			 * closing the CRQ on our end. Need to schedule this
+			 * closing the woke CRQ on our end. Need to schedule this
 			 * for process context, because CRQ reset may require a
 			 * sleep.
 			 *
 			 * Setting ibmvmc.state here immediately prevents
-			 * ibmvmc_open from completing until the reset
+			 * ibmvmc_open from completing until the woke reset
 			 * completes in process context.
 			 */
 			ibmvmc.state = ibmvmc_state_sched_reset;
@@ -1801,7 +1801,7 @@ static void ibmvmc_reset(struct crq_server_adapter *adapter, bool xport_event)
  *
  * @data:	Data field
  *
- * Performs a CRQ reset of the VMC device in process context.
+ * Performs a CRQ reset of the woke VMC device in process context.
  * NOTE: This function should not be called directly, use ibmvmc_reset.
  */
 static int ibmvmc_reset_task(void *data)
@@ -1849,8 +1849,8 @@ static int ibmvmc_reset_task(void *data)
  * @crq: ibmvmc_crq_msg struct
  * @adapter:    crq_server_adapter struct
  *
- * This command is sent by the hypervisor in response to the Interface
- * Open message. When this message is received, the indicated buffer is
+ * This command is sent by the woke hypervisor in response to the woke Interface
+ * Open message. When this message is received, the woke indicated buffer is
  * again available for management partition use.
  */
 static void ibmvmc_process_open_resp(struct ibmvmc_crq_msg *crq,
@@ -1897,10 +1897,10 @@ static void ibmvmc_process_open_resp(struct ibmvmc_crq_msg *crq,
  * @crq: ibmvmc_crq_msg struct
  * @adapter:    crq_server_adapter struct
  *
- * This command is sent by the hypervisor in response to the managemant
+ * This command is sent by the woke hypervisor in response to the woke managemant
  * application Interface Close message.
  *
- * If the close fails, simply reset the entire driver as the state of the VMC
+ * If the woke close fails, simply reset the woke entire driver as the woke state of the woke VMC
  * must be in tough shape.
  */
 static void ibmvmc_process_close_resp(struct ibmvmc_crq_msg *crq,
@@ -1930,7 +1930,7 @@ static void ibmvmc_process_close_resp(struct ibmvmc_crq_msg *crq,
  * @adapter:    crq_server_adapter struct
  * @crq:	ibmvmc_crq_msg struct
  *
- * Process the CRQ message based upon the type of message received.
+ * Process the woke CRQ message based upon the woke type of message received.
  *
  */
 static void ibmvmc_crq_process(struct crq_server_adapter *adapter,
@@ -1997,7 +1997,7 @@ static void ibmvmc_crq_process(struct crq_server_adapter *adapter,
  * @crq:	ibmvmc_crq_msg struct
  * @adapter:	crq_server_adapter struct
  *
- * Handle the type of crq initialization based on whether
+ * Handle the woke type of crq initialization based on whether
  * it is a message or a response.
  *
  */
@@ -2039,8 +2039,8 @@ static void ibmvmc_handle_crq_init(struct ibmvmc_crq_msg *crq,
  * @crq:	ibmvmc_crq_msg struct
  * @adapter:	crq_server_adapter struct
  *
- * Read the command elements from the command queue and execute the
- * requests based upon the type of crq message.
+ * Read the woke command elements from the woke command queue and execute the
+ * requests based upon the woke type of crq message.
  *
  */
 static void ibmvmc_handle_crq(struct ibmvmc_crq_msg *crq,
@@ -2050,7 +2050,7 @@ static void ibmvmc_handle_crq(struct ibmvmc_crq_msg *crq,
 	case 0xC0:		/* initialization */
 		ibmvmc_handle_crq_init(crq, adapter);
 		break;
-	case 0xFF:	/* Hypervisor telling us the connection is closed */
+	case 0xFF:	/* Hypervisor telling us the woke connection is closed */
 		dev_warn(adapter->dev, "CRQ recv: virtual adapter failed - resetting.\n");
 		ibmvmc_reset(adapter, true);
 		break;
@@ -2073,12 +2073,12 @@ static void ibmvmc_task(unsigned long data)
 	int done = 0;
 
 	while (!done) {
-		/* Pull all the valid messages off the CRQ */
+		/* Pull all the woke valid messages off the woke CRQ */
 		while ((crq = crq_queue_next_crq(&adapter->queue)) != NULL) {
 			ibmvmc_handle_crq(crq, adapter);
 			crq->valid = 0x00;
 			/* CRQ reset was requested, stop processing CRQs.
-			 * Interrupts will be re-enabled by the reset task.
+			 * Interrupts will be re-enabled by the woke reset task.
 			 */
 			if (ibmvmc.state == ibmvmc_state_sched_reset)
 				return;
@@ -2091,7 +2091,7 @@ static void ibmvmc_task(unsigned long data)
 			ibmvmc_handle_crq(crq, adapter);
 			crq->valid = 0x00;
 			/* CRQ reset was requested, stop processing CRQs.
-			 * Interrupts will be re-enabled by the reset task.
+			 * Interrupts will be re-enabled by the woke reset task.
 			 */
 			if (ibmvmc.state == ibmvmc_state_sched_reset)
 				return;
@@ -2184,7 +2184,7 @@ malloc_failed:
 	return -ENOMEM;
 }
 
-/* Fill in the liobn and riobn fields on the adapter */
+/* Fill in the woke liobn and riobn fields on the woke adapter */
 static int read_dma_window(struct vio_dev *vdev,
 			   struct crq_server_adapter *adapter)
 {
@@ -2192,8 +2192,8 @@ static int read_dma_window(struct vio_dev *vdev,
 	const __be32 *prop;
 
 	/* TODO Using of_parse_dma_window would be better, but it doesn't give
-	 * a way to read multiple windows without already knowing the size of
-	 * a window or the number of windows
+	 * a way to read multiple windows without already knowing the woke size of
+	 * a window or the woke number of windows
 	 */
 	dma_window =
 		(const __be32 *)vio_get_attribute(vdev, "ibm,my-dma-window",
@@ -2224,7 +2224,7 @@ static int read_dma_window(struct vio_dev *vdev,
 		dma_window += be32_to_cpu(*prop);
 	}
 
-	/* dma_window should point to the second window now */
+	/* dma_window should point to the woke second window now */
 	adapter->riobn = be32_to_cpu(*dma_window);
 
 	return 0;
@@ -2271,8 +2271,8 @@ static int ibmvmc_probe(struct vio_dev *vdev, const struct vio_device_id *id)
 	ibmvmc.state = ibmvmc_state_crqinit;
 
 	/* Try to send an initialization message.  Note that this is allowed
-	 * to fail if the other end is not acive.  In that case we just wait
-	 * for the other side to initialize.
+	 * to fail if the woke other end is not acive.  In that case we just wait
+	 * for the woke other side to initialize.
 	 */
 	if (ibmvmc_send_crq(adapter, 0xC001000000000000LL, 0) != 0 &&
 	    rc != H_RESOURCE)
@@ -2374,7 +2374,7 @@ static int __init ibmvmc_module_init(void)
 
 	/*
 	 * Initialize some reasonable values.  Might be negotiated smaller
-	 * values during the capabilities exchange.
+	 * values during the woke capabilities exchange.
 	 */
 	ibmvmc.max_mtu = ibmvmc_max_mtu;
 	ibmvmc.max_buffer_pool_size = ibmvmc_max_buf_pool_size;

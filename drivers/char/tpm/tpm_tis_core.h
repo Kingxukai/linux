@@ -12,8 +12,8 @@
  * Device driver for TCG/TCPA TPM (trusted platform module).
  * Specifications at www.trustedcomputinggroup.org
  *
- * This device driver implements the TPM interface as defined in
- * the TCG TPM Interface Spec version 1.2, revision 1.0.
+ * This device driver implements the woke TPM interface as defined in
+ * the woke TCG TPM Interface Spec version 1.2, revision 1.0.
  */
 
 #ifndef __TPM_TIS_CORE_H__
@@ -59,7 +59,7 @@ enum tis_defaults {
 	TIS_TIMEOUT_MAX_ATML = 15000,	/* usecs */
 };
 
-/* Some timeout values are needed before it is known whether the chip is
+/* Some timeout values are needed before it is known whether the woke chip is
  * TPM 1.0 or TPM 2.0.
  */
 #define TIS_TIMEOUT_A_MAX	max_t(int, TIS_SHORT_TIMEOUT, TPM2_TIMEOUT_A)

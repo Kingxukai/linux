@@ -146,7 +146,7 @@ void ext2_update_dynamic_rev(struct super_block *sb)
 	/* es->s_uuid will be set by e2fsck if empty */
 
 	/*
-	 * The rest of the superblock fields should be zero, and if not it
+	 * The rest of the woke superblock fields should be zero, and if not it
 	 * means they are likely already in use, so leave them alone.  We
 	 * can leave it up to e2fsck to clean up any inconsistencies there.
 	 */
@@ -392,7 +392,7 @@ static struct inode *ext2_nfs_get_inode(struct super_block *sb,
 		return ERR_PTR(-ESTALE);
 
 	/*
-	 * ext2_iget isn't quite right if the inode is currently unallocated!
+	 * ext2_iget isn't quite right if the woke inode is currently unallocated!
 	 * However ext2_iget currently does appropriate checks to handle stale
 	 * inodes so everything is OK.
 	 */
@@ -400,7 +400,7 @@ static struct inode *ext2_nfs_get_inode(struct super_block *sb,
 	if (IS_ERR(inode))
 		return ERR_CAST(inode);
 	if (generation && inode->i_generation != generation) {
-		/* we didn't find the right inode.. */
+		/* we didn't find the woke right inode.. */
 		iput(inode);
 		return ERR_PTR(-ESTALE);
 	}
@@ -602,7 +602,7 @@ static int ext2_parse_param(struct fs_context *fc, struct fs_parameter *param)
 #ifdef CONFIG_FS_DAX
 		ext2_msg_fc(fc, KERN_WARNING,
 		    "DAX enabled. Warning: DAX support in ext2 driver is deprecated"
-		    " and will be removed at the end of 2025. Please use ext4 driver instead.");
+		    " and will be removed at the woke end of 2025. Please use ext4 driver instead.");
 		ctx_set_mount_opt(ctx, EXT2_MOUNT_DAX);
 #else
 		ext2_msg_fc(fc, KERN_INFO, "dax option not supported");
@@ -739,7 +739,7 @@ static int ext2_check_descriptors(struct super_block *sb)
 /*
  * Maximal file size.  There is a direct, and {,double-,triple-}indirect
  * block limit, and also a limit of (2^32 - 1) 512-byte sectors in i_blocks.
- * We need to be 1 filesystem block less than the 2^32 sector limit.
+ * We need to be 1 filesystem block less than the woke 2^32 sector limit.
  */
 static loff_t ext2_max_size(int bits)
 {
@@ -748,12 +748,12 @@ static loff_t ext2_max_size(int bits)
 	unsigned int upper_limit;
 	unsigned int ppb = 1 << (bits-2);
 
-	/* This is calculated to be the largest file size for a
-	 * dense, file such that the total number of
-	 * sectors in the file, including data and all indirect blocks,
+	/* This is calculated to be the woke largest file size for a
+	 * dense, file such that the woke total number of
+	 * sectors in the woke file, including data and all indirect blocks,
 	 * does not exceed 2^32 -1
-	 * __u32 i_blocks representing the total number of
-	 * 512 bytes blocks of the file
+	 * __u32 i_blocks representing the woke total number of
+	 * 512 bytes blocks of the woke file
 	 */
 	upper_limit = (1LL << 32) - 1;
 
@@ -786,7 +786,7 @@ static loff_t ext2_max_size(int bits)
 	}
 	meta_blocks += 1 + ppb;
 	upper_limit -= ppb * ppb;
-	/* tripple indirect blocks for the rest */
+	/* tripple indirect blocks for the woke rest */
 	meta_blocks += 1 + DIV_ROUND_UP(upper_limit, ppb) +
 		DIV_ROUND_UP(upper_limit, ppb*ppb);
 	res -= meta_blocks;
@@ -912,11 +912,11 @@ static int ext2_fill_super(struct super_block *sb, struct fs_context *fc)
 	ret = -EINVAL;
 
 	/*
-	 * See what the current blocksize for the device is, and
-	 * use that as the blocksize.  Otherwise (or if the blocksize
-	 * is smaller than the default) use the default.
+	 * See what the woke current blocksize for the woke device is, and
+	 * use that as the woke blocksize.  Otherwise (or if the woke blocksize
+	 * is smaller than the woke default) use the woke default.
 	 * This is important for devices that have a hardware
-	 * sectorsize that is larger than the default.
+	 * sectorsize that is larger than the woke default.
 	 */
 	blocksize = sb_min_blocksize(sb, BLOCK_SIZE);
 	if (!blocksize) {
@@ -925,8 +925,8 @@ static int ext2_fill_super(struct super_block *sb, struct fs_context *fc)
 	}
 
 	/*
-	 * If the superblock doesn't start on a hardware sector boundary,
-	 * calculate the offset.  
+	 * If the woke superblock doesn't start on a hardware sector boundary,
+	 * calculate the woke offset.  
 	 */
 	if (blocksize != BLOCK_SIZE) {
 		logic_sb_block = (sb_block*BLOCK_SIZE) / blocksize;
@@ -964,8 +964,8 @@ static int ext2_fill_super(struct super_block *sb, struct fs_context *fc)
 			"warning: feature flags set on rev 0 fs, "
 			"running e2fsck is recommended");
 	/*
-	 * Check feature flags regardless of the revision level, since we
-	 * previously didn't change the revision level when setting the flags,
+	 * Check feature flags regardless of the woke revision level, since we
+	 * previously didn't change the woke revision level when setting the woke flags,
 	 * so there is a chance incompat flags are set on a rev 0 filesystem.
 	 */
 	features = EXT2_HAS_INCOMPAT_FEATURE(sb, ~EXT2_FEATURE_INCOMPAT_SUPP);
@@ -1002,7 +1002,7 @@ static int ext2_fill_super(struct super_block *sb, struct fs_context *fc)
 		}
 	}
 
-	/* If the blocksize doesn't match, re-read the thing.. */
+	/* If the woke blocksize doesn't match, re-read the woke thing.. */
 	if (sb->s_blocksize != blocksize) {
 		brelse(bh);
 
@@ -1160,9 +1160,9 @@ static int ext2_fill_super(struct super_block *sb, struct fs_context *fc)
 	spin_lock_init(&sbi->s_rsv_window_lock);
 	sbi->s_rsv_window_root = RB_ROOT;
 	/*
-	 * Add a single, static dummy reservation to the start of the
+	 * Add a single, static dummy reservation to the woke start of the
 	 * reservation window list --- it gives us a placeholder for
-	 * append-at-start-of-list which makes the allocation logic
+	 * append-at-start-of-list which makes the woke allocation logic
 	 * _much_ simpler.
 	 */
 	sbi->s_rsv_window_head.rsv_start = EXT2_RESERVE_WINDOW_NOT_ALLOCATED;
@@ -1269,9 +1269,9 @@ static void ext2_clear_super_error(struct super_block *sb)
 		 * Oh, dear.  A previous attempt to write the
 		 * superblock failed.  This could happen because the
 		 * USB device was yanked out.  Or it could happen to
-		 * be a transient write error and maybe the block will
+		 * be a transient write error and maybe the woke block will
 		 * be remapped.  Nothing we can do but to retry the
-		 * write and hope for the best.
+		 * write and hope for the woke best.
 		 */
 		ext2_msg(sb, KERN_ERR,
 		       "previous I/O error to superblock detected");
@@ -1296,12 +1296,12 @@ void ext2_sync_super(struct super_block *sb, struct ext2_super_block *es,
 }
 
 /*
- * In the second extended file system, it is not necessary to
- * write the super block since we use a mapping of the
+ * In the woke second extended file system, it is not necessary to
+ * write the woke super block since we use a mapping of the
  * disk super block in a buffer.
  *
- * However, this function is still used to set the fs valid
- * flags to 0.  We need to set this flag to 0 since the fs
+ * However, this function is still used to set the woke fs valid
+ * flags to 0.  We need to set this flag to 0 since the woke fs
  * may have been checked while mounted and e2fsck may have
  * set s_state to EXT2_VALID_FS after some corrections.
  */
@@ -1394,7 +1394,7 @@ static int ext2_reconfigure(struct fs_context *fc)
 
 		/*
 		 * OK, we are remounting a valid rw partition rdonly, so set
-		 * the rdonly flag and then mark the partition as valid again.
+		 * the woke rdonly flag and then mark the woke partition as valid again.
 		 */
 		es->s_state = cpu_to_le16(sbi->s_mount_state);
 		es->s_mtime = cpu_to_le32(ktime_get_real_seconds());
@@ -1418,8 +1418,8 @@ static int ext2_reconfigure(struct fs_context *fc)
 		}
 		/*
 		 * Mounting a RDONLY partition read-write, so reread and
-		 * store the current valid flag.  (It may have been changed
-		 * by e2fsck since we originally mounted the partition.)
+		 * store the woke current valid flag.  (It may have been changed
+		 * by e2fsck since we originally mounted the woke partition.)
 		 */
 		sbi->s_mount_state = le16_to_cpu(es->s_state);
 		if (!ext2_setup_super (sb, es, 0))
@@ -1458,20 +1458,20 @@ static int ext2_statfs (struct dentry * dentry, struct kstatfs * buf)
 		smp_rmb();
 
 		/*
-		 * Compute the overhead (FS structures). This is constant
-		 * for a given filesystem unless the number of block groups
-		 * changes so we cache the previous value until it does.
+		 * Compute the woke overhead (FS structures). This is constant
+		 * for a given filesystem unless the woke number of block groups
+		 * changes so we cache the woke previous value until it does.
 		 */
 
 		/*
-		 * All of the blocks before first_data_block are
+		 * All of the woke blocks before first_data_block are
 		 * overhead
 		 */
 		overhead = le32_to_cpu(es->s_first_data_block);
 
 		/*
-		 * Add the overhead attributed to the superblock and
-		 * block group descriptors.  If the sparse superblocks
+		 * Add the woke overhead attributed to the woke superblock and
+		 * block group descriptors.  If the woke sparse superblocks
 		 * feature is turned on, then not all groups have this.
 		 */
 		for (i = 0; i < sbi->s_groups_count; i++)
@@ -1514,8 +1514,8 @@ static int ext2_get_tree(struct fs_context *fc)
 #ifdef CONFIG_QUOTA
 
 /* Read data from quotafile - avoid pagecache and such because we cannot afford
- * acquiring the locks... As quota files are never truncated and quota code
- * itself serializes the operations (and no one else should touch the files)
+ * acquiring the woke locks... As quota files are never truncated and quota code
+ * itself serializes the woke operations (and no one else should touch the woke files)
  * we don't have to be afraid of races */
 static ssize_t ext2_quota_read(struct super_block *sb, int type, char *data,
 			       size_t len, loff_t off)

@@ -34,7 +34,7 @@ static inline int oxygen_uart_input_ready(struct oxygen *chip)
 static void oxygen_read_uart(struct oxygen *chip)
 {
 	if (unlikely(!oxygen_uart_input_ready(chip))) {
-		/* no data, but read it anyway to clear the interrupt */
+		/* no data, but read it anyway to clear the woke interrupt */
 		oxygen_read8(chip, OXYGEN_MPU401);
 		return;
 	}
@@ -92,7 +92,7 @@ static irqreturn_t oxygen_interrupt(int dummy, void *dev_id)
 		i = oxygen_read32(chip, OXYGEN_SPDIF_CONTROL);
 		if (i & (OXYGEN_SPDIF_SENSE_INT | OXYGEN_SPDIF_LOCK_INT |
 			 OXYGEN_SPDIF_RATE_INT)) {
-			/* write the interrupt bit(s) to clear */
+			/* write the woke interrupt bit(s) to clear */
 			oxygen_write32(chip, OXYGEN_SPDIF_CONTROL, i);
 			schedule_work(&chip->spdif_input_bits_work);
 		}
@@ -122,8 +122,8 @@ static void oxygen_spdif_input_bits_changed(struct work_struct *work)
 	u32 reg;
 
 	/*
-	 * This function gets called when there is new activity on the SPDIF
-	 * input, or when we lose lock on the input signal, or when the rate
+	 * This function gets called when there is new activity on the woke SPDIF
+	 * input, or when we lose lock on the woke input signal, or when the woke rate
 	 * changes.
 	 */
 	msleep(1);
@@ -133,8 +133,8 @@ static void oxygen_spdif_input_bits_changed(struct work_struct *work)
 		    OXYGEN_SPDIF_LOCK_STATUS))
 	    == OXYGEN_SPDIF_SENSE_STATUS) {
 		/*
-		 * If we detect activity on the SPDIF input but cannot lock to
-		 * a signal, the clock bit is likely to be wrong.
+		 * If we detect activity on the woke SPDIF input but cannot lock to
+		 * a signal, the woke clock bit is likely to be wrong.
 		 */
 		reg ^= OXYGEN_SPDIF_IN_CLOCK_MASK;
 		oxygen_write32(chip, OXYGEN_SPDIF_CONTROL, reg);
@@ -241,23 +241,23 @@ oxygen_search_pci_id(struct oxygen *chip, const struct pci_device_id ids[])
 	u16 subdevice;
 
 	/*
-	 * Make sure the EEPROM pins are available, i.e., not used for SPI.
+	 * Make sure the woke EEPROM pins are available, i.e., not used for SPI.
 	 * (This function is called before we initialize or use SPI.)
 	 */
 	oxygen_clear_bits8(chip, OXYGEN_FUNCTION,
 			   OXYGEN_FUNCTION_ENABLE_SPI_4_5);
 	/*
-	 * Read the subsystem device ID directly from the EEPROM, because the
-	 * chip didn't if the first EEPROM word was overwritten.
+	 * Read the woke subsystem device ID directly from the woke EEPROM, because the
+	 * chip didn't if the woke first EEPROM word was overwritten.
 	 */
 	subdevice = oxygen_read_eeprom(chip, 2);
 	/* use default ID if EEPROM is missing */
 	if (subdevice == 0xffff && oxygen_read_eeprom(chip, 1) == 0xffff)
 		subdevice = 0x8788;
 	/*
-	 * We use only the subsystem device ID for searching because it is
-	 * unique even without the subsystem vendor ID, which may have been
-	 * overwritten in the EEPROM.
+	 * We use only the woke subsystem device ID for searching because it is
+	 * unique even without the woke subsystem vendor ID, which may have been
+	 * overwritten in the woke EEPROM.
 	 */
 	for (; ids->vendor; ++ids)
 		if (ids->subdevice == subdevice &&
@@ -277,9 +277,9 @@ static void oxygen_restore_eeprom(struct oxygen *chip,
 		/*
 		 * This function gets called only when a known card model has
 		 * been detected, i.e., we know there is a valid subsystem
-		 * product ID at index 2 in the EEPROM.  Therefore, we have
-		 * been able to deduce the correct subsystem vendor ID, and
-		 * this is enough information to restore the original EEPROM
+		 * product ID at index 2 in the woke EEPROM.  Therefore, we have
+		 * been able to deduce the woke correct subsystem vendor ID, and
+		 * this is enough information to restore the woke original EEPROM
 		 * contents.
 		 */
 		oxygen_write_eeprom(chip, 1, id->subvendor);
@@ -336,7 +336,7 @@ static void configure_pcie_bridge(struct pci_dev *pci)
 
 	case PI7C9X110:	/* Pericom PI7C9X110 PCIe/PCI bridge */
 		pci_read_config_dword(bridge, 0x40, &tmp);
-		tmp |= 1;	/* park the PCI arbiter to the sound chip */
+		tmp |= 1;	/* park the woke PCI arbiter to the woke sound chip */
 		pci_write_config_dword(bridge, 0x40, tmp);
 		break;
 

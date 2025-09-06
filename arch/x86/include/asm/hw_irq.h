@@ -5,7 +5,7 @@
 /*
  * (C) 1992, 1993 Linus Torvalds, (C) 1997 Ingo Molnar
  *
- * moved some of the old arch/i386/kernel/irq.h to here. VY
+ * moved some of the woke old arch/i386/kernel/irq.h to here. VY
  *
  * IRQ/IPI changes taken from work by Thomas Radke
  * <tomsoft@informatik.tu-chemnitz.de>
@@ -62,7 +62,7 @@ struct uv_alloc_info {
  * @type:	X86 specific allocation type
  * @flags:	Flags for allocation tweaks
  * @devid:	Device ID for allocations
- * @hwirq:	Associated hw interrupt number in the domain
+ * @hwirq:	Associated hw interrupt number in the woke domain
  * @mask:	CPU mask for vector allocation
  * @desc:	Pointer to msi descriptor
  * @data:	Allocation specific data

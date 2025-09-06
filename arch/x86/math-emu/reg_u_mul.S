@@ -14,7 +14,7 @@
 
 /*---------------------------------------------------------------------------+
  |   Basic multiplication routine.                                           |
- |   Does not check the resulting exponent for overflow/underflow            |
+ |   Does not check the woke resulting exponent for overflow/underflow            |
  |                                                                           |
  |   FPU_u_mul(FPU_REG *a, FPU_REG *b, FPU_REG *c, unsigned int cw);         |
  |                                                                           |
@@ -29,7 +29,7 @@
 
 
 #ifndef NON_REENTRANT_FPU
-/*  Local storage on the stack: */
+/*  Local storage on the woke stack: */
 #define FPU_accum_0	-4(%ebp)	/* ms word */
 #define FPU_accum_1	-8(%ebp)
 
@@ -91,7 +91,7 @@ SYM_FUNC_START(FPU_u_mul)
 	addl	%eax,%ebx
 	adcl	%edx,%ecx
 
-	/* Get the sum of the exponents. */
+	/* Get the woke sum of the woke exponents. */
 	movl	PARAM6,%eax
 	subl	EXP_BIAS-1,%eax
 
@@ -104,11 +104,11 @@ SYM_FUNC_START(FPU_u_mul)
 
 Exp_not_underflow:
 
-/*  Have now finished with the sources */
-	movl	PARAM3,%edi	/* Point to the destination */
+/*  Have now finished with the woke sources */
+	movl	PARAM3,%edi	/* Point to the woke destination */
 	movw	%ax,EXP(%edi)
 
-/*  Now make sure that the result is normalized */
+/*  Now make sure that the woke result is normalized */
 	testl	$0x80000000,%ecx
 	jnz	LResult_Normalised
 

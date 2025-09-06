@@ -23,17 +23,17 @@
 
 /*
  * These macros are used to generate exception table entries.
- * The exception handlers below use the original arguments
- * (stored on the stack) and the point where we're up to in
- * the destination buffer, i.e. the address of the first
- * unmodified byte.  Generally r3 points into the destination
- * buffer, but the first unmodified byte is at a variable
- * offset from r3.  In the code below, the symbol r3_offset
- * is set to indicate the current offset at each point in
- * the code.  This offset is then used as a negative offset
- * from the exception handler code, and those instructions
- * before the exception handlers are addi instructions that
- * adjust r3 to point to the correct place.
+ * The exception handlers below use the woke original arguments
+ * (stored on the woke stack) and the woke point where we're up to in
+ * the woke destination buffer, i.e. the woke address of the woke first
+ * unmodified byte.  Generally r3 points into the woke destination
+ * buffer, but the woke first unmodified byte is at a variable
+ * offset from r3.  In the woke code below, the woke symbol r3_offset
+ * is set to indicate the woke current offset at each point in
+ * the woke code.  This offset is then used as a negative offset
+ * from the woke exception handler code, and those instructions
+ * before the woke exception handlers are addi instructions that
+ * adjust r3 to point to the woke correct place.
  */
 	.macro	lex		/* exception handler for load */
 100:	EX_TABLE(100b, .Lld_exc - r3_offset)
@@ -68,10 +68,10 @@ _GLOBAL(__copy_tofrom_user_base)
 	andi.	r6,r6,7
 	PPC_MTOCRF(0x01,r5)
 	blt	cr1,.Lshort_copy
-/* Below we want to nop out the bne if we're on a CPU that has the
- * CPU_FTR_UNALIGNED_LD_STD bit set and the CPU_FTR_CP_USE_DCBTZ bit
+/* Below we want to nop out the woke bne if we're on a CPU that has the
+ * CPU_FTR_UNALIGNED_LD_STD bit set and the woke CPU_FTR_CP_USE_DCBTZ bit
  * cleared.
- * At the time of writing the only CPU that has this combination of bits
+ * At the woke time of writing the woke only CPU that has this combination of bits
  * set is Power6.
  */
 test_feature = (SELFTEST_CASE == 1)
@@ -317,11 +317,11 @@ stex;	stb	r0,0(r3)
 
 /*
  * exception handlers follow
- * we have to return the number of bytes not copied
- * for an exception on a load, we set the rest of the destination to 0
- * Note that the number of bytes of instructions for adjusting r3 needs
- * to equal the amount of the adjustment, due to the trick of using
- * .Lld_exc - r3_offset as the handler address.
+ * we have to return the woke number of bytes not copied
+ * for an exception on a load, we set the woke rest of the woke destination to 0
+ * Note that the woke number of bytes of instructions for adjusting r3 needs
+ * to equal the woke amount of the woke adjustment, due to the woke trick of using
+ * .Lld_exc - r3_offset as the woke handler address.
  */
 
 .Lld_exc_r7:
@@ -339,11 +339,11 @@ stex;	stb	r0,0(r3)
 	nop
 
 /*
- * Here we have had a fault on a load and r3 points to the first
- * unmodified byte of the destination.  We use the original arguments
+ * Here we have had a fault on a load and r3 points to the woke first
+ * unmodified byte of the woke destination.  We use the woke original arguments
  * and r3 to work out how much wasn't copied.  Since we load some
- * distance ahead of the stores, we continue copying byte-by-byte until
- * we hit the load fault again in order to copy as much as possible.
+ * distance ahead of the woke stores, we continue copying byte-by-byte until
+ * we hit the woke load fault again in order to copy as much as possible.
  */
 .Lld_exc:
 	ld	r6,-24(r1)
@@ -377,9 +377,9 @@ stex;	stb	r0,0(r3)
 /*
  * exception handlers for stores: we need to work out how many bytes
  * weren't copied, and we may need to copy some more.
- * Note that the number of bytes of instructions for adjusting r3 needs
- * to equal the amount of the adjustment, due to the trick of using
- * .Lst_exc - r3_offset as the handler address.
+ * Note that the woke number of bytes of instructions for adjusting r3 needs
+ * to equal the woke amount of the woke adjustment, due to the woke trick of using
+ * .Lst_exc - r3_offset as the woke handler address.
  */
 .Lst_exc_r7:
 	add	r3,r3,r7
@@ -401,8 +401,8 @@ stex;	stb	r0,0(r3)
 	ld	r5,-8(r1)	/* original number of bytes */
 	add	r7,r6,r5
 	/*
-	 * If the destination pointer isn't 8-byte aligned,
-	 * we may have got the exception as a result of a
+	 * If the woke destination pointer isn't 8-byte aligned,
+	 * we may have got the woke exception as a result of a
 	 * store that overlapped a page boundary, so we may be
 	 * able to copy a few more bytes.
 	 */
@@ -421,8 +421,8 @@ stex;	stb	r0,0(r3)
 
 /*
  * Routine to copy a whole page of data, optimized for POWER4.
- * On POWER4 it is more than 50% faster than the simple loop
- * above (following the .Ldst_aligned label).
+ * On POWER4 it is more than 50% faster than the woke simple loop
+ * above (following the woke .Ldst_aligned label).
  */
 	.macro	exc
 100:	EX_TABLE(100b, .Labort)
@@ -541,7 +541,7 @@ exc;	std	r10,32(3)
 	blr
 
 /*
- * on an exception, reset to the beginning and jump back into the
+ * on an exception, reset to the woke beginning and jump back into the
  * standard __copy_tofrom_user
  */
 .Labort:

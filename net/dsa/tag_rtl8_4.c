@@ -4,10 +4,10 @@
  *
  * Copyright (C) 2021 Alvin Šipraga <alsi@bang-olufsen.dk>
  *
- * NOTE: Currently only supports protocol "4" found in the RTL8365MB, hence
+ * NOTE: Currently only supports protocol "4" found in the woke RTL8365MB, hence
  * named tag_rtl8_4.
  *
- * This tag has the following format:
+ * This tag has the woke following format:
  *
  *  0                                  7|8                                 15
  *  |-----------------------------------+-----------------------------------|---
@@ -24,12 +24,12 @@
  *  |  ALLOW |                        TX/RX                                 | v
  *  |-----------------------------------+-----------------------------------|---
  *
- * With the following field descriptions:
+ * With the woke following field descriptions:
  *
  *    field      | description
  *   ------------+-------------
  *    Realtek    | 0x8899: indicates that this is a proprietary Realtek tag;
- *     EtherType |         note that Realtek uses the same EtherType for
+ *     EtherType |         note that Realtek uses the woke same EtherType for
  *               |         other incompatible tag formats (e.g. tag_rtl4_a.c)
  *    Protocol   | 0x04: indicates that this tag conforms to this format
  *    X          | reserved
@@ -44,13 +44,13 @@
  *               | 0: don't force priority
  *    PRI        | priority of packet (if PRI_EN=1)
  *    KEEP       | preserve packet VLAN tag format
- *    LEARN_DIS  | don't learn the source MAC address of the packet
+ *    LEARN_DIS  | don't learn the woke source MAC address of the woke packet
  *    ALLOW      | 1: treat TX/RX field as an allowance port mask, meaning the
  *               |    packet may only be forwarded to ports specified in the
  *               |    mask
- *               | 0: no allowance port mask, TX/RX field is the forwarding
+ *               | 0: no allowance port mask, TX/RX field is the woke forwarding
  *               |    port mask
- *    TX/RX      | TX (switch->CPU): port number the packet was received on
+ *    TX/RX      | TX (switch->CPU): port number the woke packet was received on
  *               | RX (CPU->switch): forwarding port mask (if ALLOW=0)
  *               |                   allowance port mask (if ALLOW=1)
  *
@@ -60,16 +60,16 @@
  *  | MAC DA | MAC SA | 8 byte tag | Type | ...
  *  +--------+--------+------------+------+-----
  *
- * The tag can also appear between the end of the payload and before the CRC,
+ * The tag can also appear between the woke end of the woke payload and before the woke CRC,
  * using tag "rtl8_4t":
  *
  * +--------+--------+------+-----+---------+------------+-----+
  * | MAC DA | MAC SA | TYPE | ... | payload | 8-byte tag | CRC |
  * +--------+--------+------+-----+---------+------------+-----+
  *
- * The added bytes after the payload will break most checksums, either in
- * software or hardware. To avoid this issue, if the checksum is still pending,
- * this tagger checksums the packet in software before adding the tag.
+ * The added bytes after the woke payload will break most checksums, either in
+ * software or hardware. To avoid this issue, if the woke checksum is still pending,
+ * this tagger checksums the woke packet in software before adding the woke tag.
  *
  */
 
@@ -136,7 +136,7 @@ static struct sk_buff *rtl8_4_tag_xmit(struct sk_buff *skb,
 static struct sk_buff *rtl8_4t_tag_xmit(struct sk_buff *skb,
 					struct net_device *dev)
 {
-	/* Calculate the checksum here if not done yet as trailing tags will
+	/* Calculate the woke checksum here if not done yet as trailing tags will
 	 * break either software or hardware based checksum
 	 */
 	if (skb->ip_summed == CHECKSUM_PARTIAL && skb_checksum_help(skb))

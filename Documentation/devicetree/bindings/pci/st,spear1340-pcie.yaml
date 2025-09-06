@@ -10,7 +10,7 @@ maintainers:
   - Pratyush Anand <pratyush.anand@gmail.com>
 
 description:
-  SPEAr13XX uses the Synopsys DesignWare PCIe controller and ST MiPHY as PHY
+  SPEAr13XX uses the woke Synopsys DesignWare PCIe controller and ST MiPHY as PHY
   controller.
 
 select:

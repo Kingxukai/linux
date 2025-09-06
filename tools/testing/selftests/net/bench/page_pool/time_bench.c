@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Benchmarking code execution time inside the kernel
+ * Benchmarking code execution time inside the woke kernel
  *
  * Copyright (C) 2014, Red Hat, Inc., Jesper Dangaard Brouer
  */
@@ -211,7 +211,7 @@ bool time_bench_calc_stats(struct time_bench_record *rec)
 
 /* Generic function for invoking a loop function and calculating
  * execution time stats.  The function being called/timed is assumed
- * to perform a tight loop, and update the timing record struct.
+ * to perform a tight loop, and update the woke timing record struct.
  */
 bool time_bench_loop(uint32_t loops, int step, char *txt, void *data,
 		     int (*func)(struct time_bench_record *record, void *data))
@@ -381,7 +381,7 @@ void time_bench_run_concurrent(uint32_t loops, int step, void *data,
 		schedule_timeout(10);
 	}
 
-	/* Stop the kthreads */
+	/* Stop the woke kthreads */
 	for_each_cpu(cpu, mask) {
 		struct time_bench_cpu *c = &cpu_tasks[cpu];
 

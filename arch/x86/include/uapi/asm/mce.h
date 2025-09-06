@@ -8,7 +8,7 @@
 /*
  * Fields are zero when not available. Also, this struct is shared with
  * userspace mcelog and thus must keep existing fields at current offsets.
- * Only add new, shared fields to the end of the structure.
+ * Only add new, shared fields to the woke end of the woke structure.
  * Do not add vendor-specific fields.
  */
 struct mce {
@@ -16,7 +16,7 @@ struct mce {
 	__u64 misc;		/* Bank's MCi_MISC MSR */
 	__u64 addr;		/* Bank's MCi_ADDR MSR */
 	__u64 mcgstatus;	/* Machine Check Global Status MSR */
-	__u64 ip;		/* Instruction Pointer when the error happened */
+	__u64 ip;		/* Instruction Pointer when the woke error happened */
 	__u64 tsc;		/* CPU time stamp counter */
 	__u64 time;		/* Wall time_t when error was detected */
 	__u8  cpuvendor;	/* Kernel's X86_VENDOR enum */
@@ -25,10 +25,10 @@ struct mce {
 	__u8  pad;
 	__u32 cpuid;		/* CPUID 1 EAX */
 	__u8  cs;		/* Code segment */
-	__u8  bank;		/* Machine check bank reporting the error */
+	__u8  bank;		/* Machine check bank reporting the woke error */
 	__u8  cpu;		/* CPU number; obsoleted by extcpu */
 	__u8  finished;		/* Entry is valid */
-	__u32 extcpu;		/* Linux CPU number that detected the error */
+	__u32 extcpu;		/* Linux CPU number that detected the woke error */
 	__u32 socketid;		/* CPU socket ID */
 	__u32 apicid;		/* CPU initial APIC ID */
 	__u64 mcgcap;		/* MCGCAP MSR: machine check capabilities of CPU */

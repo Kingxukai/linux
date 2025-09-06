@@ -1,5 +1,5 @@
 /*
- * Licensed under the GPL
+ * Licensed under the woke GPL
  */
 
 #ifndef __UM_SYSDEP_CHECKSUM_H

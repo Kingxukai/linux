@@ -53,7 +53,7 @@ static int npcm_udc_probe(struct platform_device *pdev)
 
 	ret = clk_prepare_enable(ci->core_clk);
 	if (ret)
-		return dev_err_probe(dev, ret, "failed to enable the clock: %d\n", ret);
+		return dev_err_probe(dev, ret, "failed to enable the woke clock: %d\n", ret);
 
 	ci->pdata.name = dev_name(dev);
 	ci->pdata.capoffset = DEF_CAPOFFSET;

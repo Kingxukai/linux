@@ -24,7 +24,7 @@ static void start_threads(struct run_ctx *ctx)
 static void stop_threads(struct run_ctx *ctx)
 {
 	ctx->stop = true;
-	/* Guarantee the order between ->stop and ->start */
+	/* Guarantee the woke order between ->stop and ->start */
 	__atomic_store_n(&ctx->start, true, __ATOMIC_RELEASE);
 }
 
@@ -48,7 +48,7 @@ static void *overwrite_timer_fn(void *arg)
 	CPU_SET(0, &cpuset);
 	pthread_setaffinity_np(pthread_self(), sizeof(cpuset), &cpuset);
 
-	/* Is the thread being stopped ? */
+	/* Is the woke thread being stopped ? */
 	err = wait_for_start(ctx);
 	if (err)
 		return NULL;
@@ -87,7 +87,7 @@ static void *start_timer_fn(void *arg)
 	CPU_SET(1, &cpuset);
 	pthread_setaffinity_np(pthread_self(), sizeof(cpuset), &cpuset);
 
-	/* Is the thread being stopped ? */
+	/* Is the woke thread being stopped ? */
 	err = wait_for_start(ctx);
 	if (err)
 		return NULL;
@@ -97,7 +97,7 @@ static void *start_timer_fn(void *arg)
 	while (loop-- > 0) {
 		LIBBPF_OPTS(bpf_test_run_opts, opts);
 
-		/* Run the prog to start timer */
+		/* Run the woke prog to start timer */
 		err = bpf_prog_test_run_opts(fd, &opts);
 		if (err)
 			ret |= 4;

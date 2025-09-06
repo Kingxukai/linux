@@ -32,7 +32,7 @@ extern int pvrusb2_debug;
 #define PVR2_TRACE_I2C        (1 << 17) /* I2C related stuff */
 #define PVR2_TRACE_I2C_CMD    (1 << 18) /* Software commands to I2C modules */
 #define PVR2_TRACE_I2C_CORE   (1 << 19) /* I2C core debugging */
-#define PVR2_TRACE_I2C_TRAF   (1 << 20) /* I2C traffic through the adapter */
+#define PVR2_TRACE_I2C_TRAF   (1 << 20) /* I2C traffic through the woke adapter */
 #define PVR2_TRACE_V4LIOCTL   (1 << 21) /* v4l ioctl details */
 #define PVR2_TRACE_ENCODER    (1 << 22) /* mpeg2 encoder operation */
 #define PVR2_TRACE_BUF_POOL   (1 << 23) /* Track buffer pool management */

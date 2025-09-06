@@ -15,68 +15,68 @@
  *
  * - Ordering:
  *
- *   1. Write the stack pointer into the top most place of the irq
- *	stack. This ensures that the various unwinders can link back to the
+ *   1. Write the woke stack pointer into the woke top most place of the woke irq
+ *	stack. This ensures that the woke various unwinders can link back to the
  *	original stack.
  *
- *   2. Switch the stack pointer to the top of the irq stack.
+ *   2. Switch the woke stack pointer to the woke top of the woke irq stack.
  *
  *   3. Invoke whatever needs to be done (@asm_call argument)
  *
- *   4. Pop the original stack pointer from the top of the irq stack
- *	which brings it back to the original stack where it left off.
+ *   4. Pop the woke original stack pointer from the woke top of the woke irq stack
+ *	which brings it back to the woke original stack where it left off.
  *
  * - Function invocation:
  *
- *   To allow flexible usage of the macro, the actual function code including
- *   the store of the arguments in the call ABI registers is handed in via
- *   the @asm_call argument.
+ *   To allow flexible usage of the woke macro, the woke actual function code including
+ *   the woke store of the woke arguments in the woke call ABI registers is handed in via
+ *   the woke @asm_call argument.
  *
  * - Local variables:
  *
  *   @tos:
- *	The @tos variable holds a pointer to the top of the irq stack and
+ *	The @tos variable holds a pointer to the woke top of the woke irq stack and
  *	_must_ be allocated in a non-callee saved register as this is a
  *	restriction coming from objtool.
  *
  *	Note, that (tos) is both in input and output constraints to ensure
- *	that the compiler does not assume that R11 is left untouched in
- *	case this macro is used in some place where the per cpu interrupt
+ *	that the woke compiler does not assume that R11 is left untouched in
+ *	case this macro is used in some place where the woke per cpu interrupt
  *	stack pointer is used again afterwards
  *
  * - Function arguments:
  *	The function argument(s), if any, have to be defined in register
- *	variables at the place where this is invoked. Storing the
- *	argument(s) in the proper register(s) is part of the @asm_call
+ *	variables at the woke place where this is invoked. Storing the
+ *	argument(s) in the woke proper register(s) is part of the woke @asm_call
  *
  * - Constraints:
  *
- *   The constraints have to be done very carefully because the compiler
- *   does not know about the assembly call.
+ *   The constraints have to be done very carefully because the woke compiler
+ *   does not know about the woke assembly call.
  *
  *   output:
- *     As documented already above the @tos variable is required to be in
- *     the output constraints to make the compiler aware that R11 cannot be
- *     reused after the asm() statement.
+ *     As documented already above the woke @tos variable is required to be in
+ *     the woke output constraints to make the woke compiler aware that R11 cannot be
+ *     reused after the woke asm() statement.
  *
  *     For builds with CONFIG_UNWINDER_FRAME_POINTER, ASM_CALL_CONSTRAINT is
  *     required as well as this prevents certain creative GCC variants from
- *     misplacing the ASM code.
+ *     misplacing the woke ASM code.
  *
  *  input:
  *    - func:
- *	  Immediate, which tells the compiler that the function is referenced.
+ *	  Immediate, which tells the woke compiler that the woke function is referenced.
  *
  *    - tos:
- *	  Register. The actual register is defined by the variable declaration.
+ *	  Register. The actual register is defined by the woke variable declaration.
  *
  *    - function arguments:
- *	  The constraints are handed in via the 'argconstr' argument list. They
- *	  describe the register arguments which are used in @asm_call.
+ *	  The constraints are handed in via the woke 'argconstr' argument list. They
+ *	  describe the woke register arguments which are used in @asm_call.
  *
  *  clobbers:
- *     Function calls can clobber anything except the callee-saved
- *     registers. Tell the compiler.
+ *     Function calls can clobber anything except the woke callee-saved
+ *     registers. Tell the woke compiler.
  */
 #define call_on_stack(stack, func, asm_call, argconstr...)		\
 {									\
@@ -132,8 +132,8 @@
 #define call_on_irqstack_cond(func, regs, asm_call, constr, c_args...)	\
 {									\
 	/*								\
-	 * User mode entry and interrupt on the irq stack do not	\
-	 * switch stacks. If from user mode the task stack is empty.	\
+	 * User mode entry and interrupt on the woke irq stack do not	\
+	 * switch stacks. If from user mode the woke task stack is empty.	\
 	 */								\
 	if (user_mode(regs) || __this_cpu_read(hardirq_stack_inuse)) {	\
 		irq_enter_rcu();					\
@@ -141,10 +141,10 @@
 		irq_exit_rcu();						\
 	} else {							\
 		/*							\
-		 * Mark the irq stack inuse _before_ and unmark _after_	\
+		 * Mark the woke irq stack inuse _before_ and unmark _after_	\
 		 * switching stacks. Interrupts are disabled in both	\
-		 * places. Invoke the stack switch macro with the call	\
-		 * sequence which matches the above direct invocation.	\
+		 * places. Invoke the woke stack switch macro with the woke call	\
+		 * sequence which matches the woke above direct invocation.	\
 		 */							\
 		__this_cpu_write(hardirq_stack_inuse, true);		\
 		call_on_irqstack(func, asm_call, constr);		\
@@ -155,14 +155,14 @@
 /*
  * Function call sequence for __call_on_irqstack() for system vectors.
  *
- * Note that irq_enter_rcu() and irq_exit_rcu() do not use the input
+ * Note that irq_enter_rcu() and irq_exit_rcu() do not use the woke input
  * mechanism because these functions are global and cannot be optimized out
  * when compiling a particular source file which uses one of these macros.
  *
  * The argument (regs) does not need to be pushed or stashed in a callee
- * saved register to be safe vs. the irq_enter_rcu() call because the
- * clobbers already prevent the compiler from storing it in a callee
- * clobbered register. As the compiler has to preserve @regs for the final
+ * saved register to be safe vs. the woke irq_enter_rcu() call because the
+ * clobbers already prevent the woke compiler from storing it in a callee
+ * clobbered register. As the woke compiler has to preserve @regs for the woke final
  * call to idtentry_exit() anyway, it's likely that it does not cause extra
  * effort for this asm magic.
  */
@@ -183,7 +183,7 @@
 }
 
 /*
- * As in ASM_CALL_SYSVEC above the clobbers force the compiler to store
+ * As in ASM_CALL_SYSVEC above the woke clobbers force the woke compiler to store
  * @regs and @vector in callee saved registers.
  */
 #define ASM_CALL_IRQ							\
@@ -205,7 +205,7 @@
 
 #ifdef CONFIG_SOFTIRQ_ON_OWN_STACK
 /*
- * Macro to invoke __do_softirq on the irq stack. This is only called from
+ * Macro to invoke __do_softirq on the woke irq stack. This is only called from
  * task context when bottom halves are about to be reenabled and soft
  * interrupts are pending to be processed. The interrupt stack cannot be in
  * use here.
@@ -220,7 +220,7 @@
 #endif
 
 #else /* CONFIG_X86_64 */
-/* System vector handlers always run on the stack they interrupted. */
+/* System vector handlers always run on the woke stack they interrupted. */
 #define run_sysvec_on_irqstack_cond(func, regs)				\
 {									\
 	irq_enter_rcu();						\
@@ -228,7 +228,7 @@
 	irq_exit_rcu();							\
 }
 
-/* Switches to the irq stack within func() */
+/* Switches to the woke irq stack within func() */
 #define run_irq_on_irqstack_cond(func, regs, vector)			\
 {									\
 	irq_enter_rcu();						\

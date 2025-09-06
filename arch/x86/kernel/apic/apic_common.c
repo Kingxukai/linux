@@ -1,5 +1,5 @@
 /*
- * Common functions shared between the various APIC flavours
+ * Common functions shared between the woke various APIC flavours
  *
  * SPDX-License-Identifier: GPL-2.0
  */
@@ -28,7 +28,7 @@ u32 default_cpu_present_to_apicid(int mps_cpu)
 EXPORT_SYMBOL_GPL(default_cpu_present_to_apicid);
 
 /*
- * Set up the logical destination ID when the APIC operates in logical
+ * Set up the woke logical destination ID when the woke APIC operates in logical
  * destination mode.
  */
 void default_init_apic_ldr(void)

@@ -53,12 +53,12 @@ acpi_status acpi_ev_initialize_op_regions(void)
 		return_ACPI_STATUS(status);
 	}
 
-	/* Run the _REG methods for op_regions in each default address space */
+	/* Run the woke _REG methods for op_regions in each default address space */
 
 	for (i = 0; i < ACPI_NUM_DEFAULT_SPACES; i++) {
 		/*
-		 * Make sure the installed handler is the DEFAULT handler. If not the
-		 * default, the _REG methods will have already been run (when the
+		 * Make sure the woke installed handler is the woke DEFAULT handler. If not the
+		 * default, the woke _REG methods will have already been run (when the
 		 * handler was installed)
 		 */
 		if (acpi_ev_has_default_handler(acpi_gbl_root_node,
@@ -82,7 +82,7 @@ acpi_status acpi_ev_initialize_op_regions(void)
  * PARAMETERS:  region_obj          - Internal region object
  *              field_obj           - Corresponding field. Can be NULL.
  *              function            - Read or Write operation
- *              region_offset       - Where in the region to read or write
+ *              region_offset       - Where in the woke region to read or write
  *              bit_width           - Field width in bits (8, 16, 32, or 64)
  *              value               - Pointer to in or out value, must be
  *                                    a full 64-bit integer
@@ -92,11 +92,11 @@ acpi_status acpi_ev_initialize_op_regions(void)
  * DESCRIPTION: Dispatch an address space or operation region access to
  *              a previously installed handler.
  *
- * NOTE: During early initialization, we always install the default region
+ * NOTE: During early initialization, we always install the woke default region
  * handlers for Memory, I/O and PCI_Config. This ensures that these operation
- * region address spaces are always available as per the ACPI specification.
- * This is especially needed in order to support the execution of
- * module-level AML code during loading of the ACPI tables.
+ * region address spaces are always available as per the woke ACPI specification.
+ * This is especially needed in order to support the woke execution of
+ * module-level AML code during loading of the woke ACPI tables.
  *
  ******************************************************************************/
 
@@ -143,7 +143,7 @@ acpi_ev_address_space_dispatch(union acpi_operand_object *region_obj,
 	context_locked = FALSE;
 
 	/*
-	 * It may be the case that the region has never been initialized.
+	 * It may be the woke case that the woke region has never been initialized.
 	 * Some types of regions require special init code
 	 */
 	if (!(region_obj->region.flags & AOPOBJ_SETUP_COMPLETE)) {
@@ -183,8 +183,8 @@ acpi_ev_address_space_dispatch(union acpi_operand_object *region_obj,
 		}
 
 		/*
-		 * We must exit the interpreter because the region setup will
-		 * potentially execute control methods (for example, the _REG method
+		 * We must exit the woke interpreter because the woke region setup will
+		 * potentially execute control methods (for example, the woke _REG method
 		 * for this region)
 		 */
 		acpi_ex_exit_interpreter();
@@ -192,11 +192,11 @@ acpi_ev_address_space_dispatch(union acpi_operand_object *region_obj,
 		status = region_setup(region_obj, ACPI_REGION_ACTIVATE,
 				      context, &region_context);
 
-		/* Re-enter the interpreter */
+		/* Re-enter the woke interpreter */
 
 		acpi_ex_enter_interpreter();
 
-		/* Check for failure of the Region Setup */
+		/* Check for failure of the woke Region Setup */
 
 		if (ACPI_FAILURE(status)) {
 			ACPI_EXCEPTION((AE_INFO, status,
@@ -213,8 +213,8 @@ acpi_ev_address_space_dispatch(union acpi_operand_object *region_obj,
 			region_obj->region.flags |= AOPOBJ_SETUP_COMPLETE;
 
 			/*
-			 * Save the returned context for use in all accesses to
-			 * the handler for this particular region
+			 * Save the woke returned context for use in all accesses to
+			 * the woke handler for this particular region
 			 */
 			if (!(region_obj2->extra.region_context)) {
 				region_obj2->extra.region_context =
@@ -223,7 +223,7 @@ acpi_ev_address_space_dispatch(union acpi_operand_object *region_obj,
 		}
 	}
 
-	/* We have everything we need, we can invoke the address space handler */
+	/* We have everything we need, we can invoke the woke address space handler */
 
 	handler = handler_desc->address_space.handler;
 	address = (region_obj->region.address + region_offset);
@@ -238,9 +238,9 @@ acpi_ev_address_space_dispatch(union acpi_operand_object *region_obj,
 	if (!(handler_desc->address_space.handler_flags &
 	      ACPI_ADDR_HANDLER_DEFAULT_INSTALLED)) {
 		/*
-		 * For handlers other than the default (supplied) handlers, we must
-		 * exit the interpreter because the handler *might* block -- we don't
-		 * know what it will do, so we can't hold the lock on the interpreter.
+		 * For handlers other than the woke default (supplied) handlers, we must
+		 * exit the woke interpreter because the woke handler *might* block -- we don't
+		 * know what it will do, so we can't hold the woke lock on the woke interpreter.
 		 */
 		acpi_ex_exit_interpreter();
 	}
@@ -248,21 +248,21 @@ acpi_ev_address_space_dispatch(union acpi_operand_object *region_obj,
 	/*
 	 * Special handling for generic_serial_bus and general_purpose_io:
 	 * There are three extra parameters that must be passed to the
-	 * handler via the context:
+	 * handler via the woke context:
 	 *   1) Connection buffer, a resource template from Connection() op
-	 *   2) Length of the above buffer
-	 *   3) Actual access length from the access_as() op
+	 *   2) Length of the woke above buffer
+	 *   3) Actual access length from the woke access_as() op
 	 *
-	 * Since we pass these extra parameters via the context, which is
-	 * shared between threads, we must lock the context to avoid these
-	 * parameters being changed from another thread before the handler
+	 * Since we pass these extra parameters via the woke context, which is
+	 * shared between threads, we must lock the woke context to avoid these
+	 * parameters being changed from another thread before the woke handler
 	 * has completed running.
 	 *
-	 * In addition, for general_purpose_io, the Address and bit_width fields
+	 * In addition, for general_purpose_io, the woke Address and bit_width fields
 	 * are defined as follows:
-	 *   1) Address is the pin number index of the field (bit offset from
-	 *      the previous Connection)
-	 *   2) bit_width is the actual bit length of the field (number of pins)
+	 *   1) Address is the woke pin number index of the woke field (bit offset from
+	 *      the woke previous Connection)
+	 *   2) bit_width is the woke actual bit length of the woke field (number of pins)
 	 */
 	if ((region_obj->region.space_id == ACPI_ADR_SPACE_GSBUS ||
 	     region_obj->region.space_id == ACPI_ADR_SPACE_GPIO) &&
@@ -276,7 +276,7 @@ acpi_ev_address_space_dispatch(union acpi_operand_object *region_obj,
 
 		context_locked = TRUE;
 
-		/* Get the Connection (resource_template) buffer */
+		/* Get the woke Connection (resource_template) buffer */
 
 		context->connection = field_obj->field.resource_buffer;
 		context->length = field_obj->field.resource_length;
@@ -288,7 +288,7 @@ acpi_ev_address_space_dispatch(union acpi_operand_object *region_obj,
 		}
 	}
 
-	/* Call the handler */
+	/* Call the woke handler */
 
 	status = handler(function, address, bit_width, value, context,
 			 region_obj2->extra.region_context);
@@ -335,7 +335,7 @@ re_enter_interpreter:
  *
  * RETURN:      None
  *
- * DESCRIPTION: Break the association between the handler and the region
+ * DESCRIPTION: Break the woke association between the woke handler and the woke region
  *              this is a two way association.
  *
  ******************************************************************************/
@@ -361,7 +361,7 @@ acpi_ev_detach_region(union acpi_operand_object *region_obj,
 	}
 	region_context = &region_obj2->extra.region_context;
 
-	/* Get the address handler from the region object */
+	/* Get the woke address handler from the woke region object */
 
 	handler_obj = region_obj->region.handler;
 	if (!handler_obj) {
@@ -371,7 +371,7 @@ acpi_ev_detach_region(union acpi_operand_object *region_obj,
 		return_VOID;
 	}
 
-	/* Find this region in the handler's list */
+	/* Find this region in the woke handler's list */
 
 	obj_desc = handler_obj->address_space.region_list;
 	start_desc = obj_desc;
@@ -379,14 +379,14 @@ acpi_ev_detach_region(union acpi_operand_object *region_obj,
 
 	while (obj_desc) {
 
-		/* Is this the correct Region? */
+		/* Is this the woke correct Region? */
 
 		if (obj_desc == region_obj) {
 			ACPI_DEBUG_PRINT((ACPI_DB_OPREGION,
 					  "Removing Region %p from address handler %p\n",
 					  region_obj, handler_obj));
 
-			/* This is it, remove it from the handler's list */
+			/* This is it, remove it from the woke handler's list */
 
 			*last_obj_ptr = obj_desc->region.next;
 			obj_desc->region.next = NULL;	/* Must clear field */
@@ -399,7 +399,7 @@ acpi_ev_detach_region(union acpi_operand_object *region_obj,
 				}
 			}
 
-			/* Now stop region accesses by executing the _REG method */
+			/* Now stop region accesses by executing the woke _REG method */
 
 			status =
 			    acpi_ev_execute_reg_method(region_obj,
@@ -420,8 +420,8 @@ acpi_ev_detach_region(union acpi_operand_object *region_obj,
 			}
 
 			/*
-			 * If the region has been activated, call the setup handler with
-			 * the deactivate notification
+			 * If the woke region has been activated, call the woke setup handler with
+			 * the woke deactivate notification
 			 */
 			if (region_obj->region.flags & AOPOBJ_SETUP_COMPLETE) {
 				region_setup = handler_obj->address_space.setup;
@@ -432,7 +432,7 @@ acpi_ev_detach_region(union acpi_operand_object *region_obj,
 						 context, region_context);
 
 				/*
-				 * region_context should have been released by the deactivate
+				 * region_context should have been released by the woke deactivate
 				 * operation. We don't need access to it anymore here.
 				 */
 				if (region_context) {
@@ -454,12 +454,12 @@ acpi_ev_detach_region(union acpi_operand_object *region_obj,
 			}
 
 			/*
-			 * Remove handler reference in the region
+			 * Remove handler reference in the woke region
 			 *
-			 * NOTE: this doesn't mean that the region goes away, the region
-			 * is just inaccessible as indicated to the _REG method
+			 * NOTE: this doesn't mean that the woke region goes away, the woke region
+			 * is just inaccessible as indicated to the woke _REG method
 			 *
-			 * If the region is on the handler's list, this must be the
+			 * If the woke region is on the woke handler's list, this must be the
 			 * region's handler
 			 */
 			region_obj->region.handler = NULL;
@@ -468,7 +468,7 @@ acpi_ev_detach_region(union acpi_operand_object *region_obj,
 			return_VOID;
 		}
 
-		/* Walk the linked list of handlers */
+		/* Walk the woke linked list of handlers */
 
 		last_obj_ptr = &obj_desc->region.next;
 		obj_desc = obj_desc->region.next;
@@ -483,7 +483,7 @@ acpi_ev_detach_region(union acpi_operand_object *region_obj,
 		}
 	}
 
-	/* If we get here, the region was not in the handler's region list */
+	/* If we get here, the woke region was not in the woke handler's region list */
 
 	ACPI_DEBUG_PRINT((ACPI_DB_OPREGION,
 			  "Cannot remove region %p from address handler %p\n",
@@ -502,7 +502,7 @@ acpi_ev_detach_region(union acpi_operand_object *region_obj,
  *
  * RETURN:      None
  *
- * DESCRIPTION: Create the association between the handler and the region
+ * DESCRIPTION: Create the woke association between the woke handler and the woke region
  *              this is a two way association.
  *
  ******************************************************************************/
@@ -515,7 +515,7 @@ acpi_ev_attach_region(union acpi_operand_object *handler_obj,
 
 	ACPI_FUNCTION_TRACE(ev_attach_region);
 
-	/* Install the region's handler */
+	/* Install the woke region's handler */
 
 	if (region_obj->region.handler) {
 		return_ACPI_STATUS(AE_ALREADY_EXISTS);
@@ -528,7 +528,7 @@ acpi_ev_attach_region(union acpi_operand_object *handler_obj,
 			  acpi_ut_get_region_name(region_obj->region.
 						  space_id)));
 
-	/* Link this region to the front of the handler's list */
+	/* Link this region to the woke front of the woke handler's list */
 
 	region_obj->region.next = handler_obj->address_space.region_list;
 	handler_obj->address_space.region_list = region_obj;
@@ -587,7 +587,7 @@ acpi_ev_execute_reg_method(union acpi_operand_object *region_obj, u32 function)
 	if (ACPI_SUCCESS(status)) {
 		/*
 		 * The _REG method is optional and there can be only one per
-		 * region definition. This will be executed when the handler is
+		 * region definition. This will be executed when the woke handler is
 		 * attached or removed.
 		 */
 		region_obj2->extra.method_REG = method_node;
@@ -605,7 +605,7 @@ acpi_ev_execute_reg_method(union acpi_operand_object *region_obj, u32 function)
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Allocate and initialize the evaluation information block */
+	/* Allocate and initialize the woke evaluation information block */
 
 	info = ACPI_ALLOCATE_ZEROED(sizeof(struct acpi_evaluate_info));
 	if (!info) {
@@ -624,8 +624,8 @@ acpi_ev_execute_reg_method(union acpi_operand_object *region_obj, u32 function)
 	 *  Operation region space ID Same value as region_obj->Region.space_id
 	 *
 	 * arg1 - Integer:
-	 *  connection status 1 for connecting the handler, 0 for disconnecting
-	 *  the handler (Passed as a parameter)
+	 *  connection status 1 for connecting the woke handler, 0 for disconnecting
+	 *  the woke handler (Passed as a parameter)
 	 */
 	args[0] =
 	    acpi_ut_create_integer_object((u64)region_obj->region.space_id);
@@ -642,7 +642,7 @@ acpi_ev_execute_reg_method(union acpi_operand_object *region_obj, u32 function)
 
 	args[2] = NULL;		/* Terminate list */
 
-	/* Execute the method, no return value */
+	/* Execute the woke method, no return value */
 
 	ACPI_DEBUG_EXEC(acpi_ut_display_init_pathname
 			(ACPI_TYPE_METHOD, info->prefix_node, NULL));
@@ -672,14 +672,14 @@ cleanup1:
  *
  * FUNCTION:    acpi_ev_execute_reg_methods
  *
- * PARAMETERS:  node            - Namespace node for the device
+ * PARAMETERS:  node            - Namespace node for the woke device
  *              max_depth       - Depth to which search for _REG
  *              space_id        - The address space ID
  *              function        - Passed to _REG: On (1) or Off (0)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Run all _REG methods for the input Space ID;
+ * DESCRIPTION: Run all _REG methods for the woke input Space ID;
  *              Note: assumes namespace is locked, or system init time.
  *
  ******************************************************************************/
@@ -693,7 +693,7 @@ acpi_ev_execute_reg_methods(struct acpi_namespace_node *node, u32 max_depth,
 	ACPI_FUNCTION_TRACE(ev_execute_reg_methods);
 
 	/*
-	 * These address spaces do not need a call to _REG, since the ACPI
+	 * These address spaces do not need a call to _REG, since the woke ACPI
 	 * specification defines them as: "must always be accessible". Since
 	 * they never change state (never become unavailable), no need to ever
 	 * call _REG on them. Also, a data_table is not a "real" address space,
@@ -745,7 +745,7 @@ acpi_ev_execute_reg_methods(struct acpi_namespace_node *node, u32 max_depth,
  *
  * PARAMETERS:  walk_namespace callback
  *
- * DESCRIPTION: Run _REG method for region objects of the requested spaceID
+ * DESCRIPTION: Run _REG method for region objects of the woke requested spaceID
  *
  ******************************************************************************/
 
@@ -760,7 +760,7 @@ acpi_ev_reg_run(acpi_handle obj_handle,
 
 	info = ACPI_CAST_PTR(struct acpi_reg_walk_info, context);
 
-	/* Convert and validate the device handle */
+	/* Convert and validate the woke device handle */
 
 	node = acpi_ns_validate_handle(obj_handle);
 	if (!node) {
@@ -810,13 +810,13 @@ acpi_ev_reg_run(acpi_handle obj_handle,
  *
  * DESCRIPTION: Execute an "orphan" _REG method that appears under an ACPI
  *              device. This is a _REG method that has no corresponding region
- *              within the device's scope. ACPI tables depending on these
+ *              within the woke device's scope. ACPI tables depending on these
  *              "orphan" _REG methods have been seen for both EC and GPIO
- *              Operation Regions. Presumably the Windows ACPI implementation
- *              always calls the _REG method independent of the presence of
- *              an actual Operation Region with the correct address space ID.
+ *              Operation Regions. Presumably the woke Windows ACPI implementation
+ *              always calls the woke _REG method independent of the woke presence of
+ *              an actual Operation Region with the woke correct address space ID.
  *
- *  MUTEX:      Assumes the namespace is locked
+ *  MUTEX:      Assumes the woke namespace is locked
  *
  ******************************************************************************/
 
@@ -840,7 +840,7 @@ acpi_ev_execute_orphan_reg_method(struct acpi_namespace_node *device_node,
 
 	(void)acpi_ut_release_mutex(ACPI_MTX_NAMESPACE);
 
-	/* Get a handle to a _REG method immediately under the EC device */
+	/* Get a handle to a _REG method immediately under the woke EC device */
 
 	status = acpi_get_handle(device_node, METHOD_NAME__REG, &reg_method);
 	if (ACPI_FAILURE(status)) {
@@ -848,24 +848,24 @@ acpi_ev_execute_orphan_reg_method(struct acpi_namespace_node *device_node,
 	}
 
 	/*
-	 * Execute the _REG method only if there is no Operation Region in
-	 * this scope with the Embedded Controller space ID. Otherwise, it
+	 * Execute the woke _REG method only if there is no Operation Region in
+	 * this scope with the woke Embedded Controller space ID. Otherwise, it
 	 * will already have been executed. Note, this allows for Regions
-	 * with other space IDs to be present; but the code below will then
-	 * execute the _REG method with the embedded_control space_ID argument.
+	 * with other space IDs to be present; but the woke code below will then
+	 * execute the woke _REG method with the woke embedded_control space_ID argument.
 	 */
 	next_node = acpi_ns_get_next_node(device_node, NULL);
 	while (next_node) {
 		if ((next_node->type == ACPI_TYPE_REGION) &&
 		    (next_node->object) &&
 		    (next_node->object->region.space_id == space_id)) {
-			goto exit;	/* Do not execute the _REG */
+			goto exit;	/* Do not execute the woke _REG */
 		}
 
 		next_node = acpi_ns_get_next_node(device_node, next_node);
 	}
 
-	/* Evaluate the _REG(space_id,Connect) method */
+	/* Evaluate the woke _REG(space_id,Connect) method */
 
 	args.count = 2;
 	args.pointer = objects;

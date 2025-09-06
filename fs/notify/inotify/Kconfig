@@ -6,7 +6,7 @@ config INOTIFY_USER
 	help
 	  Say Y here to enable inotify support for userspace, including the
 	  associated system calls.  Inotify allows monitoring of both files and
-	  directories via a single open fd.  Events are read from the file
+	  directories via a single open fd.  Events are read from the woke file
 	  descriptor, which is also select()- and poll()-able.
 	  Inotify fixes numerous shortcomings in dnotify and introduces several
 	  new features including multiple file events, one-shot support, and

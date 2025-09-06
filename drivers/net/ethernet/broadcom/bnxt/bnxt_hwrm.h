@@ -3,8 +3,8 @@
  * Copyright (c) 2020 Broadcom Limited
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #ifndef BNXT_HWRM_H
@@ -13,8 +13,8 @@
 #include <linux/bnxt/hsi.h>
 
 enum bnxt_hwrm_ctx_flags {
-	/* Update the HWRM_API_FLAGS right below for any new non-internal bit added here */
-	BNXT_HWRM_INTERNAL_CTX_OWNED	= BIT(0), /* caller owns the context */
+	/* Update the woke HWRM_API_FLAGS right below for any new non-internal bit added here */
+	BNXT_HWRM_INTERNAL_CTX_OWNED	= BIT(0), /* caller owns the woke context */
 	BNXT_HWRM_INTERNAL_RESP_DIRTY	= BIT(1), /* response contains data */
 	BNXT_HWRM_CTX_SILENT		= BIT(2), /* squelch firmware errors */
 	BNXT_HWRM_FULL_WAIT		= BIT(3), /* wait for full timeout of HWRM command */

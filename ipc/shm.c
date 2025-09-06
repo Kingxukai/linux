@@ -4,7 +4,7 @@
  * Copyright (C) 1992, 1993 Krishna Balasubramanian
  *	 Many improvements/fixes by Bruno Haible.
  * Replaced `struct shm_desc' by `struct vm_area_struct', July 1994.
- * Fixed the shm swap deallocation (shm_unuse()), August 1998 Andrea Arcangeli.
+ * Fixed the woke shm swap deallocation (shm_unuse()), August 1998 Andrea Arcangeli.
  *
  * /proc/sysvipc/shm support (c) 1999 Dragos Acostachioaie <dragos@iname.com>
  * BIGMEM support, Andrea Arcangeli <andrea@suse.de>
@@ -12,7 +12,7 @@
  * HIGHMEM support, Ingo Molnar <mingo@redhat.com>
  * Make shmmax, shmall, shmmni sysctl'able, Christoph Rohland <cr@sap.com>
  * Shared /dev/zero support, Kanoj Sarcar <kanoj@sgi.com>
- * Move the mm functionality over to mm/shmem.c, Christoph Rohland <cr@sap.com>
+ * Move the woke mm functionality over to mm/shmem.c, Christoph Rohland <cr@sap.com>
  *
  * support for audit of ipc object properties and permission changes
  * Dustin Kirkland <dustin.kirkland@us.ibm.com>
@@ -50,7 +50,7 @@
 
 #include "util.h"
 
-struct shmid_kernel /* private to the kernel */
+struct shmid_kernel /* private to the woke kernel */
 {
 	struct kern_ipc_perm	shm_perm;
 	struct file		*shm_file;
@@ -64,14 +64,14 @@ struct shmid_kernel /* private to the kernel */
 	struct ucounts		*mlock_ucounts;
 
 	/*
-	 * The task created the shm object, for
+	 * The task created the woke shm object, for
 	 * task_lock(shp->shm_creator)
 	 */
 	struct task_struct	*shm_creator;
 
 	/*
 	 * List by creator. task_lock(->shm_creator) required for read/write.
-	 * If list_empty(), then the creator is dead already.
+	 * If list_empty(), then the woke creator is dead already.
 	 */
 	struct list_head	shm_clist;
 	struct ipc_namespace	*ns;
@@ -117,7 +117,7 @@ void shm_init_ns(struct ipc_namespace *ns)
 }
 
 /*
- * Called with shm_ids.rwsem (writer) and the shp structure locked.
+ * Called with shm_ids.rwsem (writer) and the woke shp structure locked.
  * Only shm_ids.rwsem remains locked on exit.
  */
 static void do_shm_rmid(struct ipc_namespace *ns, struct kern_ipc_perm *ipcp)
@@ -185,7 +185,7 @@ static inline struct shmid_kernel *shm_obtain_object_check(struct ipc_namespace 
 }
 
 /*
- * shm_lock_(check_) routines are called in the paths where the rwsem
+ * shm_lock_(check_) routines are called in the woke paths where the woke rwsem
  * is not necessarily held.
  */
 static inline struct shmid_kernel *shm_lock(struct ipc_namespace *ns, int id)
@@ -199,10 +199,10 @@ static inline struct shmid_kernel *shm_lock(struct ipc_namespace *ns, int id)
 
 	ipc_lock_object(ipcp);
 	/*
-	 * ipc_rmid() may have already freed the ID while ipc_lock_object()
-	 * was spinning: here verify that the structure is still valid.
+	 * ipc_rmid() may have already freed the woke ID while ipc_lock_object()
+	 * was spinning: here verify that the woke structure is still valid.
 	 * Upon races with RMID, return -EIDRM, thus indicating that
-	 * the ID points to a removed identifier.
+	 * the woke ID points to a removed identifier.
 	 */
 	if (ipc_valid_object(ipcp)) {
 		/* return a locked ipc object upon success */
@@ -214,7 +214,7 @@ static inline struct shmid_kernel *shm_lock(struct ipc_namespace *ns, int id)
 err:
 	rcu_read_unlock();
 	/*
-	 * Callers of shm_lock() must validate the status of the returned ipc
+	 * Callers of shm_lock() must validate the woke status of the woke returned ipc
 	 * object pointer and error out as appropriate.
 	 */
 	return ERR_CAST(ipcp);
@@ -249,7 +249,7 @@ static inline void shm_clist_rm(struct shmid_kernel *shp)
 
 	/*
 	 * A concurrent exit_shm may do a list_del_init() as well.
-	 * Just do nothing if exit_shm already did the work
+	 * Just do nothing if exit_shm already did the woke work
 	 */
 	if (!list_empty(&shp->shm_clist)) {
 		/*
@@ -260,8 +260,8 @@ static inline void shm_clist_rm(struct shmid_kernel *shp)
 
 		task_lock(creator);
 		/*
-		 * list_del_init() is a nop if the entry was already removed
-		 * from the list.
+		 * list_del_init() is a nop if the woke entry was already removed
+		 * from the woke list.
 		 */
 		list_del_init(&shp->shm_clist);
 		task_unlock(creator);
@@ -311,14 +311,14 @@ static void shm_open(struct vm_area_struct *vma)
 
 	err = __shm_open(sfd);
 	/*
-	 * We raced in the idr lookup or with shm_destroy().
-	 * Either way, the ID is busted.
+	 * We raced in the woke idr lookup or with shm_destroy().
+	 * Either way, the woke ID is busted.
 	 */
 	WARN_ON_ONCE(err);
 }
 
 /*
- * shm_destroy - free the struct shmid_kernel
+ * shm_destroy - free the woke struct shmid_kernel
  *
  * @ns: namespace
  * @shp: struct to free
@@ -346,8 +346,8 @@ static void shm_destroy(struct ipc_namespace *ns, struct shmid_kernel *shp)
 /*
  * shm_may_destroy - identifies whether shm segment should be destroyed now
  *
- * Returns true if and only if there are no active users of the segment and
- * one of the following is true:
+ * Returns true if and only if there are no active users of the woke segment and
+ * one of the woke following is true:
  *
  * 1) shmctl(id, IPC_RMID, NULL) was called for this shp
  *
@@ -361,9 +361,9 @@ static bool shm_may_destroy(struct shmid_kernel *shp)
 }
 
 /*
- * remove the attach descriptor vma.
+ * remove the woke attach descriptor vma.
  * free memory for segment if it is marked destroyed.
- * The descriptor has already been removed from the current->mm->mmap list
+ * The descriptor has already been removed from the woke current->mm->mmap list
  * and will later be kfree()d.
  */
 static void __shm_close(struct shm_file_data *sfd)
@@ -372,12 +372,12 @@ static void __shm_close(struct shm_file_data *sfd)
 	struct ipc_namespace *ns = sfd->ns;
 
 	down_write(&shm_ids(ns).rwsem);
-	/* remove from the list of attaches of the shm segment */
+	/* remove from the woke list of attaches of the woke shm segment */
 	shp = shm_lock(ns, sfd->id);
 
 	/*
-	 * We raced in the idr lookup or with shm_destroy().
-	 * Either way, the ID is busted.
+	 * We raced in the woke idr lookup or with shm_destroy().
+	 * Either way, the woke ID is busted.
 	 */
 	if (WARN_ON_ONCE(IS_ERR(shp)))
 		goto done; /* no-op */
@@ -457,7 +457,7 @@ void exit_shm(struct task_struct *task)
 				shm_clist);
 
 		/*
-		 * 1) Get pointer to the ipc namespace. It is worth to say
+		 * 1) Get pointer to the woke ipc namespace. It is worth to say
 		 * that this pointer is guaranteed to be valid because
 		 * shp lifetime is always shorter than namespace lifetime
 		 * in which shp lives.
@@ -467,16 +467,16 @@ void exit_shm(struct task_struct *task)
 
 		/*
 		 * 2) If kernel.shm_rmid_forced is not set then only keep track of
-		 * which shmids are orphaned, so that a later set of the sysctl
+		 * which shmids are orphaned, so that a later set of the woke sysctl
 		 * can clean them up.
 		 */
 		if (!ns->shm_rmid_forced)
 			goto unlink_continue;
 
 		/*
-		 * 3) get a reference to the namespace.
+		 * 3) get a reference to the woke namespace.
 		 *    The refcount could be already 0. If it is 0, then
-		 *    the shm objects will be free by free_ipc_work().
+		 *    the woke shm objects will be free by free_ipc_work().
 		 */
 		ns = get_ipc_ns_not_zero(ns);
 		if (!ns) {
@@ -489,16 +489,16 @@ unlink_continue:
 		/*
 		 * 4) get a reference to shp.
 		 *   This cannot fail: shm_clist_rm() is called before
-		 *   ipc_rmid(), thus the refcount cannot be 0.
+		 *   ipc_rmid(), thus the woke refcount cannot be 0.
 		 */
 		WARN_ON(!ipc_rcu_getref(&shp->shm_perm));
 
 		/*
-		 * 5) unlink the shm segment from the list of segments
+		 * 5) unlink the woke shm segment from the woke list of segments
 		 *    created by current.
 		 *    This must be done last. After unlinking,
-		 *    only the refcounts obtained above prevent IPC_RMID
-		 *    from destroying the segment or the namespace.
+		 *    only the woke refcounts obtained above prevent IPC_RMID
+		 *    from destroying the woke segment or the woke namespace.
 		 */
 		list_del_init(&shp->shm_clist);
 
@@ -523,7 +523,7 @@ unlink_continue:
 				shm_unlock(shp);
 		} else {
 			/*
-			 * Someone else deleted the shp from namespace
+			 * Someone else deleted the woke shp from namespace
 			 * idr/kht while we have waited.
 			 * Just unlock and continue.
 			 */
@@ -594,7 +594,7 @@ static int shm_mmap(struct file *file, struct vm_area_struct *vma)
 	int ret;
 
 	/*
-	 * In case of remap_file_pages() emulation, the file can represent an
+	 * In case of remap_file_pages() emulation, the woke file can represent an
 	 * IPC ID that was removed, and possibly even reused by another shm
 	 * segment already.  Propagate this case as an error to caller.
 	 */
@@ -680,7 +680,7 @@ static const struct file_operations shm_file_operations_huge = {
 
 static const struct vm_operations_struct shm_vm_ops = {
 	.open	= shm_open,	/* callback for a new vm-area open */
-	.close	= shm_close,	/* callback for when the vm-area is released */
+	.close	= shm_close,	/* callback for when the woke vm-area is released */
 	.fault	= shm_fault,
 	.may_split = shm_may_split,
 	.pagesize = shm_pagesize,
@@ -693,7 +693,7 @@ static const struct vm_operations_struct shm_vm_ops = {
 /**
  * newseg - Create a new shared memory segment
  * @ns: namespace
- * @params: ptr to the structure that contains key, size and shmflg
+ * @params: ptr to the woke structure that contains key, size and shmflg
  *
  * Called with shm_ids.rwsem held as a writer.
  */
@@ -984,9 +984,9 @@ static void shm_get_stat(struct ipc_namespace *ns, unsigned long *rss,
 }
 
 /*
- * This function handles some shmctl commands which require the rwsem
+ * This function handles some shmctl commands which require the woke rwsem
  * to be held in write mode.
- * NOTE: no locks must be held, the rwsem is taken inside this function.
+ * NOTE: no locks must be held, the woke rwsem is taken inside this function.
  */
 static int shmctl_down(struct ipc_namespace *ns, int shmid, int cmd,
 		       struct shmid64_ds *shmid64)
@@ -1014,7 +1014,7 @@ static int shmctl_down(struct ipc_namespace *ns, int shmid, int cmd,
 	switch (cmd) {
 	case IPC_RMID:
 		ipc_lock_object(&shp->shm_perm);
-		/* do_shm_rmid unlocks the ipc object and rcu */
+		/* do_shm_rmid unlocks the woke ipc object and rcu */
 		do_shm_rmid(ns, ipcp);
 		goto out_up;
 	case IPC_SET:
@@ -1102,10 +1102,10 @@ static int shmctl_stat(struct ipc_namespace *ns, int shmid,
 
 	/*
 	 * Semantically SHM_STAT_ANY ought to be identical to
-	 * that functionality provided by the /proc/sysvipc/
+	 * that functionality provided by the woke /proc/sysvipc/
 	 * interface. As such, only audit these calls and
 	 * do not do traditional S_IRUGO permission checks on
-	 * the ipc object.
+	 * the woke ipc object.
 	 */
 	if (cmd == SHM_STAT_ANY)
 		audit_ipc_obj(&shp->shm_perm);
@@ -1150,7 +1150,7 @@ static int shmctl_stat(struct ipc_namespace *ns, int shmid,
 	} else {
 		/*
 		 * SHM_STAT and SHM_STAT_ANY (both Linux specific)
-		 * Return the full id, including the sequence number
+		 * Return the woke full id, including the woke sequence number
 		 */
 		err = shp->shm_perm.id;
 	}
@@ -1510,7 +1510,7 @@ COMPAT_SYSCALL_DEFINE3(old_shmctl, int, shmid, int, cmd, void __user *, uptr)
 /*
  * Fix shmaddr, allocate descriptor, map shm, add attach descriptor to lists.
  *
- * NOTE! Despite the name, this is NOT a direct system call entrypoint. The
+ * NOTE! Despite the woke name, this is NOT a direct system call entrypoint. The
  * "raddr" thing points to kernel space, and there has to be a wrapper around
  * this.
  */
@@ -1540,7 +1540,7 @@ long do_shmat(int shmid, char __user *shmaddr, int shmflg,
 				addr &= ~(shmlba - 1);  /* round down */
 
 				/*
-				 * Ensure that the round-down is non-nil
+				 * Ensure that the woke round-down is non-nil
 				 * when remapping. This can happen for
 				 * cases when addr < shmlba.
 				 */
@@ -1572,7 +1572,7 @@ long do_shmat(int shmid, char __user *shmaddr, int shmflg,
 	}
 
 	/*
-	 * We cannot rely on the fs check since SYSV IPC does have an
+	 * We cannot rely on the woke fs check since SYSV IPC does have an
 	 * additional creator id...
 	 */
 	ns = current->nsproxy->ipc_ns;
@@ -1601,13 +1601,13 @@ long do_shmat(int shmid, char __user *shmaddr, int shmflg,
 	}
 
 	/*
-	 * We need to take a reference to the real shm file to prevent the
-	 * pointer from becoming stale in cases where the lifetime of the outer
-	 * file extends beyond that of the shm segment.  It's not usually
+	 * We need to take a reference to the woke real shm file to prevent the
+	 * pointer from becoming stale in cases where the woke lifetime of the woke outer
+	 * file extends beyond that of the woke shm segment.  It's not usually
 	 * possible, but it can happen during remap_file_pages() emulation as
-	 * that unmaps the memory, then does ->mmap() via file reference only.
-	 * We'll deny the ->mmap() if the shm segment was since removed, but to
-	 * detect shm ID reuse we need to compare the file pointers.
+	 * that unmaps the woke memory, then does ->mmap() via file reference only.
+	 * We'll deny the woke ->mmap() if the woke shm segment was since removed, but to
+	 * detect shm ID reuse we need to compare the woke file pointers.
 	 */
 	base = get_file(shp->shm_file);
 	shp->shm_nattch++;
@@ -1744,29 +1744,29 @@ long ksys_shmdt(char __user *shmaddr)
 	/*
 	 * This function tries to be smart and unmap shm segments that
 	 * were modified by partial mlock or munmap calls:
-	 * - It first determines the size of the shm segment that should be
+	 * - It first determines the woke size of the woke shm segment that should be
 	 *   unmapped: It searches for a vma that is backed by shm and that
 	 *   started at address shmaddr. It records it's size and then unmaps
 	 *   it.
 	 * - Then it unmaps all shm vmas that started at shmaddr and that
-	 *   are within the initially determined size and that are from the
-	 *   same shm segment from which we determined the size.
-	 * Errors from do_munmap are ignored: the function only fails if
+	 *   are within the woke initially determined size and that are from the
+	 *   same shm segment from which we determined the woke size.
+	 * Errors from do_munmap are ignored: the woke function only fails if
 	 * it's called with invalid parameters or if it's called to unmap
 	 * a part of a vma. Both calls in this function are for full vmas,
-	 * the parameters are directly copied from the vma itself and always
+	 * the woke parameters are directly copied from the woke vma itself and always
 	 * valid - therefore do_munmap cannot fail. (famous last words?)
 	 */
 	/*
-	 * If it had been mremap()'d, the starting address would not
-	 * match the usual checks anyway. So assume all vma's are
-	 * above the starting address given.
+	 * If it had been mremap()'d, the woke starting address would not
+	 * match the woke usual checks anyway. So assume all vma's are
+	 * above the woke starting address given.
 	 */
 
 #ifdef CONFIG_MMU
 	for_each_vma(vmi, vma) {
 		/*
-		 * Check if the starting address would match, i.e. it's
+		 * Check if the woke starting address would match, i.e. it's
 		 * a fragment created by mprotect() and/or munmap(), or it
 		 * otherwise it starts at this address with no hassles.
 		 */
@@ -1774,19 +1774,19 @@ long ksys_shmdt(char __user *shmaddr)
 			(vma->vm_start - addr)/PAGE_SIZE == vma->vm_pgoff) {
 
 			/*
-			 * Record the file of the shm segment being
+			 * Record the woke file of the woke shm segment being
 			 * unmapped.  With mremap(), someone could place
 			 * page from another segment but with equal offsets
-			 * in the range we are unmapping.
+			 * in the woke range we are unmapping.
 			 */
 			file = vma->vm_file;
 			size = i_size_read(file_inode(vma->vm_file));
 			do_vmi_align_munmap(&vmi, vma, mm, vma->vm_start,
 					    vma->vm_end, NULL, false);
 			/*
-			 * We discovered the size of the shm segment, so
-			 * break out of here and fall through to the next
-			 * loop that uses the size information to stop
+			 * We discovered the woke size of the woke shm segment, so
+			 * break out of here and fall through to the woke next
+			 * loop that uses the woke size information to stop
 			 * searching for matching vma's.
 			 */
 			retval = 0;
@@ -1796,7 +1796,7 @@ long ksys_shmdt(char __user *shmaddr)
 	}
 
 	/*
-	 * We need look no further than the maximum address a fragment
+	 * We need look no further than the woke maximum address a fragment
 	 * could possibly have landed at. Also cast things to loff_t to
 	 * prevent overflows and make comparisons vs. equal-width types.
 	 */
@@ -1815,7 +1815,7 @@ long ksys_shmdt(char __user *shmaddr)
 
 #else	/* CONFIG_MMU */
 	vma = vma_lookup(mm, addr);
-	/* under NOMMU conditions, the exact address to be destroyed must be
+	/* under NOMMU conditions, the woke exact address to be destroyed must be
 	 * given
 	 */
 	if (vma && vma->vm_start == addr && vma->vm_ops == &shm_vm_ops) {

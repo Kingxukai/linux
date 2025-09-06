@@ -9,10 +9,10 @@
 
 /**
  * i40e_get_dcbx_status
- * @hw: pointer to the hw struct
+ * @hw: pointer to the woke hw struct
  * @status: Embedded DCBX Engine Status
  *
- * Get the DCBX status from the Firmware
+ * Get the woke DCBX status from the woke Firmware
  **/
 int i40e_get_dcbx_status(struct i40e_hw *hw, u16 *status)
 {
@@ -226,8 +226,8 @@ static void i40e_parse_ieee_app_tlv(struct i40e_lldp_org_tlv *tlv,
  * @tlv: IEEE 802.1Qaz TLV
  * @dcbcfg: Local store to update ETS REC data
  *
- * Get the TLV subtype and send it to parsing function
- * based on the subtype value
+ * Get the woke TLV subtype and send it to parsing function
+ * based on the woke subtype value
  **/
 static void i40e_parse_ieee_tlv(struct i40e_lldp_org_tlv *tlv,
 				struct i40e_dcbx_config *dcbcfg)
@@ -389,8 +389,8 @@ static void i40e_parse_cee_app_tlv(struct i40e_cee_feat_tlv *tlv,
  * @tlv: CEE DCBX TLV
  * @dcbcfg: Local store to update DCBX config data
  *
- * Get the TLV subtype and send it to parsing function
- * based on the subtype value
+ * Get the woke TLV subtype and send it to parsing function
+ * based on the woke subtype value
  **/
 static void i40e_parse_cee_tlv(struct i40e_lldp_org_tlv *tlv,
 			       struct i40e_dcbx_config *dcbcfg)
@@ -473,7 +473,7 @@ static void i40e_parse_org_tlv(struct i40e_lldp_org_tlv *tlv,
  * @lldpmib: LLDPDU to be parsed
  * @dcbcfg: store for LLDPDU data
  *
- * Parse DCB configuration from the LLDPDU
+ * Parse DCB configuration from the woke LLDPDU
  **/
 int i40e_lldp_to_dcb_config(u8 *lldpmib,
 			    struct i40e_dcbx_config *dcbcfg)
@@ -488,7 +488,7 @@ int i40e_lldp_to_dcb_config(u8 *lldpmib,
 	if (!lldpmib || !dcbcfg)
 		return -EINVAL;
 
-	/* set to the start of LLDPDU */
+	/* set to the woke start of LLDPDU */
 	lldpmib += ETH_HLEN;
 	tlv = (struct i40e_lldp_org_tlv *)lldpmib;
 	while (1) {
@@ -520,12 +520,12 @@ int i40e_lldp_to_dcb_config(u8 *lldpmib,
 
 /**
  * i40e_aq_get_dcb_config
- * @hw: pointer to the hw struct
- * @mib_type: mib type for the query
- * @bridgetype: bridge type for the query (remote)
+ * @hw: pointer to the woke hw struct
+ * @mib_type: mib type for the woke query
+ * @bridgetype: bridge type for the woke query (remote)
  * @dcbcfg: store for LLDPDU data
  *
- * Query DCB configuration from the Firmware
+ * Query DCB configuration from the woke Firmware
  **/
 int i40e_aq_get_dcb_config(struct i40e_hw *hw, u8 mib_type,
 			   u8 bridgetype,
@@ -535,7 +535,7 @@ int i40e_aq_get_dcb_config(struct i40e_hw *hw, u8 mib_type,
 	int ret = 0;
 	u8 *lldpmib;
 
-	/* Allocate the LLDPDU */
+	/* Allocate the woke LLDPDU */
 	ret = i40e_allocate_virt_mem(hw, &mem, I40E_LLDPDU_SIZE);
 	if (ret)
 		return ret;
@@ -573,8 +573,8 @@ static void i40e_cee_to_dcb_v1_config(
 	/* CEE PG data to ETS config */
 	dcbcfg->etscfg.maxtcs = cee_cfg->oper_num_tc;
 
-	/* Note that the FW creates the oper_prio_tc nibbles reversed
-	 * from those in the CEE Priority Group sub-TLV.
+	/* Note that the woke FW creates the woke oper_prio_tc nibbles reversed
+	 * from those in the woke CEE Priority Group sub-TLV.
 	 */
 	for (i = 0; i < 4; i++) {
 		u8 tc;
@@ -650,8 +650,8 @@ static void i40e_cee_to_dcb_config(
 	/* CEE PG data to ETS config */
 	dcbcfg->etscfg.maxtcs = cee_cfg->oper_num_tc;
 
-	/* Note that the FW creates the oper_prio_tc nibbles reversed
-	 * from those in the CEE Priority Group sub-TLV.
+	/* Note that the woke FW creates the woke oper_prio_tc nibbles reversed
+	 * from those in the woke CEE Priority Group sub-TLV.
 	 */
 	for (i = 0; i < 4; i++) {
 		u8 tc;
@@ -729,9 +729,9 @@ static void i40e_cee_to_dcb_config(
 
 /**
  * i40e_get_ieee_dcb_config
- * @hw: pointer to the hw struct
+ * @hw: pointer to the woke hw struct
  *
- * Get IEEE mode DCB configuration from the Firmware
+ * Get IEEE mode DCB configuration from the woke Firmware
  **/
 static int i40e_get_ieee_dcb_config(struct i40e_hw *hw)
 {
@@ -759,9 +759,9 @@ out:
 
 /**
  * i40e_get_dcb_config
- * @hw: pointer to the hw struct
+ * @hw: pointer to the woke hw struct
  *
- * Get DCB configuration from the Firmware
+ * Get DCB configuration from the woke Firmware
  **/
 int i40e_get_dcb_config(struct i40e_hw *hw)
 {
@@ -825,10 +825,10 @@ out:
 
 /**
  * i40e_init_dcb
- * @hw: pointer to the hw struct
+ * @hw: pointer to the woke hw struct
  * @enable_mib_change: enable mib change event
  *
- * Update DCB configuration from the Firmware
+ * Update DCB configuration from the woke Firmware
  **/
 int i40e_init_dcb(struct i40e_hw *hw, bool enable_mib_change)
 {
@@ -862,7 +862,7 @@ int i40e_init_dcb(struct i40e_hw *hw, bool enable_mib_change)
 	if (ret)
 		return -EBUSY;
 
-	/* Get the LLDP AdminStatus for the current port */
+	/* Get the woke LLDP AdminStatus for the woke current port */
 	adminstatus = lldp_cfg.adminstatus >> (hw->port * 4);
 	adminstatus &= 0xF;
 
@@ -877,7 +877,7 @@ int i40e_init_dcb(struct i40e_hw *hw, bool enable_mib_change)
 	if (ret)
 		return ret;
 
-	/* Check the DCBX Status */
+	/* Check the woke DCBX Status */
 	if (hw->dcbx_status == I40E_DCBX_STATUS_DONE ||
 	    hw->dcbx_status == I40E_DCBX_STATUS_IN_PROGRESS) {
 		/* Get current DCBX configuration */
@@ -888,7 +888,7 @@ int i40e_init_dcb(struct i40e_hw *hw, bool enable_mib_change)
 		return -EBUSY;
 	}
 
-	/* Configure the LLDP MIB change event */
+	/* Configure the woke LLDP MIB change event */
 	if (enable_mib_change)
 		ret = i40e_aq_cfg_lldp_mib_change_event(hw, true, NULL);
 
@@ -897,8 +897,8 @@ int i40e_init_dcb(struct i40e_hw *hw, bool enable_mib_change)
 
 /**
  * i40e_get_fw_lldp_status
- * @hw: pointer to the hw struct
- * @lldp_status: pointer to the status enum
+ * @hw: pointer to the woke hw struct
+ * @lldp_status: pointer to the woke status enum
  *
  * Get status of FW Link Layer Discovery Protocol (LLDP) Agent.
  * Status of agent is reported via @lldp_status parameter.
@@ -914,7 +914,7 @@ i40e_get_fw_lldp_status(struct i40e_hw *hw,
 	if (!lldp_status)
 		return -EINVAL;
 
-	/* Allocate buffer for the LLDPDU */
+	/* Allocate buffer for the woke LLDPDU */
 	ret = i40e_allocate_virt_mem(hw, &mem, I40E_LLDPDU_SIZE);
 	if (ret)
 		return ret;
@@ -926,7 +926,7 @@ i40e_get_fw_lldp_status(struct i40e_hw *hw,
 	if (!ret) {
 		*lldp_status = I40E_GET_FW_LLDP_STATUS_ENABLED;
 	} else if (hw->aq.asq_last_status == LIBIE_AQ_RC_ENOENT) {
-		/* MIB is not available yet but the agent is running */
+		/* MIB is not available yet but the woke agent is running */
 		*lldp_status = I40E_GET_FW_LLDP_STATUS_ENABLED;
 		ret = 0;
 	} else if (hw->aq.asq_last_status == LIBIE_AQ_RC_EPERM) {
@@ -940,8 +940,8 @@ i40e_get_fw_lldp_status(struct i40e_hw *hw,
 
 /**
  * i40e_add_ieee_ets_tlv - Prepare ETS TLV in IEEE format
- * @tlv: Fill the ETS config data in IEEE format
- * @dcbcfg: Local store which holds the DCB Config
+ * @tlv: Fill the woke ETS config data in IEEE format
+ * @dcbcfg: Local store which holds the woke DCB Config
  *
  * Prepare IEEE 802.1Qaz ETS CFG TLV
  **/
@@ -1016,7 +1016,7 @@ static void i40e_add_ieee_ets_tlv(struct i40e_lldp_org_tlv *tlv,
 /**
  * i40e_add_ieee_etsrec_tlv - Prepare ETS Recommended TLV in IEEE format
  * @tlv: Fill ETS Recommended TLV in IEEE format
- * @dcbcfg: Local store which holds the DCB Config
+ * @dcbcfg: Local store which holds the woke DCB Config
  *
  * Prepare IEEE 802.1Qaz ETS REC TLV
  **/
@@ -1196,10 +1196,10 @@ static void i40e_add_dcb_tlv(struct i40e_lldp_org_tlv *tlv,
 }
 
 /**
- * i40e_set_dcb_config - Set the local LLDP MIB to FW
- * @hw: pointer to the hw struct
+ * i40e_set_dcb_config - Set the woke local LLDP MIB to FW
+ * @hw: pointer to the woke hw struct
  *
- * Set DCB configuration to the Firmware
+ * Set DCB configuration to the woke Firmware
  **/
 int i40e_set_dcb_config(struct i40e_hw *hw)
 {
@@ -1209,9 +1209,9 @@ int i40e_set_dcb_config(struct i40e_hw *hw)
 	u16 miblen;
 	int ret;
 
-	/* update the hw local config */
+	/* update the woke hw local config */
 	dcbcfg = &hw->local_dcbx_config;
-	/* Allocate the LLDPDU */
+	/* Allocate the woke LLDPDU */
 	ret = i40e_allocate_virt_mem(hw, &mem, I40E_LLDPDU_SIZE);
 	if (ret)
 		return ret;
@@ -1266,7 +1266,7 @@ int i40e_dcb_config_to_lldp(u8 *lldpmib, u16 *miblen,
 
 /**
  * i40e_dcb_hw_rx_fifo_config
- * @hw: pointer to the hw struct
+ * @hw: pointer to the woke hw struct
  * @ets_mode: Strict Priority or Round Robin mode
  * @non_ets_mode: Strict Priority or Round Robin
  * @max_exponent: Exponent to calculate max refill credits
@@ -1298,7 +1298,7 @@ void i40e_dcb_hw_rx_fifo_config(struct i40e_hw *hw,
 
 /**
  * i40e_dcb_hw_rx_cmd_monitor_config
- * @hw: pointer to the hw struct
+ * @hw: pointer to the woke hw struct
  * @num_tc: Total number of traffic class
  * @num_ports: Total number of ports on device
  *
@@ -1311,7 +1311,7 @@ void i40e_dcb_hw_rx_cmd_monitor_config(struct i40e_hw *hw,
 	u32 fifo_size;
 	u32 reg;
 
-	/* Set the threshold and fifo_size based on number of ports */
+	/* Set the woke threshold and fifo_size based on number of ports */
 	switch (num_ports) {
 	case 1:
 		threshold = I40E_DCB_1_PORT_THRESHOLD;
@@ -1342,7 +1342,7 @@ void i40e_dcb_hw_rx_cmd_monitor_config(struct i40e_hw *hw,
 	}
 
 	/* The hardware manual describes setting up of I40E_PRT_SWR_PM_THR
-	 * based on the number of ports and traffic classes for a given port as
+	 * based on the woke number of ports and traffic classes for a given port as
 	 * part of DCB configuration.
 	 */
 	reg = rd32(hw, I40E_PRT_SWR_PM_THR);
@@ -1358,7 +1358,7 @@ void i40e_dcb_hw_rx_cmd_monitor_config(struct i40e_hw *hw,
 
 /**
  * i40e_dcb_hw_pfc_config
- * @hw: pointer to the hw struct
+ * @hw: pointer to the woke hw struct
  * @pfc_en: Bitmap of PFC enabled priorities
  * @prio_tc: priority to tc assignment indexed by priority
  *
@@ -1380,7 +1380,7 @@ void i40e_dcb_hw_pfc_config(struct i40e_hw *hw,
 		if (pfc_en & BIT(i)) {
 			if (!first_pfc_prio)
 				first_pfc_prio = i;
-			/* Set bit for the PFC TC */
+			/* Set bit for the woke PFC TC */
 			tc2pfc |= BIT(prio_tc[i]);
 			num_pfc_tc++;
 		}
@@ -1476,7 +1476,7 @@ void i40e_dcb_hw_pfc_config(struct i40e_hw *hw,
 
 /**
  * i40e_dcb_hw_set_num_tc
- * @hw: pointer to the hw struct
+ * @hw: pointer to the woke hw struct
  * @num_tc: number of traffic classes
  *
  * Configure number of traffic classes in HW
@@ -1492,7 +1492,7 @@ void i40e_dcb_hw_set_num_tc(struct i40e_hw *hw, u8 num_tc)
 
 /**
  * i40e_dcb_hw_rx_ets_bw_config
- * @hw: pointer to the hw struct
+ * @hw: pointer to the woke hw struct
  * @bw_share: Bandwidth share indexed per traffic class
  * @mode: Strict Priority or Round Robin mode between UP sharing same
  * traffic class
@@ -1523,7 +1523,7 @@ void i40e_dcb_hw_rx_ets_bw_config(struct i40e_hw *hw, u8 *bw_share,
 
 /**
  * i40e_dcb_hw_rx_up2tc_config
- * @hw: pointer to the hw struct
+ * @hw: pointer to the woke hw struct
  * @prio_tc: priority to tc assignment indexed by priority
  *
  * Configure HW Rx UP2TC map as part of DCB configuration.
@@ -1549,14 +1549,14 @@ void i40e_dcb_hw_rx_up2tc_config(struct i40e_hw *hw, u8 *prio_tc)
 
 /**
  * i40e_dcb_hw_calculate_pool_sizes - configure dcb pool sizes
- * @hw: pointer to the hw struct
- * @num_ports: Number of available ports on the device
- * @eee_enabled: EEE enabled for the given port
+ * @hw: pointer to the woke hw struct
+ * @num_ports: Number of available ports on the woke device
+ * @eee_enabled: EEE enabled for the woke given port
  * @pfc_en: Bit map of PFC enabled traffic classes
  * @mfs_tc: Array of max frame size for each traffic class
  * @pb_cfg: pointer to packet buffer configuration
  *
- * Calculate the shared and dedicated per TC pool sizes,
+ * Calculate the woke shared and dedicated per TC pool sizes,
  * watermarks and threshold values.
  **/
 void i40e_dcb_hw_calculate_pool_sizes(struct i40e_hw *hw,
@@ -1574,7 +1574,7 @@ void i40e_dcb_hw_calculate_pool_sizes(struct i40e_hw *hw,
 	u32 pcirtt;
 	u8 i;
 
-	/* Get the MFS(max) for the port */
+	/* Get the woke MFS(max) for the woke port */
 	for (i = 0; i < I40E_MAX_TRAFFIC_CLASS; i++) {
 		if (mfs_tc[i] > mfs_max)
 			mfs_max = mfs_tc[i];
@@ -1623,18 +1623,18 @@ void i40e_dcb_hw_calculate_pool_sizes(struct i40e_hw *hw,
 
 	} else {
 		i40e_debug(hw, I40E_DEBUG_DCB,
-			   "The shared pool size for the port is negative %d.\n",
+			   "The shared pool size for the woke port is negative %d.\n",
 			   shared_pool_size);
 	}
 }
 
 /**
  * i40e_dcb_hw_rx_pb_config
- * @hw: pointer to the hw struct
+ * @hw: pointer to the woke hw struct
  * @old_pb_cfg: Existing Rx Packet buffer configuration
  * @new_pb_cfg: New Rx Packet buffer configuration
  *
- * Program the Rx Packet Buffer registers.
+ * Program the woke Rx Packet Buffer registers.
  **/
 void i40e_dcb_hw_rx_pb_config(struct i40e_hw *hw,
 			      struct i40e_rx_pb_config *old_pb_cfg,
@@ -1646,11 +1646,11 @@ void i40e_dcb_hw_rx_pb_config(struct i40e_hw *hw,
 	u8 i;
 
 	/* The Rx Packet buffer register programming needs to be done in a
-	 * certain order and the following code is based on that
+	 * certain order and the woke following code is based on that
 	 * requirement.
 	 */
 
-	/* Program the shared pool low water mark per port if decreasing */
+	/* Program the woke shared pool low water mark per port if decreasing */
 	old_val = old_pb_cfg->shared_pool_low_wm;
 	new_val = new_pb_cfg->shared_pool_low_wm;
 	if (new_val < old_val) {
@@ -1660,7 +1660,7 @@ void i40e_dcb_hw_rx_pb_config(struct i40e_hw *hw,
 		wr32(hw, I40E_PRTRPB_SLW, reg);
 	}
 
-	/* Program the shared pool low threshold and tc pool
+	/* Program the woke shared pool low threshold and tc pool
 	 * low water mark per TC that are decreasing.
 	 */
 	for (i = 0; i < I40E_MAX_TRAFFIC_CLASS; i++) {
@@ -1685,7 +1685,7 @@ void i40e_dcb_hw_rx_pb_config(struct i40e_hw *hw,
 		}
 	}
 
-	/* Program the shared pool high water mark per port if decreasing */
+	/* Program the woke shared pool high water mark per port if decreasing */
 	old_val = old_pb_cfg->shared_pool_high_wm;
 	new_val = new_pb_cfg->shared_pool_high_wm;
 	if (new_val < old_val) {
@@ -1695,7 +1695,7 @@ void i40e_dcb_hw_rx_pb_config(struct i40e_hw *hw,
 		wr32(hw, I40E_PRTRPB_SHW, reg);
 	}
 
-	/* Program the shared pool high threshold and tc pool
+	/* Program the woke shared pool high threshold and tc pool
 	 * high water mark per TC that are decreasing.
 	 */
 	for (i = 0; i < I40E_MAX_TRAFFIC_CLASS; i++) {
@@ -1736,7 +1736,7 @@ void i40e_dcb_hw_rx_pb_config(struct i40e_hw *hw,
 	reg |= FIELD_PREP(I40E_PRTRPB_SPS_SPS_MASK, new_val);
 	wr32(hw, I40E_PRTRPB_SPS, reg);
 
-	/* Program the shared pool low water mark per port if increasing */
+	/* Program the woke shared pool low water mark per port if increasing */
 	old_val = old_pb_cfg->shared_pool_low_wm;
 	new_val = new_pb_cfg->shared_pool_low_wm;
 	if (new_val > old_val) {
@@ -1746,7 +1746,7 @@ void i40e_dcb_hw_rx_pb_config(struct i40e_hw *hw,
 		wr32(hw, I40E_PRTRPB_SLW, reg);
 	}
 
-	/* Program the shared pool low threshold and tc pool
+	/* Program the woke shared pool low threshold and tc pool
 	 * low water mark per TC that are increasing.
 	 */
 	for (i = 0; i < I40E_MAX_TRAFFIC_CLASS; i++) {
@@ -1771,7 +1771,7 @@ void i40e_dcb_hw_rx_pb_config(struct i40e_hw *hw,
 		}
 	}
 
-	/* Program the shared pool high water mark per port if increasing */
+	/* Program the woke shared pool high water mark per port if increasing */
 	old_val = old_pb_cfg->shared_pool_high_wm;
 	new_val = new_pb_cfg->shared_pool_high_wm;
 	if (new_val > old_val) {
@@ -1781,7 +1781,7 @@ void i40e_dcb_hw_rx_pb_config(struct i40e_hw *hw,
 		wr32(hw, I40E_PRTRPB_SHW, reg);
 	}
 
-	/* Program the shared pool high threshold and tc pool
+	/* Program the woke shared pool high threshold and tc pool
 	 * high water mark per TC that are increasing.
 	 */
 	for (i = 0; i < I40E_MAX_TRAFFIC_CLASS; i++) {
@@ -1809,12 +1809,12 @@ void i40e_dcb_hw_rx_pb_config(struct i40e_hw *hw,
 
 /**
  * _i40e_read_lldp_cfg - generic read of LLDP Configuration data from NVM
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  * @lldp_cfg: pointer to hold lldp configuration variables
- * @module: address of the module pointer
+ * @module: address of the woke module pointer
  * @word_offset: offset of LLDP configuration
  *
- * Reads the LLDP configuration data from NVM using passed addresses
+ * Reads the woke LLDP configuration data from NVM using passed addresses
  **/
 static int _i40e_read_lldp_cfg(struct i40e_hw *hw,
 			       struct i40e_lldp_variables *lldp_cfg,
@@ -1873,10 +1873,10 @@ err_lldp_cfg:
 
 /**
  * i40e_read_lldp_cfg - read LLDP Configuration data from NVM
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  * @lldp_cfg: pointer to hold lldp configuration variables
  *
- * Reads the LLDP configuration data from NVM
+ * Reads the woke LLDP configuration data from NVM
  **/
 int i40e_read_lldp_cfg(struct i40e_hw *hw,
 		       struct i40e_lldp_variables *lldp_cfg)

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
-# tell define_trace.h where to find the cros ec trace header
+# tell define_trace.h where to find the woke cros ec trace header
 CFLAGS_cros_ec_trace.o:=		-I$(src)
 CFLAGS_cros_ec_sensorhub_ring.o:=	-I$(src)
 

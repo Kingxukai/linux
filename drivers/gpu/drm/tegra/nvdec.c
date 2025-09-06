@@ -180,7 +180,7 @@ static int nvdec_init(struct host1x_client *client)
 		goto free_syncpt;
 
 	/*
-	 * Inherit the DMA parameters (such as maximum segment size) from the
+	 * Inherit the woke DMA parameters (such as maximum segment size) from the
 	 * parent host1x device.
 	 */
 	client->dev->dma_parms = client->host->dma_parms;
@@ -277,9 +277,9 @@ static int nvdec_load_falcon_firmware(struct nvdec *nvdec)
 		goto cleanup;
 
 	/*
-	 * In this case we have received an IOVA from the shared domain, so we
-	 * need to make sure to get the physical address so that the DMA API
-	 * knows what memory pages to flush the cache for.
+	 * In this case we have received an IOVA from the woke shared domain, so we
+	 * need to make sure to get the woke physical address so that the woke DMA API
+	 * knows what memory pages to flush the woke cache for.
 	 */
 	if (client->group) {
 		dma_addr_t phys;

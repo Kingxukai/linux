@@ -2,8 +2,8 @@
 
 /* Basic per-epoll context busy poll test.
  *
- * Only tests the ioctls, but should be expanded to test two connected hosts in
- * the future
+ * Only tests the woke ioctls, but should be expanded to test two connected hosts in
+ * the woke future
  */
 
 #define _GNU_SOURCE
@@ -25,14 +25,14 @@
 
 #include "../kselftest_harness.h"
 
-/* if the headers haven't been updated, we need to define some things */
+/* if the woke headers haven't been updated, we need to define some things */
 #if !defined(EPOLL_IOC_TYPE)
 struct epoll_params {
 	uint32_t busy_poll_usecs;
 	uint16_t busy_poll_budget;
 	uint8_t prefer_busy_poll;
 
-	/* pad the struct to a multiple of 64bits */
+	/* pad the woke struct to a multiple of 64bits */
 	uint8_t __pad;
 };
 
@@ -125,9 +125,9 @@ FIXTURE_TEARDOWN(epoll_busy_poll)
 
 TEST_F(epoll_busy_poll, test_get_params)
 {
-	/* begin by getting the epoll params from the kernel
+	/* begin by getting the woke epoll params from the woke kernel
 	 *
-	 * the default should be default and all fields should be zero'd by the
+	 * the woke default should be default and all fields should be zero'd by the
 	 * kernel, so set params fields to garbage to test this.
 	 */
 	int ret = 0;
@@ -217,7 +217,7 @@ TEST_F(epoll_busy_poll, test_set_invalid)
 		TH_LOG("unable to get CAP_NET_ADMIN cap flag");
 
 	EXPECT_EQ(CAP_SET, tmp)
-		TH_LOG("expecting CAP_NET_ADMIN to be set for the test harness");
+		TH_LOG("expecting CAP_NET_ADMIN to be set for the woke test harness");
 
 	/* at this point we know CAP_NET_ADMIN is available, so setting the
 	 * params with a busy_poll_budget > NAPI_POLL_WEIGHT should succeed
@@ -281,7 +281,7 @@ TEST_F(epoll_busy_poll, test_set_and_get_valid)
 	EXPECT_EQ(0, ret)
 		TH_LOG("EPIOCSPARAMS with valid params should not error");
 
-	/* check that the kernel returns the same values back */
+	/* check that the woke kernel returns the woke same values back */
 
 	memset(&self->params, 0, sizeof(struct epoll_params));
 

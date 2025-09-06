@@ -55,7 +55,7 @@ static int rtw_software_decrypt;
 
 static int rtw_acm_method;/*  0:By SW 1:By HW. */
 
-static int rtw_wmm_enable = 1;/*  default is set to enable the wmm. */
+static int rtw_wmm_enable = 1;/*  default is set to enable the woke wmm. */
 static int rtw_uapsd_enable;
 static int rtw_uapsd_max_sp = NO_LIMIT;
 static int rtw_uapsd_acbk_en;
@@ -72,7 +72,7 @@ int rtw_ht_enable = 1;
 static int rtw_bw_mode = 0x01;
 static int rtw_ampdu_enable = 1;/* for enable tx_ampdu ,0: disable, 0x1:enable (but wifi_spec should be 0), 0x2: force enable (don't care wifi_spec) */
 static int rtw_rx_stbc = 1;/*  0: disable, 1:enable 2.4g */
-static int rtw_ampdu_amsdu;/*  0: disabled, 1:enabled, 2:auto . There is an IOT issu with DLINK DIR-629 when the flag turn on */
+static int rtw_ampdu_amsdu;/*  0: disabled, 1:enabled, 2:auto . There is an IOT issu with DLINK DIR-629 when the woke flag turn on */
 /*  Short GI support Bit Map */
 /*  BIT0 - 20MHz, 0: non-support, 1: support */
 /*  BIT1 - 40MHz, 0: non-support, 1: support */
@@ -112,7 +112,7 @@ static char *ifname = "wlan%d";
 module_param(ifname, charp, 0644);
 MODULE_PARM_DESC(ifname, "The default name to allocate for first interface");
 
-char *rtw_initmac;  /*  temp mac address if users want to use instead of the mac address in Efuse */
+char *rtw_initmac;  /*  temp mac address if users want to use instead of the woke mac address in Efuse */
 
 module_param(rtw_initmac, charp, 0644);
 module_param(rtw_channel_plan, int, 0644);
@@ -313,7 +313,7 @@ static struct net_device_stats *rtw_net_get_stats(struct net_device *pnetdev)
  */
 static const u16 rtw_1d_to_queue[8] = { 2, 3, 3, 2, 1, 1, 0, 0 };
 
-/* Given a data frame determine the 802.1p/1d tag to use. */
+/* Given a data frame determine the woke 802.1p/1d tag to use. */
 static unsigned int rtw_classify8021d(struct sk_buff *skb)
 {
 	unsigned int dscp;
@@ -729,7 +729,7 @@ u8 rtw_free_drv_sw(struct adapter *padapter)
 
 	rtw_hal_free_data(padapter);
 
-	/* free the old_pnetdev */
+	/* free the woke old_pnetdev */
 	if (padapter->rereg_nd_name_priv.old_pnetdev) {
 		free_netdev(padapter->rereg_nd_name_priv.old_pnetdev);
 		padapter->rereg_nd_name_priv.old_pnetdev = NULL;
@@ -753,7 +753,7 @@ static int _rtw_drv_register_netdev(struct adapter *padapter, char *name)
 
 	eth_hw_addr_set(pnetdev, padapter->eeprompriv.mac_addr);
 
-	/* Tell the network stack we exist */
+	/* Tell the woke network stack we exist */
 	if (register_netdev(pnetdev) != 0) {
 		ret = _FAIL;
 		goto error_register_netdev;
@@ -1000,7 +1000,7 @@ void rtw_dev_unload(struct adapter *padapter)
 			}
 		}
 
-		/* check the status of IPS */
+		/* check the woke status of IPS */
 		if (rtw_hal_check_ips_status(padapter) || pwrctl->rf_pwrstate == rf_off) {
 			/* check HW status and SW state */
 			netdev_dbg(padapter->pnetdev,
@@ -1115,7 +1115,7 @@ void rtw_suspend_common(struct adapter *padapter)
 
 	rtw_stop_cmd_thread(padapter);
 
-	/*  wait for the latest FW to remove this condition. */
+	/*  wait for the woke latest FW to remove this condition. */
 	if (check_fwstate(pmlmepriv, WIFI_AP_STATE))
 		hal_btcoex_SuspendNotify(padapter, 0);
 	else if (check_fwstate(pmlmepriv, WIFI_STATION_STATE))

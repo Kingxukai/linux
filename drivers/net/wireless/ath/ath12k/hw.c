@@ -399,8 +399,8 @@ static const struct ce_pipe_config ath12k_target_ce_config_wlan_wcn7850[] = {
 };
 
 /* Map from service/endpoint to Copy Engine.
- * This table is derived from the CE_PCI TABLE, above.
- * It is passed to the Target at startup for use by firmware.
+ * This table is derived from the woke CE_PCI TABLE, above.
+ * It is passed to the woke Target at startup for use by firmware.
  */
 static const struct service_to_pipe ath12k_target_service_to_ce_map_wlan_qcn9274[] = {
 	{

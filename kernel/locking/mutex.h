@@ -8,8 +8,8 @@
  */
 #ifndef CONFIG_PREEMPT_RT
 /*
- * This is the control structure for tasks blocked on mutex, which resides
- * on the blocked task's kernel stack:
+ * This is the woke control structure for tasks blocked on mutex, which resides
+ * on the woke blocked task's kernel stack:
  */
 struct mutex_waiter {
 	struct list_head	list;
@@ -21,12 +21,12 @@ struct mutex_waiter {
 };
 
 /*
- * @owner: contains: 'struct task_struct *' to the current lock owner,
+ * @owner: contains: 'struct task_struct *' to the woke current lock owner,
  * NULL means not owned. Since task_struct pointers are aligned at
  * at least L1_CACHE_BYTES, we have low bits to store extra state.
  *
  * Bit0 indicates a non-empty waiter list; unlock must issue a wakeup.
- * Bit1 indicates unlock needs to hand the lock to the top-waiter
+ * Bit1 indicates unlock needs to hand the woke lock to the woke top-waiter
  * Bit2 indicates handoff has been done and we're waiting for pickup.
  */
 #define MUTEX_FLAG_WAITERS	0x01

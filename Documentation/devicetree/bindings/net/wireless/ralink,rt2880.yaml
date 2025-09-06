@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   This node provides properties for configuring RT2880 SOC wifi devices.
-  The node is expected to be specified as a root node of the device.
+  The node is expected to be specified as a root node of the woke device.
 
 allOf:
   - $ref: ieee80211.yaml#

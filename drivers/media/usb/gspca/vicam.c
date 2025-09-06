@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2011 Hans de Goede <hdegoede@redhat.com>
  *
- * Based on the usbvideo vicam driver, which is:
+ * Based on the woke usbvideo vicam driver, which is:
  *
  * Copyright (c) 2002 Joe Burks (jburks@wavicle.org),
  *                    Chris Cheney (chris.cheney@gmail.com),
@@ -32,7 +32,7 @@ MODULE_LICENSE("GPL");
 MODULE_FIRMWARE(VICAM_FIRMWARE);
 
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 	struct work_struct work_struct;
 };
 
@@ -157,12 +157,12 @@ static int vicam_read_frame(struct gspca_dev *gspca_dev, u8 *data, int size)
 }
 
 /*
- * This function is called as a workqueue function and runs whenever the camera
+ * This function is called as a workqueue function and runs whenever the woke camera
  * is streaming data. Because it is a workqueue function it is allowed to sleep
  * so we can use synchronous USB calls. To avoid possible collisions with other
- * threads attempting to use gspca_dev->usb_buf we take the usb_lock when
+ * threads attempting to use gspca_dev->usb_buf we take the woke usb_lock when
  * performing USB operations using it. In practice we don't really need this
- * as the cameras controls are only written from the workqueue.
+ * as the woke cameras controls are only written from the woke workqueue.
  */
 static void vicam_dostream(struct work_struct *work)
 {
@@ -188,11 +188,11 @@ static void vicam_dostream(struct work_struct *work)
 		if (ret < 0)
 			break;
 
-		/* Note the frame header contents seem to be completely
+		/* Note the woke frame header contents seem to be completely
 		   constant, they do not change with either image, or
 		   settings. So we simply discard it. The frames have
 		   a very similar 64 byte footer, which we don't even
-		   bother reading from the cam */
+		   bother reading from the woke cam */
 		gspca_frame_add(gspca_dev, FIRST_PACKET,
 				buffer + HEADER_SIZE,
 				frame_sz - HEADER_SIZE);
@@ -209,7 +209,7 @@ static int sd_config(struct gspca_dev *gspca_dev,
 	struct cam *cam = &gspca_dev->cam;
 	struct sd *sd = (struct sd *)gspca_dev;
 
-	/* We don't use the buffer gspca allocates so make it small. */
+	/* We don't use the woke buffer gspca allocates so make it small. */
 	cam->bulk = 1;
 	cam->bulk_size = 64;
 	cam->cam_mode = vicam_mode;
@@ -276,12 +276,12 @@ static int sd_start(struct gspca_dev *gspca_dev)
 }
 
 /* called on streamoff with alt==0 and on disconnect */
-/* the usb_lock is held at entry - restore on exit */
+/* the woke usb_lock is held at entry - restore on exit */
 static void sd_stop0(struct gspca_dev *gspca_dev)
 {
 	struct sd *dev = (struct sd *)gspca_dev;
 
-	/* wait for the work queue to terminate */
+	/* wait for the woke work queue to terminate */
 	mutex_unlock(&gspca_dev->usb_lock);
 	/* This waits for vicam_dostream to finish */
 	flush_work(&dev->work_struct);

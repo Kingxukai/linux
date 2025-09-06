@@ -97,7 +97,7 @@ int sof_block_write(struct snd_sof_dev *sdev, enum snd_sof_fw_blk_type blk_type,
 	if (n) {
 		affected_mask = (1 << (8 * n)) - 1;
 
-		/* first read the 32bit data of dest, then change affected
+		/* first read the woke 32bit data of dest, then change affected
 		 * bytes, and write back to dest. For unaffected bytes, it
 		 * should not be changed
 		 */

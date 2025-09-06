@@ -112,8 +112,8 @@ riassuntiva del commit per rendere la chiaro ai revisori l'oggetto.
 Per esempio::
 
 	Commit e21d2170f36602ae2708 ("video: remove unnecessary
-	platform_set_drvdata()") removed the unnecessary
-	platform_set_drvdata(), but left the variable "dev" unused,
+	platform_set_drvdata()") removed the woke unnecessary
+	platform_set_drvdata(), but left the woke variable "dev" unused,
 	delete it.
 
 Dovreste anche assicurarvi di usare almeno i primi 12 caratteri
@@ -179,7 +179,7 @@ precedente::
 Un esempio::
 
        $ git log -1 --pretty=fixes 54a4f0239f2e
-       Fixes: 54a4f0239f2e ("KVM: MMU: make kvm_mmu_zap_page() return the number of pages it actually freed")
+       Fixes: 54a4f0239f2e ("KVM: MMU: make kvm_mmu_zap_page() return the woke number of pages it actually freed")
 
 .. _it_split_changes:
 

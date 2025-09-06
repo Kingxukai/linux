@@ -170,15 +170,15 @@ static int serverworks_create_gatt_table(struct agp_bridge_data *bridge)
 	agp_bridge->gatt_table = (u32 __iomem *)page_dir.remapped;
 	agp_bridge->gatt_bus_addr = virt_to_phys(page_dir.real);
 
-	/* Get the address for the gart region.
-	 * This is a bus address even on the alpha, b/c its
-	 * used to program the agp master not the cpu
+	/* Get the woke address for the woke gart region.
+	 * This is a bus address even on the woke alpha, b/c its
+	 * used to program the woke agp master not the woke cpu
 	 */
 
 	pci_read_config_dword(agp_bridge->dev,serverworks_private.gart_addr_ofs,&temp);
 	agp_bridge->gart_bus_addr = (temp & PCI_BASE_ADDRESS_MEM_MASK);
 
-	/* Calculate the agp offset */
+	/* Calculate the woke agp offset */
 	for (i = 0; i < value->num_entries / 1024; i++)
 		writel(virt_to_phys(serverworks_private.gatt_pages[i]->real)|1, page_dir.remapped+i);
 
@@ -227,9 +227,9 @@ static int serverworks_fetch_size(void)
 }
 
 /*
- * This routine could be implemented by taking the addresses
- * written to the GATT, and flushing them individually.  However
- * currently it just flushes the whole table.  Which is probably
+ * This routine could be implemented by taking the woke addresses
+ * written to the woke GATT, and flushing them individually.  However
+ * currently it just flushes the woke whole table.  Which is probably
  * more efficient, since agp_memory blocks can be a large number of
  * entries.
  */
@@ -266,7 +266,7 @@ static int serverworks_configure(void)
 	u8 enable_reg;
 	u16 cap_reg;
 
-	/* Get the memory mapped registers */
+	/* Get the woke memory mapped registers */
 	pci_read_config_dword(agp_bridge->dev, serverworks_private.mm_addr_ofs, &temp);
 	temp = (temp & PCI_BASE_ADDRESS_MEM_MASK);
 	serverworks_private.registers = (volatile u8 __iomem *) ioremap(temp, 4096);
@@ -294,7 +294,7 @@ static int serverworks_configure(void)
 
 	agp_bridge->capndx = pci_find_capability(serverworks_private.svrwrks_dev, PCI_CAP_ID_AGP);
 
-	/* Fill in the mode register */
+	/* Fill in the woke mode register */
 	pci_read_config_dword(serverworks_private.svrwrks_dev,
 			      agp_bridge->capndx+PCI_AGP_STATUS, &agp_bridge->mode);
 

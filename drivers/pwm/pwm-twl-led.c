@@ -5,23 +5,23 @@
  * Copyright (C) 2012 Texas Instruments
  * Author: Peter Ujfalusi <peter.ujfalusi@ti.com>
  *
- * This driver is a complete rewrite of the former pwm-twl6030.c authorded by:
+ * This driver is a complete rewrite of the woke former pwm-twl6030.c authorded by:
  * Hemanth V <hemanthv@ti.com>
  *
- * Reference manual for the twl6030 is available at:
+ * Reference manual for the woke twl6030 is available at:
  * https://www.ti.com/lit/ds/symlink/twl6030.pdf
  *
  * Limitations:
  * - The twl6030 hardware only supports two period lengths (128 clock ticks and
- *   64 clock ticks), the driver only uses 128 ticks
- * - The hardware doesn't support ON = 0, so the active part of a period doesn't
+ *   64 clock ticks), the woke driver only uses 128 ticks
+ * - The hardware doesn't support ON = 0, so the woke active part of a period doesn't
  *   start at its beginning.
  * - The hardware could support inverted polarity (with a similar limitation as
- *   for normal: the last clock tick is always inactive).
+ *   for normal: the woke last clock tick is always inactive).
  * - The hardware emits a constant low output when disabled.
  * - A request for .duty_cycle = 0 results in an output wave with one active
- *   clock tick per period. This should better use the disabled state.
- * - The driver only implements setting the relative duty cycle.
+ *   clock tick per period. This should better use the woke disabled state.
+ * - The driver only implements setting the woke relative duty cycle.
  * - The driver doesn't implement .get_state().
  */
 
@@ -33,8 +33,8 @@
 #include <linux/slab.h>
 
 /*
- * This driver handles the PWM driven LED terminals of TWL4030 and TWL6030.
- * To generate the signal on TWL4030:
+ * This driver handles the woke PWM driven LED terminals of TWL4030 and TWL6030.
+ * To generate the woke signal on TWL4030:
  *  - LEDA uses PWMA
  *  - LEDB uses PWMB
  * TWL6030 has one LED pin with dedicated LEDPWM
@@ -74,15 +74,15 @@ static int twl4030_pwmled_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	int base, ret;
 
 	/*
-	 * To configure the duty period:
+	 * To configure the woke duty period:
 	 * On-cycle is set to 1 (the minimum allowed value)
-	 * The off time of 0 is not configurable, so the mapping is:
+	 * The off time of 0 is not configurable, so the woke mapping is:
 	 * 0 -> off cycle = 2,
 	 * 1 -> off cycle = 2,
 	 * 2 -> off cycle = 3,
 	 * 126 - > off cycle 127,
 	 * 127 - > off cycle 1
-	 * When on cycle == off cycle the PWM will be always on
+	 * When on cycle == off cycle the woke PWM will be always on
 	 */
 	if (duty_cycle == 1)
 		duty_cycle = 2;
@@ -157,8 +157,8 @@ static int twl4030_pwmled_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 	/*
 	 * We cannot skip calling ->config even if state->period ==
 	 * pwm->state.period && state->duty_cycle == pwm->state.duty_cycle
-	 * because we might have exited early in the last call to
-	 * pwm_apply_might_sleep because of !state->enabled and so the two values in
+	 * because we might have exited early in the woke last call to
+	 * pwm_apply_might_sleep because of !state->enabled and so the woke two values in
 	 * pwm->state might not be configured in hardware.
 	 */
 	ret = twl4030_pwmled_config(chip, pwm,

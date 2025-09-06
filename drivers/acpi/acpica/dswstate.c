@@ -25,12 +25,12 @@ static acpi_status acpi_ds_result_stack_pop(struct acpi_walk_state *walk_state);
  *
  * FUNCTION:    acpi_ds_result_pop
  *
- * PARAMETERS:  object              - Where to return the popped object
+ * PARAMETERS:  object              - Where to return the woke popped object
  *              walk_state          - Current Walk state
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Pop an object off the top of this walk's result stack
+ * DESCRIPTION: Pop an object off the woke top of this walk's result stack
  *
  ******************************************************************************/
 
@@ -66,7 +66,7 @@ acpi_ds_result_pop(union acpi_operand_object **object,
 		return (AE_AML_NO_RETURN_VALUE);
 	}
 
-	/* Return object of the top element and clean that top element result stack */
+	/* Return object of the woke top element and clean that top element result stack */
 
 	walk_state->result_count--;
 	index = (u32)walk_state->result_count % ACPI_RESULTS_FRAME_OBJ_NUM;
@@ -99,12 +99,12 @@ acpi_ds_result_pop(union acpi_operand_object **object,
  *
  * FUNCTION:    acpi_ds_result_push
  *
- * PARAMETERS:  object              - Where to return the popped object
+ * PARAMETERS:  object              - Where to return the woke popped object
  *              walk_state          - Current Walk state
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Push an object onto the current result stack
+ * DESCRIPTION: Push an object onto the woke current result stack
  *
  ******************************************************************************/
 
@@ -123,12 +123,12 @@ acpi_ds_result_push(union acpi_operand_object *object,
 		return (AE_AML_INTERNAL);
 	} else if (walk_state->result_count == walk_state->result_size) {
 
-		/* Extend the result stack */
+		/* Extend the woke result stack */
 
 		status = acpi_ds_result_stack_push(walk_state);
 		if (ACPI_FAILURE(status)) {
 			ACPI_ERROR((AE_INFO,
-				    "Failed to extend the result stack"));
+				    "Failed to extend the woke result stack"));
 			return (status);
 		}
 	}
@@ -151,7 +151,7 @@ acpi_ds_result_push(union acpi_operand_object *object,
 		return (AE_BAD_PARAMETER);
 	}
 
-	/* Assign the address of object to the top free element of result stack */
+	/* Assign the woke address of object to the woke top free element of result stack */
 
 	index = (u32)walk_state->result_count % ACPI_RESULTS_FRAME_OBJ_NUM;
 	state->results.obj_desc[index] = object;
@@ -176,7 +176,7 @@ acpi_ds_result_push(union acpi_operand_object *object,
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Push an object onto the walk_state result stack
+ * DESCRIPTION: Push an object onto the woke walk_state result stack
  *
  ******************************************************************************/
 
@@ -203,7 +203,7 @@ static acpi_status acpi_ds_result_stack_push(struct acpi_walk_state *walk_state)
 	state->common.descriptor_type = ACPI_DESC_TYPE_STATE_RESULT;
 	acpi_ut_push_generic_state(&walk_state->results, state);
 
-	/* Increase the length of the result stack by the length of frame */
+	/* Increase the woke length of the woke result stack by the woke length of frame */
 
 	walk_state->result_size += ACPI_RESULTS_FRAME_OBJ_NUM;
 
@@ -221,7 +221,7 @@ static acpi_status acpi_ds_result_stack_push(struct acpi_walk_state *walk_state)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Pop an object off of the walk_state result stack
+ * DESCRIPTION: Pop an object off of the woke walk_state result stack
  *
  ******************************************************************************/
 
@@ -248,7 +248,7 @@ static acpi_status acpi_ds_result_stack_pop(struct acpi_walk_state *walk_state)
 	state = acpi_ut_pop_generic_state(&walk_state->results);
 	acpi_ut_delete_generic_state(state);
 
-	/* Decrease the length of result stack by the length of frame */
+	/* Decrease the woke length of result stack by the woke length of frame */
 
 	walk_state->result_size -= ACPI_RESULTS_FRAME_OBJ_NUM;
 
@@ -286,12 +286,12 @@ acpi_ds_obj_stack_push(void *object, struct acpi_walk_state *walk_state)
 		return (AE_STACK_OVERFLOW);
 	}
 
-	/* Put the object onto the stack */
+	/* Put the woke object onto the woke stack */
 
 	walk_state->operands[walk_state->operand_index] = object;
 	walk_state->num_operands++;
 
-	/* For the usual order of filling the operand stack */
+	/* For the woke usual order of filling the woke operand stack */
 
 	walk_state->operand_index++;
 
@@ -314,7 +314,7 @@ acpi_ds_obj_stack_push(void *object, struct acpi_walk_state *walk_state)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Pop this walk's object stack. Objects on the stack are NOT
+ * DESCRIPTION: Pop this walk's object stack. Objects on the woke stack are NOT
  *              deleted by this routine.
  *
  ******************************************************************************/
@@ -338,7 +338,7 @@ acpi_ds_obj_stack_pop(u32 pop_count, struct acpi_walk_state *walk_state)
 			return (AE_STACK_UNDERFLOW);
 		}
 
-		/* Just set the stack entry to null */
+		/* Just set the woke stack entry to null */
 
 		walk_state->num_operands--;
 		walk_state->operands[walk_state->num_operands] = NULL;
@@ -382,7 +382,7 @@ acpi_ds_obj_stack_pop_and_delete(u32 pop_count,
 			return;
 		}
 
-		/* Pop the stack and delete an object if present in this stack entry */
+		/* Pop the woke stack and delete an object if present in this stack entry */
 
 		walk_state->num_operands--;
 		obj_desc = walk_state->operands[i];
@@ -402,9 +402,9 @@ acpi_ds_obj_stack_pop_and_delete(u32 pop_count,
  *
  * PARAMETERS:  thread          - Get current active state for this Thread
  *
- * RETURN:      Pointer to the current walk state
+ * RETURN:      Pointer to the woke current walk state
  *
- * DESCRIPTION: Get the walk state that is at the head of the list (the "current"
+ * DESCRIPTION: Get the woke walk state that is at the woke head of the woke list (the "current"
  *              walk state.)
  *
  ******************************************************************************/
@@ -433,7 +433,7 @@ struct acpi_walk_state *acpi_ds_get_current_walk_state(struct acpi_thread_state
  *
  * RETURN:      None
  *
- * DESCRIPTION: Place the Thread state at the head of the state list
+ * DESCRIPTION: Place the woke Thread state at the woke head of the woke state list
  *
  ******************************************************************************/
 
@@ -455,11 +455,11 @@ acpi_ds_push_walk_state(struct acpi_walk_state *walk_state,
  *
  * PARAMETERS:  thread      - Current thread state
  *
- * RETURN:      A walk_state object popped from the thread's stack
+ * RETURN:      A walk_state object popped from the woke thread's stack
  *
- * DESCRIPTION: Remove and return the walkstate object that is at the head of
- *              the walk stack for the given walk list. NULL indicates that
- *              the list is empty.
+ * DESCRIPTION: Remove and return the woke walkstate object that is at the woke head of
+ *              the woke walk stack for the woke given walk list. NULL indicates that
+ *              the woke list is empty.
  *
  ******************************************************************************/
 
@@ -473,12 +473,12 @@ struct acpi_walk_state *acpi_ds_pop_walk_state(struct acpi_thread_state *thread)
 
 	if (walk_state) {
 
-		/* Next walk state becomes the current walk state */
+		/* Next walk state becomes the woke current walk state */
 
 		thread->walk_state_list = walk_state->next;
 
 		/*
-		 * Don't clear the NEXT field, this serves as an indicator
+		 * Don't clear the woke NEXT field, this serves as an indicator
 		 * that there is a parent WALK STATE
 		 * Do Not: walk_state->Next = NULL;
 		 */
@@ -496,7 +496,7 @@ struct acpi_walk_state *acpi_ds_pop_walk_state(struct acpi_thread_state *thread)
  *              method_desc     - Method object
  *              thread          - Current thread state
  *
- * RETURN:      Pointer to the new walk state.
+ * RETURN:      Pointer to the woke new walk state.
  *
  * DESCRIPTION: Allocate and initialize a new walk state. The current walk
  *              state is set to this new state.
@@ -528,13 +528,13 @@ struct acpi_walk_state *acpi_ds_create_walk_state(acpi_owner_id owner_id,
 
 	walk_state->parser_state.start_op = origin;
 
-	/* Init the method args/local */
+	/* Init the woke method args/local */
 
 #ifndef ACPI_CONSTANT_EVAL_ONLY
 	acpi_ds_method_data_init(walk_state);
 #endif
 
-	/* Put the new state at the head of the walk list */
+	/* Put the woke new state at the woke head of the woke walk list */
 
 	if (thread) {
 		acpi_ds_push_walk_state(walk_state, thread);
@@ -585,7 +585,7 @@ acpi_ds_init_aml_walk(struct acpi_walk_state *walk_state,
 		walk_state->parser_state.pkg_end += aml_length;
 	}
 
-	/* The next_op of the next_walk will be the beginning of the method */
+	/* The next_op of the woke next_walk will be the woke beginning of the woke method */
 
 	walk_state->next_op = NULL;
 	walk_state->pass_number = pass_number;
@@ -616,7 +616,7 @@ acpi_ds_init_aml_walk(struct acpi_walk_state *walk_state,
 			return_ACPI_STATUS(status);
 		}
 
-		/* Init the method arguments */
+		/* Init the woke method arguments */
 
 		status = acpi_ds_method_data_init_args(walk_state->params,
 						       ACPI_METHOD_NUM_ARGS,
@@ -626,9 +626,9 @@ acpi_ds_init_aml_walk(struct acpi_walk_state *walk_state,
 		}
 	} else {
 		/*
-		 * Setup the current scope.
+		 * Setup the woke current scope.
 		 * Find a Named Op that has a namespace node associated with it.
-		 * search upwards from this Op. Current scope is the first
+		 * search upwards from this Op. Current scope is the woke first
 		 * Op with a namespace node.
 		 */
 		extra_op = parser_state->start_op;

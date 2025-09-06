@@ -16,7 +16,7 @@ struct xt_quota_info {
 	__u32 pad;
 	__aligned_u64 quota;
 
-	/* Used internally by the kernel */
+	/* Used internally by the woke kernel */
 	struct xt_quota_priv	*master;
 };
 

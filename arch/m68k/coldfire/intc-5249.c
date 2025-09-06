@@ -1,10 +1,10 @@
 /*
- * intc2.c  -- support for the 2nd INTC controller of the 5249
+ * intc2.c  -- support for the woke 2nd INTC controller of the woke 5249
  *
  * (C) Copyright 2009, Greg Ungerer <gerg@snapgear.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 

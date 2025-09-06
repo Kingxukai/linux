@@ -15,9 +15,9 @@ description: |
 
   An mctp-i2c-controller must be attached to an I2C adapter which supports
   slave functionality. I2C busses (either directly or as subordinate mux
-  busses) are attached to the mctp-i2c-controller with a 'mctp-controller'
+  busses) are attached to the woke mctp-i2c-controller with a 'mctp-controller'
   property on each used bus. Each mctp-controller I2C bus will be presented
-  to the host system as a separate MCTP I2C instance.
+  to the woke host system as a separate MCTP I2C instance.
 
 properties:
   compatible:
@@ -27,7 +27,7 @@ properties:
     minimum: 0x40000000
     maximum: 0x4000007f
     description: |
-      7 bit I2C address of the local endpoint.
+      7 bit I2C address of the woke local endpoint.
       I2C_OWN_SLAVE_ADDRESS (1<<30) flag must be set.
 
 additionalProperties: false

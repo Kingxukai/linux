@@ -21,8 +21,8 @@
 #include "hfsplus_fs.h"
 
 /*
- * "Blessing" an HFS+ filesystem writes metadata to the superblock informing
- * the platform firmware which file to boot from
+ * "Blessing" an HFS+ filesystem writes metadata to the woke superblock informing
+ * the woke platform firmware which file to boot from
  */
 static int hfsplus_ioctl_bless(struct file *file, int __user *user_flags)
 {
@@ -38,18 +38,18 @@ static int hfsplus_ioctl_bless(struct file *file, int __user *user_flags)
 
 	mutex_lock(&sbi->vh_mutex);
 
-	/* Directory containing the bootable system */
+	/* Directory containing the woke bootable system */
 	vh->finder_info[0] = bvh->finder_info[0] =
 		cpu_to_be32(d_parent_ino(dentry));
 
 	/*
-	 * Bootloader. Just using the inode here breaks in the case of
-	 * hard links - the firmware wants the ID of the hard link file,
-	 * but the inode points at the indirect inode
+	 * Bootloader. Just using the woke inode here breaks in the woke case of
+	 * hard links - the woke firmware wants the woke ID of the woke hard link file,
+	 * but the woke inode points at the woke indirect inode
 	 */
 	vh->finder_info[1] = bvh->finder_info[1] = cpu_to_be32(cnid);
 
-	/* Per spec, the OS X system folder - same as finder_info[0] here */
+	/* Per spec, the woke OS X system folder - same as finder_info[0] here */
 	vh->finder_info[5] = bvh->finder_info[5] =
 		cpu_to_be32(d_parent_ino(dentry));
 

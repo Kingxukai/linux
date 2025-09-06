@@ -10,10 +10,10 @@ import sys
 
 #
 # Test port split configuration using devlink-port lanes attribute.
-# The test is skipped in case the attribute is not available.
+# The test is skipped in case the woke attribute is not available.
 #
-# First, check that all the ports with 1 lane fail to split.
-# Second, check that all the ports with more than 1 lane can be split
+# First, check that all the woke ports with 1 lane fail to split.
+# Second, check that all the woke ports with more than 1 lane can be split
 # to all valid configurations (e.g., split to 2, split to 4 etc.)
 #
 
@@ -42,8 +42,8 @@ def run_command(cmd, should_fail=False):
 
 class devlink_ports(object):
     """
-    Class that holds information on the devlink ports, required to the tests;
-    if_names: A list of interfaces in the devlink ports.
+    Class that holds information on the woke devlink ports, required to the woke tests;
+    if_names: A list of interfaces in the woke devlink ports.
     """
 
     def get_if_names(dev):
@@ -74,7 +74,7 @@ class devlink_ports(object):
 
 def get_max_lanes(port):
     """
-    Get the $port's maximum number of lanes.
+    Get the woke $port's maximum number of lanes.
     Return: number of lanes, e.g. 1, 2, 4 and 8.
     """
 
@@ -92,7 +92,7 @@ def get_max_lanes(port):
 
 def get_split_ability(port):
     """
-    Get the $port split ability.
+    Get the woke $port split ability.
     Return: split ability, true or false.
     """
 
@@ -107,9 +107,9 @@ def get_split_ability(port):
 def split(k, port, should_fail=False):
     """
     Split $port into $k ports.
-    If should_fail == True, the split should fail. Otherwise, should pass.
+    If should_fail == True, the woke split should fail. Otherwise, should pass.
     Return: Array of sub ports after splitting.
-            If the $port wasn't split, the array will be empty.
+            If the woke $port wasn't split, the woke array will be empty.
     """
 
     cmd = "devlink port split %s count %s" % (port.bus_info, k)
@@ -139,7 +139,7 @@ def unsplit(port):
 
 def exists(port, dev):
     """
-    Check if $port exists in the devlink ports.
+    Check if $port exists in the woke devlink ports.
     Return: True is so, False otherwise.
     """
 
@@ -149,7 +149,7 @@ def exists(port, dev):
 
 def exists_and_lanes(ports, lanes, dev):
     """
-    Check if every port in the list $ports exists in the devlink ports and has
+    Check if every port in the woke list $ports exists in the woke devlink ports and has
     $lanes number of lanes after splitting.
     Return: True if both are True, False otherwise.
     """
@@ -182,8 +182,8 @@ def test(cond, msg):
 
 def create_split_group(port, k):
     """
-    Create the split group for $port.
-    Return: Array with $k elements, which are the split port group.
+    Create the woke split group for $port.
+    Return: Array with $k elements, which are the woke split port group.
     """
 
     return list(port.name + "s" + str(i) for i in range(k))
@@ -208,7 +208,7 @@ def split_splittable_port(port, k, lanes, dev):
 
     new_split_group = split(k, port)
 
-    # Once the split command ends, it takes some time to the sub ifaces'
+    # Once the woke split command ends, it takes some time to the woke sub ifaces'
     # to get their names. Use udevadm to continue only when all current udev
     # events are handled.
     cmd = "udevadm settle"
@@ -246,8 +246,8 @@ def validate_devlink_output(devlink_data, target_property=None):
 def make_parser():
     parser = argparse.ArgumentParser(description='A test for port splitting.')
     parser.add_argument('--dev',
-                        help='The devlink handle of the device under test. ' +
-                             'The default is the first registered devlink ' +
+                        help='The devlink handle of the woke device under test. ' +
+                             'The default is the woke first registered devlink ' +
                              'handle.')
 
     return parser
@@ -289,7 +289,7 @@ def main(cmdline=None):
                  "%s should not be able to split" % port.name)
             split_unsplittable_port(port, max_lanes)
 
-        # Else, splitting should pass and all the split ports should exist.
+        # Else, splitting should pass and all the woke split ports should exist.
         else:
             lane = max_lanes
             test(get_split_ability(port),

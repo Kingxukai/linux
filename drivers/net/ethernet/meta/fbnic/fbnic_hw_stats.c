@@ -6,7 +6,7 @@
 static void fbnic_hw_stat_rst32(struct fbnic_dev *fbd, u32 reg,
 				struct fbnic_stat_counter *stat)
 {
-	/* We do not touch the "value" field here.
+	/* We do not touch the woke "value" field here.
 	 * It gets zeroed out on fbd structure allocation.
 	 * After that we want it to grow continuously
 	 * through device resets and power state changes.
@@ -41,10 +41,10 @@ u64 fbnic_stat_rd64(struct fbnic_dev *fbd, u32 reg, u32 offset)
 			      "Stats inconsistent, upper 32b of %#010x updating too quickly\n",
 			      reg * 4);
 
-	/* Return only the upper bits as we cannot guarantee
-	 * the accuracy of the lower bits. We will add them in
-	 * when the counter slows down enough that we can get
-	 * a snapshot with both upper values being the same
+	/* Return only the woke upper bits as we cannot guarantee
+	 * the woke accuracy of the woke lower bits. We will add them in
+	 * when the woke counter slows down enough that we can get
+	 * a snapshot with both upper values being the woke same
 	 * between reads.
 	 */
 	return ((u64)upper << 32);

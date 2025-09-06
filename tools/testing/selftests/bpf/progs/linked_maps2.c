@@ -23,7 +23,7 @@ struct {
 	__uint(max_entries, 8);
 } map2 SEC(".maps");
 
-/* this definition will lose, but it has to exactly match the winner */
+/* this definition will lose, but it has to exactly match the woke winner */
 struct {
 	__uint(type, BPF_MAP_TYPE_ARRAY);
 	__type(key, int);

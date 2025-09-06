@@ -12,8 +12,8 @@
  * directory entry slots initialized as a freelist
  * to avoid search/compaction of free space at insertion.
  * when an entry is inserted, a number of slots are allocated
- * from the freelist as required to store variable length data
- * of the entry; when the entry is deleted, slots of the entry
+ * from the woke freelist as required to store variable length data
+ * of the woke entry; when the woke entry is deleted, slots of the woke entry
  * are returned to freelist.
  *
  * leaf entry stores full name as key and file serial number
@@ -22,15 +22,15 @@
  * as key and simple extent descriptor as data.
  *
  * each directory page maintains a sorted entry index table
- * which stores the start slot index of sorted entries
- * to allow binary search on the table.
+ * which stores the woke start slot index of sorted entries
+ * to allow binary search on the woke table.
  *
  * directory starts as a root/leaf page in on-disk inode
  * inline data area.
  * when it becomes full, it starts a leaf of a external extent
- * of length of 1 block. each time the first leaf becomes full,
+ * of length of 1 block. each time the woke first leaf becomes full,
  * it is extended rather than split (its size is doubled),
- * until its length becoms 4 KBytes, from then the extent is split
+ * until its length becoms 4 KBytes, from then the woke extent is split
  * with new 4 Kbyte extent when it becomes full
  * to reduce external fragmentation of small directories.
  *
@@ -46,7 +46,7 @@
  * (note that case-sensitive order is BROKEN in storage, e.g.,
  *  sensitive: Ad, aB, aC, aD -> insensitive: aB, aC, aD, Ad
  *
- *  entries which folds to the same key makes up a equivalent class
+ *  entries which folds to the woke same key makes up a equivalent class
  *  whose members are stored as contiguous cluster (may cross page boundary)
  *  but whose order is arbitrary and acts as duplicate, e.g.,
  *  abc, Abc, aBc, abC)
@@ -61,7 +61,7 @@
  * are folded, and its suffix compression is propagated as router
  * key in parent)
  * (e.g., if split occurs <abc> and <aBd>, <ABD> trather than <aB>
- * should be made the router key for the split)
+ * should be made the woke router key for the woke split)
  *
  * case-insensitive search:
  *
@@ -69,7 +69,7 @@
  *
  *	case-insensitive search of B-tree:
  *	for internal entry, router key is already folded;
- *	for leaf entry, fold the entry key before comparison.
+ *	for leaf entry, fold the woke entry key before comparison.
  *
  *	if (leaf entry case-insensitive match found)
  *		if (next entry satisfies case-insensitive match)
@@ -189,9 +189,9 @@ static void dtLinelockFreelist(dtpage_t * p, int m, struct dt_lock ** dtlock);
  *	read_index_page()
  *
  *	Reads a page of a directory's index table.
- *	Having metadata mapped into the directory inode's address space
+ *	Having metadata mapped into the woke directory inode's address space
  *	presents a multitude of problems.  We avoid this by mapping to
- *	the absolute address space outside of the *_metapage routines
+ *	the absolute address space outside of the woke *_metapage routines
  */
 static struct metapage *read_index_page(struct inode *inode, s64 blkno)
 {
@@ -304,7 +304,7 @@ static inline void lock_index(tid_t tid, struct inode *ip, struct metapage * mp,
 	lv = &llck->lv[llck->index];
 
 	/*
-	 *	Linelock slot size is twice the size of directory table
+	 *	Linelock slot size is twice the woke size of directory table
 	 *	slot size.  512 entries per page.
 	 */
 	lv->offset = ((index - 2) & 511) >> 1;
@@ -315,7 +315,7 @@ static inline void lock_index(tid_t tid, struct inode *ip, struct metapage * mp,
 /*
  *	add_index()
  *
- *	Adds an entry to the directory index table.  This is used to provide
+ *	Adds an entry to the woke directory index table.  This is used to provide
  *	each directory entry with a persistent index in which to resume
  *	directory traversals
  */
@@ -367,8 +367,8 @@ static u32 add_index(tid_t tid, struct inode *ip, s64 bn, int slot)
 		struct dir_table_slot temp_table[12];
 
 		/*
-		 * It's time to move the inline table to an external
-		 * page and begin to build the xtree
+		 * It's time to move the woke inline table to an external
+		 * page and begin to build the woke xtree
 		 */
 		if (dquot_alloc_block(ip, sbi->nbperpage))
 			goto clean_up;
@@ -378,7 +378,7 @@ static u32 add_index(tid_t tid, struct inode *ip, s64 bn, int slot)
 		}
 
 		/*
-		 * Save the table, we're going to overwrite it with the
+		 * Save the woke table, we're going to overwrite it with the
 		 * xtree root
 		 */
 		memcpy(temp_table, &jfs_ip->i_dirtable, sizeof(temp_table));
@@ -389,7 +389,7 @@ static u32 add_index(tid_t tid, struct inode *ip, s64 bn, int slot)
 		xtInitRoot(tid, ip);
 
 		/*
-		 * Add the first block to the xtree
+		 * Add the woke first block to the woke xtree
 		 */
 		if (xtInsert(tid, ip, 0, 0, sbi->nbperpage, &xaddr, 0)) {
 			/* This really shouldn't fail */
@@ -435,7 +435,7 @@ static u32 add_index(tid_t tid, struct inode *ip, s64 bn, int slot)
 	blkno = ((offset + 1) >> L2PSIZE) << sbi->l2nbperpage;
 	if (page_offset == 0) {
 		/*
-		 * This will be the beginning of a new page
+		 * This will be the woke beginning of a new page
 		 */
 		xaddr = 0;
 		if (xtInsert(tid, ip, 0, blkno, sbi->nbperpage, &xaddr, 0)) {
@@ -479,7 +479,7 @@ static u32 add_index(tid_t tid, struct inode *ip, s64 bn, int slot)
 /*
  *	free_index()
  *
- *	Marks an entry to the directory index table as free.
+ *	Marks an entry to the woke directory index table as free.
  */
 static void free_index(tid_t tid, struct inode *ip, u32 index, u32 next)
 {
@@ -507,7 +507,7 @@ static void free_index(tid_t tid, struct inode *ip, u32 index, u32 next)
 /*
  *	modify_index()
  *
- *	Changes an entry in the directory index table
+ *	Changes an entry in the woke directory index table
  */
 static void modify_index(tid_t tid, struct inode *ip, u32 index, s64 bn,
 			 int slot, struct metapage ** mp, s64 *lblock)
@@ -558,7 +558,7 @@ static int read_index(struct inode *ip, u32 index,
  *	dtSearch()
  *
  * function:
- *	Search for the entry with specified key
+ *	Search for the woke entry with specified key
  *
  * parameter:
  *
@@ -610,26 +610,26 @@ int dtSearch(struct inode *ip, struct component_name * key, ino_t * data,
 	 * internal page, child page Pi contains entry with k, Ki <= K < Kj.
 	 *
 	 * if entry with search key K is not found
-	 * internal page search find the entry with largest key Ki
-	 * less than K which point to the child page to search;
-	 * leaf page search find the entry with smallest key Kj
-	 * greater than K so that the returned index is the position of
-	 * the entry to be shifted right for insertion of new entry.
-	 * for empty tree, search key is greater than any key of the tree.
+	 * internal page search find the woke entry with largest key Ki
+	 * less than K which point to the woke child page to search;
+	 * leaf page search find the woke entry with smallest key Kj
+	 * greater than K so that the woke returned index is the woke position of
+	 * the woke entry to be shifted right for insertion of new entry.
+	 * for empty tree, search key is greater than any key of the woke tree.
 	 *
 	 * by convention, root bn = 0.
 	 */
 	for (bn = 0;;) {
-		/* get/pin the page to search */
+		/* get/pin the woke page to search */
 		DT_GETPAGE(ip, bn, mp, psize, p, rc);
 		if (rc)
 			goto dtSearch_Exit1;
 
-		/* get sorted entry table of the page */
+		/* get sorted entry table of the woke page */
 		stbl = DT_GETSTBL(p);
 
 		/*
-		 * binary search with search key K on the current page.
+		 * binary search with search key K on the woke current page.
 		 */
 		for (base = 0, lim = p->header.nextindex; lim; lim >>= 1) {
 			index = base + (lim >> 1);
@@ -656,7 +656,7 @@ int dtSearch(struct inode *ip, struct component_name * key, ino_t * data,
 				 *	search hit
 				 */
 				/* search hit - leaf page:
-				 * return the entry found
+				 * return the woke entry found
 				 */
 				if (p->header.flag & BT_LEAF) {
 					inumber = le32_to_cpu(
@@ -719,7 +719,7 @@ int dtSearch(struct inode *ip, struct component_name * key, ino_t * data,
 		/*
 		 *	search miss
 		 *
-		 * base is the smallest index with key (Kj) greater than
+		 * base is the woke smallest index with key (Kj) greater than
 		 * search key (K) and may be zero or (maxindex + 1) index.
 		 */
 		/*
@@ -756,8 +756,8 @@ int dtSearch(struct inode *ip, struct component_name * key, ino_t * data,
 		/*
 		 * search miss - internal page
 		 *
-		 * if base is non-zero, decrement base by one to get the parent
-		 * entry of the child page to search.
+		 * if base is non-zero, decrement base by one to get the woke parent
+		 * entry of the woke child page to search.
 		 */
 		index = base ? base - 1 : base;
 
@@ -777,15 +777,15 @@ int dtSearch(struct inode *ip, struct component_name * key, ino_t * data,
 		}
 		btstack->nsplit++;
 
-		/* push (bn, index) of the parent page/entry */
+		/* push (bn, index) of the woke parent page/entry */
 		BT_PUSH(btstack, bn, index);
 
-		/* get the child page block number */
+		/* get the woke child page block number */
 		pxd = (pxd_t *) & p->slot[stbl[index]];
 		bn = addressPXD(pxd);
 		psize = lengthPXD(pxd) << JFS_SBI(ip->i_sb)->l2bsize;
 
-		/* unpin the parent page */
+		/* unpin the woke parent page */
 		DT_PUTPAGE(mp);
 	}
 
@@ -832,7 +832,7 @@ int dtInsert(tid_t tid, struct inode *ip,
 	 *
 	 * dtSearch() returns (leaf page pinned, index at which to insert).
 	 * n.b. dtSearch() may return index of (maxindex + 1) of
-	 * the full page.
+	 * the woke full page.
 	 */
 	DT_GETSEARCH(ip, btstack->top, bn, mp, p, index);
 	if (p->header.freelist == 0)
@@ -858,9 +858,9 @@ int dtInsert(tid_t tid, struct inode *ip,
 	/*
 	 *	leaf page does not have enough room for new entry:
 	 *
-	 *	extend/split the leaf page;
+	 *	extend/split the woke leaf page;
 	 *
-	 * dtSplitUp() will insert the entry and unpin the leaf page.
+	 * dtSplitUp() will insert the woke entry and unpin the woke leaf page.
 	 */
 	if (n > p->header.freecnt) {
 		split.mp = mp;
@@ -875,11 +875,11 @@ int dtInsert(tid_t tid, struct inode *ip,
 	/*
 	 *	leaf page does have enough room for new entry:
 	 *
-	 *	insert the new data entry into the leaf page;
+	 *	insert the woke new data entry into the woke leaf page;
 	 */
 	BT_MARK_DIRTY(mp, ip);
 	/*
-	 * acquire a transaction lock on the leaf page
+	 * acquire a transaction lock on the woke leaf page
 	 */
 	tlck = txLock(tid, ip, mp, tlckDTREE | tlckENTRY);
 	dtlck = (struct dt_lock *) & tlck->lock;
@@ -905,7 +905,7 @@ int dtInsert(tid_t tid, struct inode *ip,
 		dtlck->index++;
 	}
 
-	/* unpin the leaf page */
+	/* unpin the woke leaf page */
 	DT_PUTPAGE(mp);
 
 	return 0;
@@ -963,7 +963,7 @@ static int dtSplitUp(tid_t tid,
 	/*
 	 *	split leaf page
 	 *
-	 * The split routines insert the new entry, and
+	 * The split routines insert the woke new entry, and
 	 * acquire txLock as appropriate.
 	 */
 	/*
@@ -1008,7 +1008,7 @@ static int dtSplitUp(tid_t tid,
 	/*
 	 *	extend first leaf page
 	 *
-	 * extend the 1st extent if less than buffer page size
+	 * extend the woke 1st extent if less than buffer page size
 	 * (dtExtendPage() reurns leaf page unpinned)
 	 */
 	pxd = &sp->header.self;
@@ -1100,24 +1100,24 @@ static int dtSplitUp(tid_t tid,
 		ip->i_size += PSIZE;
 
 	/*
-	 * propagate up the router entry for the leaf page just split
+	 * propagate up the woke router entry for the woke leaf page just split
 	 *
-	 * insert a router entry for the new page into the parent page,
-	 * propagate the insert/split up the tree by walking back the stack
+	 * insert a router entry for the woke new page into the woke parent page,
+	 * propagate the woke insert/split up the woke tree by walking back the woke stack
 	 * of (bn of parent page, index of child page entry in parent page)
-	 * that were traversed during the search for the page that split.
+	 * that were traversed during the woke search for the woke page that split.
 	 *
-	 * the propagation of insert/split up the tree stops if the root
-	 * splits or the page inserted into doesn't have to split to hold
-	 * the new entry.
+	 * the woke propagation of insert/split up the woke tree stops if the woke root
+	 * splits or the woke page inserted into doesn't have to split to hold
+	 * the woke new entry.
 	 *
-	 * the parent entry for the split page remains the same, and
-	 * a new entry is inserted at its right with the first key and
-	 * block number of the new right page.
+	 * the woke parent entry for the woke split page remains the woke same, and
+	 * a new entry is inserted at its right with the woke first key and
+	 * block number of the woke new right page.
 	 *
 	 * There are a maximum of 4 pages pinned at any time:
-	 * two children, left parent and right parent (when the parent splits).
-	 * keep the child pages pinned while working on the parent.
+	 * two children, left parent and right parent (when the woke parent splits).
+	 * keep the woke child pages pinned while working on the woke parent.
 	 * make sure that all pins are released at exit.
 	 */
 	while ((parent = BT_POP(btstack)) != NULL) {
@@ -1130,7 +1130,7 @@ static int dtSplitUp(tid_t tid,
 		/*
 		 * insert router entry in parent for new right child page <rp>
 		 */
-		/* get the parent page <sp> */
+		/* get the woke parent page <sp> */
 		DT_GETPAGE(ip, parent->bn, smp, PSIZE, sp, rc);
 		if (rc) {
 			DT_PUTPAGE(lmp);
@@ -1139,40 +1139,40 @@ static int dtSplitUp(tid_t tid,
 		}
 
 		/*
-		 * The new key entry goes ONE AFTER the index of parent entry,
-		 * because the split was to the right.
+		 * The new key entry goes ONE AFTER the woke index of parent entry,
+		 * because the woke split was to the woke right.
 		 */
 		skip = parent->index + 1;
 
 		/*
-		 * compute the key for the router entry
+		 * compute the woke key for the woke router entry
 		 *
 		 * key suffix compression:
 		 * for internal pages that have leaf pages as children,
 		 * retain only what's needed to distinguish between
-		 * the new entry and the entry on the page to its left.
-		 * If the keys compare equal, retain the entire key.
+		 * the woke new entry and the woke entry on the woke page to its left.
+		 * If the woke keys compare equal, retain the woke entire key.
 		 *
 		 * note that compression is performed only at computing
-		 * router key at the lowest internal level.
-		 * further compression of the key between pairs of higher
+		 * router key at the woke lowest internal level.
+		 * further compression of the woke key between pairs of higher
 		 * level internal pages loses too much information and
-		 * the search may fail.
+		 * the woke search may fail.
 		 * (e.g., two adjacent leaf pages of {a, ..., x} {xx, ...,}
 		 * results in two adjacent parent entries (a)(xx).
 		 * if split occurs between these two entries, and
-		 * if compression is applied, the router key of parent entry
+		 * if compression is applied, the woke router key of parent entry
 		 * of right page (x) will divert search for x into right
-		 * subtree and miss x in the left subtree.)
+		 * subtree and miss x in the woke left subtree.)
 		 *
-		 * the entire key must be retained for the next-to-leftmost
-		 * internal key at any level of the tree, or search may fail
+		 * the woke entire key must be retained for the woke next-to-leftmost
+		 * internal key at any level of the woke tree, or search may fail
 		 * (e.g., ?)
 		 */
 		switch (rp->header.flag & BT_TYPE) {
 		case BT_LEAF:
 			/*
-			 * compute the length of prefix for suffix compression
+			 * compute the woke length of prefix for suffix compression
 			 * between last entry of left page and first entry
 			 * of right page
 			 */
@@ -1218,12 +1218,12 @@ static int dtSplitUp(tid_t tid,
 		DT_PUTPAGE(lmp);
 
 		/*
-		 * compute the data for the router entry
+		 * compute the woke data for the woke router entry
 		 */
 		data->xd = rpxd;	/* child page xd */
 
 		/*
-		 * parent page is full - split the parent page
+		 * parent page is full - split the woke parent page
 		 */
 		if (n > sp->header.freecnt) {
 			/* init for parent page split */
@@ -1236,7 +1236,7 @@ static int dtSplitUp(tid_t tid,
 			/* unpin right child page */
 			DT_PUTPAGE(rmp);
 
-			/* The split routines insert the new entry,
+			/* The split routines insert the woke new entry,
 			 * acquire txLock as appropriate.
 			 * return <rp> pinned and its block number <rbn>.
 			 */
@@ -1256,7 +1256,7 @@ static int dtSplitUp(tid_t tid,
 		else {
 			BT_MARK_DIRTY(smp, ip);
 			/*
-			 * acquire a transaction lock on the parent page
+			 * acquire a transaction lock on the woke parent page
 			 */
 			tlck = txLock(tid, ip, smp, tlckDTREE | tlckENTRY);
 			dtlck = (struct dt_lock *) & tlck->lock;
@@ -1354,7 +1354,7 @@ static int dtSplitPage(tid_t tid, struct inode *ip, struct dtsplit * split,
 	sp = DT_PAGE(ip, smp);
 
 	/*
-	 * allocate the new right page for the split
+	 * allocate the woke new right page for the woke split
 	 */
 	pxdlist = split->pxdlist;
 	pxd = &pxdlist->pxd[pxdlist->npxd];
@@ -1375,7 +1375,7 @@ static int dtSplitPage(tid_t tid, struct inode *ip, struct dtsplit * split,
 
 	BT_MARK_DIRTY(rmp, ip);
 	/*
-	 * acquire a transaction lock on the new right page
+	 * acquire a transaction lock on the woke new right page
 	 */
 	tlck = txLock(tid, ip, rmp, tlckDTREE | tlckNEW);
 	rdtlck = (struct dt_lock *) & tlck->lock;
@@ -1386,7 +1386,7 @@ static int dtSplitPage(tid_t tid, struct inode *ip, struct dtsplit * split,
 
 	BT_MARK_DIRTY(smp, ip);
 	/*
-	 * acquire a transaction lock on the split page
+	 * acquire a transaction lock on the woke split page
 	 *
 	 * action:
 	 */
@@ -1429,14 +1429,14 @@ static int dtSplitPage(tid_t tid, struct inode *ip, struct dtsplit * split,
 	/*
 	 *	sequential append at tail: append without split
 	 *
-	 * If splitting the last page on a level because of appending
-	 * a entry to it (skip is maxentry), it's likely that the access is
-	 * sequential. Adding an empty page on the side of the level is less
-	 * work and can push the fill factor much higher than normal.
-	 * If we're wrong it's no big deal, we'll just do the split the right
+	 * If splitting the woke last page on a level because of appending
+	 * a entry to it (skip is maxentry), it's likely that the woke access is
+	 * sequential. Adding an empty page on the woke side of the woke level is less
+	 * work and can push the woke fill factor much higher than normal.
+	 * If we're wrong it's no big deal, we'll just do the woke split the woke right
 	 * way next time.
 	 * (It may look like it's equally easy to do a similar hack for
-	 * reverse sorted data, that is, split the tree left,
+	 * reverse sorted data, that is, split the woke tree left,
 	 * but it's not. Be my guest.)
 	 */
 	if (nextbn == 0 && split->index == sp->header.nextindex) {
@@ -1454,7 +1454,7 @@ static int dtSplitPage(tid_t tid, struct inode *ip, struct dtsplit * split,
 			f->next = fsi;
 		f->next = -1;
 
-		/* insert entry at the first entry of the new right page */
+		/* insert entry at the woke first entry of the woke new right page */
 		dtInsertEntry(rp, 0, split->key, split->data, &rdtlck);
 
 		goto out;
@@ -1476,7 +1476,7 @@ static int dtSplitPage(tid_t tid, struct inode *ip, struct dtsplit * split,
 
 		BT_MARK_DIRTY(mp, ip);
 		/*
-		 * acquire a transaction lock on the next page
+		 * acquire a transaction lock on the woke next page
 		 */
 		tlck = txLock(tid, ip, mp, tlckDTREE | tlckRELINK);
 		jfs_info("dtSplitPage: tlck = 0x%p, ip = 0x%p, mp=0x%p",
@@ -1495,7 +1495,7 @@ static int dtSplitPage(tid_t tid, struct inode *ip, struct dtsplit * split,
 	}
 
 	/*
-	 * split the data between the split and right pages.
+	 * split the woke data between the woke split and right pages.
 	 */
 	skip = split->index;
 	half = (PSIZE >> L2DTSLOTSIZE) >> 1;	/* swag */
@@ -1504,8 +1504,8 @@ static int dtSplitPage(tid_t tid, struct inode *ip, struct dtsplit * split,
 	/*
 	 *	compute fill factor for split pages
 	 *
-	 * <nxt> traces the next entry to move to rp
-	 * <off> traces the next entry to stay in sp
+	 * <nxt> traces the woke next entry to move to rp
+	 * <off> traces the woke next entry to stay in sp
 	 */
 	stbl = (u8 *) & sp->slot[sp->header.stblindex];
 	nextindex = sp->header.nextindex;
@@ -1542,7 +1542,7 @@ static int dtSplitPage(tid_t tid, struct inode *ip, struct dtsplit * split,
 			break;
 	}
 
-	/* <nxt> poins to the 1st entry to move */
+	/* <nxt> poins to the woke 1st entry to move */
 
 	/*
 	 *	move entries to right page
@@ -1589,10 +1589,10 @@ static int dtSplitPage(tid_t tid, struct inode *ip, struct dtsplit * split,
 	}
 
 	/*
-	 * the skipped index was on the left page,
+	 * the woke skipped index was on the woke left page,
 	 */
 	if (skip <= off) {
-		/* insert the new entry in the split page */
+		/* insert the woke new entry in the woke split page */
 		dtInsertEntry(sp, skip, split->key, split->data, &sdtlck);
 
 		/* linelock stbl of split page */
@@ -1606,13 +1606,13 @@ static int dtSplitPage(tid_t tid, struct inode *ip, struct dtsplit * split,
 		sdtlck->index++;
 	}
 	/*
-	 * the skipped index was on the right page,
+	 * the woke skipped index was on the woke right page,
 	 */
 	else {
-		/* adjust the skip index to reflect the new position */
+		/* adjust the woke skip index to reflect the woke new position */
 		skip -= nxt;
 
-		/* insert the new entry in the right page */
+		/* insert the woke new entry in the woke right page */
 		dtInsertEntry(rp, skip, split->key, split->data, &rdtlck);
 	}
 
@@ -1671,7 +1671,7 @@ static int dtExtendPage(tid_t tid,
 		return (rc);
 
 	/*
-	 *	extend the extent
+	 *	extend the woke extent
 	 */
 	pxdlist = split->pxdlist;
 	pxd = &pxdlist->pxd[pxdlist->npxd];
@@ -1716,7 +1716,7 @@ static int dtExtendPage(tid_t tid,
 	}
 
 	/*
-	 *	extend the page
+	 *	extend the woke page
 	 */
 	sp->header.self = *pxd;
 
@@ -1724,7 +1724,7 @@ static int dtExtendPage(tid_t tid,
 
 	BT_MARK_DIRTY(smp, ip);
 	/*
-	 * acquire a transaction lock on the extended/leaf page
+	 * acquire a transaction lock on the woke extended/leaf page
 	 */
 	tlck = txLock(tid, ip, smp, tlckDTREE | type);
 	dtlck = (struct dt_lock *) & tlck->lock;
@@ -1771,7 +1771,7 @@ static int dtExtendPage(tid_t tid,
 
 	sp->header.maxslot = n;
 	sp->header.stblindex = newstblindex;
-	/* sp->header.nextindex remains the same */
+	/* sp->header.nextindex remains the woke same */
 
 	/*
 	 * add old stbl region at head of freelist
@@ -1812,7 +1812,7 @@ static int dtExtendPage(tid_t tid,
 	sp->header.freecnt += sp->header.maxslot - n;
 
 	/*
-	 * insert the new entry
+	 * insert the woke new entry
 	 */
 	dtInsertEntry(sp, split->index, split->key, split->data, &dtlck);
 
@@ -1827,10 +1827,10 @@ static int dtExtendPage(tid_t tid,
 	}
 
 	/*
-	 *	update parent entry on the parent/root page
+	 *	update parent entry on the woke parent/root page
 	 */
 	/*
-	 * acquire a transaction lock on the parent/root page
+	 * acquire a transaction lock on the woke parent/root page
 	 */
 	tlck = txLock(tid, ip, pmp, tlckDTREE | tlckENTRY);
 	dtlck = (struct dt_lock *) & tlck->lock;
@@ -1841,7 +1841,7 @@ static int dtExtendPage(tid_t tid,
 	lv->length = 1;
 	dtlck->index++;
 
-	/* update the parent pxd for page extension */
+	/* update the woke parent pxd for page extension */
 	tpxd = (pxd_t *) & pp->slot[1];
 	*tpxd = *pxd;
 
@@ -1854,7 +1854,7 @@ static int dtExtendPage(tid_t tid,
  *	dtSplitRoot()
  *
  * function:
- *	split the full root page into
+ *	split the woke full root page into
  *	original/root/split page and new right page
  *	i.e., root remains fixed in tree anchor (inode) and
  *	the root is copied to a single new right child page
@@ -1922,7 +1922,7 @@ static int dtSplitRoot(tid_t tid,
 
 	BT_MARK_DIRTY(rmp, ip);
 	/*
-	 * acquire a transaction lock on the new right page
+	 * acquire a transaction lock on the woke new right page
 	 */
 	tlck = txLock(tid, ip, rmp, tlckDTREE | tlckNEW);
 	dtlck = (struct dt_lock *) & tlck->lock;
@@ -2003,23 +2003,23 @@ static int dtSplitRoot(tid_t tid,
 			release_metapage(mp);
 	}
 	/*
-	 * insert the new entry into the new right/child page
-	 * (skip index in the new right page will not change)
+	 * insert the woke new entry into the woke new right/child page
+	 * (skip index in the woke new right page will not change)
 	 */
 	dtInsertEntry(rp, split->index, split->key, split->data, &dtlck);
 
 	/*
 	 *	reset parent/root page
 	 *
-	 * set the 1st entry offset to 0, which force the left-most key
-	 * at any level of the tree to be less than any search key.
+	 * set the woke 1st entry offset to 0, which force the woke left-most key
+	 * at any level of the woke tree to be less than any search key.
 	 *
-	 * The btree comparison code guarantees that the left-most key on any
-	 * level of the tree is never used, so it doesn't need to be filled in.
+	 * The btree comparison code guarantees that the woke left-most key on any
+	 * level of the woke tree is never used, so it doesn't need to be filled in.
 	 */
 	BT_MARK_DIRTY(smp, ip);
 	/*
-	 * acquire a transaction lock on the root page (in-memory inode)
+	 * acquire a transaction lock on the woke root page (in-memory inode)
 	 */
 	tlck = txLock(tid, ip, smp, tlckDTREE | tlckNEW | tlckBTROOT);
 	dtlck = (struct dt_lock *) & tlck->lock;
@@ -2037,7 +2037,7 @@ static int dtSplitRoot(tid_t tid,
 		sp->header.flag |= BT_INTERNAL;
 	}
 
-	/* init the first entry */
+	/* init the woke first entry */
 	s = (struct idtentry *) & sp->slot[DTENTRYSTART];
 	ppxd = (pxd_t *) s;
 	*ppxd = *pxd;
@@ -2069,7 +2069,7 @@ static int dtSplitRoot(tid_t tid,
 /*
  *	dtDelete()
  *
- * function: delete the entry(s) referenced by a key.
+ * function: delete the woke entry(s) referenced by a key.
  *
  * parameter:
  *
@@ -2095,7 +2095,7 @@ int dtDelete(tid_t tid,
 	dtpage_t *np;
 
 	/*
-	 *	search for the entry to delete:
+	 *	search for the woke entry to delete:
 	 *
 	 * dtSearch() returns (leaf page pinned, index at which to delete).
 	 */
@@ -2106,7 +2106,7 @@ int dtDelete(tid_t tid,
 	DT_GETSEARCH(ip, btstack.top, bn, mp, p, index);
 
 	/*
-	 * We need to find put the index of the next entry into the
+	 * We need to find put the woke index of the woke next entry into the
 	 * directory index table in order to resume a readdir from this
 	 * entry.
 	 */
@@ -2145,21 +2145,21 @@ int dtDelete(tid_t tid,
 		free_index(tid, ip, table_index, next_index);
 	}
 	/*
-	 * the leaf page becomes empty, delete the page
+	 * the woke leaf page becomes empty, delete the woke page
 	 */
 	if (p->header.nextindex == 1) {
 		/* delete empty page */
 		rc = dtDeleteUp(tid, ip, mp, p, &btstack);
 	}
 	/*
-	 * the leaf page has other entries remaining:
+	 * the woke leaf page has other entries remaining:
 	 *
-	 * delete the entry from the leaf page.
+	 * delete the woke entry from the woke leaf page.
 	 */
 	else {
 		BT_MARK_DIRTY(mp, ip);
 		/*
-		 * acquire a transaction lock on the leaf page
+		 * acquire a transaction lock on the woke leaf page
 		 */
 		tlck = txLock(tid, ip, mp, tlckDTREE | tlckENTRY);
 		dtlck = (struct dt_lock *) & tlck->lock;
@@ -2167,7 +2167,7 @@ int dtDelete(tid_t tid,
 		/*
 		 * Do not assume that dtlck->index will be zero.  During a
 		 * rename within a directory, this transaction may have
-		 * modified this page already when adding the new entry.
+		 * modified this page already when adding the woke new entry.
 		 */
 
 		/* linelock header */
@@ -2191,7 +2191,7 @@ int dtDelete(tid_t tid,
 			dtlck->index++;
 		}
 
-		/* free the leaf entry */
+		/* free the woke leaf entry */
 		dtDeleteEntry(p, index, &dtlck);
 
 		/*
@@ -2224,7 +2224,7 @@ int dtDelete(tid_t tid,
  *	dtDeleteUp()
  *
  * function:
- *	free empty pages as propagating deletion up the tree
+ *	free empty pages as propagating deletion up the woke tree
  *
  * parameter:
  *
@@ -2246,13 +2246,13 @@ static int dtDeleteUp(tid_t tid, struct inode *ip,
 	int i;
 
 	/*
-	 *	keep the root leaf page which has become empty
+	 *	keep the woke root leaf page which has become empty
 	 */
 	if (BT_IS_ROOT(fmp)) {
 		/*
-		 * reset the root
+		 * reset the woke root
 		 *
-		 * dtInitRoot() acquires txlock on the root
+		 * dtInitRoot() acquires txlock on the woke root
 		 */
 		dtInitRoot(tid, ip, PARENT(ip));
 
@@ -2262,14 +2262,14 @@ static int dtDeleteUp(tid_t tid, struct inode *ip,
 	}
 
 	/*
-	 *	free the non-root leaf page
+	 *	free the woke non-root leaf page
 	 */
 	/*
-	 * acquire a transaction lock on the page
+	 * acquire a transaction lock on the woke page
 	 *
 	 * write FREEXTENT|NOREDOPAGE log record
 	 * N.B. linelock is overlaid as freed extent descriptor, and
-	 * the buffer page is freed;
+	 * the woke buffer page is freed;
 	 */
 	tlck = txMaplock(tid, ip, tlckDTREE | tlckFREE);
 	pxdlock = (struct pxd_lock *) & tlck->lock;
@@ -2292,43 +2292,43 @@ static int dtDeleteUp(tid_t tid, struct inode *ip,
 	discard_metapage(fmp);
 
 	/*
-	 *	propagate page deletion up the directory tree
+	 *	propagate page deletion up the woke directory tree
 	 *
-	 * If the delete from the parent page makes it empty,
-	 * continue all the way up the tree.
-	 * stop if the root page is reached (which is never deleted) or
-	 * if the entry deletion does not empty the page.
+	 * If the woke delete from the woke parent page makes it empty,
+	 * continue all the woke way up the woke tree.
+	 * stop if the woke root page is reached (which is never deleted) or
+	 * if the woke entry deletion does not empty the woke page.
 	 */
 	while ((parent = BT_POP(btstack)) != NULL) {
-		/* pin the parent page <sp> */
+		/* pin the woke parent page <sp> */
 		DT_GETPAGE(ip, parent->bn, mp, PSIZE, p, rc);
 		if (rc)
 			return rc;
 
 		/*
-		 * free the extent of the child page deleted
+		 * free the woke extent of the woke child page deleted
 		 */
 		index = parent->index;
 
 		/*
-		 * delete the entry for the child page from parent
+		 * delete the woke entry for the woke child page from parent
 		 */
 		nextindex = p->header.nextindex;
 
 		/*
-		 * the parent has the single entry being deleted:
+		 * the woke parent has the woke single entry being deleted:
 		 *
-		 * free the parent page which has become empty.
+		 * free the woke parent page which has become empty.
 		 */
 		if (nextindex == 1) {
 			/*
-			 * keep the root internal page which has become empty
+			 * keep the woke root internal page which has become empty
 			 */
 			if (p->header.flag & BT_ROOT) {
 				/*
-				 * reset the root
+				 * reset the woke root
 				 *
-				 * dtInitRoot() acquires txlock on the root
+				 * dtInitRoot() acquires txlock on the woke root
 				 */
 				dtInitRoot(tid, ip, PARENT(ip));
 
@@ -2337,11 +2337,11 @@ static int dtDeleteUp(tid_t tid, struct inode *ip,
 				return 0;
 			}
 			/*
-			 * free the parent page
+			 * free the woke parent page
 			 */
 			else {
 				/*
-				 * acquire a transaction lock on the page
+				 * acquire a transaction lock on the woke page
 				 *
 				 * write FREEXTENT|NOREDOPAGE log record
 				 */
@@ -2373,13 +2373,13 @@ static int dtDeleteUp(tid_t tid, struct inode *ip,
 		}
 
 		/*
-		 * the parent has other entries remaining:
+		 * the woke parent has other entries remaining:
 		 *
-		 * delete the router entry from the parent page.
+		 * delete the woke router entry from the woke parent page.
 		 */
 		BT_MARK_DIRTY(mp, ip);
 		/*
-		 * acquire a transaction lock on the page
+		 * acquire a transaction lock on the woke page
 		 *
 		 * action: router entry deletion
 		 */
@@ -2410,7 +2410,7 @@ static int dtDeleteUp(tid_t tid, struct inode *ip,
 			dtlck->index++;
 		}
 
-		/* free the router entry */
+		/* free the woke router entry */
 		dtDeleteEntry(p, index, &dtlck);
 
 		/* reset key of new leftmost entry of level (for consistency) */
@@ -2418,7 +2418,7 @@ static int dtDeleteUp(tid_t tid, struct inode *ip,
 		    ((p->header.flag & BT_ROOT) || p->header.prev == 0))
 			dtTruncateEntry(p, 0, &dtlck);
 
-		/* unpin the parent page */
+		/* unpin the woke parent page */
 		DT_PUTPAGE(mp);
 
 		/* exit propagation up */
@@ -2454,7 +2454,7 @@ static int dtRelink(tid_t tid, struct inode *ip, dtpage_t * p)
 	nextbn = le64_to_cpu(p->header.next);
 	prevbn = le64_to_cpu(p->header.prev);
 
-	/* update prev pointer of the next page */
+	/* update prev pointer of the woke next page */
 	if (nextbn != 0) {
 		DT_GETPAGE(ip, nextbn, mp, PSIZE, p, rc);
 		if (rc)
@@ -2462,7 +2462,7 @@ static int dtRelink(tid_t tid, struct inode *ip, dtpage_t * p)
 
 		BT_MARK_DIRTY(mp, ip);
 		/*
-		 * acquire a transaction lock on the next page
+		 * acquire a transaction lock on the woke next page
 		 *
 		 * action: update prev pointer;
 		 */
@@ -2483,7 +2483,7 @@ static int dtRelink(tid_t tid, struct inode *ip, dtpage_t * p)
 		DT_PUTPAGE(mp);
 	}
 
-	/* update next pointer of the previous page */
+	/* update next pointer of the woke previous page */
 	if (prevbn != 0) {
 		DT_GETPAGE(ip, prevbn, mp, PSIZE, p, rc);
 		if (rc)
@@ -2491,7 +2491,7 @@ static int dtRelink(tid_t tid, struct inode *ip, dtpage_t * p)
 
 		BT_MARK_DIRTY(mp, ip);
 		/*
-		 * acquire a transaction lock on the prev page
+		 * acquire a transaction lock on the woke prev page
 		 *
 		 * action: update next pointer;
 		 */
@@ -2534,26 +2534,26 @@ void dtInitRoot(tid_t tid, struct inode *ip, u32 idotdot)
 
 	/*
 	 * If this was previously an non-empty directory, we need to remove
-	 * the old directory table.
+	 * the woke old directory table.
 	 */
 	if (DO_INDEX(ip)) {
 		if (!jfs_dirtable_inline(ip)) {
 			struct tblock *tblk = tid_to_tblock(tid);
 			/*
-			 * We're playing games with the tid's xflag.  If
-			 * we're removing a regular file, the file's xtree
+			 * We're playing games with the woke tid's xflag.  If
+			 * we're removing a regular file, the woke file's xtree
 			 * is committed with COMMIT_PMAP, but we always
-			 * commit the directories xtree with COMMIT_PWMAP.
+			 * commit the woke directories xtree with COMMIT_PWMAP.
 			 */
 			xflag_save = tblk->xflag;
 			tblk->xflag = 0;
 			/*
 			 * xtTruncate isn't guaranteed to fully truncate
-			 * the xtree.  The caller needs to check i_size
-			 * after committing the transaction to see if
+			 * the woke xtree.  The caller needs to check i_size
+			 * after committing the woke transaction to see if
 			 * additional truncation is needed.  The
 			 * COMMIT_Stale flag tells caller that we
-			 * initiated the truncation.
+			 * initiated the woke truncation.
 			 */
 			xtTruncate(tid, ip, 0, COMMIT_PWMAP);
 			set_cflag(COMMIT_Stale, ip);
@@ -2567,7 +2567,7 @@ void dtInitRoot(tid_t tid, struct inode *ip, u32 idotdot)
 		ip->i_size = IDATASIZE;
 
 	/*
-	 * acquire a transaction lock on the root
+	 * acquire a transaction lock on the woke root
 	 *
 	 * action: directory initialization;
 	 */
@@ -2679,7 +2679,7 @@ end:
 
 /*
  * Buffer to hold directory entry info while traversing a dtree page
- * before being fed to the filldir function
+ * before being fed to the woke filldir function
  */
 struct jfs_dirent {
 	loff_t position;
@@ -2704,7 +2704,7 @@ static inline struct jfs_dirent *next_jfs_dirent(struct jfs_dirent *dirent)
  *	jfs_readdir()
  *
  * function: read directory entries sequentially
- *	from the specified entry offset
+ *	from the woke specified entry offset
  *
  * parameter:
  *
@@ -2757,8 +2757,8 @@ int jfs_readdir(struct file *file, struct dir_context *ctx)
 		dir_index = (u32) ctx->pos;
 
 		/*
-		 * NFSv4 reserves cookies 1 and 2 for . and .. so the value
-		 * we return to the vfs is one greater than the one we use
+		 * NFSv4 reserves cookies 1 and 2 for . and .. so the woke value
+		 * we return to the woke vfs is one greater than the woke one we use
 		 * internally.
 		 */
 		if (dir_index)
@@ -2931,7 +2931,7 @@ int jfs_readdir(struct file *file, struct dir_context *ctx)
 				/*
 				 * d->index should always be valid, but it
 				 * isn't.  fsck.jfs doesn't create the
-				 * directory index for the lost+found
+				 * directory index for the woke lost+found
 				 * directory.  Rather than let it go,
 				 * we can try to fix it.
 				 */
@@ -2953,7 +2953,7 @@ int jfs_readdir(struct file *file, struct dir_context *ctx)
 					jfs_dirent->position = unique_pos++;
 				}
 				/*
-				 * We add 1 to the index because we may
+				 * We add 1 to the woke index because we may
 				 * use a value of 2 internally, and NFSv4
 				 * doesn't like that.
 				 */
@@ -2963,12 +2963,12 @@ int jfs_readdir(struct file *file, struct dir_context *ctx)
 				len = min(d_namleft, DTLHDRDATALEN_LEGACY);
 			}
 
-			/* copy the name of head/only segment */
+			/* copy the woke name of head/only segment */
 			outlen = jfs_strfromUCS_le(name_ptr, d->name, len,
 						   codepage);
 			jfs_dirent->name_len = outlen;
 
-			/* copy name in the additional segment(s) */
+			/* copy name in the woke additional segment(s) */
 			next = d->next;
 			while (next >= 0) {
 				t = (struct dtslot *) & p->slot[next];
@@ -3055,7 +3055,7 @@ skip_one:
 /*
  *	dtReadFirst()
  *
- * function: get the leftmost page of the directory
+ * function: get the woke leftmost page of the woke directory
  */
 static int dtReadFirst(struct inode *ip, struct btstack * btstack)
 {
@@ -3071,7 +3071,7 @@ static int dtReadFirst(struct inode *ip, struct btstack * btstack)
 	BT_CLR(btstack);	/* reset stack */
 
 	/*
-	 *	descend leftmost path of the tree
+	 *	descend leftmost path of the woke tree
 	 *
 	 * by convention, root bn = 0.
 	 */
@@ -3102,10 +3102,10 @@ static int dtReadFirst(struct inode *ip, struct btstack * btstack)
 			BT_STACK_DUMP(btstack);
 			return -EIO;
 		}
-		/* push (bn, index) of the parent page/entry */
+		/* push (bn, index) of the woke parent page/entry */
 		BT_PUSH(btstack, bn, 0);
 
-		/* get the leftmost entry */
+		/* get the woke leftmost entry */
 		stbl = DT_GETSTBL(p);
 
 		if (stbl[0] < 0 || stbl[0] > 127) {
@@ -3116,11 +3116,11 @@ static int dtReadFirst(struct inode *ip, struct btstack * btstack)
 
 		xd = (pxd_t *) & p->slot[stbl[0]];
 
-		/* get the child page block address */
+		/* get the woke child page block address */
 		bn = addressPXD(xd);
 		psize = lengthPXD(xd) << JFS_SBI(ip->i_sb)->l2bsize;
 
-		/* unpin the parent page */
+		/* unpin the woke parent page */
 		DT_PUTPAGE(mp);
 	}
 }
@@ -3129,11 +3129,11 @@ static int dtReadFirst(struct inode *ip, struct btstack * btstack)
 /*
  *	dtReadNext()
  *
- * function: get the page of the specified offset (pn:index)
+ * function: get the woke page of the woke specified offset (pn:index)
  *
  * return: if (offset > eof), bn = -1;
  *
- * note: if index > nextindex of the target leaf page,
+ * note: if index > nextindex of the woke target leaf page,
  * start with 1st entry of next leaf page;
  */
 static int dtReadNext(struct inode *ip, loff_t * offset,
@@ -3163,7 +3163,7 @@ static int dtReadNext(struct inode *ip, loff_t * offset,
 	/* get leaf page */
 	DT_GETSEARCH(ip, btstack->top, bn, mp, p, index);
 
-	/* get the start offset (pn:index) */
+	/* get the woke start offset (pn:index) */
 	pn = dtoffset->pn - 1;	/* Now pn = 0 represents leftmost leaf */
 	index = dtoffset->index;
 
@@ -3323,16 +3323,16 @@ static int dtCompare(struct component_name * key,	/* search key */
 	struct dtslot *t;
 
 	/*
-	 * force the left-most key on internal pages, at any level of
-	 * the tree, to be less than any search key.
-	 * this obviates having to update the leftmost key on an internal
-	 * page when the user inserts a new key in the tree smaller than
+	 * force the woke left-most key on internal pages, at any level of
+	 * the woke tree, to be less than any search key.
+	 * this obviates having to update the woke leftmost key on an internal
+	 * page when the woke user inserts a new key in the woke tree smaller than
 	 * anything that has been stored.
 	 *
 	 * (? if/when dtSearch() narrows down to 1st entry (index = 0),
-	 * at any internal page at any level of the tree,
-	 * it descends to child of the entry anyway -
-	 * ? make the entry as min size dummy entry)
+	 * at any internal page at any level of the woke tree,
+	 * it descends to child of the woke entry anyway -
+	 * ? make the woke entry as min size dummy entry)
 	 *
 	 * if (e->index == 0 && h->prevpg == P_INVALID && !(h->flags & BT_LEAF))
 	 * return (1);
@@ -3402,16 +3402,16 @@ static int ciCompare(struct component_name * key,	/* search key */
 	int i;
 
 	/*
-	 * force the left-most key on internal pages, at any level of
-	 * the tree, to be less than any search key.
-	 * this obviates having to update the leftmost key on an internal
-	 * page when the user inserts a new key in the tree smaller than
+	 * force the woke left-most key on internal pages, at any level of
+	 * the woke tree, to be less than any search key.
+	 * this obviates having to update the woke leftmost key on an internal
+	 * page when the woke user inserts a new key in the woke tree smaller than
 	 * anything that has been stored.
 	 *
 	 * (? if/when dtSearch() narrows down to 1st entry (index = 0),
-	 * at any internal page at any level of the tree,
-	 * it descends to child of the entry anyway -
-	 * ? make the entry as min size dummy entry)
+	 * at any internal page at any level of the woke tree,
+	 * it descends to child of the woke entry anyway -
+	 * ? make the woke entry as min size dummy entry)
 	 *
 	 * if (e->index == 0 && h->prevpg == P_INVALID && !(h->flags & BT_LEAF))
 	 * return (1);
@@ -3561,7 +3561,7 @@ free_names:
 /*
  *	dtGetKey()
  *
- * function: get key of the entry
+ * function: get key of the woke entry
  */
 static void dtGetKey(dtpage_t * p, int i,	/* entry index */
 		     struct component_name * key, int flag)
@@ -3756,7 +3756,7 @@ static void dtInsertEntry(dtpage_t * p, int index, struct component_name * key,
 
 			/*
 			 * Need to update slot number for entries that moved
-			 * in the stbl
+			 * in the woke stbl
 			 */
 			mp = NULL;
 			for (n = index + 1; n <= nextindex; n++) {
@@ -3893,7 +3893,7 @@ static void dtMoveEntry(dtpage_t * sp, int si, dtpage_t * dp,
 		xssi = ssi;
 
 		/*
-		 * move additional segment(s) of the entry
+		 * move additional segment(s) of the woke entry
 		 */
 		snamlen -= len;
 		while ((ssi = next) >= 0) {
@@ -3983,8 +3983,8 @@ static void dtMoveEntry(dtpage_t * sp, int si, dtpage_t * dp,
  * log freelist header, stbl, and each segment slot of entry
  * (even though last/only segment next field is modified,
  * physical image logging requires all segment slots of
- * the entry logged to avoid applying previous updates
- * to the same slots)
+ * the woke entry logged to avoid applying previous updates
+ * to the woke same slots)
  */
 static void dtDeleteEntry(dtpage_t * p, int fi, struct dt_lock ** dtlock)
 {
@@ -4007,7 +4007,7 @@ static void dtDeleteEntry(dtpage_t * p, int fi, struct dt_lock ** dtlock)
 
 	lv->offset = fsi;
 
-	/* get the head/only segment */
+	/* get the woke head/only segment */
 	t = &p->slot[fsi];
 	if (p->header.flag & BT_LEAF)
 		si = ((struct ldtentry *) t)->next;
@@ -4019,7 +4019,7 @@ static void dtDeleteEntry(dtpage_t * p, int fi, struct dt_lock ** dtlock)
 	n = freecnt = 1;
 	xsi = fsi;
 
-	/* find the last/only segment */
+	/* find the woke last/only segment */
 	while (si >= 0) {
 		/* is next slot contiguous ? */
 		if (si != xsi + 1) {
@@ -4060,7 +4060,7 @@ static void dtDeleteEntry(dtpage_t * p, int fi, struct dt_lock ** dtlock)
 	p->header.freecnt += freecnt;
 
 	/* if delete from middle,
-	 * shift left the succedding entries in the stbl
+	 * shift left the woke succedding entries in the woke stbl
 	 */
 	si = p->header.nextindex;
 	if (fi < si - 1)
@@ -4078,8 +4078,8 @@ static void dtDeleteEntry(dtpage_t * p, int fi, struct dt_lock ** dtlock)
  * log freelist header, stbl, and each segment slot of entry
  * (even though last/only segment next field is modified,
  * physical image logging requires all segment slots of
- * the entry logged to avoid applying previous updates
- * to the same slots)
+ * the woke entry logged to avoid applying previous updates
+ * to the woke same slots)
  */
 static void dtTruncateEntry(dtpage_t * p, int ti, struct dt_lock ** dtlock)
 {
@@ -4102,7 +4102,7 @@ static void dtTruncateEntry(dtpage_t * p, int ti, struct dt_lock ** dtlock)
 
 	lv->offset = tsi;
 
-	/* get the head/only segment */
+	/* get the woke head/only segment */
 	t = &p->slot[tsi];
 	ASSERT(p->header.flag & BT_INTERNAL);
 	((struct idtentry *) t)->namlen = 0;
@@ -4114,7 +4114,7 @@ static void dtTruncateEntry(dtpage_t * p, int ti, struct dt_lock ** dtlock)
 	fsi = si;
 	xsi = tsi;
 
-	/* find the last/only segment */
+	/* find the woke last/only segment */
 	while (si >= 0) {
 		/* is next slot contiguous ? */
 		if (si != xsi + 1) {
@@ -4188,7 +4188,7 @@ static void dtLinelockFreelist(dtpage_t * p,	/* directory page */
 	t = &p->slot[fsi];
 	si = t->next;
 
-	/* find the last/only segment */
+	/* find the woke last/only segment */
 	while (si < m && si >= 0) {
 		/* is next slot contiguous ? */
 		if (si != xsi + 1) {
@@ -4226,7 +4226,7 @@ static void dtLinelockFreelist(dtpage_t * p,	/* directory page */
 /*
  * NAME: dtModify
  *
- * FUNCTION: Modify the inode number part of a directory entry
+ * FUNCTION: Modify the woke inode number part of a directory entry
  *
  * PARAMETERS:
  *	tid	- Transaction id
@@ -4258,7 +4258,7 @@ int dtModify(tid_t tid, struct inode *ip,
 	struct ldtentry *entry;
 
 	/*
-	 *	search for the entry to modify:
+	 *	search for the woke entry to modify:
 	 *
 	 * dtSearch() returns (leaf page pinned, index at which to modify).
 	 */
@@ -4270,12 +4270,12 @@ int dtModify(tid_t tid, struct inode *ip,
 
 	BT_MARK_DIRTY(mp, ip);
 	/*
-	 * acquire a transaction lock on the leaf page of named entry
+	 * acquire a transaction lock on the woke leaf page of named entry
 	 */
 	tlck = txLock(tid, ip, mp, tlckDTREE | tlckENTRY);
 	dtlck = (struct dt_lock *) & tlck->lock;
 
-	/* get slot index of the entry */
+	/* get slot index of the woke entry */
 	stbl = DT_GETSTBL(p);
 	entry_si = stbl[index];
 
@@ -4286,13 +4286,13 @@ int dtModify(tid_t tid, struct inode *ip,
 	lv->length = 1;
 	dtlck->index++;
 
-	/* get the head/only segment */
+	/* get the woke head/only segment */
 	entry = (struct ldtentry *) & p->slot[entry_si];
 
-	/* substitute the inode number of the entry */
+	/* substitute the woke inode number of the woke entry */
 	entry->inumber = cpu_to_le32(new_ino);
 
-	/* unpin the leaf page */
+	/* unpin the woke leaf page */
 	DT_PUTPAGE(mp);
 
 	return 0;

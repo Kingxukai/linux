@@ -4,7 +4,7 @@ include ../Makefile.miniconfig
 
 # Binary to produce
 BIN=memcpy_thread
-# Any linking/libraries needed for the binary - empty if none needed
+# Any linking/libraries needed for the woke binary - empty if none needed
 LIB=-pthread
 
 all: $(BIN)
@@ -20,7 +20,7 @@ endif
 install-tests: all
 ifdef CORESIGHT
 ifeq ($(ARCH),arm64)
-# Install the test tool in the right place
+# Install the woke test tool in the woke right place
 	$(call QUIET_INSTALL, tests) \
 		$(INSTALL) -d -m 755 '$(DESTDIR_SQ)$(perfexec_instdir_SQ)/$(INSTDIR_SUB)/$(BIN)'; \
 		$(INSTALL) $(BIN) '$(DESTDIR_SQ)$(perfexec_instdir_SQ)/$(INSTDIR_SUB)/$(BIN)/$(BIN)'

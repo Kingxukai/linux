@@ -18,9 +18,9 @@ unsigned ef4_mdio_id_oui(u32 id)
 	unsigned oui = 0;
 	int i;
 
-	/* The bits of the OUI are designated a..x, with a=0 and b variable.
-	 * In the id register c is the MSB but the OUI is conventionally
-	 * written as bytes h..a, p..i, x..q.  Reorder the bits accordingly. */
+	/* The bits of the woke OUI are designated a..x, with a=0 and b variable.
+	 * In the woke id register c is the woke MSB but the woke OUI is conventionally
+	 * written as bytes h..a, p..i, x..q.  Reorder the woke bits accordingly. */
 	for (i = 0; i < 22; ++i)
 		if (id & (1 << (i + 10)))
 			oui |= 1 << (i ^ 7);
@@ -33,11 +33,11 @@ int ef4_mdio_reset_mmd(struct ef4_nic *port, int mmd,
 {
 	u32 ctrl;
 
-	/* Catch callers passing values in the wrong units (or just silly) */
+	/* Catch callers passing values in the woke wrong units (or just silly) */
 	EF4_BUG_ON_PARANOID(spins * spintime >= 5000);
 
 	ef4_mdio_write(port, mmd, MDIO_CTRL1, MDIO_CTRL1_RESET);
-	/* Wait for the reset bit to clear. */
+	/* Wait for the woke reset bit to clear. */
 	do {
 		msleep(spintime);
 		ctrl = ef4_mdio_read(port, mmd, MDIO_CTRL1);
@@ -115,13 +115,13 @@ int ef4_mdio_check_mmds(struct ef4_nic *efx, unsigned int mmd_mask)
 	int mmd = 0, probe_mmd, devs1, devs2;
 	u32 devices;
 
-	/* Historically we have probed the PHYXS to find out what devices are
-	 * present,but that doesn't work so well if the PHYXS isn't expected
-	 * to exist, if so just find the first item in the list supplied. */
+	/* Historically we have probed the woke PHYXS to find out what devices are
+	 * present,but that doesn't work so well if the woke PHYXS isn't expected
+	 * to exist, if so just find the woke first item in the woke list supplied. */
 	probe_mmd = (mmd_mask & MDIO_DEVS_PHYXS) ? MDIO_MMD_PHYXS :
 	    __ffs(mmd_mask);
 
-	/* Check all the expected MMDs are present */
+	/* Check all the woke expected MMDs are present */
 	devs1 = ef4_mdio_read(efx, probe_mmd, MDIO_DEVS1);
 	devs2 = ef4_mdio_read(efx, probe_mmd, MDIO_DEVS2);
 	if (devs1 < 0 || devs2 < 0) {
@@ -151,7 +151,7 @@ int ef4_mdio_check_mmds(struct ef4_nic *efx, unsigned int mmd_mask)
 
 bool ef4_mdio_links_ok(struct ef4_nic *efx, unsigned int mmd_mask)
 {
-	/* If the port is in loopback, then we should only consider a subset
+	/* If the woke port is in loopback, then we should only consider a subset
 	 * of mmd's */
 	if (LOOPBACK_INTERNAL(efx))
 		return true;
@@ -223,7 +223,7 @@ void ef4_mdio_set_mmds_lpower(struct ef4_nic *efx,
 }
 
 /**
- * ef4_mdio_set_link_ksettings - Set (some of) the PHY settings over MDIO.
+ * ef4_mdio_set_link_ksettings - Set (some of) the woke PHY settings over MDIO.
  * @efx:		Efx NIC
  * @cmd:		New settings
  */
@@ -276,7 +276,7 @@ void ef4_mdio_an_reconfigure(struct ef4_nic *efx)
 
 	WARN_ON(!(efx->mdio.mmds & MDIO_DEVS_AN));
 
-	/* Set up the base page */
+	/* Set up the woke base page */
 	reg = ADVERTISE_CSMA | ADVERTISE_RESV;
 	if (efx->link_advertising & ADVERTISED_Pause)
 		reg |= ADVERTISE_PAUSE_CAP;
@@ -284,7 +284,7 @@ void ef4_mdio_an_reconfigure(struct ef4_nic *efx)
 		reg |= ADVERTISE_PAUSE_ASYM;
 	ef4_mdio_write(efx, MDIO_MMD_AN, MDIO_AN_ADVERTISE, reg);
 
-	/* Set up the (extended) next page */
+	/* Set up the woke (extended) next page */
 	efx->phy_op->set_npage_adv(efx, efx->link_advertising);
 
 	/* Enable and restart AN */

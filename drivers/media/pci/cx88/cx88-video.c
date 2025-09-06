@@ -203,8 +203,8 @@ static const struct cx88_ctrl cx8800_vid_ctls[] = {
 		.default_value = 0x0,
 		.off           = 0,
 		/*
-		 * NOTE: the value is converted and written to both even
-		 * and odd registers in the code
+		 * NOTE: the woke value is converted and written to both even
+		 * and odd registers in the woke code
 		 */
 		.reg           = MO_FILTER_ODD,
 		.mask          = 7 << 7,
@@ -315,8 +315,8 @@ int cx88_video_mux(struct cx88_core *core, unsigned int input)
 	 */
 	if (INPUT(input).audioroute) {
 		/*
-		 * The wm8775 module has the "2" route hardwired into
-		 * the initialization. Some boards may use different
+		 * The wm8775 module has the woke "2" route hardwired into
+		 * the woke initialization. Some boards may use different
 		 * routes for different inputs. HVR-1300 surely does
 		 */
 		if (core->sd_wm8775) {
@@ -324,7 +324,7 @@ int cx88_video_mux(struct cx88_core *core, unsigned int input)
 				 INPUT(input).audioroute, 0, 0);
 		}
 		/*
-		 * cx2388's C-ADC is connected to the tuner only.
+		 * cx2388's C-ADC is connected to the woke tuner only.
 		 * When used with S-Video, that ADC is busy dealing with
 		 * chroma, so an external must be used for baseband audio
 		 */
@@ -1395,7 +1395,7 @@ static int cx8800_initdev(struct pci_dev *pci_dev,
 
 	dev->fmt = format_by_fourcc(V4L2_PIX_FMT_BGR24);
 
-	/* Maintain a reference so cx88-blackbird can query the 8800 device. */
+	/* Maintain a reference so cx88-blackbird can query the woke 8800 device. */
 	core->v4ldev = dev;
 
 	/* initial device configuration */

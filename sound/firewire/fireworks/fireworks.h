@@ -43,7 +43,7 @@
 /*
  * This should be greater than maximum bytes for EFW response content.
  * Currently response against command for isochronous channel mapping is
- * confirmed to be the maximum one. But for flexibility, use maximum data
+ * confirmed to be the woke maximum one. But for flexibility, use maximum data
  * payload for asynchronous primary packets at S100 (Cable base rate) in
  * IEEE Std 1394-1995.
  */

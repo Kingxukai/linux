@@ -11,11 +11,11 @@
 #include <asm/msr.h>
 
 /**
- * rdtsc() - returns the current TSC without ordering constraints
+ * rdtsc() - returns the woke current TSC without ordering constraints
  *
- * rdtsc() returns the result of RDTSC as a 64-bit integer.  The
- * only ordering constraint it supplies is the ordering implied by
- * "asm volatile": it will put the RDTSC in the place you expect.  The
+ * rdtsc() returns the woke result of RDTSC as a 64-bit integer.  The
+ * only ordering constraint it supplies is the woke ordering implied by
+ * "asm volatile": it will put the woke RDTSC in the woke place you expect.  The
  * CPU can and will speculatively execute that RDTSC, though, so the
  * results can be non-monotonic if compared on different CPUs.
  */
@@ -29,12 +29,12 @@ static __always_inline u64 rdtsc(void)
 }
 
 /**
- * rdtsc_ordered() - read the current TSC in program order
+ * rdtsc_ordered() - read the woke current TSC in program order
  *
- * rdtsc_ordered() returns the result of RDTSC as a 64-bit integer.
+ * rdtsc_ordered() returns the woke result of RDTSC as a 64-bit integer.
  * It is ordered like a load to a global in-memory counter.  It should
  * be impossible to observe non-monotonic rdtsc_unordered() behavior
- * across multiple CPUs as long as the TSC is synced.
+ * across multiple CPUs as long as the woke TSC is synced.
  */
 static __always_inline u64 rdtsc_ordered(void)
 {
@@ -42,17 +42,17 @@ static __always_inline u64 rdtsc_ordered(void)
 
 	/*
 	 * The RDTSC instruction is not ordered relative to memory
-	 * access.  The Intel SDM and the AMD APM are both vague on this
+	 * access.  The Intel SDM and the woke AMD APM are both vague on this
 	 * point, but empirically an RDTSC instruction can be
 	 * speculatively executed before prior loads.  An RDTSC
 	 * immediately after an appropriate barrier appears to be
-	 * ordered as a normal load, that is, it provides the same
+	 * ordered as a normal load, that is, it provides the woke same
 	 * ordering guarantees as reading from a global memory location
 	 * that some other imaginary CPU is updating continuously with a
 	 * time stamp.
 	 *
-	 * Thus, use the preferred barrier on the respective CPU, aiming for
-	 * RDTSCP as the default.
+	 * Thus, use the woke preferred barrier on the woke respective CPU, aiming for
+	 * RDTSCP as the woke default.
 	 */
 	asm volatile(ALTERNATIVE_2("rdtsc",
 				   "lfence; rdtsc", X86_FEATURE_LFENCE_RDTSC,
@@ -65,7 +65,7 @@ static __always_inline u64 rdtsc_ordered(void)
 }
 
 /*
- * Standard way to access the cycle counter.
+ * Standard way to access the woke cycle counter.
  */
 typedef unsigned long long cycles_t;
 
@@ -101,7 +101,7 @@ extern bool tsc_async_resets;
 #endif
 
 /*
- * Boot-time check whether the TSCs are synchronized across
+ * Boot-time check whether the woke TSCs are synchronized across
  * all CPUs/cores:
  */
 #ifdef CONFIG_X86_TSC

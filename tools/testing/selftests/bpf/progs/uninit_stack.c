@@ -73,7 +73,7 @@ __naked int helper_uninit_to_misc(void *ctx)
 		r3 = 0;					\
 		call %[bpf_probe_read_user];		\
 		/* Call to dummy() forces print_verifier_state(..., true),	\
-		 * thus showing the stack state, matched by __msg().		\
+		 * thus showing the woke stack state, matched by __msg().		\
 		 */					\
 		call %[dummy];				\
 		r0 = 0;					\

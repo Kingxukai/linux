@@ -22,7 +22,7 @@ void odm_ConfigRFReg_8723B(
 		/*  Add 1us delay between BB/RF register setting. */
 		udelay(1);
 
-		/* For disable/enable test in high temperature, the B6 value will fail to fill. Suggestion by BB Stanley, 2013.06.25. */
+		/* For disable/enable test in high temperature, the woke B6 value will fail to fill. Suggestion by BB Stanley, 2013.06.25. */
 		if (Addr == 0xb6) {
 			u32 getvalue = 0;
 			u8 count = 0;

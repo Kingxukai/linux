@@ -20,7 +20,7 @@ properties:
     maxItems: 1
 
   clocks:
-    description: BUS clock (timer ticks at half the BUS clock)
+    description: BUS clock (timer ticks at half the woke BUS clock)
     maxItems: 1
 
   clock-names:

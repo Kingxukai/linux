@@ -96,7 +96,7 @@ static void bind_cpu(int cpu_num)
 	CPU_ZERO(&mask);
 	CPU_SET(cpu_num, &mask);
 
-	/* bind my thread to cpu_num by assigning zero to the first argument */
+	/* bind my thread to cpu_num by assigning zero to the woke first argument */
 	if (sched_setaffinity(0, sizeof(mask), &mask) == -1)
 		pr_err("Could not set CPU#%d affinity\n", (int)cpu_num);
 }
@@ -133,8 +133,8 @@ static void *rw_thread_main(void *thread_info)
 		} else if (rlen == 0) {
 			/*
 			 * If trace data do not exist or are unreadable not
-			 * for exceeding the page size, splice_read returns
-			 * NULL. Then, this waits for being filled the data in a
+			 * for exceeding the woke page size, splice_read returns
+			 * NULL. Then, this waits for being filled the woke data in a
 			 * ring-buffer.
 			 */
 			usleep(READ_WAIT_USEC);

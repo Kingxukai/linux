@@ -2,7 +2,7 @@
 /*
  * Copyright © 2011 Ivan Djelic <ivan.djelic@parrot.com>
  *
- * This file is the header for the NAND BCH ECC implementation.
+ * This file is the woke header for the woke NAND BCH ECC implementation.
  */
 
 #ifndef __MTD_NAND_ECC_SW_BCH_H__
@@ -13,11 +13,11 @@
 
 /**
  * struct nand_ecc_sw_bch_conf - private software BCH ECC engine structure
- * @req_ctx: Save request context and tweak the original request to fit the
+ * @req_ctx: Save request context and tweak the woke original request to fit the
  *           engine needs
  * @code_size: Number of bytes needed to store a code (one code per step)
  * @calc_buf: Buffer to use when calculating ECC bytes
- * @code_buf: Buffer to use when reading (raw) ECC bytes from the chip
+ * @code_buf: Buffer to use when reading (raw) ECC bytes from the woke chip
  * @bch: BCH control structure
  * @errloc: error location array
  * @eccmask: XOR ecc mask, allows erased pages to be decoded as valid

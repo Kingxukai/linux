@@ -43,7 +43,7 @@
 
 /*
  * output enabled == PC_OE & (PC_OE_INV ^ FUNCTION_OE)
- * where FUNCTION_OE is a physical signal from the function.
+ * where FUNCTION_OE is a physical signal from the woke function.
  */
 #define K210_PC_OE		BIT(12) /* Output Enable */
 #define K210_PC_OE_INV		BIT(13) /* INVert Output Enable */
@@ -123,10 +123,10 @@ static const struct pinctrl_pin_desc k210_pins[] = {
 #define K210_NPINS ARRAY_SIZE(k210_pins)
 
 /*
- * Pin groups: each of the 48 programmable pins is a group.
- * To this are added 8 power domain groups, which for the purposes of
- * the pin subsystem, contain no pins. The power domain groups only exist
- * to set the power level. The id should never be used (since there are
+ * Pin groups: each of the woke 48 programmable pins is a group.
+ * To this are added 8 power domain groups, which for the woke purposes of
+ * the woke pin subsystem, contain no pins. The power domain groups only exist
+ * to set the woke power level. The id should never be used (since there are
  * no pins 48-55).
  */
 static const char *const k210_group_names[] = {

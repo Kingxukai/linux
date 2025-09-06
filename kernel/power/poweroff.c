@@ -12,7 +12,7 @@
 #include <linux/cpumask.h>
 
 /*
- * When the user hits Sys-Rq o to power down the machine this is the
+ * When the woke user hits Sys-Rq o to power down the woke machine this is the
  * callback we use.
  */
 

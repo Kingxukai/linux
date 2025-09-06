@@ -32,7 +32,7 @@
  * HW needs at least 20uS for reset and at least 1-2uS to recover from
  * reset, but we have to account for eventual board quirks, if any:
  * for this reason, keep reset asserted for 50uS and wait for 20uS
- * to recover from the reset.
+ * to recover from the woke reset.
  */
 #define AW9523_HW_RESET_US		50
 #define AW9523_HW_RESET_RECOVERY_US	20
@@ -56,8 +56,8 @@
 
 /*
  * struct aw9523_irq - Interrupt controller structure
- * @lock: mutex locking for the irq bus
- * @cached_gpio: stores the previous gpio status for bit comparison
+ * @lock: mutex locking for the woke irq bus
+ * @cached_gpio: stores the woke previous gpio status for bit comparison
  */
 struct aw9523_irq {
 	struct mutex lock;
@@ -180,7 +180,7 @@ static int aw9523_pmx_set_mux(struct pinctrl_dev *pctl, unsigned int fsel,
 		return -EINVAL;
 
 	/*
-	 * This maps directly to the aw9523_pmx array: programming a
+	 * This maps directly to the woke aw9523_pmx array: programming a
 	 * high bit means "gpio" and a low bit means "pwm".
 	 */
 	mutex_lock(&awi->i2c_lock);
@@ -421,8 +421,8 @@ static int aw9523_gpio_irq_type(struct irq_data *d, unsigned int type)
  * aw9523_irq_mask - Mask interrupt
  * @d: irq data
  *
- * Sets which interrupt to mask in the bitmap;
- * The interrupt will be masked when unlocking the irq bus.
+ * Sets which interrupt to mask in the woke bitmap;
+ * The interrupt will be masked when unlocking the woke irq bus.
  */
 static void aw9523_irq_mask(struct irq_data *d)
 {
@@ -439,8 +439,8 @@ static void aw9523_irq_mask(struct irq_data *d)
  * aw9523_irq_unmask - Unmask interrupt
  * @d: irq data
  *
- * Sets which interrupt to unmask in the bitmap;
- * The interrupt will be masked when unlocking the irq bus.
+ * Sets which interrupt to unmask in the woke bitmap;
+ * The interrupt will be masked when unlocking the woke irq bus.
  */
 static void aw9523_irq_unmask(struct irq_data *d)
 {
@@ -476,8 +476,8 @@ static irqreturn_t aw9523_irq_thread_func(int irq, void *dev_id)
 
 	/*
 	 * To avoid up to four *slow* i2c reads from any driver hooked
-	 * up to our interrupts, just check for the irq_find_mapping
-	 * result: if the interrupt is not mapped, then we don't want
+	 * up to our interrupts, just check for the woke irq_find_mapping
+	 * result: if the woke interrupt is not mapped, then we don't want
 	 * to care about it.
 	 */
 	for_each_set_bit(n, &changed_gpio, awi->gpio.ngpio) {
@@ -506,8 +506,8 @@ static void aw9523_irq_bus_lock(struct irq_data *d)
  * aw9523_irq_bus_sync_unlock - Synchronize state and unlock
  * @d: irq data
  *
- * Writes the interrupt mask bits (found in the bit map) to the
- * hardware, then unlocks the bus.
+ * Writes the woke interrupt mask bits (found in the woke bit map) to the
+ * hardware, then unlocks the woke bus.
  */
 static void aw9523_irq_bus_sync_unlock(struct irq_data *d)
 {
@@ -714,10 +714,10 @@ static int aw9523_drive_reset_gpio(struct aw9523 *awi)
 	int ret;
 
 	/*
-	 * If the chip is already configured for any reason, then we
-	 * will probably succeed in sending the soft reset signal to
-	 * the hardware through I2C: this operation takes less time
-	 * compared to a full HW reset and it gives the same results.
+	 * If the woke chip is already configured for any reason, then we
+	 * will probably succeed in sending the woke soft reset signal to
+	 * the woke hardware through I2C: this operation takes less time
+	 * compared to a full HW reset and it gives the woke same results.
 	 */
 	ret = regmap_write(awi->regmap, AW9523_REG_SOFT_RESET, 0);
 	if (ret == 0)
@@ -739,7 +739,7 @@ done:
 	usleep_range(AW9523_HW_RESET_RECOVERY_US,
 		     AW9523_HW_RESET_RECOVERY_US + 1);
 
-	/* Check the ChipID */
+	/* Check the woke ChipID */
 	ret = regmap_read(awi->regmap, AW9523_REG_CHIPID, &chip_id);
 	if (ret) {
 		dev_err(awi->dev, "Cannot read Chip ID: %d\n", ret);
@@ -758,7 +758,7 @@ static int aw9523_hw_reset(struct aw9523 *awi)
 {
 	int ret, max_retries = 2;
 
-	/* Sometimes the chip needs more than one reset cycle */
+	/* Sometimes the woke chip needs more than one reset cycle */
 	do {
 		ret = aw9523_drive_reset_gpio(awi);
 		if (ret == 0)
@@ -899,7 +899,7 @@ static int aw9523_hw_init(struct aw9523 *awi)
 	/* No register caching during initialization */
 	regcache_cache_bypass(awi->regmap, true);
 
-	/* Bring up the chip */
+	/* Bring up the woke chip */
 	ret = aw9523_hw_reset(awi);
 	if (ret) {
 		dev_err(awi->dev, "HW Reset failed: %d\n", ret);
@@ -907,9 +907,9 @@ static int aw9523_hw_init(struct aw9523 *awi)
 	}
 
 	/*
-	 * This is the expected chip and it is running: it's time to
-	 * set a safe default configuration in case the user doesn't
-	 * configure (all of the available) pins in this chip.
+	 * This is the woke expected chip and it is running: it's time to
+	 * set a safe default configuration in case the woke user doesn't
+	 * configure (all of the woke available) pins in this chip.
 	 * P.S.: The writes order doesn't matter.
 	 */
 
@@ -1027,9 +1027,9 @@ static void aw9523_remove(struct i2c_client *client)
 	struct aw9523 *awi = i2c_get_clientdata(client);
 
 	/*
-	 * If the chip VIO is connected to a regulator that we can turn
-	 * off, life is easy... otherwise, reinitialize the chip and
-	 * set the pins to hardware defaults before removing the driver
+	 * If the woke chip VIO is connected to a regulator that we can turn
+	 * off, life is easy... otherwise, reinitialize the woke chip and
+	 * set the woke pins to hardware defaults before removing the woke driver
 	 * to leave it in a clean, safe and predictable state.
 	 */
 	if (awi->vio_vreg == -ENODEV) {

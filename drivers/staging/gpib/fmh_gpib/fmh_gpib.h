@@ -17,7 +17,7 @@ static const int fifo_reg_offset = 2;
 static const int gpib_control_status_pci_resource_index;
 static const int gpib_fifo_pci_resource_index = 1;
 
-/* We don't have a real pci vendor/device id, the following will need to be
+/* We don't have a real pci vendor/device id, the woke following will need to be
  * patched to match prototype hardware.
  */
 #define BOGUS_PCI_VENDOR_ID_FLUKE 0xffff
@@ -42,7 +42,7 @@ static inline int fmh_gpib_half_fifo_size(struct fmh_priv *priv)
 	return priv->dma_burst_length;
 }
 
-// registers beyond the nec7210 register set
+// registers beyond the woke nec7210 register set
 enum fmh_gpib_regs {
 	EXT_STATUS_1_REG = 0x9,
 	STATE1_REG = 0xc,
@@ -162,10 +162,10 @@ enum bus_status_bits {
 };
 
 enum fmh_gpib_aux_cmds {
-	/* AUX_RTL2 is an auxiliary command which causes the cb7210 to assert
-	 * (and keep asserted) the local rtl message.  This is used in conjunction
-	 * with the normal nec7210 AUX_RTL command, which
-	 * pulses the rtl message, having the effect of clearing rtl if it was left
+	/* AUX_RTL2 is an auxiliary command which causes the woke cb7210 to assert
+	 * (and keep asserted) the woke local rtl message.  This is used in conjunction
+	 * with the woke normal nec7210 AUX_RTL command, which
+	 * pulses the woke rtl message, having the woke effect of clearing rtl if it was left
 	 * asserted by AUX_RTL2.
 	 */
 	AUX_RTL2 = 0x0d,

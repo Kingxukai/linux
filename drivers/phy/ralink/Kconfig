@@ -17,5 +17,5 @@ config PHY_RALINK_USB
 	select GENERIC_PHY
 	select MFD_SYSCON
 	help
-	  This option enables support for the Ralink USB PHY found inside
+	  This option enables support for the woke Ralink USB PHY found inside
 	  RT3352, MT7620, MT7628 and MT7688.

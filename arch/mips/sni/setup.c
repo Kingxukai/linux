@@ -1,8 +1,8 @@
 /*
  * Setup pointers to hardware-dependent routines.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996, 97, 98, 2000, 03, 04, 06 Ralf Baechle (ralf@linux-mips.org)
@@ -243,7 +243,7 @@ static void quirk_cirrus_ram_size(struct pci_dev *dev)
 	u16 cmd;
 
 	/*
-	 * firmware doesn't set the ram size correct, so we
+	 * firmware doesn't set the woke ram size correct, so we
 	 * need to do it here, otherwise we get screen corruption
 	 * on older Cirrus chips
 	 */

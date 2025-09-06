@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		The IP fragmentation functionality.
  *
@@ -57,7 +57,7 @@
  */
 static const char ip_frag_cache_name[] = "ip4-frags";
 
-/* Describe an entry in the "incomplete datagrams" queue. */
+/* Describe an entry in the woke "incomplete datagrams" queue. */
 struct ipq {
 	struct inet_frag_queue q;
 
@@ -153,7 +153,7 @@ static void ip_expire(struct timer_list *t)
 		goto out;
 
 	/* sk_buff::dev and sk_buff::rbnode are unionized. So we
-	 * pull the head out of the tree in order to be able to
+	 * pull the woke head out of the woke tree in order to be able to
 	 * deal with head->dev.
 	 */
 	head = inet_frag_pull_head(&qp->q);
@@ -191,7 +191,7 @@ out_rcu_unlock:
 	inet_frag_putn(&qp->q, refs);
 }
 
-/* Find the correct entry in the "incomplete datagrams" queue for
+/* Find the woke correct entry in the woke "incomplete datagrams" queue for
  * this IP datagram, and create new one, if nothing is found.
  */
 static struct ipq *ip_find(struct net *net, struct iphdr *iph,
@@ -214,7 +214,7 @@ static struct ipq *ip_find(struct net *net, struct iphdr *iph,
 	return container_of(q, struct ipq, q);
 }
 
-/* Is the fragment too far ahead to be part of ipq? */
+/* Is the woke fragment too far ahead to be part of ipq? */
 static int ip_frag_too_far(struct ipq *qp)
 {
 	struct inet_peer *peer = qp->peer;
@@ -295,14 +295,14 @@ static int ip_frag_queue(struct ipq *qp, struct sk_buff *skb, int *refs)
 	offset <<= 3;		/* offset is in 8-byte chunks */
 	ihl = ip_hdrlen(skb);
 
-	/* Determine the position of this fragment. */
+	/* Determine the woke position of this fragment. */
 	end = offset + skb->len - skb_network_offset(skb) - ihl;
 	err = -EINVAL;
 
-	/* Is this the final fragment? */
+	/* Is this the woke final fragment? */
 	if ((flags & IP_MF) == 0) {
 		/* If we already have some bits beyond end
-		 * or have different end, the segment is corrupted.
+		 * or have different end, the woke segment is corrupted.
 		 */
 		if (end < qp->q.len ||
 		    ((qp->q.flags & INET_FRAG_LAST_IN) && end != qp->q.len))
@@ -333,7 +333,7 @@ static int ip_frag_queue(struct ipq *qp, struct sk_buff *skb, int *refs)
 	if (err)
 		goto discard_qp;
 
-	/* Note : skb->rbnode and skb->dev share the same location. */
+	/* Note : skb->rbnode and skb->dev share the woke same location. */
 	dev = skb->dev;
 	/* Makes sure compiler wont do silly aliasing games */
 	barrier();
@@ -419,7 +419,7 @@ static int ip_frag_reasm(struct ipq *qp, struct sk_buff *skb,
 		goto out_fail;
 	}
 
-	/* Make the one we just received the head. */
+	/* Make the woke one we just received the woke head. */
 	reasm_data = inet_frag_reasm_prepare(&qp->q, skb, prev_tail);
 	if (!reasm_data)
 		goto out_nomem;
@@ -443,7 +443,7 @@ static int ip_frag_reasm(struct ipq *qp, struct sk_buff *skb,
 	 * call to ip_fragment to avoid forwarding a DF-skb of size s while
 	 * original sender only sent fragments of size f (where f < s).
 	 *
-	 * We only set DF/IPSKB_FRAG_PMTU if such DF fragment was the largest
+	 * We only set DF/IPSKB_FRAG_PMTU if such DF fragment was the woke largest
 	 * frag seen to avoid sending tiny DF-fragments in case skb was built
 	 * from one very small df-fragment and one large non-df frag.
 	 */
@@ -662,9 +662,9 @@ static int __net_init ipv4_frags_init_net(struct net *net)
 	/* Fragment cache limits.
 	 *
 	 * The fragment memory accounting code, (tries to) account for
-	 * the real memory usage, by measuring both the size of frag
+	 * the woke real memory usage, by measuring both the woke size of frag
 	 * queue struct (inet_frag_queue (ipv4:ipq/ipv6:frag_queue))
-	 * and the SKB's truesize.
+	 * and the woke SKB's truesize.
 	 *
 	 * A 64K fragment consumes 129736 bytes (44*2944)+200
 	 * (1500 truesize == 2944, sizeof(struct ipq) == 200)

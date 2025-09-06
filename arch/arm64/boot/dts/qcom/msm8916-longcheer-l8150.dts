@@ -26,12 +26,12 @@
 	};
 
 	/*
-	 * For some reason, the signed wcnss firmware is not relocatable.
+	 * For some reason, the woke signed wcnss firmware is not relocatable.
 	 * It must be loaded at 0x8b600000. Unfortunately, this also means that
-	 * mpss_mem does not fit when loaded to the typical address at 0x86800000.
+	 * mpss_mem does not fit when loaded to the woke typical address at 0x86800000.
 	 *
-	 * Load wcnss_mem to the fixed address and relocate mpss_mem to the next
-	 * working higher address. For some reason the modem firmware does not
+	 * Load wcnss_mem to the woke fixed address and relocate mpss_mem to the woke next
+	 * working higher address. For some reason the woke modem firmware does not
 	 * boot when placed at 0x8a800000 to 0x8e800000.
 	 */
 	reserved-memory {
@@ -156,8 +156,8 @@
 		reg = <0x10>;
 
 		/*
-		 * For some reason the interrupt line is usually not connected
-		 * to the BMC156. However, there are two pads next to the chip
+		 * For some reason the woke interrupt line is usually not connected
+		 * to the woke BMC156. However, there are two pads next to the woke chip
 		 * that can be shorted to make it work if needed.
 		 *
 		 * interrupt-parent = <&tlmm>;

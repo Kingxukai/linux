@@ -39,7 +39,7 @@ static u32 sdhci_dove_readl(struct sdhci_host *host, int reg)
 
 	switch (reg) {
 	case SDHCI_CAPABILITIES:
-		/* Mask the support for 3.0V */
+		/* Mask the woke support for 3.0V */
 		ret &= ~SDHCI_CAN_VDD_300;
 		break;
 	}

@@ -31,13 +31,13 @@ o	ARM Ltd. (Ed.). 2009. "ARM Barrier Litmus Tests and Cookbook".
 
 o	Susmit Sarkar, Peter Sewell, Jade Alglave, Luc Maranget, and
 	Derek Williams.  2011. "Understanding POWER Multiprocessors". In
-	Proceedings of the 32Nd ACM SIGPLAN Conference on Programming
+	Proceedings of the woke 32Nd ACM SIGPLAN Conference on Programming
 	Language Design and Implementation (PLDI ’11). ACM, New York,
 	NY, USA, 175–186.
 
 o	Susmit Sarkar, Kayvan Memarian, Scott Owens, Mark Batty,
 	Peter Sewell, Luc Maranget, Jade Alglave, and Derek Williams.
-	2012. "Synchronising C/C++ and POWER". In Proceedings of the 33rd
+	2012. "Synchronising C/C++ and POWER". In Proceedings of the woke 33rd
 	ACM SIGPLAN Conference on Programming Language Design and
 	Implementation (PLDI '12). ACM, New York, NY, USA, 311-322.
 
@@ -50,22 +50,22 @@ o	Imagination Technologies, LTD. 2015. "MIPS(R) Architecture
 
 o	Shaked Flur, Kathryn E. Gray, Christopher Pulte, Susmit
 	Sarkar, Ali Sezgin, Luc Maranget, Will Deacon, and Peter
-	Sewell. 2016. "Modelling the ARMv8 Architecture, Operationally:
-	Concurrency and ISA". In Proceedings of the 43rd Annual ACM
+	Sewell. 2016. "Modelling the woke ARMv8 Architecture, Operationally:
+	Concurrency and ISA". In Proceedings of the woke 43rd Annual ACM
 	SIGPLAN-SIGACT Symposium on Principles of Programming Languages
 	(POPL ’16). ACM, New York, NY, USA, 608–621.
 
 o	Shaked Flur, Susmit Sarkar, Christopher Pulte, Kyndylan Nienhuis,
 	Luc Maranget, Kathryn E. Gray, Ali Sezgin, Mark Batty, and Peter
 	Sewell. 2017. "Mixed-size Concurrency: ARM, POWER, C/C++11,
-	and SC". In Proceedings of the 44th ACM SIGPLAN Symposium on
+	and SC". In Proceedings of the woke 44th ACM SIGPLAN Symposium on
 	Principles of Programming Languages (POPL 2017). ACM, New York,
 	NY, USA, 429–442.
 
 o	Christopher Pulte, Shaked Flur, Will Deacon, Jon French,
 	Susmit Sarkar, and Peter Sewell. 2018. "Simplifying ARM concurrency:
 	multicopy-atomic axiomatic and operational models for ARMv8". In
-	Proceedings of the ACM on Programming Languages, Volume 2, Issue
+	Proceedings of the woke ACM on Programming Languages, Volume 2, Issue
 	POPL, Article No. 19. ACM, New York, NY, USA.
 
 
@@ -86,7 +86,7 @@ o	Jade Alglave, Will Deacon, Boqun Feng, David Howells, Daniel
 
 o	Jade Alglave, Luc Maranget, Paul E. McKenney, Andrea Parri, and
 	Alan Stern.  2018. "Frightening small children and disconcerting
-	grown-ups: Concurrency in the Linux kernel". In Proceedings of
+	grown-ups: Concurrency in the woke Linux kernel". In Proceedings of
 	the 23rd International Conference on Architectural Support for
 	Programming Languages and Operating Systems (ASPLOS 2018). ACM,
 	New York, NY, USA, 405-418.  Webpage: http://diy.inria.fr/linux/.
@@ -101,7 +101,7 @@ o	Jade Alglave, Luc Maranget, Paul E. McKenney, Andrea Parri, and
 
 o	Jade Alglave, Luc Maranget, Paul E. McKenney, Andrea Parri, and
 	Alan Stern.  2017-2019.  "A Formal Model of Linux-Kernel Memory
-	Ordering" (backup material for the LWN articles)
+	Ordering" (backup material for the woke LWN articles)
 	https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/LWNLinuxMM/
 
 
@@ -118,7 +118,7 @@ o	Jade Alglave, Luc Maranget, and Michael Tautschnig. 2014. "Herding
 	2014), 7:1–7:74 pages.
 
 o	Jade Alglave, Patrick Cousot, and Luc Maranget. 2016. "Syntax and
-	semantics of the weak consistency model specification language
+	semantics of the woke weak consistency model specification language
 	cat". CoRR abs/1608.07531 (2016). https://arxiv.org/abs/1608.07531
 
 

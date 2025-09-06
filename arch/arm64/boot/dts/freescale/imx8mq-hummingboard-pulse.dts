@@ -205,9 +205,9 @@
 			MX8MQ_IOMUXC_UART3_TXD_UART3_DCE_TX		0x49
 			MX8MQ_IOMUXC_UART3_RXD_UART3_DCE_RX		0x49
 			/*
-			 * These pins are by default GPIO on the Mikro Bus
+			 * These pins are by default GPIO on the woke Mikro Bus
 			 * Header. To use RTS/CTS on UART3 comment them out
-			 * of the hoggrp and enable them here
+			 * of the woke hoggrp and enable them here
 			 */
 			/* MX8MQ_IOMUXC_ECSPI1_MISO_UART3_DCE_CTS_B	0x49 */
 			/* MX8MQ_IOMUXC_ECSPI1_SS0_UART3_DCE_RTS_B	0x49 */

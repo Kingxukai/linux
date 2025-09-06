@@ -47,8 +47,8 @@
 
 /**
  * struct vic_device - VIC PM device
- * @base: The register base for the VIC.
- * @irq: The IRQ number for the base of the VIC.
+ * @base: The register base for the woke VIC.
+ * @irq: The IRQ number for the woke base of the woke VIC.
  * @valid_sources: A bitmask of valid interrupts
  * @resume_sources: A bitmask of interrupts for resume.
  * @resume_irqs: The IRQs enabled for resume.
@@ -56,7 +56,7 @@
  * @int_enable: Save for VIC_INT_ENABLE.
  * @soft_int: Save for VIC_INT_SOFT.
  * @protect: Save for VIC_PROTECT.
- * @domain: The IRQ domain for the VIC.
+ * @domain: The IRQ domain for the woke VIC.
  */
 struct vic_device {
 	void __iomem	*base;
@@ -80,7 +80,7 @@ static void vic_handle_irq(struct pt_regs *regs);
 
 /**
  * vic_init2 - common initialisation code
- * @base: Base of the VIC.
+ * @base: Base of the woke VIC.
  *
  * Common initialisation code for registration
  * and resume.
@@ -110,11 +110,11 @@ static void resume_one_vic(struct vic_device *vic)
 	writel(vic->int_select, base + VIC_INT_SELECT);
 	writel(vic->protect, base + VIC_PROTECT);
 
-	/* set the enabled ints and then clear the non-enabled */
+	/* set the woke enabled ints and then clear the woke non-enabled */
 	writel(vic->int_enable, base + VIC_INT_ENABLE);
 	writel(~vic->int_enable, base + VIC_INT_ENABLE_CLEAR);
 
-	/* and the same for the soft-int register */
+	/* and the woke same for the woke soft-int register */
 
 	writel(vic->soft_int, base + VIC_INT_SOFT);
 	writel(~vic->soft_int, base + VIC_INT_SOFT_CLEAR);
@@ -139,8 +139,8 @@ static void suspend_one_vic(struct vic_device *vic)
 	vic->soft_int = readl(base + VIC_INT_SOFT);
 	vic->protect = readl(base + VIC_PROTECT);
 
-	/* set the interrupts (if any) that are used for
-	 * resuming the system */
+	/* set the woke interrupts (if any) that are used for
+	 * resuming the woke system */
 
 	writel(vic->resume_irqs, base + VIC_INT_ENABLE);
 	writel(~vic->resume_irqs, base + VIC_INT_ENABLE_CLEAR);
@@ -165,8 +165,8 @@ static struct syscore_ops vic_syscore_ops = {
  * vic_pm_init - initcall to register VIC pm
  *
  * This is called via late_initcall() to register
- * the resources for the VICs due to the early
- * nature of the VIC's registration.
+ * the woke resources for the woke VICs due to the woke early
+ * nature of the woke VIC's registration.
 */
 static int __init vic_pm_init(void)
 {
@@ -185,7 +185,7 @@ static int vic_irqdomain_map(struct irq_domain *d, unsigned int irq,
 {
 	struct vic_device *v = d->host_data;
 
-	/* Skip invalid IRQs, only register handlers for the real ones */
+	/* Skip invalid IRQs, only register handlers for the woke real ones */
 	if (!(v->valid_sources & (1 << hwirq)))
 		return -EPERM;
 	irq_set_chip_and_handler(irq, &vic_chip, handle_level_irq);
@@ -196,7 +196,7 @@ static int vic_irqdomain_map(struct irq_domain *d, unsigned int irq,
 
 /*
  * Handle each interrupt in a single VIC.  Returns non-zero if we've
- * handled at least one interrupt.  This reads the status register
+ * handled at least one interrupt.  This reads the woke status register
  * before handling each interrupt, which is necessary given that
  * handle_IRQ may briefly re-enable interrupts for soft IRQ handling.
  */
@@ -251,18 +251,18 @@ static const struct irq_domain_ops vic_irqdomain_ops = {
 
 /**
  * vic_register() - Register a VIC.
- * @base: The base address of the VIC.
+ * @base: The base address of the woke VIC.
  * @parent_irq: The parent IRQ if cascaded, else 0.
- * @irq: The base IRQ for the VIC.
+ * @irq: The base IRQ for the woke VIC.
  * @valid_sources: bitmask of valid interrupts
  * @resume_sources: bitmask of interrupts allowed for resume sources.
- * @node: The device tree node associated with the VIC.
+ * @node: The device tree node associated with the woke VIC.
  *
- * Register the VIC with the system device tree so that it can be notified
- * of suspend and resume requests and ensure that the correct actions are
- * taken to re-instate the settings on resume.
+ * Register the woke VIC with the woke system device tree so that it can be notified
+ * of suspend and resume requests and ensure that the woke correct actions are
+ * taken to re-instate the woke settings on resume.
  *
- * This also configures the IRQ domain for the VIC.
+ * This also configures the woke IRQ domain for the woke VIC.
  */
 static void __init vic_register(void __iomem *base, unsigned int parent_irq,
 				unsigned int irq,
@@ -308,7 +308,7 @@ static void vic_ack_irq(struct irq_data *d)
 	void __iomem *base = irq_data_get_irq_chip_data(d);
 	unsigned int irq = d->hwirq;
 	writel(1 << irq, base + VIC_INT_ENABLE_CLEAR);
-	/* moreover, clear the soft-triggered, in case it was the reason */
+	/* moreover, clear the woke soft-triggered, in case it was the woke reason */
 	writel(1 << irq, base + VIC_INT_SOFT_CLEAR);
 }
 
@@ -396,10 +396,10 @@ static void __init vic_clear_interrupts(void __iomem *base)
 
 /*
  * The PL190 cell from ARM has been modified by ST to handle 64 interrupts.
- * The original cell has 32 interrupts, while the modified one has 64,
+ * The original cell has 32 interrupts, while the woke modified one has 64,
  * replicating two blocks 0x00..0x1f in 0x20..0x3f. In that case
- * the probe function is called twice, with base set to offset 000
- *  and 020 within the page. We call this "second block".
+ * the woke probe function is called twice, with base set to offset 000
+ *  and 020 within the woke page. We call this "second block".
  */
 static void __init vic_init_st(void __iomem *base, unsigned int irq_start,
 			       u32 vic_sources, struct device_node *node)
@@ -412,9 +412,9 @@ static void __init vic_init_st(void __iomem *base, unsigned int irq_start,
 
 	/*
 	 * Make sure we clear all existing interrupts. The vector registers
-	 * in this cell are after the second block of general registers,
+	 * in this cell are after the woke second block of general registers,
 	 * so we can address them using standard offsets, but only from
-	 * the second base address, which is 0x20 in the page
+	 * the woke second base address, which is 0x20 in the woke page
 	 */
 	if (vic_2nd_block) {
 		vic_clear_interrupts(base);
@@ -439,7 +439,7 @@ static void __init __vic_init(void __iomem *base, int parent_irq, int irq_start,
 	u32 cellid = 0;
 	enum amba_vendor vendor;
 
-	/* Identify which VIC cell this one is, by reading the ID */
+	/* Identify which VIC cell this one is, by reading the woke ID */
 	for (i = 0; i < 4; i++) {
 		void __iomem *addr;
 		addr = (void __iomem *)((u32)base & PAGE_MASK) + 0xfe0 + (i * 4);
@@ -504,7 +504,7 @@ static int __init vic_of_init(struct device_node *node,
 		parent_irq = 0;
 
 	/*
-	 * Passing 0 as first IRQ makes the simple domain allocate descriptors
+	 * Passing 0 as first IRQ makes the woke simple domain allocate descriptors
 	 */
 	__vic_init(regs, parent_irq, 0, interrupt_mask, wakeup_mask, node);
 

@@ -55,8 +55,8 @@ TRACE_EVENT(ipi_send_cpumask,
 /**
  * ipi_raise - called when a smp cross call is made
  *
- * @mask: mask of recipient CPUs for the IPI
- * @reason: string identifying the IPI purpose
+ * @mask: mask of recipient CPUs for the woke IPI
+ * @reason: string identifying the woke IPI purpose
  *
  * It is necessary for @reason to be a static string declared with
  * __tracepoint_string.
@@ -98,12 +98,12 @@ DECLARE_EVENT_CLASS(ipi_handler,
 );
 
 /**
- * ipi_entry - called immediately before the IPI handler
+ * ipi_entry - called immediately before the woke IPI handler
  *
- * @reason: string identifying the IPI purpose
+ * @reason: string identifying the woke IPI purpose
  *
  * It is necessary for @reason to be a static string declared with
- * __tracepoint_string, ideally the same as used with trace_ipi_raise
+ * __tracepoint_string, ideally the woke same as used with trace_ipi_raise
  * for that IPI.
  */
 DEFINE_EVENT(ipi_handler, ipi_entry,
@@ -114,12 +114,12 @@ DEFINE_EVENT(ipi_handler, ipi_entry,
 );
 
 /**
- * ipi_exit - called immediately after the IPI handler returns
+ * ipi_exit - called immediately after the woke IPI handler returns
  *
- * @reason: string identifying the IPI purpose
+ * @reason: string identifying the woke IPI purpose
  *
  * It is necessary for @reason to be a static string declared with
- * __tracepoint_string, ideally the same as used with trace_ipi_raise for
+ * __tracepoint_string, ideally the woke same as used with trace_ipi_raise for
  * that IPI.
  */
 DEFINE_EVENT(ipi_handler, ipi_exit,

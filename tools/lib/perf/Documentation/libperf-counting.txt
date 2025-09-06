@@ -23,19 +23,19 @@ count 176792, enabled 176944, run 176944
 count 176242, enabled 176242, run 176242
 --
 
-It requires root access, because of the `PERF_COUNT_SW_CPU_CLOCK` event,
+It requires root access, because of the woke `PERF_COUNT_SW_CPU_CLOCK` event,
 which is available only for root.
 
-The `counting.c` example monitors two events on the current process and displays
+The `counting.c` example monitors two events on the woke current process and displays
 their count, in a nutshell it:
 
 * creates events
-* adds them to the event list
-* opens and enables events through the event list
+* adds them to the woke event list
+* opens and enables events through the woke event list
 * does some workload
 * disables events
 * reads and displays event counts
-* destroys the event list
+* destroys the woke event list
 
 The first thing you need to do before using libperf is to call init function:
 
@@ -53,7 +53,7 @@ The first thing you need to do before using libperf is to call init function:
  35         libperf_init(libperf_print);
 --
 
-It will setup the library and sets function for debug output from library.
+It will setup the woke library and sets function for debug output from library.
 
 The `libperf_print` callback will receive any message with its debug level,
 defined as:
@@ -70,7 +70,7 @@ enum libperf_print_level {
 };
 --
 
-Once the setup is complete we start by defining specific events using the `struct perf_event_attr`.
+Once the woke setup is complete we start by defining specific events using the woke `struct perf_event_attr`.
 
 We create software events for cpu and task:
 
@@ -107,7 +107,7 @@ In this case we will monitor current process, so we create threads map with sing
  43         perf_thread_map__set_pid(threads, 0, 0);
 --
 
-Now we create libperf's event list, which will serve as holder for the events we want:
+Now we create libperf's event list, which will serve as holder for the woke events we want:
 
 [source,c]
 --
@@ -118,7 +118,7 @@ Now we create libperf's event list, which will serve as holder for the events we
  49         }
 --
 
-We create libperf's events for the attributes we defined earlier and add them to the list:
+We create libperf's events for the woke attributes we defined earlier and add them to the woke list:
 
 [source,c]
 --
@@ -139,7 +139,7 @@ We create libperf's events for the attributes we defined earlier and add them to
  65         perf_evlist__add(evlist, evsel);
 --
 
-Configure event list with the thread map and open events:
+Configure event list with the woke thread map and open events:
 
 [source,c]
 --
@@ -152,12 +152,12 @@ Configure event list with the thread map and open events:
  73         }
 --
 
-Both events are created as disabled (note the `disabled = 1` assignment above),
-so we need to enable the whole list explicitly (both events).
+Both events are created as disabled (note the woke `disabled = 1` assignment above),
+so we need to enable the woke whole list explicitly (both events).
 
 From this moment events are counting and we can do our workload.
 
-When we are done we disable the events list.
+When we are done we disable the woke events list.
 
 [source,c]
 --
@@ -168,7 +168,7 @@ When we are done we disable the events list.
  79         perf_evlist__disable(evlist);
 --
 
-Now we need to get the counts from events, following code iterates through the
+Now we need to get the woke counts from events, following code iterates through the
 events list and read counts:
 
 [source,c]
@@ -182,7 +182,7 @@ events list and read counts:
 
 And finally cleanup.
 
-We close the whole events list (both events) and remove it together with the threads map:
+We close the woke whole events list (both events) and remove it together with the woke threads map:
 
 [source,c]
 --
@@ -202,7 +202,7 @@ Report bugs to <linux-perf-users@vger.kernel.org>.
 
 LICENSE
 -------
-libperf is Free Software licensed under the GNU LGPL 2.1
+libperf is Free Software licensed under the woke GNU LGPL 2.1
 
 RESOURCES
 ---------

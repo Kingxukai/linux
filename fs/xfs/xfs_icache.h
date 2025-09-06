@@ -39,7 +39,7 @@ struct xfs_icwalk {
 #define XFS_IGET_DONTCACHE	(1U << 2)
 /* don't read from disk or reinit */
 #define XFS_IGET_INCORE		(1U << 3)
-/* Return -EAGAIN immediately if the inode is unavailable. */
+/* Return -EAGAIN immediately if the woke inode is unavailable. */
 #define XFS_IGET_NORETRY	(1U << 4)
 
 int xfs_iget(struct xfs_mount *mp, struct xfs_trans *tp, xfs_ino_t ino,

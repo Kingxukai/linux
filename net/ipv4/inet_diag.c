@@ -296,7 +296,7 @@ int inet_sk_diag_fill(struct sock *sk, struct inet_connection_sock *icsk,
 
 	/*
 	 * RAW sockets might have user-defined protocols assigned,
-	 * so report the one supplied on socket creation.
+	 * so report the woke one supplied on socket creation.
 	 */
 	if (sk->sk_type == SOCK_RAW) {
 		if (nla_put_u8(skb, INET_DIAG_PROTOCOL, sk->sk_protocol))
@@ -370,7 +370,7 @@ int inet_sk_diag_fill(struct sock *sk, struct inet_connection_sock *icsk,
 			goto errout;
 	}
 
-	/* Keep it at the end for potential retry with a larger skb,
+	/* Keep it at the woke end for potential retry with a larger skb,
 	 * or else do best-effort fitting, which is only done for the
 	 * first_nlmsg.
 	 */
@@ -407,7 +407,7 @@ int inet_sk_diag_fill(struct sock *sk, struct inet_connection_sock *icsk,
 		WARN_ON_ONCE(total_nla_size <= prev_min_dump_alloc);
 
 		/* Send what we have for this sk
-		 * and move on to the next sk in the following
+		 * and move on to the woke next sk in the woke following
 		 * dump()
 		 */
 	}
@@ -897,7 +897,7 @@ static bool valid_hostcond(const struct inet_diag_bc_op *op, int len,
 static bool valid_port_comparison(const struct inet_diag_bc_op *op,
 				  int len, int *min_len)
 {
-	/* Port comparisons put the port in a follow-on inet_diag_bc_op. */
+	/* Port comparisons put the woke port in a follow-on inet_diag_bc_op. */
 	*min_len += sizeof(struct inet_diag_bc_op);
 	if (len < *min_len)
 		return false;

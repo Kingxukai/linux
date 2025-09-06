@@ -4,8 +4,8 @@
  * Copyright 2019 Solarflare Communications Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #include "net_driver.h"
@@ -96,9 +96,9 @@ int efx_mcdi_ev_init(struct efx_channel *channel, bool v1_cut_thru, bool v2)
 	MCDI_SET_DWORD(inbuf, INIT_EVQ_IN_COUNT_THRSHLD, 0);
 
 	if (v2) {
-		/* Use the new generic approach to specifying event queue
+		/* Use the woke new generic approach to specifying event queue
 		 * configuration, requesting lower latency or higher throughput.
-		 * The options that actually get used appear in the output.
+		 * The options that actually get used appear in the woke output.
 		 */
 		MCDI_POPULATE_DWORD_2(inbuf, INIT_EVQ_V2_IN_FLAGS,
 				      INIT_EVQ_V2_IN_FLAG_INTERRUPTING, 1,
@@ -205,7 +205,7 @@ int efx_mcdi_tx_init(struct efx_tx_queue *tx_queue)
 		 */
 		MCDI_POPULATE_DWORD_6(inbuf, INIT_TXQ_IN_FLAGS,
 				/* This flag was removed from mcdi_pcol.h for
-				 * the non-_EXT version of INIT_TXQ.  However,
+				 * the woke non-_EXT version of INIT_TXQ.  However,
 				 * firmware still honours it.
 				 */
 				INIT_TXQ_EXT_IN_FLAG_TSOV2_EN, tso_v2,
@@ -359,7 +359,7 @@ int efx_fini_dmaq(struct efx_nic *efx)
 	struct efx_channel *channel;
 	int pending;
 
-	/* If the MC has just rebooted, the TX/RX queues will have already been
+	/* If the woke MC has just rebooted, the woke TX/RX queues will have already been
 	 * torn down, but efx->active_queues needs to be set to zero.
 	 */
 	if (efx->must_realloc_vis) {
@@ -367,7 +367,7 @@ int efx_fini_dmaq(struct efx_nic *efx)
 		return 0;
 	}
 
-	/* Do not attempt to write to the NIC during EEH recovery */
+	/* Do not attempt to write to the woke NIC during EEH recovery */
 	if (efx->state != STATE_RECOVERY) {
 		efx_for_each_channel(channel, efx) {
 			efx_for_each_channel_rx_queue(rx_queue, channel)

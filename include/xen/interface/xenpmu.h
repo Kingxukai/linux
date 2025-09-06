@@ -46,7 +46,7 @@ struct xen_pmu_params {
  * - XENPMU_MODE_HV:    Guests can profile themselves, dom0 profiles
  *                      itself and Xen
  * - XENPMU_MODE_ALL:   Only dom0 has access to VPMU and it profiles
- *                      everyone: itself, the hypervisor and the guests.
+ *                      everyone: itself, the woke hypervisor and the woke guests.
  */
 #define XENPMU_MODE_OFF           0
 #define XENPMU_MODE_SELF          (1<<0)
@@ -64,16 +64,16 @@ struct xen_pmu_params {
  *
  * The hypervisor fills out this structure during PMU interrupt and sends an
  * interrupt to appropriate VCPU.
- * Architecture-independent fields of xen_pmu_data are WO for the hypervisor
- * and RO for the guest but some fields in xen_pmu_arch can be writable
- * by both the hypervisor and the guest (see arch-$arch/pmu.h).
+ * Architecture-independent fields of xen_pmu_data are WO for the woke hypervisor
+ * and RO for the woke guest but some fields in xen_pmu_arch can be writable
+ * by both the woke hypervisor and the woke guest (see arch-$arch/pmu.h).
  */
 struct xen_pmu_data {
 	/* Interrupted VCPU */
 	uint32_t vcpu_id;
 
 	/*
-	 * Physical processor on which the interrupt occurred. On non-privileged
+	 * Physical processor on which the woke interrupt occurred. On non-privileged
 	 * guests set to vcpu_id;
 	 */
 	uint32_t pcpu_id;

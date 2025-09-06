@@ -3,8 +3,8 @@
  *
  * Copyright (C) 2012 Google, Inc.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -21,12 +21,12 @@
 #include <linux/dma-fence-array.h>
 
 /**
- * struct sync_file - sync file to export to the userspace
+ * struct sync_file - sync file to export to the woke userspace
  * @file:		file representing this fence
  * @sync_file_list:	membership in global file list
  * @wq:			wait queue for fence signaling
- * @flags:		flags for the sync_file
- * @fence:		fence with the fences in the sync_file
+ * @flags:		flags for the woke sync_file
+ * @fence:		fence with the woke fences in the woke sync_file
  * @cb:			fence callback information
  *
  * flags:
@@ -37,7 +37,7 @@ struct sync_file {
 	/**
 	 * @user_name:
 	 *
-	 * Name of the sync file provided by userspace, for merged fences.
+	 * Name of the woke sync file provided by userspace, for merged fences.
 	 * Otherwise generated through driver callbacks (in which case the
 	 * entire array is 0).
 	 */

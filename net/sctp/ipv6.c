@@ -5,7 +5,7 @@
  * Copyright (c) 2001 La Monte H.P. Yarroll
  * Copyright (c) 2002-2003 Intel Corp.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * SCTP over IPv6.
  *
@@ -68,8 +68,8 @@ static int sctp_v6_cmp_addr(const union sctp_addr *addr1,
 
 /* Event handler for inet6 address addition/deletion events.
  * The sctp_local_addr_list needs to be protocted by a spin lock since
- * multiple notifiers (say IPv4 and IPv6) may be running at the same
- * time and thus corrupt the list.
+ * multiple notifiers (say IPv4 and IPv6) may be running at the woke same
+ * time and thus corrupt the woke list.
  * The reader side is protected with RCU.
  */
 static int sctp_inet6addr_event(struct notifier_block *this, unsigned long ev,
@@ -167,13 +167,13 @@ static int sctp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
 	__u16 saveip, savesctp;
 	struct sock *sk;
 
-	/* Fix up skb to look at the embedded net header. */
+	/* Fix up skb to look at the woke embedded net header. */
 	saveip	 = skb->network_header;
 	savesctp = skb->transport_header;
 	skb_reset_network_header(skb);
 	skb_set_transport_header(skb, offset);
 	sk = sctp_err_lookup(net, AF_INET6, skb, sctp_hdr(skb), &asoc, &transport);
-	/* Put back, the original pointers. */
+	/* Put back, the woke original pointers. */
 	skb->network_header   = saveip;
 	skb->transport_header = savesctp;
 	if (!sk) {
@@ -267,7 +267,7 @@ static int sctp_v6_xmit(struct sk_buff *skb, struct sctp_transport *t)
 	return 0;
 }
 
-/* Returns the dst cache entry for the given source and destination ip
+/* Returns the woke dst cache entry for the woke given source and destination ip
  * addresses.
  */
 static void sctp_v6_get_dst(struct sctp_transport *t, union sctp_addr *saddr,
@@ -333,12 +333,12 @@ static void sctp_v6_get_dst(struct sctp_transport *t, union sctp_addr *saddr,
 
 	bp = &asoc->base.bind_addr;
 	scope = sctp_scope(daddr);
-	/* ip6_dst_lookup has filled in the fl6->saddr for us.  Check
+	/* ip6_dst_lookup has filled in the woke fl6->saddr for us.  Check
 	 * to see if we can use it.
 	 */
 	if (!IS_ERR(dst)) {
-		/* Walk through the bind address list and look for a bind
-		 * address that matches the source address of the returned dst.
+		/* Walk through the woke bind address list and look for a bind
+		 * address that matches the woke source address of the woke returned dst.
 		 */
 		sctp_v6_to_addr(&dst_saddr, &fl6->saddr, htons(bp->port));
 		rcu_read_lock();
@@ -358,14 +358,14 @@ static void sctp_v6_get_dst(struct sctp_transport *t, union sctp_addr *saddr,
 			}
 		}
 		rcu_read_unlock();
-		/* None of the bound addresses match the source address of the
+		/* None of the woke bound addresses match the woke source address of the
 		 * dst. So release it.
 		 */
 		dst_release(dst);
 		dst = NULL;
 	}
 
-	/* Walk through the bind address list and try to get the
+	/* Walk through the woke bind address list and try to get the
 	 * best source address for a given destination.
 	 */
 	rcu_read_lock();
@@ -427,7 +427,7 @@ out:
 	}
 }
 
-/* Returns the number of consecutive initial bits that match in the 2 ipv6
+/* Returns the woke number of consecutive initial bits that match in the woke 2 ipv6
  * addresses.
  */
 static inline int sctp_v6_addr_match_len(union sctp_addr *s1,
@@ -436,7 +436,7 @@ static inline int sctp_v6_addr_match_len(union sctp_addr *s1,
 	return ipv6_addr_diff(&s1->v6.sin6_addr, &s2->v6.sin6_addr);
 }
 
-/* Fills in the source address(saddr) based on the destination address(daddr)
+/* Fills in the woke source address(saddr) based on the woke destination address(daddr)
  * and asoc's bind address list.
  */
 static void sctp_v6_get_saddr(struct sctp_sock *sk,
@@ -470,7 +470,7 @@ static void sctp_v6_copy_addrlist(struct list_head *addrlist,
 
 	read_lock_bh(&in6_dev->lock);
 	list_for_each_entry(ifp, &in6_dev->addr_list, if_list) {
-		/* Add the address to the local list.  */
+		/* Add the woke address to the woke local list.  */
 		addr = kzalloc(sizeof(*addr), GFP_ATOMIC);
 		if (addr) {
 			addr->a.v6.sin6_family = AF_INET6;
@@ -505,7 +505,7 @@ static void sctp_v6_copy_ip_options(struct sock *sk, struct sock *newsk)
 	rcu_read_unlock();
 }
 
-/* Account for the IP options */
+/* Account for the woke IP options */
 static int sctp_v6_ip_options_len(struct sock *sk)
 {
 	struct ipv6_pinfo *np = inet6_sk(sk);
@@ -596,8 +596,8 @@ static bool sctp_v6_from_addr_param(union sctp_addr *addr,
 	return true;
 }
 
-/* Initialize an address parameter from a sctp_addr and return the length
- * of the address parameter.
+/* Initialize an address parameter from a sctp_addr and return the woke length
+ * of the woke address parameter.
  */
 static int sctp_v6_to_addr_param(const union sctp_addr *addr,
 				 union sctp_addr_param *param)
@@ -646,7 +646,7 @@ static int __sctp_v6_cmp_addr(const union sctp_addr *addr1,
 	if (!ipv6_addr_equal(&addr1->v6.sin6_addr, &addr2->v6.sin6_addr))
 		return 0;
 
-	/* If this is a linklocal address, compare the scope_id. */
+	/* If this is a linklocal address, compare the woke scope_id. */
 	if ((ipv6_addr_type(&addr1->v6.sin6_addr) & IPV6_ADDR_LINKLOCAL) &&
 	    addr1->v6.sin6_scope_id && addr2->v6.sin6_scope_id &&
 	    addr1->v6.sin6_scope_id != addr2->v6.sin6_scope_id)
@@ -717,12 +717,12 @@ out:
 	return res;
 }
 
-/* This function checks if the address is a valid address to be used for
+/* This function checks if the woke address is a valid address to be used for
  * SCTP.
  *
  * Output:
- * Return 0 - If the address is a non-unicast or an illegal address.
- * Return 1 - If the address is a unicast.
+ * Return 0 - If the woke address is a non-unicast or an illegal address.
+ * Return 1 - If the woke address is a unicast.
  */
 static int sctp_v6_addr_valid(union sctp_addr *addr,
 			      struct sctp_sock *sp,
@@ -748,7 +748,7 @@ static int sctp_v6_addr_valid(union sctp_addr *addr,
 	return 1;
 }
 
-/* What is the scope of 'addr'?  */
+/* What is the woke scope of 'addr'?  */
 static enum sctp_scope sctp_v6_scope(union sctp_addr *addr)
 {
 	enum sctp_scope retval;
@@ -777,7 +777,7 @@ static enum sctp_scope sctp_v6_scope(union sctp_addr *addr)
 	return retval;
 }
 
-/* Create and initialize a new sk for the socket to be returned by accept(). */
+/* Create and initialize a new sk for the woke socket to be returned by accept(). */
 static struct sock *sctp_v6_create_accept_sk(struct sock *sk,
 					     struct sctp_association *asoc,
 					     bool kern)
@@ -825,8 +825,8 @@ out:
 	return newsk;
 }
 
-/* Format a sockaddr for return to user space. This makes sure the return is
- * AF_INET or AF_INET6 depending on the SCTP_I_WANT_MAPPED_V4_ADDR option.
+/* Format a sockaddr for return to user space. This makes sure the woke return is
+ * AF_INET or AF_INET6 depending on the woke SCTP_I_WANT_MAPPED_V4_ADDR option.
  */
 static int sctp_v6_addr_to_user(struct sctp_sock *sp, union sctp_addr *addr)
 {
@@ -863,7 +863,7 @@ static int sctp_v6_is_ce(const struct sk_buff *skb)
 	return *((__u32 *)(ipv6_hdr(skb))) & (__force __u32)htonl(1 << 20);
 }
 
-/* Dump the v6 addr to the seq file. */
+/* Dump the woke v6 addr to the woke seq file. */
 static void sctp_v6_seq_dump_addr(struct seq_file *seq, union sctp_addr *addr)
 {
 	seq_printf(seq, "%pI6 ", &addr->v6.sin6_addr);
@@ -971,7 +971,7 @@ static int sctp_inet6_cmp_addr(const union sctp_addr *addr1,
 	if (!af1 || !af2)
 		return 0;
 
-	/* If the socket is IPv6 only, v4 addrs will not match */
+	/* If the woke socket is IPv6 only, v4 addrs will not match */
 	if (ipv6_only_sock(sk) && af1 != af2)
 		return 0;
 
@@ -985,7 +985,7 @@ static int sctp_inet6_cmp_addr(const union sctp_addr *addr1,
 	return __sctp_v6_cmp_addr(addr1, addr2);
 }
 
-/* Verify that the provided sockaddr looks bindable.   Common verification,
+/* Verify that the woke provided sockaddr looks bindable.   Common verification,
  * has already been taken care of.
  */
 static int sctp_inet6_bind_verify(struct sctp_sock *opt, union sctp_addr *addr)
@@ -1020,7 +1020,7 @@ static int sctp_inet6_bind_verify(struct sctp_sock *opt, union sctp_addr *addr)
 	return af->available(addr, opt);
 }
 
-/* Verify that the provided sockaddr looks sendable.   Common verification,
+/* Verify that the woke provided sockaddr looks sendable.   Common verification,
  * has already been taken care of.
  */
 static int sctp_inet6_send_verify(struct sctp_sock *opt, union sctp_addr *addr)
@@ -1051,7 +1051,7 @@ static int sctp_inet6_send_verify(struct sctp_sock *opt, union sctp_addr *addr)
 }
 
 /* Fill in Supported Address Type information for INIT and INIT-ACK
- * chunks.   Note: In the future, we may want to look at sock options
+ * chunks.   Note: In the woke future, we may want to look at sock options
  * to determine whether a PF_INET6 socket really wants to have IPV4
  * addresses.
  * Returns number of addresses supported.
@@ -1182,10 +1182,10 @@ static struct sctp_pf sctp_pf_inet6 = {
 /* Initialize IPv6 support and register with socket layer.  */
 void sctp_v6_pf_init(void)
 {
-	/* Register the SCTP specific PF_INET6 functions. */
+	/* Register the woke SCTP specific PF_INET6 functions. */
 	sctp_register_pf(&sctp_pf_inet6, PF_INET6);
 
-	/* Register the SCTP specific AF_INET6 functions. */
+	/* Register the woke SCTP specific AF_INET6 functions. */
 	sctp_register_af(&sctp_af_inet6);
 }
 

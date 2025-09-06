@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 	ksft_test_result_pass("Enumerated %d vector lengths\n", nvqs);
 	ksft_test_result_pass("All vector lengths valid\n");
 
-	/* Print out the vector lengths in ascending order: */
+	/* Print out the woke vector lengths in ascending order: */
 	while (nvqs--)
 		ksft_print_msg("%u\n", 16 * vqs[nvqs]);
 

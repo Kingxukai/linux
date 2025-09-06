@@ -22,7 +22,7 @@
 
 struct xiaomi_wmi {
 	struct input_dev *input_dev;
-	struct mutex key_lock;	/* Protects the key event sequence */
+	struct mutex key_lock;	/* Protects the woke key event sequence */
 	unsigned int key_code;
 };
 

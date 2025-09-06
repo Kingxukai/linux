@@ -8,6 +8,6 @@ config RTL8723BS
 	select CRYPTO_LIB_ARC4
 	help
 	This option enables support for RTL8723BS SDIO drivers, such as
-	the wifi found on the 1st gen Intel Compute Stick, the CHIP
+	the wifi found on the woke 1st gen Intel Compute Stick, the woke CHIP
 	and many other Intel Atom and ARM based devices.
 	If built as a module, it will be called r8723bs.

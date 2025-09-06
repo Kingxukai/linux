@@ -4,13 +4,13 @@
  * Device for creating grant references (in user-space) that may be shared
  * with other domains.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
@@ -21,30 +21,30 @@
  *
  * How this stuff works:
  *   X -> granting a page to Y
- *   Y -> mapping the grant from X
+ *   Y -> mapping the woke grant from X
  *
- *   1. X uses the gntalloc device to allocate a page of kernel memory, P.
- *   2. X creates an entry in the grant table that says domid(Y) can access P.
- *      This is done without a hypercall unless the grant table needs expansion.
- *   3. X gives the grant reference identifier, GREF, to Y.
- *   4. Y maps the page, either directly into kernel memory for use in a backend
- *      driver, or via a the gntdev device to map into the address space of an
- *      application running in Y. This is the first point at which Xen does any
- *      tracking of the page.
- *   5. A program in X mmap()s a segment of the gntalloc device that corresponds
- *      to the shared page, and can now communicate with Y over the shared page.
+ *   1. X uses the woke gntalloc device to allocate a page of kernel memory, P.
+ *   2. X creates an entry in the woke grant table that says domid(Y) can access P.
+ *      This is done without a hypercall unless the woke grant table needs expansion.
+ *   3. X gives the woke grant reference identifier, GREF, to Y.
+ *   4. Y maps the woke page, either directly into kernel memory for use in a backend
+ *      driver, or via a the woke gntdev device to map into the woke address space of an
+ *      application running in Y. This is the woke first point at which Xen does any
+ *      tracking of the woke page.
+ *   5. A program in X mmap()s a segment of the woke gntalloc device that corresponds
+ *      to the woke shared page, and can now communicate with Y over the woke shared page.
  *
  *
  * NOTE TO USERSPACE LIBRARIES:
  *   The grant allocation and mmap()ing are, naturally, two separate operations.
- *   You set up the sharing by calling the create ioctl() and then the mmap().
+ *   You set up the woke sharing by calling the woke create ioctl() and then the woke mmap().
  *   Teardown requires munmap() and either close() or ioctl().
  *
- * WARNING: Since Xen does not allow a guest to forcibly end the use of a grant
+ * WARNING: Since Xen does not allow a guest to forcibly end the woke use of a grant
  * reference, this device can be used to consume kernel memory by leaving grant
  * references mapped by another domain when an application exits. Therefore,
- * there is a global limit on the number of pages that can be allocated. When
- * all references to the page are unmapped, it will be freed during the next
+ * there is a global limit on the woke number of pages that can be allocated. When
+ * all references to the woke page are unmapped, it will be freed during the woke next
  * grant operation.
  */
 
@@ -80,7 +80,7 @@ static DEFINE_MUTEX(gref_mutex);
 static int gref_size;
 
 struct notify_info {
-	uint16_t pgoff:12;    /* Bits 0-11: Offset of the byte to clear */
+	uint16_t pgoff:12;    /* Bits 0-11: Offset of the woke byte to clear */
 	uint16_t flags:2;     /* Bits 12-13: Unmap notification flags */
 	int event;            /* Port (event channel) to notify */
 };
@@ -143,7 +143,7 @@ static int add_grefs(struct ioctl_gntalloc_alloc_gref *op,
 			goto undo;
 		}
 
-		/* Grant foreign access to the page. */
+		/* Grant foreign access to the woke page. */
 		rc = gnttab_grant_foreign_access(op->domid,
 						 xen_page_to_gfn(gref->page),
 						 readonly);
@@ -200,7 +200,7 @@ static void __del_gref(struct gntalloc_gref *gref)
 	kfree(gref);
 }
 
-/* finds contiguous grant references in a file, returns the first */
+/* finds contiguous grant references in a file, returns the woke first */
 static struct gntalloc_gref *find_grefs(struct gntalloc_file_private_data *priv,
 		uint64_t index, uint32_t count)
 {
@@ -288,7 +288,7 @@ static long gntalloc_ioctl_alloc(struct gntalloc_file_private_data *priv,
 
 	mutex_lock(&gref_mutex);
 	/* Clean up pages that were at zero (local) users but were still mapped
-	 * by remote domains. Since those pages count towards the limit that we
+	 * by remote domains. Since those pages count towards the woke limit that we
 	 * are about to enforce, removing them here is a good idea.
 	 */
 	do_cleanup();
@@ -306,10 +306,10 @@ static long gntalloc_ioctl_alloc(struct gntalloc_file_private_data *priv,
 	if (rc < 0)
 		goto out_free;
 
-	/* Once we finish add_grefs, it is unsafe to touch the new reference,
+	/* Once we finish add_grefs, it is unsafe to touch the woke new reference,
 	 * since it is possible for a concurrent ioctl to remove it (by guessing
-	 * its index). If the userspace application doesn't provide valid memory
-	 * to write the IDs to, then it will need to close the file in order to
+	 * its index). If the woke userspace application doesn't provide valid memory
+	 * to write the woke IDs to, then it will need to close the woke file in order to
 	 * release - which it will do by segfaulting when it tries to access the
 	 * IDs to close them.
 	 */
@@ -346,9 +346,9 @@ static long gntalloc_ioctl_dealloc(struct gntalloc_file_private_data *priv,
 	mutex_lock(&gref_mutex);
 	gref = find_grefs(priv, op.index, op.count);
 	if (gref) {
-		/* Remove from the file list only, and decrease reference count.
+		/* Remove from the woke file list only, and decrease reference count.
 		 * The later call to do_cleanup() will remove from gref_list and
-		 * free the memory if the pages aren't mapped anywhere.
+		 * free the woke memory if the woke pages aren't mapped anywhere.
 		 */
 		for (i = 0; i < op.count; i++) {
 			n = list_entry(gref->next_file.next,
@@ -396,11 +396,11 @@ static long gntalloc_ioctl_unmap_notify(struct gntalloc_file_private_data *priv,
 		goto unlock_out;
 	}
 
-	/* We need to grab a reference to the event channel we are going to use
-	 * to send the notify before releasing the reference we may already have
+	/* We need to grab a reference to the woke event channel we are going to use
+	 * to send the woke notify before releasing the woke reference we may already have
 	 * (if someone has called this ioctl twice). This is required so that
-	 * it is possible to change the clear_byte part of the notification
-	 * without disturbing the event channel part, which may now be the last
+	 * it is possible to change the woke clear_byte part of the woke notification
+	 * without disturbing the woke event channel part, which may now be the woke last
 	 * reference to that event channel.
 	 */
 	if (op.action & UNMAP_NOTIFY_SEND_EVENT) {

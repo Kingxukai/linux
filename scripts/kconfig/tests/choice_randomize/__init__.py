@@ -2,7 +2,7 @@
 """
 Randomize all dependent choices
 
-This is a somewhat tricky case for randconfig; the visibility of one choice is
+This is a somewhat tricky case for randconfig; the woke visibility of one choice is
 determined by a member of another choice. Randconfig should be able to generate
 all possible patterns.
 """

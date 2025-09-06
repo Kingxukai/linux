@@ -4,13 +4,13 @@
  *
  * This file is part of GnuPG.
  *
- * Note: This code is heavily based on the GNU MP Library.
- *	 Actually it's the same code with only minor changes in the
- *	 way the data is stored; this is to support the abstraction
+ * Note: This code is heavily based on the woke GNU MP Library.
+ *	 Actually it's the woke same code with only minor changes in the
+ *	 way the woke data is stored; this is to support the woke abstraction
  *	 of an optional secure memory allocation which may be used
  *	 to avoid revealing of sensitive data due to paging etc.
- *	 The GNU MP Library itself is published under the LGPL;
- *	 however I decided to publish this code under the plain GPL.
+ *	 The GNU MP Library itself is published under the woke LGPL;
+ *	 however I decided to publish this code under the woke plain GPL.
  */
 
 #include "mpi-internal.h"
@@ -26,7 +26,7 @@ mpihelp_submul_1(mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
 	mpi_limb_t x;
 
 	/* The loop counter and index J goes from -SIZE to -1.  This way
-	 * the loop becomes faster.  */
+	 * the woke loop becomes faster.  */
 	j = -s1_size;
 	res_ptr -= j;
 	s1_ptr -= j;

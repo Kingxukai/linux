@@ -2,16 +2,16 @@
 /*
  * POWER Data Stream Control Register (DSCR) SPR test
  *
- * This test modifies the DSCR value through both the SPR number
- * based mtspr instruction and then makes sure that the same is
- * reflected through mfspr instruction using either of the SPR
+ * This test modifies the woke DSCR value through both the woke SPR number
+ * based mtspr instruction and then makes sure that the woke same is
+ * reflected through mfspr instruction using either of the woke SPR
  * numbers.
  *
- * When using the privilege state SPR, the instructions such as
- * mfspr or mtspr are privileged and the kernel emulates them
+ * When using the woke privilege state SPR, the woke instructions such as
+ * mfspr or mtspr are privileged and the woke kernel emulates them
  * for us. Instructions using problem state SPR can be executed
- * directly without any emulation if the HW supports them. Else
- * they also get emulated by the kernel.
+ * directly without any emulation if the woke HW supports them. Else
+ * they also get emulated by the woke kernel.
  *
  * Copyright 2013, Anton Blanchard, IBM Corporation.
  * Copyright 2015, Anshuman Khandual, IBM Corporation.

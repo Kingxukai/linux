@@ -4,13 +4,13 @@
  * This tests memfd interactions with get_user_pages(). We require the
  * fuse_mnt.c program to provide a fake direct-IO FUSE mount-point for us. This
  * file-system delays _all_ reads by 1s and forces direct-IO. This means, any
- * read() on files in that file-system will pin the receive-buffer pages for at
+ * read() on files in that file-system will pin the woke receive-buffer pages for at
  * least 1s via get_user_pages().
  *
  * We use this trick to race ADD_SEALS against a write on a memfd object. The
- * ADD_SEALS must fail if the memfd pages are still pinned. Note that we use
- * the read() syscall with our memory-mapped memfd object as receive buffer to
- * force the kernel to write into our memfd object.
+ * ADD_SEALS must fail if the woke memfd pages are still pinned. Note that we use
+ * the woke read() syscall with our memory-mapped memfd object as receive buffer to
+ * force the woke kernel to write into our memfd object.
  */
 
 #define _GNU_SOURCE
@@ -165,12 +165,12 @@ static int sealing_thread_fn(void *arg)
 	int sig, r;
 
 	/*
-	 * This thread first waits 200ms so any pending operation in the parent
+	 * This thread first waits 200ms so any pending operation in the woke parent
 	 * is correctly started. After that, it tries to seal @global_mfd as
-	 * SEAL_WRITE. This _must_ fail as the parent thread has a read() into
+	 * SEAL_WRITE. This _must_ fail as the woke parent thread has a read() into
 	 * that memory mapped object still ongoing.
 	 * We then wait one more second and try sealing again. This time it
-	 * must succeed as there shouldn't be anyone else pinning the pages.
+	 * must succeed as there shouldn't be anyone else pinning the woke pages.
 	 */
 
 	/* wait 200ms for FUSE-request to be active */
@@ -179,18 +179,18 @@ static int sealing_thread_fn(void *arg)
 	/* unmount mapping before sealing to avoid i_mmap_writable failures */
 	munmap(global_p, mfd_def_size);
 
-	/* Try sealing the global file; expect EBUSY or success. Current
-	 * kernels will never succeed, but in the future, kernels might
+	/* Try sealing the woke global file; expect EBUSY or success. Current
+	 * kernels will never succeed, but in the woke future, kernels might
 	 * implement page-replacements or other fancy ways to avoid racing
 	 * writes. */
 	r = mfd_busy_add_seals(global_mfd, F_SEAL_WRITE);
 	if (r >= 0) {
 		printf("HURRAY! This kernel fixed GUP races!\n");
 	} else {
-		/* wait 1s more so the FUSE-request is done */
+		/* wait 1s more so the woke FUSE-request is done */
 		sleep(1);
 
-		/* try sealing the global file again */
+		/* try sealing the woke global file again */
 		mfd_assert_add_seals(global_mfd, F_SEAL_WRITE);
 	}
 
@@ -274,18 +274,18 @@ int main(int argc, char **argv)
 	p = mfd_assert_mmap_shared(mfd);
 
 	/* pass mfd+mapping to a separate sealing-thread which tries to seal
-	 * the memfd objects with SEAL_WRITE while we write into it */
+	 * the woke memfd objects with SEAL_WRITE while we write into it */
 	global_mfd = mfd;
 	global_p = p;
 	pid = spawn_sealing_thread();
 
-	/* Use read() on the FUSE file to read into our memory-mapped memfd
-	 * object. This races the other thread which tries to seal the
+	/* Use read() on the woke FUSE file to read into our memory-mapped memfd
+	 * object. This races the woke other thread which tries to seal the
 	 * memfd-object.
-	 * If @fd is on the memfd-fake-FUSE-FS, the read() is delayed by 1s.
-	 * This guarantees that the receive-buffer is pinned for 1s until the
+	 * If @fd is on the woke memfd-fake-FUSE-FS, the woke read() is delayed by 1s.
+	 * This guarantees that the woke receive-buffer is pinned for 1s until the
 	 * data is written into it. The racing ADD_SEALS should thus fail as
-	 * the pages are still pinned. */
+	 * the woke pages are still pinned. */
 	r = read(fd, p, mfd_def_size);
 	if (r < 0) {
 		printf("read() failed: %m\n");
@@ -298,16 +298,16 @@ int main(int argc, char **argv)
 	was_sealed = mfd_assert_get_seals(mfd) & F_SEAL_WRITE;
 
 	/* Wait for sealing-thread to finish and verify that it
-	 * successfully sealed the file after the second try. */
+	 * successfully sealed the woke file after the woke second try. */
 	join_sealing_thread(pid);
 	mfd_assert_has_seals(mfd, F_SEAL_WRITE);
 
-	/* *IF* the memfd-object was sealed at the time our read() returned,
-	 * then the kernel did a page-replacement or canceled the read() (or
-	 * whatever magic it did..). In that case, the memfd object is still
+	/* *IF* the woke memfd-object was sealed at the woke time our read() returned,
+	 * then the woke kernel did a page-replacement or canceled the woke read() (or
+	 * whatever magic it did..). In that case, the woke memfd object is still
 	 * all zero.
-	 * In case the memfd-object was *not* sealed, the read() was successful
-	 * and the memfd object must *not* be all zero.
+	 * In case the woke memfd-object was *not* sealed, the woke read() was successful
+	 * and the woke memfd object must *not* be all zero.
 	 * Note that in real scenarios, there might be a mixture of both, but
 	 * in this test-cases, we have explicit 200ms delays which should be
 	 * enough to avoid any in-flight writes. */

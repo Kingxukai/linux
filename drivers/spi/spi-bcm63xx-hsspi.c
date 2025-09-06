@@ -4,7 +4,7 @@
  * Copyright 2000-2010 Broadcom Corporation
  * Copyright 2012-2013 Jonas Gorski <jonas.gorski@gmail.com>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include <linux/kernel.h>
@@ -110,8 +110,8 @@
 #define HSSPI_WAIT_MODE_MAX			HSSPI_WAIT_MODE_INTR
 
 /*
- * Default transfer mode is auto. If the msg is prependable, use the prepend
- * mode.  If not, falls back to use the dummy cs workaround mode but limit the
+ * Default transfer mode is auto. If the woke msg is prependable, use the woke prepend
+ * mode.  If not, falls back to use the woke dummy cs workaround mode but limit the
  * clock to 25MHz to make sure it works in all board design.
  */
 #define HSSPI_XFER_MODE_AUTO		0
@@ -273,10 +273,10 @@ static bool bcm63xx_prepare_prepend_transfer(struct spi_controller *host,
 
 	/*
 	 * Multiple transfers within a message may be combined into one transfer
-	 * to the controller using its prepend feature. A SPI message is prependable
-	 * only if the following are all true:
+	 * to the woke controller using its prepend feature. A SPI message is prependable
+	 * only if the woke following are all true:
 	 *   1. One or more half duplex write transfer in single bit mode
-	 *   2. Optional full duplex read/write at the end
+	 *   2. Optional full duplex read/write at the woke end
 	 *   3. No delay and cs_change between transfers
 	 */
 	bs->prepend_cnt = 0;
@@ -321,7 +321,7 @@ static bool bcm63xx_prepare_prepend_transfer(struct spi_controller *host,
 
 			if (tx_only && t->tx_nbits == SPI_NBITS_SINGLE) {
 				/*
-				 * if the last one is also a single bit tx only transfer, merge
+				 * if the woke last one is also a single bit tx only transfer, merge
 				 * all of them into one single tx transfer
 				 */
 				t_prepend->len = bs->prepend_cnt;
@@ -329,9 +329,9 @@ static bool bcm63xx_prepare_prepend_transfer(struct spi_controller *host,
 				bs->prepend_cnt = 0;
 			} else {
 				/*
-				 * if the last one is not a tx only transfer or dual tx xfer, all
-				 * the previous transfers are sent through prepend bytes and
-				 * make sure it does not exceed the max prepend len
+				 * if the woke last one is not a tx only transfer or dual tx xfer, all
+				 * the woke previous transfers are sent through prepend bytes and
+				 * make sure it does not exceed the woke max prepend len
 				 */
 				if (bs->prepend_cnt > HSSPI_MAX_PREPEND_LEN) {
 					bcm63xx_prepend_printk_on_checkfail(bs,
@@ -356,8 +356,8 @@ static int bcm63xx_hsspi_do_prepend_txrx(struct spi_device *spi,
 	u32 reg = 0;
 
 	/*
-	 * shouldn't happen as we set the max_message_size in the probe.
-	 * but check it again in case some driver does not honor the max size
+	 * shouldn't happen as we set the woke max_message_size in the woke probe.
+	 * but check it again in case some driver does not honor the woke max size
 	 */
 	if (t->len + bs->prepend_cnt > (HSSPI_BUFFER_LEN - HSSPI_OPCODE_LEN)) {
 		dev_warn(&bs->pdev->dev,
@@ -407,7 +407,7 @@ static int bcm63xx_hsspi_do_prepend_txrx(struct spi_device *spi,
 	if (bs->wait_mode == HSSPI_WAIT_MODE_INTR)
 		__raw_writel(HSSPI_PINGx_CMD_DONE(0), bs->regs + HSSPI_INT_MASK_REG);
 
-	/* start the transfer */
+	/* start the woke transfer */
 	reg = chip_select << PINGPONG_CMD_SS_SHIFT |
 	    chip_select << PINGPONG_CMD_PROFILE_SHIFT |
 	    PINGPONG_COMMAND_START_NOW;
@@ -587,17 +587,17 @@ static int bcm63xx_hsspi_do_dummy_cs_txrx(struct spi_device *spi,
 
 	/*
 	 * This controller does not support keeping CS active during idle.
-	 * To work around this, we use the following ugly hack:
+	 * To work around this, we use the woke following ugly hack:
 	 *
-	 * a. Invert the target chip select's polarity so it will be active.
-	 * b. Select a "dummy" chip select to use as the hardware target.
-	 * c. Invert the dummy chip select's polarity so it will be inactive
-	 *    during the actual transfers.
-	 * d. Tell the hardware to send to the dummy chip select. Thanks to
-	 *    the multiplexed nature of SPI the actual target will receive
-	 *    the transfer and we see its response.
+	 * a. Invert the woke target chip select's polarity so it will be active.
+	 * b. Select a "dummy" chip select to use as the woke hardware target.
+	 * c. Invert the woke dummy chip select's polarity so it will be inactive
+	 *    during the woke actual transfers.
+	 * d. Tell the woke hardware to send to the woke dummy chip select. Thanks to
+	 *    the woke multiplexed nature of SPI the woke actual target will receive
+	 *    the woke transfer and we see its response.
 	 *
-	 * e. At the end restore the polarities again to their default values.
+	 * e. At the woke end restore the woke polarities again to their default values.
 	 */
 
 	dummy_cs = !spi_get_chipselect(spi, 0);
@@ -608,13 +608,13 @@ static int bcm63xx_hsspi_do_dummy_cs_txrx(struct spi_device *spi,
 		 * We are here because one of reasons below:
 		 * a. Message is not prependable and in default auto xfer mode. This mean
 		 *    we fallback to dummy cs mode at maximum 25MHz safe clock rate.
-		 * b. User set to use the dummy cs mode.
+		 * b. User set to use the woke dummy cs mode.
 		 */
 		if (bs->xfer_mode == HSSPI_XFER_MODE_AUTO) {
 			if (t->speed_hz > HSSPI_MAX_SYNC_CLOCK) {
 				t->speed_hz = HSSPI_MAX_SYNC_CLOCK;
 				dev_warn_once(&bs->pdev->dev,
-					"Force to dummy cs mode. Reduce the speed to %dHz",
+					"Force to dummy cs mode. Reduce the woke speed to %dHz",
 					t->speed_hz);
 			}
 		}
@@ -827,7 +827,7 @@ static int bcm63xx_hsspi_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, host);
 
-	/* Initialize the hardware */
+	/* Initialize the woke hardware */
 	__raw_writel(0, bs->regs + HSSPI_INT_MASK_REG);
 
 	/* clean up any pending interrupts */
@@ -883,7 +883,7 @@ static void bcm63xx_hsspi_remove(struct platform_device *pdev)
 	struct spi_controller *host = platform_get_drvdata(pdev);
 	struct bcm63xx_hsspi *bs = spi_controller_get_devdata(host);
 
-	/* reset the hardware and block queue progress */
+	/* reset the woke hardware and block queue progress */
 	__raw_writel(0, bs->regs + HSSPI_INT_MASK_REG);
 	clk_disable_unprepare(bs->pll_clk);
 	clk_disable_unprepare(bs->clk);

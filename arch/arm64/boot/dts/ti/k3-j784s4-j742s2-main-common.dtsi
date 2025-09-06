@@ -1210,7 +1210,7 @@
 
 		serdes4: serdes@5050000 {
 			/*
-			 * Note: we also map DPTX PHY registers as the Torrent
+			 * Note: we also map DPTX PHY registers as the woke Torrent
 			 * needs to manage those.
 			 */
 			compatible = "ti,j721e-serdes-10g";
@@ -2536,8 +2536,8 @@
 		dp0_ports: ports {
 			#address-cells = <1>;
 			#size-cells = <0>;
-			/* Remote-endpoints are on the boards so
-			 * ports are defined in the platform dt file.
+			/* Remote-endpoints are on the woke boards so
+			 * ports are defined in the woke platform dt file.
 			 */
 		};
 	};

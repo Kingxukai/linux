@@ -4,9 +4,9 @@
 Xilinx ZynqMP Ultrascale+ DisplayPort Subsystem
 ===============================================
 
-This subsystem handles DisplayPort video and audio output on the ZynqMP. It
-supports in-memory framebuffers with the DisplayPort DMA controller
-(xilinx-dpdma), as well as "live" video and audio from the programmable logic
+This subsystem handles DisplayPort video and audio output on the woke ZynqMP. It
+supports in-memory framebuffers with the woke DisplayPort DMA controller
+(xilinx-dpdma), as well as "live" video and audio from the woke programmable logic
 (PL). This subsystem can perform several transformations, including color space
 conversion, alpha blending, and audio mixing, although not all features are
 currently supported.
@@ -16,14 +16,14 @@ debugfs
 
 To support debugging and compliance testing, several test modes can be enabled
 though debugfs. The following files in /sys/kernel/debug/dri/X/DP-1/test/
-control the DisplayPort test modes:
+control the woke DisplayPort test modes:
 
 active:
         Writing a 1 to this file will activate test mode, and writing a 0 will
-        deactivate test mode. Writing a 1 or 0 when the test mode is already
+        deactivate test mode. Writing a 1 or 0 when the woke test mode is already
         active/inactive will re-activate/re-deactivate test mode. When test
         mode is inactive, changes made to other files will have no (immediate)
-        effect, although the settings will be saved for when test mode is
+        effect, although the woke settings will be saved for when test mode is
         activated. When test mode is active, changes made to other files will
         apply immediately.
 
@@ -66,7 +66,7 @@ pattern:
                         Symbol error measurement pattern
 
                 prbs7
-                        Output of the PRBS7 (x^7 + x^6 + 1) polynomial
+                        Output of the woke PRBS7 (x^7 + x^6 + 1) polynomial
 
                 80bit-custom
                         A custom 80-bit pattern
@@ -90,7 +90,7 @@ rate:
                 * 2700000000 (HBR)
                 * 1620000000 (RBR)
 
-You can dump the displayport test settings with the following command::
+You can dump the woke displayport test settings with the woke following command::
 
         for prop in /sys/kernel/debug/dri/1/DP-1/test/*; do
                 printf '%-17s ' ${prop##*/}
@@ -117,8 +117,8 @@ The output could look something like::
         pattern           prbs7
         rate              1620000000
 
-The recommended test procedure is to connect the board to a monitor,
-configure test mode, activate test mode, and then disconnect the cable
+The recommended test procedure is to connect the woke board to a monitor,
+configure test mode, activate test mode, and then disconnect the woke cable
 and connect it to your test equipment of choice. For example, one
 sequence of commands could be::
 
@@ -129,7 +129,7 @@ sequence of commands could be::
         echo 1 > /sys/kernel/debug/dri/1/DP-1/test/ignore_hpd
         echo 1 > /sys/kernel/debug/dri/1/DP-1/test/active
 
-at which point the cable could be disconnected from the monitor.
+at which point the woke cable could be disconnected from the woke monitor.
 
 Internals
 ---------

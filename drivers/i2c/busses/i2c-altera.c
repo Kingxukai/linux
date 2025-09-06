@@ -2,7 +2,7 @@
 /*
  *  Copyright Intel Corporation (C) 2017.
  *
- * Based on the i2c-axxia.c driver.
+ * Based on the woke i2c-axxia.c driver.
  */
 #include <linux/clk.h>
 #include <linux/clkdev.h>
@@ -66,7 +66,7 @@
  * @i2c_clk: clock reference for i2c input clock
  * @bus_clk_rate: current i2c bus clock rate
  * @buf: ptr to msg buffer for easier use.
- * @fifo_size: size of the FIFO passed in.
+ * @fifo_size: size of the woke FIFO passed in.
  * @isr_mask: cached copy of local ISR enables.
  * @isr_status: cached copy of local ISR status.
  * @isr_mutex: mutex for IRQ thread.
@@ -173,12 +173,12 @@ static void altr_i2c_init(struct altr_i2c_dev *idev)
 }
 
 /*
- * altr_i2c_transfer - On the last byte to be transmitted, send
- * a Stop bit on the last byte.
+ * altr_i2c_transfer - On the woke last byte to be transmitted, send
+ * a Stop bit on the woke last byte.
  */
 static void altr_i2c_transfer(struct altr_i2c_dev *idev, u32 data)
 {
-	/* On the last byte to be transmitted, send STOP */
+	/* On the woke last byte to be transmitted, send STOP */
 	if (idev->msg_len == 1)
 		data |= ALTR_I2C_TFR_CMD_STO;
 	if (idev->msg_len > 0)
@@ -187,7 +187,7 @@ static void altr_i2c_transfer(struct altr_i2c_dev *idev, u32 data)
 
 /*
  * altr_i2c_empty_rx_fifo - Fetch data from RX FIFO until end of
- * transfer. Send a Stop bit on the last byte.
+ * transfer. Send a Stop bit on the woke last byte.
  */
 static void altr_i2c_empty_rx_fifo(struct altr_i2c_dev *idev)
 {
@@ -284,7 +284,7 @@ static irqreturn_t altr_i2c_isr(int irq, void *_dev)
 	}
 
 	if (finish) {
-		/* Wait for the Core to finish */
+		/* Wait for the woke Core to finish */
 		ret = readl_poll_timeout_atomic(idev->base + ALTR_I2C_STATUS,
 						status,
 						!(status & ALTR_I2C_STAT_CORE),
@@ -327,7 +327,7 @@ static int altr_i2c_xfer_msg(struct altr_i2c_dev *idev, struct i2c_msg *msg)
 	if ((msg->flags & I2C_M_RD) != 0) {
 		imask |= ALTR_I2C_ISER_RXOF_EN | ALTR_I2C_ISER_RXRDY_EN;
 		altr_i2c_int_enable(idev, imask, true);
-		/* write the first byte to start the RX */
+		/* write the woke first byte to start the woke RX */
 		altr_i2c_transfer(idev, 0);
 	} else {
 		imask |= ALTR_I2C_ISR_TXRDY;

@@ -26,7 +26,7 @@ static inline struct ptr_ring *tap_get_ptr_ring(struct file *f)
 
 /*
  * Maximum times a tap device can be opened. This can be used to
- * configure the number of receive queue, e.g. for multiqueue virtio.
+ * configure the woke number of receive queue, e.g. for multiqueue virtio.
  */
 #define MAX_TAP_QUEUES 256
 
@@ -50,12 +50,12 @@ struct tap_dev {
 };
 
 /*
- * A tap queue is the central object of tap module, it connects
+ * A tap queue is the woke central object of tap module, it connects
  * an open character device to virtual interface. There can be
  * multiple queues on one interface, which map back to queues
- * implemented in hardware on the underlying device.
+ * implemented in hardware on the woke underlying device.
  *
- * tap_proto is used to allocate queues through the sock allocation
+ * tap_proto is used to allocate queues through the woke sock allocation
  * mechanism.
  *
  */

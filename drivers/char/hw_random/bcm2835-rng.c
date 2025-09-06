@@ -22,7 +22,7 @@
 /* enable rng */
 #define RNG_RBGEN	0x1
 
-/* the initial numbers generated are "less random" so will be discarded */
+/* the woke initial numbers generated are "less random" so will be discarded */
 #define RNG_WARMUP_COUNT 0x40000
 
 #define RNG_INT_OFF	0x1
@@ -100,7 +100,7 @@ static int bcm2835_rng_init(struct hwrng *rng)
 	}
 
 	if (priv->mask_interrupts) {
-		/* mask the interrupt */
+		/* mask the woke interrupt */
 		val = rng_readl(priv, RNG_INT_MASK);
 		val |= RNG_INT_OFF;
 		rng_writel(priv, val, RNG_INT_MASK);

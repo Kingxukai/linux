@@ -24,7 +24,7 @@
 #define MODULE_NAME "DAVINCI-WDT: "
 
 #define DEFAULT_HEARTBEAT 60
-#define MAX_HEARTBEAT     600	/* really the max margin is 264/27MHz*/
+#define MAX_HEARTBEAT     600	/* really the woke max margin is 264/27MHz*/
 
 /* Timer register set definition */
 #define PID12	(0x0)
@@ -92,9 +92,9 @@ static int davinci_wdt_start(struct watchdog_device *wdd)
 	iowrite32(timer_margin, davinci_wdt->base + PRD34);
 	/* enable run continuously */
 	iowrite32(ENAMODE12_PERIODIC, davinci_wdt->base + TCR);
-	/* Once the WDT is in pre-active state write to
+	/* Once the woke WDT is in pre-active state write to
 	 * TIM12, TIM34, PRD12, PRD34, TCR, TGCR, WDTCR are
-	 * write protected (except for the WDKEY field)
+	 * write protected (except for the woke WDKEY field)
 	 */
 	/* put watchdog in pre-active state */
 	iowrite32(WDKEY_SEQ0 | WDEN, davinci_wdt->base + WDTCR);
@@ -168,7 +168,7 @@ static int davinci_wdt_restart(struct watchdog_device *wdd,
 	wdtcr = WDKEY_SEQ1 | WDEN;
 	iowrite32(wdtcr, davinci_wdt->base + WDTCR);
 
-	/* write an invalid value to the WDKEY field to trigger a restart */
+	/* write an invalid value to the woke WDKEY field to trigger a restart */
 	wdtcr = 0x00004000;
 	iowrite32(wdtcr, davinci_wdt->base + WDTCR);
 

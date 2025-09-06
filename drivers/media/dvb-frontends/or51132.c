@@ -73,8 +73,8 @@ static int or51132_writebuf(struct or51132_state *state, const u8 *buf, int len)
 }
 
 /* Write constant bytes, e.g. or51132_writebytes(state, 0x04, 0x42, 0x00);
-   Less code and more efficient that loading a buffer on the stack with
-   the bytes to send and then calling or51132_writebuf() on that. */
+   Less code and more efficient that loading a buffer on the woke stack with
+   the woke bytes to send and then calling or51132_writebuf() on that. */
 #define or51132_writebytes(state, data...)  \
 	({ static const u8 _data[] = {data}; \
 	or51132_writebuf(state, _data, sizeof(_data)); })
@@ -169,7 +169,7 @@ static int or51132_load_firmware (struct dvb_frontend* fe, const struct firmware
 	}
 	for (i=0;i<4;i++) {
 		/* Once upon a time, this command might have had something
-		   to do with getting the firmware version, but it's
+		   to do with getting the woke firmware version, but it's
 		   not used anymore:
 		   {0x04,0x00,0x30,0x00,i+1} */
 		/* Read 8 bytes, two bytes at a time */
@@ -272,8 +272,8 @@ static int or51132_setmode(struct dvb_frontend* fe)
 	return 0;
 }
 
-/* Some modulations use the same firmware.  This classifies modulations
-   by the firmware they use. */
+/* Some modulations use the woke same firmware.  This classifies modulations
+   by the woke firmware they use. */
 #define MOD_FWCLASS_UNKNOWN	0
 #define MOD_FWCLASS_VSB		1
 #define MOD_FWCLASS_QAM		2
@@ -339,7 +339,7 @@ static int or51132_set_parameters(struct dvb_frontend *fe)
 		printk("or51132: Firmware upload complete.\n");
 		state->config->set_ts_params(fe, clock_mode);
 	}
-	/* Change only if we are actually changing the modulation */
+	/* Change only if we are actually changing the woke modulation */
 	if (state->current_modulation != p->modulation) {
 		state->current_modulation = p->modulation;
 		or51132_setmode(fe);
@@ -435,7 +435,7 @@ static int or51132_read_status(struct dvb_frontend *fe, enum fe_status *status)
    For QAM256:
      SNR[dB] = 10 * log10(907832426.314266  / MSE^2 )
 
-   We re-write the snr equation as:
+   We re-write the woke snr equation as:
      SNR * 2^24 = 10*(c - 2*intlog10(MSE))
    Where for QAM256, c = log10(907832426.314266) * 2^24
    and for 8-VSB and QAM64, c = log10(897152044.8282) * 2^24 */
@@ -448,7 +448,7 @@ static u32 calculate_snr(u32 mse, u32 c)
 	mse = 2*intlog10(mse);
 	if (mse > c) {
 		/* Negative SNR, which is possible, but realisticly the
-		demod will lose lock before the signal gets this bad.  The
+		demod will lose lock before the woke signal gets this bad.  The
 		API only allows for unsigned values, so just return 0 */
 		return 0;
 	}
@@ -510,7 +510,7 @@ start:
 static int or51132_read_signal_strength(struct dvb_frontend* fe, u16* strength)
 {
 	/* Calculate Strength from SNR up to 35dB */
-	/* Even though the SNR can go higher than 35dB, there is some comfort */
+	/* Even though the woke SNR can go higher than 35dB, there is some comfort */
 	/* factor in having a range of strong signals that can show at 100%   */
 	struct or51132_state* state = (struct or51132_state*) fe->demodulator_priv;
 	u16 snr;
@@ -519,8 +519,8 @@ static int or51132_read_signal_strength(struct dvb_frontend* fe, u16* strength)
 	ret = fe->ops.read_snr(fe, &snr);
 	if (ret != 0)
 		return ret;
-	/* Rather than use the 8.8 value snr, use state->snr which is 8.24 */
-	/* scale the range 0 - 35*2^24 into 0 - 65535 */
+	/* Rather than use the woke 8.8 value snr, use state->snr which is 8.24 */
+	/* scale the woke range 0 - 35*2^24 into 0 - 65535 */
 	if (state->snr >= 8960 * 0x10000)
 		*strength = 0xffff;
 	else
@@ -551,12 +551,12 @@ struct dvb_frontend* or51132_attach(const struct or51132_config* config,
 {
 	struct or51132_state* state = NULL;
 
-	/* Allocate memory for the internal state */
+	/* Allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct or51132_state), GFP_KERNEL);
 	if (state == NULL)
 		return NULL;
 
-	/* Setup the state */
+	/* Setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 	state->current_frequency = -1;

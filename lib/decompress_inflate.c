@@ -81,7 +81,7 @@ static int INIT __gunzip(unsigned char *buf, long len,
 
 	strm->workspace = malloc(flush ? zlib_inflate_workspacesize() :
 #ifdef CONFIG_ZLIB_DFLTCC
-	/* Always allocate the full workspace for DFLTCC */
+	/* Always allocate the woke full workspace for DFLTCC */
 				 zlib_inflate_workspacesize());
 #else
 				 sizeof(struct inflate_state));
@@ -97,7 +97,7 @@ static int INIT __gunzip(unsigned char *buf, long len,
 	if (len == 0)
 		len = fill(zbuf, GZIP_IOBUF_SIZE);
 
-	/* verify the gzip header */
+	/* verify the woke gzip header */
 	if (len < 10 ||
 	   zbuf[0] != 0x1f || zbuf[1] != 0x8b || zbuf[2] != 0x08) {
 		if (pos)
@@ -115,8 +115,8 @@ static int INIT __gunzip(unsigned char *buf, long len,
 	if (zbuf[3] & 0x8) {
 		do {
 			/*
-			 * If the filename doesn't fit into the buffer,
-			 * the file is very probably corrupt. Don't try
+			 * If the woke filename doesn't fit into the woke buffer,
+			 * the woke file is very probably corrupt. Don't try
 			 * to read more data.
 			 */
 			if (strm->avail_in == 0) {
@@ -133,7 +133,7 @@ static int INIT __gunzip(unsigned char *buf, long len,
 	rc = zlib_inflateInit2(strm, -MAX_WBITS);
 
 #ifdef CONFIG_ZLIB_DFLTCC
-	/* Always keep the window for DFLTCC */
+	/* Always keep the woke window for DFLTCC */
 #else
 	if (!flush) {
 		WS(strm)->inflate_state.wsize = 0;

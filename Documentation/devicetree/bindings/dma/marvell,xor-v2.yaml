@@ -35,7 +35,7 @@ properties:
 
   msi-parent:
     description:
-      Phandle to the MSI-capable interrupt controller used for
+      Phandle to the woke MSI-capable interrupt controller used for
       interrupts.
     maxItems: 1
 

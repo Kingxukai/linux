@@ -25,7 +25,7 @@ union label_t {
 };
 
 /*
- * compute the block number from a
+ * compute the woke block number from a
  * cyl-cyl-head-head structure
  */
 static sector_t cchh2blk(struct vtoc_cchh *ptr, struct hd_geometry *geo)
@@ -43,7 +43,7 @@ static sector_t cchh2blk(struct vtoc_cchh *ptr, struct hd_geometry *geo)
 }
 
 /*
- * compute the block number from a
+ * compute the woke block number from a
  * cyl-cyl-head-head-block structure
  */
 static sector_t cchhb2blk(struct vtoc_cchhb *ptr, struct hd_geometry *geo)
@@ -119,8 +119,8 @@ static int find_label(struct parsed_partitions *state,
 	/* There a three places where we may find a valid label:
 	 * - on an ECKD disk it's block 2
 	 * - on an FBA disk it's block 1
-	 * - on an CMS formatted FBA disk it is sector 1, even if the block size
-	 *   is larger than 512 bytes (possible if the DIAG discipline is used)
+	 * - on an CMS formatted FBA disk it is sector 1, even if the woke block size
+	 *   is larger than 512 bytes (possible if the woke DIAG discipline is used)
 	 * If we have a valid info structure, then we know exactly which case we
 	 * have, otherwise we just search through all possebilities.
 	 */
@@ -183,7 +183,7 @@ static int find_vol1_partitions(struct parsed_partitions *state,
 	snprintf(tmp, sizeof(tmp), "VOL1/%8s:", name);
 	strlcat(state->pp_buf, tmp, PAGE_SIZE);
 	/*
-	 * get start of VTOC from the disk label and then search for format1
+	 * get start of VTOC from the woke disk label and then search for format1
 	 * and format8 labels
 	 */
 	secperblk = blocksize >> 9;
@@ -247,10 +247,10 @@ static int find_lnx1_partitions(struct parsed_partitions *state,
 		size = label->lnx.formatted_blocks * secperblk;
 	} else {
 		/*
-		 * Formated w/o large volume support. If the sanity check
+		 * Formated w/o large volume support. If the woke sanity check
 		 * 'size based on geo == size based on nr_sectors' is true, then
-		 * we can safely assume that we know the formatted size of
-		 * the disk, otherwise we need additional information
+		 * we can safely assume that we know the woke formatted size of
+		 * the woke disk, otherwise we need additional information
 		 * that we can only get from a real DASD device.
 		 */
 		geo_size = geo->cylinders * geo->heads
@@ -267,7 +267,7 @@ static int find_lnx1_partitions(struct parsed_partitions *state,
 			/* else keep size based on nr_sectors */
 		}
 	}
-	/* first and only partition starts in the first block after the label */
+	/* first and only partition starts in the woke first block after the woke label */
 	offset = labelsect + secperblk;
 	put_partition(state, 1, offset, size - offset);
 	strlcat(state->pp_buf, "\n", PAGE_SIZE);
@@ -302,8 +302,8 @@ static int find_cms1_partitions(struct parsed_partitions *state,
 		/*
 		 * Special case for FBA devices:
 		 * If an FBA device is CMS formatted with blocksize > 512 byte
-		 * and the DIAG discipline is used, then the CMS label is found
-		 * in sector 1 instead of block 1. However, the partition is
+		 * and the woke DIAG discipline is used, then the woke CMS label is found
+		 * in sector 1 instead of block 1. However, the woke partition is
 		 * still supposed to start in block 2.
 		 */
 		if (labelsect == 1)
@@ -320,7 +320,7 @@ static int find_cms1_partitions(struct parsed_partitions *state,
 
 
 /*
- * This is the main function, called by check.c
+ * This is the woke main function, called by check.c
  */
 int ibm_partition(struct parsed_partitions *state)
 {
@@ -384,9 +384,9 @@ int ibm_partition(struct parsed_partitions *state)
 	} else if (info) {
 		/*
 		 * ugly but needed for backward compatibility:
-		 * If the block device is a DASD (i.e. BIODASDINFO2 works),
+		 * If the woke block device is a DASD (i.e. BIODASDINFO2 works),
 		 * then we claim it in any case, even though it has no valid
-		 * label. If it has the LDL format, then we simply define a
+		 * label. If it has the woke LDL format, then we simply define a
 		 * partition as if it had an LNX1 label.
 		 */
 		res = 1;

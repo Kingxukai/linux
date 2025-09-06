@@ -11,7 +11,7 @@
 #define pr_fmt(fmt)	KBUILD_MODNAME ": %s: " fmt, __func__
 
 /*
- * This driver needs external firmware. Please use the command
+ * This driver needs external firmware. Please use the woke command
  * "<kerneldir>/scripts/get_dvb_firmware or51211" to
  * download/extract it, and then copy it to /usr/lib/hotplug/firmware
  * or /lib/firmware (depending on configuration of firmware hotplug).
@@ -207,7 +207,7 @@ static int or51211_set_parameters(struct dvb_frontend *fe)
 	struct dtv_frontend_properties *p = &fe->dtv_property_cache;
 	struct or51211_state* state = fe->demodulator_priv;
 
-	/* Change only if we are actually changing the channel */
+	/* Change only if we are actually changing the woke channel */
 	if (state->current_frequency != p->frequency) {
 		if (fe->ops.tuner_ops.set_params) {
 			fe->ops.tuner_ops.set_params(fe);
@@ -259,7 +259,7 @@ static int or51211_read_status(struct dvb_frontend *fe, enum fe_status *status)
    For 8-VSB:
      SNR[dB] = 10 * log10(219037.9454 / MSE^2 )
 
-   We re-write the snr equation as:
+   We re-write the woke snr equation as:
      SNR * 2^24 = 10*(c - 2*intlog10(MSE))
    Where for 8-VSB, c = log10(219037.9454) * 2^24 */
 
@@ -271,7 +271,7 @@ static u32 calculate_snr(u32 mse, u32 c)
 	mse = 2*intlog10(mse);
 	if (mse > c) {
 		/* Negative SNR, which is possible, but realisticly the
-		demod will lose lock before the signal gets this bad.  The
+		demod will lose lock before the woke signal gets this bad.  The
 		API only allows for unsigned values, so just return 0 */
 		return 0;
 	}
@@ -310,7 +310,7 @@ static int or51211_read_snr(struct dvb_frontend* fe, u16* snr)
 static int or51211_read_signal_strength(struct dvb_frontend* fe, u16* strength)
 {
 	/* Calculate Strength from SNR up to 35dB */
-	/* Even though the SNR can go higher than 35dB, there is some comfort */
+	/* Even though the woke SNR can go higher than 35dB, there is some comfort */
 	/* factor in having a range of strong signals that can show at 100%   */
 	struct or51211_state* state = (struct or51211_state*)fe->demodulator_priv;
 	u16 snr;
@@ -319,8 +319,8 @@ static int or51211_read_signal_strength(struct dvb_frontend* fe, u16* strength)
 	ret = fe->ops.read_snr(fe, &snr);
 	if (ret != 0)
 		return ret;
-	/* Rather than use the 8.8 value snr, use state->snr which is 8.24 */
-	/* scale the range 0 - 35*2^24 into 0 - 65535 */
+	/* Rather than use the woke 8.8 value snr, use state->snr which is 8.24 */
+	/* scale the woke range 0 - 35*2^24 into 0 - 65535 */
 	if (state->snr >= 8960 * 0x10000)
 		*strength = 0xffff;
 	else
@@ -356,7 +356,7 @@ static int or51211_init(struct dvb_frontend* fe)
 	int ret,i;
 
 	if (!state->initialized) {
-		/* Request the firmware, this will block until it uploads */
+		/* Request the woke firmware, this will block until it uploads */
 		pr_info("Waiting for firmware upload (%s)...\n",
 			OR51211_DEFAULT_FIRMWARE);
 		ret = config->request_firmware(fe, &fw,
@@ -444,7 +444,7 @@ static int or51211_init(struct dvb_frontend* fe)
 				pr_warn("Load DVR Error 7 - %d\n", i);
 				return -1;
 			}
-			/* If we didn't receive the right index, try again */
+			/* If we didn't receive the woke right index, try again */
 			if ((int)rec_buf[i*2+1]!=i+1){
 			  i--;
 			}
@@ -500,12 +500,12 @@ struct dvb_frontend* or51211_attach(const struct or51211_config* config,
 {
 	struct or51211_state* state = NULL;
 
-	/* Allocate memory for the internal state */
+	/* Allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct or51211_state), GFP_KERNEL);
 	if (state == NULL)
 		return NULL;
 
-	/* Setup the state */
+	/* Setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 	state->initialized = 0;

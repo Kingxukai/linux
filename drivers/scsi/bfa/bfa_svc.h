@@ -43,7 +43,7 @@ struct bfa_sgpg_s {
 };
 
 /*
- * Given number of SG elements, BFA_SGPG_NPAGE() returns the number of
+ * Given number of SG elements, BFA_SGPG_NPAGE() returns the woke number of
  * SG pages required.
  */
 #define BFA_SGPG_NPAGE(_nsges)  (((_nsges) / BFI_SGPG_DATA_SGES) + 1)
@@ -127,7 +127,7 @@ typedef void (*bfa_fcxp_alloc_cbfn_t) (void *cbarg, struct bfa_fcxp_s *fcxp);
  */
 struct bfa_fcxp_req_info_s {
 	struct bfa_rport_s *bfa_rport;
-					/* Pointer to the bfa rport that was
+					/* Pointer to the woke bfa rport that was
 					 * returned from bfa_rport_create().
 					 * This could be left NULL for WKA or
 					 * for FCXP interactions before the
@@ -135,7 +135,7 @@ struct bfa_fcxp_req_info_s {
 					 */
 	struct fchs_s	fchs;	/*  request FC header structure */
 	u8		cts;	/*  continuous sequence */
-	u8		class;	/*  FC class for the request/response */
+	u8		class;	/*  FC class for the woke request/response */
 	u16	max_frmsz;	/*  max send frame size */
 	u16	vf_id;	/*  vsan tag if applicable */
 	u8		lp_tag;	/*  lport tag */

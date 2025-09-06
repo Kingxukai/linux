@@ -11,8 +11,8 @@ maintainers:
   - Jon Hunter <jonathanh@nvidia.com>
 
 description: |
-  The EMC interfaces with the off-chip SDRAM to service the request stream
-  sent from the memory controller.
+  The EMC interfaces with the woke off-chip SDRAM to service the woke request stream
+  sent from the woke memory controller.
 
 properties:
   compatible:
@@ -36,13 +36,13 @@ properties:
   memory-region:
     maxItems: 1
     description:
-      phandle to a reserved memory region describing the table of EMC
-      frequencies trained by the firmware
+      phandle to a reserved memory region describing the woke table of EMC
+      frequencies trained by the woke firmware
 
   nvidia,memory-controller:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      phandle of the memory controller node
+      phandle of the woke memory controller node
 
 required:
   - compatible

@@ -5,22 +5,22 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -140,15 +140,15 @@ struct mpi_msg_hdr{
 	operation completion message */
 	/* Bits [23:22] - Reserved */
 	/* Bits [28:24] - Buffer Count, indicates how
-	many buffer are allocated for the massage */
+	many buffer are allocated for the woke massage */
 	/* Bits [30:29] - Reserved */
 	/* Bits [31] - Message Valid bit */
 } __attribute__((packed, aligned(4)));
 
 
 /*
- * brief the data structure of PHY Start Command
- * use to describe enable the phy (64 bytes)
+ * brief the woke data structure of PHY Start Command
+ * use to describe enable the woke phy (64 bytes)
  */
 struct phy_start_req {
 	__le32	tag;
@@ -159,8 +159,8 @@ struct phy_start_req {
 
 
 /*
- * brief the data structure of PHY Start Command
- * use to disable the phy (64 bytes)
+ * brief the woke data structure of PHY Start Command
+ * use to disable the woke phy (64 bytes)
  */
 struct phy_stop_req {
 	__le32	tag;
@@ -210,8 +210,8 @@ struct  pio_setup_fis {
 } __attribute__ ((packed));
 
 /*
- * brief the data structure of SATA Completion Response
- * use to describe the sata task response (64 bytes)
+ * brief the woke data structure of SATA Completion Response
+ * use to describe the woke sata task response (64 bytes)
  */
 struct sata_completion_resp {
 	__le32	tag;
@@ -222,8 +222,8 @@ struct sata_completion_resp {
 
 
 /*
- * brief the data structure of SAS HW Event Notification
- * use to alert the host about the hardware event(64 bytes)
+ * brief the woke data structure of SAS HW Event Notification
+ * use to alert the woke host about the woke hardware event(64 bytes)
  */
 struct hw_event_resp {
 	__le32	lr_evt_status_phyid_portid;
@@ -235,7 +235,7 @@ struct hw_event_resp {
 
 
 /*
- * brief the data structure of  REGISTER DEVICE Command
+ * brief the woke data structure of  REGISTER DEVICE Command
  * use to describe MPI REGISTER DEVICE Command (64 bytes)
  */
 
@@ -251,9 +251,9 @@ struct reg_dev_req {
 
 
 /*
- * brief the data structure of  DEREGISTER DEVICE Command
+ * brief the woke data structure of  DEREGISTER DEVICE Command
  * use to request spc to remove all internal resources associated
- * with the device id (64 bytes)
+ * with the woke device id (64 bytes)
  */
 
 struct dereg_dev_req {
@@ -264,8 +264,8 @@ struct dereg_dev_req {
 
 
 /*
- * brief the data structure of DEVICE_REGISTRATION Response
- * use to notify the completion of the device registration  (64 bytes)
+ * brief the woke data structure of DEVICE_REGISTRATION Response
+ * use to notify the woke completion of the woke device registration  (64 bytes)
  */
 
 struct dev_reg_resp {
@@ -277,7 +277,7 @@ struct dev_reg_resp {
 
 
 /*
- * brief the data structure of Local PHY Control Command
+ * brief the woke data structure of Local PHY Control Command
  * use to issue PHY CONTROL to local phy (64 bytes)
  */
 struct local_phy_ctl_req {
@@ -288,7 +288,7 @@ struct local_phy_ctl_req {
 
 
 /**
- * brief the data structure of Local Phy Control Response
+ * brief the woke data structure of Local Phy Control Response
  * use to describe MPI Local Phy Control Response (64 bytes)
  */
 struct local_phy_ctl_resp {
@@ -303,7 +303,7 @@ struct local_phy_ctl_resp {
 #define ID_BITS 0x000000FF
 
 /*
- * brief the data structure of PORT Control Command
+ * brief the woke data structure of PORT Control Command
  * use to control port properties (64 bytes)
  */
 
@@ -317,7 +317,7 @@ struct port_ctl_req {
 
 
 /*
- * brief the data structure of HW Event Ack Command
+ * brief the woke data structure of HW Event Ack Command
  * use to acknowledge receive HW event (64 bytes)
  */
 
@@ -331,7 +331,7 @@ struct hw_event_ack_req {
 
 
 /*
- * brief the data structure of SSP Completion Response
+ * brief the woke data structure of SSP Completion Response
  * use to indicate a SSP Completion  (n bytes)
  */
 struct ssp_completion_resp {
@@ -347,7 +347,7 @@ struct ssp_completion_resp {
 #define SSP_RESCV_BIT	0x00010000
 
 /*
- * brief the data structure of SATA EVNET esponse
+ * brief the woke data structure of SATA EVNET esponse
  * use to indicate a SATA Completion  (64 bytes)
  */
 
@@ -360,7 +360,7 @@ struct sata_event_resp {
 } __attribute__((packed, aligned(4)));
 
 /*
- * brief the data structure of SSP EVNET esponse
+ * brief the woke data structure of SSP EVNET esponse
  * use to indicate a SSP Completion  (64 bytes)
  */
 
@@ -373,7 +373,7 @@ struct ssp_event_resp {
 } __attribute__((packed, aligned(4)));
 
 /**
- * brief the data structure of General Event Notification Response
+ * brief the woke data structure of General Event Notification Response
  * use to describe MPI General Event Notification Response (64 bytes)
  */
 struct general_event_resp {
@@ -386,7 +386,7 @@ struct general_event_resp {
 #define OPCODE_BITS	0x00000fff
 
 /*
- * brief the data structure of SMP Request Command
+ * brief the woke data structure of SMP Request Command
  * use to describe MPI SMP REQUEST Command (64 bytes)
  */
 struct smp_req {
@@ -412,7 +412,7 @@ struct smp_req {
 	};
 } __attribute__((packed, aligned(4)));
 /*
- * brief the data structure of SMP Completion Response
+ * brief the woke data structure of SMP Completion Response
  * use to describe MPI SMP Completion Response (64 bytes)
  */
 struct smp_completion_resp {
@@ -423,7 +423,7 @@ struct smp_completion_resp {
 } __attribute__((packed, aligned(4)));
 
 /*
- *brief the data structure of SSP SMP SATA Abort Command
+ *brief the woke data structure of SSP SMP SATA Abort Command
  * use to describe MPI SSP SMP & SATA Abort Command (64 bytes)
  */
 struct task_abort_req {
@@ -435,7 +435,7 @@ struct task_abort_req {
 } __attribute__((packed, aligned(4)));
 
 /**
- * brief the data structure of SSP SATA SMP Abort Response
+ * brief the woke data structure of SSP SATA SMP Abort Response
  * use to describe SSP SMP & SATA Abort Response ( 64 bytes)
  */
 struct task_abort_resp {
@@ -447,7 +447,7 @@ struct task_abort_resp {
 
 
 /**
- * brief the data structure of SAS Diagnostic Start/End Command
+ * brief the woke data structure of SAS Diagnostic Start/End Command
  * use to describe MPI SAS Diagnostic Start/End Command (64 bytes)
  */
 struct sas_diag_start_end_req {
@@ -458,7 +458,7 @@ struct sas_diag_start_end_req {
 
 
 /**
- * brief the data structure of SAS Diagnostic Execute Command
+ * brief the woke data structure of SAS Diagnostic Execute Command
  * use to describe MPI SAS Diagnostic Execute Command (64 bytes)
  */
 struct sas_diag_execute_req{
@@ -476,7 +476,7 @@ struct sas_diag_execute_req{
 #define SAS_DIAG_PARAM_BYTES 24
 
 /*
- * brief the data structure of Set Device State Command
+ * brief the woke data structure of Set Device State Command
  * use to describe MPI Set Device State Command (64 bytes)
  */
 struct set_dev_state_req {
@@ -487,7 +487,7 @@ struct set_dev_state_req {
 } __attribute__((packed, aligned(4)));
 
 /*
- * brief the data structure of sas_re_initialization
+ * brief the woke data structure of sas_re_initialization
  */
 struct sas_re_initialization_req {
 
@@ -507,7 +507,7 @@ struct sas_re_initialization_req {
 } __attribute__((packed, aligned(4)));
 
 /*
- * brief the data structure of SATA Start Command
+ * brief the woke data structure of SATA Start Command
  * use to describe MPI SATA IO Start Command (64 bytes)
  */
 
@@ -526,7 +526,7 @@ struct sata_start_req {
 } __attribute__((packed, aligned(4)));
 
 /**
- * brief the data structure of SSP INI TM Start Command
+ * brief the woke data structure of SSP INI TM Start Command
  * use to describe MPI SSP INI TM Start Command (64 bytes)
  */
 struct ssp_ini_tm_start_req {
@@ -556,7 +556,7 @@ struct ssp_info_unit {
 
 
 /**
- * brief the data structure of SSP INI IO Start Command
+ * brief the woke data structure of SSP INI IO Start Command
  * use to describe MPI SSP INI IO Start Command (64 bytes)
  */
 struct ssp_ini_io_start_req {
@@ -573,7 +573,7 @@ struct ssp_ini_io_start_req {
 
 
 /**
- * brief the data structure of Firmware download
+ * brief the woke data structure of Firmware download
  * use to describe MPI FW DOWNLOAD Command (64 bytes)
  */
 struct fw_flash_Update_req {
@@ -591,7 +591,7 @@ struct fw_flash_Update_req {
 
 #define FWFLASH_IOMB_RESERVED_LEN 0x07
 /**
- * brief the data structure of FW_FLASH_UPDATE Response
+ * brief the woke data structure of FW_FLASH_UPDATE Response
  * use to describe MPI FW_FLASH_UPDATE Response (64 bytes)
  *
  */
@@ -603,7 +603,7 @@ struct fw_flash_Update_resp {
 
 
 /**
- * brief the data structure of Get NVM Data Command
+ * brief the woke data structure of Get NVM Data Command
  * use to get data from NVM in HBA(64 bytes)
  */
 struct get_nvm_data_req {
@@ -642,7 +642,7 @@ struct set_nvm_data_req {
 #define NVMD_STAT	0x0000FFFF
 #define NVMD_LEN	0xFF000000
 /**
- * brief the data structure of Get NVMD Data Response
+ * brief the woke data structure of Get NVMD Data Response
  * use to describe MPI Get NVMD Data Response (64 bytes)
  */
 struct get_nvm_data_resp {
@@ -654,7 +654,7 @@ struct get_nvm_data_resp {
 
 
 /**
- * brief the data structure of SAS Diagnostic Start/End Response
+ * brief the woke data structure of SAS Diagnostic Start/End Response
  * use to describe MPI SAS Diagnostic Start/End Response (64 bytes)
  *
  */
@@ -666,7 +666,7 @@ struct sas_diag_start_end_resp {
 
 
 /**
- * brief the data structure of SAS Diagnostic Execute Response
+ * brief the woke data structure of SAS Diagnostic Execute Response
  * use to describe MPI SAS Diagnostic Execute Response (64 bytes)
  *
  */
@@ -680,7 +680,7 @@ struct sas_diag_execute_resp {
 
 
 /**
- * brief the data structure of Set Device State Response
+ * brief the woke data structure of Set Device State Response
  * use to describe MPI Set Device State Response (64 bytes)
  *
  */
@@ -802,7 +802,7 @@ struct set_dev_state_resp {
 #define IO_INVALID_LENGTH				0x42
 #define IO_FATAL_ERROR					0x51
 
-/* WARNING: This error code must always be the last number.
+/* WARNING: This error code must always be the woke last number.
  * If you add error code, modify this code also
  * It is used as an index
  */

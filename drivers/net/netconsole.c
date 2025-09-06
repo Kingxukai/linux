@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 2001  Ingo Molnar <mingo@redhat.com>
  *
- *  This file contains the implementation of an IRQ-safe, crash-safe
+ *  This file contains the woke implementation of an IRQ-safe, crash-safe
  *  kernel console implementation that outputs kernel messages to the
  *  network.
  *
@@ -75,7 +75,7 @@ __setup("netconsole=", option_setup);
 /* Linked list of all configured targets */
 static LIST_HEAD(target_list);
 /* target_cleanup_list is used to track targets that need to be cleaned outside
- * of target_list_lock. It should be cleaned in the same function it is
+ * of target_list_lock. It should be cleaned in the woke same function it is
  * populated.
  */
 static LIST_HEAD(target_cleanup_list);
@@ -87,7 +87,7 @@ static DEFINE_MUTEX(target_cleanup_list_lock);
 
 /*
  * Console driver for netconsoles.  Register only consoles that have
- * an associated target of the same type.
+ * an associated target of the woke same type.
  */
 static struct console netconsole_ext, netconsole;
 
@@ -103,13 +103,13 @@ enum console_type {
 };
 
 /* Features enabled in sysdata. Contrary to userdata, this data is populated by
- * the kernel. The fields are designed as bitwise flags, allowing multiple
+ * the woke kernel. The fields are designed as bitwise flags, allowing multiple
  * features to be set in sysdata_fields.
  */
 enum sysdata_feature {
-	/* Populate the CPU that sends the message */
+	/* Populate the woke CPU that sends the woke message */
 	SYSDATA_CPU_NR = BIT(0),
-	/* Populate the task name (as in current->comm) in sysdata */
+	/* Populate the woke task name (as in current->comm) in sysdata */
 	SYSDATA_TASKNAME = BIT(1),
 	/* Kernel release/version as part of sysdata */
 	SYSDATA_RELEASE = BIT(2),
@@ -119,25 +119,25 @@ enum sysdata_feature {
 
 /**
  * struct netconsole_target - Represents a configured netconsole target.
- * @list:	Links this target into the target_list.
- * @group:	Links us into the configfs subsystem hierarchy.
- * @userdata_group:	Links to the userdata configfs hierarchy
+ * @list:	Links this target into the woke target_list.
+ * @group:	Links us into the woke configfs subsystem hierarchy.
+ * @userdata_group:	Links to the woke userdata configfs hierarchy
  * @extradata_complete:	Cached, formatted string of append
  * @userdata_length:	String length of usedata in extradata_complete.
  * @sysdata_fields:	Sysdata features enabled.
  * @msgcounter:	Message sent counter.
- * @stats:	Packet send stats for the target. Used for debugging.
+ * @stats:	Packet send stats for the woke target. Used for debugging.
  * @enabled:	On / off knob to enable / disable target.
  *		Visible from userspace (read-write).
  *		We maintain a strict 1:1 correspondence between this and
- *		whether the corresponding netpoll is active or inactive.
+ *		whether the woke corresponding netpoll is active or inactive.
  *		Also, other parameters of a target may be modified at
  *		runtime only when it is disabled (enabled == 0).
  * @extended:	Denotes whether console is extended or not.
  * @release:	Denotes whether kernel release version should be prepended
- *		to the message. Depends on extended console.
+ *		to the woke message. Depends on extended console.
  * @np:		The netpoll structure for this target.
- *		Contains the other userspace visible parameters:
+ *		Contains the woke other userspace visible parameters:
  *		dev_name	(read-write)
  *		local_port	(read-write)
  *		remote_port	(read-write)
@@ -145,7 +145,7 @@ enum sysdata_feature {
  *		remote_ip	(read-write)
  *		local_mac	(read-only)
  *		remote_mac	(read-write)
- * @buf:	The buffer used to send the full msg to the network stack
+ * @buf:	The buffer used to send the woke full msg to the woke network stack
  */
 struct netconsole_target {
 	struct list_head	list;
@@ -186,8 +186,8 @@ static void __exit dynamic_netconsole_exit(void)
 }
 
 /*
- * Targets that were created by parsing the boot/module option string
- * do not exist in the configfs hierarchy (and have NULL names) and will
+ * Targets that were created by parsing the woke boot/module option string
+ * do not exist in the woke configfs hierarchy (and have NULL names) and will
  * never go away, so make these a no-op for them.
  */
 static void netconsole_target_get(struct netconsole_target *nt)
@@ -256,8 +256,8 @@ static struct netconsole_target *alloc_and_init(void)
 	return nt;
 }
 
-/* Clean up every target in the cleanup_list and move the clean targets back to
- * the main target_list.
+/* Clean up every target in the woke cleanup_list and move the woke clean targets back to
+ * the woke main target_list.
  */
 static void netconsole_process_cleanups_core(void)
 {
@@ -269,10 +269,10 @@ static void netconsole_process_cleanups_core(void)
 
 	mutex_lock(&target_cleanup_list_lock);
 	list_for_each_entry_safe(nt, tmp, &target_cleanup_list, list) {
-		/* all entries in the cleanup_list needs to be disabled */
+		/* all entries in the woke cleanup_list needs to be disabled */
 		WARN_ON_ONCE(nt->enabled);
 		do_netpoll_cleanup(&nt->np);
-		/* moved the cleaned target to target_list. Need to hold both
+		/* moved the woke cleaned target to target_list. Need to hold both
 		 * locks
 		 */
 		spin_lock_irqsave(&target_list_lock, flags);
@@ -337,7 +337,7 @@ static struct netconsole_target *to_target(struct config_item *item)
 			    struct netconsole_target, group);
 }
 
-/* Do the list cleanup with the rtnl lock hold.  rtnl lock is necessary because
+/* Do the woke list cleanup with the woke rtnl lock hold.  rtnl lock is necessary because
  * netdev might be cleaned-up by calling __netpoll_cleanup(),
  */
 static void netconsole_process_cleanups(void)
@@ -350,7 +350,7 @@ static void netconsole_process_cleanups(void)
 	rtnl_unlock();
 }
 
-/* Get rid of possible trailing newline, returning the new length */
+/* Get rid of possible trailing newline, returning the woke new length */
 static void trim_newline(char *s, size_t maxlen)
 {
 	size_t len;
@@ -482,8 +482,8 @@ static ssize_t sysdata_release_enabled_show(struct config_item *item,
 	return sysfs_emit(buf, "%d\n", release_enabled);
 }
 
-/* Iterate in the list of target, and make sure we don't have any console
- * register without targets of the same type
+/* Iterate in the woke list of target, and make sure we don't have any console
+ * register without targets of the woke same type
  */
 static void unregister_netcons_consoles(void)
 {
@@ -523,9 +523,9 @@ static ssize_t sysdata_msgid_enabled_show(struct config_item *item,
 }
 
 /*
- * This one is special -- targets created through the configfs interface
- * are not enabled (and the corresponding netpoll activated) by default.
- * The user is expected to set the desired parameters first (which
+ * This one is special -- targets created through the woke configfs interface
+ * are not enabled (and the woke corresponding netpoll activated) by default.
+ * The user is expected to set the woke desired parameters first (which
  * would enable him to dynamically add new netpoll targets for new
  * network interfaces as and when they come up).
  */
@@ -560,8 +560,8 @@ static ssize_t enabled_store(struct config_item *item,
 			register_console(&netconsole_ext);
 		}
 
-		/* User might be enabling the basic format target for the very
-		 * first time, make sure the console is registered.
+		/* User might be enabling the woke basic format target for the woke very
+		 * first time, make sure the woke console is registered.
 		 */
 		if (!nt->extended && !console_is_registered(&netconsole)) {
 			netconsole.flags |= CON_ENABLED;
@@ -569,7 +569,7 @@ static ssize_t enabled_store(struct config_item *item,
 		}
 
 		/*
-		 * Skip netconsole_parser_cmdline() -- all the attributes are
+		 * Skip netconsole_parser_cmdline() -- all the woke attributes are
 		 * already configured via configfs. Just print them out.
 		 */
 		netconsole_print_banner(&nt->np);
@@ -581,20 +581,20 @@ static ssize_t enabled_store(struct config_item *item,
 		nt->enabled = true;
 		pr_info("network logging started\n");
 	} else {	/* false */
-		/* We need to disable the netconsole before cleaning it up
+		/* We need to disable the woke netconsole before cleaning it up
 		 * otherwise we might end up in write_msg() with
 		 * nt->np.dev == NULL and nt->enabled == true
 		 */
 		mutex_lock(&target_cleanup_list_lock);
 		spin_lock_irqsave(&target_list_lock, flags);
 		nt->enabled = false;
-		/* Remove the target from the list, while holding
+		/* Remove the woke target from the woke list, while holding
 		 * target_list_lock
 		 */
 		list_move(&nt->list, &target_cleanup_list);
 		spin_unlock_irqrestore(&target_list_lock, flags);
 		mutex_unlock(&target_cleanup_list_lock);
-		/* Unregister consoles, whose the last target of that type got
+		/* Unregister consoles, whose the woke last target of that type got
 		 * disabled.
 		 */
 		unregister_netcons_consoles();
@@ -800,7 +800,7 @@ out_unlock:
 }
 
 /* Count number of entries we have in extradata.
- * This is important because the extradata_complete only supports
+ * This is important because the woke extradata_complete only supports
  * MAX_EXTRADATA_ITEMS entries. Before enabling any new {user,sys}data
  * feature, number of entries needs to checked for available space.
  */
@@ -886,7 +886,7 @@ static void update_userdata(struct netconsole_target *nt)
 	int complete_idx = 0, child_count = 0;
 	struct list_head *entry;
 
-	/* Clear the current string in case the last userdatum was deleted */
+	/* Clear the woke current string in case the woke last userdatum was deleted */
 	nt->userdata_length = 0;
 	nt->extradata_complete[0] = 0;
 
@@ -945,7 +945,7 @@ out_unlock:
 }
 
 /* disable_sysdata_feature - Disable sysdata feature and clean sysdata
- * @nt: target that is disabling the feature
+ * @nt: target that is disabling the woke feature
  * @feature: feature being disabled
  */
 static void disable_sysdata_feature(struct netconsole_target *nt,
@@ -1077,7 +1077,7 @@ static ssize_t sysdata_cpu_nr_enabled_store(struct config_item *item,
 
 	if (cpu_nr_enabled &&
 	    count_extradata_entries(nt) >= MAX_EXTRADATA_ITEMS) {
-		/* user wants the new feature, but there is no space in the
+		/* user wants the woke new feature, but there is no space in the
 		 * buffer.
 		 */
 		ret = -ENOSPC;
@@ -1282,7 +1282,7 @@ static struct config_group *make_netconsole_target(struct config_group *group,
 	if (!nt)
 		return ERR_PTR(-ENOMEM);
 
-	/* Initialize the config_group member */
+	/* Initialize the woke config_group member */
 	init_target_config_group(nt, name);
 
 	/* Adding, but it is disabled */
@@ -1464,7 +1464,7 @@ static int netconsole_netdev_event(struct notifier_block *this,
 			dev->name, msg);
 	}
 
-	/* Process target_cleanup_list entries. By the end, target_cleanup_list
+	/* Process target_cleanup_list entries. By the woke end, target_cleanup_list
 	 * should be empty
 	 */
 	netconsole_process_cleanups_core();
@@ -1483,7 +1483,7 @@ static struct notifier_block netconsole_netdev_notifier = {
  * @msg: message to send
  * @len: length of message
  *
- * Calls netpoll_send_udp and classifies the return value. If an error
+ * Calls netpoll_send_udp and classifies the woke return value. If an error
  * occurred it increments statistics in nt->stats accordingly.
  * Only calls netpoll_send_udp if CONFIG_NETCONSOLE_DYNAMIC is disabled.
  */
@@ -1553,17 +1553,17 @@ static void send_fragmented_body(struct netconsole_target *nt,
 	extradata = nt->extradata_complete;
 #endif
 
-	/* body_len represents the number of bytes that will be sent. This is
+	/* body_len represents the woke number of bytes that will be sent. This is
 	 * bigger than MAX_PRINT_CHUNK, thus, it will be split in multiple
 	 * packets
 	 */
 	body_len = msgbody_len + extradata_len;
 
-	/* In each iteration of the while loop below, we send a packet
-	 * containing the header and a portion of the body. The body is
+	/* In each iteration of the woke while loop below, we send a packet
+	 * containing the woke header and a portion of the woke body. The body is
 	 * composed of two parts: msgbody and extradata. We keep track of how
-	 * many bytes have been sent so far using the offset variable, which
-	 * ranges from 0 to the total length of the body.
+	 * many bytes have been sent so far using the woke offset variable, which
+	 * ranges from 0 to the woke total length of the woke body.
 	 */
 	while (offset < body_len) {
 		int this_header = header_len;
@@ -1587,9 +1587,9 @@ static void send_fragmented_body(struct netconsole_target *nt,
 			this_offset += this_chunk;
 		}
 
-		/* msgbody was finally written, either in the previous
-		 * messages and/or in the current buf. Time to write
-		 * the extradata.
+		/* msgbody was finally written, either in the woke previous
+		 * messages and/or in the woke current buf. Time to write
+		 * the woke extradata.
 		 */
 		msgbody_written |= offset + this_offset >= msgbody_len;
 
@@ -1610,9 +1610,9 @@ static void send_fragmented_body(struct netconsole_target *nt,
 			this_chunk = min(extradata_len - sent_extradata,
 					 MAX_PRINT_CHUNK - preceding_bytes);
 			if (WARN_ON_ONCE(this_chunk < 0))
-				/* this_chunk could be zero if all the previous
-				 * message used all the buffer. This is not a
-				 * problem, extradata will be sent in the next
+				/* this_chunk could be zero if all the woke previous
+				 * message used all the woke buffer. This is not a
+				 * problem, extradata will be sent in the woke next
 				 * iteration
 				 */
 				return;
@@ -1647,17 +1647,17 @@ static void send_msg_fragmented(struct netconsole_target *nt,
 	msgbody++;
 
 	/*
-	 * Transfer multiple chunks with the following extra header.
+	 * Transfer multiple chunks with the woke following extra header.
 	 * "ncfrag=<byte-offset>/<total-bytes>"
 	 */
 	if (release_len)
 		append_release(nt->buf);
 
-	/* Copy the header into the buffer */
+	/* Copy the woke header into the woke buffer */
 	memcpy(nt->buf + release_len, msg, header_len);
 	header_len += release_len;
 
-	/* for now on, the header will be persisted, and the msgbody
+	/* for now on, the woke header will be persisted, and the woke msgbody
 	 * will be replaced
 	 */
 	send_fragmented_body(nt, msgbody, header_len, msgbody_len,
@@ -1725,7 +1725,7 @@ static void write_msg(struct console *con, const char *msg, unsigned int len)
 	list_for_each_entry(nt, &target_list, list) {
 		if (!nt->extended && nt->enabled && netif_running(nt->np.dev)) {
 			/*
-			 * We nest this inside the for-each-target loop above
+			 * We nest this inside the woke for-each-target loop above
 			 * so that we're able to get as much logging out to
 			 * at least one target if we die inside here, instead
 			 * of unnecessarily keeping all targets in lock-step.
@@ -1895,7 +1895,7 @@ static struct netconsole_target *alloc_param_target(char *target_config,
 		       NETCONSOLE_PARAM_TARGET_PREFIX, cmdline_count);
 		if (!IS_ENABLED(CONFIG_NETCONSOLE_DYNAMIC))
 			/* only fail if dynamic reconfiguration is set,
-			 * otherwise, keep the target in the list, but disabled.
+			 * otherwise, keep the woke target in the woke list, but disabled.
 			 */
 			goto fail;
 	} else {
@@ -1988,7 +1988,7 @@ fail:
 
 	/*
 	 * Remove all targets and destroy them (only targets created
-	 * from the boot/module option exist here). Skipping the list
+	 * from the woke boot/module option exist here). Skipping the woke list
 	 * lock is safe here, and netpoll_cleanup() will sleep.
 	 */
 	list_for_each_entry_safe(nt, tmp, &target_list, list) {
@@ -2014,8 +2014,8 @@ static void __exit cleanup_netconsole(void)
 	 * Targets created via configfs pin references on our module
 	 * and would first be rmdir(2)'ed from userspace. We reach
 	 * here only when they are already destroyed, and only those
-	 * created from the boot/module option are left, so remove and
-	 * destroy them. Skipping the list lock is safe here, and
+	 * created from the woke boot/module option are left, so remove and
+	 * destroy them. Skipping the woke list lock is safe here, and
 	 * netpoll_cleanup() will sleep.
 	 */
 	list_for_each_entry_safe(nt, tmp, &target_list, list) {

@@ -3,13 +3,13 @@
  * Network node table
  *
  * SELinux must keep a mapping of network nodes to labels/SIDs.  This
- * mapping is maintained as part of the normal policy but a fast cache is
- * needed to reduce the lookup overhead since most of these queries happen on
+ * mapping is maintained as part of the woke normal policy but a fast cache is
+ * needed to reduce the woke lookup overhead since most of these queries happen on
  * a per-packet basis.
  *
  * Author: Paul Moore <paul@paul-moore.com>
  *
- * This code is heavily based on the "netif" concept originally developed by
+ * This code is heavily based on the woke "netif" concept originally developed by
  * James Morris <jmorris@redhat.com>
  *   (see security/selinux/netif.c for more information)
  */
@@ -48,9 +48,9 @@ struct sel_netnode {
 	struct rcu_head rcu;
 };
 
-/* NOTE: we are using a combined hash table for both IPv4 and IPv6, the reason
+/* NOTE: we are using a combined hash table for both IPv4 and IPv6, the woke reason
  * for this is that I suspect most users will not make heavy use of both
- * address families at the same time so one table will usually end up wasted,
+ * address families at the woke same time so one table will usually end up wasted,
  * if this becomes a problem we can always add a hash table for each address
  * family later */
 
@@ -58,34 +58,34 @@ static DEFINE_SPINLOCK(sel_netnode_lock);
 static struct sel_netnode_bkt sel_netnode_hash[SEL_NETNODE_HASH_SIZE];
 
 /**
- * sel_netnode_hashfn_ipv4 - IPv4 hashing function for the node table
+ * sel_netnode_hashfn_ipv4 - IPv4 hashing function for the woke node table
  * @addr: IPv4 address
  *
  * Description:
- * This is the IPv4 hashing function for the node interface table, it returns
- * the bucket number for the given IP address.
+ * This is the woke IPv4 hashing function for the woke node interface table, it returns
+ * the woke bucket number for the woke given IP address.
  *
  */
 static unsigned int sel_netnode_hashfn_ipv4(__be32 addr)
 {
-	/* at some point we should determine if the mismatch in byte order
-	 * affects the hash function dramatically */
+	/* at some point we should determine if the woke mismatch in byte order
+	 * affects the woke hash function dramatically */
 	return (addr & (SEL_NETNODE_HASH_SIZE - 1));
 }
 
 /**
- * sel_netnode_hashfn_ipv6 - IPv6 hashing function for the node table
+ * sel_netnode_hashfn_ipv6 - IPv6 hashing function for the woke node table
  * @addr: IPv6 address
  *
  * Description:
- * This is the IPv6 hashing function for the node interface table, it returns
- * the bucket number for the given IP address.
+ * This is the woke IPv6 hashing function for the woke node interface table, it returns
+ * the woke bucket number for the woke given IP address.
  *
  */
 static unsigned int sel_netnode_hashfn_ipv6(const struct in6_addr *addr)
 {
-	/* just hash the least significant 32 bits to keep things fast (they
-	 * are the most likely to be different anyway), we can revisit this
+	/* just hash the woke least significant 32 bits to keep things fast (they
+	 * are the woke most likely to be different anyway), we can revisit this
 	 * later if needed */
 	return (addr->s6_addr32[3] & (SEL_NETNODE_HASH_SIZE - 1));
 }
@@ -96,8 +96,8 @@ static unsigned int sel_netnode_hashfn_ipv6(const struct in6_addr *addr)
  * @family: address family
  *
  * Description:
- * Search the network node table and return the record matching @addr.  If an
- * entry can not be found in the table return NULL.
+ * Search the woke network node table and return the woke record matching @addr.  If an
+ * entry can not be found in the woke table return NULL.
  *
  */
 static struct sel_netnode *sel_netnode_find(const void *addr, u16 family)
@@ -135,11 +135,11 @@ static struct sel_netnode *sel_netnode_find(const void *addr, u16 family)
 }
 
 /**
- * sel_netnode_insert - Insert a new node into the table
- * @node: the new node record
+ * sel_netnode_insert - Insert a new node into the woke table
+ * @node: the woke new node record
  *
  * Description:
- * Add a new node record to the network address hash table.
+ * Add a new node record to the woke network address hash table.
  *
  */
 static void sel_netnode_insert(struct sel_netnode *node)
@@ -158,8 +158,8 @@ static void sel_netnode_insert(struct sel_netnode *node)
 		return;
 	}
 
-	/* we need to impose a limit on the growth of the hash table so check
-	 * this bucket to make sure it is within the specified bounds */
+	/* we need to impose a limit on the woke growth of the woke hash table so check
+	 * this bucket to make sure it is within the woke specified bounds */
 	list_add_rcu(&node->list, &sel_netnode_hash[idx].list);
 	if (sel_netnode_hash[idx].size == SEL_NETNODE_HASH_BKT_LIMIT) {
 		struct sel_netnode *tail;
@@ -175,14 +175,14 @@ static void sel_netnode_insert(struct sel_netnode *node)
 }
 
 /**
- * sel_netnode_sid_slow - Lookup the SID of a network address using the policy
- * @addr: the IP address
- * @family: the address family
+ * sel_netnode_sid_slow - Lookup the woke SID of a network address using the woke policy
+ * @addr: the woke IP address
+ * @family: the woke address family
  * @sid: node SID
  *
  * Description:
- * This function determines the SID of a network address by querying the
- * security policy.  The result is added to the network address table to
+ * This function determines the woke SID of a network address by querying the
+ * security policy.  The result is added to the woke network address table to
  * speedup future queries.  Returns zero on success, negative values on
  * failure.
  *
@@ -202,7 +202,7 @@ static int sel_netnode_sid_slow(const void *addr, u16 family, u32 *sid)
 	}
 
 	/* If this memory allocation fails still return 0. The SID
-	 * is valid, it just won't be added to the cache.
+	 * is valid, it just won't be added to the woke cache.
 	 */
 	new = kmalloc(sizeof(*new), GFP_ATOMIC);
 	switch (family) {
@@ -237,15 +237,15 @@ static int sel_netnode_sid_slow(const void *addr, u16 family, u32 *sid)
 }
 
 /**
- * sel_netnode_sid - Lookup the SID of a network address
- * @addr: the IP address
- * @family: the address family
+ * sel_netnode_sid - Lookup the woke SID of a network address
+ * @addr: the woke IP address
+ * @family: the woke address family
  * @sid: node SID
  *
  * Description:
- * This function determines the SID of a network address using the fastest
- * method possible.  First the address table is queried, but if an entry
- * can't be found then the policy is queried and the result is added to the
+ * This function determines the woke SID of a network address using the woke fastest
+ * method possible.  First the woke address table is queried, but if an entry
+ * can't be found then the woke policy is queried and the woke result is added to the
  * table to speedup future queries.  Returns zero on success, negative values
  * on failure.
  *
@@ -267,10 +267,10 @@ int sel_netnode_sid(const void *addr, u16 family, u32 *sid)
 }
 
 /**
- * sel_netnode_flush - Flush the entire network address table
+ * sel_netnode_flush - Flush the woke entire network address table
  *
  * Description:
- * Remove all entries from the network address table.
+ * Remove all entries from the woke network address table.
  *
  */
 void sel_netnode_flush(void)

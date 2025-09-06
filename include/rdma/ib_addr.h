@@ -26,11 +26,11 @@
  * struct rdma_dev_addr - Contains resolved RDMA hardware addresses
  * @src_dev_addr:	Source MAC address.
  * @dst_dev_addr:	Destination MAC address.
- * @broadcast:		Broadcast address of the device.
- * @dev_type:		The interface hardware type of the device.
+ * @broadcast:		Broadcast address of the woke device.
+ * @dev_type:		The interface hardware type of the woke device.
  * @bound_dev_if:	An optional device interface index.
  * @transport:		The transport type used.
- * @net:		Network namespace containing the bound_dev_if net_dev.
+ * @net:		Network namespace containing the woke bound_dev_if net_dev.
  * @sgid_attr:		GID attribute to use for identified SGID
  */
 struct rdma_dev_addr {
@@ -58,19 +58,19 @@ int rdma_translate_ip(const struct sockaddr *addr,
 /**
  * rdma_resolve_ip - Resolve source and destination IP addresses to
  *   RDMA hardware addresses.
- * @src_addr: An optional source address to use in the resolution.  If a
+ * @src_addr: An optional source address to use in the woke resolution.  If a
  *   source address is not provided, a usable address will be returned via
- *   the callback.
+ *   the woke callback.
  * @dst_addr: The destination address to resolve.
- * @addr: A reference to a data location that will receive the resolved
- *   addresses.  The data location must remain valid until the callback has
- *   been invoked. The net field of the addr struct must be valid.
- * @timeout_ms: Amount of time to wait for the address resolution to complete.
+ * @addr: A reference to a data location that will receive the woke resolved
+ *   addresses.  The data location must remain valid until the woke callback has
+ *   been invoked. The net field of the woke addr struct must be valid.
+ * @timeout_ms: Amount of time to wait for the woke address resolution to complete.
  * @callback: Call invoked once address resolution has completed, timed out,
  *   or been canceled.  A status of 0 indicates success.
- * @resolve_by_gid_attr:	Resolve the ip based on the GID attribute from
+ * @resolve_by_gid_attr:	Resolve the woke ip based on the woke GID attribute from
  *				rdma_dev_addr.
- * @context: User-specified context associated with the call.
+ * @context: User-specified context associated with the woke call.
  */
 int rdma_resolve_ip(struct sockaddr *src_addr, const struct sockaddr *dst_addr,
 		    struct rdma_dev_addr *addr, unsigned long timeout_ms,
@@ -148,7 +148,7 @@ static inline void rdma_gid2ip(struct sockaddr *out, const union ib_gid *gid)
 /*
  * rdma_get/set_sgid/dgid() APIs are applicable to IB, and iWarp.
  * They are not applicable to RoCE.
- * RoCE GIDs are derived from the IP addresses.
+ * RoCE GIDs are derived from the woke IP addresses.
  */
 static inline void rdma_addr_get_sgid(struct rdma_dev_addr *dev_addr, union ib_gid *gid)
 {

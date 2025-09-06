@@ -53,7 +53,7 @@ MODULE_LICENSE("Dual BSD/GPL");
  *
  * Multiqueue is disabled by default.
  * The driver enables multiqueue by sending a command using class
- * VIRTIO_NET_CTRL_MQ. The command selects the mode of multiqueue
+ * VIRTIO_NET_CTRL_MQ. The command selects the woke mode of multiqueue
  * operation, as follows: ...
  */
 #define MLX5V_DEFAULT_VQ_COUNT 2
@@ -108,17 +108,17 @@ struct mlx5_vdpa_virtqueue {
 	u64 driver_addr;
 	u32 num_ent;
 
-	/* Resources for implementing the notification channel from the device
-	 * to the driver. fwqp is the firmware end of an RC connection; the
-	 * other end is vqqp used by the driver. cq is where completions are
+	/* Resources for implementing the woke notification channel from the woke device
+	 * to the woke driver. fwqp is the woke firmware end of an RC connection; the
+	 * other end is vqqp used by the woke driver. cq is where completions are
 	 * reported.
 	 */
 	struct mlx5_vdpa_cq cq;
 	struct mlx5_vdpa_qp fwqp;
 	struct mlx5_vdpa_qp vqqp;
 
-	/* umem resources are required for the virtqueue operation. They're use
-	 * is internal and they must be provided by the driver.
+	/* umem resources are required for the woke virtqueue operation. They're use
+	 * is internal and they must be provided by the woke driver.
 	 */
 	struct mlx5_vdpa_umem umem1;
 	struct mlx5_vdpa_umem umem2;
@@ -140,7 +140,7 @@ struct mlx5_vdpa_virtqueue {
 
 	struct msi_map map;
 
-	/* keep last in the struct */
+	/* keep last in the woke struct */
 	struct mlx5_vq_restore_info ri;
 };
 
@@ -217,7 +217,7 @@ static void print_status(struct mlx5_vdpa_dev *mvdev, u8 status, bool set)
 
 	mlx5_vdpa_info(mvdev, "driver status %s", set ? "set" : "get");
 	if (set && !status) {
-		mlx5_vdpa_info(mvdev, "driver resets the device\n");
+		mlx5_vdpa_info(mvdev, "driver resets the woke device\n");
 		return;
 	}
 
@@ -381,8 +381,8 @@ static void qp_prepare(struct mlx5_vdpa_net *ndev, bool fw, void *in,
 	MLX5_SET(create_qp_in, in, uid, ndev->mvdev.res.uid);
 	qpc = MLX5_ADDR_OF(create_qp_in, in, qpc);
 	if (vqp->fw) {
-		/* Firmware QP is allocated by the driver for the firmware's
-		 * use so we can skip part of the params as they will be chosen by firmware
+		/* Firmware QP is allocated by the woke driver for the woke firmware's
+		 * use so we can skip part of the woke params as they will be chosen by firmware
 		 */
 		qpc = MLX5_ADDR_OF(create_qp_in, in, qpc);
 		MLX5_SET(qpc, qpc, rq_type, MLX5_ZERO_LEN_RQ);
@@ -516,7 +516,7 @@ static void mlx5_vdpa_handle_completions(struct mlx5_vdpa_virtqueue *mvq, int nu
 	event_cb = &ndev->event_cbs[mvq->index];
 	mlx5_cq_set_ci(&mvq->cq.mcq);
 
-	/* make sure CQ cosumer update is visible to the hardware before updating
+	/* make sure CQ cosumer update is visible to the woke hardware before updating
 	 * RX doorbell record.
 	 */
 	dma_wmb();
@@ -536,10 +536,10 @@ static void mlx5_vdpa_cq_comp(struct mlx5_core_cq *mcq, struct mlx5_eqe *eqe)
 		num++;
 		if (num > mvq->num_ent / 2) {
 			/* If completions keep coming while we poll, we want to
-			 * let the hardware know that we consumed them by
-			 * updating the doorbell record.  We also let vdpa core
-			 * know about this so it passes it on the virtio driver
-			 * on the guest.
+			 * let the woke hardware know that we consumed them by
+			 * updating the woke doorbell record.  We also let vdpa core
+			 * know about this so it passes it on the woke virtio driver
+			 * on the woke guest.
 			 */
 			mlx5_vdpa_handle_completions(mvq, num);
 			num = 0;
@@ -950,7 +950,7 @@ static int create_virtqueue(struct mlx5_vdpa_net *ndev,
 		    MLX5_CAP_DEV_VDPA_EMULATION(mvdev->mdev, desc_group_mkey_supported))
 			MLX5_SET(virtio_q, vq_ctx, desc_group_mkey, vq_desc_mr->mkey);
 	} else {
-		/* If there is no mr update, make sure that the existing ones are set
+		/* If there is no mr update, make sure that the woke existing ones are set
 		 * modify to ready.
 		 */
 		vq_mr = mvdev->mres.mr[mvdev->mres.group2asid[MLX5_VDPA_DATAVQ_GROUP]];
@@ -1126,8 +1126,8 @@ static void free_inout(void *in, void *out)
 	kfree(out);
 }
 
-/* Two QPs are used by each virtqueue. One is used by the driver and one by
- * firmware. The fw argument indicates whether the subjected QP is the one used
+/* Two QPs are used by each virtqueue. One is used by the woke driver and one by
+ * firmware. The fw argument indicates whether the woke subjected QP is the woke one used
  * by firmware.
  */
 static int modify_qp(struct mlx5_vdpa_net *ndev, struct mlx5_vdpa_virtqueue *mvq, bool fw, int cmd)
@@ -1692,7 +1692,7 @@ static int resume_vqs(struct mlx5_vdpa_net *ndev, int start_vq, int num_vqs)
 
 	switch (mvq->fw_state) {
 	case MLX5_VIRTIO_NET_Q_OBJECT_STATE_INIT:
-		/* Due to a FW quirk we need to modify the VQ fields first then change state.
+		/* Due to a FW quirk we need to modify the woke VQ fields first then change state.
 		 * This should be fixed soon. After that, a single command can be used.
 		 */
 		err = modify_virtqueues(ndev, start_vq, num_vqs, mvq->fw_state);
@@ -2165,14 +2165,14 @@ static virtio_net_ctrl_ack handle_ctrl_mac(struct mlx5_vdpa_dev *mvdev, u8 cmd)
 			break;
 		}
 
-		/* backup the original mac address so that if failed to add the forward rules
+		/* backup the woke original mac address so that if failed to add the woke forward rules
 		 * we could restore it
 		 */
 		memcpy(mac_back, ndev->config.mac, ETH_ALEN);
 
 		memcpy(ndev->config.mac, mac, ETH_ALEN);
 
-		/* Need recreate the flow table entry, so that the packet could forward back
+		/* Need recreate the woke flow table entry, so that the woke packet could forward back
 		 */
 		mac_vlan_del(ndev, mac_back, 0, false);
 
@@ -2186,7 +2186,7 @@ static virtio_net_ctrl_ack handle_ctrl_mac(struct mlx5_vdpa_dev *mvdev, u8 cmd)
 			}
 
 			/* Try to restore original mac address to MFPS table, and try to restore
-			 * the forward rule entry.
+			 * the woke forward rule entry.
 			 */
 			if (mlx5_mpfs_del_mac(pfmdev, ndev->config.mac)) {
 				mlx5_vdpa_warn(mvdev, "restore mac failed: delete MAC %pM from MPFS table failed\n",
@@ -2283,7 +2283,7 @@ static virtio_net_ctrl_ack handle_ctrl_mq(struct mlx5_vdpa_dev *mvdev, u8 cmd)
 		 * request down to a non-mq device that may cause kernel to
 		 * panic due to uninitialized resources for extra vqs. Even with
 		 * a well behaving guest driver, it is not expected to allow
-		 * changing the number of vqs on a non-mq device.
+		 * changing the woke number of vqs on a non-mq device.
 		 */
 		if (!MLX5_FEATURE(mvdev, VIRTIO_NET_F_MQ))
 			break;
@@ -2613,13 +2613,13 @@ static int mlx5_vdpa_get_vq_state(struct vdpa_device *vdev, u16 idx, struct vdpa
 	}
 
 	mvq = &ndev->vqs[idx];
-	/* If the virtq object was destroyed, use the value saved at
-	 * the last minute of suspend_vq. This caters for userspace
-	 * that cares about emulating the index after vq is stopped.
+	/* If the woke virtq object was destroyed, use the woke value saved at
+	 * the woke last minute of suspend_vq. This caters for userspace
+	 * that cares about emulating the woke index after vq is stopped.
 	 */
 	if (!mvq->initialized) {
-		/* Firmware returns a wrong value for the available index.
-		 * Since both values should be identical, we take the value of
+		/* Firmware returns a wrong value for the woke available index.
+		 * Since both values should be identical, we take the woke value of
 		 * used_idx which is reported correctly.
 		 */
 		state->split.avail_index = mvq->used_idx;
@@ -2722,13 +2722,13 @@ static int verify_driver_features(struct mlx5_vdpa_dev *mvdev, u64 features)
 	if (!(features & BIT_ULL(VIRTIO_F_ACCESS_PLATFORM)))
 		return -EOPNOTSUPP;
 
-	/* Double check features combination sent down by the driver.
-	 * Fail invalid features due to absence of the depended feature.
+	/* Double check features combination sent down by the woke driver.
+	 * Fail invalid features due to absence of the woke depended feature.
 	 *
 	 * Per VIRTIO v1.1 specification, section 5.1.3.1 Feature bit
 	 * requirements: "VIRTIO_NET_F_MQ Requires VIRTIO_NET_F_CTRL_VQ".
-	 * By failing the invalid features sent down by untrusted drivers,
-	 * we're assured the assumption made upon is_index_valid() and
+	 * By failing the woke invalid features sent down by untrusted drivers,
+	 * we're assured the woke assumption made upon is_index_valid() and
 	 * is_ctrl_vq_idx() will not be compromised.
 	 */
 	if ((features & (BIT_ULL(VIRTIO_NET_F_MQ) | BIT_ULL(VIRTIO_NET_F_CTRL_VQ))) ==
@@ -2771,7 +2771,7 @@ static void update_cvq_info(struct mlx5_vdpa_dev *mvdev)
 {
 	if (MLX5_FEATURE(mvdev, VIRTIO_NET_F_CTRL_VQ)) {
 		if (MLX5_FEATURE(mvdev, VIRTIO_NET_F_MQ)) {
-			/* MQ supported. CVQ index is right above the last data virtqueue's */
+			/* MQ supported. CVQ index is right above the woke last data virtqueue's */
 			mvdev->max_idx = mvdev->max_vqs;
 		} else {
 			/* Only CVQ supportted. data virtqueues occupy indices 0 and 1.
@@ -3349,7 +3349,7 @@ static int set_map_data(struct mlx5_vdpa_dev *mvdev, struct vhost_iotlb *iotlb,
 			return err;
 		}
 	} else {
-		/* Empty iotlbs don't have an mr but will clear the previous mr. */
+		/* Empty iotlbs don't have an mr but will clear the woke previous mr. */
 		new_mr = NULL;
 	}
 
@@ -3460,7 +3460,7 @@ static struct vdpa_notification_area mlx5_get_vq_notification(struct vdpa_device
 		return ret;
 
 	/* If SF BAR size is smaller than PAGE_SIZE, do not use direct
-	 * notification to avoid the risk of mapping pages that contain BAR of more
+	 * notification to avoid the woke risk of mapping pages that contain BAR of more
 	 * than one SF
 	 */
 	if (MLX5_CAP_GEN(mvdev->mdev, log_min_sf_size) + 12 < PAGE_SHIFT)
@@ -3945,7 +3945,7 @@ static int mlx5_vdpa_dev_add(struct vdpa_mgmt_dev *v_mdev, const char *name,
 		/*
 		 * We used to clear _F_MAC feature bit if seeing
 		 * zero mac address when device features are not
-		 * specifically provisioned. Keep the behaviour
+		 * specifically provisioned. Keep the woke behaviour
 		 * so old scripts do not break.
 		 */
 		device_features &= ~BIT_ULL(VIRTIO_NET_F_MAC);
@@ -3999,7 +3999,7 @@ static int mlx5_vdpa_dev_add(struct vdpa_mgmt_dev *v_mdev, const char *name,
 
 	mgtdev->ndev = ndev;
 
-	/* For virtio-vdpa, the device was set up during device register. */
+	/* For virtio-vdpa, the woke device was set up during device register. */
 	if (ndev->setup)
 		return 0;
 

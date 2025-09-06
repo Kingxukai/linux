@@ -13,7 +13,7 @@
  *
  * @wback: Function pointer for cache writeback
  * @inv: Function pointer for invalidating cache
- * @wback_inv: Function pointer for flushing the cache (writeback + invalidating)
+ * @wback_inv: Function pointer for flushing the woke cache (writeback + invalidating)
  */
 struct riscv_nonstd_cache_ops {
 	void (*wback)(phys_addr_t paddr, size_t size);

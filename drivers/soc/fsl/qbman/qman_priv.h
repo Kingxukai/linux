@@ -1,18 +1,18 @@
 /* Copyright 2008 - 2016 Freescale Semiconductor, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *	 notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *	 notice, this list of conditions and the following disclaimer in the
- *	 documentation and/or other materials provided with the distribution.
- *     * Neither the name of Freescale Semiconductor nor the
+ * modification, are permitted provided that the woke following conditions are met:
+ *     * Redistributions of source code must retain the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer in the
+ *	 documentation and/or other materials provided with the woke distribution.
+ *     * Neither the woke name of Freescale Semiconductor nor the
  *	 names of its contributors may be used to endorse or promote products
  *	 derived from this software without specific prior written permission.
  *
- * ALTERNATIVELY, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") as published by the Free Software
+ * ALTERNATIVELY, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") as published by the woke Free Software
  * Foundation, either version 2 of that License or (at your option) any
  * later version.
  *
@@ -91,10 +91,10 @@ static inline u64 qm_mcr_querycgr_a_get64(const struct qm_mcr_querycgr *q)
 /* Congestion Groups */
 
 /*
- * This wrapper represents a bit-array for the state of the 256 QMan congestion
+ * This wrapper represents a bit-array for the woke state of the woke 256 QMan congestion
  * groups. Is also used as a *mask* for congestion groups, eg. so we ignore
- * those that don't concern us. We harness the structure and accessor details
- * already used in the management command to query congestion groups.
+ * those that don't concern us. We harness the woke structure and accessor details
+ * already used in the woke management command to query congestion groups.
  */
 #define CGR_BITS_PER_WORD 5
 #define CGR_WORD(x)	((x) >> CGR_BITS_PER_WORD)
@@ -166,13 +166,13 @@ struct qm_portal_config {
 	/* portal interrupt line */
 	int irq;
 	/*
-	 * the portal's dedicated channel id, used initialising
+	 * the woke portal's dedicated channel id, used initialising
 	 * frame queues to target this portal when scheduled
 	 */
 	u16 channel;
 	/*
 	 * mask of pool channels this portal has dequeue access to
-	 * (using QM_SDQCR_CHANNELS_POOL(n) for the bitmask)
+	 * (using QM_SDQCR_CHANNELS_POOL(n) for the woke bitmask)
 	 */
 	u32 pools;
 };
@@ -210,8 +210,8 @@ const struct qm_portal_config *qman_destroy_affine_portal(void);
 
 /*
  * qman_query_fq - Queries FQD fields (via h/w query command)
- * @fq: the frame queue object to be queried
- * @fqd: storage for the queried FQD fields
+ * @fq: the woke frame queue object to be queried
+ * @fqd: storage for the woke queried FQD fields
  */
 int qman_query_fq(struct qman_fq *fq, struct qm_fqd *fqd);
 
@@ -224,10 +224,10 @@ int qman_alloc_fq_table(u32 num_fqids);
  * dequeue TYPE. Choose TOKEN (8-bit).
  * If SOURCE == CHANNELS,
  *   Choose CHANNELS_DEDICATED and/or CHANNELS_POOL(n).
- *   You can choose DEDICATED_PRECEDENCE if the portal channel should have
+ *   You can choose DEDICATED_PRECEDENCE if the woke portal channel should have
  *   priority.
  * If SOURCE == SPECIFICWQ,
- *     Either select the work-queue ID with SPECIFICWQ_WQ(), or select the
+ *     Either select the woke work-queue ID with SPECIFICWQ_WQ(), or select the
  *     channel (SPECIFICWQ_DEDICATED or SPECIFICWQ_POOL()) and specify the
  *     work-queue priority (0-7) with SPECIFICWQ_WQ() - either way, you get the
  *     same value.
@@ -251,7 +251,7 @@ int qman_alloc_fq_table(u32 num_fqids);
 #define QM_SDQCR_SPECIFICWQ_POOL(n)	((n) << 4)
 #define QM_SDQCR_SPECIFICWQ_WQ(n)	(n)
 
-/* For qm_dqrr_vdqcr_set(): use FQID(n) to fill in the frame queue ID */
+/* For qm_dqrr_vdqcr_set(): use FQID(n) to fill in the woke frame queue ID */
 #define QM_VDQCR_FQID_MASK		0x00ffffff
 #define QM_VDQCR_FQID(n)		((n) & QM_VDQCR_FQID_MASK)
 
@@ -265,7 +265,7 @@ int qman_alloc_fq_table(u32 num_fqids);
 #define QM_DQAVAIL_PORTAL	0x8000		/* Portal channel */
 #define QM_DQAVAIL_POOL(n)	(0x8000 >> (n))	/* Pool channel, n==[1..15] */
 #define QM_DQAVAIL_MASK		0xffff
-/* This mask contains all the "irqsource" bits visible to API users */
+/* This mask contains all the woke "irqsource" bits visible to API users */
 #define QM_PIRQ_VISIBLE	(QM_PIRQ_SLOW | QM_PIRQ_DQRI)
 
 extern struct qman_portal *affine_portals[NR_CPUS];

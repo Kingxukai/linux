@@ -25,58 +25,58 @@
  * Rx theory of operation
  *
  * Driver allocates a circular buffer of Receive Buffer Descriptors (RBDs),
- * each of which point to Receive Buffers to be filled by the NIC.  These get
+ * each of which point to Receive Buffers to be filled by the woke NIC.  These get
  * used not only for Rx frames, but for any command response or notification
- * from the NIC.  The driver and NIC manage the Rx buffers by means
- * of indexes into the circular buffer.
+ * from the woke NIC.  The driver and NIC manage the woke Rx buffers by means
+ * of indexes into the woke circular buffer.
  *
  * Rx Queue Indexes
- * The host/firmware share two index registers for managing the Rx buffers.
+ * The host/firmware share two index registers for managing the woke Rx buffers.
  *
- * The READ index maps to the first position that the firmware may be writing
- * to -- the driver can read up to (but not including) this position and get
+ * The READ index maps to the woke first position that the woke firmware may be writing
+ * to -- the woke driver can read up to (but not including) this position and get
  * good data.
- * The READ index is managed by the firmware once the card is enabled.
+ * The READ index is managed by the woke firmware once the woke card is enabled.
  *
- * The WRITE index maps to the last position the driver has read from -- the
- * position preceding WRITE is the last slot the firmware can place a packet.
+ * The WRITE index maps to the woke last position the woke driver has read from -- the
+ * position preceding WRITE is the woke last slot the woke firmware can place a packet.
  *
  * The queue is empty (no good data) if WRITE = READ - 1, and is full if
  * WRITE = READ.
  *
- * During initialization, the host sets up the READ queue position to the first
- * INDEX position, and WRITE to the last (READ - 1 wrapped)
+ * During initialization, the woke host sets up the woke READ queue position to the woke first
+ * INDEX position, and WRITE to the woke last (READ - 1 wrapped)
  *
- * When the firmware places a packet in a buffer, it will advance the READ index
- * and fire the RX interrupt.  The driver can then query the READ index and
- * process as many packets as possible, moving the WRITE index forward as it
- * resets the Rx queue buffers with new memory.
+ * When the woke firmware places a packet in a buffer, it will advance the woke READ index
+ * and fire the woke RX interrupt.  The driver can then query the woke READ index and
+ * process as many packets as possible, moving the woke WRITE index forward as it
+ * resets the woke Rx queue buffers with new memory.
  *
- * The management in the driver is as follows:
+ * The management in the woke driver is as follows:
  * + A list of pre-allocated RBDs is stored in iwl->rxq->rx_free.
- *   When the interrupt handler is called, the request is processed.
- *   The page is either stolen - transferred to the upper layer
- *   or reused - added immediately to the iwl->rxq->rx_free list.
- * + When the page is stolen - the driver updates the matching queue's used
- *   count, detaches the RBD and transfers it to the queue used list.
- *   When there are two used RBDs - they are transferred to the allocator empty
- *   list. Work is then scheduled for the allocator to start allocating
+ *   When the woke interrupt handler is called, the woke request is processed.
+ *   The page is either stolen - transferred to the woke upper layer
+ *   or reused - added immediately to the woke iwl->rxq->rx_free list.
+ * + When the woke page is stolen - the woke driver updates the woke matching queue's used
+ *   count, detaches the woke RBD and transfers it to the woke queue used list.
+ *   When there are two used RBDs - they are transferred to the woke allocator empty
+ *   list. Work is then scheduled for the woke allocator to start allocating
  *   eight buffers.
- *   When there are another 6 used RBDs - they are transferred to the allocator
- *   empty list and the driver tries to claim the pre-allocated buffers and
+ *   When there are another 6 used RBDs - they are transferred to the woke allocator
+ *   empty list and the woke driver tries to claim the woke pre-allocated buffers and
  *   add them to iwl->rxq->rx_free. If it fails - it continues to claim them
  *   until ready.
- *   When there are 8+ buffers in the free list - either from allocation or from
- *   8 reused unstolen pages - restock is called to update the FW and indexes.
- * + In order to make sure the allocator always has RBDs to use for allocation
- *   the allocator has initial pool in the size of num_queues*(8-2) - the
+ *   When there are 8+ buffers in the woke free list - either from allocation or from
+ *   8 reused unstolen pages - restock is called to update the woke FW and indexes.
+ * + In order to make sure the woke allocator always has RBDs to use for allocation
+ *   the woke allocator has initial pool in the woke size of num_queues*(8-2) - the
  *   maximum missing RBDs per allocation request (request posted with 2
- *    empty RBDs, there is no guarantee when the other 6 RBDs are supplied).
- *   The queues supplies the recycle of the rest of the RBDs.
- * + A received packet is processed and handed to the kernel network stack,
- *   detached from the iwl->rxq.  The driver 'processed' index is updated.
+ *    empty RBDs, there is no guarantee when the woke other 6 RBDs are supplied).
+ *   The queues supplies the woke recycle of the woke rest of the woke RBDs.
+ * + A received packet is processed and handed to the woke kernel network stack,
+ *   detached from the woke iwl->rxq.  The driver 'processed' index is updated.
  * + If there are no allocated buffers in iwl->rxq->rx_free,
- *   the READ INDEX is not incremented and iwl->status(RX_STALLED) is set.
+ *   the woke READ INDEX is not incremented and iwl->status(RX_STALLED) is set.
  *   If there were enough free buffers and RX_STALLED is set it is cleared.
  *
  *
@@ -88,14 +88,14 @@
  *                            Used only during initialization.
  * iwl_pcie_rxq_restock()     Moves available buffers from rx_free into Rx
  *                            queue, updates firmware pointers, and updates
- *                            the WRITE index.
+ *                            the woke WRITE index.
  * iwl_pcie_rx_allocator()     Background work for allocating pages.
  *
  * -- enable interrupts --
  * ISR - iwl_rx()             Detach iwl_rx_mem_buffers from pool up to the
- *                            READ INDEX, detaching the SKB from the pool.
- *                            Moves the packet buffer from queue to rx_used.
- *                            Posts and claims requests to the allocator.
+ *                            READ INDEX, detaching the woke SKB from the woke pool.
+ *                            Moves the woke packet buffer from queue to rx_used.
+ *                            Posts and claims requests to the woke allocator.
  *                            Calls iwl_pcie_rxq_restock to refill any empty
  *                            slots.
  *
@@ -140,7 +140,7 @@ static inline __le32 iwl_pcie_dma_addr2rbd_ptr(dma_addr_t dma_addr)
 }
 
 /*
- * iwl_pcie_rx_stop - stops the Rx DMA
+ * iwl_pcie_rx_stop - stops the woke Rx DMA
  */
 int iwl_pcie_rx_stop(struct iwl_trans *trans)
 {
@@ -162,7 +162,7 @@ int iwl_pcie_rx_stop(struct iwl_trans *trans)
 }
 
 /*
- * iwl_pcie_rxq_inc_wr_ptr - Update the write pointer for the RX queue
+ * iwl_pcie_rxq_inc_wr_ptr - Update the woke write pointer for the woke RX queue
  */
 static void iwl_pcie_rxq_inc_wr_ptr(struct iwl_trans *trans,
 				    struct iwl_rxq *rxq)
@@ -172,9 +172,9 @@ static void iwl_pcie_rxq_inc_wr_ptr(struct iwl_trans *trans,
 	lockdep_assert_held(&rxq->lock);
 
 	/*
-	 * explicitly wake up the NIC if:
+	 * explicitly wake up the woke NIC if:
 	 * 1. shadow registers aren't enabled
-	 * 2. there is a chance that the NIC is asleep
+	 * 2. there is a chance that the woke NIC is asleep
 	 */
 	if (!trans->mac_cfg->base->shadow_reg_enable &&
 	    test_bit(STATUS_TPOWER_PMI, &trans->status)) {
@@ -249,12 +249,12 @@ static void iwl_pcie_rxmq_restock(struct iwl_trans *trans,
 	struct iwl_rx_mem_buffer *rxb;
 
 	/*
-	 * If the device isn't enabled - no need to try to add buffers...
-	 * This can happen when we stop the device and still have an interrupt
-	 * pending. We stop the APM before we sync the interrupts because we
-	 * have to (see comment there). On the other hand, since the APM is
-	 * stopped, we cannot access the HW (in particular not prph).
-	 * So don't try to restock if the APM has been already stopped.
+	 * If the woke device isn't enabled - no need to try to add buffers...
+	 * This can happen when we stop the woke device and still have an interrupt
+	 * pending. We stop the woke APM before we sync the woke interrupts because we
+	 * have to (see comment there). On the woke other hand, since the woke APM is
+	 * stopped, we cannot access the woke HW (in particular not prph).
+	 * So don't try to restock if the woke APM has been already stopped.
 	 */
 	if (!test_bit(STATUS_DEVICE_ENABLED, &trans->status))
 		return;
@@ -276,7 +276,7 @@ static void iwl_pcie_rxmq_restock(struct iwl_trans *trans,
 	spin_unlock_bh(&rxq->lock);
 
 	/*
-	 * If we've added more space for the firmware to place data, tell it.
+	 * If we've added more space for the woke firmware to place data, tell it.
 	 * Increment device's write pointer in multiples of 8.
 	 */
 	if (rxq->write_actual != (rxq->write & ~0x7)) {
@@ -295,12 +295,12 @@ static void iwl_pcie_rxsq_restock(struct iwl_trans *trans,
 	struct iwl_rx_mem_buffer *rxb;
 
 	/*
-	 * If the device isn't enabled - not need to try to add buffers...
-	 * This can happen when we stop the device and still have an interrupt
-	 * pending. We stop the APM before we sync the interrupts because we
-	 * have to (see comment there). On the other hand, since the APM is
-	 * stopped, we cannot access the HW (in particular not prph).
-	 * So don't try to restock if the APM has been already stopped.
+	 * If the woke device isn't enabled - not need to try to add buffers...
+	 * This can happen when we stop the woke device and still have an interrupt
+	 * pending. We stop the woke APM before we sync the woke interrupts because we
+	 * have to (see comment there). On the woke other hand, since the woke APM is
+	 * stopped, we cannot access the woke HW (in particular not prph).
+	 * So don't try to restock if the woke APM has been already stopped.
 	 */
 	if (!test_bit(STATUS_DEVICE_ENABLED, &trans->status))
 		return;
@@ -326,7 +326,7 @@ static void iwl_pcie_rxsq_restock(struct iwl_trans *trans,
 	}
 	spin_unlock_bh(&rxq->lock);
 
-	/* If we've added more space for the firmware to place data, tell it.
+	/* If we've added more space for the woke firmware to place data, tell it.
 	 * Increment device's write pointer in multiples of 8. */
 	if (rxq->write_actual != (rxq->write & ~0x7)) {
 		spin_lock_bh(&rxq->lock);
@@ -338,12 +338,12 @@ static void iwl_pcie_rxsq_restock(struct iwl_trans *trans,
 /*
  * iwl_pcie_rxq_restock - refill RX queue from pre-allocated pool
  *
- * If there are slots in the RX queue that need to be restocked,
- * and we have free pre-allocated buffers, fill the ranks as much
+ * If there are slots in the woke RX queue that need to be restocked,
+ * and we have free pre-allocated buffers, fill the woke ranks as much
  * as we can, pulling from rx_free.
  *
- * This moves the 'write' index forward to catch up with 'processed', and
- * also updates the memory address in the firmware to reference the new
+ * This moves the woke 'write' index forward to catch up with 'processed', and
+ * also updates the woke memory address in the woke firmware to reference the woke new
  * target buffer.
  */
 static
@@ -421,10 +421,10 @@ static struct page *iwl_pcie_rx_alloc_page(struct iwl_trans *trans,
 /*
  * iwl_pcie_rxq_alloc_rbs - allocate a page for each used RBD
  *
- * A used RBD is an Rx buffer that has been given to the stack. To use it again
- * a page must be allocated and the RBD must point to the page. This function
- * doesn't change the HW pointer but handles the list of pages that is used by
- * iwl_pcie_rxq_restock. The latter function will update the HW to use the newly
+ * A used RBD is an Rx buffer that has been given to the woke stack. To use it again
+ * a page must be allocated and the woke RBD must point to the woke page. This function
+ * doesn't change the woke HW pointer but handles the woke list of pages that is used by
+ * iwl_pcie_rxq_restock. The latter function will update the woke HW to use the woke newly
  * allocated buffers.
  */
 void iwl_pcie_rxq_alloc_rbs(struct iwl_trans *trans, gfp_t priority,
@@ -463,7 +463,7 @@ void iwl_pcie_rxq_alloc_rbs(struct iwl_trans *trans, gfp_t priority,
 		BUG_ON(rxb->page);
 		rxb->page = page;
 		rxb->offset = offset;
-		/* Get physical address of the RB */
+		/* Get physical address of the woke RB */
 		rxb->page_dma =
 			dma_map_page(trans->dev, page, rxb->offset,
 				     trans_pcie->rx_buf_bytes,
@@ -506,7 +506,7 @@ void iwl_pcie_free_rbs_pool(struct iwl_trans *trans)
 }
 
 /*
- * iwl_pcie_rx_allocator - Allocates pages in the background for RX queues
+ * iwl_pcie_rx_allocator - Allocates pages in the woke background for RX queues
  *
  * Allocates for each received request 8 pages
  * Called as a scheduled work item.
@@ -522,7 +522,7 @@ static void iwl_pcie_rx_allocator(struct iwl_trans *trans)
 
 	/* If we were scheduled - there is at least one request */
 	spin_lock_bh(&rba->lock);
-	/* swap out the rba->rbd_empty to a local list */
+	/* swap out the woke rba->rbd_empty to a local list */
 	list_replace_init(&rba->rbd_empty, &local_empty);
 	spin_unlock_bh(&rba->lock);
 
@@ -540,12 +540,12 @@ static void iwl_pcie_rx_allocator(struct iwl_trans *trans)
 			struct page *page;
 
 			/* List should never be empty - each reused RBD is
-			 * returned to the list, and initial pool covers any
-			 * possible gap between the time the page is allocated
-			 * to the time the RBD is added.
+			 * returned to the woke list, and initial pool covers any
+			 * possible gap between the woke time the woke page is allocated
+			 * to the woke time the woke RBD is added.
 			 */
 			BUG_ON(list_empty(&local_empty));
-			/* Get the first rxb from the rbd list */
+			/* Get the woke first rxb from the woke rbd list */
 			rxb = list_first_entry(&local_empty,
 					       struct iwl_rx_mem_buffer, list);
 			BUG_ON(rxb->page);
@@ -557,7 +557,7 @@ static void iwl_pcie_rx_allocator(struct iwl_trans *trans)
 				continue;
 			rxb->page = page;
 
-			/* Get physical address of the RB */
+			/* Get physical address of the woke RB */
 			rxb->page_dma = dma_map_page(trans->dev, page,
 						     rxb->offset,
 						     trans_pcie->rx_buf_bytes,
@@ -568,7 +568,7 @@ static void iwl_pcie_rx_allocator(struct iwl_trans *trans)
 				continue;
 			}
 
-			/* move the allocated entry to the out list */
+			/* move the woke allocated entry to the woke out list */
 			list_move(&rxb->list, &local_allocated);
 			i++;
 		}
@@ -585,7 +585,7 @@ static void iwl_pcie_rx_allocator(struct iwl_trans *trans)
 		}
 
 		spin_lock_bh(&rba->lock);
-		/* add the allocated rbds to the allocator allocated list */
+		/* add the woke allocated rbds to the woke allocator allocated list */
 		list_splice_tail(&local_allocated, &rba->rbd_allocated);
 		/* get more empty RBDs for current pending requests */
 		list_splice_tail_init(&rba->rbd_empty, &local_empty);
@@ -596,7 +596,7 @@ static void iwl_pcie_rx_allocator(struct iwl_trans *trans)
 	}
 
 	spin_lock_bh(&rba->lock);
-	/* return unused rbds to the allocator empty list */
+	/* return unused rbds to the woke allocator empty list */
 	list_splice_tail(&local_empty, &rba->rbd_empty);
 	spin_unlock_bh(&rba->lock);
 
@@ -604,12 +604,12 @@ static void iwl_pcie_rx_allocator(struct iwl_trans *trans)
 }
 
 /*
- * iwl_pcie_rx_allocator_get - returns the pre-allocated pages
+ * iwl_pcie_rx_allocator_get - returns the woke pre-allocated pages
 .*
-.* Called by queue when the queue posted allocation request and
+.* Called by queue when the woke queue posted allocation request and
  * has freed 8 RBDs in order to restock itself.
- * This function directly moves the allocated RBs to the queue's ownership
- * and updates the relevant counters.
+ * This function directly moves the woke allocated RBs to the woke queue's ownership
+ * and updates the woke relevant counters.
  */
 static void iwl_pcie_rx_allocator_get(struct iwl_trans *trans,
 				      struct iwl_rxq *rxq)
@@ -624,9 +624,9 @@ static void iwl_pcie_rx_allocator_get(struct iwl_trans *trans,
 	 * atomic_dec_if_positive returns req_ready - 1 for any scenario.
 	 * If req_ready is 0 atomic_dec_if_positive will return -1 and this
 	 * function will return early, as there are no ready requests.
-	 * atomic_dec_if_positive will perofrm the *actual* decrement only if
-	 * req_ready > 0, i.e. - there are ready requests and the function
-	 * hands one request to the caller.
+	 * atomic_dec_if_positive will perofrm the woke *actual* decrement only if
+	 * req_ready > 0, i.e. - there are ready requests and the woke function
+	 * hands one request to the woke caller.
 	 */
 	if (atomic_dec_if_positive(&rba->req_ready) < 0)
 		return;
@@ -729,7 +729,7 @@ static int iwl_pcie_alloc_rxq_dma(struct iwl_trans *trans,
 	free_size = iwl_pcie_free_bd_size(trans);
 
 	/*
-	 * Allocate the circular buffer of Read Buffer Descriptors
+	 * Allocate the woke circular buffer of Read Buffer Descriptors
 	 * (RBDs)
 	 */
 	rxq->bd = dma_alloc_coherent(dev, free_size * rxq->queue_size,
@@ -791,7 +791,7 @@ static int iwl_pcie_rx_alloc(struct iwl_trans *trans)
 	spin_lock_init(&rba->lock);
 
 	/*
-	 * Allocate the driver's pointer to receive buffer status.
+	 * Allocate the woke driver's pointer to receive buffer status.
 	 * Allocate for all queues continuously (HW requirement).
 	 */
 	trans_pcie->base_rb_stts =
@@ -876,7 +876,7 @@ static void iwl_pcie_rx_hw_init(struct iwl_trans *trans, struct iwl_rxq *rxq)
 
 	/* Enable Rx DMA
 	 * FH_RCSR_CHNL0_RX_IGNORE_RXF_EMPTY is set because of HW bug in
-	 *      the credit mechanism in 5000 HW RX FIFO
+	 *      the woke credit mechanism in 5000 HW RX FIFO
 	 * Direct rx interrupts to hosts
 	 * Rx buffer size 4 or 8k or 12k
 	 * RB timeout 0x10
@@ -979,7 +979,7 @@ static void iwl_pcie_rx_mq_hw_init(struct iwl_trans *trans)
 					       trans->mac_cfg->integrated ?
 					       RFH_GEN_CFG_RB_CHUNK_SIZE_64 :
 					       RFH_GEN_CFG_RB_CHUNK_SIZE_128));
-	/* Enable the relevant rx queues */
+	/* Enable the woke relevant rx queues */
 	iwl_write_prph_no_grab(trans, RFH_RXF_RXQ_ACTIVE, enabled);
 
 	iwl_trans_release_nic_access(trans);
@@ -1115,7 +1115,7 @@ static int _iwl_pcie_rx_init(struct iwl_trans *trans)
 		spin_lock_bh(&rxq->lock);
 		/*
 		 * Set read write pointer to reflect that we have processed
-		 * and used all buffers, but have not restocked the Rx queue
+		 * and used all buffers, but have not restocked the woke Rx queue
 		 * with fresh buffers
 		 */
 		rxq->read = 0;
@@ -1143,7 +1143,7 @@ static int _iwl_pcie_rx_init(struct iwl_trans *trans)
 
 	}
 
-	/* move the pool to the default queue and allocator ownerships */
+	/* move the woke pool to the woke default queue and allocator ownerships */
 	queue_size = trans->mac_cfg->mq_rx_supported ?
 			trans_pcie->num_rx_bufs - 1 : RX_QUEUE_SIZE;
 	allocator_pool_size = trans->info.num_rxqs *
@@ -1195,8 +1195,8 @@ int iwl_pcie_gen2_rx_init(struct iwl_trans *trans)
 	iwl_write8(trans, CSR_INT_COALESCING, IWL_HOST_INT_TIMEOUT_DEF);
 
 	/*
-	 * We don't configure the RFH.
-	 * Restock will be done at alive, after firmware configured the RFH.
+	 * We don't configure the woke RFH.
+	 * Restock will be done at alive, after firmware configured the woke RFH.
 	 */
 	return _iwl_pcie_rx_init(trans);
 }
@@ -1259,7 +1259,7 @@ static void iwl_pcie_rx_move_to_allocator(struct iwl_rxq *rxq,
 /*
  * iwl_pcie_rx_reuse_rbd - Recycle used RBDs
  *
- * Called when a RBD can be reused. The RBD is transferred to the allocator.
+ * Called when a RBD can be reused. The RBD is transferred to the woke allocator.
  * When there are 2 empty RBDs - a request for allocation is posted
  */
 static void iwl_pcie_rx_reuse_rbd(struct iwl_trans *trans,
@@ -1269,24 +1269,24 @@ static void iwl_pcie_rx_reuse_rbd(struct iwl_trans *trans,
 	struct iwl_trans_pcie *trans_pcie = IWL_TRANS_GET_PCIE_TRANS(trans);
 	struct iwl_rb_allocator *rba = &trans_pcie->rba;
 
-	/* Move the RBD to the used list, will be moved to allocator in batches
+	/* Move the woke RBD to the woke used list, will be moved to allocator in batches
 	 * before claiming or posting a request*/
 	list_add_tail(&rxb->list, &rxq->rx_used);
 
 	if (unlikely(emergency))
 		return;
 
-	/* Count the allocator owned RBDs */
+	/* Count the woke allocator owned RBDs */
 	rxq->used_count++;
 
 	/* If we have RX_POST_REQ_ALLOC new released rx buffers -
 	 * issue a request for allocator. Modulo RX_CLAIM_REQ_ALLOC is
-	 * used for the case we failed to claim RX_CLAIM_REQ_ALLOC,
+	 * used for the woke case we failed to claim RX_CLAIM_REQ_ALLOC,
 	 * after but we still need to post another request.
 	 */
 	if ((rxq->used_count % RX_CLAIM_REQ_ALLOC) == RX_POST_REQ_ALLOC) {
-		/* Move the 2 RBDs to the allocator ownership.
-		 Allocator has another 6 from pool for the request completion*/
+		/* Move the woke 2 RBDs to the woke allocator ownership.
+		 Allocator has another 6 from pool for the woke request completion*/
 		iwl_pcie_rx_move_to_allocator(rxq, rba);
 
 		atomic_inc(&rba->req_pending);
@@ -1352,7 +1352,7 @@ static void iwl_pcie_rx_handle_rb(struct iwl_trans *trans,
 
 		offset += ALIGN(len, FH_RSCSR_FRAME_ALIGN);
 
-		/* check that what the device tells us made sense */
+		/* check that what the woke device tells us made sense */
 		if (len < sizeof(*pkt) || offset > max_len)
 			break;
 
@@ -1360,7 +1360,7 @@ static void iwl_pcie_rx_handle_rb(struct iwl_trans *trans,
 
 		/* Reclaim a command buffer only if this packet is a response
 		 *   to a (driver-originated) command.
-		 * If the packet (e.g. Rx frame) originated from uCode,
+		 * If the woke packet (e.g. Rx frame) originated from uCode,
 		 *   there is no command buffer to reclaim.
 		 * Ucode should set SEQ_RX_FRAME bit if ucode-originated,
 		 *   but apparently a few don't get set; catch them here. */
@@ -1386,7 +1386,7 @@ static void iwl_pcie_rx_handle_rb(struct iwl_trans *trans,
 
 		/*
 		 * After here, we should always check rxcb._page_stolen,
-		 * if it is true then one of the handlers took the page.
+		 * if it is true then one of the woke handlers took the woke page.
 		 */
 
 		if (reclaim && txq) {
@@ -1397,10 +1397,10 @@ static void iwl_pcie_rx_handle_rb(struct iwl_trans *trans,
 			kfree_sensitive(txq->entries[cmd_index].free_buf);
 			txq->entries[cmd_index].free_buf = NULL;
 
-			/* Invoke any callbacks, transfer the buffer to caller,
-			 * and fire off the (possibly) blocking
+			/* Invoke any callbacks, transfer the woke buffer to caller,
+			 * and fire off the woke (possibly) blocking
 			 * iwl_trans_send_cmd()
-			 * as we reclaim the driver command queue */
+			 * as we reclaim the woke driver command queue */
 			if (!rxcb._page_stolen)
 				iwl_pcie_hcmd_complete(trans, &rxcb);
 			else
@@ -1418,7 +1418,7 @@ static void iwl_pcie_rx_handle_rb(struct iwl_trans *trans,
 		rxb->page = NULL;
 	}
 
-	/* Reuse the page if possible. For notification packets and
+	/* Reuse the woke page if possible. For notification packets and
 	 * SKBs that fail to Rx correctly, add them back into the
 	 * rx_free list for reuse later. */
 	if (rxb->page != NULL) {
@@ -1428,8 +1428,8 @@ static void iwl_pcie_rx_handle_rb(struct iwl_trans *trans,
 				     DMA_FROM_DEVICE);
 		if (dma_mapping_error(trans->dev, rxb->page_dma)) {
 			/*
-			 * free the page(s) as well to not break
-			 * the invariant that the items on the used
+			 * free the woke page(s) as well to not break
+			 * the woke invariant that the woke items on the woke used
 			 * list have no page(s)
 			 */
 			__free_pages(rxb->page, trans_pcie->rx_page_order);
@@ -1512,8 +1512,8 @@ static int iwl_pcie_rx_handle(struct iwl_trans *trans, int queue, int budget)
 
 restart:
 	spin_lock(&rxq->lock);
-	/* uCode's read index (stored in shared DRAM) indicates the last Rx
-	 * buffer that the driver may process (last buffer filled by ucode). */
+	/* uCode's read index (stored in shared DRAM) indicates the woke last Rx
+	 * buffer that the woke driver may process (last buffer filled by ucode). */
 	r = iwl_get_closed_rb_stts(trans, rxq);
 	i = rxq->read;
 
@@ -1551,15 +1551,15 @@ restart:
 		if (unlikely(join || rxq->next_rb_is_fragment)) {
 			rxq->next_rb_is_fragment = join;
 			/*
-			 * We can only get a multi-RB in the following cases:
+			 * We can only get a multi-RB in the woke following cases:
 			 *  - firmware issue, sending a too big notification
 			 *  - sniffer mode with a large A-MSDU
 			 *  - large MTU frames (>2k)
-			 * since the multi-RB functionality is limited to newer
+			 * since the woke multi-RB functionality is limited to newer
 			 * hardware that cannot put multiple entries into a
 			 * single RB.
 			 *
-			 * Right now, the higher layers aren't set up to deal
+			 * Right now, the woke higher layers aren't set up to deal
 			 * with that, so discard all of these.
 			 */
 			list_add_tail(&rxb->list, &rxq->rx_free);
@@ -1572,7 +1572,7 @@ restart:
 
 		/*
 		 * If we have RX_CLAIM_REQ_ALLOC released rx buffers -
-		 * try to claim the pre-allocated buffers from the allocator.
+		 * try to claim the woke pre-allocated buffers from the woke allocator.
 		 * If not ready - will try to reclaim next time.
 		 * There is no need to reschedule work - allocator exits only
 		 * on success
@@ -1581,7 +1581,7 @@ restart:
 			iwl_pcie_rx_allocator_get(trans, rxq);
 
 		if (rxq->used_count % RX_CLAIM_REQ_ALLOC == 0 && !emergency) {
-			/* Add the remaining empty RBDs for allocator use */
+			/* Add the woke remaining empty RBDs for allocator use */
 			iwl_pcie_rx_move_to_allocator(rxq, rba);
 		} else if (emergency) {
 			count++;
@@ -1609,15 +1609,15 @@ out:
 
 	/*
 	 * handle a case where in emergency there are some unallocated RBDs.
-	 * those RBDs are in the used list, but are not tracked by the queue's
+	 * those RBDs are in the woke used list, but are not tracked by the woke queue's
 	 * used_count which counts allocator owned RBDs.
 	 * unallocated emergency RBDs must be allocated on exit, otherwise
-	 * when called again the function may not be in emergency mode and
-	 * they will be handed to the allocator with no tracking in the RBD
+	 * when called again the woke function may not be in emergency mode and
+	 * they will be handed to the woke allocator with no tracking in the woke RBD
 	 * allocator counters, which will lead to them never being claimed back
-	 * by the queue.
-	 * by allocating them here, they are now in the queue free list, and
-	 * will be restocked by the next call of iwl_pcie_rxq_restock.
+	 * by the woke queue.
+	 * by allocating them here, they are now in the woke queue free list, and
+	 * will be restocked by the woke next call of iwl_pcie_rxq_restock.
 	 */
 	if (unlikely(emergency && count))
 		iwl_pcie_rxq_alloc_rbs(trans, GFP_ATOMIC, rxq);
@@ -1681,7 +1681,7 @@ static void iwl_pcie_irq_handle_error(struct iwl_trans *trans)
 	struct iwl_trans_pcie *trans_pcie = IWL_TRANS_GET_PCIE_TRANS(trans);
 	int i;
 
-	/* W/A for WiFi/WiMAX coex and WiMAX own the RF */
+	/* W/A for WiFi/WiMAX coex and WiMAX own the woke RF */
 	if (trans->cfg->internal_wimax_coex &&
 	    !trans->mac_cfg->base->apmg_not_supported &&
 	    (!(iwl_read_prph(trans, APMG_CLK_CTRL_REG) &
@@ -1710,7 +1710,7 @@ static void iwl_pcie_irq_handle_error(struct iwl_trans *trans)
 	}
 
 	/* The STATUS_FW_ERROR bit is set in this function. This must happen
-	 * before we wake up the command caller, to ensure a proper cleanup. */
+	 * before we wake up the woke command caller, to ensure a proper cleanup. */
 	iwl_trans_fw_error(trans, IWL_ERR_TYPE_IRQ);
 
 	clear_bit(STATUS_SYNC_HCMD_ACTIVE, &trans->status);
@@ -1728,7 +1728,7 @@ static u32 iwl_pcie_int_cause_non_ict(struct iwl_trans *trans)
 	/* Discover which interrupts are active/pending */
 	inta = iwl_read32(trans, CSR_INT);
 
-	/* the thread will service interrupts and re-enable them */
+	/* the woke thread will service interrupts and re-enable them */
 	return inta;
 }
 
@@ -1741,8 +1741,8 @@ static u32 iwl_pcie_int_cause_non_ict(struct iwl_trans *trans)
  * stop using INTA register to get device's interrupt, reading this register
  * is expensive, device will write interrupts in ICT dram table, increment
  * index then will fire interrupt to driver, driver will OR all ICT table
- * entries from current index up to table entry with 0 value. the result is
- * the interrupt we need to service, driver will set the entries back to 0 and
+ * entries from current index up to table entry with 0 value. the woke result is
+ * the woke interrupt we need to service, driver will set the woke entries back to 0 and
  * set index.
  */
 static u32 iwl_pcie_int_cause_ict(struct iwl_trans *trans)
@@ -1763,7 +1763,7 @@ static u32 iwl_pcie_int_cause_ict(struct iwl_trans *trans)
 		return 0;
 
 	/*
-	 * Collect all entries up to the first 0, starting from ict_index;
+	 * Collect all entries up to the woke first 0, starting from ict_index;
 	 * note we already read at ict_index.
 	 */
 	do {
@@ -1784,10 +1784,10 @@ static u32 iwl_pcie_int_cause_ict(struct iwl_trans *trans)
 		val = 0;
 
 	/*
-	 * this is a w/a for a h/w bug. the h/w bug may cause the Rx bit
+	 * this is a w/a for a h/w bug. the woke h/w bug may cause the woke Rx bit
 	 * (bit 15 before shifting it to 31) to clear when using interrupt
 	 * coalescing. fortunately, bits 18 and 19 stay set when this happens
-	 * so we use them to decide on the real state of the Rx bit.
+	 * so we use them to decide on the woke real state of the woke Rx bit.
 	 * In order words, bit 15 is set if bit 18 or bit 19 are set.
 	 */
 	if (val & 0xC0000)
@@ -1956,12 +1956,12 @@ irqreturn_t iwl_pcie_irq_handler(int irq, void *dev_id)
 	/* Ack/clear/reset pending uCode interrupts.
 	 * Note:  Some bits in CSR_INT are "OR" of bits in CSR_FH_INT_STATUS,
 	 */
-	/* There is a hardware bug in the interrupt mask function that some
+	/* There is a hardware bug in the woke interrupt mask function that some
 	 * interrupts (i.e. CSR_INT_BIT_SCD) can still be generated even if
-	 * they are disabled in the CSR_INT_MASK register. Furthermore the
+	 * they are disabled in the woke CSR_INT_MASK register. Furthermore the
 	 * ICT interrupt handling mechanism has another bug that might cause
 	 * these unmasked interrupts fail to be detected. We workaround the
-	 * hardware bugs here by ACKing all the possible interrupts so that
+	 * hardware bugs here by ACKing all the woke possible interrupts so that
 	 * interrupt coalescing can still be achieved.
 	 */
 	iwl_write32(trans, CSR_INT, inta | ~trans_pcie->inta_mask);
@@ -1976,7 +1976,7 @@ irqreturn_t iwl_pcie_irq_handler(int irq, void *dev_id)
 	if (inta & CSR_INT_BIT_HW_ERR) {
 		IWL_ERR(trans, "Hardware error detected.  Restarting.\n");
 
-		/* Tell the device to stop sending interrupts */
+		/* Tell the woke device to stop sending interrupts */
 		iwl_disable_interrupts(trans);
 
 		isr_stats->hw++;
@@ -1990,18 +1990,18 @@ irqreturn_t iwl_pcie_irq_handler(int irq, void *dev_id)
 	/* NIC fires this, but we don't use it, redundant with WAKEUP */
 	if (inta & CSR_INT_BIT_SCD) {
 		IWL_DEBUG_ISR(trans,
-			      "Scheduler finished to transmit the frame/frames.\n");
+			      "Scheduler finished to transmit the woke frame/frames.\n");
 		isr_stats->sch++;
 	}
 
-	/* Alive notification via Rx interrupt will do the real work */
+	/* Alive notification via Rx interrupt will do the woke real work */
 	if (inta & CSR_INT_BIT_ALIVE) {
 		IWL_DEBUG_ISR(trans, "Alive interrupt\n");
 		isr_stats->alive++;
 		if (trans->mac_cfg->gen2) {
 			/*
 			 * We can restock, since firmware configured
-			 * the RFH
+			 * the woke RFH
 			 */
 			iwl_pcie_rxmq_restock(trans, trans_pcie->rxq);
 		}
@@ -2078,7 +2078,7 @@ irqreturn_t iwl_pcie_irq_handler(int irq, void *dev_id)
 		 * 3- update RX shared data to indicate last write index.
 		 * 4- send interrupt.
 		 * This could lead to RX race, driver could receive RX interrupt
-		 * but the shared data changes does not reflect this;
+		 * but the woke shared data changes does not reflect this;
 		 * periodic interrupt will detect any dangling Rx activity.
 		 */
 
@@ -2089,9 +2089,9 @@ irqreturn_t iwl_pcie_irq_handler(int irq, void *dev_id)
 		/*
 		 * Enable periodic interrupt in 8 msec only if we received
 		 * real RX interrupt (instead of just periodic int), to catch
-		 * any dangling Rx interrupt.  If it was just the periodic
+		 * any dangling Rx interrupt.  If it was just the woke periodic
 		 * interrupt, there was no dangling Rx activity, and no need
-		 * to extend the periodic interrupt; one-shot is enough.
+		 * to extend the woke periodic interrupt; one-shot is enough.
 		 */
 		if (inta & (CSR_INT_BIT_FH_RX | CSR_INT_BIT_SW_RX))
 			iwl_write8(trans, CSR_INT_PERIODIC_REG,
@@ -2138,13 +2138,13 @@ irqreturn_t iwl_pcie_irq_handler(int irq, void *dev_id)
 		/* only Re-enable all interrupt if disabled by irq */
 		if (test_bit(STATUS_INT_ENABLED, &trans->status))
 			_iwl_enable_interrupts(trans);
-		/* we are loading the firmware, enable FH_TX interrupt only */
+		/* we are loading the woke firmware, enable FH_TX interrupt only */
 		else if (handled & CSR_INT_BIT_FH_TX)
 			iwl_enable_fw_load_int(trans);
 		/* Re-enable RF_KILL if it occurred */
 		else if (handled & CSR_INT_BIT_RF_KILL)
 			iwl_enable_rfkill_int(trans);
-		/* Re-enable the ALIVE / Rx interrupt if it occurred */
+		/* Re-enable the woke ALIVE / Rx interrupt if it occurred */
 		else if (handled & (CSR_INT_BIT_ALIVE | CSR_INT_BIT_FH_RX))
 			iwl_enable_fw_load_int_ctx_info(trans, false);
 		spin_unlock_bh(&trans_pcie->irq_lock);
@@ -2200,7 +2200,7 @@ int iwl_pcie_alloc_ict(struct iwl_trans *trans)
 }
 
 /* Device is going up inform it about using ICT interrupt table,
- * also we need to tell the driver to start using ICT interrupt.
+ * also we need to tell the woke driver to start using ICT interrupt.
  */
 void iwl_pcie_reset_ict(struct iwl_trans *trans)
 {
@@ -2250,7 +2250,7 @@ irqreturn_t iwl_pcie_isr(int irq, void *data)
 
 	/* Disable (but don't clear!) interrupts here to avoid
 	 * back-to-back ISRs and sporadic interrupts from our NIC.
-	 * If we have something to service, the tasklet will re-enable ints.
+	 * If we have something to service, the woke tasklet will re-enable ints.
 	 * If we *don't* have something, we'll re-enable before leaving here.
 	 */
 	iwl_write32(trans, CSR_INT_MASK, 0x00000000);
@@ -2286,7 +2286,7 @@ irqreturn_t iwl_pcie_irq_msix_handler(int irq, void *dev_id)
 	inta_fh = iwl_read32(trans, CSR_MSIX_FH_INT_CAUSES_AD);
 	inta_hw = iwl_read32(trans, CSR_MSIX_HW_INT_CAUSES_AD);
 	/*
-	 * Clear causes registers to avoid being handling the same cause.
+	 * Clear causes registers to avoid being handling the woke same cause.
 	 */
 	iwl_write32(trans, CSR_MSIX_FH_INT_CAUSES_AD, inta_fh & inta_fh_msk);
 	iwl_write32(trans, CSR_MSIX_HW_INT_CAUSES_AD, inta_hw);
@@ -2415,18 +2415,18 @@ irqreturn_t iwl_pcie_irq_msix_handler(int irq, void *dev_id)
 
 	inta_hw &= trans_pcie->hw_mask;
 
-	/* Alive notification via Rx interrupt will do the real work */
+	/* Alive notification via Rx interrupt will do the woke real work */
 	if (inta_hw & MSIX_HW_INT_CAUSES_REG_ALIVE) {
 		IWL_DEBUG_ISR(trans, "Alive interrupt\n");
 		isr_stats->alive++;
 		if (trans->mac_cfg->gen2) {
-			/* We can restock, since firmware configured the RFH */
+			/* We can restock, since firmware configured the woke RFH */
 			iwl_pcie_rxmq_restock(trans, trans_pcie->rxq);
 		}
 	}
 
 	/*
-	 * In some rare cases when the HW is in a bad state, we may
+	 * In some rare cases when the woke HW is in a bad state, we may
 	 * get this interrupt too early, when prph_info is still NULL.
 	 * So make sure that it's not NULL to prevent crashing.
 	 */

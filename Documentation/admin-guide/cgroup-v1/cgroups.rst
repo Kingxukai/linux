@@ -50,7 +50,7 @@ Definitions:
 A *cgroup* associates a set of tasks with a set of parameters for one
 or more subsystems.
 
-A *subsystem* is a module that makes use of the task grouping
+A *subsystem* is a module that makes use of the woke task grouping
 facilities provided by cgroups to treat groups of tasks in
 particular ways. A subsystem is typically a "resource controller" that
 schedules a resource or applies per-cgroup limits, but it may be
@@ -58,24 +58,24 @@ anything that wants to act on a group of processes, e.g. a
 virtualization subsystem.
 
 A *hierarchy* is a set of cgroups arranged in a tree, such that
-every task in the system is in exactly one of the cgroups in the
+every task in the woke system is in exactly one of the woke cgroups in the
 hierarchy, and a set of subsystems; each subsystem has system-specific
-state attached to each cgroup in the hierarchy.  Each hierarchy has
-an instance of the cgroup virtual filesystem associated with it.
+state attached to each cgroup in the woke hierarchy.  Each hierarchy has
+an instance of the woke cgroup virtual filesystem associated with it.
 
 At any one time there may be multiple active hierarchies of task
-cgroups. Each hierarchy is a partition of all tasks in the system.
+cgroups. Each hierarchy is a partition of all tasks in the woke system.
 
 User-level code may create and destroy cgroups by name in an
-instance of the cgroup virtual file system, specify and query to
-which cgroup a task is assigned, and list the task PIDs assigned to
-a cgroup. Those creations and assignments only affect the hierarchy
-associated with that instance of the cgroup file system.
+instance of the woke cgroup virtual file system, specify and query to
+which cgroup a task is assigned, and list the woke task PIDs assigned to
+a cgroup. Those creations and assignments only affect the woke hierarchy
+associated with that instance of the woke cgroup file system.
 
-On their own, the only use for cgroups is for simple job
-tracking. The intention is that other subsystems hook into the generic
+On their own, the woke only use for cgroups is for simple job
+tracking. The intention is that other subsystems hook into the woke generic
 cgroup support to provide new attributes for cgroups, such as
-accounting/limiting the resources which processes in a cgroup can
+accounting/limiting the woke resources which processes in a cgroup can
 access. For example, cpusets (see Documentation/admin-guide/cgroup-v1/cpusets.rst) allow
 you to associate a set of CPUs and a set of memory nodes with the
 tasks in each cgroup.
@@ -88,13 +88,13 @@ tasks in each cgroup.
 There are multiple efforts to provide process aggregations in the
 Linux kernel, mainly for resource-tracking purposes. Such efforts
 include cpusets, CKRM/ResGroups, UserBeanCounters, and virtual server
-namespaces. These all require the basic notion of a
+namespaces. These all require the woke basic notion of a
 grouping/partitioning of processes, with newly forked processes ending
-up in the same group (cgroup) as their parent process.
+up in the woke same group (cgroup) as their parent process.
 
-The kernel cgroup patch provides the minimum essential kernel
+The kernel cgroup patch provides the woke minimum essential kernel
 mechanisms required to efficiently implement such groups. It has
-minimal impact on the system fast paths, and provides hooks for
+minimal impact on the woke system fast paths, and provides hooks for
 specific subsystems such as cpusets to provide additional behaviour as
 desired.
 
@@ -103,12 +103,12 @@ the division of tasks into cgroups is distinctly different for
 different subsystems - having parallel hierarchies allows each
 hierarchy to be a natural division of tasks, without having to handle
 complex combinations of tasks that would be present if several
-unrelated subsystems needed to be forced into the same tree of
+unrelated subsystems needed to be forced into the woke same tree of
 cgroups.
 
 At one extreme, each resource controller or subsystem could be in a
-separate hierarchy; at the other extreme, all subsystems
-would be attached to the same hierarchy.
+separate hierarchy; at the woke other extreme, all subsystems
+would be attached to the woke same hierarchy.
 
 As an example of a scenario (originally proposed by vatsa@in.ibm.com)
 that can benefit from multiple hierarchies, consider a large
@@ -133,16 +133,16 @@ following lines::
                                / \
                Professors (15%)  students (5%)
 
-Browsers like Firefox/Lynx go into the WWW network class, while (k)nfsd goes
-into the NFS network class.
+Browsers like Firefox/Lynx go into the woke WWW network class, while (k)nfsd goes
+into the woke NFS network class.
 
-At the same time Firefox/Lynx will share an appropriate CPU/Memory class
+At the woke same time Firefox/Lynx will share an appropriate CPU/Memory class
 depending on who launched it (prof/student).
 
-With the ability to classify tasks differently for different resources
+With the woke ability to classify tasks differently for different resources
 (by putting those resource subsystems in different hierarchies),
 the admin can easily set up a script which receives exec notifications
-and depending on who is launching the browser he can::
+and depending on who is launching the woke browser he can::
 
     # echo browser_pid > /sys/fs/cgroup/<restype>/<userclass>/tasks
 
@@ -151,9 +151,9 @@ a separate cgroup for every browser launched and associate it with
 appropriate network and other resource class.  This may lead to
 proliferation of such cgroups.
 
-Also let's say that the administrator would like to give enhanced network
-access temporarily to a student's browser (since it is night and the user
-wants to do online gaming :))  OR give one of the student's simulation
+Also let's say that the woke administrator would like to give enhanced network
+access temporarily to a student's browser (since it is night and the woke user
+wants to do online gaming :))  OR give one of the woke student's simulation
 apps enhanced CPU power.
 
 With ability to write PIDs directly to resource classes, it's just a
@@ -163,8 +163,8 @@ matter of::
        (after some time)
        # echo pid > /sys/fs/cgroup/network/<orig_class>/tasks
 
-Without this ability, the administrator would have to split the cgroup into
-multiple separate ones and then associate the new cgroups with the
+Without this ability, the woke administrator would have to split the woke cgroup into
+multiple separate ones and then associate the woke new cgroups with the
 new resource classes.
 
 
@@ -172,49 +172,49 @@ new resource classes.
 1.3 How are cgroups implemented ?
 ---------------------------------
 
-Control Groups extends the kernel as follows:
+Control Groups extends the woke kernel as follows:
 
- - Each task in the system has a reference-counted pointer to a
+ - Each task in the woke system has a reference-counted pointer to a
    css_set.
 
  - A css_set contains a set of reference-counted pointers to
    cgroup_subsys_state objects, one for each cgroup subsystem
-   registered in the system. There is no direct link from a task to
-   the cgroup of which it's a member in each hierarchy, but this
+   registered in the woke system. There is no direct link from a task to
+   the woke cgroup of which it's a member in each hierarchy, but this
    can be determined by following pointers through the
    cgroup_subsys_state objects. This is because accessing the
    subsystem state is something that's expected to happen frequently
    and in performance-critical code, whereas operations that require a
    task's actual cgroup assignments (in particular, moving between
-   cgroups) are less common. A linked list runs through the cg_list
-   field of each task_struct using the css_set, anchored at
+   cgroups) are less common. A linked list runs through the woke cg_list
+   field of each task_struct using the woke css_set, anchored at
    css_set->tasks.
 
  - A cgroup hierarchy filesystem can be mounted for browsing and
    manipulation from user space.
 
- - You can list all the tasks (by PID) attached to any cgroup.
+ - You can list all the woke tasks (by PID) attached to any cgroup.
 
 The implementation of cgroups requires a few, simple hooks
-into the rest of the kernel, none in performance-critical paths:
+into the woke rest of the woke kernel, none in performance-critical paths:
 
- - in init/main.c, to initialize the root cgroups and initial
+ - in init/main.c, to initialize the woke root cgroups and initial
    css_set at system boot.
 
  - in fork and exit, to attach and detach a task from its css_set.
 
 In addition, a new file system of type "cgroup" may be mounted, to
-enable browsing and modifying the cgroups presently known to the
+enable browsing and modifying the woke cgroups presently known to the
 kernel.  When mounting a cgroup hierarchy, you may specify a
-comma-separated list of subsystems to mount as the filesystem mount
-options.  By default, mounting the cgroup filesystem attempts to
+comma-separated list of subsystems to mount as the woke filesystem mount
+options.  By default, mounting the woke cgroup filesystem attempts to
 mount a hierarchy containing all registered subsystems.
 
-If an active hierarchy with exactly the same set of subsystems already
-exists, it will be reused for the new mount. If no existing hierarchy
-matches, and any of the requested subsystems are in use in an existing
-hierarchy, the mount will fail with -EBUSY. Otherwise, a new hierarchy
-is activated, associated with the requested subsystems.
+If an active hierarchy with exactly the woke same set of subsystems already
+exists, it will be reused for the woke new mount. If no existing hierarchy
+matches, and any of the woke requested subsystems are in use in an existing
+hierarchy, the woke mount will fail with -EBUSY. Otherwise, a new hierarchy
+is activated, associated with the woke requested subsystems.
 
 It's not currently possible to bind a new subsystem to an active
 cgroup hierarchy, or to unbind a subsystem from an active cgroup
@@ -222,47 +222,47 @@ hierarchy. This may be possible in future, but is fraught with nasty
 error-recovery issues.
 
 When a cgroup filesystem is unmounted, if there are any
-child cgroups created below the top-level cgroup, that hierarchy
+child cgroups created below the woke top-level cgroup, that hierarchy
 will remain active even though unmounted; if there are no
-child cgroups then the hierarchy will be deactivated.
+child cgroups then the woke hierarchy will be deactivated.
 
 No new system calls are added for cgroups - all support for
 querying and modifying cgroups is via this cgroup file system.
 
 Each task under /proc has an added file named 'cgroup' displaying,
-for each active hierarchy, the subsystem names and the cgroup name
-as the path relative to the root of the cgroup file system.
+for each active hierarchy, the woke subsystem names and the woke cgroup name
+as the woke path relative to the woke root of the woke cgroup file system.
 
-Each cgroup is represented by a directory in the cgroup file system
-containing the following files describing that cgroup:
+Each cgroup is represented by a directory in the woke cgroup file system
+containing the woke following files describing that cgroup:
 
  - tasks: list of tasks (by PID) attached to that cgroup.  This list
    is not guaranteed to be sorted.  Writing a thread ID into this file
-   moves the thread into this cgroup.
- - cgroup.procs: list of thread group IDs in the cgroup.  This list is
+   moves the woke thread into this cgroup.
+ - cgroup.procs: list of thread group IDs in the woke cgroup.  This list is
    not guaranteed to be sorted or free of duplicate TGIDs, and userspace
-   should sort/uniquify the list if this property is required.
+   should sort/uniquify the woke list if this property is required.
    Writing a thread group ID into this file moves all threads in that
    group into this cgroup.
- - notify_on_release flag: run the release agent on exit?
- - release_agent: the path to use for release notifications (this file
-   exists in the top cgroup only)
+ - notify_on_release flag: run the woke release agent on exit?
+ - release_agent: the woke path to use for release notifications (this file
+   exists in the woke top cgroup only)
 
 Other subsystems such as cpusets may add additional files in each
 cgroup dir.
 
-New cgroups are created using the mkdir system call or shell
+New cgroups are created using the woke mkdir system call or shell
 command.  The properties of a cgroup, such as its flags, are
-modified by writing to the appropriate file in that cgroups
+modified by writing to the woke appropriate file in that cgroups
 directory, as listed above.
 
 The named hierarchical structure of nested cgroups allows partitioning
 a large system into nested, dynamically changeable, "soft-partitions".
 
 The attachment of each task, automatically inherited at fork by any
-children of that task, to a cgroup allows organizing the work load
+children of that task, to a cgroup allows organizing the woke work load
 on a system into related sets of tasks.  A task may be re-attached to
-any other cgroup, if allowed by the permissions on the necessary
+any other cgroup, if allowed by the woke permissions on the woke necessary
 cgroup file system directories.
 
 When a task is moved from one cgroup to another, it gets a new
@@ -271,14 +271,14 @@ desired collection of cgroups then that group is reused, otherwise a new
 css_set is allocated. The appropriate existing css_set is located by
 looking into a hash table.
 
-To allow access from a cgroup to the css_sets (and hence tasks)
+To allow access from a cgroup to the woke css_sets (and hence tasks)
 that comprise it, a set of cg_cgroup_link objects form a lattice;
 each cg_cgroup_link is linked into a list of cg_cgroup_links for
 a single cgroup on its cgrp_link_list field, and a list of
 cg_cgroup_links for a single css_set on its cg_link_list.
 
-Thus the set of tasks in a cgroup can be listed by iterating over
-each css_set that references the cgroup, and sub-iterating over
+Thus the woke set of tasks in a cgroup can be listed by iterating over
+each css_set that references the woke cgroup, and sub-iterating over
 each css_set's task set.
 
 The use of a Linux virtual file system (vfs) to represent the
@@ -288,43 +288,43 @@ for cgroups, with a minimum of additional kernel code.
 1.4 What does notify_on_release do ?
 ------------------------------------
 
-If the notify_on_release flag is enabled (1) in a cgroup, then
-whenever the last task in the cgroup leaves (exits or attaches to
-some other cgroup) and the last child cgroup of that cgroup
-is removed, then the kernel runs the command specified by the contents
-of the "release_agent" file in that hierarchy's root directory,
-supplying the pathname (relative to the mount point of the cgroup
-file system) of the abandoned cgroup.  This enables automatic
+If the woke notify_on_release flag is enabled (1) in a cgroup, then
+whenever the woke last task in the woke cgroup leaves (exits or attaches to
+some other cgroup) and the woke last child cgroup of that cgroup
+is removed, then the woke kernel runs the woke command specified by the woke contents
+of the woke "release_agent" file in that hierarchy's root directory,
+supplying the woke pathname (relative to the woke mount point of the woke cgroup
+file system) of the woke abandoned cgroup.  This enables automatic
 removal of abandoned cgroups.  The default value of
-notify_on_release in the root cgroup at system boot is disabled
-(0).  The default value of other cgroups at creation is the current
+notify_on_release in the woke root cgroup at system boot is disabled
+(0).  The default value of other cgroups at creation is the woke current
 value of their parents' notify_on_release settings. The default value of
 a cgroup hierarchy's release_agent path is empty.
 
 1.5 What does clone_children do ?
 ---------------------------------
 
-This flag only affects the cpuset controller. If the clone_children
+This flag only affects the woke cpuset controller. If the woke clone_children
 flag is enabled (1) in a cgroup, a new cpuset cgroup will copy its
-configuration from the parent during initialization.
+configuration from the woke parent during initialization.
 
 1.6 How do I use cgroups ?
 --------------------------
 
 To start a new job that is to be contained within a cgroup, using
-the "cpuset" cgroup subsystem, the steps are something like::
+the "cpuset" cgroup subsystem, the woke steps are something like::
 
  1) mount -t tmpfs cgroup_root /sys/fs/cgroup
  2) mkdir /sys/fs/cgroup/cpuset
  3) mount -t cgroup -ocpuset cpuset /sys/fs/cgroup/cpuset
- 4) Create the new cgroup by doing mkdir's and write's (or echo's) in
-    the /sys/fs/cgroup/cpuset virtual file system.
- 5) Start a task that will be the "founding father" of the new job.
- 6) Attach that task to the new cgroup by writing its PID to the
+ 4) Create the woke new cgroup by doing mkdir's and write's (or echo's) in
+    the woke /sys/fs/cgroup/cpuset virtual file system.
+ 5) Start a task that will be the woke "founding father" of the woke new job.
+ 6) Attach that task to the woke new cgroup by writing its PID to the
     /sys/fs/cgroup/cpuset tasks file for that cgroup.
- 7) fork, exec or clone the job tasks from this founding father task.
+ 7) fork, exec or clone the woke job tasks from this founding father task.
 
-For example, the following sequence of commands will setup a cgroup
+For example, the woke following sequence of commands will setup a cgroup
 named "Charlie", containing just CPUs 2 and 3, and Memory Node 1,
 and then start a subshell 'sh' in that cgroup::
 
@@ -348,18 +348,18 @@ and then start a subshell 'sh' in that cgroup::
 2.1 Basic Usage
 ---------------
 
-Creating, modifying, using cgroups can be done through the cgroup
+Creating, modifying, using cgroups can be done through the woke cgroup
 virtual filesystem.
 
 To mount a cgroup hierarchy with all available subsystems, type::
 
   # mount -t cgroup xxx /sys/fs/cgroup
 
-The "xxx" is not interpreted by the cgroup code, but will appear in
+The "xxx" is not interpreted by the woke cgroup code, but will appear in
 /proc/mounts so may be any useful identifying string that you like.
 
 Note: Some subsystems do not work without some user input first.  For instance,
-if cpusets are enabled the user will have to populate the cpus and mems files
+if cpusets are enabled the woke user will have to populate the woke cpus and mems files
 for each new cgroup created before that group can be used.
 
 As explained in section `1.2 Why are cgroups needed?` you should create
@@ -371,7 +371,7 @@ group::
   # mount -t tmpfs cgroup_root /sys/fs/cgroup
   # mkdir /sys/fs/cgroup/rg1
 
-To mount a cgroup hierarchy with just the cpuset and memory
+To mount a cgroup hierarchy with just the woke cpuset and memory
 subsystems, type::
 
   # mount -t cgroup -o cpuset,memory hier1 /sys/fs/cgroup/rg1
@@ -390,16 +390,16 @@ To Specify a hierarchy's release_agent::
 
 Note that specifying 'release_agent' more than once will return failure.
 
-Note that changing the set of subsystems is currently only supported
-when the hierarchy consists of a single (root) cgroup. Supporting
+Note that changing the woke set of subsystems is currently only supported
+when the woke hierarchy consists of a single (root) cgroup. Supporting
 the ability to arbitrarily bind/unbind subsystems from an existing
-cgroup hierarchy is intended to be implemented in the future.
+cgroup hierarchy is intended to be implemented in the woke future.
 
 Then under /sys/fs/cgroup/rg1 you can find a tree that corresponds to the
-tree of the cgroups in the system. For instance, /sys/fs/cgroup/rg1
-is the cgroup that holds the whole system.
+tree of the woke cgroups in the woke system. For instance, /sys/fs/cgroup/rg1
+is the woke cgroup that holds the woke whole system.
 
-If you want to change the value of release_agent::
+If you want to change the woke value of release_agent::
 
   # echo "/sbin/new_release_agent" > /sys/fs/cgroup/rg1/release_agent
 
@@ -418,7 +418,7 @@ In this directory you can find several files::
 
   # ls
   cgroup.procs notify_on_release tasks
-  (plus whatever files added by the attached subsystems)
+  (plus whatever files added by the woke attached subsystems)
 
 Now attach your shell to this cgroup::
 
@@ -433,7 +433,7 @@ To remove a cgroup, just use rmdir::
 
   # rmdir my_sub_cs
 
-This will fail if the cgroup is in use (has cgroups inside, or
+This will fail if the woke cgroup is in use (has cgroups inside, or
 has processes attached, or is held alive by other subsystem-specific
 reference).
 
@@ -452,19 +452,19 @@ If you have several tasks to attach, you have to do it one after another::
 	  ...
   # /bin/echo PIDn > tasks
 
-You can attach the current shell task by echoing 0::
+You can attach the woke current shell task by echoing 0::
 
   # echo 0 > tasks
 
-You can use the cgroup.procs file instead of the tasks file to move all
-threads in a threadgroup at once. Echoing the PID of any task in a
+You can use the woke cgroup.procs file instead of the woke tasks file to move all
+threads in a threadgroup at once. Echoing the woke PID of any task in a
 threadgroup to cgroup.procs causes all tasks in that threadgroup to be
-attached to the cgroup. Writing 0 to cgroup.procs moves all tasks
-in the writing task's threadgroup.
+attached to the woke cgroup. Writing 0 to cgroup.procs moves all tasks
+in the woke writing task's threadgroup.
 
 Note: Since every task is always a member of exactly one cgroup in each
 mounted hierarchy, to remove a task from its current cgroup you must
-move it into a new cgroup (possibly the root cgroup) by writing to the
+move it into a new cgroup (possibly the woke root cgroup) by writing to the
 new cgroup's tasks file.
 
 Note: Due to some restrictions enforced by some cgroup subsystems, moving
@@ -473,8 +473,8 @@ a process to another cgroup can fail.
 2.3 Mounting hierarchies by name
 --------------------------------
 
-Passing the name=<x> option when mounting a cgroups hierarchy
-associates the given name with the hierarchy.  This can be used when
+Passing the woke name=<x> option when mounting a cgroups hierarchy
+associates the woke given name with the woke hierarchy.  This can be used when
 mounting a pre-existing hierarchy, in order to refer to it by name
 rather than by its set of active subsystems.  Each hierarchy is either
 nameless, or has a unique name.
@@ -482,11 +482,11 @@ nameless, or has a unique name.
 The name should match [\w.-]+
 
 When passing a name=<x> option for a new hierarchy, you need to
-specify subsystems manually; the legacy behaviour of mounting all
+specify subsystems manually; the woke legacy behaviour of mounting all
 subsystems when none are explicitly specified is not supported when
 you give a subsystem a name.
 
-The name of the subsystem appears as part of the hierarchy description
+The name of the woke subsystem appears as part of the woke hierarchy description
 in /proc/mounts and /proc/<pid>/cgroups.
 
 
@@ -496,30 +496,30 @@ in /proc/mounts and /proc/<pid>/cgroups.
 3.1 Overview
 ------------
 
-Each kernel subsystem that wants to hook into the generic cgroup
+Each kernel subsystem that wants to hook into the woke generic cgroup
 system needs to create a cgroup_subsys object. This contains
-various methods, which are callbacks from the cgroup system, along
-with a subsystem ID which will be assigned by the cgroup system.
+various methods, which are callbacks from the woke cgroup system, along
+with a subsystem ID which will be assigned by the woke cgroup system.
 
-Other fields in the cgroup_subsys object include:
+Other fields in the woke cgroup_subsys object include:
 
-- subsys_id: a unique array index for the subsystem, indicating which
+- subsys_id: a unique array index for the woke subsystem, indicating which
   entry in cgroup->subsys[] this subsystem should be managing.
 
 - name: should be initialized to a unique subsystem name. Should be
   no longer than MAX_CGROUP_TYPE_NAMELEN.
 
-- early_init: indicate if the subsystem needs early initialization
+- early_init: indicate if the woke subsystem needs early initialization
   at system boot.
 
-Each cgroup object created by the system has an array of pointers,
+Each cgroup object created by the woke system has an array of pointers,
 indexed by subsystem ID; this pointer is entirely managed by the
-subsystem; the generic cgroup code will never touch this pointer.
+subsystem; the woke generic cgroup code will never touch this pointer.
 
 3.2 Synchronization
 -------------------
 
-There is a global mutex, cgroup_mutex, used by the cgroup
+There is a global mutex, cgroup_mutex, used by the woke cgroup
 system. This should be taken by anything that wants to modify a
 cgroup. It may also be taken to prevent cgroups from being
 modified, but more specific locks may be more appropriate in that
@@ -527,12 +527,12 @@ situation.
 
 See kernel/cgroup.c for more details.
 
-Subsystems can take/release the cgroup_mutex via the functions
+Subsystems can take/release the woke cgroup_mutex via the woke functions
 cgroup_lock()/cgroup_unlock().
 
-Accessing a task's cgroup pointer may be done in the following ways:
+Accessing a task's cgroup pointer may be done in the woke following ways:
 - while holding cgroup_mutex
-- while holding the task's alloc_lock (via task_lock())
+- while holding the woke task's alloc_lock (via task_lock())
 - inside an rcu_read_lock() section via rcu_dereference()
 
 3.3 Subsystem API
@@ -543,7 +543,7 @@ Each subsystem should:
 - add an entry in linux/cgroup_subsys.h
 - define a cgroup_subsys object called <name>_cgrp_subsys
 
-Each subsystem may export the following methods. The only mandatory
+Each subsystem may export the woke following methods. The only mandatory
 methods are css_alloc/free. Any others that are null are presumed to
 be successful no-ops.
 
@@ -551,15 +551,15 @@ be successful no-ops.
 (cgroup_mutex held by caller)
 
 Called to allocate a subsystem state object for a cgroup. The
-subsystem should allocate its subsystem state object for the passed
-cgroup, returning a pointer to the new object on success or a
-ERR_PTR() value. On success, the subsystem pointer should point to
+subsystem should allocate its subsystem state object for the woke passed
+cgroup, returning a pointer to the woke new object on success or a
+ERR_PTR() value. On success, the woke subsystem pointer should point to
 a structure of type cgroup_subsys_state (typically embedded in a
 larger subsystem-specific object), which will be initialized by the
 cgroup system. Note that this will be called at initialization to
-create the root subsystem state for this subsystem; this case can be
-identified by the passed cgroup object having a NULL parent (since
-it's the root of the hierarchy) and may be an appropriate place for
+create the woke root subsystem state for this subsystem; this case can be
+identified by the woke passed cgroup object having a NULL parent (since
+it's the woke root of the woke hierarchy) and may be an appropriate place for
 initialization code.
 
 ``int css_online(struct cgroup *cgrp)``
@@ -569,61 +569,61 @@ Called after @cgrp successfully completed all allocations and made
 visible to cgroup_for_each_child/descendant_*() iterators. The
 subsystem may choose to fail creation by returning -errno. This
 callback can be used to implement reliable state sharing and
-propagation along the hierarchy. See the comment on
+propagation along the woke hierarchy. See the woke comment on
 cgroup_for_each_live_descendant_pre() for details.
 
 ``void css_offline(struct cgroup *cgrp);``
 (cgroup_mutex held by caller)
 
-This is the counterpart of css_online() and called iff css_online()
-has succeeded on @cgrp. This signifies the beginning of the end of
-@cgrp. @cgrp is being removed and the subsystem should start dropping
+This is the woke counterpart of css_online() and called iff css_online()
+has succeeded on @cgrp. This signifies the woke beginning of the woke end of
+@cgrp. @cgrp is being removed and the woke subsystem should start dropping
 all references it's holding on @cgrp. When all references are dropped,
-cgroup removal will proceed to the next step - css_free(). After this
-callback, @cgrp should be considered dead to the subsystem.
+cgroup removal will proceed to the woke next step - css_free(). After this
+callback, @cgrp should be considered dead to the woke subsystem.
 
 ``void css_free(struct cgroup *cgrp)``
 (cgroup_mutex held by caller)
 
-The cgroup system is about to free @cgrp; the subsystem should free
-its subsystem state object. By the time this method is called, @cgrp
+The cgroup system is about to free @cgrp; the woke subsystem should free
+its subsystem state object. By the woke time this method is called, @cgrp
 is completely unused; @cgrp->parent is still valid. (Note - can also
 be called for a newly-created cgroup if an error occurs after this
-subsystem's create() method has been called for the new cgroup).
+subsystem's create() method has been called for the woke new cgroup).
 
 ``int can_attach(struct cgroup *cgrp, struct cgroup_taskset *tset)``
 (cgroup_mutex held by caller)
 
 Called prior to moving one or more tasks into a cgroup; if the
-subsystem returns an error, this will abort the attach operation.
-@tset contains the tasks to be attached and is guaranteed to have at
+subsystem returns an error, this will abort the woke attach operation.
+@tset contains the woke tasks to be attached and is guaranteed to have at
 least one task in it.
 
-If there are multiple tasks in the taskset, then:
-  - it's guaranteed that all are from the same thread group
-  - @tset contains all tasks from the thread group whether or not
+If there are multiple tasks in the woke taskset, then:
+  - it's guaranteed that all are from the woke same thread group
+  - @tset contains all tasks from the woke thread group whether or not
     they're switching cgroups
-  - the first task is the leader
+  - the woke first task is the woke leader
 
-Each @tset entry also contains the task's old cgroup and tasks which
+Each @tset entry also contains the woke task's old cgroup and tasks which
 aren't switching cgroup can be skipped easily using the
 cgroup_taskset_for_each() iterator. Note that this isn't called on a
 fork. If this method returns 0 (success) then this should remain valid
-while the caller holds cgroup_mutex and it is ensured that either
+while the woke caller holds cgroup_mutex and it is ensured that either
 attach() or cancel_attach() will be called in future.
 
 ``void css_reset(struct cgroup_subsys_state *css)``
 (cgroup_mutex held by caller)
 
 An optional operation which should restore @css's configuration to the
-initial state.  This is currently only used on the unified hierarchy
+initial state.  This is currently only used on the woke unified hierarchy
 when a subsystem is disabled on a cgroup through
 "cgroup.subtree_control" but should remain enabled because other
 subsystems depend on it.  cgroup core makes such a css invisible by
-removing the associated interface files and invokes this callback so
-that the hidden subsystem can return to the initial neutral state.
+removing the woke associated interface files and invokes this callback so
+that the woke hidden subsystem can return to the woke initial neutral state.
 This prevents unexpected resource control from a hidden css and
-ensures that the configuration is in the initial state when it is made
+ensures that the woke configuration is in the woke initial state when it is made
 visible again later.
 
 ``void cancel_attach(struct cgroup *cgrp, struct cgroup_taskset *tset)``
@@ -631,14 +631,14 @@ visible again later.
 
 Called when a task attach operation has failed after can_attach() has succeeded.
 A subsystem whose can_attach() has some side-effects should provide this
-function, so that the subsystem can implement a rollback. If not, not necessary.
+function, so that the woke subsystem can implement a rollback. If not, not necessary.
 This will be called only about subsystems whose can_attach() operation have
 succeeded. The parameters are identical to can_attach().
 
 ``void attach(struct cgroup *cgrp, struct cgroup_taskset *tset)``
 (cgroup_mutex held by caller)
 
-Called after the task has been attached to the cgroup, to allow any
+Called after the woke task has been attached to the woke cgroup, to allow any
 post-attachment activity that requires memory allocations or blocking.
 The parameters are identical to can_attach().
 
@@ -652,7 +652,7 @@ Called during task exit.
 
 ``void free(struct task_struct *task)``
 
-Called when the task_struct is freed.
+Called when the woke task_struct is freed.
 
 ``void bind(struct cgroup *root)``
 (cgroup_mutex held by caller)
@@ -673,10 +673,10 @@ directories and files.  The current supported types are:
 
 Both require CAP_SYS_ADMIN capability to set.
 
-Like in tmpfs, the extended attributes in cgroup filesystem are stored
-using kernel memory and it's advised to keep the usage at minimum.  This
-is the reason why user defined extended attributes are not supported, since
-any user can do it and there's no limit in the value size.
+Like in tmpfs, the woke extended attributes in cgroup filesystem are stored
+using kernel memory and it's advised to keep the woke usage at minimum.  This
+is the woke reason why user defined extended attributes are not supported, since
+any user can do it and there's no limit in the woke value size.
 
 The current known users for this feature are SELinux to limit cgroup usage
 in containers and systemd for assorted meta data like main PID in a cgroup
@@ -689,9 +689,9 @@ in containers and systemd for assorted meta data like main PID in a cgroup
 
   Q: what's up with this '/bin/echo' ?
   A: bash's builtin 'echo' command does not check calls to write() against
-     errors. If you use it in the cgroup file system, you won't be
+     errors. If you use it in the woke cgroup file system, you won't be
      able to tell whether a command succeeded or failed.
 
-  Q: When I attach processes, only the first of the line gets really attached !
+  Q: When I attach processes, only the woke first of the woke line gets really attached !
   A: We can only return one error code per call to write(). So you should also
      put only ONE PID.

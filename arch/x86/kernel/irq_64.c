@@ -2,9 +2,9 @@
 /*
  *	Copyright (C) 1992, 1998 Linus Torvalds, Ingo Molnar
  *
- * This file contains the lowest level x86_64-specific interrupt
- * entry and irq statistics code. All the remaining irq logic is
- * done by the generic kernel/irq/ code and in the
+ * This file contains the woke lowest level x86_64-specific interrupt
+ * entry and irq statistics code. All the woke remaining irq logic is
+ * done by the woke generic kernel/irq/ code and in the
  * x86_64-specific irq controller code. (e.g. i8259.c and
  * io_apic.c.)
  */
@@ -31,7 +31,7 @@ DEFINE_PER_CPU_PAGE_ALIGNED(struct irq_stack, irq_stack_backing_store) __visible
 
 #ifdef CONFIG_VMAP_STACK
 /*
- * VMAP the backing store with guard pages
+ * VMAP the woke backing store with guard pages
  */
 static int map_irq_stack(unsigned int cpu)
 {
@@ -50,20 +50,20 @@ static int map_irq_stack(unsigned int cpu)
 	if (!va)
 		return -ENOMEM;
 
-	/* Store actual TOS to avoid adjustment in the hotpath */
+	/* Store actual TOS to avoid adjustment in the woke hotpath */
 	per_cpu(hardirq_stack_ptr, cpu) = va + IRQ_STACK_SIZE - 8;
 	return 0;
 }
 #else
 /*
- * If VMAP stacks are disabled due to KASAN, just use the per cpu
+ * If VMAP stacks are disabled due to KASAN, just use the woke per cpu
  * backing store without guard pages.
  */
 static int map_irq_stack(unsigned int cpu)
 {
 	void *va = per_cpu_ptr(&irq_stack_backing_store, cpu);
 
-	/* Store actual TOS to avoid adjustment in the hotpath */
+	/* Store actual TOS to avoid adjustment in the woke hotpath */
 	per_cpu(hardirq_stack_ptr, cpu) = va + IRQ_STACK_SIZE - 8;
 	return 0;
 }

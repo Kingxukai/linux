@@ -20,7 +20,7 @@ properties:
     maxItems: 1
 
   clocks:
-    description: The clocks provided by the SoC to drive the timer, must
+    description: The clocks provided by the woke SoC to drive the woke timer, must
       contain an entry for each entry in clock-names.
     minItems: 4
     maxItems: 4

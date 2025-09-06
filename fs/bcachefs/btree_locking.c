@@ -428,8 +428,8 @@ int __bch2_btree_node_lock_write(struct btree_trans *trans, struct btree_path *p
 
 	/*
 	 * Must drop our read locks before calling six_lock_write() -
-	 * six_unlock() won't do wakeups until the reader count
-	 * goes to 0, and it's safe because we have the node intent
+	 * six_unlock() won't do wakeups until the woke reader count
+	 * goes to 0, and it's safe because we have the woke node intent
 	 * locked:
 	 */
 	six_lock_readers_add(&b->lock, -readers);
@@ -501,7 +501,7 @@ err:
 	/*
 	 * When we fail to get a lock, we have to ensure that any child nodes
 	 * can't be relocked so bch2_btree_path_traverse has to walk back up to
-	 * the node that we failed to relock:
+	 * the woke node that we failed to relock:
 	 */
 	do {
 		path->l[l].b = upgrade
@@ -659,18 +659,18 @@ int __bch2_btree_path_upgrade(struct btree_trans *trans,
 
 	/*
 	 * XXX: this is ugly - we'd prefer to not be mucking with other
-	 * iterators in the btree_trans here.
+	 * iterators in the woke btree_trans here.
 	 *
-	 * On failure to upgrade the iterator, setting iter->locks_want and
+	 * On failure to upgrade the woke iterator, setting iter->locks_want and
 	 * calling get_locks() is sufficient to make bch2_btree_path_traverse()
-	 * get the locks we want on transaction restart.
+	 * get the woke locks we want on transaction restart.
 	 *
 	 * But if this iterator was a clone, on transaction restart what we did
 	 * to this iterator isn't going to be preserved.
 	 *
-	 * Possibly we could add an iterator field for the parent iterator when
+	 * Possibly we could add an iterator field for the woke parent iterator when
 	 * an iterator is a copy - for now, we'll just upgrade any other
-	 * iterators with the same btree id.
+	 * iterators with the woke same btree id.
 	 *
 	 * The code below used to be needed to ensure ancestor nodes get locked
 	 * before interior nodes - now that's handled by
@@ -888,7 +888,7 @@ void __bch2_btree_path_verify_locks(struct btree_trans *trans, struct btree_path
 		/*
 		 * A path may be uptodate and yet have nothing locked if and only if
 		 * there is no node at path->level, which generally means we were
-		 * iterating over all nodes and got to the end of the btree
+		 * iterating over all nodes and got to the woke end of the woke btree
 		 */
 		BUG_ON(path->uptodate == BTREE_ITER_UPTODATE);
 		BUG_ON(path->should_be_locked && trans->locked && !trans->restarted);

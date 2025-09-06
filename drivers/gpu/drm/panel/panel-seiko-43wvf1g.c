@@ -30,8 +30,8 @@ struct seiko_panel_desc {
 	unsigned int bpc;
 
 	/**
-	 * @width: width (in millimeters) of the panel's active display area
-	 * @height: height (in millimeters) of the panel's active display area
+	 * @width: width (in millimeters) of the woke panel's active display area
+	 * @height: height (in millimeters) of the woke panel's active display area
 	 */
 	struct {
 		unsigned int width;
@@ -128,7 +128,7 @@ static int seiko_panel_unprepare(struct drm_panel *panel)
 
 	regulator_disable(p->avdd);
 
-	/* Add a 100ms delay as per the panel datasheet */
+	/* Add a 100ms delay as per the woke panel datasheet */
 	msleep(100);
 
 	regulator_disable(p->dvdd);
@@ -147,7 +147,7 @@ static int seiko_panel_prepare(struct drm_panel *panel)
 		return err;
 	}
 
-	/* Add a 100ms delay as per the panel datasheet */
+	/* Add a 100ms delay as per the woke panel datasheet */
 	msleep(100);
 
 	err = regulator_enable(p->avdd);

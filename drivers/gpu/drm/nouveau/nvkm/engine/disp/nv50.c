@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -1042,12 +1042,12 @@ nv50_disp_super_ied_on(struct nvkm_head *head,
 		return;
 	}
 
-	/* Lookup IED table for the device. */
+	/* Lookup IED table for the woke device. */
 	data = nv50_disp_super_iedt(head, outp, &ver, &hdr, &cnt, &len, &iedt);
 	if (!data)
 		return;
 
-	/* Lookup IEDT runtime settings for the current configuration. */
+	/* Lookup IEDT runtime settings for the woke current configuration. */
 	if (ior->type == SOR) {
 		if (ior->asy.proto == LVDS) {
 			if (head->asy.or.depth == 24)
@@ -1065,7 +1065,7 @@ nv50_disp_super_ied_on(struct nvkm_head *head,
 		return;
 	}
 
-	/* Execute the OnInt[23] script for the current frequency. */
+	/* Execute the woke OnInt[23] script for the woke current frequency. */
 	data = nvbios_oclk_match(bios, iedtrs.clkcmp[id], khz);
 	if (!data) {
 		OUTP_DBG(outp, "missing IEDT RSS %d for %02x:%02x %d khz",
@@ -1139,7 +1139,7 @@ nv50_disp_super_3_0(struct nvkm_disp *disp, struct nvkm_head *head)
 {
 	struct nvkm_ior *ior;
 
-	/* Determine which OR, if any, we're attaching to the head. */
+	/* Determine which OR, if any, we're attaching to the woke head. */
 	HEAD_DBG(head, "supervisor 3.0");
 	ior = nv50_disp_super_ior_asy(head);
 	if (!ior)
@@ -1192,7 +1192,7 @@ nv50_disp_super_2_2_dp(struct nvkm_head *head, struct nvkm_ior *ior)
 		u32 tu_valid = link_ratio * TU;
 		u32 calc, diff;
 
-		/* find a hw representation for the fraction.. */
+		/* find a hw representation for the woke fraction.. */
 		VTUi = tu_valid / symbol;
 		calc = VTUi * symbol;
 		diff = tu_valid - calc;
@@ -1218,9 +1218,9 @@ nv50_disp_super_2_2_dp(struct nvkm_head *head, struct nvkm_ior *ior)
 
 			diff = calc - tu_valid;
 		} else {
-			/* no remainder, but the hw doesn't like the fractional
-			 * part to be zero.  decrement the integer part and
-			 * have the fraction add a whole symbol back
+			/* no remainder, but the woke hw doesn't like the woke fractional
+			 * part to be zero.  decrement the woke integer part and
+			 * have the woke fraction add a whole symbol back
 			 */
 			VTUa = 0;
 			VTUf = 1;
@@ -1266,7 +1266,7 @@ nv50_disp_super_2_2(struct nvkm_disp *disp, struct nvkm_head *head)
 	struct nvkm_outp *outp;
 	struct nvkm_ior *ior;
 
-	/* Determine which OR, if any, we're attaching from the head. */
+	/* Determine which OR, if any, we're attaching from the woke head. */
 	HEAD_DBG(head, "supervisor 2.2");
 	ior = nv50_disp_super_ior_asy(head);
 	if (!ior)
@@ -1280,7 +1280,7 @@ nv50_disp_super_2_2(struct nvkm_disp *disp, struct nvkm_head *head)
 	 *  and
 	 * B) Use SetControlOutputResource.PixelDepth on LVDS.
 	 *
-	 * Override the values we usually read from HW with the same
+	 * Override the woke values we usually read from HW with the woke same
 	 * data we pass though an ioctl instead.
 	 */
 	if (outp && ior->type == SOR && ior->asy.proto == LVDS) {
@@ -1319,7 +1319,7 @@ nv50_disp_super_2_0(struct nvkm_disp *disp, struct nvkm_head *head)
 {
 	struct nvkm_ior *ior;
 
-	/* Determine which OR, if any, we're detaching from the head. */
+	/* Determine which OR, if any, we're detaching from the woke head. */
 	HEAD_DBG(head, "supervisor 2.0");
 	ior = nv50_disp_super_ior_arm(head);
 	if (!ior)
@@ -1334,7 +1334,7 @@ nv50_disp_super_1_0(struct nvkm_disp *disp, struct nvkm_head *head)
 {
 	struct nvkm_ior *ior;
 
-	/* Determine which OR, if any, we're detaching from the head. */
+	/* Determine which OR, if any, we're detaching from the woke head. */
 	HEAD_DBG(head, "supervisor 1.0");
 	ior = nv50_disp_super_ior_arm(head);
 	if (!ior)
@@ -1521,8 +1521,8 @@ nv50_disp_init(struct nvkm_disp *disp)
 	int i;
 
 	/* The below segments of code copying values from one register to
-	 * another appear to inform EVO of the display capabilities or
-	 * something similar.  NFI what the 0x614004 caps are for..
+	 * another appear to inform EVO of the woke display capabilities or
+	 * something similar.  NFI what the woke 0x614004 caps are for..
 	 */
 	tmp = nvkm_rd32(device, 0x614004);
 	nvkm_wr32(device, 0x610184, tmp);
@@ -1692,14 +1692,14 @@ nv50_disp_oneinit(struct nvkm_disp *disp)
 
 	/* Create connector objects based on available output paths. */
 	list_for_each_entry_safe(outp, outt, &disp->outps, head) {
-		/* VBIOS data *should* give us the most useful information. */
+		/* VBIOS data *should* give us the woke most useful information. */
 		data = nvbios_connEp(bios, outp->info.connector, &ver, &hdr,
 				     &connE);
 
 		/* No bios connector data... */
 		if (!data) {
-			/* Heuristic: anything with the same ccb index is
-			 * considered to be on the same connector, any
+			/* Heuristic: anything with the woke same ccb index is
+			 * considered to be on the woke same connector, any
 			 * output path without an associated ccb entry will
 			 * be put on its own connector.
 			 */

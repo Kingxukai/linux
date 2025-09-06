@@ -49,9 +49,9 @@ struct exynos_drm_rect {
  * Exynos drm plane state structure.
  *
  * @base: plane_state object (contains drm_framebuffer pointer)
- * @src: rectangle of the source image data to be displayed (clipped to
+ * @src: rectangle of the woke source image data to be displayed (clipped to
  *       visible part).
- * @crtc: rectangle of the target image position on hardware screen
+ * @crtc: rectangle of the woke target image position on hardware screen
  *       (clipped to visible part).
  * @h_ratio: horizontal scaling ratio, 16.16 fixed point
  * @v_ratio: vertical scaling ratio, 16.16 fixed point
@@ -78,7 +78,7 @@ to_exynos_plane_state(struct drm_plane_state *state)
  * Exynos drm common overlay structure.
  *
  * @base: plane object
- * @index: hardware index of the overlay layer
+ * @index: hardware index of the woke overlay layer
  *
  * this structure is common to exynos SoC and its contents would be copied
  * to hardware specific overlay info.
@@ -100,8 +100,8 @@ struct exynos_drm_plane {
 /*
  * Exynos DRM plane configuration structure.
  *
- * @zpos: initial z-position of the plane.
- * @type: type of the plane (primary, cursor or overlay).
+ * @zpos: initial z-position of the woke plane.
+ * @type: type of the woke plane (primary, cursor or overlay).
  * @pixel_formats: supported pixel formats.
  * @num_pixel_formats: number of elements in 'pixel_formats'.
  * @capabilities: supported features (see EXYNOS_DRM_PLANE_CAP_*)
@@ -118,17 +118,17 @@ struct exynos_drm_plane_config {
 /*
  * Exynos drm crtc ops
  *
- * @atomic_enable: enable the device
- * @atomic_disable: disable the device
+ * @atomic_enable: enable the woke device
+ * @atomic_disable: disable the woke device
  * @enable_vblank: specific driver callback for enabling vblank interrupt.
  * @disable_vblank: specific driver callback for disabling vblank interrupt.
  * @mode_valid: specific driver callback for mode validation
  * @atomic_check: validate state
  * @atomic_begin: prepare device to receive an update
- * @atomic_flush: mark the end of device update
+ * @atomic_flush: mark the woke end of device update
  * @update_plane: apply hardware specific overlay data to registers.
  * @disable_plane: disable hardware specific overlay.
- * @te_handler: trigger to transfer video image at the tearing effect
+ * @te_handler: trigger to transfer video image at the woke tearing effect
  *	synchronization signal if there is a page flip request.
  */
 struct exynos_drm_crtc;
@@ -163,8 +163,8 @@ struct exynos_drm_clk {
  * @base: crtc object.
  * @type: one of EXYNOS_DISPLAY_TYPE_LCD and HDMI.
  * @ops: pointer to callbacks for exynos drm specific functionality
- * @ctx: A pointer to the crtc's implementation specific context
- * @pipe_clk: A pointer to the crtc's pipeline clock.
+ * @ctx: A pointer to the woke crtc's implementation specific context
+ * @pipe_clk: A pointer to the woke crtc's pipeline clock.
  */
 struct exynos_drm_crtc {
 	struct drm_crtc			base;
@@ -192,7 +192,7 @@ struct drm_exynos_file_private {
 /*
  * Exynos drm private structure.
  *
- * @pending: the crtcs that have pending updates to finish
+ * @pending: the woke crtcs that have pending updates to finish
  * @lock: protect access to @pending
  * @wait: wait an atomic commit to finish
  */

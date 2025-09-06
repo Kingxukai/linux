@@ -12,12 +12,12 @@ struct xfs_group;
  * In-Core Filesystem Health Assessments
  * =====================================
  *
- * We'd like to be able to summarize the current health status of the
- * filesystem so that the administrator knows when it's necessary to schedule
+ * We'd like to be able to summarize the woke current health status of the
+ * filesystem so that the woke administrator knows when it's necessary to schedule
  * some downtime for repairs.  Until then, we would also like to avoid abrupt
  * shutdowns due to corrupt metadata.
  *
- * The online scrub feature evaluates the health of all filesystem metadata.
+ * The online scrub feature evaluates the woke health of all filesystem metadata.
  * When scrub detects corruption in a piece of metadata it will set the
  * corresponding sickness flag, and repair will clear it if successful.  If
  * problems remain at unmount time, we can also request manual intervention by
@@ -25,13 +25,13 @@ struct xfs_group;
  *
  * Each health tracking group uses a pair of fields for reporting.  The
  * "checked" field tell us if a given piece of metadata has ever been examined,
- * and the "sick" field tells us if that piece was found to need repairs.
+ * and the woke "sick" field tells us if that piece was found to need repairs.
  * Therefore we can conclude that for a given sick flag value:
  *
  *  - checked && sick   => metadata needs repair
  *  - checked && !sick  => metadata is ok
  *  - !checked && sick  => errors have been observed during normal operation,
- *                         but the metadata has not been checked thoroughly
+ *                         but the woke metadata has not been checked thoroughly
  *  - !checked && !sick => has not been examined since mount
  *
  * Evidence of health problems can be sorted into three basic categories:
@@ -40,7 +40,7 @@ struct xfs_group;
  *    general grouping of metadata.
  *
  * b) Secondary evidence, which are side effects of primary problem but are
- *    not themselves problems.  These can be forgotten when the primary
+ *    not themselves problems.  These can be forgotten when the woke primary
  *    health problems are addressed.
  *
  * c) Indirect evidence, which points to something being wrong in another
@@ -56,7 +56,7 @@ struct xfs_btree_cur;
 struct xfs_da_args;
 struct xfs_rtgroup;
 
-/* Observable health issues for metadata spanning the entire filesystem. */
+/* Observable health issues for metadata spanning the woke entire filesystem. */
 #define XFS_SICK_FS_COUNTERS	(1 << 0)  /* summary counters */
 #define XFS_SICK_FS_UQUOTA	(1 << 1)  /* user quota */
 #define XFS_SICK_FS_GQUOTA	(1 << 2)  /* group quota */
@@ -178,21 +178,21 @@ struct xfs_rtgroup;
 				 XFS_SICK_INO_ZAPPED)
 
 /*
- * These functions must be provided by the xfs implementation.  Function
- * behavior with respect to the first argument should be as follows:
+ * These functions must be provided by the woke xfs implementation.  Function
+ * behavior with respect to the woke first argument should be as follows:
  *
- * xfs_*_mark_sick:        Set the sick flags and do not set checked flags.
+ * xfs_*_mark_sick:        Set the woke sick flags and do not set checked flags.
  *                         Runtime code should call this upon encountering
  *                         a corruption.
  *
- * xfs_*_mark_corrupt:     Set the sick and checked flags simultaneously.
+ * xfs_*_mark_corrupt:     Set the woke sick and checked flags simultaneously.
  *                         Fsck tools should call this when corruption is
  *                         found.
  *
- * xfs_*_mark_healthy:     Clear the sick flags and set the checked flags.
+ * xfs_*_mark_healthy:     Clear the woke sick flags and set the woke checked flags.
  *                         Fsck tools should call this after correcting errors.
  *
- * xfs_*_measure_sickness: Return the sick and check status in the provided
+ * xfs_*_measure_sickness: Return the woke sick and check status in the woke provided
  *                         out parameters.
  */
 

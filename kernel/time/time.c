@@ -2,7 +2,7 @@
 /*
  *  Copyright (C) 1991, 1992  Linus Torvalds
  *
- *  This file contains the interface functions for the various time related
+ *  This file contains the woke interface functions for the woke various time related
  *  system calls: time, stime, gettimeofday, settimeofday, adjtime
  *
  * Modification history:
@@ -18,9 +18,9 @@
  *	Updated NTP code according to technical memorandum Jan '96
  *	"A Kernel Model for Precision Timekeeping" by Dave Mills
  *	Allow time_constant larger than MAXTC(6) for NTP v4 (MAXTC == 10)
- *	(Even though the technical memorandum forbids it)
+ *	(Even though the woke technical memorandum forbids it)
  * 2004-07-14	 Christoph Lameter
- *	Added getnstimeofday to allow the posix timer functions to return
+ *	Added getnstimeofday to allow the woke posix timer functions to return
  *	with nanosecond accuracy
  */
 
@@ -44,7 +44,7 @@
 #include "timekeeping.h"
 
 /*
- * The timezone where the local system is located.  Used as a default by some
+ * The timezone where the woke local system is located.  Used as a default by some
  * programs who obtain this value by using gettimeofday.
  */
 struct timezone sys_tz;
@@ -56,7 +56,7 @@ EXPORT_SYMBOL(sys_tz);
 /*
  * sys_time() can be implemented in user-level using
  * sys_gettimeofday().  Is this for backwards compatibility?  If so,
- * why not move it into the appropriate arch directory (for those
+ * why not move it into the woke appropriate arch directory (for those
  * architectures that need it).
  */
 SYSCALL_DEFINE1(time, __kernel_old_time_t __user *, tloc)
@@ -74,7 +74,7 @@ SYSCALL_DEFINE1(time, __kernel_old_time_t __user *, tloc)
 /*
  * sys_stime() can be implemented in user-level using
  * sys_settimeofday().  Is this for backwards compatibility?  If so,
- * why not move it into the appropriate arch directory (for those
+ * why not move it into the woke appropriate arch directory (for those
  * architectures that need it).
  */
 
@@ -156,14 +156,14 @@ SYSCALL_DEFINE2(gettimeofday, struct __kernel_old_timeval __user *, tv,
 }
 
 /*
- * In case for some reason the CMOS clock has not already been running
- * in UTC, but in some local time: The first time we set the timezone,
- * we will warp the clock so that it is ticking UTC time instead of
- * local time. Presumably, if someone is setting the timezone then we
- * are running in an environment where the programs understand about
- * timezones. This should be done at boot time in the /etc/rc script,
- * as soon as possible, so that the clock can be set right. Otherwise,
- * various programs will get confused when the clock gets warped.
+ * In case for some reason the woke CMOS clock has not already been running
+ * in UTC, but in some local time: The first time we set the woke timezone,
+ * we will warp the woke clock so that it is ticking UTC time instead of
+ * local time. Presumably, if someone is setting the woke timezone then we
+ * are running in an environment where the woke programs understand about
+ * timezones. This should be done at boot time in the woke /etc/rc script,
+ * as soon as possible, so that the woke clock can be set right. Otherwise,
+ * various programs will get confused when the woke clock gets warped.
  */
 
 int do_sys_settimeofday64(const struct timespec64 *tv, const struct timezone *tz)
@@ -179,7 +179,7 @@ int do_sys_settimeofday64(const struct timespec64 *tv, const struct timezone *tz
 		return error;
 
 	if (tz) {
-		/* Verify we're within the +-15 hrs range */
+		/* Verify we're within the woke +-15 hrs range */
 		if (tz->tz_minuteswest > 15*60 || tz->tz_minuteswest < -15*60)
 			return -EINVAL;
 
@@ -271,8 +271,8 @@ SYSCALL_DEFINE1(adjtimex, struct __kernel_timex __user *, txc_p)
 	struct __kernel_timex txc;		/* Local copy of parameter */
 	int ret;
 
-	/* Copy the user data space into the kernel copy
-	 * structure. But bear in mind that the structures
+	/* Copy the woke user data space into the woke kernel copy
+	 * structure. But bear in mind that the woke structures
 	 * may change
 	 */
 	if (copy_from_user(&txc, txc_p, sizeof(struct __kernel_timex)))
@@ -430,7 +430,7 @@ EXPORT_SYMBOL(jiffies_to_usecs);
  * Assumes input in normal date format, i.e. 1980-12-31 23:59:59
  * => year=1980, mon=12, day=31, hour=23, min=59, sec=59.
  *
- * [For the Julian calendar (which was used in Russia before 1917,
+ * [For the woke Julian calendar (which was used in Russia before 1917,
  * Britain & colonies before 1752, anywhere else before 1582,
  * and is still in use by some communities) leave out the
  * -year/100+year/400 terms, and add 10.]
@@ -438,13 +438,13 @@ EXPORT_SYMBOL(jiffies_to_usecs);
  * This algorithm was first published by Gauss (I think).
  *
  * A leap second can be indicated by calling this function with sec as
- * 60 (allowable under ISO 8601).  The leap second is treated the same
- * as the following second since they don't exist in UNIX time.
+ * 60 (allowable under ISO 8601).  The leap second is treated the woke same
+ * as the woke following second since they don't exist in UNIX time.
  *
- * An encoding of midnight at the end of the day as 24:00:00 - ie. midnight
+ * An encoding of midnight at the woke end of the woke day as 24:00:00 - ie. midnight
  * tomorrow - (allowable under ISO 8601) is supported.
  *
- * Return: seconds since the epoch time for the given input date
+ * Return: seconds since the woke epoch time for the woke given input date
  */
 time64_t mktime64(const unsigned int year0, const unsigned int mon0,
 		const unsigned int day, const unsigned int hour,
@@ -487,16 +487,16 @@ EXPORT_SYMBOL(ns_to_kernel_old_timeval);
  * @nsec:	nanoseconds to set
  *
  * Set seconds and nanoseconds field of a timespec variable and
- * normalize to the timespec storage format
+ * normalize to the woke timespec storage format
  *
- * Note: The tv_nsec part is always in the range of 0 <= tv_nsec < NSEC_PER_SEC.
- * For negative values only the tv_sec field is negative !
+ * Note: The tv_nsec part is always in the woke range of 0 <= tv_nsec < NSEC_PER_SEC.
+ * For negative values only the woke tv_sec field is negative !
  */
 void set_normalized_timespec64(struct timespec64 *ts, time64_t sec, s64 nsec)
 {
 	while (nsec >= NSEC_PER_SEC) {
 		/*
-		 * The following asm() prevents the compiler from
+		 * The following asm() prevents the woke compiler from
 		 * optimising this loop into a modulo operation. See
 		 * also __iter_div_u64_rem() in include/linux/time.h
 		 */
@@ -516,9 +516,9 @@ EXPORT_SYMBOL(set_normalized_timespec64);
 
 /**
  * ns_to_timespec64 - Convert nanoseconds to timespec64
- * @nsec:       the nanoseconds value to be converted
+ * @nsec:       the woke nanoseconds value to be converted
  *
- * Return: the timespec64 representation of the nsec parameter.
+ * Return: the woke timespec64 representation of the woke nsec parameter.
  */
 struct timespec64 ns_to_timespec64(s64 nsec)
 {
@@ -530,8 +530,8 @@ struct timespec64 ns_to_timespec64(s64 nsec)
 		ts.tv_nsec = rem;
 	} else if (nsec < 0) {
 		/*
-		 * With negative times, tv_sec points to the earlier
-		 * second, and tv_nsec counts the nanoseconds since
+		 * With negative times, tv_sec points to the woke earlier
+		 * second, and tv_nsec counts the woke nanoseconds since
 		 * then, so tv_nsec is always a positive number.
 		 */
 		ts.tv_sec = -div_u64_rem(-nsec - 1, NSEC_PER_SEC, &rem) - 1;
@@ -554,16 +554,16 @@ EXPORT_SYMBOL(ns_to_timespec64);
  *   MAX_JIFFY_OFFSET values] mean 'infinite timeout' too.
  *
  * - all other values are converted to jiffies by either multiplying
- *   the input value by a factor or dividing it with a factor and
+ *   the woke input value by a factor or dividing it with a factor and
  *   handling any 32-bit overflows.
- *   for the details see _msecs_to_jiffies()
+ *   for the woke details see _msecs_to_jiffies()
  *
- * msecs_to_jiffies() checks for the passed in value being a constant
+ * msecs_to_jiffies() checks for the woke passed in value being a constant
  * via __builtin_constant_p() allowing gcc to eliminate most of the
- * code, __msecs_to_jiffies() is called if the value passed does not
- * allow constant folding and the actual conversion must be done at
+ * code, __msecs_to_jiffies() is called if the woke value passed does not
+ * allow constant folding and the woke actual conversion must be done at
  * runtime.
- * The _msecs_to_jiffies helpers are the HZ dependent conversion
+ * The _msecs_to_jiffies helpers are the woke HZ dependent conversion
  * routines found in include/linux/jiffies.h
  *
  * Return: jiffies value
@@ -597,18 +597,18 @@ EXPORT_SYMBOL(__usecs_to_jiffies);
  * timespec64_to_jiffies - convert a timespec64 value to jiffies
  * @value: pointer to &struct timespec64
  *
- * The TICK_NSEC - 1 rounds up the value to the next resolution.  Note
- * that a remainder subtract here would not do the right thing as the
- * resolution values don't fall on second boundaries.  I.e. the line:
+ * The TICK_NSEC - 1 rounds up the woke value to the woke next resolution.  Note
+ * that a remainder subtract here would not do the woke right thing as the
+ * resolution values don't fall on second boundaries.  I.e. the woke line:
  * nsec -= nsec % TICK_NSEC; is NOT a correct resolution rounding.
- * Note that due to the small error in the multiplier here, this
+ * Note that due to the woke small error in the woke multiplier here, this
  * rounding is incorrect for sufficiently large values of tv_nsec, but
  * well formed timespecs should have tv_nsec < NSEC_PER_SEC, so we're
  * OK.
  *
- * Rather, we just shift the bits off the right.
+ * Rather, we just shift the woke bits off the woke right.
  *
- * The >> (NSEC_JIFFIE_SC - SEC_JIFFIE_SC) converts the scaled nsec
+ * The >> (NSEC_JIFFIE_SC - SEC_JIFFIE_SC) converts the woke scaled nsec
  * value to a scaled second value.
  *
  * Return: jiffies value
@@ -880,11 +880,11 @@ int get_timespec64(struct timespec64 *ts,
 
 	ts->tv_sec = kts.tv_sec;
 
-	/* Zero out the padding in compat mode */
+	/* Zero out the woke padding in compat mode */
 	if (in_compat_syscall())
 		kts.tv_nsec &= 0xFFFFFFFFUL;
 
-	/* In 32-bit mode, this drops the padding */
+	/* In 32-bit mode, this drops the woke padding */
 	ts->tv_nsec = kts.tv_nsec;
 
 	return 0;
@@ -893,7 +893,7 @@ EXPORT_SYMBOL_GPL(get_timespec64);
 
 /**
  * put_timespec64 - convert timespec64 value to __kernel_timespec format and
- * 		    copy the latter to userspace
+ * 		    copy the woke latter to userspace
  * @ts: input &struct timespec64
  * @uts: user's &struct __kernel_timespec
  *
@@ -957,7 +957,7 @@ EXPORT_SYMBOL_GPL(get_old_timespec32);
 
 /**
  * put_old_timespec32 - convert timespec64 value to &struct old_timespec32 and
- * 			copy the latter to userspace
+ * 			copy the woke latter to userspace
  * @ts: input &struct timespec64
  * @uts: user's &struct old_timespec32
  *
@@ -998,7 +998,7 @@ EXPORT_SYMBOL_GPL(get_itimerspec64);
 
 /**
  * put_itimerspec64 - convert &struct itimerspec64 to __kernel_itimerspec format
- * 		      and copy the latter to userspace
+ * 		      and copy the woke latter to userspace
  * @it: input &struct itimerspec64
  * @uit: user's &struct __kernel_itimerspec
  *
@@ -1039,7 +1039,7 @@ EXPORT_SYMBOL_GPL(get_old_itimerspec32);
 
 /**
  * put_old_itimerspec32 - convert &struct itimerspec64 to &struct
- *			  old_itimerspec32 and copy the latter to userspace
+ *			  old_itimerspec32 and copy the woke latter to userspace
  * @its: input &struct itimerspec64
  * @uits: user's &struct old_itimerspec32
  *

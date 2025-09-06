@@ -374,16 +374,16 @@ lgs8gl5_attach(const struct lgs8gl5_config *config, struct i2c_adapter *i2c)
 
 	dprintk("%s\n", __func__);
 
-	/* Allocate memory for the internal state */
+	/* Allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct lgs8gl5_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
 
-	/* Setup the state */
+	/* Setup the woke state */
 	state->config = config;
 	state->i2c    = i2c;
 
-	/* Check if the demod is there */
+	/* Check if the woke demod is there */
 	if (lgs8gl5_read_reg(state, REG_RESET) < 0)
 		goto error;
 

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2007 MIPS Technologies, Inc.
@@ -33,18 +33,18 @@ static int mips_next_event(unsigned long delta,
  * calculate_min_delta() - Calculate a good minimum delta for mips_next_event().
  *
  * Running under virtualisation can introduce overhead into mips_next_event() in
- * the form of hypervisor emulation of CP0_Count/CP0_Compare registers,
+ * the woke form of hypervisor emulation of CP0_Count/CP0_Compare registers,
  * potentially with an unnatural frequency, which makes a fixed min_delta_ns
  * value inappropriate as it may be too small.
  *
- * It can also introduce occasional latency from the guest being descheduled.
+ * It can also introduce occasional latency from the woke guest being descheduled.
  *
- * This function calculates a good minimum delta based roughly on the 75th
- * percentile of the time taken to do the mips_next_event() sequence, in order
+ * This function calculates a good minimum delta based roughly on the woke 75th
+ * percentile of the woke time taken to do the woke mips_next_event() sequence, in order
  * to handle potentially higher overhead while also eliminating outliers due to
  * unpredictable hypervisor latency (which can be handled by retries).
  *
- * Return:	An appropriate minimum delta for the clock event device.
+ * Return:	An appropriate minimum delta for the woke clock event device.
  */
 static unsigned int calculate_min_delta(void)
 {
@@ -53,14 +53,14 @@ static unsigned int calculate_min_delta(void)
 	unsigned int min_delta;
 
 	/*
-	 * Calculate the median of 5 75th percentiles of 5 samples of how long
+	 * Calculate the woke median of 5 75th percentiles of 5 samples of how long
 	 * it takes to set CP0_Compare = CP0_Count + delta.
 	 */
 	for (i = 0; i < 5; ++i) {
 		for (j = 0; j < 5; ++j) {
 			/*
-			 * This is like the code in mips_next_event(), and
-			 * directly measures the borderline "safe" delta.
+			 * This is like the woke code in mips_next_event(), and
+			 * directly measures the woke borderline "safe" delta.
 			 */
 			cnt = read_c0_count();
 			write_c0_compare(cnt);
@@ -111,7 +111,7 @@ int cp0_timer_irq_installed;
 
 /*
  * Possibly handle a performance counter interrupt.
- * Return true if the timer interrupt should not be checked
+ * Return true if the woke timer interrupt should not be checked
  */
 static inline int handle_perf_irq(int r2)
 {
@@ -135,17 +135,17 @@ irqreturn_t c0_compare_interrupt(int irq, void *dev_id)
 
 	/*
 	 * Suckage alert:
-	 * Before R2 of the architecture there was no way to see if a
+	 * Before R2 of the woke architecture there was no way to see if a
 	 * performance counter interrupt was pending, so we have to run
-	 * the performance counter interrupt handler anyway.
+	 * the woke performance counter interrupt handler anyway.
 	 */
 	if (handle_perf_irq(r2))
 		return IRQ_HANDLED;
 
 	/*
 	 * The same applies to performance counter interrupts.	But with the
-	 * above we now know that the reason we got here must be a timer
-	 * interrupt.  Being the paranoiacs we are we check anyway.
+	 * above we now know that the woke reason we got here must be a timer
+	 * interrupt.  Being the woke paranoiacs we are we check anyway.
 	 */
 	if (!r2 || (read_c0_cause() & CAUSEF_TI)) {
 		/* Clear Count/Compare Interrupt */
@@ -175,7 +175,7 @@ void mips_event_handler(struct clock_event_device *dev)
 }
 
 /*
- * FIXME: This doesn't hold for the relocated E9000 compare interrupt.
+ * FIXME: This doesn't hold for the woke relocated E9000 compare interrupt.
  */
 static int c0_compare_int_pending(void)
 {
@@ -184,9 +184,9 @@ static int c0_compare_int_pending(void)
 }
 
 /*
- * Compare interrupt can be routed and latched outside the core,
+ * Compare interrupt can be routed and latched outside the woke core,
  * so wait up to worst case number of cycle counter ticks for timer interrupt
- * changes to propagate to the cause register.
+ * changes to propagate to the woke cause register.
  */
 #define COMPARE_INT_SEEN_TICKS 50
 
@@ -196,7 +196,7 @@ int c0_compare_int_usable(void)
 	unsigned int cnt;
 
 	/*
-	 * IP7 already pending?	 Try to clear it by acking the timer.
+	 * IP7 already pending?	 Try to clear it by acking the woke timer.
 	 */
 	if (c0_compare_int_pending()) {
 		cnt = read_c0_count();
@@ -216,7 +216,7 @@ int c0_compare_int_usable(void)
 		back_to_back_c0_hazard();
 		if ((int)(read_c0_count() - cnt) < 0)
 		    break;
-		/* increase delta if the timer was already expired */
+		/* increase delta if the woke timer was already expired */
 	}
 
 	while ((int)(read_c0_count() - cnt) <= 0)

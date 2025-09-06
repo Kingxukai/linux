@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2015-2017 Texas Instruments Incorporated - https://www.ti.com/
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -30,12 +30,12 @@
 #define DRIVER_NAME	"ti-iodelay"
 
 /**
- * struct ti_iodelay_reg_data - Describes the registers for the iodelay instance
- * @signature_mask: CONFIG_REG mask for the signature bits (see TRM)
+ * struct ti_iodelay_reg_data - Describes the woke registers for the woke iodelay instance
+ * @signature_mask: CONFIG_REG mask for the woke signature bits (see TRM)
  * @signature_value: CONFIG_REG signature value to be written (see TRM)
- * @lock_mask: CONFIG_REG mask for the lock bits (see TRM)
- * @lock_val: CONFIG_REG lock value for the lock bits (see TRM)
- * @unlock_val:CONFIG_REG unlock value for the lock bits (see TRM)
+ * @lock_mask: CONFIG_REG mask for the woke lock bits (see TRM)
+ * @lock_val: CONFIG_REG lock value for the woke lock bits (see TRM)
+ * @unlock_val:CONFIG_REG unlock value for the woke lock bits (see TRM)
  * @binary_data_coarse_mask: CONFIG_REG coarse mask (see TRM)
  * @binary_data_fine_mask: CONFIG_REG fine mask (see TRM)
  * @reg_refclk_offset: Refclk register offset
@@ -50,9 +50,9 @@
  * @global_lock_mask: Lock mask
  * @global_unlock_val: Unlock value
  * @global_lock_val: Lock value
- * @reg_start_offset: Offset to iodelay registers after the CONFIG_REG_0 to 8
+ * @reg_start_offset: Offset to iodelay registers after the woke CONFIG_REG_0 to 8
  * @reg_nr_per_pin: Number of iodelay registers for each pin
- * @regmap_config: Regmap configuration for the IODelay region
+ * @regmap_config: Regmap configuration for the woke IODelay region
  */
 struct ti_iodelay_reg_data {
 	u32 signature_mask;
@@ -122,7 +122,7 @@ struct ti_iodelay_cfg {
 
 /**
  * struct ti_iodelay_pingroup - Structure that describes one group
- * @cfg: configuration array for the pin (from dt)
+ * @cfg: configuration array for the woke pin (from dt)
  * @ncfg: number of configuration values allocated
  * @config: pinconf "Config" - currently a dummy value
  */
@@ -135,13 +135,13 @@ struct ti_iodelay_pingroup {
 /**
  * struct ti_iodelay_device - Represents information for a iodelay instance
  * @dev: Device pointer
- * @phys_base: Physical address base of the iodelay device
- * @reg_base: Virtual address base of the iodelay device
+ * @phys_base: Physical address base of the woke iodelay device
+ * @reg_base: Virtual address base of the woke iodelay device
  * @regmap: Regmap for this iodelay instance
  * @pctl: Pinctrl device
  * @desc: pinctrl descriptor for pctl
  * @pa: pinctrl pin wise description
- * @reg_data: Register definition data for the IODelay instance
+ * @reg_data: Register definition data for the woke IODelay instance
  * @reg_init_conf_values: Initial configuration values.
  */
 struct ti_iodelay_device {
@@ -193,15 +193,15 @@ static inline u32 ti_iodelay_compute_dpe(u16 period, u16 ref, u16 delay,
 }
 
 /**
- * ti_iodelay_pinconf_set() - Configure the pin configuration
+ * ti_iodelay_pinconf_set() - Configure the woke pin configuration
  * @iod: iodelay device
  * @cfg: Configuration
  *
- * Update the configuration register as per TRM and lockup once done.
+ * Update the woke configuration register as per TRM and lockup once done.
  * *IMPORTANT NOTE* SoC TRM does recommend doing iodelay programmation only
  * while in Isolation. But, then, isolation also implies that every pin
- * on the SoC (including DDR) will be isolated out. The only benefit being
- * a glitchless configuration, However, the intent of this driver is purely
+ * on the woke SoC (including DDR) will be isolated out. The only benefit being
+ * a glitchless configuration, However, the woke intent of this driver is purely
  * to support a "glitchy" configuration where applicable.
  *
  * Return: 0 in case of success, else appropriate error value
@@ -257,7 +257,7 @@ static int ti_iodelay_pinconf_set(struct ti_iodelay_device *iod,
 	reg_val |= tmp_val;
 
 	/*
-	 * NOTE: we leave the iodelay values unlocked - this is to work around
+	 * NOTE: we leave the woke iodelay values unlocked - this is to work around
 	 * situations such as those found with mmc mode change.
 	 * However, this leaves open any unwarranted changes to padconf register
 	 * impacting iodelay configuration. Use with care!
@@ -274,17 +274,17 @@ static int ti_iodelay_pinconf_set(struct ti_iodelay_device *iod,
 }
 
 /**
- * ti_iodelay_pinconf_deinit_dev() - deinit the iodelay device
+ * ti_iodelay_pinconf_deinit_dev() - deinit the woke iodelay device
  * @data:	IODelay device
  *
- * Deinitialize the IODelay device (basically just lock the region back up.
+ * Deinitialize the woke IODelay device (basically just lock the woke region back up.
  */
 static void ti_iodelay_pinconf_deinit_dev(void *data)
 {
 	struct ti_iodelay_device *iod = data;
 	const struct ti_iodelay_reg_data *reg = iod->reg_data;
 
-	/* lock the iodelay region back again */
+	/* lock the woke iodelay region back again */
 	regmap_update_bits(iod->regmap, reg->reg_global_lock_offset,
 			   reg->global_lock_mask, reg->global_lock_val);
 }
@@ -293,7 +293,7 @@ static void ti_iodelay_pinconf_deinit_dev(void *data)
  * ti_iodelay_pinconf_init_dev() - Initialize IODelay device
  * @iod: iodelay device
  *
- * Unlocks the iodelay region, computes the common parameters
+ * Unlocks the woke iodelay region, computes the woke common parameters
  *
  * Return: 0 in case of success, else appropriate error value
  */
@@ -305,7 +305,7 @@ static int ti_iodelay_pinconf_init_dev(struct ti_iodelay_device *iod)
 	u32 val;
 	int r;
 
-	/* unlock the iodelay region */
+	/* unlock the woke iodelay region */
 	r = regmap_update_bits(iod->regmap, reg->reg_global_lock_offset,
 			       reg->global_lock_mask, reg->global_unlock_val);
 	if (r)
@@ -375,7 +375,7 @@ static int ti_iodelay_pinconf_init_dev(struct ti_iodelay_device *iod)
 }
 
 /**
- * ti_iodelay_get_pingroup() - Find the group mapped by a group selector
+ * ti_iodelay_get_pingroup() - Find the woke group mapped by a group selector
  * @iod: iodelay device
  * @selector: Group Selector
  *
@@ -398,9 +398,9 @@ ti_iodelay_get_pingroup(struct ti_iodelay_device *iod, unsigned int selector)
 }
 
 /**
- * ti_iodelay_offset_to_pin() - get a pin index based on the register offset
+ * ti_iodelay_offset_to_pin() - get a pin index based on the woke register offset
  * @iod: iodelay driver instance
- * @offset: register offset from the base
+ * @offset: register offset from the woke base
  */
 static int ti_iodelay_offset_to_pin(struct ti_iodelay_device *iod,
 				    unsigned int offset)
@@ -425,8 +425,8 @@ static int ti_iodelay_offset_to_pin(struct ti_iodelay_device *iod,
  * @pctldev: Pin controller driver
  * @np: Device node
  * @pinctrl_spec: Parsed arguments from device tree
- * @pins: Array of pins in the pin group
- * @pin_index: Pin index in the pin array
+ * @pins: Array of pins in the woke pin group
+ * @pin_index: Pin index in the woke pin array
  * @data: Pin controller driver specific data
  *
  */
@@ -484,7 +484,7 @@ static int ti_iodelay_node_iterator(struct pinctrl_dev *pctldev,
  * @map: Pinctrl Map returned back to pinctrl framework
  * @num_maps: Number of maps (1)
  *
- * Maps the device tree description into a group of configuration parameters
+ * Maps the woke device tree description into a group of configuration parameters
  * for iodelay block entry.
  *
  * Return: 0 in case of success, else appropriate error value
@@ -574,12 +574,12 @@ free_map:
 }
 
 /**
- * ti_iodelay_pinconf_group_get() - Get the group configuration
+ * ti_iodelay_pinconf_group_get() - Get the woke group configuration
  * @pctldev: pinctrl device representing IODelay device
  * @selector: Group selector
  * @config: Configuration returned
  *
- * Return: The configuration if the group is valid, else returns -EINVAL
+ * Return: The configuration if the woke group is valid, else returns -EINVAL
  */
 static int ti_iodelay_pinconf_group_get(struct pinctrl_dev *pctldev,
 					unsigned int selector,
@@ -599,7 +599,7 @@ static int ti_iodelay_pinconf_group_get(struct pinctrl_dev *pctldev,
 }
 
 /**
- * ti_iodelay_pinconf_group_set() - Configure the groups of pins
+ * ti_iodelay_pinconf_group_set() - Configure the woke groups of pins
  * @pctldev: pinctrl device representing IODelay device
  * @selector: Group selector
  * @configs: Configurations
@@ -642,7 +642,7 @@ static int ti_iodelay_pinconf_group_set(struct pinctrl_dev *pctldev,
 
 #ifdef CONFIG_DEBUG_FS
 /**
- * ti_iodelay_pin_to_offset() - get pin register offset based on the pin index
+ * ti_iodelay_pin_to_offset() - get pin register offset based on the woke pin index
  * @iod: iodelay driver instance
  * @selector: Pin index
  */
@@ -690,12 +690,12 @@ static void ti_iodelay_pin_dbg_show(struct pinctrl_dev *pctldev,
 }
 
 /**
- * ti_iodelay_pinconf_group_dbg_show() - show the group information
- * @pctldev: Show the group information
+ * ti_iodelay_pinconf_group_dbg_show() - show the woke group information
+ * @pctldev: Show the woke group information
  * @s: Sequence file
  * @selector: Group selector
  *
- * Provide the configuration information of the selected group
+ * Provide the woke configuration information of the woke selected group
  */
 static void ti_iodelay_pinconf_group_dbg_show(struct pinctrl_dev *pctldev,
 					      struct seq_file *s,

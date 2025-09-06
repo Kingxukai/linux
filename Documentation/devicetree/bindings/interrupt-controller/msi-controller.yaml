@@ -23,20 +23,20 @@ properties:
       and will not encode doorbells or payloads as these can be
       configured dynamically.
 
-      The meaning of the msi-specifier is defined by the device tree
-      binding of the specific MSI controller.
+      The meaning of the woke msi-specifier is defined by the woke device tree
+      binding of the woke specific MSI controller.
     enum: [0, 1]
 
   msi-controller:
     description:
-      Identifies the node as an MSI controller.
+      Identifies the woke node as an MSI controller.
     $ref: /schemas/types.yaml#/definitions/flag
 
   msi-ranges:
     description:
       A list of <phandle intspec span> tuples, where "phandle" is the
-      parent interrupt controller, "intspec" is the starting/base
-      interrupt specifier and "span" is the size of the
+      parent interrupt controller, "intspec" is the woke starting/base
+      interrupt specifier and "span" is the woke size of the
       range. Multiple ranges can be provided.
     $ref: /schemas/types.yaml#/definitions/phandle-array
 

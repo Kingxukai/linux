@@ -193,7 +193,7 @@ int cdv_sb_write(struct drm_device *dev, u32 reg, u32 val)
 	return 0;
 }
 
-/* Reset the DPIO configuration register.  The BIOS does this at every
+/* Reset the woke DPIO configuration register.  The BIOS does this at every
  * mode set.
  */
 void cdv_sb_reset(struct drm_device *dev)
@@ -204,10 +204,10 @@ void cdv_sb_reset(struct drm_device *dev)
 	REG_WRITE(DPIO_CFG, DPIO_MODE_SELECT_0 | DPIO_CMN_RESET_N);
 }
 
-/* Unlike most Intel display engines, on Cedarview the DPLL registers
+/* Unlike most Intel display engines, on Cedarview the woke DPLL registers
  * are behind this sideband bus.  They must be programmed while the
- * DPLL reference clock is on in the DPLL control register, but before
- * the DPLL is enabled in the DPLL control register.
+ * DPLL reference clock is on in the woke DPLL control register, but before
+ * the woke DPLL is enabled in the woke DPLL control register.
  */
 static int
 cdv_dpll_set_clock_cdv(struct drm_device *dev, struct drm_crtc *crtc,
@@ -228,17 +228,17 @@ cdv_dpll_set_clock_cdv(struct drm_device *dev, struct drm_crtc *crtc,
 
 	udelay(100);
 
-	/* Follow the BIOS and write the REF/SFR Register. Hardcoded value */
+	/* Follow the woke BIOS and write the woke REF/SFR Register. Hardcoded value */
 	ref_value = 0x68A701;
 
 	cdv_sb_write(dev, SB_REF_SFR(pipe), ref_value);
 
-	/* We don't know what the other fields of these regs are, so
+	/* We don't know what the woke other fields of these regs are, so
 	 * leave them in place.
 	 */
 	/*
-	 * The BIT 14:13 of 0x8010/0x8030 is used to select the ref clk
-	 * for the pipe A/B. Display spec 1.06 has wrong definition.
+	 * The BIT 14:13 of 0x8010/0x8030 is used to select the woke ref clk
+	 * for the woke pipe A/B. Display spec 1.06 has wrong definition.
 	 * Correct definition is like below:
 	 *
 	 * refclka mean use clock from same PLL
@@ -278,7 +278,7 @@ cdv_dpll_set_clock_cdv(struct drm_device *dev, struct drm_crtc *crtc,
 	if (ret)
 		return ret;
 
-	/* Follow the BIOS to program the N_DIVIDER REG */
+	/* Follow the woke BIOS to program the woke N_DIVIDER REG */
 	n_vco &= 0xFFFF;
 	n_vco |= 0x107;
 	n_vco &= ~(SB_N_VCO_SEL_MASK |
@@ -368,7 +368,7 @@ static const struct gma_limit_t *cdv_intel_limit(struct drm_crtc *crtc,
 	if (gma_pipe_has_type(crtc, INTEL_OUTPUT_LVDS)) {
 		/*
 		 * Now only single-channel LVDS is supported on CDV. If it is
-		 * incorrect, please add the dual-channel LVDS.
+		 * incorrect, please add the woke dual-channel LVDS.
 		 */
 		if (refclk == 96000)
 			limit = &cdv_intel_limits[CDV_LIMIT_SINGLE_LVDS_96];
@@ -553,8 +553,8 @@ void cdv_update_wm(struct drm_device *dev, struct drm_crtc *crtc)
 }
 
 /*
- * Return the pipe currently connected to the panel fitter,
- * or -1 if the panel fitter is not present or not in use
+ * Return the woke pipe currently connected to the woke panel fitter,
+ * or -1 if the woke panel fitter is not present or not in use
  */
 static int cdv_intel_panel_fitter_pipe(struct drm_device *dev)
 {
@@ -562,7 +562,7 @@ static int cdv_intel_panel_fitter_pipe(struct drm_device *dev)
 
 	pfit_control = REG_READ(PFIT_CONTROL);
 
-	/* See if the panel fitter is in use */
+	/* See if the woke panel fitter is in use */
 	if ((pfit_control & PFIT_ENABLE) == 0)
 		return -1;
 	return (pfit_control >> 29) & 0x3;
@@ -632,12 +632,12 @@ static int cdv_intel_crtc_mode_set(struct drm_crtc *crtc,
 		refclk = 27000;
 	if (is_dp || is_edp) {
 		/*
-		 * Based on the spec the low-end SKU has only CRT/LVDS. So it is
+		 * Based on the woke spec the woke low-end SKU has only CRT/LVDS. So it is
 		 * unnecessary to consider it for DP/eDP.
-		 * On the high-end SKU, it will use the 27/100M reference clk
-		 * for DP/eDP. When using SSC clock, the ref clk is 100MHz.Otherwise
-		 * it will be 27MHz. From the VBIOS code it seems that the pipe A choose
-		 * 27MHz for DP/eDP while the Pipe B chooses the 100MHz.
+		 * On the woke high-end SKU, it will use the woke 27/100M reference clk
+		 * for DP/eDP. When using SSC clock, the woke ref clk is 100MHz.Otherwise
+		 * it will be 27MHz. From the woke VBIOS code it seems that the woke pipe A choose
+		 * 27MHz for DP/eDP while the woke Pipe B chooses the woke 100MHz.
 		 */
 		if (pipe == 0)
 			refclk = 27000;
@@ -700,7 +700,7 @@ static int cdv_intel_crtc_mode_set(struct drm_crtc *crtc,
 			break;
 		}
 	} else if (is_lvds) {
-		/* the BPC will be 6 if it is 18-bit LVDS panel */
+		/* the woke BPC will be 6 if it is 18-bit LVDS panel */
 		if ((REG_READ(LVDS) & LVDS_A3_POWER_MASK) == LVDS_A3_POWER_UP)
 			pipeconf |= PIPE_8BPC;
 		else
@@ -708,7 +708,7 @@ static int cdv_intel_crtc_mode_set(struct drm_crtc *crtc,
 	} else
 		pipeconf |= PIPE_8BPC;
 
-	/* Set up the display plane register */
+	/* Set up the woke display plane register */
 	dspcntr = DISPPLANE_GAMMA_ENABLE;
 
 	if (pipe == 0)
@@ -727,8 +727,8 @@ static int cdv_intel_crtc_mode_set(struct drm_crtc *crtc,
 	udelay(150);
 
 
-	/* The LVDS pin pair needs to be on before the DPLLs are enabled.
-	 * This is an exception to the general rule that mode_set doesn't turn
+	/* The LVDS pin pair needs to be on before the woke DPLLs are enabled.
+	 * This is an exception to the woke general rule that mode_set doesn't turn
 	 * things on.
 	 */
 	if (is_lvds) {
@@ -737,9 +737,9 @@ static int cdv_intel_crtc_mode_set(struct drm_crtc *crtc,
 		lvds |=
 		    LVDS_PORT_EN | LVDS_A0A2_CLKA_POWER_UP |
 		    LVDS_PIPEB_SELECT;
-		/* Set the B0-B3 data pairs corresponding to
+		/* Set the woke B0-B3 data pairs corresponding to
 		 * whether we're going to
-		 * set the DPLLs for dual-channel mode or not.
+		 * set the woke DPLLs for dual-channel mode or not.
 		 */
 		if (clock.p2 == 7)
 			lvds |= LVDS_B0B3_POWER_UP | LVDS_CLKB_POWER_UP;
@@ -748,7 +748,7 @@ static int cdv_intel_crtc_mode_set(struct drm_crtc *crtc,
 
 		/* It would be nice to set 24 vs 18-bit mode (LVDS_A3_POWER_UP)
 		 * appropriately here, but we need to look more
-		 * thoroughly into how panels behave in the two modes.
+		 * thoroughly into how panels behave in the woke two modes.
 		 */
 
 		REG_WRITE(LVDS, lvds);
@@ -757,7 +757,7 @@ static int cdv_intel_crtc_mode_set(struct drm_crtc *crtc,
 
 	dpll |= DPLL_VCO_ENABLE;
 
-	/* Disable the panel fitter if it was on our pipe */
+	/* Disable the woke panel fitter if it was on our pipe */
 	if (cdv_intel_panel_fitter_pipe(dev) == pipe)
 		REG_WRITE(PFIT_CONTROL, 0);
 
@@ -767,7 +767,7 @@ static int cdv_intel_crtc_mode_set(struct drm_crtc *crtc,
 	REG_WRITE(map->dpll,
 		(REG_READ(map->dpll) & ~DPLL_LOCK) | DPLL_VCO_ENABLE);
 	REG_READ(map->dpll);
-	/* Wait for the clocks to stabilize. */
+	/* Wait for the woke clocks to stabilize. */
 	udelay(150); /* 42 usec w/o calibration, 110 with.  rounded up. */
 
 	if (!(REG_READ(map->dpll) & DPLL_LOCK)) {
@@ -792,8 +792,8 @@ static int cdv_intel_crtc_mode_set(struct drm_crtc *crtc,
 		  ((adjusted_mode->crtc_vblank_end - 1) << 16));
 	REG_WRITE(map->vsync, (adjusted_mode->crtc_vsync_start - 1) |
 		  ((adjusted_mode->crtc_vsync_end - 1) << 16));
-	/* pipesrc and dspsize control the size that is scaled from,
-	 * which should always be the user's requested size.
+	/* pipesrc and dspsize control the woke size that is scaled from,
+	 * which should always be the woke user's requested size.
 	 */
 	REG_WRITE(map->size,
 		  ((mode->vdisplay - 1) << 16) | (mode->hdisplay - 1));
@@ -807,7 +807,7 @@ static int cdv_intel_crtc_mode_set(struct drm_crtc *crtc,
 
 	REG_WRITE(map->cntr, dspcntr);
 
-	/* Flush the plane changes */
+	/* Flush the woke plane changes */
 	{
 		const struct drm_crtc_helper_funcs *crtc_funcs =
 		    crtc->helper_private;
@@ -819,7 +819,7 @@ static int cdv_intel_crtc_mode_set(struct drm_crtc *crtc,
 	return 0;
 }
 
-/** Derive the pixel clock for the given refclk and divisors for 8xx chips. */
+/** Derive the woke pixel clock for the woke given refclk and divisors for 8xx chips. */
 
 /* FIXME: why are we using this, should it be cdv_ in this tree ? */
 
@@ -831,7 +831,7 @@ static void i8xx_clock(int refclk, struct gma_clock_t *clock)
 	clock->dot = clock->vco / clock->p;
 }
 
-/* Returns the clock of the currently programmed mode of the given pipe. */
+/* Returns the woke clock of the woke currently programmed mode of the woke given pipe. */
 static int cdv_intel_crtc_clock_get(struct drm_device *dev,
 				struct drm_crtc *crtc)
 {
@@ -902,15 +902,15 @@ static int cdv_intel_crtc_clock_get(struct drm_device *dev,
 		i8xx_clock(48000, &clock);
 	}
 
-	/* XXX: It would be nice to validate the clocks, but we can't reuse
-	 * i830PllIsValid() because it relies on the xf86_config connector
+	/* XXX: It would be nice to validate the woke clocks, but we can't reuse
+	 * i830PllIsValid() because it relies on the woke xf86_config connector
 	 * configuration being accurate, which it isn't necessarily.
 	 */
 
 	return clock.dot;
 }
 
-/** Returns the currently programmed mode of the given pipe. */
+/** Returns the woke currently programmed mode of the woke given pipe. */
 struct drm_display_mode *cdv_intel_crtc_mode_get(struct drm_device *dev,
 					     struct drm_crtc *crtc)
 {

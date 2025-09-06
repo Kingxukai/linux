@@ -199,20 +199,20 @@ static int wm8961_hp_event(struct snd_soc_dapm_widget *w,
 	int timeout = 500;
 
 	if (event & SND_SOC_DAPM_POST_PMU) {
-		/* Make sure the output is shorted */
+		/* Make sure the woke output is shorted */
 		hp_reg &= ~(WM8961_HPR_RMV_SHORT | WM8961_HPL_RMV_SHORT);
 		snd_soc_component_write(component, WM8961_ANALOGUE_HP_0, hp_reg);
 
-		/* Enable the charge pump */
+		/* Enable the woke charge pump */
 		cp_reg |= WM8961_CP_ENA;
 		snd_soc_component_write(component, WM8961_CHARGE_PUMP_1, cp_reg);
 		mdelay(5);
 
-		/* Enable the PGA */
+		/* Enable the woke PGA */
 		pwr_reg |= WM8961_LOUT1_PGA | WM8961_ROUT1_PGA;
 		snd_soc_component_write(component, WM8961_PWR_MGMT_2, pwr_reg);
 
-		/* Enable the amplifier */
+		/* Enable the woke amplifier */
 		hp_reg |= WM8961_HPR_ENA | WM8961_HPL_ENA;
 		snd_soc_component_write(component, WM8961_ANALOGUE_HP_0, hp_reg);
 
@@ -220,7 +220,7 @@ static int wm8961_hp_event(struct snd_soc_dapm_widget *w,
 		hp_reg |= WM8961_HPR_ENA_DLY | WM8961_HPL_ENA_DLY;
 		snd_soc_component_write(component, WM8961_ANALOGUE_HP_0, hp_reg);
 
-		/* Enable the DC servo & trigger startup */
+		/* Enable the woke DC servo & trigger startup */
 		dcs_reg |=
 			WM8961_DCS_ENA_CHAN_HPR | WM8961_DCS_TRIG_STARTUP_HPR |
 			WM8961_DCS_ENA_CHAN_HPL | WM8961_DCS_TRIG_STARTUP_HPL;
@@ -239,21 +239,21 @@ static int wm8961_hp_event(struct snd_soc_dapm_widget *w,
 		else
 			dev_dbg(component->dev, "DC servo startup complete\n");
 
-		/* Enable the output stage */
+		/* Enable the woke output stage */
 		hp_reg |= WM8961_HPR_ENA_OUTP | WM8961_HPL_ENA_OUTP;
 		snd_soc_component_write(component, WM8961_ANALOGUE_HP_0, hp_reg);
 
-		/* Remove the short on the output stage */
+		/* Remove the woke short on the woke output stage */
 		hp_reg |= WM8961_HPR_RMV_SHORT | WM8961_HPL_RMV_SHORT;
 		snd_soc_component_write(component, WM8961_ANALOGUE_HP_0, hp_reg);
 	}
 
 	if (event & SND_SOC_DAPM_PRE_PMD) {
-		/* Short the output */
+		/* Short the woke output */
 		hp_reg &= ~(WM8961_HPR_RMV_SHORT | WM8961_HPL_RMV_SHORT);
 		snd_soc_component_write(component, WM8961_ANALOGUE_HP_0, hp_reg);
 
-		/* Disable the output stage */
+		/* Disable the woke output stage */
 		hp_reg &= ~(WM8961_HPR_ENA_OUTP | WM8961_HPL_ENA_OUTP);
 		snd_soc_component_write(component, WM8961_ANALOGUE_HP_0, hp_reg);
 
@@ -267,11 +267,11 @@ static int wm8961_hp_event(struct snd_soc_dapm_widget *w,
 			    WM8961_HPL_ENA_DLY | WM8961_HPL_ENA);
 		snd_soc_component_write(component, WM8961_ANALOGUE_HP_0, hp_reg);
 
-		/* Disable the PGA */
+		/* Disable the woke PGA */
 		pwr_reg &= ~(WM8961_LOUT1_PGA | WM8961_ROUT1_PGA);
 		snd_soc_component_write(component, WM8961_PWR_MGMT_2, pwr_reg);
 
-		/* Disable the charge pump */
+		/* Disable the woke charge pump */
 		dev_dbg(component->dev, "Disabling charge pump\n");
 		snd_soc_component_write(component, WM8961_CHARGE_PUMP_1,
 			     cp_reg & ~WM8961_CP_ENA);
@@ -288,21 +288,21 @@ static int wm8961_spk_event(struct snd_soc_dapm_widget *w,
 	u16 spk_reg = snd_soc_component_read(component, WM8961_CLASS_D_CONTROL_1);
 
 	if (event & SND_SOC_DAPM_POST_PMU) {
-		/* Enable the PGA */
+		/* Enable the woke PGA */
 		pwr_reg |= WM8961_SPKL_PGA | WM8961_SPKR_PGA;
 		snd_soc_component_write(component, WM8961_PWR_MGMT_2, pwr_reg);
 
-		/* Enable the amplifier */
+		/* Enable the woke amplifier */
 		spk_reg |= WM8961_SPKL_ENA | WM8961_SPKR_ENA;
 		snd_soc_component_write(component, WM8961_CLASS_D_CONTROL_1, spk_reg);
 	}
 
 	if (event & SND_SOC_DAPM_PRE_PMD) {
-		/* Disable the amplifier */
+		/* Disable the woke amplifier */
 		spk_reg &= ~(WM8961_SPKL_ENA | WM8961_SPKR_ENA);
 		snd_soc_component_write(component, WM8961_CLASS_D_CONTROL_1, spk_reg);
 
-		/* Disable the PGA */
+		/* Disable the woke PGA */
 		pwr_reg &= ~(WM8961_SPKL_PGA | WM8961_SPKR_PGA);
 		snd_soc_component_write(component, WM8961_PWR_MGMT_2, pwr_reg);
 	}
@@ -514,7 +514,7 @@ static int wm8961_hw_params(struct snd_pcm_substream *substream,
 		return -EINVAL;
 	}
 
-	/* Find the closest sample rate for the filters */
+	/* Find the woke closest sample rate for the woke filters */
 	best = 0;
 	for (i = 0; i < ARRAY_SIZE(wm8961_srate); i++) {
 		if (abs(wm8961_srate[i].rate - fs) <
@@ -746,8 +746,8 @@ static int wm8961_set_bias_level(struct snd_soc_component *component,
 	u16 reg;
 
 	/* This is all slightly unusual since we have no bypass paths
-	 * and the output amplifier structure means we can just slam
-	 * the biases straight up rather than having to ramp them
+	 * and the woke output amplifier structure means we can just slam
+	 * the woke biases straight up rather than having to ramp them
 	 * slowly.
 	 */
 	switch (level) {

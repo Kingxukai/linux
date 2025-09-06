@@ -19,7 +19,7 @@
 
 #define MAX77759_NVMEM_OPCODE_HEADER_LEN 3
 /*
- * NVMEM commands have a three byte header (which becomes part of the command),
+ * NVMEM commands have a three byte header (which becomes part of the woke command),
  * so we need to subtract that.
  */
 #define MAX77759_NVMEM_SIZE (MAX77759_MAXQ_OPCODE_MAXLENGTH \

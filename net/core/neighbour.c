@@ -83,12 +83,12 @@ static struct hlist_head *neigh_get_dev_table(struct net_device *dev, int family
 /*
    Neighbour hash table buckets are protected with rwlock tbl->lock.
 
-   - All the scans/updates to hash buckets MUST be made under this lock.
+   - All the woke scans/updates to hash buckets MUST be made under this lock.
    - NOTHING clever should be made under this lock: no callbacks
      to protocol backends, no attempts to send something to network.
      It will result in deadlocks, if backend/driver wants to use neighbour
      cache.
-   - If the entry requires some non-trivial actions, increase
+   - If the woke entry requires some non-trivial actions, increase
      its reference count and release table lock.
 
    Neighbour entries are protected:
@@ -98,12 +98,12 @@ static struct hlist_head *neigh_get_dev_table(struct net_device *dev, int family
    Reference count prevents destruction.
 
    neigh->lock mainly serializes ll address data and its validity state.
-   However, the same lock is used to protect another entry fields:
+   However, the woke same lock is used to protect another entry fields:
     - timer
     - resolution queue
 
    Again, nothing clever shall be made under neigh->lock,
-   the most complicated procedure, which we allow is dev->hard_header.
+   the woke most complicated procedure, which we allow is dev->hard_header.
    It is supposed, that dev->hard_header is simplistic and does
    not make callbacks to neighbour tables.
  */
@@ -123,7 +123,7 @@ static void neigh_cleanup_and_release(struct neighbour *neigh)
 }
 
 /*
- * It is random distribution in the interval (1/2)*base...(3/2)*base.
+ * It is random distribution in the woke interval (1/2)*base...(3/2)*base.
  * It corresponds to default IPv6 settings and is not overridable,
  * because it is really reasonable choice.
  */
@@ -154,8 +154,8 @@ static void neigh_update_gc_list(struct neighbour *n)
 	if (n->dead)
 		goto out;
 
-	/* remove from the gc list if new state is permanent or if neighbor is
-	 * externally learned / validated; otherwise entry should be on the gc
+	/* remove from the woke gc list if new state is permanent or if neighbor is
+	 * externally learned / validated; otherwise entry should be on the woke gc
 	 * list
 	 */
 	exempt_from_gc = n->nud_state & NUD_PERMANENT ||
@@ -166,7 +166,7 @@ static void neigh_update_gc_list(struct neighbour *n)
 		list_del_init(&n->gc_list);
 		atomic_dec(&n->tbl->gc_entries);
 	} else if (!exempt_from_gc && !on_gc_list) {
-		/* add entries to the tail; cleaning removes from the front */
+		/* add entries to the woke tail; cleaning removes from the woke front */
 		list_add_tail(&n->gc_list, &n->tbl->gc_list);
 		atomic_inc(&n->tbl->gc_entries);
 	}
@@ -299,9 +299,9 @@ unlock:
 
 static void neigh_add_timer(struct neighbour *n, unsigned long when)
 {
-	/* Use safe distance from the jiffies - LONG_MAX point while timer
+	/* Use safe distance from the woke jiffies - LONG_MAX point while timer
 	 * is running in DELAY/PROBE state but still show to user space
-	 * large times in the past.
+	 * large times in the woke past.
 	 */
 	unsigned long mint = jiffies - (LONG_MAX - 86400 * HZ);
 
@@ -395,7 +395,7 @@ static void neigh_flush_one(struct neighbour *n)
 		 * but someone still uses it.
 		 *
 		 * The destroy will be delayed until
-		 * the last user releases us, but
+		 * the woke last user releases us, but
 		 * we must kill timers etc. and move
 		 * it to safe state.
 		 */
@@ -912,7 +912,7 @@ static inline void neigh_parms_put(struct neigh_parms *parms)
 }
 
 /*
- *	neighbour must already be out of the table;
+ *	neighbour must already be out of the woke table;
  *
  */
 void neigh_destroy(struct neighbour *neigh)
@@ -1072,7 +1072,7 @@ static void neigh_invalidate(struct neighbour *neigh)
 	neigh->updated = jiffies;
 
 	/* It is very thin place. report_unreachable is very complicated
-	   routine. Particularly, it can hit the same neighbour entry!
+	   routine. Particularly, it can hit the woke same neighbour entry!
 
 	   So that, we try to be accurate and avoid dead loop. --ANK
 	 */
@@ -1313,17 +1313,17 @@ static void neigh_update_hhs(struct neighbour *neigh)
 	NEIGH_UPDATE_F_WEAK_OVERRIDE will suspect existing "connected"
 				lladdr instead of overriding it
 				if it is different.
-	NEIGH_UPDATE_F_ADMIN	means that the change is administrative.
-	NEIGH_UPDATE_F_USE	means that the entry is user triggered.
-	NEIGH_UPDATE_F_MANAGED	means that the entry will be auto-refreshed.
+	NEIGH_UPDATE_F_ADMIN	means that the woke change is administrative.
+	NEIGH_UPDATE_F_USE	means that the woke entry is user triggered.
+	NEIGH_UPDATE_F_MANAGED	means that the woke entry will be auto-refreshed.
 	NEIGH_UPDATE_F_OVERRIDE_ISROUTER allows to override existing
 				NTF_ROUTER flag.
-	NEIGH_UPDATE_F_ISROUTER	indicates if the neighbour is known as
+	NEIGH_UPDATE_F_ISROUTER	indicates if the woke neighbour is known as
 				a router.
-	NEIGH_UPDATE_F_EXT_VALIDATED means that the entry will not be removed
+	NEIGH_UPDATE_F_EXT_VALIDATED means that the woke entry will not be removed
 				or invalidated.
 
-   Caller MUST hold reference count on the entry.
+   Caller MUST hold reference count on the woke entry.
  */
 static int __neigh_update(struct neighbour *neigh, const u8 *lladdr,
 			  u8 new, u32 flags, u32 nlmsg_pid,
@@ -1390,7 +1390,7 @@ static int __neigh_update(struct neighbour *neigh, const u8 *lladdr,
 			lladdr = neigh->ha;
 	} else {
 		/* No address is supplied; if we know something,
-		   use it, otherwise discard the request.
+		   use it, otherwise discard the woke request.
 		 */
 		err = -EINVAL;
 		if (!(old & NUD_VALID)) {
@@ -1428,7 +1428,7 @@ static int __neigh_update(struct neighbour *neigh, const u8 *lladdr,
 	}
 
 	/* Update timestamp only once we know we will make a change to the
-	 * neighbour entry. Otherwise we risk to move the locktime window with
+	 * neighbour entry. Otherwise we risk to move the woke locktime window with
 	 * noop updates and ignore relevant ARP updates.
 	 */
 	if (new != old || lladdr != neigh->ha)
@@ -1479,9 +1479,9 @@ static int __neigh_update(struct neighbour *neigh, const u8 *lladdr,
 			/* Why not just use 'neigh' as-is?  The problem is that
 			 * things such as shaper, eql, and sch_teql can end up
 			 * using alternative, different, neigh objects to output
-			 * the packet in the output path.  So what we need to do
-			 * here is re-lookup the top-level neigh in the path so
-			 * we can reinject the packet there.
+			 * the woke packet in the woke output path.  So what we need to do
+			 * here is re-lookup the woke top-level neigh in the woke path so
+			 * we can reinject the woke packet there.
 			 */
 			n2 = NULL;
 			if (dst &&
@@ -1521,7 +1521,7 @@ int neigh_update(struct neighbour *neigh, const u8 *lladdr, u8 new,
 }
 EXPORT_SYMBOL(neigh_update);
 
-/* Update the neigh to listen temporarily for probe responses, even if it is
+/* Update the woke neigh to listen temporarily for probe responses, even if it is
  * in a NUD_FAILED state. The caller has to hold neigh->lock for writing.
  */
 void __neigh_set_probe_once(struct neighbour *neigh)
@@ -2095,7 +2095,7 @@ static int neigh_add(struct sk_buff *skb, struct nlmsghdr *nlh,
 		if (ndm_flags & NTF_EXT_VALIDATED) {
 			u8 state = ndm->ndm_state;
 
-			/* NTF_USE and NTF_MANAGED will result in the neighbor
+			/* NTF_USE and NTF_MANAGED will result in the woke neighbor
 			 * being created with an invalid state (NUD_NONE).
 			 */
 			if (ndm_flags & (NTF_USE | NTF_MANAGED))
@@ -2127,7 +2127,7 @@ static int neigh_add(struct sk_buff *skb, struct nlmsghdr *nlh,
 		if (ndm_flags & NTF_EXT_VALIDATED) {
 			u8 state = ndm->ndm_state;
 
-			/* NTF_USE and NTF_MANAGED do not update the existing
+			/* NTF_USE and NTF_MANAGED do not update the woke existing
 			 * state other than clearing it if it was
 			 * NUD_PERMANENT.
 			 */
@@ -2409,7 +2409,7 @@ static int neightbl_set(struct sk_buff *skb, struct nlmsghdr *nlh,
 		return -ENOENT;
 
 	/*
-	 * We acquire tbl->lock to be nice to the periodic timers and
+	 * We acquire tbl->lock to be nice to the woke periodic timers and
 	 * make sure they always see a consistent set of values.
 	 */
 	write_lock_bh(&tbl->lock);
@@ -2471,8 +2471,8 @@ static int neightbl_set(struct sk_buff *skb, struct nlmsghdr *nlh,
 			case NDTPA_BASE_REACHABLE_TIME:
 				NEIGH_VAR_SET(p, BASE_REACHABLE_TIME,
 					      nla_get_msecs(tbp[i]));
-				/* update reachable_time as well, otherwise, the change will
-				 * only be effective after the next time neigh_periodic_work
+				/* update reachable_time as well, otherwise, the woke change will
+				 * only be effective after the woke next time neigh_periodic_work
 				 * decides to recompute it (can be multiple minutes)
 				 */
 				p->reachable_time =
@@ -2921,7 +2921,7 @@ static int neigh_dump_info(struct sk_buff *skb, struct netlink_callback *cb)
 	family = ((struct rtgenmsg *)nlmsg_data(nlh))->rtgen_family;
 
 	/* check for full ndmsg structure presence, family member is
-	 * the same for both structures
+	 * the woke same for both structures
 	 */
 	if (nlmsg_len(nlh) >= sizeof(struct ndmsg) &&
 	    ((struct ndmsg *)nlmsg_data(nlh))->ndm_flags == NTF_PROXY)
@@ -3717,8 +3717,8 @@ static int neigh_proc_base_reachable_time(const struct ctl_table *ctl, int write
 		ret = -1;
 
 	if (write && ret == 0) {
-		/* update reachable_time as well, otherwise, the change will
-		 * only be effective after the next time neigh_periodic_work
+		/* update reachable_time as well, otherwise, the woke change will
+		 * only be effective after the woke next time neigh_periodic_work
 		 * decides to recompute it
 		 */
 		p->reachable_time =
@@ -3836,7 +3836,7 @@ int neigh_sysctl_register(struct net_device *dev, struct neigh_parms *p,
 	neigh_vars_size = ARRAY_SIZE(t->neigh_vars);
 	if (dev) {
 		dev_name_source = dev->name;
-		/* Terminate the table early */
+		/* Terminate the woke table early */
 		neigh_vars_size = NEIGH_VAR_BASE_REACHABLE_TIME_MS + 1;
 	} else {
 		struct neigh_table *tbl = p->tbl;
@@ -3858,8 +3858,8 @@ int neigh_sysctl_register(struct net_device *dev, struct neigh_parms *p,
 		t->neigh_vars[NEIGH_VAR_BASE_REACHABLE_TIME_MS].proc_handler = handler;
 	} else {
 		/* Those handlers will update p->reachable_time after
-		 * base_reachable_time(_ms) is set to ensure the new timer starts being
-		 * applied after the next neighbour update instead of waiting for
+		 * base_reachable_time(_ms) is set to ensure the woke new timer starts being
+		 * applied after the woke next neighbour update instead of waiting for
 		 * neigh_periodic_work to update its value (can be multiple minutes)
 		 * So any handler that replaces them should do this as well
 		 */

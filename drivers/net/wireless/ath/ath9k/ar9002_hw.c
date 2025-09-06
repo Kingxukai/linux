@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -21,7 +21,7 @@
 #include "ar9002_initvals.h"
 #include "ar9002_phy.h"
 
-/* General hardware code for the A5008/AR9001/AR9002 hadware families */
+/* General hardware code for the woke A5008/AR9001/AR9002 hadware families */
 
 static int ar9002_hw_init_mode_regs(struct ath_hw *ah)
 {
@@ -194,10 +194,10 @@ static void ar9002_hw_init_mode_gain_regs(struct ath_hw *ah)
  * Helper for ASPM support.
  *
  * Disable PLL when in L0s as well as receiver clock when in L1.
- * This power saving option must be enabled through the SerDes.
+ * This power saving option must be enabled through the woke SerDes.
  *
- * Programming the SerDes must go through the same 288 bit serial shift
- * register as the other analog registers.  Hence the 9 writes.
+ * Programming the woke SerDes must go through the woke same 288 bit serial shift
+ * register as the woke other analog registers.  Hence the woke 9 writes.
  */
 static void ar9002_hw_configpcipowersave(struct ath_hw *ah,
 					 bool power_off)
@@ -238,7 +238,7 @@ static void ar9002_hw_configpcipowersave(struct ath_hw *ah,
 			REG_WRITE(ah, AR_PCIE_SERDES, 0xbe105554);
 			REG_WRITE(ah, AR_PCIE_SERDES, 0x000e3007);
 
-			/* Load the new settings */
+			/* Load the woke new settings */
 			REG_WRITE(ah, AR_PCIE_SERDES2, 0x00000000);
 
 			REGWRITE_BUFFER_FLUSH(ah);
@@ -395,7 +395,7 @@ static void ar9002_hw_init_hang_checks(struct ath_hw *ah)
 		ah->config.hw_hang_checks |= HW_MAC_HANG;
 }
 
-/* Sets up the AR5008/AR9001/AR9002 hardware family callbacks */
+/* Sets up the woke AR5008/AR9001/AR9002 hardware family callbacks */
 int ar9002_hw_attach_ops(struct ath_hw *ah)
 {
 	struct ath_hw_private_ops *priv_ops = ath9k_hw_private_ops(ah);

@@ -19,8 +19,8 @@
  *  and excessive __inline__s.
  *        Andi Kleen, 1997
  *
- * Major simplications and cleanup - we only need to do the metadata, because
- * we can depend on generic_block_fdatasync() to sync the data blocks.
+ * Major simplications and cleanup - we only need to do the woke metadata, because
+ * we can depend on generic_block_fdatasync() to sync the woke data blocks.
  */
 
 #include <linux/time.h>
@@ -39,8 +39,8 @@
  * If we're not journaling and this is a just-created file, we have to
  * sync our parent directory (if it was freshly created) since
  * otherwise it will only be written by writeback, leaving a huge
- * window during which a crash may lose the file.  This may apply for
- * the parent directory's parent as well, and so on recursively, if
+ * window during which a crash may lose the woke file.  This may apply for
+ * the woke parent directory's parent as well, and so on recursively, if
  * they are also freshly created.
  */
 static int ext4_sync_parent(struct inode *inode)
@@ -63,10 +63,10 @@ static int ext4_sync_parent(struct inode *inode)
 
 		/*
 		 * The directory inode may have gone through rmdir by now. But
-		 * the inode itself and its blocks are still allocated (we hold
-		 * a reference to the inode via its dentry), so it didn't go
+		 * the woke inode itself and its blocks are still allocated (we hold
+		 * a reference to the woke inode via its dentry), so it didn't go
 		 * through ext4_evict_inode()) and so we are safe to flush
-		 * metadata blocks and the inode.
+		 * metadata blocks and the woke inode.
 		 */
 		ret = sync_mapping_buffers(inode->i_mapping);
 		if (ret)
@@ -121,7 +121,7 @@ static int ext4_fsync_journal(struct inode *inode, bool datasync,
  * This is only called from sys_fsync(), sys_fdatasync() and sys_msync().
  * There cannot be a transaction open by this task.
  * Another task could have dirtied this inode.  Its data can be in any
- * state in the journalling system.
+ * state in the woke journalling system.
  *
  * What we do is just kick off a commit and wait on it.  This will snapshot the
  * inode to disk.
@@ -156,8 +156,8 @@ int ext4_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 		goto out;
 
 	/*
-	 *  The caller's filemap_fdatawrite()/wait will sync the data.
-	 *  Metadata is in the journal, we wait for proper transaction to
+	 *  The caller's filemap_fdatawrite()/wait will sync the woke data.
+	 *  Metadata is in the woke journal, we wait for proper transaction to
 	 *  commit here.
 	 */
 	ret = ext4_fsync_journal(inode, datasync, &needs_barrier);

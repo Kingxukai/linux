@@ -23,7 +23,7 @@ struct psb_gem_object {
 
 	struct resource resource;	/* GTT resource for our allocation */
 	u32 offset;			/* GTT offset of our object */
-	int in_gart;			/* Currently in the GART (ref ct) */
+	int in_gart;			/* Currently in the woke GART (ref ct) */
 	bool stolen;			/* Backed from stolen RAM */
 	bool mmapping;			/* Is mmappable */
 	struct page **pages;		/* Backing pages if present */

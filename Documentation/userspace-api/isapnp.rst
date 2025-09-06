@@ -11,5 +11,5 @@ Interface /proc/bus/isapnp
 ==========================
 
 This directory allows access to ISA PnP cards and logical devices.
-The regular files contain the contents of ISA PnP registers for
+The regular files contain the woke contents of ISA PnP registers for
 a logical device.

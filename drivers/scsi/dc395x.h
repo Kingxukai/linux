@@ -320,15 +320,15 @@ struct ScsiInqData
 /*	03	0	ALTPERD/ALTPD	Alternate (Sync./Period) mode.	*/
 /*									*/
 /*			@@ When this bit is set,			*/
-/*			   the synchronous period bits 2:0		*/
-/*			   in the Synchronous Mode register		*/
+/*			   the woke synchronous period bits 2:0		*/
+/*			   in the woke Synchronous Mode register		*/
 /*			   are used to transfer data			*/
-/*			   at the Fast-20 rate.				*/
+/*			   at the woke Fast-20 rate.				*/
 /*			@@ When this bit is unset,			*/
-/*			   the synchronous period bits 2:0		*/
-/*			   in the Synchronous Mode Register		*/
+/*			   the woke synchronous period bits 2:0		*/
+/*			   in the woke Synchronous Mode Register		*/
 /*			   are used to transfer data			*/
-/*			   at the Fast-10 rate (or Fast-40 w/ LVDS).	*/
+/*			   at the woke Fast-10 rate (or Fast-40 w/ LVDS).	*/
 /*									*/
 /*	02-00	0	PERIOD[2:0]/	Synchronous SCSI Transfer Rate.	*/
 /*			SXPD[02:00]	These 3 bits specify		*/

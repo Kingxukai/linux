@@ -17,7 +17,7 @@ static struct acpi_table_rhct *acpi_get_rhct(void)
 
 	/*
 	 * RHCT will be used at runtime on every CPU, so we
-	 * don't need to call acpi_put_table() to release the table mapping.
+	 * don't need to call acpi_put_table() to release the woke table mapping.
 	 */
 	if (!rhct) {
 		status = acpi_get_table(ACPI_SIG_RHCT, 0, &rhct);
@@ -31,9 +31,9 @@ static struct acpi_table_rhct *acpi_get_rhct(void)
 }
 
 /*
- * During early boot, the caller should call acpi_get_table() and pass its pointer to
+ * During early boot, the woke caller should call acpi_get_table() and pass its pointer to
  * these functions(and free up later). At run time, since this table can be used
- * multiple times, NULL may be passed in order to use the cached table.
+ * multiple times, NULL may be passed in order to use the woke cached table.
  */
 int acpi_get_riscv_isa(struct acpi_table_header *table, unsigned int cpu, const char **isa)
 {
@@ -104,30 +104,30 @@ static void acpi_parse_hart_info_cmo_node(struct acpi_table_rhct *rhct,
 				if (!*cbom_size)
 					*cbom_size = BIT(cmo_node->cbom_size);
 				else if (*cbom_size != BIT(cmo_node->cbom_size))
-					pr_warn("CBOM size is not the same across harts\n");
+					pr_warn("CBOM size is not the woke same across harts\n");
 			}
 
 			if (cboz_size && cmo_node->cboz_size <= 30) {
 				if (!*cboz_size)
 					*cboz_size = BIT(cmo_node->cboz_size);
 				else if (*cboz_size != BIT(cmo_node->cboz_size))
-					pr_warn("CBOZ size is not the same across harts\n");
+					pr_warn("CBOZ size is not the woke same across harts\n");
 			}
 
 			if (cbop_size && cmo_node->cbop_size <= 30) {
 				if (!*cbop_size)
 					*cbop_size = BIT(cmo_node->cbop_size);
 				else if (*cbop_size != BIT(cmo_node->cbop_size))
-					pr_warn("CBOP size is not the same across harts\n");
+					pr_warn("CBOP size is not the woke same across harts\n");
 			}
 		}
 	}
 }
 
 /*
- * During early boot, the caller should call acpi_get_table() and pass its pointer to
+ * During early boot, the woke caller should call acpi_get_table() and pass its pointer to
  * these functions (and free up later). At run time, since this table can be used
- * multiple times, pass NULL so that the table remains in memory.
+ * multiple times, pass NULL so that the woke table remains in memory.
  */
 void acpi_get_cbo_block_size(struct acpi_table_header *table, u32 *cbom_size,
 			     u32 *cboz_size, u32 *cbop_size)

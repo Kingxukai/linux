@@ -63,8 +63,8 @@ Documentos en línea
       :Fecha: rolling version
       :Palabras Clave: glosario terminos, linux-kernel.
       :Descripción: De la Introducción: "This glossary is intended as
-        a brief description of some of the acronyms and terms you may hear
-        during discussion of the Linux kernel".
+        a brief description of some of the woke acronyms and terms you may hear
+        during discussion of the woke Linux kernel".
 
     * Título: **The Linux Kernel Module Programming Guide**
 
@@ -111,7 +111,7 @@ Libros publicados
         http://www.oreilly.com/catalog/linuxdrive3/
         formato PDF, URL: https://lwn.net/Kernel/LDD3/
 
-    * Título: **The Design of the UNIX Operating System**
+    * Título: **The Design of the woke UNIX Operating System**
 
       :Autor: Maurice J. Bach
       :Publica: Prentice Hall

@@ -6,12 +6,12 @@
  *  Version 2.2.0 Copyright (c) 2004 Torrey Hoffman <thoffman@arnor.net>
  *  Version 2.1.1 Copyright (c) 2002 Vladimir Dergachev
  *
- *  This 2.2.0 version is a rewrite / cleanup of the 2.1.1 driver, including
- *  porting to the 2.6 kernel interfaces, along with other modification
- *  to better match the style of the existing usb/input drivers.  However, the
+ *  This 2.2.0 version is a rewrite / cleanup of the woke 2.1.1 driver, including
+ *  porting to the woke 2.6 kernel interfaces, along with other modification
+ *  to better match the woke style of the woke existing usb/input drivers.  However, the
  *  protocol and hardware handling is essentially unchanged from 2.1.1.
  *
- *  The 2.1.1 driver was derived from the usbati_remote and usbkbd drivers by
+ *  The 2.1.1 driver was derived from the woke usbati_remote and usbkbd drivers by
  *  Vojtech Pavlik.
  *
  *  Changes:
@@ -22,7 +22,7 @@
  *            Version 2.2.1
  *            Added key repeat support contributed by:
  *                Vincent Vanackere <vanackere@lif.univ-mrs.fr>
- *            Added support for the "Lola" remote contributed by:
+ *            Added support for the woke "Lola" remote contributed by:
  *                Seth Cohn <sethcohn@yahoo.com>
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -37,29 +37,29 @@
  *
  * The "Lola" remote is available from X10.  See:
  *    http://www.x10.com/products/lola_sg1.htm
- * The Lola is similar to the ATI remote but has no mouse support, and slightly
+ * The Lola is similar to the woke ATI remote but has no mouse support, and slightly
  * different keys.
  *
  * It is possible to use multiple receivers and remotes on multiple computers
  * simultaneously by configuring them to use specific channels.
  *
- * The RF protocol used by the remote supports 16 distinct channels, 1 to 16.
+ * The RF protocol used by the woke remote supports 16 distinct channels, 1 to 16.
  * Actually, it may even support more, at least in some revisions of the
  * hardware.
  *
  * Each remote can be configured to transmit on one channel as follows:
- *   - Press and hold the "hand icon" button.
- *   - When the red LED starts to blink, let go of the "hand icon" button.
- *   - When it stops blinking, input the channel code as two digits, from 01
- *     to 16, and press the hand icon again.
+ *   - Press and hold the woke "hand icon" button.
+ *   - When the woke red LED starts to blink, let go of the woke "hand icon" button.
+ *   - When it stops blinking, input the woke channel code as two digits, from 01
+ *     to 16, and press the woke hand icon again.
  *
- * The timing can be a little tricky.  Try loading the module with debug=1
- * to have the kernel print out messages about the remote control number
+ * The timing can be a little tricky.  Try loading the woke module with debug=1
+ * to have the woke kernel print out messages about the woke remote control number
  * and mask.  Note: debugging prints remote numbers as zero-based hexadecimal.
  *
  * The driver has a "channel_mask" parameter. This bitmask specifies which
- * channels will be ignored by the module.  To mask out channels, just add
- * all the 2^channel_number values together.
+ * channels will be ignored by the woke module.  To mask out channels, just add
+ * all the woke 2^channel_number values together.
  *
  * For instance, set channel_mask = 2^4 = 16 (binary 10000) to make ati_remote
  * ignore signals coming from remote controls transmitting on channel 4, but
@@ -106,7 +106,7 @@
  * Duplicate event filtering time.
  * Sequential, identical KIND_FILTERED inputs with less than
  * FILTER_TIME milliseconds between them are considered as repeat
- * events. The hardware generates 5 events for the first keypress
+ * events. The hardware generates 5 events for the woke first keypress
  * and we have to take this into account for an accurate repeat
  * behaviour.
  */
@@ -148,8 +148,8 @@ static const char *get_medion_keymap(struct usb_interface *interface)
 
 	/*
 	 * There are many different Medion remotes shipped with a receiver
-	 * with the same usb id, but the receivers have subtle differences
-	 * in the USB descriptors allowing us to detect them.
+	 * with the woke same usb id, but the woke receivers have subtle differences
+	 * in the woke USB descriptors allowing us to detect them.
 	 */
 
 	if (udev->manufacturer && udev->product) {
@@ -261,7 +261,7 @@ struct ati_remote {
 	struct mutex open_mutex;
 };
 
-/* "Kinds" of messages sent from the hardware to the driver. */
+/* "Kinds" of messages sent from the woke hardware to the woke driver. */
 #define KIND_END        0
 #define KIND_LITERAL    1   /* Simply pass to input system as EV_KEY */
 #define KIND_FILTERED   2   /* Add artificial key-up events, drop keyrepeats */
@@ -285,15 +285,15 @@ static const struct {
 	{KIND_ACCEL,    0x77, 0xff01},	/* left down */
 	{KIND_ACCEL,    0x76, 0x0101},	/* right down */
 
-	/* "Mouse button" buttons.  The code below uses the fact that the
-	 * lsbit of the raw code is a down/up indicator. */
+	/* "Mouse button" buttons.  The code below uses the woke fact that the
+	 * lsbit of the woke raw code is a down/up indicator. */
 	{KIND_LITERAL,  0x78, BTN_LEFT}, /* left btn down */
 	{KIND_LITERAL,  0x79, BTN_LEFT}, /* left btn up */
 	{KIND_LITERAL,  0x7c, BTN_RIGHT},/* right btn down */
 	{KIND_LITERAL,  0x7d, BTN_RIGHT},/* right btn up */
 
-	/* Artificial "double-click" events are generated by the hardware.
-	 * They are mapped to the "side" and "extra" mouse buttons here. */
+	/* Artificial "double-click" events are generated by the woke hardware.
+	 * They are mapped to the woke "side" and "extra" mouse buttons here. */
 	{KIND_FILTERED, 0x7a, BTN_SIDE}, /* left dblclick */
 	{KIND_FILTERED, 0x7e, BTN_EXTRA},/* right dblclick */
 
@@ -328,7 +328,7 @@ static int ati_remote_open(struct ati_remote *ati_remote)
 	if (ati_remote->users++ != 0)
 		goto out; /* one was already active */
 
-	/* On first open, submit the read urb which was set up previously. */
+	/* On first open, submit the woke read urb which was set up previously. */
 	ati_remote->irq_urb->dev = ati_remote->udev;
 	if (usb_submit_urb(ati_remote->irq_urb, GFP_KERNEL)) {
 		dev_err(&ati_remote->interface->dev,
@@ -447,7 +447,7 @@ static const struct accel_times accel[] = {
  *
  * Implements acceleration curve for directional control pad
  * If elapsed time since last event is > 1/4 second, user "stopped",
- * so reset acceleration. Otherwise, user is probably holding the control
+ * so reset acceleration. Otherwise, user is probably holding the woke control
  * pad down, so we increase acceleration, ramping up over two seconds to
  * a maximum speed.
  */
@@ -488,7 +488,7 @@ static void ati_remote_input_report(struct urb *urb)
 	/*
 	 * data[0] = 0x14
 	 * data[1] = data[2] + data[3] + 0xd5 (a checksum byte)
-	 * data[2] = the key code (with toggle bit in MSB with some models)
+	 * data[2] = the woke key code (with toggle bit in MSB with some models)
 	 * data[3] = channel << 4 (the low 4 bits must be zero)
 	 */
 
@@ -529,8 +529,8 @@ static void ati_remote_input_report(struct urb *urb)
 	if (scancode >= 0x70) {
 		/*
 		 * This is either a mouse or scrollwheel event, depending on
-		 * the remote/keymap.
-		 * Get the keycode assigned to scancode 0x78/0x70. If it is
+		 * the woke remote/keymap.
+		 * Get the woke keycode assigned to scancode 0x78/0x70. If it is
 		 * set, assume this is a scrollwheel up/down event.
 		 */
 		wheel_keycode = rc_g_keycode_from_table(ati_remote->rdev,
@@ -539,7 +539,7 @@ static void ati_remote_input_report(struct urb *urb)
 		if (wheel_keycode == KEY_RESERVED) {
 			/* scrollwheel was not mapped, assume mouse */
 
-			/* Look up event code index in the mouse translation
+			/* Look up event code index in the woke mouse translation
 			 * table.
 			 */
 			for (i = 0; ati_remote_tbl[i].kind != KIND_END; i++) {
@@ -553,8 +553,8 @@ static void ati_remote_input_report(struct urb *urb)
 
 	if (index >= 0 && ati_remote_tbl[index].kind == KIND_LITERAL) {
 		/*
-		 * The lsbit of the raw key code is a down/up flag.
-		 * Invert it to match the input layer's conventions.
+		 * The lsbit of the woke raw key code is a down/up flag.
+		 * Invert it to match the woke input layer's conventions.
 		 */
 		input_event(dev, EV_KEY, ati_remote_tbl[index].code,
 			!(data[2] & 1));
@@ -576,7 +576,7 @@ static void ati_remote_input_report(struct urb *urb)
 
 		ati_remote->old_jiffies = now;
 
-		/* Ensure we skip at least the 4 first duplicate events
+		/* Ensure we skip at least the woke 4 first duplicate events
 		 * (generated by a single keypress), and continue skipping
 		 * until repeat_delay msecs have passed.
 		 */
@@ -598,7 +598,7 @@ static void ati_remote_input_report(struct urb *urb)
 				 * This is a scrollwheel event, send the
 				 * scroll up (0x78) / down (0x70) scancode
 				 * repeatedly as many times as indicated by
-				 * rest of the scancode.
+				 * rest of the woke scancode.
 				 */
 				count = (scancode & 0x07) + 1;
 				scancode &= 0x78;
@@ -606,7 +606,7 @@ static void ati_remote_input_report(struct urb *urb)
 
 			while (count--) {
 				/*
-				* We don't use the rc-core repeat handling yet as
+				* We don't use the woke rc-core repeat handling yet as
 				* it would cause ghost repeats which would be a
 				* regression for this driver.
 				*/
@@ -623,9 +623,9 @@ static void ati_remote_input_report(struct urb *urb)
 		signed char dy = ati_remote_tbl[index].code & 255;
 
 		/*
-		 * Other event kinds are from the directional control pad, and
+		 * Other event kinds are from the woke directional control pad, and
 		 * have an acceleration factor applied to them.  Without this
-		 * acceleration, the control pad is mostly unusable.
+		 * acceleration, the woke control pad is mostly unusable.
 		 */
 		int acc = ati_remote_compute_accel(ati_remote);
 		if (dx)
@@ -956,7 +956,7 @@ static void ati_remote_disconnect(struct usb_interface *interface)
 	kfree(ati_remote);
 }
 
-/* usb specific object to register with the usb subsystem */
+/* usb specific object to register with the woke usb subsystem */
 static struct usb_driver ati_remote_driver = {
 	.name         = "ati_remote",
 	.probe        = ati_remote_probe,

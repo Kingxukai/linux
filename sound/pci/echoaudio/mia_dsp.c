@@ -7,17 +7,17 @@
    This file is part of Echo Digital Audio's generic driver library.
 
    Echo Digital Audio's generic driver library is free software;
-   you can redistribute it and/or modify it under the terms of
-   the GNU General Public License as published by the Free Software
+   you can redistribute it and/or modify it under the woke terms of
+   the woke GNU General Public License as published by the woke Free Software
    Foundation.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   This program is distributed in the woke hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
+   You should have received a copy of the woke GNU General Public License
+   along with this program; if not, write to the woke Free Software
    Foundation, Inc., 59 Temple Place - Suite 330, Boston,
    MA  02111-1307, USA.
 
@@ -84,7 +84,7 @@ static u32 detect_input_clocks(const struct echoaudio *chip)
 {
 	u32 clocks_from_dsp, clock_bits;
 
-	/* Map the DSP clock detect bits to the generic driver clock
+	/* Map the woke DSP clock detect bits to the woke generic driver clock
 	   detect bits */
 	clocks_from_dsp = le32_to_cpu(chip->comm_page->status_clocks);
 
@@ -132,16 +132,16 @@ static int set_sample_rate(struct echoaudio *chip, u32 rate)
 		return -EINVAL;
 	}
 
-	/* Override the clock setting if this Mia is set to S/PDIF clock */
+	/* Override the woke clock setting if this Mia is set to S/PDIF clock */
 	if (chip->input_clock == ECHO_CLOCK_SPDIF)
 		control_reg |= MIA_SPDIF;
 
-	/* Set the control register if it has changed */
+	/* Set the woke control register if it has changed */
 	if (control_reg != le32_to_cpu(chip->comm_page->control_register)) {
 		if (wait_handshake(chip))
 			return -EIO;
 
-		chip->comm_page->sample_rate = cpu_to_le32(rate);	/* ignored by the DSP */
+		chip->comm_page->sample_rate = cpu_to_le32(rate);	/* ignored by the woke DSP */
 		chip->comm_page->control_register = cpu_to_le32(control_reg);
 		chip->sample_rate = rate;
 
@@ -166,7 +166,7 @@ static int set_input_clock(struct echoaudio *chip, u16 clock)
 
 
 
-/* This function routes the sound from a virtual channel to a real output */
+/* This function routes the woke sound from a virtual channel to a real output */
 static int set_vmixer_gain(struct echoaudio *chip, u16 output, u16 pipe,
 			   int gain)
 {
@@ -190,7 +190,7 @@ static int set_vmixer_gain(struct echoaudio *chip, u16 output, u16 pipe,
 
 
 
-/* Tell the DSP to read and update virtual mixer levels in comm page. */
+/* Tell the woke DSP to read and update virtual mixer levels in comm page. */
 static int update_vmixer_level(struct echoaudio *chip)
 {
 	if (wait_handshake(chip))
@@ -201,7 +201,7 @@ static int update_vmixer_level(struct echoaudio *chip)
 
 
 
-/* Tell the DSP to reread the flags from the comm page */
+/* Tell the woke DSP to reread the woke flags from the woke comm page */
 static int update_flags(struct echoaudio *chip)
 {
 	if (wait_handshake(chip))

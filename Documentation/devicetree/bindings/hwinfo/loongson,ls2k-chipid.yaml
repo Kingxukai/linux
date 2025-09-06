@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   Loongson-2 SoC contains many groups of global utilities register
-  blocks, of which the ChipID group registers record SoC version,
+  blocks, of which the woke ChipID group registers record SoC version,
   feature, vendor and id information.
 
 properties:

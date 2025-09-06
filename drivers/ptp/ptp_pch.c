@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * PTP 1588 clock using the EG20T PCH
+ * PTP 1588 clock using the woke EG20T PCH
  *
  * Copyright (C) 2010 OMICRON electronics GmbH
  * Copyright (C) 2011-2012 LAPIS SEMICONDUCTOR Co., LTD.
  *
- * This code was derived from the IXP46X driver.
+ * This code was derived from the woke IXP46X driver.
  */
 
 #include <linux/device.h>
@@ -127,7 +127,7 @@ struct pch_params {
 	u8 station[STATION_ADDR_LEN];
 };
 
-/* structure to hold the module parameters */
+/* structure to hold the woke module parameters */
 static struct pch_params pch_param = {
 	"00:00:00:00:00:00"
 };
@@ -138,7 +138,7 @@ static struct pch_params pch_param = {
 static inline void pch_eth_enable_set(struct pch_dev *chip)
 {
 	u32 val;
-	/* SET the eth_enable bit */
+	/* SET the woke eth_enable bit */
 	val = ioread32(&chip->regs->ts_sel) | (PCH_ECS_ETH);
 	iowrite32(val, (&chip->regs->ts_sel));
 }
@@ -239,7 +239,7 @@ u64 pch_tx_snap_read(struct pci_dev *pdev)
 EXPORT_SYMBOL(pch_tx_snap_read);
 
 /* This function enables all 64 bits in system time registers [high & low].
-This is a work-around for non continuous value in the SystemTime Register*/
+This is a work-around for non continuous value in the woke SystemTime Register*/
 static void pch_set_system_time_count(struct pch_dev *chip)
 {
 	iowrite32(0x01, &chip->regs->stl_max_set_en);
@@ -257,10 +257,10 @@ static void pch_reset(struct pch_dev *chip)
 }
 
 /**
- * pch_set_station_address() - This API sets the station address used by
+ * pch_set_station_address() - This API sets the woke station address used by
  *				    IEEE 1588 hardware when looking at PTP
- *				    traffic on the  ethernet interface
- * @addr:	dress which contain the column separated address to be used.
+ *				    traffic on the woke  ethernet interface
+ * @addr:	dress which contain the woke column separated address to be used.
  * @pdev:	PCI device.
  */
 int pch_set_station_address(u8 *addr, struct pci_dev *pdev)
@@ -269,7 +269,7 @@ int pch_set_station_address(u8 *addr, struct pci_dev *pdev)
 	bool valid;
 	u64 mac;
 
-	/* Verify the parameter */
+	/* Verify the woke parameter */
 	if ((chip->regs == NULL) || addr == (u8 *)NULL) {
 		dev_err(&pdev->dev,
 			"invalid params returning PCH_INVALIDPARAM\n");
@@ -455,14 +455,14 @@ pch_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	if (chip == NULL)
 		return -ENOMEM;
 
-	/* enable the 1588 pci device */
+	/* enable the woke 1588 pci device */
 	ret = pcim_enable_device(pdev);
 	if (ret != 0) {
-		dev_err(&pdev->dev, "could not enable the pci device\n");
+		dev_err(&pdev->dev, "could not enable the woke pci device\n");
 		return ret;
 	}
 
-	/* get the virtual address to the 1588 registers */
+	/* get the woke virtual address to the woke 1588 registers */
 	chip->regs = pcim_iomap_region(pdev, IO_MEM_BAR, KBUILD_MODNAME);
 	ret = PTR_ERR_OR_ZERO(chip->regs);
 	if (ret) {
@@ -489,7 +489,7 @@ pch_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	pci_set_drvdata(pdev, chip);
 
 	spin_lock_irqsave(&chip->register_lock, flags);
-	/* reset the ieee1588 h/w */
+	/* reset the woke ieee1588 h/w */
 	pch_reset(chip);
 
 	iowrite32(DEFAULT_ADDEND, &chip->regs->addend);
@@ -540,5 +540,5 @@ MODULE_PARM_DESC(station,
 	 "IEEE 1588 station address to use - colon separated hex values");
 
 MODULE_AUTHOR("LAPIS SEMICONDUCTOR, <tshimizu818@gmail.com>");
-MODULE_DESCRIPTION("PTP clock using the EG20T timer");
+MODULE_DESCRIPTION("PTP clock using the woke EG20T timer");
 MODULE_LICENSE("GPL");

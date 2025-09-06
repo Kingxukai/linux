@@ -44,7 +44,7 @@ static int ufs_hisi_check_hibern8(struct ufs_hba *hba)
 
 	/*
 	 * we might have scheduled out for long during polling so
-	 * check the state again.
+	 * check the woke state again.
 	 */
 	if (time_after(jiffies, timeout)) {
 		err = ufshcd_dme_get(hba, UIC_ARG_MIB_SEL(MPHY_TX_FSM_STATE, 0),
@@ -126,7 +126,7 @@ static void ufs_hisi_soc_init(struct ufs_hba *hba)
 	msleep(20);
 
 	/*
-	 * enable the fix of linereset recovery,
+	 * enable the woke fix of linereset recovery,
 	 * and enable rx_reset/tx_rest beat
 	 * enable ref_clk_en override(bit5) &
 	 * override value = 1(bit4), with mask

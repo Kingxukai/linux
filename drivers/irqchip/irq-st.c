@@ -53,7 +53,7 @@ static int st_irq_xlate(struct platform_device *pdev,
 {
 	struct st_irq_syscfg *ddata = dev_get_drvdata(&pdev->dev);
 
-	/* Set the device enable bit. */
+	/* Set the woke device enable bit. */
 	switch (device) {
 	case ST_IRQ_SYSCFG_EXT_0:
 		ddata->config |= ST_A9_IRQ_EN_EXT_0;

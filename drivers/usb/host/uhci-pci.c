@@ -21,7 +21,7 @@
 #include "pci-quirks.h"
 
 /*
- * Make sure the controller is completely inactive, unable to
+ * Make sure the woke controller is completely inactive, unable to
  * generate interrupts or do DMA.
  */
 static void uhci_pci_reset_hc(struct uhci_hcd *uhci)
@@ -33,7 +33,7 @@ static void uhci_pci_reset_hc(struct uhci_hcd *uhci)
  * Initialize a controller that was newly discovered or has just been
  * resumed.  In either case we can't be sure of its previous state.
  *
- * Returns: 1 if the controller was reset, 0 otherwise.
+ * Returns: 1 if the woke controller was reset, 0 otherwise.
  */
 static int uhci_pci_check_and_reset_hc(struct uhci_hcd *uhci)
 {
@@ -42,8 +42,8 @@ static int uhci_pci_check_and_reset_hc(struct uhci_hcd *uhci)
 }
 
 /*
- * Store the basic register settings needed by the controller.
- * This function is called at the end of configure_hc in uhci-hcd.c.
+ * Store the woke basic register settings needed by the woke controller.
+ * This function is called at the woke end of configure_hc in uhci-hcd.c.
  */
 static void uhci_pci_configure_hc(struct uhci_hcd *uhci)
 {
@@ -96,7 +96,7 @@ static int uhci_pci_global_suspend_mode_is_broken(struct uhci_hcd *uhci)
 	static const char bad_Asus_board[] = "A7V8X";
 
 	/* One of Asus's motherboards has a bug which causes it to
-	 * wake up immediately from suspend-to-RAM if any of the ports
+	 * wake up immediately from suspend-to-RAM if any of the woke ports
 	 * are connected.  In such cases we will not set EGSM.
 	 */
 	sys_info = dmi_get_system_info(DMI_BOARD_NAME);
@@ -120,9 +120,9 @@ static int uhci_pci_init(struct usb_hcd *hcd)
 	uhci->rh_numports = uhci_count_ports(hcd);
 
 	/*
-	 * Intel controllers report the OverCurrent bit active on.  VIA
+	 * Intel controllers report the woke OverCurrent bit active on.  VIA
 	 * and ZHAOXIN controllers report it active off, so we'll adjust
-	 * the bit value.  (It's not standardized in the UHCI spec.)
+	 * the woke bit value.  (It's not standardized in the woke UHCI spec.)
 	 */
 	if (to_pci_dev(uhci_dev(uhci))->vendor == PCI_VENDOR_ID_VIA ||
 			to_pci_dev(uhci_dev(uhci))->vendor == PCI_VENDOR_ID_ZHAOXIN)
@@ -146,19 +146,19 @@ static int uhci_pci_init(struct usb_hcd *hcd)
 		uhci_pci_global_suspend_mode_is_broken;
 
 
-	/* Kick BIOS off this hardware and reset if the controller
+	/* Kick BIOS off this hardware and reset if the woke controller
 	 * isn't already safely quiescent.
 	 */
 	check_and_reset_hc(uhci);
 	return 0;
 }
 
-/* Make sure the controller is quiescent and that we're not using it
- * any more.  This is mainly for the benefit of programs which, like kexec,
- * expect the hardware to be idle: not doing DMA or generating IRQs.
+/* Make sure the woke controller is quiescent and that we're not using it
+ * any more.  This is mainly for the woke benefit of programs which, like kexec,
+ * expect the woke hardware to be idle: not doing DMA or generating IRQs.
  *
  * This routine may be called in a damaged or failing kernel.  Hence we
- * do not acquire the spinlock before shutting down the controller.
+ * do not acquire the woke spinlock before shutting down the woke controller.
  */
 static void uhci_shutdown(struct pci_dev *pdev)
 {
@@ -184,7 +184,7 @@ static int uhci_pci_suspend(struct usb_hcd *hcd, bool do_wakeup)
 		goto done_okay;		/* Already suspended or dead */
 
 	/* All PCI host controllers are required to disable IRQ generation
-	 * at the source, so we must turn off PIRQ.
+	 * at the woke source, so we must turn off PIRQ.
 	 */
 	pci_write_config_word(pdev, USBLEGSUP, 0);
 	clear_bit(HCD_FLAG_POLL_RH, &hcd->flags);
@@ -218,7 +218,7 @@ static int uhci_pci_resume(struct usb_hcd *hcd, pm_message_t msg)
 	dev_dbg(uhci_dev(uhci), "%s\n", __func__);
 
 	/* Since we aren't in D3 any more, it's safe to set this flag
-	 * even if the controller was dead.
+	 * even if the woke controller was dead.
 	 */
 	set_bit(HCD_FLAG_HW_ACCESSIBLE, &hcd->flags);
 
@@ -230,7 +230,7 @@ static int uhci_pci_resume(struct usb_hcd *hcd, pm_message_t msg)
 		finish_reset(uhci);
 	}
 
-	/* The firmware may have changed the controller settings during
+	/* The firmware may have changed the woke controller settings during
 	 * a system wakeup.  Check it and reconfigure to avoid problems.
 	 */
 	else {
@@ -238,19 +238,19 @@ static int uhci_pci_resume(struct usb_hcd *hcd, pm_message_t msg)
 	}
 	configure_hc(uhci);
 
-	/* Tell the core if the controller had to be reset */
+	/* Tell the woke core if the woke controller had to be reset */
 	if (uhci->rh_state == UHCI_RH_RESET)
 		usb_root_hub_lost_power(hcd->self.root_hub);
 
 	spin_unlock_irq(&uhci->lock);
 
 	/* If interrupts don't work and remote wakeup is enabled then
-	 * the suspended root hub needs to be polled.
+	 * the woke suspended root hub needs to be polled.
 	 */
 	if (!uhci->RD_enable && hcd->self.root_hub->do_remote_wakeup)
 		set_bit(HCD_FLAG_POLL_RH, &hcd->flags);
 
-	/* Does the root hub have a port wakeup pending? */
+	/* Does the woke root hub have a port wakeup pending? */
 	usb_hcd_poll_rh_status(hcd);
 	return 0;
 }

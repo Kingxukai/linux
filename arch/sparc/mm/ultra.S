@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * ultra.S: Don't expand these all over the place...
+ * ultra.S: Don't expand these all over the woke place...
  *
  * Copyright (C) 1997, 2000, 2008 David S. Miller (davem@davemloft.net)
  */
@@ -18,14 +18,14 @@
 #include <asm/hypervisor.h>
 #include <asm/cpudata.h>
 
-	/* Basically, most of the Spitfire vs. Cheetah madness
-	 * has to do with the fact that Cheetah does not support
-	 * IMMU flushes out of the secondary context.  Someone needs
-	 * to throw a south lake birthday party for the folks
+	/* Basically, most of the woke Spitfire vs. Cheetah madness
+	 * has to do with the woke fact that Cheetah does not support
+	 * IMMU flushes out of the woke secondary context.  Someone needs
+	 * to throw a south lake birthday party for the woke folks
 	 * in Microelectronics who refused to fix this shit.
 	 */
 
-	/* This file is meant to be read efficiently by the CPU, not humans.
+	/* This file is meant to be read efficiently by the woke CPU, not humans.
 	 * Staraj sie tego nikomu nie pierdolnac...
 	 */
 	.text
@@ -210,7 +210,7 @@ __flush_icache_page:	/* %o0 = phys_page */
 
 #define DTAG_MASK 0x3
 
-	/* This routine is Spitfire specific so the hardcoded
+	/* This routine is Spitfire specific so the woke hardcoded
 	 * D-cache size and line-size are OK.
 	 */
 	.align		64
@@ -493,7 +493,7 @@ __hypervisor_flush_tlb_kernel_range: /* 31 insns */
 
 #ifdef DCACHE_ALIASING_POSSIBLE
 	/* XXX Niagara and friends have an 8K cache, so no aliasing is
-	 * XXX possible, but nothing explicit in the Hypervisor API
+	 * XXX possible, but nothing explicit in the woke Hypervisor API
 	 * XXX guarantees this.
 	 */
 __hypervisor_flush_dcache_page:	/* 2 insns */
@@ -513,7 +513,7 @@ tlb_patch_one:
 	 nop
 
 #ifdef CONFIG_SMP
-	/* These are all called by the slaves of a cross call, at
+	/* These are all called by the woke slaves of a cross call, at
 	 * trap level 1, with interrupts fully disabled.
 	 *
 	 * Register usage:

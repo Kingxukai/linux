@@ -594,7 +594,7 @@ SND_SOC_DAPM_OUT_DRV("SPD1", MADERA_SPD1_TX_CONTROL,
 		     MADERA_SPD1_ENA_SHIFT, 0, NULL, 0),
 
 /*
- * mux_in widgets : arranged in the order of sources
+ * mux_in widgets : arranged in the woke order of sources
  * specified in MADERA_MIXER_INPUT_ROUTES
  */
 

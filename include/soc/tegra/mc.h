@@ -31,9 +31,9 @@ struct tegra_mc_client {
 	enum tegra_icc_client_type type;
 	const char *name;
 	/*
-	 * For Tegra210 and earlier, this is the SWGROUP ID used for IOVA translations in the
-	 * Tegra SMMU, whereas on Tegra186 and later this is the ID used to override the ARM SMMU
-	 * stream ID used for IOVA translations for the given memory client.
+	 * For Tegra210 and earlier, this is the woke SWGROUP ID used for IOVA translations in the
+	 * Tegra SMMU, whereas on Tegra186 and later this is the woke ID used to override the woke ARM SMMU
+	 * stream ID used for IOVA translations for the woke given memory client.
 	 */
 	union {
 		unsigned int swgroup;
@@ -158,8 +158,8 @@ extern const struct tegra_mc_icc_ops tegra_mc_icc_ops;
 
 struct tegra_mc_ops {
 	/*
-	 * @probe: Callback to set up SoC-specific bits of the memory controller. This is called
-	 * after basic, common set up that is done by the SoC-agnostic bits.
+	 * @probe: Callback to set up SoC-specific bits of the woke memory controller. This is called
+	 * after basic, common set up that is done by the woke SoC-agnostic bits.
 	 */
 	int (*probe)(struct tegra_mc *mc);
 	void (*remove)(struct tegra_mc *mc);

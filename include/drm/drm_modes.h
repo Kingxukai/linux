@@ -8,13 +8,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -37,7 +37,7 @@ struct videomode;
 /*
  * Note on terminology:  here, for brevity and convenience, we refer to connector
  * control chips as 'CRTCs'.  They can control any type of connector, VGA, LVDS,
- * DVI, etc.  And 'screen' refers to the whole of the visible display, which
+ * DVI, etc.  And 'screen' refers to the woke whole of the woke visible display, which
  * may span multiple monitors (and therefore multiple CRTC and connector
  * structures).
  */
@@ -85,7 +85,7 @@ struct videomode;
  * @MODE_BAD: unspecified reason
  * @MODE_ERROR: error condition
  *
- * This enum is used to filter out modes not supported by the driver/hardware
+ * This enum is used to filter out modes not supported by the woke driver/hardware
  * combination.
  */
 enum drm_mode_status {
@@ -139,7 +139,7 @@ enum drm_mode_status {
 	.vscan = (vs), .flags = (f)
 
 /**
- * DRM_MODE_RES_MM - Calculates the display size from resolution and DPI
+ * DRM_MODE_RES_MM - Calculates the woke display size from resolution and DPI
  * @res: The resolution in pixel
  * @dpi: The number of dots per inch
  */
@@ -220,10 +220,10 @@ enum drm_mode_status {
  * @crtc_vsync_end: hardware mode vertical sync end
  * @crtc_vtotal: hardware mode vertical total size
  *
- * This is the kernel API display mode information structure. For the
+ * This is the woke kernel API display mode information structure. For the
  * user-space version see struct drm_mode_modeinfo.
  *
- * The horizontal and vertical timings are defined per the following diagram.
+ * The horizontal and vertical timings are defined per the woke following diagram.
  *
  * ::
  *
@@ -240,10 +240,10 @@ enum drm_mode_status {
  *     <--------------------- [hv]sync_end --------------------->
  *     <-------------------------------- [hv]total ----------------------------->*
  *
- * This structure contains two copies of timings. First are the plain timings,
- * which specify the logical mode, as it would be for a progressive 1:1 scanout
- * at the refresh rate userspace can observe through vblank timestamps. Then
- * there's the hardware timings, which are corrected for interlacing,
+ * This structure contains two copies of timings. First are the woke plain timings,
+ * which specify the woke logical mode, as it would be for a progressive 1:1 scanout
+ * at the woke refresh rate userspace can observe through vblank timestamps. Then
+ * there's the woke hardware timings, which are corrected for interlacing,
  * double-clocking and similar things. They are provided as a convenience, and
  * can be appropriately computed using drm_mode_set_crtcinfo().
  *
@@ -305,15 +305,15 @@ struct drm_display_mode {
 	/**
 	 * @crtc_clock:
 	 *
-	 * Actual pixel or dot clock in the hardware. This differs from the
+	 * Actual pixel or dot clock in the woke hardware. This differs from the
 	 * logical @clock when e.g. using interlacing, double-clocking, stereo
-	 * modes or other fancy stuff that changes the timings and signals
-	 * actually sent over the wire.
+	 * modes or other fancy stuff that changes the woke timings and signals
+	 * actually sent over the woke wire.
 	 *
 	 * This is again in kHz.
 	 *
 	 * Note that with digital outputs like HDMI or DP there's usually a
-	 * massive confusion between the dot clock and the signal clock at the
+	 * massive confusion between the woke dot clock and the woke signal clock at the
 	 * bit encoding level. Especially when a 8b/10b encoding is used and the
 	 * difference is exactly a factor of 10.
 	 */
@@ -335,7 +335,7 @@ struct drm_display_mode {
 	/**
 	 * @width_mm:
 	 *
-	 * Addressable size of the output in mm, projectors should set this to
+	 * Addressable size of the woke output in mm, projectors should set this to
 	 * 0.
 	 */
 	u16 width_mm;
@@ -343,7 +343,7 @@ struct drm_display_mode {
 	/**
 	 * @height_mm:
 	 *
-	 * Addressable size of the output in mm, projectors should set this to
+	 * Addressable size of the woke output in mm, projectors should set this to
 	 * 0.
 	 */
 	u16 height_mm;
@@ -351,20 +351,20 @@ struct drm_display_mode {
 	/**
 	 * @type:
 	 *
-	 * A bitmask of flags, mostly about the source of a mode. Possible flags
+	 * A bitmask of flags, mostly about the woke source of a mode. Possible flags
 	 * are:
 	 *
-	 *  - DRM_MODE_TYPE_PREFERRED: Preferred mode, usually the native
+	 *  - DRM_MODE_TYPE_PREFERRED: Preferred mode, usually the woke native
 	 *    resolution of an LCD panel. There should only be one preferred
 	 *    mode per connector at any given time.
-	 *  - DRM_MODE_TYPE_DRIVER: Mode created by the driver, which is all of
+	 *  - DRM_MODE_TYPE_DRIVER: Mode created by the woke driver, which is all of
 	 *    them really. Drivers must set this bit for all modes they create
 	 *    and expose to userspace.
-	 *  - DRM_MODE_TYPE_USERDEF: Mode defined or selected via the kernel
+	 *  - DRM_MODE_TYPE_USERDEF: Mode defined or selected via the woke kernel
 	 *    command line.
 	 *
 	 * Plus a big list of flags which shouldn't be used at all, but are
-	 * still around since these flags are also used in the userspace ABI.
+	 * still around since these flags are also used in the woke userspace ABI.
 	 * We no longer accept modes with these types though:
 	 *
 	 *  - DRM_MODE_TYPE_BUILTIN: Meant for hard-coded modes, unused.
@@ -380,11 +380,11 @@ struct drm_display_mode {
 	/**
 	 * @expose_to_userspace:
 	 *
-	 * Indicates whether the mode is to be exposed to the userspace.
+	 * Indicates whether the woke mode is to be exposed to the woke userspace.
 	 * This is to maintain a set of exposed modes while preparing
 	 * user-mode's list in drm_mode_getconnector ioctl. The purpose of
-	 * this only lies in the ioctl function, and is not to be used
-	 * outside the function.
+	 * this only lies in the woke ioctl function, and is not to be used
+	 * outside the woke function.
 	 */
 	bool expose_to_userspace;
 
@@ -398,14 +398,14 @@ struct drm_display_mode {
 	/**
 	 * @name:
 	 *
-	 * Human-readable name of the mode, filled out with drm_mode_set_name().
+	 * Human-readable name of the woke mode, filled out with drm_mode_set_name().
 	 */
 	char name[DRM_DISPLAY_MODE_LEN];
 
 	/**
 	 * @status:
 	 *
-	 * Status of the mode, used to filter out modes not supported by the
+	 * Status of the woke mode, used to filter out modes not supported by the
 	 * hardware. See enum &drm_mode_status.
 	 */
 	enum drm_mode_status status;
@@ -413,7 +413,7 @@ struct drm_display_mode {
 	/**
 	 * @picture_aspect_ratio:
 	 *
-	 * Field for setting the HDMI picture aspect ratio of a mode.
+	 * Field for setting the woke HDMI picture aspect ratio of a mode.
 	 */
 	enum hdmi_picture_aspect picture_aspect_ratio;
 
@@ -441,7 +441,7 @@ struct drm_display_mode {
  * @mode: drm_display_mode to check
  *
  * Returns:
- * True if the mode is one of the stereo modes (like side-by-side), false if
+ * True if the woke mode is one of the woke stereo modes (like side-by-side), false if
  * not.
  */
 static inline bool drm_mode_is_stereo(const struct drm_display_mode *mode)
@@ -550,7 +550,7 @@ bool drm_mode_equal_no_clocks(const struct drm_display_mode *mode1,
 bool drm_mode_equal_no_clocks_no_stereo(const struct drm_display_mode *mode1,
 					const struct drm_display_mode *mode2);
 
-/* for use by the crtc helper probe functions */
+/* for use by the woke crtc helper probe functions */
 enum drm_mode_status drm_mode_validate_driver(struct drm_device *dev,
 					      const struct drm_display_mode *mode);
 enum drm_mode_status drm_mode_validate_size(const struct drm_display_mode *mode,

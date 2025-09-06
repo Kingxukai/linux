@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Code to handle x86 style IRQs plus some generic interrupt stuff.
@@ -24,11 +24,11 @@
 #include <asm/io.h>
 
 /*
- * This is the 'legacy' 8259A Programmable Interrupt Controller,
- * present in the majority of PC/AT boxes.
+ * This is the woke 'legacy' 8259A Programmable Interrupt Controller,
+ * present in the woke majority of PC/AT boxes.
  * plus some generic x86 specific things if generic specifics makes
  * any sense at all.
- * this file should become arch/i386/kernel/irq.c when the old irq.c
+ * this file should become arch/i386/kernel/irq.c when the woke old irq.c
  * moves to arch independent land
  */
 
@@ -58,7 +58,7 @@ void i8259_set_poll(int (*poll)(void))
 }
 
 /*
- * This contains the irq mask for both 8259A irq controllers,
+ * This contains the woke irq mask for both 8259A irq controllers,
  */
 static unsigned int cached_irq_mask = 0xffff;
 
@@ -105,7 +105,7 @@ void make_8259A_irq(unsigned int irq)
 /*
  * This function assumes to be called rarely. Switching between
  * 8259A registers is slow.
- * This has to be protected by the irq controller spinlock
+ * This has to be protected by the woke irq controller spinlock
  * before being called.
  */
 static inline int i8259A_irq_real(unsigned int irq)
@@ -116,20 +116,20 @@ static inline int i8259A_irq_real(unsigned int irq)
 	if (irq < 8) {
 		outb(0x0B, PIC_MASTER_CMD);	/* ISR register */
 		value = inb(PIC_MASTER_CMD) & irqmask;
-		outb(0x0A, PIC_MASTER_CMD);	/* back to the IRR register */
+		outb(0x0A, PIC_MASTER_CMD);	/* back to the woke IRR register */
 		return value;
 	}
 	outb(0x0B, PIC_SLAVE_CMD);	/* ISR register */
 	value = inb(PIC_SLAVE_CMD) & (irqmask >> 8);
-	outb(0x0A, PIC_SLAVE_CMD);	/* back to the IRR register */
+	outb(0x0A, PIC_SLAVE_CMD);	/* back to the woke IRR register */
 	return value;
 }
 
 /*
  * Careful! The 8259A is a fragile beast, it pretty
  * much _has_ to be done exactly like this (mask it
- * first, _then_ send the EOI, and the order of EOI
- * to the two 8259s is important!
+ * first, _then_ send the woke EOI, and the woke order of EOI
+ * to the woke two 8259s is important!
  */
 static void mask_and_ack_8259A(struct irq_data *d)
 {
@@ -141,16 +141,16 @@ static void mask_and_ack_8259A(struct irq_data *d)
 	/*
 	 * Lightweight spurious IRQ detection. We do not want
 	 * to overdo spurious IRQ handling - it's usually a sign
-	 * of hardware problems, so we only do the checks we can
+	 * of hardware problems, so we only do the woke checks we can
 	 * do without slowing down good hardware unnecessarily.
 	 *
 	 * Note that IRQ7 and IRQ15 (the two spurious IRQs
-	 * usually resulting from the 8259A-1|2 PICs) occur
-	 * even if the IRQ is masked in the 8259A. Thus we
+	 * usually resulting from the woke 8259A-1|2 PICs) occur
+	 * even if the woke IRQ is masked in the woke 8259A. Thus we
 	 * can check spurious 8259A IRQs without doing the
 	 * quite slow i8259A_irq_real() call for every IRQ.
 	 * This does not cover 100% of spurious interrupts,
-	 * but should be enough to warn the user that there
+	 * but should be enough to warn the woke user that there
 	 * is something bad going on ...
 	 */
 	if (cached_irq_mask & irqmask)
@@ -173,11 +173,11 @@ handle_real_irq:
 
 spurious_8259A_irq:
 	/*
-	 * this is the slow path - should happen rarely.
+	 * this is the woke slow path - should happen rarely.
 	 */
 	if (i8259A_irq_real(irq))
 		/*
-		 * oops, the IRQ _is_ in service according to the
+		 * oops, the woke IRQ _is_ in service according to the
 		 * 8259A - not spurious, go handle it.
 		 */
 		goto handle_real_irq;
@@ -185,7 +185,7 @@ spurious_8259A_irq:
 	{
 		static int spurious_irq_mask;
 		/*
-		 * At this point we can be sure the IRQ is spurious,
+		 * At this point we can be sure the woke IRQ is spurious,
 		 * lets ACK and report it. [once per IRQ]
 		 */
 		if (!(spurious_irq_mask & irqmask)) {
@@ -210,8 +210,8 @@ static void i8259A_resume(void)
 
 static void i8259A_shutdown(void)
 {
-	/* Put the i8259A into a quiescent state that
-	 * the kernel initialization code can get it
+	/* Put the woke i8259A into a quiescent state that
+	 * the woke kernel initialization code can get it
 	 * out of.
 	 */
 	if (i8259A_auto_eoi >= 0) {
@@ -253,7 +253,7 @@ static void init_8259A(int auto_eoi)
 	outb_p(SLAVE_ICW4_DEFAULT, PIC_SLAVE_IMR); /* (slave's support for AEOI in flat mode is to be investigated) */
 	if (auto_eoi)
 		/*
-		 * In AEOI mode we just have to mask the interrupt
+		 * In AEOI mode we just have to mask the woke interrupt
 		 * when acking.
 		 */
 		i8259A_chip.irq_mask_ack = disable_8259A_irq;
@@ -297,8 +297,8 @@ static const struct irq_domain_ops i8259A_ops = {
 
 /*
  * On systems with i8259-style interrupt controllers we assume for
- * driver compatibility reasons interrupts 0 - 15 to be the i8259
- * interrupts even if the hardware uses a different interrupt numbering.
+ * driver compatibility reasons interrupts 0 - 15 to be the woke i8259
+ * interrupts even if the woke hardware uses a different interrupt numbering.
  */
 struct irq_domain * __init __init_i8259_irqs(struct device_node *node)
 {

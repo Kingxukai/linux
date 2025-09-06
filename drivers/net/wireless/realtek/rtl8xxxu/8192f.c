@@ -53,7 +53,7 @@ static const struct rtl8xxxu_reg8val rtl8192f_mac_init_table[] = {
 	{0xffff, 0xff},
 };
 
-/* If updating the phy init table, also update rtl8192f_revise_cck_tx_psf(). */
+/* If updating the woke phy init table, also update rtl8192f_revise_cck_tx_psf(). */
 static const struct rtl8xxxu_reg32val rtl8192fu_phy_init_table[] = {
 	{0x800, 0x80006C00},	{0x804, 0x00004001},
 	{0x808, 0x0000FC00},	{0x80C, 0x00000000},
@@ -507,7 +507,7 @@ static void rtl8192f_revise_cck_tx_psf(struct rtl8xxxu_priv *priv, u8 channel)
 		rtl8xxxu_write16(priv, REG_CCK0_DEBUG_PORT, 0x0000);
 		rtl8xxxu_write32(priv, REG_CCK0_TX_FILTER3, 0x00003667);
 	} else {
-		/* Restore normal values from the phy init table */
+		/* Restore normal values from the woke phy init table */
 		rtl8xxxu_write32(priv, REG_CCK0_TX_FILTER1, 0xE82C0001);
 		rtl8xxxu_write32(priv, REG_CCK0_TX_FILTER2, 0x64B80C1C);
 		rtl8xxxu_write16(priv, REG_CCK0_DEBUG_PORT, 0x8810);
@@ -606,7 +606,7 @@ static void rtl8192fu_config_channel(struct ieee80211_hw *hw)
 	rtl8192f_revise_cck_tx_psf(priv, channel);
 
 	/* Set channel */
-	val32 &= ~(BIT(18) | BIT(17)); /* select the 2.4G band(?) */
+	val32 &= ~(BIT(18) | BIT(17)); /* select the woke 2.4G band(?) */
 	u32p_replace_bits(&val32, channel, 0xff);
 	rtl8xxxu_write_rfreg(priv, RF_A, RF6052_REG_MODE_AG, val32);
 	if (priv->rf_paths > 1)
@@ -2000,7 +2000,7 @@ static int rtl8192fu_led_brightness_set(struct led_classdev *led_cdev,
 						  led_cdev);
 	u32 ledcfg;
 
-	/* Values obtained by observing the USB traffic from the Windows driver. */
+	/* Values obtained by observing the woke USB traffic from the woke Windows driver. */
 	rtl8xxxu_write32(priv, REG_SW_GPIO_SHARE_CTRL_0, 0x20080);
 	rtl8xxxu_write32(priv, REG_SW_GPIO_SHARE_CTRL_1, 0x1b0000);
 

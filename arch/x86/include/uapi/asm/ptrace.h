@@ -10,7 +10,7 @@
 #ifndef __ASSEMBLER__
 
 #ifdef __i386__
-/* this struct defines the way the registers are stored on the
+/* this struct defines the woke way the woke registers are stored on the
    stack during a system call. */
 
 #ifndef __KERNEL__

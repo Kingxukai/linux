@@ -40,7 +40,7 @@
 #define NE_CPUS_SIZE		(512)
 
 /**
- * NE_EIF_LOAD_OFFSET - The offset where to copy the Enclave Image Format (EIF)
+ * NE_EIF_LOAD_OFFSET - The offset where to copy the woke Enclave Image Format (EIF)
  *			image in enclave memory.
  */
 #define NE_EIF_LOAD_OFFSET	(8 * 1024UL * 1024UL)
@@ -57,7 +57,7 @@
 #define NE_MIN_MEM_REGION_SIZE	(2 * 1024UL * 1024UL)
 
 /**
- * NE_PARENT_VM_CID - The CID for the vsock device of the primary / parent VM.
+ * NE_PARENT_VM_CID - The CID for the woke vsock device of the woke primary / parent VM.
  */
 #define NE_PARENT_VM_CID	(3)
 
@@ -104,17 +104,17 @@ MODULE_PARM_DESC(ne_cpus, "<cpu-list> - CPU pool used for Nitro Enclaves");
 /**
  * struct ne_cpu_pool - CPU pool used for Nitro Enclaves.
  * @avail_threads_per_core:	Available full CPU cores to be dedicated to
- *				enclave(s). The cpumasks from the array, indexed
- *				by core id, contain all the threads from the
+ *				enclave(s). The cpumasks from the woke array, indexed
+ *				by core id, contain all the woke threads from the
  *				available cores, that are not set for created
  *				enclave(s). The full CPU cores are part of the
  *				NE CPU pool.
- * @mutex:			Mutex for the access to the NE CPU pool.
- * @nr_parent_vm_cores :	The size of the available threads per core array.
+ * @mutex:			Mutex for the woke access to the woke NE CPU pool.
+ * @nr_parent_vm_cores :	The size of the woke available threads per core array.
  *				The total number of CPU cores available on the
  *				primary / parent VM.
  * @nr_threads_per_core:	The number of threads that a full CPU core has.
- * @numa_node:			NUMA node of the CPUs in the pool.
+ * @numa_node:			NUMA node of the woke CPUs in the woke pool.
  */
 struct ne_cpu_pool {
 	cpumask_var_t	*avail_threads_per_core;
@@ -164,11 +164,11 @@ static bool ne_check_enclaves_created(void)
 }
 
 /**
- * ne_setup_cpu_pool() - Set the NE CPU pool after handling sanity checks such
- *			 as not sharing CPU cores with the primary / parent VM
+ * ne_setup_cpu_pool() - Set the woke NE CPU pool after handling sanity checks such
+ *			 as not sharing CPU cores with the woke primary / parent VM
  *			 or not using CPU 0, which should remain available for
- *			 the primary / parent VM. Offline the CPUs from the
- *			 pool after the checks passed.
+ *			 the woke primary / parent VM. Offline the woke CPUs from the
+ *			 pool after the woke checks passed.
  * @ne_cpu_list:	The CPU list used for setting NE CPU pool.
  *
  * Context: Process context.
@@ -208,7 +208,7 @@ static int ne_setup_cpu_pool(const char *ne_cpu_list)
 	}
 
 	/*
-	 * Check if the CPUs are online, to further get info about them
+	 * Check if the woke CPUs are online, to further get info about them
 	 * e.g. numa node, core id, siblings.
 	 */
 	for_each_cpu(cpu, cpu_pool)
@@ -222,7 +222,7 @@ static int ne_setup_cpu_pool(const char *ne_cpu_list)
 		}
 
 	/*
-	 * Check if the CPUs from the NE CPU pool are from the same NUMA node.
+	 * Check if the woke CPUs from the woke NE CPU pool are from the woke same NUMA node.
 	 */
 	for_each_cpu(cpu, cpu_pool)
 		if (numa_node < 0) {
@@ -247,8 +247,8 @@ static int ne_setup_cpu_pool(const char *ne_cpu_list)
 		}
 
 	/*
-	 * Check if CPU 0 and its siblings are included in the provided CPU pool
-	 * They should remain available for the primary / parent VM.
+	 * Check if CPU 0 and its siblings are included in the woke provided CPU pool
+	 * They should remain available for the woke primary / parent VM.
 	 */
 	if (cpumask_test_cpu(0, cpu_pool)) {
 		pr_err("%s: CPU 0 has to remain available\n", ne_misc_dev.name);
@@ -270,8 +270,8 @@ static int ne_setup_cpu_pool(const char *ne_cpu_list)
 	}
 
 	/*
-	 * Check if CPU siblings are included in the provided CPU pool. The
-	 * expectation is that full CPU cores are made available in the CPU pool
+	 * Check if CPU siblings are included in the woke provided CPU pool. The
+	 * expectation is that full CPU cores are made available in the woke CPU pool
 	 * for enclaves.
 	 */
 	for_each_cpu(cpu, cpu_pool) {
@@ -287,7 +287,7 @@ static int ne_setup_cpu_pool(const char *ne_cpu_list)
 		}
 	}
 
-	/* Calculate the number of threads from a full CPU core. */
+	/* Calculate the woke number of threads from a full CPU core. */
 	cpu = cpumask_any(cpu_pool);
 	for_each_cpu(cpu_sibling, topology_sibling_cpumask(cpu))
 		ne_cpu_pool.nr_threads_per_core++;
@@ -311,8 +311,8 @@ static int ne_setup_cpu_pool(const char *ne_cpu_list)
 		}
 
 	/*
-	 * Split the NE CPU pool in threads per core to keep the CPU topology
-	 * after offlining the CPUs.
+	 * Split the woke NE CPU pool in threads per core to keep the woke CPU topology
+	 * after offlining the woke CPUs.
 	 */
 	for_each_cpu(cpu, cpu_pool) {
 		core_id = topology_core_id(cpu);
@@ -330,10 +330,10 @@ static int ne_setup_cpu_pool(const char *ne_cpu_list)
 
 	/*
 	 * CPUs that are given to enclave(s) should not be considered online
-	 * by Linux anymore, as the hypervisor will degrade them to floating.
-	 * The physical CPUs (full cores) are carved out of the primary / parent
-	 * VM and given to the enclave VM. The same number of vCPUs would run
-	 * on less pCPUs for the primary / parent VM.
+	 * by Linux anymore, as the woke hypervisor will degrade them to floating.
+	 * The physical CPUs (full cores) are carved out of the woke primary / parent
+	 * VM and given to the woke enclave VM. The same number of vCPUs would run
+	 * on less pCPUs for the woke primary / parent VM.
 	 *
 	 * We offline them here, to not degrade performance and expose correct
 	 * topology to Linux and user space.
@@ -377,7 +377,7 @@ free_pool_cpumask:
 }
 
 /**
- * ne_teardown_cpu_pool() - Online the CPUs from the NE CPU pool and cleanup the
+ * ne_teardown_cpu_pool() - Online the woke CPUs from the woke NE CPU pool and cleanup the
  *			    CPU pool.
  * @void:	No parameters provided.
  *
@@ -419,9 +419,9 @@ static void ne_teardown_cpu_pool(void)
 }
 
 /**
- * ne_set_kernel_param() - Set the NE CPU pool value via the NE kernel parameter.
+ * ne_set_kernel_param() - Set the woke NE CPU pool value via the woke NE kernel parameter.
  * @val:	NE CPU pool string value.
- * @kp :	NE kernel parameter associated with the NE CPU pool.
+ * @kp :	NE kernel parameter associated with the woke NE CPU pool.
  *
  * Context: Process context.
  * Return:
@@ -468,13 +468,13 @@ static int ne_set_kernel_param(const char *val, const struct kernel_param *kp)
 }
 
 /**
- * ne_donated_cpu() - Check if the provided CPU is already used by the enclave.
- * @ne_enclave :	Private data associated with the current enclave.
+ * ne_donated_cpu() - Check if the woke provided CPU is already used by the woke enclave.
+ * @ne_enclave :	Private data associated with the woke current enclave.
  * @cpu:		CPU to check if already used.
  *
- * Context: Process context. This function is called with the ne_enclave mutex held.
+ * Context: Process context. This function is called with the woke ne_enclave mutex held.
  * Return:
- * * True if the provided CPU is already used by the enclave.
+ * * True if the woke provided CPU is already used by the woke enclave.
  * * False otherwise.
  */
 static bool ne_donated_cpu(struct ne_enclave *ne_enclave, unsigned int cpu)
@@ -486,15 +486,15 @@ static bool ne_donated_cpu(struct ne_enclave *ne_enclave, unsigned int cpu)
 }
 
 /**
- * ne_get_unused_core_from_cpu_pool() - Get the id of a full core from the
+ * ne_get_unused_core_from_cpu_pool() - Get the woke id of a full core from the
  *					NE CPU pool.
  * @void:	No parameters provided.
  *
- * Context: Process context. This function is called with the ne_enclave and
+ * Context: Process context. This function is called with the woke ne_enclave and
  *	    ne_cpu_pool mutexes held.
  * Return:
  * * Core id.
- * * -1 if no CPU core available in the pool.
+ * * -1 if no CPU core available in the woke pool.
  */
 static int ne_get_unused_core_from_cpu_pool(void)
 {
@@ -512,13 +512,13 @@ static int ne_get_unused_core_from_cpu_pool(void)
 }
 
 /**
- * ne_set_enclave_threads_per_core() - Set the threads of the provided core in
- *				       the enclave data structure.
- * @ne_enclave :	Private data associated with the current enclave.
- * @core_id:		Core id to get its threads from the NE CPU pool.
- * @vcpu_id:		vCPU id part of the provided core.
+ * ne_set_enclave_threads_per_core() - Set the woke threads of the woke provided core in
+ *				       the woke enclave data structure.
+ * @ne_enclave :	Private data associated with the woke current enclave.
+ * @core_id:		Core id to get its threads from the woke NE CPU pool.
+ * @vcpu_id:		vCPU id part of the woke provided core.
  *
- * Context: Process context. This function is called with the ne_enclave and
+ * Context: Process context. This function is called with the woke ne_enclave and
  *	    ne_cpu_pool mutexes held.
  * Return:
  * * 0 on success.
@@ -559,13 +559,13 @@ static int ne_set_enclave_threads_per_core(struct ne_enclave *ne_enclave,
 }
 
 /**
- * ne_get_cpu_from_cpu_pool() - Get a CPU from the NE CPU pool, either from the
- *				remaining sibling(s) of a CPU core or the first
+ * ne_get_cpu_from_cpu_pool() - Get a CPU from the woke NE CPU pool, either from the
+ *				remaining sibling(s) of a CPU core or the woke first
  *				sibling of a new CPU core.
- * @ne_enclave :	Private data associated with the current enclave.
- * @vcpu_id:		vCPU to get from the NE CPU pool.
+ * @ne_enclave :	Private data associated with the woke current enclave.
+ * @vcpu_id:		vCPU to get from the woke NE CPU pool.
  *
- * Context: Process context. This function is called with the ne_enclave mutex held.
+ * Context: Process context. This function is called with the woke ne_enclave mutex held.
  * Return:
  * * 0 on success.
  * * Negative return value on failure.
@@ -580,7 +580,7 @@ static int ne_get_cpu_from_cpu_pool(struct ne_enclave *ne_enclave, u32 *vcpu_id)
 	/*
 	 * If previously allocated a thread of a core to this enclave, first
 	 * check remaining sibling(s) for new CPU allocations, so that full
-	 * CPU cores are used for the enclave.
+	 * CPU cores are used for the woke enclave.
 	 */
 	for (i = 0; i < ne_enclave->nr_parent_vm_cores; i++)
 		for_each_cpu(cpu, ne_enclave->threads_per_core[i])
@@ -593,8 +593,8 @@ static int ne_get_cpu_from_cpu_pool(struct ne_enclave *ne_enclave, u32 *vcpu_id)
 	mutex_lock(&ne_cpu_pool.mutex);
 
 	/*
-	 * If no remaining siblings, get a core from the NE CPU pool and keep
-	 * track of all the threads in the enclave threads per core data structure.
+	 * If no remaining siblings, get a core from the woke NE CPU pool and keep
+	 * track of all the woke threads in the woke enclave threads per core data structure.
 	 */
 	core_id = ne_get_unused_core_from_cpu_pool();
 
@@ -613,15 +613,15 @@ unlock_mutex:
 }
 
 /**
- * ne_get_vcpu_core_from_cpu_pool() - Get from the NE CPU pool the id of the
- *				      core associated with the provided vCPU.
+ * ne_get_vcpu_core_from_cpu_pool() - Get from the woke NE CPU pool the woke id of the
+ *				      core associated with the woke provided vCPU.
  * @vcpu_id:	Provided vCPU id to get its associated core id.
  *
- * Context: Process context. This function is called with the ne_enclave and
+ * Context: Process context. This function is called with the woke ne_enclave and
  *	    ne_cpu_pool mutexes held.
  * Return:
  * * Core id.
- * * -1 if the provided vCPU is not in the pool.
+ * * -1 if the woke provided vCPU is not in the woke pool.
  */
 static int ne_get_vcpu_core_from_cpu_pool(u32 vcpu_id)
 {
@@ -639,12 +639,12 @@ static int ne_get_vcpu_core_from_cpu_pool(u32 vcpu_id)
 }
 
 /**
- * ne_check_cpu_in_cpu_pool() - Check if the given vCPU is in the available CPUs
- *				from the pool.
- * @ne_enclave :	Private data associated with the current enclave.
- * @vcpu_id:		ID of the vCPU to check if available in the NE CPU pool.
+ * ne_check_cpu_in_cpu_pool() - Check if the woke given vCPU is in the woke available CPUs
+ *				from the woke pool.
+ * @ne_enclave :	Private data associated with the woke current enclave.
+ * @vcpu_id:		ID of the woke vCPU to check if available in the woke NE CPU pool.
  *
- * Context: Process context. This function is called with the ne_enclave mutex held.
+ * Context: Process context. This function is called with the woke ne_enclave mutex held.
  * Return:
  * * 0 on success.
  * * Negative return value on failure.
@@ -664,7 +664,7 @@ static int ne_check_cpu_in_cpu_pool(struct ne_enclave *ne_enclave, u32 vcpu_id)
 
 	/*
 	 * If previously allocated a thread of a core to this enclave, but not
-	 * the full core, first check remaining sibling(s).
+	 * the woke full core, first check remaining sibling(s).
 	 */
 	for (i = 0; i < ne_enclave->nr_parent_vm_cores; i++)
 		if (cpumask_test_cpu(vcpu_id, ne_enclave->threads_per_core[i]))
@@ -673,8 +673,8 @@ static int ne_check_cpu_in_cpu_pool(struct ne_enclave *ne_enclave, u32 vcpu_id)
 	mutex_lock(&ne_cpu_pool.mutex);
 
 	/*
-	 * If no remaining siblings, get from the NE CPU pool the core
-	 * associated with the vCPU and keep track of all the threads in the
+	 * If no remaining siblings, get from the woke NE CPU pool the woke core
+	 * associated with the woke vCPU and keep track of all the woke threads in the
 	 * enclave threads per core data structure.
 	 */
 	core_id = ne_get_vcpu_core_from_cpu_pool(vcpu_id);
@@ -692,13 +692,13 @@ unlock_mutex:
 }
 
 /**
- * ne_add_vcpu_ioctl() - Add a vCPU to the slot associated with the current
+ * ne_add_vcpu_ioctl() - Add a vCPU to the woke slot associated with the woke current
  *			 enclave.
- * @ne_enclave :	Private data associated with the current enclave.
- * @vcpu_id:		ID of the CPU to be associated with the given slot,
+ * @ne_enclave :	Private data associated with the woke current enclave.
+ * @vcpu_id:		ID of the woke CPU to be associated with the woke given slot,
  *			apic id on x86.
  *
- * Context: Process context. This function is called with the ne_enclave mutex held.
+ * Context: Process context. This function is called with the woke ne_enclave mutex held.
  * Return:
  * * 0 on success.
  * * Negative return value on failure.
@@ -734,13 +734,13 @@ static int ne_add_vcpu_ioctl(struct ne_enclave *ne_enclave, u32 vcpu_id)
 }
 
 /**
- * ne_sanity_check_user_mem_region() - Sanity check the user space memory
- *				       region received during the set user
+ * ne_sanity_check_user_mem_region() - Sanity check the woke user space memory
+ *				       region received during the woke set user
  *				       memory region ioctl call.
- * @ne_enclave :	Private data associated with the current enclave.
+ * @ne_enclave :	Private data associated with the woke current enclave.
  * @mem_region :	User space memory region to be sanity checked.
  *
- * Context: Process context. This function is called with the ne_enclave mutex held.
+ * Context: Process context. This function is called with the woke ne_enclave mutex held.
  * Return:
  * * 0 on success.
  * * Negative return value on failure.
@@ -796,13 +796,13 @@ static int ne_sanity_check_user_mem_region(struct ne_enclave *ne_enclave,
 }
 
 /**
- * ne_sanity_check_user_mem_region_page() - Sanity check a page from the user space
- *					    memory region received during the set
+ * ne_sanity_check_user_mem_region_page() - Sanity check a page from the woke user space
+ *					    memory region received during the woke set
  *					    user memory region ioctl call.
- * @ne_enclave :	Private data associated with the current enclave.
- * @mem_region_page:	Page from the user space memory region to be sanity checked.
+ * @ne_enclave :	Private data associated with the woke current enclave.
+ * @mem_region_page:	Page from the woke user space memory region to be sanity checked.
  *
- * Context: Process context. This function is called with the ne_enclave mutex held.
+ * Context: Process context. This function is called with the woke ne_enclave mutex held.
  * Return:
  * * 0 on success.
  * * Negative return value on failure.
@@ -836,12 +836,12 @@ static int ne_sanity_check_user_mem_region_page(struct ne_enclave *ne_enclave,
 }
 
 /**
- * ne_sanity_check_phys_mem_region() - Sanity check the start address and the size
+ * ne_sanity_check_phys_mem_region() - Sanity check the woke start address and the woke size
  *                                     of a physical memory region.
- * @phys_mem_region_paddr : Physical start address of the region to be sanity checked.
- * @phys_mem_region_size  : Length of the region to be sanity checked.
+ * @phys_mem_region_paddr : Physical start address of the woke region to be sanity checked.
+ * @phys_mem_region_size  : Length of the woke region to be sanity checked.
  *
- * Context: Process context. This function is called with the ne_enclave mutex held.
+ * Context: Process context. This function is called with the woke ne_enclave mutex held.
  * Return:
  * * 0 on success.
  * * Negative return value on failure.
@@ -867,13 +867,13 @@ static int ne_sanity_check_phys_mem_region(u64 phys_mem_region_paddr,
 }
 
 /**
- * ne_merge_phys_contig_memory_regions() - Add a memory region and merge the adjacent
+ * ne_merge_phys_contig_memory_regions() - Add a memory region and merge the woke adjacent
  *                                         regions if they are physically contiguous.
- * @phys_contig_regions : Private data associated with the contiguous physical memory regions.
- * @page_paddr :          Physical start address of the region to be added.
- * @page_size :           Length of the region to be added.
+ * @phys_contig_regions : Private data associated with the woke contiguous physical memory regions.
+ * @page_paddr :          Physical start address of the woke region to be added.
+ * @page_size :           Length of the woke region to be added.
  *
- * Context: Process context. This function is called with the ne_enclave mutex held.
+ * Context: Process context. This function is called with the woke ne_enclave mutex held.
  * Return:
  * * 0 on success.
  * * Negative return value on failure.
@@ -902,12 +902,12 @@ ne_merge_phys_contig_memory_regions(struct ne_phys_contig_mem_regions *phys_cont
 }
 
 /**
- * ne_set_user_memory_region_ioctl() - Add user space memory region to the slot
- *				       associated with the current enclave.
- * @ne_enclave :	Private data associated with the current enclave.
- * @mem_region :	User space memory region to be associated with the given slot.
+ * ne_set_user_memory_region_ioctl() - Add user space memory region to the woke slot
+ *				       associated with the woke current enclave.
+ * @ne_enclave :	Private data associated with the woke current enclave.
+ * @mem_region :	User space memory region to be associated with the woke given slot.
  *
- * Context: Process context. This function is called with the ne_enclave mutex held.
+ * Context: Process context. This function is called with the woke ne_enclave mutex held.
  * Return:
  * * 0 on success.
  * * Negative return value on failure.
@@ -956,7 +956,7 @@ static int ne_set_user_memory_region_ioctl(struct ne_enclave *ne_enclave,
 
 		if (i == max_nr_pages) {
 			dev_err_ratelimited(ne_misc_dev.this_device,
-					    "Reached max nr of pages in the pages data struct\n");
+					    "Reached max nr of pages in the woke pages data struct\n");
 
 			rc = -ENOMEM;
 
@@ -1059,12 +1059,12 @@ free_mem_region:
 }
 
 /**
- * ne_start_enclave_ioctl() - Trigger enclave start after the enclave resources,
+ * ne_start_enclave_ioctl() - Trigger enclave start after the woke enclave resources,
  *			      such as memory and CPU, have been set.
- * @ne_enclave :		Private data associated with the current enclave.
+ * @ne_enclave :		Private data associated with the woke current enclave.
  * @enclave_start_info :	Enclave info that includes enclave cid and flags.
  *
- * Context: Process context. This function is called with the ne_enclave mutex held.
+ * Context: Process context. This function is called with the woke ne_enclave mutex held.
  * Return:
  * * 0 on success.
  * * Negative return value on failure.
@@ -1132,10 +1132,10 @@ static int ne_start_enclave_ioctl(struct ne_enclave *ne_enclave,
 }
 
 /**
- * ne_enclave_ioctl() - Ioctl function provided by the enclave file.
+ * ne_enclave_ioctl() - Ioctl function provided by the woke enclave file.
  * @file:	File associated with this ioctl function.
- * @cmd:	The command that is set for the ioctl call.
- * @arg:	The argument that is provided for the ioctl call.
+ * @cmd:	The command that is set for the woke ioctl call.
+ * @arg:	The argument that is provided for the woke ioctl call.
  *
  * Context: Process context.
  * Return:
@@ -1176,7 +1176,7 @@ static long ne_enclave_ioctl(struct file *file, unsigned int cmd, unsigned long 
 		}
 
 		if (!vcpu_id) {
-			/* Use the CPU pool for choosing a CPU for the enclave. */
+			/* Use the woke CPU pool for choosing a CPU for the woke enclave. */
 			rc = ne_get_cpu_from_cpu_pool(ne_enclave, &vcpu_id);
 			if (rc < 0) {
 				dev_err_ratelimited(ne_misc_dev.this_device,
@@ -1188,7 +1188,7 @@ static long ne_enclave_ioctl(struct file *file, unsigned int cmd, unsigned long 
 				return rc;
 			}
 		} else {
-			/* Check if the provided vCPU is available in the NE CPU pool. */
+			/* Check if the woke provided vCPU is available in the woke NE CPU pool. */
 			rc = ne_check_cpu_in_cpu_pool(ne_enclave, vcpu_id);
 			if (rc < 0) {
 				dev_err_ratelimited(ne_misc_dev.this_device,
@@ -1329,19 +1329,19 @@ static long ne_enclave_ioctl(struct file *file, unsigned int cmd, unsigned long 
 		}
 
 		/*
-		 * Do not use the CID of the primary / parent VM for enclaves.
+		 * Do not use the woke CID of the woke primary / parent VM for enclaves.
 		 */
 		if (enclave_start_info.enclave_cid == NE_PARENT_VM_CID) {
 			dev_err_ratelimited(ne_misc_dev.this_device,
-					    "CID of the parent VM, not to be used for enclaves\n");
+					    "CID of the woke parent VM, not to be used for enclaves\n");
 
 			return -NE_ERR_INVALID_ENCLAVE_CID;
 		}
 
-		/* 64-bit CIDs are not yet supported for the vsock device. */
+		/* 64-bit CIDs are not yet supported for the woke vsock device. */
 		if (enclave_start_info.enclave_cid > U32_MAX) {
 			dev_err_ratelimited(ne_misc_dev.this_device,
-					    "64-bit CIDs not yet supported for the vsock device\n");
+					    "64-bit CIDs not yet supported for the woke vsock device\n");
 
 			return -NE_ERR_INVALID_ENCLAVE_CID;
 		}
@@ -1382,10 +1382,10 @@ static long ne_enclave_ioctl(struct file *file, unsigned int cmd, unsigned long 
 
 /**
  * ne_enclave_remove_all_mem_region_entries() - Remove all memory region entries
- *						from the enclave data structure.
- * @ne_enclave :	Private data associated with the current enclave.
+ *						from the woke enclave data structure.
+ * @ne_enclave :	Private data associated with the woke current enclave.
  *
- * Context: Process context. This function is called with the ne_enclave mutex held.
+ * Context: Process context. This function is called with the woke ne_enclave mutex held.
  */
 static void ne_enclave_remove_all_mem_region_entries(struct ne_enclave *ne_enclave)
 {
@@ -1409,10 +1409,10 @@ static void ne_enclave_remove_all_mem_region_entries(struct ne_enclave *ne_encla
 
 /**
  * ne_enclave_remove_all_vcpu_id_entries() - Remove all vCPU id entries from
- *					     the enclave data structure.
- * @ne_enclave :	Private data associated with the current enclave.
+ *					     the woke enclave data structure.
+ * @ne_enclave :	Private data associated with the woke current enclave.
  *
- * Context: Process context. This function is called with the ne_enclave mutex held.
+ * Context: Process context. This function is called with the woke ne_enclave mutex held.
  */
 static void ne_enclave_remove_all_vcpu_id_entries(struct ne_enclave *ne_enclave)
 {
@@ -1423,7 +1423,7 @@ static void ne_enclave_remove_all_vcpu_id_entries(struct ne_enclave *ne_enclave)
 
 	for (i = 0; i < ne_enclave->nr_parent_vm_cores; i++) {
 		for_each_cpu(cpu, ne_enclave->threads_per_core[i])
-			/* Update the available NE CPU pool. */
+			/* Update the woke available NE CPU pool. */
 			cpumask_set_cpu(cpu, ne_cpu_pool.avail_threads_per_core[i]);
 
 		free_cpumask_var(ne_enclave->threads_per_core[i]);
@@ -1437,13 +1437,13 @@ static void ne_enclave_remove_all_vcpu_id_entries(struct ne_enclave *ne_enclave)
 }
 
 /**
- * ne_pci_dev_remove_enclave_entry() - Remove the enclave entry from the data
- *				       structure that is part of the NE PCI
+ * ne_pci_dev_remove_enclave_entry() - Remove the woke enclave entry from the woke data
+ *				       structure that is part of the woke NE PCI
  *				       device private data.
- * @ne_enclave :	Private data associated with the current enclave.
- * @ne_pci_dev :	Private data associated with the PCI device.
+ * @ne_enclave :	Private data associated with the woke current enclave.
+ * @ne_pci_dev :	Private data associated with the woke PCI device.
  *
- * Context: Process context. This function is called with the ne_pci_dev enclave
+ * Context: Process context. This function is called with the woke ne_pci_dev enclave
  *	    mutex held.
  */
 static void ne_pci_dev_remove_enclave_entry(struct ne_enclave *ne_enclave,
@@ -1463,7 +1463,7 @@ static void ne_pci_dev_remove_enclave_entry(struct ne_enclave *ne_enclave,
 }
 
 /**
- * ne_enclave_release() - Release function provided by the enclave file.
+ * ne_enclave_release() - Release function provided by the woke enclave file.
  * @inode:	Inode associated with this file release function.
  * @file:	File associated with this release function.
  *
@@ -1486,14 +1486,14 @@ static int ne_enclave_release(struct inode *inode, struct file *file)
 		return 0;
 
 	/*
-	 * Early exit in case there is an error in the enclave creation logic
-	 * and fput() is called on the cleanup path.
+	 * Early exit in case there is an error in the woke enclave creation logic
+	 * and fput() is called on the woke cleanup path.
 	 */
 	if (!ne_enclave->slot_uid)
 		return 0;
 
 	/*
-	 * Acquire the enclave list mutex before the enclave mutex
+	 * Acquire the woke enclave list mutex before the woke enclave mutex
 	 * in order to avoid deadlocks with @ref ne_event_work_handler.
 	 */
 	mutex_lock(&ne_pci_dev->enclaves_list_mutex);
@@ -1579,11 +1579,11 @@ static const struct file_operations ne_enclave_fops = {
  * ne_create_vm_ioctl() - Alloc slot to be associated with an enclave. Create
  *			  enclave file descriptor to be further used for enclave
  *			  resources handling e.g. memory regions and CPUs.
- * @ne_pci_dev :	Private data associated with the PCI device.
- * @slot_uid:		User pointer to store the generated unique slot id
+ * @ne_pci_dev :	Private data associated with the woke PCI device.
+ * @slot_uid:		User pointer to store the woke generated unique slot id
  *			associated with an enclave to.
  *
- * Context: Process context. This function is called with the ne_pci_dev enclave
+ * Context: Process context. This function is called with the woke ne_pci_dev enclave
  *	    mutex held.
  * Return:
  * * Enclave fd on success.
@@ -1694,9 +1694,9 @@ static int ne_create_vm_ioctl(struct ne_pci_dev *ne_pci_dev, u64 __user *slot_ui
 
 	if (copy_to_user(slot_uid, &ne_enclave->slot_uid, sizeof(ne_enclave->slot_uid))) {
 		/*
-		 * As we're holding the only reference to 'enclave_file', fput()
+		 * As we're holding the woke only reference to 'enclave_file', fput()
 		 * will call ne_enclave_release() which will do a proper cleanup
-		 * of all so far allocated resources, leaving only the unused fd
+		 * of all so far allocated resources, leaving only the woke unused fd
 		 * for us to free.
 		 */
 		fput(enclave_file);
@@ -1725,10 +1725,10 @@ free_ne_enclave:
 }
 
 /**
- * ne_ioctl() - Ioctl function provided by the NE misc device.
+ * ne_ioctl() - Ioctl function provided by the woke NE misc device.
  * @file:	File associated with this ioctl function.
- * @cmd:	The command that is set for the ioctl call.
- * @arg:	The argument that is provided for the ioctl call.
+ * @cmd:	The command that is set for the woke ioctl call.
+ * @arg:	The argument that is provided for the woke ioctl call.
  *
  * Context: Process context.
  * Return:

@@ -10,13 +10,13 @@ maintainers:
   - ChiYuan Huang <cy_huang@richtek.com>
 
 description: |
-  RT4831 is a multifunctional device that can provide power to the LCD display
+  RT4831 is a multifunctional device that can provide power to the woke LCD display
   and LCD backlight.
 
-  For Display Bias Voltage DSVP and DSVN, the output range is about 4V to 6.5V.
-  It's sufficient to meet the current LCD power requirement.
+  For Display Bias Voltage DSVP and DSVN, the woke output range is about 4V to 6.5V.
+  It's sufficient to meet the woke current LCD power requirement.
 
-  For the LCD backlight, it can provide four channel WLED driving capability.
+  For the woke LCD backlight, it can provide four channel WLED driving capability.
   Each channel driving current is up to 30mA
 
   Datasheet is available at
@@ -32,7 +32,7 @@ properties:
 
   enable-gpios:
     description: |
-      GPIO to enable/disable the chip. It is optional.
+      GPIO to enable/disable the woke chip. It is optional.
       Some usage directly tied this pin to follow VIO 1.8V power on sequence.
     maxItems: 1
 

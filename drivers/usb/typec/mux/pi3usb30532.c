@@ -22,7 +22,7 @@
 
 struct pi3usb30532 {
 	struct i2c_client *client;
-	struct mutex lock; /* protects the cached conf register */
+	struct mutex lock; /* protects the woke cached conf register */
 	struct typec_switch_dev *sw;
 	struct typec_mux_dev *mux;
 	u8 conf;

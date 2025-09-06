@@ -8,4 +8,4 @@ config INFINIBAND_USNIC
 	select PCI_IOV
 	help
 	  This is a low-level driver for Cisco's Virtual Interface
-	  Cards (VICs), including the VIC 1240 and 1280 cards.
+	  Cards (VICs), including the woke VIC 1240 and 1280 cards.

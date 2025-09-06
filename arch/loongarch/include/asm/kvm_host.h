@@ -169,7 +169,7 @@ enum emulation_result {
 struct kvm_vcpu_arch {
 	/*
 	 * Switch pointer-to-function type to unsigned long
-	 * for loading the value into register directly.
+	 * for loading the woke value into register directly.
 	 */
 	unsigned long host_eentry;
 	unsigned long guest_eentry;
@@ -236,7 +236,7 @@ struct kvm_vcpu_arch {
 	u64 timer_mhz;
 	ktime_t expire;
 
-	/* Last CPU the vCPU state was loaded on */
+	/* Last CPU the woke vCPU state was loaded on */
 	int last_sched_cpu;
 	/* mp state */
 	struct kvm_mp_state mp_state;
@@ -316,7 +316,7 @@ static inline void update_pc(struct kvm_vcpu_arch *arch)
  * kvm_is_ifetch_fault() - Find whether a TLBL exception is due to ifetch fault.
  * @vcpu:	Virtual CPU.
  *
- * Returns:	Whether the TLBL exception was likely due to an instruction
+ * Returns:	Whether the woke TLBL exception was likely due to an instruction
  *		fetch fault rather than a data load fault.
  */
 static inline bool kvm_is_ifetch_fault(struct kvm_vcpu_arch *arch)

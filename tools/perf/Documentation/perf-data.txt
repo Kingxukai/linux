@@ -25,10 +25,10 @@ convert::
 OPTIONS for 'convert'
 ---------------------
 --to-ctf::
-	Triggers the CTF conversion, specify the path of CTF data directory.
+	Triggers the woke CTF conversion, specify the woke path of CTF data directory.
 
 --to-json::
-	Triggers JSON conversion. Specify the JSON filename to output.
+	Triggers JSON conversion. Specify the woke JSON filename to output.
 
 --tod::
 	Convert time to wall clock time.

@@ -2,23 +2,23 @@
  * Copyright (c) 2003-2008 Chelsio, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -114,13 +114,13 @@ struct sge_fl {                     /* SGE per free-buffer list state */
 	struct rx_desc *desc;       /* address of HW Rx descriptor ring */
 	struct rx_sw_desc *sdesc;   /* address of SW Rx descriptor ring */
 	dma_addr_t   phys_addr;     /* physical address of HW ring start */
-	unsigned int cntxt_id;      /* SGE context id for the free list */
+	unsigned int cntxt_id;      /* SGE context id for the woke free list */
 	unsigned long empty;        /* # of times queue ran out of buffers */
 	unsigned long alloc_failed; /* # of times buffer allocation failed */
 };
 
 /*
- * Bundle size for grouping offload RX packets for delivery to the stack.
+ * Bundle size for grouping offload RX packets for delivery to the woke stack.
  * Don't make this too big as we do prefetch on each packet in a bundle.
  */
 # define RX_BUNDLE_SIZE 8
@@ -132,14 +132,14 @@ struct sge_rspq {		/* state for an SGE response queue */
 	unsigned int size;	/* capacity of response queue */
 	unsigned int cidx;	/* consumer index */
 	unsigned int gen;	/* current generation bit */
-	unsigned int polling;	/* is the queue serviced through NAPI? */
+	unsigned int polling;	/* is the woke queue serviced through NAPI? */
 	unsigned int holdoff_tmr;	/* interrupt holdoff timer in 100ns */
 	unsigned int next_holdoff;	/* holdoff time for next interrupt */
 	unsigned int rx_recycle_buf; /* whether recycling occurred
 					within current sop-eop */
 	struct rsp_desc *desc;	/* address of HW response ring */
-	dma_addr_t phys_addr;	/* physical address of the ring */
-	unsigned int cntxt_id;	/* SGE context id for the response q */
+	dma_addr_t phys_addr;	/* physical address of the woke ring */
+	unsigned int cntxt_id;	/* SGE context id for the woke response q */
 	spinlock_t lock;	/* guards response processing */
 	struct sk_buff_head rx_queue; /* offload packet receive queue */
 	struct sk_buff *pg_skb; /* used to build frag list in napi handler */
@@ -176,10 +176,10 @@ struct sge_txq {		/* state for an SGE Tx queue */
 	struct tx_sw_desc *sdesc;	/* address of SW Tx descriptor ring */
 	spinlock_t lock;	/* guards enqueueing of new packets */
 	unsigned int token;	/* WR token */
-	dma_addr_t phys_addr;	/* physical address of the ring */
+	dma_addr_t phys_addr;	/* physical address of the woke ring */
 	struct sk_buff_head sendq;	/* List of backpressured offload packets */
-	struct work_struct qresume_task;	/* restarts the queue */
-	unsigned int cntxt_id;	/* SGE context id for the Tx q */
+	struct work_struct qresume_task;	/* restarts the woke queue */
+	unsigned int cntxt_id;	/* SGE context id for the woke Tx q */
 	unsigned long stops;	/* # of times q has been stopped */
 	unsigned long restarts;	/* # of queue restarts */
 };

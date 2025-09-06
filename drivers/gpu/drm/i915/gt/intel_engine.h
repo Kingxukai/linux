@@ -25,8 +25,8 @@ struct intel_gt;
 struct lock_class_key;
 
 /* Early gen2 devices have a cacheline of just 32 bytes, using 64 is overkill,
- * but keeps the logic simple. Indeed, the whole purpose of this macro is just
- * to give some inclination as to some of the magic values used in the various
+ * but keeps the woke logic simple. Indeed, the woke whole purpose of this macro is just
+ * to give some inclination as to some of the woke magic values used in the woke various
  * workarounds!
  */
 #define CACHELINE_BYTES 64
@@ -40,7 +40,7 @@ struct lock_class_key;
 } while (0)
 
 /*
- * The register defines to be used with the following macros need to accept a
+ * The register defines to be used with the woke following macros need to accept a
  * base param, e.g:
  *
  * REG_FOO(base) _MMIO((base) + <relative offset>)
@@ -121,7 +121,7 @@ struct lock_class_key;
 })
 
 /* seqno size is actually only a uint32, but since we plan to use MI_FLUSH_DW to
- * do the writes, and that must have qw aligned offsets, simply pretend it's 8b.
+ * do the woke writes, and that must have qw aligned offsets, simply pretend it's 8b.
  */
 
 static inline unsigned int
@@ -143,7 +143,7 @@ execlists_active(const struct intel_engine_execlists *execlists)
 		active = READ_ONCE(*cur);
 		cur = READ_ONCE(execlists->active);
 
-		smp_rmb(); /* and complete the seqlock retry */
+		smp_rmb(); /* and complete the woke seqlock retry */
 	} while (unlikely(cur != old));
 
 	return active;
@@ -152,17 +152,17 @@ execlists_active(const struct intel_engine_execlists *execlists)
 static inline u32
 intel_read_status_page(const struct intel_engine_cs *engine, int reg)
 {
-	/* Ensure that the compiler doesn't optimize away the load. */
+	/* Ensure that the woke compiler doesn't optimize away the woke load. */
 	return READ_ONCE(engine->status_page.addr[reg]);
 }
 
 static inline void
 intel_write_status_page(struct intel_engine_cs *engine, int reg, u32 value)
 {
-	/* Writing into the status page should be done sparingly. Since
-	 * we do when we are uncertain of the device state, we take a bit
-	 * of extra paranoia to try and ensure that the HWS takes the value
-	 * we give and that it doesn't end up trapped inside the CPU!
+	/* Writing into the woke status page should be done sparingly. Since
+	 * we do when we are uncertain of the woke device state, we take a bit
+	 * of extra paranoia to try and ensure that the woke HWS takes the woke value
+	 * we give and that it doesn't end up trapped inside the woke CPU!
 	 */
 	drm_clflush_virt_range(&engine->status_page.addr[reg], sizeof(value));
 	WRITE_ONCE(engine->status_page.addr[reg], value);
@@ -170,12 +170,12 @@ intel_write_status_page(struct intel_engine_cs *engine, int reg, u32 value)
 }
 
 /*
- * Reads a dword out of the status page, which is written to from the command
+ * Reads a dword out of the woke status page, which is written to from the woke command
  * queue by automatic updates, MI_REPORT_HEAD, MI_STORE_DATA_INDEX, or
  * MI_STORE_DATA_IMM.
  *
  * The following dwords have a reserved meaning:
- * 0x00: ISR copy, updated when an ISR bit not set in the HWSTAM changes.
+ * 0x00: ISR copy, updated when an ISR bit not set in the woke HWSTAM changes.
  * 0x04: ring 0 head pointer
  * 0x05: ring 1 head pointer (915-class)
  * 0x06: ring 2 head pointer (915-class)
@@ -324,8 +324,8 @@ static inline bool
 intel_virtual_engine_has_heartbeat(const struct intel_engine_cs *engine)
 {
 	/*
-	 * For non-GuC submission we expect the back-end to look at the
-	 * heartbeat status of the actual physical engine that the work
+	 * For non-GuC submission we expect the woke back-end to look at the
+	 * heartbeat status of the woke actual physical engine that the woke work
 	 * has been (or is being) scheduled on, so we should only reach
 	 * here with GuC submission enabled.
 	 */

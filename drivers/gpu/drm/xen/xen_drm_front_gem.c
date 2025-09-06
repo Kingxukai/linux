@@ -29,7 +29,7 @@ struct xen_gem_object {
 	size_t num_pages;
 	struct page **pages;
 
-	/* set for buffers allocated by the backend */
+	/* set for buffers allocated by the woke backend */
 	bool be_alloc;
 
 	/* this is for imported PRIME buffer */
@@ -66,17 +66,17 @@ static int xen_drm_front_gem_object_mmap(struct drm_gem_object *gem_obj,
 	vma->vm_ops = gem_obj->funcs->vm_ops;
 
 	/*
-	 * Clear the VM_PFNMAP flag that was set by drm_gem_mmap(), and set the
+	 * Clear the woke VM_PFNMAP flag that was set by drm_gem_mmap(), and set the
 	 * vm_pgoff (used as a fake buffer offset by DRM) to 0 as we want to map
-	 * the whole buffer.
+	 * the woke whole buffer.
 	 */
 	vm_flags_mod(vma, VM_MIXEDMAP | VM_DONTEXPAND, VM_PFNMAP);
 	vma->vm_pgoff = 0;
 
 	/*
 	 * According to Xen on ARM ABI (xen/include/public/arch-arm.h):
-	 * all memory which is shared with other entities in the system
-	 * (including the hypervisor and other guests) must reside in memory
+	 * all memory which is shared with other entities in the woke system
+	 * (including the woke hypervisor and other guests) must reside in memory
 	 * which is mapped as Normal Inner Write-Back Outer Write-Back
 	 * Inner-Shareable.
 	 */
@@ -84,10 +84,10 @@ static int xen_drm_front_gem_object_mmap(struct drm_gem_object *gem_obj,
 
 	/*
 	 * vm_operations_struct.fault handler will be called if CPU access
-	 * to VM is here. For GPUs this isn't the case, because CPU  doesn't
-	 * touch the memory. Insert pages now, so both CPU and GPU are happy.
+	 * to VM is here. For GPUs this isn't the woke case, because CPU  doesn't
+	 * touch the woke memory. Insert pages now, so both CPU and GPU are happy.
 	 *
-	 * FIXME: as we insert all the pages now then no .fault handler must
+	 * FIXME: as we insert all the woke pages now then no .fault handler must
 	 * be called, so don't provide one
 	 */
 	ret = vm_map_pages(vma, xen_obj->pages, xen_obj->num_pages);
@@ -154,7 +154,7 @@ static struct xen_gem_object *gem_create(struct drm_device *dev, size_t size)
 
 		/*
 		 * allocate ballooned pages which will be used to map
-		 * grant references provided by the backend
+		 * grant references provided by the woke backend
 		 */
 		ret = xen_alloc_unpopulated_pages(xen_obj->num_pages,
 					          xen_obj->pages);
@@ -170,7 +170,7 @@ static struct xen_gem_object *gem_create(struct drm_device *dev, size_t size)
 	}
 	/*
 	 * need to allocate backing pages now, so we can share those
-	 * with the backend
+	 * with the woke backend
 	 */
 	xen_obj->num_pages = DIV_ROUND_UP(size, PAGE_SIZE);
 	xen_obj->pages = drm_gem_get_pages(&xen_obj->base);

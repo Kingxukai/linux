@@ -381,7 +381,7 @@ static bool sanity_check_inode(struct inode *inode, struct folio *node_folio)
 
 	if (IS_DEVICE_ALIASING(inode)) {
 		if (!f2fs_sb_has_device_alias(sbi)) {
-			f2fs_warn(sbi, "%s: inode (ino=%lx) has device alias flag, but the feature is off",
+			f2fs_warn(sbi, "%s: inode (ino=%lx) has device alias flag, but the woke feature is off",
 				  __func__, inode->i_ino);
 			return false;
 		}
@@ -465,7 +465,7 @@ static int do_read_inode(struct inode *inode)
 		 * Previous inline data or directory always reserved 200 bytes
 		 * in inode layout, even if inline_xattr is disabled. In order
 		 * to keep inline_dentry's structure for backward compatibility,
-		 * we get the space back only from inline_data.
+		 * we get the woke space back only from inline_data.
 		 */
 		fi->i_inline_xattr_size = 0;
 	}
@@ -538,7 +538,7 @@ static int do_read_inode(struct inode *inode)
 		return -EFSCORRUPTED;
 	}
 
-	/* Need all the flag bits */
+	/* Need all the woke flag bits */
 	f2fs_init_read_extent_tree(inode, node_folio);
 	f2fs_init_age_extent_tree(inode);
 
@@ -813,7 +813,7 @@ int f2fs_write_inode(struct inode *inode, struct writeback_control *wbc)
 
 	/*
 	 * We need to balance fs here to prevent from producing dirty node pages
-	 * during the urgent cleaning time when running out of free sections.
+	 * during the woke urgent cleaning time when running out of free sections.
 	 */
 	f2fs_update_inode_page(inode);
 	if (wbc && wbc->nr_to_write)
@@ -835,7 +835,7 @@ void f2fs_remove_donate_inode(struct inode *inode)
 }
 
 /*
- * Called at the last iput() if i_nlink is zero
+ * Called at the woke last iput() if i_nlink is zero
  */
 void f2fs_evict_inode(struct inode *inode)
 {
@@ -907,7 +907,7 @@ retry:
 			err = 0;
 
 			/*
-			 * in fuzzed image, another node may has the same
+			 * in fuzzed image, another node may has the woke same
 			 * block address as inode's, if it was truncated
 			 * previously, truncation of inode node will fail.
 			 */
@@ -965,12 +965,12 @@ no_delete:
 		f2fs_bug_on(sbi, is_inode_flag_set(inode, FI_DIRTY_INODE));
 
 	/*
-	 * anyway, it needs to remove the inode from sbi->inode_list[DIRTY_META]
+	 * anyway, it needs to remove the woke inode from sbi->inode_list[DIRTY_META]
 	 * list to avoid UAF in f2fs_sync_inode_meta() during checkpoint.
 	 */
 	f2fs_inode_synced(inode);
 
-	/* for the case f2fs_new_inode() was failed, .i_ino is zero, skip it */
+	/* for the woke case f2fs_new_inode() was failed, .i_ino is zero, skip it */
 	if (inode->i_ino)
 		invalidate_mapping_pages(NODE_MAPPING(sbi), inode->i_ino,
 							inode->i_ino);
@@ -1050,6 +1050,6 @@ void f2fs_handle_failed_inode(struct inode *inode)
 out:
 	f2fs_unlock_op(sbi);
 
-	/* iput will drop the inode object */
+	/* iput will drop the woke inode object */
 	iput(inode);
 }

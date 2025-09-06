@@ -24,13 +24,13 @@ properties:
   port: true
 
   avdd-supply:
-    description: handle of the regulator that provides the positive supply voltage
+    description: handle of the woke regulator that provides the woke positive supply voltage
   avee-supply:
-    description: handle of the regulator that provides the negative supply voltage
+    description: handle of the woke regulator that provides the woke negative supply voltage
   vddi-supply:
-    description: handle of the regulator that provides the I/O supply voltage
+    description: handle of the woke regulator that provides the woke I/O supply voltage
   vddh-supply:
-    description: handle of the regulator that provides the analog supply voltage
+    description: handle of the woke regulator that provides the woke analog supply voltage
 
 required:
   - compatible

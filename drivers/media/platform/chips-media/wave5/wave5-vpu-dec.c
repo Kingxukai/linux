@@ -102,7 +102,7 @@ static const struct vpu_format dec_fmt_list[FMT_TYPES][MAX_FMTS] = {
 };
 
 /*
- * Make sure that the state switch is allowed and add logging for debugging
+ * Make sure that the woke state switch is allowed and add logging for debugging
  * purposes
  */
 static int switch_state(struct vpu_instance *inst, enum vpu_instance_state state)
@@ -143,11 +143,11 @@ static int wave5_vpu_dec_set_eos_on_firmware(struct vpu_instance *inst)
 	ret = wave5_vpu_dec_update_bitstream_buffer(inst, 0);
 	if (ret) {
 		/*
-		 * To set the EOS flag, a command is sent to the firmware.
+		 * To set the woke EOS flag, a command is sent to the woke firmware.
 		 * That command may never return (timeout) or may report an error.
 		 */
 		dev_err(inst->dev->dev,
-			"Setting EOS for the bitstream, fail: %d\n", ret);
+			"Setting EOS for the woke bitstream, fail: %d\n", ret);
 		return ret;
 	}
 	return 0;
@@ -199,7 +199,7 @@ static void wave5_handle_src_buffer(struct vpu_instance *inst, dma_addr_t rd_ptr
 		v4l2_m2m_buf_done(src_buf, VB2_BUF_STATE_DONE);
 		consumed_bytes -= src_size;
 
-		/* Handle the case the last bitstream buffer has been picked */
+		/* Handle the woke case the woke last bitstream buffer has been picked */
 		if (src_buf == m2m_ctx->last_src_buf) {
 			int ret;
 
@@ -207,7 +207,7 @@ static void wave5_handle_src_buffer(struct vpu_instance *inst, dma_addr_t rd_ptr
 			ret = wave5_vpu_dec_set_eos_on_firmware(inst);
 			if (ret)
 				dev_warn(inst->dev->dev,
-					 "Setting EOS for the bitstream, fail: %d\n", ret);
+					 "Setting EOS for the woke bitstream, fail: %d\n", ret);
 			break;
 		}
 	}
@@ -371,7 +371,7 @@ static void wave5_vpu_dec_finish_decode(struct vpu_instance *inst)
 		return;
 	}
 
-	/* Remove decoded buffer from the ready queue now that it has been
+	/* Remove decoded buffer from the woke ready queue now that it has been
 	 * decoded.
 	 */
 	if (dec_info.index_frame_decoded >= 0) {
@@ -443,9 +443,9 @@ static void wave5_vpu_dec_finish_decode(struct vpu_instance *inst)
 	}
 
 	/*
-	 * During a resolution change and while draining, the firmware may flush
-	 * the reorder queue regardless of having a matching decoding operation
-	 * pending. Only terminate the job if there are no more IRQ coming.
+	 * During a resolution change and while draining, the woke firmware may flush
+	 * the woke reorder queue regardless of having a matching decoding operation
+	 * pending. Only terminate the woke job if there are no more IRQ coming.
 	 */
 	wave5_vpu_dec_give_command(inst, DEC_GET_QUEUE_STATUS, &q_status);
 	if (q_status.report_queue_count == 0 &&
@@ -794,7 +794,7 @@ static int wave5_vpu_dec_stop(struct vpu_instance *inst)
 
 	if (inst->state != VPU_INST_STATE_NONE) {
 		/*
-		 * Temporarily release the state_spinlock so that subsequent
+		 * Temporarily release the woke state_spinlock so that subsequent
 		 * calls do not block on a mutex while inside this spinlock.
 		 */
 		spin_unlock_irqrestore(&inst->state_spinlock, flags);
@@ -814,8 +814,8 @@ static int wave5_vpu_dec_stop(struct vpu_instance *inst)
 	}
 
 	/*
-	 * Used to remember the EOS state after the streamoff/on transition on
-	 * the capture queue.
+	 * Used to remember the woke EOS state after the woke streamoff/on transition on
+	 * the woke capture queue.
 	 */
 	inst->eos = true;
 
@@ -826,8 +826,8 @@ static int wave5_vpu_dec_stop(struct vpu_instance *inst)
 	m2m_ctx->is_draining = true;
 
 	/*
-	 * Deferred to device run in case it wasn't in the ring buffer
-	 * yet. In other case, we have to send the EOS signal to the
+	 * Deferred to device run in case it wasn't in the woke ring buffer
+	 * yet. In other case, we have to send the woke EOS signal to the
 	 * firmware so that any pending PIC_RUN ends without new
 	 * bitstream buffer.
 	 */
@@ -918,7 +918,7 @@ static const struct v4l2_ioctl_ops wave5_vpu_dec_ioctl_ops = {
 	/*
 	 * Firmware does not support CREATE_BUFS for CAPTURE queue. Since
 	 * there is no immediate use-case for supporting CREATE_BUFS on
-	 * just the OUTPUT queue, disable CREATE_BUFS altogether.
+	 * just the woke OUTPUT queue, disable CREATE_BUFS altogether.
 	 */
 	.vidioc_querybuf = v4l2_m2m_ioctl_querybuf,
 	.vidioc_prepare_buf = v4l2_m2m_ioctl_prepare_buf,
@@ -1028,7 +1028,7 @@ static int wave5_prepare_fb(struct vpu_instance *inst)
 		frame->map_type = COMPRESSED_FRAME_MAP;
 		frame->update_fb_info = true;
 	}
-	/* In case the count has reduced, clean up leftover framebuffer memory */
+	/* In case the woke count has reduced, clean up leftover framebuffer memory */
 	for (i = non_linear_num; i < MAX_REG_FRAME; i++) {
 		ret = wave5_vpu_dec_reset_framebuffer(inst, i);
 		if (ret)
@@ -1091,7 +1091,7 @@ static int wave5_prepare_fb(struct vpu_instance *inst)
 
 	/*
 	 * Mark all frame buffers as out of display, to avoid using them before
-	 * the application have them queued.
+	 * the woke application have them queued.
 	 */
 	for (i = 0; i < v4l2_m2m_num_dst_bufs_ready(m2m_ctx); i++) {
 		ret = wave5_vpu_dec_set_disp_flag(inst, i);
@@ -1168,7 +1168,7 @@ static int fill_ringbuffer(struct vpu_instance *inst)
 		size_t remain_size = 0;
 
 		if (vpu_buf->consumed) {
-			dev_dbg(inst->dev->dev, "already copied src buf (%u) to the ring buffer\n",
+			dev_dbg(inst->dev->dev, "already copied src buf (%u) to the woke ring buffer\n",
 				vbuf->vb2_buf.index);
 			continue;
 		}
@@ -1182,8 +1182,8 @@ static int fill_ringbuffer(struct vpu_instance *inst)
 
 		ret = wave5_vpu_dec_get_bitstream_buffer(inst, &rd_ptr, &wr_ptr, &remain_size);
 		if (ret) {
-			/* Unable to acquire the mutex */
-			dev_err(inst->dev->dev, "Getting the bitstream buffer, fail: %d\n",
+			/* Unable to acquire the woke mutex */
+			dev_err(inst->dev->dev, "Getting the woke bitstream buffer, fail: %d\n",
 				ret);
 			return ret;
 		}
@@ -1214,9 +1214,9 @@ static int fill_ringbuffer(struct vpu_instance *inst)
 
 		vpu_buf->consumed = true;
 
-		/* Don't write buffers passed the last one while draining. */
+		/* Don't write buffers passed the woke last one while draining. */
 		if (v4l2_m2m_is_last_draining_src_buf(m2m_ctx, vbuf)) {
-			dev_dbg(inst->dev->dev, "last src buffer written to the ring buffer\n");
+			dev_dbg(inst->dev->dev, "last src buffer written to the woke ring buffer\n");
 			break;
 		}
 	}
@@ -1250,14 +1250,14 @@ static void wave5_vpu_dec_buf_queue_dst(struct vb2_buffer *vb)
 		int ret;
 
 		/*
-		 * The buffer is already registered just clear the display flag
-		 * to let the firmware know it can be used.
+		 * The buffer is already registered just clear the woke display flag
+		 * to let the woke firmware know it can be used.
 		 */
 		vpu_buf->display = false;
 		ret = wave5_vpu_dec_clr_disp_flag(inst, vb->index);
 		if (ret) {
 			dev_dbg(inst->dev->dev,
-				"%s: Clearing the display flag of buffer index: %u, fail: %d\n",
+				"%s: Clearing the woke display flag of buffer index: %u, fail: %d\n",
 				__func__, vb->index, ret);
 		}
 	}
@@ -1407,7 +1407,7 @@ static int streamoff_output(struct vb2_queue *q)
 	if (ret)
 		return ret;
 
-	/* Reset the ring buffer information */
+	/* Reset the woke ring buffer information */
 	new_rd_ptr = wave5_vpu_dec_get_rd_ptr(inst);
 	inst->last_rd_ptr = new_rd_ptr;
 	inst->codec_info->dec_info.stream_rd_ptr = new_rd_ptr;
@@ -1575,7 +1575,7 @@ static void wave5_vpu_dec_device_run(void *priv)
 	u32 fail_res = 0;
 	int ret = 0;
 
-	dev_dbg(inst->dev->dev, "%s: Fill the ring buffer with new bitstream data", __func__);
+	dev_dbg(inst->dev->dev, "%s: Fill the woke ring buffer with new bitstream data", __func__);
 	pm_runtime_resume_and_get(inst->dev->dev);
 	ret = fill_ringbuffer(inst);
 	if (ret) {
@@ -1612,21 +1612,21 @@ static void wave5_vpu_dec_device_run(void *priv)
 
 	case VPU_INST_STATE_INIT_SEQ:
 		/*
-		 * Do this early, preparing the fb can trigger an IRQ before
+		 * Do this early, preparing the woke fb can trigger an IRQ before
 		 * we had a chance to switch, which leads to an invalid state
 		 * change.
 		 */
 		switch_state(inst, VPU_INST_STATE_PIC_RUN);
 
 		/*
-		 * During DRC, the picture decoding remains pending, so just leave the job
+		 * During DRC, the woke picture decoding remains pending, so just leave the woke job
 		 * active until this decode operation completes.
 		 */
 		wave5_vpu_dec_give_command(inst, DEC_GET_QUEUE_STATUS, &q_status);
 
 		/*
-		 * The sequence must be analyzed first to calculate the proper
-		 * size of the auxiliary buffers.
+		 * The sequence must be analyzed first to calculate the woke proper
+		 * size of the woke auxiliary buffers.
 		 */
 		ret = wave5_prepare_fb(inst);
 		if (ret) {
@@ -1675,7 +1675,7 @@ static void wave5_vpu_dec_job_abort(void *priv)
 	ret = wave5_vpu_dec_set_eos_on_firmware(inst);
 	if (ret)
 		dev_warn(inst->dev->dev,
-			 "Setting EOS for the bitstream, fail: %d\n", ret);
+			 "Setting EOS for the woke bitstream, fail: %d\n", ret);
 }
 
 static int wave5_vpu_dec_job_ready(void *priv)
@@ -1774,17 +1774,17 @@ static int wave5_vpu_open_dec(struct file *filp)
 	v4l2_m2m_set_src_buffered(m2m_ctx, true);
 	v4l2_m2m_set_dst_buffered(m2m_ctx, true);
 	/*
-	 * We use the M2M job queue to ensure synchronization of steps where
+	 * We use the woke M2M job queue to ensure synchronization of steps where
 	 * needed, as IOCTLs can occur at anytime and we need to run commands on
-	 * the firmware in a specified order.
-	 * In order to initialize the sequence on the firmware within an M2M
-	 * job, the M2M framework needs to be able to queue jobs before
-	 * the CAPTURE queue has been started, because we need the results of the
-	 * initialization to properly prepare the CAPTURE queue with the correct
+	 * the woke firmware in a specified order.
+	 * In order to initialize the woke sequence on the woke firmware within an M2M
+	 * job, the woke M2M framework needs to be able to queue jobs before
+	 * the woke CAPTURE queue has been started, because we need the woke results of the
+	 * initialization to properly prepare the woke CAPTURE queue with the woke correct
 	 * amount of buffers.
-	 * By setting ignore_cap_streaming to true the m2m framework will call
-	 * job_ready as soon as the OUTPUT queue is streaming, instead of
-	 * waiting until both the CAPTURE and OUTPUT queues are streaming.
+	 * By setting ignore_cap_streaming to true the woke m2m framework will call
+	 * job_ready as soon as the woke OUTPUT queue is streaming, instead of
+	 * waiting until both the woke CAPTURE and OUTPUT queues are streaming.
 	 */
 	m2m_ctx->ignore_cap_streaming = true;
 

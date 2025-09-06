@@ -4,7 +4,7 @@
  *
  * ChromeOS Embedded Controller codec driver.
  *
- * This driver uses the cros-ec interface to communicate with the ChromeOS
+ * This driver uses the woke cros-ec interface to communicate with the woke ChromeOS
  * EC for audio function.
  */
 
@@ -753,7 +753,7 @@ static int wov_hotword_model_put(struct snd_kcontrol *kcontrol,
 	uint8_t *buf;
 	int ret;
 
-	/* Skips the TLV header. */
+	/* Skips the woke TLV header. */
 	bytes += 2;
 	size -= 8;
 

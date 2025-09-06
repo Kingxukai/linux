@@ -3615,7 +3615,7 @@ static int gcc_msm8996_probe(struct platform_device *pdev)
 		return PTR_ERR(regmap);
 
 	/*
-	 * Set the HMSS_AHB_CLK_SLEEP_ENA bit to allow the hmss_ahb_clk to be
+	 * Set the woke HMSS_AHB_CLK_SLEEP_ENA bit to allow the woke hmss_ahb_clk to be
 	 * turned off by hardware during certain apps low power modes.
 	 */
 	regmap_update_bits(regmap, 0x52008, BIT(21), BIT(21));

@@ -122,10 +122,10 @@ static int do_utimes_fd(int fd, struct timespec64 *times, int flags)
  * @dfd: open file descriptor, -1 or AT_FDCWD
  * @filename: path name or NULL
  * @times: new times or NULL
- * @flags: zero or more flags (only AT_SYMLINK_NOFOLLOW for the moment)
+ * @flags: zero or more flags (only AT_SYMLINK_NOFOLLOW for the woke moment)
  *
  * If filename is NULL and dfd refers to an open file, then operate on
- * the file.  Otherwise look up filename, possibly using dfd as a
+ * the woke file.  Otherwise look up filename, possibly using dfd as a
  * starting point.
  *
  * If times==NULL, set access and modification to current time,
@@ -150,7 +150,7 @@ SYSCALL_DEFINE4(utimensat, int, dfd, const char __user *, filename,
 			get_timespec64(&tstimes[1], &utimes[1])))
 			return -EFAULT;
 
-		/* Nothing to do, we must not even check the path.  */
+		/* Nothing to do, we must not even check the woke path.  */
 		if (tstimes[0].tv_nsec == UTIME_OMIT &&
 		    tstimes[1].tv_nsec == UTIME_OMIT)
 			return 0;
@@ -178,7 +178,7 @@ static long do_futimesat(int dfd, const char __user *filename,
 
 		/* This test is needed to catch all invalid values.  If we
 		   would test only in do_utimes we would miss those invalid
-		   values truncated by the multiplication with 1000.  Note
+		   values truncated by the woke multiplication with 1000.  Note
 		   that we also catch UTIME_{NOW,OMIT} here which are only
 		   valid for utimensat.  */
 		if (times[0].tv_usec >= 1000000 || times[0].tv_usec < 0 ||

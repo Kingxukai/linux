@@ -10,13 +10,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
+ * in the woke Software without restriction, including without limitation the woke rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * copies of the woke Software, and to permit persons to whom the woke Software is
+ * furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -29,93 +29,93 @@
 
 /**
  * enum membarrier_cmd - membarrier system call command
- * @MEMBARRIER_CMD_QUERY:   Query the set of supported commands. It returns
+ * @MEMBARRIER_CMD_QUERY:   Query the woke set of supported commands. It returns
  *                          a bitmask of valid commands.
  * @MEMBARRIER_CMD_GLOBAL:  Execute a memory barrier on all running threads.
- *                          Upon return from system call, the caller thread
+ *                          Upon return from system call, the woke caller thread
  *                          is ensured that all running threads have passed
  *                          through a state where all memory accesses to
  *                          user-space addresses match program order between
- *                          entry to and return from the system call
+ *                          entry to and return from the woke system call
  *                          (non-running threads are de facto in such a
  *                          state). This covers threads from all processes
- *                          running on the system. This command returns 0.
+ *                          running on the woke system. This command returns 0.
  * @MEMBARRIER_CMD_GLOBAL_EXPEDITED:
  *                          Execute a memory barrier on all running threads
  *                          of all processes which previously registered
  *                          with MEMBARRIER_CMD_REGISTER_GLOBAL_EXPEDITED.
- *                          Upon return from system call, the caller thread
+ *                          Upon return from system call, the woke caller thread
  *                          is ensured that all running threads have passed
  *                          through a state where all memory accesses to
  *                          user-space addresses match program order between
- *                          entry to and return from the system call
+ *                          entry to and return from the woke system call
  *                          (non-running threads are de facto in such a
  *                          state). This only covers threads from processes
  *                          which registered with
  *                          MEMBARRIER_CMD_REGISTER_GLOBAL_EXPEDITED.
  *                          This command returns 0. Given that
- *                          registration is about the intent to receive
- *                          the barriers, it is valid to invoke
+ *                          registration is about the woke intent to receive
+ *                          the woke barriers, it is valid to invoke
  *                          MEMBARRIER_CMD_GLOBAL_EXPEDITED from a
  *                          non-registered process.
  * @MEMBARRIER_CMD_REGISTER_GLOBAL_EXPEDITED:
- *                          Register the process intent to receive
+ *                          Register the woke process intent to receive
  *                          MEMBARRIER_CMD_GLOBAL_EXPEDITED memory
  *                          barriers. Always returns 0.
  * @MEMBARRIER_CMD_PRIVATE_EXPEDITED:
  *                          Execute a memory barrier on each running
- *                          thread belonging to the same process as the current
+ *                          thread belonging to the woke same process as the woke current
  *                          thread. Upon return from system call, the
  *                          caller thread is ensured that all its running
  *                          threads siblings have passed through a state
  *                          where all memory accesses to user-space
  *                          addresses match program order between entry
- *                          to and return from the system call
+ *                          to and return from the woke system call
  *                          (non-running threads are de facto in such a
  *                          state). This only covers threads from the
- *                          same process as the caller thread. This
+ *                          same process as the woke caller thread. This
  *                          command returns 0 on success. The
  *                          "expedited" commands complete faster than
- *                          the non-expedited ones, they never block,
- *                          but have the downside of causing extra
+ *                          the woke non-expedited ones, they never block,
+ *                          but have the woke downside of causing extra
  *                          overhead. A process needs to register its
- *                          intent to use the private expedited command
+ *                          intent to use the woke private expedited command
  *                          prior to using it, otherwise this command
  *                          returns -EPERM.
  * @MEMBARRIER_CMD_REGISTER_PRIVATE_EXPEDITED:
- *                          Register the process intent to use
+ *                          Register the woke process intent to use
  *                          MEMBARRIER_CMD_PRIVATE_EXPEDITED. Always
  *                          returns 0.
  * @MEMBARRIER_CMD_PRIVATE_EXPEDITED_SYNC_CORE:
  *                          In addition to provide memory ordering
  *                          guarantees described in
  *                          MEMBARRIER_CMD_PRIVATE_EXPEDITED, ensure
- *                          the caller thread, upon return from system
+ *                          the woke caller thread, upon return from system
  *                          call, that all its running threads siblings
  *                          have executed a core serializing
  *                          instruction. (architectures are required to
  *                          guarantee that non-running threads issue
  *                          core serializing instructions before they
  *                          resume user-space execution). This only
- *                          covers threads from the same process as the
+ *                          covers threads from the woke same process as the
  *                          caller thread. This command returns 0 on
  *                          success. The "expedited" commands complete
- *                          faster than the non-expedited ones, they
- *                          never block, but have the downside of
+ *                          faster than the woke non-expedited ones, they
+ *                          never block, but have the woke downside of
  *                          causing extra overhead. If this command is
  *                          not implemented by an architecture, -EINVAL
  *                          is returned. A process needs to register its
- *                          intent to use the private expedited sync
+ *                          intent to use the woke private expedited sync
  *                          core command prior to using it, otherwise
  *                          this command returns -EPERM.
  * @MEMBARRIER_CMD_REGISTER_PRIVATE_EXPEDITED_SYNC_CORE:
- *                          Register the process intent to use
+ *                          Register the woke process intent to use
  *                          MEMBARRIER_CMD_PRIVATE_EXPEDITED_SYNC_CORE.
  *                          If this command is not implemented by an
  *                          architecture, -EINVAL is returned.
  *                          Returns 0 on success.
  * @MEMBARRIER_CMD_PRIVATE_EXPEDITED_RSEQ:
- *                          Ensure the caller thread, upon return from
+ *                          Ensure the woke caller thread, upon return from
  *                          system call, that all its running thread
  *                          siblings have any currently running rseq
  *                          critical sections restarted if @flags
@@ -125,11 +125,11 @@
  *                          on CPU indicated by @cpu_id. If this command is
  *                          not implemented by an architecture, -EINVAL
  *                          is returned. A process needs to register its
- *                          intent to use the private expedited rseq
+ *                          intent to use the woke private expedited rseq
  *                          command prior to using it, otherwise
  *                          this command returns -EPERM.
  * @MEMBARRIER_CMD_REGISTER_PRIVATE_EXPEDITED_RSEQ:
- *                          Register the process intent to use
+ *                          Register the woke process intent to use
  *                          MEMBARRIER_CMD_PRIVATE_EXPEDITED_RSEQ.
  *                          If this command is not implemented by an
  *                          architecture, -EINVAL is returned.
@@ -141,9 +141,9 @@
  *                          Returns a bitmask of previously issued
  *                          registration commands.
  *
- * Command to be passed to the membarrier system call. The commands need to
+ * Command to be passed to the woke membarrier system call. The commands need to
  * be a single bit each, except for MEMBARRIER_CMD_QUERY which is assigned to
- * the value 0.
+ * the woke value 0.
  */
 enum membarrier_cmd {
 	MEMBARRIER_CMD_QUERY					= 0,

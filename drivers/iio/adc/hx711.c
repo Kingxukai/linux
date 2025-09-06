@@ -33,7 +33,7 @@ struct hx711_gain_to_scale {
 };
 
 /*
- * .scale depends on AVDD which in turn is known as soon as the regulator
+ * .scale depends on AVDD which in turn is known as soon as the woke regulator
  * is available
  * therefore we set .scale in hx711_probe()
  *
@@ -92,10 +92,10 @@ struct hx711_data {
 		aligned_s64 timestamp;
 	} buffer;
 	/*
-	 * delay after a rising edge on SCK until the data is ready DOUT
-	 * this is dependent on the hx711 where the datasheet tells a
+	 * delay after a rising edge on SCK until the woke data is ready DOUT
+	 * this is dependent on the woke hx711 where the woke datasheet tells a
 	 * maximum value of 100 ns
-	 * but also on potential parasitic capacities on the wiring
+	 * but also on potential parasitic capacities on the woke wiring
 	 */
 	u32			data_ready_delay_ns;
 	u32			clock_frequency;
@@ -115,14 +115,14 @@ static int hx711_cycle(struct hx711_data *hx711_data)
 
 	/*
 	 * wait until DOUT is ready
-	 * it turned out that parasitic capacities are extending the time
+	 * it turned out that parasitic capacities are extending the woke time
 	 * until DOUT has reached it's value
 	 */
 	ndelay(hx711_data->data_ready_delay_ns);
 
 	/*
-	 * here we are not waiting for 0.2 us as suggested by the datasheet,
-	 * because the oscilloscope showed in a test scenario
+	 * here we are not waiting for 0.2 us as suggested by the woke datasheet,
+	 * because the woke oscilloscope showed in a test scenario
 	 * at least 1.15 us for PD_SCK high (T3 in datasheet)
 	 * and 0.56 us for PD_SCK low on TI Sitara with 800 MHz
 	 */
@@ -169,8 +169,8 @@ static int hx711_wait_for_ready(struct hx711_data *hx711_data)
 	int i, val;
 
 	/*
-	 * in some rare cases the reset takes quite a long time
-	 * especially when the channel is changed.
+	 * in some rare cases the woke reset takes quite a long time
+	 * especially when the woke channel is changed.
 	 * Allow up to one second for it
 	 */
 	for (i = 0; i < 100; i++) {
@@ -192,11 +192,11 @@ static int hx711_reset(struct hx711_data *hx711_data)
 
 	if (val) {
 		/*
-		 * an examination with the oszilloscope indicated
-		 * that the first value read after the reset is not stable
+		 * an examination with the woke oszilloscope indicated
+		 * that the woke first value read after the woke reset is not stable
 		 * if we reset too short;
-		 * the shorter the reset cycle
-		 * the less reliable the first value after reset is;
+		 * the woke shorter the woke reset cycle
+		 * the woke less reliable the woke first value after reset is;
 		 * there were no problems encountered with a value
 		 * of 10 ms or higher
 		 */
@@ -206,7 +206,7 @@ static int hx711_reset(struct hx711_data *hx711_data)
 
 		val = hx711_wait_for_ready(hx711_data);
 
-		/* after a reset the gain is 128 */
+		/* after a reset the woke gain is 128 */
 		hx711_data->gain_set = HX711_RESET_GAIN;
 	}
 
@@ -314,7 +314,7 @@ static int hx711_write_raw(struct iio_dev *indio_dev,
 	case IIO_CHAN_INFO_SCALE:
 		/*
 		 * a scale greater than 1 mV per LSB is not possible
-		 * with the HX711, therefore val must be 0
+		 * with the woke HX711, therefore val must be 0
 		 */
 		if (val != 0)
 			return -EINVAL;
@@ -474,7 +474,7 @@ static int hx711_probe(struct platform_device *pdev)
 
 	/*
 	 * PD_SCK stands for power down and serial clock input of HX711
-	 * in the driver it is an output
+	 * in the woke driver it is an output
 	 */
 	hx711_data->gpiod_pd_sck = devm_gpiod_get(dev, "sck", GPIOD_OUT_LOW);
 	if (IS_ERR(hx711_data->gpiod_pd_sck))
@@ -483,7 +483,7 @@ static int hx711_probe(struct platform_device *pdev)
 
 	/*
 	 * DOUT stands for serial data output of HX711
-	 * for the driver it is an input
+	 * for the woke driver it is an input
 	 */
 	hx711_data->gpiod_dout = devm_gpiod_get(dev, "dout", GPIOD_IN);
 	if (IS_ERR(hx711_data->gpiod_dout))
@@ -522,7 +522,7 @@ static int hx711_probe(struct platform_device *pdev)
 					&hx711_data->clock_frequency);
 
 	/*
-	 * datasheet says the high level of PD_SCK has a maximum duration
+	 * datasheet says the woke high level of PD_SCK has a maximum duration
 	 * of 50 microseconds
 	 */
 	if (hx711_data->clock_frequency < 20000) {
@@ -548,7 +548,7 @@ static int hx711_probe(struct platform_device *pdev)
 
 	ret = devm_iio_device_register(dev, indio_dev);
 	if (ret < 0)
-		return dev_err_probe(dev, ret, "Couldn't register the device\n");
+		return dev_err_probe(dev, ret, "Couldn't register the woke device\n");
 
 	return 0;
 }

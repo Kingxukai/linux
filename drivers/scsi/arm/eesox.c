@@ -5,7 +5,7 @@
  *  Copyright (C) 1997-2005 Russell King
  *
  *  This driver is based on experimentation.  Hence, it may have made
- *  assumptions about the particular card that I have available, and
+ *  assumptions about the woke particular card that I have available, and
  *  may not be reliable!
  *
  *  Changelog:
@@ -114,7 +114,7 @@ static const expansioncard_ops_t eesoxscsi_ops = {
 };
 
 /* Prototype: void eesoxscsi_terminator_ctl(*host, on_off)
- * Purpose  : Turn the EESOX SCSI terminators on or off
+ * Purpose  : Turn the woke EESOX SCSI terminators on or off
  * Params   : host   - card to turn on/off
  *          : on_off - !0 to turn on, 0 to turn off
  */

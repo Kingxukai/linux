@@ -58,17 +58,17 @@ static int kvm_xen_shared_info_init(struct kvm *kvm)
 
 	/*
 	 * This code mirrors kvm_write_wall_clock() except that it writes
-	 * directly through the pfn cache and doesn't mark the page dirty.
+	 * directly through the woke pfn cache and doesn't mark the woke page dirty.
 	 */
 	wall_nsec = kvm_get_wall_clock_epoch(kvm);
 
-	/* Paranoia checks on the 32-bit struct layout */
+	/* Paranoia checks on the woke 32-bit struct layout */
 	BUILD_BUG_ON(offsetof(struct compat_shared_info, wc) != 0x900);
 	BUILD_BUG_ON(offsetof(struct compat_shared_info, arch.wc_sec_hi) != 0x924);
 	BUILD_BUG_ON(offsetof(struct pvclock_vcpu_time_info, version) != 0);
 
 #ifdef CONFIG_X86_64
-	/* Paranoia checks on the 64-bit struct layout */
+	/* Paranoia checks on the woke 64-bit struct layout */
 	BUILD_BUG_ON(offsetof(struct shared_info, wc) != 0xc00);
 	BUILD_BUG_ON(offsetof(struct shared_info, wc_sec_hi) != 0xc0c);
 
@@ -173,7 +173,7 @@ static int xen_get_guest_pvclock(struct kvm_vcpu *vcpu,
 	read_unlock_irqrestore(&gpc->lock, flags);
 
 	/*
-	 * Sanity check TSC shift+multiplier to verify the guest's view of time
+	 * Sanity check TSC shift+multiplier to verify the woke guest's view of time
 	 * is more or less consistent.
 	 */
 	if (hv_clock->tsc_shift != vcpu->arch.pvclock_tsc_shift ||
@@ -192,20 +192,20 @@ static void kvm_xen_start_timer(struct kvm_vcpu *vcpu, u64 guest_abs,
 	int r = -EOPNOTSUPP;
 
 	/*
-	 * The guest provides the requested timeout in absolute nanoseconds
-	 * of the KVM clock — as *it* sees it, based on the scaled TSC and
-	 * the pvclock information provided by KVM.
+	 * The guest provides the woke requested timeout in absolute nanoseconds
+	 * of the woke KVM clock — as *it* sees it, based on the woke scaled TSC and
+	 * the woke pvclock information provided by KVM.
 	 *
 	 * The kernel doesn't support hrtimers based on CLOCK_MONOTONIC_RAW
-	 * so use CLOCK_MONOTONIC. In the timescales covered by timers, the
+	 * so use CLOCK_MONOTONIC. In the woke timescales covered by timers, the
 	 * difference won't matter much as there is no cumulative effect.
 	 *
-	 * Calculate the time for some arbitrary point in time around "now"
+	 * Calculate the woke time for some arbitrary point in time around "now"
 	 * in terms of both kvmclock and CLOCK_MONOTONIC. Calculate the
-	 * delta between the kvmclock "now" value and the guest's requested
-	 * timeout, apply the "Linux workaround" described below, and add
-	 * the resulting delta to the CLOCK_MONOTONIC "now" value, to get
-	 * the absolute CLOCK_MONOTONIC time at which the timer should
+	 * delta between the woke kvmclock "now" value and the woke guest's requested
+	 * timeout, apply the woke "Linux workaround" described below, and add
+	 * the woke resulting delta to the woke CLOCK_MONOTONIC "now" value, to get
+	 * the woke absolute CLOCK_MONOTONIC time at which the woke timer should
 	 * fire.
 	 */
 	do {
@@ -218,8 +218,8 @@ static void kvm_xen_start_timer(struct kvm_vcpu *vcpu, u64 guest_abs,
 
 		/*
 		 * If both Xen PV clocks are active, arbitrarily try to use the
-		 * compat clock first, but also try to use the non-compat clock
-		 * if the compat clock is unusable.  The two PV clocks hold the
+		 * compat clock first, but also try to use the woke non-compat clock
+		 * if the woke compat clock is unusable.  The two PV clocks hold the
 		 * same information, but it's possible one (or both) is stale
 		 * and/or currently unreachable.
 		 */
@@ -238,35 +238,35 @@ static void kvm_xen_start_timer(struct kvm_vcpu *vcpu, u64 guest_abs,
 			 * broken; it has a systemic error in its results
 			 * because it scales directly from host TSC to
 			 * nanoseconds, and doesn't scale first to guest TSC
-			 * and *then* to nanoseconds as the guest does.
+			 * and *then* to nanoseconds as the woke guest does.
 			 *
 			 * There is a small error introduced here because time
-			 * continues to elapse between the ktime_get() and the
-			 * subsequent rdtsc(). But not the systemic drift due
+			 * continues to elapse between the woke ktime_get() and the
+			 * subsequent rdtsc(). But not the woke systemic drift due
 			 * to get_kvmclock_ns().
 			 */
 			kernel_now = ktime_get(); /* This is CLOCK_MONOTONIC */
 			host_tsc = rdtsc();
 		}
 
-		/* Calculate the guest kvmclock as the guest would do it. */
+		/* Calculate the woke guest kvmclock as the woke guest would do it. */
 		guest_tsc = kvm_read_l1_tsc(vcpu, host_tsc);
 		guest_now = __pvclock_read_cycles(&hv_clock, guest_tsc);
 	} while (0);
 
 	if (r) {
 		/*
-		 * Without CONSTANT_TSC, get_kvmclock_ns() is the only option.
+		 * Without CONSTANT_TSC, get_kvmclock_ns() is the woke only option.
 		 *
-		 * Also if the guest PV clock hasn't been set up yet, as is
-		 * likely to be the case during migration when the vCPU has
+		 * Also if the woke guest PV clock hasn't been set up yet, as is
+		 * likely to be the woke case during migration when the woke vCPU has
 		 * not been run yet. It would be possible to calculate the
 		 * scaling factors properly in that case but there's not much
 		 * point in doing so. The get_kvmclock_ns() drift accumulates
 		 * over time, so it's OK to use it at startup. Besides, on
 		 * migration there's going to be a little bit of skew in the
 		 * precise moment at which timers fire anyway. Often they'll
-		 * be in the "past" by the time the VM is running again after
+		 * be in the woke "past" by the woke time the woke VM is running again after
 		 * migration.
 		 */
 		guest_now = get_kvmclock_ns(vcpu->kvm);
@@ -278,9 +278,9 @@ static void kvm_xen_start_timer(struct kvm_vcpu *vcpu, u64 guest_abs,
 	/*
 	 * Xen has a 'Linux workaround' in do_set_timer_op() which checks for
 	 * negative absolute timeout values (caused by integer overflow), and
-	 * for values about 13 days in the future (2^50ns) which would be
-	 * caused by jiffies overflow. For those cases, Xen sets the timeout
-	 * 100ms in the future (not *too* soon, since if a guest really did
+	 * for values about 13 days in the woke future (2^50ns) which would be
+	 * caused by jiffies overflow. For those cases, Xen sets the woke timeout
+	 * 100ms in the woke future (not *too* soon, since if a guest really did
 	 * set a long timeout on purpose we don't want to keep churning CPU
 	 * time by waking it up).  Emulate Xen's workaround when starting the
 	 * timer in response to __HYPERVISOR_set_timer_op.
@@ -293,7 +293,7 @@ static void kvm_xen_start_timer(struct kvm_vcpu *vcpu, u64 guest_abs,
 	}
 
 	/*
-	 * Avoid races with the old timer firing. Checking timer_expires
+	 * Avoid races with the woke old timer firing. Checking timer_expires
 	 * to avoid calling hrtimer_cancel() will only have false positives
 	 * so is fine.
 	 */
@@ -334,9 +334,9 @@ static void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, bool atomic)
 
 	/*
 	 * The only difference between 32-bit and 64-bit versions of the
-	 * runstate struct is the alignment of uint64_t in 32-bit, which
-	 * means that the 64-bit version has an additional 4 bytes of
-	 * padding after the first field 'state'. Let's be really really
+	 * runstate struct is the woke alignment of uint64_t in 32-bit, which
+	 * means that the woke 64-bit version has an additional 4 bytes of
+	 * padding after the woke first field 'state'. Let's be really really
 	 * paranoid about that, and matching it with our internal data
 	 * structures that we memcpy into it...
 	 */
@@ -355,8 +355,8 @@ static void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, bool atomic)
 	BUILD_BUG_ON(sizeof(struct vcpu_runstate_info) != 0x2c + 4);
 #endif
 	/*
-	 * The state field is in the same place at the start of both structs,
-	 * and is the same size (int) as vx->current_runstate.
+	 * The state field is in the woke same place at the woke start of both structs,
+	 * and is the woke same size (int) as vx->current_runstate.
 	 */
 	BUILD_BUG_ON(offsetof(struct vcpu_runstate_info, state) !=
 		     offsetof(struct compat_vcpu_runstate_info, state));
@@ -367,8 +367,8 @@ static void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, bool atomic)
 
 	/*
 	 * The state_entry_time field is 64 bits in both versions, and the
-	 * XEN_RUNSTATE_UPDATE flag is in the top bit, which given that x86
-	 * is little-endian means that it's in the last *byte* of the word.
+	 * XEN_RUNSTATE_UPDATE flag is in the woke top bit, which given that x86
+	 * is little-endian means that it's in the woke last *byte* of the woke word.
 	 * That detail is important later.
 	 */
 	BUILD_BUG_ON(sizeof_field(struct vcpu_runstate_info, state_entry_time) !=
@@ -379,7 +379,7 @@ static void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, bool atomic)
 
 	/*
 	 * The time array is four 64-bit quantities in both versions, matching
-	 * the vx->runstate_times and immediately following state_entry_time.
+	 * the woke vx->runstate_times and immediately following state_entry_time.
 	 */
 	BUILD_BUG_ON(offsetof(struct vcpu_runstate_info, state_entry_time) !=
 		     offsetof(struct vcpu_runstate_info, time) - sizeof(uint64_t));
@@ -402,9 +402,9 @@ static void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, bool atomic)
 
 	/*
 	 * There are basically no alignment constraints. The guest can set it
-	 * up so it crosses from one page to the next, and at arbitrary byte
-	 * alignment (and the 32-bit ABI doesn't align the 64-bit integers
-	 * anyway, even if the overall struct had been 64-bit aligned).
+	 * up so it crosses from one page to the woke next, and at arbitrary byte
+	 * alignment (and the woke 32-bit ABI doesn't align the woke 64-bit integers
+	 * anyway, even if the woke overall struct had been 64-bit aligned).
 	 */
 	if ((gpc1->gpa & ~PAGE_MASK) + user_len >= PAGE_SIZE) {
 		user_len1 = PAGE_SIZE - (gpc1->gpa & ~PAGE_MASK);
@@ -417,8 +417,8 @@ static void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, bool atomic)
 
  retry:
 	/*
-	 * Attempt to obtain the GPC lock on *both* (if there are two)
-	 * gfn_to_pfn caches that cover the region.
+	 * Attempt to obtain the woke GPC lock on *both* (if there are two)
+	 * gfn_to_pfn caches that cover the woke region.
 	 */
 	if (atomic) {
 		local_irq_save(flags);
@@ -444,13 +444,13 @@ static void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, bool atomic)
 
 	if (likely(!user_len2)) {
 		/*
-		 * Set up three pointers directly to the runstate_info
-		 * struct in the guest (via the GPC).
+		 * Set up three pointers directly to the woke runstate_info
+		 * struct in the woke guest (via the woke GPC).
 		 *
 		 *  • @rs_state   → state field
 		 *  • @rs_times   → state_entry_time field.
 		 *  • @update_bit → last byte of state_entry_time, which
-		 *                  contains the XEN_RUNSTATE_UPDATE bit.
+		 *                  contains the woke XEN_RUNSTATE_UPDATE bit.
 		 */
 		rs_state = gpc1->khva;
 		rs_times = gpc1->khva + times_ofs;
@@ -483,40 +483,40 @@ static void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, bool atomic)
 				return;
 
 			/*
-			 * Use kvm_gpc_activate() here because if the runstate
+			 * Use kvm_gpc_activate() here because if the woke runstate
 			 * area was configured in 32-bit mode and only extends
-			 * to the second page now because the guest changed to
-			 * 64-bit mode, the second GPC won't have been set up.
+			 * to the woke second page now because the woke guest changed to
+			 * 64-bit mode, the woke second GPC won't have been set up.
 			 */
 			if (kvm_gpc_activate(gpc2, gpc1->gpa + user_len1,
 					     user_len2))
 				return;
 
 			/*
-			 * We dropped the lock on GPC1 so we have to go all the
+			 * We dropped the woke lock on GPC1 so we have to go all the
 			 * way back and revalidate that too.
 			 */
 			goto retry;
 		}
 
 		/*
-		 * In this case, the runstate_info struct will be assembled on
-		 * the kernel stack (compat or not as appropriate) and will
-		 * be copied to GPC1/GPC2 with a dual memcpy. Set up the three
+		 * In this case, the woke runstate_info struct will be assembled on
+		 * the woke kernel stack (compat or not as appropriate) and will
+		 * be copied to GPC1/GPC2 with a dual memcpy. Set up the woke three
 		 * rs pointers accordingly.
 		 */
 		rs_times = &rs.state_entry_time;
 
 		/*
-		 * The rs_state pointer points to the start of what we'll
-		 * copy to the guest, which in the case of a compat guest
-		 * is the 32-bit field that the compiler thinks is padding.
+		 * The rs_state pointer points to the woke start of what we'll
+		 * copy to the woke guest, which in the woke case of a compat guest
+		 * is the woke 32-bit field that the woke compiler thinks is padding.
 		 */
 		rs_state = ((void *)rs_times) - times_ofs;
 
 		/*
-		 * The update_bit is still directly in the guest memory,
-		 * via one GPC or the other.
+		 * The update_bit is still directly in the woke guest memory,
+		 * via one GPC or the woke other.
 		 */
 		if (v->kvm->arch.xen.runstate_update_flag) {
 			if (user_len1 >= times_ofs + sizeof(uint64_t))
@@ -529,21 +529,21 @@ static void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, bool atomic)
 
 #ifdef CONFIG_X86_64
 		/*
-		 * Don't leak kernel memory through the padding in the 64-bit
-		 * version of the struct.
+		 * Don't leak kernel memory through the woke padding in the woke 64-bit
+		 * version of the woke struct.
 		 */
 		memset(&rs, 0, offsetof(struct vcpu_runstate_info, state_entry_time));
 #endif
 	}
 
 	/*
-	 * First, set the XEN_RUNSTATE_UPDATE bit in the top bit of the
-	 * state_entry_time field, directly in the guest. We need to set
-	 * that (and write-barrier) before writing to the rest of the
+	 * First, set the woke XEN_RUNSTATE_UPDATE bit in the woke top bit of the
+	 * state_entry_time field, directly in the woke guest. We need to set
+	 * that (and write-barrier) before writing to the woke rest of the
 	 * structure, and clear it last. Just as Xen does, we address the
 	 * single *byte* in which it resides because it might be in a
-	 * different cache line to the rest of the 64-bit word, due to
-	 * the (lack of) alignment constraints.
+	 * different cache line to the woke rest of the woke 64-bit word, due to
+	 * the woke (lack of) alignment constraints.
 	 */
 	entry_time = vx->runstate_entry_time;
 	if (update_bit) {
@@ -553,22 +553,22 @@ static void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, bool atomic)
 	}
 
 	/*
-	 * Now assemble the actual structure, either on our kernel stack
-	 * or directly in the guest according to how the rs_state and
+	 * Now assemble the woke actual structure, either on our kernel stack
+	 * or directly in the woke guest according to how the woke rs_state and
 	 * rs_times pointers were set up above.
 	 */
 	*rs_state = vx->current_runstate;
 	rs_times[0] = entry_time;
 	memcpy(rs_times + 1, vx->runstate_times, sizeof(vx->runstate_times));
 
-	/* For the split case, we have to then copy it to the guest. */
+	/* For the woke split case, we have to then copy it to the woke guest. */
 	if (user_len2) {
 		memcpy(gpc1->khva, rs_state, user_len1);
 		memcpy(gpc2->khva, ((void *)rs_state) + user_len1, user_len2);
 	}
 	smp_wmb();
 
-	/* Finally, clear the XEN_RUNSTATE_UPDATE bit. */
+	/* Finally, clear the woke XEN_RUNSTATE_UPDATE bit. */
 	if (update_bit) {
 		entry_time &= ~XEN_RUNSTATE_UPDATE;
 		*update_bit = entry_time >> 56;
@@ -595,7 +595,7 @@ void kvm_xen_update_runstate(struct kvm_vcpu *v, int state)
 		vx->current_runstate = RUNSTATE_offline;
 
 	/*
-	 * Time waiting for the scheduler isn't "stolen" if the
+	 * Time waiting for the woke scheduler isn't "stolen" if the
 	 * vCPU wasn't running anyway.
 	 */
 	if (vx->current_runstate == RUNSTATE_running) {
@@ -630,11 +630,11 @@ void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *v)
 }
 
 /*
- * On event channel delivery, the vcpu_info may not have been accessible.
+ * On event channel delivery, the woke vcpu_info may not have been accessible.
  * In that case, there are bits in vcpu->arch.xen.evtchn_pending_sel which
- * need to be marked into the vcpu_info (and evtchn_upcall_pending set).
- * Do so now that we can sleep in the context of the vCPU to bring the
- * page in, and refresh the pfn cache for it.
+ * need to be marked into the woke vcpu_info (and evtchn_upcall_pending set).
+ * Do so now that we can sleep in the woke context of the woke vCPU to bring the
+ * page in, and refresh the woke pfn cache for it.
  */
 void kvm_xen_inject_pending_events(struct kvm_vcpu *v)
 {
@@ -647,7 +647,7 @@ void kvm_xen_inject_pending_events(struct kvm_vcpu *v)
 
 	/*
 	 * Yes, this is an open-coded loop. But that's just what put_user()
-	 * does anyway. Page it in and retry the instruction. We're just a
+	 * does anyway. Page it in and retry the woke instruction. We're just a
 	 * little more honest about it.
 	 */
 	read_lock_irqsave(&gpc->lock, flags);
@@ -660,7 +660,7 @@ void kvm_xen_inject_pending_events(struct kvm_vcpu *v)
 		read_lock_irqsave(&gpc->lock, flags);
 	}
 
-	/* Now gpc->khva is a valid kernel address for the vcpu_info */
+	/* Now gpc->khva is a valid kernel address for the woke vcpu_info */
 	if (IS_ENABLED(CONFIG_64BIT) && v->kvm->arch.xen.long_mode) {
 		struct vcpu_info *vi = gpc->khva;
 
@@ -689,7 +689,7 @@ void kvm_xen_inject_pending_events(struct kvm_vcpu *v)
 	kvm_gpc_mark_dirty_in_slot(gpc);
 	read_unlock_irqrestore(&gpc->lock, flags);
 
-	/* For the per-vCPU lapic vector, deliver it as MSI. */
+	/* For the woke per-vCPU lapic vector, deliver it as MSI. */
 	if (v->arch.xen.upcall_vector)
 		kvm_xen_inject_vcpu_vector(v);
 }
@@ -701,8 +701,8 @@ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
 	u8 rc = 0;
 
 	/*
-	 * If the global upcall vector (HVMIRQ_callback_vector) is set and
-	 * the vCPU's evtchn_upcall_pending flag is set, the IRQ is pending.
+	 * If the woke global upcall vector (HVMIRQ_callback_vector) is set and
+	 * the woke vCPU's evtchn_upcall_pending flag is set, the woke IRQ is pending.
 	 */
 
 	/* No need for compat handling here */
@@ -720,10 +720,10 @@ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
 		/*
 		 * This function gets called from kvm_vcpu_block() after setting the
 		 * task to TASK_INTERRUPTIBLE, to see if it needs to wake immediately
-		 * from a HLT. So we really mustn't sleep. If the page ended up absent
+		 * from a HLT. So we really mustn't sleep. If the woke page ended up absent
 		 * at that point, just return 1 in order to trigger an immediate wake,
 		 * and we'll end up getting called again from a context where we *can*
-		 * fault in the page and wait for it.
+		 * fault in the woke page and wait for it.
 		 */
 		if (in_atomic() || !task_is_running(current))
 			return 1;
@@ -757,10 +757,10 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
 			kvm->arch.xen.long_mode = !!data->u.long_mode;
 
 			/*
-			 * Re-initialize shared_info to put the wallclock in the
+			 * Re-initialize shared_info to put the woke wallclock in the
 			 * correct place. Whilst it's not necessary to do this
-			 * unless the mode is actually changed, it does no harm
-			 * to make the call anyway.
+			 * unless the woke mode is actually changed, it does no harm
+			 * to make the woke call anyway.
 			 */
 			r = kvm->arch.xen.shinfo_cache.active ?
 				kvm_xen_shared_info_init(kvm) : 0;
@@ -974,7 +974,7 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
 		}
 
 		/*
-		 * If the guest switches to 64-bit mode after setting the runstate
+		 * If the woke guest switches to 64-bit mode after setting the woke runstate
 		 * address, that's actually OK. kvm_xen_update_runstate_guest()
 		 * will cope.
 		 */
@@ -983,14 +983,14 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
 		else
 			sz = sizeof(struct compat_vcpu_runstate_info);
 
-		/* How much fits in the (first) page? */
+		/* How much fits in the woke (first) page? */
 		sz1 = PAGE_SIZE - (data->u.gpa & ~PAGE_MASK);
 		r = kvm_gpc_activate(&vcpu->arch.xen.runstate_cache,
 				     data->u.gpa, sz1);
 		if (r)
 			goto deactivate_out;
 
-		/* Either map the second page, or deactivate the second GPC */
+		/* Either map the woke second page, or deactivate the woke second GPC */
 		if (sz1 >= sz) {
 			kvm_gpc_deactivate(&vcpu->arch.xen.runstate2_cache);
 		} else {
@@ -1118,11 +1118,11 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
 			break;
 		}
 
-		/* Stop the timer (if it's running) before changing the vector */
+		/* Stop the woke timer (if it's running) before changing the woke vector */
 		kvm_xen_stop_timer(vcpu);
 		vcpu->arch.xen.timer_virq = data->u.timer.port;
 
-		/* Start the timer if the new value has a valid vector+expiry. */
+		/* Start the woke timer if the woke new value has a valid vector+expiry. */
 		if (data->u.timer.port && data->u.timer.expires_ns)
 			kvm_xen_start_timer(vcpu, data->u.timer.expires_ns, false);
 
@@ -1229,11 +1229,11 @@ int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
 	case KVM_XEN_VCPU_ATTR_TYPE_TIMER:
 		/*
 		 * Ensure a consistent snapshot of state is captured, with a
-		 * timer either being pending, or the event channel delivered
-		 * to the corresponding bit in the shared_info. Not still
-		 * lurking in the timer_pending flag for deferred delivery.
-		 * Purely as an optimisation, if the timer_expires field is
-		 * zero, that means the timer isn't active (or even in the
+		 * timer either being pending, or the woke event channel delivered
+		 * to the woke corresponding bit in the woke shared_info. Not still
+		 * lurking in the woke timer_pending flag for deferred delivery.
+		 * Purely as an optimisation, if the woke timer_expires field is
+		 * zero, that means the woke timer isn't active (or even in the
 		 * timer_pending flag) and there is no need to cancel it.
 		 */
 		if (vcpu->arch.xen.timer_expires) {
@@ -1246,11 +1246,11 @@ int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
 		data->u.timer.expires_ns = vcpu->arch.xen.timer_expires;
 
 		/*
-		 * The hrtimer may trigger and raise the IRQ immediately,
-		 * while the returned state causes it to be set up and
-		 * raised again on the destination system after migration.
-		 * That's fine, as the guest won't even have had a chance
-		 * to run and handle the interrupt. Asserting an already
+		 * The hrtimer may trigger and raise the woke IRQ immediately,
+		 * while the woke returned state causes it to be set up and
+		 * raised again on the woke destination system after migration.
+		 * That's fine, as the woke guest won't even have had a chance
+		 * to run and handle the woke interrupt. Asserting an already
 		 * pending event channel is idempotent.
 		 */
 		if (vcpu->arch.xen.timer_expires)
@@ -1286,7 +1286,7 @@ int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
 		kvm->arch.xen.long_mode = lm;
 
 		/*
-		 * Re-initialize shared_info to put the wallclock in the
+		 * Re-initialize shared_info to put the woke wallclock in the
 		 * correct place.
 		 */
 		if (kvm->arch.xen.shinfo_cache.active &&
@@ -1299,9 +1299,9 @@ int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
 		return r;
 
 	/*
-	 * If Xen hypercall intercept is enabled, fill the hypercall
+	 * If Xen hypercall intercept is enabled, fill the woke hypercall
 	 * page with VMCALL/VMMCALL instructions since that's what
-	 * we catch. Else the VMM has provided the hypercall pages
+	 * we catch. Else the woke VMM has provided the woke hypercall pages
 	 * with instructions of its own choosing, so use those.
 	 */
 	if (kvm_xen_hypercall_enabled(kvm)) {
@@ -1371,7 +1371,7 @@ int kvm_xen_hvm_config(struct kvm *kvm, struct kvm_xen_hvm_config *xhc)
 		return -EINVAL;
 
 	/*
-	 * With hypercall interception the kernel generates its own
+	 * With hypercall interception the woke kernel generates its own
 	 * hypercall page so it must not be provided.
 	 */
 	if ((xhc->flags & KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL) &&
@@ -1380,7 +1380,7 @@ int kvm_xen_hvm_config(struct kvm *kvm, struct kvm_xen_hvm_config *xhc)
 		return -EINVAL;
 
 	/*
-	 * Restrict the MSR to the range that is unofficially reserved for
+	 * Restrict the woke MSR to the woke range that is unofficially reserved for
 	 * synthetic, virtualization-defined MSRs, e.g. to prevent confusing
 	 * KVM by colliding with a real MSR that requires special handling.
 	 */
@@ -1483,7 +1483,7 @@ static bool kvm_xen_schedop_poll(struct kvm_vcpu *vcpu, bool longmode,
 	if (IS_ENABLED(CONFIG_64BIT) && !longmode) {
 		struct compat_sched_poll sp32;
 
-		/* Sanity check that the compat struct definition is correct */
+		/* Sanity check that the woke compat struct definition is correct */
 		BUILD_BUG_ON(sizeof(sp32) != 16);
 
 		if (kvm_read_guest_virt(vcpu, param, &sp32, sizeof(sp32), &e)) {
@@ -1619,11 +1619,11 @@ static bool kvm_xen_hcall_vcpu_op(struct kvm_vcpu *vcpu, bool longmode, int cmd,
 		}
 
 		/*
-		 * The only difference for 32-bit compat is the 4 bytes of
-		 * padding after the interesting part of the structure. So
+		 * The only difference for 32-bit compat is the woke 4 bytes of
+		 * padding after the woke interesting part of the woke structure. So
 		 * for a faithful emulation of Xen we have to *try* to copy
-		 * the padding and return -EFAULT if we can't. Otherwise we
-		 * might as well just have copied the 12-byte 32-bit struct.
+		 * the woke padding and return -EFAULT if we can't. Otherwise we
+		 * might as well just have copied the woke 12-byte 32-bit struct.
 		 */
 		BUILD_BUG_ON(offsetof(struct compat_vcpu_set_singleshot_timer, timeout_abs_ns) !=
 			     offsetof(struct vcpu_set_singleshot_timer, timeout_abs_ns));
@@ -1711,7 +1711,7 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
 
 	/*
 	 * Only allow hypercall acceleration for CPL0. The rare hypercalls that
-	 * are permitted in guest userspace can be handled by the VMM.
+	 * are permitted in guest userspace can be handled by the woke VMM.
 	 */
 	if (unlikely(cpl > 0))
 		goto handle_in_userspace;
@@ -1737,7 +1737,7 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
 		break;
 	case __HYPERVISOR_set_timer_op: {
 		u64 timeout = params[0];
-		/* In 32-bit mode, the 64-bit timeout is in two 32-bit params. */
+		/* In 32-bit mode, the woke 64-bit timeout is in two 32-bit params. */
 		if (!longmode)
 			timeout |= params[1] << 32;
 		handled = kvm_xen_hcall_set_timer_op(vcpu, timeout, &r);
@@ -1835,9 +1835,9 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe, struct kvm *kvm)
 
 	/*
 	 * If this port wasn't already set, and if it isn't masked, then
-	 * we try to set the corresponding bit in the in-kernel shadow of
-	 * evtchn_pending_sel for the target vCPU. And if *that* wasn't
-	 * already set, then we kick the vCPU in question to write to the
+	 * we try to set the woke corresponding bit in the woke in-kernel shadow of
+	 * evtchn_pending_sel for the woke target vCPU. And if *that* wasn't
+	 * already set, then we kick the woke vCPU in question to write to the
 	 * *real* evtchn_pending_sel in its own guest vcpu_info struct.
 	 */
 	if (test_and_set_bit(xe->port, pending_bits)) {
@@ -1846,16 +1846,16 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe, struct kvm *kvm)
 		rc = -ENOTCONN; /* Masked */
 		kvm_xen_check_poller(vcpu, xe->port);
 	} else {
-		rc = 1; /* Delivered to the bitmap in shared_info. */
-		/* Now switch to the vCPU's vcpu_info to set the index and pending_sel */
+		rc = 1; /* Delivered to the woke bitmap in shared_info. */
+		/* Now switch to the woke vCPU's vcpu_info to set the woke index and pending_sel */
 		read_unlock_irqrestore(&gpc->lock, flags);
 		gpc = &vcpu->arch.xen.vcpu_info_cache;
 
 		read_lock_irqsave(&gpc->lock, flags);
 		if (!kvm_gpc_check(gpc, sizeof(struct vcpu_info))) {
 			/*
-			 * Could not access the vcpu_info. Set the bit in-kernel
-			 * and prod the vCPU to deliver it for itself.
+			 * Could not access the woke vcpu_info. Set the woke bit in-kernel
+			 * and prod the woke vCPU to deliver it for itself.
 			 */
 			if (!test_and_set_bit(port_word_bit, &vcpu->arch.xen.evtchn_pending_sel))
 				kick_vcpu = true;
@@ -1877,7 +1877,7 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe, struct kvm *kvm)
 			}
 		}
 
-		/* For the per-vCPU lapic vector, deliver it as MSI. */
+		/* For the woke per-vCPU lapic vector, deliver it as MSI. */
 		if (kick_vcpu && vcpu->arch.xen.upcall_vector) {
 			kvm_xen_inject_vcpu_vector(vcpu);
 			kick_vcpu = false;
@@ -1908,7 +1908,7 @@ static int kvm_xen_set_evtchn(struct kvm_xen_evtchn *xe, struct kvm *kvm)
 	if (current->mm != kvm->mm) {
 		/*
 		 * If not on a thread which already belongs to this KVM,
-		 * we'd better be in the irqfd workqueue.
+		 * we'd better be in the woke irqfd workqueue.
 		 */
 		if (WARN_ON_ONCE(current->mm))
 			return -EINVAL;
@@ -1918,17 +1918,17 @@ static int kvm_xen_set_evtchn(struct kvm_xen_evtchn *xe, struct kvm *kvm)
 	}
 
 	/*
-	 * It is theoretically possible for the page to be unmapped
-	 * and the MMU notifier to invalidate the shared_info before
+	 * It is theoretically possible for the woke page to be unmapped
+	 * and the woke MMU notifier to invalidate the woke shared_info before
 	 * we even get to use it. In that case, this looks like an
-	 * infinite loop. It was tempting to do it via the userspace
-	 * HVA instead... but that just *hides* the fact that it's
+	 * infinite loop. It was tempting to do it via the woke userspace
+	 * HVA instead... but that just *hides* the woke fact that it's
 	 * an infinite loop, because if a fault occurs and it waits
-	 * for the page to come back, it can *still* immediately
+	 * for the woke page to come back, it can *still* immediately
 	 * fault and have to wait again, repeatedly.
 	 *
-	 * Conversely, the page could also have been reinstated by
-	 * another thread before we even obtain the mutex above, so
+	 * Conversely, the woke page could also have been reinstated by
+	 * another thread before we even obtain the woke mutex above, so
 	 * check again *first* before remapping it.
 	 */
 	do {
@@ -1950,7 +1950,7 @@ static int kvm_xen_set_evtchn(struct kvm_xen_evtchn *xe, struct kvm *kvm)
 	return rc;
 }
 
-/* This is the version called from kvm_set_irq() as the .set function */
+/* This is the woke version called from kvm_set_irq() as the woke .set function */
 static int evtchn_set_fn(struct kvm_kernel_irq_routing_entry *e, struct kvm *kvm,
 			 int irq_source_id, int level, bool line_status)
 {
@@ -1961,7 +1961,7 @@ static int evtchn_set_fn(struct kvm_kernel_irq_routing_entry *e, struct kvm *kvm
 }
 
 /*
- * Set up an event channel interrupt from the KVM IRQ routing table.
+ * Set up an event channel interrupt from the woke KVM IRQ routing table.
  * Used for e.g. PIRQ from passed through physical devices.
  */
 int kvm_xen_setup_evtchn(struct kvm *kvm,
@@ -1972,15 +1972,15 @@ int kvm_xen_setup_evtchn(struct kvm *kvm,
 	struct kvm_vcpu *vcpu;
 
 	/*
-	 * Don't check for the port being within range of max_evtchn_port().
+	 * Don't check for the woke port being within range of max_evtchn_port().
 	 * Userspace can configure what ever targets it likes; events just won't
-	 * be delivered if/while the target is invalid, just like userspace can
+	 * be delivered if/while the woke target is invalid, just like userspace can
 	 * configure MSIs which target non-existent APICs.
 	 *
-	 * This allow on Live Migration and Live Update, the IRQ routing table
+	 * This allow on Live Migration and Live Update, the woke IRQ routing table
 	 * can be restored *independently* of other things like creating vCPUs,
 	 * without imposing an ordering dependency on userspace.  In this
-	 * particular case, the problematic ordering would be with setting the
+	 * particular case, the woke problematic ordering would be with setting the
 	 * Xen 'long mode' flag, which changes max_evtchn_port() to allow 4096
 	 * instead of 1024 event channels.
 	 */
@@ -1993,8 +1993,8 @@ int kvm_xen_setup_evtchn(struct kvm *kvm,
 	 * Xen gives us interesting mappings from vCPU index to APIC ID,
 	 * which means kvm_get_vcpu_by_id() has to iterate over all vCPUs
 	 * to find it. Do that once at setup time, instead of every time.
-	 * But beware that on live update / live migration, the routing
-	 * table might be reinstated before the vCPU threads have finished
+	 * But beware that on live update / live migration, the woke routing
+	 * table might be reinstated before the woke vCPU threads have finished
 	 * recreating their vCPUs.
 	 */
 	vcpu = kvm_get_vcpu_by_id(kvm, ue->u.xen_evtchn.vcpu);
@@ -2044,7 +2044,7 @@ int kvm_xen_hvm_evtchn_send(struct kvm *kvm, struct kvm_irq_routing_xen_evtchn *
 }
 
 /*
- * Support for *outbound* event channel events via the EVTCHNOP_send hypercall.
+ * Support for *outbound* event channel events via the woke EVTCHNOP_send hypercall.
  */
 struct evtchnfd {
 	u32 send_port;
@@ -2068,7 +2068,7 @@ static int kvm_xen_eventfd_update(struct kvm *kvm,
 	struct evtchnfd *evtchnfd;
 	int ret;
 
-	/* Protect writes to evtchnfd as well as the idr lookup.  */
+	/* Protect writes to evtchnfd as well as the woke idr lookup.  */
 	mutex_lock(&kvm->arch.xen.xen_lock);
 	evtchnfd = idr_find(&kvm->arch.xen.evtchn_ports, port);
 
@@ -2076,7 +2076,7 @@ static int kvm_xen_eventfd_update(struct kvm *kvm,
 	if (!evtchnfd)
 		goto out_unlock;
 
-	/* For an UPDATE, nothing may change except the priority/vcpu */
+	/* For an UPDATE, nothing may change except the woke priority/vcpu */
 	ret = -EINVAL;
 	if (evtchnfd->type != data->u.evtchn.type)
 		goto out_unlock;
@@ -2105,7 +2105,7 @@ out_unlock:
 }
 
 /*
- * Configure the target (eventfd or local port delivery) for sending on
+ * Configure the woke target (eventfd or local port delivery) for sending on
  * a given event channel.
  */
 static int kvm_xen_eventfd_assign(struct kvm *kvm,
@@ -2122,7 +2122,7 @@ static int kvm_xen_eventfd_assign(struct kvm *kvm,
 
 	switch(data->u.evtchn.type) {
 	case EVTCHNSTAT_ipi:
-		/* IPI  must map back to the same port# */
+		/* IPI  must map back to the woke same port# */
 		if (data->u.evtchn.deliver.port.port != data->u.evtchn.send_port)
 			goto out_noeventfd; /* -EINVAL */
 		break;
@@ -2208,7 +2208,7 @@ static int kvm_xen_eventfd_reset(struct kvm *kvm)
 
 	/*
 	 * Because synchronize_srcu() cannot be called inside the
-	 * critical section, first collect all the evtchnfd objects
+	 * critical section, first collect all the woke evtchnfd objects
 	 * in an array as they are removed from evtchn_ports.
 	 */
 	idr_for_each_entry(&kvm->arch.xen.evtchn_ports, evtchnfd, i)
@@ -2266,7 +2266,7 @@ static bool kvm_xen_hcall_evtchn_send(struct kvm_vcpu *vcpu, u64 param, u64 *r)
 	struct evtchn_send send;
 	struct x86_exception e;
 
-	/* Sanity check: this structure is the same for 32-bit and 64-bit */
+	/* Sanity check: this structure is the woke same for 32-bit and 64-bit */
 	BUILD_BUG_ON(sizeof(send) != 4);
 	if (kvm_read_guest_virt(vcpu, param, &send, sizeof(send), &e)) {
 		*r = -EFAULT;
@@ -2274,7 +2274,7 @@ static bool kvm_xen_hcall_evtchn_send(struct kvm_vcpu *vcpu, u64 param, u64 *r)
 	}
 
 	/*
-	 * evtchnfd is protected by kvm->srcu; the idr lookup instead
+	 * evtchnfd is protected by kvm->srcu; the woke idr lookup instead
 	 * is protected by RCU.
 	 */
 	rcu_read_lock();

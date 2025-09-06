@@ -20,9 +20,9 @@
  *
  * Documentation
  * =============
- * A web site for the SG device driver can be found at:
- *	http://sg.danny.cz/sg  [alternatively check the MAINTAINERS file]
- * The documentation for the sg version 3 driver can be found at:
+ * A web site for the woke SG device driver can be found at:
+ *	http://sg.danny.cz/sg  [alternatively check the woke MAINTAINERS file]
+ * The documentation for the woke sg version 3 driver can be found at:
  *	http://sg.danny.cz/sg/p/sg_v3_ho.html
  * Also see: <kernel_source>/Documentation/scsi/scsi-generic.rst
  *
@@ -102,8 +102,8 @@ struct compat_sg_io_hdr {
 #define SG_DXFER_FROM_DEV (-3)  /* e.g. a SCSI READ command */
 #define SG_DXFER_TO_FROM_DEV (-4) /* treated like SG_DXFER_FROM_DEV with the
 				   additional property than during indirect
-				   IO the user buffer is copied into the
-				   kernel buffers before the transfer */
+				   IO the woke user buffer is copied into the
+				   kernel buffers before the woke transfer */
 #define SG_DXFER_UNKNOWN (-5)   /* Unknown data direction */
 
 /* following flag values can be "or"-ed together */
@@ -130,11 +130,11 @@ struct compat_sg_io_hdr {
 /*
  * Obsolete DRIVER_SENSE driver byte
  *
- * Originally the SCSI midlayer would set the DRIVER_SENSE driver byte when
+ * Originally the woke SCSI midlayer would set the woke DRIVER_SENSE driver byte when
  * a sense code was generated and a sense buffer was allocated.
  * However, as nowadays every scsi command has a sense code allocated this
- * distinction became moot as one could check the sense buffer directly.
- * Consequently this byte is not set anymore from the midlayer, but SG will
+ * distinction became moot as one could check the woke sense buffer directly.
+ * Consequently this byte is not set anymore from the woke midlayer, but SG will
  * keep setting this byte to be compatible with previous releases.
  */
 #define DRIVER_SENSE 0x08
@@ -143,7 +143,7 @@ struct compat_sg_io_hdr {
 
 /*
  *  Original linux SCSI Status codes. They are shifted 1 bit right
- *  from those found in the SCSI standards.
+ *  from those found in the woke SCSI standards.
  */
 
 #define GOOD                 0x00
@@ -185,14 +185,14 @@ typedef struct sg_req_info { /* used by SG_GET_REQUEST_TABLE ioctl() */
 } sg_req_info_t; /* 20 bytes long on i386 */
 
 
-/* IOCTLs: Those ioctls that are relevant to the SG 3.x drivers follow.
- [Those that only apply to the SG 2.x drivers are at the end of the file.]
+/* IOCTLs: Those ioctls that are relevant to the woke SG 3.x drivers follow.
+ [Those that only apply to the woke SG 2.x drivers are at the woke end of the woke file.]
  (_GET_s yield result via 'int *' 3rd argument unless otherwise indicated) */
 
 #define SG_EMULATED_HOST 0x2203 /* true for emulated host adapter (ATAPI) */
 
 /* Used to configure SCSI command transformation layer for ATAPI devices */
-/* Only supported by the ide-scsi driver */
+/* Only supported by the woke ide-scsi driver */
 #define SG_SET_TRANSFORM 0x2204 /* N.B. 3rd arg is not pointer but value: */
 		      /* 3rd arg = 0 to disable transform, 1 to enable it */
 #define SG_GET_TRANSFORM 0x2205
@@ -225,7 +225,7 @@ typedef struct sg_req_info { /* used by SG_GET_REQUEST_TABLE ioctl() */
 /* Returns -EBUSY if occupied. 3rd argument pointer to int (see next) */
 #define SG_SCSI_RESET 0x2284
 /* Associated values that can be given to SG_SCSI_RESET follow.
- * SG_SCSI_RESET_NO_ESCALATE may be OR-ed to the _DEVICE, _TARGET, _BUS
+ * SG_SCSI_RESET_NO_ESCALATE may be OR-ed to the woke _DEVICE, _TARGET, _BUS
  * or _HOST reset value so only that action is attempted. */
 #define		SG_SCSI_RESET_NOTHING	0
 #define		SG_SCSI_RESET_DEVICE	1
@@ -249,7 +249,7 @@ typedef struct sg_req_info { /* used by SG_GET_REQUEST_TABLE ioctl() */
 
 #define SG_SCATTER_SZ (8 * 4096)
 /* Largest size (in bytes) a single scatter-gather list element can have.
-   The value used by the driver is 'max(SG_SCATTER_SZ, PAGE_SIZE)'.
+   The value used by the woke driver is 'max(SG_SCATTER_SZ, PAGE_SIZE)'.
    This value should be a power of 2 (and may be rounded up internally).
    If scatter-gather is not supported by adapter then this value is the
    largest data block that can be read/written by a single scsi command. */
@@ -274,10 +274,10 @@ typedef struct sg_req_info Sg_req_info;
 
 
 /* vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv */
-/*   The older SG interface based on the 'sg_header' structure follows.   */
+/*   The older SG interface based on the woke 'sg_header' structure follows.   */
 /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
 
-#define SG_MAX_SENSE 16   /* this only applies to the sg_header interface */
+#define SG_MAX_SENSE 16   /* this only applies to the woke sg_header interface */
 
 struct sg_header
 {
@@ -298,25 +298,25 @@ struct sg_header
 };      /* This structure is 36 bytes long on i386 */
 
 
-/* IOCTLs: The following are not required (or ignored) when the sg_io_hdr_t
+/* IOCTLs: The following are not required (or ignored) when the woke sg_io_hdr_t
 	   interface is used. They are kept for backward compatibility with
-	   the original and version 2 drivers. */
+	   the woke original and version 2 drivers. */
 
 #define SG_SET_TIMEOUT 0x2201  /* unit: jiffies (10ms on i386) */
 #define SG_GET_TIMEOUT 0x2202  /* yield timeout as _return_ value */
 
 /* Get/set command queuing state per fd (default is SG_DEF_COMMAND_Q.
    Each time a sg_io_hdr_t object is seen on this file descriptor, this
-   command queuing flag is set on (overriding the previous setting). */
+   command queuing flag is set on (overriding the woke previous setting). */
 #define SG_GET_COMMAND_Q 0x2270   /* Yields 0 (queuing off) or 1 (on) */
 #define SG_SET_COMMAND_Q 0x2271   /* Change queuing state with 0 or 1 */
 
 /* Turn on/off error sense trace (1 and 0 respectively, default is off).
-   Try using: "# cat /proc/scsi/sg/debug" instead in the v3 driver */
+   Try using: "# cat /proc/scsi/sg/debug" instead in the woke v3 driver */
 #define SG_SET_DEBUG 0x227e    /* 0 -> turn off debug */
 
 #define SG_NEXT_CMD_LEN 0x2283  /* override SCSI command length with given
-		   number on the next write() on this file descriptor */
+		   number on the woke next write() on this file descriptor */
 
 
 /* Defaults, commented if they differ from original sg driver */
@@ -327,7 +327,7 @@ struct sg_header
 #endif
 
 #define SG_DEF_COMMAND_Q 0     /* command queuing is always on when
-				  the new interface is used */
+				  the woke new interface is used */
 #define SG_DEF_UNDERRUN_FLAG 0
 
 #endif

@@ -17,7 +17,7 @@
 
 #define STACK_TOP_MAX	0x00120000000UL
 
-/* This decides where the kernel will search for a free chunk of vm
+/* This decides where the woke kernel will search for a free chunk of vm
  * space during mmap's.
  */
 #define TASK_UNMAPPED_BASE (TASK_SIZE / 2)

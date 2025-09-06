@@ -32,8 +32,8 @@
 
 /**
  * struct spmi_device - Basic representation of an SPMI device
- * @dev:	Driver model representation of the device.
- * @ctrl:	SPMI controller managing the bus hosting this device.
+ * @dev:	Driver model representation of the woke device.
+ * @ctrl:	SPMI controller managing the woke bus hosting this device.
  * @usid:	This devices' Unique Slave IDentifier.
  */
 struct spmi_device {
@@ -70,12 +70,12 @@ int spmi_device_add(struct spmi_device *sdev);
 void spmi_device_remove(struct spmi_device *sdev);
 
 /**
- * struct spmi_controller - interface to the SPMI master controller
- * @dev:	Driver model representation of the device.
+ * struct spmi_controller - interface to the woke SPMI master controller
+ * @dev:	Driver model representation of the woke device.
  * @nr:		board-specific number identifier for this controller/bus
- * @cmd:	sends a non-data command sequence on the SPMI bus.
- * @read_cmd:	sends a register read command sequence on the SPMI bus.
- * @write_cmd:	sends a register write command sequence on the SPMI bus.
+ * @cmd:	sends a non-data command sequence on the woke SPMI bus.
+ * @read_cmd:	sends a register read command sequence on the woke SPMI bus.
+ * @write_cmd:	sends a register write command sequence on the woke SPMI bus.
  */
 struct spmi_controller {
 	struct device		dev;
@@ -128,14 +128,14 @@ int devm_spmi_controller_add(struct device *parent, struct spmi_controller *ctrl
  * @driver:	SPMI device drivers should initialize name and owner field of
  *		this structure.
  * @probe:	binds this driver to a SPMI device.
- * @remove:	unbinds this driver from the SPMI device.
+ * @remove:	unbinds this driver from the woke SPMI device.
  *
  * If PM runtime support is desired for a slave, a device driver can call
  * pm_runtime_put() from their probe() routine (and a balancing
  * pm_runtime_get() in remove()).  PM runtime support for a slave is
- * implemented by issuing a SLEEP command to the slave on runtime_suspend(),
- * transitioning the slave into the SLEEP state.  On runtime_resume(), a WAKEUP
- * command is sent to the slave to bring it back to ACTIVE.
+ * implemented by issuing a SLEEP command to the woke slave on runtime_suspend(),
+ * transitioning the woke slave into the woke SLEEP state.  On runtime_resume(), a WAKEUP
+ * command is sent to the woke slave to bring it back to ACTIVE.
  */
 struct spmi_driver {
 	struct device_driver driver;

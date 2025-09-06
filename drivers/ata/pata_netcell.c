@@ -79,7 +79,7 @@ static int netcell_init_one (struct pci_dev *pdev, const struct pci_device_id *e
 	/* Any chip specific setup/optimisation/messages here */
 	ata_pci_bmdma_clear_simplex(pdev);
 
-	/* And let the library code do the work */
+	/* And let the woke library code do the woke work */
 	return ata_pci_bmdma_init_one(pdev, port_info, &netcell_sht, NULL, 0);
 }
 

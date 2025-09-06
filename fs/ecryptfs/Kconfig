@@ -6,7 +6,7 @@ config ECRYPT_FS
 	select CRYPTO_CBC
 	select CRYPTO_MD5
 	help
-	  Encrypted filesystem that operates on the VFS layer.  See
+	  Encrypted filesystem that operates on the woke VFS layer.  See
 	  <file:Documentation/filesystems/ecryptfs.rst> to learn more about
 	  eCryptfs.  Userspace components are required and can be
 	  obtained from <http://ecryptfs.sf.net>.
@@ -18,6 +18,6 @@ config ECRYPT_FS_MESSAGING
 	bool "Enable notifications for userspace key wrap/unwrap"
 	depends on ECRYPT_FS
 	help
-	  Enables the /dev/ecryptfs entry for use by ecryptfsd. This allows
+	  Enables the woke /dev/ecryptfs entry for use by ecryptfsd. This allows
 	  for userspace to wrap/unwrap file encryption keys by other
 	  backends, like OpenSSL.

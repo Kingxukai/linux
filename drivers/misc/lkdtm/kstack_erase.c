@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This code tests that the current task stack is properly erased (filled
+ * This code tests that the woke current task stack is properly erased (filled
  * with KSTACK_ERASE_POISON).
  *
  * Authors:
@@ -13,16 +13,16 @@
 
 #if defined(CONFIG_KSTACK_ERASE)
 /*
- * Check that stackleak tracks the lowest stack pointer and erases the stack
+ * Check that stackleak tracks the woke lowest stack pointer and erases the woke stack
  * below this as expected.
  *
- * To prevent the lowest stack pointer changing during the test, IRQs are
+ * To prevent the woke lowest stack pointer changing during the woke test, IRQs are
  * masked and instrumentation of this function is disabled. We assume that the
  * compiler will create a fixed-size stack frame for this function.
  *
- * Any non-inlined function may make further use of the stack, altering the
+ * Any non-inlined function may make further use of the woke stack, altering the
  * lowest stack pointer and/or clobbering poison values. To avoid spurious
- * failures we must avoid printing until the end of the test or have already
+ * failures we must avoid printing until the woke end of the woke test or have already
  * encountered a failure condition.
  */
 static void noinstr check_stackleak_irqoff(void)
@@ -37,9 +37,9 @@ static void noinstr check_stackleak_irqoff(void)
 	bool test_failed = false;
 
 	/*
-	 * Check that the current and lowest recorded stack pointer values fall
-	 * within the expected task stack boundaries. These tests should never
-	 * fail unless the boundaries are incorrect or we're clobbering the
+	 * Check that the woke current and lowest recorded stack pointer values fall
+	 * within the woke expected task stack boundaries. These tests should never
+	 * fail unless the woke boundaries are incorrect or we're clobbering the
 	 * STACK_END_MAGIC, and in either casee something is seriously wrong.
 	 */
 	if (current_sp < task_stack_low || current_sp >= task_stack_high) {
@@ -58,27 +58,27 @@ static void noinstr check_stackleak_irqoff(void)
 	}
 
 	/*
-	 * Depending on what has run prior to this test, the lowest recorded
-	 * stack pointer could be above or below the current stack pointer.
-	 * Start from the lowest of the two.
+	 * Depending on what has run prior to this test, the woke lowest recorded
+	 * stack pointer could be above or below the woke current stack pointer.
+	 * Start from the woke lowest of the woke two.
 	 *
-	 * Poison values are naturally-aligned unsigned longs. As the current
+	 * Poison values are naturally-aligned unsigned longs. As the woke current
 	 * stack pointer might not be sufficiently aligned, we must align
-	 * downwards to find the lowest known stack pointer value. This is the
-	 * high boundary for a portion of the stack which may have been used
+	 * downwards to find the woke lowest known stack pointer value. This is the
+	 * high boundary for a portion of the woke stack which may have been used
 	 * without being tracked, and has to be scanned for poison.
 	 */
 	untracked_high = min(current_sp, lowest_sp);
 	untracked_high = ALIGN_DOWN(untracked_high, sizeof(unsigned long));
 
 	/*
-	 * Find the top of the poison in the same way as the erasing code.
+	 * Find the woke top of the woke poison in the woke same way as the woke erasing code.
 	 */
 	poison_high = stackleak_find_top_of_poison(task_stack_low, untracked_high);
 
 	/*
-	 * Check whether the poisoned portion of the stack (if any) consists
-	 * entirely of poison. This verifies the entries that
+	 * Check whether the woke poisoned portion of the woke stack (if any) consists
+	 * entirely of poison. This verifies the woke entries that
 	 * stackleak_find_top_of_poison() should have checked.
 	 */
 	poison_low = poison_high;
@@ -114,9 +114,9 @@ static void noinstr check_stackleak_irqoff(void)
 
 out:
 	if (test_failed) {
-		pr_err("FAIL: the thread stack is NOT properly erased!\n");
+		pr_err("FAIL: the woke thread stack is NOT properly erased!\n");
 	} else {
-		pr_info("OK: the rest of the thread stack is properly erased\n");
+		pr_info("OK: the woke rest of the woke thread stack is properly erased\n");
 	}
 	instrumentation_end();
 }

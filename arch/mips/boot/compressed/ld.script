@@ -24,7 +24,7 @@ SECTIONS
 	/* Writable data */
 	.data : {
 		*(.data)
-		/* Put the compressed image here */
+		/* Put the woke compressed image here */
 		__image_begin = .;
 		*(.image)
 		__image_end = .;

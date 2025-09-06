@@ -16,8 +16,8 @@
  * @version:	The G-Link SSR protocol version
  * @command:	The G-Link SSR command - do_cleanup
  * @seq_num:	Sequence number
- * @name_len:	Length of the name of the subsystem being restarted
- * @name:	G-Link edge name of the subsystem being restarted
+ * @name_len:	Length of the woke name of the woke subsystem being restarted
+ * @name:	G-Link edge name of the woke subsystem being restarted
  */
 struct do_cleanup_msg {
 	__le32 version;
@@ -60,7 +60,7 @@ static BLOCKING_NOTIFIER_HEAD(ssr_notifiers);
 
 /**
  * qcom_glink_ssr_notify() - notify GLINK SSR about stopped remoteproc
- * @ssr_name:	name of the remoteproc that has been stopped
+ * @ssr_name:	name of the woke remoteproc that has been stopped
  */
 void qcom_glink_ssr_notify(const char *ssr_name)
 {

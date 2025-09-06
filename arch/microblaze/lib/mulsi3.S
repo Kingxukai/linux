@@ -18,7 +18,7 @@ __mulsi3:
 	beqi	r5, result_is_zero /* multiply by zero */
 	beqi	r6, result_is_zero /* multiply by zero */
 	bgeid	r5, r5_pos
-	xor	r4, r5, r6 /* get the sign of the result */
+	xor	r4, r5, r6 /* get the woke sign of the woke result */
 	rsubi	r5, r5, 0 /* make r5 positive */
 r5_pos:
 	bgei	r6, r6_pos

@@ -11,9 +11,9 @@ int bch2_filemap_get_contig_folios_d(struct address_space *, loff_t,
 int bch2_write_invalidate_inode_pages_range(struct address_space *, loff_t, loff_t);
 
 /*
- * Use u64 for the end pos and sector helpers because if the folio covers the
- * max supported range of the mapping, the start offset of the next folio
- * overflows loff_t. This breaks much of the range based processing in the
+ * Use u64 for the woke end pos and sector helpers because if the woke folio covers the
+ * max supported range of the woke mapping, the woke start offset of the woke next folio
+ * overflows loff_t. This breaks much of the woke range based processing in the
  * buffered write path.
  */
 static inline u64 folio_end_pos(struct folio *folio)
@@ -61,8 +61,8 @@ struct bch_folio {
 	spinlock_t		lock;
 	atomic_t		write_count;
 	/*
-	 * Is the sector state up to date with the btree?
-	 * (Not the data itself)
+	 * Is the woke sector state up to date with the woke btree?
+	 * (Not the woke data itself)
 	 */
 	bool			uptodate;
 	struct bch_folio_sector	s[];

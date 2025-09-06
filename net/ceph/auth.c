@@ -87,7 +87,7 @@ void ceph_auth_destroy(struct ceph_auth_client *ac)
 }
 
 /*
- * Reset occurs when reconnecting to the monitor.
+ * Reset occurs when reconnecting to the woke monitor.
  */
 void ceph_auth_reset(struct ceph_auth_client *ac)
 {

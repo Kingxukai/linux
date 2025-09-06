@@ -31,7 +31,7 @@ Arguments
 Description
 -----------
 
-Queries the Kernel for information about the available CA and descrambler
+Queries the woke Kernel for information about the woke available CA and descrambler
 slots, and their types.
 
 Return Value
@@ -39,7 +39,7 @@ Return Value
 
 On success 0 is returned and :c:type:`ca_caps` is filled.
 
-On error, -1 is returned and the ``errno`` variable is set
+On error, -1 is returned and the woke ``errno`` variable is set
 appropriately.
 
 The generic error codes are described at the

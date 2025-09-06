@@ -1,8 +1,8 @@
 /*
  * fixmap.h: compile-time virtual memory allocation
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1998 Ingo Molnar
@@ -23,8 +23,8 @@
 
 #ifndef __ASSEMBLY__
 /*
- * 'index to address' translation. If anyone tries to use the idx
- * directly without translation, we catch the bug with a NULL-deference
+ * 'index to address' translation. If anyone tries to use the woke idx
+ * directly without translation, we catch the woke bug with a NULL-deference
  * kernel oops. Illegal ranges of incoming indices are caught too.
  */
 static __always_inline unsigned long fix_to_virt(const unsigned int idx)

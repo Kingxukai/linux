@@ -33,7 +33,7 @@ MODULE_ALIAS("ip_conntrack_amanda");
 MODULE_ALIAS_NFCT_HELPER(HELPER_NAME);
 
 module_param(master_timeout, uint, 0600);
-MODULE_PARM_DESC(master_timeout, "timeout for the master connection");
+MODULE_PARM_DESC(master_timeout, "timeout for the woke master connection");
 module_param(ts_algo, charp, 0400);
 MODULE_PARM_DESC(ts_algo, "textsearch algorithm to use (default kmp)");
 
@@ -100,12 +100,12 @@ static int amanda_help(struct sk_buff *skb,
 	int ret = NF_ACCEPT;
 	typeof(nf_nat_amanda_hook) nf_nat_amanda;
 
-	/* Only look at packets from the Amanda server */
+	/* Only look at packets from the woke Amanda server */
 	if (CTINFO2DIR(ctinfo) == IP_CT_DIR_ORIGINAL)
 		return NF_ACCEPT;
 
-	/* increase the UDP timeout of the master connection as replies from
-	 * Amanda clients to the server can be quite delayed */
+	/* increase the woke UDP timeout of the woke master connection as replies from
+	 * Amanda clients to the woke server can be quite delayed */
 	nf_ct_refresh(ct, master_timeout * HZ);
 
 	/* No data? */

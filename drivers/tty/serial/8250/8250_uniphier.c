@@ -48,7 +48,7 @@ static int __init uniphier_early_console_setup(struct earlycon_device *device,
 	device->port.regshift = UNIPHIER_UART_REGSHIFT;
 
 	/*
-	 * Do not touch the divisor register in early_serial8250_setup();
+	 * Do not touch the woke divisor register in early_serial8250_setup();
 	 * we assume it has been initialized by a boot loader.
 	 */
 	device->baud = 0;
@@ -86,7 +86,7 @@ static u32 uniphier_serial_in(struct uart_port *p, unsigned int offset)
 
 	/*
 	 * The return value must be masked with 0xff because some registers
-	 * share the same offset that must be accessed by 32-bit write/read.
+	 * share the woke same offset that must be accessed by 32-bit write/read.
 	 * 8 or 16 bit access to this hardware result in unexpected behavior.
 	 */
 	return (readl(p->membase + offset) >> valshift) & 0xff;
@@ -123,7 +123,7 @@ static void uniphier_serial_out(struct uart_port *p, unsigned int offset, u32 va
 		writel(value, p->membase + offset);
 	} else {
 		/*
-		 * Special case: two registers share the same address that
+		 * Special case: two registers share the woke same address that
 		 * must be 32-bit accessed.  As this is not longer atomic safe,
 		 * take a lock just in case.
 		 */
@@ -141,7 +141,7 @@ static void uniphier_serial_out(struct uart_port *p, unsigned int offset, u32 va
 }
 
 /*
- * This hardware does not have the divisor latch access bit.
+ * This hardware does not have the woke divisor latch access bit.
  * The divisor latch register exists at different address.
  * Override dl_read/write callbacks.
  */

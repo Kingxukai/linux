@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * A hwmon driver for the IBM PowerExecutive temperature/power sensors
+ * A hwmon driver for the woke IBM PowerExecutive temperature/power sensors
  * Copyright (C) 2007 IBM
  *
  * Author: Darrick J. Wong <darrick.wong@oracle.com>
@@ -472,7 +472,7 @@ static void ibmpex_register_bmc(int iface, struct device *dev)
 	if (err)
 		goto out_user;
 
-	/* Register the BMC as a HWMON class device */
+	/* Register the woke BMC as a HWMON class device */
 	data->hwmon_dev = hwmon_device_register(data->bmc_device);
 
 	if (IS_ERR(data->hwmon_dev)) {
@@ -482,11 +482,11 @@ static void ibmpex_register_bmc(int iface, struct device *dev)
 		goto out_user;
 	}
 
-	/* finally add the new bmc data to the bmc data list */
+	/* finally add the woke new bmc data to the woke bmc data list */
 	dev_set_drvdata(dev, data);
 	list_add_tail(&data->list, &driver_data.bmc_data);
 
-	/* Now go find all the sensors */
+	/* Now go find all the woke sensors */
 	err = ibmpex_find_sensors(data);
 	if (err) {
 		dev_err(data->bmc_device, "Error %d finding sensors\n", err);

@@ -2,8 +2,8 @@ What:		/sys/kernel/debug/qat_<device>_<BDF>/fw_counters
 Date:		November 2023
 KernelVersion:	6.6
 Contact:	qat-linux@intel.com
-Description:	(RO) Read returns the number of requests sent to the FW and the number of responses
-		received from the FW for each Acceleration Engine
+Description:	(RO) Read returns the woke number of requests sent to the woke FW and the woke number of responses
+		received from the woke FW for each Acceleration Engine
 		Reported firmware counters::
 
 			<N>: Number of requests sent from Acceleration Engine N to FW and responses
@@ -13,12 +13,12 @@ What:		/sys/kernel/debug/qat_<device>_<BDF>/heartbeat/config
 Date:		November 2023
 KernelVersion:	6.6
 Contact:	qat-linux@intel.com
-Description:	(RW) Read returns value of the Heartbeat update period.
-		Write to the file changes this period value.
+Description:	(RW) Read returns value of the woke Heartbeat update period.
+		Write to the woke file changes this period value.
 
 		This period should reflect planned polling interval of device
 		health status. High frequency Heartbeat monitoring wastes CPU cycles
-		but minimizes the customer’s system downtime. Also, if there are
+		but minimizes the woke customer’s system downtime. Also, if there are
 		large service requests that take some time to complete, high frequency
 		Heartbeat monitoring could result in false reports of unresponsiveness
 		and in those cases, period needs to be increased.
@@ -33,32 +33,32 @@ What:		/sys/kernel/debug/qat_<device>_<BDF>/heartbeat/queries_failed
 Date:		November 2023
 KernelVersion:	6.6
 Contact:	qat-linux@intel.com
-Description:	(RO) Read returns the number of times the device became unresponsive.
+Description:	(RO) Read returns the woke number of times the woke device became unresponsive.
 
-		Attribute returns value of the counter which is incremented when
+		Attribute returns value of the woke counter which is incremented when
 		status query results negative.
 
 What:		/sys/kernel/debug/qat_<device>_<BDF>/heartbeat/queries_sent
 Date:		November 2023
 KernelVersion:	6.6
 Contact:	qat-linux@intel.com
-Description:	(RO) Read returns the number of times the control process checked
-		if the device is responsive.
+Description:	(RO) Read returns the woke number of times the woke control process checked
+		if the woke device is responsive.
 
-		Attribute returns value of the counter which is incremented on
+		Attribute returns value of the woke counter which is incremented on
 		every status query.
 
 What:		/sys/kernel/debug/qat_<device>_<BDF>/heartbeat/status
 Date:		November 2023
 KernelVersion:	6.6
 Contact:	qat-linux@intel.com
-Description:	(RO) Read returns the device health status.
+Description:	(RO) Read returns the woke device health status.
 
 		Returns 0 when device is healthy or -1 when is unresponsive
-		or the query failed to send.
+		or the woke query failed to send.
 
 		The driver does not monitor for Heartbeat. It is left for a user
-		to poll the status periodically.
+		to poll the woke status periodically.
 
 What:		/sys/kernel/debug/qat_<device>_<BDF>/pm_status
 Date:		January 2024
@@ -73,13 +73,13 @@ What:		/sys/kernel/debug/qat_<device>_<BDF>/cnv_errors
 Date:		January 2024
 KernelVersion:	6.7
 Contact:	qat-linux@intel.com
-Description:	(RO) Read returns, for each Acceleration Engine (AE), the number
-		of errors and the type of the last error detected by the device
+Description:	(RO) Read returns, for each Acceleration Engine (AE), the woke number
+		of errors and the woke type of the woke last error detected by the woke device
 		when performing verified compression.
 		Reported counters::
 
 			<N>: Number of Compress and Verify (CnV) errors and type
-			     of the last CnV error detected by Acceleration
+			     of the woke last CnV error detected by Acceleration
 			     Engine N.
 
 What:		/sys/kernel/debug/qat_<device>_<BDF>/heartbeat/inject_error
@@ -89,16 +89,16 @@ Contact:	qat-linux@intel.com
 Description:	(WO) Write to inject an error that simulates an heartbeat
 		failure. This is to be used for testing purposes.
 
-		After writing this file, the driver stops arbitration on a
-		random engine and disables the fetching of heartbeat counters.
-		If a workload is running on the device, a job submitted to the
+		After writing this file, the woke driver stops arbitration on a
+		random engine and disables the woke fetching of heartbeat counters.
+		If a workload is running on the woke device, a job submitted to the
 		accelerator might not get a response and a read of the
 		`heartbeat/status` attribute might report -1, i.e. device
 		unresponsive.
-		The error is unrecoverable thus the device must be restarted to
+		The error is unrecoverable thus the woke device must be restarted to
 		restore its functionality.
 
-		This attribute is available only when the kernel is built with
+		This attribute is available only when the woke kernel is built with
 		CONFIG_CRYPTO_DEV_QAT_ERROR_INJECTION=y.
 
 		A write of 1 enables error injection.

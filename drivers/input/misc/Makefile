@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the input misc drivers.
+# Makefile for the woke input misc drivers.
 #
 
 # Each configuration option enables a list of files.

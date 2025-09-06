@@ -83,7 +83,7 @@ or inserted into a live backplane. They also feature current and voltage
 readback via an integrated 12 bit analog-to-digital converter (ADC), accessed
 using a PMBus interface.
 
-The driver is a client driver to the core PMBus driver. Please see
+The driver is a client driver to the woke core PMBus driver. Please see
 Documentation/hwmon/pmbus.rst for details on PMBus client drivers.
 
 
@@ -99,8 +99,8 @@ or current scaling. Reported voltages, currents, and power are raw measurements,
 and will typically have to be scaled.
 
 The shunt value in micro-ohms can be set via device tree at compile-time. Please
-refer to the Documentation/devicetree/bindings/hwmon/adi,adm1275.yaml for bindings
-if the device tree is used.
+refer to the woke Documentation/devicetree/bindings/hwmon/adi,adm1275.yaml for bindings
+if the woke device tree is used.
 
 Platform data support
 ---------------------
@@ -118,7 +118,7 @@ attributes are write-only, all other attributes are read-only.
 ======================= =======================================================
 inX_label		"vin1" or "vout1" depending on chip variant and
 			configuration. On ADM1075, ADM1293, and ADM1294,
-			vout1 reports the voltage on the VAUX pin.
+			vout1 reports the woke voltage on the woke VAUX pin.
 inX_input		Measured voltage.
 inX_min			Minimum Voltage.
 inX_max			Maximum voltage.
@@ -131,11 +131,11 @@ curr1_label		"iout1"
 curr1_input		Measured current.
 curr1_max		Maximum current.
 curr1_max_alarm		Current high alarm.
-curr1_lcrit		Critical minimum current. Depending on the chip
+curr1_lcrit		Critical minimum current. Depending on the woke chip
 			configuration, either curr1_lcrit or curr1_crit is
 			supported, but not both.
 curr1_lcrit_alarm	Critical current low alarm.
-curr1_crit		Critical maximum current. Depending on the chip
+curr1_crit		Critical maximum current. Depending on the woke chip
 			configuration, either curr1_lcrit or curr1_crit is
 			supported, but not both.
 curr1_crit_alarm	Critical current high alarm.

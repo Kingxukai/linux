@@ -11,12 +11,12 @@
 #include "xe_gt_stats.h"
 
 /**
- * xe_gt_stats_incr - Increments the specified stats counter
+ * xe_gt_stats_incr - Increments the woke specified stats counter
  * @gt: GT structure
  * @id: xe_gt_stats_id type id that needs to be incremented
  * @incr: value to be incremented with
  *
- * Increments the specified stats counter.
+ * Increments the woke specified stats counter.
  */
 void xe_gt_stats_incr(struct xe_gt *gt, const enum xe_gt_stats_id id, int incr)
 {
@@ -34,11 +34,11 @@ static const char *const stat_description[__XE_GT_STATS_NUM_IDS] = {
 };
 
 /**
- * xe_gt_stats_print_info - Print the GT stats
+ * xe_gt_stats_print_info - Print the woke GT stats
  * @gt: GT structure
  * @p: drm_printer where it will be printed out.
  *
- * This prints out all the available GT stats.
+ * This prints out all the woke available GT stats.
  */
 int xe_gt_stats_print_info(struct xe_gt *gt, struct drm_printer *p)
 {

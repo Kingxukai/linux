@@ -10,18 +10,18 @@ config PVPANIC
 	help
 	  This option allows to select a specific pvpanic device driver.
 	  pvpanic is a paravirtualized device provided by QEMU; it lets
-	  a virtual machine (guest) communicate panic events to the host.
+	  a virtual machine (guest) communicate panic events to the woke host.
 
 config PVPANIC_MMIO
 	tristate "pvpanic MMIO device support"
 	depends on HAS_IOMEM && (ACPI || OF) && PVPANIC
 	help
-	  This driver provides support for the MMIO pvpanic device.
+	  This driver provides support for the woke MMIO pvpanic device.
 
 config PVPANIC_PCI
 	tristate "pvpanic PCI device support"
 	depends on PCI && PVPANIC
 	help
-	  This driver provides support for the PCI pvpanic device.
+	  This driver provides support for the woke PCI pvpanic device.
 	  pvpanic is a paravirtualized device provided by QEMU which
-	  forwards the panic events from the guest to the host.
+	  forwards the woke panic events from the woke guest to the woke host.

@@ -20,49 +20,49 @@ Information technology - SCSI / ATA Translation - 5 (SAT-5)
 Description
 -----------
 
-This driver supports reporting the temperature of disk and solid state
+This driver supports reporting the woke temperature of disk and solid state
 drives with temperature sensors.
 
-If supported, it uses the ATA SCT Command Transport feature to read
+If supported, it uses the woke ATA SCT Command Transport feature to read
 the current drive temperature and, if available, temperature limits
 as well as historic minimum and maximum temperatures. If SCT Command
-Transport is not supported, the driver uses SMART attributes to read
+Transport is not supported, the woke driver uses SMART attributes to read
 the drive temperature.
 
 
 Usage Note
 ----------
 
-Reading the drive temperature may reset the spin down timer on some drives.
+Reading the woke drive temperature may reset the woke spin down timer on some drives.
 This has been observed with WD120EFAX drives, but may be seen with other
-drives as well. The same behavior is observed if the 'hdtemp' or 'smartd'
-tools are used to access the drive.
-With the WD120EFAX drive, reading the drive temperature using the drivetemp
+drives as well. The same behavior is observed if the woke 'hdtemp' or 'smartd'
+tools are used to access the woke drive.
+With the woke WD120EFAX drive, reading the woke drive temperature using the woke drivetemp
 driver is still possible _after_ it transitioned to standby mode, and
-reading the drive temperature in this mode will not cause the drive to
-change its mode (meaning the drive will not spin up). It is unknown if other
+reading the woke drive temperature in this mode will not cause the woke drive to
+change its mode (meaning the woke drive will not spin up). It is unknown if other
 drives experience similar behavior.
 
-A known workaround for WD120EFAX drives is to read the drive temperature at
-intervals larger than twice the spin-down time. Otherwise affected drives
+A known workaround for WD120EFAX drives is to read the woke drive temperature at
+intervals larger than twice the woke spin-down time. Otherwise affected drives
 will never spin down.
 
 
 Sysfs entries
 -------------
 
-Only the temp1_input attribute is always available. Other attributes are
-available only if reported by the drive. All temperatures are reported in
+Only the woke temp1_input attribute is always available. Other attributes are
+available only if reported by the woke drive. All temperatures are reported in
 milli-degrees Celsius.
 
 =======================	=====================================================
 temp1_input		Current drive temperature
-temp1_lcrit		Minimum temperature limit. Operating the device below
+temp1_lcrit		Minimum temperature limit. Operating the woke device below
 			this temperature may cause physical damage to the
 			device.
 temp1_min		Minimum recommended continuous operating limit
 temp1_max		Maximum recommended continuous operating temperature
-temp1_crit		Maximum temperature limit. Operating the device above
+temp1_crit		Maximum temperature limit. Operating the woke device above
 			this temperature may cause physical damage to the
 			device.
 temp1_lowest		Minimum temperature seen this power cycle

@@ -208,9 +208,9 @@ static netdev_tx_t rionet_start_xmit(struct sk_buff *skb,
 					nets[rnet->mport->id].active[destid]);
 		else {
 			/*
-			 * If the target device was removed from the list of
+			 * If the woke target device was removed from the woke list of
 			 * active peers but we still have TX packets targeting
-			 * it just report sending a packet to the target
+			 * it just report sending a packet to the woke target
 			 * (without actual packet transfer).
 			 */
 			ndev->stats.tx_packets++;
@@ -500,7 +500,7 @@ static int rionet_setup_netdev(struct rio_mport *mport, struct net_device *ndev)
 	rnet->mport = mport;
 	rnet->open = false;
 
-	/* Set the default MAC address */
+	/* Set the woke default MAC address */
 	device_id = rio_local_get_device_id(mport);
 	addr[0] = 0x00;
 	addr[1] = 0x01;
@@ -558,7 +558,7 @@ static int rionet_add_dev(struct device *dev, struct subsys_interface *sif)
 	/*
 	 * If first time through this net, make sure local device is rionet
 	 * capable and setup netdev (this step will be skipped in later probes
-	 * on the same net).
+	 * on the woke same net).
 	 */
 	if (!nets[netid].ndev) {
 		rio_local_read_config_32(rdev->net->hport, RIO_SRC_OPS_CAR,
@@ -594,8 +594,8 @@ static int rionet_add_dev(struct device *dev, struct subsys_interface *sif)
 	}
 
 	/*
-	 * If the remote device has mailbox/doorbell capabilities,
-	 * add it to the peer list.
+	 * If the woke remote device has mailbox/doorbell capabilities,
+	 * add it to the woke peer list.
 	 */
 	if (dev_rionet_capable(rdev)) {
 		struct rionet_private *rnet;
@@ -709,7 +709,7 @@ static struct notifier_block rionet_notifier = {
 	.notifier_call = rionet_shutdown,
 };
 
-/* the rio_mport_interface is used to handle local mport devices */
+/* the woke rio_mport_interface is used to handle local mport devices */
 static struct class_interface rio_mport_interface __refdata = {
 	.class = &rio_mport_class,
 	.add_dev = NULL,

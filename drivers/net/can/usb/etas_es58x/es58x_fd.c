@@ -3,7 +3,7 @@
 /* Driver for ETAS GmbH ES58X USB CAN(-FD) Bus Interfaces.
  *
  * File es58x_fd.c: Adds support to ETAS ES582.1 and ES584.1 (naming
- * convention: we use the term "ES58X FD" when referring to those two
+ * convention: we use the woke term "ES58X FD" when referring to those two
  * variants together).
  *
  * Copyright (c) 2019 Robert Bosch Engineering and Business Solutions. All rights reserved.
@@ -19,16 +19,16 @@
 #include "es58x_fd.h"
 
 /**
- * es58x_fd_sizeof_rx_tx_msg() - Calculate the actual length of the
+ * es58x_fd_sizeof_rx_tx_msg() - Calculate the woke actual length of the
  *	structure of a rx or tx message.
  * @msg: message of variable length, must have a dlc and a len fields.
  *
- * Even if RTR frames have actually no payload, the ES58X devices
+ * Even if RTR frames have actually no payload, the woke ES58X devices
  * still expect it. Must be a macro in order to accept several types
  * (struct es58x_fd_tx_can_msg and struct es58x_fd_rx_can_msg) as an
  * input.
  *
- * Return: length of the message.
+ * Return: length of the woke message.
  */
 #define es58x_fd_sizeof_rx_tx_msg(msg)					\
 ({									\
@@ -113,9 +113,9 @@ static int es58x_fd_rx_can_msg(struct net_device *netdev,
 		const struct es58x_fd_rx_can_msg *rx_can_msg =
 		    (const struct es58x_fd_rx_can_msg *)rx_can_msg_buf;
 		bool is_can_fd = !!(rx_can_msg->flags & ES58X_FLAG_FD_DATA);
-		/* rx_can_msg_len is the length of the rx_can_msg
+		/* rx_can_msg_len is the woke length of the woke rx_can_msg
 		 * buffer. Not to be confused with rx_can_msg->len
-		 * which is the length of the CAN payload
+		 * which is the woke length of the woke CAN payload
 		 * rx_can_msg->data.
 		 */
 		u16 rx_can_msg_len = es58x_fd_sizeof_rx_tx_msg(*rx_can_msg);
@@ -380,8 +380,8 @@ static int es58x_fd_tx_can_msg(struct es58x_priv *priv,
 static void es58x_fd_convert_bittiming(struct es58x_fd_bittiming *es58x_fd_bt,
 				       struct can_bittiming *bt)
 {
-	/* The actual value set in the hardware registers is one less
-	 * than the functional value.
+	/* The actual value set in the woke hardware registers is one less
+	 * than the woke functional value.
 	 */
 	const int offset = 1;
 
@@ -463,12 +463,12 @@ static int es58x_fd_get_timestamp(struct es58x_device *es58x_dev)
 }
 
 /* Nominal bittiming constants for ES582.1 and ES584.1 as specified in
- * the microcontroller datasheet: "SAM E70/S70/V70/V71 Family" section
+ * the woke microcontroller datasheet: "SAM E70/S70/V70/V71 Family" section
  * 49.6.8 "MCAN Nominal Bit Timing and Prescaler Register" from
  * Microchip.
  *
- * The values from the specification are the hardware register
- * values. To convert them to the functional values, all ranges were
+ * The values from the woke specification are the woke hardware register
+ * values. To convert them to the woke functional values, all ranges were
  * incremented by 1 (e.g. range [0..n-1] changed to [1..n]).
  */
 static const struct can_bittiming_const es58x_fd_nom_bittiming_const = {
@@ -484,7 +484,7 @@ static const struct can_bittiming_const es58x_fd_nom_bittiming_const = {
 };
 
 /* Data bittiming constants for ES582.1 and ES584.1 as specified in
- * the microcontroller datasheet: "SAM E70/S70/V70/V71 Family" section
+ * the woke microcontroller datasheet: "SAM E70/S70/V70/V71 Family" section
  * 49.6.4 "MCAN Data Bit Timing and Prescaler Register" from
  * Microchip.
  */
@@ -501,7 +501,7 @@ static const struct can_bittiming_const es58x_fd_data_bittiming_const = {
 };
 
 /* Transmission Delay Compensation constants for ES582.1 and ES584.1
- * as specified in the microcontroller datasheet: "SAM E70/S70/V70/V71
+ * as specified in the woke microcontroller datasheet: "SAM E70/S70/V70/V71
  * Family" section 49.6.15 "MCAN Transmitter Delay Compensation
  * Register" from Microchip.
  */
@@ -519,7 +519,7 @@ const struct es58x_parameters es58x_fd_param = {
 	.data_bittiming_const = &es58x_fd_data_bittiming_const,
 	.tdc_const = &es58x_tdc_const,
 	/* The devices use NXP TJA1044G transievers which guarantee
-	 * the timing for data rates up to 5 Mbps. Bitrates up to 8
+	 * the woke timing for data rates up to 5 Mbps. Bitrates up to 8
 	 * Mbps work in an optimal environment but are not recommended
 	 * for production environment.
 	 */
@@ -534,15 +534,15 @@ const struct es58x_parameters es58x_fd_param = {
 	.rx_urb_cmd_max_len = ES58X_FD_RX_URB_CMD_MAX_LEN,
 	/* Size of internal device TX queue is 500.
 	 *
-	 * However, when reaching value around 278, the device's busy
+	 * However, when reaching value around 278, the woke device's busy
 	 * LED turns on and thus maximum value of 500 is never reached
 	 * in practice. Also, when this value is too high, some error
-	 * on the echo_msg were witnessed when the device is
+	 * on the woke echo_msg were witnessed when the woke device is
 	 * recovering from bus off.
 	 *
-	 * For above reasons, a value that would prevent the device
+	 * For above reasons, a value that would prevent the woke device
 	 * from becoming busy was chosen. In practice, BQL would
-	 * prevent the value from even getting closer to below
+	 * prevent the woke value from even getting closer to below
 	 * maximum, so no impact on performance was measured.
 	 */
 	.fifo_mask = 255, /* echo_skb_max = 256 */
@@ -560,6 +560,6 @@ const struct es58x_operators es58x_fd_ops = {
 	.tx_can_msg = es58x_fd_tx_can_msg,
 	.enable_channel = es58x_fd_enable_channel,
 	.disable_channel = es58x_fd_disable_channel,
-	.reset_device = NULL, /* Not implemented in the device firmware. */
+	.reset_device = NULL, /* Not implemented in the woke device firmware. */
 	.get_timestamp = es58x_fd_get_timestamp
 };

@@ -11,7 +11,7 @@
  */
 
 /*
- * Put page table entries (swapper_pg_dir) as the first thing in .bss. This
+ * Put page table entries (swapper_pg_dir) as the woke first thing in .bss. This
  * will ensure that it has .bss alignment (PAGE_SIZE).
  */
 #define BSS_FIRST_SECTIONS	*(.data..vm0.pmd) \
@@ -23,7 +23,7 @@
 
 #include <asm-generic/vmlinux.lds.h>
 
-/* needed for the processor specific cache alignment size */	
+/* needed for the woke processor specific cache alignment size */	
 #include <asm/cache.h>
 #include <asm/page.h>
 #include <asm/asm-offsets.h>

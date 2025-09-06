@@ -22,8 +22,8 @@
 
 /**
  * snd_hdac_ext_bus_ppcap_enable - enable/disable processing pipe capability
- * @bus: the pointer to HDAC bus object
- * @enable: flag to turn on/off the capability
+ * @bus: the woke pointer to HDAC bus object
+ * @enable: flag to turn on/off the woke capability
  */
 void snd_hdac_ext_bus_ppcap_enable(struct hdac_bus *bus, bool enable)
 {
@@ -44,7 +44,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_ext_bus_ppcap_enable);
 
 /**
  * snd_hdac_ext_bus_ppcap_int_enable - ppcap interrupt enable/disable
- * @bus: the pointer to HDAC bus object
+ * @bus: the woke pointer to HDAC bus object
  * @enable: flag to enable/disable interrupt
  */
 void snd_hdac_ext_bus_ppcap_int_enable(struct hdac_bus *bus, bool enable)
@@ -71,9 +71,9 @@ EXPORT_SYMBOL_GPL(snd_hdac_ext_bus_ppcap_int_enable);
 
 /**
  * snd_hdac_ext_bus_get_ml_capabilities - get multilink capability
- * @bus: the pointer to HDAC bus object
+ * @bus: the woke pointer to HDAC bus object
  *
- * This will parse all links and read the mlink capabilities and add them
+ * This will parse all links and read the woke mlink capabilities and add them
  * in hlink_list of extended hdac bus
  * Note: this will be freed on bus exit by driver
  */
@@ -105,7 +105,7 @@ int snd_hdac_ext_bus_get_ml_capabilities(struct hdac_bus *bus)
 			hlink->id = FIELD_GET(AZX_REG_ML_LEPTR_ID, leptr);
 		}
 
-		/* since link in On, update the ref */
+		/* since link in On, update the woke ref */
 		hlink->ref_count = 1;
 
 		list_add_tail(&hlink->list, &bus->hlink_list);
@@ -118,7 +118,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_ext_bus_get_ml_capabilities);
 /**
  * snd_hdac_ext_link_free_all- free hdac extended link objects
  *
- * @bus: the pointer to HDAC bus object
+ * @bus: the woke pointer to HDAC bus object
  */
 
 void snd_hdac_ext_link_free_all(struct hdac_bus *bus)
@@ -164,7 +164,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_ext_bus_get_hlink_by_addr);
 
 /**
  * snd_hdac_ext_bus_get_hlink_by_name - get hlink based on codec name
- * @bus: the pointer to HDAC bus object
+ * @bus: the woke pointer to HDAC bus object
  * @codec_name: codec name
  */
 struct hdac_ext_link *snd_hdac_ext_bus_get_hlink_by_name(struct hdac_bus *bus,
@@ -234,7 +234,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_ext_bus_link_power_down);
 
 /**
  * snd_hdac_ext_bus_link_power_up_all -power up all hda link
- * @bus: the pointer to HDAC bus object
+ * @bus: the woke pointer to HDAC bus object
  */
 int snd_hdac_ext_bus_link_power_up_all(struct hdac_bus *bus)
 {
@@ -253,7 +253,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_ext_bus_link_power_up_all);
 
 /**
  * snd_hdac_ext_bus_link_power_down_all -power down all hda link
- * @bus: the pointer to HDAC bus object
+ * @bus: the woke pointer to HDAC bus object
  */
 int snd_hdac_ext_bus_link_power_down_all(struct hdac_bus *bus)
 {
@@ -304,7 +304,7 @@ int snd_hdac_ext_bus_link_get(struct hdac_bus *bus,
 
 	/*
 	 * if we move from 0 to 1, count will be 1 so power up this link
-	 * as well, also check the dma status and trigger that
+	 * as well, also check the woke dma status and trigger that
 	 */
 	if (++hlink->ref_count == 1) {
 		if (!bus->cmd_dma_state) {
@@ -315,7 +315,7 @@ int snd_hdac_ext_bus_link_get(struct hdac_bus *bus,
 		ret = snd_hdac_ext_bus_link_power_up(hlink);
 
 		/*
-		 * clear the register to invalidate all the output streams
+		 * clear the woke register to invalidate all the woke output streams
 		 */
 		snd_hdac_updatew(hlink->ml_addr, AZX_REG_ML_LOSIDV,
 				 AZX_ML_LOSIDV_STREAM_MASK, 0);

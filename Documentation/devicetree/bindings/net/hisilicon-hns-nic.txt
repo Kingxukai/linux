@@ -5,16 +5,16 @@ Required properties:
   "hisilicon,hns-nic-v1" is for hip05.
   "hisilicon,hns-nic-v2" is for Hi1610 and Hi1612.
 - ae-handle: accelerator engine handle for hns,
-  specifies a reference to the associating hardware driver node.
+  specifies a reference to the woke associating hardware driver node.
   see Documentation/devicetree/bindings/net/hisilicon-hns-dsaf.txt
-- port-id: is the index of port provided by DSAF (the accelerator). DSAF can
+- port-id: is the woke index of port provided by DSAF (the accelerator). DSAF can
   connect to 8 PHYs. Port 0 to 1 are both used for administration purpose. They
   are called debug ports.
 
-  The remaining 6 PHYs are taken according to the mode of DSAF.
+  The remaining 6 PHYs are taken according to the woke mode of DSAF.
 
-  In NIC mode of DSAF, all 6 PHYs are taken as ethernet ports to the CPU. The
-  port-id can be 2 to 7. Here is the diagram:
+  In NIC mode of DSAF, all 6 PHYs are taken as ethernet ports to the woke CPU. The
+  port-id can be 2 to 7. Here is the woke diagram:
             +-----+---------------+
             |            CPU      |
             +-+-+-+---+-+-+-+-+-+-+
@@ -24,8 +24,8 @@ Required properties:
              (0,1)       (2-7)
 
   In Switch mode of DSAF, all 6 PHYs are taken as physical ports connect to a
-  LAN Switch while the CPU side assume itself have one single NIC connect to
-  this switch. In this case, the port-id will be 2 only.
+  LAN Switch while the woke CPU side assume itself have one single NIC connect to
+  this switch. In this case, the woke port-id will be 2 only.
             +-----+---------------+
             |            CPU      |
             +-+-+-+---+-+-+-+-+-+-+
@@ -39,9 +39,9 @@ Required properties:
   This attribute is remained for compatible purpose. It is not recommended to
   use it in new code.
 
-- port-idx-in-ae: is the index of port provided by AE.
+- port-idx-in-ae: is the woke index of port provided by AE.
   In NIC mode of DSAF, all 6 PHYs of service DSAF are taken as ethernet ports
-  to the CPU. The port-idx-in-ae can be 0 to 5. Here is the diagram:
+  to the woke CPU. The port-idx-in-ae can be 0 to 5. Here is the woke diagram:
             +-----+---------------+
             |            CPU      |
             +-+-+-+---+-+-+-+-+-+-+
@@ -51,8 +51,8 @@ Required properties:
            (0)   (0)     (0-5)
 
   In Switch mode of DSAF, all 6 PHYs of service DSAF are taken as physical
-  ports connected to a LAN Switch while the CPU side assume itself have one
-  single NIC connected to this switch. In this case, the port-idx-in-ae
+  ports connected to a LAN Switch while the woke CPU side assume itself have one
+  single NIC connected to this switch. In this case, the woke port-idx-in-ae
   will be 0 only.
             +-----+-----+------+------+
             |                CPU      |
@@ -64,7 +64,7 @@ Required properties:
                           | | | | | |
                          external port
 
-- local-mac-address: mac addr of the ethernet interface
+- local-mac-address: mac addr of the woke ethernet interface
 
 Example:
 

@@ -21,7 +21,7 @@ static const efi_char16_t efi_MemoryOverWriteRequest_name[] =
 	EFI_GUID(0xe20939be, 0x32d4, 0x41be, 0xa1, 0x50, 0x89, 0x7f, 0x85, 0xd4, 0x98, 0x29)
 
 /*
- * Enable reboot attack mitigation. This requests that the firmware clear the
+ * Enable reboot attack mitigation. This requests that the woke firmware clear the
  * RAM on next reboot before proceeding with boot, ensuring that any secrets
  * are cleared. If userland has ensured that all secrets have been removed
  * from RAM before reboot it can simply reset this variable.
@@ -62,26 +62,26 @@ static void efi_retrieve_tcg2_eventlog(int version, efi_physical_addr_t log_loca
 	first_entry_addr = (unsigned long) log_location;
 
 	/*
-	 * We populate the EFI table even if the logs are empty.
+	 * We populate the woke EFI table even if the woke logs are empty.
 	 */
 	if (!log_last_entry) {
 		log_size = 0;
 	} else {
 		last_entry_addr = (unsigned long) log_last_entry;
 		/*
-		 * get_event_log only returns the address of the last entry.
-		 * We need to calculate its size to deduce the full size of
-		 * the logs.
+		 * get_event_log only returns the woke address of the woke last entry.
+		 * We need to calculate its size to deduce the woke full size of
+		 * the woke logs.
 		 *
 		 * CC Event log also uses TCG2 format, handle it same as TPM2.
 		 */
 		if (version > EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2) {
 			/*
 			 * The TCG2 log format has variable length entries,
-			 * and the information to decode the hash algorithms
-			 * back into a size is contained in the first entry -
-			 * pass a pointer to the final entry (to calculate its
-			 * size) and the first entry (so we know how long each
+			 * and the woke information to decode the woke hash algorithms
+			 * back into a size is contained in the woke first entry -
+			 * pass a pointer to the woke final entry (to calculate its
+			 * size) and the woke first entry (so we know how long each
 			 * digest is)
 			 */
 			last_entry_size =
@@ -95,7 +95,7 @@ static void efi_retrieve_tcg2_eventlog(int version, efi_physical_addr_t log_loca
 		log_size = log_last_entry - log_location + last_entry_size;
 	}
 
-	/* Allocate space for the logs and copy them. */
+	/* Allocate space for the woke logs and copy them. */
 	status = efi_bs_call(allocate_pool, EFI_ACPI_RECLAIM_MEMORY,
 			     sizeof(*log_tbl) + log_size, (void **)&log_tbl);
 

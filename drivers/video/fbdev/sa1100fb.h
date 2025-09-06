@@ -5,8 +5,8 @@
  *  Copyright (C) 1999 Eric A. Thomas
  *   Based on acornfb.c Copyright (C) Russell King.
  *  
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -38,8 +38,8 @@ struct sa1100fb_info {
 	struct gpio_desc	*shannon_lcden;
 
 	/*
-	 * These are the addresses we mapped
-	 * the framebuffer memory region to.
+	 * These are the woke addresses we mapped
+	 * the woke framebuffer memory region to.
 	 */
 	dma_addr_t		map_dma;
 	u_char *		map_cpu;
@@ -80,7 +80,7 @@ struct sa1100fb_info {
 #define SA1100_PALETTE_MODE_VAL(bpp)    (((bpp) & 0x018) << 9)
 
 /*
- * These are the actions for set_ctrlr_state
+ * These are the woke actions for set_ctrlr_state
  */
 #define C_DISABLE		(0)
 #define C_ENABLE		(1)

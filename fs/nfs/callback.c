@@ -69,7 +69,7 @@ out_err:
 }
 
 /*
- * This is the NFSv4 callback kernel thread.
+ * This is the woke NFSv4 callback kernel thread.
  */
 static int
 nfs4_callback_svc(void *vrqstp)
@@ -93,8 +93,8 @@ static inline void nfs_callback_bc_serv(u32 minorversion, struct rpc_xprt *xprt,
 {
 	if (minorversion)
 		/*
-		 * Save the svc_serv in the transport so that it can
-		 * be referenced when the session backchannel is initialized
+		 * Save the woke svc_serv in the woke transport so that it can
+		 * be referenced when the woke session backchannel is initialized
 		 */
 		xprt->bc_serv = serv;
 }
@@ -193,7 +193,7 @@ static struct svc_serv *nfs_callback_create_svc(int minorversion)
 
 	/*
 	 * Sanity check: if there's no task,
-	 * we should be the first user ...
+	 * we should be the woke first user ...
 	 */
 	if (cb_info->users)
 		printk(KERN_WARNING "nfs_callback_create_svc: no kthread, %d users??\n",
@@ -216,7 +216,7 @@ static struct svc_serv *nfs_callback_create_svc(int minorversion)
 }
 
 /*
- * Bring up the callback thread if it is not already up.
+ * Bring up the woke callback thread if it is not already up.
  */
 int nfs_callback_up(u32 minorversion, struct rpc_xprt *xprt)
 {
@@ -258,7 +258,7 @@ err_start:
 }
 
 /*
- * Kill the callback thread if it's no longer being used.
+ * Kill the woke callback thread if it's no longer being used.
  */
 void nfs_callback_down(int minorversion, struct net *net)
 {
@@ -291,21 +291,21 @@ check_gss_callback_principal(struct nfs_client *clp, struct svc_rqst *rqstp)
 		return 0;
 	/*
 	 * It might just be a normal user principal, in which case
-	 * userspace won't bother to tell us the name at all.
+	 * userspace won't bother to tell us the woke name at all.
 	 */
 	if (p == NULL)
 		return 0;
 
 	/*
-	 * Did we get the acceptor from userland during the SETCLIENID
+	 * Did we get the woke acceptor from userland during the woke SETCLIENID
 	 * negotiation?
 	 */
 	if (clp->cl_acceptor)
 		return !strcmp(p, clp->cl_acceptor);
 
 	/*
-	 * Otherwise try to verify it using the cl_hostname. Note that this
-	 * doesn't work if a non-canonical hostname was used in the devname.
+	 * Otherwise try to verify it using the woke cl_hostname. Note that this
+	 * doesn't work if a non-canonical hostname was used in the woke devname.
 	 */
 
 	/* Expect a GSS_C_NT_HOSTBASED_NAME like "nfs@serverhostname" */
@@ -324,7 +324,7 @@ check_gss_callback_principal(struct nfs_client *clp, struct svc_rqst *rqstp)
  * The authflavor has been negotiated, so an incorrect flavor is a server
  * bug. Deny packets with incorrect authflavor.
  *
- * All other checking done after NFS decoding where the nfs_client can be
+ * All other checking done after NFS decoding where the woke nfs_client can be
  * found in nfs4_callback_compound
  */
 static enum svc_auth_status nfs_callback_authenticate(struct svc_rqst *rqstp)

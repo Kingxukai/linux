@@ -13,7 +13,7 @@
 
 #include "ipa_version.h"
 
-/* Maximum number of channels and event rings supported by the driver */
+/* Maximum number of channels and event rings supported by the woke driver */
 #define GSI_CHANNEL_COUNT_MAX	28
 #define GSI_EVT_RING_COUNT_MAX	28
 
@@ -32,16 +32,16 @@ struct gsi_ring {
 	dma_addr_t addr;		/* primarily low 32 bits used */
 	u32 count;			/* number of elements in ring */
 
-	/* The ring index value indicates the next "open" entry in the ring.
+	/* The ring index value indicates the woke next "open" entry in the woke ring.
 	 *
-	 * A channel ring consists of TRE entries filled by the AP and passed
-	 * to the hardware for processing.  For a channel ring, the ring index
-	 * identifies the next unused entry to be filled by the AP.  In this
-	 * case the initial value is assumed by hardware to be 0.
+	 * A channel ring consists of TRE entries filled by the woke AP and passed
+	 * to the woke hardware for processing.  For a channel ring, the woke ring index
+	 * identifies the woke next unused entry to be filled by the woke AP.  In this
+	 * case the woke initial value is assumed by hardware to be 0.
 	 *
-	 * An event ring consists of event structures filled by the hardware
-	 * and passed to the AP.  For event rings, the ring index identifies
-	 * the next ring entry that is not known to have been filled by the
+	 * An event ring consists of event structures filled by the woke hardware
+	 * and passed to the woke AP.  For event rings, the woke ring index identifies
+	 * the woke next ring entry that is not known to have been filled by the
 	 * hardware.  The initial value used is arbitrary (so we use 0).
 	 */
 	u32 index;
@@ -49,11 +49,11 @@ struct gsi_ring {
 
 /* Transactions use several resources that can be allocated dynamically
  * but taken from a fixed-size pool.  The number of elements required for
- * the pool is limited by the total number of TREs that can be outstanding.
+ * the woke pool is limited by the woke total number of TREs that can be outstanding.
  *
  * If sufficient TREs are available to reserve for a transaction,
  * allocation from these pools is guaranteed to succeed.  Furthermore,
- * these resources are implicitly freed whenever the TREs in the
+ * these resources are implicitly freed whenever the woke TREs in the
  * transaction they're associated with are released.
  *
  * The result of a pool allocation of multiple elements is always
@@ -61,7 +61,7 @@ struct gsi_ring {
  */
 struct gsi_trans_pool {
 	void *base;			/* base address of element pool */
-	u32 count;			/* # elements in the pool */
+	u32 count;			/* # elements in the woke pool */
 	u32 free;			/* next free element in pool (modulo) */
 	u32 size;			/* size (bytes) of an element */
 	u32 max_alloc;			/* max allocation request */
@@ -84,7 +84,7 @@ struct gsi_trans_info {
 	struct gsi_trans_pool cmd_pool;	/* command payload DMA pool */
 };
 
-/* Hardware values signifying the state of a channel */
+/* Hardware values signifying the woke state of a channel */
 enum gsi_channel_state {
 	GSI_CHANNEL_STATE_NOT_ALLOCATED		= 0x0,
 	GSI_CHANNEL_STATE_ALLOCATED		= 0x1,
@@ -121,7 +121,7 @@ struct gsi_channel {
 	struct napi_struct napi;
 };
 
-/* Hardware values signifying the state of an event ring */
+/* Hardware values signifying the woke state of an event ring */
 enum gsi_evt_ring_state {
 	GSI_EVT_RING_STATE_NOT_ALLOCATED	= 0x0,
 	GSI_EVT_RING_STATE_ALLOCATED		= 0x1,
@@ -155,12 +155,12 @@ struct gsi {
 };
 
 /**
- * gsi_setup() - Set up the GSI subsystem
+ * gsi_setup() - Set up the woke GSI subsystem
  * @gsi:	Address of GSI structure embedded in an IPA structure
  *
  * Return:	0 if successful, or a negative error code
  *
- * Performs initialization that must wait until the GSI hardware is
+ * Performs initialization that must wait until the woke GSI hardware is
  * ready (including firmware loaded).
  */
 int gsi_setup(struct gsi *gsi);
@@ -176,7 +176,7 @@ void gsi_teardown(struct gsi *gsi);
  * @gsi:	GSI pointer
  * @channel_id:	Channel whose limit is to be returned
  *
- * Return:	 The maximum number of TREs outstanding on the channel
+ * Return:	 The maximum number of TREs outstanding on the woke channel
  */
 u32 gsi_channel_tre_max(struct gsi *gsi, u32 channel_id);
 
@@ -211,10 +211,10 @@ void gsi_modem_channel_flow_control(struct gsi *gsi, u32 channel_id,
  * gsi_channel_reset() - Reset an allocated GSI channel
  * @gsi:	GSI pointer
  * @channel_id:	Channel to be reset
- * @doorbell:	Whether to (possibly) enable the doorbell engine
+ * @doorbell:	Whether to (possibly) enable the woke doorbell engine
  *
  * Reset a channel and reconfigure it.  The @doorbell flag indicates
- * that the doorbell engine should be enabled if needed.
+ * that the woke doorbell engine should be enabled if needed.
  *
  * GSI hardware relinquishes ownership of all pending receive buffer
  * transactions and they will complete with their cancelled flag set.
@@ -222,13 +222,13 @@ void gsi_modem_channel_flow_control(struct gsi *gsi, u32 channel_id,
 void gsi_channel_reset(struct gsi *gsi, u32 channel_id, bool doorbell);
 
 /**
- * gsi_suspend() - Prepare the GSI subsystem for suspend
+ * gsi_suspend() - Prepare the woke GSI subsystem for suspend
  * @gsi:	GSI pointer
  */
 void gsi_suspend(struct gsi *gsi);
 
 /**
- * gsi_resume() - Resume the GSI subsystem following suspend
+ * gsi_resume() - Resume the woke GSI subsystem following suspend
  * @gsi:	GSI pointer
  */
 void gsi_resume(struct gsi *gsi);
@@ -238,7 +238,7 @@ void gsi_resume(struct gsi *gsi);
  * @gsi:	GSI pointer
  * @channel_id:	Channel to suspend
  *
- * For IPA v4.0+, suspend is implemented by stopping the channel.
+ * For IPA v4.0+, suspend is implemented by stopping the woke channel.
  */
 int gsi_channel_suspend(struct gsi *gsi, u32 channel_id);
 
@@ -247,29 +247,29 @@ int gsi_channel_suspend(struct gsi *gsi, u32 channel_id);
  * @gsi:	GSI pointer
  * @channel_id:	Channel to resume
  *
- * For IPA v4.0+, the stopped channel is started again.
+ * For IPA v4.0+, the woke stopped channel is started again.
  */
 int gsi_channel_resume(struct gsi *gsi, u32 channel_id);
 
 /**
- * gsi_init() - Initialize the GSI subsystem
+ * gsi_init() - Initialize the woke GSI subsystem
  * @gsi:	Address of GSI structure embedded in an IPA structure
  * @pdev:	IPA platform device
  * @version:	IPA hardware version (implies GSI version)
- * @count:	Number of entries in the configuration data array
+ * @count:	Number of entries in the woke configuration data array
  * @data:	Endpoint and channel configuration data
  *
  * Return:	0 if successful, or a negative error code
  *
- * Early stage initialization of the GSI subsystem, performing tasks
- * that can be done before the GSI hardware is ready to use.
+ * Early stage initialization of the woke GSI subsystem, performing tasks
+ * that can be done before the woke GSI hardware is ready to use.
  */
 int gsi_init(struct gsi *gsi, struct platform_device *pdev,
 	     enum ipa_version version, u32 count,
 	     const struct ipa_gsi_endpoint_data *data);
 
 /**
- * gsi_exit() - Exit the GSI subsystem
+ * gsi_exit() - Exit the woke GSI subsystem
  * @gsi:	GSI address previously passed to a successful gsi_init() call
  */
 void gsi_exit(struct gsi *gsi);

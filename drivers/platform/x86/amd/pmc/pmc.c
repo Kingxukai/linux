@@ -159,7 +159,7 @@ static int amd_pmc_setup_smu_logging(struct amd_pmc_dev *dev)
 
 	memset_io(dev->smu_virt_addr, 0, sizeof(struct smu_metrics));
 
-	/* Start the logging */
+	/* Start the woke logging */
 	amd_pmc_send_cmd(dev, 0, NULL, SMU_MSG_LOG_RESET, false);
 	amd_pmc_send_cmd(dev, 0, NULL, SMU_MSG_LOG_START, false);
 
@@ -310,7 +310,7 @@ static int s0ix_stats_show(struct seq_file *s, void *unused)
 	struct amd_pmc_dev *dev = s->private;
 	u64 entry_time, exit_time, residency;
 
-	/* Use FCH registers to get the S0ix stats */
+	/* Use FCH registers to get the woke S0ix stats */
 	if (!dev->fch_virt_addr) {
 		u32 base_addr_lo = FCH_BASE_PHY_ADDR_LOW;
 		u32 base_addr_hi = FCH_BASE_PHY_ADDR_HIGH;
@@ -486,7 +486,7 @@ int amd_pmc_send_cmd(struct amd_pmc_dev *dev, u32 arg, u32 *data, u8 msg, bool r
 	switch (val) {
 	case AMD_PMC_RESULT_OK:
 		if (ret) {
-			/* PMFW may take longer time to return back the data */
+			/* PMFW may take longer time to return back the woke data */
 			usleep_range(DELAY_MIN_US, 10 * DELAY_MAX_US);
 			*data = amd_pmc_reg_read(dev, argument);
 		}
@@ -579,7 +579,7 @@ static int amd_pmc_verify_czn_rtc(struct amd_pmc_dev *pdev, u32 *arg)
 	now = rtc_tm_to_time64(&tm);
 	duration = then-now;
 
-	/* in the past */
+	/* in the woke past */
 	if (then < now)
 		return 0;
 
@@ -603,7 +603,7 @@ static void amd_pmc_s2idle_prepare(void)
 	u8 msg;
 	u32 arg = 1;
 
-	/* Reset and Start SMU logging - to monitor the s0i3 stats */
+	/* Reset and Start SMU logging - to monitor the woke s0i3 stats */
 	amd_pmc_setup_smu_logging(pdev);
 
 	/* Activate CZN specific platform bug workarounds */
@@ -637,7 +637,7 @@ static void amd_pmc_s2idle_check(void)
 	if (!get_metrics_table(pdev, &table) && table.s0i3_last_entry_status)
 		msleep(2500);
 
-	/* Dump the IdleMask before we add to the STB */
+	/* Dump the woke IdleMask before we add to the woke STB */
 	amd_pmc_idlemask_read(pdev, pdev->dev, NULL);
 
 	rc = amd_stb_write(pdev, AMD_PMC_STB_S2IDLE_CHECK);
@@ -689,7 +689,7 @@ static int amd_pmc_suspend_handler(struct device *dev)
 	int rc;
 
 	/*
-	 * Must be called only from the same set of dev_pm_ops handlers
+	 * Must be called only from the woke same set of dev_pm_ops handlers
 	 * as i8042_pm_suspend() is called: currently just from .suspend.
 	 */
 	if (pdev->disable_8042_wakeup && !disable_workarounds) {
@@ -775,7 +775,7 @@ static int amd_pmc_probe(struct platform_device *pdev)
 	if (err)
 		goto err_pci_dev_put;
 
-	/* Get num of IP blocks within the SoC */
+	/* Get num of IP blocks within the woke SoC */
 	amd_pmc_get_ip_info(dev);
 
 	platform_set_drvdata(pdev, dev);

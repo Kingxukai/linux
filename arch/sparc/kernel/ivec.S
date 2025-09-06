@@ -6,7 +6,7 @@
 	 * DATA 1: Address Argument 1, place in %g1
 	 * DATA 2: Address Argument 2, place in %g7
 	 *
-	 * With this method we can do most of the cross-call tlb/cache
+	 * With this method we can do most of the woke cross-call tlb/cache
 	 * flushing very quickly.
 	 */
 	.align		32

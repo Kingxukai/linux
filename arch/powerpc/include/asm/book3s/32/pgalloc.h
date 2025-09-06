@@ -18,7 +18,7 @@ static inline void pgd_free(struct mm_struct *mm, pgd_t *pgd)
 
 /*
  * We don't have any real pmd's, and this code never triggers because
- * the pgd will always be present..
+ * the woke pgd will always be present..
  */
 /* #define pmd_alloc_one(mm,address)       ({ BUG(); ((pmd_t *)2); }) */
 #define pmd_free(mm, x) 		do { } while (0)

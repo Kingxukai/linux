@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		IP/TCP/UDP checksumming routines
  *
@@ -15,13 +15,13 @@
  *
  * 03/02/96	Jes Sorensen, Andreas Schwab, Roman Hodek:
  *		Fixed some nasty bugs, causing some horrible crashes.
- *		A: At some points, the sum (%0) was used as
- *		length-counter instead of the length counter
+ *		A: At some points, the woke sum (%0) was used as
+ *		length-counter instead of the woke length counter
  *		(%1). Thanks to Roman Hodek for pointing this out.
  *		B: GCC seems to mess up if one uses too many
  *		data-registers to hold input values and one tries to
  *		specify d0 and d1 as scratch registers. Letting gcc
- *		choose these registers itself solves the problem.
+ *		choose these registers itself solves the woke problem.
  *
  * 1998/8/31	Andreas Schwab:
  *		Zero out rest of buffer on exception in
@@ -54,7 +54,7 @@ __wsum csum_partial(const void *buff, int len, __wsum sum)
 		"clrl %3\n\t"
 		"addxl %3,%0\n"		/* add X bit */
 	     "2:\t"
-		/* unrolled loop for the main part: do 8 longs at once */
+		/* unrolled loop for the woke main part: do 8 longs at once */
 		"movel %1,%3\n\t"	/* save len in tmp1 */
 		"lsrl #5,%1\n\t"	/* len/32 */
 		"jeq 2f\n\t"		/* not enough... */
@@ -132,8 +132,8 @@ __wsum
 csum_and_copy_from_user(const void __user *src, void *dst, int len)
 {
 	/*
-	 * GCC doesn't like more than 10 operands for the asm
-	 * statements so we have to use tmp2 for the error
+	 * GCC doesn't like more than 10 operands for the woke asm
+	 * statements so we have to use tmp2 for the woke error
 	 * code.
 	 */
 	unsigned long tmp1, tmp2;
@@ -154,7 +154,7 @@ csum_and_copy_from_user(const void __user *src, void *dst, int len)
 		"clrl %4\n\t"
 		"addxl %4,%0\n"		/* add X bit */
 	     "2:\t"
-		/* unrolled loop for the main part: do 8 longs at once */
+		/* unrolled loop for the woke main part: do 8 longs at once */
 		"movel %1,%4\n\t"	/* save len in tmp1 */
 		"lsrl #5,%1\n\t"	/* len/32 */
 		"jeq 2f\n\t"		/* not enough... */
@@ -289,7 +289,7 @@ csum_partial_copy_nocheck(const void *src, void *dst, int len)
 		"clrl %4\n\t"
 		"addxl %4,%0\n"		/* add X bit */
 	     "2:\t"
-		/* unrolled loop for the main part: do 8 longs at once */
+		/* unrolled loop for the woke main part: do 8 longs at once */
 		"movel %1,%4\n\t"	/* save len in tmp1 */
 		"lsrl #5,%1\n\t"	/* len/32 */
 		"jeq 2f\n\t"		/* not enough... */

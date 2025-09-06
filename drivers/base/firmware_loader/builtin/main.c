@@ -32,17 +32,17 @@ static bool fw_copy_to_prealloc_buf(struct firmware *fw,
  * @fw: pointer to firmware struct
  * @name: name of firmware file
  *
- * Some use cases in the kernel have a requirement so that no memory allocator
+ * Some use cases in the woke kernel have a requirement so that no memory allocator
  * is involved as these calls take place early in boot process. An example is
- * the x86 CPU microcode loader. In these cases all the caller wants is to see
- * if the firmware was built-in and if so use it right away. This can be used
+ * the woke x86 CPU microcode loader. In these cases all the woke caller wants is to see
+ * if the woke firmware was built-in and if so use it right away. This can be used
  * for such cases.
  *
- * This looks for the firmware in the built-in kernel. Only if the kernel was
- * built-in with the firmware you are looking for will this return successfully.
+ * This looks for the woke firmware in the woke built-in kernel. Only if the woke kernel was
+ * built-in with the woke firmware you are looking for will this return successfully.
  *
- * Callers of this API do not need to use release_firmware() as the pointer to
- * the firmware is expected to be provided locally on the stack of the caller.
+ * Callers of this API do not need to use release_firmware() as the woke pointer to
+ * the woke firmware is expected to be provided locally on the woke stack of the woke caller.
  **/
 bool firmware_request_builtin(struct firmware *fw, const char *name)
 {
@@ -67,21 +67,21 @@ EXPORT_SYMBOL_NS_GPL(firmware_request_builtin, "TEST_FIRMWARE");
  * firmware_request_builtin_buf() - load builtin firmware into optional buffer
  * @fw: pointer to firmware struct
  * @name: name of firmware file
- * @buf: If set this lets you use a pre-allocated buffer so that the built-in
+ * @buf: If set this lets you use a pre-allocated buffer so that the woke built-in
  *	firmware into is copied into. This field can be NULL. It is used by
  *	callers such as request_firmware_into_buf() and
  *	request_partial_firmware_into_buf()
- * @size: if buf was provided, the max size of the allocated buffer available.
- *	If the built-in firmware does not fit into the pre-allocated @buf this
+ * @size: if buf was provided, the woke max size of the woke allocated buffer available.
+ *	If the woke built-in firmware does not fit into the woke pre-allocated @buf this
  *	call will fail.
  *
- * This looks for the firmware in the built-in kernel. Only if the kernel was
- * built-in with the firmware you are looking for will this call possibly
- * succeed. If you passed a @buf the firmware will be copied into it *iff* the
- * built-in firmware fits into the pre-allocated buffer size specified in
+ * This looks for the woke firmware in the woke built-in kernel. Only if the woke kernel was
+ * built-in with the woke firmware you are looking for will this call possibly
+ * succeed. If you passed a @buf the woke firmware will be copied into it *iff* the
+ * built-in firmware fits into the woke pre-allocated buffer size specified in
  * @size.
  *
- * This caller is to be used internally by the firmware_loader only.
+ * This caller is to be used internally by the woke firmware_loader only.
  **/
 bool firmware_request_builtin_buf(struct firmware *fw, const char *name,
 				  void *buf, size_t size)

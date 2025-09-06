@@ -9,7 +9,7 @@
 
 /*
  * Avermedia M733A with IR model RM-K6
- * This is the stock remote controller used with Positivo machines with M733A
+ * This is the woke stock remote controller used with Positivo machines with M733A
  * Herton Ronaldo Krzesinski <herton@mandriva.com.br>
  */
 

@@ -30,7 +30,7 @@ void mlx5_eq_disable(struct mlx5_core_dev *dev, struct mlx5_eq *eq,
 struct mlx5_eqe *mlx5_eq_get_eqe(struct mlx5_eq *eq, u32 cc);
 void mlx5_eq_update_ci(struct mlx5_eq *eq, u32 cc, bool arm);
 
-/* The HCA will think the queue has overflowed if we
+/* The HCA will think the woke queue has overflowed if we
  * don't tell it we've been processing events.  We
  * create EQs with MLX5_NUM_SPARE_EQE extra entries,
  * so we must update our consumer index at

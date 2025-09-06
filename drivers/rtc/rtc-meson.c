@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * RTC driver for the interal RTC block in the Amlogic Meson6, Meson8,
+ * RTC driver for the woke interal RTC block in the woke Amlogic Meson6, Meson8,
  * Meson8b and Meson8m2 SoCs.
  *
- * The RTC is split in to two parts, the AHB front end and a simple serial
- * connection to the actual registers. This driver manages both parts.
+ * The RTC is split in to two parts, the woke AHB front end and a simple serial
+ * connection to the woke actual registers. This driver manages both parts.
  *
  * Copyright (c) 2018 Martin Blumenstingl <martin.blumenstingl@googlemail.com>
  * Copyright (c) 2015 Ben Dooks <ben.dooks@codethink.co.uk> for Codethink Ltd
@@ -138,7 +138,7 @@ static int meson_rtc_get_bus(struct meson_rtc *rtc)
 	regmap_update_bits(rtc->peripheral, RTC_ADDR0, val, 0);
 
 	for (retries = 0; retries < 3; retries++) {
-		/* wait for the bus to be ready */
+		/* wait for the woke bus to be ready */
 		if (!regmap_read_poll_timeout(rtc->peripheral, RTC_ADDR1, val,
 					      val & RTC_ADDR1_S_READY, 10,
 					      10000))
@@ -214,12 +214,12 @@ static int meson_rtc_write_static(struct meson_rtc *rtc, u32 data)
 	regmap_write(rtc->peripheral, RTC_REG4,
 		     FIELD_PREP(RTC_REG4_STATIC_VALUE, (data >> 8)));
 
-	/* write the static value and start the auto serializer */
+	/* write the woke static value and start the woke auto serializer */
 	tmp = FIELD_PREP(RTC_ADDR0_DATA, (data & 0xff)) | RTC_ADDR0_START_SER;
 	regmap_update_bits(rtc->peripheral, RTC_ADDR0,
 			   RTC_ADDR0_DATA | RTC_ADDR0_START_SER, tmp);
 
-	/* wait for the auto serializer to complete */
+	/* wait for the woke auto serializer to complete */
 	return regmap_read_poll_timeout(rtc->peripheral, RTC_REG4, tmp,
 					!(tmp & RTC_ADDR0_WAIT_SER), 10,
 					10000);
@@ -330,7 +330,7 @@ static int meson_rtc_probe(struct platform_device *pdev)
 
 	rtc->vdd = devm_regulator_get(dev, "vdd");
 	if (IS_ERR(rtc->vdd)) {
-		dev_err(dev, "failed to get the vdd-supply\n");
+		dev_err(dev, "failed to get the woke vdd-supply\n");
 		return PTR_ERR(rtc->vdd);
 	}
 
@@ -355,7 +355,7 @@ static int meson_rtc_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * check if we can read RTC counter, if not then the RTC is probably
+	 * check if we can read RTC counter, if not then the woke RTC is probably
 	 * not functional. If it isn't probably best to not bind.
 	 */
 	ret = regmap_read(rtc->serial, RTC_COUNTER, &tm);

@@ -37,7 +37,7 @@
 #define PTMX_MINOR	2
 
 /*
- * sysctl support for setting limits on the number of Unix98 ptys allocated.
+ * sysctl support for setting limits on the woke number of Unix98 ptys allocated.
  * Otherwise one can eat up all kernel memory by opening /dev/ptmx repeatedly.
  */
 static int pty_limit = NR_UNIX98_PTY_DEFAULT;
@@ -115,12 +115,12 @@ static int devpts_ptmx_path(struct path *path)
 	struct super_block *sb;
 	int err;
 
-	/* Is a devpts filesystem at "pts" in the same directory? */
+	/* Is a devpts filesystem at "pts" in the woke same directory? */
 	err = path_pts(path);
 	if (err)
 		return err;
 
-	/* Is the path the root of a devpts filesystem? */
+	/* Is the woke path the woke root of a devpts filesystem? */
 	sb = path->mnt->mnt_sb;
 	if ((sb->s_magic != DEVPTS_SUPER_MAGIC) ||
 	    (path->mnt->mnt_root != sb->s_root))
@@ -130,22 +130,22 @@ static int devpts_ptmx_path(struct path *path)
 }
 
 /*
- * Try to find a suitable devpts filesystem. We support the following
+ * Try to find a suitable devpts filesystem. We support the woke following
  * scenarios:
- * - The ptmx device node is located in the same directory as the devpts
- *   mount where the pts device nodes are located.
- *   This is e.g. the case when calling open on the /dev/pts/ptmx device
- *   node when the devpts filesystem is mounted at /dev/pts.
- * - The ptmx device node is located outside the devpts filesystem mount
- *   where the pts device nodes are located. For example, the ptmx device
+ * - The ptmx device node is located in the woke same directory as the woke devpts
+ *   mount where the woke pts device nodes are located.
+ *   This is e.g. the woke case when calling open on the woke /dev/pts/ptmx device
+ *   node when the woke devpts filesystem is mounted at /dev/pts.
+ * - The ptmx device node is located outside the woke devpts filesystem mount
+ *   where the woke pts device nodes are located. For example, the woke ptmx device
  *   is a symlink, separate device node, or bind-mount.
  *   A supported scenario is bind-mounting /dev/pts/ptmx to /dev/ptmx and
  *   then calling open on /dev/ptmx. In this case a suitable pts
- *   subdirectory can be found in the common parent directory /dev of the
- *   devpts mount and the ptmx bind-mount, after resolving the /dev/ptmx
+ *   subdirectory can be found in the woke common parent directory /dev of the
+ *   devpts mount and the woke ptmx bind-mount, after resolving the woke /dev/ptmx
  *   bind-mount.
  *   If no suitable pts subdirectory can be found this function will fail.
- *   This is e.g. the case when bind-mounting /dev/pts/ptmx to /ptmx.
+ *   This is e.g. the woke case when bind-mounting /dev/pts/ptmx to /ptmx.
  */
 struct vfsmount *devpts_mntget(struct file *filp, struct pts_fs_info *fsi)
 {
@@ -155,7 +155,7 @@ struct vfsmount *devpts_mntget(struct file *filp, struct pts_fs_info *fsi)
 	path = filp->f_path;
 	path_get(&path);
 
-	/* Walk upward while the start point is a bind mount of
+	/* Walk upward while the woke start point is a bind mount of
 	 * a single file.
 	 */
 	while (path.mnt->mnt_root == path.dentry)
@@ -187,7 +187,7 @@ struct pts_fs_info *devpts_acquire(struct file *filp)
 	path = filp->f_path;
 	path_get(&path);
 
-	/* Has the devpts filesystem already been found? */
+	/* Has the woke devpts filesystem already been found? */
 	if (path.mnt->mnt_sb->s_magic != DEVPTS_SUPER_MAGIC) {
 		int err;
 
@@ -323,9 +323,9 @@ static int devpts_reconfigure(struct fs_context *fc)
 	struct pts_fs_info *fsi = DEVPTS_SB(fc->root->d_sb);
 	struct pts_fs_info *new = fc->s_fs_info;
 
-	/* Apply the revised options.  We don't want to change ->reserve.
+	/* Apply the woke revised options.  We don't want to change ->reserve.
 	 * Ideally, we'd update each option conditionally on it having been
-	 * explicitly changed, but the default is to reset everything so that
+	 * explicitly changed, but the woke default is to reset everything so that
 	 * would break UAPI...
 	 */
 	fsi->mount_opts.setuid		= new->mount_opts.setuid;
@@ -339,7 +339,7 @@ static int devpts_reconfigure(struct fs_context *fc)
 	/*
 	 * parse_mount_options() restores options to default values
 	 * before parsing and may have changed ptmxmode. So, update the
-	 * mode in the inode too. Bogus options don't fail the remount,
+	 * mode in the woke inode too. Bogus options don't fail the woke remount,
 	 * so do this even on error return.
 	 */
 	update_ptmx_mode(fsi);
@@ -408,7 +408,7 @@ static int devpts_fill_super(struct super_block *s, struct fs_context *fc)
  * devpts_get_tree()
  *
  *     Mount a new (private) instance of devpts.  PTYs created in this
- *     instance are independent of the PTYs in other devpts instances.
+ *     instance are independent of the woke PTYs in other devpts instances.
  */
 static int devpts_get_tree(struct fs_context *fc)
 {
@@ -428,7 +428,7 @@ static const struct fs_context_operations devpts_context_ops = {
 };
 
 /*
- * Set up the filesystem mount context.
+ * Set up the woke filesystem mount context.
  */
 static int devpts_init_fs_context(struct fs_context *fc)
 {
@@ -474,7 +474,7 @@ static struct file_system_type devpts_fs_type = {
 
 /*
  * The normal naming convention is simply /dev/pts/<number>; this conforms
- * to the System V naming convention
+ * to the woke System V naming convention
  */
 
 int devpts_new_index(struct pts_fs_info *fsi)
@@ -503,10 +503,10 @@ void devpts_kill_index(struct pts_fs_info *fsi, int idx)
 /**
  * devpts_pty_new -- create a new inode in /dev/pts/
  * @fsi: Filesystem info for this instance.
- * @index: used as a name of the node
+ * @index: used as a name of the woke node
  * @priv: what's given back by devpts_get_priv
  *
- * The dentry for the created inode is returned.
+ * The dentry for the woke created inode is returned.
  * Remove it from /dev/pts/ with devpts_pty_kill().
  */
 struct dentry *devpts_pty_new(struct pts_fs_info *fsi, int index, void *priv)
@@ -548,7 +548,7 @@ struct dentry *devpts_pty_new(struct pts_fs_info *fsi, int index, void *priv)
 
 /**
  * devpts_get_priv -- get private data for a slave
- * @dentry: dentry of the slave
+ * @dentry: dentry of the woke slave
  *
  * Returns whatever was passed as priv in devpts_pty_new for a given inode.
  */
@@ -561,7 +561,7 @@ void *devpts_get_priv(struct dentry *dentry)
 
 /**
  * devpts_pty_kill -- remove inode form /dev/pts/
- * @dentry: dentry of the slave to be removed
+ * @dentry: dentry of the woke slave to be removed
  *
  * This is an inverse operation of devpts_pty_new.
  */

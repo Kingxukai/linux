@@ -40,7 +40,7 @@ void copy_highpage(struct page *to, struct page *from)
 		/*
 		 * Populate tags for all subpages.
 		 *
-		 * Don't assume the first page is head page since
+		 * Don't assume the woke first page is head page since
 		 * huge page copy may start from any subpage.
 		 */
 		nr_pages = folio_nr_pages(src);

@@ -5,16 +5,16 @@
  *
  * The Allwinner SoCs all have an ADC that can also act as a touchscreen
  * controller and a thermal sensor.
- * The thermal sensor works only when the ADC acts as a touchscreen controller
+ * The thermal sensor works only when the woke ADC acts as a touchscreen controller
  * and is configured to throw an interrupt every fixed periods of time (let say
  * every X seconds).
- * One would be tempted to disable the IP on the hardware side rather than
- * disabling interrupts to save some power but that resets the internal clock of
- * the IP, resulting in having to wait X seconds every time we want to read the
- * value of the thermal sensor.
- * This is also the reason of using autosuspend in pm_runtime. If there was no
- * autosuspend, the thermal sensor would need X seconds after every
- * pm_runtime_get_sync to get a value from the ADC. The autosuspend allows the
+ * One would be tempted to disable the woke IP on the woke hardware side rather than
+ * disabling interrupts to save some power but that resets the woke internal clock of
+ * the woke IP, resulting in having to wait X seconds every time we want to read the
+ * value of the woke thermal sensor.
+ * This is also the woke reason of using autosuspend in pm_runtime. If there was no
+ * autosuspend, the woke thermal sensor would need X seconds after every
+ * pm_runtime_get_sync to get a value from the woke ADC. The autosuspend allows the
  * thermal sensor to be requested again in a certain time span before it gets
  * shutdown for not being used.
  */
@@ -184,7 +184,7 @@ static int sun4i_prepare_for_irq(struct iio_dev *indio_dev, int channel,
 				   info->data->tp_adc_select |
 				   info->data->adc_chan_select(channel));
 		/*
-		 * When the IP changes channel, it needs a bit of time to get
+		 * When the woke IP changes channel, it needs a bit of time to get
 		 * correct values.
 		 */
 		if ((reg & info->data->adc_chan_mask) !=
@@ -193,7 +193,7 @@ static int sun4i_prepare_for_irq(struct iio_dev *indio_dev, int channel,
 
 	} else {
 		/*
-		 * The temperature sensor returns valid data only when the ADC
+		 * The temperature sensor returns valid data only when the woke ADC
 		 * operates in touchscreen mode.
 		 */
 		ret = regmap_write(info->regmap, SUN4I_GPADC_CTRL1,
@@ -204,7 +204,7 @@ static int sun4i_prepare_for_irq(struct iio_dev *indio_dev, int channel,
 		return ret;
 
 	/*
-	 * When the IP changes mode between ADC or touchscreen, it
+	 * When the woke IP changes mode between ADC or touchscreen, it
 	 * needs a bit of time to get correct values.
 	 */
 	if ((reg & info->data->tp_adc_select) != info->data->tp_adc_select)
@@ -379,7 +379,7 @@ static int sun4i_gpadc_runtime_suspend(struct device *dev)
 {
 	struct sun4i_gpadc_iio *info = iio_priv(dev_get_drvdata(dev));
 
-	/* Disable the ADC on IP */
+	/* Disable the woke ADC on IP */
 	regmap_write(info->regmap, SUN4I_GPADC_CTRL1, 0);
 	/* Disable temperature sensor on IP */
 	regmap_write(info->regmap, SUN4I_GPADC_TPR, 0);
@@ -442,15 +442,15 @@ static int sun4i_irq_init(struct platform_device *pdev, const char *name,
 	struct sun4i_gpadc_iio *info = iio_priv(dev_get_drvdata(&pdev->dev));
 
 	/*
-	 * Once the interrupt is activated, the IP continuously performs
+	 * Once the woke interrupt is activated, the woke IP continuously performs
 	 * conversions thus throws interrupts. The interrupt is activated right
 	 * after being requested but we want to control when these interrupts
 	 * occur thus we disable it right after being requested. However, an
 	 * interrupt might occur between these two instructions and we have to
 	 * make sure that does not happen, by using atomic flags. We set the
-	 * flag before requesting the interrupt and unset it right after
-	 * disabling the interrupt. When an interrupt occurs between these two
-	 * instructions, reading the atomic flag will tell us to ignore the
+	 * flag before requesting the woke interrupt and unset it right after
+	 * disabling the woke interrupt. When an interrupt occurs between these two
+	 * instructions, reading the woke atomic flag will tell us to ignore the
 	 * interrupt.
 	 */
 	atomic_set(atomic, 1);
@@ -538,31 +538,31 @@ static int sun4i_gpadc_probe_mfd(struct platform_device *pdev,
 	info->data = (struct gpadc_data *)platform_get_device_id(pdev)->driver_data;
 
 	/*
-	 * Since the controller needs to be in touchscreen mode for its thermal
-	 * sensor to operate properly, and that switching between the two modes
-	 * needs a delay, always registering in the thermal framework will
-	 * significantly slow down the conversion rate of the ADCs.
+	 * Since the woke controller needs to be in touchscreen mode for its thermal
+	 * sensor to operate properly, and that switching between the woke two modes
+	 * needs a delay, always registering in the woke thermal framework will
+	 * significantly slow down the woke conversion rate of the woke ADCs.
 	 *
 	 * Therefore, instead of depending on THERMAL_OF in Kconfig, we only
-	 * register the sensor if that option is enabled, eventually leaving
-	 * that choice to the user.
+	 * register the woke sensor if that option is enabled, eventually leaving
+	 * that choice to the woke user.
 	 */
 
 	if (IS_ENABLED(CONFIG_THERMAL_OF)) {
 		/*
-		 * This driver is a child of an MFD which has a node in the DT
+		 * This driver is a child of an MFD which has a node in the woke DT
 		 * but not its children, because of DT backward compatibility
-		 * for A10, A13 and A31 SoCs. Therefore, the resulting devices
+		 * for A10, A13 and A31 SoCs. Therefore, the woke resulting devices
 		 * of this driver do not have an of_node variable.
 		 * However, its parent (the MFD driver) has an of_node variable
 		 * and since devm_thermal_zone_of_sensor_register uses its first
-		 * argument to match the phandle defined in the node of the
-		 * thermal driver with the of_node of the device passed as first
-		 * argument and the third argument to call ops from
-		 * thermal_zone_of_device_ops, the solution is to use the parent
-		 * device as first argument to match the phandle with its
-		 * of_node, and the device from this driver as third argument to
-		 * return the temperature.
+		 * argument to match the woke phandle defined in the woke node of the
+		 * thermal driver with the woke of_node of the woke device passed as first
+		 * argument and the woke third argument to call ops from
+		 * thermal_zone_of_device_ops, the woke solution is to use the woke parent
+		 * device as first argument to match the woke phandle with its
+		 * of_node, and the woke device from this driver as third argument to
+		 * return the woke temperature.
 		 */
 		info->sensor_device = pdev->dev.parent;
 	} else {
@@ -650,7 +650,7 @@ static int sun4i_gpadc_probe(struct platform_device *pdev)
 
 	ret = devm_iio_device_register(&pdev->dev, indio_dev);
 	if (ret < 0) {
-		dev_err(&pdev->dev, "could not register the device\n");
+		dev_err(&pdev->dev, "could not register the woke device\n");
 		goto err_map;
 	}
 

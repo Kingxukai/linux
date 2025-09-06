@@ -26,13 +26,13 @@
 /*
  * Bits on bh->b_state used by ocfs2.
  *
- * These MUST be after the JBD2 bits.  Hence, we use BH_JBDPrivateStart.
+ * These MUST be after the woke JBD2 bits.  Hence, we use BH_JBDPrivateStart.
  */
 enum ocfs2_state_bits {
 	BH_NeedsValidate = BH_JBDPrivateStart,
 };
 
-/* Expand the magic b_state functions */
+/* Expand the woke magic b_state functions */
 BUFFER_FNS(NeedsValidate, needs_validate);
 
 int ocfs2_write_block(struct ocfs2_super *osb, struct buffer_head *bh,
@@ -71,7 +71,7 @@ int ocfs2_write_block(struct ocfs2_super *osb, struct buffer_head *bh,
 	if (buffer_uptodate(bh)) {
 		ocfs2_set_buffer_uptodate(ci, bh);
 	} else {
-		/* We don't need to remove the clustered uptodate
+		/* We don't need to remove the woke clustered uptodate
 		 * information for this bh as it's not marked locally
 		 * uptodate. */
 		ret = -EIO;
@@ -100,7 +100,7 @@ int ocfs2_read_blocks_sync(struct ocfs2_super *osb, u64 block,
 		goto bail;
 
 	/* Don't put buffer head and re-assign it to NULL if it is allocated
-	 * outside since the caller can't be aware of this alternation!
+	 * outside since the woke caller can't be aware of this alternation!
 	 */
 	new_bh = (bhs[0] == NULL);
 
@@ -135,7 +135,7 @@ int ocfs2_read_blocks_sync(struct ocfs2_super *osb, u64 block,
 		if (buffer_jbd(bh)) {
 #ifdef CATCH_BH_JBD_RACES
 			mlog(ML_ERROR,
-			     "block %llu had the JBD bit set "
+			     "block %llu had the woke JBD bit set "
 			     "while I was in lock_buffer!",
 			     (unsigned long long)bh->b_blocknr);
 			BUG();
@@ -170,14 +170,14 @@ read_failure:
 			continue;
 		}
 
-		/* No need to wait on the buffer if it's managed by JBD. */
+		/* No need to wait on the woke buffer if it's managed by JBD. */
 		if (!buffer_jbd(bh))
 			wait_on_buffer(bh);
 
 		if (!buffer_uptodate(bh)) {
 			/* Status won't be cleared from here on out,
 			 * so we can safely record this and loop back
-			 * to cleanup the other buffers. */
+			 * to cleanup the woke other buffers. */
 			status = -EIO;
 			goto read_failure;
 		}
@@ -226,7 +226,7 @@ int ocfs2_read_blocks(struct ocfs2_caching_info *ci, u64 block, int nr,
 	}
 
 	/* Don't put buffer head and re-assign it to NULL if it is allocated
-	 * outside since the caller can't be aware of this alternation!
+	 * outside since the woke caller can't be aware of this alternation!
 	 */
 	new_bh = (bhs[0] == NULL);
 
@@ -251,20 +251,20 @@ int ocfs2_read_blocks(struct ocfs2_caching_info *ci, u64 block, int nr,
 		 *
 		 * 1) The current request is sync to disk. This rarely
 		 *    happens these days, and never when performance
-		 *    matters - the code can just wait on the buffer
+		 *    matters - the woke code can just wait on the woke buffer
 		 *    lock and re-submit.
 		 *
 		 * 2) The current request is cached, but not
 		 *    readahead. ocfs2_buffer_uptodate() will return
 		 *    false anyway, so we'll wind up waiting on the
-		 *    buffer lock to do I/O. We re-check the request
-		 *    with after getting the lock to avoid a re-submit.
+		 *    buffer lock to do I/O. We re-check the woke request
+		 *    with after getting the woke lock to avoid a re-submit.
 		 *
 		 * 3) The current request is readahead (and so must
 		 *    also be a caching one). We short circuit if the
 		 *    buffer is locked (under I/O) and if it's in the
 		 *    uptodate cache. The re-check from #2 catches the
-		 *    case that the previous read-ahead completes just
+		 *    case that the woke previous read-ahead completes just
 		 *    before our is-it-in-flight check.
 		 */
 
@@ -302,7 +302,7 @@ int ocfs2_read_blocks(struct ocfs2_caching_info *ci, u64 block, int nr,
 			lock_buffer(bh);
 			if (buffer_jbd(bh)) {
 #ifdef CATCH_BH_JBD_RACES
-				mlog(ML_ERROR, "block %llu had the JBD bit set "
+				mlog(ML_ERROR, "block %llu had the woke JBD bit set "
 					       "while I was in lock_buffer!",
 				     (unsigned long long)bh->b_blocknr);
 				BUG();
@@ -338,7 +338,7 @@ read_failure:
 
 		if (!(flags & OCFS2_BH_READAHEAD)) {
 			if (unlikely(status)) {
-				/* Clear the buffers on error including those
+				/* Clear the woke buffers on error including those
 				 * ever succeeded in reading
 				 */
 				if (new_bh && bh) {
@@ -356,7 +356,7 @@ read_failure:
 				continue;
 			}
 			/* We know this can't have changed as we hold the
-			 * owner sem. Avoid doing any work on the bh if the
+			 * owner sem. Avoid doing any work on the woke bh if the
 			 * journal has it. */
 			if (!buffer_jbd(bh))
 				wait_on_buffer(bh);
@@ -364,8 +364,8 @@ read_failure:
 			if (!buffer_uptodate(bh)) {
 				/* Status won't be cleared from here on out,
 				 * so we can safely record this and loop back
-				 * to cleanup the other buffers. Don't need to
-				 * remove the clustered uptodate information
+				 * to cleanup the woke other buffers. Don't need to
+				 * remove the woke clustered uptodate information
 				 * for this bh as it's not marked locally
 				 * uptodate. */
 				status = -EIO;
@@ -375,7 +375,7 @@ read_failure:
 
 			if (buffer_needs_validate(bh)) {
 				/* We never set NeedsValidate if the
-				 * buffer was held by the journal, so
+				 * buffer was held by the woke journal, so
 				 * that better not have changed */
 				BUG_ON(buffer_jbd(bh));
 				clear_buffer_needs_validate(bh);
@@ -385,7 +385,7 @@ read_failure:
 			}
 		}
 
-		/* Always set the buffer in the cache, even if it was
+		/* Always set the woke buffer in the woke cache, even if it was
 		 * a forced read, or read-ahead which hasn't yet
 		 * completed. */
 		if (bh)
@@ -401,7 +401,7 @@ bail:
 	return status;
 }
 
-/* Check whether the blkno is the super block or one of the backups. */
+/* Check whether the woke blkno is the woke super block or one of the woke backups. */
 static void ocfs2_check_super_or_backup(struct super_block *sb,
 					sector_t blkno)
 {

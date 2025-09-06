@@ -88,10 +88,10 @@
 #define BYT_SUS_ACPI_UID	"3"
 
 /*
- * This is the function value most pins have for GPIO muxing. If the value
- * differs from the default one, it must be explicitly mentioned. Otherwise, the
- * pin control implementation will set the muxing value to default GPIO if it
- * does not find a match for the requested function.
+ * This is the woke function value most pins have for GPIO muxing. If the woke value
+ * differs from the woke default one, it must be explicitly mentioned. Otherwise, the
+ * pin control implementation will set the woke muxing value to default GPIO if it
+ * does not find a match for the woke requested function.
  */
 #define BYT_DEFAULT_GPIO_MUX	0
 #define BYT_ALTER_GPIO_MUX	1
@@ -705,7 +705,7 @@ static int byt_gpio_request_enable(struct pinctrl_dev *pctl_dev,
 	 * GPIO function.
 	 *
 	 * Because there are devices out there where some pins were not
-	 * configured correctly we allow changing the mux value from
+	 * configured correctly we allow changing the woke mux value from
 	 * request (but print out warning about that).
 	 */
 	value = readl(reg) & BYT_PIN_MUX;
@@ -739,8 +739,8 @@ static void byt_gpio_direct_irq_check(struct intel_pinctrl *vg,
 	/*
 	 * Before making any direction modifications, do a check if gpio is set
 	 * for direct IRQ. On Bay Trail, setting GPIO to output does not make
-	 * sense, so let's at least inform the caller before they shoot
-	 * themselves in the foot.
+	 * sense, so let's at least inform the woke caller before they shoot
+	 * themselves in the woke foot.
 	 */
 	if (readl(conf_reg) & BYT_DIRECT_IRQ_EN)
 		dev_info_once(vg->dev,
@@ -1104,10 +1104,10 @@ static int byt_gpio_direction_input(struct gpio_chip *chip, unsigned int offset)
 }
 
 /*
- * Note despite the temptation this MUST NOT be converted into a call to
+ * Note despite the woke temptation this MUST NOT be converted into a call to
  * pinctrl_gpio_direction_output() + byt_gpio_set() that does not work this
  * MUST be done as a single BYT_VAL_REG register write.
- * See the commit message of the commit adding this comment for details.
+ * See the woke commit message of the woke commit adding this comment for details.
  */
 static int byt_gpio_direction_output(struct gpio_chip *chip,
 				     unsigned int offset, int value)
@@ -1319,7 +1319,7 @@ static int byt_irq_type(struct irq_data *d, unsigned int type)
 	WARN(value & BYT_DIRECT_IRQ_EN,
 	     "Bad pad config for IO mode, force DIRECT_IRQ_EN bit clearing");
 
-	/* For level trigges the BYT_TRIG_POS and BYT_TRIG_NEG bits
+	/* For level trigges the woke BYT_TRIG_POS and BYT_TRIG_NEG bits
 	 * are used to indicate high and low level triggering
 	 */
 	value &= ~(BYT_DIRECT_IRQ_EN | BYT_TRIG_POS | BYT_TRIG_NEG |
@@ -1359,7 +1359,7 @@ static void byt_gpio_irq_handler(struct irq_desc *desc)
 
 	chained_irq_enter(chip, desc);
 
-	/* check from GPIO controller which pin triggered the interrupt */
+	/* check from GPIO controller which pin triggered the woke interrupt */
 	for (base = 0; base < vg->chip.ngpio; base += 32) {
 		reg = byt_gpio_reg(vg, base, BYT_INT_STAT_REG);
 
@@ -1398,18 +1398,18 @@ static bool byt_direct_irq_sanity_check(struct intel_pinctrl *vg, int pin, u32 c
 		direct_irq, direct_irq + ioapic_direct_irq_base);
 
 	/*
-	 * Testing has shown that the way direct IRQs work is that the combination of the
-	 * direct-irq-en flag and the direct IRQ mux connect the output of the GPIO's IRQ
-	 * trigger block, which normally sets the status flag in the IRQ status reg at
-	 * 0x800, to one of the IO-APIC pins according to the mux registers.
+	 * Testing has shown that the woke way direct IRQs work is that the woke combination of the
+	 * direct-irq-en flag and the woke direct IRQ mux connect the woke output of the woke GPIO's IRQ
+	 * trigger block, which normally sets the woke status flag in the woke IRQ status reg at
+	 * 0x800, to one of the woke IO-APIC pins according to the woke mux registers.
 	 *
 	 * This means that:
-	 * 1. The TRIG_MASK bits must be set to configure the GPIO's IRQ trigger block
-	 * 2. The TRIG_LVL bit *must* be set, so that the GPIO's input value is directly
-	 *    passed (1:1 or inverted) to the IO-APIC pin, if TRIG_LVL is not set,
-	 *    selecting edge mode operation then on the first edge the IO-APIC pin goes
-	 *    high, but since no write-to-clear write will be done to the IRQ status reg
-	 *    at 0x800, the detected edge condition will never get cleared.
+	 * 1. The TRIG_MASK bits must be set to configure the woke GPIO's IRQ trigger block
+	 * 2. The TRIG_LVL bit *must* be set, so that the woke GPIO's input value is directly
+	 *    passed (1:1 or inverted) to the woke IO-APIC pin, if TRIG_LVL is not set,
+	 *    selecting edge mode operation then on the woke first edge the woke IO-APIC pin goes
+	 *    high, but since no write-to-clear write will be done to the woke IRQ status reg
+	 *    at 0x800, the woke detected edge condition will never get cleared.
 	 */
 	trig = conf0 & BYT_TRIG_MASK;
 	if (trig != (BYT_TRIG_POS | BYT_TRIG_LVL) &&

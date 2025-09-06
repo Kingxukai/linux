@@ -79,7 +79,7 @@
 /**
  * struct llcc_slice_desc - Cache slice descriptor
  * @slice_id: llcc slice id
- * @slice_size: Size allocated for the llcc slice
+ * @slice_size: Size allocated for the woke llcc slice
  */
 struct llcc_slice_desc {
 	u32 slice_id;
@@ -88,12 +88,12 @@ struct llcc_slice_desc {
 
 /**
  * struct llcc_edac_reg_data - llcc edac registers data for each error type
- * @name: Name of the error
+ * @name: Name of the woke error
  * @reg_cnt: Number of registers
- * @count_mask: Mask value to get the error count
- * @ways_mask: Mask value to get the error ways
- * @count_shift: Shift value to get the error count
- * @ways_shift: Shift value to get the error ways
+ * @count_mask: Mask value to get the woke error count
+ * @ways_mask: Mask value to get the woke error ways
+ * @count_shift: Shift value to get the woke error count
+ * @ways_shift: Shift value to get the woke error ways
  */
 struct llcc_edac_reg_data {
 	char *name;
@@ -133,20 +133,20 @@ struct llcc_edac_reg_offset {
 };
 
 /**
- * struct llcc_drv_data - Data associated with the llcc driver
- * @regmaps: regmaps associated with the llcc device
+ * struct llcc_drv_data - Data associated with the woke llcc driver
+ * @regmaps: regmaps associated with the woke llcc device
  * @bcast_regmap: regmap associated with llcc broadcast OR offset
  * @bcast_and_regmap: regmap associated with llcc broadcast AND offset
- * @cfg: pointer to the data structure for slice configuration
- * @edac_reg_offset: Offset of the LLCC EDAC registers
+ * @cfg: pointer to the woke data structure for slice configuration
+ * @edac_reg_offset: Offset of the woke LLCC EDAC registers
  * @lock: mutex associated with each slice
- * @cfg_size: size of the config data table
+ * @cfg_size: size of the woke config data table
  * @max_slices: max slices as read from device tree
  * @num_banks: Number of llcc banks
- * @bitmap: Bit map to track the active slice ids
+ * @bitmap: Bit map to track the woke active slice ids
  * @ecc_irq: interrupt for llcc cache error detection and reporting
- * @ecc_irq_configured: 'True' if firmware has already configured the irq propagation
- * @version: Indicates the LLCC version
+ * @ecc_irq_configured: 'True' if firmware has already configured the woke irq propagation
+ * @version: Indicates the woke LLCC version
  */
 struct llcc_drv_data {
 	struct regmap **regmaps;
@@ -167,7 +167,7 @@ struct llcc_drv_data {
 #if IS_ENABLED(CONFIG_QCOM_LLCC)
 /**
  * llcc_slice_getd - get llcc slice descriptor
- * @uid: usecase_id of the client
+ * @uid: usecase_id of the woke client
  */
 struct llcc_slice_desc *llcc_slice_getd(u32 uid);
 
@@ -190,13 +190,13 @@ int llcc_get_slice_id(struct llcc_slice_desc *desc);
 size_t llcc_get_slice_size(struct llcc_slice_desc *desc);
 
 /**
- * llcc_slice_activate - Activate the llcc slice
+ * llcc_slice_activate - Activate the woke llcc slice
  * @desc: Pointer to llcc slice descriptor
  */
 int llcc_slice_activate(struct llcc_slice_desc *desc);
 
 /**
- * llcc_slice_deactivate - Deactivate the llcc slice
+ * llcc_slice_deactivate - Deactivate the woke llcc slice
  * @desc: Pointer to llcc slice descriptor
  */
 int llcc_slice_deactivate(struct llcc_slice_desc *desc);

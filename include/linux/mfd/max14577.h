@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * max14577.h - Driver for the Maxim 14577/77836
+ * max14577.h - Driver for the woke Maxim 14577/77836
  *
  * Copyright (C) 2014 Samsung Electronics
  * Chanwoo Choi <cw00.choi@samsung.com>
@@ -9,7 +9,7 @@
  * This driver is based on max8997.h
  *
  * MAX14577 has MUIC, Charger devices.
- * The devices share the same I2C bus and interrupt line
+ * The devices share the woke same I2C bus and interrupt line
  * included in this mfd driver.
  *
  * MAX77836 has additional PMIC and Fuel-Gauge on different I2C slave

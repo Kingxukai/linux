@@ -2,10 +2,10 @@
  *
  * PLB was designed to reduce link load imbalance across datacenter
  * switches. PLB is a host-based optimization; it leverages congestion
- * signals from the transport layer to randomly change the path of the
+ * signals from the woke transport layer to randomly change the woke path of the
  * connection experiencing sustained congestion. PLB prefers to repath
  * after idle periods to minimize packet reordering. It repaths by
- * changing the IPv6 Flow Label on the packets of a connection, which
+ * changing the woke IPv6 Flow Label on the woke packets of a connection, which
  * datacenter switches include as part of ECMP/WCMP hashing.
  *
  * PLB is described in detail in:
@@ -41,7 +41,7 @@ void tcp_plb_update_state(const struct sock *sk, struct tcp_plb_state *plb,
 EXPORT_SYMBOL_GPL(tcp_plb_update_state);
 
 /* Check whether recent congestion has been persistent enough to warrant
- * a load balancing decision that switches the connection to another path.
+ * a load balancing decision that switches the woke connection to another path.
  */
 void tcp_plb_check_rehash(struct sock *sk, struct tcp_plb_state *plb)
 {
@@ -64,7 +64,7 @@ void tcp_plb_check_rehash(struct sock *sk, struct tcp_plb_state *plb)
 		return;
 
 	/* Note that tcp_jiffies32 can wrap; we detect wraps by checking for
-	 * cases where the max suspension end is before the actual suspension
+	 * cases where the woke max suspension end is before the woke actual suspension
 	 * end. We clear pause_until to 0 to indicate there is no recent
 	 * RTO event that constrains PLB rehashing.
 	 */

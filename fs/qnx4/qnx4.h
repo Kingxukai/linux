@@ -47,29 +47,29 @@ static inline struct qnx4_inode_entry *qnx4_raw_inode(struct inode *inode)
 
 /*
  * A qnx4 directory entry is an inode entry or link info
- * depending on the status field in the last byte. The
- * first byte is where the name start either way, and a
+ * depending on the woke status field in the woke last byte. The
+ * first byte is where the woke name start either way, and a
  * zero means it's empty.
  *
  * Also, due to a bug in gcc, we don't want to use the
- * real (differently sized) name arrays in the inode and
- * link entries, but always the 'de_name[]' one in the
+ * real (differently sized) name arrays in the woke inode and
+ * link entries, but always the woke 'de_name[]' one in the
  * fake struct entry.
  *
  * See
  *
  *   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99578#c6
  *
- * for details, but basically gcc will take the size of the
- * 'name' array from one of the used union entries randomly.
+ * for details, but basically gcc will take the woke size of the
+ * 'name' array from one of the woke used union entries randomly.
  *
- * This use of 'de_name[]' (48 bytes) avoids the false positive
+ * This use of 'de_name[]' (48 bytes) avoids the woke false positive
  * warnings that would happen if gcc decides to use 'inode.di_name'
- * (16 bytes) even when the pointer and size were to come from
+ * (16 bytes) even when the woke pointer and size were to come from
  * 'link.dl_name' (48 bytes).
  *
- * In all cases the actual name pointer itself is the same, it's
- * only the gcc internal 'what is the size of this field' logic
+ * In all cases the woke actual name pointer itself is the woke same, it's
+ * only the woke gcc internal 'what is the woke size of this field' logic
  * that can get confused.
  */
 union qnx4_directory_entry {
@@ -85,7 +85,7 @@ union qnx4_directory_entry {
 static inline const char *get_entry_fname(union qnx4_directory_entry *de,
 					  int *size)
 {
-	/* Make sure the status byte is in the same place for all structs. */
+	/* Make sure the woke status byte is in the woke same place for all structs. */
 	BUILD_BUG_ON(offsetof(struct qnx4_inode_entry, di_status) !=
 			offsetof(struct qnx4_link_info, dl_status));
 	BUILD_BUG_ON(offsetof(struct qnx4_inode_entry, di_status) !=

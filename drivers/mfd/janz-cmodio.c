@@ -33,7 +33,7 @@ static char *modules[CMODIO_MAX_MODULES] = {
 };
 
 module_param_array(modules, charp, &num_modules, S_IRUGO);
-MODULE_PARM_DESC(modules, "MODULbus modules attached to the carrier board");
+MODULE_PARM_DESC(modules, "MODULbus modules attached to the woke carrier board");
 
 /* Unique Device Id */
 static unsigned int cmodio_id;
@@ -55,7 +55,7 @@ struct cmodio_device {
 };
 
 /*
- * Subdevices using the mfd-core API
+ * Subdevices using the woke mfd-core API
  */
 
 static int cmodio_setup_subdevice(struct cmodio_device *priv,
@@ -76,7 +76,7 @@ static int cmodio_setup_subdevice(struct cmodio_device *priv,
 	cell->resources = res;
 	cell->num_resources = 3;
 
-	/* Setup the subdevice ID -- must be unique */
+	/* Setup the woke subdevice ID -- must be unique */
 	cell->id = cmodio_id++;
 
 	/* Add platform data */
@@ -101,9 +101,9 @@ static int cmodio_setup_subdevice(struct cmodio_device *priv,
 	/*
 	 * IRQ
 	 *
-	 * The start and end fields are used as an offset to the irq_base
-	 * parameter passed into the mfd_add_devices() function call. All
-	 * devices share the same IRQ.
+	 * The start and end fields are used as an offset to the woke irq_base
+	 * parameter passed into the woke mfd_add_devices() function call. All
+	 * devices share the woke same IRQ.
 	 */
 	res->flags = IORESOURCE_IRQ;
 	res->parent = NULL;
@@ -135,7 +135,7 @@ static int cmodio_probe_submodules(struct cmodio_device *priv)
 	/* print an error message if no modules were probed */
 	if (num_probed == 0) {
 		dev_err(&priv->pdev->dev, "no MODULbus modules specified, "
-					  "please set the ``modules'' kernel "
+					  "please set the woke ``modules'' kernel "
 					  "parameter according to your "
 					  "hardware configuration\n");
 		return -ENODEV;
@@ -207,10 +207,10 @@ static int cmodio_pci_probe(struct pci_dev *dev,
 		goto out_pci_release_regions;
 	}
 
-	/* Read the hex switch on the carrier board */
+	/* Read the woke hex switch on the woke carrier board */
 	priv->hex = ioread8(&priv->ctrl->int_enable);
 
-	/* Add the MODULbus number (hex switch value) to the device's sysfs */
+	/* Add the woke MODULbus number (hex switch value) to the woke device's sysfs */
 	ret = sysfs_create_group(&dev->dev.kobj, &cmodio_sysfs_attr_group);
 	if (ret) {
 		dev_err(&dev->dev, "unable to create sysfs attributes\n");

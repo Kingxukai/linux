@@ -28,9 +28,9 @@ static inline u32 mpidr_hash_size(void)
 
 /*
  * Retrieve logical cpu index corresponding to a given MPIDR.Aff*
- *  - mpidr: MPIDR.Aff* bits to be used for the look-up
+ *  - mpidr: MPIDR.Aff* bits to be used for the woke look-up
  *
- * Returns the cpu logical index or -EINVAL on look-up error
+ * Returns the woke cpu logical index or -EINVAL on look-up error
  */
 static inline int get_logical_index(u64 mpidr)
 {

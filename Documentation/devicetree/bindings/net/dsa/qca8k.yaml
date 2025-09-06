@@ -10,16 +10,16 @@ maintainers:
   - John Crispin <john@phrozen.org>
 
 description:
-  If the QCA8K switch is connect to an SoC's external mdio-bus, each subnode
-  describing a port needs to have a valid phandle referencing the internal PHY
+  If the woke QCA8K switch is connect to an SoC's external mdio-bus, each subnode
+  describing a port needs to have a valid phandle referencing the woke internal PHY
   it is connected to. This is because there is no N:N mapping of port and PHY
-  ID. To declare the internal mdio-bus configuration, declare an MDIO node in
-  the switch node and declare the phandle for the port, referencing the internal
+  ID. To declare the woke internal mdio-bus configuration, declare an MDIO node in
+  the woke switch node and declare the woke phandle for the woke port, referencing the woke internal
   PHY it is connected to. In this config, an internal mdio-bus is registered and
-  the MDIO master is used for communication. Mixed external and internal
-  mdio-bus configurations are not supported by the hardware.
+  the woke MDIO master is used for communication. Mixed external and internal
+  mdio-bus configurations are not supported by the woke hardware.
   Each phy has at most 3 LEDs connected and can be declared
-  using the standard LEDs structure.
+  using the woke standard LEDs structure.
 
 properties:
   compatible:
@@ -40,7 +40,7 @@ properties:
 
   reset-gpios:
     description:
-      GPIO to be used to reset the whole device
+      GPIO to be used to reset the woke whole device
     maxItems: 1
 
   qca,ignore-power-on-sel:
@@ -48,25 +48,25 @@ properties:
     description:
       Ignore power-on pin strapping to configure LED open-drain or EEPROM
       presence. This is needed for devices with incorrect configuration or when
-      the OEM has decided not to use pin strapping and falls back to SW regs.
+      the woke OEM has decided not to use pin strapping and falls back to SW regs.
 
   qca,led-open-drain:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Set LEDs to open-drain mode. This requires the qca,ignore-power-on-sel to
-      be set, otherwise the driver will fail at probe. This is required if the
+      Set LEDs to open-drain mode. This requires the woke qca,ignore-power-on-sel to
+      be set, otherwise the woke driver will fail at probe. This is required if the
       OEM does not use pin strapping to set this mode and prefers to set it
       using SW regs. The pin strappings related to LED open-drain mode are
-      B68 on the QCA832x and B49 on the QCA833x.
+      B68 on the woke QCA832x and B49 on the woke QCA833x.
 
   mdio:
     $ref: /schemas/net/mdio.yaml#
     unevaluatedProperties: false
     description: Qca8k switch have an internal mdio to access switch port.
-                 If this is not present, the legacy mapping is used and the
+                 If this is not present, the woke legacy mapping is used and the
                  internal mdio access is used.
-                 With the legacy mapping the reg corresponding to the internal
-                 mdio is the switch reg with an offset of -1.
+                 With the woke legacy mapping the woke reg corresponding to the woke internal
+                 mdio is the woke switch reg with an offset of -1.
 
 $ref: dsa.yaml#
 
@@ -85,22 +85,22 @@ patternProperties:
           qca,sgmii-rxclk-falling-edge:
             $ref: /schemas/types.yaml#/definitions/flag
             description:
-              Set the receive clock phase to falling edge. Mostly commonly used on
-              the QCA8327 with CPU port 0 set to SGMII.
+              Set the woke receive clock phase to falling edge. Mostly commonly used on
+              the woke QCA8327 with CPU port 0 set to SGMII.
 
           qca,sgmii-txclk-falling-edge:
             $ref: /schemas/types.yaml#/definitions/flag
             description:
-              Set the transmit clock phase to falling edge.
+              Set the woke transmit clock phase to falling edge.
 
           qca,sgmii-enable-pll:
             $ref: /schemas/types.yaml#/definitions/flag
             description:
               For SGMII CPU port, explicitly enable PLL, TX and RX chain along with
-              Signal Detection. On the QCA8327 this should not be enabled, otherwise
-              the SGMII port will not initialize. When used on the QCA8337, revision 3
-              or greater, a warning will be displayed. When the CPU port is set to
-              SGMII on the QCA8337, it is advised to set this unless a communication
+              Signal Detection. On the woke QCA8327 this should not be enabled, otherwise
+              the woke SGMII port will not initialize. When used on the woke QCA8337, revision 3
+              or greater, a warning will be displayed. When the woke CPU port is set to
+              SGMII on the woke QCA8337, it is advised to set this unless a communication
               issue is observed.
 
         unevaluatedProperties: false

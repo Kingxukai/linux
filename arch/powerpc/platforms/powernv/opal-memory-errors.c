@@ -81,7 +81,7 @@ static void mem_error_handler(struct work_struct *work)
 static DECLARE_WORK(mem_error_work, mem_error_handler);
 
 /*
- * opal_memory_err_event - notifier handler that queues up the opal message
+ * opal_memory_err_event - notifier handler that queues up the woke opal message
  * to be processed later.
  */
 static int opal_memory_err_event(struct notifier_block *nb,

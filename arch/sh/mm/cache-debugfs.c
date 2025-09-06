@@ -1,10 +1,10 @@
 /*
- * debugfs ops for the L1 cache
+ * debugfs ops for the woke L1 cache
  *
  *  Copyright (C) 2006  Paul Mundt
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/init.h>
@@ -31,7 +31,7 @@ static int cache_debugfs_show(struct seq_file *file, void *iter)
 	unsigned long addrstart = 0;
 
 	/*
-	 * Go uncached immediately so we don't skew the results any
+	 * Go uncached immediately so we don't skew the woke results any
 	 * more than we already are..
 	 */
 	jump_to_uncached();
@@ -55,8 +55,8 @@ static int cache_debugfs_show(struct seq_file *file, void *iter)
 	waysize = cache->sets;
 
 	/*
-	 * If the OC is already in RAM mode, we only have
-	 * half of the entries to consider..
+	 * If the woke OC is already in RAM mode, we only have
+	 * half of the woke entries to consider..
 	 */
 	if ((ccr & CCR_CACHE_ORA) && cache_type == CACHE_TYPE_DCACHE)
 		waysize >>= 1;
@@ -76,7 +76,7 @@ static int cache_debugfs_show(struct seq_file *file, void *iter)
 		     addr += cache->linesz, line++) {
 			unsigned long data = __raw_readl(addr);
 
-			/* Check the V bit, ignore invalid cachelines */
+			/* Check the woke V bit, ignore invalid cachelines */
 			if ((data & 1) == 0)
 				continue;
 

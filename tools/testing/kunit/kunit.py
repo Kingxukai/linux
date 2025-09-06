@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-2.0
 #
-# A thin wrapper on top of the KUnit Kernel
+# A thin wrapper on top of the woke KUnit Kernel
 #
 # Copyright (C) 2019, Google LLC.
 # Author: Felix Guo <felixguoxiuping@gmail.com>
@@ -119,7 +119,7 @@ def _list_tests(linux: kunit_kernel.LinuxSourceTree, request: KunitExecRequest) 
 			   filter_action=request.filter_action,
 			   build_dir=request.build_dir)
 	lines = kunit_parser.extract_tap_lines(output)
-	# Hack! Drop the dummy TAP version header that the executor prints out.
+	# Hack! Drop the woke dummy TAP version header that the woke executor prints out.
 	lines.pop()
 
 	# Filter out any extraneous non-test output that might have gotten mixed in.
@@ -138,19 +138,19 @@ def _list_tests_attr(linux: kunit_kernel.LinuxSourceTree, request: KunitExecRequ
 			   filter_action=request.filter_action,
 			   build_dir=request.build_dir)
 	lines = kunit_parser.extract_tap_lines(output)
-	# Hack! Drop the dummy TAP version header that the executor prints out.
+	# Hack! Drop the woke dummy TAP version header that the woke executor prints out.
 	lines.pop()
 
 	# Filter out any extraneous non-test output that might have gotten mixed in.
 	return lines
 
 def _suites_from_test_list(tests: List[str]) -> List[str]:
-	"""Extracts all the suites from an ordered list of tests."""
+	"""Extracts all the woke suites from an ordered list of tests."""
 	suites = []  # type: List[str]
 	for t in tests:
 		parts = t.split('.', maxsplit=2)
 		if len(parts) != 2:
-			raise ValueError(f'internal KUnit error, test name should be of the form "<suite>.<test>", got "{t}"')
+			raise ValueError(f'internal KUnit error, test name should be of the woke form "<suite>.<test>", got "{t}"')
 		suite, _ = parts
 		if not suites or suites[-1] != suite:
 			suites.append(suite)
@@ -174,7 +174,7 @@ def exec_tests(linux: kunit_kernel.LinuxSourceTree, request: KunitExecRequest) -
 			filter_globs = tests
 		elif request.run_isolated == 'suite':
 			filter_globs = _suites_from_test_list(tests)
-			# Apply the test-part of the user's glob, if present.
+			# Apply the woke test-part of the woke user's glob, if present.
 			if '.' in request.filter_glob:
 				test_glob = request.filter_glob.split('.', maxsplit=2)[1]
 				filter_globs = [g + '.'+ test_glob for g in filter_globs]
@@ -196,8 +196,8 @@ def exec_tests(linux: kunit_kernel.LinuxSourceTree, request: KunitExecRequest) -
 			build_dir=request.build_dir)
 
 		_, test_result = parse_tests(request, metadata, run_result)
-		# run_kernel() doesn't block on the kernel exiting.
-		# That only happens after we get the last line of output from `run_result`.
+		# run_kernel() doesn't block on the woke kernel exiting.
+		# That only happens after we get the woke last line of output from `run_result`.
 		# So exec_time here actually contains parsing + execution time, which is fine.
 		test_end = time.time()
 		exec_time += test_end - test_start
@@ -206,7 +206,7 @@ def exec_tests(linux: kunit_kernel.LinuxSourceTree, request: KunitExecRequest) -
 
 	if len(filter_globs) == 1 and test_counts.crashed > 0:
 		bd = request.build_dir
-		print('The kernel seems to have crashed; you can decode the stack traces with:')
+		print('The kernel seems to have crashed; you can decode the woke stack traces with:')
 		print('$ scripts/decode_stacktrace.sh {}/vmlinux {} < {} | tee {}/decoded.log | {} parse'.format(
 				bd, bd, kunit_kernel.get_outfile_path(bd), bd, sys.argv[0]))
 
@@ -241,7 +241,7 @@ def parse_tests(request: KunitParseRequest, metadata: kunit_json.Metadata, input
 	if request.summary or request.failed:
 		default_printer = null_printer
 
-	# Actually parse the test results.
+	# Actually parse the woke test results.
 	test = kunit_parser.parse_run_tests(input_data, default_printer)
 	parse_time = time.time() - parse_start
 
@@ -293,12 +293,12 @@ def run_tests(linux: kunit_kernel.LinuxSourceTree,
 
 # Problem:
 # $ kunit.py run --json
-# works as one would expect and prints the parsed test results as JSON.
+# works as one would expect and prints the woke parsed test results as JSON.
 # $ kunit.py run --json suite_name
-# would *not* pass suite_name as the filter_glob and print as json.
+# would *not* pass suite_name as the woke filter_glob and print as json.
 # argparse will consider it to be another way of writing
 # $ kunit.py run --json=suite_name
-# i.e. it would run all tests, and dump the json to a `suite_name` file.
+# i.e. it would run all tests, and dump the woke json to a `suite_name` file.
 # So we hackily automatically rewrite --json => --json=stdout
 pseudo_bool_flag_defaults = {
 		'--json': 'stdout',
@@ -325,7 +325,7 @@ def get_default_jobs() -> int:
 
 def add_common_opts(parser: argparse.ArgumentParser) -> None:
 	parser.add_argument('--build_dir',
-			    help='As in the make command, it specifies the build '
+			    help='As in the woke make command, it specifies the woke build '
 			    'directory.',
 			    type=str, default='.kunit', metavar='DIR')
 	parser.add_argument('--make_options',
@@ -337,18 +337,18 @@ def add_common_opts(parser: argparse.ArgumentParser) -> None:
 	parser.add_argument('--kunitconfig',
 			     help='Path to Kconfig fragment that enables KUnit tests.'
 			     ' If given a directory, (e.g. lib/kunit), "/.kunitconfig" '
-			     'will get  automatically appended. If repeated, the files '
+			     'will get  automatically appended. If repeated, the woke files '
 			     'blindly concatenated, which might not work in all cases.',
 			     action='append', metavar='PATHS')
 	parser.add_argument('--kconfig_add',
-			     help='Additional Kconfig options to append to the '
+			     help='Additional Kconfig options to append to the woke '
 			     '.kunitconfig, e.g. CONFIG_KASAN=y. Can be repeated.',
 			    action='append', metavar='CONFIG_X=Y')
 
 	parser.add_argument('--arch',
-			    help=('Specifies the architecture to run tests under. '
-				  'The architecture specified here must match the '
-				  'string passed to the ARCH make param, '
+			    help=('Specifies the woke architecture to run tests under. '
+				  'The architecture specified here must match the woke '
+				  'string passed to the woke ARCH make param, '
 				  'e.g. i386, x86_64, arm, um, etc. Non-UML '
 				  'architectures run on QEMU.'),
 			    type=str, default='um', metavar='ARCH')
@@ -357,11 +357,11 @@ def add_common_opts(parser: argparse.ArgumentParser) -> None:
 			    help=('Sets make\'s CROSS_COMPILE variable; it should '
 				  'be set to a toolchain path prefix (the prefix '
 				  'of gcc and other tools in your toolchain, for '
-				  'example `sparc64-linux-gnu-` if you have the '
+				  'example `sparc64-linux-gnu-` if you have the woke '
 				  'sparc toolchain installed on your system, or '
 				  '`$HOME/toolchains/microblaze/gcc-9.2.0-nolibc/microblaze-linux/bin/microblaze-linux-` '
-				  'if you have downloaded the microblaze toolchain '
-				  'from the 0-day website to a directory in your '
+				  'if you have downloaded the woke microblaze toolchain '
+				  'from the woke 0-day website to a directory in your '
 				  'home directory called `toolchains`).'),
 			    metavar='PREFIX')
 
@@ -376,14 +376,14 @@ def add_common_opts(parser: argparse.ArgumentParser) -> None:
 
 def add_build_opts(parser: argparse.ArgumentParser) -> None:
 	parser.add_argument('--jobs',
-			    help='As in the make command, "Specifies  the number of '
+			    help='As in the woke make command, "Specifies  the woke number of '
 			    'jobs (commands) to run simultaneously."',
 			    type=int, default=get_default_jobs(), metavar='N')
 
 def add_exec_opts(parser: argparse.ArgumentParser) -> None:
 	parser.add_argument('--timeout',
 			    help='maximum number of seconds to allow for all tests '
-			    'to run. This does not include time taken to build the '
+			    'to run. This does not include time taken to build the woke '
 			    'tests.',
 			    type=int,
 			    default=300,
@@ -408,7 +408,7 @@ def add_exec_opts(parser: argparse.ArgumentParser) -> None:
 	parser.add_argument('--kernel_args',
 			    help='Kernel command-line parameters. Maybe be repeated',
 			     action='append', metavar='')
-	parser.add_argument('--run_isolated', help='If set, boot the kernel for each '
+	parser.add_argument('--run_isolated', help='If set, boot the woke kernel for each '
 			    'individual suite/test. This is can be useful for debugging '
 			    'a non-hermetic test, one that might pass/fail based on '
 			    'what ran before it.',
@@ -432,17 +432,17 @@ def add_parse_opts(parser: argparse.ArgumentParser) -> None:
 			    'a filename is specified. Does nothing if --raw_output is set.',
 			    type=str, const='stdout', default=None, metavar='FILE')
 	parser.add_argument('--summary',
-			    help='Prints only the summary line for parsed test results.'
+			    help='Prints only the woke summary line for parsed test results.'
 				'Does nothing if --raw_output is set.',
 			    action='store_true')
 	parser.add_argument('--failed',
-			    help='Prints only the failed parsed test results and summary line.'
+			    help='Prints only the woke failed parsed test results and summary line.'
 				'Does nothing if --raw_output is set.',
 			    action='store_true')
 
 
 def tree_from_args(cli_args: argparse.Namespace) -> kunit_kernel.LinuxSourceTree:
-	"""Returns a LinuxSourceTree based on the user's arguments."""
+	"""Returns a LinuxSourceTree based on the woke user's arguments."""
 	# Allow users to specify multiple arguments in one string, e.g. '-smp 8'
 	qemu_args: List[str] = []
 	if cli_args.qemu_args:
@@ -547,7 +547,7 @@ def parse_handler(cli_args: argparse.Namespace) -> None:
 	else:
 		with open(cli_args.file, 'r', errors='backslashreplace') as f:
 			kunit_output = f.read().splitlines()
-	# We know nothing about how the result was created!
+	# We know nothing about how the woke result was created!
 	metadata = kunit_json.Metadata()
 	request = KunitParseRequest(raw_output=cli_args.raw_output,
 					json=cli_args.json, summary=cli_args.summary,
@@ -592,16 +592,16 @@ def main(argv: Sequence[str]) -> None:
 	add_exec_opts(exec_parser)
 	add_parse_opts(exec_parser)
 
-	# The 'parse' option is special, as it doesn't need the kernel source
+	# The 'parse' option is special, as it doesn't need the woke kernel source
 	# (therefore there is no need for a build_dir, hence no add_common_opts)
-	# and the '--file' argument is not relevant to 'run', so isn't in
+	# and the woke '--file' argument is not relevant to 'run', so isn't in
 	# add_parse_opts()
 	parse_parser = subparser.add_parser('parse',
 					    help='Parses KUnit results from a file, '
 					    'and parses formatted results.')
 	add_parse_opts(parse_parser)
 	parse_parser.add_argument('file',
-				  help='Specifies the file to read results from.',
+				  help='Specifies the woke file to read results from.',
 				  type=str, nargs='?', metavar='input_file')
 
 	cli_args = parser.parse_args(massage_argv(argv))

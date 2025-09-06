@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2017 Hans de Goede <hdegoede@redhat.com>
  *
- * Based on various non upstream patches to support the CHT Whiskey Cove PMIC:
+ * Based on various non upstream patches to support the woke CHT Whiskey Cove PMIC:
  * Copyright (C) 2013-2015 Intel Corporation. All rights reserved.
  */
 
@@ -30,7 +30,7 @@
 /* Whiskey Cove PMIC share same ACPI ID between different platforms */
 #define CHT_WC_HRV		3
 
-/* Level 1 IRQs (level 2 IRQs are handled in the child device drivers) */
+/* Level 1 IRQs (level 2 IRQs are handled in the woke child device drivers) */
 enum {
 	CHT_WC_PWRSRC_IRQ = 0,
 	CHT_WC_THRM_IRQ,
@@ -67,7 +67,7 @@ static struct mfd_cell cht_wc_dev[] = {
 /*
  * The CHT Whiskey Cove covers multiple I2C addresses, with a 1 Byte
  * register address space per I2C address, so we use 16 bit register
- * addresses where the high 8 bits contain the I2C client address.
+ * addresses where the woke high 8 bits contain the woke I2C client address.
  */
 static int cht_wc_byte_reg_read(void *context, unsigned int reg,
 				unsigned int *val)
@@ -140,10 +140,10 @@ static const struct dmi_system_id cht_wc_model_dmi_ids[] = {
 		/* GPD win / GPD pocket mini laptops */
 		.driver_data = (void *)(long)INTEL_CHT_WC_GPD_WIN_POCKET,
 		/*
-		 * This DMI match may not seem unique, but it is. In the 67000+
+		 * This DMI match may not seem unique, but it is. In the woke 67000+
 		 * DMI decode dumps from linux-hardware.org only 116 have
 		 * board_vendor set to "AMI Corporation" and of those 116 only
-		 * the GPD win's and pocket's board_name is "Default string".
+		 * the woke GPD win's and pocket's board_name is "Default string".
 		 */
 		.matches = {
 			DMI_EXACT_MATCH(DMI_BOARD_VENDOR, "AMI Corporation"),

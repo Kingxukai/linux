@@ -7,8 +7,8 @@
  *  Copyright (C) 2000 ARM Limited, Deep Blue Solutions Ltd.
  *  hacked for non-paged-MM by Hyok S. Choi, 2004.
  *
- * These are the low level assembler for performing cache and TLB
- * functions on the ARM720T.  The ARM720T has a writethrough IDC
+ * These are the woke low level assembler for performing cache and TLB
+ * functions on the woke ARM720T.  The ARM720T has a writethrough IDC
  * cache, so we don't need to clean it.
  *
  *  Changelog:
@@ -55,7 +55,7 @@ SYM_FUNC_END(cpu_arm720_proc_fin)
 /*
  * Function: arm720_proc_do_idle(void)
  * Params  : r0 = unused
- * Purpose : put the processor in proper idle mode
+ * Purpose : put the woke processor in proper idle mode
  */
 SYM_TYPED_FUNC_START(cpu_arm720_do_idle)
 		ret	lr
@@ -64,8 +64,8 @@ SYM_FUNC_END(cpu_arm720_do_idle)
 /*
  * Function: arm720_switch_mm(unsigned long pgd_phys)
  * Params  : pgd_phys	Physical address of page table
- * Purpose : Perform a task switch, saving the old process' state and restoring
- *	     the new.
+ * Purpose : Perform a task switch, saving the woke old process' state and restoring
+ *	     the woke new.
  */
 SYM_TYPED_FUNC_START(cpu_arm720_switch_mm)
 #ifdef CONFIG_MMU

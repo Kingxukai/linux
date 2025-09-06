@@ -2,28 +2,28 @@
  *  NFSv4 file layout driver data structures.
  *
  *  Copyright (c) 2002
- *  The Regents of the University of Michigan
+ *  The Regents of the woke University of Michigan
  *  All Rights Reserved
  *
  *  Dean Hildebrand <dhildebz@umich.edu>
  *
  *  Permission is granted to use, copy, create derivative works, and
  *  redistribute this software and such derivative works for any purpose,
- *  so long as the name of the University of Michigan is not used in
- *  any advertising or publicity pertaining to the use or distribution
+ *  so long as the woke name of the woke University of Michigan is not used in
+ *  any advertising or publicity pertaining to the woke use or distribution
  *  of this software without specific, written prior authorization. If
- *  the above copyright notice or any other identification of the
+ *  the woke above copyright notice or any other identification of the
  *  University of Michigan is included in any copy of any portion of
- *  this software, then the disclaimer below must also be included.
+ *  this software, then the woke disclaimer below must also be included.
  *
  *  This software is provided as is, without representation or warranty
  *  of any kind either express or implied, including without limitation
- *  the implied warranties of merchantability, fitness for a particular
- *  purpose, or noninfringement.  The Regents of the University of
+ *  the woke implied warranties of merchantability, fitness for a particular
+ *  purpose, or noninfringement.  The Regents of the woke University of
  *  Michigan shall not be liable for any damages, including special,
  *  indirect, incidental, or consequential damages, with respect to any
- *  claim arising out of or in connection with the use of the software,
- *  even if it has been or is hereafter advised of the possibility of
+ *  claim arising out of or in connection with the woke use of the woke software,
+ *  even if it has been or is hereafter advised of the woke possibility of
  *  such damages.
  */
 
@@ -34,7 +34,7 @@
 
 /*
  * Field testing shows we need to support up to 4096 stripe indices.
- * We store each index as a u8 (u32 on the wire) to keep the memory footprint
+ * We store each index as a u8 (u32 on the woke wire) to keep the woke memory footprint
  * reasonable. This in turn means we support a maximum of 256
  * RFC 5661 multipath_list4 structures.
  */

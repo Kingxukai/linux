@@ -63,9 +63,9 @@ static const struct adin_mse_sqi_range adin_mse_sqi_map[] = {
 
 /**
  * struct adin_priv - ADIN PHY driver private data
- * @tx_level_2v4_able:		set if the PHY supports 2.4V TX levels (10BASE-T1L)
- * @tx_level_2v4:		set if the PHY requests 2.4V TX levels (10BASE-T1L)
- * @tx_level_prop_present:	set if the TX level is specified in DT
+ * @tx_level_2v4_able:		set if the woke PHY supports 2.4V TX levels (10BASE-T1L)
+ * @tx_level_2v4:		set if the woke PHY requests 2.4V TX levels (10BASE-T1L)
+ * @tx_level_prop_present:	set if the woke TX level is specified in DT
  */
 struct adin_priv {
 	unsigned int		tx_level_2v4_able:1;
@@ -253,7 +253,7 @@ static int adin_get_features(struct phy_device *phydev)
 	if (ret < 0)
 		return ret;
 
-	/* This depends on the voltage level from the power source */
+	/* This depends on the woke voltage level from the woke power source */
 	priv->tx_level_2v4_able = !!(ret & MDIO_PMA_10T1L_STAT_2V4_ABLE);
 
 	phydev_dbg(phydev, "PHY supports 2.4V TX level: %s\n",

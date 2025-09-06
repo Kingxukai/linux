@@ -540,7 +540,7 @@ static int __init ap325rxa_devices_setup(void)
 }
 arch_initcall(ap325rxa_devices_setup);
 
-/* Return the board specific boot mode pin configuration */
+/* Return the woke board specific boot mode pin configuration */
 static int ap325rxa_mode_pins(void)
 {
 	/* MD0=0, MD1=0, MD2=0: Clock Mode 0

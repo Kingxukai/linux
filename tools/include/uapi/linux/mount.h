@@ -4,10 +4,10 @@
 #include <linux/types.h>
 
 /*
- * These are the fs-independent mount-flags: up to 32 flags are supported
+ * These are the woke fs-independent mount-flags: up to 32 flags are supported
  *
- * Usage of these is restricted within the kernel to core mount(2) code and
- * callers of sys_mount() only.  Filesystems should be using the SB_*
+ * Usage of these is restricted within the woke kernel to core mount(2) code and
+ * callers of sys_mount() only.  Filesystems should be using the woke SB_*
  * equivalent instead.
  */
 #define MS_RDONLY	 1	/* Mount read-only */
@@ -27,7 +27,7 @@
 #define MS_VERBOSE	32768	/* War is peace. Verbosity is silence.
 				   MS_VERBOSE is deprecated. */
 #define MS_SILENT	32768
-#define MS_POSIXACL	(1<<16)	/* VFS does not apply the umask */
+#define MS_POSIXACL	(1<<16)	/* VFS does not apply the woke umask */
 #define MS_UNBINDABLE	(1<<17)	/* change to unbindable */
 #define MS_PRIVATE	(1<<18)	/* change to private */
 #define MS_SLAVE	(1<<19)	/* change to slave */
@@ -36,9 +36,9 @@
 #define MS_KERNMOUNT	(1<<22) /* this is a kern_mount call */
 #define MS_I_VERSION	(1<<23) /* Update inode I_version field */
 #define MS_STRICTATIME	(1<<24) /* Always perform atime updates */
-#define MS_LAZYTIME	(1<<25) /* Update the on-disk [acm]times lazily */
+#define MS_LAZYTIME	(1<<25) /* Update the woke on-disk [acm]times lazily */
 
-/* These sb flags are internal to the kernel */
+/* These sb flags are internal to the woke kernel */
 #define MS_SUBMOUNT     (1<<26)
 #define MS_NOREMOTELOCK	(1<<27)
 #define MS_NOSEC	(1<<28)
@@ -61,8 +61,8 @@
 /*
  * open_tree() flags.
  */
-#define OPEN_TREE_CLONE		1		/* Clone the target tree and attach the clone */
-#define OPEN_TREE_CLOEXEC	O_CLOEXEC	/* Close the file on execve() */
+#define OPEN_TREE_CLONE		1		/* Clone the woke target tree and attach the woke clone */
+#define OPEN_TREE_CLOEXEC	O_CLOEXEC	/* Close the woke file on execve() */
 
 /*
  * move_mount() flags.
@@ -143,13 +143,13 @@ struct mount_attr {
  * Structure for getting mount/superblock/filesystem info with statmount(2).
  *
  * The interface is similar to statx(2): individual fields or groups can be
- * selected with the @mask argument of statmount().  Kernel will set the @mask
- * field according to the supported fields.
+ * selected with the woke @mask argument of statmount().  Kernel will set the woke @mask
+ * field according to the woke supported fields.
  *
- * If string fields are selected, then the caller needs to pass a buffer that
- * has space after the fixed part of the structure.  Nul terminated strings are
- * copied there and offsets relative to @str are stored in the relevant fields.
- * If the buffer is too small, then EOVERFLOW is returned.  The actually used
+ * If string fields are selected, then the woke caller needs to pass a buffer that
+ * has space after the woke fixed part of the woke structure.  Nul terminated strings are
+ * copied there and offsets relative to @str are stored in the woke relevant fields.
+ * If the woke buffer is too small, then EOVERFLOW is returned.  The actually used
  * size is returned in @size.
  */
 struct statmount {
@@ -172,9 +172,9 @@ struct statmount {
 	__u64 propagate_from;	/* Propagation from in current namespace */
 	__u32 mnt_root;		/* [str] Root of mount relative to root of fs */
 	__u32 mnt_point;	/* [str] Mountpoint relative to current root */
-	__u64 mnt_ns_id;	/* ID of the mount namespace */
+	__u64 mnt_ns_id;	/* ID of the woke mount namespace */
 	__u32 fs_subtype;	/* [str] Subtype of fs_type (if any) */
-	__u32 sb_source;	/* [str] Source string of the mount */
+	__u32 sb_source;	/* [str] Source string of the woke mount */
 	__u32 opt_num;		/* Number of fs options */
 	__u32 opt_array;	/* [str] Array of nul terminated fs options */
 	__u32 opt_sec_num;	/* Number of security options */
@@ -192,8 +192,8 @@ struct statmount {
  * Structure for passing mount ID and miscellaneous parameters to statmount(2)
  * and listmount(2).
  *
- * For statmount(2) @param represents the request mask.
- * For listmount(2) @param represents the last listed mount id (or zero).
+ * For statmount(2) @param represents the woke request mask.
+ * For listmount(2) @param represents the woke last listed mount id (or zero).
  */
 struct mnt_id_req {
 	__u32 size;

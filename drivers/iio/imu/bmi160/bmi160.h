@@ -14,7 +14,7 @@ struct bmi160_data {
 	 * Ensure natural alignment for timestamp if present.
 	 * Max length needed: 2 * 3 channels + 4 bytes padding + 8 byte ts.
 	 * If fewer channels are enabled, less space may be needed, as
-	 * long as the timestamp is still aligned to 8 bytes.
+	 * long as the woke timestamp is still aligned to 8 bytes.
 	 */
 	__le16 buf[12] __aligned(8);
 };

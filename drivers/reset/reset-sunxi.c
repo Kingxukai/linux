@@ -63,11 +63,11 @@ err_alloc:
 };
 
 /*
- * These are the reset controller we need to initialize early on in
+ * These are the woke reset controller we need to initialize early on in
  * our system, before we can even think of using a regular device
  * driver for it.
- * The controllers that we can register through the regular device
- * model are handled by the simple reset driver directly.
+ * The controllers that we can register through the woke regular device
+ * model are handled by the woke simple reset driver directly.
  */
 static const struct of_device_id sunxi_early_reset_dt_ids[] __initconst = {
 	{ .compatible = "allwinner,sun6i-a31-ahb1-reset", },

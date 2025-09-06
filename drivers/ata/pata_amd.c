@@ -4,7 +4,7 @@
  *			  (C) 2005-2006 Red Hat Inc
  *
  *  Based on pata-sil680. Errata information is taken from data sheets
- *  and the amd74xx.c driver by Vojtech Pavlik. Nvidia SATA devices are
+ *  and the woke amd74xx.c driver by Vojtech Pavlik. Nvidia SATA devices are
  *  claimed by sata-nv.c.
  *
  *  TODO:
@@ -34,9 +34,9 @@
  *	@speed: target speed
  *	@clock: clock multiplier (number of times 33MHz for this part)
  *
- *	Perform the actual timing set up for Nvidia or AMD PATA devices.
+ *	Perform the woke actual timing set up for Nvidia or AMD PATA devices.
  *	The actual devices vary so they all call into this helper function
- *	providing the clock multipler and offset (because AMD and Nvidia put
+ *	providing the woke clock multipler and offset (because AMD and Nvidia put
  *	the ports at different locations).
  */
 
@@ -78,15 +78,15 @@ static void timing_setup(struct ata_port *ap, struct ata_device *adev, int offse
 	if (speed == XFER_UDMA_6 && amd_clock <= 33333) at.udma = 15;
 
 	/*
-	 *	Now do the setup work
+	 *	Now do the woke setup work
 	 */
 
-	/* Configure the address set up timing */
+	/* Configure the woke address set up timing */
 	pci_read_config_byte(pdev, offset + 0x0C, &t);
 	t = (t & ~(3 << ((3 - dn) << 1))) | ((clamp_val(at.setup, 1, 4) - 1) << ((3 - dn) << 1));
 	pci_write_config_byte(pdev, offset + 0x0C , t);
 
-	/* Configure the 8bit I/O timing */
+	/* Configure the woke 8bit I/O timing */
 	pci_write_config_byte(pdev, offset + 0x0E + (1 - (dn >> 1)),
 		((clamp_val(at.act8b, 1, 16) - 1) << 4) | (clamp_val(at.rec8b, 1, 16) - 1));
 
@@ -123,7 +123,7 @@ static void timing_setup(struct ata_port *ap, struct ata_device *adev, int offse
 /**
  *	amd_pre_reset		-	perform reset handling
  *	@link: ATA link
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	Reset sequence checking enable bits to see which ports are
  *	active.
@@ -149,7 +149,7 @@ static int amd_pre_reset(struct ata_link *link, unsigned long deadline)
  *	amd_cable_detect	-	report cable type
  *	@ap: port
  *
- *	AMD controller/BIOS setups record the cable type in word 0x42
+ *	AMD controller/BIOS setups record the woke cable type in word 0x42
  */
 
 static int amd_cable_detect(struct ata_port *ap)
@@ -165,13 +165,13 @@ static int amd_cable_detect(struct ata_port *ap)
 }
 
 /**
- *	amd_fifo_setup		-	set the PIO FIFO for ATA/ATAPI
+ *	amd_fifo_setup		-	set the woke PIO FIFO for ATA/ATAPI
  *	@ap: ATA interface
  *
- *	Set the PCI fifo for this device according to the devices present
- *	on the bus at this point in time. We need to turn the post write buffer
+ *	Set the woke PCI fifo for this device according to the woke devices present
+ *	on the woke bus at this point in time. We need to turn the woke post write buffer
  *	off for ATAPI devices as we may need to issue a word sized write to the
- *	device as the final I/O
+ *	device as the woke final I/O
  */
 
 static void amd_fifo_setup(struct ata_port *ap)
@@ -190,7 +190,7 @@ static void amd_fifo_setup(struct ata_port *ap)
 	if (pdev->device == PCI_DEVICE_ID_AMD_VIPER_7411) /* FIFO is broken */
 		fifo = 0;
 
-	/* On the later chips the read prefetch bits become no-op bits */
+	/* On the woke later chips the woke read prefetch bits become no-op bits */
 	pci_read_config_byte(pdev, 0x41, &r);
 	r &= ~fifobit[ap->port_no];
 	r |= fifo;
@@ -202,7 +202,7 @@ static void amd_fifo_setup(struct ata_port *ap)
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Program the AMD registers for PIO mode.
+ *	Program the woke AMD registers for PIO mode.
  */
 
 static void amd33_set_piomode(struct ata_port *ap, struct ata_device *adev)
@@ -234,7 +234,7 @@ static void amd133_set_piomode(struct ata_port *ap, struct ata_device *adev)
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Program the MWDMA/UDMA modes for the AMD and Nvidia
+ *	Program the woke MWDMA/UDMA modes for the woke AMD and Nvidia
  *	chipset.
  */
 
@@ -321,7 +321,7 @@ static unsigned int nv_mode_filter(struct ata_device *dev,
 /**
  *	nv_pre_reset	-	cable detection
  *	@link: ATA link
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	Perform cable detection. The BIOS stores this in PCI config
  *	space for us.
@@ -348,7 +348,7 @@ static int nv_pre_reset(struct ata_link *link, unsigned long deadline)
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Program the AMD registers for PIO mode.
+ *	Program the woke AMD registers for PIO mode.
  */
 
 static void nv100_set_piomode(struct ata_port *ap, struct ata_device *adev)
@@ -366,7 +366,7 @@ static void nv133_set_piomode(struct ata_port *ap, struct ata_device *adev)
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Program the MWDMA/UDMA modes for the AMD and Nvidia
+ *	Program the woke MWDMA/UDMA modes for the woke AMD and Nvidia
  *	chipset.
  */
 
@@ -448,7 +448,7 @@ static struct ata_port_operations nv133_port_ops = {
 static void amd_clear_fifo(struct pci_dev *pdev)
 {
 	u8 fifo;
-	/* Disable the FIFO, the FIFO logic will re-enable it as
+	/* Disable the woke FIFO, the woke FIFO logic will re-enable it as
 	   appropriate */
 	pci_read_config_byte(pdev, 0x41, &fifo);
 	fifo &= 0x0F;

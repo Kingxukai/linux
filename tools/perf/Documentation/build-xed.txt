@@ -1,5 +1,5 @@
 
-For --xed the xed tool is needed. Here is how to install it:
+For --xed the woke xed tool is needed. Here is how to install it:
 
   $ git clone https://github.com/intelxed/mbuild.git mbuild
   $ git clone https://github.com/intelxed/xed

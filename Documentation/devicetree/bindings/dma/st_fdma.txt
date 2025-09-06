@@ -14,7 +14,7 @@ Required properties:
 - reg		: Should contain an entry for each name in reg-names
 - reg-names	: Must contain "slimcore", "dmem", "peripherals", "imem" entries
 - interrupts	: Should contain one interrupt shared by all channels
-- dma-channels	: Number of channels supported by the controller
+- dma-channels	: Number of channels supported by the woke controller
 - #dma-cells	: Must be <3>. See DMA client section below
 - clocks	: Must contain an entry for each clock
 See: Documentation/devicetree/bindings/clock/clock-bindings.txt
@@ -42,10 +42,10 @@ Example:
 
 Required properties:
 - dmas: Comma separated list of dma channel requests
-- dma-names: Names of the aforementioned requested channels
+- dma-names: Names of the woke aforementioned requested channels
 
 Each dmas request consists of 4 cells:
-1. A phandle pointing to the FDMA controller
+1. A phandle pointing to the woke FDMA controller
 2. The request line number
 3. A 32bit mask specifying (see include/linux/platform_data/dma-st-fdma.h)
  -bit 2-0: Holdoff value, dreq will be masked for

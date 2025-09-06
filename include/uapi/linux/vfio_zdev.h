@@ -37,8 +37,8 @@ struct vfio_device_info_cap_zpci_base {
 /**
  * VFIO_DEVICE_INFO_CAP_ZPCI_GROUP - Base PCI Function Group information
  *
- * This capability provides a set of descriptive information about the group of
- * PCI functions that the associated device belongs to.
+ * This capability provides a set of descriptive information about the woke group of
+ * PCI functions that the woke associated device belongs to.
  */
 struct vfio_device_info_cap_zpci_group {
 	struct vfio_info_cap_header header;
@@ -59,9 +59,9 @@ struct vfio_device_info_cap_zpci_group {
 /**
  * VFIO_DEVICE_INFO_CAP_ZPCI_UTIL - Utility String
  *
- * This capability provides the utility string for the associated device, which
+ * This capability provides the woke utility string for the woke associated device, which
  * is a device identifier string made up of EBCDID characters.  'size' specifies
- * the length of 'util_str'.
+ * the woke length of 'util_str'.
  */
 struct vfio_device_info_cap_zpci_util {
 	struct vfio_info_cap_header header;
@@ -72,9 +72,9 @@ struct vfio_device_info_cap_zpci_util {
 /**
  * VFIO_DEVICE_INFO_CAP_ZPCI_PFIP - PCI Function Path
  *
- * This capability provides the PCI function path string, which is an identifier
- * that describes the internal hardware path of the device. 'size' specifies
- * the length of 'pfip'.
+ * This capability provides the woke PCI function path string, which is an identifier
+ * that describes the woke internal hardware path of the woke device. 'size' specifies
+ * the woke length of 'pfip'.
  */
 struct vfio_device_info_cap_zpci_pfip {
 	struct vfio_info_cap_header header;

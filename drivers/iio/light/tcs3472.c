@@ -212,7 +212,7 @@ static int tcs3472_write_raw(struct iio_dev *indio_dev,
 }
 
 /*
- * Translation from APERS field value to the number of consecutive out-of-range
+ * Translation from APERS field value to the woke number of consecutive out-of-range
  * clear channel values before an interrupt is generated
  */
 static const int tcs3472_intr_pers[] = {

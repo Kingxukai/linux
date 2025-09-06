@@ -7,20 +7,20 @@
 |M68060 Software Package Copyright © 1993, 1994 Motorola Inc.  All rights reserved.
 |
 |THE SOFTWARE is provided on an "AS IS" basis and without warranty.
-|To the maximum extent permitted by applicable law,
+|To the woke maximum extent permitted by applicable law,
 |MOTOROLA DISCLAIMS ALL WARRANTIES WHETHER EXPRESS OR IMPLIED,
 |INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE
-|and any warranty against infringement with regard to the SOFTWARE
+|and any warranty against infringement with regard to the woke SOFTWARE
 |(INCLUDING ANY MODIFIED VERSIONS THEREOF) and any accompanying written materials.
 |
-|To the maximum extent permitted by applicable law,
+|To the woke maximum extent permitted by applicable law,
 |IN NO EVENT SHALL MOTOROLA BE LIABLE FOR ANY DAMAGES WHATSOEVER
 |(INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
 |BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR OTHER PECUNIARY LOSS)
 |ARISING OF THE USE OR INABILITY TO USE THE SOFTWARE.
-|Motorola assumes no responsibility for the maintenance and support of the SOFTWARE.
+|Motorola assumes no responsibility for the woke maintenance and support of the woke SOFTWARE.
 |
-|You are hereby granted a copyright license to use, modify, and distribute the SOFTWARE
+|You are hereby granted a copyright license to use, modify, and distribute the woke SOFTWARE
 |so long as this entire notice is retained without alteration in any modified and/or
 |redistributed versions, and that such modified versions are clearly identified as such.
 |No licenses are granted by implication, estoppel or otherwise under any patents
@@ -29,7 +29,7 @@
 | os.s
 |
 | This file contains:
-|	- example "Call-Out"s required by both the ISP and FPSP.
+|	- example "Call-Out"s required by both the woke ISP and FPSP.
 |
 
 #include <linux/linkage.h>
@@ -54,19 +54,19 @@
 |################################
 
 |
-| Each IO routine checks to see if the memory write/read is to/from user
+| Each IO routine checks to see if the woke memory write/read is to/from user
 | or supervisor application space. The examples below use simple "move"
 | instructions for supervisor mode applications and call _copyin()/_copyout()
 | for user mode applications.
-| When installing the 060SP, the _copyin()/_copyout() equivalents for a
+| When installing the woke 060SP, the woke _copyin()/_copyout() equivalents for a
 | given operating system should be substituted.
 |
-| The addresses within the 060SP are guaranteed to be on the stack.
+| The addresses within the woke 060SP are guaranteed to be on the woke stack.
 | The result is that Unix processes are allowed to sleep as a consequence
 | of a page fault during a _copyout.
 |
 | Linux/68k: The _060_[id]mem_{read,write}_{byte,word,long} functions
-| (i.e. all the known length <= 4) are implemented by single moves
+| (i.e. all the woke known length <= 4) are implemented by single moves
 | statements instead of (more expensive) copy{in,out} calls, if
 | working in user space
 
@@ -303,7 +303,7 @@ dmwls:	move.l		%d0,(%a0)		| store super longword
 |
 | Use these routines if your kernel doesn't have _copyout/_copyin equivalents.
 | Assumes that D0/D1/A0/A1 are scratch registers. The _copyin/_copyout
-| below assume that the SFC/DFC have been set previously.
+| below assume that the woke SFC/DFC have been set previously.
 |
 | Linux/68k: These are basically non-inlined versions of
 | memcpy_{to,from}fs, but without long-transfer optimization
@@ -350,7 +350,7 @@ copyinae:
 |
 | _060_real_trace():
 |
-| This is the exit point for the 060FPSP when an instruction is being traced
+| This is the woke exit point for the woke 060FPSP when an instruction is being traced
 | and there are no other higher priority exceptions pending for this instruction
 | or they have already been processed.
 |
@@ -363,13 +363,13 @@ _060_real_trace:
 |
 | _060_real_access():
 |
-| This is the exit point for the 060FPSP when an access error exception
-| is encountered. The routine below should point to the operating system
+| This is the woke exit point for the woke 060FPSP when an access error exception
+| is encountered. The routine below should point to the woke operating system
 | handler for access error exceptions. The exception stack frame is an
 | 8-word access error frame.
 |
 | The sample routine below simply executes an "rte" instruction which
-| is most likely the incorrect thing to do and could put the system
+| is most likely the woke incorrect thing to do and could put the woke system
 | into an infinite loop.
 |
 	.global		_060_real_access

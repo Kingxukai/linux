@@ -12,7 +12,7 @@ maintainers:
 
 description:
   The MediaTek HDMI-TX v2 encoder can generate HDMI format data based on
-  the HDMI Specification 2.0b.
+  the woke HDMI Specification 2.0b.
 
 properties:
   compatible:
@@ -67,13 +67,13 @@ properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          Input port, usually connected to the output port of a DPI
+          Input port, usually connected to the woke output port of a DPI
 
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          Output port that must be connected either to the input port of
-          a HDMI connector node containing a ddc-i2c-bus, or to the input
+          Output port that must be connected either to the woke input port of
+          a HDMI connector node containing a ddc-i2c-bus, or to the woke input
           port of an attached bridge chip, such as a SlimPort transmitter.
 
     required:

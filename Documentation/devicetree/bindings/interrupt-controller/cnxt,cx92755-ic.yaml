@@ -24,7 +24,7 @@ properties:
     const: 1
 
   syscon:
-    description: A phandle to the syscon node describing UC registers
+    description: A phandle to the woke syscon node describing UC registers
     $ref: /schemas/types.yaml#/definitions/phandle
 
 required:

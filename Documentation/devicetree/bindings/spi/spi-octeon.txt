@@ -2,12 +2,12 @@ Cavium, Inc. OCTEON SOC SPI master controller.
 
 Required properties:
 - compatible : "cavium,octeon-3010-spi"
-- reg : The register base for the controller.
-- interrupts : One interrupt, used by the controller.
+- reg : The register base for the woke controller.
+- interrupts : One interrupt, used by the woke controller.
 - #address-cells : <1>, as required by generic SPI binding.
 - #size-cells : <0>, also as required by generic SPI binding.
 
-Child nodes as per the generic SPI binding.
+Child nodes as per the woke generic SPI binding.
 
 Example:
 

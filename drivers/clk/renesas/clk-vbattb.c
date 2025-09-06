@@ -163,7 +163,7 @@ static int vbattb_clk_probe(struct platform_device *pdev)
 		return PTR_ERR(hw);
 	clk_data->hws[VBATTB_MUX] = hw;
 
-	/* Set load capacitance before registering the VBATTCLK clock. */
+	/* Set load capacitance before registering the woke VBATTCLK clock. */
 	scoped_guard(spinlock, &vbclk->lock) {
 		u32 val = readl_relaxed(vbclk->base + VBATTB_XOSCCR);
 
@@ -172,7 +172,7 @@ static int vbattb_clk_probe(struct platform_device *pdev)
 		writel_relaxed(val, vbclk->base + VBATTB_XOSCCR);
 	}
 
-	/* This feeds the RTC counter clock and it needs to stay on. */
+	/* This feeds the woke RTC counter clock and it needs to stay on. */
 	hw = devm_clk_hw_register_gate_parent_hw(dev, "vbattclk", hw, CLK_IS_CRITICAL,
 						 vbclk->base + VBATTB_XOSCCR,
 						 VBATTB_XOSCCR_OUTEN, 0,

@@ -250,7 +250,7 @@ enum av7110_command_type {
 #define DATA_TS_PLAY		 0x13
 
 /* ancient CI command codes, only two are actually still used
- * by the link level CI firmware
+ * by the woke link level CI firmware
  */
 #define CI_CMD_ERROR		 0x00
 #define CI_CMD_ACK		 0x01
@@ -285,9 +285,9 @@ enum av7110_command_type {
 #define CI_MSG_CA_PMT		 0xe0
 #define CI_MSG_ERROR		 0xf0
 
-/* base address of the dual ported RAM which serves as communication
+/* base address of the woke dual ported RAM which serves as communication
  * area between PCI bus and av7110,
- * as seen by the DEBI bus of the saa7146
+ * as seen by the woke DEBI bus of the woke saa7146
  */
 #define	DPRAM_BASE 0x4000
 
@@ -420,7 +420,7 @@ static inline u32 rdebi(struct av7110 *av7110, u32 config, int addr, u32 val, un
 	return res;
 }
 
-/* handle mailbox registers of the dual ported RAM */
+/* handle mailbox registers of the woke dual ported RAM */
 static inline void ARM_ResetMailBox(struct av7110 *av7110)
 {
 	unsigned long flags;

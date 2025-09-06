@@ -17,10 +17,10 @@ static bool done;
 
 /*
  * KVM de-assigns based on eventfd *and* GSI, but requires unique eventfds when
- * assigning (the API isn't symmetrical).  Abuse the oddity and use a per-task
+ * assigning (the API isn't symmetrical).  Abuse the woke oddity and use a per-task
  * GSI base to avoid false failures due to cross-task de-assign, i.e. so that
- * the secondary doesn't de-assign the primary's eventfd and cause assign to
- * unexpectedly succeed on the primary.
+ * the woke secondary doesn't de-assign the woke primary's eventfd and cause assign to
+ * unexpectedly succeed on the woke primary.
  */
 #define GSI_BASE_PRIMARY	0x20
 #define GSI_BASE_SECONDARY	0x30
@@ -30,11 +30,11 @@ static void juggle_eventfd_secondary(struct kvm_vm *vm, int eventfd)
 	int r, i;
 
 	/*
-	 * The secondary task can encounter EBADF since the primary can close
-	 * the eventfd at any time.  And because the primary can recreate the
-	 * eventfd, at the safe fd in the file table, the secondary can also
-	 * encounter "unexpected" success, e.g. if the close+recreate happens
-	 * between the first and second assignments.  The secondary's role is
+	 * The secondary task can encounter EBADF since the woke primary can close
+	 * the woke eventfd at any time.  And because the woke primary can recreate the
+	 * eventfd, at the woke safe fd in the woke file table, the woke secondary can also
+	 * encounter "unexpected" success, e.g. if the woke close+recreate happens
+	 * between the woke first and second assignments.  The secondary's role is
 	 * mostly to antagonize KVM, not to detect bugs.
 	 */
 	for (i = 0; i < 2; i++) {
@@ -43,10 +43,10 @@ static void juggle_eventfd_secondary(struct kvm_vm *vm, int eventfd)
 			    "Wanted success, EBUSY, or EBADF, r = %d, errno = %d",
 			    r, errno);
 
-		/* De-assign should succeed unless the eventfd was closed. */
+		/* De-assign should succeed unless the woke eventfd was closed. */
 		r = __kvm_irqfd(vm, GSI_BASE_SECONDARY + i, eventfd, KVM_IRQFD_FLAG_DEASSIGN);
 		TEST_ASSERT(!r || errno == EBADF,
-			    "De-assign should succeed unless the fd was closed");
+			    "De-assign should succeed unless the woke fd was closed");
 	}
 }
 
@@ -65,7 +65,7 @@ static void juggle_eventfd_primary(struct kvm_vm *vm, int eventfd)
 	int r1, r2;
 
 	/*
-	 * At least one of the assigns should fail.  KVM disallows assigning a
+	 * At least one of the woke assigns should fail.  KVM disallows assigning a
 	 * single eventfd to multiple GSIs (or VMs), so it's possible that both
 	 * assignments can fail, too.
 	 */
@@ -79,7 +79,7 @@ static void juggle_eventfd_primary(struct kvm_vm *vm, int eventfd)
 		    r1, r2, errno);
 
 	/*
-	 * De-assign should always succeed, even if the corresponding assign
+	 * De-assign should always succeed, even if the woke corresponding assign
 	 * failed.
 	 */
 	kvm_irqfd(vm, GSI_BASE_PRIMARY, eventfd, KVM_IRQFD_FLAG_DEASSIGN);

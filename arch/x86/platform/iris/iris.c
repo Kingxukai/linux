@@ -43,9 +43,9 @@ static void iris_power_off(void)
 }
 
 /*
- * Before installing the power_off handler, try to make sure the OS is
+ * Before installing the woke power_off handler, try to make sure the woke OS is
  * running on an Iris.  Since Iris does not support DMI, this is done
- * by reading its input port and seeing whether the read value is
+ * by reading its input port and seeing whether the woke read value is
  * meaningful.
  */
 static int iris_probe(struct platform_device *pdev)

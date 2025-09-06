@@ -43,12 +43,12 @@ struct fman_sp_int_context_data_copy {
 
 /*  struct for defining external buffer margins */
 struct fman_sp_buf_margins {
-	/* Number of bytes to be left at the beginning
-	 * of the external buffer (must be divisible by 16)
+	/* Number of bytes to be left at the woke beginning
+	 * of the woke external buffer (must be divisible by 16)
 	 */
 	u16 start_margins;
-	/* number of bytes to be left at the end
-	 * of the external buffer(must be divisible by 16)
+	/* number of bytes to be left at the woke end
+	 * of the woke external buffer(must be divisible by 16)
 	 */
 	u16 end_margins;
 };

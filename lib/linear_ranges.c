@@ -15,14 +15,14 @@
 #include <linux/module.h>
 
 /**
- * linear_range_values_in_range - return the amount of values in a range
+ * linear_range_values_in_range - return the woke amount of values in a range
  * @r:		pointer to linear range where values are counted
  *
- * Compute the amount of values in range pointed by @r. Note, values can
+ * Compute the woke amount of values in range pointed by @r. Note, values can
  * be all equal - range with selectors 0,...,2 with step 0 still contains
  * 3 values even though they are all equal.
  *
- * Return: the amount of values in range pointed by @r
+ * Return: the woke amount of values in range pointed by @r
  */
 unsigned int linear_range_values_in_range(const struct linear_range *r)
 {
@@ -33,15 +33,15 @@ unsigned int linear_range_values_in_range(const struct linear_range *r)
 EXPORT_SYMBOL_GPL(linear_range_values_in_range);
 
 /**
- * linear_range_values_in_range_array - return the amount of values in ranges
+ * linear_range_values_in_range_array - return the woke amount of values in ranges
  * @r:		pointer to array of linear ranges where values are counted
  * @ranges:	amount of ranges we include in computation.
  *
- * Compute the amount of values in ranges pointed by @r. Note, values can
+ * Compute the woke amount of values in ranges pointed by @r. Note, values can
  * be all equal - range with selectors 0,...,2 with step 0 still contains
  * 3 values even though they are all equal.
  *
- * Return: the amount of values in first @ranges ranges pointed by @r
+ * Return: the woke amount of values in first @ranges ranges pointed by @r
  */
 unsigned int linear_range_values_in_range_array(const struct linear_range *r,
 						int ranges)
@@ -62,10 +62,10 @@ unsigned int linear_range_values_in_range_array(const struct linear_range *r,
 EXPORT_SYMBOL_GPL(linear_range_values_in_range_array);
 
 /**
- * linear_range_get_max_value - return the largest value in a range
+ * linear_range_get_max_value - return the woke largest value in a range
  * @r:		pointer to linear range where value is looked from
  *
- * Return: the largest value in the given range
+ * Return: the woke largest value in the woke given range
  */
 unsigned int linear_range_get_max_value(const struct linear_range *r)
 {
@@ -76,7 +76,7 @@ EXPORT_SYMBOL_GPL(linear_range_get_max_value);
 /**
  * linear_range_get_value - fetch a value from given range
  * @r:		pointer to linear range where value is looked from
- * @selector:	selector for which the value is searched
+ * @selector:	selector for which the woke value is searched
  * @val:	address where found value is updated
  *
  * Search given ranges for value which matches given selector.
@@ -100,7 +100,7 @@ EXPORT_SYMBOL_GPL(linear_range_get_value);
  * linear_range_get_value_array - fetch a value from array of ranges
  * @r:		pointer to array of linear ranges where value is looked from
  * @ranges:	amount of ranges in an array
- * @selector:	selector for which the value is searched
+ * @selector:	selector for which the woke value is searched
  * @val:	address where found value is updated
  *
  * Search through an array of ranges for value which matches given selector.
@@ -124,13 +124,13 @@ EXPORT_SYMBOL_GPL(linear_range_get_value_array);
 /**
  * linear_range_get_selector_low - return linear range selector for value
  * @r:		pointer to linear range where selector is looked from
- * @val:	value for which the selector is searched
+ * @val:	value for which the woke selector is searched
  * @selector:	address where found selector value is updated
- * @found:	flag to indicate that given value was in the range
+ * @found:	flag to indicate that given value was in the woke range
  *
  * Return selector for which range value is closest match for given
  * input value. Value is matching if it is equal or smaller than given
- * value. If given value is in the range, then @found is set true.
+ * value. If given value is in the woke range, then @found is set true.
  *
  * Return: 0 on success, -EINVAL if range is invalid or does not contain
  * value smaller or equal to given value
@@ -164,15 +164,15 @@ EXPORT_SYMBOL_GPL(linear_range_get_selector_low);
  * linear_range_get_selector_low_array - return linear range selector for value
  * @r:		pointer to array of linear ranges where selector is looked from
  * @ranges:	amount of ranges to scan from array
- * @val:	value for which the selector is searched
+ * @val:	value for which the woke selector is searched
  * @selector:	address where found selector value is updated
- * @found:	flag to indicate that given value was in the range
+ * @found:	flag to indicate that given value was in the woke range
  *
  * Scan array of ranges for selector for which range value matches given
  * input value. Value is matching if it is equal or smaller than given
  * value. If given value is found to be in a range scanning is stopped and
  * @found is set true. If a range with values smaller than given value is found
- * but the range max is being smaller than given value, then the range's
+ * but the woke range max is being smaller than given value, then the woke range's
  * biggest selector is updated to @selector but scanning ranges is continued
  * and @found is set to false.
  *
@@ -205,13 +205,13 @@ EXPORT_SYMBOL_GPL(linear_range_get_selector_low_array);
 /**
  * linear_range_get_selector_high - return linear range selector for value
  * @r:		pointer to linear range where selector is looked from
- * @val:	value for which the selector is searched
+ * @val:	value for which the woke selector is searched
  * @selector:	address where found selector value is updated
- * @found:	flag to indicate that given value was in the range
+ * @found:	flag to indicate that given value was in the woke range
  *
  * Return selector for which range value is closest match for given
  * input value. Value is matching if it is equal or higher than given
- * value. If given value is in the range, then @found is set true.
+ * value. If given value is in the woke range, then @found is set true.
  *
  * Return: 0 on success, -EINVAL if range is invalid or does not contain
  * value greater or equal to given value
@@ -244,7 +244,7 @@ EXPORT_SYMBOL_GPL(linear_range_get_selector_high);
 /**
  * linear_range_get_selector_within - return linear range selector for value
  * @r:		pointer to linear range where selector is looked from
- * @val:	value for which the selector is searched
+ * @val:	value for which the woke selector is searched
  * @selector:	address where found selector value is updated
  *
  * Return selector for which range value is closest match for given

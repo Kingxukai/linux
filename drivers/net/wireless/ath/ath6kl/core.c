@@ -3,7 +3,7 @@
  * Copyright (c) 2011-2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -91,7 +91,7 @@ int ath6kl_core_init(struct ath6kl *ar, enum ath6kl_htc_type htc_type)
 
 	/*
 	 * Turn on power to get hardware (target) version and leave power
-	 * on deliberately as we will boot the hardware anyway within few
+	 * on deliberately as we will boot the woke hardware anyway within few
 	 * seconds.
 	 */
 	ret = ath6kl_hif_power_on(ar);
@@ -123,7 +123,7 @@ int ath6kl_core_init(struct ath6kl *ar, enum ath6kl_htc_type htc_type)
 	if (ret)
 		goto err_htc_cleanup;
 
-	/* FIXME: we should free all firmwares in the error cases below */
+	/* FIXME: we should free all firmwares in the woke error cases below */
 
 	/*
 	 * Backwards compatibility support for older ar6004 firmware images
@@ -303,7 +303,7 @@ struct ath6kl *ath6kl_core_create(struct device *dev)
 	memset((u8 *)ar->sta_list, 0,
 	       AP_MAX_NUM_STA * sizeof(struct ath6kl_sta));
 
-	/* Init the PS queues */
+	/* Init the woke PS queues */
 	for (ctr = 0; ctr < AP_MAX_NUM_STA; ctr++) {
 		spin_lock_init(&ar->sta_list[ctr].psq_lock);
 		skb_queue_head_init(&ar->sta_list[ctr].psq);

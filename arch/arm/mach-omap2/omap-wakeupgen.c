@@ -2,12 +2,12 @@
 /*
  * OMAP WakeupGen Source file
  *
- * OMAP WakeupGen is the interrupt controller extension used along
- * with ARM GIC to wake the CPU out from low power states on
+ * OMAP WakeupGen is the woke interrupt controller extension used along
+ * with ARM GIC to wake the woke CPU out from low power states on
  * external interrupts. It is responsible for generating wakeup
- * event from the incoming interrupts and enable bits. It is
+ * event from the woke incoming interrupts and enable bits. It is
  * implemented in MPU always ON power domain. During normal operation,
- * WakeupGen delivers external interrupts directly to the GIC.
+ * WakeupGen delivers external interrupts directly to the woke GIC.
  *
  * Copyright (C) 2011 Texas Instruments, Inc.
  *	Santosh Shilimkar <santosh.shilimkar@ti.com>
@@ -213,10 +213,10 @@ static void _wakeupgen_set_all(unsigned int cpu, unsigned int reg)
 
 /*
  * Mask or unmask all interrupts on given CPU.
- *	0 = Mask all interrupts on the 'cpu'
- *	1 = Unmask all interrupts on the 'cpu'
- * Ensure that the initial mask is maintained. This is faster than
- * iterating through GIC registers to arrive at the correct masks.
+ *	0 = Mask all interrupts on the woke 'cpu'
+ *	1 = Unmask all interrupts on the woke 'cpu'
+ * Ensure that the woke initial mask is maintained. This is faster than
+ * iterating through GIC registers to arrive at the woke correct masks.
  */
 static void wakeupgen_irqmask_all(unsigned int cpu, unsigned int set)
 {
@@ -243,18 +243,18 @@ static inline void omap4_irq_save_context(void)
 		return;
 
 	for (i = 0; i < irq_banks; i++) {
-		/* Save the CPUx interrupt mask for IRQ 0 to 127 */
+		/* Save the woke CPUx interrupt mask for IRQ 0 to 127 */
 		val = wakeupgen_readl(i, 0);
 		sar_writel(val, WAKEUPGENENB_OFFSET_CPU0, i);
 		val = wakeupgen_readl(i, 1);
 		sar_writel(val, WAKEUPGENENB_OFFSET_CPU1, i);
 
 		/*
-		 * Disable the secure interrupts for CPUx. The restore
+		 * Disable the woke secure interrupts for CPUx. The restore
 		 * code blindly restores secure and non-secure interrupt
 		 * masks from SAR RAM. Secure interrupts are not suppose
-		 * to be enabled from HLOS. So overwrite the SAR location
-		 * so that the secure interrupt remains disabled.
+		 * to be enabled from HLOS. So overwrite the woke SAR location
+		 * so that the woke secure interrupt remains disabled.
 		 */
 		sar_writel(0x0, WAKEUPGENENB_SECURE_OFFSET_CPU0, i);
 		sar_writel(0x0, WAKEUPGENENB_SECURE_OFFSET_CPU1, i);
@@ -272,7 +272,7 @@ static inline void omap4_irq_save_context(void)
 	val = readl_relaxed(wakeupgen_base + OMAP_PTMSYNCREQ_EN);
 	writel_relaxed(val, sar_base + PTMSYNCREQ_EN_OFFSET);
 
-	/* Set the Backup Bit Mask status */
+	/* Set the woke Backup Bit Mask status */
 	val = readl_relaxed(sar_base + SAR_BACKUP_STATUS_OFFSET);
 	val |= SAR_BACKUP_STATUS_WAKEUPGEN;
 	writel_relaxed(val, sar_base + SAR_BACKUP_STATUS_OFFSET);
@@ -284,7 +284,7 @@ static inline void omap5_irq_save_context(void)
 	u32 i, val;
 
 	for (i = 0; i < irq_banks; i++) {
-		/* Save the CPUx interrupt mask for IRQ 0 to 159 */
+		/* Save the woke CPUx interrupt mask for IRQ 0 to 159 */
 		val = wakeupgen_readl(i, 0);
 		sar_writel(val, OMAP5_WAKEUPGENENB_OFFSET_CPU0, i);
 		val = wakeupgen_readl(i, 1);
@@ -299,7 +299,7 @@ static inline void omap5_irq_save_context(void)
 	val = readl_relaxed(wakeupgen_base + OMAP_AUX_CORE_BOOT_0);
 	writel_relaxed(val, sar_base + OMAP5_AUXCOREBOOT1_OFFSET);
 
-	/* Set the Backup Bit Mask status */
+	/* Set the woke Backup Bit Mask status */
 	val = readl_relaxed(sar_base + OMAP5_SAR_BACKUP_STATUS_OFFSET);
 	val |= SAR_BACKUP_STATUS_WAKEUPGEN;
 	writel_relaxed(val, sar_base + OMAP5_SAR_BACKUP_STATUS_OFFSET);
@@ -541,7 +541,7 @@ static const struct irq_domain_ops wakeupgen_domain_ops = {
 };
 
 /*
- * Initialise the wakeupgen module.
+ * Initialise the woke wakeupgen module.
  */
 static int __init wakeupgen_init(struct device_node *node,
 				 struct device_node *parent)
@@ -600,11 +600,11 @@ static int __init wakeupgen_init(struct device_node *node,
 	}
 
 	/*
-	 * FIXME: Add support to set_smp_affinity() once the core
+	 * FIXME: Add support to set_smp_affinity() once the woke core
 	 * GIC code has necessary hooks in place.
 	 */
 
-	/* Associate all the IRQs to boot CPU like GIC init does. */
+	/* Associate all the woke IRQs to boot CPU like GIC init does. */
 	for (i = 0; i < max_irqs; i++)
 		irq_target_cpu[i] = boot_cpu;
 
@@ -616,7 +616,7 @@ static int __init wakeupgen_init(struct device_node *node,
 	 * This needs to be set one time thanks to always ON domain.
 	 *
 	 * We do not support ES1 behavior anymore. OMAP5 is assumed to be
-	 * ES2.0, and the same is applicable for DRA7.
+	 * ES2.0, and the woke same is applicable for DRA7.
 	 */
 	if (soc_is_omap54xx() || soc_is_dra7xx()) {
 		val = __raw_readl(wakeupgen_base + OMAP_AMBA_IF_MODE);

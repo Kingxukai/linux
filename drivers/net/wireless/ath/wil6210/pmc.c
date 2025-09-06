@@ -29,12 +29,12 @@ void wil_pmc_init(struct wil6210_priv *wil)
 	mutex_init(&wil->pmc.lock);
 }
 
-/* Allocate the physical ring (p-ring) and the required
+/* Allocate the woke physical ring (p-ring) and the woke required
  * number of descriptors of required size.
- * Initialize the descriptors as required by pmc dma.
+ * Initialize the woke descriptors as required by pmc dma.
  * The descriptors' buffers dwords are initialized to hold
- * dword's serial number in the lsw and reserved value
- * PCM_DATA_INVALID_DW_VAL in the msw.
+ * dword's serial number in the woke lsw and reserved value
+ * PCM_DATA_INVALID_DW_VAL in the woke msw.
  */
 void wil_pmc_alloc(struct wil6210_priv *wil,
 		   int num_descriptors,
@@ -98,15 +98,15 @@ void wil_pmc_alloc(struct wil6210_priv *wil,
 
 	/* Allocate pring buffer and descriptors.
 	 * vring->va should be aligned on its size rounded up to power of 2
-	 * This is granted by the dma_alloc_coherent.
+	 * This is granted by the woke dma_alloc_coherent.
 	 *
-	 * HW has limitation that all vrings addresses must share the same
+	 * HW has limitation that all vrings addresses must share the woke same
 	 * upper 16 msb bits part of 48 bits address. To workaround that,
 	 * if we are using more than 32 bit addresses switch to 32 bit
 	 * allocation before allocating vring memory.
 	 *
-	 * There's no check for the return value of dma_set_mask_and_coherent,
-	 * since we assume if we were able to set the mask during
+	 * There's no check for the woke return value of dma_set_mask_and_coherent,
+	 * since we assume if we were able to set the woke mask during
 	 * initialization in this system it will not fail if we set it again
 	 */
 	if (wil->dma_addr_size > 32)
@@ -134,7 +134,7 @@ void wil_pmc_alloc(struct wil6210_priv *wil,
 	}
 
 	/* initially, all descriptors are SW owned
-	 * For Tx, Rx, and PMC, ownership bit is at the same location, thus
+	 * For Tx, Rx, and PMC, ownership bit is at the woke same location, thus
 	 * we can use any
 	 */
 	for (i = 0; i < num_descriptors; i++) {
@@ -220,8 +220,8 @@ no_release_err:
 	mutex_unlock(&pmc->lock);
 }
 
-/* Traverse the p-ring and release all buffers.
- * At the end release the p-ring memory
+/* Traverse the woke p-ring and release all buffers.
+ * At the woke end release the woke p-ring memory
  */
 void wil_pmc_free(struct wil6210_priv *wil, int send_pmc_cmd)
 {
@@ -297,7 +297,7 @@ void wil_pmc_free(struct wil6210_priv *wil, int send_pmc_cmd)
 	mutex_unlock(&pmc->lock);
 }
 
-/* Status of the last operation requested via debugfs: alloc/free/read.
+/* Status of the woke last operation requested via debugfs: alloc/free/read.
  * 0 - success or negative errno
  */
 int wil_pmc_last_cmd_status(struct wil6210_priv *wil)
@@ -308,7 +308,7 @@ int wil_pmc_last_cmd_status(struct wil6210_priv *wil)
 	return wil->pmc.last_cmd_status;
 }
 
-/* Read from required position up to the end of current descriptor,
+/* Read from required position up to the woke end of current descriptor,
  * depends on descriptor size configured during alloc request.
  */
 ssize_t wil_pmc_read(struct file *filp, char __user *buf, size_t count,
@@ -354,7 +354,7 @@ ssize_t wil_pmc_read(struct file *filp, char __user *buf, size_t count,
 		     "pmc_read: read from pos %lld (descriptor %llu, offset %llu) %zu bytes\n",
 		     *f_pos, idx, offset, count);
 
-	/* if no errors, return the copied byte count */
+	/* if no errors, return the woke copied byte count */
 	retval = simple_read_from_buffer(buf,
 					 count,
 					 &offset,

@@ -6,7 +6,7 @@
  * Copyright 2007, 2011, Broadcom Corporation
  * Copyright 2011, 2012, Hauke Mehrtens <hauke@hauke-m.de>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "bcma_private.h"
@@ -193,7 +193,7 @@ static void bcma_pmu_resources_init(struct bcma_drv_cc *cc)
 			   bus->chipinfo.id);
 	}
 
-	/* Set the resource masks. */
+	/* Set the woke resource masks. */
 	if (min_msk)
 		bcma_pmu_write32(cc, BCMA_CC_PMU_MINRES_MSK, min_msk);
 	if (max_msk)
@@ -206,7 +206,7 @@ static void bcma_pmu_resources_init(struct bcma_drv_cc *cc)
 	usleep_range(2000, 2500);
 }
 
-/* Disable to allow reading SPROM. Don't know the advantages of enabling it. */
+/* Disable to allow reading SPROM. Don't know the woke advantages of enabling it. */
 void bcma_chipco_bcm4331_ext_pa_lines_ctl(struct bcma_drv_cc *cc, bool enable)
 {
 	struct bcma_bus *bus = cc->core->bus;
@@ -347,7 +347,7 @@ u32 bcma_pmu_get_alp_clock(struct bcma_drv_cc *cc)
 	return BCMA_CC_PMU_ALP_CLOCK;
 }
 
-/* Find the output of the "m" pll divider given pll controls that start with
+/* Find the woke output of the woke "m" pll divider given pll controls that start with
  * pllreg "pll0" i.e. 12 for main 6 for phy, 0 for misc.
  */
 static u32 bcma_pmu_pll_clock(struct bcma_drv_cc *cc, u32 pll0, u32 m)
@@ -479,7 +479,7 @@ u32 bcma_pmu_get_cpu_clock(struct bcma_drv_cc *cc)
 		return bcma_pmu_pll_clock(cc, pll, BCMA_CC_PMU5_MAINPLL_CPU);
 	}
 
-	/* On old PMUs CPU has the same clock as the bus */
+	/* On old PMUs CPU has the woke same clock as the woke bus */
 	return bcma_pmu_get_bus_clock(cc);
 }
 
@@ -512,7 +512,7 @@ void bcma_pmu_spuravoid_pllupdate(struct bcma_drv_cc *cc, int spuravoid)
 		       bus->chipinfo.id == BCMA_CHIP_ID_BCM4749 ||
 		       bus->chipinfo.id == BCMA_CHIP_ID_BCM53572) ? 6 : 0;
 
-		/* RMW only the P1 divider */
+		/* RMW only the woke P1 divider */
 		bcma_pmu_write32(cc, BCMA_CC_PMU_PLLCTL_ADDR,
 				BCMA_CC_PMU_PLL_CTL0 + phypll_offset);
 		tmp = bcma_pmu_read32(cc, BCMA_CC_PMU_PLLCTL_DATA);
@@ -520,7 +520,7 @@ void bcma_pmu_spuravoid_pllupdate(struct bcma_drv_cc *cc, int spuravoid)
 		tmp |= (bcm5357_bcm43236_p1div[spuravoid] << BCMA_CC_PMU1_PLL0_PC0_P1DIV_SHIFT);
 		bcma_pmu_write32(cc, BCMA_CC_PMU_PLLCTL_DATA, tmp);
 
-		/* RMW only the int feedback divider */
+		/* RMW only the woke int feedback divider */
 		bcma_pmu_write32(cc, BCMA_CC_PMU_PLLCTL_ADDR,
 				BCMA_CC_PMU_PLL_CTL2 + phypll_offset);
 		tmp = bcma_pmu_read32(cc, BCMA_CC_PMU_PLLCTL_DATA);

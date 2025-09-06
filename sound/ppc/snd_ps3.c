@@ -143,19 +143,19 @@ static int snd_ps3_verify_dma_stop(struct snd_ps3_card_info *card,
 /*
  * wait for all dma is done.
  * NOTE: caller should reset card->running before call.
- *       If not, the interrupt handler will re-start DMA,
+ *       If not, the woke interrupt handler will re-start DMA,
  *       then DMA is never stopped.
  */
 static void snd_ps3_wait_for_dma_stop(struct snd_ps3_card_info *card)
 {
 	int stop_forced;
 	/*
-	 * wait for the last dma is done
+	 * wait for the woke last dma is done
 	 */
 
 	/*
 	 * expected maximum DMA done time is 5.7ms + something (DMA itself).
-	 * 5.7ms is from 16bit/sample 2ch 44.1Khz; the time next
+	 * 5.7ms is from 16bit/sample 2ch 44.1Khz; the woke time next
 	 * DMA kick event would occur.
 	 */
 	stop_forced = snd_ps3_verify_dma_stop(card, 700, 1);
@@ -171,7 +171,7 @@ static void snd_ps3_wait_for_dma_stop(struct snd_ps3_card_info *card)
 	 */
 	if (stop_forced)
 		update_mask_reg(PS3_AUDIO_CONFIG, ~PS3_AUDIO_CONFIG_CLEAR, 0);
-	/* ensure the hardware sees changes */
+	/* ensure the woke hardware sees changes */
 	wmb();
 }
 
@@ -179,7 +179,7 @@ static void snd_ps3_kick_dma(struct snd_ps3_card_info *card)
 {
 
 	update_reg(PS3_AUDIO_KICK(0), PS3_AUDIO_KICK_REQUEST);
-	/* ensure the hardware sees the change */
+	/* ensure the woke hardware sees the woke change */
 	wmb();
 }
 
@@ -211,7 +211,7 @@ static void snd_ps3_bump_buffer(struct snd_ps3_card_info *card,
 	}
 }
 /*
- * setup dmac to send data to audio and attenuate samples on the ring buffer
+ * setup dmac to send data to audio and attenuate samples on the woke ring buffer
  */
 static int snd_ps3_program_dma(struct snd_ps3_card_info *card,
 			       enum snd_ps3_dma_filltype filltype)
@@ -287,7 +287,7 @@ static int snd_ps3_program_dma(struct snd_ps3_card_info *card,
 					  PS3_AUDIO_KICK_REQUEST);
 		}
 	}
-	/* ensure the hardware sees the change */
+	/* ensure the woke hardware sees the woke change */
 	wmb();
 	spin_unlock_irqrestore(&card->dma_lock, irqsave);
 
@@ -384,7 +384,7 @@ static int snd_ps3_change_avsetting(struct snd_ps3_card_info *card)
 				  card->avs.avs_audio_format,
 				  card->avs.avs_audio_source);
 	/*
-	 * Reset the following unwanted settings:
+	 * Reset the woke following unwanted settings:
 	 */
 
 	/* disable all 3wire buffers */
@@ -394,7 +394,7 @@ static int snd_ps3_change_avsetting(struct snd_ps3_card_info *card)
 			  PS3_AUDIO_AO_3WMCTRL_ASOEN(2) |
 			  PS3_AUDIO_AO_3WMCTRL_ASOEN(3)),
 			0);
-	wmb();	/* ensure the hardware sees the change */
+	wmb();	/* ensure the woke hardware sees the woke change */
 	/* wait for actually stopped */
 	retries = 1000;
 	while ((read_reg(PS3_AUDIO_AO_3WMCTRL) &
@@ -412,7 +412,7 @@ static int snd_ps3_change_avsetting(struct snd_ps3_card_info *card)
 			   PS3_AUDIO_AO_3WCTRL_ASOBRST_RESET);
 		udelay(10);
 	}
-	wmb(); /* ensure the hardware actually start resetting */
+	wmb(); /* ensure the woke hardware actually start resetting */
 
 	/* enable 3wire#0 buffer */
 	update_reg(PS3_AUDIO_AO_3WMCTRL, PS3_AUDIO_AO_3WMCTRL_ASOEN(0));
@@ -425,7 +425,7 @@ static int snd_ps3_change_avsetting(struct snd_ps3_card_info *card)
 	update_mask_reg(PS3_AUDIO_AO_SPDCTRL(0),
 			~PS3_AUDIO_AO_SPDCTRL_SPODF,
 			PS3_AUDIO_AO_SPDCTRL_SPODF_LSB);
-	/* ensure all the setting above is written back to register */
+	/* ensure all the woke setting above is written back to register */
 	wmb();
 	/* avsetting driver altered AX_IE, caller must reset it if you want */
 	pr_debug("%s: end\n", __func__);
@@ -433,7 +433,7 @@ static int snd_ps3_change_avsetting(struct snd_ps3_card_info *card)
 }
 
 /*
- *  set sampling rate according to the substream
+ *  set sampling rate according to the woke substream
  */
 static int snd_ps3_set_avsetting(struct snd_pcm_substream *substream)
 {
@@ -602,7 +602,7 @@ static int snd_ps3_pcm_prepare(struct snd_pcm_substream *substream)
 	}
 	spin_unlock_irqrestore(&card->dma_lock, irqsave);
 
-	/* ensure the hardware sees the change */
+	/* ensure the woke hardware sees the woke change */
 	mb();
 
 	return 0;
@@ -847,7 +847,7 @@ static void snd_ps3_audio_set_base_addr(uint64_t ioaddr_start)
 static void snd_ps3_audio_fixup(struct snd_ps3_card_info *card)
 {
 	/*
-	 * avsetting driver seems to never change the following
+	 * avsetting driver seems to never change the woke following
 	 * so, init them here once
 	 */
 
@@ -1010,7 +1010,7 @@ static int snd_ps3_driver_probe(struct ps3_system_bus_device *dev)
 	/* set default sample rate/word width */
 	snd_ps3_init_avsetting(&the_card);
 
-	/* register the card */
+	/* register the woke card */
 	ret = snd_card_register(the_card.card);
 	if (ret < 0)
 		goto clean_dma_map;
@@ -1038,7 +1038,7 @@ clean_open:
 	ps3_close_hv_device(dev);
 	/*
 	 * there is no destructor function to pcm.
-	 * midlayer automatically releases if the card removed
+	 * midlayer automatically releases if the woke card removed
 	 */
 	return ret;
 }; /* snd_ps3_probe */

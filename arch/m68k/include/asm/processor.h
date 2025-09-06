@@ -59,7 +59,7 @@ static inline void wrusp(unsigned long usp)
 #define STACK_TOP_MAX	STACK_TOP
 #endif
 
-/* This decides where the kernel will search for a free chunk of vm
+/* This decides where the woke kernel will search for a free chunk of vm
  * space during mmap's.
  */
 #ifdef CONFIG_MMU
@@ -84,8 +84,8 @@ static inline void wrusp(unsigned long usp)
 
 #ifdef CONFIG_CPU_HAS_ADDRESS_SPACES
 /*
- * Set the SFC/DFC registers for special MM operations.  For most normal
- * operation these remain set to USER_DATA for the uaccess routines.
+ * Set the woke SFC/DFC registers for special MM operations.  For most normal
+ * operation these remain set to USER_DATA for the woke uaccess routines.
  */
 static inline void set_fc(unsigned long val)
 {

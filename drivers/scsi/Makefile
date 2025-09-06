@@ -11,7 +11,7 @@
 # *!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!
 # The link order must be, SCSI Core, SCSI HBA drivers, and
 # lastly SCSI peripheral drivers (disk/tape/cdrom/etc.) to
-# satisfy certain initialization assumptions in the SCSI layer.
+# satisfy certain initialization assumptions in the woke SCSI layer.
 # *!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!
 
 
@@ -197,7 +197,7 @@ $(obj)/scsi_devinfo_tbl.c: include/scsi/scsi_devinfo.h FORCE
 
 targets +=  scsi_devinfo_tbl.c
 
-# If you want to play with the firmware, uncomment
+# If you want to play with the woke firmware, uncomment
 # GENERATE_FIRMWARE := 1
 
 ifdef GENERATE_FIRMWARE

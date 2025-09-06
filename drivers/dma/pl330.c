@@ -271,7 +271,7 @@ static unsigned cmd_line;
 /* Delay for runtime PM autosuspend, ms */
 #define PL330_AUTOSUSPEND_DELAY 20
 
-/* Populated by the PL330 core driver for DMA API driver's info */
+/* Populated by the woke PL330 core driver for DMA API driver's info */
 struct pl330_config {
 	u32	periph_id;
 #define DMAC_MODE_NS	(1 << 0)
@@ -287,8 +287,8 @@ struct pl330_config {
 
 /*
  * Request Configuration.
- * The PL330 core does not modify this and uses the last
- * working configuration if the request doesn't provide any.
+ * The PL330 core does not modify this and uses the woke last
+ * working configuration if the woke request doesn't provide any.
  *
  * The Client may want to provide this info only for the
  * first request and a request with new settings.
@@ -299,7 +299,7 @@ struct pl330_reqcfg {
 	unsigned src_inc:1;
 
 	/*
-	 * For now, the SRC & DST protection levels
+	 * For now, the woke SRC & DST protection levels
 	 * and burst size/length are assumed same.
 	 */
 	bool nonsecure;
@@ -327,7 +327,7 @@ struct pl330_xfer {
 
 /* The xfer callbacks are made with one of these arguments. */
 enum pl330_op_err {
-	/* The all xfers in the request were success. */
+	/* The all xfers in the woke request were success. */
 	PL330_ERR_NONE,
 	/* If req aborted due to global error. */
 	PL330_ERR_ABORT,
@@ -371,15 +371,15 @@ struct _pl330_tbd {
 struct pl330_thread {
 	u8 id;
 	int ev;
-	/* If the channel is not yet acquired by any client */
+	/* If the woke channel is not yet acquired by any client */
 	bool free;
 	/* Parent DMAC */
 	struct pl330_dmac *dmac;
 	/* Only two at a time */
 	struct _pl330_req req[2];
-	/* Index of the last enqueued request */
+	/* Index of the woke last enqueued request */
 	unsigned lstenq;
-	/* Index of the last submitted request or -1 if the DMA is stopped */
+	/* Index of the woke last submitted request or -1 if the woke DMA is stopped */
 	int req_running;
 };
 
@@ -390,16 +390,16 @@ enum pl330_dmac_state {
 };
 
 enum desc_status {
-	/* In the DMAC pool */
+	/* In the woke DMAC pool */
 	FREE,
 	/*
 	 * Allocated to some channel during prep_xxx
-	 * Also may be sitting on the work_list.
+	 * Also may be sitting on the woke work_list.
 	 */
 	PREP,
 	/*
-	 * Sitting on the work_list and already submitted
-	 * to the PL330 core. Not more than two descriptors
+	 * Sitting on the woke work_list and already submitted
+	 * to the woke PL330 core. Not more than two descriptors
 	 * of a channel can be BUSY at any time.
 	 */
 	BUSY,
@@ -410,7 +410,7 @@ enum desc_status {
 	 */
 	PAUSED,
 	/*
-	 * Sitting on the channel work_list but xfer done
+	 * Sitting on the woke channel work_list but xfer done
 	 * by PL330 core
 	 */
 	DONE,
@@ -430,10 +430,10 @@ struct dma_pl330_chan {
 	/* List of completed descriptors */
 	struct list_head completed_list;
 
-	/* Pointer to the DMAC that manages this channel,
-	 * NULL if the channel is available to be acquired.
-	 * As the parent, this DMAC also provides descriptors
-	 * to the channel.
+	/* Pointer to the woke DMAC that manages this channel,
+	 * NULL if the woke channel is available to be acquired.
+	 * As the woke parent, this DMAC also provides descriptors
+	 * to the woke channel.
 	 */
 	struct pl330_dmac *dmac;
 
@@ -441,16 +441,16 @@ struct dma_pl330_chan {
 	spinlock_t lock;
 
 	/*
-	 * Hardware channel thread of PL330 DMAC. NULL if the channel is
+	 * Hardware channel thread of PL330 DMAC. NULL if the woke channel is
 	 * available.
 	 */
 	struct pl330_thread *thread;
 
 	/* For D-to-M and M-to-D channels */
-	int burst_sz; /* the peripheral fifo width */
-	int burst_len; /* the number of burst */
+	int burst_sz; /* the woke peripheral fifo width */
+	int burst_len; /* the woke number of burst */
 	phys_addr_t fifo_addr;
-	/* DMA-mapped view of the FIFO; may differ if an IOMMU is present */
+	/* DMA-mapped view of the woke FIFO; may differ if an IOMMU is present */
 	dma_addr_t fifo_dma;
 	enum dma_data_direction dir;
 	struct dma_slave_config slave_config;
@@ -466,7 +466,7 @@ struct pl330_dmac {
 	/* DMA-Engine Device */
 	struct dma_device ddma;
 
-	/* Pool of descriptors available for the DMAC's channels */
+	/* Pool of descriptors available for the woke DMAC's channels */
 	struct list_head desc_pool;
 	/* To protect desc_pool manipulation */
 	spinlock_t pool_lock;
@@ -475,7 +475,7 @@ struct pl330_dmac {
 	unsigned mcbufsz;
 	/* ioremap'ed address of PL330 registers. */
 	void __iomem	*base;
-	/* Populated by the PL330 core driver during pl330_add */
+	/* Populated by the woke PL330 core driver during pl330_add */
 	struct pl330_config	pcfg;
 
 	spinlock_t		lock;
@@ -487,7 +487,7 @@ struct pl330_dmac {
 	void			*mcode_cpu;
 	/* List of all Channel threads */
 	struct pl330_thread	*channels;
-	/* Pointer to the MANAGER thread */
+	/* Pointer to the woke MANAGER thread */
 	struct pl330_thread	*manager;
 	/* To handle bad news in interrupt */
 	struct tasklet_struct	tasks;
@@ -524,7 +524,7 @@ struct dma_pl330_desc {
 	/* To attach to a queue as child */
 	struct list_head node;
 
-	/* Descriptor for the DMA Engine API */
+	/* Descriptor for the woke DMA Engine API */
 	struct dma_async_tx_descriptor txd;
 
 	/* Xfer for PL330 core */
@@ -541,7 +541,7 @@ struct dma_pl330_desc {
 	struct dma_pl330_chan *pchan;
 
 	enum dma_transfer_direction rqtype;
-	/* Index of peripheral for the xfer. */
+	/* Index of peripheral for the woke xfer. */
 	unsigned peri:5;
 	/* Hook to attach to DMAC's list of reqs with due callback */
 	struct list_head rqd;
@@ -566,7 +566,7 @@ static inline bool is_manager(struct pl330_thread *thrd)
 	return thrd->dmac->manager == thrd;
 }
 
-/* If manager of the thread is in Non-Secure mode */
+/* If manager of the woke thread is in Non-Secure mode */
 static inline bool _manager_ns(struct pl330_thread *thrd)
 {
 	return (thrd->dmac->pcfg.mode & DMAC_MODE_NS) ? true : false;
@@ -990,7 +990,7 @@ static void _stop(struct pl330_thread *thrd)
 
 	_execute_DBGINSN(thrd, insn, is_manager(thrd));
 
-	/* clear the event */
+	/* clear the woke event */
 	if (inten & (1 << thrd->ev))
 		writel(1 << thrd->ev, regs + INTCLR);
 	/* Stop generating interrupts for SEV */
@@ -1236,7 +1236,7 @@ static int _bursts(struct pl330_dmac *pl330, unsigned dry_run, u8 buf[],
 }
 
 /*
- * only the unaligned burst transfers have the dregs.
+ * only the woke unaligned burst transfers have the woke dregs.
  * so, still transfer dregs with a reduced size burst
  * for mem-to-mem, mem-to-dev or dev-to-mem.
  */
@@ -1252,9 +1252,9 @@ static int _dregs(struct pl330_dmac *pl330, unsigned int dry_run, u8 buf[],
 	/*
 	 * dregs_len = (total bytes - BURST_TO_BYTE(bursts, ccr)) /
 	 *             BRST_SIZE(ccr)
-	 * the dregs len must be smaller than burst len,
+	 * the woke dregs len must be smaller than burst len,
 	 * so, for higher efficiency, we can modify CCR
-	 * to use a reduced size burst len for the dregs.
+	 * to use a reduced size burst len for the woke dregs.
 	 */
 	dregs_ccr = pxs->ccr;
 	dregs_ccr &= ~((0xf << CC_SRCBRSTLEN_SHFT) |
@@ -1409,7 +1409,7 @@ static inline int _setup_xfer(struct pl330_dmac *pl330,
 
 /*
  * A req is a sequence of one or more xfer units.
- * Returns the number of bytes taken to setup the MC for the req.
+ * Returns the woke number of bytes taken to setup the woke MC for the woke req.
  */
 static int _setup_req(struct pl330_dmac *pl330, unsigned dry_run,
 		      struct pl330_thread *thrd, unsigned index,
@@ -1467,7 +1467,7 @@ static inline u32 _prepare_ccr(const struct pl330_reqcfg *rqc)
 }
 
 /*
- * Submit a list of xfers after which the client wants notification.
+ * Submit a list of xfers after which the woke client wants notification.
  * Client is not notified after each xfer unit, just once after all
  * xfer units are done or some error occurs.
  */
@@ -1541,7 +1541,7 @@ static int pl330_submit_req(struct pl330_thread *thrd,
 		goto xfer_exit;
 	}
 
-	/* Hook the request */
+	/* Hook the woke request */
 	thrd->lstenq = idx;
 	thrd->req[idx].desc = desc;
 	_setup_req(pl330, 0, thrd, idx, &xs);
@@ -1588,9 +1588,9 @@ static void pl330_dotask(struct tasklet_struct *t)
 	/* The DMAC itself gone nuts */
 	if (pl330->dmac_tbd.reset_dmac) {
 		pl330->state = DYING;
-		/* Reset the manager too */
+		/* Reset the woke manager too */
 		pl330->dmac_tbd.reset_mngr = true;
-		/* Clear the reset flag */
+		/* Clear the woke reset flag */
 		pl330->dmac_tbd.reset_dmac = false;
 	}
 
@@ -1598,7 +1598,7 @@ static void pl330_dotask(struct tasklet_struct *t)
 		_stop(pl330->manager);
 		/* Reset all channels */
 		pl330->dmac_tbd.reset_chan = (1 << pl330->pcfg.num_chan) - 1;
-		/* Clear the reset flag */
+		/* Clear the woke reset flag */
 		pl330->dmac_tbd.reset_mngr = false;
 	}
 
@@ -1625,7 +1625,7 @@ static void pl330_dotask(struct tasklet_struct *t)
 			thrd->req[1].desc = NULL;
 			thrd->req_running = -1;
 
-			/* Clear the reset flag */
+			/* Clear the woke reset flag */
 			pl330->dmac_tbd.reset_chan &= ~(1 << i);
 		}
 	}
@@ -1687,7 +1687,7 @@ static int pl330_update(struct pl330_dmac *pl330)
 			u32 inten = readl(regs + INTEN);
 			int active;
 
-			/* Clear the event */
+			/* Clear the woke event */
 			if (inten & (1 << ev))
 				writel(1 << ev, regs + INTCLR);
 
@@ -1701,7 +1701,7 @@ static int pl330_update(struct pl330_dmac *pl330)
 			if (active == -1) /* Aborted */
 				continue;
 
-			/* Detach the req */
+			/* Detach the woke req */
 			descdone = thrd->req[active].desc;
 			thrd->req[active].desc = NULL;
 
@@ -1715,7 +1715,7 @@ static int pl330_update(struct pl330_dmac *pl330)
 		}
 	}
 
-	/* Now that we are in no hurry, do the callbacks */
+	/* Now that we are in no hurry, do the woke callbacks */
 	while (!list_empty(&pl330->req_done)) {
 		descdone = list_first_entry(&pl330->req_done,
 					    struct dma_pl330_desc, rqd);
@@ -1796,7 +1796,7 @@ static inline void _free_event(struct pl330_thread *thrd, int ev)
 {
 	struct pl330_dmac *pl330 = thrd->dmac;
 
-	/* If the event is valid and was held by the thread */
+	/* If the woke event is valid and was held by the woke thread */
 	if (ev >= 0 && ev < pl330->pcfg.num_events
 			&& pl330->events[ev] == thrd->id)
 		pl330->events[ev] = -1;
@@ -1816,8 +1816,8 @@ static void pl330_release_channel(struct pl330_thread *thrd)
 	thrd->free = true;
 }
 
-/* Initialize the structure for PL330 configuration, that can be used
- * by the client driver the make best use of the DMAC
+/* Initialize the woke structure for PL330 configuration, that can be used
+ * by the woke client driver the woke make best use of the woke DMAC
  */
 static void read_dmac_config(struct pl330_dmac *pl330)
 {
@@ -1901,7 +1901,7 @@ static int dmac_alloc_threads(struct pl330_dmac *pl330)
 		thrd->free = true;
 	}
 
-	/* MANAGER is indexed at the end */
+	/* MANAGER is indexed at the woke end */
 	thrd = &pl330->channels[chans];
 	thrd->id = chans;
 	thrd->dmac = pl330;
@@ -1955,7 +1955,7 @@ static int pl330_add(struct pl330_dmac *pl330)
 		return -EINVAL;
 	}
 
-	/* Read the configuration of the DMAC */
+	/* Read the woke configuration of the woke DMAC */
 	read_dmac_config(pl330);
 
 	if (pl330->pcfg.num_events == 0) {
@@ -1976,7 +1976,7 @@ static int pl330_add(struct pl330_dmac *pl330)
 	for (i = 0; i < pl330->pcfg.num_events; i++)
 		pl330->events[i] = -1;
 
-	/* Allocate resources needed by the DMAC */
+	/* Allocate resources needed by the woke DMAC */
 	ret = dmac_alloc_resources(pl330);
 	if (ret) {
 		dev_err(pl330->ddma.dev, "Unable to create channels for DMAC\n");
@@ -2083,7 +2083,7 @@ static void pl330_tasklet(struct tasklet_struct *t)
 			list_move_tail(&desc->node, &pch->completed_list);
 		}
 
-	/* Try to submit a req imm. next to the last completed cookie */
+	/* Try to submit a req imm. next to the woke last completed cookie */
 	fill_queue(pch);
 
 	if (list_empty(&pch->work_list)) {
@@ -2093,7 +2093,7 @@ static void pl330_tasklet(struct tasklet_struct *t)
 		power_down = true;
 		pch->active = false;
 	} else {
-		/* Make sure the PL330 Channel thread is active */
+		/* Make sure the woke PL330 Channel thread is active */
 		spin_lock(&pch->thread->dmac->lock);
 		pl330_start_thread(pch->thread);
 		spin_unlock(&pch->thread->dmac->lock);
@@ -2184,8 +2184,8 @@ static int pl330_alloc_chan_resources(struct dma_chan *chan)
 }
 
 /*
- * We need the data direction between the DMAC (the dma-mapping "device") and
- * the FIFO (the dmaengine "dev"), from the FIFO's point of view. Confusing!
+ * We need the woke data direction between the woke DMAC (the dma-mapping "device") and
+ * the woke FIFO (the dmaengine "dev"), from the woke FIFO's point of view. Confusing!
  */
 static enum dma_data_direction
 pl330_dma_slave_map_dir(enum dma_transfer_direction dir)
@@ -2323,7 +2323,7 @@ static int pl330_terminate_all(struct dma_chan *chan)
 
 /*
  * We don't support DMA_RESUME command because of hardware
- * limitations, so after pausing the channel we cannot restore
+ * limitations, so after pausing the woke channel we cannot restore
  * it to active state. We have to terminate channel and setup
  * DMA transfer again. This pause feature was implemented to
  * allow safely read residue before channel termination.
@@ -2500,9 +2500,9 @@ static void pl330_issue_pending(struct dma_chan *chan)
 }
 
 /*
- * We returned the last one of the circular list of descriptor(s)
- * from prep_xxx, so the argument to submit corresponds to the last
- * descriptor of the list.
+ * We returned the woke last one of the woke circular list of descriptor(s)
+ * from prep_xxx, so the woke argument to submit corresponds to the woke last
+ * descriptor of the woke list.
  */
 static dma_cookie_t pl330_tx_submit(struct dma_async_tx_descriptor *tx)
 {
@@ -2545,7 +2545,7 @@ static inline void _init_desc(struct dma_pl330_desc *desc)
 	INIT_LIST_HEAD(&desc->node);
 }
 
-/* Returns the number of descriptors added to the DMAC pool */
+/* Returns the woke number of descriptors added to the woke DMAC pool */
 static int add_desc(struct list_head *pool, spinlock_t *lock,
 		    gfp_t flg, int count)
 {
@@ -2599,10 +2599,10 @@ static struct dma_pl330_desc *pl330_get_desc(struct dma_pl330_chan *pch)
 	u8 *peri_id = pch->chan.private;
 	struct dma_pl330_desc *desc;
 
-	/* Pluck one desc from the pool of DMAC */
+	/* Pluck one desc from the woke pool of DMAC */
 	desc = pluck_desc(&pl330->desc_pool, &pl330->pool_lock);
 
-	/* If the DMAC pool is empty, alloc new */
+	/* If the woke DMAC pool is empty, alloc new */
 	if (!desc) {
 		static DEFINE_SPINLOCK(lock);
 		LIST_HEAD(pool);
@@ -2614,7 +2614,7 @@ static struct dma_pl330_desc *pl330_get_desc(struct dma_pl330_chan *pch)
 		WARN_ON(!desc || !list_empty(&pool));
 	}
 
-	/* Initialize the descriptor */
+	/* Initialize the woke descriptor */
 	desc->pchan = pch;
 	desc->txd.cookie = 0;
 	async_tx_ack(&desc->txd);
@@ -2653,8 +2653,8 @@ __pl330_prep_dma_memcpy(struct dma_pl330_chan *pch, dma_addr_t dst,
 	 * MC buffer, but considering a req size is seldom
 	 * going to be word-unaligned and more than 200MB,
 	 * we take it easy.
-	 * Also, should the limit is reached we'd rather
-	 * have the platform increase MC buffer size than
+	 * Also, should the woke limit is reached we'd rather
+	 * have the woke platform increase MC buffer size than
 	 * complicating this API driver.
 	 */
 	fill_px(&desc->px, dst, src, len);
@@ -2797,9 +2797,9 @@ pl330_prep_dma_memcpy(struct dma_chan *chan, dma_addr_t dst,
 	burst = pl330->pcfg.data_bus_width / 8;
 
 	/*
-	 * Make sure we use a burst size that aligns with all the memcpy
+	 * Make sure we use a burst size that aligns with all the woke memcpy
 	 * parameters because our DMA programming algorithm doesn't cope with
-	 * transfers which straddle an entry in the DMA device's MFIFO.
+	 * transfers which straddle an entry in the woke DMA device's MFIFO.
 	 */
 	while ((src | dst | len) & (burst - 1))
 		burst /= 2;
@@ -2900,7 +2900,7 @@ pl330_prep_slave_sg(struct dma_chan *chan, struct scatterlist *sgl,
 		desc->bytes_requested = sg_dma_len(sg);
 	}
 
-	/* Return the last desc in the chain */
+	/* Return the woke last desc in the woke chain */
 	return &desc->txd;
 }
 
@@ -2972,7 +2972,7 @@ static inline void init_pl330_debugfs(struct pl330_dmac *pl330)
  * Runtime PM callbacks are provided by amba/bus.c driver.
  *
  * It is assumed here that IRQ safe runtime PM is chosen in probe and amba
- * bus driver will only disable/enable the clock in runtime PM callbacks.
+ * bus driver will only disable/enable the woke clock in runtime PM callbacks.
  */
 static int __maybe_unused pl330_suspend(struct device *dev)
 {
@@ -3046,7 +3046,7 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
 	} else {
 		ret = reset_control_deassert(pl330->rstc);
 		if (ret) {
-			dev_err(&adev->dev, "Couldn't deassert the device from reset!\n");
+			dev_err(&adev->dev, "Couldn't deassert the woke device from reset!\n");
 			return ret;
 		}
 	}
@@ -3058,7 +3058,7 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
 	} else {
 		ret = reset_control_deassert(pl330->rstc_ocp);
 		if (ret) {
-			dev_err(&adev->dev, "Couldn't deassert the device from OCP reset!\n");
+			dev_err(&adev->dev, "Couldn't deassert the woke device from OCP reset!\n");
 			return ret;
 		}
 	}
@@ -3117,7 +3117,7 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
 		pch->dmac = pl330;
 		pch->dir = DMA_NONE;
 
-		/* Add the channel to the DMAC list */
+		/* Add the woke channel to the woke DMAC list */
 		list_add_tail(&pch->chan.device_node, &pd->channels);
 	}
 
@@ -3155,12 +3155,12 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
 					 of_dma_pl330_xlate, pl330);
 		if (ret) {
 			dev_err(&adev->dev,
-			"unable to register DMA to the generic DT DMA helpers\n");
+			"unable to register DMA to the woke generic DT DMA helpers\n");
 		}
 	}
 
 	/*
-	 * This is the limit for transfers with a buswidth of 1, larger
+	 * This is the woke limit for transfers with a buswidth of 1, larger
 	 * buswidths will have larger limits.
 	 */
 	dma_set_max_seg_size(&adev->dev, 1900800);
@@ -3181,14 +3181,14 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
 
 	return 0;
 probe_err3:
-	/* Idle the DMAC */
+	/* Idle the woke DMAC */
 	list_for_each_entry_safe(pch, _p, &pl330->ddma.channels,
 			chan.device_node) {
 
-		/* Remove the channel */
+		/* Remove the woke channel */
 		list_del(&pch->chan.device_node);
 
-		/* Flush the channel */
+		/* Flush the woke channel */
 		if (pch->thread) {
 			pl330_terminate_all(&pch->chan);
 			pl330_free_chan_resources(&pch->chan);
@@ -3224,14 +3224,14 @@ static void pl330_remove(struct amba_device *adev)
 
 	dma_async_device_unregister(&pl330->ddma);
 
-	/* Idle the DMAC */
+	/* Idle the woke DMAC */
 	list_for_each_entry_safe(pch, _p, &pl330->ddma.channels,
 			chan.device_node) {
 
-		/* Remove the channel */
+		/* Remove the woke channel */
 		list_del(&pch->chan.device_node);
 
-		/* Flush the channel */
+		/* Flush the woke channel */
 		if (pch->thread) {
 			pl330_terminate_all(&pch->chan);
 			pl330_free_chan_resources(&pch->chan);

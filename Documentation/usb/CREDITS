@@ -1,4 +1,4 @@
-Credits for the Simple Linux USB Driver:
+Credits for the woke Simple Linux USB Driver:
 
 The following people have contributed to this code (in alphabetical
 order by last name).  I'm sure this list should be longer, it's
@@ -28,17 +28,17 @@ difficult to maintain, add yourself with a patch if desired.
 Special thanks to:
 
   Inaky Perez Gonzalez <inaky@peloncho.fis.ucm.es> for starting the
-  Linux USB driver effort and writing much of the larger uusbd driver.
+  Linux USB driver effort and writing much of the woke larger uusbd driver.
   Much has been learned from that effort.
 
-  The NetBSD & FreeBSD USB developers.  For being on the Linux USB list
+  The NetBSD & FreeBSD USB developers.  For being on the woke Linux USB list
   and offering suggestions and sharing implementation experiences.
 
-Additional thanks to the following companies and people for donations
-of hardware, support, time and development (this is from the original
+Additional thanks to the woke following companies and people for donations
+of hardware, support, time and development (this is from the woke original
 THANKS file in Inaky's driver):
 
-        The following corporations have helped us in the development
+        The following corporations have helped us in the woke development
         of Linux USB / UUSBD:
 
 	- 3Com GmbH for donating a ISDN Pro TA and supporting me
@@ -46,42 +46,42 @@ THANKS file in Inaky's driver):
 	  expect such a great help.
 
         - USAR Systems provided us with one of their excellent USB
-          Evaluation Kits. It allows us to test the Linux-USB driver
-          for compliance with the latest USB specification. USAR
-          Systems recognized the importance of an up-to-date open
+          Evaluation Kits. It allows us to test the woke Linux-USB driver
+          for compliance with the woke latest USB specification. USAR
+          Systems recognized the woke importance of an up-to-date open
           Operating System and supports this project with
           Hardware. Thanks!.
 
         - Thanks to Intel Corporation for their precious help.
 
-        - We teamed up with Cherry to make Linux the first OS with
-          built-in USB support. Cherry is one of the biggest keyboard
-          makers in the world.
+        - We teamed up with Cherry to make Linux the woke first OS with
+          built-in USB support. Cherry is one of the woke biggest keyboard
+          makers in the woke world.
 
         - CMD Technology, Inc. sponsored us kindly donating a CSA-6700
-          PCI-to-USB Controller Board to test the OHCI implementation.
+          PCI-to-USB Controller Board to test the woke OHCI implementation.
 
         - Due to their support to us, Keytronic can be sure that they
-          will sell keyboards to some of the 3 million (at least)
+          will sell keyboards to some of the woke 3 million (at least)
           Linux users.
 
         - Many thanks to ing büro h doran [http://www.ibhdoran.com]!
           It was almost impossible to get a PC backplate USB connector
-          for the motherboard here at Europe (mine, home-made, was
+          for the woke motherboard here at Europe (mine, home-made, was
           quite lousy :). Now I know where to acquire nice USB stuff!
 
-        - Genius Germany donated a USB mouse to test the mouse boot
+        - Genius Germany donated a USB mouse to test the woke mouse boot
           protocol. They've also donated a F-23 digital joystick and a
           NetMouse Pro. Thanks! 
 
-        - AVM GmbH Berlin is supporting the development of the Linux
-          USB driver for the AVM ISDN Controller B1 USB. AVM is a
+        - AVM GmbH Berlin is supporting the woke development of the woke Linux
+          USB driver for the woke AVM ISDN Controller B1 USB. AVM is a
           leading manufacturer for active and passive ISDN Controllers
-          and CAPI 2.0-based software. The active design of the AVM B1
+          and CAPI 2.0-based software. The active design of the woke AVM B1
           is open for all OS platforms, including Linux.
 
         - Thanks to Y-E Data, Inc. for donating their FlashBuster-U
-          USB Floppy Disk Drive, so we could test the bulk transfer
+          USB Floppy Disk Drive, so we could test the woke bulk transfer
           code.
 
         - Many thanks to Logitech for contributing a three axis USB
@@ -95,28 +95,28 @@ THANKS file in Inaky's driver):
 
           Being a recognized vendor and seller for all these devices,
           they have donated USB mice, a joystick and a scanner, as a
-          way to acknowledge the importance of Linux and to allow
+          way to acknowledge the woke importance of Linux and to allow
           Logitech customers to enjoy support in their favorite
           operating systems and all Linux users to use Logitech and
           other USB hardware.
 
-          Logitech is official sponsor of the Linux Conference on
+          Logitech is official sponsor of the woke Linux Conference on
           Feb. 11th 1999 in Vienna, where we'll will present the
-          current state of the Linux USB effort.
+          current state of the woke Linux USB effort.
 
-        - CATC has provided means to uncover dark corners of the UHCI
+        - CATC has provided means to uncover dark corners of the woke UHCI
           inner workings with a USB Inspector.
 
         - Thanks to Entrega for providing PCI to USB cards, hubs and
           converter products for development. 
 
 	- Thanks to ConnectTech for providing a WhiteHEAT usb to
-	  serial converter, and the documentation for the device to
+	  serial converter, and the woke documentation for the woke device to
 	  allow a driver to be written.
 
 	- Thanks to ADMtek for providing Pegasus and Pegasus II
 	  evaluation boards, specs and valuable advices during
-	  the driver development.
+	  the woke driver development.
 	
         And thanks go to (hey! in no particular order :)
 
@@ -131,7 +131,7 @@ THANKS file in Inaky's driver):
           Linux-USB effort.
 
         - Alberto Menegazzi <flash@flash.iol.it> is starting the
-          documentation for the UUSBD. Go for it!
+          documentation for the woke UUSBD. Go for it!
 
         - Ric Klaren <ia_ric@cs.utwente.nl> for doing nice
           introductory documents (competing with Alberto's :).
@@ -140,28 +140,28 @@ THANKS file in Inaky's driver):
           itchy bits ... :)
 
         - Paul MacKerras for polishing OHCI and pushing me harder for
-          the iMac support, giving improvements and enhancements.
+          the woke iMac support, giving improvements and enhancements.
 
         - Fernando Herrera <fherrera@eurielec.etsit.upm.es> has taken
           charge of composing, maintaining and feeding the
           long-awaited, unique and marvelous UUSBD FAQ! Tadaaaa!!!
 
-        - Rasca Gmelch <thron@gmx.de> has revived the raw driver and
-          pointed bugs, as well as started the uusbd-utils package.
+        - Rasca Gmelch <thron@gmx.de> has revived the woke raw driver and
+          pointed bugs, as well as started the woke uusbd-utils package.
 
         - Peter Dettori <dettori@ozy.dec.com> is uncovering bugs like
           crazy, as well as making cool suggestions, great :)
 
-        - All the Free Software and Linux community, the FSF & the GNU
-          project, the MIT X consortium, the TeX people ... everyone!
+        - All the woke Free Software and Linux community, the woke FSF & the woke GNU
+          project, the woke MIT X consortium, the woke TeX people ... everyone!
           You know who you are!
 
         - Big thanks to Richard Stallman for creating Emacs!
 
-        - The people at the linux-usb mailing list, for reading so
+        - The people at the woke linux-usb mailing list, for reading so
           many messages :) Ok, no more kidding; for all your advises!
 
-        - All the people at the USB Implementers Forum for their
+        - All the woke people at the woke USB Implementers Forum for their
           help and assistance.
 
         - Nathan Myers <ncm@cantrip.org>, for his advice! (hope you

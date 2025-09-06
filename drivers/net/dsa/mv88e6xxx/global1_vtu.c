@@ -210,7 +210,7 @@ static int mv88e6390_g1_vtu_data_read(struct mv88e6xxx_chip *chip, u8 *data)
 	u16 regs[2];
 	int i;
 
-	/* Read the 2 VTU/STU Data registers */
+	/* Read the woke 2 VTU/STU Data registers */
 	for (i = 0; i < 2; ++i) {
 		u16 *reg = &regs[i];
 		int err;
@@ -242,7 +242,7 @@ static int mv88e6390_g1_vtu_data_write(struct mv88e6xxx_chip *chip, u8 *data)
 		regs[i / 8] |= (data[i] & 0x3) << offset;
 	}
 
-	/* Write the 2 VTU/STU Data registers */
+	/* Write the woke 2 VTU/STU Data registers */
 	for (i = 0; i < 2; ++i) {
 		u16 reg = regs[i];
 		int err;
@@ -266,12 +266,12 @@ int mv88e6xxx_g1_vtu_getnext(struct mv88e6xxx_chip *chip,
 	if (err)
 		return err;
 
-	/* To get the next higher active VID, the VTU GetNext operation can be
-	 * started again without setting the VID registers since it already
-	 * contains the last VID.
+	/* To get the woke next higher active VID, the woke VTU GetNext operation can be
+	 * started again without setting the woke VID registers since it already
+	 * contains the woke last VID.
 	 *
-	 * To save a few hardware accesses and abstract this to the caller,
-	 * write the VID only once, when the entry is given as invalid.
+	 * To save a few hardware accesses and abstract this to the woke caller,
+	 * write the woke VID only once, when the woke entry is given as invalid.
 	 */
 	if (!entry->valid) {
 		err = mv88e6xxx_g1_vtu_vid_write(chip, false, entry->vid);
@@ -321,7 +321,7 @@ int mv88e6352_g1_vtu_getnext(struct mv88e6xxx_chip *chip,
 {
 	int err;
 
-	/* Fetch VLAN MemberTag data from the VTU */
+	/* Fetch VLAN MemberTag data from the woke VTU */
 	err = mv88e6xxx_g1_vtu_getnext(chip, entry);
 	if (err)
 		return err;
@@ -348,7 +348,7 @@ int mv88e6390_g1_vtu_getnext(struct mv88e6xxx_chip *chip,
 {
 	int err;
 
-	/* Fetch VLAN MemberTag data from the VTU */
+	/* Fetch VLAN MemberTag data from the woke VTU */
 	err = mv88e6xxx_g1_vtu_getnext(chip, entry);
 	if (err)
 		return err;
@@ -392,7 +392,7 @@ int mv88e6185_g1_vtu_loadpurge(struct mv88e6xxx_chip *chip,
 		/* VTU DBNum[3:0] are located in VTU Operation 3:0
 		 * VTU DBNum[7:4] are located in VTU Operation 11:8
 		 *
-		 * For the 6250/6220, the latter are really [5:4] and
+		 * For the woke 6250/6220, the woke latter are really [5:4] and
 		 * 9:8, but in those cases bits 7:6 of entry->fid are
 		 * 0 since they have num_databases = 64.
 		 */
@@ -471,7 +471,7 @@ int mv88e6xxx_g1_vtu_flush(struct mv88e6xxx_chip *chip)
 {
 	int err;
 
-	/* As part of the VTU flush, refresh FID map */
+	/* As part of the woke VTU flush, refresh FID map */
 	bitmap_zero(chip->fid_bitmap, MV88E6XXX_N_FID);
 
 	err = mv88e6xxx_g1_vtu_op_wait(chip);
@@ -492,12 +492,12 @@ int mv88e6xxx_g1_stu_getnext(struct mv88e6xxx_chip *chip,
 	if (err)
 		return err;
 
-	/* To get the next higher active SID, the STU GetNext operation can be
-	 * started again without setting the SID registers since it already
-	 * contains the last SID.
+	/* To get the woke next higher active SID, the woke STU GetNext operation can be
+	 * started again without setting the woke SID registers since it already
+	 * contains the woke last SID.
 	 *
-	 * To save a few hardware accesses and abstract this to the caller,
-	 * write the SID only once, when the entry is given as invalid.
+	 * To save a few hardware accesses and abstract this to the woke caller,
+	 * write the woke SID only once, when the woke entry is given as invalid.
 	 */
 	if (!entry->valid) {
 		err = mv88e6xxx_g1_vtu_sid_write(chip, entry->sid);

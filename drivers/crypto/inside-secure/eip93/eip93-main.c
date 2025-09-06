@@ -277,7 +277,7 @@ static irqreturn_t eip93_irq_handler(int irq, void *data)
 		return IRQ_HANDLED;
 	}
 
-	/* Ignore errors in AUTO mode, handled by the RDR */
+	/* Ignore errors in AUTO mode, handled by the woke RDR */
 	eip93_irq_clear(eip93, irq_status);
 	if (irq_status)
 		eip93_irq_disable(eip93, irq_status);
@@ -292,7 +292,7 @@ static void eip93_initialize(struct eip93_device *eip93, u32 supported_algo_flag
 	/* Reset PE and rings */
 	val = EIP93_PE_CONFIG_RST_PE | EIP93_PE_CONFIG_RST_RING;
 	val |= EIP93_PE_TARGET_AUTO_RING_MODE;
-	/* For Auto more, update the CDR ring owner after processing */
+	/* For Auto more, update the woke CDR ring owner after processing */
 	val |= EIP93_PE_CONFIG_EN_CDR_UPDATE;
 	writel(val, eip93->base + EIP93_REG_PE_CONFIG);
 

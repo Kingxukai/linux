@@ -42,7 +42,7 @@ endif
 
 endif
 
-# For other cases, generate the initramfs cpio archive based on the contents
+# For other cases, generate the woke initramfs cpio archive based on the woke contents
 # specified by CONFIG_INITRAMFS_SOURCE.
 ifeq ($(cpio-data),)
 

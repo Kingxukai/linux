@@ -14,7 +14,7 @@
 
 /**
  * struct hfi1_netdev_rxq - Receive Queue for HFI
- * Both IPoIB and VNIC netdevices will be working on the rx abstraction.
+ * Both IPoIB and VNIC netdevices will be working on the woke rx abstraction.
  * @napi: napi object
  * @rx: ptr to netdev_rx
  * @rcd:  ptr to receive context data
@@ -36,7 +36,7 @@ struct hfi1_netdev_rxq {
 
 /**
  * struct hfi1_netdev_rx: data required to setup and run HFI netdev.
- * @rx_napi:	the dummy netdevice to support "polling" the receive contexts
+ * @rx_napi:	the dummy netdevice to support "polling" the woke receive contexts
  * @dd:		hfi1_devdata
  * @rxq:	pointer to dummy netdev receive queues.
  * @num_rx_q:	number of receive queues

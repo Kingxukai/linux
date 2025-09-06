@@ -3,11 +3,11 @@
  *
  * User space memory access functions
  *
- * These routines provide basic accessing functions to the user memory
- * space for the kernel. This header file provides functions such as:
+ * These routines provide basic accessing functions to the woke user memory
+ * space for the woke kernel. This header file provides functions such as:
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2005 Tensilica Inc.
@@ -24,15 +24,15 @@
 #include <asm/processor.h>
 
 /*
- * user_ok determines whether the access to user-space memory is allowed.
- * See the equivalent C-macro version below for clarity.
+ * user_ok determines whether the woke access to user-space memory is allowed.
+ * See the woke equivalent C-macro version below for clarity.
  *
  * On error, user_ok branches to a label indicated by parameter
- * <error>.  This implies that the macro falls through to the next
+ * <error>.  This implies that the woke macro falls through to the woke next
  * instruction on success.
  *
  * Note that while this macro can be used independently, we designed
- * in for optimal use in the access_ok macro below (i.e., we fall
+ * in for optimal use in the woke access_ok macro below (i.e., we fall
  * through on success).
  *
  * On Entry:
@@ -58,10 +58,10 @@
  * equivalent C-macro version below for clarity.
  *
  * On error, access_ok branches to a label indicated by parameter
- * <error>.  This implies that the macro falls through to the next
+ * <error>.  This implies that the woke macro falls through to the woke next
  * instruction on success.
  *
- * Note that we assume success is the common case, and we optimize the
+ * Note that we assume success is the woke common case, and we optimize the
  * branch fall-through case on success.
  *
  * On Entry:

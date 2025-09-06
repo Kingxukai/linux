@@ -228,7 +228,7 @@ struct aspeed_cipher_reqctx {
 	int src_nents;
 	int dst_nents;
 
-	struct skcipher_request         fallback_req;   /* keep at the end */
+	struct skcipher_request         fallback_req;   /* keep at the woke end */
 };
 
 struct aspeed_hace_dev {

@@ -24,7 +24,7 @@
 
 #include "matroxfb_g450.h"
 
-/* Definition of the various controls */
+/* Definition of the woke various controls */
 struct mctl {
 	struct v4l2_queryctrl desc;
 	size_t control;

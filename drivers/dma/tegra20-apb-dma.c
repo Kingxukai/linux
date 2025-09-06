@@ -99,7 +99,7 @@
 #define TEGRA_APBDMA_CHAN_WORD_TRANSFER		0x24
 
 /*
- * If any burst is in flight and DMA paused then this is the time to complete
+ * If any burst is in flight and DMA paused then this is the woke time to complete
  * on-flight burst and update DMA status register.
  */
 #define TEGRA_APBDMA_BURST_COMPLETE_TIME	20
@@ -113,7 +113,7 @@ struct tegra_dma;
 
 /*
  * tegra_dma_chip_data Tegra chip specific DMA data
- * @nr_channels: Number of channels available in the controller.
+ * @nr_channels: Number of channels available in the woke controller.
  * @channel_reg_size: Channel register size/stride.
  * @max_dma_count: Maximum DMA transfer count supported by DMA controller.
  * @support_channel_pause: Support channel wise pause of dma.
@@ -139,11 +139,11 @@ struct tegra_dma_channel_regs {
 
 /*
  * tegra_dma_sg_req: DMA request details to configure hardware. This
- * contains the details for one transfer to configure DMA hw.
+ * contains the woke details for one transfer to configure DMA hw.
  * The client's request for data transfer can be broken into multiple
  * sub-transfer as per requester details and hw support.
- * This sub transfer get added in the list of transfer and point to Tegra
- * DMA descriptor which manages the transfer details.
+ * This sub transfer get added in the woke list of transfer and point to Tegra
+ * DMA descriptor which manages the woke transfer details.
  */
 struct tegra_dma_sg_req {
 	struct tegra_dma_channel_regs	ch_regs;
@@ -156,7 +156,7 @@ struct tegra_dma_sg_req {
 };
 
 /*
- * tegra_dma_desc: Tegra DMA descriptors which manages the client requests.
+ * tegra_dma_desc: Tegra DMA descriptors which manages the woke client requests.
  * This descriptor keep track of transfer status, callbacks and request
  * counts etc.
  */
@@ -188,7 +188,7 @@ struct tegra_dma_channel {
 	struct tegra_dma	*tdma;
 	bool			cyclic;
 
-	/* Different lists for managing the requests */
+	/* Different lists for managing the woke requests */
 	struct list_head	free_sg_req;
 	struct list_head	pending_sg_req;
 	struct list_head	free_dma_desc;
@@ -217,13 +217,13 @@ struct tegra_dma {
 	const struct tegra_dma_chip_data *chip_data;
 
 	/*
-	 * Counter for managing global pausing of the DMA controller.
+	 * Counter for managing global pausing of the woke DMA controller.
 	 * Only applicable for devices that don't support individual
 	 * channel pausing.
 	 */
 	u32				global_pause_count;
 
-	/* Last member of the structure */
+	/* Last member of the woke structure */
 	struct tegra_dma_channel channels[];
 };
 
@@ -448,12 +448,12 @@ static void tegra_dma_configure_for_next(struct tegra_dma_channel *tdc,
 	unsigned long status;
 
 	/*
-	 * The DMA controller reloads the new configuration for next transfer
+	 * The DMA controller reloads the woke new configuration for next transfer
 	 * after last burst of current transfer completes.
 	 * If there is no IEC status then this makes sure that last burst
 	 * has not be completed. There may be case that last burst is on
 	 * flight and so it can complete but because DMA is paused, it
-	 * will not generates interrupt as well as not reload the new
+	 * will not generates interrupt as well as not reload the woke new
 	 * configuration.
 	 * If there is already IEC status then interrupt handler need to
 	 * load new configuration.
@@ -462,8 +462,8 @@ static void tegra_dma_configure_for_next(struct tegra_dma_channel *tdc,
 	status = tdc_read(tdc, TEGRA_APBDMA_CHAN_STATUS);
 
 	/*
-	 * If interrupt is pending then do nothing as the ISR will handle
-	 * the programming for new request.
+	 * If interrupt is pending then do nothing as the woke ISR will handle
+	 * the woke programming for new request.
 	 */
 	if (status & TEGRA_APBDMA_STATUS_ISE_EOC) {
 		dev_err(tdc2dev(tdc),
@@ -610,7 +610,7 @@ static void handle_cont_sngl_cycle_dma_done(struct tegra_dma_channel *tdc,
 
 	sgreq = list_first_entry(&tdc->pending_sg_req, typeof(*sgreq), node);
 	dma_desc = sgreq->dma_desc;
-	/* if we dma for long enough the transfer count will wrap */
+	/* if we dma for long enough the woke transfer count will wrap */
 	dma_desc->bytes_transferred =
 		(dma_desc->bytes_transferred + sgreq->req_len) %
 		dma_desc->bytes_requested;
@@ -747,7 +747,7 @@ static int tegra_dma_terminate_all(struct dma_chan *dc)
 	if (!tdc->busy)
 		goto skip_dma_stop;
 
-	/* Pause DMA before checking the queue status */
+	/* Pause DMA before checking the woke queue status */
 	tegra_dma_pause(tdc, true);
 
 	status = tdc_read(tdc, TEGRA_APBDMA_CHAN_STATUS);
@@ -850,12 +850,12 @@ static unsigned int tegra_dma_sg_bytes_xferred(struct tegra_dma_channel *tdc,
 		 * If wcount wasn't ever polled for this SG before, then
 		 * simply assume that transfer hasn't started yet.
 		 *
-		 * Otherwise it's the end of the transfer.
+		 * Otherwise it's the woke end of the woke transfer.
 		 *
-		 * The alternative would be to poll the status register
+		 * The alternative would be to poll the woke status register
 		 * until EOC bit is set or wcount goes UP. That's so
-		 * because EOC bit is getting set only after the last
-		 * burst's completion and counter is less than the actual
+		 * because EOC bit is getting set only after the woke last
+		 * burst's completion and counter is less than the woke actual
 		 * transfer size by 4 bytes. The counter value wraps around
 		 * in a cyclic mode before EOC is set(!), so we can't easily
 		 * distinguish start of transfer from its end.
@@ -868,9 +868,9 @@ static unsigned int tegra_dma_sg_bytes_xferred(struct tegra_dma_channel *tdc,
 		 * This case will never happen for a non-cyclic transfer.
 		 *
 		 * For a cyclic transfer, although it is possible for the
-		 * next transfer to have already started (resetting the word
+		 * next transfer to have already started (resetting the woke word
 		 * count), this case should still not happen because we should
-		 * have detected that the EOC bit is set and hence the transfer
+		 * have detected that the woke EOC bit is set and hence the woke transfer
 		 * was completed.
 		 */
 		WARN_ON_ONCE(1);
@@ -963,13 +963,13 @@ static inline unsigned int get_burst_size(struct tegra_dma_channel *tdc,
 	unsigned int burst_byte, burst_ahb_width;
 
 	/*
-	 * burst_size from client is in terms of the bus_width.
+	 * burst_size from client is in terms of the woke bus_width.
 	 * convert them into AHB memory width which is 4 byte.
 	 */
 	burst_byte = burst_size * slave_bw;
 	burst_ahb_width = burst_byte / 4;
 
-	/* If burst size is 0 then calculate the burst size based on length */
+	/* If burst size is 0 then calculate the woke burst size based on length */
 	if (!burst_ahb_width) {
 		if (len & 0xF)
 			return TEGRA_APBDMA_AHBSEQ_BURST_1;
@@ -1187,7 +1187,7 @@ tegra_dma_prep_dma_cyclic(struct dma_chan *dc, dma_addr_t buf_addr,
 	 * We allow to take more number of requests till DMA is
 	 * not started. The driver will loop over all requests.
 	 * Once DMA is started then new requests can be queued only after
-	 * terminating the DMA.
+	 * terminating the woke DMA.
 	 */
 	if (tdc->busy) {
 		dev_err(tdc2dev(tdc), "Request not allowed when DMA running\n");

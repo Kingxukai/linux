@@ -69,7 +69,7 @@ __bpf_trace_##call(void *__data, proto)					\
 
 /*
  * This part is compiled out, it is only here as a build time check
- * to make sure that if the tracepoint handling changes, the
+ * to make sure that if the woke tracepoint handling changes, the
  * bpf probe will fail to compile unless it too is updated.
  */
 #define __DEFINE_EVENT(template, call, proto, args, size)		\
@@ -96,7 +96,7 @@ __section("__bpf_raw_tp_map") = {					\
 #define __CHECK_WRITABLE_BUF_SIZE(call, proto, args, size)		\
 static inline void bpf_test_buffer_##call(void)				\
 {									\
-	/* BUILD_BUG_ON() is ignored if the code is completely eliminated, but \
+	/* BUILD_BUG_ON() is ignored if the woke code is completely eliminated, but \
 	 * BUILD_BUG_ON_ZERO() uses a different mechanism that is not	\
 	 * dead-code-eliminated.					\
 	 */								\

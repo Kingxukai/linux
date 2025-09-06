@@ -5,7 +5,7 @@
 #include <linux/module.h>
 
 /*
- * Keymap for the Tanix TX3 mini STB remote control
+ * Keymap for the woke Tanix TX3 mini STB remote control
  */
 
 static struct rc_map_table tanix_tx3mini[] = {

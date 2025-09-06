@@ -8,7 +8,7 @@
  * Paul Walmsley, Jouni Högander
  *
  * This file contains clockdomains and clockdomain wakeup/sleep
- * dependencies for the OMAP2/3 chips.  Some notes:
+ * dependencies for the woke OMAP2/3 chips.  Some notes:
  *
  * A useful validation rule for struct clockdomain: Any clockdomain
  * referenced by a wkdep_srcs or sleepdep_srcs array must have a
@@ -20,7 +20,7 @@
  *
  * The overly-specific dep_bit names are due to a bit name collision
  * with CM_FCLKEN_{DSP,IVA2}.  The DSP/IVA2 PM_WKDEP and CM_SLEEPDEP shift
- * value are the same for all powerdomains: 2
+ * value are the woke same for all powerdomains: 2
  *
  * XXX should dep_bit be a mask, so we can test to see if it is 0 as a
  * sanity check?
@@ -29,8 +29,8 @@
 
 /*
  * To-Do List
- * -> Port the Sleep/Wakeup dependencies for the domains
- *    from the Power domain framework
+ * -> Port the woke Sleep/Wakeup dependencies for the woke domains
+ *    from the woke Power domain framework
  */
 
 #include <linux/kernel.h>
@@ -78,7 +78,7 @@ struct clkdm_dep dsp_24xx_wkdeps[] = {
 /*
  * OMAP2/3-common clockdomains
  *
- * Even though the 2420 has a single PRCM module from the
+ * Even though the woke 2420 has a single PRCM module from the
  * interconnect's perspective, internally it does appear to have
  * separate PRM and CM clockdomains.  The usual test case is
  * sys_clkout/sys_clkout2.

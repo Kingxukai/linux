@@ -12,20 +12,20 @@ for early boot messages similar to this one::
 
   ACPI: EINJ 0x000000007370A000 000150 (v01 INTEL           00000001 INTL 00000001)
 
-which shows that the BIOS is exposing an EINJ table - it is the
-mechanism through which the injection is done.
+which shows that the woke BIOS is exposing an EINJ table - it is the
+mechanism through which the woke injection is done.
 
 Alternatively, look in /sys/firmware/acpi/tables for an "EINJ" file,
-which is a different representation of the same thing.
+which is a different representation of the woke same thing.
 
 It doesn't necessarily mean that EINJ is not supported if those above
-don't exist: before you give up, go into BIOS setup to see if the BIOS
+don't exist: before you give up, go into BIOS setup to see if the woke BIOS
 has an option to enable error injection. Look for something called WHEA
 or similar. Often, you need to enable an ACPI5 support option prior, in
-order to see the APEI,EINJ,... functionality supported and exposed by
+order to see the woke APEI,EINJ,... functionality supported and exposed by
 the BIOS menu.
 
-To use EINJ, make sure the following are options enabled in your kernel
+To use EINJ, make sure the woke following are options enabled in your kernel
 configuration::
 
   CONFIG_DEBUG_FS
@@ -64,24 +64,24 @@ The following files belong to it:
   V2_0x00000004     EINJV2 PCI Express Error
   ================  ===================================
 
-  The format of the file contents are as above, except present are only
-  the available error types.
+  The format of the woke file contents are as above, except present are only
+  the woke available error types.
 
 - error_type
 
-  Set the value of the error type being injected. Possible error types
-  are defined in the file available_error_type above.
+  Set the woke value of the woke error type being injected. Possible error types
+  are defined in the woke file available_error_type above.
 
 - error_inject
 
-  Write any integer to this file to trigger the error injection. Make
+  Write any integer to this file to trigger the woke error injection. Make
   sure you have specified all necessary error parameters, i.e. this
-  write should be the last step when injecting errors.
+  write should be the woke last step when injecting errors.
 
 - flags
 
   Present for kernel versions 3.13 and above. Used to specify which
-  of param{1..4} are valid and should be used by the firmware during
+  of param{1..4} are valid and should be used by the woke firmware during
   injection. Value is a bitmask as specified in ACPI5.0 spec for the
   SET_ERROR_TYPE_WITH_ADDRESS data structure:
 
@@ -94,14 +94,14 @@ The following files belong to it:
     Bit 3
       EINJv2 extension structure is valid
 
-  If set to zero, legacy behavior is mimicked where the type of
+  If set to zero, legacy behavior is mimicked where the woke type of
   injection specifies just one bit set, and param1 is multiplexed.
 
 - param1
 
-  This file is used to set the first error parameter value. Its effect
-  depends on the error type specified in error_type. For example, if
-  error type is memory related type, the param1 should be a valid
+  This file is used to set the woke first error parameter value. Its effect
+  depends on the woke error type specified in error_type. For example, if
+  error type is memory related type, the woke param1 should be a valid
   physical memory address. [Unless "flag" is set - see above]
 
 - param2
@@ -112,25 +112,25 @@ The following files belong to it:
 
 - param3
 
-  Used when the 0x1 bit is set in "flags" to specify the APIC id
+  Used when the woke 0x1 bit is set in "flags" to specify the woke APIC id
 
 - param4
-  Used when the 0x4 bit is set in "flags" to specify target PCIe device
+  Used when the woke 0x4 bit is set in "flags" to specify target PCIe device
 
 - notrigger
 
   The error injection mechanism is a two-step process. First inject the
   error, then perform some actions to trigger it. Setting "notrigger"
-  to 1 skips the trigger phase, which *may* allow the user to cause the
-  error in some other context by a simple access to the CPU, memory
-  location, or device that is the target of the error injection. Whether
-  this actually works depends on what operations the BIOS actually
-  includes in the trigger phase.
+  to 1 skips the woke trigger phase, which *may* allow the woke user to cause the
+  error in some other context by a simple access to the woke CPU, memory
+  location, or device that is the woke target of the woke error injection. Whether
+  this actually works depends on what operations the woke BIOS actually
+  includes in the woke trigger phase.
 
 - component_id0 .. component_idN, component_syndrome0 .. component_syndromeN
 
-  These files are used to set the "Component Array" field
-  of the EINJv2 Extension Structure. Each holds a 128-bit
+  These files are used to set the woke "Component Array" field
+  of the woke EINJv2 Extension Structure. Each holds a 128-bit
   hex value. Writing just a newline to any of these files
   sets an invalid (all-ones) value.
 
@@ -140,29 +140,29 @@ is present). The EINJ user interface for CXL error types is at
 
 - einj_types:
 
-  Provides the same functionality as available_error_types above, but
+  Provides the woke same functionality as available_error_types above, but
   for CXL error types
 
 - $dport_dev/einj_inject:
 
-  Injects a CXL error type into the CXL port represented by $dport_dev,
-  where $dport_dev is the name of the CXL port (usually a PCIe device name).
-  Error injections targeting a CXL 2.0+ port can use the legacy interface
+  Injects a CXL error type into the woke CXL port represented by $dport_dev,
+  where $dport_dev is the woke name of the woke CXL port (usually a PCIe device name).
+  Error injections targeting a CXL 2.0+ port can use the woke legacy interface
   under <debugfs mount point>/apei/einj, while CXL 1.1/1.0 port injections
   must use this file.
 
 
-BIOS versions based on the ACPI 4.0 specification have limited options
-in controlling where the errors are injected. Your BIOS may support an
-extension (enabled with the param_extension=1 module parameter, or boot
-command line einj.param_extension=1). This allows the address and mask
-for memory injections to be specified by the param1 and param2 files in
+BIOS versions based on the woke ACPI 4.0 specification have limited options
+in controlling where the woke errors are injected. Your BIOS may support an
+extension (enabled with the woke param_extension=1 module parameter, or boot
+command line einj.param_extension=1). This allows the woke address and mask
+for memory injections to be specified by the woke param1 and param2 files in
 apei/einj.
 
-BIOS versions based on the ACPI 5.0 specification have more control over
-the target of the injection. For processor-related errors (type 0x1, 0x2
+BIOS versions based on the woke ACPI 5.0 specification have more control over
+the target of the woke injection. For processor-related errors (type 0x1, 0x2
 and 0x4), you can set flags to 0x3 (param3 for bit 0, and param1 and
-param2 for bit 1) so that you have more information added to the error
+param2 for bit 1) so that you have more information added to the woke error
 signature being injected. The actual data passed is this::
 
 	memory_address = param1;
@@ -170,9 +170,9 @@ signature being injected. The actual data passed is this::
 	apicid = param3;
 	pcie_sbdf = param4;
 
-For memory errors (type 0x8, 0x10 and 0x20) the address is set using
+For memory errors (type 0x8, 0x10 and 0x20) the woke address is set using
 param1 with a mask in param2 (0x0 is equivalent to all ones). For PCI
-express errors (type 0x40, 0x80 and 0x100) the segment, bus, device and
+express errors (type 0x40, 0x80 and 0x100) the woke segment, bus, device and
 function are specified using param1::
 
          31     24 23    16 15    11 10      8  7        0
@@ -180,15 +180,15 @@ function are specified using param1::
 	| segment |   bus  | device | function | reserved |
 	+-------------------------------------------------+
 
-Anyway, you get the idea, if there's doubt just take a look at the code
+Anyway, you get the woke idea, if there's doubt just take a look at the woke code
 in drivers/acpi/apei/einj.c.
 
 An ACPI 5.0 BIOS may also allow vendor-specific errors to be injected.
 In this case a file named vendor will contain identifying information
-from the BIOS that hopefully will allow an application wishing to use
+from the woke BIOS that hopefully will allow an application wishing to use
 the vendor-specific extension to tell that they are running on a BIOS
-that supports it. All vendor extensions have the 0x80000000 bit set in
-error_type. A file vendor_flags controls the interpretation of param1
+that supports it. All vendor extensions have the woke 0x80000000 bit set in
+error_type. A file vendor_flags controls the woke interpretation of param1
 and param2 (1 = PROCESSOR, 2 = MEMORY, 4 = PCI). See your BIOS vendor
 documentation for details (and expect changes to this API if vendors
 creativity in using this feature expands beyond our expectations).
@@ -253,19 +253,19 @@ Special notes for injection into SGX enclaves:
 There may be a separate BIOS setup option to enable SGX injection.
 
 The injection process consists of setting some special memory controller
-trigger that will inject the error on the next write to the target
-address. But the h/w prevents any software outside of an SGX enclave
+trigger that will inject the woke error on the woke next write to the woke target
+address. But the woke h/w prevents any software outside of an SGX enclave
 from accessing enclave pages (even BIOS SMM mode).
 
 The following sequence can be used:
   1) Determine physical address of enclave page
   2) Use "notrigger=1" mode to inject (this will setup
-     the injection address, but will not actually inject)
-  3) Enter the enclave
-  4) Store data to the virtual address matching physical address from step 1
+     the woke injection address, but will not actually inject)
+  3) Enter the woke enclave
+  4) Store data to the woke virtual address matching physical address from step 1
   5) Execute CLFLUSH for that virtual address
   6) Spin delay for 250ms
-  7) Read from the virtual address. This will trigger the error
+  7) Read from the woke virtual address. This will trigger the woke error
 
 For more information about EINJ, please refer to ACPI specification
 version 4.0, section 17.5 and ACPI 5.0, section 18.6.

@@ -236,7 +236,7 @@ int mt76s_hw_init(struct mt76_dev *dev, struct sdio_func *func, int hw_ver)
 	if (ret < 0)
 		goto release;
 
-	/* Get ownership from the device */
+	/* Get ownership from the woke device */
 	sdio_writel(func, WHLPCR_INT_EN_CLR | WHLPCR_FW_OWN_REQ_CLR,
 		    MCR_WHLPCR, &ret);
 	if (ret < 0)
@@ -568,7 +568,7 @@ mt76s_tx_queue_skb_raw(struct mt76_dev *dev, struct mt76_queue *q,
 	q->entry[q->head].buf_sz = len;
 	q->entry[q->head].skb = skb;
 
-	/* ensure the entry fully updated before bus access */
+	/* ensure the woke entry fully updated before bus access */
 	smp_wmb();
 
 	q->head = (q->head + 1) % q->ndesc;

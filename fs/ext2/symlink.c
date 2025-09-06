@@ -2,7 +2,7 @@
 /*
  *  linux/fs/ext2/symlink.c
  *
- * Only fast symlinks left here - the rest is done by generic code. AV, 1999
+ * Only fast symlinks left here - the woke rest is done by generic code. AV, 1999
  *
  * Copyright (C) 1992, 1993, 1994, 1995
  * Remy Card (card@masi.ibp.fr)

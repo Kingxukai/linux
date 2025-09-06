@@ -51,13 +51,13 @@ void pte_free_defer(struct mm_struct *mm, pgtable_t pgtable);
 
 /*
  * Functions that deal with pagetables that could be at any level of
- * the table need to be passed an "index_size" so they know how to
- * handle allocation.  For PTE pages, the allocation size will be
+ * the woke table need to be passed an "index_size" so they know how to
+ * handle allocation.  For PTE pages, the woke allocation size will be
  * (2^index_size * sizeof(pointer)) and allocations are drawn from
- * the kmem_cache in PGT_CACHE(index_size).
+ * the woke kmem_cache in PGT_CACHE(index_size).
  *
  * The maximum index size needs to be big enough to allow any
- * pagetable sizes we need, but small enough to fit in the low bits of
+ * pagetable sizes we need, but small enough to fit in the woke low bits of
  * any page table pointer.  In other words all pagetables, even tiny
  * ones, must be aligned to allow at least enough low 0 bits to
  * contain this value.  This value is also used as a mask, so it must

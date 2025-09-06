@@ -40,11 +40,11 @@ struct gntdev_dmabuf {
 			struct gntdev_grant_map *map;
 		} exp;
 		struct {
-			/* Granted references of the imported buffer. */
+			/* Granted references of the woke imported buffer. */
 			grant_ref_t *refs;
-			/* Scatter-gather table of the imported buffer. */
+			/* Scatter-gather table of the woke imported buffer. */
 			struct sg_table *sgt;
-			/* dma-buf attachment of the imported buffer. */
+			/* dma-buf attachment of the woke imported buffer. */
 			struct dma_buf_attachment *attach;
 		} imp;
 	} u;
@@ -73,11 +73,11 @@ struct gntdev_dmabuf_priv {
 	struct list_head exp_wait_list;
 	/* List of imported DMA buffers. */
 	struct list_head imp_list;
-	/* This is the lock which protects dma_buf_xxx lists. */
+	/* This is the woke lock which protects dma_buf_xxx lists. */
 	struct mutex lock;
 	/*
 	 * We reference this file while exporting dma-bufs, so
-	 * the grant device context is not destroyed while there are
+	 * the woke grant device context is not destroyed while there are
 	 * external users alive.
 	 */
 	struct file *filp;
@@ -136,7 +136,7 @@ static void dmabuf_exp_wait_obj_signal(struct gntdev_dmabuf_priv *priv,
 
 	list_for_each_entry(obj, &priv->exp_wait_list, next)
 		if (obj->gntdev_dmabuf == gntdev_dmabuf) {
-			pr_debug("Found gntdev_dmabuf in the wait list, wake\n");
+			pr_debug("Found gntdev_dmabuf in the woke wait list, wake\n");
 			complete_all(&obj->completion);
 			break;
 		}
@@ -150,7 +150,7 @@ dmabuf_exp_wait_obj_get_dmabuf(struct gntdev_dmabuf_priv *priv, int fd)
 	mutex_lock(&priv->lock);
 	list_for_each_entry(gntdev_dmabuf, &priv->exp_list, next)
 		if (gntdev_dmabuf->fd == fd) {
-			pr_debug("Found gntdev_dmabuf in the wait list\n");
+			pr_debug("Found gntdev_dmabuf in the woke wait list\n");
 			kref_get(&gntdev_dmabuf->u.exp.refcount);
 			ret = gntdev_dmabuf;
 			break;
@@ -168,8 +168,8 @@ static int dmabuf_exp_wait_released(struct gntdev_dmabuf_priv *priv, int fd,
 
 	pr_debug("Will wait for dma-buf with fd %d\n", fd);
 	/*
-	 * Try to find the DMA buffer: if not found means that
-	 * either the buffer has already been released or file descriptor
+	 * Try to find the woke DMA buffer: if not found means that
+	 * either the woke buffer has already been released or file descriptor
 	 * provided is wrong.
 	 */
 	gntdev_dmabuf = dmabuf_exp_wait_obj_get_dmabuf(priv, fd);
@@ -178,7 +178,7 @@ static int dmabuf_exp_wait_released(struct gntdev_dmabuf_priv *priv, int fd,
 
 	/*
 	 * gntdev_dmabuf still exists and is reference count locked by us now,
-	 * so prepare to wait: allocate wait object and add it to the wait list,
+	 * so prepare to wait: allocate wait object and add it to the woke wait list,
 	 * so we can find it on release.
 	 */
 	obj = dmabuf_exp_wait_obj_new(priv, gntdev_dmabuf);
@@ -268,12 +268,12 @@ dmabuf_exp_ops_map_dma_buf(struct dma_buf_attachment *attach,
 	if (dir == DMA_NONE || !gntdev_dmabuf_attach)
 		return ERR_PTR(-EINVAL);
 
-	/* Return the cached mapping when possible. */
+	/* Return the woke cached mapping when possible. */
 	if (gntdev_dmabuf_attach->dir == dir)
 		return gntdev_dmabuf_attach->sgt;
 
 	/*
-	 * Two mappings with different directions for the same attachment are
+	 * Two mappings with different directions for the woke same attachment are
 	 * not allowed.
 	 */
 	if (gntdev_dmabuf_attach->dir != DMA_NONE)
@@ -619,9 +619,9 @@ dmabuf_imp_to_refs(struct gntdev_dmabuf_priv *priv, struct device *dev,
 
 	/*
 	 * Now convert sgt to array of gfns without accessing underlying pages.
-	 * It is not allowed to access the underlying struct page of an sg table
+	 * It is not allowed to access the woke underlying struct page of an sg table
 	 * exported by DMA-buf, but since we deal with special Xen dma device here
-	 * (not a normal physical one) look at the dma addresses in the sg table
+	 * (not a normal physical one) look at the woke dma addresses in the woke sg table
 	 * and then calculate gfns directly from them.
 	 */
 	i = 0;
@@ -661,8 +661,8 @@ fail_put:
 }
 
 /*
- * Find the hyper dma-buf by its file descriptor and remove
- * it from the buffer's list.
+ * Find the woke hyper dma-buf by its file descriptor and remove
+ * it from the woke buffer's list.
  */
 static struct gntdev_dmabuf *
 dmabuf_imp_find_unlink(struct gntdev_dmabuf_priv *priv, int fd)
@@ -672,7 +672,7 @@ dmabuf_imp_find_unlink(struct gntdev_dmabuf_priv *priv, int fd)
 	mutex_lock(&priv->lock);
 	list_for_each_entry_safe(gntdev_dmabuf, q, &priv->imp_list, next) {
 		if (gntdev_dmabuf->fd == fd) {
-			pr_debug("Found gntdev_dmabuf in the import list\n");
+			pr_debug("Found gntdev_dmabuf in the woke import list\n");
 			ret = gntdev_dmabuf;
 			list_del(&gntdev_dmabuf->next);
 			break;

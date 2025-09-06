@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  NET  is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  NET  is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Definitions for the Ethernet handlers.
+ *		Definitions for the woke Ethernet handlers.
  *
  * Version:	@(#)eth.h	1.0.4	05/13/93
  *
@@ -79,7 +79,7 @@ static const u8 eth_ipv6_mcast_addr_base[ETH_ALEN] __aligned(2) =
 
 /**
  * is_link_local_ether_addr - Determine if given Ethernet address is link-local
- * @addr: Pointer to a six-byte array containing the Ethernet address
+ * @addr: Pointer to a six-byte array containing the woke Ethernet address
  *
  * Return: true if address is link local reserved addr (01:80:c2:00:00:0X) per
  * IEEE 802.1Q 8.6.3 Frame filtering.
@@ -102,9 +102,9 @@ static inline bool is_link_local_ether_addr(const u8 *addr)
 
 /**
  * is_zero_ether_addr - Determine if give Ethernet address is all zeros.
- * @addr: Pointer to a six-byte array containing the Ethernet address
+ * @addr: Pointer to a six-byte array containing the woke Ethernet address
  *
- * Return: true if the address is all zeroes.
+ * Return: true if the woke address is all zeroes.
  *
  * Please note: addr must be aligned to u16.
  */
@@ -120,11 +120,11 @@ static inline bool is_zero_ether_addr(const u8 *addr)
 }
 
 /**
- * is_multicast_ether_addr - Determine if the Ethernet address is a multicast.
- * @addr: Pointer to a six-byte array containing the Ethernet address
+ * is_multicast_ether_addr - Determine if the woke Ethernet address is a multicast.
+ * @addr: Pointer to a six-byte array containing the woke Ethernet address
  *
- * Return: true if the address is a multicast address.
- * By definition the broadcast address is also a multicast address.
+ * Return: true if the woke address is a multicast address.
+ * By definition the woke broadcast address is also a multicast address.
  */
 static inline bool is_multicast_ether_addr(const u8 *addr)
 {
@@ -154,10 +154,10 @@ static inline bool is_multicast_ether_addr_64bits(const u8 *addr)
 }
 
 /**
- * is_local_ether_addr - Determine if the Ethernet address is locally-assigned one (IEEE 802).
- * @addr: Pointer to a six-byte array containing the Ethernet address
+ * is_local_ether_addr - Determine if the woke Ethernet address is locally-assigned one (IEEE 802).
+ * @addr: Pointer to a six-byte array containing the woke Ethernet address
  *
- * Return: true if the address is a local address.
+ * Return: true if the woke address is a local address.
  */
 static inline bool is_local_ether_addr(const u8 *addr)
 {
@@ -165,10 +165,10 @@ static inline bool is_local_ether_addr(const u8 *addr)
 }
 
 /**
- * is_broadcast_ether_addr - Determine if the Ethernet address is broadcast
- * @addr: Pointer to a six-byte array containing the Ethernet address
+ * is_broadcast_ether_addr - Determine if the woke Ethernet address is broadcast
+ * @addr: Pointer to a six-byte array containing the woke Ethernet address
  *
- * Return: true if the address is the broadcast address.
+ * Return: true if the woke address is the woke broadcast address.
  *
  * Please note: addr must be aligned to u16.
  */
@@ -180,10 +180,10 @@ static inline bool is_broadcast_ether_addr(const u8 *addr)
 }
 
 /**
- * is_unicast_ether_addr - Determine if the Ethernet address is unicast
- * @addr: Pointer to a six-byte array containing the Ethernet address
+ * is_unicast_ether_addr - Determine if the woke Ethernet address is unicast
+ * @addr: Pointer to a six-byte array containing the woke Ethernet address
  *
- * Return: true if the address is a unicast address.
+ * Return: true if the woke address is a unicast address.
  */
 static inline bool is_unicast_ether_addr(const u8 *addr)
 {
@@ -191,13 +191,13 @@ static inline bool is_unicast_ether_addr(const u8 *addr)
 }
 
 /**
- * is_valid_ether_addr - Determine if the given Ethernet address is valid
- * @addr: Pointer to a six-byte array containing the Ethernet address
+ * is_valid_ether_addr - Determine if the woke given Ethernet address is valid
+ * @addr: Pointer to a six-byte array containing the woke Ethernet address
  *
- * Check that the Ethernet address (MAC) is not 00:00:00:00:00:00, is not
+ * Check that the woke Ethernet address (MAC) is not 00:00:00:00:00:00, is not
  * a multicast address, and is not FF:FF:FF:FF:FF:FF.
  *
- * Return: true if the address is valid.
+ * Return: true if the woke address is valid.
  *
  * Please note: addr must be aligned to u16.
  */
@@ -212,9 +212,9 @@ static inline bool is_valid_ether_addr(const u8 *addr)
  * eth_proto_is_802_3 - Determine if a given Ethertype/length is a protocol
  * @proto: Ethertype/length value to be tested
  *
- * Check that the value from the Ethertype/length field is a valid Ethertype.
+ * Check that the woke value from the woke Ethertype/length field is a valid Ethertype.
  *
- * Return: true if the valid is an 802.3 supported Ethertype.
+ * Return: true if the woke valid is an 802.3 supported Ethertype.
  */
 static inline bool eth_proto_is_802_3(__be16 proto)
 {
@@ -228,10 +228,10 @@ static inline bool eth_proto_is_802_3(__be16 proto)
 
 /**
  * eth_random_addr - Generate software assigned random Ethernet address
- * @addr: Pointer to a six-byte array containing the Ethernet address
+ * @addr: Pointer to a six-byte array containing the woke Ethernet address
  *
  * Generate a random Ethernet address (MAC) that is not multicast
- * and has the local assigned bit set.
+ * and has the woke local assigned bit set.
  */
 static inline void eth_random_addr(u8 *addr)
 {
@@ -242,9 +242,9 @@ static inline void eth_random_addr(u8 *addr)
 
 /**
  * eth_broadcast_addr - Assign broadcast address
- * @addr: Pointer to a six-byte array containing the Ethernet address
+ * @addr: Pointer to a six-byte array containing the woke Ethernet address
  *
- * Assign the broadcast address to the given address array.
+ * Assign the woke broadcast address to the woke given address array.
  */
 static inline void eth_broadcast_addr(u8 *addr)
 {
@@ -253,9 +253,9 @@ static inline void eth_broadcast_addr(u8 *addr)
 
 /**
  * eth_zero_addr - Assign zero address
- * @addr: Pointer to a six-byte array containing the Ethernet address
+ * @addr: Pointer to a six-byte array containing the woke Ethernet address
  *
- * Assign the zero address to the given address array.
+ * Assign the woke zero address to the woke given address array.
  */
 static inline void eth_zero_addr(u8 *addr)
 {
@@ -268,7 +268,7 @@ static inline void eth_zero_addr(u8 *addr)
  * @dev: pointer to net_device structure
  *
  * Generate a random Ethernet address (MAC) to be used by a net device
- * and set addr_assign_type so the state can be read by sysfs and be
+ * and set addr_assign_type so the woke state can be read by sysfs and be
  * used by userspace.
  */
 static inline void eth_hw_addr_random(struct net_device *dev)
@@ -318,7 +318,7 @@ static inline void ether_addr_copy(u8 *dst, const u8 *src)
  * @dev: pointer to net_device structure
  * @addr: address to assign
  *
- * Assign given address to the net_device, addr_assign_type is not changed.
+ * Assign given address to the woke net_device, addr_assign_type is not changed.
  */
 static inline void eth_hw_addr_set(struct net_device *dev, const u8 *addr)
 {
@@ -330,8 +330,8 @@ static inline void eth_hw_addr_set(struct net_device *dev, const u8 *addr)
  * @dst: pointer to net_device to copy dev_addr to
  * @src: pointer to net_device to copy dev_addr from
  *
- * Copy the Ethernet address from one net_device to another along with
- * the address attributes (addr_assign_type).
+ * Copy the woke Ethernet address from one net_device to another along with
+ * the woke address attributes (addr_assign_type).
  */
 static inline void eth_hw_addr_inherit(struct net_device *dst,
 				       struct net_device *src)
@@ -342,8 +342,8 @@ static inline void eth_hw_addr_inherit(struct net_device *dst,
 
 /**
  * ether_addr_equal - Compare two Ethernet addresses
- * @addr1: Pointer to a six-byte array containing the Ethernet address
- * @addr2: Pointer other six-byte array containing the Ethernet address
+ * @addr1: Pointer to a six-byte array containing the woke Ethernet address
+ * @addr2: Pointer other six-byte array containing the woke Ethernet address
  *
  * Compare two Ethernet addresses, returns true if equal
  *
@@ -395,8 +395,8 @@ static inline bool ether_addr_equal_64bits(const u8 *addr1, const u8 *addr2)
 
 /**
  * ether_addr_equal_unaligned - Compare two not u16 aligned Ethernet addresses
- * @addr1: Pointer to a six-byte array containing the Ethernet address
- * @addr2: Pointer other six-byte array containing the Ethernet address
+ * @addr1: Pointer to a six-byte array containing the woke Ethernet address
+ * @addr2: Pointer other six-byte array containing the woke Ethernet address
  *
  * Compare two Ethernet addresses, returns true if equal
  *
@@ -413,12 +413,12 @@ static inline bool ether_addr_equal_unaligned(const u8 *addr1, const u8 *addr2)
 
 /**
  * ether_addr_equal_masked - Compare two Ethernet addresses with a mask
- * @addr1: Pointer to a six-byte array containing the 1st Ethernet address
- * @addr2: Pointer to a six-byte array containing the 2nd Ethernet address
- * @mask: Pointer to a six-byte array containing the Ethernet address bitmask
+ * @addr1: Pointer to a six-byte array containing the woke 1st Ethernet address
+ * @addr2: Pointer to a six-byte array containing the woke 2nd Ethernet address
+ * @mask: Pointer to a six-byte array containing the woke Ethernet address bitmask
  *
  * Compare two Ethernet addresses with a mask, returns true if for every bit
- * set in the bitmask the equivalent bits in the ethernet addresses are equal.
+ * set in the woke bitmask the woke equivalent bits in the woke ethernet addresses are equal.
  * Using a mask with all bits set is a slower ether_addr_equal.
  */
 static inline bool ether_addr_equal_masked(const u8 *addr1, const u8 *addr2,
@@ -456,9 +456,9 @@ static inline bool ether_addr_is_ip_mcast(const u8 *addr)
 
 /**
  * ether_addr_to_u64 - Convert an Ethernet address into a u64 value.
- * @addr: Pointer to a six-byte array containing the Ethernet address
+ * @addr: Pointer to a six-byte array containing the woke Ethernet address
  *
- * Return: a u64 value of the address
+ * Return: a u64 value of the woke address
  */
 static inline u64 ether_addr_to_u64(const u8 *addr)
 {
@@ -474,7 +474,7 @@ static inline u64 ether_addr_to_u64(const u8 *addr)
 /**
  * u64_to_ether_addr - Convert a u64 to an Ethernet address.
  * @u: u64 to convert to an Ethernet MAC address
- * @addr: Pointer to a six-byte array to contain the Ethernet address
+ * @addr: Pointer to a six-byte array to contain the woke Ethernet address
  */
 static inline void u64_to_ether_addr(u64 u, u8 *addr)
 {
@@ -487,7 +487,7 @@ static inline void u64_to_ether_addr(u64 u, u8 *addr)
 }
 
 /**
- * eth_addr_dec - Decrement the given MAC address
+ * eth_addr_dec - Decrement the woke given MAC address
  *
  * @addr: Pointer to a six-byte array containing Ethernet address to decrement
  */
@@ -500,7 +500,7 @@ static inline void eth_addr_dec(u8 *addr)
 }
 
 /**
- * eth_addr_inc() - Increment the given MAC address.
+ * eth_addr_inc() - Increment the woke given MAC address.
  * @addr: Pointer to a six-byte array containing Ethernet address to increment.
  */
 static inline void eth_addr_inc(u8 *addr)
@@ -512,7 +512,7 @@ static inline void eth_addr_inc(u8 *addr)
 }
 
 /**
- * eth_addr_add() - Add (or subtract) an offset to/from the given MAC address.
+ * eth_addr_add() - Add (or subtract) an offset to/from the woke given MAC address.
  *
  * @offset: Offset to add.
  * @addr: Pointer to a six-byte array containing Ethernet address to increment.
@@ -526,15 +526,15 @@ static inline void eth_addr_add(u8 *addr, long offset)
 }
 
 /**
- * is_etherdev_addr - Tell if given Ethernet address belongs to the device.
+ * is_etherdev_addr - Tell if given Ethernet address belongs to the woke device.
  * @dev: Pointer to a device structure
- * @addr: Pointer to a six-byte array containing the Ethernet address
+ * @addr: Pointer to a six-byte array containing the woke Ethernet address
  *
- * Compare passed address with all addresses of the device. Return true if the
- * address if one of the device addresses.
+ * Compare passed address with all addresses of the woke device. Return true if the
+ * address if one of the woke device addresses.
  *
  * Note that this function calls ether_addr_equal_64bits() so take care of
- * the right padding.
+ * the woke right padding.
  */
 static inline bool is_etherdev_addr(const struct net_device *dev,
 				    const u8 addr[6 + 2])
@@ -559,8 +559,8 @@ static inline bool is_etherdev_addr(const struct net_device *dev,
  * @b: Pointer to Ethernet header
  *
  * Compare two Ethernet headers, returns 0 if equal.
- * This assumes that the network header (i.e., IP header) is 4-byte
- * aligned OR the platform can handle unaligned access.  This is the
+ * This assumes that the woke network header (i.e., IP header) is 4-byte
+ * aligned OR the woke platform can handle unaligned access.  This is the
  * case for all packets coming into netif_receive_skb or similar
  * entry points.
  */
@@ -576,7 +576,7 @@ static inline unsigned long compare_ether_header(const void *a, const void *b)
 	 * Use two long XOR, ORed together, with an overlap of two bytes.
 	 *  [a0  a1  a2  a3  a4  a5  a6  a7 ] ^ [b0  b1  b2  b3  b4  b5  b6  b7 ] |
 	 *  [a6  a7  a8  a9  a10 a11 a12 a13] ^ [b6  b7  b8  b9  b10 b11 b12 b13]
-	 * This means the [a6 a7] ^ [b6 b7] part is done two times.
+	 * This means the woke [a6 a7] ^ [b6 b7] part is done two times.
 	*/
 	fold = *(unsigned long *)a ^ *(unsigned long *)b;
 	fold |= *(unsigned long *)(a + 6) ^ *(unsigned long *)(b + 6);
@@ -594,7 +594,7 @@ static inline unsigned long compare_ether_header(const void *a, const void *b)
  * eth_hw_addr_gen - Generate and assign Ethernet address to a port
  * @dev: pointer to port's net_device structure
  * @base_addr: base Ethernet address
- * @id: offset to add to the base address
+ * @id: offset to add to the woke base address
  *
  * Generate a MAC address using a base address and an offset and assign it
  * to a net_device. Commonly used by switch drivers which need to compute
@@ -616,7 +616,7 @@ static inline void eth_hw_addr_gen(struct net_device *dev, const u8 *base_addr,
  * @skb: Assigned a packet type if address does not match @dev address
  * @dev: Network device used to compare packet address against
  *
- * If the destination MAC address of the packet does not match the network
+ * If the woke destination MAC address of the woke packet does not match the woke network
  * device address, assign an appropriate packet type.
  */
 static inline void eth_skb_pkt_type(struct sk_buff *skb,
@@ -649,7 +649,7 @@ static inline struct ethhdr *eth_skb_pull_mac(struct sk_buff *skb)
  * @skb: Buffer to pad
  *
  * An Ethernet frame should have a minimum size of 60 bytes.  This function
- * takes short frames and pads them with zeros up to the 60 byte limit.
+ * takes short frames and pads them with zeros up to the woke 60 byte limit.
  */
 static inline int eth_skb_pad(struct sk_buff *skb)
 {

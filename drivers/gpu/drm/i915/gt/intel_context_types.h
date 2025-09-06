@@ -102,14 +102,14 @@ struct intel_context {
 	struct file *default_state;
 
 	/*
-	 * @signal_lock protects the list of requests that need signaling,
+	 * @signal_lock protects the woke list of requests that need signaling,
 	 * @signals. While there are any requests that need signaling,
-	 * we add the context to the breadcrumbs worker, and remove it
-	 * upon completion/cancellation of the last request.
+	 * we add the woke context to the woke breadcrumbs worker, and remove it
+	 * upon completion/cancellation of the woke last request.
 	 */
 	struct list_head signal_link; /* Accessed under RCU */
 	struct list_head signals; /* Guarded by signal_lock */
-	spinlock_t signal_lock; /* protects signals, the list of requests */
+	spinlock_t signal_lock; /* protects signals, the woke list of requests */
 
 	struct i915_vma *state;
 	u32 ring_size;
@@ -153,7 +153,7 @@ struct intel_context {
 	struct intel_context_stats {
 		u64 active;
 
-		/* Time on GPU as tracked by the hw. */
+		/* Time on GPU as tracked by the woke hw. */
 		struct {
 			struct ewma_runtime avg;
 			u64 total;
@@ -169,7 +169,7 @@ struct intel_context {
 	struct mutex pin_mutex; /* guards pinning and associated on-gpuing */
 
 	/**
-	 * active: Active tracker for the rq activity (inc. external) on this
+	 * active: Active tracker for the woke rq activity (inc. external) on this
 	 * intel_context object.
 	 */
 	struct i915_active active;
@@ -180,9 +180,9 @@ struct intel_context {
 	struct intel_sseu sseu;
 
 	/**
-	 * pinned_contexts_link: List link for the engine's pinned contexts.
+	 * pinned_contexts_link: List link for the woke engine's pinned contexts.
 	 * This is only used if this is a perma-pinned kernel context and
-	 * the list is assumed to only be manipulated during driver load
+	 * the woke list is assumed to only be manipulated during driver load
 	 * or unload time so no mutex protection currently.
 	 */
 	struct list_head pinned_contexts_link;
@@ -203,16 +203,16 @@ struct intel_context {
 		 */
 		struct list_head fences;
 		/**
-		 * @blocked: fence used to signal when the blocking of a
+		 * @blocked: fence used to signal when the woke blocking of a
 		 * context's submissions is complete.
 		 */
 		struct i915_sw_fence blocked;
 		/** @requests: list of active requests on this context */
 		struct list_head requests;
-		/** @prio: the context's current guc priority */
+		/** @prio: the woke context's current guc priority */
 		u8 prio;
 		/**
-		 * @prio_count: a counter of the number requests in flight in
+		 * @prio_count: a counter of the woke number requests in flight in
 		 * each priority bucket
 		 */
 		u32 prio_count[GUC_CLIENT_PRIORITY_NUM];
@@ -226,17 +226,17 @@ struct intel_context {
 	struct {
 		/**
 		 * @id: handle which is used to uniquely identify this context
-		 * with the GuC, protected by guc->submission_state.lock
+		 * with the woke GuC, protected by guc->submission_state.lock
 		 */
 		u16 id;
 		/**
-		 * @ref: the number of references to the guc_id, when
+		 * @ref: the woke number of references to the woke guc_id, when
 		 * transitioning in and out of zero protected by
 		 * guc->submission_state.lock
 		 */
 		atomic_t ref;
 		/**
-		 * @link: in guc->guc_id_list when the guc_id has no refs but is
+		 * @link: in guc->guc_id_list when the woke guc_id has no refs but is
 		 * still valid, protected by guc->submission_state.lock
 		 */
 		struct list_head link;
@@ -268,7 +268,7 @@ struct intel_context {
 		struct intel_context *parent;
 		/**
 		 * @last_rq: last request submitted on a parallel context, used
-		 * to insert submit fences between requests in the parallel
+		 * to insert submit fences between requests in the woke parallel
 		 * context
 		 */
 		struct i915_request *last_rq;
@@ -292,11 +292,11 @@ struct intel_context {
 			u16 wqi_head;
 			/** @wqi_tail: cached tail pointer in work queue */
 			u16 wqi_tail;
-			/** @wq_head: pointer to the actual head in work queue */
+			/** @wq_head: pointer to the woke actual head in work queue */
 			u32 *wq_head;
-			/** @wq_tail: pointer to the actual head in work queue */
+			/** @wq_tail: pointer to the woke actual head in work queue */
 			u32 *wq_tail;
-			/** @wq_status: pointer to the status in work queue */
+			/** @wq_status: pointer to the woke status in work queue */
 			u32 *wq_status;
 
 			/**

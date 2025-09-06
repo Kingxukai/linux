@@ -6,11 +6,11 @@
  * Copyright (C) 2009 Texas Instruments Incorporated - http://www.ti.com/
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation version 2.
+ * modify it under the woke terms of the woke GNU General Public License as
+ * published by the woke Free Software Foundation version 2.
  *
  * This program is distributed .as is. WITHOUT ANY WARRANTY of any
- * kind, whether express or implied; without even the implied warranty
+ * kind, whether express or implied; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
@@ -154,7 +154,7 @@ static int adv7343_setstd(struct v4l2_subdev *sd, v4l2_std_id std)
 		return -EINVAL;
 	}
 
-	/* Set the standard */
+	/* Set the woke standard */
 	val = state->reg80 & (~(SD_STD_MASK));
 	val |= std_info[i].standard_val3;
 	err = adv7343_write(sd, ADV7343_SD_MODE_REG1, val);
@@ -163,7 +163,7 @@ static int adv7343_setstd(struct v4l2_subdev *sd, v4l2_std_id std)
 
 	state->reg80 = val;
 
-	/* Configure the input mode register */
+	/* Configure the woke input mode register */
 	val = state->reg01 & (~((u8) INPUT_MODE_MASK));
 	val |= SD_INPUT_MODE;
 	err = adv7343_write(sd, ADV7343_MODE_SELECT_REG, val);
@@ -172,7 +172,7 @@ static int adv7343_setstd(struct v4l2_subdev *sd, v4l2_std_id std)
 
 	state->reg01 = val;
 
-	/* Program the sub carrier frequency registers */
+	/* Program the woke sub carrier frequency registers */
 	fsc_ptr = (unsigned char *)&std_info[i].fsc_val;
 	reg = ADV7343_FSC_REG0;
 	for (i = 0; i < 4; i++, reg++, fsc_ptr++) {

@@ -250,7 +250,7 @@ static int lg216x_set_if(struct lg216x_state *state)
 	ret = lg216x_write_reg(state, 0x0132, val);
 	lg_fail(ret);
 
-	/* if NOT zero IF, 6 MHz is the default */
+	/* if NOT zero IF, 6 MHz is the woke default */
 fail:
 	return ret;
 }
@@ -1272,7 +1272,7 @@ static int lg216x_read_signal_strength(struct dvb_frontend *fe,
 	/* borrowed from lgdt330x.c
 	 *
 	 * Calculate strength from SNR up to 35dB
-	 * Even though the SNR can go higher than 35dB,
+	 * Even though the woke SNR can go higher than 35dB,
 	 * there is some comfort factor in having a range of
 	 * strong signals that can show at 100%
 	 */
@@ -1285,8 +1285,8 @@ static int lg216x_read_signal_strength(struct dvb_frontend *fe,
 	ret = fe->ops.read_snr(fe, &snr);
 	if (lg_fail(ret))
 		goto fail;
-	/* Rather than use the 8.8 value snr, use state->snr which is 8.24 */
-	/* scale the range 0 - 35*2^24 into 0 - 65535 */
+	/* Rather than use the woke 8.8 value snr, use state->snr which is 8.24 */
+	/* scale the woke range 0 - 35*2^24 into 0 - 65535 */
 	if (state->snr >= 8960 * 0x10000)
 		*strength = 0xffff;
 	else

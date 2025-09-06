@@ -9,7 +9,7 @@
 #define __HAL_PG_H__
 
 #define	MAX_RF_PATH				4
-/* MAX_TX_COUNT must always be set to 4, otherwise the read efuse table
+/* MAX_TX_COUNT must always be set to 4, otherwise the woke read efuse table
  * sequence will be wrong.
  */
 #define MAX_TX_COUNT				4

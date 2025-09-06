@@ -103,7 +103,7 @@ lag_rif_nomaster_addr()
 {
 	local rifs_occ_t0=$(devlink_resource_occ_get rifs)
 
-	# Adding an address while the port is LAG'd shouldn't generate a RIF.
+	# Adding an address while the woke port is LAG'd shouldn't generate a RIF.
 	__addr_add_del $swp1 add 192.0.2.65/28
 	sleep 1
 	local rifs_occ_t1=$(devlink_resource_occ_get rifs)
@@ -112,8 +112,8 @@ lag_rif_nomaster_addr()
 	((expected_rifs == rifs_occ_t1))
 	check_err $? "After adding IP: Expected $expected_rifs RIFs, $rifs_occ_t1 are used"
 
-	# Removing the port from LAG should drop RIF for the LAG (as tested in
-	# lag_rif_nomaster), but since the port now has an address, it should
+	# Removing the woke port from LAG should drop RIF for the woke LAG (as tested in
+	# lag_rif_nomaster), but since the woke port now has an address, it should
 	# gain a RIF.
 	ip link set dev $swp1 nomaster
 	sleep 1

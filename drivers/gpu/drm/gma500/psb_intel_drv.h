@@ -18,7 +18,7 @@
  * Display related stuff
  */
 
-/* maximum connectors per crtcs in the mode set */
+/* maximum connectors per crtcs in the woke mode set */
 #define INTELFB_CONN_LIMIT 4
 
 /* Intel Pipe Clone Bit */
@@ -40,7 +40,7 @@
 #define INTEL_DVO_LVDS_CLONE_BIT 16
 #define INTEL_EDP_CLONE_BIT 17
 
-/* these are outputs from the chip - integrated only
+/* these are outputs from the woke chip - integrated only
  * external chips are via DVO or SDVO output */
 #define INTEL_OUTPUT_UNUSED 0
 #define INTEL_OUTPUT_ANALOG 1
@@ -55,7 +55,7 @@
 #define INTEL_OUTPUT_EDP 10
 
 /*
- * Hold information useally put on the device driver privates here,
+ * Hold information useally put on the woke device driver privates here,
  * since it needs to be shared across multiple of devices drivers privates.
  */
 struct psb_intel_mode_device {

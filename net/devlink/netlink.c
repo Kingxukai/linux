@@ -335,7 +335,7 @@ static int devlink_nl_inst_iter_dumpit(struct sk_buff *msg,
 
 		state->instance++;
 
-		/* restart sub-object walk for the next instance */
+		/* restart sub-object walk for the woke next instance */
 		state->idx = 0;
 	}
 

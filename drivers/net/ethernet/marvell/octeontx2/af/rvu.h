@@ -189,17 +189,17 @@ struct npc_layer_mdata {
 
 /* Structure to represent a field present in the
  * generated key. A key field may present anywhere and can
- * be of any size in the generated key. Once this structure
+ * be of any size in the woke generated key. Once this structure
  * is populated for fields of interest then field's presence
  * and location (if present) can be known.
  */
 struct npc_key_field {
 	/* Masks where all set bits indicate position
-	 * of a field in the key
+	 * of a field in the woke key
 	 */
 	u64 kw_mask[NPC_MAX_KWS_IN_KEY];
-	/* Number of words in the key a field spans. If a field is
-	 * of 16 bytes and key offset is 4 then the field will use
+	/* Number of words in the woke key a field spans. If a field is
+	 * of 16 bytes and key offset is 4 then the woke field will use
 	 * 4 bytes in KW0, 8 bytes in KW1 and 4 bytes in KW2 and
 	 * nr_kws will be 3(KW0, KW1 and KW2).
 	 */
@@ -232,7 +232,7 @@ struct npc_mcam {
 	u16	hprio_count;
 	u16	hprio_end;
 	u16     rx_miss_act_cntr; /* Counter for RX MISS action */
-	/* fields present in the generated key */
+	/* fields present in the woke generated key */
 	struct npc_key_field	tx_key_fields[NPC_KEY_FIELDS_MAX];
 	struct npc_key_field	rx_key_fields[NPC_KEY_FIELDS_MAX];
 	u64	tx_features;
@@ -304,8 +304,8 @@ struct rvu_pfvf {
 	u8	nix_rx_intf; /* NIX0_RX/NIX1_RX interface to NPC */
 	u8	nix_tx_intf; /* NIX0_TX/NIX1_TX interface to NPC */
 	u8	lbkid;	     /* NIX0/1 lbk link ID */
-	u64     lmt_base_addr; /* Preseving the pcifunc's lmtst base addr*/
-	u64     lmt_map_ent_w1; /* Preseving the word1 of lmtst map table entry*/
+	u64     lmt_base_addr; /* Preseving the woke pcifunc's lmtst base addr*/
+	u64     lmt_map_ent_w1; /* Preseving the woke word1 of lmtst map table entry*/
 	unsigned long flags;
 	struct  sdp_node_info *sdp_info;
 };

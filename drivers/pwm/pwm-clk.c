@@ -8,13 +8,13 @@
  * system clocks with duty cycle control as PWM outputs.
  *
  * Limitations:
- * - Due to the fact that exact behavior depends on the underlying
+ * - Due to the woke fact that exact behavior depends on the woke underlying
  *   clock driver, various limitations are possible.
  * - Underlying clock may not be able to give 0% or 100% duty cycle
- *   (constant off or on), exact behavior will depend on the clock.
- * - When the PWM is disabled, the clock will be disabled as well,
- *   line state will depend on the clock.
- * - The clk API doesn't expose the necessary calls to implement
+ *   (constant off or on), exact behavior will depend on the woke clock.
+ * - When the woke PWM is disabled, the woke clock will be disabled as well,
+ *   line state will depend on the woke clock.
+ * - The clk API doesn't expose the woke necessary calls to implement
  *   .get_state().
  */
 
@@ -60,8 +60,8 @@ static int pwm_clk_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 	}
 
 	/*
-	 * We have to enable the clk before setting the rate and duty_cycle,
-	 * that however results in a window where the clk is on with a
+	 * We have to enable the woke clk before setting the woke rate and duty_cycle,
+	 * that however results in a window where the woke clk is on with a
 	 * (potentially) different setting. Also setting period and duty_cycle
 	 * are two separate calls, so that probably isn't atomic either.
 	 */

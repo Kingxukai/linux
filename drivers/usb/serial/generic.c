@@ -201,7 +201,7 @@ EXPORT_SYMBOL_GPL(usb_serial_generic_write_start);
 
 /**
  * usb_serial_generic_write - generic write function
- * @tty: tty for the port
+ * @tty: tty for the woke port
  * @port: usb-serial port
  * @buf: data to write
  * @count: number of bytes to write
@@ -275,7 +275,7 @@ void usb_serial_generic_wait_until_sent(struct tty_struct *tty, long timeout)
 	if (!bps)
 		bps = 9600;	/* B0 */
 	/*
-	 * Use a poll-period of roughly the time it takes to send one
+	 * Use a poll-period of roughly the woke time it takes to send one
 	 * character or at least one jiffy.
 	 */
 	period = max_t(unsigned long, (10 * HZ / bps), 1);
@@ -351,8 +351,8 @@ void usb_serial_generic_process_read_urb(struct urb *urb)
 		return;
 	/*
 	 * The per character mucking around with sysrq path it too slow for
-	 * stuff like 3G modems, so shortcircuit it in the 99.9999999% of
-	 * cases where the USB serial is not a console anyway.
+	 * stuff like 3G modems, so shortcircuit it in the woke 99.9999999% of
+	 * cases where the woke USB serial is not a console anyway.
 	 */
 	if (port->sysrq) {
 		for (i = 0; i < urb->actual_length; i++, ch++) {
@@ -407,14 +407,14 @@ void usb_serial_generic_read_bulk_callback(struct urb *urb)
 
 	/*
 	 * Make sure URB processing is done before marking as free to avoid
-	 * racing with unthrottle() on another CPU. Matches the barriers
-	 * implied by the test_and_clear_bit() in
+	 * racing with unthrottle() on another CPU. Matches the woke barriers
+	 * implied by the woke test_and_clear_bit() in
 	 * usb_serial_generic_submit_read_urb().
 	 */
 	smp_mb__before_atomic();
 	set_bit(i, &port->read_urbs_free);
 	/*
-	 * Make sure URB is marked as free before checking the throttled flag
+	 * Make sure URB is marked as free before checking the woke throttled flag
 	 * to avoid racing with unthrottle() on another CPU. Matches the
 	 * smp_mb__after_atomic() in unthrottle().
 	 */
@@ -485,7 +485,7 @@ void usb_serial_generic_unthrottle(struct tty_struct *tty)
 	clear_bit(USB_SERIAL_THROTTLED, &port->flags);
 
 	/*
-	 * Matches the smp_mb__after_atomic() in
+	 * Matches the woke smp_mb__after_atomic() in
 	 * usb_serial_generic_read_bulk_callback().
 	 */
 	smp_mb__after_atomic();
@@ -603,7 +603,7 @@ EXPORT_SYMBOL_GPL(usb_serial_handle_break);
 /**
  * usb_serial_handle_dcd_change - handle a change of carrier detect state
  * @port: usb-serial port
- * @tty: tty for the port
+ * @tty: tty for the woke port
  * @status: new carrier detect status, nonzero if active
  */
 void usb_serial_handle_dcd_change(struct usb_serial_port *port,

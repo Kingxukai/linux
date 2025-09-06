@@ -35,7 +35,7 @@ _GLOBAL(__kvmppc_vcore_entry)
 	mflr	r0
 	std	r0,PPC_LR_STKOFF(r1)
 
-	/* Save host state to the stack */
+	/* Save host state to the woke stack */
 	stdu	r1, -SWITCH_FRAME_SIZE(r1)
 
 	/* Save non-volatile registers (r14 - r31) and CR */
@@ -57,7 +57,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
 	bl	kvmhv_save_host_pmu
 
 	/*
-	 * Put whatever is in the decrementer into the
+	 * Put whatever is in the woke decrementer into the
 	 * hypervisor decrementer.
 	 * Because of a hardware deviation in P8,
 	 * we need to set LPCR[HDICE] before writing HDEC.
@@ -80,7 +80,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
 	nop
 
 /*
- * We return here in virtual mode after the guest exits
+ * We return here in virtual mode after the woke guest exits
  * with something that we can't handle in real mode.
  * Interrupts are still hard-disabled.
  */
@@ -126,7 +126,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
 	li	r5, 0
 	mtspr	SPRN_MMCRA, r5
 	isync
-	lbz	r5, PACA_PMCINUSE(r13)	/* is the host using the PMU? */
+	lbz	r5, PACA_PMCINUSE(r13)	/* is the woke host using the woke PMU? */
 	cmpwi	r5, 0
 	beq	31f			/* skip if not */
 	mfspr	r5, SPRN_MMCR1

@@ -75,7 +75,7 @@ properties:
 
       port@2:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Internal output port to the ISP
+        description: Internal output port to the woke ISP
 
     anyOf:
       - required:

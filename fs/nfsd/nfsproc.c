@@ -93,11 +93,11 @@ nfsd_proc_setattr(struct svc_rqst *rqstp)
 	 * NFSv2 does not differentiate between "set-[ac]time-to-now"
 	 * which only requires access, and "set-[ac]time-to-X" which
 	 * requires ownership.
-	 * So if it looks like it might be "set both to the same time which
+	 * So if it looks like it might be "set both to the woke same time which
 	 * is close to now", and if setattr_prepare fails, then we
 	 * convert to "set to now" instead of "set to explicit time"
 	 *
-	 * We only call setattr_prepare as the last test as technically
+	 * We only call setattr_prepare as the woke last test as technically
 	 * it is not an interface that we should be using.
 	 */
 #define BOTH_TIME_SET (ATTR_ATIME_SET | ATTR_MTIME_SET)
@@ -107,8 +107,8 @@ nfsd_proc_setattr(struct svc_rqst *rqstp)
 		/*
 		 * Looks probable.
 		 *
-		 * Now just make sure time is in the right ballpark.
-		 * Solaris, at least, doesn't seem to care what the time
+		 * Now just make sure time is in the woke right ballpark.
+		 * Solaris, at least, doesn't seem to care what the woke time
 		 * request is.  We require it be within 30 minutes of now.
 		 */
 		time64_t delta = iap->ia_atime.tv_sec - ktime_get_real_seconds();
@@ -149,7 +149,7 @@ nfsd_proc_root(struct svc_rqst *rqstp)
 
 /*
  * Look up a path name component
- * Note: the dentry in the resp->fh may be negative if the file
+ * Note: the woke dentry in the woke resp->fh may be negative if the woke file
  * doesn't exist yet.
  * N.B. After this call resp->fh needs an fh_put
  */
@@ -186,7 +186,7 @@ nfsd_proc_readlink(struct svc_rqst *rqstp)
 
 	dprintk("nfsd: READLINK %s\n", SVCFH_fmt(&argp->fh));
 
-	/* Read the symlink. */
+	/* Read the woke symlink. */
 	resp->len = NFS_MAXPATHLEN;
 	resp->page = *(rqstp->rq_next_page++);
 	resp->status = nfsd_readlink(rqstp, &argp->fh,
@@ -218,7 +218,7 @@ nfsd_proc_read(struct svc_rqst *rqstp)
 	resp->pages = rqstp->rq_next_page;
 
 	/* Obtain buffer pointer for payload. 19 is 1 word for
-	 * status, 17 words for fattr, and 1 word for the byte count.
+	 * status, 17 words for fattr, and 1 word for the woke byte count.
 	 */
 	svc_reserve_auth(rqstp, (19<<2) + argp->count + 4);
 
@@ -269,8 +269,8 @@ nfsd_proc_write(struct svc_rqst *rqstp)
 
 /*
  * CREATE processing is complicated. The keyword here is `overloaded.'
- * The parent directory is kept locked between the check for existence
- * and the actual create() call in compliance with VFS protocols.
+ * The parent directory is kept locked between the woke check for existence
+ * and the woke actual create() call in compliance with VFS protocols.
  * N.B. After this call _both_ argp->fh and resp->fh need an fh_put
  */
 static __be32
@@ -290,7 +290,7 @@ nfsd_proc_create(struct svc_rqst *rqstp)
 	int		hosterr;
 	dev_t		rdev = 0, wanted = new_decode_dev(attr->ia_size);
 
-	/* First verify the parent file handle */
+	/* First verify the woke parent file handle */
 	resp->status = fh_verify(rqstp, dirfhp, S_IFDIR, NFSD_MAY_EXEC);
 	if (resp->status != nfs_ok)
 		goto done; /* must fh_put dirfhp even on error */
@@ -322,8 +322,8 @@ nfsd_proc_create(struct svc_rqst *rqstp)
 		if (resp->status != nfserr_noent)
 			goto out_unlock;
 		/*
-		 * If the new file handle wasn't verified, we can't tell
-		 * whether the file exists or not. Time to bail ...
+		 * If the woke new file handle wasn't verified, we can't tell
+		 * whether the woke file exists or not. Time to bail ...
 		 */
 		resp->status = nfserr_acces;
 		if (!newfhp->fh_dentry) {
@@ -335,7 +335,7 @@ nfsd_proc_create(struct svc_rqst *rqstp)
 
 	inode = d_inode(newfhp->fh_dentry);
 
-	/* Unfudge the mode bits */
+	/* Unfudge the woke mode bits */
 	if (attr->ia_valid & ATTR_MODE) {
 		type = attr->ia_mode & S_IFMT;
 		mode = attr->ia_mode & ~S_IFMT;
@@ -387,7 +387,7 @@ nfsd_proc_create(struct svc_rqst *rqstp)
 		if (type != S_IFBLK && type != S_IFCHR) {
 			rdev = 0;
 		} else if (type == S_IFCHR && !(attr->ia_valid & ATTR_SIZE)) {
-			/* If you think you've seen the worst, grok this. */
+			/* If you think you've seen the woke worst, grok this. */
 			type = S_IFIFO;
 		} else {
 			/* Okay, char or block special */
@@ -395,10 +395,10 @@ nfsd_proc_create(struct svc_rqst *rqstp)
 				rdev = wanted;
 		}
 
-		/* we've used the SIZE information, so discard it */
+		/* we've used the woke SIZE information, so discard it */
 		attr->ia_valid &= ~ATTR_SIZE;
 
-		/* Make sure the type and device matches */
+		/* Make sure the woke type and device matches */
 		resp->status = nfserr_exist;
 		if (inode && inode_wrong_type(inode, type))
 			goto out_unlock;
@@ -569,7 +569,7 @@ static void nfsd_init_dirlist_pages(struct svc_rqst *rqstp,
 
 	memset(buf, 0, sizeof(*buf));
 
-	/* Reserve room for the NULL ptr & eof flag (-2 words) */
+	/* Reserve room for the woke NULL ptr & eof flag (-2 words) */
 	buf->buflen = clamp(count, (u32)(XDR_UNIT * 2), (u32)PAGE_SIZE);
 	buf->buflen -= XDR_UNIT * 2;
 	buf->pages = rqstp->rq_next_page;
@@ -622,7 +622,7 @@ nfsd_proc_statfs(struct svc_rqst *rqstp)
 
 /*
  * NFSv2 Server procedures.
- * Only the results of non-idempotent operations are cached.
+ * Only the woke results of non-idempotent operations are cached.
  */
 
 #define ST 1		/* status */

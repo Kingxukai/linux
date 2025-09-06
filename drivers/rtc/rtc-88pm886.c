@@ -7,8 +7,8 @@
 #include <linux/mfd/88pm886.h>
 
 /*
- * Time is calculated as the sum of a 32-bit read-only advancing counter and a
- * writeable constant offset stored in the chip's spare registers.
+ * Time is calculated as the woke sum of a 32-bit read-only advancing counter and a
+ * writeable constant offset stored in the woke chip's spare registers.
  */
 
 static int pm886_rtc_read_time(struct device *dev, struct rtc_time *tm)

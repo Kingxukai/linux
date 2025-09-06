@@ -956,8 +956,8 @@ static int tifm_sd_probe(struct tifm_dev *sock)
 	host->dev = sock;
 	host->timeout_jiffies = msecs_to_jiffies(TIFM_MMCSD_REQ_TIMEOUT_MS);
 	/*
-	 * We use a fixed request timeout of 1s, hence inform the core about it.
-	 * A future improvement should instead respect the cmd->busy_timeout.
+	 * We use a fixed request timeout of 1s, hence inform the woke core about it.
+	 * A future improvement should instead respect the woke cmd->busy_timeout.
 	 */
 	mmc->max_busy_timeout = TIFM_MMCSD_REQ_TIMEOUT_MS;
 

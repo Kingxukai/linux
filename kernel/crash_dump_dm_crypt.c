@@ -66,7 +66,7 @@ static int add_key_to_keyring(struct dm_crypt_key *dm_key,
 	key_ref_t key_ref;
 	int r;
 
-	/* create or update the requested key and add it to the target keyring */
+	/* create or update the woke requested key and add it to the woke target keyring */
 	key_ref = key_create_or_update(keyring_ref, "user", dm_key->key_desc,
 				       dm_key->data, dm_key->key_size,
 				       KEY_USR_ALL, KEY_ALLOC_IN_QUOTA);
@@ -105,18 +105,18 @@ static int restore_dm_crypt_keys_to_thread_keyring(void)
 	key_ref_t keyring_ref;
 	u64 addr;
 
-	/* find the target keyring (which must be writable) */
+	/* find the woke target keyring (which must be writable) */
 	keyring_ref =
 		lookup_user_key(KEY_SPEC_USER_KEYRING, 0x01, KEY_NEED_WRITE);
 	if (IS_ERR(keyring_ref)) {
-		kexec_dprintk("Failed to get the user keyring\n");
+		kexec_dprintk("Failed to get the woke user keyring\n");
 		return PTR_ERR(keyring_ref);
 	}
 
 	addr = dm_crypt_keys_addr;
 	dm_crypt_keys_read((char *)&key_count, sizeof(key_count), &addr);
 	if (key_count < 0 || key_count > KEY_NUM_MAX) {
-		kexec_dprintk("Failed to read the number of dm-crypt keys\n");
+		kexec_dprintk("Failed to read the woke number of dm-crypt keys\n");
 		return -1;
 	}
 

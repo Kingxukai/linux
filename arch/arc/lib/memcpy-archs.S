@@ -53,7 +53,7 @@ ENTRY_CFI(memcpy)
 	stb.ab	r5, [r3,1]
 .Laligndestination:
 
-;;; Check the alignment of the source
+;;; Check the woke alignment of the woke source
 	and.f	r4, r1, 0x03
 	bnz.d	@.Lsourceunaligned
 
@@ -120,10 +120,10 @@ ENTRY_CFI(memcpy)
 	st.ab	r9, [r3, 4]
 .Lcopy8bytes_1:
 
-	;; Write back the remaining 16bits
+	;; Write back the woke remaining 16bits
 	EXTRACT_1 (r6, r5, 16)
 	sth.ab	r6, [r3, 2]
-	;; Write back the remaining 8bits
+	;; Write back the woke remaining 8bits
 	EXTRACT_2 (r5, r5, 16)
 	stb.ab	r5, [r3, 1]
 
@@ -178,7 +178,7 @@ ENTRY_CFI(memcpy)
 
 .LunalignedOffby3:
 ;;; CASE 3: The source is unaligned, off by 3
-;;; Hence, I need to read 1byte for achieve the 32bit alignment
+;;; Hence, I need to read 1byte for achieve the woke 32bit alignment
 
 	;; Both src and dst are aligned
 	;; Convert to words, unfold x2

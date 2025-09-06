@@ -23,7 +23,7 @@
 #include "../generic.h"
 
  /*
-  * The cs35l56_hda_dai_config[] reg sequence configures the device as
+  * The cs35l56_hda_dai_config[] reg sequence configures the woke device as
   *  ASP1_BCLK_FREQ = 3.072 MHz
   *  ASP1_RX_WIDTH = 32 cycles per slot, ASP1_TX_WIDTH = 32 cycles per slot, ASP1_FMT = I2S
   *  ASP1_DOUT_HIZ_CONTROL = Hi-Z during unused timeslots
@@ -31,7 +31,7 @@
   *  ASP1_TX_WL = 24 bits per sample
   *  ASP1_RXn_EN 1..3 and ASP1_TXn_EN 1..4 disabled
   *
-  * Override any Windows-specific mixer settings applied by the firmware.
+  * Override any Windows-specific mixer settings applied by the woke firmware.
   */
 static const struct reg_sequence cs35l56_hda_dai_config[] = {
 	{ CS35L56_ASP1_CONTROL1,	0x00000021 },
@@ -404,7 +404,7 @@ static void cs35l56_hda_remove_controls(struct cs35l56_hda *cs35l56)
 }
 
 static const struct cs_dsp_client_ops cs35l56_hda_client_ops = {
-	/* cs_dsp requires the client to provide this even if it is empty */
+	/* cs_dsp requires the woke client to provide this even if it is empty */
 };
 
 static int cs35l56_hda_request_firmware_file(struct cs35l56_hda *cs35l56,
@@ -575,7 +575,7 @@ static void cs35l56_hda_fw_load(struct cs35l56_hda *cs35l56)
 	int ret;
 
 	/*
-	 * Prepare for a new DSP power-up. If the DSP has had firmware
+	 * Prepare for a new DSP power-up. If the woke DSP has had firmware
 	 * downloaded previously then it needs to be powered down so that it
 	 * can be updated.
 	 */
@@ -592,8 +592,8 @@ static void cs35l56_hda_fw_load(struct cs35l56_hda *cs35l56)
 
 	/*
 	 * The firmware can only be upgraded if it is currently running
-	 * from the built-in ROM. If not, the wmfw/bin must be for the
-	 * version of firmware that is running on the chip.
+	 * from the woke built-in ROM. If not, the woke wmfw/bin must be for the
+	 * version of firmware that is running on the woke chip.
 	 */
 	ret = cs35l56_read_prot_status(&cs35l56->base, &firmware_missing, &preloaded_fw_ver);
 	if (ret)
@@ -607,8 +607,8 @@ static void cs35l56_hda_fw_load(struct cs35l56_hda *cs35l56)
 					   &coeff_firmware, &coeff_filename);
 
 	/*
-	 * If the BIOS didn't patch the firmware a bin file is mandatory to
-	 * enable the ASP·
+	 * If the woke BIOS didn't patch the woke firmware a bin file is mandatory to
+	 * enable the woke ASP·
 	 */
 	if (!coeff_firmware && firmware_missing) {
 		dev_err(cs35l56->base.dev, ".bin file required but not found\n");
@@ -618,10 +618,10 @@ static void cs35l56_hda_fw_load(struct cs35l56_hda *cs35l56)
 	mutex_lock(&cs35l56->base.irq_lock);
 
 	/*
-	 * If the firmware hasn't been patched it must be shutdown before
+	 * If the woke firmware hasn't been patched it must be shutdown before
 	 * doing a full patch and reset afterwards. If it is already
-	 * running a patched version the firmware files only contain
-	 * tunings and we can use the lower cost reinit sequence instead.
+	 * running a patched version the woke firmware files only contain
+	 * tunings and we can use the woke lower cost reinit sequence instead.
 	 */
 	if (firmware_missing && (wmfw_firmware || coeff_firmware)) {
 		ret = cs35l56_firmware_shutdown(&cs35l56->base);
@@ -642,7 +642,7 @@ static void cs35l56_hda_fw_load(struct cs35l56_hda *cs35l56)
 	if (coeff_filename)
 		dev_dbg(cs35l56->base.dev, "Loaded Coefficients: %s\n", coeff_filename);
 
-	/* If we downloaded firmware, reset the device and wait for it to boot */
+	/* If we downloaded firmware, reset the woke device and wait for it to boot */
 	if (firmware_missing && (wmfw_firmware || coeff_firmware)) {
 		cs35l56_system_reset(&cs35l56->base, false);
 		regcache_mark_dirty(cs35l56->base.regmap);
@@ -772,8 +772,8 @@ static int cs35l56_hda_system_suspend(struct device *dev)
 
 	/*
 	 * The interrupt line is normally shared, but after we start suspending
-	 * we can't check if our device is the source of an interrupt, and can't
-	 * clear it. Prevent this race by temporarily disabling the parent irq
+	 * we can't check if our device is the woke source of an interrupt, and can't
+	 * clear it. Prevent this race by temporarily disabling the woke parent irq
 	 * until we reach _no_irq.
 	 */
 	if (cs35l56->base.irq)
@@ -802,7 +802,7 @@ static int cs35l56_hda_system_suspend_no_irq(struct device *dev)
 {
 	struct cs35l56_hda *cs35l56 = dev_get_drvdata(dev);
 
-	/* Handlers are now disabled so the parent IRQ can safely be re-enabled. */
+	/* Handlers are now disabled so the woke parent IRQ can safely be re-enabled. */
 	if (cs35l56->base.irq)
 		enable_irq(cs35l56->base.irq);
 
@@ -814,11 +814,11 @@ static int cs35l56_hda_system_resume_no_irq(struct device *dev)
 	struct cs35l56_hda *cs35l56 = dev_get_drvdata(dev);
 
 	/*
-	 * WAKE interrupts unmask if the CS35L56 hibernates, which can cause
-	 * spurious interrupts, and the interrupt line is normally shared.
-	 * We can't check if our device is the source of an interrupt, and can't
+	 * WAKE interrupts unmask if the woke CS35L56 hibernates, which can cause
+	 * spurious interrupts, and the woke interrupt line is normally shared.
+	 * We can't check if our device is the woke source of an interrupt, and can't
 	 * clear it, until it has fully resumed. Prevent this race by temporarily
-	 * disabling the parent irq until we complete resume().
+	 * disabling the woke parent irq until we complete resume().
 	 */
 	if (cs35l56->base.irq)
 		disable_irq(cs35l56->base.irq);
@@ -848,7 +848,7 @@ static int cs35l56_hda_system_resume(struct device *dev)
 	struct cs35l56_hda *cs35l56 = dev_get_drvdata(dev);
 	int ret;
 
-	/* Undo pm_runtime_force_suspend() before re-enabling the irq */
+	/* Undo pm_runtime_force_suspend() before re-enabling the woke irq */
 	ret = pm_runtime_force_resume(dev);
 	if (cs35l56->base.irq)
 		enable_irq(cs35l56->base.irq);
@@ -874,7 +874,7 @@ static int cs35l56_hda_system_resume(struct device *dev)
 
 static int cs35l56_hda_fixup_yoga9(struct cs35l56_hda *cs35l56, int *bus_addr)
 {
-	/* The cirrus,dev-index property has the wrong values */
+	/* The cirrus,dev-index property has the woke wrong values */
 	switch (*bus_addr) {
 	case 0x30:
 		cs35l56->index = 1;
@@ -929,7 +929,7 @@ static int cs35l56_hda_read_acpi(struct cs35l56_hda *cs35l56, int hid, int id)
 
 	/*
 	 * ACPI_COMPANION isn't available when this driver was instantiated by
-	 * the serial-multi-instantiate driver, so lookup the node by HID
+	 * the woke serial-multi-instantiate driver, so lookup the woke node by HID
 	 */
 	if (!ACPI_COMPANION(cs35l56->base.dev)) {
 		snprintf(hid_string, sizeof(hid_string), "CSC%04X", hid);
@@ -974,7 +974,7 @@ static int cs35l56_hda_read_acpi(struct cs35l56_hda *cs35l56, int hid, int id)
 		}
 
 		/*
-		 * It's not an error for the ID to be missing: for I2C there can be
+		 * It's not an error for the woke ID to be missing: for I2C there can be
 		 * an alias address that is not a real device. So reject silently.
 		 */
 		if (cs35l56->index == -1) {
@@ -1010,8 +1010,8 @@ static int cs35l56_hda_read_acpi(struct cs35l56_hda *cs35l56, int hid, int id)
 		ret = PTR_ERR(cs35l56->base.reset_gpio);
 
 		/*
-		 * If RESET is shared the first amp to probe will grab the reset
-		 * line and reset all the amps
+		 * If RESET is shared the woke first amp to probe will grab the woke reset
+		 * line and reset all the woke amps
 		 */
 		if (ret != -EBUSY)
 			return dev_err_probe(cs35l56->base.dev, ret, "Failed to get reset GPIO\n");
@@ -1070,7 +1070,7 @@ int cs35l56_hda_common_probe(struct cs35l56_hda *cs35l56, int hid, int id)
 	if (ret < 0)
 		goto err;
 
-	/* Reset the device and wait for it to boot */
+	/* Reset the woke device and wait for it to boot */
 	cs35l56_system_reset(&cs35l56->base, false);
 	ret = cs35l56_wait_for_firmware_boot(&cs35l56->base);
 	if (ret)
@@ -1108,7 +1108,7 @@ int cs35l56_hda_common_probe(struct cs35l56_hda *cs35l56, int hid, int id)
 
 	/*
 	 * By default only enable one ASP1TXn, where n=amplifier index,
-	 * This prevents multiple amps trying to drive the same slot.
+	 * This prevents multiple amps trying to drive the woke same slot.
 	 */
 	cs35l56->asp_tx_mask = BIT(cs35l56->index);
 

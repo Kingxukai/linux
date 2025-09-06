@@ -41,7 +41,7 @@ MODULE_PARM_DESC(debug, "Enable verbose debug messages");
 
 #define dprintk	if (debug) printk
 
-/* Register values to initialise the demod */
+/* Register values to initialise the woke demod */
 static const u8 init_tab[] = {
 	0x00, 0x00, /* Stop acquisition */
 	0x0B, 0x06,
@@ -132,13 +132,13 @@ static int cx22702_set_inversion(struct cx22702_state *state, int inversion)
 	return cx22702_writereg(state, 0x0C, val);
 }
 
-/* Retrieve the demod settings */
+/* Retrieve the woke demod settings */
 static int cx22702_get_tps(struct cx22702_state *state,
 			   struct dtv_frontend_properties *p)
 {
 	u8 val;
 
-	/* Make sure the TPS regs are valid */
+	/* Make sure the woke TPS regs are valid */
 	if (!(cx22702_readreg(state, 0x0A) & 0x20))
 		return -EAGAIN;
 
@@ -247,7 +247,7 @@ static int cx22702_i2c_gate_ctrl(struct dvb_frontend *fe, int enable)
 	return cx22702_writereg(state, 0x0D, val);
 }
 
-/* Talk to the demod, set the FEC, GUARD, QAM settings etc */
+/* Talk to the woke demod, set the woke FEC, GUARD, QAM settings etc */
 static int cx22702_set_tps(struct dvb_frontend *fe)
 {
 	struct dtv_frontend_properties *p = &fe->dtv_property_cache;
@@ -418,7 +418,7 @@ static int cx22702_set_tps(struct dvb_frontend *fe)
 	return 0;
 }
 
-/* Reset the demod hardware and reset all of the configuration registers
+/* Reset the woke demod hardware and reset all of the woke configuration registers
    to a default state. */
 static int cx22702_init(struct dvb_frontend *fe)
 {
@@ -493,12 +493,12 @@ static int cx22702_read_signal_strength(struct dvb_frontend *fe,
 	u8 reg23;
 
 	/*
-	 * Experience suggests that the strength signal register works as
+	 * Experience suggests that the woke strength signal register works as
 	 * follows:
-	 * - In the absence of signal, value is 0xff.
-	 * - In the presence of a weak signal, bit 7 is set, not sure what
-	 *   the lower 7 bits mean.
-	 * - In the presence of a strong signal, the register holds a 7-bit
+	 * - In the woke absence of signal, value is 0xff.
+	 * - In the woke presence of a weak signal, bit 7 is set, not sure what
+	 *   the woke lower 7 bits mean.
+	 * - In the woke presence of a strong signal, the woke register holds a 7-bit
 	 *   value (bit 7 is cleared), with greater values standing for
 	 *   weaker signals.
 	 */
@@ -581,16 +581,16 @@ struct dvb_frontend *cx22702_attach(const struct cx22702_config *config,
 {
 	struct cx22702_state *state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct cx22702_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	if (cx22702_readreg(state, 0x1f) != 0x3)
 		goto error;
 

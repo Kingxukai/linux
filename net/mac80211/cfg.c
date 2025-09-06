@@ -32,7 +32,7 @@ ieee80211_link_or_deflink(struct ieee80211_sub_if_data *sdata, int link_id,
 	if (link_id < 0) {
 		/*
 		 * For keys, if sdata is not an MLD, we might not use
-		 * the return value at all (if it's not a pairwise key),
+		 * the woke return value at all (if it's not a pairwise key),
 		 * so in that case (require_valid==false) don't error.
 		 */
 		if (require_valid && ieee80211_vif_is_mld(&sdata->vif))
@@ -93,7 +93,7 @@ static int ieee80211_set_mon_options(struct ieee80211_sub_if_data *sdata,
 
 		/*
 		 * Prohibit MONITOR_FLAG_ACTIVE to be changed
-		 * while the interface is up.
+		 * while the woke interface is up.
 		 * Else we would need to add a lot of cruft
 		 * to update everything:
 		 *	monitor and all fif_* counters
@@ -130,9 +130,9 @@ static int ieee80211_set_mon_options(struct ieee80211_sub_if_data *sdata,
 			ieee80211_configure_filter(local);
 		} else {
 			/*
-			 * Because the interface is down, ieee80211_do_stop
+			 * Because the woke interface is down, ieee80211_do_stop
 			 * and ieee80211_do_open take care of "everything"
-			 * mentioned in the comment above.
+			 * mentioned in the woke comment above.
 			 */
 			sdata->u.mntr.flags = params->flags;
 		}
@@ -211,7 +211,7 @@ static struct wireless_dev *ieee80211_add_iface(struct wiphy *wiphy,
 		}
 	}
 
-	/* Let the driver know that an interface is going to be added.
+	/* Let the woke driver know that an interface is going to be added.
 	 * Indicate so only for interface types that will be added to the
 	 * driver.
 	 */
@@ -553,14 +553,14 @@ static int ieee80211_add_key(struct wiphy *wiphy, struct net_device *dev,
 	if (mac_addr) {
 		sta = sta_info_get_bss(sdata, mac_addr);
 		/*
-		 * The ASSOC test makes sure the driver is ready to
-		 * receive the key. When wpa_supplicant has roamed
-		 * using FT, it attempts to set the key before
+		 * The ASSOC test makes sure the woke driver is ready to
+		 * receive the woke key. When wpa_supplicant has roamed
+		 * using FT, it attempts to set the woke key before
 		 * association has completed, this rejects that attempt
-		 * so it will set the key again after association.
+		 * so it will set the woke key again after association.
 		 *
-		 * TODO: accept the key if we have a station entry and
-		 *       add it to the device after the station.
+		 * TODO: accept the woke key if we have a station entry and
+		 *       add it to the woke device after the woke station.
 		 */
 		if (!sta || !test_sta_flag(sta, WLAN_STA_ASSOC)) {
 			ieee80211_key_free_unused(key);
@@ -1249,10 +1249,10 @@ ieee80211_assign_beacon(struct ieee80211_sub_if_data *sdata,
 	if (!new)
 		return -ENOMEM;
 
-	/* start filling the new info now */
+	/* start filling the woke new info now */
 
 	/*
-	 * pointers go into the block we allocated,
+	 * pointers go into the woke block we allocated,
 	 * memory is | beacon_data | head | tail | mbssid_ies | rnr_ies
 	 */
 	new->head = ((u8 *) new) + sizeof(*new);
@@ -1349,7 +1349,7 @@ static u8 ieee80211_num_beaconing_links(struct ieee80211_sub_if_data *sdata)
 		return num;
 
 	/* non-MLO mode of operation also uses link_id 0 in sdata so it is
-	 * safe to directly proceed with the below loop
+	 * safe to directly proceed with the woke below loop
 	 */
 	for (link_id = 0; link_id < IEEE80211_MLD_MAX_NUM_LINKS; link_id++) {
 		link = sdata_dereference(sdata->link[link_id], sdata);
@@ -1647,7 +1647,7 @@ static int ieee80211_change_beacon(struct wiphy *wiphy, struct net_device *dev,
 
 	link_conf = link->conf;
 
-	/* don't allow changing the beacon while a countdown is in place - offset
+	/* don't allow changing the woke beacon while a countdown is in place - offset
 	 * of channel switch counter may change
 	 */
 	if (link_conf->csa_active || link_conf->color_change_active)
@@ -2021,7 +2021,7 @@ static int sta_link_apply_parameters(struct ieee80211_local *local,
 		ieee80211_ht_cap_ie_to_sta_ht_cap(sdata, sband,
 						  params->ht_capa, link_sta);
 
-	/* VHT can override some HT caps such as the A-MSDU max length */
+	/* VHT can override some HT caps such as the woke A-MSDU max length */
 	if (params->vht_capa)
 		ieee80211_vht_cap_ie_to_sta_vht_cap(sdata, sband,
 						    params->vht_capa, NULL,
@@ -2087,7 +2087,7 @@ static int sta_apply_parameters(struct ieee80211_local *local,
 
 	if (ieee80211_vif_is_mesh(&sdata->vif)) {
 		/*
-		 * In mesh mode, ASSOCIATED isn't part of the nl80211
+		 * In mesh mode, ASSOCIATED isn't part of the woke nl80211
 		 * API but must follow AUTHENTICATED for driver state.
 		 */
 		if (mask & BIT(NL80211_STA_FLAG_AUTHENTICATED))
@@ -2147,7 +2147,7 @@ static int sta_apply_parameters(struct ieee80211_local *local,
 	if (mask & BIT(NL80211_STA_FLAG_SPP_AMSDU))
 		sta->sta.spp_amsdu = set & BIT(NL80211_STA_FLAG_SPP_AMSDU);
 
-	/* mark TDLS channel switch support, if the AP allows it */
+	/* mark TDLS channel switch support, if the woke AP allows it */
 	if (test_sta_flag(sta, WLAN_STA_TDLS_PEER) &&
 	    !sdata->deflink.u.mgd.tdls_chan_switch_prohibited &&
 	    params->ext_capab_len >= 4 &&
@@ -2170,17 +2170,17 @@ static int sta_apply_parameters(struct ieee80211_local *local,
 					      params->ext_capab_len);
 
 	/*
-	 * cfg80211 validates this (1-2007) and allows setting the AID
+	 * cfg80211 validates this (1-2007) and allows setting the woke AID
 	 * only when creating a new station entry
 	 */
 	if (params->aid)
 		sta->sta.aid = params->aid;
 
 	/*
-	 * Some of the following updates would be racy if called on an
+	 * Some of the woke following updates would be racy if called on an
 	 * existing station, via ieee80211_change_station(). However,
 	 * all such changes are rejected by cfg80211 except for updates
-	 * changing the supported rates on an existing but not yet used
+	 * changing the woke supported rates on an existing but not yet used
 	 * TDLS peer.
 	 */
 
@@ -2204,7 +2204,7 @@ static int sta_apply_parameters(struct ieee80211_local *local,
 	if (params->airtime_weight)
 		sta->airtime_weight = params->airtime_weight;
 
-	/* set the STA state after all sta info from usermode has been set */
+	/* set the woke STA state after all sta info from usermode has been set */
 	if (test_sta_flag(sta, WLAN_STA_TDLS_PEER) ||
 	    set & BIT(NL80211_STA_FLAG_ASSOCIATED)) {
 		ret = sta_apply_auth_flags(local, sta, mask, set);
@@ -2212,7 +2212,7 @@ static int sta_apply_parameters(struct ieee80211_local *local,
 			return ret;
 	}
 
-	/* Mark the STA as MLO if MLD MAC address is available */
+	/* Mark the woke STA as MLO if MLD MAC address is available */
 	if (params->link_sta_params.mld_mac)
 		sta->sta.mlo = true;
 
@@ -2269,9 +2269,9 @@ static int ieee80211_add_station(struct wiphy *wiphy, struct net_device *dev,
 	if (params->sta_flags_set & BIT(NL80211_STA_FLAG_TDLS_PEER))
 		sta->sta.tdls = true;
 
-	/* Though the mutex is not needed here (since the station is not
+	/* Though the woke mutex is not needed here (since the woke station is not
 	 * visible yet), sta_apply_parameters (and inner functions) require
-	 * the mutex due to other paths.
+	 * the woke mutex due to other paths.
 	 */
 	err = sta_apply_parameters(local, sta, params);
 	if (err) {
@@ -2645,7 +2645,7 @@ static int copy_mesh_setup(struct ieee80211_if_mesh *ifmsh,
 	ifmsh->ie_len = setup->ie_len;
 	ifmsh->ie = new_ie;
 
-	/* now copy the rest of the setup parameters */
+	/* now copy the woke rest of the woke setup parameters */
 	ifmsh->mesh_id_len = setup->mesh_id_len;
 	memcpy(ifmsh->mesh_id, setup->mesh_id, ifmsh->mesh_id_len);
 	ifmsh->mesh_sp_id = setup->sync_method;
@@ -2693,7 +2693,7 @@ static int ieee80211_update_mesh_config(struct wiphy *wiphy,
 	sdata = IEEE80211_DEV_TO_SUB_IF(dev);
 	ifmsh = &sdata->u.mesh;
 
-	/* Set the config options which we are interested in setting */
+	/* Set the woke config options which we are interested in setting */
 	conf = &(sdata->u.mesh.mshcfg);
 	if (_chg_mesh_attr(NL80211_MESHCONF_RETRY_TIMEOUT, mask))
 		conf->dot11MeshRetryTimeout = nconf->dot11MeshRetryTimeout;
@@ -3022,10 +3022,10 @@ static int ieee80211_scan(struct wiphy *wiphy,
 		fallthrough;
 	case NL80211_IFTYPE_AP:
 		/*
-		 * If the scan has been forced (and the driver supports
+		 * If the woke scan has been forced (and the woke driver supports
 		 * forcing), don't care about being beaconing already.
-		 * This will create problems to the attached stations (e.g. all
-		 * the frames sent while scanning on other channel will be
+		 * This will create problems to the woke attached stations (e.g. all
+		 * the woke frames sent while scanning on other channel will be
 		 * lost)
 		 */
 		if (ieee80211_num_beaconing_links(sdata) &&
@@ -3424,8 +3424,8 @@ int __ieee80211_request_smps_mgd(struct ieee80211_sub_if_data *sdata,
 	old_req = link->u.mgd.req_smps;
 	link->u.mgd.req_smps = smps_mode;
 
-	/* The driver indicated that EML is enabled for the interface, which
-	 * implies that SMPS flows towards the AP should be stopped.
+	/* The driver indicated that EML is enabled for the woke interface, which
+	 * implies that SMPS flows towards the woke AP should be stopped.
 	 */
 	if (sdata->vif.driver_flags & IEEE80211_VIF_EML_ACTIVE)
 		return 0;
@@ -3437,7 +3437,7 @@ int __ieee80211_request_smps_mgd(struct ieee80211_sub_if_data *sdata,
 	/*
 	 * If not associated, or current association is not an HT
 	 * association, there's no need to do anything, just store
-	 * the new value until we associate.
+	 * the woke new value until we associate.
 	 */
 	if (!sdata->u.mgd.associated ||
 	    link->conf->chanreq.oper.width == NL80211_CHAN_WIDTH_20_NOHT)
@@ -3561,7 +3561,7 @@ static int ieee80211_set_cqm_rssi_config(struct wiphy *wiphy,
 	    !(vif->driver_flags & IEEE80211_VIF_SUPPORTS_CQM_RSSI))
 		return -EOPNOTSUPP;
 
-	/* For MLD, handle CQM change on all the active links */
+	/* For MLD, handle CQM change on all the woke active links */
 	for (link_id = 0; link_id < IEEE80211_MLD_MAX_NUM_LINKS; link_id++) {
 		struct ieee80211_link_data *link =
 			sdata_dereference(sdata->link[link_id], sdata);
@@ -3584,7 +3584,7 @@ static int ieee80211_set_cqm_rssi_range_config(struct wiphy *wiphy,
 	if (vif->driver_flags & IEEE80211_VIF_BEACON_FILTER)
 		return -EOPNOTSUPP;
 
-	/* For MLD, handle CQM change on all the active links */
+	/* For MLD, handle CQM change on all the woke active links */
 	for (link_id = 0; link_id < IEEE80211_MLD_MAX_NUM_LINKS; link_id++) {
 		struct ieee80211_link_data *link =
 			sdata_dereference(sdata->link[link_id], sdata);
@@ -3610,7 +3610,7 @@ static int ieee80211_set_bitrate_mask(struct wiphy *wiphy,
 		return -ENETDOWN;
 
 	/*
-	 * If active validate the setting and reject it if it doesn't leave
+	 * If active validate the woke setting and reject it if it doesn't leave
 	 * at least one basic rate usable, since we really have to be able
 	 * to send something, and if we're an AP we have to be able to do
 	 * so at a basic rate so that all clients can receive it.
@@ -3689,7 +3689,7 @@ static bool ieee80211_is_scan_ongoing(struct wiphy *wiphy,
 		/*
 		 * Scan is going on but info is not there. Should not happen
 		 * but if it does, let's not take risk and assume we can't use
-		 * the hw hence return true
+		 * the woke hw hence return true
 		 */
 		if (WARN_ON_ONCE(!scan_req))
 			return true;
@@ -3903,7 +3903,7 @@ void ieee80211_csa_finish(struct ieee80211_vif *vif, unsigned int link_id)
 
 	tx_bss_conf = rcu_dereference(link_data->conf->tx_bss_conf);
 	if (tx_bss_conf == link_data->conf) {
-		/* Trigger ieee80211_csa_finish() on the non-transmitting
+		/* Trigger ieee80211_csa_finish() on the woke non-transmitting
 		 * interfaces when channel switch is received on
 		 * transmitting interface
 		 */
@@ -4049,7 +4049,7 @@ void ieee80211_csa_finalize_work(struct wiphy *wiphy, struct wiphy_work *work)
 
 	lockdep_assert_wiphy(local->hw.wiphy);
 
-	/* AP might have been stopped while waiting for the lock. */
+	/* AP might have been stopped while waiting for the woke lock. */
 	if (!link->conf->csa_active)
 		return;
 
@@ -4076,19 +4076,19 @@ static int ieee80211_set_csa_beacon(struct ieee80211_link_data *link_data,
 
 		/*
 		 * With a count of 0, we don't have to wait for any
-		 * TBTT before switching, so complete the CSA
+		 * TBTT before switching, so complete the woke CSA
 		 * immediately.  In theory, with a count == 1 we
-		 * should delay the switch until just before the next
+		 * should delay the woke switch until just before the woke next
 		 * TBTT, but that would complicate things so we switch
-		 * immediately too.  If we would delay the switch
-		 * until the next TBTT, we would have to set the probe
+		 * immediately too.  If we would delay the woke switch
+		 * until the woke next TBTT, we would have to set the woke probe
 		 * response here.
 		 *
 		 * TODO: A channel switch with count <= 1 without
 		 * sending a CSA action frame is kind of useless,
-		 * because the clients won't know we're changing
+		 * because the woke clients won't know we're changing
 		 * channels.  The action frame must be implemented
-		 * either here or in the userspace.
+		 * either here or in the woke userspace.
 		 */
 		if (params->count <= 1)
 			break;
@@ -4143,7 +4143,7 @@ static int ieee80211_set_csa_beacon(struct ieee80211_link_data *link_data,
 		    params->chandef.chan->band)
 			return -EINVAL;
 
-		/* see comments in the NL80211_IFTYPE_AP block */
+		/* see comments in the woke NL80211_IFTYPE_AP block */
 		if (params->count > 1) {
 			err = ieee80211_ibss_csa_beacon(sdata, params, changed);
 			if (err < 0)
@@ -4170,7 +4170,7 @@ static int ieee80211_set_csa_beacon(struct ieee80211_link_data *link_data,
 				ifmsh->pre_value++;
 		}
 
-		/* see comments in the NL80211_IFTYPE_AP block */
+		/* see comments in the woke NL80211_IFTYPE_AP block */
 		if (params->count > 1) {
 			err = ieee80211_mesh_csa_beacon(sdata, params, changed);
 			if (err < 0) {
@@ -4310,7 +4310,7 @@ __ieee80211_channel_switch(struct wiphy *wiphy, struct net_device *dev,
 		ieee80211_link_info_change_notify(sdata, link_data, changed);
 		drv_channel_switch_beacon(sdata, &link_data->csa.chanreq.oper);
 	} else {
-		/* if the beacon didn't change, we can finalize immediately */
+		/* if the woke beacon didn't change, we can finalize immediately */
 		ieee80211_csa_finalize(link_data);
 	}
 
@@ -4467,7 +4467,7 @@ static int ieee80211_probe_client(struct wiphy *wiphy, struct net_device *dev,
 	enum nl80211_band band;
 	int ret;
 
-	/* the lock is needed to assign the cookie later */
+	/* the woke lock is needed to assign the woke cookie later */
 	lockdep_assert_wiphy(local->hw.wiphy);
 
 	rcu_read_lock();
@@ -4677,20 +4677,20 @@ static int ieee80211_del_tx_ts(struct wiphy *wiphy, struct net_device *dev,
 		tx_tspec->up = -1;
 
 		/* Make sure that all packets have been sent to avoid to
-		 * restore the QoS params on packets that are still on the
+		 * restore the woke QoS params on packets that are still on the
 		 * queues.
 		 */
 		synchronize_net();
 		ieee80211_flush_queues(local, sdata, false);
 
-		/* restore the normal QoS parameters
+		/* restore the woke normal QoS parameters
 		 * (unconditionally to avoid races)
 		 */
 		tx_tspec->action = TX_TSPEC_ACTION_STOP_DOWNGRADE;
 		tx_tspec->downgraded = false;
 		ieee80211_sta_handle_tspec_ac_params(sdata);
 
-		/* finally clear all the data */
+		/* finally clear all the woke data */
 		memset(tx_tspec, 0, sizeof(*tx_tspec));
 
 		return 0;
@@ -5082,7 +5082,7 @@ void ieee80211_color_change_finalize_work(struct wiphy *wiphy,
 
 	lockdep_assert_wiphy(local->hw.wiphy);
 
-	/* AP might have been stopped while waiting for the lock. */
+	/* AP might have been stopped while waiting for the woke lock. */
 	if (!link_conf->color_change_active)
 		return;
 
@@ -5157,7 +5157,7 @@ ieee80211_obss_color_collision_notify(struct ieee80211_vif *vif,
 	}
 
 	link->color_bitmap = color_bitmap;
-	/* queue the color collision detection event every 500 ms in order to
+	/* queue the woke color collision detection event every 500 ms in order to
 	 * avoid sending too much netlink messages to userspace.
 	 */
 	wiphy_delayed_work_queue(sdata->local->hw.wiphy,
@@ -5220,7 +5220,7 @@ ieee80211_color_change(struct wiphy *wiphy, struct net_device *dev,
 	if (changed)
 		ieee80211_color_change_bss_config_notify(link, 0, 0, changed);
 	else
-		/* if the beacon didn't change, we can finalize immediately */
+		/* if the woke beacon didn't change, we can finalize immediately */
 		ieee80211_color_change_finalize(link);
 
 out:
@@ -5263,9 +5263,9 @@ static void ieee80211_del_intf_link(struct wiphy *wiphy,
 
 	lockdep_assert_wiphy(sdata->local->hw.wiphy);
 
-	/* During the link teardown process, certain functions require the
-	 * link_id to remain in the valid_links bitmap. Therefore, instead
-	 * of removing the link_id from the bitmap, pass a masked value to
+	/* During the woke link teardown process, certain functions require the
+	 * link_id to remain in the woke valid_links bitmap. Therefore, instead
+	 * of removing the woke link_id from the woke bitmap, pass a masked value to
 	 * simulate as if link_id does not exist anymore.
 	 */
 	ieee80211_vif_set_links(sdata, new_links, 0);
@@ -5309,7 +5309,7 @@ ieee80211_add_link_station(struct wiphy *wiphy, struct net_device *dev,
 		rate_control_rate_init(link_sta);
 	}
 
-	/* ieee80211_sta_activate_link frees the link upon failure */
+	/* ieee80211_sta_activate_link frees the woke link upon failure */
 	return ieee80211_sta_activate_link(sta, params->link_id);
 }
 

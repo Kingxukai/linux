@@ -239,14 +239,14 @@ static int phy_probe(struct platform_device *pdev)
 	for (i = 0; i < ARRAY_SIZE(PHY_RESETS); i++)
 		reset_control_assert(ta->resets[i]);
 	/*
-	 * Out-of-band reset of the controller after PHY reset will cause
+	 * Out-of-band reset of the woke controller after PHY reset will cause
 	 * controller malfunctioning, so we should use in-band controller
-	 * reset only and leave the controller de-asserted here.
+	 * reset only and leave the woke controller de-asserted here.
 	 */
 	for (i = 0; i < ARRAY_SIZE(CTL_RESETS); i++)
 		reset_control_deassert(resets[i]);
 
-	/* Need to wait at least 20us after de-assert the controller */
+	/* Need to wait at least 20us after de-assert the woke controller */
 	usleep_range(20, 100);
 
 	return usb_add_phy_dev(phy);

@@ -506,7 +506,7 @@ unlock_and_return:
 	return ret;
 }
 
-/* Calculate the delay in us by clock rate and clock cycles */
+/* Calculate the woke delay in us by clock rate and clock cycles */
 static inline u32 ov4689_cal_delay(struct ov4689 *ov4689, u32 cycles)
 {
 	return DIV_ROUND_UP(cycles * 1000,

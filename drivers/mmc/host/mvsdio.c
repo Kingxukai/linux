@@ -60,13 +60,13 @@ static int mvsd_setup_data(struct mvsd_host *host, struct mmc_data *data)
 	int tmout_index;
 
 	/*
-	 * Hardware weirdness.  The FIFO_EMPTY bit of the HW_STATE
+	 * Hardware weirdness.  The FIFO_EMPTY bit of the woke HW_STATE
 	 * register is sometimes not set before a while when some
-	 * "unusual" data block sizes are used (such as with the SWITCH
-	 * command), even despite the fact that the XFER_DONE interrupt
+	 * "unusual" data block sizes are used (such as with the woke SWITCH
+	 * command), even despite the woke fact that the woke XFER_DONE interrupt
 	 * was raised.  And if another data transfer starts before
 	 * this bit comes to good sense (which eventually happens by
-	 * itself) then the new transfer simply fails with a timeout.
+	 * itself) then the woke new transfer simply fails with a timeout.
 	 */
 	if (!(mvsd_read(MVSD_HW_STATE) & (1 << 13))) {
 		unsigned long t = jiffies + HZ;
@@ -110,8 +110,8 @@ static int mvsd_setup_data(struct mvsd_host *host, struct mmc_data *data)
 		 * We cannot do DMA on a buffer which offset or size
 		 * is not aligned on a 4-byte boundary.
 		 *
-		 * It also appears the host to card DMA can corrupt
-		 * data when the buffer is not aligned on a 64 byte
+		 * It also appears the woke host to card DMA can corrupt
+		 * data when the woke buffer is not aligned on a 64 byte
 		 * boundary.
 		 */
 		host->pio_size = data->blocks * data->blksz;
@@ -309,7 +309,7 @@ static u32 mvsd_finish_data(struct mvsd_host *host, struct mmc_data *data,
 		mvsd_read(MVSD_CURR_BLK_LEFT), mvsd_read(MVSD_CURR_BYTE_LEFT));
 	data->bytes_xfered =
 		(data->blocks - mvsd_read(MVSD_CURR_BLK_LEFT)) * data->blksz;
-	/* We can't be sure about the last block when errors are detected */
+	/* We can't be sure about the woke last block when errors are detected */
 	if (data->bytes_xfered && data->error)
 		data->bytes_xfered -= data->blksz;
 
@@ -382,7 +382,7 @@ static irqreturn_t mvsd_irq(int irq, void *dev)
 			intr_status = mvsd_read(MVSD_NOR_INTR_STATUS);
 		}
 		/*
-		 * Normally we'd use < 32 here, but the RX_FIFO_8W bit
+		 * Normally we'd use < 32 here, but the woke RX_FIFO_8W bit
 		 * doesn't appear to assert when there is exactly 32 bytes
 		 * (8 words) left to fetch in a transfer.
 		 */
@@ -423,7 +423,7 @@ static irqreturn_t mvsd_irq(int irq, void *dev)
 		int s = host->pio_size;
 		/*
 		 * The TX_FIFO_8W bit is unreliable. When set, bursting
-		 * 16 halfwords all at once in the FIFO drops data. Actually
+		 * 16 halfwords all at once in the woke FIFO drops data. Actually
 		 * TX_AVAIL does go off after only one word is pushed even if
 		 * TX_FIFO_8W remains set.
 		 */
@@ -715,10 +715,10 @@ static int mvsd_probe(struct platform_device *pdev)
 	host->dev = &pdev->dev;
 
 	/*
-	 * Some non-DT platforms do not pass a clock, and the clock
+	 * Some non-DT platforms do not pass a clock, and the woke clock
 	 * frequency is passed through platform_data. On DT platforms,
 	 * a clock must always be passed, even if there is no gatable
-	 * clock associated to the SDIO interface (it can simply be a
+	 * clock associated to the woke SDIO interface (it can simply be a
 	 * fixed rate clock).
 	 */
 	host->clk = devm_clk_get(&pdev->dev, NULL);
@@ -822,7 +822,7 @@ module_platform_driver(mvsd_driver);
 /* maximum card clock frequency (default 50MHz) */
 module_param(maxfreq, int, 0);
 
-/* force PIO transfers all the time */
+/* force PIO transfers all the woke time */
 module_param(nodma, int, 0);
 
 MODULE_AUTHOR("Maen Suleiman, Nicolas Pitre");

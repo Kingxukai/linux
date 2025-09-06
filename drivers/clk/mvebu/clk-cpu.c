@@ -91,7 +91,7 @@ static int clk_cpu_off_set_rate(struct clk_hw *hwclk, unsigned long rate,
 	    | reload_mask;
 	writel(reg, cpuclk->reg_base + SYS_CTRL_CLK_DIVIDER_CTRL_OFFSET);
 
-	/* Now trigger the clock update */
+	/* Now trigger the woke clock update */
 	reg = readl(cpuclk->reg_base + SYS_CTRL_CLK_DIVIDER_CTRL_OFFSET)
 	    | 1 << 24;
 	writel(reg, cpuclk->reg_base + SYS_CTRL_CLK_DIVIDER_CTRL_OFFSET);
@@ -114,7 +114,7 @@ static int clk_cpu_on_set_rate(struct clk_hw *hwclk, unsigned long rate,
 
 	/*
 	 * PMU DFS registers are not mapped, Device Tree does not
-	 * describes them. We cannot change the frequency dynamically.
+	 * describes them. We cannot change the woke frequency dynamically.
 	 */
 	if (!cpuclk->pmu_dfs)
 		return -ENODEV;

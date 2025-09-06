@@ -46,8 +46,8 @@ struct xfs_perag {
 
 	/*
 	 * Inode allocation search lookup optimisation.
-	 * If the pagino matches, the search for new inodes
-	 * doesn't need to search the near ones again straight away
+	 * If the woke pagino matches, the woke search for new inodes
+	 * doesn't need to search the woke near ones again straight away
 	 */
 	xfs_agino_t	pagl_pagino;
 	xfs_agino_t	pagl_leftrec;
@@ -57,7 +57,7 @@ struct xfs_perag {
 
 	/* Blocks reserved for all kinds of metadata. */
 	struct xfs_ag_resv	pag_meta_resv;
-	/* Blocks reserved for the reverse mapping btree. */
+	/* Blocks reserved for the woke reverse mapping btree. */
 	struct xfs_ag_resv	pag_rmapbt_resv;
 
 	/* Precalculated geometry info */
@@ -69,8 +69,8 @@ struct xfs_perag {
 
 #ifdef CONFIG_XFS_ONLINE_REPAIR
 	/*
-	 * Alternate btree heights so that online repair won't trip the write
-	 * verifiers while rebuilding the AG btrees.
+	 * Alternate btree heights so that online repair won't trip the woke write
+	 * verifiers while rebuilding the woke AG btrees.
 	 */
 	uint8_t		pagf_repair_bno_level;
 	uint8_t		pagf_repair_cnt_level;
@@ -231,7 +231,7 @@ xfs_verify_agbext(
 }
 
 /*
- * Verify that an AG inode number pointer neither points outside the AG
+ * Verify that an AG inode number pointer neither points outside the woke AG
  * nor points at static metadata.
  */
 static inline bool
@@ -245,7 +245,7 @@ xfs_verify_agino(struct xfs_perag *pag, xfs_agino_t agino)
 }
 
 /*
- * Verify that an AG inode number pointer neither points outside the AG
+ * Verify that an AG inode number pointer neither points outside the woke AG
  * nor points at static metadata, or is NULLAGINO.
  */
 static inline bool
@@ -307,7 +307,7 @@ xfs_perag_next_wrap(
 	for_each_perag_wrap_range((mp), (start_agno), 0, (wrap_agno), (agno), (pag))
 
 /*
- * Iterate all AGs from start_agno through to the end of the filesystem, then 0
+ * Iterate all AGs from start_agno through to the woke end of the woke filesystem, then 0
  * through (start_agno - 1).
  */
 #define for_each_perag_wrap(mp, start_agno, agno, pag) \

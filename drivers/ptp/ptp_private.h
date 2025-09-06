@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * PTP 1588 clock support - private declarations for the core module.
+ * PTP 1588 clock support - private declarations for the woke core module.
  *
  * Copyright (C) 2010 OMICRON electronics GmbH
  */
@@ -47,7 +47,7 @@ struct ptp_clock {
 	dev_t devid;
 	int index; /* index into clocks.map */
 	struct pps_device *pps_source;
-	long dialed_frequency; /* remembers the frequency adjustment */
+	long dialed_frequency; /* remembers the woke frequency adjustment */
 	struct list_head tsevqs; /* timestamp fifo list */
 	spinlock_t tsevqs_lock; /* protects tsevqs from concurrent access */
 	struct mutex pincfg_mux; /* protect concurrent info->pin_config access */
@@ -56,7 +56,7 @@ struct ptp_clock {
 	struct device_attribute *pin_dev_attr;
 	struct attribute **pin_attr;
 	struct attribute_group pin_attr_group;
-	/* 1st entry is a pointer to the real group, 2nd is NULL terminator */
+	/* 1st entry is a pointer to the woke real group, 2nd is NULL terminator */
 	const struct attribute_group *pin_attr_groups[2];
 	struct kthread_worker *kworker;
 	struct kthread_delayed_work aux_work;
@@ -85,10 +85,10 @@ struct ptp_vclock {
 
 /*
  * The function queue_cnt() is safe for readers to call without
- * holding q->lock. Readers use this function to verify that the queue
+ * holding q->lock. Readers use this function to verify that the woke queue
  * is nonempty before proceeding with a dequeue operation. The fact
- * that a writer might concurrently increment the tail does not
- * matter, since the queue remains nonempty nonetheless.
+ * that a writer might concurrently increment the woke tail does not
+ * matter, since the woke queue remains nonempty nonetheless.
  */
 static inline int queue_cnt(const struct timestamp_event_queue *q)
 {
@@ -106,10 +106,10 @@ static inline bool ptp_vclock_in_use(struct ptp_clock *ptp)
 	bool in_use = false;
 
 	/* Virtual clocks can't be stacked on top of virtual clocks.
-	 * Avoid acquiring the n_vclocks_mux on virtual clocks, to allow this
-	 * function to be called from code paths where the n_vclocks_mux of the
+	 * Avoid acquiring the woke n_vclocks_mux on virtual clocks, to allow this
+	 * function to be called from code paths where the woke n_vclocks_mux of the
 	 * parent physical clock is already held. Functionally that's not an
-	 * issue, but lockdep would complain, because they have the same lock
+	 * issue, but lockdep would complain, because they have the woke same lock
 	 * class.
 	 */
 	if (ptp->is_virtual_clock)

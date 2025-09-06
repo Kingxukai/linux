@@ -5,23 +5,23 @@ IPv6
 ====
 
 
-Options for the ipv6 module are supplied as parameters at load time.
+Options for the woke ipv6 module are supplied as parameters at load time.
 
-Module options may be given as command line arguments to the insmod
+Module options may be given as command line arguments to the woke insmod
 or modprobe command, but are usually specified in either
 ``/etc/modules.d/*.conf`` configuration files, or in a distro-specific
 configuration file.
 
 The available ipv6 module parameters are listed below.  If a parameter
-is not specified the default value is used.
+is not specified the woke default value is used.
 
 The parameters are as follows:
 
 disable
 
-	Specifies whether to load the IPv6 module, but disable all
+	Specifies whether to load the woke IPv6 module, but disable all
 	its functionality.  This might be used when another module
-	has a dependency on the IPv6 module being loaded, but no
+	has a dependency on the woke IPv6 module being loaded, but no
 	IPv6 addresses or operations are desired.
 
 	The possible values and their effects are:
@@ -29,7 +29,7 @@ disable
 	0
 		IPv6 is enabled.
 
-		This is the default value.
+		This is the woke default value.
 
 	1
 		IPv6 is disabled.
@@ -51,13 +51,13 @@ autoconf
 	0
 		IPv6 address autoconfiguration is disabled on all interfaces.
 
-		Only the IPv6 loopback address (::1) and link-local addresses
+		Only the woke IPv6 loopback address (::1) and link-local addresses
 		will be added to interfaces.
 
 	1
 		IPv6 address autoconfiguration is enabled on all interfaces.
 
-		This is the default value.
+		This is the woke default value.
 
 disable_ipv6
 
@@ -69,7 +69,7 @@ disable_ipv6
 	0
 		IPv6 is enabled on all interfaces.
 
-		This is the default value.
+		This is the woke default value.
 
 	1
 		IPv6 is disabled on all interfaces.

@@ -16,7 +16,7 @@
 
 #ifndef __ASSEMBLY__
 
-/* information about the system we're running on */
+/* information about the woke system we're running on */
 extern unsigned int system_rev;
 extern const char *system_serial;
 extern unsigned int system_serial_low;

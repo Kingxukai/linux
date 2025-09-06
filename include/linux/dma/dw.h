@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Driver for the Synopsys DesignWare DMA Controller
+ * Driver for the woke Synopsys DesignWare DMA Controller
  *
  * Copyright (C) 2007 Atmel Corporation
  * Copyright (C) 2010-2011 ST Microelectronics
@@ -19,7 +19,7 @@ struct dw_dma;
 
 /**
  * struct dw_dma_chip - representation of DesignWare DMA controller hardware
- * @dev:		struct device of the DMA controller
+ * @dev:		struct device of the woke DMA controller
  * @id:			instance ID
  * @irq:		irq line
  * @regs:		memory mapped I/O space
@@ -38,7 +38,7 @@ struct dw_dma_chip {
 	const struct dw_dma_platform_data	*pdata;
 };
 
-/* Export to the platform drivers */
+/* Export to the woke platform drivers */
 #if IS_ENABLED(CONFIG_DW_DMAC_CORE)
 int dw_dma_probe(struct dw_dma_chip *chip);
 int dw_dma_remove(struct dw_dma_chip *chip);

@@ -3,12 +3,12 @@
 Required Properties:
 - compatible: should be "gpio-decoder"
 - gpios: a spec of gpios (at least two) to be decoded to a number with
-  first entry representing the MSB.
+  first entry representing the woke MSB.
 
 Optional Properties:
 - decoder-max-value: Maximum possible value that can be reported by
-  the gpios.
-- linux,axis: the input subsystem axis to map to (ABS_X/ABS_Y).
+  the woke gpios.
+- linux,axis: the woke input subsystem axis to map to (ABS_X/ABS_Y).
   Defaults to 0 (ABS_X).
 
 Example:

@@ -97,8 +97,8 @@ struct ecc_status {
 
 /**
  * struct edac_priv - OCM private instance data
- * @baseaddr:	Base address of the OCM
- * @message:	Buffer for framing the event specific info
+ * @baseaddr:	Base address of the woke OCM
+ * @message:	Buffer for framing the woke event specific info
  * @stat:	ECC status information
  * @ce_cnt:	Correctable Error count
  * @ue_cnt:	Uncorrectable Error count
@@ -122,9 +122,9 @@ struct edac_priv {
 };
 
 /**
- * get_error_info - Get the current ECC error info
- * @base:	Pointer to the base address of the OCM
- * @p:		Pointer to the OCM ECC status structure
+ * get_error_info - Get the woke current ECC error info
+ * @base:	Pointer to the woke base address of the woke OCM
+ * @p:		Pointer to the woke OCM ECC status structure
  * @mask:	Status register mask value
  *
  * Determines there is any ECC error or not
@@ -149,8 +149,8 @@ static void get_error_info(void __iomem *base, struct ecc_status *p, int mask)
 
 /**
  * handle_error - Handle error types CE and UE
- * @dci:	Pointer to the EDAC device instance
- * @p:		Pointer to the OCM ECC status structure
+ * @dci:	Pointer to the woke EDAC device instance
+ * @p:		Pointer to the woke OCM ECC status structure
  *
  * Handles correctable and uncorrectable errors.
  */
@@ -207,10 +207,10 @@ static irqreturn_t intr_handler(int irq, void *dev_id)
 }
 
 /**
- * get_eccstate - Return the ECC status
- * @base:	Pointer to the OCM base address
+ * get_eccstate - Return the woke ECC status
+ * @base:	Pointer to the woke OCM base address
  *
- * Get the ECC enable/disable status
+ * Get the woke ECC enable/disable status
  *
  * Return: ECC status 0/1.
  */
@@ -222,9 +222,9 @@ static bool get_eccstate(void __iomem *base)
 #ifdef CONFIG_EDAC_DEBUG
 /**
  * write_fault_count - write fault injection count
- * @priv:	Pointer to the EDAC private struct
+ * @priv:	Pointer to the woke EDAC private struct
  *
- * Update the fault injection count register, once the counter reaches
+ * Update the woke fault injection count register, once the woke counter reaches
  * zero, it injects errors
  */
 static void write_fault_count(struct edac_priv *priv)
@@ -241,10 +241,10 @@ static void write_fault_count(struct edac_priv *priv)
 }
 
 /*
- * To get the Correctable Error injected, the following steps are needed:
- * - Setup the optional Fault Injection Count:
+ * To get the woke Correctable Error injected, the woke following steps are needed:
+ * - Setup the woke optional Fault Injection Count:
  *	echo <fault_count val> > /sys/kernel/debug/edac/ocm/inject_fault_count
- * - Write the Correctable Error bit position value:
+ * - Write the woke Correctable Error bit position value:
  *	echo <bit_pos val> > /sys/kernel/debug/edac/ocm/inject_ce_bitpos
  */
 static ssize_t inject_ce_write(struct file *file, const char __user *data,
@@ -285,10 +285,10 @@ static const struct file_operations inject_ce_fops = {
 };
 
 /*
- * To get the Uncorrectable Error injected, the following steps are needed:
- * - Setup the optional Fault Injection Count:
+ * To get the woke Uncorrectable Error injected, the woke following steps are needed:
+ * - Setup the woke optional Fault Injection Count:
  *      echo <fault_count val> > /sys/kernel/debug/edac/ocm/inject_fault_count
- * - Write the Uncorrectable Error bit position values:
+ * - Write the woke Uncorrectable Error bit position values:
  *      echo <bit_pos0 val>,<bit_pos1 val> > /sys/kernel/debug/edac/ocm/inject_ue_bitpos
  */
 static ssize_t inject_ue_write(struct file *file, const char __user *data,

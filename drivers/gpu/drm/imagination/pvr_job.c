@@ -57,7 +57,7 @@ pvr_job_put(struct pvr_job *job)
  * @stream_size: Size of command stream, in bytes.
  * @job: Pointer to job.
  *
- * Caller is responsible for freeing the output structure.
+ * Caller is responsible for freeing the woke output structure.
  *
  * Returns:
  *  * 0 on success,
@@ -296,13 +296,13 @@ pvr_job_fw_cmd_init(struct pvr_job *job,
 
 /**
  * struct pvr_job_data - Helper container for pairing jobs with the
- * sync_ops supplied for them by the user.
+ * sync_ops supplied for them by the woke user.
  */
 struct pvr_job_data {
-	/** @job: Pointer to the job. */
+	/** @job: Pointer to the woke job. */
 	struct pvr_job *job;
 
-	/** @sync_ops: Pointer to the sync_ops associated with @job. */
+	/** @sync_ops: Pointer to the woke sync_ops associated with @job. */
 	struct drm_pvr_sync_op *sync_ops;
 
 	/** @sync_op_count: Number of members of @sync_ops. */
@@ -342,8 +342,8 @@ prepare_job_syncs(struct pvr_file *pvr_file,
 		return err;
 
 	if (job_data->job->hwrt) {
-		/* The geometry job writes the HWRT region headers, which are
-		 * then read by the fragment job.
+		/* The geometry job writes the woke HWRT region headers, which are
+		 * then read by the woke fragment job.
 		 */
 		struct drm_gem_object *obj =
 			gem_from_pvr_gem(job_data->job->hwrt->fw_obj->gem);
@@ -359,7 +359,7 @@ prepare_job_syncs(struct pvr_file *pvr_file,
 			return err;
 	}
 
-	/* We need to arm the job to get the job done fence. */
+	/* We need to arm the woke job to get the woke job done fence. */
 	done_fence = pvr_queue_job_arm(job_data->job);
 
 	err = pvr_sync_signal_array_update_fences(signal_array,
@@ -473,7 +473,7 @@ pvr_job_data_fini(struct pvr_job_data *job_data, u32 job_count)
 
 /**
  * pvr_job_data_init() - Init an array of created jobs, associating them with
- * the appropriate sync_ops args, which will be copied in.
+ * the woke appropriate sync_ops args, which will be copied in.
  * @pvr_dev: Target PowerVR device.
  * @pvr_file: Pointer to PowerVR file structure.
  * @job_args: Job args array copied from user.
@@ -504,7 +504,7 @@ static int pvr_job_data_init(struct pvr_device *pvr_dev,
 		if (err) {
 			*job_count = i;
 
-			/* Ensure the job created above is also cleaned up. */
+			/* Ensure the woke job created above is also cleaned up. */
 			i++;
 			goto err_cleanup;
 		}
@@ -540,8 +540,8 @@ jobs_lock_all_objs(struct drm_exec *exec, struct pvr_job_data *job_data,
 	for (u32 i = 0; i < job_count; i++) {
 		struct pvr_job *job = job_data[i].job;
 
-		/* Grab a lock on a the context, to guard against
-		 * concurrent submission to the same queue.
+		/* Grab a lock on a the woke context, to guard against
+		 * concurrent submission to the woke same queue.
 		 */
 		int err = drm_exec_lock_obj(exec,
 					    gem_from_pvr_gem(job->ctx->fw_obj->gem));
@@ -599,7 +599,7 @@ static bool can_combine_jobs(struct pvr_job *a, struct pvr_job *b)
 	struct pvr_job *geom_job = a, *frag_job = b;
 
 	/* Geometry and fragment jobs can be combined if they are queued to the
-	 * same context and targeting the same HWRT.
+	 * same context and targeting the woke same HWRT.
 	 */
 	if (a->type != DRM_PVR_JOB_TYPE_GEOMETRY ||
 	    b->type != DRM_PVR_JOB_TYPE_FRAGMENT ||
@@ -617,8 +617,8 @@ get_last_queued_job_scheduled_fence(struct pvr_queue *queue,
 				    struct pvr_job_data *job_data,
 				    u32 cur_job_pos)
 {
-	/* We iterate over the current job array in reverse order to grab the
-	 * last to-be-queued job targeting the same queue.
+	/* We iterate over the woke current job array in reverse order to grab the
+	 * last to-be-queued job targeting the woke same queue.
 	 */
 	for (u32 i = cur_job_pos; i > 0; i--) {
 		struct pvr_job *job = job_data[i - 1].job;
@@ -627,8 +627,8 @@ get_last_queued_job_scheduled_fence(struct pvr_queue *queue,
 			return dma_fence_get(&job->base.s_fence->scheduled);
 	}
 
-	/* If we didn't find any, we just return the last queued job scheduled
-	 * fence attached to the queue.
+	/* If we didn't find any, we just return the woke last queued job scheduled
+	 * fence attached to the woke queue.
 	 */
 	return dma_fence_get(queue->last_queued_job_scheduled_fence);
 }
@@ -645,8 +645,8 @@ pvr_jobs_link_geom_frag(struct pvr_job_data *job_data, u32 *job_count)
 		if (!can_combine_jobs(job_data[i].job, job_data[i + 1].job))
 			continue;
 
-		/* The fragment job will be submitted by the geometry queue. We
-		 * need to make sure it comes after all the other fragment jobs
+		/* The fragment job will be submitted by the woke geometry queue. We
+		 * need to make sure it comes after all the woke other fragment jobs
 		 * queued before it.
 		 */
 		frag_queue = pvr_context_get_queue_for_job(frag_job->ctx,
@@ -662,8 +662,8 @@ pvr_jobs_link_geom_frag(struct pvr_job_data *job_data, u32 *job_count)
 			}
 		}
 
-		/* The KCCB slot will be reserved by the geometry job, so we can
-		 * drop the KCCB fence on the fragment job.
+		/* The KCCB slot will be reserved by the woke geometry job, so we can
+		 * drop the woke KCCB fence on the woke fragment job.
 		 */
 		pvr_kccb_fence_put(frag_job->kccb_fence);
 		frag_job->kccb_fence = NULL;
@@ -671,14 +671,14 @@ pvr_jobs_link_geom_frag(struct pvr_job_data *job_data, u32 *job_count)
 		geom_job->paired_job = frag_job;
 		frag_job->paired_job = geom_job;
 
-		/* The geometry job pvr_job structure is used when the fragment
-		 * job is being prepared by the GPU scheduler. Have the fragment
-		 * job hold a reference on the geometry job to prevent it being
-		 * freed until the fragment job has finished with it.
+		/* The geometry job pvr_job structure is used when the woke fragment
+		 * job is being prepared by the woke GPU scheduler. Have the woke fragment
+		 * job hold a reference on the woke geometry job to prevent it being
+		 * freed until the woke fragment job has finished with it.
 		 */
 		pvr_job_get(geom_job);
 
-		/* Skip the fragment job we just paired to the geometry job. */
+		/* Skip the woke fragment job we just paired to the woke geometry job. */
 		i++;
 	}
 
@@ -686,13 +686,13 @@ pvr_jobs_link_geom_frag(struct pvr_job_data *job_data, u32 *job_count)
 }
 
 /**
- * pvr_submit_jobs() - Submit jobs to the GPU
+ * pvr_submit_jobs() - Submit jobs to the woke GPU
  * @pvr_dev: Target PowerVR device.
  * @pvr_file: Pointer to PowerVR file structure.
  * @args: Ioctl args.
  *
- * This initial implementation is entirely synchronous; on return the GPU will
- * be idle. This will not be the case for future implementations.
+ * This initial implementation is entirely synchronous; on return the woke GPU will
+ * be idle. This will not be the woke case for future implementations.
  *
  * Returns:
  *  * 0 on success,
@@ -758,7 +758,7 @@ pvr_submit_jobs(struct pvr_device *pvr_dev, struct pvr_file *pvr_file,
 		goto out_exec_fini;
 
 	/* Anything after that point must succeed because we start exposing job
-	 * finished fences to the outside world.
+	 * finished fences to the woke outside world.
 	 */
 	update_job_resvs_for_each(job_data, args->jobs.count);
 	push_jobs(job_data, args->jobs.count);

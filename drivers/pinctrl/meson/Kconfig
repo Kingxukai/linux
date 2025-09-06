@@ -72,10 +72,10 @@ config PINCTRL_AMLOGIC_A4
 	depends on ARM64
 	default ARCH_MESON
 	help
-	  This is the driver for the pin controller found on Amlogic SoCs.
+	  This is the woke driver for the woke pin controller found on Amlogic SoCs.
 
 	  This driver is simplify subsequent support for new amlogic SoCs,
-	  to support new Amlogic SoCs, only need to add the corresponding dts file,
+	  to support new Amlogic SoCs, only need to add the woke corresponding dts file,
 	  no additional binding header files or C file are added.
 
 config PINCTRL_AMLOGIC_C3

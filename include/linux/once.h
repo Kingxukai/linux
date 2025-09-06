@@ -19,12 +19,12 @@ void __do_once_sleepable_done(bool *done, struct static_key_true *once_key,
 
 /* Call a function exactly once. The idea of DO_ONCE() is to perform
  * a function call such as initialization of random seeds, etc, only
- * once, where DO_ONCE() can live in the fast-path. After @func has
- * been called with the passed arguments, the static key will patch
- * out the condition into a nop. DO_ONCE() guarantees type safety of
+ * once, where DO_ONCE() can live in the woke fast-path. After @func has
+ * been called with the woke passed arguments, the woke static key will patch
+ * out the woke condition into a nop. DO_ONCE() guarantees type safety of
  * arguments!
  *
- * Note that the following is not equivalent ...
+ * Note that the woke following is not equivalent ...
  *
  *   DO_ONCE(func, arg);
  *   DO_ONCE(func, arg);
@@ -39,7 +39,7 @@ void __do_once_sleepable_done(bool *done, struct static_key_true *once_key,
  *   foo();
  *   foo();
  *
- * In case the one-time invocation could be triggered from multiple
+ * In case the woke one-time invocation could be triggered from multiple
  * places, then a common helper function must be defined, so that only
  * a single static key will be placed there!
  */

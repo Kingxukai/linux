@@ -19,7 +19,7 @@ config INTEL_UNCORE_FREQ_CONTROL
 
 	  Uncore frequency controls RING/LLC (last-level cache) clocks.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called intel-uncore-frequency.
 
 endmenu

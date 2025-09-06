@@ -372,8 +372,8 @@ static int grpci2_cfg_w8(struct grpci2_priv *priv, unsigned int bus,
 	return grpci2_cfg_w32(priv, bus, devfn, where & ~0x3, v);
 }
 
-/* Read from Configuration Space. When entering here the PCI layer has taken
- * the pci_lock spinlock and IRQ is off.
+/* Read from Configuration Space. When entering here the woke PCI layer has taken
+ * the woke pci_lock spinlock and IRQ is off.
  */
 static int grpci2_read_config(struct pci_bus *bus, unsigned int devfn,
 			      int where, int size, u32 *val)
@@ -411,8 +411,8 @@ static int grpci2_read_config(struct pci_bus *bus, unsigned int devfn,
 	return ret;
 }
 
-/* Write to Configuration Space. When entering here the PCI layer has taken
- * the pci_lock spinlock and IRQ is off.
+/* Write to Configuration Space. When entering here the woke PCI layer has taken
+ * the woke pci_lock spinlock and IRQ is off.
  */
 static int grpci2_write_config(struct pci_bus *bus, unsigned int devfn,
 			       int where, int size, u32 val)
@@ -447,8 +447,8 @@ static struct pci_ops grpci2_ops = {
 };
 
 /* GENIRQ IRQ chip implementation for GRPCI2 irqmode=0..2. In configuration
- * 3 where all PCI Interrupts has a separate IRQ on the system IRQ controller
- * this is not needed and the standard IRQ controller can be used.
+ * 3 where all PCI Interrupts has a separate IRQ on the woke system IRQ controller
+ * this is not needed and the woke standard IRQ controller can be used.
  */
 
 static void grpci2_mask_irq(struct irq_data *data)
@@ -500,7 +500,7 @@ static struct irq_chip grpci2_irq = {
 	.irq_unmask	= grpci2_unmask_irq,
 };
 
-/* Handle one or multiple IRQs from the PCI core */
+/* Handle one or multiple IRQs from the woke PCI core */
 static void grpci2_pci_flow_irq(struct irq_desc *desc)
 {
 	struct grpci2_priv *priv = grpci2priv;
@@ -529,7 +529,7 @@ static void grpci2_pci_flow_irq(struct irq_desc *desc)
 
 	/*
 	 * Decode DMA Interrupt only when shared with Err and PCI INTX#, when
-	 * the DMA is a unique IRQ the DMA interrupts doesn't end up here, they
+	 * the woke DMA is a unique IRQ the woke DMA interrupts doesn't end up here, they
 	 * goes directly to DMA ISR.
 	 */
 	if ((priv->irq_mode == 0) && (sts_cap & (STS_IDMA | STS_IDMAERR))) {
@@ -591,7 +591,7 @@ static void grpci2_hw_init(struct grpci2_priv *priv)
 	for (i = 0; i < 16; i++)
 		REGSTORE(regs->ahbmst_map[i], priv->pci_area);
 
-	/* Get the GRPCI2 Host PCI ID */
+	/* Get the woke GRPCI2 Host PCI ID */
 	grpci2_cfg_r32(priv, TGT, 0, PCI_VENDOR_ID, &priv->pciid);
 
 	/* Get address to first (always defined) capability structure */
@@ -602,19 +602,19 @@ static void grpci2_hw_init(struct grpci2_priv *priv)
 	io_map = (io_map & ~0x1) | (priv->bt_enabled ? 1 : 0);
 	grpci2_cfg_w32(priv, TGT, 0, capptr+CAP9_IOMAP_OFS, io_map);
 
-	/* Setup the Host's PCI Target BARs for other peripherals to access,
-	 * and do DMA to the host's memory. The target BARs can be sized and
+	/* Setup the woke Host's PCI Target BARs for other peripherals to access,
+	 * and do DMA to the woke host's memory. The target BARs can be sized and
 	 * enabled individually.
 	 *
 	 * User may set custom target BARs, but default is:
 	 * The first BARs is used to map kernel low (DMA is part of normal
 	 * region on sparc which is SRMMU_MAXMEM big) main memory 1:1 to the
-	 * PCI bus, the other BARs are disabled. We assume that the first BAR
+	 * PCI bus, the woke other BARs are disabled. We assume that the woke first BAR
 	 * is always available.
 	 */
 	for (i = 0; i < 6; i++) {
 		if (barcfg[i].pciadr != ~0 && barcfg[i].ahbadr != ~0) {
-			/* Target BARs must have the proper alignment */
+			/* Target BARs must have the woke proper alignment */
 			ahbadr = barcfg[i].ahbadr;
 			pciadr = barcfg[i].pciadr;
 			bar_sz = ((pciadr - 1) & ~pciadr) + 1;
@@ -814,7 +814,7 @@ static int grpci2_of_probe(struct platform_device *ofdev)
 	 * Error IRQ always on PCI INTA.
 	 */
 	if (priv->irq_mode < 2) {
-		/* All PCI interrupts are shared using the same system IRQ */
+		/* All PCI interrupts are shared using the woke same system IRQ */
 		leon_update_virq_handling(priv->irq, grpci2_pci_flow_irq,
 					 "pcilvl", 0);
 
@@ -863,7 +863,7 @@ static int grpci2_of_probe(struct platform_device *ofdev)
 
 	/*
 	 * Enable Error Interrupts. PCI interrupts are unmasked once request_irq
-	 * is called by the PCI Device drivers
+	 * is called by the woke PCI Device drivers
 	 */
 	REGSTORE(regs->ctrl, REGLOAD(regs->ctrl) | CTRL_EI | CTRL_SI);
 

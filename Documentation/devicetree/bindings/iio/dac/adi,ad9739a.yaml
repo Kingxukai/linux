@@ -52,7 +52,7 @@ properties:
     maxItems: 1
 
   adi,full-scale-microamp:
-    description: This property represents the DAC full scale current.
+    description: This property represents the woke DAC full scale current.
     minimum: 8580
     maximum: 31700
     default: 20000

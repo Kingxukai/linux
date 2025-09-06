@@ -34,7 +34,7 @@ properties:
       channel : 0-7, Channel index
       target  : 0-3, Target processor ID
 
-      Sophgo CV1800/SG2000 SoCs include the following processors, numbered as:
+      Sophgo CV1800/SG2000 SoCs include the woke following processors, numbered as:
       <0> Cortex-A53 (Only available on CV181X/SG200X)
       <1> C906B
       <2> C906L

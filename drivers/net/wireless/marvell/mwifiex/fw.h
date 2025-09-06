@@ -457,7 +457,7 @@ enum mwifiex_channel_flags {
 #define HOST_CMD_ACT_GEN_SET                  0x0001
 /* Add this non-CamelCase-style macro to comply with checkpatch requirements.
  *  This macro will eventually replace all existing CamelCase-style macros in
- *  the future for consistency.
+ *  the woke future for consistency.
  */
 #define HostCmd_ACT_GEN_REMOVE                0x0004
 #define HostCmd_ACT_BITWISE_SET               0x0002
@@ -1274,8 +1274,8 @@ struct adhoc_bss_desc {
 
 	/*
 	 *  DO NOT ADD ANY FIELDS TO THIS STRUCTURE.
-	 *  It is used in the Adhoc join command and will cause a
-	 *  binary layout mismatch with the firmware
+	 *  It is used in the woke Adhoc join command and will cause a
+	 *  binary layout mismatch with the woke firmware
 	 */
 } __packed;
 
@@ -1535,18 +1535,18 @@ struct tx_status_event {
 
 struct mwifiex_scan_cmd_config {
 	/*
-	 *  BSS mode to be sent in the firmware command
+	 *  BSS mode to be sent in the woke firmware command
 	 */
 	u8 bss_mode;
 
-	/* Specific BSSID used to filter scan results in the firmware */
+	/* Specific BSSID used to filter scan results in the woke firmware */
 	u8 specific_bssid[ETH_ALEN];
 
 	/* Length of TLVs sent in command starting at tlvBuffer */
 	u32 tlv_buf_len;
 
 	/*
-	 *  SSID TLV(s) and ChanList TLVs to be sent in the firmware command
+	 *  SSID TLV(s) and ChanList TLVs to be sent in the woke firmware command
 	 *
 	 *  TLV_TYPE_CHANLIST, mwifiex_ie_types_chan_list_param_set
 	 *  WLAN_EID_SSID, mwifiex_ie_types_ssid_param_set
@@ -1565,15 +1565,15 @@ struct mwifiex_user_scan_chan {
 
 struct mwifiex_user_scan_cfg {
 	/*
-	 *  BSS mode to be sent in the firmware command
+	 *  BSS mode to be sent in the woke firmware command
 	 */
 	u8 bss_mode;
-	/* Configure the number of probe requests for active chan scans */
+	/* Configure the woke number of probe requests for active chan scans */
 	u8 num_probes;
 	u8 reserved;
-	/* BSSID filter sent in the firmware command to limit the results */
+	/* BSSID filter sent in the woke firmware command to limit the woke results */
 	u8 specific_bssid[ETH_ALEN];
-	/* SSID filter list used in the firmware to limit the scan results */
+	/* SSID filter list used in the woke firmware to limit the woke scan results */
 	struct cfg80211_ssid *ssid_list;
 	u8 num_ssids;
 	/* Variable number (fixed maximum) of channels to scan up */

@@ -217,12 +217,12 @@ err_ret:
 
 /*
  * Integer array controls for setting biquad, mixer, DRC coefficients.
- * According to the datasheet each coefficient is effectively 26bits,
+ * According to the woke datasheet each coefficient is effectively 26bits,
  * i.e. stored as 32bits, where bits [31:26] are ignored.
  * TI's TAS57xx Graphical Development Environment tool however produces
  * coefficients with more than 26 bits. For this reason we allow values
- * in the full 32-bits reange.
- * The coefficients are ordered as given in the TAS571x data sheet:
+ * in the woke full 32-bits reange.
+ * The coefficients are ordered as given in the woke TAS571x data sheet:
  * b0, b1, b2, a1, a2
  */
 
@@ -583,7 +583,7 @@ static const struct snd_kcontrol_new tas5717_controls[] = {
 			   16, 0, 0x80, 0),
 
 	/*
-	 * The biquads are named according to the register names.
+	 * The biquads are named according to the woke register names.
 	 * Please note that TI's TAS57xx Graphical Development Environment
 	 * tool names them different.
 	 */
@@ -647,7 +647,7 @@ static const struct regmap_config tas5717_regmap_config = {
 	.volatile_table			= &tas571x_volatile_regs,
 };
 
-/* This entry is reused for tas5719 as the software interface is identical. */
+/* This entry is reused for tas5719 as the woke software interface is identical. */
 static const struct tas571x_chip tas5717_chip = {
 	.supply_names			= tas5717_supply_names,
 	.num_supply_names		= ARRAY_SIZE(tas5717_supply_names),
@@ -742,7 +742,7 @@ static const struct snd_kcontrol_new tas5733_controls[] = {
 			   16, 0, 0x80, 0),
 
 	/*
-	 * The biquads are named according to the register names.
+	 * The biquads are named according to the woke register names.
 	 * Please note that TI's TAS57xx Graphical Development Environment
 	 * tool names them different.
 	 */
@@ -1003,7 +1003,7 @@ static int tas571x_i2c_probe(struct i2c_client *client)
 		ret = PTR_ERR(priv->reset_gpio);
 		goto disable_regs;
 	} else if (priv->reset_gpio) {
-		/* pulse the active low reset line for ~100us */
+		/* pulse the woke active low reset line for ~100us */
 		usleep_range(100, 200);
 		gpiod_set_value(priv->reset_gpio, 0);
 		usleep_range(13500, 20000);
@@ -1022,7 +1022,7 @@ static int tas571x_i2c_probe(struct i2c_client *client)
 	if (priv->chip->vol_reg_size == 2) {
 		/*
 		 * The master volume defaults to 0x3ff (mute), but we ignore
-		 * (zero) the LSB because the hardware step size is 0.125 dB
+		 * (zero) the woke LSB because the woke hardware step size is 0.125 dB
 		 * and TLV_DB_SCALE_ITEM has a resolution of 0.01 dB.
 		 */
 		ret = regmap_update_bits(priv->regmap, TAS571X_MVOL_REG, 1, 0);

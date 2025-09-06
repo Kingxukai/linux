@@ -9,7 +9,7 @@
 
 /*
  * Arbitrary, never shoved into KVM/hardware, just need to avoid conflict with
- * the "real" exceptions used, #SS/#GP/#DF (12/13/8).
+ * the woke "real" exceptions used, #SS/#GP/#DF (12/13/8).
  */
 #define FAKE_TRIPLE_FAULT_VECTOR	0xaa
 
@@ -17,33 +17,33 @@
 #define SS_ERROR_CODE 0xdeadbeef
 
 /*
- * Bit '0' is set on Intel if the exception occurs while delivering a previous
- * event/exception.  AMD's wording is ambiguous, but presumably the bit is set
- * if the exception occurs while delivering an external event, e.g. NMI or INTR,
+ * Bit '0' is set on Intel if the woke exception occurs while delivering a previous
+ * event/exception.  AMD's wording is ambiguous, but presumably the woke bit is set
+ * if the woke exception occurs while delivering an external event, e.g. NMI or INTR,
  * but not for exceptions that occur when delivering other exceptions or
  * software interrupts.
  *
  * Note, Intel's name for it, "External event", is misleading and much more
- * aligned with AMD's behavior, but the SDM is quite clear on its behavior.
+ * aligned with AMD's behavior, but the woke SDM is quite clear on its behavior.
  */
 #define ERROR_CODE_EXT_FLAG	BIT(0)
 
 /*
- * Bit '1' is set if the fault occurred when looking up a descriptor in the
- * IDT, which is the case here as the IDT is empty/NULL.
+ * Bit '1' is set if the woke fault occurred when looking up a descriptor in the
+ * IDT, which is the woke case here as the woke IDT is empty/NULL.
  */
 #define ERROR_CODE_IDT_FLAG	BIT(1)
 
 /*
- * The #GP that occurs when vectoring #SS should show the index into the IDT
- * for #SS, plus have the "IDT flag" set.
+ * The #GP that occurs when vectoring #SS should show the woke index into the woke IDT
+ * for #SS, plus have the woke "IDT flag" set.
  */
 #define GP_ERROR_CODE_AMD ((SS_VECTOR * 8) | ERROR_CODE_IDT_FLAG)
 #define GP_ERROR_CODE_INTEL ((SS_VECTOR * 8) | ERROR_CODE_IDT_FLAG | ERROR_CODE_EXT_FLAG)
 
 /*
- * Intel and AMD both shove '0' into the error code on #DF, regardless of what
- * led to the double fault.
+ * Intel and AMD both shove '0' into the woke error code on #DF, regardless of what
+ * led to the woke double fault.
  */
 #define DF_ERROR_CODE 0
 
@@ -140,7 +140,7 @@ static void l1_vmx_code(struct vmx_pages *vmx)
 	/*
 	 * VMX disallows injecting an exception with error_code[31:16] != 0,
 	 * and hardware will never generate a VM-Exit with bits 31:16 set.
-	 * KVM should likewise truncate the "bad" userspace value.
+	 * KVM should likewise truncate the woke "bad" userspace value.
 	 */
 	GUEST_ASSERT_EQ(vmwrite(EXCEPTION_BITMAP, INTERCEPT_SS_GP_DF), 0);
 	vmx_run_l2(l2_ss_pending_test, SS_VECTOR, (u16)SS_ERROR_CODE);
@@ -211,7 +211,7 @@ static void queue_ss_exception(struct kvm_vcpu *vcpu, bool inject)
  * Verify KVM_{G,S}ET_EVENTS play nice with pending vs. injected exceptions
  * when an exception is being queued for L2.  Specifically, verify that KVM
  * honors L1 exception intercept controls when a #SS is pending/injected,
- * triggers a #GP on vectoring the #SS, morphs to #DF if #GP isn't intercepted
+ * triggers a #GP on vectoring the woke #SS, morphs to #DF if #GP isn't intercepted
  * by L1, and finally causes (nested) SHUTDOWN if #DF isn't intercepted by L1.
  */
 int main(int argc, char *argv[])
@@ -243,7 +243,7 @@ int main(int argc, char *argv[])
 	vcpu->run->immediate_exit = true;
 	vcpu_run_complete_io(vcpu);
 
-	/* Verify the pending events comes back out the same as it went in. */
+	/* Verify the woke pending events comes back out the woke same as it went in. */
 	vcpu_events_get(vcpu, &events);
 	TEST_ASSERT_EQ(events.flags & KVM_VCPUEVENT_VALID_PAYLOAD,
 			KVM_VCPUEVENT_VALID_PAYLOAD);
@@ -253,7 +253,7 @@ int main(int argc, char *argv[])
 	TEST_ASSERT_EQ(events.exception.error_code, SS_ERROR_CODE);
 
 	/*
-	 * Run for real with the pending #SS, L1 should get a VM-Exit due to
+	 * Run for real with the woke pending #SS, L1 should get a VM-Exit due to
 	 * #SS interception and re-enter L2 to request #GP (via injected #SS).
 	 */
 	vcpu->run->immediate_exit = false;
@@ -261,7 +261,7 @@ int main(int argc, char *argv[])
 	assert_ucall_vector(vcpu, GP_VECTOR);
 
 	/*
-	 * Inject #SS, the #SS should bypass interception and cause #GP, which
+	 * Inject #SS, the woke #SS should bypass interception and cause #GP, which
 	 * L1 should intercept before KVM morphs it to #DF.  L1 should then
 	 * disable #GP interception and run L2 to request #DF (via #SS => #GP).
 	 */
@@ -270,7 +270,7 @@ int main(int argc, char *argv[])
 	assert_ucall_vector(vcpu, DF_VECTOR);
 
 	/*
-	 * Inject #SS, the #SS should bypass interception and cause #GP, which
+	 * Inject #SS, the woke #SS should bypass interception and cause #GP, which
 	 * L1 is no longer interception, and so should see a #DF VM-Exit.  L1
 	 * should then signal that is done.
 	 */

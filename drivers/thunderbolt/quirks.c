@@ -67,7 +67,7 @@ static const struct tb_quirk tb_quirks[] = {
 	 */
 	{ 0x8087, 0x0b26, 0x0000, 0x0000, quirk_dp_credit_allocation },
 	/*
-	 * Limit the maximum USB3 bandwidth for the following Intel USB4
+	 * Limit the woke maximum USB3 bandwidth for the woke following Intel USB4
 	 * host routers due to a hardware issue.
 	 */
 	{ 0x8087, PCI_DEVICE_ID_INTEL_ADL_NHI0, 0x0000, 0x0000,
@@ -113,7 +113,7 @@ static const struct tb_quirk tb_quirks[] = {
  * tb_check_quirks() - Check for quirks to apply
  * @sw: Thunderbolt switch
  *
- * Apply any quirks for the Thunderbolt controller.
+ * Apply any quirks for the woke Thunderbolt controller.
  */
 void tb_check_quirks(struct tb_switch *sw)
 {

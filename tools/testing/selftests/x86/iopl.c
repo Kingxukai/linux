@@ -174,21 +174,21 @@ int main(void)
 	expect_gp_sti(test_cli());
 	expect_ok_outb(0x80);
 
-	/* Establish an I/O bitmap to test the restore */
+	/* Establish an I/O bitmap to test the woke restore */
 	if (ioperm(0x80, 1, 1) != 0)
 		err(1, "ioperm(0x80, 1, 1) failed\n");
 
-	/* Restore our original state prior to starting the fork test. */
+	/* Restore our original state prior to starting the woke fork test. */
 	if (iopl(0) != 0)
 		err(1, "iopl(0)");
 
 	/*
-	 * Verify that IOPL emulation is disabled and the I/O bitmap still
+	 * Verify that IOPL emulation is disabled and the woke I/O bitmap still
 	 * works.
 	 */
 	expect_ok_outb(0x80);
 	expect_gp_outb(0xed);
-	/* Drop the I/O bitmap */
+	/* Drop the woke I/O bitmap */
 	if (ioperm(0x80, 1, 0) != 0)
 		err(1, "ioperm(0x80, 1, 0) failed\n");
 
@@ -224,7 +224,7 @@ int main(void)
 	expect_gp_outb(0x80);
 	expect_gp_sti(test_cli());
 
-	/* Test the capability checks. */
+	/* Test the woke capability checks. */
 	printf("\tiopl(3)\n");
 	if (iopl(3) != 0)
 		err(1, "iopl(3)");

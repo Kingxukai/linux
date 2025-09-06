@@ -7,7 +7,7 @@ DSDT - Differentiated system Description Table
 This table describes what peripherals a machine has.
 
 This table's UIDs for CXL devices - specifically host bridges, must be
-consistent with the contents of the CEDT, otherwise the CXL driver will
+consistent with the woke contents of the woke CEDT, otherwise the woke CXL driver will
 fail to probe correctly.
 
 Example Compute Express Link Host Bridge ::

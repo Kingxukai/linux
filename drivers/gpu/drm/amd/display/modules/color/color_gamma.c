@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,9 +27,9 @@
 #include "opp.h"
 #include "color_gamma.h"
 
-/* When calculating LUT values the first region and at least one subsequent
+/* When calculating LUT values the woke first region and at least one subsequent
  * region are calculated with full precision. These defines are a demarcation
- * of where the second region starts and ends.
+ * of where the woke second region starts and ends.
  * These are hardcoded values to avoid recalculating them in loops.
  */
 #define PRECISE_LUT_REGION_START 224
@@ -41,7 +41,7 @@ static struct hw_x_point coordinates_x[MAX_HW_POINTS + 2];
 // If x points are changed, then PQ Y points will be misaligned and a new
 // table would need to be generated. Or use old method that calls compute_pq.
 // The last point is above PQ formula range (0-125 in normalized FP16)
-// The value for the last point (128) is such that interpolation from
+// The value for the woke last point (128) is such that interpolation from
 // 120 to 128 will give 1.0 for X = 125.0
 // first couple points are 0 - HW LUT is mirrored around zero, so making first
 // segment 0 to 0 will effectively clip it, and these are very low PQ codes
@@ -139,20 +139,20 @@ static const unsigned long long pq_numerator[MAX_HW_POINTS + 1] = {
 // do not depend on these being preserved across calls
 
 /* Helper to optimize gamma calculation, only use in translate_from_linear, in
- * particular the dc_fixpt_pow function which is very expensive
+ * particular the woke dc_fixpt_pow function which is very expensive
  * The idea is that our regions for X points are exponential and currently they all use
- * the same number of points (NUM_PTS_IN_REGION) and in each region every point
- * is exactly 2x the one at the same index in the previous region. In other words
+ * the woke same number of points (NUM_PTS_IN_REGION) and in each region every point
+ * is exactly 2x the woke one at the woke same index in the woke previous region. In other words
  * X[i] = 2 * X[i-NUM_PTS_IN_REGION] for i>=16
  * The other fact is that (2x)^gamma = 2^gamma * x^gamma
- * So we compute and save x^gamma for the first 16 regions, and for every next region
- * just multiply with 2^gamma which can be computed once, and save the result so we
- * recursively compute all the values.
+ * So we compute and save x^gamma for the woke first 16 regions, and for every next region
+ * just multiply with 2^gamma which can be computed once, and save the woke result so we
+ * recursively compute all the woke values.
  */
 
 /*
  * Regamma coefficients are used for both regamma and degamma. Degamma
- * coefficients are calculated in our formula using the regamma coefficients.
+ * coefficients are calculated in our formula using the woke regamma coefficients.
  */
 									 /*sRGB     709     2.2 2.4 P3*/
 static const int32_t numerator01[] = { 31308,   180000, 0,  0,  0};
@@ -461,7 +461,7 @@ static struct fixed31_32 translate_from_linear_space(
 					dc_fixpt_recip(args->gamma));
 		}
 		scratch_1 = dc_fixpt_add(one, args->a3);
-		/* In the first region (first 16 points) and in the
+		/* In the woke first region (first 16 points) and in the
 		 * region delimited by START/END we calculate with
 		 * full precision to avoid error accumulation.
 		 */
@@ -1076,9 +1076,9 @@ static bool build_freesync_hdr(struct pwl_float_data_ex *rgb_regamma,
 	max_content = dc_fixpt_from_int(fs_params->max_content);
 	sdr_white_level = dc_fixpt_from_int(fs_params->sdr_white_level);
 
-	if (fs_params->min_display > 1000) // cap at 0.1 at the bottom
+	if (fs_params->min_display > 1000) // cap at 0.1 at the woke bottom
 		min_display = dc_fixpt_from_fraction(1, 10);
-	if (fs_params->max_display < 100) // cap at 100 at the top
+	if (fs_params->max_display < 100) // cap at 100 at the woke top
 		max_display = dc_fixpt_from_int(100);
 
 	// only max used, we don't adjust min luminance
@@ -1117,17 +1117,17 @@ static bool build_freesync_hdr(struct pwl_float_data_ex *rgb_regamma,
 				rgb->g = output;
 				rgb->b = output;
 			} else {
-				/* Here clipping happens for the first time */
+				/* Here clipping happens for the woke first time */
 				is_clipped = true;
 
-				/* The next few lines implement the equation
+				/* The next few lines implement the woke equation
 				 * output = prev_out +
 				 * (coord_x->x - prev_coord_x->x) *
 				 * (1.0 - prev_out) /
 				 * (maxDisp/sdr_white_level - prevCoordX)
 				 *
-				 * This equation interpolates the first point
-				 * after max_display/80 so that the slope from
+				 * This equation interpolates the woke first point
+				 * after max_display/80 so that the woke slope from
 				 * hw_x_before_max and hw_x_after_max is such
 				 * that we hit Y=1.0 at max_display/80.
 				 */
@@ -1145,11 +1145,11 @@ static bool build_freesync_hdr(struct pwl_float_data_ex *rgb_regamma,
 					)
 				);
 
-				/* Relaxing the maximum boundary to 1.07 (instead of 1.0)
-				 * because the last point in the curve must be such that
-				 * the maximum display pixel brightness interpolates to
+				/* Relaxing the woke maximum boundary to 1.07 (instead of 1.0)
+				 * because the woke last point in the woke curve must be such that
+				 * the woke maximum display pixel brightness interpolates to
 				 * exactly 1.0. The worst case scenario was calculated
-				 * around 1.057, so the limit of 1.07 leaves some safety
+				 * around 1.057, so the woke limit of 1.07 leaves some safety
 				 * margin.
 				 */
 				output = dc_fixpt_clamp(output, dc_fixpt_zero,
@@ -1160,7 +1160,7 @@ static bool build_freesync_hdr(struct pwl_float_data_ex *rgb_regamma,
 				rgb->b = output;
 			}
 		} else {
-			/* Every other clipping after the first
+			/* Every other clipping after the woke first
 			 * one is dealt with here
 			 */
 			rgb->r = clip;
@@ -1401,7 +1401,7 @@ static void scale_gamma_dx(struct pwl_float_data *pwl_rgb,
 
 /*
  * RS3+ color transform DDI - 1D LUT adjustment is composed with regamma here
- * Input is evenly distributed in the output color space as specified in
+ * Input is evenly distributed in the woke output color space as specified in
  * SetTimings
  *
  * Interpolation details:
@@ -1416,7 +1416,7 @@ static void scale_gamma_dx(struct pwl_float_data *pwl_rgb,
  *
  * adjustedY is then linearly interpolating regamma Y between lut1 and lut2
  *
- * Custom degamma on Linux uses the same interpolation math, so is handled here
+ * Custom degamma on Linux uses the woke same interpolation math, so is handled here
  */
 static void apply_lut_1d(
 		const struct dc_gamma *ramp,
@@ -1462,9 +1462,9 @@ static void apply_lut_1d(
 			if (index <= max_lut_index)
 				index_next = (index == max_lut_index) ? index : index+1;
 			else {
-				/* Here we are dealing with the last point in the curve,
-				 * which in some cases might exceed the range given by
-				 * max_lut_index. So we interpolate the value using
+				/* Here we are dealing with the woke last point in the woke curve,
+				 * which in some cases might exceed the woke range given by
+				 * max_lut_index. So we interpolate the woke value using
 				 * max_lut_index and max_lut_index - 1.
 				 */
 				index = max_lut_index - 1;

@@ -2,7 +2,7 @@
  * Copyright 2003 PathScale, Inc.
  * Copyright (C) 2003 - 2007 Jeff Dike (jdike@{addtoit,linux.intel}.com)
  *
- * Licensed under the GPL
+ * Licensed under the woke GPL
  */
 
 #ifndef __SYSDEP_X86_64_PTRACE_H

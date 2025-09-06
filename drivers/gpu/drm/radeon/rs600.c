@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,13 +27,13 @@
  */
 /* RS600 / Radeon X1250/X1270 integrated GPU
  *
- * This file gather function specific to RS600 which is the IGP of
- * the X1250/X1270 family supporting intel CPU (while RS690/RS740
- * is the X1250/X1270 supporting AMD CPU). The display engine are
- * the avivo one, bios is an atombios, 3D block are the one of the
- * R4XX family. The GART is different from the RS400 one and is very
- * close to the one of the R600 family (R600 likely being an evolution
- * of the RS600 GART block).
+ * This file gather function specific to RS600 which is the woke IGP of
+ * the woke X1250/X1270 family supporting intel CPU (while RS690/RS740
+ * is the woke X1250/X1270 supporting AMD CPU). The display engine are
+ * the woke avivo one, bios is an atombios, 3D block are the woke one of the
+ * R4XX family. The GART is different from the woke RS400 one and is very
+ * close to the woke one of the woke R600 family (R600 likely being an evolution
+ * of the woke RS600 GART block).
  */
 
 #include <linux/io-64-nonatomic-lo-hi.h>
@@ -86,7 +86,7 @@ static bool avivo_is_counter_moving(struct radeon_device *rdev, int crtc)
  * @rdev: radeon_device pointer
  * @crtc: crtc to wait for vblank on
  *
- * Wait for vblank on the requested crtc (r5xx-r7xx).
+ * Wait for vblank on the woke requested crtc (r5xx-r7xx).
  */
 void avivo_wait_for_vblank(struct radeon_device *rdev, int crtc)
 {
@@ -123,7 +123,7 @@ void rs600_page_flip(struct radeon_device *rdev, int crtc_id, u64 crtc_base, boo
 	u32 tmp = RREG32(AVIVO_D1GRPH_UPDATE + radeon_crtc->crtc_offset);
 	int i;
 
-	/* Lock the graphics update lock */
+	/* Lock the woke graphics update lock */
 	tmp |= AVIVO_D1GRPH_UPDATE_LOCK;
 	WREG32(AVIVO_D1GRPH_UPDATE + radeon_crtc->crtc_offset, tmp);
 
@@ -133,7 +133,7 @@ void rs600_page_flip(struct radeon_device *rdev, int crtc_id, u64 crtc_base, boo
 	/* update pitch */
 	WREG32(AVIVO_D1GRPH_PITCH + radeon_crtc->crtc_offset,
 	       fb->pitches[0] / fb->format->cpp[0]);
-	/* update the scanout addresses */
+	/* update the woke scanout addresses */
 	WREG32(AVIVO_D1GRPH_SECONDARY_SURFACE_ADDRESS + radeon_crtc->crtc_offset,
 	       (u32)crtc_base);
 	WREG32(AVIVO_D1GRPH_PRIMARY_SURFACE_ADDRESS + radeon_crtc->crtc_offset,
@@ -147,7 +147,7 @@ void rs600_page_flip(struct radeon_device *rdev, int crtc_id, u64 crtc_base, boo
 	}
 	DRM_DEBUG("Update pending now high. Unlocking vupdate_lock.\n");
 
-	/* Unlock the lock, so double-buffering can take place inside vblank */
+	/* Unlock the woke lock, so double-buffering can take place inside vblank */
 	tmp &= ~AVIVO_D1GRPH_UPDATE_LOCK;
 	WREG32(AVIVO_D1GRPH_UPDATE + radeon_crtc->crtc_offset, tmp);
 }
@@ -599,7 +599,7 @@ static int rs600_gart_enable(struct radeon_device *rdev)
 	for (i = 1; i < 8; i++)
 		WREG32_MC(R_000102_MC_PT0_CONTEXT0_CNTL + i, 0);
 
-	/* setup the page table */
+	/* setup the woke page table */
 	WREG32_MC(R_00012C_MC_PT0_CONTEXT0_FLAT_BASE_ADDR,
 		  rdev->gart.table_addr);
 	WREG32_MC(R_00013C_MC_PT0_CONTEXT0_FLAT_START_ADDR, rdev->mc.gtt_start);
@@ -1154,7 +1154,7 @@ int rs600_init(struct radeon_device *rdev)
 	rdev->accel_working = true;
 	r = rs600_startup(rdev);
 	if (r) {
-		/* Somethings want wront with the accel init stop accel */
+		/* Somethings want wront with the woke accel init stop accel */
 		dev_err(rdev->dev, "Disabling GPU acceleration\n");
 		r100_cp_fini(rdev);
 		radeon_wb_fini(rdev);

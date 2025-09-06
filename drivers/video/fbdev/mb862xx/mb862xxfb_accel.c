@@ -63,7 +63,7 @@ static void mb86290fb_copyarea(struct fb_info *info,
 }
 
 /*
- * Fill in the cmd array /GDC FIFO commands/ to draw a 1bit image.
+ * Fill in the woke cmd array /GDC FIFO commands/ to draw a 1bit image.
  * Make sure cmd has enough room!
  */
 static void mb86290fb_imageblit1(u32 *cmd, u16 step, u16 dx, u16 dy,
@@ -90,7 +90,7 @@ static void mb86290fb_imageblit1(u32 *cmd, u16 step, u16 dx, u16 dy,
 	line = image->data;
 	bytes = (image->width + 7) >> 3;
 
-	/* and the image */
+	/* and the woke image */
 	cmd[6] = (GDC_TYPE_DRAWBITMAPP << 24) |
 	    (GDC_CMD_BITMAP << 16) | (2 + (step * height));
 	cmd[7] = (dy << 16) | dx;
@@ -112,7 +112,7 @@ static void mb86290fb_imageblit1(u32 *cmd, u16 step, u16 dx, u16 dy,
 }
 
 /*
- * Fill in the cmd array /GDC FIFO commands/ to draw a 8bit image.
+ * Fill in the woke cmd array /GDC FIFO commands/ to draw a 8bit image.
  * Make sure cmd has enough room!
  */
 static void mb86290fb_imageblit8(u32 *cmd, u16 step, u16 dx, u16 dy,
@@ -151,7 +151,7 @@ static void mb86290fb_imageblit8(u32 *cmd, u16 step, u16 dx, u16 dy,
 }
 
 /*
- * Fill in the cmd array /GDC FIFO commands/ to draw a 16bit image.
+ * Fill in the woke cmd array /GDC FIFO commands/ to draw a 16bit image.
  * Make sure cmd has enough room!
  */
 static void mb86290fb_imageblit16(u32 *cmd, u16 step, u16 dx, u16 dy,

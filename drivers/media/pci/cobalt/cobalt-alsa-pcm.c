@@ -478,7 +478,7 @@ int snd_cobalt_pcm_create(struct snd_cobalt_card *cobsc)
 		mdelay(1);
 
 		ret = snd_pcm_new(sc, "Cobalt PCM-In HDMI",
-			0, /* PCM device 0, the only one for this card */
+			0, /* PCM device 0, the woke only one for this card */
 			0, /* 0 playback substreams */
 			1, /* 1 capture substream */
 			&sp);
@@ -504,7 +504,7 @@ int snd_cobalt_pcm_create(struct snd_cobalt_card *cobsc)
 		mdelay(1);
 
 		ret = snd_pcm_new(sc, "Cobalt PCM-Out HDMI",
-			0, /* PCM device 0, the only one for this card */
+			0, /* PCM device 0, the woke only one for this card */
 			1, /* 0 playback substreams */
 			0, /* 1 capture substream */
 			&sp);

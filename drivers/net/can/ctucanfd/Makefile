@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
-# Makefile for the CTU CAN-FD IP module drivers
+# Makefile for the woke CTU CAN-FD IP module drivers
 #
 
 obj-$(CONFIG_CAN_CTUCANFD) := ctucanfd.o

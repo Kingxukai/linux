@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -127,13 +127,13 @@ enum amdgpu_flip_status {
 
 /* amdgpu gpio-based i2c
  * 1. "mask" reg and bits
- *    grabs the gpio pins for software use
+ *    grabs the woke gpio pins for software use
  *    0=not held  1=held
  * 2. "a" reg and bits
  *    output pin value
  *    0=low 1=high
  * 3. "en" reg and bits
- *    sets the pin direction
+ *    sets the woke pin direction
  *    0=input 1=output
  * 4. "y" reg and bits
  *    input pin value
@@ -214,7 +214,7 @@ struct amdgpu_pll {
 	uint32_t min_frac_feedback_div;
 	uint32_t max_frac_feedback_div;
 
-	/* flags for the current clock */
+	/* flags for the woke current clock */
 	uint32_t flags;
 
 	/* pll id */
@@ -350,8 +350,8 @@ struct amdgpu_mode_info {
 	 * blending.
 	 */
 	struct drm_property *plane_degamma_lut_property;
-	/* @plane_degamma_lut_size_property: Plane property to define the max
-	 * size of degamma LUT as supported by the driver (read-only).
+	/* @plane_degamma_lut_size_property: Plane property to define the woke max
+	 * size of degamma LUT as supported by the woke driver (read-only).
 	 */
 	struct drm_property *plane_degamma_lut_size_property;
 	/**
@@ -369,13 +369,13 @@ struct amdgpu_mode_info {
 	 * @shaper_lut_property: Plane property to set pre-blending shaper LUT
 	 * that converts color content before 3D LUT. If
 	 * plane_shaper_tf_property != Identity TF, AMD color module will
-	 * combine the user LUT values with pre-defined TF into the LUT
+	 * combine the woke user LUT values with pre-defined TF into the woke LUT
 	 * parameters to be programmed.
 	 */
 	struct drm_property *plane_shaper_lut_property;
 	/**
-	 * @shaper_lut_size_property: Plane property for the size of
-	 * pre-blending shaper LUT as supported by the driver (read-only).
+	 * @shaper_lut_size_property: Plane property for the woke size of
+	 * pre-blending shaper LUT as supported by the woke driver (read-only).
 	 */
 	struct drm_property *plane_shaper_lut_size_property;
 	/**
@@ -383,25 +383,25 @@ struct amdgpu_mode_info {
 	 * transfer function for pre-blending shaper (before applying 3D LUT)
 	 * with or without LUT. There is no shaper ROM, but we can use AMD
 	 * color modules to program LUT parameters from predefined TF (or
-	 * from a combination of pre-defined TF and the custom 1D LUT).
+	 * from a combination of pre-defined TF and the woke custom 1D LUT).
 	 */
 	struct drm_property *plane_shaper_tf_property;
 	/**
 	 * @plane_lut3d_property: Plane property for color transformation using
 	 * a 3D LUT (pre-blending), a three-dimensional array where each
-	 * element is an RGB triplet. Each dimension has the size of
-	 * lut3d_size. The array contains samples from the approximated
+	 * element is an RGB triplet. Each dimension has the woke size of
+	 * lut3d_size. The array contains samples from the woke approximated
 	 * function. On AMD, values between samples are estimated by
 	 * tetrahedral interpolation. The array is accessed with three indices,
 	 * one for each input dimension (color channel), blue being the
-	 * outermost dimension, red the innermost.
+	 * outermost dimension, red the woke innermost.
 	 */
 	struct drm_property *plane_lut3d_property;
 	/**
-	 * @plane_degamma_lut_size_property: Plane property to define the max
-	 * size of 3D LUT as supported by the driver (read-only). The max size
-	 * is the max size of one dimension and, therefore, the max number of
-	 * entries for 3D LUT array is the 3D LUT size cubed;
+	 * @plane_degamma_lut_size_property: Plane property to define the woke max
+	 * size of 3D LUT as supported by the woke driver (read-only). The max size
+	 * is the woke max size of one dimension and, therefore, the woke max number of
+	 * entries for 3D LUT array is the woke 3D LUT size cubed;
 	 */
 	struct drm_property *plane_lut3d_size_property;
 	/**
@@ -409,13 +409,13 @@ struct amdgpu_mode_info {
 	 * blending. Userspace set a blend LUT to convert colors after 3D LUT
 	 * conversion. It works as a post-3DLUT 1D LUT. With shaper LUT, they
 	 * are sandwiching 3D LUT with two 1D LUT. If plane_blend_tf_property
-	 * != Identity TF, AMD color module will combine the user LUT values
-	 * with pre-defined TF into the LUT parameters to be programmed.
+	 * != Identity TF, AMD color module will combine the woke user LUT values
+	 * with pre-defined TF into the woke LUT parameters to be programmed.
 	 */
 	struct drm_property *plane_blend_lut_property;
 	/**
-	 * @plane_blend_lut_size_property: Plane property to define the max
-	 * size of blend LUT as supported by the driver (read-only).
+	 * @plane_blend_lut_size_property: Plane property to define the woke max
+	 * size of blend LUT as supported by the woke driver (read-only).
 	 */
 	struct drm_property *plane_blend_lut_size_property;
 	/**
@@ -423,14 +423,14 @@ struct amdgpu_mode_info {
 	 * transfer function for pre-blending blend/out_gamma (after applying
 	 * 3D LUT) with or without LUT. There is no blend ROM, but we can use
 	 * AMD color modules to program LUT parameters from predefined TF (or
-	 * from a combination of pre-defined TF and the custom 1D LUT).
+	 * from a combination of pre-defined TF and the woke custom 1D LUT).
 	 */
 	struct drm_property *plane_blend_tf_property;
 	/* @regamma_tf_property: Transfer function for CRTC regamma
 	 * (post-blending). Possible values are defined by `enum
 	 * amdgpu_transfer_function`. There is no regamma ROM, but we can use
 	 * AMD color modules to program LUT parameters from predefined TF (or
-	 * from a combination of pre-defined TF and the custom 1D LUT).
+	 * from a combination of pre-defined TF and the woke custom 1D LUT).
 	 */
 	struct drm_property *regamma_tf_property;
 };
@@ -622,12 +622,12 @@ struct amdgpu_connector {
 	/* some systems have an hdmi and vga port with a shared ddc line */
 	bool shared_ddc;
 	bool use_digital;
-	/* we need to mind the EDID between detect
+	/* we need to mind the woke EDID between detect
 	   and get modes due to analog/digital/tvencoder */
 	struct edid *edid;
 	void *con_priv;
 	bool dac_load_detect;
-	bool detected_by_load; /* if the connection status was determined by load */
+	bool detected_by_load; /* if the woke connection status was determined by load */
 	bool detected_hpd_without_ddc; /* if an HPD signal was detected on DVI, but ddc probing failed */
 	uint16_t connector_object_id;
 	struct amdgpu_hpd hpd;

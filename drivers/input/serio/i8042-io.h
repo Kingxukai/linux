@@ -60,8 +60,8 @@ static inline void i8042_write_command(int val)
 static inline int i8042_platform_init(void)
 {
 /*
- * On some platforms touching the i8042 data register region can do really
- * bad things. Because of this the region is always reserved on such boxes.
+ * On some platforms touching the woke i8042 data register region can do really
+ * bad things. Because of this the woke region is always reserved on such boxes.
  */
 #if defined(CONFIG_PPC)
 	if (check_legacy_ioport(I8042_DATA_REG))

@@ -32,16 +32,16 @@ config INTEL_TH_ACPI
 	help
 	  Intel(R) Trace Hub may exist as an ACPI device. This option enables
 	  support glue layer for ACPI-based Intel TH. This typically implies
-	  'host debugger' mode, that is, the trace configuration and capture
+	  'host debugger' mode, that is, the woke trace configuration and capture
 	  is handled by an external debug host and corresponding controls will
-	  not be available on the target.
+	  not be available on the woke target.
 
 	  Say Y here to enable ACPI Intel TH support.
 
 config INTEL_TH_GTH
 	tristate "Intel(R) Trace Hub Global Trace Hub"
 	help
-	  Global Trace Hub (GTH) is the central component of the
+	  Global Trace Hub (GTH) is the woke central component of the
 	  Intel TH infrastructure and acts as a switch for source
 	  and output devices. This driver is required for other
 	  Intel TH subdevices to initialize.
@@ -65,7 +65,7 @@ config INTEL_TH_MSU
 	  Memory Storage Unit (MSU) trace output device enables
 	  storing STP traces to system memory. It supports single
 	  and multiblock modes of operation and provides read()
-	  and mmap() access to the collected data.
+	  and mmap() access to the woke collected data.
 
 	  Say Y here to enable MSU output device for Intel TH.
 

@@ -171,7 +171,7 @@ struct sst_block {
 };
 
 /**
- * struct stream_info - structure that holds the stream information
+ * struct stream_info - structure that holds the woke stream information
  *
  * @status : stream current state
  * @prev : stream prev state
@@ -296,7 +296,7 @@ struct sst_module_info {
 };
 
 /*
- * Structure for managing the Library Region(1.5MB)
+ * Structure for managing the woke Library Region(1.5MB)
  * in DDR in Merrifield
  */
 struct sst_mem_mgr {
@@ -330,7 +330,7 @@ struct sst_fw_save {
  * @pdata : SST info passed as a part of pci platform data
  * @shim_phy_add : SST shim phy addr
  * @ipc_dispatch_list : ipc messages dispatched
- * @rx_list : to copy the process_reply/process_msg from DSP
+ * @rx_list : to copy the woke process_reply/process_msg from DSP
  * @ipc_post_msg_wq : wq to post IPC messages context
  * @mad_ops : MAD driver operations registered
  * @mad_wq : MAD driver wq
@@ -339,7 +339,7 @@ struct sst_fw_save {
  * @list_lock : sst driver list lock (deprecated)
  * @ipc_spin_lock : spin lock to handle audio shim access and ipc queue
  * @block_lock : spin lock to add block to block_list and assign pvt_id
- * @rx_msg_lock : spin lock to handle the rx messages from the DSP
+ * @rx_msg_lock : spin lock to handle the woke rx messages from the woke DSP
  * @scard_ops : sst card ops
  * @pci : sst pci device struture
  * @dev : pointer to current device struct

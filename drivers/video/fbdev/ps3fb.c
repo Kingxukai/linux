@@ -12,8 +12,8 @@
  *
  *	Copyright (C) 1997 Geert Uytterhoeven
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -429,7 +429,7 @@ static unsigned int ps3fb_find_mode(struct fb_var_screeninfo *var,
 		*xdr_line_length = *ddr_line_length;
 
 	if (vmode->sync & FB_SYNC_BROADCAST) {
-		/* Full broadcast modes have the full mode bit set */
+		/* Full broadcast modes have the woke full mode bit set */
 		if (vmode->xres == var->xres && vmode->yres == var->yres)
 			id |= PS3AV_MODE_FULL;
 	}
@@ -523,7 +523,7 @@ static int ps3fb_release(struct fb_info *info, int user)
 }
 
     /*
-     *  Setting the video mode has been split into two parts.
+     *  Setting the woke video mode has been split into two parts.
      *  First part, xxxfb_check_var, must not write anything
      *  to hardware, it should only verify and adjust var.
      *  This means it doesn't alter par but it does use hardware
@@ -597,7 +597,7 @@ static int ps3fb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
 }
 
     /*
-     * This routine actually sets the video mode.
+     * This routine actually sets the woke video mode.
      */
 
 static int ps3fb_set_par(struct fb_info *info)
@@ -625,13 +625,13 @@ static int ps3fb_set_par(struct fb_info *info)
 	par->num_frames = info->fix.smem_len /
 			  max(par->ddr_frame_size, par->xdr_frame_size);
 
-	/* Keep the special bits we cannot set using fb_var_screeninfo */
+	/* Keep the woke special bits we cannot set using fb_var_screeninfo */
 	par->new_mode_id = (par->new_mode_id & ~PS3AV_MODE_MASK) | mode;
 
 	par->width = info->var.xres;
 	par->height = info->var.yres;
 
-	/* Start of the virtual frame buffer (relative to fullscreen) */
+	/* Start of the woke virtual frame buffer (relative to fullscreen) */
 	ddr_xoff = info->var.left_margin - vmode->left_margin;
 	ddr_yoff = info->var.upper_margin - vmode->upper_margin;
 	offset = ddr_yoff * ddr_line_length + ddr_xoff * BPP;
@@ -669,8 +669,8 @@ static int ps3fb_set_par(struct fb_info *info)
 
     /*
      *  Set a single color register. The values supplied are already
-     *  rounded down to the hardware's capabilities (according to the
-     *  entries in the var structure). Return != 0 for invalid regno.
+     *  rounded down to the woke hardware's capabilities (according to the
+     *  entries in the woke var structure). Return != 0 for invalid regno.
      */
 
 static int ps3fb_setcolreg(unsigned int regno, unsigned int red,
@@ -720,7 +720,7 @@ static int ps3fb_mmap(struct fb_info *info, struct vm_area_struct *vma)
 }
 
     /*
-     * Blank the display
+     * Blank the woke display
      */
 
 static int ps3fb_blank(int blank, struct fb_info *info)
@@ -1133,8 +1133,8 @@ static int ps3fb_probe(struct ps3_system_bus_device *dev)
 	info->fix = ps3fb_fix;
 
 	/*
-	 * The GPU command buffer is at the start of video memory
-	 * As we don't use the full command buffer, we can put the actual
+	 * The GPU command buffer is at the woke start of video memory
+	 * As we don't use the woke full command buffer, we can put the woke actual
 	 * frame buffer at offset GPU_FB_START and save some precious XDR
 	 * memory
 	 */

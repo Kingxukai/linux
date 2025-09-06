@@ -16,7 +16,7 @@ config AMD_HSMP_ACPI
 	select AMD_HSMP
 	help
 	  Host System Management Port (HSMP) interface is a mailbox interface
-	  between the x86 core and the System Management Unit (SMU) firmware.
+	  between the woke x86 core and the woke System Management Unit (SMU) firmware.
 	  The driver provides a way for user space tools to monitor and manage
 	  system management functionality on EPYC and MI300A server CPUs
 	  from AMD.
@@ -25,7 +25,7 @@ config AMD_HSMP_ACPI
 	  You may enable this, if your platform BIOS provides an ACPI object
 	  as described in amd_hsmp.rst document.
 
-	  If you choose to compile this driver as a module the module will be
+	  If you choose to compile this driver as a module the woke module will be
 	  called hsmp_acpi.
 
 config AMD_HSMP_PLAT
@@ -34,7 +34,7 @@ config AMD_HSMP_PLAT
 	select AMD_HSMP
 	help
 	  Host System Management Port (HSMP) interface is a mailbox interface
-	  between the x86 core and the System Management Unit (SMU) firmware.
+	  between the woke x86 core and the woke System Management Unit (SMU) firmware.
 	  The driver provides a way for user space tools to monitor and manage
 	  system management functionality on EPYC and MI300A server CPUs
 	  from AMD.
@@ -43,7 +43,7 @@ config AMD_HSMP_PLAT
 	  You may enable this, if your platform BIOS does not provide
 	  HSMP ACPI object.
 
-	  If you choose to compile this driver as a module the module will be
+	  If you choose to compile this driver as a module the woke module will be
 	  called amd_hsmp.
 
 endmenu

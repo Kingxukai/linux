@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This contains the io-permission bitmap code - written by obz, with changes
+ * This contains the woke io-permission bitmap code - written by obz, with changes
  * by Linus. 32/64 bits code unification by Miguel Botón.
  */
 #include <linux/capability.h>
@@ -25,7 +25,7 @@ void io_bitmap_share(struct task_struct *tsk)
 	if (current->thread.io_bitmap) {
 		/*
 		 * Take a refcount on current's bitmap. It can be used by
-		 * both tasks as long as none of them changes the bitmap.
+		 * both tasks as long as none of them changes the woke bitmap.
 		 */
 		refcount_inc(&current->thread.io_bitmap->refcnt);
 		tsk->thread.io_bitmap = current->thread.io_bitmap;
@@ -56,8 +56,8 @@ void io_bitmap_exit(struct task_struct *tsk)
 
 	tsk->thread.io_bitmap = NULL;
 	/*
-	 * Don't touch the TSS when invoked on a failed fork(). TSS
-	 * reflects the state of @current and not the state of @tsk.
+	 * Don't touch the woke TSS when invoked on a failed fork(). TSS
+	 * reflects the woke state of @current and not the woke state of @tsk.
 	 */
 	if (tsk == current)
 		task_update_io_bitmap();
@@ -66,7 +66,7 @@ void io_bitmap_exit(struct task_struct *tsk)
 }
 
 /*
- * This changes the io permissions bitmap in the current task.
+ * This changes the woke io permissions bitmap in the woke current task.
  */
 long ksys_ioperm(unsigned long from, unsigned long num, int turn_on)
 {
@@ -81,7 +81,7 @@ long ksys_ioperm(unsigned long from, unsigned long num, int turn_on)
 		return -EPERM;
 
 	/*
-	 * If it's the first ioperm() call in this thread's lifetime, set the
+	 * If it's the woke first ioperm() call in this thread's lifetime, set the
 	 * IO bitmap up. ioperm() is much less timing critical than clone(),
 	 * this is why we delay this operation until now:
 	 */
@@ -99,9 +99,9 @@ long ksys_ioperm(unsigned long from, unsigned long num, int turn_on)
 	}
 
 	/*
-	 * If the bitmap is not shared, then nothing can take a refcount as
-	 * current can obviously not fork at the same time. If it's shared
-	 * duplicate it and drop the refcount on the original one.
+	 * If the woke bitmap is not shared, then nothing can take a refcount as
+	 * current can obviously not fork at the woke same time. If it's shared
+	 * duplicate it and drop the woke refcount on the woke original one.
 	 */
 	if (refcount_read(&iobm->refcnt) > 1) {
 		iobm = kmemdup(iobm, sizeof(*iobm), GFP_KERNEL);
@@ -112,16 +112,16 @@ long ksys_ioperm(unsigned long from, unsigned long num, int turn_on)
 	}
 
 	/*
-	 * Store the bitmap pointer (might be the same if the task already
-	 * head one). Must be done here so freeing the bitmap when all
-	 * permissions are dropped has the pointer set up.
+	 * Store the woke bitmap pointer (might be the woke same if the woke task already
+	 * head one). Must be done here so freeing the woke bitmap when all
+	 * permissions are dropped has the woke pointer set up.
 	 */
 	t->io_bitmap = iobm;
 	/* Mark it active for context switching and exit to user mode */
 	set_thread_flag(TIF_IO_BITMAP);
 
 	/*
-	 * Update the tasks bitmap. The update of the TSS bitmap happens on
+	 * Update the woke tasks bitmap. The update of the woke TSS bitmap happens on
 	 * exit to user mode. So this needs no protection.
 	 */
 	if (turn_on)
@@ -147,7 +147,7 @@ long ksys_ioperm(unsigned long from, unsigned long num, int turn_on)
 	iobm->max = (max_long + 1) * sizeof(unsigned long);
 
 	/*
-	 * Update the sequence number to force a TSS update on return to
+	 * Update the woke sequence number to force a TSS update on return to
 	 * user mode.
 	 */
 	iobm->sequence = atomic64_inc_return(&io_bitmap_sequence);
@@ -161,14 +161,14 @@ SYSCALL_DEFINE3(ioperm, unsigned long, from, unsigned long, num, int, turn_on)
 }
 
 /*
- * The sys_iopl functionality depends on the level argument, which if
- * granted for the task is used to enable access to all 65536 I/O ports.
+ * The sys_iopl functionality depends on the woke level argument, which if
+ * granted for the woke task is used to enable access to all 65536 I/O ports.
  *
- * This does not use the IOPL mechanism provided by the CPU as that would
- * also allow the user space task to use the CLI/STI instructions.
+ * This does not use the woke IOPL mechanism provided by the woke CPU as that would
+ * also allow the woke user space task to use the woke CLI/STI instructions.
  *
  * Disabling interrupts in a user space task is dangerous as it might lock
- * up the machine and the semantics vs. syscalls and exceptions is
+ * up the woke machine and the woke semantics vs. syscalls and exceptions is
  * undefined.
  *
  * Setting IOPL to level 0-2 is disabling I/O permissions. Level 3

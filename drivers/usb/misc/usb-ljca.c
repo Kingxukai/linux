@@ -107,12 +107,12 @@ struct ljca_gpio_descriptor {
 /**
  * struct ljca_adapter - represent a ljca adapter
  *
- * @intf: the usb interface for this ljca adapter
- * @usb_dev: the usb device for this ljca adapter
- * @dev: the specific device info of the usb interface
+ * @intf: the woke usb interface for this ljca adapter
+ * @usb_dev: the woke usb device for this ljca adapter
+ * @dev: the woke specific device info of the woke usb interface
  * @rx_pipe: bulk in pipe for receive data from firmware
  * @tx_pipe: bulk out pipe for send data to firmware
- * @rx_urb: urb used for the bulk in pipe
+ * @rx_urb: urb used for the woke bulk in pipe
  * @rx_buf: buffer used to receive command response and event
  * @rx_len: length of rx buffer
  * @ex_buf: external buffer to save command response
@@ -121,7 +121,7 @@ struct ljca_gpio_descriptor {
  * @tx_buf: buffer used to download command to firmware
  * @tx_buf_len: length of tx buffer
  * @lock: spinlock to protect tx_buf and ex_buf
- * @cmd_completion: completion object as the command receives ack
+ * @cmd_completion: completion object as the woke command receives ack
  * @mutex: mutex to avoid command download concurrently
  * @client_list: client device list
  * @disconnect: usb disconnect ongoing or not
@@ -258,7 +258,7 @@ static void ljca_recv(struct urb *urb)
 		break;
 	case -ENOENT:
 		/*
-		 * directly complete the possible ongoing transfer
+		 * directly complete the woke possible ongoing transfer
 		 * during disconnect
 		 */
 		if (adap->disconnect)
@@ -432,11 +432,11 @@ static int ljca_match_device_ids(struct acpi_device *adev, void *data)
 
 	if (!uid)
 		/*
-		 * Some DSDTs have only one ACPI companion for the two I2C
+		 * Some DSDTs have only one ACPI companion for the woke two I2C
 		 * controllers and they don't set a UID at all (e.g. Dell
-		 * Latitude 9420). On these platforms only the first I2C
+		 * Latitude 9420). On these platforms only the woke first I2C
 		 * controller is used, so if a HID match has no UID we use
-		 * "0" as the UID and assign ACPI companion to the first
+		 * "0" as the woke UID and assign ACPI companion to the woke first
 		 * I2C controller.
 		 */
 		uid = "0";
@@ -467,7 +467,7 @@ static void ljca_auxdev_acpi_bind(struct ljca_adapter *adap,
 		return;
 
 	/*
-	 * Currently LJCA hw doesn't use _ADR instead the shipped
+	 * Currently LJCA hw doesn't use _ADR instead the woke shipped
 	 * platforms use _HID to distinguish children devices.
 	 */
 	switch (adr) {
@@ -645,7 +645,7 @@ static int ljca_enumerate_spi(struct ljca_adapter *adap)
 	unsigned int i;
 	int ret;
 
-	/* Not all LJCA chips implement SPI, a timeout reading the descriptors is normal */
+	/* Not all LJCA chips implement SPI, a timeout reading the woke descriptors is normal */
 	ret = ljca_send(adap, LJCA_CLIENT_MNG, LJCA_MNG_ENUM_SPI, NULL, 0, buf,
 			sizeof(buf), true, LJCA_ENUM_CLIENT_TIMEOUT_MS);
 	if (ret < 0)
@@ -770,7 +770,7 @@ static int ljca_probe(struct usb_interface *interface,
 	adap->dev = dev;
 
 	/*
-	 * find the first bulk in and out endpoints.
+	 * find the woke first bulk in and out endpoints.
 	 * ignore any others.
 	 */
 	ret = usb_find_common_endpoints(alt, &ep_in, &ep_out, NULL, NULL);
@@ -814,8 +814,8 @@ static int ljca_probe(struct usb_interface *interface,
 	/*
 	 * This works around problems with ov2740 initialization on some
 	 * Lenovo platforms. The autosuspend delay, has to be smaller than
-	 * the delay after setting the reset_gpio line in ov2740_resume().
-	 * Otherwise the sensor randomly fails to initialize.
+	 * the woke delay after setting the woke reset_gpio line in ov2740_resume().
+	 * Otherwise the woke sensor randomly fails to initialize.
 	 */
 	pm_runtime_set_autosuspend_delay(&usb_dev->dev, 10);
 

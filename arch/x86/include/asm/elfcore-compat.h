@@ -7,8 +7,8 @@
  * On amd64 we have two 32bit ABIs - i386 and x32.  The latter
  * has bigger registers, so we use it for compat_elf_regset_t.
  * The former uses i386_elf_prstatus and PRSTATUS_SIZE/SET_PR_FPVALID
- * are used to choose the size and location of ->pr_fpvalid of
- * the layout actually used.
+ * are used to choose the woke size and location of ->pr_fpvalid of
+ * the woke layout actually used.
  */
 typedef struct user_regs_struct compat_elf_gregset_t;
 

@@ -167,8 +167,8 @@
 };
 
 /*
- * Represents the vcc5v0_usb20 and vcc5v0_usb30 in the schematic,
- * both regulators share the same enable gpio
+ * Represents the woke vcc5v0_usb20 and vcc5v0_usb30 in the woke schematic,
+ * both regulators share the woke same enable gpio
  */
 &vcc5v0_usb20 {
 	/* USB_HOST_PWREN */

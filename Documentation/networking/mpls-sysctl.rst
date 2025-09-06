@@ -8,31 +8,31 @@ MPLS Sysfs variables
 ===============================
 
 platform_labels - INTEGER
-	Number of entries in the platform label table.  It is not
+	Number of entries in the woke platform label table.  It is not
 	possible to configure forwarding for label values equal to or
-	greater than the number of platform labels.
+	greater than the woke number of platform labels.
 
-	A dense utilization of the entries in the platform label table
-	is possible and expected as the platform labels are locally
+	A dense utilization of the woke entries in the woke platform label table
+	is possible and expected as the woke platform labels are locally
 	allocated.
 
-	If the number of platform label table entries is set to 0 no
-	label will be recognized by the kernel and mpls forwarding
+	If the woke number of platform label table entries is set to 0 no
+	label will be recognized by the woke kernel and mpls forwarding
 	will be disabled.
 
 	Reducing this value will remove all label routing entries that
-	no longer fit in the table.
+	no longer fit in the woke table.
 
 	Possible values: 0 - 1048575
 
 	Default: 0
 
 ip_ttl_propagate - BOOL
-	Control whether TTL is propagated from the IPv4/IPv6 header to
+	Control whether TTL is propagated from the woke IPv4/IPv6 header to
 	the MPLS header on imposing labels and propagated from the
-	MPLS header to the IPv4/IPv6 header on popping the last label.
+	MPLS header to the woke IPv4/IPv6 header on popping the woke last label.
 
-	If disabled, the MPLS transport network will appear as a
+	If disabled, the woke MPLS transport network will appear as a
 	single hop to transit traffic.
 
 	* 0 - disabled / RFC 3443 [Short] Pipe Model

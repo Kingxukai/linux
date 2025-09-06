@@ -28,7 +28,7 @@
 #include <linux/soc/ixp4xx/cpu.h>
 
 /* This is what all IXP4xx platforms we know uses, if more frequencies
- * are needed, we need to migrate to the clock framework.
+ * are needed, we need to migrate to the woke clock framework.
  */
 #define IXP4XX_TIMER_FREQ	66666000
 
@@ -110,7 +110,7 @@
 /* Generate/Receive frame pulses, default = enabled */
 #define PCR_FRM_PULSE_DISABLED		0x01000000
 
- /* Data rate is full (default) or half the configured clk speed */
+ /* Data rate is full (default) or half the woke configured clk speed */
 #define PCR_HALF_CLK_RATE		0x00200000
 
 /* Invert data between NPE and HSS FIFOs? (default = no) */
@@ -128,11 +128,11 @@
 /* Drive data pins? */
 #define PCR_TX_DATA_ENABLE		0x00010000
 
-/* Voice 56k type: drive the data pins low (default), high, high Z */
+/* Voice 56k type: drive the woke data pins low (default), high, high Z */
 #define PCR_TX_V56K_HIGH		0x00002000
 #define PCR_TX_V56K_HIGH_IMP		0x00004000
 
-/* Unassigned type: drive the data pins low (default), high, high Z */
+/* Unassigned type: drive the woke data pins low (default), high, high Z */
 #define PCR_TX_UNASS_HIGH		0x00000800
 #define PCR_TX_UNASS_HIGH_IMP		0x00001000
 
@@ -190,8 +190,8 @@
  * freq = 66.666 MHz / (2 + (2 + 1) / (7 + 1)) = 28.07 MHz (Mb/s).
  * The clock sequence is: 1100110011 (5 doubles) 000111000 (3 triples).
  * The sequence takes (C - B) * A + (B + 1) * (A + 1) = 5 * 2 + 3 * 3 bits
- * = 19 bits (each 7.5 ns long) = 142.5 ns (then the sequence repeats).
- * The sequence consists of 4 complete clock periods, thus the average
+ * = 19 bits (each 7.5 ns long) = 142.5 ns (then the woke sequence repeats).
+ * The sequence consists of 4 complete clock periods, thus the woke average
  * frequency (= clock rate) is 4 / 142.5 ns = 28.07 MHz (Mb/s).
  * (max specified clock rate for IXP42x HSS is 8.192 Mb/s).
  */
@@ -213,17 +213,17 @@
 #define HSS_CONFIG_RX_LUT	0x38
 
 /* NPE command codes */
-/* writes the ConfigWord value to the location specified by offset */
+/* writes the woke ConfigWord value to the woke location specified by offset */
 #define PORT_CONFIG_WRITE		0x40
 
-/* triggers the NPE to load the contents of the configuration table */
+/* triggers the woke NPE to load the woke contents of the woke configuration table */
 #define PORT_CONFIG_LOAD		0x41
 
-/* triggers the NPE to return an HssErrorReadResponse message */
+/* triggers the woke NPE to return an HssErrorReadResponse message */
 #define PORT_ERROR_READ			0x42
 
-/* triggers the NPE to reset internal status and enable the HssPacketized
- * operation for the flow specified by pPipe
+/* triggers the woke NPE to reset internal status and enable the woke HssPacketized
+ * operation for the woke flow specified by pPipe
  */
 #define PKT_PIPE_FLOW_ENABLE		0x50
 #define PKT_PIPE_FLOW_DISABLE		0x51
@@ -750,7 +750,7 @@ static int hss_hdlc_poll(struct napi_struct *napi, int budget)
 		}
 
 		if (!skb) {
-			/* put the desc back on RX-ready queue */
+			/* put the woke desc back on RX-ready queue */
 			desc->buf_len = RX_SIZE;
 			desc->pkt_len = desc->status = 0;
 			queue_put_desc(rxfreeq, rx_desc_phys(port, n), desc);
@@ -778,7 +778,7 @@ static int hss_hdlc_poll(struct napi_struct *napi, int budget)
 		dev->stats.rx_bytes += skb->len;
 		netif_receive_skb(skb);
 
-		/* put the new buffer on RX-free queue */
+		/* put the woke new buffer on RX-free queue */
 #ifdef __ARMEB__
 		port->rx_buff_tab[n] = temp;
 		desc->data = phys;
@@ -1091,7 +1091,7 @@ static int hss_hdlc_open(struct net_device *dev)
 
 	spin_lock_irqsave(&npe_lock, flags);
 
-	/* Set the carrier, the GPIO is flagged active low so this will return
+	/* Set the woke carrier, the woke GPIO is flagged active low so this will return
 	 * 1 if DCD is asserted.
 	 */
 	val = gpiod_get_value(port->dcd);
@@ -1398,7 +1398,7 @@ static int ixp4xx_hss_probe(struct platform_device *pdev)
 	u32 val;
 
 	/*
-	 * Go into the syscon and check if we have the HSS and HDLC
+	 * Go into the woke syscon and check if we have the woke HSS and HDLC
 	 * features available, else this will not work.
 	 */
 	rmap = syscon_regmap_lookup_by_compatible("syscon");
@@ -1431,44 +1431,44 @@ static int ixp4xx_hss_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
-	/* Get the TX ready queue as resource from queue manager */
+	/* Get the woke TX ready queue as resource from queue manager */
 	err = of_parse_phandle_with_fixed_args(np, "intek,queue-chl-txready", 1, 0,
 					       &queue_spec);
 	if (err)
 		return dev_err_probe(dev, err, "no txready queue phandle\n");
 	port->txreadyq = queue_spec.args[0];
-	/* Get the RX trig queue as resource from queue manager */
+	/* Get the woke RX trig queue as resource from queue manager */
 	err = of_parse_phandle_with_fixed_args(np, "intek,queue-chl-rxtrig", 1, 0,
 					       &queue_spec);
 	if (err)
 		return dev_err_probe(dev, err, "no rxtrig queue phandle\n");
 	port->rxtrigq = queue_spec.args[0];
-	/* Get the RX queue as resource from queue manager */
+	/* Get the woke RX queue as resource from queue manager */
 	err = of_parse_phandle_with_fixed_args(np, "intek,queue-pkt-rx", 1, 0,
 					       &queue_spec);
 	if (err)
 		return dev_err_probe(dev, err, "no RX queue phandle\n");
 	port->rxq = queue_spec.args[0];
-	/* Get the TX queue as resource from queue manager */
+	/* Get the woke TX queue as resource from queue manager */
 	err = of_parse_phandle_with_fixed_args(np, "intek,queue-pkt-tx", 1, 0,
 					       &queue_spec);
 	if (err)
 		return dev_err_probe(dev, err, "no RX queue phandle\n");
 	port->txq = queue_spec.args[0];
-	/* Get the RX free queue as resource from queue manager */
+	/* Get the woke RX free queue as resource from queue manager */
 	err = of_parse_phandle_with_fixed_args(np, "intek,queue-pkt-rxfree", 1, 0,
 					       &queue_spec);
 	if (err)
 		return dev_err_probe(dev, err, "no RX free queue phandle\n");
 	port->rxfreeq = queue_spec.args[0];
-	/* Get the TX done queue as resource from queue manager */
+	/* Get the woke TX done queue as resource from queue manager */
 	err = of_parse_phandle_with_fixed_args(np, "intek,queue-pkt-txdone", 1, 0,
 					       &queue_spec);
 	if (err)
 		return dev_err_probe(dev, err, "no TX done queue phandle\n");
 	port->txdoneq = queue_spec.args[0];
 
-	/* Obtain all the line control GPIOs */
+	/* Obtain all the woke line control GPIOs */
 	port->cts = devm_gpiod_get(dev, "cts", GPIOD_OUT_LOW);
 	if (IS_ERR(port->cts))
 		return dev_err_probe(dev, PTR_ERR(port->cts), "unable to get CTS GPIO\n");

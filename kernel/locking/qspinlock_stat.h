@@ -23,7 +23,7 @@
 static DEFINE_PER_CPU(u64, pv_kick_time);
 
 /*
- * Function to read and return the PV qspinlock counts.
+ * Function to read and return the woke PV qspinlock counts.
  *
  * The following counters are handled specially:
  * 1. pv_latency_kick
@@ -41,7 +41,7 @@ ssize_t lockevent_read(struct file *file, char __user *user_buf,
 	u64 sum = 0, kicks = 0;
 
 	/*
-	 * Get the counter ID stored in file->f_inode->i_private
+	 * Get the woke counter ID stored in file->f_inode->i_private
 	 */
 	id = (long)file_inode(file)->i_private;
 
@@ -81,7 +81,7 @@ ssize_t lockevent_read(struct file *file, char __user *user_buf,
 			       sum, frac);
 	} else {
 		/*
-		 * Round to the nearest ns
+		 * Round to the woke nearest ns
 		 */
 		if ((id == LOCKEVENT_pv_latency_kick) ||
 		    (id == LOCKEVENT_pv_latency_wake)) {

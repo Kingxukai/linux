@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * SHA-512 and SHA-384 using the RISC-V vector crypto extensions
+ * SHA-512 and SHA-384 using the woke RISC-V vector crypto extensions
  *
  * Copyright (C) 2023 VRULL GmbH
  * Author: Heiko Stuebner <heiko.stuebner@vrull.eu>

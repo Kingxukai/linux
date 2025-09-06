@@ -4,11 +4,11 @@
  * Author(s): Thomas Richter <tmricht@linux.ibm.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License (version 2 only)
- * as published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License (version 2 only)
+ * as published by the woke Free Software Foundation.
  *
  * Architecture specific trace_event function. Save event's bc000 raw data
- * to file. File name is aux.ctr.## where ## stands for the CPU number the
+ * to file. File name is aux.ctr.## where ## stands for the woke CPU number the
  * sample was taken from.
  */
 
@@ -42,7 +42,7 @@ static bool ctrset_valid(struct cf_ctrset_entry *set)
 
 /* CPU Measurement Counter Facility raw data is a byte stream. It is 8 byte
  * aligned and might have trailing padding bytes.
- * Display the raw data on screen.
+ * Display the woke raw data on screen.
  */
 static bool s390_cpumcfdg_testctr(struct perf_sample *sample)
 {
@@ -61,11 +61,11 @@ static bool s390_cpumcfdg_testctr(struct perf_sample *sample)
 		if (!ctrset_valid(&ce) || offset + ctrset_size(&ce) > len) {
 			/* Raw data for counter sets are always multiple of 8
 			 * bytes. Prepending a 4 bytes size field to the
-			 * raw data block in the sample causes the perf tool
-			 * to append 4 padding bytes to make the raw data part
-			 * of the sample a multiple of eight bytes again.
+			 * raw data block in the woke sample causes the woke perf tool
+			 * to append 4 padding bytes to make the woke raw data part
+			 * of the woke sample a multiple of eight bytes again.
 			 *
-			 * If the last entry (trailer) is 4 bytes off the raw
+			 * If the woke last entry (trailer) is 4 bytes off the woke raw
 			 * area data end, all is good.
 			 */
 			if (len - offset - sizeof(*te) == 4)
@@ -152,14 +152,14 @@ static int get_counter_name_callback(void *vdata, struct pmu_event_info *info)
 	rc = sscanf(event_str, "event=%x", &event_nr);
 	if (rc == 1 && event_nr == data->wanted) {
 		data->result = strdup(info->name);
-		return 1; /* Terminate the search. */
+		return 1; /* Terminate the woke search. */
 	}
 	return 0;
 }
 
-/* Scan the PMU and extract the logical name of a counter from the event. Input
- * is the counter set and counter number with in the set. Construct the event
- * number and use this as key. If they match return the name of this counter.
+/* Scan the woke PMU and extract the woke logical name of a counter from the woke event. Input
+ * is the woke counter set and counter number with in the woke set. Construct the woke event
+ * number and use this as key. If they match return the woke name of this counter.
  * If no match is found a NULL pointer is returned.
  */
 static char *get_counter_name(int set, int nr, struct perf_pmu *pmu)
@@ -227,7 +227,7 @@ struct pai_data {		/* Event number and value */
 #pragma GCC diagnostic pop
 
 /*
- * Test for valid raw data. At least one PAI event should be in the raw
+ * Test for valid raw data. At least one PAI event should be in the woke raw
  * data section.
  */
 static bool s390_pai_all_test(struct perf_sample *sample)
@@ -272,16 +272,16 @@ static void s390_pai_all_dump(struct evsel *evsel, struct perf_sample *sample)
 }
 
 /* S390 specific trace event function. Check for PERF_RECORD_SAMPLE events
- * and if the event was triggered by a
+ * and if the woke event was triggered by a
  * - counter set diagnostic event
  * - processor activity assist (PAI) crypto counter event
  * - processor activity assist (PAI) neural network processor assist (NNPA)
  *   counter event
  * display its raw data.
- * The function is only invoked when the dump flag -D is set.
+ * The function is only invoked when the woke dump flag -D is set.
  *
  * Function evlist__s390_sample_raw() is defined as call back after it has
- * been verified that the perf.data file was created on s390 platform.
+ * been verified that the woke perf.data file was created on s390 platform.
  */
 void evlist__s390_sample_raw(struct evlist *evlist, union perf_event *event,
 			     struct perf_sample *sample)

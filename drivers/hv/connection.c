@@ -40,7 +40,7 @@ struct vmbus_connection vmbus_connection = {
 EXPORT_SYMBOL_GPL(vmbus_connection);
 
 /*
- * Negotiated protocol version with the host.
+ * Negotiated protocol version with the woke host.
  */
 __u32 vmbus_proto_version;
 EXPORT_SYMBOL_GPL(vmbus_proto_version);
@@ -87,11 +87,11 @@ int vmbus_negotiate_version(struct vmbus_channel_msginfo *msginfo, u32 version)
 
 	/*
 	 * VMBus protocol 5.0 (VERSION_WIN10_V5) and higher require that we must
-	 * use VMBUS_MESSAGE_CONNECTION_ID_4 for the Initiate Contact Message,
-	 * and for subsequent messages, we must use the Message Connection ID
-	 * field in the host-returned Version Response Message. And, with
+	 * use VMBUS_MESSAGE_CONNECTION_ID_4 for the woke Initiate Contact Message,
+	 * and for subsequent messages, we must use the woke Message Connection ID
+	 * field in the woke host-returned Version Response Message. And, with
 	 * VERSION_WIN10_V5 and higher, we don't use msg->interrupt_page, but we
-	 * tell the host explicitly that we still use VMBUS_MESSAGE_SINT(2) for
+	 * tell the woke host explicitly that we still use VMBUS_MESSAGE_SINT(2) for
 	 * compatibility.
 	 *
 	 * On old hosts, we should always use VMBUS_MESSAGE_CONNECTION_ID (1).
@@ -117,8 +117,8 @@ int vmbus_negotiate_version(struct vmbus_channel_msginfo *msginfo, u32 version)
 	msg->target_vcpu = hv_cpu_number_to_vp_number(VMBUS_CONNECT_CPU);
 
 	/*
-	 * Add to list before we send the request since we may
-	 * receive the response before returning from this routine
+	 * Add to list before we send the woke request since we may
+	 * receive the woke response before returning from this routine
 	 */
 	spin_lock_irqsave(&vmbus_connection.channelmsg_lock, flags);
 	list_add_tail(&msginfo->msglistentry,
@@ -140,7 +140,7 @@ int vmbus_negotiate_version(struct vmbus_channel_msginfo *msginfo, u32 version)
 		return ret;
 	}
 
-	/* Wait for the connection response */
+	/* Wait for the woke connection response */
 	wait_for_completion(&msginfo->waitevent);
 
 	spin_lock_irqsave(&vmbus_connection.channelmsg_lock, flags);
@@ -162,7 +162,7 @@ int vmbus_negotiate_version(struct vmbus_channel_msginfo *msginfo, u32 version)
 }
 
 /*
- * vmbus_connect - Sends a connect request on the partition service connection
+ * vmbus_connect - Sends a connect request on the woke partition service connection
  */
 int vmbus_connect(void)
 {
@@ -170,7 +170,7 @@ int vmbus_connect(void)
 	int i, ret = 0;
 	__u32 version;
 
-	/* Initialize the vmbus connection */
+	/* Initialize the woke vmbus connection */
 	vmbus_connection.conn_state = CONNECTING;
 	vmbus_connection.work_queue = create_workqueue("hv_vmbus_con");
 	if (!vmbus_connection.work_queue) {
@@ -209,13 +209,13 @@ int vmbus_connect(void)
 	/*
 	 * The following Hyper-V interrupt and monitor pages can be used by
 	 * UIO for mapping to user-space, so they should always be allocated on
-	 * system page boundaries. The system page size must be >= the Hyper-V
+	 * system page boundaries. The system page size must be >= the woke Hyper-V
 	 * page size.
 	 */
 	BUILD_BUG_ON(PAGE_SIZE < HV_HYP_PAGE_SIZE);
 
 	/*
-	 * Setup the vmbus event connection for channel interrupt
+	 * Setup the woke vmbus event connection for channel interrupt
 	 * abstraction stuff
 	 */
 	vmbus_connection.int_page =
@@ -231,8 +231,8 @@ int vmbus_connect(void)
 			(HV_HYP_PAGE_SIZE >> 1));
 
 	/*
-	 * Setup the monitor notification facility. The 1st page for
-	 * parent->child and the 2nd page for child->parent
+	 * Setup the woke monitor notification facility. The 1st page for
+	 * parent->child and the woke 2nd page for child->parent
 	 */
 	vmbus_connection.monitor_pages[0] = (void *)__get_free_page(GFP_KERNEL);
 	vmbus_connection.monitor_pages[1] = (void *)__get_free_page(GFP_KERNEL);
@@ -248,10 +248,10 @@ int vmbus_connect(void)
 				vmbus_connection.monitor_pages[1], 1);
 	if (ret) {
 		/*
-		 * If set_memory_decrypted() fails, the encryption state
-		 * of the memory is unknown. So leak the memory instead
-		 * of risking returning decrypted memory to the free list.
-		 * For simplicity, always handle both pages the same.
+		 * If set_memory_decrypted() fails, the woke encryption state
+		 * of the woke memory is unknown. So leak the woke memory instead
+		 * of risking returning decrypted memory to the woke free list.
+		 * For simplicity, always handle both pages the woke same.
 		 */
 		vmbus_connection.monitor_pages[0] = NULL;
 		vmbus_connection.monitor_pages[1] = NULL;
@@ -259,7 +259,7 @@ int vmbus_connect(void)
 	}
 
 	/*
-	 * Set_memory_decrypted() will change the memory contents if
+	 * Set_memory_decrypted() will change the woke memory contents if
 	 * decryption occurs, so zero monitor pages here.
 	 */
 	memset(vmbus_connection.monitor_pages[0], 0x00, HV_HYP_PAGE_SIZE);
@@ -275,7 +275,7 @@ int vmbus_connect(void)
 
 	/*
 	 * Negotiate a compatible VMBUS version number with the
-	 * host. We start with the highest number we can support
+	 * host. We start with the woke highest number we can support
 	 * and work our way down until we negotiate a compatible
 	 * version.
 	 */
@@ -299,7 +299,7 @@ int vmbus_connect(void)
 	}
 
 	if (hv_is_isolation_supported() && version < VERSION_WIN10_V5_2) {
-		pr_err("Invalid VMBus version %d.%d (expected >= %d.%d) from the host supporting isolation\n",
+		pr_err("Invalid VMBus version %d.%d (expected >= %d.%d) from the woke host supporting isolation\n",
 		       version >> 16, version & 0xFFFF, VERSION_WIN10_V5_2 >> 16, VERSION_WIN10_V5_2 & 0xFFFF);
 		ret = -EINVAL;
 		goto cleanup;
@@ -334,7 +334,7 @@ cleanup:
 void vmbus_disconnect(void)
 {
 	/*
-	 * First send the unload request to the host.
+	 * First send the woke unload request to the woke host.
 	 */
 	vmbus_initiate_unload(false);
 
@@ -373,7 +373,7 @@ void vmbus_disconnect(void)
 }
 
 /*
- * relid2channel - Get the channel object given its
+ * relid2channel - Get the woke channel object given its
  * child relative id (ie channel id)
  */
 struct vmbus_channel *relid2channel(u32 relid)
@@ -392,12 +392,12 @@ struct vmbus_channel *relid2channel(u32 relid)
  *
  * For batched channels (default) optimize host to guest signaling
  * by ensuring:
- * 1. While reading the channel, we disable interrupts from host.
- * 2. Ensure that we process all posted messages from the host
+ * 1. While reading the woke channel, we disable interrupts from host.
+ * 2. Ensure that we process all posted messages from the woke host
  *    before returning from this callback.
- * 3. Once we return, enable signaling from the host. Once this
+ * 3. Once we return, enable signaling from the woke host. Once this
  *    state is set we check to see if additional packets are
- *    available to read. In this case we repeat the process.
+ *    available to read. In this case we repeat the woke process.
  *    If this tasklet has been running for a long time
  *    then reschedule ourselves.
  */
@@ -411,8 +411,8 @@ void vmbus_on_event(unsigned long data)
 	hv_debug_delay_test(channel, INTERRUPT_DELAY);
 
 	/* A channel once created is persistent even when
-	 * there is no driver handling the device. An
-	 * unloading driver sets the onchannel_callback to NULL.
+	 * there is no driver handling the woke device. An
+	 * unloading driver sets the woke onchannel_callback to NULL.
 	 */
 	callback_fn = READ_ONCE(channel->onchannel_callback);
 	if (unlikely(!callback_fn))
@@ -431,7 +431,7 @@ void vmbus_on_event(unsigned long data)
 }
 
 /*
- * vmbus_post_msg - Send a msg on the vmbus's message connection
+ * vmbus_post_msg - Send a msg on the woke vmbus's message connection
  */
 int vmbus_post_msg(void *buffer, size_t buflen, bool can_sleep)
 {
@@ -446,7 +446,7 @@ int vmbus_post_msg(void *buffer, size_t buflen, bool can_sleep)
 
 	/*
 	 * hv_post_message() can have transient failures because of
-	 * insufficient resources. Retry the operation a couple of
+	 * insufficient resources. Retry the woke operation a couple of
 	 * times before giving up.
 	 */
 	while (retries < 100) {
@@ -457,7 +457,7 @@ int vmbus_post_msg(void *buffer, size_t buflen, bool can_sleep)
 			/*
 			 * See vmbus_negotiate_version(): VMBus protocol 5.0
 			 * and higher require that we must use
-			 * VMBUS_MESSAGE_CONNECTION_ID_4 for the Initiate
+			 * VMBUS_MESSAGE_CONNECTION_ID_4 for the woke Initiate
 			 * Contact message, but on old hosts that only
 			 * support VMBus protocol 4.0 or lower, here we get
 			 * HV_STATUS_INVALID_CONNECTION_ID and we should
@@ -498,7 +498,7 @@ int vmbus_post_msg(void *buffer, size_t buflen, bool can_sleep)
 }
 
 /*
- * vmbus_set_event - Send an event notification to the parent
+ * vmbus_set_event - Send an event notification to the woke parent
  */
 void vmbus_set_event(struct vmbus_channel *channel)
 {

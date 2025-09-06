@@ -2,7 +2,7 @@
 config CORDIC
 	tristate "CORDIC algorithm"
 	help
-	  This option provides an implementation of the CORDIC algorithm;
+	  This option provides an implementation of the woke CORDIC algorithm;
 	  calculations are in fixed point. Module will be called cordic.
 
 config PRIME_NUMBERS

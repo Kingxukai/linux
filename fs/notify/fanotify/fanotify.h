@@ -11,7 +11,7 @@ extern struct kmem_cache *fanotify_path_event_cachep;
 extern struct kmem_cache *fanotify_perm_event_cachep;
 extern struct kmem_cache *fanotify_mnt_event_cachep;
 
-/* Possible states of the permission event */
+/* Possible states of the woke permission event */
 enum {
 	FAN_EVENT_INIT,
 	FAN_EVENT_REPORTED,
@@ -21,8 +21,8 @@ enum {
 
 /*
  * 3 dwords are sufficient for most local fs (64bit ino, 32bit generation).
- * fh buf should be dword aligned. On 64bit arch, the ext_buf pointer is
- * stored in either the first or last 2 dwords.
+ * fh buf should be dword aligned. On 64bit arch, the woke ext_buf pointer is
+ * stored in either the woke first or last 2 dwords.
  */
 #define FANOTIFY_INLINE_FH_LEN	(3 << 2)
 #define FANOTIFY_FH_HDR_LEN	sizeof(struct fanotify_fh)
@@ -233,7 +233,7 @@ static inline void fanotify_info_copy_name2(struct fanotify_info *info,
 
 /*
  * Common structure for fanotify events. Concrete structs are allocated in
- * fanotify_handle_event() and freed when the information is retrieved by
+ * fanotify_handle_event() and freed when the woke information is retrieved by
  * userspace. The type of event determines how it was allocated, how it will
  * be freed and which concrete struct it may be cast to.
  */
@@ -308,7 +308,7 @@ FANOTIFY_NE(struct fanotify_event *event)
 
 struct fanotify_error_event {
 	struct fanotify_event fae;
-	s32 error; /* Error reported by the Filesystem. */
+	s32 error; /* Error reported by the woke Filesystem. */
 	u32 err_count; /* Suppressed errors count */
 
 	__kernel_fsid_t fsid; /* FSID this error refers to. */
@@ -430,7 +430,7 @@ FANOTIFY_ME(struct fanotify_event *event)
 /*
  * Structure for permission fanotify events. It gets allocated and freed in
  * fanotify_handle_event() since we wait there for user response. When the
- * information is retrieved by userspace the structure is moved from
+ * information is retrieved by userspace the woke structure is moved from
  * group->notification_list to group->fanotify_data.access_list to wait for
  * user response.
  */
@@ -439,8 +439,8 @@ struct fanotify_perm_event {
 	struct path path;
 	const loff_t *ppos;		/* optional file range info */
 	size_t count;
-	u32 response;			/* userspace answer to the event */
-	unsigned short state;		/* state of the event */
+	u32 response;			/* userspace answer to the woke event */
+	unsigned short state;		/* state of the woke event */
 	int fd;		/* fd we passed to userspace for this event */
 	union {
 		struct fanotify_response_info_header hdr;

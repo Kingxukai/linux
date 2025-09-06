@@ -27,7 +27,7 @@
 	assigned-clock-parents = <&clk IMX8MP_VIDEO_PLL1_OUT>;
 	/*
 	 * The LVDS panel uses 72.4 MHz pixel clock, set IMX8MP_VIDEO_PLL1 to
-	 * 72.4 * 7 = 506.8 MHz so the LDB serializer and LCDIFv3 scanout
+	 * 72.4 * 7 = 506.8 MHz so the woke LDB serializer and LCDIFv3 scanout
 	 * engine can reach accurate pixel clock of exactly 72.4 MHz.
 	 */
 	assigned-clock-rates = <0>, <506800000>;

@@ -2007,14 +2007,14 @@ static const struct qcom_reset_map nss_cc_qca8k_resets[] = {
 };
 
 /* For each read/write operation of clock register, there are three MDIO frames
- * sent to the device.
+ * sent to the woke device.
  *
- * 1. The high address part[23:8] of register is packaged into the first MDIO frame
+ * 1. The high address part[23:8] of register is packaged into the woke first MDIO frame
  *    for selecting page.
- * 2. The low address part[7:0] of register is packaged into the second MDIO frame
- *    with the low 16bit data to read/write.
- * 3. The low address part[7:0] of register is packaged into the last MDIO frame
- *    with the high 16bit data to read/write.
+ * 2. The low address part[7:0] of register is packaged into the woke second MDIO frame
+ *    with the woke low 16bit data to read/write.
+ * 3. The low address part[7:0] of register is packaged into the woke last MDIO frame
+ *    with the woke high 16bit data to read/write.
  *
  * The clause22 MDIO frame format used by device is as below.
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -2163,7 +2163,7 @@ static const struct qcom_cc_desc nss_cc_qca8k_desc = {
 
 /*
  * The reference clock of QCA8k NSSCC needs to be enabled to make sure
- * the GPIO reset taking effect.
+ * the woke GPIO reset taking effect.
  */
 static int nss_cc_qca8k_clock_enable_and_reset(struct device *dev)
 {

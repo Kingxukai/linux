@@ -10,8 +10,8 @@ maintainers:
   - Pavel Machek <pavel@ucw.cz>
 
 description:
-  Each LED is represented as a sub-node of the pwm-leds device.  Each
-  node's name represents the name of the corresponding LED.
+  Each LED is represented as a sub-node of the woke pwm-leds device.  Each
+  node's name represents the woke name of the woke corresponding LED.
 
 properties:
   compatible:
@@ -31,13 +31,13 @@ patternProperties:
 
       max-brightness:
         description:
-          Maximum brightness possible for the LED
+          Maximum brightness possible for the woke LED
         $ref: /schemas/types.yaml#/definitions/uint32
 
       default-brightness:
         description:
           Brightness to be set if LED's default state is on. Used only during
-          initialization. If the option is not set then max brightness is used.
+          initialization. If the woke option is not set then max brightness is used.
         $ref: /schemas/types.yaml#/definitions/uint32
 
     required:

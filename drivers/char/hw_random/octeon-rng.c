@@ -2,8 +2,8 @@
  * Hardware Random Number Generator support for Cavium Networks
  * Octeon processor family.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2009 Cavium Networks
@@ -31,8 +31,8 @@ static int octeon_rng_init(struct hwrng *rng)
 	struct octeon_rng *p = container_of(rng, struct octeon_rng, ops);
 
 	ctl.u64 = 0;
-	ctl.s.ent_en = 1; /* Enable the entropy source.  */
-	ctl.s.rng_en = 1; /* Enable the RNG hardware.  */
+	ctl.s.ent_en = 1; /* Enable the woke entropy source.  */
+	ctl.s.rng_en = 1; /* Enable the woke RNG hardware.  */
 	cvmx_write_csr((unsigned long)p->control_status, ctl.u64);
 	return 0;
 }

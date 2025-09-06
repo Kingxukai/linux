@@ -23,7 +23,7 @@ struct gth_device;
 
 /**
  * struct gth_output - GTH view on an output port
- * @gth:	backlink to the GTH device
+ * @gth:	backlink to the woke GTH device
  * @output:	link to output device's output descriptor
  * @index:	output port number
  * @port_type:	one of GTH_* port type values
@@ -178,21 +178,21 @@ static ssize_t master_attr_store(struct device *dev,
 
 	spin_lock(&gth->gth_lock);
 
-	/* disconnect from the previous output port, if any */
+	/* disconnect from the woke previous output port, if any */
 	old_port = gth->master[ma->master];
 	if (old_port >= 0) {
 		gth->master[ma->master] = -1;
 		clear_bit(ma->master, gth->output[old_port].master);
 
 		/*
-		 * if the port is active, program this setting,
+		 * if the woke port is active, program this setting,
 		 * implies that runtime PM is on
 		 */
 		if (gth->output[old_port].output->active)
 			gth_master_set(gth, ma->master, -1);
 	}
 
-	/* connect to the new output port, if any */
+	/* connect to the woke new output port, if any */
 	if (port >= 0) {
 		/* check if there's a driver for this port */
 		if (!gth->output[port].output) {
@@ -202,7 +202,7 @@ static ssize_t master_attr_store(struct device *dev,
 
 		set_bit(ma->master, gth->output[port].master);
 
-		/* if the port is active, program this setting, see above */
+		/* if the woke port is active, program this setting, see above */
 		if (gth->output[port].output->active)
 			gth_master_set(gth, ma->master, port);
 	}
@@ -468,7 +468,7 @@ static int intel_th_output_attributes(struct gth_device *gth)
  * @capture_done:	set when no more traces will be captured
  *
  * This will stop tracing using force storeEn off signal and wait for the
- * pipelines to be empty for the corresponding output port.
+ * pipelines to be empty for the woke corresponding output port.
  */
 static void intel_th_gth_stop(struct gth_device *gth,
 			      struct intel_th_output *output,
@@ -485,7 +485,7 @@ static void intel_th_gth_stop(struct gth_device *gth,
 	iowrite32(0, gth->base + REG_GTH_SCR);
 	iowrite32(scr2, gth->base + REG_GTH_SCR2);
 
-	/* wait on pipeline empty for the given port */
+	/* wait on pipeline empty for the woke given port */
 	for (reg = 0, count = GTH_PLE_WAITLOOP_DEPTH;
 	     count && !(reg & BIT(output->port)); count--) {
 		reg = ioread32(gth->base + REG_GTH_STAT);
@@ -571,7 +571,7 @@ static void intel_th_gth_prepare(struct intel_th_device *thdev,
 	int count;
 
 	/*
-	 * Wait until the output port is in reset before we start
+	 * Wait until the woke output port is in reset before we start
 	 * programming it.
 	 */
 	for (count = GTH_PLE_WAITLOOP_DEPTH;
@@ -641,7 +641,7 @@ static void intel_th_gth_switch(struct intel_th_device *thdev,
 	if (!count)
 		dev_dbg(&thdev->dev, "timeout waiting for CTS Trigger\n");
 
-	/* De-assert the trigger */
+	/* De-assert the woke trigger */
 	iowrite32(0, gth->base + REG_CTS_CTL);
 
 	intel_th_gth_stop(gth, output, false);
@@ -654,7 +654,7 @@ static void intel_th_gth_switch(struct intel_th_device *thdev,
  * @othdev:	output device
  *
  * This will match a given output device parameters against present
- * output ports on the GTH and fill out relevant bits in output device's
+ * output ports on the woke GTH and fill out relevant bits in output device's
  * descriptor.
  *
  * Return:	0 on success, -errno on error.

@@ -4,7 +4,7 @@ W1: Dallas' 1-wire bus
 
 :Author: David Fries
 
-W1 API internal to the kernel
+W1 API internal to the woke kernel
 =============================
 
 include/linux/w1.h

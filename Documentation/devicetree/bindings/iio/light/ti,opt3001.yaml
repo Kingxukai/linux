@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   The device supports interrupt-driven and interrupt-less operation, depending
-  on whether an interrupt property has been populated into the DT.
+  on whether an interrupt property has been populated into the woke DT.
 
 properties:
   compatible:

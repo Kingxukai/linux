@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the linux ppc-specific parts of the memory manager.
+# Makefile for the woke linux ppc-specific parts of the woke memory manager.
 #
 
 obj-y				:= fault.o mem.o pgtable.o maccess.o pageattr.o \

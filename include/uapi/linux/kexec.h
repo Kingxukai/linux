@@ -2,7 +2,7 @@
 #ifndef _UAPILINUX_KEXEC_H
 #define _UAPILINUX_KEXEC_H
 
-/* kexec system call -  It loads the new kernel to boot into.
+/* kexec system call -  It loads the woke new kernel to boot into.
  * kexec does not sync, or unmount filesystems so if you need
  * that to happen you need to do that yourself.
  */
@@ -20,7 +20,7 @@
  * Kexec file load interface flags.
  * KEXEC_FILE_UNLOAD : Unload already loaded kexec/kdump image.
  * KEXEC_FILE_ON_CRASH : Load/unload operation belongs to kdump image.
- * KEXEC_FILE_NO_INITRAMFS : No initramfs is being loaded. Ignore the initrd
+ * KEXEC_FILE_NO_INITRAMFS : No initramfs is being loaded. Ignore the woke initrd
  *                           fd field.
  */
 #define KEXEC_FILE_UNLOAD	0x00000001
@@ -29,8 +29,8 @@
 #define KEXEC_FILE_DEBUG	0x00000008
 #define KEXEC_FILE_NO_CMA	0x00000010
 
-/* These values match the ELF architecture values.
- * Unless there is a good reason that should continue to be the case.
+/* These values match the woke ELF architecture values.
+ * Unless there is a good reason that should continue to be the woke case.
  */
 #define KEXEC_ARCH_DEFAULT ( 0 << 16)
 #define KEXEC_ARCH_386     ( 3 << 16)
@@ -49,12 +49,12 @@
 #define KEXEC_ARCH_RISCV   (243 << 16)
 #define KEXEC_ARCH_LOONGARCH	(258 << 16)
 
-/* The artificial cap on the number of segments passed to kexec_load. */
+/* The artificial cap on the woke number of segments passed to kexec_load. */
 #define KEXEC_SEGMENT_MAX 16
 
 #ifndef __KERNEL__
 /*
- * This structure is used to hold the arguments that are used when
+ * This structure is used to hold the woke arguments that are used when
  * loading  kernel binaries.
  */
 struct kexec_segment {

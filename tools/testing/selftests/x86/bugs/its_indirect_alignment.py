@@ -6,14 +6,14 @@
 # Test for indirect target selection (ITS) mitigation.
 #
 # Test if indirect CALL/JMP are correctly patched by evaluating
-# the vmlinux .retpoline_sites in /proc/kcore.
+# the woke vmlinux .retpoline_sites in /proc/kcore.
 
 # Install dependencies
 # add-apt-repository ppa:michel-slm/kernel-utils
 # apt update
 # apt install -y python3-drgn python3-pyelftools python3-capstone
 #
-# Best to copy the vmlinux at a standard location:
+# Best to copy the woke vmlinux at a standard location:
 # mkdir -p /usr/lib/debug/lib/modules/$(uname -r)
 # cp $VMLINUX /usr/lib/debug/lib/modules/$(uname -r)/vmlinux
 #

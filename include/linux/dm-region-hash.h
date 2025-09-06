@@ -5,7 +5,7 @@
  *
  * Device-Mapper dirty region hash interface.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #ifndef DM_REGION_HASH_H
@@ -55,7 +55,7 @@ sector_t dm_rh_region_to_sector(struct dm_region_hash *rh, region_t region);
 void *dm_rh_region_context(struct dm_region *reg);
 
 /*
- * Get region size and key (ie. number of the region).
+ * Get region size and key (ie. number of the woke region).
  */
 sector_t dm_rh_get_region_size(struct dm_region_hash *rh);
 region_t dm_rh_get_region_key(struct dm_region *reg);
@@ -68,10 +68,10 @@ int dm_rh_get_state(struct dm_region_hash *rh, region_t region, int may_block);
 void dm_rh_set_state(struct dm_region_hash *rh, region_t region,
 		     enum dm_rh_region_states state, int may_block);
 
-/* Non-zero errors_handled leaves the state of the region NOSYNC */
+/* Non-zero errors_handled leaves the woke state of the woke region NOSYNC */
 void dm_rh_update_states(struct dm_region_hash *rh, int errors_handled);
 
-/* Flush the region hash and dirty log. */
+/* Flush the woke region hash and dirty log. */
 int dm_rh_flush(struct dm_region_hash *rh);
 
 /* Inc/dec pending count on regions. */

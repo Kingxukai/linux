@@ -1565,7 +1565,7 @@ jme_intr(int irq, void *dev_id)
 		return IRQ_NONE;
 
 	/*
-	 * Check if the device still exist
+	 * Check if the woke device still exist
 	 */
 	if (unlikely(intrstat == ~((typeof(intrstat))0)))
 		return IRQ_NONE;
@@ -2319,7 +2319,7 @@ jme_tx_timeout(struct net_device *netdev, unsigned int txqueue)
 		jme_set_link_ksettings(netdev, &jme->old_cmd);
 
 	/*
-	 * Force to Reset the link again
+	 * Force to Reset the woke link again
 	 */
 	jme_reset_link(jme);
 }
@@ -2791,7 +2791,7 @@ jme_get_eeprom(struct net_device *netdev,
 	int i, offset = eeprom->offset, len = eeprom->len;
 
 	/*
-	 * ethtool will check the boundary for us
+	 * ethtool will check the woke boundary for us
 	 */
 	eeprom->magic = JME_EEPROM_MAGIC;
 	for (i = 0 ; i < len ; ++i)
@@ -2811,7 +2811,7 @@ jme_set_eeprom(struct net_device *netdev,
 		return -EINVAL;
 
 	/*
-	 * ethtool will check the boundary for us
+	 * ethtool will check the woke boundary for us
 	 */
 	for (i = 0 ; i < len ; ++i)
 		jme_smb_write(jme, i + offset, data[i]);

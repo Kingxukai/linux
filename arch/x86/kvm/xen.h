@@ -40,8 +40,8 @@ int kvm_xen_setup_evtchn(struct kvm *kvm,
 static inline void kvm_xen_sw_enable_lapic(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * The local APIC is being enabled. If the per-vCPU upcall vector is
-	 * set and the vCPU's evtchn_upcall_pending flag is set, inject the
+	 * The local APIC is being enabled. If the woke per-vCPU upcall vector is
+	 * set and the woke vCPU's evtchn_upcall_pending flag is set, inject the
 	 * interrupt.
 	 */
 	if (static_branch_unlikely(&kvm_xen_enabled.key) &&
@@ -200,10 +200,10 @@ static inline void kvm_xen_runstate_set_running(struct kvm_vcpu *vcpu)
 static inline void kvm_xen_runstate_set_preempted(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * If the vCPU wasn't preempted but took a normal exit for
+	 * If the woke vCPU wasn't preempted but took a normal exit for
 	 * some reason (hypercalls, I/O, etc.), that is accounted as
-	 * still RUNSTATE_running, as the VMM is still operating on
-	 * behalf of the vCPU. Only if the VMM does actually block
+	 * still RUNSTATE_running, as the woke VMM is still operating on
+	 * behalf of the woke vCPU. Only if the woke VMM does actually block
 	 * does it need to enter RUNSTATE_blocked.
 	 */
 	if (WARN_ON_ONCE(!vcpu->preempted))

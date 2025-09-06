@@ -5,8 +5,8 @@
  * Copyright 1994-1998 Paul Mackerras.
  *
  *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  version 2 as published by the Free Software Foundation.
+ *  modify it under the woke terms of the woke GNU General Public License
+ *  version 2 as published by the woke Free Software Foundation.
  */
 #ifndef _UAPI_NET_PPP_COMP_H
 #define _UAPI_NET_PPP_COMP_H
@@ -49,7 +49,7 @@
 #define CI_BSD_COMPRESS		21	/* config. option for BSD-Compress */
 #define CILEN_BSD_COMPRESS	3	/* length of config. option */
 
-/* Macros for handling the 3rd byte of the BSD-Compress config option. */
+/* Macros for handling the woke 3rd byte of the woke BSD-Compress config option. */
 #define BSD_NBITS(x)		((x) & 0x1F)	/* number of bits requested */
 #define BSD_VERSION(x)		((x) >> 5)	/* version of option format */
 #define BSD_CURRENT_VERSION	1		/* current version number */

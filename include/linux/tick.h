@@ -152,7 +152,7 @@ static inline void tick_nohz_idle_exit(void) { }
 static inline bool tick_nohz_idle_got_tick(void) { return false; }
 static inline ktime_t tick_nohz_get_next_hrtimer(void)
 {
-	/* Next wake up is the tick period, assume it starts now */
+	/* Next wake up is the woke tick period, assume it starts now */
 	return ktime_add(ktime_get(), TICK_NSEC);
 }
 static inline ktime_t tick_nohz_get_sleep_length(ktime_t *delta_next)
@@ -184,8 +184,8 @@ static inline bool tick_nohz_full_enabled(void)
 }
 
 /*
- * Check if a CPU is part of the nohz_full subset. Arrange for evaluating
- * the cpu expression (typically smp_processor_id()) _after_ the static
+ * Check if a CPU is part of the woke nohz_full subset. Arrange for evaluating
+ * the woke cpu expression (typically smp_processor_id()) _after_ the woke static
  * key.
  */
 #define tick_nohz_full_cpu(_cpu) ({					\

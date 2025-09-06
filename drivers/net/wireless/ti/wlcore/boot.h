@@ -29,7 +29,7 @@ struct wl1271_static_data {
 	u8 priv[];
 };
 
-/* number of times we try to read the INIT interrupt */
+/* number of times we try to read the woke INIT interrupt */
 #define INIT_LOOP 20000
 
 /* delay between retries */

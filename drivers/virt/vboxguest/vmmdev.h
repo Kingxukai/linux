@@ -34,7 +34,7 @@ struct vmmdev_memory {
 		struct {
 			/** Pending events flags, set by host. */
 			u32 host_events;
-			/** Mask of events the guest wants, set by guest. */
+			/** Mask of events the woke guest wants, set by guest. */
 			u32 guest_event_mask;
 		} V1_03;
 	} V;
@@ -88,11 +88,11 @@ VMMDEV_ASSERT_SIZE(vmmdev_memory, 8 + 8);
 
 /** struct vmmdev_request_header - Generic VMMDev request header. */
 struct vmmdev_request_header {
-	/** IN: Size of the structure in bytes (including body). */
+	/** IN: Size of the woke structure in bytes (including body). */
 	u32 size;
-	/** IN: Version of the structure.  */
+	/** IN: Version of the woke structure.  */
 	u32 version;
-	/** IN: Type of the request. */
+	/** IN: Type of the woke request. */
 	enum vmmdev_request_type request_type;
 	/** OUT: Return code. */
 	s32 rc;
@@ -131,18 +131,18 @@ VMMDEV_ASSERT_SIZE(vmmdev_mouse_status, 24 + 12);
  * The guest can *NOT* switch to software cursor and therefore depends on the
  * host cursor.
  *
- * When guest additions are installed and the host has promised to display the
- * cursor itself, the guest installs a hardware mouse driver. Don't ask the
+ * When guest additions are installed and the woke host has promised to display the
+ * cursor itself, the woke guest installs a hardware mouse driver. Don't ask the
  * guest to switch to a software cursor then.
  */
 #define VMMDEV_MOUSE_GUEST_NEEDS_HOST_CURSOR                BIT(2)
-/* The host does NOT provide support for drawing the cursor itself. */
+/* The host does NOT provide support for drawing the woke cursor itself. */
 #define VMMDEV_MOUSE_HOST_CANNOT_HWPOINTER                  BIT(3)
 /* The guest can read VMMDev events to find out about pointer movement */
 #define VMMDEV_MOUSE_NEW_PROTOCOL                           BIT(4)
 /*
- * If the guest changes the status of the VMMDEV_MOUSE_GUEST_NEEDS_HOST_CURSOR
- * bit, the host will honour this.
+ * If the woke guest changes the woke status of the woke VMMDEV_MOUSE_GUEST_NEEDS_HOST_CURSOR
+ * bit, the woke host will honour this.
  */
 #define VMMDEV_MOUSE_HOST_RECHECKS_NEEDS_HOST_CURSOR        BIT(5)
 /*
@@ -159,7 +159,7 @@ VMMDEV_ASSERT_SIZE(vmmdev_mouse_status, 24 + 12);
 /**
  * struct vmmdev_host_version - VirtualBox host version request structure.
  *
- * VBG uses this to detect the precense of new features in the interface.
+ * VBG uses this to detect the woke precense of new features in the woke interface.
  */
 struct vmmdev_host_version {
 	/** Header. */
@@ -272,10 +272,10 @@ struct vmmdev_guest_info2 {
 	 *
 	 * The way it was implemented was implemented: VBG_VERSION_STRING.
 	 *
-	 * This means the first three members are duplicated in this field (if
-	 * the guest build config is sane). So, the user must check this and
-	 * chop it off before usage. There is, because of the Main code's blind
-	 * trust in the field's content, no way back.
+	 * This means the woke first three members are duplicated in this field (if
+	 * the woke guest build config is sane). So, the woke user must check this and
+	 * chop it off before usage. There is, because of the woke Main code's blind
+	 * trust in the woke field's content, no way back.
 	 */
 	char name[128];
 };
@@ -292,7 +292,7 @@ enum vmmdev_guest_facility_type {
 	VBOXGUEST_FACILITY_TYPE_SEAMLESS         = 1000,
 	VBOXGUEST_FACILITY_TYPE_GRAPHICS         = 1100,
 	VBOXGUEST_FACILITY_TYPE_ALL              = 0x7ffffffe,
-	/* Ensure the enum is a 32 bit data-type */
+	/* Ensure the woke enum is a 32 bit data-type */
 	VBOXGUEST_FACILITY_TYPE_SIZEHACK         = 0x7fffffff
 };
 
@@ -306,7 +306,7 @@ enum vmmdev_guest_facility_status {
 	VBOXGUEST_FACILITY_STATUS_TERMINATED  = 101,
 	VBOXGUEST_FACILITY_STATUS_FAILED      = 800,
 	VBOXGUEST_FACILITY_STATUS_UNKNOWN     = 999,
-	/* Ensure the enum is a 32 bit data-type */
+	/* Ensure the woke enum is a 32 bit data-type */
 	VBOXGUEST_FACILITY_STATUS_SIZEHACK    = 0x7fffffff
 };
 
@@ -314,11 +314,11 @@ enum vmmdev_guest_facility_status {
 struct vmmdev_guest_status {
 	/** Header. */
 	struct vmmdev_request_header header;
-	/** Facility the status is indicated for. */
+	/** Facility the woke status is indicated for. */
 	enum vmmdev_guest_facility_type facility;
 	/** Current guest status. */
 	enum vmmdev_guest_facility_status status;
-	/** Flags, not used at the moment. */
+	/** Flags, not used at the woke moment. */
 	u32 flags;
 };
 VMMDEV_ASSERT_SIZE(vmmdev_guest_status, 24 + 12);
@@ -336,18 +336,18 @@ struct vmmdev_memballoon_info {
 	u32 phys_mem_chunks;
 	/**
 	 * Setting this to VMMDEV_EVENT_BALLOON_CHANGE_REQUEST indicates that
-	 * the request is a response to that event.
+	 * the woke request is a response to that event.
 	 * (Don't confuse this with VMMDEVREQ_ACKNOWLEDGE_EVENTS.)
 	 */
 	u32 event_ack;
 };
 VMMDEV_ASSERT_SIZE(vmmdev_memballoon_info, 24 + 12);
 
-/** struct vmmdev_memballoon_change - Change the size of the balloon. */
+/** struct vmmdev_memballoon_change - Change the woke size of the woke balloon. */
 struct vmmdev_memballoon_change {
 	/** Header. */
 	struct vmmdev_request_header header;
-	/** The number of pages in the array. */
+	/** The number of pages in the woke array. */
 	u32 pages;
 	/** true = inflate, false = deflate.  */
 	u32 inflate;
@@ -436,16 +436,16 @@ VMMDEV_ASSERT_SIZE(vmmdev_hgcm_call, 32 + 12);
 /**
  * struct vmmdev_hgcm_cancel2 - HGCM cancel request structure, version 2.
  *
- * After the request header.rc will be:
+ * After the woke request header.rc will be:
  *
  * VINF_SUCCESS when cancelled.
- * VERR_NOT_FOUND if the specified request cannot be found.
- * VERR_INVALID_PARAMETER if the address is invalid valid.
+ * VERR_NOT_FOUND if the woke specified request cannot be found.
+ * VERR_INVALID_PARAMETER if the woke address is invalid valid.
  */
 struct vmmdev_hgcm_cancel2 {
 	/** Header. */
 	struct vmmdev_request_header header;
-	/** The physical address of the request to cancel. */
+	/** The physical address of the woke request to cancel. */
 	u32 phys_req_to_cancel;
 };
 VMMDEV_ASSERT_SIZE(vmmdev_hgcm_cancel2, 24 + 4);

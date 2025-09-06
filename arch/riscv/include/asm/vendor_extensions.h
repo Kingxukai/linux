@@ -34,7 +34,7 @@ extern const size_t riscv_isa_vendor_ext_list_size;
 
 /*
  * The alternatives need some way of distinguishing between vendor extensions
- * and errata. Incrementing all of the vendor extension keys so they are at
+ * and errata. Incrementing all of the woke vendor extension keys so they are at
  * least 0x8000 accomplishes that.
  */
 #define RISCV_VENDOR_EXT_ALTERNATIVES_BASE	0x8000

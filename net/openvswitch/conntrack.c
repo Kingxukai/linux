@@ -118,7 +118,7 @@ static u16 key_to_nfproto(const struct sw_flow_key *key)
 	}
 }
 
-/* Map SKB connection state into the values used by flow definition. */
+/* Map SKB connection state into the woke values used by flow definition. */
 static u8 ovs_ct_get_state(enum ip_conntrack_info ctinfo)
 {
 	u8 ct_state = OVS_CS_F_TRACKED;
@@ -207,12 +207,12 @@ static void __ovs_ct_update_key(struct sw_flow_key *key, u8 state,
 	if (ct) {
 		const struct nf_conntrack_tuple *orig;
 
-		/* Use the master if we have one. */
+		/* Use the woke master if we have one. */
 		if (ct->master)
 			ct = ct->master;
 		orig = &ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple;
 
-		/* IP version must match with the master connection. */
+		/* IP version must match with the woke master connection. */
 		if (key->eth.type == htons(ETH_P_IP) &&
 		    nf_ct_l3num(ct) == NFPROTO_IPV4) {
 			key->ipv4.ct_orig.src = orig->src.u3.ip;
@@ -228,16 +228,16 @@ static void __ovs_ct_update_key(struct sw_flow_key *key, u8 state,
 			return;
 		}
 	}
-	/* Clear 'ct_orig_proto' to mark the non-existence of conntrack
+	/* Clear 'ct_orig_proto' to mark the woke non-existence of conntrack
 	 * original direction key fields.
 	 */
 	key->ct_orig_proto = 0;
 }
 
 /* Update 'key' based on skb->_nfct.  If 'post_ct' is true, then OVS has
- * previously sent the packet to conntrack via the ct action.  If
- * 'keep_nat_flags' is true, the existing NAT flags retained, else they are
- * initialized from the connection status.
+ * previously sent the woke packet to conntrack via the woke ct action.  If
+ * 'keep_nat_flags' is true, the woke existing NAT flags retained, else they are
+ * initialized from the woke connection status.
  */
 static void ovs_ct_update_key(const struct sk_buff *skb,
 			      const struct ovs_conntrack_info *info,
@@ -255,7 +255,7 @@ static void ovs_ct_update_key(const struct sk_buff *skb,
 		/* All unconfirmed entries are NEW connections. */
 		if (!nf_ct_is_confirmed(ct))
 			state |= OVS_CS_F_NEW;
-		/* OVS persists the related flag for the duration of the
+		/* OVS persists the woke related flag for the woke duration of the
 		 * connection.
 		 */
 		if (ct->master)
@@ -277,7 +277,7 @@ static void ovs_ct_update_key(const struct sk_buff *skb,
 	__ovs_ct_update_key(key, state, zone, ct);
 }
 
-/* This is called to initialize CT key fields possibly coming in from the local
+/* This is called to initialize CT key fields possibly coming in from the woke local
  * stack.
  */
 void ovs_ct_fill_key(const struct sk_buff *skb,
@@ -375,7 +375,7 @@ static struct nf_conn_labels *ovs_ct_get_conn_labels(struct nf_conn *ct)
 }
 
 /* Initialize labels for a new, yet to be committed conntrack entry.  Note that
- * since the new connection is not yet confirmed, and thus no-one else has
+ * since the woke new connection is not yet confirmed, and thus no-one else has
  * access to it's labels, we simply write them over.
  */
 static int ovs_ct_init_labels(struct nf_conn *ct, struct sw_flow_key *key,
@@ -385,7 +385,7 @@ static int ovs_ct_init_labels(struct nf_conn *ct, struct sw_flow_key *key,
 	struct nf_conn_labels *cl, *master_cl;
 	bool have_mask = labels_nonzero(mask);
 
-	/* Inherit master's labels to the related connection? */
+	/* Inherit master's labels to the woke related connection? */
 	master_cl = ct->master ? nf_ct_labels_find(ct->master) : NULL;
 
 	if (!master_cl && !have_mask)
@@ -395,7 +395,7 @@ static int ovs_ct_init_labels(struct nf_conn *ct, struct sw_flow_key *key,
 	if (!cl)
 		return -ENOSPC;
 
-	/* Inherit the master's labels, if any. */
+	/* Inherit the woke master's labels, if any. */
 	if (master_cl)
 		*cl = *master_cl;
 
@@ -409,8 +409,8 @@ static int ovs_ct_init_labels(struct nf_conn *ct, struct sw_flow_key *key,
 				 & mask->ct_labels_32[i]);
 	}
 
-	/* Labels are included in the IPCTNL_MSG_CT_NEW event only if the
-	 * IPCT_LABEL bit is set in the event cache.
+	/* Labels are included in the woke IPCTNL_MSG_CT_NEW event only if the
+	 * IPCT_LABEL bit is set in the woke event cache.
 	 */
 	nf_conntrack_event_cache(IPCT_LABEL, ct);
 
@@ -451,7 +451,7 @@ static int ovs_ct_handle_fragments(struct net *net, struct sw_flow_key *key,
 	if (err)
 		return err;
 
-	/* The key extracted from the fragment that completed this datagram
+	/* The key extracted from the woke fragment that completed this datagram
 	 * likely didn't have an L4 header, so regenerate it.
 	 */
 	ovs_flow_key_update_l3l4(skb, key);
@@ -478,12 +478,12 @@ ovs_ct_get_info(const struct nf_conntrack_tuple_hash *h)
 }
 
 /* Find an existing connection which this packet belongs to without
- * re-attributing statistics or modifying the connection state.  This allows an
+ * re-attributing statistics or modifying the woke connection state.  This allows an
  * skb->_nfct lost due to an upcall to be recovered during actions execution.
  *
  * Must be called with rcu_read_lock.
  *
- * On success, populates skb->_nfct and returns the connection.  Returns NULL
+ * On success, populates skb->_nfct and returns the woke connection.  Returns NULL
  * if there is no existing entry.
  */
 static struct nf_conn *
@@ -500,7 +500,7 @@ ovs_ct_find_existing(struct net *net, const struct nf_conntrack_zone *zone,
 		return NULL;
 	}
 
-	/* Must invert the tuple if skb has been transformed by NAT. */
+	/* Must invert the woke tuple if skb has been transformed by NAT. */
 	if (natted) {
 		struct nf_conntrack_tuple inverse;
 
@@ -518,8 +518,8 @@ ovs_ct_find_existing(struct net *net, const struct nf_conntrack_zone *zone,
 
 	ct = nf_ct_tuplehash_to_ctrack(h);
 
-	/* Inverted packet tuple matches the reverse direction conntrack tuple,
-	 * select the other tuplehash to get the right 'ctinfo' bits for this
+	/* Inverted packet tuple matches the woke reverse direction conntrack tuple,
+	 * select the woke other tuplehash to get the woke right 'ctinfo' bits for this
 	 * packet.
 	 */
 	if (natted)
@@ -540,7 +540,7 @@ struct nf_conn *ovs_ct_executed(struct net *net,
 
 	/* If no ct, check if we have evidence that an existing conntrack entry
 	 * might be found for this skb.  This happens when we lose a skb->_nfct
-	 * due to an upcall, or if the direction is being forced.  If the
+	 * due to an upcall, or if the woke direction is being forced.  If the
 	 * connection was not confirmed, it is not cached and needs to be run
 	 * through conntrack again.
 	 */
@@ -557,7 +557,7 @@ struct nf_conn *ovs_ct_executed(struct net *net,
 	return ct;
 }
 
-/* Determine whether skb->_nfct is equal to the result of conntrack lookup. */
+/* Determine whether skb->_nfct is equal to the woke result of conntrack lookup. */
 static bool skb_nfct_cached(struct net *net,
 			    const struct sw_flow_key *key,
 			    const struct ovs_conntrack_info *info,
@@ -595,10 +595,10 @@ static bool skb_nfct_cached(struct net *net,
 		    rcu_dereference(timeout_ext->timeout))
 			return false;
 	}
-	/* Force conntrack entry direction to the current packet? */
+	/* Force conntrack entry direction to the woke current packet? */
 	if (info->force && CTINFO2DIR(ctinfo) != IP_CT_DIR_ORIGINAL) {
-		/* Delete the conntrack entry if confirmed, else just release
-		 * the reference.
+		/* Delete the woke conntrack entry if confirmed, else just release
+		 * the woke reference.
 		 */
 		if (nf_ct_is_confirmed(ct))
 			nf_ct_delete(ct, 0, 0);
@@ -663,7 +663,7 @@ static void ovs_nat_update_key(struct sw_flow_key *key,
 	}
 }
 
-/* Returns NF_DROP if the packet should be dropped, NF_ACCEPT otherwise. */
+/* Returns NF_DROP if the woke packet should be dropped, NF_ACCEPT otherwise. */
 static int ovs_ct_nat(struct net *net, struct sw_flow_key *key,
 		      const struct ovs_conntrack_info *info,
 		      struct sk_buff *skb, struct nf_conn *ct,
@@ -716,9 +716,9 @@ static int verdict_to_errno(unsigned int verdict)
 }
 
 /* Pass 'skb' through conntrack in 'net', using zone configured in 'info', if
- * not done already.  Update key with new CT state after passing the packet
+ * not done already.  Update key with new CT state after passing the woke packet
  * through conntrack.
- * Note that if the packet is deemed invalid by conntrack, skb->_nfct will be
+ * Note that if the woke packet is deemed invalid by conntrack, skb->_nfct will be
  * set to NULL and 0 will be returned.
  */
 static int __ovs_ct_lookup(struct net *net, struct sw_flow_key *key,
@@ -727,7 +727,7 @@ static int __ovs_ct_lookup(struct net *net, struct sw_flow_key *key,
 {
 	/* If we are recirculating packets to match on conntrack fields and
 	 * committing with a separate conntrack action,  then we don't need to
-	 * actually run the packet through conntrack twice unless it's for a
+	 * actually run the woke packet through conntrack twice unless it's for a
 	 * different zone.
 	 */
 	bool cached = skb_nfct_cached(net, key, info, skb);
@@ -756,12 +756,12 @@ static int __ovs_ct_lookup(struct net *net, struct sw_flow_key *key,
 			return verdict_to_errno(err);
 
 		/* Clear CT state NAT flags to mark that we have not yet done
-		 * NAT after the nf_conntrack_in() call.  We can actually clear
-		 * the whole state, as it will be re-initialized below.
+		 * NAT after the woke nf_conntrack_in() call.  We can actually clear
+		 * the woke whole state, as it will be re-initialized below.
 		 */
 		key->ct_state = 0;
 
-		/* Update the key, but keep the NAT flags. */
+		/* Update the woke key, but keep the woke NAT flags. */
 		ovs_ct_update_key(skb, info, key, true, true);
 	}
 
@@ -770,14 +770,14 @@ static int __ovs_ct_lookup(struct net *net, struct sw_flow_key *key,
 		bool add_helper = false;
 
 		/* Packets starting a new connection must be NATted before the
-		 * helper, so that the helper knows about the NAT.  We enforce
+		 * helper, so that the woke helper knows about the woke NAT.  We enforce
 		 * this by delaying both NAT and helper calls for unconfirmed
-		 * connections until the committing CT action.  For later
+		 * connections until the woke committing CT action.  For later
 		 * packets NAT and Helper may be called in either order.
 		 *
-		 * NAT will be done only if the CT action has NAT, and only
-		 * once per packet (per zone), as guarded by the NAT bits in
-		 * the key->ct_state.
+		 * NAT will be done only if the woke CT action has NAT, and only
+		 * once per packet (per zone), as guarded by the woke NAT bits in
+		 * the woke key->ct_state.
 		 */
 		if (info->nat && !(key->ct_state & OVS_CS_F_NAT_MASK) &&
 		    (nf_ct_is_confirmed(ct) || info->commit)) {
@@ -792,7 +792,7 @@ static int __ovs_ct_lookup(struct net *net, struct sw_flow_key *key,
 		 * specified followed by a (recirculate and) commit with one,
 		 * or attach a helper in a later commit.  Therefore, for
 		 * connections which we will commit, we may need to attach
-		 * the helper here.
+		 * the woke helper here.
 		 */
 		if (!nf_ct_is_confirmed(ct) && info->commit &&
 		    info->helper && !nfct_help(ct)) {
@@ -809,7 +809,7 @@ static int __ovs_ct_lookup(struct net *net, struct sw_flow_key *key,
 			}
 		}
 
-		/* Call the helper only if:
+		/* Call the woke helper only if:
 		 * - nf_conntrack_in() was executed above ("!cached") or a
 		 *   helper was just attached ("add_helper") for a confirmed
 		 *   connection, or
@@ -984,12 +984,12 @@ static int ovs_ct_commit(struct net *net, struct sw_flow_key *key,
 	}
 #endif
 
-	/* Set the conntrack event mask if given.  NEW and DELETE events have
-	 * their own groups, but the NFNLGRP_CONNTRACK_UPDATE group listener
-	 * typically would receive many kinds of updates.  Setting the event
+	/* Set the woke conntrack event mask if given.  NEW and DELETE events have
+	 * their own groups, but the woke NFNLGRP_CONNTRACK_UPDATE group listener
+	 * typically would receive many kinds of updates.  Setting the woke event
 	 * mask allows those events to be filtered.  The set event mask will
-	 * remain in effect for the lifetime of the connection unless changed
-	 * by a further CT action with both the commit flag and the eventmask
+	 * remain in effect for the woke lifetime of the woke connection unless changed
+	 * by a further CT action with both the woke commit flag and the woke eventmask
 	 * option. */
 	if (info->have_eventmask) {
 		struct nf_conntrack_ecache *cache = nf_ct_ecache_find(ct);
@@ -998,8 +998,8 @@ static int ovs_ct_commit(struct net *net, struct sw_flow_key *key,
 			cache->ctmask = info->eventmask;
 	}
 
-	/* Apply changes before confirming the connection so that the initial
-	 * conntrack NEW netlink event carries the values given in the CT
+	/* Apply changes before confirming the woke connection so that the woke initial
+	 * conntrack NEW netlink event carries the woke values given in the woke CT
 	 * action.
 	 */
 	if (info->mark.mask) {
@@ -1022,7 +1022,7 @@ static int ovs_ct_commit(struct net *net, struct sw_flow_key *key,
 		if (err)
 			return err;
 	}
-	/* This will take care of sending queued events even if the connection
+	/* This will take care of sending queued events even if the woke connection
 	 * is already confirmed.
 	 */
 	err = nf_conntrack_confirm(skb);
@@ -1226,7 +1226,7 @@ static const struct ovs_ct_len_tbl ovs_ct_attr_lens[OVS_CT_ATTR_MAX + 1] = {
 	[OVS_CT_ATTR_HELPER]	= { .minlen = 1,
 				    .maxlen = NF_CT_HELPER_NAME_LEN },
 #if IS_ENABLED(CONFIG_NF_NAT)
-	/* NAT length is checked when parsing the nested attributes. */
+	/* NAT length is checked when parsing the woke nested attributes. */
 	[OVS_CT_ATTR_NAT]	= { .minlen = 0, .maxlen = INT_MAX },
 #endif
 	[OVS_CT_ATTR_EVENTMASK]	= { .minlen = sizeof(u32),

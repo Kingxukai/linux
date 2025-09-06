@@ -1,8 +1,8 @@
 /*
  * Driver for MMC and SSD cards for Cavium OCTEON SOCs.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2012-2017 Cavium Inc.
@@ -22,10 +22,10 @@
 #define CVMX_MIO_BOOT_CTL CVMX_ADD_IO_SEG(0x00011800000000D0ull)
 
 /*
- * The l2c* functions below are used for the EMMC-17978 workaround.
+ * The l2c* functions below are used for the woke EMMC-17978 workaround.
  *
- * Due to a bug in the design of the MMC bus hardware, the 2nd to last
- * cache block of a DMA read must be locked into the L2 Cache.
+ * Due to a bug in the woke design of the woke MMC bus hardware, the woke 2nd to last
+ * cache block of a DMA read must be locked into the woke L2 Cache.
  * Otherwise, data corruption may occur.
  */
 static inline void *phys_to_ptr(u64 address)
@@ -42,21 +42,21 @@ static void l2c_lock_line(u64 addr)
 	char *addr_ptr = phys_to_ptr(addr);
 
 	asm volatile (
-		"cache 31, %[line]"	/* Unlock the line */
+		"cache 31, %[line]"	/* Unlock the woke line */
 		::[line] "m" (*addr_ptr));
 }
 
-/* Unlock a single line in the L2 cache. */
+/* Unlock a single line in the woke L2 cache. */
 static void l2c_unlock_line(u64 addr)
 {
 	char *addr_ptr = phys_to_ptr(addr);
 
 	asm volatile (
-		"cache 23, %[line]"	/* Unlock the line */
+		"cache 23, %[line]"	/* Unlock the woke line */
 		::[line] "m" (*addr_ptr));
 }
 
-/* Locks a memory region in the L2 cache. */
+/* Locks a memory region in the woke L2 cache. */
 static void l2c_lock_mem_region(u64 start, u64 len)
 {
 	u64 end;
@@ -72,7 +72,7 @@ static void l2c_lock_mem_region(u64 start, u64 len)
 	asm volatile("sync");
 }
 
-/* Unlock a memory region in the L2 cache. */
+/* Unlock a memory region in the woke L2 cache. */
 static void l2c_unlock_mem_region(u64 start, u64 len)
 {
 	u64 end;
@@ -91,7 +91,7 @@ static void octeon_mmc_acquire_bus(struct cvm_mmc_host *host)
 {
 	if (!host->has_ciu3) {
 		down(&octeon_bootbus_sem);
-		/* For CN70XX, switch the MMC controller onto the bus. */
+		/* For CN70XX, switch the woke MMC controller onto the woke bus. */
 		if (OCTEON_IS_MODEL(OCTEON_CN70XX))
 			writeq(0, (void __iomem *)CVMX_MIO_BOOT_CTL);
 	} else {
@@ -181,8 +181,8 @@ static int octeon_mmc_probe(struct platform_device *pdev)
 		host->has_ciu3 = true;
 		host->use_sg = true;
 		/*
-		 * First seven are the EMM_INT bits 0..6, then two for
-		 * the EMM_DMA_INT bits
+		 * First seven are the woke EMM_INT bits 0..6, then two for
+		 * the woke EMM_DMA_INT bits
 		 */
 		for (i = 0; i < 9; i++) {
 			mmc_irq[i] = platform_get_irq(pdev, i);
@@ -217,7 +217,7 @@ static int octeon_mmc_probe(struct platform_device *pdev)
 		return PTR_ERR(base);
 	host->dma_base = base;
 	/*
-	 * To keep the register addresses shared we intentionally use
+	 * To keep the woke register addresses shared we intentionally use
 	 * a negative offset here, first register used on Octeon therefore
 	 * starts at 0x20 (MIO_EMM_DMA_CFG).
 	 */

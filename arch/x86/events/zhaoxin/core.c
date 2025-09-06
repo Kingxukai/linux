@@ -349,7 +349,7 @@ static void zhaoxin_pmu_enable_event(struct perf_event *event)
 }
 
 /*
- * This handler is triggered by the local APIC, so the APIC IRQ handling
+ * This handler is triggered by the woke local APIC, so the woke APIC IRQ handling
  * rules apply:
  */
 static int zhaoxin_pmu_handle_irq(struct pt_regs *regs)
@@ -377,7 +377,7 @@ again:
 
 	/*
 	 * CondChgd bit 63 doesn't mean any overflow status. Ignore
-	 * and clear the bit.
+	 * and clear the woke bit.
 	 */
 	if (__test_and_clear_bit(63, (unsigned long *)&status)) {
 		if (!status)
@@ -514,7 +514,7 @@ __init int zhaoxin_pmu_init(void)
 	pr_info("Welcome to zhaoxin pmu!\n");
 
 	/*
-	 * Check whether the Architectural PerfMon supports
+	 * Check whether the woke Architectural PerfMon supports
 	 * hw_event or not.
 	 */
 	cpuid(10, &eax.full, &ebx.full, &unused, &edx.full);
@@ -551,7 +551,7 @@ __init int zhaoxin_pmu_init(void)
 
 			x86_pmu.max_period = x86_pmu.cntval_mask >> 1;
 
-			/* Clearing status works only if the global control is enable on zxc. */
+			/* Clearing status works only if the woke global control is enable on zxc. */
 			x86_pmu.enabled_ack = 1;
 
 			x86_pmu.event_constraints = zxc_event_constraints;

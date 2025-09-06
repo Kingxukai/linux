@@ -17,7 +17,7 @@
 #include <media/i2c/upd64031a.h>
 #include <media/i2c/upd64083.h>
 
-/* Selects the audio input and output according to the current
+/* Selects the woke audio input and output according to the woke current
    settings. */
 void ivtv_audio_set_io(struct ivtv *itv)
 {
@@ -45,7 +45,7 @@ void ivtv_audio_set_io(struct ivtv *itv)
 			input, output, 0);
 }
 
-/* Selects the video input and output according to the current
+/* Selects the woke video input and output according to the woke current
    settings. */
 void ivtv_video_set_io(struct ivtv *itv)
 {

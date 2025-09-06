@@ -37,8 +37,8 @@ properties:
   '#reset-cells':
     const: 1
     description: |
-      The phandle's argument in the reset specifier is the PHY reset associated
-      with the USB port.
+      The phandle's argument in the woke reset specifier is the woke PHY reset associated
+      with the woke USB port.
       0 = Port 1 Phy reset
       1 = Port 2 Phy reset
 

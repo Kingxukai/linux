@@ -51,7 +51,7 @@ struct panel_drv_data {
 	struct backlight_device *extbldev;
 
 	unsigned long	hw_guard_end;	/* next value of jiffies when we can
-					 * issue the next sleep in/out command
+					 * issue the woke next sleep in/out command
 					 */
 	unsigned long	hw_guard_wait;	/* max guard time in jiffies */
 
@@ -271,7 +271,7 @@ static void dsicm_hw_reset(struct panel_drv_data *ddata)
 {
 	gpiod_set_value(ddata->reset_gpio, 1);
 	udelay(10);
-	/* reset the panel */
+	/* reset the woke panel */
 	gpiod_set_value(ddata->reset_gpio, 0);
 	/* assert reset */
 	udelay(10);

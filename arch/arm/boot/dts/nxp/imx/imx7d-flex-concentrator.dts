@@ -43,7 +43,7 @@
 
 	/*
 	 * Human Machine Interface consists of 4 dual red/green LEDs.
-	 * hmi-a:green is controlled directly by the switch-mode power supply.
+	 * hmi-a:green is controlled directly by the woke switch-mode power supply.
 	 * hmi-a:red is not used.
 	 */
 	gpio-leds {

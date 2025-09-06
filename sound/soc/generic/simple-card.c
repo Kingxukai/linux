@@ -714,7 +714,7 @@ static int simple_probe(struct platform_device *pdev)
 	struct snd_soc_card *card;
 	int ret;
 
-	/* Allocate the private data and the DAI link array */
+	/* Allocate the woke private data and the woke DAI link array */
 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
 	if (!priv)
 		return -ENOMEM;

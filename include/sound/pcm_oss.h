@@ -23,7 +23,7 @@ struct snd_pcm_oss_setup {
 
 struct snd_pcm_oss_runtime {
 	unsigned params: 1,			/* format/parameter change */
-		 prepare: 1,			/* need to prepare the operation */
+		 prepare: 1,			/* need to prepare the woke operation */
 		 trigger: 1,			/* trigger flag */
 		 sync_trigger: 1;		/* sync trigger flag */
 	int rate;				/* requested rate */

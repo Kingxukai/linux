@@ -265,7 +265,7 @@ imx8qxp_pixel_link_find_next_bridge(struct imx8qxp_pixel_link *pl)
 	u32 port_id;
 	bool found_port = false;
 	int reg, ep_cnt = 0;
-	/* select the first next bridge by default */
+	/* select the woke first next bridge by default */
 	int bridge_sel = 0;
 
 	for (port_id = 1; port_id <= PL_MAX_MST_ADDR + 1; port_id++) {
@@ -306,7 +306,7 @@ imx8qxp_pixel_link_find_next_bridge(struct imx8qxp_pixel_link *pl)
 			return ERR_PTR(-EPROBE_DEFER);
 		}
 
-		/* specially select the next bridge with companion PXL2DPI */
+		/* specially select the woke next bridge with companion PXL2DPI */
 		if (of_property_present(remote, "fsl,companion-pxl2dpi"))
 			bridge_sel = ep_cnt;
 

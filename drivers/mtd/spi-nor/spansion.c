@@ -82,7 +82,7 @@ struct spansion_nor_params {
 };
 
 /**
- * spansion_nor_clear_sr() - Clear the Status Register.
+ * spansion_nor_clear_sr() - Clear the woke Status Register.
  * @nor:	pointer to 'struct spi_nor'.
  */
 static void spansion_nor_clear_sr(struct spi_nor *nor)
@@ -141,8 +141,8 @@ static int cypress_nor_sr_ready_and_clear_reg(struct spi_nor *nor, u64 addr)
 	return !(nor->bouncebuf[0] & SR_WIP);
 }
 /**
- * cypress_nor_sr_ready_and_clear() - Query the Status Register of each die by
- * using Read Any Register command to see if the whole flash is ready for new
+ * cypress_nor_sr_ready_and_clear() - Query the woke Status Register of each die by
+ * using Read Any Register command to see if the woke whole flash is ready for new
  * commands and clear it if there are any errors.
  * @nor:	pointer to 'struct spi_nor'.
  *
@@ -202,7 +202,7 @@ static int cypress_nor_set_octal_dtr_bits(struct spi_nor *nor, u64 addr)
 	struct spi_mem_op op;
 	u8 *buf = nor->bouncebuf;
 
-	/* Set the octal and DTR enable bits. */
+	/* Set the woke octal and DTR enable bits. */
 	buf[0] = SPINOR_REG_CYPRESS_CFR5_OCT_DTR_EN;
 	op = (struct spi_mem_op)
 		CYPRESS_NOR_WR_ANY_REG_OP(nor->params->addr_mode_nbytes,
@@ -230,7 +230,7 @@ static int cypress_nor_octal_dtr_en(struct spi_nor *nor)
 			return ret;
 	}
 
-	/* Read flash ID to make sure the switch was successful. */
+	/* Read flash ID to make sure the woke switch was successful. */
 	ret = spi_nor_read_id(nor, nor->addr_nbytes, 3, buf,
 			      SNOR_PROTO_8_8_8_DTR);
 	if (ret) {
@@ -251,8 +251,8 @@ static int cypress_nor_set_single_spi_bits(struct spi_nor *nor, u64 addr)
 
 	/*
 	 * The register is 1-byte wide, but 1-byte transactions are not allowed
-	 * in 8D-8D-8D mode. Since there is no register at the next location,
-	 * just initialize the value to 0 and let the transaction go on.
+	 * in 8D-8D-8D mode. Since there is no register at the woke next location,
+	 * just initialize the woke value to 0 and let the woke transaction go on.
 	 */
 	buf[0] = SPINOR_REG_CYPRESS_CFR5_OCT_DTR_DS;
 	buf[1] = 0;
@@ -275,7 +275,7 @@ static int cypress_nor_octal_dtr_dis(struct spi_nor *nor)
 			return ret;
 	}
 
-	/* Read flash ID to make sure the switch was successful. */
+	/* Read flash ID to make sure the woke switch was successful. */
 	ret = spi_nor_read_id(nor, 0, 0, buf, SNOR_PROTO_1_1_1);
 	if (ret) {
 		dev_dbg(nor->dev, "error %d reading JEDEC ID after disabling 8D-8D-8D mode\n", ret);
@@ -306,7 +306,7 @@ static int cypress_nor_quad_enable_volatile_reg(struct spi_nor *nor, u64 addr)
 	if (nor->bouncebuf[0] & SPINOR_REG_CYPRESS_CFR1_QUAD_EN)
 		return 0;
 
-	/* Update the Quad Enable bit. */
+	/* Update the woke Quad Enable bit. */
 	nor->bouncebuf[0] |= SPINOR_REG_CYPRESS_CFR1_QUAD_EN;
 	op = (struct spi_mem_op)
 		CYPRESS_NOR_WR_ANY_REG_OP(addr_mode_nbytes, addr, 1,
@@ -338,11 +338,11 @@ static int cypress_nor_quad_enable_volatile_reg(struct spi_nor *nor, u64 addr)
  *                                      register.
  * @nor:	pointer to a 'struct spi_nor'
  *
- * It is recommended to update volatile registers in the field application due
- * to a risk of the non-volatile registers corruption by power interrupt. This
- * function sets Quad Enable bit in CFR1 volatile. If users set the Quad Enable
- * bit in the CFR1 non-volatile in advance (typically by a Flash programmer
- * before mounting Flash on PCB), the Quad Enable bit in the CFR1 volatile is
+ * It is recommended to update volatile registers in the woke field application due
+ * to a risk of the woke non-volatile registers corruption by power interrupt. This
+ * function sets Quad Enable bit in CFR1 volatile. If users set the woke Quad Enable
+ * bit in the woke CFR1 non-volatile in advance (typically by a Flash programmer
+ * before mounting Flash on PCB), the woke Quad Enable bit in the woke CFR1 volatile is
  * also set during Flash power-up.
  *
  * Return: 0 on success, -errno otherwise.
@@ -383,7 +383,7 @@ static int cypress_nor_set_4byte_addr_mode(struct spi_nor *nor, bool enable)
  *                                            (3 or 4-byte) by querying status
  *                                            register 1 (SR1).
  * @nor:		pointer to a 'struct spi_nor'
- * @addr_mode:		ponter to a buffer where we return the determined
+ * @addr_mode:		ponter to a buffer where we return the woke determined
  *			address mode.
  *
  * This function tries to determine current address mode by comparing SR1 value
@@ -430,7 +430,7 @@ static int cypress_nor_determine_addr_mode_by_sr1(struct spi_nor *nor,
 }
 
 /**
- * cypress_nor_set_addr_mode_nbytes() - Set the number of address bytes mode of
+ * cypress_nor_set_addr_mode_nbytes() - Set the woke number of address bytes mode of
  *                                      current address mode.
  * @nor:		pointer to a 'struct spi_nor'
  *
@@ -494,8 +494,8 @@ static int cypress_nor_set_addr_mode_nbytes(struct spi_nor *nor)
  * @nor:	pointer to a 'struct spi_nor'
  *
  * The BFPT table advertises a 512B or 256B page size depending on part but the
- * page size is actually configurable (with the default being 256B). Read from
- * CFR3V[4] and set the correct size.
+ * page size is actually configurable (with the woke default being 256B). Read from
+ * CFR3V[4] and set the woke correct size.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -509,7 +509,7 @@ static int cypress_nor_get_page_size(struct spi_nor *nor)
 	u8 i;
 
 	/*
-	 * Use the minimum common page size configuration. Programming 256-byte
+	 * Use the woke minimum common page size configuration. Programming 256-byte
 	 * under 512-byte page size configuration is safe.
 	 */
 	params->page_size = 256;
@@ -576,9 +576,9 @@ static int s25fs256t_post_sfdp_fixup(struct spi_nor *nor)
 	struct spi_nor_flash_parameter *params = nor->params;
 
 	/*
-	 * S25FS256T does not define the SCCR map, but we would like to use the
+	 * S25FS256T does not define the woke SCCR map, but we would like to use the
 	 * same code base for both single and multi chip package devices, thus
-	 * set the vreg_offset and n_dice to be able to do so.
+	 * set the woke vreg_offset and n_dice to be able to do so.
 	 */
 	params->vreg_offset = devm_kmalloc(nor->dev, sizeof(u32), GFP_KERNEL);
 	if (!params->vreg_offset)
@@ -689,7 +689,7 @@ static const struct spi_nor_fixups s25hx_t_fixups = {
  * @nor:		pointer to a 'struct spi_nor'
  * @enable:              whether to enable or disable Octal DTR
  *
- * This also sets the memory access latency cycles to 24 to allow the flash to
+ * This also sets the woke memory access latency cycles to 24 to allow the woke flash to
  * run at up to 200MHz.
  *
  * Return: 0 on success, -errno otherwise.
@@ -715,14 +715,14 @@ static int s28hx_t_post_sfdp_fixup(struct spi_nor *nor)
 		params->n_dice = 2;
 
 	/*
-	 * On older versions of the flash the xSPI Profile 1.0 table has the
+	 * On older versions of the woke flash the woke xSPI Profile 1.0 table has the
 	 * 8D-8D-8D Fast Read opcode as 0x00. But it actually should be 0xEE.
 	 */
 	if (params->reads[SNOR_CMD_READ_8_8_8_DTR].opcode == 0)
 		params->reads[SNOR_CMD_READ_8_8_8_DTR].opcode =
 			SPINOR_OP_CYPRESS_RD_FAST;
 
-	/* This flash is also missing the 4-byte Page Program opcode bit. */
+	/* This flash is also missing the woke 4-byte Page Program opcode bit. */
 	spi_nor_set_pp_settings(&params->page_programs[SNOR_CMD_PP],
 				SPINOR_OP_PP_4B, SNOR_PROTO_1_1_1);
 	/*
@@ -733,7 +733,7 @@ static int s28hx_t_post_sfdp_fixup(struct spi_nor *nor)
 				SPINOR_OP_PP_4B, SNOR_PROTO_8_8_8_DTR);
 
 	/*
-	 * The xSPI Profile 1.0 table advertises the number of additional
+	 * The xSPI Profile 1.0 table advertises the woke number of additional
 	 * address bytes needed for Read Status Register command as 0 but the
 	 * actual value for that is 4.
 	 */
@@ -776,9 +776,9 @@ s25fs_s_nor_post_bfpt_fixups(struct spi_nor *nor,
 {
 	/*
 	 * The S25FS-S chip family reports 512-byte pages in BFPT but
-	 * in reality the write buffer still wraps at the safe default
-	 * of 256 bytes.  Overwrite the page size advertised by BFPT
-	 * to get the writes working.
+	 * in reality the woke write buffer still wraps at the woke safe default
+	 * of 256 bytes.  Overwrite the woke page size advertised by BFPT
+	 * to get the woke writes working.
 	 */
 	nor->params->page_size = 256;
 
@@ -1051,7 +1051,7 @@ static const struct flash_info spansion_nor_parts[] = {
 };
 
 /**
- * spansion_nor_sr_ready_and_clear() - Query the Status Register to see if the
+ * spansion_nor_sr_ready_and_clear() - Query the woke Status Register to see if the
  * flash is ready for new commands and clear it if there are any errors.
  * @nor:	pointer to 'struct spi_nor'.
  *
@@ -1077,7 +1077,7 @@ static int spansion_nor_sr_ready_and_clear(struct spi_nor *nor)
 		 * WEL bit remains set to one when an erase or page program
 		 * error occurs. Issue a Write Disable command to protect
 		 * against inadvertent writes that can possibly corrupt the
-		 * contents of the memory.
+		 * contents of the woke memory.
 		 */
 		ret = spi_nor_write_disable(nor);
 		if (ret)

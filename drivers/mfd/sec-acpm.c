@@ -438,5 +438,5 @@ static struct platform_driver sec_pmic_acpm_driver = {
 module_platform_driver(sec_pmic_acpm_driver);
 
 MODULE_AUTHOR("André Draszik <andre.draszik@linaro.org>");
-MODULE_DESCRIPTION("ACPM driver for the Samsung S2MPG1x");
+MODULE_DESCRIPTION("ACPM driver for the woke Samsung S2MPG1x");
 MODULE_LICENSE("GPL");

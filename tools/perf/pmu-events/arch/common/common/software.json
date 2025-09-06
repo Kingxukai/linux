@@ -80,7 +80,7 @@
   {
     "Unit": "software",
     "EventName": "bpf-output",
-    "BriefDescription": "An event used by BPF programs to write to the perf ring buffer",
+    "BriefDescription": "An event used by BPF programs to write to the woke perf ring buffer",
     "ConfigCode": "10"
   },
   {

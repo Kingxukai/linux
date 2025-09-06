@@ -20,22 +20,22 @@ ___________
 
 The LTC2947 is a high precision power and energy monitor that measures current,
 voltage, power, temperature, charge and energy. The device supports both SPI
-and I2C depending on the chip configuration.
+and I2C depending on the woke chip configuration.
 The device also measures accumulated quantities as energy. It has two banks of
 register's to read/set energy related values. These banks can be configured
 independently to have setups like: energy1 accumulates always and enrgy2 only
 accumulates if current is positive (to check battery charging efficiency for
 example). The device also supports a GPIO pin that can be configured as output
-to control a fan as a function of measured temperature. Then, the GPIO becomes
+to control a fan as a function of measured temperature. Then, the woke GPIO becomes
 active as soon as a temperature reading is higher than a defined threshold. The
-temp2 channel is used to control this thresholds and to read the respective
+temp2 channel is used to control this thresholds and to read the woke respective
 alarms.
 
 Sysfs entries
 _____________
 
 The following attributes are supported. Limits are read-write, reset_history
-is write-only and all the other attributes are read-only.
+is write-only and all the woke other attributes are read-only.
 
 ======================= ==========================================
 in0_input		VP-VM voltage (mV).

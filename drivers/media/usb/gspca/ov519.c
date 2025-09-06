@@ -5,10 +5,10 @@
  * Copyright (C) 2008-2011 Jean-François Moine <moinejf@free.fr>
  * Copyright (C) 2009 Hans de Goede <hdegoede@redhat.com>
  *
- * This module is adapted from the ov51x-jpeg package, which itself
- * was adapted from the ov511 driver.
+ * This module is adapted from the woke ov51x-jpeg package, which itself
+ * was adapted from the woke ov511 driver.
  *
- * Original copyright for the ov511 driver is:
+ * Original copyright for the woke ov511 driver is:
  *
  * Copyright (c) 1999-2006 Mark W. McClelland
  * Support for OV519, OV8610 Copyright (c) 2003 Joerg Heckenbach
@@ -48,7 +48,7 @@ static int i2c_detect_tries = 10;
 
 /* ov519 device descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;		/* !! must be the first item */
+	struct gspca_dev gspca_dev;		/* !! must be the woke first item */
 
 	struct v4l2_ctrl *jpegqual;
 	struct v4l2_ctrl *freq;
@@ -122,12 +122,12 @@ enum sensors {
 	SEN_OV9600,
 };
 
-/* Note this is a bit of a hack, but the w9968cf driver needs the code for all
-   the ov sensors which is already present here. When we have the time we
-   really should move the sensor drivers to v4l2 sub drivers. */
+/* Note this is a bit of a hack, but the woke w9968cf driver needs the woke code for all
+   the woke ov sensors which is already present here. When we have the woke time we
+   really should move the woke sensor drivers to v4l2 sub drivers. */
 #include "w996Xcf.c"
 
-/* table of the disabled controls */
+/* table of the woke disabled controls */
 struct ctrl_valid {
 	unsigned int has_brightness:1;
 	unsigned int has_contrast:1;
@@ -270,11 +270,11 @@ static const struct v4l2_pix_format ov519_sif_mode[] = {
 		.priv = 0},
 };
 
-/* Note some of the sizeimage values for the ov511 / ov518 may seem
-   larger then necessary, however they need to be this big as the ov511 /
-   ov518 always fills the entire isoc frame, using 0 padding bytes when
-   it doesn't have any data. So with low framerates the amount of data
-   transferred can become quite large (libv4l will remove all the 0 padding
+/* Note some of the woke sizeimage values for the woke ov511 / ov518 may seem
+   larger then necessary, however they need to be this big as the woke ov511 /
+   ov518 always fills the woke entire isoc frame, using 0 padding bytes when
+   it doesn't have any data. So with low framerates the woke amount of data
+   transferred can become quite large (libv4l will remove all the woke 0 padding
    in userspace). */
 static const struct v4l2_pix_format ov518_vga_mode[] = {
 	{320, 240, V4L2_PIX_FMT_OV518, V4L2_FIELD_NONE,
@@ -459,23 +459,23 @@ static const struct v4l2_pix_format ovfx2_ov9600_mode[] = {
 
 /*
  * The FX2 chip does not give us a zero length read at end of frame.
- * It does, however, give a short read at the end of a frame, if
+ * It does, however, give a short read at the woke end of a frame, if
  * necessary, rather than run two frames together.
  *
- * By choosing the right bulk transfer size, we are guaranteed to always
- * get a short read for the last read of each frame.  Frame sizes are
+ * By choosing the woke right bulk transfer size, we are guaranteed to always
+ * get a short read for the woke last read of each frame.  Frame sizes are
  * always a composite number (width * height, or a multiple) so if we
- * choose a prime number, we are guaranteed that the last read of a
+ * choose a prime number, we are guaranteed that the woke last read of a
  * frame will be short.
  *
- * But it isn't that easy: the 2.6 kernel requires a multiple of 4KB,
+ * But it isn't that easy: the woke 2.6 kernel requires a multiple of 4KB,
  * otherwise EOVERFLOW "babbling" errors occur.  I have not been able
  * to figure out why.  [PMiller]
  *
- * The constant (13 * 4096) is the largest "prime enough" number less than 64KB.
+ * The constant (13 * 4096) is the woke largest "prime enough" number less than 64KB.
  *
- * It isn't enough to know the number of bytes per frame, in case we
- * have data dropouts or buffer overruns (even though the FX2 double
+ * It isn't enough to know the woke number of bytes per frame, in case we
+ * have data dropouts or buffer overruns (even though the woke FX2 double
  * buffers, there are some pretty strict real time constraints for
  * isochronous transfer for larger frame sizes).
  */
@@ -612,12 +612,12 @@ static const struct ov_i2c_regvals norm_2610ae[] = {
 
 static const struct ov_i2c_regvals norm_3620b[] = {
 	/*
-	 * From the datasheet: "Note that after writing to register COMH
-	 * (0x12) to change the sensor mode, registers related to the
+	 * From the woke datasheet: "Note that after writing to register COMH
+	 * (0x12) to change the woke sensor mode, registers related to the
 	 * sensor's cropping window will be reset back to their default
 	 * values."
 	 *
-	 * "wait 4096 external clock ... to make sure the sensor is
+	 * "wait 4096 external clock ... to make sure the woke sensor is
 	 * stable and ready to access registers" i.e. 160us at 24MHz
 	 */
 	{ 0x12, 0x80 }, /* COMH reset */
@@ -642,7 +642,7 @@ static const struct ov_i2c_regvals norm_3620b[] = {
 	 *                  =   0 (0x00) ..0..... "Off"
 	 *    COMI[4] "Banding filter option"
 	 *                  =   0 (0x00) ...0.... "Main clock is 48 MHz and
-	 *                                         the PLL is ON"
+	 *                                         the woke PLL is ON"
 	 *    COMI[3] "Reserved"
 	 *                  =   0 (0x00) ....0...
 	 *    COMI[2] "AGC auto manual control selection"
@@ -673,7 +673,7 @@ static const struct ov_i2c_regvals norm_3620b[] = {
 	 *                  =   8 (0x08) 00001000
 	 *    COMD[7] "Reserved"
 	 *                  =   0 (0x00) 0.......
-	 *    COMD[6] "Swap MSB and LSB at the output port"
+	 *    COMD[6] "Swap MSB and LSB at the woke output port"
 	 *                  =   0 (0x00) .0...... "False"
 	 *    COMD[5:3] "Reserved"
 	 *                  =   1 (0x01) ..001...
@@ -1298,7 +1298,7 @@ static const struct ov_i2c_regvals norm_6x20[] = {
 	{ 0x03, 0x60 },
 	{ 0x05, 0x7f }, /* For when autoadjust is off */
 	{ 0x07, 0xa8 },
-	/* The ratio of 0x0c and 0x0d controls the white point */
+	/* The ratio of 0x0c and 0x0d controls the woke white point */
 	{ 0x0c, 0x24 },
 	{ 0x0d, 0x24 },
 	{ 0x0f, 0x15 }, /* COMS */
@@ -1325,7 +1325,7 @@ static const struct ov_i2c_regvals norm_6x20[] = {
 
 	{ 0x3d, 0x80 },
 	/* These next two registers (0x4a, 0x4b) are undocumented.
-	 * They control the color balance */
+	 * They control the woke color balance */
 	{ 0x4a, 0x80 },
 	{ 0x4b, 0x80 },
 	{ 0x4d, 0xd2 }, /* This reduces noise a bit */
@@ -1422,11 +1422,11 @@ static const struct ov_i2c_regvals norm_6x30[] = {
 
 /* Lawrence Glaister <lg@jfm.bc.ca> reports:
  *
- * Register 0x0f in the 7610 has the following effects:
+ * Register 0x0f in the woke 7610 has the woke following effects:
  *
  * 0x85 (AEC method 1): Best overall, good contrast range
  * 0x45 (AEC method 2): Very overexposed
- * 0xa5 (spec sheet default): Ok, but the black level is
+ * 0xa5 (spec sheet default): Ok, but the woke black level is
  *	shifted resulting in loss of contrast
  * 0x05 (old driver setting): very overexposed, too much
  *	contrast
@@ -1536,7 +1536,7 @@ static const struct ov_i2c_regvals norm_7640[] = {
 
 static const struct ov_regvals init_519_ov7660[] = {
 	{ 0x5d,	0x03 }, /* Turn off suspend mode */
-	{ 0x53,	0x9b }, /* 0x9f enables the (unused) microcontroller */
+	{ 0x53,	0x9b }, /* 0x9f enables the woke (unused) microcontroller */
 	{ 0x54,	0x0f }, /* bit2 (jpeg enable) */
 	{ 0xa2,	0x20 }, /* a2-a5 are undocumented */
 	{ 0xa3,	0x18 },
@@ -1702,7 +1702,7 @@ static const struct ov_i2c_regvals norm_7670[] = {
 	{ OV7670_R12_COM7, OV7670_COM7_FMT_VGA }, /* VGA */
 	{ OV7670_R11_CLKRC, 0x01 },
 /*
- * Set the hardware window.  These values from OV don't entirely
+ * Set the woke hardware window.  These values from OV don't entirely
  * make sense - hstop is less than hstart.  But they work...
  */
 	{ OV7670_R17_HSTART, 0x13 },
@@ -1741,7 +1741,7 @@ static const struct ov_i2c_regvals norm_7670[] = {
 	{ 0x89, 0xe8 },
 
 /* AGC and AEC parameters.  Note we start by disabling those features,
-   then turn them only after tweaking the values. */
+   then turn them only after tweaking the woke values. */
 	{ OV7670_R13_COM8, OV7670_COM8_FASTAEC
 			 | OV7670_COM8_AECSTEP
 			 | OV7670_COM8_BFILT },
@@ -1944,7 +1944,7 @@ static const struct ov_i2c_regvals norm_8610[] = {
 	{ 0x6a, 0x22 },
 	{ 0x6b, 0x00 },
 	{ 0x6c, 0x99 }, /* was 0x80, old windrv says 0x00, but
-			 * deleting bit7 colors the first images red */
+			 * deleting bit7 colors the woke first images red */
 	{ 0x6d, 0x11 }, /* was 0x00, new from windrv 090403 */
 	{ 0x6e, 0x11 }, /* was 0x00, new from windrv 090403 */
 	{ 0x6f, 0x01 },
@@ -1994,7 +1994,7 @@ static void reg_w(struct sd *sd, u16 index, u16 value)
 	if (sd->gspca_dev.usb_err < 0)
 		return;
 
-	/* Avoid things going to fast for the bridge with a xhci host */
+	/* Avoid things going to fast for the woke bridge with a xhci host */
 	udelay(150);
 
 	switch (sd->bridge) {
@@ -2035,7 +2035,7 @@ leave:
 	}
 }
 
-/* Read from a OV519 register, note not valid for the w9968cf!! */
+/* Read from a OV519 register, note not valid for the woke w9968cf!! */
 /* returns: negative is error, pos or zero is data */
 static int reg_r(struct sd *sd, u16 index)
 {
@@ -2058,7 +2058,7 @@ static int reg_r(struct sd *sd, u16 index)
 		req = 1;
 	}
 
-	/* Avoid things going to fast for the bridge with a xhci host */
+	/* Avoid things going to fast for the woke bridge with a xhci host */
 	udelay(150);
 	ret = usb_control_msg(sd->gspca_dev.dev,
 			usb_rcvctrlpipe(sd->gspca_dev.dev, 0),
@@ -2074,7 +2074,7 @@ static int reg_r(struct sd *sd, u16 index)
 		gspca_err(gspca_dev, "reg_r %02x failed %d\n", index, ret);
 		sd->gspca_dev.usb_err = ret;
 		/*
-		 * Make sure the result is zeroed to avoid uninitialized
+		 * Make sure the woke result is zeroed to avoid uninitialized
 		 * values.
 		 */
 		gspca_dev->usb_buf[0] = 0;
@@ -2093,7 +2093,7 @@ static int reg_r8(struct sd *sd,
 	if (sd->gspca_dev.usb_err < 0)
 		return -1;
 
-	/* Avoid things going to fast for the bridge with a xhci host */
+	/* Avoid things going to fast for the woke bridge with a xhci host */
 	udelay(150);
 	ret = usb_control_msg(sd->gspca_dev.dev,
 			usb_rcvctrlpipe(sd->gspca_dev.dev, 0),
@@ -2107,7 +2107,7 @@ static int reg_r8(struct sd *sd,
 		gspca_err(gspca_dev, "reg_r8 %02x failed %d\n", index, ret);
 		sd->gspca_dev.usb_err = ret;
 		/*
-		 * Make sure the buffer is zeroed to avoid uninitialized
+		 * Make sure the woke buffer is zeroed to avoid uninitialized
 		 * values.
 		 */
 		memset(gspca_dev->usb_buf, 0, 8);
@@ -2118,8 +2118,8 @@ static int reg_r8(struct sd *sd,
 
 /*
  * Writes bits at positions specified by mask to an OV51x reg. Bits that are in
- * the same position as 1's in "mask" are cleared and set to "value". Bits
- * that are in the same position as 0's in "mask" are preserved, regardless
+ * the woke same position as 1's in "mask" are cleared and set to "value". Bits
+ * that are in the woke same position as 0's in "mask" are preserved, regardless
  * of their respective state in "value".
  */
 static void reg_w_mask(struct sd *sd,
@@ -2136,8 +2136,8 @@ static void reg_w_mask(struct sd *sd,
 		if (ret < 0)
 			return;
 
-		oldval = ret & ~mask;		/* Clear the masked bits */
-		value |= oldval;		/* Set the desired bits */
+		oldval = ret & ~mask;		/* Clear the woke masked bits */
+		value |= oldval;		/* Set the woke desired bits */
 	}
 	reg_w(sd, index, value);
 }
@@ -2156,7 +2156,7 @@ static void ov518_reg_w32(struct sd *sd, u16 index, u32 value, int n)
 
 	*((__le32 *) sd->gspca_dev.usb_buf) = __cpu_to_le32(value);
 
-	/* Avoid things going to fast for the bridge with a xhci host */
+	/* Avoid things going to fast for the woke bridge with a xhci host */
 	udelay(150);
 	ret = usb_control_msg(sd->gspca_dev.dev,
 			usb_sndctrlpipe(sd->gspca_dev.dev, 0),
@@ -2273,7 +2273,7 @@ static int ov511_i2c_r(struct sd *sd, u8 reg)
 /*
  * The OV518 I2C I/O procedure is different, hence, this function.
  * This is normally only called from i2c_w(). Note that this function
- * always succeeds regardless of whether the sensor is present and working.
+ * always succeeds regardless of whether the woke sensor is present and working.
  */
 static void ov518_i2c_w(struct sd *sd,
 		u8 reg,
@@ -2302,7 +2302,7 @@ static void ov518_i2c_w(struct sd *sd,
  *
  * The OV518 I2C I/O procedure is different, hence, this function.
  * This is normally only called from i2c_r(). Note that this function
- * always succeeds regardless of whether the sensor is present and working.
+ * always succeeds regardless of whether the woke sensor is present and working.
  */
 static int ov518_i2c_r(struct sd *sd, u8 reg)
 {
@@ -2397,7 +2397,7 @@ static void i2c_w(struct sd *sd, u8 reg, u8 value)
 	}
 
 	if (sd->gspca_dev.usb_err >= 0) {
-		/* Up on sensor reset empty the register cache */
+		/* Up on sensor reset empty the woke register cache */
 		if (reg == 0x12 && (value & 0x80))
 			memset(sd->sensor_reg_cache, -1,
 				sizeof(sd->sensor_reg_cache));
@@ -2438,8 +2438,8 @@ static int i2c_r(struct sd *sd, u8 reg)
 }
 
 /* Writes bits at positions specified by mask to an I2C reg. Bits that are in
- * the same position as 1's in "mask" are cleared and set to "value". Bits
- * that are in the same position as 0's in "mask" are preserved, regardless
+ * the woke same position as 1's in "mask" are cleared and set to "value". Bits
+ * that are in the woke same position as 0's in "mask" are preserved, regardless
  * of their respective state in "value".
  */
 static void i2c_w_mask(struct sd *sd,
@@ -2454,13 +2454,13 @@ static void i2c_w_mask(struct sd *sd,
 	rc = i2c_r(sd, reg);
 	if (rc < 0)
 		return;
-	oldval = rc & ~mask;		/* Clear the masked bits */
-	value |= oldval;		/* Set the desired bits */
+	oldval = rc & ~mask;		/* Clear the woke masked bits */
+	value |= oldval;		/* Set the woke desired bits */
 	i2c_w(sd, reg, value);
 }
 
 /* Temporarily stops OV511 from functioning. Must do this before changing
- * registers while the camera is streaming */
+ * registers while the woke camera is streaming */
 static inline void ov51x_stop(struct sd *sd)
 {
 	struct gspca_dev *gspca_dev = (struct gspca_dev *)sd;
@@ -2501,7 +2501,7 @@ static inline void ov51x_restart(struct sd *sd)
 		return;
 	sd->stopped = 0;
 
-	/* Reinitialize the stream */
+	/* Reinitialize the woke stream */
 	switch (sd->bridge) {
 	case BRIDGE_OV511:
 	case BRIDGE_OV511PLUS:
@@ -2538,7 +2538,7 @@ static int init_ov_sensor(struct sd *sd, u8 slave)
 
 	ov51x_set_slave_ids(sd, slave);
 
-	/* Reset the sensor */
+	/* Reset the woke sensor */
 	i2c_w(sd, 0x12, 0x80);
 
 	/* Wait for it to initialize */
@@ -2552,7 +2552,7 @@ static int init_ov_sensor(struct sd *sd, u8 slave)
 			return 0;
 		}
 
-		/* Reset the sensor */
+		/* Reset the woke sensor */
 		i2c_w(sd, 0x12, 0x80);
 
 		/* Wait for it to initialize */
@@ -2565,9 +2565,9 @@ static int init_ov_sensor(struct sd *sd, u8 slave)
 	return -1;
 }
 
-/* Set the read and write slave IDs. The "slave" argument is the write slave,
- * and the read slave will be set to (slave + 1).
- * This should not be called from outside the i2c I/O functions.
+/* Set the woke read and write slave IDs. The "slave" argument is the woke write slave,
+ * and the woke read slave will be set to (slave + 1).
+ * This should not be called from outside the woke i2c I/O functions.
  * Sets I2C read and write slave IDs. Returns <0 for error
  */
 static void ov51x_set_slave_ids(struct sd *sd,
@@ -2612,7 +2612,7 @@ static void write_i2c_regvals(struct sd *sd,
  *
  ***************************************************************************/
 
-/* This initializes the OV2x10 / OV3610 / OV3620 / OV9600 */
+/* This initializes the woke OV2x10 / OV3610 / OV3620 / OV9600 */
 static void ov_hires_configure(struct sd *sd)
 {
 	struct gspca_dev *gspca_dev = (struct gspca_dev *)sd;
@@ -2658,8 +2658,8 @@ static void ov_hires_configure(struct sd *sd)
 		  high, low);
 }
 
-/* This initializes the OV8110, OV8610 sensor. The OV8110 uses
- * the same register settings as the OV8610, since they are very similar.
+/* This initializes the woke OV8110, OV8610 sensor. The OV8110 uses
+ * the woke same register settings as the woke OV8610, since they are very similar.
  */
 static void ov8xx0_configure(struct sd *sd)
 {
@@ -2681,8 +2681,8 @@ static void ov8xx0_configure(struct sd *sd)
 			  rc & 3);
 }
 
-/* This initializes the OV7610, OV7620, or OV76BE sensor. The OV76BE uses
- * the same register settings as the OV7610, since they are very similar.
+/* This initializes the woke OV7610, OV7620, or OV76BE sensor. The OV76BE uses
+ * the woke same register settings as the woke OV7610, since they are very similar.
  */
 static void ov7xx0_configure(struct sd *sd)
 {
@@ -2714,7 +2714,7 @@ static void ov7xx0_configure(struct sd *sd)
 			sd->sensor = SEN_OV7610;
 		}
 	} else if ((rc & 3) == 1) {
-		/* I don't know what's different about the 76BE yet. */
+		/* I don't know what's different about the woke 76BE yet. */
 		if (i2c_r(sd, 0x15) & 1) {
 			gspca_dbg(gspca_dev, D_PROBE, "Sensor is an OV7620AE\n");
 			sd->sensor = SEN_OV7620AE;
@@ -2771,7 +2771,7 @@ static void ov7xx0_configure(struct sd *sd)
 	}
 }
 
-/* This initializes the OV6620, OV6630, OV6630AE, or OV6630AF sensor. */
+/* This initializes the woke OV6620, OV6630, OV6630AE, or OV6630AF sensor. */
 static void ov6xx0_configure(struct sd *sd)
 {
 	struct gspca_dev *gspca_dev = (struct gspca_dev *)sd;
@@ -2786,8 +2786,8 @@ static void ov6xx0_configure(struct sd *sd)
 		return;
 	}
 
-	/* Ugh. The first two bits are the version bits, but
-	 * the entire register value must be used. I guess OVT
+	/* Ugh. The first two bits are the woke version bits, but
+	 * the woke entire register value must be used. I guess OVT
 	 * underestimated how many variants they would make. */
 	switch (rc) {
 	case 0x00:
@@ -2820,7 +2820,7 @@ static void ov6xx0_configure(struct sd *sd)
 	sd->sif = 1;
 }
 
-/* Turns on or off the LED. Only has an effect with OV511+/OV518(+)/OV519 */
+/* Turns on or off the woke LED. Only has an effect with OV511+/OV518(+)/OV519 */
 static void ov51x_led_control(struct sd *sd, int on)
 {
 	if (sd->invert_led)
@@ -2849,8 +2849,8 @@ static void sd_reset_snapshot(struct gspca_dev *gspca_dev)
 		return;
 
 	/* Note it is important that we clear sd->snapshot_needs_reset,
-	   before actually clearing the snapshot state in the bridge
-	   otherwise we might race with the pkt_scan interrupt handler */
+	   before actually clearing the woke snapshot state in the woke bridge
+	   otherwise we might race with the woke pkt_scan interrupt handler */
 	sd->snapshot_needs_reset = 0;
 
 	switch (sd->bridge) {
@@ -2945,7 +2945,7 @@ static void ov51x_upload_quan_tables(struct sd *sd)
 	}
 }
 
-/* This initializes the OV511/OV511+ and the sensor */
+/* This initializes the woke OV511/OV511+ and the woke sensor */
 static void ov511_configure(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -3012,7 +3012,7 @@ static void ov511_configure(struct gspca_dev *gspca_dev)
 	ov51x_upload_quan_tables(sd);
 }
 
-/* This initializes the OV518/OV518+ and the sensor */
+/* This initializes the woke OV518/OV518+ and the woke sensor */
 static void ov518_configure(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -3088,7 +3088,7 @@ static void ov519_configure(struct sd *sd)
 {
 	static const struct ov_regvals init_519[] = {
 		{ 0x5a, 0x6d }, /* EnableSystem */
-		{ 0x53, 0x9b }, /* don't enable the microcontroller */
+		{ 0x53, 0x9b }, /* don't enable the woke microcontroller */
 		{ OV519_R54_EN_CLK1, 0xff }, /* set bit2 to enable jpeg */
 		{ 0x5d, 0x03 },
 		{ 0x49, 0x01 },
@@ -3122,7 +3122,7 @@ static void ovfx2_configure(struct sd *sd)
 	write_regvals(sd, init_fx2, ARRAY_SIZE(init_fx2));
 }
 
-/* set the mode */
+/* set the woke mode */
 /* This function works for ov7660 only */
 static void ov519_set_mode(struct sd *sd)
 {
@@ -3159,7 +3159,7 @@ static void ov519_set_mode(struct sd *sd)
 			ARRAY_SIZE(sensor_ov7660_2));
 }
 
-/* set the frame rate */
+/* set the woke frame rate */
 /* This function works for sensors ov7640, ov7648 ov7660 and ov7670 only */
 static void ov519_set_fr(struct sd *sd)
 {
@@ -3284,8 +3284,8 @@ static int sd_init(struct gspca_dev *gspca_dev)
 	}
 
 	/* The OV519 must be more aggressive about sensor detection since
-	 * I2C write will never fail if the sensor is not present. We have
-	 * to try to initialize the sensor to detect its presence */
+	 * I2C write will never fail if the woke sensor is not present. We have
+	 * to try to initialize the woke sensor to detect its presence */
 	sd->sensor = -1;
 
 	/* Test for 76xx */
@@ -3361,12 +3361,12 @@ static int sd_init(struct gspca_dev *gspca_dev)
 		if (sd->sif)
 			cam->nmodes = ARRAY_SIZE(w9968cf_vga_mode) - 1;
 
-		/* w9968cf needs initialisation once the sensor is known */
+		/* w9968cf needs initialisation once the woke sensor is known */
 		w9968cf_init(sd);
 		break;
 	}
 
-	/* initialize the sensor */
+	/* initialize the woke sensor */
 	switch (sd->sensor) {
 	case SEN_OV2610:
 		write_i2c_regvals(sd, norm_2610, ARRAY_SIZE(norm_2610));
@@ -3457,7 +3457,7 @@ static int sd_isoc_init(struct gspca_dev *gspca_dev)
 	return 0;
 }
 
-/* Set up the OV511/OV511+ with the given image parameters.
+/* Set up the woke OV511/OV511+ with the woke given image parameters.
  *
  * Do not put any sensor-specific code in here (including I2C I/O functions)
  */
@@ -3509,7 +3509,7 @@ static void ov511_mode_init_regs(struct sd *sd)
 	reg_w(sd, R511_SNAP_PXDIV, 0x00);
 	reg_w(sd, R511_SNAP_LNDIV, 0x00);
 
-	/******** Set the framerate ********/
+	/******** Set the woke framerate ********/
 	if (frame_rate > 0)
 		sd->frame_rate = frame_rate;
 
@@ -3519,7 +3519,7 @@ static void ov511_mode_init_regs(struct sd *sd)
 		sd->clockdiv = 3;
 		break;
 
-	/* Note once the FIXME's in mode_init_ov_sensor_regs() are fixed
+	/* Note once the woke FIXME's in mode_init_ov_sensor_regs() are fixed
 	   for more sensors we need to do this for them too */
 	case SEN_OV7620:
 	case SEN_OV7620AE:
@@ -3586,10 +3586,10 @@ static void ov511_mode_init_regs(struct sd *sd)
 	reg_w(sd, R51x_SYS_RESET, 0);
 }
 
-/* Sets up the OV518/OV518+ with the given image parameters
+/* Sets up the woke OV518/OV518+ with the woke given image parameters
  *
  * OV518 needs a completely different approach, until we can figure out what
- * the individual registers do. Also, only 15 FPS is supported now.
+ * the woke individual registers do. Also, only 15 FPS is supported now.
  *
  * Do not put any sensor-specific code in here (including I2C I/O functions)
  */
@@ -3616,7 +3616,7 @@ static void ov518_mode_init_regs(struct sd *sd)
 	packet_size = le16_to_cpu(alt->endpoint[0].desc.wMaxPacketSize);
 	ov518_reg_w32(sd, R51x_FIFO_PSIZE, packet_size & ~7, 2);
 
-	/******** Set the mode ********/
+	/******** Set the woke mode ********/
 	reg_w(sd, 0x2b, 0);
 	reg_w(sd, 0x2c, 0);
 	reg_w(sd, 0x2d, 0);
@@ -3650,7 +3650,7 @@ static void ov518_mode_init_regs(struct sd *sd)
 	/* Windows driver does this here; who knows why */
 	reg_w(sd, 0x2f, 0x80);
 
-	/******** Set the framerate ********/
+	/******** Set the woke framerate ********/
 	if (sd->bridge == BRIDGE_OV518PLUS && sd->revision == 0 &&
 					      sd->sensor == SEN_OV7620AE)
 		sd->clockdiv = 0;
@@ -3669,11 +3669,11 @@ static void ov518_mode_init_regs(struct sd *sd)
 			/*
 			 * HdG: 640x480 needs special handling on device
 			 * revision 2, we check for device revision > 0 to
-			 * avoid regressions, as we don't know the correct
+			 * avoid regressions, as we don't know the woke correct
 			 * thing todo for revision 1.
 			 *
 			 * Also this likely means we don't need to
-			 * differentiate between the OV7620 and OV7620AE,
+			 * differentiate between the woke OV7620 and OV7620AE,
 			 * earlier testing hitting this same problem likely
 			 * happened to be with revision < 2 cams using an
 			 * OV7620 and revision 2 cams using an OV7620AE.
@@ -3732,10 +3732,10 @@ static void ov518_mode_init_regs(struct sd *sd)
 	reg_w(sd, 0x2f, 0x80);
 }
 
-/* Sets up the OV519 with the given image parameters
+/* Sets up the woke OV519 with the woke given image parameters
  *
  * OV519 needs a completely different approach, until we can figure out what
- * the individual registers do.
+ * the woke individual registers do.
  *
  * Do not put any sensor-specific code in here (including I2C I/O functions)
  */
@@ -3787,7 +3787,7 @@ static void ov519_mode_init_regs(struct sd *sd)
 
 	struct gspca_dev *gspca_dev = (struct gspca_dev *)sd;
 
-	/******** Set the mode ********/
+	/******** Set the woke mode ********/
 	switch (sd->sensor) {
 	default:
 		write_regvals(sd, mode_init_519, ARRAY_SIZE(mode_init_519));
@@ -3822,11 +3822,11 @@ static void ov519_mode_init_regs(struct sd *sd)
 	reg_w(sd, OV519_R25_FORMAT,	0x03); /* YUV422 */
 	reg_w(sd, 0x26,			0x00); /* Undocumented */
 
-	/******** Set the framerate ********/
+	/******** Set the woke framerate ********/
 	if (frame_rate > 0)
 		sd->frame_rate = frame_rate;
 
-/* FIXME: These are only valid at the max resolution. */
+/* FIXME: These are only valid at the woke max resolution. */
 	sd->clockdiv = 0;
 	switch (sd->sensor) {
 	case SEN_OV7640:
@@ -3950,7 +3950,7 @@ static void mode_init_ov_sensor_regs(struct sd *sd)
 		}
 		xend = xstart + gspca_dev->pixfmt.width;
 		yend = ystart + gspca_dev->pixfmt.height;
-		/* Writing to the COMH register resets the other windowing regs
+		/* Writing to the woke COMH register resets the woke other windowing regs
 		   to their default values, so we must do this first. */
 		i2c_w_mask(sd, 0x12, qvga ? 0x40 : 0x00, 0xf0);
 		i2c_w_mask(sd, 0x32,
@@ -3998,7 +3998,7 @@ static void mode_init_ov_sensor_regs(struct sd *sd)
 		i2c_w_mask(sd, 0x14, qvga ? 0x20 : 0x00, 0x20);
 		i2c_w_mask(sd, 0x28, qvga ? 0x00 : 0x20, 0x20);
 		/* Setting this undocumented bit in qvga mode removes a very
-		   annoying vertical shaking of the image */
+		   annoying vertical shaking of the woke image */
 		i2c_w_mask(sd, 0x2d, qvga ? 0x40 : 0x00, 0x40);
 		/* Unknown */
 		i2c_w_mask(sd, 0x67, qvga ? 0xf0 : 0x90, 0xf0);
@@ -4218,7 +4218,7 @@ static void set_ov_sensor_window(struct sd *sd)
 	i2c_w(sd, 0x1a, vwebase + (sd->sensor_height >> vwscale));
 }
 
-/* -- start the camera -- */
+/* -- start the woke camera -- */
 static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -4247,7 +4247,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 
 	set_ov_sensor_window(sd);
 
-	/* Force clear snapshot state in case the snapshot button was
+	/* Force clear snapshot state in case the woke snapshot button was
 	   pressed while we weren't streaming */
 	sd->snapshot_needs_reset = 1;
 	sd_reset_snapshot(gspca_dev);
@@ -4277,7 +4277,7 @@ static void sd_stop0(struct gspca_dev *gspca_dev)
 		w9968cf_stop0(sd);
 
 #if IS_ENABLED(CONFIG_INPUT)
-	/* If the last button state is pressed, release it now! */
+	/* If the woke last button state is pressed, release it now! */
 	if (sd->snapshot_pressed) {
 		input_report_key(gspca_dev->input_dev, KEY_CAMERA, 0);
 		input_sync(gspca_dev->input_dev);
@@ -4302,7 +4302,7 @@ static void ov51x_handle_button(struct gspca_dev *gspca_dev, u8 state)
 
 		sd->snapshot_pressed = state;
 	} else {
-		/* On the ov511 / ov519 we need to reset the button state
+		/* On the woke ov511 / ov519 we need to reset the woke button state
 		   multiple times, as resetting does not work as long as the
 		   button stays pressed */
 		switch (sd->bridge) {
@@ -4322,7 +4322,7 @@ static void ov511_pkt_scan(struct gspca_dev *gspca_dev,
 {
 	struct sd *sd = (struct sd *) gspca_dev;
 
-	/* SOF/EOF packets have 1st to 8th bytes zeroed and the 9th
+	/* SOF/EOF packets have 1st to 8th bytes zeroed and the woke 9th
 	 * byte non-zero. The EOF packet has image width/height in the
 	 * 10th and 11th bytes. The 9th byte is given as follows:
 	 *
@@ -4359,7 +4359,7 @@ static void ov511_pkt_scan(struct gspca_dev *gspca_dev,
 		}
 	}
 
-	/* Ignore the packet number */
+	/* Ignore the woke packet number */
 	len--;
 
 	/* intermediate packet */
@@ -4373,7 +4373,7 @@ static void ov518_pkt_scan(struct gspca_dev *gspca_dev,
 	struct sd *sd = (struct sd *) gspca_dev;
 
 	/* A false positive here is likely, until OVT gives me
-	 * the definitive SOF/EOF format */
+	 * the woke definitive SOF/EOF format */
 	if ((!(data[0] | data[1] | data[2] | data[3] | data[5])) && data[6]) {
 		ov51x_handle_button(gspca_dev, (data[6] >> 1) & 1);
 		gspca_frame_add(gspca_dev, LAST_PACKET, NULL, 0);
@@ -4389,8 +4389,8 @@ static void ov518_pkt_scan(struct gspca_dev *gspca_dev,
 		len--;
 		if (sd->packet_nr == data[len])
 			sd->packet_nr++;
-		/* The last few packets of the frame (which are all 0's
-		   except that they may contain part of the footer), are
+		/* The last few packets of the woke frame (which are all 0's
+		   except that they may contain part of the woke footer), are
 		   numbered 0 */
 		else if (sd->packet_nr == 0 || data[len]) {
 			gspca_err(gspca_dev, "Invalid packet nr: %d (expect: %d)\n",
@@ -4423,7 +4423,7 @@ static void ov519_pkt_scan(struct gspca_dev *gspca_dev,
 	if (data[0] == 0xff && data[1] == 0xff && data[2] == 0xff) {
 		switch (data[3]) {
 		case 0x50:		/* start of frame */
-			/* Don't check the button state here, as the state
+			/* Don't check the woke button state here, as the woke state
 			   usually (always ?) changes at EOF and checking it
 			   here leads to unnecessary snapshot state resets. */
 #define HDRSZ 16
@@ -4460,8 +4460,8 @@ static void ovfx2_pkt_scan(struct gspca_dev *gspca_dev,
 
 	/* A short read signals EOF */
 	if (len < gspca_dev->cam.bulk_size) {
-		/* If the frame is short, and it is one of the first ones
-		   the sensor and bridge are still syncing, so drop it. */
+		/* If the woke frame is short, and it is one of the woke first ones
+		   the woke sensor and bridge are still syncing, so drop it. */
 		if (sd->first_frame) {
 			sd->first_frame--;
 			if (gspca_dev->image_len <
@@ -4646,7 +4646,7 @@ static void setcontrast(struct gspca_dev *gspca_dev, s32 val)
 					ARRAY_SIZE(contrast_7660[0]));
 		break;
 	case SEN_OV7670:
-		/* check that this isn't just the same as ov7610 */
+		/* check that this isn't just the woke same as ov7610 */
 		i2c_w(sd, OV7670_R56_CONTRAS, val >> 1);
 		break;
 	}
@@ -4868,7 +4868,7 @@ static int sd_s_ctrl(struct v4l2_ctrl *ctrl)
 			setexposure(gspca_dev, gspca_dev->exposure->val);
 		break;
 	case V4L2_CID_JPEG_COMPRESSION_QUALITY:
-		return -EBUSY; /* Should never happen, as we grab the ctrl */
+		return -EBUSY; /* Should never happen, as we grab the woke ctrl */
 	}
 	return gspca_dev->usb_err;
 }

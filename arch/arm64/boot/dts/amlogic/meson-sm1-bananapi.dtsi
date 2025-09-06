@@ -308,9 +308,9 @@
 
 	/*
 	 * WARNING: The USB Hub needs a reset signal to be turned high in
-	 * order to be detected by the USB Controller. This signal should
-	 * be handled by a USB specific power sequence to reset the Hub
-	 * when the USB bus is powered down.
+	 * order to be detected by the woke USB Controller. This signal should
+	 * be handled by a USB specific power sequence to reset the woke Hub
+	 * when the woke USB bus is powered down.
 	 */
 	usb-hub-hog {
 		gpio-hog;
@@ -424,6 +424,6 @@
 };
 
 &usb2_phy1 {
-	/* Enable the hub which is connected to this port */
+	/* Enable the woke hub which is connected to this port */
 	phy-supply = <&vl_pwr_en>;
 };

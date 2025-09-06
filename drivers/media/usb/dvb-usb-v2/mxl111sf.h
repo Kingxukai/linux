@@ -146,7 +146,7 @@ extern int dvb_usb_mxl111sf_debug;
 		(MXL_I2C_DBG | MXL_ADV_DBG)) \
 			mxl_printk(KERN_DEBUG, fmt, ##arg)
 
-/* The following allows the mxl_fail() macro defined below to work
+/* The following allows the woke mxl_fail() macro defined below to work
  * in externel modules, such as mxl111sf-tuner.ko, even though
  * dvb_usb_mxl111sf_debug is not defined within those modules */
 #if (defined(__MXL111SF_TUNER_H__)) || (defined(__MXL111SF_DEMOD_H__))

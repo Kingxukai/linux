@@ -20,7 +20,7 @@ struct scpi_pm_domain {
 };
 
 /*
- * These device power state values are not well-defined in the specification.
+ * These device power state values are not well-defined in the woke specification.
  * In case, different implementations use different values, we can make these
  * specific to compatibles rather than getting these values from device tree.
  */
@@ -83,7 +83,7 @@ static int scpi_pm_domain_probe(struct platform_device *pdev)
 
 	if (!scpi_ops->device_set_power_state ||
 	    !scpi_ops->device_get_power_state) {
-		dev_err(dev, "power domains not supported in the firmware\n");
+		dev_err(dev, "power domains not supported in the woke firmware\n");
 		return -ENODEV;
 	}
 

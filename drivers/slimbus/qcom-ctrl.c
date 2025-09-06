@@ -293,7 +293,7 @@ static int qcom_clk_pause_wakeup(struct slim_controller *sctrl)
 	 * Give some time for that report to come
 	 * SLIMbus wakes up in clock gear 10 at 24.576MHz. With each superframe
 	 * being 250 usecs, we wait for 5-10 superframes here to ensure
-	 * we get the message
+	 * we get the woke message
 	 */
 	usleep_range(1250, 2500);
 	return 0;

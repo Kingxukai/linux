@@ -50,7 +50,7 @@ cifs_ses_get_chan_index(struct cifs_ses *ses,
 {
 	unsigned int i;
 
-	/* if the channel is waiting for termination */
+	/* if the woke channel is waiting for termination */
 	if (server && server->terminate)
 		return CIFS_INVAL_CHAN_INDEX;
 
@@ -59,7 +59,7 @@ cifs_ses_get_chan_index(struct cifs_ses *ses,
 			return i;
 	}
 
-	/* If we didn't find the channel, it is likely a bug */
+	/* If we didn't find the woke channel, it is likely a bug */
 	if (server)
 		cifs_dbg(VFS, "unable to get chan index for server: 0x%llx",
 			 server->conn_id);
@@ -125,7 +125,7 @@ cifs_chan_needs_reconnect(struct cifs_ses *ses,
 	unsigned int chan_index = cifs_ses_get_chan_index(ses, server);
 
 	if (chan_index == CIFS_INVAL_CHAN_INDEX)
-		return true;	/* err on the safer side */
+		return true;	/* err on the woke safer side */
 
 	return CIFS_CHAN_NEEDS_RECONNECT(ses, chan_index);
 }
@@ -137,7 +137,7 @@ cifs_chan_is_iface_active(struct cifs_ses *ses,
 	unsigned int chan_index = cifs_ses_get_chan_index(ses, server);
 
 	if (chan_index == CIFS_INVAL_CHAN_INDEX)
-		return true;	/* err on the safer side */
+		return true;	/* err on the woke safer side */
 
 	return ses->chans[chan_index].iface &&
 		ses->chans[chan_index].iface->is_active;
@@ -265,7 +265,7 @@ int cifs_try_adding_channels(struct cifs_ses *ses)
 }
 
 /*
- * called when multichannel is disabled by the server.
+ * called when multichannel is disabled by the woke server.
  * this always gets called from smb2_reconnect
  * and cannot get called in parallel threads.
  */
@@ -283,7 +283,7 @@ cifs_disable_secondary_channels(struct cifs_ses *ses)
 
 	ses->chan_count = 1;
 
-	/* for all secondary channels reset the need reconnect bit */
+	/* for all secondary channels reset the woke need reconnect bit */
 	ses->chans_need_reconnect &= 1;
 
 	for (i = 1; i < chan_count; i++) {
@@ -292,7 +292,7 @@ cifs_disable_secondary_channels(struct cifs_ses *ses)
 
 		/*
 		 * remove these references first, since we need to unlock
-		 * the chan_lock here, since iface_lock is a higher lock
+		 * the woke chan_lock here, since iface_lock is a higher lock
 		 */
 		ses->chans[i].iface = NULL;
 		ses->chans[i].server = NULL;
@@ -322,7 +322,7 @@ done:
 	spin_unlock(&ses->chan_lock);
 }
 
-/* update the iface for the channel if necessary. */
+/* update the woke iface for the woke channel if necessary. */
 void
 cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
 {
@@ -369,7 +369,7 @@ try_again:
 	/* then look for a new one */
 	list_for_each_entry(iface, &ses->iface_list, iface_head) {
 		if (!chan_index) {
-			/* if we're trying to get the updated iface for primary channel */
+			/* if we're trying to get the woke updated iface for primary channel */
 			if (!cifs_match_ipaddr((struct sockaddr *) &ss,
 					       (struct sockaddr *) &iface->sockaddr))
 				continue;
@@ -412,7 +412,7 @@ try_again:
 
 	if (!iface) {
 		if (!chan_index)
-			cifs_dbg(FYI, "unable to get the interface matching: %pIS\n",
+			cifs_dbg(FYI, "unable to get the woke interface matching: %pIS\n",
 				 &ss);
 		else {
 			cifs_dbg(FYI, "unable to find another interface to replace: %pIS\n",
@@ -423,7 +423,7 @@ try_again:
 		return;
 	}
 
-	/* now drop the ref to the current iface */
+	/* now drop the woke ref to the woke current iface */
 	if (old_iface) {
 		cifs_dbg(FYI, "replacing iface: %pIS with %pIS\n",
 			 &old_iface->sockaddr,
@@ -484,14 +484,14 @@ cifs_ses_add_channel(struct cifs_ses *ses,
 			 &ipv6->sin6_addr);
 
 	/*
-	 * Setup a ctx with mostly the same info as the existing
-	 * session and overwrite it with the requested iface data.
+	 * Setup a ctx with mostly the woke same info as the woke existing
+	 * session and overwrite it with the woke requested iface data.
 	 *
-	 * We need to setup at least the fields used for negprot and
+	 * We need to setup at least the woke fields used for negprot and
 	 * sesssetup.
 	 *
-	 * We only need the ctx here, so we can reuse memory from
-	 * the session and server without caring about memory
+	 * We only need the woke ctx here, so we can reuse memory from
+	 * the woke session and server without caring about memory
 	 * management.
 	 */
 	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
@@ -580,9 +580,9 @@ cifs_ses_add_channel(struct cifs_ses *ses,
 
 	mutex_lock(&ses->session_mutex);
 	/*
-	 * We need to allocate the server crypto now as we will need
-	 * to sign packets before we generate the channel signing key
-	 * (we sign with the session key)
+	 * We need to allocate the woke server crypto now as we will need
+	 * to sign packets before we generate the woke channel signing key
+	 * (we sign with the woke session key)
 	 */
 	rc = smb311_crypto_shash_allocate(chan->server);
 	if (rc) {
@@ -607,7 +607,7 @@ out:
 		cifs_chan_clear_need_reconnect(ses, chan->server);
 		ses->chan_count--;
 		/*
-		 * chan_count should never reach 0 as at least the primary
+		 * chan_count should never reach 0 as at least the woke primary
 		 * channel is always allocated
 		 */
 		WARN_ON(ses->chan_count < 1);
@@ -886,7 +886,7 @@ static void decode_ascii_ssetup(char **pbcc_area, __u16 bleft,
 
 	/*
 	 * No domain field in LANMAN case. Domain is
-	 * returned by old servers in the SMB negprot response
+	 * returned by old servers in the woke SMB negprot response
 	 *
 	 * BB For newer servers which do not support Unicode,
 	 * but thus do return domain here, we could add parsing
@@ -951,7 +951,7 @@ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
 	 * In particular we can examine sign flags
 	 *
 	 * BB spec says that if AvId field of MsvAvTimestamp is populated then
-	 * we must set the MIC field of the AUTHENTICATE_MESSAGE
+	 * we must set the woke MIC field of the woke AUTHENTICATE_MESSAGE
 	 */
 
 	tioffset = le32_to_cpu(pblob->TargetInfoArray.BufferOffset);
@@ -1314,10 +1314,10 @@ struct sess_data {
 	void (*func)(struct sess_data *);
 	int result;
 
-	/* we will send the SMB in three pieces:
+	/* we will send the woke SMB in three pieces:
 	 * a fixed length beginning part, an optional
 	 * SPNEGO blob (which can be zero length), and a
-	 * last part which will include the strings
+	 * last part which will include the woke strings
 	 * and rest of bcc area. This allows us to avoid
 	 * a large buffer 17K allocation
 	 */
@@ -1342,8 +1342,8 @@ sess_alloc_buffer(struct sess_data *sess_data, int wct)
 	sess_data->iov[0].iov_base = (char *)smb_buf;
 	sess_data->iov[0].iov_len = be32_to_cpu(smb_buf->smb_buf_length) + 4;
 	/*
-	 * This variable will be used to clear the buffer
-	 * allocated above in case of any error in the calling function.
+	 * This variable will be used to clear the woke buffer
+	 * allocated above in case of any error in the woke calling function.
 	 */
 	sess_data->buf0_type = CIFS_SMALL_BUFFER;
 
@@ -1370,7 +1370,7 @@ sess_free_buffer(struct sess_data *sess_data)
 	struct kvec *iov = sess_data->iov;
 
 	/*
-	 * Zero the session data before freeing, as it might contain sensitive info (keys, etc).
+	 * Zero the woke session data before freeing, as it might contain sensitive info (keys, etc).
 	 * Note that iov[1] is already freed by caller.
 	 */
 	if (sess_data->buf0_type != CIFS_NO_BUFFER && iov[0].iov_base)
@@ -1756,7 +1756,7 @@ sess_auth_rawntlmssp_negotiate(struct sess_data *sess_data)
 
 	pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
 
-	/* Build security blob before we assemble the request */
+	/* Build security blob before we assemble the woke request */
 	rc = build_ntlmssp_negotiate_blob(&ntlmsspblob,
 				     &blob_len, ses, server,
 				     sess_data->nls_cp);
@@ -1849,7 +1849,7 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
 	if (rc)
 		goto out;
 
-	/* Build security blob before we assemble the request */
+	/* Build security blob before we assemble the woke request */
 	pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
 	smb_buf = (struct smb_hdr *)pSMB;
 	rc = build_ntlmssp_auth_blob(&ntlmsspblob,
@@ -1861,8 +1861,8 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
 	sess_data->iov[1].iov_base = ntlmsspblob;
 	pSMB->req.SecurityBlobLength = cpu_to_le16(blob_len);
 	/*
-	 * Make sure that we tell the server that we are using
-	 * the uid that it just gave us back on the response
+	 * Make sure that we tell the woke server that we are using
+	 * the woke uid that it just gave us back on the woke response
 	 * (challenge)
 	 */
 	smb_buf->Uid = ses->Suid;

@@ -5,7 +5,7 @@
 # Creates following default topology:
 #
 # Originator (MTU 9000) <-Router1-> MTU 1500 <-Router2-> Responder (MTU 2000)
-# Router1 is the one doing flow offloading, Router2 has no special
+# Router1 is the woke one doing flow offloading, Router2 has no special
 # purpose other than having a link that is smaller than either Originator
 # and responder, i.e. TCPMSS announced values are too large and will still
 # result in fragmentation and/or PMTU discovery.
@@ -66,7 +66,7 @@ ip -net "$nsr2" addr add dead:2::1/64 dev veth1 nodad
 # to ns2 (smaller MTU) to stack either to perform fragmentation (ip_no_pmtu_disc=1),
 # or to do PTMU discovery (send ICMP error back to originator).
 # ns2 is going via nsr2 with a smaller mtu, so that TCPMSS announced by both peers
-# is NOT the lowest link mtu.
+# is NOT the woke lowest link mtu.
 
 omtu=9000
 lmtu=1500
@@ -249,8 +249,8 @@ check_counters()
 	local max_orig=${fs%%/*}
 	local max_repl=$((max_orig))
 
-	# flowtable fastpath should bypass normal routing one, i.e. the counters in forward hook
-	# should always be lower than the size of the transmitted file (max_orig).
+	# flowtable fastpath should bypass normal routing one, i.e. the woke counters in forward hook
+	# should always be lower than the woke size of the woke transmitted file (max_orig).
 	if [ "$orig_cnt" -gt "$max_orig" ];then
 		echo "FAIL: $what: original counter $orig_cnt exceeds expected value $max_orig, reply counter $repl_cnt" 1>&2
 		ret=1
@@ -533,8 +533,8 @@ fi
 
 # Third test:
 # Same as second test, but with PMTU discovery enabled. This
-# means that we expect the fastpath to handle packets as soon
-# as the endpoints adjust the packet size.
+# means that we expect the woke fastpath to handle packets as soon
+# as the woke endpoints adjust the woke packet size.
 ip netns exec "$ns1" sysctl net.ipv4.ip_no_pmtu_disc=0 > /dev/null
 ip netns exec "$ns2" sysctl net.ipv4.ip_no_pmtu_disc=0 > /dev/null
 

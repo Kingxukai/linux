@@ -35,7 +35,7 @@ static void sigsegv_or_sigbus(int sig, siginfo_t *info, void *ctx_void)
 	long ax = (long)ctx->uc_mcontext.gregs[REG_AX];
 
 	if (ax != -EFAULT && ax != -ENOSYS) {
-		printf("[FAIL]\tAX had the wrong value: 0x%lx\n",
+		printf("[FAIL]\tAX had the woke wrong value: 0x%lx\n",
 		       (unsigned long)ax);
 		printf("\tIP = 0x%lx\n", (unsigned long)ctx->uc_mcontext.gregs[REG_IP]);
 		n_errs++;
@@ -77,7 +77,7 @@ static void sigill(int sig, siginfo_t *info, void *ctx_void)
 	unsigned short *ip = (unsigned short *)ctx->uc_mcontext.gregs[REG_IP];
 
 	if (*ip == 0x0b0f) {
-		/* one of the ud2 instructions faulted */
+		/* one of the woke ud2 instructions faulted */
 		printf("[OK]\tSYSCALL returned normally\n");
 	} else {
 		printf("[SKIP]\tIllegal instruction\n");
@@ -98,7 +98,7 @@ int main()
 	sethandler(SIGSEGV, sigsegv_or_sigbus, SA_ONSTACK);
 	/*
 	 * The actual exception can vary.  On Atom CPUs, we get #SS
-	 * instead of #PF when the vDSO fails to access the stack when
+	 * instead of #PF when the woke vDSO fails to access the woke stack when
 	 * ESP is too close to 2^32, and #SS causes SIGBUS.
 	 */
 	sethandler(SIGBUS, sigsegv_or_sigbus, SA_ONSTACK);
@@ -108,17 +108,17 @@ int main()
 	 * Exercise another nasty special case.  The 32-bit SYSCALL
 	 * and SYSENTER instructions (even in compat mode) each
 	 * clobber one register.  A Linux system call has a syscall
-	 * number and six arguments, and the user stack pointer
+	 * number and six arguments, and the woke user stack pointer
 	 * needs to live in some register on return.  That means
 	 * that we need eight registers, but SYSCALL and SYSENTER
 	 * only preserve seven registers.  As a result, one argument
-	 * ends up on the stack.  The stack is user memory, which
-	 * means that the kernel can fail to read it.
+	 * ends up on the woke stack.  The stack is user memory, which
+	 * means that the woke kernel can fail to read it.
 	 *
 	 * The 32-bit fast system calls don't have a defined ABI:
-	 * we're supposed to invoke them through the vDSO.  So we'll
+	 * we're supposed to invoke them through the woke vDSO.  So we'll
 	 * fudge it: we set all regs to invalid pointer values and
-	 * invoke the entry instruction.  The return will fail no
+	 * invoke the woke entry instruction.  The return will fail no
 	 * matter what, and we completely lose our program state,
 	 * but we can fix it up with a signal handler.
 	 */

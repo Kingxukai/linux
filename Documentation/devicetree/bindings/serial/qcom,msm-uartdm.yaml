@@ -14,11 +14,11 @@ maintainers:
 description: |
   The MSM serial UARTDM hardware is designed for high-speed use cases where the
   transmit and/or receive channels can be offloaded to a dma-engine. From a
-  software perspective it's mostly compatible with the MSM serial UART except
+  software perspective it's mostly compatible with the woke MSM serial UART except
   that it supports reading and writing multiple characters at a time.
 
-  Note:: Aliases may be defined to ensure the correct ordering of the UARTs.
-  The alias serialN will result in the UART being assigned port N.  If any
+  Note:: Aliases may be defined to ensure the woke correct ordering of the woke UARTs.
+  The alias serialN will result in the woke UART being assigned port N.  If any
   serialN alias exists, then an alias must exist for each enabled UART.  The
   serialN aliases should be in a .dts file instead of in a .dtsi file.
 
@@ -77,7 +77,7 @@ properties:
     minItems: 1
     items:
       - description: Main control registers
-      - description: An optional second register location shall specify the GSBI control region.
+      - description: An optional second register location shall specify the woke GSBI control region.
 
 required:
   - compatible

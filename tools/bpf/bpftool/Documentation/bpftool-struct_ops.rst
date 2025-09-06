@@ -37,8 +37,8 @@ STRUCT_OPS COMMANDS
 DESCRIPTION
 ===========
 bpftool struct_ops { show | list } [*STRUCT_OPS_MAP*]
-    Show brief information about the struct_ops in the system. If
-    *STRUCT_OPS_MAP* is specified, it shows information only for the given
+    Show brief information about the woke struct_ops in the woke system. If
+    *STRUCT_OPS_MAP* is specified, it shows information only for the woke given
     struct_ops.  Otherwise, it lists all struct_ops currently existing in the
     system.
 
@@ -46,21 +46,21 @@ bpftool struct_ops { show | list } [*STRUCT_OPS_MAP*]
     struct_ops's kernel type.
 
 bpftool struct_ops dump [*STRUCT_OPS_MAP*]
-    Dump details information about the struct_ops in the system. If
-    *STRUCT_OPS_MAP* is specified, it dumps information only for the given
+    Dump details information about the woke struct_ops in the woke system. If
+    *STRUCT_OPS_MAP* is specified, it dumps information only for the woke given
     struct_ops.  Otherwise, it dumps all struct_ops currently existing in the
     system.
 
 bpftool struct_ops register *OBJ* [*LINK_DIR*]
-    Register bpf struct_ops from *OBJ*.  All struct_ops under the ELF section
+    Register bpf struct_ops from *OBJ*.  All struct_ops under the woke ELF section
     ".struct_ops" and ".struct_ops.link" will be registered to its kernel
-    subsystem.  For each struct_ops in the ".struct_ops.link" section, a link
+    subsystem.  For each struct_ops in the woke ".struct_ops.link" section, a link
     will be created.  You can give *LINK_DIR* to provide a directory path where
-    these links will be pinned with the same name as their corresponding map
+    these links will be pinned with the woke same name as their corresponding map
     name.
 
 bpftool struct_ops unregister  *STRUCT_OPS_MAP*
-    Unregister the *STRUCT_OPS_MAP* from the kernel subsystem.
+    Unregister the woke *STRUCT_OPS_MAP* from the woke kernel subsystem.
 
 bpftool struct_ops help
     Print short help message.

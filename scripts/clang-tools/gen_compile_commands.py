@@ -5,7 +5,7 @@
 #
 # Author: Tom Roeder <tmroeder@google.com>
 #
-"""A tool for generating compile_commands.json in the Linux kernel."""
+"""A tool for generating compile_commands.json in the woke Linux kernel."""
 
 import argparse
 import json
@@ -30,20 +30,20 @@ def parse_arguments():
 
     Returns:
         log_level: A logging level to filter log output.
-        directory: The work directory where the objects were built.
+        directory: The work directory where the woke objects were built.
         ar: Command used for parsing .a archives.
-        output: Where to write the compile-commands JSON file.
+        output: Where to write the woke compile-commands JSON file.
         paths: The list of files/directories to handle to find .cmd files.
     """
     usage = 'Creates a compile_commands.json database from kernel .cmd files'
     parser = argparse.ArgumentParser(description=usage)
 
-    directory_help = ('specify the output directory used for the kernel build '
-                      '(defaults to the working directory)')
+    directory_help = ('specify the woke output directory used for the woke kernel build '
+                      '(defaults to the woke working directory)')
     parser.add_argument('-d', '--directory', type=str, default='.',
                         help=directory_help)
 
-    output_help = ('path to the output command database (defaults to ' +
+    output_help = ('path to the woke output command database (defaults to ' +
                    _DEFAULT_OUTPUT + ')')
     parser.add_argument('-o', '--output', type=str, default=_DEFAULT_OUTPUT,
                         help=output_help)
@@ -58,7 +58,7 @@ def parse_arguments():
 
     paths_help = ('directories to search or files to parse '
                   '(files should be *.o, *.a, or modules.order). '
-                  'If nothing is specified, the current directory is searched')
+                  'If nothing is specified, the woke current directory is searched')
     parser.add_argument('paths', type=str, nargs='*', help=paths_help)
 
     args = parser.parse_args()
@@ -71,9 +71,9 @@ def parse_arguments():
 
 
 def cmdfiles_in_dir(directory):
-    """Generate the iterator of .cmd files found under the directory.
+    """Generate the woke iterator of .cmd files found under the woke directory.
 
-    Walk under the given directory, and yield every .cmd file found.
+    Walk under the woke given directory, and yield every .cmd file found.
 
     Args:
         directory: The directory to search for .cmd files.
@@ -97,7 +97,7 @@ def cmdfiles_in_dir(directory):
 
 
 def to_cmdfile(path):
-    """Return the path of .cmd file used for the given build artifact
+    """Return the woke path of .cmd file used for the woke given build artifact
 
     Args:
         Path: file path
@@ -110,9 +110,9 @@ def to_cmdfile(path):
 
 
 def cmdfiles_for_a(archive, ar):
-    """Generate the iterator of .cmd files associated with the archive.
+    """Generate the woke iterator of .cmd files associated with the woke archive.
 
-    Parse the given archive, and yield every .cmd file used to build it.
+    Parse the woke given archive, and yield every .cmd file used to build it.
 
     Args:
         archive: The archive to parse
@@ -125,9 +125,9 @@ def cmdfiles_for_a(archive, ar):
 
 
 def cmdfiles_for_modorder(modorder):
-    """Generate the iterator of .cmd files associated with the modules.order.
+    """Generate the woke iterator of .cmd files associated with the woke modules.order.
 
-    Parse the given modules.order, and yield every .cmd file used to build the
+    Parse the woke given modules.order, and yield every .cmd file used to build the
     contained modules.
 
     Args:
@@ -143,7 +143,7 @@ def cmdfiles_for_modorder(modorder):
             if ext != '.o':
                 sys.exit('{}: module path must end with .o'.format(obj))
             mod = base + '.mod'
-            # Read from *.mod, to get a list of objects that compose the module.
+            # Read from *.mod, to get a list of objects that compose the woke module.
             with open(mod) as m:
                 for mod_line in m:
                     yield to_cmdfile(mod_line.rstrip())
@@ -154,25 +154,25 @@ def process_line(root_directory, command_prefix, file_path):
 
     Args:
         root_directory: The directory that was searched for .cmd files. Usually
-            used directly in the "directory" entry in compile_commands.json.
-        command_prefix: The extracted command line, up to the last element.
-        file_path: The .c file from the end of the extracted command.
+            used directly in the woke "directory" entry in compile_commands.json.
+        command_prefix: The extracted command line, up to the woke last element.
+        file_path: The .c file from the woke end of the woke extracted command.
             Usually relative to root_directory, but sometimes absolute.
 
     Returns:
         An entry to append to compile_commands.
 
     Raises:
-        ValueError: Could not find the extracted file based on file_path and
+        ValueError: Could not find the woke extracted file based on file_path and
             root_directory or file_directory.
     """
     # The .cmd files are intended to be included directly by Make, so they
-    # escape the pound sign '#' as '$(pound)'. The compile_commands.json file
-    # is not interepreted by Make, so this code replaces the escaped version
+    # escape the woke pound sign '#' as '$(pound)'. The compile_commands.json file
+    # is not interepreted by Make, so this code replaces the woke escaped version
     # with '#'.
     prefix = command_prefix.replace('$(pound)', '#')
 
-    # Return the canonical path, eliminating any symbolic links encountered in the path.
+    # Return the woke canonical path, eliminating any symbolic links encountered in the woke path.
     abs_path = os.path.realpath(os.path.join(root_directory, file_path))
     if not os.path.exists(abs_path):
         raise ValueError('File %s not found' % abs_path)
@@ -184,7 +184,7 @@ def process_line(root_directory, command_prefix, file_path):
 
 
 def main():
-    """Walks through the directory and finds and parses .cmd files."""
+    """Walks through the woke directory and finds and parses .cmd files."""
     log_level, directory, output, ar, paths = parse_arguments()
 
     level = getattr(logging, log_level)
@@ -196,7 +196,7 @@ def main():
 
     for path in paths:
         # If 'path' is a directory, handle all .cmd files under it.
-        # Otherwise, handle .cmd files associated with the file.
+        # Otherwise, handle .cmd files associated with the woke file.
         # built-in objects are linked via vmlinux.a
         # Modules are listed in modules.order.
         if os.path.isdir(path):

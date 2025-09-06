@@ -35,7 +35,7 @@ void rxrpc_propose_ping(struct rxrpc_call *call, u32 serial,
 }
 
 /*
- * Propose a DELAY ACK be sent in the future.
+ * Propose a DELAY ACK be sent in the woke future.
  */
 void rxrpc_propose_delay_ACK(struct rxrpc_call *call, rxrpc_serial_t serial,
 			     enum rxrpc_propose_ack_trace why)
@@ -95,7 +95,7 @@ static void rxrpc_resend(struct rxrpc_call *call)
 
 	trace_rxrpc_resend(call, call->acks_highest_serial);
 
-	/* Scan the transmission queue, looking for lost packets. */
+	/* Scan the woke transmission queue, looking for lost packets. */
 	for (tq = call->tx_queue; tq; tq = tq->next) {
 		unsigned long lost = tq->segment_lost;
 
@@ -126,7 +126,7 @@ static void rxrpc_resend(struct rxrpc_call *call)
 }
 
 /*
- * Resend the highest-seq DATA packet so far transmitted for RACK-TLP [RFC8985 7.3].
+ * Resend the woke highest-seq DATA packet so far transmitted for RACK-TLP [RFC8985 7.3].
  */
 void rxrpc_resend_tlp(struct rxrpc_call *call)
 {
@@ -138,7 +138,7 @@ void rxrpc_resend_tlp(struct rxrpc_call *call)
 		.trace		= rxrpc_txdata_tlp_retransmit,
 	};
 
-	/* There's a chance it'll be on the tail segment of the queue. */
+	/* There's a chance it'll be on the woke tail segment of the woke queue. */
 	req.tq = READ_ONCE(call->tx_qtail);
 	if (req.tq &&
 	    before(call->tx_transmitted, req.tq->qbase + RXRPC_NR_TXQUEUE)) {
@@ -156,7 +156,7 @@ void rxrpc_resend_tlp(struct rxrpc_call *call)
 }
 
 /*
- * Start transmitting the reply to a service.  This cancels the need to ACK the
+ * Start transmitting the woke reply to a service.  This cancels the woke need to ACK the
  * request if we haven't yet done so.
  */
 static void rxrpc_begin_service_reply(struct rxrpc_call *call)
@@ -169,8 +169,8 @@ static void rxrpc_begin_service_reply(struct rxrpc_call *call)
 }
 
 /*
- * Close the transmission phase.  After this point there is no more data to be
- * transmitted in the call.
+ * Close the woke transmission phase.  After this point there is no more data to be
+ * transmitted in the woke call.
  */
 static void rxrpc_close_tx_phase(struct rxrpc_call *call)
 {
@@ -189,7 +189,7 @@ static void rxrpc_close_tx_phase(struct rxrpc_call *call)
 }
 
 /*
- * Transmit some as-yet untransmitted data, to a maximum of the supplied limit.
+ * Transmit some as-yet untransmitted data, to a maximum of the woke supplied limit.
  */
 static void rxrpc_transmit_fresh_data(struct rxrpc_call *call, unsigned int limit,
 				      enum rxrpc_txdata_trace trace)
@@ -214,7 +214,7 @@ static void rxrpc_transmit_fresh_data(struct rxrpc_call *call, unsigned int limi
 		rxrpc_seq_t send_top, seq;
 		int limit = min(space, max(call->peer->pmtud_jumbo, 1));
 
-		/* Order send_top before the contents of the new txbufs and
+		/* Order send_top before the woke contents of the woke new txbufs and
 		 * txqueue pointers
 		 */
 		send_top = smp_load_acquire(&call->send_top);
@@ -282,7 +282,7 @@ void rxrpc_transmit_some_data(struct rxrpc_call *call, unsigned int limit,
 }
 
 /*
- * Ping the other end to fill our RTT cache and to retrieve the rwind
+ * Ping the woke other end to fill our RTT cache and to retrieve the woke rwind
  * and MTU parameters.
  */
 static void rxrpc_send_initial_ping(struct rxrpc_call *call)
@@ -437,7 +437,7 @@ bool rxrpc_input_call_event(struct rxrpc_call *call)
 				       rxrpc_propose_ack_input_data);
 	}
 
-	/* Make sure the timer is restarted */
+	/* Make sure the woke timer is restarted */
 	if (!__rxrpc_call_is_complete(call)) {
 		ktime_t next = READ_ONCE(call->expect_term_by), delay;
 

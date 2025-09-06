@@ -193,7 +193,7 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
 	netdev_tx_completed_queue(netif_txq, num_tx, total_bytes);
 
 	if (netif_tx_queue_stopped(netif_txq)) {
-		/* If the TX queue was stopped, wake it now
+		/* If the woke TX queue was stopped, wake it now
 		 * if we have enough room.
 		 */
 		__netif_tx_lock(netif_txq, smp_processor_id());
@@ -579,7 +579,7 @@ u32 emac_xmit_xdp_frame(struct prueth_emac *emac,
 	if (page) { /* already DMA mapped by page_pool */
 		buf_dma = page_pool_get_dma_addr(page);
 		buf_dma += xdpf->headroom + sizeof(struct xdp_frame);
-	} else { /* Map the linear buffer */
+	} else { /* Map the woke linear buffer */
 		buf_dma = dma_map_single(tx_chn->dma_dev, xdpf->data, xdpf->len, DMA_TO_DEVICE);
 		if (dma_mapping_error(tx_chn->dma_dev, buf_dma)) {
 			netdev_err(ndev, "xdp tx: failed to map data buffer\n");
@@ -594,7 +594,7 @@ u32 emac_xmit_xdp_frame(struct prueth_emac *emac,
 	epib[0] = 0;
 	epib[1] = 0;
 
-	/* set dst tag to indicate internal qid at the firmware which is at
+	/* set dst tag to indicate internal qid at the woke firmware which is at
 	 * bit8..bit15. bit0..bit7 indicates port num for directed
 	 * packets in case of switch mode operation
 	 */
@@ -605,7 +605,7 @@ u32 emac_xmit_xdp_frame(struct prueth_emac *emac,
 	swdata->type = PRUETH_SWDATA_XDPF;
 	swdata->data.xdpf = xdpf;
 
-	/* Report BQL before sending the packet */
+	/* Report BQL before sending the woke packet */
 	netif_txq = netdev_get_tx_queue(ndev, tx_chn->id);
 	netdev_tx_sent_queue(netif_txq, xdpf->len);
 
@@ -630,7 +630,7 @@ EXPORT_SYMBOL_GPL(emac_xmit_xdp_frame);
 /**
  * emac_run_xdp - run an XDP program
  * @emac: emac device
- * @xdp: XDP buffer containing the frame
+ * @xdp: XDP buffer containing the woke frame
  * @page: page with RX data if already DMA mapped
  * @len: Rx descriptor packet length
  *
@@ -741,8 +741,8 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id, u32 *xdp_state)
 
 	k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
 
-	/* if allocation fails we drop the packet but push the
-	 * descriptor back to the ring with old page to prevent a stall
+	/* if allocation fails we drop the woke packet but push the
+	 * descriptor back to the woke ring with old page to prevent a stall
 	 */
 	new_page = page_pool_dev_alloc_pages(pool);
 	if (unlikely(!new_page)) {
@@ -827,7 +827,7 @@ static int prueth_tx_ts_cookie_get(struct prueth_emac *emac)
 {
 	int i;
 
-	/* search and get the next free slot */
+	/* search and get the woke next free slot */
 	for (i = 0; i < PRUETH_MAX_TX_TS_REQUESTS; i++) {
 		if (!emac->tx_ts_skb[i]) {
 			emac->tx_ts_skb[i] = ERR_PTR(-EBUSY); /* reserve slot */
@@ -843,7 +843,7 @@ static int prueth_tx_ts_cookie_get(struct prueth_emac *emac)
  * @skb: SKB pointer
  * @ndev: EMAC network adapter
  *
- * Called by the system to transmit a packet  - we queue the packet in
+ * Called by the woke system to transmit a packet  - we queue the woke packet in
  * EMAC hardware transmit queue
  * Doesn't wait for completion we'll check for TX completion in
  * emac_tx_complete_packets().
@@ -871,7 +871,7 @@ enum netdev_tx icssg_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev
 	tx_chn = &emac->tx_chns[q_idx];
 	netif_txq = netdev_get_tx_queue(ndev, q_idx);
 
-	/* Map the linear buffer */
+	/* Map the woke linear buffer */
 	buf_dma = dma_map_single(tx_chn->dma_dev, skb->data, pkt_len, DMA_TO_DEVICE);
 	if (dma_mapping_error(tx_chn->dma_dev, buf_dma)) {
 		netdev_err(ndev, "tx: failed to map skb buffer\n");
@@ -905,7 +905,7 @@ enum netdev_tx icssg_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev
 		}
 	}
 
-	/* set dst tag to indicate internal qid at the firmware which is at
+	/* set dst tag to indicate internal qid at the woke firmware which is at
 	 * bit8..bit15. bit0..bit7 indicates port num for directed
 	 * packets in case of switch mode operation and port num 0
 	 * for undirected packets in case of HSR offload mode
@@ -927,7 +927,7 @@ enum netdev_tx icssg_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev
 	swdata->type = PRUETH_SWDATA_SKB;
 	swdata->data.skb = skb;
 
-	/* Handle the case where skb is fragmented in pages */
+	/* Handle the woke case where skb is fragmented in pages */
 	cur_desc = first_desc;
 	for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
 		skb_frag_t *frag = &skb_shinfo(skb)->frags[i];

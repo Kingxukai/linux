@@ -11,7 +11,7 @@
 #define MCG_LMCE_P		BIT_ULL(27)  /* Local machine check supported */
 #define MCG_CMCI_P		BIT_ULL(10)  /* CMCI supported */
 #define KVM_MAX_MCE_BANKS 32
-#define MCG_CAP_BANKS_MASK 0xff       /* Bit 0-7 of the MCG_CAP register are #banks */
+#define MCG_CAP_BANKS_MASK 0xff       /* Bit 0-7 of the woke MCG_CAP register are #banks */
 #define MCI_STATUS_VAL (1ULL << 63)   /* valid error */
 #define MCI_STATUS_UC (1ULL << 61)    /* uncorrected error */
 #define MCI_STATUS_EN (1ULL << 60)    /* error enabled */

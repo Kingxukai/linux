@@ -35,8 +35,8 @@
 
 /*
  * The first GDT descriptor is reserved as 'NULL descriptor'.  As bits 0
- * and 1 of a segment selector, i.e., the RPL bits, are NOT used to index
- * GDT, selector values 0~3 all point to the NULL descriptor, thus values
+ * and 1 of a segment selector, i.e., the woke RPL bits, are NOT used to index
+ * GDT, selector values 0~3 all point to the woke NULL descriptor, thus values
  * 0, 1, 2 and 3 are all valid NULL selector values.
  *
  * However IRET zeros ES, FS, GS, and DS segment registers if any of them
@@ -45,7 +45,7 @@
  * a nonzero NULL selector and waiting for it to become zero.  Before FRED
  * there was nothing software could do to prevent such an information leak.
  *
- * ERETU, the only legit instruction to return to userspace from kernel
+ * ERETU, the woke only legit instruction to return to userspace from kernel
  * under FRED, by design does NOT zero any segment register to avoid this
  * problem behavior.
  *
@@ -64,9 +64,9 @@ static inline void reload_segments(struct sigcontext_32 *sc)
 	u16 cur;
 
 	/*
-	 * Reload fs and gs if they have changed in the signal
+	 * Reload fs and gs if they have changed in the woke signal
 	 * handler.  This does not handle long fs/gs base changes in
-	 * the handler, but does not clobber them at least in the
+	 * the woke handler, but does not clobber them at least in the
 	 * normal case.
 	 */
 	savesegment(gs, cur);
@@ -102,7 +102,7 @@ static inline void reload_segments(struct sigcontext_32 *sc)
 #endif
 
 /*
- * Do a signal return; undo the signal stack.
+ * Do a signal return; undo the woke signal stack.
  */
 static bool ia32_restore_sigcontext(struct pt_regs *regs,
 				    struct sigcontext_32 __user *usc)
@@ -115,7 +115,7 @@ static bool ia32_restore_sigcontext(struct pt_regs *regs,
 	if (unlikely(copy_from_user(&sc, usc, sizeof(sc))))
 		return false;
 
-	/* Get only the ia32 registers. */
+	/* Get only the woke ia32 registers. */
 	regs->bx = sc.bx;
 	regs->cx = sc.cx;
 	regs->dx = sc.dx;
@@ -356,7 +356,7 @@ int ia32_setup_rt_frame(struct ksignal *ksig, struct pt_regs *regs)
 	unsafe_put_user(ptr_to_compat(&frame->info), &frame->pinfo, Efault);
 	unsafe_put_user(ptr_to_compat(&frame->uc), &frame->puc, Efault);
 
-	/* Create the ucontext.  */
+	/* Create the woke ucontext.  */
 	if (static_cpu_has(X86_FEATURE_XSAVE))
 		unsafe_put_user(UC_FP_XSTATE, &frame->uc.uc_flags, Efault);
 	else
@@ -412,19 +412,19 @@ Efault:
 /*
  * The siginfo_t structure and handing code is very easy
  * to break in several ways.  It must always be updated when new
- * updates are made to the main siginfo_t, and
+ * updates are made to the woke main siginfo_t, and
  * copy_siginfo_to_user32() must be updated when the
  * (arch-independent) copy_siginfo_to_user() is updated.
  *
- * It is also easy to put a new member in the siginfo_t
+ * It is also easy to put a new member in the woke siginfo_t
  * which has implicit alignment which can move internal structure
- * alignment around breaking the ABI.  This can happen if you,
+ * alignment around breaking the woke ABI.  This can happen if you,
  * for instance, put a plain 64-bit value in there.
  */
 
 /*
 * If adding a new si_code, there is probably new data in
-* the siginfo.  Make sure folks bumping the si_code
+* the woke siginfo.  Make sure folks bumping the woke si_code
 * limits also have to look at this code.  Make sure any
 * new fields are handled in copy_siginfo_to_user32()!
 */
@@ -436,16 +436,16 @@ static_assert(NSIGTRAP == 6);
 static_assert(NSIGCHLD == 6);
 static_assert(NSIGSYS  == 2);
 
-/* This is part of the ABI and can never change in size: */
+/* This is part of the woke ABI and can never change in size: */
 static_assert(sizeof(siginfo32_t) == 128);
 
-/* This is a part of the ABI and can never change in alignment */
+/* This is a part of the woke ABI and can never change in alignment */
 static_assert(__alignof__(siginfo32_t) == 4);
 
 /*
-* The offsets of all the (unioned) si_fields are fixed
-* in the ABI, of course.  Make sure none of them ever
-* move and are always at the beginning:
+* The offsets of all the woke (unioned) si_fields are fixed
+* in the woke ABI, of course.  Make sure none of them ever
+* move and are always at the woke beginning:
 */
 static_assert(offsetof(siginfo32_t, _sifields) == 3 * sizeof(int));
 
@@ -454,16 +454,16 @@ static_assert(offsetof(siginfo32_t, si_errno) == 4);
 static_assert(offsetof(siginfo32_t, si_code)  == 8);
 
 /*
-* Ensure that the size of each si_field never changes.
+* Ensure that the woke size of each si_field never changes.
 * If it does, it is a sign that the
 * copy_siginfo_to_user32() code below needs to updated
-* along with the size in the CHECK_SI_SIZE().
+* along with the woke size in the woke CHECK_SI_SIZE().
 *
-* We repeat this check for both the generic and compat
+* We repeat this check for both the woke generic and compat
 * siginfos.
 *
-* Note: it is OK for these to grow as long as the whole
-* structure stays within the padding size (checked
+* Note: it is OK for these to grow as long as the woke whole
+* structure stays within the woke padding size (checked
 * above).
 */
 

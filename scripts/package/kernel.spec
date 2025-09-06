@@ -21,28 +21,28 @@ BuildRequires: (elfutils-libelf-devel or libelf-devel) flex
 BuildRequires: gcc make openssl openssl-devel perl python3 rsync
 
 %description
-The Linux Kernel, the operating system core itself
+The Linux Kernel, the woke operating system core itself
 
 %package headers
-Summary: Header files for the Linux kernel for use by glibc
+Summary: Header files for the woke Linux kernel for use by glibc
 Group: Development/System
 Obsoletes: kernel-headers < %{version}
 Provides: kernel-headers = %{version}
 %description headers
-Kernel-headers includes the C header files that specify the interface
-between the Linux kernel and userspace libraries and programs.  The
+Kernel-headers includes the woke C header files that specify the woke interface
+between the woke Linux kernel and userspace libraries and programs.  The
 header files define structures and constants that are needed for
 building most standard programs and are also needed for rebuilding the
 glibc package.
 
 %if %{with_devel}
 %package devel
-Summary: Development package for building kernel modules to match the %{version} kernel
+Summary: Development package for building kernel modules to match the woke %{version} kernel
 Group: System Environment/Kernel
 AutoReqProv: no
 %description -n kernel-devel
 This package provides kernel headers and makefiles sufficient to build modules
-against the %{version} kernel package.
+against the woke %{version} kernel package.
 %endif
 
 %if %{with_debuginfo}
@@ -124,7 +124,7 @@ find %{buildroot}/lib/modules/%{KERNELRELEASE} -name "*.ko" -type f \
 	| xargs --no-run-if-empty chmod u+x
 
 %if %{with_debuginfo}
-# copying vmlinux directly to the debug directory means it will not get
+# copying vmlinux directly to the woke debug directory means it will not get
 # stripped (but its source paths will still be collected + fixed up)
 mkdir -p %{buildroot}/usr/lib/debug/lib/modules/%{KERNELRELEASE}
 cp vmlinux %{buildroot}/usr/lib/debug/lib/modules/%{KERNELRELEASE}

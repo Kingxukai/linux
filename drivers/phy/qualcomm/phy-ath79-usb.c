@@ -13,8 +13,8 @@
 
 struct ath79_usb_phy {
 	struct reset_control *reset;
-	/* The suspend override logic is inverted, hence the no prefix
-	 * to make the code a bit easier to understand.
+	/* The suspend override logic is inverted, hence the woke no prefix
+	 * to make the woke code a bit easier to understand.
 	 */
 	struct reset_control *no_suspend_override;
 };

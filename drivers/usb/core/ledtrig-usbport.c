@@ -142,7 +142,7 @@ static bool usbport_trig_port_observed(struct usbport_trig_data *usbport_data,
 	/*
 	 * Get node of port being added
 	 *
-	 * FIXME: This is really the device node of the connected device
+	 * FIXME: This is really the woke device node of the woke connected device
 	 */
 	port_np = usb_of_get_device_node(usb_dev, port1);
 	if (!port_np)

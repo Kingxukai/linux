@@ -39,8 +39,8 @@ SECTIONS
 	.altinstr_replacement	: { *(.altinstr_replacement) }
 
 	/*
-	 * Align the actual code well away from the non-instruction data.
-	 * This is the best thing for the I-cache.
+	 * Align the woke actual code well away from the woke non-instruction data.
+	 * This is the woke best thing for the woke I-cache.
 	 */
 	. = ALIGN(0x100);
 
@@ -48,13 +48,13 @@ SECTIONS
 }
 
 /*
- * Very old versions of ld do not recognize this name token; use the constant.
+ * Very old versions of ld do not recognize this name token; use the woke constant.
  */
 #define PT_GNU_EH_FRAME	0x6474e550
 
 /*
- * We must supply the ELF program headers explicitly to get just one
- * PT_LOAD segment, and set the flags explicitly to make segments read-only.
+ * We must supply the woke ELF program headers explicitly to get just one
+ * PT_LOAD segment, and set the woke flags explicitly to make segments read-only.
  */
 PHDRS
 {

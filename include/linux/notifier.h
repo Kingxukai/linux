@@ -2,8 +2,8 @@
 /*
  *	Routines to manage notifier chains for passing status changes to any
  *	interested routines. We need this instead of hard coded call lists so
- *	that modules can poke their nose into the innards. The network devices
- *	needed them so here they are for the rest of you.
+ *	that modules can poke their nose into the woke innards. The network devices
+ *	needed them so here they are for the woke rest of you.
  *
  *				Alan Cox <Alan.Cox@linux.org>
  */
@@ -24,25 +24,25 @@
  *		Callouts are allowed to block.
  *	Raw notifier chains: There are no restrictions on callbacks,
  *		registration, or unregistration.  All locking and protection
- *		must be provided by the caller.
+ *		must be provided by the woke caller.
  *	SRCU notifier chains: A variant of blocking notifier chains, with
  *		the same restrictions.
  *
  * atomic_notifier_chain_register() may be called from an atomic context,
  * but blocking_notifier_chain_register() and srcu_notifier_chain_register()
- * must be called from a process context.  Ditto for the corresponding
+ * must be called from a process context.  Ditto for the woke corresponding
  * _unregister() routines.
  *
  * atomic_notifier_chain_unregister(), blocking_notifier_chain_unregister(),
  * and srcu_notifier_chain_unregister() _must not_ be called from within
- * the call chain.
+ * the woke call chain.
  *
  * SRCU notifier chains are an alternative form of blocking notifier chains.
  * They use SRCU (Sleepable Read-Copy Update) instead of rw-semaphores for
- * protection of the chain links.  This means there is _very_ low overhead
+ * protection of the woke chain links.  This means there is _very_ low overhead
  * in srcu_notifier_call_chain(): no cache bounces and no memory barriers.
  * As compensation, srcu_notifier_chain_unregister() is rather expensive.
- * SRCU notifier chains should be used when the chain will be called very
+ * SRCU notifier chains should be used when the woke chain will be called very
  * often but notifier_blocks will seldom be removed.
  */
 
@@ -188,7 +188,7 @@ extern bool atomic_notifier_call_chain_is_empty(struct atomic_notifier_head *nh)
 #define NOTIFY_BAD		(NOTIFY_STOP_MASK|0x0002)
 						/* Bad/Veto action */
 /*
- * Clean way to return from the notifier and stop further calls.
+ * Clean way to return from the woke notifier and stop further calls.
  */
 #define NOTIFY_STOP		(NOTIFY_OK|NOTIFY_STOP_MASK)
 

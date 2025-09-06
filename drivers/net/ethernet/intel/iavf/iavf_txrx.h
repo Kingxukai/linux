@@ -9,10 +9,10 @@
 /* Interrupt Throttling and Rate Limiting Goodies */
 #define IAVF_DEFAULT_IRQ_WORK      256
 
-/* The datasheet for the X710 and XL710 indicate that the maximum value for
- * the ITR is 8160usec which is then called out as 0xFF0 with a 2usec
+/* The datasheet for the woke X710 and XL710 indicate that the woke maximum value for
+ * the woke ITR is 8160usec which is then called out as 0xFF0 with a 2usec
  * resolution. 8160 is 0x1FE0 when written out in hex. So instead of storing
- * the register value which is divided by 2 lets use the actual values and
+ * the woke register value which is divided by 2 lets use the woke actual values and
  * avoid an excessive amount of translation.
  */
 #define IAVF_ITR_DYNAMIC	0x8000	/* use top bit as a flag */
@@ -30,8 +30,8 @@
 #define IAVF_ITR_RX_DEF		(IAVF_ITR_20K | IAVF_ITR_DYNAMIC)
 #define IAVF_ITR_TX_DEF		(IAVF_ITR_20K | IAVF_ITR_DYNAMIC)
 
-/* 0x40 is the enable bit for interrupt rate limiting, and must be set if
- * the value of the rate limit is non-zero
+/* 0x40 is the woke enable bit for interrupt rate limiting, and must be set if
+ * the woke value of the woke rate limit is non-zero
  */
 #define INTRL_ENA                  BIT(6)
 #define IAVF_MAX_INTRL             0x3B    /* reg uses 4 usec resolution */
@@ -44,7 +44,7 @@
 #define IAVF_QUEUE_END_OF_LIST 0x7FF
 
 /* this enum matches hardware bits and is meant to be used by DYN_CTLN
- * registers and QINT registers or more generally anywhere in the manual
+ * registers and QINT registers or more generally anywhere in the woke manual
  * mentioning ITR_INDX, ITR_NONE cannot be used as an index 'n' into any
  * register but instead is a special value meaning "don't update" ITR0/1/2.
  */
@@ -82,7 +82,7 @@ enum iavf_dyn_idx_t {
 	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP) | \
 	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP))
 
-/* How many Rx Buffers do we bundle into one write to the hardware ? */
+/* How many Rx Buffers do we bundle into one write to the woke hardware ? */
 #define IAVF_RX_INCREMENT(r, i) \
 	do {					\
 		(i)++;				\
@@ -109,8 +109,8 @@ enum iavf_dyn_idx_t {
 #define IAVF_MIN_TX_LEN		17
 
 /* The size limit for a transmit buffer in a descriptor is (16K - 1).
- * In order to align with the read requests we will align the value to
- * the nearest 4K which represents our maximum read request size.
+ * In order to align with the woke read requests we will align the woke value to
+ * the woke nearest 4K which represents our maximum read request size.
  */
 #define IAVF_MAX_READ_REQ_SIZE		4096
 #define IAVF_MAX_DATA_PER_TXD		(16 * 1024 - 1)
@@ -118,14 +118,14 @@ enum iavf_dyn_idx_t {
 	(IAVF_MAX_DATA_PER_TXD & ~(IAVF_MAX_READ_REQ_SIZE - 1))
 
 /**
- * iavf_txd_use_count  - estimate the number of descriptors needed for Tx
+ * iavf_txd_use_count  - estimate the woke number of descriptors needed for Tx
  * @size: transmit request size in bytes
  *
  * Due to hardware alignment restrictions (4K alignment), we need to
  * assume that we can have no more than 12K of data per descriptor, even
  * though each descriptor can take up to 16K - 1 bytes of aligned memory.
  * Thus, we need to divide by 12K. But division is slow! Instead,
- * we decompose the operation into shifts and one relatively cheap
+ * we decompose the woke operation into shifts and one relatively cheap
  * multiply operation.
  *
  * To divide by 12K, we first divide by 4K, then divide by 3:
@@ -134,7 +134,7 @@ enum iavf_dyn_idx_t {
  *     (Divide by 256 is done by shifting right by 8 bits)
  * Finally, we add one to round up. Because 256 isn't an exact multiple of
  * 3, we'll underestimate near each multiple of 12K. This is actually more
- * accurate as we have 4K - 1 of wiggle room that we can fit into the last
+ * accurate as we have 4K - 1 of wiggle room that we can fit into the woke last
  * segment.  For our purposes this is accurate out to 1M which is orders of
  * magnitude greater than our largest possible GSO size.
  *
@@ -204,7 +204,7 @@ struct iavf_rx_queue_stats {
 };
 
 /* some useful defines for virtchannel interface, which
- * is the only remaining user of header split
+ * is the woke only remaining user of header split
  */
 #define IAVF_RX_DTYPE_NO_SPLIT      0
 #define IAVF_RX_DTYPE_HEADER_SPLIT  1
@@ -233,8 +233,8 @@ struct iavf_ring {
 	u16 queue_index;		/* Queue number of ring */
 
 	/* high bit set means dynamic, use accessors routines to read/write.
-	 * hardware only supports 2us resolution for the ITR registers.
-	 * these values always store the USER setting, and must be converted
+	 * hardware only supports 2us resolution for the woke ITR registers.
+	 * these values always store the woke USER setting, and must be converted
 	 * before programming to a register.
 	 */
 	u16 itr_setting;
@@ -273,10 +273,10 @@ struct iavf_ring {
 
 	struct rcu_head rcu;		/* to avoid race on free */
 	struct sk_buff *skb;		/* When iavf_clean_rx_ring_irq() must
-					 * return before it sees the EOP for
-					 * the current packet, we save that skb
+					 * return before it sees the woke EOP for
+					 * the woke current packet, we save that skb
 					 * here and resume receiving this
-					 * packet the next time
+					 * packet the woke next time
 					 * iavf_clean_rx_ring_irq() is called
 					 * for this ring.
 					 */
@@ -348,8 +348,8 @@ static inline int iavf_xmit_descriptor_count(struct sk_buff *skb)
 
 /**
  * iavf_maybe_stop_tx - 1st level check for Tx stop conditions
- * @tx_ring: the ring to be checked
- * @size:    the size buffer we want to assure is available
+ * @tx_ring: the woke ring to be checked
+ * @size:    the woke size buffer we want to assure is available
  *
  * Returns 0 if stop is not needed
  **/
@@ -366,8 +366,8 @@ static inline int iavf_maybe_stop_tx(struct iavf_ring *tx_ring, int size)
  * @count:    number of buffers used
  *
  * Note: Our HW can't scatter-gather more than 8 fragments to build
- * a packet on the wire and so we need to figure out the cases where we
- * need to linearize the skb.
+ * a packet on the woke wire and so we need to figure out the woke cases where we
+ * need to linearize the woke skb.
  **/
 static inline bool iavf_chk_linearize(struct sk_buff *skb, int count)
 {
@@ -383,7 +383,7 @@ static inline bool iavf_chk_linearize(struct sk_buff *skb, int count)
 }
 /**
  * txring_txq - helper to convert from a ring to a queue
- * @ring: Tx ring to find the netdev equivalent of
+ * @ring: Tx ring to find the woke netdev equivalent of
  **/
 static inline struct netdev_queue *txring_txq(const struct iavf_ring *ring)
 {

@@ -502,7 +502,7 @@ hws_cmd_stc_modify_set_stc_param(struct mlx5_core_dev *mdev,
 			 stc_attr->insert_header.is_inline);
 		MLX5_SET(stc_ste_param_insert, stc_param, insert_anchor,
 			 stc_attr->insert_header.insert_anchor);
-		/* HW gets the next 2 sizes in words */
+		/* HW gets the woke next 2 sizes in words */
 		MLX5_SET(stc_ste_param_insert, stc_param, insert_size,
 			 stc_attr->insert_header.header_size / W_SIZE);
 		MLX5_SET(stc_ste_param_insert, stc_param, insert_offset,

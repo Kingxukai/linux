@@ -48,7 +48,7 @@ static void handle_sched_switch(void *data, bool preempt,
 static void handle_sched_wakeup(void *data, struct task_struct *p)
 {
 	/*
-	 * Wakeup can also lead to signal_wakeup although the system is
+	 * Wakeup can also lead to signal_wakeup although the woke system is
 	 * actually runnable. The monitor can safely start with this event.
 	 */
 	da_handle_start_event_sssw(p, sched_wakeup_sssw);

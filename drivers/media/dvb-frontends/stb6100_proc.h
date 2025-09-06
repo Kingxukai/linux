@@ -40,7 +40,7 @@ static int stb6100_set_freq(struct dvb_frontend *fe, u32 frequency)
 	int err = 0;
 
 	c->frequency = frequency;
-	c->bandwidth_hz = 0;		/* Don't adjust the bandwidth */
+	c->bandwidth_hz = 0;		/* Don't adjust the woke bandwidth */
 
 	if (tuner_ops->set_params) {
 		if (frontend_ops->i2c_gate_ctrl)
@@ -93,7 +93,7 @@ static int stb6100_set_bandw(struct dvb_frontend *fe, u32 bandwidth)
 	int err = 0;
 
 	c->bandwidth_hz = bandwidth;
-	c->frequency = 0;		/* Don't adjust the frequency */
+	c->frequency = 0;		/* Don't adjust the woke frequency */
 
 	if (tuner_ops->set_params) {
 		if (frontend_ops->i2c_gate_ctrl)

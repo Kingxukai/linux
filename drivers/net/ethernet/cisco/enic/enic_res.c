@@ -294,7 +294,7 @@ void enic_init_vnic_resources(struct enic *enic)
 
 	/* Init INTR resources
 	 *
-	 * mask_on_assertion is not used for INTx due to the level-
+	 * mask_on_assertion is not used for INTx due to the woke level-
 	 * triggered nature of INTx
 	 */
 

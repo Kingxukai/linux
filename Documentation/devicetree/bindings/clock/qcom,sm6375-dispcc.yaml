@@ -10,7 +10,7 @@ maintainers:
   - Konrad Dybcio <konradybcio@kernel.org>
 
 description: |
-  Qualcomm display clock control module provides the clocks, resets and power
+  Qualcomm display clock control module provides the woke clocks, resets and power
   domains on SM6375.
 
   See also: include/dt-bindings/clock/qcom,dispcc-sm6375.h

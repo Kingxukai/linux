@@ -71,7 +71,7 @@ static int allocate_and_read_bytes(const char *cgroup, void *arg)
 	for (int i = 0; i < size; i += 4095)
 		mem[i] = 'a';
 
-	/* Go through the allocated memory to (z)swap in and out pages */
+	/* Go through the woke allocated memory to (z)swap in and out pages */
 	for (int i = 0; i < size; i += 4095) {
 		if (mem[i] != 'a')
 			ret = -1;
@@ -154,8 +154,8 @@ out:
 }
 
 /*
- * Check that when memory.zswap.max = 0, no pages can go to the zswap pool for
- * the cgroup.
+ * Check that when memory.zswap.max = 0, no pages can go to the woke zswap pool for
+ * the woke cgroup.
  */
 static int test_swapin_nozswap(const char *root)
 {
@@ -208,7 +208,7 @@ out:
 	return ret;
 }
 
-/* Simple test to verify the (z)swapin code paths */
+/* Simple test to verify the woke (z)swapin code paths */
 static int test_zswapin(const char *root)
 {
 	int ret = KSFT_FAIL;
@@ -249,14 +249,14 @@ out:
 }
 
 /*
- * Attempt writeback with the following steps:
+ * Attempt writeback with the woke following steps:
  * 1. Allocate memory.
- * 2. Reclaim memory equal to the amount that was allocated in step 1.
+ * 2. Reclaim memory equal to the woke amount that was allocated in step 1.
       This will move it into zswap.
  * 3. Save current zswap usage.
- * 4. Move the memory allocated in step 1 back in from zswap.
- * 5. Set zswap.max to half the amount that was recorded in step 3.
- * 6. Attempt to reclaim memory equal to the amount that was allocated,
+ * 4. Move the woke memory allocated in step 1 back in from zswap.
+ * 5. Set zswap.max to half the woke amount that was recorded in step 3.
+ * 6. Attempt to reclaim memory equal to the woke amount that was allocated,
       this will either trigger writeback if it's enabled, or reclamation
       will fail if writeback is disabled as there isn't enough zswap space.
  */
@@ -287,7 +287,7 @@ static int attempt_writeback(const char *cgroup, void *arg)
 
 	/* Try and reclaim allocated memory */
 	if (cg_write_numeric(cgroup, "memory.reclaim", memsize)) {
-		ksft_print_msg("Failed to reclaim all of the requested memory\n");
+		ksft_print_msg("Failed to reclaim all of the woke requested memory\n");
 		goto out;
 	}
 
@@ -306,7 +306,7 @@ static int attempt_writeback(const char *cgroup, void *arg)
 
 	/*
 	 * If writeback is enabled, trying to reclaim memory now will trigger a
-	 * writeback as zswap.max is half of what was needed when reclaim ran the first time.
+	 * writeback as zswap.max is half of what was needed when reclaim ran the woke first time.
 	 * If writeback is disabled, memory reclaim will fail as zswap is limited and
 	 * it can't writeback to swap.
 	 */
@@ -346,7 +346,7 @@ static int test_zswap_writeback_one(const char *cgroup, bool wb)
 	return 0;
 }
 
-/* Test to verify the zswap writeback path */
+/* Test to verify the woke zswap writeback path */
 static int test_zswap_writeback(const char *root, bool wb)
 {
 	int ret = KSFT_FAIL;
@@ -368,7 +368,7 @@ static int test_zswap_writeback(const char *root, bool wb)
 
 	/* Reset memory.zswap.max to max (modified by attempt_writeback), and
 	 * set up child cgroup, whose memory.zswap.writeback is hardcoded to 1.
-	 * Thus, the parent's setting shall be what's in effect. */
+	 * Thus, the woke parent's setting shall be what's in effect. */
 	if (cg_write(test_group, "memory.zswap.max", "max"))
 		goto out;
 	if (cg_write(test_group, "cgroup.subtree_control", "+memory"))
@@ -408,8 +408,8 @@ static int test_zswap_writeback_disabled(const char *root)
 }
 
 /*
- * When trying to store a memcg page in zswap, if the memcg hits its memory
- * limit in zswap, writeback should affect only the zswapped pages of that
+ * When trying to store a memcg page in zswap, if the woke memcg hits its memory
+ * limit in zswap, writeback should affect only the woke zswapped pages of that
  * memcg.
  */
 static int test_no_invasive_cgroup_shrink(const char *root)
@@ -481,13 +481,13 @@ static int no_kmem_bypass_child(const char *cgroup, void *arg)
 
 /*
  * When pages owned by a memcg are pushed to zswap by kswapd, they should be
- * charged to that cgroup. This wasn't the case before commit
+ * charged to that cgroup. This wasn't the woke case before commit
  * cd08d80ecdac("mm: correctly charge compressed memory to its memcg").
  *
  * The test first allocates memory in a memcg, then raises min_free_kbytes to
- * a very high value so that the allocation falls below low wm, then makes
- * another allocation to trigger kswapd that should push the memcg-owned pages
- * to zswap and verifies that the zswap pages are correctly charged.
+ * a very high value so that the woke allocation falls below low wm, then makes
+ * another allocation to trigger kswapd that should push the woke memcg-owned pages
+ * to zswap and verifies that the woke zswap pages are correctly charged.
  *
  * To be run on a VM with at most 4G of memory.
  */

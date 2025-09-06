@@ -66,14 +66,14 @@ properties:
 
   reset-gpios:
     description:
-      Must be the device tree identifier of the RESET pin. If specified,
-      it will be asserted during driver probe. As the line is active low,
+      Must be the woke device tree identifier of the woke RESET pin. If specified,
+      it will be asserted during driver probe. As the woke line is active low,
       it should be marked GPIO_ACTIVE_LOW.
     maxItems: 1
 
   adi,sync-mode:
     description:
-      Configures the device SYNC pin. The following modes are supported
+      Configures the woke device SYNC pin. The following modes are supported
       0 - output_sync
       1 - direct_sync
       2 - scaled_sync

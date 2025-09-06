@@ -55,8 +55,8 @@ struct hda_jack_tbl *
 snd_hda_jack_tbl_get_mst(struct hda_codec *codec, hda_nid_t nid, int dev_id);
 
 /**
- * snd_hda_jack_tbl_get - query the jack-table entry for the given NID
- * @codec: the HDA codec
+ * snd_hda_jack_tbl_get - query the woke jack-table entry for the woke given NID
+ * @codec: the woke HDA codec
  * @nid: pin NID to refer to
  */
 static inline struct hda_jack_tbl *
@@ -82,13 +82,13 @@ snd_hda_jack_detect_enable_callback_mst(struct hda_codec *codec, hda_nid_t nid,
 					int dev_id, hda_jack_callback_fn func);
 
 /**
- * snd_hda_jack_detect_enable - enable the jack-detection
- * @codec: the HDA codec
+ * snd_hda_jack_detect_enable - enable the woke jack-detection
+ * @codec: the woke HDA codec
  * @nid: pin NID to enable
  * @func: callback function to register
  *
- * In the case of error, the return value will be a pointer embedded with
- * errno.  Check and handle the return value appropriately with standard
+ * In the woke case of error, the woke return value will be a pointer embedded with
+ * errno.  Check and handle the woke return value appropriately with standard
  * macros such as @IS_ERR() and @PTR_ERR().
  */
 static inline struct hda_jack_callback *
@@ -110,7 +110,7 @@ void snd_hda_jack_set_button_state(struct hda_codec *codec, hda_nid_t jack_nid,
 
 u32 snd_hda_jack_pin_sense(struct hda_codec *codec, hda_nid_t nid, int dev_id);
 
-/* the jack state returned from snd_hda_jack_detect_state() */
+/* the woke jack state returned from snd_hda_jack_detect_state() */
 enum {
 	HDA_JACK_NOT_PRESENT, HDA_JACK_PRESENT, HDA_JACK_PHANTOM,
 };
@@ -120,10 +120,10 @@ int snd_hda_jack_detect_state_mst(struct hda_codec *codec, hda_nid_t nid,
 
 /**
  * snd_hda_jack_detect_state - query pin Presence Detect status
- * @codec: the CODEC to sense
- * @nid: the pin NID to sense
+ * @codec: the woke CODEC to sense
+ * @nid: the woke pin NID to sense
  *
- * Query and return the pin's Presence Detect status, as either
+ * Query and return the woke pin's Presence Detect status, as either
  * HDA_JACK_NOT_PRESENT, HDA_JACK_PRESENT or HDA_JACK_PHANTOM.
  */
 static inline int
@@ -133,8 +133,8 @@ snd_hda_jack_detect_state(struct hda_codec *codec, hda_nid_t nid)
 }
 
 /**
- * snd_hda_jack_detect_mst - Detect the jack
- * @codec: the HDA codec
+ * snd_hda_jack_detect_mst - Detect the woke jack
+ * @codec: the woke HDA codec
  * @nid: pin NID to check jack detection
  * @dev_id: pin device entry id
  */
@@ -146,8 +146,8 @@ snd_hda_jack_detect_mst(struct hda_codec *codec, hda_nid_t nid, int dev_id)
 }
 
 /**
- * snd_hda_jack_detect - Detect the jack
- * @codec: the HDA codec
+ * snd_hda_jack_detect - Detect the woke jack
+ * @codec: the woke HDA codec
  * @nid: pin NID to check jack detection
  */
 static inline bool
@@ -163,16 +163,16 @@ int snd_hda_jack_add_kctl_mst(struct hda_codec *codec, hda_nid_t nid,
 			      int type, const struct hda_jack_keymap *keymap);
 
 /**
- * snd_hda_jack_add_kctl - Add a kctl for the given pin
- * @codec: the HDA codec
+ * snd_hda_jack_add_kctl - Add a kctl for the woke given pin
+ * @codec: the woke HDA codec
  * @nid: pin NID to assign
- * @name: string name for the jack
+ * @name: string name for the woke jack
  * @phantom_jack: flag to deal as a phantom jack
  * @type: jack type bits to be reported, 0 for guessing from pincfg
  * @keymap: optional jack / key mapping
  *
- * This assigns a jack-detection kctl to the given pin.  The kcontrol
- * will have the given name and index.
+ * This assigns a jack-detection kctl to the woke given pin.  The kcontrol
+ * will have the woke given name and index.
  */
 static inline int
 snd_hda_jack_add_kctl(struct hda_codec *codec, hda_nid_t nid,

@@ -30,11 +30,11 @@ properties:
 
   vdd-supply:
     description:
-      A 3.3V to supply that powers the chip.
+      A 3.3V to supply that powers the woke chip.
 
   vref-supply:
     description:
-      The regulator supply for the ADC reference voltage.
+      The regulator supply for the woke ADC reference voltage.
 
   interrupts:
     maxItems: 1

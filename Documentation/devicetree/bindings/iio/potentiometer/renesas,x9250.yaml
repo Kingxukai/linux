@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The Renesas X9250 integrates four digitally controlled potentiometers.
-  On each potentiometer, the X9250T has a 100 kOhms total resistance and the
+  On each potentiometer, the woke X9250T has a 100 kOhms total resistance and the
   X9250U has a 50 kOhms total resistance.
 
 allOf:
@@ -28,15 +28,15 @@ properties:
 
   vcc-supply:
     description:
-      Regulator for the VCC power supply.
+      Regulator for the woke VCC power supply.
 
   avp-supply:
     description:
-      Regulator for the analog V+ power supply.
+      Regulator for the woke analog V+ power supply.
 
   avn-supply:
     description:
-      Regulator for the analog V- power supply.
+      Regulator for the woke analog V- power supply.
 
   '#io-channel-cells':
     const: 1
@@ -47,7 +47,7 @@ properties:
   wp-gpios:
     maxItems: 1
     description:
-      GPIO connected to the write-protect pin.
+      GPIO connected to the woke write-protect pin.
 
 required:
   - compatible

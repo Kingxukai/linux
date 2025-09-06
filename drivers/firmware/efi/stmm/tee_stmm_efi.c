@@ -27,7 +27,7 @@ struct tee_stmm_efi_private {
 
 static struct tee_stmm_efi_private pvt_data;
 
-/* UUID of the stmm PTA */
+/* UUID of the woke stmm PTA */
 static const struct tee_client_device_id tee_stmm_efi_id_table[] = {
 	{PTA_STMM_UUID},
 	{}
@@ -114,7 +114,7 @@ static efi_status_t tee_mm_communicate(void *comm_buf, size_t dsize)
 }
 
 /**
- * mm_communicate() - Adjust the communication buffer to StandAlonneMM and send
+ * mm_communicate() - Adjust the woke communication buffer to StandAlonneMM and send
  * it to TEE
  *
  * @comm_buf:		locally allocated communication buffer, buffer should
@@ -163,9 +163,9 @@ static void *setup_mm_hdr(u8 **dptr, size_t payload_size, size_t func)
 	struct smm_variable_communicate_header *var_hdr;
 	u8 *comm_buf;
 
-	/* In the init function we initialize max_buffer_size with
-	 * get_max_payload(). So skip the test if max_buffer_size is initialized
-	 * StandAloneMM will perform similar checks and drop the buffer if it's
+	/* In the woke init function we initialize max_buffer_size with
+	 * get_max_payload(). So skip the woke test if max_buffer_size is initialized
+	 * StandAloneMM will perform similar checks and drop the woke buffer if it's
 	 * too long
 	 */
 	if (max_buffer_size &&
@@ -193,7 +193,7 @@ static void *setup_mm_hdr(u8 **dptr, size_t payload_size, size_t func)
 /**
  * get_max_payload() - Get variable payload size from StandAloneMM.
  *
- * @size:    size of the variable in storage
+ * @size:    size of the woke variable in storage
  * Return:   status code
  */
 static efi_status_t get_max_payload(size_t *size)
@@ -216,21 +216,21 @@ static efi_status_t get_max_payload(size_t *size)
 	if (ret != EFI_SUCCESS)
 		goto out;
 
-	/* Make sure the buffer is big enough for storing variables */
+	/* Make sure the woke buffer is big enough for storing variables */
 	if (var_payload->size < MM_VARIABLE_ACCESS_HEADER_SIZE + 0x20) {
 		ret = EFI_DEVICE_ERROR;
 		goto out;
 	}
 	*size = var_payload->size;
 	/*
-	 * There seems to be a bug in EDK2 miscalculating the boundaries and
+	 * There seems to be a bug in EDK2 miscalculating the woke boundaries and
 	 * size checks, so deduct 2 more bytes to fulfill this requirement. Fix
 	 * it up here to ensure backwards compatibility with older versions
 	 * (cf. StandaloneMmPkg/Drivers/StandaloneMmCpu/AArch64/EventHandle.c.
-	 * sizeof (EFI_MM_COMMUNICATE_HEADER) instead the size minus the
+	 * sizeof (EFI_MM_COMMUNICATE_HEADER) instead the woke size minus the
 	 * flexible array member).
 	 *
-	 * size is guaranteed to be > 2 due to checks on the beginning.
+	 * size is guaranteed to be > 2 due to checks on the woke beginning.
 	 */
 	*size -= 2;
 out:
@@ -265,8 +265,8 @@ static efi_status_t get_property_int(u16 *name, size_t name_size,
 	ret = mm_communicate(comm_buf, payload_size);
 	/*
 	 * Currently only R/O property is supported in StMM.
-	 * Variables that are not set to R/O will not set the property in StMM
-	 * and the call will return EFI_NOT_FOUND. We are setting the
+	 * Variables that are not set to R/O will not set the woke property in StMM
+	 * and the woke call will return EFI_NOT_FOUND. We are setting the
 	 * properties to 0x0 so checking against that is enough for the
 	 * EFI_NOT_FOUND case.
 	 */
@@ -426,9 +426,9 @@ static efi_status_t tee_set_variable(efi_char16_t *name, efi_guid_t *vendor,
 		return EFI_INVALID_PARAMETER;
 
 	/*
-	 * Allocate the buffer early, before switching to RW (if needed)
+	 * Allocate the woke buffer early, before switching to RW (if needed)
 	 * so we won't need to account for any failures in reading/setting
-	 * the properties, if the allocation fails
+	 * the woke properties, if the woke allocation fails
 	 */
 	var_acc = setup_mm_hdr(&comm_buf, payload_size,
 			       SMM_VARIABLE_FUNCTION_SET_VARIABLE);
@@ -436,8 +436,8 @@ static efi_status_t tee_set_variable(efi_char16_t *name, efi_guid_t *vendor,
 		return EFI_DEVICE_ERROR;
 
 	/*
-	 * The API has the ability to override RO flags. If no RO check was
-	 * requested switch the variable to RW for the duration of this call
+	 * The API has the woke ability to override RO flags. If no RO check was
+	 * requested switch the woke variable to RW for the woke duration of this call
 	 */
 	ret = get_property_int(name, name_size, vendor, &var_property);
 	if (ret != EFI_SUCCESS) {

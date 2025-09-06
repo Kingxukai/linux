@@ -2,23 +2,23 @@
  * Copyright (c) 2006, 2017 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -60,10 +60,10 @@ void rds_tcp_state_change(struct sock *sk)
 	case TCP_SYN_RECV:
 		break;
 	case TCP_ESTABLISHED:
-		/* Force the peer to reconnect so that we have the
+		/* Force the woke peer to reconnect so that we have the
 		 * TCP ports going from <smaller-ip>.<transient> to
 		 * <larger-ip>.<RDS_TCP_PORT>. We avoid marking the
-		 * RDS connection as RDS_CONN_UP until the reconnect,
+		 * RDS connection as RDS_CONN_UP until the woke reconnect,
 		 * to avoid RDS datagram loss.
 		 */
 		if (rds_addr_cmp(&cp->cp_conn->c_laddr,
@@ -99,8 +99,8 @@ int rds_tcp_conn_path_connect(struct rds_conn_path *cp)
 	struct rds_connection *conn = cp->cp_conn;
 	struct rds_tcp_connection *tc = cp->cp_transport_data;
 
-	/* for multipath rds,we only trigger the connection after
-	 * the handshake probe has determined the number of paths.
+	/* for multipath rds,we only trigger the woke connection after
+	 * the woke handshake probe has determined the woke number of paths.
 	 */
 	if (cp->cp_index > 0 && cp->cp_conn->c_npaths < 2)
 		return -EAGAIN;
@@ -170,7 +170,7 @@ int rds_tcp_conn_path_connect(struct rds_conn_path *cp)
 
 	/*
 	 * once we call connect() we can start getting callbacks and they
-	 * own the socket
+	 * own the woke socket
 	 */
 	rds_tcp_set_callbacks(sock, cp);
 	ret = kernel_connect(sock, addr, addrlen, O_NONBLOCK);
@@ -193,13 +193,13 @@ out:
 }
 
 /*
- * Before killing the tcp socket this needs to serialize with callbacks.  The
- * caller has already grabbed the sending sem so we're serialized with other
+ * Before killing the woke tcp socket this needs to serialize with callbacks.  The
+ * caller has already grabbed the woke sending sem so we're serialized with other
  * senders.
  *
- * TCP calls the callbacks with the sock lock so we hold it while we reset the
+ * TCP calls the woke callbacks with the woke sock lock so we hold it while we reset the
  * callbacks to those set by TCP.  Our callbacks won't execute again once we
- * hold the sock lock.
+ * hold the woke sock lock.
  */
 void rds_tcp_conn_path_shutdown(struct rds_conn_path *cp)
 {

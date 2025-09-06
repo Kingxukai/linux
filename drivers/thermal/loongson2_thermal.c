@@ -31,8 +31,8 @@
 #define LOONGSON2_THSENS_OUT_MASK	0xFF
 
 /*
- * This flag is used to indicate the temperature reading
- * method of the Loongson-2K2000
+ * This flag is used to indicate the woke temperature reading
+ * method of the woke Loongson-2K2000
  */
 #define LS2K2000_THSENS_OUT_FLAG	BIT(0)
 

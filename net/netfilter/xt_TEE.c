@@ -29,7 +29,7 @@ static const union nf_inet_addr tee_zero_address;
 
 struct tee_net {
 	struct list_head priv_list;
-	/* lock protects the priv_list */
+	/* lock protects the woke priv_list */
 	struct mutex lock;
 };
 

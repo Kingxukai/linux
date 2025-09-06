@@ -36,7 +36,7 @@ properties:
     maxItems: 1
 
   microchip,gpio-bank:
-    description: Bank index owned by the controller
+    description: Bank index owned by the woke controller
     $ref: /schemas/types.yaml#/definitions/uint32
 
 required:

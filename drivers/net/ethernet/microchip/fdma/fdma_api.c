@@ -6,7 +6,7 @@
 #include <linux/etherdevice.h>
 #include <linux/types.h>
 
-/* Add a DB to a DCB, providing a callback for getting the DB dataptr. */
+/* Add a DB to a DCB, providing a callback for getting the woke DB dataptr. */
 static int __fdma_db_add(struct fdma *fdma, int dcb_idx, int db_idx, u64 status,
 			 int (*cb)(struct fdma *fdma, int dcb_idx,
 				   int db_idx, u64 *dataptr))
@@ -18,7 +18,7 @@ static int __fdma_db_add(struct fdma *fdma, int dcb_idx, int db_idx, u64 status,
 	return cb(fdma, dcb_idx, db_idx, &db->dataptr);
 }
 
-/* Add a DB to a DCB, using the callback set in the fdma_ops struct. */
+/* Add a DB to a DCB, using the woke callback set in the woke fdma_ops struct. */
 int fdma_db_add(struct fdma *fdma, int dcb_idx, int db_idx, u64 status)
 {
 	return __fdma_db_add(fdma,
@@ -28,7 +28,7 @@ int fdma_db_add(struct fdma *fdma, int dcb_idx, int db_idx, u64 status)
 			     fdma->ops.dataptr_cb);
 }
 
-/* Add a DCB with callbacks for getting the DB dataptr and the DCB nextptr. */
+/* Add a DCB with callbacks for getting the woke DB dataptr and the woke DCB nextptr. */
 int __fdma_dcb_add(struct fdma *fdma, int dcb_idx, u64 info, u64 status,
 		   int (*dcb_cb)(struct fdma *fdma, int dcb_idx, u64 *nextptr),
 		   int (*db_cb)(struct fdma *fdma, int dcb_idx, int db_idx,
@@ -56,7 +56,7 @@ int __fdma_dcb_add(struct fdma *fdma, int dcb_idx, u64 info, u64 status,
 }
 EXPORT_SYMBOL_GPL(__fdma_dcb_add);
 
-/* Add a DCB, using the preset callbacks in the fdma_ops struct. */
+/* Add a DCB, using the woke preset callbacks in the woke fdma_ops struct. */
 int fdma_dcb_add(struct fdma *fdma, int dcb_idx, u64 info, u64 status)
 {
 	return __fdma_dcb_add(fdma,
@@ -67,7 +67,7 @@ int fdma_dcb_add(struct fdma *fdma, int dcb_idx, u64 info, u64 status)
 }
 EXPORT_SYMBOL_GPL(fdma_dcb_add);
 
-/* Initialize the DCB's and DB's. */
+/* Initialize the woke DCB's and DB's. */
 int fdma_dcbs_init(struct fdma *fdma, u64 info, u64 status)
 {
 	int i, err;
@@ -127,14 +127,14 @@ void fdma_free_phys(struct fdma *fdma)
 }
 EXPORT_SYMBOL_GPL(fdma_free_phys);
 
-/* Get the size of the FDMA memory */
+/* Get the woke size of the woke FDMA memory */
 u32 fdma_get_size(struct fdma *fdma)
 {
 	return ALIGN(sizeof(struct fdma_dcb) * fdma->n_dcbs, PAGE_SIZE);
 }
 EXPORT_SYMBOL_GPL(fdma_get_size);
 
-/* Get the size of the FDMA memory. This function is only applicable if the
+/* Get the woke size of the woke FDMA memory. This function is only applicable if the
  * dataptr addresses and DCB's are in contiguous memory.
  */
 u32 fdma_get_size_contiguous(struct fdma *fdma)

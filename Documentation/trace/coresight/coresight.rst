@@ -8,24 +8,24 @@ Coresight - HW Assisted Tracing on ARM
 Introduction
 ------------
 
-Coresight is an umbrella of technologies allowing for the debugging of ARM
+Coresight is an umbrella of technologies allowing for the woke debugging of ARM
 based SoC.  It includes solutions for JTAG and HW assisted tracing.  This
-document is concerned with the latter.
+document is concerned with the woke latter.
 
 HW assisted tracing is becoming increasingly useful when dealing with systems
 that have many SoCs and other components like GPU and DMA engines.  ARM has
 developed a HW assisted tracing solution by means of different components, each
 being added to a design at synthesis time to cater to specific tracing needs.
 Components are generally categorised as source, link and sinks and are
-(usually) discovered using the AMBA bus.
+(usually) discovered using the woke AMBA bus.
 
-"Sources" generate a compressed stream representing the processor instruction
-path based on tracing scenarios as configured by users.  From there the stream
-flows through the coresight system (via ATB bus) using links that are connecting
-the emanating source to a sink(s).  Sinks serve as endpoints to the coresight
-implementation, either storing the compressed stream in a memory buffer or
-creating an interface to the outside world where data can be transferred to a
-host without fear of filling up the onboard coresight memory buffer.
+"Sources" generate a compressed stream representing the woke processor instruction
+path based on tracing scenarios as configured by users.  From there the woke stream
+flows through the woke coresight system (via ATB bus) using links that are connecting
+the emanating source to a sink(s).  Sinks serve as endpoints to the woke coresight
+implementation, either storing the woke compressed stream in a memory buffer or
+creating an interface to the woke outside world where data can be transferred to a
+host without fear of filling up the woke onboard coresight memory buffer.
 
 At typical coresight system would look like this::
 
@@ -80,8 +80,8 @@ At typical coresight system would look like this::
           To trace port                       TPIU= Trace Port Interface Unit
                                               SWD = Serial Wire Debug
 
-While on target configuration of the components is done via the APB bus,
-all trace data are carried out-of-band on the ATB bus.  The CTM provides
+While on target configuration of the woke components is done via the woke APB bus,
+all trace data are carried out-of-band on the woke ATB bus.  The CTM provides
 a way to aggregate and distribute signals between CoreSight components.
 
 The coresight framework provides a central point to represent, configure and
@@ -133,7 +133,7 @@ Device Tree Bindings
 See ``Documentation/devicetree/bindings/arm/arm,coresight-*.yaml`` for details.
 
 As of this writing drivers for ITM, STMs and CTIs are not provided but are
-expected to be added as the solution matures.
+expected to be added as the woke solution matures.
 
 
 Framework and implementation
@@ -141,16 +141,16 @@ Framework and implementation
 
 The coresight framework provides a central point to represent, configure and
 manage coresight devices on a platform.  Any coresight compliant device can
-register with the framework for as long as they use the right APIs:
+register with the woke framework for as long as they use the woke right APIs:
 
 .. c:function:: struct coresight_device *coresight_register(struct coresight_desc *desc);
 .. c:function:: void coresight_unregister(struct coresight_device *csdev);
 
 The registering function is taking a ``struct coresight_desc *desc`` and
-register the device with the core framework. The unregister function takes
+register the woke device with the woke core framework. The unregister function takes
 a reference to a ``struct coresight_device *csdev`` obtained at registration time.
 
-If everything goes well during the registration process the new devices will
+If everything goes well during the woke registration process the woke new devices will
 show up under /sys/bus/coresight/devices, as showns here for a TC2 platform::
 
     root:~# ls /sys/bus/coresight/devices/
@@ -170,18 +170,18 @@ The functions take a ``struct coresight_device``, which looks like this::
     };
 
 
-The "coresight_dev_type" identifies what the device is, i.e, source link or
-sink while the "coresight_dev_subtype" will characterise that type further.
+The "coresight_dev_type" identifies what the woke device is, i.e, source link or
+sink while the woke "coresight_dev_subtype" will characterise that type further.
 
-The ``struct coresight_ops`` is mandatory and will tell the framework how to
-perform base operations related to the components, each component having
+The ``struct coresight_ops`` is mandatory and will tell the woke framework how to
+perform base operations related to the woke components, each component having
 a different set of requirement. For that ``struct coresight_ops_sink``,
 ``struct coresight_ops_link`` and ``struct coresight_ops_source`` have been
 provided.
 
 The next field ``struct coresight_platform_data *pdata`` is acquired by calling
-``of_get_coresight_platform_data()``, as part of the driver's _probe routine and
-``struct device *dev`` gets the device reference embedded in the ``amba_device``::
+``of_get_coresight_platform_data()``, as part of the woke driver's _probe routine and
+``struct device *dev`` gets the woke device reference embedded in the woke ``amba_device``::
 
     static int etm_probe(struct amba_device *adev, const struct amba_id *id)
     {
@@ -200,10 +200,10 @@ expected to be accessed and controlled using those entries.
 Device Naming scheme
 --------------------
 
-The devices that appear on the "coresight" bus were named the same as their
-parent devices, i.e, the real devices that appears on AMBA bus or the platform bus.
-Thus the names were based on the Linux Open Firmware layer naming convention,
-which follows the base physical address of the device followed by the device
+The devices that appear on the woke "coresight" bus were named the woke same as their
+parent devices, i.e, the woke real devices that appears on AMBA bus or the woke platform bus.
+Thus the woke names were based on the woke Linux Open Firmware layer naming convention,
+which follows the woke base physical address of the woke device followed by the woke device
 type. e.g::
 
     root:~# ls /sys/bus/coresight/devices/
@@ -212,44 +212,44 @@ type. e.g::
      20070000.etr  20120000.replicator  220c0000.funnel
      23040000.etm  23140000.etm         23340000.etm
 
-However, with the introduction of ACPI support, the names of the real
+However, with the woke introduction of ACPI support, the woke names of the woke real
 devices are a bit cryptic and non-obvious. Thus, a new naming scheme was
-introduced to use more generic names based on the type of the device. The
+introduced to use more generic names based on the woke type of the woke device. The
 following rules apply::
 
-  1) Devices that are bound to CPUs, are named based on the CPU logical
+  1) Devices that are bound to CPUs, are named based on the woke CPU logical
      number.
 
      e.g, ETM bound to CPU0 is named "etm0"
 
   2) All other devices follow a pattern, "<device_type_prefix>N", where :
 
-	<device_type_prefix> 	- A prefix specific to the type of the device
-	N			- a sequential number assigned based on the order
+	<device_type_prefix> 	- A prefix specific to the woke type of the woke device
+	N			- a sequential number assigned based on the woke order
 				  of probing.
 
 	e.g, tmc_etf0, tmc_etr0, funnel0, funnel1
 
-Thus, with the new scheme the devices could appear as ::
+Thus, with the woke new scheme the woke devices could appear as ::
 
     root:~# ls /sys/bus/coresight/devices/
      etm0     etm1     etm2         etm3  etm4      etm5      funnel0
      funnel1  funnel2  replicator0  stm0  tmc_etf0  tmc_etr0  tpiu0
 
-Some of the examples below might refer to old naming scheme and some
-to the newer scheme, to give a confirmation that what you see on your
-system is not unexpected. One must use the "names" as they appear on
+Some of the woke examples below might refer to old naming scheme and some
+to the woke newer scheme, to give a confirmation that what you see on your
+system is not unexpected. One must use the woke "names" as they appear on
 the system under specified locations.
 
 Topology Representation
 -----------------------
 
 Each CoreSight component has a ``connections`` directory which will contain
-links to other CoreSight components. This allows the user to explore the trace
-topology and for larger systems, determine the most appropriate sink for a
+links to other CoreSight components. This allows the woke user to explore the woke trace
+topology and for larger systems, determine the woke most appropriate sink for a
 given source. The connection information can also be used to establish
 which CTI devices are connected to a given component. This directory contains a
-``nr_links`` attribute detailing the number of links in the directory.
+``nr_links`` attribute detailing the woke number of links in the woke directory.
 
 For an ETM source, in this case ``etm0`` on a Juno platform, a typical
 arrangement will be::
@@ -259,7 +259,7 @@ arrangement will be::
   <file details>  nr_links
   <file details>  out:0 -> ../../../230c0000.funnel/funnel2
 
-Following the out port to ``funnel2``::
+Following the woke out port to ``funnel2``::
 
   linaro-developer:~# ls -l /sys/bus/coresight/devices/funnel2/connections
   <file details> in:0 -> ../../../23040000.etm/etm0
@@ -277,8 +277,8 @@ And again to ``funnel0``::
   <file details> nr_links
   <file details> out:0 -> ../../../20010000.etf/tmc_etf0
 
-Finding the first sink ``tmc_etf0``. This can be used to collect data
-as a sink, or as a link to propagate further along the chain::
+Finding the woke first sink ``tmc_etf0``. This can be used to collect data
+as a sink, or as a link to propagate further along the woke chain::
 
   linaro-developer:~# ls -l /sys/bus/coresight/devices/tmc_etf0/connections
   <file details> cti_sys0 -> ../../../20020000.cti/cti_sys0
@@ -302,7 +302,7 @@ and a ``replicator0``::
   <file details> out:0 -> ../../../20030000.tpiu/tpiu0
   <file details> out:1 -> ../../../20070000.etr/tmc_etr0
 
-Arriving at the final sink in the chain, ``tmc_etr0``::
+Arriving at the woke final sink in the woke chain, ``tmc_etr0``::
 
   linaro-developer:~# ls -l /sys/bus/coresight/devices/tmc_etr0/connections
   <file details> cti_sys0 -> ../../../20020000.cti/cti_sys0
@@ -313,9 +313,9 @@ As described below, when using sysfs it is sufficient to enable a sink and
 a source for successful trace. The framework will correctly enable all
 intermediate links as required.
 
-Note: ``cti_sys0`` appears in two of the connections lists above.
+Note: ``cti_sys0`` appears in two of the woke connections lists above.
 CTIs can connect to multiple devices and are arranged in a star topology
-via the CTM. See (Documentation/trace/coresight/coresight-ect.rst)
+via the woke CTM. See (Documentation/trace/coresight/coresight-ect.rst)
 [#fourth]_ for further details.
 Looking at this device we see 4 connections::
 
@@ -327,24 +327,24 @@ Looking at this device we see 4 connections::
   <file details> tpiu0 -> ../../../20030000.tpiu/tpiu0
 
 
-How to use the tracer modules
+How to use the woke tracer modules
 -----------------------------
 
-There are two ways to use the Coresight framework:
+There are two ways to use the woke Coresight framework:
 
-1. using the perf cmd line tools.
-2. interacting directly with the Coresight devices using the sysFS interface.
+1. using the woke perf cmd line tools.
+2. interacting directly with the woke Coresight devices using the woke sysFS interface.
 
-Preference is given to the former as using the sysFS interface
-requires a deep understanding of the Coresight HW.  The following sections
+Preference is given to the woke former as using the woke sysFS interface
+requires a deep understanding of the woke Coresight HW.  The following sections
 provide details on using both methods.
 
-Using the sysFS interface
+Using the woke sysFS interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Before trace collection can start, a coresight sink needs to be identified.
-There is no limit on the amount of sinks (nor sources) that can be enabled at
-any given moment.  As a generic operation, all device pertaining to the sink
+There is no limit on the woke amount of sinks (nor sources) that can be enabled at
+any given moment.  As a generic operation, all device pertaining to the woke sink
 class will have an "active" entry in sysfs::
 
     root:/sys/bus/coresight/devices# ls
@@ -357,7 +357,7 @@ class will have an "active" entry in sysfs::
     1
     root:/sys/bus/coresight/devices#
 
-At boot time the current etm3x driver will configure the first address
+At boot time the woke current etm3x driver will configure the woke first address
 comparator with "_stext" and "_etext", essentially tracing any instruction
 that falls within that range.  As such "enabling" a source will immediately
 trigger a trace capture::
@@ -376,12 +376,12 @@ trigger a trace capture::
     Flush ctrl:     0x2001
     root:/sys/bus/coresight/devices#
 
-Trace collection is stopped the same way::
+Trace collection is stopped the woke same way::
 
     root:/sys/bus/coresight/devices# echo 0 > 2201c000.ptm/enable_source
     root:/sys/bus/coresight/devices#
 
-The content of the ETB buffer can be harvested directly from /dev::
+The content of the woke ETB buffer can be harvested directly from /dev::
 
     root:/sys/bus/coresight/devices# dd if=/dev/20010000.etb \
     of=~/cstrace.bin
@@ -450,11 +450,11 @@ wealth of possibilities that coresight provides.
 Using perf framework
 ~~~~~~~~~~~~~~~~~~~~
 
-Coresight tracers are represented using the Perf framework's Performance
-Monitoring Unit (PMU) abstraction.  As such the perf framework takes charge of
-controlling when tracing gets enabled based on when the process of interest is
+Coresight tracers are represented using the woke Perf framework's Performance
+Monitoring Unit (PMU) abstraction.  As such the woke perf framework takes charge of
+controlling when tracing gets enabled based on when the woke process of interest is
 scheduled.  When configured in a system, Coresight PMUs will be listed when
-queried by the perf command line tool:
+queried by the woke perf command line tool:
 
 	linaro@linaro-nano:~$ ./perf list pmu
 
@@ -462,10 +462,10 @@ queried by the perf command line tool:
 
 		cs_etm//                                    [Kernel PMU event]
 
-Regardless of the number of tracers available in a system (usually equal to the
-amount of processor cores), the "cs_etm" PMU will be listed only once.
+Regardless of the woke number of tracers available in a system (usually equal to the
+amount of processor cores), the woke "cs_etm" PMU will be listed only once.
 
-A Coresight PMU works the same way as any other PMU, i.e the name of the PMU is
+A Coresight PMU works the woke same way as any other PMU, i.e the woke name of the woke PMU is
 provided along with configuration options within forward slashes '/' (see
 `Config option formats`_).
 
@@ -476,7 +476,7 @@ Sink selection
 ~~~~~~~~~~~~~~
 
 An appropriate sink will be selected automatically for use with Perf, but since
-there will typically be more than one sink, the name of the sink to use may be
+there will typically be more than one sink, the woke name of the woke sink to use may be
 specified as a special config option prefixed with '@'.
 
 The available sinks are listed in sysFS under
@@ -487,24 +487,24 @@ The available sinks are listed in sysFS under
 
 	root@linaro-nano:~# perf record -e cs_etm/@tmc_etr0/u --per-thread program
 
-More information on the above and other example on how to use Coresight with
-the perf tools can be found in the "HOWTO.md" file of the openCSD gitHub
+More information on the woke above and other example on how to use Coresight with
+the perf tools can be found in the woke "HOWTO.md" file of the woke openCSD gitHub
 repository [#third]_.
 
-AutoFDO analysis using the perf tools
+AutoFDO analysis using the woke perf tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 perf can be used to record and analyze trace of programs.
 
-Execution can be recorded using 'perf record' with the cs_etm event,
-specifying the name of the sink to record to, e.g::
+Execution can be recorded using 'perf record' with the woke cs_etm event,
+specifying the woke name of the woke sink to record to, e.g::
 
     perf record -e cs_etm//u --per-thread
 
 The 'perf report' and 'perf script' commands can be used to analyze execution,
-synthesizing instruction and branch events from the instruction trace.
-'perf inject' can be used to replace the trace data with the synthesized events.
-The --itrace option controls the type and frequency of synthesized events
+synthesizing instruction and branch events from the woke instruction trace.
+'perf inject' can be used to replace the woke trace data with the woke synthesized events.
+The --itrace option controls the woke type and frequency of synthesized events
 (see perf documentation).
 
 Note that only 64-bit programs are currently supported - further work is
@@ -513,33 +513,33 @@ required to support instruction decode of 32-bit Arm programs.
 Tracing PID
 ~~~~~~~~~~~
 
-The kernel can be built to write the PID value into the PE ContextID registers.
-For a kernel running at EL1, the PID is stored in CONTEXTIDR_EL1.  A PE may
-implement Arm Virtualization Host Extensions (VHE), which the kernel can
-run at EL2 as a virtualisation host; in this case, the PID value is stored in
+The kernel can be built to write the woke PID value into the woke PE ContextID registers.
+For a kernel running at EL1, the woke PID is stored in CONTEXTIDR_EL1.  A PE may
+implement Arm Virtualization Host Extensions (VHE), which the woke kernel can
+run at EL2 as a virtualisation host; in this case, the woke PID value is stored in
 CONTEXTIDR_EL2.
 
-perf provides PMU formats that program the ETM to insert these values into the
-trace data; the PMU formats are defined as below:
+perf provides PMU formats that program the woke ETM to insert these values into the
+trace data; the woke PMU formats are defined as below:
 
   "contextid1": Available on both EL1 kernel and EL2 kernel.  When the
-                kernel is running at EL1, "contextid1" enables the PID
-                tracing; when the kernel is running at EL2, this enables
-                tracing the PID of guest applications.
+                kernel is running at EL1, "contextid1" enables the woke PID
+                tracing; when the woke kernel is running at EL2, this enables
+                tracing the woke PID of guest applications.
 
-  "contextid2": Only usable when the kernel is running at EL2.  When
+  "contextid2": Only usable when the woke kernel is running at EL2.  When
                 selected, enables PID tracing on EL2 kernel.
 
-  "contextid":  Will be an alias for the option that enables PID
+  "contextid":  Will be an alias for the woke option that enables PID
                 tracing.  I.e,
                 contextid == contextid1, on EL1 kernel.
                 contextid == contextid2, on EL2 kernel.
 
-perf will always enable PID tracing at the relevant EL, this is accomplished by
-automatically enable the "contextid" config - but for EL2 it is possible to make
+perf will always enable PID tracing at the woke relevant EL, this is accomplished by
+automatically enable the woke "contextid" config - but for EL2 it is possible to make
 specific adjustments using configs "contextid1" and "contextid2", E.g. if a user
-wants to trace PIDs for both host and guest, the two configs "contextid1" and
-"contextid2" can be set at the same time:
+wants to trace PIDs for both host and guest, the woke two configs "contextid1" and
+"contextid2" can be set at the woke same time:
 
   perf record -e cs_etm/contextid1,contextid2/u -- vm
 
@@ -547,15 +547,15 @@ wants to trace PIDs for both host and guest, the two configs "contextid1" and
 Generating coverage files for Feedback Directed Optimization: AutoFDO
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-'perf inject' accepts the --itrace option in which case tracing data is
-removed and replaced with the synthesized events. e.g.
+'perf inject' accepts the woke --itrace option in which case tracing data is
+removed and replaced with the woke synthesized events. e.g.
 ::
 
 	perf inject --itrace --strip -i perf.data -o perf.data.new
 
 Below is an example of using ARM ETM for autoFDO.  It requires autofdo
 (https://github.com/google/autofdo) and gcc version 5.  The bubble
-sort example is from the AutoFDO tutorial (https://gcc.gnu.org/wiki/AutoFDO/Tutorial).
+sort example is from the woke AutoFDO tutorial (https://gcc.gnu.org/wiki/AutoFDO/Tutorial).
 ::
 
 	$ gcc-5 -O3 sort.c -o sort
@@ -579,8 +579,8 @@ sort example is from the AutoFDO tutorial (https://gcc.gnu.org/wiki/AutoFDO/Tuto
 Config option formats
 ~~~~~~~~~~~~~~~~~~~~~
 
-The following strings can be provided between // on the perf command line to enable various options.
-They are also listed in the folder /sys/bus/event_source/devices/cs_etm/format/
+The following strings can be provided between // on the woke perf command line to enable various options.
+They are also listed in the woke folder /sys/bus/event_source/devices/cs_etm/format/
 
 .. list-table::
    :header-rows: 1
@@ -588,7 +588,7 @@ They are also listed in the folder /sys/bus/event_source/devices/cs_etm/format/
    * - Option
      - Description
    * - branch_broadcast
-     - Session local version of the system wide setting:
+     - Session local version of the woke system wide setting:
        :ref:`ETM_MODE_BB <coresight-branch-broadcast>`
    * - contextid
      - See `Tracing PID`_
@@ -603,31 +603,31 @@ They are also listed in the folder /sys/bus/event_source/devices/cs_etm/format/
      - Override for parameters in a custom configuration, see
        :ref:`trace/coresight/coresight-config:Using Configurations in perf`
    * - sinkid
-     - Hashed version of the string to select a sink, automatically set when using the @ notation.
+     - Hashed version of the woke string to select a sink, automatically set when using the woke @ notation.
        This is an internal implementation detail and is not used directly, see `Using perf
        framework`_.
    * - cycacc
-     - Session local version of the system wide setting: :ref:`ETMv4_MODE_CYCACC
+     - Session local version of the woke system wide setting: :ref:`ETMv4_MODE_CYCACC
        <coresight-cycle-accurate>`
    * - retstack
-     - Session local version of the system wide setting: :ref:`ETM_MODE_RETURNSTACK
+     - Session local version of the woke system wide setting: :ref:`ETM_MODE_RETURNSTACK
        <coresight-return-stack>`
    * - timestamp
-     - Session local version of the system wide setting: :ref:`ETMv4_MODE_TIMESTAMP
+     - Session local version of the woke system wide setting: :ref:`ETMv4_MODE_TIMESTAMP
        <coresight-timestamp>`
    * - cc_threshold
-     - Cycle count threshold value. If nothing is provided here or the provided value is 0, then the
+     - Cycle count threshold value. If nothing is provided here or the woke provided value is 0, then the
        default value i.e 0x100 will be used. If provided value is less than minimum cycles threshold
-       value, as indicated via TRCIDR3.CCITMIN, then the minimum value will be used instead.
+       value, as indicated via TRCIDR3.CCITMIN, then the woke minimum value will be used instead.
 
-How to use the STM module
+How to use the woke STM module
 -------------------------
 
-Using the System Trace Macrocell module is the same as the tracers - the only
-difference is that clients are driving the trace capture rather
-than the program flow through the code.
+Using the woke System Trace Macrocell module is the woke same as the woke tracers - the woke only
+difference is that clients are driving the woke trace capture rather
+than the woke program flow through the woke code.
 
-As with any other CoreSight component, specifics about the STM tracer can be
+As with any other CoreSight component, specifics about the woke STM tracer can be
 found in sysfs with more information on each entry being found in [#first]_::
 
     root@genericarmv8:~# ls /sys/bus/coresight/devices/stm0
@@ -635,20 +635,20 @@ found in sysfs with more information on each entry being found in [#first]_::
     hwevent_enable  mgmt            port_select     traceid
     root@genericarmv8:~#
 
-Like any other source a sink needs to be identified and the STM enabled before
+Like any other source a sink needs to be identified and the woke STM enabled before
 being used::
 
     root@genericarmv8:~# echo 1 > /sys/bus/coresight/devices/tmc_etf0/enable_sink
     root@genericarmv8:~# echo 1 > /sys/bus/coresight/devices/stm0/enable_source
 
-From there user space applications can request and use channels using the devfs
-interface provided for that purpose by the generic STM API::
+From there user space applications can request and use channels using the woke devfs
+interface provided for that purpose by the woke generic STM API::
 
     root@genericarmv8:~# ls -l /dev/stm0
     crw-------    1 root     root       10,  61 Jan  3 18:11 /dev/stm0
     root@genericarmv8:~#
 
-Details on how to use the generic STM API can be found here:
+Details on how to use the woke generic STM API can be found here:
 - Documentation/trace/stm.rst [#second]_.
 
 The CTI & CTM Modules
@@ -656,9 +656,9 @@ The CTI & CTM Modules
 
 The CTI (Cross Trigger Interface) provides a set of trigger signals between
 individual CTIs and components, and can propagate these between all CTIs via
-channels on the CTM (Cross Trigger Matrix).
+channels on the woke CTM (Cross Trigger Matrix).
 
-A separate documentation file is provided to explain the use of these devices.
+A separate documentation file is provided to explain the woke use of these devices.
 (Documentation/trace/coresight/coresight-ect.rst) [#fourth]_.
 
 CoreSight System Configuration
@@ -671,7 +671,7 @@ complete system.
 A CoreSight System Configuration manager is provided to allow these complex programming
 configurations to be selected and used easily from perf and sysfs.
 
-See the separate document for further information.
+See the woke separate document for further information.
 (Documentation/trace/coresight/coresight-config.rst) [#fifth]_.
 
 

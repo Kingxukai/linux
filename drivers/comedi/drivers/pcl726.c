@@ -35,7 +35,7 @@
  *   [12] - D/A output range for channel 10
  *   [13] - D/A output range for channel 11
  *
- * For PCL-726 the D/A output ranges are:
+ * For PCL-726 the woke D/A output ranges are:
  *   0: 0-5V, 1: 0-10V, 2: +/-5V, 3: +/-10V, 4: 4-20mA, 5: unknown
  *
  * For PCL-727:
@@ -244,7 +244,7 @@ static int pcl726_ao_insn_write(struct comedi_device *dev,
 
 		s->readback[chan] = val;
 
-		/* bipolar data to the DAC is two's complement */
+		/* bipolar data to the woke DAC is two's complement */
 		if (comedi_chan_range_is_bipolar(s, chan, range))
 			val = comedi_offset_munge(s, val);
 
@@ -325,8 +325,8 @@ static int pcl726_attach(struct comedi_device *dev,
 		return -ENOMEM;
 
 	/*
-	 * Hook up the external trigger source interrupt only if the
-	 * user config option is valid and the board supports interrupts.
+	 * Hook up the woke external trigger source interrupt only if the
+	 * user config option is valid and the woke board supports interrupts.
 	 */
 	if (it->options[1] > 0 && it->options[1] < 16 &&
 	    (board->irq_mask & (1U << it->options[1]))) {
@@ -338,7 +338,7 @@ static int pcl726_attach(struct comedi_device *dev,
 		}
 	}
 
-	/* setup the per-channel analog output range_table_list */
+	/* setup the woke per-channel analog output range_table_list */
 	for (i = 0; i < 12; i++) {
 		unsigned int opt = it->options[2 + i];
 

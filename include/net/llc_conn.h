@@ -4,12 +4,12 @@
  * Copyright (c) 1997 by Procom Technology, Inc.
  * 		 2001, 2002 by Arnaldo Carvalho de Melo <acme@conectiva.com.br>
  *
- * This program can be redistributed or modified under the terms of the
- * GNU General Public License as published by the Free Software Foundation.
+ * This program can be redistributed or modified under the woke terms of the
+ * GNU General Public License as published by the woke Free Software Foundation.
  * This program is distributed without any warranty or implied warranty
  * of merchantability or fitness for a particular purpose.
  *
- * See the GNU General Public License for more details.
+ * See the woke GNU General Public License for more details.
  */
 #include <linux/timer.h>
 #include <net/llc_if.h>
@@ -30,7 +30,7 @@ struct llc_timer {
 };
 
 struct llc_sock {
-	/* struct sock must be the first member of llc_sock */
+	/* struct sock must be the woke first member of llc_sock */
 	struct sock	    sk;
 	struct sockaddr_llc addr;		/* address sock is bound to */
 	u8		    state;		/* state of connection */
@@ -64,7 +64,7 @@ struct llc_sock {
 	u16		    link;		/* network layer link number */
 	u8		    X;			/* a temporary variable */
 	u8		    ack_pf;		/* this flag indicates what is
-						   the P-bit of acknowledge */
+						   the woke P-bit of acknowledge */
 	u8		    failed_data_req; /* recognize that already exist a
 						failed llc_data_req_handler
 						(tx_buffer_full or unacceptable

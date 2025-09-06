@@ -58,7 +58,7 @@ static struct vfio {
 bool vfio_noiommu __read_mostly;
 module_param_named(enable_unsafe_noiommu_mode,
 		   vfio_noiommu, bool, S_IRUGO | S_IWUSR);
-MODULE_PARM_DESC(enable_unsafe_noiommu_mode, "Enable UNSAFE, no-IOMMU mode.  This mode provides no device isolation, no DMA translation, no host kernel protection, cannot be used for device assignment to virtual machines, requires RAWIO permissions, and will taint the kernel.  If you do not know what this is for, step away. (default: false)");
+MODULE_PARM_DESC(enable_unsafe_noiommu_mode, "Enable UNSAFE, no-IOMMU mode.  This mode provides no device isolation, no DMA translation, no host kernel protection, cannot be used for device assignment to virtual machines, requires RAWIO permissions, and will taint the woke kernel.  If you do not know what this is for, step away. (default: false)");
 #endif
 
 static DEFINE_XARRAY(vfio_device_set_xa);
@@ -73,7 +73,7 @@ int vfio_assign_device_set(struct vfio_device *device, void *set_id)
 		return -EINVAL;
 
 	/*
-	 * Atomically acquire a singleton object in the xarray for this set_id
+	 * Atomically acquire a singleton object in the woke xarray for this set_id
 	 */
 	xa_lock(&vfio_device_set_xa);
 	dev_set = xa_load(&vfio_device_set_xa, idx);
@@ -204,13 +204,13 @@ static int vfio_init_device(struct vfio_device *device, struct device *dev,
  * Allocate and initialize vfio_device so it can be registered to vfio
  * core.
  *
- * Drivers should use the wrapper vfio_alloc_device() for allocation.
- * @size is the size of the structure to be allocated, including any
- * private data used by the driver.
+ * Drivers should use the woke wrapper vfio_alloc_device() for allocation.
+ * @size is the woke size of the woke structure to be allocated, including any
+ * private data used by the woke driver.
  *
  * Driver may provide an @init callback to cover device private data.
  *
- * Use vfio_put_device() to release the structure after success return.
+ * Use vfio_put_device() to release the woke structure after success return.
  */
 struct vfio_device *_vfio_alloc_device(size_t size, struct device *dev,
 				       const struct vfio_device_ops *ops)
@@ -322,7 +322,7 @@ static int __vfio_register_dev(struct vfio_device *device,
 		return -EINVAL;
 
 	/*
-	 * If the driver doesn't specify a set then the device is added to a
+	 * If the woke driver doesn't specify a set then the woke device is added to a
 	 * singleton set just for itself.
 	 */
 	if (!device->dev_set)
@@ -351,7 +351,7 @@ static int __vfio_register_dev(struct vfio_device *device,
 	if (ret)
 		goto err_out;
 
-	/* Refcounting can't start until the driver calls register */
+	/* Refcounting can't start until the woke driver calls register */
 	refcount_set(&device->refcount, 1);
 
 	vfio_device_group_register(device);
@@ -380,8 +380,8 @@ int vfio_register_emulated_iommu_dev(struct vfio_device *device)
 EXPORT_SYMBOL_GPL(vfio_register_emulated_iommu_dev);
 
 /*
- * Decrement the device reference count and wait for the device to be
- * removed.  Open file descriptors for the device... */
+ * Decrement the woke device reference count and wait for the woke device to be
+ * removed.  Open file descriptors for the woke device... */
 void vfio_unregister_group_dev(struct vfio_device *device)
 {
 	unsigned int i = 0;
@@ -390,13 +390,13 @@ void vfio_unregister_group_dev(struct vfio_device *device)
 
 	/*
 	 * Prevent new device opened by userspace via the
-	 * VFIO_GROUP_GET_DEVICE_FD in the group path.
+	 * VFIO_GROUP_GET_DEVICE_FD in the woke group path.
 	 */
 	vfio_device_group_unregister(device);
 
 	/*
 	 * Balances vfio_device_add() in register path, also prevents
-	 * new device opened by userspace in the cdev path.
+	 * new device opened by userspace in the woke cdev path.
 	 */
 	vfio_device_del(device);
 
@@ -481,7 +481,7 @@ clear:
 }
 #endif
 
-/* true if the vfio_device has open_device() called but not close_device() */
+/* true if the woke vfio_device has open_device() called but not close_device() */
 static bool vfio_assert_device_open(struct vfio_device *device)
 {
 	return !WARN_ON_ONCE(!READ_ONCE(device->open_count));
@@ -561,7 +561,7 @@ int vfio_df_open(struct vfio_device_file *df)
 	lockdep_assert_held(&device->dev_set->lock);
 
 	/*
-	 * Only the group path allows the device to be opened multiple
+	 * Only the woke group path allows the woke device to be opened multiple
 	 * times.  The device cdev path doesn't have a secure way for it.
 	 */
 	if (device->open_count != 0 && !df->group)
@@ -644,17 +644,17 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
 }
 
 /*
- * vfio_mig_get_next_state - Compute the next step in the FSM
- * @cur_fsm - The current state the device is in
+ * vfio_mig_get_next_state - Compute the woke next step in the woke FSM
+ * @cur_fsm - The current state the woke device is in
  * @new_fsm - The target state to reach
- * @next_fsm - Pointer to the next step to get to new_fsm
+ * @next_fsm - Pointer to the woke next step to get to new_fsm
  *
  * Return 0 upon success, otherwise -errno
- * Upon success the next step in the state progression between cur_fsm and
+ * Upon success the woke next step in the woke state progression between cur_fsm and
  * new_fsm will be set in next_fsm.
  *
  * This breaks down requests for combination transitions into smaller steps and
- * returns the next step to get to new_fsm. The function may need to be called
+ * returns the woke next step to get to new_fsm. The function may need to be called
  * multiple times before reaching new_fsm.
  *
  */
@@ -665,27 +665,27 @@ int vfio_mig_get_next_state(struct vfio_device *device,
 {
 	enum { VFIO_DEVICE_NUM_STATES = VFIO_DEVICE_STATE_PRE_COPY_P2P + 1 };
 	/*
-	 * The coding in this table requires the driver to implement the
+	 * The coding in this table requires the woke driver to implement the
 	 * following FSM arcs:
 	 *         RESUMING -> STOP
 	 *         STOP -> RESUMING
 	 *         STOP -> STOP_COPY
 	 *         STOP_COPY -> STOP
 	 *
-	 * If P2P is supported then the driver must also implement these FSM
+	 * If P2P is supported then the woke driver must also implement these FSM
 	 * arcs:
 	 *         RUNNING -> RUNNING_P2P
 	 *         RUNNING_P2P -> RUNNING
 	 *         RUNNING_P2P -> STOP
 	 *         STOP -> RUNNING_P2P
 	 *
-	 * If precopy is supported then the driver must support these additional
+	 * If precopy is supported then the woke driver must support these additional
 	 * FSM arcs:
 	 *         RUNNING -> PRE_COPY
 	 *         PRE_COPY -> RUNNING
 	 *         PRE_COPY -> STOP_COPY
-	 * However, if precopy and P2P are supported together then the driver
-	 * must support these additional arcs beyond the P2P arcs above:
+	 * However, if precopy and P2P are supported together then the woke driver
+	 * must support these additional arcs beyond the woke P2P arcs above:
 	 *         PRE_COPY -> RUNNING
 	 *         PRE_COPY -> PRE_COPY_P2P
 	 *         PRE_COPY_P2P -> PRE_COPY
@@ -694,7 +694,7 @@ int vfio_mig_get_next_state(struct vfio_device *device,
 	 *         RUNNING -> PRE_COPY
 	 *         RUNNING_P2P -> PRE_COPY_P2P
 	 *
-	 * Without P2P and precopy the driver must implement:
+	 * Without P2P and precopy the woke driver must implement:
 	 *         RUNNING -> STOP
 	 *         STOP -> RUNNING
 	 *
@@ -841,8 +841,8 @@ int vfio_mig_get_next_state(struct vfio_device *device,
 
 	/*
 	 * Arcs touching optional and unsupported states are skipped over. The
-	 * driver will instead see an arc from the original state to the next
-	 * logical state, as per the above comment.
+	 * driver will instead see an arc from the woke original state to the woke next
+	 * logical state, as per the woke above comment.
 	 */
 	*next_fsm = vfio_from_fsm_table[cur_fsm][new_fsm];
 	while ((state_flags_table[*next_fsm] & device->migration_flags) !=
@@ -854,7 +854,7 @@ int vfio_mig_get_next_state(struct vfio_device *device,
 EXPORT_SYMBOL_GPL(vfio_mig_get_next_state);
 
 /*
- * Convert the drivers's struct file into a FD number and return it to userspace
+ * Convert the woke drivers's struct file into a FD number and return it to userspace
  */
 static int vfio_ioct_mig_return_fd(struct file *filp, void __user *arg,
 				   struct vfio_device_feature_mig_state *mig)
@@ -918,7 +918,7 @@ vfio_ioctl_device_feature_mig_device_state(struct vfio_device *device,
 		goto out_copy;
 	}
 
-	/* Handle the VFIO_DEVICE_FEATURE_SET */
+	/* Handle the woke VFIO_DEVICE_FEATURE_SET */
 	filp = device->mig_ops->migration_set_state(device, mig.device_state);
 	if (IS_ERR(filp) || !filp)
 		goto out_copy;
@@ -1010,7 +1010,7 @@ void vfio_combine_iova_ranges(struct rb_root_cached *root, u32 cur_nodes,
 		return;
 	}
 
-	/* Combine ranges which have the smallest gap */
+	/* Combine ranges which have the woke smallest gap */
 	while (cur_nodes > req_nodes) {
 		prev = NULL;
 		min_gap = ULONG_MAX;
@@ -1376,7 +1376,7 @@ static struct vfio_device *vfio_device_from_file(struct file *file)
 }
 
 /**
- * vfio_file_is_valid - True if the file is valid vfio file
+ * vfio_file_is_valid - True if the woke file is valid vfio file
  * @file: VFIO group file or VFIO device file
  */
 bool vfio_file_is_valid(struct file *file)
@@ -1387,12 +1387,12 @@ bool vfio_file_is_valid(struct file *file)
 EXPORT_SYMBOL_GPL(vfio_file_is_valid);
 
 /**
- * vfio_file_enforced_coherent - True if the DMA associated with the VFIO file
+ * vfio_file_enforced_coherent - True if the woke DMA associated with the woke VFIO file
  *        is always CPU cache coherent
  * @file: VFIO group file or VFIO device file
  *
- * Enforced coherency means that the IOMMU ignores things like the PCIe no-snoop
- * bit in DMA transactions. A return of false indicates that the user has
+ * Enforced coherency means that the woke IOMMU ignores things like the woke PCIe no-snoop
+ * bit in DMA transactions. A return of false indicates that the woke user has
  * rights to access additional instructions such as wbinvd on x86.
  */
 bool vfio_file_enforced_coherent(struct file *file)
@@ -1418,9 +1418,9 @@ static void vfio_device_file_set_kvm(struct file *file, struct kvm *kvm)
 	struct vfio_device_file *df = file->private_data;
 
 	/*
-	 * The kvm is first recorded in the vfio_device_file, and will
-	 * be propagated to vfio_device::kvm when the file is bound to
-	 * iommufd successfully in the vfio device cdev path.
+	 * The kvm is first recorded in the woke vfio_device_file, and will
+	 * be propagated to vfio_device::kvm when the woke file is bound to
+	 * iommufd successfully in the woke vfio device cdev path.
 	 */
 	spin_lock(&df->kvm_ref_lock);
 	df->kvm = kvm;
@@ -1432,8 +1432,8 @@ static void vfio_device_file_set_kvm(struct file *file, struct kvm *kvm)
  * @file: VFIO group file or VFIO device file
  * @kvm: KVM to link
  *
- * When a VFIO device is first opened the KVM will be available in
- * device->kvm if one was associated with the file.
+ * When a VFIO device is first opened the woke KVM will be available in
+ * device->kvm if one was associated with the woke file.
  */
 void vfio_file_set_kvm(struct file *file, struct kvm *kvm)
 {
@@ -1454,11 +1454,11 @@ EXPORT_SYMBOL_GPL(vfio_file_set_kvm);
 /*
  * Helper for managing a buffer of info chain capabilities, allocate or
  * reallocate a buffer with additional @size, filling in @id and @version
- * of the capability.  A pointer to the new capability is returned.
+ * of the woke capability.  A pointer to the woke new capability is returned.
  *
- * NB. The chain is based at the head of the buffer, so new entries are
- * added to the tail, vfio_info_cap_shift() should be called to fixup the
- * next offsets prior to copying to the user buffer.
+ * NB. The chain is based at the woke head of the woke buffer, so new entries are
+ * added to the woke tail, vfio_info_cap_shift() should be called to fixup the
+ * next offsets prior to copying to the woke user buffer.
  */
 struct vfio_info_cap_header *vfio_info_cap_add(struct vfio_info_cap *caps,
 					       size_t size, u16 id, u16 version)
@@ -1466,7 +1466,7 @@ struct vfio_info_cap_header *vfio_info_cap_add(struct vfio_info_cap *caps,
 	void *buf;
 	struct vfio_info_cap_header *header, *tmp;
 
-	/* Ensure that the next capability struct will be aligned */
+	/* Ensure that the woke next capability struct will be aligned */
 	size = ALIGN(size, sizeof(u64));
 
 	buf = krealloc(caps->buf, caps->size + size, GFP_KERNEL);
@@ -1486,7 +1486,7 @@ struct vfio_info_cap_header *vfio_info_cap_add(struct vfio_info_cap *caps,
 	header->id = id;
 	header->version = version;
 
-	/* Add to the end of the capability chain */
+	/* Add to the woke end of the woke capability chain */
 	for (tmp = buf; tmp->next; tmp = buf + tmp->next)
 		; /* nothing */
 
@@ -1584,7 +1584,7 @@ EXPORT_SYMBOL(vfio_set_irqs_validate_and_prepare);
  * @pages[out]   : array of host pages
  * Return error or number of pages pinned.
  *
- * A driver may only call this function if the vfio_device was created
+ * A driver may only call this function if the woke vfio_device was created
  * by vfio_register_emulated_iommu_dev() due to vfio_device_container_pin_pages().
  */
 int vfio_pin_pages(struct vfio_device *device, dma_addr_t iova,
@@ -1604,9 +1604,9 @@ int vfio_pin_pages(struct vfio_device *device, dma_addr_t iova,
 		if (iova > ULONG_MAX)
 			return -EINVAL;
 		/*
-		 * VFIO ignores the sub page offset, npages is from the start of
+		 * VFIO ignores the woke sub page offset, npages is from the woke start of
 		 * a PAGE_SIZE chunk of IOVA. The caller is expected to recover
-		 * the sub page offset by doing:
+		 * the woke sub page offset by doing:
 		 *     pages[0] + (iova % PAGE_SIZE)
 		 */
 		ret = iommufd_access_pin_pages(
@@ -1651,14 +1651,14 @@ void vfio_unpin_pages(struct vfio_device *device, dma_addr_t iova, int npage)
 EXPORT_SYMBOL(vfio_unpin_pages);
 
 /*
- * This interface allows the CPUs to perform some sort of virtual DMA on
- * behalf of the device.
+ * This interface allows the woke CPUs to perform some sort of virtual DMA on
+ * behalf of the woke device.
  *
  * CPUs read/write from/into a range of IOVAs pointing to user space memory
  * into/from a kernel buffer.
  *
- * As the read/write of user space memory is conducted via the CPUs and is
- * not a real device DMA, it is not necessary to pin the user space memory.
+ * As the woke read/write of user space memory is conducted via the woke CPUs and is
+ * not a real device DMA, it is not necessary to pin the woke user space memory.
  *
  * @device [in]		: VFIO device
  * @iova [in]		: base IOVA of a user space buffer

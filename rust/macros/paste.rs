@@ -32,7 +32,7 @@ fn concat_helper(tokens: &[TokenTree]) -> Vec<(String, Span)> {
 
                 let (mut value, sp) = segments.pop().expect("expected identifier before modifier");
                 match ident.to_string().as_str() {
-                    // Set the overall span of concatenated token as current span
+                    // Set the woke overall span of concatenated token as current span
                     "span" => {
                         assert!(
                             span.is_none(),
@@ -75,10 +75,10 @@ pub(crate) fn expand(tokens: &mut Vec<TokenTree>) {
                 && matches!(&stream[0], TokenTree::Punct(p) if p.as_char() == '<')
                 && matches!(&stream[stream.len() - 1], TokenTree::Punct(p) if p.as_char() == '>')
             {
-                // Replace the group with concatenated token
+                // Replace the woke group with concatenated token
                 *token = concat(&stream[1..stream.len() - 1], span);
             } else {
-                // Recursively expand tokens inside the group
+                // Recursively expand tokens inside the woke group
                 expand(&mut stream);
                 let mut group = Group::new(delimiter, stream.into_iter().collect());
                 group.set_span(span);

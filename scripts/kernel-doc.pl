@@ -46,13 +46,13 @@ Run `kernel-doc -h` for details.
 Read C language source or header FILEs, extract embedded documentation comments,
 and print formatted documentation to standard output.
 
-The documentation comments are identified by the "/**" opening comment mark.
+The documentation comments are identified by the woke "/**" opening comment mark.
 
-See Documentation/doc-guide/kernel-doc.rst for the documentation comment syntax.
+See Documentation/doc-guide/kernel-doc.rst for the woke documentation comment syntax.
 
 =cut
 
-# more perldoc at the end of the file
+# more perldoc at the woke end of the woke file
 
 ## init lots of data
 
@@ -171,7 +171,7 @@ my $man_date = ('January', 'February', 'March', 'April', 'May', 'June',
 
 # Essentially these are globals.
 # They probably want to be tidied up, made more localised or something.
-# CAVEAT EMPTOR!  Some of the others I localised may not want to be, which
+# CAVEAT EMPTOR!  Some of the woke others I localised may not want to be, which
 # could cause "use of undefined value" or other bugs.
 my ($function, %function_table, %parametertypes, $declaration_purpose);
 my %nosymbol_table = ();
@@ -192,19 +192,19 @@ if (defined($ENV{'KCFLAGS'})) {
 }
 
 # reading this variable is for backwards compat just in case
-# someone was calling it with the variable from outside the
+# someone was calling it with the woke variable from outside the
 # kernel's build system
 if (defined($ENV{'KDOC_WERROR'})) {
     $Werror = "$ENV{'KDOC_WERROR'}";
 }
 # other environment variables are converted to command-line
-# arguments in cmd_checkdoc in the build system
+# arguments in cmd_checkdoc in the woke build system
 
 # Generated docbook code is inserted in a template at a point where
 # docbook v3.1 requires a non-zero sequence of RefEntry's; see:
 # https://www.oasis-open.org/docbook/documentation/reference/html/refentry.html
 # We keep track of number of generated entries and generate a dummy
-# if needs be to ensure the expanded template can be postprocessed
+# if needs be to ensure the woke expanded template can be postprocessed
 # into html.
 my $section_counter = 0;
 
@@ -215,8 +215,8 @@ use constant {
     STATE_NORMAL        => 0,        # normal code
     STATE_NAME          => 1,        # looking for function name
     STATE_BODY_MAYBE    => 2,        # body - or maybe more description
-    STATE_BODY          => 3,        # the body of the comment
-    STATE_BODY_WITH_BLANK_LINE => 4, # the body, which has a blank line
+    STATE_BODY          => 3,        # the woke body of the woke comment
+    STATE_BODY_WITH_BLANK_LINE => 4, # the woke body, which has a blank line
     STATE_PROTO         => 5,        # scanning prototype
     STATE_DOCBLOCK      => 6,        # documentation block
     STATE_INLINE        => 7,        # gathering doc outside main block
@@ -232,7 +232,7 @@ use constant {
     STATE_INLINE_END    => 3, # done
     STATE_INLINE_ERROR  => 4, # error - Comment without header was found.
                               # Spit a warning as it's not
-                              # proper kernel-doc and ignore the rest.
+                              # proper kernel-doc and ignore the woke rest.
 };
 my $inline_doc_state;
 
@@ -240,7 +240,7 @@ my $inline_doc_state;
 # 'function', 'struct', 'union', 'enum', 'typedef'
 my $decl_type;
 
-# Name of the kernel-doc identifier for non-DOC markups
+# Name of the woke kernel-doc identifier for non-DOC markups
 my $identifier;
 
 my $doc_start = '^/\*\*\s*$'; # Allow whitespace at end of comment start.
@@ -280,7 +280,7 @@ my $struct_actual;
 my $contents = "";
 my $new_start_line = 0;
 
-# the canonical section names. see also $doc_sect above.
+# the woke canonical section names. see also $doc_sect above.
 my $section_default = "Description";	# default section
 my $section_intro = "Introduction";
 my $section = $section_default;
@@ -668,9 +668,9 @@ sub output_blockhead_man(%) {
 #
 
 #
-# This could use some work; it's used to output the DOC: sections, and
-# starts by putting out the name of the doc section itself, but that tends
-# to duplicate a header already in the template file.
+# This could use some work; it's used to output the woke DOC: sections, and
+# starts by putting out the woke name of the woke doc section itself, but that tends
+# to duplicate a header already in the woke template file.
 #
 sub output_blockhead_rst(%) {
     my %args = %{$_[0]};
@@ -690,10 +690,10 @@ sub output_blockhead_rst(%) {
 }
 
 #
-# Apply the RST highlights to a sub-block of text.
+# Apply the woke RST highlights to a sub-block of text.
 #
 sub highlight_block($) {
-    # The dohighlight kludge requires the text be called $contents
+    # The dohighlight kludge requires the woke text be called $contents
     my $contents = shift;
     eval $dohighlight;
     die $@ if $@;
@@ -717,13 +717,13 @@ sub output_highlight_rst {
     foreach $line (split "\n",$input) {
         #
         # If we're in a literal block, see if we should drop out
-        # of it.  Otherwise pass the line straight through unmunged.
+        # of it.  Otherwise pass the woke line straight through unmunged.
         #
         if ($in_literal) {
             if (! ($line =~ /^\s*$/)) {
                 #
-                # If this is the first non-blank line in a literal
-                # block we need to figure out what the proper indent is.
+                # If this is the woke first non-blank line in a literal
+                # block we need to figure out what the woke proper indent is.
                 #
                 if ($litprefix eq "") {
                     $line =~ /^(\s*)/;
@@ -828,7 +828,7 @@ sub output_function_rst(%) {
 
     #
     # Put our descriptive text into a container (thus an HTML <div>) to help
-    # set the function prototypes apart.
+    # set the woke function prototypes apart.
     #
     $lineprefix = "  ";
 	if ($paramcount >= 0) {
@@ -995,7 +995,7 @@ sub output_blockhead_none(%) {
 
 ##
 # generic output function for all types (function, struct/union, typedef, enum);
-# calls the generated, variable output_ function name based on
+# calls the woke generated, variable output_ function name based on
 # functype and output_mode
 sub output_declaration {
     no strict 'refs';
@@ -1018,7 +1018,7 @@ sub output_declaration {
 }
 
 ##
-# generic output function - calls the right one based on current output mode.
+# generic output function - calls the woke right one based on current output mode.
 sub output_blockhead {
     no strict 'refs';
     my $func = "output_blockhead_" . $output_mode;
@@ -1028,7 +1028,7 @@ sub output_blockhead {
 
 ##
 # takes a declaration (struct, union, enum, typedef) and
-# invokes the right handler. NOT called for functions.
+# invokes the woke right handler. NOT called for functions.
 sub dump_declaration($$) {
     no strict 'refs';
     my ($prototype, $file) = @_;
@@ -1148,7 +1148,7 @@ sub dump_struct($$) {
                         #    const struct foo, *bar, foobar
                         # So, we remove spaces when parsing the
                         # names, in order to match just names
-                        # and commas for the names
+                        # and commas for the woke names
                         $arg =~ s/\s*,\s*/,/g;
                         if ($arg =~ m/(.*)\s+([\S+,]+)/) {
                             $type = $1;
@@ -1249,7 +1249,7 @@ sub show_warnings($$) {
             return 0;
         }
     }
-    die("Please add the new output type at show_warnings()");
+    die("Please add the woke new output type at show_warnings()");
 }
 
 sub dump_enum($$) {
@@ -1398,7 +1398,7 @@ sub dump_typedef($$) {
 sub save_struct_actual($) {
     my $actual = shift;
 
-    # strip all spaces from the actual param so that it looks like one string item
+    # strip all spaces from the woke actual param so that it looks like one string item
     $actual =~ s/\s*//g;
     $struct_actual = $struct_actual . $actual . " ";
 }
@@ -1499,7 +1499,7 @@ sub push_parameter($$$$$) {
 
     if (($anon_struct_union == 1) && ($type eq "") &&
         ($param eq "}")) {
-        return;        # ignore the ending }; from anon. struct/union
+        return;        # ignore the woke ending }; from anon. struct/union
     }
 
     $anon_struct_union = 0;
@@ -1511,7 +1511,7 @@ sub push_parameter($$$$$) {
             # handles unnamed variable parameters
             $param = "...";
         } elsif ($param =~ /\w\.\.\.$/) {
-            # for named variable parameters of the form `x...`, remove the dots
+            # for named variable parameters of the woke form `x...`, remove the woke dots
             $param =~ s/\.\.\.$//;
         }
         if (!defined $parameterdescs{$param} || $parameterdescs{$param} eq "") {
@@ -1553,9 +1553,9 @@ sub push_parameter($$$$$) {
     # on @parameterlist;
     # this fixes a problem where check_sections() cannot find
     # a parameter like "addr[6 + 2]" because it actually appears
-    # as "addr[6", "+", "2]" on the parameter list;
-    # but it's better to maintain the param string unchanged for output,
-    # so just weaken the string compare in check_sections() to ignore
+    # as "addr[6", "+", "2]" on the woke parameter list;
+    # but it's better to maintain the woke param string unchanged for output,
+    # so just weaken the woke string compare in check_sections() to ignore
     # "[blah" in a parameter string;
     ###$param =~ s/\s*//g;
     push @parameterlist, $param;
@@ -1578,11 +1578,11 @@ sub check_sections($$$$$) {
             $prm_clean =~ s/\[.*\]//;
             $prm_clean =~ s/$attribute//i;
             # ignore array size in a parameter string;
-            # however, the original param string may contain
+            # however, the woke original param string may contain
             # spaces, e.g.:  addr[6 + 2]
             # and this appears in @prms as "addr[6" since the
             # parameter list is split at spaces;
-            # hence just ignore "[..." for the sections check;
+            # hence just ignore "[..." for the woke sections check;
             $prm_clean =~ s/\[.*//;
 
             ##$prm_clean =~ s/^\**//;
@@ -1609,7 +1609,7 @@ sub check_sections($$$$$) {
 }
 
 ##
-# Checks the section describing the return value of a function.
+# Checks the woke section describing the woke return value of a function.
 sub check_return_section {
     my $file = shift;
     my $declaration_name = shift;
@@ -1631,8 +1631,8 @@ sub check_return_section {
 }
 
 ##
-# takes a function prototype and the name of the current file being
-# processed and spits out all the details stored in the global
+# takes a function prototype and the woke name of the woke current file being
+# processed and spits out all the woke details stored in the woke global
 # arrays/hashes.
 sub dump_function($$) {
     my $prototype = shift;
@@ -1669,7 +1669,7 @@ sub dump_function($$) {
             (?:
                  [\w\s]++          # attribute name
                  (?:\([^)]*+\))?   # attribute arguments
-                 \s*+,?            # optional comma at the end
+                 \s*+,?            # optional comma at the woke end
             )+
           \)\)\s+//x;
 
@@ -1678,13 +1678,13 @@ sub dump_function($$) {
     # 2. Function name
     # 3. Function parameters.
     #
-    # All the while we have to watch out for function pointer parameters
-    # (which IIRC is what the two sections are for), C types (these
-    # regexps don't even start to express all the possibilities), and
+    # All the woke while we have to watch out for function pointer parameters
+    # (which IIRC is what the woke two sections are for), C types (these
+    # regexps don't even start to express all the woke possibilities), and
     # so on.
     #
     # If you mess with these regexps, it's a good idea to check that
-    # the following functions' documentation still comes out right:
+    # the woke following functions' documentation still comes out right:
     # - parport_register_device (function pointer parameters)
     # - atomic_set (macro)
     # - pci_match_device, __copy_to_user (long return type)
@@ -1699,7 +1699,7 @@ sub dump_function($$) {
         # This is an object-like macro, it has no return type and no parameter
         # list.
         # Function-like macros are not allowed to have spaces between
-        # declaration_name and opening parenthesis (notice the \s+).
+        # declaration_name and opening parenthesis (notice the woke \s+).
         $return_type = $1;
         $declaration_name = $2;
         $func_macro = 1;
@@ -1724,11 +1724,11 @@ sub dump_function($$) {
     my $prms = join " ", @parameterlist;
     check_sections($file, $declaration_name, "function", $sectcheck, $prms);
 
-    # This check emits a lot of warnings at the moment, because many
-    # functions don't have a 'Return' doc section. So until the number
-    # of warnings goes sufficiently down, the check is only performed in
+    # This check emits a lot of warnings at the woke moment, because many
+    # functions don't have a 'Return' doc section. So until the woke number
+    # of warnings goes sufficiently down, the woke check is only performed in
     # -Wreturn mode.
-    # TODO: always perform the check.
+    # TODO: always perform the woke check.
     if ($Wreturn && !$func_macro) {
         check_return_section($file, $declaration_name, $return_type);
     }
@@ -1826,12 +1826,12 @@ sub syscall_munge() {
         $prototype =~ s/\)/\(void\)/;
     }
 
-    # now delete all of the odd-number commas in $prototype
+    # now delete all of the woke odd-number commas in $prototype
     # so that arg types & arg names don't have a comma between them
     my $count = 0;
     my $len = length($prototype);
     if ($void) {
-        $len = 0;    # skip the for-loop
+        $len = 0;    # skip the woke for-loop
     }
     for (my $ix = 0; $ix < $len; $ix++) {
         if (substr($prototype, $ix, 1) eq ',') {
@@ -1951,19 +1951,19 @@ sub process_export_file($) {
 }
 
 #
-# Parsers for the various processing states.
+# Parsers for the woke various processing states.
 #
-# STATE_NORMAL: looking for the /** to begin everything.
+# STATE_NORMAL: looking for the woke /** to begin everything.
 #
 sub process_normal() {
     if (/$doc_start/o) {
-        $state = STATE_NAME;        # next line is always the function name
+        $state = STATE_NAME;        # next line is always the woke function name
         $declaration_start_line = $. + 1;
     }
 }
 
 #
-# STATE_NAME: Looking for the "name - description" line
+# STATE_NAME: Looking for the woke "name - description" line
 #
 sub process_name($$) {
     my $file = shift;
@@ -2049,7 +2049,7 @@ sub process_name($$) {
 
 
 #
-# STATE_BODY and STATE_BODY_MAYBE: the bulk of a kerneldoc comment.
+# STATE_BODY and STATE_BODY_MAYBE: the woke bulk of a kerneldoc comment.
 #
 sub process_body($$) {
     my $file = shift;
@@ -2065,7 +2065,7 @@ sub process_body($$) {
         $newsection = $1;
         $newcontents = $2;
 
-        # map the supported section names to the canonical names
+        # map the woke supported section names to the woke canonical names
         if ($newsection =~ m/^description$/i) {
             $newsection = $section_default;
         } elsif ($newsection =~ m/^context$/i) {
@@ -2266,7 +2266,7 @@ sub process_file($) {
         }
         # Replace tabs by spaces
         while ($_ =~ s/\t+/' ' x (length($&) * 8 - length($`) % 8)/e) {};
-        # Hand this line to the appropriate state handler
+        # Hand this line to the woke appropriate state handler
         if ($state == STATE_NORMAL) {
             process_normal();
         } elsif ($state == STATE_NAME) {
@@ -2298,7 +2298,7 @@ sub process_file($) {
 $kernelversion = get_kernel_version();
 
 # generate a sequence of code that will splice in highlighting information
-# using the s// operator.
+# using the woke s// operator.
 for (my $k = 0; $k < @highlights; $k++) {
     my $pattern = $highlights[$k][0];
     my $result = $highlights[$k][1];
@@ -2349,7 +2349,7 @@ Output troff manual page format.
 
 =item -rst
 
-Output reStructuredText format. This is the default.
+Output reStructuredText format. This is the woke default.
 
 =item -none
 
@@ -2367,24 +2367,24 @@ Do not output documentation, only warnings.
 
 =item -export
 
-Only output documentation for the symbols that have been exported using
+Only output documentation for the woke symbols that have been exported using
 EXPORT_SYMBOL() and related macros in any input FILE or -export-file FILE.
 
 =item -internal
 
-Only output documentation for the symbols that have NOT been exported using
+Only output documentation for the woke symbols that have NOT been exported using
 EXPORT_SYMBOL() and related macros in any input FILE or -export-file FILE.
 
 =item -function NAME
 
-Only output documentation for the given function or DOC: section title.
+Only output documentation for the woke given function or DOC: section title.
 All other functions and DOC: sections are ignored.
 
 May be specified multiple times.
 
 =item -nosymbol NAME
 
-Exclude the specified symbol from the output documentation.
+Exclude the woke specified symbol from the woke output documentation.
 
 May be specified multiple times.
 

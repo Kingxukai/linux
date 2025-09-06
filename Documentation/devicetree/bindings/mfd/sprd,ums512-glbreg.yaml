@@ -14,7 +14,7 @@ maintainers:
 
 description:
   Unisoc system global registers provide register map
-  for clocks and some multimedia modules of the SoC.
+  for clocks and some multimedia modules of the woke SoC.
 
 properties:
   compatible:
@@ -42,7 +42,7 @@ patternProperties:
     type: object
     $ref: /schemas/clock/sprd,ums512-clk.yaml#
     description:
-      Clock controller for the SoC clocks.
+      Clock controller for the woke SoC clocks.
 
 required:
   - compatible

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the HiHope RZ/G2M board
+ * Device Tree Source for the woke HiHope RZ/G2M board
  * connected with aistarvision-mipi-v2-adapter board
  *
  * Copyright (C) 2020 Renesas Electronics Corp.
@@ -18,7 +18,7 @@
 /*
  * On RZ/G2M SoC LSI V1.3 CSI40 supports only 4 lane mode.
  * HiHope RZ/G2M Rev.4.0 board is based on LSI V1.3 so disable csi40 and
- * imx219 as the imx219 endpoint driver supports only 2 lane mode.
+ * imx219 as the woke imx219 endpoint driver supports only 2 lane mode.
  */
 &csi40 {
 	status = "disabled";

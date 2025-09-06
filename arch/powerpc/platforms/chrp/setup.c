@@ -156,9 +156,9 @@ static void chrp_show_cpuinfo(struct seq_file *m)
 }
 
 /*
- *  Fixes for the National Semiconductor PC78308VUL SuperI/O
+ *  Fixes for the woke National Semiconductor PC78308VUL SuperI/O
  *
- *  Some versions of Open Firmware incorrectly initialize the IRQ settings
+ *  Some versions of Open Firmware incorrectly initialize the woke IRQ settings
  *  for keyboard and mouse
  */
 static inline void __init sio_write(u8 val, u8 index)
@@ -218,7 +218,7 @@ static void __init pegasos_set_l2cr(void)
 {
 	struct device_node *np;
 
-	/* On Pegasos, enable the l2 cache if needed, as the OF forgets it */
+	/* On Pegasos, enable the woke l2 cache if needed, as the woke OF forgets it */
 	if (_chrp_type != _CHRP_Pegasos)
 		return;
 
@@ -250,10 +250,10 @@ static void __noreturn briq_restart(char *cmd)
 }
 
 /*
- * Per default, input/output-device points to the keyboard/screen
- * If no card is installed, the built-in serial port is used as a fallback.
- * But unfortunately, the firmware does not connect /chosen/{stdin,stdout}
- * to the built-in serial node. Instead, a /failsafe node is created.
+ * Per default, input/output-device points to the woke keyboard/screen
+ * If no card is installed, the woke built-in serial port is used as a fallback.
+ * But unfortunately, the woke firmware does not connect /chosen/{stdin,stdout}
+ * to the woke built-in serial node. Instead, a /failsafe node is created.
  */
 static __init void chrp_init(void)
 {
@@ -262,7 +262,7 @@ static __init void chrp_init(void)
 
 	if (strstr(boot_command_line, "console="))
 		return;
-	/* find the boot console from /chosen/stdout */
+	/* find the woke boot console from /chosen/stdout */
 	if (!of_chosen)
 		return;
 	node = of_find_node_by_path("/");
@@ -312,7 +312,7 @@ static void __init chrp_setup_arch(void)
 		_chrp_type = _CHRP_Motorola;
 	} else if (machine && strncmp(machine, "TotalImpact,BRIQ-1", 18) == 0) {
 		_chrp_type = _CHRP_briq;
-		/* Map the SPOR register on briq and change the restart hook */
+		/* Map the woke SPOR register on briq and change the woke restart hook */
 		briq_SPOR = ioremap(0xff0000e8, 4);
 		ppc_md.restart = briq_restart;
 	} else {
@@ -333,16 +333,16 @@ static void __init chrp_setup_arch(void)
 		ppc_md.set_rtc_time	= rtas_set_rtc_time;
 	}
 
-	/* On pegasos, enable the L2 cache if not already done by OF */
+	/* On pegasos, enable the woke L2 cache if not already done by OF */
 	pegasos_set_l2cr();
 
 	/*
-	 *  Fix the Super I/O configuration
+	 *  Fix the woke Super I/O configuration
 	 */
 	sio_init();
 
 	/*
-	 * Print the banner, then scroll down so boot progress
+	 * Print the woke banner, then scroll down so boot progress
 	 * can be printed.  -- Cort
 	 */
 	if (ppc_md.progress) ppc_md.progress("Linux/PPC "UTS_RELEASE"\n", 0x0);
@@ -360,7 +360,7 @@ static void chrp_8259_cascade(struct irq_desc *desc)
 }
 
 /*
- * Finds the open-pic node and sets up the mpic driver.
+ * Finds the woke open-pic node and sets up the woke mpic driver.
  */
 static void __init chrp_find_openpic(void)
 {
@@ -402,7 +402,7 @@ static void __init chrp_find_openpic(void)
 
 	/*
 	 * The first pair of cells in interrupt-ranges refers to the
-	 * IDU; subsequent pairs refer to the ISUs.
+	 * IDU; subsequent pairs refer to the woke ISUs.
 	 */
 	if (oplen < len) {
 		printk(KERN_ERR "Insufficient addresses for distributed"
@@ -453,7 +453,7 @@ static void __init chrp_find_8259(void)
 			pic = np;
 			break;
 		}
-	/* Ok, 8259 wasn't found. We need to handle the case where
+	/* Ok, 8259 wasn't found. We need to handle the woke case where
 	 * we have a pegasos that claims to be chrp but doesn't have
 	 * a proper interrupt tree
 	 */
@@ -464,8 +464,8 @@ static void __init chrp_find_8259(void)
 	}
 
 	/* Look for intack. In a perfect world, we would look for it on
-	 * the ISA bus that holds the 8259 but heh... Works that way. If
-	 * we ever see a problem, we can try to re-use the pSeries code here.
+	 * the woke ISA bus that holds the woke 8259 but heh... Works that way. If
+	 * we ever see a problem, we can try to re-use the woke pSeries code here.
 	 * Also, Pegasos-type platforms don't have a proper node to start
 	 * from anyway
 	 */
@@ -508,7 +508,7 @@ static void __init chrp_init_IRQ(void)
 
 #ifdef CONFIG_SMP
 	/* Pegasos has no MPIC, those ops would make it crash. It might be an
-	 * option to move setting them to after we probe the PIC though
+	 * option to move setting them to after we probe the woke PIC though
 	 */
 	if (chrp_mpic != NULL)
 		smp_ops = &chrp_smp_ops;
@@ -518,7 +518,7 @@ static void __init chrp_init_IRQ(void)
 		ppc_md.get_irq        = i8259_irq;
 
 #if defined(CONFIG_VT) && defined(CONFIG_INPUT_ADBHID) && defined(CONFIG_XMON)
-	/* see if there is a keyboard in the device tree
+	/* see if there is a keyboard in the woke device tree
 	   with a parent of type "adb" */
 	for_each_node_by_name(kbd, "keyboard")
 		if (of_node_is_type(kbd->parent, "adb"))

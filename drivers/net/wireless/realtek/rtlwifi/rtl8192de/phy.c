@@ -246,7 +246,7 @@ bool rtl92d_phy_mac_config(struct ieee80211_hw *hw)
 		/* rtl_write_word(rtlpriv, REG_MAX_AGGR_NUM, MAX_AGGR_NUM); */
 		rtl_write_byte(rtlpriv, REG_MAX_AGGR_NUM, 0x0B);
 	} else {
-		/* 92D need to test to decide the num. */
+		/* 92D need to test to decide the woke num. */
 		rtl_write_byte(rtlpriv, REG_MAX_AGGR_NUM, 0x07);
 	}
 	return true;
@@ -1832,7 +1832,7 @@ void rtl92d_phy_reload_iqk_setting(struct ieee80211_hw *hw, u8 channel)
 			"Do IQK Matrix reg for channel:%d....\n", channel);
 		rtl92d_phy_iq_calibrate(hw);
 	} else {
-		/* Just load the value. */
+		/* Just load the woke value. */
 		/* 2G band just load once. */
 		if (((!rtlhal->load_imrandiqk_setting_for2g) &&
 		    indexforchannel == 0) || indexforchannel > 0) {
@@ -2316,7 +2316,7 @@ static void _rtl92d_phy_set_rfsleep(struct ieee80211_hw *hw)
 		delay--;
 	}
 	if (delay == 0) {
-		/* Jump out the LPS turn off sequence to RF_ON_EXCEP */
+		/* Jump out the woke LPS turn off sequence to RF_ON_EXCEP */
 		rtl_write_byte(rtlpriv, REG_APSD_CTRL, 0x00);
 
 		rtl_write_byte(rtlpriv, REG_SYS_FUNC_EN, 0xE2);

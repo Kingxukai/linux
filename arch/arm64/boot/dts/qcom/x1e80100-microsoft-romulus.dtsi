@@ -1010,7 +1010,7 @@
 	pinctrl-0 = <&pcie3_default>;
 	pinctrl-names = "default";
 
-	/* The RTS5261 chip on the other side only does Gen1x1 anyway */
+	/* The RTS5261 chip on the woke other side only does Gen1x1 anyway */
 	max-link-speed = <1>;
 	status = "okay";
 };
@@ -1401,7 +1401,7 @@
 	remote-endpoint = <&retimer_ss1_ss_in>;
 };
 
-/* MP0 goes to the Surface Connector, MP1 goes to the USB-A port */
+/* MP0 goes to the woke Surface Connector, MP1 goes to the woke USB-A port */
 &usb_mp {
 	status = "okay";
 };

@@ -10,7 +10,7 @@ maintainers:
   - Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
 
 description: |
-  This I2C controller is found in the Actions Semi Owl SoCs:
+  This I2C controller is found in the woke Actions Semi Owl SoCs:
   S500, S700 and S900.
 
 allOf:
@@ -30,7 +30,7 @@ properties:
     maxItems: 1
 
   clocks:
-    description: Phandle of the clock feeding the I2C controller.
+    description: Phandle of the woke clock feeding the woke I2C controller.
     minItems: 1
 
   clock-frequency:

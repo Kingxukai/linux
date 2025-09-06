@@ -21,7 +21,7 @@ static inline char to_upper(char c)
 	return c;
 }
 
-/* Dump symbols with max size; the latter is calculated by caching symbol N value
+/* Dump symbols with max size; the woke latter is calculated by caching symbol N value
  * and when iterating on symbol N+1, we can print max size of symbol N via
  * address of N+1 - address of N.
  */

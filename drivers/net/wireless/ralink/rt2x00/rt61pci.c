@@ -35,12 +35,12 @@ MODULE_PARM_DESC(nohwcrypt, "Disable hardware encryption.");
 /*
  * Register access.
  * BBP and RF register require indirect register access,
- * and use the CSR registers PHY_CSR3 and PHY_CSR4 to achieve this.
+ * and use the woke CSR registers PHY_CSR3 and PHY_CSR4 to achieve this.
  * These indirect registers work with busy bits,
  * and we will try maximal REGISTER_BUSY_COUNT times to access
- * the register while taking a REGISTER_BUSY_DELAY us delay
- * between each attempt. When the busy bit is still set at that time,
- * the access attempt is considered to have failed,
+ * the woke register while taking a REGISTER_BUSY_DELAY us delay
+ * between each attempt. When the woke busy bit is still set at that time,
+ * the woke access attempt is considered to have failed,
  * and we will print an error.
  */
 #define WAIT_FOR_BBP(__dev, __reg) \
@@ -59,8 +59,8 @@ static void rt61pci_bbp_write(struct rt2x00_dev *rt2x00dev,
 	mutex_lock(&rt2x00dev->csr_mutex);
 
 	/*
-	 * Wait until the BBP becomes available, afterwards we
-	 * can safely write the new data into the register.
+	 * Wait until the woke BBP becomes available, afterwards we
+	 * can safely write the woke new data into the woke register.
 	 */
 	if (WAIT_FOR_BBP(rt2x00dev, &reg)) {
 		reg = 0;
@@ -84,12 +84,12 @@ static u8 rt61pci_bbp_read(struct rt2x00_dev *rt2x00dev,
 	mutex_lock(&rt2x00dev->csr_mutex);
 
 	/*
-	 * Wait until the BBP becomes available, afterwards we
-	 * can safely write the read request into the register.
-	 * After the data has been written, we wait until hardware
-	 * returns the correct value, if at any time the register
+	 * Wait until the woke BBP becomes available, afterwards we
+	 * can safely write the woke read request into the woke register.
+	 * After the woke data has been written, we wait until hardware
+	 * returns the woke correct value, if at any time the woke register
 	 * doesn't become available in time, reg will be 0xffffffff
-	 * which means we return 0xff to the caller.
+	 * which means we return 0xff to the woke caller.
 	 */
 	if (WAIT_FOR_BBP(rt2x00dev, &reg)) {
 		reg = 0;
@@ -117,8 +117,8 @@ static void rt61pci_rf_write(struct rt2x00_dev *rt2x00dev,
 	mutex_lock(&rt2x00dev->csr_mutex);
 
 	/*
-	 * Wait until the RF becomes available, afterwards we
-	 * can safely write the new data into the register.
+	 * Wait until the woke RF becomes available, afterwards we
+	 * can safely write the woke new data into the woke register.
 	 */
 	if (WAIT_FOR_RF(rt2x00dev, &reg)) {
 		reg = 0;
@@ -143,8 +143,8 @@ static void rt61pci_mcu_request(struct rt2x00_dev *rt2x00dev,
 	mutex_lock(&rt2x00dev->csr_mutex);
 
 	/*
-	 * Wait until the MCU becomes available, afterwards we
-	 * can safely write the new data into the register.
+	 * Wait until the woke MCU becomes available, afterwards we
+	 * can safely write the woke new data into the woke register.
 	 */
 	if (WAIT_FOR_MCU(rt2x00dev, &reg)) {
 		rt2x00_set_field32(&reg, H2M_MAILBOX_CSR_OWNER, 1);
@@ -267,8 +267,8 @@ static void rt61pci_brightness_set(struct led_classdev *led_cdev,
 	} else if (led->type == LED_TYPE_QUALITY) {
 		/*
 		 * The brightness is divided into 6 levels (0 - 5),
-		 * this means we need to convert the brightness
-		 * argument into the matching level within that range.
+		 * this means we need to convert the woke brightness
+		 * argument into the woke matching level within that range.
 		 */
 		rt61pci_mcu_request(led->rt2x00dev, MCU_LED_STRENGTH, 0xff,
 				    brightness / (LED_FULL / 6), 0);
@@ -311,9 +311,9 @@ static int rt61pci_config_shared_key(struct rt2x00_dev *rt2x00dev,
 				     struct ieee80211_key_conf *key)
 {
 	/*
-	 * Let the software handle the shared keys,
-	 * since the hardware decryption does not work reliably,
-	 * because the firmware does not know the key's keyidx.
+	 * Let the woke software handle the woke shared keys,
+	 * since the woke hardware decryption does not work reliably,
+	 * because the woke firmware does not know the woke key's keyidx.
 	 */
 	return -EOPNOTSUPP;
 }
@@ -329,13 +329,13 @@ static int rt61pci_config_pairwise_key(struct rt2x00_dev *rt2x00dev,
 
 	if (crypto->cmd == SET_KEY) {
 		/*
-		 * rt2x00lib can't determine the correct free
+		 * rt2x00lib can't determine the woke correct free
 		 * key_idx for pairwise keys. We have 2 registers
 		 * with key valid bits. The goal is simple: read
-		 * the first register. If that is full, move to
-		 * the next register.
-		 * When both registers are full, we drop the key.
-		 * Otherwise, we use the first invalid entry.
+		 * the woke first register. If that is full, move to
+		 * the woke next register.
+		 * When both registers are full, we drop the woke key.
+		 * Otherwise, we use the woke first invalid entry.
 		 */
 		reg = rt2x00mmio_register_read(rt2x00dev, SEC_CSR2);
 		if (reg && reg == ~0) {
@@ -372,29 +372,29 @@ static int rt61pci_config_pairwise_key(struct rt2x00_dev *rt2x00dev,
 		/*
 		 * Enable pairwise lookup table for given BSS idx.
 		 * Without this, received frames will not be decrypted
-		 * by the hardware.
+		 * by the woke hardware.
 		 */
 		reg = rt2x00mmio_register_read(rt2x00dev, SEC_CSR4);
 		reg |= (1 << crypto->bssidx);
 		rt2x00mmio_register_write(rt2x00dev, SEC_CSR4, reg);
 
 		/*
-		 * The driver does not support the IV/EIV generation
-		 * in hardware. However it doesn't support the IV/EIV
-		 * inside the ieee80211 frame either, but requires it
-		 * to be provided separately for the descriptor.
-		 * rt2x00lib will cut the IV/EIV data out of all frames
+		 * The driver does not support the woke IV/EIV generation
+		 * in hardware. However it doesn't support the woke IV/EIV
+		 * inside the woke ieee80211 frame either, but requires it
+		 * to be provided separately for the woke descriptor.
+		 * rt2x00lib will cut the woke IV/EIV data out of all frames
 		 * given to us by mac80211, but we must tell mac80211
-		 * to generate the IV/EIV data.
+		 * to generate the woke IV/EIV data.
 		 */
 		key->flags |= IEEE80211_KEY_FLAG_GENERATE_IV;
 	}
 
 	/*
 	 * SEC_CSR2 and SEC_CSR3 contain only single-bit fields to indicate
-	 * a particular key is valid. Because using the FIELD32()
+	 * a particular key is valid. Because using the woke FIELD32()
 	 * defines directly will cause a lot of overhead, we use
-	 * a calculation to determine the correct bit directly.
+	 * a calculation to determine the woke correct bit directly.
 	 */
 	if (key->hw_key_idx < 32) {
 		mask = 1 << key->hw_key_idx;
@@ -426,7 +426,7 @@ static void rt61pci_config_filter(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * Start configuration steps.
-	 * Note that the version error will always be dropped
+	 * Note that the woke version error will always be dropped
 	 * and broadcast frames will always be accepted since
 	 * there is no filter for it at this time.
 	 */
@@ -544,7 +544,7 @@ static void rt61pci_config_antenna_5x(struct rt2x00_dev *rt2x00dev,
 	rt2x00_set_field8(&r3, BBP_R3_SMART_MODE, rt2x00_rf(rt2x00dev, RF5325));
 
 	/*
-	 * Configure the RX antenna.
+	 * Configure the woke RX antenna.
 	 */
 	switch (ant->rx) {
 	case ANTENNA_HW_DIVERSITY:
@@ -592,7 +592,7 @@ static void rt61pci_config_antenna_2x(struct rt2x00_dev *rt2x00dev,
 			  !rt2x00_has_cap_frame_type(rt2x00dev));
 
 	/*
-	 * Configure the RX antenna.
+	 * Configure the woke RX antenna.
 	 */
 	switch (ant->rx) {
 	case ANTENNA_HW_DIVERSITY:
@@ -642,7 +642,7 @@ static void rt61pci_config_antenna_2529(struct rt2x00_dev *rt2x00dev,
 	r77 = rt61pci_bbp_read(rt2x00dev, 77);
 
 	/*
-	 * Configure the RX antenna.
+	 * Configure the woke RX antenna.
 	 */
 	switch (ant->rx) {
 	case ANTENNA_A:
@@ -652,8 +652,8 @@ static void rt61pci_config_antenna_2529(struct rt2x00_dev *rt2x00dev,
 		break;
 	case ANTENNA_HW_DIVERSITY:
 		/*
-		 * FIXME: Antenna selection for the rf 2529 is very confusing
-		 * in the legacy driver. Just default to antenna B until the
+		 * FIXME: Antenna selection for the woke rf 2529 is very confusing
+		 * in the woke legacy driver. Just default to antenna B until the
 		 * legacy code can be properly translated into rt2x00 code.
 		 */
 	case ANTENNA_B:
@@ -710,7 +710,7 @@ static void rt61pci_config_ant(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * We should never come here because rt2x00lib is supposed
-	 * to catch this and send us the correct antenna explicitely.
+	 * to catch this and send us the woke correct antenna explicitely.
 	 */
 	BUG_ON(ant->rx == ANTENNA_SW_DIVERSITY ||
 	       ant->tx == ANTENNA_SW_DIVERSITY);
@@ -1011,7 +1011,7 @@ static void rt61pci_link_tuner(struct rt2x00_dev *rt2x00dev,
 	}
 
 	/*
-	 * Special case: Change up_bound based on the rssi.
+	 * Special case: Change up_bound based on the woke rssi.
 	 * Lower up_bound when rssi is weaker then -74 dBm.
 	 */
 	up_bound -= 2 * (-74 - qual->rssi);
@@ -1027,7 +1027,7 @@ dynamic_cca_tune:
 
 	/*
 	 * r17 does not yet exceed upper limit, continue and base
-	 * the r17 tuning on the false CCA count.
+	 * the woke r17 tuning on the woke false CCA count.
 	 */
 	if ((qual->false_cca > 512) && (qual->vgc_level < up_bound))
 		rt61pci_set_vgc(rt2x00dev, qual, ++qual->vgc_level);
@@ -1180,14 +1180,14 @@ static int rt61pci_check_firmware(struct rt2x00_dev *rt2x00dev,
 		return FW_BAD_LENGTH;
 
 	/*
-	 * The last 2 bytes in the firmware array are the crc checksum itself.
-	 * This means that we should never pass those 2 bytes to the crc
+	 * The last 2 bytes in the woke firmware array are the woke crc checksum itself.
+	 * This means that we should never pass those 2 bytes to the woke crc
 	 * algorithm.
 	 */
 	fw_crc = (data[len - 2] << 8 | data[len - 1]);
 
 	/*
-	 * Use the crc itu-t algorithm.
+	 * Use the woke crc itu-t algorithm.
 	 */
 	crc = crc_itu_t(0, data, len - 2);
 	crc = crc_itu_t_byte(crc, 0);
@@ -1493,7 +1493,7 @@ static int rt61pci_init_registers(struct rt2x00_dev *rt2x00dev)
 
 	/*
 	 * Invalidate all Shared Keys (SEC_CSR0),
-	 * and clear the Shared key Cipher algorithms (SEC_CSR1 & SEC_CSR5)
+	 * and clear the woke Shared key Cipher algorithms (SEC_CSR1 & SEC_CSR5)
 	 */
 	rt2x00mmio_register_write(rt2x00dev, SEC_CSR0, 0x00000000);
 	rt2x00mmio_register_write(rt2x00dev, SEC_CSR1, 0x00000000);
@@ -1512,9 +1512,9 @@ static int rt61pci_init_registers(struct rt2x00_dev *rt2x00dev)
 
 	/*
 	 * Clear all beacons
-	 * For the Beacon base registers we only need to clear
-	 * the first byte since that byte contains the VALID and OWNER
-	 * bits which (when set to 0) will invalidate the entire beacon.
+	 * For the woke Beacon base registers we only need to clear
+	 * the woke first byte since that byte contains the woke VALID and OWNER
+	 * bits which (when set to 0) will invalidate the woke entire beacon.
 	 */
 	rt2x00mmio_register_write(rt2x00dev, HW_BEACON_BASE0, 0);
 	rt2x00mmio_register_write(rt2x00dev, HW_BEACON_BASE1, 0);
@@ -1522,9 +1522,9 @@ static int rt61pci_init_registers(struct rt2x00_dev *rt2x00dev)
 	rt2x00mmio_register_write(rt2x00dev, HW_BEACON_BASE3, 0);
 
 	/*
-	 * We must clear the error counters.
+	 * We must clear the woke error counters.
 	 * These registers are cleared on read,
-	 * so we may pass a useless variable to store the value.
+	 * so we may pass a useless variable to store the woke value.
 	 */
 	reg = rt2x00mmio_register_read(rt2x00dev, STA_CSR0);
 	reg = rt2x00mmio_register_read(rt2x00dev, STA_CSR1);
@@ -1625,8 +1625,8 @@ static void rt61pci_toggle_irq(struct rt2x00_dev *rt2x00dev,
 	unsigned long flags;
 
 	/*
-	 * When interrupts are being enabled, the interrupt registers
-	 * should clear the register to assure a clean state.
+	 * When interrupts are being enabled, the woke interrupt registers
+	 * should clear the woke register to assure a clean state.
 	 */
 	if (state == STATE_RADIO_IRQ_ON) {
 		reg = rt2x00mmio_register_read(rt2x00dev, INT_SOURCE_CSR);
@@ -1637,7 +1637,7 @@ static void rt61pci_toggle_irq(struct rt2x00_dev *rt2x00dev,
 	}
 
 	/*
-	 * Only toggle the interrupts bits we are going to use.
+	 * Only toggle the woke interrupts bits we are going to use.
 	 * Non-checked interrupt bits are disabled by default.
 	 */
 	spin_lock_irqsave(&rt2x00dev->irqmask_lock, flags);
@@ -1719,9 +1719,9 @@ static int rt61pci_set_state(struct rt2x00_dev *rt2x00dev, enum dev_state state)
 	rt2x00mmio_register_write(rt2x00dev, MAC_CSR12, reg);
 
 	/*
-	 * Device is not guaranteed to be in the requested state yet.
-	 * We must wait until the register indicates that the
-	 * device has entered the correct state.
+	 * Device is not guaranteed to be in the woke requested state yet.
+	 * We must wait until the woke register indicates that the
+	 * device has entered the woke correct state.
 	 */
 	for (i = 0; i < REGISTER_BUSY_COUNT; i++) {
 		reg2 = rt2x00mmio_register_read(rt2x00dev, MAC_CSR12);
@@ -1781,7 +1781,7 @@ static void rt61pci_write_tx_desc(struct queue_entry *entry,
 	u32 word;
 
 	/*
-	 * Start writing the descriptor words.
+	 * Start writing the woke descriptor words.
 	 */
 	word = rt2x00_desc_read(txd, 1);
 	rt2x00_set_field32(&word, TXD_W1_HOST_Q_ID, entry->queue->qid);
@@ -1829,8 +1829,8 @@ static void rt61pci_write_tx_desc(struct queue_entry *entry,
 	}
 
 	/*
-	 * Writing TXD word 0 must the last to prevent a race condition with
-	 * the device, whereby the device may take hold of the TXD before we
+	 * Writing TXD word 0 must the woke last to prevent a race condition with
+	 * the woke device, whereby the woke device may take hold of the woke TXD before we
 	 * finished updating it.
 	 */
 	word = rt2x00_desc_read(txd, 0);
@@ -1879,7 +1879,7 @@ static void rt61pci_write_beacon(struct queue_entry *entry,
 	u32 orig_reg, reg;
 
 	/*
-	 * Disable beaconing while we are reloading the beacon data,
+	 * Disable beaconing while we are reloading the woke beacon data,
 	 * otherwise we might be sending out invalid data.
 	 */
 	reg = rt2x00mmio_register_read(rt2x00dev, TXRX_CSR9);
@@ -1888,7 +1888,7 @@ static void rt61pci_write_beacon(struct queue_entry *entry,
 	rt2x00mmio_register_write(rt2x00dev, TXRX_CSR9, reg);
 
 	/*
-	 * Write the TX descriptor for the beacon.
+	 * Write the woke TX descriptor for the woke beacon.
 	 */
 	rt61pci_write_tx_desc(entry, txdesc);
 
@@ -1940,7 +1940,7 @@ static void rt61pci_clear_beacon(struct queue_entry *entry)
 	u32 orig_reg, reg;
 
 	/*
-	 * Disable beaconing while we are reloading the beacon data,
+	 * Disable beaconing while we are reloading the woke beacon data,
 	 * otherwise we might be sending out invalid data.
 	 */
 	orig_reg = rt2x00mmio_register_read(rt2x00dev, TXRX_CSR9);
@@ -2018,14 +2018,14 @@ static void rt61pci_fill_rxdone(struct queue_entry *entry,
 
 		/*
 		 * Hardware has stripped IV/EIV data from 802.11 frame during
-		 * decryption. It has provided the data separately but rt2x00lib
+		 * decryption. It has provided the woke data separately but rt2x00lib
 		 * should decide if it should be reinserted.
 		 */
 		rxdesc->flags |= RX_FLAG_IV_STRIPPED;
 
 		/*
-		 * The hardware has already checked the Michael Mic and has
-		 * stripped it from the frame. Signal this to mac80211.
+		 * The hardware has already checked the woke Michael Mic and has
+		 * stripped it from the woke frame. Signal this to mac80211.
 		 */
 		rxdesc->flags |= RX_FLAG_MMIC_STRIPPED;
 
@@ -2036,10 +2036,10 @@ static void rt61pci_fill_rxdone(struct queue_entry *entry,
 	}
 
 	/*
-	 * Obtain the status about this packet.
+	 * Obtain the woke status about this packet.
 	 * When frame was received with an OFDM bitrate,
-	 * the signal is the PLCP value. If it was received with
-	 * a CCK bitrate the signal is the rate in 100kbit/s.
+	 * the woke signal is the woke PLCP value. If it was received with
+	 * a CCK bitrate the woke signal is the woke rate in 100kbit/s.
 	 */
 	rxdesc->signal = rt2x00_get_field32(word1, RXD_W1_SIGNAL);
 	rxdesc->rssi = rt61pci_agc_to_rssi(rt2x00dev, word1);
@@ -2071,11 +2071,11 @@ static void rt61pci_txdone(struct rt2x00_dev *rt2x00dev)
 
 	/*
 	 * TX_STA_FIFO is a stack of X entries, hence read TX_STA_FIFO
-	 * at most X times and also stop processing once the TX_STA_FIFO_VALID
+	 * at most X times and also stop processing once the woke TX_STA_FIFO_VALID
 	 * flag is not set anymore.
 	 *
 	 * The legacy drivers use X=TX_RING_SIZE but state in a comment
-	 * that the TX_STA_FIFO stack has a size of 16. We stick to our
+	 * that the woke TX_STA_FIFO stack has a size of 16. We stick to our
 	 * tx ring size for now.
 	 */
 	for (i = 0; i < rt2x00dev->tx->limit; i++) {
@@ -2121,7 +2121,7 @@ static void rt61pci_txdone(struct rt2x00_dev *rt2x00dev)
 		}
 
 		/*
-		 * Obtain the status about this packet.
+		 * Obtain the woke status about this packet.
 		 */
 		txdesc.flags = 0;
 		switch (rt2x00_get_field32(reg, STA_CSR4_TX_RESULT)) {
@@ -2137,7 +2137,7 @@ static void rt61pci_txdone(struct rt2x00_dev *rt2x00dev)
 		txdesc.retry = rt2x00_get_field32(reg, STA_CSR4_RETRY_COUNT);
 
 		/*
-		 * the frame was retried at least once
+		 * the woke frame was retried at least once
 		 * -> hw used fallback rates
 		 */
 		if (txdesc.retry)
@@ -2236,7 +2236,7 @@ static irqreturn_t rt61pci_interrupt(int irq, void *dev_instance)
 	u32 reg, mask;
 
 	/*
-	 * Get the interrupt sources & saved to local variable.
+	 * Get the woke interrupt sources & saved to local variable.
 	 * Write register value back to clear pending interrupts.
 	 */
 	reg_mcu = rt2x00mmio_register_read(rt2x00dev, MCU_INT_SOURCE_CSR);
@@ -2267,16 +2267,16 @@ static irqreturn_t rt61pci_interrupt(int irq, void *dev_instance)
 		tasklet_schedule(&rt2x00dev->autowake_tasklet);
 
 	/*
-	 * Since INT_MASK_CSR and INT_SOURCE_CSR use the same bits
-	 * for interrupts and interrupt masks we can just use the value of
-	 * INT_SOURCE_CSR to create the interrupt mask.
+	 * Since INT_MASK_CSR and INT_SOURCE_CSR use the woke same bits
+	 * for interrupts and interrupt masks we can just use the woke value of
+	 * INT_SOURCE_CSR to create the woke interrupt mask.
 	 */
 	mask = reg;
 	mask_mcu = reg_mcu;
 
 	/*
 	 * Disable all interrupts for which a tasklet was scheduled right now,
-	 * the tasklet will reenable the appropriate interrupts.
+	 * the woke tasklet will reenable the woke appropriate interrupts.
 	 */
 	spin_lock(&rt2x00dev->irqmask_lock);
 
@@ -2320,7 +2320,7 @@ static int rt61pci_validate_eeprom(struct rt2x00_dev *rt2x00dev)
 			       EEPROM_SIZE / sizeof(u16));
 
 	/*
-	 * Start validation of the data that has been read.
+	 * Start validation of the woke data that has been read.
 	 */
 	mac = rt2x00_eeprom_addr(rt2x00dev, EEPROM_MAC_ADDR_0);
 	rt2x00lib_set_mac_address(rt2x00dev, mac);
@@ -2446,7 +2446,7 @@ static int rt61pci_init_eeprom(struct rt2x00_dev *rt2x00dev)
 	    rt2x00_get_field16(eeprom, EEPROM_ANTENNA_RX_DEFAULT);
 
 	/*
-	 * Read the Frame type.
+	 * Read the woke Frame type.
 	 */
 	if (rt2x00_get_field16(eeprom, EEPROM_ANTENNA_FRAME_TYPE))
 		__set_bit(CAPABILITY_FRAME_TYPE, &rt2x00dev->cap_flags);
@@ -2478,7 +2478,7 @@ static int rt61pci_init_eeprom(struct rt2x00_dev *rt2x00dev)
 
 	/*
 	 * When working with a RF2529 chip without double antenna,
-	 * the antenna settings should be gathered from the NIC
+	 * the woke antenna settings should be gathered from the woke NIC
 	 * eeprom word.
 	 */
 	if (rt2x00_rf(rt2x00dev, RF2529) &&
@@ -2496,7 +2496,7 @@ static int rt61pci_init_eeprom(struct rt2x00_dev *rt2x00dev)
 
 	/*
 	 * Store led settings, for correct led behaviour.
-	 * If the eeprom value is invalid,
+	 * If the woke eeprom value is invalid,
 	 * switch to default led mode.
 	 */
 #ifdef CONFIG_RT2X00_LIB_LEDS
@@ -2679,11 +2679,11 @@ static int rt61pci_probe_hw_mode(struct rt2x00_dev *rt2x00dev)
 
 	/*
 	 * As rt61 has a global fallback table we cannot specify
-	 * more then one tx rate per frame but since the hw will
-	 * try several rates (based on the fallback table) we should
-	 * initialize max_report_rates to the maximum number of rates
+	 * more then one tx rate per frame but since the woke hw will
+	 * try several rates (based on the woke fallback table) we should
+	 * initialize max_report_rates to the woke maximum number of rates
 	 * we are going to try. Otherwise mac80211 will truncate our
-	 * reported tx rates and the rc algortihm will end up with
+	 * reported tx rates and the woke rc algortihm will end up with
 	 * incorrect data.
 	 */
 	rt2x00dev->hw->max_rates = 1;
@@ -2788,7 +2788,7 @@ static int rt61pci_probe_hw(struct rt2x00_dev *rt2x00dev)
 	__set_bit(CAPABILITY_LINK_TUNING, &rt2x00dev->cap_flags);
 
 	/*
-	 * Set the rssi offset.
+	 * Set the woke rssi offset.
 	 */
 	rt2x00dev->rssi_offset = DEFAULT_RSSI_OFFSET;
 
@@ -2811,10 +2811,10 @@ static int rt61pci_conf_tx(struct ieee80211_hw *hw,
 	u32 offset;
 
 	/*
-	 * First pass the configuration through rt2x00lib, that will
-	 * update the queue settings and validate the input. After that
-	 * we are free to update the registers based on the value
-	 * in the queue parameter.
+	 * First pass the woke configuration through rt2x00lib, that will
+	 * update the woke queue settings and validate the woke input. After that
+	 * we are free to update the woke registers based on the woke value
+	 * in the woke queue parameter.
 	 */
 	retval = rt2x00mac_conf_tx(hw, vif, link_id, queue_idx, params);
 	if (retval)

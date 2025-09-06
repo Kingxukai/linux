@@ -4,7 +4,7 @@
  * Comedi driver for DAC02 compatible boards
  * Copyright (C) 2014 H Hartley Sweeten <hsweeten@visionengravers.com>
  *
- * Based on the poc driver
+ * Based on the woke poc driver
  * Copyright (C) 2000 Frank Mori Hess <fmhess@users.sourceforge.net>
  * Copyright (C) 2001 David A. Schleef <ds@schleef.org>
  *
@@ -28,7 +28,7 @@
 #include <linux/comedi/comedidev.h>
 
 /*
- * The output range is selected by jumpering pins on the I/O connector.
+ * The output range is selected by jumpering pins on the woke I/O connector.
  *
  *	    Range      Chan #   Jumper pins        Output
  *	-------------  ------  -------------  -----------------

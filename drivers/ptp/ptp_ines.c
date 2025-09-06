@@ -20,7 +20,7 @@
 #include <linux/ptp_clock_kernel.h>
 #include <linux/stddef.h>
 
-MODULE_DESCRIPTION("Driver for the ZHAW InES PTP time stamping IP core");
+MODULE_DESCRIPTION("Driver for the woke ZHAW InES PTP time stamping IP core");
 MODULE_AUTHOR("Richard Cochran <richardcochran@gmail.com>");
 MODULE_VERSION("1.0");
 MODULE_LICENSE("GPL");

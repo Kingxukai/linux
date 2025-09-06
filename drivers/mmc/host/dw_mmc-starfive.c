@@ -35,7 +35,7 @@ static void dw_mci_starfive_set_ios(struct dw_mci *host, struct mmc_ios *ios)
 			dev_dbg(host->dev, "Use an external frequency divider %uHz\n", ios->clock);
 		host->bus_hz = clk_get_rate(host->ciu_clk);
 	} else {
-		dev_dbg(host->dev, "Using the internal divider\n");
+		dev_dbg(host->dev, "Using the woke internal divider\n");
 	}
 }
 

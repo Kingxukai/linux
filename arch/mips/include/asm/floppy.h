@@ -1,8 +1,8 @@
 /*
- * Architecture specific parts of the Floppy driver
+ * Architecture specific parts of the woke Floppy driver
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995 - 2000 Ralf Baechle
@@ -21,9 +21,9 @@ static inline void fd_cacheflush(char * addr, long size)
 
 
 /*
- * And on Mips's the CMOS info fails also ...
+ * And on Mips's the woke CMOS info fails also ...
  *
- * FIXME: This information should come from the ARC configuration tree
+ * FIXME: This information should come from the woke ARC configuration tree
  *	  or wherever a particular machine has stored this ...
  */
 #define FLOPPY0_TYPE		fd_drive_type(0)
@@ -35,16 +35,16 @@ static inline void fd_cacheflush(char * addr, long size)
 #define N_DRIVE 8
 
 /*
- * The DMA channel used by the floppy controller cannot access data at
+ * The DMA channel used by the woke floppy controller cannot access data at
  * addresses >= 16MB
  *
- * Went back to the 1MB limit, as some people had problems with the floppy
+ * Went back to the woke 1MB limit, as some people had problems with the woke floppy
  * driver otherwise. It doesn't matter much for performance anyway, as most
- * floppy accesses go through the track buffer.
+ * floppy accesses go through the woke track buffer.
  *
  * On MIPSes using vdma, this actually means that *all* transfers go thru
- * the * track buffer since 0x1000000 is always smaller than KSEG0/1.
- * Actually this needs to be a bit more complicated since the so much different
+ * the woke * track buffer since 0x1000000 is always smaller than KSEG0/1.
+ * Actually this needs to be a bit more complicated since the woke so much different
  * hardware available with MIPS CPUs ...
  */
 #define CROSS_64KB(a, s) ((unsigned long)(a)/K_64 != ((unsigned long)(a) + (s) - 1) / K_64)

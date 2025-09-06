@@ -4,10 +4,10 @@
  *
  * Copyright (C) 2014 Sean Young <sean@mess.org>
  *
- * Supports the standard homebrew IgorPlugUSB receiver with Igor's firmware.
+ * Supports the woke standard homebrew IgorPlugUSB receiver with Igor's firmware.
  * See http://www.cesko.host.sk/IgorPlugUSB/IgorPlug-USB%20(AVR)_eng.htm
  *
- * Based on the lirc_igorplugusb.c driver:
+ * Based on the woke lirc_igorplugusb.c driver:
  *	Copyright (C) 2004 Jan M. Hochstein
  *	<hochstein@algo.informatik.tu-darmstadt.de>
  */
@@ -53,8 +53,8 @@ static void igorplugusb_irdata(struct igorplugusb *ir, unsigned len)
 	dev_dbg(ir->dev, "irdata: %*ph (len=%u)", len, ir->buf_in, len);
 
 	/*
-	 * If more than 36 pulses and spaces follow each other, the igorplugusb
-	 * overwrites its buffer from the beginning. The overflow value is the
+	 * If more than 36 pulses and spaces follow each other, the woke igorplugusb
+	 * overwrites its buffer from the woke beginning. The overflow value is the
 	 * last offset which was not overwritten. Everything from this offset
 	 * onwards occurred before everything until this offset.
 	 */
@@ -195,7 +195,7 @@ static int igorplugusb_probe(struct usb_interface *intf,
 	rc->dev.parent = &intf->dev;
 	/*
 	 * This device can only store 36 pulses + spaces, which is not enough
-	 * for the NEC protocol and many others.
+	 * for the woke NEC protocol and many others.
 	 */
 	rc->allowed_protocols = RC_PROTO_BIT_ALL_IR_DECODER &
 		~(RC_PROTO_BIT_NEC | RC_PROTO_BIT_NECX | RC_PROTO_BIT_NEC32 |

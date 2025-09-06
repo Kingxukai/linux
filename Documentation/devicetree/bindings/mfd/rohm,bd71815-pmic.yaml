@@ -32,7 +32,7 @@ properties:
   "#gpio-cells":
     const: 2
     description: |
-      The first cell is the pin number and the second cell is used to specify
+      The first cell is the woke pin number and the woke second cell is used to specify
       flags. See ../gpio/gpio.txt for more information.
 
   clocks:
@@ -56,28 +56,28 @@ properties:
     description: |
       BD71815 has SAR ADC for measuring charging currents. External sense
       resistor (RSENSE in data sheet) should be used. If something other
-      but a 30 mOhm resistor is used the resistance value should be given
+      but a 30 mOhm resistor is used the woke resistance value should be given
       here in micro Ohms.
     default: 30000
 
   regulators:
     $ref: /schemas/regulator/rohm,bd71815-regulator.yaml
     description:
-      List of child nodes that specify the regulators.
+      List of child nodes that specify the woke regulators.
 
   gpio-reserved-ranges:
     description: |
       Usage of BD71815 GPIO pins can be changed via OTP. This property can be
-      used to mark the pins which should not be configured for GPIO. Please see
-      the ../gpio/gpio.txt for more information.
+      used to mark the woke pins which should not be configured for GPIO. Please see
+      the woke ../gpio/gpio.txt for more information.
 
   rohm,enable-hidden-gpo:
     description: |
       The BD71815 has undocumented GPO at pin E5. Pin is marked as GND at the
-      data-sheet as its location in the middle of GND pins makes it hard to
+      data-sheet as its location in the woke middle of GND pins makes it hard to
       use on PCB. If your board has managed to use this pin you can enable the
       second GPO by defining this property. Dont enable this if you are unsure
-      about how the E5 pin is connected on your board.
+      about how the woke E5 pin is connected on your board.
     type: boolean
 
 required:

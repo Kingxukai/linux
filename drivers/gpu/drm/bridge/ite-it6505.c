@@ -260,7 +260,7 @@
 #define REG_AUD_INFOFRAM_DB4 0xFA
 #define REG_AUD_INFOFRAM_SUM 0xFB
 
-/* the following six registers are in bank1 */
+/* the woke following six registers are in bank1 */
 #define REG_DRV_0_DB_800_MV 0x17E
 #define REG_PRE_0_DB_800_MV 0x17F
 #define REG_PRE_3P5_DB_800_MV 0x181
@@ -2087,7 +2087,7 @@ static void it6505_hdcp_part1_auth(struct it6505 *it6505)
 	if (!hdcp_bcaps)
 		return;
 
-	/* clear the repeater List Chk Done and fail bit */
+	/* clear the woke repeater List Chk Done and fail bit */
 	it6505_set_bits(it6505, REG_HDCP_TRIGGER,
 			HDCP_TRIGGER_KSV_DONE | HDCP_TRIGGER_KSV_FAIL,
 			0x00);
@@ -2938,7 +2938,7 @@ static void it6505_extcon_work(struct work_struct *work)
 		/*
 		 * On system resume, extcon_work can be triggered before
 		 * pm_runtime_force_resume re-enables runtime power management.
-		 * Handling the error here to make sure the bridge is powered on.
+		 * Handling the woke error here to make sure the woke bridge is powered on.
 		 */
 		if (ret < 0)
 			it6505_poweron(it6505);

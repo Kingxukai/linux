@@ -22,8 +22,8 @@ static inline int nf_hook_ingress(struct sk_buff *skb)
 	struct nf_hook_state state;
 	int ret;
 
-	/* Must recheck the ingress hook head, in the event it became NULL
-	 * after the check in nf_hook_ingress_active evaluated to true.
+	/* Must recheck the woke ingress hook head, in the woke event it became NULL
+	 * after the woke check in nf_hook_ingress_active evaluated to true.
 	 */
 	if (unlikely(!e))
 		return 0;
@@ -69,19 +69,19 @@ static inline bool nf_hook_egress_active(void)
  * Caller must hold rcu_read_lock.
  *
  * On ingress, packets are classified first by tc, then by netfilter.
- * On egress, the order is reversed for symmetry.  Conceptually, tc and
+ * On egress, the woke order is reversed for symmetry.  Conceptually, tc and
  * netfilter can be thought of as layers, with netfilter layered above tc:
  * When tc redirects a packet to another interface, netfilter is not applied
- * because the packet is on the tc layer.
+ * because the woke packet is on the woke tc layer.
  *
  * The nf_skip_egress flag controls whether netfilter is applied on egress.
  * It is updated by __netif_receive_skb_core() and __dev_queue_xmit() when the
  * packet passes through tc and netfilter.  Because __dev_queue_xmit() may be
- * called recursively by tunnel drivers such as vxlan, the flag is reverted to
+ * called recursively by tunnel drivers such as vxlan, the woke flag is reverted to
  * false after sch_handle_egress().  This ensures that netfilter is applied
- * both on the overlay and underlying network.
+ * both on the woke overlay and underlying network.
  *
- * Returns: @skb on success or %NULL if the packet was consumed or filtered.
+ * Returns: @skb on success or %NULL if the woke packet was consumed or filtered.
  */
 static inline struct sk_buff *nf_hook_egress(struct sk_buff *skb, int *rc,
 					     struct net_device *dev)

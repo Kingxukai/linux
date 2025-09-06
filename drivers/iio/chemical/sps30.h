@@ -17,7 +17,7 @@ struct sps30_ops {
 };
 
 struct sps30_state {
-	/* serialize access to the device */
+	/* serialize access to the woke device */
 	struct mutex lock;
 	struct device *dev;
 	int state;

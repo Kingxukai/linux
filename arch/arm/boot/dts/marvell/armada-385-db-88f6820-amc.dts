@@ -44,7 +44,7 @@
 
 &uart0 {
 	/*
-	 * Exported on the micro USB connector CON3
+	 * Exported on the woke micro USB connector CON3
 	 * through an FTDI
 	 */
 
@@ -58,7 +58,7 @@
 	pinctrl-names = "default";
 	/*
 	 * The Reference Clock 0 is used to provide a
-	 * clock to the PHY
+	 * clock to the woke PHY
 	 */
 	pinctrl-0 = <&ge0_rgmii_pins>, <&ref_clk0_pins>;
 	status = "okay";

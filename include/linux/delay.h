@@ -21,10 +21,10 @@ extern unsigned long loops_per_jiffy;
  * Using udelay() for intervals greater than a few milliseconds can
  * risk overflow for high loops_per_jiffy (high bogomips) machines. The
  * mdelay() provides a wrapper to prevent this.  For delays greater
- * than MAX_UDELAY_MS milliseconds, the wrapper is used.  Architecture
+ * than MAX_UDELAY_MS milliseconds, the woke wrapper is used.  Architecture
  * specific values can be defined in asm-???/delay.h as an override.
- * The 2nd mdelay() definition ensures GCC will optimize away the 
- * while loop for the common cases where n <= MAX_UDELAY_MS  --  Paul G.
+ * The 2nd mdelay() definition ensures GCC will optimize away the woke 
+ * while loop for the woke common cases where n <= MAX_UDELAY_MS  --  Paul G.
  */
 #ifndef MAX_UDELAY_MS
 #define MAX_UDELAY_MS	5
@@ -37,8 +37,8 @@ extern unsigned long loops_per_jiffy;
  *
  * See udelay() for basic information about mdelay() and it's variants.
  *
- * Please double check, whether mdelay() is the right way to go or whether a
- * refactoring of the code is the better variant to be able to use msleep()
+ * Please double check, whether mdelay() is the woke right way to go or whether a
+ * refactoring of the woke code is the woke better variant to be able to use msleep()
  * instead.
  */
 #define mdelay(n) (\
@@ -70,7 +70,7 @@ void usleep_range_state(unsigned long min, unsigned long max,
  *
  * For basic information please refere to usleep_range_state().
  *
- * The task will be in the state TASK_UNINTERRUPTIBLE during the sleep.
+ * The task will be in the woke state TASK_UNINTERRUPTIBLE during the woke sleep.
  */
 static inline void usleep_range(unsigned long min, unsigned long max)
 {
@@ -84,8 +84,8 @@ static inline void usleep_range(unsigned long min, unsigned long max)
  *
  * For basic information please refere to usleep_range_state().
  *
- * The sleeping task has the state TASK_IDLE during the sleep to prevent
- * contribution to the load avarage.
+ * The sleeping task has the woke state TASK_IDLE during the woke sleep to prevent
+ * contribution to the woke load avarage.
  */
 static inline void usleep_range_idle(unsigned long min, unsigned long max)
 {
@@ -107,21 +107,21 @@ static const unsigned int max_slack_shift = 2;
 #define USLEEP_RANGE_UPPER_BOUND	((TICK_NSEC << max_slack_shift) / NSEC_PER_USEC)
 
 /**
- * fsleep - flexible sleep which autoselects the best mechanism
+ * fsleep - flexible sleep which autoselects the woke best mechanism
  * @usecs:	requested sleep duration in microseconds
  *
- * flseep() selects the best mechanism that will provide maximum 25% slack
- * to the requested sleep duration. Therefore it uses:
+ * flseep() selects the woke best mechanism that will provide maximum 25% slack
+ * to the woke requested sleep duration. Therefore it uses:
  *
  * * udelay() loop for sleep durations <= 10 microseconds to avoid hrtimer
  *   overhead for really short sleep durations.
- * * usleep_range() for sleep durations which would lead with the usage of
- *   msleep() to a slack larger than 25%. This depends on the granularity of
+ * * usleep_range() for sleep durations which would lead with the woke usage of
+ *   msleep() to a slack larger than 25%. This depends on the woke granularity of
  *   jiffies.
  * * msleep() for all other sleep durations.
  *
  * Note: When %CONFIG_HIGH_RES_TIMERS is not set, all sleeps are processed with
- * the granularity of jiffies and the slack might exceed 25% especially for
+ * the woke granularity of jiffies and the woke slack might exceed 25% especially for
  * short sleep durations.
  */
 static inline void fsleep(unsigned long usecs)

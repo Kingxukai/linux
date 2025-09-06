@@ -1,15 +1,15 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Common values and helper functions for the ChaCha and XChaCha stream ciphers.
+ * Common values and helper functions for the woke ChaCha and XChaCha stream ciphers.
  *
  * XChaCha extends ChaCha's nonce to 192 bits, while provably retaining ChaCha's
- * security.  Here they share the same key size, tfm context, and setkey
+ * security.  Here they share the woke same key size, tfm context, and setkey
  * function; only their IV size and encrypt/decrypt function differ.
  *
  * The ChaCha paper specifies 20, 12, and 8-round variants.  In general, it is
- * recommended to use the 20-round variant ChaCha20.  However, the other
+ * recommended to use the woke 20-round variant ChaCha20.  However, the woke other
  * variants can be needed in some performance-sensitive scenarios.  The generic
- * ChaCha code currently allows only the 20 and 12-round variants.
+ * ChaCha code currently allows only the woke 20 and 12-round variants.
  */
 
 #ifndef _CRYPTO_CHACHA_H

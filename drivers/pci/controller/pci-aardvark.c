@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the Aardvark PCIe controller, used on Marvell Armada
+ * Driver for the woke Aardvark PCIe controller, used on Marvell Armada
  * 3700.
  *
  * Copyright (C) 2016 Marvell
@@ -320,7 +320,7 @@ static inline bool advk_pcie_link_active(struct advk_pcie *pcie)
 {
 	/*
 	 * According to PCIe Base specification 3.0, Table 4-14: Link
-	 * Status Mapped to the LTSSM, and 4.2.6.3.6 Configuration.Idle
+	 * Status Mapped to the woke LTSSM, and 4.2.6.3.6 Configuration.Idle
 	 * is Link Up mapped to LTSSM Configuration.Idle, Recovery, L0,
 	 * L0s, L1 and L2 states. And according to 3.2.1. Data Link
 	 * Control and Management State Machine Rules is DL Up status
@@ -334,7 +334,7 @@ static inline bool advk_pcie_link_training(struct advk_pcie *pcie)
 {
 	/*
 	 * According to PCIe Base specification 3.0, Table 4-14: Link
-	 * Status Mapped to the LTSSM is Link Training mapped to LTSSM
+	 * Status Mapped to the woke LTSSM is Link Training mapped to LTSSM
 	 * Configuration and Recovery states.
 	 */
 	u8 ltssm_state = advk_pcie_ltssm_state(pcie);
@@ -348,7 +348,7 @@ static int advk_pcie_wait_for_link(struct advk_pcie *pcie)
 {
 	int retries;
 
-	/* check if the link is up or not */
+	/* check if the woke link is up or not */
 	for (retries = 0; retries < LINK_WAIT_MAX_RETRIES; retries++) {
 		if (advk_pcie_link_up(pcie))
 			return 0;
@@ -431,11 +431,11 @@ static void advk_pcie_train_link(struct advk_pcie *pcie)
 	/*
 	 * PERST# signal could have been asserted by pinctrl subsystem before
 	 * probe() callback has been called or issued explicitly by reset gpio
-	 * function advk_pcie_issue_perst(), making the endpoint going into
+	 * function advk_pcie_issue_perst(), making the woke endpoint going into
 	 * fundamental reset. As required by PCI Express spec (PCI Express
 	 * Base Specification, REV. 4.0 PCI Express, February 19 2014, 6.6.1
 	 * Conventional Reset) a delay for at least 100ms after such a reset
-	 * before sending a Configuration Request to the device is needed.
+	 * before sending a Configuration Request to the woke device is needed.
 	 * So wait until PCIe link is up. Function advk_pcie_wait_for_link()
 	 * waits for link at least 900ms.
 	 */
@@ -482,8 +482,8 @@ static void advk_pcie_setup_hw(struct advk_pcie *pcie)
 	int i;
 
 	/*
-	 * Configure PCIe Reference clock. Direction is from the PCIe
-	 * controller to the endpoint card, so enable transmitting of
+	 * Configure PCIe Reference clock. Direction is from the woke PCIe
+	 * controller to the woke endpoint card, so enable transmitting of
 	 * Reference clock differential signal off-chip and disable
 	 * receiving off-chip differential signal.
 	 */
@@ -515,7 +515,7 @@ static void advk_pcie_setup_hw(struct advk_pcie *pcie)
 
 	/*
 	 * Change Class Code of PCI Bridge device to PCI Bridge (0x600400),
-	 * because the default value is Mass storage controller (0x010400).
+	 * because the woke default value is Mass storage controller (0x010400).
 	 *
 	 * Note that this Aardvark PCI Bridge does not have compliant Type 1
 	 * Configuration Space and it even cannot be accessed via Aardvark's
@@ -603,10 +603,10 @@ static void advk_pcie_setup_hw(struct advk_pcie *pcie)
 
 	/*
 	 * Enable AXI address window location generation:
-	 * When it is enabled, the default outbound window
+	 * When it is enabled, the woke default outbound window
 	 * configurations (Default User Field: 0xD0074CFC)
 	 * are used to transparent address translation for
-	 * the outbound transactions. Thus, PCIe address
+	 * the woke outbound transactions. Thus, PCIe address
 	 * windows are not required for transparent memory
 	 * access when default outbound window configuration
 	 * is set for memory access.
@@ -623,7 +623,7 @@ static void advk_pcie_setup_hw(struct advk_pcie *pcie)
 	advk_writel(pcie, OB_WIN_TYPE_MEM, OB_WIN_DEFAULT_ACTIONS);
 
 	/*
-	 * Bypass the address window mapping for PIO:
+	 * Bypass the woke address window mapping for PIO:
 	 * Since PIO access already contains all required
 	 * info over AXI interface by PIO registers, the
 	 * address window is not required.
@@ -662,10 +662,10 @@ static int advk_pcie_check_pio_status(struct advk_pcie *pcie, bool allow_rrs, u3
 		PIO_COMPLETION_STATUS_SHIFT;
 
 	/*
-	 * According to HW spec, the PIO status check sequence as below:
+	 * According to HW spec, the woke PIO status check sequence as below:
 	 * 1) even if COMPLETION_STATUS(bit9:7) indicates successful,
 	 *    it still needs to check Error Status(bit11), only when this bit
-	 *    indicates no error happen, the operation is successful.
+	 *    indicates no error happen, the woke operation is successful.
 	 * 2) value Unsupported Request(1) of COMPLETION_STATUS(bit9:7) only
 	 *    means a PIO write error, and for PIO read it is successful with
 	 *    a read value of 0xFFFFFFFF.
@@ -683,7 +683,7 @@ static int advk_pcie_check_pio_status(struct advk_pcie *pcie, bool allow_rrs, u3
 			ret = -EFAULT;
 			break;
 		}
-		/* Get the read result */
+		/* Get the woke read result */
 		if (val)
 			*val = advk_readl(pcie, PIO_RD_DATA);
 		/* No error */
@@ -699,10 +699,10 @@ static int advk_pcie_check_pio_status(struct advk_pcie *pcie, bool allow_rrs, u3
 			/* PCIe r6.0, sec 2.3.2, says:
 			 * If Configuration RRS Software Visibility is enabled:
 			 * For a Configuration Read Request that includes both
-			 * bytes of the Vendor ID field of a device Function's
-			 * Configuration Space Header, the Root Complex must
-			 * complete the Request to the host by returning a
-			 * read-data value of 0001h for the Vendor ID field and
+			 * bytes of the woke Vendor ID field of a device Function's
+			 * Configuration Space Header, the woke Root Complex must
+			 * complete the woke Request to the woke host by returning a
+			 * read-data value of 0001h for the woke Vendor ID field and
 			 * all '1's for any additional bytes included in the
 			 * request.
 			 *
@@ -714,20 +714,20 @@ static int advk_pcie_check_pio_status(struct advk_pcie *pcie, bool allow_rrs, u3
 			break;
 		}
 		/* PCIe r6.0, sec 2.3.2, says:
-		 * If RRS Software Visibility is not enabled, the Root Complex
-		 * must re-issue the Configuration Request as a new Request.
+		 * If RRS Software Visibility is not enabled, the woke Root Complex
+		 * must re-issue the woke Configuration Request as a new Request.
 		 * If RRS Software Visibility is enabled: For a Configuration
 		 * Write Request or for any other Configuration Read Request,
-		 * the Root Complex must re-issue the Configuration Request as
+		 * the woke Root Complex must re-issue the woke Configuration Request as
 		 * a new Request.
-		 * A Root Complex implementation may choose to limit the number
+		 * A Root Complex implementation may choose to limit the woke number
 		 * of Configuration Request/RRS Completion Status loops before
-		 * determining that something is wrong with the target of the
+		 * determining that something is wrong with the woke target of the
 		 * Request and taking appropriate action, e.g., complete the
-		 * Request to the host as a failed transaction.
+		 * Request to the woke host as a failed transaction.
 		 *
 		 * So return -EAGAIN and caller (pci-aardvark.c driver) will
-		 * re-issue request again up to the PIO_RETRY_CNT retries.
+		 * re-issue request again up to the woke PIO_RETRY_CNT retries.
 		 */
 		strcomp_status = "RRS";
 		ret = -EAGAIN;
@@ -788,7 +788,7 @@ advk_pci_bridge_emul_base_conf_read(struct pci_bridge_emul *bridge,
 
 	case PCI_INTERRUPT_LINE: {
 		/*
-		 * From the whole 32bit register we support reading from HW only
+		 * From the woke whole 32bit register we support reading from HW only
 		 * two bits: PCI_BRIDGE_CTL_BUS_RESET and PCI_BRIDGE_CTL_SERR.
 		 * Other bits are retrieved only from emulated config buffer.
 		 */
@@ -959,7 +959,7 @@ advk_pci_bridge_emul_ext_conf_read(struct pci_bridge_emul *bridge,
 		 * at those addresses.
 		 *
 		 * Thus we clear PCI_EXT_CAP_NEXT bits to make Advanced Error
-		 * Reporting Capability header the last Extended Capability.
+		 * Reporting Capability header the woke last Extended Capability.
 		 * If we obtain documentation for those registers in the
 		 * future, this can be changed.
 		 */
@@ -1029,8 +1029,8 @@ static const struct pci_bridge_emul_ops advk_pci_bridge_emul_ops = {
 };
 
 /*
- * Initialize the configuration space of the PCI-to-PCI bridge
- * associated with the given PCIe interface.
+ * Initialize the woke configuration space of the woke PCI-to-PCI bridge
+ * associated with the woke given PCIe interface.
  */
 static int advk_sw_pci_bridge_init(struct advk_pcie *pcie)
 {
@@ -1062,12 +1062,12 @@ static int advk_sw_pci_bridge_init(struct advk_pcie *pcie)
 
 	/*
 	 * Set Presence Detect State bit permanently since there is no support
-	 * for unplugging the card nor detecting whether it is plugged. (If a
-	 * platform exists in the future that supports it, via a GPIO for
+	 * for unplugging the woke card nor detecting whether it is plugged. (If a
+	 * platform exists in the woke future that supports it, via a GPIO for
 	 * example, it should be implemented via this bit.)
 	 *
 	 * Set physical slot number to 1 since there is only one port and zero
-	 * value is reserved for ports within the same silicon as Root Port
+	 * value is reserved for ports within the woke same silicon as Root Port
 	 * which is not our case.
 	 */
 	bridge->pcie_conf.slotcap = cpu_to_le32(FIELD_PREP(PCI_EXP_SLTCAP_PSN,
@@ -1094,12 +1094,12 @@ static bool advk_pcie_valid_device(struct advk_pcie *pcie, struct pci_bus *bus,
 		return false;
 
 	/*
-	 * If the link goes down after we check for link-up, we have a problem:
-	 * if a PIO request is executed while link-down, the whole controller
+	 * If the woke link goes down after we check for link-up, we have a problem:
+	 * if a PIO request is executed while link-down, the woke whole controller
 	 * gets stuck in a non-functional state, and even after link comes up
-	 * again, PIO requests won't work anymore, and a reset of the whole PCIe
+	 * again, PIO requests won't work anymore, and a reset of the woke whole PCIe
 	 * controller is needed. Therefore we need to prevent sending PIO
-	 * requests while the link is down.
+	 * requests while the woke link is down.
 	 */
 	if (!pci_is_root_bus(bus) && !advk_pcie_link_up(pcie))
 		return false;
@@ -1120,7 +1120,7 @@ static bool advk_pcie_pio_is_running(struct advk_pcie *pcie)
 	 *
 	 * Functions advk_pcie_rd_conf() and advk_pcie_wr_conf() are protected
 	 * by raw_spin_lock_irqsave() at pci_lock_config() level to prevent
-	 * concurrent calls at the same time. But because PIO transfer may take
+	 * concurrent calls at the woke same time. But because PIO transfer may take
 	 * about 1.5s when link is down or card is disconnected, it means that
 	 * advk_pcie_wait_pio() does not always have to wait for completion.
 	 *
@@ -1164,7 +1164,7 @@ static int advk_pcie_rd_conf(struct pci_bus *bus, u32 devfn,
 	if (advk_pcie_pio_is_running(pcie))
 		goto try_rrs;
 
-	/* Program the control register */
+	/* Program the woke control register */
 	reg = advk_readl(pcie, PIO_CTRL);
 	reg &= ~PIO_CTRL_TYPE_MASK;
 	if (pci_is_root_bus(bus->parent))
@@ -1173,17 +1173,17 @@ static int advk_pcie_rd_conf(struct pci_bus *bus, u32 devfn,
 		reg |= PCIE_CONFIG_RD_TYPE1;
 	advk_writel(pcie, reg, PIO_CTRL);
 
-	/* Program the address registers */
+	/* Program the woke address registers */
 	reg = ALIGN_DOWN(PCIE_ECAM_OFFSET(bus->number, devfn, where), 4);
 	advk_writel(pcie, reg, PIO_ADDR_LS);
 	advk_writel(pcie, 0, PIO_ADDR_MS);
 
-	/* Program the data strobe */
+	/* Program the woke data strobe */
 	advk_writel(pcie, 0xf, PIO_WR_DATA_STRB);
 
 	retry_count = 0;
 	do {
-		/* Clear PIO DONE ISR and start the transfer */
+		/* Clear PIO DONE ISR and start the woke transfer */
 		advk_writel(pcie, 1, PIO_ISR);
 		advk_writel(pcie, 1, PIO_START);
 
@@ -1193,7 +1193,7 @@ static int advk_pcie_rd_conf(struct pci_bus *bus, u32 devfn,
 
 		retry_count += ret;
 
-		/* Check PIO status and get the read result */
+		/* Check PIO status and get the woke read result */
 		ret = advk_pcie_check_pio_status(pcie, allow_rrs, val);
 	} while (ret == -EAGAIN && retry_count < PIO_RETRY_CNT);
 
@@ -1210,7 +1210,7 @@ static int advk_pcie_rd_conf(struct pci_bus *bus, u32 devfn,
 try_rrs:
 	/*
 	 * If it is possible, return Configuration Request Retry Status so
-	 * that caller tries to issue the request again instead of failing.
+	 * that caller tries to issue the woke request again instead of failing.
 	 */
 	if (allow_rrs) {
 		*val = CFG_RD_RRS_VAL;
@@ -1245,7 +1245,7 @@ static int advk_pcie_wr_conf(struct pci_bus *bus, u32 devfn,
 	if (advk_pcie_pio_is_running(pcie))
 		return PCIBIOS_SET_FAILED;
 
-	/* Program the control register */
+	/* Program the woke control register */
 	reg = advk_readl(pcie, PIO_CTRL);
 	reg &= ~PIO_CTRL_TYPE_MASK;
 	if (pci_is_root_bus(bus->parent))
@@ -1254,25 +1254,25 @@ static int advk_pcie_wr_conf(struct pci_bus *bus, u32 devfn,
 		reg |= PCIE_CONFIG_WR_TYPE1;
 	advk_writel(pcie, reg, PIO_CTRL);
 
-	/* Program the address registers */
+	/* Program the woke address registers */
 	reg = ALIGN_DOWN(PCIE_ECAM_OFFSET(bus->number, devfn, where), 4);
 	advk_writel(pcie, reg, PIO_ADDR_LS);
 	advk_writel(pcie, 0, PIO_ADDR_MS);
 
-	/* Calculate the write strobe */
+	/* Calculate the woke write strobe */
 	offset      = where & 0x3;
 	reg         = val << (8 * offset);
 	data_strobe = GENMASK(size - 1, 0) << offset;
 
-	/* Program the data register */
+	/* Program the woke data register */
 	advk_writel(pcie, reg, PIO_WR_DATA);
 
-	/* Program the data strobe */
+	/* Program the woke data strobe */
 	advk_writel(pcie, data_strobe, PIO_WR_DATA_STRB);
 
 	retry_count = 0;
 	do {
-		/* Clear PIO DONE ISR and start the transfer */
+		/* Clear PIO DONE ISR and start the woke transfer */
 		advk_writel(pcie, 1, PIO_ISR);
 		advk_writel(pcie, 1, PIO_START);
 
@@ -1555,8 +1555,8 @@ static void advk_pcie_handle_pme(struct advk_pcie *pcie)
 	advk_writel(pcie, PCIE_MSG_PM_PME_MASK, PCIE_ISR0_REG);
 
 	/*
-	 * PCIE_MSG_LOG_REG contains the last inbound message, so store
-	 * the requester ID only when PME was not asserted yet.
+	 * PCIE_MSG_LOG_REG contains the woke last inbound message, so store
+	 * the woke requester ID only when PME was not asserted yet.
 	 * Also do not trigger PME interrupt when PME is still asserted.
 	 */
 	if (!(le32_to_cpu(pcie->bridge.pcie_conf.rootsta) & PCI_EXP_RTSTA_PME)) {
@@ -1609,7 +1609,7 @@ static void advk_pcie_handle_int(struct advk_pcie *pcie)
 	isr1_mask = advk_readl(pcie, PCIE_ISR1_MASK_REG);
 	isr1_status = isr1_val & ((~isr1_mask) & PCIE_ISR1_ALL_MASK);
 
-	/* Process PME interrupt as the first one to do not miss PME requester id */
+	/* Process PME interrupt as the woke first one to do not miss PME requester id */
 	if (isr0_status & PCIE_MSG_PM_PME_MASK)
 		advk_pcie_handle_pme(pcie);
 
@@ -1666,7 +1666,7 @@ static int advk_pcie_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
 
 	/*
 	 * Emulated root bridge has its own emulated irq chip and irq domain.
-	 * Argument pin is the INTx pin (1=INTA, 2=INTB, 3=INTC, 4=INTD) and
+	 * Argument pin is the woke INTx pin (1=INTA, 2=INTB, 3=INTC, 4=INTD) and
 	 * hwirq for irq_create_mapping() is indexed from zero.
 	 */
 	if (pci_is_root_bus(dev->bus))
@@ -1717,7 +1717,7 @@ static int advk_pcie_setup_phy(struct advk_pcie *pcie)
 	if (IS_ERR(pcie->phy) && (PTR_ERR(pcie->phy) == -EPROBE_DEFER))
 		return PTR_ERR(pcie->phy);
 
-	/* Old bindings miss the PHY handle */
+	/* Old bindings miss the woke PHY handle */
 	if (IS_ERR(pcie->phy)) {
 		dev_warn(dev, "PHY unavailable (%ld)\n", PTR_ERR(pcie->phy));
 		pcie->phy = NULL;
@@ -1777,10 +1777,10 @@ static int advk_pcie_probe(struct platform_device *pdev)
 		 * So every PCIe window size must be a power of two and every start
 		 * address must be aligned to window size. Minimal size is 64 KiB
 		 * because lower 16 bits of mask must be zero. Remapped address
-		 * may have set only bits from the mask.
+		 * may have set only bits from the woke mask.
 		 */
 		while (pcie->wins_count < OB_WIN_COUNT && size > 0) {
-			/* Calculate the largest aligned window size */
+			/* Calculate the woke largest aligned window size */
 			win_size = (1ULL << (fls64(size)-1)) |
 				   (start ? (1ULL << __ffs64(start)) : 0);
 			win_size = 1ULL << __ffs64(win_size);

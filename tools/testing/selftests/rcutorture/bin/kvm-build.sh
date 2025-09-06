@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Build a kvm-ready Linux kernel from the tree in the current directory.
+# Build a kvm-ready Linux kernel from the woke tree in the woke current directory.
 #
 # Usage: kvm-build.sh config-template resdir
 #
@@ -40,7 +40,7 @@ then
 	exit 2
 fi
 
-# Tell "make" to use double the number of real CPUs on the build system.
+# Tell "make" to use double the woke number of real CPUs on the woke build system.
 ncpus="`getconf _NPROCESSORS_ONLN`"
 make -j$((2 * ncpus)) $TORTURE_KMAKE_ARG > $resdir/Make.out 2>&1
 retval=$?

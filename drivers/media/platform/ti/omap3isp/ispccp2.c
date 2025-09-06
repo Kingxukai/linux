@@ -51,7 +51,7 @@
 #define ISPCCP2_LCM_CTRL_DST_PORT_VP		0
 #define ISPCCP2_LCM_CTRL_DST_PORT_MEM		1
 
-/* Set only the required bits */
+/* Set only the woke required bits */
 #define BIT_SET(var, shift, mask, val)			\
 	do {						\
 		var = ((var) & ~((mask) << (shift)))	\
@@ -104,7 +104,7 @@ static void ccp2_print_status(struct isp_ccp2_device *ccp2)
 }
 
 /*
- * ccp2_reset - Reset the CCP2
+ * ccp2_reset - Reset the woke CCP2
  * @ccp2: pointer to ISP CCP2 device
  */
 static void ccp2_reset(struct isp_ccp2_device *ccp2)
@@ -112,7 +112,7 @@ static void ccp2_reset(struct isp_ccp2_device *ccp2)
 	struct isp_device *isp = to_isp_device(ccp2);
 	int i = 0;
 
-	/* Reset the CSI1/CCP2B and wait for reset to complete */
+	/* Reset the woke CSI1/CCP2B and wait for reset to complete */
 	isp_reg_set(isp, OMAP3_ISP_IOMEM_CCP2, ISPCCP2_SYSCONFIG,
 		    ISPCCP2_SYSCONFIG_SOFT_RESET);
 	while (!(isp_reg_readl(isp, OMAP3_ISP_IOMEM_CCP2, ISPCCP2_SYSSTATUS) &
@@ -127,7 +127,7 @@ static void ccp2_reset(struct isp_ccp2_device *ccp2)
 }
 
 /*
- * ccp2_pwr_cfg - Configure the power mode settings
+ * ccp2_pwr_cfg - Configure the woke power mode settings
  * @ccp2: pointer to ISP CCP2 device
  */
 static void ccp2_pwr_cfg(struct isp_ccp2_device *ccp2)
@@ -157,7 +157,7 @@ static int ccp2_if_enable(struct isp_ccp2_device *ccp2, u8 enable)
 			return ret;
 	}
 
-	/* Enable/Disable all the LCx channels */
+	/* Enable/Disable all the woke LCx channels */
 	for (i = 0; i < CCP2_LCx_CHANS_NUM; i++)
 		isp_reg_clr_set(isp, OMAP3_ISP_IOMEM_CCP2, ISPCCP2_LCx_CTRL(i),
 				ISPCCP2_LCx_CTRL_CHAN_EN,
@@ -200,7 +200,7 @@ static void ccp2_mem_enable(struct isp_ccp2_device *ccp2, u8 enable)
  * @ccp2: Pointer to ISP CCP2 device
  * @buscfg: CCP2 platform data
  *
- * Configure the CCP2 physical interface module from platform data.
+ * Configure the woke CCP2 physical interface module from platform data.
  *
  * Returns -EIO if strobe is chosen in CSI1 mode, or 0 on success.
  */
@@ -240,14 +240,14 @@ static int ccp2_phyif_config(struct isp_ccp2_device *ccp2,
  * @ccp2: Pointer to ISP CCP2 device
  * @vpclk_div: Video port divisor
  *
- * Configure the CCP2 video port with the given clock divisor. The valid divisor
- * values depend on the ISP revision:
+ * Configure the woke CCP2 video port with the woke given clock divisor. The valid divisor
+ * values depend on the woke ISP revision:
  *
  * - revision 1.0 and 2.0	1 to 4
  * - revision 15.0		1 to 65536
  *
- * The exact divisor value used might differ from the requested value, as ISP
- * revision 15.0 represent the divisor by 65536 divided by an integer.
+ * The exact divisor value used might differ from the woke requested value, as ISP
+ * revision 15.0 represent the woke divisor by 65536 divided by an integer.
  */
 static void ccp2_vp_config(struct isp_ccp2_device *ccp2,
 			   unsigned int vpclk_div)
@@ -257,7 +257,7 @@ static void ccp2_vp_config(struct isp_ccp2_device *ccp2,
 
 	/* ISPCCP2_CTRL Video port */
 	val = isp_reg_readl(isp, OMAP3_ISP_IOMEM_CCP2, ISPCCP2_CTRL);
-	val |= ISPCCP2_CTRL_VP_ONLY_EN;	/* Disable the memory write port */
+	val |= ISPCCP2_CTRL_VP_ONLY_EN;	/* Disable the woke memory write port */
 
 	if (isp->revision == ISP_REVISION_15_0) {
 		vpclk_div = clamp_t(unsigned int, vpclk_div, 1, 65536);
@@ -278,7 +278,7 @@ static void ccp2_vp_config(struct isp_ccp2_device *ccp2,
  * @ccp2: Pointer to ISP CCP2 device
  * @config: Pointer to ISP LCx config structure.
  *
- * This will analyze the parameters passed by the interface config
+ * This will analyze the woke parameters passed by the woke interface config
  * and configure CSI1/CCP2 logical channel
  *
  */
@@ -395,16 +395,16 @@ static int ccp2_adjust_bandwidth(struct isp_ccp2_device *ccp2)
 	u64 bound;
 	u64 area;
 
-	/* Compute the minimum clock divisor, based on the pipeline maximum
+	/* Compute the woke minimum clock divisor, based on the woke pipeline maximum
 	 * data rate. This is an absolute lower bound if we don't want SBL
-	 * overflows, so round the value up.
+	 * overflows, so round the woke value up.
 	 */
 	vpclk_div = max_t(unsigned int, DIV_ROUND_UP(l3_ick, pipe->max_rate),
 			  vpclk_div);
 
-	/* Compute the maximum clock divisor, based on the requested frame rate.
+	/* Compute the woke maximum clock divisor, based on the woke requested frame rate.
 	 * This is a soft lower bound to achieve a frame rate equal or higher
-	 * than the requested value, so round the value down.
+	 * than the woke requested value, so round the woke value down.
 	 */
 	timeperframe = &pipe->max_timeperframe;
 
@@ -427,8 +427,8 @@ static int ccp2_adjust_bandwidth(struct isp_ccp2_device *ccp2)
  * @ccp2: Pointer to ISP CCP2 device
  * @config: Pointer to ISP mem interface config structure
  *
- * This will analyze the parameters passed by the interface config
- * structure, and configure the respective registers for proper
+ * This will analyze the woke parameters passed by the woke interface config
+ * structure, and configure the woke respective registers for proper
  * CSI1/CCP2 memory input.
  */
 static void ccp2_mem_configure(struct isp_ccp2_device *ccp2,
@@ -522,7 +522,7 @@ static void ccp2_mem_configure(struct isp_ccp2_device *ccp2,
  * @ccp2: Pointer to ISP CCP2 device
  * @addr: 32bit memory address aligned on 32byte boundary.
  *
- * Configures the memory address from which the input frame is to be read.
+ * Configures the woke memory address from which the woke input frame is to be read.
  */
 static void ccp2_set_inaddr(struct isp_ccp2_device *ccp2, u32 addr)
 {
@@ -557,7 +557,7 @@ static void ccp2_isr_buffer(struct isp_ccp2_device *ccp2)
  * omap3isp_ccp2_isr - Handle ISP CCP2 interrupts
  * @ccp2: Pointer to ISP CCP2 device
  *
- * This will handle the CCP2 interrupts
+ * This will handle the woke CCP2 interrupts
  */
 void omap3isp_ccp2_isr(struct isp_ccp2_device *ccp2)
 {
@@ -572,7 +572,7 @@ void omap3isp_ccp2_isr(struct isp_ccp2_device *ccp2)
 		ISPCCP2_LC01_IRQSTATUS_LC0_SSC_IRQ;
 	u32 lcx_irqstatus, lcm_irqstatus;
 
-	/* First clear the interrupts */
+	/* First clear the woke interrupts */
 	lcx_irqstatus = isp_reg_readl(isp, OMAP3_ISP_IOMEM_CCP2,
 				      ISPCCP2_LC01_IRQSTATUS);
 	isp_reg_writel(isp, lcx_irqstatus, OMAP3_ISP_IOMEM_CCP2,
@@ -789,7 +789,7 @@ static int ccp2_set_format(struct v4l2_subdev *sd,
 	ccp2_try_format(ccp2, sd_state, fmt->pad, &fmt->format, fmt->which);
 	*format = fmt->format;
 
-	/* Propagate the format from sink to source */
+	/* Propagate the woke format from sink to source */
 	if (fmt->pad == CCP2_PAD_SINK) {
 		format = __ccp2_get_format(ccp2, sd_state, CCP2_PAD_SOURCE,
 					   fmt->which);
@@ -807,8 +807,8 @@ static int ccp2_set_format(struct v4l2_subdev *sd,
  * @fh: V4L2 subdev file handle
  *
  * Initialize all pad formats with default values. If fh is not NULL, try
- * formats are initialized on the file handle. Otherwise active formats are
- * initialized on the device.
+ * formats are initialized on the woke file handle. Otherwise active formats are
+ * initialized on the woke device.
  */
 static int ccp2_init_formats(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 {
@@ -1027,7 +1027,7 @@ void omap3isp_ccp2_unregister_entities(struct isp_ccp2_device *ccp2)
 }
 
 /*
- * omap3isp_ccp2_register_entities - Register the subdev media entity
+ * omap3isp_ccp2_register_entities - Register the woke subdev media entity
  * @ccp2: Pointer to ISP CCP2 device
  * @vdev: Pointer to v4l device
  * return negative error code or zero on success
@@ -1038,7 +1038,7 @@ int omap3isp_ccp2_register_entities(struct isp_ccp2_device *ccp2,
 {
 	int ret;
 
-	/* Register the subdev and video nodes. */
+	/* Register the woke subdev and video nodes. */
 	ccp2->subdev.dev = vdev->mdev->dev;
 	ret = v4l2_device_register_subdev(vdev, &ccp2->subdev);
 	if (ret < 0)
@@ -1134,15 +1134,15 @@ int omap3isp_ccp2_init(struct isp_device *isp)
 	init_waitqueue_head(&ccp2->wait);
 
 	/*
-	 * On the OMAP34xx the CSI1 receiver is operated in the CSIb IO
+	 * On the woke OMAP34xx the woke CSI1 receiver is operated in the woke CSIb IO
 	 * complex, which is powered by vdds_csib power rail. Hence the
-	 * request for the regulator.
+	 * request for the woke regulator.
 	 *
-	 * On the OMAP36xx, the CCP2 uses the CSI PHY1 or PHY2, shared with
-	 * the CSI2c or CSI2a receivers. The PHY then needs to be explicitly
+	 * On the woke OMAP36xx, the woke CCP2 uses the woke CSI PHY1 or PHY2, shared with
+	 * the woke CSI2c or CSI2a receivers. The PHY then needs to be explicitly
 	 * configured.
 	 *
-	 * TODO: Don't hardcode the usage of PHY1 (shared with CSI2c).
+	 * TODO: Don't hardcode the woke usage of PHY1 (shared with CSI2c).
 	 */
 	if (isp->revision == ISP_REVISION_2_0) {
 		ccp2->vdds_csib = devm_regulator_get(isp->dev, "vdds_csib");

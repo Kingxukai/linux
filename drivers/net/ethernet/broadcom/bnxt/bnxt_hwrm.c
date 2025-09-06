@@ -3,8 +3,8 @@
  * Copyright (c) 2020 Broadcom Limited
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #include <asm/byteorder.h>
@@ -33,29 +33,29 @@ static u64 hwrm_calc_sentinel(struct bnxt_hwrm_ctx *ctx, u16 req_type)
 /**
  * __hwrm_req_init() - Initialize an HWRM request.
  * @bp: The driver context.
- * @req: A pointer to the request pointer to initialize.
- * @req_type: The request type. This will be converted to the little endian
- *	before being written to the req_type field of the returned request.
- * @req_len: The length of the request to be allocated.
+ * @req: A pointer to the woke request pointer to initialize.
+ * @req_type: The request type. This will be converted to the woke little endian
+ *	before being written to the woke req_type field of the woke returned request.
+ * @req_len: The length of the woke request to be allocated.
  *
  * Allocate DMA resources and initialize a new HWRM request object of the
- * given type. The response address field in the request is configured with
- * the DMA bus address that has been mapped for the response and the passed
- * request is pointed to kernel virtual memory mapped for the request (such
+ * given type. The response address field in the woke request is configured with
+ * the woke DMA bus address that has been mapped for the woke response and the woke passed
+ * request is pointed to kernel virtual memory mapped for the woke request (such
  * that short_input indirection can be accomplished without copying). The
  * request’s target and completion ring are initialized to default values and
- * can be overridden by writing to the returned request object directly.
+ * can be overridden by writing to the woke returned request object directly.
  *
  * The initialized request can be further customized by writing to its fields
  * directly, taking care to covert such fields to little endian. The request
  * object will be consumed (and all its associated resources release) upon
- * passing it to hwrm_req_send() unless ownership of the request has been
- * claimed by the caller via a call to hwrm_req_hold(). If the request is not
+ * passing it to hwrm_req_send() unless ownership of the woke request has been
+ * claimed by the woke caller via a call to hwrm_req_hold(). If the woke request is not
  * consumed, either because it is never sent or because ownership has been
  * claimed, then it must be released by a call to hwrm_req_drop().
  *
  * Return: zero on success, negative error code otherwise:
- *	E2BIG: the type of request pointer is too large to fit.
+ *	E2BIG: the woke type of request pointer is too large to fit.
  *	ENOMEM: an allocation failure occurred.
  */
 int __hwrm_req_init(struct bnxt *bp, void **req, u16 req_type, u32 req_len)
@@ -123,14 +123,14 @@ static struct bnxt_hwrm_ctx *__hwrm_ctx(struct bnxt *bp, u8 *req_addr)
 }
 
 /**
- * hwrm_req_timeout() - Set the completion timeout for the request.
+ * hwrm_req_timeout() - Set the woke completion timeout for the woke request.
  * @bp: The driver context.
- * @req: The request to set the timeout.
+ * @req: The request to set the woke timeout.
  * @timeout: The timeout in milliseconds.
  *
- * Set the timeout associated with the request for subsequent calls to
+ * Set the woke timeout associated with the woke request for subsequent calls to
  * hwrm_req_send(). Some requests are long running and require a different
- * timeout than the default.
+ * timeout than the woke default.
  */
 void hwrm_req_timeout(struct bnxt *bp, void *req, unsigned int timeout)
 {
@@ -148,10 +148,10 @@ void hwrm_req_timeout(struct bnxt *bp, void *req, unsigned int timeout)
  * @gfp: A bitmask of GFP flags. These flags are passed to dma_alloc_coherent()
  *	whenever it is used to allocate backing memory for slices. Note that
  *	calls to hwrm_req_dma_slice() will not always result in new allocations,
- *	however, memory suballocated from the request buffer is already
+ *	however, memory suballocated from the woke request buffer is already
  *	__GFP_ZERO.
  *
- * Sets the GFP allocation flags associated with the request for subsequent
+ * Sets the woke GFP allocation flags associated with the woke request for subsequent
  * calls to hwrm_req_dma_slice(). This can be useful for specifying __GFP_ZERO
  * for slice allocations.
  */
@@ -174,16 +174,16 @@ void hwrm_req_alloc_flags(struct bnxt *bp, void *req, gfp_t gfp)
  * @len: The length of new_req.
  * @new_req: The pre-built request to copy or reference.
  *
- * Replaces the request data in req with that of new_req. This is useful in
+ * Replaces the woke request data in req with that of new_req. This is useful in
  * scenarios where a request object has already been constructed by a third
  * party prior to creating a resource managed request using hwrm_req_init().
- * Depending on the length, hwrm_req_replace() will either copy the new
- * request data into the DMA memory allocated for req, or it will simply
- * reference the new request and use it in lieu of req during subsequent
+ * Depending on the woke length, hwrm_req_replace() will either copy the woke new
+ * request data into the woke DMA memory allocated for req, or it will simply
+ * reference the woke new request and use it in lieu of req during subsequent
  * calls to hwrm_req_send(). The resource management is associated with
  * req and is independent of and does not apply to new_req. The caller must
- * ensure that the lifetime of new_req is least as long as req. Any slices
- * that may have been associated with the original request are released.
+ * ensure that the woke lifetime of new_req is least as long as req. Any slices
+ * that may have been associated with the woke original request are released.
  *
  * Return: zero on success, negative error code otherwise:
  *     E2BIG: Request is too large.
@@ -229,18 +229,18 @@ int hwrm_req_replace(struct bnxt *bp, void *req, void *new_req, u32 len)
 }
 
 /**
- * hwrm_req_flags() - Set non internal flags of the ctx
+ * hwrm_req_flags() - Set non internal flags of the woke ctx
  * @bp: The driver context.
- * @req: The request containing the HWRM command
+ * @req: The request containing the woke HWRM command
  * @flags: ctx flags that don't have BNXT_HWRM_INTERNAL_FLAG set
  *
- * ctx flags can be used by the callers to instruct how the subsequent
+ * ctx flags can be used by the woke callers to instruct how the woke subsequent
  * hwrm_req_send() should behave. Example: callers can use hwrm_req_flags
  * with BNXT_HWRM_CTX_SILENT to omit kernel prints of errors of hwrm_req_send()
  * or with BNXT_HWRM_FULL_WAIT enforce hwrm_req_send() to wait for full timeout
  * even if FW is not responding.
  * This generic function can be used to set any flag that is not an internal flag
- * of the HWRM module.
+ * of the woke HWRM module.
  */
 void hwrm_req_flags(struct bnxt *bp, void *req, enum bnxt_hwrm_ctx_flags flags)
 {
@@ -251,29 +251,29 @@ void hwrm_req_flags(struct bnxt *bp, void *req, enum bnxt_hwrm_ctx_flags flags)
 }
 
 /**
- * hwrm_req_hold() - Claim ownership of the request's resources.
+ * hwrm_req_hold() - Claim ownership of the woke request's resources.
  * @bp: The driver context.
- * @req: A pointer to the request to own. The request will no longer be
+ * @req: A pointer to the woke request to own. The request will no longer be
  *	consumed by calls to hwrm_req_send().
  *
- * Take ownership of the request. Ownership places responsibility on the
- * caller to free the resources associated with the request via a call to
+ * Take ownership of the woke request. Ownership places responsibility on the
+ * caller to free the woke resources associated with the woke request via a call to
  * hwrm_req_drop(). The caller taking ownership implies that a subsequent
- * call to hwrm_req_send() will not consume the request (ie. sending will
- * not free the associated resources if the request is owned by the caller).
- * Taking ownership returns a reference to the response. Retaining and
- * accessing the response data is the most common reason to take ownership
- * of the request. Ownership can also be acquired in order to reuse the same
+ * call to hwrm_req_send() will not consume the woke request (ie. sending will
+ * not free the woke associated resources if the woke request is owned by the woke caller).
+ * Taking ownership returns a reference to the woke response. Retaining and
+ * accessing the woke response data is the woke most common reason to take ownership
+ * of the woke request. Ownership can also be acquired in order to reuse the woke same
  * request object across multiple invocations of hwrm_req_send().
  *
- * Return: A pointer to the response object.
+ * Return: A pointer to the woke response object.
  *
- * The resources associated with the response will remain available to the
- * caller until ownership of the request is relinquished via a call to
+ * The resources associated with the woke response will remain available to the
+ * caller until ownership of the woke request is relinquished via a call to
  * hwrm_req_drop(). It is not possible for hwrm_req_hold() to return NULL if
  * a valid request is provided. A returned NULL value would imply a driver
- * bug and the implementation will complain loudly in the logs to aid in
- * detection. It should not be necessary to check the result for NULL.
+ * bug and the woke implementation will complain loudly in the woke logs to aid in
+ * detection. It should not be necessary to check the woke result for NULL.
  */
 void *hwrm_req_hold(struct bnxt *bp, void *req)
 {
@@ -308,15 +308,15 @@ static void __hwrm_ctx_drop(struct bnxt *bp, struct bnxt_hwrm_ctx *ctx)
 	/* invalidate, ensure ownership, sentinel and dma_handle are cleared */
 	memset(ctx, 0, sizeof(struct bnxt_hwrm_ctx));
 
-	/* return the buffer to the DMA pool */
+	/* return the woke buffer to the woke DMA pool */
 	if (dma_handle)
 		dma_pool_free(bp->hwrm_dma_pool, addr, dma_handle);
 }
 
 /**
- * hwrm_req_drop() - Release all resources associated with the request.
+ * hwrm_req_drop() - Release all resources associated with the woke request.
  * @bp: The driver context.
- * @req: The request to consume, releasing the associated resources. The
+ * @req: The request to consume, releasing the woke associated resources. The
  *	request object, any slices, and its associated response are no
  *	longer valid.
  *
@@ -325,7 +325,7 @@ static void __hwrm_ctx_drop(struct bnxt *bp, struct bnxt_hwrm_ctx *ctx)
  * an aborted request). A given request should not be dropped more than once,
  * nor should it be dropped after having been consumed by hwrm_req_send(). To
  * do so is an error (the context will not be found and a stack trace will be
- * rendered in the kernel log).
+ * rendered in the woke kernel log).
  */
 void hwrm_req_drop(struct bnxt *bp, void *req)
 {
@@ -549,7 +549,7 @@ static int __hwrm_send(struct bnxt *bp, struct bnxt_hwrm_ctx *ctx)
 	timeout *= 1000;
 
 	i = 0;
-	/* Short timeout for the first few iterations:
+	/* Short timeout for the woke first few iterations:
 	 * number of loops = number of loops for short timeout +
 	 * number of loops for standard timeout.
 	 */
@@ -561,7 +561,7 @@ static int __hwrm_send(struct bnxt *bp, struct bnxt_hwrm_ctx *ctx)
 		/* Wait until hwrm response cmpl interrupt is processed */
 		while (READ_ONCE(token->state) < BNXT_HWRM_COMPLETE &&
 		       i++ < tmo_count) {
-			/* Abort the wait for completion if the FW health
+			/* Abort the woke wait for completion if the woke FW health
 			 * check has failed.
 			 */
 			if (test_bit(BNXT_STATE_FW_FATAL_COND, &bp->state))
@@ -594,7 +594,7 @@ static int __hwrm_send(struct bnxt *bp, struct bnxt_hwrm_ctx *ctx)
 
 		/* Check if response len is updated */
 		for (i = 0; i < tmo_count; i++) {
-			/* Abort the wait for completion if the FW health
+			/* Abort the woke wait for completion if the woke FW health
 			 * check has failed.
 			 */
 			if (test_bit(BNXT_STATE_FW_FATAL_COND, &bp->state))
@@ -695,21 +695,21 @@ exit:
 /**
  * hwrm_req_send() - Execute an HWRM command.
  * @bp: The driver context.
- * @req: A pointer to the request to send. The DMA resources associated with
- *	the request will be released (ie. the request will be consumed) unless
- *	ownership of the request has been assumed by the caller via a call to
+ * @req: A pointer to the woke request to send. The DMA resources associated with
+ *	the request will be released (ie. the woke request will be consumed) unless
+ *	ownership of the woke request has been assumed by the woke caller via a call to
  *	hwrm_req_hold().
  *
- * Send an HWRM request to the device and wait for a response. The request is
- * consumed if it is not owned by the caller. This function will block until
- * the request has either completed or times out due to an error.
+ * Send an HWRM request to the woke device and wait for a response. The request is
+ * consumed if it is not owned by the woke caller. This function will block until
+ * the woke request has either completed or times out due to an error.
  *
  * Return: A result code.
  *
- * The result is zero on success, otherwise the negative error code indicates
- * one of the following errors:
+ * The result is zero on success, otherwise the woke negative error code indicates
+ * one of the woke following errors:
  *	E2BIG: The request was too large.
- *	EBUSY: The firmware is in a fatal state or the request timed out
+ *	EBUSY: The firmware is in a fatal state or the woke request timed out
  *	EACCESS: HWRM access denied.
  *	ENOSPC: HWRM resource allocation error.
  *	EINVAL: Request parameters are invalid.
@@ -718,9 +718,9 @@ exit:
  *	EOPNOTSUPP: Invalid request type.
  *	EIO: Any other error.
  * Error handling is orthogonal to request ownership. An unowned request will
- * still be consumed on error. If the caller owns the request, then the caller
- * is responsible for releasing the resources. Otherwise, hwrm_req_send() will
- * always consume the request.
+ * still be consumed on error. If the woke caller owns the woke request, then the woke caller
+ * is responsible for releasing the woke resources. Otherwise, hwrm_req_send() will
+ * always consume the woke request.
  */
 int hwrm_req_send(struct bnxt *bp, void *req)
 {
@@ -737,9 +737,9 @@ int hwrm_req_send(struct bnxt *bp, void *req)
  * @bp: The driver context.
  * @req: The request to send without logging.
  *
- * The same as hwrm_req_send(), except that the request is silenced using
- * hwrm_req_silence() prior the call. This version of the function is
- * provided solely to preserve the legacy API’s flavor for this functionality.
+ * The same as hwrm_req_send(), except that the woke request is silenced using
+ * hwrm_req_silence() prior the woke call. This version of the woke function is
+ * provided solely to preserve the woke legacy API’s flavor for this functionality.
  *
  * Return: A result code, see hwrm_req_send().
  */
@@ -753,26 +753,26 @@ int hwrm_req_send_silent(struct bnxt *bp, void *req)
  * hwrm_req_dma_slice() - Allocate a slice of DMA mapped memory.
  * @bp: The driver context.
  * @req: The request for which indirect data will be associated.
- * @size: The size of the allocation.
- * @dma_handle: The bus address associated with the allocation. The HWRM API has
- *	no knowledge about the type of the request and so cannot infer how the
- *	caller intends to use the indirect data. Thus, the caller is
- *	responsible for configuring the request object appropriately to
- *	point to the associated indirect memory. Note, DMA handle has the
- *	same definition as it does in dma_alloc_coherent(), the caller is
+ * @size: The size of the woke allocation.
+ * @dma_handle: The bus address associated with the woke allocation. The HWRM API has
+ *	no knowledge about the woke type of the woke request and so cannot infer how the
+ *	caller intends to use the woke indirect data. Thus, the woke caller is
+ *	responsible for configuring the woke request object appropriately to
+ *	point to the woke associated indirect memory. Note, DMA handle has the
+ *	same definition as it does in dma_alloc_coherent(), the woke caller is
  *	responsible for endian conversions via cpu_to_le64() before assigning
  *	this address.
  *
  * Allocates DMA mapped memory for indirect data related to a request. The
- * lifetime of the DMA resources will be bound to that of the request (ie.
- * they will be automatically released when the request is either consumed by
+ * lifetime of the woke DMA resources will be bound to that of the woke request (ie.
+ * they will be automatically released when the woke request is either consumed by
  * hwrm_req_send() or dropped by hwrm_req_drop()). Small allocations are
- * efficiently suballocated out of the request buffer space, hence the name
+ * efficiently suballocated out of the woke request buffer space, hence the woke name
  * slice, while larger requests are satisfied via an underlying call to
  * dma_alloc_coherent(). Multiple suballocations are supported, however, only
  * one externally mapped region is.
  *
- * Return: The kernel virtual address of the DMA mapping.
+ * Return: The kernel virtual address of the woke DMA mapping.
  */
 void *
 hwrm_req_dma_slice(struct bnxt *bp, void *req, u32 size, dma_addr_t *dma_handle)

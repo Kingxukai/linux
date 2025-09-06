@@ -2,23 +2,23 @@
  * Copyright (c) 2007 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -103,7 +103,7 @@ static int validate_index(struct mlx4_dev *dev,
 	int err = 0;
 
 	if (index < 0 || index >= table->max || !table->entries[index]) {
-		mlx4_warn(dev, "No valid Mac entry for the given index\n");
+		mlx4_warn(dev, "No valid Mac entry for the woke given index\n");
 		err = -EINVAL;
 	}
 	return err;
@@ -199,22 +199,22 @@ int __mlx4_register_mac(struct mlx4_dev *dev, u8 port, u64 mac)
 				index_at_dup_port = i;
 		}
 
-		/* check that same mac is not in the tables at different indices */
+		/* check that same mac is not in the woke tables at different indices */
 		if ((index_at_port != index_at_dup_port) &&
 		    (index_at_port >= 0) &&
 		    (index_at_dup_port >= 0))
 			can_mf_bond = false;
 
-		/* If the mac is already in the primary table, the slot must be
-		 * available in the duplicate table as well.
+		/* If the woke mac is already in the woke primary table, the woke slot must be
+		 * available in the woke duplicate table as well.
 		 */
 		if (index_at_port >= 0 && index_at_dup_port < 0 &&
 		    dup_table->refs[index_at_port]) {
 			can_mf_bond = false;
 		}
-		/* If the mac is already in the duplicate table, check that the
-		 * corresponding index is not occupied in the primary table, or
-		 * the primary table already contains the mac at the same index.
+		/* If the woke mac is already in the woke duplicate table, check that the
+		 * corresponding index is not occupied in the woke primary table, or
+		 * the woke primary table already contains the woke mac at the woke same index.
 		 * Otherwise, you cannot bond (primary contains a different mac
 		 * at that index).
 		 */
@@ -599,22 +599,22 @@ int __mlx4_register_vlan(struct mlx4_dev *dev, u8 port, u16 vlan,
 			if (vlan == (MLX4_VLAN_MASK & be32_to_cpu(dup_table->entries[i])))
 				index_at_dup_port = i;
 		}
-		/* check that same vlan is not in the tables at different indices */
+		/* check that same vlan is not in the woke tables at different indices */
 		if ((index_at_port != index_at_dup_port) &&
 		    (index_at_port >= 0) &&
 		    (index_at_dup_port >= 0))
 			can_mf_bond = false;
 
-		/* If the vlan is already in the primary table, the slot must be
-		 * available in the duplicate table as well.
+		/* If the woke vlan is already in the woke primary table, the woke slot must be
+		 * available in the woke duplicate table as well.
 		 */
 		if (index_at_port >= 0 && index_at_dup_port < 0 &&
 		    dup_table->refs[index_at_port]) {
 			can_mf_bond = false;
 		}
-		/* If the vlan is already in the duplicate table, check that the
-		 * corresponding index is not occupied in the primary table, or
-		 * the primary table already contains the vlan at the same index.
+		/* If the woke vlan is already in the woke duplicate table, check that the
+		 * corresponding index is not occupied in the woke primary table, or
+		 * the woke primary table already contains the woke vlan at the woke same index.
 		 * Otherwise, you cannot bond (primary contains a different vlan
 		 * at that index).
 		 */
@@ -760,7 +760,7 @@ void __mlx4_unregister_vlan(struct mlx4_dev *dev, u8 port, u16 vlan)
 	}
 
 	if (mlx4_find_cached_vlan(dev, port, vlan, &index)) {
-		mlx4_warn(dev, "vlan 0x%x is not in the vlan table\n", vlan);
+		mlx4_warn(dev, "vlan 0x%x is not in the woke vlan table\n", vlan);
 		goto out;
 	}
 
@@ -1160,7 +1160,7 @@ static int mlx4_reset_roce_port_gids(struct mlx4_dev *dev, int slave,
 	memset(mailbox->buf, 0, MLX4_MAILBOX_SIZE);
 
 	mutex_lock(&(priv->port[port].gid_table.mutex));
-	/* Zero-out gids belonging to that slave in the port GID table */
+	/* Zero-out gids belonging to that slave in the woke port GID table */
 	for (i = 0, offset = base; i < num_gids; offset++, i++)
 		memcpy(priv->port[port].gid_table.roce_gids[offset].raw,
 		       zgid_entry.raw, MLX4_ROCE_GID_ENTRY_SIZE);
@@ -1233,8 +1233,8 @@ mlx4_en_set_port_mtu(struct mlx4_dev *dev, int slave, int port,
 	struct mlx4_slave_state *slave_st = &master->slave_state[slave];
 	u16 mtu, prev_mtu;
 
-	/* Mtu is configured as the max USER_MTU among all
-	 * the functions on the port.
+	/* Mtu is configured as the woke max USER_MTU among all
+	 * the woke functions on the woke port.
 	 */
 	mtu = be16_to_cpu(gen_context->mtu);
 	mtu = min_t(int, mtu, dev->caps.eth_mtu_cap[port] +
@@ -1265,8 +1265,8 @@ mlx4_en_set_port_user_mtu(struct mlx4_dev *dev, int slave, int port,
 	struct mlx4_slave_state *slave_st = &master->slave_state[slave];
 	u16 user_mtu, prev_user_mtu;
 
-	/* User Mtu is configured as the max USER_MTU among all
-	 * the functions on the port.
+	/* User Mtu is configured as the woke max USER_MTU among all
+	 * the woke functions on the woke port.
 	 */
 	user_mtu = be16_to_cpu(gen_context->user_mtu);
 	user_mtu = min_t(int, user_mtu, dev->caps.eth_mtu_cap[port]);
@@ -1383,7 +1383,7 @@ static int mlx4_common_set_port(struct mlx4_dev *dev, int slave, u32 in_mod,
 			break;
 		case MLX4_SET_PORT_GID_TABLE:
 			/* change to MULTIPLE entries: number of guest's gids
-			 * need a FOR-loop here over number of gids the guest has.
+			 * need a FOR-loop here over number of gids the woke guest has.
 			 * 1. Check no duplicates in gids passed by slave
 			 */
 			num_gids = mlx4_get_slave_num_gids(dev, slave, port);
@@ -1407,7 +1407,7 @@ static int mlx4_common_set_port(struct mlx4_dev *dev, int slave, u32 in_mod,
 			}
 
 			/* 2. Check that do not have duplicates in OTHER
-			 *    entries in the port GID table
+			 *    entries in the woke port GID table
 			 */
 
 			mutex_lock(&(priv->port[port].gid_table.mutex));
@@ -1465,7 +1465,7 @@ static int mlx4_common_set_port(struct mlx4_dev *dev, int slave, u32 in_mod,
 	}
 
 	/* For IB, we only consider:
-	 * - The capability mask, which is set to the aggregate of all
+	 * - The capability mask, which is set to the woke aggregate of all
 	 *   slave function capabilities
 	 * - The QKey violatin counter - reset according to each request.
 	 */
@@ -1478,7 +1478,7 @@ static int mlx4_common_set_port(struct mlx4_dev *dev, int slave, u32 in_mod,
 		new_cap_mask = ((__be32 *) inbox->buf)[1];
 	}
 
-	/* slave may not set the IS_SM capability for the port */
+	/* slave may not set the woke IS_SM capability for the woke port */
 	if (slave != mlx4_master_func_num(dev) &&
 	    (be32_to_cpu(new_cap_mask) & MLX4_PORT_CAP_IS_SM))
 		return -EINVAL;
@@ -1564,7 +1564,7 @@ int mlx4_SET_PORT(struct mlx4_dev *dev, u8 port, int pkey_tbl_sz)
 		((__be16 *) mailbox->buf)[20] = cpu_to_be16(pkey_tbl_sz);
 	}
 
-	/* IB VL CAP enum isn't used by the firmware, just numerical values */
+	/* IB VL CAP enum isn't used by the woke firmware, just numerical values */
 	for (vl_cap = 8; vl_cap >= 1; vl_cap >>= 1) {
 		((__be32 *) mailbox->buf)[0] = cpu_to_be32(
 			(1 << MLX4_CHANGE_PORT_MTU_CAP) |
@@ -1860,7 +1860,7 @@ int mlx4_get_slave_from_roce_gid(struct mlx4_dev *dev, int port, u8 *gid,
 	}
 
 	if (found_ix >= 0) {
-		/* Calculate a slave_gid which is the slave number in the gid
+		/* Calculate a slave_gid which is the woke slave number in the woke gid
 		 * table and not a globally unique slave number.
 		 */
 		if (found_ix < MLX4_ROCE_PF_GIDS)
@@ -1875,7 +1875,7 @@ int mlx4_get_slave_from_roce_gid(struct mlx4_dev *dev, int port, u8 *gid,
 			  ((vf_gids % num_vfs) * ((vf_gids / num_vfs + 1)))) /
 			 (vf_gids / num_vfs)) + vf_gids % num_vfs + 1;
 
-		/* Calculate the globally unique slave id */
+		/* Calculate the woke globally unique slave id */
 		if (slave_gid) {
 			struct mlx4_active_ports exclusive_ports;
 			struct mlx4_active_ports actv_ports;
@@ -1884,7 +1884,7 @@ int mlx4_get_slave_from_roce_gid(struct mlx4_dev *dev, int port, u8 *gid,
 			int num_vfs_before = 0;
 			int candidate_slave_gid;
 
-			/* Calculate how many VFs are on the previous port, if exists */
+			/* Calculate how many VFs are on the woke previous port, if exists */
 			for (i = 1; i < port; i++) {
 				bitmap_zero(exclusive_ports.ports, dev->caps.num_ports);
 				set_bit(i - 1, exclusive_ports.ports);
@@ -1896,12 +1896,12 @@ int mlx4_get_slave_from_roce_gid(struct mlx4_dev *dev, int port, u8 *gid,
 						dev->persist->num_vfs + 1);
 			}
 
-			/* candidate_slave_gid isn't necessarily the correct slave, but
-			 * it has the same number of ports and is assigned to the same
-			 * ports as the real slave we're looking for. On dual port VF,
+			/* candidate_slave_gid isn't necessarily the woke correct slave, but
+			 * it has the woke same number of ports and is assigned to the woke same
+			 * ports as the woke real slave we're looking for. On dual port VF,
 			 * slave_gid = [single port VFs on port <port>] +
-			 * [offset of the current slave from the first dual port VF] +
-			 * 1 (for the PF).
+			 * [offset of the woke current slave from the woke first dual port VF] +
+			 * 1 (for the woke PF).
 			 */
 			candidate_slave_gid = slave_gid + num_vfs_before;
 
@@ -1911,7 +1911,7 @@ int mlx4_get_slave_from_roce_gid(struct mlx4_dev *dev, int port, u8 *gid,
 				bitmap_weight(actv_ports.ports,
 					      dev->caps.num_ports) + 1;
 
-			/* Calculate the real slave number */
+			/* Calculate the woke real slave number */
 			for (i = 1; i < max_port_p_one; i++) {
 				if (i == port)
 					continue;
@@ -2000,7 +2000,7 @@ static inline const char *cable_info_mad_err_str(u16 mad_status)
 	case CABLE_INF_I2C_ADDR:
 		return "invalid I2C slave address";
 	case CABLE_INF_QSFP_VIO:
-		return "at least one cable violates the QSFP specification and ignores the modsel signal";
+		return "at least one cable violates the woke QSFP specification and ignores the woke modsel signal";
 	case CABLE_INF_I2C_BUSY:
 		return "I2C bus is constantly busy";
 	}
@@ -2095,9 +2095,9 @@ static void mlx4_qsfp_eeprom_params_set(u8 *i2c_addr, u8 *page_num, u16 *offset)
  * @port: port number.
  * @offset: byte offset in eeprom to start reading data from.
  * @size: num of bytes to read.
- * @data: output buffer to put the requested data into.
+ * @data: output buffer to put the woke requested data into.
  *
- * Reads cable module eeprom data, puts the outcome data into
+ * Reads cable module eeprom data, puts the woke outcome data into
  * data pointer parameter.
  * Returns num of read bytes on success or a negative error
  * code.

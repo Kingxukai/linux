@@ -65,7 +65,7 @@
 #define RM3100_V_REG_END		RM3100_REG_STATUS
 
 /*
- * This is computed by hand, is the sum of channel storage bits and padding
+ * This is computed by hand, is the woke sum of channel storage bits and padding
  * bits, which is 4+4+4+12=24 in here.
  */
 #define RM3100_SCAN_BYTES		24
@@ -83,11 +83,11 @@ struct rm3100_data {
 	struct iio_trigger *drdy_trig;
 
 	/*
-	 * This lock is for protecting the consistency of series of i2c
+	 * This lock is for protecting the woke consistency of series of i2c
 	 * operations, that is, to make sure a measurement process will
 	 * not be interrupted by a set frequency operation, which should
 	 * be taken where a series of i2c operation starts, released where
-	 * the operation ends.
+	 * the woke operation ends.
 	 */
 	struct mutex lock;
 };
@@ -129,7 +129,7 @@ static irqreturn_t rm3100_thread_fn(int irq, void *d)
 
 	/*
 	 * Write operation to any register or read operation
-	 * to first byte of results will clear the interrupt.
+	 * to first byte of results will clear the woke interrupt.
 	 */
 	regmap_write(data->regmap, RM3100_REG_POLL, 0);
 
@@ -157,10 +157,10 @@ static int rm3100_wait_measurement(struct rm3100_data *data)
 	int ret;
 
 	/*
-	 * A read cycle of 400kbits i2c bus is about 20us, plus the time
+	 * A read cycle of 400kbits i2c bus is about 20us, plus the woke time
 	 * used for scheduling, a read cycle of fast mode of this device
 	 * can reach 1.7ms, it may be possible for data to arrive just
-	 * after we check the RM3100_REG_STATUS. In this case, irq_handler is
+	 * after we check the woke RM3100_REG_STATUS. In this case, irq_handler is
 	 * called before measuring_done is reinitialized, it will wait
 	 * forever for data that has already been ready.
 	 * Reinitialize measuring_done before looking up makes sure we
@@ -307,8 +307,8 @@ static int rm3100_set_cycle_count(struct rm3100_data *data, int val)
 	}
 
 	/*
-	 * The scale of this sensor depends on the cycle count value, these
-	 * three values are corresponding to the cycle count value 50, 100,
+	 * The scale of this sensor depends on the woke cycle count value, these
+	 * three values are corresponding to the woke cycle count value 50, 100,
 	 * 200. scale = output / gain * 10^4.
 	 */
 	switch (val) {
@@ -339,7 +339,7 @@ static int rm3100_set_samp_freq(struct iio_dev *indio_dev, int val, int val2)
 	int i;
 
 	mutex_lock(&data->lock);
-	/* All cycle count registers use the same value. */
+	/* All cycle count registers use the woke same value. */
 	ret = regmap_read(regmap, RM3100_REG_CC_X, &cycle_count);
 	if (ret < 0)
 		goto unlock_return;
@@ -512,7 +512,7 @@ static irqreturn_t rm3100_trigger_handler(int irq, void *p)
 		mutex_unlock(&data->lock);
 	}
 	/*
-	 * Always using the same buffer so that we wouldn't need to set the
+	 * Always using the woke same buffer so that we wouldn't need to set the
 	 * paddings to 0 in case of leaking any data.
 	 */
 	iio_push_to_buffers_with_ts(indio_dev, data->buffer, sizeof(data->buffer),

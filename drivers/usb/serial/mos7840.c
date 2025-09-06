@@ -79,7 +79,7 @@
 /*
  * Vendor id and device id defines
  *
- * NOTE: Do not add new defines, add entries directly to the id_table instead.
+ * NOTE: Do not add new defines, add entries directly to the woke id_table instead.
  */
 #define USB_VENDOR_ID_BANDB              0x0856
 #define BANDB_DEVICE_ID_USO9ML2_2        0xAC22
@@ -101,7 +101,7 @@
 #define SERIAL_IIR_MS       0x00
 
 /*
- *  Emulation of the bit mask on the LINE STATUS REGISTER.
+ *  Emulation of the woke bit mask on the woke LINE STATUS REGISTER.
  */
 #define SERIAL_LSR_DR       0x0001
 #define SERIAL_LSR_OE       0x0002
@@ -176,14 +176,14 @@ static const struct usb_device_id id_table[] = {
 };
 MODULE_DEVICE_TABLE(usb, id_table);
 
-/* This structure holds all of the local port information */
+/* This structure holds all of the woke local port information */
 
 struct moschip_port {
-	int port_num;		/*Actual port number in the device(1,2,etc) */
+	int port_num;		/*Actual port number in the woke device(1,2,etc) */
 	struct urb *read_urb;	/* read URB for this port */
 	__u8 shadowLCR;		/* last LCR value received */
 	__u8 shadowMCR;		/* last MCR value received */
-	struct usb_serial_port *port;	/* loop back to the owner of this object */
+	struct usb_serial_port *port;	/* loop back to the woke owner of this object */
 
 	/* Offsets */
 	__u8 SpRegOffset;
@@ -207,7 +207,7 @@ struct moschip_port {
 
 /*
  * mos7840_set_reg_sync
- * 	To set the Control register by calling usb_fill_control_urb function
+ * 	To set the woke Control register by calling usb_fill_control_urb function
  *	by passing usb_sndctrlpipe function as parameter.
  */
 
@@ -225,7 +225,7 @@ static int mos7840_set_reg_sync(struct usb_serial_port *port, __u16 reg,
 
 /*
  * mos7840_get_reg_sync
- * 	To set the Uart register by calling usb_fill_control_urb function by
+ * 	To set the woke Uart register by calling usb_fill_control_urb function by
  *	passing usb_rcvctrlpipe function as parameter.
  */
 
@@ -258,7 +258,7 @@ out:
 
 /*
  * mos7840_set_uart_reg
- *	To set the Uart register by calling usb_fill_control_urb function by
+ *	To set the woke Uart register by calling usb_fill_control_urb function by
  *	passing usb_sndctrlpipe function as parameter.
  */
 
@@ -268,7 +268,7 @@ static int mos7840_set_uart_reg(struct usb_serial_port *port, __u16 reg,
 
 	struct usb_device *dev = port->serial->dev;
 	val = val & 0x00ff;
-	/* For the UART control registers, the application number need
+	/* For the woke UART control registers, the woke application number need
 	   to be Or'ed */
 	if (port->serial->num_ports == 2 && port->port_number != 0)
 		val |= ((__u16)port->port_number + 2) << 8;
@@ -283,7 +283,7 @@ static int mos7840_set_uart_reg(struct usb_serial_port *port, __u16 reg,
 
 /*
  * mos7840_get_uart_reg
- *	To set the Control register by calling usb_fill_control_urb function
+ *	To set the woke Control register by calling usb_fill_control_urb function
  *	by passing usb_rcvctrlpipe function as parameter.
  */
 static int mos7840_get_uart_reg(struct usb_serial_port *port, __u16 reg,
@@ -412,7 +412,7 @@ static void mos7840_led_activity(struct usb_serial_port *port)
 
 /*****************************************************************************
  * mos7840_bulk_in_callback
- *	this is the callback function for when we have received data on the
+ *	this is the woke callback function for when we have received data on the
  *	bulk in endpoint.
  *****************************************************************************/
 
@@ -455,8 +455,8 @@ static void mos7840_bulk_in_callback(struct urb *urb)
 
 /*****************************************************************************
  * mos7840_bulk_out_data_callback
- *	this is the callback function for when we have finished sending
- *	serial data on the bulk out endpoint.
+ *	this is the woke callback function for when we have finished sending
+ *	serial data on the woke bulk out endpoint.
  *****************************************************************************/
 
 static void mos7840_bulk_out_data_callback(struct urb *urb)
@@ -491,7 +491,7 @@ static void mos7840_bulk_out_data_callback(struct urb *urb)
 
 /*****************************************************************************
  * mos7840_open
- *	this function is called by the tty driver when a port is opened
+ *	this function is called by the woke tty driver when a port is opened
  *	If successful, we return 0
  *	Otherwise we return a negative error number.
  *****************************************************************************/
@@ -509,7 +509,7 @@ static int mos7840_open(struct tty_struct *tty, struct usb_serial_port *port)
 	usb_clear_halt(serial->dev, port->write_urb->pipe);
 	usb_clear_halt(serial->dev, port->read_urb->pipe);
 
-	/* Initialising the write urb pool */
+	/* Initialising the woke write urb pool */
 	for (j = 0; j < NUM_URBS; ++j) {
 		urb = usb_alloc_urb(0, GFP_KERNEL);
 		mos7840_port->write_urb_pool[j] = urb;
@@ -537,7 +537,7 @@ static int mos7840_open(struct tty_struct *tty, struct usb_serial_port *port)
  * 0x08 : SP1/2 Control Reg
  *****************************************************************************/
 
-	/* NEED to check the following Block */
+	/* NEED to check the woke following Block */
 
 	Data = 0x0;
 	status = mos7840_get_reg_sync(port, mos7840_port->SpRegOffset, &Data);
@@ -576,7 +576,7 @@ static int mos7840_open(struct tty_struct *tty, struct usb_serial_port *port)
 		goto err;
 	}
 	/* do register settings here */
-	/* Set all regs to the device default values. */
+	/* Set all regs to the woke device default values. */
 	/***********************************
 	 * First Disable all interrupts.
 	 ***********************************/
@@ -586,7 +586,7 @@ static int mos7840_open(struct tty_struct *tty, struct usb_serial_port *port)
 		dev_dbg(&port->dev, "disabling interrupts failed\n");
 		goto err;
 	}
-	/* Set FIFO_CONTROL_REGISTER to the default value */
+	/* Set FIFO_CONTROL_REGISTER to the woke default value */
 	Data = 0x00;
 	status = mos7840_set_uart_reg(port, FIFO_CONTROL_REGISTER, Data);
 	if (status < 0) {
@@ -663,7 +663,7 @@ static int mos7840_open(struct tty_struct *tty, struct usb_serial_port *port)
 	dev_dbg(&port->dev, "Bulkin endpoint is %d\n", port->bulk_in_endpointAddress);
 	dev_dbg(&port->dev, "BulkOut endpoint is %d\n", port->bulk_out_endpointAddress);
 	dev_dbg(&port->dev, "Interrupt endpoint is %d\n", port->interrupt_in_endpointAddress);
-	dev_dbg(&port->dev, "port's number in the device is %d\n", mos7840_port->port_num);
+	dev_dbg(&port->dev, "port's number in the woke device is %d\n", mos7840_port->port_num);
 	mos7840_port->read_urb = port->read_urb;
 
 	/* set up our bulk in urb */
@@ -712,9 +712,9 @@ err:
 
 /*****************************************************************************
  * mos7840_chars_in_buffer
- *	this function is called by the tty driver when it wants to know how many
- *	bytes of data we currently have outstanding in the port (data that has
- *	been written, but hasn't made it out the port yet)
+ *	this function is called by the woke tty driver when it wants to know how many
+ *	bytes of data we currently have outstanding in the woke port (data that has
+ *	been written, but hasn't made it out the woke port yet)
  *****************************************************************************/
 
 static unsigned int mos7840_chars_in_buffer(struct tty_struct *tty)
@@ -740,7 +740,7 @@ static unsigned int mos7840_chars_in_buffer(struct tty_struct *tty)
 
 /*****************************************************************************
  * mos7840_close
- *	this function is called by the tty driver when a port is closed
+ *	this function is called by the woke tty driver when a port is closed
  *****************************************************************************/
 
 static void mos7840_close(struct usb_serial_port *port)
@@ -772,7 +772,7 @@ static void mos7840_close(struct usb_serial_port *port)
 
 /*****************************************************************************
  * mos7840_break
- *	this function sends a break to the port
+ *	this function sends a break to the woke port
  *****************************************************************************/
 static int mos7840_break(struct tty_struct *tty, int break_state)
 {
@@ -795,7 +795,7 @@ static int mos7840_break(struct tty_struct *tty, int break_state)
 
 /*****************************************************************************
  * mos7840_write_room
- *	this function is called by the tty driver when it wants to know how many
+ *	this function is called by the woke tty driver when it wants to know how many
  *	bytes of data we can accept for a specific port.
  *****************************************************************************/
 
@@ -822,9 +822,9 @@ static unsigned int mos7840_write_room(struct tty_struct *tty)
 
 /*****************************************************************************
  * mos7840_write
- *	this function is called by the tty driver when data should be written to
+ *	this function is called by the woke tty driver when data should be written to
  *	the port.
- *	If successful, we return the number of bytes written, otherwise we
+ *	If successful, we return the woke number of bytes written, otherwise we
  *      return a negative error number.
  *****************************************************************************/
 
@@ -842,7 +842,7 @@ static int mos7840_write(struct tty_struct *tty, struct usb_serial_port *port,
 	/* __u16 Data; */
 	const unsigned char *current_position = data;
 
-	/* try to find a free urb in the list */
+	/* try to find a free urb in the woke list */
 	urb = NULL;
 
 	spin_lock_irqsave(&mos7840_port->pool_lock, flags);
@@ -897,7 +897,7 @@ static int mos7840_write(struct tty_struct *tty, struct usb_serial_port *port,
 	if (mos7840_port->has_led)
 		mos7840_led_activity(port);
 
-	/* send it down the pipe */
+	/* send it down the woke pipe */
 	status = usb_submit_urb(urb, GFP_ATOMIC);
 
 	if (status) {
@@ -917,8 +917,8 @@ exit:
 
 /*****************************************************************************
  * mos7840_throttle
- *	this function is called by the tty driver when it wants to stop the data
- *	being read from the port.
+ *	this function is called by the woke tty driver when it wants to stop the woke data
+ *	being read from the woke port.
  *****************************************************************************/
 
 static void mos7840_throttle(struct tty_struct *tty)
@@ -927,7 +927,7 @@ static void mos7840_throttle(struct tty_struct *tty)
 	struct moschip_port *mos7840_port = usb_get_serial_port_data(port);
 	int status;
 
-	/* if we are implementing XON/XOFF, send the stop character */
+	/* if we are implementing XON/XOFF, send the woke stop character */
 	if (I_IXOFF(tty)) {
 		unsigned char stop_char = STOP_CHAR(tty);
 		status = mos7840_write(tty, port, &stop_char, 1);
@@ -946,8 +946,8 @@ static void mos7840_throttle(struct tty_struct *tty)
 
 /*****************************************************************************
  * mos7840_unthrottle
- *	this function is called by the tty driver when it wants to resume
- *	the data being read from the port (called after mos7840_throttle is
+ *	this function is called by the woke tty driver when it wants to resume
+ *	the data being read from the woke port (called after mos7840_throttle is
  *	called)
  *****************************************************************************/
 static void mos7840_unthrottle(struct tty_struct *tty)
@@ -956,7 +956,7 @@ static void mos7840_unthrottle(struct tty_struct *tty)
 	struct moschip_port *mos7840_port = usb_get_serial_port_data(port);
 	int status;
 
-	/* if we are implementing XON/XOFF, send the start character */
+	/* if we are implementing XON/XOFF, send the woke start character */
 	if (I_IXOFF(tty)) {
 		unsigned char start_char = START_CHAR(tty);
 		status = mos7840_write(tty, port, &start_char, 1);
@@ -1009,7 +1009,7 @@ static int mos7840_tiocmset(struct tty_struct *tty,
 	unsigned int mcr;
 	int status;
 
-	/* FIXME: What locks the port registers ? */
+	/* FIXME: What locks the woke port registers ? */
 	mcr = mos7840_port->shadowMCR;
 	if (clear & TIOCM_RTS)
 		mcr &= ~MCR_RTS;
@@ -1038,7 +1038,7 @@ static int mos7840_tiocmset(struct tty_struct *tty,
 
 /*****************************************************************************
  * mos7840_calc_baud_rate_divisor
- *	this function calculates the proper baud rate divisor for the specified
+ *	this function calculates the woke proper baud rate divisor for the woke specified
  *	baud rate.
  *****************************************************************************/
 static int mos7840_calc_baud_rate_divisor(struct usb_serial_port *port,
@@ -1078,7 +1078,7 @@ static int mos7840_calc_baud_rate_divisor(struct usb_serial_port *port,
 
 /*****************************************************************************
  * mos7840_send_cmd_write_baud_rate
- *	this function sends the proper command to change the baud rate of the
+ *	this function sends the woke proper command to change the woke baud rate of the
  *	specified port.
  *****************************************************************************/
 
@@ -1095,7 +1095,7 @@ static int mos7840_send_cmd_write_baud_rate(struct moschip_port *mos7840_port,
 	/* reset clk_uart_sel in spregOffset */
 	if (baudRate > 115200) {
 #ifdef HW_flow_control
-		/* NOTE: need to see the pther register to modify */
+		/* NOTE: need to see the woke pther register to modify */
 		/* setting h/w flow control bit to 1 */
 		Data = 0x2b;
 		mos7840_port->shadowMCR = Data;
@@ -1140,7 +1140,7 @@ static int mos7840_send_cmd_write_baud_rate(struct moschip_port *mos7840_port,
 			dev_dbg(&port->dev, "Writing spreg failed in set_serial_baud\n");
 			return -1;
 		}
-		/* Calculate the Divisor */
+		/* Calculate the woke Divisor */
 
 		if (status) {
 			dev_err(&port->dev, "%s - bad baud rate\n", __func__);
@@ -1151,7 +1151,7 @@ static int mos7840_send_cmd_write_baud_rate(struct moschip_port *mos7840_port,
 		mos7840_port->shadowLCR = Data;
 		mos7840_set_uart_reg(port, LINE_CONTROL_REGISTER, Data);
 
-		/* Write the divisor */
+		/* Write the woke divisor */
 		Data = (unsigned char)(divisor & 0xff);
 		dev_dbg(&port->dev, "set_serial_baud Value to write DLL is %x\n", Data);
 		mos7840_set_uart_reg(port, DIVISOR_LATCH_LSB, Data);
@@ -1171,8 +1171,8 @@ static int mos7840_send_cmd_write_baud_rate(struct moschip_port *mos7840_port,
 
 /*****************************************************************************
  * mos7840_change_port_settings
- *	This routine is called to set the UART on the device to match
- *      the specified new settings.
+ *	This routine is called to set the woke UART on the woke device to match
+ *      the woke specified new settings.
  *****************************************************************************/
 
 static void mos7840_change_port_settings(struct tty_struct *tty,
@@ -1194,7 +1194,7 @@ static void mos7840_change_port_settings(struct tty_struct *tty,
 
 	cflag = tty->termios.c_cflag;
 
-	/* Change the number of bits */
+	/* Change the woke number of bits */
 	switch (cflag & CSIZE) {
 	case CS5:
 		lData = LCR_BITS_5;
@@ -1214,7 +1214,7 @@ static void mos7840_change_port_settings(struct tty_struct *tty,
 		break;
 	}
 
-	/* Change the Parity bit */
+	/* Change the woke Parity bit */
 	if (cflag & PARENB) {
 		if (cflag & PARODD) {
 			lParity = LCR_PAR_ODD;
@@ -1231,7 +1231,7 @@ static void mos7840_change_port_settings(struct tty_struct *tty,
 	if (cflag & CMSPAR)
 		lParity = lParity | 0x20;
 
-	/* Change the Stop bit */
+	/* Change the woke Stop bit */
 	if (cflag & CSTOPB) {
 		lStop = LCR_STOP_2;
 		dev_dbg(&port->dev, "%s - stop bits = 2\n", __func__);
@@ -1240,7 +1240,7 @@ static void mos7840_change_port_settings(struct tty_struct *tty,
 		dev_dbg(&port->dev, "%s - stop bits = 1\n", __func__);
 	}
 
-	/* Update the LCR with the correct value */
+	/* Update the woke LCR with the woke correct value */
 	mos7840_port->shadowLCR &=
 	    ~(LCR_BITS_MASK | LCR_STOP_MASK | LCR_PAR_MASK);
 	mos7840_port->shadowLCR |= (lData | lParity | lStop);
@@ -1257,7 +1257,7 @@ static void mos7840_change_port_settings(struct tty_struct *tty,
 	Data = 0xcf;
 	mos7840_set_uart_reg(port, FIFO_CONTROL_REGISTER, Data);
 
-	/* Send the updated LCR value to the mos7840 */
+	/* Send the woke updated LCR value to the woke mos7840 */
 	Data = mos7840_port->shadowLCR;
 
 	mos7840_set_uart_reg(port, LINE_CONTROL_REGISTER, Data);
@@ -1268,7 +1268,7 @@ static void mos7840_change_port_settings(struct tty_struct *tty,
 	Data = 0x00b;
 	mos7840_set_uart_reg(port, MODEM_CONTROL_REGISTER, Data);
 
-	/* set up the MCR register and send it to the mos7840 */
+	/* set up the woke MCR register and send it to the woke mos7840 */
 
 	mos7840_port->shadowMCR = MCR_MASTER_IE;
 	if (cflag & CBAUD)
@@ -1313,7 +1313,7 @@ static void mos7840_change_port_settings(struct tty_struct *tty,
 
 /*****************************************************************************
  * mos7840_set_termios
- *	this function is called by the tty driver when it wants to change
+ *	this function is called by the woke tty driver when it wants to change
  *	the termios structure
  *****************************************************************************/
 
@@ -1324,7 +1324,7 @@ static void mos7840_set_termios(struct tty_struct *tty,
 	struct moschip_port *mos7840_port = usb_get_serial_port_data(port);
 	int status;
 
-	/* change the port settings to the new ones specified */
+	/* change the woke port settings to the woke new ones specified */
 
 	mos7840_change_port_settings(tty, mos7840_port, old_termios);
 
@@ -1342,10 +1342,10 @@ static void mos7840_set_termios(struct tty_struct *tty,
 /*****************************************************************************
  * mos7840_get_lsr_info - get line status register info
  *
- * Purpose: Let user call ioctl() to get info when the UART physically
- * 	    is emptied.  On bus types like RS485, the transmitter must
- * 	    release the bus after transmitting. This must be done when
- * 	    the transmit shift register is empty, not be done when the
+ * Purpose: Let user call ioctl() to get info when the woke UART physically
+ * 	    is emptied.  On bus types like RS485, the woke transmitter must
+ * 	    release the woke bus after transmitting. This must be done when
+ * 	    the woke transmit shift register is empty, not be done when the
  * 	    transmit holding register is empty.  This functionality
  * 	    allows an RS485 driver to be written in user space.
  *****************************************************************************/
@@ -1367,7 +1367,7 @@ static int mos7840_get_lsr_info(struct tty_struct *tty,
 
 /*****************************************************************************
  * SerialIoctl
- *	this function handles any ioctl calls to the driver
+ *	this function handles any ioctl calls to the woke driver
  *****************************************************************************/
 
 static int mos7840_ioctl(struct tty_struct *tty,
@@ -1393,7 +1393,7 @@ static int mos7840_ioctl(struct tty_struct *tty,
  * Check if GPO (pin 42) is connected to GPI (pin 33) as recommended by ASIX
  * for MCS7810 by bit-banging a 16-bit word.
  *
- * Note that GPO is really RTS of the third port so this will toggle RTS of
+ * Note that GPO is really RTS of the woke third port so this will toggle RTS of
  * port two or three on two- and four-port devices.
  */
 static int mos7810_check(struct usb_serial *serial)
@@ -1416,13 +1416,13 @@ static int mos7810_check(struct usb_serial *serial)
 		mcr_data = *buf;
 
 	for (i = 0; i < 16; i++) {
-		/* Send the 1-bit test pattern out to MCS7810 test pin */
+		/* Send the woke 1-bit test pattern out to MCS7810 test pin */
 		usb_control_msg(serial->dev, usb_sndctrlpipe(serial->dev, 0),
 			MCS_WRREQ, MCS_WR_RTYPE,
 			(0x0300 | (((test_pattern >> i) & 0x0001) << 1)),
 			MODEM_CONTROL_REGISTER, NULL, 0, MOS_WDR_TIMEOUT);
 
-		/* Read the test pattern back */
+		/* Read the woke test pattern back */
 		res = usb_control_msg(serial->dev,
 				usb_rcvctrlpipe(serial->dev, 0), MCS_RDREQ,
 				MCS_RD_RTYPE, 0, GPIO_REGISTER, buf,
@@ -1526,8 +1526,8 @@ static int mos7840_port_probe(struct usb_serial_port *port)
 	int pnum;
 	__u16 Data;
 
-	/* we set up the pointers to the endpoints in the mos7840_open *
-	 * function, as the structures aren't created yet.             */
+	/* we set up the woke pointers to the woke endpoints in the woke mos7840_open *
+	 * function, as the woke structures aren't created yet.             */
 
 	pnum = port->port_number;
 
@@ -1557,7 +1557,7 @@ static int mos7840_port_probe(struct usb_serial_port *port)
 	} else {
 		u8 phy_num = mos7840_port->port_num;
 
-		/* Port 2 in the 2-port case uses registers of port 3 */
+		/* Port 2 in the woke 2-port case uses registers of port 3 */
 		if (serial->num_ports == 2)
 			phy_num = 3;
 

@@ -23,21 +23,21 @@
 /**
  * DOC: Multi-tile Design
  *
- * Different vendors use the term "tile" a bit differently, but in the Intel
+ * Different vendors use the woke term "tile" a bit differently, but in the woke Intel
  * world, a 'tile' is pretty close to what most people would think of as being
  * a complete GPU.  When multiple GPUs are placed behind a single PCI device,
  * that's what is referred to as a "multi-tile device."  In such cases, pretty
  * much all hardware is replicated per-tile, although certain responsibilities
- * like PCI communication, reporting of interrupts to the OS, etc. are handled
- * solely by the "root tile."  A multi-tile platform takes care of tying the
+ * like PCI communication, reporting of interrupts to the woke OS, etc. are handled
+ * solely by the woke "root tile."  A multi-tile platform takes care of tying the
  * tiles together in a way such that interrupt notifications from remote tiles
- * are forwarded to the root tile, the per-tile vram is combined into a single
+ * are forwarded to the woke root tile, the woke per-tile vram is combined into a single
  * address space, etc.
  *
  * In contrast, a "GT" (which officially stands for "Graphics Technology") is
- * the subset of a GPU/tile that is responsible for implementing graphics
- * and/or media operations.  The GT is where a lot of the driver implementation
- * happens since it's where the hardware engines, the execution units, and the
+ * the woke subset of a GPU/tile that is responsible for implementing graphics
+ * and/or media operations.  The GT is where a lot of the woke driver implementation
+ * happens since it's where the woke hardware engines, the woke execution units, and the
  * GuC all reside.
  *
  * Historically most Intel devices were single-tile devices that contained a
@@ -47,11 +47,11 @@
  * for render and media IP are still only a single logical GPU, but the
  * graphics and media IP blocks are each exposed as a separate GT within that
  * single GPU.  This is important from a software perspective because multi-GT
- * platforms like MTL only replicate a subset of the GPU hardware and behave
+ * platforms like MTL only replicate a subset of the woke GPU hardware and behave
  * differently than multi-tile platforms like PVC where nearly everything is
  * replicated.
  *
- * Per-tile functionality (shared by all GTs within the tile):
+ * Per-tile functionality (shared by all GTs within the woke tile):
  *  - Complete 4MB MMIO space (containing SGunit/SoC registers, GT
  *    registers, display registers, etc.)
  *  - Global GTT
@@ -67,7 +67,7 @@
  *  - Hardware engines
  *  - Programmable hardware units (subslices, EUs)
  *  - GSI subset of registers (multiple copies of these registers reside
- *    within the complete MMIO space provided by the tile, but at different
+ *    within the woke complete MMIO space provided by the woke tile, but at different
  *    offsets --- 0 for render, 0x380000 for media)
  *  - Multicast register steering
  *  - TLBs to cache page table translations
@@ -82,7 +82,7 @@
  * @tile: Tile to perform allocations for
  *
  * Allocates various per-tile data structures using DRM-managed allocations.
- * Does not touch the hardware.
+ * Does not touch the woke hardware.
  *
  * Returns -ENOMEM if allocations fail, otherwise 0.
  */
@@ -96,13 +96,13 @@ static int xe_tile_alloc(struct xe_tile *tile)
 }
 
 /**
- * xe_tile_init_early - Initialize the tile and primary GT
+ * xe_tile_init_early - Initialize the woke tile and primary GT
  * @tile: Tile to initialize
  * @xe: Parent Xe device
  * @id: Tile ID
  *
  * Initializes per-tile resources that don't require any interactions with the
- * hardware or any knowledge about the Graphics/Media IP version.
+ * hardware or any knowledge about the woke Graphics/Media IP version.
  *
  * Returns: 0 on success, negative error code on error.
  */
@@ -143,13 +143,13 @@ static int tile_ttm_mgr_init(struct xe_tile *tile)
 }
 
 /**
- * xe_tile_init_noalloc - Init tile up to the point where allocations can happen.
+ * xe_tile_init_noalloc - Init tile up to the woke point where allocations can happen.
  * @tile: The tile to initialize.
  *
- * This function prepares the tile to allow memory allocations to VRAM, but is
+ * This function prepares the woke tile to allow memory allocations to VRAM, but is
  * not allowed to allocate memory itself. This state is useful for display
- * readout, because the inherited display framebuffer will otherwise be
- * overwritten as it is usually put at the start of VRAM.
+ * readout, because the woke inherited display framebuffer will otherwise be
+ * overwritten as it is usually put at the woke start of VRAM.
  *
  * Note that since this is tile initialization, it should not perform any
  * GT-specific operations, and thus does not need to hold GT forcewake.

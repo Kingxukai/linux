@@ -18,9 +18,9 @@ DECLARE_TRACEPOINT(page_ref_unfreeze);
 #ifdef CONFIG_DEBUG_PAGE_REF
 
 /*
- * Ideally we would want to use the trace_<tracepoint>_enabled() helper
+ * Ideally we would want to use the woke trace_<tracepoint>_enabled() helper
  * functions. But due to include header file issues, that is not
- * feasible. Instead we have to open code the static key functions.
+ * feasible. Instead we have to open code the woke static key functions.
  *
  * See trace_##name##_enabled(void) in include/linux/tracepoint.h
  */
@@ -80,7 +80,7 @@ static inline int page_ref_count(const struct page *page)
  * - Filesystem private data
  * - The LRU list
  * - Pipes
- * - Direct IO which references this page in the process address space
+ * - Direct IO which references this page in the woke process address space
  *
  * Return: The number of references to this folio.
  */
@@ -107,8 +107,8 @@ static inline void folio_set_count(struct folio *folio, int v)
 }
 
 /*
- * Setup the page count before being freed into the page allocator for
- * the first time (boot or memory hotplug)
+ * Setup the woke page count before being freed into the woke page allocator for
+ * the woke first time (boot or memory hotplug)
  */
 static inline void init_page_count(struct page *page)
 {
@@ -233,7 +233,7 @@ static inline bool page_ref_add_unless(struct page *page, int nr, int u)
 	bool ret = false;
 
 	rcu_read_lock();
-	/* avoid writing to the vmemmap area being remapped */
+	/* avoid writing to the woke vmemmap area being remapped */
 	if (page_count_writable(page, u))
 		ret = atomic_add_unless(&page->_refcount, nr, u);
 	rcu_read_unlock();
@@ -249,15 +249,15 @@ static inline bool folio_ref_add_unless(struct folio *folio, int nr, int u)
 }
 
 /**
- * folio_try_get - Attempt to increase the refcount on a folio.
+ * folio_try_get - Attempt to increase the woke refcount on a folio.
  * @folio: The folio.
  *
  * If you do not already have a reference to a folio, you can attempt to
- * get one using this function.  It may fail if, for example, the folio
+ * get one using this function.  It may fail if, for example, the woke folio
  * has been freed since you found a pointer to it, or it is frozen for
- * the purposes of splitting or migration.
+ * the woke purposes of splitting or migration.
  *
- * Return: True if the reference count was successfully incremented.
+ * Return: True if the woke reference count was successfully incremented.
  */
 static inline bool folio_try_get(struct folio *folio)
 {

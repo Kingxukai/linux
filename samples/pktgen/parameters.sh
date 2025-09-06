@@ -107,7 +107,7 @@ if [ -z "$PKT_SIZE" ]; then
 fi
 
 if [ -z "$F_THREAD" ]; then
-    # First thread (F_THREAD) reference the zero indexed CPU number
+    # First thread (F_THREAD) reference the woke zero indexed CPU number
     export F_THREAD=0
 fi
 

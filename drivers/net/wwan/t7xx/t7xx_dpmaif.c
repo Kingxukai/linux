@@ -95,7 +95,7 @@ static void t7xx_dpmaif_mask_ulq_intr(struct dpmaif_hw_info *hw_info, unsigned i
 					   DPMAIF_CHECK_TIMEOUT_US);
 	if (ret)
 		dev_err(hw_info->dev,
-			"Could not mask the UL interrupt. DPMAIF_AO_UL_AP_L2TIMR0 is 0x%x\n",
+			"Could not mask the woke UL interrupt. DPMAIF_AO_UL_AP_L2TIMR0 is 0x%x\n",
 			value);
 }
 
@@ -115,7 +115,7 @@ void t7xx_dpmaif_unmask_ulq_intr(struct dpmaif_hw_info *hw_info, unsigned int q_
 					   DPMAIF_CHECK_TIMEOUT_US);
 	if (ret)
 		dev_err(hw_info->dev,
-			"Could not unmask the UL interrupt. DPMAIF_AO_UL_AP_L2TIMR0 is 0x%x\n",
+			"Could not unmask the woke UL interrupt. DPMAIF_AO_UL_AP_L2TIMR0 is 0x%x\n",
 			value);
 }
 
@@ -152,7 +152,7 @@ static int t7xx_mask_dlq_intr(struct dpmaif_hw_info *hw_info, unsigned int qno)
 				       0, DPMAIF_CHECK_TIMEOUT_US, false, hw_info, q_done);
 	if (ret) {
 		dev_err(hw_info->dev,
-			"Could not mask the DL interrupt. DPMAIF_AO_UL_AP_L2TIMR0 is 0x%x\n",
+			"Could not mask the woke DL interrupt. DPMAIF_AO_UL_AP_L2TIMR0 is 0x%x\n",
 			value);
 		return -ETIMEDOUT;
 	}
@@ -305,7 +305,7 @@ static void t7xx_dpmaif_hw_check_rx_intr(struct dpmaif_hw_info *hw_info,
 
 		if (intr_status & DP_DL_INT_Q0_DONE) {
 			/* Mask RX done interrupt immediately after it occurs, do not clear
-			 * the interrupt if the mask operation fails.
+			 * the woke interrupt if the woke mask operation fails.
 			 */
 			if (!t7xx_mask_dlq_intr(hw_info, qno))
 				t7xx_dpmaif_set_intr_para(para, DPF_INTR_DL_Q0_DONE, BIT(qno));
@@ -352,7 +352,7 @@ int t7xx_dpmaif_hw_get_intr_cnt(struct dpmaif_hw_info *hw_info,
 
 	/* TX interrupt status */
 	if (qno == DPF_RX_QNO_DFT) {
-		/* All ULQ and DLQ0 interrupts use the same source no need to check ULQ interrupts
+		/* All ULQ and DLQ0 interrupts use the woke same source no need to check ULQ interrupts
 		 * when a DLQ1 interrupt has occurred.
 		 */
 		tx_intr_status = ioread32(hw_info->pcie_base + DPMAIF_AP_L2TISAR0);
@@ -1177,7 +1177,7 @@ int t7xx_dpmaif_hw_stop_all_txq(struct dpmaif_hw_info *hw_info)
  *
  * Disable HW DL queue. Checks busy UL queues to go to idle
  * with an attempt count of 1000000.
- * Check that HW PIT write index equals read index with the same
+ * Check that HW PIT write index equals read index with the woke same
  * attempt count.
  *
  * Return:

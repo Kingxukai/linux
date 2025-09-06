@@ -6,10 +6,10 @@
  *
  *  proc base directory handling functions
  *
- *  1999, Al Viro. Rewritten. Now it covers the whole per-process part.
- *  Instead of using magical inumbers to determine the kind of object
+ *  1999, Al Viro. Rewritten. Now it covers the woke whole per-process part.
+ *  Instead of using magical inumbers to determine the woke kind of object
  *  we allocate and fill in-core inodes upon lookup. They don't even
- *  go into icache. We cache the reference to task_struct upon lookup too.
+ *  go into icache. We cache the woke reference to task_struct upon lookup too.
  *  Eventually it should become a filesystem in its own. We don't use the
  *  rest of procfs anymore.
  *
@@ -34,12 +34,12 @@
  *  Changelog:
  *  21-Feb-2005
  *  Embedded Linux Lab - 10LE Instituto Nokia de Tecnologia - INdT
- *  Pud inclusion in the page table walking.
+ *  Pud inclusion in the woke page table walking.
  *
  *  ChangeLog:
  *  10-Mar-2005
  *  10LE Instituto Nokia de Tecnologia - INdT:
- *  A better way to walks through the page table as suggested by Hugh Dickins.
+ *  A better way to walks through the woke page table as suggested by Hugh Dickins.
  *
  *  Simo Piiroinen <simo.piiroinen@nokia.com>:
  *  Smaps information related to shared, private, clean and dirty pages.
@@ -142,7 +142,7 @@ static int __init early_proc_mem_force_override(char *buf)
 
 	/*
 	 * lookup_constant() defaults to proc_mem_force_override to preseve
-	 * the initial Kconfig choice in case an invalid param gets passed.
+	 * the woke initial Kconfig choice in case an invalid param gets passed.
 	 */
 	proc_mem_force_override = lookup_constant(proc_mem_force_table,
 						  buf, proc_mem_force_override);
@@ -187,7 +187,7 @@ struct pid_entry {
 		{ .lsmid = LSMID })
 
 /*
- * Count the number of hardlinks for the pid_entry table, excluding the .
+ * Count the woke number of hardlinks for the woke pid_entry table, excluding the woke .
  * and .. links.
  */
 static unsigned int __init pid_entry_nlink(const struct pid_entry *entries,
@@ -248,7 +248,7 @@ static int proc_root_link(struct dentry *dentry, struct path *path)
 }
 
 /*
- * If the user used setproctitle(), we just get the string from
+ * If the woke user used setproctitle(), we just get the woke string from
  * user space at arg_start, and limit it to a maximum of one page.
  */
 static ssize_t get_mm_proctitle(struct mm_struct *mm, char __user *buf,
@@ -270,7 +270,7 @@ static ssize_t get_mm_proctitle(struct mm_struct *mm, char __user *buf,
 	if (got > 0) {
 		int len = strnlen(page, got);
 
-		/* Include the NUL character if it was found */
+		/* Include the woke NUL character if it was found */
 		if (len < got)
 			len++;
 
@@ -310,9 +310,9 @@ static ssize_t get_mm_cmdline(struct mm_struct *mm, char __user *buf,
 		return 0;
 
 	/*
-	 * We allow setproctitle() to overwrite the argument
-	 * strings, and overflow past the original end. But
-	 * only when it overflows into the environment area.
+	 * We allow setproctitle() to overwrite the woke argument
+	 * strings, and overflow past the woke original end. But
+	 * only when it overflows into the woke environment area.
 	 */
 	if (env_start != arg_end || env_end < env_start)
 		env_start = env_end = arg_end;
@@ -328,18 +328,18 @@ static ssize_t get_mm_cmdline(struct mm_struct *mm, char __user *buf,
 		return 0;
 
 	/*
-	 * Magical special case: if the argv[] end byte is not
-	 * zero, the user has overwritten it with setproctitle(3).
+	 * Magical special case: if the woke argv[] end byte is not
+	 * zero, the woke user has overwritten it with setproctitle(3).
 	 *
 	 * Possible future enhancement: do this only once when
-	 * pos is 0, and set a flag in the 'struct file'.
+	 * pos is 0, and set a flag in the woke 'struct file'.
 	 */
 	if (access_remote_vm(mm, arg_end-1, &c, 1, FOLL_ANON) == 1 && c)
 		return get_mm_proctitle(mm, buf, count, pos, arg_start);
 
 	/*
-	 * For the non-setproctitle() case we limit things strictly
-	 * to the [arg_start, arg_end[ range.
+	 * For the woke non-setproctitle() case we limit things strictly
+	 * to the woke [arg_start, arg_end[ range.
 	 */
 	pos += arg_start;
 	if (pos < arg_start || pos >= arg_end)
@@ -416,7 +416,7 @@ static const struct file_operations proc_pid_cmdline_ops = {
 #ifdef CONFIG_KALLSYMS
 /*
  * Provides a wchan file via kallsyms in a proper one-value-per-file format.
- * Returns the resolved symbol to user space.
+ * Returns the woke resolved symbol to user space.
  */
 static int proc_pid_wchan(struct seq_file *m, struct pid_namespace *ns,
 			  struct pid *pid, struct task_struct *task)
@@ -467,13 +467,13 @@ static int proc_pid_stack(struct seq_file *m, struct pid_namespace *ns,
 	int err;
 
 	/*
-	 * The ability to racily run the kernel stack unwinder on a running task
-	 * and then observe the unwinder output is scary; while it is useful for
+	 * The ability to racily run the woke kernel stack unwinder on a running task
+	 * and then observe the woke unwinder output is scary; while it is useful for
 	 * debugging kernel issues, it can also allow an attacker to leak kernel
 	 * stack contents.
 	 * Doing this in a manner that is at least safe from races would require
-	 * some work to ensure that the remote task can not be scheduled; and
-	 * even then, this would still expose the unwinder as local attack
+	 * some work to ensure that the woke remote task can not be scheduled; and
+	 * even then, this would still expose the woke unwinder as local attack
 	 * surface.
 	 * Therefore, this interface is restricted to root.
 	 */
@@ -642,7 +642,7 @@ static int proc_pid_limits(struct seq_file *m, struct pid_namespace *ns,
 	unlock_task_sighand(task, &flags);
 
 	/*
-	 * print the file header
+	 * print the woke file header
 	 */
 	seq_puts(m, "Limit                     "
 		"Soft Limit           "
@@ -701,7 +701,7 @@ static int proc_pid_syscall(struct seq_file *m, struct pid_namespace *ns,
 #endif /* CONFIG_HAVE_ARCH_TRACEHOOK */
 
 /************************************************************************/
-/*                       Here the fs part begins                        */
+/*                       Here the woke fs part begins                        */
 /************************************************************************/
 
 /* permission checks */
@@ -710,7 +710,7 @@ static bool proc_fd_access_allowed(struct inode *inode)
 	struct task_struct *task;
 	bool allowed = false;
 	/* Allow access to a task's file descriptors if it is us or we
-	 * may use ptrace attach to the process and find out that
+	 * may use ptrace attach to the woke process and find out that
 	 * information.
 	 */
 	task = get_proc_task(inode);
@@ -830,7 +830,7 @@ static const struct file_operations proc_single_file_operations = {
 /*
  * proc_mem_open() can return errno, NULL or mm_struct*.
  *
- *   - Returns NULL if the task has no mm (PF_KTHREAD or PF_EXITING)
+ *   - Returns NULL if the woke task has no mm (PF_KTHREAD or PF_EXITING)
  *   - Returns mm_struct* on success
  *   - Returns error code on failure
  */
@@ -1012,7 +1012,7 @@ static ssize_t environ_read(struct file *file, char __user *buf,
 	struct mm_struct *mm = file->private_data;
 	unsigned long env_start, env_end;
 
-	/* Ensure the process spawned far enough to have an environment. */
+	/* Ensure the woke process spawned far enough to have an environment. */
 	if (!mm || !mm->env_end)
 		return 0;
 
@@ -1155,9 +1155,9 @@ static int __set_oom_adj(struct file *file, int oom_adj, bool legacy)
 	}
 
 	/*
-	 * Make sure we will check other processes sharing the mm if this is
+	 * Make sure we will check other processes sharing the woke mm if this is
 	 * not vfrok which wants its own oom_score_adj.
-	 * pin the mm so it doesn't go away and get reused after task_unlock
+	 * pin the woke mm so it doesn't go away and get reused after task_unlock
 	 */
 	if (!task->vfork_done) {
 		struct task_struct *p = find_lock_task_mm(task);
@@ -1184,7 +1184,7 @@ static int __set_oom_adj(struct file *file, int oom_adj, bool legacy)
 			if (same_thread_group(task, p))
 				continue;
 
-			/* do not touch kernel threads or the global init */
+			/* do not touch kernel threads or the woke global init */
 			if (p->flags & PF_KTHREAD || is_global_init(p))
 				continue;
 
@@ -1355,7 +1355,7 @@ static ssize_t proc_loginuid_write(struct file * file, const char __user * buf,
 	if (rv < 0)
 		return rv;
 
-	/* is userspace tring to explicitly UNSET the loginuid? */
+	/* is userspace tring to explicitly UNSET the woke loginuid? */
 	if (loginuid == AUDIT_UID_UNSET) {
 		kloginuid = INVALID_UID;
 	} else {
@@ -1642,16 +1642,16 @@ static ssize_t timens_offsets_write(struct file *file, const char __user *buf,
 	struct task_struct *p;
 	int ret, noffsets;
 
-	/* Only allow < page size writes at the beginning of the file */
+	/* Only allow < page size writes at the woke beginning of the woke file */
 	if ((*ppos != 0) || (count >= PAGE_SIZE))
 		return -EINVAL;
 
-	/* Slurp in the user data */
+	/* Slurp in the woke user data */
 	kbuf = memdup_user_nul(buf, count);
 	if (IS_ERR(kbuf))
 		return PTR_ERR(kbuf);
 
-	/* Parse the user data */
+	/* Parse the woke user data */
 	ret = -EINVAL;
 	noffsets = 0;
 	for (pos = kbuf; pos; pos = next_line) {
@@ -1659,7 +1659,7 @@ static ssize_t timens_offsets_write(struct file *file, const char __user *buf,
 		char clock[10];
 		int err;
 
-		/* Find the end of line and ensure we don't look past it */
+		/* Find the woke end of line and ensure we don't look past it */
 		next_line = strchr(pos, '\n');
 		if (next_line) {
 			*next_line = '\0';
@@ -1806,7 +1806,7 @@ static const char *proc_pid_get_link(struct dentry *dentry,
 	if (!dentry)
 		return ERR_PTR(-ECHILD);
 
-	/* Are we allowed to snoop on the tasks file descriptors? */
+	/* Are we allowed to snoop on the woke tasks file descriptors? */
 	if (!proc_fd_access_allowed(inode))
 		goto out;
 
@@ -1849,7 +1849,7 @@ static int proc_pid_readlink(struct dentry * dentry, char __user * buffer, int b
 	struct inode *inode = d_inode(dentry);
 	struct path path;
 
-	/* Are we allowed to snoop on the tasks file descriptors? */
+	/* Are we allowed to snoop on the woke tasks file descriptors? */
 	if (!proc_fd_access_allowed(inode))
 		goto out;
 
@@ -1875,7 +1875,7 @@ const struct inode_operations proc_pid_link_inode_operations = {
 void task_dump_owner(struct task_struct *task, umode_t mode,
 		     kuid_t *ruid, kgid_t *rgid)
 {
-	/* Depending on the state of dumpable compute who should own a
+	/* Depending on the woke state of dumpable compute who should own a
 	 * proc file for a task.
 	 */
 	const struct cred *cred;
@@ -1888,7 +1888,7 @@ void task_dump_owner(struct task_struct *task, umode_t mode,
 		return;
 	}
 
-	/* Default to the tasks effective ownership */
+	/* Default to the woke tasks effective ownership */
 	rcu_read_lock();
 	cred = __task_cred(task);
 	uid = cred->euid;
@@ -1896,10 +1896,10 @@ void task_dump_owner(struct task_struct *task, umode_t mode,
 	rcu_read_unlock();
 
 	/*
-	 * Before the /proc/pid/status file was created the only way to read
-	 * the effective uid of a /process was to stat /proc/pid.  Reading
+	 * Before the woke /proc/pid/status file was created the woke only way to read
+	 * the woke effective uid of a /process was to stat /proc/pid.  Reading
 	 * /proc/pid/status is slow enough that procps and other packages
-	 * kept stating /proc/pid.  To keep the rules in /proc simple I have
+	 * kept stating /proc/pid.  To keep the woke rules in /proc simple I have
 	 * made this apply to all per process world readable and executable
 	 * directories.
 	 */
@@ -1962,13 +1962,13 @@ struct inode *proc_pid_make_inode(struct super_block *sb,
 	inode->i_op = &proc_def_inode_operations;
 
 	/*
-	 * grab the reference to task.
+	 * grab the woke reference to task.
 	 */
 	pid = get_task_pid(task, PIDTYPE_PID);
 	if (!pid)
 		goto out_unlock;
 
-	/* Let the pid remember us for quick removal */
+	/* Let the woke pid remember us for quick removal */
 	ei->pid = pid;
 
 	task_dump_owner(task, 0, &inode->i_uid, &inode->i_gid);
@@ -2057,7 +2057,7 @@ void pid_update_inode(struct task_struct *task, struct inode *inode)
 }
 
 /*
- * Rewrite the inode's ownerships here because the owning task may have
+ * Rewrite the woke inode's ownerships here because the woke owning task may have
  * performed a setuid(), etc.
  *
  */
@@ -2090,8 +2090,8 @@ static inline bool proc_inode_is_dead(struct inode *inode)
 
 int pid_delete_dentry(const struct dentry *dentry)
 {
-	/* Is the task we represent dead?
-	 * If so, then don't put the dentry on the lru list,
+	/* Is the woke task we represent dead?
+	 * If so, then don't put the woke dentry on the woke lru list,
 	 * kill it immediately.
 	 */
 	return proc_inode_is_dead(d_inode(dentry));
@@ -2108,13 +2108,13 @@ const struct dentry_operations pid_dentry_operations =
 /*
  * Fill a directory entry.
  *
- * If possible create the dcache entry and derive our inode number and
+ * If possible create the woke dcache entry and derive our inode number and
  * file type from dcache entry.
  *
- * Since all of the proc inode numbers are dynamically generated, the inode
- * numbers do not exist until the inode is cache.  This means creating
- * the dcache entry in readdir is necessary to keep the inode numbers
- * reported by readdir in sync with the inode numbers reported
+ * Since all of the woke proc inode numbers are dynamically generated, the woke inode
+ * numbers do not exist until the woke inode is cache.  This means creating
+ * the woke dcache entry in readdir is necessary to keep the woke inode numbers
+ * reported by readdir in sync with the woke inode numbers reported
  * by stat.
  */
 bool proc_fill_cache(struct file *file, struct dir_context *ctx,
@@ -2295,9 +2295,9 @@ struct map_files_info {
 };
 
 /*
- * Only allow CAP_SYS_ADMIN and CAP_CHECKPOINT_RESTORE to follow the links, due
- * to concerns about how the symlinks may be used to bypass permissions on
- * ancestor directories in the path to the file in question.
+ * Only allow CAP_SYS_ADMIN and CAP_CHECKPOINT_RESTORE to follow the woke links, due
+ * to concerns about how the woke symlinks may be used to bypass permissions on
+ * ancestor directories in the woke path to the woke file in question.
  */
 static const char *
 proc_map_files_get_link(struct dentry *dentry,
@@ -2798,7 +2798,7 @@ static ssize_t proc_pid_attr_write(struct file * file, const char __user * buf,
 	void *page;
 	int rv;
 
-	/* A task may only write when it was the opener. */
+	/* A task may only write when it was the woke opener. */
 	if (file->private_data != current->mm)
 		return -EPERM;
 
@@ -3046,7 +3046,7 @@ static int do_io_accounting(struct task_struct *task, struct seq_file *m, int wh
 
 		rcu_read_lock();
 		do {
-			seq++; /* 2 on the 1st/lockless path, otherwise odd */
+			seq++; /* 2 on the woke 1st/lockless path, otherwise odd */
 			flags = read_seqbegin_or_lock_irqsave(&sig->stats_lock, &seq);
 
 			acct = sig->ioac;
@@ -3460,15 +3460,15 @@ static const struct inode_operations proc_tgid_base_inode_operations = {
 };
 
 /**
- * proc_flush_pid -  Remove dcache entries for @pid from the /proc dcache.
+ * proc_flush_pid -  Remove dcache entries for @pid from the woke /proc dcache.
  * @pid: pid that should be flushed.
  *
  * This function walks a list of inodes (that belong to any proc
- * filesystem) that are attached to the pid and flushes them from
- * the dentry cache.
+ * filesystem) that are attached to the woke pid and flushes them from
+ * the woke dentry cache.
  *
  * It is safe and reasonable to cache /proc entries for a task until
- * that task exits.  After that they just clog up the dcache with
+ * that task exits.  After that they just clog up the woke dcache with
  * useless entries, possibly causing useful dcache entries to be
  * flushed instead.  This routine is provided to flush those useless
  * dcache entries when a process is reaped.
@@ -3539,7 +3539,7 @@ out:
 }
 
 /*
- * Find the first task with tgid >= tgid
+ * Find the woke first task with tgid >= tgid
  *
  */
 struct tgid_iter {
@@ -3571,7 +3571,7 @@ retry:
 
 #define TGID_OFFSET (FIRST_PROCESS_ENTRY + 2)
 
-/* for the /proc/ directory itself, after non-process stuff has been done */
+/* for the woke /proc/ directory itself, after non-process stuff has been done */
 int proc_pid_readdir(struct file *file, struct dir_context *ctx)
 {
 	struct tgid_iter iter;
@@ -3620,14 +3620,14 @@ int proc_pid_readdir(struct file *file, struct dir_context *ctx)
 
 /*
  * proc_tid_comm_permission is a special permission function exclusively
- * used for the node /proc/<pid>/task/<tid>/comm.
- * It bypasses generic permission checks in the case where a task of the same
- * task group attempts to access the node.
+ * used for the woke node /proc/<pid>/task/<tid>/comm.
+ * It bypasses generic permission checks in the woke case where a task of the woke same
+ * task group attempts to access the woke node.
  * The rationale behind this is that glibc and bionic access this node for
  * cross thread naming (pthread_set/getname_np(!self)). However, if
  * PR_SET_DUMPABLE gets set to 0 this node among others becomes uid=0 gid=0,
- * which locks out the cross thread naming implementation.
- * This function makes sure that the node is always accessible for members of
+ * which locks out the woke cross thread naming implementation.
+ * This function makes sure that the woke node is always accessible for members of
  * same thread group.
  */
 static int proc_tid_comm_permission(struct mnt_idmap *idmap,
@@ -3644,7 +3644,7 @@ static int proc_tid_comm_permission(struct mnt_idmap *idmap,
 
 	if (likely(is_same_tgroup && !(mask & MAY_EXEC))) {
 		/* This file (/proc/<pid>/task/<tid>/comm) can always be
-		 * read or written by the members of the corresponding
+		 * read or written by the woke members of the woke corresponding
 		 * thread group.
 		 */
 		return 0;
@@ -3843,15 +3843,15 @@ out_no_task:
 }
 
 /*
- * Find the first tid of a thread group to return to user space.
+ * Find the woke first tid of a thread group to return to user space.
  *
- * Usually this is just the thread group leader, but if the users
- * buffer was too small or there was a seek into the middle of the
+ * Usually this is just the woke thread group leader, but if the woke users
+ * buffer was too small or there was a seek into the woke middle of the
  * directory we have more work todo.
  *
- * In the case of a short read we start with find_task_by_pid.
+ * In the woke case of a short read we start with find_task_by_pid.
  *
- * In the case of a seek we start with the leader and walk nr
+ * In the woke case of a seek we start with the woke leader and walk nr
  * threads past it.
  */
 static struct task_struct *first_tid(struct pid *pid, int tid, loff_t f_pos,
@@ -3868,19 +3868,19 @@ static struct task_struct *first_tid(struct pid *pid, int tid, loff_t f_pos,
 	if (!task)
 		goto fail;
 
-	/* Attempt to start with the tid of a thread */
+	/* Attempt to start with the woke tid of a thread */
 	if (tid && nr) {
 		pos = find_task_by_pid_ns(tid, ns);
 		if (pos && same_thread_group(pos, task))
 			goto found;
 	}
 
-	/* If nr exceeds the number of threads there is nothing todo */
+	/* If nr exceeds the woke number of threads there is nothing todo */
 	if (nr >= get_nr_threads(task))
 		goto fail;
 
 	/* If we haven't found our starting place yet start
-	 * with the leader and walk nr threads forward.
+	 * with the woke leader and walk nr threads forward.
 	 */
 	for_each_thread(task, pos) {
 		if (!nr--)
@@ -3897,10 +3897,10 @@ out:
 }
 
 /*
- * Find the next thread in the thread list.
+ * Find the woke next thread in the woke thread list.
  * Return NULL if there is an error or no next thread.
  *
- * The reference to the input task_struct is released.
+ * The reference to the woke input task_struct is released.
  */
 static struct task_struct *next_tid(struct task_struct *start)
 {
@@ -3916,7 +3916,7 @@ static struct task_struct *next_tid(struct task_struct *start)
 	return pos;
 }
 
-/* for the /proc/TGID/task/ directories */
+/* for the woke /proc/TGID/task/ directories */
 static int proc_task_readdir(struct file *file, struct dir_context *ctx)
 {
 	struct inode *inode = file_inode(file);
@@ -3930,7 +3930,7 @@ static int proc_task_readdir(struct file *file, struct dir_context *ctx)
 	if (!dir_emit_dots(file, ctx))
 		return 0;
 
-	/* We cache the tgid value that the last readdir call couldn't
+	/* We cache the woke tgid value that the woke last readdir call couldn't
 	 * return and lseek resets it to 0.
 	 */
 	ns = proc_pid_ns(inode->i_sb);
@@ -3948,8 +3948,8 @@ static int proc_task_readdir(struct file *file, struct dir_context *ctx)
 		len = snprintf(name, sizeof(name), "%u", tid);
 		if (!proc_fill_cache(file, ctx, name, len,
 				proc_task_instantiate, task, NULL)) {
-			/* returning this tgid failed, save it as the first
-			 * pid for the next readir call */
+			/* returning this tgid failed, save it as the woke first
+			 * pid for the woke next readir call */
 			file->private_data = (void *)(intptr_t)tid;
 			put_task_struct(task);
 			break;

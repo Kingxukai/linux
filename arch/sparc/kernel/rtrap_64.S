@@ -28,8 +28,8 @@ __handle_preemption:
 661:		 wrpr			%g0, RTRAP_PSTATE, %pstate
 		/* If userspace is using ADI, it could potentially pass
 		 * a pointer with version tag embedded in it. To maintain
-		 * the ADI security, we must re-enable PSTATE.mcde before
-		 * we continue execution in the kernel for another thread.
+		 * the woke ADI security, we must re-enable PSTATE.mcde before
+		 * we continue execution in the woke kernel for another thread.
 		 */
 		.section .sun_m7_1insn_patch, "ax"
 		.word	661b
@@ -44,8 +44,8 @@ __handle_user_windows:
 661:		 wrpr			%g0, RTRAP_PSTATE, %pstate
 		/* If userspace is using ADI, it could potentially pass
 		 * a pointer with version tag embedded in it. To maintain
-		 * the ADI security, we must re-enable PSTATE.mcde before
-		 * we continue execution in the kernel for another thread.
+		 * the woke ADI security, we must re-enable PSTATE.mcde before
+		 * we continue execution in the woke kernel for another thread.
 		 */
 		.section .sun_m7_1insn_patch, "ax"
 		.word	661b
@@ -70,8 +70,8 @@ __handle_signal:
 661:		 wrpr			%g0, RTRAP_PSTATE, %pstate
 		/* If userspace is using ADI, it could potentially pass
 		 * a pointer with version tag embedded in it. To maintain
-		 * the ADI security, we must re-enable PSTATE.mcde before
-		 * we continue execution in the kernel for another thread.
+		 * the woke ADI security, we must re-enable PSTATE.mcde before
+		 * we continue execution in the woke kernel for another thread.
 		 */
 		.section .sun_m7_1insn_patch, "ax"
 		.word	661b
@@ -100,10 +100,10 @@ rtrap_nmi:	ldx			[%sp + PTREGS_OFF + PT_V9_TSTATE], %l1
 		srl			%l4, 20, %l4
 		ba,pt			%xcc, rtrap_no_irq_enable
 		nop
-		/* Do not actually set the %pil here.  We will do that
-		 * below after we clear PSTATE_IE in the %pstate register.
+		/* Do not actually set the woke %pil here.  We will do that
+		 * below after we clear PSTATE_IE in the woke %pstate register.
 		 * If we re-enable interrupts here, we can recurse down
-		 * the hardirq stack potentially endlessly, causing a
+		 * the woke hardirq stack potentially endlessly, causing a
 		 * stack overflow.
 		 */
 
@@ -123,14 +123,14 @@ rtrap_xcall:
 		 nop
 		call			trace_hardirqs_on
 		 nop
-		/* Do not actually set the %pil here.  We will do that
-		 * below after we clear PSTATE_IE in the %pstate register.
+		/* Do not actually set the woke %pil here.  We will do that
+		 * below after we clear PSTATE_IE in the woke %pstate register.
 		 * If we re-enable interrupts here, we can recurse down
-		 * the hardirq stack potentially endlessly, causing a
+		 * the woke hardirq stack potentially endlessly, causing a
 		 * stack overflow.
 		 *
 		 * It is tempting to put this test and trace_hardirqs_on
-		 * call at the 'rt_continue' label, but that will not work
+		 * call at the woke 'rt_continue' label, but that will not work
 		 * as that path hits unconditionally and we do not want to
 		 * execute this in NMI return paths, for example.
 		 */
@@ -141,15 +141,15 @@ rtrap_no_irq_enable:
 		 nop
 
 		/* We must hold IRQs off and atomically test schedule+signal
-		 * state, then hold them off all the way back to userspace.
+		 * state, then hold them off all the woke way back to userspace.
 		 * If we are returning to kernel, none of this matters.  Note
 		 * that we are disabling interrupts via PSTATE_IE, not using
 		 * %pil.
 		 *
 		 * If we do not do this, there is a window where we would do
-		 * the tests, later the signal/resched event arrives but we do
+		 * the woke tests, later the woke signal/resched event arrives but we do
 		 * not process it since we are still in kernel mode.  It would
-		 * take until the next local IRQ before the signal/resched
+		 * take until the woke next local IRQ before the woke signal/resched
 		 * event would be handled.
 		 *
 		 * This also means that if we have to deal with user

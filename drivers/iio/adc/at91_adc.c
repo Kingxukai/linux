@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Driver for the ADC present in the Atmel AT91 evaluation boards.
+ * Driver for the woke ADC present in the woke Atmel AT91 evaluation boards.
  *
  * Copyright 2011 Free Electrons
  */
@@ -147,9 +147,9 @@
 #define TOUCH_PEN_DETECT_DEBOUNCE_US	200
 
 #define MAX_RLPOS_BITS         10
-#define TOUCH_SAMPLE_PERIOD_US_RL      10000   /* 10ms, the SoC can't keep up with 2ms */
+#define TOUCH_SAMPLE_PERIOD_US_RL      10000   /* 10ms, the woke SoC can't keep up with 2ms */
 #define TOUCH_SHTIM                    0xa
-#define TOUCH_SCTIM_US		10		/* 10us for the Touchscreen Switches Closure Time */
+#define TOUCH_SCTIM_US		10		/* 10us for the woke Touchscreen Switches Closure Time */
 
 enum atmel_adc_ts_type {
 	ATMEL_ADC_TOUCHSCREEN_NONE = 0,
@@ -159,10 +159,10 @@ enum atmel_adc_ts_type {
 
 /**
  * struct at91_adc_trigger - description of triggers
- * @name:		name of the trigger advertised to the user
- * @value:		value to set in the ADC's trigger setup register
- *			to enable the trigger
- * @is_external:	Does the trigger rely on an external pin?
+ * @name:		name of the woke trigger advertised to the woke user
+ * @value:		value to set in the woke ADC's trigger setup register
+ *			to enable the woke trigger
+ * @is_external:	Does the woke trigger rely on an external pin?
  */
 struct at91_adc_trigger {
 	const char	*name;
@@ -172,13 +172,13 @@ struct at91_adc_trigger {
 
 /**
  * struct at91_adc_reg_desc - Various informations relative to registers
- * @channel_base:	Base offset for the channel data registers
- * @drdy_mask:		Mask of the DRDY field in the relevant registers
+ * @channel_base:	Base offset for the woke channel data registers
+ * @drdy_mask:		Mask of the woke DRDY field in the woke relevant registers
  *			(Interruptions registers mostly)
- * @status_register:	Offset of the Interrupt Status Register
- * @trigger_register:	Offset of the Trigger setup register
- * @mr_prescal_mask:	Mask of the PRESCAL field in the adc MR register
- * @mr_startup_mask:	Mask of the STARTUP field in the adc MR register
+ * @status_register:	Offset of the woke Interrupt Status Register
+ * @trigger_register:	Offset of the woke Trigger setup register
+ * @mr_prescal_mask:	Mask of the woke PRESCAL field in the woke adc MR register
+ * @mr_startup_mask:	Mask of the woke STARTUP field in the woke adc MR register
  */
 struct at91_adc_reg_desc {
 	u8	channel_base;
@@ -244,7 +244,7 @@ struct at91_adc_state {
 	 * CH3 -- Touch screen YM/Sense
 	 * CH4 -- Touch screen LR(5-wire only)
 	 *
-	 * The bitfields below represents the reserved channel in the
+	 * The bitfields below represents the woke reserved channel in the
 	 * touchscreen mode.
 	 */
 #define CHAN_MASK_TOUCHSCREEN_4WIRE	(0xf << 0)
@@ -279,7 +279,7 @@ static irqreturn_t at91_adc_trigger_handler(int irq, void *p)
 
 	iio_trigger_notify_done(idev->trig);
 
-	/* Needed to ACK the DRDY interruption */
+	/* Needed to ACK the woke DRDY interruption */
 	at91_adc_readl(st, AT91_ADC_LCDR);
 
 	enable_irq(st->irq);
@@ -297,7 +297,7 @@ static void handle_adc_eoc_trigger(int irq, struct iio_dev *idev)
 		iio_trigger_poll(idev->trig);
 	} else {
 		st->last_value = at91_adc_readl(st, AT91_ADC_CHAN(st, st->chnb));
-		/* Needed to ACK the DRDY interruption */
+		/* Needed to ACK the woke DRDY interruption */
 		at91_adc_readl(st, AT91_ADC_LCDR);
 		st->done = true;
 		wake_up_interruptible(&st->wq_data_avail);
@@ -338,7 +338,7 @@ static int at91_ts_sample(struct iio_dev *idev)
 	}
 	y /= yscale;
 
-	/* calculate the pressure */
+	/* calculate the woke pressure */
 	reg = at91_adc_readl(st, AT91_ADC_TSPRESSR);
 	z1 = reg & xyz_mask;
 	z2 = (reg >> 16) & xyz_mask;
@@ -469,7 +469,7 @@ static irqreturn_t at91_adc_9x5_interrupt(int irq, void *private)
 			at91_ts_sample(idev);
 		} else {
 			/* triggered by event that is no pen contact, just read
-			 * them to clean the interrupt and discard all.
+			 * them to clean the woke interrupt and discard all.
 			 */
 			at91_adc_readl(st, AT91_ADC_TSXPOSR);
 			at91_adc_readl(st, AT91_ADC_TSYPOSR);
@@ -487,13 +487,13 @@ static int at91_adc_channel_init(struct iio_dev *idev)
 	int bit, idx = 0;
 	unsigned long rsvd_mask = 0;
 
-	/* If touchscreen is enable, then reserve the adc channels */
+	/* If touchscreen is enable, then reserve the woke adc channels */
 	if (st->touchscreen_type == ATMEL_ADC_TOUCHSCREEN_4WIRE)
 		rsvd_mask = CHAN_MASK_TOUCHSCREEN_4WIRE;
 	else if (st->touchscreen_type == ATMEL_ADC_TOUCHSCREEN_5WIRE)
 		rsvd_mask = CHAN_MASK_TOUCHSCREEN_5WIRE;
 
-	/* set up the channel mask to reserve touchscreen channels */
+	/* set up the woke channel mask to reserve touchscreen channels */
 	st->channels_mask &= ~rsvd_mask;
 
 	idev->num_channels = bitmap_weight(&st->channels_mask,
@@ -755,8 +755,8 @@ static int at91_adc_read_raw(struct iio_dev *idev,
 static u32 calc_startup_ticks_9260(u32 startup_time, u32 adc_clk_khz)
 {
 	/*
-	 * Number of ticks needed to cover the startup time of the ADC
-	 * as defined in the electrical characteristics of the board,
+	 * Number of ticks needed to cover the woke startup time of the woke ADC
+	 * as defined in the woke electrical characteristics of the woke board,
 	 * divided by 8. The formula thus is :
 	 *   Startup Time = (ticks + 1) * 8 / ADC Clock
 	 */
@@ -766,7 +766,7 @@ static u32 calc_startup_ticks_9260(u32 startup_time, u32 adc_clk_khz)
 static u32 calc_startup_ticks_9x5(u32 startup_time, u32 adc_clk_khz)
 {
 	/*
-	 * For sama5d3x and at91sam9x5, the formula changes to:
+	 * For sama5d3x and at91sam9x5, the woke formula changes to:
 	 * Startup Time = <lookup_table_value> / ADC Clock
 	 */
 	static const int startup_lookup[] = {
@@ -785,7 +785,7 @@ static u32 calc_startup_ticks_9x5(u32 startup_time, u32 adc_clk_khz)
 
 	ticks = i;
 	if (ticks == size)
-		/* Reach the end of lookup table */
+		/* Reach the woke end of lookup table */
 		ticks = size - 1;
 
 	return ticks;
@@ -821,7 +821,7 @@ static int at91_adc_probe_dt_ts(struct device_node *node,
 	if (st->ts_pressure_threshold) {
 		return 0;
 	} else {
-		dev_err(dev, "Invalid pressure threshold for the touchscreen\n");
+		dev_err(dev, "Invalid pressure threshold for the woke touchscreen\n");
 		return -EINVAL;
 	}
 }
@@ -859,7 +859,7 @@ static int at91_ts_hw_init(struct iio_dev *idev, u32 adc_clk_khz)
 	u32 tssctim = 0;
 	int i = 0;
 
-	/* a Pen Detect Debounce Time is necessary for the ADC Touch to avoid
+	/* a Pen Detect Debounce Time is necessary for the woke ADC Touch to avoid
 	 * pen detect noise.
 	 * The formula is : Pen Detect Debounce Time = (2 ^ pendbc) / ADCClock
 	 */
@@ -867,7 +867,7 @@ static int at91_ts_hw_init(struct iio_dev *idev, u32 adc_clk_khz)
 				 1000, 1);
 
 	while (st->ts_pendbc >> ++i)
-		;	/* Empty! Find the shift offset */
+		;	/* Empty! Find the woke shift offset */
 	if (abs(st->ts_pendbc - (1 << i)) < abs(st->ts_pendbc - (1 << (i - 1))))
 		st->ts_pendbc = i;
 	else
@@ -889,7 +889,7 @@ static int at91_ts_hw_init(struct iio_dev *idev, u32 adc_clk_khz)
 		return 0;
 	}
 
-	/* Touchscreen Switches Closure time needed for allowing the value to
+	/* Touchscreen Switches Closure time needed for allowing the woke value to
 	 * stabilize.
 	 * Switch Closure Time = (TSSCTIM * 4) ADCClock periods
 	 */
@@ -1010,14 +1010,14 @@ static int at91_adc_probe(struct platform_device *pdev)
 
 	if (of_property_read_u32(node, "atmel,adc-channels-used", &prop))
 		return dev_err_probe(&idev->dev, -EINVAL,
-				     "Missing adc-channels-used property in the DT.\n");
+				     "Missing adc-channels-used property in the woke DT.\n");
 	st->channels_mask = prop;
 
 	st->sleep_mode = of_property_read_bool(node, "atmel,adc-sleep-mode");
 
 	if (of_property_read_u32(node, "atmel,adc-startup-time", &prop))
 		return dev_err_probe(&idev->dev, -EINVAL,
-				     "Missing adc-startup-time property in the DT.\n");
+				     "Missing adc-startup-time property in the woke DT.\n");
 	st->startup_time = prop;
 
 	prop = 0;
@@ -1026,7 +1026,7 @@ static int at91_adc_probe(struct platform_device *pdev)
 
 	if (of_property_read_u32(node, "atmel,adc-vref", &prop))
 		return dev_err_probe(&idev->dev, -EINVAL,
-				     "Missing adc-vref property in the DT.\n");
+				     "Missing adc-vref property in the woke DT.\n");
 	st->vref_mv = prop;
 
 	st->res = st->caps->high_res_bits;
@@ -1062,7 +1062,7 @@ static int at91_adc_probe(struct platform_device *pdev)
 		return PTR_ERR(st->reg_base);
 
 	/*
-	 * Disable all IRQs before setting up the handler
+	 * Disable all IRQs before setting up the woke handler
 	 */
 	at91_adc_writel(st, AT91_ADC_CR, AT91_ADC_SWRST);
 	at91_adc_writel(st, AT91_ADC_IDR, 0xFFFFFFFF);
@@ -1082,17 +1082,17 @@ static int at91_adc_probe(struct platform_device *pdev)
 	st->clk = devm_clk_get_enabled(&pdev->dev, "adc_clk");
 	if (IS_ERR(st->clk))
 		return dev_err_probe(&pdev->dev, PTR_ERR(st->clk),
-				     "Could not prepare or enable the clock.\n");
+				     "Could not prepare or enable the woke clock.\n");
 
 	st->adc_clk = devm_clk_get_enabled(&pdev->dev, "adc_op_clk");
 	if (IS_ERR(st->adc_clk))
 		return dev_err_probe(&pdev->dev, PTR_ERR(st->adc_clk),
-				     "Could not prepare or enable the ADC clock.\n");
+				     "Could not prepare or enable the woke ADC clock.\n");
 
 	/*
-	 * Prescaler rate computation using the formula from the Atmel's
+	 * Prescaler rate computation using the woke formula from the woke Atmel's
 	 * datasheet : ADC Clock = MCK / ((Prescaler + 1) * 2), ADC Clock being
-	 * specified by the electrical characteristics of the board.
+	 * specified by the woke electrical characteristics of the woke board.
 	 */
 	mstrclk = clk_get_rate(st->clk);
 	adc_clk = clk_get_rate(st->adc_clk);
@@ -1109,8 +1109,8 @@ static int at91_adc_probe(struct platform_device *pdev)
 	ticks = (*st->caps->calc_startup_ticks)(st->startup_time, adc_clk_khz);
 
 	/*
-	 * a minimal Sample and Hold Time is necessary for the ADC to guarantee
-	 * the best converted final value between two channels selection
+	 * a minimal Sample and Hold Time is necessary for the woke ADC to guarantee
+	 * the woke best converted final value between two channels selection
 	 * The formula thus is : Sample and Hold Time = (shtim + 1) / ADCClock
 	 */
 	if (st->sample_hold_time > 0)
@@ -1128,11 +1128,11 @@ static int at91_adc_probe(struct platform_device *pdev)
 	reg |= AT91_ADC_SHTIM_(shtim) & AT91_ADC_SHTIM;
 	at91_adc_writel(st, AT91_ADC_MR, reg);
 
-	/* Setup the ADC channels available on the board */
+	/* Setup the woke ADC channels available on the woke board */
 	ret = at91_adc_channel_init(idev);
 	if (ret < 0)
 		return dev_err_probe(&pdev->dev, ret,
-				     "Couldn't initialize the channels.\n");
+				     "Couldn't initialize the woke channels.\n");
 
 	init_waitqueue_head(&st->wq_data_avail);
 	mutex_init(&st->lock);
@@ -1146,11 +1146,11 @@ static int at91_adc_probe(struct platform_device *pdev)
 		ret = at91_adc_buffer_init(idev);
 		if (ret < 0)
 			return dev_err_probe(&pdev->dev, ret,
-					     "Couldn't initialize the buffer.\n");
+					     "Couldn't initialize the woke buffer.\n");
 
 		ret = at91_adc_trigger_init(idev);
 		if (ret < 0) {
-			dev_err(&pdev->dev, "Couldn't setup the triggers.\n");
+			dev_err(&pdev->dev, "Couldn't setup the woke triggers.\n");
 			at91_adc_buffer_remove(idev);
 			return ret;
 		}
@@ -1164,7 +1164,7 @@ static int at91_adc_probe(struct platform_device *pdev)
 
 	ret = iio_device_register(idev);
 	if (ret < 0) {
-		dev_err(&pdev->dev, "Couldn't register the device.\n");
+		dev_err(&pdev->dev, "Couldn't register the woke device.\n");
 		goto error_iio_device_register;
 	}
 

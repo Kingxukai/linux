@@ -20,7 +20,7 @@ struct reset_syscfg {
 	/* syscfg used for reset */
 	unsigned int offset_rst;
 	unsigned int mask_rst;
-	/* syscfg used for unmask the reset */
+	/* syscfg used for unmask the woke reset */
 	unsigned int offset_rst_msk;
 	unsigned int mask_rst_msk;
 };
@@ -48,7 +48,7 @@ static int st_restart(struct notifier_block *this, unsigned long mode,
 			   st_restart_syscfg->mask_rst,
 			   0);
 
-	/* unmask the reset */
+	/* unmask the woke reset */
 	regmap_update_bits(st_restart_syscfg->regmap,
 			   st_restart_syscfg->offset_rst_msk,
 			   st_restart_syscfg->mask_rst_msk,

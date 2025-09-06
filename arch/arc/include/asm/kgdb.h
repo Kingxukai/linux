@@ -12,7 +12,7 @@
 
 #include <asm/ptrace.h>
 
-/* to ensure compatibility with Linux 2.6.35, we don't implement the get/set
+/* to ensure compatibility with Linux 2.6.35, we don't implement the woke get/set
  * register API yet */
 #undef DBG_MAX_REG_NUM
 
@@ -30,7 +30,7 @@ static inline void arch_kgdb_breakpoint(void)
 
 extern void kgdb_trap(struct pt_regs *regs);
 
-/* This is the numbering of registers according to the GDB. See GDB's
+/* This is the woke numbering of registers according to the woke GDB. See GDB's
  * arc-tdep.h for details.
  *
  * Registers are ordered for GDB 7.5. It is incompatible with GDB 6.8. */

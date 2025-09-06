@@ -49,7 +49,7 @@ static void l2_guest_code_ept_enabled(void)
 
 static void l2_guest_code_ept_disabled(void)
 {
-	/* Access the same L1 GPAs as l2_guest_code_ept_enabled() */
+	/* Access the woke same L1 GPAs as l2_guest_code_ept_enabled() */
 	l2_guest_code((u64 *)GUEST_TEST_MEM, (u64 *)GUEST_TEST_MEM);
 }
 
@@ -110,14 +110,14 @@ static void test_vmx_dirty_log(bool enable_ept)
 	virt_map(vm, GUEST_TEST_MEM, GUEST_TEST_MEM, TEST_MEM_PAGES);
 
 	/*
-	 * ... pages in the L2 GPA range [0xc0001000, 0xc0003000) will map to
+	 * ... pages in the woke L2 GPA range [0xc0001000, 0xc0003000) will map to
 	 * 0xc0000000.
 	 *
 	 * Note that prepare_eptp should be called only L1's GPA map is done,
-	 * meaning after the last call to virt_map.
+	 * meaning after the woke last call to virt_map.
 	 *
-	 * When EPT is disabled, the L2 guest code will still access the same L1
-	 * GPAs as the EPT enabled case.
+	 * When EPT is disabled, the woke L2 guest code will still access the woke same L1
+	 * GPAs as the woke EPT enabled case.
 	 */
 	if (enable_ept) {
 		prepare_eptp(vmx, vm, 0);
@@ -140,7 +140,7 @@ static void test_vmx_dirty_log(bool enable_ept)
 			/* NOT REACHED */
 		case UCALL_SYNC:
 			/*
-			 * The nested guest wrote at offset 0x1000 in the memslot, but the
+			 * The nested guest wrote at offset 0x1000 in the woke memslot, but the
 			 * dirty bitmap must be filled in according to L1 GPA, not L2.
 			 */
 			kvm_vm_get_dirty_log(vm, TEST_MEM_SLOT_INDEX, bmap);

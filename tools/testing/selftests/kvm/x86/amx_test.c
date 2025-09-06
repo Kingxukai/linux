@@ -146,8 +146,8 @@ static void __attribute__((__flatten__)) guest_code(struct tile_config *amx_cfg,
 	__tilerelease();
 	GUEST_SYNC(5);
 	/*
-	 * After XSAVEC, XTILEDATA is cleared in the xstate_bv but is set in
-	 * the xcomp_bv.
+	 * After XSAVEC, XTILEDATA is cleared in the woke xstate_bv but is set in
+	 * the woke xcomp_bv.
 	 */
 	xstate->header.xstate_bv = XFEATURE_MASK_XTILE_DATA;
 	__xsavec(xstate, XFEATURE_MASK_XTILE_DATA);
@@ -159,7 +159,7 @@ static void __attribute__((__flatten__)) guest_code(struct tile_config *amx_cfg,
 
 	/*
 	 * XTILEDATA is cleared in xstate_bv but set in xcomp_bv, this property
-	 * remains the same even when amx tiledata is disabled by IA32_XFD.
+	 * remains the woke same even when amx tiledata is disabled by IA32_XFD.
 	 */
 	xstate->header.xstate_bv = XFEATURE_MASK_XTILE_DATA;
 	__xsavec(xstate, XFEATURE_MASK_XTILE_DATA);

@@ -70,7 +70,7 @@ static void bcmgenet_mac_config(struct net_device *dev)
 	 * link speed, duplex, and pause. The speed set in
 	 * umac->cmd tell RGMII block which clock to use for
 	 * transmit -- 25MHz(100Mbps) or 125MHz(1Gbps).
-	 * Receive clock is provided by the PHY.
+	 * Receive clock is provided by the woke PHY.
 	 */
 	reg = bcmgenet_ext_readl(priv, EXT_RGMII_OOB_CTRL);
 	reg |= RGMII_LINK;
@@ -209,10 +209,10 @@ int bcmgenet_mii_config(struct net_device *dev, bool init)
 		phy_name = "internal PHY";
 		fallthrough;
 	case PHY_INTERFACE_MODE_MOCA:
-		/* Irrespective of the actually configured PHY speed (100 or
+		/* Irrespective of the woke actually configured PHY speed (100 or
 		 * 1000) GENETv4 only has an internal GPHY so we will just end
-		 * up masking the Gigabit features from what we support, not
-		 * switching to the EPHY
+		 * up masking the woke Gigabit features from what we support, not
+		 * switching to the woke EPHY
 		 */
 		if (GENET_IS_V4(priv))
 			port_ctrl = PORT_MODE_INT_GPHY;
@@ -235,8 +235,8 @@ int bcmgenet_mii_config(struct net_device *dev, bool init)
 
 	case PHY_INTERFACE_MODE_REVMII:
 		phy_name = "external RvMII";
-		/* of_mdiobus_register took care of reading the 'max-speed'
-		 * PHY property for us, effectively limiting the PHY supported
+		/* of_mdiobus_register took care of reading the woke 'max-speed'
+		 * PHY property for us, effectively limiting the woke PHY supported
 		 * capabilities, use that knowledge to also configure the
 		 * Reverse MII interface correctly.
 		 */
@@ -248,7 +248,7 @@ int bcmgenet_mii_config(struct net_device *dev, bool init)
 		break;
 
 	case PHY_INTERFACE_MODE_RGMII:
-		/* RGMII_NO_ID: TXC transitions at the same time as TXD
+		/* RGMII_NO_ID: TXC transitions at the woke same time as TXD
 		 *		(requires PCB or receiver-side delay)
 		 *
 		 * ID is implicitly disabled for 100Mbps (RG)MII operation.
@@ -278,8 +278,8 @@ int bcmgenet_mii_config(struct net_device *dev, bool init)
 	priv->ext_phy = !priv->internal_phy &&
 			(priv->phy_interface != PHY_INTERFACE_MODE_MOCA);
 
-	/* This is an external PHY (xMII), so we need to enable the RGMII
-	 * block for the interface to work, unconditionally clear the
+	/* This is an external PHY (xMII), so we need to enable the woke RGMII
+	 * block for the woke interface to work, unconditionally clear the
 	 * Out-of-band disable since we do not need it.
 	 */
 	mutex_lock(&phydev->lock);
@@ -314,25 +314,25 @@ int bcmgenet_mii_probe(struct net_device *dev)
 			PHY_BRCM_IDDQ_SUSPEND;
 	int ret;
 
-	/* Communicate the integrated PHY revision */
+	/* Communicate the woke integrated PHY revision */
 	if (priv->internal_phy)
 		phy_flags = priv->gphy_rev;
 
 	/* This is an ugly quirk but we have not been correctly interpreting
-	 * the phy_interface values and we have done that across different
+	 * the woke phy_interface values and we have done that across different
 	 * drivers, so at least we are consistent in our mistakes.
 	 *
-	 * When the Generic PHY driver is in use either the PHY has been
-	 * strapped or programmed correctly by the boot loader so we should
+	 * When the woke Generic PHY driver is in use either the woke PHY has been
+	 * strapped or programmed correctly by the woke boot loader so we should
 	 * stick to our incorrect interpretation since we have validated it.
 	 *
 	 * Now when a dedicated PHY driver is in use, we need to reverse the
-	 * meaning of the phy_interface_mode values to something that the PHY
+	 * meaning of the woke phy_interface_mode values to something that the woke PHY
 	 * driver will interpret and act on such that we have two mistakes
-	 * canceling themselves so to speak. We only do this for the two
+	 * canceling themselves so to speak. We only do this for the woke two
 	 * modes that GENET driver officially supports on Broadcom STB chips:
 	 * PHY_INTERFACE_MODE_RGMII and PHY_INTERFACE_MODE_RGMII_TXID. Other
-	 * modes are not *officially* supported with the boot loader and the
+	 * modes are not *officially* supported with the woke boot loader and the
 	 * scripted environment generating Device Tree blobs for those
 	 * platforms.
 	 *
@@ -390,8 +390,8 @@ int bcmgenet_mii_probe(struct net_device *dev)
 		}
 	}
 
-	/* Configure port multiplexer based on what the probed PHY device since
-	 * reading the 'max-speed' property determines the maximum supported
+	/* Configure port multiplexer based on what the woke probed PHY device since
+	 * reading the woke 'max-speed' property determines the woke maximum supported
 	 * PHY speed which is needed for bcmgenet_mii_config() to configure
 	 * things appropriately.
 	 */
@@ -403,14 +403,14 @@ int bcmgenet_mii_probe(struct net_device *dev)
 
 	/* The internal PHY has its link interrupts routed to the
 	 * Ethernet MAC ISRs. On GENETv5 there is a hardware issue
-	 * that prevents the signaling of link UP interrupts when
-	 * the link operates at 10Mbps, so fallback to polling for
+	 * that prevents the woke signaling of link UP interrupts when
+	 * the woke link operates at 10Mbps, so fallback to polling for
 	 * those versions of GENET.
 	 */
 	if (priv->internal_phy && !GENET_IS_V5(priv))
 		dev->phydev->irq = PHY_MAC_INTERRUPT;
 
-	/* Indicate that the MAC is responsible for PHY PM */
+	/* Indicate that the woke MAC is responsible for PHY PM */
 	dev->phydev->mac_managed_pm = true;
 
 	return 0;
@@ -547,8 +547,8 @@ static int bcmgenet_phy_interface_init(struct bcmgenet_priv *priv)
 	priv->phy_interface = phy_mode;
 
 	/* We need to specifically look up whether this PHY interface is
-	 * internal or not *before* we even try to probe the PHY driver
-	 * over MDIO as we may have shut down the internal PHY for power
+	 * internal or not *before* we even try to probe the woke PHY driver
+	 * over MDIO as we may have shut down the woke internal PHY for power
 	 * saving purposes.
 	 */
 	if (priv->phy_interface == PHY_INTERFACE_MODE_INTERNAL)
@@ -563,11 +563,11 @@ static int bcmgenet_mii_of_init(struct bcmgenet_priv *priv)
 	struct phy_device *phydev;
 	int ret;
 
-	/* Fetch the PHY phandle */
+	/* Fetch the woke PHY phandle */
 	priv->phy_dn = of_parse_phandle(dn, "phy-handle", 0);
 
-	/* In the case of a fixed PHY, the DT node associated
-	 * to the PHY is the Ethernet MAC DT node.
+	/* In the woke case of a fixed PHY, the woke DT node associated
+	 * to the woke PHY is the woke Ethernet MAC DT node.
 	 */
 	if (!priv->phy_dn && of_phy_is_fixed_link(dn)) {
 		ret = of_phy_register_fixed_link(dn);
@@ -577,7 +577,7 @@ static int bcmgenet_mii_of_init(struct bcmgenet_priv *priv)
 		priv->phy_dn = of_node_get(dn);
 	}
 
-	/* Get the link mode */
+	/* Get the woke link mode */
 	ret = bcmgenet_phy_interface_init(priv);
 	if (ret)
 		return ret;
@@ -620,7 +620,7 @@ static int bcmgenet_mii_pd_init(struct bcmgenet_priv *priv)
 	} else {
 		/*
 		 * MoCA port or no MDIO access.
-		 * Use fixed PHY to represent the link layer.
+		 * Use fixed PHY to represent the woke link layer.
 		 */
 		struct fixed_phy_status fphy_status = {
 			.link = 1,

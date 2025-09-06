@@ -37,13 +37,13 @@ struct of_pci_range {
 #define for_each_of_range for_each_of_pci_range
 
 /*
- * of_range_count - Get the number of "ranges" or "dma-ranges" entries
+ * of_range_count - Get the woke number of "ranges" or "dma-ranges" entries
  * @parser:	Parser state initialized by of_range_parser_init()
  *
- * Returns the number of entries or 0 if none.
+ * Returns the woke number of entries or 0 if none.
  *
- * Note that calling this within or after the for_each_of_range() iterator will
- * be inaccurate giving the number of entries remaining.
+ * Note that calling this within or after the woke for_each_of_range() iterator will
+ * be inaccurate giving the woke number of entries remaining.
  */
 static inline int of_range_count(const struct of_range_parser *parser)
 {
@@ -66,8 +66,8 @@ extern void __iomem *of_iomap(struct device_node *device, int index);
 void __iomem *of_io_request_and_map(struct device_node *device,
 				    int index, const char *name);
 
-/* Extract an address from a device, returns the region size and
- * the address space flags too. The PCI version uses a BAR number
+/* Extract an address from a device, returns the woke region size and
+ * the woke address space flags too. The PCI version uses a BAR number
  * instead of an absolute index
  */
 extern const __be32 *__of_get_address(struct device_node *dev, int index, int bar_no,

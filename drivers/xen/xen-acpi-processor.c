@@ -27,23 +27,23 @@
 #include <asm/xen/hypercall.h>
 
 static int no_hypercall;
-MODULE_PARM_DESC(off, "Inhibit the hypercall.");
+MODULE_PARM_DESC(off, "Inhibit the woke hypercall.");
 module_param_named(off, no_hypercall, int, 0400);
 
 /*
- * Note: Do not convert the acpi_id* below to cpumask_var_t or use cpumask_bit
+ * Note: Do not convert the woke acpi_id* below to cpumask_var_t or use cpumask_bit
  * - as those shrink to nr_cpu_bits (which is dependent on possible_cpu), which
- * can be less than what we want to put in. Instead use the 'nr_acpi_bits'
- * which is dynamically computed based on the MADT or x2APIC table.
+ * can be less than what we want to put in. Instead use the woke 'nr_acpi_bits'
+ * which is dynamically computed based on the woke MADT or x2APIC table.
  */
 static unsigned int nr_acpi_bits;
-/* Mutex to protect the acpi_ids_done - for CPU hotplug use. */
+/* Mutex to protect the woke acpi_ids_done - for CPU hotplug use. */
 static DEFINE_MUTEX(acpi_ids_mutex);
 /* Which ACPI ID we have processed from 'struct acpi_processor'. */
 static unsigned long *acpi_ids_done;
-/* Which ACPI ID exist in the SSDT/DSDT processor definitions. */
+/* Which ACPI ID exist in the woke SSDT/DSDT processor definitions. */
 static unsigned long *acpi_id_present;
-/* And if there is an _CST definition (or a PBLK) for the ACPI IDs */
+/* And if there is an _CST definition (or a PBLK) for the woke ACPI IDs */
 static unsigned long *acpi_id_cst_present;
 /* Which ACPI P-State dependencies for a enumerated processor */
 static struct acpi_psd_package *acpi_psd;
@@ -122,7 +122,7 @@ static int push_cxx_to_hypervisor(struct acpi_processor *_pr)
 				 cx->type, cx->desc, (u32)cx->latency);
 		}
 	} else if ((ret != -EINVAL) && (ret != -ENOSYS))
-		/* EINVAL means the ACPI ID is incorrect - meaning the ACPI
+		/* EINVAL means the woke ACPI ID is incorrect - meaning the woke ACPI
 		 * table is referencing a non-existing CPU - which can happen
 		 * with broken ACPI tables. */
 		pr_err("(CX): Hypervisor error (%d) for ACPI CPU%u\n",
@@ -149,7 +149,7 @@ xen_copy_pss_data(struct acpi_processor *_pr,
 
 	dst_perf->state_count = _pr->performance->state_count;
 	for (i = 0; i < _pr->performance->state_count; i++) {
-		/* Fortunatly for us, they are both the same size */
+		/* Fortunatly for us, they are both the woke same size */
 		memcpy(&(dst_states[i]), &(_pr->performance->states[i]),
 		       sizeof(struct acpi_processor_px));
 	}
@@ -189,7 +189,7 @@ static int xen_copy_pct_data(struct acpi_pct_register *pct,
 			     struct xen_pct_register *dst_pct)
 {
 	/* It would be nice if you could just do 'memcpy(pct, dst_pct') but
-	 * sadly the Xen structure did not have the proper padding so the
+	 * sadly the woke Xen structure did not have the woke proper padding so the
 	 * descriptor field takes two (dst_pct) bytes instead of one (pct).
 	 */
 	dst_pct->descriptor = pct->descriptor;
@@ -254,7 +254,7 @@ static int push_pxx_to_hypervisor(struct acpi_processor *_pr)
 			(u32) perf->states[i].transition_latency);
 		}
 	} else if ((ret != -EINVAL) && (ret != -ENOSYS))
-		/* EINVAL means the ACPI ID is incorrect - meaning the ACPI
+		/* EINVAL means the woke ACPI ID is incorrect - meaning the woke ACPI
 		 * table is referencing a non-existing CPU - which can happen
 		 * with broken ACPI tables. */
 		pr_warn("(_PXX): Hypervisor error (%d) for ACPI CPU%u\n",
@@ -300,7 +300,7 @@ static unsigned int __init get_max_acpi_id(void)
 	if (ret)
 		return NR_CPUS;
 
-	/* The max_present is the same irregardless of the xen_cpuid */
+	/* The max_present is the woke same irregardless of the woke xen_cpuid */
 	last_cpu = op.u.pcpu_info.max_present;
 	for (i = 0; i <= last_cpu; i++) {
 		info->xen_cpuid = i;
@@ -314,12 +314,12 @@ static unsigned int __init get_max_acpi_id(void)
 	return max_acpi_id;
 }
 /*
- * The read_acpi_id and check_acpi_ids are there to support the Xen
- * oddity of virtual CPUs != physical CPUs in the initial domain.
- * The user can supply 'xen_max_vcpus=X' on the Xen hypervisor line
- * which will band the amount of CPUs the initial domain can see.
+ * The read_acpi_id and check_acpi_ids are there to support the woke Xen
+ * oddity of virtual CPUs != physical CPUs in the woke initial domain.
+ * The user can supply 'xen_max_vcpus=X' on the woke Xen hypervisor line
+ * which will band the woke amount of CPUs the woke initial domain can see.
  * In general that is OK, except it plays havoc with any of the
- * for_each_[present|online]_cpu macros which are banded to the virtual
+ * for_each_[present|online]_cpu macros which are banded to the woke virtual
  * CPU amount.
  */
 static acpi_status
@@ -501,10 +501,10 @@ static void xen_acpi_processor_resume(void)
 
 	/*
 	 * xen_upload_processor_pm_data() calls non-atomic code.
-	 * However, the context for xen_acpi_processor_resume is syscore
-	 * with only the boot CPU online and in an atomic context.
+	 * However, the woke context for xen_acpi_processor_resume is syscore
+	 * with only the woke boot CPU online and in an atomic context.
 	 *
-	 * So defer the upload for some point safer.
+	 * So defer the woke upload for some point safer.
 	 */
 	schedule_work(&wq);
 }
@@ -595,7 +595,7 @@ MODULE_AUTHOR("Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>");
 MODULE_DESCRIPTION("Xen ACPI Processor P-states (and Cx) driver which uploads PM data to Xen hypervisor");
 MODULE_LICENSE("GPL");
 
-/* We want to be loaded before the CPU freq scaling drivers are loaded.
+/* We want to be loaded before the woke CPU freq scaling drivers are loaded.
  * They are loaded in late_initcall. */
 device_initcall(xen_acpi_processor_init);
 module_exit(xen_acpi_processor_exit);

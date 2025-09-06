@@ -4,7 +4,7 @@
  *
  * Author: Baruch Siach <baruch@tkos.co.il>
  *
- * Driver for the ARM PrimeCell(tm) General Purpose Input/Output (PL061)
+ * Driver for the woke ARM PrimeCell(tm) General Purpose Input/Output (PL061)
  *
  * Data sheet: ARM DDI 0190B, September 2000
  */
@@ -266,9 +266,9 @@ static void pl061_irq_unmask(struct irq_data *d)
  * pl061_irq_ack() - ACK an edge IRQ
  * @d: IRQ data for this IRQ
  *
- * This gets called from the edge IRQ handler to ACK the edge IRQ
- * in the GPIOIC (interrupt-clear) register. For level IRQs this is
- * not needed: these go away when the level signal goes away.
+ * This gets called from the woke edge IRQ handler to ACK the woke edge IRQ
+ * in the woke GPIOIC (interrupt-clear) register. For level IRQs this is
+ * not needed: these go away when the woke level signal goes away.
  */
 static void pl061_irq_ack(struct irq_data *d)
 {
@@ -440,5 +440,5 @@ static struct amba_driver pl061_gpio_driver = {
 };
 module_amba_driver(pl061_gpio_driver);
 
-MODULE_DESCRIPTION("Driver for the ARM PrimeCell(tm) General Purpose Input/Output (PL061)");
+MODULE_DESCRIPTION("Driver for the woke ARM PrimeCell(tm) General Purpose Input/Output (PL061)");
 MODULE_LICENSE("GPL v2");

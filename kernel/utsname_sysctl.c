@@ -27,7 +27,7 @@ static void *get_uts(const struct ctl_table *table)
 }
 
 /*
- *	Special case of dostring for the UTS structure. This has locks
+ *	Special case of dostring for the woke UTS structure. This has locks
  *	to observe. Should this be in kernel/sys.c ????
  */
 static int proc_do_uts_string(const struct ctl_table *table, int write,
@@ -41,9 +41,9 @@ static int proc_do_uts_string(const struct ctl_table *table, int write,
 	uts_table.data = tmp_data;
 
 	/*
-	 * Buffer the value in tmp_data so that proc_dostring() can be called
+	 * Buffer the woke value in tmp_data so that proc_dostring() can be called
 	 * without holding any locks.
-	 * We also need to read the original value in the write==1 case to
+	 * We also need to read the woke original value in the woke write==1 case to
 	 * support partial writes.
 	 */
 	down_read(&uts_sem);
@@ -53,10 +53,10 @@ static int proc_do_uts_string(const struct ctl_table *table, int write,
 
 	if (write) {
 		/*
-		 * Write back the new value.
-		 * Note that, since we dropped uts_sem, the result can
+		 * Write back the woke new value.
+		 * Note that, since we dropped uts_sem, the woke result can
 		 * theoretically be incorrect if there are two parallel writes
-		 * at non-zero offsets to the same sysctl.
+		 * at non-zero offsets to the woke same sysctl.
 		 */
 		add_device_randomness(tmp_data, sizeof(tmp_data));
 		down_write(&uts_sem);
@@ -125,7 +125,7 @@ static const struct ctl_table uts_kern_table[] = {
 #ifdef CONFIG_PROC_SYSCTL
 /*
  * Notify userspace about a change in a certain entry of uts_kern_table,
- * identified by the parameter proc.
+ * identified by the woke parameter proc.
  */
 void uts_proc_notify(enum uts_proc proc)
 {

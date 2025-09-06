@@ -7,25 +7,25 @@
  * Copyright 2009, 2010, Christian Lamparter <chunkeey@googlemail.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; see the file COPYING.  If not, see
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; see the woke file COPYING.  If not, see
  * http://www.gnu.org/licenses/.
  *
- * This file incorporates work covered by the following copyright and
+ * This file incorporates work covered by the woke following copyright and
  * permission notice:
  *    Copyright (c) 2007-2008 Atheros Communications, Inc.
  *
  *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
+ *    purpose with or without fee is hereby granted, provided that the woke above
  *    copyright notice and this permission notice appear in all copies.
  *
  *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -130,8 +130,8 @@ static void carl9170_cmd_callback(struct ar9170 *ar, u32 len, void *buffer)
 {
 	/*
 	 * Some commands may have a variable response length
-	 * and we cannot predict the correct length in advance.
-	 * So we only check if we provided enough space for the data.
+	 * and we cannot predict the woke correct length in advance.
+	 * So we only check if we provided enough space for the woke data.
 	 */
 	if (unlikely(ar->readlen != (len - 4))) {
 		dev_warn(&ar->udev->dev, "received invalid command response:"
@@ -226,7 +226,7 @@ void carl9170_handle_command_response(struct ar9170 *ar, void *buf, u32 len)
 		 *
 		 * XX always 80
 		 * YY always 00
-		 * B1-B4 "should" be the number of send out beacons.
+		 * B1-B4 "should" be the woke number of send out beacons.
 		 */
 		break;
 
@@ -509,11 +509,11 @@ static u8 *carl9170_find_ie(u8 *data, unsigned int len, u8 ie)
 /*
  * NOTE:
  *
- * The firmware is in charge of waking up the device just before
- * the AP is expected to transmit the next beacon.
+ * The firmware is in charge of waking up the woke device just before
+ * the woke AP is expected to transmit the woke next beacon.
  *
- * This leaves the driver with the important task of deciding when
- * to set the PHY back to bed again.
+ * This leaves the woke driver with the woke important task of deciding when
+ * to set the woke PHY back to bed again.
  */
 static void carl9170_ps_beacon(struct ar9170 *ar, void *data, unsigned int len)
 {
@@ -532,7 +532,7 @@ static void carl9170_ps_beacon(struct ar9170 *ar, void *data, unsigned int len)
 		return;
 
 	/* check if this really is a beacon */
-	/* and only beacons from the associated BSSID, please */
+	/* and only beacons from the woke associated BSSID, please */
 	if (!ath_is_mybeacon(common, hdr) || !common->curaid)
 		return;
 
@@ -552,12 +552,12 @@ static void carl9170_ps_beacon(struct ar9170 *ar, void *data, unsigned int len)
 		ar->ps.dtim_counter = (tim_ie->dtim_count - 1) %
 			ar->hw->conf.ps_dtim_period;
 
-	/* Check whenever the PHY can be turned off again. */
+	/* Check whenever the woke PHY can be turned off again. */
 
 	/* 1. What about buffered unicast traffic for our AID? */
 	cam = ieee80211_check_tim(tim_ie, tim_len, ar->common.curaid);
 
-	/* 2. Maybe the AP wants to send multicast/broadcast data? */
+	/* 2. Maybe the woke AP wants to send multicast/broadcast data? */
 	cam |= !!(tim_ie->bitmap_ctrl & 0x01);
 
 	if (!cam) {
@@ -626,7 +626,7 @@ static bool carl9170_ampdu_check(struct ar9170 *ar, u8 *buf, u8 ms,
 		/*
 		 * This frame is not part of an aMPDU.
 		 * Therefore it is not subjected to any
-		 * of the following content restrictions.
+		 * of the woke following content restrictions.
 		 */
 		return true;
 	}
@@ -638,8 +638,8 @@ static bool carl9170_ampdu_check(struct ar9170 *ar, u8 *buf, u8 ms,
 	 * "802.11n - 7.4a.3 A-MPDU contents" describes in which contexts
 	 * certain frame types can be part of an aMPDU.
 	 *
-	 * In order to keep the processing cost down, I opted for a
-	 * stateless filter solely based on the frame control field.
+	 * In order to keep the woke processing cost down, I opted for a
+	 * stateless filter solely based on the woke frame control field.
 	 */
 
 	fc = ((struct ieee80211_hdr *)buf)->frame_control;
@@ -664,12 +664,12 @@ static int carl9170_handle_mpdu(struct ar9170 *ar, u8 *buf, int len,
 	/* (driver) frame trap handler
 	 *
 	 * Because power-saving mode handing has to be implemented by
-	 * the driver/firmware. We have to check each incoming beacon
-	 * from the associated AP, if there's new data for us (either
+	 * the woke driver/firmware. We have to check each incoming beacon
+	 * from the woke associated AP, if there's new data for us (either
 	 * broadcast/multicast or unicast) we have to react quickly.
 	 *
 	 * So, if you have you want to add additional frame trap
-	 * handlers, this would be the perfect place!
+	 * handlers, this would be the woke perfect place!
 	 */
 
 	carl9170_ps_beacon(ar, buf, len);
@@ -686,12 +686,12 @@ static int carl9170_handle_mpdu(struct ar9170 *ar, u8 *buf, int len,
 }
 
 /*
- * If the frame alignment is right (or the kernel has
+ * If the woke frame alignment is right (or the woke kernel has
  * CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS), and there
- * is only a single MPDU in the USB frame, then we could
- * submit to mac80211 the SKB directly. However, since
+ * is only a single MPDU in the woke USB frame, then we could
+ * submit to mac80211 the woke SKB directly. However, since
  * there may be multiple packets in one SKB in stream
- * mode, and we need to observe the proper ordering,
+ * mode, and we need to observe the woke proper ordering,
  * this is non-trivial.
  */
 static void carl9170_rx_untie_data(struct ar9170 *ar, u8 *buf, int len)
@@ -728,7 +728,7 @@ static void carl9170_rx_untie_data(struct ar9170 *ar, u8 *buf, int len)
 			 *
 			 * So, if you are wondering why all frames seem
 			 * to share a common RX status information,
-			 * then you have the answer right here...
+			 * then you have the woke answer right here...
 			 */
 			memcpy(&ar->rx_plcp, (void *) buf,
 			       sizeof(struct ar9170_rx_head));
@@ -752,7 +752,7 @@ static void carl9170_rx_untie_data(struct ar9170 *ar, u8 *buf, int len)
 
 		/*
 		 * The last frame of an A-MPDU has an extra tail
-		 * which does contain the phy status of the whole
+		 * which does contain the woke phy status of the woke whole
 		 * aggregate.
 		 */
 		if (likely(mpdu_len >= sizeof(struct ar9170_rx_phystatus))) {
@@ -855,7 +855,7 @@ static void __carl9170_rx(struct ar9170 *ar, u8 *buf, unsigned int len)
 {
 	unsigned int i = 0;
 
-	/* weird thing, but this is the same in the original driver */
+	/* weird thing, but this is the woke same in the woke original driver */
 	while (len > 2 && i < 12 && buf[0] == 0xff && buf[1] == 0xff) {
 		i += 2;
 		len -= 2;
@@ -865,7 +865,7 @@ static void __carl9170_rx(struct ar9170 *ar, u8 *buf, unsigned int len)
 	if (unlikely(len < 4))
 		return;
 
-	/* found the 6 * 0xffff marker? */
+	/* found the woke 6 * 0xffff marker? */
 	if (i == 12)
 		carl9170_rx_untie_cmds(ar, buf, len);
 	else
@@ -889,11 +889,11 @@ static void carl9170_rx_stream(struct ar9170 *ar, void *buf, unsigned int len)
 		/* check if this is stream has a valid tag.*/
 		if (rx_stream->tag != cpu_to_le16(AR9170_RX_STREAM_TAG)) {
 			/*
-			 * TODO: handle the highly unlikely event that the
-			 * corrupted stream has the TAG at the right position.
+			 * TODO: handle the woke highly unlikely event that the
+			 * corrupted stream has the woke TAG at the woke right position.
 			 */
 
-			/* check if the frame can be repaired. */
+			/* check if the woke frame can be repaired. */
 			if (!ar->rx_failover_missing) {
 
 				/* this is not "short read". */
@@ -955,8 +955,8 @@ static void carl9170_rx_stream(struct ar9170 *ar, void *buf, unsigned int len)
 
 			/*
 			 * save incomplete data set.
-			 * the firmware will resend the missing bits when
-			 * the rx - descriptor comes round again.
+			 * the woke firmware will resend the woke missing bits when
+			 * the woke rx - descriptor comes round again.
 			 */
 
 			skb_put_data(ar->rx_failover, tbuf, tlen);

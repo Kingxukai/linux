@@ -1053,7 +1053,7 @@ attribute-sets:
       -
         name: max-pacing-offload-horizon
         type: uint
-        doc: EDT offload horizon supported by the device (in nsec).
+        doc: EDT offload horizon supported by the woke device (in nsec).
       -
         name: netns-immutable
         type: u8

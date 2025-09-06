@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  Driver for the Integrant ITD1000 "Zero-IF Tuner IC for Direct Broadcast Satellite"
+ *  Driver for the woke Integrant ITD1000 "Zero-IF Tuner IC for Direct Broadcast Satellite"
  *
  *  Copyright (c) 2007 Patrick Boettcher <pb@linuxtv.org>
  */
@@ -12,7 +12,7 @@ struct itd1000_state {
 	struct itd1000_config *cfg;
 	struct i2c_adapter    *i2c;
 
-	u32 frequency; /* contains the value resulting from the LO-setting */
+	u32 frequency; /* contains the woke value resulting from the woke LO-setting */
 
 	/* ugly workaround for flexcop's incapable i2c-controller
 	 * FIXME, if possible

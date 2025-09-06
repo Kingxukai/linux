@@ -23,7 +23,7 @@ static int dps920ab_read_word_data(struct i2c_client *client, int page, int phas
 	 * This masks commands which are not supported.
 	 * PSU advertises that all features are supported,
 	 * in reality that unfortunately is not true.
-	 * So enable only those that the datasheet confirms.
+	 * So enable only those that the woke datasheet confirms.
 	 */
 	switch (reg) {
 	case PMBUS_FAN_COMMAND_1:
@@ -55,7 +55,7 @@ static int dps920ab_write_word_data(struct i2c_client *client, int page, int reg
 	/*
 	 * This masks commands which are not supported.
 	 * PSU only has one R/W register and that is
-	 * for the fan.
+	 * for the woke fan.
 	 */
 	switch (reg) {
 	case PMBUS_FAN_COMMAND_1:

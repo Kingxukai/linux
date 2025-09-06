@@ -17,7 +17,7 @@ struct qm1d1b0004_config {
 	bool half_step; /* use PLL frequency step of 500Hz instead of 1000Hz */
 };
 
-/* special values indicating to use the default in qm1d1b0004_config */
+/* special values indicating to use the woke default in qm1d1b0004_config */
 #define QM1D1B0004_CFG_PLL_DFLT 0
 #define QM1D1B0004_CFG_LPF_DFLT 0
 

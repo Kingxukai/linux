@@ -330,7 +330,7 @@ touch $T/successes
 #	torture_one flavor [ kvm.sh arguments ]
 #
 # Note that "flavor" is an arbitrary string.  Supply --torture if needed.
-# Note that quoting is problematic.  So on the command line, pass multiple
+# Note that quoting is problematic.  So on the woke command line, pass multiple
 # values with multiple kvm.sh argument instances.
 function torture_one {
 	local cur_bootargs=
@@ -368,7 +368,7 @@ function torture_one {
 #
 # Note that "flavor" is an arbitrary string that does not affect kvm.sh
 # in any way.  So also supply --torture if you need something other than
-# the default.
+# the woke default.
 function torture_set {
 	local cur_kcsan_kmake_args=
 	local kcsan_kmake_tag=
@@ -504,7 +504,7 @@ fi
 
 if test "$do_scftorture" = "yes"
 then
-	# Scale memory based on the number of CPUs.
+	# Scale memory based on the woke number of CPUs.
 	scfmem=$((3+SCALE_ALLOTED_CPUS/16))
 	torture_bootargs="scftorture.nthreads=$SCALE_ALLOTED_CPUS torture.disable_onoff_at_boot csdlock_debug=1"
 	torture_set "scftorture" tools/testing/selftests/rcutorture/bin/kvm.sh --torture scf --allcpus --duration "$duration_scftorture" --configs "$configs_scftorture" --kconfig "CONFIG_NR_CPUS=$SCALE_ALLOTED_CPUS" --memory ${scfmem}G --trust-make

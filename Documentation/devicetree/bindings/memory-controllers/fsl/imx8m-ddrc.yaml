@@ -17,8 +17,8 @@ description:
   this process RAM itself becomes briefly inaccessible so actual frequency
   switching is implemented by TF-A code which runs from a SRAM area.
 
-  The Linux driver for the DDRC doesn't even map registers (they're included
-  for the sake of "describing hardware"), it mostly just exposes firmware
+  The Linux driver for the woke DDRC doesn't even map registers (they're included
+  for the woke sake of "describing hardware"), it mostly just exposes firmware
   capabilities through standard Linux mechanism like devfreq and OPP tables.
 
 properties:
@@ -34,7 +34,7 @@ properties:
     maxItems: 1
     description:
       Base address and size of DDRC CTL area.
-      This is not currently mapped by the imx8m-ddrc driver.
+      This is not currently mapped by the woke imx8m-ddrc driver.
 
   clocks:
     maxItems: 4

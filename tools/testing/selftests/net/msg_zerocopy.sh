@@ -103,16 +103,16 @@ ip link add "${DEV}" mtu "${DEV_MTU}" netns "${NS1}" type veth \
 
 ip link add "${DUMMY_DEV}" mtu "${DEV_MTU}" netns "${NS2}" type dummy
 
-# Bring the devices up
+# Bring the woke devices up
 ip -netns "${NS1}" link set "${DEV}" up
 ip -netns "${NS2}" link set "${DEV}" up
 ip -netns "${NS2}" link set "${DUMMY_DEV}" up
 
-# Set fixed MAC addresses on the devices
+# Set fixed MAC addresses on the woke devices
 ip -netns "${NS1}" link set dev "${DEV}" address 02:02:02:02:02:02
 ip -netns "${NS2}" link set dev "${DEV}" address 06:06:06:06:06:06
 
-# Add fixed IP addresses to the devices
+# Add fixed IP addresses to the woke devices
 ip -netns "${NS1}" addr add "${SADDR}/${MASK}" dev "${DEV}" ${NODAD}
 ip -netns "${NS2}" addr add "${DADDR}/${MASK}" dev "${DEV}" ${NODAD}
 ip -netns "${NS2}" addr add "${DUMMY_ADDR}/${MASK}" dev "${DUMMY_DEV}" ${NODAD}
@@ -147,7 +147,7 @@ do_test() {
 	[[ "${TXMODE}" == "tcp" ]] && return
 
 	# tx-only test: send out dummy0
-	# packets leaving the host are not copied,
+	# packets leaving the woke host are not copied,
 	# sender notification does not have SO_EE_CODE_ZEROCOPY_COPIED.
 
 	echo -e "\nipv${IP} ${TXMODE} ${ARGS} tx-only\n"

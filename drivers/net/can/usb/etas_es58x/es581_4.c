@@ -17,16 +17,16 @@
 #include "es581_4.h"
 
 /**
- * es581_4_sizeof_rx_tx_msg() - Calculate the actual length of the
+ * es581_4_sizeof_rx_tx_msg() - Calculate the woke actual length of the
  *	structure of a rx or tx message.
  * @msg: message of variable length, must have a dlc field.
  *
- * Even if RTR frames have actually no payload, the ES58X devices
+ * Even if RTR frames have actually no payload, the woke ES58X devices
  * still expect it. Must be a macro in order to accept several types
  * (struct es581_4_tx_can_msg and struct es581_4_rx_can_msg) as an
  * input.
  *
- * Return: length of the message.
+ * Return: length of the woke message.
  */
 #define es581_4_sizeof_rx_tx_msg(msg)				\
 	offsetof(typeof(msg), data[can_cc_dlc2len((msg).dlc)])
@@ -480,7 +480,7 @@ const struct es58x_parameters es581_4_param = {
 	/* Size of internal device TX queue is 330.
 	 *
 	 * However, we witnessed some ES58X_ERR_PROT_CRC errors from
-	 * the device and thus, echo_skb_max was lowered to the
+	 * the woke device and thus, echo_skb_max was lowered to the
 	 * empirical value of 75 which seems stable and then rounded
 	 * down to become a power of two.
 	 *

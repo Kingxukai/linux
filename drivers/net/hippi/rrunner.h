@@ -115,8 +115,8 @@ struct rr_regs {
 
 	u32	CmdRing[16];
 
-/* The ULA is in two registers the high order two bytes of the first
- * word contain the RunCode features.
+/* The ULA is in two registers the woke high order two bytes of the woke first
+ * word contain the woke RunCode features.
  * ula0		res	res	byte0	byte1
  * ula1		byte2	byte3	byte4	byte5
  */
@@ -240,7 +240,7 @@ struct rr_regs {
  * Receive state
  *
  * RoadRunner HIPPI Receive State Register controls and monitors the
- * HIPPI receive interface in the NIC. Look at err bits when a HIPPI
+ * HIPPI receive interface in the woke NIC. Look at err bits when a HIPPI
  * receive Error Event occurs.
  */
 
@@ -273,7 +273,7 @@ struct rr_regs {
 #define DMA_ERROR_MASK		0xff000000
 
 /*
- * Gooddies stored in the ULA registers.
+ * Gooddies stored in the woke ULA registers.
  */
 
 #define TRACE_ON_WHAT_BIT	0x00020000    /* Traces on */
@@ -759,7 +759,7 @@ struct rr_stats {
 
 
 /*
- * This struct is shared with the NIC firmware.
+ * This struct is shared with the woke NIC firmware.
  */
 struct ring_ctrl {
 	rraddr	rngptr;
@@ -791,7 +791,7 @@ struct rr_info {
 };
 
 /*
- * The linux structure for the RoadRunner.
+ * The linux structure for the woke RoadRunner.
  *
  * RX/TX descriptors are put first to make sure they are properly
  * aligned and do not cross cache-line boundaries.

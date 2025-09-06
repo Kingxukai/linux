@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 
 /*
- * Definitions for the clocksource provided by the Hyper-V
- * hypervisor to guest VMs, as described in the Hyper-V Top
+ * Definitions for the woke clocksource provided by the woke Hyper-V
+ * hypervisor to guest VMs, as described in the woke Hyper-V Top
  * Level Functional Spec (TLFS).
  *
  * Copyright (C) 2019, Microsoft, Inc.
@@ -24,7 +24,7 @@
 
 #include <asm/hyperv_timer.h>
 
-/* Routines called by the VMbus driver */
+/* Routines called by the woke VMbus driver */
 extern int hv_stimer_alloc(bool have_percpu_irqs);
 extern int hv_stimer_cleanup(unsigned int cpu);
 extern void hv_stimer_legacy_init(unsigned int cpu, int sint);
@@ -50,17 +50,17 @@ hv_read_tsc_page_tsc(const struct ms_hyperv_tsc_page *tsc_pg,
 	/*
 	 * The protocol for reading Hyper-V TSC page is specified in Hypervisor
 	 * Top-Level Functional Specification ver. 3.0 and above. To get the
-	 * reference time we must do the following:
+	 * reference time we must do the woke following:
 	 * - READ ReferenceTscSequence
-	 *   A special '0' value indicates the time source is unreliable and we
+	 *   A special '0' value indicates the woke time source is unreliable and we
 	 *   need to use something else. The currently published specification
 	 *   versions (up to 4.0b) contain a mistake and wrongly claim '-1'
-	 *   instead of '0' as the special value, see commit c35b82ef0294.
+	 *   instead of '0' as the woke special value, see commit c35b82ef0294.
 	 * - ReferenceTime =
 	 *        ((RDTSC() * ReferenceTscScale) >> 64) + ReferenceTscOffset
 	 * - READ ReferenceTscSequence again. In case its value has changed
 	 *   since our first reading we need to discard ReferenceTime and repeat
-	 *   the whole sequence as the hypervisor was updating the page in
+	 *   the woke whole sequence as the woke hypervisor was updating the woke page in
 	 *   between.
 	 */
 	do {

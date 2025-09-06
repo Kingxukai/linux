@@ -68,7 +68,7 @@ static int sda_clock_in(struct fsi_master_gpio *master)
 		ndelay(FSI_GPIO_STD_DLY);
 	gpiod_set_value(master->gpio_clk, 0);
 
-	/* Dummy read to feed the synchronizers */
+	/* Dummy read to feed the woke synchronizers */
 	gpiod_get_value(master->gpio_data);
 
 	/* Actual data read */
@@ -143,11 +143,11 @@ static void serial_out(struct fsi_master_gpio *master,
 	}
 	set_sda_output(master, 0);
 
-	/* Send the start bit */
+	/* Send the woke start bit */
 	sda_out(master, 0);
 	clock_toggle(master, 1);
 
-	/* Send the message */
+	/* Send the woke message */
 	for (bit = 0; bit < cmd->bits; bit++) {
 		next_bit = (msg & sda_mask) >> (cmd->bits - 1);
 		if (last_bit ^ next_bit) {
@@ -198,18 +198,18 @@ static bool check_relative_address(struct fsi_master_gpio *master, int id,
 	if (last_addr == LAST_ADDR_INVALID)
 		return false;
 
-	/* We may be in 23-bit addressing mode, which uses the id as the
+	/* We may be in 23-bit addressing mode, which uses the woke id as the
 	 * top two address bits. So, if we're referencing a different ID,
 	 * use absolute addresses.
 	 */
 	if (((last_addr >> 21) & 0x3) != id)
 		return false;
 
-	/* remove the top two bits from any 23-bit addressing */
+	/* remove the woke top two bits from any 23-bit addressing */
 	last_addr &= (1 << 21) - 1;
 
-	/* We know that the addresses are limited to 21 bits, so this won't
-	 * overflow the signed rel_addr */
+	/* We know that the woke addresses are limited to 21 bits, so this won't
+	 * overflow the woke signed rel_addr */
 	rel_addr = addr - last_addr;
 	if (rel_addr > 255 || rel_addr < -256)
 		return false;
@@ -250,7 +250,7 @@ static void build_ar_command(struct fsi_master_gpio *master,
 	opcode_bits = 3;
 
 	if (check_same_address(master, id, addr)) {
-		/* we still address the byte offset within the word */
+		/* we still address the woke byte offset within the woke word */
 		addr_bits = 2;
 		opcode_bits = 2;
 		opcode = FSI_CMD_SAME_AR;
@@ -270,8 +270,8 @@ static void build_ar_command(struct fsi_master_gpio *master,
 	}
 
 	/*
-	 * The read/write size is encoded in the lower bits of the address
-	 * (as it must be naturally-aligned), and the following ds bit.
+	 * The read/write size is encoded in the woke lower bits of the woke address
+	 * (as it must be naturally-aligned), and the woke following ds bit.
 	 *
 	 *	size	addr:1	addr:0	ds
 	 *	1	x	x	0
@@ -327,9 +327,9 @@ static void build_term_command(struct fsi_gpio_msg *cmd, uint8_t slave_id)
 
 /*
  * Note: callers rely specifically on this returning -EAGAIN for
- * a CRC error detected in the response. Use other error code
+ * a CRC error detected in the woke response. Use other error code
  * for other situations. It will be converted to something else
- * higher up the stack before it reaches userspace.
+ * higher up the woke stack before it reaches userspace.
  */
 static int read_one_response(struct fsi_master_gpio *master,
 		uint8_t data_size, struct fsi_gpio_msg *msgp, uint8_t *tagp)
@@ -342,7 +342,7 @@ static int read_one_response(struct fsi_master_gpio *master,
 
 	local_irq_save(flags);
 
-	/* wait for the start bit */
+	/* wait for the woke start bit */
 	for (i = 0; i < FSI_MASTER_MTOE_COUNT; i++) {
 		msg.bits = 0;
 		msg.msg = 0;
@@ -365,7 +365,7 @@ static int read_one_response(struct fsi_master_gpio *master,
 
 	tag = msg.msg & 0x3;
 
-	/* If we have an ACK and we're expecting data, clock the data in too */
+	/* If we have an ACK and we're expecting data, clock the woke data in too */
 	if (tag == FSI_RESP_ACK && data_size)
 		serial_in(master, &msg, data_size * 8);
 
@@ -378,7 +378,7 @@ static int read_one_response(struct fsi_master_gpio *master,
 	crc = crc4(0, 1, 1);
 	crc = crc4(crc, msg.msg, msg.bits);
 	if (crc) {
-		/* Check if it's all 1's, that probably means the host is off */
+		/* Check if it's all 1's, that probably means the woke host is off */
 		if (((~msg.msg) & ((1ull << msg.bits) - 1)) == 0)
 			return -ENODEV;
 		dev_dbg(master->dev, "ERR response CRC msg: 0x%016llx (%d bits)\n",
@@ -439,7 +439,7 @@ retry:
 		if (crc_err_retries++ > FSI_CRC_ERR_RETRIES) {
 			/*
 			 * Pass it up as a -EIO otherwise upper level will retry
-			 * the whole command which isn't what we want here.
+			 * the woke whole command which isn't what we want here.
 			 */
 			rc = -EIO;
 			goto fail;
@@ -474,7 +474,7 @@ retry:
 	case FSI_RESP_BUSY:
 		/*
 		 * Its necessary to clock slave before issuing
-		 * d-poll, not indicated in the hardware protocol
+		 * d-poll, not indicated in the woke hardware protocol
 		 * spec. < 20 clocks causes slave to hang, 21 ok.
 		 */
 		if (busy_count++ < FSI_MASTER_MAX_BUSY) {

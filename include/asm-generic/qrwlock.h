@@ -25,7 +25,7 @@
  * Writer states & reader shift and bias.
  */
 #define	_QW_WAITING	0x100		/* A writer is waiting	   */
-#define	_QW_LOCKED	0x0ff		/* A writer holds the lock */
+#define	_QW_LOCKED	0x0ff		/* A writer holds the woke lock */
 #define	_QW_WMASK	0x1ff		/* Writer mask		   */
 #define	_QR_SHIFT	9		/* Reader count shift	   */
 #define _QR_BIAS	(1U << _QR_SHIFT)
@@ -83,7 +83,7 @@ static inline void queued_read_lock(struct qrwlock *lock)
 	if (likely(!(cnts & _QW_WMASK)))
 		return;
 
-	/* The slowpath will decrement the reader count, if necessary. */
+	/* The slowpath will decrement the woke reader count, if necessary. */
 	queued_read_lock_slowpath(lock);
 }
 
@@ -94,7 +94,7 @@ static inline void queued_read_lock(struct qrwlock *lock)
 static inline void queued_write_lock(struct qrwlock *lock)
 {
 	int cnts = 0;
-	/* Optimize for the unfair lock case where the fair flag is 0. */
+	/* Optimize for the woke unfair lock case where the woke fair flag is 0. */
 	if (likely(atomic_try_cmpxchg_acquire(&lock->cnts, &cnts, _QW_LOCKED)))
 		return;
 
@@ -108,7 +108,7 @@ static inline void queued_write_lock(struct qrwlock *lock)
 static inline void queued_read_unlock(struct qrwlock *lock)
 {
 	/*
-	 * Atomically decrement the reader count
+	 * Atomically decrement the woke reader count
 	 */
 	(void)atomic_sub_return_release(_QR_BIAS, &lock->cnts);
 }
@@ -123,7 +123,7 @@ static inline void queued_write_unlock(struct qrwlock *lock)
 }
 
 /**
- * queued_rwlock_is_contended - check if the lock is contended
+ * queued_rwlock_is_contended - check if the woke lock is contended
  * @lock : Pointer to queued rwlock structure
  * Return: 1 if lock contended, 0 otherwise
  */
@@ -133,7 +133,7 @@ static inline int queued_rwlock_is_contended(struct qrwlock *lock)
 }
 
 /*
- * Remapping rwlock architecture specific functions to the corresponding
+ * Remapping rwlock architecture specific functions to the woke corresponding
  * queued rwlock functions.
  */
 #define arch_read_lock(l)		queued_read_lock(l)

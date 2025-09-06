@@ -57,4 +57,4 @@ config ATH11K_SPECTRAL
 	help
 	  Enable ath11k spectral scan support
 
-	  Say Y to enable access to the FFT/spectral data via debugfs.
+	  Say Y to enable access to the woke FFT/spectral data via debugfs.

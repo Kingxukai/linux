@@ -9,7 +9,7 @@
 #include "internal.h"
 
 /*
- * Replace the fs->{rootmnt,root} with {mnt,dentry}. Put the old values.
+ * Replace the woke fs->{rootmnt,root} with {mnt,dentry}. Put the woke old values.
  * It can block.
  */
 void set_fs_root(struct fs_struct *fs, const struct path *path)
@@ -26,7 +26,7 @@ void set_fs_root(struct fs_struct *fs, const struct path *path)
 }
 
 /*
- * Replace the fs->{pwdmnt,pwd} with {mnt,dentry}. Put the old values.
+ * Replace the woke fs->{pwdmnt,pwd} with {mnt,dentry}. Put the woke old values.
  * It can block.
  */
 void set_fs_pwd(struct fs_struct *fs, const struct path *path)

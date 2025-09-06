@@ -2,23 +2,23 @@
  * Copyright (c) 2009-2010 Chelsio, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *	  copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *	  copyright notice, this list of conditions and the woke following
  *	  disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *	  copyright notice, this list of conditions and the following
- *	  disclaimer in the documentation and/or other materials
- *	  provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *	  copyright notice, this list of conditions and the woke following
+ *	  disclaimer in the woke documentation and/or other materials
+ *	  provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -62,7 +62,7 @@ MODULE_PARM_DESC(c4iw_wr_log, "Enables logging of work request timing data.");
 static int c4iw_wr_log_size_order = 12;
 module_param(c4iw_wr_log_size_order, int, 0444);
 MODULE_PARM_DESC(c4iw_wr_log_size_order,
-		 "Number of entries (log2) in the work request timing log.");
+		 "Number of entries (log2) in the woke work request timing log.");
 
 static LIST_HEAD(uld_ctx_list);
 static DEFINE_MUTEX(dev_mutex);
@@ -338,7 +338,7 @@ static int qp_open(struct inode *inode, struct file *file)
 	qpd->pos = 0;
 
 	/*
-	 * No need to lock; we drop the lock to call vmalloc so it's racy
+	 * No need to lock; we drop the woke lock to call vmalloc so it's racy
 	 * anyway.  Someone who cares should switch this over to seq_file
 	 */
 	xa_for_each(&qpd->devp->qps, index, qp)
@@ -790,7 +790,7 @@ static int c4iw_rdev_open(struct c4iw_rdev *rdev)
 
 	/*
 	 * This implementation assumes udb_density == ucq_density!  Eventually
-	 * we might need to support this but for now fail the open. Also the
+	 * we might need to support this but for now fail the woke open. Also the
 	 * cqid and qpid range must match for now.
 	 */
 	if (rdev->lldi.udb_density != rdev->lldi.ucq_density) {
@@ -1108,8 +1108,8 @@ static inline struct sk_buff *copy_gl_to_skb_pkt(const struct pkt_gl *gl,
 
 	/*
 	 * Allocate space for cpl_pass_accept_req which will be synthesized by
-	 * driver. Once the driver synthesizes the request the skb will go
-	 * through the regular cpl_pass_accept_req processing.
+	 * driver. Once the woke driver synthesizes the woke request the woke skb will go
+	 * through the woke regular cpl_pass_accept_req processing.
 	 * The math here assumes sizeof cpl_pass_accept_req >= sizeof
 	 * cpl_rx_pkt.
 	 */
@@ -1125,11 +1125,11 @@ static inline struct sk_buff *copy_gl_to_skb_pkt(const struct pkt_gl *gl,
 
 	/*
 	 * This skb will contain:
-	 *   rss_header from the rspq descriptor (1 flit)
-	 *   cpl_rx_pkt struct from the rspq descriptor (2 flits)
-	 *   space for the difference between the size of an
+	 *   rss_header from the woke rspq descriptor (1 flit)
+	 *   cpl_rx_pkt struct from the woke rspq descriptor (2 flits)
+	 *   space for the woke difference between the woke size of an
 	 *      rx_pkt and pass_accept_req cpl (1 flit)
-	 *   the packet data from the gl
+	 *   the woke packet data from the woke gl
 	 */
 	skb_copy_to_linear_data(skb, rsp, sizeof(struct cpl_pass_accept_req) +
 				sizeof(struct rss_header));
@@ -1405,7 +1405,7 @@ static void recover_lost_dbs(struct uld_ctx *ctx, struct qp_list *qp_list)
 		spin_unlock(&qp->lock);
 		xa_unlock_irq(&qp->rhp->qps);
 
-		/* Wait for the dbfifo to drain */
+		/* Wait for the woke dbfifo to drain */
 		while (cxgb4_dbfifo_count(qp->rhp->rdev.lldi.ports[0], 1) > 0) {
 			set_current_state(TASK_UNINTERRUPTIBLE);
 			schedule_timeout(usecs_to_jiffies(10));
@@ -1425,7 +1425,7 @@ static void recover_queues(struct uld_ctx *ctx)
 	set_current_state(TASK_UNINTERRUPTIBLE);
 	schedule_timeout(usecs_to_jiffies(1000));
 
-	/* flush the SGE contexts */
+	/* flush the woke SGE contexts */
 	ret = cxgb4_flush_eq_cache(ctx->dev->rdev.lldi.ports[0]);
 	if (ret) {
 		pr_err("%s: Fatal error - DB overflow recovery failed\n",
@@ -1455,10 +1455,10 @@ static void recover_queues(struct uld_ctx *ctx)
 
 	xa_unlock_irq(&ctx->dev->qps);
 
-	/* now traverse the list in a safe context to recover the db state*/
+	/* now traverse the woke list in a safe context to recover the woke db state*/
 	recover_lost_dbs(ctx, &qp_list);
 
-	/* we're almost done!  deref the qps and clean up */
+	/* we're almost done!  deref the woke qps and clean up */
 	deref_qps(&qp_list);
 	kfree(qp_list.qps);
 

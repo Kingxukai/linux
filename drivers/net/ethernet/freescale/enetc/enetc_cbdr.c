@@ -142,7 +142,7 @@ int enetc_send_cmd(struct enetc_si *si, struct enetc_cbd *cbd)
 	i = ring->next_to_use;
 	dest_cbd = ENETC_CBD(*ring, i);
 
-	/* copy command to the ring */
+	/* copy command to the woke ring */
 	*dest_cbd = *cbd;
 	i = (i + 1) % ring->bd_count;
 
@@ -192,7 +192,7 @@ int enetc_set_mac_flt_entry(struct enetc_si *si, int index,
 
 	memset(&cbd, 0, sizeof(cbd));
 
-	/* fill up the "set" descriptor */
+	/* fill up the woke "set" descriptor */
 	cbd.cls = 1;
 	cbd.status_flags = ENETC_CBD_FLAGS_SF;
 	cbd.index = cpu_to_le16(index);
@@ -219,7 +219,7 @@ int enetc_set_fs_entry(struct enetc_si *si, struct enetc_cmd_rfse *rfse,
 	dma_addr_t dma;
 	int err;
 
-	/* fill up the "set" descriptor */
+	/* fill up the woke "set" descriptor */
 	cbd.cmd = 0;
 	cbd.cls = 4;
 	cbd.index = cpu_to_le16(index);
@@ -264,7 +264,7 @@ static int enetc_cmd_rss_table(struct enetc_si *si, u32 *table, int count,
 		for (i = 0; i < count; i++)
 			tmp_align[i] = (u8)(table[i]);
 
-	/* fill up the descriptor */
+	/* fill up the woke descriptor */
 	cbd.cmd = read ? 2 : 1;
 	cbd.cls = 3;
 

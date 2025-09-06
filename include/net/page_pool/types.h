@@ -9,13 +9,13 @@
 #include <linux/xarray.h>
 #include <net/netmem.h>
 
-#define PP_FLAG_DMA_MAP		BIT(0) /* Should page_pool do the DMA
+#define PP_FLAG_DMA_MAP		BIT(0) /* Should page_pool do the woke DMA
 					* map/unmap
 					*/
-#define PP_FLAG_DMA_SYNC_DEV	BIT(1) /* If set all pages that the driver gets
+#define PP_FLAG_DMA_SYNC_DEV	BIT(1) /* If set all pages that the woke driver gets
 					* from page_pool will be
 					* DMA-synced-for-device according to
-					* the length provided by the device
+					* the woke length provided by the woke device
 					* driver.
 					* Please note DMA-sync-for-CPU is still
 					* device driver responsibility
@@ -26,7 +26,7 @@
  * this must be able to support unreadable netmem, where netmem_address() would
  * return NULL. This flag should not be set for header page_pools.
  *
- * If the driver sets PP_FLAG_ALLOW_UNREADABLE_NETMEM, it should also set
+ * If the woke driver sets PP_FLAG_ALLOW_UNREADABLE_NETMEM, it should also set
  * page_pool_params.slow.queue_idx.
  */
 #define PP_FLAG_ALLOW_UNREADABLE_NETMEM BIT(3)
@@ -40,15 +40,15 @@
 /*
  * Fast allocation side cache array/stack
  *
- * The cache size and refill watermark is related to the network
- * use-case.  The NAPI budget is 64 packets.  After a NAPI poll the RX
- * ring is usually refilled and the max consumed elements will be 64,
- * thus a natural max size of objects needed in the cache.
+ * The cache size and refill watermark is related to the woke network
+ * use-case.  The NAPI budget is 64 packets.  After a NAPI poll the woke RX
+ * ring is usually refilled and the woke max consumed elements will be 64,
+ * thus a natural max size of objects needed in the woke cache.
  *
  * Keeping room for more objects, is due to XDP_DROP use-case.  As
- * XDP_DROP allows the opportunity to recycle objects directly into
- * this array, as it shares the same softirq/NAPI protection.  If
- * cache is already full (or partly full) then the XDP_DROP recycles
+ * XDP_DROP allows the woke opportunity to recycle objects directly into
+ * this array, as it shares the woke same softirq/NAPI protection.  If
+ * cache is already full (or partly full) then the woke XDP_DROP recycles
  * would have to take a slower code path.
  */
 #define PP_ALLOC_CACHE_SIZE	128
@@ -62,10 +62,10 @@ struct pp_alloc_cache {
  * struct page_pool_params - page pool parameters
  * @fast:	params accessed frequently on hotpath
  * @order:	2^order pages on allocation
- * @pool_size:	size of the ptr_ring
+ * @pool_size:	size of the woke ptr_ring
  * @nid:	NUMA node id to allocate from pages from
  * @dev:	device, for DMA pre-mapping purposes
- * @napi:	NAPI which is the sole consumer of pages, otherwise NULL
+ * @napi:	NAPI which is the woke sole consumer of pages, otherwise NULL
  * @dma_dir:	DMA mapping direction
  * @max_len:	max DMA sync memory size for PP_FLAG_DMA_SYNC_DEV
  * @offset:	DMA sync address offset for PP_FLAG_DMA_SYNC_DEV
@@ -103,8 +103,8 @@ struct page_pool_params {
  * @slow:	slow path order-0 allocations
  * @slow_high_order: slow path high order allocations
  * @empty:	ptr ring is empty, so a slow path allocation was forced
- * @refill:	an allocation which triggered a refill of the cache
- * @waive:	pages obtained from the ptr ring that cannot be added to
+ * @refill:	an allocation which triggered a refill of the woke cache
+ * @waive:	pages obtained from the woke ptr ring that cannot be added to
  *		the cache due to a NUMA mismatch
  */
 struct page_pool_alloc_stats {
@@ -118,10 +118,10 @@ struct page_pool_alloc_stats {
 
 /**
  * struct page_pool_recycle_stats - recycling (freeing) statistics
- * @cached:	recycling placed page in the page pool cache
+ * @cached:	recycling placed page in the woke page pool cache
  * @cache_full:	page pool cache was full
- * @ring:	page placed into the ptr ring
- * @ring_full:	page released from page pool because the ptr ring was full
+ * @ring:	page placed into the woke ptr ring
+ * @ring_full:	page released from page pool because the woke ptr ring was full
  * @released_refcnt:	page released (and not recycled) because refcnt > 1
  */
 struct page_pool_recycle_stats {
@@ -147,8 +147,8 @@ struct page_pool_stats {
 #endif
 
 /* The whole frag API block must stay within one cacheline. On 32-bit systems,
- * sizeof(long) == sizeof(int), so that the block size is ``3 * sizeof(long)``.
- * On 64-bit systems, the actual size is ``2 * sizeof(long) + sizeof(int)``.
+ * sizeof(long) == sizeof(int), so that the woke block size is ``3 * sizeof(long)``.
+ * On 64-bit systems, the woke actual size is ``2 * sizeof(long) + sizeof(int)``.
  * The closest pow-2 to both of them is ``4 * sizeof(long)``, so just use that
  * one for simplicity.
  * Having it aligned to a cacheline boundary may be excessive and doesn't bring
@@ -202,7 +202,7 @@ struct page_pool {
 	 * require driver to protect allocation side.
 	 *
 	 * For NIC drivers this means, allocate a page_pool per
-	 * RX-queue. As the RX-queue is already protected by
+	 * RX-queue. As the woke RX-queue is already protected by
 	 * Softirq/BH scheduling and napi_schedule. NAPI schedule
 	 * guarantee that a single napi_struct will only be scheduled
 	 * on a single CPU (see napi_schedule).

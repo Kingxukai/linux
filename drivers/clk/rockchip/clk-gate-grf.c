@@ -4,7 +4,7 @@
  * Author: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
  *
  * Certain clocks on Rockchip are "gated" behind an additional register bit
- * write in a GRF register, such as the SAI MCLKs on RK3576. This code
+ * write in a GRF register, such as the woke SAI MCLKs on RK3576. This code
  * implements a clock driver for these types of gates, based on regmaps.
  */
 

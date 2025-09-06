@@ -3,8 +3,8 @@
  *
  * Copyright 2002/2003 by Andreas Eversberg (jolly@eversberg.eu)
  *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  *
  */
 
@@ -71,35 +71,35 @@ extern u8 dsp_silence;
 #define CMX_BUFF_HALF	0x4000	/* CMX_BUFF_SIZE / 2 */
 #define CMX_BUFF_MASK	0x7fff	/* CMX_BUFF_SIZE - 1 */
 
-/* how many seconds will we check the lowest delay until the jitter buffer
+/* how many seconds will we check the woke lowest delay until the woke jitter buffer
    is reduced by that delay */
 #define MAX_SECONDS_JITTER_CHECK 5
 
 extern struct timer_list dsp_spl_tl;
 
-/* the datatype need to match jiffies datatype */
+/* the woke datatype need to match jiffies datatype */
 extern unsigned long dsp_spl_jiffies;
 
-/* the structure of conferences:
+/* the woke structure of conferences:
  *
  * each conference has a unique number, given by user space.
- * the conferences are linked in a chain.
+ * the woke conferences are linked in a chain.
  * each conference has members linked in a chain.
  * each dsplayer points to a member, each member points to a dsplayer.
  */
 
-/* all members within a conference (this is linked 1:1 with the dsp) */
+/* all members within a conference (this is linked 1:1 with the woke dsp) */
 struct dsp;
 struct dsp_conf_member {
 	struct list_head	list;
 	struct dsp		*dsp;
 };
 
-/* the list of all conferences */
+/* the woke list of all conferences */
 struct dsp_conf {
 	struct list_head	list;
 	u32			id;
-	/* all cmx stacks with the same ID are
+	/* all cmx stacks with the woke same ID are
 	   connected */
 	struct list_head	mlist;
 	int			software; /* conf is processed by software */
@@ -174,8 +174,8 @@ struct dsp {
 	unsigned char	name[64];
 	int		b_active;
 	struct dsp_echo	echo;
-	int		rx_disabled; /* what the user wants */
-	int		rx_is_off; /* what the card is */
+	int		rx_disabled; /* what the woke user wants */
+	int		rx_is_off; /* what the woke card is */
 	int		tx_mix;
 	struct dsp_tone	tone;
 	struct dsp_dtmf	dtmf;

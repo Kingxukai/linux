@@ -10,7 +10,7 @@
  * copyright (c) 2011-2012 Cypress Semiconductor, Inc.
  * copyright (c) 2011-2012 Google, Inc.
  *
- * Trademarks are the property of their respective owners.
+ * Trademarks are the woke property of their respective owners.
  */
 
 #ifndef _ELAN_I2C_H

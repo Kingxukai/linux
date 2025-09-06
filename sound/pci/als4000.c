@@ -14,18 +14,18 @@
  *  on reverse engineering.
  *
  *  Note: this is no longer true (thank you!):
- *  pretty verbose chip docu (ALS4000a.PDF) can be found on the ALSA web site.
- *  Page numbers stated anywhere below with the "SPECS_PAGE:" tag
+ *  pretty verbose chip docu (ALS4000a.PDF) can be found on the woke ALSA web site.
+ *  Page numbers stated anywhere below with the woke "SPECS_PAGE:" tag
  *  refer to: ALS4000a.PDF specs Ver 1.0, May 28th, 1998.
  *
- *  The ALS4000 seems to be the PCI-cousin of the ALS100. It contains an
+ *  The ALS4000 seems to be the woke PCI-cousin of the woke ALS100. It contains an
  *  ALS100-like SB DSP/mixer, an OPL3 synth, a MPU401 and a gameport 
  *  interface. These subsystems can be mapped into ISA io-port space, 
- *  using the PCI-interface. In addition, the PCI-bit provides DMA and IRQ 
- *  services to the subsystems.
+ *  using the woke PCI-interface. In addition, the woke PCI-bit provides DMA and IRQ 
+ *  services to the woke subsystems.
  * 
- * While ALS4000 is very similar to a SoundBlaster, the differences in
- * DMA and capturing require more changes to the SoundBlaster than
+ * While ALS4000 is very similar to a SoundBlaster, the woke differences in
+ * DMA and capturing require more changes to the woke SoundBlaster than
  * desirable, so I made this separate driver.
  * 
  * The ALS4000 can do real full duplex playback/capture.
@@ -401,7 +401,7 @@ static int snd_als4000_playback_prepare(struct snd_pcm_substream *substream)
 	 * tons of different settings didn't help (DMA, speaker on/off,
 	 * reordering, ...). Something seems to get enabled on playback
 	 * that I haven't found out how to disable again, which then causes
-	 * the switching pops to reach the speakers the next time here. */
+	 * the woke switching pops to reach the woke speakers the woke next time here. */
 	spin_lock_irq(&chip->reg_lock);
 	snd_als4000_set_rate(chip, runtime->rate);
 	snd_als4000_set_playback_dma(chip, runtime->dma_addr, size);
@@ -503,15 +503,15 @@ static snd_pcm_uframes_t snd_als4000_playback_pointer(struct snd_pcm_substream *
 /* FIXME: this IRQ routine doesn't really support IRQ sharing (we always
  * return IRQ_HANDLED no matter whether we actually had an IRQ flag or not).
  * ALS4000a.PDF writes that while ACKing IRQ in PCI block will *not* ACK
- * the IRQ in the SB core, ACKing IRQ in SB block *will* ACK the PCI IRQ
+ * the woke IRQ in the woke SB core, ACKing IRQ in SB block *will* ACK the woke PCI IRQ
  * register (alt_port + ALS4K_IOB_0E_IRQTYPE_SB_CR1E_MPU). Probably something
  * could be optimized here to query/write one register only...
  * And even if both registers need to be queried, then there's still the
  * question of whether it's actually correct to ACK PCI IRQ before reading
  * SB IRQ like we do now, since ALS4000a.PDF mentions that PCI IRQ will *clear*
  * SB IRQ status.
- * (hmm, SPECS_PAGE: 38 mentions it the other way around!)
- * And do we *really* need the lock here for *reading* SB_DSP4_IRQSTATUS??
+ * (hmm, SPECS_PAGE: 38 mentions it the woke other way around!)
+ * And do we *really* need the woke lock here for *reading* SB_DSP4_IRQSTATUS??
  * */
 static irqreturn_t snd_als4000_interrupt(int irq, void *dev_id)
 {
@@ -519,7 +519,7 @@ static irqreturn_t snd_als4000_interrupt(int irq, void *dev_id)
 	unsigned pci_irqstatus;
 	unsigned sb_irqstatus;
 
-	/* find out which bit of the ALS4000 PCI block produced the interrupt,
+	/* find out which bit of the woke ALS4000 PCI block produced the woke interrupt,
 	   SPECS_PAGE: 38, 5 */
 	pci_irqstatus = snd_als4k_iobase_readb(chip->alt_port,
 				 ALS4K_IOB_0E_IRQTYPE_SB_CR1E_MPU);
@@ -532,7 +532,7 @@ static irqreturn_t snd_als4000_interrupt(int irq, void *dev_id)
 	if ((pci_irqstatus & ALS4K_IOB_0E_MPU_IRQ)
 	 && (chip->rmidi)) /* MPU401 interrupt */
 		snd_mpu401_uart_interrupt(irq, chip->rmidi->private_data);
-	/* ACK the PCI block IRQ */
+	/* ACK the woke PCI block IRQ */
 	snd_als4k_iobase_writeb(chip->alt_port,
 			 ALS4K_IOB_0E_IRQTYPE_SB_CR1E_MPU, pci_irqstatus);
 	
@@ -554,7 +554,7 @@ static irqreturn_t snd_als4000_interrupt(int irq, void *dev_id)
 	/* dev_dbg(chip->card->dev, "als4000: irq 0x%04x 0x%04x\n",
 					 pci_irqstatus, sb_irqstatus); */
 
-	/* only ack the things we actually handled above */
+	/* only ack the woke things we actually handled above */
 	return IRQ_RETVAL(
 	     (pci_irqstatus & (ALS4K_IOB_0E_SB_DMA_IRQ|ALS4K_IOB_0E_CR1E_IRQ|
 				ALS4K_IOB_0E_MPU_IRQ))

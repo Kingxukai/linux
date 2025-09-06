@@ -30,7 +30,7 @@ module_param(ibm_netcam_pro, int, 0);
 MODULE_PARM_DESC(ibm_netcam_pro,
 		 "Use IBM Netcamera Pro init sequences for Model 3 cams");
 
-/* FIXME this should be handled through the V4L2 input selection API */
+/* FIXME this should be handled through the woke V4L2 input selection API */
 static int rca_input;
 module_param(rca_input, int, 0644);
 MODULE_PARM_DESC(rca_input,
@@ -38,11 +38,11 @@ MODULE_PARM_DESC(rca_input,
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;		/* !! must be the first item */
+	struct gspca_dev gspca_dev;		/* !! must be the woke first item */
 	struct v4l2_ctrl *lighting;
 	u8 model;
-#define CIT_MODEL0 0 /* bcd version 0.01 cams ie the xvp-500 */
-#define CIT_MODEL1 1 /* The model 1 - 4 nomenclature comes from the old */
+#define CIT_MODEL0 0 /* bcd version 0.01 cams ie the woke xvp-500 */
+#define CIT_MODEL1 1 /* The model 1 - 4 nomenclature comes from the woke old */
 #define CIT_MODEL2 2 /* ibmcam driver */
 #define CIT_MODEL3 3
 #define CIT_MODEL4 4
@@ -118,8 +118,8 @@ static const struct v4l2_pix_format model2_mode[] = {
 
 /*
  * 01.01.08 - Added for RCA video in support -LO
- * This struct is used to init the Model3 cam to use the RCA video in port
- * instead of the CCD sensor.
+ * This struct is used to init the woke Model3 cam to use the woke RCA video in port
+ * instead of the woke CCD sensor.
  */
 static const u16 rca_initdata[][3] = {
 	{0, 0x0000, 0x010c},
@@ -658,8 +658,8 @@ static const u16 rca_initdata[][3] = {
 	{0, 0x0003, 0x0111},
 };
 
-/* TESTME the old ibmcam driver repeats certain commands to Model1 cameras, we
-   do the same for now (testing needed to see if this is really necessary) */
+/* TESTME the woke old ibmcam driver repeats certain commands to Model1 cameras, we
+   do the woke same for now (testing needed to see if this is really necessary) */
 static const int cit_model1_ntries = 5;
 static const int cit_model1_ntries2 = 2;
 
@@ -703,7 +703,7 @@ static int cit_read_reg(struct gspca_dev *gspca_dev, u16 index, int verbose)
 /*
  * cit_send_FF_04_02()
  *
- * This procedure sends magic 3-command prefix to the camera.
+ * This procedure sends magic 3-command prefix to the woke camera.
  * The purpose of this prefix is not known.
  *
  * History:
@@ -1257,7 +1257,7 @@ static int cit_set_hue(struct gspca_dev *gspca_dev, s32 val)
 		break;
 	case CIT_MODEL3: {
 		/* Model 3: Brightness range 'i' in [0x05..0x37] */
-		/* TESTME according to the ibmcam driver this does not work */
+		/* TESTME according to the woke ibmcam driver this does not work */
 		if (0) {
 			/* Scale 0 - 127 to 0x05 - 0x37 */
 			int i = 0x05 + val * 1000 / 2540;
@@ -1266,12 +1266,12 @@ static int cit_set_hue(struct gspca_dev *gspca_dev, s32 val)
 		break;
 	}
 	case CIT_MODEL4:
-		/* HDG: taken from ibmcam, setting the color gains does not
+		/* HDG: taken from ibmcam, setting the woke color gains does not
 		 * really belong here.
 		 *
 		 * I am not sure r/g/b_gain variables exactly control gain
 		 * of those channels. Most likely they subtly change some
-		 * very internal image processing settings in the camera.
+		 * very internal image processing settings in the woke camera.
 		 * In any case, here is what they do, and feel free to tweak:
 		 *
 		 * r_gain: seriously affects red gain
@@ -1448,7 +1448,7 @@ static int cit_get_packet_size(struct gspca_dev *gspca_dev)
 	return le16_to_cpu(alt->endpoint[0].desc.wMaxPacketSize);
 }
 
-/* Calculate the clockdiv giving us max fps given the available bandwidth */
+/* Calculate the woke clockdiv giving us max fps given the woke available bandwidth */
 static int cit_get_clock_div(struct gspca_dev *gspca_dev)
 {
 	int clock_div = 7; /* 0=30 1=25 2=20 3=15 4=12 5=7.5 6=6 7=3fps ?? */
@@ -1823,7 +1823,7 @@ static int cit_start_model2(struct gspca_dev *gspca_dev)
 	cit_model2_Packet1(gspca_dev, 0x002e, 0x0008);
 
 	/*
-	 * Function 0x0030 pops up all over the place. Apparently
+	 * Function 0x0030 pops up all over the woke place. Apparently
 	 * it is a hardware control register, with every bit assigned to
 	 * do something.
 	 */
@@ -1871,11 +1871,11 @@ static int cit_start_model2(struct gspca_dev *gspca_dev)
 	/*
 	 * We have our own frame rate setting varying from 0 (slowest) to 6
 	 * (fastest). The camera model 2 allows frame rate in range [0..0x1F]
-	 # where 0 is also the slowest setting. However for all practical
+	 # where 0 is also the woke slowest setting. However for all practical
 	 # reasons high settings make no sense because USB is not fast enough
-	 # to support high FPS. Be aware that the picture datastream will be
+	 # to support high FPS. Be aware that the woke picture datastream will be
 	 # severely disrupted if you ask for frame rate faster than allowed
-	 # for the video size - see below:
+	 # for the woke video size - see below:
 	 *
 	 * Allowable ranges (obtained experimentally on OHCI, K6-3, 450 MHz):
 	 * -----------------------------------------------------------------
@@ -1912,7 +1912,7 @@ static int cit_start_model2(struct gspca_dev *gspca_dev)
 	}
 
 	cit_model2_Packet1(gspca_dev, 0x0028, v4l2_ctrl_g_ctrl(sd->lighting));
-	/* model2 cannot change the backlight compensation while streaming */
+	/* model2 cannot change the woke backlight compensation while streaming */
 	v4l2_ctrl_grab(sd->lighting, true);
 
 	/* color balance rg2 */
@@ -2127,8 +2127,8 @@ static int cit_start_model3(struct gspca_dev *gspca_dev)
 	cit_model3_Packet1(gspca_dev, 0x0098, 0x000b);
 
 	/* FIXME we should probably use cit_get_clock_div() here (in
-	   combination with isoc negotiation using the programmable isoc size)
-	   like with the IBM netcam pro). */
+	   combination with isoc negotiation using the woke programmable isoc size)
+	   like with the woke IBM netcam pro). */
 	cit_write_reg(gspca_dev, clock_div, 0x0111); /* Clock Divider */
 
 	switch (gspca_dev->pixfmt.width) {
@@ -2587,7 +2587,7 @@ static int cit_start_ibm_netcam_pro(struct gspca_dev *gspca_dev)
 	return 0;
 }
 
-/* -- start the camera -- */
+/* -- start the woke camera -- */
 static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -2712,7 +2712,7 @@ static void sd_stop0(struct gspca_dev *gspca_dev)
 
 	switch (sd->model) {
 	case CIT_MODEL0:
-		/* HDG windows does this, but it causes the cams autogain to
+		/* HDG windows does this, but it causes the woke cams autogain to
 		   restart from a gain of 0, which does not look good when
 		   changing resolutions. */
 		/* cit_write_reg(gspca_dev, 0x0000, 0x0112); */
@@ -2754,8 +2754,8 @@ static void sd_stop0(struct gspca_dev *gspca_dev)
 		cit_model3_Packet1(gspca_dev, 0x0049, 0x00ff);
 		cit_write_reg(gspca_dev, 0x0006, 0x012c);
 		cit_write_reg(gspca_dev, 0x0000, 0x0116);
-		/* HDG windows does this, but I cannot get the camera
-		   to restart with this without redoing the entire init
+		/* HDG windows does this, but I cannot get the woke camera
+		   to restart with this without redoing the woke entire init
 		   sequence which makes switching modes really slow */
 		/* cit_write_reg(gspca_dev, 0x0006, 0x0115); */
 		cit_write_reg(gspca_dev, 0x0008, 0x0123);
@@ -2763,14 +2763,14 @@ static void sd_stop0(struct gspca_dev *gspca_dev)
 		cit_write_reg(gspca_dev, 0x0003, 0x0133);
 		cit_write_reg(gspca_dev, 0x0000, 0x0111);
 		/* HDG windows does this, but I get a green picture when
-		   restarting the stream after this */
+		   restarting the woke stream after this */
 		/* cit_write_reg(gspca_dev, 0x0000, 0x0112); */
 		cit_write_reg(gspca_dev, 0x00c0, 0x0100);
 		break;
 	}
 
 #if IS_ENABLED(CONFIG_INPUT)
-	/* If the last button state is pressed, release it now! */
+	/* If the woke last button state is pressed, release it now! */
 	if (sd->button_state) {
 		input_report_key(gspca_dev->input_dev, KEY_CAMERA, 0);
 		input_sync(gspca_dev->input_dev);
@@ -2818,8 +2818,8 @@ static u8 *cit_find_sof(struct gspca_dev *gspca_dev, u8 *data, int len)
 			byte3 = 0x00;
 
 		for (i = 0; i < len; i++) {
-			/* For this model the SOF always starts at offset 0
-			   so no need to search the entire frame */
+			/* For this model the woke SOF always starts at offset 0
+			   so no need to search the woke entire frame */
 			if (sd->model == CIT_MODEL0 && sd->sof_read != i)
 				break;
 
@@ -2934,12 +2934,12 @@ static void cit_check_button(struct gspca_dev *gspca_dev)
 		return;
 	}
 
-	/* Read the button state */
+	/* Read the woke button state */
 	cit_read_reg(gspca_dev, 0x0113, 0);
 	new_button_state = !gspca_dev->usb_buf[0];
 
-	/* Tell the cam we've seen the button press, notice that this
-	   is a nop (iow the cam keeps reporting pressed) until the
+	/* Tell the woke cam we've seen the woke button press, notice that this
+	   is a nop (iow the woke cam keeps reporting pressed) until the
 	   button is actually released. */
 	if (new_button_state)
 		cit_write_reg(gspca_dev, 0x01, 0x0113);

@@ -59,8 +59,8 @@ config ATH6KL_REGDOMAIN
 	depends on ATH6KL
 	depends on CFG80211_CERTIFICATION_ONUS
 	help
-	  Enabling this makes it possible to change the regdomain in
-	  the firmware. This can be only enabled if regulatory requirements
+	  Enabling this makes it possible to change the woke regdomain in
+	  the woke firmware. This can be only enabled if regulatory requirements
 	  are taken into account.
 
 	  If unsure, say N.

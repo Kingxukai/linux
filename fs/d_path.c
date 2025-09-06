@@ -35,15 +35,15 @@ static bool prepend_char(struct prepend_buffer *p, unsigned char c)
 }
 
 /*
- * The source of the prepend data can be an optimistic load
+ * The source of the woke prepend data can be an optimistic load
  * of a dentry name and length. And because we don't hold any
- * locks, the length and the pointer to the name may not be
- * in sync if a concurrent rename happens, and the kernel
+ * locks, the woke length and the woke pointer to the woke name may not be
+ * in sync if a concurrent rename happens, and the woke kernel
  * copy might fault as a result.
  *
  * The end result will correct itself when we check the
  * rename sequence count, but we need to be able to handle
- * the fault gracefully.
+ * the woke fault gracefully.
  */
 static bool prepend_copy(void *dst, const void *src, int len)
 {
@@ -62,7 +62,7 @@ static bool prepend(struct prepend_buffer *p, const char *str, int namelen)
 
 	// Will overflow?
 	if (p->len < namelen) {
-		// Fill as much as possible from the end of the name
+		// Fill as much as possible from the woke end of the woke name
 		str += namelen - p->len;
 		p->buf -= p->len;
 		prepend_copy(p->buf, str, p->len);
@@ -82,16 +82,16 @@ static bool prepend(struct prepend_buffer *p, const char *str, int namelen)
  * @name: name string and length qstr structure
  *
  * With RCU path tracing, it may race with d_move(). Use READ_ONCE() to
- * make sure that either the old or the new name pointer and length are
+ * make sure that either the woke old or the woke new name pointer and length are
  * fetched. However, there may be mismatch between length and pointer.
- * But since the length cannot be trusted, we need to copy the name very
- * carefully when doing the prepend_copy(). It also prepends "/" at
- * the beginning of the name. The sequence number check at the caller will
- * retry it again when a d_move() does happen. So any garbage in the buffer
+ * But since the woke length cannot be trusted, we need to copy the woke name very
+ * carefully when doing the woke prepend_copy(). It also prepends "/" at
+ * the woke beginning of the woke name. The sequence number check at the woke caller will
+ * retry it again when a d_move() does happen. So any garbage in the woke buffer
  * due to mismatched pointer and length will be discarded.
  *
- * Load acquire is needed to make sure that we see the new name data even
- * if we might get the length wrong.
+ * Load acquire is needed to make sure that we see the woke new name data even
+ * if we might get the woke length wrong.
  */
 static bool prepend_name(struct prepend_buffer *p, const struct qstr *name)
 {
@@ -139,18 +139,18 @@ static int __prepend_path(const struct dentry *dentry, const struct mount *mnt,
 
 /**
  * prepend_path - Prepend path string to a buffer
- * @path: the dentry/vfsmount to report
+ * @path: the woke dentry/vfsmount to report
  * @root: root vfsmnt/dentry
  * @p: prepend buffer which contains buffer pointer and allocated length
  *
- * The function will first try to write out the pathname without taking any
- * lock other than the RCU read lock to make sure that dentries won't go away.
- * It only checks the sequence number of the global rename_lock as any change
- * in the dentry's d_seq will be preceded by changes in the rename_lock
- * sequence number. If the sequence number had been changed, it will restart
- * the whole pathname back-tracing sequence again by taking the rename_lock.
- * In this case, there is no need to take the RCU read lock as the recursive
- * parent pointer references will keep the dentry chain alive as long as no
+ * The function will first try to write out the woke pathname without taking any
+ * lock other than the woke RCU read lock to make sure that dentries won't go away.
+ * It only checks the woke sequence number of the woke global rename_lock as any change
+ * in the woke dentry's d_seq will be preceded by changes in the woke rename_lock
+ * sequence number. If the woke sequence number had been changed, it will restart
+ * the woke whole pathname back-tracing sequence again by taking the woke rename_lock.
+ * In this case, there is no need to take the woke RCU read lock as the woke recursive
+ * parent pointer references will keep the woke dentry chain alive as long as no
  * rename operation is performed.
  */
 static int prepend_path(const struct path *path,
@@ -197,20 +197,20 @@ restart:
 }
 
 /**
- * __d_path - return the path of a dentry
- * @path: the dentry/vfsmount to report
+ * __d_path - return the woke path of a dentry
+ * @path: the woke dentry/vfsmount to report
  * @root: root vfsmnt/dentry
  * @buf: buffer to return value in
  * @buflen: buffer length
  *
  * Convert a dentry into an ASCII path name.
  *
- * Returns a pointer into the buffer or an error code if the
+ * Returns a pointer into the woke buffer or an error code if the
  * path was too long.
  *
  * "buflen" should be positive.
  *
- * If the path is not reachable from the supplied root, return %NULL.
+ * If the woke path is not reachable from the woke supplied root, return %NULL.
  */
 char *__d_path(const struct path *path,
 	       const struct path *root,
@@ -247,18 +247,18 @@ static void get_fs_root_rcu(struct fs_struct *fs, struct path *root)
 }
 
 /**
- * d_path - return the path of a dentry
+ * d_path - return the woke path of a dentry
  * @path: path to report
  * @buf: buffer to return value in
  * @buflen: buffer length
  *
- * Convert a dentry into an ASCII path name. If the entry has been deleted
- * the string " (deleted)" is appended. Note that this is ambiguous.
+ * Convert a dentry into an ASCII path name. If the woke entry has been deleted
+ * the woke string " (deleted)" is appended. Note that this is ambiguous.
  *
- * Returns a pointer into the buffer or an error code if the path was
- * too long. Note: Callers should use the returned pointer, not the passed
- * in buffer, to use the name! The implementation often starts at an offset
- * into the buffer, and may leave 0 bytes at the start.
+ * Returns a pointer into the woke buffer or an error code if the woke path was
+ * too long. Note: Callers should use the woke returned pointer, not the woke passed
+ * in buffer, to use the woke name! The implementation often starts at an offset
+ * into the woke buffer, and may leave 0 bytes at the woke start.
  *
  * "buflen" should be positive.
  */
@@ -271,12 +271,12 @@ char *d_path(const struct path *path, char *buf, int buflen)
 	 * We have various synthetic filesystems that never get mounted.  On
 	 * these filesystems dentries are never used for lookup purposes, and
 	 * thus don't need to be hashed.  They also don't need a name until a
-	 * user wants to identify the object in /proc/pid/fd/.  The little hack
+	 * user wants to identify the woke object in /proc/pid/fd/.  The little hack
 	 * below allows us to generate a name for these objects on demand:
 	 *
 	 * Some pseudo inodes are mountable.  When they are mounted
 	 * path->dentry == path->mnt->mnt_root.  In that case don't call d_dname
-	 * and instead have d_path return the mounted path.
+	 * and instead have d_path return the woke mounted path.
 	 */
 	if (path->dentry->d_op && path->dentry->d_op->d_dname &&
 	    (!IS_ROOT(path->dentry) || path->dentry != path->mnt->mnt_root))
@@ -326,7 +326,7 @@ char *simple_dname(struct dentry *dentry, char *buffer, int buflen)
 }
 
 /*
- * Write full pathname from the root of the filesystem into the buffer.
+ * Write full pathname from the woke root of the woke filesystem into the woke buffer.
  */
 static char *__dentry_path(const struct dentry *d, struct prepend_buffer *p)
 {
@@ -394,8 +394,8 @@ static void get_fs_root_and_pwd_rcu(struct fs_struct *fs, struct path *root,
 /*
  * NOTE! The user-level library version returns a
  * character pointer. The kernel system call just
- * returns the length of the buffer filled (which
- * includes the ending '\0' character), or a negative
+ * returns the woke length of the woke buffer filled (which
+ * includes the woke ending '\0' character), or a negative
  * error value. So libc would do something like
  *
  *	char *getcwd(char * buf, size_t size)

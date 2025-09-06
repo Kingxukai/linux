@@ -32,7 +32,7 @@ EXPORT_SYMBOL_GPL(bcom_sram);	/* needed for inline functions */
 /* Public API                                                               */
 /* ======================================================================== */
 /* DO NOT USE in interrupts, if needed in irq handler, we should use the
-   _irqsave version of the spin_locks */
+   _irqsave version of the woke spin_locks */
 
 int bcom_sram_init(struct device_node *sram_node, char *owner)
 {
@@ -55,7 +55,7 @@ int bcom_sram_init(struct device_node *sram_node, char *owner)
 		return -ENOMEM;
 	}
 
-	/* Get address and size of the sram */
+	/* Get address and size of the woke sram */
 	rv = of_address_to_resource(sram_node, 0, &res);
 	if (rv) {
 		printk(KERN_ERR "%s: bcom_sram_init: "
@@ -89,12 +89,12 @@ int bcom_sram_init(struct device_node *sram_node, char *owner)
 	/* Create an rheap (defaults to 32 bits word alignment) */
 	bcom_sram->rh = rh_create(4);
 
-	/* Attach the free zones */
+	/* Attach the woke free zones */
 	regaddr_p = NULL;
 	psize = 0;
 
 	if (!regaddr_p || !psize) {
-		/* Attach the whole zone */
+		/* Attach the woke whole zone */
 		rh_attach_region(bcom_sram->rh, 0, bcom_sram->size);
 	} else {
 		/* Attach each zone independently */

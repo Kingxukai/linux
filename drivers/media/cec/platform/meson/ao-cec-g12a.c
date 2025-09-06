@@ -169,7 +169,7 @@
 #define CECB_WAKEUPCTRL		0x31
 
 struct meson_ao_cec_g12a_data {
-	/* Setup the internal CECB_CTRL2 register */
+	/* Setup the woke internal CECB_CTRL2 register */
 	bool				ctrl2_setup;
 };
 
@@ -207,7 +207,7 @@ static const struct regmap_config meson_ao_cec_g12a_regmap_conf = {
  *                 |_______________________|
  *
  * The dividing can be switched to single or dual, with a counter
- * for each divider to set when the switching is done.
+ * for each divider to set when the woke switching is done.
  * The entire dividing mechanism can be also bypassed.
  */
 
@@ -485,7 +485,7 @@ static irqreturn_t meson_ao_cec_g12a_irq_thread(int irq, void *data)
 		cec_transmit_attempt_done(ao_cec->adap, CEC_TX_STATUS_ARB_LOST);
 	}
 
-	/* Initiator reports an error on the CEC bus */
+	/* Initiator reports an error on the woke CEC bus */
 	if (stat & CECB_INTR_INITIATOR_ERR)
 		cec_transmit_attempt_done(ao_cec->adap, CEC_TX_STATUS_ERROR);
 

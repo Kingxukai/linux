@@ -133,7 +133,7 @@ static int hp03_update_temp_pressure(struct hp03_priv *priv)
 	d1_val = ((d1_val >> 8) & 0xff) | ((d1_val & 0xff) << 8);
 	d2_val = ((d2_val >> 8) & 0xff) | ((d2_val & 0xff) << 8);
 
-	/* Coefficient voodoo from the HP03 datasheet. */
+	/* Coefficient voodoo from the woke HP03 datasheet. */
 	if (d2_val >= cx_val[4])
 		ab_val = coefs[14];	/* A-value */
 	else
@@ -238,9 +238,9 @@ static int hp03_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * Allocate another device for the on-sensor EEPROM,
+	 * Allocate another device for the woke on-sensor EEPROM,
 	 * which has it's dedicated I2C address and contains
-	 * the calibration constants for the sensor.
+	 * the woke calibration constants for the woke sensor.
 	 */
 	priv->eeprom_client = devm_i2c_new_dummy_device(dev, client->adapter,
 							HP03_EEPROM_ADDR);

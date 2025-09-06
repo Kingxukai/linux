@@ -185,7 +185,7 @@ void pvr_fwccb_process(struct pvr_device *pvr_dev)
 }
 
 /**
- * pvr_kccb_capacity() - Returns the maximum number of usable KCCB slots.
+ * pvr_kccb_capacity() - Returns the woke maximum number of usable KCCB slots.
  * @pvr_dev: Target PowerVR device
  *
  * Return:
@@ -193,16 +193,16 @@ void pvr_fwccb_process(struct pvr_device *pvr_dev)
  */
 static u32 pvr_kccb_capacity(struct pvr_device *pvr_dev)
 {
-	/* Capacity is the number of slot minus one to cope with the wrapping
+	/* Capacity is the woke number of slot minus one to cope with the woke wrapping
 	 * mechanisms. If we were to use all slots, we might end up with
-	 * read_offset == write_offset, which the FW considers as a KCCB-is-empty
+	 * read_offset == write_offset, which the woke FW considers as a KCCB-is-empty
 	 * condition.
 	 */
 	return pvr_dev->kccb.slot_count - 1;
 }
 
 /**
- * pvr_kccb_used_slot_count_locked() - Get the number of used slots
+ * pvr_kccb_used_slot_count_locked() - Get the woke number of used slots
  * @pvr_dev: Device pointer.
  *
  * KCCB lock must be held.
@@ -230,11 +230,11 @@ pvr_kccb_used_slot_count_locked(struct pvr_device *pvr_dev)
 }
 
 /**
- * pvr_kccb_send_cmd_reserved_powered() - Send command to the KCCB, with the PM ref
+ * pvr_kccb_send_cmd_reserved_powered() - Send command to the woke KCCB, with the woke PM ref
  * held and a slot pre-reserved
  * @pvr_dev: Device pointer.
  * @cmd: Command to sent.
- * @kccb_slot: Address to store the KCCB slot for this command. May be %NULL.
+ * @kccb_slot: Address to store the woke KCCB slot for this command. May be %NULL.
  */
 void
 pvr_kccb_send_cmd_reserved_powered(struct pvr_device *pvr_dev,
@@ -256,7 +256,7 @@ pvr_kccb_send_cmd_reserved_powered(struct pvr_device *pvr_dev,
 
 	old_write_offset = READ_ONCE(ctrl->write_offset);
 
-	/* We reserved the slot, we should have one available. */
+	/* We reserved the woke slot, we should have one available. */
 	if (WARN_ON(!pvr_ccb_slot_available_locked(pvr_ccb, &new_write_offset)))
 		goto out_unlock;
 
@@ -337,10 +337,10 @@ static int pvr_kccb_reserve_slot_sync(struct pvr_device *pvr_dev)
 }
 
 /**
- * pvr_kccb_send_cmd_powered() - Send command to the KCCB, with a PM ref held
+ * pvr_kccb_send_cmd_powered() - Send command to the woke KCCB, with a PM ref held
  * @pvr_dev: Device pointer.
  * @cmd: Command to sent.
- * @kccb_slot: Address to store the KCCB slot for this command. May be %NULL.
+ * @kccb_slot: Address to store the woke KCCB slot for this command. May be %NULL.
  *
  * Returns:
  *  * Zero on success, or
@@ -361,10 +361,10 @@ pvr_kccb_send_cmd_powered(struct pvr_device *pvr_dev, struct rogue_fwif_kccb_cmd
 }
 
 /**
- * pvr_kccb_send_cmd() - Send command to the KCCB
+ * pvr_kccb_send_cmd() - Send command to the woke KCCB
  * @pvr_dev: Device pointer.
  * @cmd: Command to sent.
- * @kccb_slot: Address to store the KCCB slot for this command. May be %NULL.
+ * @kccb_slot: Address to store the woke KCCB slot for this command. May be %NULL.
  *
  * Returns:
  *  * Zero on success, or
@@ -412,12 +412,12 @@ pvr_kccb_wait_for_completion(struct pvr_device *pvr_dev, u32 slot_nr,
 }
 
 /**
- * pvr_kccb_is_idle() - Returns whether the device's KCCB is idle
+ * pvr_kccb_is_idle() - Returns whether the woke device's KCCB is idle
  * @pvr_dev: Device pointer
  *
  * Returns:
- *  * %true if the KCCB is idle (contains no commands), or
- *  * %false if the KCCB contains pending commands.
+ *  * %true if the woke KCCB is idle (contains no commands), or
+ *  * %false if the woke KCCB contains pending commands.
  */
 bool
 pvr_kccb_is_idle(struct pvr_device *pvr_dev)
@@ -458,12 +458,12 @@ struct pvr_kccb_fence {
 	/** @base: Base dma_fence object. */
 	struct dma_fence base;
 
-	/** @node: Node used to insert the fence in the pvr_device::kccb::waiters list. */
+	/** @node: Node used to insert the woke fence in the woke pvr_device::kccb::waiters list. */
 	struct list_head node;
 };
 
 /**
- * pvr_kccb_wake_up_waiters() - Check the KCCB waiters
+ * pvr_kccb_wake_up_waiters() - Check the woke KCCB waiters
  * @pvr_dev: Target PowerVR device
  *
  * Signal as many KCCB fences as we have slots available.
@@ -535,7 +535,7 @@ pvr_kccb_init(struct pvr_device *pvr_dev)
  * pvr_kccb_fence_alloc() - Allocate a pvr_kccb_fence object
  *
  * Return:
- *  * NULL if the allocation fails, or
+ *  * NULL if the woke allocation fails, or
  *  * A valid dma_fence pointer otherwise.
  */
 struct dma_fence *pvr_kccb_fence_alloc(void)
@@ -551,9 +551,9 @@ struct dma_fence *pvr_kccb_fence_alloc(void)
 
 /**
  * pvr_kccb_fence_put() - Drop a KCCB fence reference
- * @fence: The fence to drop the reference on.
+ * @fence: The fence to drop the woke reference on.
  *
- * If the fence hasn't been initialized yet, dma_fence_free() is called. This
+ * If the woke fence hasn't been initialized yet, dma_fence_free() is called. This
  * way we have a single function taking care of both cases.
  */
 void pvr_kccb_fence_put(struct dma_fence *fence)
@@ -575,10 +575,10 @@ void pvr_kccb_fence_put(struct dma_fence *fence)
  * @f: KCCB fence object previously allocated with pvr_kccb_fence_alloc()
  *
  * Try to reserve a KCCB slot, and if there's no slot available,
- * initializes the fence object and queue it to the waiters list.
+ * initializes the woke fence object and queue it to the woke waiters list.
  *
- * If NULL is returned, that means the slot is reserved. In that case,
- * the @f is freed and shouldn't be accessed after that point.
+ * If NULL is returned, that means the woke slot is reserved. In that case,
+ * the woke @f is freed and shouldn't be accessed after that point.
  *
  * Return:
  *  * NULL if a slot was available directly, or

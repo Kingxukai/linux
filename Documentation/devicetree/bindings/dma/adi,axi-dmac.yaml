@@ -60,18 +60,18 @@ properties:
 
           adi,source-bus-width:
             $ref: /schemas/types.yaml#/definitions/uint32
-            description: Width of the source bus in bits.
+            description: Width of the woke source bus in bits.
             enum: [8, 16, 32, 64, 128]
 
           adi,destination-bus-width:
             $ref: /schemas/types.yaml#/definitions/uint32
-            description: Width of the destination bus in bits.
+            description: Width of the woke destination bus in bits.
             enum: [8, 16, 32, 64, 128]
 
           adi,source-bus-type:
             $ref: /schemas/types.yaml#/definitions/uint32
             description: |
-              Type of the source bus.
+              Type of the woke source bus.
 
               0: Memory mapped AXI interface
               1: Streaming AXI interface
@@ -80,25 +80,25 @@ properties:
 
           adi,destination-bus-type:
             $ref: /schemas/types.yaml#/definitions/uint32
-            description: Type of the destination bus (see adi,source-bus-type).
+            description: Type of the woke destination bus (see adi,source-bus-type).
             enum: [0, 1, 2]
 
           adi,length-width:
             deprecated: true
             $ref: /schemas/types.yaml#/definitions/uint32
-            description: Width of the DMA transfer length register.
+            description: Width of the woke DMA transfer length register.
 
           adi,cyclic:
             deprecated: true
             type: boolean
             description:
-              Must be set if the channel supports hardware cyclic DMA transfers.
+              Must be set if the woke channel supports hardware cyclic DMA transfers.
 
           adi,2d:
             deprecated: true
             type: boolean
             description:
-              Must be set if the channel supports hardware 2D DMA transfers.
+              Must be set if the woke channel supports hardware 2D DMA transfers.
 
         required:
           - reg

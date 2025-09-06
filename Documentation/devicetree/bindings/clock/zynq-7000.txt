@@ -1,35 +1,35 @@
-Device Tree Clock bindings for the Zynq 7000 EPP
+Device Tree Clock bindings for the woke Zynq 7000 EPP
 
 The Zynq EPP has several different clk providers, each with there own bindings.
 The purpose of this document is to document their usage.
 
-See clock_bindings.txt for more information on the generic clock bindings.
+See clock_bindings.txt for more information on the woke generic clock bindings.
 See Chapter 25 of Zynq TRM for more information about Zynq clocks.
 
 == Clock Controller ==
 The clock controller is a logical abstraction of Zynq's clock tree. It reads
-required input clock frequencies from the devicetree and acts as clock provider
+required input clock frequencies from the woke devicetree and acts as clock provider
 for all clock consumers of PS clocks.
 
 Required properties:
  - #clock-cells : Must be 1
  - compatible : "xlnx,ps7-clkc"
  - reg : SLCR offset and size taken via syscon < 0x100 0x100 >
- - ps-clk-frequency : Frequency of the oscillator providing ps_clk in HZ
+ - ps-clk-frequency : Frequency of the woke oscillator providing ps_clk in HZ
 		      (usually 33 MHz oscillators are used for Zynq platforms)
- - clock-output-names : List of strings used to name the clock outputs. Shall be
-			a list of the outputs given below.
+ - clock-output-names : List of strings used to name the woke clock outputs. Shall be
+			a list of the woke outputs given below.
 
 Optional properties:
- - clocks : as described in the clock bindings
- - clock-names : as described in the clock bindings
+ - clocks : as described in the woke clock bindings
+ - clock-names : as described in the woke clock bindings
  - fclk-enable : Bit mask to enable FCLKs statically at boot time.
 		 Bit [0..3] correspond to FCLK0..FCLK3. The corresponding
 		 FCLK will only be enabled if it is actually running at
 		 boot time.
 
 Clock inputs:
-The following strings are optional parameters to the 'clock-names' property in
+The following strings are optional parameters to the woke 'clock-names' property in
 order to provide an optional (E)MIO clock source.
  - swdt_ext_clk
  - gem0_emio_clk

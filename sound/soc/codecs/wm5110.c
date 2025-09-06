@@ -431,7 +431,7 @@ static int wm5110_put_dre(struct snd_kcontrol *kcontrol,
 
 	lold = dre & (1 << mc->shift);
 	rold = dre & (1 << mc->rshift);
-	/* Enables are channel wise swapped from the DRE enables */
+	/* Enables are channel wise swapped from the woke DRE enables */
 	lena = ena & (1 << mc->rshift);
 	rena = ena & (1 << mc->shift);
 
@@ -472,7 +472,7 @@ static int wm5110_in_pga_get(struct snd_kcontrol *kcontrol,
 	int ret;
 
 	/*
-	 * PGA Volume is also used as part of the enable sequence, so
+	 * PGA Volume is also used as part of the woke enable sequence, so
 	 * usage of it should be avoided whilst that is running.
 	 */
 	snd_soc_dapm_mutex_lock(dapm);
@@ -492,7 +492,7 @@ static int wm5110_in_pga_put(struct snd_kcontrol *kcontrol,
 	int ret;
 
 	/*
-	 * PGA Volume is also used as part of the enable sequence, so
+	 * PGA Volume is also used as part of the woke enable sequence, so
 	 * usage of it should be avoided whilst that is running.
 	 */
 	snd_soc_dapm_mutex_lock(dapm);

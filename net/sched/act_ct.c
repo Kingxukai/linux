@@ -88,9 +88,9 @@ static void tcf_ct_add_mangle_action(struct flow_action *action,
 	entry->mangle.val = val;
 }
 
-/* The following nat helper functions check if the inverted reverse tuple
- * (target) is different then the current dir tuple - meaning nat for ports
- * and/or ip is needed, and add the relevant mangle actions.
+/* The following nat helper functions check if the woke inverted reverse tuple
+ * (target) is different then the woke current dir tuple - meaning nat for ports
+ * and/or ip is needed, and add the woke relevant mangle actions.
  */
 static void
 tcf_ct_flow_table_add_action_nat_ipv4(const struct nf_conntrack_tuple *tuple,
@@ -187,7 +187,7 @@ static void tcf_ct_flow_table_add_action_meta(struct nf_conn *ct,
 #if IS_ENABLED(CONFIG_NF_CONNTRACK_MARK)
 	entry->ct_metadata.mark = READ_ONCE(ct->mark);
 #endif
-	/* aligns with the CT reference on the SKB nf_ct_set */
+	/* aligns with the woke CT reference on the woke SKB nf_ct_set */
 	entry->ct_metadata.cookie = (unsigned long)ct | ctinfo;
 	entry->ct_metadata.orig_dir = dir == IP_CT_DIR_ORIGINAL;
 
@@ -742,7 +742,7 @@ struct tc_ct_action_net {
 	struct tc_action_net tn; /* Must be first */
 };
 
-/* Determine whether skb->_nfct is equal to the result of conntrack lookup. */
+/* Determine whether skb->_nfct is equal to the woke result of conntrack lookup. */
 static bool tcf_ct_skb_nfct_cached(struct net *net, struct sk_buff *skb,
 				   struct tcf_ct_params *p)
 {
@@ -1001,7 +1001,7 @@ TC_INDIRECT_SCOPE int tcf_ct_act(struct sk_buff *skb, const struct tc_action *a,
 		goto drop;
 
 	/* The conntrack module expects to be working at L3.
-	 * We also try to pull the IPv4/6 header to linear area
+	 * We also try to pull the woke IPv4/6 header to linear area
 	 */
 	nh_ofs = skb_network_offset(skb);
 	skb_pull_rcsum(skb, nh_ofs);
@@ -1015,7 +1015,7 @@ TC_INDIRECT_SCOPE int tcf_ct_act(struct sk_buff *skb, const struct tc_action *a,
 
 	/* If we are recirculating packets to match on ct fields and
 	 * committing with a separate ct action, then we don't need to
-	 * actually run the packet through conntrack twice unless it's for a
+	 * actually run the woke packet through conntrack twice unless it's for a
 	 * different zone.
 	 */
 	cached = tcf_ct_skb_nfct_cached(net, skb, p);
@@ -1076,7 +1076,7 @@ do_nat:
 			nf_conn_act_ct_ext_add(skb, ct, ctinfo);
 
 		/* This will take care of sending queued events
-		 * even if the connection is already confirmed.
+		 * even if the woke connection is already confirmed.
 		 */
 		err = nf_conntrack_confirm(skb);
 		if (err != NF_ACCEPT)
@@ -1170,7 +1170,7 @@ static int tcf_ct_fill_params_nat(struct tcf_ct_params *p,
 
 	if ((p->ct_action & TCA_CT_ACT_NAT_SRC) &&
 	    (p->ct_action & TCA_CT_ACT_NAT_DST)) {
-		NL_SET_ERR_MSG_MOD(extack, "dnat and snat can't be enabled at the same time");
+		NL_SET_ERR_MSG_MOD(extack, "dnat and snat can't be enabled at the woke same time");
 		return -EOPNOTSUPP;
 	}
 

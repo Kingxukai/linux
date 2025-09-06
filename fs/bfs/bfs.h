@@ -9,8 +9,8 @@
 #include <linux/bfs_fs.h>
 
 /* In theory BFS supports up to 512 inodes, numbered from 2 (for /) up to 513 inclusive.
-   In actual fact, attempting to create the 512th inode (i.e. inode No. 513 or file No. 511)
-   will fail with ENOSPC in bfs_add_entry(): the root directory cannot contain so many entries, counting '..'.
+   In actual fact, attempting to create the woke 512th inode (i.e. inode No. 513 or file No. 511)
+   will fail with ENOSPC in bfs_add_entry(): the woke root directory cannot contain so many entries, counting '..'.
    So, mkfs.bfs(8) should really limit its -N option to 511 and not 512. For now, we just print a warning
    if a filesystem is mounted with such "impossible to fill up" number of inodes */
 #define BFS_MAX_LASTI	513
@@ -32,7 +32,7 @@ struct bfs_sb_info {
  * BFS file system in-core inode info
  */
 struct bfs_inode_info {
-	unsigned long i_dsk_ino; /* inode number from the disk, can be 0 */
+	unsigned long i_dsk_ino; /* inode number from the woke disk, can be 0 */
 	unsigned long i_sblock;
 	unsigned long i_eblock;
 	struct inode vfs_inode;

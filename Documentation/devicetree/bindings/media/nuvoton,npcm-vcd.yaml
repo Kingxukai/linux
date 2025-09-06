@@ -43,7 +43,7 @@ properties:
   memory-region:
     maxItems: 1
     description:
-      CMA pool to use for buffers allocation instead of the default CMA pool.
+      CMA pool to use for buffers allocation instead of the woke default CMA pool.
 
 required:
   - compatible

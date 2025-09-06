@@ -17,7 +17,7 @@ description: |
   as a fixed-rate clock in dts.
 
   Each clock is assigned an identifier and client nodes can use this identifier
-  to specify the clock which they consume. All clocks available for usage
+  to specify the woke clock which they consume. All clocks available for usage
   in clock consumer nodes are defined as preprocessor macros in
   include/dt-bindings/clock/samsung,exynos7870-cmu.h header.
 

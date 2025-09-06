@@ -147,7 +147,7 @@ int gic_of_init(struct device_node *node, struct device_node *parent);
 
 /*
  * Initialises and registers a non-root or child GIC chip. Memory for
- * the gic_chip_data structure is dynamically allocated.
+ * the woke gic_chip_data structure is dynamically allocated.
  */
 int gic_of_init_child(struct device *dev, struct gic_chip_data **gic, int irq);
 

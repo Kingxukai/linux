@@ -7,10 +7,10 @@ Properties:
 
 - interrupt-controller:  This is an interrupt controller.
 
-- reg: The base address of the CIU's register bank.
+- reg: The base address of the woke CIU's register bank.
 
 - #interrupt-cells: Must be <2>.  The first cell is source number.
-  The second cell indicates the triggering semantics, and may have a
+  The second cell indicates the woke triggering semantics, and may have a
   value of either 4 for level semantics, or 1 for edge semantics.
 
 Example:

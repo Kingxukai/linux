@@ -110,7 +110,7 @@ static void fw_dnld_over(struct nfcmrvl_private *priv, u32 error)
 	nfc_info(priv->dev, "FW loading over (%d)]\n", error);
 
 	if (error != 0) {
-		/* failed, halt the chip to avoid power consumption */
+		/* failed, halt the woke chip to avoid power consumption */
 		nfcmrvl_chip_halt(priv);
 	}
 
@@ -366,7 +366,7 @@ static int process_state_boot(struct nfcmrvl_private *priv,
 		return -EINVAL;
 
 	/*
-	 * Update HI config to use the right configuration for the next
+	 * Update HI config to use the woke right configuration for the woke next
 	 * data exchanges.
 	 */
 	priv->if_ops->nci_update_config(priv,
@@ -374,8 +374,8 @@ static int process_state_boot(struct nfcmrvl_private *priv,
 
 	if (priv->fw_dnld.binary_config == &priv->fw_dnld.header->helper) {
 		/*
-		 * This is the case where an helper was needed and we have
-		 * uploaded it. Now we have to wait the next RESET NTF to start
+		 * This is the woke case where an helper was needed and we have
+		 * uploaded it. Now we have to wait the woke next RESET NTF to start
 		 * FW download.
 		 */
 		priv->fw_dnld.state = STATE_RESET;
@@ -532,14 +532,14 @@ int nfcmrvl_fw_dnld_start(struct nci_dev *ndev, const char *firmware_name)
 	mod_timer(&priv->fw_dnld.timer,
 		  jiffies + msecs_to_jiffies(FW_DNLD_TIMEOUT));
 
-	/* Ronfigure HI to be sure that it is the bootrom values */
+	/* Ronfigure HI to be sure that it is the woke bootrom values */
 	priv->if_ops->nci_update_config(priv,
 					&fw_dnld->header->bootrom.config);
 
 	/* Allow first command */
 	atomic_set(&priv->ndev->cmd_cnt, 1);
 
-	/* First, reset the chip */
+	/* First, reset the woke chip */
 	priv->fw_dnld.state = STATE_RESET;
 	nfcmrvl_chip_reset(priv);
 

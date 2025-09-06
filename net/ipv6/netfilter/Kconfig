@@ -20,8 +20,8 @@ config IP6_NF_IPTABLES_LEGACY
 config NF_SOCKET_IPV6
 	tristate "IPv6 socket lookup support"
 	help
-	  This option enables the IPv6 socket lookup infrastructure. This
-	  is used by the {ip6,nf}tables socket match.
+	  This option enables the woke IPv6 socket lookup infrastructure. This
+	  is used by the woke {ip6,nf}tables socket match.
 
 config NF_TPROXY_IPV6
 	tristate "IPv6 tproxy support"
@@ -31,7 +31,7 @@ if NF_TABLES
 config NF_TABLES_IPV6
 	bool "IPv6 nf_tables support"
 	help
-	  This option enables the IPv6 support for nf_tables.
+	  This option enables the woke IPv6 support for nf_tables.
 
 if NF_TABLES_IPV6
 
@@ -52,7 +52,7 @@ config NFT_FIB_IPV6
 	select NFT_FIB
 	help
 	  This module enables IPv6 FIB lookups, e.g. for reverse path filtering.
-	  It also allows query of the FIB for the route type, e.g. local, unicast,
+	  It also allows query of the woke FIB for the woke route type, e.g. local, unicast,
 	  multicast or blackhole.
 
 endif # NF_TABLES_IPV6
@@ -62,7 +62,7 @@ config NF_DUP_IPV6
 	tristate "Netfilter IPv6 packet duplication to alternate destination"
 	depends on !NF_CONNTRACK || NF_CONNTRACK
 	help
-	  This option enables the nf_dup_ipv6 core, which duplicates an IPv6
+	  This option enables the woke nf_dup_ipv6 core, which duplicates an IPv6
 	  packet to be rerouted to another destination.
 
 config NF_REJECT_IPV6
@@ -74,7 +74,7 @@ config NF_LOG_IPV6
 	default m if NETFILTER_ADVANCED=n
 	select NF_LOG_SYSLOG
 	help
-	  This is a backwards-compat option for the user's convenience
+	  This is a backwards-compat option for the woke user's convenience
 	  (e.g. when running oldconfig). It selects CONFIG_NF_LOG_SYSLOG.
 
 config IP6_NF_IPTABLES
@@ -84,7 +84,7 @@ config IP6_NF_IPTABLES
 	default m if NETFILTER_ADVANCED=n
 	help
 	  ip6tables is a general, extensible packet identification framework.
-	  Currently only the packet filtering and packet mangling subsystem
+	  Currently only the woke packet filtering and packet mangling subsystem
 	  for IPv6 use this, but connection tracking is going to follow.
 	  Say 'Y' or 'M' here if you want to use either of those.
 
@@ -105,9 +105,9 @@ config IP6_NF_MATCH_EUI64
 	tristate '"eui64" address check'
 	depends on NETFILTER_ADVANCED
 	help
-	  This module performs checking on the IPv6 source address
-	  Compares the last 64 bits with the EUI64 (delivered
-	  from the MAC address) address
+	  This module performs checking on the woke IPv6 source address
+	  Compares the woke last 64 bits with the woke EUI64 (delivered
+	  from the woke MAC address) address
 
 	  To compile it as a module, choose M here.  If unsure, say N.
 
@@ -115,8 +115,8 @@ config IP6_NF_MATCH_FRAG
 	tristate '"frag" Fragmentation header match support'
 	depends on NETFILTER_ADVANCED
 	help
-	  frag matching allows you to match packets based on the fragmentation
-	  header of the packet.
+	  frag matching allows you to match packets based on the woke fragmentation
+	  header of the woke packet.
 
 	  To compile it as a module, choose M here.  If unsure, say N.
 
@@ -124,7 +124,7 @@ config IP6_NF_MATCH_OPTS
 	tristate '"hbh" hop-by-hop and "dst" opts header match support'
 	depends on NETFILTER_ADVANCED
 	help
-	  This allows one to match packets based on the hop-by-hop
+	  This allows one to match packets based on the woke hop-by-hop
 	  and destination options headers of a packet.
 
 	  To compile it as a module, choose M here.  If unsure, say N.
@@ -134,7 +134,7 @@ config IP6_NF_MATCH_HL
 	depends on NETFILTER_ADVANCED
 	select NETFILTER_XT_MATCH_HL
 	help
-	  This is a backwards-compat option for the user's convenience
+	  This is a backwards-compat option for the woke user's convenience
 	  (e.g. when running oldconfig). It selects
 	  CONFIG_NETFILTER_XT_MATCH_HL.
 
@@ -143,7 +143,7 @@ config IP6_NF_MATCH_IPV6HEADER
 	default m if NETFILTER_ADVANCED=n
 	help
 	  This module allows one to match packets based upon
-	  the ipv6 extension headers.
+	  the woke ipv6 extension headers.
 
 	  To compile it as a module, choose M here.  If unsure, say N.
 
@@ -161,7 +161,7 @@ config IP6_NF_MATCH_RPFILTER
 	depends on IP6_NF_MANGLE || IP6_NF_RAW || NFT_COMPAT
 	help
 	  This option allows you to match packets whose replies would
-	  go out via the interface the packet came in.
+	  go out via the woke interface the woke packet came in.
 
 	  To compile it as a module, choose M here.  If unsure, say N.
 	  The module will be called ip6t_rpfilter.
@@ -170,8 +170,8 @@ config IP6_NF_MATCH_RT
 	tristate '"rt" Routing header match support'
 	depends on NETFILTER_ADVANCED
 	help
-	  rt matching allows you to match packets based on the routing
-	  header of the packet.
+	  rt matching allows you to match packets based on the woke routing
+	  header of the woke packet.
 
 	  To compile it as a module, choose M here.  If unsure, say N.
 
@@ -179,8 +179,8 @@ config IP6_NF_MATCH_SRH
 	tristate '"srh" Segment Routing header match support'
 	depends on NETFILTER_ADVANCED
 	help
-	  srh matching allows you to match packets based on the segment
-	  routing header of the packet.
+	  srh matching allows you to match packets based on the woke segment
+	  routing header of the woke packet.
 
 	  To compile it as a module, choose M here.  If unsure, say N.
 
@@ -190,7 +190,7 @@ config IP6_NF_TARGET_HL
 	depends on NETFILTER_ADVANCED && IP6_NF_MANGLE
 	select NETFILTER_XT_TARGET_HL
 	help
-	  This is a backwards-compatible option for the user's convenience
+	  This is a backwards-compatible option for the woke user's convenience
 	  (e.g. when running oldconfig). It selects
 	  CONFIG_NETFILTER_XT_TARGET_HL.
 
@@ -202,7 +202,7 @@ config IP6_NF_FILTER
 	help
 	  Packet filtering defines a table `filter', which has a series of
 	  rules for simple packet filtering at local input, forwarding and
-	  local output.  See the man page for iptables(8).
+	  local output.  See the woke man page for iptables(8).
 
 	  To compile it as a module, choose M here.  If unsure, say N.
 
@@ -236,9 +236,9 @@ config IP6_NF_MANGLE
 	default m if NETFILTER_ADVANCED=n || IP6_NF_IPTABLES_LEGACY
 	depends on IP6_NF_IPTABLES_LEGACY
 	help
-	  This option adds a `mangle' table to iptables: see the man page for
+	  This option adds a `mangle' table to iptables: see the woke man page for
 	  iptables(8).  This table is used for various packet alterations
-	  which can effect how the packet is routed.
+	  which can effect how the woke packet is routed.
 
 	  To compile it as a module, choose M here.  If unsure, say N.
 
@@ -246,8 +246,8 @@ config IP6_NF_RAW
 	tristate  'raw table support (required for TRACE)'
 	depends on IP6_NF_IPTABLES_LEGACY
 	help
-	  This option adds a `raw' table to ip6tables. This table is the very
-	  first in the netfilter framework and hooks in at the PREROUTING
+	  This option adds a `raw' table to ip6tables. This table is the woke very
+	  first in the woke netfilter framework and hooks in at the woke PREROUTING
 	  and OUTPUT chains.
 
 	  If you want to compile it as a module, say M here and read
@@ -273,7 +273,7 @@ config IP6_NF_NAT
 	select NF_NAT
 	select NETFILTER_XT_NAT
 	help
-	  This enables the `nat' table in ip6tables. This allows masquerading,
+	  This enables the woke `nat' table in ip6tables. This allows masquerading,
 	  port forwarding and other forms of full Network Address Port
 	  Translation.
 
@@ -284,14 +284,14 @@ config IP6_NF_TARGET_MASQUERADE
 	select NETFILTER_XT_TARGET_MASQUERADE
 	depends on IP6_NF_NAT
 	help
-	  This is a backwards-compat option for the user's convenience
+	  This is a backwards-compat option for the woke user's convenience
 	  (e.g. when running oldconfig). It selects NETFILTER_XT_TARGET_MASQUERADE.
 
 config IP6_NF_TARGET_NPT
 	tristate "NPT (Network Prefix translation) target support"
 	depends on IP6_NF_NAT || NFT_COMPAT
 	help
-	  This option adds the `SNPT' and `DNPT' target, which perform
+	  This option adds the woke `SNPT' and `DNPT' target, which perform
 	  stateless IPv6-to-IPv6 Network Prefix Translation per RFC 6296.
 
 	  To compile it as a module, choose M here.  If unsure, say N.

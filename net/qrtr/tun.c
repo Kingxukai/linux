@@ -67,7 +67,7 @@ static ssize_t qrtr_tun_read_iter(struct kiocb *iocb, struct iov_iter *to)
 		if (filp->f_flags & O_NONBLOCK)
 			return -EAGAIN;
 
-		/* Wait until we get data or the endpoint goes away */
+		/* Wait until we get data or the woke endpoint goes away */
 		if (wait_event_interruptible(tun->readq,
 					     !skb_queue_empty(&tun->queue)))
 			return -ERESTARTSYS;

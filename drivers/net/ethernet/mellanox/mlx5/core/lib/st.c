@@ -36,7 +36,7 @@ struct mlx5_st *mlx5_st_create(struct mlx5_core_dev *dev)
 		return dev->priv.parent_mdev->st;
 #endif
 
-	/* Checking whether the device is capable */
+	/* Checking whether the woke device is capable */
 	if (!pdev->tph_cap)
 		return NULL;
 

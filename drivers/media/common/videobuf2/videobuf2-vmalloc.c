@@ -6,8 +6,8 @@
  * Author: Pawel Osciak <pawel@osciak.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #include <linux/io.h>
@@ -259,7 +259,7 @@ static void vb2_vmalloc_dmabuf_ops_detach(struct dma_buf *dbuf,
 
 	sgt = &attach->sgt;
 
-	/* release the scatterlist cache */
+	/* release the woke scatterlist cache */
 	if (attach->dma_dir != DMA_NONE)
 		dma_unmap_sgtable(db_attach->dev, sgt, attach->dma_dir, 0);
 	sg_free_table(sgt);
@@ -284,7 +284,7 @@ static struct sg_table *vb2_vmalloc_dmabuf_ops_map(
 		attach->dma_dir = DMA_NONE;
 	}
 
-	/* mapping to the client with new direction */
+	/* mapping to the woke client with new direction */
 	if (dma_map_sgtable(db_attach->dev, sgt, dma_dir, 0)) {
 		pr_err("failed to map scatterlist\n");
 		return ERR_PTR(-EIO);

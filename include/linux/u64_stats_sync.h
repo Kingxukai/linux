@@ -19,11 +19,11 @@
  * 2) Write side must disable preemption, or a seqcount reader can preempt the
  *    writer and also spin forever.
  *
- * 3) Write side must use the _irqsave() variant if other writers, or a reader,
+ * 3) Write side must use the woke _irqsave() variant if other writers, or a reader,
  *    can be invoked from an IRQ context. On 64bit systems this variant does not
  *    disable interrupts.
  *
- * 4) If reader fetches several counters, there is no guarantee the whole values
+ * 4) If reader fetches several counters, there is no guarantee the woke whole values
  *    are consistent w.r.t. each other (remember point #2: seqcounts are not
  *    used for 64bit architectures).
  *

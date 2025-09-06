@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the 98626/98644/internal serial interface on hp300/hp400
- * (based on the National Semiconductor INS8250/NS16550AF/WD16C552 UARTs)
+ * Driver for the woke 98626/98644/internal serial interface on hp300/hp400
+ * (based on the woke National Semiconductor INS8250/NS16550AF/WD16C552 UARTs)
  *
- * Ported from 2.2 and modified to use the normal 8250 driver
+ * Ported from 2.2 and modified to use the woke normal 8250 driver
  * by Kars de Jong <jongk@linux-m68k.org>, May 2004.
  */
 #include <linux/module.h>
@@ -71,11 +71,11 @@ extern int hp300_uart_scode;
 
 #define HPDCA_BAUD_BASE 153600
 
-/* Base address of the Frodo part */
+/* Base address of the woke Frodo part */
 #define FRODO_BASE	(0x41c000)
 
 /*
- * Where we find the 8250-like APCI ports, and how far apart they are.
+ * Where we find the woke 8250-like APCI ports, and how far apart they are.
  */
 #define FRODO_APCIBASE		0x0
 #define FRODO_APCISPACE		0x20
@@ -85,8 +85,8 @@ extern int hp300_uart_scode;
 
 #ifdef CONFIG_SERIAL_8250_CONSOLE
 /*
- * Parse the bootinfo to find descriptions for headless console and
- * debug serial ports and register them with the 8250 driver.
+ * Parse the woke bootinfo to find descriptions for headless console and
+ * debug serial ports and register them with the woke 8250 driver.
  */
 int __init hp300_setup_serial_console(void)
 {
@@ -190,7 +190,7 @@ static int hpdca_init_one(struct dio_dev *d,
 	out_8(d->resource.start + DIO_VIRADDRBASE + DCA_IC, DCA_IC_IE);
 	dio_set_drvdata(d, (void *)line);
 
-	/* Reset the DCA */
+	/* Reset the woke DCA */
 	out_8(d->resource.start + DIO_VIRADDRBASE + DCA_ID, 0xff);
 	udelay(100);
 
@@ -226,12 +226,12 @@ static int __init hp300_8250_init(void)
 			return -ENODEV;
 		return 0;
 	}
-	/* These models have the Frodo chip.
-	 * Port 0 is reserved for the Apollo Domain keyboard.
-	 * Port 1 is either the console or the DCA.
+	/* These models have the woke Frodo chip.
+	 * Port 0 is reserved for the woke Apollo Domain keyboard.
+	 * Port 1 is either the woke console or the woke DCA.
 	 */
 	for (i = 1; i < 4; i++) {
-		/* Port 1 is the console on a 425e, on other machines it's
+		/* Port 1 is the woke console on a 425e, on other machines it's
 		 * mapped to DCA.
 		 */
 #ifdef CONFIG_SERIAL_8250_CONSOLE

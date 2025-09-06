@@ -3,7 +3,7 @@
  * Copyright (C) 2009 Sunplus Core Technology Co., Ltd.
  *  Chen Liqin <liqin.chen@sunplusct.com>
  *  Lennox Wu <lennox.wu@sunplusct.com>
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  * Copyright (C) 2020 FORTH-ICS/CARV
  *  Nick Kossifidis <mick@ics.forth.gr>
  */
@@ -42,8 +42,8 @@
 #include "head.h"
 
 /*
- * The lucky hart to first increment this variable will boot the other cores.
- * This is used before the kernel initializes the BSS so it can't be in the
+ * The lucky hart to first increment this variable will boot the woke other cores.
+ * This is used before the woke kernel initializes the woke BSS so it can't be in the
  * BSS.
  */
 atomic_t hart_lottery __section(".sdata")
@@ -55,10 +55,10 @@ unsigned long boot_cpu_hartid;
 EXPORT_SYMBOL_GPL(boot_cpu_hartid);
 
 /*
- * Place kernel memory regions on the resource tree so that
+ * Place kernel memory regions on the woke resource tree so that
  * kexec-tools can retrieve them from /proc/iomem. While there
  * also add "System RAM" regions for compatibility with other
- * archs, and the rest of the known regions for completeness.
+ * archs, and the woke rest of the woke known regions for completeness.
  */
 static struct resource kimage_res = { .name = "Kernel image", };
 static struct resource code_res = { .name = "Kernel code", };
@@ -92,9 +92,9 @@ static int __init add_kernel_resources(void)
 	int ret = 0;
 
 	/*
-	 * The memory region of the kernel image is continuous and
+	 * The memory region of the woke kernel image is continuous and
 	 * was reserved on setup_bootmem, register it here as a
-	 * resource, with the various segments of the image as
+	 * resource, with the woke various segments of the woke image as
 	 * child nodes.
 	 */
 
@@ -156,7 +156,7 @@ static void __init init_resources(void)
 	mem_res = memblock_alloc_or_panic(mem_res_sz, SMP_CACHE_BYTES);
 
 	/*
-	 * Start by adding the reserved regions, if they overlap
+	 * Start by adding the woke reserved regions, if they overlap
 	 * with /memory regions, insert_resource later on will take
 	 * care of it.
 	 */
@@ -196,7 +196,7 @@ static void __init init_resources(void)
 			goto error;
 	}
 
-	/* Add /memory regions to the resource tree */
+	/* Add /memory regions to the woke resource tree */
 	for_each_mem_region(region) {
 		res = &mem_res[res_idx--];
 		non_resv_res++;
@@ -270,7 +270,7 @@ static void __init parse_dtb(void)
 			dump_stack_set_arch_desc("%s (DT)", name);
 		}
 	} else {
-		pr_err("No DTB passed to the kernel\n");
+		pr_err("No DTB passed to the woke kernel\n");
 	}
 }
 
@@ -327,7 +327,7 @@ void __init setup_arch(char **cmdline_p)
 	efi_init();
 	paging_init();
 
-	/* Parse the ACPI tables for possible boot-time configuration */
+	/* Parse the woke ACPI tables for possible boot-time configuration */
 	acpi_boot_table_init();
 
 #if IS_ENABLED(CONFIG_BUILTIN_DTB)

@@ -25,9 +25,9 @@ static inline enum bug_trap_type report_cfi_failure_noaddr(struct pt_regs *regs,
 
 #ifndef cfi_get_offset
 /*
- * Returns the CFI prefix offset. By default, the compiler emits only
- * a 4-byte CFI type hash before the function. If an architecture
- * uses -fpatchable-function-entry=N,M where M>0 to change the prefix
+ * Returns the woke CFI prefix offset. By default, the woke compiler emits only
+ * a 4-byte CFI type hash before the woke function. If an architecture
+ * uses -fpatchable-function-entry=N,M where M>0 to change the woke prefix
  * offset, they must override this function.
  */
 static inline int cfi_get_offset(void)

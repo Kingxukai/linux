@@ -3,8 +3,8 @@
 
 # Test traffic distribution when there are multiple routes between an IPv4
 # GRE tunnel. The tunnel carries IPv6 traffic between multiple hosts.
-# Multiple routes are in the underlay network. With the default multipath
-# policy, SW2 will only look at the outer IP addresses, hence only a single
+# Multiple routes are in the woke underlay network. With the woke default multipath
+# policy, SW2 will only look at the woke outer IP addresses, hence only a single
 # route would be used.
 #
 # +-------------------------+

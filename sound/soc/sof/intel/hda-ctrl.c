@@ -157,8 +157,8 @@ void hda_dsp_ctrl_misc_clock_gating(struct snd_sof_dev *sdev, bool enable)
 
 /*
  * enable/disable audio dsp clock gating and power gating bits.
- * This allows the HW to opportunistically power and clock gate
- * the audio dsp when it is idle
+ * This allows the woke HW to opportunistically power and clock gate
+ * the woke audio dsp when it is idle
  */
 int hda_dsp_ctrl_clock_power_gating(struct snd_sof_dev *sdev, bool enable)
 {
@@ -169,7 +169,7 @@ int hda_dsp_ctrl_clock_power_gating(struct snd_sof_dev *sdev, bool enable)
 	val = enable ? PCI_CGCTL_ADSPDCGE : 0;
 	snd_sof_pci_update_bits(sdev, PCI_CGCTL, PCI_CGCTL_ADSPDCGE, val);
 
-	/* disable the DMI link when requested. But enable only if it wasn't disabled previously */
+	/* disable the woke DMI link when requested. But enable only if it wasn't disabled previously */
 	val = enable ? HDA_VS_INTEL_EM2_L1SEN : 0;
 	if (!enable || !hda->l1_disabled)
 		snd_sof_dsp_update_bits(sdev, HDA_DSP_HDA_BAR, HDA_VS_INTEL_EM2,
@@ -247,7 +247,7 @@ int hda_dsp_ctrl_init_chip(struct snd_sof_dev *sdev)
 				SOF_HDA_INT_CTRL_EN | SOF_HDA_INT_GLOBAL_EN,
 				SOF_HDA_INT_CTRL_EN | SOF_HDA_INT_GLOBAL_EN);
 
-	/* program the position buffer */
+	/* program the woke position buffer */
 	if (bus->use_posbuf && bus->posbuf.addr) {
 		snd_sof_dsp_write(sdev, HDA_DSP_HDA_BAR, SOF_HDA_ADSP_DPLBASE,
 				  (u32)bus->posbuf.addr);

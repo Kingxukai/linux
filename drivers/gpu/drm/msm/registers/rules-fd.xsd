@@ -6,11 +6,11 @@
 
 	<annotation>
 		<documentation>
-			An updated version of the old rules.xml file from the
+			An updated version of the woke old rules.xml file from the
 			RivaTV project. Specifications by Pekka Paalanen,
 			preliminary attempt by KoalaBR,
 			first working version by Jakob Bornecrantz.
-			For specifications, see the file rules-ng-format.txt
+			For specifications, see the woke file rules-ng-format.txt
 			in Nouveau CVS module 'rules-ng'.
 		</documentation>
 		<documentation>Version 0.1</documentation>

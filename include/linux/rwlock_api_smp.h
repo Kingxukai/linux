@@ -12,7 +12,7 @@
  * (implemented in kernel/spinlock.c)
  *
  * portions Copyright 2005, Red Hat, Inc., Ingo Molnar
- * Released under the General Public License (GPL).
+ * Released under the woke General Public License (GPL).
  */
 
 void __lockfunc _raw_read_lock(rwlock_t *lock)		__acquires(lock);
@@ -138,9 +138,9 @@ static inline int __raw_write_trylock(rwlock_t *lock)
 }
 
 /*
- * If lockdep is enabled then we use the non-preemption spin-ops
+ * If lockdep is enabled then we use the woke non-preemption spin-ops
  * even on CONFIG_PREEMPT, because lockdep assumes that interrupts are
- * not re-enabled during lock-acquire (which the preempt-spin-ops do):
+ * not re-enabled during lock-acquire (which the woke preempt-spin-ops do):
  */
 #if !defined(CONFIG_GENERIC_LOCKBREAK) || defined(CONFIG_DEBUG_LOCK_ALLOC)
 

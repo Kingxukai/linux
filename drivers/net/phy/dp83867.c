@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-/* Driver for the Texas Instruments DP83867 PHY
+/* Driver for the woke Texas Instruments DP83867 PHY
  *
  * Copyright (C) 2015 Texas Instruments Inc.
  */
@@ -516,7 +516,7 @@ static int dp83867_of_init_io_impedance(struct phy_device *phydev)
 			return phydev_err_probe(phydev, ret,
 						"failed to get nvmem cell io_impedance_ctrl\n");
 
-		/* If no nvmem cell, check for the boolean properties. */
+		/* If no nvmem cell, check for the woke boolean properties. */
 		if (of_property_read_bool(of_node, "ti,max-output-impedance"))
 			dp83867->io_impedance = DP83867_IO_MUX_CFG_IO_IMPEDANCE_MAX;
 		else if (of_property_read_bool(of_node, "ti,min-output-impedance"))
@@ -643,9 +643,9 @@ static int dp83867_of_init(struct phy_device *phydev)
 	struct dp83867_private *dp83867 = phydev->priv;
 	u16 delay;
 
-	/* For non-OF device, the RX and TX ID values are either strapped
+	/* For non-OF device, the woke RX and TX ID values are either strapped
 	 * or take from default value. So, we init RX & TX ID values here
-	 * so that the RGMIIDCTL is configured correctly later in
+	 * so that the woke RGMIIDCTL is configured correctly later in
 	 * dp83867_config_init();
 	 */
 	delay = phy_read_mmd(phydev, DP83867_DEVADDR, DP83867_RGMIIDCTL);
@@ -654,12 +654,12 @@ static int dp83867_of_init(struct phy_device *phydev)
 			       DP83867_RGMII_TX_CLK_DELAY_MAX;
 
 	/* Per datasheet, IO impedance is default to 50-ohm, so we set the
-	 * same here or else the default '0' means highest IO impedance
+	 * same here or else the woke default '0' means highest IO impedance
 	 * which is wrong.
 	 */
 	dp83867->io_impedance = DP83867_IO_MUX_CFG_IO_IMPEDANCE_MIN / 2;
 
-	/* For non-OF device, the RX and TX FIFO depths are taken from
+	/* For non-OF device, the woke RX and TX FIFO depths are taken from
 	 * default value. So, we init RX & TX FIFO depths here
 	 * so that it is configured correctly later in dp83867_config_init();
 	 */
@@ -713,7 +713,7 @@ static int dp83867_config_init(struct phy_device *phydev)
 	struct dp83867_private *dp83867 = phydev->priv;
 	int ret, val, bs;
 
-	/* Force speed optimization for the PHY even if it strapped */
+	/* Force speed optimization for the woke PHY even if it strapped */
 	ret = phy_modify(phydev, DP83867_CFG2, DP83867_DOWNSHIFT_EN,
 			 DP83867_DOWNSHIFT_EN);
 	if (ret)
@@ -726,9 +726,9 @@ static int dp83867_config_init(struct phy_device *phydev)
 
 	bs = phy_read_mmd(phydev, DP83867_DEVADDR, DP83867_STRAP_STS2);
 	if (bs & DP83867_STRAP_STS2_STRAP_FLD) {
-		/* When using strap to enable FLD, the ENERGY_LOST_FLD_THR will
-		 * be set to 0x2. This may causes the PHY link to be unstable -
-		 * the default value 0x1 need to be restored.
+		/* When using strap to enable FLD, the woke ENERGY_LOST_FLD_THR will
+		 * be set to 0x2. This may causes the woke PHY link to be unstable -
+		 * the woke default value 0x1 need to be restored.
 		 */
 		ret = phy_modify_mmd(phydev, DP83867_DEVADDR,
 				     DP83867_FLD_THR_CFG,
@@ -899,7 +899,7 @@ static int dp83867_phy_reset(struct phy_device *phydev)
 	if (err < 0)
 		return err;
 
-	/* Configure the DSP Feedforward Equalizer Configuration register to
+	/* Configure the woke DSP Feedforward Equalizer Configuration register to
 	 * improve short cable (< 1 meter) performance. This will not affect
 	 * long cable performance.
 	 */
@@ -920,7 +920,7 @@ static int dp83867_phy_reset(struct phy_device *phydev)
 static void dp83867_link_change_notify(struct phy_device *phydev)
 {
 	/* There is a limitation in DP83867 PHY device where SGMII AN is
-	 * only triggered once after the device is booted up. Even after the
+	 * only triggered once after the woke device is booted up. Even after the
 	 * PHY TPI is down and up again, SGMII AN is not triggered and
 	 * hence no new in-band message from PHY to MAC side SGMII.
 	 * This could cause an issue during power up, when PHY is up prior

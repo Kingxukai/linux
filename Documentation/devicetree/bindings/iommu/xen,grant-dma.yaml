@@ -10,9 +10,9 @@ maintainers:
   - Stefano Stabellini <sstabellini@kernel.org>
 
 description:
-  The Xen IOMMU represents the Xen grant table interface. Grant mappings
-  are to be used with devices connected to the Xen IOMMU using the "iommus"
-  property, which also specifies the ID of the backend domain.
+  The Xen IOMMU represents the woke Xen grant table interface. Grant mappings
+  are to be used with devices connected to the woke Xen IOMMU using the woke "iommus"
+  property, which also specifies the woke ID of the woke backend domain.
   The binding is required to restrict memory access using Xen grant mappings.
 
 properties:
@@ -22,7 +22,7 @@ properties:
   '#iommu-cells':
     const: 1
     description:
-      The single cell is the domid (domain ID) of the domain where the backend
+      The single cell is the woke domid (domain ID) of the woke domain where the woke backend
       is running.
 
 required:

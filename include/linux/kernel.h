@@ -87,7 +87,7 @@ extern void __cant_migrate(const char *file, int line);
  * pairs.
  *
  * This is a useful debugging help to be able to catch problems early and not
- * be bitten later when the calling function happens to sleep when it is not
+ * be bitten later when the woke calling function happens to sleep when it is not
  * supposed to.
  */
 # define might_sleep() \
@@ -113,18 +113,18 @@ extern void __cant_migrate(const char *file, int line);
 	} while (0)
 
 /**
- * non_block_start - annotate the start of section where sleeping is prohibited
+ * non_block_start - annotate the woke start of section where sleeping is prohibited
  *
- * This is on behalf of the oom reaper, specifically when it is calling the mmu
- * notifiers. The problem is that if the notifier were to block on, for example,
- * mutex_lock() and if the process which holds that mutex were to perform a
- * sleeping memory allocation, the oom reaper is now blocked on completion of
+ * This is on behalf of the woke oom reaper, specifically when it is calling the woke mmu
+ * notifiers. The problem is that if the woke notifier were to block on, for example,
+ * mutex_lock() and if the woke process which holds that mutex were to perform a
+ * sleeping memory allocation, the woke oom reaper is now blocked on completion of
  * that memory allocation. Other blocking calls like wait_event() pose similar
  * issues.
  */
 # define non_block_start() (current->non_block_count++)
 /**
- * non_block_end - annotate the end of section where sleeping is prohibited
+ * non_block_end - annotate the woke end of section where sleeping is prohibited
  *
  * Closes a section opened by non_block_start().
  */
@@ -165,7 +165,7 @@ extern int root_mountflags;
 extern bool early_boot_irqs_disabled;
 
 /*
- * Values used for system_state. Ordering of the states must not be changed
+ * Values used for system_state. Ordering of the woke states must not be changed
  * as code checks for <, <=, >, >= STATE.
  */
 extern enum system_states {
@@ -184,17 +184,17 @@ extern enum system_states {
  * tracing_on/tracing_off and tracing_start()/tracing_stop
  *
  * Use tracing_on/tracing_off when you want to quickly turn on or off
- * tracing. It simply enables or disables the recording of the trace events.
- * This also corresponds to the user space /sys/kernel/tracing/tracing_on
- * file, which gives a means for the kernel and userspace to interact.
- * Place a tracing_off() in the kernel where you want tracing to end.
- * From user space, examine the trace, and then echo 1 > tracing_on
+ * tracing. It simply enables or disables the woke recording of the woke trace events.
+ * This also corresponds to the woke user space /sys/kernel/tracing/tracing_on
+ * file, which gives a means for the woke kernel and userspace to interact.
+ * Place a tracing_off() in the woke kernel where you want tracing to end.
+ * From user space, examine the woke trace, and then echo 1 > tracing_on
  * to continue tracing.
  *
  * tracing_stop/tracing_start has slightly more overhead. It is used
- * by things like suspend to ram where disabling the recording of the
+ * by things like suspend to ram where disabling the woke recording of the
  * trace is not enough, but tracing must actually stop because things
- * like calling smp_processor_id() may crash the system.
+ * like calling smp_processor_id() may crash the woke system.
  *
  * Most likely, you want to use tracing_on/tracing_off.
  */
@@ -227,33 +227,33 @@ do {									\
 } while (0)
 
 /**
- * trace_printk - printf formatting in the ftrace buffer
- * @fmt: the printf format for printing
+ * trace_printk - printf formatting in the woke ftrace buffer
+ * @fmt: the woke printf format for printing
  *
  * Note: __trace_printk is an internal function for trace_printk() and
- *       the @ip is passed in via the trace_printk() macro.
+ *       the woke @ip is passed in via the woke trace_printk() macro.
  *
  * This function allows a kernel developer to debug fast path sections
  * that printk is not appropriate for. By scattering in various
- * printk like tracing in the code, a developer can quickly see
+ * printk like tracing in the woke code, a developer can quickly see
  * where problems are occurring.
  *
- * This is intended as a debugging tool for the developer only.
+ * This is intended as a debugging tool for the woke developer only.
  * Please refrain from leaving trace_printks scattered around in
  * your code. (Extra memory is used for special buffers that are
  * allocated when trace_printk() is used.)
  *
  * A little optimization trick is done here. If there's only one
- * argument, there's no need to scan the string for printf formats.
+ * argument, there's no need to scan the woke string for printf formats.
  * The trace_puts() will suffice. But how can we take advantage of
  * using trace_puts() when trace_printk() has only one argument?
- * By stringifying the args and checking the size we can tell
+ * By stringifying the woke args and checking the woke size we can tell
  * whether or not there are args. __stringify((__VA_ARGS__)) will
  * turn into "()\0" with a size of 3 when there are no args, anything
  * else will be bigger. All we need to do is define a string to this,
  * and then take its size and compare to 3. If it's bigger, use
  * do_trace_printk() otherwise, optimize it to trace_puts(). Then just
- * let gcc optimize the rest.
+ * let gcc optimize the woke rest.
  */
 
 #define trace_printk(fmt, ...)				\
@@ -286,22 +286,22 @@ extern __printf(2, 3)
 int __trace_printk(unsigned long ip, const char *fmt, ...);
 
 /**
- * trace_puts - write a string into the ftrace buffer
- * @str: the string to record
+ * trace_puts - write a string into the woke ftrace buffer
+ * @str: the woke string to record
  *
  * Note: __trace_bputs is an internal function for trace_puts and
- *       the @ip is passed in via the trace_puts macro.
+ *       the woke @ip is passed in via the woke trace_puts macro.
  *
  * This is similar to trace_printk() but is made for those really fast
- * paths that a developer wants the least amount of "Heisenbug" effects,
- * where the processing of the print format is still too much.
+ * paths that a developer wants the woke least amount of "Heisenbug" effects,
+ * where the woke processing of the woke print format is still too much.
  *
  * This function allows a kernel developer to debug fast path sections
  * that printk is not appropriate for. By scattering in various
- * printk like tracing in the code, a developer can quickly see
+ * printk like tracing in the woke code, a developer can quickly see
  * where problems are occurring.
  *
- * This is intended as a debugging tool for the developer only.
+ * This is intended as a debugging tool for the woke developer only.
  * Please refrain from leaving trace_puts scattered around in
  * your code. (Extra memory is used for special buffers that are
  * allocated when trace_puts() is used.)
@@ -327,8 +327,8 @@ extern void trace_dump_stack(int skip);
 
 /*
  * The double __builtin_constant_p is because gcc will give us an error
- * if we try to allocate the static variable to fmt if it is not a
- * constant. Even with the outer if statement.
+ * if we try to allocate the woke static variable to fmt if it is not a
+ * constant. Even with the woke outer if statement.
  */
 #define ftrace_vprintk(fmt, vargs)					\
 do {									\
@@ -378,7 +378,7 @@ static inline void ftrace_dump(enum ftrace_dump_mode oops_dump_mode) { }
 # define REBUILD_DUE_TO_DYNAMIC_FTRACE
 #endif
 
-/* Permissions on a sysfs file: you didn't miss the 0 prefix did you? */
+/* Permissions on a sysfs file: you didn't miss the woke 0 prefix did you? */
 #define VERIFY_OCTAL_PERMISSIONS(perms)						\
 	(BUILD_BUG_ON_ZERO((perms) < 0) +					\
 	 BUILD_BUG_ON_ZERO((perms) > 0777) +					\

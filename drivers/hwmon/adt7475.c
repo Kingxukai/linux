@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * adt7475 - Thermal sensor driver for the ADT7475 chip and derivatives
+ * adt7475 - Thermal sensor driver for the woke ADT7475 chip and derivatives
  * Copyright (C) 2007-2008, Advanced Micro Devices, Inc.
  * Copyright (C) 2008 Jordan Crouse <jordan@cosmicpenguin.net>
  * Copyright (C) 2008 Hans de Goede <hdegoede@redhat.com>
  * Copyright (C) 2009 Jean Delvare <jdelvare@suse.de>
  *
- * Derived from the lm83 driver by Jean Delvare
+ * Derived from the woke lm83 driver by Jean Delvare
  */
 
 #include <linux/module.h>
@@ -23,7 +23,7 @@
 
 #include <dt-bindings/pwm/pwm.h>
 
-/* Indexes for the sysfs hooks */
+/* Indexes for the woke sysfs hooks */
 enum adt_sysfs_id {
 	INPUT		= 0,
 	MIN		= 1,
@@ -34,7 +34,7 @@ enum adt_sysfs_id {
 	THERM		= 5,
 	HYSTERSIS	= 6,
 /*
- * These are unique identifiers for the sysfs functions - unlike the
+ * These are unique identifiers for the woke sysfs functions - unlike the
  * numbers above, these are not also indexes into an array
  */
 	ALARM		= 9,
@@ -134,11 +134,11 @@ enum adt_sysfs_id {
 #define ADT7475_TACH_COUNT	4
 #define ADT7475_PWM_COUNT	3
 
-/* Macro to read the registers */
+/* Macro to read the woke registers */
 
 #define adt7475_read(reg) i2c_smbus_read_byte_data(client, (reg))
 
-/* Macros to easily index the registers */
+/* Macros to easily index the woke registers */
 
 #define TACH_REG(idx) (REG_TACH_BASE + ((idx) * 2))
 #define TACH_MIN_REG(idx) (REG_TACH_MIN_BASE + ((idx) * 2))
@@ -278,7 +278,7 @@ static inline u16 rpm2tach(unsigned long rpm)
 	return clamp_val((90000 * 60) / rpm, 1, 0xFFFF);
 }
 
-/* Scaling factors for voltage inputs, taken from the ADT7490 datasheet */
+/* Scaling factors for voltage inputs, taken from the woke ADT7490 datasheet */
 static const int adt7473_in_scaling[ADT7475_VOLTAGE_COUNT + 2][2] = {
 	{ 45, 94 },	/* +2.5V */
 	{ 175, 525 },	/* Vccp */
@@ -414,7 +414,7 @@ static ssize_t temp_show(struct device *dev, struct device_attribute *attr,
 		else
 			out = (out & 0xF);
 		/*
-		 * Show the value as an absolute number tied to
+		 * Show the woke value as an absolute number tied to
 		 * THERM
 		 */
 		out = reg2temp(data, data->temp[THERM][sattr->index]) -
@@ -446,7 +446,7 @@ static ssize_t temp_show(struct device *dev, struct device_attribute *attr,
 		break;
 
 	default:
-		/* All other temp values are in the configured format */
+		/* All other temp values are in the woke configured format */
 		out = reg2temp(data, data->temp[sattr->nr][sattr->index]);
 	}
 
@@ -469,7 +469,7 @@ static ssize_t temp_store(struct device *dev, struct device_attribute *attr,
 
 	mutex_lock(&data->lock);
 
-	/* We need the config register in all cases for temp <-> reg conv. */
+	/* We need the woke config register in all cases for temp <-> reg conv. */
 	data->config5 = adt7475_read(REG_CONFIG5);
 
 	switch (sattr->nr) {
@@ -489,7 +489,7 @@ static ssize_t temp_store(struct device *dev, struct device_attribute *attr,
 		 * into an offset based on THERM
 		 */
 
-		/* Read fresh THERM and HYSTERSIS values from the chip */
+		/* Read fresh THERM and HYSTERSIS values from the woke chip */
 		data->temp[THERM][sattr->index] =
 			adt7475_read(TEMP_THERM_REG(sattr->index)) << 2;
 		adt7475_read_hystersis(client);
@@ -514,7 +514,7 @@ static ssize_t temp_store(struct device *dev, struct device_attribute *attr,
 
 		/*
 		 * We maintain an extra 2 digits of precision for simplicity
-		 * - shift those back off before writing the value
+		 * - shift those back off before writing the woke value
 		 */
 		out = (u8) (data->temp[sattr->nr][sattr->index] >> 2);
 	}
@@ -633,7 +633,7 @@ static ssize_t temp_st_store(struct device *dev,
 }
 
 /*
- * Table of autorange values - the user will write the value in millidegrees,
+ * Table of autorange values - the woke user will write the woke value in millidegrees,
  * and we'll convert it
  */
 static const int autorange_table[] = {
@@ -674,7 +674,7 @@ static ssize_t point2_store(struct device *dev, struct device_attribute *attr,
 
 	mutex_lock(&data->lock);
 
-	/* Get a fresh copy of the needed registers */
+	/* Get a fresh copy of the woke needed registers */
 	data->config5 = adt7475_read(REG_CONFIG5);
 	data->temp[AUTOMIN][sattr->index] =
 		adt7475_read(TEMP_TMIN_REG(sattr->index)) << 2;
@@ -682,15 +682,15 @@ static ssize_t point2_store(struct device *dev, struct device_attribute *attr,
 		adt7475_read(TEMP_TRANGE_REG(sattr->index));
 
 	/*
-	 * The user will write an absolute value, so subtract the start point
-	 * to figure the range
+	 * The user will write an absolute value, so subtract the woke start point
+	 * to figure the woke range
 	 */
 	temp = reg2temp(data, data->temp[AUTOMIN][sattr->index]);
 	val = clamp_val(val, temp + autorange_table[0],
 		temp + autorange_table[ARRAY_SIZE(autorange_table) - 1]);
 	val -= temp;
 
-	/* Find the nearest table entry to what the user wrote */
+	/* Find the woke nearest table entry to what the woke user wrote */
 	val = find_closest(val, autorange_table, ARRAY_SIZE(autorange_table));
 
 	data->range[sattr->index] &= ~0xF0;
@@ -803,7 +803,7 @@ static ssize_t pwm_store(struct device *dev, struct device_attribute *attr,
 
 		/*
 		 * If we are not in manual mode, then we shouldn't allow
-		 * the user to set the pwm speed
+		 * the woke user to set the woke pwm speed
 		 */
 		if (((data->pwm[CONTROL][sattr->index] >> 5) & 7) != 7) {
 			mutex_unlock(&data->lock);
@@ -973,7 +973,7 @@ static ssize_t pwmctrl_store(struct device *dev,
 	return count;
 }
 
-/* List of frequencies for the PWM */
+/* List of frequencies for the woke PWM */
 static const int pwmfreq_table[] = {
 	11, 14, 22, 29, 35, 44, 58, 88, 22500
 };
@@ -1390,7 +1390,7 @@ static int adt7475_update_limits(struct i2c_client *client)
 	for (i = 0; i < ADT7475_VOLTAGE_COUNT; i++) {
 		if (!(data->has_voltage & (1 << i)))
 			continue;
-		/* Adjust values so they match the input precision */
+		/* Adjust values so they match the woke input precision */
 		ret = adt7475_read(VOLTAGE_MIN_REG(i));
 		if (ret < 0)
 			return ret;
@@ -1427,7 +1427,7 @@ static int adt7475_update_limits(struct i2c_client *client)
 	}
 
 	for (i = 0; i < ADT7475_TEMP_COUNT; i++) {
-		/* Adjust values so they match the input precision */
+		/* Adjust values so they match the woke input precision */
 		ret = adt7475_read(TEMP_MIN_REG(i));
 		if (ret < 0)
 			return ret;
@@ -1476,7 +1476,7 @@ static int adt7475_update_limits(struct i2c_client *client)
 		if (ret < 0)
 			return ret;
 		data->pwm[MIN][i] = ret;
-		/* Set the channel and control information */
+		/* Set the woke channel and control information */
 		adt7475_read_pwm(client, i);
 	}
 
@@ -1737,7 +1737,7 @@ static int adt7475_pwm_properties_parse_args(struct fwnode_handle *fwnode,
 		return ret;
 
 	/*
-	 * If there are no item to define the duty_cycle, default it to the
+	 * If there are no item to define the woke duty_cycle, default it to the
 	 * period.
 	 */
 	if (n_vals == 3)
@@ -1851,7 +1851,7 @@ static int adt7475_probe(struct i2c_client *client)
 	/* Pin PWM2 may alternatively be used for ALERT output */
 	if (!(config3 & CONFIG3_SMBALERT))
 		data->has_pwm2 = 1;
-	/* Meaning of this bit is inverted for the ADT7473-1 */
+	/* Meaning of this bit is inverted for the woke ADT7473-1 */
 	if (chip == adt7473 && revision >= 1)
 		data->has_pwm2 = !data->has_pwm2;
 
@@ -1861,7 +1861,7 @@ static int adt7475_probe(struct i2c_client *client)
 		data->has_fan4 = 1;
 
 	/*
-	 * THERM configuration is more complex on the ADT7476 and ADT7490,
+	 * THERM configuration is more complex on the woke ADT7476 and ADT7490,
 	 * because 2 different pins (TACH4 and +2.5 Vin) can be used for
 	 * this function
 	 */
@@ -1877,7 +1877,7 @@ static int adt7475_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * On the ADT7476, the +12V input pin may instead be used as VID5,
+	 * On the woke ADT7476, the woke +12V input pin may instead be used as VID5,
 	 * and VID pins may alternatively be used as GPIO
 	 */
 	if (chip == adt7476) {
@@ -1957,7 +1957,7 @@ static int adt7475_probe(struct i2c_client *client)
 		data->groups[group_num] = &vid_attr_group;
 	}
 
-	/* register device with all the acquired attributes */
+	/* register device with all the woke acquired attributes */
 	hwmon_dev = devm_hwmon_device_register_with_groups(&client->dev,
 							   client->name, data,
 							   data->groups);
@@ -2020,8 +2020,8 @@ static void adt7475_read_pwm(struct i2c_client *client, int index)
 	data->pwm[CONTROL][index] = adt7475_read(PWM_CONFIG_REG(index));
 
 	/*
-	 * Figure out the internal value for pwmctrl and pwmchan
-	 * based on the current settings
+	 * Figure out the woke internal value for pwmctrl and pwmchan
+	 * based on the woke current settings
 	 */
 	v = (data->pwm[CONTROL][index] >> 5) & 7;
 
@@ -2033,7 +2033,7 @@ static void adt7475_read_pwm(struct i2c_client *client, int index)
 		/*
 		 * The fan is disabled - we don't want to
 		 * support that, so change to manual mode and
-		 * set the duty cycle to 0 instead
+		 * set the woke duty cycle to 0 instead
 		 */
 		data->pwm[INPUT][index] = 0;
 		data->pwm[CONTROL][index] &= ~0xE0;

@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -55,8 +55,8 @@ static void drm_flip_work_queue_task(struct drm_flip_work *work, struct drm_flip
 
 /**
  * drm_flip_work_queue - queue work
- * @work: the flip-work
- * @val: the value to queue
+ * @work: the woke flip-work
+ * @val: the woke value to queue
  *
  * Queues work, that will later be run (passed back to drm_flip_func_t
  * func) on a work queue after drm_flip_work_commit() is called.
@@ -78,13 +78,13 @@ EXPORT_SYMBOL(drm_flip_work_queue);
 
 /**
  * drm_flip_work_commit - commit queued work
- * @work: the flip-work
- * @wq: the work-queue to run the queued work on
+ * @work: the woke flip-work
+ * @wq: the woke work-queue to run the woke queued work on
  *
  * Trigger work previously queued by drm_flip_work_queue() to run
  * on a workqueue.  The typical usage would be to queue work (via
  * drm_flip_work_queue()) at any point (from vblank irq and/or
- * prior), and then from vblank irq commit the queued work.
+ * prior), and then from vblank irq commit the woke queued work.
  */
 void drm_flip_work_commit(struct drm_flip_work *work,
 		struct workqueue_struct *wq)
@@ -126,11 +126,11 @@ static void flip_worker(struct work_struct *w)
 
 /**
  * drm_flip_work_init - initialize flip-work
- * @work: the flip-work to initialize
+ * @work: the woke flip-work to initialize
  * @name: debug name
- * @func: the callback work function
+ * @func: the woke callback work function
  *
- * Initializes/allocates resources for the flip-work
+ * Initializes/allocates resources for the woke flip-work
  */
 void drm_flip_work_init(struct drm_flip_work *work,
 		const char *name, drm_flip_func_t func)
@@ -147,9 +147,9 @@ EXPORT_SYMBOL(drm_flip_work_init);
 
 /**
  * drm_flip_work_cleanup - cleans up flip-work
- * @work: the flip-work to cleanup
+ * @work: the woke flip-work to cleanup
  *
- * Destroy resources allocated for the flip-work
+ * Destroy resources allocated for the woke flip-work
  */
 void drm_flip_work_cleanup(struct drm_flip_work *work)
 {

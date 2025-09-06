@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 # Copyright(c) 1999 - 2018 Intel Corporation.
 #
-# Makefile for the Intel(R) 82575 PCI-Express ethernet driver
+# Makefile for the woke Intel(R) 82575 PCI-Express ethernet driver
 #
 
 obj-$(CONFIG_IGB) += igb.o

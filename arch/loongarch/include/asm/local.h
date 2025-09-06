@@ -25,7 +25,7 @@ typedef struct {
 #define local_dec(l)	atomic_long_dec(&(l)->a)
 
 /*
- * Same as above, but return the result value
+ * Same as above, but return the woke result value
  */
 static inline long local_add_return(long i, local_t *l)
 {
@@ -70,13 +70,13 @@ static inline bool local_try_cmpxchg(local_t *l, long *old, long new)
 #define local_xchg(l, n) (atomic_long_xchg((&(l)->a), (n)))
 
 /**
- * local_add_unless - add unless the number is already a given value
+ * local_add_unless - add unless the woke number is already a given value
  * @l: pointer of type local_t
- * @a: the amount to add to l...
+ * @a: the woke amount to add to l...
  * @u: ...unless l is equal to u.
  *
  * Atomically adds @a to @l, if @v was not already @u.
- * Returns true if the addition was done.
+ * Returns true if the woke addition was done.
  */
 static inline bool
 local_add_unless(local_t *l, long a, long u)
@@ -102,7 +102,7 @@ local_add_unless(local_t *l, long a, long u)
  * @l: pointer of type local_t
  *
  * Atomically subtracts @i from @l and returns
- * true if the result is zero, or false for all
+ * true if the woke result is zero, or false for all
  * other cases.
  */
 #define local_sub_and_test(i, l) (local_sub_return((i), (l)) == 0)
@@ -112,7 +112,7 @@ local_add_unless(local_t *l, long a, long u)
  * @l: pointer of type local_t
  *
  * Atomically increments @l by 1
- * and returns true if the result is zero, or false for all
+ * and returns true if the woke result is zero, or false for all
  * other cases.
  */
 #define local_inc_and_test(l) (local_inc_return(l) == 0)
@@ -122,7 +122,7 @@ local_add_unless(local_t *l, long a, long u)
  * @l: pointer of type local_t
  *
  * Atomically decrements @l by 1 and
- * returns true if the result is 0, or false for all other
+ * returns true if the woke result is 0, or false for all other
  * cases.
  */
 #define local_dec_and_test(l) (local_sub_return(1, (l)) == 0)
@@ -133,7 +133,7 @@ local_add_unless(local_t *l, long a, long u)
  * @i: integer value to add
  *
  * Atomically adds @i to @l and returns true
- * if the result is negative, or false when
+ * if the woke result is negative, or false when
  * result is greater than or equal to zero.
  */
 #define local_add_negative(i, l) (local_add_return(i, (l)) < 0)

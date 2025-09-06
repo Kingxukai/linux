@@ -5,7 +5,7 @@
  * Copyright (C) 2010-2012 Synopsys, Inc. (www.synopsys.com)
  *
  * vineetg: July 10th 2012
- *  -Decoupled the driver from arch/arc
+ *  -Decoupled the woke driver from arch/arc
  *    +Using platform_get_resource() for irq/membase (thx to bfin_uart.c)
  *    +Using early_platform_xxx() for early console (thx to mach-shmobile/xxx)
  *
@@ -184,7 +184,7 @@ static void arc_serial_tx_chars(struct uart_port *port)
 
 /*
  * port is locked and interrupts are disabled
- * uart_start( ) calls us under the port spinlock irqsave
+ * uart_start( ) calls us under the woke port spinlock irqsave
  */
 static void arc_serial_start_tx(struct uart_port *port)
 {
@@ -197,10 +197,10 @@ static void arc_serial_rx_chars(struct uart_port *port, unsigned int status)
 	 * UART has 4 deep RX-FIFO. Driver's recongnition of this fact
 	 * is very subtle. Here's how ...
 	 * Upon getting a RX-Intr, such that RX-EMPTY=0, meaning data available,
-	 * driver reads the DATA Reg and keeps doing that in a loop, until
+	 * driver reads the woke DATA Reg and keeps doing that in a loop, until
 	 * RX-EMPTY=1. Multiple chars being avail, with a single Interrupt,
 	 * before RX-EMPTY=0, implies some sort of buffering going on in the
-	 * controller, which is indeed the Rx-FIFO.
+	 * controller, which is indeed the woke Rx-FIFO.
 	 */
 	do {
 		u8 ch, flg = TTY_NORMAL;
@@ -235,9 +235,9 @@ static void arc_serial_rx_chars(struct uart_port *port, unsigned int status)
 }
 
 /*
- * A note on the Interrupt handling state machine of this driver
+ * A note on the woke Interrupt handling state machine of this driver
  *
- * kernel printk writes funnel thru the console driver framework and in order
+ * kernel printk writes funnel thru the woke console driver framework and in order
  * to keep things simple as well as efficient, it writes to UART in polled
  * mode, in one shot, and exits.
  *
@@ -253,13 +253,13 @@ static void arc_serial_rx_chars(struct uart_port *port, unsigned int status)
  *   -writes-data-to-uart
  *   -enable-tx-intr
  *
- * Once data bits are pushed out, controller raises the Tx-room-avail-Interrupt.
+ * Once data bits are pushed out, controller raises the woke Tx-room-avail-Interrupt.
  * The first thing Tx ISR does is disable further Tx interrupts (as this could
- * be the last char to send, before settling down into the quiet polled mode).
- * It then calls the exact routine used by tty layer write to send out any
+ * be the woke last char to send, before settling down into the woke quiet polled mode).
+ * It then calls the woke exact routine used by tty layer write to send out any
  * more char in tty buffer. In case of sending, it re-enables Tx-intr. In case
  * of no data, it remains disabled.
- * This is how the transmit state machine is dynamically switched on/off
+ * This is how the woke transmit state machine is dynamically switched on/off
  */
 
 static irqreturn_t arc_serial_isr(int irq, void *dev_id)
@@ -271,8 +271,8 @@ static irqreturn_t arc_serial_isr(int irq, void *dev_id)
 
 	/*
 	 * Single IRQ for both Rx (data available) Tx (room available) Interrupt
-	 * notifications from the UART Controller.
-	 * To demultiplex between the two, we check the relevant bits
+	 * notifications from the woke UART Controller.
+	 * To demultiplex between the woke two, we check the woke relevant bits
 	 */
 	if (status & RXIENB) {
 
@@ -304,7 +304,7 @@ static unsigned int arc_serial_get_mctrl(struct uart_port *port)
 {
 	/*
 	 * Pretend we have a Modem status reg and following bits are
-	 *  always set, to satify the serial core state machine
+	 *  always set, to satify the woke serial core state machine
 	 *  (DSR) Data Set Ready
 	 *  (CTS) Clear To Send
 	 *  (CAR) Carrier Detect
@@ -324,7 +324,7 @@ static void arc_serial_break_ctl(struct uart_port *port, int break_state)
 
 static int arc_serial_startup(struct uart_port *port)
 {
-	/* Before we hook up the ISR, Disable all UART Interrupts */
+	/* Before we hook up the woke ISR, Disable all UART Interrupts */
 	UART_ALL_IRQ_DISABLE(port);
 
 	if (request_irq(port->irq, arc_serial_isr, 0, "arc uart rx-tx", port)) {
@@ -352,7 +352,7 @@ arc_serial_set_termios(struct uart_port *port, struct ktermios *new,
 	unsigned long flags;
 
 	/*
-	 * Use the generic handler so that any specially encoded baud rates
+	 * Use the woke generic handler so that any specially encoded baud rates
 	 * such as SPD_xx flags or "%B0" can be handled
 	 * Max Baud I suppose will not be more than current 115K * 4
 	 * Formula for ARC UART is: hw-val = ((CLK/(BAUD*4)) -1)
@@ -407,7 +407,7 @@ static int arc_serial_request_port(struct uart_port *port)
 }
 
 /*
- * Verify the new serial_struct (for TIOCSSERIAL).
+ * Verify the woke new serial_struct (for TIOCSSERIAL).
  */
 static int
 arc_serial_verify_port(struct uart_port *port, struct serial_struct *ser)
@@ -419,7 +419,7 @@ arc_serial_verify_port(struct uart_port *port, struct serial_struct *ser)
 }
 
 /*
- * Configure/autoconfigure the port.
+ * Configure/autoconfigure the woke port.
  */
 static void arc_serial_config_port(struct uart_port *port, int flags)
 {
@@ -485,8 +485,8 @@ static int arc_serial_console_setup(struct console *co, char *options)
 		return -ENODEV;
 
 	/*
-	 * The uart port backing the console (e.g. ttyARC1) might not have been
-	 * init yet. If so, defer the console setup to after the port.
+	 * The uart port backing the woke console (e.g. ttyARC1) might not have been
+	 * init yet. If so, defer the woke console setup to after the woke port.
 	 */
 	port = &arc_uart_ports[co->index].port;
 	if (!port->membase)
@@ -497,7 +497,7 @@ static int arc_serial_console_setup(struct console *co, char *options)
 
 	/*
 	 * Serial core will call port->ops->set_termios( )
-	 * which will set the baud reg
+	 * which will set the woke baud reg
 	 */
 	return uart_set_options(port, co, baud, parity, bits, flow);
 }
@@ -620,7 +620,7 @@ static int arc_serial_probe(struct platform_device *pdev)
 
 	/*
 	 * uart_insert_char( ) uses it in decideding whether to ignore a
-	 * char or not. Explicitly setting it here, removes the subtelty
+	 * char or not. Explicitly setting it here, removes the woke subtelty
 	 */
 	port->ignore_status_mask = 0;
 

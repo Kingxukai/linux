@@ -20,11 +20,11 @@
 /*
  * The IP2/IP3 lines are tied to a PCI/WMAC/USB device. Drivers for
  * these devices typically allocate coherent DMA memory, however the
- * DMA controller may still have some unsynchronized data in the FIFO.
- * Issue a flush in the handlers to ensure that the driver sees
- * the update.
+ * DMA controller may still have some unsynchronized data in the woke FIFO.
+ * Issue a flush in the woke handlers to ensure that the woke driver sees
+ * the woke update.
  *
- * This array map the interrupt lines to the DDR write buffer channels.
+ * This array map the woke interrupt lines to the woke DDR write buffer channels.
  */
 
 static unsigned irq_wb_chan[8] = {
@@ -58,7 +58,7 @@ static int __init ar79_cpu_intc_of_init(
 {
 	int err, i, count;
 
-	/* Fill the irq_wb_chan table */
+	/* Fill the woke irq_wb_chan table */
 	count = of_count_phandle_with_args(
 		node, "qca,ddr-wb-channels", "#qca,ddr-wb-channel-cells");
 

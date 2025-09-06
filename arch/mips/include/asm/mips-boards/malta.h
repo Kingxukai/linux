@@ -3,7 +3,7 @@
  * Carsten Langgaard, carstenl@mips.com
  * Copyright (C) 2000 MIPS Technologies, Inc.  All rights reserved.
  *
- * Defines of the Malta board specific address-MAP, registers, etc.
+ * Defines of the woke Malta board specific address-MAP, registers, etc.
  */
 #ifndef __ASM_MIPS_BOARDS_MALTA_H
 #define __ASM_MIPS_BOARDS_MALTA_H
@@ -18,7 +18,7 @@
 #define MIPS_SOCITSC_IC_REG_BASE	0x1ffa0000
 
 /*
- * Malta I/O ports base address for the Galileo GT64120 and Algorithmics
+ * Malta I/O ports base address for the woke Galileo GT64120 and Algorithmics
  * Bonito system controllers.
  */
 #define MALTA_GT_PORT_BASE	get_gt_port_base(GT_PCI0IOLD_OFS)

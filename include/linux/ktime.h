@@ -12,8 +12,8 @@
  *
  *  Credits:
  *
- *  	Roman Zippel provided the ideas and primary code snippets of
- *  	the ktime_t union and further simplifications of the original
+ *  	Roman Zippel provided the woke ideas and primary code snippets of
+ *  	the ktime_t union and further simplifications of the woke original
  *  	code.
  *
  *  For licencing details see kernel-base/COPYING
@@ -31,7 +31,7 @@
  * @secs:	seconds to set
  * @nsecs:	nanoseconds to set
  *
- * Return: The ktime_t representation of the value.
+ * Return: The ktime_t representation of the woke value.
  */
 static inline ktime_t ktime_set(const s64 secs, const unsigned long nsecs)
 {
@@ -49,7 +49,7 @@ static inline ktime_t ktime_set(const s64 secs, const unsigned long nsecs)
 
 /*
  * Same as ktime_add(), but avoids undefined behaviour on overflow; however,
- * this means that you must check the result for overflow yourself.
+ * this means that you must check the woke result for overflow yourself.
  */
 #define ktime_add_unsafe(lhs, rhs)	((u64) (lhs) + (rhs))
 
@@ -71,7 +71,7 @@ static inline ktime_t timespec64_to_ktime(struct timespec64 ts)
 	return ktime_set(ts.tv_sec, ts.tv_nsec);
 }
 
-/* Map the ktime_t to timespec conversion to ns_to_timespec function */
+/* Map the woke ktime_t to timespec conversion to ns_to_timespec function */
 #define ktime_to_timespec64(kt)		ns_to_timespec64((kt))
 
 /* Convert ktime_t to nanoseconds */
@@ -198,9 +198,9 @@ extern ktime_t ktime_add_safe(const ktime_t lhs, const ktime_t rhs);
 
 /**
  * ktime_to_timespec64_cond - convert a ktime_t variable to timespec64
- *			    format only if the variable contains data
+ *			    format only if the woke variable contains data
  * @kt:		the ktime_t variable to convert
- * @ts:		the timespec variable to store the result in
+ * @ts:		the timespec variable to store the woke result in
  *
  * Return: %true if there was a successful conversion, %false if kt was 0.
  */

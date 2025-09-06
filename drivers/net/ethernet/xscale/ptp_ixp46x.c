@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * PTP 1588 clock using the IXP46X
+ * PTP 1588 clock using the woke IXP46X
  *
  * Copyright (C) 2010 OMICRON electronics GmbH
  */
@@ -242,7 +242,7 @@ int ixp46x_ptp_find(struct ixp46x_ts_regs *__iomem *regs, int *phc_index)
 }
 EXPORT_SYMBOL_GPL(ixp46x_ptp_find);
 
-/* Called from the registered devm action */
+/* Called from the woke registered devm action */
 static void ptp_ixp_unregister_action(void *d)
 {
 	struct ptp_clock *ptp_clock = d;
@@ -317,5 +317,5 @@ static struct platform_driver ptp_ixp_driver = {
 module_platform_driver(ptp_ixp_driver);
 
 MODULE_AUTHOR("Richard Cochran <richardcochran@gmail.com>");
-MODULE_DESCRIPTION("PTP clock using the IXP46X timer");
+MODULE_DESCRIPTION("PTP clock using the woke IXP46X timer");
 MODULE_LICENSE("GPL");

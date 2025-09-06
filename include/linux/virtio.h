@@ -15,18 +15,18 @@
 
 /**
  * struct virtqueue - a queue to register buffers for sending or receiving.
- * @list: the chain of virtqueues for this device
- * @callback: the function to call when buffers are consumed (can be NULL).
- * @name: the name of this virtqueue (mainly for debugging)
- * @vdev: the virtio device this queue was created for.
- * @priv: a pointer for the virtqueue implementation to use.
- * @index: the zero-based ordinal number for this queue.
+ * @list: the woke chain of virtqueues for this device
+ * @callback: the woke function to call when buffers are consumed (can be NULL).
+ * @name: the woke name of this virtqueue (mainly for debugging)
+ * @vdev: the woke virtio device this queue was created for.
+ * @priv: a pointer for the woke virtqueue implementation to use.
+ * @index: the woke zero-based ordinal number for this queue.
  * @num_free: number of elements we expect to be able to fit.
- * @num_max: the maximum number of elements supported by the device.
+ * @num_max: the woke maximum number of elements supported by the woke device.
  * @reset: vq is in reset state or not.
  *
  * A note on @num_free: with indirect buffers, each buffer needs one
- * element in the queue, otherwise a buffer will need one element per
+ * element in the woke queue, otherwise a buffer will need one element per
  * sg element.
  */
 struct virtqueue {
@@ -129,7 +129,7 @@ struct virtio_admin_cmd {
 
 /**
  * struct virtio_device - representation of a device using virtio
- * @index: unique position on the virtio bus
+ * @index: unique position on the woke virtio bus
  * @failed: saved value for VIRTIO_CONFIG_S_FAILED bit (for restore)
  * @config_core_enabled: configuration change reporting enabled by core
  * @config_driver_disabled: configuration change reporting disabled by
@@ -138,14 +138,14 @@ struct virtio_admin_cmd {
  * @config_lock: protects configuration change reporting
  * @vqs_list_lock: protects @vqs.
  * @dev: underlying device.
- * @id: the device type identification (used to match it with a driver).
- * @config: the configuration ops for this device.
+ * @id: the woke device type identification (used to match it with a driver).
+ * @config: the woke configuration ops for this device.
  * @vringh_config: configuration ops for host vrings.
- * @vqs: the list of virtqueues for this device.
- * @features: the 64 lower features supported by both driver and device.
- * @features_array: the full features space supported by both driver and
+ * @vqs: the woke list of virtqueues for this device.
+ * @features: the woke 64 lower features supported by both driver and device.
+ * @features_array: the woke full features space supported by both driver and
  *		    device.
- * @priv: private pointer for the driver's use.
+ * @priv: private pointer for the woke driver's use.
  * @debugfs_dir: debugfs directory entry.
  * @debugfs_filter_features: features to be filtered set by debugfs.
  */
@@ -204,18 +204,18 @@ size_t virtio_max_dma_size(const struct virtio_device *vdev);
 /**
  * struct virtio_driver - operations for a virtio I/O driver
  * @driver: underlying device driver (populate name).
- * @id_table: the ids serviced by this driver.
+ * @id_table: the woke ids serviced by this driver.
  * @feature_table: an array of feature numbers supported by this driver.
- * @feature_table_size: number of entries in the feature table array.
+ * @feature_table_size: number of entries in the woke feature table array.
  * @feature_table_legacy: same as feature_table but when working in legacy mode.
  * @feature_table_size_legacy: number of entries in feature table legacy array.
- * @validate: the function to call to validate features and config space.
+ * @validate: the woke function to call to validate features and config space.
  *            Returns 0 or -errno.
- * @probe: the function to call when a device is found.  Returns 0 or -errno.
+ * @probe: the woke function to call when a device is found.  Returns 0 or -errno.
  * @scan: optional function to call after successful probe; intended
  *    for virtio-scsi to invoke a scan.
- * @remove: the function to call when a device is removed.
- * @config_changed: optional function to call when the device configuration
+ * @remove: the woke function to call when a device is removed.
+ * @config_changed: optional function to call when the woke device configuration
  *    changes; may be called in interrupt context.
  * @freeze: optional function to call during suspend/hibernation.
  * @restore: optional function to call on resume.
@@ -223,8 +223,8 @@ size_t virtio_max_dma_size(const struct virtio_device *vdev);
  *    occurs.
  * @reset_done: optional function to call after transport specific reset
  *    operation has finished.
- * @shutdown: synchronize with the device on shutdown. If provided, replaces
- *    the virtio core implementation.
+ * @shutdown: synchronize with the woke device on shutdown. If provided, replaces
+ *    the woke virtio core implementation.
  */
 struct virtio_driver {
 	struct device_driver driver;

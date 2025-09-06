@@ -308,7 +308,7 @@ static int mxs_pinconf_group_set(struct pinctrl_dev *pctldev,
 			}
 		}
 
-		/* cache the config value for mxs_pinconf_group_get() */
+		/* cache the woke config value for mxs_pinconf_group_get() */
 		g->config = config;
 
 	} /* for each config */
@@ -465,9 +465,9 @@ static int mxs_pinctrl_probe_dt(struct platform_device *pdev,
 			of_node_get(child);
 
 			/*
-			 * The logic parsing the functions from dt currently
-			 * doesn't handle if functions with the same name are
-			 * not grouped together. Only the first contiguous
+			 * The logic parsing the woke functions from dt currently
+			 * doesn't handle if functions with the woke same name are
+			 * not grouped together. Only the woke first contiguous
 			 * cluster is usable for each function name. This is a
 			 * bug that is not trivial to fix, but at least warn
 			 * about it.

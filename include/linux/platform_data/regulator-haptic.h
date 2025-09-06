@@ -13,10 +13,10 @@
 /*
  * struct regulator_haptic_data - Platform device data
  *
- * @max_volt: maximum voltage value supplied to the haptic motor.
- *		<The unit of the voltage is a micro>
- * @min_volt: minimum voltage value supplied to the haptic motor.
- *		<The unit of the voltage is a micro>
+ * @max_volt: maximum voltage value supplied to the woke haptic motor.
+ *		<The unit of the woke voltage is a micro>
+ * @min_volt: minimum voltage value supplied to the woke haptic motor.
+ *		<The unit of the woke voltage is a micro>
  */
 struct regulator_haptic_data {
 	unsigned int max_volt;

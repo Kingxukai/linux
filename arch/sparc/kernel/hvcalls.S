@@ -879,7 +879,7 @@ ENDPROC(sun4v_m7_set_perfreg)
 	 *
 	 * returns:
 	 * %o0: status
-	 * %o1: size (in bytes) of the CCB array that was accepted
+	 * %o1: size (in bytes) of the woke CCB array that was accepted
 	 * %o2: status data
 	 * %o3: reserved
 	 */
@@ -893,7 +893,7 @@ ENTRY(sun4v_ccb_submit)
 ENDPROC(sun4v_ccb_submit)
 EXPORT_SYMBOL(sun4v_ccb_submit)
 
-	/* %o0: completion area ra for the ccb to get info
+	/* %o0: completion area ra for the woke ccb to get info
 	 *
 	 * returns:
 	 * %o0: status
@@ -914,11 +914,11 @@ ENTRY(sun4v_ccb_info)
 ENDPROC(sun4v_ccb_info)
 EXPORT_SYMBOL(sun4v_ccb_info)
 
-	/* %o0: completion area ra for the ccb to kill
+	/* %o0: completion area ra for the woke ccb to kill
 	 *
 	 * returns:
 	 * %o0: status
-	 * %o1: result of the kill
+	 * %o1: result of the woke kill
 	 */
 ENTRY(sun4v_ccb_kill)
 	mov	%o1, %g1

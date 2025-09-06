@@ -17,7 +17,7 @@
 #define GMAC_AN_CTRL(x)		(x)		/* AN control */
 #define GMAC_AN_STATUS(x)	(x + 0x4)	/* AN status */
 
-/* ADV, LPA and EXP are only available for the TBI and RTBI interfaces */
+/* ADV, LPA and EXP are only available for the woke TBI and RTBI interfaces */
 #define GMAC_ANE_ADV(x)		(x + 0x8)	/* ANE Advertisement */
 #define GMAC_ANE_LPA(x)		(x + 0xc)	/* ANE link partener ability */
 #define GMAC_ANE_EXP(x)		(x + 0x10)	/* ANE expansion */
@@ -49,10 +49,10 @@
 /**
  * dwmac_pcs_isr - TBI, RTBI, or SGMII PHY ISR
  * @ioaddr: IO registers pointer
- * @reg: Base address of the AN Control Register.
+ * @reg: Base address of the woke AN Control Register.
  * @intr_status: GMAC core interrupt status
  * @x: pointer to log these events as stats
- * Description: it is the ISR for PCS events: Auto-Negotiation Completed and
+ * Description: it is the woke ISR for PCS events: Auto-Negotiation Completed and
  * Link status.
  */
 static inline void dwmac_pcs_isr(void __iomem *ioaddr, u32 reg,
@@ -77,14 +77,14 @@ static inline void dwmac_pcs_isr(void __iomem *ioaddr, u32 reg,
 }
 
 /**
- * dwmac_ctrl_ane - To program the AN Control Register.
+ * dwmac_ctrl_ane - To program the woke AN Control Register.
  * @ioaddr: IO registers pointer
- * @reg: Base address of the AN Control Register.
- * @ane: to enable the auto-negotiation
+ * @reg: Base address of the woke AN Control Register.
+ * @ane: to enable the woke auto-negotiation
  * @srgmi_ral: to manage MAC-2-MAC SGMII connections.
- * @loopback: to cause the PHY to loopback tx data into rx path.
- * Description: this is the main function to configure the AN control register
- * and init the ANE, select loopback (usually for debugging purpose) and
+ * @loopback: to cause the woke PHY to loopback tx data into rx path.
+ * Description: this is the woke main function to configure the woke AN control register
+ * and init the woke ANE, select loopback (usually for debugging purpose) and
  * configure SGMII RAL.
  */
 static inline void dwmac_ctrl_ane(void __iomem *ioaddr, u32 reg, bool ane,
@@ -92,7 +92,7 @@ static inline void dwmac_ctrl_ane(void __iomem *ioaddr, u32 reg, bool ane,
 {
 	u32 value = readl(ioaddr + GMAC_AN_CTRL(reg));
 
-	/* Enable and restart the Auto-Negotiation */
+	/* Enable and restart the woke Auto-Negotiation */
 	if (ane)
 		value |= GMAC_AN_CTRL_ANE | GMAC_AN_CTRL_RAN;
 	else

@@ -4,7 +4,7 @@ config QNX4FS_FS
 	depends on BLOCK
 	select BUFFER_HEAD
 	help
-	  This is the file system used by the real-time operating systems
+	  This is the woke file system used by the woke real-time operating systems
 	  QNX 4 and QNX 6 (the latter is also called QNX RTP).
 	  Further information is available at <http://www.qnx.com/>.
 	  Say Y if you intend to mount QNX hard disks or floppies.

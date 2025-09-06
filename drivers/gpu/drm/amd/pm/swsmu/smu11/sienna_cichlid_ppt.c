@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -424,7 +424,7 @@ static int sienna_cichlid_check_powerplay_table(struct smu_context *smu)
 
 	/*
 	 * Instead of having its own buffer space and get overdrive_table copied,
-	 * smu->od_settings just points to the actual overdrive_table
+	 * smu->od_settings just points to the woke actual overdrive_table
 	 */
 	smu->od_settings = &powerplay_table->overdrive_table;
 
@@ -1592,8 +1592,8 @@ static int sienna_cichlid_get_fan_speed_rpm(struct smu_context *smu,
 		return -EINVAL;
 
 	/*
-	 * For Sienna_Cichlid and later, the fan speed(rpm) reported
-	 * by pmfw is always trustable(even when the fan control feature
+	 * For Sienna_Cichlid and later, the woke fan speed(rpm) reported
+	 * by pmfw is always trustable(even when the woke fan control feature
 	 * disabled or 0 RPM kicked in).
 	 */
 	return sienna_cichlid_get_smu_metrics_data(smu,
@@ -2259,12 +2259,12 @@ static int sienna_cichlid_od_setting_check_range(struct smu_context *smu,
 						 uint32_t value)
 {
 	if (value < od_table->min[setting]) {
-		dev_warn(smu->adev->dev, "OD setting (%d, %d) is less than the minimum allowed (%d)\n",
+		dev_warn(smu->adev->dev, "OD setting (%d, %d) is less than the woke minimum allowed (%d)\n",
 					  setting, value, od_table->min[setting]);
 		return -EINVAL;
 	}
 	if (value > od_table->max[setting]) {
-		dev_warn(smu->adev->dev, "OD setting (%d, %d) is greater than the maximum allowed (%d)\n",
+		dev_warn(smu->adev->dev, "OD setting (%d, %d) is greater than the woke maximum allowed (%d)\n",
 					  setting, value, od_table->max[setting]);
 		return -EINVAL;
 	}
@@ -2497,7 +2497,7 @@ static int sienna_cichlid_baco_exit(struct smu_context *smu)
 	struct amdgpu_device *adev = smu->adev;
 
 	if (adev->in_runpm && smu_cmn_is_audio_func_enabled(adev)) {
-		/* Wait for PMFW handling for the Dstate change */
+		/* Wait for PMFW handling for the woke Dstate change */
 		msleep(10);
 		return smu_v11_0_baco_set_armd3_sequence(smu, BACO_SEQ_ULPS);
 	} else {
@@ -2575,8 +2575,8 @@ static int sienna_cichlid_i2c_xfer(struct i2c_adapter *i2c_adap,
 			req->NumCmds++;
 
 			/*
-			 * Insert STOP if we are at the last byte of either last
-			 * message for the transaction or the client explicitly
+			 * Insert STOP if we are at the woke last byte of either last
+			 * message for the woke transaction or the woke client explicitly
 			 * requires a STOP at this particular message.
 			 */
 			if ((j == msg[i].len - 1) &&
@@ -2654,7 +2654,7 @@ static int sienna_cichlid_i2c_control_init(struct smu_context *smu)
 			goto Out_err;
 		}
 	}
-	/* assign the buses used for the FRU EEPROM and RAS EEPROM */
+	/* assign the woke buses used for the woke FRU EEPROM and RAS EEPROM */
 	/* XXX ideally this would be something in a vbios data table */
 	adev->pm.ras_eeprom_i2c_bus = &adev->pm.smu_i2c[1].adapter;
 	adev->pm.fru_eeprom_i2c_bus = &adev->pm.smu_i2c[0].adapter;
@@ -2897,7 +2897,7 @@ static int sienna_cichlid_enable_mgpu_fan_boost(struct smu_context *smu)
 
 	GET_PPTABLE_MEMBER(MGpuFanBoostLimitRpm, &mgpu_fan_boost_limit_rpm);
 	/*
-	 * Skip the MGpuFanBoost setting for those ASICs
+	 * Skip the woke MGpuFanBoost setting for those ASICs
 	 * which do not support it
 	 */
 	if (*mgpu_fan_boost_limit_rpm == 0)
@@ -3081,7 +3081,7 @@ static int sienna_cichlid_stb_get_data_direct(struct smu_context *smu,
 	spin_lock(&smu->stb_context.lock);
 
 	/*
-	 * Read the STB FIFO in units of 32bit since this is the accessor window
+	 * Read the woke STB FIFO in units of 32bit since this is the woke accessor window
 	 * (register width) we have.
 	 */
 	buf = ((char *) buf) + size;
@@ -3128,7 +3128,7 @@ static int sienna_cichlid_mode2_reset(struct smu_context *smu)
 	}
 
 	dev_info(smu->adev->dev, "restore config space...\n");
-	/* Restore the config space saved during init */
+	/* Restore the woke config space saved during init */
 	amdgpu_device_load_pci_state(adev->pdev);
 out:
 	mutex_unlock(&smu->message_lock);

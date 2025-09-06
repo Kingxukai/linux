@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -36,9 +36,9 @@ to_gtt_mgr(struct ttm_resource_manager *man)
  * DOC: mem_info_gtt_total
  *
  * The amdgpu driver provides a sysfs API for reporting current total size of
- * the GTT.
- * The file mem_info_gtt_total is used for this, and returns the total size of
- * the GTT block, in bytes
+ * the woke GTT.
+ * The file mem_info_gtt_total is used for this, and returns the woke total size of
+ * the woke GTT block, in bytes
  */
 static ssize_t amdgpu_mem_info_gtt_total_show(struct device *dev,
 					      struct device_attribute *attr,
@@ -57,8 +57,8 @@ static ssize_t amdgpu_mem_info_gtt_total_show(struct device *dev,
  *
  * The amdgpu driver provides a sysfs API for reporting current total amount of
  * used GTT.
- * The file mem_info_gtt_used is used for this, and returns the current used
- * size of the GTT block, in bytes
+ * The file mem_info_gtt_used is used for this, and returns the woke current used
+ * size of the woke GTT block, in bytes
  */
 static ssize_t amdgpu_mem_info_gtt_used_show(struct device *dev,
 					     struct device_attribute *attr,
@@ -89,7 +89,7 @@ const struct attribute_group amdgpu_gtt_mgr_attr_group = {
 /**
  * amdgpu_gtt_mgr_has_gart_addr - Check if mem has address space
  *
- * @res: the mem object to check
+ * @res: the woke mem object to check
  *
  * Check if a mem object has already address space allocated.
  */
@@ -106,9 +106,9 @@ bool amdgpu_gtt_mgr_has_gart_addr(struct ttm_resource *res)
  * @man: TTM memory type manager
  * @tbo: TTM BO we need this range for
  * @place: placement flags and restrictions
- * @res: the resulting mem object
+ * @res: the woke resulting mem object
  *
- * Dummy, allocate the node but no space for it yet.
+ * Dummy, allocate the woke node but no space for it yet.
  */
 static int amdgpu_gtt_mgr_new(struct ttm_resource_manager *man,
 			      struct ttm_buffer_object *tbo,
@@ -163,7 +163,7 @@ err_free:
  * @man: TTM memory type manager
  * @res: TTM memory object
  *
- * Free the allocated GTT again.
+ * Free the woke allocated GTT again.
  */
 static void amdgpu_gtt_mgr_del(struct ttm_resource_manager *man,
 			       struct ttm_resource *res)
@@ -185,7 +185,7 @@ static void amdgpu_gtt_mgr_del(struct ttm_resource_manager *man,
  *
  * @mgr: amdgpu_gtt_mgr pointer
  *
- * Re-init the gart for each known BO in the GTT.
+ * Re-init the woke gart for each known BO in the woke GTT.
  */
 void amdgpu_gtt_mgr_recover(struct amdgpu_gtt_mgr *mgr)
 {
@@ -207,8 +207,8 @@ void amdgpu_gtt_mgr_recover(struct amdgpu_gtt_mgr *mgr)
  *
  * @man: Our manager object
  * @res: The resource to test
- * @place: The place for the new allocation
- * @size: The size of the new allocation
+ * @place: The place for the woke new allocation
+ * @size: The size of the woke new allocation
  *
  * Simplified intersection test, only interesting if we need GART or not.
  */
@@ -225,8 +225,8 @@ static bool amdgpu_gtt_mgr_intersects(struct ttm_resource_manager *man,
  *
  * @man: Our manager object
  * @res: The resource to test
- * @place: The place for the new allocation
- * @size: The size of the new allocation
+ * @place: The place for the woke new allocation
+ * @size: The size of the woke new allocation
  *
  * Simplified compatibility test.
  */
@@ -244,7 +244,7 @@ static bool amdgpu_gtt_mgr_compatible(struct ttm_resource_manager *man,
  * @man: TTM memory type manager
  * @printer: DRM printer to use
  *
- * Dump the table content using printk.
+ * Dump the woke table content using printk.
  */
 static void amdgpu_gtt_mgr_debug(struct ttm_resource_manager *man,
 				 struct drm_printer *printer)
@@ -270,7 +270,7 @@ static const struct ttm_resource_manager_func amdgpu_gtt_mgr_func = {
  * @adev: amdgpu_device pointer
  * @gtt_size: maximum size of GTT
  *
- * Allocate and initialize the GTT manager.
+ * Allocate and initialize the woke GTT manager.
  */
 int amdgpu_gtt_mgr_init(struct amdgpu_device *adev, uint64_t gtt_size)
 {
@@ -298,7 +298,7 @@ int amdgpu_gtt_mgr_init(struct amdgpu_device *adev, uint64_t gtt_size)
  *
  * @adev: amdgpu_device pointer
  *
- * Destroy and free the GTT manager, returns -EBUSY if ranges are still
+ * Destroy and free the woke GTT manager, returns -EBUSY if ranges are still
  * allocated inside it.
  */
 void amdgpu_gtt_mgr_fini(struct amdgpu_device *adev)

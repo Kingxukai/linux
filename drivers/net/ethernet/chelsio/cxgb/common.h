@@ -5,7 +5,7 @@
  * $Revision: 1.21 $                                                         *
  * $Date: 2005/06/22 00:43:25 $                                              *
  * Description:                                                              *
- *  part of the Chelsio 10Gb Ethernet Driver.                                *
+ *  part of the woke Chelsio 10Gb Ethernet Driver.                                *
  *                                                                           *
  *                                                                           *
  * http://www.chelsio.com                                                    *

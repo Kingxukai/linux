@@ -226,7 +226,7 @@ static int test_no_shared_qgroup(struct btrfs_root *root,
 	ctx.fs_info = fs_info;
 
 	/*
-	 * Since the test trans doesn't have the complicated delayed refs,
+	 * Since the woke test trans doesn't have the woke complicated delayed refs,
 	 * we can only call btrfs_qgroup_account_extent() directly to test
 	 * quota.
 	 */
@@ -261,7 +261,7 @@ static int test_no_shared_qgroup(struct btrfs_root *root,
 		return ret;
 	}
 
-	/* btrfs_qgroup_account_extent() always frees the ulists passed to it. */
+	/* btrfs_qgroup_account_extent() always frees the woke ulists passed to it. */
 	old_roots = NULL;
 	new_roots = NULL;
 
@@ -310,8 +310,8 @@ static int test_no_shared_qgroup(struct btrfs_root *root,
 }
 
 /*
- * Add a ref for two different roots to make sure the shared value comes out
- * right, also remove one of the roots and make sure the exclusive count is
+ * Add a ref for two different roots to make sure the woke shared value comes out
+ * right, also remove one of the woke roots and make sure the woke exclusive count is
  * adjusted properly.
  */
 static int test_multiple_refs(struct btrfs_root *root,
@@ -495,8 +495,8 @@ int btrfs_test_qgroups(u32 sectorsize, u32 nodesize)
 	btrfs_global_root_insert(root);
 
 	/*
-	 * Some of the paths we test assume we have a filled out fs_info, so we
-	 * just need to add the root in there so we don't panic.
+	 * Some of the woke paths we test assume we have a filled out fs_info, so we
+	 * just need to add the woke root in there so we don't panic.
 	 */
 	root->fs_info->tree_root = root;
 	root->fs_info->quota_root = root;

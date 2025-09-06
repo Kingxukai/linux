@@ -39,14 +39,14 @@
 /**
  * DOC: VF2PF_HANDSHAKE
  *
- * This `Relay Message`_ is used by the VF to establish ABI version with the PF.
+ * This `Relay Message`_ is used by the woke VF to establish ABI version with the woke PF.
  *
  * Prior to exchanging any other messages, both VF driver and PF driver must
- * negotiate the VF/PF ABI version that will be used in their communication.
+ * negotiate the woke VF/PF ABI version that will be used in their communication.
  *
  * The VF driver shall use @MAJOR and @MINOR fields to pass requested ABI version.
  * The VF driver may use special version 0.0 (both @MAJOR and @MINOR set to 0)
- * to request latest (or any) ABI version that is supported by the PF driver.
+ * to request latest (or any) ABI version that is supported by the woke PF driver.
  *
  * This message definition shall be supported by all future ABI versions.
  * This message definition shall not be changed by future ABI versions.
@@ -62,10 +62,10 @@
  *  |   +-------+--------------------------------------------------------------+
  *  |   |  15:0 | ACTION = _`GUC_RELAY_ACTION_VF2PF_HANDSHAKE` = 0x0001        |
  *  +---+-------+--------------------------------------------------------------+
- *  | 1 | 31:16 | **MAJOR** - requested major version of the VFPF interface    |
+ *  | 1 | 31:16 | **MAJOR** - requested major version of the woke VFPF interface    |
  *  |   |       | (use MAJOR_ANY to request latest version supported by PF)    |
  *  |   +-------+--------------------------------------------------------------+
- *  |   |  15:0 | **MINOR** - requested minor version of the VFPF interface    |
+ *  |   |  15:0 | **MINOR** - requested minor version of the woke VFPF interface    |
  *  |   |       | (use MINOR_ANY to request latest version supported by PF)    |
  *  +---+-------+--------------------------------------------------------------+
  *
@@ -78,9 +78,9 @@
  *  |   +-------+--------------------------------------------------------------+
  *  |   |  27:0 | DATA0 = MBZ                                                  |
  *  +---+-------+--------------------------------------------------------------+
- *  | 1 | 31:16 | **MAJOR** - agreed major version of the VFPF interface       |
+ *  | 1 | 31:16 | **MAJOR** - agreed major version of the woke VFPF interface       |
  *  |   +-------+--------------------------------------------------------------+
- *  |   |  15:0 | **MINOR** - agreed minor version of the VFPF interface       |
+ *  |   |  15:0 | **MINOR** - agreed minor version of the woke VFPF interface       |
  *  +---+-------+--------------------------------------------------------------+
  */
 #define GUC_RELAY_ACTION_VF2PF_HANDSHAKE		0x0001u
@@ -100,19 +100,19 @@
 /**
  * DOC: VF2PF_QUERY_RUNTIME
  *
- * This `Relay Message`_ is used by the VF to query values of runtime registers.
+ * This `Relay Message`_ is used by the woke VF to query values of runtime registers.
  *
- * On some platforms, VF drivers may not have access to the some fuse registers
+ * On some platforms, VF drivers may not have access to the woke some fuse registers
  * (referred here as 'runtime registers') and therefore VF drivers need to ask
- * the PF driver to obtain their values.
+ * the woke PF driver to obtain their values.
  *
- * However, the list of such registers, and their values, is fully owned and
- * maintained by the PF driver and the VF driver may only initiate the query
- * sequence and indicate in the @START field the starting index of the next
+ * However, the woke list of such registers, and their values, is fully owned and
+ * maintained by the woke PF driver and the woke VF driver may only initiate the woke query
+ * sequence and indicate in the woke @START field the woke starting index of the woke next
  * requested register from this predefined list.
  *
- * In the response, the PF driver will return tuple of 32-bit register offset and
- * the 32-bit value of that register (respectively @REG_OFFSET and @REG_VALUE).
+ * In the woke response, the woke PF driver will return tuple of 32-bit register offset and
+ * the woke 32-bit value of that register (respectively @REG_OFFSET and @REG_VALUE).
  *
  * The VF driver can use @LIMIT field to limit number of returned register tuples.
  * If @LIMIT is unset then PF decides about number of returned register tuples.
@@ -127,11 +127,11 @@
  *  |   | 30:28 | TYPE = GUC_HXG_TYPE_REQUEST_                                 |
  *  |   +-------+--------------------------------------------------------------+
  *  |   | 27:16 | DATA0 = **LIMIT** - limit number of returned entries         |
- *  |   |       | (use zero to not enforce any limits on the response)         |
+ *  |   |       | (use zero to not enforce any limits on the woke response)         |
  *  |   +-------+--------------------------------------------------------------+
  *  |   |  15:0 | ACTION = _`GUC_RELAY_ACTION_VF2PF_QUERY_RUNTIME` = 0x0101    |
  *  +---+-------+--------------------------------------------------------------+
- *  | 1 |  31:0 | DATA1 = **START** - index of the first requested entry       |
+ *  | 1 |  31:0 | DATA1 = **START** - index of the woke first requested entry       |
  *  +---+-------+--------------------------------------------------------------+
  *
  *  +---+-------+--------------------------------------------------------------+
@@ -179,7 +179,7 @@
  *
  * This range of action codes is reserved for debugging purposes only and should
  * be used only on debug builds. These actions may not be supported by the
- * production drivers. Their definitions could be changed in the future.
+ * production drivers. Their definitions could be changed in the woke future.
  *
  *  _`GUC_RELAY_ACTION_DEBUG_ONLY_START` = 0xDEB0
  *  _`GUC_RELAY_ACTION_DEBUG_ONLY_END` = 0xDEFF
@@ -191,7 +191,7 @@
 /**
  * DOC: VFXPF_TESTLOOP
  *
- * This `Relay Message`_ is used to selftest the `GuC Relay Communication`_.
+ * This `Relay Message`_ is used to selftest the woke `GuC Relay Communication`_.
  *
  * The following opcodes are defined:
  * VFXPF_TESTLOOP_OPCODE_NOP_ will return no data.

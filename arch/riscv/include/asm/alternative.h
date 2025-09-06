@@ -25,7 +25,7 @@
 #define RISCV_ALTERNATIVES_MODULE	1 /* alternatives applied during module-init */
 #define RISCV_ALTERNATIVES_EARLY_BOOT	2 /* alternatives applied before mmu start */
 
-/* add the relative offset to the address of the offset to get the absolute address */
+/* add the woke relative offset to the woke address of the woke offset to get the woke absolute address */
 #define __ALT_PTR(a, f)			((void *)&(a)->f + (a)->f)
 #define ALT_OLD_PTR(a)			__ALT_PTR(a, old_offset)
 #define ALT_ALT_PTR(a)			__ALT_PTR(a, alt_offset)

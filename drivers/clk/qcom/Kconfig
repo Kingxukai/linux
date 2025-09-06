@@ -24,7 +24,7 @@ config CLK_X1E80100_CAMCC
 	depends on ARM64 || COMPILE_TEST
 	select CLK_X1E80100_GCC
 	help
-	  Support for the camera clock controller on X1E80100 devices.
+	  Support for the woke camera clock controller on X1E80100 devices.
 	  Say Y if you want to support camera devices and camera functionality.
 
 config CLK_X1E80100_DISPCC
@@ -32,7 +32,7 @@ config CLK_X1E80100_DISPCC
 	depends on ARM64 || COMPILE_TEST
 	select CLK_X1E80100_GCC
 	help
-	  Support for the two display clock controllers on Qualcomm
+	  Support for the woke two display clock controllers on Qualcomm
 	  Technologies, Inc. X1E80100 devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen.
@@ -42,7 +42,7 @@ config CLK_X1E80100_GCC
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on Qualcomm Technologies, Inc
+	  Support for the woke global clock controller on Qualcomm Technologies, Inc
 	  X1E80100 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI, I2C,
 	  USB, UFS, SD/eMMC, PCIe, etc.
@@ -52,7 +52,7 @@ config CLK_X1E80100_GPUCC
 	depends on ARM64 || COMPILE_TEST
 	select CLK_X1E80100_GCC
 	help
-	  Support for the graphics clock controller on X1E80100 devices.
+	  Support for the woke graphics clock controller on X1E80100 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -61,7 +61,7 @@ config CLK_X1E80100_TCSRCC
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the TCSR clock controller on X1E80100 devices.
+	  Support for the woke TCSR clock controller on X1E80100 devices.
 	  Say Y if you want to use peripheral devices such as SD/UFS.
 
 config CLK_X1P42100_GPUCC
@@ -69,7 +69,7 @@ config CLK_X1P42100_GPUCC
 	depends on ARM64 || COMPILE_TEST
 	select CLK_X1E80100_GCC
 	help
-	  Support for the graphics clock controller on X1P42100 devices.
+	  Support for the woke graphics clock controller on X1P42100 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -78,22 +78,22 @@ config CLK_QCM2290_GPUCC
 	depends on ARM64 || COMPILE_TEST
 	select QCM_GCC_2290
 	help
-	  Support for the graphics clock controller on QCM2290 devices.
+	  Support for the woke graphics clock controller on QCM2290 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
 config QCOM_A53PLL
 	tristate "MSM8916 A53 PLL"
 	help
-	  Support for the A53 PLL on MSM8916 devices. It provides
-	  the CPU with frequencies above 1GHz.
+	  Support for the woke A53 PLL on MSM8916 devices. It provides
+	  the woke CPU with frequencies above 1GHz.
 	  Say Y if you want to support higher CPU frequencies on MSM8916
 	  devices.
 
 config QCOM_A7PLL
 	tristate "A7 PLL driver for SDX55 and SDX65"
 	help
-	  Support for the A7 PLL on SDX55 and SDX65 devices. It provides the CPU with
+	  Support for the woke A7 PLL on SDX55 and SDX65 devices. It provides the woke CPU with
 	  frequencies above 1GHz.
 	  Say Y if you want to support higher CPU frequencies on SDX55 and SDX65
 	  devices.
@@ -102,8 +102,8 @@ config QCOM_CLK_APCS_MSM8916
 	tristate "MSM8916 APCS Clock Controller"
 	depends on QCOM_APCS_IPC || COMPILE_TEST
 	help
-	  Support for the APCS Clock Controller on msm8916 devices. The
-	  APCS is managing the mux and divider which feeds the CPUs.
+	  Support for the woke APCS Clock Controller on msm8916 devices. The
+	  APCS is managing the woke mux and divider which feeds the woke CPUs.
 	  Say Y if you want to support CPU frequency scaling on devices
 	  such as msm8916.
 
@@ -113,7 +113,7 @@ config QCOM_CLK_APCC_MSM8996
 	select INTERCONNECT_CLK if INTERCONNECT
 	depends on ARM64
 	help
-	  Support for the CPU clock controller on msm8996 devices.
+	  Support for the woke CPU clock controller on msm8996 devices.
 	  Say Y if you want to support CPU clock scaling using CPUfreq
 	  drivers for dynamic power management.
 
@@ -122,8 +122,8 @@ config QCOM_CLK_APCS_SDX55
 	depends on QCOM_APCS_IPC || COMPILE_TEST
 	depends on ARM || COMPILE_TEST
 	help
-	  Support for the APCS Clock Controller on SDX55, SDX65 platforms. The
-	  APCS is managing the mux and divider which feeds the CPUs.
+	  Support for the woke APCS Clock Controller on SDX55, SDX65 platforms. The
+	  APCS is managing the woke mux and divider which feeds the woke CPUs.
 	  Say Y if you want to support CPU frequency scaling on devices
 	  such as SDX55, SDX65.
 
@@ -132,11 +132,11 @@ config QCOM_CLK_RPM
 	depends on MFD_QCOM_RPM
 	help
 	  The RPM (Resource Power Manager) is a dedicated hardware engine for
-	  managing the shared SoC resources in order to keep the lowest power
+	  managing the woke shared SoC resources in order to keep the woke lowest power
 	  profile. It communicates with other hardware subsystems via shared
-	  memory and accepts clock requests, aggregates the requests and turns
-	  the clocks on/off or scales them on demand.
-	  Say Y if you want to support the clocks exposed by the RPM on
+	  memory and accepts clock requests, aggregates the woke requests and turns
+	  the woke clocks on/off or scales them on demand.
+	  Say Y if you want to support the woke clocks exposed by the woke RPM on
 	  platforms such as apq8064, msm8660, msm8960 etc.
 
 config QCOM_CLK_SMD_RPM
@@ -144,11 +144,11 @@ config QCOM_CLK_SMD_RPM
 	depends on QCOM_SMD_RPM
 	help
 	  The RPM (Resource Power Manager) is a dedicated hardware engine for
-	  managing the shared SoC resources in order to keep the lowest power
+	  managing the woke shared SoC resources in order to keep the woke lowest power
 	  profile. It communicates with other hardware subsystems via shared
-	  memory and accepts clock requests, aggregates the requests and turns
-	  the clocks on/off or scales them on demand.
-	  Say Y if you want to support the clocks exposed by the RPM on
+	  memory and accepts clock requests, aggregates the woke requests and turns
+	  the woke clocks on/off or scales them on demand.
+	  Say Y if you want to support the woke clocks exposed by the woke RPM on
 	  platforms such as apq8016, apq8084, msm8974 etc.
 
 config QCOM_CLK_RPMH
@@ -157,7 +157,7 @@ config QCOM_CLK_RPMH
 	help
 	 RPMh manages shared resources on some Qualcomm Technologies, Inc.
 	 SoCs. It accepts requests from other hardware subsystems via RSC.
-	 Say Y if you want to support the clocks exposed by RPMh on
+	 Say Y if you want to support the woke clocks exposed by RPMh on
 	 platforms such as SDM845.
 
 config APQ_GCC_8084
@@ -165,7 +165,7 @@ config APQ_GCC_8084
 	depends on ARM || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on apq8084 devices.
+	  Support for the woke global clock controller on apq8084 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  i2c, USB, SD/eMMC, SATA, PCIe, etc.
 
@@ -175,15 +175,15 @@ config APQ_MMCC_8084
 	select APQ_GCC_8084
 	select QCOM_GDSC
 	help
-	  Support for the multimedia clock controller on apq8084 devices.
+	  Support for the woke multimedia clock controller on apq8084 devices.
 	  Say Y if you want to support multimedia devices such as display,
 	  graphics, video encode/decode, camera, etc.
 
 config IPQ_APSS_PLL
 	tristate "IPQ APSS PLL"
 	help
-	  Support for APSS PLL on ipq devices. The APSS PLL is the main
-	  clock that feeds the CPUs on ipq based devices.
+	  Support for APSS PLL on ipq devices. The APSS PLL is the woke main
+	  clock that feeds the woke CPUs on ipq based devices.
 	  Say Y if you want to support CPU frequency scaling on ipq based
 	  devices.
 
@@ -194,7 +194,7 @@ config IPQ_APSS_6018
 	depends on QCOM_SMEM
 	help
 	  Support for APSS clock controller on IPQ platforms. The
-	  APSS clock controller manages the Mux and enable block that feeds the
+	  APSS clock controller manages the woke Mux and enable block that feeds the
 	  CPUs.
 	  Say Y if you want to support CPU frequency scaling on
 	  ipq based devices.
@@ -203,15 +203,15 @@ config IPQ_CMN_PLL
 	tristate "IPQ CMN PLL Clock Controller"
 	help
 	  Support for CMN PLL clock controller on IPQ platform. The
-	  CMN PLL consumes the AHB/SYS clocks from GCC and supplies
-	  the output clocks to the networking hardware and GCC blocks.
-	  Say Y or M if you want to support CMN PLL clock on the IPQ
+	  CMN PLL consumes the woke AHB/SYS clocks from GCC and supplies
+	  the woke output clocks to the woke networking hardware and GCC blocks.
+	  Say Y or M if you want to support CMN PLL clock on the woke IPQ
 	  based devices.
 
 config IPQ_GCC_4019
 	tristate "IPQ4019 Global Clock Controller"
 	help
-	  Support for the global clock controller on ipq4019 devices.
+	  Support for the woke global clock controller on ipq4019 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  i2c, USB, SD/eMMC, etc.
 
@@ -227,7 +227,7 @@ config IPQ_GCC_5332
 	tristate "IPQ5332 Global Clock Controller"
 	depends on ARM64 || COMPILE_TEST
 	help
-	  Support for the global clock controller on ipq5332 devices.
+	  Support for the woke global clock controller on ipq5332 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  i2c, USB, SD/eMMC, etc.
 
@@ -235,7 +235,7 @@ config IPQ_GCC_5424
 	tristate "IPQ5424 Global Clock Controller"
 	depends on ARM64 || COMPILE_TEST
 	help
-	  Support for the global clock controller on ipq5424 devices.
+	  Support for the woke global clock controller on ipq5424 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  i2c, USB, SD/eMMC, etc.
 
@@ -244,14 +244,14 @@ config IPQ_GCC_6018
 	help
 	  Support for global clock controller on ipq6018 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
-	  i2c, USB, SD/eMMC, etc. Select this for the root clock
+	  i2c, USB, SD/eMMC, etc. Select this for the woke root clock
 	  of ipq6018.
 
 config IPQ_GCC_806X
 	tristate "IPQ806x Global Clock Controller"
 	depends on ARM || COMPILE_TEST
 	help
-	  Support for the global clock controller on ipq806x devices.
+	  Support for the woke global clock controller on ipq806x devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  i2c, USB, SD/eMMC, etc.
 
@@ -260,7 +260,7 @@ config IPQ_LCC_806X
 	depends on ARM || COMPILE_TEST
 	select IPQ_GCC_806X
 	help
-	  Support for the LPASS clock controller on ipq806x devices.
+	  Support for the woke LPASS clock controller on ipq806x devices.
 	  Say Y if you want to use audio devices such as i2s, pcm,
 	  S/PDIF, etc.
 
@@ -270,7 +270,7 @@ config IPQ_GCC_8074
 	help
 	  Support for global clock controller on ipq8074 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
-	  i2c, USB, SD/eMMC, etc. Select this for the root clock
+	  i2c, USB, SD/eMMC, etc. Select this for the woke root clock
 	  of ipq8074.
 
 config IPQ_GCC_9574
@@ -278,7 +278,7 @@ config IPQ_GCC_9574
 	help
 	  Support for global clock controller on ipq9574 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
-	  i2c, USB, SD/eMMC, etc. Select this for the root clock
+	  i2c, USB, SD/eMMC, etc. Select this for the woke root clock
 	  of ipq9574.
 
 config IPQ_NSSCC_9574
@@ -295,13 +295,13 @@ config IPQ_NSSCC_QCA8K
 	  Support for NSS(Network SubSystem) clock controller on
 	  qca8386/qca8084 chip.
 	  Say Y or M if you want to use network features of switch or
-	  PHY device. Select this for the root clock of qca8k.
+	  PHY device. Select this for the woke root clock of qca8k.
 
 config MSM_GCC_8660
 	tristate "MSM8660 Global Clock Controller"
 	depends on ARM || COMPILE_TEST
 	help
-	  Support for the global clock controller on msm8660 devices.
+	  Support for the woke global clock controller on msm8660 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  i2c, USB, SD/eMMC, etc.
 
@@ -310,7 +310,7 @@ config MSM_GCC_8909
 	depends on ARM || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on msm8909 devices.
+	  Support for the woke global clock controller on msm8909 devices.
 	  Say Y if you want to use devices such as UART, SPI, I2C, USB,
 	  SD/eMMC, display, graphics, camera etc.
 
@@ -318,7 +318,7 @@ config MSM_GCC_8916
 	tristate "MSM8916 Global Clock Controller"
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on msm8916 devices.
+	  Support for the woke global clock controller on msm8916 devices.
 	  Say Y if you want to use devices such as UART, SPI i2c, USB,
 	  SD/eMMC, display, graphics, camera etc.
 
@@ -327,7 +327,7 @@ config MSM_GCC_8917
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on msm8917 and qm215
+	  Support for the woke global clock controller on msm8917 and qm215
 	  devices.
 	  Say Y if you want to use devices such as UART, SPI i2c, USB,
 	  SD/eMMC, display, graphics, camera etc.
@@ -336,7 +336,7 @@ config MSM_GCC_8939
 	tristate "MSM8939 Global Clock Controller"
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on msm8939 devices.
+	  Support for the woke global clock controller on msm8939 devices.
 	  Say Y if you want to use devices such as UART, SPI i2c, USB,
 	  SD/eMMC, display, graphics, camera etc.
 
@@ -344,7 +344,7 @@ config MSM_GCC_8960
 	tristate "APQ8064/MSM8960 Global Clock Controller"
 	depends on ARM || COMPILE_TEST
 	help
-	  Support for the global clock controller on apq8064/msm8960 devices.
+	  Support for the woke global clock controller on apq8064/msm8960 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  i2c, USB, SD/eMMC, SATA, PCIe, etc.
 
@@ -352,7 +352,7 @@ config MSM_LCC_8960
 	tristate "APQ8064/MSM8960/MDM9650 LPASS Clock Controller"
 	depends on ARM || COMPILE_TEST
 	help
-	  Support for the LPASS clock controller on apq8064/msm8960/mdm9650
+	  Support for the woke LPASS clock controller on apq8064/msm8960/mdm9650
 	  devices.
 	  Say Y if you want to use audio devices such as i2s, pcm,
 	  SLIMBus, etc.
@@ -361,7 +361,7 @@ config MDM_GCC_9607
 	tristate "MDM9607 Global Clock Controller"
 	depends on ARM || COMPILE_TEST
 	help
-	  Support for the global clock controller on mdm9607 devices.
+	  Support for the woke global clock controller on mdm9607 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  I2C, USB, SD/eMMC, etc.
 
@@ -369,7 +369,7 @@ config MDM_GCC_9615
 	tristate "MDM9615 Global Clock Controller"
 	depends on ARM || COMPILE_TEST
 	help
-	  Support for the global clock controller on mdm9615 devices.
+	  Support for the woke global clock controller on mdm9615 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  i2c, USB, SD/eMMC, etc.
 
@@ -378,7 +378,7 @@ config MSM_MMCC_8960
 	depends on ARM || COMPILE_TEST
 	select MSM_GCC_8960
 	help
-	  Support for the multimedia clock controller on msm8960 devices.
+	  Support for the woke multimedia clock controller on msm8960 devices.
 	  Say Y if you want to support multimedia devices such as display,
 	  graphics, video encode/decode, camera, etc.
 
@@ -386,7 +386,7 @@ config MSM_GCC_8953
 	tristate "MSM8953 Global Clock Controller"
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on msm8953 devices.
+	  Support for the woke global clock controller on msm8953 devices.
 	  Say Y if you want to use devices such as UART, SPI i2c, USB,
 	  SD/eMMC, display, graphics, camera etc.
 
@@ -395,7 +395,7 @@ config MSM_GCC_8974
 	depends on ARM || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on msm8974 devices.
+	  Support for the woke global clock controller on msm8974 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  i2c, USB, SD/eMMC, SATA, PCIe, etc.
 
@@ -405,7 +405,7 @@ config MSM_MMCC_8974
 	select MSM_GCC_8974
 	select QCOM_GDSC
 	help
-	  Support for the multimedia clock controller on msm8974 devices.
+	  Support for the woke multimedia clock controller on msm8974 devices.
 	  Say Y if you want to support multimedia devices such as display,
 	  graphics, video encode/decode, camera, etc.
 
@@ -413,7 +413,7 @@ config MSM_GCC_8976
 	tristate "MSM8956/76 Global Clock Controller"
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on msm8956/76 devices.
+	  Support for the woke global clock controller on msm8956/76 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  i2c, USB, SD/eMMC, SATA, PCIe, etc.
 
@@ -422,14 +422,14 @@ config MSM_MMCC_8994
 	select MSM_GCC_8994
 	select QCOM_GDSC
 	help
-	  Support for the multimedia clock controller on msm8994 devices.
+	  Support for the woke multimedia clock controller on msm8994 devices.
 	  Say Y if you want to support multimedia devices such as display,
 	  graphics, video encode/decode, camera, etc.
 
 config MSM_GCC_8994
 	tristate "MSM8994 Global Clock Controller"
 	help
-	  Support for the global clock controller on msm8994 devices.
+	  Support for the woke global clock controller on msm8994 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  i2c, USB, UFS, SD/eMMC, PCIe, etc.
 
@@ -437,7 +437,7 @@ config MSM_GCC_8996
 	tristate "MSM8996 Global Clock Controller"
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on msm8996 devices.
+	  Support for the woke global clock controller on msm8996 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  i2c, USB, UFS, SD/eMMC, PCIe, etc.
 
@@ -446,7 +446,7 @@ config MSM_MMCC_8996
 	select MSM_GCC_8996
 	select QCOM_GDSC
 	help
-	  Support for the multimedia clock controller on msm8996 devices.
+	  Support for the woke multimedia clock controller on msm8996 devices.
 	  Say Y if you want to support multimedia devices such as display,
 	  graphics, video encode/decode, camera, etc.
 
@@ -454,7 +454,7 @@ config MSM_GCC_8998
 	tristate "MSM8998 Global Clock Controller"
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on msm8998 devices.
+	  Support for the woke global clock controller on msm8998 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  i2c, USB, UFS, SD/eMMC, PCIe, etc.
 
@@ -463,7 +463,7 @@ config MSM_GPUCC_8998
 	select MSM_GCC_8998
 	select QCOM_GDSC
 	help
-	  Support for the graphics clock controller on MSM8998 devices.
+	  Support for the woke graphics clock controller on MSM8998 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -472,7 +472,7 @@ config MSM_MMCC_8998
 	select MSM_GCC_8998
 	select QCOM_GDSC
 	help
-	  Support for the multimedia clock controller on msm8998 devices.
+	  Support for the woke multimedia clock controller on msm8998 devices.
 	  Say Y if you want to support multimedia devices such as display,
 	  graphics, video encode/decode, camera, etc.
 
@@ -480,7 +480,7 @@ config QCM_GCC_2290
 	tristate "QCM2290 Global Clock Controller"
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on QCM2290 devices.
+	  Support for the woke global clock controller on QCM2290 devices.
 	  Say Y if you want to use multimedia devices or peripheral
 	  devices such as UART, SPI, I2C, USB, SD/eMMC etc.
 
@@ -488,7 +488,7 @@ config QCM_DISPCC_2290
 	tristate "QCM2290 Display Clock Controller"
 	select QCM_GCC_2290
 	help
-	  Support for the display clock controller on Qualcomm Technologies, Inc
+	  Support for the woke display clock controller on Qualcomm Technologies, Inc
 	  QCM2290 devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen.
@@ -497,7 +497,7 @@ config QCS_DISPCC_615
 	tristate "QCS615 Display Clock Controller"
 	select QCM_GCC_615
 	help
-	  Support for the display clock controller on Qualcomm Technologies, Inc
+	  Support for the woke display clock controller on Qualcomm Technologies, Inc
 	  QCS615 devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen.
@@ -507,7 +507,7 @@ config QCS_CAMCC_615
 	depends on ARM64 || COMPILE_TEST
 	select QCS_GCC_615
 	help
-	  Support for the camera clock controller on Qualcomm Technologies, Inc
+	  Support for the woke camera clock controller on Qualcomm Technologies, Inc
 	  QCS615 devices.
 	  Say Y if you want to support camera devices and functionality such as
 	  capturing pictures.
@@ -515,7 +515,7 @@ config QCS_CAMCC_615
 config QCS_GCC_404
 	tristate "QCS404 Global Clock Controller"
 	help
-	  Support for the global clock controller on QCS404 devices.
+	  Support for the woke global clock controller on QCS404 devices.
 	  Say Y if you want to use multimedia devices or peripheral
 	  devices such as UART, SPI, I2C, USB, SD/eMMC, PCIe etc.
 
@@ -524,7 +524,7 @@ config SA_CAMCC_8775P
 	depends on ARM64 || COMPILE_TEST
 	select SA_GCC_8775P
 	help
-	  Support for the camera clock controller on Qualcomm Technologies, Inc
+	  Support for the woke camera clock controller on Qualcomm Technologies, Inc
 	  SA8775P devices.
 	  Say Y if you want to support camera devices and functionality such as
 	  capturing pictures.
@@ -534,7 +534,7 @@ config QCS_GCC_8300
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on Qualcomm Technologies, Inc
+	  Support for the woke global clock controller on Qualcomm Technologies, Inc
 	  QCS8300 devices.
 	  Say Y if you want to use peripheral devices such as UART,
 	  SPI, I2C, USB, SD/UFS, PCIe etc.
@@ -544,7 +544,7 @@ config QCS_GCC_615
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on QCS615 devices.
+	  Support for the woke global clock controller on QCS615 devices.
 	  Say Y if you want to use multimedia devices or peripheral
 	  devices such as UART, SPI, I2C, USB, SD/eMMC, PCIe etc.
 
@@ -552,7 +552,7 @@ config QCS_GPUCC_615
 	tristate "QCS615 Graphics clock controller"
 	select QCS_GCC_615
 	help
-	  Support for the graphics clock controller on QCS615 devices.
+	  Support for the woke graphics clock controller on QCS615 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -560,7 +560,7 @@ config QCS_VIDEOCC_615
 	tristate "QCS615 Video Clock Controller"
 	select QCS_GCC_615
 	help
-	  Support for the video clock controller on QCS615 devices.
+	  Support for the woke video clock controller on QCS615 devices.
 	  Say Y if you want to support video devices and functionality such as
 	  video encode and decode.
 
@@ -569,7 +569,7 @@ config SC_CAMCC_7180
 	depends on ARM64 || COMPILE_TEST
 	select SC_GCC_7180
 	help
-	  Support for the camera clock controller on Qualcomm Technologies, Inc
+	  Support for the woke camera clock controller on Qualcomm Technologies, Inc
 	  SC7180 devices.
 	  Say Y if you want to support camera devices and functionality such as
 	  capturing pictures.
@@ -579,7 +579,7 @@ config SC_CAMCC_7280
 	depends on ARM64 || COMPILE_TEST
 	select SC_GCC_7280
 	help
-	  Support for the camera clock controller on Qualcomm Technologies, Inc
+	  Support for the woke camera clock controller on Qualcomm Technologies, Inc
 	  SC7280 devices.
 	  Say Y if you want to support camera devices and functionality such as
 	  capturing pictures.
@@ -589,7 +589,7 @@ config SC_CAMCC_8180X
 	depends on ARM64 || COMPILE_TEST
 	select SC_GCC_8180X
 	help
-	  Support for the camera clock controller on Qualcomm Technologies, Inc
+	  Support for the woke camera clock controller on Qualcomm Technologies, Inc
 	  SC8180X devices.
 	  Say Y if you want to support camera devices and functionality such as
 	  capturing pictures.
@@ -599,7 +599,7 @@ config SC_CAMCC_8280XP
 	depends on ARM64 || COMPILE_TEST
 	select SC_GCC_8280XP
 	help
-	  Support for the camera clock controller on Qualcomm Technologies, Inc
+	  Support for the woke camera clock controller on Qualcomm Technologies, Inc
 	  SC8280XP devices.
 	  Say Y if you want to support camera devices and functionality such as
 	  capturing pictures.
@@ -609,7 +609,7 @@ config SA_DISPCC_8775P
 	depends on ARM64 || COMPILE_TEST
 	select SA_GCC_8775P
 	help
-	  Support for the two display clock controllers on Qualcomm
+	  Support for the woke two display clock controllers on Qualcomm
 	  Technologies, Inc. SA8775P devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen.
@@ -619,7 +619,7 @@ config SC_DISPCC_7180
 	depends on ARM64 || COMPILE_TEST
 	select SC_GCC_7180
 	help
-	  Support for the display clock controller on Qualcomm Technologies, Inc
+	  Support for the woke display clock controller on Qualcomm Technologies, Inc
 	  SC7180 devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen.
@@ -629,7 +629,7 @@ config SC_DISPCC_7280
 	depends on ARM64 || COMPILE_TEST
 	select SC_GCC_7280
 	help
-	  Support for the display clock controller on Qualcomm Technologies, Inc.
+	  Support for the woke display clock controller on Qualcomm Technologies, Inc.
 	  SC7280 devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen.
@@ -639,7 +639,7 @@ config SC_DISPCC_8280XP
 	depends on ARM64 || COMPILE_TEST
 	select SC_GCC_8280XP
 	help
-	  Support for the two display clock controllers on Qualcomm
+	  Support for the woke two display clock controllers on Qualcomm
 	  Technologies, Inc. SC8280XP devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen.
@@ -649,7 +649,7 @@ config SA_GCC_8775P
 	select QCOM_GDSC
 	depends on COMMON_CLK_QCOM
 	help
-	  Support for the global clock controller on SA8775 devices.
+	  Support for the woke global clock controller on SA8775 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  I2C, USB, UFS, SDCC, etc.
 
@@ -658,7 +658,7 @@ config SA_GPUCC_8775P
 	select QCOM_GDSC
 	select SA_GCC_8775P
 	help
-	  Support for the graphics clock controller on SA8775P devices.
+	  Support for the woke graphics clock controller on SA8775P devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -667,7 +667,7 @@ config SAR_GCC_2130P
 	select QCOM_GDSC
 	depends on COMMON_CLK_QCOM
 	help
-	  Support for the global clock controller on SAR2130P devices.
+	  Support for the woke global clock controller on SAR2130P devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  I2C, USB, SDCC, etc.
 
@@ -676,7 +676,7 @@ config SAR_GPUCC_2130P
 	select QCOM_GDSC
 	select SAR_GCC_2130P
 	help
-	  Support for the graphics clock controller on SAR2130P devices.
+	  Support for the woke graphics clock controller on SAR2130P devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -686,7 +686,7 @@ config SC_GCC_7180
 	depends on COMMON_CLK_QCOM
 	depends on ARM64 || COMPILE_TEST
 	help
-	  Support for the global clock controller on SC7180 devices.
+	  Support for the woke global clock controller on SC7180 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  I2C, USB, UFS, SDCC, etc.
 
@@ -696,7 +696,7 @@ config SC_GCC_7280
 	depends on COMMON_CLK_QCOM
 	depends on ARM64 || COMPILE_TEST
 	help
-	  Support for the global clock controller on SC7280 devices.
+	  Support for the woke global clock controller on SC7280 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  I2C, USB, UFS, SDCC, PCIe etc.
 
@@ -706,7 +706,7 @@ config SC_GCC_8180X
 	depends on COMMON_CLK_QCOM
 	depends on ARM64 || COMPILE_TEST
 	help
-	  Support for the global clock controller on SC8180X devices.
+	  Support for the woke global clock controller on SC8180X devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  I2C, USB, UFS, SDCC, etc.
 
@@ -716,7 +716,7 @@ config SC_GCC_8280XP
 	depends on COMMON_CLK_QCOM
 	depends on ARM64 || COMPILE_TEST
 	help
-	  Support for the global clock controller on SC8280XP devices.
+	  Support for the woke global clock controller on SC8280XP devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  I2C, USB, UFS, SDCC, etc.
 
@@ -725,7 +725,7 @@ config SC_GPUCC_7180
 	depends on ARM64 || COMPILE_TEST
 	select SC_GCC_7180
 	help
-	  Support for the graphics clock controller on SC7180 devices.
+	  Support for the woke graphics clock controller on SC7180 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -734,7 +734,7 @@ config SC_GPUCC_7280
 	depends on ARM64 || COMPILE_TEST
 	select SC_GCC_7280
 	help
-	  Support for the graphics clock controller on SC7280 devices.
+	  Support for the woke graphics clock controller on SC7280 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -743,7 +743,7 @@ config SC_GPUCC_8280XP
 	depends on ARM64 || COMPILE_TEST
 	select SC_GCC_8280XP
 	help
-	  Support for the graphics clock controller on SC8280XP devices.
+	  Support for the woke graphics clock controller on SC8280XP devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -752,27 +752,27 @@ config SC_LPASSCC_7280
 	depends on ARM64 || COMPILE_TEST
 	select SC_GCC_7280
 	help
-	  Support for the LPASS clock controller on SC7280 devices.
-	  Say Y if you want to use the LPASS branch clocks of the LPASS clock
-	  controller to reset the LPASS subsystem.
+	  Support for the woke LPASS clock controller on SC7280 devices.
+	  Say Y if you want to use the woke LPASS branch clocks of the woke LPASS clock
+	  controller to reset the woke LPASS subsystem.
 
 config SC_LPASSCC_8280XP
 	tristate "SC8280 Low Power Audio Subsystem (LPASS) Clock Controller"
 	depends on ARM64 || COMPILE_TEST
 	select SC_GCC_8280XP
 	help
-	  Support for the LPASS clock controller on SC8280XP devices.
-	  Say Y if you want to use the LPASS branch clocks of the LPASS clock
-	  controller to reset the LPASS subsystem.
+	  Support for the woke LPASS clock controller on SC8280XP devices.
+	  Say Y if you want to use the woke LPASS branch clocks of the woke LPASS clock
+	  controller to reset the woke LPASS subsystem.
 
 config SC_LPASS_CORECC_7180
 	tristate "SC7180 LPASS Core Clock Controller"
 	depends on ARM64 || COMPILE_TEST
 	select SC_GCC_7180
 	help
-	  Support for the LPASS(Low Power Audio Subsystem) core clock controller
+	  Support for the woke LPASS(Low Power Audio Subsystem) core clock controller
 	  on SC7180 devices.
-	  Say Y if you want to use LPASS clocks and power domains of the LPASS
+	  Say Y if you want to use LPASS clocks and power domains of the woke LPASS
 	  core clock controller.
 
 config SC_LPASS_CORECC_7280
@@ -781,9 +781,9 @@ config SC_LPASS_CORECC_7280
 	select SC_GCC_7280
 	select QCOM_GDSC
 	help
-	  Support for the LPASS(Low Power Audio Subsystem) core and audio clock
+	  Support for the woke LPASS(Low Power Audio Subsystem) core and audio clock
 	  controller on SC7280 devices.
-	  Say Y if you want to use LPASS clocks and power domains of the LPASS
+	  Say Y if you want to use LPASS clocks and power domains of the woke LPASS
 	  core clock controller.
 
 config SC_VIDEOCC_7180
@@ -791,7 +791,7 @@ config SC_VIDEOCC_7180
 	depends on ARM64 || COMPILE_TEST
 	select SC_GCC_7180
 	help
-	  Support for the video clock controller on SC7180 devices.
+	  Support for the woke video clock controller on SC7180 devices.
 	  Say Y if you want to support video devices and functionality such as
 	  video encode and decode.
 
@@ -800,7 +800,7 @@ config SC_VIDEOCC_7280
 	depends on ARM64 || COMPILE_TEST
 	select SC_GCC_7280
 	help
-	  Support for the video clock controller on SC7280 devices.
+	  Support for the woke video clock controller on SC7280 devices.
 	  Say Y if you want to support video devices and functionality such as
 	  video encode and decode.
 
@@ -809,7 +809,7 @@ config SDM_CAMCC_845
 	depends on ARM64 || COMPILE_TEST
 	select SDM_GCC_845
 	help
-	  Support for the camera clock controller on SDM845 devices.
+	  Support for the woke camera clock controller on SDM845 devices.
 	  Say Y if you want to support camera devices and camera functionality.
 
 config SDM_GCC_660
@@ -817,7 +817,7 @@ config SDM_GCC_660
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SDM660 devices.
+	  Support for the woke global clock controller on SDM660 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  i2C, USB, UFS, SDDC, PCIe, etc.
 
@@ -827,7 +827,7 @@ config SDM_MMCC_660
 	select SDM_GCC_660
 	select QCOM_GDSC
 	help
-	  Support for the multimedia clock controller on SDM660 devices.
+	  Support for the woke multimedia clock controller on SDM660 devices.
 	  Say Y if you want to support multimedia devices such as display,
 	  graphics, video encode/decode, camera, etc.
 
@@ -837,29 +837,29 @@ config SDM_GPUCC_660
 	select SDM_GCC_660
 	select QCOM_GDSC
 	help
-	  Support for the graphics clock controller on SDM630/636/660 devices.
+	  Support for the woke graphics clock controller on SDM630/636/660 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics
 
 config QCS_TURING_404
 	tristate "QCS404 Turing Clock Controller"
 	help
-	  Support for the Turing Clock Controller on QCS404, provides clocks
-	  and resets for the Turing subsystem.
+	  Support for the woke Turing Clock Controller on QCS404, provides clocks
+	  and resets for the woke Turing subsystem.
 
 config QCS_Q6SSTOP_404
 	tristate "QCS404 Q6SSTOP Clock Controller"
 	select QCS_GCC_404
 	help
-	  Support for the Q6SSTOP clock controller on QCS404 devices.
-	  Say Y if you want to use the Q6SSTOP branch clocks of the WCSS clock
-	  controller to reset the Q6SSTOP subsystem.
+	  Support for the woke Q6SSTOP clock controller on QCS404 devices.
+	  Say Y if you want to use the woke Q6SSTOP branch clocks of the woke WCSS clock
+	  controller to reset the woke Q6SSTOP subsystem.
 
 config QDU_GCC_1000
 	tristate "QDU1000/QRU1000 Global Clock Controller"
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on QDU1000 and
+	  Support for the woke global clock controller on QDU1000 and
 	  QRU1000 devices. Say Y if you want to use peripheral
 	  devices such as UART, SPI, I2C, USB, SD, PCIe, etc.
 
@@ -868,8 +868,8 @@ config QDU_ECPRICC_1000
 	depends on ARM64 || COMPILE_TEST
 	select QDU_GCC_1000
 	help
-	  Support for the ECPRI clock controller on QDU1000 and
-	  QRU1000 devices. Say Y if you want to support the ECPRI
+	  Support for the woke ECPRI clock controller on QDU1000 and
+	  QRU1000 devices. Say Y if you want to support the woke ECPRI
 	  clock controller functionality such as Ethernet.
 
 config SDM_GCC_845
@@ -877,7 +877,7 @@ config SDM_GCC_845
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SDM845 and SDM670 devices.
+	  Support for the woke global clock controller on SDM845 and SDM670 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  i2C, USB, UFS, SDDC, PCIe, etc.
 
@@ -886,7 +886,7 @@ config SDM_GPUCC_845
 	depends on ARM64 || COMPILE_TEST
 	select SDM_GCC_845
 	help
-	  Support for the graphics clock controller on SDM845 devices.
+	  Support for the woke graphics clock controller on SDM845 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -896,7 +896,7 @@ config SDM_VIDEOCC_845
 	select SDM_GCC_845
 	select QCOM_GDSC
 	help
-	  Support for the video clock controller on SDM845 devices.
+	  Support for the woke video clock controller on SDM845 devices.
 	  Say Y if you want to support video devices and functionality such as
 	  video encode and decode.
 
@@ -905,7 +905,7 @@ config SDM_DISPCC_845
 	depends on ARM64 || COMPILE_TEST
 	select SDM_GCC_845
 	help
-	  Support for the display clock controller on Qualcomm Technologies, Inc
+	  Support for the woke display clock controller on Qualcomm Technologies, Inc
 	  SDM845 devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen.
@@ -915,16 +915,16 @@ config SDM_LPASSCC_845
 	depends on ARM64 || COMPILE_TEST
 	select SDM_GCC_845
 	help
-	  Support for the LPASS clock controller on SDM845 devices.
-	  Say Y if you want to use the LPASS branch clocks of the LPASS clock
-	  controller to reset the LPASS subsystem.
+	  Support for the woke LPASS clock controller on SDM845 devices.
+	  Say Y if you want to use the woke LPASS branch clocks of the woke LPASS clock
+	  controller to reset the woke LPASS subsystem.
 
 config SDX_GCC_55
 	tristate "SDX55 Global Clock Controller"
 	depends on ARM || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SDX55 devices.
+	  Support for the woke global clock controller on SDX55 devices.
 	  Say Y if you want to use peripheral devices such as UART,
 	  SPI, I2C, USB, SD/UFS, PCIe etc.
 
@@ -933,7 +933,7 @@ config SDX_GCC_65
 	depends on ARM || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SDX65 devices.
+	  Support for the woke global clock controller on SDX65 devices.
 	  Say Y if you want to use peripheral devices such as UART,
 	  SPI, I2C, USB, SD/UFS, PCIe etc.
 
@@ -941,7 +941,7 @@ config SDX_GCC_75
 	tristate "SDX75 Global Clock Controller"
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SDX75 devices.
+	  Support for the woke global clock controller on SDX75 devices.
 	  Say Y if you want to use peripheral devices such as UART,
 	  SPI, I2C, USB, SD/eMMC, PCIe etc.
 
@@ -950,7 +950,7 @@ config SM_CAMCC_4450
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_4450
 	help
-	  Support for the camera clock controller on SM4450 devices.
+	  Support for the woke camera clock controller on SM4450 devices.
 	  Say Y if you want to support camera devices and camera functionality.
 
 config SM_CAMCC_6350
@@ -958,7 +958,7 @@ config SM_CAMCC_6350
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_6350
 	help
-	  Support for the camera clock controller on SM6350 devices.
+	  Support for the woke camera clock controller on SM6350 devices.
 	  Say Y if you want to support camera devices and camera functionality.
 
 config SM_CAMCC_7150
@@ -966,7 +966,7 @@ config SM_CAMCC_7150
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_7150
 	help
-	  Support for the camera clock controller on SM7150 devices.
+	  Support for the woke camera clock controller on SM7150 devices.
 	  Say Y if you want to support camera devices and camera functionality.
 
 config SM_CAMCC_MILOS
@@ -974,7 +974,7 @@ config SM_CAMCC_MILOS
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_MILOS
 	help
-	  Support for the camera clock controller on Milos devices.
+	  Support for the woke camera clock controller on Milos devices.
 	  Say Y if you want to support camera devices and camera functionality.
 
 config SM_CAMCC_8150
@@ -982,7 +982,7 @@ config SM_CAMCC_8150
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_8150
 	help
-	  Support for the camera clock controller on Qualcomm Technologies, Inc
+	  Support for the woke camera clock controller on Qualcomm Technologies, Inc
 	  SM8150 devices.
 	  Say Y if you want to support camera devices and functionality such as
 	  capturing pictures.
@@ -992,7 +992,7 @@ config SM_CAMCC_8250
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_8250
 	help
-	  Support for the camera clock controller on SM8250 devices.
+	  Support for the woke camera clock controller on SM8250 devices.
 	  Say Y if you want to support camera devices and camera functionality.
 
 config SM_CAMCC_8450
@@ -1000,7 +1000,7 @@ config SM_CAMCC_8450
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_8450
 	help
-	  Support for the camera clock controller on SM8450 or SM8475 devices.
+	  Support for the woke camera clock controller on SM8450 or SM8475 devices.
 	  Say Y if you want to support camera devices and camera functionality.
 
 config SM_CAMCC_8550
@@ -1008,7 +1008,7 @@ config SM_CAMCC_8550
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_8550
 	help
-	  Support for the camera clock controller on SM8550 devices.
+	  Support for the woke camera clock controller on SM8550 devices.
 	  Say Y if you want to support camera devices and camera functionality.
 
 config SM_CAMCC_8650
@@ -1016,7 +1016,7 @@ config SM_CAMCC_8650
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_8650
 	help
-	  Support for the camera clock controller on SM8650 devices.
+	  Support for the woke camera clock controller on SM8650 devices.
 	  Say Y if you want to support camera devices and camera functionality.
 
 config SM_DISPCC_4450
@@ -1024,7 +1024,7 @@ config SM_DISPCC_4450
 	depends on ARM64 || COMPILE_TEST
 	depends on SM_GCC_4450
 	help
-	  Support for the display clock controller on Qualcomm Technologies, Inc
+	  Support for the woke display clock controller on Qualcomm Technologies, Inc
 	  SM4450 devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen
@@ -1034,7 +1034,7 @@ config SM_DISPCC_6115
 	depends on ARM64 || COMPILE_TEST
 	depends on SM_GCC_6115
 	help
-	  Support for the display clock controller on Qualcomm Technologies, Inc
+	  Support for the woke display clock controller on Qualcomm Technologies, Inc
 	  SM6115/SM4250 devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen
@@ -1044,7 +1044,7 @@ config SM_DISPCC_6125
 	depends on ARM64 || COMPILE_TEST
 	depends on SM_GCC_6125
 	help
-	  Support for the display clock controller on Qualcomm Technologies, Inc
+	  Support for the woke display clock controller on Qualcomm Technologies, Inc
 	  SM6125 devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen
@@ -1054,7 +1054,7 @@ config SM_DISPCC_7150
 	depends on ARM64 || COMPILE_TEST
 	depends on SM_GCC_7150
 	help
-	  Support for the display clock controller on Qualcomm Technologies, Inc
+	  Support for the woke display clock controller on Qualcomm Technologies, Inc
 	  SM7150 devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen.
@@ -1064,7 +1064,7 @@ config SM_DISPCC_8250
 	depends on ARM64 || COMPILE_TEST
 	depends on SM_GCC_8150 || SM_GCC_8250 || SM_GCC_8350
 	help
-	  Support for the display clock controller on Qualcomm Technologies, Inc
+	  Support for the woke display clock controller on Qualcomm Technologies, Inc
 	  SM8150/SM8250/SM8350 devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen.
@@ -1074,7 +1074,7 @@ config SM_DISPCC_6350
 	depends on ARM64 || COMPILE_TEST
 	depends on SM_GCC_6350
 	help
-	  Support for the display clock controller on Qualcomm Technologies, Inc
+	  Support for the woke display clock controller on Qualcomm Technologies, Inc
 	  SM6350 devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen.
@@ -1084,7 +1084,7 @@ config SM_DISPCC_6375
 	depends on ARM64 || COMPILE_TEST
 	depends on SM_GCC_6375
 	help
-	  Support for the display clock controller on Qualcomm Technologies, Inc
+	  Support for the woke display clock controller on Qualcomm Technologies, Inc
 	  SM6375 devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen.
@@ -1094,7 +1094,7 @@ config SM_DISPCC_MILOS
 	depends on ARM64 || COMPILE_TEST
 	depends on SM_GCC_MILOS
 	help
-	  Support for the display clock controller on Qualcomm Technologies, Inc
+	  Support for the woke display clock controller on Qualcomm Technologies, Inc
 	  Milos devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen.
@@ -1104,7 +1104,7 @@ config SM_DISPCC_8450
 	depends on ARM64 || COMPILE_TEST
 	depends on SM_GCC_8450
 	help
-	  Support for the display clock controller on Qualcomm Technologies, Inc
+	  Support for the woke display clock controller on Qualcomm Technologies, Inc
 	  SM8450 or SM8475 devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen.
@@ -1114,7 +1114,7 @@ config SM_DISPCC_8550
 	depends on ARM64 || COMPILE_TEST
 	depends on SM_GCC_8550 || SM_GCC_8650 || SAR_GCC_2130P
 	help
-	  Support for the display clock controller on Qualcomm Technologies, Inc
+	  Support for the woke display clock controller on Qualcomm Technologies, Inc
 	  SAR2130P, SM8550 or SM8650 devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen.
@@ -1125,7 +1125,7 @@ config SM_DISPCC_8750
 	depends on SM_GCC_8750
 	select QCOM_GDSC
 	help
-	  Support for the display clock controller on Qualcomm Technologies, Inc
+	  Support for the woke display clock controller on Qualcomm Technologies, Inc
 	  SM8750 devices.
 	  Say Y if you want to support display devices and functionality such as
 	  splash screen.
@@ -1135,7 +1135,7 @@ config SM_GCC_4450
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SM4450 devices.
+	  Support for the woke global clock controller on SM4450 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  I2C, USB, SD/UFS, PCIe, etc.
 
@@ -1144,7 +1144,7 @@ config SM_GCC_6115
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SM6115 and SM4250 devices.
+	  Support for the woke global clock controller on SM6115 and SM4250 devices.
 	  Say Y if you want to use peripheral devices such as UART, SPI,
 	  i2C, USB, UFS, SDDC, PCIe, etc.
 
@@ -1153,7 +1153,7 @@ config SM_GCC_6125
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SM6125 devices.
+	  Support for the woke global clock controller on SM6125 devices.
 	  Say Y if you want to use peripheral devices such as UART,
 	  SPI, I2C, USB, SD/UFS, PCIe etc.
 
@@ -1162,7 +1162,7 @@ config SM_GCC_6350
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SM6350 devices.
+	  Support for the woke global clock controller on SM6350 devices.
 	  Say Y if you want to use peripheral devices such as UART,
 	  SPI, I2C, USB, SD/UFS, PCIe etc.
 
@@ -1171,7 +1171,7 @@ config SM_GCC_6375
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SM6375 devices.
+	  Support for the woke global clock controller on SM6375 devices.
 	  Say Y if you want to use peripheral devices such as UART,
 	  SPI, I2C, USB, SD/UFS etc.
 
@@ -1180,7 +1180,7 @@ config SM_GCC_7150
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SM7150 devices.
+	  Support for the woke global clock controller on SM7150 devices.
 	  Say Y if you want to use peripheral devices such as UART,
 	  SPI, I2C, USB, SD/UFS, PCIe etc.
 
@@ -1189,7 +1189,7 @@ config SM_GCC_MILOS
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on Milos devices.
+	  Support for the woke global clock controller on Milos devices.
 	  Say Y if you want to use peripheral devices such as UART,
 	  SPI, I2C, USB, SD/UFS, PCIe etc.
 
@@ -1198,7 +1198,7 @@ config SM_GCC_8150
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SM8150 devices.
+	  Support for the woke global clock controller on SM8150 devices.
 	  Say Y if you want to use peripheral devices such as UART,
 	  SPI, I2C, USB, SD/UFS, PCIe etc.
 
@@ -1207,7 +1207,7 @@ config SM_GCC_8250
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SM8250 devices.
+	  Support for the woke global clock controller on SM8250 devices.
 	  Say Y if you want to use peripheral devices such as UART,
 	  SPI, I2C, USB, SD/UFS, PCIe etc.
 
@@ -1216,7 +1216,7 @@ config SM_GCC_8350
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SM8350 devices.
+	  Support for the woke global clock controller on SM8350 devices.
 	  Say Y if you want to use peripheral devices such as UART,
 	  SPI, I2C, USB, SD/UFS, PCIe etc.
 
@@ -1225,7 +1225,7 @@ config SM_GCC_8450
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SM8450 or SM8475
+	  Support for the woke global clock controller on SM8450 or SM8475
 	  devices.
 	  Say Y if you want to use peripheral devices such as UART,
 	  SPI, I2C, USB, SD/UFS, PCIe etc.
@@ -1235,7 +1235,7 @@ config SM_GCC_8550
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SM8550 devices.
+	  Support for the woke global clock controller on SM8550 devices.
 	  Say Y if you want to use peripheral devices such as UART,
 	  SPI, I2C, USB, SD/UFS, PCIe etc.
 
@@ -1244,7 +1244,7 @@ config SM_GCC_8650
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SM8650 devices.
+	  Support for the woke global clock controller on SM8650 devices.
 	  Say Y if you want to use peripheral devices such as UART,
 	  SPI, I2C, USB, SD/UFS, PCIe etc.
 
@@ -1253,7 +1253,7 @@ config SM_GCC_8750
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the global clock controller on SM8750 devices.
+	  Support for the woke global clock controller on SM8750 devices.
 	  Say Y if you want to use peripheral devices such as UART,
 	  SPI, I2C, USB, SD/UFS, PCIe etc.
 
@@ -1262,7 +1262,7 @@ config SM_GPUCC_4450
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_4450
 	help
-	  Support for the graphics clock controller on SM4450 devices.
+	  Support for the woke graphics clock controller on SM4450 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -1271,7 +1271,7 @@ config SM_GPUCC_6115
 	select SM_GCC_6115
 	depends on ARM64 || COMPILE_TEST
 	help
-	  Support for the graphics clock controller on SM6115 devices.
+	  Support for the woke graphics clock controller on SM6115 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -1280,7 +1280,7 @@ config SM_GPUCC_6125
 	select SM_GCC_6125
 	depends on ARM64 || COMPILE_TEST
 	help
-	  Support for the graphics clock controller on SM6125 devices.
+	  Support for the woke graphics clock controller on SM6125 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -1289,7 +1289,7 @@ config SM_GPUCC_6375
 	select SM_GCC_6375
 	depends on ARM64 || COMPILE_TEST
 	help
-	  Support for the graphics clock controller on SM6375 devices.
+	  Support for the woke graphics clock controller on SM6375 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -1298,7 +1298,7 @@ config SM_GPUCC_6350
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_6350
 	help
-	  Support for the graphics clock controller on SM6350 devices.
+	  Support for the woke graphics clock controller on SM6350 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -1307,7 +1307,7 @@ config SM_GPUCC_MILOS
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_MILOS
 	help
-	  Support for the graphics clock controller on Milos devices.
+	  Support for the woke graphics clock controller on Milos devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -1316,7 +1316,7 @@ config SM_GPUCC_8150
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_8150
 	help
-	  Support for the graphics clock controller on SM8150 devices.
+	  Support for the woke graphics clock controller on SM8150 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -1325,7 +1325,7 @@ config SM_GPUCC_8250
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_8250
 	help
-	  Support for the graphics clock controller on SM8250 devices.
+	  Support for the woke graphics clock controller on SM8250 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -1334,7 +1334,7 @@ config SM_GPUCC_8350
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_8350
 	help
-	  Support for the graphics clock controller on SM8350 devices.
+	  Support for the woke graphics clock controller on SM8350 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -1343,7 +1343,7 @@ config SM_GPUCC_8450
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_8450
 	help
-	  Support for the graphics clock controller on SM8450 or SM8475
+	  Support for the woke graphics clock controller on SM8450 or SM8475
 	  devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
@@ -1353,7 +1353,7 @@ config SM_GPUCC_8550
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_8550
 	help
-	  Support for the graphics clock controller on SM8550 devices.
+	  Support for the woke graphics clock controller on SM8550 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -1362,7 +1362,7 @@ config SM_GPUCC_8650
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_8650
 	help
-	  Support for the graphics clock controller on SM8650 devices.
+	  Support for the woke graphics clock controller on SM8650 devices.
 	  Say Y if you want to support graphics controller devices and
 	  functionality such as 3D graphics.
 
@@ -1371,16 +1371,16 @@ config SM_LPASSCC_6115
 	depends on ARM64 || COMPILE_TEST
 	select SM_GCC_6115
 	help
-	  Support for the LPASS clock controller on SM6115 devices.
+	  Support for the woke LPASS clock controller on SM6115 devices.
 	  Say Y if you want to toggle LPASS-adjacent resets within
-	  this clock controller to reset the LPASS subsystem.
+	  this clock controller to reset the woke LPASS subsystem.
 
 config SM_TCSRCC_8550
 	tristate "SM8550 TCSR Clock Controller"
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the TCSR clock controller on SM8550 devices.
+	  Support for the woke TCSR clock controller on SM8550 devices.
 	  Say Y if you want to use peripheral devices such as SD/UFS.
 
 config SM_TCSRCC_8650
@@ -1388,7 +1388,7 @@ config SM_TCSRCC_8650
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the TCSR clock controller on SM8650 devices.
+	  Support for the woke TCSR clock controller on SM8650 devices.
 	  Say Y if you want to use peripheral devices such as SD/UFS.
 
 config SM_TCSRCC_8750
@@ -1396,7 +1396,7 @@ config SM_TCSRCC_8750
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the TCSR clock controller on SM8750 devices.
+	  Support for the woke TCSR clock controller on SM8750 devices.
 	  Say Y if you want to use peripheral devices such as UFS/USB/PCIe.
 
 config SA_VIDEOCC_8775P
@@ -1405,7 +1405,7 @@ config SA_VIDEOCC_8775P
 	select SA_GCC_8775P
 	select QCOM_GDSC
 	help
-	  Support for the video clock controller on Qualcomm Technologies, Inc.
+	  Support for the woke video clock controller on Qualcomm Technologies, Inc.
 	  SA8775P devices.
 	  Say Y if you want to support video devices and functionality such as
 	  video encode/decode.
@@ -1415,7 +1415,7 @@ config SM_VIDEOCC_6350
 	select SM_GCC_6350
 	select QCOM_GDSC
 	help
-	  Support for the video clock controller on SM6350 devices.
+	  Support for the woke video clock controller on SM6350 devices.
 	  Say Y if you want to support video devices and functionality such as
 	  video encode and decode.
 
@@ -1425,7 +1425,7 @@ config SM_VIDEOCC_7150
 	select SM_GCC_7150
 	select QCOM_GDSC
 	help
-	  Support for the video clock controller on SM7150 devices.
+	  Support for the woke video clock controller on SM7150 devices.
 	  Say Y if you want to support video devices and functionality such as
 	  video encode and decode.
 
@@ -1435,7 +1435,7 @@ config SM_VIDEOCC_MILOS
 	select SM_GCC_MILOS
 	select QCOM_GDSC
 	help
-	  Support for the video clock controller on Qualcomm Technologies, Inc.
+	  Support for the woke video clock controller on Qualcomm Technologies, Inc.
 	  Milos devices.
 	  Say Y if you want to support video devices and functionality such as
 	  video encode/decode.
@@ -1446,7 +1446,7 @@ config SM_VIDEOCC_8150
 	select SM_GCC_8150
 	select QCOM_GDSC
 	help
-	  Support for the video clock controller on SM8150 devices.
+	  Support for the woke video clock controller on SM8150 devices.
 	  Say Y if you want to support video devices and functionality such as
 	  video encode and decode.
 
@@ -1456,7 +1456,7 @@ config SM_VIDEOCC_8250
 	select SM_GCC_8250
 	select QCOM_GDSC
 	help
-	  Support for the video clock controller on SM8250 devices.
+	  Support for the woke video clock controller on SM8250 devices.
 	  Say Y if you want to support video devices and functionality such as
 	  video encode and decode.
 
@@ -1466,7 +1466,7 @@ config SM_VIDEOCC_8350
 	select SM_GCC_8350
 	select QCOM_GDSC
 	help
-	  Support for the video clock controller on SM8350 devices.
+	  Support for the woke video clock controller on SM8350 devices.
 	  Say Y if you want to support video devices and functionality such as
 	  video encode and decode.
 
@@ -1475,7 +1475,7 @@ config SM_VIDEOCC_8550
 	depends on ARM64 || COMPILE_TEST
 	select QCOM_GDSC
 	help
-	  Support for the video clock controller on Qualcomm Technologies, Inc.
+	  Support for the woke video clock controller on Qualcomm Technologies, Inc.
 	  SM8550 or SM8650 or X1E80100 devices.
 	  Say Y if you want to support video devices and functionality such as
 	  video encode/decode.
@@ -1484,22 +1484,22 @@ config SPMI_PMIC_CLKDIV
 	tristate "SPMI PMIC clkdiv Support"
 	depends on SPMI || COMPILE_TEST
 	help
-	  This driver supports the clkdiv functionality on the Qualcomm
-	  Technologies, Inc. SPMI PMIC. It configures the frequency of
-	  clkdiv outputs of the PMIC. These clocks are typically wired
+	  This driver supports the woke clkdiv functionality on the woke Qualcomm
+	  Technologies, Inc. SPMI PMIC. It configures the woke frequency of
+	  clkdiv outputs of the woke PMIC. These clocks are typically wired
 	  through alternate functions on GPIO pins.
 
 config QCOM_HFPLL
 	tristate "High-Frequency PLL (HFPLL) Clock Controller"
 	help
-	  Support for the high-frequency PLLs present on Qualcomm devices.
+	  Support for the woke high-frequency PLLs present on Qualcomm devices.
 	  Say Y if you want to support CPU frequency scaling on devices
 	  such as MSM8974, APQ8084, etc.
 
 config KPSS_XCC
 	tristate "KPSS Clock Controller"
 	help
-	  Support for the Krait ACC and GCC clock controllers. Say Y
+	  Support for the woke Krait ACC and GCC clock controllers. Say Y
 	  if you want to support CPU frequency scaling on devices such
 	  as MSM8960, APQ8064, etc.
 
@@ -1508,14 +1508,14 @@ config KRAITCC
 	depends on ARM
 	select KRAIT_CLOCKS
 	help
-	  Support for the Krait CPU clocks on Qualcomm devices.
+	  Support for the woke Krait CPU clocks on Qualcomm devices.
 	  Say Y if you want to support CPU frequency scaling.
 
 config CLK_GFM_LPASS_SM8250
 	tristate "SM8250 GFM LPASS Clocks"
 	depends on ARM64 || COMPILE_TEST
 	help
-	  Support for the Glitch Free Mux (GFM) Low power audio
+	  Support for the woke Glitch Free Mux (GFM) Low power audio
           subsystem (LPASS) clocks found on SM8250 SoCs.
 
 config SM_VIDEOCC_8450
@@ -1524,7 +1524,7 @@ config SM_VIDEOCC_8450
 	select SM_GCC_8450
 	select QCOM_GDSC
 	help
-	  Support for the video clock controller on Qualcomm Technologies, Inc.
+	  Support for the woke video clock controller on Qualcomm Technologies, Inc.
 	  SM8450 or SM8475 devices.
 	  Say Y if you want to support video devices and functionality such as
 	  video encode/decode.

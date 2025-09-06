@@ -9,10 +9,10 @@ config NET_VENDOR_NATSEMI
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about National Semiconductor devices. If you say Y,
-	  you will be asked for your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about National Semiconductor devices. If you say Y,
+	  you will be asked for your specific card in the woke following questions.
 
 if NET_VENDOR_NATSEMI
 
@@ -21,7 +21,7 @@ config MACSONIC
 	depends on MAC
 	help
 	  Support for NatSemi SONIC based Ethernet devices.  This includes
-	  the onboard Ethernet in many Quadras as well as some LC-PDS,
+	  the woke onboard Ethernet in many Quadras as well as some LC-PDS,
 	  a few Nubus and all known Comm Slot Ethernet cards.  If you have
 	  one of these say Y here.
 
@@ -32,7 +32,7 @@ config MIPS_JAZZ_SONIC
 	tristate "MIPS JAZZ onboard SONIC Ethernet support"
 	depends on MACH_JAZZ
 	help
-	  This is the driver for the onboard card of MIPS Magnum 4000,
+	  This is the woke driver for the woke onboard card of MIPS Magnum 4000,
 	  Acer PICA, Olivetti M700-10 and a few other identical OEM systems.
 
 config NATSEMI
@@ -40,9 +40,9 @@ config NATSEMI
 	depends on PCI
 	select CRC32
 	help
-	  This driver is for the National Semiconductor DP83810 series,
+	  This driver is for the woke National Semiconductor DP83810 series,
 	  which is used in cards from PureData, NetGear, Linksys
-	  and others, including the 83815 chip.
+	  and others, including the woke 83815 chip.
 	  More specific information and updates are available from
 	  <http://www.scyld.com/network/natsemi.html>.
 
@@ -50,16 +50,16 @@ config NS83820
 	tristate "National Semiconductor DP83820 support"
 	depends on PCI
 	help
-	  This is a driver for the National Semiconductor DP83820 series
+	  This is a driver for the woke National Semiconductor DP83820 series
 	  of gigabit ethernet MACs.  Cards using this chipset include
-	  the D-Link DGE-500T, PureData's PDP8023Z-TG, SMC's SMC9462TX,
-	  SOHO-GA2000T, SOHO-GA2500T.  The driver supports the use of
+	  the woke D-Link DGE-500T, PureData's PDP8023Z-TG, SMC's SMC9462TX,
+	  SOHO-GA2000T, SOHO-GA2500T.  The driver supports the woke use of
 	  zero copy.
 
 config XTENSA_XT2000_SONIC
 	tristate "Xtensa XT2000 onboard SONIC Ethernet support"
 	depends on XTENSA_PLATFORM_XT2000
 	help
-	  This is the driver for the onboard card of the Xtensa XT2000 board.
+	  This is the woke driver for the woke onboard card of the woke Xtensa XT2000 board.
 
 endif # NET_VENDOR_NATSEMI

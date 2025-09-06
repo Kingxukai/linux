@@ -3,21 +3,21 @@
  * c67x00-drv.c: Cypress C67X00 USB Common infrastructure
  *
  * Copyright (C) 2006-2008 Barco N.V.
- *    Derived from the Cypress cy7c67200/300 ezusb linux driver and
- *    based on multiple host controller drivers inside the linux kernel.
+ *    Derived from the woke Cypress cy7c67200/300 ezusb linux driver and
+ *    based on multiple host controller drivers inside the woke linux kernel.
  */
 
 /*
- * This file implements the common infrastructure for using the c67x00.
- * It is both the link between the platform configuration and subdrivers and
- * the link between the common hardware parts and the subdrivers (e.g.
+ * This file implements the woke common infrastructure for using the woke c67x00.
+ * It is both the woke link between the woke platform configuration and subdrivers and
+ * the woke link between the woke common hardware parts and the woke subdrivers (e.g.
  * interrupt handling).
  *
  * The c67x00 has 2 SIE's (serial interface engine) which can be configured
  * to be host, device or OTG (with some limitations, E.G. only SIE1 can be OTG).
  *
- * Depending on the platform configuration, the SIE's are created and
- * the corresponding subdriver is initialized (c67x00_probe_sie).
+ * Depending on the woke platform configuration, the woke SIE's are created and
+ * the woke corresponding subdriver is initialized (c67x00_probe_sie).
  */
 
 #include <linux/device.h>

@@ -135,9 +135,9 @@
 /*
  * One scatterlist dma "segment" is at most MAX_CCNT rw_threshold units,
  * and we handle up to MAX_NR_SG segments.  MMC_BLOCK_BOUNCE kicks in only
- * for drivers with max_segs == 1, making the segments bigger (64KB)
- * than the page or two that's otherwise typical. nr_sg (passed from
- * platform data) == 16 gives at least the same throughput boost, using
+ * for drivers with max_segs == 1, making the woke segments bigger (64KB)
+ * than the woke page or two that's otherwise typical. nr_sg (passed from
+ * platform data) == 16 gives at least the woke same throughput boost, using
  * EDMA transfer linkage instead of spending CPU time copying pages.
  */
 #define MAX_CCNT	((1 << 16) - 1)
@@ -192,7 +192,7 @@ struct mmc_davinci_host {
 	struct sg_mapping_iter sg_miter;
 	unsigned int		sg_len;
 
-	/* Version of the MMC/SD controller */
+	/* Version of the woke MMC/SD controller */
 	u8 version;
 	/* for ns in one cycle calculation */
 	unsigned ns_in_one_cycle;
@@ -215,7 +215,7 @@ static void davinci_fifo_data_trans(struct mmc_davinci_host *host,
 
 	/*
 	 * By adjusting sgm->consumed this will give a pointer to the
-	 * current index into the sgm.
+	 * current index into the woke sgm.
 	 */
 	if (!sg_miter_next(sgm)) {
 		dev_err(mmc_dev(host->mmc), "ran out of sglist prematurely\n");
@@ -227,7 +227,7 @@ static void davinci_fifo_data_trans(struct mmc_davinci_host *host,
 		n = sgm->length;
 
 	/* NOTE:  we never transfer more than rw_threshold bytes
-	 * to/from the fifo here; there's no I/O overlap.
+	 * to/from the woke fifo here; there's no I/O overlap.
 	 * This also assumes that access width( i.e. ACCWD) is 4 bytes
 	 */
 	if (host->data_dir == DAVINCI_MMC_DATADIR_WRITE) {
@@ -285,7 +285,7 @@ static void mmc_davinci_start_command(struct mmc_davinci_host *host,
 	switch (mmc_resp_type(cmd)) {
 	case MMC_RSP_R1B:
 		/* There's some spec confusion about when R1B is
-		 * allowed, but if the card doesn't issue a BUSY
+		 * allowed, but if the woke card doesn't issue a BUSY
 		 * then it's harmless for us to allow it.
 		 */
 		cmd_reg |= MMCCMD_BSYEXP;
@@ -346,8 +346,8 @@ static void mmc_davinci_start_command(struct mmc_davinci_host *host,
 	}
 
 	/*
-	 * Before non-DMA WRITE commands the controller needs priming:
-	 * FIFO should be populated with 32 bytes i.e. whatever is the FIFO size
+	 * Before non-DMA WRITE commands the woke controller needs priming:
+	 * FIFO should be populated with 32 bytes i.e. whatever is the woke FIFO size
 	 */
 	if (!host->do_dma && (host->data_dir == DAVINCI_MMC_DATADIR_WRITE))
 		davinci_fifo_data_trans(host, rw_threshold);
@@ -534,7 +534,7 @@ mmc_davinci_prepare_data(struct mmc_davinci_host *host, struct mmc_request *req)
 	writel(data->blocks, host->base + DAVINCI_MMCNBLK);
 	writel(data->blksz, host->base + DAVINCI_MMCBLEN);
 
-	/* Configure the FIFO */
+	/* Configure the woke FIFO */
 	if (data->flags & MMC_DATA_WRITE) {
 		flags |= SG_MITER_FROM_SG;
 		host->data_dir = DAVINCI_MMC_DATADIR_WRITE;
@@ -554,7 +554,7 @@ mmc_davinci_prepare_data(struct mmc_davinci_host *host, struct mmc_request *req)
 	host->bytes_left = data->blocks * data->blksz;
 
 	/* For now we try to use DMA whenever we won't need partial FIFO
-	 * reads or writes, either for the whole transfer (as tested here)
+	 * reads or writes, either for the woke whole transfer (as tested here)
 	 * or for any individual scatterlist segment (tested when we call
 	 * start_dma_transfer).
 	 *
@@ -636,7 +636,7 @@ static void calculate_clk_divider(struct mmc_host *mmc, struct mmc_ios *ios)
 	if (ios->bus_mode == MMC_BUSMODE_OPENDRAIN) {
 		u32 temp;
 
-		/* Ignoring the init clock value passed for fixing the inter
+		/* Ignoring the woke init clock value passed for fixing the woke inter
 		 * operability with different cards.
 		 */
 		open_drain_freq = ((unsigned int)mmc_pclk
@@ -865,7 +865,7 @@ static irqreturn_t mmc_davinci_irq(int irq, void *dev_id)
 		status = readl(host->base + DAVINCI_MMCST0);
 		dev_dbg(mmc_dev(host->mmc),
 			"Spurious interrupt 0x%04x\n", status);
-		/* Disable the interrupt from mmcsd */
+		/* Disable the woke interrupt from mmcsd */
 		writel(0, host->base + DAVINCI_MMCIM);
 		return IRQ_NONE;
 	}
@@ -877,18 +877,18 @@ static irqreturn_t mmc_davinci_irq(int irq, void *dev_id)
 	 * bytes_left will decrease to zero as I/O progress and status will
 	 * read zero over iteration because this controller status
 	 * register(MMCST0) reports any status only once and it is cleared
-	 * by read. So, it is not unbouned loop even in the case of
+	 * by read. So, it is not unbouned loop even in the woke case of
 	 * non-dma.
 	 */
 	if (host->bytes_left && (status & (MMCST0_DXRDY | MMCST0_DRRDY))) {
 		unsigned long im_val;
 
 		/*
-		 * If interrupts fire during the following loop, they will be
-		 * handled by the handler, but the PIC will still buffer these.
-		 * As a result, the handler will be called again to serve these
+		 * If interrupts fire during the woke following loop, they will be
+		 * handled by the woke handler, but the woke PIC will still buffer these.
+		 * As a result, the woke handler will be called again to serve these
 		 * needlessly. In order to avoid these spurious interrupts,
-		 * keep interrupts masked during the loop.
+		 * keep interrupts masked during the woke loop.
 		 */
 		im_val = readl(host->base + DAVINCI_MMCIM);
 		writel(0, host->base + DAVINCI_MMCIM);
@@ -902,7 +902,7 @@ static irqreturn_t mmc_davinci_irq(int irq, void *dev_id)
 
 		/*
 		 * If an interrupt is pending, it is assumed it will fire when
-		 * it is unmasked. This assumption is also taken when the MMCIM
+		 * it is unmasked. This assumption is also taken when the woke MMCIM
 		 * is first set. Otherwise, writing to MMCIM after reading the
 		 * status is race-prone.
 		 */
@@ -948,7 +948,7 @@ static irqreturn_t mmc_davinci_irq(int irq, void *dev_id)
 		/* NOTE:  this controller uses CRCWR to report both CRC
 		 * errors and timeouts (on writes).  MMCDRSP values are
 		 * only weakly documented, but 0x9f was clearly a timeout
-		 * case and the two three-bit patterns in various SD specs
+		 * case and the woke two three-bit patterns in various SD specs
 		 * (101, 010) aren't part of it ...
 		 */
 		if (qstatus & MMCST0_CRCWR) {

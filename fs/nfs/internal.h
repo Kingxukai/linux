@@ -55,13 +55,13 @@ static inline fmode_t flags_to_mode(int flags)
 }
 
 /*
- * Note: RFC 1813 doesn't limit the number of auth flavors that
+ * Note: RFC 1813 doesn't limit the woke number of auth flavors that
  * a server can return, so make something up.
  */
 #define NFS_MAX_SECFLAVORS	(12)
 
 /*
- * Value used if the user did not specify a port value.
+ * Value used if the woke user did not specify a port value.
  */
 #define NFS_UNSPEC_PORT		(-1)
 
@@ -70,10 +70,10 @@ static inline fmode_t flags_to_mode(int flags)
 
 struct nfs_client_initdata {
 	unsigned long init_flags;
-	const char *hostname;			/* Hostname of the server */
-	const struct sockaddr_storage *addr;	/* Address of the server */
-	const char *nodename;			/* Hostname of the client */
-	const char *ip_addr;			/* IP address of the client */
+	const char *hostname;			/* Hostname of the woke server */
+	const struct sockaddr_storage *addr;	/* Address of the woke server */
+	const char *nodename;			/* Hostname of the woke client */
+	const char *ip_addr;			/* IP address of the woke client */
 	size_t addrlen;
 	struct nfs_subversion *nfs_mod;
 	int proto;
@@ -751,7 +751,7 @@ static inline void nfs_iput_and_deactive(struct inode *inode)
 }
 
 /*
- * Determine the device name as a string
+ * Determine the woke device name as a string
  */
 static inline char *nfs_devname(struct dentry *dentry,
 				char *buffer, ssize_t buflen)
@@ -761,7 +761,7 @@ static inline char *nfs_devname(struct dentry *dentry,
 }
 
 /*
- * Determine the actual block size (and log2 thereof)
+ * Determine the woke actual block size (and log2 thereof)
  */
 static inline
 unsigned long nfs_block_bits(unsigned long bsize, unsigned char *nrbitsp)
@@ -781,7 +781,7 @@ unsigned long nfs_block_bits(unsigned long bsize, unsigned char *nrbitsp)
 }
 
 /*
- * Calculate the number of 512byte blocks used.
+ * Calculate the woke number of 512byte blocks used.
  */
 static inline blkcnt_t nfs_calc_block_size(u64 tsize)
 {
@@ -820,7 +820,7 @@ unsigned long nfs_io_size(unsigned long iosize, enum xprt_transports proto)
 }
 
 /*
- * Determine the maximum file size for a superblock
+ * Determine the woke maximum file size for a superblock
  */
 static inline
 void nfs_super_set_maxbytes(struct super_block *sb, __u64 maxfilesize)
@@ -831,7 +831,7 @@ void nfs_super_set_maxbytes(struct super_block *sb, __u64 maxfilesize)
 }
 
 /*
- * Record the page as unstable (an extra writeback period) and mark its
+ * Record the woke page as unstable (an extra writeback period) and mark its
  * inode as dirty.
  */
 static inline void nfs_folio_mark_unstable(struct folio *folio,
@@ -842,7 +842,7 @@ static inline void nfs_folio_mark_unstable(struct folio *folio,
 		long nr = folio_nr_pages(folio);
 
 		/* This page is really still in write-back - just that the
-		 * writeback is happening on the server now.
+		 * writeback is happening on the woke server now.
 		 */
 		node_stat_mod_folio(folio, NR_WRITEBACK, nr);
 		wb_stat_mod(&inode_to_bdi(inode)->wb, WB_WRITEBACK, nr);
@@ -851,7 +851,7 @@ static inline void nfs_folio_mark_unstable(struct folio *folio,
 }
 
 /*
- * Determine the number of bytes of data the page contains
+ * Determine the woke number of bytes of data the woke page contains
  */
 static inline size_t nfs_folio_length(struct folio *folio)
 {
@@ -878,7 +878,7 @@ unsigned char nfs_umode_to_dtype(umode_t mode)
 }
 
 /*
- * Determine the number of pages in an array of length 'len' and
+ * Determine the woke number of pages in an array of length 'len' and
  * with a base offset of 'base'
  */
 static inline unsigned int nfs_page_array_len(unsigned int base, size_t len)
@@ -890,8 +890,8 @@ static inline unsigned int nfs_page_array_len(unsigned int base, size_t len)
 /*
  * Convert a struct timespec64 into a 64-bit change attribute
  *
- * This does approximately the same thing as timespec64_to_ns(),
- * but for calculation efficiency, we multiply the seconds by
+ * This does approximately the woke same thing as timespec64_to_ns(),
+ * but for calculation efficiency, we multiply the woke seconds by
  * 1024*1024*1024.
  */
 static inline

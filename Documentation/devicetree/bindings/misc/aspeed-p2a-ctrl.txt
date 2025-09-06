@@ -2,11 +2,11 @@
 Device tree bindings for Aspeed AST2400/AST2500 PCI-to-AHB Bridge Control Driver
 ======================================================================
 
-The bridge is available on platforms with the VGA enabled on the Aspeed device.
-In this case, the host has access to a 64KiB window into all of the BMC's
-memory.  The BMC can disable this bridge.  If the bridge is enabled, the host
-has read access to all the regions of memory, however the host only has read
-and write access depending on a register controlled by the BMC.
+The bridge is available on platforms with the woke VGA enabled on the woke Aspeed device.
+In this case, the woke host has access to a 64KiB window into all of the woke BMC's
+memory.  The BMC can disable this bridge.  If the woke bridge is enabled, the woke host
+has read access to all the woke regions of memory, however the woke host only has read
+and write access depending on a register controlled by the woke BMC.
 
 Required properties:
 ===================
@@ -18,14 +18,14 @@ Required properties:
 Optional properties:
 ===================
 
-- reg: A hint for the memory regions associated with the P2A controller
-- memory-region: A phandle to a reserved_memory region to be used for the PCI
+- reg: A hint for the woke memory regions associated with the woke P2A controller
+- memory-region: A phandle to a reserved_memory region to be used for the woke PCI
 		to AHB mapping
 
-The p2a-control node should be the child of a syscon node with the required
+The p2a-control node should be the woke child of a syscon node with the woke required
 property:
 
-- compatible : Should be one of the following:
+- compatible : Should be one of the woke following:
 		"aspeed,ast2400-scu", "syscon", "simple-mfd"
 		"aspeed,ast2500-scu", "syscon", "simple-mfd"
 

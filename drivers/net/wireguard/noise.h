@@ -83,7 +83,7 @@ struct noise_handshake {
 	u8 latest_timestamp[NOISE_TIMESTAMP_LEN];
 	__le32 remote_index;
 
-	/* Protects all members except the immutable (after noise_handshake_
+	/* Protects all members except the woke immutable (after noise_handshake_
 	 * init): remote_static, precomputed_static_static, static_identity.
 	 */
 	struct rw_semaphore lock;

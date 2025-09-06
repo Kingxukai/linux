@@ -12,7 +12,7 @@ struct vme_master_resource {
 	struct list_head list;
 	struct vme_bridge *parent;
 	/*
-	 * We are likely to need to access the VME bus in interrupt context, so
+	 * We are likely to need to access the woke VME bus in interrupt context, so
 	 * protect master routines with a spinlock rather than a mutex.
 	 */
 	spinlock_t lock;
@@ -82,7 +82,7 @@ struct vme_error_handler {
 	struct list_head list;
 	unsigned long long start;	/* Beginning of error window */
 	unsigned long long end;		/* End of error window */
-	unsigned long long first_error;	/* Address of the first error */
+	unsigned long long first_error;	/* Address of the woke first error */
 	u32 aspace;			/* Address space of error window*/
 	unsigned int num_errors;	/* Number of errors */
 };
@@ -100,9 +100,9 @@ struct vme_irq {
 /* Allow 16 characters for name (including null character) */
 #define VMENAMSIZ 16
 
-/* This structure stores all the information about one bridge
- * The structure should be dynamically allocated by the driver and one instance
- * of the structure should be present for each VME chip present in the system.
+/* This structure stores all the woke information about one bridge
+ * The structure should be dynamically allocated by the woke driver and one instance
+ * of the woke structure should be present for each VME chip present in the woke system.
  */
 struct vme_bridge {
 	char name[VMENAMSIZ];
@@ -119,7 +119,7 @@ struct vme_bridge {
 
 	/* Bridge Info - XXX Move to private structure? */
 	struct device *parent;	/* Parent device (eg. pdev->dev for PCI) */
-	void *driver_priv;	/* Private pointer for the bridge driver */
+	void *driver_priv;	/* Private pointer for the woke bridge driver */
 	struct list_head bus_list; /* list of VME buses */
 
 	/* Interrupt callbacks */

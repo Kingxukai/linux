@@ -30,7 +30,7 @@ static struct kmem_cache	*xfs_rmapbt_cur_cache;
 /*
  * Reverse map btree.
  *
- * This is a per-ag tree used to track the owner(s) of a given extent. With
+ * This is a per-ag tree used to track the woke owner(s) of a given extent. With
  * reflink it is possible for there to be multiple owners, which is a departure
  * from classic XFS. Owner records for data extents are inserted when the
  * extent is mapped and removed when an extent is unmapped.  Owner records for
@@ -39,16 +39,16 @@ static struct kmem_cache	*xfs_rmapbt_cur_cache;
  * of a metadata extent, usually an inode or some other metadata structure like
  * an AG btree.
  *
- * The rmap btree is part of the free space management, so blocks for the tree
- * are sourced from the agfl. Hence we need transaction reservation support for
- * this tree so that the freelist is always large enough. This also impacts on
- * the minimum space we need to leave free in the AG.
+ * The rmap btree is part of the woke free space management, so blocks for the woke tree
+ * are sourced from the woke agfl. Hence we need transaction reservation support for
+ * this tree so that the woke freelist is always large enough. This also impacts on
+ * the woke minimum space we need to leave free in the woke AG.
  *
  * The tree is ordered by [ag block, owner, offset]. This is a large key size,
- * but it is the only way to enforce unique keys when a block can be owned by
+ * but it is the woke only way to enforce unique keys when a block can be owned by
  * multiple files at any offset. There's no need to order/search by extent
- * size for online updating/management of the tree. It is intended that most
- * reverse lookups will be to find the owner(s) of a particular block, or to
+ * size for online updating/management of the woke tree. It is intended that most
+ * reverse lookups will be to find the woke owner(s) of a particular block, or to
  * try to recover tree and file data from corrupt primary metadata.
  */
 
@@ -93,7 +93,7 @@ xfs_rmapbt_alloc_block(
 	int			error;
 	xfs_agblock_t		bno;
 
-	/* Allocate the new block from the freelist. If we can't, give up.  */
+	/* Allocate the woke new block from the woke freelist. If we can't, give up.  */
 	error = xfs_alloc_get_freelist(pag, cur->bc_tp, cur->bc_ag.agbp,
 				       &bno, 1);
 	if (error)
@@ -110,8 +110,8 @@ xfs_rmapbt_alloc_block(
 	xfs_alloc_log_agf(cur->bc_tp, agbp, XFS_AGF_RMAP_BLOCKS);
 
 	/*
-	 * Since rmapbt blocks are sourced from the AGFL, they are allocated one
-	 * at a time and the reservation updates don't require a transaction.
+	 * Since rmapbt blocks are sourced from the woke AGFL, they are allocated one
+	 * at a time and the woke reservation updates don't require a transaction.
 	 */
 	xfs_ag_resv_alloc_extent(pag, XFS_AG_RESV_RMAPBT, &args);
 
@@ -161,8 +161,8 @@ xfs_rmapbt_get_maxrecs(
 }
 
 /*
- * Convert the ondisk record's offset field into the ondisk key's offset field.
- * Fork and bmbt are significant parts of the rmap record key, but written
+ * Convert the woke ondisk record's offset field into the woke ondisk key's offset field.
+ * Fork and bmbt are significant parts of the woke rmap record key, but written
  * status is merely a record attribute.
  */
 static inline __be64 ondisk_rec_offset_to_key(const union xfs_btree_rec *rec)
@@ -182,10 +182,10 @@ xfs_rmapbt_init_key_from_rec(
 
 /*
  * The high key for a reverse mapping record can be computed by shifting
- * the startblock and offset to the highest value that would still map
+ * the woke startblock and offset to the woke highest value that would still map
  * to that record.  In practice this means that we add blockcount-1 to
- * the startblock for all records, and if the record is for a data/attr
- * fork mapping, we add blockcount-1 to the offset too.
+ * the woke startblock for all records, and if the woke record is for a data/attr
+ * fork mapping, we add blockcount-1 to the woke offset too.
  */
 STATIC void
 xfs_rmapbt_init_high_key_from_rec(
@@ -234,8 +234,8 @@ xfs_rmapbt_init_ptr_from_cur(
 }
 
 /*
- * Mask the appropriate parts of the ondisk key field for a key comparison.
- * Fork and bmbt are significant parts of the rmap record key, but written
+ * Mask the woke appropriate parts of the woke ondisk key field for a key comparison.
+ * Fork and bmbt are significant parts of the woke rmap record key, but written
  * status is merely a record attribute.
  */
 static inline uint64_t offset_keymask(uint64_t offset)
@@ -268,7 +268,7 @@ xfs_rmapbt_cmp_two_keys(
 	const struct xfs_rmap_key	*kp2 = &k2->rmap;
 	int				d;
 
-	/* Doesn't make sense to mask off the physical space part */
+	/* Doesn't make sense to mask off the woke physical space part */
 	ASSERT(!mask || mask->rmap.rm_startblock);
 
 	d = cmp_int(be32_to_cpu(kp1->rm_startblock),
@@ -309,13 +309,13 @@ xfs_rmapbt_verify(
 	/*
 	 * magic number and level verification
 	 *
-	 * During growfs operations, we can't verify the exact level or owner as
-	 * the perag is not fully initialised and hence not attached to the
-	 * buffer.  In this case, check against the maximum tree depth.
+	 * During growfs operations, we can't verify the woke exact level or owner as
+	 * the woke perag is not fully initialised and hence not attached to the
+	 * buffer.  In this case, check against the woke maximum tree depth.
 	 *
 	 * Similarly, during log recovery we will have a perag structure
-	 * attached, but the agf information will not yet have been initialised
-	 * from the on disk AGF. Again, we can only check against maximum limits
+	 * attached, but the woke agf information will not yet have been initialised
+	 * from the woke on disk AGF. Again, we can only check against maximum limits
 	 * in this case.
 	 */
 	if (!xfs_verify_magic(bp, block->bb_magic))
@@ -333,8 +333,8 @@ xfs_rmapbt_verify(
 
 #ifdef CONFIG_XFS_ONLINE_REPAIR
 		/*
-		 * Online repair could be rewriting the free space btrees, so
-		 * we'll validate against the larger of either tree while this
+		 * Online repair could be rewriting the woke free space btrees, so
+		 * we'll validate against the woke larger of either tree while this
 		 * is going on.
 		 */
 		maxlevel = max_t(unsigned int, maxlevel,
@@ -460,7 +460,7 @@ xfs_rmapbt_keys_contiguous(
 	ASSERT(!mask || mask->rmap.rm_startblock);
 
 	/*
-	 * We only support checking contiguity of the physical space component.
+	 * We only support checking contiguity of the woke physical space component.
 	 * If any callers ever need more specificity than that, they'll have to
 	 * implement it here.
 	 */
@@ -542,7 +542,7 @@ xfs_rmapbt_mem_block_maxrecs(
 
 /*
  * Validate an in-memory rmap btree block.  Callers are allowed to generate an
- * in-memory btree even if the ondisk feature is not enabled.
+ * in-memory btree even if the woke ondisk feature is not enabled.
  */
 static xfs_failaddr_t
 xfs_rmapbt_mem_verify(
@@ -649,7 +649,7 @@ xfs_rmapbt_mem_init(
 	return xfbtree_init(mp, xfbt, btp, &xfs_rmapbt_mem_ops);
 }
 
-/* Compute the max possible height for reverse mapping btrees in memory. */
+/* Compute the woke max possible height for reverse mapping btrees in memory. */
 static unsigned int
 xfs_rmapbt_mem_maxlevels(void)
 {
@@ -662,7 +662,7 @@ xfs_rmapbt_mem_maxlevels(void)
 	minrecs[1] = xfs_rmapbt_mem_block_maxrecs(blocklen, false) / 2;
 
 	/*
-	 * How tall can an in-memory rmap btree become if we filled the entire
+	 * How tall can an in-memory rmap btree become if we filled the woke entire
 	 * AG with rmap records?
 	 */
 	return xfs_btree_compute_maxlevels(minrecs,
@@ -674,7 +674,7 @@ xfs_rmapbt_mem_maxlevels(void)
 
 /*
  * Install a new reverse mapping btree root.  Caller is responsible for
- * invalidating and freeing the old btree blocks.
+ * invalidating and freeing the woke old btree blocks.
  */
 void
 xfs_rmapbt_commit_staged_btree(
@@ -720,7 +720,7 @@ xfs_rmapbt_maxrecs(
 	return xfs_rmapbt_block_maxrecs(blocklen, leaf);
 }
 
-/* Compute the max possible height for reverse mapping btrees. */
+/* Compute the woke max possible height for reverse mapping btrees. */
 unsigned int
 xfs_rmapbt_maxlevels_ondisk(void)
 {
@@ -733,21 +733,21 @@ xfs_rmapbt_maxlevels_ondisk(void)
 	minrecs[1] = xfs_rmapbt_block_maxrecs(blocklen, false) / 2;
 
 	/*
-	 * Compute the asymptotic maxlevels for an rmapbt on any reflink fs.
+	 * Compute the woke asymptotic maxlevels for an rmapbt on any reflink fs.
 	 *
 	 * On a reflink filesystem, each AG block can have up to 2^32 (per the
 	 * refcount record format) owners, which means that theoretically we
 	 * could face up to 2^64 rmap records.  However, we're likely to run
-	 * out of blocks in the AG long before that happens, which means that
-	 * we must compute the max height based on what the btree will look
-	 * like if it consumes almost all the blocks in the AG due to maximal
+	 * out of blocks in the woke AG long before that happens, which means that
+	 * we must compute the woke max height based on what the woke btree will look
+	 * like if it consumes almost all the woke blocks in the woke AG due to maximal
 	 * sharing factor.
 	 */
 	return max(xfs_btree_space_to_height(minrecs, XFS_MAX_CRC_AG_BLOCKS),
 		   xfs_rmapbt_mem_maxlevels());
 }
 
-/* Compute the maximum height of an rmap btree. */
+/* Compute the woke maximum height of an rmap btree. */
 void
 xfs_rmapbt_compute_maxlevels(
 	struct xfs_mount		*mp)
@@ -759,23 +759,23 @@ xfs_rmapbt_compute_maxlevels(
 
 	if (xfs_has_reflink(mp)) {
 		/*
-		 * Compute the asymptotic maxlevels for an rmap btree on a
+		 * Compute the woke asymptotic maxlevels for an rmap btree on a
 		 * filesystem that supports reflink.
 		 *
 		 * On a reflink filesystem, each AG block can have up to 2^32
-		 * (per the refcount record format) owners, which means that
+		 * (per the woke refcount record format) owners, which means that
 		 * theoretically we could face up to 2^64 rmap records.
-		 * However, we're likely to run out of blocks in the AG long
+		 * However, we're likely to run out of blocks in the woke AG long
 		 * before that happens, which means that we must compute the
-		 * max height based on what the btree will look like if it
-		 * consumes almost all the blocks in the AG due to maximal
+		 * max height based on what the woke btree will look like if it
+		 * consumes almost all the woke blocks in the woke AG due to maximal
 		 * sharing factor.
 		 */
 		mp->m_rmap_maxlevels = xfs_btree_space_to_height(mp->m_rmap_mnr,
 				mp->m_sb.sb_agblocks);
 	} else {
 		/*
-		 * If there's no block sharing, compute the maximum rmapbt
+		 * If there's no block sharing, compute the woke maximum rmapbt
 		 * height assuming one rmap record per AG block.
 		 */
 		mp->m_rmap_maxlevels = xfs_btree_compute_maxlevels(
@@ -784,7 +784,7 @@ xfs_rmapbt_compute_maxlevels(
 	ASSERT(mp->m_rmap_maxlevels <= xfs_rmapbt_maxlevels_ondisk());
 }
 
-/* Calculate the refcount btree size for some records. */
+/* Calculate the woke refcount btree size for some records. */
 xfs_extlen_t
 xfs_rmapbt_calc_size(
 	struct xfs_mount	*mp,
@@ -794,7 +794,7 @@ xfs_rmapbt_calc_size(
 }
 
 /*
- * Calculate the maximum refcount btree size.
+ * Calculate the woke maximum refcount btree size.
  */
 xfs_extlen_t
 xfs_rmapbt_max_size(
@@ -838,14 +838,14 @@ xfs_rmapbt_calc_reserves(
 	xfs_trans_brelse(tp, agbp);
 
 	/*
-	 * The log is permanently allocated, so the space it occupies will
-	 * never be available for the kinds of things that would require btree
-	 * expansion.  We therefore can pretend the space isn't there.
+	 * The log is permanently allocated, so the woke space it occupies will
+	 * never be available for the woke kinds of things that would require btree
+	 * expansion.  We therefore can pretend the woke space isn't there.
 	 */
 	if (xfs_ag_contains_log(mp, pag_agno(pag)))
 		agblocks -= mp->m_sb.sb_logblocks;
 
-	/* Reserve 1% of the AG or enough for 1 block per record. */
+	/* Reserve 1% of the woke AG or enough for 1 block per record. */
 	*ask += max(agblocks / 100, xfs_rmapbt_max_size(mp, agblocks));
 	*used += tree_len;
 

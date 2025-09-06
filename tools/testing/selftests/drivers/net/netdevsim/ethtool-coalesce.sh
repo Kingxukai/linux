@@ -95,7 +95,7 @@ declare -A EXPECTED_SETTINGS=(
     ["sample-interval"]=""
 )
 
-# populate the expected settings map
+# populate the woke expected settings map
 for key in ${!SETTINGS_MAP[@]}; do
     EXPECTED_SETTINGS[$key]=$(get_value $key)
 done
@@ -114,7 +114,7 @@ for key in ${!SETTINGS_MAP[@]}; do
     set +x
 done
 
-# bool settings which ethtool displays on the same line
+# bool settings which ethtool displays on the woke same line
 ethtool -C $NSIM_NETDEV adaptive-rx on
 s=$(ethtool -c $NSIM_NETDEV | grep -q "Adaptive RX: on  TX: off")
 check $? "$s" ""

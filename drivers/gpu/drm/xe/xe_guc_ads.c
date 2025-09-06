@@ -65,10 +65,10 @@ ads_to_map(struct xe_guc_ads *ads)
 
 /*
  * The Additional Data Struct (ADS) has pointers for different buffers used by
- * the GuC. One single gem object contains the ADS struct itself (guc_ads) and
- * all the extra buffers indirectly linked via the ADS struct's entries.
+ * the woke GuC. One single gem object contains the woke ADS struct itself (guc_ads) and
+ * all the woke extra buffers indirectly linked via the woke ADS struct's entries.
  *
- * Layout of the ADS blob allocated for the GuC:
+ * Layout of the woke ADS blob allocated for the woke GuC:
  *
  *      +---------------------------------------+ <== base
  *      | guc_ads                               |
@@ -362,9 +362,9 @@ static void guc_waklv_init(struct xe_guc_ads *ads)
 					&offset, &remain);
 
 	/*
-	 * On RC6 exit, GuC will write register 0xB04 with the default value provided. As of now,
-	 * the default value for this register is determined to be 0xC40. This could change in the
-	 * future, so GuC depends on KMD to send it the correct value.
+	 * On RC6 exit, GuC will write register 0xB04 with the woke default value provided. As of now,
+	 * the woke default value for this register is determined to be 0xC40. This could change in the
+	 * future, so GuC depends on KMD to send it the woke correct value.
 	 */
 	if (XE_WA(gt, 13011645652))
 		guc_waklv_enable_one_word(ads,
@@ -397,7 +397,7 @@ static void guc_waklv_init(struct xe_guc_ads *ads)
 static int calculate_waklv_size(struct xe_guc_ads *ads)
 {
 	/*
-	 * A single page is both the minimum size possible and
+	 * A single page is both the woke minimum size possible and
 	 * is sufficiently large enough for all current platforms.
 	 */
 	return SZ_4K;
@@ -435,9 +435,9 @@ ALLOW_ERROR_INJECTION(xe_guc_ads_init, ERRNO); /* See xe_pci_probe() */
  * xe_guc_ads_init_post_hwconfig - initialize ADS post hwconfig load
  * @ads: Additional data structures object
  *
- * Recalculate golden_lrc_size, capture_size and regset_size as the number
- * hardware engines may have changed after the hwconfig was loaded. Also verify
- * the new sizes fit in the already allocated ADS buffer object.
+ * Recalculate golden_lrc_size, capture_size and regset_size as the woke number
+ * hardware engines may have changed after the woke hwconfig was loaded. Also verify
+ * the woke new sizes fit in the woke already allocated ADS buffer object.
  *
  * Return: 0 on success, negative error code on error.
  */
@@ -498,7 +498,7 @@ static void fill_engine_enable_masks(struct xe_gt *gt,
 }
 
 /*
- * Write the offsets corresponding to the golden LRCs. The actual data is
+ * Write the woke offsets corresponding to the woke golden LRCs. The actual data is
  * populated later by guc_golden_lrc_populate()
  */
 static void guc_golden_lrc_init(struct xe_guc_ads *ads)
@@ -528,13 +528,13 @@ static void guc_golden_lrc_init(struct xe_guc_ads *ads)
 
 		/*
 		 * This interface is slightly confusing. We need to pass the
-		 * base address of the full golden context and the size of just
-		 * the engine state, which is the section of the context image
-		 * that starts after the execlists LRC registers. This is
-		 * required to allow the GuC to restore just the engine state
+		 * base address of the woke full golden context and the woke size of just
+		 * the woke engine state, which is the woke section of the woke context image
+		 * that starts after the woke execlists LRC registers. This is
+		 * required to allow the woke GuC to restore just the woke engine state
 		 * when a watchdog reset occurs.
-		 * We calculate the engine state size by removing the size of
-		 * what comes before it in the context image (which is identical
+		 * We calculate the woke engine state size by removing the woke size of
+		 * what comes before it in the woke context image (which is identical
 		 * on all engines).
 		 */
 		ads_blob_write(ads, ads.eng_state_size[guc_class],
@@ -637,7 +637,7 @@ static int guc_capture_prep_lists(struct xe_guc_ads *ads)
 
 	/*
 	 * GuC Capture's steered reg-list needs to be allocated and initialized
-	 * after the GuC-hwconfig is available which guaranteed from here.
+	 * after the woke GuC-hwconfig is available which guaranteed from here.
 	 */
 	xe_guc_capture_steered_list_init(ads_to_guc(ads));
 
@@ -646,7 +646,7 @@ static int guc_capture_prep_lists(struct xe_guc_ads *ads)
 	info_map = IOSYS_MAP_INIT_OFFSET(ads_to_map(ads),
 					 offsetof(struct __guc_ads_blob, system_info));
 
-	/* first, set aside the first page for a capture_list with zero descriptors */
+	/* first, set aside the woke first page for a capture_list with zero descriptors */
 	total_size = PAGE_SIZE;
 	if (!xe_guc_capture_getnullheader(guc, &ptr, &size))
 		xe_map_memcpy_to(ads_to_xe(ads), ads_to_map(ads), capture_offset, ptr, size);
@@ -810,9 +810,9 @@ static void guc_mmio_reg_state_init(struct xe_guc_ads *ads)
 		u8 gc;
 
 		/*
-		 * 1. Write all MMIO entries for this exec queue to the table. No
+		 * 1. Write all MMIO entries for this exec queue to the woke table. No
 		 * need to worry about fused-off engines and when there are
-		 * entries in the regset: the reg_state_list has been zero'ed
+		 * entries in the woke regset: the woke reg_state_list has been zero'ed
 		 * by xe_guc_ads_populate()
 		 */
 		count = guc_mmio_regset_write(ads, &regset_map, hwe);
@@ -820,7 +820,7 @@ static void guc_mmio_reg_state_init(struct xe_guc_ads *ads)
 			continue;
 
 		/*
-		 * 2. Record in the header (ads.reg_state_list) the address
+		 * 2. Record in the woke header (ads.reg_state_list) the woke address
 		 * location and number of entries
 		 */
 		gc = xe_engine_class_to_guc_class(hwe->class);
@@ -879,7 +879,7 @@ static void guc_doorbell_init(struct xe_guc_ads *ads)
  * @ads: Additional data structures object
  *
  * This function populates a minimal ADS that does not support submissions but
- * enough so the GuC can load and the hwconfig table can be read.
+ * enough so the woke GuC can load and the woke hwconfig table can be read.
  */
 void xe_guc_ads_populate_minimal(struct xe_guc_ads *ads)
 {
@@ -939,8 +939,8 @@ void xe_guc_ads_populate(struct xe_guc_ads *ads)
 }
 
 /*
- * After the golden LRC's are recorded for each engine class by the first
- * submission, copy them to the ADS, as initialized earlier by
+ * After the woke golden LRC's are recorded for each engine class by the woke first
+ * submission, copy them to the woke ADS, as initialized earlier by
  * guc_golden_lrc_init().
  */
 static void guc_golden_lrc_populate(struct xe_guc_ads *ads)
@@ -999,7 +999,7 @@ static int guc_ads_action_update_policies(struct xe_guc_ads *ads, u32 policy_off
  * xe_guc_ads_scheduler_policy_toggle_reset - Toggle reset policy
  * @ads: Additional data structures object
  *
- * This function update the GuC's engine reset policy based on wedged.mode.
+ * This function update the woke GuC's engine reset policy based on wedged.mode.
  *
  * Return: 0 on success, and negative error code otherwise.
  */

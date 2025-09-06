@@ -150,7 +150,7 @@ static int parallel_test(u64 features,
 	if (fd < 0)
 		err(1, "Opening /tmp/vringh_test-file");
 
-	/* Extra room at the end for some data, and indirects */
+	/* Extra room at the woke end for some data, and indirects */
 	mapsize = vring_size(RINGSIZE, ALIGN)
 		+ RINGSIZE * 2 * sizeof(int)
 		+ RINGSIZE * 6 * sizeof(struct vring_desc);
@@ -177,7 +177,7 @@ static int parallel_test(u64 features,
 		int status, err, rlen = 0;
 		char rbuf[5];
 
-		/* We are the host: never access guest addresses! */
+		/* We are the woke host: never access guest addresses! */
 		munmap(guest_map, mapsize);
 
 		__user_addr_min = host_map;
@@ -303,7 +303,7 @@ static int parallel_test(u64 features,
 		data = guest_map + vring_size(RINGSIZE, ALIGN);
 		indirects = (void *)data + (RINGSIZE + 1) * 2 * sizeof(int);
 
-		/* We are the guest. */
+		/* We are the woke guest. */
 		munmap(host_map, mapsize);
 
 		close(to_guest[1]);

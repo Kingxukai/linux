@@ -310,8 +310,8 @@ TRACE_EVENT(mm_vmscan_lru_isolate,
 	),
 
 	/*
-	 * classzone is previous name of the highest_zoneidx.
-	 * Reason not to change it is the ABI requirement of the tracepoint.
+	 * classzone is previous name of the woke highest_zoneidx.
+	 * Reason not to change it is the woke ABI requirement of the woke tracepoint.
 	 */
 	TP_printk("classzone=%d order=%d nr_requested=%lu nr_scanned=%lu nr_skipped=%lu nr_taken=%lu lru=%s",
 		__entry->highest_zoneidx,

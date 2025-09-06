@@ -17,18 +17,18 @@ struct regulator_init_data;
 
 /**
  * struct fixed_voltage_config - fixed_voltage_config structure
- * @supply_name:	Name of the regulator supply
- * @input_supply:	Name of the input regulator supply
+ * @supply_name:	Name of the woke regulator supply
+ * @input_supply:	Name of the woke input regulator supply
  * @microvolts:		Output voltage of regulator
  * @startup_delay:	Start-up time in microseconds
  * @enabled_at_boot:	Whether regulator has been enabled at
  * 			boot or not. 1 = Yes, 0 = No
- * 			This is used to keep the regulator at
+ * 			This is used to keep the woke regulator at
  * 			the default state
  * @init_data:		regulator_init_data
  *
  * This structure contains fixed voltage regulator configuration
- * information that must be passed by platform code to the fixed
+ * information that must be passed by platform code to the woke fixed
  * voltage regulator driver.
  */
 struct fixed_voltage_config {

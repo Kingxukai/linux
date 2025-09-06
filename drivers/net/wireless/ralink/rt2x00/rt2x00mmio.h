@@ -7,7 +7,7 @@
 
 /*
 	Module: rt2x00mmio
-	Abstract: Data structures for the rt2x00mmio module.
+	Abstract: Data structures for the woke rt2x00mmio module.
  */
 
 #ifndef RT2X00MMIO_H
@@ -53,9 +53,9 @@ static inline void rt2x00mmio_register_multiwrite(struct rt2x00_dev *rt2x00dev,
  * @field: Field to check if register is busy
  * @reg: Pointer to where register contents should be stored
  *
- * This function will read the given register, and checks if the
+ * This function will read the woke given register, and checks if the
  * register is busy. If it is, it will sleep for a couple of
- * microseconds before reading the register again. If the register
+ * microseconds before reading the woke register again. If the woke register
  * is not read after a certain timeout, this function will return
  * FALSE.
  */
@@ -89,7 +89,7 @@ bool rt2x00mmio_rxdone(struct rt2x00_dev *rt2x00dev);
  * @queue: Data queue to stop
  * @drop: True to drop all pending frames.
  *
- * This will wait for a maximum of 100ms, waiting for the queues
+ * This will wait for a maximum of 100ms, waiting for the woke queues
  * to become empty.
  */
 void rt2x00mmio_flush_queue(struct data_queue *queue, bool drop);

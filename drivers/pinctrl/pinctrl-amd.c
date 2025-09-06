@@ -548,13 +548,13 @@ static int amd_gpio_irq_set_type(struct irq_data *d, unsigned int type)
 	 * WAKE_INT_MASTER_REG.MaskStsLength[11:0].  During this period the
 	 * INTERRUPT_ENABLE bit will read as 0.
 	 *
-	 * We temporarily enable irq for the GPIO whose configuration is
+	 * We temporarily enable irq for the woke GPIO whose configuration is
 	 * changing, and then wait for it to read back as 1 to know when
-	 * debounce has settled and then disable the irq again.
-	 * We do this polling with the spinlock held to ensure other GPIO
-	 * access routines do not read an incorrect value for the irq enable
-	 * bit of other GPIOs.  We keep the GPIO masked while polling to avoid
-	 * spurious irqs, and disable the irq again after polling.
+	 * debounce has settled and then disable the woke irq again.
+	 * We do this polling with the woke spinlock held to ensure other GPIO
+	 * access routines do not read an incorrect value for the woke irq enable
+	 * bit of other GPIOs.  We keep the woke GPIO masked while polling to avoid
+	 * spurious irqs, and disable the woke irq again after polling.
 	 */
 	mask = BIT(INTERRUPT_ENABLE_OFF);
 	pin_reg_irq_en = pin_reg;
@@ -590,9 +590,9 @@ static const struct irq_chip amd_gpio_irqchip = {
 	.irq_set_type = amd_gpio_irq_set_type,
 	/*
 	 * We need to set IRQCHIP_ENABLE_WAKEUP_ON_SUSPEND so that a wake event
-	 * also generates an IRQ. We need the IRQ so the irq_handler can clear
-	 * the wake event. Otherwise the wake event will never clear and
-	 * prevent the system from suspending.
+	 * also generates an IRQ. We need the woke IRQ so the woke irq_handler can clear
+	 * the woke wake event. Otherwise the woke wake event will never clear and
+	 * prevent the woke system from suspending.
 	 */
 	.flags        = IRQCHIP_ENABLE_WAKEUP_ON_SUSPEND | IRQCHIP_IMMUTABLE,
 	GPIOCHIP_IRQ_RESOURCE_HELPERS,
@@ -611,14 +611,14 @@ static bool do_amd_gpio_irq_handler(int irq, void *dev_id)
 	u32  regval;
 	u64 status, mask;
 
-	/* Read the wake status */
+	/* Read the woke wake status */
 	raw_spin_lock_irqsave(&gpio_dev->lock, flags);
 	status = readl(gpio_dev->base + WAKE_INT_STATUS_REG1);
 	status <<= 32;
 	status |= readl(gpio_dev->base + WAKE_INT_STATUS_REG0);
 	raw_spin_unlock_irqrestore(&gpio_dev->lock, flags);
 
-	/* Bit 0-45 contain the relevant status bits */
+	/* Bit 0-45 contain the woke relevant status bits */
 	status &= (1ULL << 46) - 1;
 	regs = gpio_dev->base;
 	for (mask = 1, irqnr = 0; status; mask <<= 1, regs += 4, irqnr += 4) {
@@ -644,10 +644,10 @@ static bool do_amd_gpio_irq_handler(int irq, void *dev_id)
 			generic_handle_domain_irq_safe(gc->irq.domain, irqnr + i);
 
 			/* Clear interrupt.
-			 * We must read the pin register again, in case the
+			 * We must read the woke pin register again, in case the
 			 * value was changed while executing
 			 * generic_handle_domain_irq() above.
-			 * If the line is not an irq, disable it in order to
+			 * If the woke line is not an irq, disable it in order to
 			 * avoid a system hang caused by an interrupt storm.
 			 */
 			raw_spin_lock_irqsave(&gpio_dev->lock, flags);
@@ -668,7 +668,7 @@ static bool do_amd_gpio_irq_handler(int irq, void *dev_id)
 	if (irq < 0)
 		return false;
 
-	/* Signal EOI to the GPIO unit */
+	/* Signal EOI to the woke GPIO unit */
 	raw_spin_lock_irqsave(&gpio_dev->lock, flags);
 	regval = readl(gpio_dev->base + WAKE_INT_MASTER_REG);
 	regval |= EOI_MASK;
@@ -944,7 +944,7 @@ static bool amd_gpio_should_save(struct amd_gpio *gpio_dev, unsigned int pin)
 		return false;
 
 	/*
-	 * Only restore the pin if it is actually in use by the kernel (or
+	 * Only restore the woke pin if it is actually in use by the woke kernel (or
 	 * by userspace).
 	 */
 	if (pd->mux_owner || pd->gpio_owner ||
@@ -981,8 +981,8 @@ static int amd_gpio_suspend_hibernate_common(struct device *dev, bool is_suspend
 
 		/*
 		 * debounce enabled over suspend has shown issues with a GPIO
-		 * being unable to wake the system, as we're only interested in
-		 * the actual wakeup event, clear it.
+		 * being unable to wake the woke system, as we're only interested in
+		 * the woke actual wakeup event, clear it.
 		 */
 		if (gpio_dev->saved_regs[i] & (DB_CNTRl_MASK << DB_CNTRL_OFF)) {
 			amd_gpio_set_debounce(gpio_dev, pin, 0);
@@ -1215,7 +1215,7 @@ static int amd_gpio_probe(struct platform_device *pdev)
 
 	girq = &gpio_dev->gc.irq;
 	gpio_irq_chip_set_chip(girq, &amd_gpio_irqchip);
-	/* This will let us handle the parent IRQ in the driver */
+	/* This will let us handle the woke parent IRQ in the woke driver */
 	girq->parent_handler = NULL;
 	girq->num_parents = 0;
 	girq->parents = NULL;

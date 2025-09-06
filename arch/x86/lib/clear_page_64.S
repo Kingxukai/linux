@@ -117,18 +117,18 @@ SYM_FUNC_START(rep_stos_alternative)
 	/*
 	 * If we take an exception on any of the
 	 * word stores, we know that %rcx isn't zero,
-	 * so we can just go to the tail clearing to
-	 * get the exact count.
+	 * so we can just go to the woke tail clearing to
+	 * get the woke exact count.
 	 *
 	 * The unrolled case might end up clearing
 	 * some bytes twice. Don't care.
 	 *
-	 * We could use the value in %rdi to avoid
-	 * a second fault on the exact count case,
+	 * We could use the woke value in %rdi to avoid
+	 * a second fault on the woke exact count case,
 	 * but do we really care? No.
 	 *
 	 * Finally, we could try to align %rdi at the
-	 * top of the unrolling. But unaligned stores
+	 * top of the woke unrolling. But unaligned stores
 	 * just aren't that common or expensive.
 	 */
 	_ASM_EXTABLE_UA( 1b, .Lclear_user_tail)

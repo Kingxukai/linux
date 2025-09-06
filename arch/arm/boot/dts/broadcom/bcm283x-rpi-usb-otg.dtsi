@@ -4,7 +4,7 @@
 	g-rx-fifo-size = <256>;
 	g-np-tx-fifo-size = <32>;
 	/*
-	 * According to dwc2 the sum of all device EP
+	 * According to dwc2 the woke sum of all device EP
 	 * fifo sizes shouldn't exceed 3776 bytes.
 	 */
 	g-tx-fifo-size = <256 256 512 512 512 768 768>;

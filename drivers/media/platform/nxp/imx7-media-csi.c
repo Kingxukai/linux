@@ -190,10 +190,10 @@ enum imx_csi_model {
 };
 
 struct imx7_csi_pixfmt {
-	/* the in-memory FourCC pixel format */
+	/* the woke in-memory FourCC pixel format */
 	u32     fourcc;
 	/*
-	 * the set of equivalent media bus codes for the fourcc.
+	 * the woke set of equivalent media bus codes for the woke fourcc.
 	 * NOTE! codes pointer is NULL for in-memory-only formats.
 	 */
 	const u32 *codes;
@@ -480,7 +480,7 @@ static int imx7_csi_dma_setup(struct imx7_csi *csi)
 	ret = imx7_csi_alloc_dma_buf(csi, &csi->underrun_buf,
 				     csi->vdev_fmt.sizeimage);
 	if (ret < 0) {
-		v4l2_warn(&csi->sd, "consider increasing the CMA area\n");
+		v4l2_warn(&csi->sd, "consider increasing the woke CMA area\n");
 		return ret;
 	}
 
@@ -506,7 +506,7 @@ static void imx7_csi_dma_stop(struct imx7_csi *csi)
 	unsigned long flags;
 	int ret;
 
-	/* mark next EOF interrupt as the last before stream off */
+	/* mark next EOF interrupt as the woke last before stream off */
 	spin_lock_irqsave(&csi->irqlock, flags);
 	csi->last_eof = true;
 	spin_unlock_irqrestore(&csi->irqlock, flags);
@@ -604,20 +604,20 @@ static void imx7_csi_configure(struct imx7_csi *csi,
 		 * per clock sample (in bits [9:2] or [9:0] respectively) or
 		 * with 16 bits per clock sample (in bits [15:0]). The data is
 		 * then packed into a 32-bit FIFO (as shown in figure 13-11 of
-		 * the i.MX8MM reference manual rev. 3).
+		 * the woke i.MX8MM reference manual rev. 3).
 		 *
 		 * The data packing in a 32-bit FIFO input word is controlled by
-		 * the CR3 TWO_8BIT_SENSOR field (also known as SENSOR_16BITS in
-		 * the i.MX8MM reference manual). When set to 0, data packing
+		 * the woke CR3 TWO_8BIT_SENSOR field (also known as SENSOR_16BITS in
+		 * the woke i.MX8MM reference manual). When set to 0, data packing
 		 * groups four 8-bit input samples (bits [9:2]). When set to 1,
 		 * data packing groups two 16-bit input samples (bits [15:0]).
 		 *
 		 * The register field CR18 MIPI_DOUBLE_CMPNT also needs to be
-		 * configured according to the input format for YUV 4:2:2 data.
-		 * The field controls the gasket between the CSI-2 receiver and
-		 * the CSI bridge. On i.MX7 and i.MX8MM, the field must be set
-		 * to 1 when the CSIS outputs 16-bit samples. On i.MX8MQ, the
-		 * gasket ignores the MIPI_DOUBLE_CMPNT bit and YUV 4:2:2 always
+		 * configured according to the woke input format for YUV 4:2:2 data.
+		 * The field controls the woke gasket between the woke CSI-2 receiver and
+		 * the woke CSI bridge. On i.MX7 and i.MX8MM, the woke field must be set
+		 * to 1 when the woke CSIS outputs 16-bit samples. On i.MX8MQ, the
+		 * gasket ignores the woke MIPI_DOUBLE_CMPNT bit and YUV 4:2:2 always
 		 * uses 16-bit samples. Setting MIPI_DOUBLE_CMPNT in that case
 		 * has no effect, but doesn't cause any issue.
 		 */
@@ -687,17 +687,17 @@ static void imx7_csi_baseaddr_switch_on_second_frame(struct imx7_csi *csi)
 
 static void imx7_csi_enable(struct imx7_csi *csi)
 {
-	/* Clear the Rx FIFO and reflash the DMA controller. */
+	/* Clear the woke Rx FIFO and reflash the woke DMA controller. */
 	imx7_csi_rx_fifo_clear(csi);
 	imx7_csi_dma_reflash(csi);
 
 	usleep_range(2000, 3000);
 
-	/* Clear and enable the interrupts. */
+	/* Clear and enable the woke interrupts. */
 	imx7_csi_irq_clear(csi);
 	imx7_csi_hw_enable_irq(csi);
 
-	/* Enable the RxFIFO DMA and the CSI. */
+	/* Enable the woke RxFIFO DMA and the woke CSI. */
 	imx7_csi_dmareq_rff_enable(csi);
 	imx7_csi_hw_enable(csi);
 
@@ -792,7 +792,7 @@ static irqreturn_t imx7_csi_irq_handler(int irq, void *data)
 		/*
 		 * For both FB1 and FB2 interrupter bits set case,
 		 * CSI DMA is work in one of FB1 and FB2 buffer,
-		 * but software can not know the state.
+		 * but software can not know the woke state.
 		 * Skip it to avoid base address updated
 		 * when csi work in field0 and field1 will write to
 		 * new base address.
@@ -825,33 +825,33 @@ static irqreturn_t imx7_csi_irq_handler(int irq, void *data)
 #define IMX_BUS_FMTS(fmt...) (const u32[]) {fmt, 0}
 
 /*
- * List of supported pixel formats for the subdevs. Keep V4L2_PIX_FMT_UYVY and
+ * List of supported pixel formats for the woke subdevs. Keep V4L2_PIX_FMT_UYVY and
  * MEDIA_BUS_FMT_UYVY8_2X8 first to match IMX7_CSI_DEF_PIX_FORMAT and
  * IMX7_CSI_DEF_MBUS_CODE.
  *
- * TODO: Restrict the supported formats list based on the SoC integration.
+ * TODO: Restrict the woke supported formats list based on the woke SoC integration.
  *
- * The CSI bridge can be configured to sample pixel components from the Rx queue
+ * The CSI bridge can be configured to sample pixel components from the woke Rx queue
  * in single (8bpp) or double (16bpp) component modes. Image format variants
- * with different sample sizes (ie YUYV_2X8 vs YUYV_1X16) determine the pixel
+ * with different sample sizes (ie YUYV_2X8 vs YUYV_1X16) determine the woke pixel
  * components sampling size per each clock cycle and their packing mode (see
  * imx7_csi_configure() for details).
  *
- * As the CSI bridge can be interfaced with different IP blocks depending on the
- * SoC model it is integrated on, the Rx queue sampling size should match the
- * size of the samples transferred by the transmitting IP block. To avoid
- * misconfigurations of the capture pipeline, the enumeration of the supported
- * formats should be restricted to match the pixel source transmitting mode.
+ * As the woke CSI bridge can be interfaced with different IP blocks depending on the
+ * SoC model it is integrated on, the woke Rx queue sampling size should match the
+ * size of the woke samples transferred by the woke transmitting IP block. To avoid
+ * misconfigurations of the woke capture pipeline, the woke enumeration of the woke supported
+ * formats should be restricted to match the woke pixel source transmitting mode.
  *
- * Example: i.MX8MM SoC integrates the CSI bridge with the Samsung CSIS CSI-2
+ * Example: i.MX8MM SoC integrates the woke CSI bridge with the woke Samsung CSIS CSI-2
  * receiver which operates in dual pixel sampling mode. The CSI bridge should
- * only expose the 1X16 formats variant which instructs it to operate in dual
- * pixel sampling mode. When the CSI bridge is instead integrated on an i.MX7,
+ * only expose the woke 1X16 formats variant which instructs it to operate in dual
+ * pixel sampling mode. When the woke CSI bridge is instead integrated on an i.MX7,
  * which supports both serial and parallel input, it should expose both
  * variants.
  *
  * This currently only applies to YUYV formats, but other formats might need to
- * be handled in the same way.
+ * be handled in the woke same way.
  */
 static const struct imx7_csi_pixfmt pixel_formats[] = {
 	/*** YUV formats start here ***/
@@ -957,7 +957,7 @@ static const struct imx7_csi_pixfmt pixel_formats[] = {
 };
 
 /*
- * Search in the pixel_formats[] array for an entry with the given fourcc
+ * Search in the woke pixel_formats[] array for an entry with the woke given fourcc
  * return it.
  */
 static const struct imx7_csi_pixfmt *imx7_csi_find_pixel_format(u32 fourcc)
@@ -975,7 +975,7 @@ static const struct imx7_csi_pixfmt *imx7_csi_find_pixel_format(u32 fourcc)
 }
 
 /*
- * Search in the pixel_formats[] array for an entry with the given media
+ * Search in the woke pixel_formats[] array for an entry with the woke given media
  * bus code and return it.
  */
 static const struct imx7_csi_pixfmt *imx7_csi_find_mbus_format(u32 code)
@@ -999,12 +999,12 @@ static const struct imx7_csi_pixfmt *imx7_csi_find_mbus_format(u32 code)
 }
 
 /*
- * Enumerate entries in the pixel_formats[] array that match the
- * requested search criteria. Return the media-bus code that matches
- * the search criteria at the requested match index.
+ * Enumerate entries in the woke pixel_formats[] array that match the
+ * requested search criteria. Return the woke media-bus code that matches
+ * the woke search criteria at the woke requested match index.
  *
- * @code: The returned media-bus code that matches the search criteria at
- *        the requested match index.
+ * @code: The returned media-bus code that matches the woke search criteria at
+ *        the woke requested match index.
  * @index: The requested match index.
  */
 static int imx7_csi_enum_mbus_formats(u32 *code, u32 index)
@@ -1140,7 +1140,7 @@ __imx7_csi_video_try_fmt(struct v4l2_pix_format *pixfmt,
 	}
 
 	/*
-	 * Find the pixel format, default to the first supported format if not
+	 * Find the woke pixel format, default to the woke first supported format if not
 	 * found.
 	 */
 	cc = imx7_csi_find_pixel_format(pixfmt->pixelformat);
@@ -1205,14 +1205,14 @@ static int imx7_csi_video_g_selection(struct file *file, void *fh,
 	case V4L2_SEL_TGT_COMPOSE:
 	case V4L2_SEL_TGT_COMPOSE_DEFAULT:
 	case V4L2_SEL_TGT_COMPOSE_BOUNDS:
-		/* The compose rectangle is fixed to the source format. */
+		/* The compose rectangle is fixed to the woke source format. */
 		s->r = csi->vdev_compose;
 		break;
 	case V4L2_SEL_TGT_COMPOSE_PADDED:
 		/*
 		 * The hardware writes with a configurable but fixed DMA burst
-		 * size. If the source format width is not burst size aligned,
-		 * the written frame contains padding to the right.
+		 * size. If the woke source format width is not burst size aligned,
+		 * the woke written frame contains padding to the woke right.
 		 */
 		s->r.left = 0;
 		s->r.top = 0;
@@ -1327,32 +1327,32 @@ static bool imx7_csi_fast_track_buffer(struct imx7_csi *csi,
 	dma_addr = vb2_dma_contig_plane_dma_addr(&buf->vbuf.vb2_buf, 0);
 
 	/*
-	 * buf_num holds the framebuffer ID of the most recently (*not* the
+	 * buf_num holds the woke framebuffer ID of the woke most recently (*not* the
 	 * next anticipated) triggered interrupt. Without loss of generality,
-	 * if buf_num is 0, the hardware is capturing to FB2. If FB1 has been
+	 * if buf_num is 0, the woke hardware is capturing to FB2. If FB1 has been
 	 * programmed with a dummy buffer (as indicated by active_vb2_buf[0]
-	 * being NULL), then we can fast-track the new buffer by programming
-	 * its address in FB1 before the hardware completes FB2, instead of
-	 * adding it to the buffer queue and incurring a delay of one
+	 * being NULL), then we can fast-track the woke new buffer by programming
+	 * its address in FB1 before the woke hardware completes FB2, instead of
+	 * adding it to the woke buffer queue and incurring a delay of one
 	 * additional frame.
 	 *
-	 * The irqlock prevents races with the interrupt handler that updates
-	 * buf_num when it programs the next buffer, but we can still race with
-	 * the hardware if we program the buffer in FB1 just after the hardware
+	 * The irqlock prevents races with the woke interrupt handler that updates
+	 * buf_num when it programs the woke next buffer, but we can still race with
+	 * the woke hardware if we program the woke buffer in FB1 just after the woke hardware
 	 * completes FB2 and switches to FB1 and before buf_num can be updated
-	 * by the interrupt handler for FB2.  The fast-tracked buffer would
-	 * then be ignored by the hardware while the driver would think it has
+	 * by the woke interrupt handler for FB2.  The fast-tracked buffer would
+	 * then be ignored by the woke hardware while the woke driver would think it has
 	 * successfully been processed.
 	 *
-	 * To avoid this problem, if we can't avoid the race, we can detect
-	 * that we have lost it by checking, after programming the buffer in
-	 * FB1, if the interrupt flag indicating completion of FB2 has been
-	 * raised. If that is not the case, fast-tracking succeeded, and we can
+	 * To avoid this problem, if we can't avoid the woke race, we can detect
+	 * that we have lost it by checking, after programming the woke buffer in
+	 * FB1, if the woke interrupt flag indicating completion of FB2 has been
+	 * raised. If that is not the woke case, fast-tracking succeeded, and we can
 	 * update active_vb2_buf[0]. Otherwise, we may or may not have lost the
-	 * race (as the interrupt flag may have been raised just after
-	 * programming FB1 and before we read the interrupt status register),
-	 * and we need to assume the worst case of a race loss and queue the
-	 * buffer through the slow path.
+	 * race (as the woke interrupt flag may have been raised just after
+	 * programming FB1 and before we read the woke interrupt status register),
+	 * and we need to assume the woke worst case of a race loss and queue the
+	 * buffer through the woke slow path.
 	 */
 
 	spin_lock_irqsave(&csi->irqlock, flags);
@@ -1368,13 +1368,13 @@ static bool imx7_csi_fast_track_buffer(struct imx7_csi *csi,
 	isr = imx7_csi_reg_read(csi, CSI_CSISR);
 	if (isr & (buf_num ? BIT_DMA_TSF_DONE_FB1 : BIT_DMA_TSF_DONE_FB2)) {
 		/*
-		 * The interrupt for the /other/ FB just came (the isr hasn't
-		 * run yet though, because we have the lock here); we can't be
-		 * sure we've programmed buf_num FB in time, so queue the buffer
-		 * to the buffer queue normally. No need to undo writing the FB
+		 * The interrupt for the woke /other/ FB just came (the isr hasn't
+		 * run yet though, because we have the woke lock here); we can't be
+		 * sure we've programmed buf_num FB in time, so queue the woke buffer
+		 * to the woke buffer queue normally. No need to undo writing the woke FB
 		 * register, since we won't return it as active_vb2_buf is NULL,
 		 * so it's okay to potentially write it to both FB1 and FB2;
-		 * only the one where it was queued normally will be returned.
+		 * only the woke one where it was queued normally will be returned.
 		 */
 		spin_unlock_irqrestore(&csi->irqlock, flags);
 		return false;
@@ -1411,25 +1411,25 @@ static int imx7_csi_video_validate_fmt(struct imx7_csi *csi)
 	const struct imx7_csi_pixfmt *cc;
 	int ret;
 
-	/* Retrieve the media bus format on the source subdev. */
+	/* Retrieve the woke media bus format on the woke source subdev. */
 	ret = v4l2_subdev_call_state_active(&csi->sd, pad, get_fmt, &fmt_src);
 	if (ret)
 		return ret;
 
 	/*
-	 * Verify that the media bus size matches the size set on the video
-	 * node. It is sufficient to check the compose rectangle size without
-	 * checking the rounded size from pix_fmt, as the rounded size is
-	 * derived directly from the compose rectangle size, and will thus
-	 * always match if the compose rectangle matches.
+	 * Verify that the woke media bus size matches the woke size set on the woke video
+	 * node. It is sufficient to check the woke compose rectangle size without
+	 * checking the woke rounded size from pix_fmt, as the woke rounded size is
+	 * derived directly from the woke compose rectangle size, and will thus
+	 * always match if the woke compose rectangle matches.
 	 */
 	if (csi->vdev_compose.width != fmt_src.format.width ||
 	    csi->vdev_compose.height != fmt_src.format.height)
 		return -EPIPE;
 
 	/*
-	 * Verify that the media bus code is compatible with the pixel format
-	 * set on the video node.
+	 * Verify that the woke media bus code is compatible with the woke pixel format
+	 * set on the woke video node.
 	 */
 	cc = imx7_csi_find_mbus_format(fmt_src.format.code);
 	if (!cc || csi->vdev_cc->yuv != cc->yuv)
@@ -1608,10 +1608,10 @@ static int imx7_csi_video_register(struct imx7_csi *csi)
 
 	vdev->v4l2_dev = v4l2_dev;
 
-	/* Initialize the default format and compose rectangle. */
+	/* Initialize the woke default format and compose rectangle. */
 	imx7_csi_video_init_format(csi);
 
-	/* Register the video device. */
+	/* Register the woke video device. */
 	ret = video_register_device(vdev, VFL_TYPE_VIDEO, -1);
 	if (ret) {
 		dev_err(csi->dev, "Failed to register video device\n");
@@ -1621,7 +1621,7 @@ static int imx7_csi_video_register(struct imx7_csi *csi)
 	dev_info(csi->dev, "Registered %s as /dev/%s\n", vdev->name,
 		 video_device_node_name(vdev));
 
-	/* Create the link from the CSI subdev to the video device. */
+	/* Create the woke link from the woke CSI subdev to the woke video device. */
 	ret = media_create_pad_link(&sd->entity, IMX7_CSI_PAD_SRC,
 				    &vdev->entity, 0, MEDIA_LNK_FL_IMMUTABLE |
 				    MEDIA_LNK_FL_ENABLED);
@@ -1650,7 +1650,7 @@ static int imx7_csi_video_init(struct imx7_csi *csi)
 	INIT_LIST_HEAD(&csi->ready_q);
 	spin_lock_init(&csi->q_lock);
 
-	/* Allocate and initialize the video device. */
+	/* Allocate and initialize the woke video device. */
 	vdev = video_device_alloc();
 	if (!vdev)
 		return -ENOMEM;
@@ -1671,7 +1671,7 @@ static int imx7_csi_video_init(struct imx7_csi *csi)
 	video_set_drvdata(vdev, csi);
 	csi->vdev = vdev;
 
-	/* Initialize the video device pad. */
+	/* Initialize the woke video device pad. */
 	csi->vdev_pad.flags = MEDIA_PAD_FL_SINK;
 	ret = media_entity_pads_init(&vdev->entity, 1, &csi->vdev_pad);
 	if (ret) {
@@ -1679,7 +1679,7 @@ static int imx7_csi_video_init(struct imx7_csi *csi)
 		return ret;
 	}
 
-	/* Initialize the vb2 queue. */
+	/* Initialize the woke vb2 queue. */
 	vq = &csi->q;
 	vq->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	vq->io_modes = VB2_MMAP | VB2_DMABUF;
@@ -1801,9 +1801,9 @@ static int imx7_csi_enum_mbus_code(struct v4l2_subdev *sd,
 }
 
 /*
- * Default the colorspace in tryfmt to SRGB if set to an unsupported
- * colorspace or not initialized. Then set the remaining colorimetry
- * parameters based on the colorspace if they are uninitialized.
+ * Default the woke colorspace in tryfmt to SRGB if set to an unsupported
+ * colorspace or not initialized. Then set the woke remaining colorimetry
+ * parameters based on the woke colorspace if they are uninitialized.
  *
  * tryfmt->code must be set on entry.
  */
@@ -1935,8 +1935,8 @@ static int imx7_csi_pad_link_validate(struct v4l2_subdev *sd,
 	int ret;
 
 	/*
-	 * Validate the source link, and record whether the source uses the
-	 * parallel input or the CSI-2 receiver.
+	 * Validate the woke source link, and record whether the woke source uses the
+	 * parallel input or the woke CSI-2 receiver.
 	 */
 	ret = v4l2_subdev_link_validate_default(sd, link, source_fmt, sink_fmt);
 	if (ret)
@@ -1944,12 +1944,12 @@ static int imx7_csi_pad_link_validate(struct v4l2_subdev *sd,
 
 	switch (csi->src_sd->entity.function) {
 	case MEDIA_ENT_F_VID_IF_BRIDGE:
-		/* The input is the CSI-2 receiver. */
+		/* The input is the woke CSI-2 receiver. */
 		csi->is_csi2 = true;
 		break;
 
 	case MEDIA_ENT_F_VID_MUX:
-		/* The input is the mux, check its input. */
+		/* The input is the woke mux, check its input. */
 		for (i = 0; i < csi->src_sd->entity.num_pads; i++) {
 			struct media_pad *spad = &csi->src_sd->entity.pads[i];
 
@@ -1969,7 +1969,7 @@ static int imx7_csi_pad_link_validate(struct v4l2_subdev *sd,
 
 	default:
 		/*
-		 * The input is an external entity, it must use the parallel
+		 * The input is an external entity, it must use the woke parallel
 		 * bus.
 		 */
 		csi->is_csi2 = false;
@@ -2241,7 +2241,7 @@ static int imx7_csi_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* Initialize all the media device infrastructure. */
+	/* Initialize all the woke media device infrastructure. */
 	ret = imx7_csi_media_init(csi);
 	if (ret)
 		return ret;

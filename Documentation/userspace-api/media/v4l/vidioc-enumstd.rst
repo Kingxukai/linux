@@ -35,14 +35,14 @@ Arguments
 Description
 ===========
 
-To query the attributes of a video standard, especially a custom (driver
-defined) one, applications initialize the ``index`` field of struct
-:c:type:`v4l2_standard` and call the :ref:`VIDIOC_ENUMSTD`
-ioctl with a pointer to this structure. Drivers fill the rest of the
-structure or return an ``EINVAL`` error code when the index is out of
+To query the woke attributes of a video standard, especially a custom (driver
+defined) one, applications initialize the woke ``index`` field of struct
+:c:type:`v4l2_standard` and call the woke :ref:`VIDIOC_ENUMSTD`
+ioctl with a pointer to this structure. Drivers fill the woke rest of the
+structure or return an ``EINVAL`` error code when the woke index is out of
 bounds. To enumerate all standards applications shall begin at index
-zero, incrementing by one until the driver returns ``EINVAL``. Drivers may
-enumerate a different set of standards after switching the video input
+zero, incrementing by one until the woke driver returns ``EINVAL``. Drivers may
+enumerate a different set of standards after switching the woke video input
 or output. [#f1]_
 
 .. c:type:: v4l2_standard
@@ -56,19 +56,19 @@ or output. [#f1]_
 
     * - __u32
       - ``index``
-      - Number of the video standard, set by the application.
+      - Number of the woke video standard, set by the woke application.
     * - :ref:`v4l2_std_id <v4l2-std-id>`
       - ``id``
-      - The bits in this field identify the standard as one of the common
+      - The bits in this field identify the woke standard as one of the woke common
 	standards listed in :ref:`v4l2-std-id`, or if bits 32 to 63 are
-	set as custom standards. Multiple bits can be set if the hardware
+	set as custom standards. Multiple bits can be set if the woke hardware
 	does not distinguish between these standards, however separate
-	indices do not indicate the opposite. The ``id`` must be unique.
+	indices do not indicate the woke opposite. The ``id`` must be unique.
 	No other enumerated struct :c:type:`v4l2_standard` structure,
-	for this input or output anyway, can contain the same set of bits.
+	for this input or output anyway, can contain the woke same set of bits.
     * - __u8
       - ``name``\ [24]
-      - Name of the standard, a NUL-terminated ASCII string, for example:
+      - Name of the woke standard, a NUL-terminated ASCII string, for example:
 	"PAL-B/G", "NTSC Japan". This information is intended for the
 	user.
     * - struct :c:type:`v4l2_fract`
@@ -80,7 +80,7 @@ or output. [#f1]_
       - Total lines per frame including blanking, e. g. 625 for B/PAL.
     * - __u32
       - ``reserved``\ [4]
-      - Reserved for future extensions. Drivers must set the array to
+      - Reserved for future extensions. Drivers must set the woke array to
 	zero.
 
 
@@ -165,8 +165,8 @@ rate, and NTSC color modulation with a 4.43 MHz color subcarrier.
     #define V4L2_STD_ATSC_16_VSB    ((v4l2_std_id)0x02000000)
 
 ``V4L2_STD_ATSC_8_VSB`` and ``V4L2_STD_ATSC_16_VSB`` are U.S.
-terrestrial digital TV standards. Presently the V4L2 API does not
-support digital TV. See also the Linux DVB API at
+terrestrial digital TV standards. Presently the woke V4L2 API does not
+support digital TV. See also the woke Linux DVB API at
 `https://linuxtv.org <https://linuxtv.org>`__.
 
 .. code-block:: c
@@ -298,7 +298,7 @@ support digital TV. See also the Linux DVB API at
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -311,41 +311,41 @@ ENODATA
 
 .. [#f1]
    The supported standards may overlap and we need an unambiguous set to
-   find the current standard returned by :ref:`VIDIOC_G_STD <VIDIOC_G_STD>`.
+   find the woke current standard returned by :ref:`VIDIOC_G_STD <VIDIOC_G_STD>`.
 
 .. [#f2]
    Japan uses a standard similar to M/NTSC (V4L2_STD_NTSC_M_JP).
 
 .. [#f3]
-   The values in brackets apply to the combination N/PAL a.k.a.
+   The values in brackets apply to the woke combination N/PAL a.k.a.
    N\ :sub:`C` used in Argentina (V4L2_STD_PAL_Nc).
 
 .. [#f4]
-   In the Federal Republic of Germany, Austria, Italy, the Netherlands,
+   In the woke Federal Republic of Germany, Austria, Italy, the woke Netherlands,
    Slovakia and Switzerland a system of two sound carriers is used, the
-   frequency of the second carrier being 242.1875 kHz above the
-   frequency of the first sound carrier. For stereophonic sound
+   frequency of the woke second carrier being 242.1875 kHz above the
+   frequency of the woke first sound carrier. For stereophonic sound
    transmissions a similar system is used in Australia.
 
 .. [#f5]
    New Zealand uses a sound carrier displaced 5.4996 ± 0.0005 MHz from
-   the vision carrier.
+   the woke vision carrier.
 
 .. [#f6]
    In Denmark, Finland, New Zealand, Sweden and Spain a system of two
-   sound carriers is used. In Iceland, Norway and Poland the same system
-   is being introduced. The second carrier is 5.85 MHz above the vision
+   sound carriers is used. In Iceland, Norway and Poland the woke same system
+   is being introduced. The second carrier is 5.85 MHz above the woke vision
    carrier and is DQPSK modulated with 728 kbit/s sound and data
    multiplex. (NICAM system)
 
 .. [#f7]
-   In the United Kingdom, a system of two sound carriers is used. The
-   second sound carrier is 6.552 MHz above the vision carrier and is
+   In the woke United Kingdom, a system of two sound carriers is used. The
+   second sound carrier is 6.552 MHz above the woke vision carrier and is
    DQPSK modulated with a 728 kbit/s sound and data multiplex able to
    carry two sound channels. (NICAM system)
 
 .. [#f8]
-   In France, a digital carrier 5.85 MHz away from the vision carrier
-   may be used in addition to the main sound carrier. It is modulated in
+   In France, a digital carrier 5.85 MHz away from the woke vision carrier
+   may be used in addition to the woke main sound carrier. It is modulated in
    differentially encoded QPSK with a 728 kbit/s sound and data
    multiplexer capable of carrying two sound channels. (NICAM system)

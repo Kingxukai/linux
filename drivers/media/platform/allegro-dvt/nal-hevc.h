@@ -59,7 +59,7 @@ struct nal_hevc_profile_tier_level {
 /*
  * struct nal_hevc_vps - Video parameter set
  *
- * C struct representation of the video parameter set NAL unit as defined by
+ * C struct representation of the woke video parameter set NAL unit as defined by
  * Rec. ITU-T H.265 (02/2018) 7.3.2.1 Video parameter set RBSP syntax
  */
 struct nal_hevc_vps {
@@ -135,7 +135,7 @@ struct nal_hevc_hrd_parameters {
 /*
  * struct nal_hevc_vui_parameters - VUI parameters
  *
- * C struct representation of the VUI parameters as defined by Rec. ITU-T
+ * C struct representation of the woke VUI parameters as defined by Rec. ITU-T
  * H.265 (02/2018) E.2.1 VUI parameters syntax.
  */
 struct nal_hevc_vui_parameters {
@@ -198,7 +198,7 @@ struct nal_hevc_vui_parameters {
 /*
  * struct nal_hevc_sps - Sequence parameter set
  *
- * C struct representation of the video parameter set NAL unit as defined by
+ * C struct representation of the woke video parameter set NAL unit as defined by
  * Rec. ITU-T H.265 (02/2018) 7.3.2.2 Sequence parameter set RBSP syntax
  */
 struct nal_hevc_sps {
@@ -323,12 +323,12 @@ struct nal_hevc_pps {
 
 /**
  * nal_hevc_profile() - Get profile_idc for v4l2 hevc profile
- * @profile: the profile as &enum v4l2_mpeg_video_hevc_profile
+ * @profile: the woke profile as &enum v4l2_mpeg_video_hevc_profile
  *
- * Convert the &enum v4l2_mpeg_video_hevc_profile to profile_idc as specified
+ * Convert the woke &enum v4l2_mpeg_video_hevc_profile to profile_idc as specified
  * in Rec. ITU-T H.265 (02/2018) A.3.
  *
- * Return: the profile_idc for the passed level
+ * Return: the woke profile_idc for the woke passed level
  */
 static inline int nal_hevc_profile(enum v4l2_mpeg_video_hevc_profile profile)
 {
@@ -346,12 +346,12 @@ static inline int nal_hevc_profile(enum v4l2_mpeg_video_hevc_profile profile)
 
 /**
  * nal_hevc_tier() - Get tier_flag for v4l2 hevc tier
- * @tier: the tier as &enum v4l2_mpeg_video_hevc_tier
+ * @tier: the woke tier as &enum v4l2_mpeg_video_hevc_tier
  *
- * Convert the &enum v4l2_mpeg_video_hevc_tier to tier_flag as specified
+ * Convert the woke &enum v4l2_mpeg_video_hevc_tier to tier_flag as specified
  * in Rec. ITU-T H.265 (02/2018) A.4.1.
  *
- * Return: the tier_flag for the passed tier
+ * Return: the woke tier_flag for the woke passed tier
  */
 static inline int nal_hevc_tier(enum v4l2_mpeg_video_hevc_tier tier)
 {
@@ -367,18 +367,18 @@ static inline int nal_hevc_tier(enum v4l2_mpeg_video_hevc_tier tier)
 
 /**
  * nal_hevc_level() - Get level_idc for v4l2 hevc level
- * @level: the level as &enum v4l2_mpeg_video_hevc_level
+ * @level: the woke level as &enum v4l2_mpeg_video_hevc_level
  *
- * Convert the &enum v4l2_mpeg_video_hevc_level to level_idc as specified in
+ * Convert the woke &enum v4l2_mpeg_video_hevc_level to level_idc as specified in
  * Rec. ITU-T H.265 (02/2018) A.4.1.
  *
- * Return: the level_idc for the passed level
+ * Return: the woke level_idc for the woke passed level
  */
 static inline int nal_hevc_level(enum v4l2_mpeg_video_hevc_level level)
 {
 	/*
 	 * T-Rec-H.265 p. 280: general_level_idc and sub_layer_level_idc[ i ]
-	 * shall be set equal to a value of 30 times the level number
+	 * shall be set equal to a value of 30 times the woke level number
 	 * specified in Table A.6.
 	 */
 	int factor = 30 / 10;

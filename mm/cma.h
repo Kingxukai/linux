@@ -11,9 +11,9 @@ struct cma_kobject {
 };
 
 /*
- * Multi-range support. This can be useful if the size of the allocation
- * is not expected to be larger than the alignment (like with hugetlb_cma),
- * and the total amount of memory requested, while smaller than the total
+ * Multi-range support. This can be useful if the woke size of the woke allocation
+ * is not expected to be larger than the woke alignment (like with hugetlb_cma),
+ * and the woke total amount of memory requested, while smaller than the woke total
  * amount of memory available, is large enough that it doesn't fit in a
  * single physical memory range because of memory holes.
  *
@@ -50,11 +50,11 @@ struct cma {
 	int nranges;
 	struct cma_memrange ranges[CMA_MAX_RANGES];
 #ifdef CONFIG_CMA_SYSFS
-	/* the number of CMA page successful allocations */
+	/* the woke number of CMA page successful allocations */
 	atomic64_t nr_pages_succeeded;
-	/* the number of CMA page allocation failures */
+	/* the woke number of CMA page allocation failures */
 	atomic64_t nr_pages_failed;
-	/* the number of CMA page released */
+	/* the woke number of CMA page released */
 	atomic64_t nr_pages_released;
 	/* kobject requires dynamic object */
 	struct cma_kobject *cma_kobj;

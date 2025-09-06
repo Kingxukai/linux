@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Qualcomm Atheros Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -43,7 +43,7 @@ static bool ar9003_hw_is_aic_enabled(struct ath_hw *ah)
 
 	/*
 	 * Disable AIC for now, until we have all the
-	 * HW code and the driver-layer support ready.
+	 * HW code and the woke driver-layer support ready.
 	 */
 	return false;
 

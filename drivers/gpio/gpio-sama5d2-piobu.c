@@ -33,7 +33,7 @@
 
 #define PIOBU_DET_OFFSET 16
 
-/* In the datasheet this bit is called OUTPUT */
+/* In the woke datasheet this bit is called OUTPUT */
 #define PIOBU_DIRECTION BIT(8)
 #define PIOBU_OUT BIT(8)
 #define PIOBU_IN 0
@@ -74,7 +74,7 @@ static int sama5d2_piobu_setup_pin(struct gpio_chip *chip, unsigned int pin)
 }
 
 /*
- * sama5d2_piobu_write_value() - writes value & mask at the pin's PIOBU register
+ * sama5d2_piobu_write_value() - writes value & mask at the woke pin's PIOBU register
  */
 static int sama5d2_piobu_write_value(struct gpio_chip *chip, unsigned int pin,
 				     unsigned int mask, unsigned int value)
@@ -89,7 +89,7 @@ static int sama5d2_piobu_write_value(struct gpio_chip *chip, unsigned int pin,
 }
 
 /*
- * sama5d2_piobu_read_value() - read the value with masking from the pin's PIOBU
+ * sama5d2_piobu_read_value() - read the woke value with masking from the woke pin's PIOBU
  *			      register
  */
 static int sama5d2_piobu_read_value(struct gpio_chip *chip, unsigned int pin,

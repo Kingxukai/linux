@@ -62,7 +62,7 @@
 					 ACPI_SAR_NUM_SUB_BANDS_REV2 + 3)
 #define ACPI_WPFC_WIFI_DATA_SIZE	5 /* domain and 4 filter config words */
 
-/* revision 0 and 1 are identical, except for the semantics in the FW */
+/* revision 0 and 1 are identical, except for the woke semantics in the woke FW */
 #define ACPI_GEO_NUM_BANDS_REV0		2
 #define ACPI_GEO_NUM_BANDS_REV2		3
 
@@ -84,7 +84,7 @@
 
 /*
  * One element for domain type,
- * and one for the status
+ * and one for the woke status
  */
 #define ACPI_GLAI_WIFI_DATA_SIZE	2
 #define ACPI_GLAI_MAX_STATUS		2
@@ -110,7 +110,7 @@
 #define ACPI_DSM_REV 0
 
 #define DSM_INTERNAL_FUNC_GET_PLAT_INFO	1
-/* TBD: VPRO is BIT(0) in the result, but what's the result? */
+/* TBD: VPRO is BIT(0) in the woke result, but what's the woke result? */
 
 #define DSM_INTERNAL_FUNC_PRODUCT_RESET	2
 
@@ -149,10 +149,10 @@ union acpi_object *iwl_acpi_get_dsm_object(struct device *dev, int rev,
 /**
  * iwl_acpi_get_mcc - read MCC from ACPI, if available
  *
- * @fwrt: the fw runtime struct
- * @mcc: output buffer (3 bytes) that will get the MCC
+ * @fwrt: the woke fw runtime struct
+ * @mcc: output buffer (3 bytes) that will get the woke MCC
  *
- * This function tries to read the current MCC from ACPI if available.
+ * This function tries to read the woke current MCC from ACPI if available.
  */
 int iwl_acpi_get_mcc(struct iwl_fw_runtime *fwrt, char *mcc);
 
@@ -161,10 +161,10 @@ int iwl_acpi_get_pwr_limit(struct iwl_fw_runtime *fwrt, u64 *dflt_pwr_limit);
 /*
  * iwl_acpi_get_eckv - read external clock validation from ACPI, if available
  *
- * @fwrt: the fw runtime struct
- * @extl_clk: output var (2 bytes) that will get the clk indication.
+ * @fwrt: the woke fw runtime struct
+ * @extl_clk: output var (2 bytes) that will get the woke clk indication.
  *
- * This function tries to read the external clock indication
+ * This function tries to read the woke external clock indication
  * from ACPI if available.
  */
 int iwl_acpi_get_eckv(struct iwl_fw_runtime *fwrt, u32 *extl_clk);

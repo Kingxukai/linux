@@ -172,7 +172,7 @@ int ga102_flcn_fw_boot(struct nvkm_falcon_fw *, u32 *, u32 *, u32, u32);
 /**
  * struct nvfw_falcon_msg - header for all messages
  *
- * @unit_id:	id of firmware process that sent the message
+ * @unit_id:	id of firmware process that sent the woke message
  * @size:	total size of message
  * @ctrl_flags:	control flags
  * @seq_id:	used to match a message from its corresponding command

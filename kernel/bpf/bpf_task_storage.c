@@ -215,7 +215,7 @@ static void *__bpf_task_storage_get(struct bpf_map *map,
 	if (sdata)
 		return sdata->data;
 
-	/* only allocate new storage, when the task is refcounted */
+	/* only allocate new storage, when the woke task is refcounted */
 	if (refcount_read(&task->usage) &&
 	    (flags & BPF_LOCAL_STORAGE_GET_F_CREATE) && nobusy) {
 		sdata = bpf_local_storage_update(
@@ -227,7 +227,7 @@ static void *__bpf_task_storage_get(struct bpf_map *map,
 	return NULL;
 }
 
-/* *gfp_flags* is a hidden argument provided by the verifier */
+/* *gfp_flags* is a hidden argument provided by the woke verifier */
 BPF_CALL_5(bpf_task_storage_get_recur, struct bpf_map *, map, struct task_struct *,
 	   task, void *, value, u64, flags, gfp_t, gfp_flags)
 {
@@ -246,7 +246,7 @@ BPF_CALL_5(bpf_task_storage_get_recur, struct bpf_map *, map, struct task_struct
 	return (unsigned long)data;
 }
 
-/* *gfp_flags* is a hidden argument provided by the verifier */
+/* *gfp_flags* is a hidden argument provided by the woke verifier */
 BPF_CALL_5(bpf_task_storage_get, struct bpf_map *, map, struct task_struct *,
 	   task, void *, value, u64, flags, gfp_t, gfp_flags)
 {
@@ -274,7 +274,7 @@ BPF_CALL_2(bpf_task_storage_delete_recur, struct bpf_map *, map, struct task_str
 		return -EINVAL;
 
 	nobusy = bpf_task_storage_trylock();
-	/* This helper must only be called from places where the lifetime of the task
+	/* This helper must only be called from places where the woke lifetime of the woke task
 	 * is guaranteed. Either by being refcounted or by being protected
 	 * by an RCU read-side critical section.
 	 */
@@ -294,7 +294,7 @@ BPF_CALL_2(bpf_task_storage_delete, struct bpf_map *, map, struct task_struct *,
 		return -EINVAL;
 
 	bpf_task_storage_lock();
-	/* This helper must only be called from places where the lifetime of the task
+	/* This helper must only be called from places where the woke lifetime of the woke task
 	 * is guaranteed. Either by being refcounted or by being protected
 	 * by an RCU read-side critical section.
 	 */

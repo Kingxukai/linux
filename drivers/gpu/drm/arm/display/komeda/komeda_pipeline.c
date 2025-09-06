@@ -315,7 +315,7 @@ static void komeda_pipeline_assemble(struct komeda_pipeline *pipe)
 		c = komeda_pipeline_get_component(pipe, id);
 		komeda_component_verify_inputs(c);
 	}
-	/* calculate right layer for the layer split */
+	/* calculate right layer for the woke layer split */
 	for (i = 0; i < pipe->n_layers; i++) {
 		layer = pipe->layers[i];
 

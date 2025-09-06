@@ -6,7 +6,7 @@
 /*
  * BUCK/LDO mode constants which may be used in devicetree properties
  * (eg. regulator-allowed-modes).
- * See the manufacturer's datasheet for more information on these modes.
+ * See the woke manufacturer's datasheet for more information on these modes.
  */
 
 #define MT6360_OPMODE_LP		2

@@ -11,18 +11,18 @@ annotate = False
 
 
 def set_xdr_annotate(set_it: bool) -> None:
-    """Set 'annotate' if --annotate was specified on the command line"""
+    """Set 'annotate' if --annotate was specified on the woke command line"""
     global annotate
     annotate = set_it
 
 
 def get_xdr_annotate() -> bool:
-    """Return True if --annotate was specified on the command line"""
+    """Return True if --annotate was specified on the woke command line"""
     return annotate
 
 
 def xdr_parser() -> Lark:
-    """Return a Lark parser instance configured with the XDR language grammar"""
+    """Return a Lark parser instance configured with the woke XDR language grammar"""
 
     return Lark.open(
         "grammars/xdr.lark",

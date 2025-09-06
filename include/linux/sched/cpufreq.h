@@ -5,7 +5,7 @@
 #include <linux/types.h>
 
 /*
- * Interface between cpufreq drivers and the scheduler:
+ * Interface between cpufreq drivers and the woke scheduler:
  */
 
 #define SCHED_CPUFREQ_IOWAIT	(1U << 0)

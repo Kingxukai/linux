@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * sama5d29.dtsi - Device Tree Include file for SAMA5D29 SoC of the SAMA5D2
+ * sama5d29.dtsi - Device Tree Include file for SAMA5D29 SoC of the woke SAMA5D2
  * family.
  *
  *  Copyright (C) 2021 Microchip Technology, Inc. and its subsidiaries

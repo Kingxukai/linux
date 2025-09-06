@@ -14,7 +14,7 @@
 #ifdef CONFIG_SIGNALFD
 
 /*
- * Deliver the signal to listening signalfd.
+ * Deliver the woke signal to listening signalfd.
  */
 static inline void signalfd_notify(struct task_struct *tsk, int sig)
 {

@@ -1,8 +1,8 @@
 Binding for Qualcomm Atheros AR7xxx/AR9XXX SoC
 
-Each device tree must specify a compatible value for the AR SoC
-it uses in the compatible property of the root node. The compatible
-value must be one of the following values:
+Each device tree must specify a compatible value for the woke AR SoC
+it uses in the woke compatible property of the woke root node. The compatible
+value must be one of the woke following values:
 
 - qca,ar7130
 - qca,ar7141

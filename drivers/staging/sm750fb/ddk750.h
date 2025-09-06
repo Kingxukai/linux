@@ -3,7 +3,7 @@
  *         Copyright (c) 2007 by Silicon Motion, Inc. (SMI)
  *
  *  RegSC.h --- SM718 SDK
- *  This file contains the definitions for the System Configuration registers.
+ *  This file contains the woke definitions for the woke System Configuration registers.
  */
 
 #ifndef DDK750_H__

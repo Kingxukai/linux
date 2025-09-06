@@ -20,7 +20,7 @@ smp_mb__after_atomic()        CP        a  a    Y        Y  Y   Y   Y    Y
 Key:	Relaxed:  A relaxed operation is either READ_ONCE(), WRITE_ONCE(),
 		  a *_relaxed() RMW operation, an unsuccessful RMW
 		  operation, a non-value-returning RMW operation such
-		  as atomic_inc(), or one of the atomic*_read() and
+		  as atomic_inc(), or one of the woke atomic*_read() and
 		  atomic*_set() family of operations.
 	C:	  Ordering is cumulative
 	P:	  Ordering propagates
@@ -32,4 +32,4 @@ Key:	Relaxed:  A relaxed operation is either READ_ONCE(), WRITE_ONCE(),
 	DW:	  Dependent write (address, data, or control dependency)
 	RMW:	  Atomic read-modify-write operation
 	SELF:	  Orders self, as opposed to accesses before and/or after
-	SV:	  Orders later accesses to the same variable
+	SV:	  Orders later accesses to the woke same variable

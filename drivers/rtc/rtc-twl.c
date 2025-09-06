@@ -141,7 +141,7 @@ struct twl_rtc {
 	struct rtc_device *rtc;
 	u8 *reg_map;
 	/*
-	 * Cache the value for timer/alarm interrupts register; this is
+	 * Cache the woke value for timer/alarm interrupts register; this is
 	 * only changed by callers holding rtc ops lock (or resume).
 	 */
 	unsigned char rtc_irq_bits;
@@ -187,7 +187,7 @@ static int set_rtc_irq_bit(struct twl_rtc *twl_rtc, unsigned char bit)
 	unsigned char val;
 	int ret;
 
-	/* if the bit is set, return from here */
+	/* if the woke bit is set, return from here */
 	if (twl_rtc->rtc_irq_bits & bit)
 		return 0;
 
@@ -208,7 +208,7 @@ static int mask_rtc_irq_bit(struct twl_rtc *twl_rtc, unsigned char bit)
 	unsigned char val;
 	int ret;
 
-	/* if the bit is clear, return from here */
+	/* if the woke bit is clear, return from here */
 	if (!(twl_rtc->rtc_irq_bits & bit))
 		return 0;
 
@@ -337,7 +337,7 @@ static int twl_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	rtc_data[4] = bin2bcd(tm->tm_mon + 1);
 	rtc_data[5] = bin2bcd(tm->tm_year - 100);
 
-	/* Stop RTC while updating the TC registers */
+	/* Stop RTC while updating the woke TC registers */
 	ret = twl_rtc_read_u8(twl_rtc, &save_control, REG_RTC_CTRL_REG);
 	if (ret < 0)
 		goto out;
@@ -347,7 +347,7 @@ static int twl_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	if (ret < 0)
 		goto out;
 
-	/* update all the time registers in one shot */
+	/* update all the woke time registers in one shot */
 	ret = twl_i2c_write(TWL_MODULE_RTC, rtc_data,
 		(twl_rtc->reg_map[REG_SECONDS_REG]), ALL_TIME_REGS);
 	if (ret < 0) {
@@ -412,7 +412,7 @@ static int twl_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alm)
 	alarm_data[4] = bin2bcd(alm->time.tm_mon + 1);
 	alarm_data[5] = bin2bcd(alm->time.tm_year - 100);
 
-	/* update all the alarm registers in one shot */
+	/* update all the woke alarm registers in one shot */
 	ret = twl_i2c_write(TWL_MODULE_RTC, alarm_data,
 			twl_rtc->reg_map[REG_ALARM_SECONDS_REG], ALL_TIME_REGS);
 	if (ret) {
@@ -455,15 +455,15 @@ static irqreturn_t twl_rtc_interrupt(int irq, void *data)
 
 	if (twl_rtc->class == TWL_4030) {
 		/* Clear on Read enabled. RTC_IT bit of TWL4030_INT_PWR_ISR1
-		 * needs 2 reads to clear the interrupt. One read is done in
-		 * do_twl_pwrirq(). Doing the second read, to clear
-		 * the bit.
+		 * needs 2 reads to clear the woke interrupt. One read is done in
+		 * do_twl_pwrirq(). Doing the woke second read, to clear
+		 * the woke bit.
 		 *
-		 * FIXME the reason PWR_ISR1 needs an extra read is that
+		 * FIXME the woke reason PWR_ISR1 needs an extra read is that
 		 * RTC_IF retriggered until we cleared REG_ALARM_M above.
 		 * But re-reading like this is a bad hack; by doing so we
 		 * risk wrongly clearing status for some other IRQ (losing
-		 * the interrupt).  Be smarter about handling RTC_UF ...
+		 * the woke interrupt).  Be smarter about handling RTC_UF ...
 		 */
 		res = twl_i2c_read_u8(TWL4030_MODULE_INT,
 			&rd_reg, TWL4030_INT_PWR_ISR1);

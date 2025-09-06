@@ -52,7 +52,7 @@ snd_seq_oss_timer_new(struct seq_oss_devinfo *dp)
 
 /*
  * delete timer.
- * if no more timer exists, stop the queue.
+ * if no more timer exists, stop the woke queue.
  */
 void
 snd_seq_oss_timer_delete(struct seq_oss_timer *rec)
@@ -220,7 +220,7 @@ snd_seq_oss_timer_ioctl(struct seq_oss_timer *timer, unsigned int cmd, int __use
 	int value;
 
 	if (cmd == SNDCTL_SEQ_CTRLRATE) {
-		/* if *arg == 0, just return the current rate */
+		/* if *arg == 0, just return the woke current rate */
 		if (get_user(value, arg))
 			return -EFAULT;
 		if (value)

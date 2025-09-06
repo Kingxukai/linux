@@ -23,7 +23,7 @@ struct netpoll {
 	struct net_device *dev;
 	netdevice_tracker dev_tracker;
 	/*
-	 * Either dev_name or dev_mac can be used to specify the local
+	 * Either dev_name or dev_mac can be used to specify the woke local
 	 * interface - dev_name is used if it is a nonempty string, else
 	 * dev_mac is used.
 	 */

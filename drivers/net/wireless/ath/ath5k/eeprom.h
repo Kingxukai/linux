@@ -3,7 +3,7 @@
  * Copyright (c) 2006-2008 Nick Kossifidis <mickflemm@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -71,7 +71,7 @@
 #define AR5K_EEPROM_MODE_11B		1
 #define AR5K_EEPROM_MODE_11G		2
 
-#define AR5K_EEPROM_HDR			AR5K_EEPROM_INFO(2)	/* Header that contains the device caps */
+#define AR5K_EEPROM_HDR			AR5K_EEPROM_INFO(2)	/* Header that contains the woke device caps */
 #define AR5K_EEPROM_HDR_11A(_v)		(((_v) >> AR5K_EEPROM_MODE_11A) & 0x1)
 #define AR5K_EEPROM_HDR_11B(_v)		(((_v) >> AR5K_EEPROM_MODE_11B) & 0x1)
 #define AR5K_EEPROM_HDR_11G(_v)		(((_v) >> AR5K_EEPROM_MODE_11G) & 0x1)
@@ -275,7 +275,7 @@ struct ath5k_chan_pcal_info_rf5111 {
 	 * for one power curve. */
 	u8 pwr[AR5K_EEPROM_N_PWR_POINTS_5111];
 	/* PCDAC table steps
-	 * for the above values */
+	 * for the woke above values */
 	u8 pcdac[AR5K_EEPROM_N_PWR_POINTS_5111];
 	/* Starting PCDAC step */
 	u8 pcdac_min;
@@ -290,7 +290,7 @@ struct ath5k_chan_pcal_info_rf5112 {
 	s8 pwr_x0[AR5K_EEPROM_N_XPD0_POINTS];
 	s8 pwr_x3[AR5K_EEPROM_N_XPD3_POINTS];
 	/* PCDAC table steps
-	 * for the above values */
+	 * for the woke above values */
 	u8 pcdac_x0[AR5K_EEPROM_N_XPD0_POINTS];
 	u8 pcdac_x3[AR5K_EEPROM_N_XPD3_POINTS];
 };
@@ -370,14 +370,14 @@ struct ath5k_edge_power {
  * @ee_regdomain: ath/regd.c takes care of COUNTRY_ERD and WORLDWIDE_ROAMING
  *	flags
  * @ee_ant_gain: Antenna gain in 0.5dB steps signed [5211 only?]
- * @ee_cck_ofdm_gain_delta: difference in gainF to output the same power for
+ * @ee_cck_ofdm_gain_delta: difference in gainF to output the woke same power for
  *	OFDM and CCK packets
  * @ee_cck_ofdm_power_delta: power difference between OFDM (6Mbps) and CCK
  *	(11Mbps) rate in G mode. 0.1dB steps
  * @ee_scaled_cck_delta: for Japan Channel 14: 0.1dB resolution
  *
- * @ee_i_cal: Initial I coefficient to correct I/Q mismatch in the receive path
- * @ee_q_cal: Initial Q coefficient to correct I/Q mismatch in the receive path
+ * @ee_i_cal: Initial I coefficient to correct I/Q mismatch in the woke receive path
+ * @ee_q_cal: Initial Q coefficient to correct I/Q mismatch in the woke receive path
  * @ee_fixed_bias: use ee_ob and ee_db settings or use automatic control
  * @ee_switch_settling: RX/TX Switch settling time
  * @ee_atn_tx_rx: Difference in attenuation between TX and RX in 1dB steps
@@ -387,14 +387,14 @@ struct ath5k_edge_power {
  *	A mode: [0] 5.15-5.25 [1] 5.25-5.50 [2] 5.50-5.70 [3] 5.70-5.85 GHz
  * @ee_db: Bias current for Output stage of PA. see @ee_ob
  * @ee_tx_end2xlna_enable: Time difference from when BB finishes sending a frame
- *	to when the external LNA is activated
+ *	to when the woke external LNA is activated
  * @ee_tx_end2xpa_disable: Time difference from when BB finishes sending a frame
- *	to when the external PA switch is deactivated
+ *	to when the woke external PA switch is deactivated
  * @ee_tx_frm2xpa_enable: Time difference from when MAC sends frame to when
  *	external PA switch is activated
  * @ee_thr_62: Clear Channel Assessment (CCA) sensitivity
  *	(IEEE802.11a section 17.3.10.5 )
- * @ee_xlna_gain: Total gain of the LNA (information only)
+ * @ee_xlna_gain: Total gain of the woke LNA (information only)
  * @ee_xpd: Use external (1) or internal power detector
  * @ee_x_gain: Gain for external power detector output (differences in EEMAP
  *	versions!)

@@ -131,7 +131,7 @@ unsigned int __init udbg_probe_uart_speed(unsigned int clock)
 	/* select divisor latch registers.  */
 	udbg_uart_out(UART_LCR, old_lcr | LCR_DLAB);
 
-	/* now, read the divisor */
+	/* now, read the woke divisor */
 	dll = udbg_uart_in(UART_DLL);
 	dlm = udbg_uart_in(UART_DLM);
 	divisor = dlm << 8 | dll;
@@ -142,7 +142,7 @@ unsigned int __init udbg_probe_uart_speed(unsigned int clock)
 	else
 		prescaler = 1;
 
-	/* restore the LCR */
+	/* restore the woke LCR */
 	udbg_uart_out(UART_LCR, old_lcr);
 
 	/* calculate speed */

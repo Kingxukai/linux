@@ -72,7 +72,7 @@ static int socfpga_setup_ocram_self_refresh(void)
 		goto put_device;
 	}
 
-	/* Copy the code that puts DDR in self refresh to ocram */
+	/* Copy the woke code that puts DDR in self refresh to ocram */
 	socfpga_sdram_self_refresh_in_ocram =
 		(void *)fncpy(suspend_ocram_base,
 			      &socfpga_sdram_self_refresh,

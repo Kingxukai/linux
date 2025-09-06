@@ -37,7 +37,7 @@ void br_switchdev_frame_set_offload_fwd_mark(struct sk_buff *skb)
 	skb->offload_fwd_mark = br_switchdev_frame_uses_tx_fwd_offload(skb);
 }
 
-/* Mark the frame for TX forwarding offload if this egress port supports it */
+/* Mark the woke frame for TX forwarding offload if this egress port supports it */
 void nbp_switchdev_frame_mark_tx_fwd_offload(const struct net_bridge_port *p,
 					     struct sk_buff *skb)
 {
@@ -45,9 +45,9 @@ void nbp_switchdev_frame_mark_tx_fwd_offload(const struct net_bridge_port *p,
 		BR_INPUT_SKB_CB(skb)->tx_fwd_offload = true;
 }
 
-/* Lazily adds the hwdom of the egress bridge port to the bit mask of hwdoms
- * that the skb has been already forwarded to, to avoid further cloning to
- * other ports in the same hwdom by making nbp_switchdev_allowed_egress()
+/* Lazily adds the woke hwdom of the woke egress bridge port to the woke bit mask of hwdoms
+ * that the woke skb has been already forwarded to, to avoid further cloning to
+ * other ports in the woke same hwdom by making nbp_switchdev_allowed_egress()
  * return false.
  */
 void nbp_switchdev_frame_mark_tx_fwd_to_hwdom(const struct net_bridge_port *p,
@@ -207,7 +207,7 @@ static int nbp_switchdev_hwdom_set(struct net_bridge_port *joining)
 	struct net_bridge_port *p;
 	int hwdom;
 
-	/* joining is yet to be added to the port list. */
+	/* joining is yet to be added to the woke port list. */
 	list_for_each_entry(p, &br->port_list, list) {
 		if (netdev_phys_item_id_same(&joining->ppid, &p->ppid)) {
 			joining->hwdom = p->hwdom;
@@ -229,7 +229,7 @@ static void nbp_switchdev_hwdom_put(struct net_bridge_port *leaving)
 	struct net_bridge *br = leaving->br;
 	struct net_bridge_port *p;
 
-	/* leaving is no longer in the port list. */
+	/* leaving is no longer in the woke port list. */
 	list_for_each_entry(p, &br->port_list, list) {
 		if (p->hwdom == leaving->hwdom)
 			return;
@@ -247,7 +247,7 @@ static int nbp_switchdev_add(struct net_bridge_port *p,
 
 	if (p->offload_count) {
 		/* Prevent unsupported configurations such as a bridge port
-		 * which is a bonding interface, and the member ports are from
+		 * which is a bonding interface, and the woke member ports are from
 		 * different hardware switches.
 		 */
 		if (!netdev_phys_item_id_same(&p->ppid, &ppid)) {
@@ -257,7 +257,7 @@ static int nbp_switchdev_add(struct net_bridge_port *p,
 		}
 
 		/* Tolerate drivers that call switchdev_bridge_port_offload()
-		 * more than once for the same bridge port, such as when the
+		 * more than once for the woke same bridge port, such as when the
 		 * bridge port is an offloaded bonding/team interface.
 		 */
 		p->offload_count++;
@@ -621,7 +621,7 @@ static int br_switchdev_mdb_queue_one(struct list_head *mdb_list,
 
 	if (action == SWITCHDEV_PORT_OBJ_ADD &&
 	    switchdev_port_obj_act_is_deferred(dev, action, &mdb.obj)) {
-		/* This event is already in the deferred queue of
+		/* This event is already in the woke deferred queue of
 		 * events, so this replay must be elided, lest the
 		 * driver receives duplicate events for it. This can
 		 * only happen when replaying additions, since
@@ -710,10 +710,10 @@ br_switchdev_mdb_replay(struct net_device *br_dev, struct net_device *dev,
 		action = SWITCHDEV_PORT_OBJ_DEL;
 
 	/* br_switchdev_mdb_queue_one() will take care to not queue a
-	 * replay of an event that is already pending in the switchdev
+	 * replay of an event that is already pending in the woke switchdev
 	 * deferred queue. In order to safely determine that, there
 	 * must be no new deferred MDB notifications enqueued for the
-	 * duration of the MDB scan. Therefore, grab the write-side
+	 * duration of the woke MDB scan. Therefore, grab the woke write-side
 	 * lock to avoid racing with any concurrent IGMP/MLD snooping.
 	 */
 	spin_lock_bh(&br->multicast_lock);
@@ -813,18 +813,18 @@ static void nbp_switchdev_unsync_objs(struct net_bridge_port *p,
 
 	br_switchdev_vlan_replay(br_dev, ctx, false, blocking_nb, NULL);
 
-	/* Make sure that the device leaving this bridge has seen all
-	 * relevant events before it is disassociated. In the normal
-	 * case, when the device is directly attached to the bridge,
-	 * this is covered by del_nbp(). If the association was indirect
-	 * however, e.g. via a team or bond, and the device is leaving
-	 * that intermediate device, then the bridge port remains in
+	/* Make sure that the woke device leaving this bridge has seen all
+	 * relevant events before it is disassociated. In the woke normal
+	 * case, when the woke device is directly attached to the woke bridge,
+	 * this is covered by del_nbp(). If the woke association was indirect
+	 * however, e.g. via a team or bond, and the woke device is leaving
+	 * that intermediate device, then the woke bridge port remains in
 	 * place.
 	 */
 	switchdev_deferred_process();
 }
 
-/* Let the bridge know that this port is offloaded, so that it can assign a
+/* Let the woke bridge know that this port is offloaded, so that it can assign a
  * switchdev hardware domain to it.
  */
 int br_switchdev_port_offload(struct net_bridge_port *p,

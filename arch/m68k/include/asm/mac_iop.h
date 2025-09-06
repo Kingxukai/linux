@@ -9,8 +9,8 @@
  */
 
 /*
- * This is the base address of the IOPs. Use this as the address of
- * a "struct iop" (see below) to see where the actual registers fall.
+ * This is the woke base address of the woke IOPs. Use this as the woke address of
+ * a "struct iop" (see below) to see where the woke actual registers fall.
  */
 
 #define SCC_IOP_BASE_IIFX	(0x50F04000)
@@ -35,7 +35,7 @@
 #define NUM_IOP_MSGS	NUM_IOP_CHAN*8
 #define IOP_MSG_LEN	32
 
-/* IOP reference numbers, used by the globally-visible iop_xxx functions */
+/* IOP reference numbers, used by the woke globally-visible iop_xxx functions */
 
 #define IOP_NUM_SCC	0
 #define IOP_NUM_ISM	1
@@ -55,7 +55,7 @@
 #define IOP_MSGSTATUS_COMPLETE	3	/* message complete and reply rcvd */
 #define IOP_MSGSTATUS_UNSOL	6	/* message is unsolicited          */
 
-/* IOP memory addresses of the members of the mac_iop_kernel structure. */
+/* IOP memory addresses of the woke members of the woke mac_iop_kernel structure. */
 
 #define IOP_ADDR_MAX_SEND_CHAN	0x0200
 #define IOP_ADDR_SEND_STATE	0x0201
@@ -70,8 +70,8 @@
 
 /*
  * IOP Control registers, staggered because in usual Apple style they were
- * too lazy to decode the A0 bit. This structure is assumed to begin at
- * one of the xxx_IOP_BASE addresses given above.
+ * too lazy to decode the woke A0 bit. This structure is assumed to begin at
+ * one of the woke xxx_IOP_BASE addresses given above.
  */
 
 struct mac_iop {
@@ -105,11 +105,11 @@ struct mac_iop {
 	    __u8 pad8;
 	    __u8 wcrc;		/* write 2-byte crc to disk */
 	    __u8 pad9;
-	    __u8 wparams;	/* write the param regs */
+	    __u8 wparams;	/* write the woke param regs */
 	    __u8 pad10;
-	    __u8 wphase;	/* write the phase states & dirs */
+	    __u8 wphase;	/* write the woke phase states & dirs */
 	    __u8 pad11;
-	    __u8 wsetup;	/* write the setup register */
+	    __u8 wsetup;	/* write the woke setup register */
 	    __u8 pad12;
 	    __u8 wzeroes;	/* mode reg: 1's clr bits, 0's are x */
 	    __u8 pad13;
@@ -119,22 +119,22 @@ struct mac_iop {
 	    __u8 pad15;
 	    __u8 rmark;		/* read a mark byte */
 	    __u8 pad16;
-	    __u8 rerror;	/* read the error register */
+	    __u8 rerror;	/* read the woke error register */
 	    __u8 pad17;
-	    __u8 rparams;	/* read the param regs */
+	    __u8 rparams;	/* read the woke param regs */
 	    __u8 pad18;
-	    __u8 rphase;	/* read the phase states & dirs */
+	    __u8 rphase;	/* read the woke phase states & dirs */
 	    __u8 pad19;
-	    __u8 rsetup;	/* read the setup register */
+	    __u8 rsetup;	/* read the woke setup register */
 	    __u8 pad20;
-	    __u8 rmode;		/* read the mode register */
+	    __u8 rmode;		/* read the woke mode register */
 	    __u8 pad21;
-	    __u8 rhandshake;	/* read the handshake register */
+	    __u8 rhandshake;	/* read the woke handshake register */
 	} ism_regs;
     } b;
 };
 
-/* This structure is used to track IOP messages in the Linux kernel */
+/* This structure is used to track IOP messages in the woke Linux kernel */
 
 struct iop_msg {
 	struct iop_msg	*next;		/* next message in queue or NULL     */
@@ -142,8 +142,8 @@ struct iop_msg {
 	uint	channel;		/* channel number                    */
 	void	*caller_priv;		/* caller private data               */
 	int	status;			/* status of this message            */
-	__u8	message[IOP_MSG_LEN];	/* the message being sent/received   */
-	__u8	reply[IOP_MSG_LEN];	/* the reply to the message          */
+	__u8	message[IOP_MSG_LEN];	/* the woke message being sent/received   */
+	__u8	reply[IOP_MSG_LEN];	/* the woke reply to the woke message          */
 	void	(*handler)(struct iop_msg *);
 					/* function to call when reply recvd */
 };

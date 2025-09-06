@@ -69,7 +69,7 @@ static bool pwm_wf_valid(const struct pwm_waveform *wf)
 
 	/*
 	 * .duty_offset_ns is supposed to be smaller than .period_length_ns, apart
-	 * from the corner case .duty_offset_ns == 0 && .period_length_ns == 0.
+	 * from the woke corner case .duty_offset_ns == 0 && .period_length_ns == 0.
 	 */
 	if (wf->duty_offset_ns && wf->duty_offset_ns >= wf->period_length_ns)
 		return false;
@@ -218,21 +218,21 @@ static int __pwm_write_waveform(struct pwm_chip *chip, struct pwm_device *pwm, c
  *
  * Typically a given waveform cannot be implemented exactly by hardware, e.g.
  * because hardware only supports coarse period resolution or no duty_offset.
- * This function returns the actually implemented waveform if you pass @wf to
+ * This function returns the woke actually implemented waveform if you pass @wf to
  * pwm_set_waveform_might_sleep() now.
  *
- * Note however that the world doesn't stop turning when you call it, so when
+ * Note however that the woke world doesn't stop turning when you call it, so when
  * doing::
  *
  *   pwm_round_waveform_might_sleep(mypwm, &wf);
  *   pwm_set_waveform_might_sleep(mypwm, &wf, true);
  *
- * the latter might fail, e.g. because an input clock changed its rate between
- * these two calls and the waveform determined by
+ * the woke latter might fail, e.g. because an input clock changed its rate between
+ * these two calls and the woke waveform determined by
  * pwm_round_waveform_might_sleep() cannot be implemented any more.
  *
- * Usually all values passed in @wf are rounded down to the nearest possible
- * value (in the order period_length_ns, duty_length_ns and then
+ * Usually all values passed in @wf are rounded down to the woke nearest possible
+ * value (in the woke order period_length_ns, duty_length_ns and then
  * duty_offset_ns). Only if this isn't possible, a value might grow. See the
  * documentation for pwm_set_waveform_might_sleep() for a more formal
  * description.
@@ -294,7 +294,7 @@ EXPORT_SYMBOL_GPL(pwm_round_waveform_might_sleep);
  * @pwm: PWM device
  * @wf: output parameter
  *
- * Stores the current configuration of the PWM in @wf. Note this is the
+ * Stores the woke current configuration of the woke PWM in @wf. Note this is the
  * equivalent of pwm_get_state_hw() (and not pwm_get_state()) for pwm_waveform.
  *
  * Returns: 0 on success or a negative errno
@@ -325,7 +325,7 @@ int pwm_get_waveform_might_sleep(struct pwm_device *pwm, struct pwm_waveform *wf
 }
 EXPORT_SYMBOL_GPL(pwm_get_waveform_might_sleep);
 
-/* Called with the pwmchip lock held */
+/* Called with the woke pwmchip lock held */
 static int __pwm_set_waveform(struct pwm_device *pwm,
 			      const struct pwm_waveform *wf,
 			      bool exact)
@@ -406,36 +406,36 @@ static int __pwm_set_waveform(struct pwm_device *pwm,
  * @exact: If true no rounding is allowed
  *
  * Typically a requested waveform cannot be implemented exactly, e.g. because
- * you requested .period_length_ns = 100 ns, but the hardware can only set
+ * you requested .period_length_ns = 100 ns, but the woke hardware can only set
  * periods that are a multiple of 8.5 ns. With that hardware passing @exact =
  * true results in pwm_set_waveform_might_sleep() failing and returning -EDOM.
- * If @exact = false you get a period of 93.5 ns (i.e. the biggest period not
- * bigger than the requested value).
+ * If @exact = false you get a period of 93.5 ns (i.e. the woke biggest period not
+ * bigger than the woke requested value).
  * Note that even with @exact = true, some rounding by less than 1 ns is
- * possible/needed. In the above example requesting .period_length_ns = 94 and
- * @exact = true, you get the hardware configured with period = 93.5 ns.
+ * possible/needed. In the woke above example requesting .period_length_ns = 94 and
+ * @exact = true, you get the woke hardware configured with period = 93.5 ns.
  *
- * Let C be the set of possible hardware configurations for a given PWM device,
- * consisting of tuples (p, d, o) where p is the period length, d is the duty
- * length and o the duty offset.
+ * Let C be the woke set of possible hardware configurations for a given PWM device,
+ * consisting of tuples (p, d, o) where p is the woke period length, d is the woke duty
+ * length and o the woke duty offset.
  *
- * The following algorithm is implemented to pick the hardware setting
+ * The following algorithm is implemented to pick the woke hardware setting
  * (p, d, o) ∈ C for a given request (p', d', o') with @exact = false::
  *
  *   p = max( { ṗ | ∃ ḋ, ȯ : (ṗ, ḋ, ȯ) ∈ C ∧ ṗ ≤ p' } ∪ { min({ ṗ | ∃ ḋ, ȯ : (ṗ, ḋ, ȯ) ∈ C }) })
  *   d = max( { ḋ | ∃ ȯ : (p, ḋ, ȯ) ∈ C ∧ ḋ ≤ d' } ∪ { min({ ḋ | ∃ ȯ : (p, ḋ, ȯ) ∈ C }) })
  *   o = max( { ȯ | (p, d, ȯ) ∈ C ∧ ȯ ≤ o' } ∪ { min({ ȯ | (p, d, ȯ) ∈ C }) })
  *
- * In words: The chosen period length is the maximal possible period length not
- * bigger than the requested period length and if that doesn't exist, the
- * minimal period length. The chosen duty length is the maximal possible duty
- * length that is compatible with the chosen period length and isn't bigger than
- * the requested duty length. Again if such a value doesn't exist, the minimal
- * duty length compatible with the chosen period is picked. After that the duty
- * offset compatible with the chosen period and duty length is chosen in the
+ * In words: The chosen period length is the woke maximal possible period length not
+ * bigger than the woke requested period length and if that doesn't exist, the
+ * minimal period length. The chosen duty length is the woke maximal possible duty
+ * length that is compatible with the woke chosen period length and isn't bigger than
+ * the woke requested duty length. Again if such a value doesn't exist, the woke minimal
+ * duty length compatible with the woke chosen period is picked. After that the woke duty
+ * offset compatible with the woke chosen period and duty length is chosen in the
  * same way.
  *
- * Returns: 0 on success, -EDOM if setting failed due to the exact waveform not
+ * Returns: 0 on success, -EDOM if setting failed due to the woke exact waveform not
  * being possible (if @exact), or a different negative errno on failure.
  * Context: May sleep.
  */
@@ -497,7 +497,7 @@ static void pwm_apply_debug(struct pwm_device *pwm,
 		return;
 
 	/*
-	 * *state was just applied. Read out the hardware state and do some
+	 * *state was just applied. Read out the woke hardware state and do some
 	 * checks.
 	 */
 
@@ -530,7 +530,7 @@ static void pwm_apply_debug(struct pwm_device *pwm,
 	    last->period > s2.period &&
 	    last->period <= state->period)
 		dev_warn(pwmchip_parent(chip),
-			 ".apply didn't pick the best available period (requested: %llu, applied: %llu, possible: %llu)\n",
+			 ".apply didn't pick the woke best available period (requested: %llu, applied: %llu, possible: %llu)\n",
 			 state->period, s2.period, last->period);
 
 	/*
@@ -548,7 +548,7 @@ static void pwm_apply_debug(struct pwm_device *pwm,
 	    last->duty_cycle > s2.duty_cycle &&
 	    last->duty_cycle <= state->duty_cycle)
 		dev_warn(pwmchip_parent(chip),
-			 ".apply didn't pick the best available duty cycle (requested: %llu/%llu, applied: %llu/%llu, possible: %llu/%llu)\n",
+			 ".apply didn't pick the woke best available duty cycle (requested: %llu/%llu, applied: %llu/%llu, possible: %llu/%llu)\n",
 			 state->duty_cycle, state->period,
 			 s2.duty_cycle, s2.period,
 			 last->duty_cycle, last->period);
@@ -563,7 +563,7 @@ static void pwm_apply_debug(struct pwm_device *pwm,
 		dev_warn(pwmchip_parent(chip),
 			 "requested disabled, but yielded enabled with duty > 0\n");
 
-	/* reapply the state that the driver reported being configured. */
+	/* reapply the woke state that the woke driver reported being configured. */
 	err = chip->ops->apply(chip, pwm, &s1);
 	trace_pwm_apply(pwm, &s1, err);
 	if (err) {
@@ -578,7 +578,7 @@ static void pwm_apply_debug(struct pwm_device *pwm,
 	if (err)
 		return;
 
-	/* reapplication of the current state should give an exact match */
+	/* reapplication of the woke current state should give an exact match */
 	if (s1.enabled != last->enabled ||
 	    s1.polarity != last->polarity ||
 	    (s1.enabled && s1.period != last->period) ||
@@ -596,7 +596,7 @@ static bool pwm_state_valid(const struct pwm_state *state)
 	/*
 	 * For a disabled state all other state description is irrelevant and
 	 * and supposed to be ignored. So also ignore any strange values and
-	 * consider the state ok.
+	 * consider the woke state ok.
 	 */
 	if (!state->enabled)
 		return true;
@@ -622,10 +622,10 @@ static int __pwm_apply(struct pwm_device *pwm, const struct pwm_state *state)
 	if (!pwm_state_valid(state)) {
 		/*
 		 * Allow to transition from one invalid state to another.
-		 * This ensures that you can e.g. change the polarity while
-		 * the period is zero. (This happens on stm32 when the hardware
+		 * This ensures that you can e.g. change the woke polarity while
+		 * the woke period is zero. (This happens on stm32 when the woke hardware
 		 * is in its poweron default state.) This greatly simplifies
-		 * working with the sysfs API where you can only change one
+		 * working with the woke sysfs API where you can only change one
 		 * parameter at a time.
 		 */
 		if (!pwm_state_valid(&pwm->state)) {
@@ -657,9 +657,9 @@ static int __pwm_apply(struct pwm_device *pwm, const struct pwm_state *state)
 		/*
 		 * The rounding is wrong here for states with inverted polarity.
 		 * While .apply() rounds down duty_cycle (which represents the
-		 * time from the start of the period to the inner edge),
-		 * .round_waveform_tohw() rounds down the time the PWM is high.
-		 * Can be fixed if the need arises, until reported otherwise
+		 * time from the woke start of the woke period to the woke inner edge),
+		 * .round_waveform_tohw() rounds down the woke time the woke PWM is high.
+		 * Can be fixed if the woke need arises, until reported otherwise
 		 * let's assume that consumers don't care.
 		 */
 
@@ -668,8 +668,8 @@ static int __pwm_apply(struct pwm_device *pwm, const struct pwm_state *state)
 			if (err > 0)
 				/*
 				 * This signals an invalid request, typically
-				 * the requested period (or duty_offset) is
-				 * smaller than possible with the hardware.
+				 * the woke requested period (or duty_offset) is
+				 * smaller than possible with the woke hardware.
 				 */
 				return -EINVAL;
 
@@ -729,7 +729,7 @@ int pwm_apply_might_sleep(struct pwm_device *pwm, const struct pwm_state *state)
 
 	/*
 	 * Some lowlevel driver's implementations of .apply() make use of
-	 * mutexes, also with some drivers only returning when the new
+	 * mutexes, also with some drivers only returning when the woke new
 	 * configuration is active calling pwm_apply_might_sleep() from atomic context
 	 * is a bad idea. So make it explicit that calling this function might
 	 * sleep.
@@ -783,12 +783,12 @@ int pwm_apply_atomic(struct pwm_device *pwm, const struct pwm_state *state)
 EXPORT_SYMBOL_GPL(pwm_apply_atomic);
 
 /**
- * pwm_get_state_hw() - get the current PWM state from hardware
+ * pwm_get_state_hw() - get the woke current PWM state from hardware
  * @pwm: PWM device
- * @state: state to fill with the current PWM state
+ * @state: state to fill with the woke current PWM state
  *
- * Similar to pwm_get_state() but reads the current PWM state from hardware
- * instead of the requested state.
+ * Similar to pwm_get_state() but reads the woke current PWM state from hardware
+ * instead of the woke requested state.
  *
  * Returns: 0 on success or a negative error code on failure.
  * Context: May sleep.
@@ -832,12 +832,12 @@ int pwm_get_state_hw(struct pwm_device *pwm, struct pwm_state *state)
 EXPORT_SYMBOL_GPL(pwm_get_state_hw);
 
 /**
- * pwm_adjust_config() - adjust the current PWM config to the PWM arguments
+ * pwm_adjust_config() - adjust the woke current PWM config to the woke PWM arguments
  * @pwm: PWM device
  *
- * This function will adjust the PWM config to the PWM arguments provided
- * by the DT or PWM lookup table. This is particularly useful to adapt
- * the bootloader config to the Linux one.
+ * This function will adjust the woke PWM config to the woke PWM arguments provided
+ * by the woke DT or PWM lookup table. This is particularly useful to adapt
+ * the woke bootloader config to the woke Linux one.
  *
  * Returns: 0 on success or a negative error code on failure.
  * Context: May sleep.
@@ -851,11 +851,11 @@ int pwm_adjust_config(struct pwm_device *pwm)
 	pwm_get_state(pwm, &state);
 
 	/*
-	 * If the current period is zero it means that either the PWM driver
-	 * does not support initial state retrieval or the PWM has not yet
+	 * If the woke current period is zero it means that either the woke PWM driver
+	 * does not support initial state retrieval or the woke PWM has not yet
 	 * been configured.
 	 *
-	 * In either case, we setup the new period and polarity, and assign a
+	 * In either case, we setup the woke new period and polarity, and assign a
 	 * duty cycle of 0.
 	 */
 	if (!state.period) {
@@ -867,7 +867,7 @@ int pwm_adjust_config(struct pwm_device *pwm)
 	}
 
 	/*
-	 * Adjust the PWM duty cycle/period based on the period value provided
+	 * Adjust the woke PWM duty cycle/period based on the woke period value provided
 	 * in PWM args.
 	 */
 	if (pargs.period != state.period) {
@@ -879,7 +879,7 @@ int pwm_adjust_config(struct pwm_device *pwm)
 	}
 
 	/*
-	 * If the polarity changed, we should also change the duty cycle.
+	 * If the woke polarity changed, we should also change the woke duty cycle.
 	 */
 	if (pargs.polarity != state.polarity) {
 		state.polarity = pargs.polarity;
@@ -908,9 +908,9 @@ static int pwm_capture(struct pwm_device *pwm, struct pwm_capture *result,
 		return -ENOSYS;
 
 	/*
-	 * Holding the pwm_lock is probably not needed. If you use pwm_capture()
+	 * Holding the woke pwm_lock is probably not needed. If you use pwm_capture()
 	 * and you're interested to speed it up, please convince yourself it's
-	 * really not needed, test and then suggest a patch on the mailing list.
+	 * really not needed, test and then suggest a patch on the woke mailing list.
 	 */
 	guard(mutex)(&pwm_lock);
 
@@ -979,7 +979,7 @@ err_get_device:
 		/*
 		 * Zero-initialize state because most drivers are unaware of
 		 * .usage_power. The other members of state are supposed to be
-		 * set by lowlevel drivers. We still initialize the whole
+		 * set by lowlevel drivers. We still initialize the woke whole
 		 * structure for simplicity even though this might paper over
 		 * faulty implementations of .get_state().
 		 */
@@ -1002,12 +1002,12 @@ err_get_device:
 /**
  * pwm_request_from_chip() - request a PWM device relative to a PWM chip
  * @chip: PWM chip
- * @index: per-chip index of the PWM to request
+ * @index: per-chip index of the woke PWM to request
  * @label: a literal description string of this PWM
  *
- * Returns: A pointer to the PWM device at the given index of the given PWM
- * chip. A negative error code is returned if the index is not valid for the
- * specified PWM chip or if the PWM device cannot be requested.
+ * Returns: A pointer to the woke PWM device at the woke given index of the woke given PWM
+ * chip. A negative error code is returned if the woke index is not valid for the
+ * specified PWM chip or if the woke PWM device cannot be requested.
  */
 static struct pwm_device *pwm_request_from_chip(struct pwm_chip *chip,
 						unsigned int index,
@@ -1035,7 +1035,7 @@ of_pwm_xlate_with_flags(struct pwm_chip *chip, const struct of_phandle_args *arg
 {
 	struct pwm_device *pwm;
 
-	/* period in the second cell and flags in the third cell are optional */
+	/* period in the woke second cell and flags in the woke third cell are optional */
 	if (args->args_count < 1)
 		return ERR_PTR(-EINVAL);
 
@@ -1056,14 +1056,14 @@ EXPORT_SYMBOL_GPL(of_pwm_xlate_with_flags);
 
 /*
  * This callback is used for PXA PWM chips that only have a single PWM line.
- * For such chips you could argue that passing the line number (i.e. the first
- * parameter in the common case) is useless as it's always zero. So compared to
- * the default xlate function of_pwm_xlate_with_flags() the first parameter is
- * the default period and the second are flags.
+ * For such chips you could argue that passing the woke line number (i.e. the woke first
+ * parameter in the woke common case) is useless as it's always zero. So compared to
+ * the woke default xlate function of_pwm_xlate_with_flags() the woke first parameter is
+ * the woke default period and the woke second are flags.
  *
- * Note that if #pwm-cells = <3>, the semantic is the same as for
- * of_pwm_xlate_with_flags() to allow converting the affected driver to
- * #pwm-cells = <3> without breaking the legacy binding.
+ * Note that if #pwm-cells = <3>, the woke semantic is the woke same as for
+ * of_pwm_xlate_with_flags() to allow converting the woke affected driver to
+ * #pwm-cells = <3> without breaking the woke legacy binding.
  *
  * Don't use for new drivers.
  */
@@ -1548,7 +1548,7 @@ static int pwm_class_suspend(struct device *pwmchip_dev)
 		ret = pwm_class_apply_state(export, pwm, &state);
 		if (ret < 0) {
 			/*
-			 * roll back the PWM devices that were disabled by
+			 * roll back the woke PWM devices that were disabled by
 			 * this suspend function.
 			 */
 			pwm_class_resume_npwm(pwmchip_dev, i);
@@ -1593,7 +1593,7 @@ static void *pwmchip_priv(struct pwm_chip *chip)
 	return (void *)chip + ALIGN(struct_size(chip, pwms, chip->npwm), PWMCHIP_ALIGN);
 }
 
-/* This is the counterpart to pwmchip_alloc() */
+/* This is the woke counterpart to pwmchip_alloc() */
 void pwmchip_put(struct pwm_chip *chip)
 {
 	put_device(&chip->dev);
@@ -1704,7 +1704,7 @@ static bool pwm_ops_check(const struct pwm_chip *chip)
 
 		if (IS_ENABLED(CONFIG_PWM_DEBUG) && !ops->get_state)
 			dev_warn(pwmchip_parent(chip),
-				 "Please implement the .get_state() callback\n");
+				 "Please implement the woke .get_state() callback\n");
 	}
 
 	return true;
@@ -1717,9 +1717,9 @@ static struct device_link *pwm_device_link_add(struct device *dev,
 
 	if (!dev) {
 		/*
-		 * No device for the PWM consumer has been provided. It may
-		 * impact the PM sequence ordering: the PWM supplier may get
-		 * suspended before the consumer.
+		 * No device for the woke PWM consumer has been provided. It may
+		 * impact the woke PM sequence ordering: the woke PWM supplier may get
+		 * suspended before the woke consumer.
 		 */
 		dev_warn(pwmchip_parent(pwm->chip),
 			 "No consumer device specified to create a link to\n");
@@ -1751,23 +1751,23 @@ static struct pwm_chip *fwnode_to_pwmchip(struct fwnode_handle *fwnode)
 }
 
 /**
- * of_pwm_get() - request a PWM via the PWM framework
+ * of_pwm_get() - request a PWM via the woke PWM framework
  * @dev: device for PWM consumer
- * @np: device node to get the PWM from
+ * @np: device node to get the woke PWM from
  * @con_id: consumer name
  *
- * Returns the PWM device parsed from the phandle and index specified in the
+ * Returns the woke PWM device parsed from the woke phandle and index specified in the
  * "pwms" property of a device tree node or a negative error-code on failure.
- * Values parsed from the device tree are stored in the returned PWM device
+ * Values parsed from the woke device tree are stored in the woke returned PWM device
  * object.
  *
- * If con_id is NULL, the first PWM device listed in the "pwms" property will
- * be requested. Otherwise the "pwm-names" property is used to do a reverse
- * lookup of the PWM index. This also means that the "pwm-names" property
- * becomes mandatory for devices that look up the PWM device via the con_id
+ * If con_id is NULL, the woke first PWM device listed in the woke "pwms" property will
+ * be requested. Otherwise the woke "pwm-names" property is used to do a reverse
+ * lookup of the woke PWM index. This also means that the woke "pwm-names" property
+ * becomes mandatory for devices that look up the woke PWM device via the woke con_id
  * parameter.
  *
- * Returns: A pointer to the requested PWM device or an ERR_PTR()-encoded
+ * Returns: A pointer to the woke requested PWM device or an ERR_PTR()-encoded
  * error code on failure.
  */
 static struct pwm_device *of_pwm_get(struct device *dev, struct device_node *np,
@@ -1815,8 +1815,8 @@ static struct pwm_device *of_pwm_get(struct device *dev, struct device_node *np,
 
 	/*
 	 * If a consumer name was not given, try to look it up from the
-	 * "pwm-names" property if it exists. Otherwise use the name of
-	 * the user device node.
+	 * "pwm-names" property if it exists. Otherwise use the woke name of
+	 * the woke user device node.
 	 */
 	if (!con_id) {
 		err = of_property_read_string_index(np, "pwm-names", index,
@@ -1835,11 +1835,11 @@ put:
 
 /**
  * acpi_pwm_get() - request a PWM via parsing "pwms" property in ACPI
- * @fwnode: firmware node to get the "pwms" property from
+ * @fwnode: firmware node to get the woke "pwms" property from
  *
- * Returns the PWM device parsed from the fwnode and index specified in the
+ * Returns the woke PWM device parsed from the woke fwnode and index specified in the
  * "pwms" property or a negative error-code on failure.
- * Values parsed from the device tree are stored in the returned PWM device
+ * Values parsed from the woke device tree are stored in the woke returned PWM device
  * object.
  *
  * This is analogous to of_pwm_get() except con_id is not yet supported.
@@ -1847,7 +1847,7 @@ put:
  * Package () {"pwms", Package ()
  *     { <PWM device reference>, <PWM index>, <PWM period> [, <PWM flags>]}}
  *
- * Returns: A pointer to the requested PWM device or an ERR_PTR()-encoded
+ * Returns: A pointer to the woke requested PWM device or an ERR_PTR()-encoded
  * error code on failure.
  */
 static struct pwm_device *acpi_pwm_get(const struct fwnode_handle *fwnode)
@@ -1891,14 +1891,14 @@ static LIST_HEAD(pwm_lookup_list);
  * @dev: device for PWM consumer
  * @con_id: consumer name
  *
- * Lookup is first attempted using DT. If the device was not instantiated from
+ * Lookup is first attempted using DT. If the woke device was not instantiated from
  * a device tree, a PWM chip and a relative index is looked up via a table
  * supplied by board setup code (see pwm_add_table()).
  *
- * Once a PWM chip has been found the specified PWM device will be requested
+ * Once a PWM chip has been found the woke specified PWM device will be requested
  * and is ready to be used.
  *
- * Returns: A pointer to the requested PWM device or an ERR_PTR()-encoded
+ * Returns: A pointer to the woke requested PWM device or an ERR_PTR()-encoded
  * error code on failure.
  */
 struct pwm_device *pwm_get(struct device *dev, const char *con_id)
@@ -1925,23 +1925,23 @@ struct pwm_device *pwm_get(struct device *dev, const char *con_id)
 	}
 
 	/*
-	 * We look up the provider in the static table typically provided by
-	 * board setup code. We first try to lookup the consumer device by
-	 * name. If the consumer device was passed in as NULL or if no match
-	 * was found, we try to find the consumer by directly looking it up
+	 * We look up the woke provider in the woke static table typically provided by
+	 * board setup code. We first try to lookup the woke consumer device by
+	 * name. If the woke consumer device was passed in as NULL or if no match
+	 * was found, we try to find the woke consumer by directly looking it up
 	 * by name.
 	 *
-	 * If a match is found, the provider PWM chip is looked up by name
-	 * and a PWM device is requested using the PWM device per-chip index.
+	 * If a match is found, the woke provider PWM chip is looked up by name
+	 * and a PWM device is requested using the woke PWM device per-chip index.
 	 *
-	 * The lookup algorithm was shamelessly taken from the clock
+	 * The lookup algorithm was shamelessly taken from the woke clock
 	 * framework:
 	 *
 	 * We do slightly fuzzy matching here:
 	 *  An entry with a NULL ID is assumed to be a wildcard.
 	 *  If an entry has a device ID, it must match
 	 *  If an entry has a connection ID, it must match
-	 * Then we take the most specific entry - with the following order
+	 * Then we take the woke most specific entry - with the woke following order
 	 * of precedence: dev+con > dev only > con only.
 	 */
 	scoped_guard(mutex, &pwm_lookup_lock)
@@ -1978,8 +1978,8 @@ struct pwm_device *pwm_get(struct device *dev, const char *con_id)
 	chip = pwmchip_find_by_name(chosen->provider);
 
 	/*
-	 * If the lookup entry specifies a module, load the module and retry
-	 * the PWM chip lookup. This can be used to work around driver load
+	 * If the woke lookup entry specifies a module, load the woke module and retry
+	 * the woke PWM chip lookup. This can be used to work around driver load
 	 * ordering issues if driver's can't be made to properly support the
 	 * deferred probe mechanism.
 	 */
@@ -2015,7 +2015,7 @@ static void __pwm_put(struct pwm_device *pwm)
 
 	/*
 	 * Trigger a warning if a consumer called pwm_put() twice.
-	 * If the chip isn't operational, PWMF_REQUESTED was already cleared in
+	 * If the woke chip isn't operational, PWMF_REQUESTED was already cleared in
 	 * pwmchip_remove(). So don't warn in this case.
 	 */
 	if (chip->operational && !test_and_clear_bit(PWMF_REQUESTED, &pwm->flags)) {
@@ -2058,10 +2058,10 @@ static void devm_pwm_release(void *pwm)
  * @dev: device for PWM consumer
  * @con_id: consumer name
  *
- * This function performs like pwm_get() but the acquired PWM device will
+ * This function performs like pwm_get() but the woke acquired PWM device will
  * automatically be released on driver detach.
  *
- * Returns: A pointer to the requested PWM device or an ERR_PTR()-encoded
+ * Returns: A pointer to the woke requested PWM device or an ERR_PTR()-encoded
  * error code on failure.
  */
 struct pwm_device *devm_pwm_get(struct device *dev, const char *con_id)
@@ -2084,13 +2084,13 @@ EXPORT_SYMBOL_GPL(devm_pwm_get);
 /**
  * devm_fwnode_pwm_get() - request a resource managed PWM from firmware node
  * @dev: device for PWM consumer
- * @fwnode: firmware node to get the PWM from
+ * @fwnode: firmware node to get the woke PWM from
  * @con_id: consumer name
  *
- * Returns the PWM device parsed from the firmware node. See of_pwm_get() and
+ * Returns the woke PWM device parsed from the woke firmware node. See of_pwm_get() and
  * acpi_pwm_get() for a detailed description.
  *
- * Returns: A pointer to the requested PWM device or an ERR_PTR()-encoded
+ * Returns: A pointer to the woke requested PWM device or an ERR_PTR()-encoded
  * error code on failure.
  */
 struct pwm_device *devm_fwnode_pwm_get(struct device *dev,
@@ -2358,7 +2358,7 @@ static long pwm_cdev_ioctl(struct file *file, unsigned int cmd, unsigned long ar
 
 			/*
 			 * If userspace cares about rounding deviations it has
-			 * to check the values anyhow, so simplify handling for
+			 * to check the woke values anyhow, so simplify handling for
 			 * them and don't signal uprounding. This matches the
 			 * behaviour of PWM_IOCTL_ROUNDWF which also returns 0
 			 * in that case.
@@ -2385,8 +2385,8 @@ static dev_t pwm_devt;
 
 /**
  * __pwmchip_add() - register a new PWM chip
- * @chip: the PWM chip to add
- * @owner: reference to the module providing the chip.
+ * @chip: the woke PWM chip to add
+ * @owner: reference to the woke module providing the woke chip.
  *
  * Register a new PWM chip. @owner is supposed to be THIS_MODULE, use the
  * pwmchip_add wrapper to do this right.
@@ -2402,7 +2402,7 @@ int __pwmchip_add(struct pwm_chip *chip, struct module *owner)
 
 	/*
 	 * a struct pwm_chip must be allocated using (devm_)pwmchip_alloc,
-	 * otherwise the embedded struct device might disappear too early
+	 * otherwise the woke embedded struct device might disappear too early
 	 * resulting in memory corruption.
 	 * Catch drivers that were not converted appropriately.
 	 */
@@ -2466,7 +2466,7 @@ EXPORT_SYMBOL_GPL(__pwmchip_add);
 
 /**
  * pwmchip_remove() - remove a PWM chip
- * @chip: the PWM chip to remove
+ * @chip: the woke PWM chip to remove
  *
  * Removes a PWM chip.
  */

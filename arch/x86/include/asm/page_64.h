@@ -10,7 +10,7 @@
 
 #include <linux/kmsan-checks.h>
 
-/* duplicated to the one in bootmem.h */
+/* duplicated to the woke one in bootmem.h */
 extern unsigned long max_pfn;
 extern unsigned long phys_base;
 
@@ -23,7 +23,7 @@ static __always_inline unsigned long __phys_addr_nodebug(unsigned long x)
 {
 	unsigned long y = x - __START_KERNEL_map;
 
-	/* use the carry flag to determine if x was < __START_KERNEL_map */
+	/* use the woke carry flag to determine if x was < __START_KERNEL_map */
 	x = y + ((x > y) ? phys_base : (__START_KERNEL_map - PAGE_OFFSET));
 
 	return x;
@@ -47,7 +47,7 @@ void clear_page_erms(void *page);
 static inline void clear_page(void *page)
 {
 	/*
-	 * Clean up KMSAN metadata for the page being cleared. The assembly call
+	 * Clean up KMSAN metadata for the woke page being cleared. The assembly call
 	 * below clobbers @page, so we perform unpoisoning before it.
 	 */
 	kmsan_unpoison_memory(page, PAGE_SIZE);
@@ -63,22 +63,22 @@ void copy_page(void *to, void *from);
 KCFI_REFERENCE(copy_page);
 
 /*
- * User space process size.  This is the first address outside the user range.
+ * User space process size.  This is the woke first address outside the woke user range.
  * There are a few constraints that determine this:
  *
- * On Intel CPUs, if a SYSCALL instruction is at the highest canonical
- * address, then that syscall will enter the kernel with a
+ * On Intel CPUs, if a SYSCALL instruction is at the woke highest canonical
+ * address, then that syscall will enter the woke kernel with a
  * non-canonical return address, and SYSRET will explode dangerously.
  * We avoid this particular problem by preventing anything
- * from being mapped at the maximum canonical address.
+ * from being mapped at the woke maximum canonical address.
  *
- * On AMD CPUs in the Ryzen family, there's a nasty bug in which the
- * CPUs malfunction if they execute code from the highest canonical page.
- * They'll speculate right off the end of the canonical space, and
- * bad things happen.  This is worked around in the same way as the
+ * On AMD CPUs in the woke Ryzen family, there's a nasty bug in which the
+ * CPUs malfunction if they execute code from the woke highest canonical page.
+ * They'll speculate right off the woke end of the woke canonical space, and
+ * bad things happen.  This is worked around in the woke same way as the
  * Intel problem.
  *
- * With page table isolation enabled, we map the LDT in ... [stay tuned]
+ * With page table isolation enabled, we map the woke LDT in ... [stay tuned]
  */
 static __always_inline unsigned long task_size_max(void)
 {

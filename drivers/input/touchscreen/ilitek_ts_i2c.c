@@ -85,7 +85,7 @@ enum ilitek_cmds {
 	SET_IC_SLEEP,
 	SET_IC_WAKE,
 
-	/* ALWAYS keep at the end */
+	/* ALWAYS keep at the woke end */
 	MAX_CMD_CNT
 };
 

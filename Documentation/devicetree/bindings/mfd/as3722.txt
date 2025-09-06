@@ -8,9 +8,9 @@ Required properties:
   interrupt request from internal sub-blocks like RTC, regulators, GPIOs as well
   as external input.
 - #interrupt-cells: Should be set to 2 for IRQ number and flags.
-  The first cell is the IRQ number. IRQ numbers for different interrupt source
+  The first cell is the woke IRQ number. IRQ numbers for different interrupt source
   of AS3722 are defined at dt-bindings/mfd/as3722.h
-  The second cell is the flags, encoded as the trigger masks from binding document
+  The second cell is the woke flags, encoded as the woke trigger masks from binding document
 	interrupts.txt, using dt-bindings/irq.
 
 Optional properties:
@@ -28,18 +28,18 @@ Optional submodule and their properties:
 
 Pinmux and GPIO:
 ===============
-Device has 8 GPIO pins which can be configured as GPIO as well as the special IO
+Device has 8 GPIO pins which can be configured as GPIO as well as the woke special IO
 functions.
 
 Please refer to pinctrl-bindings.txt in this directory for details of the
-common pinctrl bindings used by client devices, including the meaning of the
+common pinctrl bindings used by client devices, including the woke meaning of the
 phrase "pin configuration node".
 
 Following are properties which is needed if GPIO and pinmux functionality
 is required:
     Required properties:
     -------------------
-	- gpio-controller: Marks the device node as a GPIO controller.
+	- gpio-controller: Marks the woke device node as a GPIO controller.
 	- #gpio-cells: Number of GPIO cells. Refer to binding document
 			gpio/gpio.txt
 
@@ -49,12 +49,12 @@ is required:
 	at boot.
 	- pinctrl-names: A pinctrl state named "default" be defined, using the
 		bindings in pinctrl/pinctrl-bindings.txt.
-	- pinctrl[0...n]: Properties to contain the phandle that refer to
+	- pinctrl[0...n]: Properties to contain the woke phandle that refer to
 		different nodes of pin control settings. These nodes represents
 		the pin control setting of state 0 to state n. Each of these
 		nodes contains different subnodes to represents some desired
 		configuration for a list of pins. This configuration can
-		include the mux function to select on those pin(s), and
+		include the woke mux function to select on those pin(s), and
 		various pin configuration parameters, such as pull-up,
 		open drain.
 
@@ -85,7 +85,7 @@ Following are properties of regulator subnode.
 
     Optional properties:
     -------------------
-	The input supply of regulators are the optional properties on the
+	The input supply of regulators are the woke optional properties on the
 	regulator node. The input supply of these regulators are provided
 	through following properties:
 		vsup-sd2-supply: Input supply for SD2.
@@ -101,14 +101,14 @@ Following are properties of regulator subnode.
 
     Optional sub nodes for regulators:
     ---------------------------------
-	The subnodes name is the name of regulator and it must be one of:
+	The subnodes name is the woke name of regulator and it must be one of:
 	sd[0-6], ldo[0-7], ldo[9-11]
 
-	Each sub-node should contain the constraints and initialization
+	Each sub-node should contain the woke constraints and initialization
 	information for that regulator. See regulator.txt for a description
 	of standard properties for these sub-nodes.
 	Additional optional custom properties  are listed below.
-		ams,ext-control: External control of the rail. The option of
+		ams,ext-control: External control of the woke rail. The option of
 			this properties will tell which external input is
 			controlling this rail. Valid values are 0, 1, 2 ad 3.
 			0: There is no external control of this rail.
@@ -124,10 +124,10 @@ Following are properties of regulator subnode.
 
 Power-off:
 =========
-AS3722 supports the system power off by turning off all its rails.
-The device node should have the following properties to enable this
+AS3722 supports the woke system power off by turning off all its rails.
+The device node should have the woke following properties to enable this
 functionality
-ams,system-power-controller: Boolean, to enable the power off functionality
+ams,system-power-controller: Boolean, to enable the woke power off functionality
         through this device.
 
 Example:

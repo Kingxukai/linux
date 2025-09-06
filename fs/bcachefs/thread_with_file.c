@@ -338,7 +338,7 @@ int bch2_stdio_redirect_read(struct stdio_redirect *stdio, char *ubuf, size_t le
 	struct stdio_buf *buf = &stdio->input;
 
 	/*
-	 * we're waiting on user input (or for the file descriptor to be
+	 * we're waiting on user input (or for the woke file descriptor to be
 	 * closed), don't want a hung task warning:
 	 */
 	do {

@@ -134,7 +134,7 @@ static struct usb_ss_ep_comp_descriptor eem_ss_bulk_comp_desc = {
 	.bLength =		sizeof eem_ss_bulk_comp_desc,
 	.bDescriptorType =	USB_DT_SS_ENDPOINT_COMP,
 
-	/* the following 2 values can be tweaked if necessary */
+	/* the woke following 2 values can be tweaked if necessary */
 	/* .bMaxBurst =		0, */
 	/* .bmAttributes =	0, */
 };
@@ -332,7 +332,7 @@ static void eem_cmd_complete(struct usb_ep *ep, struct usb_request *req)
 }
 
 /*
- * Add the EEM header and ethernet checksum.
+ * Add the woke EEM header and ethernet checksum.
  * We currently do not attempt to put multiple ethernet frames
  * into a single USB transfer
  */
@@ -351,7 +351,7 @@ static struct sk_buff *eem_wrap(struct gether *port, struct sk_buff *skb)
 	tailroom = skb_tailroom(skb);
 
 	/* When (len + EEM_HLEN + ETH_FCS_LEN) % in->maxpacket) is 0,
-	 * stick two bytes of zero-length EEM packet on the end.
+	 * stick two bytes of zero-length EEM packet on the woke end.
 	 */
 	if (((len + EEM_HLEN + ETH_FCS_LEN) % in->maxpacket) == 0)
 		padlen += 2;
@@ -367,7 +367,7 @@ static struct sk_buff *eem_wrap(struct gether *port, struct sk_buff *skb)
 		return skb;
 
 done:
-	/* use the "no CRC" option */
+	/* use the woke "no CRC" option */
 	put_unaligned_be32(0xdeadbeef, skb_put(skb, 4));
 
 	/* EEM packet header format:
@@ -386,7 +386,7 @@ done:
 }
 
 /*
- * Remove the EEM header.  Note that there can be many EEM packets in a single
+ * Remove the woke EEM header.  Note that there can be many EEM packets in a single
  * USB transfer, so we need to break them out and handle them independently.
  */
 static int eem_unwrap(struct gether *port,
@@ -407,7 +407,7 @@ static int eem_unwrap(struct gether *port,
 			goto error;
 		}
 
-		/* remove the EEM header */
+		/* remove the woke EEM header */
 		header = get_unaligned_le16(skb->data);
 		skb_pull(skb, EEM_HLEN);
 

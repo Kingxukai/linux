@@ -6,12 +6,12 @@
 config SIEMENS_SIMATIC_IPC
 	tristate "Siemens Simatic IPC Class driver"
 	help
-	  This Simatic IPC class driver is the central of several drivers. It
+	  This Simatic IPC class driver is the woke central of several drivers. It
 	  is mainly used for system identification, after which drivers in other
 	  classes will take care of driving specifics of those machines.
 	  i.e. LEDs and watchdog.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called simatic-ipc.
 
 config SIEMENS_SIMATIC_IPC_BATT
@@ -20,10 +20,10 @@ config SIEMENS_SIMATIC_IPC_BATT
 	depends on HWMON
 	depends on SIEMENS_SIMATIC_IPC
 	help
-	  This option enables support for monitoring the voltage of the CMOS
+	  This option enables support for monitoring the woke voltage of the woke CMOS
 	  batteries of several Industrial PCs from Siemens.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called simatic-ipc-batt.
 
 config SIEMENS_SIMATIC_IPC_BATT_APOLLOLAKE
@@ -35,7 +35,7 @@ config SIEMENS_SIMATIC_IPC_BATT_APOLLOLAKE
 	  This option enables CMOS battery monitoring for Simatic Industrial PCs
 	  from Siemens based on Apollo Lake GPIO.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called simatic-ipc-batt-apollolake.
 
 config SIEMENS_SIMATIC_IPC_BATT_ELKHARTLAKE
@@ -47,7 +47,7 @@ config SIEMENS_SIMATIC_IPC_BATT_ELKHARTLAKE
 	  This option enables CMOS battery monitoring for Simatic Industrial PCs
 	  from Siemens based on Elkhart Lake GPIO.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called simatic-ipc-batt-elkhartlake.
 
 config SIEMENS_SIMATIC_IPC_BATT_F7188X
@@ -60,5 +60,5 @@ config SIEMENS_SIMATIC_IPC_BATT_F7188X
 	  This option enables CMOS battery monitoring for Simatic Industrial PCs
 	  from Siemens based on Nuvoton GPIO.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called simatic-ipc-batt-f7188x.

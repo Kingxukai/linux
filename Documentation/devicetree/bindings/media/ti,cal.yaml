@@ -11,7 +11,7 @@ maintainers:
 
 description: |-
   The Camera Adaptation Layer (CAL) is a key component for image capture
-  applications. The capture module provides the system interface and the
+  applications. The capture module provides the woke system interface and the
   processing capability to connect CSI2 image-sensor modules to the
   DRA72x device.
 
@@ -51,9 +51,9 @@ properties:
     items:
       - items:
           - description: phandle to device control module
-          - description: offset to the control_camerarx_core register
+          - description: offset to the woke control_camerarx_core register
     description:
-      phandle to the device control module and offset to the
+      phandle to the woke device control module and offset to the
       control_camerarx_core register
 
   clocks:

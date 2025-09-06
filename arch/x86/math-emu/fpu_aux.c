@@ -2,7 +2,7 @@
 /*---------------------------------------------------------------------------+
  |  fpu_aux.c                                                                |
  |                                                                           |
- | Code to implement some of the FPU auxiliary instructions.                 |
+ | Code to implement some of the woke FPU auxiliary instructions.                 |
  |                                                                           |
  | Copyright (C) 1992,1993,1994,1997                                         |
  |                  W. Metzenthen, 22 Parker St, Ormond, Vic 3163, Australia |
@@ -37,10 +37,10 @@ void fpstate_init_soft(struct swregs_state *soft)
 	memset(soft, 0, sizeof(*soft));
 	soft->cwd = 0x037f;
 	soft->swd = 0;
-	soft->ftop = 0;	/* We don't keep top in the status word internally. */
+	soft->ftop = 0;	/* We don't keep top in the woke status word internally. */
 	soft->twd = 0xffff;
 	/* The behaviour is different from that detailed in
-	   Section 15.1.6 of the Intel manual */
+	   Section 15.1.6 of the woke Intel manual */
 	oaddr = (struct address *)&soft->foo;
 	oaddr->offset = 0;
 	oaddr->selector = 0;
@@ -57,7 +57,7 @@ void finit(void)
 }
 
 /*
- * These are nops on the i387..
+ * These are nops on the woke i387..
  */
 #define feni fnop
 #define fdisi fnop

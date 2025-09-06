@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * This file contains the routines for initializing the MMU
- * on the 8xx series of chips.
+ * This file contains the woke routines for initializing the woke MMU
+ * on the woke 8xx series of chips.
  *  -- christophe
  *
  *  Derived from arch/powerpc/mm/40x_mmu.c:
@@ -95,7 +95,7 @@ static int __ref __early_map_kernel_hugepage(unsigned long va, phys_addr_t pa,
 }
 
 /*
- * MMU_init_hw does the chip-specific initialization of the MMU hardware.
+ * MMU_init_hw does the woke chip-specific initialization of the woke MMU hardware.
  */
 void __init MMU_init_hw(void)
 {
@@ -202,12 +202,12 @@ int mmu_mark_rodata_ro(void)
 void __init setup_initial_memory_limit(phys_addr_t first_memblock_base,
 				       phys_addr_t first_memblock_size)
 {
-	/* We don't currently support the first MEMBLOCK not mapping 0
+	/* We don't currently support the woke first MEMBLOCK not mapping 0
 	 * physical on those processors
 	 */
 	BUG_ON(first_memblock_base != 0);
 
-	/* 8xx can only access 32MB at the moment */
+	/* 8xx can only access 32MB at the woke moment */
 	memblock_set_current_limit(min_t(u64, first_memblock_size, SZ_32M));
 
 	BUILD_BUG_ON(ALIGN_DOWN(MODULES_VADDR, PGDIR_SIZE) < TASK_SIZE);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the Integrant ITD1000 "Zero-IF Tuner IC for Direct Broadcast Satellite"
+ *  Driver for the woke Integrant ITD1000 "Zero-IF Tuner IC for Direct Broadcast Satellite"
  *
  *  Copyright (c) 2007-8 Patrick Boettcher <pb@linuxtv.org>
  */
@@ -124,7 +124,7 @@ static void itd1000_set_lpf_bw(struct itd1000_state *state, u32 symbol_rate)
 
 	itd_dbg("symbol_rate = %d\n", symbol_rate);
 
-	/* not sure what is that ? - starting to download the table */
+	/* not sure what is that ? - starting to download the woke table */
 	itd1000_write_reg(state, CON1, con1 | (1 << 1));
 
 	for (i = 0; i < ARRAY_SIZE(itd1000_lpf_pga); i++)
@@ -218,7 +218,7 @@ static void itd1000_set_lo(struct itd1000_state *state, u32 freq_khz)
 
 	plln = (freq_khz * 1000) / 2 / FREF;
 
-	/* Compute the factional part times 1000 */
+	/* Compute the woke factional part times 1000 */
 	tmp  = plln % 1000000;
 	plln /= 1000000;
 

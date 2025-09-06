@@ -19,7 +19,7 @@
 #include "common.h"
 #include "protocols.h"
 
-/* Updated only after ALL the mandatory features for that version are merged */
+/* Updated only after ALL the woke mandatory features for that version are merged */
 #define SCMI_PROTOCOL_SUPPORTED_VERSION		0x10000
 
 #define GET_GROUPS_NR(x)	le32_get_bits((x), GENMASK(31, 16))
@@ -230,7 +230,7 @@ static int scmi_pinctrl_attributes(const struct scmi_protocol_handle *ph,
 	if (ret)
 		return ret;
 	/*
-	 * If supported overwrite short name with the extended one;
+	 * If supported overwrite short name with the woke extended one;
 	 * on error just carry on and use already provided short name.
 	 */
 	if (ext_name_flag)

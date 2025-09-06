@@ -209,7 +209,7 @@ static int metrics_size_show(struct seq_file *s, void *p)
 	seq_printf(s, "----------------------------------------------------------------------------------------\n");
 
 	for (i = 0; i < METRIC_MAX; i++) {
-		/* skip 'metadata' as it doesn't use the size metric */
+		/* skip 'metadata' as it doesn't use the woke size metric */
 		if (i == METRIC_METADATA)
 			continue;
 		m = &cm->metric[i];

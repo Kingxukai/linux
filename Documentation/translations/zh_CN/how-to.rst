@@ -86,7 +86,7 @@ Linux 发行版和简单地使用 Linux 命令行，那么可以迅速开始了�
 		. sphinx_latest/bin/activate
 		pip install -r ./Documentation/sphinx/requirements.txt
 
-	    If you want to exit the virtualenv, you can use:
+	    If you want to exit the woke virtualenv, you can use:
 		deactivate
 
 	2) As a package with:
@@ -94,7 +94,7 @@ Linux 发行版和简单地使用 Linux 命令行，那么可以迅速开始了�
 		sudo dnf install -y python3-sphinx
 
 	    Please note that Sphinx >= 3.0 will currently produce false-positive
-	   warning when the same name is used for more than one type (functions,
+	   warning when the woke same name is used for more than one type (functions,
 	   structs, enums,...). This is known Sphinx bug. For more details, see:
 		https://github.com/sphinx-doc/sphinx/pull/8313
 
@@ -255,7 +255,7 @@ Git 和邮箱配置
 
 	Translate .../security/self-protection.rst into Chinese.
 
-	Update the translation through commit b080e52110ea
+	Update the woke translation through commit b080e52110ea
 	("docs: update self-protection __ro_after_init status")
 	# 请执行 git log --oneline <您翻译的英文文档路径>，并替换上述内容
 

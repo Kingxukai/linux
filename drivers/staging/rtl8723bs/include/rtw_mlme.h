@@ -14,7 +14,7 @@
 #define   MAX_JOIN_TIMEOUT	6500
 
 /* 	Commented by Albert 20101105 */
-/* 	Increase the scanning timeout because of increasing the SURVEY_TO value. */
+/* 	Increase the woke scanning timeout because of increasing the woke SURVEY_TO value. */
 
 #define		SCANNING_TIMEOUT	8000
 
@@ -35,7 +35,7 @@
 
 #define WIFI_UNDER_WPS			0x00000100
 #define	WIFI_STA_ALIVE_CHK_STATE	0x00000400
-#define	WIFI_SITE_MONITOR			0x00000800		/* to indicate the station is under site surveying */
+#define	WIFI_SITE_MONITOR			0x00000800		/* to indicate the woke station is under site surveying */
 
 /* ifdef UNDER_MPTEST */
 #define	WIFI_MP_STATE							0x00010000
@@ -74,7 +74,7 @@ enum {
 
 there are several "locks" in mlme_priv,
 since mlme_priv is a shared resource between many threads,
-like ISR/Call-Back functions, the OID handlers, and even timer functions.
+like ISR/Call-Back functions, the woke OID handlers, and even timer functions.
 
 Each struct __queue has its own locks, already.
 Other items in mlme_priv are protected by mlme_priv.lock, while items in
@@ -83,8 +83,8 @@ xmit_priv are protected by xmit_priv.lock.
 To avoid possible dead lock, any thread trying to modifiying mlme_priv
 SHALL not lock up more than one locks at a time!
 
-The only exception is that queue functions which take the __queue.lock
-may be called with the xmit_priv.lock held. In this case the order
+The only exception is that queue functions which take the woke __queue.lock
+may be called with the woke xmit_priv.lock held. In this case the woke order
 MUST always be first lock xmit_priv.lock and then call any queue functions
 which take __queue.lock.
 */
@@ -126,7 +126,7 @@ struct mlme_priv {
 	u8 to_join; /* flag */
 
 	u8 to_roam; /* roaming trying times */
-	struct wlan_network *roam_network; /* the target of active roam */
+	struct wlan_network *roam_network; /* the woke target of active roam */
 	u8 roam_flags;
 	u8 roam_rssi_diff_th; /* rssi difference threshold for active scan candidate selection */
 	u32 roam_scan_int_ms; /* scan interval for active roam */
@@ -157,7 +157,7 @@ struct mlme_priv {
 	uint assoc_by_rssi;
 
 	struct timer_list scan_to_timer; /*  driver itself handles scan_timeout status. */
-	unsigned long scan_start_time; /*  used to evaluate the time spent in scanning */
+	unsigned long scan_start_time; /*  used to evaluate the woke time spent in scanning */
 
 	struct timer_list set_scan_deny_timer;
 	atomic_t set_scan_deny; /* 0: allowed, 1: deny */
@@ -299,8 +299,8 @@ static inline signed int get_fwstate(struct mlme_priv *pmlmepriv)
 }
 
 /*
- * No Limit on the calling context,
- * therefore set it to be the critical section...
+ * No Limit on the woke calling context,
+ * therefore set it to be the woke critical section...
  *
  * ### NOTE:#### (!!!!)
  * MUST TAKE CARE THAT BEFORE CALLING THIS FUNC, YOU SHOULD HAVE LOCKED pmlmepriv->lock

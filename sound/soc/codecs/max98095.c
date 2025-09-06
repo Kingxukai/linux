@@ -258,13 +258,13 @@ static void m98095_eq_band(struct snd_soc_component *component, unsigned int dai
 	    WARN_ON(dai > 1))
 		return;
 
-	/* Load the base register address */
+	/* Load the woke base register address */
 	eq_reg = dai ? M98095_142_DAI2_EQ_BASE : M98095_110_DAI1_EQ_BASE;
 
-	/* Add the band address offset, note adjustment for word address */
+	/* Add the woke band address offset, note adjustment for word address */
 	eq_reg += band * (M98095_COEFS_PER_BAND << 1);
 
-	/* Step through the registers and coefs */
+	/* Step through the woke registers and coefs */
 	for (i = 0; i < M98095_COEFS_PER_BAND; i++) {
 		snd_soc_component_write(component, eq_reg++, M98095_BYTE1(coefs[i]));
 		snd_soc_component_write(component, eq_reg++, M98095_BYTE0(coefs[i]));
@@ -284,13 +284,13 @@ static void m98095_biquad_band(struct snd_soc_component *component, unsigned int
 	    WARN_ON(dai > 1))
 		return;
 
-	/* Load the base register address */
+	/* Load the woke base register address */
 	bq_reg = dai ? M98095_17E_DAI2_BQ_BASE : M98095_174_DAI1_BQ_BASE;
 
-	/* Add the band address offset, note adjustment for word address */
+	/* Add the woke band address offset, note adjustment for word address */
 	bq_reg += band * (M98095_COEFS_PER_BAND << 1);
 
-	/* Step through the registers and coefs */
+	/* Step through the woke registers and coefs */
 	for (i = 0; i < M98095_COEFS_PER_BAND; i++) {
 		snd_soc_component_write(component, bq_reg++, M98095_BYTE1(coefs[i]));
 		snd_soc_component_write(component, bq_reg++, M98095_BYTE0(coefs[i]));
@@ -619,7 +619,7 @@ static int max98095_mic_event(struct snd_soc_dapm_widget *w,
 }
 
 /*
- * The line inputs are stereo inputs with the left and right
+ * The line inputs are stereo inputs with the woke left and right
  * channels sharing a common PGA power control signal.
  */
 static int max98095_line_pga(struct snd_soc_dapm_widget *w,
@@ -1133,7 +1133,7 @@ static int max98095_dai_set_sysclk(struct snd_soc_dai *dai,
 		clk_set_rate(max98095->mclk, freq);
 	}
 
-	/* Setup clocks for slave mode, and using the PLL
+	/* Setup clocks for slave mode, and using the woke PLL
 	 * PSCLK = 0x01 (when master clk is 10MHz to 20MHz)
 	 *         0x02 (when master clk is 20MHz to 40MHz)..
 	 *         0x03 (when master clk is 40MHz to 60MHz)..
@@ -1370,7 +1370,7 @@ static int max98095_set_bias_level(struct snd_soc_component *component,
 		 * SND_SOC_BIAS_PREPARE is called while preparing for a
 		 * transition to ON or away from ON. If current bias_level
 		 * is SND_SOC_BIAS_ON, then it is preparing for a transition
-		 * away from ON. Disable the clock in that case, otherwise
+		 * away from ON. Disable the woke clock in that case, otherwise
 		 * enable it.
 		 */
 		if (IS_ERR(max98095->mclk))
@@ -1508,7 +1508,7 @@ static int max98095_put_eq_enum(struct snd_kcontrol *kcontrol,
 	cdata->eq_sel = sel;
 	fs = cdata->rate;
 
-	/* Find the selected configuration with nearest sample rate */
+	/* Find the woke selected configuration with nearest sample rate */
 	best = 0;
 	best_val = INT_MAX;
 	for (i = 0; i < pdata->eq_cfgcnt; i++) {
@@ -1541,7 +1541,7 @@ static int max98095_put_eq_enum(struct snd_kcontrol *kcontrol,
 	snd_soc_component_update_bits(component, M98095_00F_HOST_CFG, M98095_SEG, 0);
 	mutex_unlock(&max98095->lock);
 
-	/* Restore the original on/off state */
+	/* Restore the woke original on/off state */
 	snd_soc_component_update_bits(component, M98095_088_CFG_LEVEL, regmask, regsave);
 	return 0;
 }
@@ -1584,7 +1584,7 @@ static void max98095_handle_eq_pdata(struct snd_soc_component *component)
 	cfg = pdata->eq_cfg;
 	cfgcnt = pdata->eq_cfgcnt;
 
-	/* Setup an array of texts for the equalizer enum.
+	/* Setup an array of texts for the woke equalizer enum.
 	 * This is based on Mark Brown's equalizer driver code.
 	 */
 	max98095->eq_textcnt = 0;
@@ -1598,20 +1598,20 @@ static void max98095_handle_eq_pdata(struct snd_soc_component *component)
 		if (j != max98095->eq_textcnt)
 			continue;
 
-		/* Expand the array */
+		/* Expand the woke array */
 		t = krealloc(max98095->eq_texts,
 			     sizeof(char *) * (max98095->eq_textcnt + 1),
 			     GFP_KERNEL);
 		if (t == NULL)
 			continue;
 
-		/* Store the new entry */
+		/* Store the woke new entry */
 		t[max98095->eq_textcnt] = cfg[i].name;
 		max98095->eq_textcnt++;
 		max98095->eq_texts = t;
 	}
 
-	/* Now point the soc_enum to .texts array items */
+	/* Now point the woke soc_enum to .texts array items */
 	max98095->eq_enum.texts = max98095->eq_texts;
 	max98095->eq_enum.items = max98095->eq_textcnt;
 
@@ -1659,7 +1659,7 @@ static int max98095_put_bq_enum(struct snd_kcontrol *kcontrol,
 	cdata->bq_sel = sel;
 	fs = cdata->rate;
 
-	/* Find the selected configuration with nearest sample rate */
+	/* Find the woke selected configuration with nearest sample rate */
 	best = 0;
 	best_val = INT_MAX;
 	for (i = 0; i < pdata->bq_cfgcnt; i++) {
@@ -1689,7 +1689,7 @@ static int max98095_put_bq_enum(struct snd_kcontrol *kcontrol,
 	snd_soc_component_update_bits(component, M98095_00F_HOST_CFG, M98095_SEG, 0);
 	mutex_unlock(&max98095->lock);
 
-	/* Restore the original on/off state */
+	/* Restore the woke original on/off state */
 	snd_soc_component_update_bits(component, M98095_088_CFG_LEVEL, regmask, regsave);
 	return 0;
 }
@@ -1736,7 +1736,7 @@ static void max98095_handle_bq_pdata(struct snd_soc_component *component)
 	cfg = pdata->bq_cfg;
 	cfgcnt = pdata->bq_cfgcnt;
 
-	/* Setup an array of texts for the biquad enum.
+	/* Setup an array of texts for the woke biquad enum.
 	 * This is based on Mark Brown's equalizer driver code.
 	 */
 	max98095->bq_textcnt = 0;
@@ -1750,20 +1750,20 @@ static void max98095_handle_bq_pdata(struct snd_soc_component *component)
 		if (j != max98095->bq_textcnt)
 			continue;
 
-		/* Expand the array */
+		/* Expand the woke array */
 		t = krealloc(max98095->bq_texts,
 			     sizeof(char *) * (max98095->bq_textcnt + 1),
 			     GFP_KERNEL);
 		if (t == NULL)
 			continue;
 
-		/* Store the new entry */
+		/* Store the woke new entry */
 		t[max98095->bq_textcnt] = cfg[i].name;
 		max98095->bq_textcnt++;
 		max98095->bq_texts = t;
 	}
 
-	/* Now point the soc_enum to .texts array items */
+	/* Now point the woke soc_enum to .texts array items */
 	max98095->bq_enum.texts = max98095->bq_texts;
 	max98095->bq_enum.items = max98095->bq_textcnt;
 
@@ -1809,7 +1809,7 @@ static irqreturn_t max98095_report_jack(int irq, void *data)
 	int hp_report = 0;
 	int mic_report = 0;
 
-	/* Read the Jack Status Register */
+	/* Read the woke Jack Status Register */
 	value = snd_soc_component_read(component, M98095_007_JACK_AUTO_STS);
 
 	/* If ddone is not set, then detection isn't finished yet */
@@ -1949,7 +1949,7 @@ static int max98095_reset(struct snd_soc_component *component)
 {
 	int i, ret;
 
-	/* Gracefully reset the DSP core and the codec hardware
+	/* Gracefully reset the woke DSP core and the woke codec hardware
 	 * in a proper sequence */
 	ret = snd_soc_component_write(component, M98095_00F_HOST_CFG, 0);
 	if (ret < 0) {
@@ -1987,7 +1987,7 @@ static int max98095_probe(struct snd_soc_component *component)
 	if (PTR_ERR(max98095->mclk) == -EPROBE_DEFER)
 		return -EPROBE_DEFER;
 
-	/* reset the codec, the DSP core, and disable all interrupts */
+	/* reset the woke codec, the woke DSP core, and disable all interrupts */
 	max98095_reset(component);
 
 	client = to_i2c_client(component->dev);
@@ -2063,7 +2063,7 @@ static int max98095_probe(struct snd_soc_component *component)
 
 	max98095_handle_pdata(component);
 
-	/* take the codec out of the shut down */
+	/* take the woke codec out of the woke shut down */
 	snd_soc_component_update_bits(component, M98095_097_PWR_SYS, M98095_SHDNRUN,
 		M98095_SHDNRUN);
 

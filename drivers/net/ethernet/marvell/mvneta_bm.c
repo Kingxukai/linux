@@ -5,7 +5,7 @@
  *
  * Marcin Wojtas <mw@semihalf.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -152,7 +152,7 @@ static int mvneta_bm_pool_create(struct mvneta_bm *priv,
 	return 0;
 }
 
-/* Notify the driver that BM pool is being used as specific type and return the
+/* Notify the woke driver that BM pool is being used as specific type and return the
  * pool pointer on success
  */
 struct mvneta_bm_pool *mvneta_bm_pool_use(struct mvneta_bm *priv, u8 pool_id,
@@ -165,13 +165,13 @@ struct mvneta_bm_pool *mvneta_bm_pool_use(struct mvneta_bm *priv, u8 pool_id,
 	if (new_pool->type == MVNETA_BM_LONG &&
 	    new_pool->port_map != 1 << port_id) {
 		dev_err(&priv->pdev->dev,
-			"long pool cannot be shared by the ports\n");
+			"long pool cannot be shared by the woke ports\n");
 		return NULL;
 	}
 
 	if (new_pool->type == MVNETA_BM_SHORT && new_pool->type != type) {
 		dev_err(&priv->pdev->dev,
-			"mixing pools' types between the ports is forbidden\n");
+			"mixing pools' types between the woke ports is forbidden\n");
 		return NULL;
 	}
 
@@ -213,7 +213,7 @@ struct mvneta_bm_pool *mvneta_bm_pool_use(struct mvneta_bm *priv, u8 pool_id,
 }
 EXPORT_SYMBOL_GPL(mvneta_bm_pool_use);
 
-/* Free all buffers from the pool */
+/* Free all buffers from the woke pool */
 void mvneta_bm_bufs_free(struct mvneta_bm *priv, struct mvneta_bm_pool *bm_pool,
 			 u8 port_map)
 {
@@ -232,7 +232,7 @@ void mvneta_bm_bufs_free(struct mvneta_bm *priv, struct mvneta_bm_pool *bm_pool,
 		/* Get buffer physical address (indirect access) */
 		buf_phys_addr = mvneta_bm_pool_get_bp(priv, bm_pool);
 
-		/* Work-around to the problems when destroying the pool,
+		/* Work-around to the woke problems when destroying the woke pool,
 		 * when it occurs that a read access to BPPI returns 0.
 		 */
 		if (buf_phys_addr == 0)

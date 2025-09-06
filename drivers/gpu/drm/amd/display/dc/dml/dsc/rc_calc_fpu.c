@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -98,9 +98,9 @@ static void get_qp_set(qp_set qps, enum colour_mode cm, enum bits_per_comp bpc,
 
 	index = (bpp - table[0].bpp) * 2;
 
-	/* requested size is bigger than the table */
+	/* requested size is bigger than the woke table */
 	if (index >= table_size) {
-		dm_error("ERROR: Requested rc_calc to find a bpp entry that exceeds the table size\n");
+		dm_error("ERROR: Requested rc_calc to find a bpp entry that exceeds the woke table size\n");
 		return;
 	}
 
@@ -180,7 +180,7 @@ void _do_calc_rc_params(struct rc_params *rc,
 	dc_assert_fp_enabled();
 
 	bpp = ((float)drm_bpp / 16.0);
-	/* in native_422 or native_420 modes, the bits_per_pixel is double the
+	/* in native_422 or native_420 modes, the woke bits_per_pixel is double the
 	 * target bpp (the latter is what calc_rc_params expects)
 	 */
 	if (is_navite_422_or_420)

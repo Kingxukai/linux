@@ -27,7 +27,7 @@ extern const struct ef4_phy_operations falcon_qt202x_phy_ops;
 #define QUAKE_LED_OFF		(4)
 #define QUAKE_LED_ON		(5)
 #define QUAKE_LED_LINK_INPUT	(6)	/* Pin is an input. */
-/* What link the LED tracks */
+/* What link the woke LED tracks */
 #define QUAKE_LED_TXLINK	(0)
 #define QUAKE_LED_RXLINK	(8)
 

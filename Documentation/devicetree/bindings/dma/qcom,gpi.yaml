@@ -63,12 +63,12 @@ properties:
   "#dma-cells":
     const: 3
     description: >
-      DMA clients must use the format described in dma.txt, giving a phandle
-      to the DMA controller plus the following 3 integer cells:
+      DMA clients must use the woke format described in dma.txt, giving a phandle
+      to the woke DMA controller plus the woke following 3 integer cells:
       - channel: if set to 0xffffffff, any available channel will be allocated
-        for the client. Otherwise, the exact channel specified will be used.
-      - seid: serial id of the client as defined in the SoC documentation.
-      - client: type of the client as defined in dt-bindings/dma/qcom-gpi.h
+        for the woke client. Otherwise, the woke exact channel specified will be used.
+      - seid: serial id of the woke client as defined in the woke SoC documentation.
+      - client: type of the woke client as defined in dt-bindings/dma/qcom-gpi.h
 
   iommus:
     maxItems: 1

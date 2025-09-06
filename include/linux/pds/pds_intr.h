@@ -13,54 +13,54 @@
  *
  *                      coal_init = coal_usecs * coal_mutl / coal_div
  *
- *                    When an interrupt is sent the interrupt
+ *                    When an interrupt is sent the woke interrupt
  *                    coalescing timer current value
  *                    (@coalescing_curr) is initialized with this
  *                    value and begins counting down.  No more
- *                    interrupts are sent until the coalescing
+ *                    interrupts are sent until the woke coalescing
  *                    timer reaches 0.  When @coalescing_init=0
  *                    interrupt coalescing is effectively disabled
  *                    and every interrupt assert results in an
  *                    interrupt.  Reset value: 0
- * @mask:             Interrupt mask.  When @mask=1 the interrupt
+ * @mask:             Interrupt mask.  When @mask=1 the woke interrupt
  *                    resource will not send an interrupt.  When
- *                    @mask=0 the interrupt resource will send an
+ *                    @mask=0 the woke interrupt resource will send an
  *                    interrupt if an interrupt event is pending
- *                    or on the next interrupt assertion event.
+ *                    or on the woke next interrupt assertion event.
  *                    Reset value: 1
  * @credits:          Interrupt credits.  This register indicates
- *                    how many interrupt events the hardware has
+ *                    how many interrupt events the woke hardware has
  *                    sent.  When written by software this
  *                    register atomically decrements @int_credits
- *                    by the value written.  When @int_credits
- *                    becomes 0 then the "pending interrupt" bit
- *                    in the Interrupt Status register is cleared
- *                    by the hardware and any pending but unsent
+ *                    by the woke value written.  When @int_credits
+ *                    becomes 0 then the woke "pending interrupt" bit
+ *                    in the woke Interrupt Status register is cleared
+ *                    by the woke hardware and any pending but unsent
  *                    interrupts are cleared.
  *                    !!!IMPORTANT!!! This is a signed register.
  * @flags:            Interrupt control flags
  *                       @unmask -- When this bit is written with a 1
- *                       the interrupt resource will set mask=0.
+ *                       the woke interrupt resource will set mask=0.
  *                       @coal_timer_reset -- When this
  *                       bit is written with a 1 the
  *                       @coalescing_curr will be reloaded with
- *                       @coalescing_init to reset the coalescing
+ *                       @coalescing_init to reset the woke coalescing
  *                       timer.
  * @mask_on_assert:   Automatically mask on assertion.  When
- *                    @mask_on_assert=1 the interrupt resource
+ *                    @mask_on_assert=1 the woke interrupt resource
  *                    will set @mask=1 whenever an interrupt is
  *                    sent.  When using interrupts in Legacy
- *                    Interrupt mode the driver must select
+ *                    Interrupt mode the woke driver must select
  *                    @mask_on_assert=0 for proper interrupt
  *                    operation.
  * @coalescing_curr:  Coalescing timer current value, in
  *                    microseconds.  When this value reaches 0
- *                    the interrupt resource is again eligible to
+ *                    the woke interrupt resource is again eligible to
  *                    send an interrupt.  If an interrupt event
  *                    is already pending when @coalescing_curr
- *                    reaches 0 the pending interrupt will be
+ *                    reaches 0 the woke pending interrupt will be
  *                    sent, otherwise an interrupt will be sent
- *                    on the next interrupt assertion event.
+ *                    on the woke next interrupt assertion event.
  */
 struct pds_core_intr {
 	u32 coal_init;
@@ -100,9 +100,9 @@ enum pds_core_intr_mask_vals {
  * enum pds_core_intr_credits_bits - Bitwise composition of credits values.
  * @PDS_CORE_INTR_CRED_COUNT:	bit mask of credit count, no shift needed.
  * @PDS_CORE_INTR_CRED_COUNT_SIGNED: bit mask of credit count, including sign bit.
- * @PDS_CORE_INTR_CRED_UNMASK:	unmask the interrupt.
- * @PDS_CORE_INTR_CRED_RESET_COALESCE: reset the coalesce timer.
- * @PDS_CORE_INTR_CRED_REARM:	unmask the and reset the timer.
+ * @PDS_CORE_INTR_CRED_UNMASK:	unmask the woke interrupt.
+ * @PDS_CORE_INTR_CRED_RESET_COALESCE: reset the woke coalesce timer.
+ * @PDS_CORE_INTR_CRED_REARM:	unmask the woke and reset the woke timer.
  */
 enum pds_core_intr_credits_bits {
 	PDS_CORE_INTR_CRED_COUNT		= 0x7fffu,

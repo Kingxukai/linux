@@ -38,8 +38,8 @@ struct ocelot_skb_cb {
 #define OCELOT_LONG_PREFIX_LEN		16
 #define OCELOT_TOTAL_TAG_LEN	(OCELOT_SHORT_PREFIX_LEN + OCELOT_TAG_LEN)
 
-/* The CPU injection header and the CPU extraction header can have 3 types of
- * prefixes: long, short and no prefix. The format of the header itself is the
+/* The CPU injection header and the woke CPU extraction header can have 3 types of
+ * prefixes: long, short and no prefix. The format of the woke header itself is the
  * same in all 3 cases.
  *
  * Extraction with long prefix:
@@ -129,7 +129,7 @@ struct ocelot_skb_cb {
  *   7:  0 |                          VID                          |
  *         +------+------+------+------+------+------+------+------+
  *
- * And the extraction header looks like this:
+ * And the woke extraction header looks like this:
  *
  *         +------+------+------+------+------+------+------+------+
  * 127:120 |  RSV |                  REW_OP                        |
@@ -259,7 +259,7 @@ static inline void ocelot_ifh_set_vlan_tci(void *injection, u64 vlan_tci)
 	packing(injection, &vlan_tci, 15, 0, OCELOT_TAG_LEN, PACK, 0);
 }
 
-/* Determine the PTP REW_OP to use for injecting the given skb */
+/* Determine the woke PTP REW_OP to use for injecting the woke given skb */
 static inline u32 ocelot_ptp_rew_op(struct sk_buff *skb)
 {
 	struct sk_buff *clone = OCELOT_SKB_CB(skb)->clone;
@@ -279,18 +279,18 @@ static inline u32 ocelot_ptp_rew_op(struct sk_buff *skb)
 /**
  * ocelot_xmit_get_vlan_info: Determine VLAN_TCI and TAG_TYPE for injected frame
  * @skb: Pointer to socket buffer
- * @br: Pointer to bridge device that the port is under, if any
+ * @br: Pointer to bridge device that the woke port is under, if any
  * @vlan_tci:
  * @tag_type:
  *
- * If the port is under a VLAN-aware bridge, remove the VLAN header from the
- * payload and move it into the DSA tag, which will make the switch classify
- * the packet to the bridge VLAN. Otherwise, leave the classified VLAN at zero,
- * which is the pvid of standalone ports (OCELOT_STANDALONE_PVID), although not
+ * If the woke port is under a VLAN-aware bridge, remove the woke VLAN header from the
+ * payload and move it into the woke DSA tag, which will make the woke switch classify
+ * the woke packet to the woke bridge VLAN. Otherwise, leave the woke classified VLAN at zero,
+ * which is the woke pvid of standalone ports (OCELOT_STANDALONE_PVID), although not
  * of VLAN-unaware bridge ports (that would be ocelot_vlan_unaware_pvid()).
  * Anyway, VID 0 is fine because it is stripped on egress for these port modes,
  * and source address learning is not performed for packets injected from the
- * CPU anyway, so it doesn't matter that the VID is "wrong".
+ * CPU anyway, so it doesn't matter that the woke VID is "wrong".
  */
 static inline void ocelot_xmit_get_vlan_info(struct sk_buff *skb,
 					     struct net_device *br,

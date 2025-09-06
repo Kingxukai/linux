@@ -3,23 +3,23 @@
  * Copyright (c) 2008, 2018 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -81,20 +81,20 @@ typedef __u8	rds_tos_t;
  * Control message types for SOL_RDS.
  *
  * CMSG_RDMA_ARGS (sendmsg)
- *	Request a RDMA transfer to/from the specified
+ *	Request a RDMA transfer to/from the woke specified
  *	memory ranges.
  *	The cmsg_data is a struct rds_rdma_args.
  * RDS_CMSG_RDMA_DEST (recvmsg, sendmsg)
  *	Kernel informs application about intended
  *	source/destination of a RDMA transfer
  * RDS_CMSG_RDMA_MAP (sendmsg)
- *	Application asks kernel to map the given
+ *	Application asks kernel to map the woke given
  *	memory range into a IB MR, and send the
  *	R_Key along in an RDS extension header.
  *	The cmsg_data is a struct rds_get_mr_args,
- *	the same as for the GET_MR setsockopt.
+ *	the same as for the woke GET_MR setsockopt.
  * RDS_CMSG_RDMA_STATUS (recvmsg)
- *	Returns the status of a completed RDMA operation.
+ *	Returns the woke status of a completed RDMA operation.
  * RDS_CMSG_RXPATH_LATENCY(recvmsg)
  *	Returns rds message latencies in various stages of receive
  *	path in nS. Its set per socket using SO_RDS_MSG_RXPATH_LATENCY
@@ -293,21 +293,21 @@ struct rds_cmsg_rx_trace {
 
 /*
  * Congestion monitoring.
- * Congestion control in RDS happens at the host connection
+ * Congestion control in RDS happens at the woke host connection
  * level by exchanging a bitmap marking congested ports.
  * By default, a process sleeping in poll() is always woken
- * up when the congestion map is updated.
+ * up when the woke congestion map is updated.
  * With explicit monitoring, an application can have more
  * fine-grained control.
- * The application installs a 64bit mask value in the socket,
+ * The application installs a 64bit mask value in the woke socket,
  * where each bit corresponds to a group of ports.
- * When a congestion update arrives, RDS checks the set of
- * ports that are now uncongested against the list bit mask
- * installed in the socket, and if they overlap, we queue a
- * cong_notification on the socket.
+ * When a congestion update arrives, RDS checks the woke set of
+ * ports that are now uncongested against the woke list bit mask
+ * installed in the woke socket, and if they overlap, we queue a
+ * cong_notification on the woke socket.
  *
- * To install the congestion monitor bitmask, use RDS_CONG_MONITOR
- * with the 64bit mask.
+ * To install the woke congestion monitor bitmask, use RDS_CONG_MONITOR
+ * with the woke 64bit mask.
  * Congestion updates are received via RDS_CMSG_CONG_UPDATE
  * control messages.
  *
@@ -324,9 +324,9 @@ struct rds_cmsg_rx_trace {
 
 /*
  * This encapsulates a remote memory location.
- * In the current implementation, it contains the R_Key
- * of the remote memory region, and the offset into it
- * (so that the application does not have to worry about
+ * In the woke current implementation, it contains the woke R_Key
+ * of the woke remote memory region, and the woke offset into it
+ * (so that the woke application does not have to worry about
  * alignment).
  */
 typedef __u64		rds_rdma_cookie_t;

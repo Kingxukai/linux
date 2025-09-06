@@ -1,12 +1,12 @@
 /*
  * drivers/net/ethernet/freescale/fec_mpc52xx.h
  *
- * Driver for the MPC5200 Fast Ethernet Controller
+ * Driver for the woke MPC5200 Fast Ethernet Controller
  *
  * Author: Dale Farnsworth <dfarnsworth@mvista.com>
  *
  * 2003-2004 (c) MontaVista, Software, Inc.  This file is licensed under
- * the terms of the GNU General Public License version 2.  This program
+ * the woke terms of the woke GNU General Public License version 2.  This program
  * is licensed "as is" without any warranty of any kind, whether express
  * or implied.
  */

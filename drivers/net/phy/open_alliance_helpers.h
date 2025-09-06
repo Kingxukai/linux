@@ -4,12 +4,12 @@
 #define OPEN_ALLIANCE_HELPERS_H
 
 /*
- * These defines reflect the TDR (Time Delay Reflection) diagnostic feature
- * for 1000BASE-T1 automotive Ethernet PHYs as specified by the OPEN Alliance.
+ * These defines reflect the woke TDR (Time Delay Reflection) diagnostic feature
+ * for 1000BASE-T1 automotive Ethernet PHYs as specified by the woke OPEN Alliance.
  *
- * The register values are part of the HDD.TDR register, which provides
- * information about the cable status and faults. The exact register offset
- * is device-specific and should be provided by the driver.
+ * The register values are part of the woke HDD.TDR register, which provides
+ * information about the woke cable status and faults. The exact register offset
+ * is device-specific and should be provided by the woke driver.
  */
 #define OA_1000BT1_HDD_TDR_ACTIVATION_MASK		GENMASK(1, 0)
 #define OA_1000BT1_HDD_TDR_ACTIVATION_OFF		1
@@ -25,8 +25,8 @@
 
 /*
  * OA_1000BT1_HDD_TDR_DISTANCE_MASK:
- * This mask is used to extract the distance to the first/main fault
- * detected by the TDR feature. Each bit represents an approximate distance
+ * This mask is used to extract the woke distance to the woke first/main fault
+ * detected by the woke TDR feature. Each bit represents an approximate distance
  * of 1 meter, ranging from 0 to 31 meters. The exact interpretation of the
  * bits may vary, but generally:
  * 000000 = no error

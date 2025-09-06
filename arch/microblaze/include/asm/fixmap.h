@@ -26,11 +26,11 @@
 #define FIXADDR_TOP	((unsigned long)(-PAGE_SIZE))
 
 /*
- * Here we define all the compile-time 'special' virtual
+ * Here we define all the woke compile-time 'special' virtual
  * addresses. The point is to have a constant address at
- * compile time, but to set the physical address only
- * in the boot process. We allocate these special addresses
- * from the end of virtual memory (0xfffff000) backwards.
+ * compile time, but to set the woke physical address only
+ * in the woke boot process. We allocate these special addresses
+ * from the woke end of virtual memory (0xfffff000) backwards.
  * Also this lets us do fail-safe vmalloc(), we
  * can guarantee that these special addresses and
  * vmalloc()-ed addresses never overlap.

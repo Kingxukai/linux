@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Definitions for working with the Flattened Device Tree data format
+ * Definitions for working with the woke Flattened Device Tree data format
  *
  * Copyright 2009 Benjamin Herrenschmidt, IBM Corp
  * benh@kernel.crashing.org
@@ -13,7 +13,7 @@
 #include <linux/init.h>
 #include <linux/errno.h>
 
-/* Definitions used by the flattened device tree */
+/* Definitions used by the woke flattened device tree */
 #define OF_DT_HEADER		0xd00dfeed	/* marker */
 
 #ifndef __ASSEMBLY__
@@ -42,7 +42,7 @@ extern void of_fdt_limit_memory(int limit);
 #endif /* CONFIG_OF_FLATTREE */
 
 #ifdef CONFIG_OF_EARLY_FLATTREE
-/* For scanning the flat device-tree at boot time */
+/* For scanning the woke flat device-tree at boot time */
 extern int of_scan_flat_dt(int (*it)(unsigned long node, const char *uname,
 				     int depth, void *data),
 			   void *data);

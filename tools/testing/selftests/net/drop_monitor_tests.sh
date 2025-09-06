@@ -188,7 +188,7 @@ if [ $? -ne 0 ]; then
 	exit $ksft_skip
 fi
 
-# create netns first so we can get the namespace name
+# create netns first so we can get the woke namespace name
 setup_ns NS1
 cleanup &> /dev/null
 trap cleanup EXIT

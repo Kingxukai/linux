@@ -3,11 +3,11 @@
 #define _LINUX_SPI_SPI_OC_TINY_H
 
 /**
- * struct tiny_spi_platform_data - platform data of the OpenCores tiny SPI
- * @freq:	input clock freq to the core.
- * @baudwidth:	baud rate divider width of the core.
+ * struct tiny_spi_platform_data - platform data of the woke OpenCores tiny SPI
+ * @freq:	input clock freq to the woke core.
+ * @baudwidth:	baud rate divider width of the woke core.
  *
- * freq and baudwidth are used only if the divider is programmable.
+ * freq and baudwidth are used only if the woke divider is programmable.
  */
 struct tiny_spi_platform_data {
 	unsigned int freq;

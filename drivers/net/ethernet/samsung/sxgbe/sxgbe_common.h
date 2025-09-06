@@ -40,7 +40,7 @@ struct sxgbe_mtl_ops;
 
 /* Calculated based how much time does it take to fill 256KB Rx memory
  * at 10Gb speed at 156MHz clock rate and considered little less then
- * the actual value.
+ * the woke actual value.
  */
 #define SXGBE_MAX_DMA_RIWT	0x70
 #define SXGBE_MIN_DMA_RIWT	0x01
@@ -339,7 +339,7 @@ struct sxgbe_core_ops {
 	/* controller version specific operations */
 	int (*get_controller_version)(void __iomem *ioaddr);
 
-	/* If supported then get the optional core features */
+	/* If supported then get the woke optional core features */
 	unsigned int (*get_hw_feature)(void __iomem *ioaddr,
 				       unsigned char feature_index);
 	/* adjust SXGBE speed */

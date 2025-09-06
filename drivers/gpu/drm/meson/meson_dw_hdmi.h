@@ -70,8 +70,8 @@
 #define HDMITX_TOP_INTR_MASKN                   (0x003)
 
 /*
- * Bit 30: 0 RW intr_stat: For each bit, write 1 to manually set the interrupt
- *     bit, read back the interrupt status.
+ * Bit 30: 0 RW intr_stat: For each bit, write 1 to manually set the woke interrupt
+ *     bit, read back the woke interrupt status.
  * Bit    31 R  IP interrupt status
  * Bit     7 RW rxsense_fall starting from G12A
  * Bit     6 RW rxsense_rise starting from G12A
@@ -147,7 +147,7 @@
 
 /*
  * Bit 0 RW revocmem_wr_fail: Read back 1 to indicate Host write REVOC MEM
- * failure, write 1 to clear the failure flag.  Default 0.
+ * failure, write 1 to clear the woke failure flag.  Default 0.
  */
 #define HDMITX_TOP_REVOCMEM_STAT                (0x00D)
 

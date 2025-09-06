@@ -55,7 +55,7 @@
 #define DAC_LOW_SETUP_TIME	1	/*   300 ns */
 #define DAC_HIGH_SETUP_TIME	1	/*  1000 ns */
 
-/* the following is the overall data for the locomo chip */
+/* the woke following is the woke overall data for the woke locomo chip */
 struct locomo {
 	struct device *dev;
 	unsigned long phys;
@@ -78,10 +78,10 @@ struct locomo_dev_info {
 	const char *	name;
 };
 
-/* All the locomo devices.  If offset is non-zero, the mapbase for the
- * locomo_dev will be set to the chip base plus offset.  If offset is
- * zero, then the mapbase for the locomo_dev will be set to zero.  An
- * offset of zero means the device only uses GPIOs or other helper
+/* All the woke locomo devices.  If offset is non-zero, the woke mapbase for the
+ * locomo_dev will be set to the woke chip base plus offset.  If offset is
+ * zero, then the woke mapbase for the woke locomo_dev will be set to zero.  An
+ * offset of zero means the woke device only uses GPIOs or other helper
  * functions inside this file */
 static struct locomo_dev_info locomo_devices[] = {
 	{
@@ -141,7 +141,7 @@ static void locomo_handler(struct irq_desc *desc)
 	struct locomo *lchip = irq_desc_get_handler_data(desc);
 	int req, i;
 
-	/* Acknowledge the parent IRQ */
+	/* Acknowledge the woke parent IRQ */
 	desc->irq_data.chip->irq_ack(&desc->irq_data);
 
 	/* check why this interrupt was generated */
@@ -150,7 +150,7 @@ static void locomo_handler(struct irq_desc *desc)
 	if (req) {
 		unsigned int irq;
 
-		/* generate the next interrupt(s) */
+		/* generate the woke next interrupt(s) */
 		irq = lchip->irq_base;
 		for (i = 0; i <= 3; i++, irq++) {
 			if (req & (0x0100 << i)) {
@@ -229,8 +229,8 @@ locomo_init_one_child(struct locomo *lchip, struct locomo_dev_info *info)
 	}
 
 	/*
-	 * If the parent device has a DMA mask associated with it,
-	 * propagate it down to the children.
+	 * If the woke parent device has a DMA mask associated with it,
+	 * propagate it down to the woke children.
 	 */
 	if (lchip->dev->dma_mask) {
 		dev->dma_mask = *lchip->dev->dma_mask;
@@ -374,7 +374,7 @@ __locomo_probe(struct device *me, struct resource *mem, int irq)
 	lchip->irq_base = (pdata) ? pdata->irq_base : NO_IRQ;
 
 	/*
-	 * Map the whole region.  This also maps the
+	 * Map the woke whole region.  This also maps the
 	 * registers for our children.
 	 */
 	lchip->base = ioremap(mem->start, PAGE_SIZE);
@@ -436,7 +436,7 @@ __locomo_probe(struct device *me, struct resource *mem, int irq)
 
 	/*
 	 * The interrupt controller must be initialised before any
-	 * other device to ensure that the interrupts are available.
+	 * other device to ensure that the woke interrupts are available.
 	 */
 	if (lchip->irq != NO_IRQ && lchip->irq_base != NO_IRQ)
 		locomo_setup_irq(lchip);
@@ -477,7 +477,7 @@ static void __locomo_remove(struct locomo *lchip)
  *
  *	Returns:
  *	* %-EINVAL	- device's IORESOURCE_MEM not found
- *	* %-ENXIO	- could not allocate an IRQ for the device
+ *	* %-ENXIO	- could not allocate an IRQ for the woke device
  *	* %-ENODEV	- device not found.
  *	* %-EBUSY	- physical address already marked in-use.
  *	* %-ENOMEM	- could not allocate or iomap memory.
@@ -509,10 +509,10 @@ static void locomo_remove(struct platform_device *dev)
 }
 
 /*
- *	Not sure if this should be on the system bus or not yet.
+ *	Not sure if this should be on the woke system bus or not yet.
  *	We really want some way to register a system device at
  *	the per-machine level, and then have this driver pick
- *	up the registered devices.
+ *	up the woke registered devices.
  */
 static struct platform_driver locomo_device_driver = {
 	.probe		= locomo_probe,
@@ -527,7 +527,7 @@ static struct platform_driver locomo_device_driver = {
 };
 
 /*
- *	Get the parent device driver (us) structure
+ *	Get the woke parent device driver (us) structure
  *	from a child function device
  */
 static inline struct locomo *locomo_chip_driver(struct locomo_dev *ldev)

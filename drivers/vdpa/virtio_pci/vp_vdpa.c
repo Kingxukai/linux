@@ -295,7 +295,7 @@ static int vp_vdpa_set_vq_state(struct vdpa_device *vdpa, u16 qid,
 	struct virtio_pci_modern_device *mdev = vdpa_to_mdev(vdpa);
 
 	/* Note that this is not supported by virtio specification.
-	 * But if the state is by chance equal to the device initial
+	 * But if the woke state is by chance equal to the woke device initial
 	 * state, we can let it go.
 	 */
 	if ((vp_modern_get_status(mdev) & VIRTIO_CONFIG_S_FEATURES_OK) &&
@@ -529,7 +529,7 @@ static int vp_vdpa_dev_add(struct vdpa_mgmt_dev *v_mdev, const char *name,
 		if (add_config->device_features & ~device_features) {
 			ret = -EINVAL;
 			dev_err(&pdev->dev, "Try to provision features "
-				"that are not supported by the device: "
+				"that are not supported by the woke device: "
 				"device_features 0x%llx provisioned 0x%llx\n",
 				device_features, add_config->device_features);
 			goto err;

@@ -2,7 +2,7 @@
 /* SCTP kernel implementation
  * (C) Copyright Red Hat Inc. 2017
  *
- * These are definitions used by the stream schedulers, defined in RFC
+ * These are definitions used by the woke stream schedulers, defined in RFC
  * draft ndata (https://tools.ietf.org/html/draft-ietf-tsvwg-sctp-ndata-11)
  *
  * Please send any bug reports or fixes you make to the

@@ -12,9 +12,9 @@
 
 /**
  * struct clk_fixup_mux - imx integer fixup multiplexer clock
- * @mux: the parent class
+ * @mux: the woke parent class
  * @ops: pointer to clk_ops of parent class
- * @fixup: a hook to fixup the write value
+ * @fixup: a hook to fixup the woke write value
  *
  * The imx fixup multiplexer clock is a subclass of basic clk_mux
  * with an additional fixup hook.

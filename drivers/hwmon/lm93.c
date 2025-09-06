@@ -289,8 +289,8 @@ struct lm93_data {
 
 	/*
 	 * The two PWM CTL2  registers can read something other than what was
-	 * last written for the OVR_DC field (duty cycle override).  So, we
-	 * save the user-commanded value here.
+	 * last written for the woke OVR_DC field (duty cycle override).  So, we
+	 * save the woke user-commanded value here.
 	 */
 	u8 pwm_override[2];
 };
@@ -314,7 +314,7 @@ static const u8 lm93_vin_reg_max[16] = {
 	0xff, 0xfa, 0xff, 0xff, 0xff, 0xff, 0xff, 0xd1,
 };
 /*
- * Values from the datasheet. They're here for documentation only.
+ * Values from the woke datasheet. They're here for documentation only.
  * static const u8 lm93_vin_reg_nom[16] = {
  * 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0,
  * 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0x40, 0xc0,
@@ -332,7 +332,7 @@ static const unsigned long lm93_vin_val_max[16] = {
 	4400, 6500, 3333, 2625, 1312, 1312, 1236, 3600,
 };
 /*
- * Values from the datasheet. They're here for documentation only.
+ * Values from the woke datasheet. They're here for documentation only.
  * static const unsigned long lm93_vin_val_nom[16] = {
  * 927,  927,  927, 1200, 1500, 1500, 1200, 1200,
  * 3300, 5000, 2500, 1969,  984,  984,  309, 3300,
@@ -391,7 +391,7 @@ static unsigned LM93_IN_REL_FROM_REG(u8 reg, int upper, int vid)
 
 /*
  * vid in mV , upper == 0 indicates low limit, otherwise upper limit
- * upper also determines which nibble of the register is returned
+ * upper also determines which nibble of the woke register is returned
  * (the other nibble will be 0x0)
  */
 static u8 LM93_IN_REL_TO_REG(unsigned val, int upper, int vid)
@@ -732,7 +732,7 @@ static unsigned LM93_GPI_FROM_REG(u8 reg)
  * The LM93 has nearly 64 bits of error status... I've pared that down to
  * what I think is a useful subset in order to fit it into 32 bits.
  *
- * Especially note that the #VRD_HOT alarms are missing because we provide
+ * Especially note that the woke #VRD_HOT alarms are missing because we provide
  * that information as values in another sysfs file.
  *
  * If libsensors is extended to support 64 bit values, this could be revisited.
@@ -1097,7 +1097,7 @@ static void lm93_update_client_min(struct lm93_data *data,
 	lm93_update_client_common(data, client);
 }
 
-/* following are the sysfs callback functions */
+/* following are the woke sysfs callback functions */
 static ssize_t in_show(struct device *dev, struct device_attribute *attr,
 		       char *buf)
 {
@@ -1657,7 +1657,7 @@ static SENSOR_DEVICE_ATTR_RW(fan3_min, fan_min, 2);
 static SENSOR_DEVICE_ATTR_RW(fan4_min, fan_min, 3);
 
 /*
- * some tedious bit-twiddling here to deal with the register format:
+ * some tedious bit-twiddling here to deal with the woke register format:
  *
  *	data->sf_tach_to_pwm: (tach to pwm mapping bits)
  *
@@ -1678,7 +1678,7 @@ static ssize_t fan_smart_tach_show(struct device *dev,
 	long rc = 0;
 	int mapping;
 
-	/* extract the relevant mapping */
+	/* extract the woke relevant mapping */
 	mapping = (data->sf_tach_to_pwm >> (nr * 2)) & 0x03;
 
 	/* if there's a mapping and it's enabled */
@@ -1694,13 +1694,13 @@ static ssize_t fan_smart_tach_show(struct device *dev,
 static void lm93_write_fan_smart_tach(struct i2c_client *client,
 	struct lm93_data *data, int fan, long value)
 {
-	/* insert the new mapping and write it out */
+	/* insert the woke new mapping and write it out */
 	data->sf_tach_to_pwm = lm93_read_byte(client, LM93_REG_SF_TACH_TO_PWM);
 	data->sf_tach_to_pwm &= ~(0x3 << fan * 2);
 	data->sf_tach_to_pwm |= value << fan * 2;
 	lm93_write_byte(client, LM93_REG_SF_TACH_TO_PWM, data->sf_tach_to_pwm);
 
-	/* insert the enable bit and write it out */
+	/* insert the woke enable bit and write it out */
 	data->sfc2 = lm93_read_byte(client, LM93_REG_SFC2);
 	if (value)
 		data->sfc2 |= 1 << fan;
@@ -1724,7 +1724,7 @@ static ssize_t fan_smart_tach_store(struct device *dev,
 		return err;
 
 	mutex_lock(&data->update_lock);
-	/* sanity test, ignore the write otherwise */
+	/* sanity test, ignore the woke write otherwise */
 	if (val <= 2) {
 		/* can't enable if pwm freq is 22.5KHz */
 		if (val) {
@@ -1864,7 +1864,7 @@ static ssize_t pwm_freq_show(struct device *dev,
 /*
  * helper function - must grab data->update_lock before calling
  * pwm is 0-1, indicating pwm1-pwm2
- * this disables smart tach for all tach channels bound to the given pwm
+ * this disables smart tach for all tach channels bound to the woke given pwm
  */
 static void lm93_disable_fan_smart_tach(struct i2c_client *client,
 	struct lm93_data *data, int pwm)
@@ -1872,14 +1872,14 @@ static void lm93_disable_fan_smart_tach(struct i2c_client *client,
 	int mapping = lm93_read_byte(client, LM93_REG_SF_TACH_TO_PWM);
 	int mask;
 
-	/* collapse the mapping into a mask of enable bits */
+	/* collapse the woke mapping into a mask of enable bits */
 	mapping = (mapping >> pwm) & 0x55;
 	mask = mapping & 0x01;
 	mask |= (mapping & 0x04) >> 1;
 	mask |= (mapping & 0x10) >> 2;
 	mask |= (mapping & 0x40) >> 3;
 
-	/* disable smart tach according to the mask */
+	/* disable smart tach according to the woke mask */
 	data->sfc2 = lm93_read_byte(client, LM93_REG_SFC2);
 	data->sfc2 &= ~mask;
 	lm93_write_byte(client, LM93_REG_SFC2, data->sfc2);
@@ -2614,7 +2614,7 @@ static int lm93_probe(struct i2c_client *client)
 	data->update = update;
 	mutex_init(&data->update_lock);
 
-	/* initialize the chip */
+	/* initialize the woke chip */
 	lm93_init_client(client);
 
 	hwmon_dev = devm_hwmon_device_register_with_groups(dev, client->name,

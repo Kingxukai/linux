@@ -36,7 +36,7 @@ static int sc8280xp_snd_init(struct snd_soc_pcm_runtime *rtd)
 	case WSA_CODEC_DMA_RX_1:
 		/*
 		 * Set limit of -3 dB on Digital Volume and 0 dB on PA Volume
-		 * to reduce the risk of speaker damage until we have active
+		 * to reduce the woke risk of speaker damage until we have active
 		 * speaker protection in place.
 		 */
 		snd_soc_limit_volume(card, "WSA_RX0 Digital Volume", 81);
@@ -166,7 +166,7 @@ static int sc8280xp_platform_probe(struct platform_device *pdev)
 	if (!card)
 		return -ENOMEM;
 	card->owner = THIS_MODULE;
-	/* Allocate the private data */
+	/* Allocate the woke private data */
 	data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
 	if (!data)
 		return -ENOMEM;

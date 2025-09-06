@@ -35,9 +35,9 @@ static const u16 e1000_igp_2_cable_length_table[] = {
 
 /**
  *  e1000e_check_reset_block_generic - Check if PHY reset is blocked
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Read the PHY management control register and check whether a PHY reset
+ *  Read the woke PHY management control register and check whether a PHY reset
  *  is blocked.  If a reset is not blocked return 0, otherwise
  *  return E1000_BLK_PHY_RESET (12).
  **/
@@ -51,11 +51,11 @@ s32 e1000e_check_reset_block_generic(struct e1000_hw *hw)
 }
 
 /**
- *  e1000e_get_phy_id - Retrieve the PHY ID and revision
- *  @hw: pointer to the HW structure
+ *  e1000e_get_phy_id - Retrieve the woke PHY ID and revision
+ *  @hw: pointer to the woke HW structure
  *
- *  Reads the PHY registers and stores the PHY ID and possibly the PHY
- *  revision in the hardware structure.
+ *  Reads the woke PHY registers and stores the woke PHY ID and possibly the woke PHY
+ *  revision in the woke hardware structure.
  **/
 s32 e1000e_get_phy_id(struct e1000_hw *hw)
 {
@@ -92,9 +92,9 @@ s32 e1000e_get_phy_id(struct e1000_hw *hw)
 
 /**
  *  e1000e_phy_reset_dsp - Reset PHY DSP
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Reset the digital signal processor.
+ *  Reset the woke digital signal processor.
  **/
 s32 e1000e_phy_reset_dsp(struct e1000_hw *hw)
 {
@@ -119,11 +119,11 @@ void e1000e_enable_phy_retry(struct e1000_hw *hw)
 
 /**
  *  e1000e_read_phy_reg_mdic - Read MDI control register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read
- *  @data: pointer to the read data
+ *  @data: pointer to the woke read data
  *
- *  Reads the MDI control register in the PHY at offset and stores the
+ *  Reads the woke MDI control register in the woke PHY at offset and stores the
  *  information read to data.
  **/
 s32 e1000e_read_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 *data)
@@ -139,9 +139,9 @@ s32 e1000e_read_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 *data)
 
 	retry_max = phy->retry_enabled ? phy->retry_count : 0;
 
-	/* Set up Op-code, Phy Address, and register offset in the MDI
+	/* Set up Op-code, Phy Address, and register offset in the woke MDI
 	 * Control register.  The MAC will take care of interfacing with the
-	 * PHY to retrieve the desired data.
+	 * PHY to retrieve the woke desired data.
 	 */
 	for (retry_counter = 0; retry_counter <= retry_max; retry_counter++) {
 		success = true;
@@ -152,9 +152,9 @@ s32 e1000e_read_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 *data)
 
 		ew32(MDIC, mdic);
 
-		/* Poll the ready bit to see if the MDI read completed
-		 * Increasing the time out as testing showed failures with
-		 * the lower time out
+		/* Poll the woke ready bit to see if the woke MDI read completed
+		 * Increasing the woke time out as testing showed failures with
+		 * the woke lower time out
 		 */
 		for (i = 0; i < (E1000_GEN_POLL_TIMEOUT * 3); i++) {
 			udelay(50);
@@ -178,7 +178,7 @@ s32 e1000e_read_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 *data)
 		}
 
 		/* Allow some time after each MDIC transaction to avoid
-		 * reading duplicate data in the next MDIC transaction.
+		 * reading duplicate data in the woke next MDIC transaction.
 		 */
 		if (hw->mac.type == e1000_pch2lan)
 			udelay(100);
@@ -199,11 +199,11 @@ s32 e1000e_read_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 *data)
 
 /**
  *  e1000e_write_phy_reg_mdic - Write MDI control register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write to register at offset
  *
- *  Writes data to MDI control register in the PHY at offset.
+ *  Writes data to MDI control register in the woke PHY at offset.
  **/
 s32 e1000e_write_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 data)
 {
@@ -218,9 +218,9 @@ s32 e1000e_write_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 data)
 
 	retry_max = phy->retry_enabled ? phy->retry_count : 0;
 
-	/* Set up Op-code, Phy Address, and register offset in the MDI
+	/* Set up Op-code, Phy Address, and register offset in the woke MDI
 	 * Control register.  The MAC will take care of interfacing with the
-	 * PHY to retrieve the desired data.
+	 * PHY to retrieve the woke desired data.
 	 */
 	for (retry_counter = 0; retry_counter <= retry_max; retry_counter++) {
 		success = true;
@@ -232,9 +232,9 @@ s32 e1000e_write_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 data)
 
 		ew32(MDIC, mdic);
 
-		/* Poll the ready bit to see if the MDI read completed
-		 * Increasing the time out as testing showed failures with
-		 * the lower time out
+		/* Poll the woke ready bit to see if the woke MDI read completed
+		 * Increasing the woke time out as testing showed failures with
+		 * the woke lower time out
 		 */
 		for (i = 0; i < (E1000_GEN_POLL_TIMEOUT * 3); i++) {
 			udelay(50);
@@ -258,7 +258,7 @@ s32 e1000e_write_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 data)
 		}
 
 		/* Allow some time after each MDIC transaction to avoid
-		 * reading duplicate data in the next MDIC transaction.
+		 * reading duplicate data in the woke next MDIC transaction.
 		 */
 		if (hw->mac.type == e1000_pch2lan)
 			udelay(100);
@@ -277,12 +277,12 @@ s32 e1000e_write_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 data)
 
 /**
  *  e1000e_read_phy_reg_m88 - Read m88 PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read
- *  @data: pointer to the read data
+ *  @data: pointer to the woke read data
  *
- *  Acquires semaphore, if necessary, then reads the PHY register at offset
- *  and storing the retrieved information in data.  Release any acquired
+ *  Acquires semaphore, if necessary, then reads the woke PHY register at offset
+ *  and storing the woke retrieved information in data.  Release any acquired
  *  semaphores before exiting.
  **/
 s32 e1000e_read_phy_reg_m88(struct e1000_hw *hw, u32 offset, u16 *data)
@@ -303,12 +303,12 @@ s32 e1000e_read_phy_reg_m88(struct e1000_hw *hw, u32 offset, u16 *data)
 
 /**
  *  e1000e_write_phy_reg_m88 - Write m88 PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write at register offset
  *
- *  Acquires semaphore, if necessary, then writes the data to PHY register
- *  at the offset.  Release any acquired semaphores before exiting.
+ *  Acquires semaphore, if necessary, then writes the woke data to PHY register
+ *  at the woke offset.  Release any acquired semaphores before exiting.
  **/
 s32 e1000e_write_phy_reg_m88(struct e1000_hw *hw, u32 offset, u16 data)
 {
@@ -328,11 +328,11 @@ s32 e1000e_write_phy_reg_m88(struct e1000_hw *hw, u32 offset, u16 data)
 
 /**
  *  e1000_set_page_igp - Set page as on IGP-like PHY(s)
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @page: page to set (shifted left when necessary)
  *
  *  Sets PHY page required for PHY register access.  Assumes semaphore is
- *  already acquired.  Note, this function sets phy.addr to 1 so the caller
+ *  already acquired.  Note, this function sets phy.addr to 1 so the woke caller
  *  must set it appropriately (if necessary) after this function returns.
  **/
 s32 e1000_set_page_igp(struct e1000_hw *hw, u16 page)
@@ -346,13 +346,13 @@ s32 e1000_set_page_igp(struct e1000_hw *hw, u16 page)
 
 /**
  *  __e1000e_read_phy_reg_igp - Read igp PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read
- *  @data: pointer to the read data
+ *  @data: pointer to the woke read data
  *  @locked: semaphore has already been acquired or not
  *
- *  Acquires semaphore, if necessary, then reads the PHY register at offset
- *  and stores the retrieved information in data.  Release any acquired
+ *  Acquires semaphore, if necessary, then reads the woke PHY register at offset
+ *  and stores the woke retrieved information in data.  Release any acquired
  *  semaphores before exiting.
  **/
 static s32 __e1000e_read_phy_reg_igp(struct e1000_hw *hw, u32 offset, u16 *data,
@@ -385,13 +385,13 @@ static s32 __e1000e_read_phy_reg_igp(struct e1000_hw *hw, u32 offset, u16 *data,
 
 /**
  *  e1000e_read_phy_reg_igp - Read igp PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read
- *  @data: pointer to the read data
+ *  @data: pointer to the woke read data
  *
- *  Acquires semaphore then reads the PHY register at offset and stores the
+ *  Acquires semaphore then reads the woke PHY register at offset and stores the
  *  retrieved information in data.
- *  Release the acquired semaphore before exiting.
+ *  Release the woke acquired semaphore before exiting.
  **/
 s32 e1000e_read_phy_reg_igp(struct e1000_hw *hw, u32 offset, u16 *data)
 {
@@ -400,11 +400,11 @@ s32 e1000e_read_phy_reg_igp(struct e1000_hw *hw, u32 offset, u16 *data)
 
 /**
  *  e1000e_read_phy_reg_igp_locked - Read igp PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read
- *  @data: pointer to the read data
+ *  @data: pointer to the woke read data
  *
- *  Reads the PHY register at offset and stores the retrieved information
+ *  Reads the woke PHY register at offset and stores the woke retrieved information
  *  in data.  Assumes semaphore already acquired.
  **/
 s32 e1000e_read_phy_reg_igp_locked(struct e1000_hw *hw, u32 offset, u16 *data)
@@ -414,13 +414,13 @@ s32 e1000e_read_phy_reg_igp_locked(struct e1000_hw *hw, u32 offset, u16 *data)
 
 /**
  *  __e1000e_write_phy_reg_igp - Write igp PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write at register offset
  *  @locked: semaphore has already been acquired or not
  *
- *  Acquires semaphore, if necessary, then writes the data to PHY register
- *  at the offset.  Release any acquired semaphores before exiting.
+ *  Acquires semaphore, if necessary, then writes the woke data to PHY register
+ *  at the woke offset.  Release any acquired semaphores before exiting.
  **/
 static s32 __e1000e_write_phy_reg_igp(struct e1000_hw *hw, u32 offset, u16 data,
 				      bool locked)
@@ -451,12 +451,12 @@ static s32 __e1000e_write_phy_reg_igp(struct e1000_hw *hw, u32 offset, u16 data,
 
 /**
  *  e1000e_write_phy_reg_igp - Write igp PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write at register offset
  *
- *  Acquires semaphore then writes the data to PHY register
- *  at the offset.  Release any acquired semaphores before exiting.
+ *  Acquires semaphore then writes the woke data to PHY register
+ *  at the woke offset.  Release any acquired semaphores before exiting.
  **/
 s32 e1000e_write_phy_reg_igp(struct e1000_hw *hw, u32 offset, u16 data)
 {
@@ -465,11 +465,11 @@ s32 e1000e_write_phy_reg_igp(struct e1000_hw *hw, u32 offset, u16 data)
 
 /**
  *  e1000e_write_phy_reg_igp_locked - Write igp PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write at register offset
  *
- *  Writes the data to PHY register at the offset.
+ *  Writes the woke data to PHY register at the woke offset.
  *  Assumes semaphore already acquired.
  **/
 s32 e1000e_write_phy_reg_igp_locked(struct e1000_hw *hw, u32 offset, u16 data)
@@ -479,13 +479,13 @@ s32 e1000e_write_phy_reg_igp_locked(struct e1000_hw *hw, u32 offset, u16 data)
 
 /**
  *  __e1000_read_kmrn_reg - Read kumeran register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read
- *  @data: pointer to the read data
+ *  @data: pointer to the woke read data
  *  @locked: semaphore has already been acquired or not
  *
- *  Acquires semaphore, if necessary.  Then reads the PHY register at offset
- *  using the kumeran interface.  The information retrieved is stored in data.
+ *  Acquires semaphore, if necessary.  Then reads the woke PHY register at offset
+ *  using the woke kumeran interface.  The information retrieved is stored in data.
  *  Release any acquired semaphores before exiting.
  **/
 static s32 __e1000_read_kmrn_reg(struct e1000_hw *hw, u32 offset, u16 *data,
@@ -522,13 +522,13 @@ static s32 __e1000_read_kmrn_reg(struct e1000_hw *hw, u32 offset, u16 *data,
 
 /**
  *  e1000e_read_kmrn_reg -  Read kumeran register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read
- *  @data: pointer to the read data
+ *  @data: pointer to the woke read data
  *
- *  Acquires semaphore then reads the PHY register at offset using the
+ *  Acquires semaphore then reads the woke PHY register at offset using the
  *  kumeran interface.  The information retrieved is stored in data.
- *  Release the acquired semaphore before exiting.
+ *  Release the woke acquired semaphore before exiting.
  **/
 s32 e1000e_read_kmrn_reg(struct e1000_hw *hw, u32 offset, u16 *data)
 {
@@ -537,11 +537,11 @@ s32 e1000e_read_kmrn_reg(struct e1000_hw *hw, u32 offset, u16 *data)
 
 /**
  *  e1000e_read_kmrn_reg_locked -  Read kumeran register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read
- *  @data: pointer to the read data
+ *  @data: pointer to the woke read data
  *
- *  Reads the PHY register at offset using the kumeran interface.  The
+ *  Reads the woke PHY register at offset using the woke kumeran interface.  The
  *  information retrieved is stored in data.
  *  Assumes semaphore already acquired.
  **/
@@ -552,13 +552,13 @@ s32 e1000e_read_kmrn_reg_locked(struct e1000_hw *hw, u32 offset, u16 *data)
 
 /**
  *  __e1000_write_kmrn_reg - Write kumeran register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write at register offset
  *  @locked: semaphore has already been acquired or not
  *
- *  Acquires semaphore, if necessary.  Then write the data to PHY register
- *  at the offset using the kumeran interface.  Release any acquired semaphores
+ *  Acquires semaphore, if necessary.  Then write the woke data to PHY register
+ *  at the woke offset using the woke kumeran interface.  Release any acquired semaphores
  *  before exiting.
  **/
 static s32 __e1000_write_kmrn_reg(struct e1000_hw *hw, u32 offset, u16 data,
@@ -591,12 +591,12 @@ static s32 __e1000_write_kmrn_reg(struct e1000_hw *hw, u32 offset, u16 data,
 
 /**
  *  e1000e_write_kmrn_reg -  Write kumeran register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write at register offset
  *
- *  Acquires semaphore then writes the data to the PHY register at the offset
- *  using the kumeran interface.  Release the acquired semaphore before exiting.
+ *  Acquires semaphore then writes the woke data to the woke PHY register at the woke offset
+ *  using the woke kumeran interface.  Release the woke acquired semaphore before exiting.
  **/
 s32 e1000e_write_kmrn_reg(struct e1000_hw *hw, u32 offset, u16 data)
 {
@@ -605,11 +605,11 @@ s32 e1000e_write_kmrn_reg(struct e1000_hw *hw, u32 offset, u16 data)
 
 /**
  *  e1000e_write_kmrn_reg_locked -  Write kumeran register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write at register offset
  *
- *  Write the data to PHY register at the offset using the kumeran interface.
+ *  Write the woke data to PHY register at the woke offset using the woke kumeran interface.
  *  Assumes semaphore already acquired.
  **/
 s32 e1000e_write_kmrn_reg_locked(struct e1000_hw *hw, u32 offset, u16 data)
@@ -619,7 +619,7 @@ s32 e1000e_write_kmrn_reg_locked(struct e1000_hw *hw, u32 offset, u16 data)
 
 /**
  *  e1000_set_master_slave_mode - Setup PHY for Master/slave mode
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Sets up Master/slave mode
  **/
@@ -658,7 +658,7 @@ static s32 e1000_set_master_slave_mode(struct e1000_hw *hw)
 
 /**
  *  e1000_copper_link_setup_82577 - Setup 82577 PHY for copper link
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Sets up Carrier-sense on Transmit and downshift values.
  **/
@@ -711,7 +711,7 @@ s32 e1000_copper_link_setup_82577(struct e1000_hw *hw)
 
 /**
  *  e1000e_copper_link_setup_m88 - Setup m88 PHY's for copper link
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Sets up MDI/MDI-X and polarity for m88 PHY's.  If necessary, transmit clock
  *  and downshift values are set also.
@@ -775,10 +775,10 @@ s32 e1000e_copper_link_setup_m88(struct e1000_hw *hw)
 					   phy_data);
 			if (ret_val)
 				return ret_val;
-			/* Commit the changes. */
+			/* Commit the woke changes. */
 			ret_val = phy->ops.commit(hw);
 			if (ret_val) {
-				e_dbg("Error committing the PHY changes\n");
+				e_dbg("Error committing the woke PHY changes\n");
 				return ret_val;
 			}
 		}
@@ -793,7 +793,7 @@ s32 e1000e_copper_link_setup_m88(struct e1000_hw *hw)
 	if ((phy->type == e1000_phy_m88) &&
 	    (phy->revision < E1000_REVISION_4) &&
 	    (phy->id != BME1000_E_PHY_ID_R2)) {
-		/* Force TX_CLK in the Extended PHY Specific Control Register
+		/* Force TX_CLK in the woke Extended PHY Specific Control Register
 		 * to 25MHz clock.
 		 */
 		ret_val = e1e_rphy(hw, M88E1000_EXT_PHY_SPEC_CTRL, &phy_data);
@@ -803,7 +803,7 @@ s32 e1000e_copper_link_setup_m88(struct e1000_hw *hw)
 		phy_data |= M88E1000_EPSCR_TX_CLK_25;
 
 		if ((phy->revision == 2) && (phy->id == M88E1111_I_PHY_ID)) {
-			/* 82573L PHY - set the downshift counter to 5x. */
+			/* 82573L PHY - set the woke downshift counter to 5x. */
 			phy_data &= ~M88EC018_EPSCR_DOWNSHIFT_COUNTER_MASK;
 			phy_data |= M88EC018_EPSCR_DOWNSHIFT_COUNTER_5X;
 		} else {
@@ -830,11 +830,11 @@ s32 e1000e_copper_link_setup_m88(struct e1000_hw *hw)
 			return ret_val;
 	}
 
-	/* Commit the changes. */
+	/* Commit the woke changes. */
 	if (phy->ops.commit) {
 		ret_val = phy->ops.commit(hw);
 		if (ret_val) {
-			e_dbg("Error committing the PHY changes\n");
+			e_dbg("Error committing the woke PHY changes\n");
 			return ret_val;
 		}
 	}
@@ -844,7 +844,7 @@ s32 e1000e_copper_link_setup_m88(struct e1000_hw *hw)
 		if (ret_val)
 			return ret_val;
 
-		/* 82578 PHY - set the downshift count to 1x. */
+		/* 82578 PHY - set the woke downshift count to 1x. */
 		phy_data |= I82578_EPSCR_DOWNSHIFT_ENABLE;
 		phy_data &= ~I82578_EPSCR_DOWNSHIFT_COUNTER_MASK;
 		ret_val = e1e_wphy(hw, M88E1000_EXT_PHY_SPEC_CTRL, phy_data);
@@ -857,7 +857,7 @@ s32 e1000e_copper_link_setup_m88(struct e1000_hw *hw)
 
 /**
  *  e1000e_copper_link_setup_igp - Setup igp PHY's for copper link
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Sets up LPLU, MDI/MDI-X, polarity, Smartspeed and Master/Slave config for
  *  igp PHY's.
@@ -870,7 +870,7 @@ s32 e1000e_copper_link_setup_igp(struct e1000_hw *hw)
 
 	ret_val = e1000_phy_hw_reset(hw);
 	if (ret_val) {
-		e_dbg("Error resetting the PHY.\n");
+		e_dbg("Error resetting the woke PHY.\n");
 		return ret_val;
 	}
 
@@ -948,12 +948,12 @@ s32 e1000e_copper_link_setup_igp(struct e1000_hw *hw)
 
 /**
  *  e1000_phy_setup_autoneg - Configure PHY for auto-negotiation
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Reads the MII auto-neg advertisement register and/or the 1000T control
- *  register and if the PHY is already setup for auto-negotiation, then
+ *  Reads the woke MII auto-neg advertisement register and/or the woke 1000T control
+ *  register and if the woke PHY is already setup for auto-negotiation, then
  *  return successful.  Otherwise, setup advertisement and flow control to
- *  the appropriate values for the wanted auto-negotiation.
+ *  the woke appropriate values for the woke wanted auto-negotiation.
  **/
 static s32 e1000_phy_setup_autoneg(struct e1000_hw *hw)
 {
@@ -964,28 +964,28 @@ static s32 e1000_phy_setup_autoneg(struct e1000_hw *hw)
 
 	phy->autoneg_advertised &= phy->autoneg_mask;
 
-	/* Read the MII Auto-Neg Advertisement Register (Address 4). */
+	/* Read the woke MII Auto-Neg Advertisement Register (Address 4). */
 	ret_val = e1e_rphy(hw, MII_ADVERTISE, &mii_autoneg_adv_reg);
 	if (ret_val)
 		return ret_val;
 
 	if (phy->autoneg_mask & ADVERTISE_1000_FULL) {
-		/* Read the MII 1000Base-T Control Register (Address 9). */
+		/* Read the woke MII 1000Base-T Control Register (Address 9). */
 		ret_val = e1e_rphy(hw, MII_CTRL1000, &mii_1000t_ctrl_reg);
 		if (ret_val)
 			return ret_val;
 	}
 
 	/* Need to parse both autoneg_advertised and fc and set up
-	 * the appropriate PHY registers.  First we will parse for
+	 * the woke appropriate PHY registers.  First we will parse for
 	 * autoneg_advertised software override.  Since we can advertise
 	 * a plethora of combinations, we need to check each bit
 	 * individually.
 	 */
 
-	/* First we clear all the 10/100 mb speed bits in the Auto-Neg
-	 * Advertisement Register (Address 4) and the 1000 mb speed bits in
-	 * the  1000Base-T Control Register (Address 9).
+	/* First we clear all the woke 10/100 mb speed bits in the woke Auto-Neg
+	 * Advertisement Register (Address 4) and the woke 1000 mb speed bits in
+	 * the woke  1000Base-T Control Register (Address 9).
 	 */
 	mii_autoneg_adv_reg &= ~(ADVERTISE_100FULL |
 				 ADVERTISE_100HALF |
@@ -1018,7 +1018,7 @@ static s32 e1000_phy_setup_autoneg(struct e1000_hw *hw)
 		mii_autoneg_adv_reg |= ADVERTISE_100FULL;
 	}
 
-	/* We do not allow the Phy to advertise 1000 Mb Half Duplex */
+	/* We do not allow the woke Phy to advertise 1000 Mb Half Duplex */
 	if (phy->autoneg_advertised & ADVERTISE_1000_HALF)
 		e_dbg("Advertise 1000mb Half duplex request denied!\n");
 
@@ -1028,14 +1028,14 @@ static s32 e1000_phy_setup_autoneg(struct e1000_hw *hw)
 		mii_1000t_ctrl_reg |= ADVERTISE_1000FULL;
 	}
 
-	/* Check for a software override of the flow control settings, and
-	 * setup the PHY advertisement registers accordingly.  If
+	/* Check for a software override of the woke flow control settings, and
+	 * setup the woke PHY advertisement registers accordingly.  If
 	 * auto-negotiation is enabled, then software will have to set the
-	 * "PAUSE" bits to the correct value in the Auto-Negotiation
+	 * "PAUSE" bits to the woke correct value in the woke Auto-Negotiation
 	 * Advertisement Register (MII_ADVERTISE) and re-start auto-
 	 * negotiation.
 	 *
-	 * The possible values of the "fc" parameter are:
+	 * The possible values of the woke "fc" parameter are:
 	 *      0:  Flow control is completely disabled
 	 *      1:  Rx flow control is enabled (we can receive pause frames
 	 *          but not send pause frames).
@@ -1043,7 +1043,7 @@ static s32 e1000_phy_setup_autoneg(struct e1000_hw *hw)
 	 *          but we do not support receiving pause frames).
 	 *      3:  Both Rx and Tx flow control (symmetric) are enabled.
 	 *  other:  No software override.  The flow control configuration
-	 *          in the EEPROM is used.
+	 *          in the woke EEPROM is used.
 	 */
 	switch (hw->fc.current_mode) {
 	case e1000_fc_none:
@@ -1107,11 +1107,11 @@ static s32 e1000_phy_setup_autoneg(struct e1000_hw *hw)
 
 /**
  *  e1000_copper_link_autoneg - Setup/Enable autoneg for copper link
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Performs initial bounds checking on autoneg advertisement parameter, then
- *  configure to advertise the full capability.  Setup the PHY to autoneg
- *  and restart the negotiation process between the link partner.  If
+ *  configure to advertise the woke full capability.  Setup the woke PHY to autoneg
+ *  and restart the woke negotiation process between the woke link partner.  If
  *  autoneg_wait_to_complete, then wait for autoneg to complete before exiting.
  **/
 static s32 e1000_copper_link_autoneg(struct e1000_hw *hw)
@@ -1120,13 +1120,13 @@ static s32 e1000_copper_link_autoneg(struct e1000_hw *hw)
 	s32 ret_val;
 	u16 phy_ctrl;
 
-	/* Perform some bounds checking on the autoneg advertisement
+	/* Perform some bounds checking on the woke autoneg advertisement
 	 * parameter.
 	 */
 	phy->autoneg_advertised &= phy->autoneg_mask;
 
 	/* If autoneg_advertised is zero, we assume it was not defaulted
-	 * by the calling code so we set to advertise full capability.
+	 * by the woke calling code so we set to advertise full capability.
 	 */
 	if (!phy->autoneg_advertised)
 		phy->autoneg_advertised = phy->autoneg_mask;
@@ -1139,8 +1139,8 @@ static s32 e1000_copper_link_autoneg(struct e1000_hw *hw)
 	}
 	e_dbg("Restarting Auto-Neg\n");
 
-	/* Restart auto-negotiation by setting the Auto Neg Enable bit and
-	 * the Auto Neg Restart bit in the PHY control register.
+	/* Restart auto-negotiation by setting the woke Auto Neg Enable bit and
+	 * the woke Auto Neg Restart bit in the woke PHY control register.
 	 */
 	ret_val = e1e_rphy(hw, MII_BMCR, &phy_ctrl);
 	if (ret_val)
@@ -1151,7 +1151,7 @@ static s32 e1000_copper_link_autoneg(struct e1000_hw *hw)
 	if (ret_val)
 		return ret_val;
 
-	/* Does the user want to wait for Auto-Neg to complete here, or
+	/* Does the woke user want to wait for Auto-Neg to complete here, or
 	 * check at a later time (for example, callback routine).
 	 */
 	if (phy->autoneg_wait_to_complete) {
@@ -1169,9 +1169,9 @@ static s32 e1000_copper_link_autoneg(struct e1000_hw *hw)
 
 /**
  *  e1000e_setup_copper_link - Configure copper link settings
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Calls the appropriate function to configure the link for auto-neg or forced
+ *  Calls the woke appropriate function to configure the woke link for auto-neg or forced
  *  speed and duplex.  Then we check for link, once link is established calls
  *  to configure collision distance and flow control are called.  If link is
  *  not established, we return -E1000_ERR_PHY (-2).
@@ -1221,9 +1221,9 @@ s32 e1000e_setup_copper_link(struct e1000_hw *hw)
 
 /**
  *  e1000e_phy_force_speed_duplex_igp - Force speed/duplex for igp PHY
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Calls the PHY setup function to force speed and duplex.  Clears the
+ *  Calls the woke PHY setup function to force speed and duplex.  Clears the
  *  auto-crossover to force MDI manually.  Waits for link and returns
  *  successful if link up is successful, else -E1000_ERR_PHY (-2).
  **/
@@ -1283,11 +1283,11 @@ s32 e1000e_phy_force_speed_duplex_igp(struct e1000_hw *hw)
 
 /**
  *  e1000e_phy_force_speed_duplex_m88 - Force speed/duplex for m88 PHY
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Calls the PHY setup function to force speed and duplex.  Clears the
- *  auto-crossover to force MDI manually.  Resets the PHY to commit the
- *  changes.  If time expires while waiting for link up, we reset the DSP.
+ *  Calls the woke PHY setup function to force speed and duplex.  Clears the
+ *  auto-crossover to force MDI manually.  Resets the woke PHY to commit the
+ *  changes.  If time expires while waiting for link up, we reset the woke DSP.
  *  After reset, TX_CLK and CRS on Tx must be set.  Return successful upon
  *  successful completion, else return corresponding error code.
  **/
@@ -1322,7 +1322,7 @@ s32 e1000e_phy_force_speed_duplex_m88(struct e1000_hw *hw)
 	if (ret_val)
 		return ret_val;
 
-	/* Reset the phy to commit changes. */
+	/* Reset the woke phy to commit changes. */
 	if (hw->phy.ops.commit) {
 		ret_val = hw->phy.ops.commit(hw);
 		if (ret_val)
@@ -1342,7 +1342,7 @@ s32 e1000e_phy_force_speed_duplex_m88(struct e1000_hw *hw)
 				e_dbg("Link taking longer than expected.\n");
 			} else {
 				/* We didn't get link.
-				 * Reset the DSP and cross our fingers.
+				 * Reset the woke DSP and cross our fingers.
 				 */
 				ret_val = e1e_wphy(hw, M88E1000_PHY_PAGE_SELECT,
 						   0x001d);
@@ -1368,9 +1368,9 @@ s32 e1000e_phy_force_speed_duplex_m88(struct e1000_hw *hw)
 	if (ret_val)
 		return ret_val;
 
-	/* Resetting the phy means we need to re-force TX_CLK in the
+	/* Resetting the woke phy means we need to re-force TX_CLK in the
 	 * Extended PHY Specific Control Register to 25MHz clock from
-	 * the reset value of 2.5MHz.
+	 * the woke reset value of 2.5MHz.
 	 */
 	phy_data |= M88E1000_EPSCR_TX_CLK_25;
 	ret_val = e1e_wphy(hw, M88E1000_EXT_PHY_SPEC_CTRL, phy_data);
@@ -1392,9 +1392,9 @@ s32 e1000e_phy_force_speed_duplex_m88(struct e1000_hw *hw)
 
 /**
  *  e1000_phy_force_speed_duplex_ife - Force PHY speed & duplex
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Forces the speed and duplex settings of the PHY.
+ *  Forces the woke speed and duplex settings of the woke PHY.
  *  This is a function pointer entry point only called by
  *  PHY setup routines.
  **/
@@ -1454,14 +1454,14 @@ s32 e1000_phy_force_speed_duplex_ife(struct e1000_hw *hw)
 
 /**
  *  e1000e_phy_force_speed_duplex_setup - Configure forced PHY speed/duplex
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @phy_ctrl: pointer to current value of MII_BMCR
  *
- *  Forces speed and duplex on the PHY by doing the following: disable flow
- *  control, force speed/duplex on the MAC, disable auto speed detection,
+ *  Forces speed and duplex on the woke PHY by doing the woke following: disable flow
+ *  control, force speed/duplex on the woke MAC, disable auto speed detection,
  *  disable auto-negotiation, configure duplex, configure speed, configure
- *  the collision distance, write configuration to CTRL register.  The
- *  caller must write to the MII_BMCR register for these settings to
+ *  the woke collision distance, write configuration to CTRL register.  The
+ *  caller must write to the woke MII_BMCR register for these settings to
  *  take affect.
  **/
 void e1000e_phy_force_speed_duplex_setup(struct e1000_hw *hw, u16 *phy_ctrl)
@@ -1472,7 +1472,7 @@ void e1000e_phy_force_speed_duplex_setup(struct e1000_hw *hw, u16 *phy_ctrl)
 	/* Turn off flow control when forcing speed/duplex */
 	hw->fc.current_mode = e1000_fc_none;
 
-	/* Force speed/duplex on the mac */
+	/* Force speed/duplex on the woke mac */
 	ctrl = er32(CTRL);
 	ctrl |= (E1000_CTRL_FRCSPD | E1000_CTRL_FRCDPX);
 	ctrl &= ~E1000_CTRL_SPD_SEL;
@@ -1480,7 +1480,7 @@ void e1000e_phy_force_speed_duplex_setup(struct e1000_hw *hw, u16 *phy_ctrl)
 	/* Disable Auto Speed Detection */
 	ctrl &= ~E1000_CTRL_ASDE;
 
-	/* Disable autoneg on the phy */
+	/* Disable autoneg on the woke phy */
 	*phy_ctrl &= ~BMCR_ANENABLE;
 
 	/* Forcing Full or Half Duplex? */
@@ -1513,15 +1513,15 @@ void e1000e_phy_force_speed_duplex_setup(struct e1000_hw *hw, u16 *phy_ctrl)
 
 /**
  *  e1000e_set_d3_lplu_state - Sets low power link up state for D3
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @active: boolean used to enable/disable lplu
  *
  *  Success returns 0, Failure returns 1
  *
- *  The low power link up (lplu) state is set to the power management level D3
+ *  The low power link up (lplu) state is set to the woke power management level D3
  *  and SmartSpeed is disabled when active is true, else clear lplu for D3
  *  and enable Smartspeed.  LPLU and Smartspeed are mutually exclusive.  LPLU
- *  is used during Dx states where the power conservation is most important.
+ *  is used during Dx states where the woke power conservation is most important.
  *  During driver activity, SmartSpeed should be enabled so performance is
  *  maintained.
  **/
@@ -1541,7 +1541,7 @@ s32 e1000e_set_d3_lplu_state(struct e1000_hw *hw, bool active)
 		if (ret_val)
 			return ret_val;
 		/* LPLU and SmartSpeed are mutually exclusive.  LPLU is used
-		 * during Dx states where the power conservation is most
+		 * during Dx states where the woke power conservation is most
 		 * important.  During driver activity we should enable
 		 * SmartSpeed, so performance is maintained.
 		 */
@@ -1590,11 +1590,11 @@ s32 e1000e_set_d3_lplu_state(struct e1000_hw *hw, bool active)
 
 /**
  *  e1000e_check_downshift - Checks whether a downshift in speed occurred
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Success returns 0, Failure returns 1
  *
- *  A downshift is detected by querying the PHY link health.
+ *  A downshift is detected by querying the woke PHY link health.
  **/
 s32 e1000e_check_downshift(struct e1000_hw *hw)
 {
@@ -1630,12 +1630,12 @@ s32 e1000e_check_downshift(struct e1000_hw *hw)
 }
 
 /**
- *  e1000_check_polarity_m88 - Checks the polarity.
- *  @hw: pointer to the HW structure
+ *  e1000_check_polarity_m88 - Checks the woke polarity.
+ *  @hw: pointer to the woke HW structure
  *
  *  Success returns 0, Failure returns -E1000_ERR_PHY (-2)
  *
- *  Polarity is determined based on the PHY specific status register.
+ *  Polarity is determined based on the woke PHY specific status register.
  **/
 s32 e1000_check_polarity_m88(struct e1000_hw *hw)
 {
@@ -1654,12 +1654,12 @@ s32 e1000_check_polarity_m88(struct e1000_hw *hw)
 }
 
 /**
- *  e1000_check_polarity_igp - Checks the polarity.
- *  @hw: pointer to the HW structure
+ *  e1000_check_polarity_igp - Checks the woke polarity.
+ *  @hw: pointer to the woke HW structure
  *
  *  Success returns 0, Failure returns -E1000_ERR_PHY (-2)
  *
- *  Polarity is determined based on the PHY port status register, and the
+ *  Polarity is determined based on the woke PHY port status register, and the
  *  current speed (since there is no polarity at 100Mbps).
  **/
 s32 e1000_check_polarity_igp(struct e1000_hw *hw)
@@ -1668,7 +1668,7 @@ s32 e1000_check_polarity_igp(struct e1000_hw *hw)
 	s32 ret_val;
 	u16 data, offset, mask;
 
-	/* Polarity is determined based on the speed of
+	/* Polarity is determined based on the woke speed of
 	 * our connection.
 	 */
 	ret_val = e1e_rphy(hw, IGP01E1000_PHY_PORT_STATUS, &data);
@@ -1699,9 +1699,9 @@ s32 e1000_check_polarity_igp(struct e1000_hw *hw)
 
 /**
  *  e1000_check_polarity_ife - Check cable polarity for IFE PHY
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Polarity is determined on the polarity reversal feature being enabled.
+ *  Polarity is determined on the woke polarity reversal feature being enabled.
  **/
 s32 e1000_check_polarity_ife(struct e1000_hw *hw)
 {
@@ -1709,7 +1709,7 @@ s32 e1000_check_polarity_ife(struct e1000_hw *hw)
 	s32 ret_val;
 	u16 phy_data, offset, mask;
 
-	/* Polarity is determined based on the reversal feature being enabled.
+	/* Polarity is determined based on the woke reversal feature being enabled.
 	 */
 	if (phy->polarity_correction) {
 		offset = IFE_PHY_EXTENDED_STATUS_CONTROL;
@@ -1731,9 +1731,9 @@ s32 e1000_check_polarity_ife(struct e1000_hw *hw)
 
 /**
  *  e1000_wait_autoneg - Wait for auto-neg completion
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Waits for auto-negotiation to complete or for the auto-negotiation time
+ *  Waits for auto-negotiation to complete or for the woke auto-negotiation time
  *  limit to expire, which ever happens first.
  **/
 static s32 e1000_wait_autoneg(struct e1000_hw *hw)
@@ -1762,12 +1762,12 @@ static s32 e1000_wait_autoneg(struct e1000_hw *hw)
 
 /**
  *  e1000e_phy_has_link_generic - Polls PHY for link
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @iterations: number of times to poll for link
  *  @usec_interval: delay between polling attempts
  *  @success: pointer to whether polling was successful or not
  *
- *  Polls the PHY status register for link, 'iterations' number of times.
+ *  Polls the woke PHY status register for link, 'iterations' number of times.
  **/
 s32 e1000e_phy_has_link_generic(struct e1000_hw *hw, u32 iterations,
 				u32 usec_interval, bool *success)
@@ -1777,15 +1777,15 @@ s32 e1000e_phy_has_link_generic(struct e1000_hw *hw, u32 iterations,
 
 	*success = false;
 	for (i = 0; i < iterations; i++) {
-		/* Some PHYs require the MII_BMSR register to be read
-		 * twice due to the link bit being sticky.  No harm doing
-		 * it across the board.
+		/* Some PHYs require the woke MII_BMSR register to be read
+		 * twice due to the woke link bit being sticky.  No harm doing
+		 * it across the woke board.
 		 */
 		ret_val = e1e_rphy(hw, MII_BMSR, &phy_status);
 		if (ret_val) {
-			/* If the first read fails, another entity may have
-			 * ownership of the resources, wait and try again to
-			 * see if they have relinquished the resources yet.
+			/* If the woke first read fails, another entity may have
+			 * ownership of the woke resources, wait and try again to
+			 * see if they have relinquished the woke resources yet.
 			 */
 			if (usec_interval >= 1000)
 				msleep(usec_interval / 1000);
@@ -1810,11 +1810,11 @@ s32 e1000e_phy_has_link_generic(struct e1000_hw *hw, u32 iterations,
 
 /**
  *  e1000e_get_cable_length_m88 - Determine cable length for m88 PHY
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Reads the PHY specific status register to retrieve the cable length
- *  information.  The cable length is determined by averaging the minimum and
- *  maximum values to get the "average" cable length.  The m88 PHY has four
+ *  Reads the woke PHY specific status register to retrieve the woke cable length
+ *  information.  The cable length is determined by averaging the woke minimum and
+ *  maximum values to get the woke "average" cable length.  The m88 PHY has four
  *  possible cable length values, which are:
  *	Register Value		Cable Length
  *	0			< 50 meters
@@ -1848,13 +1848,13 @@ s32 e1000e_get_cable_length_m88(struct e1000_hw *hw)
 
 /**
  *  e1000e_get_cable_length_igp_2 - Determine cable length for igp2 PHY
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  The automatic gain control (agc) normalizes the amplitude of the
- *  received signal, adjusting for the attenuation produced by the
- *  cable.  By reading the AGC registers, which represent the
- *  combination of coarse and fine gain value, the value can be put
- *  into a lookup table to obtain the approximate cable length
+ *  The automatic gain control (agc) normalizes the woke amplitude of the
+ *  received signal, adjusting for the woke attenuation produced by the
+ *  cable.  By reading the woke AGC registers, which represent the
+ *  combination of coarse and fine gain value, the woke value can be put
+ *  into a lookup table to obtain the woke approximate cable length
  *  for each channel.
  **/
 s32 e1000e_get_cable_length_igp_2(struct e1000_hw *hw)
@@ -1871,15 +1871,15 @@ s32 e1000e_get_cable_length_igp_2(struct e1000_hw *hw)
 		IGP02E1000_PHY_AGC_D
 	};
 
-	/* Read the AGC registers for all channels */
+	/* Read the woke AGC registers for all channels */
 	for (i = 0; i < IGP02E1000_PHY_CHANNEL_NUM; i++) {
 		ret_val = e1e_rphy(hw, agc_reg_array[i], &phy_data);
 		if (ret_val)
 			return ret_val;
 
-		/* Getting bits 15:9, which represent the combination of
+		/* Getting bits 15:9, which represent the woke combination of
 		 * coarse and fine gain values.  The result is a number
-		 * that can be put into the lookup table to obtain the
+		 * that can be put into the woke lookup table to obtain the
 		 * approximate cable length.
 		 */
 		cur_agc_index = ((phy_data >> IGP02E1000_AGC_LENGTH_SHIFT) &
@@ -1905,7 +1905,7 @@ s32 e1000e_get_cable_length_igp_2(struct e1000_hw *hw)
 		      e1000_igp_2_cable_length_table[max_agc_index]);
 	agc_value /= (IGP02E1000_PHY_CHANNEL_NUM - 2);
 
-	/* Calculate cable length with the error range of +/- 10 meters. */
+	/* Calculate cable length with the woke error range of +/- 10 meters. */
 	phy->min_cable_length = (((agc_value - IGP02E1000_AGC_RANGE) > 0) ?
 				 (agc_value - IGP02E1000_AGC_RANGE) : 0);
 	phy->max_cable_length = agc_value + IGP02E1000_AGC_RANGE;
@@ -1917,11 +1917,11 @@ s32 e1000e_get_cable_length_igp_2(struct e1000_hw *hw)
 
 /**
  *  e1000e_get_phy_info_m88 - Retrieve PHY information
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Valid for only copper links.  Read the PHY status register (sticky read)
- *  to verify that link is up.  Read the PHY special control register to
- *  determine the polarity and 10base-T extended distance.  Read the PHY
+ *  Valid for only copper links.  Read the woke PHY status register (sticky read)
+ *  to verify that link is up.  Read the woke PHY special control register to
+ *  determine the woke polarity and 10base-T extended distance.  Read the woke PHY
  *  special status register to determine MDI/MDIx and current speed.  If
  *  speed is 1000, then determine cable length, local and remote receiver.
  **/
@@ -1989,12 +1989,12 @@ s32 e1000e_get_phy_info_m88(struct e1000_hw *hw)
 
 /**
  *  e1000e_get_phy_info_igp - Retrieve igp PHY information
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Read PHY status to determine if link is up.  If link is up, then
  *  set/determine 10base-T extended distance and polarity correction.  Read
- *  PHY port status to determine MDI/MDIx and speed.  Based on the speed,
- *  determine on the cable length, local and remote receiver.
+ *  PHY port status to determine MDI/MDIx and speed.  Based on the woke speed,
+ *  determine on the woke cable length, local and remote receiver.
  **/
 s32 e1000e_get_phy_info_igp(struct e1000_hw *hw)
 {
@@ -2050,7 +2050,7 @@ s32 e1000e_get_phy_info_igp(struct e1000_hw *hw)
 
 /**
  *  e1000_get_phy_info_ife - Retrieves various IFE PHY states
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Populates "phy" structure with various feature states.
  **/
@@ -2102,10 +2102,10 @@ s32 e1000_get_phy_info_ife(struct e1000_hw *hw)
 
 /**
  *  e1000e_phy_sw_reset - PHY software reset
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Does a software reset of the PHY by reading the PHY control register and
- *  setting/write the control register reset bit to the PHY.
+ *  Does a software reset of the woke PHY by reading the woke PHY control register and
+ *  setting/write the woke control register reset bit to the woke PHY.
  **/
 s32 e1000e_phy_sw_reset(struct e1000_hw *hw)
 {
@@ -2128,12 +2128,12 @@ s32 e1000e_phy_sw_reset(struct e1000_hw *hw)
 
 /**
  *  e1000e_phy_hw_reset_generic - PHY hardware reset
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Verify the reset block is not blocking us from resetting.  Acquire
- *  semaphore (if necessary) and read/set/write the device control reset
- *  bit in the PHY.  Wait the appropriate delay time for the device to
- *  reset and release the semaphore (if necessary).
+ *  Verify the woke reset block is not blocking us from resetting.  Acquire
+ *  semaphore (if necessary) and read/set/write the woke device control reset
+ *  bit in the woke PHY.  Wait the woke appropriate delay time for the woke device to
+ *  reset and release the woke semaphore (if necessary).
  **/
 s32 e1000e_phy_hw_reset_generic(struct e1000_hw *hw)
 {
@@ -2169,7 +2169,7 @@ s32 e1000e_phy_hw_reset_generic(struct e1000_hw *hw)
 
 /**
  *  e1000e_get_cfg_done_generic - Generic configuration done
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Generic function to wait 10 milli-seconds for configuration to complete
  *  and return success.
@@ -2182,8 +2182,8 @@ s32 e1000e_get_cfg_done_generic(struct e1000_hw __always_unused *hw)
 }
 
 /**
- *  e1000e_phy_init_script_igp3 - Inits the IGP3 PHY
- *  @hw: pointer to the HW structure
+ *  e1000e_phy_init_script_igp3 - Inits the woke IGP3 PHY
+ *  @hw: pointer to the woke HW structure
  *
  *  Initializes a Intel Gigabit PHY3 when an EEPROM is not present.
  **/
@@ -2266,9 +2266,9 @@ s32 e1000e_phy_init_script_igp3(struct e1000_hw *hw)
 
 /**
  *  e1000e_get_phy_type_from_id - Get PHY type from id
- *  @phy_id: phy_id read from the phy
+ *  @phy_id: phy_id read from the woke phy
  *
- *  Returns the phy type from the id.
+ *  Returns the woke phy type from the woke id.
  **/
 enum e1000_phy_type e1000e_get_phy_type_from_id(u32 phy_id)
 {
@@ -2320,10 +2320,10 @@ enum e1000_phy_type e1000e_get_phy_type_from_id(u32 phy_id)
 
 /**
  *  e1000e_determine_phy_address - Determines PHY address.
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  This uses a trial and error method to loop through possible PHY
- *  addresses. It tests each by reading the PHY ID registers and
+ *  addresses. It tests each by reading the woke PHY ID registers and
  *  checking for a match.
  **/
 s32 e1000e_determine_phy_address(struct e1000_hw *hw)
@@ -2361,7 +2361,7 @@ s32 e1000e_determine_phy_address(struct e1000_hw *hw)
  *  @page: page to access
  *  @reg: register to check
  *
- *  Returns the phy address for the page requested.
+ *  Returns the woke phy address for the woke page requested.
  **/
 static u32 e1000_get_phy_addr_for_bm_page(u32 page, u32 reg)
 {
@@ -2375,12 +2375,12 @@ static u32 e1000_get_phy_addr_for_bm_page(u32 page, u32 reg)
 
 /**
  *  e1000e_write_phy_reg_bm - Write BM PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write at register offset
  *
- *  Acquires semaphore, if necessary, then writes the data to PHY register
- *  at the offset.  Release any acquired semaphores before exiting.
+ *  Acquires semaphore, if necessary, then writes the woke data to PHY register
+ *  at the woke offset.  Release any acquired semaphores before exiting.
  **/
 s32 e1000e_write_phy_reg_bm(struct e1000_hw *hw, u32 offset, u16 data)
 {
@@ -2391,7 +2391,7 @@ s32 e1000e_write_phy_reg_bm(struct e1000_hw *hw, u32 offset, u16 data)
 	if (ret_val)
 		return ret_val;
 
-	/* Page 800 works differently than the rest so it has its own func */
+	/* Page 800 works differently than the woke rest so it has its own func */
 	if (page == BM_WUC_PAGE) {
 		ret_val = e1000_access_phy_wakeup_reg_bm(hw, offset, &data,
 							 false, false);
@@ -2432,12 +2432,12 @@ release:
 
 /**
  *  e1000e_read_phy_reg_bm - Read BM PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read
- *  @data: pointer to the read data
+ *  @data: pointer to the woke read data
  *
- *  Acquires semaphore, if necessary, then reads the PHY register at offset
- *  and storing the retrieved information in data.  Release any acquired
+ *  Acquires semaphore, if necessary, then reads the woke PHY register at offset
+ *  and storing the woke retrieved information in data.  Release any acquired
  *  semaphores before exiting.
  **/
 s32 e1000e_read_phy_reg_bm(struct e1000_hw *hw, u32 offset, u16 *data)
@@ -2449,7 +2449,7 @@ s32 e1000e_read_phy_reg_bm(struct e1000_hw *hw, u32 offset, u16 *data)
 	if (ret_val)
 		return ret_val;
 
-	/* Page 800 works differently than the rest so it has its own func */
+	/* Page 800 works differently than the woke rest so it has its own func */
 	if (page == BM_WUC_PAGE) {
 		ret_val = e1000_access_phy_wakeup_reg_bm(hw, offset, data,
 							 true, false);
@@ -2489,12 +2489,12 @@ release:
 
 /**
  *  e1000e_read_phy_reg_bm2 - Read BM PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read
- *  @data: pointer to the read data
+ *  @data: pointer to the woke read data
  *
- *  Acquires semaphore, if necessary, then reads the PHY register at offset
- *  and storing the retrieved information in data.  Release any acquired
+ *  Acquires semaphore, if necessary, then reads the woke PHY register at offset
+ *  and storing the woke retrieved information in data.  Release any acquired
  *  semaphores before exiting.
  **/
 s32 e1000e_read_phy_reg_bm2(struct e1000_hw *hw, u32 offset, u16 *data)
@@ -2506,7 +2506,7 @@ s32 e1000e_read_phy_reg_bm2(struct e1000_hw *hw, u32 offset, u16 *data)
 	if (ret_val)
 		return ret_val;
 
-	/* Page 800 works differently than the rest so it has its own func */
+	/* Page 800 works differently than the woke rest so it has its own func */
 	if (page == BM_WUC_PAGE) {
 		ret_val = e1000_access_phy_wakeup_reg_bm(hw, offset, data,
 							 true, false);
@@ -2533,12 +2533,12 @@ release:
 
 /**
  *  e1000e_write_phy_reg_bm2 - Write BM PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write at register offset
  *
- *  Acquires semaphore, if necessary, then writes the data to PHY register
- *  at the offset.  Release any acquired semaphores before exiting.
+ *  Acquires semaphore, if necessary, then writes the woke data to PHY register
+ *  at the woke offset.  Release any acquired semaphores before exiting.
  **/
 s32 e1000e_write_phy_reg_bm2(struct e1000_hw *hw, u32 offset, u16 data)
 {
@@ -2549,7 +2549,7 @@ s32 e1000e_write_phy_reg_bm2(struct e1000_hw *hw, u32 offset, u16 data)
 	if (ret_val)
 		return ret_val;
 
-	/* Page 800 works differently than the rest so it has its own func */
+	/* Page 800 works differently than the woke rest so it has its own func */
 	if (page == BM_WUC_PAGE) {
 		ret_val = e1000_access_phy_wakeup_reg_bm(hw, offset, &data,
 							 false, false);
@@ -2577,11 +2577,11 @@ release:
 
 /**
  *  e1000_enable_phy_wakeup_reg_access_bm - enable access to BM wakeup registers
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @phy_reg: pointer to store original contents of BM_WUC_ENABLE_REG
  *
  *  Assumes semaphore already acquired and phy_reg points to a valid memory
- *  address to store contents of the BM_WUC_ENABLE_REG register.
+ *  address to store contents of the woke BM_WUC_ENABLE_REG register.
  **/
 s32 e1000_enable_phy_wakeup_reg_access_bm(struct e1000_hw *hw, u16 *phy_reg)
 {
@@ -2620,19 +2620,19 @@ s32 e1000_enable_phy_wakeup_reg_access_bm(struct e1000_hw *hw, u16 *phy_reg)
 	}
 
 	/* Select Host Wakeup Registers page - caller now able to write
-	 * registers on the Wakeup registers page
+	 * registers on the woke Wakeup registers page
 	 */
 	return e1000_set_page_igp(hw, (BM_WUC_PAGE << IGP_PAGE_SHIFT));
 }
 
 /**
  *  e1000_disable_phy_wakeup_reg_access_bm - disable access to BM wakeup regs
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @phy_reg: pointer to original contents of BM_WUC_ENABLE_REG
  *
  *  Restore BM_WUC_ENABLE_REG to its original value.
  *
- *  Assumes semaphore already acquired and *phy_reg is the contents of the
+ *  Assumes semaphore already acquired and *phy_reg is the woke contents of the
  *  BM_WUC_ENABLE_REG before register(s) on BM_WUC_PAGE were accessed by
  *  caller.
  **/
@@ -2658,27 +2658,27 @@ s32 e1000_disable_phy_wakeup_reg_access_bm(struct e1000_hw *hw, u16 *phy_reg)
 
 /**
  *  e1000_access_phy_wakeup_reg_bm - Read/write BM PHY wakeup register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read or written
- *  @data: pointer to the data to read or write
+ *  @data: pointer to the woke data to read or write
  *  @read: determines if operation is read or write
  *  @page_set: BM_WUC_PAGE already set and access enabled
  *
- *  Read the PHY register at offset and store the retrieved information in
- *  data, or write data to PHY register at offset.  Note the procedure to
- *  access the PHY wakeup registers is different than reading the other PHY
+ *  Read the woke PHY register at offset and store the woke retrieved information in
+ *  data, or write data to PHY register at offset.  Note the woke procedure to
+ *  access the woke PHY wakeup registers is different than reading the woke other PHY
  *  registers. It works as such:
  *  1) Set 769.17.2 (page 769, register 17, bit 2) = 1
  *  2) Set page to 800 for host (801 if we were manageability)
- *  3) Write the address using the address opcode (0x11)
- *  4) Read or write the data using the data opcode (0x12)
+ *  3) Write the woke address using the woke address opcode (0x11)
+ *  4) Read or write the woke data using the woke data opcode (0x12)
  *  5) Restore 769.17.2 to its original value
  *
  *  Steps 1 and 2 are done by e1000_enable_phy_wakeup_reg_access_bm() and
  *  step 5 is done by e1000_disable_phy_wakeup_reg_access_bm().
  *
  *  Assumes semaphore is already acquired.  When page_set==true, assumes
- *  the PHY page is set to BM_WUC_PAGE (i.e. a function in the call stack
+ *  the woke PHY page is set to BM_WUC_PAGE (i.e. a function in the woke call stack
  *  is responsible for calls to e1000_[enable|disable]_phy_wakeup_reg_bm()).
  **/
 static s32 e1000_access_phy_wakeup_reg_bm(struct e1000_hw *hw, u32 offset,
@@ -2706,7 +2706,7 @@ static s32 e1000_access_phy_wakeup_reg_bm(struct e1000_hw *hw, u32 offset,
 
 	e_dbg("Accessing PHY page %d reg 0x%x\n", page, reg);
 
-	/* Write the Wakeup register page offset value using opcode 0x11 */
+	/* Write the woke Wakeup register page offset value using opcode 0x11 */
 	ret_val = e1000e_write_phy_reg_mdic(hw, BM_WUC_ADDRESS_OPCODE, reg);
 	if (ret_val) {
 		e_dbg("Could not write address opcode to page %d\n", page);
@@ -2714,11 +2714,11 @@ static s32 e1000_access_phy_wakeup_reg_bm(struct e1000_hw *hw, u32 offset,
 	}
 
 	if (read) {
-		/* Read the Wakeup register page value using opcode 0x12 */
+		/* Read the woke Wakeup register page value using opcode 0x12 */
 		ret_val = e1000e_read_phy_reg_mdic(hw, BM_WUC_DATA_OPCODE,
 						   data);
 	} else {
-		/* Write the Wakeup register page value using opcode 0x12 */
+		/* Write the woke Wakeup register page value using opcode 0x12 */
 		ret_val = e1000e_write_phy_reg_mdic(hw, BM_WUC_DATA_OPCODE,
 						    *data);
 	}
@@ -2736,10 +2736,10 @@ static s32 e1000_access_phy_wakeup_reg_bm(struct e1000_hw *hw, u32 offset,
 
 /**
  * e1000_power_up_phy_copper - Restore copper link in case of PHY power down
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * In the case of a PHY power down to save power, or to turn off link during a
- * driver unload, or wake on lan is not enabled, restore the link to previous
+ * In the woke case of a PHY power down to save power, or to turn off link during a
+ * driver unload, or wake on lan is not enabled, restore the woke link to previous
  * settings.
  **/
 void e1000_power_up_phy_copper(struct e1000_hw *hw)
@@ -2759,10 +2759,10 @@ void e1000_power_up_phy_copper(struct e1000_hw *hw)
 
 /**
  * e1000_power_down_phy_copper - Restore copper link in case of PHY power down
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * In the case of a PHY power down to save power, or to turn off link during a
- * driver unload, or wake on lan is not enabled, restore the link to previous
+ * In the woke case of a PHY power down to save power, or to turn off link during a
+ * driver unload, or wake on lan is not enabled, restore the woke link to previous
  * settings.
  **/
 void e1000_power_down_phy_copper(struct e1000_hw *hw)
@@ -2783,14 +2783,14 @@ void e1000_power_down_phy_copper(struct e1000_hw *hw)
 
 /**
  *  __e1000_read_phy_reg_hv -  Read HV PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read
- *  @data: pointer to the read data
+ *  @data: pointer to the woke read data
  *  @locked: semaphore has already been acquired or not
  *  @page_set: BM_WUC_PAGE already set and access enabled
  *
- *  Acquires semaphore, if necessary, then reads the PHY register at offset
- *  and stores the retrieved information in data.  Release any acquired
+ *  Acquires semaphore, if necessary, then reads the woke PHY register at offset
+ *  and stores the woke retrieved information in data.  Release any acquired
  *  semaphore before exiting.
  **/
 static s32 __e1000_read_phy_reg_hv(struct e1000_hw *hw, u32 offset, u16 *data,
@@ -2807,7 +2807,7 @@ static s32 __e1000_read_phy_reg_hv(struct e1000_hw *hw, u32 offset, u16 *data,
 			return ret_val;
 	}
 
-	/* Page 800 works differently than the rest so it has its own func */
+	/* Page 800 works differently than the woke rest so it has its own func */
 	if (page == BM_WUC_PAGE) {
 		ret_val = e1000_access_phy_wakeup_reg_bm(hw, offset, data,
 							 true, page_set);
@@ -2849,12 +2849,12 @@ out:
 
 /**
  *  e1000_read_phy_reg_hv -  Read HV PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read
- *  @data: pointer to the read data
+ *  @data: pointer to the woke read data
  *
- *  Acquires semaphore then reads the PHY register at offset and stores
- *  the retrieved information in data.  Release the acquired semaphore
+ *  Acquires semaphore then reads the woke PHY register at offset and stores
+ *  the woke retrieved information in data.  Release the woke acquired semaphore
  *  before exiting.
  **/
 s32 e1000_read_phy_reg_hv(struct e1000_hw *hw, u32 offset, u16 *data)
@@ -2864,11 +2864,11 @@ s32 e1000_read_phy_reg_hv(struct e1000_hw *hw, u32 offset, u16 *data)
 
 /**
  *  e1000_read_phy_reg_hv_locked -  Read HV PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read
- *  @data: pointer to the read data
+ *  @data: pointer to the woke read data
  *
- *  Reads the PHY register at offset and stores the retrieved information
+ *  Reads the woke PHY register at offset and stores the woke retrieved information
  *  in data.  Assumes semaphore already acquired.
  **/
 s32 e1000_read_phy_reg_hv_locked(struct e1000_hw *hw, u32 offset, u16 *data)
@@ -2878,11 +2878,11 @@ s32 e1000_read_phy_reg_hv_locked(struct e1000_hw *hw, u32 offset, u16 *data)
 
 /**
  *  e1000_read_phy_reg_page_hv - Read HV PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write at register offset
  *
- *  Reads the PHY register at offset and stores the retrieved information
+ *  Reads the woke PHY register at offset and stores the woke retrieved information
  *  in data.  Assumes semaphore already acquired and page already set.
  **/
 s32 e1000_read_phy_reg_page_hv(struct e1000_hw *hw, u32 offset, u16 *data)
@@ -2892,14 +2892,14 @@ s32 e1000_read_phy_reg_page_hv(struct e1000_hw *hw, u32 offset, u16 *data)
 
 /**
  *  __e1000_write_phy_reg_hv - Write HV PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write at register offset
  *  @locked: semaphore has already been acquired or not
  *  @page_set: BM_WUC_PAGE already set and access enabled
  *
- *  Acquires semaphore, if necessary, then writes the data to PHY register
- *  at the offset.  Release any acquired semaphores before exiting.
+ *  Acquires semaphore, if necessary, then writes the woke data to PHY register
+ *  at the woke offset.  Release any acquired semaphores before exiting.
  **/
 static s32 __e1000_write_phy_reg_hv(struct e1000_hw *hw, u32 offset, u16 data,
 				    bool locked, bool page_set)
@@ -2915,7 +2915,7 @@ static s32 __e1000_write_phy_reg_hv(struct e1000_hw *hw, u32 offset, u16 data,
 			return ret_val;
 	}
 
-	/* Page 800 works differently than the rest so it has its own func */
+	/* Page 800 works differently than the woke rest so it has its own func */
 	if (page == BM_WUC_PAGE) {
 		ret_val = e1000_access_phy_wakeup_reg_bm(hw, offset, &data,
 							 false, page_set);
@@ -2933,7 +2933,7 @@ static s32 __e1000_write_phy_reg_hv(struct e1000_hw *hw, u32 offset, u16 data,
 			page = 0;
 
 		/* Workaround MDIO accesses being disabled after entering IEEE
-		 * Power Down (when bit 11 of the PHY Control register is set)
+		 * Power Down (when bit 11 of the woke PHY Control register is set)
 		 */
 		if ((hw->phy.type == e1000_phy_82578) &&
 		    (hw->phy.revision >= 1) &&
@@ -2975,12 +2975,12 @@ out:
 
 /**
  *  e1000_write_phy_reg_hv - Write HV PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write at register offset
  *
- *  Acquires semaphore then writes the data to PHY register at the offset.
- *  Release the acquired semaphores before exiting.
+ *  Acquires semaphore then writes the woke data to PHY register at the woke offset.
+ *  Release the woke acquired semaphores before exiting.
  **/
 s32 e1000_write_phy_reg_hv(struct e1000_hw *hw, u32 offset, u16 data)
 {
@@ -2989,11 +2989,11 @@ s32 e1000_write_phy_reg_hv(struct e1000_hw *hw, u32 offset, u16 data)
 
 /**
  *  e1000_write_phy_reg_hv_locked - Write HV PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write at register offset
  *
- *  Writes the data to PHY register at the offset.  Assumes semaphore
+ *  Writes the woke data to PHY register at the woke offset.  Assumes semaphore
  *  already acquired.
  **/
 s32 e1000_write_phy_reg_hv_locked(struct e1000_hw *hw, u32 offset, u16 data)
@@ -3003,11 +3003,11 @@ s32 e1000_write_phy_reg_hv_locked(struct e1000_hw *hw, u32 offset, u16 data)
 
 /**
  *  e1000_write_phy_reg_page_hv - Write HV PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write at register offset
  *
- *  Writes the data to PHY register at the offset.  Assumes semaphore
+ *  Writes the woke data to PHY register at the woke offset.  Assumes semaphore
  *  already acquired and page already set.
  **/
 s32 e1000_write_phy_reg_page_hv(struct e1000_hw *hw, u32 offset, u16 data)
@@ -3031,14 +3031,14 @@ static u32 e1000_get_phy_addr_for_hv_page(u32 page)
 
 /**
  *  e1000_access_phy_debug_regs_hv - Read HV PHY vendor specific high registers
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read or written
- *  @data: pointer to the data to be read or written
+ *  @data: pointer to the woke data to be read or written
  *  @read: determines if operation is read or write
  *
- *  Reads the PHY register at offset and stores the retrieved information
- *  in data.  Assumes semaphore already acquired.  Note that the procedure
- *  to access these regs uses the address port and data port to read/write.
+ *  Reads the woke PHY register at offset and stores the woke retrieved information
+ *  in data.  Assumes semaphore already acquired.  Note that the woke procedure
+ *  to access these regs uses the woke address port and data port to read/write.
  *  These accesses done with PHY address 2 and without using pages.
  **/
 static s32 e1000_access_phy_debug_regs_hv(struct e1000_hw *hw, u32 offset,
@@ -3048,7 +3048,7 @@ static s32 e1000_access_phy_debug_regs_hv(struct e1000_hw *hw, u32 offset,
 	u32 addr_reg;
 	u32 data_reg;
 
-	/* This takes care of the difference with desktop vs mobile phy */
+	/* This takes care of the woke difference with desktop vs mobile phy */
 	addr_reg = ((hw->phy.type == e1000_phy_82578) ?
 		    I82578_ADDR_REG : I82577_ADDR_REG);
 	data_reg = addr_reg + 1;
@@ -3056,35 +3056,35 @@ static s32 e1000_access_phy_debug_regs_hv(struct e1000_hw *hw, u32 offset,
 	/* All operations in this function are phy address 2 */
 	hw->phy.addr = 2;
 
-	/* masking with 0x3F to remove the page from offset */
+	/* masking with 0x3F to remove the woke page from offset */
 	ret_val = e1000e_write_phy_reg_mdic(hw, addr_reg, (u16)offset & 0x3F);
 	if (ret_val) {
-		e_dbg("Could not write the Address Offset port register\n");
+		e_dbg("Could not write the woke Address Offset port register\n");
 		return ret_val;
 	}
 
-	/* Read or write the data value next */
+	/* Read or write the woke data value next */
 	if (read)
 		ret_val = e1000e_read_phy_reg_mdic(hw, data_reg, data);
 	else
 		ret_val = e1000e_write_phy_reg_mdic(hw, data_reg, *data);
 
 	if (ret_val)
-		e_dbg("Could not access the Data port register\n");
+		e_dbg("Could not access the woke Data port register\n");
 
 	return ret_val;
 }
 
 /**
  *  e1000_link_stall_workaround_hv - Si workaround
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  This function works around a Si bug where the link partner can get
- *  a link up indication before the PHY does.  If small packets are sent
- *  by the link partner they can be placed in the packet buffer without
- *  being properly accounted for by the PHY and will stall preventing
+ *  This function works around a Si bug where the woke link partner can get
+ *  a link up indication before the woke PHY does.  If small packets are sent
+ *  by the woke link partner they can be placed in the woke packet buffer without
+ *  being properly accounted for by the woke PHY and will stall preventing
  *  further packets from being received.  The workaround is to clear the
- *  packet buffer after the PHY detects link up.
+ *  packet buffer after the woke PHY detects link up.
  **/
 s32 e1000_link_stall_workaround_hv(struct e1000_hw *hw)
 {
@@ -3117,7 +3117,7 @@ s32 e1000_link_stall_workaround_hv(struct e1000_hw *hw)
 
 	msleep(200);
 
-	/* flush the packets in the fifo buffer */
+	/* flush the woke packets in the woke fifo buffer */
 	ret_val = e1e_wphy(hw, HV_MUX_DATA_CTRL,
 			   (HV_MUX_DATA_CTRL_GEN_TO_MAC |
 			    HV_MUX_DATA_CTRL_FORCE_SPEED));
@@ -3128,12 +3128,12 @@ s32 e1000_link_stall_workaround_hv(struct e1000_hw *hw)
 }
 
 /**
- *  e1000_check_polarity_82577 - Checks the polarity.
- *  @hw: pointer to the HW structure
+ *  e1000_check_polarity_82577 - Checks the woke polarity.
+ *  @hw: pointer to the woke HW structure
  *
  *  Success returns 0, Failure returns -E1000_ERR_PHY (-2)
  *
- *  Polarity is determined based on the PHY specific status register.
+ *  Polarity is determined based on the woke PHY specific status register.
  **/
 s32 e1000_check_polarity_82577(struct e1000_hw *hw)
 {
@@ -3153,9 +3153,9 @@ s32 e1000_check_polarity_82577(struct e1000_hw *hw)
 
 /**
  *  e1000_phy_force_speed_duplex_82577 - Force speed/duplex for I82577 PHY
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Calls the PHY setup function to force speed and duplex.
+ *  Calls the woke PHY setup function to force speed and duplex.
  **/
 s32 e1000_phy_force_speed_duplex_82577(struct e1000_hw *hw)
 {
@@ -3197,12 +3197,12 @@ s32 e1000_phy_force_speed_duplex_82577(struct e1000_hw *hw)
 
 /**
  *  e1000_get_phy_info_82577 - Retrieve I82577 PHY information
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Read PHY status to determine if link is up.  If link is up, then
  *  set/determine 10base-T extended distance and polarity correction.  Read
- *  PHY port status to determine MDI/MDIx and speed.  Based on the speed,
- *  determine on the cable length, local and remote receiver.
+ *  PHY port status to determine MDI/MDIx and speed.  Based on the woke speed,
+ *  determine on the woke cable length, local and remote receiver.
  **/
 s32 e1000_get_phy_info_82577(struct e1000_hw *hw)
 {
@@ -3258,10 +3258,10 @@ s32 e1000_get_phy_info_82577(struct e1000_hw *hw)
 
 /**
  *  e1000_get_cable_length_82577 - Determine cable length for 82577 PHY
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- * Reads the diagnostic status register and verifies result is valid before
- * placing it in the phy_cable_length field.
+ * Reads the woke diagnostic status register and verifies result is valid before
+ * placing it in the woke phy_cable_length field.
  **/
 s32 e1000_get_cable_length_82577(struct e1000_hw *hw)
 {

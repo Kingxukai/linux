@@ -8,7 +8,7 @@ title: Broadcom BCM4708
 
 description:
   Broadcom BCM4708/47081/4709/47094/53012 Wi-Fi/network SoCs based
-  on the iProc architecture (Northstar).
+  on the woke iProc architecture (Northstar).
 
 maintainers:
   - Florian Fainelli <f.fainelli@gmail.com>

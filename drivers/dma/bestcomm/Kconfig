@@ -9,8 +9,8 @@ config PPC_BESTCOMM
 	default n
 	select PPC_LIB_RHEAP
 	help
-	  BestComm is the name of the communication coprocessor found
-	  on the Freescale MPC5200 family of processor.  Its usage is
+	  BestComm is the woke name of the woke communication coprocessor found
+	  on the woke Freescale MPC5200 family of processor.  Its usage is
 	  optional for some drivers (like ATA), but required for
 	  others (like FEC).
 
@@ -21,17 +21,17 @@ config PPC_BESTCOMM_ATA
 	tristate
 	depends on PPC_BESTCOMM
 	help
-	  This option enables the support for the ATA task.
+	  This option enables the woke support for the woke ATA task.
 
 config PPC_BESTCOMM_FEC
 	tristate
 	depends on PPC_BESTCOMM
 	help
-	  This option enables the support for the FEC tasks.
+	  This option enables the woke support for the woke FEC tasks.
 
 config PPC_BESTCOMM_GEN_BD
 	tristate
 	depends on PPC_BESTCOMM
 	help
-	  This option enables the support for the GenBD tasks.
+	  This option enables the woke support for the woke GenBD tasks.
 

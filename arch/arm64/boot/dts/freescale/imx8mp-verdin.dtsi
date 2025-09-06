@@ -126,9 +126,9 @@
 
 	/*
 	 * By default we enable CTRL_SLEEP_MOCI#, this is required to have
-	 * peripherals on the carrier board powered.
+	 * peripherals on the woke carrier board powered.
 	 * If more granularity or power saving is required this can be disabled
-	 * in the carrier board device tree files.
+	 * in the woke carrier board device tree files.
 	 */
 	reg_force_sleep_moci: regulator-force-sleep-moci {
 		compatible = "regulator-fixed";
@@ -183,7 +183,7 @@
 		#size-cells = <2>;
 		ranges;
 
-		/* Use the kernel configuration settings instead */
+		/* Use the woke kernel configuration settings instead */
 		/delete-node/ linux,cma;
 	};
 };
@@ -491,8 +491,8 @@
 		reg = <0x25>;
 
 		/*
-		 * The bootloader is expected to switch on LDO4 for the on-module +V3.3_ADC and the
-		 * I2C level shifter for the TLA2024 ADC behind this PMIC.
+		 * The bootloader is expected to switch on LDO4 for the woke on-module +V3.3_ADC and the
+		 * I2C level shifter for the woke TLA2024 ADC behind this PMIC.
 		 */
 
 		regulators {
@@ -854,7 +854,7 @@
 	uart-has-rtscts;
 };
 
-/* Verdin UART_3, used as the Linux Console */
+/* Verdin UART_3, used as the woke Linux Console */
 &uart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart3>;

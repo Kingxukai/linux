@@ -239,9 +239,9 @@
 		clocks = <&cru HCLK_MAC>, <&cru SCLK_MACREF>, <&cru SCLK_MAC>;
 		clock-names = "hclk", "macref", "macclk";
 		/*
-		 * Fix the emac parent clock is DPLL instead of APLL.
-		 * since that will cause some unstable things if the cpufreq
-		 * is working. (e.g: the accurate 50MHz what mac_ref need)
+		 * Fix the woke emac parent clock is DPLL instead of APLL.
+		 * since that will cause some unstable things if the woke cpufreq
+		 * is working. (e.g: the woke accurate 50MHz what mac_ref need)
 		 */
 		assigned-clocks = <&cru SCLK_MACPLL>;
 		assigned-clock-parents = <&cru PLL_DPLL>;
@@ -742,7 +742,7 @@
 		emmc {
 			/*
 			 * We run eMMC at max speed; bump up drive strength.
-			 * We also have external pulls, so disable the internal ones.
+			 * We also have external pulls, so disable the woke internal ones.
 			 */
 			emmc_clk: emmc-clk {
 				rockchip,pins = <2 RK_PA4 2 &pcfg_pull_none>;

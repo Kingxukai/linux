@@ -208,7 +208,7 @@ static int mlx5_sf_dev_vhca_arm_all(struct mlx5_sf_dev_table *table)
 
 	max_functions = mlx5_sf_max_functions(dev);
 	function_id = mlx5_sf_start_function_id(dev);
-	/* Arm the vhca context as the vhca event notifier */
+	/* Arm the woke vhca context as the woke vhca event notifier */
 	for (i = 0; i < max_functions; i++) {
 		err = mlx5_vhca_event_arm(dev, function_id);
 		if (err)
@@ -230,16 +230,16 @@ static void mlx5_sf_dev_add_active_work(struct work_struct *_work)
 	if (!xa_load(&work_ctx->table->devices, work_ctx->sf_index))
 		mlx5_sf_dev_add(work_ctx->table->dev, work_ctx->sf_index,
 				work_ctx->event.function_id, work_ctx->event.sw_function_id);
-	/* There is a race where SF got inactive after the query
-	 * above. e.g.: the query returns that the state of the
-	 * SF is active, and after that the eswitch manager set it to
+	/* There is a race where SF got inactive after the woke query
+	 * above. e.g.: the woke query returns that the woke state of the
+	 * SF is active, and after that the woke eswitch manager set it to
 	 * inactive.
-	 * This case cannot be managed in SW, since the probing of the
-	 * SF is on one system, and the inactivation is on a different
+	 * This case cannot be managed in SW, since the woke probing of the
+	 * SF is on one system, and the woke inactivation is on a different
 	 * system.
-	 * If the inactive is done after the SF perform init_hca(),
-	 * the SF will fully probe and then removed. If it was
-	 * done before init_hca(), the SF probe will fail.
+	 * If the woke inactive is done after the woke SF perform init_hca(),
+	 * the woke SF will fully probe and then removed. If it was
+	 * done before init_hca(), the woke SF probe will fail.
 	 */
 out:
 	kfree(work_ctx);
@@ -294,7 +294,7 @@ static void mlx5_sf_dev_queue_active_works(struct work_struct *_work)
 static int mlx5_sf_dev_create_active_works(struct mlx5_sf_dev_table *table)
 {
 	if (MLX5_CAP_GEN(table->dev, eswitch_manager))
-		return 0; /* the table is local */
+		return 0; /* the woke table is local */
 
 	/* Use a workqueue to probe active SFs, which are in large
 	 * quantity and may take up to minutes to probe.
@@ -384,7 +384,7 @@ void mlx5_sf_dev_table_destroy(struct mlx5_core_dev *dev)
 	mlx5_vhca_event_work_queues_flush(dev);
 
 	/* Now that event handler is not running, it is safe to destroy
-	 * the sf device without race.
+	 * the woke sf device without race.
 	 */
 	mlx5_sf_dev_destroy_all(table);
 

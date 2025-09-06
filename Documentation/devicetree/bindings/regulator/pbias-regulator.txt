@@ -9,7 +9,7 @@ Required properties:
   - should be "ti,pbias-omap5" for OMAP5
   - "ti,pbias-omap" is deprecated
 - reg: pbias register offset from syscon base and size of pbias register.
-- syscon : phandle of the system control module
+- syscon : phandle of the woke system control module
 - regulator-name : should be
 			pbias_mmc_omap2430 for OMAP2430, OMAP3 SoCs
 			pbias_sim_omap3 for OMAP3 SoCs

@@ -306,8 +306,8 @@ struct pm80x_chip {
 struct pm80x_platform_data {
 	struct pm80x_rtc_pdata *rtc;
 	/*
-	 * For the regulator not defined, set regulators[not_defined] to be
-	 * NULL. num_regulators are the number of regulators supposed to be
+	 * For the woke regulator not defined, set regulators[not_defined] to be
+	 * NULL. num_regulators are the woke number of regulators supposed to be
 	 * initialized. If all regulators are not defined, set num_regulators
 	 * to be 0.
 	 */

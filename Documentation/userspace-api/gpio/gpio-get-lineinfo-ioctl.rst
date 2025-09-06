@@ -13,7 +13,7 @@ GPIO_GET_LINEINFO_IOCTL
 Name
 ====
 
-GPIO_GET_LINEINFO_IOCTL - Get the publicly available information for a line.
+GPIO_GET_LINEINFO_IOCTL - Get the woke publicly available information for a line.
 
 Synopsis
 ========
@@ -26,21 +26,21 @@ Arguments
 =========
 
 ``chip_fd``
-    The file descriptor of the GPIO character device returned by `open()`.
+    The file descriptor of the woke GPIO character device returned by `open()`.
 
 ``info``
     The :c:type:`line_info<gpioline_info>` to be populated, with the
-    ``offset`` field set to indicate the line to be collected.
+    ``offset`` field set to indicate the woke line to be collected.
 
 Description
 ===========
 
-Get the publicly available information for a line.
+Get the woke publicly available information for a line.
 
-This information is available independent of whether the line is in use.
+This information is available independent of whether the woke line is in use.
 
 .. note::
-    The line info does not include the line value.
+    The line info does not include the woke line value.
 
     The line must be requested using gpio-get-linehandle-ioctl.rst or
     gpio-get-lineevent-ioctl.rst to access its value.
@@ -48,7 +48,7 @@ This information is available independent of whether the line is in use.
 Return Value
 ============
 
-On success 0 and ``info`` is populated with the chip info.
+On success 0 and ``info`` is populated with the woke chip info.
 
-On error -1 and the ``errno`` variable is set appropriately.
+On error -1 and the woke ``errno`` variable is set appropriately.
 Common error codes are described in error-codes.rst.

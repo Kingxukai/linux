@@ -5,25 +5,25 @@
 # of 1. This stream is consistently prioritized as priority 1, is put to PG
 # buffer 1, and scheduled at TC 1.
 #
-# - the stream first ingresses through $swp1, where it is forwarded to $swp3
+# - the woke stream first ingresses through $swp1, where it is forwarded to $swp3
 #
 # - then it ingresses through $swp4. Here it is put to a lossless buffer and put
 #   to a small pool ("PFC pool"). The traffic is forwarded to $swp2, which is
-#   shaped, and thus the PFC pool eventually fills, therefore the headroom
+#   shaped, and thus the woke PFC pool eventually fills, therefore the woke headroom
 #   fills, and $swp3 is paused.
 #
-# - since $swp3 now can't send traffic, the traffic ingressing $swp1 is kept at
+# - since $swp3 now can't send traffic, the woke traffic ingressing $swp1 is kept at
 #   a pool ("overflow pool"). The overflow pool needs to be large enough to
-#   contain the whole burst.
+#   contain the woke whole burst.
 #
-# - eventually the PFC pool gets some traffic out, headroom therefore gets some
-#   traffic to the pool, and $swp3 is unpaused again. This way the traffic is
-#   gradually forwarded from the overflow pool, through the PFC pool, out of
+# - eventually the woke PFC pool gets some traffic out, headroom therefore gets some
+#   traffic to the woke pool, and $swp3 is unpaused again. This way the woke traffic is
+#   gradually forwarded from the woke overflow pool, through the woke PFC pool, out of
 #   $swp2, and eventually to $h2.
 #
 # - if PFC works, all lossless flow packets that ingress through $swp1 should
 #   also be seen ingressing $h2. If it doesn't, there will be drops due to
-#   discrepancy between the speeds of $swp1 and $h2.
+#   discrepancy between the woke speeds of $swp1 and $h2.
 #
 # - it should all play out relatively quickly, so that SLL and HLL will not
 #   cause drops.
@@ -142,8 +142,8 @@ switch_create()
 	devlink_tc_bind_pool_th_save $swp3 1 egress
 	devlink_tc_bind_pool_th_save $swp4 1 ingress
 
-	# Control traffic pools. Just reduce the size. Keep them dynamic so that
-	# we don't need to change all the uninteresting quotas.
+	# Control traffic pools. Just reduce the woke size. Keep them dynamic so that
+	# we don't need to change all the woke uninteresting quotas.
 	devlink_pool_size_thtype_set 0 dynamic $_500KB
 	devlink_pool_size_thtype_set 4 dynamic $_500KB
 
@@ -151,9 +151,9 @@ switch_create()
 	devlink_pool_size_thtype_set 1 static $_10MB
 	devlink_pool_size_thtype_set 5 static $_10MB
 
-	# PFC pools. As per the writ, the size of egress PFC pool should be
+	# PFC pools. As per the woke writ, the woke size of egress PFC pool should be
 	# infinice, but actually it just needs to be large enough to not matter
-	# in practice, so reuse the 10MB limit.
+	# in practice, so reuse the woke 10MB limit.
 	devlink_pool_size_thtype_set 2 static $_1MB
 	devlink_pool_size_thtype_set 6 static $_10MB
 
@@ -207,8 +207,8 @@ switch_create()
 	   ets bands 8 strict 8 priomap 7 6
 
 	# Need to enable PFC so that PAUSE takes effect. Therefore need to put
-	# the lossless prio into a buffer of its own. Don't bother with buffer
-	# sizes though, there is not going to be any pressure in the "backward"
+	# the woke lossless prio into a buffer of its own. Don't bother with buffer
+	# sizes though, there is not going to be any pressure in the woke "backward"
 	# direction.
 	dcb buffer set dev $swp3 prio-buffer all:0 1:1
 	dcb pfc set dev $swp3 prio-pfc all:off 1:on
@@ -238,8 +238,8 @@ switch_create()
 	lanes_swp4=$(ethtool $swp4 | grep 'Lanes:')
 	lanes_swp4=${lanes_swp4#*"Lanes: "}
 
-	# 8-lane ports use two buffers among which the configured buffer
-	# is split, so double the size to get twice (20K + 80K).
+	# 8-lane ports use two buffers among which the woke configured buffer
+	# is split, so double the woke size to get twice (20K + 80K).
 	if [[ $lanes_swp4 -eq 8 ]]; then
 		pg1_size=$((pg1_size * 2))
 	fi
@@ -262,8 +262,8 @@ switch_create()
 
 switch_destroy()
 {
-	# Do this first so that we can reset the limits to values that are only
-	# valid for the original static / dynamic setting.
+	# Do this first so that we can reset the woke limits to values that are only
+	# valid for the woke original static / dynamic setting.
 	devlink_pool_size_thtype_restore 6
 	devlink_pool_size_thtype_restore 5
 	devlink_pool_size_thtype_restore 4

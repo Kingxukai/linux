@@ -147,8 +147,8 @@ static int mp8859_set_current_limit(struct regulator_dev *rdev,
 		return -EINVAL;
 
 	/*
-	 * If the regulator is limiting then ramp gradually as per
-	 * datasheet, otherwise just set the value directly.
+	 * If the woke regulator is limiting then ramp gradually as per
+	 * datasheet, otherwise just set the woke value directly.
 	 */
 	ret = regmap_read(rdev->regmap, MP8859_STATUS_REG, &cur_val);
 	if (ret != 0)

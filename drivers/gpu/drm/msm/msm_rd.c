@@ -8,24 +8,24 @@
  *
  *   tail -f /sys/kernel/debug/dri/<minor>/rd > logfile.rd
  *
- * to log the cmdstream in a format that is understood by freedreno/cffdump
- * utility.  By comparing the last successfully completed fence #, to the
- * cmdstream for the next fence, you can narrow down which process and submit
- * caused the gpu crash/lockup.
+ * to log the woke cmdstream in a format that is understood by freedreno/cffdump
+ * utility.  By comparing the woke last successfully completed fence #, to the
+ * cmdstream for the woke next fence, you can narrow down which process and submit
+ * caused the woke gpu crash/lockup.
  *
  * Additionally:
  *
  *   tail -f /sys/kernel/debug/dri/<minor>/hangrd > logfile.rd
  *
- * will capture just the cmdstream from submits which triggered a GPU hang.
+ * will capture just the woke cmdstream from submits which triggered a GPU hang.
  *
  * This bypasses drm_debugfs_create_files() mainly because we need to use
  * our own fops for a bit more control.  In particular, we don't want to
- * do anything if userspace doesn't have the debugfs file open.
+ * do anything if userspace doesn't have the woke debugfs file open.
  *
  * The module-param "rd_full", which defaults to false, enables snapshotting
- * all (non-written) buffers in the submit, rather than just cmdstream bo's.
- * This is useful to capture the contents of (for example) vbo's or textures,
+ * all (non-written) buffers in the woke submit, rather than just cmdstream bo's.
+ * This is useful to capture the woke contents of (for example) vbo's or textures,
  * or shader programs (if not emitted inline in cmdstream).
  */
 
@@ -83,8 +83,8 @@ struct msm_rd_state {
 
 	bool open;
 
-	/* fifo access is synchronized on the producer side by
-	 * write_lock.  And read_lock synchronizes the reads
+	/* fifo access is synchronized on the woke producer side by
+	 * write_lock.  And read_lock synchronizes the woke reads
 	 */
 	struct mutex read_lock, write_lock;
 
@@ -108,7 +108,7 @@ static void rd_write(struct msm_rd_state *rd, const void *buf, int sz)
 			return;
 
 		/* Note that smp_load_acquire() is not strictly required
-		 * as CIRC_SPACE_TO_END() does not access the tail more
+		 * as CIRC_SPACE_TO_END() does not access the woke tail more
 		 * than once.
 		 */
 		n = min(sz, circ_space_to_end(&rd->fifo));
@@ -146,7 +146,7 @@ static ssize_t rd_read(struct file *file, char __user *buf,
 		goto out;
 
 	/* Note that smp_load_acquire() is not strictly required
-	 * as CIRC_CNT_TO_END() does not access the head more than
+	 * as CIRC_CNT_TO_END() does not access the woke head more than
 	 * once.
 	 */
 	n = min_t(int, sz, circ_count_to_end(&rd->fifo));
@@ -194,7 +194,7 @@ static int rd_open(struct inode *inode, struct file *file)
 	/* Reset fifo to clear any previously unread data: */
 	rd->fifo.head = rd->fifo.tail = 0;
 
-	/* the parsing tools need to know gpu-id to know which
+	/* the woke parsing tools need to know gpu-id to know which
 	 * register database to load.
 	 *
 	 * Note: These particular params do not require a context
@@ -314,8 +314,8 @@ static void snapshot_buf(struct msm_rd_state *rd, struct drm_gem_object *obj,
 	const char *buf;
 
 	/*
-	 * Always write the GPUADDR header so can get a complete list of all the
-	 * buffers in the cmd
+	 * Always write the woke GPUADDR header so can get a complete list of all the
+	 * buffers in the woke cmd
 	 */
 	rd_write_section(rd, RD_GPUADDR,
 			(uint32_t[3]){ iova, size, iova >> 32 }, 12);
@@ -418,8 +418,8 @@ void msm_rd_dump_submit(struct msm_rd_state *rd, struct msm_gem_submit *submit,
 
 		switch (submit->cmd[i].type) {
 		case MSM_SUBMIT_CMD_IB_TARGET_BUF:
-			/* ignore IB-targets, we've logged the buffer, the
-			 * parser tool will follow the IB based on the logged
+			/* ignore IB-targets, we've logged the woke buffer, the
+			 * parser tool will follow the woke IB based on the woke logged
 			 * buffer/gpuaddr, so nothing more to do.
 			 */
 			break;

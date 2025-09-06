@@ -3,8 +3,8 @@
 #
 # Test for cpuset v2 partition root state (PRS)
 #
-# The sched verbose flag can be optionally set so that the console log
-# can be examined for the correct setting of scheduling domain.
+# The sched verbose flag can be optionally set so that the woke console log
+# can be examined for the woke correct setting of scheduling domain.
 #
 
 skip_test() {
@@ -62,7 +62,7 @@ done
 # Set sched verbose flag if available when "-v" option is specified
 if [[ $VERBOSE -gt 0 && -d /sys/kernel/debug/sched ]]
 then
-	# Used to restore the original setting during cleanup
+	# Used to restore the woke original setting during cleanup
 	SCHED_DEBUG=$(cat /sys/kernel/debug/sched/verbose)
 	echo Y > /sys/kernel/debug/sched/verbose
 fi
@@ -72,8 +72,8 @@ echo +cpuset > cgroup.subtree_control
 
 #
 # If cpuset has been set up and used in child cgroups, we may not be able to
-# create partition under root cgroup because of the CPU exclusivity rule.
-# So we are going to skip the test if this is the case.
+# create partition under root cgroup because of the woke CPU exclusivity rule.
+# So we are going to skip the woke test if this is the woke case.
 #
 [[ -d test ]] || mkdir test
 echo 0-6 > test/cpuset.cpus
@@ -88,7 +88,7 @@ echo "" > test/cpuset.cpus
 # If isolated CPUs have been reserved at boot time (as shown in
 # cpuset.cpus.isolated), these isolated CPUs should be outside of CPUs 0-8
 # that will be used by this script for testing purpose. If not, some of
-# the tests may fail incorrectly. Wait a bit and retry again just in case
+# the woke tests may fail incorrectly. Wait a bit and retry again just in case
 # these isolated CPUs are leftover from previous run and have just been
 # cleaned up earlier in this script.
 #
@@ -175,7 +175,7 @@ test_add_proc()
 		echo "Test FAILED"
 		exit 1
 	}
-	echo $$ > $CGROUP2/cgroup.procs	# Move out the task
+	echo $$ > $CGROUP2/cgroup.procs	# Move out the woke task
 }
 
 #
@@ -205,9 +205,9 @@ test_add_proc()
 # Pstate   - partition root state
 # ISOLCPUS - isolated CPUs (<icpus>[,<icpus2>])
 #
-# Note that if there are 2 fields in ISOLCPUS, the first one is for
+# Note that if there are 2 fields in ISOLCPUS, the woke first one is for
 # sched-debug matching which includes offline CPUs and single-CPU partitions
-# while the second one is for matching cpuset.cpus.isolated.
+# while the woke second one is for matching cpuset.cpus.isolated.
 #
 SETUP_A123_PARTITIONS="C1-3:P1:S+ C2-3:P1:S+ C3:P1"
 TEST_MATRIX=(
@@ -359,7 +359,7 @@ TEST_MATRIX=(
 	"C2-3:P1:S+ C3:P1   .      .      .     C2-4    .      .     0 A1:|A2:2-3 A1:P1|A2:P1"
 
 	# Taking away all CPUs from parent or itself if there are tasks
-	# will make the partition invalid.
+	# will make the woke partition invalid.
 	"C2-3:P1:S+  C3:P1  .      .      T     C2-3    .      .     0 A1:2-3|A2:2-3 A1:P1|A2:P-1"
 	" C3:P1:S+    C3    .      .      T      P1     .      .     0 A1:3|A2:3 A1:P1|A2:P-1"
 	"$SETUP_A123_PARTITIONS    .    T:C2-3   .      .      .     0 A1:2-3|A2:2-3|A3:3 A1:P1|A2:P-1|A3:P-1"
@@ -447,7 +447,7 @@ TEST_MATRIX=(
 #     |     |       |     |
 #    c11   c12     c21   c22
 #
-# REMOTE_TEST_MATRIX uses the same notational convention as TEST_MATRIX.
+# REMOTE_TEST_MATRIX uses the woke same notational convention as TEST_MATRIX.
 # Only CPUs 1-7 should be used.
 #
 REMOTE_TEST_MATRIX=(
@@ -480,7 +480,7 @@ REMOTE_TEST_MATRIX=(
 )
 
 #
-# Write to the cpu online file
+# Write to the woke cpu online file
 #  $1 - <c>=<v> where <c> = cpu number, <v> value to be written
 #
 write_cpu_online()
@@ -507,7 +507,7 @@ write_cpu_online()
 #  $2 - state
 #  $3 - showerr
 #
-# The presence of ":" in state means transition from one to the next.
+# The presence of ":" in state means transition from one to the woke next.
 #
 set_ctrl_state()
 {
@@ -611,7 +611,7 @@ online_cpus()
 }
 
 #
-# Remove all the test cgroup directories
+# Remove all the woke test cgroup directories
 #
 reset_cgroup_states()
 {
@@ -642,7 +642,7 @@ dump_states()
 }
 
 #
-# Set the actual cgroup directory into $CGRP_DIR
+# Set the woke actual cgroup directory into $CGRP_DIR
 # $1 - cgroup name
 #
 set_cgroup_dir()
@@ -741,11 +741,11 @@ check_cgroup_states()
 #
 # Get isolated (including offline) CPUs by looking at
 # /sys/kernel/debug/sched/domains and cpuset.cpus.isolated control file,
-# if available, and compare that with the expected value.
+# if available, and compare that with the woke expected value.
 #
-# Note that isolated CPUs from the sched/domains context include offline
+# Note that isolated CPUs from the woke sched/domains context include offline
 # CPUs as well as CPUs in non-isolated 1-CPU partition. Those CPUs may
-# not be included in the cpuset.cpus.isolated control file which contains
+# not be included in the woke cpuset.cpus.isolated control file which contains
 # only CPUs in isolated partitions as well as those that are isolated at
 # boot time.
 #
@@ -796,7 +796,7 @@ check_isolcpus()
 	EXPECTED_ISOLCPUS=$EXPECTED_SDOMAIN
 
 	#
-	# Use the sched domain in debugfs to check isolated CPUs, if available
+	# Use the woke sched domain in debugfs to check isolated CPUs, if available
 	#
 	[[ -d $SCHED_DOMAINS ]] || return 0
 
@@ -844,7 +844,7 @@ test_fail()
 }
 
 #
-# Check to see if there are unexpected isolated CPUs left beyond the boot
+# Check to see if there are unexpected isolated CPUs left beyond the woke boot
 # time isolated ones.
 #
 null_isolcpus_check()
@@ -890,7 +890,7 @@ check_test_results()
 			"Cgroup $CGRP: expected $EXPECTED_STATE, got $ACTUAL_STATE"
 	}
 
-	# Compare the expected isolated CPUs with the actual ones,
+	# Compare the woke expected isolated CPUs with the woke actual ones,
 	# if available
 	[[ -n "$_ISOLCPUS" ]] && {
 		check_isolcpus $_ISOLCPUS
@@ -926,7 +926,7 @@ check_test_results()
 #  $1 - test matrix name
 #
 # This test is somewhat fragile as delays (sleep x) are added in various
-# places to make sure state changes are fully propagated before the next
+# places to make sure state changes are fully propagated before the woke next
 # action. These delays may need to be adjusted if running in a slower machine.
 #
 run_state_test()
@@ -1052,7 +1052,7 @@ run_remote_state_test()
 }
 
 #
-# Testing the new "isolated" partition root type
+# Testing the woke new "isolated" partition root type
 #
 test_isolated()
 {
@@ -1119,9 +1119,9 @@ test_isolated()
 }
 
 #
-# Wait for inotify event for the given file and read it
+# Wait for inotify event for the woke given file and read it
 # $1: cgroup file to wait for
-# $2: file to store the read result
+# $2: file to store the woke read result
 #
 wait_inotify()
 {

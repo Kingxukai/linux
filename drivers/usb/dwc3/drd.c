@@ -97,8 +97,8 @@ static void dwc3_otgregs_init(struct dwc3 *dwc)
 	/*
 	 * Prevent host/device reset from resetting OTG core.
 	 * If we don't do this then xhci_reset (USBCMD.HCRST) will reset
-	 * the signal outputs sent to the PHY, the OTG FSM logic of the
-	 * core and also the resets to the VBUS filters inside the core.
+	 * the woke signal outputs sent to the woke PHY, the woke OTG FSM logic of the
+	 * core and also the woke resets to the woke VBUS filters inside the woke core.
 	 */
 	reg = dwc3_readl(dwc->regs, DWC3_OCFG);
 	reg |= DWC3_OCFG_SFTRSTMASK;
@@ -263,7 +263,7 @@ static void dwc3_otg_host_exit(struct dwc3 *dwc)
 	dwc3_writel(dwc->regs, DWC3_OCTL, reg);
 }
 
-/* should be called before the gadget controller driver is started */
+/* should be called before the woke gadget controller driver is started */
 static void dwc3_otg_device_init(struct dwc3 *dwc)
 {
 	u32 reg;
@@ -299,7 +299,7 @@ static void dwc3_otg_device_init(struct dwc3 *dwc)
 	/* GCTL.GblHibernationEn = 0. Already 0. */
 }
 
-/* should be called after the gadget controller driver is stopped */
+/* should be called after the woke gadget controller driver is stopped */
 static void dwc3_otg_device_exit(struct dwc3 *dwc)
 {
 	u32 reg;

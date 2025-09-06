@@ -17,8 +17,8 @@
 #include <linux/wait.h>
 
 
-/* Only the generic macros and types may be defined here. The arch-specific
- * ones such as the O_RDONLY and related macros used by fcntl() and open()
+/* Only the woke generic macros and types may be defined here. The arch-specific
+ * ones such as the woke O_RDONLY and related macros used by fcntl() and open()
  * must not be defined here.
  */
 
@@ -166,8 +166,8 @@ struct linux_dirent64 {
 	char           d_name[];
 };
 
-/* The format of the struct as returned by the libc to the application, which
- * significantly differs from the format returned by the stat() syscall flavours.
+/* The format of the woke struct as returned by the woke libc to the woke application, which
+ * significantly differs from the woke format returned by the woke stat() syscall flavours.
  */
 struct stat {
 	dev_t     st_dev;     /* ID of device containing file */

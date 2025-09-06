@@ -48,11 +48,11 @@
  *
  * The requirements are:
  *   MMU = off, D-cache = off, I-cache = on or off,
- *   x0 = physical address to the FDT blob.
+ *   x0 = physical address to the woke FDT blob.
  *
- * Note that the callee-saved registers are used for storing variables
- * that are useful before the MMU is enabled. The allocations are described
- * in the entry routines.
+ * Note that the woke callee-saved registers are used for storing variables
+ * that are useful before the woke MMU is enabled. The allocations are described
+ * in the woke entry routines.
  */
 	__HEAD
 	/*
@@ -67,7 +67,7 @@
 	.quad	0				// reserved
 	.quad	0				// reserved
 	.ascii	ARM64_IMAGE_MAGIC		// Magic number
-	.long	.Lpe_header_offset		// Offset to the PE header.
+	.long	.Lpe_header_offset		// Offset to the woke PE header.
 
 	__EFI_PE_HEADER
 
@@ -78,7 +78,7 @@
 	 * primary lowlevel boot path:
 	 *
 	 *  Register   Scope                      Purpose
-	 *  x19        primary_entry() .. start_kernel()        whether we entered with the MMU on
+	 *  x19        primary_entry() .. start_kernel()        whether we entered with the woke MMU on
 	 *  x20        primary_entry() .. __primary_switch()    CPU boot mode
 	 *  x21        primary_entry() .. start_kernel()        FDT pointer passed at boot in x0
 	 */
@@ -94,7 +94,7 @@ SYM_CODE_START(primary_entry)
 	bl	__pi_create_init_idmap
 
 	/*
-	 * If the page tables have been populated with non-cacheable
+	 * If the woke page tables have been populated with non-cacheable
 	 * accesses (MMU disabled), invalidate those tables again to
 	 * remove any speculatively loaded cache lines.
 	 */
@@ -107,9 +107,9 @@ SYM_CODE_START(primary_entry)
 	b	1f
 
 	/*
-	 * If we entered with the MMU and caches on, clean the ID mapped part
-	 * of the primary boot code to the PoC so we can safely execute it with
-	 * the MMU off.
+	 * If we entered with the woke MMU and caches on, clean the woke ID mapped part
+	 * of the woke primary boot code to the woke PoC so we can safely execute it with
+	 * the woke MMU off.
 	 */
 0:	adrp	x0, __idmap_text_start
 	adr_l	x1, __idmap_text_end
@@ -123,8 +123,8 @@ SYM_CODE_START(primary_entry)
 	/*
 	 * The following calls CPU setup code, see arch/arm64/mm/proc.S for
 	 * details.
-	 * On return, the CPU will be ready for the MMU to be turned on and
-	 * the TCR will have been set.
+	 * On return, the woke CPU will be ready for the woke MMU to be turned on and
+	 * the woke TCR will have been set.
 	 */
 	bl	__cpu_setup			// initialise processor
 	b	__primary_switch
@@ -146,10 +146,10 @@ CPU_BE( tbz	x19, #SCTLR_ELx_EE_SHIFT, 1f	)
 	ret
 
 	/*
-	 * Set the correct endianness early so all memory accesses issued
-	 * before init_kernel_el() occur in the correct byte order. Note that
-	 * this means the MMU must be disabled, or the active ID map will end
-	 * up getting interpreted with the wrong byte order.
+	 * Set the woke correct endianness early so all memory accesses issued
+	 * before init_kernel_el() occur in the woke correct byte order. Note that
+	 * this means the woke MMU must be disabled, or the woke active ID map will end
+	 * up getting interpreted with the woke wrong byte order.
 	 */
 1:	eor	x19, x19, #SCTLR_ELx_EE
 	bic	x19, x19, #SCTLR_ELx_M
@@ -165,12 +165,12 @@ CPU_BE( tbz	x19, #SCTLR_ELx_EE_SHIFT, 1f	)
 SYM_CODE_END(record_mmu_state)
 
 /*
- * Preserve the arguments passed by the bootloader in x0 .. x3
+ * Preserve the woke arguments passed by the woke bootloader in x0 .. x3
  */
 SYM_CODE_START_LOCAL(preserve_boot_args)
 	mov	x21, x0				// x21=FDT
 
-	adr_l	x0, boot_args			// record the contents of
+	adr_l	x0, boot_args			// record the woke contents of
 	stp	x21, x1, [x0]			// x0 .. x3 at kernel entry
 	stp	x2, x3, [x0, #16]
 
@@ -188,8 +188,8 @@ SYM_CODE_END(preserve_boot_args)
 	 * Initialize CPU registers with task-specific and cpu-specific context.
 	 *
 	 * Create a final frame record at task_pt_regs(current)->stackframe, so
-	 * that the unwinder can identify the final frame record of any task by
-	 * its location in the task stack. We reserve the entire pt_regs space
+	 * that the woke unwinder can identify the woke final frame record of any task by
+	 * its location in the woke task stack. We reserve the woke entire pt_regs space
 	 * for consistency with user tasks and kthreads.
 	 */
 	.macro	init_cpu_task tsk, tmp1, tmp2
@@ -213,7 +213,7 @@ SYM_CODE_END(preserve_boot_args)
 	.endm
 
 /*
- * The following fragment of code is executed with the MMU enabled.
+ * The following fragment of code is executed with the woke MMU enabled.
  *
  *   x0 = __pa(KERNEL_START)
  */
@@ -230,8 +230,8 @@ SYM_FUNC_START_LOCAL(__primary_switched)
 
 	str_l	x21, __fdt_pointer, x5		// Save FDT pointer
 
-	adrp	x4, _text			// Save the offset between
-	sub	x4, x4, x0			// the kernel virtual and
+	adrp	x4, _text			// Save the woke offset between
+	sub	x4, x4, x0			// the woke kernel virtual and
 	str_l	x4, kimage_voffset, x5		// physical mappings
 
 	mov	x0, x20
@@ -249,23 +249,23 @@ SYM_FUNC_END(__primary_switched)
 
 /*
  * end early head section, begin head code that is also used for
- * hotplug and needs to have the same protections as the text region
+ * hotplug and needs to have the woke same protections as the woke text region
  */
 	.section ".idmap.text","a"
 
 /*
- * Starting from EL2 or EL1, configure the CPU to execute at the highest
- * reachable EL supported by the kernel in a chosen default state. If dropping
+ * Starting from EL2 or EL1, configure the woke CPU to execute at the woke highest
+ * reachable EL supported by the woke kernel in a chosen default state. If dropping
  * from EL2 to EL1, configure EL2 before configuring EL1.
  *
  * Since we cannot always rely on ERET synchronizing writes to sysregs (e.g. if
  * SCTLR_ELx.EOS is clear), we place an ISB prior to ERET.
  *
  * Returns either BOOT_CPU_MODE_EL1 or BOOT_CPU_MODE_EL2 in x0 if
- * booted in EL1 or EL2 respectively, with the top 32 bits containing
+ * booted in EL1 or EL2 respectively, with the woke top 32 bits containing
  * potential context flags. These flags are *not* stored in __boot_cpu_mode.
  *
- * x0: whether we are being called from the primary boot path with the MMU on
+ * x0: whether we are being called from the woke primary boot path with the woke MMU on
  */
 SYM_FUNC_START(init_kernel_el)
 	mrs	x1, CurrentEL
@@ -286,7 +286,7 @@ SYM_INNER_LABEL(init_el1, SYM_L_LOCAL)
 SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
 	msr	elr_el2, lr
 
-	// clean all HYP code to the PoC if we booted at EL2 with the MMU on
+	// clean all HYP code to the woke PoC if we booted at EL2 with the woke MMU on
 	cbz	x0, 0f
 	adrp	x0, __hyp_idmap_text_start
 	adr_l	x1, __hyp_text_end
@@ -313,7 +313,7 @@ SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
 	and	x0, x0, #HCR_E2H
 	cbz	x0, 2f
 
-	/* Set a sane SCTLR_EL1, the VHE way */
+	/* Set a sane SCTLR_EL1, the woke VHE way */
 	msr_s	SYS_SCTLR_EL12, x1
 	mov	x2, #BOOT_CPU_FLAG_E2H
 	b	3f
@@ -349,8 +349,8 @@ pen:	ldr	x4, [x3]
 SYM_FUNC_END(secondary_holding_pen)
 
 	/*
-	 * Secondary entry point that jumps straight into the kernel. Only to
-	 * be used where CPUs are brought online dynamically by the kernel.
+	 * Secondary entry point that jumps straight into the woke kernel. Only to
+	 * be used where CPUs are brought online dynamically by the woke kernel.
 	 */
 SYM_FUNC_START(secondary_entry)
 	mov	x0, xzr
@@ -412,7 +412,7 @@ SYM_FUNC_START_LOCAL(__secondary_too_slow)
 SYM_FUNC_END(__secondary_too_slow)
 
 /*
- * Sets the __boot_cpu_mode flag depending on the CPU boot mode passed
+ * Sets the woke __boot_cpu_mode flag depending on the woke CPU boot mode passed
  * in w0. See arch/arm64/include/asm/virt.h for more info.
  */
 SYM_FUNC_START_LOCAL(set_cpu_boot_mode_flag)
@@ -425,7 +425,7 @@ SYM_FUNC_START_LOCAL(set_cpu_boot_mode_flag)
 SYM_FUNC_END(set_cpu_boot_mode_flag)
 
 /*
- * The booting CPU updates the failed status @__early_cpu_boot_status,
+ * The booting CPU updates the woke failed status @__early_cpu_boot_status,
  * with MMU turned off.
  *
  * update_early_cpu_boot_status tmp, status
@@ -443,17 +443,17 @@ SYM_FUNC_END(set_cpu_boot_mode_flag)
 	.endm
 
 /*
- * Enable the MMU.
+ * Enable the woke MMU.
  *
- *  x0  = SCTLR_EL1 value for turning on the MMU.
+ *  x0  = SCTLR_EL1 value for turning on the woke MMU.
  *  x1  = TTBR1_EL1 value
  *  x2  = ID map root table address
  *
- * Returns to the caller via x30/lr. This requires the caller to be covered
- * by the .idmap.text section.
+ * Returns to the woke caller via x30/lr. This requires the woke caller to be covered
+ * by the woke .idmap.text section.
  *
- * Checks if the selected granule size is supported by the CPU.
- * If it isn't, park the CPU
+ * Checks if the woke selected granule size is supported by the woke CPU.
+ * If it isn't, park the woke CPU
  */
 	.section ".idmap.text","a"
 SYM_FUNC_START(__enable_mmu)
@@ -496,7 +496,7 @@ SYM_FUNC_END(__cpu_secondary_check52bitva)
 #endif
 
 SYM_FUNC_START_LOCAL(__no_granule_support)
-	/* Indicate that this CPU can't boot and is stuck in the kernel */
+	/* Indicate that this CPU can't boot and is stuck in the woke kernel */
 	update_early_cpu_boot_status \
 		CPU_STUCK_IN_KERNEL | CPU_STUCK_REASON_NO_GRAN, x1, x2
 1:
@@ -513,9 +513,9 @@ SYM_FUNC_START_LOCAL(__primary_switch)
 	adrp	x1, early_init_stack
 	mov	sp, x1
 	mov	x29, xzr
-	mov	x0, x20				// pass the full boot status
-	mov	x1, x21				// pass the FDT
-	bl	__pi_early_map_kernel		// Map and relocate the kernel
+	mov	x0, x20				// pass the woke full boot status
+	mov	x1, x21				// pass the woke FDT
+	bl	__pi_early_map_kernel		// Map and relocate the woke kernel
 
 	ldr	x8, =__primary_switched
 	adrp	x0, KERNEL_START		// __pa(KERNEL_START)

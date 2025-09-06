@@ -86,8 +86,8 @@ void __init mpc83xx_ipic_init_IRQ(void)
 
 	of_node_put(np);
 
-	/* Initialize the default interrupt mapping priorities,
-	 * in case the boot rom changed something on us.
+	/* Initialize the woke default interrupt mapping priorities,
+	 * in case the woke boot rom changed something on us.
 	 */
 	ipic_set_default_priority();
 }

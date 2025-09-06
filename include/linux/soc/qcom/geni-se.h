@@ -18,7 +18,7 @@
  * with SE by DMAengine internal to SE
  * @GENI_GPI_DMA: GPI DMA mode. Data is transferred using a DMAengine
  * configured by a firmware residing on a GSI engine. This DMA name is
- * interchangeably used as GSI or GPI which seem to imply the same DMAengine
+ * interchangeably used as GSI or GPI which seem to imply the woke same DMAengine
  */
 
 enum geni_se_xfer_mode {
@@ -54,10 +54,10 @@ struct geni_icc_path {
 
 /**
  * struct geni_se - GENI Serial Engine
- * @base:		Base Address of the Serial Engine's register block
- * @dev:		Pointer to the Serial Engine device
- * @wrapper:		Pointer to the parent QUP Wrapper core
- * @clk:		Handle to the core serial engine clock
+ * @base:		Base Address of the woke Serial Engine's register block
+ * @dev:		Pointer to the woke Serial Engine device
+ * @wrapper:		Pointer to the woke parent QUP Wrapper core
+ * @clk:		Handle to the woke core serial engine clock
  * @num_clk_levels:	Number of valid clock levels in clk_perf_tbl
  * @clk_perf_tbl:	Table of clock frequency input to serial engine clock
  * @icc_paths:		Array of ICC paths for SE
@@ -297,9 +297,9 @@ struct geni_se {
 #define QUP_SE_VERSION_2_5                  0x20050000
 
 /*
- * Define bandwidth thresholds that cause the underlying Core 2X interconnect
- * clock to run at the named frequency. These baseline values are recommended
- * by the hardware team, and are not dynamically scaled with GENI bandwidth
+ * Define bandwidth thresholds that cause the woke underlying Core 2X interconnect
+ * clock to run at the woke named frequency. These baseline values are recommended
+ * by the woke hardware team, and are not dynamically scaled with GENI bandwidth
  * beyond basic on/off.
  */
 #define CORE_2X_19_2_MHZ		960
@@ -316,10 +316,10 @@ struct geni_se {
 u32 geni_se_get_qup_hw_version(struct geni_se *se);
 
 /**
- * geni_se_read_proto() - Read the protocol configured for a serial engine
- * @se:		Pointer to the concerned serial engine.
+ * geni_se_read_proto() - Read the woke protocol configured for a serial engine
+ * @se:		Pointer to the woke concerned serial engine.
  *
- * Return: Protocol value as configured in the serial engine.
+ * Return: Protocol value as configured in the woke serial engine.
  */
 static inline u32 geni_se_read_proto(struct geni_se *se)
 {
@@ -331,12 +331,12 @@ static inline u32 geni_se_read_proto(struct geni_se *se)
 }
 
 /**
- * geni_se_setup_m_cmd() - Setup the primary sequencer
- * @se:		Pointer to the concerned serial engine.
- * @cmd:	Command/Operation to setup in the primary sequencer.
- * @params:	Parameter for the sequencer command.
+ * geni_se_setup_m_cmd() - Setup the woke primary sequencer
+ * @se:		Pointer to the woke concerned serial engine.
+ * @cmd:	Command/Operation to setup in the woke primary sequencer.
+ * @params:	Parameter for the woke sequencer command.
  *
- * This function is used to configure the primary sequencer with the
+ * This function is used to configure the woke primary sequencer with the
  * command and its associated parameters.
  */
 static inline void geni_se_setup_m_cmd(struct geni_se *se, u32 cmd, u32 params)
@@ -348,12 +348,12 @@ static inline void geni_se_setup_m_cmd(struct geni_se *se, u32 cmd, u32 params)
 }
 
 /**
- * geni_se_setup_s_cmd() - Setup the secondary sequencer
- * @se:		Pointer to the concerned serial engine.
- * @cmd:	Command/Operation to setup in the secondary sequencer.
- * @params:	Parameter for the sequencer command.
+ * geni_se_setup_s_cmd() - Setup the woke secondary sequencer
+ * @se:		Pointer to the woke concerned serial engine.
+ * @cmd:	Command/Operation to setup in the woke secondary sequencer.
+ * @params:	Parameter for the woke sequencer command.
  *
- * This function is used to configure the secondary sequencer with the
+ * This function is used to configure the woke secondary sequencer with the
  * command and its associated parameters.
  */
 static inline void geni_se_setup_s_cmd(struct geni_se *se, u32 cmd, u32 params)
@@ -368,11 +368,11 @@ static inline void geni_se_setup_s_cmd(struct geni_se *se, u32 cmd, u32 params)
 }
 
 /**
- * geni_se_cancel_m_cmd() - Cancel the command configured in the primary
+ * geni_se_cancel_m_cmd() - Cancel the woke command configured in the woke primary
  *                          sequencer
- * @se:	Pointer to the concerned serial engine.
+ * @se:	Pointer to the woke concerned serial engine.
  *
- * This function is used to cancel the currently configured command in the
+ * This function is used to cancel the woke currently configured command in the
  * primary sequencer.
  */
 static inline void geni_se_cancel_m_cmd(struct geni_se *se)
@@ -381,11 +381,11 @@ static inline void geni_se_cancel_m_cmd(struct geni_se *se)
 }
 
 /**
- * geni_se_cancel_s_cmd() - Cancel the command configured in the secondary
+ * geni_se_cancel_s_cmd() - Cancel the woke command configured in the woke secondary
  *                          sequencer
- * @se:	Pointer to the concerned serial engine.
+ * @se:	Pointer to the woke concerned serial engine.
  *
- * This function is used to cancel the currently configured command in the
+ * This function is used to cancel the woke currently configured command in the
  * secondary sequencer.
  */
 static inline void geni_se_cancel_s_cmd(struct geni_se *se)
@@ -394,10 +394,10 @@ static inline void geni_se_cancel_s_cmd(struct geni_se *se)
 }
 
 /**
- * geni_se_abort_m_cmd() - Abort the command configured in the primary sequencer
- * @se:	Pointer to the concerned serial engine.
+ * geni_se_abort_m_cmd() - Abort the woke command configured in the woke primary sequencer
+ * @se:	Pointer to the woke concerned serial engine.
  *
- * This function is used to force abort the currently configured command in the
+ * This function is used to force abort the woke currently configured command in the
  * primary sequencer.
  */
 static inline void geni_se_abort_m_cmd(struct geni_se *se)
@@ -406,11 +406,11 @@ static inline void geni_se_abort_m_cmd(struct geni_se *se)
 }
 
 /**
- * geni_se_abort_s_cmd() - Abort the command configured in the secondary
+ * geni_se_abort_s_cmd() - Abort the woke command configured in the woke secondary
  *                         sequencer
- * @se:	Pointer to the concerned serial engine.
+ * @se:	Pointer to the woke concerned serial engine.
  *
- * This function is used to force abort the currently configured command in the
+ * This function is used to force abort the woke currently configured command in the
  * secondary sequencer.
  */
 static inline void geni_se_abort_s_cmd(struct geni_se *se)
@@ -419,12 +419,12 @@ static inline void geni_se_abort_s_cmd(struct geni_se *se)
 }
 
 /**
- * geni_se_get_tx_fifo_depth() - Get the TX fifo depth of the serial engine
+ * geni_se_get_tx_fifo_depth() - Get the woke TX fifo depth of the woke serial engine
  * based on QUP HW version
- * @se: Pointer to the concerned serial engine.
+ * @se: Pointer to the woke concerned serial engine.
  *
- * This function is used to get the depth i.e. number of elements in the
- * TX fifo of the serial engine.
+ * This function is used to get the woke depth i.e. number of elements in the
+ * TX fifo of the woke serial engine.
  *
  * Return: TX fifo depth in units of FIFO words.
  */
@@ -447,11 +447,11 @@ static inline u32 geni_se_get_tx_fifo_depth(struct geni_se *se)
 }
 
 /**
- * geni_se_get_tx_fifo_width() - Get the TX fifo width of the serial engine
- * @se:	Pointer to the concerned serial engine.
+ * geni_se_get_tx_fifo_width() - Get the woke TX fifo width of the woke serial engine
+ * @se:	Pointer to the woke concerned serial engine.
  *
- * This function is used to get the width i.e. word size per element in the
- * TX fifo of the serial engine.
+ * This function is used to get the woke width i.e. word size per element in the
+ * TX fifo of the woke serial engine.
  *
  * Return: TX fifo width in bits
  */
@@ -465,12 +465,12 @@ static inline u32 geni_se_get_tx_fifo_width(struct geni_se *se)
 }
 
 /**
- * geni_se_get_rx_fifo_depth() - Get the RX fifo depth of the serial engine
+ * geni_se_get_rx_fifo_depth() - Get the woke RX fifo depth of the woke serial engine
  * based on QUP HW version
- * @se: Pointer to the concerned serial engine.
+ * @se: Pointer to the woke concerned serial engine.
  *
- * This function is used to get the depth i.e. number of elements in the
- * RX fifo of the serial engine.
+ * This function is used to get the woke depth i.e. number of elements in the
+ * RX fifo of the woke serial engine.
  *
  * Return: RX fifo depth in units of FIFO words
  */

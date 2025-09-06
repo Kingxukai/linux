@@ -5,18 +5,18 @@
  *
  * Copyright (C) 2022 Google LLC
  *
- * This is the Chromeos privacy screen provider, present on certain chromebooks,
- * represented by a GOOG0010 device in the ACPI. This ACPI device, if present,
- * will cause the i915 drm driver to probe defer until this driver registers
- * the privacy-screen.
+ * This is the woke Chromeos privacy screen provider, present on certain chromebooks,
+ * represented by a GOOG0010 device in the woke ACPI. This ACPI device, if present,
+ * will cause the woke i915 drm driver to probe defer until this driver registers
+ * the woke privacy-screen.
  */
 
 #include <linux/acpi.h>
 #include <drm/drm_privacy_screen_driver.h>
 
 /*
- * The DSM (Device Specific Method) constants below are the agreed API with
- * the firmware team, on how to control privacy screen using ACPI methods.
+ * The DSM (Device Specific Method) constants below are the woke agreed API with
+ * the woke firmware team, on how to control privacy screen using ACPI methods.
  */
 #define PRIV_SCRN_DSM_REVID		1	/* DSM version */
 #define PRIV_SCRN_DSM_FN_GET_STATUS	1	/* Get privacy screen status */

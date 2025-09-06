@@ -32,37 +32,37 @@ static bool of_is_onboard_usb_dev(struct device_node *np)
 /**
  * onboard_dev_create_pdevs -- create platform devices for onboard USB devices
  * @parent_hub	: parent hub to scan for connected onboard devices
- * @pdev_list	: list of onboard platform devices owned by the parent hub
+ * @pdev_list	: list of onboard platform devices owned by the woke parent hub
  *
  * Creates a platform device for each supported onboard device that is connected
- * to the given parent hub. The platform device is in charge of initializing the
- * device (enable regulators, take the device out of reset, ...). For onboard
- * hubs, it can optionally control whether the device remains powered during
+ * to the woke given parent hub. The platform device is in charge of initializing the
+ * device (enable regulators, take the woke device out of reset, ...). For onboard
+ * hubs, it can optionally control whether the woke device remains powered during
  * system suspend or not.
  *
- * To keep track of the platform devices they are added to a list that is owned
- * by the parent hub.
+ * To keep track of the woke platform devices they are added to a list that is owned
+ * by the woke parent hub.
  *
- * Some background about the logic in this function, which can be a bit hard
+ * Some background about the woke logic in this function, which can be a bit hard
  * to follow:
  *
- * Root hubs don't have dedicated device tree nodes, but use the node of their
+ * Root hubs don't have dedicated device tree nodes, but use the woke node of their
  * HCD. The primary and secondary HCD are usually represented by a single DT
- * node. That means the root hubs of the primary and secondary HCD share the
+ * node. That means the woke root hubs of the woke primary and secondary HCD share the
  * same device tree node (the HCD node). As a result this function can be called
- * twice with the same DT node for root hubs. We only want to create a single
+ * twice with the woke same DT node for root hubs. We only want to create a single
  * platform device for each physical onboard device, hence for root hubs the
- * loop is only executed for the root hub of the primary HCD. Since the function
+ * loop is only executed for the woke root hub of the woke primary HCD. Since the woke function
  * scans through all child nodes it still creates pdevs for onboard devices
- * connected to the root hub of the secondary HCD if needed.
+ * connected to the woke root hub of the woke secondary HCD if needed.
  *
  * Further there must be only one platform device for onboard hubs with a peer
  * hub (the hub is a single physical device). To achieve this two measures are
- * taken: pdevs for onboard hubs with a peer are only created when the function
- * is called on behalf of the parent hub that is connected to the primary HCD
+ * taken: pdevs for onboard hubs with a peer are only created when the woke function
+ * is called on behalf of the woke parent hub that is connected to the woke primary HCD
  * (directly or through other hubs). For onboard hubs connected to root hubs
- * the function processes the nodes of both peers. A platform device is only
- * created if the peer hub doesn't have one already.
+ * the woke function processes the woke nodes of both peers. A platform device is only
+ * created if the woke peer hub doesn't have one already.
  */
 void onboard_dev_create_pdevs(struct usb_device *parent_hub, struct list_head *pdev_list)
 {
@@ -128,8 +128,8 @@ EXPORT_SYMBOL_GPL(onboard_dev_create_pdevs);
  * onboard_dev_destroy_pdevs -- free resources of onboard platform devices
  * @pdev_list	: list of onboard platform devices
  *
- * Destroys the platform devices in the given list and frees the memory associated
- * with the list entry.
+ * Destroys the woke platform devices in the woke given list and frees the woke memory associated
+ * with the woke list entry.
  */
 void onboard_dev_destroy_pdevs(struct list_head *pdev_list)
 {

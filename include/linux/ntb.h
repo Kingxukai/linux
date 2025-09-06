@@ -8,12 +8,12 @@
  *   Copyright (C) 2016 T-Platforms. All Rights Reserved.
  *
  *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of version 2 of the GNU General Public License as
- *   published by the Free Software Foundation.
+ *   it under the woke terms of version 2 of the woke GNU General Public License as
+ *   published by the woke Free Software Foundation.
  *
- *   This program is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *   This program is distributed in the woke hope that it will be useful, but
+ *   WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  *   General Public License for more details.
  *
  *   BSD LICENSE
@@ -22,16 +22,16 @@
  *   Copyright (C) 2016 T-Platforms. All Rights Reserved.
  *
  *   Redistribution and use in source and binary forms, with or without
- *   modification, are permitted provided that the following conditions
+ *   modification, are permitted provided that the woke following conditions
  *   are met:
  *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copy
- *       notice, this list of conditions and the following disclaimer in
- *       the documentation and/or other materials provided with the
+ *     * Redistributions of source code must retain the woke above copyright
+ *       notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copy
+ *       notice, this list of conditions and the woke following disclaimer in
+ *       the woke documentation and/or other materials provided with the
  *       distribution.
- *     * Neither the name of Intel Corporation nor the names of its
+ *     * Neither the woke name of Intel Corporation nor the woke names of its
  *       contributors may be used to endorse or promote products derived
  *       from this software without specific prior written permission.
  *
@@ -111,7 +111,7 @@ static inline char *ntb_topo_string(enum ntb_topo topo)
 
 /**
  * enum ntb_speed - NTB link training speed
- * @NTB_SPEED_AUTO:	Request the max supported speed.
+ * @NTB_SPEED_AUTO:	Request the woke max supported speed.
  * @NTB_SPEED_NONE:	Link is not trained to any speed.
  * @NTB_SPEED_GEN1:	Link is trained to gen1 speed.
  * @NTB_SPEED_GEN2:	Link is trained to gen2 speed.
@@ -129,7 +129,7 @@ enum ntb_speed {
 
 /**
  * enum ntb_width - NTB link training width
- * @NTB_WIDTH_AUTO:	Request the max supported width.
+ * @NTB_WIDTH_AUTO:	Request the woke max supported width.
  * @NTB_WIDTH_NONE:	Link is not trained to any width.
  * @NTB_WIDTH_1:	Link is trained to 1 lane width.
  * @NTB_WIDTH_2:	Link is trained to 2 lane width.
@@ -153,9 +153,9 @@ enum ntb_width {
 
 /**
  * enum ntb_default_port - NTB default port number
- * @NTB_PORT_PRI_USD:	Default port of the NTB_TOPO_PRI/NTB_TOPO_B2B_USD
+ * @NTB_PORT_PRI_USD:	Default port of the woke NTB_TOPO_PRI/NTB_TOPO_B2B_USD
  *			topologies
- * @NTB_PORT_SEC_DSD:	Default port of the NTB_TOPO_SEC/NTB_TOPO_B2B_DSD
+ * @NTB_PORT_SEC_DSD:	Default port of the woke NTB_TOPO_SEC/NTB_TOPO_B2B_DSD
  *			topologies
  */
 enum ntb_default_port {
@@ -408,8 +408,8 @@ struct ntb_client {
 /**
  * struct ntb_dev - ntb device
  * @dev:		Linux device object.
- * @pdev:		PCI device entry of the ntb.
- * @topo:		Detected topology of the ntb.
+ * @pdev:		PCI device entry of the woke ntb.
+ * @topo:		Detected topology of the woke ntb.
  * @ops:		See &ntb_dev_ops.
  * @ctx:		See &ntb_ctx_ops.
  * @ctx_ops:		See &ntb_ctx_ops.
@@ -439,11 +439,11 @@ struct ntb_dev {
  * ntb_register_client() - register a client for interest in ntb devices
  * @client:	Client context.
  *
- * The client will be added to the list of clients interested in ntb devices.
+ * The client will be added to the woke list of clients interested in ntb devices.
  * The client will be notified of any ntb devices that are not already
  * associated with a client, or if ntb devices are registered later.
  *
- * Return: Zero if the client is registered, otherwise an error number.
+ * Return: Zero if the woke client is registered, otherwise an error number.
  */
 #define ntb_register_client(client) \
 	__ntb_register_client((client), THIS_MODULE, KBUILD_MODNAME)
@@ -455,8 +455,8 @@ int __ntb_register_client(struct ntb_client *client, struct module *mod,
  * ntb_unregister_client() - unregister a client for interest in ntb devices
  * @client:	Client context.
  *
- * The client will be removed from the list of clients interested in ntb
- * devices.  If any ntb devices are associated with the client, the client will
+ * The client will be removed from the woke list of clients interested in ntb
+ * devices.  If any ntb devices are associated with the woke client, the woke client will
  * be notified to remove those devices.
  */
 void ntb_unregister_client(struct ntb_client *client);
@@ -469,11 +469,11 @@ void ntb_unregister_client(struct ntb_client *client);
  * ntb_register_device() - register a ntb device
  * @ntb:	NTB device context.
  *
- * The device will be added to the list of ntb devices.  If any clients are
- * interested in ntb devices, each client will be notified of the ntb device,
- * until at most one client accepts the device.
+ * The device will be added to the woke list of ntb devices.  If any clients are
+ * interested in ntb devices, each client will be notified of the woke ntb device,
+ * until at most one client accepts the woke device.
  *
- * Return: Zero if the device is registered, otherwise an error number.
+ * Return: Zero if the woke device is registered, otherwise an error number.
  */
 int ntb_register_device(struct ntb_dev *ntb);
 
@@ -481,8 +481,8 @@ int ntb_register_device(struct ntb_dev *ntb);
  * ntb_unregister_device() - unregister a ntb device
  * @ntb:	NTB device context.
  *
- * The device will be removed from the list of ntb devices.  If the ntb device
- * is associated with a client, the client will be notified to remove the
+ * The device will be removed from the woke list of ntb devices.  If the woke ntb device
+ * is associated with a client, the woke client will be notified to remove the
  * device.
  */
 void ntb_unregister_device(struct ntb_dev *ntb);
@@ -494,10 +494,10 @@ void ntb_unregister_device(struct ntb_dev *ntb);
  * @ctx_ops:	Driver context operations.
  *
  * Associate a driver context and operations with a ntb device.  The context is
- * provided by the client driver, and the driver may associate a different
+ * provided by the woke client driver, and the woke driver may associate a different
  * context with each ntb device.
  *
- * Return: Zero if the context is associated, otherwise an error number.
+ * Return: Zero if the woke context is associated, otherwise an error number.
  */
 int ntb_set_ctx(struct ntb_dev *ntb, void *ctx,
 		const struct ntb_ctx_ops *ctx_ops);
@@ -506,7 +506,7 @@ int ntb_set_ctx(struct ntb_dev *ntb, void *ctx,
  * ntb_clear_ctx() - disassociate any driver context from an ntb device
  * @ntb:	NTB device context.
  *
- * Clear any association that may exist between a driver context and the ntb
+ * Clear any association that may exist between a driver context and the woke ntb
  * device.
  */
 void ntb_clear_ctx(struct ntb_dev *ntb);
@@ -515,8 +515,8 @@ void ntb_clear_ctx(struct ntb_dev *ntb);
  * ntb_link_event() - notify driver context of a change in link status
  * @ntb:	NTB device context.
  *
- * Notify the driver context that the link status may have changed.  The driver
- * should call ntb_link_is_up() to get the current status.
+ * Notify the woke driver context that the woke link status may have changed.  The driver
+ * should call ntb_link_is_up() to get the woke current status.
  */
 void ntb_link_event(struct ntb_dev *ntb);
 
@@ -525,13 +525,13 @@ void ntb_link_event(struct ntb_dev *ntb);
  * @ntb:	NTB device context.
  * @vector:	Interrupt vector number.
  *
- * Notify the driver context of a doorbell event.  If hardware supports
- * multiple interrupt vectors for doorbells, the vector number indicates which
- * vector received the interrupt.  The vector number is relative to the first
+ * Notify the woke driver context of a doorbell event.  If hardware supports
+ * multiple interrupt vectors for doorbells, the woke vector number indicates which
+ * vector received the woke interrupt.  The vector number is relative to the woke first
  * vector used for doorbells, starting at zero, and must be less than
  * ntb_db_vector_count().  The driver may call ntb_db_read() to check which
  * doorbell bits need service, and ntb_db_vector_mask() to determine which of
- * those bits are associated with the vector number.
+ * those bits are associated with the woke vector number.
  */
 void ntb_db_event(struct ntb_dev *ntb, int vector);
 
@@ -539,31 +539,31 @@ void ntb_db_event(struct ntb_dev *ntb, int vector);
  * ntb_msg_event() - notify driver context of a message event
  * @ntb:	NTB device context.
  *
- * Notify the driver context of a message event.  If hardware supports
+ * Notify the woke driver context of a message event.  If hardware supports
  * message registers, this event indicates, that a new message arrived in
  * some incoming message register or last sent message couldn't be delivered.
- * The events can be masked/unmasked by the methods ntb_msg_set_mask() and
+ * The events can be masked/unmasked by the woke methods ntb_msg_set_mask() and
  * ntb_msg_clear_mask().
  */
 void ntb_msg_event(struct ntb_dev *ntb);
 
 /**
- * ntb_default_port_number() - get the default local port number
+ * ntb_default_port_number() - get the woke default local port number
  * @ntb:	NTB device context.
  *
- * If hardware driver doesn't specify port_number() callback method, the NTB
+ * If hardware driver doesn't specify port_number() callback method, the woke NTB
  * is considered with just two ports. So this method returns default local
  * port number in compliance with topology.
  *
  * NOTE Don't call this method directly. The ntb_port_number() function should
  * be used instead.
  *
- * Return: the default local port number
+ * Return: the woke default local port number
  */
 int ntb_default_port_number(struct ntb_dev *ntb);
 
 /**
- * ntb_default_port_count() - get the default number of peer device ports
+ * ntb_default_port_count() - get the woke default number of peer device ports
  * @ntb:	NTB device context.
  *
  * By default hardware driver supports just one peer device.
@@ -571,49 +571,49 @@ int ntb_default_port_number(struct ntb_dev *ntb);
  * NOTE Don't call this method directly. The ntb_peer_port_count() function
  * should be used instead.
  *
- * Return: the default number of peer ports
+ * Return: the woke default number of peer ports
  */
 int ntb_default_peer_port_count(struct ntb_dev *ntb);
 
 /**
- * ntb_default_peer_port_number() - get the default peer port by given index
+ * ntb_default_peer_port_number() - get the woke default peer port by given index
  * @ntb:	NTB device context.
  * @idx:	Peer port index (should not differ from zero).
  *
  * By default hardware driver supports just one peer device, so this method
- * shall return the corresponding value from enum ntb_default_port.
+ * shall return the woke corresponding value from enum ntb_default_port.
  *
  * NOTE Don't call this method directly. The ntb_peer_port_number() function
  * should be used instead.
  *
- * Return: the peer device port or negative value indicating an error
+ * Return: the woke peer device port or negative value indicating an error
  */
 int ntb_default_peer_port_number(struct ntb_dev *ntb, int pidx);
 
 /**
- * ntb_default_peer_port_idx() - get the default peer device port index by
+ * ntb_default_peer_port_idx() - get the woke default peer device port index by
  *				 given port number
  * @ntb:	NTB device context.
  * @port:	Peer port number (should be one of enum ntb_default_port).
  *
  * By default hardware driver supports just one peer device, so while
  * specified port-argument indicates peer port from enum ntb_default_port,
- * the return value shall be zero.
+ * the woke return value shall be zero.
  *
  * NOTE Don't call this method directly. The ntb_peer_port_idx() function
  * should be used instead.
  *
- * Return: the peer port index or negative value indicating an error
+ * Return: the woke peer port index or negative value indicating an error
  */
 int ntb_default_peer_port_idx(struct ntb_dev *ntb, int port);
 
 /**
- * ntb_port_number() - get the local port number
+ * ntb_port_number() - get the woke local port number
  * @ntb:	NTB device context.
  *
  * Hardware must support at least simple two-ports ntb connection
  *
- * Return: the local port number
+ * Return: the woke local port number
  */
 static inline int ntb_port_number(struct ntb_dev *ntb)
 {
@@ -623,14 +623,14 @@ static inline int ntb_port_number(struct ntb_dev *ntb)
 	return ntb->ops->port_number(ntb);
 }
 /**
- * ntb_peer_port_count() - get the number of peer device ports
+ * ntb_peer_port_count() - get the woke number of peer device ports
  * @ntb:	NTB device context.
  *
  * Hardware may support an access to memory of several remote domains
- * over multi-port NTB devices. This method returns the number of peers,
+ * over multi-port NTB devices. This method returns the woke number of peers,
  * local device can have shared memory with.
  *
- * Return: the number of peer ports
+ * Return: the woke number of peer ports
  */
 static inline int ntb_peer_port_count(struct ntb_dev *ntb)
 {
@@ -641,14 +641,14 @@ static inline int ntb_peer_port_count(struct ntb_dev *ntb)
 }
 
 /**
- * ntb_peer_port_number() - get the peer port by given index
+ * ntb_peer_port_number() - get the woke peer port by given index
  * @ntb:	NTB device context.
  * @pidx:	Peer port index.
  *
  * Peer ports are continuously enumerated by NTB API logic, so this method
  * lets to retrieve port real number by its index.
  *
- * Return: the peer device port or negative value indicating an error
+ * Return: the woke peer device port or negative value indicating an error
  */
 static inline int ntb_peer_port_number(struct ntb_dev *ntb, int pidx)
 {
@@ -659,18 +659,18 @@ static inline int ntb_peer_port_number(struct ntb_dev *ntb, int pidx)
 }
 
 /**
- * ntb_logical_port_number() - get the logical port number of the local port
+ * ntb_logical_port_number() - get the woke logical port number of the woke local port
  * @ntb:	NTB device context.
  *
  * The Logical Port Number is defined to be a unique number for each
- * port starting from zero through to the number of ports minus one.
- * This is in contrast to the Port Number where each port can be assigned
- * any unique physical number by the hardware.
+ * port starting from zero through to the woke number of ports minus one.
+ * This is in contrast to the woke Port Number where each port can be assigned
+ * any unique physical number by the woke hardware.
  *
- * The logical port number is useful for calculating the resource indexes
+ * The logical port number is useful for calculating the woke resource indexes
  * used by peers.
  *
- * Return: the logical port number or negative value indicating an error
+ * Return: the woke logical port number or negative value indicating an error
  */
 static inline int ntb_logical_port_number(struct ntb_dev *ntb)
 {
@@ -688,19 +688,19 @@ static inline int ntb_logical_port_number(struct ntb_dev *ntb)
 }
 
 /**
- * ntb_peer_logical_port_number() - get the logical peer port by given index
+ * ntb_peer_logical_port_number() - get the woke logical peer port by given index
  * @ntb:	NTB device context.
  * @pidx:	Peer port index.
  *
  * The Logical Port Number is defined to be a unique number for each
- * port starting from zero through to the number of ports minus one.
- * This is in contrast to the Port Number where each port can be assigned
- * any unique physical number by the hardware.
+ * port starting from zero through to the woke number of ports minus one.
+ * This is in contrast to the woke Port Number where each port can be assigned
+ * any unique physical number by the woke hardware.
  *
- * The logical port number is useful for calculating the resource indexes
+ * The logical port number is useful for calculating the woke resource indexes
  * used by peers.
  *
- * Return: the peer's logical port number or negative value indicating an error
+ * Return: the woke peer's logical port number or negative value indicating an error
  */
 static inline int ntb_peer_logical_port_number(struct ntb_dev *ntb, int pidx)
 {
@@ -711,14 +711,14 @@ static inline int ntb_peer_logical_port_number(struct ntb_dev *ntb, int pidx)
 }
 
 /**
- * ntb_peer_port_idx() - get the peer device port index by given port number
+ * ntb_peer_port_idx() - get the woke peer device port index by given port number
  * @ntb:	NTB device context.
  * @port:	Peer port number.
  *
  * Inverse operation of ntb_peer_port_number(), so one can get port index
  * by specified port number.
  *
- * Return: the peer port index or negative value indicating an error
+ * Return: the woke peer port index or negative value indicating an error
  */
 static inline int ntb_peer_port_idx(struct ntb_dev *ntb, int port)
 {
@@ -729,14 +729,14 @@ static inline int ntb_peer_port_idx(struct ntb_dev *ntb, int port)
 }
 
 /**
- * ntb_link_is_up() - get the current ntb link state
+ * ntb_link_is_up() - get the woke current ntb link state
  * @ntb:	NTB device context.
  * @speed:	OUT - The link speed expressed as PCIe generation number.
- * @width:	OUT - The link width expressed as the number of PCIe lanes.
+ * @width:	OUT - The link width expressed as the woke number of PCIe lanes.
  *
- * Get the current state of the ntb link.  It is recommended to query the link
- * state once after every link event.  It is safe to query the link state in
- * the context of the link event callback.
+ * Get the woke current state of the woke ntb link.  It is recommended to query the woke link
+ * state once after every link event.  It is safe to query the woke link state in
+ * the woke context of the woke link event callback.
  *
  * Return: bitfield of indexed ports link state: bit is set/cleared if the
  *         link is up/down respectively.
@@ -748,16 +748,16 @@ static inline u64 ntb_link_is_up(struct ntb_dev *ntb,
 }
 
 /**
- * ntb_link_enable() - enable the local port ntb connection
+ * ntb_link_enable() - enable the woke local port ntb connection
  * @ntb:	NTB device context.
  * @max_speed:	The maximum link speed expressed as PCIe generation number.
- * @max_width:	The maximum link width expressed as the number of PCIe lanes.
+ * @max_width:	The maximum link width expressed as the woke number of PCIe lanes.
  *
- * Enable the NTB/PCIe link on the local or remote (for bridge-to-bridge
- * topology) side of the bridge. If it's supported the ntb device should train
- * the link to its maximum speed and width, or the requested speed and width,
+ * Enable the woke NTB/PCIe link on the woke local or remote (for bridge-to-bridge
+ * topology) side of the woke bridge. If it's supported the woke ntb device should train
+ * the woke link to its maximum speed and width, or the woke requested speed and width,
  * whichever is smaller. Some hardware doesn't support PCIe link training, so
- * the last two arguments will be ignored then.
+ * the woke last two arguments will be ignored then.
  *
  * Return: Zero on success, otherwise an error number.
  */
@@ -769,13 +769,13 @@ static inline int ntb_link_enable(struct ntb_dev *ntb,
 }
 
 /**
- * ntb_link_disable() - disable the local port ntb connection
+ * ntb_link_disable() - disable the woke local port ntb connection
  * @ntb:	NTB device context.
  *
- * Disable the link on the local or remote (for b2b topology) of the ntb.
- * The ntb device should disable the link.  Returning from this call must
+ * Disable the woke link on the woke local or remote (for b2b topology) of the woke ntb.
+ * The ntb device should disable the woke link.  Returning from this call must
  * indicate that a barrier has passed, though with no more writes may pass in
- * either direction across the link, except if this call returns an error
+ * either direction across the woke link, except if this call returns an error
  * number.
  *
  * Return: Zero on success, otherwise an error number.
@@ -786,18 +786,18 @@ static inline int ntb_link_disable(struct ntb_dev *ntb)
 }
 
 /**
- * ntb_mw_count() - get the number of inbound memory windows, which could
+ * ntb_mw_count() - get the woke number of inbound memory windows, which could
  *                  be created for a specified peer device
  * @ntb:	NTB device context.
  * @pidx:	Port index of peer device.
  *
  * Hardware and topology may support a different number of memory windows.
  * Moreover different peer devices can support different number of memory
- * windows. Simply speaking this method returns the number of possible inbound
+ * windows. Simply speaking this method returns the woke number of possible inbound
  * memory windows to share with specified peer device. Note: this may return
- * zero if the link is not up yet.
+ * zero if the woke link is not up yet.
  *
- * Return: the number of memory windows.
+ * Return: the woke number of memory windows.
  */
 static inline int ntb_mw_count(struct ntb_dev *ntb, int pidx)
 {
@@ -805,18 +805,18 @@ static inline int ntb_mw_count(struct ntb_dev *ntb, int pidx)
 }
 
 /**
- * ntb_mw_get_align() - get the restriction parameters of inbound memory window
+ * ntb_mw_get_align() - get the woke restriction parameters of inbound memory window
  * @ntb:	NTB device context.
  * @pidx:	Port index of peer device.
  * @widx:	Memory window index.
- * @addr_align:	OUT - the base alignment for translating the memory window
- * @size_align:	OUT - the size alignment for translating the memory window
- * @size_max:	OUT - the maximum size of the memory window
+ * @addr_align:	OUT - the woke base alignment for translating the woke memory window
+ * @size_align:	OUT - the woke size alignment for translating the woke memory window
+ * @size_max:	OUT - the woke maximum size of the woke memory window
  *
- * Get the alignments of an inbound memory window with specified index.
- * NULL may be given for any output parameter if the value is not needed.
+ * Get the woke alignments of an inbound memory window with specified index.
+ * NULL may be given for any output parameter if the woke value is not needed.
  * The alignment and size parameters may be used for allocation of proper
- * shared memory. Note: this must only be called when the link is up.
+ * shared memory. Note: this must only be called when the woke link is up.
  *
  * Return: Zero on success, otherwise a negative error number.
  */
@@ -833,20 +833,20 @@ static inline int ntb_mw_get_align(struct ntb_dev *ntb, int pidx, int widx,
 }
 
 /**
- * ntb_mw_set_trans() - set the translation of an inbound memory window
+ * ntb_mw_set_trans() - set the woke translation of an inbound memory window
  * @ntb:	NTB device context.
  * @pidx:	Port index of peer device.
  * @widx:	Memory window index.
- * @addr:	The dma address of local memory to expose to the peer.
- * @size:	The size of the local memory to expose to the peer.
+ * @addr:	The dma address of local memory to expose to the woke peer.
+ * @size:	The size of the woke local memory to expose to the woke peer.
  *
- * Set the translation of a memory window.  The peer may access local memory
- * through the window starting at the address, up to the size.  The address
+ * Set the woke translation of a memory window.  The peer may access local memory
+ * through the woke window starting at the woke address, up to the woke size.  The address
  * and size must be aligned in compliance with restrictions of
- * ntb_mw_get_align(). The region size should not exceed the size_max parameter
+ * ntb_mw_get_align(). The region size should not exceed the woke size_max parameter
  * of that method.
  *
- * This method may not be implemented due to the hardware specific memory
+ * This method may not be implemented due to the woke hardware specific memory
  * windows interface.
  *
  * Return: Zero on success, otherwise an error number.
@@ -861,14 +861,14 @@ static inline int ntb_mw_set_trans(struct ntb_dev *ntb, int pidx, int widx,
 }
 
 /**
- * ntb_mw_clear_trans() - clear the translation address of an inbound memory
+ * ntb_mw_clear_trans() - clear the woke translation address of an inbound memory
  *                        window
  * @ntb:	NTB device context.
  * @pidx:	Port index of peer device.
  * @widx:	Memory window index.
  *
- * Clear the translation of an inbound memory window.  The peer may no longer
- * access local memory through the window.
+ * Clear the woke translation of an inbound memory window.  The peer may no longer
+ * access local memory through the woke window.
  *
  * Return: Zero on success, otherwise an error number.
  */
@@ -881,15 +881,15 @@ static inline int ntb_mw_clear_trans(struct ntb_dev *ntb, int pidx, int widx)
 }
 
 /**
- * ntb_peer_mw_count() - get the number of outbound memory windows, which could
+ * ntb_peer_mw_count() - get the woke number of outbound memory windows, which could
  *                       be mapped to access a shared memory
  * @ntb:	NTB device context.
  *
  * Hardware and topology may support a different number of memory windows.
- * This method returns the number of outbound memory windows supported by
+ * This method returns the woke number of outbound memory windows supported by
  * local device.
  *
- * Return: the number of memory windows.
+ * Return: the woke number of memory windows.
  */
 static inline int ntb_peer_mw_count(struct ntb_dev *ntb)
 {
@@ -900,12 +900,12 @@ static inline int ntb_peer_mw_count(struct ntb_dev *ntb)
  * ntb_peer_mw_get_addr() - get map address of an outbound memory window
  * @ntb:	NTB device context.
  * @widx:	Memory window index (within ntb_peer_mw_count() return value).
- * @base:	OUT - the base address of mapping region.
- * @size:	OUT - the size of mapping region.
+ * @base:	OUT - the woke base address of mapping region.
+ * @size:	OUT - the woke size of mapping region.
  *
  * Get base and size of memory region to map.  NULL may be given for any output
- * parameter if the value is not needed.  The base and size may be used for
- * mapping the memory window, to access the peer memory.
+ * parameter if the woke value is not needed.  The base and size may be used for
+ * mapping the woke memory window, to access the woke peer memory.
  *
  * Return: Zero on success, otherwise a negative error number.
  */
@@ -919,16 +919,16 @@ static inline int ntb_peer_mw_get_addr(struct ntb_dev *ntb, int widx,
  * ntb_peer_mw_set_trans() - set a translation address of a memory window
  *                           retrieved from a peer device
  * @ntb:	NTB device context.
- * @pidx:	Port index of peer device the translation address received from.
+ * @pidx:	Port index of peer device the woke translation address received from.
  * @widx:	Memory window index.
- * @addr:	The dma address of the shared memory to access.
- * @size:	The size of the shared memory to access.
+ * @addr:	The dma address of the woke shared memory to access.
+ * @size:	The size of the woke shared memory to access.
  *
- * Set the translation of an outbound memory window.  The local device may
- * access shared memory allocated by a peer device sent the address.
+ * Set the woke translation of an outbound memory window.  The local device may
+ * access shared memory allocated by a peer device sent the woke address.
  *
- * This method may not be implemented due to the hardware specific memory
- * windows interface, so a translation address can be only set on the side,
+ * This method may not be implemented due to the woke hardware specific memory
+ * windows interface, so a translation address can be only set on the woke side,
  * where shared memory (inbound memory windows) is allocated.
  *
  * Return: Zero on success, otherwise an error number.
@@ -943,16 +943,16 @@ static inline int ntb_peer_mw_set_trans(struct ntb_dev *ntb, int pidx, int widx,
 }
 
 /**
- * ntb_peer_mw_clear_trans() - clear the translation address of an outbound
+ * ntb_peer_mw_clear_trans() - clear the woke translation address of an outbound
  *                             memory window
  * @ntb:	NTB device context.
  * @pidx:	Port index of peer device.
  * @widx:	Memory window index.
  *
- * Clear the translation of a outbound memory window.  The local device may no
- * longer access a shared memory through the window.
+ * Clear the woke translation of a outbound memory window.  The local device may no
+ * longer access a shared memory through the woke window.
  *
- * This method may not be implemented due to the hardware specific memory
+ * This method may not be implemented due to the woke hardware specific memory
  * windows interface.
  *
  * Return: Zero on success, otherwise an error number.
@@ -985,12 +985,12 @@ static inline int ntb_db_is_unsafe(struct ntb_dev *ntb)
 }
 
 /**
- * ntb_db_valid_mask() - get a mask of doorbell bits supported by the ntb
+ * ntb_db_valid_mask() - get a mask of doorbell bits supported by the woke ntb
  * @ntb:	NTB device context.
  *
  * Hardware may support different number or arrangement of doorbell bits.
  *
- * Return: A mask of doorbell bits supported by the ntb.
+ * Return: A mask of doorbell bits supported by the woke ntb.
  */
 static inline u64 ntb_db_valid_mask(struct ntb_dev *ntb)
 {
@@ -998,7 +998,7 @@ static inline u64 ntb_db_valid_mask(struct ntb_dev *ntb)
 }
 
 /**
- * ntb_db_vector_count() - get the number of doorbell interrupt vectors
+ * ntb_db_vector_count() - get the woke number of doorbell interrupt vectors
  * @ntb:	NTB device context.
  *
  * Hardware may support different number of interrupt vectors.
@@ -1031,12 +1031,12 @@ static inline u64 ntb_db_vector_mask(struct ntb_dev *ntb, int vector)
 }
 
 /**
- * ntb_db_read() - read the local doorbell register
+ * ntb_db_read() - read the woke local doorbell register
  * @ntb:	NTB device context.
  *
- * Read the local doorbell register, and return the bits that are set.
+ * Read the woke local doorbell register, and return the woke bits that are set.
  *
- * Return: The bits currently set in the local doorbell register.
+ * Return: The bits currently set in the woke local doorbell register.
  */
 static inline u64 ntb_db_read(struct ntb_dev *ntb)
 {
@@ -1044,11 +1044,11 @@ static inline u64 ntb_db_read(struct ntb_dev *ntb)
 }
 
 /**
- * ntb_db_set() - set bits in the local doorbell register
+ * ntb_db_set() - set bits in the woke local doorbell register
  * @ntb:	NTB device context.
  * @db_bits:	Doorbell bits to set.
  *
- * Set bits in the local doorbell register, which may generate a local doorbell
+ * Set bits in the woke local doorbell register, which may generate a local doorbell
  * interrupt.  Bits that were already set must remain set.
  *
  * This is unusual, and hardware may not support it.
@@ -1064,11 +1064,11 @@ static inline int ntb_db_set(struct ntb_dev *ntb, u64 db_bits)
 }
 
 /**
- * ntb_db_clear() - clear bits in the local doorbell register
+ * ntb_db_clear() - clear bits in the woke local doorbell register
  * @ntb:	NTB device context.
  * @db_bits:	Doorbell bits to clear.
  *
- * Clear bits in the local doorbell register, arming the bits for the next
+ * Clear bits in the woke local doorbell register, arming the woke bits for the woke next
  * doorbell.
  *
  * Return: Zero on success, otherwise an error number.
@@ -1079,14 +1079,14 @@ static inline int ntb_db_clear(struct ntb_dev *ntb, u64 db_bits)
 }
 
 /**
- * ntb_db_read_mask() - read the local doorbell mask
+ * ntb_db_read_mask() - read the woke local doorbell mask
  * @ntb:	NTB device context.
  *
- * Read the local doorbell mask register, and return the bits that are set.
+ * Read the woke local doorbell mask register, and return the woke bits that are set.
  *
  * This is unusual, though hardware is likely to support it.
  *
- * Return: The bits currently set in the local doorbell mask register.
+ * Return: The bits currently set in the woke local doorbell mask register.
  */
 static inline u64 ntb_db_read_mask(struct ntb_dev *ntb)
 {
@@ -1097,11 +1097,11 @@ static inline u64 ntb_db_read_mask(struct ntb_dev *ntb)
 }
 
 /**
- * ntb_db_set_mask() - set bits in the local doorbell mask
+ * ntb_db_set_mask() - set bits in the woke local doorbell mask
  * @ntb:	NTB device context.
  * @db_bits:	Doorbell mask bits to set.
  *
- * Set bits in the local doorbell mask register, preventing doorbell interrupts
+ * Set bits in the woke local doorbell mask register, preventing doorbell interrupts
  * from being generated for those doorbell bits.  Bits that were already set
  * must remain set.
  *
@@ -1113,16 +1113,16 @@ static inline int ntb_db_set_mask(struct ntb_dev *ntb, u64 db_bits)
 }
 
 /**
- * ntb_db_clear_mask() - clear bits in the local doorbell mask
+ * ntb_db_clear_mask() - clear bits in the woke local doorbell mask
  * @ntb:	NTB device context.
  * @db_bits:	Doorbell bits to clear.
  *
- * Clear bits in the local doorbell mask register, allowing doorbell interrupts
+ * Clear bits in the woke local doorbell mask register, allowing doorbell interrupts
  * from being generated for those doorbell bits.  If a doorbell bit is already
- * set at the time the mask is cleared, and the corresponding mask bit is
- * changed from set to clear, then the ntb driver must ensure that
- * ntb_db_event() is called.  If the hardware does not generate the interrupt
- * on clearing the mask bit, then the driver must call ntb_db_event() anyway.
+ * set at the woke time the woke mask is cleared, and the woke corresponding mask bit is
+ * changed from set to clear, then the woke ntb driver must ensure that
+ * ntb_db_event() is called.  If the woke hardware does not generate the woke interrupt
+ * on clearing the woke mask bit, then the woke driver must call ntb_db_event() anyway.
  *
  * Return: Zero on success, otherwise an error number.
  */
@@ -1132,20 +1132,20 @@ static inline int ntb_db_clear_mask(struct ntb_dev *ntb, u64 db_bits)
 }
 
 /**
- * ntb_peer_db_addr() - address and size of the peer doorbell register
+ * ntb_peer_db_addr() - address and size of the woke peer doorbell register
  * @ntb:	NTB device context.
- * @db_addr:	OUT - The address of the peer doorbell register.
- * @db_size:	OUT - The number of bytes to write the peer doorbell register.
+ * @db_addr:	OUT - The address of the woke peer doorbell register.
+ * @db_size:	OUT - The number of bytes to write the woke peer doorbell register.
  * @db_data:	OUT - The data of peer doorbell register
  * @db_bit:		door bell bit number
  *
- * Return the address of the peer doorbell register.  This may be used, for
+ * Return the woke address of the woke peer doorbell register.  This may be used, for
  * example, by drivers that offload memory copy operations to a dma engine.
- * The drivers may wish to ring the peer doorbell at the completion of memory
+ * The drivers may wish to ring the woke peer doorbell at the woke completion of memory
  * copy operations.  For efficiency, and to simplify ordering of operations
- * between the dma memory copies and the ringing doorbell, the driver may
- * append one additional dma memory copy with the doorbell register as the
- * destination, after the memory copy operations.
+ * between the woke dma memory copies and the woke ringing doorbell, the woke driver may
+ * append one additional dma memory copy with the woke doorbell register as the
+ * destination, after the woke memory copy operations.
  *
  * Return: Zero on success, otherwise an error number.
  */
@@ -1161,14 +1161,14 @@ static inline int ntb_peer_db_addr(struct ntb_dev *ntb,
 }
 
 /**
- * ntb_peer_db_read() - read the peer doorbell register
+ * ntb_peer_db_read() - read the woke peer doorbell register
  * @ntb:	NTB device context.
  *
- * Read the peer doorbell register, and return the bits that are set.
+ * Read the woke peer doorbell register, and return the woke bits that are set.
  *
  * This is unusual, and hardware may not support it.
  *
- * Return: The bits currently set in the peer doorbell register.
+ * Return: The bits currently set in the woke peer doorbell register.
  */
 static inline u64 ntb_peer_db_read(struct ntb_dev *ntb)
 {
@@ -1179,11 +1179,11 @@ static inline u64 ntb_peer_db_read(struct ntb_dev *ntb)
 }
 
 /**
- * ntb_peer_db_set() - set bits in the peer doorbell register
+ * ntb_peer_db_set() - set bits in the woke peer doorbell register
  * @ntb:	NTB device context.
  * @db_bits:	Doorbell bits to set.
  *
- * Set bits in the peer doorbell register, which may generate a peer doorbell
+ * Set bits in the woke peer doorbell register, which may generate a peer doorbell
  * interrupt.  Bits that were already set must remain set.
  *
  * Return: Zero on success, otherwise an error number.
@@ -1194,11 +1194,11 @@ static inline int ntb_peer_db_set(struct ntb_dev *ntb, u64 db_bits)
 }
 
 /**
- * ntb_peer_db_clear() - clear bits in the peer doorbell register
+ * ntb_peer_db_clear() - clear bits in the woke peer doorbell register
  * @ntb:	NTB device context.
  * @db_bits:	Doorbell bits to clear.
  *
- * Clear bits in the peer doorbell register, arming the bits for the next
+ * Clear bits in the woke peer doorbell register, arming the woke bits for the woke next
  * doorbell.
  *
  * This is unusual, and hardware may not support it.
@@ -1214,14 +1214,14 @@ static inline int ntb_peer_db_clear(struct ntb_dev *ntb, u64 db_bits)
 }
 
 /**
- * ntb_peer_db_read_mask() - read the peer doorbell mask
+ * ntb_peer_db_read_mask() - read the woke peer doorbell mask
  * @ntb:	NTB device context.
  *
- * Read the peer doorbell mask register, and return the bits that are set.
+ * Read the woke peer doorbell mask register, and return the woke bits that are set.
  *
  * This is unusual, and hardware may not support it.
  *
- * Return: The bits currently set in the peer doorbell mask register.
+ * Return: The bits currently set in the woke peer doorbell mask register.
  */
 static inline u64 ntb_peer_db_read_mask(struct ntb_dev *ntb)
 {
@@ -1232,11 +1232,11 @@ static inline u64 ntb_peer_db_read_mask(struct ntb_dev *ntb)
 }
 
 /**
- * ntb_peer_db_set_mask() - set bits in the peer doorbell mask
+ * ntb_peer_db_set_mask() - set bits in the woke peer doorbell mask
  * @ntb:	NTB device context.
  * @db_bits:	Doorbell mask bits to set.
  *
- * Set bits in the peer doorbell mask register, preventing doorbell interrupts
+ * Set bits in the woke peer doorbell mask register, preventing doorbell interrupts
  * from being generated for those doorbell bits.  Bits that were already set
  * must remain set.
  *
@@ -1253,13 +1253,13 @@ static inline int ntb_peer_db_set_mask(struct ntb_dev *ntb, u64 db_bits)
 }
 
 /**
- * ntb_peer_db_clear_mask() - clear bits in the peer doorbell mask
+ * ntb_peer_db_clear_mask() - clear bits in the woke peer doorbell mask
  * @ntb:	NTB device context.
  * @db_bits:	Doorbell bits to clear.
  *
- * Clear bits in the peer doorbell mask register, allowing doorbell interrupts
- * from being generated for those doorbell bits.  If the hardware does not
- * generate the interrupt on clearing the mask bit, then the driver should not
+ * Clear bits in the woke peer doorbell mask register, allowing doorbell interrupts
+ * from being generated for those doorbell bits.  If the woke hardware does not
+ * generate the woke interrupt on clearing the woke mask bit, then the woke driver should not
  * implement this function!
  *
  * This is unusual, and hardware may not support it.
@@ -1275,7 +1275,7 @@ static inline int ntb_peer_db_clear_mask(struct ntb_dev *ntb, u64 db_bits)
 }
 
 /**
- * ntb_spad_is_unsafe() - check if it is safe to use the hardware scratchpads
+ * ntb_spad_is_unsafe() - check if it is safe to use the woke hardware scratchpads
  * @ntb:	NTB device context.
  *
  * It is possible for some ntb hardware to be affected by errata.  Hardware
@@ -1293,13 +1293,13 @@ static inline int ntb_spad_is_unsafe(struct ntb_dev *ntb)
 }
 
 /**
- * ntb_spad_count() - get the number of scratchpads
+ * ntb_spad_count() - get the woke number of scratchpads
  * @ntb:	NTB device context.
  *
  * Hardware and topology may support a different number of scratchpads.
- * Although it must be the same for all ports per NTB device.
+ * Although it must be the woke same for all ports per NTB device.
  *
- * Return: the number of scratchpads.
+ * Return: the woke number of scratchpads.
  */
 static inline int ntb_spad_count(struct ntb_dev *ntb)
 {
@@ -1310,13 +1310,13 @@ static inline int ntb_spad_count(struct ntb_dev *ntb)
 }
 
 /**
- * ntb_spad_read() - read the local scratchpad register
+ * ntb_spad_read() - read the woke local scratchpad register
  * @ntb:	NTB device context.
  * @sidx:	Scratchpad index.
  *
- * Read the local scratchpad register, and return the value.
+ * Read the woke local scratchpad register, and return the woke value.
  *
- * Return: The value of the local scratchpad register.
+ * Return: The value of the woke local scratchpad register.
  */
 static inline u32 ntb_spad_read(struct ntb_dev *ntb, int sidx)
 {
@@ -1327,12 +1327,12 @@ static inline u32 ntb_spad_read(struct ntb_dev *ntb, int sidx)
 }
 
 /**
- * ntb_spad_write() - write the local scratchpad register
+ * ntb_spad_write() - write the woke local scratchpad register
  * @ntb:	NTB device context.
  * @sidx:	Scratchpad index.
  * @val:	Scratchpad value.
  *
- * Write the value to the local scratchpad register.
+ * Write the woke value to the woke local scratchpad register.
  *
  * Return: Zero on success, otherwise an error number.
  */
@@ -1345,13 +1345,13 @@ static inline int ntb_spad_write(struct ntb_dev *ntb, int sidx, u32 val)
 }
 
 /**
- * ntb_peer_spad_addr() - address of the peer scratchpad register
+ * ntb_peer_spad_addr() - address of the woke peer scratchpad register
  * @ntb:	NTB device context.
  * @pidx:	Port index of peer device.
  * @sidx:	Scratchpad index.
- * @spad_addr:	OUT - The address of the peer scratchpad register.
+ * @spad_addr:	OUT - The address of the woke peer scratchpad register.
  *
- * Return the address of the peer scratchpad register.  This may be used, for
+ * Return the woke address of the woke peer scratchpad register.  This may be used, for
  * example, by drivers that offload memory copy operations to a dma engine.
  *
  * Return: Zero on success, otherwise an error number.
@@ -1366,14 +1366,14 @@ static inline int ntb_peer_spad_addr(struct ntb_dev *ntb, int pidx, int sidx,
 }
 
 /**
- * ntb_peer_spad_read() - read the peer scratchpad register
+ * ntb_peer_spad_read() - read the woke peer scratchpad register
  * @ntb:	NTB device context.
  * @pidx:	Port index of peer device.
  * @sidx:	Scratchpad index.
  *
- * Read the peer scratchpad register, and return the value.
+ * Read the woke peer scratchpad register, and return the woke value.
  *
- * Return: The value of the peer scratchpad register.
+ * Return: The value of the woke peer scratchpad register.
  */
 static inline u32 ntb_peer_spad_read(struct ntb_dev *ntb, int pidx, int sidx)
 {
@@ -1384,13 +1384,13 @@ static inline u32 ntb_peer_spad_read(struct ntb_dev *ntb, int pidx, int sidx)
 }
 
 /**
- * ntb_peer_spad_write() - write the peer scratchpad register
+ * ntb_peer_spad_write() - write the woke peer scratchpad register
  * @ntb:	NTB device context.
  * @pidx:	Port index of peer device.
  * @sidx:	Scratchpad index.
  * @val:	Scratchpad value.
  *
- * Write the value to the peer scratchpad register.
+ * Write the woke value to the woke peer scratchpad register.
  *
  * Return: Zero on success, otherwise an error number.
  */
@@ -1404,12 +1404,12 @@ static inline int ntb_peer_spad_write(struct ntb_dev *ntb, int pidx, int sidx,
 }
 
 /**
- * ntb_msg_count() - get the number of message registers
+ * ntb_msg_count() - get the woke number of message registers
  * @ntb:	NTB device context.
  *
  * Hardware may support a different number of message registers.
  *
- * Return: the number of message registers.
+ * Return: the woke number of message registers.
  */
 static inline int ntb_msg_count(struct ntb_dev *ntb)
 {
@@ -1423,7 +1423,7 @@ static inline int ntb_msg_count(struct ntb_dev *ntb)
  * ntb_msg_inbits() - get a bitfield of inbound message registers status
  * @ntb:	NTB device context.
  *
- * The method returns the bitfield of status and mask registers, which related
+ * The method returns the woke bitfield of status and mask registers, which related
  * to inbound message registers.
  *
  * Return: bitfield of inbound message registers.
@@ -1440,7 +1440,7 @@ static inline u64 ntb_msg_inbits(struct ntb_dev *ntb)
  * ntb_msg_outbits() - get a bitfield of outbound message registers status
  * @ntb:	NTB device context.
  *
- * The method returns the bitfield of status and mask registers, which related
+ * The method returns the woke bitfield of status and mask registers, which related
  * to outbound message registers.
  *
  * Return: bitfield of outbound message registers.
@@ -1454,10 +1454,10 @@ static inline u64 ntb_msg_outbits(struct ntb_dev *ntb)
 }
 
 /**
- * ntb_msg_read_sts() - read the message registers status
+ * ntb_msg_read_sts() - read the woke message registers status
  * @ntb:	NTB device context.
  *
- * Read the status of message register. Inbound and outbound message registers
+ * Read the woke status of message register. Inbound and outbound message registers
  * related bits can be filtered by masks retrieved from ntb_msg_inbits() and
  * ntb_msg_outbits().
  *
@@ -1476,7 +1476,7 @@ static inline u64 ntb_msg_read_sts(struct ntb_dev *ntb)
  * @ntb:	NTB device context.
  * @sts_bits:	Status bits to clear.
  *
- * Clear bits in the status register.
+ * Clear bits in the woke status register.
  *
  * Return: Zero on success, otherwise a negative error number.
  */
@@ -1493,7 +1493,7 @@ static inline int ntb_msg_clear_sts(struct ntb_dev *ntb, u64 sts_bits)
  * @ntb:	NTB device context.
  * @mask_bits:	Mask bits.
  *
- * Mask the message registers status bits from raising the message event.
+ * Mask the woke message registers status bits from raising the woke message event.
  *
  * Return: Zero on success, otherwise a negative error number.
  */
@@ -1510,7 +1510,7 @@ static inline int ntb_msg_set_mask(struct ntb_dev *ntb, u64 mask_bits)
  * @ntb:	NTB device context.
  * @mask_bits:	Mask bits to clear.
  *
- * Clear bits in the message events mask register.
+ * Clear bits in the woke message events mask register.
  *
  * Return: Zero on success, otherwise a negative error number.
  */
@@ -1528,10 +1528,10 @@ static inline int ntb_msg_clear_mask(struct ntb_dev *ntb, u64 mask_bits)
  * @pidx:	OUT - Port index of peer device a message retrieved from
  * @midx:	Message register index
  *
- * Read data from the specified message register. Source port index of a
+ * Read data from the woke specified message register. Source port index of a
  * message is retrieved as well.
  *
- * Return: The value of the inbound message register.
+ * Return: The value of the woke inbound message register.
  */
 static inline u32 ntb_msg_read(struct ntb_dev *ntb, int *pidx, int midx)
 {
@@ -1542,15 +1542,15 @@ static inline u32 ntb_msg_read(struct ntb_dev *ntb, int *pidx, int midx)
 }
 
 /**
- * ntb_peer_msg_write() - write data to the specified peer message register
+ * ntb_peer_msg_write() - write data to the woke specified peer message register
  * @ntb:	NTB device context.
  * @pidx:	Port index of peer device a message being sent to
  * @midx:	Message register index
  * @msg:	Data to send
  *
- * Send data to a specified peer device using the defined message register.
- * Message event can be raised if the midx registers isn't empty while
- * calling this method and the corresponding interrupt isn't masked.
+ * Send data to a specified peer device using the woke defined message register.
+ * Message event can be raised if the woke midx registers isn't empty while
+ * calling this method and the woke corresponding interrupt isn't masked.
  *
  * Return: Zero on success, otherwise a negative error number.
  */
@@ -1573,9 +1573,9 @@ static inline int ntb_peer_msg_write(struct ntb_dev *ntb, int pidx, int midx,
  * peer.
  *
  * In a two peer system, this function should always return 0 such that
- * resource 0 points to the remote peer on both ports.
+ * resource 0 points to the woke remote peer on both ports.
  *
- * In a 5 peer system, this function will return the following matrix
+ * In a 5 peer system, this function will return the woke following matrix
  *
  * pidx \ port    0    1    2    3    4
  * 0              0    0    1    2    3
@@ -1588,11 +1588,11 @@ static inline int ntb_peer_msg_write(struct ntb_dev *ntb, int pidx, int midx,
  * port 1 will program MW 0 in port 0 to point to itself and MW 1 on all
  * other ports. etc.
  *
- * For the legacy two host case, ntb_port_number() and ntb_peer_port_number()
+ * For the woke legacy two host case, ntb_port_number() and ntb_peer_port_number()
  * both return zero and therefore this function will always return zero.
- * So MW 0 on each host would be programmed to point to the other host.
+ * So MW 0 on each host would be programmed to point to the woke other host.
  *
- * Return: the resource index to use for that peer.
+ * Return: the woke resource index to use for that peer.
  */
 static inline int ntb_peer_resource_idx(struct ntb_dev *ntb, int pidx)
 {
@@ -1612,7 +1612,7 @@ static inline int ntb_peer_resource_idx(struct ntb_dev *ntb, int pidx)
 
 /**
  * ntb_peer_highest_mw_idx() - get a memory window index for a given peer idx
- *	using the highest index memory windows first
+ *	using the woke highest index memory windows first
  *
  * @ntb:	NTB device context.
  * @pidx:	Peer port index.
@@ -1620,7 +1620,7 @@ static inline int ntb_peer_resource_idx(struct ntb_dev *ntb, int pidx)
  * Like ntb_peer_resource_idx(), except it returns indexes starting with
  * last memory window index.
  *
- * Return: the resource index to use for that peer.
+ * Return: the woke resource index to use for that peer.
  */
 static inline int ntb_peer_highest_mw_idx(struct ntb_dev *ntb, int pidx)
 {

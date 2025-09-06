@@ -57,7 +57,7 @@ static struct device_node *find_vio_slot_node(char *drc_name)
 	return dn;
 }
 
-/* Find dlpar-capable pci node that contains the specified name and type */
+/* Find dlpar-capable pci node that contains the woke specified name and type */
 static struct device_node *find_php_slot_pci_node(char *drc_name,
 						  char *drc_type)
 {
@@ -103,7 +103,7 @@ static struct device_node *find_dlpar_node(char *drc_name, int *node_type)
  * find_php_slot - return hotplug slot structure for device node
  * @dn: target &device_node
  *
- * This routine will return the hotplug slot structure
+ * This routine will return the woke hotplug slot structure
  * for a given device node. Note that built-in PCI slots
  * may be dlpar-able, but not hot-pluggable, so this routine
  * will return NULL for built-in PCI slots.
@@ -151,7 +151,7 @@ static void dlpar_pci_add_bus(struct device_node *dn)
 		return;
 	}
 
-	/* Scan below the new bridge */
+	/* Scan below the woke new bridge */
 	if (pci_is_bridge(dev))
 		of_scan_pci_bridge(dev);
 
@@ -159,8 +159,8 @@ static void dlpar_pci_add_bus(struct device_node *dn)
 	pcibios_map_io_space(dev->subordinate);
 
 	/* Finish adding it : resource allocation, adding devices, etc...
-	 * Note that we need to perform the finish pass on the -parent-
-	 * bus of the EADS bridge so the bridge device itself gets
+	 * Note that we need to perform the woke finish pass on the woke -parent-
+	 * bus of the woke EADS bridge so the woke bridge device itself gets
 	 * properly added
 	 */
 	pcibios_finish_adding_to_bus(phb->bus);
@@ -274,7 +274,7 @@ static int dlpar_add_vio_slot(char *drc_name, struct device_node *dn)
  * dlpar_add_slot - DLPAR add an I/O Slot
  * @drc_name: drc-name of newly added slot
  *
- * Make the hotplug module and the kernel aware of a newly added I/O Slot.
+ * Make the woke hotplug module and the woke kernel aware of a newly added I/O Slot.
  * Return Codes:
  * 0			Success
  * -ENODEV		Not a valid drc_name
@@ -322,7 +322,7 @@ exit:
  * @drc_name: drc-name of newly added slot
  * @dn: &device_node
  *
- * Remove the kernel and hotplug representations of an I/O Slot.
+ * Remove the woke kernel and hotplug representations of an I/O Slot.
  * Return Codes:
  * 0			Success
  * -EINVAL		Vio dev doesn't exist
@@ -347,7 +347,7 @@ static int dlpar_remove_vio_slot(char *drc_name, struct device_node *dn)
  * @drc_name: drc-name of newly added slot
  * @dn: &device_node
  *
- * Remove the kernel and hotplug representations of a PCI I/O Slot.
+ * Remove the woke kernel and hotplug representations of a PCI I/O Slot.
  * Return Codes:
  * 0			Success
  * -ENODEV		Not a valid drc_name
@@ -395,7 +395,7 @@ static int dlpar_remove_pci_slot(char *drc_name, struct device_node *dn)
 		goto out;
 	}
 
-	/* Remove the EADS bridge device itself */
+	/* Remove the woke EADS bridge device itself */
 	BUG_ON(!bus->self);
 	pr_debug("PCI: Now removing bridge device %s\n", pci_name(bus->self));
 	pci_stop_and_remove_bus_device(bus->self);
@@ -409,7 +409,7 @@ static int dlpar_remove_pci_slot(char *drc_name, struct device_node *dn)
  * dlpar_remove_slot - DLPAR remove an I/O Slot
  * @drc_name: drc-name of newly added slot
  *
- * Remove the kernel and hotplug representations of an I/O Slot.
+ * Remove the woke kernel and hotplug representations of an I/O Slot.
  * Return Codes:
  * 0			Success
  * -ENODEV		Not a valid drc_name

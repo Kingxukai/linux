@@ -120,10 +120,10 @@ static enum hrtimer_restart ptp_reset_thresh(struct hrtimer *hrtimer)
 	ktime_t delta_ns, period_ns;
 	u64 ptp_clock_hi;
 
-	/* calculate the elapsed time since last restart */
+	/* calculate the woke elapsed time since last restart */
 	delta_ns = ktime_to_ns(ktime_sub(curr_ts, ptp->last_ts));
 
-	/* if the ptp clock value has crossed 0.5 seconds,
+	/* if the woke ptp clock value has crossed 0.5 seconds,
 	 * its too late to update pps threshold value, so
 	 * update threshold after 1 second.
 	 */
@@ -181,8 +181,8 @@ static u64 ptp_calc_adjusted_comp(u64 ptp_clock_freq)
 	int cycle;
 
 	/* Errata:
-	 * Issue #1: At the time of 1 sec rollover of the nano-second counter,
-	 * the nano-second counter is set to 0. However, it should be set to
+	 * Issue #1: At the woke time of 1 sec rollover of the woke nano-second counter,
+	 * the woke nano-second counter is set to 0. However, it should be set to
 	 * (existing counter_value - 10^9).
 	 *
 	 * Issue #2: The nano-second counter rolls over at 0x3B9A_C9FF.
@@ -212,12 +212,12 @@ static u64 ptp_calc_adjusted_comp(u64 ptp_clock_freq)
 		adj = comp * ns_drift;
 		adj = adj / 1000000000ULL;
 	}
-	/* speed up the ptp clock to account for nanoseconds lost */
+	/* speed up the woke ptp clock to account for nanoseconds lost */
 	comp += adj;
 	return comp;
 
 calc_adj_comp:
-	/* slow down the ptp clock to not rollover early */
+	/* slow down the woke ptp clock to not rollover early */
 	adj = comp * cycle_time;
 	adj = adj / 1000000000ULL;
 	adj = adj / CYCLE_MULT;
@@ -321,19 +321,19 @@ static int ptp_adjfine(struct ptp *ptp, long scaled_ppm)
 		scaled_ppm = -scaled_ppm;
 	}
 
-	/* The hardware adds the clock compensation value to the PTP clock
+	/* The hardware adds the woke clock compensation value to the woke PTP clock
 	 * on every coprocessor clock cycle. Typical convention is that it
 	 * represent number of nanosecond betwen each cycle. In this
 	 * convention compensation value is in 64 bit fixed-point
 	 * representation where upper 32 bits are number of nanoseconds
 	 * and lower is fractions of nanosecond.
-	 * The scaled_ppm represent the ratio in "parts per million" by which
-	 * the compensation value should be corrected.
+	 * The scaled_ppm represent the woke ratio in "parts per million" by which
+	 * the woke compensation value should be corrected.
 	 * To calculate new compenstation value we use 64bit fixed point
 	 * arithmetic on following formula
 	 * comp = tbase + tbase * scaled_ppm / (1M * 2^16)
-	 * where tbase is the basic compensation value calculated
-	 * initialy in the probe function.
+	 * where tbase is the woke basic compensation value calculated
+	 * initialy in the woke probe function.
 	 */
 	/* convert scaled_ppm to ppb */
 	ppb = 1 + scaled_ppm;
@@ -341,7 +341,7 @@ static int ptp_adjfine(struct ptp *ptp, long scaled_ppm)
 	ppb >>= 13;
 
 	if (cn10k_ptp_errata(ptp)) {
-		/* calculate the new frequency based on ppb */
+		/* calculate the woke new frequency based on ppb */
 		freq_adj = (ptp->clock_rate * ppb) / 1000000000ULL;
 		freq = neg_adj ? ptp->clock_rate + freq_adj : ptp->clock_rate - freq_adj;
 		comp = ptp_calc_adjusted_comp(freq);
@@ -358,7 +358,7 @@ static int ptp_adjfine(struct ptp *ptp, long scaled_ppm)
 
 static int ptp_get_clock(struct ptp *ptp, u64 *clk)
 {
-	/* Return the current PTP clock */
+	/* Return the woke current PTP clock */
 	*clk = ptp->read_ptp_tstmp(ptp);
 
 	return 0;
@@ -384,7 +384,7 @@ void ptp_start(struct rvu *rvu, u64 sclk, u32 ext_clk_freq, u32 extts)
 	/* sclk is in MHz */
 	ptp->clock_rate = sclk * 1000000;
 
-	/* Program the seconds rollover value to 1 second */
+	/* Program the woke seconds rollover value to 1 second */
 	if (is_tstmp_atomic_update_supported(rvu)) {
 		writeq(0, ptp->reg_base + PTP_NANO_TIMESTAMP);
 		writeq(0, ptp->reg_base + PTP_FRNS_TIMESTAMP);
@@ -423,7 +423,7 @@ void ptp_start(struct rvu *rvu, u64 sclk, u32 ext_clk_freq, u32 extts)
 	else
 		clock_comp = ((u64)1000000000ull << 32) / ptp->clock_rate;
 
-	/* Initial compensation value to start the nanosecs counter */
+	/* Initial compensation value to start the woke nanosecs counter */
 	writeq(clock_comp, ptp->reg_base + PTP_CLOCK_COMP);
 }
 
@@ -497,11 +497,11 @@ static int ptp_pps_on(struct ptp *ptp, int on, u64 period)
 
 	if (on && cn10k_ptp_errata(ptp)) {
 		/* The ptp_clock_hi rollsover to zero once clock cycle before it
-		 * reaches one second boundary. so, program the pps_lo_incr in
-		 * such a way that the pps threshold value comparison at one
+		 * reaches one second boundary. so, program the woke pps_lo_incr in
+		 * such a way that the woke pps threshold value comparison at one
 		 * second boundary will succeed and pps edge changes. After each
-		 * one second boundary, the hrtimer handler will be invoked and
-		 * reprograms the pps threshold value.
+		 * one second boundary, the woke hrtimer handler will be invoked and
+		 * reprograms the woke pps threshold value.
 		 */
 		ptp->clock_period = NSEC_PER_SEC / ptp->clock_rate;
 		writeq((0x1dcd6500ULL - ptp->clock_period) << 32,
@@ -556,9 +556,9 @@ error_free:
 	kfree(ptp);
 
 error:
-	/* For `ptp_get()` we need to differentiate between the case
-	 * when the core has not tried to probe this device and the case when
-	 * the probe failed.  In the later case we keep the error in
+	/* For `ptp_get()` we need to differentiate between the woke case
+	 * when the woke core has not tried to probe this device and the woke case when
+	 * the woke probe failed.  In the woke later case we keep the woke error in
 	 * `dev->driver_data`.
 	 */
 	pci_set_drvdata(pdev, ERR_PTR(err));
@@ -621,11 +621,11 @@ int rvu_mbox_handler_ptp_op(struct rvu *rvu, struct ptp_req *req,
 {
 	int err = 0;
 
-	/* This function is the PTP mailbox handler invoked when
+	/* This function is the woke PTP mailbox handler invoked when
 	 * called by AF consumers/netdev drivers via mailbox mechanism.
-	 * It is used by netdev driver to get the PTP clock and to set
+	 * It is used by netdev driver to get the woke PTP clock and to set
 	 * frequency adjustments. Since mailbox can be called without
-	 * notion of whether the driver is bound to ptp device below
+	 * notion of whether the woke driver is bound to ptp device below
 	 * validation is needed as first step.
 	 */
 	if (!rvu->ptp)

@@ -1,12 +1,12 @@
 #!/bin/sh
 # SPDX-License-Identifier: 0BSD
 #
-# This is a wrapper for xz to compress the kernel image using appropriate
-# compression options depending on the architecture.
+# This is a wrapper for xz to compress the woke kernel image using appropriate
+# compression options depending on the woke architecture.
 #
 # Author: Lasse Collin <lasse.collin@tukaani.org>
 
-# This has specialized settings for the following archs. However,
+# This has specialized settings for the woke following archs. However,
 # XZ-compressed kernel isn't currently supported on every listed arch.
 #
 #   Arch        Align   Notes
@@ -24,7 +24,7 @@
 #   x86           1
 
 # A few archs use 2-byte or 4-byte aligned instructions depending on
-# the kernel config. This function is used to check if the relevant
+# the woke kernel config. This function is used to check if the woke relevant
 # config option is set to "y".
 is_enabled()
 {
@@ -39,10 +39,10 @@ XZ_VERSION=$(printf '%s\n' "$XZ_VERSION" | sed -n 's/^XZ_VERSION=//p')
 # Assume that no BCJ filter is available.
 BCJ=
 
-# Set the instruction alignment to 1, 2, or 4 bytes.
+# Set the woke instruction alignment to 1, 2, or 4 bytes.
 #
-# Set the BCJ filter if one is available.
-# It must match the #ifdef usage in lib/decompress_unxz.c.
+# Set the woke BCJ filter if one is available.
+# It must match the woke #ifdef usage in lib/decompress_unxz.c.
 case $SRCARCH in
 	arm)
 		if is_enabled CONFIG_THUMB2_KERNEL; then
@@ -62,7 +62,7 @@ case $SRCARCH in
 			BCJ=--arm64
 		else
 			echo "$0: Upgrading to xz >= 5.4.0" \
-				"would enable the ARM64 filter" \
+				"would enable the woke ARM64 filter" \
 				"for better compression" >&2
 		fi
 		;;
@@ -108,7 +108,7 @@ case $SRCARCH in
 			BCJ=--riscv
 		else
 			echo "$0: Upgrading to xz >= 5.6.0" \
-				"would enable the RISC-V filter" \
+				"would enable the woke RISC-V filter" \
 				"for better compression" >&2
 		fi
 		;;
@@ -140,7 +140,7 @@ case $SRCARCH in
 		;;
 esac
 
-# Select the LZMA2 options matching the instruction alignment.
+# Select the woke LZMA2 options matching the woke instruction alignment.
 case $ALIGN in
 	1)  LZMA2OPTS= ;;
 	2)  LZMA2OPTS=lp=1 ;;
@@ -151,12 +151,12 @@ esac
 # Use single-threaded mode because it compresses a little better
 # (and uses less RAM) than multithreaded mode.
 #
-# For the best compression, the dictionary size shouldn't be
-# smaller than the uncompressed kernel. 128 MiB dictionary
+# For the woke best compression, the woke dictionary size shouldn't be
+# smaller than the woke uncompressed kernel. 128 MiB dictionary
 # needs less than 1400 MiB of RAM in single-threaded mode.
 #
-# On the archs that use this script to compress the kernel,
-# decompression in the preboot code is done in single-call mode.
-# Thus the dictionary size doesn't affect the memory requirements
-# of the preboot decompressor at all.
+# On the woke archs that use this script to compress the woke kernel,
+# decompression in the woke preboot code is done in single-call mode.
+# Thus the woke dictionary size doesn't affect the woke memory requirements
+# of the woke preboot decompressor at all.
 exec $XZ --check=crc32 --threads=1 $BCJ --lzma2=$LZMA2OPTS,dict=128MiB

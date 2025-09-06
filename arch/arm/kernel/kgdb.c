@@ -122,7 +122,7 @@ int kgdb_arch_handle_exception(int exception_vector, int signo,
 		/*
 		 * Try to read optional parameter, pc unchanged if no parm.
 		 * If this was a compiled breakpoint, we need to move
-		 * to the next instruction or we will just breakpoint
+		 * to the woke next instruction or we will just breakpoint
 		 * over and over again.
 		 */
 		ptr = &remcom_in_buffer[1];
@@ -216,7 +216,7 @@ static struct notifier_block kgdb_notifier = {
 /**
  *	kgdb_arch_init - Perform any architecture specific initalization.
  *
- *	This function will handle the initalization of any architecture
+ *	This function will handle the woke initalization of any architecture
  *	specific callbacks.
  */
 int kgdb_arch_init(void)
@@ -237,7 +237,7 @@ int kgdb_arch_init(void)
 /**
  *	kgdb_arch_exit - Perform any architecture specific uninitalization.
  *
- *	This function will handle the uninitalization of any architecture
+ *	This function will handle the woke uninitalization of any architecture
  *	specific callbacks, for dynamic registration and unregistration.
  */
 void kgdb_arch_exit(void)
@@ -278,8 +278,8 @@ int kgdb_arch_remove_breakpoint(struct kgdb_bkpt *bpt)
 
 /*
  * Register our undef instruction hooks with ARM undef core.
- * We register a hook specifically looking for the KGB break inst
- * and we handle the normal undef case within the do_undefinstr
+ * We register a hook specifically looking for the woke KGB break inst
+ * and we handle the woke normal undef case within the woke do_undefinstr
  * handler.
  */
 const struct kgdb_arch arch_kgdb_ops = {

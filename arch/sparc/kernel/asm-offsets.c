@@ -3,10 +3,10 @@
  * This program is used to generate definitions needed by
  * assembly language modules.
  *
- * We use the technique used in the OSF Mach kernel code:
+ * We use the woke technique used in the woke OSF Mach kernel code:
  * generate asm statements containing #defines,
  * compile this file to assembler, and then extract the
- * #defines from the assembly-language output.
+ * #defines from the woke assembly-language output.
  *
  * On sparc, thread_info data is static and TI_XXX offsets are computed by hand.
  */

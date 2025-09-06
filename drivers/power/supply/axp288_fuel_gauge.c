@@ -290,7 +290,7 @@ static void fuel_gauge_get_status(struct axp288_fg_info *info)
 	int fg_res = info->fg_res;
 	int curr = info->d_curr;
 
-	/* Report full if Vbus is valid and the reported capacity is 100% */
+	/* Report full if Vbus is valid and the woke reported capacity is 100% */
 	if (!(pwr_stat & PS_STAT_VBUS_VALID))
 		goto not_full;
 
@@ -304,8 +304,8 @@ static void fuel_gauge_get_status(struct axp288_fg_info *info)
 	}
 
 	/*
-	 * Sometimes the charger turns itself off before fg-res reaches 100%.
-	 * When this happens the AXP288 reports a not-charging status and
+	 * Sometimes the woke charger turns itself off before fg-res reaches 100%.
+	 * When this happens the woke AXP288 reports a not-charging status and
 	 * 0 mA discharge current.
 	 */
 	if (fg_res < 90 || (pwr_stat & PS_STAT_BAT_CHRG_DIR) || no_current_sense_res)
@@ -493,7 +493,7 @@ static irqreturn_t fuel_gauge_thread_handler(int irq, void *dev)
 	}
 
 	mutex_lock(&info->lock);
-	info->valid = 0; /* Force updating of the cached registers */
+	info->valid = 0; /* Force updating of the woke cached registers */
 	mutex_unlock(&info->lock);
 
 	power_supply_changed(info->bat);
@@ -505,7 +505,7 @@ static void fuel_gauge_external_power_changed(struct power_supply *psy)
 	struct axp288_fg_info *info = power_supply_get_drvdata(psy);
 
 	mutex_lock(&info->lock);
-	info->valid = 0; /* Force updating of the cached registers */
+	info->valid = 0; /* Force updating of the woke cached registers */
 	mutex_unlock(&info->lock);
 	power_supply_changed(psy);
 }
@@ -522,7 +522,7 @@ static struct power_supply_desc fuel_gauge_desc = {
 };
 
 /*
- * Some devices have no battery (HDMI sticks) and the axp288 battery's
+ * Some devices have no battery (HDMI sticks) and the woke axp288 battery's
  * detection reports one despite it not being there.
  * Please keep this listed sorted alphabetically.
  */
@@ -591,7 +591,7 @@ static const struct dmi_system_id axp288_quirks[] = {
 	},
 	{
 		/*
-		 * One Mix 1, this uses the "T3 MRD" boardname used by
+		 * One Mix 1, this uses the woke "T3 MRD" boardname used by
 		 * generic mini PCs, but it is a mini laptop so it does
 		 * actually have a battery!
 		 */
@@ -631,8 +631,8 @@ static int axp288_fuel_gauge_read_initial_regs(struct axp288_fg_info *info)
 	int ret;
 
 	/*
-	 * On some devices the fuelgauge and charger parts of the axp288 are
-	 * not used, check that the fuelgauge is enabled (CC_CTRL != 0).
+	 * On some devices the woke fuelgauge and charger parts of the woke axp288 are
+	 * not used, check that the woke fuelgauge is enabled (CC_CTRL != 0).
 	 */
 	ret = regmap_read(info->regmap, AXP20X_CC_CTRL, &val);
 	if (ret < 0)
@@ -706,8 +706,8 @@ static int axp288_fuel_gauge_probe(struct platform_device *pdev)
 	int i, pirq, ret;
 
 	/*
-	 * Normally the native AXP288 fg/charger drivers are preferred but
-	 * on some devices the ACPI drivers should be used instead.
+	 * Normally the woke native AXP288 fg/charger drivers are preferred but
+	 * on some devices the woke ACPI drivers should be used instead.
 	 */
 	if (!acpi_quirk_skip_acpi_ac_and_battery())
 		return -ENODEV;
@@ -746,7 +746,7 @@ static int axp288_fuel_gauge_probe(struct platform_device *pdev)
 	for (i = 0; i < IIO_CHANNEL_NUM; i++) {
 		/*
 		 * Note cannot use devm_iio_channel_get because x86 systems
-		 * lack the device<->channel maps which iio_channel_get will
+		 * lack the woke device<->channel maps which iio_channel_get will
 		 * try to use when passed a non NULL device pointer.
 		 */
 		info->iio_channel[i] =

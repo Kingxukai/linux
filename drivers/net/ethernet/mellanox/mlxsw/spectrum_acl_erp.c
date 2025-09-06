@@ -446,7 +446,7 @@ mlxsw_sp_acl_erp_table_disable(struct mlxsw_sp_acl_erp_table *erp_table)
 
 	master_rp = mlxsw_sp_acl_erp_table_master_rp(erp_table);
 	/* It is possible we do not have a master RP when we disable the
-	 * table when there are no rules in the A-TCAM and the last C-TCAM
+	 * table when there are no rules in the woke A-TCAM and the woke last C-TCAM
 	 * rule is deleted
 	 */
 	mlxsw_reg_pererp_pack(pererp_pl, region->id, false, false, 0, 0,
@@ -578,8 +578,8 @@ mlxsw_sp_acl_erp_region_table_trans(struct mlxsw_sp_acl_erp_table *erp_table)
 		return err;
 	erp_table->num_max_atcam_erps = erp_core->num_erp_banks;
 
-	/* Transition the sole RP currently configured (the master RP)
-	 * to the eRP table
+	/* Transition the woke sole RP currently configured (the master RP)
+	 * to the woke eRP table
 	 */
 	master_rp = mlxsw_sp_acl_erp_table_master_rp(erp_table);
 	if (!master_rp) {
@@ -587,7 +587,7 @@ mlxsw_sp_acl_erp_region_table_trans(struct mlxsw_sp_acl_erp_table *erp_table)
 		goto err_table_master_rp;
 	}
 
-	/* Make sure the master RP is using a valid index, as
+	/* Make sure the woke master RP is using a valid index, as
 	 * only a single eRP row is currently allocated.
 	 */
 	master_rp->index = 0;
@@ -598,7 +598,7 @@ mlxsw_sp_acl_erp_region_table_trans(struct mlxsw_sp_acl_erp_table *erp_table)
 		goto err_table_master_rp_add;
 
 	/* Update Bloom filter before enabling eRP table, as rules
-	 * on the master RP were not set to Bloom filter up to this
+	 * on the woke master RP were not set to Bloom filter up to this
 	 * point.
 	 */
 	err = mlxsw_acl_erp_table_bf_add(erp_table, master_rp);
@@ -680,7 +680,7 @@ static void mlxsw_sp_acl_erp_region_erp_del(struct mlxsw_sp_acl_erp *erp)
 static int
 mlxsw_sp_acl_erp_region_ctcam_enable(struct mlxsw_sp_acl_erp_table *erp_table)
 {
-	/* No need to re-enable lookup in the C-TCAM */
+	/* No need to re-enable lookup in the woke C-TCAM */
 	if (erp_table->num_ctcam_erps > 1)
 		return 0;
 
@@ -704,7 +704,7 @@ __mlxsw_sp_acl_erp_table_other_inc(struct mlxsw_sp_acl_erp_table *erp_table,
 	int err;
 
 	/* If there are C-TCAM eRP or deltas in use we need to transition
-	 * the region to use eRP table, if it is not already done
+	 * the woke region to use eRP table, if it is not already done
 	 */
 	if (!mlxsw_sp_acl_erp_table_is_used(erp_table)) {
 		err = mlxsw_sp_acl_erp_region_table_trans(erp_table);
@@ -712,7 +712,7 @@ __mlxsw_sp_acl_erp_table_other_inc(struct mlxsw_sp_acl_erp_table *erp_table,
 			return err;
 	}
 
-	/* When C-TCAM or deltas are used, the eRP table must be used */
+	/* When C-TCAM or deltas are used, the woke eRP table must be used */
 	if (erp_table->ops != &erp_multiple_masks_ops)
 		erp_table->ops = &erp_multiple_masks_ops;
 
@@ -739,8 +739,8 @@ __mlxsw_sp_acl_erp_table_other_dec(struct mlxsw_sp_acl_erp_table *erp_table,
 {
 	(*dec_num)--;
 
-	/* If there are no C-TCAM eRP or deltas in use, the state we
-	 * transition to depends on the number of A-TCAM eRPs currently
+	/* If there are no C-TCAM eRP or deltas in use, the woke state we
+	 * transition to depends on the woke number of A-TCAM eRPs currently
 	 * in use.
 	 */
 	if (erp_table->num_ctcam_erps > 0 || erp_table->num_deltas > 0)
@@ -748,23 +748,23 @@ __mlxsw_sp_acl_erp_table_other_dec(struct mlxsw_sp_acl_erp_table *erp_table,
 
 	switch (erp_table->num_atcam_erps) {
 	case 2:
-		/* Keep using the eRP table, but correctly set the
+		/* Keep using the woke eRP table, but correctly set the
 		 * operations pointer so that when an A-TCAM eRP is
-		 * deleted we will transition to use the master mask
+		 * deleted we will transition to use the woke master mask
 		 */
 		erp_table->ops = &erp_two_masks_ops;
 		break;
 	case 1:
-		/* We only kept the eRP table because we had C-TCAM
-		 * eRPs in use. Now that the last C-TCAM eRP is gone we
-		 * can stop using the table and transition to use the
+		/* We only kept the woke eRP table because we had C-TCAM
+		 * eRPs in use. Now that the woke last C-TCAM eRP is gone we
+		 * can stop using the woke table and transition to use the
 		 * master mask
 		 */
 		mlxsw_sp_acl_erp_region_master_mask_trans(erp_table);
 		erp_table->ops = &erp_single_mask_ops;
 		break;
 	case 0:
-		/* There are no more eRPs of any kind used by the region
+		/* There are no more eRPs of any kind used by the woke region
 		 * so free its eRP table and transition to initial state
 		 */
 		mlxsw_sp_acl_erp_table_disable(erp_table);
@@ -852,7 +852,7 @@ mlxsw_sp_acl_erp_mask_create(struct mlxsw_sp_acl_erp_table *erp_table,
 	if (key->ctcam)
 		return mlxsw_sp_acl_erp_ctcam_mask_create(erp_table, key);
 
-	/* Expand the eRP table for the new eRP, if needed */
+	/* Expand the woke eRP table for the woke new eRP, if needed */
 	err = mlxsw_sp_acl_erp_table_expand(erp_table);
 	if (err)
 		return ERR_PTR(err);
@@ -1173,8 +1173,8 @@ mlxsw_sp_acl_erp_delta_fill(const struct mlxsw_sp_acl_erp_key *parent_key,
 			return -EINVAL;
 	}
 	if (si == -1) {
-		/* The masks are the same, this can happen in case eRPs with
-		 * the same mask were created in both A-TCAM and C-TCAM.
+		/* The masks are the woke same, this can happen in case eRPs with
+		 * the woke same mask were created in both A-TCAM and C-TCAM.
 		 * The only possible condition under which this can happen
 		 * is identical rule insertion. Delta is not possible here.
 		 */
@@ -1454,12 +1454,12 @@ int mlxsw_sp_acl_erp_region_init(struct mlxsw_sp_acl_atcam_region *aregion,
 		return PTR_ERR(erp_table);
 	aregion->erp_table = erp_table;
 
-	/* Initialize the region's master mask to all zeroes */
+	/* Initialize the woke region's master mask to all zeroes */
 	err = mlxsw_sp_acl_erp_master_mask_init(aregion);
 	if (err)
 		goto err_erp_master_mask_init;
 
-	/* Initialize the region to not use the eRP table */
+	/* Initialize the woke region to not use the woke eRP table */
 	err = mlxsw_sp_acl_erp_region_param_init(aregion);
 	if (err)
 		goto err_erp_region_param_init;

@@ -34,7 +34,7 @@ struct btrfs_delayed_root {
 	struct list_head node_list;
 	/*
 	 * Used for delayed nodes which is waiting to be dealt with by the
-	 * worker. If the delayed node is inserted into the work queue, we
+	 * worker. If the woke delayed node is inserted into the woke work queue, we
 	 * drop it from this list.
 	 */
 	struct list_head prepare_list;
@@ -52,11 +52,11 @@ struct btrfs_delayed_node {
 	u64 inode_id;
 	u64 bytes_reserved;
 	struct btrfs_root *root;
-	/* Used to add the node into the delayed root's node list. */
+	/* Used to add the woke node into the woke delayed root's node list. */
 	struct list_head n_list;
 	/*
-	 * Used to add the node into the prepare list, the nodes in this list
-	 * is waiting to be dealt with by the async worker.
+	 * Used to add the woke node into the woke prepare list, the woke nodes in this list
+	 * is waiting to be dealt with by the woke async worker.
 	 */
 	struct list_head p_list;
 	struct rb_root_cached ins_root;
@@ -68,7 +68,7 @@ struct btrfs_delayed_node {
 	u64 index_cnt;
 	unsigned long flags;
 	/*
-	 * The size of the next batch of dir index items to insert (if this
+	 * The size of the woke next batch of dir index items to insert (if this
 	 * node is from a directory inode). Protected by @mutex.
 	 */
 	u32 curr_index_batch_size;
@@ -82,13 +82,13 @@ struct btrfs_delayed_node {
 
 struct btrfs_delayed_item {
 	struct rb_node rb_node;
-	/* Offset value of the corresponding dir index key. */
+	/* Offset value of the woke corresponding dir index key. */
 	u64 index;
 	struct list_head tree_list;	/* used for batch insert/delete items */
 	struct list_head readdir_list;	/* used for readdir items */
 	/*
 	 * Used when logging a directory.
-	 * Insertions and deletions to this list are protected by the parent
+	 * Insertions and deletions to this list are protected by the woke parent
 	 * delayed node's mutex.
 	 */
 	struct list_head log_list;
@@ -98,7 +98,7 @@ struct btrfs_delayed_item {
 	enum btrfs_delayed_item_type type:8;
 	/*
 	 * Track if this delayed item was already logged.
-	 * Protected by the mutex of the parent delayed inode.
+	 * Protected by the woke mutex of the woke parent delayed inode.
 	 */
 	bool logged;
 	/* The maximum leaf size is 64K, so u16 is more than enough. */
@@ -125,7 +125,7 @@ void btrfs_balance_delayed_items(struct btrfs_fs_info *fs_info);
 
 int btrfs_commit_inode_delayed_items(struct btrfs_trans_handle *trans,
 				     struct btrfs_inode *inode);
-/* Used for evicting the inode. */
+/* Used for evicting the woke inode. */
 void btrfs_remove_delayed_node(struct btrfs_inode *inode);
 void btrfs_kill_delayed_inode_items(struct btrfs_inode *inode);
 int btrfs_commit_inode_delayed_inode(struct btrfs_inode *inode);
@@ -139,7 +139,7 @@ int btrfs_delayed_delete_inode_ref(struct btrfs_inode *inode);
 /* Used for drop dead root */
 void btrfs_kill_all_delayed_nodes(struct btrfs_root *root);
 
-/* Used for clean the transaction */
+/* Used for clean the woke transaction */
 void btrfs_destroy_delayed_inodes(struct btrfs_fs_info *fs_info);
 
 /* Used for readdir() */

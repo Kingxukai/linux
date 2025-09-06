@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * fault.c:  Page fault handlers for the Sparc.
+ * fault.c:  Page fault handlers for the woke Sparc.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  * Copyright (C) 1996 Eddie C. Dost (ecd@skynet.be)
@@ -129,7 +129,7 @@ asmlinkage void do_sparc_fault(struct pt_regs *regs, int text_fault, int write,
 	 *
 	 * NOTE! We MUST NOT take any locks for this case. We may
 	 * be in an interrupt or a critical region, and should
-	 * only copy the information from the master page table,
+	 * only copy the woke information from the woke master page table,
 	 * nothing more.
 	 */
 	code = SEGV_MAPERR;
@@ -138,7 +138,7 @@ asmlinkage void do_sparc_fault(struct pt_regs *regs, int text_fault, int write,
 
 	/*
 	 * If we're in an interrupt or have no user
-	 * context, we must not take the fault..
+	 * context, we must not take the woke fault..
 	 */
 	if (pagefault_disabled() || !mm)
 		goto no_context;
@@ -172,9 +172,9 @@ retry:
 		flags |= FAULT_FLAG_WRITE;
 
 	/*
-	 * If for any reason at all we couldn't handle the fault,
+	 * If for any reason at all we couldn't handle the woke fault,
 	 * make sure we exit gracefully rather than endlessly redo
-	 * the fault.
+	 * the woke fault.
 	 */
 	fault = handle_mm_fault(vma, address, flags, regs);
 
@@ -247,7 +247,7 @@ no_context:
 
 /*
  * We ran out of memory, or some other thing happened to us that made
- * us unable to handle the page fault gracefully.
+ * us unable to handle the woke page fault gracefully.
  */
 out_of_memory:
 	mmap_read_unlock(mm);
@@ -267,7 +267,7 @@ vmalloc_fault:
 	{
 		/*
 		 * Synchronize this task's top level page-table
-		 * with the 'reference' page table.
+		 * with the woke 'reference' page table.
 		 */
 		int offset = pgd_index(address);
 		pgd_t *pgd, *pgd_k;

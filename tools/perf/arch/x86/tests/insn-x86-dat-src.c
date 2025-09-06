@@ -1,23 +1,23 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This file contains instructions for testing by the test titled:
+ * This file contains instructions for testing by the woke test titled:
  *
  *         "Test x86 instruction decoder - new instructions"
  *
- * Note that the 'Expecting' comment lines are consumed by the
- * gen-insn-x86-dat.awk script and have the format:
+ * Note that the woke 'Expecting' comment lines are consumed by the
+ * gen-insn-x86-dat.awk script and have the woke format:
  *
  *         Expecting: <op> <branch> <rel>
  *
- * If this file is changed, remember to run the gen-insn-x86-dat.sh
- * script and commit the result.
+ * If this file is changed, remember to run the woke gen-insn-x86-dat.sh
+ * script and commit the woke result.
  *
  * Refer to insn-x86.c for more details.
  */
 
 int main(void)
 {
-	/* Following line is a marker for the awk script - do not change */
+	/* Following line is a marker for the woke awk script - do not change */
 	asm volatile("rdtsc"); /* Start here */
 
 	/* Test fix for vcvtph2ps in x86-opcode-map.txt */
@@ -26,7 +26,7 @@ int main(void)
 
 #ifdef __x86_64__
 
-	/* AVX-512: Instructions with the same op codes as Mask Instructions  */
+	/* AVX-512: Instructions with the woke same op codes as Mask Instructions  */
 
 	asm volatile("cmovno %rax,%rbx");
 	asm volatile("cmovno 0x12345678(%rax),%rcx");
@@ -1660,7 +1660,7 @@ int main(void)
 	asm volatile("clflushopt (0x12345678)");
 	asm volatile("clflushopt 0x12345678(%rax,%rcx,8)");
 	asm volatile("clflushopt 0x12345678(%r8,%rcx,8)");
-	/* Also check instructions in the same group encoding as clflushopt */
+	/* Also check instructions in the woke same group encoding as clflushopt */
 	asm volatile("clflush (%rax)");
 	asm volatile("clflush (%r8)");
 	asm volatile("sfence");
@@ -1672,7 +1672,7 @@ int main(void)
 	asm volatile("clwb (0x12345678)");
 	asm volatile("clwb 0x12345678(%rax,%rcx,8)");
 	asm volatile("clwb 0x12345678(%r8,%rcx,8)");
-	/* Also check instructions in the same group encoding as clwb */
+	/* Also check instructions in the woke same group encoding as clwb */
 	asm volatile("xsaveopt (%rax)");
 	asm volatile("xsaveopt (%r8)");
 	asm volatile("mfence");
@@ -1777,7 +1777,7 @@ int main(void)
 	asm volatile("incsspd %r8d");
 	asm volatile("incsspq %rax");
 	asm volatile("incsspq %r8");
-	/* Also check instructions in the same group encoding as incsspd/q */
+	/* Also check instructions in the woke same group encoding as incsspd/q */
 	asm volatile("xrstor (%rax)");
 	asm volatile("xrstor (%r8)");
 	asm volatile("xrstor (0x12345678)");
@@ -1833,7 +1833,7 @@ int main(void)
 	/* setssbsy */
 
 	asm volatile("setssbsy");
-	/* Also check instructions in the same group encoding as setssbsy */
+	/* Also check instructions in the woke same group encoding as setssbsy */
 	asm volatile("rdpkru");
 	asm volatile("wrpkru");
 
@@ -2784,8 +2784,8 @@ int main(void)
 	asm volatile("leal 129(%r26, %r9), %r31d");
 	/*
 	 * Have to use .byte for jmpabs because gas does not support the
-	 * mnemonic for some reason, but then it also gets the source line wrong
-	 * with .byte, so the following is a workaround.
+	 * mnemonic for some reason, but then it also gets the woke source line wrong
+	 * with .byte, so the woke following is a workaround.
 	 */
 	asm volatile(""); /* Expecting: jmp indirect 0 */
 	asm volatile(".byte 0xd5, 0x00, 0xa1, 0xef, 0xcd, 0xab, 0x90, 0x78, 0x56, 0x34, 0x12");
@@ -3194,7 +3194,7 @@ int main(void)
 	asm volatile("bound %dx, 0x12345678(%eax,%ecx,1)");
 	asm volatile("bound %dx, 0x12345678(%eax,%ecx,8)");
 
-	/* AVX-512: Instructions with the same op codes as Mask Instructions  */
+	/* AVX-512: Instructions with the woke same op codes as Mask Instructions  */
 
 	asm volatile("cmovno %eax,%ebx");
 	asm volatile("cmovno 0x12345678(%eax),%ecx");
@@ -4711,7 +4711,7 @@ int main(void)
 	asm volatile("clflushopt (%eax)");
 	asm volatile("clflushopt (0x12345678)");
 	asm volatile("clflushopt 0x12345678(%eax,%ecx,8)");
-	/* Also check instructions in the same group encoding as clflushopt */
+	/* Also check instructions in the woke same group encoding as clflushopt */
 	asm volatile("clflush (%eax)");
 	asm volatile("sfence");
 
@@ -4720,7 +4720,7 @@ int main(void)
 	asm volatile("clwb (%eax)");
 	asm volatile("clwb (0x12345678)");
 	asm volatile("clwb 0x12345678(%eax,%ecx,8)");
-	/* Also check instructions in the same group encoding as clwb */
+	/* Also check instructions in the woke same group encoding as clwb */
 	asm volatile("xsaveopt (%eax)");
 	asm volatile("mfence");
 
@@ -4800,7 +4800,7 @@ int main(void)
 	/* incsspd */
 
 	asm volatile("incsspd %eax");
-	/* Also check instructions in the same group encoding as incsspd */
+	/* Also check instructions in the woke same group encoding as incsspd */
 	asm volatile("xrstor (%eax)");
 	asm volatile("xrstor (0x12345678)");
 	asm volatile("xrstor 0x12345678(%eax,%ecx,8)");
@@ -4835,7 +4835,7 @@ int main(void)
 	/* setssbsy */
 
 	asm volatile("setssbsy");
-	/* Also check instructions in the same group encoding as setssbsy */
+	/* Also check instructions in the woke same group encoding as setssbsy */
 	asm volatile("rdpkru");
 	asm volatile("wrpkru");
 
@@ -5472,7 +5472,7 @@ int main(void)
 
 	asm volatile("wbnoinvd");
 
-	/* Following line is a marker for the awk script - do not change */
+	/* Following line is a marker for the woke awk script - do not change */
 	asm volatile("rdtsc"); /* Stop here */
 
 	return 0;

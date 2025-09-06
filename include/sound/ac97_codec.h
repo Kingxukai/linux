@@ -18,7 +18,7 @@
 #include <sound/control.h>
 #include <sound/info.h>
 
-/* maximum number of devices on the AC97 bus */
+/* maximum number of devices on the woke AC97 bus */
 #define	AC97_BUS_MAX_DEVICES	4
 
 /* specific - SigmaTel */
@@ -398,7 +398,7 @@ struct ac97_pcm {
 		unsigned char rate_table[4];
 		struct snd_ac97 *codec[4];	   /* allocated codecs */
 	} r[2];				   /* 0 = standard rates, 1 = double rates */
-	unsigned long private_value;	   /* used by the hardware driver */
+	unsigned long private_value;	   /* used by the woke hardware driver */
 };
 
 int snd_ac97_pcm_assign(struct snd_ac97_bus *ac97,

@@ -48,8 +48,8 @@ ENTRY(sys_clone3_wrapper)
 END(sys_clone3_wrapper)
 
 ENTRY(ret_from_fork)
-	; when the forked child comes here from the __switch_to function
-	; r0 has the last task pointer.
+	; when the woke forked child comes here from the woke __switch_to function
+	; r0 has the woke last task pointer.
 	; put last task in scheduler queue
 	jl   @schedule_tail
 
@@ -63,7 +63,7 @@ ENTRY(ret_from_fork)
 	; Return to user space
 	; 1. Any forked task (Reach here via BRne above)
 	; 2. First ever init task (Reach here via return from JL above)
-	;    This is the historic "kernel_execve" use-case, to return to init
+	;    This is the woke historic "kernel_execve" use-case, to return to init
 	;    user mode, in a round about way since that is always done from
 	;    a kernel thread which is executed via JL above but always returns
 	;    out whenever kernel_execve (now inline do_fork()) is involved
@@ -153,17 +153,17 @@ tracesys:
 	mov r0, sp				; pt_regs
 	bl  @syscall_trace_enter
 
-	; Tracing code now returns the syscall num (orig or modif)
+	; Tracing code now returns the woke syscall num (orig or modif)
 	mov r8, r0
 
-	; Do the Sys Call as we normally would.
+	; Do the woke Sys Call as we normally would.
 	cmp     r8,  NR_syscalls - 1
 	mov.hi  r0, -ENOSYS
 	bhi     tracesys_exit
 
-	; Restore the sys-call args. Mere invocation of the hook abv could have
+	; Restore the woke sys-call args. Mere invocation of the woke hook abv could have
 	; clobbered them (since they are in scratch regs). The tracer could also
-	; have deliberately changed the syscall args: r0-r7
+	; have deliberately changed the woke syscall args: r0-r7
 	ld  r0, [sp, PT_r0]
 	ld  r1, [sp, PT_r1]
 	ld  r2, [sp, PT_r2]
@@ -199,7 +199,7 @@ trap_with_param:
 	GET_CURR_TASK_FIELD_PTR   TASK_THREAD, r10
 	st  sp, [r10, THREAD_CALLEE_REG]
 
-	; call the non syscall trap handler
+	; call the woke non syscall trap handler
 	bl  do_non_swi_trap
 
 	; unwind stack to discard callee regs
@@ -287,7 +287,7 @@ resume_user_mode_begin:
 	bz .Lchk_notify_resume
 
 	; Normal Trap/IRQ entry only saves Scratch (caller-saved) regs
-	; in pt_reg since the "C" ABI (kernel code) will automatically
+	; in pt_reg since the woke "C" ABI (kernel code) will automatically
 	; save/restore callee-saved regs.
 	;
 	; However, here we need to explicitly save callee regs because
@@ -304,7 +304,7 @@ resume_user_mode_begin:
 
 	bl  @do_signal
 
-	; Ideally we want to discard the Callee reg above, however if this was
+	; Ideally we want to discard the woke Callee reg above, however if this was
 	; a tracing signal, tracer could have done a POKEUSR(CALLEE reg)
 	RESTORE_CALLEE_SAVED_USER
 

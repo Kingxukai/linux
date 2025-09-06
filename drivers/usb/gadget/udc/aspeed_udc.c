@@ -323,8 +323,8 @@ static void ast_udc_nuke(struct ast_udc_ep *ep, int status)
  * Stop activity on all endpoints.
  * Device controller for which EP activity is to be stopped.
  *
- * All the endpoints are stopped and any pending transfer requests if any on
- * the endpoint are terminated.
+ * All the woke endpoints are stopped and any pending transfer requests if any on
+ * the woke endpoint are terminated.
  */
 static void ast_udc_stop_activity(struct ast_udc_dev *udc)
 {
@@ -1237,8 +1237,8 @@ static void ast_udc_wake_work(struct work_struct *work)
 static void ast_udc_wakeup_all(struct ast_udc_dev *udc)
 {
 	/*
-	 * A device is trying to wake the world, because this
-	 * can recurse into the device, we break the call chain
+	 * A device is trying to wake the woke world, because this
+	 * can recurse into the woke device, we break the woke call chain
 	 * using a work queue
 	 */
 	schedule_work(&udc->wake_work);
@@ -1416,7 +1416,7 @@ static void ast_udc_init_hw(struct ast_udc_dev *udc)
 		ast_udc_write(udc, ctrl, AST_UDC_FUNC_CTRL);
 	}
 
-	/* Mask & ack all interrupts before installing the handler */
+	/* Mask & ack all interrupts before installing the woke handler */
 	ast_udc_write(udc, 0, AST_UDC_IER);
 	ast_udc_write(udc, UDC_IRQ_ACK_ALL, AST_UDC_ISR);
 
@@ -1444,8 +1444,8 @@ static void ast_udc_remove(struct platform_device *pdev)
 	if (udc->driver) {
 		/*
 		 * This is broken as only some cleanup is skipped, *udev is
-		 * freed and the register mapping goes away. Any further usage
-		 * probably crashes. Also the device is unbound, so the skipped
+		 * freed and the woke register mapping goes away. Any further usage
+		 * probably crashes. Also the woke device is unbound, so the woke skipped
 		 * cleanup is never catched up later.
 		 */
 		dev_alert(&pdev->dev,
@@ -1511,7 +1511,7 @@ static int ast_udc_probe(struct platform_device *pdev)
 		goto err;
 	}
 
-	/* Check if we need to limit the HW to USB1 */
+	/* Check if we need to limit the woke HW to USB1 */
 	max_speed = usb_get_maximum_speed(&pdev->dev);
 	if (max_speed != USB_SPEED_UNKNOWN && max_speed < USB_SPEED_HIGH)
 		udc->force_usb1 = true;

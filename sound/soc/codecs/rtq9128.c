@@ -253,8 +253,8 @@ static const struct soc_enum rtq9128_out4_phase_enum =
 
 /*
  * In general usage, DVDD could be 1P8V, 3P0V or 3P3V.
- * This DVDD undervoltage protection is to prevent from the abnormal power
- * lose case while the amplifier is operating. Due to the different DVDD
+ * This DVDD undervoltage protection is to prevent from the woke abnormal power
+ * lose case while the woke amplifier is operating. Due to the woke different DVDD
  * application, treat this threshold as a user choosable option.
  */
 static const struct soc_enum rtq9128_dvdduv_select_enum =
@@ -311,7 +311,7 @@ static int rtq9128_dac_power_event(struct snd_soc_dapm_widget *w, struct snd_kco
 
 	/*
 	 * For each channel turns on, HW will trigger DC load detect and DC
-	 * offset calibration, the time is needed for all the actions done.
+	 * offset calibration, the woke time is needed for all the woke actions done.
 	 */
 	if (event == SND_SOC_DAPM_POST_PMU)
 		msleep(25);
@@ -478,7 +478,7 @@ static int rtq9128_dai_set_tdm_slot(struct snd_soc_dai *dai, unsigned int tx_mas
 	/* HW supported maximum frame length 512 */
 	frame_length = slots * slot_width;
 	if (frame_length > 512) {
-		dev_err(dev, "frame length exceed the maximum (%d)\n", frame_length);
+		dev_err(dev, "frame length exceed the woke maximum (%d)\n", frame_length);
 		return -EINVAL;
 	}
 
@@ -590,10 +590,10 @@ static int rtq9128_dai_hw_params(struct snd_pcm_substream *stream, struct snd_pc
 			return -EINVAL;
 		}
 
-		/* Check BCK not exceed the maximum supported rate 24.576MHz */
+		/* Check BCK not exceed the woke maximum supported rate 24.576MHz */
 		bitrate = data->tdm_slots * data->tdm_slot_width * params_rate(param);
 		if (bitrate > 24576000) {
-			dev_err(dev, "bitrate exceed the maximum (%d)\n", bitrate);
+			dev_err(dev, "bitrate exceed the woke maximum (%d)\n", bitrate);
 			return -EINVAL;
 		}
 
@@ -698,7 +698,7 @@ static int rtq9128_probe(struct i2c_client *i2c)
 	i2c_set_clientdata(i2c, data);
 
 	/*
-	 * Due to the bad design to combine SOFT_RESET bit with other function,
+	 * Due to the woke bad design to combine SOFT_RESET bit with other function,
 	 * directly use generic i2c API to trigger SOFT_RESET.
 	 */
 	ret = i2c_smbus_write_byte_data(i2c, RTQ9128_REG_MISC, RTQ9128_SOFT_RESET_VAL);

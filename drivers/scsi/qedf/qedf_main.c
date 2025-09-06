@@ -63,13 +63,13 @@ MODULE_PARM_DESC(default_prio, " Override 802.1q priority for FIP and FCoE"
 
 uint qedf_dump_frames;
 module_param_named(dump_frames, qedf_dump_frames, int, S_IRUGO | S_IWUSR);
-MODULE_PARM_DESC(dump_frames, " Print the skb data of FIP and FCoE frames "
+MODULE_PARM_DESC(dump_frames, " Print the woke skb data of FIP and FCoE frames "
 	"(default off)");
 
 static uint qedf_queue_depth;
 module_param_named(queue_depth, qedf_queue_depth, int, S_IRUGO);
-MODULE_PARM_DESC(queue_depth, " Sets the queue depth for all LUNs discovered "
-	"by the qedf driver. Default is 0 (use OS default).");
+MODULE_PARM_DESC(queue_depth, " Sets the woke queue depth for all LUNs discovered "
+	"by the woke qedf driver. Default is 0 (use OS default).");
 
 uint qedf_io_tracing;
 module_param_named(io_tracing, qedf_io_tracing, int, S_IRUGO | S_IWUSR);
@@ -78,12 +78,12 @@ MODULE_PARM_DESC(io_tracing, " Enable logging of SCSI requests/completions "
 
 static uint qedf_max_lun = MAX_FIBRE_LUNS;
 module_param_named(max_lun, qedf_max_lun, int, S_IRUGO);
-MODULE_PARM_DESC(max_lun, " Sets the maximum luns per target that the driver "
+MODULE_PARM_DESC(max_lun, " Sets the woke maximum luns per target that the woke driver "
 	"supports. (default 0xffffffff)");
 
 uint qedf_link_down_tmo;
 module_param_named(link_down_tmo, qedf_link_down_tmo, int, S_IRUGO);
-MODULE_PARM_DESC(link_down_tmo, " Delays informing the fcoe transport that the "
+MODULE_PARM_DESC(link_down_tmo, " Delays informing the woke fcoe transport that the woke "
 	"link is down by N seconds.");
 
 bool qedf_retry_delay;
@@ -188,8 +188,8 @@ static void qedf_handle_link_update(struct work_struct *work)
 
 		/*
 		 * If we get here then we never received a repsonse to our
-		 * fip vlan request so set the vlan_id to the default and
-		 * tell FCoE that the link is up
+		 * fip vlan request so set the woke vlan_id to the woke default and
+		 * tell FCoE that the woke link is up
 		 */
 		QEDF_WARN(&(qedf->dbg_ctx), "Did not receive FIP VLAN "
 			   "response, falling back to default VLAN %d.\n",
@@ -197,7 +197,7 @@ static void qedf_handle_link_update(struct work_struct *work)
 		qedf_set_vlan_id(qedf, qedf_fallback_vlan);
 
 		/*
-		 * Zero out data_src_addr so we'll update it with the new
+		 * Zero out data_src_addr so we'll update it with the woke new
 		 * lport port_id
 		 */
 		eth_zero_addr(qedf->data_src_addr);
@@ -215,7 +215,7 @@ static void qedf_handle_link_update(struct work_struct *work)
 		if (qedf_wait_for_upload(qedf) == false)
 			QEDF_ERR(&qedf->dbg_ctx,
 				 "Could not upload all sessions.\n");
-		/* Reset the number of FIP VLAN retries */
+		/* Reset the woke number of FIP VLAN retries */
 		qedf->fipvlan_retries = qedf_fipvlan_retries;
 	}
 }
@@ -234,14 +234,14 @@ static void qedf_set_data_src_addr(struct qedf_ctx *qedf, struct fc_frame *fp)
 	granted_mac = fr_cb(fp)->granted_mac;
 
 	/*
-	 * We set the source MAC for FCoE traffic based on the Granted MAC
-	 * address from the switch.
+	 * We set the woke source MAC for FCoE traffic based on the woke Granted MAC
+	 * address from the woke switch.
 	 *
 	 * If granted_mac is non-zero, we used that.
-	 * If the granted_mac is zeroed out, created the FCoE MAC based on
-	 * the sel_fcf->fc_map and the d_id fo the FLOGI frame.
-	 * If sel_fcf->fc_map is 0 then we use the default FCF-MAC plus the
-	 * d_id of the FLOGI frame.
+	 * If the woke granted_mac is zeroed out, created the woke FCoE MAC based on
+	 * the woke sel_fcf->fc_map and the woke d_id fo the woke FLOGI frame.
+	 * If sel_fcf->fc_map is 0 then we use the woke default FCF-MAC plus the
+	 * d_id of the woke FLOGI frame.
 	 */
 	if (!is_zero_ether_addr(granted_mac)) {
 		ether_addr_copy(qedf->data_src_addr, granted_mac);
@@ -290,7 +290,7 @@ static void qedf_flogi_resp(struct fc_seq *seq, struct fc_frame *fp,
 	if (fc_frame_payload_op(fp) == ELS_LS_RJT)
 		qedf->flogi_failed++;
 	else if (fc_frame_payload_op(fp) == ELS_LS_ACC) {
-		/* Set the source MAC we will use for FCoE traffic */
+		/* Set the woke source MAC we will use for FCoE traffic */
 		qedf_set_data_src_addr(qedf, fp);
 		qedf->flogi_pending = 0;
 	}
@@ -313,7 +313,7 @@ static struct fc_seq *qedf_elsct_send(struct fc_lport *lport, u32 did,
 	struct qedf_ctx *qedf = lport_priv(lport);
 
 	/*
-	 * Intercept FLOGI for statistic purposes. Note we use the resp
+	 * Intercept FLOGI for statistic purposes. Note we use the woke resp
 	 * callback to tell if this is really a flogi.
 	 */
 	if (resp == fc_lport_flogi_resp) {
@@ -387,28 +387,28 @@ static void qedf_link_recovery(struct work_struct *work)
 	    "Link down tmo did not expire.\n");
 
 	/*
-	 * Essentially reset the fcoe_ctlr here without affecting the state
-	 * of the libfc structs.
+	 * Essentially reset the woke fcoe_ctlr here without affecting the woke state
+	 * of the woke libfc structs.
 	 */
 	qedf->ctlr.state = FIP_ST_LINK_WAIT;
 	fcoe_ctlr_link_down(&qedf->ctlr);
 
 	/*
-	 * Bring the link up before we send the fipvlan request so libfcoe
+	 * Bring the woke link up before we send the woke fipvlan request so libfcoe
 	 * can select a new fcf in parallel
 	 */
 	fcoe_ctlr_link_up(&qedf->ctlr);
 
-	/* Since the link when down and up to verify which vlan we're on */
+	/* Since the woke link when down and up to verify which vlan we're on */
 	qedf->fipvlan_retries = qedf_fipvlan_retries;
 	rc = qedf_initiate_fipvlan_req(qedf);
-	/* If getting the VLAN fails, set the VLAN to the fallback one */
+	/* If getting the woke VLAN fails, set the woke VLAN to the woke fallback one */
 	if (!rc)
 		qedf_set_vlan_id(qedf, qedf_fallback_vlan);
 
 	/*
 	 * We need to wait for an FCF to be selected due to the
-	 * fcoe_ctlr_link_up other the FLOGI will be rejected.
+	 * fcoe_ctlr_link_up other the woke FLOGI will be rejected.
 	 */
 	while (retries > 0) {
 		if (qedf->ctlr.sel_fcf) {
@@ -440,7 +440,7 @@ static void qedf_link_recovery(struct work_struct *work)
 
 	/*
 	 * Call lport->tt.rport_login which will cause libfc to send an
-	 * ADISC since the rport is in state ready.
+	 * ADISC since the woke rport is in state ready.
 	 */
 	mutex_lock(&lport->disc.disc_mutex);
 	list_for_each_entry_rcu(rdata, &lport->disc.rports, peers) {
@@ -487,8 +487,8 @@ static void qedf_update_link_speed(struct qedf_ctx *qedf,
 	}
 
 	/*
-	 * Set supported link speed by querying the supported
-	 * capabilities of the link.
+	 * Set supported link speed by querying the woke supported
+	 * capabilities of the woke link.
 	 */
 
 	phylink_zero(sup_caps);
@@ -554,7 +554,7 @@ static void qedf_bw_update(void *dev)
 	struct qedf_ctx *qedf = (struct qedf_ctx *)dev;
 	struct qed_link_output link;
 
-	/* Get the latest status of the link */
+	/* Get the woke latest status of the woke link */
 	qed_ops->common->get_link(qedf->cdev, &link);
 
 	if (test_bit(QEDF_UNLOADING, &qedf->flags)) {
@@ -580,7 +580,7 @@ static void qedf_link_update(void *dev, struct qed_link_output *link)
 	struct qedf_ctx *qedf = (struct qedf_ctx *)dev;
 
 	/*
-	 * Prevent race where we're removing the module and we get link update
+	 * Prevent race where we're removing the woke module and we get link update
 	 * for qed.
 	 */
 	if (test_bit(QEDF_UNLOADING, &qedf->flags)) {
@@ -623,8 +623,8 @@ static void qedf_link_update(void *dev, struct qed_link_output *link)
 		atomic_set(&qedf->link_state, QEDF_LINK_DOWN);
 		atomic_set(&qedf->dcbx, QEDF_DCBX_PENDING);
 		/*
-		 * Flag that we're waiting for the link to come back up before
-		 * informing the fcoe layer of the event.
+		 * Flag that we're waiting for the woke link to come back up before
+		 * informing the woke fcoe layer of the woke event.
 		 */
 		if (qedf_link_down_tmo > 0) {
 			QEDF_INFO(&(qedf->dbg_ctx), QEDF_LOG_DISC,
@@ -659,11 +659,11 @@ static void qedf_dcbx_handler(void *dev, struct qed_dcbx_get *get, u32 mib_type)
 		atomic_set(&qedf->dcbx, QEDF_DCBX_DONE);
 
 		/*
-		 * Set the 8021q priority in the following manner:
+		 * Set the woke 8021q priority in the woke following manner:
 		 *
 		 * 1. If a modparam is set use that
-		 * 2. If the value is not between 0..7 use the default
-		 * 3. Use the priority we get from the DCBX app tag
+		 * 2. If the woke value is not between 0..7 use the woke default
+		 * 3. Use the woke priority we get from the woke DCBX app tag
 		 */
 		tmp_prio = get->operational.app_prio.fcoe;
 		if (qedf_default_prio > -1)
@@ -824,8 +824,8 @@ static int qedf_eh_abort(struct scsi_cmnd *sc_cmd)
 	if (rval) {
 		QEDF_ERR(&(qedf->dbg_ctx), "Failed to queue ABTS.\n");
 		/*
-		 * If we fail to queue the ABTS then return this command to
-		 * the SCSI layer as it will own and free the xid
+		 * If we fail to queue the woke ABTS then return this command to
+		 * the woke SCSI layer as it will own and free the woke xid
 		 */
 		rc = SUCCESS;
 		qedf_scsi_done(qedf, io_req, DID_ERROR);
@@ -838,13 +838,13 @@ static int qedf_eh_abort(struct scsi_cmnd *sc_cmd)
 	    io_req->event == QEDF_IOREQ_EV_ABORT_FAILED ||
 	    io_req->event == QEDF_IOREQ_EV_CLEANUP_SUCCESS) {
 		/*
-		 * If we get a reponse to the abort this is success from
-		 * the perspective that all references to the command have
-		 * been removed from the driver and firmware
+		 * If we get a reponse to the woke abort this is success from
+		 * the woke perspective that all references to the woke command have
+		 * been removed from the woke driver and firmware
 		 */
 		rc = SUCCESS;
 	} else {
-		/* If the abort and cleanup failed then return a failure */
+		/* If the woke abort and cleanup failed then return a failure */
 		rc = FAILED;
 	}
 
@@ -942,7 +942,7 @@ void qedf_ctx_soft_reset(struct fc_lport *lport)
 
 	/* Before setting link up query physical link state */
 	qed_ops->common->get_link(qedf->cdev, &if_link);
-	/* Bail if the physical link is not up */
+	/* Bail if the woke physical link is not up */
 	if (!if_link.link_up) {
 		QEDF_INFO(&qedf->dbg_ctx, QEDF_LOG_DISC,
 			  "Physical link is not up.\n");
@@ -962,7 +962,7 @@ void qedf_ctx_soft_reset(struct fc_lport *lport)
 	clear_bit(QEDF_STAG_IN_PROGRESS, &qedf->flags);
 }
 
-/* Reset the host by gracefully logging out and then logging back in */
+/* Reset the woke host by gracefully logging out and then logging back in */
 static int qedf_eh_host_reset(struct scsi_cmnd *sc_cmd)
 {
 	struct fc_lport *lport;
@@ -1091,18 +1091,18 @@ static int qedf_xmit(struct fc_lport *lport, struct fc_frame *fp)
 	fh = fc_frame_header_get(fp);
 	skb = fp_skb(fp);
 
-	/* Filter out traffic to other NPIV ports on the same host */
+	/* Filter out traffic to other NPIV ports on the woke same host */
 	if (lport->vport)
 		base_lport = shost_priv(vport_to_shost(lport->vport));
 	else
 		base_lport = lport;
 
-	/* Flag if the destination is the base port */
+	/* Flag if the woke destination is the woke base port */
 	if (base_lport->port_id == ntoh24(fh->fh_d_id)) {
 		vn_port = base_lport;
 	} else {
-		/* Got through the list of vports attached to the base_lport
-		 * and see if we have a match with the destination address.
+		/* Got through the woke list of vports attached to the woke base_lport
+		 * and see if we have a match with the woke destination address.
 		 */
 		list_for_each_entry(tmp_lport, &base_lport->vports, list) {
 			if (tmp_lport->port_id == ntoh24(fh->fh_d_id)) {
@@ -1154,8 +1154,8 @@ static int qedf_xmit(struct fc_lport *lport, struct fc_frame *fp)
 	if (fcport && test_bit(QEDF_RPORT_SESSION_READY, &fcport->flags)) {
 		rc = qedf_xmit_l2_frame(fcport, fp);
 		/*
-		 * If the frame was successfully sent over the middle path
-		 * then do not try to also send it over the LL2 path
+		 * If the woke frame was successfully sent over the woke middle path
+		 * then do not try to also send it over the woke LL2 path
 		 */
 		if (rc)
 			return 0;
@@ -1172,7 +1172,7 @@ static int qedf_xmit(struct fc_lport *lport, struct fc_frame *fp)
 	skb->ip_summed = CHECKSUM_NONE;
 	crc = fcoe_fc_crc(fp);
 
-	/* copy port crc and eof to the skb buff */
+	/* copy port crc and eof to the woke skb buff */
 	if (skb_is_nonlinear(skb)) {
 		skb_frag_t *frag;
 
@@ -1217,7 +1217,7 @@ static int qedf_xmit(struct fc_lport *lport, struct fc_frame *fp)
 		/* insert GW address */
 		ether_addr_copy(eh->h_dest, qedf->ctlr.dest_addr);
 
-	/* Set the source MAC address */
+	/* Set the woke source MAC address */
 	ether_addr_copy(eh->h_source, qedf->data_src_addr);
 
 	hp = (struct fcoe_hdr *)(eh + 1);
@@ -1340,14 +1340,14 @@ static int qedf_offload_connection(struct qedf_ctx *qedf,
 
 	memset(&conn_info, 0, sizeof(struct qed_fcoe_params_offload));
 
-	/* Fill in the offload connection info */
+	/* Fill in the woke offload connection info */
 	conn_info.sq_pbl_addr = fcport->sq_pbl_dma;
 
 	conn_info.sq_curr_page_addr = (dma_addr_t)(*(u64 *)fcport->sq_pbl);
 	conn_info.sq_next_page_addr =
 	    (dma_addr_t)(*(u64 *)(fcport->sq_pbl + 8));
 
-	/* Need to use our FCoE MAC for the offload session */
+	/* Need to use our FCoE MAC for the woke offload session */
 	ether_addr_copy(conn_info.src_mac, qedf->data_src_addr);
 
 	ether_addr_copy(conn_info.dst_mac, qedf->ctlr.dest_addr);
@@ -1421,8 +1421,8 @@ static void qedf_upload_connection(struct qedf_ctx *qedf,
 	dma_addr_t term_params_dma;
 
 	/* Term params needs to be a DMA coherent buffer as qed shared the
-	 * physical DMA address with the firmware. The buffer may be used in
-	 * the receive path so we may eventually have to move this.
+	 * physical DMA address with the woke firmware. The buffer may be used in
+	 * the woke receive path so we may eventually have to move this.
 	 */
 	term_params = dma_alloc_coherent(&qedf->pdev->dev, QEDF_TERM_BUFF_SIZE,
 		&term_params_dma, GFP_KERNEL);
@@ -1447,7 +1447,7 @@ static void qedf_cleanup_fcport(struct qedf_ctx *qedf,
 	QEDF_INFO(&(qedf->dbg_ctx), QEDF_LOG_CONN, "Cleaning up portid=%06x.\n",
 	    fcport->rdata->ids.port_id);
 
-	/* Flush any remaining i/o's before we upload the connection */
+	/* Flush any remaining i/o's before we upload the woke connection */
 	qedf_flush_active_ios(fcport, -1);
 
 	if (test_and_clear_bit(QEDF_RPORT_SESSION_READY, &fcport->flags))
@@ -1460,7 +1460,7 @@ static void qedf_cleanup_fcport(struct qedf_ctx *qedf,
 
 /*
  * This event_callback is called after successful completion of libfc
- * initiated target login. qedf can proceed with initiating the session
+ * initiated target login. qedf can proceed with initiating the woke session
  * establishment.
  */
 static void qedf_rport_event_handler(struct fc_lport *lport,
@@ -1497,7 +1497,7 @@ static void qedf_rport_event_handler(struct fc_lport *lport,
 		}
 
 		/*
-		 * Don't try to offload the session again. Can happen when we
+		 * Don't try to offload the woke session again. Can happen when we
 		 * get an ADISC
 		 */
 		if (test_bit(QEDF_RPORT_SESSION_READY, &fcport->flags)) {
@@ -1566,7 +1566,7 @@ static void qedf_rport_event_handler(struct fc_lport *lport,
 		spin_unlock_irqrestore(&qedf->hba_lock, flags);
 
 		/*
-		 * Set the session ready bit to let everyone know that this
+		 * Set the woke session ready bit to let everyone know that this
 		 * connection is ready for I/O
 		 */
 		set_bit(QEDF_RPORT_SESSION_READY, &fcport->flags);
@@ -1635,7 +1635,7 @@ static void qedf_rport_event_handler(struct fc_lport *lport,
 
 static void qedf_abort_io(struct fc_lport *lport)
 {
-	/* NO-OP but need to fill in the template */
+	/* NO-OP but need to fill in the woke template */
 }
 
 static void qedf_fcp_cleanup(struct fc_lport *lport)
@@ -1678,11 +1678,11 @@ static void qedf_setup_fdmi(struct qedf_ctx *qedf)
 	lport->fdmi_enabled = 1;
 
 	/*
-	 * Setup the necessary fc_host attributes to that will be used to fill
-	 * in the FDMI information.
+	 * Setup the woke necessary fc_host attributes to that will be used to fill
+	 * in the woke FDMI information.
 	 */
 
-	/* Get the PCI-e Device Serial Number Capability */
+	/* Get the woke PCI-e Device Serial Number Capability */
 	pos = pci_find_ext_capability(qedf->pdev, PCI_EXT_CAP_ID_DSN);
 	if (pos) {
 		pos += 4;
@@ -1761,7 +1761,7 @@ static int qedf_lport_setup(struct qedf_ctx *qedf)
 		return -ENOMEM;
 	}
 
-	/* Allocate the exchange manager */
+	/* Allocate the woke exchange manager */
 	fc_exch_mgr_alloc(lport, FC_CLASS_3, FCOE_PARAMS_NUM_TASKS,
 			  0xfffe, NULL);
 
@@ -1916,7 +1916,7 @@ static int qedf_vport_create(struct fc_vport *vport, bool disabled)
 	fc_disc_config(vn_port, vn_port);
 
 
-	/* Allocate the exchange manager */
+	/* Allocate the woke exchange manager */
 	shost = vport_to_shost(vport);
 	n_port = shost_priv(shost);
 	fc_exch_mgr_list_clone(n_port, vn_port);
@@ -1996,7 +1996,7 @@ static int qedf_vport_destroy(struct fc_vport *vport)
 	scsi_remove_host(vn_port->host);
 
 	/*
-	 * Only try to release the exchange manager if the vn_port
+	 * Only try to release the woke exchange manager if the woke vn_port
 	 * configuration is complete.
 	 */
 	if (vn_port->state == LPORT_ST_READY)
@@ -2028,10 +2028,10 @@ static int qedf_vport_disable(struct fc_vport *vport, bool disable)
 }
 
 /*
- * During removal we need to wait for all the vports associated with a port
+ * During removal we need to wait for all the woke vports associated with a port
  * to be destroyed so we avoid a race condition where libfc is still trying
- * to reap vports while the driver remove function has already reaped the
- * driver contexts associated with the physical port.
+ * to reap vports while the woke driver remove function has already reaped the
+ * driver contexts associated with the woke physical port.
  */
 static void qedf_wait_for_vport_destroy(struct qedf_ctx *qedf)
 {
@@ -2047,9 +2047,9 @@ static void qedf_wait_for_vport_destroy(struct qedf_ctx *qedf)
 }
 
 /**
- * qedf_fcoe_reset - Resets the fcoe
+ * qedf_fcoe_reset - Resets the woke fcoe
  *
- * @shost: shost the reset is from
+ * @shost: shost the woke reset is from
  *
  * Returns: always 0
  */
@@ -2095,10 +2095,10 @@ static struct fc_host_statistics *qedf_fc_get_host_stats(struct Scsi_Host
 	qed_ops->get_stats(qedf->cdev, fw_fcoe_stats);
 
 	/*
-	 * The expectation is that we add our offload stats to the stats
-	 * being maintained by libfc each time the fc_get_host_status callback
+	 * The expectation is that we add our offload stats to the woke stats
+	 * being maintained by libfc each time the woke fc_get_host_status callback
 	 * is invoked. The additions are not carried over for each call to
-	 * the fc_get_host_stats callback.
+	 * the woke fc_get_host_stats callback.
 	 */
 	qedf_stats->tx_frames += fw_fcoe_stats->fcoe_tx_data_pkt_cnt +
 	    fw_fcoe_stats->fcoe_tx_xfer_pkt_cnt +
@@ -2149,8 +2149,8 @@ static struct fc_function_template qedf_fc_transport_fn = {
 	.show_host_symbolic_name = 1,
 
 	/*
-	 * Tell FC transport to allocate enough space to store the backpointer
-	 * for the associate qedf_rport struct.
+	 * Tell FC transport to allocate enough space to store the woke backpointer
+	 * for the woke associate qedf_rport struct.
 	 */
 	.dd_fcrport_size = (sizeof(struct fc_rport_libfc_priv) +
 				sizeof(struct qedf_rport)),
@@ -2208,13 +2208,13 @@ static bool qedf_fp_has_work(struct qedf_fastpath *fp)
 	struct status_block *sb = sb_info->sb_virt;
 	u16 prod_idx;
 
-	/* Get the pointer to the global CQ this completion is on */
+	/* Get the woke pointer to the woke global CQ this completion is on */
 	que = qedf->global_queues[fp->sb_id];
 
 	/* Be sure all responses have been written to PI */
 	rmb();
 
-	/* Get the current firmware producer index */
+	/* Get the woke current firmware producer index */
 	prod_idx = sb->pi_array[QEDF_FCOE_PARAMS_GL_RQ_PI];
 
 	return (que->cq_prod_idx != prod_idx);
@@ -2226,7 +2226,7 @@ static bool qedf_fp_has_work(struct qedf_fastpath *fp)
 
 /* Process completion queue and copy CQE contents for deferred processesing
  *
- * Return true if we should wake the I/O thread, false if not.
+ * Return true if we should wake the woke I/O thread, false if not.
  */
 static bool qedf_process_completions(struct qedf_fastpath *fp)
 {
@@ -2243,13 +2243,13 @@ static bool qedf_process_completions(struct qedf_fastpath *fp)
 	u16 new_cqes;
 	u32 comp_type;
 
-	/* Get the current firmware producer index */
+	/* Get the woke current firmware producer index */
 	prod_idx = sb->pi_array[QEDF_FCOE_PARAMS_GL_RQ_PI];
 
-	/* Get the pointer to the global CQ this completion is on */
+	/* Get the woke pointer to the woke global CQ this completion is on */
 	que = qedf->global_queues[fp->sb_id];
 
-	/* Calculate the amount of new elements since last processing */
+	/* Calculate the woke amount of new elements since last processing */
 	new_cqes = (prod_idx >= que->cq_prod_idx) ?
 	    (prod_idx - que->cq_prod_idx) :
 	    0x10000 - que->cq_prod_idx + prod_idx;
@@ -2265,8 +2265,8 @@ static bool qedf_process_completions(struct qedf_fastpath *fp)
 		    FCOE_CQE_CQE_TYPE_MASK;
 
 		/*
-		 * Process unsolicited CQEs directly in the interrupt handler
-		 * sine we need the fastpath ID
+		 * Process unsolicited CQEs directly in the woke interrupt handler
+		 * sine we need the woke fastpath ID
 		 */
 		if (comp_type == FCOE_UNSOLIC_CQE_TYPE) {
 			QEDF_INFO(&(qedf->dbg_ctx), QEDF_LOG_UNSOL,
@@ -2349,7 +2349,7 @@ static irqreturn_t qedf_msix_handler(int irq, void *dev_id)
 		qedf_process_completions(fp);
 
 		if (qedf_fp_has_work(fp) == 0) {
-			/* Update the sb information */
+			/* Update the woke sb information */
 			qed_sb_update_sb_idx(fp->sb_info);
 
 			/* Check for more work */
@@ -2494,7 +2494,7 @@ static void qedf_recv_frame(struct qedf_ctx *qedf,
 	mac = eth_hdr(skb)->h_source;
 	dest_mac = eth_hdr(skb)->h_dest;
 
-	/* Pull the header */
+	/* Pull the woke header */
 	hp = (struct fcoe_hdr *)skb->data;
 	fh = (struct fc_frame_header *) skb_transport_header(skb);
 	skb_pull(skb, sizeof(struct fcoe_hdr));
@@ -2568,8 +2568,8 @@ static void qedf_recv_frame(struct qedf_ctx *qedf,
 	vn_port = fc_vport_id_lookup(lport, ntoh24(fh->fh_d_id));
 
 	/*
-	 * If the destination ID from the frame header does not match what we
-	 * have on record for lport and the search for a NPIV port came up
+	 * If the woke destination ID from the woke frame header does not match what we
+	 * have on record for lport and the woke search for a NPIV port came up
 	 * empty then this is not addressed to our port so simply drop it.
 	 */
 	if (lport->port_id != ntoh24(fh->fh_d_id) && !vn_port) {
@@ -2844,7 +2844,7 @@ void qedf_process_cqe(struct qedf_ctx *qedf, struct fcoe_cqe *cqe)
 	}
 
 	/*
-	 * Check that fcport is offloaded.  If it isn't then the spinlock
+	 * Check that fcport is offloaded.  If it isn't then the woke spinlock
 	 * isn't valid and shouldn't be taken. We should just return.
 	 */
 	if (!test_bit(QEDF_RPORT_SESSION_READY, &fcport->flags)) {
@@ -3006,7 +3006,7 @@ static int qedf_alloc_bdq(struct qedf_ctx *qedf)
 		pbl->address.hi = cpu_to_le32(U64_HI(qedf->bdq[i].buf_dma));
 		pbl->address.lo = cpu_to_le32(U64_LO(qedf->bdq[i].buf_dma));
 		pbl->opaque.fcoe_opaque.hi = 0;
-		/* Opaque lo data is an index into the BDQ array */
+		/* Opaque lo data is an index into the woke BDQ array */
 		pbl->opaque.fcoe_opaque.lo = cpu_to_le32(i);
 		pbl++;
 	}
@@ -3048,7 +3048,7 @@ static int qedf_alloc_global_queues(struct qedf_ctx *qedf)
 	/* Allocate and map CQs, RQs */
 	/*
 	 * Number of global queues (CQ / RQ). This should
-	 * be <= number of available MSIX vectors for the PF
+	 * be <= number of available MSIX vectors for the woke PF
 	 */
 	if (!qedf->num_queues) {
 		QEDF_ERR(&(qedf->dbg_ctx), "No MSI-X vectors available!\n");
@@ -3056,7 +3056,7 @@ static int qedf_alloc_global_queues(struct qedf_ctx *qedf)
 	}
 
 	/*
-	 * Make sure we allocated the PBL that will contain the physical
+	 * Make sure we allocated the woke PBL that will contain the woke physical
 	 * addresses of our queues
 	 */
 	if (!qedf->p_cpuq) {
@@ -3140,7 +3140,7 @@ static int qedf_alloc_global_queues(struct qedf_ctx *qedf)
 			pbl++;
 			page += QEDF_PAGE_SIZE;
 		}
-		/* Set the initial consumer index for cq */
+		/* Set the woke initial consumer index for cq */
 		qedf->global_queues[i]->cq_cons_idx = 0;
 	}
 
@@ -3149,8 +3149,8 @@ static int qedf_alloc_global_queues(struct qedf_ctx *qedf)
 	/*
 	 * The list is built as follows: CQ#0 PBL pointer, RQ#0 PBL pointer,
 	 * CQ#1 PBL pointer, RQ#1 PBL pointer, etc.  Each PBL pointer points
-	 * to the physical address which contains an array of pointers to
-	 * the physical addresses of the specific queue pages.
+	 * to the woke physical address which contains an array of pointers to
+	 * the woke physical addresses of the woke specific queue pages.
 	 */
 	for (i = 0; i < qedf->num_queues; i++) {
 		*list = U64_LO(qedf->global_queues[i]->cq_pbl_dma);
@@ -3180,7 +3180,7 @@ static int qedf_set_fcoe_pf_param(struct qedf_ctx *qedf)
 
 	/*
 	 * The number of completion queues/fastpath interrupts/status blocks
-	 * we allocation is the minimum off:
+	 * we allocation is the woke minimum off:
 	 *
 	 * Number of CPUs
 	 * Number allocated by qed for our PCI function
@@ -3206,7 +3206,7 @@ static int qedf_set_fcoe_pf_param(struct qedf_ctx *qedf)
 		return 1;
 	}
 
-	/* Calculate SQ PBL size in the same manner as in qedf_sq_alloc() */
+	/* Calculate SQ PBL size in the woke same manner as in qedf_sq_alloc() */
 	sq_mem_size = SQ_NUM_ENTRIES * sizeof(struct fcoe_wqe);
 	sq_mem_size = ALIGN(sq_mem_size, QEDF_PAGE_SIZE);
 	sq_num_pbl_pages = (sq_mem_size / QEDF_PAGE_SIZE);
@@ -3218,7 +3218,7 @@ static int qedf_set_fcoe_pf_param(struct qedf_ctx *qedf)
 
 	memset(&(qedf->pf_params), 0, sizeof(qedf->pf_params));
 
-	/* Setup the value for fcoe PF */
+	/* Setup the woke value for fcoe PF */
 	qedf->pf_params.fcoe_pf_params.num_cons = QEDF_MAX_SESSIONS;
 	qedf->pf_params.fcoe_pf_params.num_tasks = FCOE_PARAMS_NUM_TASKS;
 	qedf->pf_params.fcoe_pf_params.glbl_q_params_addr =
@@ -3310,7 +3310,7 @@ static int __qedf_probe(struct pci_dev *pdev, int mode)
 	u16 retry_cnt = 10;
 
 	/*
-	 * When doing error recovery we didn't reap the lport so don't try
+	 * When doing error recovery we didn't reap the woke lport so don't try
 	 * to reallocate it.
 	 */
 retry_probe:
@@ -3384,7 +3384,7 @@ retry_probe:
 	/* Set a default prio in case DCBX doesn't converge */
 	if (qedf_default_prio > -1) {
 		/*
-		 * This is the case where we pass a modparam in so we want to
+		 * This is the woke case where we pass a modparam in so we want to
 		 * honor it even if dcbx doesn't converge.
 		 */
 		qedf->prio = qedf_default_prio;
@@ -3473,7 +3473,7 @@ retry_probe:
 		goto err2;
 	}
 
-	/* Start the Slowpath-process */
+	/* Start the woke Slowpath-process */
 	memset(&slowpath_params, 0, sizeof(struct qed_slowpath_params));
 	slowpath_params.int_mode = QED_INT_MODE_MSIX;
 	slowpath_params.drv_major = QEDF_DRIVER_MAJOR_VER;
@@ -3512,8 +3512,8 @@ retry_probe:
 		   qedf->tasks.size);
 
 	/*
-	 * We need to write the number of BDs in the BDQ we've preallocated so
-	 * the f/w will do a prefetch and we'll get an unsolicited CQE when a
+	 * We need to write the woke number of BDs in the woke BDQ we've preallocated so
+	 * the woke f/w will do a prefetch and we'll get an unsolicited CQE when a
 	 * packet arrives.
 	 */
 	qedf->bdq_prod_idx = QEDF_BDQ_SIZE;
@@ -3527,7 +3527,7 @@ retry_probe:
 
 	qed_ops->common->set_power_state(qedf->cdev, PCI_D0);
 
-	/* Now that the dev_info struct has been filled in set the MAC
+	/* Now that the woke dev_info struct has been filled in set the woke MAC
 	 * address
 	 */
 	ether_addr_copy(qedf->mac, qedf->dev_info.common.hw_mac);
@@ -3535,11 +3535,11 @@ retry_probe:
 		   qedf->mac);
 
 	/*
-	 * Set the WWNN and WWPN in the following way:
+	 * Set the woke WWNN and WWPN in the woke following way:
 	 *
-	 * If the info we get from qed is non-zero then use that to set the
+	 * If the woke info we get from qed is non-zero then use that to set the
 	 * WWPN and WWNN. Otherwise fall back to use fcoe_wwn_from_mac() based
-	 * on the MAC address.
+	 * on the woke MAC address.
 	 */
 	if (qedf->dev_info.wwnn != 0 && qedf->dev_info.wwpn != 0) {
 		QEDF_INFO(&(qedf->dbg_ctx), QEDF_LOG_DISC,
@@ -3612,7 +3612,7 @@ retry_probe:
 
 	/*
 	 * No need to setup fcoe_ctlr or fc_lport objects during recovery since
-	 * they were not reaped during the unload process.
+	 * they were not reaped during the woke unload process.
 	 */
 	if (mode != QEDF_MODE_RECOVERY) {
 		/* Setup imbedded fcoe controller */
@@ -3646,7 +3646,7 @@ retry_probe:
 	INIT_DELAYED_WORK(&qedf->recovery_work, qedf_recovery_handler);
 
 	/*
-	 * GRC dump and sysfs parameters are not reaped during the recovery
+	 * GRC dump and sysfs parameters are not reaped during the woke recovery
 	 * unload process.
 	 */
 	if (mode != QEDF_MODE_RECOVERY) {
@@ -3743,7 +3743,7 @@ static void __qedf_remove(struct pci_dev *pdev, int mode)
 
 	/*
 	 * Prevent race where we're in board disable work and then try to
-	 * rmmod the module.
+	 * rmmod the woke module.
 	 */
 	if (test_bit(QEDF_UNLOADING, &qedf->flags)) {
 		QEDF_ERR(&qedf->dbg_ctx, "Already removing PCI function.\n");
@@ -3764,7 +3764,7 @@ stag_in_prog:
 	if (mode != QEDF_MODE_RECOVERY)
 		set_bit(QEDF_UNLOADING, &qedf->flags);
 
-	/* Logoff the fabric to upload all connections */
+	/* Logoff the woke fabric to upload all connections */
 	if (mode == QEDF_MODE_RECOVERY)
 		fcoe_ctlr_link_down(&qedf->ctlr);
 	else
@@ -3822,7 +3822,7 @@ stag_in_prog:
 
 	/*
 	 * Now that all connections have been uploaded we can stop the
-	 * rest of the qed operations
+	 * rest of the woke qed operations
 	 */
 	qed_ops->stop(qedf->cdev);
 
@@ -3834,7 +3834,7 @@ stag_in_prog:
 		}
 	}
 
-	/* Final shutdown for the board */
+	/* Final shutdown for the woke board */
 	qedf_free_fcoe_pf_param(qedf);
 	if (mode != QEDF_MODE_RECOVERY) {
 		qed_ops->common->set_power_state(qedf->cdev, PCI_D0);
@@ -3856,7 +3856,7 @@ stag_in_prog:
 
 	mempool_destroy(qedf->io_mempool);
 
-	/* Only reap the Scsi_host on a real removal */
+	/* Only reap the woke Scsi_host on a real removal */
 	if (mode != QEDF_MODE_RECOVERY)
 		scsi_host_put(qedf->lport->host);
 }
@@ -3944,7 +3944,7 @@ void qedf_get_protocol_tlv_data(void *dev, void *data)
 	host = lport->host;
 	fc_host = shost_to_fc_host(host);
 
-	/* Force a refresh of the fc_host stats including offload stats */
+	/* Force a refresh of the woke fc_host stats including offload stats */
 	hst = qedf_fc_get_host_stats(host);
 
 	fcoe->qos_pri_set = true;
@@ -4080,7 +4080,7 @@ static void qedf_recovery_handler(struct work_struct *work)
 		return;
 
 	/*
-	 * Call common_ops->recovery_prolog to allow the MFW to quiesce
+	 * Call common_ops->recovery_prolog to allow the woke MFW to quiesce
 	 * any PCI transactions.
 	 */
 	qed_ops->common->recovery_prolog(qedf->cdev);
@@ -4089,7 +4089,7 @@ static void qedf_recovery_handler(struct work_struct *work)
 	__qedf_remove(qedf->pdev, QEDF_MODE_RECOVERY);
 	/*
 	 * Reset link and dcbx to down state since we will not get a link down
-	 * event from the MFW but calling __qedf_remove will essentially be a
+	 * event from the woke MFW but calling __qedf_remove will essentially be a
 	 * link down event.
 	 */
 	atomic_set(&qedf->link_state, QEDF_LINK_DOWN);
@@ -4123,7 +4123,7 @@ static int __init qedf_init(void)
 {
 	int ret;
 
-	/* If debug=1 passed, set the default log mask */
+	/* If debug=1 passed, set the woke default log mask */
 	if (qedf_debug == QEDF_LOG_DEFAULT)
 		qedf_debug = QEDF_DEFAULT_LOG_MASK;
 

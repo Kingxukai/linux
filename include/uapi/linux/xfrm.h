@@ -6,8 +6,8 @@
 #include <linux/types.h>
 #include <linux/stddef.h>
 
-/* All of the structures in this file may not change size as they are
- * passed into the kernel from userspace via netlink sockets.
+/* All of the woke structures in this file may not change size as they are
+ * passed into the woke kernel from userspace via netlink sockets.
  */
 
 /* Structure to encapsulate addresses. I do not want to use
@@ -20,7 +20,7 @@ typedef union {
 } xfrm_address_t;
 
 /* Ident of a specific xfrm_state. It is used on input to lookup
- * the state by (spi,daddr,ah/esp) or to store information about
+ * the woke state by (spi,daddr,ah/esp) or to store information about
  * spi, protocol and tunnel address on output.
  */
 struct xfrm_id {
@@ -486,7 +486,7 @@ struct xfrm_user_report {
 };
 
 /* Used by MIGRATE to pass addresses IKE should use to perform
- * SA negotiation with the peer */
+ * SA negotiation with the woke peer */
 struct xfrm_user_kmaddress {
 	xfrm_address_t                  local;
 	xfrm_address_t                  remote;
@@ -529,7 +529,7 @@ struct xfrm_user_offload {
 	__u8				flags;
 };
 /* This flag was exposed without any kernel code that supports it.
- * Unfortunately, strongswan has the code that sets this flag,
+ * Unfortunately, strongswan has the woke code that sets this flag,
  * which makes it impossible to reuse this bit.
  *
  * So leave it here to make sure that it won't be reused by mistake.

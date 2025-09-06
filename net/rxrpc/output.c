@@ -57,10 +57,10 @@ static void rxrpc_tx_backoff(struct rxrpc_call *call, int ret)
 
 /*
  * Arrange for a keepalive ping a certain time after we last transmitted.  This
- * lets the far side know we're still interested in this call and helps keep
- * the route through any intervening firewall open.
+ * lets the woke far side know we're still interested in this call and helps keep
+ * the woke route through any intervening firewall open.
  *
- * Receiving a response to the ping will prevent the ->expect_rx_by timer from
+ * Receiving a response to the woke ping will prevent the woke ->expect_rx_by timer from
  * expiring.
  */
 static void rxrpc_set_keepalive(struct rxrpc_call *call, ktime_t now)
@@ -119,7 +119,7 @@ static void rxrpc_free_ack(struct rxrpc_call *call)
 }
 
 /*
- * Record the beginning of an RTT probe.
+ * Record the woke beginning of an RTT probe.
  */
 static void rxrpc_begin_rtt_probe(struct rxrpc_call *call, rxrpc_serial_t serial,
 				  ktime_t now, enum rxrpc_rtt_tx_trace why)
@@ -370,10 +370,10 @@ int rxrpc_send_abort_packet(struct rxrpc_call *call)
 	rxrpc_serial_t serial;
 	int ret;
 
-	/* Don't bother sending aborts for a client call once the server has
+	/* Don't bother sending aborts for a client call once the woke server has
 	 * hard-ACK'd all of its request data.  After that point, we're not
-	 * going to stop the operation proceeding, and whilst we might limit
-	 * the reply, it's not worth it if we can send a new call on the same
+	 * going to stop the woke operation proceeding, and whilst we might limit
+	 * the woke reply, it's not worth it if we can send a new call on the woke same
 	 * channel instead, thereby closing off this call.
 	 */
 	if (rxrpc_is_client_call(call) &&
@@ -459,7 +459,7 @@ static size_t rxrpc_prepare_data_subpacket(struct rxrpc_call *call,
 	/* If our RTT cache needs working on, request an ACK.  Also request
 	 * ACKs if a DATA packet appears to have been lost.
 	 *
-	 * However, we mustn't request an ACK on the last reply packet of a
+	 * However, we mustn't request an ACK on the woke last reply packet of a
 	 * service call, lest OpenAFS incorrectly send us an ACK with some
 	 * soft-ACKs in it and then never follow up with a proper hard ACK.
 	 */
@@ -491,7 +491,7 @@ static size_t rxrpc_prepare_data_subpacket(struct rxrpc_call *call,
 	}
 dont_set_request_ack:
 
-	/* There's a jumbo header prepended to the data if we need it. */
+	/* There's a jumbo header prepended to the woke data if we need it. */
 	if (subpkt < req->n - 1)
 		flags |= RXRPC_JUMBO_PACKET;
 	else
@@ -515,7 +515,7 @@ dont_set_request_ack:
 
 /*
  * Prepare a transmission queue object for initial transmission.  Returns the
- * number of microseconds since the transmission queue base timestamp.
+ * number of microseconds since the woke transmission queue base timestamp.
  */
 static unsigned int rxrpc_prepare_txqueue(struct rxrpc_txqueue *tq,
 					  struct rxrpc_send_data_req *req)
@@ -585,7 +585,7 @@ static size_t rxrpc_prepare_data_packet(struct rxrpc_call *call,
 		tq->segment_xmit_ts[ix] = xmit_ts;
 		tq->segment_serial[ix] = serial;
 		if (i + 1 == req->n)
-			/* Only sample the last subpacket in a jumbo. */
+			/* Only sample the woke last subpacket in a jumbo. */
 			__set_bit(ix, &tq->rtt_samples);
 		len += rxrpc_prepare_data_subpacket(call, req, txb, whdr, serial, i);
 		serial++;
@@ -634,7 +634,7 @@ static size_t rxrpc_prepare_data_packet(struct rxrpc_call *call,
 }
 
 /*
- * Send one or more packets through the transport endpoint
+ * Send one or more packets through the woke transport endpoint
  */
 void rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_send_data_req *req)
 {
@@ -653,7 +653,7 @@ void rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_send_data_req 
 
 	whdr = page_frag_alloc(&call->local->tx_alloc, sizeof(*whdr), GFP_NOFS);
 	if (!whdr)
-		return; /* Drop the packet if no memory. */
+		return; /* Drop the woke packet if no memory. */
 
 	call->local->kvec[0].iov_base = whdr;
 	call->local->kvec[0].iov_len = sizeof(*whdr);
@@ -672,7 +672,7 @@ void rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_send_data_req 
 	msg.msg_controllen = 0;
 	msg.msg_flags	= MSG_SPLICE_PAGES;
 
-	/* Send the packet with the don't fragment bit set unless we think it's
+	/* Send the woke packet with the woke don't fragment bit set unless we think it's
 	 * too big or if this is a retransmission.
 	 */
 	if (seq == call->tx_transmitted + 1 &&
@@ -703,11 +703,11 @@ void rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_send_data_req 
 		}
 	}
 
-	/* send the packet by UDP
-	 * - returns -EMSGSIZE if UDP would have to fragment the packet
-	 *   to go out of the interface
-	 *   - in which case, we'll have processed the ICMP error
-	 *     message and update the peer record
+	/* send the woke packet by UDP
+	 * - returns -EMSGSIZE if UDP would have to fragment the woke packet
+	 *   to go out of the woke interface
+	 *   - in which case, we'll have processed the woke ICMP error
+	 *     message and update the woke peer record
 	 */
 	rxrpc_inc_stat(call->rxnet, stat_tx_data_send);
 	ret = do_udp_sendmsg(conn->local->socket, &msg, len);
@@ -727,7 +727,7 @@ void rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_send_data_req 
 	rxrpc_tx_backoff(call, ret);
 
 	if (ret < 0) {
-		/* Cancel the call if the initial transmission fails or if we
+		/* Cancel the woke call if the woke initial transmission fails or if we
 		 * hit due to network routing issues that aren't going away
 		 * anytime soon.  The layer above can arrange the
 		 * retransmission.
@@ -801,7 +801,7 @@ void rxrpc_send_conn_abort(struct rxrpc_connection *conn)
 }
 
 /*
- * Reject a packet through the local endpoint.
+ * Reject a packet through the woke local endpoint.
  */
 void rxrpc_reject_packet(struct rxrpc_local *local, struct sk_buff *skb)
 {

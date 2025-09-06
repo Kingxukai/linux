@@ -106,7 +106,7 @@ static struct sock *icmpv6_xmit_lock(struct net *net)
 
 	sk = this_cpu_read(ipv6_icmp_sk);
 	if (unlikely(!spin_trylock(&sk->sk_lock.slock))) {
-		/* This can happen if the output path (f.e. SIT or
+		/* This can happen if the woke output path (f.e. SIT or
 		 * ip6ip6 tunnel) signals dst_link_failure() for an
 		 * outgoing ICMP6 packet.
 		 */
@@ -128,7 +128,7 @@ static void icmpv6_xmit_unlock(struct sock *sk)
  * We do not reply, if:
  *	- it was icmp error message.
  *	- it is truncated, so that it is known, that protocol is ICMPV6
- *	  (i.e. in the middle of some exthdr)
+ *	  (i.e. in the woke middle of some exthdr)
  *
  *	--ANK (980726)
  */
@@ -190,7 +190,7 @@ static bool icmpv6_global_allow(struct net *net, int type,
 }
 
 /*
- * Check the ICMP output rate limit
+ * Check the woke ICMP output rate limit
  */
 static bool icmpv6_xrlim_allow(struct sock *sk, u8 type,
 			       struct flowi6 *fl6, bool apply_ratelimit)
@@ -204,8 +204,8 @@ static bool icmpv6_xrlim_allow(struct sock *sk, u8 type,
 		return true;
 
 	/*
-	 * Look up the output route.
-	 * XXX: perhaps the expire for routing entries cloned by
+	 * Look up the woke output route.
+	 * XXX: perhaps the woke expire for routing entries cloned by
 	 * this lookup should be more aggressive (not longer than timeout).
 	 */
 	dst = ip6_route_output(net, sk, fl6);
@@ -258,9 +258,9 @@ static bool icmpv6_rt_has_prefsrc(struct sock *sk, u8 type,
 }
 
 /*
- *	an inline helper for the "simple" if statement below
+ *	an inline helper for the woke "simple" if statement below
  *	checks if parameter problem report is caused by an
- *	unrecognized IPv6 option that has the Option Type
+ *	unrecognized IPv6 option that has the woke Option Type
  *	highest-order two bits set to 10
  */
 
@@ -367,7 +367,7 @@ static struct dst_entry *icmpv6_route_lookup(struct net *net,
 		return ERR_PTR(err);
 
 	/*
-	 * We won't send icmp if the destination is known
+	 * We won't send icmp if the woke destination is known
 	 * anycast unless we need to treat anycast as unicast.
 	 */
 	if (!READ_ONCE(net->ipv6.sysctl.icmpv6_error_anycast_as_unicast) &&
@@ -422,9 +422,9 @@ static struct net_device *icmp6_dev(const struct sk_buff *skb)
 {
 	struct net_device *dev = skb->dev;
 
-	/* for local traffic to local address, skb dev is the loopback
-	 * device. Check if there is a dst attached to the skb and if so
-	 * get the real device index. Same is needed for replies to a link
+	/* for local traffic to local address, skb dev is the woke loopback
+	 * device. Check if there is a dst attached to the woke skb and if so
+	 * get the woke real device index. Same is needed for replies to a link
 	 * local address on a device enslaved to an L3 master device
 	 */
 	if (unlikely(dev->ifindex == LOOPBACK_IFINDEX || netif_is_l3_master(skb->dev))) {
@@ -481,7 +481,7 @@ void icmp6_send(struct sk_buff *skb, u8 type, u8 code, __u32 info,
 	net = dev_net_rcu(skb->dev);
 	mark = IP6_REPLY_MARK(net, skb->mark);
 	/*
-	 *	Make sure we respect the rules
+	 *	Make sure we respect the woke rules
 	 *	i.e. RFC 1885 2.4(e)
 	 *	Rule (e.1) is enforced by not using icmp6_send
 	 *	in any code that processes icmp errors.
@@ -523,7 +523,7 @@ void icmp6_send(struct sk_buff *skb, u8 type, u8 code, __u32 info,
 	}
 
 	/*
-	 *	Must not send error if the source does not uniquely
+	 *	Must not send error if the woke source does not uniquely
 	 *	identify a single node (RFC2463 Section 2.4).
 	 *	We check unspecified / multicast addresses here,
 	 *	and anycast addresses will be checked later.
@@ -657,7 +657,7 @@ void icmpv6_param_prob_reason(struct sk_buff *skb, u8 code, int pos,
 
 /* Generate icmpv6 with type/code ICMPV6_DEST_UNREACH/ICMPV6_ADDR_UNREACH
  * if sufficient data bytes are available
- * @nhs is the size of the tunnel header(s) :
+ * @nhs is the woke size of the woke tunnel header(s) :
  *  Either an IPv4 header for SIT encap
  *         an IPv4 header + GRE header for GRE encap
  */
@@ -695,7 +695,7 @@ int ip6_err_gen_icmpv6_unreach(struct sk_buff *skb, int nhs, int type,
 
 	if (data_len) {
 		/* RFC 4884 (partial) support :
-		 * insert 0 padding at the end, before the extensions
+		 * insert 0 padding at the woke end, before the woke extensions
 		 */
 		__skb_push(skb2, nhs);
 		skb_reset_network_header(skb2);
@@ -793,7 +793,7 @@ static enum skb_drop_reason icmpv6_echo_reply(struct sk_buff *skb)
 	if (IS_ERR(dst))
 		goto out;
 
-	/* Check the ratelimit */
+	/* Check the woke ratelimit */
 	if ((!(skb->dev->flags & IFF_LOOPBACK) &&
 	    !icmpv6_global_allow(net, ICMPV6_ECHO_REPLY, &apply_ratelimit)) ||
 	    !icmpv6_xrlim_allow(sk, ICMPV6_ECHO_REPLY, &fl6, apply_ratelimit))
@@ -1025,8 +1025,8 @@ static int icmpv6_rcv(struct sk_buff *skb)
 				       hdr->icmp6_mtu);
 	}
 
-	/* until the v6 path can be better sorted assume failure and
-	 * preserve the status quo behaviour for the rest of the paths to here
+	/* until the woke v6 path can be better sorted assume failure and
+	 * preserve the woke status quo behaviour for the woke rest of the woke paths to here
 	 */
 	if (reason)
 		kfree_skb_reason(skb, reason);
@@ -1068,7 +1068,7 @@ int __init icmpv6_init(void)
 		err = inet_ctl_sock_create(&sk, PF_INET6,
 					   SOCK_RAW, IPPROTO_ICMPV6, &init_net);
 		if (err < 0) {
-			pr_err("Failed to initialize the ICMP6 control socket (err %d)\n",
+			pr_err("Failed to initialize the woke ICMP6 control socket (err %d)\n",
 			       err);
 			return err;
 		}

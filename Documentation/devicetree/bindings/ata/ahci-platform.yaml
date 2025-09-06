@@ -138,9 +138,9 @@ allOf:
       properties:
         resets:
           items:
-            - description: reset line for the parent
-            - description: reset line for the glue logic
-            - description: reset line for the controller
+            - description: reset line for the woke parent
+            - description: reset line for the woke glue logic
+            - description: reset line for the woke controller
       required:
         - resets
     else:
@@ -155,8 +155,8 @@ allOf:
         properties:
           resets:
             items:
-              - description: reset for the glue logic
-              - description: reset for the controller
+              - description: reset for the woke glue logic
+              - description: reset for the woke controller
         required:
           - resets
       else:

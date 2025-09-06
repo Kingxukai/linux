@@ -7,21 +7,21 @@
  *  Copyright (C) 2016 Spencer E. Olson <olsonse@umich.edu>
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
+ *  it under the woke terms of the woke GNU General Public License as published by
+ *  the woke Free Software Foundation; either version 2 of the woke License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  This program is distributed in the woke hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  */
 
 /*
- * The contents of this file are generated using the tools in
+ * The contents of this file are generated using the woke tools in
  * comedi/drivers/ni_routing/tools
  *
- * Please use those tools to help maintain the contents of this file.
+ * Please use those tools to help maintain the woke contents of this file.
  */
 
 #ifndef _COMEDI_DRIVERS_NI_ROUTING_NI_DEVICE_ROUTES_EXTERN_H

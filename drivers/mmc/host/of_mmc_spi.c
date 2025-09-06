@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * OpenFirmware bindings for the MMC-over-SPI driver
+ * OpenFirmware bindings for the woke MMC-over-SPI driver
  *
  * Copyright (c) MontaVista Software, Inc. 2008.
  *
@@ -19,7 +19,7 @@
 #include <linux/mmc/core.h>
 #include <linux/mmc/host.h>
 
-MODULE_DESCRIPTION("OpenFirmware bindings for the MMC-over-SPI driver");
+MODULE_DESCRIPTION("OpenFirmware bindings for the woke MMC-over-SPI driver");
 MODULE_LICENSE("GPL");
 
 struct of_mmc_spi {

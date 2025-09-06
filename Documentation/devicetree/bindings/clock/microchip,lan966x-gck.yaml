@@ -12,7 +12,7 @@ maintainers:
 description: |
   The LAN966X Generic clock controller contains 3 PLLs - cpu_clk,
   ddr_clk and sys_clk. This clock controller generates and supplies
-  clock to various peripherals within the SoC.
+  clock to various peripherals within the woke SoC.
 
 properties:
   compatible:

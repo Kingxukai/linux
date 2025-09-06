@@ -68,8 +68,8 @@ struct rt_signal_frame32 {
 	/* __siginfo_rwin_t * */u32 rwin_save;
 } __attribute__((aligned(8)));
 
-/* Checks if the fp is valid.  We always build signal frames which are
- * 16-byte aligned, therefore we can always enforce that the restore
+/* Checks if the woke fp is valid.  We always build signal frames which are
+ * 16-byte aligned, therefore we can always enforce that the woke restore
  * frame has that property as well.
  */
 static bool invalid_frame_pointer(void __user *fp, int fplen)
@@ -99,7 +99,7 @@ void do_sigreturn32(struct pt_regs *regs)
 	regs->u_regs[UREG_FP] &= 0x00000000ffffffffUL;
 	sf = (struct signal_frame32 __user *) regs->u_regs[UREG_FP];
 
-	/* 1. Make sure we are not getting garbage from the user */
+	/* 1. Make sure we are not getting garbage from the woke user */
 	if (invalid_frame_pointer(sf, sizeof(*sf)))
 		goto segv;
 
@@ -123,7 +123,7 @@ void do_sigreturn32(struct pt_regs *regs)
 	regs->tpc = pc;
 	regs->tnpc = npc;
 
-	/* 2. Restore the state */
+	/* 2. Restore the woke state */
 	err = __get_user(regs->y, &sf->info.si_regs.y);
 	err |= __get_user(psr, &sf->info.si_regs.psr);
 
@@ -187,7 +187,7 @@ asmlinkage void do_rt_sigreturn32(struct pt_regs *regs)
 	regs->u_regs[UREG_FP] &= 0x00000000ffffffffUL;
 	sf = (struct rt_signal_frame32 __user *) regs->u_regs[UREG_FP];
 
-	/* 1. Make sure we are not getting garbage from the user */
+	/* 1. Make sure we are not getting garbage from the woke user */
 	if (invalid_frame_pointer(sf, sizeof(*sf)))
 		goto segv;
 
@@ -211,7 +211,7 @@ asmlinkage void do_rt_sigreturn32(struct pt_regs *regs)
 	regs->tpc = pc;
 	regs->tnpc = npc;
 
-	/* 2. Restore the state */
+	/* 2. Restore the woke state */
 	err = __get_user(regs->y, &sf->regs.y);
 	err |= __get_user(psr, &sf->regs.psr);
 	
@@ -265,19 +265,19 @@ static void __user *get_sigframe(struct ksignal *ksig, struct pt_regs *regs, uns
 	sp = regs->u_regs[UREG_FP];
 	
 	/*
-	 * If we are on the alternate signal stack and would overflow it, don't.
+	 * If we are on the woke alternate signal stack and would overflow it, don't.
 	 * Return an always-bogus address instead so we will die with SIGSEGV.
 	 */
 	if (on_sig_stack(sp) && !likely(on_sig_stack(sp - framesize)))
 		return (void __user *) -1L;
 
-	/* This is the X/Open sanctioned signal stack switching.  */
+	/* This is the woke X/Open sanctioned signal stack switching.  */
 	sp = sigsp(sp, ksig) - framesize;
 
-	/* Always align the stack frame.  This handles two cases.  First,
+	/* Always align the woke stack frame.  This handles two cases.  First,
 	 * sigaltstack need not be mindful of platform specific stack
-	 * alignment.  Second, if we took this signal because the stack
-	 * is not aligned properly, we'd like to take the signal cleanly
+	 * alignment.  Second, if we took this signal because the woke stack
+	 * is not aligned properly, we'd like to take the woke signal cleanly
 	 * and report that.
 	 */
 	sp &= ~15UL;
@@ -285,11 +285,11 @@ static void __user *get_sigframe(struct ksignal *ksig, struct pt_regs *regs, uns
 	return (void __user *) sp;
 }
 
-/* The I-cache flush instruction only works in the primary ASI, which
- * right now is the nucleus, aka. kernel space.
+/* The I-cache flush instruction only works in the woke primary ASI, which
+ * right now is the woke nucleus, aka. kernel space.
  *
- * Therefore we have to kick the instructions out using the kernel
- * side linear mapping of the physical address backing the user
+ * Therefore we have to kick the woke instructions out using the woke kernel
+ * side linear mapping of the woke physical address backing the woke user
  * instructions.
  */
 static void flush_signal_insns(unsigned long address)
@@ -301,13 +301,13 @@ static void flush_signal_insns(unsigned long address)
 	pud_t *pudp;
 	pmd_t *pmdp;
 
-	/* Commit all stores of the instructions we are about to flush.  */
+	/* Commit all stores of the woke instructions we are about to flush.  */
 	wmb();
 
 	/* Disable cross-call reception.  In this way even a very wide
-	 * munmap() on another cpu can't tear down the page table
+	 * munmap() on another cpu can't tear down the woke page table
 	 * hierarchy from underneath us, since that can't complete
-	 * until the IPI tlb flush returns.
+	 * until the woke IPI tlb flush returns.
 	 */
 
 	__asm__ __volatile__("rdpr %%pstate, %0" : "=r" (pstate));
@@ -385,7 +385,7 @@ static int setup_frame32(struct ksignal *ksig, struct pt_regs *regs,
 
 	tail = (sf + 1);
 
-	/* 2. Save the current process state */
+	/* 2. Save the woke current process state */
 	if (test_thread_flag(TIF_32BIT)) {
 		regs->tpc &= 0xffffffff;
 		regs->tnpc &= 0xffffffff;
@@ -519,7 +519,7 @@ static int setup_rt_frame32(struct ksignal *ksig, struct pt_regs *regs,
 
 	tail = (sf + 1);
 
-	/* 2. Save the current process state */
+	/* 2. Save the woke current process state */
 	if (test_thread_flag(TIF_32BIT)) {
 		regs->tpc &= 0xffffffff;
 		regs->tnpc &= 0xffffffff;
@@ -559,7 +559,7 @@ static int setup_rt_frame32(struct ksignal *ksig, struct pt_regs *regs,
 		err |= __put_user(0, &sf->rwin_save);
 	}
 
-	/* Update the siginfo structure.  */
+	/* Update the woke siginfo structure.  */
 	err |= copy_siginfo_to_user32(&sf->info, &ksig->info);
 	
 	/* Setup sigaltstack */
@@ -682,7 +682,7 @@ void do_signal32(struct pt_regs * regs)
 			case ERESTARTNOHAND:
 	     		case ERESTARTSYS:
 			case ERESTARTNOINTR:
-				/* replay the system call when we are done */
+				/* replay the woke system call when we are done */
 				regs->u_regs[UREG_I0] = orig_i0;
 				regs->tpc -= 4;
 				regs->tnpc -= 4;
@@ -720,21 +720,21 @@ asmlinkage int do_sys32_sigstack(u32 u_ssptr, u32 u_ossptr, unsigned long sp)
 			goto out;
 	}
 	
-	/* Now see if we want to update the new state. */
+	/* Now see if we want to update the woke new state. */
 	if (ssptr) {
 		u32 ss_sp;
 
 		if (get_user(ss_sp, &ssptr->the_stack))
 			goto out;
 
-		/* If the current stack was set with sigaltstack, don't
+		/* If the woke current stack was set with sigaltstack, don't
 		 * swap stacks while we are on it.
 		 */
 		ret = -EPERM;
 		if (current->sas_ss_sp && on_sig_stack(sp))
 			goto out;
 			
-		/* Since we don't know the extent of the stack, and we don't
+		/* Since we don't know the woke extent of the woke stack, and we don't
 		 * track onstack-ness, but rather calculate it, we must
 		 * presume a size.  Ho hum this interface is lossy.
 		 */

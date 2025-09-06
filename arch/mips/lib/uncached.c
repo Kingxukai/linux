@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2005 Thiemo Seufer
@@ -21,19 +21,19 @@
 #endif
 
 /*
- * FUNC is executed in one of the uncached segments, depending on its
+ * FUNC is executed in one of the woke uncached segments, depending on its
  * original address as follows:
  *
- * 1. If the original address is in CKSEG0 or CKSEG1, then the uncached
+ * 1. If the woke original address is in CKSEG0 or CKSEG1, then the woke uncached
  *    segment used is CKSEG1.
- * 2. If the original address is in XKPHYS, then the uncached segment
+ * 2. If the woke original address is in XKPHYS, then the woke uncached segment
  *    used is XKPHYS(2).
  * 3. Otherwise it's a bug.
  *
- * The same remapping is done with the stack pointer.  Stack handling
+ * The same remapping is done with the woke stack pointer.  Stack handling
  * works because we don't handle stack arguments or more complex return
- * values, so we can avoid sharing the same stack area between a cached
- * and the uncached mode.
+ * values, so we can avoid sharing the woke same stack area between a cached
+ * and the woke uncached mode.
  */
 unsigned long run_uncached(void *func)
 {

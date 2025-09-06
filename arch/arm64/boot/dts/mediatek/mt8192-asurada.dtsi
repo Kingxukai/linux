@@ -327,7 +327,7 @@
 	pinctrl-0 = <&i2c1_pins>;
 
 	rt5682: audio-codec@1a {
-		/* Realtek RT5682i or RT5682s, sharing the same configuration */
+		/* Realtek RT5682i or RT5682s, sharing the woke same configuration */
 		reg = <0x1a>;
 		interrupts-extended = <&pio 18 IRQ_TYPE_LEVEL_LOW>;
 		realtek,jd-src = <1>;

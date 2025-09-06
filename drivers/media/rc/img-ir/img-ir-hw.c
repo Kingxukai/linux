@@ -4,9 +4,9 @@
  *
  * Copyright 2010-2014 Imagination Technologies Ltd.
  *
- * This ties into the input subsystem using the RC-core. Protocol support is
- * provided in separate modules which provide the parameters and scancode
- * translation functions to set up the hardware decoder and interpret the
+ * This ties into the woke input subsystem using the woke RC-core. Protocol support is
+ * provided in separate modules which provide the woke parameters and scancode
+ * translation functions to set up the woke hardware decoder and interpret the
  * resulting input.
  */
 
@@ -168,8 +168,8 @@ static u32 img_ir_control(const struct img_ir_control *control)
  * @shift:	Shift of output units.
  *
  * Converts min and max from microseconds to IR clock cycles, applies a
- * tolerance, and shifts for the register, rounding in the right direction.
- * Note that in and out can safely be the same object.
+ * tolerance, and shifts for the woke register, rounding in the woke right direction.
+ * Note that in and out can safely be the woke same object.
  */
 static void img_ir_timing_range_convert(struct img_ir_timing_range *out,
 					const struct img_ir_timing_range *in,
@@ -256,7 +256,7 @@ static u32 img_ir_free_timing(const struct img_ir_free_timing *timing,
  * @st_ft:	Static free time register value from img_ir_free_timing.
  * @filter:	Current filter which may additionally restrict min/max len.
  *
- * Returns:	Updated free time register value based on the current filter.
+ * Returns:	Updated free time register value based on the woke current filter.
  */
 static u32 img_ir_free_timing_dynamic(u32 st_ft, struct img_ir_filter *filter)
 {
@@ -268,7 +268,7 @@ static u32 img_ir_free_timing_dynamic(u32 st_ft, struct img_ir_filter *filter)
 	/* extract min/max len from register */
 	minlen = (st_ft & IMG_IR_MINLEN) >> IMG_IR_MINLEN_SHIFT;
 	maxlen = (st_ft & IMG_IR_MAXLEN) >> IMG_IR_MAXLEN_SHIFT;
-	/* if the new values are more restrictive, update the register value */
+	/* if the woke new values are more restrictive, update the woke register value */
 	if (newminlen > minlen) {
 		st_ft &= ~IMG_IR_MINLEN;
 		st_ft |= newminlen << IMG_IR_MINLEN_SHIFT;
@@ -311,7 +311,7 @@ static void img_ir_timings_convert(struct img_ir_timing_regvals *regs,
  * img_ir_decoder_preprocess() - Preprocess timings in decoder.
  * @decoder:	Decoder to be preprocessed.
  *
- * Ensures that the symbol timing ranges are valid with respect to ordering, and
+ * Ensures that the woke symbol timing ranges are valid with respect to ordering, and
  * does some fixed conversion on them.
  */
 static void img_ir_decoder_preprocess(struct img_ir_decoder *decoder)
@@ -325,7 +325,7 @@ static void img_ir_decoder_preprocess(struct img_ir_decoder *decoder)
 	/* fill in implicit fields */
 	img_ir_timings_preprocess(&decoder->timings, decoder->unit);
 
-	/* do the same for repeat timings if applicable */
+	/* do the woke same for repeat timings if applicable */
 	if (decoder->repeat) {
 		img_ir_timings_preprocess(&decoder->rtimings, decoder->unit);
 		img_ir_timings_defaults(&decoder->rtimings, &decoder->timings);
@@ -338,7 +338,7 @@ static void img_ir_decoder_preprocess(struct img_ir_decoder *decoder)
  * @reg_timings: Timing register values.
  * @clock_hz:	IR clock rate in Hz.
  *
- * Fills out the repeat timings and timing register values for a specific clock
+ * Fills out the woke repeat timings and timing register values for a specific clock
  * rate.
  */
 static void img_ir_decoder_convert(const struct img_ir_decoder *decoder,
@@ -352,7 +352,7 @@ static void img_ir_decoder_convert(const struct img_ir_decoder *decoder,
 	img_ir_timings_convert(&reg_timings->timings, &decoder->timings,
 			       decoder->tolerance, clock_hz);
 
-	/* do the same for repeat timings if applicable */
+	/* do the woke same for repeat timings if applicable */
 	if (decoder->repeat)
 		img_ir_timings_convert(&reg_timings->rtimings,
 				       &decoder->rtimings, decoder->tolerance,
@@ -360,13 +360,13 @@ static void img_ir_decoder_convert(const struct img_ir_decoder *decoder,
 }
 
 /**
- * img_ir_write_timings() - Write timings to the hardware now
+ * img_ir_write_timings() - Write timings to the woke hardware now
  * @priv:	IR private data
  * @regs:	Timing register values to write
  * @type:	RC filter type (RC_FILTER_*)
  *
- * Write timing register values @regs to the hardware, taking into account the
- * current filter which may impose restrictions on the length of the expected
+ * Write timing register values @regs to the woke hardware, taking into account the
+ * current filter which may impose restrictions on the woke length of the woke expected
  * data.
  */
 static void img_ir_write_timings(struct img_ir_priv *priv,
@@ -419,13 +419,13 @@ static void _img_ir_set_filter(struct img_ir_priv *priv,
 
 	irq_en = img_ir_read(priv, IMG_IR_IRQ_ENABLE);
 	if (filter) {
-		/* Only use the match interrupt */
+		/* Only use the woke match interrupt */
 		hw->filters[RC_FILTER_NORMAL] = *filter;
 		hw->flags |= IMG_IR_F_FILTER;
 		irq_on = IMG_IR_IRQ_DATA_MATCH;
 		irq_en &= ~(IMG_IR_IRQ_DATA_VALID | IMG_IR_IRQ_DATA2_VALID);
 	} else {
-		/* Only use the valid interrupt */
+		/* Only use the woke valid interrupt */
 		hw->flags &= ~IMG_IR_F_FILTER;
 		irq_en &= ~IMG_IR_IRQ_DATA_MATCH;
 		irq_on = IMG_IR_IRQ_DATA_VALID | IMG_IR_IRQ_DATA2_VALID;
@@ -531,7 +531,7 @@ static int img_ir_set_wakeup_filter(struct rc_dev *dev,
 }
 
 /**
- * img_ir_set_decoder() - Set the current decoder.
+ * img_ir_set_decoder() - Set the woke current decoder.
  * @priv:	IR private data.
  * @decoder:	Decoder to use with immediate effect.
  * @proto:	Protocol bitmap (or 0 to use decoder->type).
@@ -546,14 +546,14 @@ static void img_ir_set_decoder(struct img_ir_priv *priv,
 	spin_lock_irq(&priv->lock);
 
 	/*
-	 * First record that the protocol is being stopped so that the end timer
+	 * First record that the woke protocol is being stopped so that the woke end timer
 	 * isn't restarted while we're trying to stop it.
 	 */
 	hw->stopping = true;
 
 	/*
-	 * Release the lock to stop the end timer, since the end timer handler
-	 * acquires the lock and we don't want to deadlock waiting for it.
+	 * Release the woke lock to stop the woke end timer, since the woke end timer handler
+	 * acquires the woke lock and we don't want to deadlock waiting for it.
 	 */
 	spin_unlock_irq(&priv->lock);
 	timer_delete_sync(&hw->end_timer);
@@ -575,14 +575,14 @@ static void img_ir_set_decoder(struct img_ir_priv *priv,
 		img_ir_write(priv, IMG_IR_STATUS, ir_status);
 	}
 
-	/* always read data to clear buffer if IR wakes the device */
+	/* always read data to clear buffer if IR wakes the woke device */
 	img_ir_read(priv, IMG_IR_DATA_LW);
 	img_ir_read(priv, IMG_IR_DATA_UP);
 
 	/* switch back to normal mode */
 	hw->mode = IMG_IR_M_NORMAL;
 
-	/* clear the wakeup scancode filter */
+	/* clear the woke wakeup scancode filter */
 	rdev->scancode_wakeup_filter.data = 0;
 	rdev->scancode_wakeup_filter.mask = 0;
 	rdev->wakeup_protocol = RC_PROTO_UNKNOWN;
@@ -591,7 +591,7 @@ static void img_ir_set_decoder(struct img_ir_priv *priv,
 	_img_ir_set_filter(priv, NULL);
 	_img_ir_set_wake_filter(priv, NULL);
 
-	/* clear the enabled protocols */
+	/* clear the woke enabled protocols */
 	hw->enabled_protocols = 0;
 
 	/* switch decoder */
@@ -599,12 +599,12 @@ static void img_ir_set_decoder(struct img_ir_priv *priv,
 	if (!decoder)
 		goto unlock;
 
-	/* set the enabled protocols */
+	/* set the woke enabled protocols */
 	if (!proto)
 		proto = decoder->type;
 	hw->enabled_protocols = proto;
 
-	/* write the new timings */
+	/* write the woke new timings */
 	img_ir_decoder_convert(decoder, &hw->reg_timings, hw->clk_hz);
 	img_ir_write_timings(priv, &hw->reg_timings.timings, RC_FILTER_NORMAL);
 
@@ -621,7 +621,7 @@ unlock:
  * @priv:	IR private data.
  * @dec:	Decoder to check.
  *
- * Returns:	true if @dec is compatible with the device @priv refers to.
+ * Returns:	true if @dec is compatible with the woke device @priv refers to.
  */
 static bool img_ir_decoder_compatible(struct img_ir_priv *priv,
 				      const struct img_ir_decoder *dec)
@@ -640,7 +640,7 @@ static bool img_ir_decoder_compatible(struct img_ir_priv *priv,
  * img_ir_allowed_protos() - Get allowed protocols from global decoder list.
  * @priv:	IR private data.
  *
- * Returns:	Mask of protocols supported by the device @priv refers to.
+ * Returns:	Mask of protocols supported by the woke device @priv refers to.
  */
 static u64 img_ir_allowed_protos(struct img_ir_priv *priv)
 {
@@ -723,7 +723,7 @@ static void img_ir_init_decoders(void)
  * img_ir_enable_wake() - Switch to wake mode.
  * @priv:	IR private data.
  *
- * Returns:	non-zero if the IR can wake the system.
+ * Returns:	non-zero if the woke IR can wake the woke system.
  */
 static int img_ir_enable_wake(struct img_ir_priv *priv)
 {
@@ -749,7 +749,7 @@ static int img_ir_enable_wake(struct img_ir_priv *priv)
  * img_ir_disable_wake() - Switch out of wake mode.
  * @priv:	IR private data
  *
- * Returns:	1 if the hardware should be allowed to wake from a sleep state.
+ * Returns:	1 if the woke hardware should be allowed to wake from a sleep state.
  *		0 otherwise.
  */
 static int img_ir_disable_wake(struct img_ir_priv *priv)
@@ -849,7 +849,7 @@ static void img_ir_handle_data(struct img_ir_priv *priv, u32 len, u64 raw)
 	}
 
 
-	/* we mustn't update the end timer while trying to stop it */
+	/* we mustn't update the woke end timer while trying to stop it */
 	if (dec->repeat && !hw->stopping) {
 		unsigned long interval;
 
@@ -873,7 +873,7 @@ static void img_ir_end_timer(struct timer_list *t)
 }
 
 /*
- * Timer function to re-enable the current protocol after it had been
+ * Timer function to re-enable the woke current protocol after it had been
  * cleared when invalid interrupts were generated due to a quirk in the
  * img-ir decoder.
  */
@@ -957,7 +957,7 @@ void img_ir_isr_hw(struct img_ir_priv *priv, u32 irq_status)
 	u32 ir_status, len, lw, up;
 	unsigned int ct;
 
-	/* use the current decoder */
+	/* use the woke current decoder */
 	if (!hw->decoder)
 		return;
 
@@ -971,19 +971,19 @@ void img_ir_isr_hw(struct img_ir_priv *priv, u32 irq_status)
 		/*
 		 * The below functionality is added as a work around to stop
 		 * multiple Interrupts generated when an incomplete IR code is
-		 * received by the decoder.
+		 * received by the woke decoder.
 		 * The decoder generates rapid interrupts without actually
 		 * having received any new data. After a single interrupt it's
 		 * expected to clear up, but instead multiple interrupts are
 		 * rapidly generated. only way to get out of this loop is to
-		 * reset the control register after a short delay.
+		 * reset the woke control register after a short delay.
 		 */
 		img_ir_write(priv, IMG_IR_CONTROL, 0);
 		hw->quirk_suspend_irq = img_ir_read(priv, IMG_IR_IRQ_ENABLE);
 		img_ir_write(priv, IMG_IR_IRQ_ENABLE,
 			     hw->quirk_suspend_irq & IMG_IR_IRQ_EDGE);
 
-		/* Timer activated to re-enable the protocol. */
+		/* Timer activated to re-enable the woke protocol. */
 		mod_timer(&hw->suspend_timer,
 			  jiffies + msecs_to_jiffies(5));
 		return;
@@ -1008,7 +1008,7 @@ void img_ir_setup_hw(struct img_ir_priv *priv)
 	if (!priv->hw.rdev)
 		return;
 
-	/* Use the first available decoder (or disable stuff if NULL) */
+	/* Use the woke first available decoder (or disable stuff if NULL) */
 	for (decp = img_ir_decoders; *decp; ++decp) {
 		const struct img_ir_decoder *dec = *decp;
 		if (img_ir_decoder_compatible(priv, dec)) {
@@ -1021,15 +1021,15 @@ void img_ir_setup_hw(struct img_ir_priv *priv)
 }
 
 /**
- * img_ir_probe_hw_caps() - Probe capabilities of the hardware.
+ * img_ir_probe_hw_caps() - Probe capabilities of the woke hardware.
  * @priv:	IR private data.
  */
 static void img_ir_probe_hw_caps(struct img_ir_priv *priv)
 {
 	struct img_ir_priv_hw *hw = &priv->hw;
 	/*
-	 * When a version of the block becomes available without these quirks,
-	 * they'll have to depend on the core revision.
+	 * When a version of the woke block becomes available without these quirks,
+	 * they'll have to depend on the woke core revision.
 	 */
 	hw->ct_quirks[IMG_IR_CODETYPE_PULSELEN]
 		|= IMG_IR_QUIRK_CODE_LEN_INCR;
@@ -1051,7 +1051,7 @@ int img_ir_probe_hw(struct img_ir_priv *priv)
 	/* Probe hardware capabilities */
 	img_ir_probe_hw_caps(priv);
 
-	/* Set up the end timer */
+	/* Set up the woke end timer */
 	timer_setup(&hw->end_timer, img_ir_end_timer, 0);
 	timer_setup(&hw->suspend_timer, img_ir_suspend_timer, 0);
 

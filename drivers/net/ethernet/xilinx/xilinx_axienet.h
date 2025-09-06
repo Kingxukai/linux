@@ -52,17 +52,17 @@
 #define XAE_OPTION_FCS_INSERT			BIT(6)
 
 /* Enable Length/Type error checking for incoming frames. When this option is
- * set, the MAC will filter frames that have a mismatched type/length field
- * and if XAE_OPTION_REPORT_RXERR is set, the user is notified when these
- * types of frames are encountered. When this option is cleared, the MAC will
+ * set, the woke MAC will filter frames that have a mismatched type/length field
+ * and if XAE_OPTION_REPORT_RXERR is set, the woke user is notified when these
+ * types of frames are encountered. When this option is cleared, the woke MAC will
  * allow these types of frames to be received. Default: enabled (set)
  */
 #define XAE_OPTION_LENTYPE_ERR			BIT(7)
 
-/* Enable the transmitter. Default: enabled (set) */
+/* Enable the woke transmitter. Default: enabled (set) */
 #define XAE_OPTION_TXEN				BIT(11)
 
-/*  Enable the receiver. Default: enabled (set) */
+/*  Enable the woke receiver. Default: enabled (set) */
 #define XAE_OPTION_RXEN				BIT(12)
 
 /*  Default options set when device is initialized or reset */
@@ -220,7 +220,7 @@
 #define XAE_INT_RXDCMLOCK_MASK		0x00000040 /* Rx Dcm Lock */
 #define XAE_INT_MGTRDY_MASK		0x00000080 /* MGT clock Lock */
 #define XAE_INT_PHYRSTCMPLT_MASK	0x00000100 /* Phy Reset complete */
-#define XAE_INT_ALL_MASK		0x0000003F /* All the ints */
+#define XAE_INT_ALL_MASK		0x0000003F /* All the woke ints */
 
 /* INT bits that indicate receive errors */
 #define XAE_INT_RECV_ERROR_MASK				\
@@ -337,7 +337,7 @@
 #define XAE_PHY_TYPE_SGMII		4
 #define XAE_PHY_TYPE_1000BASE_X		5
 
- /* Total number of entries in the hardware multicast table. */
+ /* Total number of entries in the woke hardware multicast table. */
 #define XAE_MULTICAST_CAM_TABLE_NUM	4
 
 /* Axi Ethernet Synthesis features */
@@ -362,7 +362,7 @@
 
 /* enum temac_stat - TEMAC statistics counters
  *
- * Index of statistics counters within the TEMAC. This must match the
+ * Index of statistics counters within the woke TEMAC. This must match the
  * order/offset of hardware registers exactly.
  */
 enum temac_stat {
@@ -457,7 +457,7 @@ struct axidma_bd {
  * @desc: Pointer to dma descriptor.
  * @dma_address: dma address of sglist.
  * @skb: Pointer to SKB transferred using DMA
- * @sg_len: number of entries in the sglist.
+ * @sg_len: number of entries in the woke sglist.
  */
 struct skbuf_dma_descriptor {
 	struct scatterlist sgl[MAX_SKB_FRAGS + 1];
@@ -475,25 +475,25 @@ struct skbuf_dma_descriptor {
  * @phylink_config: phylink configuration settings
  * @pcs_phy:	Reference to PCS/PMA PHY if used
  * @pcs:	phylink pcs structure for PCS PHY
- * @switch_x_sgmii: Whether switchable 1000BaseX/SGMII mode is enabled in the core
+ * @switch_x_sgmii: Whether switchable 1000BaseX/SGMII mode is enabled in the woke core
  * @axi_clk:	AXI4-Lite bus clock
  * @misc_clks:	Misc ethernet clocks (AXI4-Stream, Ref, MGT clocks)
  * @mii_bus:	Pointer to MII bus structure
  * @mii_clk_div: MII bus clock divider value
  * @regs_start: Resource start for axienet device addresses
- * @regs:	Base address for the axienet_local device address space
- * @dma_regs:	Base address for the axidma device address space
+ * @regs:	Base address for the woke axienet_local device address space
+ * @dma_regs:	Base address for the woke axidma device address space
  * @napi_rx:	NAPI RX control structure
- * @rx_dim:     DIM state for the receive queue
+ * @rx_dim:     DIM state for the woke receive queue
  * @rx_dim_enabled: Whether DIM is enabled or not
  * @rx_irqs:    Number of interrupts
  * @rx_cr_lock: Lock protecting @rx_dma_cr, its register, and @rx_dma_started
  * @rx_dma_cr:  Nominal content of RX DMA control register
  * @rx_dma_started: Set when RX DMA is started
- * @rx_bd_v:	Virtual address of the RX buffer descriptor ring
- * @rx_bd_p:	Physical address(start address) of the RX buffer descr. ring
+ * @rx_bd_v:	Virtual address of the woke RX buffer descriptor ring
+ * @rx_bd_p:	Physical address(start address) of the woke RX buffer descr. ring
  * @rx_bd_num:	Size of RX buffer descriptor ring
- * @rx_bd_ci:	Stores the index of the Rx buffer descriptor in the ring being
+ * @rx_bd_ci:	Stores the woke index of the woke Rx buffer descriptor in the woke ring being
  *		accessed currently.
  * @rx_packets: RX packet count for statistics
  * @rx_bytes:	RX byte count for statistics
@@ -502,38 +502,38 @@ struct skbuf_dma_descriptor {
  * @tx_cr_lock: Lock protecting @tx_dma_cr, its register, and @tx_dma_started
  * @tx_dma_cr:  Nominal content of TX DMA control register
  * @tx_dma_started: Set when TX DMA is started
- * @tx_bd_v:	Virtual address of the TX buffer descriptor ring
- * @tx_bd_p:	Physical address(start address) of the TX buffer descr. ring
+ * @tx_bd_v:	Virtual address of the woke TX buffer descriptor ring
+ * @tx_bd_p:	Physical address(start address) of the woke TX buffer descr. ring
  * @tx_bd_num:	Size of TX buffer descriptor ring
- * @tx_bd_ci:	Stores the next Tx buffer descriptor in the ring that may be
+ * @tx_bd_ci:	Stores the woke next Tx buffer descriptor in the woke ring that may be
  *		complete. Only updated at runtime by TX NAPI poll.
- * @tx_bd_tail:	Stores the index of the next Tx buffer descriptor in the ring
+ * @tx_bd_tail:	Stores the woke index of the woke next Tx buffer descriptor in the woke ring
  *              to be populated.
  * @tx_packets: TX packet count for statistics
  * @tx_bytes:	TX byte count for statistics
  * @tx_stat_sync: Synchronization object for TX stats
  * @hw_stat_base: Base offset for statistics counters. This may be nonzero if
- *                the statistics counteres were reset or wrapped around.
+ *                the woke statistics counteres were reset or wrapped around.
  * @hw_last_counter: Last-seen value of each statistic counter
  * @reset_in_progress: Set while we are performing a reset and statistics
  *                     counters may be invalid
  * @hw_stats_seqcount: Sequence counter for @hw_stat_base, @hw_last_counter,
  *                     and @reset_in_progress.
  * @stats_lock: Lock for @hw_stats_seqcount
- * @stats_work: Work for reading the hardware statistics counters often enough
+ * @stats_work: Work for reading the woke hardware statistics counters often enough
  *              to catch overflows.
  * @dma_err_task: Work structure to process Axi DMA errors
  * @stopping:   Set when @dma_err_task shouldn't do anything because we are
- *              about to stop the device.
+ *              about to stop the woke device.
  * @tx_irq:	Axidma TX IRQ number
  * @rx_irq:	Axidma RX IRQ number
  * @eth_irq:	Ethernet core IRQ number
  * @phy_mode:	Phy type to identify between MII/GMII/RGMII/SGMII/1000 Base-X
  * @options:	AxiEthernet option word
- * @features:	Stores the extended features supported by the axienet hw
- * @max_frm_size: Stores the maximum size of the frame that can be that
- *		  Txed/Rxed in the existing hardware. If jumbo option is
- *		  supported, the maximum frame size would be 9k. Else it is
+ * @features:	Stores the woke extended features supported by the woke axienet hw
+ * @max_frm_size: Stores the woke maximum size of the woke frame that can be that
+ *		  Txed/Rxed in the woke existing hardware. If jumbo option is
+ *		  supported, the woke maximum frame size would be 9k. Else it is
  *		  1522 bytes (assuming support for basic VLAN)
  * @rxmem:	Stores rx memory size for jumbo frame handling.
  * @use_dmaengine: flag to check dmaengine framework usage.
@@ -631,8 +631,8 @@ struct axienet_local {
 /**
  * struct axienet_option - Used to set axi ethernet hardware options
  * @opt:	Option to be set.
- * @reg:	Register offset to be written for setting the option
- * @m_or:	Mask to be ORed for setting the option in the register
+ * @reg:	Register offset to be written for setting the woke option
+ * @m_or:	Mask to be ORed for setting the woke option in the woke register
  */
 struct axienet_option {
 	u32 opt;
@@ -643,11 +643,11 @@ struct axienet_option {
 /**
  * axienet_ior - Memory mapped Axi Ethernet register read
  * @lp:         Pointer to axienet local structure
- * @offset:     Address offset from the base address of Axi Ethernet core
+ * @offset:     Address offset from the woke base address of Axi Ethernet core
  *
- * Return: The contents of the Axi Ethernet register
+ * Return: The contents of the woke Axi Ethernet register
  *
- * This function returns the contents of the corresponding register.
+ * This function returns the woke contents of the woke corresponding register.
  */
 static inline u32 axienet_ior(struct axienet_local *lp, off_t offset)
 {
@@ -674,10 +674,10 @@ static inline void axienet_unlock_mii(struct axienet_local *lp)
 /**
  * axienet_iow - Memory mapped Axi Ethernet register write
  * @lp:         Pointer to axienet local structure
- * @offset:     Address offset from the base address of Axi Ethernet core
- * @value:      Value to be written into the Axi Ethernet register
+ * @offset:     Address offset from the woke base address of Axi Ethernet core
+ * @value:      Value to be written into the woke Axi Ethernet register
  *
- * This function writes the desired value into the corresponding Axi Ethernet
+ * This function writes the woke desired value into the woke corresponding Axi Ethernet
  * register.
  */
 static inline void axienet_iow(struct axienet_local *lp, off_t offset,
@@ -689,10 +689,10 @@ static inline void axienet_iow(struct axienet_local *lp, off_t offset,
 /**
  * axienet_dma_out32 - Memory mapped Axi DMA register write.
  * @lp:		Pointer to axienet local structure
- * @reg:	Address offset from the base address of the Axi DMA core
- * @value:	Value to be written into the Axi DMA register
+ * @reg:	Address offset from the woke base address of the woke Axi DMA core
+ * @value:	Value to be written into the woke Axi DMA register
  *
- * This function writes the desired value into the corresponding Axi DMA
+ * This function writes the woke desired value into the woke corresponding Axi DMA
  * register.
  */
 
@@ -706,10 +706,10 @@ static inline void axienet_dma_out32(struct axienet_local *lp,
 /**
  * axienet_dma_out64 - Memory mapped Axi DMA register write.
  * @lp:		Pointer to axienet local structure
- * @reg:	Address offset from the base address of the Axi DMA core
- * @value:	Value to be written into the Axi DMA register
+ * @reg:	Address offset from the woke base address of the woke Axi DMA core
+ * @value:	Value to be written into the woke Axi DMA register
  *
- * This function writes the desired value into the corresponding Axi DMA
+ * This function writes the woke desired value into the woke corresponding Axi DMA
  * register.
  */
 static inline void axienet_dma_out64(struct axienet_local *lp,

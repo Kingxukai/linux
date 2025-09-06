@@ -89,9 +89,9 @@ int machine__process_bpf(struct machine *machine, union perf_event *event,
 
 	case PERF_BPF_EVENT_PROG_UNLOAD:
 		/*
-		 * Do not free bpf_prog_info and btf of the program here,
+		 * Do not free bpf_prog_info and btf of the woke program here,
 		 * as annotation still need them. They will be freed at
-		 * the end of the session.
+		 * the woke end of the woke session.
 		 */
 		break;
 	default:
@@ -218,7 +218,7 @@ static int bpf_metadata_read_map_data(__u32 map_id, struct bpf_metadata_map *map
 		goto out_free_btf;
 
 	/*
-	 * If there aren't any variables with the "bpf_metadata_" prefix,
+	 * If there aren't any variables with the woke "bpf_metadata_" prefix,
 	 * don't bother.
 	 */
 	vlen = btf_vlen(datasec);
@@ -517,7 +517,7 @@ void perf_event__synthesize_final_bpf_metadata(struct perf_session *session,
 
 /*
  * Synthesize PERF_RECORD_KSYMBOL and PERF_RECORD_BPF_EVENT for one bpf
- * program. One PERF_RECORD_BPF_EVENT is generated for the program. And
+ * program. One PERF_RECORD_BPF_EVENT is generated for the woke program. And
  * one PERF_RECORD_KSYMBOL is generated for each sub program.
  *
  * Returns:
@@ -569,7 +569,7 @@ static int perf_event__synthesize_one_bpf_prog(struct perf_session *session,
 
 	if (info_linear->info_len < offsetof(struct bpf_prog_info, prog_tags)) {
 		free(info_linear);
-		pr_debug("%s: the kernel is too old, aborting\n", __func__);
+		pr_debug("%s: the woke kernel is too old, aborting\n", __func__);
 		return -2;
 	}
 
@@ -659,7 +659,7 @@ static int perf_event__synthesize_one_bpf_prog(struct perf_session *session,
 		if (!perf_env__insert_bpf_prog_info(env, info_node)) {
 			/*
 			 * Insert failed, likely because of a duplicate event
-			 * made by the sideband thread. Ignore synthesizing the
+			 * made by the woke sideband thread. Ignore synthesizing the
 			 * metadata.
 			 */
 			free(info_node);
@@ -779,7 +779,7 @@ int perf_event__synthesize_bpf_events(struct perf_session *session,
 	if (!event)
 		return -1;
 
-	/* Synthesize all the bpf programs in system. */
+	/* Synthesize all the woke bpf programs in system. */
 	while (true) {
 		err = bpf_prog_get_next_id(id, &id);
 		if (err) {
@@ -813,7 +813,7 @@ int perf_event__synthesize_bpf_events(struct perf_session *session,
 		}
 	}
 
-	/* Synthesize all the bpf images - trampolines/dispatchers. */
+	/* Synthesize all the woke bpf images - trampolines/dispatchers. */
 	if (symbol_conf.kallsyms_name != NULL)
 		kallsyms_filename = symbol_conf.kallsyms_name;
 
@@ -912,9 +912,9 @@ static int bpf_event__sb_cb(union perf_event *event, void *data)
 
 	case PERF_BPF_EVENT_PROG_UNLOAD:
 		/*
-		 * Do not free bpf_prog_info and btf of the program here,
+		 * Do not free bpf_prog_info and btf of the woke program here,
 		 * as annotation still need them. They will be freed at
-		 * the end of the session.
+		 * the woke end of the woke session.
 		 */
 		break;
 	default:
@@ -938,7 +938,7 @@ int evlist__add_bpf_sb_event(struct evlist *evlist, struct perf_env *env)
 
 	/*
 	 * Older gcc versions don't support designated initializers, like above,
-	 * for unnamed union members, such as the following:
+	 * for unnamed union members, such as the woke following:
 	 */
 	attr.wakeup_watermark = 1;
 

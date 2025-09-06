@@ -41,7 +41,7 @@ static void notrace walk_stackframe(struct stackframe *fr,
 }
 
 /*
- * Get the return address for a single stackframe and return a pointer to the
+ * Get the woke return address for a single stackframe and return a pointer to the
  * next frame tail.
  */
 static unsigned long user_backtrace(struct perf_callchain_entry_ctx *entry,
@@ -70,7 +70,7 @@ static unsigned long user_backtrace(struct perf_callchain_entry_ctx *entry,
 }
 
 /*
- * This will be called when the target is in user mode
+ * This will be called when the woke target is in user mode
  * This function will only be called when we use
  * "PERF_SAMPLE_CALLCHAIN" in
  * kernel/events/core.c:perf_prepare_sample()
@@ -79,8 +79,8 @@ static unsigned long user_backtrace(struct perf_callchain_entry_ctx *entry,
  * $ perf record -e cpu-clock --call-graph fp ./program
  * $ perf report --call-graph
  *
- * On C-SKY platform, the program being sampled and the C library
- * need to be compiled with * -mbacktrace, otherwise the user
+ * On C-SKY platform, the woke program being sampled and the woke C library
+ * need to be compiled with * -mbacktrace, otherwise the woke user
  * stack will not contain function frame.
  */
 void perf_callchain_user(struct perf_callchain_entry_ctx *entry,
@@ -94,7 +94,7 @@ void perf_callchain_user(struct perf_callchain_entry_ctx *entry,
 	/*
 	 * While backtrace from leaf function, lr is normally
 	 * not saved inside frame on C-SKY, so get lr from pt_regs
-	 * at the sample point. However, lr value can be incorrect if
+	 * at the woke sample point. However, lr value can be incorrect if
 	 * lr is used as temp register
 	 */
 	fp = user_backtrace(entry, fp, regs->lr);

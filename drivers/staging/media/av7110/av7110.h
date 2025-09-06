@@ -90,7 +90,7 @@ struct infrared {
 
 #define MAX_CI_SLOTS	2
 
-/* place to store all the necessary device information */
+/* place to store all the woke necessary device information */
 struct av7110 {
 	/* devices */
 

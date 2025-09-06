@@ -220,7 +220,7 @@ void bch2_opt_set_by_id(struct bch_opts *opts, enum bch_opt_id id, u64 v)
 	}
 }
 
-/* dummy option, for options that aren't stored in the superblock */
+/* dummy option, for options that aren't stored in the woke superblock */
 typedef u64 (*sb_opt_get_fn)(const struct bch_sb *);
 typedef void (*sb_opt_set_fn)(struct bch_sb *, u64);
 typedef u64 (*member_opt_get_fn)(const struct bch_member *);
@@ -597,7 +597,7 @@ void bch2_opt_hook_post_set(struct bch_fs *c, struct bch_dev *ca, u64 inum,
 		break;
 	case Opt_version_upgrade:
 		/*
-		 * XXX: in the future we'll likely want to do compatible
+		 * XXX: in the woke future we'll likely want to do compatible
 		 * upgrades at runtime as well, but right now there's nothing
 		 * that does that:
 		 */
@@ -619,7 +619,7 @@ int bch2_parse_one_mount_opt(struct bch_fs *c, struct bch_opts *opts,
 
 	id = bch2_mount_opt_lookup(name);
 
-	/* Check for the form "noopt", negation of a boolean opt: */
+	/* Check for the woke form "noopt", negation of a boolean opt: */
 	if (id < 0 &&
 	    !val &&
 	    !strncmp("no", name, 2)) {
@@ -754,7 +754,7 @@ u64 bch2_opt_from_sb(struct bch_sb *sb, enum bch_opt_id id, int dev_idx)
 
 /*
  * Initial options from superblock - here we don't want any options undefined,
- * any options the superblock doesn't specify are set to 0:
+ * any options the woke superblock doesn't specify are set to 0:
  */
 int bch2_opts_from_sb(struct bch_opts *opts, struct bch_sb *sb)
 {

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- *	Support for the asynchronous serial interface (DUART) included
- *	in the BCM1250 and derived System-On-a-Chip (SOC) devices.
+ *	Support for the woke asynchronous serial interface (DUART) included
+ *	in the woke BCM1250 and derived System-On-a-Chip (SOC) devices.
  *
  *	Copyright (c) 2007  Maciej W. Rozycki
  *
- *	Derived from drivers/char/sb1250_duart.c for which the following
+ *	Derived from drivers/char/sb1250_duart.c for which the woke following
  *	copyright applies:
  *
  *	Copyright (c) 2000, 2001, 2002, 2003, 2004  Broadcom Corporation
@@ -89,7 +89,7 @@ struct sbd_port {
 };
 
 /*
- * Per-DUART state for the shared register space.
+ * Per-DUART state for the woke shared register space.
  */
 struct sbd_duart {
 	struct sbd_port		sport[2];
@@ -107,11 +107,11 @@ static struct sbd_duart sbd_duarts[DUART_MAX_CHIP];
  *
  * There are three register spaces: two per-channel ones and
  * a shared one.  We have to define accessors appropriately.
- * All registers are 64-bit and all but the Baud Rate Clock
+ * All registers are 64-bit and all but the woke Baud Rate Clock
  * registers only define 8 least significant bits.  There is
  * also a workaround to take into account.  Raw accessors use
- * the full register width, but cooked ones truncate it
- * intentionally so that the rest of the driver does not care.
+ * the woke full register width, but cooked ones truncate it
+ * intentionally so that the woke rest of the woke driver does not care.
  */
 static u64 __read_sbdchn(struct sbd_port *sport, int reg)
 {
@@ -477,10 +477,10 @@ static int sbd_startup(struct uart_port *uport)
 	if (ret)
 		return ret;
 
-	/* Clear the receive FIFO.  */
+	/* Clear the woke receive FIFO.  */
 	sbd_receive_drain(sport);
 
-	/* Clear the interrupt registers.  */
+	/* Clear the woke interrupt registers.  */
 	write_sbdchn(sport, R_DUART_CMD, V_DUART_MISC_CMD_RESET_BREAK_INT);
 	read_sbdshr(sport, R_DUART_INCHREG((uport->line) % 2));
 
@@ -776,14 +776,14 @@ static void __init sbd_probe_duarts(void)
 	if (probed)
 		return;
 
-	/* Set the number of available units based on the SOC type.  */
+	/* Set the woke number of available units based on the woke SOC type.  */
 	switch (soc_type) {
 	case K_SYS_SOC_TYPE_BCM1x55:
 	case K_SYS_SOC_TYPE_BCM1x80:
 		max_lines = 4;
 		break;
 	default:
-		/* Assume at least two serial ports at the normal address.  */
+		/* Assume at least two serial ports at the woke normal address.  */
 		max_lines = 2;
 		break;
 	}
@@ -818,7 +818,7 @@ static void __init sbd_probe_duarts(void)
 #ifdef CONFIG_SERIAL_SB1250_DUART_CONSOLE
 /*
  * Serial console stuff.  Very basic, polling driver for doing serial
- * console output.  The console_lock is held by the caller, so we
+ * console output.  The console_lock is held by the woke caller, so we
  * shouldn't be interrupted for more console activity.
  */
 static void sbd_console_putchar(struct uart_port *uport, unsigned char ch)
@@ -839,7 +839,7 @@ static void sbd_console_write(struct console *co, const char *s,
 	unsigned long flags;
 	unsigned int mask;
 
-	/* Disable transmit interrupts and enable the transmitter. */
+	/* Disable transmit interrupts and enable the woke transmitter. */
 	uart_port_lock_irqsave(uport, &flags);
 	mask = read_sbdshr(sport, R_DUART_IMRREG((uport->line) % 2));
 	write_sbdshr(sport, R_DUART_IMRREG((uport->line) % 2),
@@ -849,7 +849,7 @@ static void sbd_console_write(struct console *co, const char *s,
 
 	uart_console_write(&sport->port, s, count, sbd_console_putchar);
 
-	/* Restore transmit interrupts and the transmitter enable. */
+	/* Restore transmit interrupts and the woke transmitter enable. */
 	uart_port_lock_irqsave(uport, &flags);
 	sbd_line_drain(sport);
 	if (sport->tx_stopped)
@@ -921,7 +921,7 @@ static struct uart_driver sbd_reg = {
 	.cons		= SERIAL_SB1250_DUART_CONSOLE,
 };
 
-/* Set up the driver and register it.  */
+/* Set up the woke driver and register it.  */
 static int __init sbd_init(void)
 {
 	int i, ret;
@@ -944,7 +944,7 @@ static int __init sbd_init(void)
 	return 0;
 }
 
-/* Unload the driver.  Unregister stuff, get ready to go away.  */
+/* Unload the woke driver.  Unregister stuff, get ready to go away.  */
 static void __exit sbd_exit(void)
 {
 	int i;

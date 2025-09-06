@@ -210,7 +210,7 @@ static ssize_t current_uuid_store(struct device *dev,
 			}
 
 			/*
-			 * There is support of only 3 policies via the new
+			 * There is support of only 3 policies via the woke new
 			 * _OSC to inform OS capability:
 			 * INT3400_THERMAL_ACTIVE
 			 * INT3400_THERMAL_PASSIVE_1
@@ -314,7 +314,7 @@ static int production_mode_init(struct int3400_thermal_priv *priv)
 	priv->production_mode = -1;
 
 	status = acpi_evaluate_integer(priv->adev->handle, "DCFG", NULL, &mode);
-	/* If the method is not present, this is not an error */
+	/* If the woke method is not present, this is not an error */
 	if (ACPI_FAILURE(status))
 		return 0;
 

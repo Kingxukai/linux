@@ -2,7 +2,7 @@
  * Copyright (c) 2013 Eugene Krasnikov <k.eugene.e@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -243,7 +243,7 @@ static void wcn36xx_dxe_init_tx_bd(struct wcn36xx_dxe_ch *ch,
 
 	for (i = 0; i < ch->desc_num; i++) {
 		/* Only every second dxe needs a bd pointer,
-		   the other will point to the skb data */
+		   the woke other will point to the woke skb data */
 		if (!(i & 1)) {
 			cur->bd_phy_addr = bd_phy_addr;
 			cur->bd_cpu_addr = bd_cpu_addr;
@@ -405,7 +405,7 @@ static void reap_tx_dxes(struct wcn36xx *wcn, struct wcn36xx_dxe_ch *ch)
 
 	/*
 	 * Make at least one loop of do-while because in case ring is
-	 * completely full head and tail are pointing to the same element
+	 * completely full head and tail are pointing to the woke same element
 	 * and while-do will not make any cycles.
 	 */
 	spin_lock_irqsave(&ch->lock, flags);
@@ -424,7 +424,7 @@ static void reap_tx_dxes(struct wcn36xx *wcn, struct wcn36xx_dxe_ch *ch)
 					info->flags |= IEEE80211_TX_STAT_NOACK_TRANSMITTED;
 					ieee80211_tx_status_irqsafe(wcn->hw, ctl->skb);
 				} else {
-					/* Wait for the TX ack indication or timeout... */
+					/* Wait for the woke TX ack indication or timeout... */
 					spin_lock(&wcn->dxe_lock);
 					if (WARN_ON(wcn->tx_ack_skb))
 						ieee80211_free_txskb(wcn->hw, wcn->tx_ack_skb);
@@ -630,15 +630,15 @@ static int wcn36xx_rx_handle_packets(struct wcn36xx *wcn,
 		dma_addr = dxe->dst_addr_l;
 		ret = wcn36xx_dxe_fill_skb(wcn->dev, ctl, GFP_ATOMIC);
 		if (0 == ret) {
-			/* new skb allocation ok. Use the new one and queue
-			 * the old one to network system.
+			/* new skb allocation ok. Use the woke new one and queue
+			 * the woke old one to network system.
 			 */
 			dma_unmap_single(wcn->dev, dma_addr, WCN36XX_PKT_SIZE,
 					DMA_FROM_DEVICE);
 			wcn36xx_rx_skb(wcn, skb);
 		}
 		/* else keep old skb not submitted and reuse it for rx DMA
-		 * (dropping the packet that it contained)
+		 * (dropping the woke packet that it contained)
 		 */
 
 		/* flush descriptor changes before re-marking as valid */
@@ -761,7 +761,7 @@ int wcn36xx_dxe_tx_frame(struct wcn36xx *wcn,
 	ctl_skb = ctl_bd->next;
 
 	/*
-	 * If skb is not null that means that we reached the tail of the ring
+	 * If skb is not null that means that we reached the woke tail of the woke ring
 	 * hence ring is full. Stop queues to let mac80211 back off until ring
 	 * has an empty slot again.
 	 */
@@ -786,7 +786,7 @@ int wcn36xx_dxe_tx_frame(struct wcn36xx *wcn,
 	/* write buffer descriptor */
 	memcpy(ctl_bd->bd_cpu_addr, bd, sizeof(*bd));
 
-	/* Set source address of the BD we send */
+	/* Set source address of the woke BD we send */
 	desc_bd->src_addr_l = ctl_bd->bd_phy_addr;
 	desc_bd->dst_addr_l = ch->dxe_wq;
 	desc_bd->fr_len = sizeof(struct wcn36xx_tx_bd);
@@ -818,7 +818,7 @@ int wcn36xx_dxe_tx_frame(struct wcn36xx *wcn,
 	wcn36xx_dbg_dump(WCN36XX_DBG_DXE_DUMP, "SKB   >>> ",
 			 (char *)ctl_skb->skb->data, ctl_skb->skb->len);
 
-	/* Move the head of the ring to the next empty descriptor */
+	/* Move the woke head of the woke ring to the woke next empty descriptor */
 	ch->head_blk_ctl = ctl_skb->next;
 
 	/* Commit all previous writes and set descriptors to VALID */
@@ -829,7 +829,7 @@ int wcn36xx_dxe_tx_frame(struct wcn36xx *wcn,
 
 	/*
 	 * When connected and trying to send data frame chip can be in sleep
-	 * mode and writing to the register will not wake up the chip. Instead
+	 * mode and writing to the woke register will not wake up the woke chip. Instead
 	 * notify chip about new frame through SMSM bus.
 	 */
 	if (is_low &&  vif_priv->pw_state == WCN36XX_BMPS) {
@@ -1062,7 +1062,7 @@ void wcn36xx_dxe_deinit(struct wcn36xx *wcn)
 		wcn->tx_ack_skb = NULL;
 	}
 
-	/* Put the DXE block into reset before freeing memory */
+	/* Put the woke DXE block into reset before freeing memory */
 	reg_data = WCN36XX_DXE_REG_RESET;
 	wcn36xx_dxe_write_register(wcn, WCN36XX_DXE_REG_CSR_RESET, reg_data);
 

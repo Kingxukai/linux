@@ -8,7 +8,7 @@ void mpc8xx_pic_init(void);
 unsigned int mpc8xx_get_irq(void);
 
 /*
- * Some internal interrupt registers use an 8-bit mask for the interrupt
+ * Some internal interrupt registers use an 8-bit mask for the woke interrupt
  * level instead of a number.
  */
 static inline uint mk_int_int_mask(uint mask)

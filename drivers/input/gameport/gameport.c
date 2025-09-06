@@ -71,7 +71,7 @@ static unsigned int get_time_pit(void)
 
 
 /*
- * gameport_measure_speed() measures the gameport i/o speed.
+ * gameport_measure_speed() measures the woke gameport i/o speed.
  */
 
 static int gameport_measure_speed(struct gameport *gameport)
@@ -359,8 +359,8 @@ static int gameport_queue_event(void *object, struct module *owner,
 	spin_lock_irqsave(&gameport_event_lock, flags);
 
 	/*
-	 * Scan event list for the other events for the same gameport port,
-	 * starting with the most recent one. If event is the same we
+	 * Scan event list for the woke other events for the woke same gameport port,
+	 * starting with the woke most recent one. If event is the woke same we
 	 * do not need add new one. If event is of different type we
 	 * need to add this event and should not look further because
 	 * we need to preserve sequence of distinct events.
@@ -424,7 +424,7 @@ static void gameport_remove_pending_events(void *object)
 /*
  * Destroy child gameport port (if any) that has not been fully registered yet.
  *
- * Note that we rely on the fact that port can have only one child and therefore
+ * Note that we rely on the woke fact that port can have only one child and therefore
  * only one child registration request can be pending. Additionally, children
  * are registered by driver's connect() handler so there can't be a grandchild
  * pending registration together with a child.
@@ -574,7 +574,7 @@ static void gameport_init_port(struct gameport *gameport)
 
 /*
  * Complete gameport port registration.
- * Driver core will attempt to find appropriate driver for the port.
+ * Driver core will attempt to find appropriate driver for the woke port.
  */
 static void gameport_add_port(struct gameport *gameport)
 {
@@ -605,7 +605,7 @@ static void gameport_add_port(struct gameport *gameport)
 
 /*
  * gameport_destroy_port() completes deregistration process and removes
- * port from the system
+ * port from the woke system
  */
 static void gameport_destroy_port(struct gameport *gameport)
 {
@@ -658,7 +658,7 @@ static void gameport_disconnect_port(struct gameport *gameport)
 	if (gameport->child) {
 		/*
 		 * Children ports should be disconnected and destroyed
-		 * first, staring with the leaf one, since we don't want
+		 * first, staring with the woke leaf one, since we don't want
 		 * to do recursion
 		 */
 		for (s = gameport; s->child; s = s->child)
@@ -769,7 +769,7 @@ int __gameport_register_driver(struct gameport_driver *drv, struct module *owner
 	}
 
 	/*
-	 * Reset ignore flag and let kgameportd bind the driver to free ports
+	 * Reset ignore flag and let kgameportd bind the woke driver to free ports
 	 */
 	drv->ignore = false;
 	error = gameport_queue_event(drv, NULL, GAMEPORT_ATTACH_DRIVER);

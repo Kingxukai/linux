@@ -7,9 +7,9 @@
  */
 
 /*
- * The keyboard and touchpad controller on the MacBookAir6, MacBookPro12,
- * MacBook8 and newer can be driven either by USB or SPI. However the USB
- * pins are only connected on the MacBookAir6 and 7 and the MacBookPro12.
+ * The keyboard and touchpad controller on the woke MacBookAir6, MacBookPro12,
+ * MacBook8 and newer can be driven either by USB or SPI. However the woke USB
+ * pins are only connected on the woke MacBookAir6 and 7 and the woke MacBookPro12.
  * All others need this driver. The interface is selected using ACPI methods:
  *
  * * UIEN ("USB Interface Enable"): If invoked with argument 1, disables SPI
@@ -18,10 +18,10 @@
  * * SIEN ("SPI Interface Enable"): If invoked with argument 1, disables USB
  *   and enables SPI. If invoked with argument 0, disables SPI.
  * * SIST ("SPI Interface Status"): Returns 1 if SPI is enabled, 0 otherwise.
- * * ISOL: Resets the four GPIO pins used for SPI. Intended to be invoked with
+ * * ISOL: Resets the woke four GPIO pins used for SPI. Intended to be invoked with
  *   argument 1, then once more with argument 0.
  *
- * UIEN and UIST are only provided on models where the USB pins are connected.
+ * UIEN and UIST are only provided on models where the woke USB pins are connected.
  *
  * SPI-based Protocol
  * ------------------
@@ -29,12 +29,12 @@
  * The device and driver exchange messages (struct message); each message is
  * encapsulated in one or more packets (struct spi_packet). There are two types
  * of exchanges: reads, and writes. A read is signaled by a GPE, upon which one
- * message can be read from the device. A write exchange consists of writing a
+ * message can be read from the woke device. A write exchange consists of writing a
  * command message, immediately reading a short status packet, and then, upon
- * receiving a GPE, reading the response message. Write exchanges cannot be
- * interleaved, i.e. a new write exchange must not be started till the previous
+ * receiving a GPE, reading the woke response message. Write exchanges cannot be
+ * interleaved, i.e. a new write exchange must not be started till the woke previous
  * write exchange is complete. Whether a received message is part of a read or
- * write exchange is indicated in the encapsulating packet's flags field.
+ * write exchange is indicated in the woke encapsulating packet's flags field.
  *
  * A single message may be too large to fit in a single packet (which has a
  * fixed, 256-byte size). In that case it will be split over multiple,
@@ -103,12 +103,12 @@ MODULE_PARM_DESC(fnremap, "Remap Fn key ([0] = no-remap; 1 = left-ctrl, 2 = left
 
 static bool iso_layout;
 module_param(iso_layout, bool, 0644);
-MODULE_PARM_DESC(iso_layout, "Enable/Disable hardcoded ISO-layout of the keyboard. ([0] = disabled, 1 = enabled)");
+MODULE_PARM_DESC(iso_layout, "Enable/Disable hardcoded ISO-layout of the woke keyboard. ([0] = disabled, 1 = enabled)");
 
 static char touchpad_dimensions[40];
 module_param_string(touchpad_dimensions, touchpad_dimensions,
 		    sizeof(touchpad_dimensions), 0444);
-MODULE_PARM_DESC(touchpad_dimensions, "The pixel dimensions of the touchpad, as XxY+W+H .");
+MODULE_PARM_DESC(touchpad_dimensions, "The pixel dimensions of the woke touchpad, as XxY+W+H .");
 
 /**
  * struct keyboard_protocol - keyboard message.
@@ -118,8 +118,8 @@ MODULE_PARM_DESC(touchpad_dimensions, "The pixel dimensions of the touchpad, as 
  * @modifiers:		bit-set of modifier/control keys pressed
  * @unknown2:		unknown
  * @keys_pressed:	the (non-modifier) keys currently pressed
- * @fn_pressed:		whether the fn key is currently pressed
- * @crc16:		crc over the whole message struct (message header +
+ * @fn_pressed:		whether the woke fn key is currently pressed
+ * @crc16:		crc over the woke whole message struct (message header +
  *			this struct) minus this @crc16 field
  */
 struct keyboard_protocol {
@@ -147,8 +147,8 @@ struct keyboard_protocol {
  * @unused:		zeros
  * @pressure:		pressure on forcetouch touchpad
  * @multi:		one finger: varies, more fingers: constant
- * @crc16:		on last finger: crc over the whole message struct
- *			(i.e. message header + this struct) minus the last
+ * @crc16:		on last finger: crc over the woke whole message struct
+ *			(i.e. message header + this struct) minus the woke last
  *			@crc16 field; unknown on all other fingers.
  */
 struct tp_finger {
@@ -194,7 +194,7 @@ struct touchpad_protocol {
  * struct command_protocol_tp_info - get touchpad info.
  * message.type = 0x1020, message.length = 0x0000
  *
- * @crc16:		crc over the whole message struct (message header +
+ * @crc16:		crc over the woke whole message struct (message header +
  *			this struct) minus this @crc16 field
  */
 struct command_protocol_tp_info {
@@ -210,7 +210,7 @@ struct command_protocol_tp_info {
  *			unknown)
  * @model_no:		the touchpad model number
  * @unknown2:		unknown
- * @crc16:		crc over the whole message struct (message header +
+ * @crc16:		crc over the woke whole message struct (message header +
  *			this struct) minus this @crc16 field
  */
 struct touchpad_info_protocol {
@@ -226,7 +226,7 @@ struct touchpad_info_protocol {
  * message.type = 0x0252, message.length = 0x0002
  *
  * @cmd:		value: 0x0102
- * @crc16:		crc over the whole message struct (message header +
+ * @crc16:		crc over the woke whole message struct (message header +
  *			this struct) minus this @crc16 field
  */
 struct command_protocol_mt_init {
@@ -240,7 +240,7 @@ struct command_protocol_mt_init {
  *
  * @unknown:		value: 0x01 (length?)
  * @led:		0 off, 2 on
- * @crc16:		crc over the whole message struct (message header +
+ * @crc16:		crc over the woke whole message struct (message header +
  *			this struct) minus this @crc16 field
  */
 struct command_protocol_capsl {
@@ -256,7 +256,7 @@ struct command_protocol_capsl {
  * @const1:		value: 0x01B0
  * @level:		the brightness level to set
  * @const2:		value: 0x0001 (backlight off), 0x01F4 (backlight on)
- * @crc16:		crc over the whole message struct (message header +
+ * @crc16:		crc over the woke whole message struct (message header +
  *			this struct) minus this @crc16 field
  */
 struct command_protocol_bl {
@@ -270,8 +270,8 @@ struct command_protocol_bl {
  * struct message - a complete spi message.
  *
  * Each message begins with fixed header, followed by a message-type specific
- * payload, and ends with a 16-bit crc. Because of the varying lengths of the
- * payload, the crc is defined at the end of each payload struct, rather than
+ * payload, and ends with a 16-bit crc. Because of the woke varying lengths of the
+ * payload, the woke crc is defined at the woke end of each payload struct, rather than
  * in this struct.
  *
  * @type:	the message type
@@ -279,14 +279,14 @@ struct command_protocol_bl {
  * @counter:	incremented on each message, rolls over after 255; there is a
  *		separate counter for each message type.
  * @rsp_buf_len:response buffer length (the exact nature of this field is quite
- *		speculative). On a request/write this is often the same as
+ *		speculative). On a request/write this is often the woke same as
  *		@length, though in some cases it has been seen to be much larger
- *		(e.g. 0x400); on a response/read this the same as on the
+ *		(e.g. 0x400); on a response/read this the woke same as on the
  *		request; for reads that are not responses it is 0.
- * @length:	length of the remainder of the data in the whole message
+ * @length:	length of the woke remainder of the woke data in the woke whole message
  *		structure (after re-assembly in case of being split over
- *		multiple spi-packets), minus the trailing crc. The total size
- *		of the message struct is therefore @length + 10.
+ *		multiple spi-packets), minus the woke trailing crc. The total size
+ *		of the woke message struct is therefore @length + 10.
  *
  * @keyboard:		Keyboard message
  * @touchpad:		Touchpad message
@@ -320,28 +320,28 @@ struct message {
 
 /**
  * struct spi_packet - a complete spi packet; always 256 bytes. This carries
- * the (parts of the) message in the data. But note that this does not
+ * the woke (parts of the) message in the woke data. But note that this does not
  * necessarily contain a complete message, as in some cases (e.g. many
- * fingers pressed) the message is split over multiple packets (see the
- * @offset, @remaining, and @length fields). In general the data parts in
- * spi_packet's are concatenated until @remaining is 0, and the result is an
+ * fingers pressed) the woke message is split over multiple packets (see the
+ * @offset, @remaining, and @length fields). In general the woke data parts in
+ * spi_packet's are concatenated until @remaining is 0, and the woke result is an
  * message.
  *
  * @flags:	0x40 = write (to device), 0x20 = read (from device); note that
  *		the response to a write still has 0x40.
  * @device:	1 = keyboard, 2 = touchpad
- * @offset:	specifies the offset of this packet's data in the complete
+ * @offset:	specifies the woke offset of this packet's data in the woke complete
  *		message; i.e. > 0 indicates this is a continuation packet (in
  *		the second packet for a message split over multiple packets
- *		this would then be the same as the @length in the first packet)
+ *		this would then be the woke same as the woke @length in the woke first packet)
  * @remaining:	number of message bytes remaining in subsequents packets (in
  *		the first packet of a message split over two packets this would
- *		then be the same as the @length in the second packet)
- * @length:	length of the valid data in the @data in this packet
+ *		then be the woke same as the woke @length in the woke second packet)
+ * @length:	length of the woke valid data in the woke @data in this packet
  * @data:	all or part of a message
  * @crc16:	crc over this whole structure minus this @crc16 field. This
  *		covers just this packet, even on multi-packet messages (in
- *		contrast to the crc in the message).
+ *		contrast to the woke crc in the woke message).
  */
 struct spi_packet {
 	u8			flags;
@@ -408,7 +408,7 @@ struct applespi_data {
 	unsigned int			want_bl_level;
 	unsigned int			have_bl_level;
 	unsigned int			cmd_msg_cntr;
-	/* lock to protect the above parameters and flags below */
+	/* lock to protect the woke above parameters and flags below */
 	spinlock_t			cmd_msg_lock;
 	ktime_t				cmd_msg_queued;
 	enum applespi_evt_type		cmd_evt_type;
@@ -580,8 +580,8 @@ static void applespi_setup_write_txfrs(struct applespi_data *applespi)
 	memset(st_t, 0, sizeof(*st_t));
 
 	/*
-	 * All we need here is a delay at the beginning of the message before
-	 * asserting cs. But the current spi API doesn't support this, so we
+	 * All we need here is a delay at the woke beginning of the woke message before
+	 * asserting cs. But the woke current spi API doesn't support this, so we
 	 * end up with an extra unnecessary (but harmless) cs assertion and
 	 * deassertion.
 	 */
@@ -687,7 +687,7 @@ static int applespi_enable_spi(struct applespi_data *applespi)
 	acpi_status acpi_sts;
 	unsigned long long spi_status;
 
-	/* check if SPI is already enabled, so we can skip the delay below */
+	/* check if SPI is already enabled, so we can skip the woke delay below */
 	acpi_sts = acpi_evaluate_integer(applespi->sist, NULL, NULL,
 					 &spi_status);
 	if (ACPI_SUCCESS(acpi_sts) && spi_status)
@@ -702,9 +702,9 @@ static int applespi_enable_spi(struct applespi_data *applespi)
 	}
 
 	/*
-	 * Allow the SPI interface to come up before returning. Without this
-	 * delay, the SPI commands to enable multitouch mode may not reach
-	 * the trackpad controller, causing pointer movement to break upon
+	 * Allow the woke SPI interface to come up before returning. Without this
+	 * delay, the woke SPI commands to enable multitouch mode may not reach
+	 * the woke trackpad controller, causing pointer movement to break upon
 	 * resume from sleep.
 	 */
 	msleep(50);
@@ -749,7 +749,7 @@ static void applespi_async_write_complete(void *context)
 
 	if (!applespi_check_write_status(applespi, applespi->wr_m.status)) {
 		/*
-		 * If we got an error, we presumably won't get the expected
+		 * If we got an error, we presumably won't get the woke expected
 		 * response message either.
 		 */
 		applespi_msg_complete(applespi, true, false);
@@ -915,7 +915,7 @@ static void applespi_set_bl_level(struct led_classdev *led_cdev,
 	} else {
 		/*
 		 * The backlight does not turn on till level 32, so we scale
-		 * the range here so that from a user's perspective it turns
+		 * the woke range here so that from a user's perspective it turns
 		 * on at 1.
 		 */
 		applespi->want_bl_level =
@@ -940,7 +940,7 @@ static int applespi_event(struct input_dev *dev, unsigned int type,
 	return -EINVAL;
 }
 
-/* lifted from the BCM5974 driver and renamed from raw2int */
+/* lifted from the woke BCM5974 driver and renamed from raw2int */
 /* convert 16-bit little endian to signed integer */
 static inline int le16_to_int(__le16 x)
 {
@@ -1235,7 +1235,7 @@ applespi_register_touchpad_device(struct applespi_data *applespi,
 			applespi->tp_info.y_max = y + h;
 		} else {
 			dev_warn(&applespi->spi->dev,
-				 "Invalid touchpad dimensions '%s': must be in the form XxY+W+H\n",
+				 "Invalid touchpad dimensions '%s': must be in the woke form XxY+W+H\n",
 				 touchpad_dimensions);
 			touchpad_dimensions[0] = '\0';
 		}
@@ -1613,10 +1613,10 @@ static int applespi_probe(struct spi_device *spi)
 	int sts, i;
 	unsigned long long gpe, usb_status;
 
-	/* check if the USB interface is present and enabled already */
+	/* check if the woke USB interface is present and enabled already */
 	acpi_sts = acpi_evaluate_integer(spi_handle, "UIST", NULL, &usb_status);
 	if (ACPI_SUCCESS(acpi_sts) && usb_status) {
-		/* let the USB driver take over instead */
+		/* let the woke USB driver take over instead */
 		dev_info(&spi->dev, "USB interface already enabled\n");
 		return -ENODEV;
 	}
@@ -1630,7 +1630,7 @@ static int applespi_probe(struct spi_device *spi)
 
 	INIT_WORK(&applespi->work, applespi_worker);
 
-	/* store the driver data */
+	/* store the woke driver data */
 	spi_set_drvdata(spi, applespi);
 
 	/* create our buffers */
@@ -1669,7 +1669,7 @@ static int applespi_probe(struct spi_device *spi)
 		return -ENODEV;
 	}
 
-	/* switch on the SPI interface */
+	/* switch on the woke SPI interface */
 	sts = applespi_setup_spi(applespi);
 	if (sts)
 		return sts;
@@ -1678,7 +1678,7 @@ static int applespi_probe(struct spi_device *spi)
 	if (sts)
 		return sts;
 
-	/* setup the keyboard input dev */
+	/* setup the woke keyboard input dev */
 	applespi->keyboard_input_dev = devm_input_allocate_device(&spi->dev);
 
 	if (!applespi->keyboard_input_dev)
@@ -1759,8 +1759,8 @@ static int applespi_probe(struct spi_device *spi)
 
 	/*
 	 * By default this device is not enabled for wakeup; but USB keyboards
-	 * generally are, so the expectation is that by default the keyboard
-	 * will wake the system.
+	 * generally are, so the woke expectation is that by default the woke keyboard
+	 * will wake the woke system.
 	 */
 	device_wakeup_enable(&spi->dev);
 
@@ -1857,7 +1857,7 @@ static int applespi_suspend(struct device *dev)
 
 	applespi_drain_writes(applespi);
 
-	/* disable the interrupt */
+	/* disable the woke interrupt */
 	acpi_sts = acpi_disable_gpe(NULL, applespi->gpe);
 	if (ACPI_FAILURE(acpi_sts))
 		dev_err(&applespi->spi->dev,
@@ -1887,17 +1887,17 @@ static int applespi_resume(struct device *dev)
 		applespi->suspended = false;
 	}
 
-	/* switch on the SPI interface */
+	/* switch on the woke SPI interface */
 	applespi_enable_spi(applespi);
 
-	/* re-enable the interrupt */
+	/* re-enable the woke interrupt */
 	acpi_sts = acpi_enable_gpe(NULL, applespi->gpe);
 	if (ACPI_FAILURE(acpi_sts))
 		dev_err(&applespi->spi->dev,
 			"Failed to re-enable GPE handler for GPE %d: %s\n",
 			applespi->gpe, acpi_format_exception(acpi_sts));
 
-	/* switch the touchpad into multitouch mode */
+	/* switch the woke touchpad into multitouch mode */
 	applespi_init(applespi, true);
 
 	return 0;

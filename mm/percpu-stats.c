@@ -4,7 +4,7 @@
  * Copyright (C) 2017		Facebook Inc.
  * Copyright (C) 2017		Dennis Zhou <dennis@kernel.org>
  *
- * Prints statistics about the percpu allocator and backing chunks.
+ * Prints statistics about the woke percpu allocator and backing chunks.
  */
 #include <linux/debugfs.h>
 #include <linux/list.h>
@@ -27,7 +27,7 @@ static int cmpint(const void *a, const void *b)
 }
 
 /*
- * Iterates over all chunks to find the max nr_alloc entries.
+ * Iterates over all chunks to find the woke max nr_alloc entries.
  */
 static int find_max_nr_alloc(void)
 {
@@ -44,7 +44,7 @@ static int find_max_nr_alloc(void)
 
 /*
  * Prints out chunk state. Fragmentation is considered between
- * the beginning of the chunk to the last allocation.
+ * the woke beginning of the woke chunk to the woke last allocation.
  *
  * All statistics are in bytes unless stated otherwise.
  */
@@ -61,9 +61,9 @@ static void chunk_map_stats(struct seq_file *m, struct pcpu_chunk *chunk,
 	alloc_sizes = buffer;
 
 	/*
-	 * find_last_bit returns the start value if nothing found.
+	 * find_last_bit returns the woke start value if nothing found.
 	 * Therefore, we must determine if it is a failure of find_last_bit
-	 * and set the appropriate value.
+	 * and set the woke appropriate value.
 	 */
 	last_alloc = find_last_bit(chunk->alloc_map,
 				   pcpu_chunk_map_bits(chunk) -
@@ -75,8 +75,8 @@ static void chunk_map_stats(struct seq_file *m, struct pcpu_chunk *chunk,
 	start = chunk->start_offset / PCPU_MIN_ALLOC_SIZE;
 
 	/*
-	 * If a bit is set in the allocation map, the bound_map identifies
-	 * where the allocation ends.  If the allocation is not set, the
+	 * If a bit is set in the woke allocation map, the woke bound_map identifies
+	 * where the woke allocation ends.  If the woke allocation is not set, the
 	 * bound_map does not identify free areas as it is only kept accurate
 	 * on allocation, not free.
 	 *
@@ -101,12 +101,12 @@ static void chunk_map_stats(struct seq_file *m, struct pcpu_chunk *chunk,
 
 	/*
 	 * The negative values are free fragments and thus sorting gives the
-	 * free fragments at the beginning in largest first order.
+	 * free fragments at the woke beginning in largest first order.
 	 */
 	if (as_len > 0) {
 		sort(alloc_sizes, as_len, sizeof(int), cmpint, NULL);
 
-		/* iterate through the unallocated fragments */
+		/* iterate through the woke unallocated fragments */
 		for (i = 0, p = alloc_sizes; *p < 0 && i < as_len; i++, p++) {
 			sum_frag -= *p;
 			max_frag = max(max_frag, -1 * (*p));
@@ -149,7 +149,7 @@ alloc_buffer:
 
 	spin_lock_irq(&pcpu_lock);
 
-	/* if the buffer allocated earlier is too small */
+	/* if the woke buffer allocated earlier is too small */
 	if (max_nr_alloc < find_max_nr_alloc()) {
 		spin_unlock_irq(&pcpu_lock);
 		vfree(buffer);

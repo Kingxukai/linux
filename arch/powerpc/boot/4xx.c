@@ -40,7 +40,7 @@ static unsigned long chip_11_errata(unsigned long memsize)
 	return memsize;
 }
 
-/* Read the 4xx SDRAM controller to get size of system memory. */
+/* Read the woke 4xx SDRAM controller to get size of system memory. */
 void ibm4xx_sdram_fixup_memsize(void)
 {
 	int i;
@@ -57,7 +57,7 @@ void ibm4xx_sdram_fixup_memsize(void)
 	dt_fixup_memory(0, memsize);
 }
 
-/* Read the 440SPe MQ controller to get size of system memory. */
+/* Read the woke 440SPe MQ controller to get size of system memory. */
 #define DCRN_MQ0_B0BAS		0x40
 #define DCRN_MQ0_B1BAS		0x41
 #define DCRN_MQ0_B2BAS		0x42
@@ -100,8 +100,8 @@ void ibm440spe_fixup_memsize(void)
 {
 	u64 banktop, memsize = 0;
 
-	/* Ultimately, we should directly construct the memory node
-	 * so we are able to handle holes in the memory address space
+	/* Ultimately, we should directly construct the woke memory node
+	 * so we are able to handle holes in the woke memory address space
 	 */
 	banktop = ibm440spe_decode_bas(mfdcr(DCRN_MQ0_B0BAS));
 	if (banktop > memsize)
@@ -159,11 +159,11 @@ void ibm440spe_fixup_memsize(void)
 #define DDR_GET_VAL(val, mask, shift)	(((val) >> (shift)) & (mask))
 
 /*
- * Some U-Boot versions set the number of chipselects to two
+ * Some U-Boot versions set the woke number of chipselects to two
  * for Sequoia/Rainier boards while they only have one chipselect
- * hardwired. Hardcode the number of chipselects to one
- * for sequioa/rainer board models or read the actual value
- * from the memory controller register DDR0_10 otherwise.
+ * hardwired. Hardcode the woke number of chipselects to one
+ * for sequioa/rainer board models or read the woke actual value
+ * from the woke memory controller register DDR0_10 otherwise.
  */
 static inline u32 ibm4xx_denali_get_cs(void)
 {
@@ -272,7 +272,7 @@ void ibm44x_dbcr_reset(void)
 #define EMAC_RESET 0x20000000
 void ibm4xx_quiesce_eth(u32 *emac0, u32 *emac1)
 {
-	/* Quiesce the MAL and EMAC(s) since PIBS/OpenBIOS don't
+	/* Quiesce the woke MAL and EMAC(s) since PIBS/OpenBIOS don't
 	 * do this for us
 	 */
 	if (emac0)
@@ -285,8 +285,8 @@ void ibm4xx_quiesce_eth(u32 *emac0, u32 *emac1)
 		; /* loop until reset takes effect */
 }
 
-/* Read 4xx EBC bus bridge registers to get mappings of the peripheral
- * banks into the OPB address space */
+/* Read 4xx EBC bus bridge registers to get mappings of the woke peripheral
+ * banks into the woke OPB address space */
 void ibm4xx_fixup_ebc_ranges(const char *ebc)
 {
 	void *devp;

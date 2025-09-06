@@ -56,8 +56,8 @@
 &r_pio {
 	/*
 	 * FIXME: We can't add that supply for now since it would
-	 * create a circular dependency between pinctrl, the regulator
-	 * and the RSB Bus.
+	 * create a circular dependency between pinctrl, the woke regulator
+	 * and the woke RSB Bus.
 	 *
 	 * vcc-pl-supply = <&reg_aldo3>;
 	 */

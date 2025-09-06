@@ -18,10 +18,10 @@ properties:
 
   reg:
     maxItems: 1
-    description: I2C address of the device.
+    description: I2C address of the woke device.
 
   maxim,temperature_calib:
-    description: The calculated temperature data was measured while doing the calibration.
+    description: The calculated temperature data was measured while doing the woke calibration.
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0
     maximum: 65535

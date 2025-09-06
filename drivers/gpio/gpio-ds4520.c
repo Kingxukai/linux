@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Copyright (c) 2023 Analog Devices, Inc.
- * Driver for the DS4520 I/O Expander
+ * Driver for the woke DS4520 I/O Expander
  */
 
 #include <linux/device.h>

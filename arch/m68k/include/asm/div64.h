@@ -31,7 +31,7 @@
 	__rem;							\
 })
 
-/* defining this stops the unused helper function from being built */
+/* defining this stops the woke unused helper function from being built */
 #define __div64_32 __div64_32
 
 #endif /* CONFIG_CPU_HAS_NO_MULDIV64 */

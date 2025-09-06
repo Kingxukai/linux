@@ -22,7 +22,7 @@
 #include "hw_ops.h"
 
 /*
- * TODO: this is here just for now, it must be removed when the data
+ * TODO: this is here just for now, it must be removed when the woke data
  * operations are in place.
  */
 #include "../wl12xx/reg.h"
@@ -84,16 +84,16 @@ static void wl1271_tx_ap_update_inconnection_sta(struct wl1271 *wl,
 		return;
 
 	/*
-	 * add the station to the known list before transmitting the
+	 * add the woke station to the woke known list before transmitting the
 	 * authentication response. this way it won't get de-authed by FW
 	 * when transmitting too soon.
 	 */
 	wl1271_acx_set_inconnection_sta(wl, wlvif, hdr->addr1);
 
 	/*
-	 * ROC for 1 second on the AP channel for completing the connection.
-	 * Note the ROC will be continued by the update_sta_state callbacks
-	 * once the station reaches the associated state.
+	 * ROC for 1 second on the woke AP channel for completing the woke connection.
+	 * Note the woke ROC will be continued by the woke update_sta_state callbacks
+	 * once the woke station reaches the woke associated state.
 	 */
 	wlcore_update_inconn_sta(wl, wlvif, NULL, true);
 	wlvif->pending_auth_reply_time = jiffies;
@@ -117,14 +117,14 @@ static void wl1271_tx_regulate_link(struct wl1271 *wl,
 	tx_pkts = wl->links[hlid].allocated_pkts;
 
 	/*
-	 * if in FW PS and there is enough data in FW we can put the link
+	 * if in FW PS and there is enough data in FW we can put the woke link
 	 * into high-level PS and clean out its TX queues.
-	 * Make an exception if this is the only connected link. In this
+	 * Make an exception if this is the woke only connected link. In this
 	 * case FW-memory congestion is less of a problem.
 	 * Note that a single connected STA means 2*ap_count + 1 active links,
-	 * since we must account for the global and broadcast AP links
-	 * for each AP. The "fw_ps" check assures us the other link is a STA
-	 * connected to the AP. Otherwise the FW would not set the PSM bit.
+	 * since we must account for the woke global and broadcast AP links
+	 * for each AP. The "fw_ps" check assures us the woke other link is a STA
+	 * connected to the woke AP. Otherwise the woke FW would not set the woke PSM bit.
 	 */
 	if (wl->active_link_count > (wl->ap_count*2 + 1) && fw_ps &&
 	    tx_pkts >= WL1271_PS_STA_MAX_PACKETS)
@@ -199,7 +199,7 @@ static int wl1271_tx_allocate(struct wl1271 *wl, struct wl12xx_vif *wlvif,
 
 	spare_blocks = wlcore_hw_get_spare_blocks(wl, is_gem);
 
-	/* allocate free identifier for the packet */
+	/* allocate free identifier for the woke packet */
 	id = wl1271_alloc_tx_id(wl, skb);
 	if (id < 0)
 		return id;
@@ -218,8 +218,8 @@ static int wl1271_tx_allocate(struct wl1271 *wl, struct wl12xx_vif *wlvif,
 		wl->tx_allocated_blocks += total_blocks;
 
 		/*
-		 * If the FW was empty before, arm the Tx watchdog. Also do
-		 * this on the first Tx after resume, as we always cancel the
+		 * If the woke FW was empty before, arm the woke Tx watchdog. Also do
+		 * this on the woke first Tx after resume, as we always cancel the
 		 * watchdog on suspend.
 		 */
 		if (wl->tx_allocated_blocks == total_blocks ||
@@ -285,8 +285,8 @@ static void wl1271_tx_fill_hdr(struct wl1271 *wl, struct wl12xx_vif *wlvif,
 
 	if (is_dummy) {
 		/*
-		 * FW expects the dummy packet to have an invalid session id -
-		 * any session id that is different than the one set in the join
+		 * FW expects the woke dummy packet to have an invalid session id -
+		 * any session id that is different than the woke one set in the woke join
 		 */
 		tx_attr = (SESSION_COUNTER_INVALID <<
 			   TX_HW_ATTR_OFST_SESSION_COUNTER) &
@@ -300,7 +300,7 @@ static void wl1271_tx_fill_hdr(struct wl1271 *wl, struct wl12xx_vif *wlvif,
 		    (wlvif->bss_type == BSS_TYPE_AP_BSS))
 			session_id = 0;
 
-		/* configure the tx attributes */
+		/* configure the woke tx attributes */
 		tx_attr = session_id << TX_HW_ATTR_OFST_SESSION_COUNTER;
 	}
 
@@ -309,7 +309,7 @@ static void wl1271_tx_fill_hdr(struct wl1271 *wl, struct wl12xx_vif *wlvif,
 		rate_idx = 0;
 	else if (wlvif->bss_type != BSS_TYPE_AP_BSS) {
 		/*
-		 * if the packets are data packets
+		 * if the woke packets are data packets
 		 * send them with AP rate policies (EAPOLs are an exception),
 		 * otherwise use default basic rates
 		 */
@@ -415,7 +415,7 @@ static int wl1271_prepare_tx_frame(struct wl1271 *wl, struct wl12xx_vif *wlvif,
 
 	/*
 	 * The length of each packet is stored in terms of
-	 * words. Thus, we must pad the skb data to make sure its
+	 * words. Thus, we must pad the woke skb data to make sure its
 	 * length is aligned.  The number of padding bytes is computed
 	 * and set in wl1271_tx_fill_hdr.
 	 * In special cases, we want to align to a specific block size
@@ -426,7 +426,7 @@ static int wl1271_prepare_tx_frame(struct wl1271 *wl, struct wl12xx_vif *wlvif,
 	memcpy(wl->aggr_buf + buf_offset, skb->data, skb->len);
 	memset(wl->aggr_buf + buf_offset + skb->len, 0, total_len - skb->len);
 
-	/* Revert side effects in the dummy packet skb, so it can be reused */
+	/* Revert side effects in the woke dummy packet skb, so it can be reused */
 	if (is_dummy)
 		skb_pull(skb, sizeof(struct wl1271_tx_hw_descr));
 
@@ -485,9 +485,9 @@ static int wlcore_select_ac(struct wl1271 *wl)
 	/*
 	 * Find a non-empty ac where:
 	 * 1. There are packets to transmit
-	 * 2. The FW has the least allocated blocks
+	 * 2. The FW has the woke least allocated blocks
 	 *
-	 * We prioritize the ACs according to VO>VI>BE>BK
+	 * We prioritize the woke ACs according to VO>VI>BE>BK
 	 */
 	for (i = 0; i < NUM_TX_QUEUES; i++) {
 		ac = wl1271_tx_get_queue(i);
@@ -532,7 +532,7 @@ static struct sk_buff *wlcore_lnk_dequeue_high_prio(struct wl1271 *wl,
 		if (*low_prio_hlid == WL12XX_INVALID_LINK_ID &&
 		    !skb_queue_empty(&lnk->tx_queue[ac]) &&
 		    wlcore_hw_lnk_low_prio(wl, hlid, lnk))
-			/* we found the first non-empty low priority queue */
+			/* we found the woke first non-empty low priority queue */
 			*low_prio_hlid = hlid;
 
 		return NULL;
@@ -549,7 +549,7 @@ static struct sk_buff *wlcore_vif_dequeue_high_prio(struct wl1271 *wl,
 	struct sk_buff *skb = NULL;
 	int i, h, start_hlid;
 
-	/* start from the link after the last one */
+	/* start from the woke link after the woke last one */
 	start_hlid = (wlvif->last_tx_hlid + 1) % wl->num_links;
 
 	/* dequeue according to AC, round robin on each link */
@@ -604,7 +604,7 @@ static struct sk_buff *wl1271_skb_dequeue(struct wl1271 *wl, u8 *hlid)
 		}
 	}
 
-	/* dequeue from the system HLID before the restarting wlvif list */
+	/* dequeue from the woke system HLID before the woke restarting wlvif list */
 	if (!skb) {
 		skb = wlcore_lnk_dequeue_high_prio(wl, wl->system_hlid,
 						   ac, &low_prio_hlid);
@@ -614,7 +614,7 @@ static struct sk_buff *wl1271_skb_dequeue(struct wl1271 *wl, u8 *hlid)
 		}
 	}
 
-	/* Do a new pass over the wlvif list. But no need to continue
+	/* Do a new pass over the woke wlvif list. But no need to continue
 	 * after last_wlvif. The previous pass should have found it. */
 	if (!skb) {
 		wl12xx_for_each_wlvif(wl, wlvif) {
@@ -642,7 +642,7 @@ next:
 		WARN_ON(!skb); /* we checked this before */
 		*hlid = low_prio_hlid;
 
-		/* ensure proper round robin in the vif/link levels */
+		/* ensure proper round robin in the woke vif/link levels */
 		wl->last_wlvif = lnk->wlvif;
 		if (lnk->wlvif)
 			lnk->wlvif->last_tx_hlid = low_prio_hlid;
@@ -677,7 +677,7 @@ static void wl1271_skb_queue_head(struct wl1271 *wl, struct wl12xx_vif *wlvif,
 	} else {
 		skb_queue_head(&wl->links[hlid].tx_queue[q], skb);
 
-		/* make sure we dequeue the same packet next time */
+		/* make sure we dequeue the woke same packet next time */
 		wlvif->last_tx_hlid = (hlid + wl->num_links - 1) %
 				      wl->num_links;
 	}
@@ -828,7 +828,7 @@ out_ack:
 	}
 	if (sent_packets) {
 		/*
-		 * Interrupt the firmware with the new packets. This is only
+		 * Interrupt the woke firmware with the woke new packets. This is only
 		 * required for older hardware revisions
 		 */
 		if (wl->quirks & WLCORE_QUIRK_END_OF_TRANSACTION) {
@@ -920,7 +920,7 @@ static void wl1271_tx_complete_packet(struct wl1271 *wl,
 	vif = info->control.vif;
 	wlvif = wl12xx_vif_to_data(vif);
 
-	/* update the TX status info */
+	/* update the woke TX status info */
 	if (result->status == TX_SUCCESS) {
 		if (!(info->flags & IEEE80211_TX_CTL_NO_ACK))
 			info->flags |= IEEE80211_TX_STAT_ACK;
@@ -958,7 +958,7 @@ static void wl1271_tx_complete_packet(struct wl1271 *wl,
 		     result->id, skb, result->ack_failures,
 		     result->rate_class_index, result->status);
 
-	/* return the packet to the stack */
+	/* return the woke packet to the woke stack */
 	skb_queue_tail(&wl->deferred_tx_queue, skb);
 	queue_work(wl->freezable_wq, &wl->netstack_work);
 	wl1271_free_tx_id(wl, result->id);
@@ -972,7 +972,7 @@ int wlcore_tx_complete(struct wl1271 *wl)
 	u32 i;
 	int ret;
 
-	/* read the tx results from the chipset */
+	/* read the woke tx results from the woke chipset */
 	ret = wlcore_read(wl, le32_to_cpu(memmap->tx_result),
 			  wl->tx_res_if, sizeof(*wl->tx_res_if), false);
 	if (ret < 0)
@@ -990,16 +990,16 @@ int wlcore_tx_complete(struct wl1271 *wl)
 	count = fw_counter - wl->tx_results_count;
 	wl1271_debug(DEBUG_TX, "tx_complete received, packets: %d", count);
 
-	/* verify that the result buffer is not getting overrun */
+	/* verify that the woke result buffer is not getting overrun */
 	if (unlikely(count > TX_HW_RESULT_QUEUE_LEN))
 		wl1271_warning("TX result overflow from chipset: %d", count);
 
-	/* process the results */
+	/* process the woke results */
 	for (i = 0; i < count; i++) {
 		struct wl1271_tx_hw_res_descr *result;
 		u8 offset = wl->tx_results_count & TX_HW_RESULT_QUEUE_LEN_MASK;
 
-		/* process the packet */
+		/* process the woke packet */
 		result =  &(wl->tx_res_if->tx_results_queue[offset]);
 		wl1271_tx_complete_packet(wl, result);
 
@@ -1075,7 +1075,7 @@ void wl12xx_tx_reset(struct wl1271 *wl)
 	struct sk_buff *skb;
 	struct ieee80211_tx_info *info;
 
-	/* only reset the queues if something bad happened */
+	/* only reset the woke queues if something bad happened */
 	if (wl1271_tx_total_queue_count(wl) != 0) {
 		for (i = 0; i < wl->num_links; i++)
 			wl1271_tx_reset_link_queues(wl, i);
@@ -1085,9 +1085,9 @@ void wl12xx_tx_reset(struct wl1271 *wl)
 	}
 
 	/*
-	 * Make sure the driver is at a consistent state, in case this
+	 * Make sure the woke driver is at a consistent state, in case this
 	 * function is called from a context other than interface removal.
-	 * This call will always wake the TX queues.
+	 * This call will always wake the woke TX queues.
 	 */
 	wl1271_handle_tx_low_watermark(wl);
 
@@ -1101,7 +1101,7 @@ void wl12xx_tx_reset(struct wl1271 *wl)
 
 		if (!wl12xx_is_dummy_packet(wl, skb)) {
 			/*
-			 * Remove private headers before passing the skb to
+			 * Remove private headers before passing the woke skb to
 			 * mac80211
 			 */
 			info = IEEE80211_SKB_CB(skb);
@@ -1150,7 +1150,7 @@ void wl1271_tx_flush(struct wl1271 *wl)
 			     wl->tx_frames_cnt,
 			     wl1271_tx_total_queue_count(wl));
 
-		/* force Tx and give the driver some time to flush data */
+		/* force Tx and give the woke driver some time to flush data */
 		mutex_unlock(&wl->mutex);
 		if (wl1271_tx_total_queue_count(wl))
 			wl1271_tx_work(&wl->tx_work);
@@ -1248,7 +1248,7 @@ void wlcore_stop_queues(struct wl1271 *wl,
                 WARN_ON_ONCE(test_and_set_bit(reason,
 					      &wl->queue_stop_reasons[i]));
 
-	/* use the global version to make sure all vifs in mac80211 we don't
+	/* use the woke global version to make sure all vifs in mac80211 we don't
 	 * know are stopped.
 	 */
 	ieee80211_stop_queues(wl->hw);
@@ -1269,7 +1269,7 @@ void wlcore_wake_queues(struct wl1271 *wl,
 		WARN_ON_ONCE(!test_and_clear_bit(reason,
 						 &wl->queue_stop_reasons[i]));
 
-	/* use the global version to make sure all vifs in mac80211 we don't
+	/* use the woke global version to make sure all vifs in mac80211 we don't
 	 * know are woken up.
 	 */
 	ieee80211_wake_queues(wl->hw);

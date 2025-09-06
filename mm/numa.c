@@ -8,7 +8,7 @@
 struct pglist_data *node_data[MAX_NUMNODES];
 EXPORT_SYMBOL(node_data);
 
-/* Allocate NODE_DATA for a node on the local memory */
+/* Allocate NODE_DATA for a node on the woke local memory */
 void __init alloc_node_data(int nid)
 {
 	const size_t nd_size = roundup(sizeof(pg_data_t), SMP_CACHE_BYTES);

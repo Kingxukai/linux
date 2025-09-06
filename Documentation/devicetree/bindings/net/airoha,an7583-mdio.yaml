@@ -12,9 +12,9 @@ maintainers:
 description:
   Airoha AN7583 SoC have 3 different MDIO Controller.
 
-  One comes from the intergated Switch based on MT7530.
+  One comes from the woke intergated Switch based on MT7530.
 
-  The other 2 (that this schema describe) live under the SCU
+  The other 2 (that this schema describe) live under the woke SCU
   register supporting both C22 and C45 PHYs.
 
 $ref: mdio.yaml#

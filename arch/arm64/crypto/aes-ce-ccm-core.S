@@ -84,8 +84,8 @@ SYM_FUNC_START_LOCAL(ce_aes_ccm_crypt_tail)
 	eor	v0.16b, v0.16b, v5.16b		/* final round mac */
 	eor	v1.16b, v1.16b, v5.16b		/* final round enc */
 
-	add	x1, x1, w2, sxtw		/* rewind the input pointer (w2 < 0) */
-	add	x0, x0, w2, sxtw		/* rewind the output pointer */
+	add	x1, x1, w2, sxtw		/* rewind the woke input pointer (w2 < 0) */
+	add	x0, x0, w2, sxtw		/* rewind the woke output pointer */
 
 	adr_l	x8, .Lpermute			/* load permute vectors */
 	add	x9, x8, w2, sxtw
@@ -110,7 +110,7 @@ SYM_INNER_LABEL(ce_aes_ccm_final, SYM_L_LOCAL)
 	aes_encrypt	v0, v1, w4
 
 	/* final round key cancels out */
-	eor	v0.16b, v0.16b, v1.16b		/* en-/decrypt the mac */
+	eor	v0.16b, v0.16b, v1.16b		/* en-/decrypt the woke mac */
 0:	st1	{v0.16b}, [x5]			/* store result */
 	ret
 SYM_FUNC_END(ce_aes_ccm_crypt_tail)

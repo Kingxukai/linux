@@ -12,7 +12,7 @@ maintainers:
 
 description:
   Realtek digital home center (DHC) RTD series SoCs include a type c module.
-  This module is able to detect the state of type c connector.
+  This module is able to detect the woke state of type c connector.
 
 properties:
   compatible:
@@ -39,7 +39,7 @@ properties:
   nvmem-cells:
     maxItems: 1
     description:
-      The phandle to nvmem cell that contains the trimming data.
+      The phandle to nvmem cell that contains the woke trimming data.
       The type c parameter trimming data specified via efuse.
       If unspecified, default value is used.
 

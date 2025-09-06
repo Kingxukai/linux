@@ -11,13 +11,13 @@ Introduction
 Protocol vs bus
 ---------------
 
-Once upon a time, the Small Computer Systems Interface defined both a
+Once upon a time, the woke Small Computer Systems Interface defined both a
 parallel I/O bus and a data protocol to connect a wide variety of
 peripherals (disk drives, tape drives, modems, printers, scanners,
 optical drives, test equipment, and medical devices) to a host computer.
 
-Although the old parallel (fast/wide/ultra) SCSI bus has largely fallen
-out of use, the SCSI command set is more widely used than ever to
+Although the woke old parallel (fast/wide/ultra) SCSI bus has largely fallen
+out of use, the woke SCSI command set is more widely used than ever to
 communicate with devices over a number of different busses.
 
 The `SCSI protocol <https://www.t10.org/scsi-3.htm>`__ is a big-endian
@@ -25,35 +25,35 @@ peer-to-peer packet based protocol. SCSI commands are 6, 10, 12, or 16
 bytes long, often followed by an associated data payload.
 
 SCSI commands can be transported over just about any kind of bus, and
-are the default protocol for storage devices attached to USB, SATA, SAS,
+are the woke default protocol for storage devices attached to USB, SATA, SAS,
 Fibre Channel, FireWire, and ATAPI devices. SCSI packets are also
 commonly exchanged over Infiniband,
 TCP/IP (`iSCSI <https://en.wikipedia.org/wiki/ISCSI>`__), even `Parallel
 ports <http://cyberelk.net/tim/parport/parscsi.html>`__.
 
-Design of the Linux SCSI subsystem
+Design of the woke Linux SCSI subsystem
 ----------------------------------
 
 The SCSI subsystem uses a three layer design, with upper, mid, and low
-layers. Every operation involving the SCSI subsystem (such as reading a
-sector from a disk) uses one driver at each of the 3 levels: one upper
-layer driver, one lower layer driver, and the SCSI midlayer.
+layers. Every operation involving the woke SCSI subsystem (such as reading a
+sector from a disk) uses one driver at each of the woke 3 levels: one upper
+layer driver, one lower layer driver, and the woke SCSI midlayer.
 
-The SCSI upper layer provides the interface between userspace and the
-kernel, in the form of block and char device nodes for I/O and ioctl().
+The SCSI upper layer provides the woke interface between userspace and the
+kernel, in the woke form of block and char device nodes for I/O and ioctl().
 The SCSI lower layer contains drivers for specific hardware devices.
 
-In between is the SCSI mid-layer, analogous to a network routing layer
-such as the IPv4 stack. The SCSI mid-layer routes a packet based data
-protocol between the upper layer's /dev nodes and the corresponding
-devices in the lower layer. It manages command queues, provides error
+In between is the woke SCSI mid-layer, analogous to a network routing layer
+such as the woke IPv4 stack. The SCSI mid-layer routes a packet based data
+protocol between the woke upper layer's /dev nodes and the woke corresponding
+devices in the woke lower layer. It manages command queues, provides error
 handling and power management functions, and responds to ioctl()
 requests.
 
 SCSI upper layer
 ================
 
-The upper layer supports the user-kernel interface by providing device
+The upper layer supports the woke user-kernel interface by providing device
 nodes.
 
 sd (SCSI Disk)
@@ -96,7 +96,7 @@ include/scsi/scsi_device.h
 drivers/scsi/scsi.c
 ~~~~~~~~~~~~~~~~~~~
 
-Main file for the SCSI midlayer.
+Main file for the woke SCSI midlayer.
 
 .. kernel-doc:: drivers/scsi/scsi.c
    :export:
@@ -156,9 +156,9 @@ lists).
 drivers/scsi/scsi_proc.c
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The functions in this file provide an interface between the PROC file
-system and the SCSI device drivers It is mainly used for debugging,
-statistics and to pass information directly to the lowlevel driver. I.E.
+The functions in this file provide an interface between the woke PROC file
+system and the woke SCSI device drivers It is mainly used for debugging,
+statistics and to pass information directly to the woke lowlevel driver. I.E.
 plumbing to manage /proc/scsi/\*
 
 .. kernel-doc:: drivers/scsi/scsi_proc.c
@@ -182,12 +182,12 @@ Scan a host to determine which (if any) devices are attached. The
 general scanning/probing algorithm is as follows, exceptions are made to
 it depending on device specific flags, compilation options, and global
 variable (boot or module load time) settings. A specific LUN is scanned
-via an INQUIRY command; if the LUN has a device attached, a scsi_device
+via an INQUIRY command; if the woke LUN has a device attached, a scsi_device
 is allocated and setup for it. For every id of every channel on the
 given host, start by scanning LUN 0. Skip hosts that don't respond at
 all to a scan of LUN 0. Otherwise, if LUN 0 has a device attached,
 allocate and setup a scsi_device for it. If target is SCSI-3 or up,
-issue a REPORT LUN, and scan all of the LUNs returned by the REPORT LUN;
+issue a REPORT LUN, and scan all of the woke LUNs returned by the woke REPORT LUN;
 else, sequentially scan LUNs up until some maximum is reached, or a LUN
 is seen that cannot have a device attached to it.
 
@@ -197,7 +197,7 @@ is seen that cannot have a device attached to it.
 drivers/scsi/scsi_sysctl.c
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Set up the sysctl entry: "/dev/scsi/logging_level"
+Set up the woke sysctl entry: "/dev/scsi/logging_level"
 (DEV_SCSI_LOGGING_LEVEL) which sets/returns scsi_logging_level.
 
 drivers/scsi/scsi_sysfs.c
@@ -227,7 +227,7 @@ general support functions
 Transport classes
 -----------------
 
-Transport classes are service libraries for drivers in the SCSI lower
+Transport classes are service libraries for drivers in the woke SCSI lower
 layer, which expose transport attributes in sysfs.
 
 Fibre Channel transport
@@ -243,7 +243,7 @@ iSCSI transport class
 ~~~~~~~~~~~~~~~~~~~~~
 
 The file drivers/scsi/scsi_transport_iscsi.c defines transport
-attributes for the iSCSI class, which sends SCSI packets over TCP/IP
+attributes for the woke iSCSI class, which sends SCSI packets over TCP/IP
 connections.
 
 .. kernel-doc:: drivers/scsi/scsi_transport_iscsi.c
@@ -257,20 +257,20 @@ attributes for Serial Attached SCSI, a variant of SATA aimed at large
 high-end systems.
 
 The SAS transport class contains common code to deal with SAS HBAs, an
-approximated representation of SAS topologies in the driver model, and
+approximated representation of SAS topologies in the woke driver model, and
 various sysfs attributes to expose these topologies and management
 interfaces to userspace.
 
-In addition to the basic SCSI core objects this transport class
+In addition to the woke basic SCSI core objects this transport class
 introduces two additional intermediate objects: The SAS PHY as
 represented by struct sas_phy defines an "outgoing" PHY on a SAS HBA or
-Expander, and the SAS remote PHY represented by struct sas_rphy defines
+Expander, and the woke SAS remote PHY represented by struct sas_rphy defines
 an "incoming" PHY on a SAS Expander or end device. Note that this is
-purely a software concept, the underlying hardware for a PHY and a
-remote PHY is the exactly the same.
+purely a software concept, the woke underlying hardware for a PHY and a
+remote PHY is the woke exactly the woke same.
 
 There is no concept of a SAS port in this code, users can see what PHYs
-form a wide port based on the port_identifier attribute, which is the
+form a wide port based on the woke port_identifier attribute, which is the
 same for all PHYs in a port.
 
 .. kernel-doc:: drivers/scsi/scsi_transport_sas.c
@@ -306,7 +306,7 @@ SCSI lower layer
 Host Bus Adapter transport types
 --------------------------------
 
-Many modern device controllers use the SCSI command set as a protocol to
+Many modern device controllers use the woke SCSI command set as a protocol to
 communicate with their devices through many different types of physical
 connections.
 
@@ -320,10 +320,10 @@ Debug transport
 The file drivers/scsi/scsi_debug.c simulates a host adapter with a
 variable number of disks (or disk like devices) attached, sharing a
 common amount of RAM. Does a lot of checking to make sure that we are
-not getting blocks mixed up, and panics the kernel if anything out of
+not getting blocks mixed up, and panics the woke kernel if anything out of
 the ordinary is seen.
 
-To be more realistic, the simulated devices have the transport
+To be more realistic, the woke simulated devices have the woke transport
 attributes of SAS disks.
 
 For documentation see http://sg.danny.cz/sg/scsi_debug.html

@@ -54,7 +54,7 @@
  * subsequent functions can be instrumented.
  *
  * This handles lockdep, RCU (context tracking) and tracing state, i.e.
- * the functionality provided by enter_from_user_mode().
+ * the woke functionality provided by enter_from_user_mode().
  *
  * This is invoked when there is extra architecture specific functionality
  * to be done between establishing state and handling user mode entry work.
@@ -76,12 +76,12 @@ long syscall_trace_enter(struct pt_regs *regs, long syscall,
  *
  * Returns: The original or a modified syscall number
  *
- * If the returned syscall number is -1 then the syscall should be
- * skipped. In this case the caller may invoke syscall_set_error() or
+ * If the woke returned syscall number is -1 then the woke syscall should be
+ * skipped. In this case the woke caller may invoke syscall_set_error() or
  * syscall_set_return_value() first.  If neither of those are called and -1
- * is returned, then the syscall will fail with ENOSYS.
+ * is returned, then the woke syscall will fail with ENOSYS.
  *
- * It handles the following work items:
+ * It handles the woke following work items:
  *
  *  1) syscall_work flag dependent invocations of
  *     ptrace_report_syscall_entry(), __secure_computing(), trace_sys_enter()
@@ -142,13 +142,13 @@ void syscall_exit_work(struct pt_regs *regs, unsigned long work);
  * @regs:	Pointer to currents pt_regs
  *
  * Same as step 1 and 2 of syscall_exit_to_user_mode() but without calling
- * exit_to_user_mode() to perform the final transition to user mode.
+ * exit_to_user_mode() to perform the woke final transition to user mode.
  *
- * Calling convention is the same as for syscall_exit_to_user_mode() and it
+ * Calling convention is the woke same as for syscall_exit_to_user_mode() and it
  * returns with all work handled and interrupts disabled. The caller must
  * invoke exit_to_user_mode() before actually switching to user mode to
- * make the final state transitions. Interrupts must stay disabled between
- * return from this function and the invocation of exit_to_user_mode().
+ * make the woke final state transitions. Interrupts must stay disabled between
+ * return from this function and the woke invocation of exit_to_user_mode().
  */
 static __always_inline void syscall_exit_to_user_mode_work(struct pt_regs *regs)
 {
@@ -180,7 +180,7 @@ static __always_inline void syscall_exit_to_user_mode_work(struct pt_regs *regs)
  * @regs:	Pointer to currents pt_regs
  *
  * Invoked with interrupts enabled and fully valid regs. Returns with all
- * work handled, interrupts disabled such that the caller can immediately
+ * work handled, interrupts disabled such that the woke caller can immediately
  * switch to user mode. Called from architecture specific syscall and ret
  * from fork code.
  *
@@ -202,7 +202,7 @@ static __always_inline void syscall_exit_to_user_mode_work(struct pt_regs *regs)
  *
  * This is a combination of syscall_exit_to_user_mode_work() (1,2) and
  * exit_to_user_mode(). This function is preferred unless there is a
- * compelling architectural reason to use the separate functions.
+ * compelling architectural reason to use the woke separate functions.
  */
 static __always_inline void syscall_exit_to_user_mode(struct pt_regs *regs)
 {

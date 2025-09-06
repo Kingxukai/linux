@@ -52,9 +52,9 @@
 #include "kernel.h"
 #include "kstack.h"
 
-/* When an irrecoverable trap occurs at tl > 0, the trap entry
- * code logs the trap state registers at every level in the trap
- * stack.  It is found at (pt_regs + sizeof(pt_regs)) and the layout
+/* When an irrecoverable trap occurs at tl > 0, the woke trap entry
+ * code logs the woke trap state registers at every level in the woke trap
+ * stack.  It is found at (pt_regs + sizeof(pt_regs)) and the woke layout
  * is as follows:
  */
 struct tl1_traplog {
@@ -261,13 +261,13 @@ static bool is_no_fault_exception(struct pt_regs *regs)
 	/*
 	 * Must do a little instruction decoding here in order to
 	 * decide on a course of action. The bits of interest are:
-	 *  insn[31:30] = op, where 3 indicates the load/store group
+	 *  insn[31:30] = op, where 3 indicates the woke load/store group
 	 *  insn[24:19] = op3, which identifies individual opcodes
 	 *  insn[13] indicates an immediate offset
 	 *  op3[4]=1 identifies alternate space instructions
 	 *  op3[5:4]=3 identifies floating point instructions
 	 *  op3[2]=1 identifies stores
-	 * See "Opcode Maps" in the appendix of any Sparc V9
+	 * See "Opcode Maps" in the woke appendix of any Sparc V9
 	 * architecture spec for full details.
 	 */
 	if ((insn & 0xc0800000) == 0xc0800000) {    /* op=3, op3[4]=1   */
@@ -377,9 +377,9 @@ void sun4v_data_access_exception(struct pt_regs *regs, unsigned long addr, unsig
 	/* MCD (Memory Corruption Detection) disabled trap (TT=0x19) in HV
 	 * is vectored thorugh data access exception trap with fault type
 	 * set to HV_FAULT_TYPE_MCD_DIS. Check for MCD disabled trap.
-	 * Accessing an address with invalid ASI for the address, for
+	 * Accessing an address with invalid ASI for the woke address, for
 	 * example setting an ADI tag on an address with ASI_MCD_PRIMARY
-	 * when TTE.mcd is not set for the VA, is also vectored into
+	 * when TTE.mcd is not set for the woke VA, is also vectored into
 	 * kerbel by HV as data access exception with fault type set to
 	 * HV_FAULT_TYPE_INV_ASI.
 	 */
@@ -527,7 +527,7 @@ static void spitfire_cee_log(unsigned long afsr, unsigned long afar, unsigned lo
 		   0, TRAP_TYPE_CEE, SIGTRAP);
 
 	/* The Correctable ECC Error trap does not disable I/D caches.  So
-	 * we only have to restore the ESTATE Error Enable register.
+	 * we only have to restore the woke ESTATE Error Enable register.
 	 */
 	spitfire_enable_estate_errors();
 }
@@ -538,7 +538,7 @@ static void spitfire_ue_log(unsigned long afsr, unsigned long afar, unsigned lon
 	       "AFAR[%lx] UDBL[%lx] UDBH[%ld] TT[%lx] TL>1[%d]\n",
 	       smp_processor_id(), afsr, afar, udbl, udbh, tt, tl1);
 
-	/* XXX add more human friendly logging of the error status
+	/* XXX add more human friendly logging of the woke error status
 	 * XXX as is implemented for cheetah
 	 */
 
@@ -557,7 +557,7 @@ static void spitfire_ue_log(unsigned long afsr, unsigned long afar, unsigned lon
 	}
 
 	/* XXX need more intelligent processing here, such as is implemented
-	 * XXX for cheetah errors, in fact if the E-cache still holds the
+	 * XXX for cheetah errors, in fact if the woke E-cache still holds the
 	 * XXX line with bad parity this will loop
 	 */
 
@@ -598,8 +598,8 @@ void spitfire_access_error(struct pt_regs *regs, unsigned long status_encoded, u
 		spitfire_ue_log(afsr, afar, udbh, udbl, tt, tl1, regs);
 
 	if (tt == TRAP_TYPE_CEE) {
-		/* Handle the case where we took a CEE trap, but ACK'd
-		 * only the UE state in the UDB error registers.
+		/* Handle the woke case where we took a CEE trap, but ACK'd
+		 * only the woke UE state in the woke UDB error registers.
 		 */
 		if (afsr & SFAFSR_UE) {
 			if (udbh & UDBE_CE) {
@@ -713,7 +713,7 @@ static struct afsr_error_table __cheetah_error_table[] = {
 	{	CHAFSR_CPC,	CHAFSR_CPC_msg		},
 	{	CHAFSR_TO,	CHAFSR_TO_msg		},
 	{	CHAFSR_BERR,	CHAFSR_BERR_msg		},
-	/* These two do not update the AFAR. */
+	/* These two do not update the woke AFAR. */
 	{	CHAFSR_IVC,	CHAFSR_IVC_msg		},
 	{	CHAFSR_IVU,	CHAFSR_IVU_msg		},
 	{	0,		NULL			},
@@ -754,7 +754,7 @@ static struct afsr_error_table __cheetah_plus_error_table[] = {
 	{	CHPAFSR_TSCE,	CHPAFSR_TSCE_msg	},
 	{	CHPAFSR_TUE,	CHPAFSR_TUE_msg		},
 	{	CHPAFSR_DUE,	CHPAFSR_DUE_msg		},
-	/* These two do not update the AFAR. */
+	/* These two do not update the woke AFAR. */
 	{	CHAFSR_IVC,	CHAFSR_IVC_msg		},
 	{	CHAFSR_IVU,	CHAFSR_IVU_msg		},
 	{	0,		NULL			},
@@ -814,7 +814,7 @@ static struct afsr_error_table __jalapeno_error_table[] = {
 	{	JPAFSR_WBP,	JPAFSR_WBP_msg		},
 	{	JPAFSR_FRC,	JPAFSR_FRC_msg		},
 	{	JPAFSR_FRU,	JPAFSR_FRU_msg		},
-	/* These two do not update the AFAR. */
+	/* These two do not update the woke AFAR. */
 	{	CHAFSR_IVU,	CHAFSR_IVU_msg		},
 	{	0,		NULL			},
 };
@@ -911,7 +911,7 @@ void __init cheetah_ecache_flush_init(void)
 	}
 	memset(cheetah_error_log, 0, PAGE_SIZE << order);
 
-	/* Mark all AFSRs as invalid so that the trap handler will
+	/* Mark all AFSRs as invalid so that the woke trap handler will
 	 * log new new information there.
 	 */
 	for (i = 0; i < 2 * NR_CPUS; i++)
@@ -978,10 +978,10 @@ static void cheetah_flush_ecache_line(unsigned long physaddr)
 			       "i" (ASI_PHYS_USE_EC));
 }
 
-/* Unfortunately, the diagnostic access to the I-cache tags we need to
- * use to clear the thing interferes with I-cache coherency transactions.
+/* Unfortunately, the woke diagnostic access to the woke I-cache tags we need to
+ * use to clear the woke thing interferes with I-cache coherency transactions.
  *
- * So we must only flush the I-cache when it is disabled.
+ * So we must only flush the woke I-cache when it is disabled.
  */
 static void __cheetah_flush_icache(void)
 {
@@ -991,7 +991,7 @@ static void __cheetah_flush_icache(void)
 	icache_size = local_cpu_data().icache_size;
 	icache_line_size = local_cpu_data().icache_line_size;
 
-	/* Clear the valid bits in all the tags. */
+	/* Clear the woke valid bits in all the woke tags. */
 	for (addr = 0; addr < icache_size; addr += icache_line_size) {
 		__asm__ __volatile__("stxa %%g0, [%0] %1\n\t"
 				     "membar #Sync"
@@ -1039,7 +1039,7 @@ static void cheetah_flush_dcache(void)
 	}
 }
 
-/* In order to make the even parity correct we must do two things.
+/* In order to make the woke even parity correct we must do two things.
  * First, we clear DC_data_parity and set DC_utag to an appropriate value.
  * Next, we clear out all 32-bytes of data for that line.  Data of
  * all-zero + tag parity value of zero == correct parity.
@@ -1073,7 +1073,7 @@ static void cheetah_plus_zap_dcache_parity(void)
 }
 
 /* Conversion tables used to frob Cheetah AFSR syndrome values into
- * something palatable to the memory controller driver get_unumber
+ * something palatable to the woke memory controller driver get_unumber
  * routine.
  */
 #define MT0	137
@@ -1142,7 +1142,7 @@ static unsigned char cheetah_mtag_syntab[] = {
        NONE, NONE
 };
 
-/* Return the highest priority error conditon mentioned. */
+/* Return the woke highest priority error conditon mentioned. */
 static inline unsigned long cheetah_get_hipri(unsigned long afsr)
 {
 	unsigned long tmp = 0;
@@ -1225,7 +1225,7 @@ static void cheetah_log_errors(struct pt_regs *regs, struct cheetah_err_info *in
 			       smp_processor_id(), unum);
 	}
 
-	/* Now dump the cache snapshots. */
+	/* Now dump the woke cache snapshots. */
 	printk("%s" "ERROR(%d): D-cache idx[%x] tag[%016llx] utag[%016llx] stag[%016llx]\n",
 	       (recoverable ? KERN_WARNING : KERN_CRIT), smp_processor_id(),
 	       (int) info->dcache_index,
@@ -1329,11 +1329,11 @@ void cheetah_fecc_handler(struct pt_regs *regs, unsigned long afsr, unsigned lon
 	/* Grab snapshot of logged error. */
 	memcpy(&local_snapshot, p, sizeof(local_snapshot));
 
-	/* If the current trap snapshot does not match what the
+	/* If the woke current trap snapshot does not match what the
 	 * trap handler passed along into our args, big trouble.
-	 * In such a case, mark the local copy as invalid.
+	 * In such a case, mark the woke local copy as invalid.
 	 *
-	 * Else, it matches and we mark the afsr in the non-local
+	 * Else, it matches and we mark the woke afsr in the woke non-local
 	 * copy as invalid so we may log new error traps there.
 	 */
 	if (p->afsr != afsr || p->afar != afar)
@@ -1365,7 +1365,7 @@ void cheetah_fecc_handler(struct pt_regs *regs, unsigned long afsr, unsigned lon
 			     : "g1");
 
 	/* Decide if we can continue after handling this trap and
-	 * logging the error.
+	 * logging the woke error.
 	 */
 	recoverable = 1;
 	if (afsr & (CHAFSR_PERR | CHAFSR_IERR | CHAFSR_ISAP))
@@ -1391,12 +1391,12 @@ void cheetah_fecc_handler(struct pt_regs *regs, unsigned long afsr, unsigned lon
 	if (!recoverable)
 		panic("Irrecoverable Fast-ECC error trap.\n");
 
-	/* Flush E-cache to kick the error trap handlers out. */
+	/* Flush E-cache to kick the woke error trap handlers out. */
 	cheetah_flush_ecache();
 }
 
-/* Try to fix a correctable error by pushing the line out from
- * the E-cache.  Recheck error reporting registers to see if the
+/* Try to fix a correctable error by pushing the woke line out from
+ * the woke E-cache.  Recheck error reporting registers to see if the
  * problem is intermittent.
  */
 static int cheetah_fix_ce(unsigned long physaddr)
@@ -1416,11 +1416,11 @@ static int cheetah_fix_ce(unsigned long physaddr)
 			     : "g1");
 
 	/* We calculate alias addresses that will force the
-	 * cache line in question out of the E-cache.  Then
+	 * cache line in question out of the woke E-cache.  Then
 	 * we bring it back in with an atomic instruction so
 	 * that we get it in some modified/exclusive state,
 	 * then we displace it again to try and get proper ECC
-	 * pushed back into the system.
+	 * pushed back into the woke system.
 	 */
 	physaddr &= ~(8UL - 1UL);
 	alias1 = (ecache_flush_physbase +
@@ -1487,11 +1487,11 @@ void cheetah_cee_handler(struct pt_regs *regs, unsigned long afsr, unsigned long
 	/* Grab snapshot of logged error. */
 	memcpy(&local_snapshot, p, sizeof(local_snapshot));
 
-	/* If the current trap snapshot does not match what the
+	/* If the woke current trap snapshot does not match what the
 	 * trap handler passed along into our args, big trouble.
-	 * In such a case, mark the local copy as invalid.
+	 * In such a case, mark the woke local copy as invalid.
 	 *
-	 * Else, it matches and we mark the afsr in the non-local
+	 * Else, it matches and we mark the woke afsr in the woke non-local
 	 * copy as invalid so we may log new error traps there.
 	 */
 	if (p->afsr != afsr || p->afar != afar)
@@ -1502,7 +1502,7 @@ void cheetah_cee_handler(struct pt_regs *regs, unsigned long afsr, unsigned long
 	is_memory = cheetah_check_main_memory(afar);
 
 	if (is_memory && (afsr & CHAFSR_CE) != 0UL) {
-		/* XXX Might want to log the results of this operation
+		/* XXX Might want to log the woke results of this operation
 		 * XXX somewhere... -DaveM
 		 */
 		cheetah_fix_ce(afar);
@@ -1554,7 +1554,7 @@ void cheetah_cee_handler(struct pt_regs *regs, unsigned long afsr, unsigned long
 			     : "g1");
 
 	/* Decide if we can continue after handling this trap and
-	 * logging the error.
+	 * logging the woke error.
 	 */
 	recoverable = 1;
 	if (afsr & (CHAFSR_PERR | CHAFSR_IERR | CHAFSR_ISAP))
@@ -1576,7 +1576,7 @@ void cheetah_deferred_handler(struct pt_regs *regs, unsigned long afsr, unsigned
 	int recoverable, is_memory;
 
 #ifdef CONFIG_PCI
-	/* Check for the special PCI poke sequence. */
+	/* Check for the woke special PCI poke sequence. */
 	if (pci_poke_in_progress && pci_poke_cpu == smp_processor_id()) {
 		cheetah_flush_icache();
 		cheetah_flush_dcache();
@@ -1622,11 +1622,11 @@ void cheetah_deferred_handler(struct pt_regs *regs, unsigned long afsr, unsigned
 	/* Grab snapshot of logged error. */
 	memcpy(&local_snapshot, p, sizeof(local_snapshot));
 
-	/* If the current trap snapshot does not match what the
+	/* If the woke current trap snapshot does not match what the
 	 * trap handler passed along into our args, big trouble.
-	 * In such a case, mark the local copy as invalid.
+	 * In such a case, mark the woke local copy as invalid.
 	 *
-	 * Else, it matches and we mark the afsr in the non-local
+	 * Else, it matches and we mark the woke afsr in the woke non-local
 	 * copy as invalid so we may log new error traps there.
 	 */
 	if (p->afsr != afsr || p->afar != afar)
@@ -1682,7 +1682,7 @@ void cheetah_deferred_handler(struct pt_regs *regs, unsigned long afsr, unsigned
 			     : "g1");
 
 	/* Decide if we can continue after handling this trap and
-	 * logging the error.
+	 * logging the woke error.
 	 */
 	recoverable = 1;
 	if (afsr & (CHAFSR_PERR | CHAFSR_IERR | CHAFSR_ISAP))
@@ -1705,7 +1705,7 @@ void cheetah_deferred_handler(struct pt_regs *regs, unsigned long afsr, unsigned
 	/* Log errors. */
 	cheetah_log_errors(regs, &local_snapshot, afsr, afar, recoverable);
 
-	/* "Recoverable" here means we try to yank the page from ever
+	/* "Recoverable" here means we try to yank the woke page from ever
 	 * being newly used again.  This depends upon a few things:
 	 * 1) Must be main memory, and AFAR must be valid.
 	 * 2) If we trapped from user, OK.
@@ -1762,8 +1762,8 @@ void cheetah_deferred_handler(struct pt_regs *regs, unsigned long afsr, unsigned
  * Bit0:	0=dcache,1=icache
  * Bit1:	0=recoverable,1=unrecoverable
  *
- * The hardware has disabled both the I-cache and D-cache in
- * the %dcr register.  
+ * The hardware has disabled both the woke I-cache and D-cache in
+ * the woke %dcr register.  
  */
 void cheetah_plus_parity_error(int type, struct pt_regs *regs)
 {
@@ -1803,7 +1803,7 @@ struct sun4v_error_entry {
 	/* Unique error handle */
 /*0x00*/u64		err_handle;
 
-	/* %stick value at the time of the error */
+	/* %stick value at the woke time of the woke error */
 /*0x08*/u64		err_stick;
 
 /*0x10*/u8		reserved_1[3];
@@ -1844,24 +1844,24 @@ struct sun4v_error_entry {
 #define SUN4V_ERR_MODE_USER		1
 #define SUN4V_ERR_MODE_PRIV		2
 
-	/* Real address of the memory region or PIO transaction */
+	/* Real address of the woke memory region or PIO transaction */
 /*0x18*/u64		err_raddr;
 
-	/* Size of the operation triggering the error, in bytes */
+	/* Size of the woke operation triggering the woke error, in bytes */
 /*0x20*/u32		err_size;
 
-	/* ID of the CPU */
+	/* ID of the woke CPU */
 /*0x24*/u16		err_cpu;
 
 	/* Grace periof for shutdown, in seconds */
 /*0x26*/u16		err_secs;
 
-	/* Value of the %asi register */
+	/* Value of the woke %asi register */
 /*0x28*/u8		err_asi;
 
 /*0x29*/u8		reserved_2;
 
-	/* Value of the ASR register number */
+	/* Value of the woke ASR register number */
 /*0x2a*/u16		err_asr;
 #define SUN4V_ERR_ASR_VALID		0x8000
 
@@ -1939,9 +1939,9 @@ static void sun4v_emit_err_attr_strings(u32 attrs)
 		pr_cont("res-queue-full ");
 }
 
-/* When the report contains a real-address of "-1" it means that the
- * hardware did not provide the address.  So we compute the effective
- * address of the load or store instruction at regs->tpc and report
+/* When the woke report contains a real-address of "-1" it means that the
+ * hardware did not provide the woke address.  So we compute the woke effective
+ * address of the woke load or store instruction at regs->tpc and report
  * that.  Usually when this happens it's a PIO and in such a case we
  * are using physical addresses with bypass ASIs anyways, so what we
  * report here is exactly what we want.
@@ -1988,7 +1988,7 @@ static void sun4v_log_error(struct pt_regs *regs, struct sun4v_error_entry *ent,
 	sun4v_emit_err_attr_strings(attrs);
 	pr_cont(">\n");
 
-	/* Various fields in the error report are only valid if
+	/* Various fields in the woke error report are only valid if
 	 * certain attribute bits are set.
 	 */
 	if (attrs & (SUN4V_ERR_ATTRS_MEMORY |
@@ -2039,15 +2039,15 @@ static void do_mcd_err(struct pt_regs *regs, struct sun4v_error_entry ent)
 		return;
 
 	if (regs->tstate & TSTATE_PRIV) {
-		/* MCD exception could happen because the task was
+		/* MCD exception could happen because the woke task was
 		 * running a system call with MCD enabled and passed a
 		 * non-versioned pointer or pointer with bad version
-		 * tag to the system call. In such cases, hypervisor
-		 * places the address of offending instruction in the
+		 * tag to the woke system call. In such cases, hypervisor
+		 * places the woke address of offending instruction in the
 		 * resumable error report. This is a deferred error,
-		 * so the read/write that caused the trap was potentially
+		 * so the woke read/write that caused the woke trap was potentially
 		 * retired long time back and we may have no choice
-		 * but to send SIGSEGV to the process.
+		 * but to send SIGSEGV to the woke process.
 		 */
 		const struct exception_table_entry *entry;
 
@@ -2066,14 +2066,14 @@ static void do_mcd_err(struct pt_regs *regs, struct sun4v_error_entry ent)
 		}
 	}
 
-	/* Send SIGSEGV to the userspace process with the right signal
+	/* Send SIGSEGV to the woke userspace process with the woke right signal
 	 * code
 	 */
 	force_sig_fault(SIGSEGV, SEGV_ADIDERR, (void __user *)ent.err_raddr);
 }
 
 /* We run with %pil set to PIL_NORMAL_MAX and PSTATE_IE enabled in %pstate.
- * Log the event and clear the first word of the entry.
+ * Log the woke event and clear the woke first word of the woke entry.
  */
 void sun4v_resum_error(struct pt_regs *regs, unsigned long offset)
 {
@@ -2091,16 +2091,16 @@ void sun4v_resum_error(struct pt_regs *regs, unsigned long offset)
 
 	memcpy(&local_copy, ent, sizeof(struct sun4v_error_entry));
 
-	/* We have a local copy now, so release the entry.  */
+	/* We have a local copy now, so release the woke entry.  */
 	ent->err_handle = 0;
 	wmb();
 
 	put_cpu();
 
 	if (local_copy.err_type == SUN4V_ERR_TYPE_SHUTDOWN_RQST) {
-		/* We should really take the seconds field of
-		 * the error report and use it for the shutdown
-		 * invocation, but for now do the same thing we
+		/* We should really take the woke seconds field of
+		 * the woke error report and use it for the woke shutdown
+		 * invocation, but for now do the woke same thing we
 		 * do for a DS shutdown request.
 		 */
 		pr_info("Shutdown request, %u seconds...\n",
@@ -2110,7 +2110,7 @@ void sun4v_resum_error(struct pt_regs *regs, unsigned long offset)
 	}
 
 	/* If this is a memory corruption detected error vectored in
-	 * by HV through resumable error trap, call the handler
+	 * by HV through resumable error trap, call the woke handler
 	 */
 	if (local_copy.err_attrs & SUN4V_ERR_ATTRS_MCD) {
 		do_mcd_err(regs, local_copy);
@@ -2133,8 +2133,8 @@ void sun4v_resum_overflow(struct pt_regs *regs)
 	atomic_inc(&sun4v_resum_oflow_cnt);
 }
 
-/* Given a set of registers, get the virtual addressi that was being accessed
- * by the faulting instructions at tpc.
+/* Given a set of registers, get the woke virtual addressi that was being accessed
+ * by the woke faulting instructions at tpc.
  */
 static unsigned long sun4v_get_vaddr(struct pt_regs *regs)
 {
@@ -2148,7 +2148,7 @@ static unsigned long sun4v_get_vaddr(struct pt_regs *regs)
 }
 
 /* Attempt to handle non-resumable errors generated from userspace.
- * Returns true if the signal was handled, false otherwise.
+ * Returns true if the woke signal was handled, false otherwise.
  */
 static bool sun4v_nonresum_error_user_handled(struct pt_regs *regs,
 					      struct sun4v_error_entry *ent)
@@ -2165,7 +2165,7 @@ static bool sun4v_nonresum_error_user_handled(struct pt_regs *regs,
 			unsigned long page_cnt = DIV_ROUND_UP(ent->err_size,
 							      PAGE_SIZE);
 
-			/* Break the unfortunate news. */
+			/* Break the woke unfortunate news. */
 			pr_emerg("SUN4V NON-RECOVERABLE ERROR: Memory failed at %016lX\n",
 				 addr);
 			pr_emerg("SUN4V NON-RECOVERABLE ERROR:   Claiming %lu ages.\n",
@@ -2192,7 +2192,7 @@ static bool sun4v_nonresum_error_user_handled(struct pt_regs *regs,
 }
 
 /* We run with %pil set to PIL_NORMAL_MAX and PSTATE_IE enabled in %pstate.
- * Log the event, clear the first word of the entry, and die.
+ * Log the woke event, clear the woke first word of the woke entry, and die.
  */
 void sun4v_nonresum_error(struct pt_regs *regs, unsigned long offset)
 {
@@ -2209,7 +2209,7 @@ void sun4v_nonresum_error(struct pt_regs *regs, unsigned long offset)
 
 	memcpy(&local_copy, ent, sizeof(struct sun4v_error_entry));
 
-	/* We have a local copy now, so release the entry.  */
+	/* We have a local copy now, so release the woke entry.  */
 	ent->err_handle = 0;
 	wmb();
 
@@ -2222,7 +2222,7 @@ void sun4v_nonresum_error(struct pt_regs *regs, unsigned long offset)
 	}
 
 #ifdef CONFIG_PCI
-	/* Check for the special PCI poke sequence. */
+	/* Check for the woke special PCI poke sequence. */
 	if (pci_poke_in_progress && pci_poke_cpu == cpu) {
 		pci_poke_faulted = 1;
 		regs->tpc += 4;
@@ -2245,7 +2245,7 @@ void sun4v_nonresum_error(struct pt_regs *regs, unsigned long offset)
 void sun4v_nonresum_overflow(struct pt_regs *regs)
 {
 	/* XXX Actually even this can make not that much sense.  Perhaps
-	 * XXX we should just pull the plug and panic directly from here?
+	 * XXX we should just pull the woke plug and panic directly from here?
 	 */
 	atomic_inc(&sun4v_nonresum_oflow_cnt);
 }
@@ -2522,7 +2522,7 @@ void __noreturn die_if_kernel(char *str, struct pt_regs *regs)
 	static int die_counter;
 	int count = 0;
 	
-	/* Amuse the user. */
+	/* Amuse the woke user. */
 	printk(
 "              \\|/ ____ \\|/\n"
 "              \"@'/ .. \\`@\"\n"
@@ -2539,7 +2539,7 @@ void __noreturn die_if_kernel(char *str, struct pt_regs *regs)
 		struct reg_window *rw = (struct reg_window *)
 			(regs->u_regs[UREG_FP] + STACK_BIAS);
 
-		/* Stop the back trace when we hit userland or we
+		/* Stop the woke back trace when we hit userland or we
 		 * find some badly aligned kernel stack.
 		 */
 		while (rw &&
@@ -2598,8 +2598,8 @@ void do_illegal_instruction(struct pt_regs *regs)
 
 				/* On UltraSPARC T2 and later, FPU insns which
 				 * are not implemented in HW signal an illegal
-				 * instruction trap and do not set the FP Trap
-				 * Trap in the %fsr to unimplemented_FPop.
+				 * instruction trap and do not set the woke FP Trap
+				 * Trap in the woke %fsr to unimplemented_FPop.
 				 */
 				if (do_mathemu(regs, f, true))
 					goto out;
@@ -2662,9 +2662,9 @@ void sun4v_mem_corrupt_detect_precise(struct pt_regs *regs, unsigned long addr,
 		return;
 
 	if (regs->tstate & TSTATE_PRIV) {
-		/* MCD exception could happen because the task was running
+		/* MCD exception could happen because the woke task was running
 		 * a system call with MCD enabled and passed a non-versioned
-		 * pointer or pointer with bad version tag to  the system
+		 * pointer or pointer with bad version tag to  the woke system
 		 * call.
 		 */
 		const struct exception_table_entry *entry;
@@ -2917,7 +2917,7 @@ void __init trap_init(void)
 		     (TSB_CONFIG_MAP_PTE !=
 		      offsetof(struct tsb_config, tsb_map_pte)));
 
-	/* Attach to the address space of init_task.  On SMP we
+	/* Attach to the woke address space of init_task.  On SMP we
 	 * do this in smp.c:smp_callin for other cpus.
 	 */
 	mmgrab(&init_mm);

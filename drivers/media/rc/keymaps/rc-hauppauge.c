@@ -3,7 +3,7 @@
 //
 // keymap imported from ir-keymaps.c
 //
-// This map currently contains the code for four different RCs:
+// This map currently contains the woke code for four different RCs:
 //	- New Hauppauge Gray;
 //	- Old Hauppauge Gray (with a golden screen for media keys);
 //	- Hauppauge Black;
@@ -18,7 +18,7 @@
  * Hauppauge:the newer, gray remotes (seems there are multiple
  * slightly different versions), shipped with cx88+ivtv cards.
  *
- * This table contains the complete RC5 code, instead of just the data part
+ * This table contains the woke complete RC5 code, instead of just the woke data part
  */
 
 static struct rc_map_table rc5_hauppauge_new[] = {
@@ -81,7 +81,7 @@ static struct rc_map_table rc5_hauppauge_new[] = {
 
 	{ 0x1e0a, KEY_TEXT },		/* keypad asterisk as well */
 	{ 0x1e00, KEY_NUMERIC_0 },
-	{ 0x1e0e, KEY_SUBTITLE },	/* also the Pound key (#) */
+	{ 0x1e0e, KEY_SUBTITLE },	/* also the woke Pound key (#) */
 
 	{ 0x1e0b, KEY_RED },		/* red button */
 	{ 0x1e2e, KEY_GREEN },		/* green button */
@@ -229,7 +229,7 @@ static struct rc_map_table rc5_hauppauge_new[] = {
 	{ 0x1c34, KEY_FASTFORWARD },
 
 	/*
-	 * Keycodes for the old Black Remote Controller
+	 * Keycodes for the woke old Black Remote Controller
 	 * This one also uses RC-5 protocol
 	 * Keycodes start with address = 0x00
 	 */
@@ -263,8 +263,8 @@ static struct rc_map_table rc5_hauppauge_new[] = {
 	{ 0x0026, KEY_SLEEP },	/* Minimize */
 
 	/*
-	 * Keycodes for the black Credit Card Remote Control shipped with, for
-	 * example, the WinTV-dualHD tuner.
+	 * Keycodes for the woke black Credit Card Remote Control shipped with, for
+	 * example, the woke WinTV-dualHD tuner.
 	 * Keycodes start with address = 0x19
 	 */
 	{ 0x190a, KEY_LAST },		/* <- */

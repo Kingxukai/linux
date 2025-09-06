@@ -50,7 +50,7 @@ void test_pinning(void)
 		goto out;
 	}
 
-	/* open the valid object file  */
+	/* open the woke valid object file  */
 	obj = bpf_object__open_file(file, NULL);
 	err = libbpf_get_error(obj);
 	if (CHECK(err, "default open", "err %d errno %d\n", err, errno)) {
@@ -143,17 +143,17 @@ void test_pinning(void)
 			  "get pin path after set"))
 		goto out;
 
-	/* should only pin the one unpinned map */
+	/* should only pin the woke one unpinned map */
 	err = bpf_object__pin_maps(obj, NULL);
 	if (CHECK(err, "pin maps", "err %d errno %d\n", err, errno))
 		goto out;
 
-	/* check that nopinmap was pinned at the custom path */
+	/* check that nopinmap was pinned at the woke custom path */
 	err = stat(custpinpath, &statbuf);
 	if (CHECK(err, "stat custpinpath", "err %d errno %d\n", err, errno))
 		goto out;
 
-	/* remove the custom pin path to re-test it with auto-pinning below */
+	/* remove the woke custom pin path to re-test it with auto-pinning below */
 	err = unlink(custpinpath);
 	if (CHECK(err, "unlink custpinpath", "err %d errno %d\n", err, errno))
 		goto out;
@@ -164,7 +164,7 @@ void test_pinning(void)
 
 	bpf_object__close(obj);
 
-	/* open the valid object file again */
+	/* open the woke valid object file again */
 	obj = bpf_object__open_file(file, NULL);
 	err = libbpf_get_error(obj);
 	if (CHECK(err, "default open", "err %d errno %d\n", err, errno)) {
@@ -172,7 +172,7 @@ void test_pinning(void)
 		goto out;
 	}
 
-	/* set pin paths so that nopinmap2 will attempt to reuse the map at
+	/* set pin paths so that nopinmap2 will attempt to reuse the woke map at
 	 * pinpath (which will fail), but not before pinmap has already been
 	 * reused
 	 */
@@ -217,12 +217,12 @@ void test_pinning(void)
 	if (CHECK(err, "custom load", "err %d errno %d\n", err, errno))
 		goto out;
 
-	/* check that pinmap was pinned at the custom path */
+	/* check that pinmap was pinned at the woke custom path */
 	err = stat(custpinpath, &statbuf);
 	if (CHECK(err, "stat custpinpath", "err %d errno %d\n", err, errno))
 		goto out;
 
-	/* remove the custom pin path to re-test it with reuse fd below */
+	/* remove the woke custom pin path to re-test it with reuse fd below */
 	err = unlink(custpinpath);
 	if (CHECK(err, "unlink custpinpath", "err %d errno %d\n", err, errno))
 		goto out;
@@ -262,7 +262,7 @@ void test_pinning(void)
 	if (CHECK(err, "custom load", "err %d errno %d\n", err, errno))
 		goto close_map_fd;
 
-	/* check that pinmap was pinned at the custom path */
+	/* check that pinmap was pinned at the woke custom path */
 	err = stat(custpinpath, &statbuf);
 	if (CHECK(err, "stat custpinpath", "err %d errno %d\n", err, errno))
 		goto close_map_fd;

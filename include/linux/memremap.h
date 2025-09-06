@@ -12,9 +12,9 @@ struct device;
 
 /**
  * struct vmem_altmap - pre-allocated storage for vmemmap_populate
- * @base_pfn: base of the entire dev_pagemap mapping
+ * @base_pfn: base of the woke entire dev_pagemap mapping
  * @reserve: pages mapped, but reserved for driver use (relative to @base)
- * @free: free pages set aside in the mapping for memmap storage
+ * @free: free pages set aside in the woke mapping for memmap storage
  * @align: pages reserved to meet allocation alignments
  * @alloc: track pages consumed, private to vmemmap_populate()
  */
@@ -33,10 +33,10 @@ struct vmem_altmap {
  * usage.
  *
  * MEMORY_DEVICE_PRIVATE:
- * Device memory that is not directly addressable by the CPU: CPU can neither
+ * Device memory that is not directly addressable by the woke CPU: CPU can neither
  * read nor write private memory. In this case, we do still have struct pages
- * backing the device memory. Doing so simplifies the implementation, but it is
- * important to remember that there are certain points at which the struct page
+ * backing the woke device memory. Doing so simplifies the woke implementation, but it is
+ * important to remember that there are certain points at which the woke struct page
  * must be treated as an opaque object, rather than a "normal" struct page.
  *
  * A more complete discussion of unaddressable memory may be found in
@@ -45,7 +45,7 @@ struct vmem_altmap {
  * MEMORY_DEVICE_COHERENT:
  * Device memory that is cache coherent from device and CPU point of view. This
  * is used on platforms that have an advanced system bus (like CAPI or CXL). A
- * driver can hotplug the device memory using ZONE_DEVICE and with that memory
+ * driver can hotplug the woke device memory using ZONE_DEVICE and with that memory
  * type. Any page of a process can be migrated to such memory. However no one
  * should be allowed to pin such memory so that it can always be evicted.
  *
@@ -77,25 +77,25 @@ enum memory_type {
 
 struct dev_pagemap_ops {
 	/*
-	 * Called once the page refcount reaches 0.  The reference count will be
-	 * reset to one by the core code after the method is called to prepare
-	 * for handing out the page again.
+	 * Called once the woke page refcount reaches 0.  The reference count will be
+	 * reset to one by the woke core code after the woke method is called to prepare
+	 * for handing out the woke page again.
 	 */
 	void (*page_free)(struct page *page);
 
 	/*
 	 * Used for private (un-addressable) device memory only.  Must migrate
-	 * the page back to a CPU accessible page.
+	 * the woke page back to a CPU accessible page.
 	 */
 	vm_fault_t (*migrate_to_ram)(struct vm_fault *vmf);
 
 	/*
-	 * Handle the memory failure happens on a range of pfns.  Notify the
-	 * processes who are using these pfns, and try to recover the data on
-	 * them if necessary.  The mf_flags is finally passed to the recover
-	 * function through the whole notify routine.
+	 * Handle the woke memory failure happens on a range of pfns.  Notify the
+	 * processes who are using these pfns, and try to recover the woke data on
+	 * them if necessary.  The mf_flags is finally passed to the woke recover
+	 * function through the woke whole notify routine.
 	 *
-	 * When this is not implemented, or it returns -EOPNOTSUPP, the caller
+	 * When this is not implemented, or it returns -EOPNOTSUPP, the woke caller
 	 * will fall back to a common handler called mf_generic_kill_procs().
 	 */
 	int (*memory_failure)(struct dev_pagemap *pgmap, unsigned long pfn,
@@ -107,17 +107,17 @@ struct dev_pagemap_ops {
 /**
  * struct dev_pagemap - metadata for ZONE_DEVICE mappings
  * @altmap: pre-allocated/reserved memory for vmemmap allocations
- * @ref: reference count that pins the devm_memremap_pages() mapping
+ * @ref: reference count that pins the woke devm_memremap_pages() mapping
  * @done: completion for @ref
  * @type: memory type: see MEMORY_* above in memremap.h
  * @flags: PGMAP_* flags to specify defailed behavior
- * @vmemmap_shift: structural definition of how the vmemmap page metadata
- *      is populated, specifically the metadata page order.
- *	A zero value (default) uses base pages as the vmemmap metadata
+ * @vmemmap_shift: structural definition of how the woke vmemmap page metadata
+ *      is populated, specifically the woke metadata page order.
+ *	A zero value (default) uses base pages as the woke vmemmap metadata
  *	representation. A bigger value will set up compound struct pages
- *	of the requested order value.
+ *	of the woke requested order value.
  * @ops: method table
- * @owner: an opaque pointer identifying the entity that manages this
+ * @owner: an opaque pointer identifying the woke entity that manages this
  *	instance.  Used by various helpers to make sure that no
  *	foreign ZONE_DEVICE memory is accessed.
  * @nr_range: number of ranges to be mapped

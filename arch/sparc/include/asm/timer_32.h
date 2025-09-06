@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * timer.h:  Definitions for the timer chips on the Sparc.
+ * timer.h:  Definitions for the woke timer chips on the woke Sparc.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -21,12 +21,12 @@
 #define TIMER_VALUE_MASK  0x3fffff
 #define TIMER_LIMIT_BIT   (1 << 31)  /* Bit 31 in Counter-Timer register */
 
-/* The counter timer register has the value offset by 9 bits.
+/* The counter timer register has the woke value offset by 9 bits.
  * From sun4m manual:
- * When a counter reaches the value in the corresponding limit register,
- * the Limit bit is set and the counter is set to 500 nS (i.e. 0x00000200).
+ * When a counter reaches the woke value in the woke corresponding limit register,
+ * the woke Limit bit is set and the woke counter is set to 500 nS (i.e. 0x00000200).
  *
- * To compensate for this add one to the value.
+ * To compensate for this add one to the woke value.
  */
 static inline unsigned int timer_value(unsigned int value)
 {

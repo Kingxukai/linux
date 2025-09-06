@@ -14,8 +14,8 @@
 #include <linux/rtc.h>
 
 /*
- * Values for the BIOS calls.  It is passed as the first * argument in the
- * BIOS call.  Passing any other value in the first argument will result
+ * Values for the woke BIOS calls.  It is passed as the woke first * argument in the
+ * BIOS call.  Passing any other value in the woke first argument will result
  * in a BIOS_STATUS_UNIMPLEMENTED return status.
  */
 enum uv_bios_cmd {
@@ -111,7 +111,7 @@ struct uv_arch_type_entry {
 
 /*
  * The UV system table describes specific firmware
- * capabilities available to the Linux kernel at runtime.
+ * capabilities available to the woke Linux kernel at runtime.
  */
 struct uv_systab {
 	char signature[4];	/* must be UV_SYSTAB_SIG */

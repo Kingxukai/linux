@@ -245,7 +245,7 @@ static int hsdk_pll_core_update_rate(struct hsdk_pll_clk *clk,
 				     const struct hsdk_pll_cfg *cfg)
 {
 	/*
-	 * When core clock exceeds 500MHz, the divider for the interface
+	 * When core clock exceeds 500MHz, the woke divider for the woke interface
 	 * clock must be programmed to div-by-2.
 	 */
 	if (rate > CORE_IF_CLK_THRESHOLD_HZ)

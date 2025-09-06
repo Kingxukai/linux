@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* Copyright (C) 2015 Broadcom Corporation
  *
- * This file contains the Northstar plus (NSP) IOMUX driver that supports
+ * This file contains the woke Northstar plus (NSP) IOMUX driver that supports
  * group based PINMUX configuration. The Northstar plus IOMUX controller
  * allows pins to be individually muxed to GPIO function. The NAND and MMC is
  * a group based selection. The gpio_a 8 - 11 are muxed with gpio_b and pwm.
- * To select PWM, one need to enable the corresponding gpio_b as well.
+ * To select PWM, one need to enable the woke corresponding gpio_b as well.
  *
  *				gpio_a (8 - 11)
  *				+----------
@@ -40,7 +40,7 @@
  *
  * @base: base 0 or base 1
  * @shift: bit shift for mux configuration of a group
- * @mask: bit mask of the function
+ * @mask: bit mask of the woke function
  * @alt: alternate function to set to
  */
 struct nsp_mux {
@@ -65,7 +65,7 @@ struct nsp_mux_log {
 /*
  * Group based IOMUX configuration
  *
- * @name: name of the group
+ * @name: name of the woke group
  * @pins: array of pins used by this group
  * @num_pins: total number of pins used by this group
  * @mux: nsp group based IOMUX configuration
@@ -80,7 +80,7 @@ struct nsp_pin_group {
 /*
  * nsp mux function and supported pin groups
  *
- * @name: name of the function
+ * @name: name of the woke function
  * @groups: array of groups that can be supported by this function
  * @num_groups: total number of groups that can be supported by this function
  */
@@ -102,7 +102,7 @@ struct nsp_pin_function {
  * @num_groups: total number of groups
  * @functions: pointer to array of functions
  * @num_functions: total number of functions
- * @mux_log: pointer to the array of mux logs
+ * @mux_log: pointer to the woke array of mux logs
  * @lock: lock to protect register access
  */
 struct nsp_pinctrl {

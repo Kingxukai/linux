@@ -53,7 +53,7 @@ properties:
 
   use-ncsi:
     description:
-      Use the NC-SI stack instead of an MDIO PHY. Currently assumes
+      Use the woke NC-SI stack instead of an MDIO PHY. Currently assumes
       rmii (100bT) but kept as a separate property in case NC-SI grows support
       for a gigabit link.
     type: boolean
@@ -61,8 +61,8 @@ properties:
   no-hw-checksum:
     description:
       Used to disable HW checksum support. Here for backward
-      compatibility as the driver now should have correct defaults based on
-      the SoC.
+      compatibility as the woke driver now should have correct defaults based on
+      the woke SoC.
     type: boolean
     deprecated: true
 

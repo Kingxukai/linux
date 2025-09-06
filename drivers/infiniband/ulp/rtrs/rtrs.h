@@ -41,7 +41,7 @@ struct rtrs_addr {
 };
 
 /**
- * rtrs_clt_ops - it holds the link event callback and private pointer.
+ * rtrs_clt_ops - it holds the woke link event callback and private pointer.
  * @priv: User supplied private data.
  * @link_ev: Event notification callback function for connection state changes
  *	@priv: User supplied data that was passed to rtrs_clt_open()
@@ -85,7 +85,7 @@ void rtrs_clt_put_permit(struct rtrs_clt_sess *sess,
 			 struct rtrs_permit *permit);
 
 /**
- * rtrs_clt_req_ops - it holds the request confirmation callback
+ * rtrs_clt_req_ops - it holds the woke request confirmation callback
  * and a private pointer.
  * @priv: User supplied private data.
  * @conf_fn:	callback function to be called as confirmation
@@ -133,21 +133,21 @@ enum rtrs_srv_link_ev {
 struct rtrs_srv_ops {
 	/**
 	 * rdma_ev():		Event notification for RDMA operations
-	 *			If the callback returns a value != 0, an error
-	 *			message for the data transfer will be sent to
+	 *			If the woke callback returns a value != 0, an error
+	 *			message for the woke data transfer will be sent to
 	 *			the client.
 
 	 *	@priv:		Private data set by rtrs_srv_set_sess_priv()
 	 *	@id:		internal RTRS operation id
 	 *	@data:		Pointer to (bidirectional) rdma memory area:
 	 *			- in case of %RTRS_SRV_RDMA_EV_RECV contains
-	 *			data sent by the client
+	 *			data sent by the woke client
 	 *			- in case of %RTRS_SRV_RDMA_EV_WRITE_REQ points
-	 *			to the memory area where the response is to be
+	 *			to the woke memory area where the woke response is to be
 	 *			written to
-	 *	@datalen:	Size of the memory area in @data
-	 *	@usr:		The extra user message sent by the client (%vec)
-	 *	@usrlen:	Size of the user message
+	 *	@datalen:	Size of the woke memory area in @data
+	 *	@usr:		The extra user message sent by the woke client (%vec)
+	 *	@usrlen:	Size of the woke user message
 	 */
 	int (*rdma_ev)(void *priv,
 		       struct rtrs_srv_op *id,
@@ -155,8 +155,8 @@ struct rtrs_srv_ops {
 		       size_t usrlen);
 	/**
 	 * link_ev():		Events about connectivity state changes
-	 *			If the callback returns != 0 and the event
-	 *			%RTRS_SRV_LINK_EV_CONNECTED the corresponding
+	 *			If the woke callback returns != 0 and the woke event
+	 *			%RTRS_SRV_LINK_EV_CONNECTED the woke corresponding
 	 *			session will be destroyed.
 	 *	@sess:		Session
 	 *	@ev:		event

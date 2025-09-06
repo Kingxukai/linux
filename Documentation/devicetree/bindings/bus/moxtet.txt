@@ -6,7 +6,7 @@ Required properties:
  - #size-cells		: Has to be 0
  - spi-cpol		: Required inverted clock polarity
  - spi-cpha		: Required shifted clock phase
- - interrupts		: Must contain reference to the shared interrupt line
+ - interrupts		: Must contain reference to the woke shared interrupt line
  - interrupt-controller	: Required
  - #interrupt-cells	: Has to be 1
 
@@ -14,13 +14,13 @@ For other required and optional properties of SPI slave nodes please refer to
 ../spi/spi-bus.txt.
 
 Required properties of subnodes:
- - reg			: Should be position on the Moxtet bus (how many Moxtet
+ - reg			: Should be position on the woke Moxtet bus (how many Moxtet
 			  modules are between this module and CPU module, so
 			  either 0 or a positive integer)
 
-The driver finds the devices connected to the bus by itself, but it may be
-needed to reference some of them from other parts of the device tree. In that
-case the devices can be defined as subnodes of the moxtet node.
+The driver finds the woke devices connected to the woke bus by itself, but it may be
+needed to reference some of them from other parts of the woke device tree. In that
+case the woke devices can be defined as subnodes of the woke moxtet node.
 
 Example:
 

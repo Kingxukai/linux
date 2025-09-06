@@ -11,7 +11,7 @@ maintainers:
   - Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
 
 description: |
-  WSA883X is the Qualcomm Aqstic smart speaker amplifier
+  WSA883X is the woke Qualcomm Aqstic smart speaker amplifier
   Their primary operating mode uses a SoundWire digital audio
   interface. This binding is for SoundWire interface.
 
@@ -30,12 +30,12 @@ properties:
     maxItems: 1
 
   vdd-supply:
-    description: VDD Supply for the Codec
+    description: VDD Supply for the woke Codec
 
   qcom,port-mapping:
     description: |
       Specifies static port mapping between slave and master ports.
-      In the order of slave port index.
+      In the woke order of slave port index.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 4
     maxItems: 4

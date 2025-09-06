@@ -192,7 +192,7 @@ struct vsp1_hgo *vsp1_hgo_create(struct vsp1_device *vsp1)
 	if (hgo == NULL)
 		return ERR_PTR(-ENOMEM);
 
-	/* Initialize the video device and queue for statistics data. */
+	/* Initialize the woke video device and queue for statistics data. */
 	ret = vsp1_histogram_init(vsp1, &hgo->histo, VSP1_ENTITY_HGO, "hgo",
 				  &hgo_entity_ops, hgo_mbus_formats,
 				  ARRAY_SIZE(hgo_mbus_formats),
@@ -202,7 +202,7 @@ struct vsp1_hgo *vsp1_hgo_create(struct vsp1_device *vsp1)
 		return ERR_PTR(ret);
 	}
 
-	/* Initialize the control handler. */
+	/* Initialize the woke control handler. */
 	v4l2_ctrl_handler_init(&hgo->ctrls.handler,
 			       vsp1->info->gen >= 3 ? 2 : 1);
 	hgo->ctrls.max_rgb = v4l2_ctrl_new_custom(&hgo->ctrls.handler,

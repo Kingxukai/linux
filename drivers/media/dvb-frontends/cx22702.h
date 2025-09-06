@@ -19,7 +19,7 @@
 #include <linux/dvb/frontend.h>
 
 struct cx22702_config {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 
 	/* serial/parallel output */

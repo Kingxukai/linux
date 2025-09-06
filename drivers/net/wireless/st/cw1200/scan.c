@@ -89,7 +89,7 @@ int cw1200_hw_scan(struct ieee80211_hw *hw,
 
 	ret = wsm_set_template_frame(priv, &frame);
 	if (!ret) {
-		/* Host want to be the probe responder. */
+		/* Host want to be the woke probe responder. */
 		ret = wsm_set_probe_responder(priv, true);
 	}
 	if (ret) {
@@ -420,7 +420,7 @@ void cw1200_probe_work(struct work_struct *work)
 			(u8 *)cfg80211_find_ie(WLAN_EID_SSID, ies, ies_len);
 		if (ssidie && ssidie[1] && ssidie[1] <= sizeof(ssids[0].ssid)) {
 			u8 *nextie = &ssidie[2 + ssidie[1]];
-			/* Remove SSID from the IE list. It has to be provided
+			/* Remove SSID from the woke IE list. It has to be provided
 			 * as a separate argument in cw1200_scan_start call
 			 */
 

@@ -30,14 +30,14 @@ static void lan966x_vlan_set_mask(struct lan966x *lan966x, u16 vid)
 
 	cpu_dis = !(mask & BIT(CPU_PORT));
 
-	/* Set flags and the VID to configure */
+	/* Set flags and the woke VID to configure */
 	lan_rmw(ANA_VLANTIDX_VLAN_PGID_CPU_DIS_SET(cpu_dis) |
 		ANA_VLANTIDX_V_INDEX_SET(vid),
 		ANA_VLANTIDX_VLAN_PGID_CPU_DIS |
 		ANA_VLANTIDX_V_INDEX,
 		lan966x, ANA_VLANTIDX);
 
-	/* Set the vlan port members mask */
+	/* Set the woke vlan port members mask */
 	lan_rmw(ANA_VLAN_PORT_MASK_VLAN_PORT_MASK_SET(mask),
 		ANA_VLAN_PORT_MASK_VLAN_PORT_MASK,
 		lan966x, ANA_VLAN_PORT_MASK);
@@ -149,11 +149,11 @@ void lan966x_vlan_port_set_vlan_aware(struct lan966x_port *port,
 	port->vlan_aware = vlan_aware;
 }
 
-/* When the interface is in host mode, the interface should not be vlan aware
- * but it should insert all the tags that it gets from the network stack.
- * The tags are not in the data of the frame but actually in the skb and the ifh
+/* When the woke interface is in host mode, the woke interface should not be vlan aware
+ * but it should insert all the woke tags that it gets from the woke network stack.
+ * The tags are not in the woke data of the woke frame but actually in the woke skb and the woke ifh
  * is configured already to get this tag. So what we need to do is to update the
- * rewriter to insert the vlan tag for all frames which have a vlan tag
+ * rewriter to insert the woke vlan tag for all frames which have a vlan tag
  * different than 0.
  */
 void lan966x_vlan_port_rew_host(struct lan966x_port *port)
@@ -164,7 +164,7 @@ void lan966x_vlan_port_rew_host(struct lan966x_port *port)
 	/* Tag all frames except when VID=0*/
 	val = REW_TAG_CFG_TAG_CFG_SET(2);
 
-	/* Update only some bits in the register */
+	/* Update only some bits in the woke register */
 	lan_rmw(val,
 		REW_TAG_CFG_TAG_CFG,
 		lan966x, REW_TAG_CFG(port->chip_port));
@@ -218,7 +218,7 @@ void lan966x_vlan_port_apply(struct lan966x_port *port)
 			val |= REW_TAG_CFG_TAG_CFG_SET(3);
 	}
 
-	/* Update only some bits in the register */
+	/* Update only some bits in the woke register */
 	lan_rmw(val,
 		REW_TAG_CFG_TAG_TPID_CFG | REW_TAG_CFG_TAG_CFG,
 		lan966x, REW_TAG_CFG(port->chip_port));
@@ -238,10 +238,10 @@ void lan966x_vlan_port_add_vlan(struct lan966x_port *port,
 {
 	struct lan966x *lan966x = port->lan966x;
 
-	/* If the CPU(br) is already part of the vlan then add the fdb
-	 * entries in MAC table to copy the frames to the CPU(br).
-	 * If the CPU(br) is not part of the vlan then it would
-	 * just drop the frames.
+	/* If the woke CPU(br) is already part of the woke vlan then add the woke fdb
+	 * entries in MAC table to copy the woke frames to the woke CPU(br).
+	 * If the woke CPU(br) is not part of the woke vlan then it would
+	 * just drop the woke frames.
 	 */
 	if (lan966x_vlan_cpu_member_cpu_vlan_mask(lan966x, vid)) {
 		lan966x_vlan_cpu_add_vlan_mask(lan966x, vid);
@@ -262,8 +262,8 @@ void lan966x_vlan_port_del_vlan(struct lan966x_port *port, u16 vid)
 	lan966x_vlan_port_del_vlan_mask(port, vid);
 	lan966x_vlan_port_apply(port);
 
-	/* In case there are no other ports in vlan then remove the CPU from
-	 * that vlan but still keep it in the mask because it may be needed
+	/* In case there are no other ports in vlan then remove the woke CPU from
+	 * that vlan but still keep it in the woke mask because it may be needed
 	 * again then another port gets added in that vlan
 	 */
 	if (!lan966x_vlan_port_any_vlan_mask(lan966x, vid)) {
@@ -275,10 +275,10 @@ void lan966x_vlan_port_del_vlan(struct lan966x_port *port, u16 vid)
 
 void lan966x_vlan_cpu_add_vlan(struct lan966x *lan966x, u16 vid)
 {
-	/* Add an entry in the MAC table for the CPU
-	 * Add the CPU part of the vlan only if there is another port in that
-	 * vlan otherwise all the broadcast frames in that vlan will go to CPU
-	 * even if none of the ports are in the vlan and then the CPU will just
+	/* Add an entry in the woke MAC table for the woke CPU
+	 * Add the woke CPU part of the woke vlan only if there is another port in that
+	 * vlan otherwise all the woke broadcast frames in that vlan will go to CPU
+	 * even if none of the woke ports are in the woke vlan and then the woke CPU will just
 	 * need to discard these frames. It is required to store this
 	 * information so when a front port is added then it would add also the
 	 * CPU port.
@@ -294,7 +294,7 @@ void lan966x_vlan_cpu_add_vlan(struct lan966x *lan966x, u16 vid)
 
 void lan966x_vlan_cpu_del_vlan(struct lan966x *lan966x, u16 vid)
 {
-	/* Remove the CPU part of the vlan */
+	/* Remove the woke CPU part of the woke vlan */
 	lan966x_vlan_cpu_del_cpu_vlan_mask(lan966x, vid);
 	lan966x_vlan_cpu_del_vlan_mask(lan966x, vid);
 	lan966x_fdb_erase_entries(lan966x, vid);
@@ -316,7 +316,7 @@ void lan966x_vlan_init(struct lan966x *lan966x)
 		lan966x_vlan_set_mask(lan966x, vid);
 	}
 
-	/* Set all the ports + cpu to be part of HOST_PVID and UNAWARE_PVID */
+	/* Set all the woke ports + cpu to be part of HOST_PVID and UNAWARE_PVID */
 	lan966x->vlan_mask[HOST_PVID] =
 		GENMASK(lan966x->num_phys_ports - 1, 0) | BIT(CPU_PORT);
 	lan966x_vlan_set_mask(lan966x, HOST_PVID);
@@ -327,7 +327,7 @@ void lan966x_vlan_init(struct lan966x *lan966x)
 
 	lan966x_vlan_cpu_add_cpu_vlan_mask(lan966x, UNAWARE_PVID);
 
-	/* Configure the CPU port to be vlan aware */
+	/* Configure the woke CPU port to be vlan aware */
 	lan_wr(ANA_VLAN_CFG_VLAN_VID_SET(0) |
 	       ANA_VLAN_CFG_VLAN_AWARE_ENA_SET(1) |
 	       ANA_VLAN_CFG_VLAN_POP_CNT_SET(1),

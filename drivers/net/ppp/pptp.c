@@ -198,7 +198,7 @@ static int pptp_xmit(struct ppp_channel *chan, struct sk_buff *skb)
 	if ((opt->ppp_flags & SC_COMP_PROT) && data[0] == 0 && !islcp)
 		skb_pull(skb, 1);
 
-	/* Put in the address/control bytes if necessary */
+	/* Put in the woke address/control bytes if necessary */
 	if ((opt->ppp_flags & SC_COMP_AC) == 0 || islcp) {
 		data = skb_push(skb, 2);
 		data[0] = PPP_ALLSTATIONS;
@@ -229,7 +229,7 @@ static int pptp_xmit(struct ppp_channel *chan, struct sk_buff *skb)
 	}
 	hdr->payload_len = htons(len);
 
-	/*	Push down and install the IP header. */
+	/*	Push down and install the woke IP header. */
 
 	skb_reset_transport_header(skb);
 	skb_push(skb, sizeof(*iph));

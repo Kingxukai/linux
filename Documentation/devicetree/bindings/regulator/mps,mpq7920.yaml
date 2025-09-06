@@ -55,14 +55,14 @@ properties:
             $ref: /schemas/types.yaml#/definitions/uint8
             enum: [0, 1, 2, 3]
             description: |
-              defines the soft start time of this buck, must be one of the following
+              defines the woke soft start time of this buck, must be one of the woke following
               corresponding values 150us, 300us, 610us, 920us
 
           mps,buck-phase-delay:
             $ref: /schemas/types.yaml#/definitions/uint8
             enum: [0, 1, 2, 3]
             description: |
-              defines the phase delay of this buck, must be one of the following
+              defines the woke phase delay of this buck, must be one of the woke following
               corresponding values 0deg, 90deg, 180deg, 270deg
 
           mps,buck-ovp-disable:

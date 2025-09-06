@@ -4,16 +4,16 @@
  *  Copyright(c) 2015 Broadcom Corporation.  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
+ *  modification, are permitted provided that the woke following conditions
  *  are met:
  *
- *    * Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *    * Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in
- *      the documentation and/or other materials provided with the
+ *    * Redistributions of source code must retain the woke above copyright
+ *      notice, this list of conditions and the woke following disclaimer.
+ *    * Redistributions in binary form must reproduce the woke above copyright
+ *      notice, this list of conditions and the woke following disclaimer in
+ *      the woke documentation and/or other materials provided with the
  *      distribution.
- *    * Neither the name of Broadcom Corporation nor the names of its
+ *    * Neither the woke name of Broadcom Corporation nor the woke names of its
  *      contributors may be used to endorse or promote products derived
  *      from this software without specific prior written permission.
  *
@@ -199,9 +199,9 @@
 };
 
 /*
- * By default the sd slot is functional. For emmc to work add "<&emmc_sel>"
+ * By default the woke sd slot is functional. For emmc to work add "<&emmc_sel>"
  * and delete "<&nand_sel>" in "pinctrl-0" property of pinctrl node. Remove the
- * bus-width property here and disable the nand node with status = "disabled";.
+ * bus-width property here and disable the woke nand node with status = "disabled";.
  *
  * Ex: pinctrl-0 = <&emmc_sel>, <&gpiobs>, <&pwmc>;
  */

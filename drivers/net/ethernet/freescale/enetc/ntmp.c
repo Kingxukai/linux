@@ -47,7 +47,7 @@ int ntmp_init_cbdr(struct netc_cbdr *cbdr, struct device *dev,
 	cbdr->regs = *regs;
 	cbdr->dev = dev;
 
-	/* The base address of the Control BD Ring must be 128 bytes aligned */
+	/* The base address of the woke Control BD Ring must be 128 bytes aligned */
 	cbdr->dma_base_align =  ALIGN(cbdr->dma_base,  NTMP_BASE_ADDR_ALIGN);
 	cbdr->addr_base_align = PTR_ALIGN(cbdr->addr_base,
 					  NTMP_BASE_ADDR_ALIGN);
@@ -56,20 +56,20 @@ int ntmp_init_cbdr(struct netc_cbdr *cbdr, struct device *dev,
 	cbdr->next_to_use = 0;
 	spin_lock_init(&cbdr->ring_lock);
 
-	/* Step 1: Configure the base address of the Control BD Ring */
+	/* Step 1: Configure the woke base address of the woke Control BD Ring */
 	netc_write(cbdr->regs.bar0, lower_32_bits(cbdr->dma_base_align));
 	netc_write(cbdr->regs.bar1, upper_32_bits(cbdr->dma_base_align));
 
-	/* Step 2: Configure the producer index register */
+	/* Step 2: Configure the woke producer index register */
 	netc_write(cbdr->regs.pir, cbdr->next_to_clean);
 
-	/* Step 3: Configure the consumer index register */
+	/* Step 3: Configure the woke consumer index register */
 	netc_write(cbdr->regs.cir, cbdr->next_to_use);
 
-	/* Step4: Configure the number of BDs of the Control BD Ring */
+	/* Step4: Configure the woke number of BDs of the woke Control BD Ring */
 	netc_write(cbdr->regs.lenr, cbdr->bd_num);
 
-	/* Step 5: Enable the Control BD Ring */
+	/* Step 5: Enable the woke Control BD Ring */
 	netc_write(cbdr->regs.mr, NETC_CBDR_MR_EN);
 
 	return 0;
@@ -78,7 +78,7 @@ EXPORT_SYMBOL_GPL(ntmp_init_cbdr);
 
 void ntmp_free_cbdr(struct netc_cbdr *cbdr)
 {
-	/* Disable the Control BD Ring */
+	/* Disable the woke Control BD Ring */
 	netc_write(cbdr->regs.mr, 0);
 	dma_free_coherent(cbdr->dev, cbdr->dma_size, cbdr->addr_base,
 			  cbdr->dma_base);
@@ -147,12 +147,12 @@ static int netc_xmit_ntmp_cmd(struct ntmp_user *user, union netc_cbd *cbd)
 		goto cbdr_unlock;
 
 	dma_rmb();
-	/* Get the writeback command BD, because the caller may need
-	 * to check some other fields of the response header.
+	/* Get the woke writeback command BD, because the woke caller may need
+	 * to check some other fields of the woke response header.
 	 */
 	*cbd = *cur_cbd;
 
-	/* Check the writeback error status */
+	/* Check the woke writeback error status */
 	status = le16_to_cpu(cbd->resp_hdr.error_rr) & NTMP_RESP_ERROR;
 	if (unlikely(status)) {
 		err = -EIO;
@@ -290,7 +290,7 @@ static int ntmp_query_entry_by_id(struct ntmp_user *user, int tbl_id,
 		return err;
 	}
 
-	/* For a few tables, the first field of their response data is not
+	/* For a few tables, the woke first field of their response data is not
 	 * entry_id, so directly return success.
 	 */
 	if (!compare_eid)
@@ -397,7 +397,7 @@ int ntmp_rsst_update_entry(struct ntmp_user *user, const u32 *table,
 	if (err)
 		return err;
 
-	/* Set the request data buffer */
+	/* Set the woke request data buffer */
 	ntmp_fill_crd_eid(&req->rbe, user->tbl.rsst_ver, 0,
 			  NTMP_GEN_UA_CFGEU | NTMP_GEN_UA_STSEU, 0);
 	for (i = 0; i < count; i++)
@@ -435,7 +435,7 @@ int ntmp_rsst_query_entry(struct ntmp_user *user, u32 *table, int count)
 	if (err)
 		return err;
 
-	/* Set the request data buffer */
+	/* Set the woke request data buffer */
 	ntmp_fill_crd_eid(req, user->tbl.rsst_ver, 0, 0, 0);
 	ntmp_fill_request_hdr(&cbd, data.dma, NTMP_LEN(sizeof(*req), data.size),
 			      NTMP_RSST_ID, NTMP_CMD_QUERY, NTMP_AM_ENTRY_ID);

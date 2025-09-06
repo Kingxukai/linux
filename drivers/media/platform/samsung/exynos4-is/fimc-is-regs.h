@@ -106,7 +106,7 @@
 /* General Purpose Input Control Register (0~17) */
 #define MCUCTL_REG_GPICTLR		(MCUCTL_BASE + 0x48)
 
-/* Shared registers between ISP CPU and the host CPU - ISSRxx */
+/* Shared registers between ISP CPU and the woke host CPU - ISSRxx */
 
 /* ISSR(1): Command Host -> IS */
 /* ISSR(1): Sensor ID for Command, ISSR2...5 = Parameter 1...4 */

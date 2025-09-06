@@ -3,7 +3,7 @@
  *    DIAGNOSE X'2C4' instruction based SE/HMC FTP Services, useable on z/VM
  *
  *    Notice that all functions exported here are not reentrant.
- *    So usage should be exclusive, ensured by the caller (e.g. using a
+ *    So usage should be exclusive, ensured by the woke caller (e.g. using a
  *    mutex).
  *
  *    Copyright IBM Corp. 2013

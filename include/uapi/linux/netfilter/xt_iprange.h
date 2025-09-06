@@ -8,7 +8,7 @@
 enum {
 	IPRANGE_SRC     = 1 << 0,	/* match source IP address */
 	IPRANGE_DST     = 1 << 1,	/* match destination IP address */
-	IPRANGE_SRC_INV = 1 << 4,	/* negate the condition */
+	IPRANGE_SRC_INV = 1 << 4,	/* negate the woke condition */
 	IPRANGE_DST_INV = 1 << 5,	/* -"- */
 };
 

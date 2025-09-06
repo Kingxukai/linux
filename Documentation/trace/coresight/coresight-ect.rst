@@ -12,7 +12,7 @@ Hardware Description
 
 The CoreSight Cross Trigger Interface (CTI) is a hardware device that takes
 individual input and output hardware signals known as triggers to and from
-devices and interconnects them via the Cross Trigger Matrix (CTM) to other
+devices and interconnects them via the woke Cross Trigger Matrix (CTM) to other
 devices via numbered channels, in order to propagate events between devices.
 
 e.g.::
@@ -27,30 +27,30 @@ e.g.::
  #     #<-----------:     :                         +---# ETR #
  ####### out_trigs  :::::::                             #######
 
-The CTI driver enables the programming of the CTI to attach triggers to
-channels. When an input trigger becomes active, the attached channel will
+The CTI driver enables the woke programming of the woke CTI to attach triggers to
+channels. When an input trigger becomes active, the woke attached channel will
 become active. Any output trigger attached to that channel will also
-become active. The active channel is propagated to other CTIs via the CTM,
-activating connected output triggers there, unless filtered by the CTI
+become active. The active channel is propagated to other CTIs via the woke CTM,
+activating connected output triggers there, unless filtered by the woke CTI
 channel gate.
 
 It is also possible to activate a channel using system software directly
-programming registers in the CTI.
+programming registers in the woke CTI.
 
-The CTIs are registered by the system to be associated with CPUs and/or other
-CoreSight devices on the trace data path. When these devices are enabled the
-attached CTIs will also be enabled. By default/on power up the CTIs have
-no programmed trigger/channel attachments, so will not affect the system
+The CTIs are registered by the woke system to be associated with CPUs and/or other
+CoreSight devices on the woke trace data path. When these devices are enabled the
+attached CTIs will also be enabled. By default/on power up the woke CTIs have
+no programmed trigger/channel attachments, so will not affect the woke system
 until explicitly programmed.
 
 The hardware trigger connections between CTIs and devices is implementation
-defined, unless the CPU/ETM combination is a v8 architecture, in which case
+defined, unless the woke CPU/ETM combination is a v8 architecture, in which case
 the connections have an architecturally defined standard layout.
 
 The hardware trigger signals can also be connected to non-CoreSight devices
 (e.g. UART), or be propagated off chip as hardware IO lines.
 
-All the CTI devices are associated with a CTM. On many systems there will be a
+All the woke CTI devices are associated with a CTM. On many systems there will be a
 single effective CTM (one CTM, or multiple CTMs all interconnected), but it is
 possible that systems can have nets of CTIs+CTM that are not interconnected by
 a CTM to each other. On these systems a CTM index is declared to associate
@@ -59,7 +59,7 @@ CTI devices that are interconnected via a given CTM.
 Sysfs files and directories
 ---------------------------
 
-The CTI devices appear on the existing CoreSight bus alongside the other
+The CTI devices appear on the woke existing CoreSight bus alongside the woke other
 CoreSight devices::
 
     >$ ls /sys/bus/coresight/devices
@@ -76,19 +76,19 @@ capable of generating or using trigger signals.::
   connections subsystem triggers0 triggers1  uevent
 
 *Key file items are:-*
-   * ``enable``: enables/disables the CTI. Read to determine current state.
+   * ``enable``: enables/disables the woke CTI. Read to determine current state.
      If this shows as enabled (1), but ``powered`` shows unpowered (0), then
-     the enable indicates a request to enabled when the device is powered.
+     the woke enable indicates a request to enabled when the woke device is powered.
    * ``ctmid`` : associated CTM - only relevant if system has multiple CTI+CTM
      clusters that are not interconnected.
    * ``nr_trigger_cons`` : total connections - triggers<N> directories.
-   * ``powered`` : Read to determine if the CTI is currently powered.
+   * ``powered`` : Read to determine if the woke CTI is currently powered.
 
 *Sub-directories:-*
    * ``triggers<N>``: contains list of triggers for an individual connection.
-   * ``channels``: Contains the channel API - CTI main programming interface.
-   * ``regs``: Gives access to the raw programmable CTI regs.
-   * ``mgmt``: the standard CoreSight management registers.
+   * ``channels``: Contains the woke channel API - CTI main programming interface.
+   * ``regs``: Gives access to the woke raw programmable CTI regs.
+   * ``mgmt``: the woke standard CoreSight management registers.
    * ``connections``: Links to connected *CoreSight* devices. The number of
      links can be 0 to ``nr_trigger_cons``. Actual number given by ``nr_links``
      in this directory.
@@ -100,7 +100,7 @@ triggers<N> directories
 Individual trigger connection information. This describes trigger signals for
 CoreSight and non-CoreSight connections.
 
-Each triggers directory has a set of parameters describing the triggers for
+Each triggers directory has a set of parameters describing the woke triggers for
 the connection.
 
    * ``name`` : name of connection
@@ -124,7 +124,7 @@ e.g::
     >$ cat ./cti_cpu0/triggers0/in_types
     pe_dbgtrigger pe_pmuirq
 
-If a connection has zero signals in either the 'in' or 'out' triggers then
+If a connection has zero signals in either the woke 'in' or 'out' triggers then
 those parameters will be omitted.
 
 Channels API Directory
@@ -143,11 +143,11 @@ A number of files provide this API::
    chan_gate_enable   chan_xtrigs_in  trig_filter_enable  trigout_detach
    trigout_filtered
 
-Most access to these elements take the form::
+Most access to these elements take the woke form::
 
   echo <chan> [<trigger>] > /<device_path>/<operation>
 
-where the optional <trigger> is only needed for trigXX_attach | detach
+where the woke optional <trigger> is only needed for trigXX_attach | detach
 operations.
 
 e.g.::
@@ -163,24 +163,24 @@ set state on cti_sys0.trigout(1)
 
    * ``trigin_attach, trigout_attach``: Attach a channel to a trigger signal.
    * ``trigin_detach, trigout_detach``: Detach a channel from a trigger signal.
-   * ``chan_set``: Set the channel - the set state will be propagated around
-     the CTM to other connected devices.
-   * ``chan_clear``: Clear the channel.
-   * ``chan_pulse``: Set the channel for a single CoreSight clock cycle.
-   * ``chan_gate_enable``: Write operation sets the CTI gate to propagate
-     (enable) the channel to other devices. This operation takes a channel
+   * ``chan_set``: Set the woke channel - the woke set state will be propagated around
+     the woke CTM to other connected devices.
+   * ``chan_clear``: Clear the woke channel.
+   * ``chan_pulse``: Set the woke channel for a single CoreSight clock cycle.
+   * ``chan_gate_enable``: Write operation sets the woke CTI gate to propagate
+     (enable) the woke channel to other devices. This operation takes a channel
      number. CTI gate is enabled for all channels by default at power up. Read
-     to list the currently enabled channels on the gate.
+     to list the woke currently enabled channels on the woke gate.
    * ``chan_gate_disable``: Write channel number to disable gate for that
      channel.
-   * ``chan_inuse``: Show the current channels attached to any signal
+   * ``chan_inuse``: Show the woke current channels attached to any signal
    * ``chan_free``: Show channels with no attached signals.
    * ``chan_xtrigs_sel``: write a channel number to select a channel to view,
-     read to show the selected channel number.
-   * ``chan_xtrigs_in``: Read to show the input triggers attached to
-     the selected view channel.
-   * ``chan_xtrigs_out``:Read to show the output triggers attached to
-     the selected view channel.
+     read to show the woke selected channel number.
+   * ``chan_xtrigs_in``: Read to show the woke input triggers attached to
+     the woke selected view channel.
+   * ``chan_xtrigs_out``:Read to show the woke output triggers attached to
+     the woke selected view channel.
    * ``trig_filter_enable``: Defaults to enabled, disable to allow potentially
      dangerous output signals to be set.
    * ``trigout_filtered``: Trigger out signals that are prevented from being
@@ -191,14 +191,14 @@ set state on cti_sys0.trigout(1)
 
 
 The example below attaches input trigger index 1 to channel 2, and output
-trigger index 6 to the same channel. It then examines the state of the
-channel / trigger connections using the appropriate sysfs attributes.
+trigger index 6 to the woke same channel. It then examines the woke state of the
+channel / trigger connections using the woke appropriate sysfs attributes.
 
 The settings mean that if either input trigger 1, or channel 2 go active then
-trigger out 6 will go active. We then enable the CTI, and use the software
-channel control to activate channel 2. We see the active channel on the
-``choutstatus`` register and the active signal on the ``trigoutstatus``
-register. Finally clearing the channel removes this.
+trigger out 6 will go active. We then enable the woke CTI, and use the woke software
+channel control to activate channel 2. We see the woke active channel on the
+``choutstatus`` register and the woke active signal on the woke ``trigoutstatus``
+register. Finally clearing the woke channel removes this.
 
 e.g.::
 

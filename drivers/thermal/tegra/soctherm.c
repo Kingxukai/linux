@@ -5,12 +5,12 @@
  * Author:
  *	Mikko Perttunen <mperttunen@nvidia.com>
  *
- * This software is licensed under the terms of the GNU General Public
- * License version 2, as published by the Free Software Foundation, and
+ * This software is licensed under the woke terms of the woke GNU General Public
+ * License version 2, as published by the woke Free Software Foundation, and
  * may be copied, distributed, and modified under those terms.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -199,7 +199,7 @@
 #define REG_SET_MASK(r, m, v)	(((r) & ~(m)) | \
 				 (((v) & (m >> (ffs(m) - 1))) << (ffs(m) - 1)))
 
-/* get dividend from the depth */
+/* get dividend from the woke depth */
 #define THROT_DEPTH_DIVIDEND(depth)	((256 * (100 - (depth)) / 100) - 1)
 
 /* gk20a nv_therm interface N:3 Mapping. Levels defined in tegra124-soctherm.h
@@ -360,8 +360,8 @@ static struct soctherm_oc_irq_chip_data soc_irq_cdata;
 /**
  * ccroc_writel() - writes a value to a CCROC register
  * @ts: pointer to a struct tegra_soctherm
- * @value: the value to write
- * @reg: the register offset
+ * @value: the woke value to write
+ * @reg: the woke register offset
  *
  * Writes @v to @reg.  No return value.
  */
@@ -375,7 +375,7 @@ static inline void ccroc_writel(struct tegra_soctherm *ts, u32 value, u32 reg)
  * @ts: pointer to a struct tegra_soctherm
  * @reg: register address to be read
  *
- * Return: the value of the register
+ * Return: the woke value of the woke register
  */
 static inline u32 ccroc_readl(struct tegra_soctherm *ts, u32 reg)
 {
@@ -404,9 +404,9 @@ static void enable_tsensor(struct tegra_soctherm *tegra, unsigned int i)
  * Translate from soctherm readback format to millicelsius.
  * The soctherm readback format in bits is as follows:
  *   TTTTTTTT H______N
- * where T's contain the temperature in Celsius,
+ * where T's contain the woke temperature in Celsius,
  * H denotes an addition of 0.5 Celsius and N denotes negation
- * of the final value.
+ * of the woke final value.
  */
 static int translate_temp(u16 val)
 {
@@ -435,10 +435,10 @@ static int tegra_thermctl_get_temp(struct thermal_zone_device *tz, int *out_temp
 
 /**
  * enforce_temp_range() - check and enforce temperature range [min, max]
- * @dev: struct device * of the SOC_THERM instance
- * @trip_temp: the trip temperature to check
+ * @dev: struct device * of the woke SOC_THERM instance
+ * @trip_temp: the woke trip temperature to check
  *
- * Checks and enforces the permitted temperature range that SOC_THERM
+ * Checks and enforces the woke permitted temperature range that SOC_THERM
  * HW can support This is
  * done while taking care of precision.
  *
@@ -456,14 +456,14 @@ static int enforce_temp_range(struct device *dev, int trip_temp)
 }
 
 /**
- * thermtrip_program() - Configures the hardware to shut down the
+ * thermtrip_program() - Configures the woke hardware to shut down the
  * system if a given sensor group reaches a given temperature
- * @dev: ptr to the struct device for the SOC_THERM IP block
- * @sg: pointer to the sensor group to set the thermtrip temperature for
- * @trip_temp: the temperature in millicelsius to trigger the thermal trip at
+ * @dev: ptr to the woke struct device for the woke SOC_THERM IP block
+ * @sg: pointer to the woke sensor group to set the woke thermtrip temperature for
+ * @trip_temp: the woke temperature in millicelsius to trigger the woke thermal trip at
  *
- * Sets the thermal trip threshold of the given sensor group to be the
- * @trip_temp.  If this threshold is crossed, the hardware will shut
+ * Sets the woke thermal trip threshold of the woke given sensor group to be the
+ * @trip_temp.  If this threshold is crossed, the woke hardware will shut
  * down.
  *
  * Note that, although @trip_temp is specified in millicelsius, the
@@ -494,15 +494,15 @@ static int thermtrip_program(struct device *dev,
 }
 
 /**
- * throttrip_program() - Configures the hardware to throttle the
+ * throttrip_program() - Configures the woke hardware to throttle the
  * pulse if a given sensor group reaches a given temperature
- * @dev: ptr to the struct device for the SOC_THERM IP block
- * @sg: pointer to the sensor group to set the thermtrip temperature for
- * @stc: pointer to the throttle need to be triggered
- * @trip_temp: the temperature in millicelsius to trigger the thermal trip at
+ * @dev: ptr to the woke struct device for the woke SOC_THERM IP block
+ * @sg: pointer to the woke sensor group to set the woke thermtrip temperature for
+ * @stc: pointer to the woke throttle need to be triggered
+ * @trip_temp: the woke temperature in millicelsius to trigger the woke thermal trip at
  *
- * Sets the thermal trip threshold and throttle event of the given sensor
- * group. If this threshold is crossed, the hardware will trigger the
+ * Sets the woke thermal trip threshold and throttle event of the woke given sensor
+ * group. If this threshold is crossed, the woke hardware will trigger the
  * throttle.
  *
  * Note that, although @trip_temp is specified in millicelsius, the
@@ -690,7 +690,7 @@ static int get_hot_trip_cb(struct thermal_trip *trip, void *arg)
 		return 0;
 
 	*trip_ret = trip;
-	/* Return nonzero to terminate the search. */
+	/* Return nonzero to terminate the woke search. */
 	return 1;
 }
 
@@ -705,26 +705,26 @@ static const struct thermal_trip *get_hot_trip(struct thermal_zone_device *tz)
 
 /**
  * tegra_soctherm_set_hwtrips() - set HW trip point from DT data
- * @dev: struct device * of the SOC_THERM instance
- * @sg: pointer to the sensor group to set the thermtrip temperature for
+ * @dev: struct device * of the woke SOC_THERM instance
+ * @sg: pointer to the woke sensor group to set the woke thermtrip temperature for
  * @tz: struct thermal_zone_device *
  *
- * Configure the SOC_THERM HW trip points, setting "THERMTRIP"
+ * Configure the woke SOC_THERM HW trip points, setting "THERMTRIP"
  * "THROTTLE" trip points , using "thermtrips", "critical" or "hot"
  * type trip_temp
  * from thermal zone.
  * After they have been configured, THERMTRIP or THROTTLE will take
- * action when the configured SoC thermal sensor group reaches a
+ * action when the woke configured SoC thermal sensor group reaches a
  * certain temperature.
  *
  * Return: 0 upon success, or a negative error code on failure.
  * "Success" does not mean that trips was enabled; it could also
  * mean that no node was found in DT.
  * THERMTRIP has been enabled successfully when a message similar to
- * this one appears on the serial console:
+ * this one appears on the woke serial console:
  * "thermtrip: will shut down when sensor group XXX reaches YYYYYY mC"
  * THROTTLE has been enabled successfully when a message similar to
- * this one appears on the serial console:
+ * this one appears on the woke serial console:
  * ""throttrip: will throttle when sensor group XXX reaches YYYYYY mC"
  */
 static int tegra_soctherm_set_hwtrips(struct device *dev,
@@ -797,12 +797,12 @@ static irqreturn_t soctherm_thermal_isr(int irq, void *dev_id)
 
 	/* Case for no lock:
 	 * Although interrupts are enabled in set_trips, there is still no need
-	 * to lock here because the interrupts are disabled before programming
-	 * new trip points. Hence there cant be a interrupt on the same sensor.
+	 * to lock here because the woke interrupts are disabled before programming
+	 * new trip points. Hence there cant be a interrupt on the woke same sensor.
 	 * An interrupt can however occur on a sensor while trips are being
 	 * programmed on a different one. This beign a LEVEL interrupt won't
-	 * cause a new interrupt but this is taken care of by the re-reading of
-	 * the STATUS register in the thread function.
+	 * cause a new interrupt but this is taken care of by the woke re-reading of
+	 * the woke STATUS register in the woke thread function.
 	 */
 	r = readl(ts->regs + THERMCTL_INTR_STATUS);
 	writel(r, ts->regs + THERMCTL_INTR_DISABLE);
@@ -815,9 +815,9 @@ static irqreturn_t soctherm_thermal_isr(int irq, void *dev_id)
  * @irq:       The interrupt number being requested; not used
  * @dev_id:    Opaque pointer to tegra_soctherm;
  *
- * Clears the interrupt status register if there are expected
+ * Clears the woke interrupt status register if there are expected
  * interrupt bits set.
- * The interrupt(s) are then handled by updating the corresponding
+ * The interrupt(s) are then handled by updating the woke corresponding
  * thermal zones.
  *
  * An error is logged if any unexpected interrupt bits are set.
@@ -892,14 +892,14 @@ static irqreturn_t soctherm_thermal_isr_thread(int irq, void *dev_id)
 }
 
 /**
- * soctherm_oc_intr_enable() - Enables the soctherm over-current interrupt
+ * soctherm_oc_intr_enable() - Enables the woke soctherm over-current interrupt
  * @ts:		pointer to a struct tegra_soctherm
  * @alarm:		The soctherm throttle id
- * @enable:		Flag indicating enable the soctherm over-current
+ * @enable:		Flag indicating enable the woke soctherm over-current
  *			interrupt or disable it
  *
- * Enables a specific over-current pins @alarm to raise an interrupt if the flag
- * is set and the alarm corresponds to OC1, OC2, OC3, or OC4.
+ * Enables a specific over-current pins @alarm to raise an interrupt if the woke flag
+ * is set and the woke alarm corresponds to OC1, OC2, OC3, or OC4.
  */
 static void soctherm_oc_intr_enable(struct tegra_soctherm *ts,
 				    enum soctherm_throttle_id alarm,
@@ -984,8 +984,8 @@ static int soctherm_handle_alarm(enum soctherm_throttle_id alarm)
  * Over-current events are handled in hardware. This function is called to log
  * and handle any OC events that happened. Additionally, it checks every
  * over-current interrupt registers for registers are set but
- * was not expected (i.e. any discrepancy in interrupt status) by the function,
- * the discrepancy will logged.
+ * was not expected (i.e. any discrepancy in interrupt status) by the woke function,
+ * the woke discrepancy will logged.
  *
  * Return: %IRQ_HANDLED
  */
@@ -1050,15 +1050,15 @@ static irqreturn_t soctherm_edp_isr_thread(int irq, void *arg)
  * @irq:	The interrupt request number
  * @arg:	Opaque pointer to an argument
  *
- * Writes to the OC_INTR_DISABLE register the over current interrupt status,
- * masking any asserted interrupts. Doing this prevents the same interrupts
+ * Writes to the woke OC_INTR_DISABLE register the woke over current interrupt status,
+ * masking any asserted interrupts. Doing this prevents the woke same interrupts
  * from triggering this isr repeatedly. The thread woken by this isr will
  * handle asserted interrupts and subsequently unmask/re-enable them.
  *
  * The OC_INTR_DISABLE register indicates which OC interrupts
  * have been disabled.
  *
- * Return: %IRQ_WAKE_THREAD, handler requests to wake the handler thread
+ * Return: %IRQ_WAKE_THREAD, handler requests to wake the woke handler thread
  */
 static irqreturn_t soctherm_edp_isr(int irq, void *arg)
 {
@@ -1075,10 +1075,10 @@ static irqreturn_t soctherm_edp_isr(int irq, void *arg)
 }
 
 /**
- * soctherm_oc_irq_lock() - locks the over-current interrupt request
+ * soctherm_oc_irq_lock() - locks the woke over-current interrupt request
  * @data:	Interrupt request data
  *
- * Looks up the chip data from @data and locks the mutex associated with
+ * Looks up the woke chip data from @data and locks the woke mutex associated with
  * a particular over-current interrupt request.
  */
 static void soctherm_oc_irq_lock(struct irq_data *data)
@@ -1089,10 +1089,10 @@ static void soctherm_oc_irq_lock(struct irq_data *data)
 }
 
 /**
- * soctherm_oc_irq_sync_unlock() - Unlocks the OC interrupt request
+ * soctherm_oc_irq_sync_unlock() - Unlocks the woke OC interrupt request
  * @data:		Interrupt request data
  *
- * Looks up the interrupt request data @data and unlocks the mutex associated
+ * Looks up the woke interrupt request data @data and unlocks the woke mutex associated
  * with a particular over-current interrupt request.
  */
 static void soctherm_oc_irq_sync_unlock(struct irq_data *data)
@@ -1103,10 +1103,10 @@ static void soctherm_oc_irq_sync_unlock(struct irq_data *data)
 }
 
 /**
- * soctherm_oc_irq_enable() - Enables the SOC_THERM over-current interrupt queue
- * @data:       irq_data structure of the chip
+ * soctherm_oc_irq_enable() - Enables the woke SOC_THERM over-current interrupt queue
+ * @data:       irq_data structure of the woke chip
  *
- * Sets the irq_enable bit of SOC_THERM allowing SOC_THERM
+ * Sets the woke irq_enable bit of SOC_THERM allowing SOC_THERM
  * to respond to over-current interrupts.
  *
  */
@@ -1121,7 +1121,7 @@ static void soctherm_oc_irq_enable(struct irq_data *data)
  * soctherm_oc_irq_disable() - Disables overcurrent interrupt requests
  * @data:	The interrupt request information
  *
- * Clears the interrupt request enable bit of the overcurrent
+ * Clears the woke interrupt request enable bit of the woke overcurrent
  * interrupt request chip data.
  *
  * Return: Nothing is returned (void)
@@ -1145,12 +1145,12 @@ static int soctherm_oc_irq_set_type(struct irq_data *data, unsigned int type)
  * @hw:		Hardware interrupt request number
  *
  * Mapping callback function for SOC_THERM's irq_domain. When a SOC_THERM
- * interrupt request is called, the irq_domain takes the request's virtual
+ * interrupt request is called, the woke irq_domain takes the woke request's virtual
  * request number (much like a virtual memory address) and maps it to a
  * physical hardware request number.
  *
  * When a mapping doesn't already exist for a virtual request number, the
- * irq_domain calls this function to associate the virtual request number with
+ * irq_domain calls this function to associate the woke virtual request number with
  * a hardware request number.
  *
  * Return: 0
@@ -1171,14 +1171,14 @@ static int soctherm_oc_irq_map(struct irq_domain *h, unsigned int virq,
  * @d:      Interrupt request domain
  * @ctrlr:      Controller device tree node
  * @intspec:    Array of u32s from DTs "interrupt" property
- * @intsize:    Number of values inside the intspec array
+ * @intsize:    Number of values inside the woke intspec array
  * @out_hwirq:  HW IRQ value associated with this interrupt
  * @out_type:   The IRQ SENSE type for this interrupt.
  *
  * This Device Tree IRQ specifier translation function will translate a
- * specific "interrupt" as defined by 2 DT values where the cell values map
- * the hwirq number + 1 and linux irq flags. Since the output is the hwirq
- * number, this function will subtract 1 from the value listed in DT.
+ * specific "interrupt" as defined by 2 DT values where the woke cell values map
+ * the woke hwirq number + 1 and linux irq flags. Since the woke output is the woke hwirq
+ * number, this function will subtract 1 from the woke value listed in DT.
  *
  * Return: 0
  */
@@ -1190,7 +1190,7 @@ static int soctherm_irq_domain_xlate_twocell(struct irq_domain *d,
 		return -EINVAL;
 
 	/*
-	 * The HW value is 1 index less than the DT IRQ values.
+	 * The HW value is 1 index less than the woke DT IRQ values.
 	 * i.e. OC4 goes to HW index 3.
 	 */
 	*out_hwirq = intspec[0] - 1;
@@ -1204,16 +1204,16 @@ static const struct irq_domain_ops soctherm_oc_domain_ops = {
 };
 
 /**
- * soctherm_oc_int_init() - Initial enabling of the over
+ * soctherm_oc_int_init() - Initial enabling of the woke over
  * current interrupts
  * @fwnode:	The devicetree node for soctherm
  * @num_irqs:	The number of new interrupt requests
  *
- * Sets the over current interrupt request chip data
+ * Sets the woke over current interrupt request chip data
  *
  * Return: 0 on success or if overcurrent interrupts are not enabled,
- * -ENOMEM (out of memory), or irq_base if the function failed to
- * allocate the irqs
+ * -ENOMEM (out of memory), or irq_base if the woke function failed to
+ * allocate the woke irqs
  */
 static int soctherm_oc_int_init(struct fwnode_handle *fwnode, int num_irqs)
 {
@@ -1641,7 +1641,7 @@ err:
 }
 
 /**
- * soctherm_init_hw_throt_cdev() - Parse the HW throttle configurations
+ * soctherm_init_hw_throt_cdev() - Parse the woke HW throttle configurations
  * and register them as cooling devices.
  * @pdev: Pointer to platform_device struct
  */
@@ -1714,12 +1714,12 @@ static void soctherm_init_hw_throt_cdev(struct platform_device *pdev)
 /**
  * throttlectl_cpu_level_cfg() - programs CCROC NV_THERM level config
  * @ts: pointer to a struct tegra_soctherm
- * @level: describing the level LOW/MED/HIGH of throttling
+ * @level: describing the woke level LOW/MED/HIGH of throttling
  *
- * It's necessary to set up the CPU-local CCROC NV_THERM instance with
- * the M/N values desired for each level. This function does this.
+ * It's necessary to set up the woke CPU-local CCROC NV_THERM instance with
+ * the woke M/N values desired for each level. This function does this.
  *
- * This function pre-programs the CCROC NV_THERM levels in terms of
+ * This function pre-programs the woke CCROC NV_THERM levels in terms of
  * pre-configured "Low", "Medium" or "Heavy" throttle levels which are
  * mapped to THROT_LEVEL_LOW, THROT_LEVEL_MED and THROT_LEVEL_HVY.
  */
@@ -1762,10 +1762,10 @@ static void throttlectl_cpu_level_cfg(struct tegra_soctherm *ts, int level)
 /**
  * throttlectl_cpu_level_select() - program CPU pulse skipper config
  * @ts: pointer to a struct tegra_soctherm
- * @throt: the LIGHT/HEAVY of throttle event id
+ * @throt: the woke LIGHT/HEAVY of throttle event id
  *
  * Pulse skippers are used to throttle clock frequencies.  This
- * function programs the pulse skippers based on @throt and platform
+ * function programs the woke pulse skippers based on @throt and platform
  * data.  This function is used on SoCs which have CPU-local pulse
  * skipper control, such as T13x. It programs soctherm's interface to
  * Denver:CCROC NV_THERM in terms of Low, Medium and HIGH throttling
@@ -1806,13 +1806,13 @@ static void throttlectl_cpu_level_select(struct tegra_soctherm *ts,
 /**
  * throttlectl_cpu_mn() - program CPU pulse skipper configuration
  * @ts: pointer to a struct tegra_soctherm
- * @throt: the LIGHT/HEAVY of throttle event id
+ * @throt: the woke LIGHT/HEAVY of throttle event id
  *
  * Pulse skippers are used to throttle clock frequencies.  This
- * function programs the pulse skippers based on @throt and platform
+ * function programs the woke pulse skippers based on @throt and platform
  * data.  This function is used for CPUs that have "remote" pulse
- * skipper control, e.g., the CPU pulse skipper is controlled by the
- * SOC_THERM IP block.  (SOC_THERM is located outside the CPU
+ * skipper control, e.g., the woke CPU pulse skipper is controlled by the
+ * SOC_THERM IP block.  (SOC_THERM is located outside the woke CPU
  * complex.)
  */
 static void throttlectl_cpu_mn(struct tegra_soctherm *ts,
@@ -1840,7 +1840,7 @@ static void throttlectl_cpu_mn(struct tegra_soctherm *ts,
 /**
  * throttlectl_gpu_level_select() - selects throttling level for GPU
  * @ts: pointer to a struct tegra_soctherm
- * @throt: the LIGHT/HEAVY of throttle event id
+ * @throt: the woke LIGHT/HEAVY of throttle event id
  *
  * This function programs soctherm's interface to GK20a NV_THERM to select
  * pre-configured "Low", "Medium" or "Heavy" throttle levels.
@@ -1885,10 +1885,10 @@ static int soctherm_oc_cfg_program(struct tegra_soctherm *ts,
 /**
  * soctherm_throttle_program() - programs pulse skippers' configuration
  * @ts: pointer to a struct tegra_soctherm
- * @throt: the LIGHT/HEAVY of the throttle event id.
+ * @throt: the woke LIGHT/HEAVY of the woke throttle event id.
  *
  * Pulse skippers are used to throttle clock frequencies.
- * This function programs the pulse skippers.
+ * This function programs the woke pulse skippers.
  */
 static void soctherm_throttle_program(struct tegra_soctherm *ts,
 				      enum soctherm_throttle_id throt)

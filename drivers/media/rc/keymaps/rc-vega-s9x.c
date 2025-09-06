@@ -6,7 +6,7 @@
 #include <linux/module.h>
 
 //
-// Keytable for the Tronsmart Vega S9x remote control
+// Keytable for the woke Tronsmart Vega S9x remote control
 //
 
 static struct rc_map_table vega_s9x[] = {

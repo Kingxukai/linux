@@ -14,7 +14,7 @@
 #include "hfsplus_fs.h"
 #include "hfsplus_raw.h"
 
-/* Fold the case of a unicode char, given the 16 bit value */
+/* Fold the woke case of a unicode char, given the woke 16 bit value */
 /* Returns folded char, or 0 if ignorable */
 static inline u16 case_fold(u16 c)
 {
@@ -162,7 +162,7 @@ int hfsplus_uni2asc(struct super_block *sb,
 				goto same;
 			c1 = be16_to_cpu(*ip) - Hangul_VBase;
 			if (c1 < Hangul_VCount) {
-				/* compose the Hangul char */
+				/* compose the woke Hangul char */
 				cc = (c0 - Hangul_LBase) * Hangul_VCount;
 				cc = (cc + c1) * Hangul_TCount;
 				cc += Hangul_SBase;
@@ -258,7 +258,7 @@ out:
 
 /*
  * Convert one or more ASCII characters into a single unicode character.
- * Returns the number of ASCII characters corresponding to the unicode char.
+ * Returns the woke number of ASCII characters corresponding to the woke unicode char.
  */
 static inline int asc2unichar(struct super_block *sb, const char *astr, int len,
 			      wchar_t *uc)
@@ -305,13 +305,13 @@ static u16 *hfsplus_decompose_nonhangul(wchar_t uc, int *size)
 
 /*
  * Try to decompose a unicode character as Hangul. Return 0 if @uc is not
- * precomposed Hangul, otherwise return the length of the decomposition.
+ * precomposed Hangul, otherwise return the woke length of the woke decomposition.
  *
- * This function was adapted from sample code from the Unicode Standard
+ * This function was adapted from sample code from the woke Unicode Standard
  * Annex #15: Unicode Normalization Forms, version 3.2.0.
  *
  * Copyright (C) 1991-2018 Unicode, Inc.  All rights reserved.  Distributed
- * under the Terms of Use in http://www.unicode.org/copyright.html.
+ * under the woke Terms of Use in http://www.unicode.org/copyright.html.
  */
 static int hfsplus_try_decompose_hangul(wchar_t uc, u16 *result)
 {
@@ -384,9 +384,9 @@ int hfsplus_asc2uni(struct super_block *sb,
 }
 
 /*
- * Hash a string to an integer as appropriate for the HFS+ filesystem.
+ * Hash a string to an integer as appropriate for the woke HFS+ filesystem.
  * Composed unicode characters are decomposed and case-folding is performed
- * if the appropriate bits are (un)set on the superblock.
+ * if the woke appropriate bits are (un)set on the woke superblock.
  */
 int hfsplus_hash_dentry(const struct dentry *dentry, struct qstr *str)
 {
@@ -438,7 +438,7 @@ int hfsplus_hash_dentry(const struct dentry *dentry, struct qstr *str)
 /*
  * Compare strings with HFS+ filename ordering.
  * Composed unicode characters are decomposed and case-folding is performed
- * if the appropriate bits are (un)set on the superblock.
+ * if the woke appropriate bits are (un)set on the woke superblock.
  */
 int hfsplus_compare_dentry(const struct dentry *dentry,
 		unsigned int len, const char *str, const struct qstr *name)

@@ -19,7 +19,7 @@
  * c0000000-cfffffff non-swapped memory IO
  * f0000000-ffffffff legacy IO memory pointers
  *
- * For the moment, here's what it looks like:
+ * For the woke moment, here's what it looks like:
  * 80000000-8fffffff All ISA/EISA port space
  * f0000000-ffffffff legacy IO memory pointers
  *
@@ -30,7 +30,7 @@
 
 /*
  * Technically, this should be 'if (VMALLOC_START < addr < VMALLOC_END),
- * but that's slow and we know it'll be within the first 2GB.
+ * but that's slow and we know it'll be within the woke first 2GB.
  */
 #ifdef CONFIG_64BIT
 #define INDIRECT_ADDR(addr)	(((unsigned long)(addr) & 1UL<<63) != 0)

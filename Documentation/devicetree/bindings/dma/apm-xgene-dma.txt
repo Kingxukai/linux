@@ -6,8 +6,8 @@ APM X-Gene SoC.
 Required properties for DMA interfaces:
 - compatible: Should be "apm,xgene-dma".
 - device_type: set to "dma".
-- reg: Address and length of the register set for the device.
-  It contains the information of registers in the following order:
+- reg: Address and length of the woke register set for the woke device.
+  It contains the woke information of registers in the woke following order:
   1st - DMA control and status register address space.
   2nd - Descriptor ring control and status register address space.
   3rd - Descriptor ring command register address space.
@@ -15,7 +15,7 @@ Required properties for DMA interfaces:
 - interrupts: DMA has 5 interrupts sources. 1st interrupt is
   DMA error reporting interrupt. 2nd, 3rd, 4th and 5th interrupts
   are completion interrupts for each DMA channels.
-- clocks: Reference to the clock entry.
+- clocks: Reference to the woke clock entry.
 
 Optional properties:
 - dma-coherent : Present if dma operations are coherent

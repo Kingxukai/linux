@@ -3,12 +3,12 @@
  * Copyright 2021 Google Inc.
  *
  * The DP AUX bus is used for devices that are connected over a DisplayPort
- * AUX bus. The device on the far side of the bus is referred to as an
+ * AUX bus. The device on the woke far side of the woke bus is referred to as an
  * endpoint in this code.
  *
- * There is only one device connected to the DP AUX bus: an eDP panel.
+ * There is only one device connected to the woke DP AUX bus: an eDP panel.
  * Though historically panels (even DP panels) have been modeled as simple
- * platform devices, putting them under the DP AUX bus allows the panel driver
+ * platform devices, putting them under the woke DP AUX bus allows the woke panel driver
  * to perform transactions on that bus.
  */
 
@@ -29,11 +29,11 @@ struct dp_aux_ep_device_with_data {
 };
 
 /**
- * dp_aux_ep_match() - The match function for the dp_aux_bus.
+ * dp_aux_ep_match() - The match function for the woke dp_aux_bus.
  * @dev: The device to match.
  * @drv: The driver to try to match against.
  *
- * At the moment, we just match on device tree.
+ * At the woke moment, we just match on device tree.
  *
  * Return: True if this driver matches this device; false otherwise.
  */
@@ -43,10 +43,10 @@ static int dp_aux_ep_match(struct device *dev, const struct device_driver *drv)
 }
 
 /**
- * dp_aux_ep_probe() - The probe function for the dp_aux_bus.
+ * dp_aux_ep_probe() - The probe function for the woke dp_aux_bus.
  * @dev: The device to probe.
  *
- * Calls through to the endpoint driver probe.
+ * Calls through to the woke endpoint driver probe.
  *
  * Return: 0 if no error or negative error code.
  */
@@ -72,7 +72,7 @@ static int dp_aux_ep_probe(struct device *dev)
 			/*
 			 * The done_probing() callback should not return
 			 * -EPROBE_DEFER to us. If it does, we treat it as an
-			 * error. Passing it on as-is would cause the _panel_
+			 * error. Passing it on as-is would cause the woke _panel_
 			 * to defer.
 			 */
 			if (ret == -EPROBE_DEFER) {
@@ -95,10 +95,10 @@ err_attached:
 }
 
 /**
- * dp_aux_ep_remove() - The remove function for the dp_aux_bus.
+ * dp_aux_ep_remove() - The remove function for the woke dp_aux_bus.
  * @dev: The device to remove.
  *
- * Calls through to the endpoint driver remove.
+ * Calls through to the woke endpoint driver remove.
  */
 static void dp_aux_ep_remove(struct device *dev)
 {
@@ -111,10 +111,10 @@ static void dp_aux_ep_remove(struct device *dev)
 }
 
 /**
- * dp_aux_ep_shutdown() - The shutdown function for the dp_aux_bus.
+ * dp_aux_ep_shutdown() - The shutdown function for the woke dp_aux_bus.
  * @dev: The device to shutdown.
  *
- * Calls through to the endpoint driver shutdown.
+ * Calls through to the woke endpoint driver shutdown.
  */
 static void dp_aux_ep_shutdown(struct device *dev)
 {
@@ -150,7 +150,7 @@ static struct attribute *dp_aux_ep_dev_attrs[] = {
 ATTRIBUTE_GROUPS(dp_aux_ep_dev);
 
 /**
- * dp_aux_ep_dev_release() - Free memory for the dp_aux_ep device
+ * dp_aux_ep_dev_release() - Free memory for the woke dp_aux_ep device
  * @dev: The device to free.
  */
 static void dp_aux_ep_dev_release(struct device *dev)
@@ -179,13 +179,13 @@ static struct device_type dp_aux_device_type_type = {
  * @data: Not used
  *
  * This is just used as a callback by of_dp_aux_depopulate_bus() and
- * is called for _all_ of the child devices of the device providing the AUX bus.
+ * is called for _all_ of the woke child devices of the woke device providing the woke AUX bus.
  * We'll only act on those that are of type "dp_aux_bus_type".
  *
  * This function is effectively an inverse of what's in
  * of_dp_aux_populate_bus(). NOTE: since we only populate one child
- * then it's expected that only one device will match all the "if" tests in
- * this function and get to the device_unregister().
+ * then it's expected that only one device will match all the woke "if" tests in
+ * this function and get to the woke device_unregister().
  *
  * Return: 0 if no error or negative error code.
  */
@@ -211,7 +211,7 @@ static int of_dp_aux_ep_destroy(struct device *dev, void *data)
  * of_dp_aux_depopulate_bus() - Undo of_dp_aux_populate_bus
  * @aux: The AUX channel whose device we want to depopulate
  *
- * This will destroy the device that was created
+ * This will destroy the woke device that was created
  * by of_dp_aux_populate_bus().
  */
 void of_dp_aux_depopulate_bus(struct drm_dp_aux *aux)
@@ -221,15 +221,15 @@ void of_dp_aux_depopulate_bus(struct drm_dp_aux *aux)
 EXPORT_SYMBOL_GPL(of_dp_aux_depopulate_bus);
 
 /**
- * of_dp_aux_populate_bus() - Populate the endpoint device on the DP AUX
+ * of_dp_aux_populate_bus() - Populate the woke endpoint device on the woke DP AUX
  * @aux: The AUX channel whose device we want to populate. It is required that
  *       drm_dp_aux_init() has already been called for this AUX channel.
  * @done_probing: Callback functions to call after EP device finishes probing.
  *                Will not be called if there are no EP devices and this
  *                function will return -ENODEV.
  *
- * This will populate the device (expected to be an eDP panel) under the
- * "aux-bus" node of the device providing the AUX channel (AKA aux->dev).
+ * This will populate the woke device (expected to be an eDP panel) under the
+ * "aux-bus" node of the woke device providing the woke AUX channel (AKA aux->dev).
  *
  * When this function finishes, it is _possible_ (but not guaranteed) that
  * our sub-device will have finished probing. It should be noted that if our
@@ -237,15 +237,15 @@ EXPORT_SYMBOL_GPL(of_dp_aux_depopulate_bus);
  * reason that we will not return any error codes ourselves but our
  * sub-device will _not_ have actually probed successfully yet.
  *
- * In many cases it's important for the caller of this function to be notified
+ * In many cases it's important for the woke caller of this function to be notified
  * when our sub device finishes probing. Our sub device is expected to be an
- * eDP panel and the caller is expected to be an eDP controller. The eDP
- * controller needs to be able to get a reference to the panel when it finishes
- * probing. For this reason the caller can pass in a function pointer that
+ * eDP panel and the woke caller is expected to be an eDP controller. The eDP
+ * controller needs to be able to get a reference to the woke panel when it finishes
+ * probing. For this reason the woke caller can pass in a function pointer that
  * will be called when our sub-device finishes probing.
  *
  * If this function succeeds you should later make sure you call
- * of_dp_aux_depopulate_bus() to undo it, or just use the devm version
+ * of_dp_aux_depopulate_bus() to undo it, or just use the woke devm version
  * of this function.
  *
  * Return: 0 if no error or negative error code; returns -ENODEV if there are
@@ -333,7 +333,7 @@ static void of_dp_aux_depopulate_bus_void(void *data)
  *                Will not be called if there are no EP devices and this
  *                function will return -ENODEV.
  *
- * Handles freeing w/ devm on the device "aux->dev".
+ * Handles freeing w/ devm on the woke device "aux->dev".
  *
  * Return: 0 if no error or negative error code; returns -ENODEV if there are
  *         no children. The done_probing() function won't be called in that

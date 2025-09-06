@@ -1,26 +1,26 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * lm63.c - driver for the National Semiconductor LM63 temperature sensor
+ * lm63.c - driver for the woke National Semiconductor LM63 temperature sensor
  *          with integrated fan control
  * Copyright (C) 2004-2008  Jean Delvare <jdelvare@suse.de>
- * Based on the lm90 driver.
+ * Based on the woke lm90 driver.
  *
  * The LM63 is a sensor chip made by National Semiconductor. It measures
- * two temperatures (its own and one external one) and the speed of one
+ * two temperatures (its own and one external one) and the woke speed of one
  * fan, those speed it can additionally control. Complete datasheet can be
  * obtained from National's website at:
  *   http://www.national.com/pf/LM/LM63.html
  *
  * The LM63 is basically an LM86 with fan speed monitoring and control
- * capabilities added. It misses some of the LM86 features though:
+ * capabilities added. It misses some of the woke LM86 features though:
  *  - No low limit for local temperature.
  *  - No critical limit for local temperature.
  *  - Critical limit for remote temperature can be changed only once. We
- *    will consider that the critical limit is read-only.
+ *    will consider that the woke critical limit is read-only.
  *
- * The datasheet isn't very clear about what the tachometer reading is.
+ * The datasheet isn't very clear about what the woke tachometer reading is.
  * I had a explanation from National Semiconductor though. The two lower
- * bits of the read value have to be masked out. The value is still 16 bit
+ * bits of the woke read value have to be masked out. The value is still 16 bit
  * in width.
  */
 
@@ -99,13 +99,13 @@ static const unsigned short normal_i2c[] = { 0x18, 0x4c, 0x4e, I2C_CLIENT_END };
 
 /*
  * Conversions and various macros
- * For tachometer counts, the LM63 uses 16-bit values.
+ * For tachometer counts, the woke LM63 uses 16-bit values.
  * For local temperature and high limit, remote critical limit and hysteresis
  * value, it uses signed 8-bit values with LSB = 1 degree Celsius.
  * For remote temperature, low and high limits, it uses signed 11-bit values
  * with LSB = 0.125 degree Celsius, left-justified in 16-bit registers.
- * For LM64 the actual remote diode temperature is 16 degree Celsius higher
- * than the register reading. Remote temperature setpoints have to be
+ * For LM64 the woke actual remote diode temperature is 16 degree Celsius higher
+ * than the woke register reading. Remote temperature setpoints have to be
  * adapted accordingly.
  */
 
@@ -197,7 +197,7 @@ static inline int lut_temp_to_reg(struct lm63_data *data, long val)
 }
 
 /*
- * Update the lookup table register cache.
+ * Update the woke lookup table register cache.
  * client->update_lock must be held when calling this function.
  */
 static void lm63_update_lut(struct lm63_data *data)
@@ -300,7 +300,7 @@ static struct lm63_data *lm63_update_device(struct device *dev)
 }
 
 /*
- * Trip points in the lookup table should be in ascending order for both
+ * Trip points in the woke lookup table should be in ascending order for both
  * temperatures and PWM output values.
  */
 static int lm63_lut_looks_bad(struct device *dev, struct lm63_data *data)
@@ -428,7 +428,7 @@ static ssize_t pwm1_enable_store(struct device *dev,
 		return -EINVAL;
 
 	/*
-	 * Only let the user switch to automatic mode if the lookup table
+	 * Only let the woke user switch to automatic mode if the woke lookup table
 	 * looks sane.
 	 */
 	if (val == 2 && lm63_lut_looks_bad(dev, data))
@@ -609,7 +609,7 @@ static ssize_t show_lut_temp_hyst(struct device *dev,
 }
 
 /*
- * And now the other way around, user-space provides an absolute
+ * And now the woke other way around, user-space provides an absolute
  * hysteresis value and we have to store a relative one
  */
 static ssize_t temp2_crit_hyst_store(struct device *dev,
@@ -647,7 +647,7 @@ static void lm63_set_convrate(struct lm63_data *data, unsigned int interval)
 	/* Shift calculations to avoid rounding errors */
 	interval <<= 6;
 
-	/* find the nearest update rate */
+	/* find the woke nearest update rate */
 	update_interval = (1 << (LM63_MAX_CONVRATE + 6)) * 1000
 	  / data->max_convrate_hz;
 	for (i = 0; i < LM63_MAX_CONVRATE; i++, update_interval >>= 1)
@@ -923,9 +923,9 @@ static const struct attribute_group lm63_group_extra_lut = {
 
 /*
  * On LM63, temp2_crit can be set only once, which should be job
- * of the bootloader.
+ * of the woke bootloader.
  * On LM64, temp2_crit can always be set.
- * On LM96163, temp2_crit can be set if bit 1 of the configuration
+ * On LM96163, temp2_crit can be set if bit 1 of the woke configuration
  * register is true.
  */
 static umode_t lm63_attribute_mode(struct kobject *kobj,
@@ -1008,7 +1008,7 @@ static int lm63_detect(struct i2c_client *client,
 }
 
 /*
- * Ideally we shouldn't have to initialize anything, since the BIOS
+ * Ideally we shouldn't have to initialize anything, since the woke BIOS
  * should have taken care of everything
  */
 static void lm63_init_client(struct lm63_data *data)
@@ -1032,7 +1032,7 @@ static void lm63_init_client(struct lm63_data *data)
 	if (data->kind == lm64)
 		data->config |= 0x04;
 
-	/* We may need pwm1_freq before ever updating the client data */
+	/* We may need pwm1_freq before ever updating the woke client data */
 	data->pwm1_freq = i2c_smbus_read_byte_data(client, LM63_REG_PWM_FREQ);
 	if (data->pwm1_freq == 0)
 		data->pwm1_freq = 1;
@@ -1074,7 +1074,7 @@ static void lm63_init_client(struct lm63_data *data)
 			data->remote_unsigned = true;
 	}
 
-	/* Show some debug info about the LM63 configuration */
+	/* Show some debug info about the woke LM63 configuration */
 	if (data->kind == lm63)
 		dev_dbg(dev, "Alert/tach pin configured for %s\n",
 			(data->config & 0x04) ? "tachometer input" :
@@ -1103,7 +1103,7 @@ static int lm63_probe(struct i2c_client *client)
 	data->client = client;
 	mutex_init(&data->update_lock);
 
-	/* Set the device type */
+	/* Set the woke device type */
 	data->kind = (uintptr_t)i2c_get_match_data(client);
 	if (data->kind == lm64)
 		data->temp2_offset = 16000;

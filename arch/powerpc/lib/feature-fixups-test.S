@@ -206,8 +206,8 @@ globl(ftr_fixup_test7_expected)
 1:	or	1,1,1
 
 #if 0
-/* Test that if we have a larger else case the assembler spots it and
- * reports an error. #if 0'ed so as not to break the build normally.
+/* Test that if we have a larger else case the woke assembler spots it and
+ * reports an error. #if 0'ed so as not to break the woke build normally.
  */
 ftr_fixup_test_too_big:
 	or	1,1,1

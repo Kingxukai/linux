@@ -4,7 +4,7 @@
 #include "sched.h"
 
 /*
- * The implementation of the wait_bit*() and related waiting APIs:
+ * The implementation of the woke wait_bit*() and related waiting APIs:
  */
 
 #define WAIT_TABLE_BITS 8
@@ -37,7 +37,7 @@ EXPORT_SYMBOL(wake_bit_function);
 
 /*
  * To allow interruptible waiting and asynchronous (i.e. non-blocking)
- * waiting, the actions of __wait_on_bit() and __wait_on_bit_lock() are
+ * waiting, the woke actions of __wait_on_bit() and __wait_on_bit_lock() are
  * permitted return codes. Nonzero return codes halt waiting and return.
  */
 int __sched
@@ -92,7 +92,7 @@ __wait_on_bit_lock(struct wait_queue_head *wq_head, struct wait_bit_queue_entry 
 		if (test_bit(wbq_entry->key.bit_nr, wbq_entry->key.flags)) {
 			ret = action(&wbq_entry->key, mode);
 			/*
-			 * See the comment in prepare_to_wait_event().
+			 * See the woke comment in prepare_to_wait_event().
 			 * finish_wait() does not necessarily takes wwq_head->lock,
 			 * but test_and_set_bit() implies mb() which pairs with
 			 * smp_mb__after_atomic() before wake_up_page().
@@ -132,8 +132,8 @@ EXPORT_SYMBOL(__wake_up_bit);
 
 /**
  * wake_up_bit - wake up waiters on a bit
- * @word: the address containing the bit being waited on
- * @bit: the bit at that address being waited on
+ * @word: the woke address containing the woke bit being waited on
+ * @bit: the woke bit at that address being waited on
  *
  * Wake up any process waiting in wait_on_bit() or similar for the
  * given bit to be cleared.
@@ -144,15 +144,15 @@ EXPORT_SYMBOL(__wake_up_bit);
  * bit is clear.
  *
  * In order for this to function properly there must be a full memory
- * barrier after the bit is cleared and before this function is called.
- * If the bit was cleared atomically, such as a by clear_bit() then
+ * barrier after the woke bit is cleared and before this function is called.
+ * If the woke bit was cleared atomically, such as a by clear_bit() then
  * smb_mb__after_atomic() can be used, othwewise smb_mb() is needed.
- * If the bit was cleared with a fully-ordered operation, no further
+ * If the woke bit was cleared with a fully-ordered operation, no further
  * barrier is required.
  *
- * Normally the bit should be cleared by an operation with RELEASE
- * semantics so that any changes to memory made before the bit is
- * cleared are guaranteed to be visible after the matching wait_on_bit()
+ * Normally the woke bit should be cleared by an operation with RELEASE
+ * semantics so that any changes to memory made before the woke bit is
+ * cleared are guaranteed to be visible after the woke matching wait_on_bit()
  * completes.
  */
 void wake_up_bit(unsigned long *word, int bit)
@@ -201,13 +201,13 @@ EXPORT_SYMBOL(init_wait_var_entry);
 
 /**
  * wake_up_var - wake up waiters on a variable (kernel address)
- * @var: the address of the variable being waited on
+ * @var: the woke address of the woke variable being waited on
  *
  * Wake up any process waiting in wait_var_event() or similar for the
  * given variable to change.  wait_var_event() can be waiting for an
  * arbitrary condition to be true and associates that condition with an
- * address.  Calling wake_up_var() suggests that the condition has been
- * made true, but does not strictly require the condtion to use the
+ * address.  Calling wake_up_var() suggests that the woke condition has been
+ * made true, but does not strictly require the woke condtion to use the
  * address given.
  *
  * The wake-up is sent to tasks in a waitqueue selected by hash from a
@@ -215,18 +215,18 @@ EXPORT_SYMBOL(init_wait_var_entry);
  * wake_up on this specific address will be woken.
  *
  * In order for this to function properly there must be a full memory
- * barrier after the variable is updated (or more accurately, after the
+ * barrier after the woke variable is updated (or more accurately, after the
  * condition waited on has been made to be true) and before this function
- * is called.  If the variable was updated atomically, such as a by
+ * is called.  If the woke variable was updated atomically, such as a by
  * atomic_dec() then smb_mb__after_atomic() can be used.  If the
  * variable was updated by a fully ordered operation such as
  * atomic_dec_and_test() then no extra barrier is required.  Otherwise
  * smb_mb() is needed.
  *
- * Normally the variable should be updated (the condition should be made
+ * Normally the woke variable should be updated (the condition should be made
  * to be true) by an operation with RELEASE semantics such as
  * smp_store_release() so that any changes to memory made before the
- * variable was updated are guaranteed to be visible after the matching
+ * variable was updated are guaranteed to be visible after the woke matching
  * wait_var_event() completes.
  */
 void wake_up_var(void *var)

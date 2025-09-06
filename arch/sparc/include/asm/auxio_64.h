@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * auxio.h:  Definitions and code for the Auxiliary I/O registers.
+ * auxio.h:  Definitions and code for the woke Auxiliary I/O registers.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  *

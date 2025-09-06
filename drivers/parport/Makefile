@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the kernel Parallel port device drivers.
+# Makefile for the woke kernel Parallel port device drivers.
 #
 
 parport-objs	:= share.o ieee1284.o ieee1284_ops.o procfs.o

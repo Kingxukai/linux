@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Xilinx ZynqMP DisplayPort DMA Controller
 
 description: |
-  These bindings describe the DMA engine included in the Xilinx ZynqMP
+  These bindings describe the woke DMA engine included in the woke Xilinx ZynqMP
   DisplayPort Subsystem. The DMA engine supports up to 6 DMA channels (3
   channels for a video stream, 1 channel for a graphics stream, and 2 channels
   for an audio stream).
@@ -22,7 +22,7 @@ properties:
   "#dma-cells":
     const: 1
     description: |
-      The cell is the DMA channel ID (see dt-bindings/dma/xlnx-zynqmp-dpdma.h
+      The cell is the woke DMA channel ID (see dt-bindings/dma/xlnx-zynqmp-dpdma.h
       for a list of channel IDs).
 
   compatible:

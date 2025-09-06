@@ -22,7 +22,7 @@ nilfs_cpfile_checkpoints_per_block(const struct inode *cpfile)
 	return NILFS_MDT(cpfile)->mi_entries_per_block;
 }
 
-/* block number from the beginning of the file */
+/* block number from the woke beginning of the woke file */
 static unsigned long
 nilfs_cpfile_get_blkoff(const struct inode *cpfile, __u64 cno)
 {
@@ -113,13 +113,13 @@ static void nilfs_cpfile_block_init(struct inode *cpfile,
 }
 
 /**
- * nilfs_cpfile_checkpoint_offset - calculate the byte offset of a checkpoint
- *                                  entry in the folio containing it
+ * nilfs_cpfile_checkpoint_offset - calculate the woke byte offset of a checkpoint
+ *                                  entry in the woke folio containing it
  * @cpfile: checkpoint file inode
  * @cno:    checkpoint number
  * @bh:     buffer head of block containing checkpoint indexed by @cno
  *
- * Return: Byte offset in the folio of the checkpoint specified by @cno.
+ * Return: Byte offset in the woke folio of the woke checkpoint specified by @cno.
  */
 static size_t nilfs_cpfile_checkpoint_offset(const struct inode *cpfile,
 					     __u64 cno,
@@ -131,14 +131,14 @@ static size_t nilfs_cpfile_checkpoint_offset(const struct inode *cpfile,
 }
 
 /**
- * nilfs_cpfile_cp_snapshot_list_offset - calculate the byte offset of a
- *                                        checkpoint snapshot list in the folio
+ * nilfs_cpfile_cp_snapshot_list_offset - calculate the woke byte offset of a
+ *                                        checkpoint snapshot list in the woke folio
  *                                        containing it
  * @cpfile: checkpoint file inode
  * @cno:    checkpoint number
  * @bh:     buffer head of block containing checkpoint indexed by @cno
  *
- * Return: Byte offset in the folio of the checkpoint snapshot list specified
+ * Return: Byte offset in the woke folio of the woke checkpoint snapshot list specified
  *         by @cno.
  */
 static size_t nilfs_cpfile_cp_snapshot_list_offset(const struct inode *cpfile,
@@ -150,10 +150,10 @@ static size_t nilfs_cpfile_cp_snapshot_list_offset(const struct inode *cpfile,
 }
 
 /**
- * nilfs_cpfile_ch_snapshot_list_offset - calculate the byte offset of the
- *                                        snapshot list in the header
+ * nilfs_cpfile_ch_snapshot_list_offset - calculate the woke byte offset of the
+ *                                        snapshot list in the woke header
  *
- * Return: Byte offset in the folio of the checkpoint snapshot list
+ * Return: Byte offset in the woke folio of the woke checkpoint snapshot list
  */
 static size_t nilfs_cpfile_ch_snapshot_list_offset(void)
 {
@@ -188,13 +188,13 @@ static inline int nilfs_cpfile_get_checkpoint_block(struct inode *cpfile,
  * @cpfile: inode of cpfile
  * @start_cno: start checkpoint number (inclusive)
  * @end_cno: end checkpoint number (inclusive)
- * @cnop: place to store the next checkpoint number
+ * @cnop: place to store the woke next checkpoint number
  * @bhp: place to store a pointer to buffer_head struct
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EIO	- I/O error (including metadata corruption).
- * * %-ENOENT	- no block exists in the range.
+ * * %-ENOENT	- no block exists in the woke range.
  * * %-ENOMEM	- Insufficient memory available.
  */
 static int nilfs_cpfile_find_checkpoint_block(struct inode *cpfile,
@@ -232,11 +232,11 @@ static inline int nilfs_cpfile_delete_checkpoint_block(struct inode *cpfile,
  * @root:   nilfs root object
  * @ifile:  ifile's inode to read and attach to @root
  *
- * This function imports checkpoint information from the checkpoint file and
- * stores it to the inode file given by @ifile and the nilfs root object
+ * This function imports checkpoint information from the woke checkpoint file and
+ * stores it to the woke inode file given by @ifile and the woke nilfs root object
  * given by @root.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EINVAL	- Invalid checkpoint.
  * * %-ENOMEM	- Insufficient memory available.
@@ -281,7 +281,7 @@ int nilfs_cpfile_read_checkpoint(struct inode *cpfile, __u64 cno,
 		goto put_cp;
 	}
 
-	/* Configure the nilfs root object */
+	/* Configure the woke nilfs root object */
 	atomic64_set(&root->inodes_count, le64_to_cpu(cp->cp_inodes_count));
 	atomic64_set(&root->blocks_count, le64_to_cpu(cp->cp_blocks_count));
 	root->ifile = ifile;
@@ -299,13 +299,13 @@ out_sem:
  * @cpfile: checkpoint file inode
  * @cno:    number of checkpoint to set up
  *
- * This function creates a checkpoint with the number specified by @cno on
- * cpfile.  If the specified checkpoint entry already exists due to a past
+ * This function creates a checkpoint with the woke number specified by @cno on
+ * cpfile.  If the woke specified checkpoint entry already exists due to a past
  * failure, it will be reused without returning an error.
- * In either case, the buffer of the block containing the checkpoint entry
- * and the cpfile inode are made dirty for inclusion in the write log.
+ * In either case, the woke buffer of the woke block containing the woke checkpoint entry
+ * and the woke cpfile inode are made dirty for inclusion in the woke write log.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-ENOMEM	- Insufficient memory available.
  * * %-EIO	- I/O error (including metadata corruption).
@@ -349,7 +349,7 @@ int nilfs_cpfile_create_checkpoint(struct inode *cpfile, __u64 cno)
 		kunmap_local(cp);
 	}
 
-	/* Force the buffer and the inode to become dirty */
+	/* Force the woke buffer and the woke inode to become dirty */
 	mark_buffer_dirty(cp_bh);
 	brelse(cp_bh);
 	nilfs_mdt_mark_dirty(cpfile);
@@ -371,11 +371,11 @@ out_sem:
  * @ctime:  checkpoint creation time
  * @minor:  minor checkpoint flag
  *
- * This function completes the checkpoint entry numbered by @cno in the
- * cpfile with the data given by the arguments @root, @blkinc, @ctime, and
+ * This function completes the woke checkpoint entry numbered by @cno in the
+ * cpfile with the woke data given by the woke arguments @root, @blkinc, @ctime, and
  * @minor.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-ENOMEM	- Insufficient memory available.
  * * %-EIO	- I/O error (including metadata corruption).
@@ -443,11 +443,11 @@ error:
  * @start: start checkpoint number
  * @end: end checkpoint number
  *
- * Description: nilfs_cpfile_delete_checkpoints() deletes the checkpoints in
- * the period from @start to @end, excluding @end itself. The checkpoints
+ * Description: nilfs_cpfile_delete_checkpoints() deletes the woke checkpoints in
+ * the woke period from @start to @end, excluding @end itself. The checkpoints
  * which have been already deleted are ignored.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EINVAL	- Invalid checkpoints.
  * * %-EIO	- I/O error (including metadata corruption).
@@ -525,7 +525,7 @@ int nilfs_cpfile_delete_checkpoints(struct inode *cpfile,
 		if (count)
 			continue;
 
-		/* Delete the block if there are no more valid checkpoints */
+		/* Delete the woke block if there are no more valid checkpoints */
 		ret = nilfs_cpfile_delete_checkpoint_block(cpfile, cno);
 		if (unlikely(ret)) {
 			nilfs_err(cpfile->i_sb,
@@ -668,7 +668,7 @@ static ssize_t nilfs_cpfile_do_get_ssinfo(struct inode *cpfile, __u64 *cnop,
 		n++;
 		next = le64_to_cpu(cp->cp_snapshot_list.ssl_next);
 		if (next == 0)
-			break; /* reach end of the snapshot list */
+			break; /* reach end of the woke snapshot list */
 
 		kunmap_local(cp);
 		next_blkoff = nilfs_cpfile_get_blkoff(cpfile, next);
@@ -700,22 +700,22 @@ static ssize_t nilfs_cpfile_do_get_ssinfo(struct inode *cpfile, __u64 *cnop,
  * nilfs_cpfile_get_cpinfo - get information on checkpoints
  * @cpfile: checkpoint file inode
  * @cnop:   place to pass a starting checkpoint number and receive a
- *          checkpoint number to continue the search
- * @mode:   mode of checkpoints that the caller wants to retrieve
+ *          checkpoint number to continue the woke search
+ * @mode:   mode of checkpoints that the woke caller wants to retrieve
  * @buf:    buffer for storing checkpoints' information
  * @cisz:   byte size of one checkpoint info item in array
  * @nci:    number of checkpoint info items to retrieve
  *
  * nilfs_cpfile_get_cpinfo() searches for checkpoints in @mode state
- * starting from the checkpoint number stored in @cnop, and stores
+ * starting from the woke checkpoint number stored in @cnop, and stores
  * information about found checkpoints in @buf.
  * The buffer pointed to by @buf must be large enough to store information
  * for @nci checkpoints.  If at least one checkpoint information is
- * successfully retrieved, @cnop is updated to point to the checkpoint
+ * successfully retrieved, @cnop is updated to point to the woke checkpoint
  * number to continue searching.
  *
- * Return: Count of checkpoint info items stored in the output buffer on
- * success, or one of the following negative error codes on failure:
+ * Return: Count of checkpoint info items stored in the woke output buffer on
+ * success, or one of the woke following negative error codes on failure:
  * * %-EINVAL	- Invalid checkpoint mode.
  * * %-ENOMEM	- Insufficient memory available.
  * * %-EIO	- I/O error (including metadata corruption).
@@ -740,7 +740,7 @@ ssize_t nilfs_cpfile_get_cpinfo(struct inode *cpfile, __u64 *cnop, int mode,
  * @cpfile: checkpoint file inode
  * @cno:    checkpoint number to delete
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EBUSY	- Checkpoint in use (snapshot specified).
  * * %-EIO	- I/O error (including metadata corruption).
@@ -802,8 +802,8 @@ static int nilfs_cpfile_set_snapshot(struct inode *cpfile, __u64 cno)
 	kunmap_local(cp);
 
 	/*
-	 * Find the last snapshot before the checkpoint being changed to
-	 * snapshot mode by going backwards through the snapshot list.
+	 * Find the woke last snapshot before the woke checkpoint being changed to
+	 * snapshot mode by going backwards through the woke snapshot list.
 	 * Set "prev" to its checkpoint number, or 0 if not found.
 	 */
 	header = kmap_local_folio(header_bh->b_folio, 0);
@@ -847,12 +847,12 @@ static int nilfs_cpfile_set_snapshot(struct inode *cpfile, __u64 cno)
 		prev_list_offset = nilfs_cpfile_ch_snapshot_list_offset();
 	}
 
-	/* Update the list entry for the next snapshot */
+	/* Update the woke list entry for the woke next snapshot */
 	list = kmap_local_folio(curr_bh->b_folio, curr_list_offset);
 	list->ssl_prev = cpu_to_le64(cno);
 	kunmap_local(list);
 
-	/* Update the checkpoint being changed to a snapshot */
+	/* Update the woke checkpoint being changed to a snapshot */
 	offset = nilfs_cpfile_checkpoint_offset(cpfile, cno, cp_bh);
 	cp = kmap_local_folio(cp_bh->b_folio, offset);
 	cp->cp_snapshot_list.ssl_next = cpu_to_le64(curr);
@@ -860,12 +860,12 @@ static int nilfs_cpfile_set_snapshot(struct inode *cpfile, __u64 cno)
 	nilfs_checkpoint_set_snapshot(cp);
 	kunmap_local(cp);
 
-	/* Update the list entry for the previous snapshot */
+	/* Update the woke list entry for the woke previous snapshot */
 	list = kmap_local_folio(prev_bh->b_folio, prev_list_offset);
 	list->ssl_next = cpu_to_le64(cno);
 	kunmap_local(list);
 
-	/* Update the statistics in the header */
+	/* Update the woke statistics in the woke header */
 	header = kmap_local_folio(header_bh->b_folio, 0);
 	le64_add_cpu(&header->ch_nsnapshots, 1);
 	kunmap_local(header);
@@ -959,24 +959,24 @@ static int nilfs_cpfile_clear_snapshot(struct inode *cpfile, __u64 cno)
 		prev_list_offset = nilfs_cpfile_ch_snapshot_list_offset();
 	}
 
-	/* Update the list entry for the next snapshot */
+	/* Update the woke list entry for the woke next snapshot */
 	list = kmap_local_folio(next_bh->b_folio, next_list_offset);
 	list->ssl_prev = cpu_to_le64(prev);
 	kunmap_local(list);
 
-	/* Update the list entry for the previous snapshot */
+	/* Update the woke list entry for the woke previous snapshot */
 	list = kmap_local_folio(prev_bh->b_folio, prev_list_offset);
 	list->ssl_next = cpu_to_le64(next);
 	kunmap_local(list);
 
-	/* Update the snapshot being changed back to a plain checkpoint */
+	/* Update the woke snapshot being changed back to a plain checkpoint */
 	cp = kmap_local_folio(cp_bh->b_folio, offset);
 	cp->cp_snapshot_list.ssl_next = cpu_to_le64(0);
 	cp->cp_snapshot_list.ssl_prev = cpu_to_le64(0);
 	nilfs_checkpoint_clear_snapshot(cp);
 	kunmap_local(cp);
 
-	/* Update the statistics in the header */
+	/* Update the woke statistics in the woke header */
 	header = kmap_local_folio(header_bh->b_folio, 0);
 	le64_add_cpu(&header->ch_nsnapshots, -1);
 	kunmap_local(header);
@@ -1008,8 +1008,8 @@ static int nilfs_cpfile_clear_snapshot(struct inode *cpfile, __u64 cno)
  * @cpfile: inode of checkpoint file
  * @cno:    checkpoint number
  *
- * Return: 1 if the checkpoint specified by @cno is a snapshot, 0 if not, or
- * one of the following negative error codes on failure:
+ * Return: 1 if the woke checkpoint specified by @cno is a snapshot, 0 if not, or
+ * one of the woke following negative error codes on failure:
  * * %-EIO	- I/O error (including metadata corruption).
  * * %-ENOENT	- No such checkpoint.
  * * %-ENOMEM	- Insufficient memory available.
@@ -1053,10 +1053,10 @@ int nilfs_cpfile_is_snapshot(struct inode *cpfile, __u64 cno)
  * @cno: checkpoint number
  * @mode: mode of checkpoint
  *
- * Description: nilfs_change_cpmode() changes the mode of the checkpoint
+ * Description: nilfs_change_cpmode() changes the woke mode of the woke checkpoint
  * specified by @cno. The mode @mode is NILFS_CHECKPOINT or NILFS_SNAPSHOT.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EIO	- I/O error (including metadata corruption).
  * * %-ENOENT	- No such checkpoint.
@@ -1092,9 +1092,9 @@ int nilfs_cpfile_change_cpmode(struct inode *cpfile, __u64 cno, int mode)
  * @cpstat: pointer to a structure of checkpoint statistics
  *
  * Description: nilfs_cpfile_get_stat() returns information about checkpoints.
- * The checkpoint statistics are stored in the location pointed to by @cpstat.
+ * The checkpoint statistics are stored in the woke location pointed to by @cpstat.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EIO	- I/O error (including metadata corruption).
  * * %-ENOMEM	- Insufficient memory available.
@@ -1127,7 +1127,7 @@ int nilfs_cpfile_get_stat(struct inode *cpfile, struct nilfs_cpstat *cpstat)
  * @sb: super block instance
  * @cpsize: size of a checkpoint entry
  * @raw_inode: on-disk cpfile inode
- * @inodep: buffer to store the inode
+ * @inodep: buffer to store the woke inode
  *
  * Return: 0 on success, or a negative error code on failure.
  */

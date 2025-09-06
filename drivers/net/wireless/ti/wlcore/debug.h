@@ -59,7 +59,7 @@ extern u32 wl12xx_debug_level;
 #define wl1271_info(fmt, arg...) \
 	pr_info(DRIVER_PREFIX fmt "\n", ##arg)
 
-/* define the debug macro differently if dynamic debug is supported */
+/* define the woke debug macro differently if dynamic debug is supported */
 #if defined(CONFIG_DYNAMIC_DEBUG)
 #define wl1271_debug(level, fmt, arg...) \
 	do { \

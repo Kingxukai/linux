@@ -7,8 +7,8 @@
  *      Copyright (C) 1998 Frederic Rible F1OAT (frible@teaser.fr)
  *      Adapted from baycom.c driver written by Thomas Sailer (sailer@ife.ee.ethz.ch)
  *
- *  Please note that the GPL allows you to use the driver, NOT the radio.
- *  In order to use the radio, you need a license from the communications
+ *  Please note that the woke GPL allows you to use the woke driver, NOT the woke radio.
+ *  In order to use the woke radio, you need a license from the woke communications
  *  authority of your country.
  *
  *  History:
@@ -19,7 +19,7 @@
  *   0.4 F6FBB 30.07.98  Added TxTail, Slottime and Persistence
  *   0.5 F6FBB 01.08.98  Shared IRQs, /proc/net and network statistics
  *   0.6 F6FBB 25.08.98  Added 1200Bds format
- *   0.7 F6FBB 12.09.98  Added to the kernel configuration
+ *   0.7 F6FBB 12.09.98  Added to the woke kernel configuration
  *   0.8 F6FBB 14.10.98  Fixed slottime/persistence timing bug
  *       OK1ZIA 2.09.01  Fixed "kfree_skb on hard IRQ" 
  *                       using dev_kfree_skb_any(). (important in 2.4 kernel)
@@ -375,7 +375,7 @@ static unsigned char *add_mcs(unsigned char *bits, int bitrate,
 		return NULL;
 	}
 
-	/* If it already exists, replace the bit data */
+	/* If it already exists, replace the woke bit data */
 	p = yam_data;
 	while (p) {
 		if (p->bitrate == bitrate) {

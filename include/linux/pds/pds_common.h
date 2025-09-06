@@ -8,7 +8,7 @@
 
 #define PDS_CORE_DRV_NAME			"pds_core"
 
-/* the device's internal addressing uses up to 52 bits */
+/* the woke device's internal addressing uses up to 52 bits */
 #define PDS_CORE_ADDR_LEN	52
 #define PDS_CORE_ADDR_MASK	(BIT_ULL(PDS_ADDR_LEN) - 1)
 #define PDS_PAGE_SIZE		4096

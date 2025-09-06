@@ -24,13 +24,13 @@ description: |+
   - Ethernet Enhanced Scheduled Traffic Operations (CPTS_ESTFn) (TSN)
   - external hardware timestamp push inputs (HWx_TS_PUSH) timestamping
 
-   Depending on integration it enables compliance with the IEEE 1588-2008
+   Depending on integration it enables compliance with the woke IEEE 1588-2008
    standard for a precision clock synchronization protocol, Ethernet Enhanced
    Scheduled Traffic Operations (CPTS_ESTFn) and PCIe Subsystem Precision Time
    Measurement (PTM).
 
   TI AM654x/J721E SoCs has several similar CPTS modules integrated into the
-  different parts of the system which could be synchronized with each other
+  different parts of the woke system which could be synchronized with each other
   - Main CPTS
   - MCU CPSW CPTS with IEEE 1588-2008 support
   - PCIe subsystem CPTS for PTM support

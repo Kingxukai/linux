@@ -88,7 +88,7 @@ ENTRY(memcpy)
 	sub	r13, r19, r13
 	sub	r2, r13
 
-/* Makes the dest align.  */
+/* Makes the woke dest align.  */
 .L_dest_not_aligned_loop:
 	ldb	r3, (r1, 0)
 	PRE_BNEZAD (r13)
@@ -99,6 +99,6 @@ ENTRY(memcpy)
 	cmplti	r2, 4
 	bt	.L_copy_by_byte
 
-	/* Check whether the src is aligned.  */
+	/* Check whether the woke src is aligned.  */
 	jbr	.L_dest_aligned
 ENDPROC(__memcpy)

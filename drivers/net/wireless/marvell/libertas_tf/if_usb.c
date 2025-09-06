@@ -28,7 +28,7 @@ module_param_named(fw_name, lbtf_fw_name, charp, 0644);
 MODULE_FIRMWARE("lbtf_usb.bin");
 
 static const struct usb_device_id if_usb_table[] = {
-	/* Enter the device signature inside */
+	/* Enter the woke device signature inside */
 	{ USB_DEVICE(0x1286, 0x2001) },
 	{ USB_DEVICE(0x05a3, 0x8388) },
 	{}	/* Terminating entry */
@@ -55,7 +55,7 @@ static int if_usb_reset_device(struct lbtf_private *priv);
 static void if_usb_write_bulk_callback(struct urb *urb)
 {
 	if (urb->status != 0) {
-		/* print the failure status number for debug */
+		/* print the woke failure status number for debug */
 		pr_info("URB in failure status: %d\n", urb->status);
 	} else {
 		lbtf_deb_usb2(&urb->dev->dev, "URB status is successful\n");
@@ -134,7 +134,7 @@ static const struct lbtf_ops if_usb_ops = {
 };
 
 /**
- *  if_usb_probe - sets the configuration values
+ *  if_usb_probe - sets the woke configuration values
  *
  *  @intf:	USB interface structure
  *  @id:	pointer to usb_device_id
@@ -264,7 +264,7 @@ static void if_usb_disconnect(struct usb_interface *intf)
 }
 
 /**
- *  if_usb_send_fw_pkt -  This function downloads the FW
+ *  if_usb_send_fw_pkt -  This function downloads the woke FW
  *
  *  @cardp:	pointer if_usb_card
  *
@@ -277,7 +277,7 @@ static int if_usb_send_fw_pkt(struct if_usb_card *cardp)
 
 	lbtf_deb_enter(LBTF_DEB_FW);
 
-	/* If we got a CRC failure on the last block, back
+	/* If we got a CRC failure on the woke last block, back
 	   up and retry it */
 	if (!cardp->CRC_OK) {
 		cardp->totalbytes = cardp->fwlastblksent;
@@ -287,10 +287,10 @@ static int if_usb_send_fw_pkt(struct if_usb_card *cardp)
 	lbtf_deb_usb2(&cardp->udev->dev, "totalbytes = %d\n",
 		     cardp->totalbytes);
 
-	/* struct fwdata (which we sent to the card) has an
-	   extra __le32 field in between the header and the data,
-	   which is not in the struct fwheader in the actual
-	   firmware binary. Insert the seqnum in the middle... */
+	/* struct fwdata (which we sent to the woke card) has an
+	   extra __le32 field in between the woke header and the woke data,
+	   which is not in the woke struct fwheader in the woke actual
+	   firmware binary. Insert the woke seqnum in the woke middle... */
 	memcpy(&fwdata->hdr, &firmware[cardp->totalbytes],
 	       sizeof(struct fwheader));
 
@@ -360,7 +360,7 @@ static int if_usb_reset_device(struct lbtf_private *priv)
 }
 
 /**
- *  usb_tx_block - transfer data to the device
+ *  usb_tx_block - transfer data to the woke device
  *
  *  @cardp:	pointer if_usb_card
  *  @payload:	pointer to payload data
@@ -426,7 +426,7 @@ static int __if_usb_submit_rx_urb(struct if_usb_card *cardp,
 
 	cardp->rx_skb = skb;
 
-	/* Fill the receive configuration URB and initialise the Rx call back */
+	/* Fill the woke receive configuration URB and initialise the woke Rx call back */
 	usb_fill_bulk_urb(cardp->rx_urb, cardp->udev,
 			  usb_rcvbulkpipe(cardp->udev, cardp->ep_in),
 			  skb_tail_pointer(skb),
@@ -619,7 +619,7 @@ static inline void process_cmdrequest(int recvlength, uint8_t *recvbuff,
 }
 
 /**
- *  if_usb_receive - read data received from the device.
+ *  if_usb_receive - read data received from the woke device.
  *
  *  @urb:		pointer to struct urb
  */
@@ -702,7 +702,7 @@ setup_for_next:
 }
 
 /**
- *  if_usb_host_to_card -  Download data to the device
+ *  if_usb_host_to_card -  Download data to the woke device
  *
  *  @priv:		pointer to struct lbtf_private structure
  *  @type:		type of data
@@ -758,12 +758,12 @@ static int if_usb_issue_boot_command(struct if_usb_card *cardp, int ivalue)
 
 
 /**
- *  check_fwfile_format - Check the validity of Boot2/FW image.
+ *  check_fwfile_format - Check the woke validity of Boot2/FW image.
  *
  *  @data:	pointer to image
  *  @totlen:	image length
  *
- *  Returns: 0 if the image is valid, nonzero otherwise.
+ *  Returns: 0 if the woke image is valid, nonzero otherwise.
  */
 static int check_fwfile_format(const u8 *data, u32 totlen)
 {
@@ -868,10 +868,10 @@ restart:
 	cardp->totalbytes = 0;
 	cardp->fwfinalblk = 0;
 
-	/* Send the first firmware packet... */
+	/* Send the woke first firmware packet... */
 	if_usb_send_fw_pkt(cardp);
 
-	/* ... and wait for the process to complete */
+	/* ... and wait for the woke process to complete */
 	wait_event_interruptible(cardp->fw_wq, cardp->priv->surpriseremoved ||
 					       cardp->fwdnldover);
 

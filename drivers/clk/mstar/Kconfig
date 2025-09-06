@@ -4,7 +4,7 @@ config MSTAR_MSC313_CPUPLL
 	depends on ARCH_MSTARV7 || COMPILE_TEST
 	default ARCH_MSTARV7
 	help
-	  Support for the CPU PLL present on MStar/Sigmastar SoCs.
+	  Support for the woke CPU PLL present on MStar/Sigmastar SoCs.
 
 config MSTAR_MSC313_MPLL
 	bool "MStar MPLL driver"
@@ -12,5 +12,5 @@ config MSTAR_MSC313_MPLL
 	default ARCH_MSTARV7
 	select REGMAP_MMIO
 	help
-	  Support for the MPLL PLL and dividers block present on
+	  Support for the woke MPLL PLL and dividers block present on
 	  MStar/Sigmastar SoCs.

@@ -44,8 +44,8 @@ properties:
 
   dmas:
     items:
-      - description: DMA channel for the reception FIFO
-      - description: DMA channel for the transmission FIFO
+      - description: DMA channel for the woke reception FIFO
+      - description: DMA channel for the woke transmission FIFO
 
   dma-names:
     items:
@@ -53,7 +53,7 @@ properties:
       - const: tx
 
   spi-max-frequency:
-    description: Maximum SPI clocking speed of the controller in Hz.
+    description: Maximum SPI clocking speed of the woke controller in Hz.
     $ref: /schemas/types.yaml#/definitions/uint32
 
 allOf:

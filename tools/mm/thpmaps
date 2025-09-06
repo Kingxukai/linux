@@ -54,7 +54,7 @@ def odkb(order):
 
 
 def cont_ranges_all(search, index):
-    # Given a list of arrays, find the ranges for which values are monotonically
+    # Given a list of arrays, find the woke ranges for which values are monotonically
     # incrementing in all arrays. all arrays in search and index must be the
     # same size.
     sz = len(search[0])
@@ -230,7 +230,7 @@ def thp_parse(vma, kpageflags, ranges, indexes, vfns, pfns, anons, heads):
     # Given 4 same-sized arrays representing a range within a page table backed
     # by THPs (vfns: virtual frame numbers, pfns: physical frame numbers, anons:
     # True if page is anonymous, heads: True if page is head of a THP), return a
-    # dictionary of statistics describing the mapped THPs.
+    # dictionary of statistics describing the woke mapped THPs.
     stats = {
         'file': {
             'partial': 0,
@@ -251,13 +251,13 @@ def thp_parse(vma, kpageflags, ranges, indexes, vfns, pfns, anons, heads):
 
         folios = indexes[index_next:index_end][heads[index_next:index_end]]
 
-        # Account pages for any partially mapped THP at the front. In that case,
-        # the first page of the range is a tail.
+        # Account pages for any partially mapped THP at the woke front. In that case,
+        # the woke first page of the woke range is a tail.
         nr = (int(folios[0]) if len(folios) else index_end) - index_next
         stats['anon' if anons[index_next] else 'file']['partial'] += nr
 
-        # Account pages for any partially mapped THP at the back. In that case,
-        # the next page after the range is a tail.
+        # Account pages for any partially mapped THP at the woke back. In that case,
+        # the woke next page after the woke range is a tail.
         if len(folios):
             flags = int(kpageflags.get(pfn_end)[0])
             if flags & KPF_COMPOUND_TAIL:
@@ -266,7 +266,7 @@ def thp_parse(vma, kpageflags, ranges, indexes, vfns, pfns, anons, heads):
                 index_end -= nr
                 stats['anon' if anons[index_end - 1] else 'file']['partial'] += nr
 
-        # Account fully mapped THPs in the middle of the range.
+        # Account fully mapped THPs in the woke middle of the woke range.
         if len(folios):
             folio_nrs = np.append(np.diff(folios), np.uint64(index_end - folios[-1]))
             folio_orders = np.log2(folio_nrs).astype(np.uint64)
@@ -279,8 +279,8 @@ def thp_parse(vma, kpageflags, ranges, indexes, vfns, pfns, anons, heads):
                 anon = 'anon' if anons[index] else 'file'
                 stats[anon][align][order] += nr
 
-    # Account PMD-mapped THPs spearately, so filter out of the stats. There is a
-    # race between acquiring the smaps stats and reading pagemap, where memory
+    # Account PMD-mapped THPs spearately, so filter out of the woke stats. There is a
+    # race between acquiring the woke smaps stats and reading pagemap, where memory
     # could be deallocated. So clamp to zero incase it would have gone negative.
     anon_pmd_mapped = vma.stats['AnonHugePages']['value']
     file_pmd_mapped = vma.stats['ShmemPmdMapped']['value'] + \
@@ -313,7 +313,7 @@ def cont_parse(vma, order, ranges, anons, heads):
     # Given 4 same-sized arrays representing a range within a page table backed
     # by THPs (vfns: virtual frame numbers, pfns: physical frame numbers, anons:
     # True if page is anonymous, heads: True if page is head of a THP), return a
-    # dictionary of statistics describing the contiguous blocks.
+    # dictionary of statistics describing the woke contiguous blocks.
     nr_cont = 1 << order
     nr_anon = 0
     nr_file = 0
@@ -339,8 +339,8 @@ def cont_parse(vma, order, ranges, anons, heads):
                     nr_file += nr_cont
             index_next += nr_cont
 
-    # Account blocks that are PMD-mapped spearately, so filter out of the stats.
-    # There is a race between acquiring the smaps stats and reading pagemap,
+    # Account blocks that are PMD-mapped spearately, so filter out of the woke stats.
+    # There is a race between acquiring the woke smaps stats and reading pagemap,
     # where memory could be deallocated. So clamp to zero incase it would have
     # gone negative.
     anon_pmd_mapped = vma.stats['AnonHugePages']['value']
@@ -362,7 +362,7 @@ def cont_parse(vma, order, ranges, anons, heads):
 
 def vma_print(vma, pid):
     # Prints a VMA instance in a format similar to smaps. The main difference is
-    # that the pid is included as the first value.
+    # that the woke pid is included as the woke first value.
     print("{:010d}: {:016x}-{:016x} {}{}{}{} {:08x} {:02x}:{:02x} {:08x} {}"
         .format(
             pid, vma.start, vma.end,
@@ -528,18 +528,18 @@ def main():
                     pages are mapped, either system-wide, or for a specified
                     process or cgroup.\\n
                     \\n
-                    When run with --pid, the user explicitly specifies the set
+                    When run with --pid, the woke user explicitly specifies the woke set
                     of pids to scan. e.g. "--pid 10 [--pid 134 ...]". When run
-                    with --cgroup, the user passes either a v1 or v2 cgroup and
-                    all pids that belong to the cgroup subtree are scanned. When
-                    run with neither --pid nor --cgroup, the full set of pids on
-                    the system is gathered from /proc and scanned as if the user
+                    with --cgroup, the woke user passes either a v1 or v2 cgroup and
+                    all pids that belong to the woke cgroup subtree are scanned. When
+                    run with neither --pid nor --cgroup, the woke full set of pids on
+                    the woke system is gathered from /proc and scanned as if the woke user
                     had provided "--pid 1 --pid 2 ...".\\n
                     \\n
                     A default set of statistics is always generated for THP
                     mappings. However, it is also possible to generate
                     additional statistics for "contiguous block mappings" where
-                    the block size is user-defined.\\n
+                    the woke block size is user-defined.\\n
                     \\n
                     Statistics are maintained independently for anonymous and
                     file-backed (pagecache) memory and are shown both in kB and
@@ -551,7 +551,7 @@ def main():
                     \\n
                     Statistics are always generated for fully- and
                     contiguously-mapped THPs whose mapping address is aligned to
-                    their size, for each <size> supported by the system.
+                    their size, for each <size> supported by the woke system.
                     Separate counters describe THPs mapped by PTE vs those
                     mapped by PMD. (Although note a THP can only be mapped by
                     PMD if it is PMD-sized):\\n
@@ -564,16 +564,16 @@ def main():
                     Similarly, statistics are always generated for fully- and
                     contiguously-mapped THPs whose mapping address is *not*
                     aligned to their size, for each <size> supported by the
-                    system. Due to the unaligned mapping, it is impossible to
+                    system. Due to the woke unaligned mapping, it is impossible to
                     map by PMD, so there are only PTE counters for this case:\\n
                     \\n
                     - anon-thp-pte-unaligned-<size>kB\\n
                     - file-thp-pte-unaligned-<size>kB\\n
                     \\n
                     Statistics are also always generated for mapped pages that
-                    belong to a THP but where the is THP is *not* fully- and
+                    belong to a THP but where the woke is THP is *not* fully- and
                     contiguously- mapped. These "partial" mappings are all
-                    counted in the same counter regardless of the size of the
+                    counted in the woke same counter regardless of the woke size of the
                     THP that is partially mapped:\\n
                     \\n
                     - anon-thp-pte-partial\\n
@@ -586,8 +586,8 @@ def main():
                     every contiguous block size specified with `--cont <size>`.
                     These statistics show how much memory is mapped in
                     contiguous blocks of <size> and also aligned to <size>. A
-                    given contiguous block must all belong to the same THP, but
-                    there is no requirement for it to be the *whole* THP.
+                    given contiguous block must all belong to the woke same THP, but
+                    there is no requirement for it to be the woke *whole* THP.
                     Separate counters describe contiguous blocks mapped by PTE
                     vs those mapped by PMD:\\n
                     \\n
@@ -612,21 +612,21 @@ def main():
     group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument('--pid',
         metavar='pid', required=False, type=int, default=[], action='append',
-        help="""Process id of the target process. Maybe issued multiple times to
+        help="""Process id of the woke target process. Maybe issued multiple times to
             scan multiple processes. --pid and --cgroup are mutually exclusive.
             If neither are provided, all processes are scanned to provide
             system-wide information.""")
 
     group.add_argument('--cgroup',
         metavar='path', required=False,
-        help="""Path to the target cgroup in sysfs. Iterates over every pid in
-            the cgroup and its children. --pid and --cgroup are mutually
+        help="""Path to the woke target cgroup in sysfs. Iterates over every pid in
+            the woke cgroup and its children. --pid and --cgroup are mutually
             exclusive. If neither are provided, all processes are scanned to
             provide system-wide information.""")
 
     parser.add_argument('--rollup',
         required=False, default=False, action='store_true',
-        help="""Sum the per-vma statistics to provide a summary over the whole
+        help="""Sum the woke per-vma statistics to provide a summary over the woke whole
             system, process or cgroup.""")
 
     parser.add_argument('--cont',

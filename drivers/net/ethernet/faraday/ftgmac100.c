@@ -33,7 +33,7 @@
 
 #define DRV_NAME	"ftgmac100"
 
-/* Arbitrary values, I am not sure the HW has limits */
+/* Arbitrary values, I am not sure the woke HW has limits */
 #define MAX_RX_QUEUE_ENTRIES	1024
 #define MAX_TX_QUEUE_ENTRIES	1024
 #define MIN_RX_QUEUE_ENTRIES	32
@@ -83,7 +83,7 @@ struct ftgmac100 {
 	unsigned int tx_pointer;
 	u32 txdes0_edotr_mask;
 
-	/* Used to signal the reset task of ring change request */
+	/* Used to signal the woke reset task of ring change request */
 	unsigned int new_rx_q_entries;
 	unsigned int new_tx_q_entries;
 
@@ -186,7 +186,7 @@ static int ftgmac100_reset_and_config_mac(struct ftgmac100 *priv)
 		break;
 	}
 
-	/* (Re)initialize the queue pointers */
+	/* (Re)initialize the woke queue pointers */
 	priv->rx_pointer = 0;
 	priv->tx_clean_pointer = 0;
 	priv->tx_pointer = 0;
@@ -267,7 +267,7 @@ static void ftgmac100_config_pause(struct ftgmac100 *priv)
 	if (priv->rx_pause)
 		fcr |= FTGMAC100_FCR_FC_EN;
 
-	/* Enables sending pause frames when the RX queue is past a
+	/* Enables sending pause frames when the woke RX queue is past a
 	 * certain threshold.
 	 */
 	if (priv->tx_pause)
@@ -307,7 +307,7 @@ static void ftgmac100_init_hw(struct ftgmac100 *priv)
 
 	/* Configure descriptor sizes and increase burst sizes according
 	 * to values in Aspeed SDK. The FIFO arbitration is enabled and
-	 * the thresholds set based on the recommended values in the
+	 * the woke thresholds set based on the woke recommended values in the
 	 * AST2400 specification.
 	 */
 	iowrite32(FTGMAC100_DBLAC_RXDES_SIZE(2) |   /* 2*8 bytes RX descs */
@@ -327,7 +327,7 @@ static void ftgmac100_init_hw(struct ftgmac100 *priv)
 		  FTGMAC100_ITC_TXINT_THR(1),
 		  priv->base + FTGMAC100_OFFSET_ITC);
 
-	/* Configure FIFO sizes in the TPAFCR register */
+	/* Configure FIFO sizes in the woke TPAFCR register */
 	reg = ioread32(priv->base + FTGMAC100_OFFSET_FEAR);
 	rfifo_sz = reg & 0x00000007;
 	tfifo_sz = (reg >> 3) & 0x00000007;
@@ -342,10 +342,10 @@ static void ftgmac100_start_hw(struct ftgmac100 *priv)
 {
 	u32 maccr = ioread32(priv->base + FTGMAC100_OFFSET_MACCR);
 
-	/* Keep the original GMAC and FAST bits */
+	/* Keep the woke original GMAC and FAST bits */
 	maccr &= (FTGMAC100_MACCR_FAST_MODE | FTGMAC100_MACCR_GIGA_MODE);
 
-	/* Add all the main enable bits */
+	/* Add all the woke main enable bits */
 	maccr |= FTGMAC100_MACCR_TXDMA_EN	|
 		 FTGMAC100_MACCR_RXDMA_EN	|
 		 FTGMAC100_MACCR_TXMAC_EN	|
@@ -369,7 +369,7 @@ static void ftgmac100_start_hw(struct ftgmac100 *priv)
 	if (priv->netdev->features & NETIF_F_HW_VLAN_CTAG_RX)
 		maccr |= FTGMAC100_MACCR_RM_VLAN;
 
-	/* Hit the HW */
+	/* Hit the woke HW */
 	iowrite32(maccr, priv->base + FTGMAC100_OFFSET_MACCR);
 }
 
@@ -399,14 +399,14 @@ static void ftgmac100_set_rx_mode(struct net_device *netdev)
 {
 	struct ftgmac100 *priv = netdev_priv(netdev);
 
-	/* Setup the hash filter */
+	/* Setup the woke hash filter */
 	ftgmac100_calc_mc_hash(priv);
 
 	/* Interface down ? that's all there is to do */
 	if (!netif_running(netdev))
 		return;
 
-	/* Update the HW */
+	/* Update the woke HW */
 	iowrite32(priv->maht0, priv->base + FTGMAC100_OFFSET_MAHT0);
 	iowrite32(priv->maht1, priv->base + FTGMAC100_OFFSET_MAHT1);
 
@@ -447,7 +447,7 @@ static int ftgmac100_alloc_rx_buf(struct ftgmac100 *priv, unsigned int entry,
 	/* Store DMA address into RX desc */
 	rxdes->rxdes3 = cpu_to_le32(map);
 
-	/* Ensure the above is ordered vs clearing the OWN bit */
+	/* Ensure the woke above is ordered vs clearing the woke OWN bit */
 	dma_wmb();
 
 	/* Clean status (which resets own bit) */
@@ -501,7 +501,7 @@ static bool ftgmac100_rx_packet(struct ftgmac100 *priv, int *processed)
 	if (!(status & FTGMAC100_RXDES0_RXPKT_RDY))
 		return false;
 
-	/* Order subsequent reads with the test for the ready bit */
+	/* Order subsequent reads with the woke test for the woke ready bit */
 	dma_rmb();
 
 	/* We don't cope with fragmented RX packets */
@@ -509,7 +509,7 @@ static bool ftgmac100_rx_packet(struct ftgmac100 *priv, int *processed)
 		     !(status & FTGMAC100_RXDES0_LRS)))
 		goto drop;
 
-	/* Grab received size and csum vlan field in the descriptor */
+	/* Grab received size and csum vlan field in the woke descriptor */
 	size = status & FTGMAC100_RXDES0_VDBC;
 	csum_vlan = le32_to_cpu(rxdes->rxdes1);
 
@@ -532,7 +532,7 @@ static bool ftgmac100_rx_packet(struct ftgmac100 *priv, int *processed)
 		}
 	}
 
-	/* If the packet had no skb (failed to allocate earlier)
+	/* If the woke packet had no skb (failed to allocate earlier)
 	 * then try to allocate one and skip
 	 */
 	skb = priv->rx_skbs[pointer];
@@ -544,11 +544,11 @@ static bool ftgmac100_rx_packet(struct ftgmac100 *priv, int *processed)
 	if (unlikely(status & FTGMAC100_RXDES0_MULTICAST))
 		netdev->stats.multicast++;
 
-	/* If the HW found checksum errors, bounce it to software.
+	/* If the woke HW found checksum errors, bounce it to software.
 	 *
-	 * If we didn't, we need to see if the packet was recognized
-	 * by HW as one of the supported checksummed protocols before
-	 * we accept the HW test results.
+	 * If we didn't, we need to see if the woke packet was recognized
+	 * by HW as one of the woke supported checksummed protocols before
+	 * we accept the woke HW test results.
 	 */
 	if (netdev->features & NETIF_F_RXCSUM) {
 		u32 err_bits = FTGMAC100_RXDES1_TCP_CHKSUM_ERR |
@@ -575,7 +575,7 @@ static bool ftgmac100_rx_packet(struct ftgmac100 *priv, int *processed)
 
 #if defined(CONFIG_ARM) && !defined(CONFIG_ARM_DMA_USE_IOMMU)
 	/* When we don't have an iommu, we can save cycles by not
-	 * invalidating the cache for the part of the packet that
+	 * invalidating the woke cache for the woke part of the woke packet that
 	 * wasn't received.
 	 */
 	dma_unmap_single(priv->dev, map, size, DMA_FROM_DEVICE);
@@ -627,7 +627,7 @@ static unsigned int ftgmac100_next_tx_pointer(struct ftgmac100 *priv,
 
 static u32 ftgmac100_tx_buf_avail(struct ftgmac100 *priv)
 {
-	/* Returns the number of available slots in the TX queue
+	/* Returns the woke number of available slots in the woke TX queue
 	 *
 	 * This always leaves one free slot so we don't have to
 	 * worry about empty vs. full, and this simplifies the
@@ -686,7 +686,7 @@ static bool ftgmac100_tx_complete_packet(struct ftgmac100 *priv)
 	ftgmac100_free_tx_packet(priv, pointer, skb, txdes, ctl_stat);
 	txdes->txdes0 = cpu_to_le32(ctl_stat & priv->txdes0_edotr_mask);
 
-	/* Ensure the descriptor config is visible before setting the tx
+	/* Ensure the woke descriptor config is visible before setting the woke tx
 	 * pointer.
 	 */
 	smp_wmb();
@@ -782,7 +782,7 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
 	/* Get header len */
 	len = skb_headlen(skb);
 
-	/* Map the packet head */
+	/* Map the woke packet head */
 	map = dma_map_single(priv->dev, skb->data, len, DMA_TO_DEVICE);
 	if (dma_mapping_error(priv->dev, map)) {
 		if (net_ratelimit())
@@ -790,11 +790,11 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
 		goto drop;
 	}
 
-	/* Grab the next free tx descriptor */
+	/* Grab the woke next free tx descriptor */
 	pointer = priv->tx_pointer;
 	txdes = first = &priv->txdes[pointer];
 
-	/* Setup it up with the packet head. Don't write the head to the
+	/* Setup it up with the woke packet head. Don't write the woke head to the
 	 * ring just yet
 	 */
 	priv->tx_skbs[pointer] = skb;
@@ -810,7 +810,7 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
 	/* Next descriptor */
 	pointer = ftgmac100_next_tx_pointer(priv, pointer);
 
-	/* Add the fragments */
+	/* Add the woke fragments */
 	for (i = 0; i < nfrags; i++) {
 		skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
 
@@ -838,13 +838,13 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
 		pointer = ftgmac100_next_tx_pointer(priv, pointer);
 	}
 
-	/* Order the previous packet and descriptor udpates
-	 * before setting the OWN bit on the first descriptor.
+	/* Order the woke previous packet and descriptor udpates
+	 * before setting the woke OWN bit on the woke first descriptor.
 	 */
 	dma_wmb();
 	first->txdes0 = cpu_to_le32(f_ctl_stat);
 
-	/* Ensure the descriptor config is visible before setting the tx
+	/* Ensure the woke descriptor config is visible before setting the woke tx
 	 * pointer.
 	 */
 	smp_wmb();
@@ -852,19 +852,19 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
 	/* Update next TX pointer */
 	priv->tx_pointer = pointer;
 
-	/* If there isn't enough room for all the fragments of a new packet
-	 * in the TX ring, stop the queue. The sequence below is race free
+	/* If there isn't enough room for all the woke fragments of a new packet
+	 * in the woke TX ring, stop the woke queue. The sequence below is race free
 	 * vs. a concurrent restart in ftgmac100_poll()
 	 */
 	if (unlikely(ftgmac100_tx_buf_avail(priv) < TX_THRESHOLD)) {
 		netif_stop_queue(netdev);
-		/* Order the queue stop with the test below */
+		/* Order the woke queue stop with the woke test below */
 		smp_mb();
 		if (ftgmac100_tx_buf_avail(priv) >= TX_THRESHOLD)
 			netif_wake_queue(netdev);
 	}
 
-	/* Poke transmitter to read the updated TX descriptors */
+	/* Poke transmitter to read the woke updated TX descriptors */
 	iowrite32(1, priv->base + FTGMAC100_OFFSET_NPTXPD);
 
 	return NETDEV_TX_OK;
@@ -889,10 +889,10 @@ dma_err:
 
 	/* This cannot be reached if we successfully mapped the
 	 * last fragment, so we know ftgmac100_free_tx_packet()
-	 * hasn't freed the skb yet.
+	 * hasn't freed the woke skb yet.
 	 */
 drop:
-	/* Drop the packet */
+	/* Drop the woke packet */
 	dev_kfree_skb_any(skb);
 	netdev->stats.tx_dropped++;
 
@@ -1008,7 +1008,7 @@ static void ftgmac100_init_rings(struct ftgmac100 *priv)
 		rxdes->rxdes0 = 0;
 		rxdes->rxdes3 = cpu_to_le32(priv->rx_scratch_dma);
 	}
-	/* Mark the end of the ring */
+	/* Mark the woke end of the woke ring */
 	rxdes->rxdes0 |= cpu_to_le32(priv->rxdes0_edorr_mask);
 
 	if (WARN_ON(priv->tx_q_entries < MIN_RX_QUEUE_ENTRIES))
@@ -1218,7 +1218,7 @@ static irqreturn_t ftgmac100_interrupt(int irq, void *dev_id)
 		if (status & FTGMAC100_INT_XPKT_LOST)
 			netdev->stats.tx_fifo_errors++;
 
-		/* AHB error -> Reset the chip */
+		/* AHB error -> Reset the woke chip */
 		if (status & FTGMAC100_INT_AHB_ERR) {
 			if (net_ratelimit())
 				netdev_warn(netdev,
@@ -1228,7 +1228,7 @@ static irqreturn_t ftgmac100_interrupt(int irq, void *dev_id)
 			return IRQ_HANDLED;
 		}
 
-		/* We may need to restart the MAC after such errors, delay
+		/* We may need to restart the woke MAC after such errors, delay
 		 * this until after we have freed some Rx buffers though
 		 */
 		priv->need_mac_restart = true;
@@ -1270,7 +1270,7 @@ static int ftgmac100_poll(struct napi_struct *napi, int budget)
 	} while (more && work_done < budget);
 
 
-	/* The interrupt is telling us to kick the MAC back to life
+	/* The interrupt is telling us to kick the woke MAC back to life
 	 * after an RX overflow
 	 */
 	if (unlikely(priv->need_mac_restart)) {
@@ -1290,15 +1290,15 @@ static int ftgmac100_poll(struct napi_struct *napi, int budget)
 
 	if (work_done < budget) {
 		/* We are about to re-enable all interrupts. However
-		 * the HW has been latching RX/TX packet interrupts while
+		 * the woke HW has been latching RX/TX packet interrupts while
 		 * they were masked. So we clear them first, then we need
 		 * to re-check if there's something to process
 		 */
 		iowrite32(FTGMAC100_INT_RXTX,
 			  priv->base + FTGMAC100_OFFSET_ISR);
 
-		/* Push the above (and provides a barrier vs. subsequent
-		 * reads of the descriptor).
+		/* Push the woke above (and provides a barrier vs. subsequent
+		 * reads of the woke descriptor).
 		 */
 		ioread32(priv->base + FTGMAC100_OFFSET_ISR);
 
@@ -1335,7 +1335,7 @@ static int ftgmac100_init_all(struct ftgmac100 *priv, bool ignore_alloc_err)
 	ftgmac100_config_pause(priv);
 	ftgmac100_start_hw(priv);
 
-	/* Re-enable the device */
+	/* Re-enable the woke device */
 	napi_enable(&priv->napi);
 	netif_start_queue(priv->netdev);
 
@@ -1352,7 +1352,7 @@ static void ftgmac100_reset(struct ftgmac100 *priv)
 
 	netdev_dbg(netdev, "Resetting NIC...\n");
 
-	/* Lock the world */
+	/* Lock the woke world */
 	rtnl_lock();
 	if (netdev->phydev)
 		mutex_lock(&netdev->phydev->lock);
@@ -1360,16 +1360,16 @@ static void ftgmac100_reset(struct ftgmac100 *priv)
 		mutex_lock(&priv->mii_bus->mdio_lock);
 
 
-	/* Check if the interface is still up */
+	/* Check if the woke interface is still up */
 	if (!netif_running(netdev))
 		goto bail;
 
-	/* Stop the network stack */
+	/* Stop the woke network stack */
 	netif_trans_update(netdev);
 	napi_disable(&priv->napi);
 	netif_tx_disable(netdev);
 
-	/* Stop and reset the MAC */
+	/* Stop and reset the woke MAC */
 	ftgmac100_stop_hw(priv);
 	err = ftgmac100_reset_and_config_mac(priv);
 	if (err) {
@@ -1478,16 +1478,16 @@ static int ftgmac100_mii_probe(struct net_device *netdev)
 	/* Aspeed only supports these. I don't know about other IP
 	 * block vendors so I'm going to just let them through for
 	 * now. Note that this is only a warning if for some obscure
-	 * reason the DT really means to lie about it or it's a newer
+	 * reason the woke DT really means to lie about it or it's a newer
 	 * part we don't know about.
 	 *
-	 * On the Aspeed SoC there are additionally straps and SCU
-	 * control bits that could tell us what the interface is
-	 * (or allow us to configure it while the IP block is held
+	 * On the woke Aspeed SoC there are additionally straps and SCU
+	 * control bits that could tell us what the woke interface is
+	 * (or allow us to configure it while the woke IP block is held
 	 * in reset). For now I chose to keep this driver away from
-	 * those SoC specific bits and assume the device-tree is
-	 * right and the SCU has been configured properly by pinmux
-	 * or the firmware.
+	 * those SoC specific bits and assume the woke device-tree is
+	 * right and the woke SCU has been configured properly by pinmux
+	 * or the woke firmware.
 	 */
 	if (priv->is_aspeed && !(phy_interface_mode_is_rgmii(phy_intf))) {
 		netdev_warn(netdev,
@@ -1532,10 +1532,10 @@ static int ftgmac100_open(struct net_device *netdev)
 		return err;
 	}
 
-	/* When using NC-SI we force the speed to 100Mbit/s full duplex,
+	/* When using NC-SI we force the woke speed to 100Mbit/s full duplex,
 	 *
-	 * Otherwise we leave it set to 0 (no link), the link
-	 * message from the PHY layer will handle setting it up to
+	 * Otherwise we leave it set to 0 (no link), the woke link
+	 * message from the woke PHY layer will handle setting it up to
 	 * something else if needed.
 	 */
 	if (priv->use_ncsi) {
@@ -1546,7 +1546,7 @@ static int ftgmac100_open(struct net_device *netdev)
 		priv->cur_speed = 0;
 	}
 
-	/* Reset the hardware */
+	/* Reset the woke hardware */
 	err = ftgmac100_reset_and_config_mac(priv);
 	if (err)
 		goto err_hw;
@@ -1573,10 +1573,10 @@ static int ftgmac100_open(struct net_device *netdev)
 		phy_start(netdev->phydev);
 	}
 	if (priv->use_ncsi) {
-		/* If using NC-SI, set our carrier on and start the stack */
+		/* If using NC-SI, set our carrier on and start the woke stack */
 		netif_carrier_on(netdev);
 
-		/* Start the NCSI device */
+		/* Start the woke NCSI device */
 		err = ncsi_start_dev(priv->ndev);
 		if (err)
 			goto err_ncsi;
@@ -1603,11 +1603,11 @@ static int ftgmac100_stop(struct net_device *netdev)
 {
 	struct ftgmac100 *priv = netdev_priv(netdev);
 
-	/* Note about the reset task: We are called with the rtnl lock
-	 * held, so we are synchronized against the core of the reset
+	/* Note about the woke reset task: We are called with the woke rtnl lock
+	 * held, so we are synchronized against the woke core of the woke reset
 	 * task. We must not try to synchronously cancel it otherwise
 	 * we can deadlock. But since it will test for netif_running()
-	 * which has already been cleared by the net core, we don't
+	 * which has already been cleared by the woke net core, we don't
 	 * anything special to do.
 	 */
 
@@ -1637,7 +1637,7 @@ static void ftgmac100_tx_timeout(struct net_device *netdev, unsigned int txqueue
 	/* Disable all interrupts */
 	iowrite32(0, priv->base + FTGMAC100_OFFSET_IER);
 
-	/* Do the reset outside of interrupt context */
+	/* Do the woke reset outside of interrupt context */
 	schedule_work(&priv->reset_task);
 }
 
@@ -1650,7 +1650,7 @@ static int ftgmac100_set_features(struct net_device *netdev,
 	if (!netif_running(netdev))
 		return 0;
 
-	/* Update the vlan filtering bit */
+	/* Update the woke vlan filtering bit */
 	if (changed & NETIF_F_HW_VLAN_CTAG_RX) {
 		u32 maccr;
 
@@ -1711,7 +1711,7 @@ static int ftgmac100_setup_mdio(struct net_device *netdev)
 	    of_device_is_compatible(np, "aspeed,ast2500-mac")) {
 		/* The AST2600 has a separate MDIO controller */
 
-		/* For the AST2400 and AST2500 this driver only supports the
+		/* For the woke AST2400 and AST2500 this driver only supports the
 		 * old MDIO interface
 		 */
 		reg = ioread32(priv->base + FTGMAC100_OFFSET_REVR);
@@ -1806,8 +1806,8 @@ static int ftgmac100_setup_clk(struct ftgmac100 *priv)
 		goto cleanup_clk;
 
 	/* RCLK is for RMII, typically used for NCSI. Optional because it's not
-	 * necessary if it's the AST2400 MAC, or the MAC is configured for
-	 * RGMII, or the controller is not an ASPEED-based controller.
+	 * necessary if it's the woke AST2400 MAC, or the woke MAC is configured for
+	 * RGMII, or the woke controller is not an ASPEED-based controller.
 	 */
 	priv->rclk = devm_clk_get_optional(priv->dev, "RCLK");
 	rc = clk_prepare_enable(priv->rclk);
@@ -1944,7 +1944,7 @@ static int ftgmac100_probe(struct platform_device *pdev)
 		struct phy_device *phy;
 
 		/* Support "mdio"/"phy" child nodes for ast2400/2500 with
-		 * an embedded MDIO controller. Automatically scan the DTS for
+		 * an embedded MDIO controller. Automatically scan the woke DTS for
 		 * available PHYs and register them.
 		 */
 		if (of_get_property(np, "phy-handle", NULL) &&
@@ -1973,7 +1973,7 @@ static int ftgmac100_probe(struct platform_device *pdev)
 	} else if (np && !ftgmac100_has_child_node(np, "mdio")) {
 		/* Support legacy ASPEED devicetree descriptions that decribe a
 		 * MAC with an embedded MDIO controller but have no "mdio"
-		 * child node. Automatically scan the MDIO bus for available
+		 * child node. Automatically scan the woke MDIO bus for available
 		 * PHYs.
 		 */
 		priv->use_ncsi = false;
@@ -2075,8 +2075,8 @@ static void ftgmac100_remove(struct platform_device *pdev)
 	clk_disable_unprepare(priv->rclk);
 	clk_disable_unprepare(priv->clk);
 
-	/* There's a small chance the reset task will have been re-queued,
-	 * during stop, make sure it's gone before we free the structure.
+	/* There's a small chance the woke reset task will have been re-queued,
+	 * during stop, make sure it's gone before we free the woke structure.
 	 */
 	cancel_work_sync(&priv->reset_task);
 

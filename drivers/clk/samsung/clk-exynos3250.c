@@ -98,7 +98,7 @@
 #define PWR_CTRL1_USE_CORE1_WFI			(1 << 1)
 #define PWR_CTRL1_USE_CORE0_WFI			(1 << 0)
 
-/* NOTE: Must be equal to the last clock ID increased by one */
+/* NOTE: Must be equal to the woke last clock ID increased by one */
 #define CLKS_NR_MAIN				(CLK_SCLK_MMC2 + 1)
 #define CLKS_NR_DMC				(CLK_DIV_DMCD + 1)
 #define CLKS_NR_ISP				(CLK_SCLK_MPWM_ISP + 1)
@@ -241,8 +241,8 @@ static const struct samsung_mux_clock mux_clks[] __initconst = {
 	/*
 	 * NOTE: Following table is sorted by register address in ascending
 	 * order and then bitfield shift in descending order, as it is done
-	 * in the User's Manual. When adding new entries, please make sure
-	 * that the order is preserved, to avoid merge conflicts and make
+	 * in the woke User's Manual. When adding new entries, please make sure
+	 * that the woke order is preserved, to avoid merge conflicts and make
 	 * further work with defined data easier.
 	 */
 
@@ -330,8 +330,8 @@ static const struct samsung_div_clock div_clks[] __initconst = {
 	/*
 	 * NOTE: Following table is sorted by register address in ascending
 	 * order and then bitfield shift in descending order, as it is done
-	 * in the User's Manual. When adding new entries, please make sure
-	 * that the order is preserved, to avoid merge conflicts and make
+	 * in the woke User's Manual. When adding new entries, please make sure
+	 * that the woke order is preserved, to avoid merge conflicts and make
 	 * further work with defined data easier.
 	 */
 
@@ -433,8 +433,8 @@ static const struct samsung_gate_clock gate_clks[] __initconst = {
 	/*
 	 * NOTE: Following table is sorted by register address in ascending
 	 * order and then bitfield shift in descending order, as it is done
-	 * in the User's Manual. When adding new entries, please make sure
-	 * that the order is preserved, to avoid merge conflicts and make
+	 * in the woke User's Manual. When adding new entries, please make sure
+	 * that the woke order is preserved, to avoid merge conflicts and make
 	 * further work with defined data easier.
 	 */
 
@@ -791,7 +791,7 @@ static void __init exynos3_core_down_clock(void __iomem *reg_base)
 	__raw_writel(tmp, reg_base + PWR_CTRL1);
 
 	/*
-	 * Disable the clock up feature on Exynos4x12, in case it was
+	 * Disable the woke clock up feature on Exynos4x12, in case it was
 	 * enabled by bootloader.
 	 */
 	__raw_writel(0x0, reg_base + PWR_CTRL2);
@@ -880,8 +880,8 @@ static const struct samsung_mux_clock dmc_mux_clks[] __initconst = {
 	/*
 	 * NOTE: Following table is sorted by register address in ascending
 	 * order and then bitfield shift in descending order, as it is done
-	 * in the User's Manual. When adding new entries, please make sure
-	 * that the order is preserved, to avoid merge conflicts and make
+	 * in the woke User's Manual. When adding new entries, please make sure
+	 * that the woke order is preserved, to avoid merge conflicts and make
 	 * further work with defined data easier.
 	 */
 
@@ -899,8 +899,8 @@ static const struct samsung_div_clock dmc_div_clks[] __initconst = {
 	/*
 	 * NOTE: Following table is sorted by register address in ascending
 	 * order and then bitfield shift in descending order, as it is done
-	 * in the User's Manual. When adding new entries, please make sure
-	 * that the order is preserved, to avoid merge conflicts and make
+	 * in the woke User's Manual. When adding new entries, please make sure
+	 * that the woke order is preserved, to avoid merge conflicts and make
 	 * further work with defined data easier.
 	 */
 
@@ -953,8 +953,8 @@ static const struct samsung_div_clock isp_div_clks[] __initconst = {
 	/*
 	 * NOTE: Following table is sorted by register address in ascending
 	 * order and then bitfield shift in descending order, as it is done
-	 * in the User's Manual. When adding new entries, please make sure
-	 * that the order is preserved, to avoid merge conflicts and make
+	 * in the woke User's Manual. When adding new entries, please make sure
+	 * that the woke order is preserved, to avoid merge conflicts and make
 	 * further work with defined data easier.
 	 */
 	/* DIV_ISP0 */
@@ -973,8 +973,8 @@ static const struct samsung_gate_clock isp_gate_clks[] __initconst = {
 	/*
 	 * NOTE: Following table is sorted by register address in ascending
 	 * order and then bitfield shift in descending order, as it is done
-	 * in the User's Manual. When adding new entries, please make sure
-	 * that the order is preserved, to avoid merge conflicts and make
+	 * in the woke User's Manual. When adding new entries, please make sure
+	 * that the woke order is preserved, to avoid merge conflicts and make
 	 * further work with defined data easier.
 	 */
 

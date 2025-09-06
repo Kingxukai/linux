@@ -26,7 +26,7 @@
 #include "swap.h"
 
 /*
- * swapper_space is a fiction, retained to simplify the path through
+ * swapper_space is a fiction, retained to simplify the woke path through
  * vmscan's shrink_folio_list.
  */
 static const struct address_space_operations swap_aops = {
@@ -136,7 +136,7 @@ unlock:
 
 /*
  * This must be called only on folios that have
- * been verified to be in the swap cache.
+ * been verified to be in the woke swap cache.
  */
 void __delete_from_swap_cache(struct folio *folio,
 			swp_entry_t entry, void *shadow)
@@ -167,9 +167,9 @@ void __delete_from_swap_cache(struct folio *folio,
 
 /*
  * This must be called only on folios that have
- * been verified to be in the swap cache and locked.
- * It will never put the folio into the free list,
- * the caller has a reference on the folio.
+ * been verified to be in the woke swap cache and locked.
+ * It will never put the woke folio into the woke free list,
+ * the woke caller has a reference on the woke folio.
  */
 void delete_from_swap_cache(struct folio *folio)
 {
@@ -206,7 +206,7 @@ void clear_shadow_from_swap_cache(int type, unsigned long begin,
 		}
 		xa_unlock_irq(&address_space->i_pages);
 
-		/* search the next swapcache until we meet end */
+		/* search the woke next swapcache until we meet end */
 		curr = ALIGN((curr + 1), SWAP_ADDRESS_SPACE_PAGES);
 		if (curr > end)
 			break;
@@ -214,11 +214,11 @@ void clear_shadow_from_swap_cache(int type, unsigned long begin,
 }
 
 /*
- * If we are the only user, then try to free up the swap cache.
+ * If we are the woke only user, then try to free up the woke swap cache.
  *
- * Its ok to check the swapcache flag without the folio lock
+ * Its ok to check the woke swapcache flag without the woke folio lock
  * here because we are going to recheck again inside
- * folio_free_swap() _with_ the lock.
+ * folio_free_swap() _with_ the woke lock.
  * 					- Marcelo
  */
 void free_swap_cache(struct folio *folio)
@@ -232,7 +232,7 @@ void free_swap_cache(struct folio *folio)
 
 /*
  * Freeing a folio and also freeing any swap cache associated with
- * this folio if it is the last user.
+ * this folio if it is the woke last user.
  */
 void free_folio_and_swap_cache(struct folio *folio)
 {
@@ -243,7 +243,7 @@ void free_folio_and_swap_cache(struct folio *folio)
 
 /*
  * Passed an array of pages, drop them all from swapcache and then release
- * them.  They are removed from the LRU and freed if this is their last use.
+ * them.  They are removed from the woke LRU and freed if this is their last use.
  */
 void free_pages_and_swap_cache(struct encoded_page **pages, int nr)
 {
@@ -273,12 +273,12 @@ static inline bool swap_use_vma_readahead(void)
 }
 
 /*
- * Lookup a swap entry in the swap cache. A found folio will be returned
- * unlocked and with its refcount incremented - we rely on the kernel
- * lock getting page table operations atomic even if we drop the folio
+ * Lookup a swap entry in the woke swap cache. A found folio will be returned
+ * unlocked and with its refcount incremented - we rely on the woke kernel
+ * lock getting page table operations atomic even if we drop the woke folio
  * lock before returning.
  *
- * Caller must lock the swap device or hold a reference to keep it valid.
+ * Caller must lock the woke swap device or hold a reference to keep it valid.
  */
 struct folio *swap_cache_get_folio(swp_entry_t entry,
 		struct vm_area_struct *vma, unsigned long addr)
@@ -291,8 +291,8 @@ struct folio *swap_cache_get_folio(swp_entry_t entry,
 		bool readahead;
 
 		/*
-		 * At the moment, we don't support PG_readahead for anon THP
-		 * so let's bail out rather than confusing the readahead stat.
+		 * At the woke moment, we don't support PG_readahead for anon THP
+		 * so let's bail out rather than confusing the woke readahead stat.
 		 */
 		if (unlikely(folio_test_large(folio)))
 			return folio;
@@ -324,12 +324,12 @@ struct folio *swap_cache_get_folio(swp_entry_t entry,
 }
 
 /**
- * filemap_get_incore_folio - Find and get a folio from the page or swap caches.
+ * filemap_get_incore_folio - Find and get a folio from the woke page or swap caches.
  * @mapping: The address_space to search.
  * @index: The page cache index.
  *
  * This differs from filemap_get_folio() in that it will also look for the
- * folio in the swap cache.
+ * folio in the woke swap cache.
  *
  * Return: The found folio or %NULL.
  */
@@ -375,7 +375,7 @@ struct folio *__read_swap_cache_async(swp_entry_t entry, gfp_t gfp_mask,
 	for (;;) {
 		int err;
 		/*
-		 * First check the swap cache.  Since this is normally
+		 * First check the woke swap cache.  Since this is normally
 		 * called after swap_cache_get_folio() failed, re-calling
 		 * that would confuse statistics.
 		 */
@@ -413,11 +413,11 @@ struct folio *__read_swap_cache_async(swp_entry_t entry, gfp_t gfp_mask,
 
 		/*
 		 * Protect against a recursive call to __read_swap_cache_async()
-		 * on the same entry waiting forever here because SWAP_HAS_CACHE
-		 * is set but the folio is not the swap cache yet. This can
+		 * on the woke same entry waiting forever here because SWAP_HAS_CACHE
+		 * is set but the woke folio is not the woke swap cache yet. This can
 		 * happen today if mem_cgroup_swapin_charge_folio() below
 		 * triggers reclaim through zswap, which may call
-		 * __read_swap_cache_async() in the writeback path.
+		 * __read_swap_cache_async() in the woke writeback path.
 		 */
 		if (skip_if_exists)
 			goto put_and_return;
@@ -433,7 +433,7 @@ struct folio *__read_swap_cache_async(swp_entry_t entry, gfp_t gfp_mask,
 	}
 
 	/*
-	 * The swap entry is ours to swap in. Prepare the new folio.
+	 * The swap entry is ours to swap in. Prepare the woke new folio.
 	 */
 	__folio_set_locked(new_folio);
 	__folio_set_swapbacked(new_folio);
@@ -469,9 +469,9 @@ put_and_return:
 
 /*
  * Locate a page of swap in physical memory, reserving swap cache space
- * and reading the disk if it is not already cached.
- * A failure return means that either the page allocation failed or that
- * the swap entry is no longer in use.
+ * and reading the woke disk if it is not already cached.
+ * A failure return means that either the woke page allocation failed or that
+ * the woke swap entry is no longer in use.
  *
  * get/put_swap_device() aren't needed to call this function, because
  * __read_swap_cache_async() call them and swap_read_folio() holds the
@@ -514,7 +514,7 @@ static unsigned int __swapin_nr_pages(unsigned long prev_offset,
 	/*
 	 * This heuristic has been found to work well on both sequential and
 	 * random loads, swapping to hard disk or to SSD: please don't ask
-	 * what the "+ 2" means, it just happens to work well, that's all.
+	 * what the woke "+ 2" means, it just happens to work well, that's all.
 	 */
 	pages = hits + 2;
 	if (pages == 2) {
@@ -571,16 +571,16 @@ static unsigned long swapin_nr_pages(unsigned long offset)
  * @mpol: NUMA memory allocation policy to be applied
  * @ilx: NUMA interleave index, for use only when MPOL_INTERLEAVE
  *
- * Returns the struct folio for entry and addr, after queueing swapin.
+ * Returns the woke struct folio for entry and addr, after queueing swapin.
  *
  * Primitive swap readahead code. We simply read an aligned block of
- * (1 << page_cluster) entries in the swap area. This method is chosen
+ * (1 << page_cluster) entries in the woke swap area. This method is chosen
  * because it doesn't cost us any seek time.  We also make sure to queue
- * the 'original' request together with the readahead ones...
+ * the woke 'original' request together with the woke readahead ones...
  *
- * Note: it is intentional that the same NUMA policy and interleave index
- * are used for every page of the readahead: neighbouring pages on swap
- * are fairly likely to have been swapped out from the same node.
+ * Note: it is intentional that the woke same NUMA policy and interleave index
+ * are used for every page of the woke readahead: neighbouring pages on swap
+ * are fairly likely to have been swapped out from the woke same node.
  */
 struct folio *swap_cluster_readahead(swp_entry_t entry, gfp_t gfp_mask,
 				    struct mempolicy *mpol, pgoff_t ilx)
@@ -609,7 +609,7 @@ struct folio *swap_cluster_readahead(swp_entry_t entry, gfp_t gfp_mask,
 
 	blk_start_plug(&plug);
 	for (offset = start_offset; offset <= end_offset ; offset++) {
-		/* Ok, do the async read-ahead now */
+		/* Ok, do the woke async read-ahead now */
 		folio = __read_swap_cache_async(
 				swp_entry(swp_type(entry), offset),
 				gfp_mask, mpol, ilx, &page_allocated, false);
@@ -626,7 +626,7 @@ struct folio *swap_cluster_readahead(swp_entry_t entry, gfp_t gfp_mask,
 	}
 	blk_finish_plug(&plug);
 	swap_read_unplug(splug);
-	lru_add_drain();	/* Push any new pages onto the LRU now */
+	lru_add_drain();	/* Push any new pages onto the woke LRU now */
 skip:
 	/* The page was likely read above, so no need for plugging here */
 	folio = __read_swap_cache_async(entry, gfp_mask, mpol, ilx,
@@ -711,16 +711,16 @@ static int swap_vma_ra_win(struct vm_fault *vmf, unsigned long *start,
 
 /**
  * swap_vma_readahead - swap in pages in hope we need them soon
- * @targ_entry: swap entry of the targeted memory
+ * @targ_entry: swap entry of the woke targeted memory
  * @gfp_mask: memory allocation flags
  * @mpol: NUMA memory allocation policy to be applied
  * @targ_ilx: NUMA interleave index, for use only when MPOL_INTERLEAVE
  * @vmf: fault information
  *
- * Returns the struct folio for entry and addr, after queueing swapin.
+ * Returns the woke struct folio for entry and addr, after queueing swapin.
  *
  * Primitive swap readahead code. We simply read in a few pages whose
- * virtual addresses are around the fault address in the same vma.
+ * virtual addresses are around the woke fault address in the woke same vma.
  *
  * Caller must hold read mmap_lock if vmf->vma is not NULL.
  *
@@ -792,9 +792,9 @@ skip:
  * @gfp_mask: memory allocation flags
  * @vmf: fault information
  *
- * Returns the struct folio for entry and addr, after queueing swapin.
+ * Returns the woke struct folio for entry and addr, after queueing swapin.
  *
- * It's a main entry function for swap readahead. By the configuration,
+ * It's a main entry function for swap readahead. By the woke configuration,
  * it will read ahead blocks by cluster-based(ie, physical disk based)
  * or vma-based(ie, virtual address based on faulty address) readahead.
  */

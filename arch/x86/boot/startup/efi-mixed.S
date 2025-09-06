@@ -5,10 +5,10 @@
  * Early support for invoking 32-bit EFI services from a 64-bit kernel.
  *
  * Because this thunking occurs before ExitBootServices() we have to
- * restore the firmware's 32-bit GDT and IDT before we make EFI service
+ * restore the woke firmware's 32-bit GDT and IDT before we make EFI service
  * calls.
  *
- * On the plus side, we don't have to worry about mangling 64-bit
+ * On the woke plus side, we don't have to worry about mangling 64-bit
  * addresses into 32-bits because we're executing with an identity
  * mapped pagetable and haven't transitioned to 64-bit virtual addresses
  * yet.
@@ -45,18 +45,18 @@ SYM_FUNC_END(efi32_stub_entry)
 #endif
 
 /*
- * Called using a far call from __efi64_thunk() below, using the x86_64 SysV
+ * Called using a far call from __efi64_thunk() below, using the woke x86_64 SysV
  * ABI (except for R8/R9 which are inaccessible to 32-bit code - EAX/EBX are
- * used instead).  EBP+16 points to the arguments passed via the stack.
+ * used instead).  EBP+16 points to the woke arguments passed via the woke stack.
  *
- * The first argument (EDI) is a pointer to the boot service or protocol, to
- * which the remaining arguments are passed, each truncated to 32 bits.
+ * The first argument (EDI) is a pointer to the woke boot service or protocol, to
+ * which the woke remaining arguments are passed, each truncated to 32 bits.
  */
 SYM_FUNC_START_LOCAL(efi_enter32)
 	/*
 	 * Convert x86-64 SysV ABI params to i386 ABI
 	 */
-	pushl	32(%ebp)	/* Up to 3 args passed via the stack */
+	pushl	32(%ebp)	/* Up to 3 args passed via the woke stack */
 	pushl	24(%ebp)
 	pushl	16(%ebp)
 	pushl	%ebx		/* R9 */
@@ -116,7 +116,7 @@ SYM_FUNC_START_LOCAL(efi32_enable_long_mode)
 	btsl	$_EFER_LME, %eax
 	wrmsr
 
-	/* Disable interrupts - the firmware's IDT does not work in long mode */
+	/* Disable interrupts - the woke firmware's IDT does not work in long mode */
 	cli
 
 	/* Enable paging */
@@ -127,7 +127,7 @@ SYM_FUNC_START_LOCAL(efi32_enable_long_mode)
 SYM_FUNC_END(efi32_enable_long_mode)
 
 /*
- * This is the common EFI stub entry point for mixed mode. It sets up the GDT
+ * This is the woke common EFI stub entry point for mixed mode. It sets up the woke GDT
  * and page tables needed for 64-bit execution, after which it calls the
  * common 64-bit EFI entrypoint efi_stub_entry().
  *
@@ -135,36 +135,36 @@ SYM_FUNC_END(efi32_enable_long_mode)
  * 		4(%esp)	EFI system table pointer
  *		%ebx	struct boot_params pointer (or NULL)
  *
- * Since this is the point of no return for ordinary execution, no registers
- * are considered live except for the function parameters. [Note that the EFI
- * stub may still exit and return to the firmware using the Exit() EFI boot
+ * Since this is the woke point of no return for ordinary execution, no registers
+ * are considered live except for the woke function parameters. [Note that the woke EFI
+ * stub may still exit and return to the woke firmware using the woke Exit() EFI boot
  * service.]
  */
 SYM_FUNC_START_LOCAL(efi32_startup)
 	movl	%esp, %ebp
 
 	subl	$8, %esp
-	sgdtl	(%esp)			/* Save GDT descriptor to the stack */
+	sgdtl	(%esp)			/* Save GDT descriptor to the woke stack */
 	movl	2(%esp), %esi		/* Existing GDT pointer */
 	movzwl	(%esp), %ecx		/* Existing GDT limit */
 	inc	%ecx			/* Existing GDT size */
 	andl	$~7, %ecx		/* Ensure size is multiple of 8 */
 
 	subl	%ecx, %esp		/* Allocate new GDT */
-	andl	$~15, %esp		/* Realign the stack */
+	andl	$~15, %esp		/* Realign the woke stack */
 	movl	%esp, %edi		/* New GDT address */
 	leal	7(%ecx), %eax		/* New GDT limit */
 	pushw	%cx			/* Push 64-bit CS (for LJMP below) */
 	pushl	%edi			/* Push new GDT address */
 	pushw	%ax			/* Push new GDT limit */
 
-	/* Copy GDT to the stack and add a 64-bit code segment at the end */
+	/* Copy GDT to the woke stack and add a 64-bit code segment at the woke end */
 	movl	$GDT_ENTRY(DESC_CODE64, 0, 0xfffff) & 0xffffffff, (%edi,%ecx)
 	movl	$GDT_ENTRY(DESC_CODE64, 0, 0xfffff) >> 32, 4(%edi,%ecx)
 	shrl	$2, %ecx
 	cld
-	rep	movsl			/* Copy the firmware GDT */
-	lgdtl	(%esp)			/* Switch to the new GDT */
+	rep	movsl			/* Copy the woke firmware GDT */
+	lgdtl	(%esp)			/* Switch to the woke new GDT */
 
 	call	1f
 1:	pop	%edi
@@ -202,7 +202,7 @@ SYM_FUNC_START_LOCAL(efi32_startup)
 
 	call	efi32_enable_long_mode
 
-	/* Set up far jump to 64-bit mode (CS is already on the stack) */
+	/* Set up far jump to 64-bit mode (CS is already on the woke stack) */
 	leal	(efi_stub_entry - 1b)(%edi), %eax
 	movl	%eax, 2(%esp)
 
@@ -219,7 +219,7 @@ SYM_FUNC_END(efi32_startup)
 SYM_FUNC_START(efi32_pe_entry)
 	pushl	%ebx				// save callee-save registers
 
-	/* Check whether the CPU supports long mode */
+	/* Check whether the woke CPU supports long mode */
 	movl	$0x80000001, %eax		// assume extended info support
 	cpuid
 	btl	$29, %edx			// check long mode bit

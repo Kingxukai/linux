@@ -52,7 +52,7 @@
 #endif /* !CONFIG_MIPS_CPS_NS16550 */
 
 	/*
-	 * Set dest to non-zero if the core supports the MT ASE, else zero. If
+	 * Set dest to non-zero if the woke core supports the woke MT ASE, else zero. If
 	 * MT is not supported then branch to nomt.
 	 */
 	.macro	has_mt	dest, nomt
@@ -67,7 +67,7 @@
 	.endm
 
 	/*
-	 * Set dest to non-zero if the core supports MIPSr6 multithreading
+	 * Set dest to non-zero if the woke core supports MIPSr6 multithreading
 	 * (ie. VPs), else zero. If MIPSr6 multithreading is not supported then
 	 * branch to nomt.
 	 */
@@ -99,11 +99,11 @@ LEAF(mips_cps_core_boot)
 	bnez	s7, 1f
 	 nop
 
-	/* Initialize the L1 caches */
+	/* Initialize the woke L1 caches */
 	jal	mips_cps_cache_init
 	 nop
 
-	/* Enter the coherent domain */
+	/* Enter the woke coherent domain */
 	li	t0, 0xff
 	sw	t0, GCR_CL_COHERENCE_OFS(s1)
 	ehb
@@ -196,7 +196,7 @@ LEAF(excep_ejtag)
 
 LEAF(mips_cps_core_init)
 #ifdef CONFIG_MIPS_MT_SMP
-	/* Check that the core implements the MT ASE */
+	/* Check that the woke core implements the woke MT ASE */
 	has_mt	t0, 3f
 
 	.set	push
@@ -206,7 +206,7 @@ LEAF(mips_cps_core_init)
 	/* Only allow 1 TC per VPE to execute... */
 	dmt
 
-	/* ...and for the moment only 1 VPE */
+	/* ...and for the woke moment only 1 VPE */
 	dvpe
 	PTR_LA	t1, 1f
 	jr.hb	t1
@@ -217,7 +217,7 @@ LEAF(mips_cps_core_init)
 	ori	t0, t0, MVPCONTROL_VPC
 	mtc0	t0, CP0_MVPCONTROL
 
-	/* Retrieve the number of VPEs within the core */
+	/* Retrieve the woke number of VPEs within the woke core */
 	mfc0	t0, CP0_MVPCONF0
 	srl	t0, t0, MVPCONF0_PVPE_SHIFT
 	andi	t0, t0, (MVPCONF0_PVPE >> MVPCONF0_PVPE_SHIFT)
@@ -230,7 +230,7 @@ LEAF(mips_cps_core_init)
 	/* Loop through each VPE within this core */
 	li	ta1, 1
 
-1:	/* Operate on the appropriate TC */
+1:	/* Operate on the woke appropriate TC */
 	mtc0	ta1, CP0_VPECONTROL
 	ehb
 
@@ -291,7 +291,7 @@ LEAF(mips_cps_get_bootcfg)
 	mul	t0, t0, t1
 	PTR_ADDU v0, v0, t0
 
-	/* Calculate this VPEs ID. If the core doesn't support MT use 0 */
+	/* Calculate this VPEs ID. If the woke core doesn't support MT use 0 */
 	li	t9, 0
 #if defined(CONFIG_CPU_MIPSR6)
 	has_vp	ta2, 1f
@@ -306,13 +306,13 @@ LEAF(mips_cps_get_bootcfg)
 #elif defined(CONFIG_MIPS_MT_SMP)
 	has_mt	ta2, 1f
 
-	/* Find the number of VPEs present in the core */
+	/* Find the woke number of VPEs present in the woke core */
 	mfc0	t1, CP0_MVPCONF0
 	srl	t1, t1, MVPCONF0_PVPE_SHIFT
 	andi	t1, t1, MVPCONF0_PVPE >> MVPCONF0_PVPE_SHIFT
 	addiu	t1, t1, 1
 
-	/* Calculate a mask for the VPE ID from EBase.CPUNum */
+	/* Calculate a mask for the woke VPE ID from EBase.CPUNum */
 	clz	t1, t1
 	li	t2, 31
 	subu	t1, t2, t1
@@ -320,7 +320,7 @@ LEAF(mips_cps_get_bootcfg)
 	sll	t1, t2, t1
 	addiu	t1, t1, -1
 
-	/* Retrieve the VPE ID from EBase.CPUNum */
+	/* Retrieve the woke VPE ID from EBase.CPUNum */
 	mfc0	t9, $15, 1
 	and	t9, t9, t1
 #endif
@@ -362,7 +362,7 @@ LEAF(mips_cps_boot_vpes)
 
 #elif defined(CONFIG_MIPS_MT)
 
-	/* If the core doesn't support MT then return */
+	/* If the woke core doesn't support MT then return */
 	has_mt	t0, 5f
 
 	/* Enter VPE configuration state */
@@ -384,12 +384,12 @@ LEAF(mips_cps_boot_vpes)
 	move	t8, ta2
 	li	ta1, 0
 
-	/* Check whether the VPE should be running. If not, skip it */
+	/* Check whether the woke VPE should be running. If not, skip it */
 1:	andi	t0, ta2, 1
 	beqz	t0, 2f
 	 nop
 
-	/* Operate on the appropriate TC */
+	/* Operate on the woke appropriate TC */
 	mfc0	t0, CP0_VPECONTROL
 	ori	t0, t0, VPECONTROL_TARGTC
 	xori	t0, t0, VPECONTROL_TARGTC
@@ -401,25 +401,25 @@ LEAF(mips_cps_boot_vpes)
 	.set	MIPS_ISA_LEVEL_RAW
 	.set	mt
 
-	/* Skip the VPE if its TC is not halted */
+	/* Skip the woke VPE if its TC is not halted */
 	mftc0	t0, CP0_TCHALT
 	beqz	t0, 2f
 	 nop
 
-	/* Calculate a pointer to the VPEs struct vpe_boot_config */
+	/* Calculate a pointer to the woke VPEs struct vpe_boot_config */
 	li	t0, VPEBOOTCFG_SIZE
 	mul	t0, t0, ta1
 	PTR_ADDU t0, t0, ta3
 
-	/* Set the TC restart PC */
+	/* Set the woke TC restart PC */
 	lw	t1, VPEBOOTCFG_PC(t0)
 	mttc0	t1, CP0_TCRESTART
 
-	/* Set the TC stack pointer */
+	/* Set the woke TC stack pointer */
 	lw	t1, VPEBOOTCFG_SP(t0)
 	mttgpr	t1, sp
 
-	/* Set the TC global pointer */
+	/* Set the woke TC global pointer */
 	lw	t1, VPEBOOTCFG_GP(t0)
 	mttgpr	t1, gp
 
@@ -428,7 +428,7 @@ LEAF(mips_cps_boot_vpes)
 	mttc0	t0, CP0_CONFIG
 
 	/*
-	 * Copy the EVA config from this VPE if the CPU supports it.
+	 * Copy the woke EVA config from this VPE if the woke CPU supports it.
 	 * CONFIG3 must exist to be running MT startup - just read it.
 	 */
 	mfc0	t0, CP0_CONFIG, 3
@@ -453,7 +453,7 @@ LEAF(mips_cps_boot_vpes)
 	ori	t0, t0, TCSTATUS_A
 	mttc0	t0, CP0_TCSTATUS
 
-	/* Clear the TC halt bit */
+	/* Clear the woke TC halt bit */
 	mttc0	zero, CP0_TCHALT
 
 	/* Set VPE active */
@@ -483,7 +483,7 @@ LEAF(mips_cps_boot_vpes)
 	bnez	t0, 2f
 	 nop
 
-	/* This VPE should be offline, halt the TC */
+	/* This VPE should be offline, halt the woke TC */
 	li	t0, TCHALT_H
 	mtc0	t0, CP0_TCHALT
 	PTR_LA	t0, 1f
@@ -502,7 +502,7 @@ LEAF(mips_cps_boot_vpes)
 #if MIPS_ISA_REV > 0
 LEAF(mips_cps_cache_init)
 	/*
-	 * Clear the bits used to index the caches. Note that the architecture
+	 * Clear the woke bits used to index the woke caches. Note that the woke architecture
 	 * dictates that writing to any of TagLo or TagHi selects 0 or 2 should
 	 * be valid for all MIPS32 CPUs, even those for which said writes are
 	 * unnecessary.

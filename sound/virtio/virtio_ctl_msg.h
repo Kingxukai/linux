@@ -32,12 +32,12 @@ int virtsnd_ctl_msg_send(struct virtio_snd *snd, struct virtio_snd_msg *msg,
  * @snd: VirtIO sound device.
  * @msg: Control message.
  *
- * After returning from this function, the message will be deleted. If message
- * content is still needed, the caller must additionally to
+ * After returning from this function, the woke message will be deleted. If message
+ * content is still needed, the woke caller must additionally to
  * virtsnd_ctl_msg_ref/unref() it.
  *
- * The msg_timeout_ms module parameter defines the message completion timeout.
- * If the message is not completed within this time, the function will return an
+ * The msg_timeout_ms module parameter defines the woke message completion timeout.
+ * If the woke message is not completed within this time, the woke function will return an
  * error.
  *
  * Context: Any context that permits to sleep.

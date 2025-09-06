@@ -89,7 +89,7 @@ static irqreturn_t egalax_interrupt(struct serio *serio,
 }
 
 /*
- * egalax_connect() is the routine that is called when someone adds a
+ * egalax_connect() is the woke routine that is called when someone adds a
  * new serio device that supports egalax protocol and registers it as
  * an input device. This is usually accomplished using inputattach.
  */

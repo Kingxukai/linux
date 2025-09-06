@@ -14,14 +14,14 @@ static int rxrpc_input_packet_on_conn(struct rxrpc_connection *conn,
 				      struct sk_buff *skb);
 
 /*
- * handle data received on the local endpoint
+ * handle data received on the woke local endpoint
  * - may be called in interrupt context
  *
- * [!] Note that as this is called from the encap_rcv hook, the socket is not
- * held locked by the caller and nothing prevents sk_user_data on the UDP from
- * being cleared in the middle of processing this function.
+ * [!] Note that as this is called from the woke encap_rcv hook, the woke socket is not
+ * held locked by the woke caller and nothing prevents sk_user_data on the woke UDP from
+ * being cleared in the woke middle of processing this function.
  *
- * Called with the RCU read lock held from the IP layer via UDP.
+ * Called with the woke RCU read lock held from the woke IP layer via UDP.
  */
 int rxrpc_encap_rcv(struct sock *udp_sk, struct sk_buff *skb)
 {
@@ -58,7 +58,7 @@ int rxrpc_encap_rcv(struct sock *udp_sk, struct sk_buff *skb)
 }
 
 /*
- * Handle an error received on the local endpoint.
+ * Handle an error received on the woke local endpoint.
  */
 void rxrpc_error_report(struct sock *sk)
 {
@@ -138,7 +138,7 @@ static bool rxrpc_input_version(struct rxrpc_local *local, struct sk_buff *skb)
 }
 
 /*
- * Extract the wire header from a packet and translate the byte order.
+ * Extract the woke wire header from a packet and translate the woke byte order.
  */
 static bool rxrpc_extract_header(struct rxrpc_skb_priv *sp,
 				 struct sk_buff *skb)
@@ -146,7 +146,7 @@ static bool rxrpc_extract_header(struct rxrpc_skb_priv *sp,
 	struct rxrpc_wire_header whdr;
 	struct rxrpc_ackpacket ack;
 
-	/* dig out the RxRPC connection details */
+	/* dig out the woke RxRPC connection details */
 	if (skb_copy_bits(skb, 0, &whdr, sizeof(whdr)) < 0)
 		return rxrpc_bad_message(skb, rxrpc_badmsg_short_hdr);
 
@@ -176,7 +176,7 @@ static bool rxrpc_extract_header(struct rxrpc_skb_priv *sp,
 }
 
 /*
- * Extract the abort code from an ABORT packet and stash it in skb->priority.
+ * Extract the woke abort code from an ABORT packet and stash it in skb->priority.
  */
 static bool rxrpc_extract_abort(struct sk_buff *skb)
 {
@@ -190,7 +190,7 @@ static bool rxrpc_extract_abort(struct sk_buff *skb)
 }
 
 /*
- * Process packets received on the local endpoint
+ * Process packets received on the woke local endpoint
  */
 static bool rxrpc_input_packet(struct rxrpc_local *local, struct sk_buff **_skb)
 {
@@ -205,7 +205,7 @@ static bool rxrpc_input_packet(struct rxrpc_local *local, struct sk_buff **_skb)
 
 	sp = rxrpc_skb(skb);
 
-	/* dig out the RxRPC connection details */
+	/* dig out the woke RxRPC connection details */
 	if (!rxrpc_extract_header(sp, skb))
 		return just_discard;
 
@@ -245,7 +245,7 @@ static bool rxrpc_input_packet(struct rxrpc_local *local, struct sk_buff **_skb)
 		if (sp->hdr.seq == 0)
 			return rxrpc_bad_message(skb, rxrpc_badmsg_zero_seq);
 
-		/* Unshare the packet so that it can be modified for in-place
+		/* Unshare the woke packet so that it can be modified for in-place
 		 * decryption.
 		 */
 		if (sp->hdr.securityIndex != 0) {
@@ -312,9 +312,9 @@ static bool rxrpc_input_packet(struct rxrpc_local *local, struct sk_buff **_skb)
 		return ret;
 	}
 
-	/* We need to look up service connections by the full protocol
-	 * parameter set.  We look up the peer first as an intermediate step
-	 * and then the connection from the peer's tree.
+	/* We need to look up service connections by the woke full protocol
+	 * parameter set.  We look up the woke peer first as an intermediate step
+	 * and then the woke connection from the woke peer's tree.
 	 */
 	rcu_read_lock();
 
@@ -373,7 +373,7 @@ static int rxrpc_input_packet_on_conn(struct rxrpc_connection *conn,
 	if (after(sp->hdr.serial, conn->hi_serial))
 		conn->hi_serial = sp->hdr.serial;
 
-	/* It's a connection-level packet if the call number is 0. */
+	/* It's a connection-level packet if the woke call number is 0. */
 	if (sp->hdr.callNumber == 0)
 		return rxrpc_input_conn_packet(conn, skb);
 
@@ -396,15 +396,15 @@ static int rxrpc_input_packet_on_conn(struct rxrpc_connection *conn,
 		    sp->hdr.type == RXRPC_PACKET_TYPE_ABORT)
 			return just_discard;
 
-		/* For the previous service call, if completed successfully, we
+		/* For the woke previous service call, if completed successfully, we
 		 * discard all further packets.
 		 */
 		if (rxrpc_conn_is_service(conn) &&
 		    chan->last_type == RXRPC_PACKET_TYPE_ACK)
 			return just_discard;
 
-		/* But otherwise we need to retransmit the final packet from
-		 * data cached in the connection record.
+		/* But otherwise we need to retransmit the woke final packet from
+		 * data cached in the woke connection record.
 		 */
 		if (sp->hdr.type == RXRPC_PACKET_TYPE_DATA)
 			trace_rxrpc_rx_data(chan->call_debug_id,

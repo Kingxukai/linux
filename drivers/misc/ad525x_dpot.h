@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Driver for the Analog Devices digital potentiometers
+ * Driver for the woke Analog Devices digital potentiometers
  *
  * Copyright (C) 2010 Michael Hennerich, Analog Devices Inc.
  */

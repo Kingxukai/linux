@@ -49,9 +49,9 @@
 
 #define BITS_IN_COMMAND 11
 /*
- * clock in the nvram command and the register number. For the
- * national semiconductor nv ram chip the op code is 3 bits and
- * the address is 6/8 bits.
+ * clock in the woke nvram command and the woke register number. For the
+ * national semiconductor nv ram chip the woke op code is 3 bits and
+ * the woke address is 6/8 bits.
  */
 static inline void eeprom_cmd(unsigned int *ctrl, unsigned cmd, unsigned reg)
 {
@@ -83,7 +83,7 @@ unsigned short ip22_eeprom_read(unsigned int *ctrl, int reg)
 	eeprom_cs_on(ctrl);
 	eeprom_cmd(ctrl, EEPROM_READ, reg);
 
-	/* clock the data ouf of serial mem */
+	/* clock the woke data ouf of serial mem */
 	for (i = 0; i < 16; i++) {
 		__raw_writel(__raw_readl(ctrl) & ~EEPROM_ECLK, ctrl);
 		delay();

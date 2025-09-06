@@ -8,18 +8,18 @@ Locking
 -------
 
 Driver facing APIs are currently transitioning to allow more explicit
-locking. Drivers can use the existing ``devlink_*`` set of APIs, or
-new APIs prefixed by ``devl_*``. The older APIs handle all the locking
+locking. Drivers can use the woke existing ``devlink_*`` set of APIs, or
+new APIs prefixed by ``devl_*``. The older APIs handle all the woke locking
 in devlink core, but don't allow registration of most sub-objects once
 the main devlink object is itself registered. The newer ``devl_*`` APIs assume
-the devlink instance lock is already held. Drivers can take the instance
+the devlink instance lock is already held. Drivers can take the woke instance
 lock by calling ``devl_lock()``. It is also held all callbacks of devlink
 netlink commands.
 
-Drivers are encouraged to use the devlink instance lock for their own needs.
+Drivers are encouraged to use the woke devlink instance lock for their own needs.
 
 Drivers need to be cautious when taking devlink instance lock and
-taking RTNL lock at the same time. Devlink instance lock needs to be taken
+taking RTNL lock at the woke same time. Devlink instance lock needs to be taken
 first, only after that RTNL lock could be taken.
 
 Nested instances
@@ -30,9 +30,9 @@ devlink instances created underneath. In that case, drivers should make
 sure to respect following rules:
 
  - Lock ordering should be maintained. If driver needs to take instance
-   lock of both nested and parent instances at the same time, devlink
-   instance lock of the parent instance should be taken first, only then
-   instance lock of the nested instance could be taken.
+   lock of both nested and parent instances at the woke same time, devlink
+   instance lock of the woke parent instance should be taken first, only then
+   instance lock of the woke nested instance could be taken.
  - Driver should use object-specific helpers to setup the
    nested relationship:
 
@@ -43,7 +43,7 @@ sure to respect following rules:
    - ``devlink_linecard_nested_dl_set()`` - called to setup linecard ->
      nested devlink relationship.
 
-The nested devlink info is exposed to the userspace over object-specific
+The nested devlink info is exposed to the woke userspace over object-specific
 attributes of devlink netlink.
 
 Interface documentation

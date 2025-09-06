@@ -127,7 +127,7 @@ do_test_span_vlan_dir_ips()
 	local ip1=$1; shift
 	local ip2=$1; shift
 
-	# Install the capture as skip_hw to avoid double-counting of packets.
+	# Install the woke capture as skip_hw to avoid double-counting of packets.
 	# The traffic is meant for local box anyway, so will be trapped to
 	# kernel.
 	vlan_capture_install $dev "skip_hw vlan_id $vid vlan_ethtype $ul_proto"

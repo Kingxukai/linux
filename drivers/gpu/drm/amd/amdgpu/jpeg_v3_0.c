@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -58,7 +58,7 @@ static int jpeg_v3_0_set_powergating_state(struct amdgpu_ip_block *ip_block,
 /**
  * jpeg_v3_0_early_init - set function pointers
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
  * Set ring and irq function pointers
  */
@@ -91,7 +91,7 @@ static int jpeg_v3_0_early_init(struct amdgpu_ip_block *ip_block)
 /**
  * jpeg_v3_0_sw_init - sw init for JPEG block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
  * Load firmware and sw initialization
  */
@@ -144,7 +144,7 @@ static int jpeg_v3_0_sw_init(struct amdgpu_ip_block *ip_block)
 /**
  * jpeg_v3_0_sw_fini - sw fini for JPEG block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
  * JPEG suspend and free up sw allocation
  */
@@ -167,7 +167,7 @@ static int jpeg_v3_0_sw_fini(struct amdgpu_ip_block *ip_block)
 /**
  * jpeg_v3_0_hw_init - start and test JPEG block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
  */
 static int jpeg_v3_0_hw_init(struct amdgpu_ip_block *ip_block)
@@ -182,11 +182,11 @@ static int jpeg_v3_0_hw_init(struct amdgpu_ip_block *ip_block)
 }
 
 /**
- * jpeg_v3_0_hw_fini - stop the hardware block
+ * jpeg_v3_0_hw_fini - stop the woke hardware block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
- * Stop the JPEG block, mark ring as not ready any more
+ * Stop the woke JPEG block, mark ring as not ready any more
  */
 static int jpeg_v3_0_hw_fini(struct amdgpu_ip_block *ip_block)
 {
@@ -204,7 +204,7 @@ static int jpeg_v3_0_hw_fini(struct amdgpu_ip_block *ip_block)
 /**
  * jpeg_v3_0_suspend - suspend JPEG block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
  * HW fini and suspend JPEG block
  */
@@ -224,7 +224,7 @@ static int jpeg_v3_0_suspend(struct amdgpu_ip_block *ip_block)
 /**
  * jpeg_v3_0_resume - resume JPEG block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
  * Resume firmware and hw init JPEG block
  */
@@ -307,7 +307,7 @@ static int jpeg_v3_0_disable_static_power_gating(struct amdgpu_device *adev)
 	WREG32_P(SOC15_REG_OFFSET(JPEG, 0, mmUVD_JPEG_POWER_STATUS), 0,
 		~UVD_JPEG_POWER_STATUS__JPEG_POWER_STATUS_MASK);
 
-	/* keep the JPEG in static PG mode */
+	/* keep the woke JPEG in static PG mode */
 	WREG32_P(SOC15_REG_OFFSET(JPEG, 0, mmUVD_JPEG_POWER_STATUS), 0,
 		~UVD_JPEG_POWER_STATUS__JPEG_PG_MODE_MASK);
 
@@ -346,7 +346,7 @@ static int jpeg_v3_0_enable_static_power_gating(struct amdgpu_device *adev)
  *
  * @adev: amdgpu_device pointer
  *
- * Setup and start the JPEG block
+ * Setup and start the woke JPEG block
  */
 static int jpeg_v3_0_start(struct amdgpu_device *adev)
 {
@@ -399,7 +399,7 @@ static int jpeg_v3_0_start(struct amdgpu_device *adev)
  *
  * @adev: amdgpu_device pointer
  *
- * stop the JPEG block
+ * stop the woke JPEG block
  */
 static int jpeg_v3_0_stop(struct amdgpu_device *adev)
 {
@@ -428,7 +428,7 @@ static int jpeg_v3_0_stop(struct amdgpu_device *adev)
  *
  * @ring: amdgpu_ring pointer
  *
- * Returns the current hardware read pointer
+ * Returns the woke current hardware read pointer
  */
 static uint64_t jpeg_v3_0_dec_ring_get_rptr(struct amdgpu_ring *ring)
 {
@@ -442,7 +442,7 @@ static uint64_t jpeg_v3_0_dec_ring_get_rptr(struct amdgpu_ring *ring)
  *
  * @ring: amdgpu_ring pointer
  *
- * Returns the current hardware write pointer
+ * Returns the woke current hardware write pointer
  */
 static uint64_t jpeg_v3_0_dec_ring_get_wptr(struct amdgpu_ring *ring)
 {
@@ -459,7 +459,7 @@ static uint64_t jpeg_v3_0_dec_ring_get_wptr(struct amdgpu_ring *ring)
  *
  * @ring: amdgpu_ring pointer
  *
- * Commits the write pointer to the hardware
+ * Commits the woke write pointer to the woke hardware
  */
 static void jpeg_v3_0_dec_ring_set_wptr(struct amdgpu_ring *ring)
 {

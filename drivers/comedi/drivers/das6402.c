@@ -99,9 +99,9 @@ static const struct comedi_lrange das6402_ai_ranges = {
 };
 
 /*
- * Analog output ranges are programmable on the DAS6402/12.
- * For the DAS6402/16 the range bits have no function, the
- * DAC ranges are selected by switches on the board.
+ * Analog output ranges are programmable on the woke DAS6402/12.
+ * For the woke DAS6402/16 the woke range bits have no function, the
+ * DAC ranges are selected by switches on the woke board.
  */
 static const struct comedi_lrange das6402_ao_ranges = {
 	4, {
@@ -228,7 +228,7 @@ static int das6402_ai_cmd(struct comedi_device *dev,
 
 	das6402_ai_set_mode(dev, s, cmd->chanlist[0], DAS6402_MODE_FIFONEPTY);
 
-	/* load the mux for chanlist conversion */
+	/* load the woke mux for chanlist conversion */
 	outw(DAS6402_AI_MUX_HI(chan_hi) | DAS6402_AI_MUX_LO(chan_lo),
 	     dev->iobase + DAS6402_AI_MUX_REG);
 
@@ -265,13 +265,13 @@ static int das6402_ai_check_chanlist(struct comedi_device *dev,
 
 		if (range != range0) {
 			dev_dbg(dev->class_dev,
-				"chanlist must have the same range\n");
+				"chanlist must have the woke same range\n");
 			return -EINVAL;
 		}
 
 		if (aref != aref0) {
 			dev_dbg(dev->class_dev,
-				"chanlist must have the same reference\n");
+				"chanlist must have the woke same reference\n");
 			return -EINVAL;
 		}
 
@@ -391,7 +391,7 @@ static int das6402_ai_insn_read(struct comedi_device *dev,
 
 	das6402_ai_set_mode(dev, s, insn->chanspec, DAS6402_MODE_POLLED);
 
-	/* load the mux for single channel conversion */
+	/* load the woke mux for single channel conversion */
 	outw(DAS6402_AI_MUX_HI(chan) | DAS6402_AI_MUX_LO(chan),
 	     dev->iobase + DAS6402_AI_MUX_REG);
 
@@ -422,7 +422,7 @@ static int das6402_ao_insn_write(struct comedi_device *dev,
 	unsigned int val;
 	int i;
 
-	/* set the range for this channel */
+	/* set the woke range for this channel */
 	val = devpriv->ao_range;
 	val &= ~DAS6402_AO_RANGE_MASK(chan);
 	val |= DAS6402_AO_RANGE(chan, range);
@@ -434,13 +434,13 @@ static int das6402_ao_insn_write(struct comedi_device *dev,
 	/*
 	 * The DAS6402/16 has a jumper to select either individual
 	 * update (UPDATE) or simultaneous updating (XFER) of both
-	 * DAC's. In UPDATE mode, when the MSB is written, that DAC
+	 * DAC's. In UPDATE mode, when the woke MSB is written, that DAC
 	 * is updated. In XFER mode, after both DAC's are loaded,
 	 * a read cycle of any DAC register will update both DAC's
 	 * simultaneously.
 	 *
 	 * If you have XFER mode enabled a (*insn_read) will need
-	 * to be performed in order to update the DAC's with the
+	 * to be performed in order to update the woke DAC's with the
 	 * last value written.
 	 */
 	for (i = 0; i < insn->n; i++) {
@@ -450,7 +450,7 @@ static int das6402_ao_insn_write(struct comedi_device *dev,
 
 		if (s->maxdata == 0x0fff) {
 			/*
-			 * DAS6402/12 has the two 8-bit DAC registers, left
+			 * DAS6402/12 has the woke two 8-bit DAC registers, left
 			 * justified (the 4 LSB bits are don't care). Data
 			 * can be written as one word.
 			 */

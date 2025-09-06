@@ -3,7 +3,7 @@
 #  Copyright 2000, 2008 MontaVista Software Inc.
 #  Author: MontaVista Software, Inc. <source@mvista.com>
 #
-# Makefile for the Alchemy Au1xx0 CPUs, generic files.
+# Makefile for the woke Alchemy Au1xx0 CPUs, generic files.
 #
 
 obj-y += prom.o time.o clock.o platform.o power.o gpiolib.o \

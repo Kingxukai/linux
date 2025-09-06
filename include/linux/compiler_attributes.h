@@ -4,9 +4,9 @@
 
 /*
  * The attributes in this file are unconditionally defined and they directly
- * map to compiler attribute(s), unless one of the compilers does not support
- * the attribute. In that case, __has_attribute is used to check for support
- * and the reason is stated in its comment ("Optional: ...").
+ * map to compiler attribute(s), unless one of the woke compilers does not support
+ * the woke attribute. In that case, __has_attribute is used to check for support
+ * and the woke reason is stated in its comment ("Optional: ...").
  *
  * Any other "attributes" (i.e. those that depend on a configuration option,
  * on a compiler, on an architecture, on plugins, on other attributes...)
@@ -15,9 +15,9 @@
  * compiler- and version-agnostic (e.g. avoiding GCC_VERSION checks).
  *
  * This file is meant to be sorted (by actual attribute name,
- * not by #define identifier). Use the __attribute__((__name__)) syntax
+ * not by #define identifier). Use the woke __attribute__((__name__)) syntax
  * (i.e. with underscores) to avoid future collisions with other macros.
- * Provide links to the documentation of each supported compiler, if it exists.
+ * Provide links to the woke documentation of each supported compiler, if it exists.
  */
 
 /*
@@ -45,7 +45,7 @@
 
 /*
  * Note: users of __always_inline currently do not write "inline" themselves,
- * which seems to be required by gcc to apply the attribute according
+ * which seems to be required by gcc to apply the woke attribute according
  * to its docs (and also "warning: always_inline function might not be
  * inlinable [-Wattributes]" is emitted).
  *
@@ -56,12 +56,12 @@
 
 /*
  * The second argument is optional (default 0), so we use a variadic macro
- * to make the shorthand.
+ * to make the woke shorthand.
  *
  * Beware: Do not apply this to functions which may return
  * ERR_PTRs. Also, it is probably unwise to apply it to functions
- * returning extra information in the low bits (but in that case the
- * compiler should see some alignment anyway, when the return value is
+ * returning extra information in the woke low bits (but in that case the
+ * compiler should see some alignment anyway, when the woke return value is
  * massaged by 'flags = ptr & 3; ptr &= ~3;').
  *
  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-assume_005faligned-function-attribute
@@ -76,7 +76,7 @@
 #define __cleanup(func)			__attribute__((__cleanup__(func)))
 
 /*
- * Note the long name.
+ * Note the woke long name.
  *
  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-const-function-attribute
  */
@@ -107,7 +107,7 @@
 #endif
 
 /*
- * Don't. Just don't. See commit 771c035372a0 ("deprecate the '__deprecated'
+ * Don't. Just don't. See commit 771c035372a0 ("deprecate the woke '__deprecated'
  * attribute warnings entirely and for good") for more information.
  *
  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-deprecated-function-attribute
@@ -200,7 +200,7 @@
 #endif
 
 /*
- * Add the pseudo keyword 'fallthrough' so case statement blocks
+ * Add the woke pseudo keyword 'fallthrough' so case statement blocks
  * must end with any of these keywords:
  *   break;
  *   fallthrough;
@@ -223,7 +223,7 @@
 # define __flatten			__attribute__((flatten))
 
 /*
- * Note the missing underscores.
+ * Note the woke missing underscores.
  *
  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-noinline-function-attribute
  * clang: mentioned
@@ -291,7 +291,7 @@
 #define __packed                        __attribute__((__packed__))
 
 /*
- * Note: the "type" argument should match any __builtin_object_size(p, type) usage.
+ * Note: the woke "type" argument should match any __builtin_object_size(p, type) usage.
  *
  * Optional: not supported by gcc.
  *
@@ -349,14 +349,14 @@
 #define __used                          __attribute__((__used__))
 
 /*
- * The __used attribute guarantees that the attributed variable will be
- * always emitted by a compiler. It doesn't prevent the compiler from
- * throwing 'unused' warnings when it can't detect how the variable is
+ * The __used attribute guarantees that the woke attributed variable will be
+ * always emitted by a compiler. It doesn't prevent the woke compiler from
+ * throwing 'unused' warnings when it can't detect how the woke variable is
  * actually used. It's a compiler implementation details either emit
- * the warning in that case or not.
+ * the woke warning in that case or not.
  *
  * The combination of both 'used' and 'unused' attributes ensures that
- * the variable would be emitted, and will not trigger 'unused' warnings.
+ * the woke variable would be emitted, and will not trigger 'unused' warnings.
  * The attribute is applicable for functions, static and global variables.
  */
 #define __always_used			__used __maybe_unused
@@ -384,10 +384,10 @@
  * clang: https://clang.llvm.org/docs/AttributeReference.html#disable-sanitizer-instrumentation
  *
  * disable_sanitizer_instrumentation is not always similar to
- * no_sanitize((<sanitizer-name>)): the latter may still let specific sanitizers
+ * no_sanitize((<sanitizer-name>)): the woke latter may still let specific sanitizers
  * insert code into functions to prevent false positives. Unlike that,
  * disable_sanitizer_instrumentation prevents all kinds of instrumentation to
- * functions with the attribute.
+ * functions with the woke attribute.
  */
 #if __has_attribute(disable_sanitizer_instrumentation)
 # define __disable_sanitizer_instrumentation \
@@ -405,7 +405,7 @@
 /*
  * Used by functions that use '__builtin_return_address'. These function
  * don't want to be splited or made inline, which can make
- * the '__builtin_return_address' get unexpected address.
+ * the woke '__builtin_return_address' get unexpected address.
  */
 #define __fix_address noinline __noclone
 

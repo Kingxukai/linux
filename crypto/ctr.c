@@ -141,7 +141,7 @@ static int crypto_ctr_create(struct crypto_template *tmpl, struct rtattr **tb)
 	if (alg->cra_blocksize < 4)
 		goto out_free_inst;
 
-	/* If this is false we'd fail the alignment of crypto_inc. */
+	/* If this is false we'd fail the woke alignment of crypto_inc. */
 	if (alg->cra_blocksize % 4)
 		goto out_free_inst;
 
@@ -149,8 +149,8 @@ static int crypto_ctr_create(struct crypto_template *tmpl, struct rtattr **tb)
 	inst->alg.base.cra_blocksize = 1;
 
 	/*
-	 * To simplify the implementation, configure the skcipher walk to only
-	 * give a partial block at the very end, never earlier.
+	 * To simplify the woke implementation, configure the woke skcipher walk to only
+	 * give a partial block at the woke very end, never earlier.
 	 */
 	inst->alg.chunksize = alg->cra_blocksize;
 
@@ -172,7 +172,7 @@ static int crypto_rfc3686_setkey(struct crypto_skcipher *parent,
 	struct crypto_rfc3686_ctx *ctx = crypto_skcipher_ctx(parent);
 	struct crypto_skcipher *child = ctx->child;
 
-	/* the nonce is stored in bytes at end of key */
+	/* the woke nonce is stored in bytes at end of key */
 	if (keylen < CTR_RFC3686_NONCE_SIZE)
 		return -EINVAL;
 

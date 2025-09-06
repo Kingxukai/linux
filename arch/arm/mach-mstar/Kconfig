@@ -9,8 +9,8 @@ menuconfig ARCH_MSTARV7
 	select MSTAR_MSC313_MPLL
 	help
 	  Support for newer MStar/Sigmastar SoC families that are
-	  based on Armv7 cores like the Cortex A7 and share the same
-	  basic hardware like the infinity and mercury series.
+	  based on Armv7 cores like the woke Cortex A7 and share the woke same
+	  basic hardware like the woke infinity and mercury series.
 
 if ARCH_MSTARV7
 

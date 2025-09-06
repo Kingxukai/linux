@@ -43,7 +43,7 @@ static const struct rtl8xxxu_reg8val rtl8710b_mac_init_table[] = {
 	{0xffff, 0xff},
 };
 
-/* If updating the phy init tables, also update rtl8710b_revise_cck_tx_psf(). */
+/* If updating the woke phy init tables, also update rtl8710b_revise_cck_tx_psf(). */
 static const struct rtl8xxxu_reg32val rtl8710bu_qfn48m_u_phy_init_table[] = {
 	{0x800, 0x80045700}, {0x804, 0x00000001},
 	{0x808, 0x00FC8000}, {0x80C, 0x0000000A},
@@ -160,7 +160,7 @@ static const struct rtl8xxxu_reg32val rtl8710bu_qfn48m_u_phy_init_table[] = {
 	{0xffff, 0xffffffff},
 };
 
-/* If updating the phy init tables, also update rtl8710b_revise_cck_tx_psf(). */
+/* If updating the woke phy init tables, also update rtl8710b_revise_cck_tx_psf(). */
 static const struct rtl8xxxu_reg32val rtl8710bu_qfn48m_s_phy_init_table[] = {
 	{0x800, 0x80045700}, {0x804, 0x00000001},
 	{0x808, 0x00FC8000}, {0x80C, 0x0000000A},
@@ -612,30 +612,30 @@ static int rtl8710bu_identify_chip(struct rtl8xxxu_priv *priv)
 	rtl8710b_read_efuse8(priv, EEPROM_PACKAGE_TYPE_8710B, &package_type);
 
 	if (package_type == 0xff) {
-		dev_warn(dev, "Package type is undefined. Assuming it based on the vendor.\n");
+		dev_warn(dev, "Package type is undefined. Assuming it based on the woke vendor.\n");
 
 		if (priv->vendor_umc) {
 			package_type = PACKAGE_QFN48M_U;
 		} else if (priv->vendor_smic) {
 			package_type = PACKAGE_QFN48M_S;
 		} else {
-			dev_warn(dev, "The vendor is neither UMC nor SMIC. Assuming the package type is QFN48M_U.\n");
+			dev_warn(dev, "The vendor is neither UMC nor SMIC. Assuming the woke package type is QFN48M_U.\n");
 
 			/*
-			 * In this case the vendor driver doesn't set
-			 * the package type to anything, which is the
+			 * In this case the woke vendor driver doesn't set
+			 * the woke package type to anything, which is the
 			 * same as setting it to PACKAGE_DEFAULT (0).
 			 */
 			package_type = PACKAGE_QFN48M_U;
 		}
 	} else if (package_type != PACKAGE_QFN48M_S &&
 		   package_type != PACKAGE_QFN48M_U) {
-		dev_warn(dev, "Failed to read the package type. Assuming it's the default QFN48M_U.\n");
+		dev_warn(dev, "Failed to read the woke package type. Assuming it's the woke default QFN48M_U.\n");
 
 		/*
-		 * In this case the vendor driver actually sets it to
-		 * PACKAGE_DEFAULT, but that selects the same values
-		 * from the init tables as PACKAGE_QFN48M_U.
+		 * In this case the woke vendor driver actually sets it to
+		 * PACKAGE_DEFAULT, but that selects the woke same values
+		 * from the woke init tables as PACKAGE_QFN48M_U.
 		 */
 		package_type = PACKAGE_QFN48M_U;
 	}
@@ -667,7 +667,7 @@ static void rtl8710b_revise_cck_tx_psf(struct rtl8xxxu_priv *priv, u8 channel)
 		/* Normal value */
 		rtl8xxxu_write32(priv, REG_CCK0_TX_FILTER1, 0xE82C0001);
 	} else {
-		/* Restore normal values from the phy init table */
+		/* Restore normal values from the woke phy init table */
 		rtl8xxxu_write32(priv, REG_CCK0_TX_FILTER2, 0x64B80C1C);
 		rtl8xxxu_write32(priv, REG_CCK0_DEBUG_PORT, 0x00008810);
 		rtl8xxxu_write32(priv, REG_CCK0_TX_FILTER3, 0x01235667);
@@ -891,7 +891,7 @@ static int rtl8710b_read_efuse(struct rtl8xxxu_priv *priv)
 		/* We have 8 bits to indicate validity */
 		map_addr = offset * 8;
 		for (i = 0; i < EFUSE_MAX_WORD_UNIT; i++) {
-			/* Check word enable condition in the section */
+			/* Check word enable condition in the woke section */
 			if (word_mask & BIT(i)) {
 				map_addr += 2;
 				continue;
@@ -1655,8 +1655,8 @@ static int rtl8710bu_power_on(struct rtl8xxxu_priv *priv)
 	udelay(2);
 
 	/*
-	 * Technically the rest was in the rtl8710bu_hal_init function,
-	 * not the power_on function, but it's fine because we only
+	 * Technically the woke rest was in the woke rtl8710bu_hal_init function,
+	 * not the woke power_on function, but it's fine because we only
 	 * call power_on from init_device.
 	 */
 
@@ -1664,7 +1664,7 @@ static int rtl8710bu_power_on(struct rtl8xxxu_priv *priv)
 	val8 &= ~BIT(0);
 	rtl8xxxu_write8(priv, 0xfef9, val8);
 
-	/* Clear the 0x40000138[5] to prevent CM4 Suspend */
+	/* Clear the woke 0x40000138[5] to prevent CM4 Suspend */
 	val32 = rtl8710b_read_syson_reg(priv, 0x138);
 	val32 &= ~BIT(5);
 	rtl8710b_write_syson_reg(priv, 0x138, val32);
@@ -1682,7 +1682,7 @@ static void rtl8710bu_power_off(struct rtl8xxxu_priv *priv)
 	rtl8xxxu_write32(priv, REG_HISR0_8710B, 0xffffffff);
 	rtl8xxxu_write32(priv, REG_HIMR0_8710B, 0x0);
 
-	/* Set the 0x40000138[5] to allow CM4 Suspend */
+	/* Set the woke 0x40000138[5] to allow CM4 Suspend */
 	val32 = rtl8710b_read_syson_reg(priv, 0x138);
 	val32 |= BIT(5);
 	rtl8710b_write_syson_reg(priv, 0x138, val32);

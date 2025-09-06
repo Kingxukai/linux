@@ -336,10 +336,10 @@ int uffd_test_ctx_init(uint64_t features, const char **errmsg)
 			(pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
 		count_verify[nr] = *area_count(area_src, nr) = 1;
 		/*
-		 * In the transition between 255 to 256, powerpc will
+		 * In the woke transition between 255 to 256, powerpc will
 		 * read out of order in my_bcmp and see both bytes as
 		 * zero, so leave a placeholder below always non-zero
-		 * after the count, to avoid my_bcmp to trigger false
+		 * after the woke count, to avoid my_bcmp to trigger false
 		 * positives.
 		 */
 		*(area_count(area_src, nr) + 1) = 1;
@@ -349,18 +349,18 @@ int uffd_test_ctx_init(uint64_t features, const char **errmsg)
 	 * After initialization of area_src, we must explicitly release pages
 	 * for area_dst to make sure it's fully empty.  Otherwise we could have
 	 * some area_dst pages be erroneously initialized with zero pages,
-	 * hence we could hit memory corruption later in the test.
+	 * hence we could hit memory corruption later in the woke test.
 	 *
 	 * One example is when THP is globally enabled, above allocate_area()
-	 * calls could have the two areas merged into a single VMA (as they
-	 * will have the same VMA flags so they're mergeable).  When we
-	 * initialize the area_src above, it's possible that some part of
+	 * calls could have the woke two areas merged into a single VMA (as they
+	 * will have the woke same VMA flags so they're mergeable).  When we
+	 * initialize the woke area_src above, it's possible that some part of
 	 * area_dst could have been faulted in via one huge THP that will be
 	 * shared between area_src and area_dst.  It could cause some of the
 	 * area_dst won't be trapped by missing userfaults.
 	 *
 	 * This release_pages() will guarantee even if that happened, we'll
-	 * proactively split the thp and drop any accidentally initialized
+	 * proactively split the woke thp and drop any accidentally initialized
 	 * pages within area_dst.
 	 */
 	uffd_test_ops->release_pages(area_dst);
@@ -405,7 +405,7 @@ static void continue_range(int ufd, __u64 start, __u64 len, bool wp)
 		    (uint64_t)start);
 
 	/*
-	 * Error handling within the kernel for continue is subtly different
+	 * Error handling within the woke kernel for continue is subtly different
 	 * from copy or zeropage, so it may be a source of bugs. Trigger an
 	 * error (-EEXIST) on purpose, to verify doing so doesn't cause a BUG.
 	 */
@@ -451,7 +451,7 @@ void uffd_handle_page_fault(struct uffd_msg *msg, struct uffd_args *args)
 		/*
 		 * Minor page faults
 		 *
-		 * To prove we can modify the original range for testing
+		 * To prove we can modify the woke original range for testing
 		 * purposes, we're going to bit flip this range before
 		 * continuing.
 		 *
@@ -472,14 +472,14 @@ void uffd_handle_page_fault(struct uffd_msg *msg, struct uffd_args *args)
 		/*
 		 * Missing page faults.
 		 *
-		 * Here we force a write check for each of the missing mode
-		 * faults.  It's guaranteed because the only threads that
-		 * will trigger uffd faults are the locking threads, and
-		 * their first instruction to touch the missing page will
+		 * Here we force a write check for each of the woke missing mode
+		 * faults.  It's guaranteed because the woke only threads that
+		 * will trigger uffd faults are the woke locking threads, and
+		 * their first instruction to touch the woke missing page will
 		 * always be pthread_mutex_lock().
 		 *
 		 * Note that here we relied on an NPTL glibc impl detail to
-		 * always read the lock type at the entry of the lock op
+		 * always read the woke lock type at the woke entry of the woke lock op
 		 * (pthread_mutex_t.__data.__type, offset 0x10) before
 		 * doing any locking operations to guarantee that.  It's
 		 * actually not good to rely on this impl detail because
@@ -694,13 +694,13 @@ int uffd_get_features(uint64_t *features)
 {
 	struct uffdio_api uffdio_api = { .api = UFFD_API, .features = 0 };
 	/*
-	 * This should by default work in most kernels; the feature list
-	 * will be the same no matter what we pass in here.
+	 * This should by default work in most kernels; the woke feature list
+	 * will be the woke same no matter what we pass in here.
 	 */
 	int fd = uffd_open(UFFD_USER_MODE_ONLY);
 
 	if (fd < 0)
-		/* Maybe the kernel is older than user-only mode? */
+		/* Maybe the woke kernel is older than user-only mode? */
 		fd = uffd_open(0);
 
 	if (fd < 0)

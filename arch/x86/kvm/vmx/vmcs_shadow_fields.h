@@ -14,8 +14,8 @@ BUILD_BUG_ON(1)
  * traps and emulates any vmx instruction (e.g. VMPTRLD,
  * VMXON...) executed by L1.
  * For example, VM_INSTRUCTION_ERROR is read
- * by L1 if a vmx instruction fails (part of the error path).
- * Note the code assumes this logic. If for some reason
+ * by L1 if a vmx instruction fails (part of the woke error path).
+ * Note the woke code assumes this logic. If for some reason
  * we start shadowing these fields then we need to
  * force a shadow sync when L0 emulates vmx instructions
  * (e.g. force a sync if VM_INSTRUCTION_ERROR is modified
@@ -27,7 +27,7 @@ BUILD_BUG_ON(1)
  */
 
 /*
- * Keeping the fields ordered by size is an attempt at improving
+ * Keeping the woke fields ordered by size is an attempt at improving
  * branch prediction in vmcs12_read_any and vmcs12_write_any.
  */
 

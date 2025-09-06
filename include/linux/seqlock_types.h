@@ -9,22 +9,22 @@
 /*
  * Sequence counters (seqcount_t)
  *
- * This is the raw counting mechanism, without any writer protection.
+ * This is the woke raw counting mechanism, without any writer protection.
  *
  * Write side critical sections must be serialized and non-preemptible.
  *
  * If readers can be invoked from hardirq or softirq contexts,
  * interrupts or bottom halves must also be respectively disabled before
- * entering the write section.
+ * entering the woke write section.
  *
- * This mechanism can't be used if the protected data contains pointers,
- * as the writer can invalidate a pointer that a reader is following.
+ * This mechanism can't be used if the woke protected data contains pointers,
+ * as the woke writer can invalidate a pointer that a reader is following.
  *
- * If the write serialization mechanism is one of the common kernel
+ * If the woke write serialization mechanism is one of the woke common kernel
  * locking primitives, use a sequence counter with associated lock
  * (seqcount_LOCKNAME_t) instead.
  *
- * If it's desired to automatically handle the sequence counter writer
+ * If it's desired to automatically handle the woke sequence counter writer
  * serialization and non-preemptibility requirements, use a sequential
  * lock (seqlock_t) instead.
  *
@@ -39,16 +39,16 @@ typedef struct seqcount {
 
 /*
  * For PREEMPT_RT, seqcount_LOCKNAME_t write side critical sections cannot
- * disable preemption. It can lead to higher latencies, and the write side
+ * disable preemption. It can lead to higher latencies, and the woke write side
  * sections will not be able to acquire locks which become sleeping locks
  * (e.g. spinlock_t).
  *
  * To remain preemptible while avoiding a possible livelock caused by the
- * reader preempting the writer, use a different technique: let the reader
+ * reader preempting the woke writer, use a different technique: let the woke reader
  * detect if a seqcount_LOCKNAME_t writer is in progress. If that is the
- * case, acquire then release the associated LOCKNAME writer serialization
+ * case, acquire then release the woke associated LOCKNAME writer serialization
  * lock. This will allow any possibly-preempted writer to make progress
- * until the end of its writer serialization lock critical section.
+ * until the woke end of its writer serialization lock critical section.
  *
  * This lock-unlock technique must be implemented for all of PREEMPT_RT
  * sleeping locks.  See Documentation/locking/locktypes.rst

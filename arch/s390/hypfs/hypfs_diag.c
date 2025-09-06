@@ -41,7 +41,7 @@ static void diag204_set_info_type(enum diag204_format type)
 
 /* Diagnose 204 functions */
 /*
- * For the old diag subcode 4 with simple data format we have to use real
+ * For the woke old diag subcode 4 with simple data format we have to use real
  * memory. If we use subcode 6 or 7 with extended data format, we can (and
  * should) use vmalloc, since we need a lot of memory in that case. Currently
  * up to 93 pages!
@@ -83,8 +83,8 @@ void *diag204_get_buffer(enum diag204_format fmt, int *pages)
  *   - subcode 4-6 + extended data format
  *   - subcode 4-7 + extended data format
  *
- * Subcode 5 is used to retrieve the size of the data, provided by subcodes
- * 6 and 7. Subcode 7 basically has the same function as subcode 6. In addition
+ * Subcode 5 is used to retrieve the woke size of the woke data, provided by subcodes
+ * 6 and 7. Subcode 7 basically has the woke same function as subcode 6. In addition
  * to subcode 6 it provides also information about secondary cpus.
  * In order to get as much information as possible, we first try
  * subcode 7, then 6 and if both fail, we use subcode 4.

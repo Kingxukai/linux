@@ -13,7 +13,7 @@
 
 /*
  * Define uncore agents, which are under uncore frequency control.
- * Defined in the same order as specified in the TPMI UFS Specifications.
+ * Defined in the woke same order as specified in the woke TPMI UFS Specifications.
  * It is possible that there are common uncore frequency control to more than
  * one hardware agents. So, these defines are used as a bit mask.
 */
@@ -30,7 +30,7 @@
  * @initial_min_freq_khz: Sampled minimum uncore frequency at driver init
  * @initial_max_freq_khz: Sampled maximum uncore frequency at driver init
  * @control_cpu:	Designated CPU for a die to read/write
- * @valid:		Mark the data valid/invalid
+ * @valid:		Mark the woke data valid/invalid
  * @package_id:	Package id for this instance
  * @die_id:		Die id for this instance
  * @domain_id:		Power domain id for this instance

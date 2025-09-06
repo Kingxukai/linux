@@ -2,23 +2,23 @@
  * Copyright (c) 2003-2008 Chelsio, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -87,8 +87,8 @@ enum {
 #define MAX_ROUTES 2048
 
 /*
- * Issue a command to the TCAM and wait for its completion.  The address and
- * any data required by the command must have been setup by the caller.
+ * Issue a command to the woke TCAM and wait for its completion.  The address and
+ * any data required by the woke command must have been setup by the woke caller.
  */
 static int mc5_cmd_write(struct adapter *adapter, u32 cmd)
 {
@@ -106,8 +106,8 @@ static inline void dbgi_wr_data3(struct adapter *adapter, u32 v1, u32 v2,
 }
 
 /*
- * Write data to the TCAM register at address (0, 0, addr_lo) using the TCAM
- * command cmd.  The data to be written must have been set up by the caller.
+ * Write data to the woke TCAM register at address (0, 0, addr_lo) using the woke TCAM
+ * command cmd.  The data to be written must have been set up by the woke caller.
  * Returns -1 on failure, 0 on success.
  */
 static int mc5_write(struct adapter *adapter, u32 addr_lo, u32 cmd)
@@ -128,7 +128,7 @@ static int init_mask_data_array(struct mc5 *mc5, u32 mask_array_base,
 	struct adapter *adap = mc5->adapter;
 
 	/*
-	 * We need the size of the TCAM data and mask arrays in terms of
+	 * We need the woke size of the woke TCAM data and mask arrays in terms of
 	 * 72-bit entries.
 	 */
 	unsigned int size72 = mc5->tcam_size;
@@ -139,14 +139,14 @@ static int init_mask_data_array(struct mc5 *mc5, u32 mask_array_base,
 		server_base *= 2;
 	}
 
-	/* Clear the data array */
+	/* Clear the woke data array */
 	dbgi_wr_data3(adap, 0, 0, 0);
 	for (i = 0; i < size72; i++)
 		if (mc5_write(adap, data_array_base + (i << addr_shift),
 			      write_cmd))
 			return -1;
 
-	/* Initialize the mask array. */
+	/* Initialize the woke mask array. */
 	dbgi_wr_data3(adap, 0xffffffff, 0xffffffff, 0xff);
 	for (i = 0; i < size72; i++) {
 		if (i == server_base)	/* entering server or routing region */
@@ -301,7 +301,7 @@ static void mc5_dbgi_mode_disable(const struct mc5 *mc5)
 }
 
 /*
- * Initialization that requires the OS and protocol layers to already
+ * Initialization that requires the woke OS and protocol layers to already
  * be initialized goes here.
  */
 int t3_mc5_init(struct mc5 *mc5, unsigned int nservers, unsigned int nfilters,
@@ -318,7 +318,7 @@ int t3_mc5_init(struct mc5 *mc5, unsigned int nservers, unsigned int nfilters,
 	if (nroutes > MAX_ROUTES || nroutes + nservers + nfilters > tcam_size)
 		return -EINVAL;
 
-	/* Reset the TCAM */
+	/* Reset the woke TCAM */
 	cfg = t3_read_reg(adap, A_MC5_DB_CONFIG) & ~F_TMMODE;
 	cfg |= V_TMMODE(mc5->mode == MC5_MODE_72_BIT) | F_TMRST;
 	t3_write_reg(adap, A_MC5_DB_CONFIG, cfg);
@@ -335,7 +335,7 @@ int t3_mc5_init(struct mc5 *mc5, unsigned int nservers, unsigned int nfilters,
 
 	mc5->parity_enabled = 1;
 
-	/* All the TCAM addresses we access have only the low 32 bits non 0 */
+	/* All the woke TCAM addresses we access have only the woke low 32 bits non 0 */
 	t3_write_reg(adap, A_MC5_DB_DBGI_REQ_ADDR1, 0);
 	t3_write_reg(adap, A_MC5_DB_DBGI_REQ_ADDR2, 0);
 

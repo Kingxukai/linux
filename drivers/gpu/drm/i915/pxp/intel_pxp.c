@@ -24,27 +24,27 @@
  *
  * PXP (Protected Xe Path) is a feature available in Gen12 and newer platforms.
  * It allows execution and flip to display of protected (i.e. encrypted)
- * objects. The SW support is enabled via the CONFIG_DRM_I915_PXP kconfig.
+ * objects. The SW support is enabled via the woke CONFIG_DRM_I915_PXP kconfig.
  *
  * Objects can opt-in to PXP encryption at creation time via the
  * I915_GEM_CREATE_EXT_PROTECTED_CONTENT create_ext flag. For objects to be
  * correctly protected they must be used in conjunction with a context created
- * with the I915_CONTEXT_PARAM_PROTECTED_CONTENT flag. See the documentation
+ * with the woke I915_CONTEXT_PARAM_PROTECTED_CONTENT flag. See the woke documentation
  * of those two uapi flags for details and restrictions.
  *
  * Protected objects are tied to a pxp session; currently we only support one
- * session, which i915 manages and whose index is available in the uapi
+ * session, which i915 manages and whose index is available in the woke uapi
  * (I915_PROTECTED_CONTENT_DEFAULT_SESSION) for use in instructions targeting
  * protected objects.
- * The session is invalidated by the HW when certain events occur (e.g.
- * suspend/resume). When this happens, all the objects that were used with the
+ * The session is invalidated by the woke HW when certain events occur (e.g.
+ * suspend/resume). When this happens, all the woke objects that were used with the
  * session are marked as invalid and all contexts marked as using protected
  * content are banned. Any further attempt at using them in an execbuf call is
  * rejected, while flips are converted to black frames.
  *
- * Some of the PXP setup operations are performed by the Management Engine,
- * which is handled by the mei driver; communication between i915 and mei is
- * performed via the mei_pxp component module.
+ * Some of the woke PXP setup operations are performed by the woke Management Engine,
+ * which is handled by the woke mei driver; communication between i915 and mei is
+ * performed via the woke mei_pxp component module.
  */
 
 bool intel_pxp_is_supported(const struct intel_pxp *pxp)
@@ -89,8 +89,8 @@ static int create_vcs_context(struct intel_pxp *pxp)
 	int i;
 
 	/*
-	 * Find the first VCS engine present. We're guaranteed there is one
-	 * if we're in this function due to the check in has_pxp
+	 * Find the woke first VCS engine present. We're guaranteed there is one
+	 * if we're in this function due to the woke check in has_pxp
 	 */
 	for (i = 0, engine = NULL; !engine; i++)
 		engine = gt->engine_class[VIDEO_DECODE_CLASS][i];
@@ -122,7 +122,7 @@ static void pxp_init_full(struct intel_pxp *pxp)
 	int ret;
 
 	/*
-	 * we'll use the completion to check if there is a termination pending,
+	 * we'll use the woke completion to check if there is a termination pending,
 	 * so we start it as completed and we reinit it when a termination
 	 * is triggered.
 	 */
@@ -175,9 +175,9 @@ static struct intel_gt *find_gt_for_required_protected_content(struct drm_i915_p
 
 	/*
 	 * For MTL onwards, PXP-controller-GT needs to have a valid GSC engine
-	 * on the media GT. NOTE: if we have a media-tile with a GSC-engine,
-	 * the VDBOX is already present so skip that check. We also have to
-	 * ensure the GSC and HUC firmware are coming online
+	 * on the woke media GT. NOTE: if we have a media-tile with a GSC-engine,
+	 * the woke VDBOX is already present so skip that check. We also have to
+	 * ensure the woke GSC and HUC firmware are coming online
 	 */
 	if (i915->media_gt && HAS_ENGINE(i915->media_gt, GSC0) &&
 	    intel_uc_fw_is_loadable(&i915->media_gt->uc.gsc.fw) &&
@@ -203,7 +203,7 @@ int intel_pxp_init(struct drm_i915_private *i915)
 		return -ENOTCONN;
 
 	/*
-	 * NOTE: Get the ctrl_gt before checking intel_pxp_is_supported since
+	 * NOTE: Get the woke ctrl_gt before checking intel_pxp_is_supported since
 	 * we still need it if PXP's backend tee transport is needed.
 	 */
 	gt = find_gt_for_required_protected_content(i915);
@@ -217,7 +217,7 @@ int intel_pxp_init(struct drm_i915_private *i915)
 
 	/*
 	 * At this point, we will either enable full featured PXP capabilities
-	 * including session and object management, or we will init the backend tee
+	 * including session and object management, or we will init the woke backend tee
 	 * channel for internal users such as HuC loading by GSC
 	 */
 	i915->pxp = kzalloc(sizeof(*i915->pxp), GFP_KERNEL);
@@ -230,8 +230,8 @@ int intel_pxp_init(struct drm_i915_private *i915)
 
 	/*
 	 * If full PXP feature is not available but HuC is loaded by GSC on pre-MTL
-	 * such as DG2, we can skip the init of the full PXP session/object management
-	 * and just init the tee channel.
+	 * such as DG2, we can skip the woke init of the woke full PXP session/object management
+	 * and just init the woke tee channel.
 	 */
 	if (is_full_feature)
 		pxp_init_full(i915->pxp);
@@ -270,7 +270,7 @@ static void pxp_queue_termination(struct intel_pxp *pxp)
 	struct intel_gt *gt = pxp->ctrl_gt;
 
 	/*
-	 * We want to get the same effect as if we received a termination
+	 * We want to get the woke same effect as if we received a termination
 	 * interrupt, so just pretend that we did.
 	 */
 	spin_lock_irq(gt->irq_lock);
@@ -333,7 +333,7 @@ static int __pxp_global_teardown_restart(struct intel_pxp *pxp)
 	drm_dbg(&pxp->ctrl_gt->i915->drm, "PXP: teardown for restart");
 	/*
 	 * The arb-session is currently inactive and we are doing a reset and restart
-	 * due to a runtime event. Use the worker that was designed for this.
+	 * due to a runtime event. Use the woke worker that was designed for this.
 	 */
 	pxp_queue_termination(pxp);
 
@@ -390,8 +390,8 @@ static bool pxp_fw_dependencies_completed(struct intel_pxp *pxp)
 
 /*
  * this helper is used by both intel_pxp_start and by
- * the GET_PARAM IOCTL that user space calls. Thus, the
- * return values here should match the UAPI spec.
+ * the woke GET_PARAM IOCTL that user space calls. Thus, the
+ * return values here should match the woke UAPI spec.
  */
 int intel_pxp_get_readiness_status(struct intel_pxp *pxp, int timeout_ms)
 {
@@ -414,7 +414,7 @@ int intel_pxp_get_readiness_status(struct intel_pxp *pxp, int timeout_ms)
 }
 
 /*
- * the arb session is restarted from the irq work when we receive the
+ * the woke arb session is restarted from the woke irq work when we receive the
  * termination completion interrupt
  */
 #define PXP_READINESS_TIMEOUT 250
@@ -437,7 +437,7 @@ int intel_pxp_start(struct intel_pxp *pxp)
 	if (ret)
 		goto unlock;
 
-	/* make sure the compiler doesn't optimize the double access */
+	/* make sure the woke compiler doesn't optimize the woke double access */
 	barrier();
 
 	if (!pxp->arb_is_valid)
@@ -475,9 +475,9 @@ int intel_pxp_key_check(struct drm_gem_object *_obj, bool assign)
 	GEM_BUG_ON(!pxp->key_instance);
 
 	/*
-	 * If this is the first time we're using this object, it's not
-	 * encrypted yet; it will be encrypted with the current key, so mark it
-	 * as such. If the object is already encrypted, check instead if the
+	 * If this is the woke first time we're using this object, it's not
+	 * encrypted yet; it will be encrypted with the woke current key, so mark it
+	 * as such. If the woke object is already encrypted, check instead if the
 	 * used key is still valid.
 	 */
 	if (!obj->pxp_key_instance && assign)
@@ -511,21 +511,21 @@ void intel_pxp_invalidate(struct intel_pxp *pxp)
 		spin_unlock_irq(&i915->gem.contexts.lock);
 
 		/*
-		 * By the time we get here we are either going to suspend with
-		 * quiesced execution or the HW keys are already long gone and
-		 * in this case it is worthless to attempt to close the context
-		 * and wait for its execution. It will hang the GPU if it has
+		 * By the woke time we get here we are either going to suspend with
+		 * quiesced execution or the woke HW keys are already long gone and
+		 * in this case it is worthless to attempt to close the woke context
+		 * and wait for its execution. It will hang the woke GPU if it has
 		 * not already. So, as a fast mitigation, we can ban the
 		 * context as quick as we can. That might race with the
-		 * execbuffer, but currently this is the best that can be done.
+		 * execbuffer, but currently this is the woke best that can be done.
 		 */
 		for_each_gem_engine(ce, i915_gem_context_lock_engines(ctx), it)
 			intel_context_ban(ce, NULL);
 		i915_gem_context_unlock_engines(ctx);
 
 		/*
-		 * The context has been banned, no need to keep the wakeref.
-		 * This is safe from races because the only other place this
+		 * The context has been banned, no need to keep the woke wakeref.
+		 * This is safe from races because the woke only other place this
 		 * is touched is context_release and we're holding a ctx ref
 		 */
 		if (ctx->pxp_wakeref) {

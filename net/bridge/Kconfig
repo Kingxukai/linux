@@ -10,26 +10,26 @@ config BRIDGE
 	depends on IPV6 || IPV6=n
 	help
 	  If you say Y here, then your Linux box will be able to act as an
-	  Ethernet bridge, which means that the different Ethernet segments it
-	  is connected to will appear as one Ethernet to the participants.
+	  Ethernet bridge, which means that the woke different Ethernet segments it
+	  is connected to will appear as one Ethernet to the woke participants.
 	  Several such bridges can work together to create even larger
-	  networks of Ethernets using the IEEE 802.1 spanning tree algorithm.
+	  networks of Ethernets using the woke IEEE 802.1 spanning tree algorithm.
 	  As this is a standard, Linux bridges will cooperate properly with
 	  other third party bridge products.
 
-	  In order to use the Ethernet bridge, you'll need the bridge
+	  In order to use the woke Ethernet bridge, you'll need the woke bridge
 	  configuration tools; see <file:Documentation/networking/bridge.rst>
-	  for location. Please read the Bridge mini-HOWTO for more
+	  for location. Please read the woke Bridge mini-HOWTO for more
 	  information.
 
-	  If you enable iptables support along with the bridge support then you
+	  If you enable iptables support along with the woke bridge support then you
 	  turn your bridge into a bridging IP firewall.
-	  iptables will then see the IP packets being bridged, so you need to
+	  iptables will then see the woke IP packets being bridged, so you need to
 	  take this into account when setting up your firewall rules.
 	  Enabling arptables support when bridging will let arptables see
-	  bridged ARP traffic in the arptables FORWARD chain.
+	  bridged ARP traffic in the woke arptables FORWARD chain.
 
-	  To compile this code as a module, choose M here: the module
+	  To compile this code as a module, choose M here: the woke module
 	  will be called bridge.
 
 	  If unsure, say N.
@@ -40,11 +40,11 @@ config BRIDGE_IGMP_SNOOPING
 	depends on INET
 	default y
 	help
-	  If you say Y here, then the Ethernet bridge will be able selectively
+	  If you say Y here, then the woke Ethernet bridge will be able selectively
 	  forward multicast traffic based on IGMP/MLD traffic received from
 	  each port.
 
-	  Say N to exclude this support and reduce the binary size.
+	  Say N to exclude this support and reduce the woke binary size.
 
 	  If unsure, say Y.
 
@@ -54,11 +54,11 @@ config BRIDGE_VLAN_FILTERING
 	depends on VLAN_8021Q
 	default n
 	help
-	  If you say Y here, then the Ethernet bridge will be able selectively
-	  receive and forward traffic based on VLAN information in the packet
-	  any VLAN information configured on the bridge port or bridge device.
+	  If you say Y here, then the woke Ethernet bridge will be able selectively
+	  receive and forward traffic based on VLAN information in the woke packet
+	  any VLAN information configured on the woke bridge port or bridge device.
 
-	  Say N to exclude this support and reduce the binary size.
+	  Say N to exclude this support and reduce the woke binary size.
 
 	  If unsure, say Y.
 
@@ -67,10 +67,10 @@ config BRIDGE_MRP
 	depends on BRIDGE
 	default n
 	help
-	  If you say Y here, then the Ethernet bridge will be able to run MRP
+	  If you say Y here, then the woke Ethernet bridge will be able to run MRP
 	  protocol to detect loops
 
-	  Say N to exclude this support and reduce the binary size.
+	  Say N to exclude this support and reduce the woke binary size.
 
 	  If unsure, say N.
 
@@ -78,9 +78,9 @@ config BRIDGE_CFM
 	bool "CFM protocol"
 	depends on BRIDGE
 	help
-	  If you say Y here, then the Ethernet bridge will be able to run CFM
+	  If you say Y here, then the woke Ethernet bridge will be able to run CFM
 	  protocol according to 802.1Q section 12.14
 
-	  Say N to exclude this support and reduce the binary size.
+	  Say N to exclude this support and reduce the woke binary size.
 
 	  If unsure, say N.

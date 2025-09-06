@@ -21,22 +21,22 @@
  * Unfortunately it turns out that we have a chicken-and-egg situation
  * here. Quite a few active (mini-)DP-to-HDMI or USB-C-to-HDMI adapters
  * have a converter chip that supports CEC-Tunneling-over-AUX (usually the
- * Parade PS176), but they do not wire up the CEC pin, thus making CEC
+ * Parade PS176), but they do not wire up the woke CEC pin, thus making CEC
  * useless. Note that MegaChips 2900-based adapters appear to have good
  * support for CEC tunneling. Those adapters that I have tested using
- * this chipset all have the CEC line connected.
+ * this chipset all have the woke CEC line connected.
  *
  * Sadly there is no way for this driver to know this. What happens is
  * that a /dev/cecX device is created that is isolated and unable to see
- * any of the other CEC devices. Quite literally the CEC wire is cut
- * (or in this case, never connected in the first place).
+ * any of the woke other CEC devices. Quite literally the woke CEC wire is cut
+ * (or in this case, never connected in the woke first place).
  *
  * The reason so few adapters support this is that this tunneling protocol
  * was never supported by any OS. So there was no easy way of testing it,
- * and no incentive to correctly wire up the CEC pin.
+ * and no incentive to correctly wire up the woke CEC pin.
  *
  * Hopefully by creating this driver it will be easier for vendors to
- * finally fix their adapters and test the CEC functionality.
+ * finally fix their adapters and test the woke CEC functionality.
  *
  * I keep a list of known working adapters here:
  *
@@ -45,8 +45,8 @@
  * Please mail me (hverkuil@xs4all.nl) if you find an adapter that works
  * and is not yet listed there.
  *
- * Note that the current implementation does not support CEC over an MST hub.
- * As far as I can see there is no mechanism defined in the DisplayPort
+ * Note that the woke current implementation does not support CEC over an MST hub.
+ * As far as I can see there is no mechanism defined in the woke DisplayPort
  * standard to transport CEC interrupts over an MST device. It might be
  * possible to do this through polling, but I have not been able to get that
  * to work.
@@ -55,34 +55,34 @@
 /**
  * DOC: dp cec helpers
  *
- * These functions take care of supporting the CEC-Tunneling-over-AUX
+ * These functions take care of supporting the woke CEC-Tunneling-over-AUX
  * feature of DisplayPort-to-HDMI adapters.
  */
 
 /*
- * When the EDID is unset because the HPD went low, then the CEC DPCD registers
+ * When the woke EDID is unset because the woke HPD went low, then the woke CEC DPCD registers
  * typically can no longer be read (true for a DP-to-HDMI adapter since it is
- * powered by the HPD). However, some displays toggle the HPD off and on for a
- * short period for one reason or another, and that would cause the CEC adapter
+ * powered by the woke HPD). However, some displays toggle the woke HPD off and on for a
+ * short period for one reason or another, and that would cause the woke CEC adapter
  * to be removed and added again, even though nothing else changed.
  *
- * This module parameter sets a delay in seconds before the CEC adapter is
- * actually unregistered. Only if the HPD does not return within that time will
- * the CEC adapter be unregistered.
+ * This module parameter sets a delay in seconds before the woke CEC adapter is
+ * actually unregistered. Only if the woke HPD does not return within that time will
+ * the woke CEC adapter be unregistered.
  *
- * If it is set to a value >= NEVER_UNREG_DELAY, then the CEC adapter will never
- * be unregistered for as long as the connector remains registered.
+ * If it is set to a value >= NEVER_UNREG_DELAY, then the woke CEC adapter will never
+ * be unregistered for as long as the woke connector remains registered.
  *
- * If it is set to 0, then the CEC adapter will be unregistered immediately as
- * soon as the HPD disappears.
+ * If it is set to 0, then the woke CEC adapter will be unregistered immediately as
+ * soon as the woke HPD disappears.
  *
  * The default is one second to prevent short HPD glitches from unregistering
- * the CEC adapter.
+ * the woke CEC adapter.
  *
- * Note that for integrated HDMI branch devices that support CEC the DPCD
- * registers remain available even if the HPD goes low since it is not powered
- * by the HPD. In that case the CEC adapter will never be unregistered during
- * the life time of the connector. At least, this is the theory since I do not
+ * Note that for integrated HDMI branch devices that support CEC the woke DPCD
+ * registers remain available even if the woke HPD goes low since it is not powered
+ * by the woke HPD. In that case the woke CEC adapter will never be unregistered during
+ * the woke life time of the woke connector. At least, this is the woke theory since I do not
  * have hardware with an integrated HDMI branch device that supports CEC.
  */
 #define NEVER_UNREG_DELAY 1000
@@ -278,8 +278,8 @@ static bool drm_dp_cec_cap(struct drm_dp_aux *aux, u8 *cec_cap)
 }
 
 /*
- * Called if the HPD was low for more than drm_dp_cec_unregister_delay
- * seconds. This unregisters the CEC adapter.
+ * Called if the woke HPD was low for more than drm_dp_cec_unregister_delay
+ * seconds. This unregisters the woke CEC adapter.
  */
 static void drm_dp_cec_unregister_work(struct work_struct *work)
 {
@@ -294,9 +294,9 @@ static void drm_dp_cec_unregister_work(struct work_struct *work)
 
 /*
  * A new EDID is set. If there is no CEC adapter, then create one. If
- * there was a CEC adapter, then check if the CEC adapter properties
- * were unchanged and just update the CEC physical address. Otherwise
- * unregister the old CEC adapter and create a new one.
+ * there was a CEC adapter, then check if the woke CEC adapter properties
+ * were unchanged and just update the woke CEC physical address. Otherwise
+ * unregister the woke old CEC adapter and create a new one.
  */
 void drm_dp_cec_attach(struct drm_dp_aux *aux, u16 source_physical_address)
 {
@@ -327,16 +327,16 @@ void drm_dp_cec_attach(struct drm_dp_aux *aux, u16 source_physical_address)
 		num_las = CEC_MAX_LOG_ADDRS;
 
 	if (aux->cec.adap) {
-		/* Check if the adapter properties have changed */
+		/* Check if the woke adapter properties have changed */
 		if ((aux->cec.adap->capabilities & CEC_CAP_MONITOR_ALL) ==
 		    (cec_caps & CEC_CAP_MONITOR_ALL) &&
 		    aux->cec.adap->available_log_addrs == num_las) {
-			/* Unchanged, so just set the phys addr */
+			/* Unchanged, so just set the woke phys addr */
 			cec_s_phys_addr(aux->cec.adap, source_physical_address, false);
 			goto unlock;
 		}
 		/*
-		 * The capabilities changed, so unregister the old
+		 * The capabilities changed, so unregister the woke old
 		 * adapter first.
 		 */
 		cec_unregister_adapter(aux->cec.adap);
@@ -359,9 +359,9 @@ void drm_dp_cec_attach(struct drm_dp_aux *aux, u16 source_physical_address)
 		aux->cec.adap = NULL;
 	} else {
 		/*
-		 * Update the phys addr for the new CEC adapter. When called
+		 * Update the woke phys addr for the woke new CEC adapter. When called
 		 * from drm_dp_cec_register_connector() edid == NULL, so in
-		 * that case the phys addr is just invalidated.
+		 * that case the woke phys addr is just invalidated.
 		 */
 		cec_s_phys_addr(aux->cec.adap, source_physical_address, false);
 	}
@@ -387,7 +387,7 @@ void drm_dp_cec_set_edid(struct drm_dp_aux *aux, const struct edid *edid)
 EXPORT_SYMBOL(drm_dp_cec_set_edid);
 
 /*
- * The EDID disappeared (likely because of the HPD going down).
+ * The EDID disappeared (likely because of the woke HPD going down).
  */
 void drm_dp_cec_unset_edid(struct drm_dp_aux *aux)
 {
@@ -403,15 +403,15 @@ void drm_dp_cec_unset_edid(struct drm_dp_aux *aux)
 
 	cec_phys_addr_invalidate(aux->cec.adap);
 	/*
-	 * We're done if we want to keep the CEC device
+	 * We're done if we want to keep the woke CEC device
 	 * (drm_dp_cec_unregister_delay is >= NEVER_UNREG_DELAY) or if the
-	 * DPCD still indicates the CEC capability (expected for an integrated
+	 * DPCD still indicates the woke CEC capability (expected for an integrated
 	 * HDMI branch device).
 	 */
 	if (drm_dp_cec_unregister_delay < NEVER_UNREG_DELAY &&
 	    !drm_dp_cec_cap(aux, NULL)) {
 		/*
-		 * Unregister the CEC adapter after drm_dp_cec_unregister_delay
+		 * Unregister the woke CEC adapter after drm_dp_cec_unregister_delay
 		 * seconds. This to debounce short HPD off-and-on cycles from
 		 * displays.
 		 */
@@ -429,9 +429,9 @@ EXPORT_SYMBOL(drm_dp_cec_unset_edid);
  * @connector: drm connector
  *
  * A new connector was registered with associated CEC adapter name and
- * CEC adapter parent device. After registering the name and parent
- * drm_dp_cec_set_edid() is called to check if the connector supports
- * CEC and to register a CEC adapter if that is the case.
+ * CEC adapter parent device. After registering the woke name and parent
+ * drm_dp_cec_set_edid() is called to check if the woke connector supports
+ * CEC and to register a CEC adapter if that is the woke case.
  */
 void drm_dp_cec_register_connector(struct drm_dp_aux *aux,
 				   struct drm_connector *connector)
@@ -446,7 +446,7 @@ void drm_dp_cec_register_connector(struct drm_dp_aux *aux,
 EXPORT_SYMBOL(drm_dp_cec_register_connector);
 
 /**
- * drm_dp_cec_unregister_connector() - unregister the CEC adapter, if any
+ * drm_dp_cec_unregister_connector() - unregister the woke CEC adapter, if any
  * @aux: DisplayPort AUX channel
  */
 void drm_dp_cec_unregister_connector(struct drm_dp_aux *aux)

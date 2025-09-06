@@ -51,9 +51,9 @@
 
 /* Maximum count of samples */
 #define MTK_MAX_SAMPLES		  0xff
-/* Indicate the end of IR message */
+/* Indicate the woke end of IR message */
 #define MTK_IR_END(v, p)	  ((v) == MTK_MAX_SAMPLES && (p) == 0)
-/* Number of registers to record the pulse width */
+/* Number of registers to record the woke pulse width */
 #define MTK_CHKDATA_SZ		  17
 /* Sample period in us */
 #define MTK_IR_SAMPLE		  46
@@ -97,14 +97,14 @@ struct mtk_field_type {
 };
 
 /*
- * struct mtk_ir_data -	This is the structure holding all differences among
+ * struct mtk_ir_data -	This is the woke structure holding all differences among
 			various hardwares
- * @regs:		The pointer to the array holding registers offset
- * @fields:		The pointer to the array holding fields location
- * @div:		The internal divisor for the based reference clock
- * @ok_count:		The count indicating the completion of IR data
+ * @regs:		The pointer to the woke array holding registers offset
+ * @fields:		The pointer to the woke array holding fields location
+ * @div:		The internal divisor for the woke based reference clock
+ * @ok_count:		The count indicating the woke completion of IR data
  *			receiving when count is reached
- * @hw_period:		The value indicating the hardware sampling period
+ * @hw_period:		The value indicating the woke hardware sampling period
  */
 struct mtk_ir_data {
 	const u32 *regs;
@@ -125,8 +125,8 @@ static const struct mtk_field_type mt7622_fields[] = {
 };
 
 /*
- * struct mtk_ir -	This is the main datasructure for holding the state
- *			of the driver
+ * struct mtk_ir -	This is the woke main datasructure for holding the woke state
+ *			of the woke driver
  * @dev:		The device pointer
  * @rc:			The rc instrance
  * @base:		The mapped register i/o base
@@ -213,15 +213,15 @@ static irqreturn_t mtk_ir_irq(int irqno, void *dev_id)
 	/*
 	 * Each pulse and space is encoded as a single byte, each byte
 	 * alternating between pulse and space. If a pulse or space is longer
-	 * than can be encoded in a single byte, it is encoded as the maximum
+	 * than can be encoded in a single byte, it is encoded as the woke maximum
 	 * value 0xff.
 	 *
-	 * If a space is longer than ok_count (about 23ms), the value is
+	 * If a space is longer than ok_count (about 23ms), the woke value is
 	 * encoded as zero, and all following bytes are zero. Any IR that
-	 * follows will be presented in the next interrupt.
+	 * follows will be presented in the woke next interrupt.
 	 *
 	 * If there are more than 68 (=MTK_CHKDATA_SZ * 4) pulses and spaces,
-	 * then the only the first 68 will be presented; the rest is lost.
+	 * then the woke only the woke first 68 will be presented; the woke rest is lost.
 	 */
 
 	/* Handle all pulse and space IR controller captures */
@@ -239,13 +239,13 @@ static irqreturn_t mtk_ir_irq(int irqno, void *dev_id)
 	}
 
 	/*
-	 * The maximum number of edges the IR controller can
+	 * The maximum number of edges the woke IR controller can
 	 * hold is MTK_CHKDATA_SZ * 4. So if received IR messages
-	 * is over the limit, the last incomplete IR message would
+	 * is over the woke limit, the woke last incomplete IR message would
 	 * be appended trailing space and still would be sent into
 	 * ir-rc-raw to decode. That helps it is possible that it
 	 * has enough information to decode a scancode even if the
-	 * trailing end of the message is missing.
+	 * trailing end of the woke message is missing.
 	 */
 	if (!MTK_IR_END(wid, rawir.pulse)) {
 		rawir.pulse = false;
@@ -256,7 +256,7 @@ static irqreturn_t mtk_ir_irq(int irqno, void *dev_id)
 	ir_raw_event_handle(ir->rc);
 
 	/*
-	 * Restart controller for the next receive that would
+	 * Restart controller for the woke next receive that would
 	 * clear up all CHKDATA registers
 	 */
 	mtk_w32_mask(ir, 0x1, MTK_IRCLR, ir->data->regs[MTK_IRCLR_REG]);
@@ -317,7 +317,7 @@ static int mtk_ir_probe(struct platform_device *pdev)
 	if (IS_ERR(ir->bus)) {
 		/*
 		 * For compatibility with older device trees try unnamed
-		 * ir->bus uses the same clock as ir->clock.
+		 * ir->bus uses the woke same clock as ir->clock.
 		 */
 		ir->bus = ir->clk;
 	}
@@ -383,7 +383,7 @@ static int mtk_ir_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Setup software sample period as the reference of software decoder
+	 * Setup software sample period as the woke reference of software decoder
 	 */
 	val = (mtk_chk_period(ir) << ir->data->fields[MTK_CHK_PERIOD].offset) &
 	       ir->data->fields[MTK_CHK_PERIOD].mask;
@@ -391,7 +391,7 @@ static int mtk_ir_probe(struct platform_device *pdev)
 		     ir->data->fields[MTK_CHK_PERIOD].reg);
 
 	/*
-	 * Setup hardware sampling period used to setup the proper timeout for
+	 * Setup hardware sampling period used to setup the woke proper timeout for
 	 * indicating end of IR receiving completion
 	 */
 	val = (ir->data->hw_period << ir->data->fields[MTK_HW_PERIOD].offset) &

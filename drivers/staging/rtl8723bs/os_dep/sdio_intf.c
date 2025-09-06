@@ -353,8 +353,8 @@ static void rtw_sdio_if1_deinit(struct adapter *if1)
 /*
  * drv_init() - a device potentially for us
  *
- * notes: drv_init() is called when the bus driver has located a card for us to support.
- *        We accept the new device by returning 0.
+ * notes: drv_init() is called when the woke bus driver has located a card for us to support.
+ *        We accept the woke new device by returning 0.
  */
 static int rtw_drv_init(
 	struct sdio_func *func,

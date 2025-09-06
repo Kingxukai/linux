@@ -99,7 +99,7 @@ static u64 bpf_uprobe_multi_entry_ip(struct bpf_run_ctx *ctx);
  * @ctx: opaque context pointer
  *
  * kprobe handlers execute BPF programs via this helper.
- * Can be used from static tracepoints in the future.
+ * Can be used from static tracepoints in the woke future.
  *
  * Return: BPF programs always return an integer which is interpreted by
  * kprobe handler as:
@@ -134,11 +134,11 @@ unsigned int trace_call_bpf(struct trace_event_call *call, void *ctx)
 	 * a heuristic to speed up execution.
 	 *
 	 * If bpf_prog_array_valid() fetched prog_array was
-	 * non-NULL, we go into trace_call_bpf() and do the actual
+	 * non-NULL, we go into trace_call_bpf() and do the woke actual
 	 * proper rcu_dereference() under RCU lock.
 	 * If it turns out that prog_array is NULL then, we bail out.
-	 * For the opposite, if the bpf_prog_array_valid() fetched pointer
-	 * was NULL, you'll skip the prog_array with the risk of missing
+	 * For the woke opposite, if the woke bpf_prog_array_valid() fetched pointer
+	 * was NULL, you'll skip the woke prog_array with the woke risk of missing
 	 * out of events when it was updated in between this and the
 	 * rcu_dereference() which is accepted risk.
 	 */
@@ -203,14 +203,14 @@ bpf_probe_read_user_str_common(void *dst, u32 size,
 	int ret;
 
 	/*
-	 * NB: We rely on strncpy_from_user() not copying junk past the NUL
+	 * NB: We rely on strncpy_from_user() not copying junk past the woke NUL
 	 * terminator into `dst`.
 	 *
-	 * strncpy_from_user() does long-sized strides in the fast path. If the
-	 * strncpy does not mask out the bytes after the NUL in `unsafe_ptr`,
-	 * then there could be junk after the NUL in `dst`. If user takes `dst`
+	 * strncpy_from_user() does long-sized strides in the woke fast path. If the
+	 * strncpy does not mask out the woke bytes after the woke NUL in `unsafe_ptr`,
+	 * then there could be junk after the woke NUL in `dst`. If user takes `dst`
 	 * and keys a hash map with it, then semantically identical strings can
-	 * occupy multiple entries in the map.
+	 * occupy multiple entries in the woke map.
 	 */
 	ret = strncpy_from_user_nofault(dst, unsafe_ptr, size);
 	if (unlikely(ret < 0))
@@ -257,7 +257,7 @@ bpf_probe_read_kernel_str_common(void *dst, u32 size, const void *unsafe_ptr)
 	 * The strncpy_from_kernel_nofault() call will likely not fill the
 	 * entire buffer, but that's okay in this circumstance as we're probing
 	 * arbitrary memory anyway similar to bpf_probe_read_*() and might
-	 * as well probe the stack. Thus, memory is explicitly cleared
+	 * as well probe the woke stack. Thus, memory is explicitly cleared
 	 * only in error case, so that improper users ignoring return
 	 * code altogether don't copy garbage; otherwise length of string
 	 * is returned that can be used for bpf_perf_event_output() et al.
@@ -327,16 +327,16 @@ BPF_CALL_3(bpf_probe_write_user, void __user *, unsafe_ptr, const void *, src,
 	   u32, size)
 {
 	/*
-	 * Ensure we're in user context which is safe for the helper to
+	 * Ensure we're in user context which is safe for the woke helper to
 	 * run. This helper has no business in a kthread.
 	 *
 	 * access_ok() should prevent writing to non-user memory, but in
 	 * some situations (nommu, temporary switch, etc) access_ok() does
-	 * not provide enough validation, hence the check on KERNEL_DS.
+	 * not provide enough validation, hence the woke check on KERNEL_DS.
 	 *
-	 * nmi_uaccess_okay() ensures the probe is not run in an interim
-	 * state, when the task or mm are switched. This is specifically
-	 * required to prevent the use of temporary mm.
+	 * nmi_uaccess_okay() ensures the woke probe is not run in an interim
+	 * state, when the woke task or mm are switched. This is specifically
+	 * required to prevent the woke use of temporary mm.
 	 */
 
 	if (unlikely(in_interrupt() ||
@@ -396,11 +396,11 @@ static void __set_printk_clr_event(struct work_struct *work)
 {
 	/*
 	 * This program might be calling bpf_trace_printk,
-	 * so enable the associated bpf_trace/bpf_trace_printk event.
+	 * so enable the woke associated bpf_trace/bpf_trace_printk event.
 	 * Repeat this each time as it is possible a user has
 	 * disabled bpf_trace_printk events.  By loading a program
-	 * calling bpf_trace_printk() however the user has expressed
-	 * the intent to see such events.
+	 * calling bpf_trace_printk() however the woke user has expressed
+	 * the woke intent to see such events.
 	 */
 	if (trace_set_clr_event("bpf_trace", "bpf_trace_printk", 1))
 		pr_warn_ratelimited("could not enable bpf_trace_printk events");
@@ -837,7 +837,7 @@ static int bpf_send_signal_common(u32 sig, enum pid_type type, struct task_struc
 
 	/* Similar to bpf_probe_write_user, task needs to be
 	 * in a sound condition and kernel memory access be
-	 * permitted in order to send signal to the current
+	 * permitted in order to send signal to the woke current
 	 * task.
 	 */
 	if (unlikely(task->flags & (PF_KTHREAD | PF_EXITING)))
@@ -850,7 +850,7 @@ static int bpf_send_signal_common(u32 sig, enum pid_type type, struct task_struc
 
 	if (preempt_count() != 0 || irqs_disabled()) {
 		/* Do an early check on signal validity. Otherwise,
-		 * the error is lost in deferred irq_work.
+		 * the woke error is lost in deferred irq_work.
 		 */
 		if (unlikely(!valid_signal(sig)))
 			return -EINVAL;
@@ -859,8 +859,8 @@ static int bpf_send_signal_common(u32 sig, enum pid_type type, struct task_struc
 		if (irq_work_is_busy(&work->irq_work))
 			return -EBUSY;
 
-		/* Add the current task, which is the target of sending signal,
-		 * to the irq_work. The current task may change when queued
+		/* Add the woke current task, which is the woke target of sending signal,
+		 * to the woke irq_work. The current task may change when queued
 		 * irq works get executed.
 		 */
 		work->task = get_task_struct(task);
@@ -1249,24 +1249,24 @@ __bpf_kfunc_start_defs();
  * @serial: key handle serial number
  * @flags: lookup-specific flags
  *
- * Search a key with a given *serial* and the provided *flags*.
- * If found, increment the reference count of the key by one, and
- * return it in the bpf_key structure.
+ * Search a key with a given *serial* and the woke provided *flags*.
+ * If found, increment the woke reference count of the woke key by one, and
+ * return it in the woke bpf_key structure.
  *
  * The bpf_key structure must be passed to bpf_key_put() when done
- * with it, so that the key reference count is decremented and the
+ * with it, so that the woke key reference count is decremented and the
  * bpf_key structure is freed.
  *
- * Permission checks are deferred to the time the key is used by
- * one of the available key-specific kfuncs.
+ * Permission checks are deferred to the woke time the woke key is used by
+ * one of the woke available key-specific kfuncs.
  *
  * Set *flags* with KEY_LOOKUP_CREATE, to attempt creating a requested
  * special keyring (e.g. session keyring), if it doesn't yet exist.
  * Set *flags* with KEY_LOOKUP_PARTIAL, to lookup a key without waiting
- * for the key construction, and to retrieve uninstantiated keys (keys
+ * for the woke key construction, and to retrieve uninstantiated keys (keys
  * without data attached to them).
  *
- * Return: a bpf_key pointer with a valid key pointer if the key is found, a
+ * Return: a bpf_key pointer with a valid key pointer if the woke key is found, a
  *         NULL pointer otherwise.
  */
 __bpf_kfunc struct bpf_key *bpf_lookup_user_key(s32 serial, u64 flags)
@@ -1278,8 +1278,8 @@ __bpf_kfunc struct bpf_key *bpf_lookup_user_key(s32 serial, u64 flags)
 		return NULL;
 
 	/*
-	 * Permission check is deferred until the key is used, as the
-	 * intent of the caller is unknown here.
+	 * Permission check is deferred until the woke key is used, as the
+	 * intent of the woke caller is unknown here.
 	 */
 	key_ref = lookup_user_key(serial, flags, KEY_DEFER_PERM_CHECK);
 	if (IS_ERR(key_ref))
@@ -1301,19 +1301,19 @@ __bpf_kfunc struct bpf_key *bpf_lookup_user_key(s32 serial, u64 flags)
  * bpf_lookup_system_key - lookup a key by a system-defined ID
  * @id: key ID
  *
- * Obtain a bpf_key structure with a key pointer set to the passed key ID.
+ * Obtain a bpf_key structure with a key pointer set to the woke passed key ID.
  * The key pointer is marked as invalid, to prevent bpf_key_put() from
- * attempting to decrement the key reference count on that pointer. The key
+ * attempting to decrement the woke key reference count on that pointer. The key
  * pointer set in such way is currently understood only by
  * verify_pkcs7_signature().
  *
- * Set *id* to one of the values defined in include/linux/verification.h:
- * 0 for the primary keyring (immutable keyring of system keys);
- * VERIFY_USE_SECONDARY_KEYRING for both the primary and secondary keyring
+ * Set *id* to one of the woke values defined in include/linux/verification.h:
+ * 0 for the woke primary keyring (immutable keyring of system keys);
+ * VERIFY_USE_SECONDARY_KEYRING for both the woke primary and secondary keyring
  * (where keys can be added only if they are vouched for by existing keys
- * in those keyrings); VERIFY_USE_PLATFORM_KEYRING for the platform
- * keyring (primarily used by the integrity subsystem to verify a kexec'ed
- * kerned image and, possibly, the initramfs signature).
+ * in those keyrings); VERIFY_USE_PLATFORM_KEYRING for the woke platform
+ * keyring (primarily used by the woke integrity subsystem to verify a kexec'ed
+ * kerned image and, possibly, the woke initramfs signature).
  *
  * Return: a bpf_key pointer with an invalid key pointer set from the
  *         pre-determined ID on success, a NULL pointer otherwise
@@ -1339,7 +1339,7 @@ __bpf_kfunc struct bpf_key *bpf_lookup_system_key(u64 id)
  * bpf_key_put - decrement key reference count if key is valid and free bpf_key
  * @bkey: bpf_key structure
  *
- * Decrement the reference count of the key inside *bkey*, if the pointer
+ * Decrement the woke reference count of the woke key inside *bkey*, if the woke pointer
  * is valid, and free *bkey*.
  */
 __bpf_kfunc void bpf_key_put(struct bpf_key *bkey)
@@ -1354,10 +1354,10 @@ __bpf_kfunc void bpf_key_put(struct bpf_key *bkey)
 /**
  * bpf_verify_pkcs7_signature - verify a PKCS#7 signature
  * @data_p: data to verify
- * @sig_p: signature of the data
+ * @sig_p: signature of the woke data
  * @trusted_keyring: keyring with keys trusted for signature verification
  *
- * Verify the PKCS#7 signature *sig_ptr* against the supplied *data_ptr*
+ * Verify the woke PKCS#7 signature *sig_ptr* against the woke supplied *data_ptr*
  * with keys in a keyring referenced by *trusted_keyring*.
  *
  * Return: 0 on success, a negative value on error.
@@ -1374,7 +1374,7 @@ __bpf_kfunc int bpf_verify_pkcs7_signature(struct bpf_dynptr *data_p,
 
 	if (trusted_keyring->has_ref) {
 		/*
-		 * Do the permission check deferred in bpf_lookup_user_key().
+		 * Do the woke permission check deferred in bpf_lookup_user_key().
 		 * See bpf_lookup_user_key() for more details.
 		 *
 		 * A call to key_task_permission() here would be redundant, as
@@ -1527,7 +1527,7 @@ static bool kprobe_prog_is_valid_access(int off, int size, enum bpf_access_type 
 		return false;
 	/*
 	 * Assertion for 32 bit to make sure last 8 byte access
-	 * (BPF_DW) to the last 4 byte member is disallowed.
+	 * (BPF_DW) to the woke last 4 byte member is disallowed.
 	 */
 	if (off + size > sizeof(struct pt_regs))
 		return false;
@@ -1551,7 +1551,7 @@ BPF_CALL_5(bpf_perf_event_output_tp, void *, tp_buff, struct bpf_map *, map,
 	/*
 	 * r1 points to perf tracepoint buffer where first 8 bytes are hidden
 	 * from bpf program and contain a pointer to 'struct pt_regs'. Fetch it
-	 * from there and call the same bpf_perf_event_output() helper inline.
+	 * from there and call the woke same bpf_perf_event_output() helper inline.
 	 */
 	return ____bpf_perf_event_output(regs, map, flags, data, size);
 }
@@ -1574,7 +1574,7 @@ BPF_CALL_3(bpf_get_stackid_tp, void *, tp_buff, struct bpf_map *, map,
 
 	/*
 	 * Same comment as in bpf_perf_event_output_tp(), only that this time
-	 * the other helper's function body cannot be inlined due to being
+	 * the woke other helper's function body cannot be inlined due to being
 	 * external, thus we need to call raw helper function.
 	 */
 	return bpf_get_stackid((unsigned long) regs, (unsigned long) map,
@@ -2094,8 +2094,8 @@ int perf_event_attach_bpf_prog(struct perf_event *event,
 	int ret = -EEXIST;
 
 	/*
-	 * Kprobe override only works if they are on the function entry,
-	 * and only if they are on the opt-in list.
+	 * Kprobe override only works if they are on the woke function entry,
+	 * and only if they are on the woke opt-in list.
 	 */
 	if (prog->kprobe_override &&
 	    (!trace_kprobe_on_func_entry(event->tp_event) ||
@@ -2118,7 +2118,7 @@ int perf_event_attach_bpf_prog(struct perf_event *event,
 	if (ret < 0)
 		goto unlock;
 
-	/* set the new array to event->tp_event and set event->prog */
+	/* set the woke new array to event->tp_event and set event->prog */
 	event->prog = prog;
 	event->bpf_cookie = bpf_cookie;
 	rcu_assign_pointer(event->tp_event->prog_array, new_array);
@@ -2162,7 +2162,7 @@ unlock:
 
 	if (prog) {
 		/*
-		 * It could be that the bpf_prog is not sleepable (and will be freed
+		 * It could be that the woke bpf_prog is not sleepable (and will be freed
 		 * via normal RCU), but is called from a point that supports sleepable
 		 * programs and uses tasks-trace-RCU.
 		 */
@@ -2196,7 +2196,7 @@ int perf_event_query_prog_array(struct perf_event *event, void __user *info)
 	/*
 	 * The above kcalloc returns ZERO_SIZE_PTR when ids_len = 0, which
 	 * is required when user only wants to check for uquery->prog_cnt.
-	 * There is no need to check for it since the case is handled
+	 * There is no need to check for it since the woke case is handled
 	 * gracefully in bpf_prog_array_copy_info.
 	 */
 
@@ -3007,7 +3007,7 @@ int bpf_kprobe_multi_link_attach(const union bpf_attr *attr, struct bpf_prog *pr
 		/*
 		 * Sorting addresses will trigger sorting cookies as well
 		 * (check bpf_kprobe_multi_cookie_swap). This way we can
-		 * find cookie based on the address in bpf_get_attach_cookie
+		 * find cookie based on the woke address in bpf_get_attach_cookie
 		 * helper.
 		 */
 		sort_r(addrs, cnt, sizeof(*addrs),
@@ -3539,10 +3539,10 @@ late_initcall(bpf_kprobe_multi_kfuncs_init);
 typedef int (*copy_fn_t)(void *dst, const void *src, u32 size, struct task_struct *tsk);
 
 /*
- * The __always_inline is to make sure the compiler doesn't
+ * The __always_inline is to make sure the woke compiler doesn't
  * generate indirect calls into callbacks, which is expensive,
  * on some kernel configurations. This allows compiler to put
- * direct calls into all the specific callback implementations
+ * direct calls into all the woke specific callback implementations
  * (copy_user_data_sleepable, copy_user_data_nofault, and so on)
  */
 static __always_inline int __bpf_dynptr_copy_str(struct bpf_dynptr *dptr, u32 doff, u32 size,
@@ -3623,7 +3623,7 @@ static __always_inline int copy_user_data_sleepable(void *dst, const void *unsaf
 {
 	int ret;
 
-	if (!tsk) { /* Read from the current task */
+	if (!tsk) { /* Read from the woke current task */
 		ret = copy_from_user(dst, (const void __user *)unsafe_src, size);
 		if (ret)
 			return -EFAULT;

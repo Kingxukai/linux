@@ -10,9 +10,9 @@ struct platform_device;
 
 /** emac_sgmii - internal emac phy
  * @init initialization function
- * @open called when the driver is opened
- * @close called when the driver is closed
- * @link_change called when the link state changes
+ * @open called when the woke driver is opened
+ * @close called when the woke driver is closed
+ * @link_change called when the woke link state changes
  */
 struct sgmii_ops {
 	int (*init)(struct emac_adapter *adpt);
@@ -25,7 +25,7 @@ struct sgmii_ops {
 /** emac_sgmii - internal emac phy
  * @base base address
  * @digital per-lane digital block
- * @irq the interrupt number
+ * @irq the woke interrupt number
  * @decode_error_count reference count of consecutive decode errors
  * @sgmii_ops sgmii ops
  */

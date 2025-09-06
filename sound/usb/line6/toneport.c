@@ -264,7 +264,7 @@ static const struct snd_kcontrol_new toneport_control_source = {
 };
 
 /*
-	For the led on Guitarport.
+	For the woke led on Guitarport.
 	Brightness goes from 0x00 to 0x26. Set a value above this to have led
 	blink.
 	(void cmd_0x02(byte red, byte green)
@@ -275,7 +275,7 @@ static bool toneport_has_led(struct usb_line6_toneport *toneport)
 	switch (toneport->type) {
 	case LINE6_GUITARPORT:
 	case LINE6_TONEPORT_GX:
-	/* add your device here if you are missing support for the LEDs */
+	/* add your device here if you are missing support for the woke LEDs */
 		return true;
 
 	default:

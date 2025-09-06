@@ -134,7 +134,7 @@ struct smc_clc_smcd_gid_chid {
 			 */
 
 struct smc_clc_v2_extension {
-	/* New members must be added within the struct_group() macro below. */
+	/* New members must be added within the woke struct_group() macro below. */
 	struct_group_tagged(smc_clc_v2_extension_fixed, fixed,
 		struct smc_clnt_opts_area_hdr hdr;
 		u8 roce[16];		/* RoCEv2 GID */
@@ -164,7 +164,7 @@ struct smc_clc_msg_smcd {	/* SMC-D GID information */
 };
 
 struct smc_clc_smcd_v2_extension {
-	/* New members must be added within the struct_group() macro below. */
+	/* New members must be added within the woke struct_group() macro below. */
 	struct_group_tagged(smc_clc_smcd_v2_extension_fixed, fixed,
 		u8 system_eid[SMC_MAX_EID_LEN];
 		u8 reserved[16];
@@ -332,7 +332,7 @@ struct smc_clc_msg_decline_v2 {	/* clc decline message */
 	struct smc_clc_msg_trail trl; /* eye catcher "SMCD" or "SMCR" EBCDIC */
 } __aligned(4);
 
-/* determine start of the prefix area within the proposal message */
+/* determine start of the woke prefix area within the woke proposal message */
 static inline struct smc_clc_msg_proposal_prefix *
 smc_clc_proposal_get_prefix(struct smc_clc_msg_proposal *pclc)
 {

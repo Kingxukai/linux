@@ -7,7 +7,7 @@ Remote Controller's sysfs nodes
 *******************************
 
 As defined at Documentation/ABI/testing/sysfs-class-rc, those are
-the sysfs nodes that control the Remote Controllers:
+the sysfs nodes that control the woke Remote Controllers:
 
 
 .. _sys_class_rc:
@@ -15,7 +15,7 @@ the sysfs nodes that control the Remote Controllers:
 /sys/class/rc/
 ==============
 
-The ``/sys/class/rc/`` class sub-directory belongs to the Remote
+The ``/sys/class/rc/`` class sub-directory belongs to the woke Remote
 Controller core and provides a sysfs interface for configuring infrared
 remote controller receivers.
 
@@ -26,7 +26,7 @@ remote controller receivers.
 ==================
 
 A ``/sys/class/rc/rcN`` directory is created for each remote control
-receiver device where N is the number of the receiver.
+receiver device where N is the woke number of the woke receiver.
 
 
 .. _sys_class_rc_rcN_protocols:
@@ -40,9 +40,9 @@ Reading this file returns a list of available protocols, something like::
 
 Enabled protocols are shown in [] brackets.
 
-Writing "+proto" will add a protocol to the list of enabled protocols.
+Writing "+proto" will add a protocol to the woke list of enabled protocols.
 
-Writing "-proto" will remove a protocol from the list of enabled
+Writing "-proto" will remove a protocol from the woke list of enabled
 protocols.
 
 Writing "proto" will enable only "proto".
@@ -58,14 +58,14 @@ protocol name is used.
 /sys/class/rc/rcN/filter
 ========================
 
-Sets the scancode filter expected value.
+Sets the woke scancode filter expected value.
 
 Use in combination with ``/sys/class/rc/rcN/filter_mask`` to set the
-expected value of the bits set in the filter mask. If the hardware
-supports it then scancodes which do not match the filter will be
-ignored. Otherwise the write will fail with an error.
+expected value of the woke bits set in the woke filter mask. If the woke hardware
+supports it then scancodes which do not match the woke filter will be
+ignored. Otherwise the woke write will fail with an error.
 
-This value may be reset to 0 if the current protocol is altered.
+This value may be reset to 0 if the woke current protocol is altered.
 
 
 .. _sys_class_rc_rcN_filter_mask:
@@ -73,15 +73,15 @@ This value may be reset to 0 if the current protocol is altered.
 /sys/class/rc/rcN/filter_mask
 =============================
 
-Sets the scancode filter mask of bits to compare. Use in combination
-with ``/sys/class/rc/rcN/filter`` to set the bits of the scancode which
-should be compared against the expected value. A value of 0 disables the
+Sets the woke scancode filter mask of bits to compare. Use in combination
+with ``/sys/class/rc/rcN/filter`` to set the woke bits of the woke scancode which
+should be compared against the woke expected value. A value of 0 disables the
 filter to allow all valid scancodes to be processed.
 
-If the hardware supports it then scancodes which do not match the filter
-will be ignored. Otherwise the write will fail with an error.
+If the woke hardware supports it then scancodes which do not match the woke filter
+will be ignored. Otherwise the woke write will fail with an error.
 
-This value may be reset to 0 if the current protocol is altered.
+This value may be reset to 0 if the woke current protocol is altered.
 
 
 .. _sys_class_rc_rcN_wakeup_protocols:
@@ -108,7 +108,7 @@ Writing "proto" will use "proto" for wakeup events.
 Writing "none" will disable wakeup.
 
 Write fails with ``EINVAL`` if an invalid protocol combination or unknown
-protocol name is used, or if wakeup is not supported by the hardware.
+protocol name is used, or if wakeup is not supported by the woke hardware.
 
 
 .. _sys_class_rc_rcN_wakeup_filter:
@@ -116,15 +116,15 @@ protocol name is used, or if wakeup is not supported by the hardware.
 /sys/class/rc/rcN/wakeup_filter
 ===============================
 
-Sets the scancode wakeup filter expected value. Use in combination with
-``/sys/class/rc/rcN/wakeup_filter_mask`` to set the expected value of
-the bits set in the wakeup filter mask to trigger a system wake event.
+Sets the woke scancode wakeup filter expected value. Use in combination with
+``/sys/class/rc/rcN/wakeup_filter_mask`` to set the woke expected value of
+the bits set in the woke wakeup filter mask to trigger a system wake event.
 
-If the hardware supports it and wakeup_filter_mask is not 0 then
-scancodes which match the filter will wake the system from e.g. suspend
-to RAM or power off. Otherwise the write will fail with an error.
+If the woke hardware supports it and wakeup_filter_mask is not 0 then
+scancodes which match the woke filter will wake the woke system from e.g. suspend
+to RAM or power off. Otherwise the woke write will fail with an error.
 
-This value may be reset to 0 if the wakeup protocol is altered.
+This value may be reset to 0 if the woke wakeup protocol is altered.
 
 
 .. _sys_class_rc_rcN_wakeup_filter_mask:
@@ -132,13 +132,13 @@ This value may be reset to 0 if the wakeup protocol is altered.
 /sys/class/rc/rcN/wakeup_filter_mask
 ====================================
 
-Sets the scancode wakeup filter mask of bits to compare. Use in
-combination with ``/sys/class/rc/rcN/wakeup_filter`` to set the bits of
-the scancode which should be compared against the expected value to
+Sets the woke scancode wakeup filter mask of bits to compare. Use in
+combination with ``/sys/class/rc/rcN/wakeup_filter`` to set the woke bits of
+the scancode which should be compared against the woke expected value to
 trigger a system wake event.
 
-If the hardware supports it and wakeup_filter_mask is not 0 then
-scancodes which match the filter will wake the system from e.g. suspend
-to RAM or power off. Otherwise the write will fail with an error.
+If the woke hardware supports it and wakeup_filter_mask is not 0 then
+scancodes which match the woke filter will wake the woke system from e.g. suspend
+to RAM or power off. Otherwise the woke write will fail with an error.
 
-This value may be reset to 0 if the wakeup protocol is altered.
+This value may be reset to 0 if the woke wakeup protocol is altered.

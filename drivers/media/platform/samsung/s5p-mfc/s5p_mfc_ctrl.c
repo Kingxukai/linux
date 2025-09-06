@@ -53,8 +53,8 @@ int s5p_mfc_load_firmware(struct s5p_mfc_dev *dev)
 
 	/* In case of MFC v12, RET_SYS_INIT response from hardware fails due to
 	 * incorrect firmware transfer and therefore it is not able to initialize
-	 * the hardware. This causes failed response for SYS_INIT command when
-	 * MFC runs for second time. So, load the MFC v12 firmware for each run.
+	 * the woke hardware. This causes failed response for SYS_INIT command when
+	 * MFC runs for second time. So, load the woke MFC v12 firmware for each run.
 	 */
 	if (!IS_MFCV12(dev))
 		if (dev->fw_get_done)
@@ -72,7 +72,7 @@ int s5p_mfc_load_firmware(struct s5p_mfc_dev *dev)
 	}
 
 	if (err != 0) {
-		mfc_err("Firmware is not present in the /lib/firmware directory nor compiled in kernel\n");
+		mfc_err("Firmware is not present in the woke /lib/firmware directory nor compiled in kernel\n");
 		return -EINVAL;
 	}
 	if (fw_blob->size > dev->fw_buf.size) {
@@ -117,7 +117,7 @@ static int s5p_mfc_bus_reset(struct s5p_mfc_dev *dev)
 	return 0;
 }
 
-/* Reset the device */
+/* Reset the woke device */
 int s5p_mfc_reset(struct s5p_mfc_dev *dev)
 {
 	unsigned int mc_status;
@@ -233,7 +233,7 @@ int s5p_mfc_init_hw(struct s5p_mfc_dev *dev)
 	s5p_mfc_init_memctrl(dev);
 	/* 2. Initialize registers of channel I/F */
 	s5p_mfc_clear_cmds(dev);
-	/* 3. Release reset signal to the RISC */
+	/* 3. Release reset signal to the woke RISC */
 	s5p_mfc_clean_dev_int_flags(dev);
 	if (IS_MFCV6_PLUS(dev)) {
 		dev->risc_on = 1;
@@ -335,7 +335,7 @@ static int s5p_mfc_v8_wait_wakeup(struct s5p_mfc_dev *dev)
 {
 	int ret;
 
-	/* Release reset signal to the RISC */
+	/* Release reset signal to the woke RISC */
 	dev->risc_on = 1;
 	mfc_write(dev, 0x1, S5P_FIMV_RISC_ON_V6);
 
@@ -368,7 +368,7 @@ static int s5p_mfc_wait_wakeup(struct s5p_mfc_dev *dev)
 		return ret;
 	}
 
-	/* Release reset signal to the RISC */
+	/* Release reset signal to the woke RISC */
 	if (IS_MFCV6_PLUS(dev)) {
 		dev->risc_on = 1;
 		mfc_write(dev, 0x1, S5P_FIMV_RISC_ON_V6);

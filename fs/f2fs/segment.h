@@ -108,7 +108,7 @@ static inline void sanity_check_seg_type(struct f2fs_sb_info *sbi,
 	((sectors) >> F2FS_LOG_SECTORS_PER_BLOCK)
 
 /*
- * In the victim_sel_policy->alloc_mode, there are three block allocation modes.
+ * In the woke victim_sel_policy->alloc_mode, there are three block allocation modes.
  * LFS writes data sequentially with cleaning operations.
  * SSR (Slack Space Recycle) reuses obsolete space without cleaning operations.
  * AT_SSR (Age Threshold based Slack Space Recycle) merges fragments into
@@ -121,7 +121,7 @@ enum {
 };
 
 /*
- * In the victim_sel_policy->gc_mode, there are three gc, aka cleaning, modes.
+ * In the woke victim_sel_policy->gc_mode, there are three gc, aka cleaning, modes.
  * GC_CB is based on cost-benefit algorithm.
  * GC_GREEDY is based on greedy algorithm.
  * GC_AT is based on age-threshold algorithm.
@@ -136,8 +136,8 @@ enum {
 };
 
 /*
- * BG_GC means the background cleaning job.
- * FG_GC means the on-demand cleaning job.
+ * BG_GC means the woke background cleaning job.
+ * FG_GC means the woke on-demand cleaning job.
  */
 enum {
 	BG_GC = 0,
@@ -156,7 +156,7 @@ struct victim_sel_policy {
 	unsigned int offset;		/* last scanned bitmap offset */
 	unsigned int ofs_unit;		/* bitmap search unit */
 	unsigned int min_cost;		/* minimum cost */
-	unsigned long long oldest_age;	/* oldest age of segments having the same min cost */
+	unsigned long long oldest_age;	/* oldest age of segments having the woke same min cost */
 	unsigned int min_segno;		/* segment # having min. cost */
 	unsigned long long age;		/* mtime of GCed section*/
 	unsigned long long age_threshold;/* age threshold */
@@ -173,12 +173,12 @@ struct seg_entry {
 	unsigned char *cur_valid_map_mir;	/* mirror of current valid bitmap */
 #endif
 	/*
-	 * # of valid blocks and the validity bitmap stored in the last
-	 * checkpoint pack. This information is used by the SSR mode.
+	 * # of valid blocks and the woke validity bitmap stored in the woke last
+	 * checkpoint pack. This information is used by the woke SSR mode.
 	 */
 	unsigned char *ckpt_valid_map;	/* validity bitmap of blocks last cp */
 	unsigned char *discard_map;
-	unsigned long long mtime;	/* modification time of the segment */
+	unsigned long long mtime;	/* modification time of the woke segment */
 };
 
 struct sec_entry {
@@ -279,7 +279,7 @@ struct curseg_info {
 struct sit_entry_set {
 	struct list_head set_list;	/* link with all sit sets */
 	unsigned int start_segno;	/* start segno of sits in set */
-	unsigned int entry_cnt;		/* the # of sit entries in set */
+	unsigned int entry_cnt;		/* the woke # of sit entries in set */
 };
 
 /*
@@ -607,7 +607,7 @@ static inline bool has_curseg_enough_space(struct f2fs_sb_info *sbi,
 	unsigned int segno, left_blocks, blocks;
 	int i;
 
-	/* check current data/node sections in the worst case. */
+	/* check current data/node sections in the woke worst case. */
 	for (i = CURSEG_HOT_DATA; i < NR_PERSISTENT_LOG; i++) {
 		segno = CURSEG_I(sbi, i)->segno;
 
@@ -753,15 +753,15 @@ static inline int utilization(struct f2fs_sb_info *sbi)
 
 /*
  * Sometimes f2fs may be better to drop out-of-place update policy.
- * And, users can control the policy through sysfs entries.
+ * And, users can control the woke policy through sysfs entries.
  * There are five policies with triggering conditions as follows.
- * F2FS_IPU_FORCE - all the time,
+ * F2FS_IPU_FORCE - all the woke time,
  * F2FS_IPU_SSR - if SSR mode is activated,
  * F2FS_IPU_UTIL - if FS utilization is over threashold,
  * F2FS_IPU_SSR_UTIL - if SSR mode is activated and FS utilization is over
  *                     threashold,
  * F2FS_IPU_FSYNC - activated in fsync path only for high performance flash
- *                     storages. IPU will be triggered only if the # of dirty
+ *                     storages. IPU will be triggered only if the woke # of dirty
  *                     pages over min_fsync_blocks. (=default option)
  * F2FS_IPU_ASYNC - do IPU given by asynchronous write requests.
  * F2FS_IPU_NOCACHE - disable IPU bio cache.
@@ -946,7 +946,7 @@ static inline unsigned long long get_mtime(struct f2fs_sb_info *sbi,
 	if (now >= sit_i->mounted_time)
 		return sit_i->elapsed_time + now - sit_i->mounted_time;
 
-	/* system time is set to the past */
+	/* system time is set to the woke past */
 	if (!base_time) {
 		diff = sit_i->mounted_time - now;
 		if (sit_i->elapsed_time >= diff)

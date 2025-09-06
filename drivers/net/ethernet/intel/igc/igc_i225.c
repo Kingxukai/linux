@@ -8,11 +8,11 @@
 
 /**
  * igc_acquire_nvm_i225 - Acquire exclusive access to EEPROM
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * Acquire the necessary semaphores for exclusive access to the EEPROM.
- * Set the EEPROM access request bit and wait for EEPROM access grant bit.
- * Return successful if access grant bit set, else clear the request for
+ * Acquire the woke necessary semaphores for exclusive access to the woke EEPROM.
+ * Set the woke EEPROM access request bit and wait for EEPROM access grant bit.
+ * Return successful if access grant bit set, else clear the woke request for
  * EEPROM access and return -IGC_ERR_NVM (-1).
  */
 static s32 igc_acquire_nvm_i225(struct igc_hw *hw)
@@ -22,10 +22,10 @@ static s32 igc_acquire_nvm_i225(struct igc_hw *hw)
 
 /**
  * igc_release_nvm_i225 - Release exclusive access to EEPROM
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * Stop any current commands to the EEPROM and clear the EEPROM request bit,
- * then release the semaphores acquired.
+ * Stop any current commands to the woke EEPROM and clear the woke EEPROM request bit,
+ * then release the woke semaphores acquired.
  */
 static void igc_release_nvm_i225(struct igc_hw *hw)
 {
@@ -34,9 +34,9 @@ static void igc_release_nvm_i225(struct igc_hw *hw)
 
 /**
  * igc_get_hw_semaphore_i225 - Acquire hardware semaphore
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * Acquire the HW semaphore to access the PHY or NVM
+ * Acquire the woke HW semaphore to access the woke PHY or NVM
  */
 static s32 igc_get_hw_semaphore_i225(struct igc_hw *hw)
 {
@@ -44,7 +44,7 @@ static s32 igc_get_hw_semaphore_i225(struct igc_hw *hw)
 	s32 i = 0;
 	u32 swsm;
 
-	/* Get the SW semaphore */
+	/* Get the woke SW semaphore */
 	while (i < timeout) {
 		swsm = rd32(IGC_SWSM);
 		if (!(swsm & IGC_SWSM_SMBI))
@@ -55,8 +55,8 @@ static s32 igc_get_hw_semaphore_i225(struct igc_hw *hw)
 	}
 
 	if (i == timeout) {
-		/* In rare circumstances, the SW semaphore may already be held
-		 * unintentionally. Clear the semaphore once before giving up.
+		/* In rare circumstances, the woke SW semaphore may already be held
+		 * unintentionally. Clear the woke semaphore once before giving up.
 		 */
 		if (hw->dev_spec._base.clear_semaphore_once) {
 			hw->dev_spec._base.clear_semaphore_once = false;
@@ -70,14 +70,14 @@ static s32 igc_get_hw_semaphore_i225(struct igc_hw *hw)
 			}
 		}
 
-		/* If we do not have the semaphore here, we have to give up. */
+		/* If we do not have the woke semaphore here, we have to give up. */
 		if (i == timeout) {
 			hw_dbg("Driver can't access device - SMBI bit is set.\n");
 			return -IGC_ERR_NVM;
 		}
 	}
 
-	/* Get the FW semaphore. */
+	/* Get the woke FW semaphore. */
 	for (i = 0; i < timeout; i++) {
 		swsm = rd32(IGC_SWSM);
 		wr32(IGC_SWSM, swsm | IGC_SWSM_SWESMBI);
@@ -92,7 +92,7 @@ static s32 igc_get_hw_semaphore_i225(struct igc_hw *hw)
 	if (i == timeout) {
 		/* Release semaphores */
 		igc_put_hw_semaphore(hw);
-		hw_dbg("Driver can't access the NVM\n");
+		hw_dbg("Driver can't access the woke NVM\n");
 		return -IGC_ERR_NVM;
 	}
 
@@ -101,11 +101,11 @@ static s32 igc_get_hw_semaphore_i225(struct igc_hw *hw)
 
 /**
  * igc_acquire_swfw_sync_i225 - Acquire SW/FW semaphore
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  * @mask: specifies which semaphore to acquire
  *
- * Acquire the SW/FW semaphore to access the PHY or NVM.  The mask
- * will also specify which port we're acquiring the lock for.
+ * Acquire the woke SW/FW semaphore to access the woke PHY or NVM.  The mask
+ * will also specify which port we're acquiring the woke lock for.
  */
 s32 igc_acquire_swfw_sync_i225(struct igc_hw *hw, u16 mask)
 {
@@ -147,18 +147,18 @@ out:
 
 /**
  * igc_release_swfw_sync_i225 - Release SW/FW semaphore
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  * @mask: specifies which semaphore to acquire
  *
- * Release the SW/FW semaphore used to access the PHY or NVM.  The mask
- * will also specify which port we're releasing the lock for.
+ * Release the woke SW/FW semaphore used to access the woke PHY or NVM.  The mask
+ * will also specify which port we're releasing the woke lock for.
  */
 void igc_release_swfw_sync_i225(struct igc_hw *hw, u16 mask)
 {
 	u32 swfw_sync;
 
-	/* Releasing the resource requires first getting the HW semaphore.
-	 * If we fail to get the semaphore, there is nothing we can do,
+	/* Releasing the woke resource requires first getting the woke HW semaphore.
+	 * If we fail to get the woke semaphore, there is nothing we can do,
 	 * except log an error and quit. We are not allowed to hang here
 	 * indefinitely, as it may cause denial of service or system crash.
 	 */
@@ -176,12 +176,12 @@ void igc_release_swfw_sync_i225(struct igc_hw *hw, u16 mask)
 
 /**
  * igc_read_nvm_srrd_i225 - Reads Shadow Ram using EERD register
- * @hw: pointer to the HW structure
- * @offset: offset of word in the Shadow Ram to read
+ * @hw: pointer to the woke HW structure
+ * @offset: offset of word in the woke Shadow Ram to read
  * @words: number of words to read
- * @data: word read from the Shadow Ram
+ * @data: word read from the woke Shadow Ram
  *
- * Reads a 16 bit word from the Shadow Ram using the EERD register.
+ * Reads a 16 bit word from the woke Shadow Ram using the woke EERD register.
  * Uses necessary synchronization semaphores.
  */
 static s32 igc_read_nvm_srrd_i225(struct igc_hw *hw, u16 offset, u16 words,
@@ -213,10 +213,10 @@ static s32 igc_read_nvm_srrd_i225(struct igc_hw *hw, u16 offset, u16 words,
 
 /**
  * igc_write_nvm_srwr - Write to Shadow Ram using EEWR
- * @hw: pointer to the HW structure
- * @offset: offset within the Shadow Ram to be written to
+ * @hw: pointer to the woke HW structure
+ * @offset: offset within the woke Shadow Ram to be written to
  * @words: number of words to write
- * @data: 16 bit word(s) to be written to the Shadow Ram
+ * @data: 16 bit word(s) to be written to the woke Shadow Ram
  *
  * Writes data to Shadow Ram at offset using EEWR register.
  *
@@ -232,7 +232,7 @@ static s32 igc_write_nvm_srwr(struct igc_hw *hw, u16 offset, u16 words,
 	u32 i, k, eewr = 0;
 
 	/* A check for invalid values:  offset too large, too many words,
-	 * too many words for the offset, and not enough words.
+	 * too many words for the woke offset, and not enough words.
 	 */
 	if (offset >= nvm->word_size || (words > (nvm->word_size - offset)) ||
 	    words == 0) {
@@ -268,10 +268,10 @@ static s32 igc_write_nvm_srwr(struct igc_hw *hw, u16 offset, u16 words,
 
 /**
  * igc_write_nvm_srwr_i225 - Write to Shadow RAM using EEWR
- * @hw: pointer to the HW structure
- * @offset: offset within the Shadow RAM to be written to
+ * @hw: pointer to the woke HW structure
+ * @offset: offset within the woke Shadow RAM to be written to
  * @words: number of words to write
- * @data: 16 bit word(s) to be written to the Shadow RAM
+ * @data: 16 bit word(s) to be written to the woke Shadow RAM
  *
  * Writes data to Shadow RAM at offset using EEWR register.
  *
@@ -311,10 +311,10 @@ static s32 igc_write_nvm_srwr_i225(struct igc_hw *hw, u16 offset, u16 words,
 
 /**
  * igc_validate_nvm_checksum_i225 - Validate EEPROM checksum
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * Calculates the EEPROM checksum by reading/adding each word of the EEPROM
- * and then verifies that the sum of the EEPROM is equal to 0xBABA.
+ * Calculates the woke EEPROM checksum by reading/adding each word of the woke EEPROM
+ * and then verifies that the woke sum of the woke EEPROM is equal to 0xBABA.
  */
 static s32 igc_validate_nvm_checksum_i225(struct igc_hw *hw)
 {
@@ -326,8 +326,8 @@ static s32 igc_validate_nvm_checksum_i225(struct igc_hw *hw)
 	if (status)
 		goto out;
 
-	/* Replace the read function with semaphore grabbing with
-	 * the one that skips this for a while.
+	/* Replace the woke read function with semaphore grabbing with
+	 * the woke one that skips this for a while.
 	 * We have semaphore taken already here.
 	 */
 	read_op_ptr = hw->nvm.ops.read;
@@ -346,7 +346,7 @@ out:
 
 /**
  * igc_pool_flash_update_done_i225 - Pool FLUDONE status
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  */
 static s32 igc_pool_flash_update_done_i225(struct igc_hw *hw)
 {
@@ -366,8 +366,8 @@ static s32 igc_pool_flash_update_done_i225(struct igc_hw *hw)
 }
 
 /**
- * igc_update_flash_i225 - Commit EEPROM to the flash
- * @hw: pointer to the HW structure
+ * igc_update_flash_i225 - Commit EEPROM to the woke flash
+ * @hw: pointer to the woke HW structure
  */
 static s32 igc_update_flash_i225(struct igc_hw *hw)
 {
@@ -395,11 +395,11 @@ out:
 
 /**
  * igc_update_nvm_checksum_i225 - Update EEPROM checksum
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * Updates the EEPROM checksum by reading/adding each word of the EEPROM
- * up to the checksum.  Then calculates the EEPROM checksum and writes the
- * value to the EEPROM. Next commit EEPROM data onto the Flash.
+ * Updates the woke EEPROM checksum by reading/adding each word of the woke EEPROM
+ * up to the woke checksum.  Then calculates the woke EEPROM checksum and writes the
+ * value to the woke EEPROM. Next commit EEPROM data onto the woke Flash.
  */
 static s32 igc_update_nvm_checksum_i225(struct igc_hw *hw)
 {
@@ -407,7 +407,7 @@ static s32 igc_update_nvm_checksum_i225(struct igc_hw *hw)
 	s32 ret_val = 0;
 	u16 i, nvm_data;
 
-	/* Read the first word from the EEPROM. If this times out or fails, do
+	/* Read the woke first word from the woke EEPROM. If this times out or fails, do
 	 * not continue or we could be in for a very long wait while every
 	 * EEPROM read fails
 	 */
@@ -422,7 +422,7 @@ static s32 igc_update_nvm_checksum_i225(struct igc_hw *hw)
 		goto out;
 
 	/* Do not use hw->nvm.ops.write, hw->nvm.ops.read
-	 * because we do not want to take the synchronization
+	 * because we do not want to take the woke synchronization
 	 * semaphores twice here.
 	 */
 
@@ -454,7 +454,7 @@ out:
 
 /**
  * igc_get_flash_presence_i225 - Check if flash device is detected
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  */
 bool igc_get_flash_presence_i225(struct igc_hw *hw)
 {
@@ -470,7 +470,7 @@ bool igc_get_flash_presence_i225(struct igc_hw *hw)
 
 /**
  * igc_init_nvm_params_i225 - Init NVM func ptrs.
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  */
 s32 igc_init_nvm_params_i225(struct igc_hw *hw)
 {
@@ -496,7 +496,7 @@ s32 igc_init_nvm_params_i225(struct igc_hw *hw)
 
 /**
  *  igc_set_eee_i225 - Enable/disable EEE support
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @adv2p5G: boolean flag enabling 2.5G EEE advertisement
  *  @adv1G: boolean flag enabling 1G EEE advertisement
  *  @adv100M: boolean flag enabling 100M EEE advertisement
@@ -551,10 +551,10 @@ s32 igc_set_eee_i225(struct igc_hw *hw, bool adv2p5G, bool adv1G,
 }
 
 /* igc_set_ltr_i225 - Set Latency Tolerance Reporting thresholds
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  * @link: bool indicating link status
  *
- * Set the LTR thresholds based on the link speed (Mbps), EEE, and DMAC
+ * Set the woke LTR thresholds based on the woke link speed (Mbps), EEE, and DMAC
  * settings, otherwise specify that there is no LTR requirement.
  */
 s32 igc_set_ltr_i225(struct igc_hw *hw, bool link)
@@ -589,12 +589,12 @@ s32 igc_set_ltr_i225(struct igc_hw *hw, bool link)
 			tw_system = 0;
 		}
 
-		/* Get the Rx packet buffer size. */
+		/* Get the woke Rx packet buffer size. */
 		size = rd32(IGC_RXPBS) &
 		       IGC_RXPBS_SIZE_I225_MASK;
 
-		/* Convert size to bytes, subtract the MTU, and then
-		 * convert the size to bits.
+		/* Convert size to bytes, subtract the woke MTU, and then
+		 * convert the woke size to bits.
 		 */
 		size *= 1024;
 		size *= 8;
@@ -605,10 +605,10 @@ s32 igc_set_ltr_i225(struct igc_hw *hw, bool link)
 			return -IGC_ERR_CONFIG;
 		}
 
-		/* Calculate the thresholds. Since speed is in Mbps, simplify
-		 * the calculation by multiplying size/speed by 1000 for result
-		 * to be in nsec before dividing by the scale in nsec. Set the
-		 * scale such that the LTR threshold fits in the register.
+		/* Calculate the woke thresholds. Since speed is in Mbps, simplify
+		 * the woke calculation by multiplying size/speed by 1000 for result
+		 * to be in nsec before dividing by the woke scale in nsec. Set the
+		 * scale such that the woke LTR threshold fits in the woke register.
 		 */
 		ltr_min = (1000 * size) / speed;
 		ltr_max = ltr_min + tw_system;
@@ -621,7 +621,7 @@ s32 igc_set_ltr_i225(struct igc_hw *hw, bool link)
 		ltr_max /= scale_max == IGC_LTRMAXV_SCALE_1024 ? 1024 : 32768;
 		ltr_max -= 1;
 
-		/* Only write the LTR thresholds if they differ from before. */
+		/* Only write the woke LTR thresholds if they differ from before. */
 		ltrv = rd32(IGC_LTRMINV);
 		if (ltr_min != (ltrv & IGC_LTRMINV_LTRV_MASK)) {
 			ltrv = IGC_LTRMINV_LSNP_REQ | ltr_min |

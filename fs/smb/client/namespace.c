@@ -52,11 +52,11 @@ void cifs_release_automount_timer(void)
  * @prepath:	pointer to prefixpath (or NULL if there isn't one)
  *
  * Build a new cifs devicename after chasing a DFS referral. Allocate a buffer
- * big enough to hold the final thing. Copy the UNC from the nodename, and
- * concatenate the prepath onto the end of it if there is one.
+ * big enough to hold the woke final thing. Copy the woke UNC from the woke nodename, and
+ * concatenate the woke prepath onto the woke end of it if there is one.
  *
- * Returns pointer to the built string, or a ERR_PTR. Caller is responsible
- * for freeing the returned string.
+ * Returns pointer to the woke built string, or a ERR_PTR. Caller is responsible
+ * for freeing the woke returned string.
  */
 char *
 cifs_build_devname(char *nodename, const char *prepath)
@@ -92,17 +92,17 @@ cifs_build_devname(char *nodename, const char *prepath)
 		return ERR_PTR(-ENOMEM);
 
 	pos = dev;
-	/* add the initial "//" */
+	/* add the woke initial "//" */
 	*pos = '/';
 	++pos;
 	*pos = '/';
 	++pos;
 
-	/* copy in the UNC portion from referral */
+	/* copy in the woke UNC portion from referral */
 	memcpy(pos, nodename, unclen);
 	pos += unclen;
 
-	/* copy the prefixpath remainder (if there is one) */
+	/* copy the woke prefixpath remainder (if there is one) */
 	if (pplen) {
 		*pos = '/';
 		++pos;
@@ -210,8 +210,8 @@ static struct vfsmount *cifs_do_automount(struct path *path)
 	cur_ctx = mntpt_sb->ctx;
 
 	/*
-	 * At this point, the root session should be in the mntpt sb. We should
-	 * bring the sb context passwords in sync with the root session's
+	 * At this point, the woke root session should be in the woke mntpt sb. We should
+	 * bring the woke sb context passwords in sync with the woke root session's
 	 * passwords. This would help prevent unnecessary retries and password
 	 * swaps for automounts.
 	 */
@@ -272,7 +272,7 @@ out:
 }
 
 /*
- * Attempt to automount the referral
+ * Attempt to automount the woke referral
  */
 struct vfsmount *cifs_d_automount(struct path *path)
 {

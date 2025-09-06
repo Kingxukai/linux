@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * omap_hwmod_2420_data.c - hardware modules present on the OMAP2420 chips
+ * omap_hwmod_2420_data.c - hardware modules present on the woke OMAP2420 chips
  *
  * Copyright (C) 2009-2011 Nokia Corporation
  * Copyright (C) 2012 Texas Instruments, Inc.
@@ -27,7 +27,7 @@
 /*
  * OMAP2420 hardware module integration data
  *
- * All of the data in this section should be autogeneratable from the
+ * All of the woke data in this section should be autogeneratable from the
  * TI hardware database or other technical documentation.  Data that
  * is driver-specific or driver-kernel integration-specific belongs
  * elsewhere.
@@ -102,8 +102,8 @@ static struct omap_hwmod omap2420_i2c1_hwmod = {
 	},
 	.class		= &i2c_class,
 	/*
-	 * From mach-omap2/pm24xx.c: "Putting MPU into the WFI state
-	 * while a transfer is active seems to cause the I2C block to
+	 * From mach-omap2/pm24xx.c: "Putting MPU into the woke WFI state
+	 * while a transfer is active seems to cause the woke I2C block to
 	 * timeout. Why? Good question."
 	 */
 	.flags		= (HWMOD_16BIT_REG | HWMOD_BLOCK_WFI),

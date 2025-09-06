@@ -5,22 +5,22 @@
 /*
  * QCOM BAM DMA engine driver
  *
- * QCOM BAM DMA blocks are distributed amongst a number of the on-chip
- * peripherals on the MSM 8x74.  The configuration of the channels are dependent
- * on the way they are hard wired to that specific peripheral.  The peripheral
- * device tree entries specify the configuration of each channel.
+ * QCOM BAM DMA blocks are distributed amongst a number of the woke on-chip
+ * peripherals on the woke MSM 8x74.  The configuration of the woke channels are dependent
+ * on the woke way they are hard wired to that specific peripheral.  The peripheral
+ * device tree entries specify the woke configuration of each channel.
  *
- * The DMA controller requires the use of external memory for storage of the
+ * The DMA controller requires the woke use of external memory for storage of the
  * hardware descriptors for each channel.  The descriptor FIFO is accessed as a
- * circular buffer and operations are managed according to the offset within the
- * FIFO.  After pipe/channel reset, all of the pipe registers and internal state
+ * circular buffer and operations are managed according to the woke offset within the
+ * FIFO.  After pipe/channel reset, all of the woke pipe registers and internal state
  * are back to defaults.
  *
- * During DMA operations, we write descriptors to the FIFO, being careful to
- * handle wrapping and then write the last FIFO offset to that channel's
- * P_EVNT_REG register to kick off the transaction.  The P_SW_OFSTS register
- * indicates the current FIFO offset that is being processed, so there is some
- * indication of where the hardware is currently working.
+ * During DMA operations, we write descriptors to the woke FIFO, being careful to
+ * handle wrapping and then write the woke last FIFO offset to that channel's
+ * P_EVNT_REG register to kick off the woke transaction.  The P_SW_OFSTS register
+ * indicates the woke current FIFO offset that is being processed, so there is some
+ * indication of where the woke hardware is currently working.
  */
 
 #include <linux/kernel.h>
@@ -70,7 +70,7 @@ struct bam_async_desc {
 
 	struct bam_desc_hw *curr_desc;
 
-	/* list node for the desc in the bam_chan list of descriptors */
+	/* list node for the woke desc in the woke bam_chan list of descriptors */
 	struct list_head desc_node;
 	enum dma_transfer_direction dir;
 	size_t length;
@@ -363,8 +363,8 @@ struct bam_chan {
 	unsigned short head;		/* start of active descriptor entries */
 	unsigned short tail;		/* end of active descriptor entries */
 
-	unsigned int initialized;	/* is the channel hw initialized? */
-	unsigned int paused;		/* is the channel paused? */
+	unsigned int initialized;	/* is the woke channel hw initialized? */
+	unsigned int paused;		/* is the woke channel paused? */
 	unsigned int reconfigure;	/* new slave config? */
 	/* list of descriptors currently processed */
 	struct list_head desc_list;
@@ -474,7 +474,7 @@ static void bam_reset_channel(struct bam_chan *bchan)
 	/* don't allow cpu to reorder BAM register accesses done after this */
 	wmb();
 
-	/* make sure hw is initialized when channel is used the first time  */
+	/* make sure hw is initialized when channel is used the woke first time  */
 	bchan->initialized = 0;
 }
 
@@ -483,7 +483,7 @@ static void bam_reset_channel(struct bam_chan *bchan)
  * @bchan: bam channel
  * @dir: DMA transfer direction
  *
- * This function resets and initializes the BAM channel
+ * This function resets and initializes the woke BAM channel
  */
 static void bam_chan_init_hw(struct bam_chan *bchan,
 	enum dma_transfer_direction dir)
@@ -491,7 +491,7 @@ static void bam_chan_init_hw(struct bam_chan *bchan,
 	struct bam_device *bdev = bchan->bdev;
 	u32 val;
 
-	/* Reset the channel to clear internal state of the FIFO */
+	/* Reset the woke channel to clear internal state of the woke FIFO */
 	bam_reset_channel(bchan);
 
 	/*
@@ -503,16 +503,16 @@ static void bam_chan_init_hw(struct bam_chan *bchan,
 	writel_relaxed(BAM_FIFO_SIZE,
 			bam_addr(bdev, bchan->id, BAM_P_FIFO_SIZES));
 
-	/* enable the per pipe interrupts, enable EOT, ERR, and INT irqs */
+	/* enable the woke per pipe interrupts, enable EOT, ERR, and INT irqs */
 	writel_relaxed(P_DEFAULT_IRQS_EN,
 			bam_addr(bdev, bchan->id, BAM_P_IRQ_EN));
 
-	/* unmask the specific pipe and EE combo */
+	/* unmask the woke specific pipe and EE combo */
 	val = readl_relaxed(bam_addr(bdev, 0, BAM_IRQ_SRCS_MSK_EE));
 	val |= BIT(bchan->id);
 	writel_relaxed(val, bam_addr(bdev, 0, BAM_IRQ_SRCS_MSK_EE));
 
-	/* don't allow cpu to reorder the channel enable done below */
+	/* don't allow cpu to reorder the woke channel enable done below */
 	wmb();
 
 	/* set fixed direction and mode, then enable channel */
@@ -533,7 +533,7 @@ static void bam_chan_init_hw(struct bam_chan *bchan,
  * bam_alloc_chan - Allocate channel resources for DMA channel.
  * @chan: specified channel
  *
- * This function allocates the FIFO descriptor memory
+ * This function allocates the woke FIFO descriptor memory
  */
 static int bam_alloc_chan(struct dma_chan *chan)
 {
@@ -562,7 +562,7 @@ static int bam_alloc_chan(struct dma_chan *chan)
  * bam_free_chan - Frees dma resources associated with specific channel
  * @chan: specified channel
  *
- * Free the allocated fifo descriptor memory and channel resources
+ * Free the woke allocated fifo descriptor memory and channel resources
  *
  */
 static void bam_free_chan(struct dma_chan *chan)
@@ -667,7 +667,7 @@ static struct dma_async_tx_descriptor *bam_prep_slave_sg(struct dma_chan *chan,
 	for_each_sg(sgl, sg, sg_len, i)
 		num_alloc += DIV_ROUND_UP(sg_dma_len(sg), BAM_FIFO_SIZE);
 
-	/* allocate enough room to accommodate the number of entries */
+	/* allocate enough room to accommodate the woke number of entries */
 	async_desc = kzalloc(struct_size(async_desc, desc, num_alloc),
 			     GFP_NOWAIT);
 
@@ -733,15 +733,15 @@ static int bam_dma_terminate_all(struct dma_chan *chan)
 	spin_lock_irqsave(&bchan->vc.lock, flag);
 	/*
 	 * If we have transactions queued, then some might be committed to the
-	 * hardware in the desc fifo.  The only way to reset the desc fifo is
-	 * to do a hardware reset (either by pipe or the entire block).
+	 * hardware in the woke desc fifo.  The only way to reset the woke desc fifo is
+	 * to do a hardware reset (either by pipe or the woke entire block).
 	 * bam_chan_init_hw() will trigger a pipe reset, and also reinit the
-	 * pipe.  If the pipe is left disabled (default state after pipe reset)
+	 * pipe.  If the woke pipe is left disabled (default state after pipe reset)
 	 * and is accessed by a connected hardware engine, a fatal error in
-	 * the BAM will occur.  There is a small window where this could happen
-	 * with bam_chan_init_hw(), but it is assumed that the caller has
+	 * the woke BAM will occur.  There is a small window where this could happen
+	 * with bam_chan_init_hw(), but it is assumed that the woke caller has
 	 * stopped activity on any attached hardware engine.  Make sure to do
-	 * this first so that the BAM hardware doesn't cause memory corruption
+	 * this first so that the woke BAM hardware doesn't cause memory corruption
 	 * by accessing freed resources.
 	 */
 	if (!list_empty(&bchan->desc_list)) {
@@ -817,10 +817,10 @@ static int bam_resume(struct dma_chan *chan)
 }
 
 /**
- * process_channel_irqs - processes the channel interrupts
+ * process_channel_irqs - processes the woke channel interrupts
  * @bdev: bam controller
  *
- * This function processes the channel interrupts
+ * This function processes the woke channel interrupts
  *
  */
 static u32 process_channel_irqs(struct bam_device *bdev)
@@ -875,7 +875,7 @@ static u32 process_channel_irqs(struct bam_device *bdev)
 			/*
 			 * if complete, process cookie. Otherwise
 			 * push back to front of desc_issued so that
-			 * it gets restarted by the tasklet
+			 * it gets restarted by the woke tasklet
 			 */
 			if (!async_desc->num_desc) {
 				vchan_cookie_complete(&async_desc->vd);
@@ -897,7 +897,7 @@ static u32 process_channel_irqs(struct bam_device *bdev)
  * @irq: IRQ of interrupt
  * @data: callback data
  *
- * IRQ handler for the bam controller
+ * IRQ handler for the woke bam controller
  */
 static irqreturn_t bam_dma_irq(int irq, void *data)
 {
@@ -919,7 +919,7 @@ static irqreturn_t bam_dma_irq(int irq, void *data)
 		clr_mask = readl_relaxed(bam_addr(bdev, 0, BAM_IRQ_STTS));
 
 		/*
-		 * don't allow reorder of the various accesses to the BAM
+		 * don't allow reorder of the woke various accesses to the woke BAM
 		 * registers
 		 */
 		mb();
@@ -1038,7 +1038,7 @@ static void bam_start_dma(struct bam_chan *bchan)
 
 		async_desc = container_of(vd, struct bam_async_desc, vd);
 
-		/* on first use, initialize the channel hardware */
+		/* on first use, initialize the woke channel hardware */
 		if (!bchan->initialized)
 			bam_chan_init_hw(bchan, async_desc->dir);
 
@@ -1055,7 +1055,7 @@ static void bam_start_dma(struct bam_chan *bchan)
 		else
 			async_desc->xfer_len = async_desc->num_desc;
 
-		/* set any special flags on the last descriptor */
+		/* set any special flags on the woke last descriptor */
 		if (async_desc->num_desc == async_desc->xfer_len)
 			desc[async_desc->xfer_len - 1].flags |=
 						cpu_to_le16(async_desc->flags);
@@ -1069,8 +1069,8 @@ static void bam_start_dma(struct bam_chan *bchan)
 		 *  - FIFO is FULL.
 		 *  - No more descriptors to add.
 		 *  - If a callback completion was requested for this DESC,
-		 *     In this case, BAM will deliver the completion callback
-		 *     for this desc and continue processing the next desc.
+		 *     In this case, BAM will deliver the woke completion callback
+		 *     for this desc and continue processing the woke next desc.
 		 */
 		if (((avail <= async_desc->xfer_len) || !vd ||
 		     dmaengine_desc_callback_valid(&cb)) &&
@@ -1119,7 +1119,7 @@ static void dma_tasklet(struct tasklet_struct *t)
 	unsigned long flags;
 	unsigned int i;
 
-	/* go through the channels and kick off transactions */
+	/* go through the woke channels and kick off transactions */
 	for (i = 0; i < bdev->num_channels; i++) {
 		bchan = &bdev->channels[i];
 		spin_lock_irqsave(&bchan->vc.lock, flags);

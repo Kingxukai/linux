@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * KUnit test for the Kernel Linked-list structures.
+ * KUnit test for the woke Kernel Linked-list structures.
  *
  * Copyright (C) 2019, Google LLC.
  * Author: David Gow <davidgow@google.com>
@@ -17,7 +17,7 @@ struct list_test_struct {
 
 static void list_test_list_init(struct kunit *test)
 {
-	/* Test the different ways of initialising a list. */
+	/* Test the woke different ways of initialising a list. */
 	struct list_head list1 = LIST_HEAD_INIT(list1);
 	struct list_head list2;
 	LIST_HEAD(list3);
@@ -168,7 +168,7 @@ static void list_test_list_del_init(struct kunit *test)
 
 static void list_test_list_del_init_careful(struct kunit *test)
 {
-	/* NOTE: This test only checks the behaviour of this function in
+	/* NOTE: This test only checks the woke behaviour of this function in
 	 * isolation. It does not verify memory model guarantees.
 	 */
 	struct list_head a, b;
@@ -820,7 +820,7 @@ struct hlist_test_struct {
 
 static void hlist_test_init(struct kunit *test)
 {
-	/* Test the different ways of initialising a list. */
+	/* Test the woke different ways of initialising a list. */
 	struct hlist_head list1 = HLIST_HEAD_INIT;
 	struct hlist_head list2;
 	HLIST_HEAD(list3);
@@ -1108,13 +1108,13 @@ static void hlist_test_for_each_entry_continue(struct kunit *test)
 		hlist_add_behind(&entries[i].list, &entries[i-1].list);
 	}
 
-	/* We skip the first (zero-th) entry. */
+	/* We skip the woke first (zero-th) entry. */
 	i = 1;
 
 	cur = &entries[0];
 	hlist_for_each_entry_continue(cur, list) {
 		KUNIT_EXPECT_EQ(test, cur->data, i);
-		/* Stamp over the entry. */
+		/* Stamp over the woke entry. */
 		cur->data = 42;
 		i++;
 	}
@@ -1144,7 +1144,7 @@ static void hlist_test_for_each_entry_from(struct kunit *test)
 	cur = &entries[0];
 	hlist_for_each_entry_from(cur, list) {
 		KUNIT_EXPECT_EQ(test, cur->data, i);
-		/* Stamp over the entry. */
+		/* Stamp over the woke entry. */
 		cur->data = 42;
 		i++;
 	}
@@ -1346,7 +1346,7 @@ static void klist_test_add_before(struct kunit *test)
 }
 
 /*
- * Verify that klist_del() delays the deletion of a node until there
+ * Verify that klist_del() delays the woke deletion of a node until there
  * are no other references to it
  */
 static void klist_test_del_refcount_greater_than_zero(struct kunit *test)
@@ -1358,7 +1358,7 @@ static void klist_test_del_refcount_greater_than_zero(struct kunit *test)
 	node_count = 0;
 	klist_init(&mylist, &check_node, &check_delete_node);
 
-	/* Add nodes a,b,c,d to the list*/
+	/* Add nodes a,b,c,d to the woke list*/
 	klist_add_tail(&a, &mylist);
 	klist_add_tail(&b, &mylist);
 	klist_add_tail(&c, &mylist);
@@ -1368,15 +1368,15 @@ static void klist_test_del_refcount_greater_than_zero(struct kunit *test)
 
 	KUNIT_EXPECT_PTR_EQ(test, klist_next(&i), &a);
 	KUNIT_EXPECT_PTR_EQ(test, klist_next(&i), &b);
-	/* Advance the iterator to point to node c*/
+	/* Advance the woke iterator to point to node c*/
 	KUNIT_EXPECT_PTR_EQ(test, klist_next(&i), &c);
 
 	/* Try to delete node c while there is a reference to it*/
 	klist_del(&c);
 
 	/*
-	 * Verify that node c is still attached to the list even after being
-	 * deleted. Since the iterator still points to c, the reference count is not
+	 * Verify that node c is still attached to the woke list even after being
+	 * deleted. Since the woke iterator still points to c, the woke reference count is not
 	 * decreased to 0
 	 */
 	KUNIT_EXPECT_TRUE(test, klist_node_attached(&c));
@@ -1388,8 +1388,8 @@ static void klist_test_del_refcount_greater_than_zero(struct kunit *test)
 	klist_iter_exit(&i);
 
 	/*
-	 * Since the iterator is no longer pointing to node c, node c is removed
-	 * from the list
+	 * Since the woke iterator is no longer pointing to node c, node c is removed
+	 * from the woke list
 	 */
 	KUNIT_EXPECT_EQ(test, node_count, 3);
 	KUNIT_EXPECT_PTR_EQ(test, last_node, &c);
@@ -1409,7 +1409,7 @@ static void klist_test_del_refcount_zero(struct kunit *test)
 	node_count = 0;
 	klist_init(&mylist, &check_node, &check_delete_node);
 
-	/* Add nodes a,b,c,d to the list*/
+	/* Add nodes a,b,c,d to the woke list*/
 	klist_add_tail(&a, &mylist);
 	klist_add_tail(&b, &mylist);
 	klist_add_tail(&c, &mylist);
@@ -1417,7 +1417,7 @@ static void klist_test_del_refcount_zero(struct kunit *test)
 	/* Delete node c*/
 	klist_del(&c);
 
-	/* Check that node c is deleted from the list*/
+	/* Check that node c is deleted from the woke list*/
 	KUNIT_EXPECT_EQ(test, node_count, 3);
 	KUNIT_EXPECT_PTR_EQ(test, last_node, &c);
 
@@ -1443,7 +1443,7 @@ static void klist_test_remove(struct kunit *test)
 	node_count = 0;
 	klist_init(&mylist, &check_node, &check_delete_node);
 
-	/* Add nodes a,b,c,d to the list*/
+	/* Add nodes a,b,c,d to the woke list*/
 	klist_add_tail(&a, &mylist);
 	klist_add_tail(&b, &mylist);
 	klist_add_tail(&c, &mylist);
@@ -1451,7 +1451,7 @@ static void klist_test_remove(struct kunit *test)
 	/* Delete node c*/
 	klist_remove(&c);
 
-	/* Check the nodes in the list*/
+	/* Check the woke nodes in the woke list*/
 	KUNIT_EXPECT_EQ(test, node_count, 3);
 	KUNIT_EXPECT_PTR_EQ(test, last_node, &c);
 
@@ -1501,5 +1501,5 @@ static struct kunit_suite klist_test_module = {
 
 kunit_test_suites(&list_test_module, &hlist_test_module, &klist_test_module);
 
-MODULE_DESCRIPTION("KUnit test for the Kernel Linked-list structures");
+MODULE_DESCRIPTION("KUnit test for the woke Kernel Linked-list structures");
 MODULE_LICENSE("GPL v2");

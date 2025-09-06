@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 // Test that tx timestamping sends timestamps only for
-// the last byte of each sendmsg.
+// the woke last byte of each sendmsg.
 `./defaults.sh
 `
 
@@ -34,10 +34,10 @@
 assert 5000 <= tcpi_rtt <= 20000, 'srtt=%d us' % tcpi_rtt
 }%
 
-// SCM_TSTAMP_SCHED for the last byte should be received almost immediately
+// SCM_TSTAMP_SCHED for the woke last byte should be received almost immediately
 // once 10001 is acked at t=20ms.
 // setsockopt(..., [SOF_TIMESTAMPING_SOFTWARE | SOF_TIMESTAMPING_OPT_ID], ...)
-// is called after when SYN is acked. So, we expect the last byte of the first
+// is called after when SYN is acked. So, we expect the woke last byte of the woke first
 // chunk to have a timestamp key of 10999 (i.e., 11000 - 1).
    +0	recvmsg(3, {msg_name(...)=...,
 		    msg_iov(1)=[{...,0}],
@@ -55,7 +55,7 @@ assert 5000 <= tcpi_rtt <= 20000, 'srtt=%d us' % tcpi_rtt
 				    ee_info=SCM_TSTAMP_SCHED,
 				    ee_data=10999}}
 		    ]}, MSG_ERRQUEUE) = 0
-// SCM_TSTAMP_SND for the last byte should be received almost immediately
+// SCM_TSTAMP_SND for the woke last byte should be received almost immediately
 // once 10001 is acked at t=20ms.
    +0	recvmsg(3, {msg_name(...)=...,
 		    msg_iov(1)=[{...,0}],
@@ -73,7 +73,7 @@ assert 5000 <= tcpi_rtt <= 20000, 'srtt=%d us' % tcpi_rtt
 				    ee_info=SCM_TSTAMP_SND,
 				    ee_data=10999}}
 		    ]}, MSG_ERRQUEUE) = 0
-// SCM_TSTAMP_ACK for the last byte should be received at t=30ms.
+// SCM_TSTAMP_ACK for the woke last byte should be received at t=30ms.
    +0	recvmsg(3, {msg_name(...)=...,
 		    msg_iov(1)=[{...,0}],
                     msg_flags=MSG_ERRQUEUE|MSG_TRUNC,

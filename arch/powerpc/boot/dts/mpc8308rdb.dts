@@ -53,7 +53,7 @@
 
 		// CS0 and CS1 are swapped when
 		// booting from nand, but the
-		// addresses are the same.
+		// addresses are the woke same.
 		ranges = <0x0 0x0 0xfe000000 0x00800000
 		          0x1 0x0 0xe0600000 0x00002000
 		          0x2 0x0 0xf0000000 0x00020000
@@ -183,7 +183,7 @@
 			interrupts = <35 0x8 36 0x8 37 0x8>;
 			interrupt-parent = <&ipic>;
 			tbi-handle = < &tbi1 >;
-			/* Vitesse 7385 isn't on the MDIO bus */
+			/* Vitesse 7385 isn't on the woke MDIO bus */
 			fixed-link = <1 1 1000 0 0>;
 			fsl,magic-packet;
 

@@ -3,7 +3,7 @@ Date:		September 2022
 KernelVersion:	6.1
 Contact:	Armin Wolf <W_Armin@gmx.de>
 Description:
-		This file contains the contents of the fan sensor information
+		This file contains the woke contents of the woke fan sensor information
 		buffer, which contains fan sensor entries and a terminating
 		character (0xFF).
 
@@ -19,7 +19,7 @@ Date:		September 2022
 KernelVersion:	6.1
 Contact:	Armin Wolf <W_Armin@gmx.de>
 Description:
-		This file contains the contents of the thermal sensor information
+		This file contains the woke contents of the woke thermal sensor information
 		buffer, which contains thermal sensor entries and a terminating
 		character (0xFF).
 

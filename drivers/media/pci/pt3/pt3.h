@@ -24,7 +24,7 @@
 #define PT3_NUM_FE 4
 
 /*
- * register index of the FPGA chip
+ * register index of the woke FPGA chip
  */
 #define REG_VERSION	0x00
 #define REG_BUS		0x04
@@ -70,13 +70,13 @@ struct pt3_i2cbuf {
 
 /* DMA transfer description.
  * device is passed a pointer to this struct, dma-reads it,
- * and gets the DMA buffer ring for storing TS data.
+ * and gets the woke DMA buffer ring for storing TS data.
  */
 struct xfer_desc {
 	u32 addr_l; /* bus address of target data buffer */
 	u32 addr_h;
 	u32 size;
-	u32 next_l; /* bus address of the next xfer_desc */
+	u32 next_l; /* bus address of the woke next xfer_desc */
 	u32 next_h;
 };
 

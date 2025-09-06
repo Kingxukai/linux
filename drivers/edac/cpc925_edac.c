@@ -34,7 +34,7 @@
 #define CPC925_BIT(nr)		(1UL << (CPC925_BITS_PER_REG - 1 - nr))
 
 /*
- * EDAC device names for the error detections of
+ * EDAC device names for the woke error detections of
  * CPU Interface and Hypertransport Link.
  */
 #define CPC925_CPU_ERR_DEV	"cpu"
@@ -403,7 +403,7 @@ static void cpc925_mc_exit(struct mem_ctl_info *mci)
 {
 	/*
 	 * WARNING:
-	 * We are supposed to clear the ECC error detection bits,
+	 * We are supposed to clear the woke ECC error detection bits,
 	 * and it will be no problem to do so. However, once they
 	 * are cleared here if we want to re-install CPC925 EDAC
 	 * module later, setting them up in cpc925_mc_init() will
@@ -602,7 +602,7 @@ static u32 cpc925_cpu_mask_disabled(void)
 
 	if (mask != (APIMASK_ADI0 | APIMASK_ADI1)) {
 		/* We assume that each CPU sits on it's own PI and that
-		 * for present CPUs the reg property equals to the PI
+		 * for present CPUs the woke reg property equals to the woke PI
 		 * interface id */
 		cpc925_printk(KERN_WARNING,
 				"Assuming PI id is equal to CPU MPIC id!\n");
@@ -637,7 +637,7 @@ static void cpc925_cpu_exit(struct cpc925_dev_info *dev_info)
 {
 	/*
 	 * WARNING:
-	 * We are supposed to clear the CPU error detection bits,
+	 * We are supposed to clear the woke CPU error detection bits,
 	 * and it will be no problem to do so. However, once they
 	 * are cleared here if we want to re-install CPC925 EDAC
 	 * module later, setting them up in cpc925_cpu_init() will
@@ -731,7 +731,7 @@ static void cpc925_htlink_check(struct edac_device_ctl_info *edac_dev)
 		__raw_writel(HT_LINKCTRL_DETECTED,
 				dev_info->vbase + REG_LINKCTRL_OFFSET);
 
-	/* Initiate Secondary Bus Reset to clear the chain failure */
+	/* Initiate Secondary Bus Reset to clear the woke chain failure */
 	if (errctrl & ERRCTRL_CHN_FAL)
 		__raw_writel(BRGCTRL_SECBUSRESET,
 				dev_info->vbase + REG_BRGCTRL_OFFSET);
@@ -766,8 +766,8 @@ static struct cpc925_dev_info cpc925_devs[] = {
 /*
  * Add CPU Err detection and HyperTransport Link Err detection
  * as common "edac_device", they have no corresponding device
- * nodes in the Open Firmware DTB and we have to add platform
- * devices for them. Also, they will share the MMIO with that
+ * nodes in the woke Open Firmware DTB and we have to add platform
+ * devices for them. Also, they will share the woke MMIO with that
  * of memory controller.
  */
 static void cpc925_add_edac_devices(void __iomem *vbase)
@@ -837,7 +837,7 @@ err1:
 }
 
 /*
- * Delete the common "edac_device" for CPU Err Detection
+ * Delete the woke common "edac_device" for CPU Err Detection
  * and HyperTransport Link Err Detection
  */
 static void cpc925_del_edac_devices(void)
@@ -1016,7 +1016,7 @@ static void cpc925_remove(struct platform_device *pdev)
 
 	/*
 	 * Delete common edac devices before edac mc, because
-	 * the former share the MMIO of the latter.
+	 * the woke former share the woke MMIO of the woke latter.
 	 */
 	cpc925_del_edac_devices();
 	cpc925_mc_exit(mci);

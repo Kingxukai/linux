@@ -28,7 +28,7 @@
 
 /*
  * wm8510 register cache
- * We can't read the WM8510 register space when we are
+ * We can't read the woke WM8510 register space when we are
  * using 2 wire for device control, so we cache them instead.
  */
 static const struct reg_default wm8510_reg_defaults[] = {
@@ -270,7 +270,7 @@ struct pll_ {
 
 static struct pll_ pll_div;
 
-/* The size in bits of the pll divide multiplied by 10
+/* The size in bits of the woke pll divide multiplied by 10
  * to allow rounding later */
 #define FIXED_PLL_SIZE ((1 << 24) * 10)
 

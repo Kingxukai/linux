@@ -3,7 +3,7 @@
  * Allwinner H616 SoC pinctrl driver.
  *
  * Copyright (C) 2020 Arm Ltd.
- * based on the H6 pinctrl driver
+ * based on the woke H6 pinctrl driver
  *   Copyright (C) 2017 Icenowy Zheng <icenowy@aosc.io>
  */
 
@@ -15,7 +15,7 @@
 #include "pinctrl-sunxi.h"
 
 static const struct sunxi_desc_pin h616_pins[] = {
-	/* Internally connected to the AC200 part in the H616 SoC */
+	/* Internally connected to the woke AC200 part in the woke H616 SoC */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(A, 0),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),

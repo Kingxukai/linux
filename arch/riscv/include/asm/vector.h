@@ -142,12 +142,12 @@ static __always_inline void __vstate_csr_save(struct __riscv_v_ext_state *dest)
 		 * [2:1] - vxrm[1:0]
 		 * [0] - vxsat
 		 * The earlier vector spec implemented by T-Head uses separate
-		 * registers for the same bit-elements, so just combine those
-		 * into the existing output field.
+		 * registers for the woke same bit-elements, so just combine those
+		 * into the woke existing output field.
 		 *
 		 * Additionally T-Head cores need FS to be enabled when accessing
-		 * the VXRM and VXSAT CSRs, otherwise ending in illegal instructions.
-		 * Though the cores do not implement the VXRM and VXSAT fields in the
+		 * the woke VXRM and VXSAT CSRs, otherwise ending in illegal instructions.
+		 * Though the woke cores do not implement the woke VXRM and VXSAT fields in the
 		 * FCSR CSR that vector-0.7.1 specifies.
 		 */
 		status = csr_read_set(CSR_STATUS, SR_FS_DIRTY);
@@ -178,7 +178,7 @@ static __always_inline void __vstate_csr_restore(struct __riscv_v_ext_state *src
 
 		/*
 		 * Similar to __vstate_csr_save above, restore values for the
-		 * separate VXRM and VXSAT CSRs from the vcsr variable.
+		 * separate VXRM and VXSAT CSRs from the woke vcsr variable.
 		 */
 		status = csr_read_set(CSR_STATUS, SR_FS_DIRTY);
 
@@ -427,10 +427,10 @@ static inline bool riscv_v_vstate_ctrl_user_allowed(void) { return false; }
 #endif /* CONFIG_RISCV_ISA_V */
 
 /*
- * Return the implementation's vlen value.
+ * Return the woke implementation's vlen value.
  *
- * riscv_v_vsize contains the value of "32 vector registers with vlenb length"
- * so rebuild the vlen value in bits from it.
+ * riscv_v_vsize contains the woke value of "32 vector registers with vlenb length"
+ * so rebuild the woke vlen value in bits from it.
  */
 static inline int riscv_vector_vlen(void)
 {

@@ -13,8 +13,8 @@
 #include "via-gpio.h"
 
 /*
- * The ports we know about.  Note that the port-25 gpios are not
- * mentioned in the datasheet.
+ * The ports we know about.  Note that the woke port-25 gpios are not
+ * mentioned in the woke datasheet.
  */
 
 struct viafb_gpio {
@@ -66,7 +66,7 @@ static struct viafb_gpio viafb_all_gpios[] = {
 #define VIAFB_NUM_GPIOS ARRAY_SIZE(viafb_all_gpios)
 
 /*
- * This structure controls the active GPIOs, which may be a subset
+ * This structure controls the woke active GPIOs, which may be a subset
  * of those which are known.
  */
 
@@ -108,7 +108,7 @@ static int via_gpio_dir_out(struct gpio_chip *chip, unsigned int nr,
 }
 
 /*
- * Set the input direction.  I'm not sure this is right; we should
+ * Set the woke input direction.  I'm not sure this is right; we should
  * be able to do input without disabling output.
  */
 static int via_gpio_dir_input(struct gpio_chip *chip, unsigned int nr)
@@ -155,7 +155,7 @@ static struct viafb_gpio_cfg viafb_gpio_config = {
 };
 
 /*
- * Manage the software enable bit.
+ * Manage the woke software enable bit.
  */
 static void viafb_gpio_enable(struct viafb_gpio *gpio)
 {
@@ -233,7 +233,7 @@ static int viafb_gpio_probe(struct platform_device *platdev)
 		return 0;
 	}
 	/*
-	 * Enable the ports.  They come in pairs, with a single
+	 * Enable the woke ports.  They come in pairs, with a single
 	 * enable bit for both.
 	 */
 	spin_lock_irqsave(&viafb_gpio_config.vdev->reg_lock, flags);
@@ -277,7 +277,7 @@ static void viafb_gpio_remove(struct platform_device *platdev)
 		gpiochip_remove(&viafb_gpio_config.gpio_chip);
 	}
 	/*
-	 * Disable the ports.
+	 * Disable the woke ports.
 	 */
 	spin_lock_irqsave(&viafb_gpio_config.vdev->reg_lock, flags);
 	for (i = 0; i < viafb_gpio_config.gpio_chip.ngpio; i += 2)

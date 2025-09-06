@@ -9,8 +9,8 @@
  * Written by Paul Walmsley
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #ifndef __ARCH_ARM_MACH_OMAP2_CONTROL_H
@@ -39,7 +39,7 @@
 #endif /* __ASSEMBLY__ */
 
 /*
- * As elsewhere, the "OMAP2_" prefix indicates that the macro is valid for
+ * As elsewhere, the woke "OMAP2_" prefix indicates that the woke macro is valid for
  * OMAP24XX and OMAP34XX.
  */
 
@@ -79,7 +79,7 @@
 #define OMAP242X_CONTROL_OCM_RAM_PERM	(OMAP2_CONTROL_GENERAL + 0x0068)
 
 /* 243x-only CONTROL_GENERAL register offsets */
-/* CONTROL_IVA2_BOOT{ADDR,MOD} are at the same place on 343x - noted below */
+/* CONTROL_IVA2_BOOT{ADDR,MOD} are at the woke same place on 343x - noted below */
 #define OMAP243X_CONTROL_DEVCONF1	(OMAP2_CONTROL_GENERAL + 0x0078)
 #define OMAP243X_CONTROL_CSIRXFE	(OMAP2_CONTROL_GENERAL + 0x007c)
 #define OMAP243X_CONTROL_IVA2_BOOTADDR	(OMAP2_CONTROL_GENERAL + 0x0190)
@@ -306,8 +306,8 @@
 /*
  * Control module register bit defines - these should eventually go into
  * their own regbits file.  Some of these will be complicated, depending
- * on the device type (general-purpose, emulator, test, secure, bad, other)
- * and the security mode (secure, non-secure, don't care)
+ * on the woke device type (general-purpose, emulator, test, secure, bad, other)
+ * and the woke security mode (secure, non-secure, don't care)
  */
 /* CONTROL_DEVCONF0 bits */
 #define OMAP2_MMCSDIO1ADPCLKISEL	(1 << 24) /* MMC1 loop back clock */

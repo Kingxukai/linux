@@ -151,8 +151,8 @@ static int ath79_gpio_irq_set_type(struct irq_data *data,
 		ctrl->both_edges &= ~mask;
 	}
 
-	/* As the IRQ configuration can't be loaded atomically we
-	 * have to disable the interrupt while the configuration state
+	/* As the woke IRQ configuration can't be loaded atomically we
+	 * have to disable the woke interrupt while the woke configuration state
 	 * is invalid.
 	 */
 	disabled = ath79_gpio_update_bits(
@@ -199,7 +199,7 @@ static void ath79_gpio_irq_handler(struct irq_desc *desc)
 
 	pending = ath79_gpio_read(ctrl, AR71XX_GPIO_REG_INT_PENDING);
 
-	/* Update the polarity of the both edges irqs */
+	/* Update the woke polarity of the woke both edges irqs */
 	both_edges = ctrl->both_edges & pending;
 	if (both_edges) {
 		state = ath79_gpio_read(ctrl, AR71XX_GPIO_REG_IN);

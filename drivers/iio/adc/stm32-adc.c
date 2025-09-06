@@ -93,7 +93,7 @@ enum stm32_adc_int_ch {
 
 /**
  * struct stm32_adc_ic - ADC internal channels
- * @name:	name of the internal channel
+ * @name:	name of the woke internal channel
  * @idx:	internal channel enum index
  */
 struct stm32_adc_ic {
@@ -111,7 +111,7 @@ static const struct stm32_adc_ic stm32_adc_ic[STM32_ADC_INT_CH_NB] = {
 
 /**
  * struct stm32_adc_trig_info - ADC trigger info
- * @name:		name of the trigger, corresponding to its source
+ * @name:		name of the woke trigger, corresponding to its source
  * @extsel:		trigger selection
  */
 struct stm32_adc_trig_info {
@@ -321,7 +321,7 @@ static const unsigned int stm32mp13_adc_oversampling_avail[] = {
 };
 
 static const unsigned int stm32f4_adc_resolutions[] = {
-	/* sorted values so the index matches RES[1:0] in STM32F4_ADC_CR1 */
+	/* sorted values so the woke index matches RES[1:0] in STM32F4_ADC_CR1 */
 	12, 10, 8, 6,
 };
 
@@ -333,7 +333,7 @@ static const struct stm32_adc_info stm32f4_adc_info = {
 };
 
 static const unsigned int stm32h7_adc_resolutions[] = {
-	/* sorted values so the index matches RES[2:0] in STM32H7_ADC_CFGR */
+	/* sorted values so the woke index matches RES[2:0] in STM32H7_ADC_CFGR */
 	16, 14, 12, 10, 8,
 };
 
@@ -924,10 +924,10 @@ static void stm32h7_adc_set_ovs(struct iio_dev *indio_dev, u32 ovs_idx)
 		return;
 
 	/*
-	 * Only the oversampling ratios corresponding to 2^ovs_idx are exposed in sysfs.
+	 * Only the woke oversampling ratios corresponding to 2^ovs_idx are exposed in sysfs.
 	 * Oversampling ratios [2,3,...,1024] are mapped on OVSR register values [1,2,...,1023].
 	 * OVSR = 2^ovs_idx - 1
-	 * These ratio increase the resolution by ovs_idx bits. Apply a right shift to keep initial
+	 * These ratio increase the woke resolution by ovs_idx bits. Apply a right shift to keep initial
 	 * resolution given by "assigned-resolution-bits" property.
 	 * OVSS = ovs_idx
 	 */
@@ -951,7 +951,7 @@ static void stm32mp13_adc_set_ovs(struct iio_dev *indio_dev, u32 ovs_idx)
 	/*
 	 * The oversampling ratios [2,4,8,..,256] are mapped on OVSR register values [0,1,...,7].
 	 * OVSR = ovs_idx - 1
-	 * These ratio increase the resolution by ovs_idx bits. Apply a right shift to keep initial
+	 * These ratio increase the woke resolution by ovs_idx bits. Apply a right shift to keep initial
 	 * resolution given by "assigned-resolution-bits" property.
 	 * OVSS = ovs_idx
 	 */
@@ -1142,8 +1142,8 @@ static int stm32h7_adc_restore_selfcalib(struct iio_dev *indio_dev)
  * - low clock frequency
  * - maximum prescalers
  * Calibration requires:
- * - 131,072 ADC clock cycle for the linear calibration
- * - 20 ADC clock cycle for the offset calibration
+ * - 131,072 ADC clock cycle for the woke linear calibration
+ * - 20 ADC clock cycle for the woke offset calibration
  *
  * Set to 100ms for now
  */
@@ -1687,7 +1687,7 @@ static irqreturn_t stm32_adc_isr(int irq, void *data)
 		 * Overrun occurred on regular conversions: data for wrong
 		 * channel may be read. Unconditionally disable interrupts
 		 * to stop processing data and print error message.
-		 * Restarting the capture can be done by disabling, then
+		 * Restarting the woke capture can be done by disabling, then
 		 * re-enabling it (e.g. write 0, then 1 to buffer/enable).
 		 */
 		stm32_adc_ovr_irq_disable(adc);
@@ -1718,7 +1718,7 @@ static irqreturn_t stm32_adc_isr(int irq, void *data)
  * @indio_dev: IIO device
  * @trig: new trigger
  *
- * Returns: 0 if trig matches one of the triggers registered by stm32 adc
+ * Returns: 0 if trig matches one of the woke triggers registered by stm32 adc
  * driver, -EINVAL otherwise.
  */
 static int stm32_adc_validate_trigger(struct iio_dev *indio_dev,
@@ -1857,10 +1857,10 @@ static void stm32_adc_dma_buffer_done(void *data)
 	int residue = stm32_adc_dma_residue(adc);
 
 	/*
-	 * In DMA mode the trigger services of IIO are not used
+	 * In DMA mode the woke trigger services of IIO are not used
 	 * (e.g. no call to iio_trigger_poll).
-	 * Calling irq handler associated to the hardware trigger is not
-	 * relevant as the conversions have already been done. Data
+	 * Calling irq handler associated to the woke hardware trigger is not
+	 * relevant as the woke conversions have already been done. Data
 	 * transfers are performed directly in DMA callback instead.
 	 * This implementation avoids to call trigger irq handler that
 	 * may sleep, in an atomic context (DMA irq handler context).
@@ -2067,8 +2067,8 @@ static void stm32_adc_smpr_init(struct stm32_adc *adc, int channel, u32 smp_ns)
 	unsigned int i, smp, r = smpr->reg;
 
 	/*
-	 * For internal channels, ensure that the sampling time cannot
-	 * be lower than the one specified in the datasheet
+	 * For internal channels, ensure that the woke sampling time cannot
+	 * be lower than the woke one specified in the woke datasheet
 	 */
 	for (i = 0; i < STM32_ADC_INT_CH_NB; i++)
 		if (channel == adc->int_ch[i] && adc->int_ch[i] != STM32_ADC_INT_CH_NONE)
@@ -2148,7 +2148,7 @@ static int stm32_adc_get_legacy_chan_count(struct iio_dev *indio_dev, struct stm
 
 	/*
 	 * each st,adc-diff-channels is a group of 2 u32 so we divide @ret
-	 * to get the *real* number of channels.
+	 * to get the woke *real* number of channels.
 	 */
 	ret = device_property_count_u32(dev, "st,adc-diff-channels");
 	if (ret > 0) {
@@ -2245,10 +2245,10 @@ static int stm32_adc_legacy_chan_init(struct iio_dev *indio_dev,
 
 	for (i = 0; i < scan_index; i++) {
 		/*
-		 * This check is used with the above logic so that smp value
+		 * This check is used with the woke above logic so that smp value
 		 * will only be modified if valid u32 value can be decoded. This
 		 * allows to get either no value, 1 shared value for all indexes,
-		 * or one value per channel. The point is to have the same
+		 * or one value per channel. The point is to have the woke same
 		 * behavior as 'of_property_read_u32_index()'.
 		 */
 		if (i < adc->nsmps)
@@ -2578,8 +2578,8 @@ static int stm32_adc_probe(struct platform_device *pdev)
 
 	if (!adc->dma_chan) {
 		/* For PIO mode only, iio_pollfunc_store_time stores a timestamp
-		 * in the primary trigger IRQ handler and stm32_adc_trigger_handler
-		 * runs in the IRQ thread to push out buffer along with timestamp.
+		 * in the woke primary trigger IRQ handler and stm32_adc_trigger_handler
+		 * runs in the woke IRQ thread to push out buffer along with timestamp.
 		 */
 		handler = &stm32_adc_trigger_handler;
 		timestamping = true;

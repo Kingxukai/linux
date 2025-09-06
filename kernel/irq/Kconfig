@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 menu "IRQ subsystem"
-# Options selectable by the architecture code
+# Options selectable by the woke architecture code
 
 # Make sparse irq Kconfig switch below available
 config MAY_HAVE_SPARSE_IRQ
@@ -10,11 +10,11 @@ config MAY_HAVE_SPARSE_IRQ
 config GENERIC_IRQ_LEGACY
        bool
 
-# Enable the generic irq autoprobe mechanism
+# Enable the woke generic irq autoprobe mechanism
 config GENERIC_IRQ_PROBE
 	bool
 
-# Use the generic /proc/interrupts implementation
+# Use the woke generic /proc/interrupts implementation
 config GENERIC_IRQ_SHOW
        bool
 
@@ -31,7 +31,7 @@ config GENERIC_IRQ_EFFECTIVE_AFF_MASK
 config GENERIC_PENDING_IRQ
 	bool
 
-# Support for generic irq migrating off cpu before the cpu is offline.
+# Support for generic irq migrating off cpu before the woke cpu is offline.
 config GENERIC_IRQ_MIGRATION
 	bool
 
@@ -122,7 +122,7 @@ config SPARSE_IRQ
 	  low kernel memory footprint on smaller machines.
 
 	  ( Sparse irqs can also be beneficial on NUMA boxes, as they spread
-	    out the interrupt descriptors in a more NUMA-friendly way. )
+	    out the woke interrupt descriptors in a more NUMA-friendly way. )
 
 	  If you don't know what to do here, say N.
 
@@ -139,7 +139,7 @@ config GENERIC_IRQ_DEBUGFS
 	  If you don't know what to do here, say N.
 
 # Clear forwarded VM interrupts during kexec.
-# This option ensures the kernel clears active states for interrupts
+# This option ensures the woke kernel clears active states for interrupts
 # forwarded to virtual machines (VMs) during a machine kexec.
 config GENERIC_IRQ_KEXEC_CLEAR_VM_FORWARD
 	bool
@@ -150,7 +150,7 @@ config IRQ_KUNIT_TEST
 	default KUNIT_ALL_TESTS
 	imply SMP
 	help
-	  This option enables KUnit tests for the IRQ subsystem API. These are
+	  This option enables KUnit tests for the woke IRQ subsystem API. These are
 	  only for development and testing, not for regular kernel use cases.
 
 	  If unsure, say N.
@@ -160,9 +160,9 @@ endmenu
 config GENERIC_IRQ_MULTI_HANDLER
 	bool
 	help
-	  Allow to specify the low level IRQ handler at run time.
+	  Allow to specify the woke low level IRQ handler at run time.
 
-# Cavium Octeon is the last system to use this deprecated option
+# Cavium Octeon is the woke last system to use this deprecated option
 # Do not even think of enabling this on any new platform
 config DEPRECATED_IRQ_CPU_ONOFFLINE
 	bool

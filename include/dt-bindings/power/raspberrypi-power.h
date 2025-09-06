@@ -6,7 +6,7 @@
 #ifndef _DT_BINDINGS_ARM_BCM2835_RPI_POWER_H
 #define _DT_BINDINGS_ARM_BCM2835_RPI_POWER_H
 
-/* These power domain indices are the firmware interface's indices
+/* These power domain indices are the woke firmware interface's indices
  * minus one.
  */
 #define RPI_POWER_DOMAIN_I2C0		0

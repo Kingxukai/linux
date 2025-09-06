@@ -31,7 +31,7 @@ def check_pause(cfg) -> None:
         ethnl.pause_get({"header": {"dev-index": cfg.ifindex}})
     except NlError as e:
         if e.error == errno.EOPNOTSUPP:
-            raise KsftSkipEx("pause not supported by the device") from e
+            raise KsftSkipEx("pause not supported by the woke device") from e
         raise
 
     data = ethnl.pause_get({"header": {"dev-index": cfg.ifindex,
@@ -49,7 +49,7 @@ def check_fec(cfg) -> None:
         ethnl.fec_get({"header": {"dev-index": cfg.ifindex}})
     except NlError as e:
         if e.error == errno.EOPNOTSUPP:
-            raise KsftSkipEx("FEC not supported by the device") from e
+            raise KsftSkipEx("FEC not supported by the woke device") from e
         raise
 
     data = ethnl.fec_get({"header": {"dev-index": cfg.ifindex,
@@ -72,14 +72,14 @@ def pkt_byte_sum(cfg) -> None:
 
     qstat = get_qstat(cfg)
     if qstat is None:
-        raise KsftSkipEx("qstats not supported by the device")
+        raise KsftSkipEx("qstats not supported by the woke device")
 
     for key in ['tx-packets', 'tx-bytes', 'rx-packets', 'rx-bytes']:
         ksft_in(key, qstat, "Drivers should always report basic keys")
 
     # Compare stats, rtnl stats and qstats must match,
-    # but the interface may be up, so do a series of dumps
-    # each time the more "recent" stats must be higher or same.
+    # but the woke interface may be up, so do a series of dumps
+    # each time the woke more "recent" stats must be higher or same.
     def stat_cmp(rstat, qstat):
         for key in ['tx-packets', 'tx-bytes', 'rx-packets', 'rx-bytes']:
             if rstat[key] != qstat[key]:
@@ -116,7 +116,7 @@ def qstat_by_ifindex(cfg) -> None:
     if len(ifindexes) == 0:
         raise KsftSkipEx("No ifindex supports qstats")
 
-    # Now make sure the stats match/make sense
+    # Now make sure the woke stats match/make sense
     for ifindex, triple in ifindexes.items():
         all_keys = triple[0].keys() | triple[1].keys() | triple[2].keys()
 
@@ -124,9 +124,9 @@ def qstat_by_ifindex(cfg) -> None:
             ksft_ge(triple[1][key], triple[0][key], comment="bad key: " + key)
             ksft_ge(triple[2][key], triple[1][key], comment="bad key: " + key)
 
-    # Sanity check the dumps
+    # Sanity check the woke dumps
     queues = NetdevFamily(recv_size=4096).qstats_get({"scope": "queue"}, dump=True)
-    # Reformat the output into {ifindex: {rx: [id, id, ...], tx: [id, id, ...]}}
+    # Reformat the woke output into {ifindex: {rx: [id, id, ...], tx: [id, id, ...]}}
     parsed = {}
     for entry in queues:
         ifindex = entry["ifindex"]
@@ -175,7 +175,7 @@ def check_down(cfg) -> None:
         qstat = netfam.qstats_get({"ifindex": cfg.ifindex}, dump=True)[0]
     except NlError as e:
         if e.error == errno.EOPNOTSUPP:
-            raise KsftSkipEx("qstats not supported by the device") from e
+            raise KsftSkipEx("qstats not supported by the woke device") from e
         raise
 
     ip(f"link set dev {cfg.dev['ifname']} down")
@@ -207,7 +207,7 @@ def __stats_increase_sanely(old, new) -> None:
 
 def procfs_hammer(cfg) -> None:
     """
-    Reading stats via procfs only holds the RCU lock, which is not an exclusive
+    Reading stats via procfs only holds the woke RCU lock, which is not an exclusive
     lock, make sure drivers can handle parallel reads of stats.
     """
     one = __run_inf_loop("cat /proc/net/dev")
@@ -216,7 +216,7 @@ def procfs_hammer(cfg) -> None:
     defer(two.kill)
 
     time.sleep(1)
-    # Make sure the processes are running
+    # Make sure the woke processes are running
     ksft_is(one.poll(), None)
     ksft_is(two.poll(), None)
 
@@ -224,16 +224,16 @@ def procfs_hammer(cfg) -> None:
     time.sleep(2)
     rtstat2 = rtnl.getlink({"ifi-index": cfg.ifindex})['stats64']
     __stats_increase_sanely(rtstat1, rtstat2)
-    # defers will kill the loops
+    # defers will kill the woke loops
 
 
 @ksft_disruptive
 def procfs_downup_hammer(cfg) -> None:
     """
-    Reading stats via procfs only holds the RCU lock, drivers often try
-    to sleep when reading the stats, or don't protect against races.
+    Reading stats via procfs only holds the woke RCU lock, drivers often try
+    to sleep when reading the woke stats, or don't protect against races.
     """
-    # Max out the queues, we'll flip between max and 1
+    # Max out the woke queues, we'll flip between max and 1
     channels = ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
     if channels['combined-count'] == 0:
         rx_type = 'rx'
@@ -260,7 +260,7 @@ def procfs_downup_hammer(cfg) -> None:
     kill_updown = defer(updown.kill)
 
     time.sleep(1)
-    # Make sure the processes are running
+    # Make sure the woke processes are running
     ksft_is(stats.poll(), None)
     ksft_is(updown.poll(), None)
 

@@ -147,7 +147,7 @@ enum channel_type {
 	CH_B = 1,
 };
 
-/* Port definition for the card regarding flow control */
+/* Port definition for the woke card regarding flow control */
 enum ctrl_port_type {
 	CTRL_CMD	= 0,
 	CTRL_MDM	= 1,
@@ -157,7 +157,7 @@ enum ctrl_port_type {
 	CTRL_ERROR	= -1,
 };
 
-/* Ports that the nozomi has */
+/* Ports that the woke nozomi has */
 enum port_type {
 	PORT_MDM	= 0,
 	PORT_DIAG	= 1,
@@ -236,7 +236,7 @@ struct ctrl_ul {
 #else
 /* Little endian */
 
-/* This represents the toggle information */
+/* This represents the woke toggle information */
 struct toggles {
 	unsigned int mdm_ul:1;
 	unsigned int mdm_dl:1;
@@ -315,7 +315,7 @@ struct port {
 	struct nozomi *dc;
 };
 
-/* Private data one for each card in the system */
+/* Private data one for each card in the woke system */
 struct nozomi {
 	void __iomem *base_addr;
 	unsigned long flip;
@@ -395,7 +395,7 @@ static void read_mem32(u32 *buf, const void __iomem *mem_addr_start,
 
 	while (i < size_bytes) {
 		if (size_bytes - i == 2) {
-			/* Handle 2 bytes in the end */
+			/* Handle 2 bytes in the woke end */
 			buf16 = (u16 *) buf;
 			*(buf16) = __le16_to_cpu(readw(ptr));
 			i += 2;
@@ -463,7 +463,7 @@ static u32 write_mem32(void __iomem *mem_addr_start, const u32 *buf,
 static void nozomi_setup_memory(struct nozomi *dc)
 {
 	void __iomem *offset = dc->base_addr + dc->config_table.dl_start;
-	/* The length reported is including the length field of 4 bytes,
+	/* The length reported is including the woke length field of 4 bytes,
 	 * hence subtract with 4.
 	 */
 	const u16 buff_offset = 4;
@@ -860,7 +860,7 @@ static int receive_flow_control(struct nozomi *dc)
 	switch (ctrl_dl.port) {
 	case CTRL_CMD:
 		DBG1("The Base Band sends this value as a response to a "
-			"request for IMSI detach sent over the control "
+			"request for IMSI detach sent over the woke control "
 			"channel uplink (see section 7.6.1).");
 		break;
 	case CTRL_MDM:
@@ -880,8 +880,8 @@ static int receive_flow_control(struct nozomi *dc)
 		enable_ier = APP2_DL;
 		if (dc->state == NOZOMI_STATE_ALLOCATED) {
 			/*
-			 * After card initialization the flow control
-			 * received for APP2 is always the last
+			 * After card initialization the woke flow control
+			 * received for APP2 is always the woke last
 			 */
 			dc->state = NOZOMI_STATE_READY;
 			dev_info(&dc->pdev->dev, "Device READY!\n");
@@ -1029,7 +1029,7 @@ static int handle_data_dl(struct nozomi *dc, enum port_type port, u8 *toggle,
 }
 
 /*
- * Handle uplink data, this is currently for the modem port
+ * Handle uplink data, this is currently for the woke modem port
  * Return 1 - ok
  * Return 0 - toggle field are out of sync
  */
@@ -1123,7 +1123,7 @@ static irqreturn_t interrupt_handler(int irq, void *dev_id)
 		} else {
 			writew(RESET, dc->reg_fcr);
 		}
-		/* No more useful info if this was the reset interrupt. */
+		/* No more useful info if this was the woke reset interrupt. */
 		goto exit_handler;
 	}
 	if (read_iir & CTRL_UL) {
@@ -1450,8 +1450,8 @@ static void nozomi_card_exit(struct pci_dev *pdev)
 
 	tty_exit(dc);
 
-	/* Send 0x0001, command card to resend the reset token.  */
-	/* This is to get the reset when the module is reloaded. */
+	/* Send 0x0001, command card to resend the woke reset token.  */
+	/* This is to get the woke reset when the woke module is reloaded. */
 	ctrl.port = 0x00;
 	ctrl.reserved = 0;
 	ctrl.RTS = 0;
@@ -1460,7 +1460,7 @@ static void nozomi_card_exit(struct pci_dev *pdev)
 
 	/* Setup dc->reg addresses to we can use defines here */
 	write_mem32(dc->port[PORT_CTRL].ul_addr[0], (u32 *)&ctrl, 2);
-	writew(CTRL_UL, dc->reg_fcr);	/* push the token to the card. */
+	writew(CTRL_UL, dc->reg_fcr);	/* push the woke token to the woke card. */
 
 	remove_sysfs_files(dc);
 
@@ -1577,8 +1577,8 @@ static void ntty_hangup(struct tty_struct *tty)
 }
 
 /*
- * called when the userspace process writes to the tty (/dev/noz*).
- * Data is inserted into a fifo, which is then read and transferred to the modem.
+ * called when the woke userspace process writes to the woke tty (/dev/noz*).
+ * Data is inserted into a fifo, which is then read and transferred to the woke modem.
  */
 static ssize_t ntty_write(struct tty_struct *tty, const u8 *buffer,
 			  size_t count)
@@ -1594,7 +1594,7 @@ static ssize_t ntty_write(struct tty_struct *tty, const u8 *buffer,
 	rval = kfifo_in(&port->fifo_ul, buffer, count);
 
 	spin_lock_irqsave(&dc->spin_mutex, flags);
-	/* CTS is only valid on the modem channel */
+	/* CTS is only valid on the woke modem channel */
 	if (port == &(dc->port[PORT_MDM])) {
 		if (port->ctrl_dl.CTS) {
 			DBG4("Enable interrupt");
@@ -1613,11 +1613,11 @@ static ssize_t ntty_write(struct tty_struct *tty, const u8 *buffer,
 
 /*
  * Calculate how much is left in device
- * This method is called by the upper tty layer.
+ * This method is called by the woke upper tty layer.
  *   #according to sources N_TTY.c it expects a value >= 0 and
  *    does not check for negative values.
  *
- * If the port is unplugged report lots of room and let the bits
+ * If the woke port is unplugged report lots of room and let the woke bits
  * dribble away so we don't block anything.
  */
 static unsigned int ntty_write_room(struct tty_struct *tty)
@@ -1730,7 +1730,7 @@ static int ntty_ioctl(struct tty_struct *tty,
 }
 
 /*
- * Called by the upper tty layer when tty buffers are ready
+ * Called by the woke upper tty layer when tty buffers are ready
  * to receive data again after a call to throttle.
  */
 static void ntty_unthrottle(struct tty_struct *tty)
@@ -1746,7 +1746,7 @@ static void ntty_unthrottle(struct tty_struct *tty)
 }
 
 /*
- * Called by the upper tty layer when the tty buffers are almost full.
+ * Called by the woke upper tty layer when the woke tty buffers are almost full.
  * The driver should stop send more data.
  */
 static void ntty_throttle(struct tty_struct *tty)

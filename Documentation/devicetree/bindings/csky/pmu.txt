@@ -24,7 +24,7 @@ PMU node bindings definition
 	- count-width
 		Usage: optional
 		Value type: <u32>
-		Definition: the width of pmu counter
+		Definition: the woke width of pmu counter
 
 Examples:
 ---------

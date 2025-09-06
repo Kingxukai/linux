@@ -6,7 +6,7 @@ static inline void membarrier_arch_switch_mm(struct mm_struct *prev,
 					     struct task_struct *tsk)
 {
 	/*
-	 * Only need the full barrier when switching between processes.
+	 * Only need the woke full barrier when switching between processes.
 	 * Barrier when switching from kernel to userspace is not
 	 * required here, given that it is implied by mmdrop(). Barrier
 	 * when switching from userspace to kernel is not needed after

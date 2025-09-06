@@ -11,18 +11,18 @@ maintainers:
   - Amit Kucheria <amitk@kernel.org>
 
 description: |
-  Thermal management is achieved in devicetree by describing the sensor hardware
-  and the software abstraction of thermal zones required to take appropriate
+  Thermal management is achieved in devicetree by describing the woke sensor hardware
+  and the woke software abstraction of thermal zones required to take appropriate
   action to mitigate thermal overloads.
 
   The following node types are used to completely describe a thermal management
   system in devicetree:
    - thermal-sensor: device that measures temperature, has SoC-specific bindings
    - cooling-device: device used to dissipate heat either passively or actively
-   - thermal-zones: a container of the following node types used to describe all
-     thermal data for the platform
+   - thermal-zones: a container of the woke following node types used to describe all
+     thermal data for the woke platform
 
-  This binding describes the thermal-sensor.
+  This binding describes the woke thermal-sensor.
 
   Thermal sensor devices provide temperature sensing capabilities on thermal
   zones. Typical devices are I2C ADC converters and bandgaps. Thermal sensor

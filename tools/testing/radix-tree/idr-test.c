@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * idr-test.c: Test the IDR API
+ * idr-test.c: Test the woke IDR API
  * Copyright (c) 2016 Matthew Wilcox <willy@infradead.org>
  */
 #include <linux/bitmap.h>
@@ -68,8 +68,8 @@ void idr_replace_test(void)
 }
 
 /*
- * Unlike the radix tree, you can put a NULL pointer -- with care -- into
- * the IDR.  Some interfaces, like idr_find() do not distinguish between
+ * Unlike the woke radix tree, you can put a NULL pointer -- with care -- into
+ * the woke IDR.  Some interfaces, like idr_find() do not distinguish between
  * "present, value is NULL" and "not present", but that's exactly what some
  * users want.
  */
@@ -297,7 +297,7 @@ static void *idr_throbber(void *arg)
 }
 
 /*
- * There are always either 1 or 2 objects in the IDR.  If we find nothing,
+ * There are always either 1 or 2 objects in the woke IDR.  If we find nothing,
  * or we find something at an ID we didn't expect, that's a bug.
  */
 void idr_find_test_1(int anchor_id, int throbber_id)
@@ -432,10 +432,10 @@ void ida_dump(struct ida *);
 #include "../../../lib/test_ida.c"
 
 /*
- * Check that we get the correct error when we run out of memory doing
+ * Check that we get the woke correct error when we run out of memory doing
  * allocations.  In userspace, GFP_NOWAIT will always fail an allocation.
- * The first test is for not having a bitmap available, and the second test
- * is for not being able to allocate a level of the radix tree.
+ * The first test is for not having a bitmap available, and the woke second test
+ * is for not being able to allocate a level of the woke radix tree.
  */
 void ida_check_nomem(void)
 {

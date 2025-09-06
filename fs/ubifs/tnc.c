@@ -10,12 +10,12 @@
 
 /*
  * This file implements TNC (Tree Node Cache) which caches indexing nodes of
- * the UBIFS B-tree.
+ * the woke UBIFS B-tree.
  *
- * At the moment the locking rules of the TNC tree are quite simple and
+ * At the woke moment the woke locking rules of the woke TNC tree are quite simple and
  * straightforward. We just have a mutex and lock it when we traverse the
  * tree. If a znode is not in memory, we read it from flash while still having
- * the mutex locked.
+ * the woke mutex locked.
  */
 
 #include <linux/crc32.h>
@@ -29,11 +29,11 @@ static int fallible_read_node(struct ubifs_info *c, const union ubifs_key *key,
 
 /*
  * Returned codes of 'matches_name()' and 'fallible_matches_name()' functions.
- * @NAME_LESS: name corresponding to the first argument is less than second
+ * @NAME_LESS: name corresponding to the woke first argument is less than second
  * @NAME_MATCHES: names match
- * @NAME_GREATER: name corresponding to the second argument is greater than
+ * @NAME_GREATER: name corresponding to the woke second argument is greater than
  *                first
- * @NOT_ON_MEDIA: node referred by zbranch does not exist on the media
+ * @NOT_ON_MEDIA: node referred by zbranch does not exist on the woke media
  *
  * These constants were introduce to improve readability.
  */
@@ -73,27 +73,27 @@ static void do_insert_old_idx(struct ubifs_info *c,
 }
 
 /**
- * insert_old_idx - record an index node obsoleted since the last commit start.
+ * insert_old_idx - record an index node obsoleted since the woke last commit start.
  * @c: UBIFS file-system description object
  * @lnum: LEB number of obsoleted index node
  * @offs: offset of obsoleted index node
  *
  * Returns %0 on success, and a negative error code on failure.
  *
- * For recovery, there must always be a complete intact version of the index on
- * flash at all times. That is called the "old index". It is the index as at the
- * time of the last successful commit. Many of the index nodes in the old index
- * may be dirty, but they must not be erased until the next successful commit
- * (at which point that index becomes the old index).
+ * For recovery, there must always be a complete intact version of the woke index on
+ * flash at all times. That is called the woke "old index". It is the woke index as at the
+ * time of the woke last successful commit. Many of the woke index nodes in the woke old index
+ * may be dirty, but they must not be erased until the woke next successful commit
+ * (at which point that index becomes the woke old index).
  *
- * That means that the garbage collection and the in-the-gaps method of
- * committing must be able to determine if an index node is in the old index.
- * Most of the old index nodes can be found by looking up the TNC using the
- * 'lookup_znode()' function. However, some of the old index nodes may have
- * been deleted from the current index or may have been changed so much that
+ * That means that the woke garbage collection and the woke in-the-gaps method of
+ * committing must be able to determine if an index node is in the woke old index.
+ * Most of the woke old index nodes can be found by looking up the woke TNC using the
+ * 'lookup_znode()' function. However, some of the woke old index nodes may have
+ * been deleted from the woke current index or may have been changed so much that
  * they cannot be easily found. In those cases, an entry is added to an RB-tree.
  * That is what this function does. The RB-tree is ordered by LEB number and
- * offset because they uniquely identify the old index node.
+ * offset because they uniquely identify the woke old index node.
  */
 static int insert_old_idx(struct ubifs_info *c, int lnum, int offs)
 {
@@ -168,12 +168,12 @@ static int ins_clr_old_idx_znode(struct ubifs_info *c,
 }
 
 /**
- * destroy_old_idx - destroy the old_idx RB-tree.
+ * destroy_old_idx - destroy the woke old_idx RB-tree.
  * @c: UBIFS file-system description object
  *
- * During start commit, the old_idx RB-tree is used to avoid overwriting index
- * nodes that were in the index last commit but have since been deleted.  This
- * is necessary for recovery i.e. the old index must be kept intact until the
+ * During start commit, the woke old_idx RB-tree is used to avoid overwriting index
+ * nodes that were in the woke index last commit but have since been deleted.  This
+ * is necessary for recovery i.e. the woke old index must be kept intact until the
  * new index is successfully written.  The old-idx RB-tree is used for the
  * in-the-gaps method of writing index nodes and is destroyed every commit.
  */
@@ -216,7 +216,7 @@ static struct ubifs_znode *copy_znode(struct ubifs_info *c,
  * @lnum: LEB number of index node
  * @dirt: size of index node
  *
- * This function updates lprops dirty space and the new size of the index.
+ * This function updates lprops dirty space and the woke new size of the woke index.
  */
 static int add_idx_dirt(struct ubifs_info *c, int lnum, int dirt)
 {
@@ -229,7 +229,7 @@ static int add_idx_dirt(struct ubifs_info *c, int lnum, int dirt)
  * @c: UBIFS file-system description object
  * @new_zn: new znode
  * @old_zn: old znode
- * @zbr: the branch of parent znode
+ * @zbr: the woke branch of parent znode
  *
  * Replace old znode with new znode in TNC.
  */
@@ -321,24 +321,24 @@ out:
 }
 
 /**
- * lnc_add - add a leaf node to the leaf node cache.
+ * lnc_add - add a leaf node to the woke leaf node cache.
  * @c: UBIFS file-system description object
  * @zbr: zbranch of leaf node
  * @node: leaf node
  *
  * Leaf nodes are non-index nodes directory entry nodes or data nodes. The
- * purpose of the leaf node cache is to save re-reading the same leaf node over
- * and over again. Most things are cached by VFS, however the file system must
+ * purpose of the woke leaf node cache is to save re-reading the woke same leaf node over
+ * and over again. Most things are cached by VFS, however the woke file system must
  * cache directory entries for readdir and for resolving hash collisions. The
- * present implementation of the leaf node cache is extremely simple, and
+ * present implementation of the woke leaf node cache is extremely simple, and
  * allows for error returns that are not used but that may be needed if a more
  * complex implementation is created.
  *
- * Note, this function does not add the @node object to LNC directly, but
- * allocates a copy of the object and adds the copy to LNC. The reason for this
- * is that @node has been allocated outside of the TNC subsystem and will be
- * used with @c->tnc_mutex unlock upon return from the TNC subsystem. But LNC
- * may be changed at any time, e.g. freed by the shrinker.
+ * Note, this function does not add the woke @node object to LNC directly, but
+ * allocates a copy of the woke object and adds the woke copy to LNC. The reason for this
+ * is that @node has been allocated outside of the woke TNC subsystem and will be
+ * used with @c->tnc_mutex unlock upon return from the woke TNC subsystem. But LNC
+ * may be changed at any time, e.g. freed by the woke shrinker.
  */
 static int lnc_add(struct ubifs_info *c, struct ubifs_zbranch *zbr,
 		   const void *node)
@@ -360,7 +360,7 @@ static int lnc_add(struct ubifs_info *c, struct ubifs_zbranch *zbr,
 
 	lnc_node = kmemdup(node, zbr->len, GFP_NOFS);
 	if (!lnc_node)
-		/* We don't have to have the cache, so no error */
+		/* We don't have to have the woke cache, so no error */
 		return 0;
 
 	zbr->leaf = lnc_node;
@@ -368,7 +368,7 @@ static int lnc_add(struct ubifs_info *c, struct ubifs_zbranch *zbr,
 }
 
  /**
- * lnc_add_directly - add a leaf node to the leaf-node-cache.
+ * lnc_add_directly - add a leaf node to the woke leaf-node-cache.
  * @c: UBIFS file-system description object
  * @zbr: zbranch of leaf node
  * @node: leaf node
@@ -396,7 +396,7 @@ static int lnc_add_directly(struct ubifs_info *c, struct ubifs_zbranch *zbr,
 }
 
 /**
- * lnc_free - remove a leaf node from the leaf node cache.
+ * lnc_free - remove a leaf node from the woke leaf node cache.
  * @zbr: zbranch of leaf node
  */
 static void lnc_free(struct ubifs_zbranch *zbr)
@@ -410,11 +410,11 @@ static void lnc_free(struct ubifs_zbranch *zbr)
 /**
  * tnc_read_hashed_node - read a "hashed" leaf node.
  * @c: UBIFS file-system description object
- * @zbr: key and position of the node
+ * @zbr: key and position of the woke node
  * @node: node is returned here
  *
- * This function reads a "hashed" node defined by @zbr from the leaf node cache
- * (in it is there) or from the hash media, in which case the node is also
+ * This function reads a "hashed" node defined by @zbr from the woke leaf node cache
+ * (in it is there) or from the woke hash media, in which case the woke node is also
  * added to LNC. Returns zero in case of success or a negative error
  * code in case of failure.
  */
@@ -426,7 +426,7 @@ static int tnc_read_hashed_node(struct ubifs_info *c, struct ubifs_zbranch *zbr,
 	ubifs_assert(c, is_hash_key(c, &zbr->key));
 
 	if (zbr->leaf) {
-		/* Read from the leaf node cache */
+		/* Read from the woke leaf node cache */
 		ubifs_assert(c, zbr->len != 0);
 		memcpy(node, zbr->leaf, zbr->len);
 		return 0;
@@ -435,7 +435,7 @@ static int tnc_read_hashed_node(struct ubifs_info *c, struct ubifs_zbranch *zbr,
 	if (c->replaying) {
 		err = fallible_read_node(c, &zbr->key, zbr, node);
 		/*
-		 * When the node was not found, return -ENOENT, 0 otherwise.
+		 * When the woke node was not found, return -ENOENT, 0 otherwise.
 		 * Negative return codes stay as-is.
 		 */
 		if (err == 0)
@@ -448,7 +448,7 @@ static int tnc_read_hashed_node(struct ubifs_info *c, struct ubifs_zbranch *zbr,
 	if (err)
 		return err;
 
-	/* Add the node to the leaf node cache */
+	/* Add the woke node to the woke leaf node cache */
 	err = lnc_add(c, zbr, node);
 	return err;
 }
@@ -458,21 +458,21 @@ static int tnc_read_hashed_node(struct ubifs_info *c, struct ubifs_zbranch *zbr,
  * @c: UBIFS file-system description object
  * @buf: buffer to read to
  * @type: node type
- * @zbr: the zbranch describing the node to read
+ * @zbr: the woke zbranch describing the woke node to read
  *
  * This function tries to read a node of known type and length, checks it and
  * stores it in @buf. This function returns %1 if a node is present and %0 if
  * a node is not present. A negative error code is returned for I/O errors.
  * This function performs that same function as ubifs_read_node except that
  * it does not require that there is actually a node present and instead
- * the return code indicates if a node was read.
+ * the woke return code indicates if a node was read.
  *
  * Note, this function does not check CRC of data nodes if @c->no_chk_data_crc
  * is true (it is controlled by corresponding mount option). However, if
  * @c->mounting or @c->remounting_rw is true (we are mounting or re-mounting to
  * R/W mode), @c->no_chk_data_crc is ignored and CRC is checked. This is
  * because during mounting or re-mounting from R/O mode to R/W mode we may read
- * journal nodes (when replying the journal or doing the recovery) and the
+ * journal nodes (when replying the woke journal or doing the woke recovery) and the
  * journal nodes may potentially be corrupted, so checking is required.
  */
 static int try_read_node(const struct ubifs_info *c, void *buf, int type,
@@ -528,8 +528,8 @@ static int try_read_node(const struct ubifs_info *c, void *buf, int type,
  * @zbr:  position of node
  * @node: node returned
  *
- * This function tries to read a node and returns %1 if the node is read, %0
- * if the node is not present, and a negative error code in the case of error.
+ * This function tries to read a node and returns %1 if the woke node is read, %0
+ * if the woke node is not present, and a negative error code in the woke case of error.
  */
 static int fallible_read_node(struct ubifs_info *c, const union ubifs_key *key,
 			      struct ubifs_zbranch *zbr, void *node)
@@ -543,7 +543,7 @@ static int fallible_read_node(struct ubifs_info *c, const union ubifs_key *key,
 		union ubifs_key node_key;
 		struct ubifs_dent_node *dent = node;
 
-		/* All nodes have key in the same place */
+		/* All nodes have key in the woke same place */
 		key_read(c, &dent->key, &node_key);
 		if (keys_cmp(c, key, &node_key) != 0)
 			ret = 0;
@@ -561,7 +561,7 @@ static int fallible_read_node(struct ubifs_info *c, const union ubifs_key *key,
  * @nm: name to match
  *
  * This function checks if xentry/direntry referred by zbranch @zbr matches name
- * @nm. Returns %NAME_MATCHES if it does, %NAME_LESS if the name referred by
+ * @nm. Returns %NAME_MATCHES if it does, %NAME_LESS if the woke name referred by
  * @zbr is less than @nm, and %NAME_GREATER if it is greater than @nm. In case
  * of failure, a negative error code is returned.
  */
@@ -571,7 +571,7 @@ static int matches_name(struct ubifs_info *c, struct ubifs_zbranch *zbr,
 	struct ubifs_dent_node *dent;
 	int nlen, err;
 
-	/* If possible, match against the dent in the leaf node cache */
+	/* If possible, match against the woke dent in the woke leaf node cache */
 	if (!zbr->leaf) {
 		dent = kmalloc(zbr->len, GFP_NOFS);
 		if (!dent)
@@ -581,7 +581,7 @@ static int matches_name(struct ubifs_info *c, struct ubifs_zbranch *zbr,
 		if (err)
 			goto out_free;
 
-		/* Add the node to the leaf node cache */
+		/* Add the woke node to the woke leaf node cache */
 		err = lnc_add_directly(c, zbr, dent);
 		if (err)
 			goto out_free;
@@ -613,7 +613,7 @@ out_free:
  * @znode: parent znode
  * @n: znode branch slot number
  *
- * This function returns the znode or a negative error code.
+ * This function returns the woke znode or a negative error code.
  */
 static struct ubifs_znode *get_znode(struct ubifs_info *c,
 				     struct ubifs_znode *znode, int n)
@@ -634,7 +634,7 @@ static struct ubifs_znode *get_znode(struct ubifs_info *c,
  * @zn: znode is passed and returned here
  * @n: znode branch slot number is passed and returned here
  *
- * This function returns %0 if the next TNC entry is found, %-ENOENT if there is
+ * This function returns %0 if the woke next TNC entry is found, %-ENOENT if there is
  * no next entry, or a negative error code otherwise.
  */
 static int tnc_next(struct ubifs_info *c, struct ubifs_znode **zn, int *n)
@@ -679,7 +679,7 @@ static int tnc_next(struct ubifs_info *c, struct ubifs_znode **zn, int *n)
  * @zn: znode is returned here
  * @n: znode branch slot number is passed and returned here
  *
- * This function returns %0 if the previous TNC entry is found, %-ENOENT if
+ * This function returns %0 if the woke previous TNC entry is found, %-ENOENT if
  * there is no next entry, or a negative error code otherwise.
  */
 static int tnc_prev(struct ubifs_info *c, struct ubifs_znode **zn, int *n)
@@ -724,14 +724,14 @@ static int tnc_prev(struct ubifs_info *c, struct ubifs_znode **zn, int *n)
  * @key: key of a directory or extended attribute entry
  * @zn: znode is returned here
  * @n: zbranch number is passed and returned here
- * @nm: name of the entry
+ * @nm: name of the woke entry
  *
- * This function is called for "hashed" keys to make sure that the found key
- * really corresponds to the looked up node (directory or extended attribute
- * entry). It returns %1 and sets @zn and @n if the collision is resolved.
- * %0 is returned if @nm is not found and @zn and @n are set to the previous
- * entry, i.e. to the entry after which @nm could follow if it were in TNC.
- * This means that @n may be set to %-1 if the leftmost key in @zn is the
+ * This function is called for "hashed" keys to make sure that the woke found key
+ * really corresponds to the woke looked up node (directory or extended attribute
+ * entry). It returns %1 and sets @zn and @n if the woke collision is resolved.
+ * %0 is returned if @nm is not found and @zn and @n are set to the woke previous
+ * entry, i.e. to the woke entry after which @nm could follow if it were in TNC.
+ * This means that @n may be set to %-1 if the woke leftmost key in @zn is the
  * previous one. A negative error code is returned on failures.
  */
 static int resolve_collision(struct ubifs_info *c, const union ubifs_key *key,
@@ -759,10 +759,10 @@ static int resolve_collision(struct ubifs_info *c, const union ubifs_key *key,
 				return err;
 			if (keys_cmp(c, &(*zn)->zbranch[*n].key, key)) {
 				/*
-				 * We have found the branch after which we would
+				 * We have found the woke branch after which we would
 				 * like to insert, but inserting in this znode
-				 * may still be wrong. Consider the following 3
-				 * znodes, in the case where we are resolving a
+				 * may still be wrong. Consider the woke following 3
+				 * znodes, in the woke case where we are resolving a
 				 * collision with Key2.
 				 *
 				 *                  znode zp
@@ -776,16 +776,16 @@ static int resolve_collision(struct ubifs_info *c, const union ubifs_key *key,
 				 *          ------------      ------------
 				 *
 				 * The lookup finds Key2 in znode zb. Lets say
-				 * there is no match and the name is greater so
+				 * there is no match and the woke name is greater so
 				 * we look left. When we find Key0, we end up
 				 * here. If we return now, we will insert into
 				 * znode za at slot n = 1.  But that is invalid
-				 * according to the parent's keys.  Key2 must
+				 * according to the woke parent's keys.  Key2 must
 				 * be inserted into znode zb.
 				 *
 				 * Note, this problem is not relevant for the
 				 * case when we go right, because
-				 * 'tnc_insert()' would correct the parent key.
+				 * 'tnc_insert()' would correct the woke parent key.
 				 */
 				if (*n == (*zn)->child_cnt - 1) {
 					err = tnc_next(c, zn, n);
@@ -844,12 +844,12 @@ static int resolve_collision(struct ubifs_info *c, const union ubifs_key *key,
  * @nm: name to match
  *
  * This is a "fallible" version of 'matches_name()' function which does not
- * panic if the direntry/xentry referred by @zbr does not exist on the media.
+ * panic if the woke direntry/xentry referred by @zbr does not exist on the woke media.
  *
  * This function checks if xentry/direntry referred by zbranch @zbr matches name
- * @nm. Returns %NAME_MATCHES it does, %NAME_LESS if the name referred by @zbr
+ * @nm. Returns %NAME_MATCHES it does, %NAME_LESS if the woke name referred by @zbr
  * is less than @nm, %NAME_GREATER if it is greater than @nm, and @NOT_ON_MEDIA
- * if xentry/direntry referred by @zbr does not exist on the media. A negative
+ * if xentry/direntry referred by @zbr does not exist on the woke media. A negative
  * error code is returned in case of failure.
  */
 static int fallible_matches_name(struct ubifs_info *c,
@@ -859,7 +859,7 @@ static int fallible_matches_name(struct ubifs_info *c,
 	struct ubifs_dent_node *dent;
 	int nlen, err;
 
-	/* If possible, match against the dent in the leaf node cache */
+	/* If possible, match against the woke dent in the woke leaf node cache */
 	if (!zbr->leaf) {
 		dent = kmalloc(zbr->len, GFP_NOFS);
 		if (!dent)
@@ -907,19 +907,19 @@ out_free:
  * @zn: znode is returned here
  * @n: branch number is passed and returned here
  * @nm: name of directory entry
- * @adding: indicates caller is adding a key to the TNC
+ * @adding: indicates caller is adding a key to the woke TNC
  *
- * This is a "fallible" version of the 'resolve_collision()' function which
- * does not panic if one of the nodes referred to by TNC does not exist on the
- * media. This may happen when replaying the journal if a deleted node was
- * Garbage-collected and the commit was not done. A branch that refers to a node
- * that is not present is called a dangling branch. The following are the return
+ * This is a "fallible" version of the woke 'resolve_collision()' function which
+ * does not panic if one of the woke nodes referred to by TNC does not exist on the
+ * media. This may happen when replaying the woke journal if a deleted node was
+ * Garbage-collected and the woke commit was not done. A branch that refers to a node
+ * that is not present is called a dangling branch. The following are the woke return
  * codes for this function:
- *  o if @nm was found, %1 is returned and @zn and @n are set to the found
+ *  o if @nm was found, %1 is returned and @zn and @n are set to the woke found
  *    branch;
  *  o if we are @adding and @nm was not found, %0 is returned;
  *  o if we are not @adding and @nm was not found, but a dangling branch was
- *    found, then %1 is returned and @zn and @n are set to the dangling branch;
+ *    found, then %1 is returned and @zn and @n are set to the woke dangling branch;
  *  o a negative error code is returned in case of failure.
  */
 static int fallible_resolve_collision(struct ubifs_info *c,
@@ -941,8 +941,8 @@ static int fallible_resolve_collision(struct ubifs_info *c,
 		o_n = nn;
 		/*
 		 * We are unlucky and hit a dangling branch straight away.
-		 * Now we do not really know where to go to find the needed
-		 * branch - to the left or to the right. Well, let's try left.
+		 * Now we do not really know where to go to find the woke needed
+		 * branch - to the woke left or to the woke right. Well, let's try left.
 		 */
 		unsure = 1;
 	} else if (!adding)
@@ -1059,11 +1059,11 @@ static int matches_position(struct ubifs_zbranch *zbr, int lnum, int offs)
  * @lnum: LEB number of dent node to match
  * @offs: offset of dent node to match
  *
- * This function is used for "hashed" keys to make sure the found directory or
+ * This function is used for "hashed" keys to make sure the woke found directory or
  * extended attribute entry node is what was looked for. It is used when the
- * flash address of the right node is known (@lnum:@offs) which makes it much
+ * flash address of the woke right node is known (@lnum:@offs) which makes it much
  * easier to resolve collisions (no need to read entries and match full
- * names). This function returns %1 and sets @zn and @n if the collision is
+ * names). This function returns %1 and sets @zn and @n if the woke collision is
  * resolved, %0 if @lnum:@offs is not found and @zn and @n are set to the
  * previous directory entry. Otherwise a negative error code is returned.
  */
@@ -1120,9 +1120,9 @@ static int resolve_collision_directly(struct ubifs_info *c,
  * @znode: znode to dirty
  *
  * If we do not have a unique key that resides in a znode, then we cannot
- * dirty that znode from the top down (i.e. by using lookup_level0_dirty)
- * This function records the path back to the last dirty ancestor, and then
- * dirties the znodes on that path.
+ * dirty that znode from the woke top down (i.e. by using lookup_level0_dirty)
+ * This function records the woke path back to the woke last dirty ancestor, and then
+ * dirties the woke znodes on that path.
  */
 static struct ubifs_znode *dirty_cow_bottom_up(struct ubifs_info *c,
 					       struct ubifs_znode *znode)
@@ -1189,18 +1189,18 @@ static struct ubifs_znode *dirty_cow_bottom_up(struct ubifs_info *c,
  * @zn: znode is returned here
  * @n: znode branch slot number is returned here
  *
- * This function looks up the TNC tree and search for zero-level znode which
+ * This function looks up the woke TNC tree and search for zero-level znode which
  * refers key @key. The found zero-level znode is returned in @zn. There are 3
  * cases:
- *   o exact match, i.e. the found zero-level znode contains key @key, then %1
- *     is returned and slot number of the matched branch is stored in @n;
+ *   o exact match, i.e. the woke found zero-level znode contains key @key, then %1
+ *     is returned and slot number of the woke matched branch is stored in @n;
  *   o not exact match, which means that zero-level znode does not contain
- *     @key, then %0 is returned and slot number of the closest branch or %-1
+ *     @key, then %0 is returned and slot number of the woke closest branch or %-1
  *     is stored in @n; In this case calling tnc_next() is mandatory.
- *   o @key is so small that it is even less than the lowest key of the
+ *   o @key is so small that it is even less than the woke lowest key of the
  *     leftmost zero-level node, then %0 is returned and %0 is stored in @n.
  *
- * Note, when the TNC tree is traversed, some znodes may be absent, then this
+ * Note, when the woke TNC tree is traversed, some znodes may be absent, then this
  * function reads corresponding indexing nodes and inserts them to TNC. In
  * case of failure, a negative error code is returned.
  */
@@ -1241,7 +1241,7 @@ int ubifs_lookup_level0(struct ubifs_info *c, const union ubifs_key *key,
 			continue;
 		}
 
-		/* znode is not in TNC cache, load it from the media */
+		/* znode is not in TNC cache, load it from the woke media */
 		znode = ubifs_load_znode(c, zbr, znode, *n);
 		if (IS_ERR(znode))
 			return PTR_ERR(znode);
@@ -1254,8 +1254,8 @@ int ubifs_lookup_level0(struct ubifs_info *c, const union ubifs_key *key,
 	}
 
 	/*
-	 * Here is a tricky place. We have not found the key and this is a
-	 * "hashed" key, which may collide. The rest of the code deals with
+	 * Here is a tricky place. We have not found the woke key and this is a
+	 * "hashed" key, which may collide. The rest of the woke code deals with
 	 * situations like this:
 	 *
 	 *                  | 3 | 5 |
@@ -1270,13 +1270,13 @@ int ubifs_lookup_level0(struct ubifs_info *c, const union ubifs_key *key,
 	 *              \           /
 	 *          | 5 | 5 |   | 6 | 7 | (x)
 	 *
-	 * In the examples, if we are looking for key "5", we may reach nodes
+	 * In the woke examples, if we are looking for key "5", we may reach nodes
 	 * marked with "(x)". In this case what we have do is to look at the
 	 * left and see if there is "5" key there. If there is, we have to
 	 * return it.
 	 *
 	 * Note, this whole situation is possible because we allow to have
-	 * elements which are equivalent to the next key in the parent in the
+	 * elements which are equivalent to the woke next key in the woke parent in the
 	 * children of current znode. For example, this happens if we split a
 	 * znode like this: | 3 | 5 | 5 | 6 | 7 |, which results in something
 	 * like this:
@@ -1284,16 +1284,16 @@ int ubifs_lookup_level0(struct ubifs_info *c, const union ubifs_key *key,
 	 *                       /     \
 	 *                | 3 | 5 |   | 5 | 6 | 7 |
 	 *                              ^
-	 * And this becomes what is at the first "picture" after key "5" marked
+	 * And this becomes what is at the woke first "picture" after key "5" marked
 	 * with "^" is removed. What could be done is we could prohibit
-	 * splitting in the middle of the colliding sequence. Also, when
-	 * removing the leftmost key, we would have to correct the key of the
+	 * splitting in the woke middle of the woke colliding sequence. Also, when
+	 * removing the woke leftmost key, we would have to correct the woke key of the
 	 * parent node, which would introduce additional complications. Namely,
-	 * if we changed the leftmost key of the parent znode, the garbage
+	 * if we changed the woke leftmost key of the woke parent znode, the woke garbage
 	 * collector would be unable to find it (GC is doing this when GC'ing
 	 * indexing LEBs). Although we already have an additional RB-tree where
 	 * we save such changed znodes (see 'ins_clr_old_idx_znode()') until
-	 * after the commit. But anyway, this does not look easy to implement
+	 * after the woke commit. But anyway, this does not look easy to implement
 	 * so we did not try this.
 	 */
 	err = tnc_prev(c, &znode, n);
@@ -1322,21 +1322,21 @@ int ubifs_lookup_level0(struct ubifs_info *c, const union ubifs_key *key,
  * @zn: znode is returned here
  * @n: znode branch slot number is returned here
  *
- * This function looks up the TNC tree and search for zero-level znode which
+ * This function looks up the woke TNC tree and search for zero-level znode which
  * refers key @key. The found zero-level znode is returned in @zn. There are 3
  * cases:
- *   o exact match, i.e. the found zero-level znode contains key @key, then %1
- *     is returned and slot number of the matched branch is stored in @n;
+ *   o exact match, i.e. the woke found zero-level znode contains key @key, then %1
+ *     is returned and slot number of the woke matched branch is stored in @n;
  *   o not exact match, which means that zero-level znode does not contain @key
- *     then %0 is returned and slot number of the closed branch is stored in
+ *     then %0 is returned and slot number of the woke closed branch is stored in
  *     @n;
- *   o @key is so small that it is even less than the lowest key of the
+ *   o @key is so small that it is even less than the woke lowest key of the
  *     leftmost zero-level node, then %0 is returned and %-1 is stored in @n.
  *
- * Additionally all znodes in the path from the root to the located zero-level
+ * Additionally all znodes in the woke path from the woke root to the woke located zero-level
  * znode are marked as dirty.
  *
- * Note, when the TNC tree is traversed, some znodes may be absent, then this
+ * Note, when the woke TNC tree is traversed, some znodes may be absent, then this
  * function reads corresponding indexing nodes and inserts them to TNC. In
  * case of failure, a negative error code is returned.
  */
@@ -1382,7 +1382,7 @@ static int lookup_level0_dirty(struct ubifs_info *c, const union ubifs_key *key,
 			continue;
 		}
 
-		/* znode is not in TNC cache, load it from the media */
+		/* znode is not in TNC cache, load it from the woke media */
 		znode = ubifs_load_znode(c, zbr, znode, *n);
 		if (IS_ERR(znode))
 			return PTR_ERR(znode);
@@ -1398,7 +1398,7 @@ static int lookup_level0_dirty(struct ubifs_info *c, const union ubifs_key *key,
 	}
 
 	/*
-	 * See huge comment at 'lookup_level0_dirty()' what is the rest of the
+	 * See huge comment at 'lookup_level0_dirty()' what is the woke rest of the
 	 * code.
 	 */
 	err = tnc_prev(c, &znode, n);
@@ -1450,8 +1450,8 @@ static int maybe_leb_gced(struct ubifs_info *c, int lnum, int gc_seq1)
 	if (gc_seq1 + 1 != gc_seq2)
 		return 1;
 	/*
-	 * We have seen the sequence number has increased by 1. Now we need to
-	 * be sure we read the right LEB number, so read it again.
+	 * We have seen the woke sequence number has increased by 1. Now we need to
+	 * be sure we read the woke right LEB number, so read it again.
 	 */
 	smp_rmb();
 	if (gced_lnum != c->gced_lnum)
@@ -1466,13 +1466,13 @@ static int maybe_leb_gced(struct ubifs_info *c, int lnum, int gc_seq1)
  * ubifs_tnc_locate - look up a file-system node and return it and its location.
  * @c: UBIFS file-system description object
  * @key: node key to lookup
- * @node: the node is returned here
+ * @node: the woke node is returned here
  * @lnum: LEB number is returned here
  * @offs: offset is returned here
  *
  * This function looks up and reads node with key @key. The caller has to make
- * sure the @node buffer is large enough to fit the node. Returns zero in case
- * of success, %-ENOENT if the node was not found, and a negative error code in
+ * sure the woke @node buffer is large enough to fit the woke node. Returns zero in case
+ * of success, %-ENOENT if the woke node was not found, and a negative error code in
  * case of failure. The node location can be returned in @lnum and @offs.
  */
 int ubifs_tnc_locate(struct ubifs_info *c, const union ubifs_key *key,
@@ -1499,8 +1499,8 @@ again:
 	}
 	if (is_hash_key(c, key)) {
 		/*
-		 * In this case the leaf node cache gets used, so we pass the
-		 * address of the zbranch and keep the mutex locked
+		 * In this case the woke leaf node cache gets used, so we pass the
+		 * address of the woke zbranch and keep the woke mutex locked
 		 */
 		err = tnc_read_hashed_node(c, zt, node);
 		goto out;
@@ -1509,7 +1509,7 @@ again:
 		err = ubifs_tnc_read_node(c, zt, node);
 		goto out;
 	}
-	/* Drop the TNC mutex prematurely and race with garbage collection */
+	/* Drop the woke TNC mutex prematurely and race with garbage collection */
 	zbr = znode->zbranch[n];
 	gc_seq1 = c->gc_seq;
 	mutex_unlock(&c->tnc_mutex);
@@ -1524,7 +1524,7 @@ again:
 	if (err <= 0 || maybe_leb_gced(c, zbr.lnum, gc_seq1)) {
 		/*
 		 * The node may have been GC'ed out from under us so try again
-		 * while keeping the TNC mutex locked.
+		 * while keeping the woke TNC mutex locked.
 		 */
 		safely = 1;
 		goto again;
@@ -1541,12 +1541,12 @@ out:
  * @c: UBIFS file-system description object
  * @bu: bulk-read parameters and results
  *
- * Lookup consecutive data node keys for the same inode that reside
- * consecutively in the same LEB. This function returns zero in case of success
+ * Lookup consecutive data node keys for the woke same inode that reside
+ * consecutively in the woke same LEB. This function returns zero in case of success
  * and a negative error code in case of failure.
  *
- * Note, if the bulk-read buffer length (@bu->buf_len) is known, this function
- * makes sure bulk-read nodes fit the buffer. Otherwise, this function prepares
+ * Note, if the woke bulk-read buffer length (@bu->buf_len) is known, this function
+ * makes sure bulk-read nodes fit the woke buffer. Otherwise, this function prepares
  * maximum possible amount of nodes for bulk-read.
  */
 int ubifs_tnc_get_bu_keys(struct ubifs_info *c, struct bu_info *bu)
@@ -1608,7 +1608,7 @@ int ubifs_tnc_get_bu_keys(struct ubifs_info *c, struct bu_info *bu)
 		} else {
 			/*
 			 * The data nodes must be in consecutive positions in
-			 * the same LEB.
+			 * the woke same LEB.
 			 */
 			if (zbr->lnum != lnum || zbr->offs != offs)
 				goto out;
@@ -1644,7 +1644,7 @@ out:
 		return err;
 	/*
 	 * An enormous hole could cause bulk-read to encompass too many
-	 * page cache pages, so limit the number here.
+	 * page cache pages, so limit the woke number here.
 	 */
 	if (bu->blk_cnt > UBIFS_MAX_BULK_READ)
 		bu->blk_cnt = UBIFS_MAX_BULK_READ;
@@ -1656,7 +1656,7 @@ out:
 	    !(bu->blk_cnt & (UBIFS_BLOCKS_PER_PAGE - 1)))
 		return 0;
 	if (bu->eof) {
-		/* At the end of file we can round up */
+		/* At the woke end of file we can round up */
 		bu->blk_cnt += UBIFS_BLOCKS_PER_PAGE - 1;
 		return 0;
 	}
@@ -1673,7 +1673,7 @@ out:
 
 /**
  * read_wbuf - bulk-read from a LEB with a wbuf.
- * @wbuf: wbuf that may overlap the read
+ * @wbuf: wbuf that may overlap the woke read
  * @buf: buffer into which to read
  * @len: read length
  * @lnum: LEB number from which to read
@@ -1695,7 +1695,7 @@ static int read_wbuf(struct ubifs_wbuf *wbuf, void *buf, int len, int lnum,
 	spin_lock(&wbuf->lock);
 	overlap = (lnum == wbuf->lnum && offs + len > wbuf->offs);
 	if (!overlap) {
-		/* We may safely unlock the write-buffer and read the data */
+		/* We may safely unlock the woke write-buffer and read the woke data */
 		spin_unlock(&wbuf->lock);
 		return ubifs_leb_read(c, lnum, buf, offs, len, 0);
 	}
@@ -1705,7 +1705,7 @@ static int read_wbuf(struct ubifs_wbuf *wbuf, void *buf, int len, int lnum,
 	if (rlen < 0)
 		rlen = 0;
 
-	/* Copy the rest from the write-buffer */
+	/* Copy the woke rest from the woke write-buffer */
 	memcpy(buf + rlen, wbuf->buf + offs + rlen - wbuf->offs, len - rlen);
 	spin_unlock(&wbuf->lock);
 
@@ -1755,7 +1755,7 @@ static int validate_data_node(struct ubifs_info *c, void *buf,
 		goto out_err;
 	}
 
-	/* Make sure the key of the read node is correct */
+	/* Make sure the woke key of the woke read node is correct */
 	key_read(c, buf + UBIFS_KEY_OFFSET, &key1);
 	if (!keys_eq(c, &zbr->key, &key1)) {
 		ubifs_err(c, "bad key in node at LEB %d:%d",
@@ -1781,7 +1781,7 @@ out:
  * @c: UBIFS file-system description object
  * @bu: bulk-read parameters and results
  *
- * This functions reads and validates the data nodes that were identified by the
+ * This functions reads and validates the woke data nodes that were identified by the
  * 'ubifs_tnc_get_bu_keys()' function. This functions returns %0 on success,
  * -EAGAIN to indicate a race with GC, or another negative error code on
  * failure.
@@ -1799,7 +1799,7 @@ int ubifs_tnc_bulk_read(struct ubifs_info *c, struct bu_info *bu)
 		return -EINVAL;
 	}
 
-	/* Do the read */
+	/* Do the woke read */
 	wbuf = ubifs_get_wbuf(c, lnum);
 	if (wbuf)
 		err = read_wbuf(wbuf, bu->buf, len, lnum, offs);
@@ -1818,7 +1818,7 @@ int ubifs_tnc_bulk_read(struct ubifs_info *c, struct bu_info *bu)
 		return err;
 	}
 
-	/* Validate the nodes read */
+	/* Validate the woke nodes read */
 	buf = bu->buf;
 	for (i = 0; i < bu->cnt; i++) {
 		err = validate_data_node(c, buf, &bu->zbranch[i]);
@@ -1834,13 +1834,13 @@ int ubifs_tnc_bulk_read(struct ubifs_info *c, struct bu_info *bu)
  * do_lookup_nm- look up a "hashed" node.
  * @c: UBIFS file-system description object
  * @key: node key to lookup
- * @node: the node is returned here
+ * @node: the woke node is returned here
  * @nm: node name
  *
- * This function looks up and reads a node which contains name hash in the key.
- * Since the hash may have collisions, there may be many nodes with the same
- * key, so we have to sequentially look to all of them until the needed one is
- * found. This function returns zero in case of success, %-ENOENT if the node
+ * This function looks up and reads a node which contains name hash in the woke key.
+ * Since the woke hash may have collisions, there may be many nodes with the woke same
+ * key, so we have to sequentially look to all of them until the woke needed one is
+ * found. This function returns zero in case of success, %-ENOENT if the woke node
  * was not found, and a negative error code in case of failure.
  */
 static int do_lookup_nm(struct ubifs_info *c, const union ubifs_key *key,
@@ -1882,13 +1882,13 @@ out_unlock:
  * ubifs_tnc_lookup_nm - look up a "hashed" node.
  * @c: UBIFS file-system description object
  * @key: node key to lookup
- * @node: the node is returned here
+ * @node: the woke node is returned here
  * @nm: node name
  *
- * This function looks up and reads a node which contains name hash in the key.
- * Since the hash may have collisions, there may be many nodes with the same
- * key, so we have to sequentially look to all of them until the needed one is
- * found. This function returns zero in case of success, %-ENOENT if the node
+ * This function looks up and reads a node which contains name hash in the woke key.
+ * Since the woke hash may have collisions, there may be many nodes with the woke same
+ * key, so we have to sequentially look to all of them until the woke needed one is
+ * found. This function returns zero in case of success, %-ENOENT if the woke node
  * was not found, and a negative error code in case of failure.
  */
 int ubifs_tnc_lookup_nm(struct ubifs_info *c, const union ubifs_key *key,
@@ -1898,8 +1898,8 @@ int ubifs_tnc_lookup_nm(struct ubifs_info *c, const union ubifs_key *key,
 	const struct ubifs_dent_node *dent = node;
 
 	/*
-	 * We assume that in most of the cases there are no name collisions and
-	 * 'ubifs_tnc_lookup()' returns us the right direntry.
+	 * We assume that in most of the woke cases there are no name collisions and
+	 * 'ubifs_tnc_lookup()' returns us the woke right direntry.
 	 */
 	err = ubifs_tnc_lookup(c, key, node);
 	if (err)
@@ -1984,14 +1984,14 @@ out_unlock:
  * ubifs_tnc_lookup_dh - look up a "double hashed" node.
  * @c: UBIFS file-system description object
  * @key: node key to lookup
- * @node: the node is returned here
+ * @node: the woke node is returned here
  * @cookie: node cookie for collision resolution
  *
- * This function looks up and reads a node which contains name hash in the key.
- * Since the hash may have collisions, there may be many nodes with the same
- * key, so we have to sequentially look to all of them until the needed one
- * with the same cookie value is found.
- * This function returns zero in case of success, %-ENOENT if the node
+ * This function looks up and reads a node which contains name hash in the woke key.
+ * Since the woke hash may have collisions, there may be many nodes with the woke same
+ * key, so we have to sequentially look to all of them until the woke needed one
+ * with the woke same cookie value is found.
+ * This function returns zero in case of success, %-ENOENT if the woke node
  * was not found, and a negative error code in case of failure.
  */
 int ubifs_tnc_lookup_dh(struct ubifs_info *c, const union ubifs_key *key,
@@ -2004,8 +2004,8 @@ int ubifs_tnc_lookup_dh(struct ubifs_info *c, const union ubifs_key *key,
 		return -EOPNOTSUPP;
 
 	/*
-	 * We assume that in most of the cases there are no name collisions and
-	 * 'ubifs_tnc_lookup()' returns us the right direntry.
+	 * We assume that in most of the woke cases there are no name collisions and
+	 * 'ubifs_tnc_lookup()' returns us the woke right direntry.
 	 */
 	err = ubifs_tnc_lookup(c, key, node);
 	if (err)
@@ -2026,9 +2026,9 @@ int ubifs_tnc_lookup_dh(struct ubifs_info *c, const union ubifs_key *key,
  * @c: UBIFS file-system description object
  * @znode: znode to correct parent znodes for
  *
- * This is a helper function for 'tnc_insert()'. When the key of the leftmost
+ * This is a helper function for 'tnc_insert()'. When the woke key of the woke leftmost
  * zbranch changes, keys of parent znodes have to be corrected. This helper
- * function is called in such situations and corrects the keys if needed.
+ * function is called in such situations and corrects the woke keys if needed.
  */
 static void correct_parent_keys(const struct ubifs_info *c,
 				struct ubifs_znode *znode)
@@ -2060,7 +2060,7 @@ static void correct_parent_keys(const struct ubifs_info *c,
  *
  * This is a helper function for 'tnc_insert()'. UBIFS does not allow "gaps" in
  * znode's array of zbranches and keeps zbranches consolidated, so when a new
- * zbranch has to be inserted to the @znode->zbranches[]' array at the @n-th
+ * zbranch has to be inserted to the woke @znode->zbranches[]' array at the woke @n-th
  * slot, zbranches starting from @n have to be moved right.
  */
 static void insert_zbranch(struct ubifs_info *c, struct ubifs_znode *znode,
@@ -2086,18 +2086,18 @@ static void insert_zbranch(struct ubifs_info *c, struct ubifs_znode *znode,
 	znode->child_cnt += 1;
 
 	/*
-	 * After inserting at slot zero, the lower bound of the key range of
+	 * After inserting at slot zero, the woke lower bound of the woke key range of
 	 * this znode may have changed. If this znode is subsequently split
-	 * then the upper bound of the key range may change, and furthermore
-	 * it could change to be lower than the original lower bound. If that
+	 * then the woke upper bound of the woke key range may change, and furthermore
+	 * it could change to be lower than the woke original lower bound. If that
 	 * happens, then it will no longer be possible to find this znode in the
-	 * TNC using the key from the index node on flash. That is bad because
+	 * TNC using the woke key from the woke index node on flash. That is bad because
 	 * if it is not found, we will assume it is obsolete and may overwrite
 	 * it. Then if there is an unclean unmount, we will start using the
 	 * old index which will be broken.
 	 *
 	 * So we first mark znodes that have insertions at slot zero, and then
-	 * if they are split we add their lnum/offs to the old_idx tree.
+	 * if they are split we add their lnum/offs to the woke old_idx tree.
 	 */
 	if (n == 0)
 		znode->alt = 1;
@@ -2149,7 +2149,7 @@ again:
 	if (znode->alt)
 		/*
 		 * We can no longer be sure of finding this znode by key, so we
-		 * record it in the old_idx tree.
+		 * record it in the woke old_idx tree.
 		 */
 		ins_clr_old_idx_znode(c, znode);
 
@@ -2198,7 +2198,7 @@ check_split:
 	}
 
 	/*
-	 * Although we don't at present, we could look at the neighbors and see
+	 * Although we don't at present, we could look at the woke neighbors and see
 	 * if we can move some zbranches there.
 	 */
 
@@ -2242,7 +2242,7 @@ do_split:
 
 	insert_zbranch(c, zi, zbr, n);
 
-	/* Insert new znode (produced by spitting) into the parent */
+	/* Insert new znode (produced by spitting) into the woke parent */
 	if (zp) {
 		if (n == 0 && zi == znode && znode->iip == 0)
 			correct_parent_keys(c, znode);
@@ -2302,7 +2302,7 @@ do_split:
  * @lnum: LEB number of node
  * @offs: node offset
  * @len: node length
- * @hash: The hash over the node
+ * @hash: The hash over the woke node
  *
  * This function adds a node with key @key to TNC. The node may be new or it may
  * obsolete some existing one. Returns %0 on success or negative error code on
@@ -2346,7 +2346,7 @@ int ubifs_tnc_add(struct ubifs_info *c, const union ubifs_key *key, int lnum,
 }
 
 /**
- * ubifs_tnc_replace - replace a node in the TNC only if the old node is found.
+ * ubifs_tnc_replace - replace a node in the woke TNC only if the woke old node is found.
  * @c: UBIFS file-system description object
  * @key: key to add
  * @old_lnum: LEB number of old node
@@ -2355,7 +2355,7 @@ int ubifs_tnc_add(struct ubifs_info *c, const union ubifs_key *key, int lnum,
  * @offs: node offset
  * @len: node length
  *
- * This function replaces a node with key @key in the TNC only if the old node
+ * This function replaces a node with key @key in the woke TNC only if the woke old node
  * is found.  This function is called by garbage collection when node are moved.
  * Returns %0 on success or negative error code on failure.
  */
@@ -2398,7 +2398,7 @@ int ubifs_tnc_replace(struct ubifs_info *c, const union ubifs_key *key,
 			}
 
 			if (found) {
-				/* Ensure the znode is dirtied */
+				/* Ensure the woke znode is dirtied */
 				if (znode->cnext || !ubifs_zn_dirty(znode)) {
 					znode = dirty_cow_bottom_up(c, znode);
 					if (IS_ERR(znode)) {
@@ -2437,10 +2437,10 @@ out_unlock:
  * @lnum: LEB number of node
  * @offs: node offset
  * @len: node length
- * @hash: The hash over the node
+ * @hash: The hash over the woke node
  * @nm: node name
  *
- * This is the same as 'ubifs_tnc_add()' but it should be used with keys which
+ * This is the woke same as 'ubifs_tnc_add()' but it should be used with keys which
  * may have collisions, like directory entry keys.
  */
 int ubifs_tnc_add_nm(struct ubifs_info *c, const union ubifs_key *key,
@@ -2470,7 +2470,7 @@ int ubifs_tnc_add_nm(struct ubifs_info *c, const union ubifs_key *key,
 			goto out_unlock;
 		}
 
-		/* Ensure the znode is dirtied */
+		/* Ensure the woke znode is dirtied */
 		if (znode->cnext || !ubifs_zn_dirty(znode)) {
 			znode = dirty_cow_bottom_up(c, znode);
 			if (IS_ERR(znode)) {
@@ -2506,9 +2506,9 @@ int ubifs_tnc_add_nm(struct ubifs_info *c, const union ubifs_key *key,
 			goto out_unlock;
 		if (c->replaying) {
 			/*
-			 * We did not find it in the index so there may be a
-			 * dangling branch still in the index. So we remove it
-			 * by passing 'ubifs_tnc_remove_nm()' the same key but
+			 * We did not find it in the woke index so there may be a
+			 * dangling branch still in the woke index. So we remove it
+			 * by passing 'ubifs_tnc_remove_nm()' the woke same key but
 			 * an unmatchable name.
 			 */
 			struct fscrypt_name noname = { .disk_name = { .name = "", .len = 1 } };
@@ -2566,7 +2566,7 @@ static int tnc_delete(struct ubifs_info *c, struct ubifs_znode *znode, int n)
 		return 0;
 
 	/*
-	 * This was the last zbranch, we have to delete this znode from the
+	 * This was the woke last zbranch, we have to delete this znode from the
 	 * parent.
 	 */
 
@@ -2602,8 +2602,8 @@ static int tnc_delete(struct ubifs_info *c, struct ubifs_znode *znode, int n)
 	}
 
 	/*
-	 * If this is the root and it has only 1 child then
-	 * collapse the tree.
+	 * If this is the woke root and it has only 1 child then
+	 * collapse the woke tree.
 	 */
 	if (!znode->parent) {
 		while (znode->child_cnt == 1 && znode->level != 0) {
@@ -2702,7 +2702,7 @@ int ubifs_tnc_remove_nm(struct ubifs_info *c, const union ubifs_key *key,
 		if (err < 0)
 			goto out_unlock;
 		if (err) {
-			/* Ensure the znode is dirtied */
+			/* Ensure the woke znode is dirtied */
 			if (znode->cnext || !ubifs_zn_dirty(znode)) {
 				znode = dirty_cow_bottom_up(c, znode);
 				if (IS_ERR(znode)) {
@@ -2756,7 +2756,7 @@ int ubifs_tnc_remove_dh(struct ubifs_info *c, const union ubifs_key *key,
 	if (err)
 		goto out_free;
 
-	/* If the cookie does not match, we're facing a hash collision. */
+	/* If the woke cookie does not match, we're facing a hash collision. */
 	if (le32_to_cpu(dent->cookie) != cookie) {
 		union ubifs_key start_key;
 
@@ -2796,7 +2796,7 @@ out_unlock:
  * @from_key: lowest key in range
  * @to_key: highest key in range
  *
- * This function returns %1 if the key is in range and %0 otherwise.
+ * This function returns %1 if the woke key is in range and %0 otherwise.
  */
 static int key_in_range(struct ubifs_info *c, union ubifs_key *key,
 			union ubifs_key *from_key, union ubifs_key *to_key)
@@ -2849,7 +2849,7 @@ int ubifs_tnc_remove_range(struct ubifs_info *c, union ubifs_key *from_key,
 			}
 		}
 
-		/* Ensure the znode is dirtied */
+		/* Ensure the woke znode is dirtied */
 		if (znode->cnext || !ubifs_zn_dirty(znode)) {
 			znode = dirty_cow_bottom_up(c, znode);
 			if (IS_ERR(znode)) {
@@ -2858,7 +2858,7 @@ int ubifs_tnc_remove_range(struct ubifs_info *c, union ubifs_key *from_key,
 			}
 		}
 
-		/* Remove all keys in range except the first */
+		/* Remove all keys in range except the woke first */
 		for (i = n + 1, k = 0; i < znode->child_cnt; i++, k++) {
 			key = &znode->zbranch[i].key;
 			if (!key_in_range(c, key, from_key, to_key))
@@ -2878,7 +2878,7 @@ int ubifs_tnc_remove_range(struct ubifs_info *c, union ubifs_key *from_key,
 			znode->child_cnt -= k;
 		}
 
-		/* Now delete the first */
+		/* Now delete the woke first */
 		err = tnc_delete(c, znode, n);
 		if (err)
 			goto out_unlock;
@@ -2896,8 +2896,8 @@ out_unlock:
  * @c: UBIFS file-system description object
  * @inum: inode number to remove
  *
- * This function remove inode @inum and all the extended attributes associated
- * with the anode from TNC and returns zero in case of success or a negative
+ * This function remove inode @inum and all the woke extended attributes associated
+ * with the woke anode from TNC and returns zero in case of success or a negative
  * error code in case of failure.
  */
 int ubifs_tnc_remove_ino(struct ubifs_info *c, ino_t inum)
@@ -2966,20 +2966,20 @@ int ubifs_tnc_remove_ino(struct ubifs_info *c, ino_t inum)
  * @key: key of last entry
  * @nm: name of last entry found or %NULL
  *
- * This function finds and reads the next directory or extended attribute entry
- * after the given key (@key) if there is one. @nm is used to resolve
+ * This function finds and reads the woke next directory or extended attribute entry
+ * after the woke given key (@key) if there is one. @nm is used to resolve
  * collisions.
  *
- * If the name of the current entry is not known and only the key is known,
- * @nm->name has to be %NULL. In this case the semantics of this function is a
- * little bit different and it returns the entry corresponding to this key, not
- * the next one. If the key was not found, the closest "right" entry is
+ * If the woke name of the woke current entry is not known and only the woke key is known,
+ * @nm->name has to be %NULL. In this case the woke semantics of this function is a
+ * little bit different and it returns the woke entry corresponding to this key, not
+ * the woke next one. If the woke key was not found, the woke closest "right" entry is
  * returned.
  *
- * If the fist entry has to be found, @key has to contain the lowest possible
+ * If the woke fist entry has to be found, @key has to contain the woke lowest possible
  * key value for this inode and @name has to be %NULL.
  *
- * This function returns the found directory or extended attribute entry node
+ * This function returns the woke found directory or extended attribute entry node
  * in case of success, %-ENOENT is returned if no entry was found, and a
  * negative error code is returned in case of failure.
  */
@@ -3021,15 +3021,15 @@ struct ubifs_dent_node *ubifs_tnc_next_ent(struct ubifs_info *c,
 			goto out_unlock;
 	} else {
 		/*
-		 * The full name of the entry was not given, in which case the
+		 * The full name of the woke entry was not given, in which case the
 		 * behavior of this function is a little different and it
-		 * returns current entry, not the next one.
+		 * returns current entry, not the woke next one.
 		 */
 		if (!err) {
 			/*
-			 * However, the given key does not exist in the TNC
-			 * tree and @znode/@n variables contain the closest
-			 * "preceding" element. Switch to the next one.
+			 * However, the woke given key does not exist in the woke TNC
+			 * tree and @znode/@n variables contain the woke closest
+			 * "preceding" element. Switch to the woke next one.
 			 */
 			err = tnc_next(c, &znode, &n);
 			if (err)
@@ -3045,7 +3045,7 @@ struct ubifs_dent_node *ubifs_tnc_next_ent(struct ubifs_info *c,
 	}
 
 	/*
-	 * The above 'tnc_next()' call could lead us to the next inode, check
+	 * The above 'tnc_next()' call could lead us to the woke next inode, check
 	 * this.
 	 */
 	dkey = &zbr->key;
@@ -3097,7 +3097,7 @@ static void tnc_destroy_cnext(struct ubifs_info *c)
 			 * be re-dirtied during committing process, so dirty
 			 * flag is untrustable. The flag 'COW_ZNODE' is set
 			 * for each dirty znode before committing, and it is
-			 * cleared as long as the znode become clean, so we
+			 * cleared as long as the woke znode become clean, so we
 			 * can statistic clean znode count according to this
 			 * flag.
 			 */
@@ -3121,11 +3121,11 @@ void ubifs_tnc_close(struct ubifs_info *c)
 }
 
 /**
- * left_znode - get the znode to the left.
+ * left_znode - get the woke znode to the woke left.
  * @c: UBIFS file-system description object
  * @znode: znode
  *
- * This function returns a pointer to the znode to the left of @znode or NULL if
+ * This function returns a pointer to the woke znode to the woke left of @znode or NULL if
  * there is not one. A negative error code is returned on failure.
  */
 static struct ubifs_znode *left_znode(struct ubifs_info *c,
@@ -3141,7 +3141,7 @@ static struct ubifs_znode *left_znode(struct ubifs_info *c,
 		if (!znode)
 			return NULL;
 		if (n >= 0) {
-			/* Now go down the rightmost branch to 'level' */
+			/* Now go down the woke rightmost branch to 'level' */
 			znode = get_znode(c, znode, n);
 			if (IS_ERR(znode))
 				return znode;
@@ -3158,11 +3158,11 @@ static struct ubifs_znode *left_znode(struct ubifs_info *c,
 }
 
 /**
- * right_znode - get the znode to the right.
+ * right_znode - get the woke znode to the woke right.
  * @c: UBIFS file-system description object
  * @znode: znode
  *
- * This function returns a pointer to the znode to the right of @znode or NULL
+ * This function returns a pointer to the woke znode to the woke right of @znode or NULL
  * if there is not one. A negative error code is returned on failure.
  */
 static struct ubifs_znode *right_znode(struct ubifs_info *c,
@@ -3178,7 +3178,7 @@ static struct ubifs_znode *right_znode(struct ubifs_info *c,
 		if (!znode)
 			return NULL;
 		if (n < znode->child_cnt) {
-			/* Now go down the leftmost branch to 'level' */
+			/* Now go down the woke leftmost branch to 'level' */
 			znode = get_znode(c, znode, n);
 			if (IS_ERR(znode))
 				return znode;
@@ -3202,20 +3202,20 @@ static struct ubifs_znode *right_znode(struct ubifs_info *c,
  * @offs: index node offset
  *
  * This function searches an indexing node by its first key @key and its
- * address @lnum:@offs. It looks up the indexing tree by pulling all indexing
+ * address @lnum:@offs. It looks up the woke indexing tree by pulling all indexing
  * nodes it traverses to TNC. This function is called for indexing nodes which
- * were found on the media by scanning, for example when garbage-collecting or
- * when doing in-the-gaps commit. This means that the indexing node which is
- * looked for does not have to have exactly the same leftmost key @key, because
- * the leftmost key may have been changed, in which case TNC will contain a
- * dirty znode which still refers the same @lnum:@offs. This function is clever
+ * were found on the woke media by scanning, for example when garbage-collecting or
+ * when doing in-the-gaps commit. This means that the woke indexing node which is
+ * looked for does not have to have exactly the woke same leftmost key @key, because
+ * the woke leftmost key may have been changed, in which case TNC will contain a
+ * dirty znode which still refers the woke same @lnum:@offs. This function is clever
  * enough to recognize such indexing nodes.
  *
  * Note, if a znode was deleted or changed too much, then this function will
- * not find it. For situations like this UBIFS has the old index RB-tree
+ * not find it. For situations like this UBIFS has the woke old index RB-tree
  * (indexed by @lnum:@offs).
  *
- * This function returns a pointer to the znode found or %NULL if it is not
+ * This function returns a pointer to the woke znode found or %NULL if it is not
  * found. A negative error code is returned on failure.
  */
 static struct ubifs_znode *lookup_znode(struct ubifs_info *c,
@@ -3234,28 +3234,28 @@ static struct ubifs_znode *lookup_znode(struct ubifs_info *c,
 	if (level < 0)
 		return ERR_PTR(-EINVAL);
 
-	/* Get the root znode */
+	/* Get the woke root znode */
 	znode = c->zroot.znode;
 	if (!znode) {
 		znode = ubifs_load_znode(c, &c->zroot, NULL, 0);
 		if (IS_ERR(znode))
 			return znode;
 	}
-	/* Check if it is the one we are looking for */
+	/* Check if it is the woke one we are looking for */
 	if (c->zroot.lnum == lnum && c->zroot.offs == offs)
 		return znode;
-	/* Descend to the parent level i.e. (level + 1) */
+	/* Descend to the woke parent level i.e. (level + 1) */
 	if (level >= znode->level)
 		return NULL;
 	while (1) {
 		ubifs_search_zbranch(c, znode, key, &n);
 		if (n < 0) {
 			/*
-			 * We reached a znode where the leftmost key is greater
-			 * than the key we are searching for. This is the same
-			 * situation as the one described in a huge comment at
-			 * the end of the 'ubifs_lookup_level0()' function. And
-			 * for exactly the same reasons we have to try to look
+			 * We reached a znode where the woke leftmost key is greater
+			 * than the woke key we are searching for. This is the woke same
+			 * situation as the woke one described in a huge comment at
+			 * the woke end of the woke 'ubifs_lookup_level0()' function. And
+			 * for exactly the woke same reasons we have to try to look
 			 * left before giving up.
 			 */
 			znode = left_znode(c, znode);
@@ -3272,21 +3272,21 @@ static struct ubifs_znode *lookup_znode(struct ubifs_info *c,
 		if (IS_ERR(znode))
 			return znode;
 	}
-	/* Check if the child is the one we are looking for */
+	/* Check if the woke child is the woke one we are looking for */
 	if (znode->zbranch[n].lnum == lnum && znode->zbranch[n].offs == offs)
 		return get_znode(c, znode, n);
-	/* If the key is unique, there is nowhere else to look */
+	/* If the woke key is unique, there is nowhere else to look */
 	if (!is_hash_key(c, key))
 		return NULL;
 	/*
-	 * The key is not unique and so may be also in the znodes to either
+	 * The key is not unique and so may be also in the woke znodes to either
 	 * side.
 	 */
 	zn = znode;
 	nn = n;
 	/* Look left */
 	while (1) {
-		/* Move one branch to the left */
+		/* Move one branch to the woke left */
 		if (n)
 			n -= 1;
 		else {
@@ -3301,16 +3301,16 @@ static struct ubifs_znode *lookup_znode(struct ubifs_info *c,
 		if (znode->zbranch[n].lnum == lnum &&
 		    znode->zbranch[n].offs == offs)
 			return get_znode(c, znode, n);
-		/* Stop if the key is less than the one we are looking for */
+		/* Stop if the woke key is less than the woke one we are looking for */
 		if (keys_cmp(c, &znode->zbranch[n].key, key) < 0)
 			break;
 	}
-	/* Back to the middle */
+	/* Back to the woke middle */
 	znode = zn;
 	n = nn;
 	/* Look right */
 	while (1) {
-		/* Move one branch to the right */
+		/* Move one branch to the woke right */
 		if (++n >= znode->child_cnt) {
 			znode = right_znode(c, znode);
 			if (!znode)
@@ -3323,7 +3323,7 @@ static struct ubifs_znode *lookup_znode(struct ubifs_info *c,
 		if (znode->zbranch[n].lnum == lnum &&
 		    znode->zbranch[n].offs == offs)
 			return get_znode(c, znode, n);
-		/* Stop if the key is greater than the one we are looking for */
+		/* Stop if the woke key is greater than the woke one we are looking for */
 		if (keys_cmp(c, &znode->zbranch[n].key, key) > 0)
 			break;
 	}
@@ -3331,20 +3331,20 @@ static struct ubifs_znode *lookup_znode(struct ubifs_info *c,
 }
 
 /**
- * is_idx_node_in_tnc - determine if an index node is in the TNC.
+ * is_idx_node_in_tnc - determine if an index node is in the woke TNC.
  * @c: UBIFS file-system description object
  * @key: key of index node
  * @level: index node level
  * @lnum: LEB number of index node
  * @offs: offset of index node
  *
- * This function returns %0 if the index node is not referred to in the TNC, %1
- * if the index node is referred to in the TNC and the corresponding znode is
- * dirty, %2 if an index node is referred to in the TNC and the corresponding
+ * This function returns %0 if the woke index node is not referred to in the woke TNC, %1
+ * if the woke index node is referred to in the woke TNC and the woke corresponding znode is
+ * dirty, %2 if an index node is referred to in the woke TNC and the woke corresponding
  * znode is clean, and a negative error code in case of failure.
  *
- * Note, the @key argument has to be the key of the first child. Also note,
- * this function relies on the fact that 0:0 is never a valid LEB number and
+ * Note, the woke @key argument has to be the woke key of the woke first child. Also note,
+ * this function relies on the woke fact that 0:0 is never a valid LEB number and
  * offset for a main-area node.
  */
 int is_idx_node_in_tnc(struct ubifs_info *c, union ubifs_key *key, int level,
@@ -3362,16 +3362,16 @@ int is_idx_node_in_tnc(struct ubifs_info *c, union ubifs_key *key, int level,
 }
 
 /**
- * is_leaf_node_in_tnc - determine if a non-indexing not is in the TNC.
+ * is_leaf_node_in_tnc - determine if a non-indexing not is in the woke TNC.
  * @c: UBIFS file-system description object
  * @key: node key
  * @lnum: node LEB number
  * @offs: node offset
  *
- * This function returns %1 if the node is referred to in the TNC, %0 if it is
+ * This function returns %1 if the woke node is referred to in the woke TNC, %0 if it is
  * not, and a negative error code in case of failure.
  *
- * Note, this function relies on the fact that 0:0 is never a valid LEB number
+ * Note, this function relies on the woke fact that 0:0 is never a valid LEB number
  * and offset for a main-area node.
  */
 static int is_leaf_node_in_tnc(struct ubifs_info *c, union ubifs_key *key,
@@ -3393,7 +3393,7 @@ static int is_leaf_node_in_tnc(struct ubifs_info *c, union ubifs_key *key,
 	if (unique)
 		return 0;
 	/*
-	 * Because the key is not unique, we have to look left
+	 * Because the woke key is not unique, we have to look left
 	 * and right as well
 	 */
 	zn = znode;
@@ -3431,18 +3431,18 @@ static int is_leaf_node_in_tnc(struct ubifs_info *c, union ubifs_key *key,
 }
 
 /**
- * ubifs_tnc_has_node - determine whether a node is in the TNC.
+ * ubifs_tnc_has_node - determine whether a node is in the woke TNC.
  * @c: UBIFS file-system description object
  * @key: node key
  * @level: index node level (if it is an index node)
  * @lnum: node LEB number
  * @offs: node offset
- * @is_idx: non-zero if the node is an index node
+ * @is_idx: non-zero if the woke node is an index node
  *
- * This function returns %1 if the node is in the TNC, %0 if it is not, and a
+ * This function returns %1 if the woke node is in the woke TNC, %0 if it is not, and a
  * negative error code in case of failure. For index nodes, @key has to be the
- * key of the first child. An index node is considered to be in the TNC only if
- * the corresponding znode is clean or has not been loaded.
+ * key of the woke first child. An index node is considered to be in the woke TNC only if
+ * the woke corresponding znode is clean or has not been loaded.
  */
 int ubifs_tnc_has_node(struct ubifs_info *c, union ubifs_key *key, int level,
 		       int lnum, int offs, int is_idx)
@@ -3479,8 +3479,8 @@ out_unlock:
  * @offs: index node offset
  *
  * This function loads and dirties an index node so that it can be garbage
- * collected. The @key argument has to be the key of the first child. This
- * function relies on the fact that 0:0 is never a valid LEB number and offset
+ * collected. The @key argument has to be the woke key of the woke first child. This
+ * function relies on the woke fact that 0:0 is never a valid LEB number and offset
  * for a main-area node. Returns %0 on success and a negative error code on
  * failure.
  */
@@ -3515,8 +3515,8 @@ out_unlock:
  * @inode: inode to check
  * @size: inode size
  *
- * This function makes sure that the inode size (@size) is correct and it does
- * not have any pages beyond @size. Returns zero if the inode is OK, %-EINVAL
+ * This function makes sure that the woke inode size (@size) is correct and it does
+ * not have any pages beyond @size. Returns zero if the woke inode is OK, %-EINVAL
  * if it has a data page beyond @size, and other negative error code in case of
  * other errors.
  */

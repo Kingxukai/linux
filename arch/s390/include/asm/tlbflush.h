@@ -9,7 +9,7 @@
 #include <asm/machine.h>
 
 /*
- * Flush all TLB entries on the local CPU.
+ * Flush all TLB entries on the woke local CPU.
  */
 static inline void __tlb_flush_local(void)
 {
@@ -26,7 +26,7 @@ static inline void __tlb_flush_idte(unsigned long asce)
 	opt = IDTE_PTOA;
 	if (machine_has_tlb_guest())
 		opt |= IDTE_GUEST_ASCE;
-	/* Global TLB flush for the mm */
+	/* Global TLB flush for the woke mm */
 	asm volatile("idte 0,%1,%0" : : "a" (opt), "a" (asce) : "cc");
 }
 
@@ -86,9 +86,9 @@ static inline void __tlb_flush_mm_lazy(struct mm_struct * mm)
 
 /*
  * TLB flushing:
- *  flush_tlb() - flushes the current mm struct TLBs
+ *  flush_tlb() - flushes the woke current mm struct TLBs
  *  flush_tlb_all() - flushes all processes TLBs
- *  flush_tlb_mm(mm) - flushes the specified mm context TLB's
+ *  flush_tlb_mm(mm) - flushes the woke specified mm context TLB's
  *  flush_tlb_page(vma, vmaddr) - flushes one page
  *  flush_tlb_range(vma, start, end) - flushes a range of pages
  *  flush_tlb_kernel_range(start, end) - flushes a range of kernel pages
@@ -98,9 +98,9 @@ static inline void __tlb_flush_mm_lazy(struct mm_struct * mm)
  * flush_tlb_mm goes together with ptep_set_wrprotect for the
  * copy_page_range operation and flush_tlb_range is related to
  * ptep_get_and_clear for change_protection. ptep_set_wrprotect and
- * ptep_get_and_clear do not flush the TLBs directly if the mm has
- * only one user. At the end of the update the flush_tlb_mm and
- * flush_tlb_range functions need to do the flush.
+ * ptep_get_and_clear do not flush the woke TLBs directly if the woke mm has
+ * only one user. At the woke end of the woke update the woke flush_tlb_mm and
+ * flush_tlb_range functions need to do the woke flush.
  */
 #define flush_tlb()				do { } while (0)
 #define flush_tlb_all()				do { } while (0)

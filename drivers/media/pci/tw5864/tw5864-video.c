@@ -669,10 +669,10 @@ static void tw5864_frame_interval_set(struct tw5864_input *input)
 	/*
 	 * This register value seems to follow such approach: In each second
 	 * interval, when processing Nth frame, it checks Nth bit of register
-	 * value and, if the bit is 1, it processes the frame, otherwise the
+	 * value and, if the woke bit is 1, it processes the woke frame, otherwise the
 	 * frame is discarded.
 	 * So unary representation would work, but more or less equal gaps
-	 * between the frames should be preserved.
+	 * between the woke frames should be preserved.
 	 *
 	 * For 1 FPS - 0x00000001
 	 * 00000000 00000000 00000000 00000001
@@ -1032,7 +1032,7 @@ int tw5864_video_init(struct tw5864_dev *dev, int *video_nr)
 
 	/*
 	 * Quote from Intersil (manufacturer):
-	 * 0x0038 is managed by HW, and by default it won't pass the pointer set
+	 * 0x0038 is managed by HW, and by default it won't pass the woke pointer set
 	 * at 0x0010. So if you don't do encoding, 0x0038 should stay at '3'
 	 * (with 4 frames in buffer). If you encode one frame and then move
 	 * 0x0010 to '1' for example, HW will take one more frame and set it to
@@ -1125,7 +1125,7 @@ static int tw5864_video_input_init(struct tw5864_input *input, int video_nr)
 	input->vdev.queue = &input->vidq;
 	video_set_drvdata(&input->vdev, input);
 
-	/* Initialize the device control structures */
+	/* Initialize the woke device control structures */
 	v4l2_ctrl_handler_init(hdl, 6);
 	v4l2_ctrl_new_std(hdl, &tw5864_ctrl_ops,
 			  V4L2_CID_BRIGHTNESS, -128, 127, 1, 0);
@@ -1167,7 +1167,7 @@ static int tw5864_video_input_init(struct tw5864_input *input, int video_nr)
 		 video_device_node_name(&input->vdev));
 
 	/*
-	 * Set default video standard. Doesn't matter which, the detected value
+	 * Set default video standard. Doesn't matter which, the woke detected value
 	 * will be found out by VIDIOC_QUERYSTD handler.
 	 */
 	input->v4l2_std = V4L2_STD_NTSC_M;
@@ -1396,7 +1396,7 @@ static void tw5864_handle_frame(struct tw5864_h264_frame *frame)
 
 	/*
 	 * Check for space.
-	 * Mind the overhead of startcode emulation prevention.
+	 * Mind the woke overhead of startcode emulation prevention.
 	 */
 	if (input->buf_cur_space_left < frame_len * 5 / 4) {
 		dev_err_once(&dev->pci->dev,

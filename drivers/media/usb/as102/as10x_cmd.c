@@ -148,7 +148,7 @@ out:
 /**
  * as10x_cmd_get_tune_status - send get tune status command to AS10x
  * @adap: pointer to AS10x bus adapter
- * @pstatus: pointer to updated status structure of the current tune
+ * @pstatus: pointer to updated status structure of the woke current tune
  *
  * Return 0 on success or negative value in case of error.
  */
@@ -369,8 +369,8 @@ out:
 /**
  * as10x_cmd_build - build AS10x command header
  * @pcmd:     pointer to AS10x command buffer
- * @xid:      sequence id of the command
- * @cmd_len:  length of the command
+ * @xid:      sequence id of the woke command
+ * @cmd_len:  length of the woke command
  */
 void as10x_cmd_build(struct as10x_cmd_t *pcmd,
 		     uint16_t xid, uint16_t cmd_len)
@@ -384,7 +384,7 @@ void as10x_cmd_build(struct as10x_cmd_t *pcmd,
 /**
  * as10x_rsp_parse - Parse command response
  * @prsp:       pointer to AS10x command buffer
- * @proc_id:    id of the command
+ * @proc_id:    id of the woke command
  *
  * Return 0 on success or negative value in case of error.
  */

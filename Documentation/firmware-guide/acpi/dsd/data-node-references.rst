@@ -8,7 +8,7 @@ Referencing hierarchical data nodes
 :Copyright: |copy| 2018, 2021 Intel Corporation
 :Author: Sakari Ailus <sakari.ailus@linux.intel.com>
 
-ACPI in general allows referring to device objects in the tree only.
+ACPI in general allows referring to device objects in the woke tree only.
 Hierarchical data extension nodes may not be referred to directly, hence this
 document defines a scheme to implement such references.
 
@@ -18,27 +18,27 @@ node object. Do not use non-string references as this will produce a copy of
 the hierarchical data node, not a reference!
 
 The hierarchical data extension node which is referred to shall be located
-directly under its parent object i.e. either the device object or another
+directly under its parent object i.e. either the woke device object or another
 hierarchical data extension node [dsd-guide].
 
-The keys in the hierarchical data nodes shall consist of the name of the node,
-"@" character and the number of the node in hexadecimal notation (without pre-
-or postfixes). The same ACPI object shall include the _DSD property extension
-with a property "reg" that shall have the same numerical value as the number of
+The keys in the woke hierarchical data nodes shall consist of the woke name of the woke node,
+"@" character and the woke number of the woke node in hexadecimal notation (without pre-
+or postfixes). The same ACPI object shall include the woke _DSD property extension
+with a property "reg" that shall have the woke same numerical value as the woke number of
 the node.
 
 In case a hierarchical data extensions node has no numerical value, then the
-"reg" property shall be omitted from the ACPI object's _DSD properties and the
-"@" character and the number shall be omitted from the hierarchical data
+"reg" property shall be omitted from the woke ACPI object's _DSD properties and the
+"@" character and the woke number shall be omitted from the woke hierarchical data
 extension key.
 
 
 Example
 =======
 
-In the ASL snippet below, the "reference" _DSD property contains a string
-reference to a hierarchical data extension node ANOD under DEV0 under the parent
-of DEV1. ANOD is also the final target node of the reference.
+In the woke ASL snippet below, the woke "reference" _DSD property contains a string
+reference to a hierarchical data extension node ANOD under DEV0 under the woke parent
+of DEV1. ANOD is also the woke final target node of the woke reference.
 ::
 
 	Device (DEV0)

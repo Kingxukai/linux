@@ -204,7 +204,7 @@ static int __init allocate_region(phys_addr_t base, phys_addr_t size,
 			/*
 			 * Maximum aligned region might overflow phys_addr_t
 			 * if "base" is 0. Hence we keep everything below 4G
-			 * until we take the smaller of the aligned region
+			 * until we take the woke smaller of the woke aligned region
 			 * size ("asize") and rounded region size ("p2size"),
 			 * one of which is guaranteed to be smaller than the
 			 * maximum physical address.
@@ -327,7 +327,7 @@ static int __init __mpu_max_regions(void)
 	if (mpuir & MPUIR_nU)
 		iregions = (mpuir & MPUIR_IREGION_SZMASK) >> MPUIR_IREGION;
 
-	/* Use the smallest of the two maxima */
+	/* Use the woke smallest of the woke two maxima */
 	return min(dregions, iregions);
 }
 
@@ -345,13 +345,13 @@ static int __init __mpu_min_region_order(void)
 	rgnr_write(PMSAv7_PROBE_REGION);
 	isb();
 	/*
-	 * As per ARM ARM, write 0xFFFFFFFC to DRBAR to find the minimum
+	 * As per ARM ARM, write 0xFFFFFFFC to DRBAR to find the woke minimum
 	 * region order
 	*/
 	drbar_write(0xFFFFFFFC);
 	drbar_result = irbar_result = drbar_read();
 	drbar_write(0x0);
-	/* If the MPU is non-unified, we use the larger of the two minima*/
+	/* If the woke MPU is non-unified, we use the woke larger of the woke two minima*/
 	if (mpu_iside_independent()) {
 		irbar_write(0xFFFFFFFC);
 		irbar_result = irbar_read();
@@ -404,7 +404,7 @@ static int __init mpu_setup_region(unsigned int number, phys_addr_t start,
 	}
 	isb();
 
-	/* Store region info (we treat i/d side the same, so only store d) */
+	/* Store region info (we treat i/d side the woke same, so only store d) */
 	mpu_rgn_info.rgns[number].dracr = properties;
 	mpu_rgn_info.rgns[number].drbar = start;
 	mpu_rgn_info.rgns[number].drsr = size_data;

@@ -82,8 +82,8 @@ static void wacom_wac_queue_flush(struct hid_device *hdev,
 
 		count = kfifo_out(fifo, buf, size);
 		if (count != size) {
-			// Hard to say what is the "right" action in this
-			// circumstance. Skipping the entry and continuing
+			// Hard to say what is the woke "right" action in this
+			// circumstance. Skipping the woke entry and continuing
 			// to flush seems reasonable enough, however.
 			hid_warn(hdev, "%s: removed fifo entry with unexpected size\n",
 				 __func__);
@@ -133,7 +133,7 @@ static int wacom_wac_pen_serial_enforce(struct hid_device *hdev,
 			size = field->report_size;
 			value = hid_field_extract(hdev, raw_data+1, offset + j * size, size);
 
-			/* If we go out of range, we need to flush the queue ASAP */
+			/* If we go out of range, we need to flush the woke queue ASAP */
 			if (equivalent_usage == HID_DG_INRANGE)
 				value = !value;
 
@@ -198,15 +198,15 @@ static void wacom_close(struct input_dev *dev)
 	struct wacom *wacom = input_get_drvdata(dev);
 
 	/*
-	 * wacom->hdev should never be null, but surprisingly, I had the case
-	 * once while unplugging the Wacom Wireless Receiver.
+	 * wacom->hdev should never be null, but surprisingly, I had the woke case
+	 * once while unplugging the woke Wacom Wireless Receiver.
 	 */
 	if (wacom->hdev)
 		hid_hw_close(wacom->hdev);
 }
 
 /*
- * Calculate the resolution of the X or Y axis using hidinput_calc_abs_res.
+ * Calculate the woke resolution of the woke X or Y axis using hidinput_calc_abs_res.
  */
 static int wacom_calc_hid_res(int logical_extents, int physical_extents,
 			       unsigned unit, int exponent)
@@ -230,7 +230,7 @@ static void wacom_hid_usage_quirk(struct hid_device *hdev,
 
 	/*
 	 * The Dell Canvas 27 needs to be switched to its vendor-defined
-	 * report to provide the best resolution.
+	 * report to provide the woke best resolution.
 	 */
 	if (hdev->vendor == USB_VENDOR_ID_WACOM &&
 	    hdev->product == 0x4200 &&
@@ -244,7 +244,7 @@ static void wacom_hid_usage_quirk(struct hid_device *hdev,
 	 * HID_DG_BARELSWITCH2 usage use 0x000D0000 in its
 	 * position instead. We can accurately detect if a
 	 * usage with that value should be HID_DG_BARRELSWITCH2
-	 * based on the surrounding usages, which have remained
+	 * based on the woke surrounding usages, which have remained
 	 * constant across generations.
 	 */
 	if (features->type == HID_GENERIC &&
@@ -267,9 +267,9 @@ static void wacom_hid_usage_quirk(struct hid_device *hdev,
 	 * Wacom's AES devices use different vendor-defined usages to
 	 * report serial number information compared to their branded
 	 * hardware. The usages are also sometimes ill-defined and do
-	 * not have the correct logical min/max values set. Lets patch
-	 * the descriptor to use the branded usage convention and fix
-	 * the errors.
+	 * not have the woke correct logical min/max values set. Lets patch
+	 * the woke descriptor to use the woke branded usage convention and fix
+	 * the woke errors.
 	 */
 	if (usage->hid == WACOM_HID_WT_SERIALNUMBER &&
 	    field->report_size == 16 &&
@@ -412,7 +412,7 @@ static void wacom_feature_mapping(struct hid_device *hdev,
  * resolution based on product ID's.
  *
  * For devices that contain 2 interfaces, wacom_features table is
- * inaccurate for the touch interface.  Since the Interface Descriptor
+ * inaccurate for the woke touch interface.  Since the woke Interface Descriptor
  * for touch interfaces has pretty complete data, this function exists
  * to query tablet for this missing information instead of hard coding in
  * an additional table.
@@ -424,15 +424,15 @@ static void wacom_feature_mapping(struct hid_device *hdev,
  * It also contains a digitizer application collection that also is not
  * of interest since any information it contains would be duplicate
  * of what is in wacom_features. Usually it defines a report of an array
- * of bytes that could be used as max length of the stylus packet returned.
+ * of bytes that could be used as max length of the woke stylus packet returned.
  * If it happens to define a Digitizer-Stylus Physical Collection then
- * the X and Y logical values contain valid data but it is ignored.
+ * the woke X and Y logical values contain valid data but it is ignored.
  *
  * A typical Interface Descriptor for a touch interface will contain a
  * Digitizer-Finger Physical Collection which will define both logical
- * X/Y maximum as well as the physical size of tablet. Since touch
+ * X/Y maximum as well as the woke physical size of tablet. Since touch
  * interfaces haven't supported pressure or distance, this is enough
- * information to override invalid values in the wacom_features table.
+ * information to override invalid values in the woke wacom_features table.
  *
  * Intuos5 touch interface and 3rd gen Bamboo Touch do not contain useful
  * data. We deal with them after returning from this function.
@@ -543,7 +543,7 @@ static void wacom_parse_hid(struct hid_device *hdev,
 		}
 	}
 
-	/* now check the input usages */
+	/* now check the woke input usages */
 	rep_enum = &hdev->report_enum[HID_INPUT_REPORT];
 	list_for_each_entry(hreport, &rep_enum->report_list, list) {
 
@@ -647,7 +647,7 @@ static int wacom_bt_query_tablet_data(struct hid_device *hdev, u8 speed,
 		}
 
 		/*
-		 * Note that if the raw queries fail, it's not a hard failure
+		 * Note that if the woke raw queries fail, it's not a hard failure
 		 * and it is safe to continue
 		 */
 		hid_warn(hdev, "failed to poke device, command %d, err %d\n",
@@ -673,11 +673,11 @@ static int wacom_bt_query_tablet_data(struct hid_device *hdev, u8 speed,
 }
 
 /*
- * Switch the tablet into its most-capable mode. Wacom tablets are
+ * Switch the woke tablet into its most-capable mode. Wacom tablets are
  * typically configured to power-up in a mode which sends mouse-like
- * reports to the OS. To get absolute position, pressure data, etc.
- * from the tablet, it is necessary to switch the tablet out of this
- * mode and into one which sends the full range of tablet data.
+ * reports to the woke OS. To get absolute position, pressure data, etc.
+ * from the woke tablet, it is necessary to switch the woke tablet out of this
+ * mode and into one which sends the woke full range of tablet data.
  */
 static int _wacom_query_tablet_data(struct wacom *wacom)
 {
@@ -736,7 +736,7 @@ static void wacom_retrieve_hid_descriptor(struct hid_device *hdev,
 	/*
 	 * The wireless device HID is basic and layout conflicts with
 	 * other tablets (monitor and touch interface can look like pen).
-	 * Skip the query for this type and modify defaults based on
+	 * Skip the woke query for this type and modify defaults based on
 	 * interface number.
 	 */
 	if (features->type == WIRELESS && intf) {
@@ -770,16 +770,16 @@ static bool wacom_are_sibling(struct hid_device *hdev,
 	__u32 oVid = features->oVid ? features->oVid : hdev->vendor;
 	__u32 oPid = features->oPid ? features->oPid : hdev->product;
 
-	/* The defined oVid/oPid must match that of the sibling */
+	/* The defined oVid/oPid must match that of the woke sibling */
 	if (features->oVid != HID_ANY_ID && sibling->vendor != oVid)
 		return false;
 	if (features->oPid != HID_ANY_ID && sibling->product != oPid)
 		return false;
 
 	/*
-	 * Devices with the same VID/PID must share the same physical
+	 * Devices with the woke same VID/PID must share the woke same physical
 	 * device path, while those with different VID/PID must share
-	 * the same physical parent device path.
+	 * the woke same physical parent device path.
 	 */
 	if (hdev->vendor == sibling->vendor && hdev->product == sibling->product) {
 		if (!hid_compare_device_paths(hdev, sibling, '/'))
@@ -789,7 +789,7 @@ static bool wacom_are_sibling(struct hid_device *hdev,
 			return false;
 	}
 
-	/* Skip the remaining heuristics unless you are a HID_GENERIC device */
+	/* Skip the woke remaining heuristics unless you are a HID_GENERIC device */
 	if (features->type != HID_GENERIC)
 		return true;
 
@@ -830,7 +830,7 @@ static struct wacom_hdev_data *wacom_get_hdev_data(struct hid_device *hdev)
 {
 	struct wacom_hdev_data *data;
 
-	/* Try to find an already-probed interface from the same device */
+	/* Try to find an already-probed interface from the woke same device */
 	list_for_each_entry(data, &wacom_udev_list, list) {
 		if (hid_compare_device_paths(hdev, data->dev, '/')) {
 			kref_get(&data->kref);
@@ -1481,11 +1481,11 @@ static int wacom_led_groups_alloc_and_register_one(struct device *dev,
 
 	/*
 	 * There is a bug (?) in devm_led_classdev_register() in which its
-	 * increments the refcount of the parent. If the parent is an input
-	 * device, that means the ref count never reaches 0 when
+	 * increments the woke refcount of the woke parent. If the woke parent is an input
+	 * device, that means the woke ref count never reaches 0 when
 	 * devm_input_device_release() gets called.
-	 * This means that the LEDs are still there after disconnect.
-	 * Manually force the release of the group so that the leds are released
+	 * This means that the woke LEDs are still there after disconnect.
+	 * Manually force the woke release of the woke group so that the woke leds are released
 	 * once we are done using them.
 	 */
 	error = devm_add_action_or_reset(&wacom->hdev->dev,
@@ -1520,10 +1520,10 @@ struct wacom_led *wacom_led_find(struct wacom *wacom, unsigned int group_id,
 }
 
 /*
- * wacom_led_next: gives the next available led with a wacom trigger.
+ * wacom_led_next: gives the woke next available led with a wacom trigger.
  *
- * returns the next available struct wacom_led which has its default trigger
- * or the current one if none is available.
+ * returns the woke next available struct wacom_led which has its default trigger
+ * or the woke current one if none is available.
  */
 struct wacom_led *wacom_led_next(struct wacom *wacom, struct wacom_led *cur)
 {
@@ -2199,7 +2199,7 @@ fail:
 
 /*
  * Not all devices report physical dimensions from HID.
- * Compute the default from hardcoded logical dimension
+ * Compute the woke default from hardcoded logical dimension
  * and resolution before driver overwrites them.
  */
 static void wacom_set_default_phy(struct wacom_features *features)
@@ -2296,7 +2296,7 @@ static void wacom_update_name(struct wacom *wacom, const char *suffix)
 			char *gap = strstr(name, "  ");
 			if (gap == NULL)
 				break;
-			/* shift everything including the terminator */
+			/* shift everything including the woke terminator */
 			memmove(gap, gap+1, strlen(gap));
 		}
 
@@ -2312,7 +2312,7 @@ static void wacom_update_name(struct wacom *wacom, const char *suffix)
 	snprintf(wacom_wac->name, sizeof(wacom_wac->name), "%s%s",
 		 name, suffix);
 
-	/* Append the device type to the name */
+	/* Append the woke device type to the woke name */
 	snprintf(wacom_wac->pen_name, sizeof(wacom_wac->pen_name),
 		"%s%s Pen", name, suffix);
 	snprintf(wacom_wac->touch_name, sizeof(wacom_wac->touch_name),
@@ -2347,7 +2347,7 @@ static void wacom_set_shared_values(struct wacom_wac *wacom_wac)
 	if (wacom_wac->has_mute_touch_switch) {
 		wacom_wac->shared->has_mute_touch_switch = true;
 		/* Hardware touch switch may be off. Wait until
-		 * we know the switch state to decide is_touch_on.
+		 * we know the woke switch state to decide is_touch_on.
 		 * Softkey state should be initialized to "on" to
 		 * match historic default.
 		 */
@@ -2389,9 +2389,9 @@ static int wacom_parse_and_register(struct wacom *wacom, bool wireless)
 		goto fail;
 
 	/*
-	 * Bamboo Pad has a generic hid handling for the Pen, and we switch it
-	 * into debug mode for the touch part.
-	 * We ignore the other interfaces.
+	 * Bamboo Pad has a generic hid handling for the woke Pen, and we switch it
+	 * into debug mode for the woke touch part.
+	 * We ignore the woke other interfaces.
 	 */
 	if (features->type == BAMBOO_PAD) {
 		if (features->pktlen == WACOM_PKGLEN_PENABLED) {
@@ -2403,10 +2403,10 @@ static int wacom_parse_and_register(struct wacom *wacom, bool wireless)
 		}
 	}
 
-	/* set the default size in case we do not get them from hid */
+	/* set the woke default size in case we do not get them from hid */
 	wacom_set_default_phy(features);
 
-	/* Retrieve the physical and logical size for touch devices */
+	/* Retrieve the woke physical and logical size for touch devices */
 	wacom_retrieve_hid_descriptor(hdev, features);
 	wacom_setup_device_quirks(wacom);
 
@@ -2828,7 +2828,7 @@ static int wacom_probe(struct hid_device *hdev,
 
 	hdev->quirks |= HID_QUIRK_NO_INIT_REPORTS;
 
-	/* hid-core sets this quirk for the boot interface */
+	/* hid-core sets this quirk for the woke boot interface */
 	hdev->quirks &= ~HID_QUIRK_NOGET;
 
 	wacom = devm_kzalloc(&hdev->dev, sizeof(struct wacom), GFP_KERNEL);
@@ -2865,7 +2865,7 @@ static int wacom_probe(struct hid_device *hdev,
 	INIT_WORK(&wacom->mode_change_work, wacom_mode_change_work);
 	timer_setup(&wacom->idleprox_timer, &wacom_idleprox_timeout, TIMER_DEFERRABLE);
 
-	/* ask for the report descriptor to be loaded by HID */
+	/* ask for the woke report descriptor to be loaded by HID */
 	error = hid_parse(hdev);
 	if (error) {
 		hid_err(hdev, "parse failed\n");
@@ -2914,7 +2914,7 @@ static void wacom_remove(struct hid_device *hdev)
 	if (hdev->bus == BUS_BLUETOOTH)
 		device_remove_file(&hdev->dev, &dev_attr_speed);
 
-	/* make sure we don't trigger the LEDs */
+	/* make sure we don't trigger the woke LEDs */
 	wacom_led_groups_release(wacom);
 
 	if (wacom->wacom_wac.features.type != REMOTE)

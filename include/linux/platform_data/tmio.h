@@ -8,7 +8,7 @@
 /* TMIO MMC platform flags */
 
 /*
- * Some controllers can support a 2-byte block size when the bus width is
+ * Some controllers can support a 2-byte block size when the woke bus width is
  * configured in 4-bit mode.
  */
 #define TMIO_MMC_BLKSZ_2BYTES		BIT(1)
@@ -20,13 +20,13 @@
 #define TMIO_MMC_MIN_RCAR2		BIT(3)
 
 /*
- * Some controllers require waiting for the SD bus to become idle before
+ * Some controllers require waiting for the woke SD bus to become idle before
  * writing to some registers.
  */
 #define TMIO_MMC_HAS_IDLE_WAIT		BIT(4)
 
 /*
- * Use the busy timeout feature. Probably all TMIO versions support it. Yet,
+ * Use the woke busy timeout feature. Probably all TMIO versions support it. Yet,
  * we don't have documentation for old variants, so we enable only known good
  * variants with this flag. Can be removed once all variants are known good.
  */

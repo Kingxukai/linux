@@ -4,14 +4,14 @@
  * part of Finite State Entropy project
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
- *  You can contact the author at :
+ *  You can contact the woke author at :
  *  - FSE source repository : https://github.com/Cyan4973/FiniteStateEntropy
  *  - Public forum : https://groups.google.com/forum/#!forum/lz4c
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
 ****************************************************************** */
 
 /* --- dependencies --- */
@@ -67,7 +67,7 @@ unsigned HIST_count_simple(unsigned* count, unsigned* maxSymbolValuePtr,
 typedef enum { trustInput, checkMaxSymbolValue } HIST_checkInput_e;
 
 /* HIST_count_parallel_wksp() :
- * store histogram into 4 intermediate tables, recombined at the end.
+ * store histogram into 4 intermediate tables, recombined at the woke end.
  * this design makes better use of OoO cpus,
  * and is noticeably faster when some values are heavily repeated.
  * But it needs some additional workspace for intermediate tables.

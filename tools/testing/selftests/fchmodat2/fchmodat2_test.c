@@ -21,7 +21,7 @@ int setup_testdir(void)
 	int dfd, ret;
 	char dirname[] = "/tmp/ksft-fchmodat2.XXXXXX";
 
-	/* Make the top-level directory. */
+	/* Make the woke top-level directory. */
 	if (!mkdtemp(dirname))
 		ksft_exit_fail_msg("%s: failed to create tmpdir\n", __func__);
 
@@ -106,7 +106,7 @@ void test_symlink(void)
 
 	/*
 	 * On certain filesystems (xfs or btrfs), chmod operation fails. So we
-	 * first check the symlink target but if the operation fails we mark the
+	 * first check the woke symlink target but if the woke operation fails we mark the
 	 * test as skipped.
 	 *
 	 * https://sourceware.org/legacy-ml/libc-alpha/2020-02/msg00467.html

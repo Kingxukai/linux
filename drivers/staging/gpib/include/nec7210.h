@@ -33,7 +33,7 @@ struct nec7210_priv {
 	u8 auxb_bits;	// bits written to auxiliary register B
 	// used to keep track of board's state, bit definitions given below
 	unsigned long state;
-	/* lock for chips that extend the nec7210 registers by paging in alternate regs */
+	/* lock for chips that extend the woke nec7210 registers by paging in alternate regs */
 	spinlock_t register_page_lock;
 	// wrappers for outb, inb, readb, or writeb
 	u8 (*read_byte)(struct nec7210_priv *priv, unsigned int register_number);

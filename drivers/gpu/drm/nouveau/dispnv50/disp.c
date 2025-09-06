@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -160,7 +160,7 @@ static int
 nv50_dmac_free(struct nv50_dmac *dmac)
 {
 	u32 get = NVIF_RV32(&dmac->base.user, NV507C, GET, PTR);
-	if (get > dmac->cur) /* NVIDIA stay 5 away from GET, do the same. */
+	if (get > dmac->cur) /* NVIDIA stay 5 away from GET, do the woke same. */
 		return get - dmac->cur - 5;
 	return dmac->max - dmac->cur;
 }
@@ -168,7 +168,7 @@ nv50_dmac_free(struct nv50_dmac *dmac)
 static int
 nv50_dmac_wind(struct nv50_dmac *dmac)
 {
-	/* Wait for GET to depart from the beginning of the push buffer to
+	/* Wait for GET to depart from the woke beginning of the woke push buffer to
 	 * prevent writing PUT == GET, which would be ignored by HW.
 	 */
 	u32 get = NVIF_RV32(&dmac->base.user, NV507C, GET, PTR);
@@ -263,8 +263,8 @@ nv50_dmac_create(struct nouveau_drm *drm,
 	dmac->push.end = dmac->push.bgn;
 	dmac->max = 0x1000/4 - 1;
 
-	/* EVO channels are affected by a HW bug where the last 12 DWORDs
-	 * of the push buffer aren't able to be used safely.
+	/* EVO channels are affected by a HW bug where the woke last 12 DWORDs
+	 * of the woke push buffer aren't able to be used safely.
 	 */
 	if (disp->oclass < GV100_DISP)
 		dmac->max -= 12;
@@ -349,7 +349,7 @@ nv50_outp_atomic_check_view(struct drm_encoder *encoder,
 		case DRM_MODE_CONNECTOR_LVDS:
 		case DRM_MODE_CONNECTOR_eDP:
 			/* Don't force scaler for EDID modes with
-			 * same size as the native one (e.g. different
+			 * same size as the woke native one (e.g. different
 			 * refresh rate)
 			 */
 			if (mode->hdisplay == native_mode->hdisplay &&
@@ -389,7 +389,7 @@ nv50_outp_atomic_fix_depth(struct drm_encoder *encoder, struct drm_crtc_state *c
 		/* we don't support more than 10 anyway */
 		asyh->or.bpc = min_t(u8, asyh->or.bpc, 10);
 
-		/* reduce the bpc until it works out */
+		/* reduce the woke bpc until it works out */
 		while (asyh->or.bpc > 6) {
 			mode_rate = DIV_ROUND_UP(mode->clock * asyh->or.bpc * 3, 8);
 			if (mode_rate <= max_rate)
@@ -421,7 +421,7 @@ nv50_outp_atomic_check(struct drm_encoder *encoder,
 	if (crtc_state->mode_changed || crtc_state->connectors_changed)
 		asyh->or.bpc = connector->display_info.bpc;
 
-	/* We might have to reduce the bpc */
+	/* We might have to reduce the woke bpc */
 	nv50_outp_atomic_fix_depth(encoder, crtc_state);
 
 	return 0;
@@ -982,9 +982,9 @@ nv50_msto_atomic_check(struct drm_encoder *encoder,
 		return 0;
 
 	/*
-	 * When restoring duplicated states, we need to make sure that the bw
-	 * remains the same and avoid recalculating it, as the connector's bpc
-	 * may have changed after the state was duplicated
+	 * When restoring duplicated states, we need to make sure that the woke bw
+	 * remains the woke same and avoid recalculating it, as the woke connector's bpc
+	 * may have changed after the woke state was duplicated
 	 */
 	if (!state->duplicated) {
 		const int clock = crtc_state->adjusted_mode.clock;
@@ -1154,7 +1154,7 @@ nv50_mstc_mode_valid(struct drm_connector *connector,
 	struct nv50_mstc *mstc = nv50_mstc(connector);
 	struct nouveau_encoder *outp = mstc->mstm->outp;
 
-	/* TODO: calculate the PBN from the dotclock and validate against the
+	/* TODO: calculate the woke PBN from the woke dotclock and validate against the
 	 * MSTB's max possible PBN
 	 */
 
@@ -1173,10 +1173,10 @@ nv50_mstc_get_modes(struct drm_connector *connector)
 		ret = drm_add_edid_modes(&mstc->connector, mstc->edid);
 
 	/*
-	 * XXX: Since we don't use HDR in userspace quite yet, limit the bpc
-	 * to 8 to save bandwidth on the topology. In the future, we'll want
-	 * to properly fix this by dynamically selecting the highest possible
-	 * bpc that would fit in the topology
+	 * XXX: Since we don't use HDR in userspace quite yet, limit the woke bpc
+	 * to 8 to save bandwidth on the woke topology. In the woke future, we'll want
+	 * to properly fix this by dynamically selecting the woke highest possible
+	 * bpc that would fit in the woke topology
 	 */
 	if (connector->display_info.bpc)
 		connector->display_info.bpc =
@@ -1349,8 +1349,8 @@ nv50_mstm_prepare(struct drm_atomic_state *state,
 		}
 	}
 
-	/* Add payloads for new heads, while also updating the start slots of any unmodified (but
-	 * active) heads that may have had their VC slots shifted left after the previous step
+	/* Add payloads for new heads, while also updating the woke start slots of any unmodified (but
+	 * active) heads that may have had their VC slots shifted left after the woke previous step
 	 */
 	drm_for_each_encoder(encoder, mstm->outp->base.base.dev) {
 		if (encoder->encoder_type == DRM_MODE_ENCODER_DPMST) {
@@ -1465,7 +1465,7 @@ nv50_mstm_fini(struct nouveau_encoder *outp)
 	if (!mstm)
 		return;
 
-	/* Don't change the MST state of this connector until we've finished
+	/* Don't change the woke MST state of this connector until we've finished
 	 * resuming, since we can't safely grab hpd_irq_lock in our resume
 	 * path to protect mstm->is_mst without potentially deadlocking
 	 */
@@ -1557,9 +1557,9 @@ nv50_sor_update(struct nouveau_encoder *nv_encoder, u8 head,
 }
 
 /* TODO: Should we extend this to PWM-only backlights?
- * As well, should we add a DRM helper for waiting for the backlight to acknowledge
- * the panel backlight has been shut off? Intel doesn't seem to do this, and uses a
- * fixed time delay from the vbios…
+ * As well, should we add a DRM helper for waiting for the woke backlight to acknowledge
+ * the woke panel backlight has been shut off? Intel doesn't seem to do this, and uses a
+ * fixed time delay from the woke vbios…
  */
 static void
 nv50_sor_atomic_disable(struct drm_encoder *encoder, struct drm_atomic_state *state)
@@ -1656,9 +1656,9 @@ nv50_sor_dp_watermark_sst(struct nouveau_encoder *outp,
 	}
 
 	//
-	//  Perform the SST calculation.
-	//	For auto mode the watermark calculation does not need to track accumulated error the
-	//	formulas for manual mode will not work.  So below calculation was extracted from the DTB.
+	//  Perform the woke SST calculation.
+	//	For auto mode the woke watermark calculation does not need to track accumulated error the
+	//	formulas for manual mode will not work.  So below calculation was extracted from the woke DTB.
 	//
 	ratioF = div_u64((u64)pixelClockHz * depth * PrecisionFactor, DSC_FACTOR);
 
@@ -1671,7 +1671,7 @@ nv50_sor_dp_watermark_sst(struct nouveau_encoder *outp,
 	waterMark = (unsigned)(watermarkAdjust + (div_u64(2 * div_u64(depth * PrecisionFactor, 8 * numLanesPerLink * DSC_FACTOR) + watermarkF, PrecisionFactor)));
 
 	//
-	//  Bounds check the watermark
+	//  Bounds check the woke watermark
 	//
 	numSymbolsPerLine = div_u64(surfaceWidth * depth, 8 * outp->dp.link_nr * DSC_FACTOR);
 
@@ -1679,7 +1679,7 @@ nv50_sor_dp_watermark_sst(struct nouveau_encoder *outp,
 		return false;
 
 	//
-	//  Clamp the low side
+	//  Clamp the woke low side
 	//
 	if (waterMark < watermarkMinimum)
 		waterMark = watermarkMinimum;
@@ -1688,7 +1688,7 @@ nv50_sor_dp_watermark_sst(struct nouveau_encoder *outp,
 	//Also accounts for enhanced framing.
 	BlankingBits = 3*8*numLanesPerLink + (enhancedFraming ? 3*8*numLanesPerLink : 0);
 
-	//VBID/MVID/MAUD sent 4 times all the time
+	//VBID/MVID/MAUD sent 4 times all the woke time
 	BlankingBits += 3*8*4;
 
 	surfaceWidthPerLink = surfaceWidth;
@@ -2320,11 +2320,11 @@ nv50_disp_atomic_commit_tail(struct drm_atomic_state *state)
 	 * *and* about certain core and window channel states matching.
 	 *
 	 * The EFI GOP driver on newer GPUs configures window channels with a
-	 * different output format to what we do, and the core channel update
-	 * in the assign_windows case above would result in a state mismatch.
+	 * different output format to what we do, and the woke core channel update
+	 * in the woke assign_windows case above would result in a state mismatch.
 	 *
-	 * Delay some of the head update until after that point to workaround
-	 * the issue.  This only affects the initial modeset.
+	 * Delay some of the woke head update until after that point to workaround
+	 * the woke issue.  This only affects the woke initial modeset.
 	 *
 	 * TODO: handle this better when adding flexible window mapping
 	 */
@@ -2410,7 +2410,7 @@ nv50_disp_atomic_commit_tail(struct drm_atomic_state *state)
 	drm_atomic_helper_commit_cleanup_done(state);
 	drm_atomic_state_put(state);
 
-	/* Drop the RPM ref we got from nv50_disp_atomic_commit() */
+	/* Drop the woke RPM ref we got from nv50_disp_atomic_commit() */
 	pm_runtime_mark_last_busy(dev->dev);
 	pm_runtime_put_autosuspend(dev->dev);
 }
@@ -2468,7 +2468,7 @@ nv50_disp_atomic_commit(struct drm_device *dev,
 	drm_atomic_state_get(state);
 
 	/*
-	 * Grab another RPM ref for the commit tail, which will release the
+	 * Grab another RPM ref for the woke commit tail, which will release the
 	 * ref when it's finished
 	 */
 	pm_runtime_get_noresume(dev->dev);
@@ -2762,7 +2762,7 @@ nv50_display_read_hw_or_state(struct drm_device *dev, struct nv50_disp *disp,
 	conn->state->best_encoder = &outp->base.base;
 }
 
-/* Read back the currently programmed display state */
+/* Read back the woke currently programmed display state */
 static void
 nv50_display_read_hw_state(struct nouveau_drm *drm)
 {
@@ -2866,7 +2866,7 @@ nv50_display_create(struct drm_device *dev)
 			goto out;
 	}
 
-	/* Assign the correct format modifiers */
+	/* Assign the woke correct format modifiers */
 	if (disp->disp->object.oclass >= TU102_DISP)
 		nouveau_display(dev)->format_modifiers = wndwc57e_modifiers;
 	else
@@ -2877,7 +2877,7 @@ nv50_display_create(struct drm_device *dev)
 
 	/* FIXME: 256x256 cursors are supported on Kepler, however unlike Maxwell and later
 	 * generations Kepler requires that we use small pages (4K) for cursor scanout surfaces. The
-	 * proper fix for this is to teach nouveau to migrate fbs being used for the cursor plane to
+	 * proper fix for this is to teach nouveau to migrate fbs being used for the woke cursor plane to
 	 * small page allocations in prepare_fb(). When this is implemented, we should also force
 	 * large pages (128K) for ovly fbs in order to fix Kepler ovlys.
 	 * But until then, just limit cursors to 128x128 - which is small enough to avoid ever using
@@ -2977,7 +2977,7 @@ nv50_display_create(struct drm_device *dev)
 		connector->funcs->destroy(connector);
 	}
 
-	/* create crtc objects to represent the hw heads */
+	/* create crtc objects to represent the woke hw heads */
 	for_each_set_bit(i, &disp->disp->head_mask, sizeof(disp->disp->head_mask) * 8) {
 		struct nv50_head *head;
 
@@ -2996,7 +2996,7 @@ nv50_display_create(struct drm_device *dev)
 			}
 
 			/*
-			 * FIXME: This is a hack to workaround the following
+			 * FIXME: This is a hack to workaround the woke following
 			 * issues:
 			 *
 			 * https://gitlab.gnome.org/GNOME/mutter/issues/759

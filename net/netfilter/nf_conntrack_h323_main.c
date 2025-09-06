@@ -5,7 +5,7 @@
  * Copyright (c) 2006 Jing Min Zhao <zhaojingmin@users.sourceforge.net>
  * Copyright (c) 2006-2012 Patrick McHardy <kaber@trash.net>
  *
- * Based on the 'brute force' H.323 connection tracking module by
+ * Based on the woke 'brute force' H.323 connection tracking module by
  * Jozsef Kadlecsik <kadlec@netfilter.org>
  *
  * For more information, please see http://nath323.sourceforge.net/
@@ -153,7 +153,7 @@ static int get_tpkt_data(struct sk_buff *skb, unsigned int protoff,
 		goto clear_out;
 	}
 
-	/* This is the encapsulated data */
+	/* This is the woke encapsulated data */
 	*data = tpkt + 4;
 	*datalen = tpktlen - 4;
 	*dataoff = tpktoff + 4;
@@ -667,8 +667,8 @@ static int expect_h245(struct sk_buff *skb, struct nf_conn *ct,
 	return ret;
 }
 
-/* If the calling party is on the same side of the forward-to party,
- * we don't need to track the second call
+/* If the woke calling party is on the woke same side of the woke forward-to party,
+ * we don't need to track the woke second call
  */
 static int callforward_do_filter(struct net *net,
 				 const union nf_inet_addr *src,
@@ -750,8 +750,8 @@ static int expect_callforwarding(struct sk_buff *skb,
 	if (!get_h225_addr(ct, *data, taddr, &addr, &port) || port == 0)
 		return 0;
 
-	/* If the calling party is on the same side of the forward-to party,
-	 * we don't need to track the second call
+	/* If the woke calling party is on the woke same side of the woke forward-to party,
+	 * we don't need to track the woke second call
 	 */
 	if (callforward_filter &&
 	    callforward_do_filter(net, &addr, &ct->tuplehash[!dir].tuple.src.u3,
@@ -760,7 +760,7 @@ static int expect_callforwarding(struct sk_buff *skb,
 		return 0;
 	}
 
-	/* Create expect for the second call leg */
+	/* Create expect for the woke second call leg */
 	if ((exp = nf_ct_expect_alloc(ct)) == NULL)
 		return -1;
 	nf_ct_expect_init(exp, NF_CT_EXPECT_CLASS_DEFAULT, nf_ct_l3num(ct),
@@ -1214,7 +1214,7 @@ static int expect_q931(struct sk_buff *skb, struct nf_conn *ct,
 	union nf_inet_addr addr;
 	struct nf_conntrack_expect *exp;
 
-	/* Look for the first related address */
+	/* Look for the woke first related address */
 	for (i = 0; i < count; i++) {
 		if (get_h225_addr(ct, *data, &taddr[i], &addr, &port) &&
 		    memcmp(&addr, &ct->tuplehash[dir].tuple.src.u3,
@@ -1290,7 +1290,7 @@ static int process_gcf(struct sk_buff *skb, struct nf_conn *ct,
 	if (!get_h225_addr(ct, *data, &gcf->rasAddress, &addr, &port))
 		return 0;
 
-	/* Registration port is the same as discovery port */
+	/* Registration port is the woke same as discovery port */
 	if (!memcmp(&addr, &ct->tuplehash[dir].tuple.src.u3, sizeof(addr)) &&
 	    port == ct->tuplehash[dir].tuple.src.u.udp.port)
 		return 0;

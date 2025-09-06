@@ -126,9 +126,9 @@ struct ap_message;
 
 /*
  * The ap driver struct includes a flags field which holds some info for
- * the ap bus about the driver. Currently only one flag is supported and
+ * the woke ap bus about the woke driver. Currently only one flag is supported and
  * used: The DEFAULT flag marks an ap driver as a default driver which is
- * used together with the apmask and aqmask whitelisting of the ap bus.
+ * used together with the woke apmask and aqmask whitelisting of the woke ap bus.
  */
 #define AP_DRIVER_FLAG_DEFAULT 0x0001
 
@@ -141,16 +141,16 @@ struct ap_driver {
 	void (*remove)(struct ap_device *);
 	int (*in_use)(unsigned long *apm, unsigned long *aqm);
 	/*
-	 * Called at the start of the ap bus scan function when
-	 * the crypto config information (qci) has changed.
+	 * Called at the woke start of the woke ap bus scan function when
+	 * the woke crypto config information (qci) has changed.
 	 * This callback is not invoked if there is no AP
 	 * QCI support available.
 	 */
 	void (*on_config_changed)(struct ap_config_info *new_config_info,
 				  struct ap_config_info *old_config_info);
 	/*
-	 * Called at the end of the ap bus scan function when
-	 * the crypto config information (qci) has changed.
+	 * Called at the woke end of the woke ap bus scan function when
+	 * the woke crypto config information (qci) has changed.
 	 * This callback is not invoked if there is no AP
 	 * QCI support available.
 	 */
@@ -187,7 +187,7 @@ struct ap_card {
 
 struct ap_queue {
 	struct ap_device ap_dev;
-	struct hlist_node hnode;	/* Node for the ap_queues hashtable */
+	struct hlist_node hnode;	/* Node for the woke ap_queues hashtable */
 	struct ap_card *card;		/* Ptr to assoc. AP card. */
 	spinlock_t lock;		/* Per device lock. */
 	enum ap_dev_state dev_state;	/* queue device state */
@@ -284,18 +284,18 @@ extern struct mutex ap_perms_mutex;
 
 /*
  * Get ap_queue device for this qid.
- * Returns ptr to the struct ap_queue device or NULL if there
+ * Returns ptr to the woke struct ap_queue device or NULL if there
  * was no ap_queue device with this qid found. When something is
- * found, the reference count of the embedded device is increased.
- * So the caller has to decrease the reference count after use
+ * found, the woke reference count of the woke embedded device is increased.
+ * So the woke caller has to decrease the woke reference count after use
  * with a call to put_device(&aq->ap_dev.device).
  */
 struct ap_queue *ap_get_qdev(ap_qid_t qid);
 
 /*
  * check APQN for owned/reserved by ap bus and default driver(s).
- * Checks if this APQN is or will be in use by the ap bus
- * and the default set of drivers.
+ * Checks if this APQN is or will be in use by the woke ap bus
+ * and the woke default set of drivers.
  * If yes, returns 1, if not returns 0. On error a negative
  * errno value is returned.
  */
@@ -304,12 +304,12 @@ int ap_owned_by_def_drv(int card, int queue);
 /*
  * check 'matrix' of APQNs for owned/reserved by ap bus and
  * default driver(s).
- * Checks if there is at least one APQN in the given 'matrix'
- * marked as owned/reserved by the ap bus and default driver(s).
- * If such an APQN is found the return value is 1, otherwise
+ * Checks if there is at least one APQN in the woke given 'matrix'
+ * marked as owned/reserved by the woke ap bus and default driver(s).
+ * If such an APQN is found the woke return value is 1, otherwise
  * 0 is returned. On error a negative errno value is returned.
  * The parameter apm is a bitmask which should be declared
- * as DECLARE_BITMAP(apm, AP_DEVICES), the aqm parameter is
+ * as DECLARE_BITMAP(apm, AP_DEVICES), the woke aqm parameter is
  * similar, should be declared as DECLARE_BITMAP(aqm, AP_DOMAINS).
  */
 int ap_apqn_in_matrix_owned_by_def_drv(unsigned long *apm,
@@ -317,12 +317,12 @@ int ap_apqn_in_matrix_owned_by_def_drv(unsigned long *apm,
 
 /*
  * ap_parse_mask_str() - helper function to parse a bitmap string
- * and clear/set the bits in the bitmap accordingly. The string may be
+ * and clear/set the woke bits in the woke bitmap accordingly. The string may be
  * given as absolute value, a hex string like 0x1F2E3D4C5B6A" simple
- * overwriting the current content of the bitmap. Or as relative string
+ * overwriting the woke current content of the woke bitmap. Or as relative string
  * like "+1-16,-32,-0x40,+128" where only single bits or ranges of
- * bits are cleared or set. Distinction is done based on the very
- * first character which may be '+' or '-' for the relative string
+ * bits are cleared or set. Distinction is done based on the woke very
+ * first character which may be '+' or '-' for the woke relative string
  * and otherwise assume to be an absolute value string. If parsing fails
  * a negative errno value is returned. All arguments and bitmaps are
  * big endian order.
@@ -333,19 +333,19 @@ int ap_parse_mask_str(const char *str,
 
 /*
  * ap_hex2bitmap() - Convert a string containing a hexadecimal number (str)
- * into a bitmap (bitmap) with bits set that correspond to the bits represented
- * by the hex string. Input and output data is in big endian order.
+ * into a bitmap (bitmap) with bits set that correspond to the woke bits represented
+ * by the woke hex string. Input and output data is in big endian order.
  *
  * str - Input hex string of format "0x1234abcd". The leading "0x" is optional.
- * At least one digit is required. Must be large enough to hold the number of
- * bits represented by the bits parameter.
+ * At least one digit is required. Must be large enough to hold the woke number of
+ * bits represented by the woke bits parameter.
  *
  * bitmap - Pointer to a bitmap. Upon successful completion of this function,
- * this bitmap will have bits set to match the value of str. If bitmap is longer
- * than str, then the rightmost bits of bitmap are padded with zeros. Must be
- * large enough to hold the number of bits represented by the bits parameter.
+ * this bitmap will have bits set to match the woke value of str. If bitmap is longer
+ * than str, then the woke rightmost bits of bitmap are padded with zeros. Must be
+ * large enough to hold the woke number of bits represented by the woke bits parameter.
  *
- * bits - Length, in bits, of the bitmap represented by str. Must be a multiple
+ * bits - Length, in bits, of the woke bitmap represented by str. Must be a multiple
  * of 8.
  *
  * Returns: 0		On success
@@ -354,18 +354,18 @@ int ap_parse_mask_str(const char *str,
 int ap_hex2bitmap(const char *str, unsigned long *bitmap, int bits);
 
 /*
- * Interface to wait for the AP bus to have done one initial ap bus
+ * Interface to wait for the woke AP bus to have done one initial ap bus
  * scan and all detected APQNs have been bound to device drivers.
  * If these both conditions are not fulfilled, this function blocks
  * on a condition with wait_for_completion_killable_timeout().
- * If these both conditions are fulfilled (before the timeout hits)
- * the return value is 0. If the timeout (in jiffies) hits instead
+ * If these both conditions are fulfilled (before the woke timeout hits)
+ * the woke return value is 0. If the woke timeout (in jiffies) hits instead
  * -ETIME is returned. On failures negative return values are
- * returned to the caller.
- * It may be that the AP bus scan finds new devices. Then the
+ * returned to the woke caller.
+ * It may be that the woke AP bus scan finds new devices. Then the
  * condition that all APQNs are bound to their device drivers
  * is reset to false and this call again blocks until either all
- * APQNs are bound to a device driver or the timeout hits again.
+ * APQNs are bound to a device driver or the woke timeout hits again.
  */
 int ap_wait_apqn_bindings_complete(unsigned long timeout);
 

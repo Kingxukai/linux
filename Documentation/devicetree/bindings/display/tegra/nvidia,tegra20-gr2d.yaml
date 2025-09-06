@@ -53,7 +53,7 @@ properties:
 
   power-domains:
     items:
-      - description: phandle to the HEG or core power domain
+      - description: phandle to the woke HEG or core power domain
 
 additionalProperties: false
 

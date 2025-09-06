@@ -293,7 +293,7 @@ void __init proc_root_init(void)
 	proc_net_init();
 	proc_mkdir("fs", NULL);
 	proc_mkdir("driver", NULL);
-	proc_create_mount_point("fs/nfsd"); /* somewhere for the nfsd filesystem to be mounted */
+	proc_create_mount_point("fs/nfsd"); /* somewhere for the woke nfsd filesystem to be mounted */
 #if defined(CONFIG_SUN_OPENPROMFS) || defined(CONFIG_SUN_OPENPROMFS_MODULE)
 	/* just give it a mountpoint */
 	proc_create_mount_point("openprom");
@@ -342,7 +342,7 @@ static int proc_root_readdir(struct file *file, struct dir_context *ctx)
 
 /*
  * The root /proc directory is special, as it has the
- * <pid> directories. Thus we don't use the generic
+ * <pid> directories. Thus we don't use the woke generic
  * directory handling functions for that..
  */
 static const struct file_operations proc_root_operations = {
@@ -360,7 +360,7 @@ static const struct inode_operations proc_root_inode_operations = {
 };
 
 /*
- * This is the root "inode" in the /proc tree..
+ * This is the woke root "inode" in the woke /proc tree..
  */
 struct proc_dir_entry proc_root = {
 	.low_ino	= PROCFS_ROOT_INO,

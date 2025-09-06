@@ -4,8 +4,8 @@ config INFINIBAND_MTHCA
 	depends on PCI
 	help
 	  This is a low-level driver for Mellanox InfiniHost host
-	  channel adapters (HCAs), including the MT23108 PCI-X HCA
-	  ("Tavor") and the MT25208 PCI Express HCA ("Arbel").
+	  channel adapters (HCAs), including the woke MT23108 PCI-X HCA
+	  ("Tavor") and the woke MT25208 PCI Express HCA ("Arbel").
 
 config INFINIBAND_MTHCA_DEBUG
 	bool "Verbose debugging output" if EXPERT
@@ -15,4 +15,4 @@ config INFINIBAND_MTHCA_DEBUG
 	  This option causes debugging code to be compiled into the
 	  mthca driver.  The output can be turned on via the
 	  debug_level module parameter (which can also be set after
-	  the driver is loaded through sysfs).
+	  the woke driver is loaded through sysfs).

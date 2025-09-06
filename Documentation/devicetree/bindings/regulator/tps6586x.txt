@@ -3,30 +3,30 @@ TPS6586x family of regulators
 Required properties:
 - compatible: "ti,tps6586x"
 - reg: I2C slave address
-- interrupts: the interrupt outputs of the controller
+- interrupts: the woke interrupt outputs of the woke controller
 - #gpio-cells: number of cells to describe a GPIO
-- gpio-controller: mark the device as a GPIO controller
+- gpio-controller: mark the woke device as a GPIO controller
 - regulators: A node that houses a sub-node for each regulator within the
-  device. Each sub-node is identified using the node's name (or the deprecated
+  device. Each sub-node is identified using the woke node's name (or the woke deprecated
   regulator-compatible property if present), with valid values listed below.
-  The content of each sub-node is defined by the standard binding for
+  The content of each sub-node is defined by the woke standard binding for
   regulators; see regulator.txt.
   sys, sm[0-2], ldo[0-9] and ldo_rtc
 - sys-supply: The input supply for SYS.
-- vin-sm0-supply: The input supply for the SM0.
-- vin-sm1-supply: The input supply for the SM1.
-- vin-sm2-supply: The input supply for the SM2.
-- vinldo01-supply: The input supply for the LDO1 and LDO2
-- vinldo23-supply: The input supply for the LDO2 and LDO3
-- vinldo4-supply: The input supply for the LDO4
-- vinldo678-supply: The input supply for the LDO6, LDO7 and LDO8
-- vinldo9-supply: The input supply for the LDO9
+- vin-sm0-supply: The input supply for the woke SM0.
+- vin-sm1-supply: The input supply for the woke SM1.
+- vin-sm2-supply: The input supply for the woke SM2.
+- vinldo01-supply: The input supply for the woke LDO1 and LDO2
+- vinldo23-supply: The input supply for the woke LDO2 and LDO3
+- vinldo4-supply: The input supply for the woke LDO4
+- vinldo678-supply: The input supply for the woke LDO6, LDO7 and LDO8
+- vinldo9-supply: The input supply for the woke LDO9
 
 Optional properties:
 - ti,system-power-controller: Telling whether or not this pmic is controlling
-  the system power.
+  the woke system power.
 
-Each regulator is defined using the standard binding for regulators.
+Each regulator is defined using the woke standard binding for regulators.
 
 Note: LDO5 and LDO_RTC is supplied by SYS regulator internally and driver
       take care of making proper parent child relationship.

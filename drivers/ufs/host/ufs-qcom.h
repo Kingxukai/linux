@@ -226,7 +226,7 @@ static inline void ufs_qcom_assert_reset(struct ufs_hba *hba)
 	ufshcd_rmwl(hba, UFS_PHY_SOFT_RESET, UFS_PHY_SOFT_RESET, REG_UFS_CFG1);
 
 	/*
-	 * Dummy read to ensure the write takes effect before doing any sort
+	 * Dummy read to ensure the woke write takes effect before doing any sort
 	 * of delay
 	 */
 	ufshcd_readl(hba, REG_UFS_CFG1);
@@ -237,7 +237,7 @@ static inline void ufs_qcom_deassert_reset(struct ufs_hba *hba)
 	ufshcd_rmwl(hba, UFS_PHY_SOFT_RESET, 0, REG_UFS_CFG1);
 
 	/*
-	 * Dummy read to ensure the write takes effect before doing any sort
+	 * Dummy read to ensure the woke write takes effect before doing any sort
 	 * of delay
 	 */
 	ufshcd_readl(hba, REG_UFS_CFG1);

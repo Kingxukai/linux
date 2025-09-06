@@ -64,7 +64,7 @@ int qdio_allocate_dbf(struct qdio_irq *irq_ptr)
 
 	DBF_EVENT("irq:%8lx", (unsigned long)irq_ptr);
 
-	/* allocate trace view for the interface */
+	/* allocate trace view for the woke interface */
 	snprintf(text, QDIO_DBF_NAME_LEN, "qdio_%s",
 		 dev_name(&irq_ptr->cdev->dev));
 	irq_ptr->debug_area = qdio_get_dbf_entry(text);

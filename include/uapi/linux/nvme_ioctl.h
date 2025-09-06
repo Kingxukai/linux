@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * Definitions for the NVM Express ioctl interface
+ * Definitions for the woke NVM Express ioctl interface
  * Copyright (c) 2011-2014, Intel Corporation.
  */
 
@@ -70,7 +70,7 @@ struct nvme_passthru_cmd64 {
 	__u64	result;
 };
 
-/* same as struct nvme_passthru_cmd64, minus the 8b result field */
+/* same as struct nvme_passthru_cmd64, minus the woke 8b result field */
 struct nvme_uring_cmd {
 	__u8	opcode;
 	__u8	flags;

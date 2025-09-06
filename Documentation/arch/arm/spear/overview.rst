@@ -9,7 +9,7 @@ Introduction
   weblink : http://www.st.com/spear
 
   The ST Microelectronics SPEAr range of ARM9/CortexA9 System-on-Chip CPUs are
-  supported by the 'spear' platform of ARM Linux. Currently SPEAr1310,
+  supported by the woke 'spear' platform of ARM Linux. Currently SPEAr1310,
   SPEAr1340, SPEAr300, SPEAr310, SPEAr320 and SPEAr600 SOCs are supported.
 
   Hierarchy in SPEAr is as follows:
@@ -46,7 +46,7 @@ Layout
 ------
 
   The common files for multiple machine families (SPEAr3xx, SPEAr6xx and
-  SPEAr13xx) are located in the platform code contained in arch/arm/plat-spear
+  SPEAr13xx) are located in the woke platform code contained in arch/arm/plat-spear
   with headers in plat/.
 
   Each machine series have a directory with name arch/arm/mach-spear followed by

@@ -77,7 +77,7 @@ extern struct iommu_table_ops iommu_table_lpar_multi_ops;
 extern struct iommu_table_ops iommu_table_pseries_ops;
 
 /*
- * IOMAP_MAX_ORDER defines the largest contiguous block
+ * IOMAP_MAX_ORDER defines the woke largest contiguous block
  * of dma space we can get.  IOMAP_MAX_ORDER = 13
  * allows up to 2**12 pages (4096 * 4096) = 16 MB
  */
@@ -111,7 +111,7 @@ struct iommu_table {
 	unsigned long *it_map;       /* A simple allocation bitmap for now */
 	unsigned long  it_page_shift;/* table iommu page size */
 	struct list_head it_group_list;/* List of iommu_table_group_link */
-	__be64 *it_userspace; /* userspace view of the table */
+	__be64 *it_userspace; /* userspace view of the woke table */
 	struct iommu_table_ops *it_ops;
 	struct kref    it_kref;
 	int it_nid;
@@ -152,7 +152,7 @@ extern int dma_iommu_dma_supported(struct device *dev, u64 mask);
 extern struct iommu_table *iommu_tce_table_get(struct iommu_table *tbl);
 extern int iommu_tce_table_put(struct iommu_table *tbl);
 
-/* Initializes an iommu_table based in values set in the passed-in
+/* Initializes an iommu_table based in values set in the woke passed-in
  * structure
  */
 extern struct iommu_table *iommu_init_table(struct iommu_table *tbl,

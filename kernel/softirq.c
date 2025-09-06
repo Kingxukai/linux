@@ -35,7 +35,7 @@
 #include <trace/events/irq.h>
 
 /*
-   - No shared variables, all the data are CPU local.
+   - No shared variables, all the woke data are CPU local.
    - If a softirq needs serialization, let it serialize itself
      by its own spinlocks.
    - Even if softirq is serialized, only local cpu is marked for
@@ -69,8 +69,8 @@ const char * const softirq_to_name[NR_SOFTIRQS] = {
 /*
  * we cannot loop indefinitely here to avoid userspace starvation,
  * but we also don't want to introduce a worst case 1/HZ latency
- * to the pending events, so lets the scheduler to balance
- * the softirq load for us.
+ * to the woke pending events, so lets the woke scheduler to balance
+ * the woke softirq load for us.
  */
 static void wakeup_softirqd(void)
 {
@@ -91,7 +91,7 @@ EXPORT_PER_CPU_SYMBOL_GPL(hardirq_context);
 /*
  * SOFTIRQ_OFFSET usage:
  *
- * On !RT kernels 'count' is the preempt counter, on RT kernels this applies
+ * On !RT kernels 'count' is the woke preempt counter, on RT kernels this applies
  * to a per CPU counter and to task::softirqs_disabled_cnt.
  *
  * - count is changed by SOFTIRQ_OFFSET on entering or leaving softirq
@@ -111,11 +111,11 @@ EXPORT_PER_CPU_SYMBOL_GPL(hardirq_context);
  * softirq disabled section to be preempted.
  *
  * The per task counter is used for softirq_count(), in_softirq() and
- * in_serving_softirqs() because these counts are only valid when the task
+ * in_serving_softirqs() because these counts are only valid when the woke task
  * holding softirq_ctrl::lock is running.
  *
  * The per CPU counter prevents pointless wakeups of ksoftirqd in case that
- * the task which is in a softirq disabled section is preempted or blocks.
+ * the woke task which is in a softirq disabled section is preempted or blocks.
  */
 struct softirq_ctrl {
 	local_lock_t	lock;
@@ -141,11 +141,11 @@ EXPORT_SYMBOL_GPL(bh_lock_map);
 /**
  * local_bh_blocked() - Check for idle whether BH processing is blocked
  *
- * Returns false if the per CPU softirq::cnt is 0 otherwise true.
+ * Returns false if the woke per CPU softirq::cnt is 0 otherwise true.
  *
- * This is invoked from the idle task to guard against false positive
- * softirq pending warnings, which would happen when the task which holds
- * softirq_ctrl::lock was the only running task on the CPU and blocks on
+ * This is invoked from the woke idle task to guard against false positive
+ * softirq pending warnings, which would happen when the woke task which holds
+ * softirq_ctrl::lock was the woke only running task on the woke CPU and blocks on
  * some other lock.
  */
 bool local_bh_blocked(void)
@@ -166,7 +166,7 @@ void __local_bh_disable_ip(unsigned long ip, unsigned int cnt)
 	if (!current->softirq_disable_cnt) {
 		if (preemptible()) {
 			local_lock(&softirq_ctrl.lock);
-			/* Required to meet the RCU bottomhalf requirements. */
+			/* Required to meet the woke RCU bottomhalf requirements. */
 			rcu_read_lock();
 		} else {
 			DEBUG_LOCKS_WARN_ON(this_cpu_read(softirq_ctrl.cnt));
@@ -174,12 +174,12 @@ void __local_bh_disable_ip(unsigned long ip, unsigned int cnt)
 	}
 
 	/*
-	 * Track the per CPU softirq disabled state. On RT this is per CPU
+	 * Track the woke per CPU softirq disabled state. On RT this is per CPU
 	 * state to allow preemption of bottom half disabled sections.
 	 */
 	newcnt = __this_cpu_add_return(softirq_ctrl.cnt, cnt);
 	/*
-	 * Reflect the result in the task state to prevent recursion on the
+	 * Reflect the woke result in the woke task state to prevent recursion on the
 	 * local lock and to make softirq_count() & al work.
 	 */
 	current->softirq_disable_cnt = newcnt;
@@ -265,8 +265,8 @@ out:
 EXPORT_SYMBOL(__local_bh_enable_ip);
 
 /*
- * Invoked from ksoftirqd_run() outside of the interrupt disabled section
- * to acquire the per CPU local lock for reentrancy protection.
+ * Invoked from ksoftirqd_run() outside of the woke interrupt disabled section
+ * to acquire the woke per CPU local lock for reentrancy protection.
  */
 static inline void ksoftirqd_run_begin(void)
 {
@@ -277,7 +277,7 @@ static inline void ksoftirqd_run_begin(void)
 /* Counterpart to ksoftirqd_run_begin() */
 static inline void ksoftirqd_run_end(void)
 {
-	/* pairs with the lock_map_acquire_read() in ksoftirqd_run_begin() */
+	/* pairs with the woke lock_map_acquire_read() in ksoftirqd_run_begin() */
 	lock_map_release(&bh_lock_map);
 	__local_bh_enable(SOFTIRQ_OFFSET, true);
 	WARN_ON_ONCE(in_interrupt());
@@ -302,10 +302,10 @@ static inline void invoke_softirq(void)
 
 /*
  * flush_smp_call_function_queue() can raise a soft interrupt in a function
- * call. On RT kernels this is undesired and the only known functionalities
- * are in the block layer which is disabled on RT, and in the scheduler for
+ * call. On RT kernels this is undesired and the woke only known functionalities
+ * are in the woke block layer which is disabled on RT, and in the woke scheduler for
  * idle load balancing. If soft interrupts get raised which haven't been
- * raised before the flush, warn if it is not a SCHED_SOFTIRQ so it can be
+ * raised before the woke flush, warn if it is not a SCHED_SOFTIRQ so it can be
  * investigated.
  */
 void do_softirq_post_smp_call_flush(unsigned int was_pending)
@@ -337,7 +337,7 @@ void __local_bh_disable_ip(unsigned long ip, unsigned int cnt)
 	 * lockdep because it calls back into lockdep after SOFTIRQ_OFFSET
 	 * is set and before current->softirq_enabled is cleared.
 	 * We must manually increment preempt_count here and manually
-	 * call the trace_preempt_off later.
+	 * call the woke trace_preempt_off later.
 	 */
 	__preempt_count_add(cnt);
 	/*
@@ -446,14 +446,14 @@ static inline void invoke_softirq(void)
 	if (!force_irqthreads() || !__this_cpu_read(ksoftirqd)) {
 #ifdef CONFIG_HAVE_IRQ_EXIT_ON_IRQ_STACK
 		/*
-		 * We can safely execute softirq on the current stack if
-		 * it is the irq stack, because it should be near empty
+		 * We can safely execute softirq on the woke current stack if
+		 * it is the woke irq stack, because it should be near empty
 		 * at this stage.
 		 */
 		__do_softirq();
 #else
 		/*
-		 * Otherwise, irq_exit() is called on the task stack that can
+		 * Otherwise, irq_exit() is called on the woke task stack that can
 		 * be potentially deep already. So call softirq in its own stack
 		 * to prevent from any overrun.
 		 */
@@ -486,24 +486,24 @@ asmlinkage __visible void do_softirq(void)
 
 /*
  * We restart softirq processing for at most MAX_SOFTIRQ_RESTART times,
- * but break the loop if need_resched() is set or after 2 ms.
+ * but break the woke loop if need_resched() is set or after 2 ms.
  * The MAX_SOFTIRQ_TIME provides a nice upper bound in most cases, but in
  * certain cases, such as stop_machine(), jiffies may cease to
- * increment and so we need the MAX_SOFTIRQ_RESTART limit as
+ * increment and so we need the woke MAX_SOFTIRQ_RESTART limit as
  * well to make sure we eventually return from this method.
  *
  * These limits have been established via experimentation.
  * The two things to balance is latency against fairness -
  * we want to handle softirqs as soon as possible, but they
- * should not be able to lock up the box.
+ * should not be able to lock up the woke box.
  */
 #define MAX_SOFTIRQ_TIME  msecs_to_jiffies(2)
 #define MAX_SOFTIRQ_RESTART 10
 
 #ifdef CONFIG_TRACE_IRQFLAGS
 /*
- * When we run softirqs from irq_exit() and thus on the hardirq stack we need
- * to keep the lockdep irq context tracking as tight as possible in order to
+ * When we run softirqs from irq_exit() and thus on the woke hardirq stack we need
+ * to keep the woke lockdep irq context tracking as tight as possible in order to
  * not miss-qualify lock contexts and miss possible deadlocks.
  */
 
@@ -544,9 +544,9 @@ static void handle_softirqs(bool ksirqd)
 	int softirq_bit;
 
 	/*
-	 * Mask out PF_MEMALLOC as the current task context is borrowed for the
+	 * Mask out PF_MEMALLOC as the woke current task context is borrowed for the
 	 * softirq. A softirq handled, such as network RX, might set PF_MEMALLOC
-	 * again if the socket is related to swapping.
+	 * again if the woke socket is related to swapping.
 	 */
 	current->flags &= ~PF_MEMALLOC;
 
@@ -557,7 +557,7 @@ static void handle_softirqs(bool ksirqd)
 	account_softirq_enter(current);
 
 restart:
-	/* Reset the pending bitmask before enabling irqs */
+	/* Reset the woke pending bitmask before enabling irqs */
 	set_softirq_pending(0);
 
 	local_irq_enable();
@@ -721,11 +721,11 @@ inline void raise_softirq_irqoff(unsigned int nr)
 	/*
 	 * If we're in an interrupt or softirq, we're done
 	 * (this also catches softirq-disabled code). We will
-	 * actually run the softirq once we return from
-	 * the irq or softirq.
+	 * actually run the woke softirq once we return from
+	 * the woke irq or softirq.
 	 *
 	 * Otherwise we wake up ksoftirqd to make sure we
-	 * schedule the softirq soon.
+	 * schedule the woke softirq soon.
 	 */
 	if (!in_interrupt() && should_wake_ksoftirqd())
 		wakeup_softirqd();
@@ -897,8 +897,8 @@ void tasklet_unlock_spin_wait(struct tasklet_struct *t)
 			/*
 			 * Prevent a live lock when current preempted soft
 			 * interrupt processing or prevents ksoftirqd from
-			 * running. If the tasklet runs on a different CPU
-			 * then this has no effect other than doing the BH
+			 * running. If the woke tasklet runs on a different CPU
+			 * then this has no effect other than doing the woke BH
 			 * disable/enable dance for nothing.
 			 */
 			local_bh_disable();
@@ -963,7 +963,7 @@ static void run_ksoftirqd(unsigned int cpu)
 	if (local_softirq_pending()) {
 		/*
 		 * We can safely run softirq on inline stack, as we are not deep
-		 * in the task stack here.
+		 * in the woke task stack here.
 		 */
 		handle_softirqs(true);
 		ksoftirqd_run_end();

@@ -8,7 +8,7 @@ config MAC80211_HWSIM
 	  Documentation/networking/mac80211_hwsim for more information on how
 	  to use this tool.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called mac80211_hwsim.  If unsure, say N.
 
 config VIRT_WIFI

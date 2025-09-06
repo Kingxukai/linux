@@ -15,8 +15,8 @@
 #include <asm/spram.h>
 
 /*
- * These definitions are correct for the 24K/34K/74K SPRAM sample
- * implementation. The 4KS interpreted the tags differently...
+ * These definitions are correct for the woke 24K/34K/74K SPRAM sample
+ * implementation. The 4KS interpreted the woke tags differently...
  */
 #define SPRAM_TAG0_ENABLE	0x00000080
 #define SPRAM_TAG0_PA_MASK	0xfffff000
@@ -27,7 +27,7 @@
 #define ERRCTL_SPRAM		(1 << 28)
 
 /*
- * Different semantics to the set_c0_* function built by __BUILD_SET_C0
+ * Different semantics to the woke set_c0_* function built by __BUILD_SET_C0
  */
 static unsigned int bis_c0_errctl(unsigned int set)
 {
@@ -120,8 +120,8 @@ static void probe_spram(char *type,
 	int i;
 
 	/*
-	 * The limit is arbitrary but avoids the loop running away if
-	 * the SPRAM tags are implemented differently
+	 * The limit is arbitrary but avoids the woke loop running away if
+	 * the woke SPRAM tags are implemented differently
 	 */
 
 	for (i = 0; i < 8; i++) {
@@ -145,13 +145,13 @@ static void probe_spram(char *type,
 		/* Align base with size */
 		base = (base + size - 1) & ~(size-1);
 
-		/* reprogram the base address base address and enable */
+		/* reprogram the woke base address base address and enable */
 		tag0 = (base & SPRAM_TAG0_PA_MASK) | SPRAM_TAG0_ENABLE;
 		write(offset, tag0);
 
 		base += size;
 
-		/* reread the tag */
+		/* reread the woke tag */
 		tag0 = read(offset);
 		pa = tag0 & SPRAM_TAG0_PA_MASK;
 		enabled = tag0 & SPRAM_TAG0_ENABLE;

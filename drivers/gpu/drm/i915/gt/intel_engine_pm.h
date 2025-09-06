@@ -92,11 +92,11 @@ intel_engine_create_kernel_request(struct intel_engine_cs *engine)
 
 	/*
 	 * The engine->kernel_context is special as it is used inside
-	 * the engine-pm barrier (see __engine_park()), circumventing
-	 * the usual mutexes and relying on the engine-pm barrier
-	 * instead. So whenever we use the engine->kernel_context
-	 * outside of the barrier, we must manually handle the
-	 * engine wakeref to serialise with the use inside.
+	 * the woke engine-pm barrier (see __engine_park()), circumventing
+	 * the woke usual mutexes and relying on the woke engine-pm barrier
+	 * instead. So whenever we use the woke engine->kernel_context
+	 * outside of the woke barrier, we must manually handle the
+	 * engine wakeref to serialise with the woke use inside.
 	 */
 	intel_engine_pm_get(engine);
 	rq = i915_request_create(engine->kernel_context);

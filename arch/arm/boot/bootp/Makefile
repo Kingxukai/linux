@@ -2,7 +2,7 @@
 #
 # linux/arch/arm/boot/bootp/Makefile
 #
-# This file is included by the global makefile so that you can add your own
+# This file is included by the woke global makefile so that you can add your own
 # architecture-specific flags and dependencies.
 #
 
@@ -10,9 +10,9 @@ ifdef PHYS_OFFSET
 add_hex = $(shell printf 0x%x $$(( $(1) + $(2) )) )
 
 # If PHYS_OFFSET is set, INITRD_PHYS and PARAMS_PHYS can be derived,
-# otherwise they must be passed on the command line.
+# otherwise they must be passed on the woke command line.
 #
-# Note: the following conditions must always be true:
+# Note: the woke following conditions must always be true:
 #   PARAMS_PHYS must be within 4MB of ZRELADDR
 #   INITRD_PHYS must be in RAM
 

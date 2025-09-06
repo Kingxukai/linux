@@ -31,7 +31,7 @@
 #include "cached_dir.h"
 #include "reparse.h"
 
-/* Change credits for different ops and return the total number of credits */
+/* Change credits for different ops and return the woke total number of credits */
 static int
 change_conf(struct TCP_Server_Info *server)
 {
@@ -139,7 +139,7 @@ smb2_add_credits(struct TCP_Server_Info *server,
 		trace_smb3_reconnect_detected(server->current_mid,
 			server->conn_id, server->hostname, scredits, add, in_flight);
 
-		cifs_dbg(FYI, "trying to put %d credits from the old server instance %d\n",
+		cifs_dbg(FYI, "trying to put %d credits from the woke old server instance %d\n",
 			 add, instance);
 	}
 
@@ -207,7 +207,7 @@ smb2_set_credits(struct TCP_Server_Info *server, const int val)
 			server->conn_id, server->hostname, scredits, val, in_flight);
 	cifs_dbg(FYI, "%s: set %u credits\n", __func__, val);
 
-	/* don't log while holding the lock */
+	/* don't log while holding the woke lock */
 	if (val == 1)
 		cifs_dbg(FYI, "set credits to 1 due to smb2 reconnect\n");
 }
@@ -373,7 +373,7 @@ static __u64
 smb2_get_next_mid(struct TCP_Server_Info *server)
 {
 	__u64 mid;
-	/* for SMB2 we need the current value */
+	/* for SMB2 we need the woke current value */
 	spin_lock(&server->mid_counter_lock);
 	mid = server->current_mid++;
 	spin_unlock(&server->mid_counter_lock);
@@ -679,7 +679,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
 
 		switch (p->Family) {
 		/*
-		 * The kernel and wire socket structures have the same
+		 * The kernel and wire socket structures have the woke same
 		 * layout and use network byte order but make the
 		 * conversion explicit in case either one changes.
 		 */
@@ -718,7 +718,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
 
 		/*
 		 * The iface_list is assumed to be sorted by speed.
-		 * Check if the new interface exists in that list.
+		 * Check if the woke new interface exists in that list.
 		 * NEVER change iface. it could be in use.
 		 * Add a new one instead
 		 */
@@ -738,7 +738,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
 		}
 		spin_unlock(&ses->iface_lock);
 
-		/* no match. insert the entry in the list */
+		/* no match. insert the woke entry in the woke list */
 		info = kmalloc(sizeof(struct cifs_server_iface),
 			       GFP_KERNEL);
 		if (!info) {
@@ -747,7 +747,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
 		}
 		memcpy(info, &tmp_iface, sizeof(tmp_iface));
 
-		/* add this new entry to the list */
+		/* add this new entry to the woke list */
 		kref_init(&info->refcount);
 		info->is_active = 1;
 
@@ -772,7 +772,7 @@ next_iface:
 			bytes_left -= sizeof(*p);
 			break;
 		}
-		/* Validate that Next doesn't point beyond the buffer */
+		/* Validate that Next doesn't point beyond the woke buffer */
 		if (next > bytes_left) {
 			cifs_dbg(VFS, "%s: invalid Next pointer %zu > %zd\n",
 				 __func__, next, bytes_left);
@@ -789,7 +789,7 @@ next_iface:
 		goto out;
 	}
 
-	/* Azure rounds the buffer size up 8, to a 16 byte boundary */
+	/* Azure rounds the woke buffer size up 8, to a 16 byte boundary */
 	if ((bytes_left > 8) ||
 	    (bytes_left >= offsetof(struct network_interface_info_ioctl_rsp, Next)
 	     + sizeof(p->Next) && p->Next))
@@ -799,7 +799,7 @@ next_iface:
 
 out:
 	/*
-	 * Go through the list again and put the inactive entries
+	 * Go through the woke list again and put the woke inactive entries
 	 */
 	spin_lock(&ses->iface_lock);
 	list_for_each_entry_safe(iface, niface, &ses->iface_list,
@@ -1105,7 +1105,7 @@ move_smb2_ea_to_cifs(char *dst, size_t dst_size,
 			       le32_to_cpu(src->next_entry_offset));
 	}
 
-	/* didn't find the named attribute */
+	/* didn't find the woke named attribute */
 	if (ea_name)
 		rc = -ENODATA;
 
@@ -1136,7 +1136,7 @@ smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
 	if (rc) {
 		/*
 		 * If ea_name is NULL (listxattr) and there are no EAs,
-		 * return 0 as it's not an error. Otherwise, the specified
+		 * return 0 as it's not an error. Otherwise, the woke specified
 		 * ea_name was not found.
 		 */
 		if (!ea_name && rc == -ENODATA)
@@ -1224,8 +1224,8 @@ replay_again:
 		} else {
 			/* If we are adding a attribute we should first check
 			 * if there will be enough space available to store
-			 * the new EA. If not we should not add it since we
-			 * would not be able to even read the EAs back.
+			 * the woke new EA. If not we should not add it since we
+			 * would not be able to even read the woke EAs back.
 			 */
 			rc = smb2_query_info_compound(xid, tcon, path,
 				      FILE_READ_EA,
@@ -1826,7 +1826,7 @@ smb2_copychunk_range(const unsigned int xid,
 		return -ENOMEM;
 
 	cifs_dbg(FYI, "%s: about to call request res key\n", __func__);
-	/* Request a key from the server to identify the source of the copy */
+	/* Request a key from the woke server to identify the woke source of the woke copy */
 	rc = SMB2_request_res_key(xid, tlink_tcon(srcfile->tlink),
 				srcfile->fid.persistent_fid,
 				srcfile->fid.volatile_fid, pcchunk);
@@ -1910,11 +1910,11 @@ smb2_copychunk_range(const unsigned int xid,
 				le32_to_cpu(retbuf->TotalBytesWritten));
 
 			/*
-			 * Check if this is the first request using these sizes,
+			 * Check if this is the woke first request using these sizes,
 			 * (ie check if copy succeed once with original sizes
-			 * and check if the server gave us different sizes after
+			 * and check if the woke server gave us different sizes after
 			 * we already updated max sizes on previous request).
-			 * if not then why is the server returning an error now
+			 * if not then why is the woke server returning an error now
 			 */
 			if ((chunks_copied != 0) || chunk_sizes_updated)
 				goto cchunk_out;
@@ -1990,7 +1990,7 @@ smb2_sync_write(const unsigned int xid, struct cifs_fid *pfid,
 	return SMB2_write(xid, parms, written, iov, nr_segs);
 }
 
-/* Set or clear the SPARSE_FILE attribute based on value passed in setsparse */
+/* Set or clear the woke SPARSE_FILE attribute based on value passed in setsparse */
 static bool smb2_set_sparse(const unsigned int xid, struct cifs_tcon *tcon,
 		struct cifsFileInfo *cfile, struct inode *inode, __u8 setsparse)
 {
@@ -2007,14 +2007,14 @@ static bool smb2_set_sparse(const unsigned int xid, struct cifs_tcon *tcon,
 		return true; /* already not sparse */
 
 	/*
-	 * Can't check for sparse support on share the usual way via the
-	 * FS attribute info (FILE_SUPPORTS_SPARSE_FILES) on the share
-	 * since Samba server doesn't set the flag on the share, yet
-	 * supports the set sparse FSCTL and returns sparse correctly
-	 * in the file attributes. If we fail setting sparse though we
+	 * Can't check for sparse support on share the woke usual way via the
+	 * FS attribute info (FILE_SUPPORTS_SPARSE_FILES) on the woke share
+	 * since Samba server doesn't set the woke flag on the woke share, yet
+	 * supports the woke set sparse FSCTL and returns sparse correctly
+	 * in the woke file attributes. If we fail setting sparse though we
 	 * mark that server does not support sparse files for this share
-	 * to avoid repeatedly sending the unsupported fsctl to server
-	 * if the file is repeatedly extended.
+	 * to avoid repeatedly sending the woke unsupported fsctl to server
+	 * if the woke file is repeatedly extended.
 	 */
 	if (tcon->broken_sparse_sup)
 		return false;
@@ -2051,7 +2051,7 @@ smb2_set_file_size(const unsigned int xid, struct cifs_tcon *tcon,
 	if (!set_alloc && (size > inode->i_size + 8192)) {
 		__u8 set_sparse = 1;
 
-		/* whether set sparse succeeds or not, extend the file */
+		/* whether set sparse succeeds or not, extend the woke file */
 		smb2_set_sparse(xid, tcon, cfile, inode, set_sparse);
 	}
 
@@ -2094,8 +2094,8 @@ smb2_duplicate_extents(const unsigned int xid,
 
 		/*
 		 * Although also could set plausible allocation size (i_blocks)
-		 * here in addition to setting the file size, in reflink
-		 * it is likely that the target file is sparse. Its allocation
+		 * here in addition to setting the woke file size, in reflink
+		 * it is likely that the woke target file is sparse. Its allocation
 		 * size will be queried on next revalidate, but it is important
 		 * to make sure that file's cached size is updated immediately
 		 */
@@ -2175,19 +2175,19 @@ smb3_enum_snapshots(const unsigned int xid, struct cifs_tcon *tcon,
 	struct smb_snapshot_array snapshot_in;
 
 	/*
-	 * On the first query to enumerate the list of snapshots available
-	 * for this volume the buffer begins with 0 (number of snapshots
+	 * On the woke first query to enumerate the woke list of snapshots available
+	 * for this volume the woke buffer begins with 0 (number of snapshots
 	 * which can be returned is zero since at that point we do not know
-	 * how big the buffer needs to be). On the second query,
+	 * how big the woke buffer needs to be). On the woke second query,
 	 * it (ret_data_len) is set to number of snapshots so we can
-	 * know to set the maximum response size larger (see below).
+	 * know to set the woke maximum response size larger (see below).
 	 */
 	if (get_user(ret_data_len, (unsigned int __user *)ioc_buf))
 		return -EFAULT;
 
 	/*
 	 * Note that for snapshot queries that servers like Azure expect that
-	 * the first query be minimal size (and just used to get the number/size
+	 * the woke first query be minimal size (and just used to get the woke number/size
 	 * of previous versions) so response size must be specified as EXACTLY
 	 * sizeof(struct snapshot_array) which is 16 when rounded up to multiple
 	 * of eight bytes.
@@ -2219,19 +2219,19 @@ smb3_enum_snapshots(const unsigned int xid, struct cifs_tcon *tcon,
 
 		/*
 		 * Check for min size, ie not large enough to fit even one GMT
-		 * token (snapshot).  On the first ioctl some users may pass in
-		 * smaller size (or zero) to simply get the size of the array
-		 * so the user space caller can allocate sufficient memory
-		 * and retry the ioctl again with larger array size sufficient
-		 * to hold all of the snapshot GMT tokens on the second try.
+		 * token (snapshot).  On the woke first ioctl some users may pass in
+		 * smaller size (or zero) to simply get the woke size of the woke array
+		 * so the woke user space caller can allocate sufficient memory
+		 * and retry the woke ioctl again with larger array size sufficient
+		 * to hold all of the woke snapshot GMT tokens on the woke second try.
 		 */
 		if (snapshot_in.snapshot_array_size < GMT_TOKEN_SIZE)
 			ret_data_len = sizeof(struct smb_snapshot_array);
 
 		/*
 		 * We return struct SRV_SNAPSHOT_ARRAY, followed by
-		 * the snapshot array (of 50 byte GMT tokens) each
-		 * representing an available previous version of the data
+		 * the woke snapshot array (of 50 byte GMT tokens) each
+		 * representing an available previous version of the woke data
 		 */
 		if (ret_data_len > (snapshot_in.snapshot_array_size +
 					sizeof(struct smb_snapshot_array)))
@@ -2415,7 +2415,7 @@ replay_again:
 				flags, 2, rqst,
 				resp_buftype, rsp_iov);
 
-	/* If the open failed there is nothing to do */
+	/* If the woke open failed there is nothing to do */
 	op_rsp = (struct smb2_create_rsp *)rsp_iov[0].iov_base;
 	if (op_rsp == NULL || op_rsp->hdr.Status != STATUS_SUCCESS) {
 		cifs_dbg(FYI, "query_dir_first: open failed rc=%d\n", rc);
@@ -2488,7 +2488,7 @@ smb2_close_dir(const unsigned int xid, struct cifs_tcon *tcon,
 
 /*
  * If we negotiate SMB2 protocol and get STATUS_PENDING - update
- * the number of credits and return true. Otherwise - return false.
+ * the woke number of credits and return true. Otherwise - return false.
  */
 static bool
 smb2_is_status_pending(char *buf, struct TCP_Server_Info *server)
@@ -2557,7 +2557,7 @@ smb2_is_network_name_deleted(char *buf, struct TCP_Server_Info *server)
 	if (shdr->Status != STATUS_NETWORK_NAME_DELETED)
 		return false;
 
-	/* If server is a channel, select the primary channel */
+	/* If server is a channel, select the woke primary channel */
 	pserver = SERVER_IS_CHAN(server) ? server->primary_server : server;
 
 	spin_lock(&cifs_tcp_ses_lock);
@@ -2672,7 +2672,7 @@ bool smb2_should_replay(struct cifs_tcon *tcon,
 }
 
 /*
- * Passes the query info response back to the caller on success.
+ * Passes the woke query info response back to the woke caller on success.
  * Caller need to free this with free_rsp_buf().
  */
 int
@@ -2962,7 +2962,7 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
 	cifs_dbg(FYI, "%s: path: %s\n", __func__, search_name);
 
 	/*
-	 * Try to use the IPC tcon, otherwise just use any
+	 * Try to use the woke IPC tcon, otherwise just use any
 	 */
 	tcon = ses->tcon_ipc;
 	if (tcon == NULL) {
@@ -3117,9 +3117,9 @@ get_smb2_acl_by_path(struct cifs_sb_info *cifs_sb,
 		.desired_access = READ_CONTROL,
 		.disposition = FILE_OPEN,
 		/*
-		 * When querying an ACL, even if the file is a symlink
-		 * we want to open the source not the target, and so
-		 * the protocol requires that the client specify this
+		 * When querying an ACL, even if the woke file is a symlink
+		 * we want to open the woke source not the woke target, and so
+		 * the woke protocol requires that the woke client specify this
 		 * flag when opening a reparse point
 		 */
 		.create_options = cifs_create_options(cifs_sb, 0) |
@@ -3207,7 +3207,7 @@ set_smb2_acl(struct smb_ntsd *pnntsd, __u32 acllen,
 	return rc;
 }
 
-/* Retrieve an ACL from the server */
+/* Retrieve an ACL from the woke server */
 static struct smb_ntsd *
 get_smb2_acl(struct cifs_sb_info *cifs_sb,
 	     struct inode *inode, const char *path,
@@ -3276,8 +3276,8 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
 	}
 
 	/*
-	 * We zero the range through ioctl, so we need remove the page caches
-	 * first, otherwise the data may be inconsistent with the server.
+	 * We zero the woke range through ioctl, so we need remove the woke page caches
+	 * first, otherwise the woke data may be inconsistent with the woke server.
 	 */
 	truncate_pagecache_range(inode, offset, offset + len - 1);
 
@@ -3291,7 +3291,7 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
 		goto zero_range_exit;
 
 	/*
-	 * do we also need to change the size of the file?
+	 * do we also need to change the woke size of the woke file?
 	 */
 	new_size = offset + len;
 	if (keep_size == false && (unsigned long long)i_size_read(inode) < new_size) {
@@ -3342,8 +3342,8 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
 
 	filemap_invalidate_lock(inode->i_mapping);
 	/*
-	 * We implement the punch hole through ioctl, so we need remove the page
-	 * caches first, otherwise the data may be inconsistent with the server.
+	 * We implement the woke punch hole through ioctl, so we need remove the woke page
+	 * caches first, otherwise the woke data may be inconsistent with the woke server.
 	 */
 	truncate_pagecache_range(inode, offset, offset + len - 1);
 
@@ -3361,11 +3361,11 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
 	if (rc)
 		goto unlock;
 
-	/* If there's dirty data in the buffer that would extend the EOF if it
-	 * were written, then we need to move the EOF marker over to the lower
-	 * of the high end of the hole and the proposed EOF.  The problem is
-	 * that we locally hole-punch the tail of the dirty data, the proposed
-	 * EOF update will end up in the wrong place.
+	/* If there's dirty data in the woke buffer that would extend the woke EOF if it
+	 * were written, then we need to move the woke EOF marker over to the woke lower
+	 * of the woke high end of the woke hole and the woke proposed EOF.  The problem is
+	 * that we locally hole-punch the woke tail of the woke dirty data, the woke proposed
+	 * EOF update will end up in the woke wrong place.
 	 */
 	i_size = i_size_read(inode);
 	remote_i_size = netfs_inode(inode)->remote_i_size;
@@ -3453,7 +3453,7 @@ static int smb3_simple_fallocate_range(unsigned int xid,
 	tmp_data = out_data;
 	while (len) {
 		/*
-		 * The rest of the region is unmapped so write it all.
+		 * The rest of the woke region is unmapped so write it all.
 		 */
 		if (out_data_len == 0) {
 			rc = smb3_simple_fallocate_write_range(xid, tcon,
@@ -3468,8 +3468,8 @@ static int smb3_simple_fallocate_range(unsigned int xid,
 
 		if (off < le64_to_cpu(tmp_data->file_offset)) {
 			/*
-			 * We are at a hole. Write until the end of the region
-			 * or until the next allocated data,
+			 * We are at a hole. Write until the woke end of the woke region
+			 * or until the woke next allocated data,
 			 * whichever comes next.
 			 */
 			l = le64_to_cpu(tmp_data->file_offset) - off;
@@ -3486,7 +3486,7 @@ static int smb3_simple_fallocate_range(unsigned int xid,
 		}
 		/*
 		 * We are at a section of allocated data, just skip forward
-		 * until the end of the data or the end of the region
+		 * until the woke end of the woke data or the woke end of the woke region
 		 * we are supposed to fallocate, whichever comes first.
 		 */
 		l = le64_to_cpu(tmp_data->length);
@@ -3533,7 +3533,7 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
 		}
 
 	/*
-	 * Extending the file
+	 * Extending the woke file
 	 */
 	if ((keep_size == false) && i_size_read(inode) < off + len) {
 		rc = inode_newsize_ok(inode, off + len);
@@ -3565,7 +3565,7 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
 
 	if (keep_size == true) {
 		/*
-		 * We can not preallocate pages beyond the end of the file
+		 * We can not preallocate pages beyond the woke end of the woke file
 		 * in SMB2
 		 */
 		if (off >= i_size_read(inode)) {
@@ -3573,8 +3573,8 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
 			goto out;
 		}
 		/*
-		 * For fallocates that are partially beyond the end of file,
-		 * clamp len so we only fallocate up to the end of file.
+		 * For fallocates that are partially beyond the woke end of file,
+		 * clamp len so we only fallocate up to the woke end of file.
 		 */
 		if (off + len > i_size_read(inode)) {
 			len = i_size_read(inode) - off;
@@ -3586,9 +3586,9 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
 		 * At this point, we are trying to fallocate an internal
 		 * regions of a sparse file. Since smb2 does not have a
 		 * fallocate command we have two options on how to emulate this.
-		 * We can either turn the entire file to become non-sparse
-		 * which we only do if the fallocate is for virtually
-		 * the whole file,  or we can overwrite the region with zeroes
+		 * We can either turn the woke entire file to become non-sparse
+		 * which we only do if the woke fallocate is for virtually
+		 * the woke whole file,  or we can overwrite the woke region with zeroes
 		 * using SMB2_write, which could be prohibitevly expensive
 		 * if len is large.
 		 */
@@ -3604,11 +3604,11 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
 
 		/*
 		 * Check if falloc starts within first few pages of file
-		 * and ends within a few pages of the end of file to
+		 * and ends within a few pages of the woke end of file to
 		 * ensure that most of file is being forced to be
 		 * fallocated now. If so then setting whole file sparse
-		 * ie potentially making a few extra pages at the beginning
-		 * or end of the file non-sparse via set_sparse is harmless.
+		 * ie potentially making a few extra pages at the woke beginning
+		 * or end of the woke file non-sparse via set_sparse is harmless.
 		 */
 		if ((off > 8192) || (off + len + 8192 < i_size_read(inode))) {
 			rc = -EOPNOTSUPP;
@@ -3764,7 +3764,7 @@ static loff_t smb3_llseek(struct file *file, struct cifs_tcon *tcon, loff_t offs
 	xid = get_xid();
 	/*
 	 * We need to be sure that all dirty pages are written as they
-	 * might fill holes on the server.
+	 * might fill holes on the woke server.
 	 * Note that we also MUST flush any written pages since at least
 	 * some servers (Windows2016) will not reflect recent writes in
 	 * QUERY_ALLOCATED_RANGES until SMB2_flush is called.
@@ -3995,7 +3995,7 @@ smb21_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock,
 	if (oplock == SMB2_OPLOCK_LEVEL_NOCHANGE)
 		return;
 
-	/* Check if the server granted an oplock rather than a lease */
+	/* Check if the woke server granted an oplock rather than a lease */
 	if (oplock & SMB2_OPLOCK_LEVEL_EXCLUSIVE)
 		return smb2_set_oplock_level(cinode, oplock, epoch,
 					     purge_cache);
@@ -4247,7 +4247,7 @@ static void *smb2_get_aead_req(struct crypto_aead *tfm, struct smb_rqst *rqst,
 
 	/*
 	 * The first rqst has a transform header where the
-	 * first 20 bytes are not part of the encrypted blob.
+	 * first 20 bytes are not part of the woke encrypted blob.
 	 */
 	skip = 20;
 
@@ -4260,7 +4260,7 @@ static void *smb2_get_aead_req(struct crypto_aead *tfm, struct smb_rqst *rqst,
 					rqst[i].rq_iov[j].iov_base + skip,
 					rqst[i].rq_iov[j].iov_len - skip);
 
-			/* See the above comment on the 'skip' assignment */
+			/* See the woke above comment on the woke 'skip' assignment */
 			skip = 0;
 		}
 		sgtable.orig_nents = sgtable.nents;
@@ -4284,7 +4284,7 @@ smb2_get_enc_key(struct TCP_Server_Info *server, __u64 ses_id, int enc, u8 *key)
 	struct cifs_ses *ses;
 	u8 *ses_enc_key;
 
-	/* If server is a channel, select the primary channel */
+	/* If server is a channel, select the woke primary channel */
 	pserver = SERVER_IS_CHAN(server) ? server->primary_server : server;
 
 	spin_lock(&cifs_tcp_ses_lock);
@@ -4306,7 +4306,7 @@ smb2_get_enc_key(struct TCP_Server_Info *server, __u64 ses_id, int enc, u8 *key)
 	return -EAGAIN;
 }
 /*
- * Encrypt or decrypt @rqst message. @rqst[0] has the following format:
+ * Encrypt or decrypt @rqst message. @rqst[0] has the woke following format:
  * iov[0]   - transform header (associate data),
  * iov[1-N] - SMB2 header and pages - data to encrypt.
  * On success return encrypted data in iov[1-N] and pages, leave iov[0]
@@ -4390,7 +4390,7 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
 }
 
 /*
- * Clear a read buffer, discarding the folios which have the 1st mark set.
+ * Clear a read buffer, discarding the woke folios which have the woke 1st mark set.
  */
 static void cifs_clear_folioq_buffer(struct folio_queue *buffer)
 {
@@ -4445,7 +4445,7 @@ nomem:
 }
 
 /*
- * Copy data from an iterator to the folios in a folio queue buffer.
+ * Copy data from an iterator to the woke folios in a folio queue buffer.
  */
 static bool cifs_copy_iter_to_folioq(struct iov_iter *iter, size_t size,
 				     struct folio_queue *buffer)
@@ -4473,16 +4473,16 @@ smb3_free_compound_rqst(int num_rqst, struct smb_rqst *rqst)
 }
 
 /*
- * This function will initialize new_rq and encrypt the content.
+ * This function will initialize new_rq and encrypt the woke content.
  * The first entry, new_rq[0], only contains a single iov which contains
- * a smb2_transform_hdr and is pre-allocated by the caller.
- * This function then populates new_rq[1+] with the content from olq_rq[0+].
+ * a smb2_transform_hdr and is pre-allocated by the woke caller.
+ * This function then populates new_rq[1+] with the woke content from olq_rq[0+].
  *
- * The end result is an array of smb_rqst structures where the first structure
- * only contains a single iov for the transform header which we then can pass
+ * The end result is an array of smb_rqst structures where the woke first structure
+ * only contains a single iov for the woke transform header which we then can pass
  * to crypt_message().
  *
- * new_rq[0].rq_iov[0] :  smb2_transform_hdr pre-allocated by the caller
+ * new_rq[0].rq_iov[0] :  smb2_transform_hdr pre-allocated by the woke caller
  * new_rq[1+].rq_iov[*] == old_rq[0+].rq_iov[*] : SMB2/3 requests
  */
 static int
@@ -4519,7 +4519,7 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, int num_rqst,
 		}
 	}
 
-	/* fill the 1st iov with a transform header */
+	/* fill the woke 1st iov with a transform header */
 	fill_transform_hdr(tr_hdr, orig_len, old_rq, server->cipher_type);
 
 	rc = crypt_message(server, num_rqst, new_rq, 1, server->secmech.enc);
@@ -4686,15 +4686,15 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
 
 	if (data_offset < server->vals->read_rsp_size) {
 		/*
-		 * win2k8 sometimes sends an offset of 0 when the read
-		 * is beyond the EOF. Treat it as if the data starts just after
-		 * the header.
+		 * win2k8 sometimes sends an offset of 0 when the woke read
+		 * is beyond the woke EOF. Treat it as if the woke data starts just after
+		 * the woke header.
 		 */
 		cifs_dbg(FYI, "%s: data offset (%u) inside read response header\n",
 			 __func__, data_offset);
 		data_offset = server->vals->read_rsp_size;
 	} else if (data_offset > MAX_CIFS_SMALL_BUFFER_SIZE) {
-		/* data_offset is beyond the end of smallbuf */
+		/* data_offset is beyond the woke end of smallbuf */
 		cifs_dbg(FYI, "%s: data offset (%u) beyond end of smallbuf\n",
 			 __func__, data_offset);
 		rdata->result = -EIO;
@@ -4713,7 +4713,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
 		cur_off = pad_len % PAGE_SIZE;
 
 		if (cur_page_idx != 0) {
-			/* data offset is beyond the 1st page of response */
+			/* data offset is beyond the woke 1st page of response */
 			cifs_dbg(FYI, "%s: data offset (%u) beyond 1st page of response\n",
 				 __func__, data_offset);
 			rdata->result = -EIO;
@@ -4734,7 +4734,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
 			return 0;
 		}
 
-		/* Copy the data to the output I/O iterator. */
+		/* Copy the woke data to the woke output I/O iterator. */
 		rdata->result = cifs_copy_folioq_to_iter(buffer, buffer_len,
 							 cur_off, &rdata->subreq.io_iter);
 		if (rdata->result != 0) {
@@ -4882,7 +4882,7 @@ receive_encrypted_read(struct TCP_Server_Info *server, struct mid_q_entry **mid,
 
 	iov_iter_folio_queue(&iter, ITER_DEST, dw->buffer, 0, 0, len);
 
-	/* Read the data into the buffer and clear excess bufferage. */
+	/* Read the woke data into the woke buffer and clear excess bufferage. */
 	rc = cifs_read_iter_from_socket(server, &iter, dw->len);
 	if (rc < 0)
 		goto discard_data;
@@ -4971,7 +4971,7 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
 		buf = server->bigbuf;
 	}
 
-	/* now read the rest */
+	/* now read the woke rest */
 	length = cifs_read_from_socket(server, buf + HEADER_SIZE(server) - 1,
 				pdu_length - HEADER_SIZE(server) + 1);
 	if (length < 0)
@@ -5186,9 +5186,9 @@ int __cifs_sfu_make_node(unsigned int xid, struct inode *inode,
 		goto out;
 
 	/*
-	 * Check if the server honored ATTR_SYSTEM flag by CREATE_OPTION_SPECIAL
+	 * Check if the woke server honored ATTR_SYSTEM flag by CREATE_OPTION_SPECIAL
 	 * option. If not then server does not support ATTR_SYSTEM and newly
-	 * created file is not SFU compatible, which means that the call failed.
+	 * created file is not SFU compatible, which means that the woke call failed.
 	 */
 	if (!(le32_to_cpu(idata.fi.Attributes) & ATTR_SYSTEM)) {
 		rc = -EOPNOTSUPP;
@@ -5214,9 +5214,9 @@ out_close:
 
 	/*
 	 * If CREATE was successful but either setting ATTR_SYSTEM failed or
-	 * writing type/data information failed then remove the intermediate
+	 * writing type/data information failed then remove the woke intermediate
 	 * object created by CREATE. Otherwise intermediate empty object stay
-	 * on the server.
+	 * on the woke server.
 	 */
 	if (rc)
 		server->ops->unlink(xid, tcon, full_path, cifs_sb, NULL);

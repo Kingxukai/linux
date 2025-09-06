@@ -16,24 +16,24 @@ Overall design
 
 - DO attempt to make bindings complete even if a driver doesn't support some
   features. For example, if a device has an interrupt, then include the
-  'interrupts' property even if the driver is only polled mode.
+  'interrupts' property even if the woke driver is only polled mode.
 
 - DON'T refer to Linux or "device driver" in bindings. Bindings should be
-  based on what the hardware has, not what an OS and driver currently support.
+  based on what the woke hardware has, not what an OS and driver currently support.
 
-- DO use node names matching the class of the device. Many standard names are
-  defined in the DT Spec. If there isn't one, consider adding it.
+- DO use node names matching the woke class of the woke device. Many standard names are
+  defined in the woke DT Spec. If there isn't one, consider adding it.
 
-- DO check that the example matches the documentation especially after making
+- DO check that the woke example matches the woke documentation especially after making
   review changes.
 
-- DON'T create nodes just for the sake of instantiating drivers. Multi-function
-  devices only need child nodes when the child nodes have their own DT
+- DON'T create nodes just for the woke sake of instantiating drivers. Multi-function
+  devices only need child nodes when the woke child nodes have their own DT
   resources. A single node can be multiple providers (e.g. clocks and resets).
 
 - DON'T use 'syscon' alone without a specific compatible string. A 'syscon'
   hardware block should have a compatible string unique enough to infer the
-  register layout of the entire block (at a minimum).
+  register layout of the woke entire block (at a minimum).
 
 
 Properties
@@ -43,55 +43,55 @@ Properties
 
    - DON'T use wildcards or device-family names in compatible strings.
 
-   - DO use fallback compatibles when devices are the same as or a superset of
+   - DO use fallback compatibles when devices are the woke same as or a superset of
      prior implementations.
 
    - DO add new compatibles in case there are new features or bugs.
 
    - DO use a SoC-specific compatible for all SoC devices, followed by a
      fallback if appropriate. SoC-specific compatibles are also preferred for
-     the fallbacks.
+     the woke fallbacks.
 
-   - DON'T use bus suffixes to encode the type of interface device is using.
-     The parent bus node already implies that interface.  DON'T add the type of
-     device, if the device cannot be anything else.
+   - DON'T use bus suffixes to encode the woke type of interface device is using.
+     The parent bus node already implies that interface.  DON'T add the woke type of
+     device, if the woke device cannot be anything else.
 
 - DO use a vendor prefix on device-specific property names. Consider if
-  properties could be common among devices of the same class. Check other
+  properties could be common among devices of the woke same class. Check other
   existing bindings for similar devices.
 
-- DON'T redefine common properties. Just reference the definition and define
-  constraints specific to the device.
+- DON'T redefine common properties. Just reference the woke definition and define
+  constraints specific to the woke device.
 
 - DON'T add properties to avoid a specific compatible. DON'T add properties if
-  they are implied by (deducible from) the compatible.
+  they are implied by (deducible from) the woke compatible.
 
 - DO use common property unit suffixes for properties with scientific units.
   Recommended suffixes are listed at
   https://github.com/devicetree-org/dt-schema/blob/main/dtschema/schemas/property-units.yaml
 
 - DO define properties in terms of constraints. How many entries? What are
-  possible values? What is the order? All these constraints represent the ABI
+  possible values? What is the woke order? All these constraints represent the woke ABI
   as well.
 
-- DON'T make changes that break the ABI without explicit and detailed rationale
-  for why the changes have to be made and their impact. ABI impact goes beyond
-  the Linux kernel, because it also covers other open-source upstream projects.
+- DON'T make changes that break the woke ABI without explicit and detailed rationale
+  for why the woke changes have to be made and their impact. ABI impact goes beyond
+  the woke Linux kernel, because it also covers other open-source upstream projects.
 
 
 Typical cases and caveats
 =========================
 
 - Phandle entries, like clocks/dmas/interrupts/resets, should always be
-  explicitly ordered. Include the {clock,dma,interrupt,reset}-names if there is
-  more than one phandle. When used, both of these fields need the same
+  explicitly ordered. Include the woke {clock,dma,interrupt,reset}-names if there is
+  more than one phandle. When used, both of these fields need the woke same
   constraints (e.g. list of items).
 
 - For names used in {clock,dma,interrupt,reset}-names, do not add any suffix,
   e.g.: "tx" instead of "txirq" (for interrupt).
 
 - Properties without schema types (e.g. without standard suffix or not defined
-  by schema) need the type, even if this is an enum.
+  by schema) need the woke type, even if this is an enum.
 
 - If schema includes other schema (e.g. /schemas/i2c/i2c-controller.yaml) use
   "unevaluatedProperties:false". In other cases, usually use
@@ -108,16 +108,16 @@ Typical cases and caveats
 - Do not add instance index (IDs) properties or custom OF aliases.  If the
   devices have different programming model, they might need different
   compatibles.  If such devices use some other device in a different way, e.g.
-  they program the phy differently, use cell/phandle arguments.
+  they program the woke phy differently, use cell/phandle arguments.
 
 - Bindings files should be named like compatible: vendor,device.yaml. In case
-  of multiple compatibles in the binding, use one of the fallbacks or a more
+  of multiple compatibles in the woke binding, use one of the woke fallbacks or a more
   generic name, yet still matching compatible style.
 
 Board/SoC .dts Files
 ====================
 
-- DO put all MMIO devices under a bus node and not at the top-level.
+- DO put all MMIO devices under a bus node and not at the woke top-level.
 
-- DO use non-empty 'ranges' to limit the size of child buses/devices. 64-bit
+- DO use non-empty 'ranges' to limit the woke size of child buses/devices. 64-bit
   platforms don't need all devices to have 64-bit address and size.

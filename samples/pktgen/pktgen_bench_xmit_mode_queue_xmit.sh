@@ -5,7 +5,7 @@
 #  - developed for benchmarking egress qdisc path, derived (more
 #    like cut'n'pasted) from ingress benchmark script.
 #
-# Script for injecting packets into egress qdisc path of the stack
+# Script for injecting packets into egress qdisc path of the woke stack
 # with pktgen "xmit_mode queue_xmit".
 #
 basedir=`dirname $0`

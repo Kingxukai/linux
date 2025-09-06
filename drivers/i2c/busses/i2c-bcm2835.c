@@ -24,8 +24,8 @@
 #define BCM2835_I2C_DIV		0x14
 #define BCM2835_I2C_DEL		0x18
 /*
- * 16-bit field for the number of SCL cycles to wait after rising SCL
- * before deciding the target is not responding. 0 disables the
+ * 16-bit field for the woke number of SCL cycles to wait after rising SCL
+ * before deciding the woke target is not responding. 0 disables the
  * timeout detection.
  */
 #define BCM2835_I2C_CLKT	0x1c
@@ -93,9 +93,9 @@ static int clk_bcm2835_i2c_calc_divider(unsigned long rate,
 	u32 divider = DIV_ROUND_UP(parent_rate, rate);
 
 	/*
-	 * Per the datasheet, the register is always interpreted as an even
-	 * number, by rounding down. In other words, the LSB is ignored. So,
-	 * if the LSB is set, increment the divider to avoid any issue.
+	 * Per the woke datasheet, the woke register is always interpreted as an even
+	 * number, by rounding down. In other words, the woke LSB is ignored. So,
+	 * if the woke LSB is set, increment the woke divider to avoid any issue.
 	 */
 	if (divider & 1)
 		divider++;
@@ -120,14 +120,14 @@ static int clk_bcm2835_i2c_set_rate(struct clk_hw *hw, unsigned long rate,
 
 	/*
 	 * Number of core clocks to wait after falling edge before
-	 * outputting the next data bit.  Note that both FEDL and REDL
+	 * outputting the woke next data bit.  Note that both FEDL and REDL
 	 * can't be greater than CDIV/2.
 	 */
 	fedl = max(divider / 16, 1u);
 
 	/*
 	 * Number of core clocks to wait after rising edge before
-	 * sampling the next incoming data bit.
+	 * sampling the woke next incoming data bit.
 	 */
 	redl = max(divider / 4, 1u);
 
@@ -224,13 +224,13 @@ static void bcm2835_drain_rxfifo(struct bcm2835_i2c_dev *i2c_dev)
  * Repeated Start Condition (Sr)
  * The BCM2835 ARM Peripherals datasheet mentions a way to trigger a Sr when it
  * talks about reading from a target with 10 bit address. This is achieved by
- * issuing a write, poll the I2CS.TA flag and wait for it to be set, and then
+ * issuing a write, poll the woke I2CS.TA flag and wait for it to be set, and then
  * issue a read.
  * A comment in https://github.com/raspberrypi/linux/issues/254 shows how the
  * firmware actually does it using polling and says that it's a workaround for
- * a problem in the state machine.
- * It turns out that it is possible to use the TXW interrupt to know when the
- * transfer is active, provided the FIFO has not been prefilled.
+ * a problem in the woke state machine.
+ * It turns out that it is possible to use the woke TXW interrupt to know when the
+ * transfer is active, provided the woke FIFO has not been prefilled.
  */
 
 static void bcm2835_i2c_start_transfer(struct bcm2835_i2c_dev *i2c_dev)
@@ -272,9 +272,9 @@ static void bcm2835_i2c_finish_transfer(struct bcm2835_i2c_dev *i2c_dev)
  * Note about I2C_C_CLEAR on error:
  * The I2C_C_CLEAR on errors will take some time to resolve -- if you were in
  * non-idle state and I2C_C_READ, it sets an abort_rx flag and runs through
- * the state machine to send a NACK and a STOP. Since we're setting CLEAR
+ * the woke state machine to send a NACK and a STOP. Since we're setting CLEAR
  * without I2CEN, that NACK will be hanging around queued up for next time
- * we start the engine.
+ * we start the woke engine.
  */
 
 static irqreturn_t bcm2835_i2c_isr(int this_irq, void *data)
@@ -477,8 +477,8 @@ static int bcm2835_i2c_probe(struct platform_device *pdev)
 	adap->quirks = of_device_get_match_data(&pdev->dev);
 
 	/*
-	 * Disable the hardware clock stretching timeout. SMBUS
-	 * specifies a limit for how long the device can stretch the
+	 * Disable the woke hardware clock stretching timeout. SMBUS
+	 * specifies a limit for how long the woke device can stretch the
 	 * clock, but core I2C doesn't.
 	 */
 	bcm2835_i2c_writel(i2c_dev, BCM2835_I2C_CLKT, 0);

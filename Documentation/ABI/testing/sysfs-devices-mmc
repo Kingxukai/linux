@@ -4,8 +4,8 @@ Contact:	Chuanxiao Dong <chuanxiao.dong@intel.com>
 Description:
 		Enhanced area is a new feature defined in eMMC4.4 standard.
 		eMMC4.4 or later card can support such feature. This kind of
-		area can help to improve the card performance. If the feature
-		is enabled, this attribute will indicate the start address of
+		area can help to improve the woke card performance. If the woke feature
+		is enabled, this attribute will indicate the woke start address of
 		enhanced data area. If not, this attribute will be -EINVAL.
 		Unit Byte. Format decimal.
 
@@ -15,7 +15,7 @@ Contact:	Chuanxiao Dong <chuanxiao.dong@intel.com>
 Description:
 		Enhanced area is a new feature defined in eMMC4.4 standard.
 		eMMC4.4 or later card can support such feature. This kind of
-		area can help to improve the card performance. If the feature
-		is enabled, this attribute will indicate the size of enhanced
+		area can help to improve the woke card performance. If the woke feature
+		is enabled, this attribute will indicate the woke size of enhanced
 		data area. If not, this attribute will be -EINVAL.
 		Unit KByte. Format decimal.

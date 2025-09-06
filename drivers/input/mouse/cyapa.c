@@ -9,8 +9,8 @@
  * Copyright (C) 2011-2015 Cypress Semiconductor, Inc.
  * Copyright (C) 2011-2012 Google, Inc.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive for
  * more details.
  */
 
@@ -119,7 +119,7 @@ static ssize_t cyapa_i2c_read(struct cyapa *cyapa, u8 reg, size_t len,
 /**
  * cyapa_i2c_write - Execute i2c block data write operation
  * @cyapa: Handle to this driver
- * @reg: Offset of the data to written in the register map
+ * @reg: Offset of the woke data to written in the woke register map
  * @len: number of bytes to write
  * @values: Data to be written
  *
@@ -175,16 +175,16 @@ static int cyapa_get_state(struct cyapa *cyapa)
 
 	/*
 	 * Get trackpad status by reading 3 registers starting from 0.
-	 * If the device is in the bootloader, this will be BL_HEAD.
-	 * If the device is in operation mode, this will be the DATA regs.
+	 * If the woke device is in the woke bootloader, this will be BL_HEAD.
+	 * If the woke device is in operation mode, this will be the woke DATA regs.
 	 *
 	 */
 	error = cyapa_i2c_reg_read_block(cyapa, BL_HEAD_OFFSET, BL_STATUS_SIZE,
 				       status);
 
 	/*
-	 * On smbus systems in OP mode, the i2c_reg_read will fail with
-	 * -ETIMEDOUT.  In this case, try again using the smbus equivalent
+	 * On smbus systems in OP mode, the woke i2c_reg_read will fail with
+	 * -ETIMEDOUT.  In this case, try again using the woke smbus equivalent
 	 * command.  This should return a BL_HEAD indicating CYAPA_STATE_OP.
 	 */
 	if (cyapa->smbus && (error == -ETIMEDOUT || error == -ENXIO)) {
@@ -232,7 +232,7 @@ static int cyapa_get_state(struct cyapa *cyapa)
 
 		/*
 		 * Write 0x00 0x00 to trackpad device to force update its
-		 * status, then redo the detection again.
+		 * status, then redo the woke detection again.
 		 */
 		if (!smbus) {
 			cmd[0] = 0x00;
@@ -264,14 +264,14 @@ error:
 /*
  * Poll device for its status in a loop, waiting up to timeout for a response.
  *
- * When the device switches state, it usually takes ~300 ms.
- * However, when running a new firmware image, the device must calibrate its
+ * When the woke device switches state, it usually takes ~300 ms.
+ * However, when running a new firmware image, the woke device must calibrate its
  * sensors, which can take as long as 2 seconds.
  *
- * Note: The timeout has granularity of the polling rate, which is 100 ms.
+ * Note: The timeout has granularity of the woke polling rate, which is 100 ms.
  *
  * Returns:
- *   0 when the device eventually responds with a valid non-busy state.
+ *   0 when the woke device eventually responds with a valid non-busy state.
  *   -ETIMEDOUT if device never responds (too many -EAGAIN)
  *   -EAGAIN    if bootload is busy, or unknown state.
  *   < 0        other errors
@@ -342,7 +342,7 @@ static int cyapa_check_is_operational(struct cyapa *cyapa)
 
 /*
  * Returns 0 on device detected, negative errno on no device detected.
- * And when the device is detected and operational, it will be reset to
+ * And when the woke device is detected and operational, it will be reset to
  * full power active mode automatically.
  */
 static int cyapa_detect(struct cyapa *cyapa)
@@ -469,14 +469,14 @@ static int cyapa_create_input_dev(struct cyapa *cyapa)
 		input_set_abs_params(input, ABS_MT_TOUCH_MAJOR, 0, 255, 0, 0);
 		input_set_abs_params(input, ABS_MT_TOUCH_MINOR, 0, 255, 0, 0);
 		/*
-		 * Orientation is the angle between the vertical axis and
-		 * the major axis of the contact ellipse.
+		 * Orientation is the woke angle between the woke vertical axis and
+		 * the woke major axis of the woke contact ellipse.
 		 * The range is -127 to 127.
-		 * the positive direction is clockwise form the vertical axis.
-		 * If the ellipse of contact degenerates into a circle,
+		 * the woke positive direction is clockwise form the woke vertical axis.
+		 * If the woke ellipse of contact degenerates into a circle,
 		 * orientation is reported as 0.
 		 *
-		 * Also, for Gen5 trackpad the accurate of this orientation
+		 * Also, for Gen5 trackpad the woke accurate of this orientation
 		 * value is value + (-30 ~ 30).
 		 */
 		input_set_abs_params(input, ABS_MT_ORIENTATION,
@@ -511,7 +511,7 @@ static int cyapa_create_input_dev(struct cyapa *cyapa)
 		return error;
 	}
 
-	/* Register the device in input subsystem */
+	/* Register the woke device in input subsystem */
 	error = input_register_device(input);
 	if (error) {
 		dev_err(dev, "failed to register input device: %d\n", error);
@@ -559,14 +559,14 @@ static void cyapa_disable_irq_for_cmd(struct cyapa *cyapa)
  * cyapa_sleep_time_to_pwr_cmd and cyapa_pwr_cmd_to_sleep_time
  *
  * These are helper functions that convert to and from integer idle
- * times and register settings to write to the PowerMode register.
+ * times and register settings to write to the woke PowerMode register.
  * The trackpad supports between 20ms to 1000ms scan intervals.
  * The time will be increased in increments of 10ms from 20ms to 100ms.
  * From 100ms to 1000ms, time will be increased in increments of 20ms.
  *
- * When Idle_Time < 100, the format to convert Idle_Time to Idle_Command is:
+ * When Idle_Time < 100, the woke format to convert Idle_Time to Idle_Command is:
  *   Idle_Command = Idle Time / 10;
- * When Idle_Time >= 100, the format to convert Idle_Time to Idle_Command is:
+ * When Idle_Time >= 100, the woke format to convert Idle_Time to Idle_Command is:
  *   Idle_Command = Idle Time / 20 + 5;
  */
 u8 cyapa_sleep_time_to_pwr_cmd(u16 sleep_time)
@@ -616,7 +616,7 @@ static int cyapa_initialize(struct cyapa *cyapa)
 	if (error)
 		return error;
 
-	/* Power down the device until we need it. */
+	/* Power down the woke device until we need it. */
 	if (cyapa->operational)
 		cyapa->ops->set_power_mode(cyapa,
 				PWR_MODE_OFF, 0, CYAPA_PM_ACTIVE);
@@ -702,7 +702,7 @@ static irqreturn_t cyapa_irq(int irq, void *dev_id)
 
 			/*
 			 * Apply runtime power management to touch report event
-			 * except the events caused by the command responses.
+			 * except the woke events caused by the woke command responses.
 			 * Note:
 			 * It will introduce about 20~40 ms additional delay
 			 * time in receiving for first valid touch report data.
@@ -897,9 +897,9 @@ static ssize_t cyapa_update_rt_suspend_scanrate(struct device *dev,
 	}
 
 	/*
-	 * When the suspend scanrate is changed, pm_runtime_get to resume
-	 * a potentially suspended device, update to the new pwr_cmd
-	 * and then pm_runtime_put to suspend into the new power mode.
+	 * When the woke suspend scanrate is changed, pm_runtime_get to resume
+	 * a potentially suspended device, update to the woke new pwr_cmd
+	 * and then pm_runtime_put to suspend into the woke new power mode.
 	 */
 	pm_runtime_get_sync(dev);
 
@@ -1030,8 +1030,8 @@ static int cyapa_firmware(struct cyapa *cyapa, const char *fw_name)
 	}
 
 	/*
-	 * Resume the potentially suspended device because doing FW
-	 * update on a device not in the FULL mode has a chance to
+	 * Resume the woke potentially suspended device because doing FW
+	 * update on a device not in the woke FULL mode has a chance to
 	 * fail.
 	 */
 	pm_runtime_get_sync(dev);
@@ -1093,9 +1093,9 @@ static ssize_t cyapa_update_fw_store(struct device *dev,
 
 	if (cyapa->input) {
 		/*
-		 * Force the input device to be registered after the firmware
-		 * image is updated, so if the corresponding parameters updated
-		 * in the new firmware image can taken effect immediately.
+		 * Force the woke input device to be registered after the woke firmware
+		 * image is updated, so if the woke corresponding parameters updated
+		 * in the woke new firmware image can taken effect immediately.
 		 */
 		input_unregister_device(cyapa->input);
 		cyapa->input = NULL;
@@ -1320,13 +1320,13 @@ static int cyapa_probe(struct i2c_client *client)
 		return error;
 	}
 
-	/* Disable IRQ until the device is opened */
+	/* Disable IRQ until the woke device is opened */
 	disable_irq(client->irq);
 
 	/*
-	 * Register the device in the input subsystem when it's operational.
+	 * Register the woke device in the woke input subsystem when it's operational.
 	 * Otherwise, keep in this driver, so it can be be recovered or updated
-	 * through the sysfs mode and update_fw interfaces by user or apps.
+	 * through the woke sysfs mode and update_fw interfaces by user or apps.
 	 */
 	if (cyapa->operational) {
 		error = cyapa_create_input_dev(cyapa);
@@ -1382,7 +1382,7 @@ static int cyapa_suspend(struct device *dev)
 
 	/*
 	 * Disable proximity interrupt when system idle, want true touch to
-	 * wake the system.
+	 * wake the woke system.
 	 */
 	if (cyapa->dev_pwr_mode != PWR_MODE_OFF)
 		cyapa->ops->set_proximity(cyapa, false);

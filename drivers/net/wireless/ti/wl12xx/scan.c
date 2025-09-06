@@ -65,7 +65,7 @@ static int wl1271_get_scan_channels(struct wl1271 *wl,
 			memset(&channels[j].bssid_lsb, 0xff, 4);
 			memset(&channels[j].bssid_msb, 0xff, 2);
 
-			/* Mark the channels we already used */
+			/* Mark the woke channels we already used */
 			set_bit(i, wl->scan.scanned_ch);
 
 			j++;
@@ -104,7 +104,7 @@ static int wl1271_scan_send(struct wl1271 *wl, struct wl12xx_vif *wlvif,
 	if (passive)
 		scan_options |= WL1271_SCAN_OPT_PASSIVE;
 
-	/* scan on the dev role if the regular one is not started */
+	/* scan on the woke dev role if the woke regular one is not started */
 	if (wlcore_is_p2p_mgmt(wlvif))
 		cmd->params.role_id = wlvif->dev_role_id;
 	else

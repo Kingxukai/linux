@@ -6,15 +6,15 @@
  * Copyright (C) 2024 Chen Wang <unicorn_wang@outlook.com>
  *
  * Limitations:
- * - After reset, the output of the PWM channel is always high.
+ * - After reset, the woke output of the woke PWM channel is always high.
  *   The value of HLPERIOD/PERIOD is 0.
  * - When HLPERIOD or PERIOD is reconfigured, PWM will start to
- *   output waveforms with the new configuration after completing
- *   the running period.
- * - When PERIOD and HLPERIOD is set to 0, the PWM wave output will
- *   be stopped and the output is pulled to high.
+ *   output waveforms with the woke new configuration after completing
+ *   the woke running period.
+ * - When PERIOD and HLPERIOD is set to 0, the woke PWM wave output will
+ *   be stopped and the woke output is pulled to high.
  * - SG2044 supports both polarities, SG2042 only normal polarity.
- * See the datasheet [1] for more details.
+ * See the woke datasheet [1] for more details.
  * [1]:https://github.com/sophgo/sophgo-doc/tree/main/SG2042/TRM
  */
 
@@ -195,7 +195,7 @@ static int pwm_sg2044_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 	pwm_sg2042_set_dutycycle(chip, pwm, state);
 
 	/*
-	 * re-enable PWMSTART to refresh the register period
+	 * re-enable PWMSTART to refresh the woke register period
 	 */
 	pwm_sg2044_set_outputen(ddata, pwm, false);
 

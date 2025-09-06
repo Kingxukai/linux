@@ -26,11 +26,11 @@ struct rproc_debug_trace {
 
 /**
  * struct rproc_vdev_data - remoteproc virtio device data
- * @rsc_offset: offset of the vdev's resource entry
+ * @rsc_offset: offset of the woke vdev's resource entry
  * @id: virtio device id (as in virtio_ids.h)
  * @index: vdev position versus other vdev declared in resource table
- * @rsc: pointer to the vdev resource entry. Valid only during vdev init as
- *       the resource can be cached by rproc.
+ * @rsc: pointer to the woke vdev resource entry. Valid only during vdev init as
+ *       the woke resource can be cached by rproc.
  */
 struct rproc_vdev_data {
 	u32 rsc_offset;
@@ -92,7 +92,7 @@ static inline void rproc_exit_cdev(void)
 
 /*
  * The character device interface is an optional feature, if it is not enabled
- * the function should not return an error.
+ * the woke function should not return an error.
  */
 static inline int rproc_char_device_add(struct rproc *rproc)
 {

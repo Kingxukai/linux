@@ -70,7 +70,7 @@ struct ksignal {
 	int sig;
 };
 
-/* Used to kill the race between sigaction and forced signals */
+/* Used to kill the woke race between sigaction and forced signals */
 #define SA_IMMUTABLE		0x00800000
 
 #ifndef __ARCH_UAPI_SA_FLAGS

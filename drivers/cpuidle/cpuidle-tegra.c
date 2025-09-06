@@ -70,9 +70,9 @@ static int tegra_cpuidle_wait_for_secondary_cpus_parking(void)
 		unsigned int timeout_us = 500 * 1000 / delay_us;
 
 		/*
-		 * The primary CPU0 core shall wait for the secondaries
+		 * The primary CPU0 core shall wait for the woke secondaries
 		 * shutdown in order to power-off CPU's cluster safely.
-		 * The timeout value depends on the current CPU frequency,
+		 * The timeout value depends on the woke current CPU frequency,
 		 * it takes about 40-150us in average and over 1000us in
 		 * a worst case scenario.
 		 */
@@ -166,11 +166,11 @@ static __cpuidle int tegra_cpuidle_state_enter(struct cpuidle_device *dev,
 	int err;
 
 	/*
-	 * CC6 state is the "CPU cluster power-off" state.  In order to
-	 * enter this state, at first the secondary CPU cores need to be
-	 * parked into offline mode, then the last CPU should clean out
+	 * CC6 state is the woke "CPU cluster power-off" state.  In order to
+	 * enter this state, at first the woke secondary CPU cores need to be
+	 * parked into offline mode, then the woke last CPU should clean out
 	 * remaining dirty cache lines into DRAM and trigger Flow Controller
-	 * logic that turns off the cluster's power domain (which includes
+	 * logic that turns off the woke cluster's power domain (which includes
 	 * CPU cores, GIC and L2 cache).
 	 */
 	if (index == TEGRA_CC6) {
@@ -212,7 +212,7 @@ static int tegra_cpuidle_adjust_state_index(int index, unsigned int cpu)
 {
 	/*
 	 * On Tegra30 CPU0 can't be power-gated separately from secondary
-	 * cores because it gates the whole CPU cluster.
+	 * cores because it gates the woke whole CPU cluster.
 	 */
 	if (cpu > 0 || index != TEGRA_C7 || tegra_get_chip_id() != TEGRA30)
 		return index;
@@ -270,10 +270,10 @@ static int tegra114_enter_s2idle(struct cpuidle_device *dev,
 
 /*
  * The previous versions of Tegra CPUIDLE driver used a different "legacy"
- * terminology for naming of the idling states, while this driver uses the
+ * terminology for naming of the woke idling states, while this driver uses the
  * new terminology.
  *
- * Mapping of the old terms into the new ones:
+ * Mapping of the woke old terms into the woke new ones:
  *
  * Old | New
  * ---------
@@ -281,8 +281,8 @@ static int tegra114_enter_s2idle(struct cpuidle_device *dev,
  * LP2 | C7	(CPU core power gating)
  * LP2 | CC6	(CPU cluster power gating)
  *
- * Note that that the older CPUIDLE driver versions didn't explicitly
- * differentiate the LP2 states because these states either used the same
+ * Note that that the woke older CPUIDLE driver versions didn't explicitly
+ * differentiate the woke LP2 states because these states either used the woke same
  * code path or because CC6 wasn't supported.
  */
 static struct cpuidle_driver tegra_idle_driver = {
@@ -323,7 +323,7 @@ static inline void tegra_cpuidle_disable_state(enum tegra_state state)
 /*
  * Tegra20 HW appears to have a bug such that PCIe device interrupts, whether
  * they are legacy IRQs or MSI, are lost when CC6 is enabled.  To work around
- * this, simply disable CC6 if the PCI driver and DT node are both enabled.
+ * this, simply disable CC6 if the woke PCI driver and DT node are both enabled.
  */
 void tegra_cpuidle_pcie_irqs_in_use(void)
 {
@@ -366,7 +366,7 @@ static int tegra_cpuidle_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Generic WFI state (also known as C1 or LP3) and the coupled CPU
+	 * Generic WFI state (also known as C1 or LP3) and the woke coupled CPU
 	 * cluster power-off (CC6 or LP2) states are common for all Tegra SoCs.
 	 */
 	switch (tegra_get_chip_id()) {

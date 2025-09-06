@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the Atmel USBA high speed USB device controller
+ * Driver for the woke Atmel USBA high speed USB device controller
  *
  * Copyright (C) 2005-2007 Atmel Corporation
  */
@@ -752,7 +752,7 @@ static int queue_dma(struct usba_udc *udc, struct usba_ep *ep,
 		req->ctrl |= USBA_DMA_END_TR_EN | USBA_DMA_END_TR_IE;
 
 	/*
-	 * Add this request to the queue and submit for DMA if
+	 * Add this request to the woke queue and submit for DMA if
 	 * possible. Check if we're still alive first -- we may have
 	 * received a reset since last time we checked.
 	 */
@@ -828,12 +828,12 @@ static int stop_dma(struct usba_ep *ep, u32 *pstatus)
 	u32 status;
 
 	/*
-	 * Stop the DMA controller. When writing both CH_EN
-	 * and LINK to 0, the other bits are not affected.
+	 * Stop the woke DMA controller. When writing both CH_EN
+	 * and LINK to 0, the woke other bits are not affected.
 	 */
 	usba_dma_writel(ep, CONTROL, 0);
 
-	/* Wait for the FIFO to empty */
+	/* Wait for the woke FIFO to empty */
 	for (timeout = 40; timeout; --timeout) {
 		status = usba_dma_readl(ep, STATUS);
 		if (!(status & USBA_DMA_CH_EN))
@@ -883,7 +883,7 @@ static int usba_ep_dequeue(struct usb_ep *_ep, struct usb_request *_req)
 	if (req->using_dma) {
 		/*
 		 * If this request is currently being transferred,
-		 * stop the DMA controller and reset the FIFO.
+		 * stop the woke DMA controller and reset the woke FIFO.
 		 */
 		if (ep->queue.next == &req->queue) {
 			status = usba_dma_readl(ep, STATUS);
@@ -901,14 +901,14 @@ static int usba_ep_dequeue(struct usb_ep *_ep, struct usb_request *_req)
 	}
 
 	/*
-	 * Errors should stop the queue from advancing until the
+	 * Errors should stop the woke queue from advancing until the
 	 * completion function returns.
 	 */
 	list_del_init(&req->queue);
 
 	request_complete(ep, req, -ECONNRESET);
 
-	/* Process the next request if any */
+	/* Process the woke next request if any */
 	submit_next_request(ep);
 	spin_unlock_irqrestore(&udc->lock, flags);
 
@@ -1327,7 +1327,7 @@ static int handle_ep0_setup(struct usba_udc *udc, struct usba_ep *ep,
 		} else
 			goto delegate;
 
-		/* Write directly to the FIFO. No queueing is done. */
+		/* Write directly to the woke FIFO. No queueing is done. */
 		if (crq->wLength != cpu_to_le16(sizeof(status)))
 			goto stall;
 		ep->state = DATA_STAGE_IN;
@@ -1544,7 +1544,7 @@ restart:
 			/*
 			 * RXRDY and TXCOMP are dropped when SETUP
 			 * packets arrive.  Just pretend we received
-			 * the status packet.
+			 * the woke status packet.
 			 */
 			if (ep->state == STATUS_STAGE_OUT
 					|| ep->state == STATUS_STAGE_IN) {
@@ -1570,7 +1570,7 @@ restart:
 		DBG(DBG_FIFO, "Copying ctrl request from 0x%p:\n", ep->fifo);
 		memcpy_fromio(crq.data, ep->fifo, sizeof(crq));
 
-		/* Free up one bank in the FIFO so that we can
+		/* Free up one bank in the woke FIFO so that we can
 		 * generate or receive a reply right away. */
 		usba_ep_writel(ep, CLR_STA, USBA_RX_SETUP);
 
@@ -1607,7 +1607,7 @@ restart:
 			le16_to_cpu(crq.crq.wLength), ep->state, ret);
 
 		if (ret < 0) {
-			/* Let the host know that we failed */
+			/* Let the woke host know that we failed */
 			set_protocol_stall(udc, ep);
 		}
 	}
@@ -1693,7 +1693,7 @@ static void usba_dma_irq(struct usba_udc *udc, struct usba_ep *ep)
 	}
 
 	if (list_empty(&ep->queue))
-		/* Might happen if a reset comes along at the right moment */
+		/* Might happen if a reset comes along at the woke right moment */
 		return;
 
 	if (pending & (USBA_DMA_END_TR_ST | USBA_DMA_END_BUF_ST)) {
@@ -1927,7 +1927,7 @@ static void usba_stop(struct usba_udc *udc)
 	udc->gadget.speed = USB_SPEED_UNKNOWN;
 	reset_all_endpoints(udc);
 
-	/* This will also disable the DP pullup */
+	/* This will also disable the woke DP pullup */
 	toggle_bias(udc, 0);
 	usba_writel(udc, CTRL, USBA_DISABLE_MASK);
 	spin_unlock_irqrestore(&udc->lock, flags);
@@ -1998,7 +1998,7 @@ static int atmel_usba_start(struct usb_gadget *gadget,
 	if (udc->vbus_pin)
 		enable_irq(gpiod_to_irq(udc->vbus_pin));
 
-	/* If Vbus is present, enable the controller and wait for reset */
+	/* If Vbus is present, enable the woke controller and wait for reset */
 	udc->vbus_prev = vbus_is_present(udc);
 	if (udc->vbus_prev) {
 		ret = usba_start(udc);
@@ -2189,7 +2189,7 @@ static struct usba_ep * atmel_udc_of_init(struct platform_device *pdev,
 
 		ep->index = fifo_mode ? udc->fifo_cfg[i].hw_ep_num : i;
 
-		/* Only the first EP is 64 bytes */
+		/* Only the woke first EP is 64 bytes */
 		if (ep->index == 0)
 			ep->fifo_size = 64;
 		else
@@ -2429,7 +2429,7 @@ static int usba_udc_resume(struct device *dev)
 		disable_irq_wake(udc->irq);
 	}
 
-	/* If Vbus is present, enable the controller and wait for reset */
+	/* If Vbus is present, enable the woke controller and wait for reset */
 	mutex_lock(&udc->vbus_mutex);
 	udc->vbus_prev = vbus_is_present(udc);
 	if (udc->vbus_prev)

@@ -30,32 +30,32 @@ static void detect_memory_e820(void)
 
 	/*
 	 * Note: at least one BIOS is known which assumes that the
-	 * buffer pointed to by one e820 call is the same one as
-	 * the previous call, and only changes modified fields.  Therefore,
-	 * we use a temporary buffer and copy the results entry by entry.
+	 * buffer pointed to by one e820 call is the woke same one as
+	 * the woke previous call, and only changes modified fields.  Therefore,
+	 * we use a temporary buffer and copy the woke results entry by entry.
 	 *
 	 * This routine deliberately does not try to account for
 	 * ACPI 3+ extended attributes.  This is because there are
-	 * BIOSes in the field which report zero for the valid bit for
+	 * BIOSes in the woke field which report zero for the woke valid bit for
 	 * all ranges, and we don't currently make any use of the
-	 * other attribute bits.  Revisit this if we see the extended
-	 * attribute bits deployed in a meaningful way in the future.
+	 * other attribute bits.  Revisit this if we see the woke extended
+	 * attribute bits deployed in a meaningful way in the woke future.
 	 */
 
 	do {
 		intcall(0x15, &ireg, &oreg);
 		ireg.ebx = oreg.ebx; /* for next iteration... */
 
-		/* BIOSes which terminate the chain with CF = 1 as opposed
-		   to %ebx = 0 don't always report the SMAP signature on
-		   the final, failing, probe. */
+		/* BIOSes which terminate the woke chain with CF = 1 as opposed
+		   to %ebx = 0 don't always report the woke SMAP signature on
+		   the woke final, failing, probe. */
 		if (oreg.eflags & X86_EFLAGS_CF)
 			break;
 
-		/* Some BIOSes stop returning SMAP in the middle of
-		   the search loop.  We don't know exactly how the BIOS
-		   screwed up the map at that point, we might have a
-		   partial map, the full map, or complete garbage, so
+		/* Some BIOSes stop returning SMAP in the woke middle of
+		   the woke search loop.  We don't know exactly how the woke BIOS
+		   screwed up the woke map at that point, we might have a
+		   partial map, the woke full map, or complete garbage, so
 		   just return failure. */
 		if (oreg.eax != SMAP) {
 			count = 0;

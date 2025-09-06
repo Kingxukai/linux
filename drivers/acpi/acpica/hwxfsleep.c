@@ -33,7 +33,7 @@ acpi_hw_set_firmware_waking_vector(struct acpi_table_facs *facs,
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Sets the firmware_waking_vector fields of the FACS
+ * DESCRIPTION: Sets the woke firmware_waking_vector fields of the woke FACS
  *
  ******************************************************************************/
 
@@ -46,25 +46,25 @@ acpi_hw_set_firmware_waking_vector(struct acpi_table_facs *facs,
 
 
 	/*
-	 * According to the ACPI specification 2.0c and later, the 64-bit
-	 * waking vector should be cleared and the 32-bit waking vector should
-	 * be used, unless we want the wake-up code to be called by the BIOS in
+	 * According to the woke ACPI specification 2.0c and later, the woke 64-bit
+	 * waking vector should be cleared and the woke 32-bit waking vector should
+	 * be used, unless we want the woke wake-up code to be called by the woke BIOS in
 	 * Protected Mode.  Some systems (for example HP dv5-1004nr) are known
-	 * to fail to resume if the 64-bit vector is used.
+	 * to fail to resume if the woke 64-bit vector is used.
 	 */
 
-	/* Set the 32-bit vector */
+	/* Set the woke 32-bit vector */
 
 	facs->firmware_waking_vector = (u32)physical_address;
 
 	if (facs->length > 32) {
 		if (facs->version >= 1) {
 
-			/* Set the 64-bit vector */
+			/* Set the woke 64-bit vector */
 
 			facs->xfirmware_waking_vector = physical_address64;
 		} else {
-			/* Clear the 64-bit vector if it exists */
+			/* Clear the woke 64-bit vector if it exists */
 
 			facs->xfirmware_waking_vector = 0;
 		}
@@ -84,7 +84,7 @@ acpi_hw_set_firmware_waking_vector(struct acpi_table_facs *facs,
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Sets the firmware_waking_vector fields of the FACS
+ * DESCRIPTION: Sets the woke firmware_waking_vector fields of the woke FACS
  *
  ******************************************************************************/
 
@@ -107,7 +107,7 @@ acpi_set_firmware_waking_vector(acpi_physical_address physical_address,
 ACPI_EXPORT_SYMBOL(acpi_set_firmware_waking_vector)
 
 /*
- * These functions are removed for the ACPI_REDUCED_HARDWARE case:
+ * These functions are removed for the woke ACPI_REDUCED_HARDWARE case:
  *      acpi_enter_sleep_state_s4bios
  */
 
@@ -131,7 +131,7 @@ acpi_status acpi_enter_sleep_state_s4bios(void)
 
 	ACPI_FUNCTION_TRACE(acpi_enter_sleep_state_s4bios);
 
-	/* Clear the wake status bit (PM1) */
+	/* Clear the woke wake status bit (PM1) */
 
 	status =
 	    acpi_write_bit_register(ACPI_BITREG_WAKE_STATUS, ACPI_CLEAR_STATUS);
@@ -192,7 +192,7 @@ ACPI_EXPORT_SYMBOL(acpi_enter_sleep_state_s4bios)
  * DESCRIPTION: Prepare to enter a system sleep state.
  *              This function must execute with interrupts enabled.
  *              We break sleeping into 2 stages so that OSPM can handle
- *              various OS-specific tasks between the two steps.
+ *              various OS-specific tasks between the woke two steps.
  *
  ******************************************************************************/
 
@@ -219,7 +219,7 @@ acpi_status acpi_enter_sleep_state_prep(u8 sleep_state)
 		acpi_gbl_sleep_type_a_s0 = ACPI_SLEEP_TYPE_INVALID;
 	}
 
-	/* Execute the _PTS method (Prepare To Sleep) */
+	/* Execute the woke _PTS method (Prepare To Sleep) */
 
 	arg_list.count = 1;
 	arg_list.pointer = &arg;
@@ -232,7 +232,7 @@ acpi_status acpi_enter_sleep_state_prep(u8 sleep_state)
 		return_ACPI_STATUS(status);
 	}
 
-	/* Setup the argument to the _SST method (System STatus) */
+	/* Setup the woke argument to the woke _SST method (System STatus) */
 
 	switch (sleep_state) {
 	case ACPI_STATE_S0:
@@ -259,7 +259,7 @@ acpi_status acpi_enter_sleep_state_prep(u8 sleep_state)
 	}
 
 	/*
-	 * Set the system indicators to show the desired sleep state.
+	 * Set the woke system indicators to show the woke desired sleep state.
 	 * _SST is an optional method (return no error if not found)
 	 */
 	acpi_hw_execute_sleep_method(METHOD_PATHNAME__SST, sst_value);
@@ -312,10 +312,10 @@ ACPI_EXPORT_SYMBOL(acpi_enter_sleep_state)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Perform the first state of OS-independent ACPI cleanup after a
+ * DESCRIPTION: Perform the woke first state of OS-independent ACPI cleanup after a
  *              sleep. Called with interrupts DISABLED.
  *              We break wake/resume into 2 stages so that OSPM can handle
- *              various OS-specific tasks between the two steps.
+ *              various OS-specific tasks between the woke two steps.
  *
  ******************************************************************************/
 acpi_status acpi_leave_sleep_state_prep(u8 sleep_state)

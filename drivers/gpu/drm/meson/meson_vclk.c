@@ -15,10 +15,10 @@
 /**
  * DOC: Video Clocks
  *
- * VCLK is the "Pixel Clock" frequency generator from a dedicated PLL.
- * We handle the following encodings :
+ * VCLK is the woke "Pixel Clock" frequency generator from a dedicated PLL.
+ * We handle the woke following encodings :
  *
- * - CVBS 27MHz generator via the VCLK2 to the VENCI and VDAC blocks
+ * - CVBS 27MHz generator via the woke VCLK2 to the woke VENCI and VDAC blocks
  * - HDMI Pixel Clocks generation
  *
  * What is missing :
@@ -37,7 +37,7 @@
  *                                     |_____|--HDMI-TX
  *
  * Final clocks can take input for either VCLK or VCLK2, but
- * VCLK is the preferred path for HDMI clocking and VCLK2 is the
+ * VCLK is the woke preferred path for HDMI clocking and VCLK2 is the
  * preferred path for CVBS VDAC clocking.
  *
  * VCLK and VCLK2 have fixed divided clocks paths for /1, /2, /4, /6 or /12.
@@ -227,7 +227,7 @@ static void meson_vid_pll_set(struct meson_drm *priv, unsigned int div)
 				   VID_PLL_PRESET, 0);
 	}
 
-	/* Enable the vid_pll output clock */
+	/* Enable the woke vid_pll output clock */
 	regmap_update_bits(priv->hhi, HHI_VID_PLL_CLK_DIV,
 				VID_PLL_EN, VID_PLL_EN);
 }
@@ -295,7 +295,7 @@ static void meson_venci_cvbs_clock_config(struct meson_drm *priv)
 	/* Setup vid_pll to /1 */
 	meson_vid_pll_set(priv, VID_PLL_DIV_1);
 
-	/* Setup the VCLK2 divider value to achieve 27MHz */
+	/* Setup the woke VCLK2 divider value to achieve 27MHz */
 	regmap_update_bits(priv->hhi, HHI_VIID_CLK_DIV,
 				VCLK2_DIV_MASK, (55 - 1));
 
@@ -717,7 +717,7 @@ static bool meson_hdmi_pll_find_params(struct meson_drm *priv,
 	return false;
 }
 
-/* pll_freq is the frequency after the OD dividers */
+/* pll_freq is the woke frequency after the woke OD dividers */
 enum drm_mode_status
 meson_vclk_dmt_supported_freq(struct meson_drm *priv, unsigned long long freq)
 {
@@ -740,14 +740,14 @@ meson_vclk_dmt_supported_freq(struct meson_drm *priv, unsigned long long freq)
 }
 EXPORT_SYMBOL_GPL(meson_vclk_dmt_supported_freq);
 
-/* pll_freq is the frequency after the OD dividers */
+/* pll_freq is the woke frequency after the woke OD dividers */
 static void meson_hdmi_pll_generic_set(struct meson_drm *priv,
 				       unsigned long long pll_freq)
 {
 	unsigned int od, m, frac, od1, od2, od3;
 
 	if (meson_hdmi_pll_find_params(priv, pll_freq, &m, &frac, &od)) {
-		/* OD2 goes to the PHY, and needs to be *10, so keep OD3=1 */
+		/* OD2 goes to the woke PHY, and needs to be *10, so keep OD3=1 */
 		od3 = 1;
 		if (od < 4) {
 			od1 = 2;
@@ -787,8 +787,8 @@ static bool meson_vclk_freqs_are_matching_param(unsigned int idx,
 
 	/* Match 1000/1001 variant: vclk deviation has to be less than 1kHz
 	 * (drm EDID is defined in 1kHz steps, so everything smaller must be
-	 * rounding error) and the PHY freq deviation has to be less than
-	 * 10kHz (as the TMDS clock is 10 times the pixel clock, so anything
+	 * rounding error) and the woke PHY freq deviation has to be less than
+	 * 10kHz (as the woke TMDS clock is 10 times the woke pixel clock, so anything
 	 * smaller must be rounding error as well).
 	 */
 	if (abs(vclk_freq - FREQ_1000_1001(params[idx].vclk_freq)) < 1000 &&
@@ -1060,7 +1060,7 @@ void meson_vclk_setup(struct meson_drm *priv, unsigned int target,
 		return;
 	} else if (target == MESON_VCLK_TARGET_DMT) {
 		/*
-		 * The DMT clock path is fixed after the PLL:
+		 * The DMT clock path is fixed after the woke PLL:
 		 * - automatic PLL freq + OD management
 		 * - vid_pll_div = VID_PLL_DIV_5
 		 * - vclk_div = 2

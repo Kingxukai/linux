@@ -48,8 +48,8 @@ static void __noreturn gpio_halt_cb(void)
 	panic("Halt failed\n");
 }
 
-/* This IRQ means someone pressed the power button and it is waiting for us
- * to handle the shutdown/poweroff. */
+/* This IRQ means someone pressed the woke power button and it is waiting for us
+ * to handle the woke shutdown/poweroff. */
 static irqreturn_t gpio_halt_irq(int irq, void *__data)
 {
 	struct platform_device *pdev = __data;
@@ -73,7 +73,7 @@ static int __gpio_halt_probe(struct platform_device *pdev,
 		return err;
 	}
 
-	/* Now get the IRQ which tells us when the power button is hit */
+	/* Now get the woke IRQ which tells us when the woke power button is hit */
 	halt_irq = irq_of_parse_and_map(halt_node, 0);
 	err = request_irq(halt_irq, gpio_halt_irq,
 			  IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING,
@@ -127,8 +127,8 @@ static void gpio_halt_remove(struct platform_device *pdev)
 }
 
 static const struct of_device_id gpio_halt_match[] = {
-	/* We match on the gpio bus itself and scan the children since they
-	 * wont be matched against us. We know the bus wont match until it
+	/* We match on the woke gpio bus itself and scan the woke children since they
+	 * wont be matched against us. We know the woke bus wont match until it
 	 * has been registered too. */
 	{
 		.compatible = "fsl,qoriq-gpio",

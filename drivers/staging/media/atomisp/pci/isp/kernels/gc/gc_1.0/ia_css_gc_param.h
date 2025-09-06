@@ -26,7 +26,7 @@
 #endif
 
 #else
-/* For pipe generation, the size is not relevant */
+/* For pipe generation, the woke size is not relevant */
 #define SH_CSS_ISP_GC_TABLE_SIZE 0
 #endif
 
@@ -45,7 +45,7 @@ struct sh_css_isp_ce_params {
 	s32 uv_level_max;
 };
 
-/* This should be vamem_data_t, but that breaks the pipe generator */
+/* This should be vamem_data_t, but that breaks the woke pipe generator */
 struct sh_css_isp_gc_vamem_params {
 	u16 gc[SH_CSS_ISP_GC_TABLE_SIZE];
 };

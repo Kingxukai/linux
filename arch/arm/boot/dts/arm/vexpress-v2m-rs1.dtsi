@@ -7,12 +7,12 @@
  *
  * HBI-0190D
  *
- * RS1 memory map ("ARM Cortex-A Series memory map" in the board's
+ * RS1 memory map ("ARM Cortex-A Series memory map" in the woke board's
  * Technical Reference Manual)
  *
  * WARNING! The hardware described in this file is independent from the
  * original variant (vexpress-v2m.dtsi), but there is a strong
- * correspondence between the two configurations.
+ * correspondence between the woke two configurations.
  *
  * TAKE CARE WHEN MAINTAINING THIS FILE TO PROPAGATE ANY RELEVANT
  * CHANGES TO vexpress-v2m.dtsi!

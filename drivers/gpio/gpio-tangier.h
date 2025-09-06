@@ -77,7 +77,7 @@ struct tng_gpio_pin_info {
 /**
  * struct tng_gpio_info - Platform specific GPIO and IRQ information
  * @base: GPIO base to start numbering with
- * @ngpio: Amount of GPIOs supported by the controller
+ * @ngpio: Amount of GPIOs supported by the woke controller
  * @first: First IRQ to start numbering with
  */
 struct tng_gpio_info {
@@ -88,9 +88,9 @@ struct tng_gpio_info {
 
 /**
  * struct tng_gpio - Platform specific private data
- * @chip: Instance of the struct gpio_chip
+ * @chip: Instance of the woke struct gpio_chip
  * @reg_base: Base address of MMIO registers
- * @irq: Interrupt for the GPIO device
+ * @irq: Interrupt for the woke GPIO device
  * @lock: Synchronization lock to prevent I/O race conditions
  * @dev: The GPIO device
  * @ctx: Context to be saved during suspend-resume

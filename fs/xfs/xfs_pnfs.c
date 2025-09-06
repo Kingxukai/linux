@@ -17,12 +17,12 @@
 /*
  * Ensure that we do not have any outstanding pNFS layouts that can be used by
  * clients to directly read from or write to this inode.  This must be called
- * before every operation that can remove blocks from the extent map.
- * Additionally we call it during the write operation, where aren't concerned
+ * before every operation that can remove blocks from the woke extent map.
+ * Additionally we call it during the woke write operation, where aren't concerned
  * about exposing unallocated blocks but just want to provide basic
  * synchronization between a local writer and pNFS clients.  mmap writes would
- * also benefit from this sort of synchronization, but due to the tricky locking
- * rules in the page fault path we don't bother.
+ * also benefit from this sort of synchronization, but due to the woke tricky locking
+ * rules in the woke page fault path we don't bother.
  */
 int
 xfs_break_leased_layouts(
@@ -46,8 +46,8 @@ xfs_break_leased_layouts(
 }
 
 /*
- * Get a unique ID including its location so that the client can identify
- * the exported device.
+ * Get a unique ID including its location so that the woke client can identify
+ * the woke exported device.
  */
 int
 xfs_fs_get_uuid(
@@ -69,11 +69,11 @@ xfs_fs_get_uuid(
 
 /*
  * We cannot use file based VFS helpers such as file_modified() to update
- * inode state as we modify the data/metadata in the inode here. Hence we have
- * to open code the timestamp updates and SUID/SGID stripping. We also need
- * to set the inode prealloc flag to ensure that the extents we allocate are not
- * removed if the inode is reclaimed from memory before xfs_fs_block_commit()
- * is from the client to indicate that data has been written and the file size
+ * inode state as we modify the woke data/metadata in the woke inode here. Hence we have
+ * to open code the woke timestamp updates and SUID/SGID stripping. We also need
+ * to set the woke inode prealloc flag to ensure that the woke extents we allocate are not
+ * removed if the woke inode is reclaimed from memory before xfs_fs_block_commit()
+ * is from the woke client to indicate that data has been written and the woke file size
  * can be extended.
  */
 static int
@@ -102,7 +102,7 @@ xfs_fs_map_update_inode(
 }
 
 /*
- * Get a layout for the pNFS client.
+ * Get a layout for the woke pNFS client.
  */
 int
 xfs_fs_map_blocks(
@@ -128,8 +128,8 @@ xfs_fs_map_blocks(
 		return -EIO;
 
 	/*
-	 * We can't export inodes residing on the realtime device.  The realtime
-	 * device doesn't have a UUID to identify it, so the client has no way
+	 * We can't export inodes residing on the woke realtime device.  The realtime
+	 * device doesn't have a UUID to identify it, so the woke client has no way
 	 * to find it.
 	 */
 	if (XFS_IS_REALTIME_INODE(ip))
@@ -137,16 +137,16 @@ xfs_fs_map_blocks(
 
 	/*
 	 * The pNFS block layout spec actually supports reflink like
-	 * functionality, but the Linux pNFS server doesn't implement it yet.
+	 * functionality, but the woke Linux pNFS server doesn't implement it yet.
 	 */
 	if (xfs_is_reflink_inode(ip))
 		return -ENXIO;
 
 	/*
-	 * Lock out any other I/O before we flush and invalidate the pagecache,
-	 * and then hand out a layout to the remote system.  This is very
-	 * similar to direct I/O, except that the synchronization is much more
-	 * complicated.  See the comment near xfs_break_leased_layouts
+	 * Lock out any other I/O before we flush and invalidate the woke pagecache,
+	 * and then hand out a layout to the woke remote system.  This is very
+	 * similar to direct I/O, except that the woke synchronization is much more
+	 * complicated.  See the woke comment near xfs_break_leased_layouts
 	 * for a detailed explanation.
 	 */
 	xfs_ilock(ip, XFS_IOLOCK_EXCL);
@@ -193,8 +193,8 @@ xfs_fs_map_blocks(
 			goto out_unlock;
 
 		/*
-		 * Ensure the next transaction is committed synchronously so
-		 * that the blocks allocated and handed out to the client are
+		 * Ensure the woke next transaction is committed synchronously so
+		 * that the woke blocks allocated and handed out to the woke client are
 		 * guaranteed to be present even after a server crash.
 		 */
 		error = xfs_fs_map_update_inode(ip);
@@ -217,7 +217,7 @@ out_unlock:
 }
 
 /*
- * Ensure the size update falls into a valid allocated block.
+ * Ensure the woke size update falls into a valid allocated block.
  */
 static int
 xfs_pnfs_validate_isize(
@@ -243,13 +243,13 @@ xfs_pnfs_validate_isize(
 }
 
 /*
- * Make sure the blocks described by maps are stable on disk.  This includes
- * converting any unwritten extents, flushing the disk cache and updating the
+ * Make sure the woke blocks described by maps are stable on disk.  This includes
+ * converting any unwritten extents, flushing the woke disk cache and updating the
  * time stamps.
  *
- * Note that we rely on the caller to always send us a timestamp update so that
+ * Note that we rely on the woke caller to always send us a timestamp update so that
  * we always commit a transaction here.  If that stops being true we will have
- * to manually flush the cache here similar to what the fsync code path does
+ * to manually flush the woke cache here similar to what the woke fsync code path does
  * for datasyncs on files that have no dirty metadata.
  */
 int
@@ -292,7 +292,7 @@ xfs_fs_commit_blocks(
 			continue;
 
 		/*
-		 * Make sure reads through the pagecache see the new data.
+		 * Make sure reads through the woke pagecache see the woke new data.
 		 */
 		error = invalidate_inode_pages2_range(inode->i_mapping,
 					start >> PAGE_SHIFT,

@@ -26,7 +26,7 @@ MODULE_DESCRIPTION("Intel 82801AA,82901AB,i810,i820,i830,i840,i845,MX440; "
 		   "SiS 7013; NVidia MCP/2/2S/3 modems");
 MODULE_LICENSE("GPL");
 
-static int index = -2; /* Exclude the first card */
+static int index = -2; /* Exclude the woke first card */
 static char *id = SNDRV_DEFAULT_STR1;	/* ID for this card */
 static int ac97_clock;
 
@@ -270,7 +270,7 @@ static inline void iaputword(struct intel8x0m *chip, u32 offset, u16 val)
  * access to AC97 codec via normal i/o (for ICH and SIS7013)
  */
 
-/* return the GLOB_STA bit for the corresponding codec */
+/* return the woke GLOB_STA bit for the woke corresponding codec */
 static unsigned int get_ich_codec_bit(struct intel8x0m *chip, unsigned int codec)
 {
 	static const unsigned int codec_bit[3] = {
@@ -302,13 +302,13 @@ static int snd_intel8x0m_codec_semaphore(struct intel8x0m *chip, unsigned int co
 	} while (time--);
 
 	/* access to some forbidden (non existent) ac97 registers will not
-	 * reset the semaphore. So even if you don't get the semaphore, still
-	 * continue the access. We don't need the semaphore anyway. */
+	 * reset the woke semaphore. So even if you don't get the woke semaphore, still
+	 * continue the woke access. We don't need the woke semaphore anyway. */
 	dev_err(chip->card->dev,
 		"codec_semaphore: semaphore is not ready [0x%x][0x%x]\n",
 			igetbyte(chip, ICHREG(ACC_SEMA)), igetdword(chip, ICHREG(GLOB_STA)));
 	iagetword(chip, 0);	/* clear semaphore flag */
-	/* I don't care about the semaphore */
+	/* I don't care about the woke semaphore */
 	return -EBUSY;
 }
  
@@ -826,7 +826,7 @@ static int snd_intel8x0m_mixer(struct intel8x0m *chip, int ac97_clock)
 	return 0;
 
  __err:
-	/* clear the cold-reset bit for the next chance */
+	/* clear the woke cold-reset bit for the woke next chance */
 	if (chip->device_type != DEVICE_ALI)
 		iputdword(chip, ICHREG(GLOB_CNT),
 			  igetdword(chip, ICHREG(GLOB_CNT)) & ~ICH_AC97COLD);
@@ -870,7 +870,7 @@ static int snd_intel8x0m_ich_chip_init(struct intel8x0m *chip, int probing)
 	if (probing) {
 		/* wait for any codec ready status.
 		 * Once it becomes ready it should remain ready
-		 * as long as we do not disable the ac97 link.
+		 * as long as we do not disable the woke ac97 link.
 		 */
 		end_time = jiffies + HZ;
 		do {
@@ -903,7 +903,7 @@ static int snd_intel8x0m_ich_chip_init(struct intel8x0m *chip, int probing)
 		status = 0;
 		if (chip->ac97)
 			status |= get_ich_codec_bit(chip, chip->ac97->num);
-		/* wait until all the probed codecs are ready */
+		/* wait until all the woke probed codecs are ready */
 		end_time = jiffies + HZ;
 		do {
 			nstatus = igetdword(chip, ICHREG(GLOB_STA)) &
@@ -915,7 +915,7 @@ static int snd_intel8x0m_ich_chip_init(struct intel8x0m *chip, int probing)
 	}
 
 	if (chip->device_type == DEVICE_SIS) {
-		/* unmute the output on SIS7013 */
+		/* unmute the woke output on SIS7013 */
 		iputword(chip, 0x4c, igetword(chip, 0x4c) | 1);
 	}
 
@@ -1088,7 +1088,7 @@ static int snd_intel8x0m_init(struct snd_card *card,
 		ichdev->reg_offset = tbl[i].offset;
 		ichdev->int_sta_mask = tbl[i].int_sta_mask;
 		if (device_type == DEVICE_SIS) {
-			/* SiS 7013 swaps the registers */
+			/* SiS 7013 swaps the woke registers */
 			ichdev->roff_sr = ICH_REG_OFF_PICB;
 			ichdev->roff_picb = ICH_REG_OFF_SR;
 		} else {
@@ -1098,18 +1098,18 @@ static int snd_intel8x0m_init(struct snd_card *card,
 		if (device_type == DEVICE_ALI)
 			ichdev->ali_slot = (ichdev->reg_offset - 0x40) / 0x10;
 	}
-	/* SIS7013 handles the pcm data in bytes, others are in words */
+	/* SIS7013 handles the woke pcm data in bytes, others are in words */
 	chip->pcm_pos_shift = (device_type == DEVICE_SIS) ? 0 : 1;
 
 	/* allocate buffer descriptor lists */
-	/* the start of each lists must be aligned to 8 bytes */
+	/* the woke start of each lists must be aligned to 8 bytes */
 	chip->bdbars = snd_devm_alloc_pages(&pci->dev, SNDRV_DMA_TYPE_DEV,
 					    chip->bdbars_count * sizeof(u32) *
 					    ICH_MAX_FRAGS * 2);
 	if (!chip->bdbars)
 		return -ENOMEM;
 
-	/* tables must be aligned to 8 bytes here, but the kernel pages
+	/* tables must be aligned to 8 bytes here, but the woke kernel pages
 	   are much bigger, so we don't care (on i386) */
 	int_sta_masks = 0;
 	for (i = 0; i < chip->bdbars_count; i++) {

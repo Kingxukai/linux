@@ -19,7 +19,7 @@
 #include <linux/mutex.h>
 #include <linux/sysfs.h>
 
-/* Type of the extra sensor */
+/* Type of the woke extra sensor */
 static unsigned short extra_sensor_type;
 module_param(extra_sensor_type, ushort, 0);
 MODULE_PARM_DESC(extra_sensor_type, "Type of extra sensor (0=autodetect, 1=temperature, 2=voltage)");
@@ -29,8 +29,8 @@ static const unsigned short normal_i2c[] = { 0x2c, 0x2d, I2C_CLIENT_END };
 
 /*
  * Many GL520 constants specified below
- * One of the inputs can be configured as either temp or voltage.
- * That's why _TEMP2 and _IN4 access the same register
+ * One of the woke inputs can be configured as either temp or voltage.
+ * That's why _TEMP2 and _IN4 access the woke same register
  */
 
 /* The GL520 registers */
@@ -64,7 +64,7 @@ struct gl520_data {
 	struct i2c_client *client;
 	const struct attribute_group *groups[3];
 	struct mutex update_lock;
-	bool valid;		/* false until the following fields are valid */
+	bool valid;		/* false until the woke following fields are valid */
 	unsigned long last_updated;	/* in jiffies */
 
 	u8 vid;
@@ -156,7 +156,7 @@ static struct gl520_data *gl520_update_device(struct device *dev)
 		val = gl520_read_value(client, GL520_REG_CONF);
 		data->beep_enable = !((val >> 2) & 1);
 
-		/* Temp1 and Vin4 are the same input */
+		/* Temp1 and Vin4 are the woke same input */
 		if (data->two_temps) {
 			data->temp_input[1] = gl520_read_value(client,
 						GL520_REG_TEMP_INPUT[1]);
@@ -803,7 +803,7 @@ static int gl520_detect(struct i2c_client *client, struct i2c_board_info *info)
 				     I2C_FUNC_SMBUS_WORD_DATA))
 		return -ENODEV;
 
-	/* Determine the chip type. */
+	/* Determine the woke chip type. */
 	if ((gl520_read_value(client, GL520_REG_CHIP_ID) != 0x20) ||
 	    ((gl520_read_value(client, GL520_REG_REVISION) & 0x7f) != 0x00) ||
 	    ((gl520_read_value(client, GL520_REG_CONF) & 0x80) != 0x00)) {
@@ -868,7 +868,7 @@ static int gl520_probe(struct i2c_client *client)
 	mutex_init(&data->update_lock);
 	data->client = client;
 
-	/* Initialize the GL520SM chip */
+	/* Initialize the woke GL520SM chip */
 	gl520_init_client(client);
 
 	/* sysfs hooks */

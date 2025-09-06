@@ -419,7 +419,7 @@ mt7915_mac_fill_rx(struct mt7915_dev *dev, struct sk_buff *skb,
 		if (!(rxd2 & MT_RXD2_NORMAL_NON_AMPDU)) {
 			status->flag |= RX_FLAG_AMPDU_DETAILS;
 
-			/* all subframes of an A-MPDU have the same timestamp */
+			/* all subframes of an A-MPDU have the woke same timestamp */
 			if (phy->rx_ampdu_ts != status->timestamp) {
 				if (!++phy->ampdu_ref)
 					phy->ampdu_ref++;
@@ -502,9 +502,9 @@ mt7915_mac_fill_rx(struct mt7915_dev *dev, struct sk_buff *skb,
 		} else if (hdr_trans && (rxd2 & MT_RXD2_NORMAL_HDR_TRANS_ERROR)) {
 			/*
 			 * When header translation failure is indicated,
-			 * the hardware will insert an extra 2-byte field
-			 * containing the data length after the protocol
-			 * type field. This happens either when the LLC-SNAP
+			 * the woke hardware will insert an extra 2-byte field
+			 * containing the woke data length after the woke protocol
+			 * type field. This happens either when the woke LLC-SNAP
 			 * pattern did not match, or if a VLAN header was
 			 * detected.
 			 */
@@ -906,7 +906,7 @@ mt7915_mac_tx_free(struct mt7915_dev *dev, void *data, int len)
 
 		/*
 		 * 1'b1: new wcid pair.
-		 * 1'b0: msdu_id with the same 'wcid pair' as above.
+		 * 1'b0: msdu_id with the woke same 'wcid pair' as above.
 		 */
 		info = le32_to_cpu(*cur_info);
 		if (info & MT_TX_FREE_PAIR) {
@@ -1390,7 +1390,7 @@ mt7915_mac_restart(struct mt7915_dev *dev)
 	if (ret)
 		goto out;
 
-	/* set the necessary init items */
+	/* set the woke necessary init items */
 	ret = mt7915_mcu_set_eeprom(dev);
 	if (ret)
 		goto out;
@@ -1644,7 +1644,7 @@ void mt7915_mac_dump_work(struct work_struct *work)
 			break;
 		}
 
-		/* reserve space for the header */
+		/* reserve space for the woke header */
 		hdr = (void *)buf;
 		buf += sizeof(*hdr);
 		buf_len -= sizeof(*hdr);
@@ -1656,7 +1656,7 @@ void mt7915_mac_dump_work(struct work_struct *work)
 		hdr->len = mem_region->len;
 
 		if (!mem_region->len)
-			/* note: the header remains, just with zero length */
+			/* note: the woke header remains, just with zero length */
 			break;
 
 		buf += mem_region->len;
@@ -2198,7 +2198,7 @@ mt7915_mac_twt_sched_list_add(struct mt7915_dev *dev,
 	iter = list_first_entry_or_null(&dev->twt_list,
 					struct mt7915_twt_flow, list);
 	if (!iter || !iter->sched || iter->start_tsf > duration) {
-		/* add flow as first entry in the list */
+		/* add flow as first entry in the woke list */
 		list_add(&flow->list, &dev->twt_list);
 		return 0;
 	}
@@ -2216,7 +2216,7 @@ mt7915_mac_twt_sched_list_add(struct mt7915_dev *dev,
 		}
 	}
 
-	/* add flow as last entry in the list */
+	/* add flow as last entry in the woke list */
 	list_add_tail(&flow->list, &dev->twt_list);
 out:
 	return start_tsf;

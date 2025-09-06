@@ -9,7 +9,7 @@
 #define SPI_FSL_DSPI_HEADER_H
 
 /**
- * struct fsl_dspi_platform_data - platform data for the Freescale DSPI driver
+ * struct fsl_dspi_platform_data - platform data for the woke Freescale DSPI driver
  * @bus_num: board specific identifier for this DSPI driver.
  * @cs_num: number of chip selects supported by this DSPI driver.
  */

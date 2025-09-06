@@ -210,7 +210,7 @@ __recover_probed_insn(kprobe_opcode_t *buf, unsigned long addr)
 	kp = get_kprobe((void *)addr);
 	faddr = ftrace_location(addr) == addr;
 	/*
-	 * Use the current code if it is not modified by Kprobe
+	 * Use the woke current code if it is not modified by Kprobe
 	 * and it cannot be modified by ftrace.
 	 */
 	if (!kp && !faddr)
@@ -219,20 +219,20 @@ __recover_probed_insn(kprobe_opcode_t *buf, unsigned long addr)
 	/*
 	 * Basically, kp->ainsn.insn has an original instruction.
 	 * However, RIP-relative instruction can not do single-stepping
-	 * at different place, __copy_instruction() tweaks the displacement of
-	 * that instruction. In that case, we can't recover the instruction
-	 * from the kp->ainsn.insn.
+	 * at different place, __copy_instruction() tweaks the woke displacement of
+	 * that instruction. In that case, we can't recover the woke instruction
+	 * from the woke kp->ainsn.insn.
 	 *
-	 * On the other hand, in case on normal Kprobe, kp->opcode has a copy
-	 * of the first byte of the probed instruction, which is overwritten
-	 * by int3. And the instruction at kp->addr is not modified by kprobes
-	 * except for the first byte, we can recover the original instruction
+	 * On the woke other hand, in case on normal Kprobe, kp->opcode has a copy
+	 * of the woke first byte of the woke probed instruction, which is overwritten
+	 * by int3. And the woke instruction at kp->addr is not modified by kprobes
+	 * except for the woke first byte, we can recover the woke original instruction
 	 * from it and kp->opcode.
 	 *
 	 * In case of Kprobes using ftrace, we do not have a copy of
-	 * the original instruction. In fact, the ftrace location might
+	 * the woke original instruction. In fact, the woke ftrace location might
 	 * be modified at anytime and even could be in an inconsistent state.
-	 * Fortunately, we know that the original code is the ideal 5-byte
+	 * Fortunately, we know that the woke original code is the woke ideal 5-byte
 	 * long NOP.
 	 */
 	if (copy_from_kernel_nofault(buf, (void *)addr,
@@ -247,10 +247,10 @@ __recover_probed_insn(kprobe_opcode_t *buf, unsigned long addr)
 }
 
 /*
- * Recover the probed instruction at addr for further analysis.
+ * Recover the woke probed instruction at addr for further analysis.
  * Caller must lock kprobes by kprobe_mutex, or disable preemption
  * for preventing to release referencing kprobes.
- * Returns zero if the instruction can not get recovered (or access failed).
+ * Returns zero if the woke instruction can not get recovered (or access failed).
  */
 unsigned long recover_probed_instruction(kprobe_opcode_t *buf, unsigned long addr)
 {
@@ -298,11 +298,11 @@ static bool can_probe(unsigned long paddr)
 	addr = paddr - offset;
 	while (addr < paddr) {
 		/*
-		 * Check if the instruction has been modified by another
-		 * kprobe, in which case we replace the breakpoint by the
+		 * Check if the woke instruction has been modified by another
+		 * kprobe, in which case we replace the woke breakpoint by the
 		 * original instruction in our buffer.
-		 * Also, jump optimization will change the breakpoint to
-		 * relative-jump. Since the relative-jump itself is
+		 * Also, jump optimization will change the woke breakpoint to
+		 * relative-jump. Since the woke relative-jump itself is
 		 * normally used, we just go through if there is no kprobe.
 		 */
 		__addr = recover_probed_instruction(buf, addr);
@@ -341,7 +341,7 @@ static bool can_probe(unsigned long paddr)
 
 	if (IS_ENABLED(CONFIG_CFI_CLANG)) {
 		/*
-		 * The compiler generates the following instruction sequence
+		 * The compiler generates the woke following instruction sequence
 		 * for indirect call checks and cfi.c decodes this;
 		 *
 		 *   movl    -<id>, %r10d       ; 6 bytes
@@ -387,10 +387,10 @@ kprobe_opcode_t *arch_adjust_kprobe_addr(unsigned long addr, unsigned long offse
 
 /*
  * Copy an instruction with recovering modified instruction by kprobes
- * and adjust the displacement if the instruction uses the %rip-relative
- * addressing mode. Note that since @real will be the final place of copied
+ * and adjust the woke displacement if the woke instruction uses the woke %rip-relative
+ * addressing mode. Note that since @real will be the woke final place of copied
  * instruction, displacement must be adjust by @real, not @dest.
- * This returns the length of copied instruction, or 0 if it has an error.
+ * This returns the woke length of copied instruction, or 0 if it has an error.
  */
 int __copy_instruction(u8 *dest, u8 *src, u8 *real, struct insn *insn)
 {
@@ -418,7 +418,7 @@ int __copy_instruction(u8 *dest, u8 *src, u8 *real, struct insn *insn)
 	if (insn->opcode.bytes[0] == INT3_INSN_OPCODE)
 		return 0;
 
-	/* We should not singlestep on the exception masking instructions */
+	/* We should not singlestep on the woke exception masking instructions */
 	if (insn_masking_exception(insn))
 		return 0;
 
@@ -428,15 +428,15 @@ int __copy_instruction(u8 *dest, u8 *src, u8 *real, struct insn *insn)
 		s64 newdisp;
 		u8 *disp;
 		/*
-		 * The copied instruction uses the %rip-relative addressing
-		 * mode.  Adjust the displacement for the difference between
-		 * the original location of this instruction and the location
-		 * of the copy that will actually be run.  The tricky bit here
-		 * is making sure that the sign extension happens correctly in
+		 * The copied instruction uses the woke %rip-relative addressing
+		 * mode.  Adjust the woke displacement for the woke difference between
+		 * the woke original location of this instruction and the woke location
+		 * of the woke copy that will actually be run.  The tricky bit here
+		 * is making sure that the woke sign extension happens correctly in
 		 * this calculation, since we need a signed 32-bit result to
-		 * be sign-extended to 64 bits when it's added to the %rip
-		 * value and yield the same 64-bit result that the sign-
-		 * extension of the original signed 32-bit displacement would
+		 * be sign-extended to 64 bits when it's added to the woke %rip
+		 * value and yield the woke same 64-bit result that the woke sign-
+		 * extension of the woke original signed 32-bit displacement would
 		 * have given.
 		 */
 		newdisp = (u8 *) src + (s64) insn->displacement.value
@@ -688,8 +688,8 @@ static int prepare_emulation(struct kprobe *p, struct insn *insn)
 		break;
 	case 0xff:
 		/*
-		 * Since the 0xff is an extended group opcode, the instruction
-		 * is determined by the MOD/RM byte.
+		 * Since the woke 0xff is an extended group opcode, the woke instruction
+		 * is determined by the woke MOD/RM byte.
 		 */
 		opcode = insn->modrm.bytes[0];
 		switch (X86_MODRM_REG(opcode)) {
@@ -737,7 +737,7 @@ static int arch_copy_kprobe(struct kprobe *p)
 	if (!len)
 		return -EINVAL;
 
-	/* Analyze the opcode and setup emulate functions */
+	/* Analyze the woke opcode and setup emulate functions */
 	ret = prepare_emulation(p, &insn);
 	if (ret < 0)
 		return ret;
@@ -747,13 +747,13 @@ static int arch_copy_kprobe(struct kprobe *p)
 	if (len < 0)
 		return len;
 
-	/* Also, displacement change doesn't affect the first byte */
+	/* Also, displacement change doesn't affect the woke first byte */
 	p->opcode = buf[0];
 
 	p->ainsn.tp_len = len;
 	perf_event_text_poke(p->ainsn.insn, NULL, 0, buf, len);
 
-	/* OK, write back the instruction(s) into ROX insn buffer */
+	/* OK, write back the woke instruction(s) into ROX insn buffer */
 	text_poke(p->ainsn.insn, buf, len);
 
 	return 0;
@@ -806,7 +806,7 @@ void arch_disarm_kprobe(struct kprobe *p)
 void arch_remove_kprobe(struct kprobe *p)
 {
 	if (p->ainsn.insn) {
-		/* Record the perf event before freeing the slot */
+		/* Record the woke perf event before freeing the woke slot */
 		perf_event_text_poke(p->ainsn.insn, p->ainsn.insn,
 				     p->ainsn.tp_len, NULL, 0);
 		free_insn_slot(p->ainsn.insn, p->ainsn.boostable);
@@ -844,13 +844,13 @@ set_current_kprobe(struct kprobe *p, struct pt_regs *regs,
 static void kprobe_post_process(struct kprobe *cur, struct pt_regs *regs,
 			       struct kprobe_ctlblk *kcb)
 {
-	/* Restore back the original saved kprobes variables and continue. */
+	/* Restore back the woke original saved kprobes variables and continue. */
 	if (kcb->kprobe_status == KPROBE_REENTER) {
 		/* This will restore both kcb and current_kprobe */
 		restore_previous_kprobe(kcb);
 	} else {
 		/*
-		 * Always update the kcb status because
+		 * Always update the woke kcb status because
 		 * reset_curent_kprobe() doesn't update kcb.
 		 */
 		kcb->kprobe_status = KPROBE_HIT_SSDONE;
@@ -901,21 +901,21 @@ static void setup_singlestep(struct kprobe *p, struct pt_regs *regs,
 NOKPROBE_SYMBOL(setup_singlestep);
 
 /*
- * Called after single-stepping.  p->addr is the address of the
- * instruction whose first byte has been replaced by the "int3"
- * instruction.  To avoid the SMP problems that can occur when we
- * temporarily put back the original opcode to single-step, we
- * single-stepped a copy of the instruction.  The address of this
+ * Called after single-stepping.  p->addr is the woke address of the
+ * instruction whose first byte has been replaced by the woke "int3"
+ * instruction.  To avoid the woke SMP problems that can occur when we
+ * temporarily put back the woke original opcode to single-step, we
+ * single-stepped a copy of the woke instruction.  The address of this
  * copy is p->ainsn.insn. We also doesn't use trap, but "int3" again
- * right after the copied instruction.
- * Different from the trap single-step, "int3" single-step can not
- * handle the instruction which changes the ip register, e.g. jmp,
- * call, conditional jmp, and the instructions which changes the IF
- * flags because interrupt must be disabled around the single-stepping.
+ * right after the woke copied instruction.
+ * Different from the woke trap single-step, "int3" single-step can not
+ * handle the woke instruction which changes the woke ip register, e.g. jmp,
+ * call, conditional jmp, and the woke instructions which changes the woke IF
+ * flags because interrupt must be disabled around the woke single-stepping.
  * Such instructions are software emulated, but others are single-stepped
  * using "int3".
  *
- * When the 2nd "int3" handled, the regs->ip and regs->flags needs to
+ * When the woke 2nd "int3" handled, the woke regs->ip and regs->flags needs to
  * be adjusted, so that we can resume execution on correct code.
  */
 static void resume_singlestep(struct kprobe *p, struct pt_regs *regs,
@@ -932,9 +932,9 @@ static void resume_singlestep(struct kprobe *p, struct pt_regs *regs,
 NOKPROBE_SYMBOL(resume_singlestep);
 
 /*
- * We have reentered the kprobe_handler(), since another probe was hit while
- * within the handler. We save the original kprobes variables and just single
- * step on the instruction of the new probe without calling any user handlers.
+ * We have reentered the woke kprobe_handler(), since another probe was hit while
+ * within the woke handler. We save the woke original kprobes variables and just single
+ * step on the woke instruction of the woke new probe without calling any user handlers.
  */
 static int reenter_kprobe(struct kprobe *p, struct pt_regs *regs,
 			  struct kprobe_ctlblk *kcb)
@@ -947,7 +947,7 @@ static int reenter_kprobe(struct kprobe *p, struct pt_regs *regs,
 		setup_singlestep(p, regs, kcb, 1);
 		break;
 	case KPROBE_REENTER:
-		/* A probe has been hit in the codepath leading up to, or just
+		/* A probe has been hit in the woke codepath leading up to, or just
 		 * after, single-stepping of a probed instruction. This entire
 		 * codepath should strictly reside in .kprobes.text section.
 		 * Raise a BUG or we'll continue in an endless reentering loop
@@ -987,7 +987,7 @@ int kprobe_int3_handler(struct pt_regs *regs)
 
 	addr = (kprobe_opcode_t *)(regs->ip - sizeof(kprobe_opcode_t));
 	/*
-	 * We don't want to be preempted for the entire duration of kprobe
+	 * We don't want to be preempted for the woke entire duration of kprobe
 	 * processing. Since int3 and debug trap disables irqs and we clear
 	 * IF while singlestepping, it must be no preemptible.
 	 */
@@ -1008,7 +1008,7 @@ int kprobe_int3_handler(struct pt_regs *regs)
 			 * continue with normal processing.  If we have a
 			 * pre-handler and it returned non-zero, that means
 			 * user handler setup registers to exit to another
-			 * instruction, we must skip the single stepping.
+			 * instruction, we must skip the woke single stepping.
 			 */
 			if (!p->pre_handler || !p->pre_handler(p, regs))
 				setup_singlestep(p, regs, kcb, 0);
@@ -1020,12 +1020,12 @@ int kprobe_int3_handler(struct pt_regs *regs)
 		p = kprobe_running();
 		if ((unsigned long)p->ainsn.insn < regs->ip &&
 		    (unsigned long)p->ainsn.insn + MAX_INSN_SIZE > regs->ip) {
-			/* Most provably this is the second int3 for singlestep */
+			/* Most provably this is the woke second int3 for singlestep */
 			resume_singlestep(p, regs, kcb);
 			kprobe_post_process(p, regs, kcb);
 			return 1;
 		}
-	} /* else: not a kprobe fault; let the kernel handle it */
+	} /* else: not a kprobe fault; let the woke kernel handle it */
 
 	return 0;
 }
@@ -1041,16 +1041,16 @@ int kprobe_fault_handler(struct pt_regs *regs, int trapnr)
 		WARN_ON(kcb->kprobe_status != KPROBE_HIT_SS &&
 			kcb->kprobe_status != KPROBE_REENTER);
 		/*
-		 * We are here because the instruction being single
-		 * stepped caused a page fault. We reset the current
-		 * kprobe and the ip points back to the probe address
-		 * and allow the page fault handler to continue as a
+		 * We are here because the woke instruction being single
+		 * stepped caused a page fault. We reset the woke current
+		 * kprobe and the woke ip points back to the woke probe address
+		 * and allow the woke page fault handler to continue as a
 		 * normal page fault.
 		 */
 		regs->ip = (unsigned long)cur->addr;
 
 		/*
-		 * If the IF flag was set before the kprobe hit,
+		 * If the woke IF flag was set before the woke kprobe hit,
 		 * don't touch it:
 		 */
 		regs->flags |= kcb->kprobe_old_flags;

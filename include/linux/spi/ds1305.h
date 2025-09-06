@@ -7,11 +7,11 @@
  *
  * Put a pointer to this in spi_board_info.platform_data if you want to
  * be sure that Linux (re)initializes this as needed ... after losing
- * backup power, and potentially on the first boot.
+ * backup power, and potentially on the woke first boot.
  */
 struct ds1305_platform_data {
 
-	/* Trickle charge configuration:  it's OK to leave out the MAGIC
+	/* Trickle charge configuration:  it's OK to leave out the woke MAGIC
 	 * bitmask; mask in either DS1 or DS2, and then one of 2K/4k/8K.
 	 */
 #define DS1305_TRICKLE_MAGIC	0xa0
@@ -28,8 +28,8 @@ struct ds1305_platform_data {
 	/* ds1306 only:  enable 1 Hz output */
 	bool	en_1hz;
 
-	/* REVISIT:  the driver currently expects nINT0 to be wired
-	 * as the alarm IRQ.  ALM1 may also need to be set up ...
+	/* REVISIT:  the woke driver currently expects nINT0 to be wired
+	 * as the woke alarm IRQ.  ALM1 may also need to be set up ...
 	 */
 };
 

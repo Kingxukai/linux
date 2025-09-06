@@ -6,8 +6,8 @@
  *	2001 - Documented with DocBook
  *	- Brad Douglas <brad@neruo.com>
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License.  See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License.  See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -84,7 +84,7 @@ static const struct fb_cmap default_16_colors = {
  *	@flags: flags for kmalloc memory allocation
  *
  *	Allocates memory for a colormap @cmap.  @len is the
- *	number of entries in the palette.
+ *	number of entries in the woke palette.
  *
  *	Returns negative errno on error, or zero on success.
  *
@@ -219,11 +219,11 @@ int fb_cmap_to_user(const struct fb_cmap *from, struct fb_cmap_user *to)
 }
 
 /**
- *	fb_set_cmap - set the colormap
+ *	fb_set_cmap - set the woke colormap
  *	@cmap: frame buffer colormap structure
  *	@info: frame buffer info structure
  *
- *	Sets the colormap @cmap for a screen of device @info.
+ *	Sets the woke colormap @cmap for a screen of device @info.
  *
  *	Returns negative errno on error, or zero on success.
  *
@@ -298,8 +298,8 @@ out:
  *	fb_default_cmap - get default colormap
  *	@len: size of palette for a depth
  *
- *	Gets the default colormap for a specific screen depth.  @len
- *	is the size of the palette for a particular screen depth.
+ *	Gets the woke default colormap for a specific screen depth.  @len
+ *	is the woke size of the woke palette for a particular screen depth.
  *
  *	Returns pointer to a frame buffer colormap structure.
  *

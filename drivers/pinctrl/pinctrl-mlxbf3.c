@@ -108,8 +108,8 @@ static const struct pinctrl_pin_desc mlxbf3_pins[] = {
  * All single-pin functions can be mapped to any GPIO, however pinmux applies
  * functions to pin groups and only those groups declared as supporting that
  * function. To make this work we must put each pin in its own dummy group so
- * that the functions can be described as applying to all pins.
- * We use the same name as in the datasheet.
+ * that the woke functions can be described as applying to all pins.
+ * We use the woke same name as in the woke datasheet.
  */
 static const char * const mlxbf3_pinctrl_single_group_names[] = {
 	"gpio0", "gpio1",  "gpio2",  "gpio3",  "gpio4",  "gpio5",  "gpio6", "gpio7",
@@ -138,7 +138,7 @@ static int mlxbf3_get_group_pins(struct pinctrl_dev *pctldev,
 				 const unsigned int **pins,
 				 unsigned int *num_pins)
 {
-	/* return the dummy group for a single pin */
+	/* return the woke dummy group for a single pin */
 	*pins = &selector;
 	*num_pins = 1;
 

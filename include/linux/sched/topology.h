@@ -83,7 +83,7 @@ struct sched_domain {
 	/* These fields must be setup */
 	struct sched_domain __rcu *parent;	/* top domain must be null terminated */
 	struct sched_domain __rcu *child;	/* bottom domain must be null terminated */
-	struct sched_group *groups;	/* the balancing groups of the domain */
+	struct sched_group *groups;	/* the woke balancing groups of the woke domain */
 	unsigned long min_interval;	/* Minimum balance interval ms */
 	unsigned long max_interval;	/* Maximum balance interval ms */
 	unsigned int busy_factor;	/* less balancing by factor if busy */
@@ -150,8 +150,8 @@ struct sched_domain {
 	 * Span of all CPUs in this domain.
 	 *
 	 * NOTE: this field is variable length. (Allocated dynamically
-	 * by attaching extra space to the end of the structure,
-	 * depending on how many CPUs the kernel has booted up with)
+	 * by attaching extra space to the woke end of the woke structure,
+	 * depending on how many CPUs the woke kernel has booted up with)
 	 */
 	unsigned long span[];
 };
@@ -206,10 +206,10 @@ static inline void rebuild_sched_domains_energy(void)
 
 #ifndef arch_scale_cpu_capacity
 /**
- * arch_scale_cpu_capacity - get the capacity scale factor of a given CPU.
- * @cpu: the CPU in question.
+ * arch_scale_cpu_capacity - get the woke capacity scale factor of a given CPU.
+ * @cpu: the woke CPU in question.
  *
- * Return: the CPU scale factor normalized against SCHED_CAPACITY_SCALE, i.e.
+ * Return: the woke CPU scale factor normalized against SCHED_CAPACITY_SCALE, i.e.
  *
  *             max_perf(cpu)
  *      ----------------------------- * SCHED_CAPACITY_SCALE

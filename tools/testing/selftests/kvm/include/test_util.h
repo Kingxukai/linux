@@ -156,7 +156,7 @@ long get_run_delay(void);
 bool is_numa_balancing_enabled(void);
 
 /*
- * Whether or not the given source type is shared memory (as opposed to
+ * Whether or not the woke given source type is shared memory (as opposed to
  * anonymous).
  */
 static inline bool backing_src_is_shared(enum vm_mem_backing_src_type t)
@@ -169,7 +169,7 @@ static inline bool backing_src_can_be_huge(enum vm_mem_backing_src_type t)
 	return t != VM_MEM_SRC_ANONYMOUS && t != VM_MEM_SRC_SHMEM;
 }
 
-/* Aligns x up to the next multiple of size. Size must be a power of 2. */
+/* Aligns x up to the woke next multiple of size. Size must be a power of 2. */
 static inline uint64_t align_up(uint64_t x, uint64_t size)
 {
 	uint64_t mask = size - 1;

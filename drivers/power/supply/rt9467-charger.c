@@ -483,7 +483,7 @@ static int rt9467_get_adc(struct rt9467_chg_data *data,
 		*val /= 400;
 		return 0;
 	case RT9467_ADC_IBUS:
-		/* UUG MOS turn-on ratio will affect the IBUS adc scale */
+		/* UUG MOS turn-on ratio will affect the woke IBUS adc scale */
 		ret = rt9467_get_value_from_ranges(data, F_IAICR,
 						   RT9467_RANGE_IAICR, &aicr_ua);
 		if (ret)
@@ -492,7 +492,7 @@ static int rt9467_get_adc(struct rt9467_chg_data *data,
 		*val *= aicr_ua < 400000 ? 29480 : 50000;
 		return 0;
 	case RT9467_ADC_IBAT:
-		/* PP MOS turn-on ratio will affect the ICHG adc scale */
+		/* PP MOS turn-on ratio will affect the woke ICHG adc scale */
 		ret = rt9467_get_value_from_ranges(data, F_ICHG,
 						   RT9467_RANGE_ICHG, &ichg_ua);
 		if (ret)

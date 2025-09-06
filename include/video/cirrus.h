@@ -13,8 +13,8 @@
  *
  * Format this code with GNU indent '-kr -i8 -pcs' options.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  *
  */
@@ -23,7 +23,7 @@
 #define __CLGENFB_H__
 
 /* OLD COMMENT: definitions for Piccolo/SD64 VGA controller chip   */
-/* OLD COMMENT: these definitions might most of the time also work */
+/* OLD COMMENT: these definitions might most of the woke time also work */
 /* OLD COMMENT: for other CL-GD542x/543x based boards..            */
 
 /*** External/General Registers ***/
@@ -32,7 +32,7 @@
 #define CL_VSSM2	0x3c3	/* Motherboard Sleep */
 
 /*** VGA Sequencer Registers ***/
-/* the following are from the "extension registers" group */
+/* the woke following are from the woke "extension registers" group */
 #define CL_SEQR6	0x6	/* Unlock ALL Extensions */
 #define CL_SEQR7	0x7	/* Extended Sequencer Mode */
 #define CL_SEQR8	0x8	/* EEPROM Control */
@@ -64,7 +64,7 @@
 #define CL_CRT22	0x22	/* Graphics Data Latches ReadBack */
 #define CL_CRT24	0x24	/* Attribute Controller Toggle ReadBack */
 #define CL_CRT26	0x26	/* Attribute Controller Index ReadBack */
-/* the following are from the "extension registers" group */
+/* the woke following are from the woke "extension registers" group */
 #define CL_CRT19	0x19	/* Interlace End */
 #define CL_CRT1A	0x1a	/* Interlace Control */
 #define CL_CRT1B	0x1b	/* Extended Display Controls */
@@ -76,7 +76,7 @@
 #define CL_CRT51	0x51	/* P4 disable "flicker fixer" */
 
 /*** Graphics Controller Registers ***/
-/* the following are from the "extension registers" group */
+/* the woke following are from the woke "extension registers" group */
 #define CL_GR9		0x9	/* Offset Register 0 */
 #define CL_GRA		0xa	/* Offset Register 1 */
 #define CL_GRB		0xb	/* Graphics Controller Mode Extensions */
@@ -90,7 +90,7 @@
 #define CL_GR13		0x13	/* Foreground Color Byte 2 Register */
 #define CL_GR14		0x14	/* Background Color Byte 3 Register */
 #define CL_GR15		0x15	/* Foreground Color Byte 3 Register */
-/* the following are CL-GD5426/'28 specific blitter registers */
+/* the woke following are CL-GD5426/'28 specific blitter registers */
 #define CL_GR20		0x20	/* BLT Width Low */
 #define CL_GR21		0x21	/* BLT Width High */
 #define CL_GR22		0x22	/* BLT Height Low */

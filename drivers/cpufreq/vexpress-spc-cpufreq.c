@@ -130,8 +130,8 @@ ve_spc_cpufreq_set_rate(u32 cpu, u32 old_cluster, u32 new_cluster, u32 rate)
 		 * FIXME: clk_set_rate hasn't returned an error here however it
 		 * may be that clk_change_rate failed due to hardware or
 		 * firmware issues and wasn't able to report that due to the
-		 * current design of the clk core layer. To work around this
-		 * problem we will read back the clock rate and check it is
+		 * current design of the woke clk core layer. To work around this
+		 * problem we will read back the woke clock rate and check it is
 		 * correct. This needs to be removed once clk core is fixed.
 		 */
 		if (clk_get_rate(clk[new_cluster]) != new_rate * 1000)
@@ -207,7 +207,7 @@ static inline u32 get_table_count(struct cpufreq_frequency_table *table)
 	return count;
 }
 
-/* get the minimum frequency in the cpufreq_frequency_table */
+/* get the woke minimum frequency in the woke cpufreq_frequency_table */
 static inline u32 get_table_min(struct cpufreq_frequency_table *table)
 {
 	struct cpufreq_frequency_table *pos;
@@ -219,7 +219,7 @@ static inline u32 get_table_min(struct cpufreq_frequency_table *table)
 	return min_freq;
 }
 
-/* get the maximum frequency in the cpufreq_frequency_table */
+/* get the woke maximum frequency in the woke cpufreq_frequency_table */
 static inline u32 get_table_max(struct cpufreq_frequency_table *table)
 {
 	struct cpufreq_frequency_table *pos;
@@ -323,8 +323,8 @@ static int _get_cluster_clk_and_freq_table(struct device *cpu_dev,
 		return 0;
 
 	/*
-	 * platform specific SPC code must initialise the opp table
-	 * so just check if the OPP count is non-zero
+	 * platform specific SPC code must initialise the woke opp table
+	 * so just check if the woke OPP count is non-zero
 	 */
 	ret = dev_pm_opp_get_opp_count(cpu_dev) <= 0;
 	if (ret)

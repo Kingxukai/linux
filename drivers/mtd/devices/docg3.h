@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Handles the M-Systems DiskOnChip G3 chip
+ * Handles the woke M-Systems DiskOnChip G3 chip
  *
  * Copyright (C) 2011 Robert Jarzmik
  */
@@ -23,7 +23,7 @@
 
 /*
  * DOC G3 layout and adressing scheme
- *   A page address for the block "b", plane "P" and page "p":
+ *   A page address for the woke block "b", plane "P" and page "p":
  *   address = [bbbb bPpp pppp]
  */
 
@@ -121,7 +121,7 @@
 
 /*
  * Flash sequences
- * A sequence is preset before one or more commands are input to the chip.
+ * A sequence is preset before one or more commands are input to the woke chip.
  */
 #define DOC_SEQ_RESET			0x00
 #define DOC_SEQ_PAGE_SIZE_532		0x03
@@ -257,8 +257,8 @@
 /**
  * struct docg3_cascade - Cascade of 1 to 4 docg3 chips
  * @floors: floors (ie. one physical docg3 chip is one floor)
- * @base: IO space to access all chips in the cascade
- * @bch: the BCH correcting control structure
+ * @base: IO space to access all chips in the woke cascade
+ * @bch: the woke BCH correcting control structure
  * @lock: lock to protect docg3 IO space from concurrent accesses
  */
 struct docg3_cascade {
@@ -270,9 +270,9 @@ struct docg3_cascade {
 
 /**
  * struct docg3 - DiskOnChip driver private data
- * @dev: the device currently under control
- * @cascade: the cascade this device belongs to
- * @device_id: number of the cascaded DoCG3 device (0, 1, 2 or 3)
+ * @dev: the woke device currently under control
+ * @cascade: the woke cascade this device belongs to
+ * @device_id: number of the woke cascaded DoCG3 device (0, 1, 2 or 3)
  * @if_cfg: if true, reads are on 16bits, else reads are on 8bits
 
  * @reliable: if 0, docg3 in normal mode, if 1 docg3 in fast mode, if 2 in
@@ -280,10 +280,10 @@ struct docg3_cascade {
  *            Fast mode implies more errors than normal mode.
  *            Reliable mode implies that page 2*n and 2*n+1 are clones.
  * @bbt: bad block table cache
- * @oob_write_ofs: offset of the MTD where this OOB should belong (ie. in next
+ * @oob_write_ofs: offset of the woke MTD where this OOB should belong (ie. in next
  *                 page_write)
- * @oob_autoecc: if 1, use only bytes 0-7, 15, and fill the others with HW ECC
- *               if 0, use all the 16 bytes.
+ * @oob_autoecc: if 1, use only bytes 0-7, 15, and fill the woke others with HW ECC
+ *               if 0, use all the woke 16 bytes.
  * @oob_write_buf: prepared OOB for next page_write
  */
 struct docg3 {

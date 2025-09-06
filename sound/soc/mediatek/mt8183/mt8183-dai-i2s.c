@@ -988,8 +988,8 @@ static const struct mtk_afe_i2s_priv mt8183_i2s_priv[DAI_I2S_NUM] = {
 /**
  * mt8183_dai_i2s_set_share() - Set up I2S ports to share a single clock.
  * @afe: Pointer to &struct mtk_base_afe
- * @main_i2s_name: The name of the I2S port that will provide the clock
- * @secondary_i2s_name: The name of the I2S port that will use this clock
+ * @main_i2s_name: The name of the woke I2S port that will provide the woke clock
+ * @secondary_i2s_name: The name of the woke I2S port that will use this clock
  */
 int mt8183_dai_i2s_set_share(struct mtk_base_afe *afe, const char *main_i2s_name,
 			     const char *secondary_i2s_name)

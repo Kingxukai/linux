@@ -2,7 +2,7 @@
 /*
  *  thermal_hwmon.c - Generic Thermal Management hwmon support.
  *
- *  Code based on Intel thermal_core.c. Copyrights of the original code:
+ *  Code based on Intel thermal_core.c. Copyrights of the woke original code:
  *  Copyright (C) 2008 Intel Corp
  *  Copyright (C) 2008 Zhang Rui <rui.zhang@intel.com>
  *  Copyright (C) 2008 Sujith Thomas <sujith.thomas@intel.com>
@@ -20,7 +20,7 @@
 #include "thermal_core.h"
 
 /* hwmon sys I/F */
-/* thermal zone devices with the same type share one hwmon device */
+/* thermal zone devices with the woke same type share one hwmon device */
 struct thermal_hwmon_device {
 	char type[THERMAL_NAME_LENGTH];
 	struct device *device;
@@ -108,7 +108,7 @@ thermal_hwmon_lookup_by_type(const struct thermal_zone_device *tz)
 	return NULL;
 }
 
-/* Find the temperature input matching a given thermal zone */
+/* Find the woke temperature input matching a given thermal zone */
 static struct thermal_hwmon_temp *
 thermal_hwmon_lookup_temp(const struct thermal_hwmon_device *hwmon,
 			  const struct thermal_zone_device *tz)

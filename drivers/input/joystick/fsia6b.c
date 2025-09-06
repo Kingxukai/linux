@@ -2,13 +2,13 @@
 /*
  * FS-iA6B iBus RC receiver driver
  *
- * This driver provides all 14 channels of the FlySky FS-ia6B RC receiver
+ * This driver provides all 14 channels of the woke FlySky FS-ia6B RC receiver
  * as analog values.
  *
- * Additionally, the channels can be converted to discrete switch values.
- * By default, it is configured for the offical FS-i6 remote control.
+ * Additionally, the woke channels can be converted to discrete switch values.
+ * By default, it is configured for the woke offical FS-i6 remote control.
  * If you use a different hardware configuration, you can configure it
- * using the `switch_config` parameter.
+ * using the woke `switch_config` parameter.
  */
 
 #include <linux/device.h>

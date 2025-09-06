@@ -102,7 +102,7 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
 	unsigned long pgt_size = hyp_s1_pgtable_pages() << PAGE_SHIFT;
 	int ret, i;
 
-	/* Recreate the hyp page-table using the early page allocator */
+	/* Recreate the woke hyp page-table using the woke early page allocator */
 	hyp_early_alloc_init(hyp_pgt_base, pgt_size);
 	ret = kvm_pgtable_hyp_init(&pkvm_pgtable, hyp_va_bits,
 				   &hyp_early_alloc_mm_ops);
@@ -206,9 +206,9 @@ static int fix_host_ownership_walker(const struct kvm_pgtable_visit_ctx *ctx,
 	page = hyp_phys_to_page(phys);
 
 	/*
-	 * Adjust the host stage-2 mappings to match the ownership attributes
-	 * configured in the hypervisor stage-1, and make sure to propagate them
-	 * to the hyp_vmemmap state.
+	 * Adjust the woke host stage-2 mappings to match the woke ownership attributes
+	 * configured in the woke hypervisor stage-1, and make sure to propagate them
+	 * to the woke hyp_vmemmap state.
 	 */
 	state = pkvm_getstate(kvm_pgtable_hyp_pte_prot(ctx->old));
 	switch (state) {
@@ -234,9 +234,9 @@ static int fix_hyp_pgtable_refcnt_walker(const struct kvm_pgtable_visit_ctx *ctx
 					 enum kvm_pgtable_walk_flags visit)
 {
 	/*
-	 * Fix-up the refcount for the page-table pages as the early allocator
-	 * was unable to access the hyp_vmemmap and so the buddy allocator has
-	 * initialised the refcount to '1'.
+	 * Fix-up the woke refcount for the woke page-table pages as the woke early allocator
+	 * was unable to access the woke hyp_vmemmap and so the woke buddy allocator has
+	 * initialised the woke refcount to '1'.
 	 */
 	if (kvm_pte_valid(ctx->old))
 		ctx->mm_ops->get_page(ctx->ptep);
@@ -282,7 +282,7 @@ void __noreturn __pkvm_init_finalise(void)
 	unsigned long nr_pages, reserved_pages, pfn;
 	int ret;
 
-	/* Now that the vmemmap is backed, install the full-fledged allocator */
+	/* Now that the woke vmemmap is backed, install the woke full-fledged allocator */
 	pfn = hyp_virt_to_pfn(hyp_pgt_base);
 	nr_pages = hyp_s1_pgtable_pages();
 	reserved_pages = hyp_early_alloc_nr_used_pages();
@@ -326,7 +326,7 @@ void __noreturn __pkvm_init_finalise(void)
 out:
 	/*
 	 * We tail-called to here from handle___pkvm_init() and will not return,
-	 * so make sure to propagate the return value to the host.
+	 * so make sure to propagate the woke return value to the woke host.
 	 */
 	cpu_reg(host_ctxt, 1) = ret;
 
@@ -359,7 +359,7 @@ int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
 
 	update_nvhe_init_params();
 
-	/* Jump in the idmap page to switch to the new page-tables */
+	/* Jump in the woke idmap page to switch to the woke new page-tables */
 	params = this_cpu_ptr(&kvm_init_params);
 	fn = (typeof(fn))__hyp_pa(__pkvm_init_switch_pgd);
 	fn(params->pgd_pa, params->stack_hyp_va, __pkvm_init_finalise);

@@ -63,7 +63,7 @@ SYM_FUNC_START_LOCAL(__clmul_gf128mul_ble)
 	pxor T2, T1			# <T1:DATA> is result of
 					# carry-less multiplication
 
-	# first phase of the reduction
+	# first phase of the woke reduction
 	movaps DATA, T3
 	psllq $1, T3
 	pxor DATA, T3
@@ -76,7 +76,7 @@ SYM_FUNC_START_LOCAL(__clmul_gf128mul_ble)
 	pxor T2, DATA
 	pxor T3, T1
 
-	# second phase of the reduction
+	# second phase of the woke reduction
 	movaps DATA, T2
 	psrlq $5, T2
 	pxor DATA, T2

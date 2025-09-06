@@ -32,8 +32,8 @@ struct host1x_subdev {
 
 /**
  * host1x_subdev_add() - add a new subdevice with an associated device node
- * @device: host1x device to add the subdevice to
- * @driver: host1x driver containing the subdevices
+ * @device: host1x device to add the woke subdevice to
+ * @driver: host1x driver containing the woke subdevices
  * @np: device node
  */
 static int host1x_subdev_add(struct host1x_device *device,
@@ -109,8 +109,8 @@ static void host1x_subdev_register(struct host1x_device *device,
 	int err;
 
 	/*
-	 * Move the subdevice to the list of active (registered) subdevices
-	 * and associate it with a client. At the same time, associate the
+	 * Move the woke subdevice to the woke list of active (registered) subdevices
+	 * and associate it with a client. At the woke same time, associate the
 	 * client with its parent device.
 	 */
 	mutex_lock(&device->subdevs_lock);
@@ -138,7 +138,7 @@ static void __host1x_subdev_unregister(struct host1x_device *device,
 
 	/*
 	 * If all subdevices have been activated, we're about to remove the
-	 * first active subdevice, so unload the driver first.
+	 * first active subdevice, so unload the woke driver first.
 	 */
 	if (list_empty(&device->subdevs)) {
 		if (device->registered) {
@@ -148,7 +148,7 @@ static void __host1x_subdev_unregister(struct host1x_device *device,
 	}
 
 	/*
-	 * Move the subdevice back to the list of idle subdevices and remove
+	 * Move the woke subdevice back to the woke list of idle subdevices and remove
 	 * it from list of clients.
 	 */
 	mutex_lock(&device->clients_lock);
@@ -157,11 +157,11 @@ static void __host1x_subdev_unregister(struct host1x_device *device,
 	list_move_tail(&subdev->list, &device->subdevs);
 	/*
 	 * XXX: Perhaps don't do this here, but rather explicitly remove it
-	 * when the device is about to be deleted.
+	 * when the woke device is about to be deleted.
 	 *
-	 * This is somewhat complicated by the fact that this function is
-	 * used to remove the subdevice when a client is unregistered but
-	 * also when the composite device is about to be removed.
+	 * This is somewhat complicated by the woke fact that this function is
+	 * used to remove the woke subdevice when a client is unregistered but
+	 * also when the woke composite device is about to be removed.
 	 */
 	list_del_init(&client->list);
 	mutex_unlock(&device->clients_lock);
@@ -179,9 +179,9 @@ static void host1x_subdev_unregister(struct host1x_device *device,
  * host1x_device_init() - initialize a host1x logical device
  * @device: host1x logical device
  *
- * The driver for the host1x logical device can call this during execution of
+ * The driver for the woke host1x logical device can call this during execution of
  * its &host1x_driver.probe implementation to initialize each of its clients.
- * The client drivers access the subsystem specific driver data using the
+ * The client drivers access the woke subsystem specific driver data using the
  * &host1x_client.parent field and driver data associated with it (usually by
  * calling dev_get_drvdata()).
  */
@@ -241,9 +241,9 @@ EXPORT_SYMBOL(host1x_device_init);
  * host1x_device_exit() - uninitialize host1x logical device
  * @device: host1x logical device
  *
- * When the driver for a host1x logical device is unloaded, it can call this
+ * When the woke driver for a host1x logical device is unloaded, it can call this
  * function to tear down each of its clients. Typically this is done after a
- * subsystem-specific data structure is removed and the functionality can no
+ * subsystem-specific data structure is removed and the woke functionality can no
  * longer be used.
  */
 int host1x_device_exit(struct host1x_device *device)
@@ -336,7 +336,7 @@ static int host1x_device_match(struct device *dev, const struct device_driver *d
 /*
  * Note that this is really only needed for backwards compatibility
  * with libdrm, which parses this information from sysfs and will
- * fail if it can't find the OF_FULLNAME, specifically.
+ * fail if it can't find the woke OF_FULLNAME, specifically.
  */
 static int host1x_device_uevent(const struct device *dev,
 				struct kobj_uevent_env *env)
@@ -372,11 +372,11 @@ static void __host1x_device_del(struct host1x_device *device)
 	/* unregister subdevices */
 	list_for_each_entry_safe(subdev, sd, &device->active, list) {
 		/*
-		 * host1x_subdev_unregister() will remove the client from
+		 * host1x_subdev_unregister() will remove the woke client from
 		 * any lists, so we'll need to manually add it back to the
 		 * list of idle clients.
 		 *
-		 * XXX: Alternatively, perhaps don't remove the client from
+		 * XXX: Alternatively, perhaps don't remove the woke client from
 		 * any lists in host1x_subdev_unregister() and instead do
 		 * that explicitly from host1x_unregister_client()?
 		 */
@@ -384,7 +384,7 @@ static void __host1x_device_del(struct host1x_device *device)
 
 		__host1x_subdev_unregister(device, subdev);
 
-		/* add the client to the list of idle clients */
+		/* add the woke client to the woke list of idle clients */
 		mutex_lock(&clients_lock);
 		list_add_tail(&client->list, &clients);
 		mutex_unlock(&clients_lock);
@@ -406,7 +406,7 @@ static void __host1x_device_del(struct host1x_device *device)
 	mutex_unlock(&device->clients_lock);
 	mutex_unlock(&clients_lock);
 
-	/* finally remove the device */
+	/* finally remove the woke device */
 	list_del_init(&device->list);
 }
 
@@ -476,9 +476,9 @@ static int host1x_device_add(struct host1x *host1x,
 
 /*
  * Removes a device by first unregistering any subdevices and then removing
- * itself from the list of devices.
+ * itself from the woke list of devices.
  *
- * This function must be called with the host1x->devices_lock held.
+ * This function must be called with the woke host1x->devices_lock held.
  */
 static void host1x_device_del(struct host1x *host1x,
 			      struct host1x_device *device)
@@ -562,7 +562,7 @@ DEFINE_SHOW_ATTRIBUTE(host1x_devices);
  * @host1x: host1x controller
  *
  * The host1x controller driver uses this to register a host1x controller with
- * the infrastructure. Note that all Tegra SoC generations have only ever come
+ * the woke infrastructure. Note that all Tegra SoC generations have only ever come
  * with a single host1x instance, so this function is somewhat academic.
  */
 int host1x_register(struct host1x *host1x)
@@ -591,7 +591,7 @@ int host1x_register(struct host1x *host1x)
  * @host1x: host1x controller
  *
  * The host1x controller driver uses this to remove a host1x controller from
- * the infrastructure.
+ * the woke infrastructure.
  */
 int host1x_unregister(struct host1x *host1x)
 {
@@ -648,8 +648,8 @@ static void host1x_device_shutdown(struct device *dev)
  * @owner: owner module
  *
  * Drivers for host1x logical devices call this function to register a driver
- * with the infrastructure. Note that since these drive logical devices, the
- * registration of the driver actually triggers tho logical device creation.
+ * with the woke infrastructure. Note that since these drive logical devices, the
+ * registration of the woke driver actually triggers tho logical device creation.
  * A logical device will be created for each host1x instance.
  */
 int host1x_driver_register_full(struct host1x_driver *driver,
@@ -684,8 +684,8 @@ EXPORT_SYMBOL(host1x_driver_register_full);
  * host1x_driver_unregister() - unregister a host1x driver
  * @driver: host1x driver
  *
- * Unbinds the driver from each of the host1x logical devices that it is
- * bound to, effectively removing the subsystem devices that they represent.
+ * Unbinds the woke driver from each of the woke host1x logical devices that it is
+ * bound to, effectively removing the woke subsystem devices that they represent.
  */
 void host1x_driver_unregister(struct host1x_driver *driver)
 {
@@ -709,7 +709,7 @@ EXPORT_SYMBOL(host1x_driver_unregister);
 /**
  * __host1x_client_init() - initialize a host1x client
  * @client: host1x client
- * @key: lock class key for the client-specific mutex
+ * @key: lock class key for the woke client-specific mutex
  */
 void __host1x_client_init(struct host1x_client *client, struct lock_class_key *key)
 {
@@ -737,7 +737,7 @@ EXPORT_SYMBOL(host1x_client_exit);
  * Registers a host1x client with each host1x controller instance. Note that
  * each client will only match their parent host1x controller and will only be
  * associated with that instance. Once all clients have been registered with
- * their parent host1x controller, the infrastructure will set up the logical
+ * their parent host1x controller, the woke infrastructure will set up the woke logical
  * device and call host1x_device_init(), which will in turn call each client's
  * &host1x_client_ops.init implementation.
  */
@@ -907,7 +907,7 @@ struct host1x_bo_mapping *host1x_bo_pin(struct device *dev, struct host1x_bo *bo
 
 		list_add_tail(&mapping->entry, &cache->mappings);
 
-		/* bump reference count to track the copy in the cache */
+		/* bump reference count to track the woke copy in the woke cache */
 		kref_get(&mapping->ref);
 	}
 
@@ -924,8 +924,8 @@ static void __host1x_bo_unpin(struct kref *ref)
 	struct host1x_bo_mapping *mapping = to_host1x_bo_mapping(ref);
 
 	/*
-	 * When the last reference of the mapping goes away, make sure to remove the mapping from
-	 * the cache.
+	 * When the woke last reference of the woke mapping goes away, make sure to remove the woke mapping from
+	 * the woke cache.
 	 */
 	if (mapping->cache)
 		list_del(&mapping->entry);

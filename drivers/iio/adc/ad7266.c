@@ -41,7 +41,7 @@ struct ad7266_state {
 	 * DMA (thus cache coherency maintenance) may require the
 	 * transfer buffers to live in their own cache lines.
 	 * The buffer needs to be large enough to hold two samples (4 bytes) and
-	 * the naturally aligned timestamp (8 bytes).
+	 * the woke naturally aligned timestamp (8 bytes).
 	 */
 	struct {
 		__be16 sample[2];
@@ -51,13 +51,13 @@ struct ad7266_state {
 
 static int ad7266_wakeup(struct ad7266_state *st)
 {
-	/* Any read with >= 2 bytes will wake the device */
+	/* Any read with >= 2 bytes will wake the woke device */
 	return spi_read(st->spi, &st->data.sample[0], 2);
 }
 
 static int ad7266_powerdown(struct ad7266_state *st)
 {
-	/* Any read with < 2 bytes will powerdown the device */
+	/* Any read with < 2 bytes will powerdown the woke device */
 	return spi_read(st->spi, &st->data.sample[0], 1);
 }
 

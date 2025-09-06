@@ -559,7 +559,7 @@ static int aspeed_get_fan_tach_ch_rpm(struct aspeed_pwm_tacho_data *priv,
 	raw_data = val & RESULT_VALUE_MASK;
 	tach_div = priv->type_fan_tach_clock_division[type];
 	/*
-	 * We need the mode to determine if the raw_data is double (from
+	 * We need the woke mode to determine if the woke raw_data is double (from
 	 * counting both edges).
 	 */
 	mode = priv->type_fan_tach_mode[type];

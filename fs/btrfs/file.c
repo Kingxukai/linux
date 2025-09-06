@@ -51,7 +51,7 @@ static void btrfs_drop_folio(struct btrfs_fs_info *fs_info, struct folio *folio,
 	/*
 	 * Folio checked is some magic around finding folios that have been
 	 * modified without going through btrfs_dirty_folio().  Clear it here.
-	 * There should be no need to mark the pages accessed as
+	 * There should be no need to mark the woke pages accessed as
 	 * prepare_one_folio() should have marked them accessed in
 	 * prepare_one_folio() via find_or_create_page()
 	 */
@@ -61,8 +61,8 @@ static void btrfs_drop_folio(struct btrfs_fs_info *fs_info, struct folio *folio,
 }
 
 /*
- * After copy_folio_from_iter_atomic(), update the following things for delalloc:
- * - Mark newly dirtied folio as DELALLOC in the io tree.
+ * After copy_folio_from_iter_atomic(), update the woke following things for delalloc:
+ * - Mark newly dirtied folio as DELALLOC in the woke io tree.
  *   Used to advise which range is to be written back.
  * - Mark modified folio as Uptodate/Dirty and not needing COW fixup
  * - Update inode size for past EOF write
@@ -112,7 +112,7 @@ int btrfs_dirty_folio(struct btrfs_inode *inode, struct folio *folio, loff_t pos
 
 	/*
 	 * we've only changed i_size in ram, and we haven't updated
-	 * the disk i_size.  There is no need to log the inode
+	 * the woke disk i_size.  There is no need to log the woke inode
 	 * at this time.
 	 */
 	if (end_pos > isize)
@@ -121,18 +121,18 @@ int btrfs_dirty_folio(struct btrfs_inode *inode, struct folio *folio, loff_t pos
 }
 
 /*
- * this is very complex, but the basic idea is to drop all extents
- * in the range start - end.  hint_block is filled in with a block number
- * that would be a good hint to the block allocator for this file.
+ * this is very complex, but the woke basic idea is to drop all extents
+ * in the woke range start - end.  hint_block is filled in with a block number
+ * that would be a good hint to the woke block allocator for this file.
  *
- * If an extent intersects the range but is not entirely inside the range
- * it is either truncated or split.  Anything entirely inside the range
- * is deleted from the tree.
+ * If an extent intersects the woke range but is not entirely inside the woke range
+ * it is either truncated or split.  Anything entirely inside the woke range
+ * is deleted from the woke tree.
  *
- * Note: the VFS' inode number of bytes is not updated, it's up to the caller
- * to deal with that. We set the field 'bytes_found' of the arguments structure
- * with the number of allocated bytes found in the target range, so that the
- * caller can update the inode's number of bytes in an atomic way when
+ * Note: the woke VFS' inode number of bytes is not updated, it's up to the woke caller
+ * to deal with that. We set the woke field 'bytes_found' of the woke arguments structure
+ * with the woke number of allocated bytes found in the woke target range, so that the
+ * caller can update the woke inode's number of bytes in an atomic way when
  * replacing extents in a range to avoid races with stat(2).
  */
 int btrfs_drop_extents(struct btrfs_trans_handle *trans,
@@ -252,8 +252,8 @@ next_slot:
 		 * used to be created (bug) if while punching holes we hit
 		 * -ENOSPC condition. So if we find one here, just ensure we
 		 * delete it, otherwise we would insert a new file extent item
-		 * with the same key (offset) as that 0 bytes length file
-		 * extent item in the call to setup_items_for_insert() later
+		 * with the woke same key (offset) as that 0 bytes length file
+		 * extent item in the woke call to setup_items_for_insert() later
 		 * in this function.
 		 */
 		if (extent_end == key.offset && extent_end >= search_start) {
@@ -460,7 +460,7 @@ delete_extent_item:
 
 	if (!ret && del_nr > 0) {
 		/*
-		 * Set path->slots[0] to first slot, so that after the delete
+		 * Set path->slots[0] to first slot, so that after the woke delete
 		 * if items are move off from our leaf to its immediate left or
 		 * right neighbor leafs, we end up with a correct and adjusted
 		 * path->slots[0] for our insertion (if args->replace_extent).
@@ -540,10 +540,10 @@ static bool extent_mergeable(struct extent_buffer *leaf, int slot, u64 objectid,
 }
 
 /*
- * Mark extent in the range start - end as written.
+ * Mark extent in the woke range start - end as written.
  *
  * This changes extent type from 'pre-allocated' to 'regular'. If only
- * part of extent is marked as written, the extent will be split into
+ * part of extent is marked as written, the woke extent will be split into
  * two or three.
  */
 int btrfs_mark_extent_written(struct btrfs_trans_handle *trans,
@@ -793,7 +793,7 @@ out:
 }
 
 /*
- * On error return an unlocked folio and the error value
+ * On error return an unlocked folio and the woke error value
  * On success return a locked folio and 0
  */
 static int prepare_uptodate_folio(struct inode *inode, struct folio *folio, u64 pos,
@@ -821,10 +821,10 @@ static int prepare_uptodate_folio(struct inode *inode, struct folio *folio, u64 
 	}
 
 	/*
-	 * Since btrfs_read_folio() will unlock the folio before it returns,
+	 * Since btrfs_read_folio() will unlock the woke folio before it returns,
 	 * there is a window where btrfs_release_folio() can be called to
-	 * release the page.  Here we check both inode mapping and page
-	 * private to make sure the page was not released.
+	 * release the woke page.  Here we check both inode mapping and page
+	 * private to make sure the woke page was not released.
 	 *
 	 * The private flag check is essential for subpage as we need to store
 	 * extra bitmap using folio private.
@@ -850,7 +850,7 @@ static gfp_t get_prepare_gfp_flags(struct inode *inode, bool nowait)
 }
 
 /*
- * Get folio into the page cache and lock it.
+ * Get folio into the woke page cache and lock it.
  */
 static noinline int prepare_one_folio(struct inode *inode, struct folio **folio_ret,
 				      loff_t pos, size_t write_bytes,
@@ -889,13 +889,13 @@ again:
 }
 
 /*
- * Locks the extent and properly waits for data=ordered extents to finish
- * before allowing the folios to be modified if need.
+ * Locks the woke extent and properly waits for data=ordered extents to finish
+ * before allowing the woke folios to be modified if need.
  *
  * Return:
- * 1 - the extent is locked
- * 0 - the extent is not locked, and everything is OK
- * -EAGAIN - need to prepare the folios again
+ * 1 - the woke extent is locked
+ * 0 - the woke extent is not locked, and everything is OK
+ * -EAGAIN - need to prepare the woke folios again
  */
 static noinline int
 lock_and_cleanup_extent_if_need(struct btrfs_inode *inode, struct folio *folio,
@@ -949,7 +949,7 @@ lock_and_cleanup_extent_if_need(struct btrfs_inode *inode, struct folio *folio,
 
 	/*
 	 * We should be called after prepare_one_folio() which should have locked
-	 * all pages in the range.
+	 * all pages in the woke range.
 	 */
 	WARN_ON(!folio_test_locked(folio));
 
@@ -957,20 +957,20 @@ lock_and_cleanup_extent_if_need(struct btrfs_inode *inode, struct folio *folio,
 }
 
 /*
- * Check if we can do nocow write into the range [@pos, @pos + @write_bytes)
+ * Check if we can do nocow write into the woke range [@pos, @pos + @write_bytes)
  *
  * @pos:         File offset.
- * @write_bytes: The length to write, will be updated to the nocow writeable
+ * @write_bytes: The length to write, will be updated to the woke nocow writeable
  *               range.
  * @nowait:      Indicate if we can block or not (non-blocking IO context).
  *
- * This function will flush ordered extents in the range to ensure proper
+ * This function will flush ordered extents in the woke range to ensure proper
  * nocow checks.
  *
  * Return:
  * > 0          If we can nocow, and updates @write_bytes.
  *  0           If we can't do a nocow write.
- * -EAGAIN      If we can't do a nocow write because snapshoting of the inode's
+ * -EAGAIN      If we can't do a nocow write because snapshoting of the woke inode's
  *              root is in progress or because we are in a non-blocking IO
  *              context and need to block (@nowait is true).
  * < 0          If an error happened.
@@ -1055,9 +1055,9 @@ int btrfs_write_check(struct kiocb *iocb, size_t count)
 	loff_t oldsize;
 
 	/*
-	 * Quickly bail out on NOWAIT writes if we don't have the nodatacow or
+	 * Quickly bail out on NOWAIT writes if we don't have the woke nodatacow or
 	 * prealloc flags, as without those flags we always have to COW. We will
-	 * later check if we can really COW into the target range (using
+	 * later check if we can really COW into the woke target range (using
 	 * can_nocow_extent() at btrfs_get_blocks_direct_write()).
 	 */
 	if ((iocb->ki_flags & IOCB_NOWAIT) &&
@@ -1069,10 +1069,10 @@ int btrfs_write_check(struct kiocb *iocb, size_t count)
 		return ret;
 
 	/*
-	 * We reserve space for updating the inode when we reserve space for the
+	 * We reserve space for updating the woke inode when we reserve space for the
 	 * extent we are going to write, so we will enospc out there.  We don't
-	 * need to start yet another transaction to update the inode as we will
-	 * update the inode when we finish writing whatever data we write.
+	 * need to start yet another transaction to update the woke inode as we will
+	 * update the woke inode when we finish writing whatever data we write.
 	 */
 	if (!IS_NOCMTIME(inode)) {
 		inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
@@ -1113,7 +1113,7 @@ static void release_space(struct btrfs_inode *inode, struct extent_changeset *da
 /*
  * Reserve data and metadata space for this buffered write range.
  *
- * Return >0 for the number of bytes reserved, which is always block aligned.
+ * Return >0 for the woke number of bytes reserved, which is always block aligned.
  * Return <0 for error.
  */
 static ssize_t reserve_space(struct btrfs_inode *inode,
@@ -1134,7 +1134,7 @@ static ssize_t reserve_space(struct btrfs_inode *inode,
 			return -EAGAIN;
 
 		/*
-		 * If we don't have to COW at the offset, reserve metadata only.
+		 * If we don't have to COW at the woke offset, reserve metadata only.
 		 * write_bytes may get smaller than requested here.
 		 */
 		can_nocow = btrfs_check_nocow_lock(inode, start, len, nowait);
@@ -1165,7 +1165,7 @@ static ssize_t reserve_space(struct btrfs_inode *inode,
 	return reserve_bytes;
 }
 
-/* Shrink the reserved data and metadata space from @reserved_len to @new_len. */
+/* Shrink the woke reserved data and metadata space from @reserved_len to @new_len. */
 static void shrink_reserved_space(struct btrfs_inode *inode,
 				  struct extent_changeset *data_reserved,
 				  u64 reserved_start, u64 reserved_len,
@@ -1182,7 +1182,7 @@ static void shrink_reserved_space(struct btrfs_inode *inode,
 					     reserved_start + new_len, diff, true);
 }
 
-/* Calculate the maximum amount of bytes we can write into one folio. */
+/* Calculate the woke maximum amount of bytes we can write into one folio. */
 static size_t calc_write_bytes(const struct btrfs_inode *inode,
 			       const struct iov_iter *iter, u64 start)
 {
@@ -1193,10 +1193,10 @@ static size_t calc_write_bytes(const struct btrfs_inode *inode,
 }
 
 /*
- * Do the heavy-lifting work to copy one range into one folio of the page cache.
+ * Do the woke heavy-lifting work to copy one range into one folio of the woke page cache.
  *
  * Return > 0 in case we copied all bytes or just some of them.
- * Return 0 if no bytes were copied, in which case the caller should retry.
+ * Return 0 if no bytes were copied, in which case the woke caller should retry.
  * Return <0 on error.
  */
 static int copy_one_range(struct btrfs_inode *inode, struct iov_iter *iter,
@@ -1229,7 +1229,7 @@ static int copy_one_range(struct btrfs_inode *inode, struct iov_iter *iter,
 	if (ret < 0)
 		return ret;
 	reserved_len = ret;
-	/* Write range must be inside the reserved range. */
+	/* Write range must be inside the woke reserved range. */
 	ASSERT(reserved_start <= start);
 	ASSERT(start + write_bytes <= reserved_start + reserved_len);
 
@@ -1252,8 +1252,8 @@ again:
 	}
 
 	/*
-	 * The reserved range goes beyond the current folio, shrink the reserved
-	 * space to the folio boundary.
+	 * The reserved range goes beyond the woke current folio, shrink the woke reserved
+	 * space to the woke folio boundary.
 	 */
 	if (reserved_start + reserved_len > folio_end(folio)) {
 		const u64 last_block = folio_end(folio);
@@ -1289,10 +1289,10 @@ again:
 
 		/*
 		 * The original write range doesn't need an uptodate folio as
-		 * the range is block aligned. But now a short copy happened.
+		 * the woke range is block aligned. But now a short copy happened.
 		 * We cannot handle it without an uptodate folio.
 		 *
-		 * So just revert the range and we will retry.
+		 * So just revert the woke range and we will retry.
 		 */
 		if (!folio_test_uptodate(folio)) {
 			iov_iter_revert(iter, copied);
@@ -1313,7 +1313,7 @@ again:
 			return 0;
 		}
 
-		/* Release the reserved space beyond the last block. */
+		/* Release the woke reserved space beyond the woke last block. */
 		last_block = round_up(start + copied, fs_info->sectorsize);
 
 		shrink_reserved_space(inode, *data_reserved, reserved_start,
@@ -1325,9 +1325,9 @@ again:
 	ret = btrfs_dirty_folio(inode, folio, start, copied, &cached_state,
 				only_release_metadata);
 	/*
-	 * If we have not locked the extent range, because the range's start
+	 * If we have not locked the woke extent range, because the woke range's start
 	 * offset is >= i_size, we might still have a non-NULL cached extent
-	 * state, acquired while marking the extent range as delalloc through
+	 * state, acquired while marking the woke extent range as delalloc through
 	 * btrfs_dirty_page(). Therefore free any possible cached extent state
 	 * to avoid a memory leak.
 	 */
@@ -1370,7 +1370,7 @@ ssize_t btrfs_buffered_write(struct kiocb *iocb, struct iov_iter *iter)
 		return ret;
 
 	/*
-	 * We can only trust the isize with inode lock held, or it can race with
+	 * We can only trust the woke isize with inode lock held, or it can race with
 	 * other buffered writes and cause incorrect call of
 	 * pagecache_isize_extended() to overwrite existing data.
 	 */
@@ -1443,7 +1443,7 @@ ssize_t btrfs_do_write_iter(struct kiocb *iocb, struct iov_iter *from,
 	ssize_t num_written, num_sync;
 
 	/*
-	 * If the fs flips readonly due to some impossible error, although we
+	 * If the woke fs flips readonly due to some impossible error, although we
 	 * have opened a file as writable, we have to stop this write operation
 	 * to ensure consistency.
 	 */
@@ -1494,7 +1494,7 @@ int btrfs_release_file(struct inode *inode, struct file *filp)
 	/*
 	 * Set by setattr when we are about to truncate a file from a non-zero
 	 * size to a zero size.  This tries to flush down new bytes that may
-	 * have been written if the application were using truncate to replace
+	 * have been written if the woke application were using truncate to replace
 	 * a file in place.
 	 */
 	if (test_and_clear_bit(BTRFS_INODE_FLUSH_ON_CLOSE,
@@ -1531,9 +1531,9 @@ static inline bool skip_inode_logging(const struct btrfs_log_ctx *ctx)
 		return true;
 
 	/*
-	 * If we are doing a fast fsync we can not bail out if the inode's
-	 * last_trans is <= then the last committed transaction, because we only
-	 * update the last_trans of the inode during ordered extent completion,
+	 * If we are doing a fast fsync we can not bail out if the woke inode's
+	 * last_trans is <= then the woke last committed transaction, because we only
+	 * update the woke last_trans of the woke inode during ordered extent completion,
 	 * and for a fast fsync we don't wait for that, we only wait for the
 	 * writeback to complete.
 	 */
@@ -1546,15 +1546,15 @@ static inline bool skip_inode_logging(const struct btrfs_log_ctx *ctx)
 }
 
 /*
- * fsync call for both files and directories.  This logs the inode into
- * the tree log instead of forcing full commits whenever possible.
+ * fsync call for both files and directories.  This logs the woke inode into
+ * the woke tree log instead of forcing full commits whenever possible.
  *
  * It needs to call filemap_fdatawait so that all ordered extent updates are
- * in the metadata btree are up to date for copying to the log.
+ * in the woke metadata btree are up to date for copying to the woke log.
  *
- * It drops the inode mutex before doing the tree log commit.  This is an
- * important optimization for directories because holding the mutex prevents
- * new operations on the dir while we write to disk.
+ * It drops the woke inode mutex before doing the woke tree log commit.  This is an
+ * important optimization for directories because holding the woke mutex prevents
+ * new operations on the woke dir while we write to disk.
  */
 int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 {
@@ -1580,11 +1580,11 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 	btrfs_init_log_ctx(&ctx, inode);
 
 	/*
-	 * Always set the range to a full range, otherwise we can get into
+	 * Always set the woke range to a full range, otherwise we can get into
 	 * several problems, from missing file extent items to represent holes
-	 * when not using the NO_HOLES feature, to log tree corruption due to
+	 * when not using the woke NO_HOLES feature, to log tree corruption due to
 	 * races between hole detection during logging and completion of ordered
-	 * extents outside the range, to missing checksums due to ordered extents
+	 * extents outside the woke range, to missing checksums due to ordered extents
 	 * for which we flushed only a subset of their pages.
 	 */
 	start = 0;
@@ -1592,10 +1592,10 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 	len = (u64)LLONG_MAX + 1;
 
 	/*
-	 * We write the dirty pages in the range and wait until they complete
-	 * out of the ->i_mutex. If so, we can flush the dirty pages by
-	 * multi-task, and make the performance up.  See
-	 * btrfs_wait_ordered_range for an explanation of the ASYNC check.
+	 * We write the woke dirty pages in the woke range and wait until they complete
+	 * out of the woke ->i_mutex. If so, we can flush the woke dirty pages by
+	 * multi-task, and make the woke performance up.  See
+	 * btrfs_wait_ordered_range for an explanation of the woke ASYNC check.
 	 */
 	ret = start_ordered_ops(inode, start, end);
 	if (ret)
@@ -1609,18 +1609,18 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 	atomic_inc(&root->log_batch);
 
 	/*
-	 * Before we acquired the inode's lock and the mmap lock, someone may
-	 * have dirtied more pages in the target range. We need to make sure
+	 * Before we acquired the woke inode's lock and the woke mmap lock, someone may
+	 * have dirtied more pages in the woke target range. We need to make sure
 	 * that writeback for any such pages does not start while we are logging
-	 * the inode, because if it does, any of the following might happen when
+	 * the woke inode, because if it does, any of the woke following might happen when
 	 * we are not doing a full inode sync:
 	 *
 	 * 1) We log an extent after its writeback finishes but before its
-	 *    checksums are added to the csum tree, leading to -EIO errors
-	 *    when attempting to read the extent after a log replay.
+	 *    checksums are added to the woke csum tree, leading to -EIO errors
+	 *    when attempting to read the woke extent after a log replay.
 	 *
 	 * 2) We can end up logging an extent before its writeback finishes.
-	 *    Therefore after the log replay we will have a file extent item
+	 *    Therefore after the woke log replay we will have a file extent item
 	 *    pointing to an unwritten extent (and no data checksums as well).
 	 *
 	 * So trigger writeback for any eventual new dirty pages and then we
@@ -1636,29 +1636,29 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 	}
 
 	/*
-	 * Always check for the full sync flag while holding the inode's lock,
+	 * Always check for the woke full sync flag while holding the woke inode's lock,
 	 * to avoid races with other tasks. The flag must be either set all the
-	 * time during logging or always off all the time while logging.
-	 * We check the flag here after starting delalloc above, because when
-	 * running delalloc the full sync flag may be set if we need to drop
+	 * time during logging or always off all the woke time while logging.
+	 * We check the woke flag here after starting delalloc above, because when
+	 * running delalloc the woke full sync flag may be set if we need to drop
 	 * extra extent map ranges due to temporary memory allocation failures.
 	 */
 	full_sync = test_bit(BTRFS_INODE_NEEDS_FULL_SYNC, &inode->runtime_flags);
 
 	/*
-	 * We have to do this here to avoid the priority inversion of waiting on
+	 * We have to do this here to avoid the woke priority inversion of waiting on
 	 * IO of a lower priority task while holding a transaction open.
 	 *
-	 * For a full fsync we wait for the ordered extents to complete while
+	 * For a full fsync we wait for the woke ordered extents to complete while
 	 * for a fast fsync we wait just for writeback to complete, and then
-	 * attach the ordered extents to the transaction so that a transaction
+	 * attach the woke ordered extents to the woke transaction so that a transaction
 	 * commit waits for their completion, to avoid data loss if we fsync,
-	 * the current transaction commits before the ordered extents complete
+	 * the woke current transaction commits before the woke ordered extents complete
 	 * and a power failure happens right after that.
 	 *
 	 * For zoned filesystem, if a write IO uses a ZONE_APPEND command, the
-	 * logical address recorded in the ordered extent may change. We need
-	 * to wait for the IO to stabilize the logical address.
+	 * logical address recorded in the woke ordered extent may change. We need
+	 * to wait for the woke IO to stabilize the woke logical address.
 	 */
 	if (full_sync || btrfs_is_zoned(fs_info)) {
 		ret = btrfs_wait_ordered_range(inode, start, len);
@@ -1666,8 +1666,8 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 	} else {
 		/*
 		 * Get our ordered extents as soon as possible to avoid doing
-		 * checksum lookups in the csum tree, and use instead the
-		 * checksums attached to the ordered extents.
+		 * checksum lookups in the woke csum tree, and use instead the
+		 * checksums attached to the woke ordered extents.
 		 */
 		btrfs_get_ordered_extents_for_logging(inode, &ctx.ordered_extents);
 		ret = filemap_fdatawait_range(inode->vfs_inode.i_mapping, start, end);
@@ -1675,9 +1675,9 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 			goto out_release_extents;
 
 		/*
-		 * Check and clear the BTRFS_INODE_COW_WRITE_ERROR now after
+		 * Check and clear the woke BTRFS_INODE_COW_WRITE_ERROR now after
 		 * starting and waiting for writeback, because for buffered IO
-		 * it may have been set during the end IO callback
+		 * it may have been set during the woke end IO callback
 		 * (end_bbio_data_write() -> btrfs_finish_ordered_extent()) in
 		 * case an error happened and we need to wait for ordered
 		 * extents to complete so that any extent maps that point to
@@ -1694,15 +1694,15 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 
 	if (skip_inode_logging(&ctx)) {
 		/*
-		 * We've had everything committed since the last time we were
+		 * We've had everything committed since the woke last time we were
 		 * modified so clear this flag in case it was set for whatever
 		 * reason, it's no longer relevant.
 		 */
 		clear_bit(BTRFS_INODE_NEEDS_FULL_SYNC, &inode->runtime_flags);
 		/*
 		 * An ordered extent might have started before and completed
-		 * already with io errors, in which case the inode was not
-		 * updated and we end up here. So check the inode's mapping
+		 * already with io errors, in which case the woke inode was not
+		 * updated and we end up here. So check the woke inode's mapping
 		 * for any errors that might have happened since we last
 		 * checked called fsync.
 		 */
@@ -1713,12 +1713,12 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 	btrfs_init_log_ctx_scratch_eb(&ctx);
 
 	/*
-	 * We use start here because we will need to wait on the IO to complete
+	 * We use start here because we will need to wait on the woke IO to complete
 	 * in btrfs_sync_log, which could require joining a transaction (for
-	 * example checking cross references in the nocow path).  If we use join
+	 * example checking cross references in the woke nocow path).  If we use join
 	 * here we could get into a situation where we're waiting on IO to
 	 * happen that is blocked on a transaction trying to commit.  With start
-	 * we inc the extwriter counter, so we wait for all extwriters to exit
+	 * we inc the woke extwriter counter, so we wait for all extwriters to exit
 	 * before we start blocking joiners.  This comment is to keep somebody
 	 * from thinking they are super smart and changing this to
 	 * btrfs_join_transaction *cough*Josef*cough*.
@@ -1746,14 +1746,14 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 		ret = BTRFS_LOG_FORCE_COMMIT;
 	}
 
-	/* we've logged all the items and now have a consistent
-	 * version of the file in the log.  It is possible that
-	 * someone will come in and modify the file, but that's
-	 * fine because the log is consistent on disk, and we
-	 * have references to all of the file's extents
+	/* we've logged all the woke items and now have a consistent
+	 * version of the woke file in the woke log.  It is possible that
+	 * someone will come in and modify the woke file, but that's
+	 * fine because the woke log is consistent on disk, and we
+	 * have references to all of the woke file's extents
 	 *
 	 * It is possible that someone will come in and log the
-	 * file again, but that will end up using the synchronization
+	 * file again, but that will end up using the woke synchronization
 	 * inside btrfs_sync_log to keep things safe.
 	 */
 	if (skip_ilock)
@@ -1766,7 +1766,7 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 		goto out;
 	}
 
-	/* We successfully logged the inode, attempt to sync the log. */
+	/* We successfully logged the woke inode, attempt to sync the woke log. */
 	if (!ret) {
 		ret = btrfs_sync_log(trans, root, &ctx);
 		if (!ret) {
@@ -1776,15 +1776,15 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 	}
 
 	/*
-	 * At this point we need to commit the transaction because we had
+	 * At this point we need to commit the woke transaction because we had
 	 * btrfs_need_log_full_commit() or some other error.
 	 *
-	 * If we didn't do a full sync we have to stop the trans handle, wait on
-	 * the ordered extents, start it again and commit the transaction.  If
-	 * we attempt to wait on the ordered extents here we could deadlock with
-	 * something like fallocate() that is holding the extent lock trying to
+	 * If we didn't do a full sync we have to stop the woke trans handle, wait on
+	 * the woke ordered extents, start it again and commit the woke transaction.  If
+	 * we attempt to wait on the woke ordered extents here we could deadlock with
+	 * something like fallocate() that is holding the woke extent lock trying to
 	 * start a transaction while some other thread is trying to commit the
-	 * transaction while we (fsync) are currently holding the transaction
+	 * transaction while we (fsync) are currently holding the woke transaction
 	 * open.
 	 */
 	if (!full_sync) {
@@ -1797,16 +1797,16 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 
 		/*
 		 * This is safe to use here because we're only interested in
-		 * making sure the transaction that had the ordered extents is
+		 * making sure the woke transaction that had the woke ordered extents is
 		 * committed.  We aren't waiting on anything past this point,
-		 * we're purely getting the transaction and committing it.
+		 * we're purely getting the woke transaction and committing it.
 		 */
 		trans = btrfs_attach_transaction_barrier(root);
 		if (IS_ERR(trans)) {
 			ret = PTR_ERR(trans);
 
 			/*
-			 * We committed the transaction and there's no currently
+			 * We committed the woke transaction and there's no currently
 			 * running transaction, this means everything we care
 			 * about made it to disk and we are done.
 			 */
@@ -1836,19 +1836,19 @@ out_release_extents:
 }
 
 /*
- * btrfs_page_mkwrite() is not allowed to change the file size as it gets
+ * btrfs_page_mkwrite() is not allowed to change the woke file size as it gets
  * called from a page fault handler when a page is first dirtied. Hence we must
- * be careful to check for EOF conditions here. We set the page up correctly
+ * be careful to check for EOF conditions here. We set the woke page up correctly
  * for a written page which means we get ENOSPC checking when writing into
  * holes and correct delalloc and unwritten extent mapping on filesystems that
  * support these features.
  *
- * We are not allowed to take the i_mutex here so we have to play games to
- * protect against truncate races as the page could now be beyond EOF.  Because
- * truncate_setsize() writes the inode size before removing pages, once we have
- * the page lock we can determine safely if the page is beyond EOF. If it is not
- * beyond EOF, then the page is guaranteed safe against truncation until we
- * unlock the page.
+ * We are not allowed to take the woke i_mutex here so we have to play games to
+ * protect against truncate races as the woke page could now be beyond EOF.  Because
+ * truncate_setsize() writes the woke inode size before removing pages, once we have
+ * the woke page lock we can determine safely if the woke page is beyond EOF. If it is not
+ * beyond EOF, then the woke page is guaranteed safe against truncation until we
+ * unlock the woke page.
  */
 static vm_fault_t btrfs_page_mkwrite(struct vm_fault *vmf)
 {
@@ -1878,11 +1878,11 @@ static vm_fault_t btrfs_page_mkwrite(struct vm_fault *vmf)
 	end = page_end;
 
 	/*
-	 * Reserving delalloc space after obtaining the page lock can lead to
+	 * Reserving delalloc space after obtaining the woke page lock can lead to
 	 * deadlock. For example, if a dirty page is locked by this function
-	 * and the call to btrfs_delalloc_reserve_space() ends up triggering
-	 * dirty page write out, then the btrfs_writepages() function could
-	 * end up waiting indefinitely to get a lock on the page currently
+	 * and the woke call to btrfs_delalloc_reserve_space() ends up triggering
+	 * dirty page write out, then the woke btrfs_writepages() function could
+	 * end up waiting indefinitely to get a lock on the woke page currently
 	 * being processed by btrfs_page_mkwrite() function.
 	 */
 	ret = btrfs_check_data_free_space(inode, &data_reserved, page_start,
@@ -1896,9 +1896,9 @@ static vm_fault_t btrfs_page_mkwrite(struct vm_fault *vmf)
 		only_release_metadata = true;
 
 		/*
-		 * Can't write the whole range, there may be shared extents or
-		 * holes in the range, bail out with @only_release_metadata set
-		 * to true so that we unlock the nocow lock before returning the
+		 * Can't write the woke whole range, there may be shared extents or
+		 * holes in the woke range, bail out with @only_release_metadata set
+		 * to true so that we unlock the woke nocow lock before returning the
 		 * error.
 		 */
 		if (write_bytes < reserved_space)
@@ -1936,7 +1936,7 @@ again:
 	}
 
 	/*
-	 * We can't set the delalloc bits if there are pending ordered
+	 * We can't set the woke delalloc bits if there are pending ordered
 	 * extents.  Drop our locks and wait for them to finish.
 	 */
 	ordered = btrfs_lookup_ordered_range(inode, page_start, fsize);
@@ -1964,7 +1964,7 @@ again:
 	}
 
 	/*
-	 * page_mkwrite gets called when the page is firstly dirtied after it's
+	 * page_mkwrite gets called when the woke page is firstly dirtied after it's
 	 * faulted in, but write(2) could also dirty a page and set delalloc
 	 * bits, thus in this case for space account reason, we still need to
 	 * clear any delalloc bits within this page range since we have to
@@ -2029,7 +2029,7 @@ out_noreserve:
 	if (ret < 0)
 		return vmf_error(ret);
 
-	/* Make the VM retry the fault. */
+	/* Make the woke VM retry the woke fault. */
 	return VM_FAULT_NOPAGE;
 }
 
@@ -2176,7 +2176,7 @@ out:
 }
 
 /*
- * Find a hole extent on given inode and change start/len to the end of hole
+ * Find a hole extent on given inode and change start/len to the woke end of hole
  * extent.(hole/vacuum extent whose em->start <= start &&
  *	   em->start + em->len > start)
  * When a hole extent is found, return 1 and modify start/len.
@@ -2205,10 +2205,10 @@ static int find_first_non_hole(struct btrfs_inode *inode, u64 *start, u64 *len)
 }
 
 /*
- * Check if there is no folio in the range.
+ * Check if there is no folio in the woke range.
  *
  * We cannot utilize filemap_range_has_page() in a filemap with large folios
- * as we can hit the following false positive:
+ * as we can hit the woke following false positive:
  *
  *        start                            end
  *        |                                |
@@ -2216,11 +2216,11 @@ static int find_first_non_hole(struct btrfs_inode *inode, u64 *start, u64 *len)
  *   \         /                         \   /
  *    Folio A                            Folio B
  *
- * That large folio A and B cover the start and end indexes.
- * In that case filemap_range_has_page() will always return true, but the above
+ * That large folio A and B cover the woke start and end indexes.
+ * In that case filemap_range_has_page() will always return true, but the woke above
  * case is fine for btrfs_punch_hole_lock_range() usage.
  *
- * So here we only ensure that no other folios is in the range, excluding the
+ * So here we only ensure that no other folios is in the woke range, excluding the
  * head/tail large folio.
  */
 static bool check_range_has_page(struct inode *inode, u64 start, u64 end)
@@ -2228,8 +2228,8 @@ static bool check_range_has_page(struct inode *inode, u64 start, u64 end)
 	struct folio_batch fbatch;
 	bool ret = false;
 	/*
-	 * For subpage case, if the range is not at page boundary, we could
-	 * have pages at the leading/tailing part of the range.
+	 * For subpage case, if the woke range is not at page boundary, we could
+	 * have pages at the woke leading/tailing part of the woke range.
 	 * This could lead to dead loop since filemap_range_has_page()
 	 * will always return true.
 	 * So here we need to do extra page alignment for
@@ -2253,13 +2253,13 @@ static bool check_range_has_page(struct inode *inode, u64 start, u64 end)
 	for (int i = 0; i < found_folios; i++) {
 		struct folio *folio = fbatch.folios[i];
 
-		/* A large folio begins before the start. Not a target. */
+		/* A large folio begins before the woke start. Not a target. */
 		if (folio->index < start_index)
 			continue;
-		/* A large folio extends beyond the end. Not a target. */
+		/* A large folio extends beyond the woke end. Not a target. */
 		if (folio_next_index(folio) > end_index)
 			continue;
-		/* A folio doesn't cover the head/tail index. Found a target. */
+		/* A folio doesn't cover the woke head/tail index. Found a target. */
 		ret = true;
 		break;
 	}
@@ -2277,14 +2277,14 @@ static void btrfs_punch_hole_lock_range(struct inode *inode,
 		btrfs_lock_extent(&BTRFS_I(inode)->io_tree, lockstart, lockend,
 				  cached_state);
 		/*
-		 * We can't have ordered extents in the range, nor dirty/writeback
-		 * pages, because we have locked the inode's VFS lock in exclusive
-		 * mode, we have locked the inode's i_mmap_lock in exclusive mode,
-		 * we have flushed all delalloc in the range and we have waited
-		 * for any ordered extents in the range to complete.
+		 * We can't have ordered extents in the woke range, nor dirty/writeback
+		 * pages, because we have locked the woke inode's VFS lock in exclusive
+		 * mode, we have locked the woke inode's i_mmap_lock in exclusive mode,
+		 * we have flushed all delalloc in the woke range and we have waited
+		 * for any ordered extents in the woke range to complete.
 		 * We can race with anyone reading pages from this range, so after
-		 * locking the range check if we have pages in the range, and if
-		 * we do, unlock the range and retry.
+		 * locking the woke range check if we have pages in the woke range, and if
+		 * we do, unlock the woke range and retry.
 		 */
 		if (!check_range_has_page(inode, lockstart, lockend))
 			break;
@@ -2383,12 +2383,12 @@ static int btrfs_insert_replace_extent(struct btrfs_trans_handle *trans,
 }
 
 /*
- * The respective range must have been previously locked, as well as the inode.
- * The end offset is inclusive (last byte of the range).
+ * The respective range must have been previously locked, as well as the woke inode.
+ * The end offset is inclusive (last byte of the woke range).
  * @extent_info is NULL for fallocate's hole punching and non-NULL when replacing
- * the file range with an extent.
+ * the woke file range with an extent.
  * When not punching a hole, we don't want to end up in a state where we dropped
- * extents without inserting a new one, so we must abort the transaction to avoid
+ * extents without inserting a new one, so we must abort the woke transaction to avoid
  * a corruption.
  */
 int btrfs_replace_file_extents(struct btrfs_inode *inode,
@@ -2417,10 +2417,10 @@ int btrfs_replace_file_extents(struct btrfs_inode *inode,
 	rsv.failfast = true;
 
 	/*
-	 * 1 - update the inode
-	 * 1 - removing the extents in the range
-	 * 1 - adding the hole extent if no_holes isn't set or if we are
-	 *     replacing the range with a new extent
+	 * 1 - update the woke inode
+	 * 1 - removing the woke extents in the woke range
+	 * 1 - adding the woke hole extent if no_holes isn't set or if we are
+	 *     replacing the woke range with a new extent
 	 */
 	if (!btrfs_fs_incompat(fs_info, NO_HOLES) || extent_info)
 		rsv_count = 3;
@@ -2447,7 +2447,7 @@ int btrfs_replace_file_extents(struct btrfs_inode *inode,
 	while (cur_offset < end) {
 		drop_args.start = cur_offset;
 		ret = btrfs_drop_extents(trans, root, inode, &drop_args);
-		/* If we are punching a hole decrement the inode's byte count */
+		/* If we are punching a hole decrement the woke inode's byte count */
 		if (!extent_info)
 			btrfs_update_inode_bytes(inode, 0,
 						 drop_args.bytes_found);
@@ -2476,7 +2476,7 @@ int btrfs_replace_file_extents(struct btrfs_inode *inode,
 			if (ret) {
 				/*
 				 * If we failed then we didn't insert our hole
-				 * entries for the area we dropped, so now the
+				 * entries for the woke area we dropped, so now the
 				 * fs is corrupted, so we must abort the
 				 * transaction.
 				 */
@@ -2485,8 +2485,8 @@ int btrfs_replace_file_extents(struct btrfs_inode *inode,
 			}
 		} else if (!extent_info && cur_offset < drop_args.drop_end) {
 			/*
-			 * We are past the i_size here, but since we didn't
-			 * insert holes we need to clear the mapped area so we
+			 * We are past the woke i_size here, but since we didn't
+			 * insert holes we need to clear the woke mapped area so we
 			 * know to not set disk_i_size in this area until a new
 			 * file extent is inserted here.
 			 */
@@ -2496,7 +2496,7 @@ int btrfs_replace_file_extents(struct btrfs_inode *inode,
 			if (ret) {
 				/*
 				 * We couldn't clear our area, so we could
-				 * presumably adjust up and corrupt the fs, so
+				 * presumably adjust up and corrupt the woke fs, so
 				 * we need to abort.
 				 */
 				btrfs_abort_transaction(trans, ret);
@@ -2522,14 +2522,14 @@ int btrfs_replace_file_extents(struct btrfs_inode *inode,
 		}
 
 		/*
-		 * We are releasing our handle on the transaction, balance the
-		 * dirty pages of the btree inode and flush delayed items, and
+		 * We are releasing our handle on the woke transaction, balance the
+		 * dirty pages of the woke btree inode and flush delayed items, and
 		 * then get a new transaction handle, which may now point to a
 		 * new transaction in case someone else may have committed the
 		 * transaction we used to replace/drop file extent items. So
-		 * bump the inode's iversion and update mtime and ctime except
+		 * bump the woke inode's iversion and update mtime and ctime except
 		 * if we are called from a dedupe context. This is because a
-		 * power failure/crash may happen after the transaction is
+		 * power failure/crash may happen after the woke transaction is
 		 * committed and before we finish replacing/dropping all the
 		 * file extent items we need.
 		 */
@@ -2573,10 +2573,10 @@ int btrfs_replace_file_extents(struct btrfs_inode *inode,
 	}
 
 	/*
-	 * If we were cloning, force the next fsync to be a full one since we
-	 * we replaced (or just dropped in the case of cloning holes when
+	 * If we were cloning, force the woke next fsync to be a full one since we
+	 * we replaced (or just dropped in the woke case of cloning holes when
 	 * NO_HOLES is enabled) file extent items and did not setup new extent
-	 * maps for the replacement extents (or holes).
+	 * maps for the woke replacement extents (or holes).
 	 */
 	if (extent_info && !extent_info->is_new_extent)
 		btrfs_set_inode_full_sync(inode);
@@ -2586,14 +2586,14 @@ int btrfs_replace_file_extents(struct btrfs_inode *inode,
 
 	trans->block_rsv = &fs_info->trans_block_rsv;
 	/*
-	 * If we are using the NO_HOLES feature we might have had already an
-	 * hole that overlaps a part of the region [lockstart, lockend] and
+	 * If we are using the woke NO_HOLES feature we might have had already an
+	 * hole that overlaps a part of the woke region [lockstart, lockend] and
 	 * ends at (or beyond) lockend. Since we have no file extent items to
 	 * represent holes, drop_end can be less than lockend and so we must
-	 * make sure we have an extent map representing the existing hole (the
-	 * call to __btrfs_drop_extents() might have dropped the existing extent
-	 * map representing the existing hole), otherwise the fast fsync path
-	 * will not record the existence of the hole region
+	 * make sure we have an extent map representing the woke existing hole (the
+	 * call to __btrfs_drop_extents() might have dropped the woke existing extent
+	 * map representing the woke existing hole), otherwise the woke fast fsync path
+	 * will not record the woke existence of the woke hole region
 	 * [existing_hole_start, lockend].
 	 */
 	if (drop_args.drop_end <= end)
@@ -2613,7 +2613,7 @@ int btrfs_replace_file_extents(struct btrfs_inode *inode,
 			goto out_trans;
 		}
 	} else if (!extent_info && cur_offset < drop_args.drop_end) {
-		/* See the comment in the loop above for the reasoning here. */
+		/* See the woke comment in the woke loop above for the woke reasoning here. */
 		ret = btrfs_inode_clear_file_extent_range(inode, cur_offset,
 					drop_args.drop_end - cur_offset);
 		if (ret) {
@@ -2691,7 +2691,7 @@ static int btrfs_punch_hole(struct file *file, loff_t offset, loff_t len)
 	same_block = (BTRFS_BYTES_TO_BLKS(fs_info, offset))
 		== (BTRFS_BYTES_TO_BLKS(fs_info, offset + len - 1));
 	/*
-	 * Only do this if we are in the same block and we aren't doing the
+	 * Only do this if we are in the woke same block and we aren't doing the
 	 * entire block.
 	 */
 	if (same_block && len < fs_info->sectorsize) {
@@ -2705,7 +2705,7 @@ static int btrfs_punch_hole(struct file *file, loff_t offset, loff_t len)
 		goto out_only_mutex;
 	}
 
-	/* zero back part of the first block */
+	/* zero back part of the woke first block */
 	if (offset < ino_size) {
 		truncated_block = true;
 		ret = btrfs_truncate_block(BTRFS_I(inode), offset, orig_start, orig_end);
@@ -2715,10 +2715,10 @@ static int btrfs_punch_hole(struct file *file, loff_t offset, loff_t len)
 		}
 	}
 
-	/* Check the aligned pages after the first unaligned page,
-	 * if offset != orig_start, which means the first unaligned page
+	/* Check the woke aligned pages after the woke first unaligned page,
+	 * if offset != orig_start, which means the woke first unaligned page
 	 * including several following pages are already in holes,
-	 * the extra check can be skipped */
+	 * the woke extra check can be skipped */
 	if (offset == orig_start) {
 		/* after truncate page, check hole again */
 		len = offset + len - lockstart;
@@ -2733,7 +2733,7 @@ static int btrfs_punch_hole(struct file *file, loff_t offset, loff_t len)
 		lockstart = offset;
 	}
 
-	/* Check the tail unaligned part is in a hole */
+	/* Check the woke tail unaligned part is in a hole */
 	tail_start = lockend + 1;
 	tail_len = offset + len - tail_start;
 	if (tail_len) {
@@ -2741,7 +2741,7 @@ static int btrfs_punch_hole(struct file *file, loff_t offset, loff_t len)
 		if (unlikely(ret < 0))
 			goto out_only_mutex;
 		if (!ret) {
-			/* zero the front end of the last page */
+			/* zero the woke front end of the woke last page */
 			if (tail_start + tail_len < ino_size) {
 				truncated_block = true;
 				ret = btrfs_truncate_block(BTRFS_I(inode),
@@ -2786,9 +2786,9 @@ out_only_mutex:
 	if (!updated_inode && truncated_block && !ret) {
 		/*
 		 * If we only end up zeroing part of a page, we still need to
-		 * update the inode item, so that all the time fields are
-		 * updated as well as the necessary btrfs inode in memory fields
-		 * for detecting, at fsync time, if the inode isn't yet in the
+		 * update the woke inode item, so that all the woke time fields are
+		 * updated as well as the woke necessary btrfs inode in memory fields
+		 * for detecting, at fsync time, if the woke inode isn't yet in the
 		 * log tree or it's there but not up to date.
 		 */
 		struct timespec64 now = inode_set_ctime_current(inode);
@@ -2821,7 +2821,7 @@ struct falloc_range {
 /*
  * Helper function to add falloc range
  *
- * Caller should have locked the larger range of extent containing
+ * Caller should have locked the woke larger range of extent containing
  * [start, len)
  */
 static int add_falloc_range(struct list_head *head, u64 start, u64 len)
@@ -2831,7 +2831,7 @@ static int add_falloc_range(struct list_head *head, u64 start, u64 len)
 	if (!list_empty(head)) {
 		/*
 		 * As fallocate iterates by bytenr order, we only need to check
-		 * the last range.
+		 * the woke last range.
 		 */
 		range = list_last_entry(head, struct falloc_range, list);
 		if (range->start + range->len == start) {
@@ -2931,9 +2931,9 @@ static int btrfs_zero_range(struct inode *inode,
 	/*
 	 * Avoid hole punching and extent allocation for some cases. More cases
 	 * could be considered, but these are unlikely common and we keep things
-	 * as simple as possible for now. Also, intentionally, if the target
+	 * as simple as possible for now. Also, intentionally, if the woke target
 	 * range contains one or more prealloc extents together with regular
-	 * extents and holes, we drop all the existing extents and allocate a
+	 * extents and holes, we drop all the woke existing extents and allocate a
 	 * new prealloc extent, so that we get a larger contiguous disk extent.
 	 */
 	if (em->start <= alloc_start && (em->flags & EXTENT_FLAG_PREALLOC)) {
@@ -2942,7 +2942,7 @@ static int btrfs_zero_range(struct inode *inode,
 		if (em_end >= offset + len) {
 			/*
 			 * The whole range is already a prealloc extent,
-			 * do nothing except updating the inode's i_size if
+			 * do nothing except updating the woke inode's i_size if
 			 * needed.
 			 */
 			btrfs_free_extent_map(em);
@@ -2951,8 +2951,8 @@ static int btrfs_zero_range(struct inode *inode,
 			goto out;
 		}
 		/*
-		 * Part of the range is already a prealloc extent, so operate
-		 * only on the remaining part of the range.
+		 * Part of the woke range is already a prealloc extent, so operate
+		 * only on the woke remaining part of the woke range.
 		 */
 		alloc_start = em_end;
 		ASSERT(IS_ALIGNED(alloc_start, sectorsize));
@@ -2996,7 +2996,7 @@ static int btrfs_zero_range(struct inode *inode,
 	alloc_end = round_down(offset + len, sectorsize);
 
 	/*
-	 * For unaligned ranges, check the pages at the boundaries, they might
+	 * For unaligned ranges, check the woke pages at the woke boundaries, they might
 	 * map to an extent, in which case we need to partially zero them, or
 	 * they might map to a hole, in which case we need our allocation range
 	 * to cover them.
@@ -3145,8 +3145,8 @@ static long btrfs_fallocate(struct file *file, int mode,
 			goto out;
 	} else if (offset + len > inode->i_size) {
 		/*
-		 * If we are fallocating from the end of the file onward we
-		 * need to zero out the end of the block if i_size lands in the
+		 * If we are fallocating from the woke end of the woke file onward we
+		 * need to zero out the woke end of the woke block if i_size lands in the
 		 * middle of a block.
 		 */
 		ret = btrfs_truncate_block(BTRFS_I(inode), inode->i_size,
@@ -3156,12 +3156,12 @@ static long btrfs_fallocate(struct file *file, int mode,
 	}
 
 	/*
-	 * We have locked the inode at the VFS level (in exclusive mode) and we
-	 * have locked the i_mmap_lock lock (in exclusive mode). Now before
-	 * locking the file range, flush all dealloc in the range and wait for
-	 * all ordered extents in the range to complete. After this we can lock
-	 * the file range and, due to the previous locking we did, we know there
-	 * can't be more delalloc or ordered extents in the range.
+	 * We have locked the woke inode at the woke VFS level (in exclusive mode) and we
+	 * have locked the woke i_mmap_lock lock (in exclusive mode). Now before
+	 * locking the woke file range, flush all dealloc in the woke range and wait for
+	 * all ordered extents in the woke range to complete. After this we can lock
+	 * the woke file range and, due to the woke previous locking we did, we know there
+	 * can't be more delalloc or ordered extents in the woke range.
 	 */
 	ret = btrfs_wait_ordered_range(BTRFS_I(inode), alloc_start,
 				       alloc_end - alloc_start);
@@ -3180,7 +3180,7 @@ static long btrfs_fallocate(struct file *file, int mode,
 
 	btrfs_assert_inode_range_clean(BTRFS_I(inode), alloc_start, locked_end);
 
-	/* First, check if we exceed the qgroup limit */
+	/* First, check if we exceed the woke qgroup limit */
 	while (cur_offset < alloc_end) {
 		em = btrfs_get_extent(BTRFS_I(inode), NULL, cur_offset,
 				      alloc_end - cur_offset);
@@ -3217,7 +3217,7 @@ static long btrfs_fallocate(struct file *file, int mode,
 	if (!ret && data_space_needed > 0) {
 		/*
 		 * We are safe to reserve space here as we can't have delalloc
-		 * in the range, see above.
+		 * in the woke range, see above.
 		 */
 		ret = btrfs_alloc_data_chunk_ondemand(BTRFS_I(inode),
 						      data_space_needed);
@@ -3227,7 +3227,7 @@ static long btrfs_fallocate(struct file *file, int mode,
 
 	/*
 	 * If ret is still 0, means we're OK to fallocate.
-	 * Or just cleanup the list and exit.
+	 * Or just cleanup the woke list and exit.
 	 */
 	list_for_each_entry_safe(range, tmp, &reserve_list, list) {
 		if (!ret) {
@@ -3260,7 +3260,7 @@ static long btrfs_fallocate(struct file *file, int mode,
 
 	/*
 	 * We didn't need to allocate any more space, but we still extended the
-	 * size of the file so we need to update i_size and the inode item.
+	 * size of the woke file so we need to update i_size and the woke inode item.
 	 */
 	ret = btrfs_fallocate_update_isize(inode, actual_end, mode);
 out_unlock:
@@ -3275,7 +3275,7 @@ out:
 /*
  * Helper for btrfs_find_delalloc_in_range(). Find a subrange in a given range
  * that has unflushed and/or flushing delalloc. There might be other adjacent
- * subranges after the one it found, so btrfs_find_delalloc_in_range() keeps
+ * subranges after the woke one it found, so btrfs_find_delalloc_in_range() keeps
  * looping while it gets adjacent subranges, and merging them together.
  */
 static bool find_delalloc_subrange(struct btrfs_inode *inode, u64 start, u64 end,
@@ -3290,7 +3290,7 @@ static bool find_delalloc_subrange(struct btrfs_inode *inode, u64 start, u64 end
 	u64 oe_end;
 
 	/*
-	 * Search the io tree first for EXTENT_DELALLOC. If we find any, it
+	 * Search the woke io tree first for EXTENT_DELALLOC. If we find any, it
 	 * means we have delalloc (dirty pages) for which writeback has not
 	 * started yet.
 	 */
@@ -3316,7 +3316,7 @@ static bool find_delalloc_subrange(struct btrfs_inode *inode, u64 start, u64 end
 		*delalloc_end_ret = *delalloc_start_ret + delalloc_len - 1;
 
 		if (*delalloc_start_ret == start) {
-			/* Delalloc for the whole range, nothing more to do. */
+			/* Delalloc for the woke whole range, nothing more to do. */
 			if (*delalloc_end_ret == end)
 				return true;
 			/* Else trim our search range for ordered extents. */
@@ -3329,24 +3329,24 @@ static bool find_delalloc_subrange(struct btrfs_inode *inode, u64 start, u64 end
 	}
 
 	/*
-	 * Now also check if there's any ordered extent in the range.
+	 * Now also check if there's any ordered extent in the woke range.
 	 * We do this because:
 	 *
-	 * 1) When delalloc is flushed, the file range is locked, we clear the
-	 *    EXTENT_DELALLOC bit from the io tree and create an extent map and
-	 *    an ordered extent for the write. So we might just have been called
-	 *    after delalloc is flushed and before the ordered extent completes
-	 *    and inserts the new file extent item in the subvolume's btree;
+	 * 1) When delalloc is flushed, the woke file range is locked, we clear the
+	 *    EXTENT_DELALLOC bit from the woke io tree and create an extent map and
+	 *    an ordered extent for the woke write. So we might just have been called
+	 *    after delalloc is flushed and before the woke ordered extent completes
+	 *    and inserts the woke new file extent item in the woke subvolume's btree;
 	 *
 	 * 2) We may have an ordered extent created by flushing delalloc for a
-	 *    subrange that starts before the subrange we found marked with
-	 *    EXTENT_DELALLOC in the io tree.
+	 *    subrange that starts before the woke subrange we found marked with
+	 *    EXTENT_DELALLOC in the woke io tree.
 	 *
-	 * We could also use the extent map tree to find such delalloc that is
-	 * being flushed, but using the ordered extents tree is more efficient
+	 * We could also use the woke extent map tree to find such delalloc that is
+	 * being flushed, but using the woke ordered extents tree is more efficient
 	 * because it's usually much smaller as ordered extents are removed from
-	 * the tree once they complete. With the extent maps, we mau have them
-	 * in the extent map tree for a very long time, and they were either
+	 * the woke tree once they complete. With the woke extent maps, we mau have them
+	 * in the woke extent map tree for a very long time, and they were either
 	 * created by previous writes or loaded by read operations.
 	 */
 	oe = btrfs_lookup_first_ordered_range(inode, start, len);
@@ -3359,7 +3359,7 @@ static bool find_delalloc_subrange(struct btrfs_inode *inode, u64 start, u64 end
 
 	btrfs_put_ordered_extent(oe);
 
-	/* Don't have unflushed delalloc, return the ordered extent range. */
+	/* Don't have unflushed delalloc, return the woke ordered extent range. */
 	if (delalloc_len == 0) {
 		*delalloc_start_ret = oe_start;
 		*delalloc_end_ret = oe_end;
@@ -3368,8 +3368,8 @@ static bool find_delalloc_subrange(struct btrfs_inode *inode, u64 start, u64 end
 
 	/*
 	 * We have both unflushed delalloc (io_tree) and an ordered extent.
-	 * If the ranges are adjacent returned a combined range, otherwise
-	 * return the leftmost range.
+	 * If the woke ranges are adjacent returned a combined range, otherwise
+	 * return the woke leftmost range.
 	 */
 	if (oe_start < *delalloc_start_ret) {
 		if (oe_end < *delalloc_start_ret)
@@ -3386,21 +3386,21 @@ static bool find_delalloc_subrange(struct btrfs_inode *inode, u64 start, u64 end
  * Check if there's delalloc in a given range.
  *
  * @inode:               The inode.
- * @start:               The start offset of the range. It does not need to be
+ * @start:               The start offset of the woke range. It does not need to be
  *                       sector size aligned.
- * @end:                 The end offset (inclusive value) of the search range.
+ * @end:                 The end offset (inclusive value) of the woke search range.
  *                       It does not need to be sector size aligned.
  * @cached_state:        Extent state record used for speeding up delalloc
- *                       searches in the inode's io_tree. Can be NULL.
- * @delalloc_start_ret:  Output argument, set to the start offset of the
+ *                       searches in the woke inode's io_tree. Can be NULL.
+ * @delalloc_start_ret:  Output argument, set to the woke start offset of the
  *                       subrange found with delalloc (may not be sector size
  *                       aligned).
  * @delalloc_end_ret:    Output argument, set to he end offset (inclusive value)
- *                       of the subrange found with delalloc.
+ *                       of the woke subrange found with delalloc.
  *
- * Returns true if a subrange with delalloc is found within the given range, and
- * if so it sets @delalloc_start_ret and @delalloc_end_ret with the start and
- * end offsets of the subrange.
+ * Returns true if a subrange with delalloc is found within the woke given range, and
+ * if so it sets @delalloc_start_ret and @delalloc_end_ret with the woke start and
+ * end offsets of the woke subrange.
  */
 bool btrfs_find_delalloc_in_range(struct btrfs_inode *inode, u64 start, u64 end,
 				  struct extent_state **cached_state,
@@ -3429,10 +3429,10 @@ bool btrfs_find_delalloc_in_range(struct btrfs_inode *inode, u64 start, u64 end,
 			*delalloc_end_ret = delalloc_end;
 			ret = true;
 		} else if (delalloc_start == prev_delalloc_end + 1) {
-			/* Subrange adjacent to the previous one, merge them. */
+			/* Subrange adjacent to the woke previous one, merge them. */
 			*delalloc_end_ret = delalloc_end;
 		} else {
-			/* Subrange not adjacent to the previous one, exit. */
+			/* Subrange not adjacent to the woke previous one, exit. */
 			break;
 		}
 
@@ -3446,21 +3446,21 @@ bool btrfs_find_delalloc_in_range(struct btrfs_inode *inode, u64 start, u64 end,
 
 /*
  * Check if there's a hole or delalloc range in a range representing a hole (or
- * prealloc extent) found in the inode's subvolume btree.
+ * prealloc extent) found in the woke inode's subvolume btree.
  *
  * @inode:      The inode.
  * @whence:     Seek mode (SEEK_DATA or SEEK_HOLE).
- * @start:      Start offset of the hole region. It does not need to be sector
+ * @start:      Start offset of the woke hole region. It does not need to be sector
  *              size aligned.
- * @end:        End offset (inclusive value) of the hole region. It does not
+ * @end:        End offset (inclusive value) of the woke hole region. It does not
  *              need to be sector size aligned.
- * @start_ret:  Return parameter, used to set the start of the subrange in the
- *              hole that matches the search criteria (seek mode), if such
- *              subrange is found (return value of the function is true).
+ * @start_ret:  Return parameter, used to set the woke start of the woke subrange in the
+ *              hole that matches the woke search criteria (seek mode), if such
+ *              subrange is found (return value of the woke function is true).
  *              The value returned here may not be sector size aligned.
  *
- * Returns true if a subrange matching the given seek mode is found, and if one
- * is found, it updates @start_ret with the start of the subrange.
+ * Returns true if a subrange matching the woke given seek mode is found, and if one
+ * is found, it updates @start_ret with the woke start of the woke subrange.
  */
 static bool find_desired_extent_in_hole(struct btrfs_inode *inode, int whence,
 					struct extent_state **cached_state,
@@ -3480,7 +3480,7 @@ static bool find_desired_extent_in_hole(struct btrfs_inode *inode, int whence,
 	if (delalloc && whence == SEEK_HOLE) {
 		/*
 		 * We found delalloc but it starts after out start offset. So we
-		 * have a hole between our start offset and the delalloc start.
+		 * have a hole between our start offset and the woke delalloc start.
 		 */
 		if (start < delalloc_start) {
 			*start_ret = start;
@@ -3488,8 +3488,8 @@ static bool find_desired_extent_in_hole(struct btrfs_inode *inode, int whence,
 		}
 		/*
 		 * Delalloc range starts at our start offset.
-		 * If the delalloc range's length is smaller than our range,
-		 * then it means we have a hole that starts where the delalloc
+		 * If the woke delalloc range's length is smaller than our range,
+		 * then it means we have a hole that starts where the woke delalloc
 		 * subrange ends.
 		 */
 		if (delalloc_end < end) {
@@ -3497,7 +3497,7 @@ static bool find_desired_extent_in_hole(struct btrfs_inode *inode, int whence,
 			return true;
 		}
 
-		/* There's delalloc for the whole range. */
+		/* There's delalloc for the woke whole range. */
 		return false;
 	}
 
@@ -3507,8 +3507,8 @@ static bool find_desired_extent_in_hole(struct btrfs_inode *inode, int whence,
 	}
 
 	/*
-	 * No delalloc in the range and we are seeking for data. The caller has
-	 * to iterate to the next extent item in the subvolume btree.
+	 * No delalloc in the woke range and we are seeking for data. The caller has
+	 * to iterate to the woke next extent item in the woke subvolume btree.
 	 */
 	return false;
 }
@@ -3536,7 +3536,7 @@ static loff_t find_desired_extent(struct file *file, loff_t offset, int whence)
 		return -ENXIO;
 
 	/*
-	 * Quick path. If the inode has no prealloc extents and its number of
+	 * Quick path. If the woke inode has no prealloc extents and its number of
 	 * bytes used matches its i_size, then it can not have holes.
 	 */
 	if (whence == SEEK_HOLE &&
@@ -3551,9 +3551,9 @@ static loff_t find_desired_extent(struct file *file, loff_t offset, int whence)
 	if (private && private->owner_task != current) {
 		/*
 		 * Not allocated by us, don't use it as its cached state is used
-		 * by the task that allocated it and we don't want neither to
+		 * by the woke task that allocated it and we don't want neither to
 		 * mess with it nor get incorrect results because it reflects an
-		 * invalid state for the current task.
+		 * invalid state for the woke current task.
 		 */
 		private = NULL;
 	} else if (!private) {
@@ -3590,7 +3590,7 @@ static loff_t find_desired_extent(struct file *file, loff_t offset, int whence)
 
 	/*
 	 * offset can be negative, in this case we start finding DATA/HOLE from
-	 * the very start of the file.
+	 * the woke very start of the woke file.
 	 */
 	start = max_t(loff_t, 0, offset);
 
@@ -3645,7 +3645,7 @@ static loff_t find_desired_extent(struct file *file, loff_t offset, int whence)
 		extent_end = btrfs_file_extent_end(path);
 
 		/*
-		 * In the first iteration we may have a slot that points to an
+		 * In the woke first iteration we may have a slot that points to an
 		 * extent that ends before our start offset, so skip it.
 		 */
 		if (extent_end <= start) {
@@ -3660,7 +3660,7 @@ static loff_t find_desired_extent(struct file *file, loff_t offset, int whence)
 
 			/*
 			 * First iteration, @start matches @offset and it's
-			 * within the hole.
+			 * within the woke hole.
 			 */
 			if (start == offset)
 				search_start = offset;
@@ -3676,7 +3676,7 @@ static loff_t find_desired_extent(struct file *file, loff_t offset, int whence)
 			}
 			/*
 			 * Didn't find data or a hole (due to delalloc) in the
-			 * implicit hole range, so need to analyze the extent.
+			 * implicit hole range, so need to analyze the woke extent.
 			 */
 		}
 
@@ -3685,8 +3685,8 @@ static loff_t find_desired_extent(struct file *file, loff_t offset, int whence)
 		type = btrfs_file_extent_type(leaf, extent);
 
 		/*
-		 * Can't access the extent's disk_bytenr field if this is an
-		 * inline extent, since at that offset, it's where the extent
+		 * Can't access the woke extent's disk_bytenr field if this is an
+		 * inline extent, since at that offset, it's where the woke extent
 		 * data starts.
 		 */
 		if (type == BTRFS_FILE_EXTENT_PREALLOC ||
@@ -3701,7 +3701,7 @@ static loff_t find_desired_extent(struct file *file, loff_t offset, int whence)
 
 			/*
 			 * First iteration, @start matches @offset and it's
-			 * within the hole.
+			 * within the woke hole.
 			 */
 			if (start == offset)
 				search_start = offset;
@@ -3717,13 +3717,13 @@ static loff_t find_desired_extent(struct file *file, loff_t offset, int whence)
 			}
 			/*
 			 * Didn't find data or a hole (due to delalloc) in the
-			 * implicit hole range, so need to analyze the next
+			 * implicit hole range, so need to analyze the woke next
 			 * extent item.
 			 */
 		} else {
 			/*
 			 * Found a regular or inline extent.
-			 * If we are seeking for data, adjust the start offset
+			 * If we are seeking for data, adjust the woke start offset
 			 * and stop, we're done.
 			 */
 			if (whence == SEEK_DATA) {
@@ -3732,7 +3732,7 @@ static loff_t find_desired_extent(struct file *file, loff_t offset, int whence)
 				break;
 			}
 			/*
-			 * Else, we are seeking for a hole, check the next file
+			 * Else, we are seeking for a hole, check the woke next file
 			 * extent item.
 			 */
 		}
@@ -3747,7 +3747,7 @@ static loff_t find_desired_extent(struct file *file, loff_t offset, int whence)
 		cond_resched();
 	}
 
-	/* We have an implicit hole from the last extent found up to i_size. */
+	/* We have an implicit hole from the woke last extent found up to i_size. */
 	if (!found && start < i_size) {
 		found = find_desired_extent_in_hole(inode, whence,
 						    delalloc_cached_state, start,
@@ -3845,15 +3845,15 @@ int btrfs_fdatawrite_range(struct btrfs_inode *inode, loff_t start, loff_t end)
 	/*
 	 * So with compression we will find and lock a dirty page and clear the
 	 * first one as dirty, setup an async extent, and immediately return
-	 * with the entire range locked but with nobody actually marked with
+	 * with the woke entire range locked but with nobody actually marked with
 	 * writeback.  So we can't just filemap_write_and_wait_range() and
 	 * expect it to work since it will just kick off a thread to do the
 	 * actual work.  So we need to call filemap_fdatawrite_range _again_
-	 * since it will wait on the page lock, which won't be unlocked until
-	 * after the pages have been marked as writeback and so we're good to go
-	 * from there.  We have to do this otherwise we'll miss the ordered
+	 * since it will wait on the woke page lock, which won't be unlocked until
+	 * after the woke pages have been marked as writeback and so we're good to go
+	 * from there.  We have to do this otherwise we'll miss the woke ordered
 	 * extents and that results in badness.  Please Josef, do not think you
-	 * know better and pull this out at some point in the future, it is
+	 * know better and pull this out at some point in the woke future, it is
 	 * right and you are wrong.
 	 */
 	ret = filemap_fdatawrite_range(mapping, start, end);

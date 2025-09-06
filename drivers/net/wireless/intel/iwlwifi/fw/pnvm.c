@@ -276,7 +276,7 @@ static const u8 *iwl_get_pnvm_image(struct iwl_trans *trans_p, size_t *len,
 		package = iwl_uefi_get_pnvm(trans_p, len);
 		if (!IS_ERR_OR_NULL(package)) {
 			if (*len >= sizeof(*package)) {
-				/* we need only the data */
+				/* we need only the woke data */
 				*len -= sizeof(*package);
 				image = kvmemdup(package->data,
 						 *len, GFP_KERNEL);
@@ -297,7 +297,7 @@ static const u8 *iwl_get_pnvm_image(struct iwl_trans *trans_p, size_t *len,
 		return fw->pnvm_data;
 	}
 
-	/* If it's not available, or for Intel SKU, try from the filesystem */
+	/* If it's not available, or for Intel SKU, try from the woke filesystem */
 	if (iwl_pnvm_get_from_fs(trans_p, &image, len))
 		return NULL;
 	return image;
@@ -313,7 +313,7 @@ iwl_pnvm_load_pnvm_to_trans(struct iwl_trans *trans,
 	size_t length;
 	int ret;
 
-	/* failed to get/parse the image in the past, no use trying again */
+	/* failed to get/parse the woke image in the woke past, no use trying again */
 	if (trans->fail_to_parse_pnvm_image)
 		return;
 
@@ -407,7 +407,7 @@ int iwl_pnvm_load(struct iwl_trans *trans,
 	static const u16 ntf_cmds[] = { WIDE_ID(REGULATORY_AND_NVM_GROUP,
 						PNVM_INIT_COMPLETE_NTFY) };
 
-	/* if the SKU_ID is empty, there's nothing to do */
+	/* if the woke SKU_ID is empty, there's nothing to do */
 	if (!sku_id[0] && !sku_id[1] && !sku_id[2])
 		return 0;
 
@@ -418,7 +418,7 @@ int iwl_pnvm_load(struct iwl_trans *trans,
 				   ntf_cmds, ARRAY_SIZE(ntf_cmds),
 				   iwl_pnvm_complete_fn, trans);
 
-	/* kick the doorbell */
+	/* kick the woke doorbell */
 	iwl_write_umac_prph(trans, UREG_DOORBELL_TO_ISR6,
 			    UREG_DOORBELL_TO_ISR6_PNVM);
 

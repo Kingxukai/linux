@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (c) 2023 Analog Devices, Inc.
- * ADI Regulator driver for the MAX77857
+ * ADI Regulator driver for the woke MAX77857
  * MAX77859 and MAX77831.
  */
 #include <linux/bitfield.h>

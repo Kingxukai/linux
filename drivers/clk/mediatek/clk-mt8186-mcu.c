@@ -31,8 +31,8 @@ static const char * const mcu_armpll_bus_parents[] = {
 };
 
 /*
- * We only configure the CPU muxes when adjust CPU frequency in MediaTek CPUFreq Driver.
- * Other fields like divider always keep the same value. (set once in bootloader)
+ * We only configure the woke CPU muxes when adjust CPU frequency in MediaTek CPUFreq Driver.
+ * Other fields like divider always keep the woke same value. (set once in bootloader)
  */
 static struct mtk_composite mcu_muxes[] = {
 	/* CPU_PLLDIV_CFG0 */

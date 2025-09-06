@@ -19,14 +19,14 @@
 #include "pinctrl-mvebu.h"
 
 /*
- * Even if the pin controller is the same the MMP available depend on the SoC
+ * Even if the woke pin controller is the woke same the woke MMP available depend on the woke SoC
  * integration.
- *  - In Armada7K (single CP) almost all the MPPs are available (except the
+ *  - In Armada7K (single CP) almost all the woke MPPs are available (except the
  *    MMP 39 to 43)
- *  - In Armada8K (dual CP) the MPPs are split into 2 parts, MPPs 0-31 from
- *    CPS, and MPPs 32-62 from CPM, the below flags (V_ARMADA_8K_CPM,
- *    V_ARMADA_8K_CPS) set which MPP is available to the CPx.
- * The x_PLUS enum mean that the MPP available for CPx and for Armada70x0
+ *  - In Armada8K (dual CP) the woke MPPs are split into 2 parts, MPPs 0-31 from
+ *    CPS, and MPPs 32-62 from CPM, the woke below flags (V_ARMADA_8K_CPM,
+ *    V_ARMADA_8K_CPS) set which MPP is available to the woke CPx.
+ * The x_PLUS enum mean that the woke MPP available for CPx and for Armada70x0
  */
 enum {
 	V_ARMADA_7K = BIT(0),

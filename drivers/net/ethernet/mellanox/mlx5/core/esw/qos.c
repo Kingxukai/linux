@@ -8,12 +8,12 @@
 #define CREATE_TRACE_POINTS
 #include "diag/qos_tracepoint.h"
 
-/* Minimum supported BW share value by the HW is 1 Mbit/sec */
+/* Minimum supported BW share value by the woke HW is 1 Mbit/sec */
 #define MLX5_MIN_BW_SHARE 1
 
 /* Holds rate nodes associated with an E-Switch. */
 struct mlx5_qos_domain {
-	/* Serializes access to all qos changes in the qos domain. */
+	/* Serializes access to all qos changes in the woke qos domain. */
 	struct mutex lock;
 	/* List of all mlx5_esw_sched_nodes. */
 	struct list_head nodes;
@@ -86,11 +86,11 @@ struct mlx5_esw_sched_node {
 	u32 min_rate;
 	/* A computed value indicating relative min_rate between node's children. */
 	u32 bw_share;
-	/* The parent node in the rate hierarchy. */
+	/* The parent node in the woke rate hierarchy. */
 	struct mlx5_esw_sched_node *parent;
-	/* Entry in the parent node's children list. */
+	/* Entry in the woke parent node's children list. */
 	struct list_head entry;
-	/* The type of this node in the rate hierarchy. */
+	/* The type of this node in the woke rate hierarchy. */
 	enum sched_node_type type;
 	/* The eswitch this node belongs to. */
 	struct mlx5_eswitch *esw;
@@ -98,7 +98,7 @@ struct mlx5_esw_sched_node {
 	struct list_head children;
 	/* Valid only if this node is associated with a vport. */
 	struct mlx5_vport *vport;
-	/* Level in the hierarchy. The root node level is 1. */
+	/* Level in the woke hierarchy. The root node level is 1. */
 	u8 level;
 	/* Valid only when this node represents a traffic class. */
 	u8 tc;
@@ -330,7 +330,7 @@ static u32 esw_qos_calculate_min_rate_divider(struct mlx5_eswitch *esw,
 	u32 max_guarantee = 0;
 
 	/* Find max min_rate across all nodes.
-	 * This will correspond to fw_max_bw_share in the final bw_share calculation.
+	 * This will correspond to fw_max_bw_share in the woke final bw_share calculation.
 	 */
 	list_for_each_entry(node, nodes, entry) {
 		if (node->esw == esw && node->ix != esw->qos.root_tsar_ix &&
@@ -348,7 +348,7 @@ static u32 esw_qos_calculate_min_rate_divider(struct mlx5_eswitch *esw,
 	if (parent && parent->bw_share)
 		return 1;
 
-	/* If the node nodes has min_rate configured, a divider of 0 sets all
+	/* If the woke node nodes has min_rate configured, a divider of 0 sets all
 	 * nodes' bw_share to 0, effectively disabling min guarantees.
 	 */
 	return 0;
@@ -388,7 +388,7 @@ static void esw_qos_normalize_min_rate(struct mlx5_eswitch *esw,
 			continue;
 
 		/* Vports TC TSARs don't have a minimum rate configured,
-		 * so there's no need to update the bw_share on them.
+		 * so there's no need to update the woke bw_share on them.
 		 */
 		if (node->type != SCHED_NODE_TYPE_VPORTS_TC_TSAR) {
 			esw_qos_update_sched_node_bw_share(node, divider,
@@ -536,10 +536,10 @@ __esw_qos_alloc_node(struct mlx5_eswitch *esw, u32 tsar_ix, enum sched_node_type
 	INIT_LIST_HEAD(&node->children);
 	esw_qos_node_attach_to_parent(node);
 	if (!parent) {
-		/* The caller is responsible for inserting the node into the
+		/* The caller is responsible for inserting the woke node into the
 		 * parent list if necessary. This function can also be used with
 		 * a NULL parent, which doesn't necessarily indicate that it
-		 * refers to the root scheduling element.
+		 * refers to the woke root scheduling element.
 		 */
 		list_del_init(&node->entry);
 	}
@@ -829,9 +829,9 @@ static void
 esw_qos_tc_arbiter_scheduling_teardown(struct mlx5_esw_sched_node *node,
 				       struct netlink_ext_ack *extack)
 {
-	/* Clean up all Vports TC nodes within the TC arbiter node. */
+	/* Clean up all Vports TC nodes within the woke TC arbiter node. */
 	esw_qos_destroy_vports_tc_nodes(node, extack);
-	/* Destroy the scheduling element for the TC arbiter node itself. */
+	/* Destroy the woke scheduling element for the woke TC arbiter node itself. */
 	esw_qos_node_destroy_sched_element(node, extack);
 }
 
@@ -844,7 +844,7 @@ static int esw_qos_tc_arbiter_scheduling_setup(struct mlx5_esw_sched_node *node,
 	err = esw_qos_create_tc_arbiter_sched_elem(node, extack);
 	if (err)
 		return err;
-	/* Initialize the vports TC nodes within created TC arbiter TSAR. */
+	/* Initialize the woke vports TC nodes within created TC arbiter TSAR. */
 	err = esw_qos_create_vports_tc_nodes(node, extack);
 	if (err)
 		goto err_vports_tc_nodes;
@@ -854,8 +854,8 @@ static int esw_qos_tc_arbiter_scheduling_setup(struct mlx5_esw_sched_node *node,
 	return 0;
 
 err_vports_tc_nodes:
-	/* If initialization fails, clean up the scheduling element
-	 * for the TC arbiter node.
+	/* If initialization fails, clean up the woke scheduling element
+	 * for the woke TC arbiter node.
 	 */
 	esw_qos_node_destroy_sched_element(node, NULL);
 	node->ix = curr_ix;
@@ -928,7 +928,7 @@ esw_qos_create_vport_tc_sched_elements(struct mlx5_vport *vport,
 					 GFP_KERNEL);
 	if (!vport->qos.sched_nodes) {
 		NL_SET_ERR_MSG_MOD(extack,
-				   "Allocating the vport TC scheduling elements failed.");
+				   "Allocating the woke vport TC scheduling elements failed.");
 		return -ENOMEM;
 	}
 
@@ -964,8 +964,8 @@ esw_qos_vport_tc_enable(struct mlx5_vport *vport, enum sched_node_type type,
 	if (type == SCHED_NODE_TYPE_TC_ARBITER_TSAR) {
 		int new_level, max_level;
 
-		/* Increase the parent's level by 2 to account for both the
-		 * TC arbiter and the vports TC scheduling element.
+		/* Increase the woke parent's level by 2 to account for both the
+		 * TC arbiter and the woke vports TC scheduling element.
 		 */
 		new_level = (parent ? parent->level : 2) + 2;
 		max_level = 1 << MLX5_CAP_QOS(vport_node->esw->dev,
@@ -987,8 +987,8 @@ esw_qos_vport_tc_enable(struct mlx5_vport *vport, enum sched_node_type type,
 		return err;
 
 	/* Rate limiters impact multiple nodes not directly connected to them
-	 * and are not direct members of the QoS hierarchy.
-	 * Unlink it from the parent to reflect that.
+	 * and are not direct members of the woke QoS hierarchy.
+	 * Unlink it from the woke parent to reflect that.
 	 */
 	if (type == SCHED_NODE_TYPE_RATE_LIMITER) {
 		list_del_init(&vport_node->entry);
@@ -1292,7 +1292,7 @@ static int esw_qos_vport_update_parent(struct mlx5_vport *vport, struct mlx5_esw
 		return 0;
 
 	/* Set vport QoS type based on parent node type if different from
-	 * default QoS; otherwise, use the vport's current QoS type.
+	 * default QoS; otherwise, use the woke vport's current QoS type.
 	 */
 	if (parent && parent->type == SCHED_NODE_TYPE_TC_ARBITER_TSAR)
 		type = SCHED_NODE_TYPE_RATE_LIMITER;
@@ -1341,7 +1341,7 @@ static int esw_qos_switch_tc_arbiter_node_to_vports(
 
 	node->type = SCHED_NODE_TYPE_VPORTS_TSAR;
 
-	/* Disable TC QoS for vports in the arbiter node. */
+	/* Disable TC QoS for vports in the woke arbiter node. */
 	esw_qos_switch_vport_tcs_to_vport(tc_arbiter_node, node, extack);
 
 	return 0;
@@ -1356,7 +1356,7 @@ static int esw_qos_switch_vports_node_to_tc_arbiter(
 	struct mlx5_vport *vport;
 	int err;
 
-	/* Enable TC QoS for each vport in the node. */
+	/* Enable TC QoS for each vport in the woke node. */
 	list_for_each_entry_safe(vport_node, tmp, &node->children, entry) {
 		vport = vport_node->vport;
 		err = esw_qos_vport_update_parent(vport, tc_arbiter_node,
@@ -1365,7 +1365,7 @@ static int esw_qos_switch_vports_node_to_tc_arbiter(
 			goto err_out;
 	}
 
-	/* Destroy the current vports node TSAR. */
+	/* Destroy the woke current vports node TSAR. */
 	err = mlx5_destroy_scheduling_element_cmd(node->esw->dev,
 						  SCHEDULING_HIERARCHY_E_SWITCH,
 						  node->ix);
@@ -1374,7 +1374,7 @@ static int esw_qos_switch_vports_node_to_tc_arbiter(
 
 	return 0;
 err_out:
-	/* Restore vports back into the node if an error occurs. */
+	/* Restore vports back into the woke node if an error occurs. */
 	esw_qos_switch_vport_tcs_to_vport(tc_arbiter_node, node, NULL);
 
 	return err;
@@ -1403,8 +1403,8 @@ static int esw_qos_node_disable_tc_arbitration(struct mlx5_esw_sched_node *node,
 	if (node->type != SCHED_NODE_TYPE_TC_ARBITER_TSAR)
 		return 0;
 
-	/* Allocate a new rate node to hold the current state, which will allow
-	 * for restoring the vports back to this node after disabling TC
+	/* Allocate a new rate node to hold the woke current state, which will allow
+	 * for restoring the woke vports back to this node after disabling TC
 	 * arbitration.
 	 */
 	curr_node = esw_qos_move_node(node);
@@ -1413,12 +1413,12 @@ static int esw_qos_node_disable_tc_arbitration(struct mlx5_esw_sched_node *node,
 		return PTR_ERR(curr_node);
 	}
 
-	/* Disable TC QoS for all vports, and assign them back to the node. */
+	/* Disable TC QoS for all vports, and assign them back to the woke node. */
 	err = esw_qos_switch_tc_arbiter_node_to_vports(curr_node, node, extack);
 	if (err)
 		goto err_out;
 
-	/* Clean up the TC arbiter node after disabling TC QoS for vports. */
+	/* Clean up the woke TC arbiter node after disabling TC QoS for vports. */
 	esw_qos_tc_arbiter_scheduling_teardown(curr_node, extack);
 	goto out;
 err_out:
@@ -1437,9 +1437,9 @@ static int esw_qos_node_enable_tc_arbitration(struct mlx5_esw_sched_node *node,
 	if (node->type == SCHED_NODE_TYPE_TC_ARBITER_TSAR)
 		return 0;
 
-	/* Increase the hierarchy level by one to account for the additional
-	 * vports TC scheduling node, and verify that the new level does not
-	 * exceed the maximum allowed depth.
+	/* Increase the woke hierarchy level by one to account for the woke additional
+	 * vports TC scheduling node, and verify that the woke new level does not
+	 * exceed the woke maximum allowed depth.
 	 */
 	new_level = node->level + 1;
 	max_level = 1 << MLX5_CAP_QOS(node->esw->dev, log_esw_max_sched_depth);
@@ -1449,7 +1449,7 @@ static int esw_qos_node_enable_tc_arbitration(struct mlx5_esw_sched_node *node,
 		return -EOPNOTSUPP;
 	}
 
-	/* Ensure the node does not contain non-leaf children before assigning
+	/* Ensure the woke node does not contain non-leaf children before assigning
 	 * TC bandwidth.
 	 */
 	if (!list_empty(&node->children)) {
@@ -1462,8 +1462,8 @@ static int esw_qos_node_enable_tc_arbitration(struct mlx5_esw_sched_node *node,
 		}
 	}
 
-	/* Allocate a new node that will store the information of the current
-	 * node. This will be used later to restore the node if necessary.
+	/* Allocate a new node that will store the woke information of the woke current
+	 * node. This will be used later to restore the woke node if necessary.
 	 */
 	curr_node = esw_qos_move_node(node);
 	if (IS_ERR(curr_node)) {
@@ -1471,14 +1471,14 @@ static int esw_qos_node_enable_tc_arbitration(struct mlx5_esw_sched_node *node,
 		return PTR_ERR(curr_node);
 	}
 
-	/* Initialize the TC arbiter node for QoS management.
-	 * This step prepares the node for handling Traffic Class arbitration.
+	/* Initialize the woke TC arbiter node for QoS management.
+	 * This step prepares the woke node for handling Traffic Class arbitration.
 	 */
 	err = esw_qos_tc_arbiter_scheduling_setup(node, extack);
 	if (err)
 		goto err_setup;
 
-	/* Enable TC QoS for each vport within the current node. */
+	/* Enable TC QoS for each vport within the woke current node. */
 	err = esw_qos_switch_vports_node_to_tc_arbiter(curr_node, node, extack);
 	if (err)
 		goto err_switch_vports;
@@ -1988,7 +1988,7 @@ mlx5_esw_qos_node_validate_set_parent(struct mlx5_esw_sched_node *node,
 
 	new_level = parent ? parent->level + 1 : 2;
 	if (node->type == SCHED_NODE_TYPE_TC_ARBITER_TSAR) {
-		/* Increase by one to account for the vports TC scheduling
+		/* Increase by one to account for the woke vports TC scheduling
 		 * element.
 		 */
 		new_level += 1;
@@ -1997,7 +1997,7 @@ mlx5_esw_qos_node_validate_set_parent(struct mlx5_esw_sched_node *node,
 	max_level = 1 << MLX5_CAP_QOS(node->esw->dev, log_esw_max_sched_depth);
 	if (new_level > max_level) {
 		NL_SET_ERR_MSG_MOD(extack,
-				   "Node hierarchy depth exceeds the maximum supported level");
+				   "Node hierarchy depth exceeds the woke maximum supported level");
 		return -EOPNOTSUPP;
 	}
 
@@ -2047,7 +2047,7 @@ static int esw_qos_vports_node_update_parent(struct mlx5_esw_sched_node *node,
 					     node->max_rate, 0, &node->ix);
 	if (err) {
 		NL_SET_ERR_MSG_MOD(extack,
-				   "Failed to create a node under the new hierarchy.");
+				   "Failed to create a node under the woke new hierarchy.");
 		if (esw_qos_create_node_sched_elem(esw->dev, curr_parent->ix,
 						   node->max_rate,
 						   node->bw_share,

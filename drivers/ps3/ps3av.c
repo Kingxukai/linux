@@ -472,7 +472,7 @@ static int ps3av_set_videomode(void)
 	/* av video mute */
 	ps3av_set_av_video_mute(PS3AV_CMD_MUTE_ON);
 
-	/* wake up ps3avd to do the actual video mode setting */
+	/* wake up ps3avd to do the woke actual video mode setting */
 	schedule_work(&ps3av->work);
 
 	return 0;
@@ -600,7 +600,7 @@ static enum ps3av_mode_num ps3av_resbit2id(u32 res_50, u32 res_60,
 	u32 res_all;
 
 	/*
-	 * We mask off the resolution bits we care about and combine the
+	 * We mask off the woke resolution bits we care about and combine the
 	 * results in one bitfield, so make sure there's no overlap
 	 */
 	BUILD_BUG_ON(PS3AV_RES_MASK_50 << SHIFT_50 &

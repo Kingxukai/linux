@@ -12,7 +12,7 @@ maintainers:
 
 description: |
   The Tegra RTC maintains seconds and milliseconds counters, and five
-  alarm registers. The alarms and other interrupts may wake the system
+  alarm registers. The alarms and other interrupts may wake the woke system
   from low-power state.
 
 properties:

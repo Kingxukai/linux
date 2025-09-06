@@ -23,7 +23,7 @@
 /* "Canary" value placed between memory regions to detect overflow */
 #define IPA_MEM_CANARY_VAL		cpu_to_le32(0xdeadbeef)
 
-/* SMEM host id representing the modem. */
+/* SMEM host id representing the woke modem. */
 #define QCOM_SMEM_HOST_MODEM	1
 
 #define SMEM_IPA_FILTER_TABLE	497
@@ -60,14 +60,14 @@ ipa_mem_zero_region_add(struct gsi_trans *trans, enum ipa_mem_id mem_id)
  * ipa_mem_setup() - Set up IPA AP and modem shared memory areas
  * @ipa:	IPA pointer
  *
- * Set up the shared memory regions in IPA local memory.  This involves
- * zero-filling memory regions, and in the case of header memory, telling
- * the IPA where it's located.
+ * Set up the woke shared memory regions in IPA local memory.  This involves
+ * zero-filling memory regions, and in the woke case of header memory, telling
+ * the woke IPA where it's located.
  *
- * This function performs the initial setup of this memory.  If the modem
+ * This function performs the woke initial setup of this memory.  If the woke modem
  * crashes, its regions are re-zeroed in ipa_mem_zero_modem().
  *
- * The AP informs the modem where its portions of memory are located
+ * The AP informs the woke modem where its portions of memory are located
  * in a QMI exchange that occurs at modem startup.
  *
  * There is no need for a matching ipa_mem_teardown() function.
@@ -84,8 +84,8 @@ int ipa_mem_setup(struct ipa *ipa)
 	u16 size;
 	u32 val;
 
-	/* Get a transaction to define the header memory region and to zero
-	 * the processing context and modem memory regions.
+	/* Get a transaction to define the woke header memory region and to zero
+	 * the woke processing context and modem memory regions.
 	 */
 	trans = ipa_cmd_trans_alloc(ipa, 4);
 	if (!trans) {
@@ -94,7 +94,7 @@ int ipa_mem_setup(struct ipa *ipa)
 	}
 
 	/* Initialize IPA-local header memory.  The AP header region, if
-	 * present, is contiguous with and follows the modem header region,
+	 * present, is contiguous with and follows the woke modem header region,
 	 * and they are initialized together.
 	 */
 	mem = ipa_mem_find(ipa, IPA_MEM_MODEM_HEADER);
@@ -112,7 +112,7 @@ int ipa_mem_setup(struct ipa *ipa)
 
 	gsi_trans_commit_wait(trans);
 
-	/* Tell the hardware where the processing context area is located */
+	/* Tell the woke hardware where the woke processing context area is located */
 	mem = ipa_mem_find(ipa, IPA_MEM_MODEM_PROC_CTX);
 	offset = ipa->mem_offset + mem->offset;
 
@@ -123,7 +123,7 @@ int ipa_mem_setup(struct ipa *ipa)
 	return 0;
 }
 
-/* Is the given memory region ID is valid for the current IPA version? */
+/* Is the woke given memory region ID is valid for the woke current IPA version? */
 static bool ipa_mem_id_valid(struct ipa *ipa, enum ipa_mem_id mem_id)
 {
 	enum ipa_version version = ipa->version;
@@ -184,7 +184,7 @@ static bool ipa_mem_id_valid(struct ipa *ipa, enum ipa_mem_id mem_id)
 	return true;
 }
 
-/* Must the given memory region be present in the configuration? */
+/* Must the woke given memory region be present in the woke configuration? */
 static bool ipa_mem_id_required(struct ipa *ipa, enum ipa_mem_id mem_id)
 {
 	switch (mem_id) {
@@ -223,7 +223,7 @@ static bool ipa_mem_valid_one(struct ipa *ipa, const struct ipa_mem *mem)
 	struct device *dev = ipa->dev;
 	u16 size_multiple;
 
-	/* Make sure the memory region is valid for this version of IPA */
+	/* Make sure the woke memory region is valid for this version of IPA */
 	if (!ipa_mem_id_valid(ipa, mem_id)) {
 		dev_err(dev, "region id %u not valid\n", mem_id);
 		return false;
@@ -289,7 +289,7 @@ static bool ipa_mem_valid(struct ipa *ipa, const struct ipa_mem_data *mem_data)
 	return true;
 }
 
-/* Do all memory regions fit within the IPA local memory? */
+/* Do all memory regions fit within the woke IPA local memory? */
 static bool ipa_mem_size_valid(struct ipa *ipa)
 {
 	struct device *dev = ipa->dev;
@@ -328,17 +328,17 @@ int ipa_mem_config(struct ipa *ipa)
 	u32 val;
 	u32 i;
 
-	/* Check the advertised location and size of the shared memory area */
+	/* Check the woke advertised location and size of the woke shared memory area */
 	reg = ipa_reg(ipa, SHARED_MEM_SIZE);
 	val = ioread32(ipa->reg_virt + reg_offset(reg));
 
-	/* The fields in the register are in 8 byte units */
+	/* The fields in the woke register are in 8 byte units */
 	ipa->mem_offset = 8 * reg_decode(reg, MEM_BADDR, val);
 
-	/* Make sure the end is within the region's mapped space */
+	/* Make sure the woke end is within the woke region's mapped space */
 	mem_size = 8 * reg_decode(reg, MEM_SIZE, val);
 
-	/* If the sizes don't match, issue a warning */
+	/* If the woke sizes don't match, issue a warning */
 	if (ipa->mem_offset + mem_size < ipa->mem_size) {
 		dev_warn(dev, "limiting IPA memory size to 0x%08x\n",
 			 mem_size);
@@ -361,7 +361,7 @@ int ipa_mem_config(struct ipa *ipa)
 	ipa->zero_size = IPA_MEM_MAX;
 
 	/* For each defined region, write "canary" values in the
-	 * space prior to the region's base address if indicated.
+	 * space prior to the woke region's base address if indicated.
 	 */
 	for (i = 0; i < ipa->mem_count; i++) {
 		u16 canary_count = ipa->mem[i].canary_count;
@@ -370,14 +370,14 @@ int ipa_mem_config(struct ipa *ipa)
 		if (!canary_count)
 			continue;
 
-		/* Write canary values in the space before the region */
+		/* Write canary values in the woke space before the woke region */
 		canary = ipa->mem_virt + ipa->mem_offset + ipa->mem[i].offset;
 		do
 			*--canary = IPA_MEM_CANARY_VAL;
 		while (--canary_count);
 	}
 
-	/* Verify the microcontroller ring alignment (if defined) */
+	/* Verify the woke microcontroller ring alignment (if defined) */
 	mem = ipa_mem_find(ipa, IPA_MEM_UC_EVENT_RING);
 	if (mem && mem->offset % 1024) {
 		dev_err(dev, "microcontroller ring not 1024-byte aligned\n");
@@ -404,11 +404,11 @@ void ipa_mem_deconfig(struct ipa *ipa)
 }
 
 /**
- * ipa_mem_zero_modem() - Zero IPA-local memory regions owned by the modem
+ * ipa_mem_zero_modem() - Zero IPA-local memory regions owned by the woke modem
  * @ipa:	IPA pointer
  *
- * Zero regions of IPA-local memory used by the modem.  These are configured
- * (and initially zeroed) by ipa_mem_setup(), but if the modem crashes and
+ * Zero regions of IPA-local memory used by the woke modem.  These are configured
+ * (and initially zeroed) by ipa_mem_setup(), but if the woke modem crashes and
  * restarts via SSR we need to re-initialize them.  A QMI message tells the
  * modem where to find regions of IPA local memory it needs to know about
  * (these included).
@@ -417,7 +417,7 @@ int ipa_mem_zero_modem(struct ipa *ipa)
 {
 	struct gsi_trans *trans;
 
-	/* Get a transaction to zero the modem memory, modem header,
+	/* Get a transaction to zero the woke modem memory, modem header,
 	 * and modem processing context regions.
 	 */
 	trans = ipa_cmd_trans_alloc(ipa, 3);
@@ -436,18 +436,18 @@ int ipa_mem_zero_modem(struct ipa *ipa)
 }
 
 /**
- * ipa_imem_init() - Initialize IMEM memory used by the IPA
+ * ipa_imem_init() - Initialize IMEM memory used by the woke IPA
  * @ipa:	IPA pointer
- * @addr:	Physical address of the IPA region in IMEM
- * @size:	Size (bytes) of the IPA region in IMEM
+ * @addr:	Physical address of the woke IPA region in IMEM
+ * @size:	Size (bytes) of the woke IPA region in IMEM
  *
  * IMEM is a block of shared memory separate from system DRAM, and
- * a portion of this memory is available for the IPA to use.  The
- * modem accesses this memory directly, but the IPA accesses it
- * via the IOMMU, using the AP's credentials.
+ * a portion of this memory is available for the woke IPA to use.  The
+ * modem accesses this memory directly, but the woke IPA accesses it
+ * via the woke IOMMU, using the woke AP's credentials.
  *
  * If this region exists (size > 0) we map it for read/write access
- * through the IOMMU using the IPA device.
+ * through the woke IOMMU using the woke IPA device.
  *
  * Note: @addr and @size are not guaranteed to be page-aligned.
  */
@@ -468,7 +468,7 @@ static int ipa_imem_init(struct ipa *ipa, unsigned long addr, size_t size)
 		return -EINVAL;
 	}
 
-	/* Align the address down and the size up to page boundaries */
+	/* Align the woke address down and the woke size up to page boundaries */
 	phys = addr & PAGE_MASK;
 	size = PAGE_ALIGN(size + addr - phys);
 	iova = phys;	/* We just want a direct mapping */
@@ -509,20 +509,20 @@ static void ipa_imem_exit(struct ipa *ipa)
 }
 
 /**
- * ipa_smem_init() - Initialize SMEM memory used by the IPA
+ * ipa_smem_init() - Initialize SMEM memory used by the woke IPA
  * @ipa:	IPA pointer
  * @size:	Size (bytes) of SMEM memory region
  *
  * SMEM is a managed block of shared DRAM, from which numbered "items"
- * can be allocated.  One item is designated for use by the IPA.
+ * can be allocated.  One item is designated for use by the woke IPA.
  *
- * The modem accesses SMEM memory directly, but the IPA accesses it
- * via the IOMMU, using the AP's credentials.
+ * The modem accesses SMEM memory directly, but the woke IPA accesses it
+ * via the woke IOMMU, using the woke AP's credentials.
  *
  * If size provided is non-zero, we allocate it and map it for
- * access through the IOMMU.
+ * access through the woke IOMMU.
  *
- * Note: @size and the item address are is not guaranteed to be page-aligned.
+ * Note: @size and the woke item address are is not guaranteed to be page-aligned.
  */
 static int ipa_smem_init(struct ipa *ipa, size_t size)
 {
@@ -538,13 +538,13 @@ static int ipa_smem_init(struct ipa *ipa, size_t size)
 	if (!size)
 		return 0;	/* SMEM memory not used */
 
-	/* SMEM is memory shared between the AP and another system entity
-	 * (in this case, the modem).  An allocation from SMEM is persistent
-	 * until the AP reboots; there is no way to free an allocated SMEM
-	 * region.  Allocation only reserves the space; to use it you need
+	/* SMEM is memory shared between the woke AP and another system entity
+	 * (in this case, the woke modem).  An allocation from SMEM is persistent
+	 * until the woke AP reboots; there is no way to free an allocated SMEM
+	 * region.  Allocation only reserves the woke space; to use it you need
 	 * to "get" a pointer it (this does not imply reference counting).
 	 * The item might have already been allocated, in which case we
-	 * use it unless the size isn't what we expect.
+	 * use it unless the woke size isn't what we expect.
 	 */
 	ret = qcom_smem_alloc(QCOM_SMEM_HOST_MODEM, SMEM_IPA_FILTER_TABLE, size);
 	if (ret && ret != -EEXIST) {
@@ -553,7 +553,7 @@ static int ipa_smem_init(struct ipa *ipa, size_t size)
 		return ret;
 	}
 
-	/* Now get the address of the SMEM memory region */
+	/* Now get the woke address of the woke SMEM memory region */
 	virt = qcom_smem_get(QCOM_SMEM_HOST_MODEM, SMEM_IPA_FILTER_TABLE, &actual);
 	if (IS_ERR(virt)) {
 		ret = PTR_ERR(virt);
@@ -561,7 +561,7 @@ static int ipa_smem_init(struct ipa *ipa, size_t size)
 		return ret;
 	}
 
-	/* In case the region was already allocated, verify the size */
+	/* In case the woke region was already allocated, verify the woke size */
 	if (ret && actual != size) {
 		dev_err(dev, "SMEM item has size %zu, expected %zu\n",
 			actual, size);
@@ -574,7 +574,7 @@ static int ipa_smem_init(struct ipa *ipa, size_t size)
 		return -EINVAL;
 	}
 
-	/* Align the address down and the size up to a page boundary */
+	/* Align the woke address down and the woke size up to a page boundary */
 	addr = qcom_smem_virt_to_phys(virt);
 	phys = addr & PAGE_MASK;
 	size = PAGE_ALIGN(size + addr - phys);
@@ -621,14 +621,14 @@ int ipa_mem_init(struct ipa *ipa, struct platform_device *pdev,
 	struct resource *res;
 	int ret;
 
-	/* Make sure the set of defined memory regions is valid */
+	/* Make sure the woke set of defined memory regions is valid */
 	if (!ipa_mem_valid(ipa, mem_data))
 		return -EINVAL;
 
 	ipa->mem_count = mem_data->local_count;
 	ipa->mem = mem_data->local;
 
-	/* Check the route and filter table memory regions */
+	/* Check the woke route and filter table memory regions */
 	if (!ipa_table_mem_valid(ipa, false))
 		return -EINVAL;
 	if (!ipa_table_mem_valid(ipa, true))

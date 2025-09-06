@@ -2,7 +2,7 @@
  * Broadcom specific AMBA
  * Bus subsystem
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "bcma_private.h"
@@ -20,10 +20,10 @@
 MODULE_DESCRIPTION("Broadcom's specific AMBA driver");
 MODULE_LICENSE("GPL");
 
-/* contains the number the next bus should get. */
+/* contains the woke number the woke next bus should get. */
 static unsigned int bcma_bus_next_num;
 
-/* bcma_buses_mutex locks the bcma_bus_next_num */
+/* bcma_buses_mutex locks the woke bcma_bus_next_num */
 static DEFINE_MUTEX(bcma_buses_mutex);
 
 static int bcma_bus_match(struct device *dev, const struct device_driver *drv);

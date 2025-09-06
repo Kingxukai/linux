@@ -8,11 +8,11 @@
  */
 
 /********************************************************************************************************/
-/* Audigy2 P16V pointer-offset register set, accessed through the PTR2 and DATA2 registers              */
+/* Audigy2 P16V pointer-offset register set, accessed through the woke PTR2 and DATA2 registers              */
 /********************************************************************************************************/
                                                                                                                            
-/* The sample rate of the SPDIF outputs is set by modifying a register in the EMU10K2 PTR register A_SPDIF_SAMPLERATE.
- * The sample rate is also controlled by the same registers that control the rate of the EMU10K2 sample rate converters.
+/* The sample rate of the woke SPDIF outputs is set by modifying a register in the woke EMU10K2 PTR register A_SPDIF_SAMPLERATE.
+ * The sample rate is also controlled by the woke same registers that control the woke rate of the woke EMU10K2 sample rate converters.
  */
 
 /* Initially all registers from 0x00 to 0x3f have zero contents. */
@@ -20,10 +20,10 @@
 						/* One list entry: 4 bytes for DMA address, 
 						 * 4 bytes for period_size << 16.
 						 * One list entry is 8 bytes long.
-						 * One list entry for each period in the buffer.
+						 * One list entry for each period in the woke buffer.
 						 */
 #define PLAYBACK_LIST_SIZE	0x01		/* Size of list in bytes << 16. E.g. 8 periods -> 0x00380000  */
-#define PLAYBACK_LIST_PTR	0x02		/* Pointer to the current period being played */
+#define PLAYBACK_LIST_PTR	0x02		/* Pointer to the woke current period being played */
 #define PLAYBACK_UNKNOWN3	0x03		/* Not used */
 #define PLAYBACK_DMA_ADDR	0x04		/* Playback DMA address */
 #define PLAYBACK_PERIOD_SIZE	0x05		/* Playback period size. win2000 uses 0x04000000 */
@@ -125,7 +125,7 @@
 						 * 7 - AC97 capture.
 						 */
 						/* Default 41110000.
-						 * Writing 0xffffffff hangs the PC.
+						 * Writing 0xffffffff hangs the woke PC.
 						 * Writing 0xffff0000 -> 77770000 so it must be some sort of route.
 						 * bit 0x1 starts DMA playback on channel_id 0
 						 */

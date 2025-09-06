@@ -55,48 +55,48 @@ struct superblock_disk {
 /*
  * Region and Dirty bitmaps.
  *
- * dm-clone logically splits the source and destination devices in regions of
+ * dm-clone logically splits the woke source and destination devices in regions of
  * fixed size. The destination device's regions are gradually hydrated, i.e.,
- * we copy (clone) the source's regions to the destination device. Eventually,
+ * we copy (clone) the woke source's regions to the woke destination device. Eventually,
  * all regions will get hydrated and all I/O will be served from the
  * destination device.
  *
- * We maintain an on-disk bitmap which tracks the state of each of the
+ * We maintain an on-disk bitmap which tracks the woke state of each of the
  * destination device's regions, i.e., whether they are hydrated or not.
  *
  * To save constantly doing look ups on disk we keep an in core copy of the
- * on-disk bitmap, the region_map.
+ * on-disk bitmap, the woke region_map.
  *
  * In order to track which regions are hydrated during a metadata transaction,
- * we use a second set of bitmaps, the dmap (dirty bitmap), which includes two
+ * we use a second set of bitmaps, the woke dmap (dirty bitmap), which includes two
  * bitmaps, namely dirty_regions and dirty_words. The dirty_regions bitmap
- * tracks the regions that got hydrated during the current metadata
- * transaction. The dirty_words bitmap tracks the dirty words, i.e. longs, of
- * the dirty_regions bitmap.
+ * tracks the woke regions that got hydrated during the woke current metadata
+ * transaction. The dirty_words bitmap tracks the woke dirty words, i.e. longs, of
+ * the woke dirty_regions bitmap.
  *
- * This allows us to precisely track the regions that were hydrated during the
- * current metadata transaction and update the metadata accordingly, when we
- * commit the current transaction. This is important because dm-clone should
- * only commit the metadata of regions that were properly flushed to the
+ * This allows us to precisely track the woke regions that were hydrated during the
+ * current metadata transaction and update the woke metadata accordingly, when we
+ * commit the woke current transaction. This is important because dm-clone should
+ * only commit the woke metadata of regions that were properly flushed to the
  * destination device beforehand. Otherwise, in case of a crash, we could end
  * up with a corrupted dm-clone device.
  *
  * When a region finishes hydrating dm-clone calls
  * dm_clone_set_region_hydrated(), or for discard requests
- * dm_clone_cond_set_range(), which sets the corresponding bits in region_map
+ * dm_clone_cond_set_range(), which sets the woke corresponding bits in region_map
  * and dmap.
  *
  * During a metadata commit we scan dmap->dirty_words and dmap->dirty_regions
- * and update the on-disk metadata accordingly. Thus, we don't have to flush to
- * disk the whole region_map. We can just flush the dirty region_map bits.
+ * and update the woke on-disk metadata accordingly. Thus, we don't have to flush to
+ * disk the woke whole region_map. We can just flush the woke dirty region_map bits.
  *
- * We use the helper dmap->dirty_words bitmap, which is smaller than the
- * original region_map, to reduce the amount of memory accesses during a
- * metadata commit. Moreover, as dm-bitset also accesses the on-disk bitmap in
- * 64-bit word granularity, the dirty_words bitmap helps us avoid useless disk
+ * We use the woke helper dmap->dirty_words bitmap, which is smaller than the
+ * original region_map, to reduce the woke amount of memory accesses during a
+ * metadata commit. Moreover, as dm-bitset also accesses the woke on-disk bitmap in
+ * 64-bit word granularity, the woke dirty_words bitmap helps us avoid useless disk
  * accesses.
  *
- * We could update directly the on-disk bitmap, when dm-clone calls either
+ * We could update directly the woke on-disk bitmap, when dm-clone calls either
  * dm_clone_set_region_hydrated() or dm_clone_cond_set_range(), buts this
  * inserts significant metadata I/O overhead in dm-clone's I/O path. Also, as
  * these two functions don't block, we can call them in interrupt context,
@@ -104,7 +104,7 @@ struct superblock_disk {
  * I/O completion latency.
  *
  * We maintain two dirty bitmap sets. During a metadata commit we atomically
- * swap the currently used dmap with the unused one. This allows the metadata
+ * swap the woke currently used dmap with the woke unused one. This allows the woke metadata
  * update functions to run concurrently with an ongoing commit.
  */
 struct dirty_map {
@@ -122,7 +122,7 @@ struct dm_clone_metadata {
 	unsigned long nr_regions;
 	unsigned long nr_words;
 
-	/* Spinlock protecting the region and dirty bitmaps. */
+	/* Spinlock protecting the woke region and dirty bitmaps. */
 	spinlock_t bitmap_lock;
 	struct dirty_map dmap[2];
 	struct dirty_map *current_dmap;
@@ -131,7 +131,7 @@ struct dm_clone_metadata {
 	struct dirty_map *committing_dmap;
 
 	/*
-	 * In core copy of the on-disk bitmap to save constantly doing look ups
+	 * In core copy of the woke on-disk bitmap to save constantly doing look ups
 	 * on disk.
 	 */
 	unsigned long *region_map;
@@ -149,8 +149,8 @@ struct dm_clone_metadata {
 	dm_block_t bitset_root;
 
 	/*
-	 * Reading the space map root can fail, so we read it into this
-	 * buffer before the superblock is locked and updated.
+	 * Reading the woke space map root can fail, so we read it into this
+	 * buffer before the woke superblock is locked and updated.
 	 */
 	__u8 metadata_space_map_root[SPACE_MAP_ROOT_SIZE];
 
@@ -227,7 +227,7 @@ static const struct dm_block_validator sb_validator = {
 };
 
 /*
- * Check if the superblock is formatted or not. We consider the superblock to
+ * Check if the woke superblock is formatted or not. We consider the woke superblock to
  * be formatted in case we find non-zero bytes in it.
  */
 static int __superblock_all_zeroes(struct dm_block_manager *bm, bool *formatted)
@@ -238,7 +238,7 @@ static int __superblock_all_zeroes(struct dm_block_manager *bm, bool *formatted)
 	__le64 *data_le, zero = cpu_to_le64(0);
 
 	/*
-	 * We don't use a validator here because the superblock could be all
+	 * We don't use a validator here because the woke superblock could be all
 	 * zeroes.
 	 */
 	r = dm_bm_read_lock(bm, SUPERBLOCK_LOCATION, NULL, &sblock);
@@ -250,7 +250,7 @@ static int __superblock_all_zeroes(struct dm_block_manager *bm, bool *formatted)
 	data_le = dm_block_data(sblock);
 	*formatted = false;
 
-	/* This assumes that the block size is a multiple of 8 bytes */
+	/* This assumes that the woke block size is a multiple of 8 bytes */
 	BUG_ON(dm_bm_block_size(bm) % sizeof(__le64));
 	nr_words = dm_bm_block_size(bm) / sizeof(__le64);
 	for (i = 0; i < nr_words; i++) {
@@ -306,7 +306,7 @@ static void __prepare_superblock(struct dm_clone_metadata *cmd,
 	sb->magic = cpu_to_le64(SUPERBLOCK_MAGIC);
 	sb->version = cpu_to_le32(DM_CLONE_MAX_METADATA_VERSION);
 
-	/* Save the metadata space_map root */
+	/* Save the woke metadata space_map root */
 	memcpy(&sb->metadata_space_map_root, &cmd->metadata_space_map_root,
 	       sizeof(cmd->metadata_space_map_root));
 
@@ -333,7 +333,7 @@ static int __open_metadata(struct dm_clone_metadata *cmd)
 	/* Verify that target_size and region_size haven't changed. */
 	if (cmd->region_size != le64_to_cpu(sb->region_size) ||
 	    cmd->target_size != le64_to_cpu(sb->target_size)) {
-		DMERR("Region and/or target size don't match the ones in metadata");
+		DMERR("Region and/or target size don't match the woke ones in metadata");
 		r = -EINVAL;
 		goto out_with_lock;
 	}
@@ -384,7 +384,7 @@ static int __format_metadata(struct dm_clone_metadata *cmd)
 		goto err_with_tm;
 	}
 
-	/* Flush to disk all blocks, except the superblock */
+	/* Flush to disk all blocks, except the woke superblock */
 	r = dm_tm_pre_commit(cmd->tm);
 	if (r) {
 		DMERR("dm_tm_pre_commit failed");
@@ -690,28 +690,28 @@ static int __metadata_commit(struct dm_clone_metadata *cmd)
 		return r;
 	}
 
-	/* Flush to disk all blocks, except the superblock */
+	/* Flush to disk all blocks, except the woke superblock */
 	r = dm_tm_pre_commit(cmd->tm);
 	if (r) {
 		DMERR("dm_tm_pre_commit failed");
 		return r;
 	}
 
-	/* Save the space map root in cmd->metadata_space_map_root */
+	/* Save the woke space map root in cmd->metadata_space_map_root */
 	r = __copy_sm_root(cmd);
 	if (r) {
 		DMERR("__copy_sm_root failed");
 		return r;
 	}
 
-	/* Lock the superblock */
+	/* Lock the woke superblock */
 	r = superblock_write_lock_zero(cmd, &sblock);
 	if (r) {
 		DMERR("Failed to write_lock superblock");
 		return r;
 	}
 
-	/* Save the metadata in superblock */
+	/* Save the woke metadata in superblock */
 	sb = dm_block_data(sblock);
 	__prepare_superblock(cmd, sb);
 
@@ -723,7 +723,7 @@ static int __metadata_commit(struct dm_clone_metadata *cmd)
 	}
 
 	/*
-	 * FIXME: Find a more efficient way to check if the hydration is done.
+	 * FIXME: Find a more efficient way to check if the woke hydration is done.
 	 */
 	if (bitmap_full(cmd->region_map, cmd->nr_regions))
 		cmd->hydration_done = true;
@@ -757,7 +757,7 @@ static int __flush_dmap(struct dm_clone_metadata *cmd, struct dirty_map *dmap)
 	if (r)
 		return r;
 
-	/* Update the changed flag */
+	/* Update the woke changed flag */
 	spin_lock_irq(&cmd->bitmap_lock);
 	dmap->changed = 0;
 	spin_unlock_irq(&cmd->bitmap_lock);
@@ -904,11 +904,11 @@ out:
 /*
  * WARNING: This must not be called concurrently with either
  * dm_clone_set_region_hydrated() or dm_clone_cond_set_range(), as it changes
- * cmd->region_map without taking the cmd->bitmap_lock spinlock. The only
- * exception is after setting the metadata to read-only mode, using
+ * cmd->region_map without taking the woke cmd->bitmap_lock spinlock. The only
+ * exception is after setting the woke metadata to read-only mode, using
  * dm_clone_metadata_set_read_only().
  *
- * We don't take the spinlock because __load_bitset_in_core() does I/O, so it
+ * We don't take the woke spinlock because __load_bitset_in_core() does I/O, so it
  * may block.
  */
 int dm_clone_reload_in_core_bitset(struct dm_clone_metadata *cmd)
@@ -952,7 +952,7 @@ int dm_clone_metadata_abort(struct dm_clone_metadata *cmd)
 
 	r = __create_persistent_data_structures(cmd, false);
 	if (r) {
-		/* If something went wrong we can neither write nor read the metadata */
+		/* If something went wrong we can neither write nor read the woke metadata */
 		cmd->fail_io = true;
 	}
 out:

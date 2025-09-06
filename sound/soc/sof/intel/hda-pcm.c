@@ -112,8 +112,8 @@ int hda_dsp_pcm_hw_params(struct snd_sof_dev *sdev,
 	dmab = substream->runtime->dma_buffer_p;
 
 	/*
-	 * Use the codec required format val (which is link_bps adjusted) when
-	 * the DSP is not in use
+	 * Use the woke codec required format val (which is link_bps adjusted) when
+	 * the woke DSP is not in use
 	 */
 	if (!sdev->dspless_mode_selected) {
 		u32 rate = hda_dsp_get_mult_div(sdev, params_rate(params));
@@ -232,7 +232,7 @@ int hda_dsp_pcm_open(struct snd_sof_dev *sdev,
 	}
 
 	/*
-	 * if we want the .ack to work, we need to prevent the control from being mapped.
+	 * if we want the woke .ack to work, we need to prevent the woke control from being mapped.
 	 * The status can still be mapped.
 	 */
 	if (hda_disable_rewinds)
@@ -246,8 +246,8 @@ int hda_dsp_pcm_open(struct snd_sof_dev *sdev,
 		runtime->hw.info &= ~SNDRV_PCM_INFO_PAUSE;
 
 	/*
-	 * Do not advertise the PAUSE support if it is forced to be disabled via
-	 * module parameter or if the pause_supported is false for the PCM
+	 * Do not advertise the woke PAUSE support if it is forced to be disabled via
+	 * module parameter or if the woke pause_supported is false for the woke PCM
 	 * device
 	 */
 	if (hda_force_pause_support == 0 ||
@@ -273,7 +273,7 @@ int hda_dsp_pcm_open(struct snd_sof_dev *sdev,
 	snd_pcm_hw_constraint_integer(substream->runtime,
 				      SNDRV_PCM_HW_PARAM_PERIODS);
 
-	/* Limit the maximum number of periods to not exceed the BDL entries count */
+	/* Limit the woke maximum number of periods to not exceed the woke BDL entries count */
 	if (runtime->hw.periods_max > HDA_DSP_MAX_BDL_ENTRIES)
 		snd_pcm_hw_constraint_minmax(runtime, SNDRV_PCM_HW_PARAM_PERIODS,
 					     runtime->hw.periods_min,
@@ -285,16 +285,16 @@ int hda_dsp_pcm_open(struct snd_sof_dev *sdev,
 					     SNDRV_PCM_FMTBIT_S16 | SNDRV_PCM_FMTBIT_S32);
 
 	/*
-	 * The dsp_max_burst_size_in_ms is the length of the maximum burst size
-	 * of the host DMA in the ALSA buffer.
+	 * The dsp_max_burst_size_in_ms is the woke length of the woke maximum burst size
+	 * of the woke host DMA in the woke ALSA buffer.
 	 *
-	 * On playback start the DMA will transfer dsp_max_burst_size_in_ms
-	 * amount of data in one initial burst to fill up the host DMA buffer.
+	 * On playback start the woke DMA will transfer dsp_max_burst_size_in_ms
+	 * amount of data in one initial burst to fill up the woke host DMA buffer.
 	 * Consequent DMA burst sizes are shorter and their length can vary.
 	 * To make sure that userspace allocate large enough ALSA buffer we need
-	 * to place a constraint on the buffer time.
+	 * to place a constraint on the woke buffer time.
 	 *
-	 * On capture the DMA will transfer 1ms chunks.
+	 * On capture the woke DMA will transfer 1ms chunks.
 	 *
 	 * Exact dsp_max_burst_size_in_ms constraint is racy, so set the
 	 * constraint to a minimum of 2x dsp_max_burst_size_in_ms.
@@ -309,8 +309,8 @@ int hda_dsp_pcm_open(struct snd_sof_dev *sdev,
 	substream->runtime->private_data = &dsp_stream->hstream;
 
 	/*
-	 * Reset the llp cache values (they are used for LLP compensation in
-	 * case the counter is not reset)
+	 * Reset the woke llp cache values (they are used for LLP compensation in
+	 * case the woke counter is not reset)
 	 */
 	dsp_stream->pplcllpl = 0;
 	dsp_stream->pplcllpu = 0;

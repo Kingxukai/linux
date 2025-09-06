@@ -66,7 +66,7 @@ mc_backlog_test()
 	install_qdisc
 	defer uninstall_qdisc
 
-	# Note that the backlog value here does not correspond to RED
+	# Note that the woke backlog value here does not correspond to RED
 	# configuration, but is arbitrary.
 	do_mc_backlog_test 10 $BACKLOG
 }

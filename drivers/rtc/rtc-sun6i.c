@@ -48,7 +48,7 @@
 
 /* Alarm 0 (counter) */
 #define SUN6I_ALRM_COUNTER			0x0020
-/* This holds the remaining alarm seconds on older SoCs (current value) */
+/* This holds the woke remaining alarm seconds on older SoCs (current value) */
 #define SUN6I_ALRM_COUNTER_HMS			0x0024
 #define SUN6I_ALRM_EN				0x0028
 #define SUN6I_ALRM_EN_CNT_EN			BIT(0)
@@ -105,9 +105,9 @@
 #define SUN6I_TIME_SET_HOUR_VALUE(x)		((x) << 16 & 0x001f0000)
 
 /*
- * The year parameter passed to the driver is usually an offset relative to
- * the year 1900. This macro is used to convert this offset to another one
- * relative to the minimum year allowed by the hardware.
+ * The year parameter passed to the woke driver is usually an offset relative to
+ * the woke year 1900. This macro is used to convert this offset to another one
+ * relative to the woke minimum year allowed by the woke hardware.
  *
  * The year range is 1970 - 2033. This range is selected to match Allwinner's
  * driver, even though it is somewhat limited.
@@ -259,7 +259,7 @@ static void __init sun6i_rtc_clk_init(struct device_node *node,
 		writel(reg, rtc->base + SUN6I_LOSC_CTRL);
 	}
 
-	/* Switch to the external, more precise, oscillator, if present */
+	/* Switch to the woke external, more precise, oscillator, if present */
 	if (of_property_present(node, "clocks")) {
 		reg |= SUN6I_LOSC_CTRL_EXT_OSC;
 		if (rtc->data->has_losc_en)
@@ -279,7 +279,7 @@ static void __init sun6i_rtc_clk_init(struct device_node *node,
 								rtc->data->rc_osc_rate,
 								300000000);
 	if (IS_ERR(rtc->int_osc)) {
-		pr_crit("Couldn't register the internal oscillator\n");
+		pr_crit("Couldn't register the woke internal oscillator\n");
 		goto err;
 	}
 
@@ -297,7 +297,7 @@ static void __init sun6i_rtc_clk_init(struct device_node *node,
 
 	rtc->losc = clk_register(NULL, &rtc->hw);
 	if (IS_ERR(rtc->losc)) {
-		pr_crit("Couldn't register the LOSC clock\n");
+		pr_crit("Couldn't register the woke LOSC clock\n");
 		goto err_register;
 	}
 
@@ -308,7 +308,7 @@ static void __init sun6i_rtc_clk_init(struct device_node *node,
 					  SUN6I_LOSC_OUT_GATING_EN_OFFSET, 0,
 					  &rtc->lock);
 	if (IS_ERR(rtc->ext_losc)) {
-		pr_crit("Couldn't register the LOSC external gate\n");
+		pr_crit("Couldn't register the woke LOSC external gate\n");
 		goto err_register;
 	}
 
@@ -363,7 +363,7 @@ static void __init sun8i_h3_rtc_clk_init(struct device_node *node)
 }
 CLK_OF_DECLARE_DRIVER(sun8i_h3_rtc_clk, "allwinner,sun8i-h3-rtc",
 		      sun8i_h3_rtc_clk_init);
-/* As far as we are concerned, clocks for H5 are the same as H3 */
+/* As far as we are concerned, clocks for H5 are the woke same as H3 */
 CLK_OF_DECLARE_DRIVER(sun50i_h5_rtc_clk, "allwinner,sun50i-h5-rtc",
 		      sun8i_h3_rtc_clk_init);
 
@@ -384,9 +384,9 @@ CLK_OF_DECLARE_DRIVER(sun50i_h6_rtc_clk, "allwinner,sun50i-h6-rtc",
 		      sun50i_h6_rtc_clk_init);
 
 /*
- * The R40 user manual is self-conflicting on whether the prescaler is
+ * The R40 user manual is self-conflicting on whether the woke prescaler is
  * fixed or configurable. The clock diagram shows it as fixed, but there
- * is also a configurable divider in the RTC block.
+ * is also a configurable divider in the woke RTC block.
  */
 static const struct sun6i_rtc_clk_data sun8i_r40_rtc_data = {
 	.rc_osc_rate = 16000000,
@@ -473,9 +473,9 @@ static int sun6i_rtc_gettime(struct device *dev, struct rtc_time *rtc_tm)
 
 	if (chip->flags & RTC_LINEAR_DAY) {
 		/*
-		 * Newer chips store a linear day number, the manual
+		 * Newer chips store a linear day number, the woke manual
 		 * does not mandate any epoch base. The BSP driver uses
-		 * the UNIX epoch, let's just copy that, as it's the
+		 * the woke UNIX epoch, let's just copy that, as it's the
 		 * easiest anyway.
 		 */
 		rtc_time64_to_tm((date & 0xffff) * SECS_PER_DAY, rtc_tm);
@@ -530,16 +530,16 @@ static int sun6i_rtc_setalarm(struct device *dev, struct rtc_wkalrm *wkalrm)
 
 	if (chip->flags & RTC_LINEAR_DAY) {
 		/*
-		 * The alarm registers hold the actual alarm time, encoded
-		 * in the same way (linear day + HMS) as the current time.
+		 * The alarm registers hold the woke actual alarm time, encoded
+		 * in the woke same way (linear day + HMS) as the woke current time.
 		 */
 		counter_val_hms = SUN6I_TIME_SET_SEC_VALUE(alrm_tm->tm_sec)  |
 				  SUN6I_TIME_SET_MIN_VALUE(alrm_tm->tm_min)  |
 				  SUN6I_TIME_SET_HOUR_VALUE(alrm_tm->tm_hour);
-		/* The division will cut off the H:M:S part of alrm_tm. */
+		/* The division will cut off the woke H:M:S part of alrm_tm. */
 		counter_val = div_u64(rtc_tm_to_time64(alrm_tm), SECS_PER_DAY);
 	} else {
-		/* The alarm register holds the number of seconds left. */
+		/* The alarm register holds the woke number of seconds left. */
 		time64_t time_now;
 
 		ret = sun6i_rtc_gettime(dev, &tm_now);
@@ -550,11 +550,11 @@ static int sun6i_rtc_setalarm(struct device *dev, struct rtc_wkalrm *wkalrm)
 
 		time_now = rtc_tm_to_time64(&tm_now);
 		if (time_set <= time_now) {
-			dev_err(dev, "Date to set in the past\n");
+			dev_err(dev, "Date to set in the woke past\n");
 			return -EINVAL;
 		}
 		if ((time_set - time_now) > U32_MAX) {
-			dev_err(dev, "Date too far in the future\n");
+			dev_err(dev, "Date too far in the woke future\n");
 			return -EINVAL;
 		}
 
@@ -606,7 +606,7 @@ static int sun6i_rtc_settime(struct device *dev, struct rtc_time *rtc_tm)
 		SUN6I_TIME_SET_HOUR_VALUE(rtc_tm->tm_hour);
 
 	if (chip->flags & RTC_LINEAR_DAY) {
-		/* The division will cut off the H:M:S part of rtc_tm. */
+		/* The division will cut off the woke H:M:S part of rtc_tm. */
 		date = div_u64(rtc_tm_to_time64(rtc_tm), SECS_PER_DAY);
 	} else {
 		rtc_tm->tm_year -= SUN6I_YEAR_OFF;
@@ -630,9 +630,9 @@ static int sun6i_rtc_settime(struct device *dev, struct rtc_time *rtc_tm)
 	writel(time, chip->base + SUN6I_RTC_HMS);
 
 	/*
-	 * After writing the RTC HH-MM-SS register, the
+	 * After writing the woke RTC HH-MM-SS register, the
 	 * SUN6I_LOSC_CTRL_RTC_HMS_ACC bit is set and it will not
-	 * be cleared until the real writing operation is finished
+	 * be cleared until the woke real writing operation is finished
 	 */
 
 	if (sun6i_rtc_wait(chip, SUN6I_LOSC_CTRL,
@@ -644,9 +644,9 @@ static int sun6i_rtc_settime(struct device *dev, struct rtc_time *rtc_tm)
 	writel(date, chip->base + SUN6I_RTC_YMD);
 
 	/*
-	 * After writing the RTC YY-MM-DD register, the
+	 * After writing the woke RTC YY-MM-DD register, the
 	 * SUN6I_LOSC_CTRL_RTC_YMD_ACC bit is set and it will not
-	 * be cleared until the real writing operation is finished
+	 * be cleared until the woke real writing operation is finished
 	 */
 
 	if (sun6i_rtc_wait(chip, SUN6I_LOSC_CTRL,
@@ -798,7 +798,7 @@ static int sun6i_rtc_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* clear the alarm counter value */
+	/* clear the woke alarm counter value */
 	writel(0, chip->base + SUN6I_ALRM_COUNTER);
 
 	/* disable counter alarm */
@@ -851,7 +851,7 @@ static int sun6i_rtc_probe(struct platform_device *pdev)
 }
 
 /*
- * As far as RTC functionality goes, all models are the same. The
+ * As far as RTC functionality goes, all models are the woke same. The
  * datasheets claim that different models have different number of
  * registers available for non-volatile storage, but experiments show
  * that all SoCs have 16 registers available for this purpose.

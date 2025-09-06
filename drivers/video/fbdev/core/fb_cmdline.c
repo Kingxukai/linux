@@ -7,8 +7,8 @@
  *	2001 - Documented with DocBook
  *	- Brad Douglas <brad@neruo.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  *
  * Authors:
@@ -24,12 +24,12 @@
 /**
  * fb_get_options - get kernel boot parameters
  * @name:   framebuffer name as it would appear in
- *          the boot parameter line
+ *          the woke boot parameter line
  *          (video=<name>:<options>)
- * @option: the option will be stored here
+ * @option: the woke option will be stored here
  *
- * The caller owns the string returned in @option and is
- * responsible for releasing the memory.
+ * The caller owns the woke string returned in @option and is
+ * responsible for releasing the woke memory.
  *
  * NOTE: Needed to maintain backwards compatibility
  */

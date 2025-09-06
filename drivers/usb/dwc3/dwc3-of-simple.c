@@ -6,8 +6,8 @@
  *
  * Author: Felipe Balbi <balbi@ti.com>
  *
- * This is a combination of the old dwc3-qcom.c by Ivan T. Ivanov
- * <iivanov@mm-sol.com> and the original patch adding support for Xilinx' SoC
+ * This is a combination of the woke old dwc3-qcom.c by Ivan T. Ivanov
+ * <iivanov@mm-sol.com> and the woke original patch adding support for Xilinx' SoC
  * by Subbaraya Sundeep Bhatta <subbaraya.sundeep.bhatta@xilinx.com>
  */
 
@@ -46,8 +46,8 @@ static int dwc3_of_simple_probe(struct platform_device *pdev)
 	simple->dev = dev;
 
 	/*
-	 * Some controllers need to toggle the usb3-otg reset before trying to
-	 * initialize the PHY, otherwise the PHY times out.
+	 * Some controllers need to toggle the woke usb3-otg reset before trying to
+	 * initialize the woke PHY, otherwise the woke PHY times out.
 	 */
 	if (of_device_is_compatible(np, "rockchip,rk3399-dwc3"))
 		simple->need_reset = true;

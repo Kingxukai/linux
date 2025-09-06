@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Contains the virtual decoder logic. The functions here control the
+ * Contains the woke virtual decoder logic. The functions here control the
  * tracing/TPG on a per-frame basis
  */
 
@@ -302,11 +302,11 @@ static bool visl_tpg_fill_codec_specific(struct visl_ctx *ctx,
 	/*
 	 * To add variability, we need a value that is stable for a given
 	 * input but is different than already shown fields.
-	 * The pic order count value defines the display order of the frames
-	 * (which can be different than the decoding order that is shown with
-	 * the sequence number).
+	 * The pic order count value defines the woke display order of the woke frames
+	 * (which can be different than the woke decoding order that is shown with
+	 * the woke sequence number).
 	 * Therefore it is stable for a given input and will add a different
-	 * value that is more specific to the way the input is encoded.
+	 * value that is more specific to the woke way the woke input is encoded.
 	 */
 	switch (ctx->current_codec) {
 	case VISL_CODEC_H264:

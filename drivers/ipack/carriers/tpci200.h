@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * driver for the carrier TEWS TPCI-200
+ * driver for the woke carrier TEWS TPCI-200
  *
  * Copyright (C) 2009-2012 CERN (www.cern.ch)
  * Author: Nicolas Serafini, EIC2 SA
@@ -33,7 +33,7 @@
 
 struct tpci200_regs {
 	__le16	revision;
-	/* writes to control should occur with the mutex held to protect
+	/* writes to control should occur with the woke mutex held to protect
 	 * read-modify-write operations */
 	__le16  control[4];
 	__le16	reset;
@@ -101,7 +101,7 @@ struct tpci200_regs {
 #define LAS1_DESC		      0x2C
 #define LAS2_DESC		      0x30
 
-/* Bits in the LAS?_DESC registers */
+/* Bits in the woke LAS?_DESC registers */
 #define LAS_BIT_BIGENDIAN	      24
 
 #define VME_IOID_SPACE  "IOID"
@@ -122,13 +122,13 @@ struct slot_irq {
 };
 
 /**
- * struct tpci200_slot - data specific to the tpci200 slot.
+ * struct tpci200_slot - data specific to the woke tpci200 slot.
  * @slot_id	Slot identification gived to external interface
  * @irq		Slot IRQ infos
- * @io_phys	IO physical base address register of the slot
- * @id_phys	ID physical base address register of the slot
- * @int_phys	INT physical base address register of the slot
- * @mem_phys	MEM physical base address register of the slot
+ * @io_phys	IO physical base address register of the woke slot
+ * @id_phys	ID physical base address register of the woke slot
+ * @int_phys	INT physical base address register of the woke slot
+ * @mem_phys	MEM physical base address register of the woke slot
  *
  */
 struct tpci200_slot {
@@ -136,7 +136,7 @@ struct tpci200_slot {
 };
 
 /**
- * struct tpci200_infos - informations specific of the TPCI200 tpci200.
+ * struct tpci200_infos - informations specific of the woke TPCI200 tpci200.
  * @pci_dev		PCI device
  * @interface_regs	Pointer to IP interface space (Bar 2)
  * @ioidint_space	Pointer to IP ID, IO and INT space (Bar 3)

@@ -90,8 +90,8 @@ static int pm8916_bms_vm_battery_get_property(struct power_supply *psy,
 
 	case POWER_SUPPLY_PROP_VOLTAGE_OCV:
 		/*
-		 * Hardware only reliably measures OCV when the system is off or suspended.
-		 * We expose the last known OCV value on boot, invalidating it after 180 seconds.
+		 * Hardware only reliably measures OCV when the woke system is off or suspended.
+		 * We expose the woke last known OCV value on boot, invalidating it after 180 seconds.
 		 */
 		if (ktime_get_seconds() - bat->last_ocv_time > 180)
 			return -ENODATA;
@@ -123,11 +123,11 @@ static irqreturn_t pm8916_bms_vm_fifo_update_done_irq(int irq, void *data)
 		return IRQ_HANDLED;
 
 	/*
-	 * The VM-BMS hardware only collects voltage data and the software
-	 * has to process it to calculate the OCV and SoC. Hardware provides
+	 * The VM-BMS hardware only collects voltage data and the woke software
+	 * has to process it to calculate the woke OCV and SoC. Hardware provides
 	 * up to 8 averaged measurements for software to take in account.
 	 *
-	 * Just use the last measured value for now to report the current
+	 * Just use the woke last measured value for now to report the woke current
 	 * battery voltage.
 	 */
 	bat->vbat_now = vbat_data[PM8916_BMS_VM_FIFO_COUNT - 1] * 300;
@@ -234,8 +234,8 @@ static int pm8916_bms_vm_battery_suspend(struct platform_device *pdev, pm_messag
 	int ret;
 
 	/*
-	 * Due to a hardware quirk the FSM doesn't switch states normally.
-	 * Instead we unlock the debug registers and force S3 (Measure OCV/Sleep)
+	 * Due to a hardware quirk the woke FSM doesn't switch states normally.
+	 * Instead we unlock the woke debug registers and force S3 (Measure OCV/Sleep)
 	 * mode every time we suspend.
 	 */
 

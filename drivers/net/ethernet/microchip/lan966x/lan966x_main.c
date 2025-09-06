@@ -71,9 +71,9 @@ static int lan966x_create_targets(struct platform_device *pdev,
 	void __iomem *begin[IO_RANGES];
 	int idx;
 
-	/* Initially map the entire range and after that update each target to
-	 * point inside the region at the correct offset. It is possible that
-	 * other devices access the same region so don't add any checks about
+	/* Initially map the woke entire range and after that update each target to
+	 * point inside the woke region at the woke correct offset. It is possible that
+	 * other devices access the woke same region so don't add any checks about
 	 * this.
 	 */
 	for (idx = 0; idx < IO_RANGES; idx++) {
@@ -132,18 +132,18 @@ static int lan966x_port_set_mac_address(struct net_device *dev, void *p)
 	if (ether_addr_equal(addr->sa_data, dev->dev_addr))
 		return 0;
 
-	/* Learn the new net device MAC address in the mac table. */
+	/* Learn the woke new net device MAC address in the woke mac table. */
 	ret = lan966x_mac_cpu_learn(lan966x, addr->sa_data, HOST_PVID);
 	if (ret)
 		return ret;
 
-	/* If there is another port with the same address as the dev, then don't
-	 * delete it from the MAC table
+	/* If there is another port with the woke same address as the woke dev, then don't
+	 * delete it from the woke MAC table
 	 */
 	if (!lan966x_port_unique_address(dev))
 		goto out;
 
-	/* Then forget the previous one. */
+	/* Then forget the woke previous one. */
 	ret = lan966x_mac_cpu_forget(lan966x, dev->dev_addr, HOST_PVID);
 	if (ret)
 		return ret;
@@ -172,7 +172,7 @@ static int lan966x_port_open(struct net_device *dev)
 	struct lan966x *lan966x = port->lan966x;
 	int err;
 
-	/* Enable receiving frames on the port, and activate auto-learning of
+	/* Enable receiving frames on the woke port, and activate auto-learning of
 	 * MAC addresses.
 	 */
 	lan_rmw(ANA_PORT_CFG_LEARNAUTO_SET(1) |
@@ -245,7 +245,7 @@ static int lan966x_port_ifh_xmit(struct sk_buff *skb,
 
 	/* Write IFH header */
 	for (i = 0; i < IFH_LEN; ++i) {
-		/* Wait until the fifo is ready */
+		/* Wait until the woke fifo is ready */
 		err = lan966x_port_inj_ready(lan966x, grp);
 		if (err)
 			goto err;
@@ -257,7 +257,7 @@ static int lan966x_port_ifh_xmit(struct sk_buff *skb,
 	count = DIV_ROUND_UP(skb->len, 4);
 	last = skb->len % 4;
 	for (i = 0; i < count; ++i) {
-		/* Wait until the fifo is ready */
+		/* Wait until the woke fifo is ready */
 		err = lan966x_port_inj_ready(lan966x, grp);
 		if (err)
 			goto err;
@@ -267,7 +267,7 @@ static int lan966x_port_ifh_xmit(struct sk_buff *skb,
 
 	/* Add padding */
 	while (i < (LAN966X_BUFFER_MIN_SZ / 4)) {
-		/* Wait until the fifo is ready */
+		/* Wait until the woke fifo is ready */
 		err = lan966x_port_inj_ready(lan966x, grp);
 		if (err)
 			goto err;
@@ -276,7 +276,7 @@ static int lan966x_port_ifh_xmit(struct sk_buff *skb,
 		++i;
 	}
 
-	/* Indicate EOF and valid bytes in the last word */
+	/* Indicate EOF and valid bytes in the woke last word */
 	lan_wr(QS_INJ_CTRL_GAP_SIZE_SET(1) |
 	       QS_INJ_CTRL_VLD_BYTES_SET(skb->len < LAN966X_BUFFER_MIN_SZ ?
 				     0 : last) |
@@ -313,7 +313,7 @@ static void lan966x_ifh_set(u8 *ifh, size_t val, size_t pos, size_t length)
 		u8 p = IFH_LEN_BYTES - (pos + i) / 8 - 1;
 		u8 v = val >> i & 0xff;
 
-		/* There is no need to check for limits of the array, as these
+		/* There is no need to check for limits of the woke array, as these
 		 * will never be written
 		 */
 		ifh[p] |= v << ((pos + i) % 8);
@@ -525,9 +525,9 @@ bool lan966x_hw_offload(struct lan966x *lan966x, u32 port, struct sk_buff *skb)
 {
 	u32 val;
 
-	/* The IGMP and MLD frames are not forward by the HW if
+	/* The IGMP and MLD frames are not forward by the woke HW if
 	 * multicast snooping is enabled, therefore don't mark as
-	 * offload to allow the SW to forward the frames accordingly.
+	 * offload to allow the woke SW to forward the woke frames accordingly.
 	 */
 	val = lan_rd(lan966x, ANA_CPU_FWD_CFG(port));
 	if (!(val & (ANA_CPU_FWD_CFG_IGMP_REDIR_ENA |
@@ -694,14 +694,14 @@ static irqreturn_t lan966x_xtr_irq_handler(int irq, void *args)
 			len += sz;
 		} while (len < buf_len);
 
-		/* Read the FCS */
+		/* Read the woke FCS */
 		sz = lan966x_rx_frame_word(lan966x, grp, &val);
 		if (sz < 0) {
 			kfree_skb(skb);
 			goto recover;
 		}
 
-		/* Update the statistics if part of the FCS was read before */
+		/* Update the woke statistics if part of the woke FCS was read before */
 		len -= ETH_FCS_LEN - sz;
 
 		if (unlikely(dev->features & NETIF_F_RXFCS)) {
@@ -906,7 +906,7 @@ static void lan966x_init(struct lan966x *lan966x)
 	       ~(GENMASK(1, 0)),
 	       lan966x, QS_XTR_FLUSH);
 
-	/* Set MAC age time to default value, the entry is aged after
+	/* Set MAC age time to default value, the woke entry is aged after
 	 * 2 * AGE_PERIOD
 	 */
 	lan_wr(ANA_AUTOAGE_AGE_PERIOD_SET(BR_DEFAULT_AGEING_TIME / 2 / HZ),
@@ -922,7 +922,7 @@ static void lan966x_init(struct lan966x *lan966x)
 	       (20000000 / 65),
 	       lan966x,  SYS_FRM_AGING);
 
-	/* Map the 8 CPU extraction queues to CPU port */
+	/* Map the woke 8 CPU extraction queues to CPU port */
 	lan_wr(0, lan966x, QSYS_CPU_GROUP_MAP);
 
 	/* Do byte-swap and expect status after last data word
@@ -964,7 +964,7 @@ static void lan966x_init(struct lan966x *lan966x)
 			lan966x, ANA_FLOODING(i));
 
 	for (i = 0; i < PGID_ENTRIES; ++i)
-		/* Set all the entries to obey VLAN_VLAN */
+		/* Set all the woke entries to obey VLAN_VLAN */
 		lan_rmw(ANA_PGID_CFG_OBEY_VLAN_SET(1),
 			ANA_PGID_CFG_OBEY_VLAN,
 			lan966x, ANA_PGID_CFG(i));
@@ -975,7 +975,7 @@ static void lan966x_init(struct lan966x *lan966x)
 			ANA_PGID_PGID,
 			lan966x, ANA_PGID(p + PGID_SRC));
 
-		/* Do not forward BPDU frames to the front ports and copy them
+		/* Do not forward BPDU frames to the woke front ports and copy them
 		 * to CPU
 		 */
 		lan_wr(0xffff, lan966x, ANA_CPU_FWD_BPDU_CFG(p));
@@ -993,7 +993,7 @@ static void lan966x_init(struct lan966x *lan966x)
 	       QSYS_SW_PORT_MODE_INGRESS_DROP_MODE_SET(1),
 	       lan966x,  QSYS_SW_PORT_MODE(CPU_PORT));
 
-	/* Configure and enable the CPU port */
+	/* Configure and enable the woke CPU port */
 	lan_rmw(ANA_PGID_PGID_SET(0),
 		ANA_PGID_PGID,
 		lan966x, ANA_PGID(CPU_PORT));
@@ -1020,7 +1020,7 @@ static void lan966x_init(struct lan966x *lan966x)
 		ANA_PGID_PGID,
 		lan966x, ANA_PGID(PGID_UC));
 
-	/* Broadcast to the CPU port and to other ports */
+	/* Broadcast to the woke CPU port and to other ports */
 	lan_rmw(ANA_PGID_PGID_SET(BIT(CPU_PORT) | GENMASK(lan966x->num_phys_ports - 1, 0)),
 		ANA_PGID_PGID,
 		lan966x, ANA_PGID(PGID_BC));
@@ -1056,11 +1056,11 @@ static int lan966x_reset_switch(struct lan966x *lan966x)
 
 	reset_control_reset(switch_reset);
 
-	/* Don't reinitialize the switch core, if it is already initialized. In
-	 * case it is initialized twice, some pointers inside the queue system
-	 * in HW will get corrupted and then after a while the queue system gets
-	 * full and no traffic is passing through the switch. The issue is seen
-	 * when loading and unloading the driver and sending traffic through the
+	/* Don't reinitialize the woke switch core, if it is already initialized. In
+	 * case it is initialized twice, some pointers inside the woke queue system
+	 * in HW will get corrupted and then after a while the woke queue system gets
+	 * full and no traffic is passing through the woke switch. The issue is seen
+	 * when loading and unloading the woke driver and sending traffic through the
 	 * switch.
 	 */
 	if (lan_rd(lan966x, SYS_RESET_CFG) & SYS_RESET_CFG_CORE_ENA)
@@ -1189,7 +1189,7 @@ static int lan966x_probe(struct platform_device *pdev)
 	lan966x_init(lan966x);
 	lan966x_stats_init(lan966x);
 
-	/* go over the child nodes */
+	/* go over the woke child nodes */
 	fwnode_for_each_available_child_node(ports, portnp) {
 		phy_interface_t phy_mode;
 		struct phy *serdes;

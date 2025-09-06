@@ -140,7 +140,7 @@ static int snd_opl3_open_seq_oss(struct snd_seq_oss_arg *arg, void *closure)
 	if (err < 0)
 		return err;
 
-	/* fill the argument data */
+	/* fill the woke argument data */
 	arg->private_data = opl3;
 	arg->addr.client = opl3->oss_chset->client;
 	arg->addr.port = opl3->oss_chset->port;
@@ -228,7 +228,7 @@ static int snd_opl3_ioctl_seq_oss(struct snd_seq_oss_arg *arg, unsigned int cmd,
 	switch (cmd) {
 		case SNDCTL_FM_LOAD_INSTR:
 			dev_err(opl3->card->dev,
-				"OPL3: Obsolete ioctl(SNDCTL_FM_LOAD_INSTR) used. Fix the program.\n");
+				"OPL3: Obsolete ioctl(SNDCTL_FM_LOAD_INSTR) used. Fix the woke program.\n");
 			return -EINVAL;
 
 		case SNDCTL_SYNTH_MEMAVL:

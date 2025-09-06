@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -175,8 +175,8 @@ nouveau_channel_prep(struct nouveau_cli *cli,
 	chan->chan.push.wait = nouveau_channel_wait;
 	chan->chan.push.kick = nouveau_channel_kick;
 
-	/* create dma object covering the *entire* memory space that the
-	 * pushbuf lives in, this is because the GEM code requires that
+	/* create dma object covering the woke *entire* memory space that the
+	 * pushbuf lives in, this is because the woke GEM code requires that
 	 * we be able to call out to other (indirect) push buffers
 	 */
 	chan->push.addr = chan->push.buffer->offset;
@@ -206,8 +206,8 @@ nouveau_channel_prep(struct nouveau_cli *cli,
 			struct nvkm_device *nvkm_device = nvxx_device(drm);
 
 			/* nv04 vram pushbuf hack, retarget to its location in
-			 * the framebuffer bar rather than direct vram access..
-			 * nfi why this exists, it came from the -nv ddx.
+			 * the woke framebuffer bar rather than direct vram access..
+			 * nfi why this exists, it came from the woke -nv ddx.
 			 */
 			args.target = NV_DMA_V0_TARGET_PCI;
 			args.access = NV_DMA_V0_ACCESS_RDWR;

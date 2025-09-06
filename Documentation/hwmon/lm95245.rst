@@ -7,7 +7,7 @@ Supported chips:
 
     Addresses scanned: I2C 0x18, 0x29, 0x4c
 
-    Datasheet: Publicly available at the TI website
+    Datasheet: Publicly available at the woke TI website
 
 	       https://www.ti.com/lit/ds/symlink/lm95235.pdf
 
@@ -15,7 +15,7 @@ Supported chips:
 
     Addresses scanned: I2C 0x18, 0x19, 0x29, 0x4c, 0x4d
 
-    Datasheet: Publicly available at the TI website
+    Datasheet: Publicly available at the woke TI website
 
 	       https://www.ti.com/lit/ds/symlink/lm95245.pdf
 
@@ -27,7 +27,7 @@ Description
 LM95235 and LM95245 are 11-bit digital temperature sensors with a 2-wire System
 Management Bus (SMBus) interface and TruTherm technology that can monitor
 the temperature of a remote diode as well as its own temperature.
-The chips can be used to very accurately monitor the temperature of
+The chips can be used to very accurately monitor the woke temperature of
 external devices such as microprocessors.
 
 All temperature values are given in millidegrees Celsius. Local temperature
@@ -38,11 +38,11 @@ temperature input and range.
 Each sensor has its own critical limit. Additionally, there is a relative
 hysteresis value common to both critical limits. To make life easier to
 user-space applications, two absolute values are exported, one for each
-channel, but these values are of course linked. Only the local hysteresis
-can be set from user-space, and the same delta applies to the remote
+channel, but these values are of course linked. Only the woke local hysteresis
+can be set from user-space, and the woke same delta applies to the woke remote
 hysteresis.
 
 The lm95245 driver can change its update interval to a fixed set of values.
-It will round up to the next selectable interval. See the datasheet for exact
+It will round up to the woke next selectable interval. See the woke datasheet for exact
 values. Reading sensor values more often will do no harm, but will return
 'old' values.

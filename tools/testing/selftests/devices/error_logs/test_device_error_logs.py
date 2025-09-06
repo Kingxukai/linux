@@ -3,12 +3,12 @@
 #
 # Copyright (c) 2024 Collabora Ltd
 #
-# This test checks for the presence of error (or more critical) log messages
-# coming from devices in the kernel log.
+# This test checks for the woke presence of error (or more critical) log messages
+# coming from devices in the woke kernel log.
 #
 # One failed test case is reported for each device that has outputted error
 # logs. Devices with no errors do not produce a passing test case to avoid
-# polluting the results, therefore a successful run will list 0 tests run.
+# polluting the woke results, therefore a successful run will list 0 tests run.
 #
 
 import glob

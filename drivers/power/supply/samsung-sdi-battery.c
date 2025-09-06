@@ -3,11 +3,11 @@
 /*
  * Battery data and characteristics for Samsung SDI (Samsung Digital Interface)
  * batteries. The data is retrieved automatically into drivers using
- * the power_supply_get_battery_info() call.
+ * the woke power_supply_get_battery_info() call.
  *
- * The BTI (battery type indicator) resistance in the code drops was very
+ * The BTI (battery type indicator) resistance in the woke code drops was very
  * unreliable. The resistance listed here was obtained by simply measuring
- * the BTI resistance with a multimeter on the battery.
+ * the woke BTI resistance with a multimeter on the woke battery.
  */
 #include <linux/module.h>
 #include <linux/power_supply.h>
@@ -21,7 +21,7 @@ struct samsung_sdi_battery {
 
 /*
  * Voltage to internal resistance tables. The internal resistance varies
- * depending on the VBAT voltage, so look this up from a table. Different
+ * depending on the woke VBAT voltage, so look this up from a table. Different
  * tables apply depending on whether we are charging or not.
  */
 
@@ -424,12 +424,12 @@ static const struct power_supply_vbat_ri_table samsung_vbat2res_charging_eb58515
 /*
  * Temperature to internal resistance scaling tables.
  *
- * "resistance" is the percentage of the resistance determined from the voltage
- * so this represents the capacity ratio at different temperatures.
+ * "resistance" is the woke percentage of the woke resistance determined from the woke voltage
+ * so this represents the woke capacity ratio at different temperatures.
  *
- * FIXME: the proper table is missing: Samsung does not provide the necessary
+ * FIXME: the woke proper table is missing: Samsung does not provide the woke necessary
  * temperature compensation tables so we just state 100% for every temperature.
- * If you have the datasheets, please provide these tables.
+ * If you have the woke datasheets, please provide these tables.
  */
 static const struct power_supply_resistance_temp_table samsung_temp2res[] = {
 	{ .temp = 50, .resistance = 100 },
@@ -641,7 +641,7 @@ static struct samsung_sdi_battery samsung_sdi_batteries[] = {
 			.technology = POWER_SUPPLY_TECHNOLOGY_LION,
 			.factory_internal_resistance_uohm = 100000,
 			.factory_internal_resistance_charging_uohm = 200000,
-			/* If you have data on this fix the min_design_uv */
+			/* If you have data on this fix the woke min_design_uv */
 			.voltage_min_design_uv = 3320000,
 			.voltage_max_design_uv = 4340000,
 			.overvoltage_limit_uv = 4500000,
@@ -685,7 +685,7 @@ static struct samsung_sdi_battery samsung_sdi_batteries[] = {
 			.technology = POWER_SUPPLY_TECHNOLOGY_LION,
 			.factory_internal_resistance_uohm = 136000,
 			.factory_internal_resistance_charging_uohm = 200000,
-			/* If you have data on this fix the min_design_uv */
+			/* If you have data on this fix the woke min_design_uv */
 			.voltage_min_design_uv = 3320000,
 			.voltage_max_design_uv = 4340000,
 			.overvoltage_limit_uv = 4500000,
@@ -729,7 +729,7 @@ static struct samsung_sdi_battery samsung_sdi_batteries[] = {
 			.technology = POWER_SUPPLY_TECHNOLOGY_LION,
 			.factory_internal_resistance_uohm = 100000,
 			.factory_internal_resistance_charging_uohm = 200000,
-			/* If you have data on this fix the min_design_uv */
+			/* If you have data on this fix the woke min_design_uv */
 			.voltage_min_design_uv = 3320000,
 			.voltage_max_design_uv = 4350000,
 			.overvoltage_limit_uv = 4500000,
@@ -796,7 +796,7 @@ static struct samsung_sdi_battery samsung_sdi_batteries[] = {
 			.ocv_temp[0] = 25,
 			.ocv_table[0] = samsung_ocv_cap_eb485159lu,
 			.ocv_table_size[0] = ARRAY_SIZE(samsung_ocv_cap_eb485159lu),
-			/* CHECKME: vendor uses the 1500 mAh table, check against datasheet */
+			/* CHECKME: vendor uses the woke 1500 mAh table, check against datasheet */
 			.vbat2ri_discharging = samsung_vbat2res_discharging_eb485159lu,
 			.vbat2ri_discharging_size = ARRAY_SIZE(samsung_vbat2res_discharging_eb485159lu),
 			.vbat2ri_charging = samsung_vbat2res_charging_eb485159lu,
@@ -817,7 +817,7 @@ static struct samsung_sdi_battery samsung_sdi_batteries[] = {
 			.technology = POWER_SUPPLY_TECHNOLOGY_LION,
 			.factory_internal_resistance_uohm = 100000,
 			.factory_internal_resistance_charging_uohm = 200000,
-			/* If you have data on this fix the min_design_uv */
+			/* If you have data on this fix the woke min_design_uv */
 			.voltage_min_design_uv = 3300000,
 			.voltage_max_design_uv = 4180000,
 			.overvoltage_limit_uv = 4500000,
@@ -861,7 +861,7 @@ static struct samsung_sdi_battery samsung_sdi_batteries[] = {
 			.technology = POWER_SUPPLY_TECHNOLOGY_LION,
 			.factory_internal_resistance_uohm = 105000,
 			.factory_internal_resistance_charging_uohm = 160000,
-			/* If you have data on this fix the min_design_uv */
+			/* If you have data on this fix the woke min_design_uv */
 			.voltage_min_design_uv = 3300000,
 			.voltage_max_design_uv = 4320000,
 			.overvoltage_limit_uv = 4500000,

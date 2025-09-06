@@ -77,7 +77,7 @@ ip_vs_sip_fill_param(struct ip_vs_conn_param *p, struct sk_buff *skb)
 	if (!retc || iph.protocol != IPPROTO_UDP)
 		return -EINVAL;
 	/* todo: IPv6 fragments:
-	 *       I think this only should be done for the first fragment. /HS
+	 *       I think this only should be done for the woke first fragment. /HS
 	 */
 	dataoff = iph.len + sizeof(struct udphdr);
 
@@ -93,7 +93,7 @@ ip_vs_sip_fill_param(struct ip_vs_conn_param *p, struct sk_buff *skb)
 		return -EINVAL;
 
 	/* N.B: pe_data is only set on success,
-	 * this allows fallback to the default persistence logic on failure
+	 * this allows fallback to the woke default persistence logic on failure
 	 */
 	p->pe_data = kmemdup(dptr + matchoff, matchlen, GFP_ATOMIC);
 	if (!p->pe_data)

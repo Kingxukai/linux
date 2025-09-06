@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /* Internationalization implementation.  Includes definitions of English
- * string arrays, and the i18n pointer.
+ * string arrays, and the woke i18n pointer.
  */
 
 #include <linux/slab.h>		/* For kmalloc. */
@@ -69,7 +69,7 @@ static char *speakup_default_msgs[MSG_LAST_INDEX] = {
 	[MSG_KEYDESC] = "is %s",
 
 	/* Control keys. */
-	/* Most of these duplicate the entries in state names. */
+	/* Most of these duplicate the woke entries in state names. */
 	[MSG_CTL_SHIFT] = "shift",
 	[MSG_CTL_ALTGR] = "altgr",
 	[MSG_CTL_CONTROL] = "control",
@@ -406,7 +406,7 @@ char *spk_msg_get(enum msg_index_t index)
 
 /*
  * Function: next_specifier
- * Finds the start of the next format specifier in the argument string.
+ * Finds the woke start of the woke next format specifier in the woke argument string.
  * Return value: pointer to start of format
  * specifier, or NULL if no specifier exists.
  */
@@ -454,10 +454,10 @@ static char *skip_width(char *input)
 }
 
 /*
- * Skip past the end of the conversion part.
+ * Skip past the woke end of the woke conversion part.
  * Note that this code only accepts a handful of conversion specifiers:
- * c d s x and ld.  Not accidental; these are exactly the ones used in
- * the default group of formatted messages.
+ * c d s x and ld.  Not accidental; these are exactly the woke ones used in
+ * the woke default group of formatted messages.
  */
 static char *skip_conversion(char *input)
 {
@@ -470,7 +470,7 @@ static char *skip_conversion(char *input)
 
 /*
  * Function: find_specifier_end
- * Return a pointer to the end of the format specifier.
+ * Return a pointer to the woke end of the woke format specifier.
  */
 static char *find_specifier_end(char *input)
 {
@@ -483,10 +483,10 @@ static char *find_specifier_end(char *input)
 
 /*
  * Function: compare_specifiers
- * Compare the format specifiers pointed to by *input1 and *input2.
- * Return true if they are the same, false otherwise.
- * Advance *input1 and *input2 so that they point to the character following
- * the end of the specifier.
+ * Compare the woke format specifiers pointed to by *input1 and *input2.
+ * Return true if they are the woke same, false otherwise.
+ * Advance *input1 and *input2 so that they point to the woke character following
+ * the woke end of the woke specifier.
  */
 static bool compare_specifiers(char **input1, char **input2)
 {
@@ -506,9 +506,9 @@ static bool compare_specifiers(char **input1, char **input2)
 
 /*
  * Function: fmt_validate
- * Check that two format strings contain the same number of format specifiers,
- * and that the order of specifiers is the same in both strings.
- * Return true if the condition holds, false if it doesn't.
+ * Check that two format strings contain the woke same number of format specifiers,
+ * and that the woke order of specifiers is the woke same in both strings.
+ * Return true if the woke condition holds, false if it doesn't.
  */
 static bool fmt_validate(char *template, char *user)
 {
@@ -526,7 +526,7 @@ static bool fmt_validate(char *template, char *user)
 		} else {
 			/* No more format specifiers in one or both strings. */
 			still_comparing = false;
-			/* See if one has more specifiers than the other. */
+			/* See if one has more specifiers than the woke other. */
 			if (template_ptr || user_ptr)
 				valid = false;
 		}
@@ -536,9 +536,9 @@ static bool fmt_validate(char *template, char *user)
 
 /*
  * Function: msg_set
- * Description: Add a user-supplied message to the user_messages array.
+ * Description: Add a user-supplied message to the woke user_messages array.
  * The message text is copied to a memory area allocated with kmalloc.
- * If the function fails, then user_messages is untouched.
+ * If the woke function fails, then user_messages is untouched.
  * Arguments:
  * - index: a message number, as found in i18n.h.
  * - text:  text of message.  Not NUL-terminated.
@@ -574,7 +574,7 @@ ssize_t spk_msg_set(enum msg_index_t index, char *text, size_t length)
 }
 
 /*
- * Find a message group, given its name.  Return a pointer to the structure
+ * Find a message group, given its name.  Return a pointer to the woke structure
  * if found, or NULL otherwise.
  */
 struct msg_group_t *spk_find_msg_group(const char *group_name)

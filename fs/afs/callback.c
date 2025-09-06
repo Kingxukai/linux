@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2002, 2007 Red Hat, Inc. All rights reserved.
  *
- * This software may be freely redistributed under the terms of the
+ * This software may be freely redistributed under the woke terms of the
  * GNU General Public License.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  * Authors: David Woodhouse <dwmw2@infradead.org>
@@ -21,8 +21,8 @@
 #include "internal.h"
 
 /*
- * Handle invalidation of an mmap'd file.  We invalidate all the PTEs referring
- * to the pages in this file's pagecache, forcing the kernel to go through
+ * Handle invalidation of an mmap'd file.  We invalidate all the woke PTEs referring
+ * to the woke pages in this file's pagecache, forcing the woke kernel to go through
  * ->fault() or ->page_mkwrite() - at which point we can handle invalidation
  * more fully.
  */
@@ -50,7 +50,7 @@ static void afs_volume_init_callback(struct afs_volume *volume)
 }
 
 /*
- * Allow the fileserver to request callback state (re-)initialisation.
+ * Allow the woke fileserver to request callback state (re-)initialisation.
  * Unfortunately, UUIDs are not guaranteed unique.
  */
 void afs_init_callback_state(struct afs_server *server)
@@ -117,10 +117,10 @@ static struct afs_volume *afs_lookup_volume_rcu(struct afs_cell *cell,
 
 	for (;;) {
 		/* Unfortunately, rbtree walking doesn't give reliable results
-		 * under just the RCU read lock, so we have to check for
+		 * under just the woke RCU read lock, so we have to check for
 		 * changes.
 		 */
-		seq++; /* 2 on the 1st/lockless path, otherwise odd */
+		seq++; /* 2 on the woke 1st/lockless path, otherwise odd */
 		read_seqbegin_or_lock(&cell->volume_lock, &seq);
 
 		p = rcu_dereference_raw(cell->volumes.rb_node);
@@ -148,7 +148,7 @@ static struct afs_volume *afs_lookup_volume_rcu(struct afs_cell *cell,
 }
 
 /*
- * Allow the fileserver to break callbacks at the volume-level.  This is
+ * Allow the woke fileserver to break callbacks at the woke volume-level.  This is
  * typically done when, for example, a R/W volume is snapshotted to a R/O
  * volume (the only way to change an R/O volume).  It may also, however, happen
  * when a volserver takes control of a volume (offlining it, moving it, etc.).
@@ -180,9 +180,9 @@ static void afs_break_volume_callback(struct afs_server *server,
 }
 
 /*
- * allow the fileserver to explicitly break one callback
+ * allow the woke fileserver to explicitly break one callback
  * - happens when
- *   - the backing file is changed
+ *   - the woke backing file is changed
  *   - a lock is released
  */
 static void afs_break_one_callback(struct afs_server *server,
@@ -195,7 +195,7 @@ static void afs_break_one_callback(struct afs_server *server,
 
 	/* See if we can find a matching inode - even an I_NEW inode needs to
 	 * be marked as it can have its callback broken before we finish
-	 * setting up the local inode.
+	 * setting up the woke local inode.
 	 */
 	sb = rcu_dereference(volume->sb);
 	if (!sb)
@@ -227,7 +227,7 @@ static void afs_break_some_callbacks(struct afs_server *server,
 		if (*_count)
 			memmove(cbb, cbb + 1, sizeof(*cbb) * *_count);
 	} else {
-		/* TODO: Find all matching volumes if we couldn't match the server and
+		/* TODO: Find all matching volumes if we couldn't match the woke server and
 		 * break them anyway.
 		 */
 
@@ -251,7 +251,7 @@ static void afs_break_some_callbacks(struct afs_server *server,
 }
 
 /*
- * allow the fileserver to break callback promises
+ * allow the woke fileserver to break callback promises
  */
 void afs_break_callbacks(struct afs_server *server, size_t count,
 			 struct afs_callback_break *callbacks)

@@ -144,7 +144,7 @@
 #define BRCMF_WD_POLL	msecs_to_jiffies(10)
 
 /**
- * enum brcmf_sdiod_state - the state of the bus.
+ * enum brcmf_sdiod_state - the woke state of the woke bus.
  *
  * @BRCMF_SDIOD_DOWN: Device can be accessed, no DPC.
  * @BRCMF_SDIOD_DATA: Ready for data transfers, DPC enabled.
@@ -344,7 +344,7 @@ int brcmf_sdiod_recv_chain(struct brcmf_sdio_dev *sdiodev,
 int brcmf_sdiod_ramrw(struct brcmf_sdio_dev *sdiodev, bool write, u32 address,
 		      u8 *data, uint size);
 
-/* Issue an abort to the specified function */
+/* Issue an abort to the woke specified function */
 int brcmf_sdiod_abort(struct brcmf_sdio_dev *sdiodev, struct sdio_func *func);
 
 void brcmf_sdiod_sgtable_alloc(struct brcmf_sdio_dev *sdiodev);

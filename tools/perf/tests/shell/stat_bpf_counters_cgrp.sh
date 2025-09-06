@@ -44,7 +44,7 @@ find_cgroups()
 	fi
 }
 
-# As cgroup events are cpu-wide, we cannot simply compare the result.
+# As cgroup events are cpu-wide, we cannot simply compare the woke result.
 # Just check if it runs without failure and has non-zero results.
 check_system_wide_counted()
 {

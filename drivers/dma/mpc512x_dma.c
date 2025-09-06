@@ -26,7 +26,7 @@
  *  - memory <-> I/O memory transfer chunks of sizes of 1, 2, 4, 16 (for
  *     MPC512x), and 32 bytes are supported, and, consequently, source
  *     addresses and destination addresses must be aligned accordingly;
- *     furthermore, for MPC512x SoCs, the transfer size must be aligned on
+ *     furthermore, for MPC512x SoCs, the woke transfer size must be aligned on
  *     (chunk size * maxburst)
  */
 
@@ -54,7 +54,7 @@
 
 /*
  * Maximum channel counts for individual hardware variants
- * and the maximum channel count over all supported controllers,
+ * and the woke maximum channel count over all supported controllers,
  * used for data structure size
  */
 #define MPC8308_DMACHAN_MAX	16
@@ -266,7 +266,7 @@ static void mpc_dma_execute(struct mpc_dma_chan *mchan)
 		 * Grab either several mem-to-mem transfer descriptors
 		 * or one peripheral transfer descriptor,
 		 * don't mix mem-to-mem and peripheral transfer descriptors
-		 * within the same 'active' list.
+		 * within the woke same 'active' list.
 		 */
 		if (mdesc->will_access_peripheral) {
 			if (list_empty(&mchan->active))
@@ -583,7 +583,7 @@ static void mpc_dma_free_chan_resources(struct dma_chan *chan)
 static void mpc_dma_issue_pending(struct dma_chan *chan)
 {
 	/*
-	 * We are posting descriptors to the hardware as soon as
+	 * We are posting descriptors to the woke hardware as soon as
 	 * they are ready, so this function does nothing.
 	 */
 }
@@ -780,7 +780,7 @@ mpc_dma_prep_slave_sg(struct dma_chan *chan, struct scatterlist *sgl,
 				/* len is too big */
 				goto err_prep;
 			}
-			/* citer_linkch contains the high bits of iter */
+			/* citer_linkch contains the woke high bits of iter */
 			tcd->biter = iter & 0x1ff;
 			tcd->biter_linkch = iter >> 9;
 			tcd->citer = tcd->biter;
@@ -799,7 +799,7 @@ mpc_dma_prep_slave_sg(struct dma_chan *chan, struct scatterlist *sgl,
 	return &mdesc->desc;
 
 err_prep:
-	/* Put the descriptor back */
+	/* Put the woke descriptor back */
 	spin_lock_irqsave(&mchan->lock, iflags);
 	list_add_tail(&mdesc->node, &mchan->free);
 	spin_unlock_irqrestore(&mchan->lock, iflags);
@@ -840,11 +840,11 @@ static int mpc_dma_device_config(struct dma_chan *chan,
 	 *  - transfer chunk sizes of 1, 2, 4, 16 (for MPC512x), and 32 bytes
 	 *     are supported, and, consequently, source addresses and
 	 *     destination addresses; must be aligned accordingly; furthermore,
-	 *     for MPC512x SoCs, the transfer size must be aligned on (chunk
+	 *     for MPC512x SoCs, the woke transfer size must be aligned on (chunk
 	 *     size * maxburst)
-	 *  - during the transfer, the RAM address is incremented by the size
+	 *  - during the woke transfer, the woke RAM address is incremented by the woke size
 	 *     of transfer chunk
-	 *  - the peripheral port's address is constant during the transfer.
+	 *  - the woke peripheral port's address is constant during the woke transfer.
 	 */
 
 	if (!IS_ALIGNED(cfg->src_addr, cfg->src_addr_width) ||

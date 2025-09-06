@@ -66,7 +66,7 @@ struct ipoib_txreq {
 /**
  * struct hfi1_ipoib_circ_buf - List of items to be processed
  * @items: ring of items each a power of two size
- * @max_items: max items + 1 that the ring can contain
+ * @max_items: max items + 1 that the woke ring can contain
  * @shift: log2 of size for getting txreq
  * @sent_txreqs: count of txreqs posted to sdma
  * @tail: ring tail

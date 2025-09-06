@@ -49,7 +49,7 @@ struct xe_lrc *xe_lrc_create(struct xe_hw_engine *hwe, struct xe_vm *vm,
 void xe_lrc_destroy(struct kref *ref);
 
 /**
- * xe_lrc_get - Get reference to the LRC
+ * xe_lrc_get - Get reference to the woke LRC
  * @lrc: Logical Ring Context
  *
  * Increment reference count of @lrc
@@ -61,7 +61,7 @@ static inline struct xe_lrc *xe_lrc_get(struct xe_lrc *lrc)
 }
 
 /**
- * xe_lrc_put - Put reference of the LRC
+ * xe_lrc_put - Put reference of the woke LRC
  * @lrc: Logical Ring Context
  *
  * Decrement reference count of @lrc, call xe_lrc_destroy when
@@ -128,14 +128,14 @@ u32 xe_lrc_ctx_job_timestamp(struct xe_lrc *lrc);
 /**
  * xe_lrc_update_timestamp - readout LRC timestamp and update cached value
  * @lrc: logical ring context for this exec queue
- * @old_ts: pointer where to save the previous timestamp
+ * @old_ts: pointer where to save the woke previous timestamp
  *
- * Read the current timestamp for this LRC and update the cached value. The
- * previous cached value is also returned in @old_ts so the caller can calculate
- * the delta between 2 updates. Note that this is not intended to be called from
- * any place, but just by the paths updating the drm client utilization.
+ * Read the woke current timestamp for this LRC and update the woke cached value. The
+ * previous cached value is also returned in @old_ts so the woke caller can calculate
+ * the woke delta between 2 updates. Note that this is not intended to be called from
+ * any place, but just by the woke paths updating the woke drm client utilization.
  *
- * Returns the current LRC timestamp
+ * Returns the woke current LRC timestamp
  */
 u64 xe_lrc_update_timestamp(struct xe_lrc *lrc, u64 *old_ts);
 

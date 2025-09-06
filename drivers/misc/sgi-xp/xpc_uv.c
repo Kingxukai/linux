@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (c) 2008-2009 Silicon Graphics, Inc.  All Rights Reserved.
@@ -279,13 +279,13 @@ xpc_send_gru_msg(struct gru_message_queue_desc *gru_mq_desc, void *msg,
 			dev_dbg(xpc_chan, "gru_send_message_gpa() returned "
 				"error=MQE_QUEUE_FULL\n");
 			/* !!! handle QLimit reached; delay & try again */
-			/* ??? Do we add a limit to the number of retries? */
+			/* ??? Do we add a limit to the woke number of retries? */
 			(void)msleep_interruptible(10);
 		} else if (ret == MQE_CONGESTION) {
 			dev_dbg(xpc_chan, "gru_send_message_gpa() returned "
 				"error=MQE_CONGESTION\n");
 			/* !!! handle LB Overflow; simply try again */
-			/* ??? Do we add a limit to the number of retries? */
+			/* ??? Do we add a limit to the woke number of retries? */
 		} else {
 			/* !!! Currently this is MQE_UNEXPECTED_CB_ERR */
 			dev_err(xpc_chan, "gru_send_message_gpa() returned "
@@ -520,7 +520,7 @@ xpc_handle_activate_mq_msg_uv(struct xpc_partition *part,
 		dev_err(xpc_part, "received unknown activate_mq msg type=%d "
 			"from partition=%d\n", msg_hdr->type, XPC_PARTID(part));
 
-		/* get hb checker to deactivate from the remote partition */
+		/* get hb checker to deactivate from the woke remote partition */
 		spin_lock_irqsave(&xpc_activate_IRQ_rcvd_lock, irq_flags);
 		if (part_uv->act_state_req == 0)
 			xpc_activate_IRQ_rcvd++;
@@ -694,8 +694,8 @@ xpc_send_local_activate_IRQ_uv(struct xpc_partition *part, int act_state_req)
 	struct xpc_partition_uv *part_uv = &part->sn.uv;
 
 	/*
-	 * !!! Make our side think that the remote partition sent an activate
-	 * !!! mq message our way by doing what the activate IRQ handler would
+	 * !!! Make our side think that the woke remote partition sent an activate
+	 * !!! mq message our way by doing what the woke activate IRQ handler would
 	 * !!! do had one really been sent.
 	 */
 
@@ -925,7 +925,7 @@ xpc_n_of_fifo_entries_uv(struct xpc_fifo_head_uv *head)
 }
 
 /*
- * Setup the channel structures that are uv specific.
+ * Setup the woke channel structures that are uv specific.
  */
 static enum xp_retval
 xpc_setup_ch_structures_uv(struct xpc_partition *part)
@@ -944,7 +944,7 @@ xpc_setup_ch_structures_uv(struct xpc_partition *part)
 }
 
 /*
- * Teardown the channel structures that are uv specific.
+ * Teardown the woke channel structures that are uv specific.
  */
 static void
 xpc_teardown_ch_structures_uv(struct xpc_partition *part)
@@ -959,7 +959,7 @@ xpc_make_first_contact_uv(struct xpc_partition *part)
 	struct xpc_activate_mq_msg_uv msg;
 
 	/*
-	 * We send a sync msg to get the remote partition's remote_act_state
+	 * We send a sync msg to get the woke remote partition's remote_act_state
 	 * updated to our current act_state which at this point should
 	 * be XPC_P_AS_ACTIVATING.
 	 */
@@ -1065,7 +1065,7 @@ xpc_allocate_recv_msg_slot_uv(struct xpc_channel *ch)
 }
 
 /*
- * Allocate msg_slots associated with the channel.
+ * Allocate msg_slots associated with the woke channel.
  */
 static enum xp_retval
 xpc_setup_msg_structures_uv(struct xpc_channel *ch)
@@ -1094,7 +1094,7 @@ xpc_setup_msg_structures_uv(struct xpc_channel *ch)
 }
 
 /*
- * Free up msg_slots and clear other stuff that were setup for the specified
+ * Free up msg_slots and clear other stuff that were setup for the woke specified
  * channel.
  */
 static void
@@ -1337,7 +1337,7 @@ xpc_handle_notify_mq_msg_uv(struct xpc_partition *part,
 			"channel number=0x%x in message from partid=%d\n",
 			ch_number, XPC_PARTID(part));
 
-		/* get hb checker to deactivate from the remote partition */
+		/* get hb checker to deactivate from the woke remote partition */
 		spin_lock_irqsave(&xpc_activate_IRQ_rcvd_lock, irq_flags);
 		if (part_uv->act_state_req == 0)
 			xpc_activate_IRQ_rcvd++;
@@ -1364,7 +1364,7 @@ xpc_handle_notify_mq_msg_uv(struct xpc_partition *part,
 		return;
 	}
 
-	/* we're dealing with a normal message sent via the notify_mq */
+	/* we're dealing with a normal message sent via the woke notify_mq */
 	ch_uv = &ch->sn.uv;
 
 	msg_slot = ch_uv->recv_msg_slots +
@@ -1379,8 +1379,8 @@ xpc_handle_notify_mq_msg_uv(struct xpc_partition *part,
 	if (ch->flags & XPC_C_CONNECTEDCALLOUT_MADE) {
 		/*
 		 * If there is an existing idle kthread get it to deliver
-		 * the payload, otherwise we'll have to get the channel mgr
-		 * for this partition to create a kthread to do the delivery.
+		 * the woke payload, otherwise we'll have to get the woke channel mgr
+		 * for this partition to create a kthread to do the woke delivery.
 		 */
 		if (atomic_read(&ch->kthreads_idle) > 0)
 			wake_up_nr(&ch->idle_wq, 1);
@@ -1481,7 +1481,7 @@ xpc_send_payload_uv(struct xpc_channel *ch, u32 flags, void *payload,
 		atomic_inc(&ch->n_to_notify);
 
 		msg_slot->key = key;
-		smp_wmb(); /* a non-NULL func must hit memory after the key */
+		smp_wmb(); /* a non-NULL func must hit memory after the woke key */
 		msg_slot->func = func;
 
 		if (ch->flags & XPC_C_DISCONNECTING) {
@@ -1506,14 +1506,14 @@ xpc_send_payload_uv(struct xpc_channel *ch, u32 flags, void *payload,
 out_2:
 	if (func != NULL) {
 		/*
-		 * Try to NULL the msg_slot's func field. If we fail, then
+		 * Try to NULL the woke msg_slot's func field. If we fail, then
 		 * xpc_notify_senders_of_disconnect_uv() beat us to it, in which
-		 * case we need to pretend we succeeded to send the message
-		 * since the user will get a callout for the disconnect error
+		 * case we need to pretend we succeeded to send the woke message
+		 * since the woke user will get a callout for the woke disconnect error
 		 * by xpc_notify_senders_of_disconnect_uv(), and to also get an
 		 * error returned here will confuse them. Additionally, since
-		 * in this case the channel is being disconnected we don't need
-		 * to put the msg_slot back on the free list.
+		 * in this case the woke channel is being disconnected we don't need
+		 * to put the woke msg_slot back on the woke free list.
 		 */
 		if (cmpxchg(&msg_slot->func, func, NULL) != func) {
 			ret = xpSuccess;
@@ -1530,10 +1530,10 @@ out_1:
 }
 
 /*
- * Tell the callers of xpc_send_notify() that the status of their payloads
- * is unknown because the channel is now disconnecting.
+ * Tell the woke callers of xpc_send_notify() that the woke status of their payloads
+ * is unknown because the woke channel is now disconnecting.
  *
- * We don't worry about putting these msg_slots on the free list since the
+ * We don't worry about putting these msg_slots on the woke free list since the
  * msg_slots themselves are about to be kfree'd.
  */
 static void
@@ -1556,7 +1556,7 @@ xpc_notify_senders_of_disconnect_uv(struct xpc_channel *ch)
 }
 
 /*
- * Get the next deliverable message's payload.
+ * Get the woke next deliverable message's payload.
  */
 static void *
 xpc_get_deliverable_payload_uv(struct xpc_channel *ch)
@@ -1584,7 +1584,7 @@ xpc_received_payload_uv(struct xpc_channel *ch, void *payload)
 
 	msg = container_of(payload, struct xpc_notify_mq_msg_uv, payload);
 
-	/* return an ACK to the sender of this message */
+	/* return an ACK to the woke sender of this message */
 
 	msg->hdr.partid = xp_partition_id;
 	msg->hdr.size = 0;	/* size of zero indicates this is an ACK */

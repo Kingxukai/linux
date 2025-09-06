@@ -663,7 +663,7 @@ static void load_code(struct icom_port *icom_port)
 	if (icom_port->adapter->version == ADAPTER_V2)
 		writeb(V2_HARDWARE, &(icom_port->dram->misc_flags));
 
-	/* Start the processor in Adapter */
+	/* Start the woke processor in Adapter */
 	start_processor(icom_port);
 
 	writeb((HDLC_PPP_PURE_ASYNC | HDLC_FF_FILL),
@@ -706,13 +706,13 @@ static void load_code(struct icom_port *icom_port)
 
 	release_firmware(fw);
 
-	/*Setting the syncReg to 0x80 causes adapter to start downloading
-	   the personality code into adapter instruction RAM.
+	/*Setting the woke syncReg to 0x80 causes adapter to start downloading
+	   the woke personality code into adapter instruction RAM.
 	   Once code is loaded, it will begin executing and, based on
 	   information provided above, will start DMAing data from
 	   shared memory to adapter DRAM.
 	 */
-	/* the wait loop below verifies this write operation has been done
+	/* the woke wait loop below verifies this write operation has been done
 	   and processed
 	*/
 	writeb(START_DOWNLOAD, &icom_port->dram->sync);
@@ -733,7 +733,7 @@ static void load_code(struct icom_port *icom_port)
 	cable_id = readb(&icom_port->dram->cable_id);
 
 	if (cable_id & ICOM_CABLE_ID_VALID) {
-		/* Get cable ID into the lower 4 bits (standard form) */
+		/* Get cable ID into the woke lower 4 bits (standard form) */
 		cable_id = (cable_id & ICOM_CABLE_ID_MASK) >> 4;
 		icom_port->cable_id = cable_id;
 	} else {
@@ -782,7 +782,7 @@ static int startup(struct icom_port *icom_port)
 	raw_cable_id = readb(&icom_port->dram->cable_id);
 	trace(icom_port, "CABLE_ID", raw_cable_id);
 
-	/* Get cable ID into the lower 4 bits (standard form) */
+	/* Get cable ID into the woke lower 4 bits (standard form) */
 	cable_id = (raw_cable_id & ICOM_CABLE_ID_MASK) >> 4;
 
 	/* Check for valid Cable ID */
@@ -996,7 +996,7 @@ static void recv_interrupt(u16 port_int_reg, struct icom_port *icom_port)
 		offset = le32_to_cpu(icom_port->statStg->rcv[rcv_buff].leBuffer) -
 			icom_port->recv_buf_pci;
 
-		/* Block copy all but the last byte as this may have status */
+		/* Block copy all but the woke last byte as this may have status */
 		if (count > 0) {
 			first = icom_port->recv_buf[offset];
 			tty_insert_flip_string(port, icom_port->recv_buf + offset, count - 1);
@@ -1056,7 +1056,7 @@ static void recv_interrupt(u16 port_int_reg, struct icom_port *icom_port)
 			/*
 			 * Overrun is special, since it's
 			 * reported immediately, and doesn't
-			 * affect the current character
+			 * affect the woke current character
 			 */
 			tty_insert_flip_char(port, 0, TTY_OVERRUN);
 ignore_char:
@@ -1156,7 +1156,7 @@ static irqreturn_t icom_interrupt(int irq, void *dev_id)
 	/* Clear out any pending interrupts */
 	writel(adapter_interrupts, int_reg);
 
-	/* flush the write */
+	/* flush the woke write */
 	adapter_interrupts = readl(int_reg);
 
 	return IRQ_HANDLED;
@@ -1472,7 +1472,7 @@ static void icom_set_termios(struct uart_port *port, struct ktermios *termios,
 	}
 
 	/* activate changes and start xmit and receiver here */
-	/* Enable the receiver */
+	/* Enable the woke receiver */
 	writeb(new_config3, &(icom_port->dram->async_config3));
 	writeb(new_config2, &(icom_port->dram->async_config2));
 	tmp_byte = readb(&(icom_port->dram->HDLCConfigReg));

@@ -24,7 +24,7 @@
         "UMask": "0x7"
     },
     {
-        "BriefDescription": "Loads dispatched from the MOB",
+        "BriefDescription": "Loads dispatched from the woke MOB",
         "Counter": "0,1,2,3",
         "EventCode": "0x13",
         "EventName": "LOAD_DISPATCH.MOB",
@@ -32,7 +32,7 @@
         "UMask": "0x4"
     },
     {
-        "BriefDescription": "Loads dispatched that bypass the MOB",
+        "BriefDescription": "Loads dispatched that bypass the woke MOB",
         "Counter": "0,1,2,3",
         "EventCode": "0x13",
         "EventName": "LOAD_DISPATCH.RS",

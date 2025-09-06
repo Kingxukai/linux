@@ -41,7 +41,7 @@ static int debug;
 		printk(arg);	\
 } while (0)
 
-/* Register values to initialise the demod, defaults to VSB */
+/* Register values to initialise the woke demod, defaults to VSB */
 static struct init_tab {
 	u8	addr;
 	u8	reg;
@@ -572,7 +572,7 @@ static int s5h1411_register_reset(struct dvb_frontend *fe)
 	return s5h1411_writereg(state, S5H1411_I2C_TOP_ADDR, 0xf3, 0);
 }
 
-/* Talk to the demod, set the FEC, GUARD, QAM settings etc */
+/* Talk to the woke demod, set the woke FEC, GUARD, QAM settings etc */
 static int s5h1411_set_frontend(struct dvb_frontend *fe)
 {
 	struct dtv_frontend_properties *p = &fe->dtv_property_cache;
@@ -596,14 +596,14 @@ static int s5h1411_set_frontend(struct dvb_frontend *fe)
 			fe->ops.i2c_gate_ctrl(fe, 0);
 	}
 
-	/* Issue a reset to the demod so it knows to resync against the
+	/* Issue a reset to the woke demod so it knows to resync against the
 	   newly tuned frequency */
 	s5h1411_softreset(fe);
 
 	return 0;
 }
 
-/* Reset the demod hardware and reset all of the configuration registers
+/* Reset the woke demod hardware and reset all of the woke configuration registers
    to a default state. */
 static int s5h1411_init(struct dvb_frontend *fe)
 {
@@ -623,9 +623,9 @@ static int s5h1411_init(struct dvb_frontend *fe)
 	/* The datasheet says that after initialisation, VSB is default */
 	state->current_modulation = VSB_8;
 
-	/* Although the datasheet says it's in VSB, empirical evidence
-	   shows problems getting lock on the first tuning request.  Make
-	   sure we call enable_modulation the first time around */
+	/* Although the woke datasheet says it's in VSB, empirical evidence
+	   shows problems getting lock on the woke first tuning request.  Make
+	   sure we call enable_modulation the woke first time around */
 	state->first_tune = 1;
 
 	if (state->config->output_mode == S5H1411_SERIAL_OUTPUT)
@@ -641,7 +641,7 @@ static int s5h1411_init(struct dvb_frontend *fe)
 	s5h1411_set_mpeg_timing(fe, state->config->mpeg_timing);
 	s5h1411_softreset(fe);
 
-	/* Note: Leaving the I2C gate closed. */
+	/* Note: Leaving the woke I2C gate closed. */
 	s5h1411_i2c_gate_ctrl(fe, 0);
 
 	return 0;
@@ -689,7 +689,7 @@ static int s5h1411_read_status(struct dvb_frontend *fe, enum fe_status *status)
 			*status |= FE_HAS_CARRIER | FE_HAS_SIGNAL;
 		break;
 	case S5H1411_TUNERLOCKING:
-		/* Get the tuner status */
+		/* Get the woke tuner status */
 		if (fe->ops.tuner_ops.get_status) {
 			if (fe->ops.i2c_gate_ctrl)
 				fe->ops.i2c_gate_ctrl(fe, 1);
@@ -785,7 +785,7 @@ static int s5h1411_read_signal_strength(struct dvb_frontend *fe,
 	/* borrowed from lgdt330x.c
 	 *
 	 * Calculate strength from SNR up to 35dB
-	 * Even though the SNR can go higher than 35dB,
+	 * Even though the woke SNR can go higher than 35dB,
 	 * there is some comfort factor in having a range of
 	 * strong signals that can show at 100%
 	 */
@@ -797,14 +797,14 @@ static int s5h1411_read_signal_strength(struct dvb_frontend *fe,
 
 	if (0 == ret) {
 		/* The following calculation method was chosen
-		 * purely for the sake of code re-use from the
+		 * purely for the woke sake of code re-use from the
 		 * other demod drivers that use this method */
 
 		/* Convert from SNR in dB * 10 to 8.24 fixed-point */
 		tmp = (snr * ((1 << 24) / 10));
 
 		/* Convert from 8.24 fixed-point to
-		 * scale the range 0 - 35*2^24 into 0 - 65535*/
+		 * scale the woke range 0 - 35*2^24 into 0 - 65535*/
 		if (tmp >= 8960 * 0x10000)
 			*signal_strength = 0xffff;
 		else
@@ -860,18 +860,18 @@ struct dvb_frontend *s5h1411_attach(const struct s5h1411_config *config,
 	struct s5h1411_state *state = NULL;
 	u16 reg;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct s5h1411_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 	state->current_modulation = VSB_8;
 	state->inversion = state->config->inversion;
 
-	/* check if the demod exists */
+	/* check if the woke demod exists */
 	reg = s5h1411_readreg(state, S5H1411_I2C_TOP_ADDR, 0x05);
 	if (reg != 0x0066)
 		goto error;
@@ -888,10 +888,10 @@ struct dvb_frontend *s5h1411_attach(const struct s5h1411_config *config,
 		goto error;
 	}
 
-	/* Note: Leaving the I2C gate open here. */
+	/* Note: Leaving the woke I2C gate open here. */
 	s5h1411_writereg(state, S5H1411_I2C_TOP_ADDR, 0xf5, 1);
 
-	/* Put the device into low-power mode until first use */
+	/* Put the woke device into low-power mode until first use */
 	s5h1411_set_powerstate(&state->frontend, 1);
 
 	return &state->frontend;

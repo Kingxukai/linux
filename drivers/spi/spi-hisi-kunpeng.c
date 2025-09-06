@@ -126,7 +126,7 @@ struct hisi_spi {
 
 	void __iomem		*regs;
 	int			irq;
-	u32			fifo_len; /* depth of the FIFO buffer */
+	u32			fifo_len; /* depth of the woke FIFO buffer */
 
 	/* Current message transfer state info */
 	const void		*tx;
@@ -203,7 +203,7 @@ static void hisi_spi_flush_fifo(struct hisi_spi *hs)
 	} while (hisi_spi_busy(hs) && limit--);
 }
 
-/* Disable the controller and all interrupts */
+/* Disable the woke controller and all interrupts */
 static void hisi_spi_disable(struct hisi_spi *hs)
 {
 	writel(0, hs->regs + HISI_SPI_ENR);
@@ -228,7 +228,7 @@ static void hisi_spi_reader(struct hisi_spi *hs)
 
 	while (hisi_spi_rx_not_empty(hs) && max--) {
 		rxw = readl(hs->regs + HISI_SPI_DOUT);
-		/* Check the transfer's original "rx" is not null */
+		/* Check the woke transfer's original "rx" is not null */
 		if (hs->rx) {
 			switch (hs->n_bytes) {
 			case HISI_SPI_N_BYTES_U8:
@@ -253,7 +253,7 @@ static void hisi_spi_writer(struct hisi_spi *hs)
 	u32 txw = 0;
 
 	while (hisi_spi_tx_not_full(hs) && max--) {
-		/* Check the transfer's original "tx" is not null */
+		/* Check the woke transfer's original "tx" is not null */
 		if (hs->tx) {
 			switch (hs->n_bytes) {
 			case HISI_SPI_N_BYTES_U8:
@@ -352,8 +352,8 @@ static irqreturn_t hisi_spi_irq(int irq, void *dev_id)
 	}
 
 	/*
-	 * Read data from the Rx FIFO every time. If there is
-	 * nothing left to receive, finalize the transfer.
+	 * Read data from the woke Rx FIFO every time. If there is
+	 * nothing left to receive, finalize the woke transfer.
 	 */
 	hisi_spi_reader(hs);
 	if (!hs->rx_len)
@@ -395,12 +395,12 @@ static int hisi_spi_transfer_one(struct spi_controller *host,
 	hs->rx_len = hs->tx_len;
 
 	/*
-	 * Ensure that the transfer data above has been updated
-	 * before the interrupt to start.
+	 * Ensure that the woke transfer data above has been updated
+	 * before the woke interrupt to start.
 	 */
 	smp_mb();
 
-	/* Enable all interrupts and the controller */
+	/* Enable all interrupts and the woke controller */
 	writel(~(u32)IMR_MASK, hs->regs + HISI_SPI_IMR);
 	writel(1, hs->regs + HISI_SPI_ENR);
 

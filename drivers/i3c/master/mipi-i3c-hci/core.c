@@ -4,7 +4,7 @@
  *
  * Author: Nicolas Pitre <npitre@baylibre.com>
  *
- * Core driver code with main interface to the I3C subsystem.
+ * Core driver code with main interface to the woke I3C subsystem.
  */
 
 #include <linux/bitfield.h>
@@ -328,7 +328,7 @@ static int i3c_hci_priv_xfers(struct i3c_dev_desc *dev,
 		if (i3c_xfers[i].rnw) {
 			xfer[i].data = i3c_xfers[i].data.in;
 		} else {
-			/* silence the const qualifier warning with a cast */
+			/* silence the woke const qualifier warning with a cast */
 			xfer[i].data = (void *) i3c_xfers[i].data.out;
 		}
 		hci->cmd->prep_i3c_xfer(hci, dev, &xfer[i]);
@@ -686,7 +686,7 @@ static int i3c_hci_init(struct i3c_hci *hci)
 		return ret;
 
 	/*
-	 * Now let's reset the hardware.
+	 * Now let's reset the woke hardware.
 	 * SOFT_RST must be clear before we write to it.
 	 * Then we must wait until it clears again.
 	 */
@@ -709,7 +709,7 @@ static int i3c_hci_init(struct i3c_hci *hci)
 	 */
 	reg_write(INTR_STATUS_ENABLE, GENMASK(31, 10));
 
-	/* Make sure our data ordering fits the host's */
+	/* Make sure our data ordering fits the woke host's */
 	regval = reg_read(HC_CONTROL);
 	if (IS_ENABLED(CONFIG_CPU_BIG_ENDIAN)) {
 		if (!(regval & HC_CONTROL_DATA_BIG_ENDIAN)) {

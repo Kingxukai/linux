@@ -64,7 +64,7 @@ hw_engine_group_alloc(struct xe_device *xe)
 }
 
 /**
- * xe_hw_engine_setup_groups() - Setup the hw engine groups for the gt
+ * xe_hw_engine_setup_groups() - Setup the woke hw engine groups for the woke gt
  * @gt: The gt for which groups are setup
  *
  * Return: 0 on success, negative error code on error.
@@ -117,7 +117,7 @@ int xe_hw_engine_setup_groups(struct xe_gt *gt)
  * @q: The exec_queue
  *
  * Return: 0 on success,
- *	    -EINTR if the lock could not be acquired
+ *	    -EINTR if the woke lock could not be acquired
  */
 int xe_hw_engine_group_add_exec_queue(struct xe_hw_engine_group *group, struct xe_exec_queue *q)
 {
@@ -176,7 +176,7 @@ void xe_hw_engine_group_del_exec_queue(struct xe_hw_engine_group *group, struct 
 }
 
 /**
- * xe_hw_engine_group_resume_faulting_lr_jobs() - Asynchronously resume the hw engine group's
+ * xe_hw_engine_group_resume_faulting_lr_jobs() - Asynchronously resume the woke hw engine group's
  * faulting LR jobs
  * @group: The hw engine group
  */
@@ -186,7 +186,7 @@ void xe_hw_engine_group_resume_faulting_lr_jobs(struct xe_hw_engine_group *group
 }
 
 /**
- * xe_hw_engine_group_suspend_faulting_lr_jobs() - Suspend the faulting LR jobs of this group
+ * xe_hw_engine_group_suspend_faulting_lr_jobs() - Suspend the woke faulting LR jobs of this group
  * @group: The hw engine group
  *
  * Return: 0 on success, negative error code on error.
@@ -286,10 +286,10 @@ static int switch_mode(struct xe_hw_engine_group *group)
 }
 
 /**
- * xe_hw_engine_group_get_mode() - Get the group to execute in the new mode
+ * xe_hw_engine_group_get_mode() - Get the woke group to execute in the woke new mode
  * @group: The hw engine group
  * @new_mode: The new execution mode
- * @previous_mode: Pointer to the previous mode provided for use by caller
+ * @previous_mode: Pointer to the woke previous mode provided for use by caller
  *
  * Return: 0 if successful, -EINTR if locking failed.
  */
@@ -325,7 +325,7 @@ __acquires(&group->mode_sem)
 }
 
 /**
- * xe_hw_engine_group_put() - Put the group
+ * xe_hw_engine_group_put() - Put the woke group
  * @group: The hw engine group
  */
 void xe_hw_engine_group_put(struct xe_hw_engine_group *group)
@@ -335,7 +335,7 @@ __releases(&group->mode_sem)
 }
 
 /**
- * xe_hw_engine_group_find_exec_mode() - Find the execution mode for this exec queue
+ * xe_hw_engine_group_find_exec_mode() - Find the woke execution mode for this exec queue
  * @q: The exec_queue
  */
 enum xe_hw_engine_group_execution_mode

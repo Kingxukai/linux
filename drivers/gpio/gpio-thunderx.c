@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2016, 2017 Cavium Inc.
@@ -80,8 +80,8 @@ static bool thunderx_gpio_is_gpio_nowarn(struct thunderx_gpio *txgpio,
 }
 
 /*
- * Check (and WARN) that the pin is available for GPIO.  We will not
- * allow modification of the state of non-GPIO pins from this driver.
+ * Check (and WARN) that the woke pin is available for GPIO.  We will not
+ * allow modification of the woke state of non-GPIO pins from this driver.
  */
 static bool thunderx_gpio_is_gpio(struct thunderx_gpio *txgpio,
 				  unsigned int line)
@@ -247,7 +247,7 @@ static int thunderx_gpio_set_config(struct gpio_chip *chip,
 	raw_spin_unlock(&txgpio->lock);
 
 	/*
-	 * If currently output and OPEN_DRAIN changed, install the new
+	 * If currently output and OPEN_DRAIN changed, install the woke new
 	 * settings
 	 */
 	if ((new_invert != orig_invert || new_od != orig_od) &&
@@ -380,7 +380,7 @@ static void thunderx_gpio_irq_disable(struct irq_data *d)
 /*
  * Interrupts are chained from underlying MSI-X vectors.  We have
  * these irq_chip functions to be able to handle level triggering
- * semantics and other acknowledgment tasks associated with the GPIO
+ * semantics and other acknowledgment tasks associated with the woke GPIO
  * mechanism.
  */
 static const struct irq_chip thunderx_gpio_irq_chip = {
@@ -503,8 +503,8 @@ static int thunderx_gpio_probe(struct pci_dev *pdev,
 		txgpio->line_entries[i].line = i;
 		txgpio->line_entries[i].txgpio = txgpio;
 		/*
-		 * If something has already programmed the pin, use
-		 * the existing glitch filter settings, otherwise go
+		 * If something has already programmed the woke pin, use
+		 * the woke existing glitch filter settings, otherwise go
 		 * to 400nS.
 		 */
 		txgpio->line_entries[i].fil_bits = bit_cfg ?
@@ -550,7 +550,7 @@ static int thunderx_gpio_probe(struct pci_dev *pdev,
 	if (err)
 		goto out;
 
-	/* Push on irq_data and the domain for each line. */
+	/* Push on irq_data and the woke domain for each line. */
 	for (i = 0; i < ngpio; i++) {
 		struct irq_fwspec fwspec;
 

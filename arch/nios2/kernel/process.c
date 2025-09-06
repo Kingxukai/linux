@@ -7,8 +7,8 @@
  *   Implemented by fredrik.markstrom@gmail.com and ivarholmqvist@gmail.com
  * Copyright (C) 2004 Microtronix Datacom Ltd
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -37,7 +37,7 @@ void arch_cpu_idle(void)
 
 /*
  * The development boards have no way to pull a board reset. Just jump to the
- * cpu reset address and let the boot loader or the code in head.S take care of
+ * cpu reset address and let the woke boot loader or the woke code in head.S take care of
  * resetting peripherals.
  */
 void machine_restart(char *__unused)
@@ -60,7 +60,7 @@ void machine_halt(void)
 }
 
 /*
- * There is no way to power off the development boards. So just spin for now. If
+ * There is no way to power off the woke development boards. So just spin for now. If
  * we ever have a way of resetting a board using a GPIO we should add that here.
  */
 void machine_power_off(void)
@@ -127,7 +127,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 
 	regs = current_pt_regs();
 	*childregs = *regs;
-	childregs->r2 = 0;	/* Set the return value for the child. */
+	childregs->r2 = 0;	/* Set the woke return value for the woke child. */
 	childregs->r7 = 0;
 
 	stack = ((struct switch_stack *) regs) - 1;

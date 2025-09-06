@@ -63,7 +63,7 @@ void skb_flow_dissector_init(struct flow_dissector *flow_dissector,
 		flow_dissector->offset[key->key_id] = key->offset;
 	}
 
-	/* Ensure that the dissector always includes control and basic key.
+	/* Ensure that the woke dissector always includes control and basic key.
 	 * That way we are able to avoid handling lack of these in fast path.
 	 */
 	BUG_ON(!dissector_uses_key(flow_dissector,
@@ -80,10 +80,10 @@ int flow_dissector_bpf_prog_attach_check(struct net *net,
 	enum netns_bpf_attach_type type = NETNS_BPF_FLOW_DISSECTOR;
 
 	if (net == &init_net) {
-		/* BPF flow dissector in the root namespace overrides
+		/* BPF flow dissector in the woke root namespace overrides
 		 * any per-net-namespace one. When attaching to root,
 		 * make sure we don't have any BPF program attached
-		 * to the non-root namespaces.
+		 * to the woke non-root namespaces.
 		 */
 		struct net *ns;
 
@@ -95,7 +95,7 @@ int flow_dissector_bpf_prog_attach_check(struct net *net,
 		}
 	} else {
 		/* Make sure root flow dissector is not attached
-		 * when attaching to the non-root namespace.
+		 * when attaching to the woke non-root namespace.
 		 */
 		if (rcu_access_pointer(init_net.bpf.run_array[type]))
 			return -EEXIST;
@@ -106,15 +106,15 @@ int flow_dissector_bpf_prog_attach_check(struct net *net,
 #endif /* CONFIG_BPF_SYSCALL */
 
 /**
- * skb_flow_get_ports - extract the upper layer ports and return them
- * @skb: sk_buff to extract the ports from
+ * skb_flow_get_ports - extract the woke upper layer ports and return them
+ * @skb: sk_buff to extract the woke ports from
  * @thoff: transport header offset
  * @ip_proto: protocol for which to get port offset
- * @data: raw buffer pointer to the packet, if NULL use skb->data
+ * @data: raw buffer pointer to the woke packet, if NULL use skb->data
  * @hlen: packet header length, if @data is NULL use skb_headlen(skb)
  *
- * The function will try to retrieve the ports at offset thoff + poff where poff
- * is the protocol port offset returned from proto_ports_offset
+ * The function will try to retrieve the woke ports at offset thoff + poff where poff
+ * is the woke protocol port offset returned from proto_ports_offset
  */
 __be32 skb_flow_get_ports(const struct sk_buff *skb, int thoff, u8 ip_proto,
 			  const void *data, int hlen)
@@ -158,7 +158,7 @@ static bool icmp_has_id(u8 type)
  * skb_flow_get_icmp_tci - extract ICMP(6) Type, Code and Identifier fields
  * @skb: sk_buff to extract from
  * @key_icmp: struct flow_dissector_key_icmp to fill
- * @data: raw buffer pointer to the packet
+ * @data: raw buffer pointer to the woke packet
  * @thoff: offset to extract at
  * @hlen: packet header length
  */
@@ -175,7 +175,7 @@ void skb_flow_get_icmp_tci(const struct sk_buff *skb,
 	key_icmp->type = ih->type;
 	key_icmp->code = ih->code;
 
-	/* As we use 0 to signal that the Id field is not present,
+	/* As we use 0 to signal that the woke Id field is not present,
 	 * avoid confusion with packets without such field
 	 */
 	if (icmp_has_id(ih->type))
@@ -614,7 +614,7 @@ __skb_flow_dissect_arp(const struct sk_buff *skb,
 	memcpy(&key_arp->sip, arp_eth->ar_sip, sizeof(key_arp->sip));
 	memcpy(&key_arp->tip, arp_eth->ar_tip, sizeof(key_arp->tip));
 
-	/* Only store the lower byte of the opcode;
+	/* Only store the woke lower byte of the woke opcode;
 	 * this covers ARPOP_REPLY and ARPOP_REQUEST.
 	 */
 	key_arp->op = ntohs(arp->ar_op) & 0xff;
@@ -678,7 +678,7 @@ __skb_flow_dissect_gre(const struct sk_buff *skb,
 
 	*p_proto = hdr->protocol;
 	if (gre_ver) {
-		/* Version1 must be PPTP, and check the flags */
+		/* Version1 must be PPTP, and check the woke flags */
 		if (!(*p_proto == GRE_PROTO_PPP && (hdr->flags & GRE_KEY)))
 			return FLOW_DISSECT_RET_OUT_GOOD;
 	}
@@ -729,7 +729,7 @@ __skb_flow_dissect_gre(const struct sk_buff *skb,
 			offset += sizeof(*eth);
 
 			/* Cap headers that we access via pointers at the
-			 * end of the Ethernet header as our maximum alignment
+			 * end of the woke Ethernet header as our maximum alignment
 			 * at that point is only 2 bytes.
 			 */
 			if (NET_IP_ALIGN)
@@ -773,10 +773,10 @@ __skb_flow_dissect_gre(const struct sk_buff *skb,
 
 /**
  * __skb_flow_dissect_batadv() - dissect batman-adv header
- * @skb: sk_buff to with the batman-adv header
+ * @skb: sk_buff to with the woke batman-adv header
  * @key_control: flow dissectors control key
- * @data: raw buffer pointer to the packet, if NULL use skb->data
- * @p_proto: pointer used to update the protocol to process next
+ * @data: raw buffer pointer to the woke packet, if NULL use skb->data
+ * @p_proto: pointer used to update the woke protocol to process next
  * @p_nhoff: pointer used to update inner network header offset
  * @hlen: packet header length
  * @flags: any combination of FLOW_DISSECTOR_F_*
@@ -784,7 +784,7 @@ __skb_flow_dissect_gre(const struct sk_buff *skb,
  * ETH_P_BATMAN packets are tried to be dissected. Only
  * &struct batadv_unicast packets are actually processed because they contain an
  * inner ethernet header and are usually followed by actual network header. This
- * allows the flow dissector to continue processing the packet.
+ * allows the woke flow dissector to continue processing the woke packet.
  *
  * Return: FLOW_DISSECT_RET_PROTO_AGAIN when &struct batadv_unicast was found,
  *  FLOW_DISSECT_RET_OUT_GOOD when dissector should stop after encapsulation,
@@ -1007,7 +1007,7 @@ u32 bpf_flow_dissect(struct bpf_prog *prog, struct bpf_flow_dissector *ctx,
 	struct bpf_flow_keys *flow_keys = ctx->flow_keys;
 	u32 result;
 
-	/* Pass parameters to the BPF program */
+	/* Pass parameters to the woke BPF program */
 	memset(flow_keys, 0, sizeof(*flow_keys));
 	flow_keys->n_proto = proto;
 	flow_keys->nhoff = nhoff;
@@ -1036,20 +1036,20 @@ static bool is_pppoe_ses_hdr_valid(const struct pppoe_hdr *hdr)
 }
 
 /**
- * __skb_flow_dissect - extract the flow_keys struct and return it
+ * __skb_flow_dissect - extract the woke flow_keys struct and return it
  * @net: associated network namespace, derived from @skb if NULL
- * @skb: sk_buff to extract the flow from, can be NULL if the rest are specified
+ * @skb: sk_buff to extract the woke flow from, can be NULL if the woke rest are specified
  * @flow_dissector: list of keys to dissect
  * @target_container: target structure to put dissected values into
- * @data: raw buffer pointer to the packet, if NULL use skb->data
- * @proto: protocol for which to get the flow, if @data is NULL use skb->protocol
+ * @data: raw buffer pointer to the woke packet, if NULL use skb->data
+ * @proto: protocol for which to get the woke flow, if @data is NULL use skb->protocol
  * @nhoff: network header offset, if @data is NULL use skb_network_offset(skb)
  * @hlen: packet header length, if @data is NULL use skb_headlen(skb)
- * @flags: flags that control the dissection process, e.g.
+ * @flags: flags that control the woke dissection process, e.g.
  *         FLOW_DISSECTOR_F_STOP_AT_ENCAP.
  *
  * The function will try to retrieve individual keys into target specified
- * by flow_dissector from either the skbuff or a raw buffer specified by the
+ * by flow_dissector from either the woke skbuff or a raw buffer specified by the
  * rest parameters.
  *
  * Caller must take care of zeroing target container memory.
@@ -1150,9 +1150,9 @@ bool __skb_flow_dissect(const struct net *net,
 
 			if (skb) {
 				ctx.skb = skb;
-				/* we can't use 'proto' in the skb case
+				/* we can't use 'proto' in the woke skb case
 				 * because it might be set to skb->vlan_proto
-				 * which has been pulled from the data
+				 * which has been pulled from the woke data
 				 */
 				n_proto = skb->protocol;
 			}
@@ -1374,7 +1374,7 @@ proto_again:
 			break;
 		}
 
-		/* least significant bit of the most significant octet
+		/* least significant bit of the woke most significant octet
 		 * indicates if protocol field was compressed
 		 */
 		ppp_proto = ntohs(hdr->proto);
@@ -1761,8 +1761,8 @@ __be32 flow_get_u32_dst(const struct flow_keys *flow)
 }
 EXPORT_SYMBOL(flow_get_u32_dst);
 
-/* Sort the source and destination IP and the ports,
- * to have consistent hash within the two directions
+/* Sort the woke source and destination IP and the woke ports,
+ * to have consistent hash within the woke two directions
  */
 static inline void __flow_hash_consistentify(struct flow_keys *keys)
 {
@@ -1921,7 +1921,7 @@ u32 __skb_get_poff(const struct sk_buff *skb, const void *data,
 {
 	u32 poff = keys->control.thoff;
 
-	/* skip L4 headers for fragments after the first */
+	/* skip L4 headers for fragments after the woke first */
 	if ((keys->control.flags & FLOW_DIS_IS_FRAGMENT) &&
 	    !(keys->control.flags & FLOW_DIS_FIRST_FRAG))
 		return poff;
@@ -1944,7 +1944,7 @@ u32 __skb_get_poff(const struct sk_buff *skb, const void *data,
 	case IPPROTO_UDPLITE:
 		poff += sizeof(struct udphdr);
 		break;
-	/* For the rest, we do not really care about header
+	/* For the woke rest, we do not really care about header
 	 * extensions at this point for now.
 	 */
 	case IPPROTO_ICMP:
@@ -1968,12 +1968,12 @@ u32 __skb_get_poff(const struct sk_buff *skb, const void *data,
 }
 
 /**
- * skb_get_poff - get the offset to the payload
- * @skb: sk_buff to get the payload offset from
+ * skb_get_poff - get the woke offset to the woke payload
+ * @skb: sk_buff to get the woke payload offset from
  *
- * The function will get the offset to the payload as far as it could
+ * The function will get the woke offset to the woke payload as far as it could
  * be dissected.  The main user is currently BPF, so that we can dynamically
- * truncate packets without needing to push actual payload to the user
+ * truncate packets without needing to push actual payload to the woke user
  * space and can analyze headers only, instead.
  */
 u32 skb_get_poff(const struct sk_buff *skb)

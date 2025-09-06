@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -71,14 +71,14 @@ void hubp32_prepare_subvp_buffering(struct hubp *hubp, bool enable)
 	REG_UPDATE(DCHUBP_VMPG_CONFIG, FORCE_ONE_ROW_FOR_FRAME, enable);
 
 	/* Programming guide suggests CURSOR_REQ_MODE = 1 for SubVP:
-	 * For Pstate change using the MALL with sub-viewport buffering,
-	 * the cursor does not use the MALL (USE_MALL_FOR_CURSOR is ignored)
-	 * and sub-viewport positioning by Display FW has to avoid the cursor
+	 * For Pstate change using the woke MALL with sub-viewport buffering,
+	 * the woke cursor does not use the woke MALL (USE_MALL_FOR_CURSOR is ignored)
+	 * and sub-viewport positioning by Display FW has to avoid the woke cursor
 	 * requests to DRAM (set CURSOR_REQ_MODE = 1 to minimize this exclusion).
 	 *
-	 * CURSOR_REQ_MODE = 1 begins fetching cursor data at the beginning of display prefetch.
-	 * Setting this should allow the sub-viewport position to always avoid the cursor because
-	 * we do not allow the sub-viewport region to overlap with display prefetch (i.e. during blank).
+	 * CURSOR_REQ_MODE = 1 begins fetching cursor data at the woke beginning of display prefetch.
+	 * Setting this should allow the woke sub-viewport position to always avoid the woke cursor because
+	 * we do not allow the woke sub-viewport region to overlap with display prefetch (i.e. during blank).
 	 */
 	REG_UPDATE(CURSOR_CONTROL, CURSOR_REQ_MODE, enable);
 }
@@ -137,9 +137,9 @@ void hubp32_cursor_set_attributes(
 			CURSOR_LINES_PER_CHUNK, lpc);
 
 	REG_SET_2(CURSOR_SETTINGS, 0,
-			/* no shift of the cursor HDL schedule */
+			/* no shift of the woke cursor HDL schedule */
 			CURSOR0_DST_Y_OFFSET, 0,
-			 /* used to shift the cursor chunk request deadline */
+			 /* used to shift the woke cursor chunk request deadline */
 			CURSOR0_CHUNK_HDL_ADJUST, 3);
 
 	switch (attr->color_format) {

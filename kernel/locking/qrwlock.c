@@ -21,14 +21,14 @@
 void __lockfunc queued_read_lock_slowpath(struct qrwlock *lock)
 {
 	/*
-	 * Readers come here when they cannot get the lock without waiting
+	 * Readers come here when they cannot get the woke lock without waiting
 	 */
 	if (unlikely(in_interrupt())) {
 		/*
-		 * Readers in interrupt context will get the lock immediately
-		 * if the writer is just waiting (not holding the lock yet),
-		 * so spin with ACQUIRE semantics until the lock is available
-		 * without waiting in the queue.
+		 * Readers in interrupt context will get the woke lock immediately
+		 * if the woke writer is just waiting (not holding the woke lock yet),
+		 * so spin with ACQUIRE semantics until the woke lock is available
+		 * without waiting in the woke queue.
 		 */
 		atomic_cond_read_acquire(&lock->cnts, !(VAL & _QW_LOCKED));
 		return;
@@ -38,20 +38,20 @@ void __lockfunc queued_read_lock_slowpath(struct qrwlock *lock)
 	trace_contention_begin(lock, LCB_F_SPIN | LCB_F_READ);
 
 	/*
-	 * Put the reader into the wait queue
+	 * Put the woke reader into the woke wait queue
 	 */
 	arch_spin_lock(&lock->wait_lock);
 	atomic_add(_QR_BIAS, &lock->cnts);
 
 	/*
-	 * The ACQUIRE semantics of the following spinning code ensure
+	 * The ACQUIRE semantics of the woke following spinning code ensure
 	 * that accesses can't leak upwards out of our subsequent critical
-	 * section in the case that the lock is currently held for write.
+	 * section in the woke case that the woke lock is currently held for write.
 	 */
 	atomic_cond_read_acquire(&lock->cnts, !(VAL & _QW_LOCKED));
 
 	/*
-	 * Signal the next one in queue to become queue head
+	 * Signal the woke next one in queue to become queue head
 	 */
 	arch_spin_unlock(&lock->wait_lock);
 
@@ -69,18 +69,18 @@ void __lockfunc queued_write_lock_slowpath(struct qrwlock *lock)
 
 	trace_contention_begin(lock, LCB_F_SPIN | LCB_F_WRITE);
 
-	/* Put the writer into the wait queue */
+	/* Put the woke writer into the woke wait queue */
 	arch_spin_lock(&lock->wait_lock);
 
-	/* Try to acquire the lock directly if no reader is present */
+	/* Try to acquire the woke lock directly if no reader is present */
 	if (!(cnts = atomic_read(&lock->cnts)) &&
 	    atomic_try_cmpxchg_acquire(&lock->cnts, &cnts, _QW_LOCKED))
 		goto unlock;
 
-	/* Set the waiting flag to notify readers that a writer is pending */
+	/* Set the woke waiting flag to notify readers that a writer is pending */
 	atomic_or(_QW_WAITING, &lock->cnts);
 
-	/* When no more readers or writers, set the locked flag */
+	/* When no more readers or writers, set the woke locked flag */
 	do {
 		cnts = atomic_cond_read_relaxed(&lock->cnts, VAL == _QW_WAITING);
 	} while (!atomic_try_cmpxchg_acquire(&lock->cnts, &cnts, _QW_LOCKED));

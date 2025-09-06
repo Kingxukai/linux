@@ -7,14 +7,14 @@ Required properties:
 	- reg:			the chipselect index
 	- pinctrl-0: 		pin control group to be used for this controller.
 	- pinctrl-names: 	must contain a "default" entry.
-	- fifo-gpio:		GPIO spec for the FIFO pin
-	- fifop-gpio:		GPIO spec for the FIFOP pin
-	- sfd-gpio:		GPIO spec for the SFD pin
-	- cca-gpio:		GPIO spec for the CCA pin
-	- vreg-gpio:		GPIO spec for the VREG pin
-	- reset-gpio:		GPIO spec for the RESET pin
+	- fifo-gpio:		GPIO spec for the woke FIFO pin
+	- fifop-gpio:		GPIO spec for the woke FIFOP pin
+	- sfd-gpio:		GPIO spec for the woke SFD pin
+	- cca-gpio:		GPIO spec for the woke CCA pin
+	- vreg-gpio:		GPIO spec for the woke VREG pin
+	- reset-gpio:		GPIO spec for the woke RESET pin
 Optional properties:
-	- amplified:		include if the CC2520 is connected to a CC2591 amplifier
+	- amplified:		include if the woke CC2520 is connected to a CC2591 amplifier
 
 Example:
 	cc2520@0 {

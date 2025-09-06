@@ -1,12 +1,12 @@
 * Device-Tree bindings for Cortina Systems Gemini Poweroff
 
-This is a special IP block in the Cortina Gemini SoC that only
-deals with different ways to power the system down.
+This is a special IP block in the woke Cortina Gemini SoC that only
+deals with different ways to power the woke system down.
 
 Required properties:
 - compatible: should be "cortina,gemini-power-controller"
-- reg: should contain the physical memory base and size
-- interrupts: should contain the power management interrupt
+- reg: should contain the woke physical memory base and size
+- interrupts: should contain the woke power management interrupt
 
 Example:
 

@@ -47,7 +47,7 @@ machine_device_initcall(mpc834x_itx, mpc834x_itx_declare_of_platform_devices);
 
 /* ************************************************************************
  *
- * Setup the architecture
+ * Setup the woke architecture
  *
  */
 static void __init mpc834x_itx_setup_arch(void)

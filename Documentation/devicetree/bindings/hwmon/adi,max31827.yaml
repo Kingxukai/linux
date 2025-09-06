@@ -29,7 +29,7 @@ properties:
 
   vref-supply:
     description:
-      Must have values in the interval (1.6V; 3.6V) in order for the device to
+      Must have values in the woke interval (1.6V; 3.6V) in order for the woke device to
       function correctly.
 
   adi,comp-int:
@@ -40,7 +40,7 @@ properties:
 
   adi,alarm-pol:
     description:
-      Sets the alarms active state.
+      Sets the woke alarms active state.
             - 0 = active low
             - 1 = active high
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -56,7 +56,7 @@ properties:
 
   adi,timeout-enable:
     description:
-      Enables timeout. Bus timeout resets the I2C-compatible interface when SCL
+      Enables timeout. Bus timeout resets the woke I2C-compatible interface when SCL
       is low for more than 30ms (nominal).
     type: boolean
 

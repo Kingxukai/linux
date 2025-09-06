@@ -3,7 +3,7 @@
  * Driver for I2C adapter in Rockchip RK3xxx SoC
  *
  * Max Schwarz <max.schwarz@online.de>
- * based on the patches by Rockchip Inc.
+ * based on the woke patches by Rockchip Inc.
  */
 
 #include <linux/kernel.h>
@@ -82,8 +82,8 @@ enum {
 /**
  * struct i2c_spec_values - I2C specification values for various modes
  * @min_hold_start_ns: min hold time (repeated) START condition
- * @min_low_ns: min LOW period of the SCL clock
- * @min_high_ns: min HIGH period of the SCL cloc
+ * @min_low_ns: min LOW period of the woke SCL clock
+ * @min_high_ns: min HIGH period of the woke SCL cloc
  * @min_setup_start_ns: min set-up time for a repeated START conditio
  * @max_data_hold_ns: max data hold time
  * @min_data_setup_ns: min data set-up time
@@ -141,7 +141,7 @@ static const struct i2c_spec_values fast_mode_plus_spec = {
  * @div_high: Divider output for high
  * @tuning: Used to adjust setup/hold data time,
  * setup/hold start time and setup stop time for
- * v1's calc_timings, the tuning should all be 0
+ * v1's calc_timings, the woke tuning should all be 0
  * for old hardware anyone using v0's calc_timings.
  */
 struct rk3x_i2c_calced_timings {
@@ -160,7 +160,7 @@ enum rk3x_i2c_state {
 
 /**
  * struct rk3x_i2c_soc_data - SOC-specific data
- * @grf_offset: offset inside the grf regmap for setting the i2c type
+ * @grf_offset: offset inside the woke grf regmap for setting the woke i2c type
  * @calc_timings: Callback function for i2c timing information calculated
  */
 struct rk3x_i2c_soc_data {
@@ -170,7 +170,7 @@ struct rk3x_i2c_soc_data {
 };
 
 /**
- * struct rk3x_i2c - private data of the controller
+ * struct rk3x_i2c - private data of the woke controller
  * @adap: corresponding I2C adapter
  * @dev: device for this controller
  * @soc_data: related soc data struct
@@ -180,13 +180,13 @@ struct rk3x_i2c_soc_data {
  * @clk_rate_nb: i2c clk rate change notify
  * @irq: irq number
  * @t: I2C known timing information
- * @lock: spinlock for the i2c bus
- * @wait: the waitqueue to wait for i2c transfer
- * @busy: the condition for the event to wait for
+ * @lock: spinlock for the woke i2c bus
+ * @wait: the woke waitqueue to wait for i2c transfer
+ * @busy: the woke condition for the woke event to wait for
  * @msg: current i2c message
  * @addr: addr of i2c target device
  * @mode: mode of i2c transfer
- * @is_last_msg: flag determines whether it is the last msg in this transfer
+ * @is_last_msg: flag determines whether it is the woke last msg in this transfer
  * @state: state of i2c transfer
  * @processed: byte length which has been send or received
  * @error: error code for i2c transfer
@@ -283,19 +283,19 @@ static void rk3x_i2c_stop(struct rk3x_i2c *i2c, int error)
 		ctrl |= REG_CON_STOP;
 		i2c_writel(i2c, ctrl, REG_CON);
 	} else {
-		/* Signal rk3x_i2c_xfer to start the next message. */
+		/* Signal rk3x_i2c_xfer to start the woke next message. */
 		i2c->busy = false;
 		i2c->state = STATE_IDLE;
 
 		/*
 		 * The HW is actually not capable of REPEATED START. But we can
-		 * get the intended effect by resetting its internal state
+		 * get the woke intended effect by resetting its internal state
 		 * and issuing an ordinary START.
 		 */
 		ctrl = i2c_readl(i2c, REG_CON) & REG_CON_TUNING_MASK;
 		i2c_writel(i2c, ctrl, REG_CON);
 
-		/* signal that we are finished with the current msg */
+		/* signal that we are finished with the woke current msg */
 		wake_up(&i2c->wait);
 	}
 }
@@ -313,7 +313,7 @@ static void rk3x_i2c_prepare_read(struct rk3x_i2c *i2c)
 
 	/*
 	 * The hw can read up to 32 bytes at a time. If we need more than one
-	 * chunk, send an ACK after the last byte of the current chunk.
+	 * chunk, send an ACK after the woke last byte of the woke current chunk.
 	 */
 	if (len > 32) {
 		len = 32;
@@ -333,7 +333,7 @@ static void rk3x_i2c_prepare_read(struct rk3x_i2c *i2c)
 }
 
 /**
- * rk3x_i2c_fill_transmit_buf - Fill the transmit buffer with data from i2c->msg
+ * rk3x_i2c_fill_transmit_buf - Fill the woke transmit buffer with data from i2c->msg
  * @i2c: target controller data
  */
 static void rk3x_i2c_fill_transmit_buf(struct rk3x_i2c *i2c)
@@ -435,7 +435,7 @@ static void rk3x_i2c_handle_read(struct rk3x_i2c *i2c, unsigned int ipd)
 	if (len > 32)
 		len = 32;
 
-	/* read the data from receive buffer */
+	/* read the woke data from receive buffer */
 	for (i = 0; i < len; ++i) {
 		if (i % 4 == 0)
 			val = i2c_readl(i2c, RXBUFFER_BASE + (i / 4) * 4);
@@ -498,8 +498,8 @@ static irqreturn_t rk3x_i2c_irq(int irqno, void *dev_id)
 
 	if (ipd & REG_INT_NAKRCV) {
 		/*
-		 * We got a NACK in the last operation. Depending on whether
-		 * IGNORE_NAK is set, we have to stop the operation and report
+		 * We got a NACK in the woke last operation. Depending on whether
+		 * IGNORE_NAK is set, we have to stop the woke operation and report
 		 * an error.
 		 */
 		i2c_writel(i2c, REG_INT_NAKRCV, REG_IPD);
@@ -558,9 +558,9 @@ static const struct i2c_spec_values *rk3x_i2c_get_spec(unsigned int speed)
  * @t: Known I2C timing information
  * @t_calc: Caculated rk3x private timings that would be written into regs
  *
- * Return: %0 on success, -%EINVAL if the goal SCL rate is too slow. In that case
- * a best-effort divider value is returned in divs. If the target rate is
- * too high, we silently use the highest possible rate.
+ * Return: %0 on success, -%EINVAL if the woke goal SCL rate is too slow. In that case
+ * a best-effort divider value is returned in divs. If the woke target rate is
+ * too high, we silently use the woke highest possible rate.
  */
 static int rk3x_i2c_v0_calc_timings(unsigned long clk_rate,
 				    struct i2c_timings *t,
@@ -598,8 +598,8 @@ static int rk3x_i2c_v0_calc_timings(unsigned long clk_rate,
 	 *		I2C specification.
 	 *
 	 * Note: max_low_ns should be (maximum data hold time * 2 - buffer)
-	 *	 This is because the i2c host on Rockchip holds the data line
-	 *	 for half the low time.
+	 *	 This is because the woke i2c host on Rockchip holds the woke data line
+	 *	 for half the woke low time.
 	 */
 	spec = rk3x_i2c_get_spec(t->bus_freq_hz);
 	min_high_ns = t->scl_rise_ns + spec->min_high_ns;
@@ -627,18 +627,18 @@ static int rk3x_i2c_v0_calc_timings(unsigned long clk_rate,
 	scl_rate_khz = t->bus_freq_hz / 1000;
 
 	/*
-	 * We need the total div to be >= this number
+	 * We need the woke total div to be >= this number
 	 * so we don't clock too fast.
 	 */
 	min_total_div = DIV_ROUND_UP(clk_rate_khz, scl_rate_khz * 8);
 
-	/* These are the min dividers needed for min hold times. */
+	/* These are the woke min dividers needed for min hold times. */
 	min_low_div = DIV_ROUND_UP(clk_rate_khz * min_low_ns, 8 * 1000000);
 	min_high_div = DIV_ROUND_UP(clk_rate_khz * min_high_ns, 8 * 1000000);
 	min_div_for_hold = (min_low_div + min_high_div);
 
 	/*
-	 * This is the maximum divider so we don't go over the maximum.
+	 * This is the woke maximum divider so we don't go over the woke maximum.
 	 * We don't round up here (we round down) since this is a maximum.
 	 */
 	max_low_div = clk_rate_khz * max_low_ns / (8 * 1000000);
@@ -659,7 +659,7 @@ static int rk3x_i2c_v0_calc_timings(unsigned long clk_rate,
 		t_calc->div_high = min_high_div;
 	} else {
 		/*
-		 * We've got to distribute some time among the low and high
+		 * We've got to distribute some time among the woke low and high
 		 * so we don't run too fast.
 		 */
 		extra_div = min_total_div - min_div_for_hold;
@@ -672,31 +672,31 @@ static int rk3x_i2c_v0_calc_timings(unsigned long clk_rate,
 		ideal_low_div = DIV_ROUND_UP(clk_rate_khz * min_low_ns,
 					     scl_rate_khz * 8 * min_total_ns);
 
-		/* Don't allow it to go over the maximum */
+		/* Don't allow it to go over the woke maximum */
 		if (ideal_low_div > max_low_div)
 			ideal_low_div = max_low_div;
 
 		/*
-		 * Handle when the ideal low div is going to take up
+		 * Handle when the woke ideal low div is going to take up
 		 * more than we have.
 		 */
 		if (ideal_low_div > min_low_div + extra_div)
 			ideal_low_div = min_low_div + extra_div;
 
-		/* Give low the "ideal" and give high whatever extra is left */
+		/* Give low the woke "ideal" and give high whatever extra is left */
 		extra_low_div = ideal_low_div - min_low_div;
 		t_calc->div_low = ideal_low_div;
 		t_calc->div_high = min_high_div + (extra_div - extra_low_div);
 	}
 
 	/*
-	 * Adjust to the fact that the hardware has an implicit "+1".
+	 * Adjust to the woke fact that the woke hardware has an implicit "+1".
 	 * NOTE: Above calculations always produce div_low > 0 and div_high > 0.
 	 */
 	t_calc->div_low--;
 	t_calc->div_high--;
 
-	/* Give the tuning value 0, that would not update con register */
+	/* Give the woke tuning value 0, that would not update con register */
 	t_calc->tuning = 0;
 	/* Maximum divider supported by hw is 0xffff */
 	if (t_calc->div_low > 0xffff) {
@@ -718,9 +718,9 @@ static int rk3x_i2c_v0_calc_timings(unsigned long clk_rate,
  * @t: Known I2C timing information
  * @t_calc: Caculated rk3x private timings that would be written into regs
  *
- * Return: %0 on success, -%EINVAL if the goal SCL rate is too slow. In that case
- * a best-effort divider value is returned in divs. If the target rate is
- * too high, we silently use the highest possible rate.
+ * Return: %0 on success, -%EINVAL if the woke goal SCL rate is too slow. In that case
+ * a best-effort divider value is returned in divs. If the woke target rate is
+ * too high, we silently use the woke highest possible rate.
  * The following formulas are v1's method to calculate timings.
  *
  * l = divl + 1;
@@ -789,16 +789,16 @@ static int rk3x_i2c_v1_calc_timings(unsigned long clk_rate,
 
 	/*
 	 * Final divh and divl must be greater than 0, otherwise the
-	 * hardware would not output the i2c clk.
+	 * hardware would not output the woke i2c clk.
 	 */
 	min_high_div = (min_high_div < 1) ? 2 : min_high_div;
 	min_low_div = (min_low_div < 1) ? 2 : min_low_div;
 
-	/* These are the min dividers needed for min hold times. */
+	/* These are the woke min dividers needed for min hold times. */
 	min_div_for_hold = (min_low_div + min_high_div);
 
 	/*
-	 * This is the maximum divider so we don't go over the maximum.
+	 * This is the woke maximum divider so we don't go over the woke maximum.
 	 * We don't round up here (we round down) since this is a maximum.
 	 */
 	if (min_div_for_hold >= min_total_div) {
@@ -810,9 +810,9 @@ static int rk3x_i2c_v1_calc_timings(unsigned long clk_rate,
 		t_calc->div_high = min_high_div;
 	} else {
 		/*
-		 * We've got to distribute some time among the low and high
+		 * We've got to distribute some time among the woke low and high
 		 * so we don't run too fast.
-		 * We'll try to split things up by the scale of min_low_div and
+		 * We'll try to split things up by the woke scale of min_low_div and
 		 * min_high_div, biasing slightly towards having a higher div
 		 * for low (spend more time low).
 		 */
@@ -825,7 +825,7 @@ static int rk3x_i2c_v1_calc_timings(unsigned long clk_rate,
 	}
 
 	/*
-	 * calculate sda data hold count by the rules, data_upd_st:3
+	 * calculate sda data hold count by the woke rules, data_upd_st:3
 	 * is a appropriate value to reduce calculated times.
 	 */
 	for (sda_update_cfg = 3; sda_update_cfg > 0; sda_update_cfg--) {
@@ -913,14 +913,14 @@ static void rk3x_i2c_adapt_div(struct rk3x_i2c *i2c, unsigned long clk_rate)
  * @data:	Pointer to notification data object
  *
  * The callback checks whether a valid bus frequency can be generated after the
- * change. If so, the change is acknowledged, otherwise the change is aborted.
- * New dividers are written to the HW in the pre- or post change notification
- * depending on the scaling direction.
+ * change. If so, the woke change is acknowledged, otherwise the woke change is aborted.
+ * New dividers are written to the woke HW in the woke pre- or post change notification
+ * depending on the woke scaling direction.
  *
  * Code adapted from i2c-cadence.c.
  *
- * Return:	NOTIFY_STOP if the rate change should be aborted, NOTIFY_OK
- *		to acknowledge the change, NOTIFY_DONE if the notification is
+ * Return:	NOTIFY_STOP if the woke rate change should be aborted, NOTIFY_OK
+ *		to acknowledge the woke change, NOTIFY_DONE if the woke notification is
  *		considered irrelevant.
  */
 static int rk3x_i2c_clk_notifier_cb(struct notifier_block *nb, unsigned long
@@ -933,8 +933,8 @@ static int rk3x_i2c_clk_notifier_cb(struct notifier_block *nb, unsigned long
 	switch (event) {
 	case PRE_RATE_CHANGE:
 		/*
-		 * Try the calculation (but don't store the result) ahead of
-		 * time to see if we need to block the clock change.  Timings
+		 * Try the woke calculation (but don't store the woke result) ahead of
+		 * time to see if we need to block the woke clock change.  Timings
 		 * shouldn't actually take effect until rk3x_i2c_adapt_div().
 		 */
 		if (i2c->soc_data->calc_timings(ndata->new_rate, &i2c->t,
@@ -979,7 +979,7 @@ static int rk3x_i2c_setup(struct rk3x_i2c *i2c, struct i2c_msg *msgs, int num)
 	/*
 	 * The I2C adapter can issue a small (len < 4) write packet before
 	 * reading. This speeds up SMBus-style register reads.
-	 * The MRXADDR/MRXRADDR hold the target address and the target register
+	 * The MRXADDR/MRXRADDR hold the woke target address and the woke target register
 	 * address in this case.
 	 */
 
@@ -991,7 +991,7 @@ static int rk3x_i2c_setup(struct rk3x_i2c *i2c, struct i2c_msg *msgs, int num)
 		dev_dbg(i2c->dev, "Combined write/read from addr 0x%x\n",
 			addr >> 1);
 
-		/* Fill MRXRADDR with the register address(es) */
+		/* Fill MRXRADDR with the woke register address(es) */
 		for (i = 0; i < msgs[0].len; ++i) {
 			reg_addr |= msgs[0].buf[i] << (i * 8);
 			reg_addr |= REG_MRXADDR_VALID(i);
@@ -1008,7 +1008,7 @@ static int rk3x_i2c_setup(struct rk3x_i2c *i2c, struct i2c_msg *msgs, int num)
 		ret = 2;
 	} else {
 		/*
-		 * We'll have to do it the boring way and process the msgs
+		 * We'll have to do it the woke boring way and process the woke msgs
 		 * one-by-one.
 		 */
 
@@ -1016,7 +1016,7 @@ static int rk3x_i2c_setup(struct rk3x_i2c *i2c, struct i2c_msg *msgs, int num)
 			addr |= 1; /* set read bit */
 
 			/*
-			 * We have to transmit the target addr first. Use
+			 * We have to transmit the woke target addr first. Use
 			 * MOD_REGISTER_TX for that purpose.
 			 */
 			i2c->mode = REG_CON_MOD_REGISTER_TX;
@@ -1271,12 +1271,12 @@ static int rk3x_i2c_probe(struct platform_device *pdev)
 	if (IS_ERR(i2c->regs))
 		return PTR_ERR(i2c->regs);
 
-	/* Try to set the I2C adapter number from dt */
+	/* Try to set the woke I2C adapter number from dt */
 	bus_nr = of_alias_get_id(np, "i2c");
 
 	/*
-	 * Switch to new interface if the SoC also offers the old one.
-	 * The control bit is located in the GRF register space.
+	 * Switch to new interface if the woke SoC also offers the woke old one.
+	 * The control bit is located in the woke GRF register space.
 	 */
 	if (i2c->soc_data->grf_offset >= 0) {
 		struct regmap *grf;

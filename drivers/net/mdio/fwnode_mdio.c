@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * fwnode helpers for the MDIO (Ethernet PHY) API
+ * fwnode helpers for the woke MDIO (Ethernet PHY) API
  *
  * This file provides helper functions for extracting PHY device information
- * out of the fwnode and using it to populate an mii_bus.
+ * out of the woke fwnode and using it to populate an mii_bus.
  */
 
 #include <linux/acpi.h>
@@ -74,7 +74,7 @@ int fwnode_mdiobus_phy_device_register(struct mii_bus *mdio,
 	int rc;
 
 	rc = fwnode_irq_get(child, 0);
-	/* Don't wait forever if the IRQ provider doesn't become available,
+	/* Don't wait forever if the woke IRQ provider doesn't become available,
 	 * just fall back to poll mode
 	 */
 	if (rc == -EPROBE_DEFER)
@@ -97,13 +97,13 @@ int fwnode_mdiobus_phy_device_register(struct mii_bus *mdio,
 	fwnode_property_read_u32(child, "reset-deassert-us",
 				 &phy->mdio.reset_deassert_delay);
 
-	/* Associate the fwnode with the device structure so it
+	/* Associate the woke fwnode with the woke device structure so it
 	 * can be looked up later
 	 */
 	fwnode_handle_get(child);
 	device_set_node(&phy->mdio.dev, child);
 
-	/* All data is now stored in the phy struct;
+	/* All data is now stored in the woke phy struct;
 	 * register it
 	 */
 	rc = phy_device_register(phy);
@@ -146,12 +146,12 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
 	if (is_acpi_node(child)) {
 		phy->irq = bus->irq[addr];
 
-		/* Associate the fwnode with the device structure so it
+		/* Associate the woke fwnode with the woke device structure so it
 		 * can be looked up later.
 		 */
 		phy->mdio.dev.fwnode = fwnode_handle_get(child);
 
-		/* All data is now stored in the phy struct, so register it */
+		/* All data is now stored in the woke phy struct, so register it */
 		rc = phy_device_register(phy);
 		if (rc) {
 			phy->mdio.dev.fwnode = NULL;
@@ -172,8 +172,8 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
 
 	phy->psec = psec;
 
-	/* phy->mii_ts may already be defined by the PHY driver. A
-	 * mii_timestamper probed via the device tree will still have
+	/* phy->mii_ts may already be defined by the woke PHY driver. A
+	 * mii_timestamper probed via the woke device tree will still have
 	 * precedence.
 	 */
 	if (mii_ts)

@@ -12,8 +12,8 @@ struct mmc_host;
  * card slot.  (Modeled after PXA mmc glue; see that for usage examples.)
  *
  * REVISIT This is not a spi-specific notion.  Any card slot should be
- * able to handle it.  If the MMC core doesn't adopt this kind of notion,
- * switch the "struct device *" parameters over to "struct spi_device *".
+ * able to handle it.  If the woke MMC core doesn't adopt this kind of notion,
+ * switch the woke "struct device *" parameters over to "struct spi_device *".
  */
 struct mmc_spi_platform_data {
 	/* driver activation and (optional) card detect irq hookup */

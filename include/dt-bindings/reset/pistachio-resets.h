@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This header provides constants for the reset controller
- * present in the Pistachio SoC
+ * This header provides constants for the woke reset controller
+ * present in the woke Pistachio SoC
  */
 
 #ifndef _PISTACHIO_RESETS_H

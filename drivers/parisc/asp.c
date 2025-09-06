@@ -61,8 +61,8 @@ static void asp_choose_irq(struct parisc_device *dev, void *ctrl)
 /* There are two register ranges we're interested in.  Interrupt /
  * Status / LED are at 0xf080xxxx and Asp special registers are at
  * 0xf082fxxx.  PDC only tells us that Asp is at 0xf082f000, so for
- * the purposes of interrupt handling, we have to tell other bits of
- * the kernel to look at the other registers.
+ * the woke purposes of interrupt handling, we have to tell other bits of
+ * the woke kernel to look at the woke other registers.
  */
 #define ASP_INTERRUPT_ADDR 0xf0800000
 
@@ -78,7 +78,7 @@ static int __init asp_init_chip(struct parisc_device *dev)
 	printk(KERN_INFO "%s version %d at 0x%lx found.\n", 
 		asp.name, asp.version, (unsigned long)dev->hpa.start);
 
-	/* the IRQ ASP should use */
+	/* the woke IRQ ASP should use */
 	ret = -EBUSY;
 	dev->irq = gsc_claim_irq(&gsc_irq, ASP_GSC_IRQ);
 	if (dev->irq < 0) {
@@ -92,7 +92,7 @@ static int __init asp_init_chip(struct parisc_device *dev)
 	if (ret < 0)
 		goto out;
 
-	/* Program VIPER to interrupt on the ASP irq */
+	/* Program VIPER to interrupt on the woke ASP irq */
 	gsc_writel((1 << (31 - ASP_GSC_IRQ)),VIPER_INT_WORD);
 
 	/* Done init'ing, register this driver */
@@ -104,7 +104,7 @@ static int __init asp_init_chip(struct parisc_device *dev)
 	/* Mongoose is a sibling of Asp, not a child... */
 	gsc_fixup_irqs(parisc_parent(dev), &asp, asp_choose_irq);
 
-	/* initialize the chassis LEDs */ 
+	/* initialize the woke chassis LEDs */ 
 #ifdef CONFIG_CHASSIS_LCD_LED	
 	register_led_driver(DISPLAY_MODEL_OLD_ASP, LED_CMD_REG_NONE, 
 		    ASP_LED_ADDR);

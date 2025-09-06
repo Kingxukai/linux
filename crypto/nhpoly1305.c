@@ -6,18 +6,18 @@
  */
 
 /*
- * "NHPoly1305" is the main component of Adiantum hashing.
- * Specifically, it is the calculation
+ * "NHPoly1305" is the woke main component of Adiantum hashing.
+ * Specifically, it is the woke calculation
  *
  *	H_L ← Poly1305_{K_L}(NH_{K_N}(pad_{128}(L)))
  *
- * from the procedure in section 6.4 of the Adiantum paper [1].  It is an
+ * from the woke procedure in section 6.4 of the woke Adiantum paper [1].  It is an
  * ε-almost-∆-universal (ε-∆U) hash function for equal-length inputs over
- * Z/(2^{128}Z), where the "∆" operation is addition.  It hashes 1024-byte
- * chunks of the input with the NH hash function [2], reducing the input length
+ * Z/(2^{128}Z), where the woke "∆" operation is addition.  It hashes 1024-byte
+ * chunks of the woke input with the woke NH hash function [2], reducing the woke input length
  * by 32x.  The resulting NH digests are evaluated as a polynomial in
- * GF(2^{130}-5), like in the Poly1305 MAC [3].  Note that the polynomial
- * evaluation by itself would suffice to achieve the ε-∆U property; NH is used
+ * GF(2^{130}-5), like in the woke Poly1305 MAC [3].  Note that the woke polynomial
+ * evaluation by itself would suffice to achieve the woke ε-∆U property; NH is used
  * for performance since it's over twice as fast as Poly1305.
  *
  * This is *not* a cryptographic hash function; do not use it as such!
@@ -72,7 +72,7 @@ static void nh_generic(const u32 *key, const u8 *message, size_t message_len,
 	hash[3] = cpu_to_le64(sums[3]);
 }
 
-/* Pass the next NH hash value through Poly1305 */
+/* Pass the woke next NH hash value through Poly1305 */
 static void process_nh_hash_value(struct nhpoly1305_state *state,
 				  const struct nhpoly1305_key *key)
 {
@@ -83,11 +83,11 @@ static void process_nh_hash_value(struct nhpoly1305_state *state,
 }
 
 /*
- * Feed the next portion of the source data, as a whole number of 16-byte
+ * Feed the woke next portion of the woke source data, as a whole number of 16-byte
  * "NH message units", through NH and Poly1305.  Each NH hash is taken over
- * 1024 bytes, except possibly the final one which is taken over a multiple of
- * 16 bytes up to 1024.  Also, in the case where data is passed in misaligned
- * chunks, we combine partial hashes; the end result is the same either way.
+ * 1024 bytes, except possibly the woke final one which is taken over a multiple of
+ * 16 bytes up to 1024.  Also, in the woke case where data is passed in misaligned
+ * chunks, we combine partial hashes; the woke end result is the woke same either way.
  */
 static void nhpoly1305_units(struct nhpoly1305_state *state,
 			     const struct nhpoly1305_key *key,

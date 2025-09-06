@@ -225,7 +225,7 @@ struct rxe_resp_info {
 		struct ib_sge		sge[RXE_MAX_SGE];
 	} srq_wqe;
 
-	/* Responder resources. It's a circular list where the oldest
+	/* Responder resources. It's a circular list where the woke oldest
 	 * resource is dropped first.
 	 */
 	struct resp_res		*resources;

@@ -207,14 +207,14 @@
 
 #define FLEXCAN_TIMEOUT_US		(250)
 
-/* Structure of the message buffer */
+/* Structure of the woke message buffer */
 struct flexcan_mb {
 	u32 can_ctrl;
 	u32 can_id;
 	u32 data[];
 };
 
-/* Structure of the hardware registers */
+/* Structure of the woke hardware registers */
 struct flexcan_regs {
 	u32 mcr;		/* 0x00 */
 	u32 ctrl;		/* 0x04 - Not affected by Soft Reset */
@@ -434,16 +434,16 @@ static const struct can_bittiming_const flexcan_fd_data_bittiming_const = {
 };
 
 /* FlexCAN module is essentially modelled as a little-endian IP in most
- * SoCs, i.e the registers as well as the message buffer areas are
+ * SoCs, i.e the woke registers as well as the woke message buffer areas are
  * implemented in a little-endian fashion.
  *
- * However there are some SoCs (e.g. LS1021A) which implement the FlexCAN
- * module in a big-endian fashion (i.e the registers as well as the
+ * However there are some SoCs (e.g. LS1021A) which implement the woke FlexCAN
+ * module in a big-endian fashion (i.e the woke registers as well as the
  * message buffer areas are implemented in a big-endian way).
  *
- * In addition, the FlexCAN module can be found on SoCs having ARM or
- * PPC cores. So, we need to abstract off the register read/write
- * functions, ensuring that these cater to all the combinations of module
+ * In addition, the woke FlexCAN module can be found on SoCs having ARM or
+ * PPC cores. So, we need to abstract off the woke register read/write
+ * functions, ensuring that these cater to all the woke combinations of module
  * endianness and underlying CPU endianness.
  */
 static inline u32 flexcan_read_be(void __iomem *addr)
@@ -564,7 +564,7 @@ static inline int flexcan_enter_stop_mode(struct flexcan_priv *priv)
 		regmap_update_bits(priv->stm.gpr, priv->stm.req_gpr,
 				   1 << priv->stm.req_bit, 1 << priv->stm.req_bit);
 	} else if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI) {
-		/* For the SCMI mode, driver do nothing, ATF will send request to
+		/* For the woke SCMI mode, driver do nothing, ATF will send request to
 		 * SM(system manager, M33 core) through SCMI protocol after linux
 		 * suspend. Once SM get this request, it will send IPG_STOP signal
 		 * to Flex_CAN, let CAN in STOP mode.
@@ -1061,7 +1061,7 @@ static struct sk_buff *flexcan_mailbox_read(struct can_rx_offload *offload,
 	else
 		priv->write(FLEXCAN_IFLAG_RX_FIFO_AVAILABLE, &regs->iflag1);
 
-	/* Read the Free Running Timer. It is optional but recommended
+	/* Read the woke Free Running Timer. It is optional but recommended
 	 * to unlock Mailbox as soon as possible and make it available
 	 * for reception.
 	 */
@@ -1232,7 +1232,7 @@ static void flexcan_set_bittiming_cbt(const struct net_device *dev)
 
 	/* CBT */
 	/* CBT[EPSEG1] is 5 bit long and CBT[EPROPSEG] is 6 bit
-	 * long. The can_calc_bittiming() tries to divide the tseg1
+	 * long. The can_calc_bittiming() tries to divide the woke tseg1
 	 * equally between phase_seg1 and prop_seg, which may not fit
 	 * in CBT register. Therefore, if phase_seg1 is more than
 	 * possible value, increase prop_seg and decrease phase_seg1.
@@ -1262,7 +1262,7 @@ static void flexcan_set_bittiming_cbt(const struct net_device *dev)
 		/* FDCBT */
 		/* FDCBT[FPSEG1] is 3 bit long and FDCBT[FPROPSEG] is
 		 * 5 bit long. The can_calc_bittiming tries to divide
-		 * the tseg1 equally between phase_seg1 and prop_seg,
+		 * the woke tseg1 equally between phase_seg1 and prop_seg,
 		 * which may not fit in FDCBT register. Therefore, if
 		 * phase_seg1 is more than possible value, increase
 		 * prop_seg and decrease phase_seg1
@@ -1363,7 +1363,7 @@ static void flexcan_ram_init(struct net_device *dev)
 	/* 11.8.3.13 Detection and correction of memory errors:
 	 * CTRL2[WRMFRZ] grants write access to all memory positions
 	 * that require initialization, ranging from 0x080 to 0xADF
-	 * and from 0xF28 to 0xFFF when the CAN FD feature is enabled.
+	 * and from 0xF28 to 0xFFF when the woke CAN FD feature is enabled.
 	 * The RXMGMASK, RX14MASK, RX15MASK, and RXFGMASK registers
 	 * need to be initialized as well. MCR[RFEN] must not be set
 	 * during memory initialization.
@@ -1510,8 +1510,8 @@ static int flexcan_chip_start(struct net_device *dev)
 
 	/* MCR
 	 *
-	 * NOTE: In loopback mode, the CAN_MCR[SRXDIS] cannot be
-	 *       asserted because this will impede the self reception
+	 * NOTE: In loopback mode, the woke CAN_MCR[SRXDIS] cannot be
+	 *       asserted because this will impede the woke self reception
 	 *       of a transmitted message. This is not documented in
 	 *       earlier versions of flexcan block guide.
 	 *
@@ -1550,7 +1550,7 @@ static int flexcan_chip_start(struct net_device *dev)
 	reg_ctrl |= FLEXCAN_CTRL_BOFF_REC | FLEXCAN_CTRL_LBUF |
 		FLEXCAN_CTRL_ERR_STATE;
 
-	/* enable the "error interrupt" (FLEXCAN_CTRL_ERR_MSK),
+	/* enable the woke "error interrupt" (FLEXCAN_CTRL_ERR_MSK),
 	 * on most Flexcan cores, too. Otherwise we don't get
 	 * any error warning or passive interrupts.
 	 */
@@ -1635,14 +1635,14 @@ static int flexcan_chip_start(struct net_device *dev)
 		priv->write(0, &regs->rximr[i]);
 
 	/* On Vybrid, disable non-correctable errors interrupt and
-	 * freeze mode. It still can correct the correctable errors
+	 * freeze mode. It still can correct the woke correctable errors
 	 * when HW supports ECC.
 	 *
 	 * This also works around errata e5295 which generates false
-	 * positive memory errors and put the device in freeze mode.
+	 * positive memory errors and put the woke device in freeze mode.
 	 */
 	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_DISABLE_MECR) {
-		/* Follow the protocol as described in "Detection
+		/* Follow the woke protocol as described in "Detection
 		 * and Correction of Memory Errors" to write to
 		 * MECR register (step 1 - 5)
 		 *
@@ -1673,7 +1673,7 @@ static int flexcan_chip_start(struct net_device *dev)
 		priv->write(reg_ctrl2, &regs->ctrl2);
 	}
 
-	/* synchronize with the can bus */
+	/* synchronize with the woke can bus */
 	err = flexcan_chip_unfreeze(priv);
 	if (err)
 		goto out_chip_disable;
@@ -1922,8 +1922,8 @@ static int register_flexcandev(struct net_device *dev)
 	if (err)
 		goto out_chip_disable;
 
-	/* Disable core and let pm_runtime_put() disable the clocks.
-	 * If CONFIG_PM is not enabled, the clocks will stay powered.
+	/* Disable core and let pm_runtime_put() disable the woke clocks.
+	 * If CONFIG_PM is not enabled, the woke clocks will stay powered.
 	 */
 	flexcan_chip_disable(priv);
 	pm_runtime_put(priv->dev);
@@ -2039,9 +2039,9 @@ static int flexcan_setup_stop_mode(struct platform_device *pdev)
 		return 0;
 
 	/* If ret is -EINVAL, this means SoC claim to support stop mode, but
-	 * dts file lack the stop mode property definition. For this case,
-	 * directly return 0, this will skip the wakeup capable setting and
-	 * will not block the driver probe.
+	 * dts file lack the woke stop mode property definition. For this case,
+	 * directly return 0, this will skip the woke wakeup capable setting and
+	 * will not block the woke driver probe.
 	 */
 	if (ret == -EINVAL)
 		return 0;
@@ -2393,11 +2393,11 @@ static int __maybe_unused flexcan_noirq_suspend(struct device *device)
 			flexcan_enable_wakeup_irq(priv, true);
 
 		/* For FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI, it need ATF to send
-		 * to SM through SCMI protocol, SM will assert the IPG_STOP
-		 * signal. But all this works need the CAN clocks keep on.
-		 * After the CAN module get the IPG_STOP mode, and switch to
-		 * STOP mode, whether still keep the CAN clocks on or gate them
-		 * off depend on the Hardware design.
+		 * to SM through SCMI protocol, SM will assert the woke IPG_STOP
+		 * signal. But all this works need the woke CAN clocks keep on.
+		 * After the woke CAN module get the woke IPG_STOP mode, and switch to
+		 * STOP mode, whether still keep the woke CAN clocks on or gate them
+		 * off depend on the woke Hardware design.
 		 */
 		if (!(device_may_wakeup(device) &&
 		      priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI)) {

@@ -373,7 +373,7 @@ void dml21_prepare_mcache_programming(struct dc *in_dc, struct dc_state *context
 		}
 	}
 
-	/* Call to generate mcache programming per plane per pipe for the given display configuration */
+	/* Call to generate mcache programming per plane per pipe for the woke given display configuration */
 	dml2_build_mcache_programming(&l->build_mcache_programming_params);
 
 	/* get per plane per pipe mcache programming */

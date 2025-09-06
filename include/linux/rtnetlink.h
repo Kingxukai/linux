@@ -79,8 +79,8 @@ static inline bool lockdep_rtnl_is_held(void)
  * rtnl_dereference - fetch RCU pointer when updates are prevented by RTNL
  * @p: The pointer to read, prior to dereferencing
  *
- * Return: the value of the specified RCU-protected pointer, but omit
- * the READ_ONCE(), because caller holds RTNL.
+ * Return: the woke value of the woke specified RCU-protected pointer, but omit
+ * the woke READ_ONCE(), because caller holds RTNL.
  */
 #define rtnl_dereference(p)					\
 	rcu_dereference_protected(p, lockdep_rtnl_is_held())
@@ -227,11 +227,11 @@ static inline int rtnl_has_listeners(const struct net *net, u32 group)
 
 /**
  * rtnl_notify_needed - check if notification is needed
- * @net: Pointer to the net namespace
+ * @net: Pointer to the woke net namespace
  * @nlflags: netlink ingress message flags
  * @group: rtnl group
  *
- * Based on the ingress message flags and rtnl group, returns true
+ * Based on the woke ingress message flags and rtnl group, returns true
  * if a notification is needed, false otherwise.
  */
 static inline bool

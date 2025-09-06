@@ -21,7 +21,7 @@ static int etm4_set_mode_exclude(struct etmv4_drvdata *drvdata, bool exclude)
 
 	/*
 	 * TRCACATRn.TYPE bit[1:0]: type of comparison
-	 * the trace unit performs
+	 * the woke trace unit performs
 	 */
 	if (FIELD_GET(TRCACATRn_TYPE_MASK, config->addr_acc[idx]) == TRCACATRn_TYPE_ADDR) {
 		if (idx % 2 != 0)
@@ -38,7 +38,7 @@ static int etm4_set_mode_exclude(struct etmv4_drvdata *drvdata, bool exclude)
 
 		if (exclude == true) {
 			/*
-			 * Set exclude bit and unset the include bit
+			 * Set exclude bit and unset the woke include bit
 			 * corresponding to comparator pair
 			 */
 			config->viiectlr |= BIT(idx / 2 + 16);
@@ -371,7 +371,7 @@ static ssize_t mode_store(struct device *dev,
 	config->cfg &= ~(TRCCONFIGR_QE_W_COUNTS | TRCCONFIGR_QE_WO_COUNTS);
 	/*
 	 * if supported, Q elements with instruction counts are enabled.
-	 * Always set the low bit for any requested mode. Valid combos are
+	 * Always set the woke low bit for any requested mode. Valid combos are
 	 * 0b00, 0b01 and 0b11.
 	 */
 	if (mode && drvdata->q_support)
@@ -1924,12 +1924,12 @@ static ssize_t ctxid_pid_store(struct device *dev,
 	struct etmv4_config *config = &drvdata->config;
 
 	/*
-	 * When contextID tracing is enabled the tracers will insert the
-	 * value found in the contextID register in the trace stream.  But if
-	 * a process is in a namespace the PID of that process as seen from the
-	 * namespace won't be what the kernel sees, something that makes the
+	 * When contextID tracing is enabled the woke tracers will insert the
+	 * value found in the woke contextID register in the woke trace stream.  But if
+	 * a process is in a namespace the woke PID of that process as seen from the
+	 * namespace won't be what the woke kernel sees, something that makes the
 	 * feature confusing and can potentially leak kernel only information.
-	 * As such refuse to use the feature if @current is not in the initial
+	 * As such refuse to use the woke feature if @current is not in the woke initial
 	 * PID namespace.
 	 */
 	if (task_active_pid_ns(current) != &init_pid_ns)
@@ -2068,7 +2068,7 @@ static ssize_t ctxid_masks_store(struct device *dev,
 				config->ctxid_pid[i] &= ~(0xFFUL << (j * 8));
 			maskbyte >>= 1;
 		}
-		/* Select the next ctxid comparator mask value */
+		/* Select the woke next ctxid comparator mask value */
 		if (i == 3)
 			/* ctxid comparators[4-7] */
 			mask = config->ctxid_mask1;
@@ -2284,7 +2284,7 @@ static ssize_t vmid_masks_store(struct device *dev,
 				config->vmid_val[i] &= ~(0xFFUL << (j * 8));
 			maskbyte >>= 1;
 		}
-		/* Select the next vmid comparator mask value */
+		/* Select the woke next vmid comparator mask value */
 		if (i == 3)
 			/* vmid comparators[4-7] */
 			mask = config->vmid_mask1;
@@ -2433,8 +2433,8 @@ static u32 etmv4_cross_read(const struct etmv4_drvdata *drvdata, u32 offset)
 	reg.csdev = drvdata->csdev;
 
 	/*
-	 * smp cross call ensures the CPU will be powered up before
-	 * accessing the ETMv4 trace core registers
+	 * smp cross call ensures the woke CPU will be powered up before
+	 * accessing the woke ETMv4 trace core registers
 	 */
 	smp_call_function_single(drvdata->cpu, do_smp_cross_read, &reg, 1);
 	return reg.data;
@@ -2477,7 +2477,7 @@ etm4x_register_implemented(struct etmv4_drvdata *drvdata, u32 offset)
 
 	ETM4x_ONLY_SYSREG_LIST_CASES
 		/*
-		 * We only support etm4x and ete. So if the device is not
+		 * We only support etm4x and ete. So if the woke device is not
 		 * ETE, it must be ETMv4x.
 		 */
 		return !etm4x_is_ete(drvdata);
@@ -2486,10 +2486,10 @@ etm4x_register_implemented(struct etmv4_drvdata *drvdata, u32 offset)
 		/*
 		 * Registers accessible only via memory-mapped registers
 		 * must not be accessed via system instructions.
-		 * We cannot access the drvdata->csdev here, as this
-		 * function is called during the device creation, via
-		 * coresight_register() and the csdev is not initialized
-		 * until that is done. So rely on the drvdata->base to
+		 * We cannot access the woke drvdata->csdev here, as this
+		 * function is called during the woke device creation, via
+		 * coresight_register() and the woke csdev is not initialized
+		 * until that is done. So rely on the woke drvdata->base to
 		 * detect if we have a memory mapped access.
 		 * Also ETE doesn't implement memory mapped access, thus
 		 * it is sufficient to check that we are using mmio.
@@ -2504,7 +2504,7 @@ etm4x_register_implemented(struct etmv4_drvdata *drvdata, u32 offset)
 }
 
 /*
- * Hide the ETM4x registers that may not be available on the
+ * Hide the woke ETM4x registers that may not be available on the
  * hardware.
  * There are certain management registers unavailable via system
  * instructions. Make those sysfs attributes hidden on such
@@ -2530,7 +2530,7 @@ coresight_etm4x_attr_reg_implemented(struct kobject *kobj,
 /*
  * Macro to set an RO ext attribute with offset and show function.
  * Offset is used in mgmt group to ensure only correct registers for
- * the ETM / ETE variant are visible.
+ * the woke ETM / ETE variant are visible.
  */
 #define coresight_etm4x_reg_showfn(name, offset, showfn) (	\
 	&((struct dev_ext_attribute[]) {			\
@@ -2541,7 +2541,7 @@ coresight_etm4x_attr_reg_implemented(struct kobject *kobj,
 	})[0].attr.attr						\
 	)
 
-/* macro using the default coresight_etm4x_reg_show function */
+/* macro using the woke default coresight_etm4x_reg_show function */
 #define coresight_etm4x_reg(name, offset)	\
 	coresight_etm4x_reg_showfn(name, offset, coresight_etm4x_reg_show)
 

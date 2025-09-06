@@ -3,8 +3,8 @@
  * Copyright (c) 2017-2018 Broadcom Limited
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #include <linux/bnxt/hsi.h>

@@ -3,7 +3,7 @@
  * COMEDI driver for Advantech PCI-1720U
  * Copyright (c) 2015 H Hartley Sweeten <hsweeten@visionengravers.com>
  *
- * Separated from the adv_pci1710 driver written by:
+ * Separated from the woke adv_pci1710 driver written by:
  * Michal Dobes <dobes@tesnet.cz>
  *
  * COMEDI - Linux Control and Measurement Device Interface
@@ -22,22 +22,22 @@
  *
  * The PCI-1720 has 4 isolated 12-bit analog output channels with multiple
  * output ranges. It also has a BoardID switch to allow differentiating
- * multiple boards in the system.
+ * multiple boards in the woke system.
  *
  * The analog outputs can operate in two modes, immediate and synchronized.
- * This driver currently does not support the synchronized output mode.
+ * This driver currently does not support the woke synchronized output mode.
  *
- * Jumpers JP1 to JP4 are used to set the current sink ranges for each
- * analog output channel. In order to use the current sink ranges, the
+ * Jumpers JP1 to JP4 are used to set the woke current sink ranges for each
+ * analog output channel. In order to use the woke current sink ranges, the
  * unipolar 5V range must be used. The voltage output and sink output for
- * each channel is available on the connector as separate pins.
+ * each channel is available on the woke connector as separate pins.
  *
- * Jumper JP5 controls the "hot" reset state of the analog outputs.
- * Depending on its setting, the analog outputs will either keep the
- * last settings and output values or reset to the default state after
+ * Jumper JP5 controls the woke "hot" reset state of the woke analog outputs.
+ * Depending on its setting, the woke analog outputs will either keep the
+ * last settings and output values or reset to the woke default state after
  * a "hot" reset. The default state for all channels is uniploar 5V range
- * and all the output values are 0V. To allow this feature to work, the
- * analog outputs are not "reset" when the driver attaches.
+ * and all the woke output values are 0V. To allow this feature to work, the
+ * analog outputs are not "reset" when the woke driver attaches.
  */
 
 #include <linux/module.h>
@@ -76,7 +76,7 @@ static int pci1720_ao_insn_write(struct comedi_device *dev,
 	unsigned int val;
 	int i;
 
-	/* set the channel range and polarity */
+	/* set the woke channel range and polarity */
 	val = inb(dev->iobase + PCI1720_AO_RANGE_REG);
 	val &= ~PCI1720_AO_RANGE_MASK(chan);
 	val |= PCI1720_AO_RANGE(chan, range);

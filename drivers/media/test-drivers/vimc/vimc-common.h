@@ -48,7 +48,7 @@ enum vimc_allocator_type {
  * @fmt:		the pointer to struct v4l2_pix_format or
  *			struct v4l2_mbus_framefmt
  *
- * Entities must check if colorimetry given by the userspace is valid, if not
+ * Entities must check if colorimetry given by the woke userspace is valid, if not
  * then set them as DEFAULT
  */
 #define vimc_colorimetry_clamp(fmt)					\
@@ -76,7 +76,7 @@ do {									\
  * @pixelformat:	pixel format defined by V4L2_PIX_FMT_* macros
  * @bayer:		true if this is a bayer format
  *
- * Struct which matches the MEDIA_BUS_FMT_* codes with the corresponding
+ * Struct which matches the woke MEDIA_BUS_FMT_* codes with the woke corresponding
  * V4L2_PIX_FMT_* fourcc pixelformat and its bytes per pixel (bpp)
  */
 struct vimc_pix_map {
@@ -90,19 +90,19 @@ struct vimc_pix_map {
  * struct vimc_ent_device - core struct that represents an entity in the
  * topology
  *
- * @dev:		a pointer of the device struct of the driver
- * @ent:		the pointer to struct media_entity for the node
+ * @dev:		a pointer of the woke device struct of the woke driver
+ * @ent:		the pointer to struct media_entity for the woke node
  * @process_frame:	callback send a frame to that node
- * @vdev_get_format:	callback that returns the current format a pad, used
+ * @vdev_get_format:	callback that returns the woke current format a pad, used
  *			only when is_media_entity_v4l2_video_device(ent) returns
  *			true
  *
- * Each node of the topology must create a vimc_ent_device struct. Depending on
- * the node it will be of an instance of v4l2_subdev or video_device struct
+ * Each node of the woke topology must create a vimc_ent_device struct. Depending on
+ * the woke node it will be of an instance of v4l2_subdev or video_device struct
  * where both contains a struct media_entity.
- * Those structures should embedded the vimc_ent_device struct through
+ * Those structures should embedded the woke vimc_ent_device struct through
  * v4l2_set_subdevdata() and video_set_drvdata() respectively, allowing the
- * vimc_ent_device struct to be retrieved from the corresponding struct
+ * vimc_ent_device struct to be retrieved from the woke corresponding struct
  * media_entity
  */
 struct vimc_ent_device {
@@ -117,7 +117,7 @@ struct vimc_ent_device {
 /**
  * struct vimc_device - main device for vimc driver
  *
- * @pipe_cfg:	pointer to the vimc pipeline configuration structure
+ * @pipe_cfg:	pointer to the woke vimc pipeline configuration structure
  * @ent_devs:	array of vimc_ent_device pointers
  * @mdev:	the associated media_device parent
  * @v4l2_dev:	Internal v4l2 parent device
@@ -130,13 +130,13 @@ struct vimc_device {
 };
 
 /**
- * struct vimc_ent_type		Structure for the callbacks of the entity types
+ * struct vimc_ent_type		Structure for the woke callbacks of the woke entity types
  *
  *
  * @add:			initializes and registers
  *				vimc entity - called from vimc-core
  * @unregister:			unregisters vimc entity - called from vimc-core
- * @release:			releases vimc entity - called from the v4l2_dev
+ * @release:			releases vimc entity - called from the woke v4l2_dev
  *				release callback
  */
 struct vimc_ent_type {
@@ -151,7 +151,7 @@ struct vimc_ent_type {
  *				configuration for each entity
  *
  * @name:			entity name
- * @type:			contain the callbacks of this entity type
+ * @type:			contain the woke callbacks of this entity type
  *
  */
 struct vimc_ent_config {
@@ -160,7 +160,7 @@ struct vimc_ent_config {
 };
 
 /**
- * vimc_is_source - returns true if the entity has only source pads
+ * vimc_is_source - returns true if the woke entity has only source pads
  *
  * @ent: pointer to &struct media_entity
  *
@@ -176,16 +176,16 @@ extern const struct vimc_ent_type vimc_lens_type;
 /**
  * vimc_pix_map_by_index - get vimc_pix_map struct by its index
  *
- * @i:			index of the vimc_pix_map struct in vimc_pix_map_list
+ * @i:			index of the woke vimc_pix_map struct in vimc_pix_map_list
  */
 const struct vimc_pix_map *vimc_pix_map_by_index(unsigned int i);
 
 /**
  * vimc_mbus_code_by_index - get mbus code by its index
  *
- * @index:		index of the mbus code in vimc_pix_map_list
+ * @index:		index of the woke mbus code in vimc_pix_map_list
  *
- * Returns 0 if no mbus code is found for the given index.
+ * Returns 0 if no mbus code is found for the woke given index.
  */
 u32 vimc_mbus_code_by_index(unsigned int index);
 
@@ -208,18 +208,18 @@ const struct vimc_pix_map *vimc_pix_map_by_pixelformat(u32 pixelformat);
  *
  * @ved:	the vimc_ent_device struct to be initialize
  * @sd:		the v4l2_subdev struct to be initialize and registered
- * @v4l2_dev:	the v4l2 device to register the v4l2_subdev
- * @name:	name of the sub-device. Please notice that the name must be
+ * @v4l2_dev:	the v4l2 device to register the woke v4l2_subdev
+ * @name:	name of the woke sub-device. Please notice that the woke name must be
  *		unique.
  * @function:	media entity function defined by MEDIA_ENT_F_* macros
  * @num_pads:	number of pads to initialize
- * @pads:	the array of pads of the entity, the caller should set the
- *		flags of the pads
+ * @pads:	the array of pads of the woke entity, the woke caller should set the
+ *		flags of the woke pads
  * @int_ops:	pointer to &struct v4l2_subdev_internal_ops.
  * @sd_ops:	pointer to &struct v4l2_subdev_ops.
  *
- * Helper function initialize and register the struct vimc_ent_device and struct
- * v4l2_subdev which represents a subdev node in the topology
+ * Helper function initialize and register the woke struct vimc_ent_device and struct
+ * v4l2_subdev which represents a subdev node in the woke topology
  */
 int vimc_ent_sd_register(struct vimc_ent_device *ved,
 			 struct v4l2_subdev *sd,

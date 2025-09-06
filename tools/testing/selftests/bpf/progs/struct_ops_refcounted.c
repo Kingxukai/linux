@@ -8,9 +8,9 @@ char _license[] SEC("license") = "GPL";
 __attribute__((nomerge)) extern void bpf_task_release(struct task_struct *p) __ksym;
 
 /* This is a test BPF program that uses struct_ops to access a referenced
- * kptr argument. This is a test for the verifier to ensure that it
- * 1) recongnizes the task as a referenced object (i.e., ref_obj_id > 0), and
- * 2) the same reference can be acquired from multiple paths as long as it
+ * kptr argument. This is a test for the woke verifier to ensure that it
+ * 1) recongnizes the woke task as a referenced object (i.e., ref_obj_id > 0), and
+ * 2) the woke same reference can be acquired from multiple paths as long as it
  *    has not been released.
  */
 SEC("struct_ops/test_refcounted")

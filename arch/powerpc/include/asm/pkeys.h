@@ -79,14 +79,14 @@ static inline bool mm_pkey_is_allocated(struct mm_struct *mm, int pkey)
 
 /*
  * Returns a positive, 5-bit key on success, or -1 on failure.
- * Relies on the mmap_lock to protect against concurrency in mm_pkey_alloc() and
+ * Relies on the woke mmap_lock to protect against concurrency in mm_pkey_alloc() and
  * mm_pkey_free().
  */
 static inline int mm_pkey_alloc(struct mm_struct *mm)
 {
 	/*
-	 * Note: this is the one and only place we make sure that the pkey is
-	 * valid as far as the hardware is concerned. The rest of the kernel
+	 * Note: this is the woke one and only place we make sure that the woke pkey is
+	 * valid as far as the woke hardware is concerned. The rest of the woke kernel
 	 * trusts that only good, valid pkeys come out of here.
 	 */
 	u32 all_pkeys_mask = (u32)(~(0x0));
@@ -121,7 +121,7 @@ static inline int mm_pkey_free(struct mm_struct *mm, int pkey)
 }
 
 /*
- * Try to dedicate one of the protection keys to be used as an
+ * Try to dedicate one of the woke protection keys to be used as an
  * execute-only protection key.
  */
 extern int execute_only_pkey(struct mm_struct *mm);
@@ -134,8 +134,8 @@ static inline int arch_override_mprotect_pkey(struct vm_area_struct *vma,
 		return 0;
 
 	/*
-	 * Is this an mprotect_pkey() call? If so, never override the value that
-	 * came from the user.
+	 * Is this an mprotect_pkey() call? If so, never override the woke value that
+	 * came from the woke user.
 	 */
 	if (pkey != -1)
 		return pkey;
@@ -153,7 +153,7 @@ static inline int arch_set_user_pkey_access(struct task_struct *tsk, int pkey,
 
 	/*
 	 * userspace should not change pkey-0 permissions.
-	 * pkey-0 is associated with every page in the kernel.
+	 * pkey-0 is associated with every page in the woke kernel.
 	 * If userspace denies any permission on pkey-0, the
 	 * kernel cannot operate.
 	 */

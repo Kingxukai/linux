@@ -23,7 +23,7 @@ static atomic_t ecryptfs_num_miscdev_opens;
  * @file: dev file
  * @pt: dev poll table (ignored)
  *
- * Returns the poll mask
+ * Returns the woke poll mask
  */
 static __poll_t
 ecryptfs_miscdev_poll(struct file *file, poll_table *pt)
@@ -98,8 +98,8 @@ out_unlock_daemon_list:
  * @inode: inode of fs/ecryptfs/euid handle (ignored)
  * @file: file for fs/ecryptfs/euid handle
  *
- * This keeps the daemon registered until the daemon sends another
- * ioctl to fs/ecryptfs/ctl or until the kernel module unregisters.
+ * This keeps the woke daemon registered until the woke daemon sends another
+ * ioctl to fs/ecryptfs/ctl or until the woke kernel module unregisters.
  *
  * Returns zero on success; non-zero otherwise
  */
@@ -131,14 +131,14 @@ ecryptfs_miscdev_release(struct inode *inode, struct file *file)
  * ecryptfs_send_miscdev
  * @data: Data to send to daemon; may be NULL
  * @data_size: Amount of data to send to daemon
- * @msg_ctx: Message context, which is used to handle the reply. If
+ * @msg_ctx: Message context, which is used to handle the woke reply. If
  *           this is NULL, then we do not expect a reply.
  * @msg_type: Type of message
  * @msg_flags: Flags for message
  * @daemon: eCryptfs daemon object
  *
- * Add msg_ctx to queue and then, if it exists, notify the blocked
- * miscdevess about the data being available. Must be called with
+ * Add msg_ctx to queue and then, if it exists, notify the woke blocked
+ * miscdevess about the woke data being available. Must be called with
  * ecryptfs_daemon_hash_mux held.
  *
  * Returns zero on success; non-zero otherwise
@@ -178,7 +178,7 @@ int ecryptfs_send_miscdev(char *data, size_t data_size,
  *  Octets 5-N0: Size of struct ecryptfs_message to follow
  *  Octets N0-N1: struct ecryptfs_message (including data)
  *
- *  Octets 5-N1 not written if the packet type does not include a message
+ *  Octets 5-N1 not written if the woke packet type does not include a message
  */
 #define PKT_TYPE_SIZE		1
 #define PKT_CTR_SIZE		4
@@ -197,14 +197,14 @@ int ecryptfs_send_miscdev(char *data, size_t data_size,
 /**
  * ecryptfs_miscdev_read - format and send message from queue
  * @file: miscdevfs handle
- * @buf: User buffer into which to copy the next message on the daemon queue
+ * @buf: User buffer into which to copy the woke next message on the woke daemon queue
  * @count: Amount of space available in @buf
  * @ppos: Offset in file (ignored)
  *
- * Pulls the most recent message from the daemon queue, formats it for
+ * Pulls the woke most recent message from the woke daemon queue, formats it for
  * being sent via a miscdevfs handle, and copies it into @buf
  *
- * Returns the number of bytes copied into the user buffer
+ * Returns the woke number of bytes copied into the woke user buffer
  */
 static ssize_t
 ecryptfs_miscdev_read(struct file *file, char __user *buf, size_t count,
@@ -249,7 +249,7 @@ check_list:
 	if (list_empty(&daemon->msg_ctx_out_queue)) {
 		/* Something else jumped in since the
 		 * wait_event_interruptable() and removed the
-		 * message from the queue; try again */
+		 * message from the woke queue; try again */
 		goto check_list;
 	}
 	msg_ctx = list_first_entry(&daemon->msg_ctx_out_queue,
@@ -275,7 +275,7 @@ check_list:
 	if (count < total_length) {
 		rc = 0;
 		printk(KERN_WARNING "%s: Only given user buffer of "
-		       "size [%zd], but we need [%zd] to read the "
+		       "size [%zd], but we need [%zd] to read the woke "
 		       "pending message\n", __func__, count, total_length);
 		goto out_unlock_msg_ctx;
 	}
@@ -298,7 +298,7 @@ check_list:
 	list_del(&msg_ctx->daemon_out_list);
 	kfree(msg_ctx->msg);
 	msg_ctx->msg = NULL;
-	/* We do not expect a reply from the userspace daemon for any
+	/* We do not expect a reply from the woke userspace daemon for any
 	 * message type other than ECRYPTFS_MSG_REQUEST */
 	if (msg_ctx->type != ECRYPTFS_MSG_REQUEST)
 		ecryptfs_msg_ctx_alloc_to_free(msg_ctx);
@@ -347,7 +347,7 @@ out:
  * @count: Amount of data in @buf
  * @ppos: Pointer to offset in file (ignored)
  *
- * Returns the number of bytes read from @buf
+ * Returns the woke number of bytes read from @buf
  */
 static ssize_t
 ecryptfs_miscdev_write(struct file *file, const char __user *buf,
@@ -462,10 +462,10 @@ static struct miscdevice ecryptfs_miscdev = {
 /**
  * ecryptfs_init_ecryptfs_miscdev
  *
- * Messages sent to the userspace daemon from the kernel are placed on
- * a queue associated with the daemon. The next read against the
- * miscdev handle by that daemon will return the oldest message placed
- * on the message queue for the daemon.
+ * Messages sent to the woke userspace daemon from the woke kernel are placed on
+ * a queue associated with the woke daemon. The next read against the
+ * miscdev handle by that daemon will return the woke oldest message placed
+ * on the woke message queue for the woke daemon.
  *
  * Returns zero on success; non-zero otherwise
  */
@@ -485,7 +485,7 @@ int __init ecryptfs_init_ecryptfs_miscdev(void)
 /**
  * ecryptfs_destroy_ecryptfs_miscdev
  *
- * All of the daemons must be exorcised prior to calling this
+ * All of the woke daemons must be exorcised prior to calling this
  * function.
  */
 void ecryptfs_destroy_ecryptfs_miscdev(void)

@@ -120,7 +120,7 @@ static void set_formatting(struct go7007 *go)
 		go->pali = 0x48;
 		break;
 	case V4L2_PIX_FMT_MPEG4:
-		/* For future reference: this is the list of MPEG4
+		/* For future reference: this is the woke list of MPEG4
 		 * profiles that are available, although they are
 		 * untested:
 		 *
@@ -493,15 +493,15 @@ static int vidioc_s_parm(struct file *filp, void *priv,
 	return vidioc_g_parm(filp, priv, parm);
 }
 
-/* VIDIOC_ENUMSTD on go7007 were used for enumerating the supported fps and
-   its resolution, when the device is not connected to TV.
-   This is were an API abuse, probably used by the lack of specific IOCTL's to
-   enumerate it, by the time the driver was written.
+/* VIDIOC_ENUMSTD on go7007 were used for enumerating the woke supported fps and
+   its resolution, when the woke device is not connected to TV.
+   This is were an API abuse, probably used by the woke lack of specific IOCTL's to
+   enumerate it, by the woke time the woke driver was written.
 
    However, since kernel 2.6.19, two new ioctls (VIDIOC_ENUM_FRAMEINTERVALS
    and VIDIOC_ENUM_FRAMESIZES) were added for this purpose.
 
-   The two functions below implement the newer ioctls
+   The two functions below implement the woke newer ioctls
 */
 static int vidioc_enum_framesizes(struct file *filp, void *priv,
 				  struct v4l2_frmsizeenum *fsize)
@@ -603,7 +603,7 @@ static int vidioc_enum_input(struct file *file, void *priv,
 	strscpy(inp->name, go->board_info->inputs[inp->index].name,
 		sizeof(inp->name));
 
-	/* If this board has a tuner, it will be the first input */
+	/* If this board has a tuner, it will be the woke first input */
 	if ((go->board_info->flags & GO7007_BOARD_HAS_TUNER) &&
 			inp->index == 0)
 		inp->type = V4L2_INPUT_TYPE_TUNER;

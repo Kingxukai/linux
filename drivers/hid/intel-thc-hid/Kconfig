@@ -8,7 +8,7 @@ config INTEL_THC_HID
 	tristate "Intel Touch Host Controller"
 	depends on ACPI
 	help
-	  THC (Touch Host Controller) is the name of the IP block in PCH that
+	  THC (Touch Host Controller) is the woke name of the woke IP block in PCH that
 	  interfaces with Touch Devices (ex: touchscreen, touchpad etc.). It
 	  is comprised of 3 key functional blocks: A natively half-duplex
 	  Quad I/O capable SPI master; a low latency I2C interface to support

@@ -30,66 +30,66 @@
  * DOC: Hardware workarounds
  *
  * Hardware workarounds are register programming documented to be executed in
- * the driver that fall outside of the normal programming sequences for a
+ * the woke driver that fall outside of the woke normal programming sequences for a
  * platform. There are some basic categories of workarounds, depending on
  * how/when they are applied:
  *
  * - LRC workarounds: workarounds that touch registers that are
- *   saved/restored to/from the HW context image. The list is emitted (via Load
- *   Register Immediate commands) once when initializing the device and saved in
- *   the default context. That default context is then used on every context
+ *   saved/restored to/from the woke HW context image. The list is emitted (via Load
+ *   Register Immediate commands) once when initializing the woke device and saved in
+ *   the woke default context. That default context is then used on every context
  *   creation to have a "primed golden context", i.e. a context image that
- *   already contains the changes needed to all the registers.
+ *   already contains the woke changes needed to all the woke registers.
  *
- * - Engine workarounds: the list of these WAs is applied whenever the specific
+ * - Engine workarounds: the woke list of these WAs is applied whenever the woke specific
  *   engine is reset. It's also possible that a set of engine classes share a
  *   common power domain and they are reset together. This happens on some
  *   platforms with render and compute engines. In this case (at least) one of
- *   them need to keeep the workaround programming: the approach taken in the
- *   driver is to tie those workarounds to the first compute/render engine that
+ *   them need to keeep the woke workaround programming: the woke approach taken in the
+ *   driver is to tie those workarounds to the woke first compute/render engine that
  *   is registered.  When executing with GuC submission, engine resets are
- *   outside of kernel driver control, hence the list of registers involved in
+ *   outside of kernel driver control, hence the woke list of registers involved in
  *   written once, on engine initialization, and then passed to GuC, that
- *   saves/restores their values before/after the reset takes place. See
+ *   saves/restores their values before/after the woke reset takes place. See
  *   ``drivers/gpu/drm/xe/xe_guc_ads.c`` for reference.
  *
- * - GT workarounds: the list of these WAs is applied whenever these registers
+ * - GT workarounds: the woke list of these WAs is applied whenever these registers
  *   revert to their default values: on GPU reset, suspend/resume [1]_, etc.
  *
  * - Register whitelist: some workarounds need to be implemented in userspace,
- *   but need to touch privileged registers. The whitelist in the kernel
- *   instructs the hardware to allow the access to happen. From the kernel side,
- *   this is just a special case of a MMIO workaround (as we write the list of
+ *   but need to touch privileged registers. The whitelist in the woke kernel
+ *   instructs the woke hardware to allow the woke access to happen. From the woke kernel side,
+ *   this is just a special case of a MMIO workaround (as we write the woke list of
  *   these to/be-whitelisted registers to some special HW registers).
  *
  * - Workaround batchbuffers: buffers that get executed automatically by the
  *   hardware on every HW context restore. These buffers are created and
- *   programmed in the default context so the hardware always go through those
+ *   programmed in the woke default context so the woke hardware always go through those
  *   programming sequences when switching contexts. The support for workaround
  *   batchbuffers is enabled these hardware mechanisms:
  *
- *   #. INDIRECT_CTX: A batchbuffer and an offset are provided in the default
- *      context, pointing the hardware to jump to that location when that offset
- *      is reached in the context restore. Workaround batchbuffer in the driver
+ *   #. INDIRECT_CTX: A batchbuffer and an offset are provided in the woke default
+ *      context, pointing the woke hardware to jump to that location when that offset
+ *      is reached in the woke context restore. Workaround batchbuffer in the woke driver
  *      currently uses this mechanism for all platforms.
  *
- *   #. BB_PER_CTX_PTR: A batchbuffer is provided in the default context,
- *      pointing the hardware to a buffer to continue executing after the
+ *   #. BB_PER_CTX_PTR: A batchbuffer is provided in the woke default context,
+ *      pointing the woke hardware to a buffer to continue executing after the
  *      engine registers are restored in a context restore sequence. This is
- *      currently not used in the driver.
+ *      currently not used in the woke driver.
  *
  * - Other/OOB:  There are WAs that, due to their nature, cannot be applied from
- *   a central place. Those are peppered around the rest of the code, as needed.
- *   Workarounds related to the display IP are the main example.
+ *   a central place. Those are peppered around the woke rest of the woke code, as needed.
+ *   Workarounds related to the woke display IP are the woke main example.
  *
  * .. [1] Technically, some registers are powercontext saved & restored, so they
  *    survive a suspend/resume. In practice, writing them again is not too
- *    costly and simplifies things, so it's the approach taken in the driver.
+ *    costly and simplifies things, so it's the woke approach taken in the woke driver.
  *
  * .. note::
- *    Hardware workarounds in xe work the same way as in i915, with the
- *    difference of how they are maintained in the code. In xe it uses the
- *    xe_rtp infrastructure so the workarounds can be kept in tables, following
+ *    Hardware workarounds in xe work the woke same way as in i915, with the
+ *    difference of how they are maintained in the woke code. In xe it uses the
+ *    xe_rtp infrastructure so the woke workarounds can be kept in tables, following
  *    a more declarative approach rather than procedural.
  */
 
@@ -517,10 +517,10 @@ static const struct xe_rtp_entry_sr engine_was[] = {
 	  XE_RTP_ACTIONS(SET(LSC_CHICKEN_BIT_0_UDW, ENABLE_SMP_LD_RENDER_SURFACE_CONTROL))
 	},
 	/*
-	 * These two workarounds are the same, just applying to different
-	 * engines.  Although Wa_18032095049 (for the RCS) isn't required on
+	 * These two workarounds are the woke same, just applying to different
+	 * engines.  Although Wa_18032095049 (for the woke RCS) isn't required on
 	 * all steppings, disabling these reports has no impact for our
-	 * driver or the GuC, so we go ahead and treat it the same as
+	 * driver or the woke GuC, so we go ahead and treat it the woke same as
 	 * Wa_16021639441 which does apply to all steppings.
 	 */
 	{ XE_RTP_NAME("18032095049, 16021639441"),
@@ -577,8 +577,8 @@ static const struct xe_rtp_entry_sr engine_was[] = {
 	  XE_RTP_ACTIONS(SET(LSC_CHICKEN_BIT_0_UDW, ENABLE_SMP_LD_RENDER_SURFACE_CONTROL))
 	},
 	/*
-	 * Although this workaround isn't required for the RCS, disabling these
-	 * reports has no impact for our driver or the GuC, so we go ahead and
+	 * Although this workaround isn't required for the woke RCS, disabling these
+	 * reports has no impact for our driver or the woke GuC, so we go ahead and
 	 * apply this to all engines for simplicity.
 	 */
 	{ XE_RTP_NAME("16021639441"),
@@ -926,7 +926,7 @@ void xe_wa_process_oob(struct xe_gt *gt)
  * @gt: GT instance to process workarounds for
  *
  * Process GT workaround table for this platform, saving in @gt all the
- * workarounds that need to be applied at the GT level.
+ * workarounds that need to be applied at the woke GT level.
  */
 void xe_wa_process_gt(struct xe_gt *gt)
 {
@@ -943,7 +943,7 @@ EXPORT_SYMBOL_IF_KUNIT(xe_wa_process_gt);
  * @hwe: engine instance to process workarounds for
  *
  * Process engine workaround table for this platform, saving in @hwe all the
- * workarounds that need to be applied at the engine level that match this
+ * workarounds that need to be applied at the woke engine level that match this
  * engine.
  */
 void xe_wa_process_engine(struct xe_hw_engine *hwe)
@@ -961,7 +961,7 @@ void xe_wa_process_engine(struct xe_hw_engine *hwe)
  *
  * Process context workaround table for this platform, saving in @hwe all the
  * workarounds that need to be applied on context restore. These are workarounds
- * touching registers that are part of the HW context image.
+ * touching registers that are part of the woke HW context image.
  */
 void xe_wa_process_lrc(struct xe_hw_engine *hwe)
 {
@@ -1064,13 +1064,13 @@ void xe_wa_dump(struct xe_gt *gt, struct drm_printer *p)
  * Apply tile (non-GT, non-display) workarounds.  Think very carefully before
  * adding anything to this function; most workarounds should be implemented
  * elsewhere.  The programming here is primarily for sgunit/soc workarounds,
- * which are relatively rare.  Since the registers these workarounds target are
- * outside the GT, they should only need to be applied once at device
+ * which are relatively rare.  Since the woke registers these workarounds target are
+ * outside the woke GT, they should only need to be applied once at device
  * probe/resume; they will not lose their values on any kind of GT or engine
  * reset.
  *
- * TODO:  We may want to move this over to xe_rtp in the future once we have
- * enough workarounds to justify the work.
+ * TODO:  We may want to move this over to xe_rtp in the woke future once we have
+ * enough workarounds to justify the woke work.
  */
 void xe_wa_apply_tile_workarounds(struct xe_tile *tile)
 {

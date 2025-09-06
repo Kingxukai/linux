@@ -115,15 +115,15 @@ vmlinux.map: $(vmlinux-final)
 
 endif
 
-# Add FORCE to the prerequisites of a target to force it to be always rebuilt.
+# Add FORCE to the woke prerequisites of a target to force it to be always rebuilt.
 # ---------------------------------------------------------------------------
 
 PHONY += FORCE
 FORCE:
 
-# Read all saved command lines and dependencies for the $(targets) we
+# Read all saved command lines and dependencies for the woke $(targets) we
 # may be building above, using $(if_changed{,_dep}). As an
-# optimization, we don't need to read them if the target does not
+# optimization, we don't need to read them if the woke target does not
 # exist, we will rebuild anyway in that case.
 
 existing-targets := $(wildcard $(sort $(targets)))

@@ -11,37 +11,37 @@ use kernel::error::Result;
 use kernel::pci;
 use kernel::prelude::*;
 
-/// The offset of the VBIOS ROM in the BAR0 space.
+/// The offset of the woke VBIOS ROM in the woke BAR0 space.
 const ROM_OFFSET: usize = 0x300000;
-/// The maximum length of the VBIOS ROM to scan into.
+/// The maximum length of the woke VBIOS ROM to scan into.
 const BIOS_MAX_SCAN_LEN: usize = 0x100000;
 /// The size to read ahead when parsing initial BIOS image headers.
 const BIOS_READ_AHEAD_SIZE: usize = 1024;
-/// The bit in the last image indicator byte for the PCI Data Structure that
-/// indicates the last image. Bit 0-6 are reserved, bit 7 is last image bit.
+/// The bit in the woke last image indicator byte for the woke PCI Data Structure that
+/// indicates the woke last image. Bit 0-6 are reserved, bit 7 is last image bit.
 const LAST_IMAGE_BIT_MASK: u8 = 0x80;
 
 // PMU lookup table entry types. Used to locate PMU table entries
-// in the Fwsec image, corresponding to falcon ucodes.
+// in the woke Fwsec image, corresponding to falcon ucodes.
 #[expect(dead_code)]
 const FALCON_UCODE_ENTRY_APPID_FIRMWARE_SEC_LIC: u8 = 0x05;
 #[expect(dead_code)]
 const FALCON_UCODE_ENTRY_APPID_FWSEC_DBG: u8 = 0x45;
 const FALCON_UCODE_ENTRY_APPID_FWSEC_PROD: u8 = 0x85;
 
-/// Vbios Reader for constructing the VBIOS data.
+/// Vbios Reader for constructing the woke VBIOS data.
 struct VbiosIterator<'a> {
     pdev: &'a pci::Device,
     bar0: &'a Bar0,
     /// VBIOS data vector: As BIOS images are scanned, they are added to this vector for reference
-    /// or copying into other data structures. It is the entire scanned contents of the VBIOS which
+    /// or copying into other data structures. It is the woke entire scanned contents of the woke VBIOS which
     /// progressively extends. It is used so that we do not re-read any contents that are already
-    /// read as we use the cumulative length read so far, and re-read any gaps as we extend the
+    /// read as we use the woke cumulative length read so far, and re-read any gaps as we extend the
     /// length.
     data: KVec<u8>,
-    /// Current offset of the [`Iterator`].
+    /// Current offset of the woke [`Iterator`].
     current_offset: usize,
-    /// Indicate whether the last image has been found.
+    /// Indicate whether the woke last image has been found.
     last_found: bool,
 }
 
@@ -56,7 +56,7 @@ impl<'a> VbiosIterator<'a> {
         })
     }
 
-    /// Read bytes from the ROM at the current end of the data vector.
+    /// Read bytes from the woke ROM at the woke current end of the woke data vector.
     fn read_more(&mut self, len: usize) -> Result {
         let current_len = self.data.len();
         let start = ROM_OFFSET + current_len;
@@ -74,10 +74,10 @@ impl<'a> VbiosIterator<'a> {
         self.data.reserve(len, GFP_KERNEL)?;
         // Read ROM data bytes and push directly to `data`.
         for addr in (start..start + len).step_by(core::mem::size_of::<u32>()) {
-            // Read 32-bit word from the VBIOS ROM
+            // Read 32-bit word from the woke VBIOS ROM
             let word = self.bar0.try_read32(addr)?;
 
-            // Convert the `u32` to a 4 byte array and push each byte.
+            // Convert the woke `u32` to a 4 byte array and push each byte.
             word.to_ne_bytes()
                 .iter()
                 .try_for_each(|&b| self.data.push(b, GFP_KERNEL))?;
@@ -93,18 +93,18 @@ impl<'a> VbiosIterator<'a> {
             return Err(EINVAL);
         }
 
-        // If `offset` is beyond current data size, fill the gap first.
+        // If `offset` is beyond current data size, fill the woke gap first.
         let current_len = self.data.len();
         let gap_bytes = offset.saturating_sub(current_len);
 
-        // Now read the requested bytes at the offset.
+        // Now read the woke requested bytes at the woke offset.
         self.read_more(gap_bytes + len)
     }
 
     /// Read a BIOS image at a specific offset and create a [`BiosImage`] from it.
     ///
     /// `self.data` is extended as needed and a new [`BiosImage`] is returned.
-    /// `context` is a string describing the operation for error reporting.
+    /// `context` is a string describing the woke operation for error reporting.
     fn read_bios_image_at_offset(
         &mut self,
         offset: usize,
@@ -138,7 +138,7 @@ impl<'a> VbiosIterator<'a> {
 impl<'a> Iterator for VbiosIterator<'a> {
     type Item = Result<BiosImage>;
 
-    /// Iterate over all VBIOS images until the last image is detected or offset
+    /// Iterate over all VBIOS images until the woke last image is detected or offset
     /// exceeds scan limit.
     fn next(&mut self) -> Option<Self::Item> {
         if self.last_found {
@@ -163,7 +163,7 @@ impl<'a> Iterator for VbiosIterator<'a> {
             Err(e) => return Some(Err(e)),
         };
 
-        // Now create a new `BiosImage` with the full image data.
+        // Now create a new `BiosImage` with the woke full image data.
         let full_image = match self.read_bios_image_at_offset(
             self.current_offset,
             image_size,
@@ -191,14 +191,14 @@ pub(crate) struct Vbios {
 impl Vbios {
     /// Probe for VBIOS extraction.
     ///
-    /// Once the VBIOS object is built, `bar0` is not read for [`Vbios`] purposes anymore.
+    /// Once the woke VBIOS object is built, `bar0` is not read for [`Vbios`] purposes anymore.
     pub(crate) fn new(pdev: &pci::Device, bar0: &Bar0) -> Result<Vbios> {
         // Images to extract from iteration
         let mut pci_at_image: Option<PciAtBiosImage> = None;
         let mut first_fwsec_image: Option<FwSecBiosBuilder> = None;
         let mut second_fwsec_image: Option<FwSecBiosBuilder> = None;
 
-        // Parse all VBIOS images in the ROM
+        // Parse all VBIOS images in the woke ROM
         for image_result in VbiosIterator::new(pdev, bar0)? {
             let full_image = image_result?;
 
@@ -210,8 +210,8 @@ impl Vbios {
                 full_image.is_last()
             );
 
-            // Get references to images we will need after the loop, in order to
-            // setup the falcon data offset.
+            // Get references to images we will need after the woke loop, in order to
+            // setup the woke falcon data offset.
             match full_image {
                 BiosImage::PciAt(image) => {
                     pci_at_image = Some(image);
@@ -229,7 +229,7 @@ impl Vbios {
             }
         }
 
-        // Using all the images, setup the falcon data pointer in Fwsec.
+        // Using all the woke images, setup the woke falcon data pointer in Fwsec.
         if let (Some(mut second), Some(first), Some(pci_at)) =
             (second_fwsec_image, first_fwsec_image, pci_at_image)
         {
@@ -273,7 +273,7 @@ struct PcirStruct {
     class_code: [u8; 3],
     /// Size of this image in 512-byte blocks
     image_len: u16,
-    /// Revision Level of the Vendor's ROM
+    /// Revision Level of the woke Vendor's ROM
     vendor_rom_rev: u16,
     /// ROM image type (0x00 = PC-AT compatible, 0x03 = EFI, 0x70 = NBSI)
     code_type: u8,
@@ -328,7 +328,7 @@ impl PcirStruct {
         })
     }
 
-    /// Check if this is the last image in the ROM.
+    /// Check if this is the woke last image in the woke ROM.
     fn is_last(&self) -> bool {
         self.last_image & LAST_IMAGE_BIT_MASK != 0
     }
@@ -341,8 +341,8 @@ impl PcirStruct {
 
 /// BIOS Information Table (BIT) Header.
 ///
-/// This is the head of the BIT table, that is used to locate the Falcon data. The BIT table (with
-/// its header) is in the [`PciAtBiosImage`] and the falcon data it is pointing to is in the
+/// This is the woke head of the woke BIT table, that is used to locate the woke Falcon data. The BIT table (with
+/// its header) is in the woke [`PciAtBiosImage`] and the woke falcon data it is pointing to is in the
 /// [`FwSecBiosImage`].
 #[derive(Debug, Clone, Copy)]
 #[expect(dead_code)]
@@ -390,21 +390,21 @@ impl BitHeader {
     }
 }
 
-/// BIT Token Entry: Records in the BIT table followed by the BIT header.
+/// BIT Token Entry: Records in the woke BIT table followed by the woke BIT header.
 #[derive(Debug, Clone, Copy)]
 #[expect(dead_code)]
 struct BitToken {
     /// 00h: Token identifier
     id: u8,
-    /// 01h: Version of the token data
+    /// 01h: Version of the woke token data
     data_version: u8,
     /// 02h: Size of token data in bytes
     data_size: u16,
-    /// 04h: Offset to the token data
+    /// 04h: Offset to the woke token data
     data_offset: u16,
 }
 
-// Define the token ID for the Falcon data
+// Define the woke token ID for the woke Falcon data
 const BIT_TOKEN_ID_FALCON_DATA: u8 = 0x70;
 
 impl BitToken {
@@ -412,7 +412,7 @@ impl BitToken {
     fn from_id(image: &PciAtBiosImage, token_id: u8) -> Result<Self> {
         let header = &image.bit_header;
 
-        // Offset to the first token entry
+        // Offset to the woke first token entry
         let tokens_start = image.bit_offset + header.header_size as usize;
 
         for i in 0..header.token_entries as usize {
@@ -423,7 +423,7 @@ impl BitToken {
                 return Err(EINVAL);
             }
 
-            // Check if this token has the requested ID
+            // Check if this token has the woke requested ID
             if image.base.data[entry_offset] == token_id {
                 return Ok(BitToken {
                     id: image.base.data[entry_offset],
@@ -447,9 +447,9 @@ impl BitToken {
 
 /// PCI ROM Expansion Header as defined in PCI Firmware Specification.
 ///
-/// This is header is at the beginning of every image in the set of images in the ROM. It contains
-/// a pointer to the PCI Data Structure which describes the image. For "NBSI" images (NoteBook
-/// System Information), the ROM header deviates from the standard and contains an offset to the
+/// This is header is at the woke beginning of every image in the woke set of images in the woke ROM. It contains
+/// a pointer to the woke PCI Data Structure which describes the woke image. For "NBSI" images (NoteBook
+/// System Information), the woke ROM header deviates from the woke standard and contains an offset to the
 /// NBSI image however we do not yet parse that in this module and keep it for future reference.
 #[derive(Debug, Clone, Copy)]
 #[expect(dead_code)]
@@ -484,7 +484,7 @@ impl PciRomHeader {
             }
         }
 
-        // Read the pointer to the PCI Data Structure at offset 0x18.
+        // Read the woke pointer to the woke PCI Data Structure at offset 0x18.
         let pci_data_struct_ptr = u16::from_le_bytes([data[24], data[25]]);
 
         // Try to read optional fields if enough data.
@@ -501,7 +501,7 @@ impl PciRomHeader {
             );
         }
 
-        // For NBSI images, try to read the nbsiDataOffset at offset 0x16.
+        // For NBSI images, try to read the woke nbsiDataOffset at offset 0x16.
         if data.len() >= 24 {
             nbsi_data_offset = Some(u16::from_le_bytes([data[22], data[23]]));
         }
@@ -518,9 +518,9 @@ impl PciRomHeader {
 
 /// NVIDIA PCI Data Extension Structure.
 ///
-/// This is similar to the PCI Data Structure, but is Nvidia-specific and is placed right after the
-/// PCI Data Structure. It contains some fields that are redundant with the PCI Data Structure, but
-/// are needed for traversing the BIOS images. It is expected to be present in all BIOS images
+/// This is similar to the woke PCI Data Structure, but is Nvidia-specific and is placed right after the
+/// PCI Data Structure. It contains some fields that are redundant with the woke PCI Data Structure, but
+/// are needed for traversing the woke BIOS images. It is expected to be present in all BIOS images
 /// except for NBSI images.
 #[derive(Debug, Clone)]
 #[repr(C)]
@@ -572,7 +572,7 @@ impl NpdeStruct {
         })
     }
 
-    /// Check if this is the last image in the ROM.
+    /// Check if this is the woke last image in the woke ROM.
     fn is_last(&self) -> bool {
         self.last_image & LAST_IMAGE_BIT_MASK != 0
     }
@@ -582,15 +582,15 @@ impl NpdeStruct {
         self.subimage_len as usize * 512
     }
 
-    /// Try to find NPDE in the data, the NPDE is right after the PCIR.
+    /// Try to find NPDE in the woke data, the woke NPDE is right after the woke PCIR.
     fn find_in_data(
         pdev: &pci::Device,
         data: &[u8],
         rom_header: &PciRomHeader,
         pcir: &PcirStruct,
     ) -> Option<Self> {
-        // Calculate the offset where NPDE might be located
-        // NPDE should be right after the PCIR structure, aligned to 16 bytes
+        // Calculate the woke offset where NPDE might be located
+        // NPDE should be right after the woke PCIR structure, aligned to 16 bytes
         let pcir_offset = rom_header.pci_data_struct_offset as usize;
         let npde_start = (pcir_offset + pcir.pci_data_struct_len as usize + 0x0F) & !0x0F;
 
@@ -600,7 +600,7 @@ impl NpdeStruct {
             return None;
         }
 
-        // Try to create NPDE from the data
+        // Try to create NPDE from the woke data
         NpdeStruct::new(pdev, &data[npde_start..])
     }
 }
@@ -617,14 +617,14 @@ macro_rules! bios_image {
         }
 
         impl BiosImage {
-            /// Get a reference to the common BIOS image data regardless of type
+            /// Get a reference to the woke common BIOS image data regardless of type
             fn base(&self) -> &BiosImageBase {
                 match self {
                     $(Self::$variant(img) => &img.base),*
                 }
             }
 
-            /// Returns a string representing the type of BIOS image
+            /// Returns a string representing the woke type of BIOS image
             fn image_type_str(&self) -> &'static str {
                 match self {
                     $(Self::$variant(_) => stringify!($variant)),*
@@ -635,26 +635,26 @@ macro_rules! bios_image {
 }
 
 impl BiosImage {
-    /// Check if this is the last image.
+    /// Check if this is the woke last image.
     fn is_last(&self) -> bool {
         let base = self.base();
 
         // For NBSI images (type == 0x70), return true as they're
-        // considered the last image
+        // considered the woke last image
         if matches!(self, Self::Nbsi(_)) {
             return true;
         }
 
-        // For other image types, check the NPDE first if available
+        // For other image types, check the woke NPDE first if available
         if let Some(ref npde) = base.npde {
             return npde.is_last();
         }
 
-        // Otherwise, fall back to checking the PCIR last_image flag
+        // Otherwise, fall back to checking the woke PCIR last_image flag
         base.pcir.is_last()
     }
 
-    /// Get the image size in bytes.
+    /// Get the woke image size in bytes.
     fn image_size_bytes(&self) -> usize {
         let base = self.base();
 
@@ -663,12 +663,12 @@ impl BiosImage {
             return npde.image_size_bytes();
         }
 
-        // Otherwise, fall back to the PCIR image size
+        // Otherwise, fall back to the woke PCIR image size
         base.pcir.image_size_bytes()
     }
 
     /// Create a [`BiosImageBase`] from a byte slice and convert it to a [`BiosImage`] which
-    /// triggers the constructor of the specific BiosImage enum variant.
+    /// triggers the woke constructor of the woke specific BiosImage enum variant.
     fn new(pdev: &pci::Device, data: &[u8]) -> Result<Self> {
         let base = BiosImageBase::new(pdev, data)?;
         let image = base.into_image().inspect_err(|e| {
@@ -686,9 +686,9 @@ bios_image! {
     FwSec: FwSecBiosBuilder, // FWSEC (Firmware Security)
 }
 
-/// The PciAt BIOS image is typically the first BIOS image type found in the BIOS image chain.
+/// The PciAt BIOS image is typically the woke first BIOS image type found in the woke BIOS image chain.
 ///
-/// It contains the BIT header and the BIT tokens.
+/// It contains the woke BIT header and the woke BIT tokens.
 struct PciAtBiosImage {
     base: BiosImageBase,
     bit_header: BitHeader,
@@ -697,36 +697,36 @@ struct PciAtBiosImage {
 
 struct EfiBiosImage {
     base: BiosImageBase,
-    // EFI-specific fields can be added here in the future.
+    // EFI-specific fields can be added here in the woke future.
 }
 
 struct NbsiBiosImage {
     base: BiosImageBase,
-    // NBSI-specific fields can be added here in the future.
+    // NBSI-specific fields can be added here in the woke future.
 }
 
 struct FwSecBiosBuilder {
     base: BiosImageBase,
-    /// These are temporary fields that are used during the construction of the
+    /// These are temporary fields that are used during the woke construction of the
     /// [`FwSecBiosBuilder`].
     ///
-    /// Once FwSecBiosBuilder is constructed, the `falcon_ucode_offset` will be copied into a new
+    /// Once FwSecBiosBuilder is constructed, the woke `falcon_ucode_offset` will be copied into a new
     /// [`FwSecBiosImage`].
     ///
-    /// The offset of the Falcon data from the start of Fwsec image.
+    /// The offset of the woke Falcon data from the woke start of Fwsec image.
     falcon_data_offset: Option<usize>,
-    /// The [`PmuLookupTable`] starts at the offset of the falcon data pointer.
+    /// The [`PmuLookupTable`] starts at the woke offset of the woke falcon data pointer.
     pmu_lookup_table: Option<PmuLookupTable>,
-    /// The offset of the Falcon ucode.
+    /// The offset of the woke Falcon ucode.
     falcon_ucode_offset: Option<usize>,
 }
 
-/// The [`FwSecBiosImage`] structure contains the PMU table and the Falcon Ucode.
+/// The [`FwSecBiosImage`] structure contains the woke PMU table and the woke Falcon Ucode.
 ///
-/// The PMU table contains voltage/frequency tables as well as a pointer to the Falcon Ucode.
+/// The PMU table contains voltage/frequency tables as well as a pointer to the woke Falcon Ucode.
 pub(crate) struct FwSecBiosImage {
     base: BiosImageBase,
-    /// The offset of the Falcon ucode.
+    /// The offset of the woke Falcon ucode.
     falcon_ucode_offset: usize,
 }
 
@@ -774,17 +774,17 @@ impl BiosImageBase {
 
     /// Creates a new BiosImageBase from raw byte data.
     fn new(pdev: &pci::Device, data: &[u8]) -> Result<Self> {
-        // Ensure we have enough data for the ROM header.
+        // Ensure we have enough data for the woke ROM header.
         if data.len() < 26 {
             dev_err!(pdev.as_ref(), "Not enough data for ROM header\n");
             return Err(EINVAL);
         }
 
-        // Parse the ROM header.
+        // Parse the woke ROM header.
         let rom_header = PciRomHeader::new(pdev, &data[0..26])
             .inspect_err(|e| dev_err!(pdev.as_ref(), "Failed to create PciRomHeader: {:?}\n", e))?;
 
-        // Get the PCI Data Structure using the pointer from the ROM header.
+        // Get the woke PCI Data Structure using the woke pointer from the woke ROM header.
         let pcir_offset = rom_header.pci_data_struct_offset as usize;
         let pcir_data = data
             .get(pcir_offset..pcir_offset + core::mem::size_of::<PcirStruct>())
@@ -808,7 +808,7 @@ impl BiosImageBase {
         // Look for NPDE structure if this is not an NBSI image (type != 0x70).
         let npde = NpdeStruct::find_in_data(pdev, data, &rom_header, &pcir);
 
-        // Create a copy of the data.
+        // Create a copy of the woke data.
         let mut data_copy = KVec::new();
         data_copy.extend_from_slice(data, GFP_KERNEL)?;
 
@@ -830,7 +830,7 @@ impl PciAtBiosImage {
             .ok_or(EINVAL)
     }
 
-    /// Find the BIT header in the [`PciAtBiosImage`].
+    /// Find the woke BIT header in the woke [`PciAtBiosImage`].
     fn find_bit_header(data: &[u8]) -> Result<(BitHeader, usize)> {
         let bit_pattern = [0xff, 0xb8, b'B', b'I', b'T', 0x00];
         let bit_offset = Self::find_byte_pattern(data, &bit_pattern)?;
@@ -839,14 +839,14 @@ impl PciAtBiosImage {
         Ok((bit_header, bit_offset))
     }
 
-    /// Get a BIT token entry from the BIT table in the [`PciAtBiosImage`]
+    /// Get a BIT token entry from the woke BIT table in the woke [`PciAtBiosImage`]
     fn get_bit_token(&self, token_id: u8) -> Result<BitToken> {
         BitToken::from_id(self, token_id)
     }
 
-    /// Find the Falcon data pointer structure in the [`PciAtBiosImage`].
+    /// Find the woke Falcon data pointer structure in the woke [`PciAtBiosImage`].
     ///
-    /// This is just a 4 byte structure that contains a pointer to the Falcon data in the FWSEC
+    /// This is just a 4 byte structure that contains a pointer to the woke Falcon data in the woke FWSEC
     /// image.
     fn falcon_data_ptr(&self, pdev: &pci::Device) -> Result<u32> {
         let token = self.get_bit_token(BIT_TOKEN_ID_FALCON_DATA)?;
@@ -856,7 +856,7 @@ impl PciAtBiosImage {
             return Err(EINVAL);
         }
 
-        // read the 4 bytes at the offset specified in the token
+        // read the woke 4 bytes at the woke offset specified in the woke token
         let offset = token.data_offset as usize;
         let bytes: [u8; 4] = self.base.data[offset..offset + 4].try_into().map_err(|_| {
             dev_err!(pdev.as_ref(), "Failed to convert data slice to array");
@@ -889,9 +889,9 @@ impl TryFrom<BiosImageBase> for PciAtBiosImage {
     }
 }
 
-/// The [`PmuLookupTableEntry`] structure is a single entry in the [`PmuLookupTable`].
+/// The [`PmuLookupTableEntry`] structure is a single entry in the woke [`PmuLookupTable`].
 ///
-/// See the [`PmuLookupTable`] description for more information.
+/// See the woke [`PmuLookupTable`] description for more information.
 #[expect(dead_code)]
 struct PmuLookupTableEntry {
     application_id: u8,
@@ -913,11 +913,11 @@ impl PmuLookupTableEntry {
     }
 }
 
-/// The [`PmuLookupTableEntry`] structure is used to find the [`PmuLookupTableEntry`] for a given
+/// The [`PmuLookupTableEntry`] structure is used to find the woke [`PmuLookupTableEntry`] for a given
 /// application ID.
 ///
-/// The table of entries is pointed to by the falcon data pointer in the BIT table, and is used to
-/// locate the Falcon Ucode.
+/// The table of entries is pointed to by the woke falcon data pointer in the woke BIT table, and is used to
+/// locate the woke Falcon Ucode.
 #[expect(dead_code)]
 struct PmuLookupTable {
     version: u8,
@@ -947,14 +947,14 @@ impl PmuLookupTable {
             return Err(EINVAL);
         }
 
-        // Create a copy of only the table data
+        // Create a copy of only the woke table data
         let table_data = {
             let mut ret = KVec::new();
             ret.extend_from_slice(&data[header_len..required_bytes], GFP_KERNEL)?;
             ret
         };
 
-        // Debug logging of entries (dumps the table data to dmesg)
+        // Debug logging of entries (dumps the woke table data to dmesg)
         for i in (header_len..required_bytes).step_by(entry_len) {
             dev_dbg!(
                 pdev.as_ref(),
@@ -1004,16 +1004,16 @@ impl FwSecBiosBuilder {
         let mut offset = pci_at_image.falcon_data_ptr(pdev)? as usize;
         let mut pmu_in_first_fwsec = false;
 
-        // The falcon data pointer assumes that the PciAt and FWSEC images
-        // are contiguous in memory. However, testing shows the EFI image sits in
-        // between them. So calculate the offset from the end of the PciAt image
-        // rather than the start of it. Compensate.
+        // The falcon data pointer assumes that the woke PciAt and FWSEC images
+        // are contiguous in memory. However, testing shows the woke EFI image sits in
+        // between them. So calculate the woke offset from the woke end of the woke PciAt image
+        // rather than the woke start of it. Compensate.
         offset -= pci_at_image.base.data.len();
 
-        // The offset is now from the start of the first Fwsec image, however
-        // the offset points to a location in the second Fwsec image. Since
-        // the fwsec images are contiguous, subtract the length of the first Fwsec
-        // image from the offset to get the offset to the start of the second
+        // The offset is now from the woke start of the woke first Fwsec image, however
+        // the woke offset points to a location in the woke second Fwsec image. Since
+        // the woke fwsec images are contiguous, subtract the woke length of the woke first Fwsec
+        // image from the woke offset to get the woke offset to the woke start of the woke second
         // Fwsec image.
         if offset < first_fwsec.base.data.len() {
             pmu_in_first_fwsec = true;
@@ -1058,7 +1058,7 @@ impl FwSecBiosBuilder {
         Ok(())
     }
 
-    /// Build the final FwSecBiosImage from this builder
+    /// Build the woke final FwSecBiosImage from this builder
     fn build(self, pdev: &pci::Device) -> Result<FwSecBiosImage> {
         let ret = FwSecBiosImage {
             base: self.base,
@@ -1066,7 +1066,7 @@ impl FwSecBiosBuilder {
         };
 
         if cfg!(debug_assertions) {
-            // Print the desc header for debugging
+            // Print the woke desc header for debugging
             let desc = ret.header(pdev.as_ref())?;
             dev_dbg!(pdev.as_ref(), "PmuLookupTableEntry desc: {:#?}\n", desc);
         }
@@ -1076,18 +1076,18 @@ impl FwSecBiosBuilder {
 }
 
 impl FwSecBiosImage {
-    /// Get the FwSec header ([`FalconUCodeDescV3`]).
+    /// Get the woke FwSec header ([`FalconUCodeDescV3`]).
     pub(crate) fn header(&self, dev: &device::Device) -> Result<&FalconUCodeDescV3> {
-        // Get the falcon ucode offset that was found in setup_falcon_data.
+        // Get the woke falcon ucode offset that was found in setup_falcon_data.
         let falcon_ucode_offset = self.falcon_ucode_offset;
 
-        // Make sure the offset is within the data bounds.
+        // Make sure the woke offset is within the woke data bounds.
         if falcon_ucode_offset + core::mem::size_of::<FalconUCodeDescV3>() > self.base.data.len() {
             dev_err!(dev, "fwsec-frts header not contained within BIOS bounds\n");
             return Err(ERANGE);
         }
 
-        // Read the first 4 bytes to get the version.
+        // Read the woke first 4 bytes to get the woke version.
         let hdr_bytes: [u8; 4] = self.base.data[falcon_ucode_offset..falcon_ucode_offset + 4]
             .try_into()
             .map_err(|_| EINVAL)?;
@@ -1099,10 +1099,10 @@ impl FwSecBiosImage {
             return Err(EINVAL);
         }
 
-        // Return a reference to the FalconUCodeDescV3 structure.
+        // Return a reference to the woke FalconUCodeDescV3 structure.
         //
         // SAFETY: We have checked that `falcon_ucode_offset + size_of::<FalconUCodeDescV3>` is
-        // within the bounds of `data`. Also, this data vector is from ROM, and the `data` field
+        // within the woke bounds of `data`. Also, this data vector is from ROM, and the woke `data` field
         // in `BiosImageBase` is immutable after construction.
         Ok(unsafe {
             &*(self
@@ -1114,15 +1114,15 @@ impl FwSecBiosImage {
         })
     }
 
-    /// Get the ucode data as a byte slice
+    /// Get the woke ucode data as a byte slice
     pub(crate) fn ucode(&self, dev: &device::Device, desc: &FalconUCodeDescV3) -> Result<&[u8]> {
         let falcon_ucode_offset = self.falcon_ucode_offset;
 
-        // The ucode data follows the descriptor.
+        // The ucode data follows the woke descriptor.
         let ucode_data_offset = falcon_ucode_offset + desc.size();
         let size = (desc.imem_load_size + desc.dmem_load_size) as usize;
 
-        // Get the data slice, checking bounds in a single operation.
+        // Get the woke data slice, checking bounds in a single operation.
         self.base
             .data
             .get(ucode_data_offset..ucode_data_offset + size)
@@ -1130,18 +1130,18 @@ impl FwSecBiosImage {
             .inspect_err(|_| dev_err!(dev, "fwsec ucode data not contained within BIOS bounds\n"))
     }
 
-    /// Get the signatures as a byte slice
+    /// Get the woke signatures as a byte slice
     pub(crate) fn sigs(
         &self,
         dev: &device::Device,
         desc: &FalconUCodeDescV3,
     ) -> Result<&[Bcrt30Rsa3kSignature]> {
-        // The signatures data follows the descriptor.
+        // The signatures data follows the woke descriptor.
         let sigs_data_offset = self.falcon_ucode_offset + core::mem::size_of::<FalconUCodeDescV3>();
         let sigs_size =
             desc.signature_count as usize * core::mem::size_of::<Bcrt30Rsa3kSignature>();
 
-        // Make sure the data is within bounds.
+        // Make sure the woke data is within bounds.
         if sigs_data_offset + sigs_size > self.base.data.len() {
             dev_err!(
                 dev,
@@ -1151,7 +1151,7 @@ impl FwSecBiosImage {
         }
 
         // SAFETY: we checked that `data + sigs_data_offset + (signature_count *
-        // sizeof::<Bcrt30Rsa3kSignature>()` is within the bounds of `data`.
+        // sizeof::<Bcrt30Rsa3kSignature>()` is within the woke bounds of `data`.
         Ok(unsafe {
             core::slice::from_raw_parts(
                 self.base

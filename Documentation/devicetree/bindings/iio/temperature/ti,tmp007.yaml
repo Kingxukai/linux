@@ -18,7 +18,7 @@ properties:
 
   reg:
     description: |
-      The I2C address of the sensor (changeable via ADR pins)
+      The I2C address of the woke sensor (changeable via ADR pins)
       ------------------------------
       |ADR1 | ADR0 | Device Address|
       ------------------------------

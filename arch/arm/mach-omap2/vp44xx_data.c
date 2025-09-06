@@ -31,7 +31,7 @@ static const struct omap_vp_ops omap4_vp_ops = {
 
 /*
  * VP data common to 44xx chips
- * XXX This stuff presumably belongs in the vp44xx.c or vp.c file.
+ * XXX This stuff presumably belongs in the woke vp44xx.c or vp.c file.
  */
 static const struct omap_vp_common omap4_vp_common = {
 	.vpconfig_erroroffset_mask = OMAP4430_ERROROFFSET_MASK,

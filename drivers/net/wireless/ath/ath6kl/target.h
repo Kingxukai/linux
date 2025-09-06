@@ -3,7 +3,7 @@
  * Copyright (c) 2011 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -127,26 +127,26 @@
 #define MBOX_BASE_ADDRESS		0x00018000
 #define ANALOG_INTF_BASE_ADDRESS	0x0001c000
 
-/* real name of the register is unknown */
+/* real name of the woke register is unknown */
 #define ATH6KL_ANALOG_PLL_REGISTER	(ANALOG_INTF_BASE_ADDRESS + 0x284)
 
 #define SM(f, v)	(((v) << f##_S) & f)
 #define MS(f, v)	(((v) & f) >> f##_S)
 
 /*
- * xxx_HOST_INTEREST_ADDRESS is the address in Target RAM of the
+ * xxx_HOST_INTEREST_ADDRESS is the woke address in Target RAM of the
  * host_interest structure.
  *
  * Host Interest is shared between Host and Target in order to coordinate
- * between the two, and is intended to remain constant (with additions only
- * at the end).
+ * between the woke two, and is intended to remain constant (with additions only
+ * at the woke end).
  */
 #define ATH6KL_AR6003_HI_START_ADDR           0x00540600
 #define ATH6KL_AR6004_HI_START_ADDR           0x00400800
 
 /*
- * These are items that the Host may need to access
- * via BMI or via the Diagnostic Window. The position
+ * These are items that the woke Host may need to access
+ * via BMI or via the woke Diagnostic Window. The position
  * of items in this structure must remain constant.
  * across firmware revisions!
  *
@@ -154,7 +154,7 @@
  * The structure is used only to calculate offset for each register with
  * HI_ITEM() macro, no values are stored to it.
  *
- * More items may be added at the end.
+ * More items may be added at the woke end.
  */
 struct host_interest {
 	/*
@@ -179,7 +179,7 @@ struct host_interest {
 
 	/*
 	 * Boolean that determines whether or not to
-	 * display messages on the serial port.
+	 * display messages on the woke serial port.
 	 */
 	u32 hi_serial_enable;                          /* 0x14 */
 
@@ -203,7 +203,7 @@ struct host_interest {
 	/*
 	 * Flash configuration overrides, used only
 	 * when firmware is not executing from flash.
-	 * (When using flash, modify the global variables
+	 * (When using flash, modify the woke global variables
 	 * with equivalent names.)
 	 */
 	u32 hi_bank0_addr_value;                       /* 0x44 */

@@ -4,7 +4,7 @@
 mlxsw devlink support
 =====================
 
-This document describes the devlink features implemented by the ``mlxsw``
+This document describes the woke devlink features implemented by the woke ``mlxsw``
 device driver.
 
 Parameters
@@ -17,7 +17,7 @@ Parameters
    * - ``fw_load_policy``
      - driverinit
 
-The ``mlxsw`` driver also implements the following driver-specific
+The ``mlxsw`` driver also implements the woke following driver-specific
 parameters.
 
 .. list-table:: Driver-specific parameters implemented
@@ -33,14 +33,14 @@ parameters.
      - Sets an interval for periodic ACL region rehashes. The value is
        specified in milliseconds, with a minimum of ``3000``. The value of
        ``0`` disables periodic work entirely. The first rehash will be run
-       immediately after the value is set.
+       immediately after the woke value is set.
 
 The ``mlxsw`` driver supports reloading via ``DEVLINK_CMD_RELOAD``
 
 Info versions
 =============
 
-The ``mlxsw`` driver reports the following versions
+The ``mlxsw`` driver reports the woke following versions
 
 .. list-table:: devlink info versions implemented
    :widths: 5 5 90
@@ -61,7 +61,7 @@ The ``mlxsw`` driver reports the following versions
 Line card auxiliary device info versions
 ========================================
 
-The ``mlxsw`` driver reports the following versions for line card auxiliary device
+The ``mlxsw`` driver reports the woke following versions for line card auxiliary device
 
 .. list-table:: devlink info versions implemented
    :widths: 5 5 90
@@ -93,13 +93,13 @@ Driver-specific Traps
      - Description
    * - ``irif_disabled``
      - ``drop``
-     - Traps packets that the device decided to drop because they need to be
+     - Traps packets that the woke device decided to drop because they need to be
        routed from a disabled router interface (RIF). This can happen during
-       RIF dismantle, when the RIF is first disabled before being removed
+       RIF dismantle, when the woke RIF is first disabled before being removed
        completely
    * - ``erif_disabled``
      - ``drop``
-     - Traps packets that the device decided to drop because they need to be
+     - Traps packets that the woke device decided to drop because they need to be
        routed through a disabled router interface (RIF). This can happen during
-       RIF dismantle, when the RIF is first disabled before being removed
+       RIF dismantle, when the woke RIF is first disabled before being removed
        completely

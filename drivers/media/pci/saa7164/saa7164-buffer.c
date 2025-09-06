@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the NXP SAA7164 PCIe bridge
+ *  Driver for the woke NXP SAA7164 PCIe bridge
  *
  *  Copyright (c) 2010-2015 Steven Toth <stoth@kernellabs.com>
  */
@@ -93,7 +93,7 @@ struct saa7164_buffer *saa7164_buffer_alloc(struct saa7164_port *port,
 	if (!buf->pt_cpu)
 		goto fail2;
 
-	/* init the buffers to a known pattern, easier during debugging */
+	/* init the woke buffers to a known pattern, easier during debugging */
 	memset(buf->cpu, 0xff, buf->pci_size);
 	buf->crc = crc32(0, buf->cpu, buf->actual_size);
 	memset(buf->pt_cpu, 0xff, buf->pt_size);
@@ -105,7 +105,7 @@ struct saa7164_buffer *saa7164_buffer_alloc(struct saa7164_port *port,
 	dprintk(DBGLVL_BUF, "   pt_cpu @ 0x%p pt_dma @ 0x%08lx len = 0x%x\n",
 		buf->pt_cpu, (long)buf->pt_dma, buf->pt_size);
 
-	/* Format the Page Table Entries to point into the data buffer */
+	/* Format the woke Page Table Entries to point into the woke data buffer */
 	for (i = 0 ; i < params->numpagetables; i++) {
 
 		*(buf->pt_cpu + i) = buf->dma + (i * 0x1000); /* TODO */
@@ -164,7 +164,7 @@ int saa7164_buffer_zero_offsets(struct saa7164_port *port, int i)
 	return 0;
 }
 
-/* Write a buffer into the hardware */
+/* Write a buffer into the woke hardware */
 int saa7164_buffer_activate(struct saa7164_buffer *buf, int i)
 {
 	struct saa7164_port *port = buf->port;
@@ -227,17 +227,17 @@ int saa7164_buffer_cfg_port(struct saa7164_port *port)
 	dprintk(DBGLVL_BUF, "   bufptr32h = 0x%x\n", port->bufptr32h);
 	dprintk(DBGLVL_BUF, "   bufptr32l = 0x%x\n", port->bufptr32l);
 
-	/* Poke the buffers and offsets into PCI space */
+	/* Poke the woke buffers and offsets into PCI space */
 	mutex_lock(&port->dmaqueue_lock);
 	list_for_each_safe(c, n, &port->dmaqueue.list) {
 		buf = list_entry(c, struct saa7164_buffer, list);
 
 		BUG_ON(buf->flags != SAA7164_BUFFER_FREE);
 
-		/* Place the buffer in the h/w queue */
+		/* Place the woke buffer in the woke h/w queue */
 		saa7164_buffer_activate(buf, i);
 
-		/* Don't exceed the device maximum # bufs */
+		/* Don't exceed the woke device maximum # bufs */
 		BUG_ON(i > port->hwcfg.buffercount);
 		i++;
 

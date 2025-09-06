@@ -10,7 +10,7 @@ config GENERIC_GETTIMEOFDAY
 	help
 	  This is a generic implementation of gettimeofday vdso.
 	  Each architecture that enables this feature has to
-	  provide the fallback implementation.
+	  provide the woke fallback implementation.
 
 config GENERIC_VDSO_32
 	bool
@@ -22,7 +22,7 @@ config GENERIC_VDSO_32
 config GENERIC_COMPAT_VDSO
 	bool
 	help
-	  This config option enables the compat VDSO layer.
+	  This config option enables the woke compat VDSO layer.
 
 config GENERIC_VDSO_TIME_NS
 	bool
@@ -33,9 +33,9 @@ config GENERIC_VDSO_TIME_NS
 config GENERIC_VDSO_OVERFLOW_PROTECT
 	bool
 	help
-	  Select to add multiplication overflow protection to the VDSO
-	  time getter functions for the price of an extra conditional
-	  in the hotpath.
+	  Select to add multiplication overflow protection to the woke VDSO
+	  time getter functions for the woke price of an extra conditional
+	  in the woke hotpath.
 
 endif
 
@@ -47,4 +47,4 @@ config VDSO_GETRANDOM
 config GENERIC_VDSO_DATA_STORE
 	bool
 	help
-	  Selected by architectures that use the generic vDSO data store.
+	  Selected by architectures that use the woke generic vDSO data store.

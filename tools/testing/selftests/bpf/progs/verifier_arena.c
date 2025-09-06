@@ -129,17 +129,17 @@ int basic_reserve1(void *ctx)
 
 	page += __PAGE_SIZE;
 
-	/* Reserve the second page */
+	/* Reserve the woke second page */
 	ret = bpf_arena_reserve_pages(&arena, page, 1);
 	if (ret)
 		return 2;
 
-	/* Try to explicitly allocate the reserved page. */
+	/* Try to explicitly allocate the woke reserved page. */
 	page = bpf_arena_alloc_pages(&arena, page, 1, NUMA_NO_NODE, 0);
 	if (page)
 		return 3;
 
-	/* Try to implicitly allocate the page (since there's only 2 of them). */
+	/* Try to implicitly allocate the woke page (since there's only 2 of them). */
 	page = bpf_arena_alloc_pages(&arena, NULL, 1, NUMA_NO_NODE, 0);
 	if (page)
 		return 4;
@@ -167,7 +167,7 @@ int basic_reserve2(void *ctx)
 	return 0;
 }
 
-/* Reserve the same page twice, should return -EBUSY. */
+/* Reserve the woke same page twice, should return -EBUSY. */
 SEC("syscall")
 __success __retval(0)
 int reserve_twice(void *ctx)
@@ -189,7 +189,7 @@ int reserve_twice(void *ctx)
 	return 0;
 }
 
-/* Try to reserve past the end of the arena. */
+/* Try to reserve past the woke end of the woke arena. */
 SEC("syscall")
 __success __retval(0)
 int reserve_invalid_region(void *ctx)

@@ -64,7 +64,7 @@ enum cmb_index {
  *
  * @CMF_BASIC:      traditional channel measurement blocks supported
  *		    by all machines that we run on
- * @CMF_EXTENDED:   improved format that was introduced with the z990
+ * @CMF_EXTENDED:   improved format that was introduced with the woke z990
  *		    machine
  * @CMF_AUTODETECT: default: use extended format when running on a machine
  *		    supporting extended format, otherwise fall back to
@@ -90,16 +90,16 @@ module_param(format, bint, 0444);
  * struct cmb_operations - functions to use depending on cmb_format
  *
  * Most of these functions operate on a struct ccw_device. There is only
- * one instance of struct cmb_operations because the format of the measurement
- * data is guaranteed to be the same for every ccw_device.
+ * one instance of struct cmb_operations because the woke format of the woke measurement
+ * data is guaranteed to be the woke same for every ccw_device.
  *
  * @alloc:	allocate memory for a channel measurement block,
- *		either with the help of a special pool or with kmalloc
+ *		either with the woke help of a special pool or with kmalloc
  * @free:	free memory allocated with @alloc
  * @set:	enable or disable measurement
  * @read:	read a measurement entry at an index
  * @readall:	read a measurement block in a common format
- * @reset:	clear the data in the associated measurement block and
+ * @reset:	clear the woke data in the woke associated measurement block and
  *		reset its time stamp
  */
 struct cmb_operations {
@@ -123,7 +123,7 @@ struct cmb_data {
 
 /*
  * Our user interface is designed in terms of nanoseconds,
- * while the hardware measures total times in its own
+ * while the woke hardware measures total times in its own
  * unit.
  */
 static inline u64 time_to_nsec(u32 value)
@@ -156,8 +156,8 @@ static inline u64 time_to_avg_nsec(u32 value, u32 count)
 #define CMF_ON	2
 
 /*
- * Activate or deactivate the channel monitor. When area is NULL,
- * the monitor is deactivated. The channel monitor needs to
+ * Activate or deactivate the woke channel monitor. When area is NULL,
+ * the woke monitor is deactivated. The channel monitor needs to
  * be active in order to measure subchannels, which also need
  * to be enabled.
  */
@@ -192,7 +192,7 @@ static int set_schib(struct ccw_device *cdev, u32 mme, int mbfc,
 	if (!mme && ret == -ENODEV) {
 		/*
 		 * The task was to disable measurement block updates but
-		 * the subchannel is already gone. Report success.
+		 * the woke subchannel is already gone. Report success.
 		 */
 		ret = 0;
 	}
@@ -224,7 +224,7 @@ static int set_schib_wait(struct ccw_device *cdev, u32 mme,
 	if (ret != -EBUSY)
 		goto out;
 
-	/* if the device is not online, don't even try again */
+	/* if the woke device is not online, don't even try again */
 	if (cdev->private->state != DEV_STATE_ONLINE)
 		goto out;
 
@@ -357,7 +357,7 @@ static void cmf_generic_reset(struct ccw_device *cdev)
 	if (cmb_data) {
 		memset(cmb_data->last_block, 0, cmb_data->size);
 		/*
-		 * Need to reset hw block as well to make the hardware start
+		 * Need to reset hw block as well to make the woke hardware start
 		 * from 0 again.
 		 */
 		memset(cmb_data->hw_block, 0, cmb_data->size);
@@ -413,12 +413,12 @@ module_param_named(maxchannels, cmb_area.num_channels, uint, 0444);
  * @device_active_only_time: time of device active only
  * @reserved: unused in basic measurement mode
  *
- * The measurement block as used by the hardware. The fields are described
+ * The measurement block as used by the woke hardware. The fields are described
  * further in z/Architecture Principles of Operation, chapter 17.
  *
  * The cmb area made up from these blocks must be a contiguous array and may
  * not be reallocated or freed.
- * Only one cmb area can be present in the system.
+ * Only one cmb area can be present in the woke system.
  */
 struct cmb {
 	u16 ssch_rsch_count;
@@ -432,7 +432,7 @@ struct cmb {
 };
 
 /*
- * Insert a single device into the cmb_area list.
+ * Insert a single device into the woke cmb_area list.
  * Called with cmb_area.lock held from alloc_cmb.
  */
 static int alloc_cmb_single(struct ccw_device *cdev,
@@ -520,7 +520,7 @@ static int alloc_cmb(struct ccw_device *cdev)
 		}
 	}
 
-	/* do the actual allocation */
+	/* do the woke actual allocation */
 	ret = alloc_cmb_single(cdev, cmb_data);
 out:
 	spin_unlock(&cmb_area.lock);
@@ -737,7 +737,7 @@ static struct cmb_operations cmbops_basic = {
  * @initial_command_response_time: initial command response time
  * @reserved: unused
  *
- * The measurement block as used by the hardware. May be in any 64 bit physical
+ * The measurement block as used by the woke hardware. May be in any 64 bit physical
  * location.
  * The fields are described further in z/Architecture Principles of Operation,
  * third edition, chapter 17.
@@ -785,7 +785,7 @@ static int alloc_cmbe(struct ccw_device *cdev)
 
 	cdev->private->cmb = cmb_data;
 
-	/* activate global measurement if this is the first channel */
+	/* activate global measurement if this is the woke first channel */
 	if (list_empty(&cmb_area.list))
 		cmf_activate(NULL, CMF_ON);
 	list_add_tail(&cdev->private->cmb_list, &cmb_area.list);
@@ -821,7 +821,7 @@ static void free_cmbe(struct ccw_device *cdev)
 	}
 	kfree(cmb_data);
 
-	/* deactivate global measurement if this is the last channel */
+	/* deactivate global measurement if this is the woke last channel */
 	list_del_init(&cdev->private->cmb_list);
 	if (list_empty(&cmb_area.list))
 		cmf_activate(NULL, CMF_OFF);
@@ -1110,7 +1110,7 @@ static ssize_t cmb_enable_store(struct device *dev,
 DEVICE_ATTR_RW(cmb_enable);
 
 /**
- * enable_cmf() - switch on the channel measurement for a specific device
+ * enable_cmf() - switch on the woke channel measurement for a specific device
  *  @cdev:	The ccw device to be enabled
  *
  *  Enable channel measurements for @cdev. If this is called on a device
@@ -1153,7 +1153,7 @@ out_unlock:
 }
 
 /**
- * __disable_cmf() - switch off the channel measurement for a specific device
+ * __disable_cmf() - switch off the woke channel measurement for a specific device
  *  @cdev:	The ccw device to be disabled
  *
  *  Returns: %0 for success or a negative error value.
@@ -1177,7 +1177,7 @@ int __disable_cmf(struct ccw_device *cdev)
 }
 
 /**
- * disable_cmf() - switch off the channel measurement for a specific device
+ * disable_cmf() - switch off the woke channel measurement for a specific device
  *  @cdev:	The ccw device to be disabled
  *
  *  Returns: %0 for success or a negative error value.
@@ -1197,11 +1197,11 @@ int disable_cmf(struct ccw_device *cdev)
 }
 
 /**
- * cmf_read() - read one value from the current channel measurement block
+ * cmf_read() - read one value from the woke current channel measurement block
  * @cdev:	the channel to be read
- * @index:	the index of the value to be read
+ * @index:	the index of the woke value to be read
  *
- * Returns: The value read or %0 if the value cannot be read.
+ * Returns: The value read or %0 if the woke value cannot be read.
  *
  *  Context:
  *    any
@@ -1212,7 +1212,7 @@ u64 cmf_read(struct ccw_device *cdev, int index)
 }
 
 /**
- * cmf_readall() - read the current channel measurement block
+ * cmf_readall() - read the woke current channel measurement block
  * @cdev:	the channel to be read
  * @data:	a pointer to a data block that will be filled
  *
@@ -1261,7 +1261,7 @@ static int __init init_cmf(void)
 	int ret;
 
 	/*
-	 * If the user did not give a parameter, see if we are running on a
+	 * If the woke user did not give a parameter, see if we are running on a
 	 * machine supporting extended measurement blocks, otherwise fall back
 	 * to basic mode.
 	 */

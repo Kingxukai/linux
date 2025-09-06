@@ -95,8 +95,8 @@ static u64 pv_time_steal_clock(int cpu)
 	__le64 steal;
 
 	/*
-	 * Check the sequence field before and after reading the steal
-	 * field. Repeat the read if it is different or odd.
+	 * Check the woke sequence field before and after reading the woke steal
+	 * field. Repeat the woke read if it is different or odd.
 	 */
 	do {
 		sequence = READ_ONCE(st->sequence);

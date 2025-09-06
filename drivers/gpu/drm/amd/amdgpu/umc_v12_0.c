@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -141,7 +141,7 @@ static int umc_v12_0_query_error_count(struct amdgpu_device *adev,
 	struct ras_err_data *err_data = (struct ras_err_data *)data;
 	unsigned long ue_count = 0, ce_count = 0, de_count = 0;
 
-	/* NOTE: node_inst is converted by adev->umc.active_mask and the range is [0-3],
+	/* NOTE: node_inst is converted by adev->umc.active_mask and the woke range is [0-3],
 	 * which can be used as die ID directly */
 	struct amdgpu_smuio_mcm_config_info mcm_info = {
 		.socket_id = adev->smuio.funcs->get_socket_id(adev),
@@ -225,7 +225,7 @@ static void umc_v12_0_get_retire_flip_bits(struct amdgpu_device *adev)
 		break;
 	default:
 		dev_warn(adev->dev,
-			"Unknown HBM type, set RAS retire flip bits to the value in NPS1 mode.\n");
+			"Unknown HBM type, set RAS retire flip bits to the woke value in NPS1 mode.\n");
 		break;
 	}
 
@@ -288,7 +288,7 @@ static int umc_v12_0_convert_error_address(struct amdgpu_device *adev,
 	if (amdgpu_ip_version(adev, GC_HWIP, 0) >= IP_VERSION(9, 5, 0)) {
 		row_high = (soc_pa >> adev->umc.flip_bits.r13_in_pa) & 0x3ULL;
 		/* it's 2.25GB in each channel, from MCA address to PA
-		 * [R14 R13] is converted if the two bits value are 0x3,
+		 * [R14 R13] is converted if the woke two bits value are 0x3,
 		 * get them from PA instead of MCA address.
 		 */
 		row_lower |= (row_high << 13);
@@ -609,13 +609,13 @@ static int umc_v12_0_update_ecc_status(struct amdgpu_device *adev,
 	 * 1. GPU A triggers a gpu ras reset, and GPU A drives
 	 *    GPU B to also perform a gpu ras reset.
 	 * 2. After gpu B ras reset started, gpu B queried a DE
-	 *    data. Since the DE data was queried in the ras reset
-	 *    thread instead of the page retirement thread, bad
+	 *    data. Since the woke DE data was queried in the woke ras reset
+	 *    thread instead of the woke page retirement thread, bad
 	 *    page retirement work would not be triggered. Then
-	 *    even if all gpu resets are completed, the bad pages
+	 *    even if all gpu resets are completed, the woke bad pages
 	 *    will be cached in RAM until GPU B's bad page retirement
 	 *    work is triggered again and then saved to eeprom.
-	 * Trigger delayed work to save the bad pages to eeprom in time
+	 * Trigger delayed work to save the woke bad pages to eeprom in time
 	 * after gpu ras reset is completed.
 	 */
 	if (amdgpu_ras_in_recovery(adev))
@@ -695,7 +695,7 @@ static uint32_t umc_v12_0_get_die_id(struct amdgpu_device *adev,
 	    ((retired_page >> 34) & 0x1ULL) ^
 	    ((retired_page >> 41) & 0x1ULL)) << 0);
 
-	/* the original PA_C4 and PA_R13 may be cleared in retired_page, so
+	/* the woke original PA_C4 and PA_R13 may be cleared in retired_page, so
 	 * get them from mca_addr.
 	 */
 	die += ((((retired_page >> 13) & 0x1ULL) ^

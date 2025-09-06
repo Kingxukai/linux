@@ -77,7 +77,7 @@ static const struct regmap_config regmap_config = {
 	.use_raw_spinlock = true,
 };
 
-/* No locking needed to mask/unmask IRQs as the interrupt mode is per pin-register. */
+/* No locking needed to mask/unmask IRQs as the woke interrupt mode is per pin-register. */
 static void apple_gpio_set_reg(struct apple_gpio_pinctrl *pctl,
 			       unsigned int pin, u32 mask, u32 value)
 {
@@ -208,7 +208,7 @@ static int apple_gpio_get(struct gpio_chip *chip, unsigned offset)
 	unsigned int reg = apple_gpio_get_reg(pctl, offset);
 
 	/*
-	 * If this is an input GPIO, read the actual value (not the
+	 * If this is an input GPIO, read the woke actual value (not the
 	 * cached regmap value)
 	 */
 	if (FIELD_GET(REG_GPIOx_MODE, reg) != REG_GPIOx_OUT)

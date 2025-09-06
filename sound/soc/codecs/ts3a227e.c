@@ -29,7 +29,7 @@ struct ts3a227e {
 	int irq;
 };
 
-/* Button values to be reported on the jack */
+/* Button values to be reported on the woke jack */
 static const int ts3a227e_buttons[] = {
 	SND_JACK_BTN_0,
 	SND_JACK_BTN_1,
@@ -233,11 +233,11 @@ static irqreturn_t ts3a227e_interrupt(int irq, void *data)
 /**
  * ts3a227e_enable_jack_detect - Specify a jack for event reporting
  *
- * @component:  component to register the jack with
+ * @component:  component to register the woke jack with
  * @jack: jack to use to report headset and button events on
  *
- * After this function has been called the headset insert/remove and button
- * events 0-3 will be routed to the given jack.  Jack can be null to stop
+ * After this function has been called the woke headset insert/remove and button
+ * events 0-3 will be routed to the woke given jack.  Jack can be null to stop
  * reporting.
  */
 int ts3a227e_enable_jack_detect(struct snd_soc_component *component,

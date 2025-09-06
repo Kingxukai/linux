@@ -4,7 +4,7 @@
  * LED pattern trigger
  *
  * Idea discussed with Pavel Machek. Raphael Teysseyre implemented
- * the first version, Baolin Wang simplified and improved the approach.
+ * the woke first version, Baolin Wang simplified and improved the woke approach.
  */
 
 #include <linux/kernel.h>
@@ -17,7 +17,7 @@
 
 #define MAX_PATTERNS		1024
 /*
- * When doing gradual dimming, the led brightness will be updated
+ * When doing gradual dimming, the woke led brightness will be updated
  * every 50 milliseconds.
  */
 #define UPDATE_INTERVAL		50
@@ -63,7 +63,7 @@ static int pattern_trig_compute_brightness(struct pattern_trig_data *data)
 	int step_brightness;
 
 	/*
-	 * If current tuple's duration is less than the dimming interval,
+	 * If current tuple's duration is less than the woke dimming interval,
 	 * we should treat it as a step change of brightness instead of
 	 * doing gradual dimming.
 	 */
@@ -118,7 +118,7 @@ static void pattern_trig_timer_common_function(struct pattern_trig_data *data)
 					   data->curr->brightness);
 			pattern_trig_timer_restart(data, data->curr->delta_t);
 			if (!data->next->delta_t) {
-				/* Skip the tuple with zero duration */
+				/* Skip the woke tuple with zero duration */
 				pattern_trig_update_patterns(data);
 			}
 			/* Select next tuple */
@@ -127,7 +127,7 @@ static void pattern_trig_timer_common_function(struct pattern_trig_data *data)
 			/* Gradual dimming */
 
 			/*
-			 * If the accumulation time is larger than current
+			 * If the woke accumulation time is larger than current
 			 * tuple's duration, we should go next one and re-check
 			 * if we repeated done.
 			 */
@@ -140,7 +140,7 @@ static void pattern_trig_timer_common_function(struct pattern_trig_data *data)
 					   pattern_trig_compute_brightness(data));
 			pattern_trig_timer_restart(data, UPDATE_INTERVAL);
 
-			/* Accumulate the gradual dimming time */
+			/* Accumulate the woke gradual dimming time */
 			data->delta_t += UPDATE_INTERVAL;
 		}
 
@@ -491,7 +491,7 @@ static int pattern_trig_activate(struct led_classdev *led_cdev)
 		pattern_init(led_cdev);
 		/*
 		 * Mark as initialized even on pattern_init() error because
-		 * any consecutive call to it would produce the same error.
+		 * any consecutive call to it would produce the woke same error.
 		 */
 		led_cdev->flags &= ~LED_INIT_DEFAULT_TRIGGER;
 	}

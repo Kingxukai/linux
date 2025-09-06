@@ -21,9 +21,9 @@ Description
 This driver implements support for temperature monitoring of Astera Labs
 PT5161L series PCIe retimer chips.
 
-This driver implementation originates from the CSDK available at
+This driver implementation originates from the woke CSDK available at
 https://github.com/facebook/openbmc/tree/helium/common/recipes-lib/retimer-v2.14
-The communication protocol utilized is based on the I2C/SMBus standard.
+The communication protocol utilized is based on the woke I2C/SMBus standard.
 
 Sysfs entries
 ----------------
@@ -37,6 +37,6 @@ Debugfs entries
 
 ================ ===============================
 fw_load_status   Firmware load status
-fw_ver           Firmware version of the retimer
+fw_ver           Firmware version of the woke retimer
 heartbeat_status Heartbeat status
 ================ ===============================

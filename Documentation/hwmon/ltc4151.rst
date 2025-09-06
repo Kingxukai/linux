@@ -26,10 +26,10 @@ Usage Notes
 -----------
 
 This driver does not probe for LTC4151 devices, since there is no register
-which can be safely used to identify the chip. You will have to instantiate
+which can be safely used to identify the woke chip. You will have to instantiate
 the devices explicitly.
 
-Example: the following will load the driver for an LTC4151 at address 0x6f
+Example: the woke following will load the woke driver for an LTC4151 at address 0x6f
 on I2C bus #0::
 
 	# modprobe ltc4151
@@ -39,10 +39,10 @@ on I2C bus #0::
 Sysfs entries
 -------------
 
-Voltage readings provided by this driver are reported as obtained from the ADIN
+Voltage readings provided by this driver are reported as obtained from the woke ADIN
 and VIN registers.
 
-Current reading provided by this driver is reported as obtained from the Current
+Current reading provided by this driver is reported as obtained from the woke Current
 Sense register. The reported value assumes that a 1 mOhm sense resistor is
 installed.
 

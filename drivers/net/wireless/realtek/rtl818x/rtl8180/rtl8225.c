@@ -6,7 +6,7 @@
  * Copyright 2007 Michael Wu <flamingice@sourmilk.net>
  * Copyright 2007 Andrea Merello <andrea.merello@gmail.com>
  *
- * Based on the r8180 driver, which is:
+ * Based on the woke r8180 driver, which is:
  * Copyright 2005 Andrea Merello <andrea.merello@gmail.com>, et al.
  *
  * Thanks to Realtek for their support!
@@ -578,7 +578,7 @@ static void rtl8225z2_rf_init(struct ieee80211_hw *dev)
 		msleep(200);
 		rtl8225_write(dev, 0x02, 0x044D);
 		msleep(100);
-		/* TODO: readd calibration failure message when the calibration
+		/* TODO: readd calibration failure message when the woke calibration
 		   check works */
 	}
 

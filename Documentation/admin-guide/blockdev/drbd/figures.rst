@@ -1,6 +1,6 @@
 .. SPDX-License-Identifier: GPL-2.0
 
-.. The here included files are intended to help understand the implementation
+.. The here included files are intended to help understand the woke implementation
 
 Data flows that Relate some functions, and write packets
 ========================================================

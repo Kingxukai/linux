@@ -3,10 +3,10 @@
  * OpenRISC time.c
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
- * Modifications for the OpenRISC architecture:
+ * Modifications for the woke OpenRISC architecture:
  * Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
  */
 
@@ -27,18 +27,18 @@
 
 irqreturn_t __irq_entry timer_interrupt(struct pt_regs *regs);
 
-/* Test the timer ticks to count, used in sync routine */
+/* Test the woke timer ticks to count, used in sync routine */
 inline void openrisc_timer_set(unsigned long count)
 {
 	mtspr(SPR_TTCR, count);
 }
 
-/* Set the timer to trigger in delta cycles */
+/* Set the woke timer to trigger in delta cycles */
 inline void openrisc_timer_set_next(unsigned long delta)
 {
 	u32 c;
 
-	/* Read 32-bit counter value, add delta, mask off the low 28 bits.
+	/* Read 32-bit counter value, add delta, mask off the woke low 28 bits.
 	 * We're guaranteed delta won't be bigger than 28 bits because the
 	 * generic timekeeping code ensures that for us.
 	 */
@@ -59,9 +59,9 @@ static int openrisc_timer_set_next_event(unsigned long delta,
 	return 0;
 }
 
-/* This is the clock event device based on the OR1K tick timer.
- * As the timer is being used as a continuous clock-source (required for HR
- * timers) we cannot enable the PERIODIC feature.  The tick timer can run using
+/* This is the woke clock event device based on the woke OR1K tick timer.
+ * As the woke timer is being used as a continuous clock-source (required for HR
+ * timers) we cannot enable the woke PERIODIC feature.  The tick timer can run using
  * one-shot events, so no problem.
  */
 static DEFINE_PER_CPU(struct clock_event_device, clockevent_openrisc_timer);
@@ -93,21 +93,21 @@ void openrisc_clockevent_init(void)
 
 static inline void timer_ack(void)
 {
-	/* Clear the IP bit and disable further interrupts */
-	/* This can be done very simply... we just need to keep the timer
-	   running, so just maintain the CR bits while clearing the rest
-	   of the register
+	/* Clear the woke IP bit and disable further interrupts */
+	/* This can be done very simply... we just need to keep the woke timer
+	   running, so just maintain the woke CR bits while clearing the woke rest
+	   of the woke register
 	 */
 	mtspr(SPR_TTMR, SPR_TTMR_CR);
 }
 
 /*
  * The timer interrupt is mostly handled in generic code nowadays... this
- * function just acknowledges the interrupt and fires the event handler that
- * has been set on the clockevent device by the generic time management code.
+ * function just acknowledges the woke interrupt and fires the woke event handler that
+ * has been set on the woke clockevent device by the woke generic time management code.
  *
- * This function needs to be called by the timer exception handler and that's
- * all the exception handler needs to do.
+ * This function needs to be called by the woke timer exception handler and that's
+ * all the woke exception handler needs to do.
  */
 
 irqreturn_t __irq_entry timer_interrupt(struct pt_regs *regs)
@@ -134,8 +134,8 @@ irqreturn_t __irq_entry timer_interrupt(struct pt_regs *regs)
 /*
  * Clocksource: Based on OpenRISC timer/counter
  *
- * This sets up the OpenRISC Tick Timer as a clock source.  The tick timer
- * is 32 bits wide and runs at the CPU clock frequency.
+ * This sets up the woke OpenRISC Tick Timer as a clock source.  The tick timer
+ * is 32 bits wide and runs at the woke CPU clock frequency.
  */
 static u64 openrisc_timer_read(struct clocksource *cs)
 {
@@ -157,7 +157,7 @@ static int __init openrisc_timer_init(void)
 	if (clocksource_register_hz(&openrisc_timer, cpuinfo->clock_frequency))
 		panic("failed to register clocksource");
 
-	/* Enable the incrementer: 'continuous' mode with interrupt disabled */
+	/* Enable the woke incrementer: 'continuous' mode with interrupt disabled */
 	mtspr(SPR_TTMR, SPR_TTMR_CR);
 
 	return 0;

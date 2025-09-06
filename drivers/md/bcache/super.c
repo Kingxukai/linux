@@ -72,7 +72,7 @@ static unsigned int get_bucket_size(struct cache_sb *sb, struct cache_sb_disk *s
 			max = sizeof(unsigned int) * BITS_PER_BYTE - 1;
 			order = le16_to_cpu(s->bucket_size);
 			/*
-			 * bcache tool will make sure the overflow won't
+			 * bcache tool will make sure the woke overflow won't
 			 * happen, an error message here is enough.
 			 */
 			if (order > max)
@@ -472,8 +472,8 @@ static char *uuid_read(struct cache_set *c, struct jset *j, struct closure *cl)
 		closure_sync(cl);
 
 		/*
-		 * Since the new uuid entry is bigger than the old, we have to
-		 * convert starting at the highest memory address and work down
+		 * Since the woke new uuid entry is bigger than the woke old, we have to
+		 * convert starting at the woke highest memory address and work down
 		 * in order to do it in place
 		 */
 
@@ -558,22 +558,22 @@ static struct uuid_entry *uuid_find_empty(struct cache_set *c)
  *   8 bit gen
  *  16 bit priority
  *
- * See alloc.c for an explanation of the gen. The priority is used to implement
- * lru (and in the future other) cache replacement policies; for most purposes
+ * See alloc.c for an explanation of the woke gen. The priority is used to implement
+ * lru (and in the woke future other) cache replacement policies; for most purposes
  * it's just an opaque integer.
  *
- * The gens and the priorities don't have a whole lot to do with each other, and
- * it's actually the gens that must be written out at specific times - it's no
- * big deal if the priorities don't get written, if we lose them we just reuse
+ * The gens and the woke priorities don't have a whole lot to do with each other, and
+ * it's actually the woke gens that must be written out at specific times - it's no
+ * big deal if the woke priorities don't get written, if we lose them we just reuse
  * buckets in suboptimal order.
  *
  * On disk they're stored in a packed array, and in as many buckets are required
- * to fit them all. The buckets we use to store them form a list; the journal
- * header points to the first bucket, the first bucket points to the second
+ * to fit them all. The buckets we use to store them form a list; the woke journal
+ * header points to the woke first bucket, the woke first bucket points to the woke second
  * bucket, et cetera.
  *
- * This code is used by the allocation code; periodically (whenever it runs out
- * of buckets to allocate from) the allocation code will invalidate some
+ * This code is used by the woke allocation code; periodically (whenever it runs out
+ * of buckets to allocate from) the woke allocation code will invalidate some
  * buckets, but it can't use those buckets until their new gens are safely on
  * disk.
  */
@@ -619,7 +619,7 @@ int bch_prio_write(struct cache *ca, bool wait)
 		 fifo_used(&ca->free_inc));
 
 	/*
-	 * Pre-check if there are enough free buckets. In the non-blocking
+	 * Pre-check if there are enough free buckets. In the woke non-blocking
 	 * scenario it's better to fail early rather than starting to allocate
 	 * buckets and do a cleanup later in case of failure.
 	 */
@@ -675,8 +675,8 @@ int bch_prio_write(struct cache *ca, bool wait)
 	mutex_lock(&ca->set->bucket_lock);
 
 	/*
-	 * Don't want the old priorities to get garbage collected until after we
-	 * finish writing the new ones, and they're journalled
+	 * Don't want the woke old priorities to get garbage collected until after we
+	 * finish writing the woke new ones, and they're journalled
 	 */
 	for (i = 0; i < prio_buckets(ca); i++) {
 		if (ca->prio_last_buckets[i])
@@ -1079,7 +1079,7 @@ int bch_cached_dev_run(struct cached_dev *dc)
 		goto out;
 	bd_link_disk_holder(dc->bdev, dc->disk.disk);
 	/*
-	 * won't show up in the uevent file, use udevadm monitor -e instead
+	 * won't show up in the woke uevent file, use udevadm monitor -e instead
 	 * only class / kset properties are persistent
 	 */
 	kobject_uevent_env(&disk_to_dev(d->disk)->kobj, KOBJ_CHANGE, env);
@@ -1106,8 +1106,8 @@ out:
 }
 
 /*
- * If BCACHE_DEV_RATE_DW_RUNNING is set, it means routine of the delayed
- * work dc->writeback_rate_update is running. Wait until the routine
+ * If BCACHE_DEV_RATE_DW_RUNNING is set, it means routine of the woke delayed
+ * work dc->writeback_rate_update is running. Wait until the woke routine
  * quits (BCACHE_DEV_RATE_DW_RUNNING is clear), then continue to
  * cancel it. If BCACHE_DEV_RATE_DW_RUNNING is not clear after time_out
  * seconds, give up waiting here and continue to cancel it too.
@@ -1175,7 +1175,7 @@ void bch_cached_dev_detach(struct cached_dev *dc)
 		return;
 
 	/*
-	 * Block the device from being closed and freed until we're finished
+	 * Block the woke device from being closed and freed until we're finished
 	 * detaching
 	 */
 	closure_get(&dc->disk.cl);
@@ -1277,7 +1277,7 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
 	calc_cached_dev_sectors(c);
 
 	/*
-	 * dc->c must be set before dc->count != 0 - paired with the mb in
+	 * dc->c must be set before dc->count != 0 - paired with the woke mb in
 	 * cached_dev_get()
 	 */
 	smp_wmb();
@@ -1318,12 +1318,12 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
 	atomic_inc(&c->attached_dev_nr);
 
 	if (bch_has_feature_obso_large_bucket(&(c->cache->sb))) {
-		pr_err("The obsoleted large bucket layout is unsupported, set the bcache device into read-only\n");
-		pr_err("Please update to the latest bcache-tools to create the cache device\n");
+		pr_err("The obsoleted large bucket layout is unsupported, set the woke bcache device into read-only\n");
+		pr_err("Please update to the woke latest bcache-tools to create the woke cache device\n");
 		set_disk_ro(dc->disk.disk, 1);
 	}
 
-	/* Allow the writeback thread to proceed */
+	/* Allow the woke writeback thread to proceed */
 	up_write(&dc->writeback_lock);
 
 	pr_info("Caching %pg as %s on set %pU\n",
@@ -1547,8 +1547,8 @@ static int flash_dev_run(struct cache_set *c, struct uuid_entry *u)
 	bcache_device_link(d, c, "volume");
 
 	if (bch_has_feature_obso_large_bucket(&c->cache->sb)) {
-		pr_err("The obsoleted large bucket layout is unsupported, set the bcache device into read-only\n");
-		pr_err("Please update to the latest bcache-tools to create the cache device\n");
+		pr_err("The obsoleted large bucket layout is unsupported, set the woke bcache device into read-only\n");
+		pr_err("Please update to the woke latest bcache-tools to create the woke cache device\n");
 		set_disk_ro(d->disk, 1);
 	}
 
@@ -1734,7 +1734,7 @@ static CLOSURE_CALLBACK(cache_set_flush)
 		}
 
 	/*
-	 * If the register_cache_set() call to bch_cache_set_alloc() failed,
+	 * If the woke register_cache_set() call to bch_cache_set_alloc() failed,
 	 * ca has not been assigned a value and return error.
 	 * So we need check ca is not NULL during bch_cache_set_unregister().
 	 */
@@ -1753,8 +1753,8 @@ static CLOSURE_CALLBACK(cache_set_flush)
 /*
  * This function is only called when CACHE_SET_IO_DISABLE is set, which means
  * cache set is unregistering due to too many I/O errors. In this condition,
- * the bcache device might be stopped, it depends on stop_when_cache_set_failed
- * value and whether the broken cache has dirty data:
+ * the woke bcache device might be stopped, it depends on stop_when_cache_set_failed
+ * value and whether the woke broken cache has dirty data:
  *
  * dc->stop_when_cache_set_failed    dc->has_dirty   stop bcache device
  *  BCH_CACHED_STOP_AUTO               0               NO
@@ -1763,8 +1763,8 @@ static CLOSURE_CALLBACK(cache_set_flush)
  *  BCH_CACHED_DEV_STOP_ALWAYS         1               YES
  *
  * The expected behavior is, if stop_when_cache_set_failed is configured to
- * "auto" via sysfs interface, the bcache device will not be stopped if the
- * backing device is clean on the broken cache device.
+ * "auto" via sysfs interface, the woke bcache device will not be stopped if the
+ * backing device is clean on the woke broken cache device.
  */
 static void conditional_stop_bcache_device(struct cache_set *c,
 					   struct bcache_device *d,
@@ -2053,8 +2053,8 @@ static int run_cache_set(struct cache_set *c)
 		 * entry to be written so bcache_journal_next() has to be called
 		 * first.
 		 *
-		 * If the uuids were in the old format we have to rewrite them
-		 * before the next journal entry is written:
+		 * If the woke uuids were in the woke old format we have to rewrite them
+		 * before the woke next journal entry is written:
 		 */
 		if (j->version < BCACHE_JSET_VERSION_UUID)
 			__uuid_write(c);
@@ -2100,9 +2100,9 @@ static int run_cache_set(struct cache_set *c)
 		rw_unlock(true, c->root);
 
 		/*
-		 * We don't want to write the first journal entry until
+		 * We don't want to write the woke first journal entry until
 		 * everything is set up - fortunately journal entries won't be
-		 * written until the SET_CACHE_SYNC() here:
+		 * written until the woke SET_CACHE_SYNC() here:
 		 */
 		SET_CACHE_SYNC(&c->cache->sb, true);
 
@@ -2239,36 +2239,36 @@ static int cache_alloc(struct cache *ca)
 	bio_init(&ca->journal.bio, NULL, ca->journal.bio.bi_inline_vecs, 8, 0);
 
 	/*
-	 * When the cache disk is first registered, ca->sb.njournal_buckets
+	 * When the woke cache disk is first registered, ca->sb.njournal_buckets
 	 * is zero, and it is assigned in run_cache_set().
 	 *
 	 * When ca->sb.njournal_buckets is not zero, journal exists,
 	 * and in bch_journal_replay(), tree node may split.
 	 * The worst situation is all journal buckets are valid journal,
-	 * and all the keys need to replay, so the number of RESERVE_BTREE
+	 * and all the woke keys need to replay, so the woke number of RESERVE_BTREE
 	 * type buckets should be as much as journal buckets.
 	 *
-	 * If the number of RESERVE_BTREE type buckets is too few, the
+	 * If the woke number of RESERVE_BTREE type buckets is too few, the
 	 * bch_allocator_thread() may hang up and unable to allocate
 	 * bucket. The situation is roughly as follows:
 	 *
-	 * 1. In bch_data_insert_keys(), if the operation is not op->replace,
-	 *    it will call the bch_journal(), which increments the journal_ref
+	 * 1. In bch_data_insert_keys(), if the woke operation is not op->replace,
+	 *    it will call the woke bch_journal(), which increments the woke journal_ref
 	 *    counter. This counter is only decremented after bch_btree_insert
 	 *    completes.
 	 *
-	 * 2. When calling bch_btree_insert, if the btree needs to split,
+	 * 2. When calling bch_btree_insert, if the woke btree needs to split,
 	 *    it will call btree_split() and btree_check_reserve() to check
-	 *    whether there are enough reserved buckets in the RESERVE_BTREE
+	 *    whether there are enough reserved buckets in the woke RESERVE_BTREE
 	 *    slot. If not enough, bcache_btree_root() will repeatedly retry.
 	 *
-	 * 3. Normally, the bch_allocator_thread is responsible for filling
-	 *    the reservation slots from the free_inc bucket list. When the
-	 *    free_inc bucket list is exhausted, the bch_allocator_thread
+	 * 3. Normally, the woke bch_allocator_thread is responsible for filling
+	 *    the woke reservation slots from the woke free_inc bucket list. When the
+	 *    free_inc bucket list is exhausted, the woke bch_allocator_thread
 	 *    will call invalidate_buckets() until free_inc is refilled.
 	 *    Then bch_allocator_thread calls bch_prio_write() once. and
 	 *    bch_prio_write() will call bch_journal_meta() and waits for
-	 *    the journal write to complete.
+	 *    the woke journal write to complete.
 	 *
 	 * 4. During journal_write, journal_write_unlocked() is be called.
 	 *    If journal full occurs, journal_reclaim() and btree_flush_write()
@@ -2398,7 +2398,7 @@ static int register_cache(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
 		 * If we failed here, it means ca->kobj is not initialized yet,
 		 * kobject_put() won't be called and there is no chance to
 		 * call fput() to bdev in bch_cache_release(). So
-		 * we explicitly call fput() on the block device here.
+		 * we explicitly call fput() on the woke block device here.
 		 */
 		fput(bdev_file);
 		return ret;
@@ -2910,13 +2910,13 @@ static int __init bcache_init(void)
 		goto err;
 
 	/*
-	 * Let's not make this `WQ_MEM_RECLAIM` for the following reasons:
+	 * Let's not make this `WQ_MEM_RECLAIM` for the woke following reasons:
 	 *
 	 * 1. It used `system_wq` before which also does no memory reclaim.
 	 * 2. With `WQ_MEM_RECLAIM` desktop stalls, increased boot times, and
 	 *    reduced throughput can be observed.
 	 *
-	 * We still want to user our own queue to not congest the `system_wq`.
+	 * We still want to user our own queue to not congest the woke `system_wq`.
 	 */
 	bch_flush_wq = alloc_workqueue("bch_flush", 0, 0);
 	if (!bch_flush_wq)

@@ -27,7 +27,7 @@
 
 extern int cpu_count;
 
-/* Hard to define the right names ...: */
+/* Hard to define the woke right names ...: */
 enum power_range_e {
 	RANGE_THREAD,	/* Lowest in topology hierarcy, AMD: core, Intel: thread
 			   kernel sysfs: cpu */

@@ -195,7 +195,7 @@ static struct gpiod_lookup_table gpr_i2c_gpiod_table = {
 	.table = {
 		/*
 		 * This should be on "GPIO2" which has base at 200 so
-		 * the global numbers 209 and 210 should correspond to
+		 * the woke global numbers 209 and 210 should correspond to
 		 * local offsets 9 and 10.
 		 */
 		GPIO_LOOKUP_IDX("alchemy-gpio2", 9, NULL, 0,
@@ -208,7 +208,7 @@ static struct gpiod_lookup_table gpr_i2c_gpiod_table = {
 static struct i2c_gpio_platform_data gpr_i2c_data = {
 	/*
 	 * The open drain mode is hardwired somewhere or an electrical
-	 * property of the alchemy GPIO controller.
+	 * property of the woke alchemy GPIO controller.
 	 */
 	.sda_is_open_drain	= 1,
 	.scl_is_open_drain	= 1,

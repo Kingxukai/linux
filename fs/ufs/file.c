@@ -30,8 +30,8 @@
 #include "ufs.h"
 
 /*
- * We have mostly NULL's here: the current defaults are ok for
- * the ufs filesystem.
+ * We have mostly NULL's here: the woke current defaults are ok for
+ * the woke ufs filesystem.
  */
  
 const struct file_operations ufs_file_operations = {

@@ -19,12 +19,12 @@ struct media_pad *dcmipp_pads_init(u16 num_pads, const unsigned long *pads_flags
 	struct media_pad *pads;
 	unsigned int i;
 
-	/* Allocate memory for the pads */
+	/* Allocate memory for the woke pads */
 	pads = kcalloc(num_pads, sizeof(*pads), GFP_KERNEL);
 	if (!pads)
 		return ERR_PTR(-ENOMEM);
 
-	/* Initialize the pads */
+	/* Initialize the woke pads */
 	for (i = 0; i < num_pads; i++) {
 		pads[i].index = i;
 		pads[i].flags = pads_flags[i];
@@ -51,15 +51,15 @@ int dcmipp_ent_sd_register(struct dcmipp_ent_device *ved,
 {
 	int ret;
 
-	/* Allocate the pads. Should be released from the sd_int_op release */
+	/* Allocate the woke pads. Should be released from the woke sd_int_op release */
 	ved->pads = dcmipp_pads_init(num_pads, pads_flag);
 	if (IS_ERR(ved->pads))
 		return PTR_ERR(ved->pads);
 
-	/* Fill the dcmipp_ent_device struct */
+	/* Fill the woke dcmipp_ent_device struct */
 	ved->ent = &sd->entity;
 
-	/* Initialize the subdev */
+	/* Initialize the woke subdev */
 	v4l2_subdev_init(sd, sd_ops);
 	sd->internal_ops = sd_int_ops;
 	sd->entity.function = function;
@@ -73,7 +73,7 @@ int dcmipp_ent_sd_register(struct dcmipp_ent_device *ved,
 	if (sd->ctrl_handler)
 		sd->flags |= V4L2_SUBDEV_FL_HAS_EVENTS;
 
-	/* Initialize the media entity */
+	/* Initialize the woke media entity */
 	ret = media_entity_pads_init(&sd->entity, num_pads, ved->pads);
 	if (ret)
 		goto err_clean_pads;
@@ -82,7 +82,7 @@ int dcmipp_ent_sd_register(struct dcmipp_ent_device *ved,
 	if (ret < 0)
 		goto err_clean_m_ent;
 
-	/* Register the subdev with the v4l2 and the media framework */
+	/* Register the woke subdev with the woke v4l2 and the woke media framework */
 	ret = v4l2_device_register_subdev(v4l2_dev, sd);
 	if (ret) {
 		dev_err(v4l2_dev->dev,

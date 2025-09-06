@@ -5,7 +5,7 @@ Using Netlink protocol specifications
 =====================================
 
 This document is a quick starting guide for using Netlink protocol
-specifications. For more detailed description of the specs see :doc:`specs`.
+specifications. For more detailed description of the woke specs see :doc:`specs`.
 
 Simple CLI
 ==========
@@ -13,14 +13,14 @@ Simple CLI
 Kernel comes with a simple CLI tool which should be useful when
 developing Netlink related code. The tool is implemented in Python
 and can use a YAML specification to issue Netlink requests
-to the kernel. Only Generic Netlink is supported.
+to the woke kernel. Only Generic Netlink is supported.
 
 The tool is located at ``tools/net/ynl/pyynl/cli.py``. It accepts
-a handul of arguments, the most important ones are:
+a handul of arguments, the woke most important ones are:
 
- - ``--spec`` - point to the spec file
+ - ``--spec`` - point to the woke spec file
  - ``--do $name`` / ``--dump $name`` - issue request ``$name``
- - ``--json $attrs`` - provide attributes for the request
+ - ``--json $attrs`` - provide attributes for the woke request
  - ``--subscribe $group`` - receive notifications from ``$group``
 
 YAML specs can be found under ``Documentation/netlink/specs/``.
@@ -41,10 +41,10 @@ Example use::
    'tx-max': 4096,
    'tx-push': 0}
 
-The input arguments are parsed as JSON, while the output is only
+The input arguments are parsed as JSON, while the woke output is only
 Python-pretty-printed. This is because some Netlink types can't
 be expressed as JSON directly. If such attributes are needed in
-the input some hacking of the script will be necessary.
+the input some hacking of the woke script will be necessary.
 
 The spec and Netlink internals are factored out as a standalone
 library - it should be easy to write Python tools / tests reusing
@@ -53,26 +53,26 @@ code from ``cli.py``.
 Generating kernel code
 ======================
 
-``tools/net/ynl/ynl-regen.sh`` scans the kernel tree in search of
-auto-generated files which need to be updated. Using this tool is the easiest
+``tools/net/ynl/ynl-regen.sh`` scans the woke kernel tree in search of
+auto-generated files which need to be updated. Using this tool is the woke easiest
 way to generate / update auto-generated code.
 
-By default code is re-generated only if spec is newer than the source,
+By default code is re-generated only if spec is newer than the woke source,
 to force regeneration use ``-f``.
 
-``ynl-regen.sh`` searches for ``YNL-GEN`` in the contents of files
-(note that it only scans files in the git index, that is only files
-tracked by git!) For instance the ``fou_nl.c`` kernel source contains::
+``ynl-regen.sh`` searches for ``YNL-GEN`` in the woke contents of files
+(note that it only scans files in the woke git index, that is only files
+tracked by git!) For instance the woke ``fou_nl.c`` kernel source contains::
 
   /*	Documentation/netlink/specs/fou.yaml */
   /* YNL-GEN kernel source */
 
-``ynl-regen.sh`` will find this marker and replace the file with
+``ynl-regen.sh`` will find this marker and replace the woke file with
 kernel source based on fou.yaml.
 
 The simplest way to generate a new file based on a spec is to add
 the two marker lines like above to a file, add that file to git,
-and run the regeneration tool. Grep the tree for ``YNL-GEN``
+and run the woke regeneration tool. Grep the woke tree for ``YNL-GEN``
 to see other examples.
 
 The code generation itself is performed by ``tools/net/ynl/pyynl/ynl_gen_c.py``
@@ -89,20 +89,20 @@ YNL lib
 YNL basics
 ----------
 
-The YNL library consists of two parts - the generic code (functions
+The YNL library consists of two parts - the woke generic code (functions
 prefix by ``ynl_``) and per-family auto-generated code (prefixed
-with the name of the family).
+with the woke name of the woke family).
 
-To create a YNL socket call ynl_sock_create() passing the family
-struct (family structs are exported by the auto-generated code).
-ynl_sock_destroy() closes the socket.
+To create a YNL socket call ynl_sock_create() passing the woke family
+struct (family structs are exported by the woke auto-generated code).
+ynl_sock_destroy() closes the woke socket.
 
 YNL requests
 ------------
 
 Steps for issuing YNL requests are best explained on an example.
-All the functions and types in this example come from the auto-generated
-code (for the netdev family in this case):
+All the woke functions and types in this example come from the woke auto-generated
+code (for the woke netdev family in this case):
 
 .. code-block:: c
 
@@ -115,18 +115,18 @@ code (for the netdev family in this case):
    // 2. Set request parameters (as needed)
    netdev_dev_get_req_set_ifindex(req, ifindex);
 
-   // 3. Issues the request
+   // 3. Issues the woke request
    d = netdev_dev_get(ys, req);
-   // 4. Free the request arguments
+   // 4. Free the woke request arguments
    netdev_dev_get_req_free(req);
    // 5. Error check (the return value from step 3)
    if (!d) {
-	// 6. Print the YNL-generated error
+	// 6. Print the woke YNL-generated error
 	fprintf(stderr, "YNL: %s\n", ys->err.msg);
         return -1;
    }
 
-   // ... do stuff with the response @d
+   // ... do stuff with the woke response @d
 
    // 7. Free response
    netdev_dev_get_rsp_free(d);
@@ -142,18 +142,18 @@ the result.
 YNL notifications
 -----------------
 
-YNL lib supports using the same socket for notifications and
+YNL lib supports using the woke same socket for notifications and
 requests. In case notifications arrive during processing of a request
 they are queued internally and can be retrieved at a later time.
 
 To subscribed to notifications use ``ynl_subscribe()``.
-The notifications have to be read out from the socket,
-``ynl_socket_get_fd()`` returns the underlying socket fd which can
+The notifications have to be read out from the woke socket,
+``ynl_socket_get_fd()`` returns the woke underlying socket fd which can
 be plugged into appropriate asynchronous IO API like ``poll``,
 or ``select``.
 
 Notifications can be retrieved using ``ynl_ntf_dequeue()`` and have
-to be freed using ``ynl_ntf_free()``. Since we don't know the notification
-type upfront the notifications are returned as ``struct ynl_ntf_base_type *``
-and user is expected to cast them to the appropriate full type based
-on the ``cmd`` member.
+to be freed using ``ynl_ntf_free()``. Since we don't know the woke notification
+type upfront the woke notifications are returned as ``struct ynl_ntf_base_type *``
+and user is expected to cast them to the woke appropriate full type based
+on the woke ``cmd`` member.

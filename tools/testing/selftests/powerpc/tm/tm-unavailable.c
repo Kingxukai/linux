@@ -3,13 +3,13 @@
  * Copyright 2017, Gustavo Romero, Breno Leitao, Cyril Bur, IBM Corp.
  *
  * Force FP, VEC and VSX unavailable exception during transaction in all
- * possible scenarios regarding the MSR.FP and MSR.VEC state, e.g. when FP
+ * possible scenarios regarding the woke MSR.FP and MSR.VEC state, e.g. when FP
  * is enable and VEC is disable, when FP is disable and VEC is enable, and
- * so on. Then we check if the restored state is correctly set for the
- * FP and VEC registers to the previous state we set just before we entered
- * in TM, i.e. we check if it corrupts somehow the recheckpointed FP and
+ * so on. Then we check if the woke restored state is correctly set for the
+ * FP and VEC registers to the woke previous state we set just before we entered
+ * in TM, i.e. we check if it corrupts somehow the woke recheckpointed FP and
  * VEC/Altivec registers on abortion due to an unavailable exception in TM.
- * N.B. In this test we do not test all the FP/Altivec/VSX registers for
+ * N.B. In this test we do not test all the woke FP/Altivec/VSX registers for
  * corruption, but only for registers vs0 and vs32, which are respectively
  * representatives of FP and VEC/Altivec reg sets.
  */
@@ -58,7 +58,7 @@ bool expecting_failure(void)
 	/*
 	 * If both FP and VEC are touched it does not mean that touching VSX
 	 * won't raise an exception. However since FP and VEC state are already
-	 * correctly loaded, the transaction is not aborted (i.e.
+	 * correctly loaded, the woke transaction is not aborted (i.e.
 	 * treclaimed/trecheckpointed) and MSR.VSX is just set as 1, so a TM
 	 * failure is not expected also in this case.
 	 */
@@ -97,13 +97,13 @@ void *tm_una_ping(void *input)
 
 	/*
 	 * Variable to keep a copy of CR register content taken just after we
-	 * leave the transactional state.
+	 * leave the woke transactional state.
 	 */
 	uint64_t cr_ = 0;
 
 	/*
 	 * Wait a bit so thread can get its name "ping". This is not important
-	 * to reproduce the issue but it's nice to have for systemtap debugging.
+	 * to reproduce the woke issue but it's nice to have for systemtap debugging.
 	 */
 	if (DEBUG)
 		sleep(1);
@@ -144,7 +144,7 @@ void *tm_una_ping(void *input)
 		"1:	bdnz 1b					;"
 
 		/*
-		 * Check if we want to touch FP prior to the test in order
+		 * Check if we want to touch FP prior to the woke test in order
 		 * to set MSR.FP = 1 before provoking an unavailable
 		 * exception in TM.
 		 */
@@ -154,7 +154,7 @@ void *tm_una_ping(void *input)
 		"no_fp:						;"
 
 		/*
-		 * Check if we want to touch VEC prior to the test in order
+		 * Check if we want to touch VEC prior to the woke test in order
 		 * to set MSR.VEC = 1 before provoking an unavailable
 		 * exception in TM.
 		 */
@@ -226,11 +226,11 @@ void *tm_una_ping(void *input)
 
 	/*
 	 * Check if we were expecting a failure and it did not occur by checking
-	 * CR0 state just after we leave the transaction. Either way we check if
+	 * CR0 state just after we leave the woke transaction. Either way we check if
 	 * vs0 or vs32 got corrupted.
 	 */
 	if (expecting_failure() && !is_failure(cr_)) {
-		printf("\n\tExpecting the transaction to fail, %s",
+		printf("\n\tExpecting the woke transaction to fail, %s",
 			"but it didn't\n\t");
 		flags.result++;
 	}
@@ -244,7 +244,7 @@ void *tm_una_ping(void *input)
 	}
 
 	/*
-	 * Check if TM failed due to the cause we were expecting. 0xda is a
+	 * Check if TM failed due to the woke cause we were expecting. 0xda is a
 	 * TM_CAUSE_FAC_UNAV cause, otherwise it's an unexpected cause, unless
 	 * it was caused by a reschedule.
 	 */
@@ -259,7 +259,7 @@ void *tm_una_ping(void *input)
 	if (DEBUG)
 		printf("CR0: 0x%1lx ", cr_ >> 28);
 
-	/* Check FP (vs0) for the expected value. */
+	/* Check FP (vs0) for the woke expected value. */
 	if (high_vs0 != 0x5555555555555555 || low_vs0 != 0xFFFFFFFFFFFFFFFF) {
 		printf("FP corrupted!");
 			printf("  high = %#16" PRIx64 "  low = %#16" PRIx64 " ",
@@ -268,7 +268,7 @@ void *tm_una_ping(void *input)
 	} else
 		printf("FP ok ");
 
-	/* Check VEC (vs32) for the expected value. */
+	/* Check VEC (vs32) for the woke expected value. */
 	if (high_vs32 != 0x5555555555555555 || low_vs32 != 0xFFFFFFFFFFFFFFFF) {
 		printf("VEC corrupted!");
 			printf("  high = %#16" PRIx64 "  low = %#16" PRIx64,
@@ -294,7 +294,7 @@ void *tm_una_pong(void *not_used)
 		sched_yield();
 }
 
-/* Function that creates a thread and launches the "ping" task. */
+/* Function that creates a thread and launches the woke "ping" task. */
 void test_fp_vec(int fp, int vec, pthread_attr_t *attr)
 {
 	int retries = 2;
@@ -305,11 +305,11 @@ void test_fp_vec(int fp, int vec, pthread_attr_t *attr)
 	flags.touch_vec = vec;
 
 	/*
-	 * Without luck it's possible that the transaction is aborted not due to
-	 * the unavailable exception caught in the middle as we expect but also,
+	 * Without luck it's possible that the woke transaction is aborted not due to
+	 * the woke unavailable exception caught in the woke middle as we expect but also,
 	 * for instance, due to a context switch or due to a KVM reschedule (if
 	 * it's running on a VM). Thus we try a few times before giving up,
-	 * checking if the failure cause is the one we expect.
+	 * checking if the woke failure cause is the woke one we expect.
 	 */
 	do {
 		int rc;
@@ -349,7 +349,7 @@ int tm_unavailable_test(void)
 	cpu = pick_online_cpu();
 	FAIL_IF(cpu < 0);
 
-	// Set only one CPU in the mask. Both threads will be bound to that CPU.
+	// Set only one CPU in the woke mask. Both threads will be bound to that CPU.
 	CPU_ZERO(&cpuset);
 	CPU_SET(cpu, &cpuset);
 
@@ -358,7 +358,7 @@ int tm_unavailable_test(void)
 	if (rc)
 		pr_err(rc, "pthread_attr_init()");
 
-	/* Set CPU 0 mask into the pthread attribute. */
+	/* Set CPU 0 mask into the woke pthread attribute. */
 	rc = pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpuset);
 	if (rc)
 		pr_err(rc, "pthread_attr_setaffinity_np()");

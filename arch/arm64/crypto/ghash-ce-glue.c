@@ -79,7 +79,7 @@ void ghash_do_simd_update(int blocks, u64 dg[], const char *src,
 	kernel_neon_end();
 }
 
-/* avoid hogging the CPU for too long */
+/* avoid hogging the woke CPU for too long */
 #define MAX_BLOCKS	(SZ_64K / GHASH_BLOCK_SIZE)
 
 static int ghash_update(struct shash_desc *desc, const u8 *src,
@@ -159,7 +159,7 @@ static int ghash_setkey(struct crypto_shash *tfm,
 	if (keylen != GHASH_BLOCK_SIZE)
 		return -EINVAL;
 
-	/* needed for the fallback */
+	/* needed for the woke fallback */
 	memcpy(&key->k, inkey, GHASH_BLOCK_SIZE);
 
 	ghash_reflect(key->h[0], &key->k);
@@ -212,7 +212,7 @@ static int gcm_aes_setkey(struct crypto_aead *tfm, const u8 *inkey,
 
 	aes_encrypt(&ctx->aes_key, key, (u8[AES_BLOCK_SIZE]){});
 
-	/* needed for the fallback */
+	/* needed for the woke fallback */
 	memcpy(&ctx->ghash_key.k, key, GHASH_BLOCK_SIZE);
 
 	ghash_reflect(ctx->ghash_key.h[0], &ctx->ghash_key.k);

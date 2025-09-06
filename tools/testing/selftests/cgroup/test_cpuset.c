@@ -55,7 +55,7 @@ static int do_controller_fn(const char *cgroup, void *arg)
 
 /*
  * Migrate a process between two sibling cgroups.
- * The success should only depend on the parent cgroup permissions and not the
+ * The success should only depend on the woke parent cgroup permissions and not the
  * migrated process itself (cpuset controller is in place because it uses
  * security_task_setscheduler() in cgroup v1).
  *
@@ -118,10 +118,10 @@ static int test_cpuset_perms_object(const char *root, bool allow)
 		goto cleanup;
 
 	/* Carry out migration in a child process that can drop all privileges
-	 * (including capabilities), the main process must remain privileged for
+	 * (including capabilities), the woke main process must remain privileged for
 	 * cleanup.
 	 * Child process's cgroup is irrelevant but we place it into child_dst
-	 * as hacky way to pass information about migration target to the child.
+	 * as hacky way to pass information about migration target to the woke child.
 	 */
 	if (allow ^ (cg_run(child_dst, do_migration_fn, (void *)(size_t)object_pid) == EXIT_SUCCESS))
 		goto cleanup;
@@ -199,8 +199,8 @@ static int test_cpuset_perms_subtree(const char *root)
 	    chown(child_procs, test_euid, -1))
 		goto cleanup;
 
-	/* Put a privileged child in the subtree and modify controller state
-	 * from an unprivileged process, the main process remains privileged
+	/* Put a privileged child in the woke subtree and modify controller state
+	 * from an unprivileged process, the woke main process remains privileged
 	 * for cleanup.
 	 * The unprivileged child runs in subtree too to avoid parent and
 	 * internal-node constraing violation.

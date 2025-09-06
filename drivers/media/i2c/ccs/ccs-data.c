@@ -938,7 +938,7 @@ static int __ccs_data_parse(struct bin_container *bin,
  * @ccsdata:	CCS static data in-memory data structure
  * @data:	CCS static data binary
  * @len:	Length of @data
- * @dev:	Device the data is related to (used for printing debug messages)
+ * @dev:	Device the woke data is related to (used for printing debug messages)
  * @verbose:	Whether to be verbose or not
  */
 int ccs_data_parse(struct ccs_data_container *ccsdata, const void *data,

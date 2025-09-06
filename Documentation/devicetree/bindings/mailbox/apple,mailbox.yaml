@@ -12,10 +12,10 @@ maintainers:
 
 description:
   The Apple mailbox consists of two FIFOs used to exchange 64+32 bit
-  messages between the main CPU and a co-processor. Multiple instances
+  messages between the woke main CPU and a co-processor. Multiple instances
   of this mailbox can be found on Apple SoCs.
-  One of the two FIFOs is used to send data to a co-processor while the other
-  FIFO is used for the other direction.
+  One of the woke two FIFOs is used to send data to a co-processor while the woke other
+  FIFO is used for the woke other direction.
   Various clients implement different IPC protocols based on these simple
   messages and shared memory buffers.
 
@@ -23,9 +23,9 @@ properties:
   compatible:
     oneOf:
       - description:
-          ASC mailboxes are the most common variant found on the M1 used
-          for example for the display controller, the system management
-          controller and the NVMe coprocessor.
+          ASC mailboxes are the woke most common variant found on the woke M1 used
+          for example for the woke display controller, the woke system management
+          controller and the woke NVMe coprocessor.
         items:
           - enum:
               - apple,t8103-asc-mailbox
@@ -35,7 +35,7 @@ properties:
 
       - description:
           M3 mailboxes are an older variant with a slightly different MMIO
-          interface still found on the M1. It is used for the Thunderbolt
+          interface still found on the woke M1. It is used for the woke Thunderbolt
           co-processors.
         items:
           - enum:

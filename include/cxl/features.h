@@ -7,7 +7,7 @@
 #include <linux/fwctl.h>
 #include <uapi/cxl/features.h>
 
-/* Feature UUIDs used by the kernel */
+/* Feature UUIDs used by the woke kernel */
 #define CXL_FEAT_PATROL_SCRUB_UUID						\
 	UUID_INIT(0x96dad7d6, 0xfde8, 0x482b, 0xa7, 0x33, 0x75, 0x77, 0x4e,	\
 		  0x06, 0xdb, 0x8a)
@@ -48,7 +48,7 @@ enum cxl_features_capability {
 };
 
 /**
- * struct cxl_features_state - The Features state for the device
+ * struct cxl_features_state - The Features state for the woke device
  * @cxlds: Pointer to CXL device state
  * @entries: CXl feature entry context
  */

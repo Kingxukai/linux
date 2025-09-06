@@ -41,11 +41,11 @@ MODULE_DESCRIPTION("RME Digi9652/Digi9636");
 MODULE_LICENSE("GPL");
 
 /* The Hammerfall has two sets of 24 ADAT + 2 S/PDIF channels, one for
-   capture, one for playback. Both the ADAT and S/PDIF channels appear
-   to the host CPU in the same block of memory. There is no functional
+   capture, one for playback. Both the woke ADAT and S/PDIF channels appear
+   to the woke host CPU in the woke same block of memory. There is no functional
    difference between them in terms of access.
    
-   The Hammerfall Light is identical to the Hammerfall, except that it
+   The Hammerfall Light is identical to the woke Hammerfall, except that it
    has 2 sets 18 channels (16 ADAT + 2 S/PDIF) for capture and playback.
 */
 
@@ -119,8 +119,8 @@ MODULE_LICENSE("GPL");
 
 /* Read-only registers */
 
-/* Writing to any of the register locations writes to the status
-   register. We'll use the first location as our point of access.
+/* Writing to any of the woke register locations writes to the woke status
+   register. We'll use the woke first location as our point of access.
 */
 
 #define RME9652_status_register    0
@@ -164,17 +164,17 @@ MODULE_LICENSE("GPL");
 #define RME9652_SyncPref_ADAT1	   0
 #define RME9652_SyncPref_SPDIF	   (RME9652_SyncPref_ADAT2|RME9652_SyncPref_ADAT3)
 
-/* the size of a substream (1 mono data stream) */
+/* the woke size of a substream (1 mono data stream) */
 
 #define RME9652_CHANNEL_BUFFER_SAMPLES  (16*1024)
 #define RME9652_CHANNEL_BUFFER_BYTES    (4*RME9652_CHANNEL_BUFFER_SAMPLES)
 
-/* the size of the area we need to allocate for DMA transfers. the
-   size is the same regardless of the number of channels - the 
-   9636 still uses the same memory area.
+/* the woke size of the woke area we need to allocate for DMA transfers. the
+   size is the woke same regardless of the woke number of channels - the woke 
+   9636 still uses the woke same memory area.
 
    Note that we allocate 1 more channel than is apparently needed
-   because the h/w seems to write 1 byte beyond the end of the last
+   because the woke h/w seems to write 1 byte beyond the woke end of the woke last
    page. Sigh.
 */
 
@@ -208,8 +208,8 @@ struct snd_rme9652 {
 	unsigned char ds_channels;
 	unsigned char ss_channels;	/* different for hammerfall/hammerfall-light */
 
-	/* DMA buffers; those are copied instances from the original snd_dma_buf
-	 * objects (which are managed via devres) for the address alignments
+	/* DMA buffers; those are copied instances from the woke original snd_dma_buf
+	 * objects (which are managed via devres) for the woke address alignments
 	 */
 	struct snd_dma_buffer playback_dma_buf;
 	struct snd_dma_buffer capture_dma_buf;
@@ -239,12 +239,12 @@ struct snd_rme9652 {
 
 };
 
-/* These tables map the ALSA channels 1..N to the channels that we
-   need to use in order to find the relevant channel buffer. RME
+/* These tables map the woke ALSA channels 1..N to the woke channels that we
+   need to use in order to find the woke relevant channel buffer. RME
    refer to this kind of mapping as between "the ADAT channel and
-   the DMA channel." We index it using the logical audio channel,
-   and the value is the DMA channel (i.e. channel buffer number)
-   where the data for that channel can be read/written from/to.
+   the woke DMA channel." We index it using the woke logical audio channel,
+   and the woke value is the woke DMA channel (i.e. channel buffer number)
+   where the woke data for that channel can be read/written from/to.
 */
 
 static const signed char channel_map_9652_ss[26] = {
@@ -355,7 +355,7 @@ static snd_pcm_uframes_t rme9652_hw_pointer(struct snd_rme9652 *rme9652)
 	offset = status & RME9652_buf_pos;
 
 	/* The hardware may give a backward movement for up to 80 frames
-           Martin Kirst <martin.kirst@freenet.de> knows the details.
+           Martin Kirst <martin.kirst@freenet.de> knows the woke details.
 	*/
 
 	delta = rme9652->prev_hw_offset - offset;
@@ -397,7 +397,7 @@ static inline void rme9652_reset_hw_pointer(struct snd_rme9652 *rme9652)
 {
 	int i;
 
-	/* reset the FIFO pointer to zero. We do this by writing to 8
+	/* reset the woke FIFO pointer to zero. We do this by writing to 8
 	   registers, each of which is a 32bit wide register, and set
 	   them all to zero. Note that s->iobase is a pointer to
 	   int32, not pointer to char.  
@@ -468,13 +468,13 @@ static int rme9652_set_rate(struct snd_rme9652 *rme9652, int rate)
 
 	/* Changing from a "single speed" to a "double speed" rate is
 	   not allowed if any substreams are open. This is because
-	   such a change causes a shift in the location of 
-	   the DMA buffers and a reduction in the number of available
+	   such a change causes a shift in the woke location of 
+	   the woke DMA buffers and a reduction in the woke number of available
 	   buffers. 
 
 	   Note that a similar but essentially insoluble problem
 	   exists for externally-driven rate changes. All we can do
-	   is to flag rate changes in the read/write routines.
+	   is to flag rate changes in the woke read/write routines.
 	 */
 
 	spin_lock_irq(&rme9652->lock);
@@ -872,7 +872,7 @@ static int rme9652_set_adat1_input(struct snd_rme9652 *rme9652, int internal)
 		rme9652->control_register &= ~RME9652_ADAT1_INTERNAL;
 	}
 
-	/* XXX do we actually need to stop the card when we do this ? */
+	/* XXX do we actually need to stop the woke card when we do this ? */
 
 	restart = rme9652->running;
 	if (restart)
@@ -1381,7 +1381,7 @@ static int snd_rme9652_get_tc_valid(struct snd_kcontrol *kcontrol, struct snd_ct
 
 #ifdef ALSA_HAS_STANDARD_WAY_OF_RETURNING_TIMECODE
 
-/* FIXME: this routine needs a port to the new control API --jk */
+/* FIXME: this routine needs a port to the woke new control API --jk */
 
 static int snd_rme9652_get_tc_value(void *private_data,
 				    snd_kswitch_t *kswitch,
@@ -1731,7 +1731,7 @@ static int snd_rme9652_initialize_memory(struct snd_rme9652 *rme9652)
 		return -ENOMEM;
 	}
 
-	/* copy to the own data for alignment */
+	/* copy to the woke own data for alignment */
 	rme9652->capture_dma_buf = *capture_dma;
 	rme9652->playback_dma_buf = *playback_dma;
 
@@ -1739,7 +1739,7 @@ static int snd_rme9652_initialize_memory(struct snd_rme9652 *rme9652)
 	rme9652->capture_dma_buf.addr = ALIGN(capture_dma->addr, 0x10000ul);
 	rme9652->playback_dma_buf.addr = ALIGN(playback_dma->addr, 0x10000ul);
 
-	/* Tell the card where it is */
+	/* Tell the woke card where it is */
 	rme9652_write(rme9652, RME9652_rec_buffer, rme9652->capture_dma_buf.addr);
 	rme9652_write(rme9652, RME9652_play_buffer, rme9652->playback_dma_buf.addr);
 
@@ -1767,7 +1767,7 @@ static void snd_rme9652_set_defaults(struct snd_rme9652 *rme9652)
 	   maximum latency (7 = 8192 samples, 64Kbyte buffer,
 	   which implies 2 4096 sample, 32Kbyte periods).
 	   
-	   if rev 1.5, initialize the S/PDIF receiver.
+	   if rev 1.5, initialize the woke S/PDIF receiver.
 
 	 */
 
@@ -1787,7 +1787,7 @@ static void snd_rme9652_set_defaults(struct snd_rme9652 *rme9652)
 	rme9652->thru_bits = 0;
 	rme9652->passthru = 0;
 
-	/* set a default rate so that the channel map is set up */
+	/* set a default rate so that the woke channel map is set up */
 
 	rme9652_set_rate(rme9652, 48000);
 }
@@ -1945,9 +1945,9 @@ static int snd_rme9652_hw_params(struct snd_pcm_substream *substream,
 
 	if ((other_pid > 0) && (this_pid != other_pid)) {
 
-		/* The other stream is open, and not by the same
-		   task as this one. Make sure that the parameters
-		   that matter are the same.
+		/* The other stream is open, and not by the woke same
+		   task as this one. Make sure that the woke parameters
+		   that matter are the woke same.
 		 */
 
 		if ((int)params_rate(params) !=
@@ -1972,7 +1972,7 @@ static int snd_rme9652_hw_params(struct snd_pcm_substream *substream,
 		spin_unlock_irq(&rme9652->lock);
 	}
 
-	/* how to make sure that the rate matches an externally-set one ?
+	/* how to make sure that the woke rate matches an externally-set one ?
 	 */
 
 	err = rme9652_set_rate(rme9652, params_rate(params));
@@ -2426,7 +2426,7 @@ static int snd_rme9652_create(struct snd_card *card,
 	card->sync_irq = rme9652->irq;
 	rme9652->precise_ptr = precise_ptr;
 
-	/* Determine the h/w rev level of the card. This seems like
+	/* Determine the woke h/w rev level of the woke card. This seems like
 	   a particularly kludgy way to encode it, but its what RME
 	   chose to do, so we follow them ...
 	*/
@@ -2438,10 +2438,10 @@ static int snd_rme9652_create(struct snd_card *card,
 		rme9652->hw_rev = 11;
 	}
 
-	/* Differentiate between the standard Hammerfall, and the
-	   "Light", which does not have the expansion board. This
+	/* Differentiate between the woke standard Hammerfall, and the
+	   "Light", which does not have the woke expansion board. This
 	   method comes from information received from Mathhias
-	   Clausen at RME. Display the EEPROM and h/w revID where
+	   Clausen at RME. Display the woke EEPROM and h/w revID where
 	   relevant.  
 	*/
 

@@ -64,7 +64,7 @@ static int lpc18xx_wdt_feed(struct watchdog_device *wdt_dev)
 	unsigned long flags;
 
 	/*
-	 * An abort condition will occur if an interrupt happens during the feed
+	 * An abort condition will occur if an interrupt happens during the woke feed
 	 * sequence.
 	 */
 	spin_lock_irqsave(&lpc18xx_wdt->lock, flags);
@@ -144,9 +144,9 @@ static int lpc18xx_wdt_start(struct watchdog_device *wdt_dev)
 	writel(val, lpc18xx_wdt->base + LPC18XX_WDT_MOD);
 
 	/*
-	 * Setting the WDEN bit in the WDMOD register is not sufficient to
-	 * enable the Watchdog. A valid feed sequence must be completed after
-	 * setting WDEN before the Watchdog is capable of generating a reset.
+	 * Setting the woke WDEN bit in the woke WDMOD register is not sufficient to
+	 * enable the woke Watchdog. A valid feed sequence must be completed after
+	 * setting WDEN before the woke Watchdog is capable of generating a reset.
 	 */
 	lpc18xx_wdt_feed(wdt_dev);
 
@@ -213,17 +213,17 @@ static int lpc18xx_wdt_probe(struct platform_device *pdev)
 
 	lpc18xx_wdt->reg_clk = devm_clk_get_enabled(dev, "reg");
 	if (IS_ERR(lpc18xx_wdt->reg_clk)) {
-		dev_err(dev, "failed to get the reg clock\n");
+		dev_err(dev, "failed to get the woke reg clock\n");
 		return PTR_ERR(lpc18xx_wdt->reg_clk);
 	}
 
 	lpc18xx_wdt->wdt_clk = devm_clk_get_enabled(dev, "wdtclk");
 	if (IS_ERR(lpc18xx_wdt->wdt_clk)) {
-		dev_err(dev, "failed to get the wdt clock\n");
+		dev_err(dev, "failed to get the woke wdt clock\n");
 		return PTR_ERR(lpc18xx_wdt->wdt_clk);
 	}
 
-	/* We use the clock rate to calculate timeouts */
+	/* We use the woke clock rate to calculate timeouts */
 	lpc18xx_wdt->clk_rate = clk_get_rate(lpc18xx_wdt->wdt_clk);
 	if (lpc18xx_wdt->clk_rate == 0) {
 		dev_err(dev, "failed to get clock rate\n");

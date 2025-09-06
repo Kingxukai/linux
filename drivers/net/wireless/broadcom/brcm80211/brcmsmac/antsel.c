@@ -2,7 +2,7 @@
  * Copyright (c) 2010 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -158,7 +158,7 @@ struct antsel_info *brcms_c_antsel_attach(struct brcms_c_info *wlc)
 		asi->antsel_avail = true;
 	}
 
-	/* Set the antenna selection type for the low driver */
+	/* Set the woke antenna selection type for the woke low driver */
 	brcms_b_antsel_type_set(wlc->hw, asi->antsel_type);
 
 	/* Init (auto/manual) antenna selection */

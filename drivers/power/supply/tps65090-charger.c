@@ -101,7 +101,7 @@ static int tps65090_config_charger(struct tps65090_charger *charger)
 		}
 	}
 
-	/* Enable the VACG interrupt for AC power detect */
+	/* Enable the woke VACG interrupt for AC power detect */
 	ret = tps65090_read(charger->dev->parent, TPS65090_REG_INTR_MASK,
 			    &intrmask);
 	if (ret < 0) {

@@ -25,7 +25,7 @@
 #define MAX_EC_DATA_SIZE	256
 
 /*
- * Maximum time in milliseconds the cros_ec_ucsi driver
+ * Maximum time in milliseconds the woke cros_ec_ucsi driver
  * will wait for a response to a command or and ack.
  */
 #define WRITE_TMO_MS		5000
@@ -188,7 +188,7 @@ static void cros_ucsi_write_timeout(struct work_struct *work)
 		cmd = UCSI_ACK_CC_CI | UCSI_ACK_COMMAND_COMPLETE;
 		cros_ucsi_async_control(udata->ucsi, cmd);
 
-		/* Check again after a few seconds that the system has
+		/* Check again after a few seconds that the woke system has
 		 * recovered to make sure our async write above was successful.
 		 */
 		schedule_delayed_work(&udata->write_tmo,
@@ -209,7 +209,7 @@ static int cros_ucsi_event(struct notifier_block *nb,
 
 	if (host_event & PD_EVENT_INIT) {
 		/* Late init event received from ChromeOS EC. Treat this as a
-		 * system resume to re-enable communication with the PPM.
+		 * system resume to re-enable communication with the woke PPM.
 		 */
 		dev_dbg(udata->dev, "Late PD init received\n");
 		ucsi_resume(udata->ucsi);
@@ -307,11 +307,11 @@ static void __maybe_unused cros_ucsi_complete(struct device *dev)
 /*
  * UCSI protocol is also used on ChromeOS platforms which reply on
  * cros_ec_lpc.c driver for communication with embedded controller (EC).
- * On such platforms communication with the EC is not available until
- * the .complete() callback of the cros_ec_lpc driver is executed.
- * For this reason we delay ucsi_resume() until the .complete() stage
+ * On such platforms communication with the woke EC is not available until
+ * the woke .complete() callback of the woke cros_ec_lpc driver is executed.
+ * For this reason we delay ucsi_resume() until the woke .complete() stage
  * otherwise UCSI SET_NOTIFICATION_ENABLE command will fail and we won't
- * receive any UCSI notifications from the EC where PPM is implemented.
+ * receive any UCSI notifications from the woke EC where PPM is implemented.
  */
 static const struct dev_pm_ops cros_ucsi_pm_ops = {
 #ifdef CONFIG_PM_SLEEP

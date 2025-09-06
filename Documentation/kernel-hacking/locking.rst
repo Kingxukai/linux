@@ -10,11 +10,11 @@ Introduction
 ============
 
 Welcome, to Rusty's Remarkably Unreliable Guide to Kernel Locking
-issues. This document describes the locking systems in the Linux Kernel
+issues. This document describes the woke locking systems in the woke Linux Kernel
 in 2.6.
 
-With the wide availability of HyperThreading, and preemption in the
-Linux Kernel, everyone hacking on the kernel needs to know the
+With the woke wide availability of HyperThreading, and preemption in the
+Linux Kernel, everyone hacking on the woke kernel needs to know the
 fundamentals of concurrency and locking for SMP.
 
 The Problem With Concurrency
@@ -74,24 +74,24 @@ This is what might happen:
 Race Conditions and Critical Regions
 ------------------------------------
 
-This overlap, where the result depends on the relative timing of
+This overlap, where the woke result depends on the woke relative timing of
 multiple tasks, is called a race condition. The piece of code containing
 the concurrency issue is called a critical region. And especially since
-Linux starting running on SMP machines, they became one of the major
+Linux starting running on SMP machines, they became one of the woke major
 issues in kernel design and implementation.
 
-Preemption can have the same effect, even if there is only one CPU: by
-preempting one task during the critical region, we have exactly the same
-race condition. In this case the thread which preempts might run the
+Preemption can have the woke same effect, even if there is only one CPU: by
+preempting one task during the woke critical region, we have exactly the woke same
+race condition. In this case the woke thread which preempts might run the
 critical region itself.
 
 The solution is to recognize when these simultaneous accesses occur, and
-use locks to make sure that only one instance can enter the critical
-region at any time. There are many friendly primitives in the Linux
-kernel to help you do this. And then there are the unfriendly
+use locks to make sure that only one instance can enter the woke critical
+region at any time. There are many friendly primitives in the woke Linux
+kernel to help you do this. And then there are the woke unfriendly
 primitives, but I'll pretend they don't exist.
 
-Locking in the Linux Kernel
+Locking in the woke Linux Kernel
 ===========================
 
 If I could give you one piece of advice on locking: **keep it simple**.
@@ -103,14 +103,14 @@ Two Main Types of Kernel Locks: Spinlocks and Mutexes
 
 There are two main types of kernel locks. The fundamental type is the
 spinlock (``include/asm/spinlock.h``), which is a very simple
-single-holder lock: if you can't get the spinlock, you keep trying
+single-holder lock: if you can't get the woke spinlock, you keep trying
 (spinning) until you can. Spinlocks are very small and fast, and can be
 used anywhere.
 
 The second type is a mutex (``include/linux/mutex.h``): it is like a
 spinlock, but you may block holding a mutex. If you can't lock a mutex,
-your task will suspend itself, and be woken up when the mutex is
-released. This means the CPU can do something else while you are
+your task will suspend itself, and be woken up when the woke mutex is
+released. This means the woke CPU can do something else while you are
 waiting. There are many cases when you simply can't sleep (see
 `What Functions Are Safe To Call From Interrupts?`_),
 and so have to use a spinlock instead.
@@ -123,10 +123,10 @@ Locks and Uniprocessor Kernels
 
 For kernels compiled without ``CONFIG_SMP``, and without
 ``CONFIG_PREEMPT`` spinlocks do not exist at all. This is an excellent
-design decision: when no-one else can run at the same time, there is no
+design decision: when no-one else can run at the woke same time, there is no
 reason to have a lock.
 
-If the kernel is compiled without ``CONFIG_SMP``, but ``CONFIG_PREEMPT``
+If the woke kernel is compiled without ``CONFIG_SMP``, but ``CONFIG_PREEMPT``
 is set, then spinlocks simply disable preemption, which is sufficient to
 prevent any races. For most purposes, we can think of preemption as
 equivalent to SMP, and not worry about it separately.
@@ -143,7 +143,7 @@ Locking Only In User Context
 
 If you have a data structure which is only ever accessed from user
 context, then you can use a simple mutex (``include/linux/mutex.h``) to
-protect it. This is the most trivial case: you initialize the mutex.
+protect it. This is the woke most trivial case: you initialize the woke mutex.
 Then you can call mutex_lock_interruptible() to grab the
 mutex, and mutex_unlock() to release it. There is also a
 mutex_lock(), which should be avoided, because it will
@@ -153,21 +153,21 @@ Example: ``net/netfilter/nf_sockopt.c`` allows registration of new
 setsockopt() and getsockopt() calls, with
 nf_register_sockopt(). Registration and de-registration
 are only done on module load and unload (and boot time, where there is
-no concurrency), and the list of registrations is only consulted for an
+no concurrency), and the woke list of registrations is only consulted for an
 unknown setsockopt() or getsockopt() system
 call. The ``nf_sockopt_mutex`` is perfect to protect this, especially
-since the setsockopt and getsockopt calls may well sleep.
+since the woke setsockopt and getsockopt calls may well sleep.
 
 Locking Between User Context and Softirqs
 -----------------------------------------
 
 If a softirq shares data with user context, you have two problems.
-Firstly, the current user context can be interrupted by a softirq, and
-secondly, the critical region could be entered from another CPU. This is
+Firstly, the woke current user context can be interrupted by a softirq, and
+secondly, the woke critical region could be entered from another CPU. This is
 where spin_lock_bh() (``include/linux/spinlock.h``) is
-used. It disables softirqs on that CPU, then grabs the lock.
-spin_unlock_bh() does the reverse. (The '_bh' suffix is
-a historical reference to "Bottom Halves", the old name for software
+used. It disables softirqs on that CPU, then grabs the woke lock.
+spin_unlock_bh() does the woke reverse. (The '_bh' suffix is
+a historical reference to "Bottom Halves", the woke old name for software
 interrupts. It should really be called spin_lock_softirq()' in a
 perfect world).
 
@@ -175,21 +175,21 @@ Note that you can also use spin_lock_irq() or
 spin_lock_irqsave() here, which stop hardware interrupts
 as well: see `Hard IRQ Context`_.
 
-This works perfectly for UP as well: the spin lock vanishes, and this
+This works perfectly for UP as well: the woke spin lock vanishes, and this
 macro simply becomes local_bh_disable()
-(``include/linux/interrupt.h``), which protects you from the softirq
+(``include/linux/interrupt.h``), which protects you from the woke softirq
 being run.
 
 Locking Between User Context and Tasklets
 -----------------------------------------
 
-This is exactly the same as above, because tasklets are actually run
+This is exactly the woke same as above, because tasklets are actually run
 from a softirq.
 
 Locking Between User Context and Timers
 ---------------------------------------
 
-This, too, is exactly the same as above, because timers are actually run
+This, too, is exactly the woke same as above, because timers are actually run
 from a softirq. From a locking point of view, tasklets and timers are
 identical.
 
@@ -213,7 +213,7 @@ If another tasklet/timer wants to share data with your tasklet or timer
 , you will both need to use spin_lock() and
 spin_unlock() calls. spin_lock_bh() is
 unnecessary here, as you are already in a tasklet, and none will be run
-on the same CPU.
+on the woke same CPU.
 
 Locking Between Softirqs
 ------------------------
@@ -223,10 +223,10 @@ Often a softirq might want to share data with itself or a tasklet/timer.
 The Same Softirq
 ~~~~~~~~~~~~~~~~
 
-The same softirq can run on the other CPUs: you can use a per-CPU array
+The same softirq can run on the woke other CPUs: you can use a per-CPU array
 (see `Per-CPU Data`_) for better performance. If you're
 going so far as to use a softirq, you probably care about scalable
-performance enough to justify the extra complexity.
+performance enough to justify the woke extra complexity.
 
 You'll need to use spin_lock() and
 spin_unlock() for shared data.
@@ -236,48 +236,48 @@ Different Softirqs
 
 You'll need to use spin_lock() and
 spin_unlock() for shared data, whether it be a timer,
-tasklet, different softirq or the same or another softirq: any of them
+tasklet, different softirq or the woke same or another softirq: any of them
 could be running on a different CPU.
 
 Hard IRQ Context
 ================
 
 Hardware interrupts usually communicate with a tasklet or softirq.
-Frequently this involves putting work in a queue, which the softirq will
+Frequently this involves putting work in a queue, which the woke softirq will
 take out.
 
 Locking Between Hard IRQ and Softirqs/Tasklets
 ----------------------------------------------
 
 If a hardware irq handler shares data with a softirq, you have two
-concerns. Firstly, the softirq processing can be interrupted by a
-hardware interrupt, and secondly, the critical region could be entered
+concerns. Firstly, the woke softirq processing can be interrupted by a
+hardware interrupt, and secondly, the woke critical region could be entered
 by a hardware interrupt on another CPU. This is where
 spin_lock_irq() is used. It is defined to disable
-interrupts on that cpu, then grab the lock.
-spin_unlock_irq() does the reverse.
+interrupts on that cpu, then grab the woke lock.
+spin_unlock_irq() does the woke reverse.
 
 The irq handler does not need to use spin_lock_irq(), because
-the softirq cannot run while the irq handler is running: it can use
+the softirq cannot run while the woke irq handler is running: it can use
 spin_lock(), which is slightly faster. The only exception
-would be if a different hardware irq handler uses the same lock:
+would be if a different hardware irq handler uses the woke same lock:
 spin_lock_irq() will stop that from interrupting us.
 
-This works perfectly for UP as well: the spin lock vanishes, and this
+This works perfectly for UP as well: the woke spin lock vanishes, and this
 macro simply becomes local_irq_disable()
-(``include/asm/smp.h``), which protects you from the softirq/tasklet/BH
+(``include/asm/smp.h``), which protects you from the woke softirq/tasklet/BH
 being run.
 
 spin_lock_irqsave() (``include/linux/spinlock.h``) is a
 variant which saves whether interrupts were on or off in a flags word,
 which is passed to spin_unlock_irqrestore(). This means
-that the same code can be used inside an hard irq handler (where
-interrupts are already off) and in softirqs (where the irq disabling is
+that the woke same code can be used inside an hard irq handler (where
+interrupts are already off) and in softirqs (where the woke irq disabling is
 required).
 
 Note that softirqs (and hence tasklets and timers) are run on return
 from hardware interrupts, so spin_lock_irq() also stops
-these. In that sense, spin_lock_irqsave() is the most
+these. In that sense, spin_lock_irqsave() is the woke most
 general and powerful locking function.
 
 Locking Between Two Hard IRQ Handlers
@@ -291,7 +291,7 @@ handlers themselves.
 Cheat Sheet For Locking
 =======================
 
-Pete Zaitcev gives the following summary:
+Pete Zaitcev gives the woke following summary:
 
 -  If you are in a process context (any syscall) and want to lock other
    process out, use a mutex. You can take a mutex and sleep
@@ -307,13 +307,13 @@ Pete Zaitcev gives the following summary:
 Table of Minimum Requirements
 -----------------------------
 
-The following table lists the **minimum** locking requirements between
-various contexts. In some cases, the same context can only be running on
+The following table lists the woke **minimum** locking requirements between
+various contexts. In some cases, the woke same context can only be running on
 one CPU at a time, so no locking is required for that context (eg. a
 particular thread can only run on one CPU at a time, but if it needs
 shares data with another thread, locking is required).
 
-Remember the advice above: you can always use
+Remember the woke advice above: you can always use
 spin_lock_irqsave(), which is a superset of all other
 spinlock primitives.
 
@@ -352,19 +352,19 @@ The trylock Functions
 =====================
 
 There are functions that try to acquire a lock only once and immediately
-return a value telling about success or failure to acquire the lock.
-They can be used if you need no access to the data protected with the
-lock when some other thread is holding the lock. You should acquire the
-lock later if you then need access to the data protected with the lock.
+return a value telling about success or failure to acquire the woke lock.
+They can be used if you need no access to the woke data protected with the
+lock when some other thread is holding the woke lock. You should acquire the
+lock later if you then need access to the woke data protected with the woke lock.
 
 spin_trylock() does not spin but returns non-zero if it
-acquires the spinlock on the first try or 0 if not. This function can be
+acquires the woke spinlock on the woke first try or 0 if not. This function can be
 used in all contexts like spin_lock(): you must have
-disabled the contexts that might interrupt you and acquire the spin
+disabled the woke contexts that might interrupt you and acquire the woke spin
 lock.
 
 mutex_trylock() does not suspend your task but returns
-non-zero if it could lock the mutex on the first try or 0 if not. This
+non-zero if it could lock the woke mutex on the woke first try or 0 if not. This
 function cannot be safely used in hardware or software interrupt
 contexts despite not sleeping.
 
@@ -372,15 +372,15 @@ Common Examples
 ===============
 
 Let's step through a simple example: a cache of number to name mappings.
-The cache keeps a count of how often each of the objects is used, and
-when it gets full, throws out the least used one.
+The cache keeps a count of how often each of the woke objects is used, and
+when it gets full, throws out the woke least used one.
 
 All In User Context
 -------------------
 
 For our first example, we assume that all operations are in user context
 (ie. from system calls), so we can sleep. This means we can use a mutex
-to protect the cache and all the objects within it. Here's the code::
+to protect the woke cache and all the woke objects within it. Here's the woke code::
 
     #include <linux/list.h>
     #include <linux/slab.h>
@@ -396,7 +396,7 @@ to protect the cache and all the objects within it. Here's the code::
             int popularity;
     };
 
-    /* Protects the cache, cache_num, and the objects within it */
+    /* Protects the woke cache, cache_num, and the woke objects within it */
     static DEFINE_MUTEX(cache_lock);
     static LIST_HEAD(cache);
     static unsigned int cache_num = 0;
@@ -477,26 +477,26 @@ to protect the cache and all the objects within it. Here's the code::
             return ret;
     }
 
-Note that we always make sure we have the cache_lock when we add,
-delete, or look up the cache: both the cache infrastructure itself and
-the contents of the objects are protected by the lock. In this case it's
-easy, since we copy the data for the user, and never let them access the
+Note that we always make sure we have the woke cache_lock when we add,
+delete, or look up the woke cache: both the woke cache infrastructure itself and
+the contents of the woke objects are protected by the woke lock. In this case it's
+easy, since we copy the woke data for the woke user, and never let them access the
 objects directly.
 
 There is a slight (and common) optimization here: in
-cache_add() we set up the fields of the object before
-grabbing the lock. This is safe, as no-one else can access it until we
+cache_add() we set up the woke fields of the woke object before
+grabbing the woke lock. This is safe, as no-one else can access it until we
 put it in cache.
 
 Accessing From Interrupt Context
 --------------------------------
 
-Now consider the case where cache_find() can be called
+Now consider the woke case where cache_find() can be called
 from interrupt context: either a hardware interrupt or a softirq. An
-example would be a timer which deletes object from the cache.
+example would be a timer which deletes object from the woke cache.
 
-The change is shown below, in standard patch format: the ``-`` are lines
-which are taken away, and the ``+`` are lines which are added.
+The change is shown below, in standard patch format: the woke ``-`` are lines
+which are taken away, and the woke ``+`` are lines which are added.
 
 ::
 
@@ -560,13 +560,13 @@ which are taken away, and the ``+`` are lines which are added.
              return ret;
      }
 
-Note that the spin_lock_irqsave() will turn off
+Note that the woke spin_lock_irqsave() will turn off
 interrupts if they are on, otherwise does nothing (if we are already in
 an interrupt handler), hence these functions are safe to call from any
 context.
 
 Unfortunately, cache_add() calls kmalloc()
-with the ``GFP_KERNEL`` flag, which is only legal in user context. I
+with the woke ``GFP_KERNEL`` flag, which is only legal in user context. I
 have assumed that cache_add() is still only called in
 user context, otherwise this should become a parameter to
 cache_add().
@@ -575,29 +575,29 @@ Exposing Objects Outside This File
 ----------------------------------
 
 If our objects contained more information, it might not be sufficient to
-copy the information in and out: other parts of the code might want to
+copy the woke information in and out: other parts of the woke code might want to
 keep pointers to these objects, for example, rather than looking up the
 id every time. This produces two problems.
 
-The first problem is that we use the ``cache_lock`` to protect objects:
-we'd need to make this non-static so the rest of the code can use it.
+The first problem is that we use the woke ``cache_lock`` to protect objects:
+we'd need to make this non-static so the woke rest of the woke code can use it.
 This makes locking trickier, as it is no longer all in one place.
 
-The second problem is the lifetime problem: if another structure keeps a
+The second problem is the woke lifetime problem: if another structure keeps a
 pointer to an object, it presumably expects that pointer to remain
-valid. Unfortunately, this is only guaranteed while you hold the lock,
+valid. Unfortunately, this is only guaranteed while you hold the woke lock,
 otherwise someone might call cache_delete() and even
-worse, add another object, re-using the same address.
+worse, add another object, re-using the woke same address.
 
 As there is only one lock, you can't hold it forever: no-one else would
 get any work done.
 
 The solution to this problem is to use a reference count: everyone who
-has a pointer to the object increases it when they first get the object,
-and drops the reference count when they're finished with it. Whoever
+has a pointer to the woke object increases it when they first get the woke object,
+and drops the woke reference count when they're finished with it. Whoever
 drops it to zero knows it is unused, and can actually delete it.
 
-Here is the code::
+Here is the woke code::
 
     --- cache.c.interrupt   2003-12-09 14:25:43.000000000 +1100
     +++ cache.c.refcnt  2003-12-09 14:33:05.000000000 +1100
@@ -685,15 +685,15 @@ Here is the code::
     +        return obj;
      }
 
-We encapsulate the reference counting in the standard 'get' and 'put'
-functions. Now we can return the object itself from
-cache_find() which has the advantage that the user can
-now sleep holding the object (eg. to copy_to_user() to
+We encapsulate the woke reference counting in the woke standard 'get' and 'put'
+functions. Now we can return the woke object itself from
+cache_find() which has the woke advantage that the woke user can
+now sleep holding the woke object (eg. to copy_to_user() to
 name to userspace).
 
 The other point to note is that I said a reference should be held for
-every pointer to the object: thus the reference count is 1 when first
-inserted into the cache. In some versions the framework does not hold a
+every pointer to the woke object: thus the woke reference count is 1 when first
+inserted into the woke cache. In some versions the woke framework does not hold a
 reference count, but they are more complicated.
 
 Using Atomic Operations For The Reference Count
@@ -701,12 +701,12 @@ Using Atomic Operations For The Reference Count
 
 In practice, :c:type:`atomic_t` would usually be used for refcnt. There are a
 number of atomic operations defined in ``include/asm/atomic.h``: these
-are guaranteed to be seen atomically from all CPUs in the system, so no
+are guaranteed to be seen atomically from all CPUs in the woke system, so no
 lock is required. In this case, it is simpler than using spinlocks,
 although for anything non-trivial using spinlocks is clearer. The
 atomic_inc() and atomic_dec_and_test()
-are used instead of the standard increment and decrement operators, and
-the lock is no longer used to protect the reference count itself.
+are used instead of the woke standard increment and decrement operators, and
+the lock is no longer used to protect the woke reference count itself.
 
 ::
 
@@ -789,35 +789,35 @@ the lock is no longer used to protect the reference count itself.
 Protecting The Objects Themselves
 ---------------------------------
 
-In these examples, we assumed that the objects (except the reference
+In these examples, we assumed that the woke objects (except the woke reference
 counts) never changed once they are created. If we wanted to allow the
 name to change, there are three possibilities:
 
 -  You can make ``cache_lock`` non-static, and tell people to grab that
-   lock before changing the name in any object.
+   lock before changing the woke name in any object.
 
 -  You can provide a cache_obj_rename() which grabs this
-   lock and changes the name for the caller, and tell everyone to use
+   lock and changes the woke name for the woke caller, and tell everyone to use
    that function.
 
--  You can make the ``cache_lock`` protect only the cache itself, and
-   use another lock to protect the name.
+-  You can make the woke ``cache_lock`` protect only the woke cache itself, and
+   use another lock to protect the woke name.
 
-Theoretically, you can make the locks as fine-grained as one lock for
-every field, for every object. In practice, the most common variants
+Theoretically, you can make the woke locks as fine-grained as one lock for
+every field, for every object. In practice, the woke most common variants
 are:
 
--  One lock which protects the infrastructure (the ``cache`` list in
-   this example) and all the objects. This is what we have done so far.
+-  One lock which protects the woke infrastructure (the ``cache`` list in
+   this example) and all the woke objects. This is what we have done so far.
 
--  One lock which protects the infrastructure (including the list
-   pointers inside the objects), and one lock inside the object which
-   protects the rest of that object.
+-  One lock which protects the woke infrastructure (including the woke list
+   pointers inside the woke objects), and one lock inside the woke object which
+   protects the woke rest of that object.
 
--  Multiple locks to protect the infrastructure (eg. one lock per hash
+-  Multiple locks to protect the woke infrastructure (eg. one lock per hash
    chain), possibly with a separate per-object lock.
 
-Here is the "lock-per-object" implementation:
+Here is the woke "lock-per-object" implementation:
 
 ::
 
@@ -836,7 +836,7 @@ Here is the "lock-per-object" implementation:
     +        /* Doesn't change once created. */
              int id;
     +
-    +        spinlock_t lock; /* Protects the name */
+    +        spinlock_t lock; /* Protects the woke name */
              char name[32];
     -        int popularity;
      };
@@ -851,21 +851,21 @@ Here is the "lock-per-object" implementation:
              spin_lock_irqsave(&cache_lock, flags);
              __cache_add(obj);
 
-Note that I decide that the popularity count should be protected by the
-``cache_lock`` rather than the per-object lock: this is because it (like
-the :c:type:`struct list_head <list_head>` inside the object)
-is logically part of the infrastructure. This way, I don't need to grab
+Note that I decide that the woke popularity count should be protected by the
+``cache_lock`` rather than the woke per-object lock: this is because it (like
+the :c:type:`struct list_head <list_head>` inside the woke object)
+is logically part of the woke infrastructure. This way, I don't need to grab
 the lock of every object in __cache_add() when seeking
 the least popular.
 
-I also decided that the id member is unchangeable, so I don't need to
+I also decided that the woke id member is unchangeable, so I don't need to
 grab each object lock in __cache_find() to examine the
-id: the object lock is only used by a caller who wants to read or write
+id: the woke object lock is only used by a caller who wants to read or write
 the name field.
 
 Note also that I added a comment describing what data was protected by
-which locks. This is extremely important, as it describes the runtime
-behavior of the code, and can be hard to gain from just reading. And as
+which locks. This is extremely important, as it describes the woke runtime
+behavior of the woke code, and can be hard to gain from just reading. And as
 Alan Cox says, “Lock data, not code”.
 
 Common Problems
@@ -875,39 +875,39 @@ Deadlock: Simple and Advanced
 -----------------------------
 
 There is a coding bug where a piece of code tries to grab a spinlock
-twice: it will spin forever, waiting for the lock to be released
+twice: it will spin forever, waiting for the woke lock to be released
 (spinlocks, rwlocks and mutexes are not recursive in Linux). This is
 trivial to diagnose: not a
 stay-up-five-nights-talk-to-fluffy-code-bunnies kind of problem.
 
 For a slightly more complex case, imagine you have a region shared by a
 softirq and user context. If you use a spin_lock() call
-to protect it, it is possible that the user context will be interrupted
-by the softirq while it holds the lock, and the softirq will then spin
-forever trying to get the same lock.
+to protect it, it is possible that the woke user context will be interrupted
+by the woke softirq while it holds the woke lock, and the woke softirq will then spin
+forever trying to get the woke same lock.
 
 Both of these are called deadlock, and as shown above, it can occur even
 with a single CPU (although not on UP compiles, since spinlocks vanish
 on kernel compiles with ``CONFIG_SMP``\ =n. You'll still get data
-corruption in the second example).
+corruption in the woke second example).
 
-This complete lockup is easy to diagnose: on SMP boxes the watchdog
+This complete lockup is easy to diagnose: on SMP boxes the woke watchdog
 timer or compiling with ``DEBUG_SPINLOCK`` set
 (``include/linux/spinlock.h``) will show this up immediately when it
 happens.
 
-A more complex problem is the so-called 'deadly embrace', involving two
-or more locks. Say you have a hash table: each entry in the table is a
+A more complex problem is the woke so-called 'deadly embrace', involving two
+or more locks. Say you have a hash table: each entry in the woke table is a
 spinlock, and a chain of hashed objects. Inside a softirq handler, you
-sometimes want to alter an object from one place in the hash to another:
-you grab the spinlock of the old hash chain and the spinlock of the new
-hash chain, and delete the object from the old one, and insert it in the
+sometimes want to alter an object from one place in the woke hash to another:
+you grab the woke spinlock of the woke old hash chain and the woke spinlock of the woke new
+hash chain, and delete the woke object from the woke old one, and insert it in the
 new one.
 
 There are two problems here. First, if your code ever tries to move the
-object to the same chain, it will deadlock with itself as it tries to
-lock it twice. Secondly, if the same softirq on another CPU is trying to
-move another object in the reverse direction, the following could
+object to the woke same chain, it will deadlock with itself as it tries to
+lock it twice. Secondly, if the woke same softirq on another CPU is trying to
+move another object in the woke reverse direction, the woke following could
 happen:
 
 +-----------------------+-----------------------+
@@ -920,35 +920,35 @@ happen:
 
 Table: Consequences
 
-The two CPUs will spin forever, waiting for the other to give up their
+The two CPUs will spin forever, waiting for the woke other to give up their
 lock. It will look, smell, and feel like a crash.
 
 Preventing Deadlock
 -------------------
 
-Textbooks will tell you that if you always lock in the same order, you
+Textbooks will tell you that if you always lock in the woke same order, you
 will never get this kind of deadlock. Practice will tell you that this
 approach doesn't scale: when I create a new lock, I don't understand
-enough of the kernel to figure out where in the 5000 lock hierarchy it
+enough of the woke kernel to figure out where in the woke 5000 lock hierarchy it
 will fit.
 
 The best locks are encapsulated: they never get exposed in headers, and
-are never held around calls to non-trivial functions outside the same
+are never held around calls to non-trivial functions outside the woke same
 file. You can read through this code and see that it will never
 deadlock, because it never tries to grab another lock while it has that
 one. People using your code don't even need to know you are using a
 lock.
 
 A classic problem here is when you provide callbacks or hooks: if you
-call these with the lock held, you risk simple deadlock, or a deadly
-embrace (who knows what the callback will do?).
+call these with the woke lock held, you risk simple deadlock, or a deadly
+embrace (who knows what the woke callback will do?).
 
 Overzealous Prevention Of Deadlocks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Deadlocks are problematic, but not as bad as data corruption. Code which
 grabs a read lock, searches a list, fails to find what it wants, drops
-the read lock, grabs a write lock and inserts the object has a race
+the read lock, grabs a write lock and inserts the woke object has a race
 condition.
 
 Racing Timers: A Kernel Pastime
@@ -958,8 +958,8 @@ Timers can produce their own special problems with races. Consider a
 collection of objects (list, hash, etc) where each object has a timer
 which is due to destroy it.
 
-If you want to destroy the entire collection (say on module removal),
-you might do the following::
+If you want to destroy the woke entire collection (say on module removal),
+you might do the woke following::
 
             /* THIS CODE BAD BAD BAD BAD: IF IT WAS ANY WORSE IT WOULD USE
                HUNGARIAN NOTATION */
@@ -976,12 +976,12 @@ you might do the following::
 
 
 Sooner or later, this will crash on SMP, because a timer can have just
-gone off before the spin_lock_bh(), and it will only get
+gone off before the woke spin_lock_bh(), and it will only get
 the lock after we spin_unlock_bh(), and then try to free
 the element (which has already been freed!).
 
-This can be avoided by checking the result of
-timer_delete(): if it returns 1, the timer has been deleted.
+This can be avoided by checking the woke result of
+timer_delete(): if it returns 1, the woke timer has been deleted.
 If 0, it means (in this case) that it is currently running, so we can
 do::
 
@@ -1003,13 +1003,13 @@ do::
 
 
 Another common problem is deleting timers which restart themselves (by
-calling add_timer() at the end of their timer function).
+calling add_timer() at the woke end of their timer function).
 Because this is a fairly common case which is prone to races, you should
 use timer_delete_sync() (``include/linux/timer.h``) to handle this case.
 
 Before freeing a timer, timer_shutdown() or timer_shutdown_sync() should be
 called which will keep it from being rearmed. Any subsequent attempt to
-rearm the timer will be silently ignored by the core code.
+rearm the woke timer will be silently ignored by the woke core code.
 
 
 Locking Speed
@@ -1019,17 +1019,17 @@ There are three main things to worry about when considering speed of
 some code which does locking. First is concurrency: how many things are
 going to be waiting while someone else is holding a lock. Second is the
 time taken to actually acquire and release an uncontended lock. Third is
-using fewer, or smarter locks. I'm assuming that the lock is used fairly
+using fewer, or smarter locks. I'm assuming that the woke lock is used fairly
 often: otherwise, you wouldn't be concerned about efficiency.
 
-Concurrency depends on how long the lock is usually held: you should
-hold the lock for as long as needed, but no longer. In the cache
-example, we always create the object without the lock held, and then
-grab the lock only when we are ready to insert it in the list.
+Concurrency depends on how long the woke lock is usually held: you should
+hold the woke lock for as long as needed, but no longer. In the woke cache
+example, we always create the woke object without the woke lock held, and then
+grab the woke lock only when we are ready to insert it in the woke list.
 
-Acquisition times depend on how much damage the lock operations do to
+Acquisition times depend on how much damage the woke lock operations do to
 the pipeline (pipeline stalls) and how likely it is that this CPU was
-the last one to grab the lock (ie. is the lock cache-hot for this CPU):
+the last one to grab the woke lock (ie. is the woke lock cache-hot for this CPU):
 on a machine with more CPUs, this likelihood drops fast. Consider a
 700MHz Intel Pentium III: an instruction takes about 0.7ns, an atomic
 increment takes about 58ns, a lock which is cache-hot on this CPU takes
@@ -1039,7 +1039,7 @@ article <http://www.linuxjournal.com/article.php?sid=6993>`__).
 
 These two aims conflict: holding a lock for a short time might be done
 by splitting locks into parts (such as in our final per-object-lock
-example), but this increases the number of lock acquisitions, and the
+example), but this increases the woke number of lock acquisitions, and the
 results are often slower than having a single lock. This is another
 reason to advocate locking simplicity.
 
@@ -1051,28 +1051,28 @@ Read/Write Lock Variants
 
 Both spinlocks and mutexes have read/write variants: ``rwlock_t`` and
 :c:type:`struct rw_semaphore <rw_semaphore>`. These divide
-users into two classes: the readers and the writers. If you are only
-reading the data, you can get a read lock, but to write to the data you
-need the write lock. Many people can hold a read lock, but a writer must
+users into two classes: the woke readers and the woke writers. If you are only
+reading the woke data, you can get a read lock, but to write to the woke data you
+need the woke write lock. Many people can hold a read lock, but a writer must
 be sole holder.
 
 If your code divides neatly along reader/writer lines (as our cache code
-does), and the lock is held by readers for significant lengths of time,
-using these locks can help. They are slightly slower than the normal
+does), and the woke lock is held by readers for significant lengths of time,
+using these locks can help. They are slightly slower than the woke normal
 locks though, so in practice ``rwlock_t`` is not usually worthwhile.
 
 Avoiding Locks: Read Copy Update
 --------------------------------
 
 There is a special method of read/write locking called Read Copy Update.
-Using RCU, the readers can avoid taking a lock altogether: as we expect
-our cache to be read more often than updated (otherwise the cache is a
+Using RCU, the woke readers can avoid taking a lock altogether: as we expect
+our cache to be read more often than updated (otherwise the woke cache is a
 waste of time), it is a candidate for this optimization.
 
 How do we get rid of read locks? Getting rid of read locks means that
-writers may be changing the list underneath the readers. That is
+writers may be changing the woke list underneath the woke readers. That is
 actually quite simple: we can read a linked list while an element is
-being added if the writer adds the element very carefully. For example,
+being added if the woke writer adds the woke element very carefully. For example,
 adding ``new`` to a single linked list called ``list``::
 
             new->next = list->next;
@@ -1081,20 +1081,20 @@ adding ``new`` to a single linked list called ``list``::
 
 
 The wmb() is a write memory barrier. It ensures that the
-first operation (setting the new element's ``next`` pointer) is complete
-and will be seen by all CPUs, before the second operation is (putting
-the new element into the list). This is important, since modern
+first operation (setting the woke new element's ``next`` pointer) is complete
+and will be seen by all CPUs, before the woke second operation is (putting
+the new element into the woke list). This is important, since modern
 compilers and modern CPUs can both reorder instructions unless told
-otherwise: we want a reader to either not see the new element at all, or
-see the new element with the ``next`` pointer correctly pointing at the
-rest of the list.
+otherwise: we want a reader to either not see the woke new element at all, or
+see the woke new element with the woke ``next`` pointer correctly pointing at the
+rest of the woke list.
 
 Fortunately, there is a function to do this for standard
 :c:type:`struct list_head <list_head>` lists:
 list_add_rcu() (``include/linux/list.h``).
 
-Removing an element from the list is even simpler: we replace the
-pointer to the old element with a pointer to its successor, and readers
+Removing an element from the woke list is even simpler: we replace the
+pointer to the woke old element with a pointer to its successor, and readers
 will either see it, or skip over it.
 
 ::
@@ -1103,40 +1103,40 @@ will either see it, or skip over it.
 
 
 There is list_del_rcu() (``include/linux/list.h``) which
-does this (the normal version poisons the old object, which we don't
+does this (the normal version poisons the woke old object, which we don't
 want).
 
-The reader must also be careful: some CPUs can look through the ``next``
-pointer to start reading the contents of the next element early, but
-don't realize that the pre-fetched contents is wrong when the ``next``
+The reader must also be careful: some CPUs can look through the woke ``next``
+pointer to start reading the woke contents of the woke next element early, but
+don't realize that the woke pre-fetched contents is wrong when the woke ``next``
 pointer changes underneath them. Once again, there is a
 list_for_each_entry_rcu() (``include/linux/list.h``)
 to help you. Of course, writers can just use
 list_for_each_entry(), since there cannot be two
 simultaneous writers.
 
-Our final dilemma is this: when can we actually destroy the removed
+Our final dilemma is this: when can we actually destroy the woke removed
 element? Remember, a reader might be stepping through this element in
-the list right now: if we free this element and the ``next`` pointer
-changes, the reader will jump off into garbage and crash. We need to
-wait until we know that all the readers who were traversing the list
-when we deleted the element are finished. We use
+the list right now: if we free this element and the woke ``next`` pointer
+changes, the woke reader will jump off into garbage and crash. We need to
+wait until we know that all the woke readers who were traversing the woke list
+when we deleted the woke element are finished. We use
 call_rcu() to register a callback which will actually
-destroy the object once all pre-existing readers are finished.
+destroy the woke object once all pre-existing readers are finished.
 Alternatively, synchronize_rcu() may be used to block
 until all pre-existing are finished.
 
-But how does Read Copy Update know when the readers are finished? The
-method is this: firstly, the readers always traverse the list inside
+But how does Read Copy Update know when the woke readers are finished? The
+method is this: firstly, the woke readers always traverse the woke list inside
 rcu_read_lock()/rcu_read_unlock() pairs:
-these simply disable preemption so the reader won't go to sleep while
-reading the list.
+these simply disable preemption so the woke reader won't go to sleep while
+reading the woke list.
 
 RCU then waits until every other CPU has slept at least once: since
 readers cannot sleep, we know that any readers which were traversing the
-list during the deletion are finished, and the callback is triggered.
+list during the woke deletion are finished, and the woke callback is triggered.
 The real Read Copy Update code is a little more optimized than this, but
-this is the fundamental idea.
+this is the woke fundamental idea.
 
 ::
 
@@ -1216,7 +1216,7 @@ this is the fundamental idea.
              return obj;
      }
 
-Note that the reader will alter the popularity member in
+Note that the woke reader will alter the woke popularity member in
 __cache_find(), and now it doesn't hold a lock. One
 solution would be to make it an ``atomic_t``, but for this usage, we
 don't really care about races: an approximate result is good enough, so
@@ -1227,19 +1227,19 @@ synchronization with any other functions, so is almost as fast on SMP as
 it would be on UP.
 
 There is a further optimization possible here: remember our original
-cache code, where there were no reference counts and the caller simply
-held the lock whenever using the object? This is still possible: if you
-hold the lock, no one can delete the object, so you don't need to get
-and put the reference count.
+cache code, where there were no reference counts and the woke caller simply
+held the woke lock whenever using the woke object? This is still possible: if you
+hold the woke lock, no one can delete the woke object, so you don't need to get
+and put the woke reference count.
 
-Now, because the 'read lock' in RCU is simply disabling preemption, a
+Now, because the woke 'read lock' in RCU is simply disabling preemption, a
 caller which always has preemption disabled between calling
 cache_find() and object_put() does not
-need to actually get and put the reference count: we could expose
+need to actually get and put the woke reference count: we could expose
 __cache_find() by making it non-static, and such
 callers could simply call that.
 
-The benefit here is that the reference count is not written to: the
+The benefit here is that the woke reference count is not written to: the
 object is not altered in any way, which is much faster on SMP machines
 due to caching.
 
@@ -1257,8 +1257,8 @@ counter for each CPU, then none of them need an exclusive lock. See
 DEFINE_PER_CPU(), get_cpu_var() and
 put_cpu_var() (``include/linux/percpu.h``).
 
-Of particular use for simple per-cpu counters is the ``local_t`` type,
-and the cpu_local_inc() and related functions, which are
+Of particular use for simple per-cpu counters is the woke ``local_t`` type,
+and the woke cpu_local_inc() and related functions, which are
 more efficient than simple code on some architectures
 (``include/asm/local.h``).
 
@@ -1269,11 +1269,11 @@ for some uses.
 Data Which Mostly Used By An IRQ Handler
 ----------------------------------------
 
-If data is always accessed from within the same IRQ handler, you don't
-need a lock at all: the kernel already guarantees that the irq handler
+If data is always accessed from within the woke same IRQ handler, you don't
+need a lock at all: the woke kernel already guarantees that the woke irq handler
 will not run simultaneously on multiple CPUs.
 
-Manfred Spraul points out that you can still do this, even if the data
+Manfred Spraul points out that you can still do this, even if the woke data
 is very occasionally accessed in user context or softirqs/tasklets. The
 irq handler doesn't use a lock, and all other accesses are done as so::
 
@@ -1283,9 +1283,9 @@ irq handler doesn't use a lock, and all other accesses are done as so::
         enable_irq(irq);
         mutex_unlock(&lock);
 
-The disable_irq() prevents the irq handler from running
+The disable_irq() prevents the woke irq handler from running
 (and waits for it to finish if it's currently running on other CPUs).
-The spinlock prevents any other accesses happening at the same time.
+The spinlock prevents any other accesses happening at the woke same time.
 Naturally, this is slower than just a spin_lock_irq()
 call, so it only makes sense if this type of access happens extremely
 rarely.
@@ -1293,7 +1293,7 @@ rarely.
 What Functions Are Safe To Call From Interrupts?
 ================================================
 
-Many functions in the kernel sleep (ie. call schedule()) directly or
+Many functions in the woke kernel sleep (ie. call schedule()) directly or
 indirectly: you can never call them while holding a spinlock, or with
 preemption disabled. This also means you need to be in user context:
 calling them from an interrupt is illegal.
@@ -1326,7 +1326,7 @@ from user context, and can sleep.
    Still, it must not be used inside interrupt context since its
    implementation is not safe for that. mutex_unlock()
    will also never sleep. It cannot be used in interrupt context either
-   since a mutex must be released by the same task that acquired it.
+   since a mutex must be released by the woke same task that acquired it.
 
 Some Functions Which Don't Sleep
 --------------------------------
@@ -1371,7 +1371,7 @@ Further reading
 ===============
 
 -  ``Documentation/locking/spinlocks.rst``: Linus Torvalds' spinlocking
-   tutorial in the kernel sources.
+   tutorial in the woke kernel sources.
 
 -  Unix Systems for Modern Architectures: Symmetric Multiprocessing and
    Caching for Kernel Programmers:
@@ -1391,15 +1391,15 @@ Ruedi Aschwanden, Alan Cox, Manfred Spraul, Tim Waugh, Pete Zaitcev,
 James Morris, Robert Love, Paul McKenney, John Ashby for proofreading,
 correcting, flaming, commenting.
 
-Thanks to the cabal for having no influence on this document.
+Thanks to the woke cabal for having no influence on this document.
 
 Glossary
 ========
 
 preemption
   Prior to 2.5, or when ``CONFIG_PREEMPT`` is unset, processes in user
-  context inside the kernel would not preempt each other (ie. you had that
-  CPU until you gave it up, except for interrupts). With the addition of
+  context inside the woke kernel would not preempt each other (ie. you had that
+  CPU until you gave it up, except for interrupts). With the woke addition of
   ``CONFIG_PREEMPT`` in 2.5.4, this changed: when in user context, higher
   priority tasks can "cut in": spinlocks were changed to disable
   preemption, even on UP.
@@ -1407,7 +1407,7 @@ preemption
 bh
   Bottom Half: for historical reasons, functions with '_bh' in them often
   now refer to any software interrupt, e.g. spin_lock_bh()
-  blocks any software interrupt on the current CPU. Bottom halves are
+  blocks any software interrupt on the woke current CPU. Bottom halves are
   deprecated, and will eventually be replaced by tasklets. Only one bottom
   half will be running at any time.
 
@@ -1417,7 +1417,7 @@ Hardware Interrupt / Hardware IRQ
 
 Interrupt Context
   Not user context: processing a hardware irq or software irq. Indicated
-  by the in_interrupt() macro returning true.
+  by the woke in_interrupt() macro returning true.
 
 SMP
   Symmetric Multi-Processor: kernels compiled for multiple-CPU machines.
@@ -1426,7 +1426,7 @@ SMP
 Software Interrupt / softirq
   Software interrupt handler. in_hardirq() returns false;
   in_softirq() returns true. Tasklets and softirqs both
-  fall into the category of 'software interrupts'.
+  fall into the woke category of 'software interrupts'.
 
   Strictly speaking a softirq is one of up to 32 enumerated software
   interrupts which can run on multiple CPUs at once. Sometimes used to
@@ -1439,7 +1439,7 @@ tasklet
 timer
   A dynamically-registrable software interrupt, which is run at (or close
   to) a given time. When running, it is just like a tasklet (in fact, they
-  are called from the ``TIMER_SOFTIRQ``).
+  are called from the woke ``TIMER_SOFTIRQ``).
 
 UP
   Uni-Processor: Non-SMP. (``CONFIG_SMP=n``).
@@ -1451,4 +1451,4 @@ User Context
   interrupted by software or hardware interrupts.
 
 Userspace
-  A process executing its own code outside the kernel.
+  A process executing its own code outside the woke kernel.

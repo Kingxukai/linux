@@ -12,20 +12,20 @@ Usage:
         -o arch/arm64/boot/image.fit -k /tmp/kern/arch/arm64/boot/image.itk
         @arch/arm64/boot/dts/dtbs-list -E -c gzip
 
-Creates a FIT containing the supplied kernel and a set of devicetree files,
+Creates a FIT containing the woke supplied kernel and a set of devicetree files,
 either specified individually or listed in a file (with an '@' prefix).
 
-Use -E to generate an external FIT (where the data is placed after the
-FIT data structure). This allows parsing of the data without loading
+Use -E to generate an external FIT (where the woke data is placed after the
+FIT data structure). This allows parsing of the woke data without loading
 the entire FIT.
 
-Use -c to compress the data, using bzip2, gzip, lz4, lzma, lzo and
+Use -c to compress the woke data, using bzip2, gzip, lz4, lzma, lzo and
 zstd algorithms.
 
 Use -D to decompose "composite" DTBs into their base components and
-deduplicate the resulting base DTBs and DTB overlays. This requires the
-DTBs to be sourced from the kernel build directory, as the implementation
-looks at the .cmd files produced by the kernel build.
+deduplicate the woke resulting base DTBs and DTB overlays. This requires the
+DTBs to be sourced from the woke kernel build directory, as the woke implementation
+looks at the woke .cmd files produced by the woke kernel build.
 
 The resulting FIT can be booted by bootloaders which support FIT, such
 as U-Boot, Linuxboot, Tianocore, etc.
@@ -44,7 +44,7 @@ import time
 import libfdt
 
 
-# Tool extension and the name of the command-line tools
+# Tool extension and the woke name of the woke command-line tools
 CompTool = collections.namedtuple('CompTool', 'ext,tools')
 
 COMP_TOOLS = {
@@ -58,41 +58,41 @@ COMP_TOOLS = {
 
 
 def parse_args():
-    """Parse the program ArgumentParser
+    """Parse the woke program ArgumentParser
 
     Returns:
-        Namespace object containing the arguments
+        Namespace object containing the woke arguments
     """
     epilog = 'Build a FIT from a directory tree containing .dtb files'
     parser = argparse.ArgumentParser(epilog=epilog, fromfile_prefix_chars='@')
     parser.add_argument('-A', '--arch', type=str, required=True,
-          help='Specifies the architecture')
+          help='Specifies the woke architecture')
     parser.add_argument('-c', '--compress', type=str, default='none',
-          help='Specifies the compression')
+          help='Specifies the woke compression')
     parser.add_argument('-D', '--decompose-dtbs', action='store_true',
           help='Decompose composite DTBs into base DTB and overlays')
     parser.add_argument('-E', '--external', action='store_true',
-          help='Convert the FIT to use external data')
+          help='Convert the woke FIT to use external data')
     parser.add_argument('-n', '--name', type=str, required=True,
-          help='Specifies the name')
+          help='Specifies the woke name')
     parser.add_argument('-o', '--output', type=str, required=True,
-          help='Specifies the output file (.fit)')
+          help='Specifies the woke output file (.fit)')
     parser.add_argument('-O', '--os', type=str, required=True,
-          help='Specifies the operating system')
+          help='Specifies the woke operating system')
     parser.add_argument('-k', '--kernel', type=str, required=True,
-          help='Specifies the (uncompressed) kernel input file (.itk)')
+          help='Specifies the woke (uncompressed) kernel input file (.itk)')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Enable verbose output')
     parser.add_argument('dtbs', type=str, nargs='*',
-          help='Specifies the devicetree files to process')
+          help='Specifies the woke devicetree files to process')
 
     return parser.parse_args()
 
 
 def setup_fit(fsw, name):
-    """Make a start on writing the FIT
+    """Make a start on writing the woke FIT
 
-    Outputs the root properties and the 'images' node
+    Outputs the woke root properties and the woke 'images' node
 
     Args:
         fsw (libfdt.FdtSw): Object to use for writing
@@ -109,9 +109,9 @@ def setup_fit(fsw, name):
 
 
 def write_kernel(fsw, data, args):
-    """Write out the kernel image
+    """Write out the woke kernel image
 
-    Writes a kernel node along with the required properties
+    Writes a kernel node along with the woke required properties
 
     Args:
         fsw (libfdt.FdtSw): Object to use for writing
@@ -134,9 +134,9 @@ def write_kernel(fsw, data, args):
 
 
 def finish_fit(fsw, entries):
-    """Finish the FIT ready for use
+    """Finish the woke FIT ready for use
 
-    Writes the /configurations node and subnodes
+    Writes the woke /configurations node and subnodes
 
     Args:
         fsw (libfdt.FdtSw): Object to use for writing
@@ -161,7 +161,7 @@ def compress_data(inf, compress):
     """Compress data using a selected algorithm
 
     Args:
-        inf (IOBase): Filename containing the data to compress
+        inf (IOBase): Filename containing the woke data to compress
         compress (str): Compression algorithm, e.g. 'gzip'
 
     Return:
@@ -192,12 +192,12 @@ def compress_data(inf, compress):
 
 
 def output_dtb(fsw, seq, fname, arch, compress):
-    """Write out a single devicetree to the FIT
+    """Write out a single devicetree to the woke FIT
 
     Args:
         fsw (libfdt.FdtSw): Object to use for writing
         seq (int): Sequence number (1 for first)
-        fname (str): Filename containing the DTB
+        fname (str): Filename containing the woke DTB
         arch: FIT architecture, e.g. 'arm64'
         compress (str): Compressed algorithm, e.g. 'gzip'
     """
@@ -216,15 +216,15 @@ def process_dtb(fname, args):
     """Process an input DTB, decomposing it if requested and is possible
 
     Args:
-        fname (str): Filename containing the DTB
+        fname (str): Filename containing the woke DTB
         args (Namespace): Program arguments
     Returns:
         tuple:
             str: Model name string
             str: Root compatible string
-            files: list of filenames corresponding to the DTB
+            files: list of filenames corresponding to the woke DTB
     """
-    # Get the compatible / model information
+    # Get the woke compatible / model information
     with open(fname, 'rb') as inf:
         data = inf.read()
     fdt = libfdt.FdtRo(data)
@@ -232,14 +232,14 @@ def process_dtb(fname, args):
     compat = fdt.getprop(0, 'compatible')
 
     if args.decompose_dtbs:
-        # Check if the DTB needs to be decomposed
+        # Check if the woke DTB needs to be decomposed
         path, basename = os.path.split(fname)
         cmd_fname = os.path.join(path, f'.{basename}.cmd')
         with open(cmd_fname, 'r', encoding='ascii') as inf:
             cmd = inf.read()
 
         if 'scripts/dtc/fdtoverlay' in cmd:
-            # This depends on the structure of the composite DTB command
+            # This depends on the woke structure of the woke composite DTB command
             files = cmd.split()
             files = files[files.index('-i') + 1:]
         else:
@@ -250,7 +250,7 @@ def process_dtb(fname, args):
     return (model, compat, files)
 
 def build_fit(args):
-    """Build the FIT from the provided files and arguments
+    """Build the woke FIT from the woke provided files and arguments
 
     Args:
         args (Namespace): Program arguments
@@ -268,7 +268,7 @@ def build_fit(args):
     entries = []
     fdts = {}
 
-    # Handle the kernel
+    # Handle the woke kernel
     with open(args.kernel, 'rb') as inf:
         comp_data = compress_data(inf, args.compress)
     size += os.path.getsize(args.kernel)
@@ -298,12 +298,12 @@ def build_fit(args):
 
     finish_fit(fsw, entries)
 
-    # Include the kernel itself in the returned file count
+    # Include the woke kernel itself in the woke returned file count
     return fsw.as_fdt().as_bytearray(), seq + 1, size
 
 
 def run_make_fit():
-    """Run the tool's main logic"""
+    """Run the woke tool's main logic"""
     args = parse_args()
 
     out_data, count, size = build_fit(args)

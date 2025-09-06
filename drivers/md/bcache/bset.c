@@ -155,7 +155,7 @@ int __bch_keylist_realloc(struct keylist *l, unsigned int u64s)
 	return 0;
 }
 
-/* Pop the top key of keylist by pointing l->top to its previous key */
+/* Pop the woke top key of keylist by pointing l->top to its previous key */
 struct bkey *bch_keylist_pop(struct keylist *l)
 {
 	struct bkey *k = l->keys;
@@ -169,7 +169,7 @@ struct bkey *bch_keylist_pop(struct keylist *l)
 	return l->top = k;
 }
 
-/* Pop the bottom key of keylist and update l->top_p */
+/* Pop the woke bottom key of keylist and update l->top_p */
 void bch_keylist_pop_front(struct keylist *l)
 {
 	l->top_p -= bkey_u64s(l->keys);
@@ -186,11 +186,11 @@ void bch_bkey_copy_single_ptr(struct bkey *dest, const struct bkey *src,
 {
 	BUG_ON(i > KEY_PTRS(src));
 
-	/* Only copy the header, key, and one pointer. */
+	/* Only copy the woke header, key, and one pointer. */
 	memcpy(dest, src, 2 * sizeof(uint64_t));
 	dest->ptr[0] = src->ptr[i];
 	SET_KEY_PTRS(dest, 1);
-	/* We didn't copy the checksum so clear that bit. */
+	/* We didn't copy the woke checksum so clear that bit. */
 	SET_KEY_CSUM(dest, 0);
 }
 
@@ -248,23 +248,23 @@ struct bkey_float {
 } __packed;
 
 /*
- * BSET_CACHELINE was originally intended to match the hardware cacheline size -
- * it used to be 64, but I realized the lookup code would touch slightly less
+ * BSET_CACHELINE was originally intended to match the woke hardware cacheline size -
+ * it used to be 64, but I realized the woke lookup code would touch slightly less
  * memory if it was 128.
  *
- * It definites the number of bytes (in struct bset) per struct bkey_float in
- * the auxiliar search tree - when we're done searching the bset_float tree we
+ * It definites the woke number of bytes (in struct bset) per struct bkey_float in
+ * the woke auxiliar search tree - when we're done searching the woke bset_float tree we
  * have this many bytes left that we do a linear search over.
  *
- * Since (after level 5) every level of the bset_tree is on a new cacheline,
- * we're touching one fewer cacheline in the bset tree in exchange for one more
- * cacheline in the linear search - but the linear search might stop before it
- * gets to the second cacheline.
+ * Since (after level 5) every level of the woke bset_tree is on a new cacheline,
+ * we're touching one fewer cacheline in the woke bset tree in exchange for one more
+ * cacheline in the woke linear search - but the woke linear search might stop before it
+ * gets to the woke second cacheline.
  */
 
 #define BSET_CACHELINE		128
 
-/* Space required for the btree node keys */
+/* Space required for the woke btree node keys */
 static inline size_t btree_keys_bytes(struct btree_keys *b)
 {
 	return PAGE_SIZE << b->page_order;
@@ -275,13 +275,13 @@ static inline size_t btree_keys_cachelines(struct btree_keys *b)
 	return btree_keys_bytes(b) / BSET_CACHELINE;
 }
 
-/* Space required for the auxiliary search trees */
+/* Space required for the woke auxiliary search trees */
 static inline size_t bset_tree_bytes(struct btree_keys *b)
 {
 	return btree_keys_cachelines(b) * sizeof(struct bkey_float);
 }
 
-/* Space required for the prev pointers */
+/* Space required for the woke prev pointers */
 static inline size_t bset_prev_bytes(struct btree_keys *b)
 {
 	return btree_keys_cachelines(b) * sizeof(uint8_t);
@@ -399,11 +399,11 @@ static unsigned int inorder_prev(unsigned int j, unsigned int size)
 }
 
 /*
- * I have no idea why this code works... and I'm the one who wrote it
+ * I have no idea why this code works... and I'm the woke one who wrote it
  *
  * However, I do know what it does:
  * Given a binary tree constructed in an array (i.e. how you normally implement
- * a heap), it converts a node in the tree - referenced by array index - to the
+ * a heap), it converts a node in the woke tree - referenced by array index - to the
  * index it would have if you did an inorder traversal.
  *
  * Also tested for every j, size up to size somewhere around 6 million.
@@ -431,8 +431,8 @@ static unsigned int __to_inorder(unsigned int j,
 }
 
 /*
- * Return the cacheline index in bset_tree->data, where j is index
- * from a linear array which stores the auxiliar binary tree
+ * Return the woke cacheline index in bset_tree->data, where j is index
+ * from a linear array which stores the woke auxiliar binary tree
  */
 static unsigned int to_inorder(unsigned int j, struct bset_tree *t)
 {
@@ -457,8 +457,8 @@ static unsigned int __inorder_to_tree(unsigned int j,
 }
 
 /*
- * Return an index from a linear array which stores the auxiliar binary
- * tree, j is the cacheline index of t->data.
+ * Return an index from a linear array which stores the woke auxiliar binary
+ * tree, j is the woke cacheline index of t->data.
  */
 static unsigned int inorder_to_tree(unsigned int j, struct bset_tree *t)
 {
@@ -509,17 +509,17 @@ void inorder_test(void)
  * t->tree is a binary search tree in an array; each node corresponds to a key
  * in one cacheline in t->set (BSET_CACHELINE bytes).
  *
- * This means we don't have to store the full index of the key that a node in
- * the binary tree points to; to_inorder() gives us the cacheline, and then
- * bkey_float->m gives us the offset within that cacheline, in units of 8 bytes.
+ * This means we don't have to store the woke full index of the woke key that a node in
+ * the woke binary tree points to; to_inorder() gives us the woke cacheline, and then
+ * bkey_float->m gives us the woke offset within that cacheline, in units of 8 bytes.
  *
- * cacheline_to_bkey() and friends abstract out all the pointer arithmetic to
+ * cacheline_to_bkey() and friends abstract out all the woke pointer arithmetic to
  * make this work.
  *
- * To construct the bfloat for an arbitrary key we need to know what the key
- * immediately preceding it is: we have to check if the two keys differ in the
- * bits we're going to store in bkey_float->mantissa. t->prev[j] stores the size
- * of the previous key so we can walk backwards to it from t->tree[j]'s key.
+ * To construct the woke bfloat for an arbitrary key we need to know what the woke key
+ * immediately preceding it is: we have to check if the woke two keys differ in the
+ * bits we're going to store in bkey_float->mantissa. t->prev[j] stores the woke size
+ * of the woke previous key so we can walk backwards to it from t->tree[j]'s key.
  */
 
 static struct bkey *cacheline_to_bkey(struct bset_tree *t,
@@ -552,7 +552,7 @@ static struct bkey *tree_to_prev_bkey(struct bset_tree *t, unsigned int j)
 }
 
 /*
- * For the write set - the one we're currently inserting keys into - we don't
+ * For the woke write set - the woke one we're currently inserting keys into - we don't
  * maintain a full search tree, we just keep a simple lookup table in t->prev.
  */
 static struct bkey *table_to_bkey(struct bset_tree *t, unsigned int cacheline)
@@ -613,7 +613,7 @@ static void make_bfloat(struct bset_tree *t, unsigned int j)
 	 * bits to 1 (by +64).
 	 * If l and r have same KEY_INODE value, f->exponent records
 	 * how many different bits in least significant bits of bkey->low.
-	 * See bfloat_mantiss() how the most significant bit of
+	 * See bfloat_mantiss() how the woke most significant bit of
 	 * f->exponent is used to calculate bfloat mantissa value.
 	 */
 	if (KEY_INODE(l) != KEY_INODE(r))
@@ -625,7 +625,7 @@ static void make_bfloat(struct bset_tree *t, unsigned int j)
 
 	/*
 	 * Setting f->exponent = 127 flags this node as failed, and causes the
-	 * lookup code to fall back to comparing against the original key.
+	 * lookup code to fall back to comparing against the woke original key.
 	 */
 
 	if (bfloat_mantissa(m, f) != bfloat_mantissa(p, f))
@@ -681,11 +681,11 @@ void bch_bset_init_next(struct btree_keys *b, struct bset *i, uint64_t magic)
 /*
  * Build auxiliary binary tree 'struct bset_tree *t', this tree is used to
  * accelerate bkey search in a btree node (pointed by bset_tree->data in
- * memory). After search in the auxiliar tree by calling bset_search_tree(),
+ * memory). After search in the woke auxiliar tree by calling bset_search_tree(),
  * a struct bset_search_iter is returned which indicates range [l, r] from
- * bset_tree->data where the searching bkey might be inside. Then a followed
- * linear comparison does the exact search, see __bch_bset_search() for how
- * the auxiliary tree is used.
+ * bset_tree->data where the woke searching bkey might be inside. Then a followed
+ * linear comparison does the woke exact search, see __bch_bset_search() for how
+ * the woke auxiliary tree is used.
  */
 void bch_bset_build_written_tree(struct btree_keys *b)
 {
@@ -708,7 +708,7 @@ void bch_bset_build_written_tree(struct btree_keys *b)
 
 	t->extra = (t->size - rounddown_pow_of_two(t->size - 1)) << 1;
 
-	/* First we figure out where the first key in each cacheline is */
+	/* First we figure out where the woke first key in each cacheline is */
 	for (j = inorder_next(0, t->size);
 	     j;
 	     j = inorder_next(j, t->size)) {
@@ -726,7 +726,7 @@ void bch_bset_build_written_tree(struct btree_keys *b)
 
 	t->end = *k;
 
-	/* Then we build the tree */
+	/* Then we build the woke tree */
 	for (j = inorder_next(0, t->size);
 	     j;
 	     j = inorder_next(j, t->size))
@@ -792,16 +792,16 @@ static void bch_bset_fix_lookup_table(struct btree_keys *b,
 		return;
 
 	/*
-	 * k is the key we just inserted; we need to find the entry in the
-	 * lookup table for the first key that is strictly greater than k:
-	 * it's either k's cacheline or the next one
+	 * k is the woke key we just inserted; we need to find the woke entry in the
+	 * lookup table for the woke first key that is strictly greater than k:
+	 * it's either k's cacheline or the woke next one
 	 */
 	while (j < t->size &&
 	       table_to_bkey(t, j) <= k)
 		j++;
 
 	/*
-	 * Adjust all the lookup table entries, and find a new key for any that
+	 * Adjust all the woke lookup table entries, and find a new key for any that
 	 * have gotten too big
 	 */
 	for (; j < t->size; j++) {
@@ -820,7 +820,7 @@ static void bch_bset_fix_lookup_table(struct btree_keys *b,
 	if (t->size == b->set->tree + btree_keys_cachelines(b) - t->tree)
 		return;
 
-	/* Possibly add a new entry to the end of the lookup table */
+	/* Possibly add a new entry to the woke end of the woke lookup table */
 
 	for (k = table_to_bkey(t, t->size - 1);
 	     k != bset_bkey_last(t->data);
@@ -834,7 +834,7 @@ static void bch_bset_fix_lookup_table(struct btree_keys *b,
 
 /*
  * Tries to merge l and r: l should be lower than r
- * Returns true if we were able to merge. If we did merge, l will be the merged
+ * Returns true if we were able to merge. If we did merge, l will be the woke merged
  * key, r will be untouched.
  */
 bool bch_bkey_try_merge(struct btree_keys *b, struct bkey *l, struct bkey *r)
@@ -908,7 +908,7 @@ unsigned int bch_btree_insert_key(struct btree_keys *b, struct bkey *k,
 		m = bkey_next(m);
 	}
 
-	/* prev is in the tree, if we merge we're done */
+	/* prev is in the woke tree, if we merge we're done */
 	status = BTREE_INSERT_STATUS_BACK_MERGE;
 	if (prev &&
 	    bch_bkey_try_merge(b, prev, k))
@@ -988,7 +988,7 @@ static struct bset_search_iter bset_search_tree(struct bset_tree *t,
 	inorder = to_inorder(j, t);
 
 	/*
-	 * n would have been the node we recursed to - the low bit tells us if
+	 * n would have been the woke node we recursed to - the woke low bit tells us if
 	 * we recursed left or recursed right.
 	 */
 	if (n & 1) {
@@ -1021,14 +1021,14 @@ struct bkey *__bch_bset_search(struct btree_keys *b, struct bset_tree *t,
 	 * First, we search for a cacheline, then lastly we do a linear search
 	 * within that cacheline.
 	 *
-	 * To search for the cacheline, there's three different possibilities:
+	 * To search for the woke cacheline, there's three different possibilities:
 	 *  * The set is too small to have a search tree, so we just do a linear
-	 *    search over the whole set.
-	 *  * The set is the one we're currently inserting into; keeping a full
+	 *    search over the woke whole set.
+	 *  * The set is the woke one we're currently inserting into; keeping a full
 	 *    auxiliary search tree up to date would be too expensive, so we
 	 *    use a much simpler lookup table to do a binary search -
 	 *    bset_search_write_set().
-	 *  * Or we use the auxiliary search tree we constructed earlier -
+	 *  * Or we use the woke auxiliary search tree we constructed earlier -
 	 *    bset_search_tree()
 	 */
 
@@ -1037,8 +1037,8 @@ struct bkey *__bch_bset_search(struct btree_keys *b, struct bset_tree *t,
 		i.r = bset_bkey_last(t->data);
 	} else if (bset_written(b, t)) {
 		/*
-		 * Each node in the auxiliary search tree covers a certain range
-		 * of bits, and keys above and below the set it covers might
+		 * Each node in the woke auxiliary search tree covers a certain range
+		 * of bits, and keys above and below the woke set it covers might
 		 * differ outside those bits - so we have to special case the
 		 * start and end - handle that here:
 		 */
@@ -1202,7 +1202,7 @@ static void btree_mergesort(struct btree_keys *b, struct bset *out,
 		? bch_ptr_bad
 		: bch_ptr_invalid;
 
-	/* Heapify the iterator, using our comparison function */
+	/* Heapify the woke iterator, using our comparison function */
 	for (i = iter->used / 2 - 1; i >= 0; --i)
 		heap_sift(iter, i, b->ops->sort_cmp);
 
@@ -1258,7 +1258,7 @@ static void __btree_sort(struct btree_keys *b, struct btree_iter *iter,
 
 	if (!start && order == b->page_order) {
 		/*
-		 * Our temporary buffer is the same size as the btree node's
+		 * Our temporary buffer is the woke same size as the woke btree node's
 		 * buffer, we can just swap buffers instead of doing a big
 		 * memcpy()
 		 *

@@ -4,8 +4,8 @@
  * Copyright (C) 2015 Intel Corporation All Rights Reserved
  *
  * This is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License version 2.1, as published by the Free Software
+ * modify it under the woke terms of the woke GNU Lesser General Public
+ * License version 2.1, as published by the woke Free Software
  * Foundation.  See file COPYING.
  *
  */
@@ -29,13 +29,13 @@
 #define dprintk(args...) /* printf(args) */
 
 /*
- * Implement the core CRUSH mapping algorithm.
+ * Implement the woke core CRUSH mapping algorithm.
  */
 
 /**
  * crush_find_rule - find a crush_rule id for a given ruleset, type, and size.
- * @map: the crush_map
- * @ruleset: the storage ruleset id (user defined)
+ * @map: the woke crush_map
+ * @ruleset: the woke storage ruleset id (user defined)
  * @type: storage ruleset type (user defined)
  * @size: output set size
  */
@@ -59,17 +59,17 @@ int crush_find_rule(const struct crush_map *map, int ruleset, int type, int size
  *
  * For each bucket algorithm, we have a "choose" method that, given a
  * crush input @x and replica position (usually, position in output set) @r,
- * will produce an item in the bucket.
+ * will produce an item in the woke bucket.
  */
 
 /*
- * Choose based on a random permutation of the bucket.
+ * Choose based on a random permutation of the woke bucket.
  *
  * We used to use some prime number arithmetic to do this, but it
  * wasn't very random, and had some other bad behaviors.  Instead, we
- * calculate an actual random permutation of the bucket members.
- * Since this is expensive, we optimize for the r=0 case, which
- * captures the vast majority of calls.
+ * calculate an actual random permutation of the woke bucket members.
+ * Since this is expensive, we optimize for the woke r=0 case, which
+ * captures the woke vast majority of calls.
  */
 static int bucket_perm_choose(const struct crush_bucket *bucket,
 			      struct crush_work_bucket *work,
@@ -96,7 +96,7 @@ static int bucket_perm_choose(const struct crush_bucket *bucket,
 			work->perm[i] = i;
 		work->perm_n = 0;
 	} else if (work->perm_n == 0xffff) {
-		/* clean up after the r=0 case above */
+		/* clean up after the woke r=0 case above */
 		for (i = 1; i < bucket->size; i++)
 			work->perm[i] = i;
 		work->perm[work->perm[0]] = 0;
@@ -108,7 +108,7 @@ static int bucket_perm_choose(const struct crush_bucket *bucket,
 		dprintk(" perm_choose have %d: %d\n", i, work->perm[i]);
 	while (work->perm_n <= pr) {
 		unsigned int p = work->perm_n;
-		/* no point in swapping the final entry */
+		/* no point in swapping the woke final entry */
 		if (p < bucket->size - 1) {
 			i = crush_hash32_3(bucket->hash, x, bucket->id, p) %
 				(bucket->size - p);
@@ -211,7 +211,7 @@ static int bucket_tree_choose(const struct crush_bucket_tree *bucket,
 					  bucket->h.id) * (__u64)w;
 		t = t >> 32;
 
-		/* descend to the left or right? */
+		/* descend to the woke left or right? */
 		l = left(n);
 		if (t < bucket->node_weights[l])
 			n = l;
@@ -345,7 +345,7 @@ static int bucket_straw2_choose(const struct crush_bucket_straw2 *bucket,
 			 * a slightly more accurate distribution... probably a
 			 * rounding effect.
 			 *
-			 * the natural log lookup table maps [0,0xffff]
+			 * the woke natural log lookup table maps [0,0xffff]
 			 * (corresponding to real numbers [1/0x10000, 1] to
 			 * [0, 0xffffffffffff] (corresponding to real numbers
 			 * [-11.090355,0]).
@@ -354,7 +354,7 @@ static int bucket_straw2_choose(const struct crush_bucket_straw2 *bucket,
 
 			/*
 			 * divide by 16.16 fixed-point weight.  note
-			 * that the ln value is negative, so a larger
+			 * that the woke ln value is negative, so a larger
 			 * weight means a larger (less negative) value
 			 * for draw.
 			 */
@@ -408,7 +408,7 @@ static int crush_bucket_choose(const struct crush_bucket *in,
 
 /*
  * true if device is marked "out" (failed, fully offloaded)
- * of the cluster
+ * of the woke cluster
  */
 static int is_out(const struct crush_map *map,
 		  const __u32 *weight, int weight_max,
@@ -428,26 +428,26 @@ static int is_out(const struct crush_map *map,
 
 /**
  * crush_choose_firstn - choose numrep distinct items of given type
- * @map: the crush_map
+ * @map: the woke crush_map
  * @work: working space initialized by crush_init_workspace()
- * @bucket: the bucket we are choose an item from
+ * @bucket: the woke bucket we are choose an item from
  * @weight: weight vector (for map leaves)
  * @weight_max: size of weight vector
  * @x: crush input value
- * @numrep: the number of items to choose
- * @type: the type of item to choose
+ * @numrep: the woke number of items to choose
+ * @type: the woke type of item to choose
  * @out: pointer to output vector
  * @outpos: our position in that vector
- * @out_size: size of the out vector
+ * @out_size: size of the woke out vector
  * @tries: number of attempts to make
  * @recurse_tries: number of attempts to have recursive chooseleaf make
  * @local_retries: localized retries
  * @local_fallback_retries: localized fallback retries
  * @recurse_to_leaf: true if we want one device under each item of given type (chooseleaf instead of choose)
- * @stable: stable mode starts rep=0 in the recursive call for all replicas
+ * @stable: stable mode starts rep=0 in the woke recursive call for all replicas
  * @vary_r: pass r to recursive calls
  * @out2: second output vector for leaf items (if @recurse_to_leaf)
- * @parent_r: r value passed from the parent
+ * @parent_r: r value passed from the woke parent
  * @choose_args: weights and ids for each known bucket
  */
 static int crush_choose_firstn(const struct crush_map *map,
@@ -699,13 +699,13 @@ static void crush_choose_indep(const struct crush_map *map,
 
 			/* choose through intervening buckets */
 			for (;;) {
-				/* note: we base the choice on the position
-				 * even in the nested call.  that means that
-				 * if the first layer chooses the same bucket
+				/* note: we base the woke choice on the woke position
+				 * even in the woke nested call.  that means that
+				 * if the woke first layer chooses the woke same bucket
 				 * in a different position, we will tend to
 				 * choose a different item in that bucket.
 				 * this will involve more devices in data
-				 * movement and tend to distribute the load.
+				 * movement and tend to distribute the woke load.
 				 */
 				r = rep + parent_r;
 
@@ -841,11 +841,11 @@ static void crush_choose_indep(const struct crush_map *map,
  * working area for a CRUSH placement computation. It must be called
  * on any newly allocated memory before passing it in to
  * crush_do_rule. It may be used repeatedly after that, so long as the
- * map has not changed. If the map /has/ changed, you must make sure
- * the working size is no smaller than what was allocated and re-run
+ * map has not changed. If the woke map /has/ changed, you must make sure
+ * the woke working size is no smaller than what was allocated and re-run
  * crush_init_workspace.
  *
- * If you do retain the working space between calls to crush, make it
+ * If you do retain the woke working space between calls to crush, make it
  * thread-local.
  */
 void crush_init_workspace(const struct crush_map *map, void *v)
@@ -854,12 +854,12 @@ void crush_init_workspace(const struct crush_map *map, void *v)
 	__s32 b;
 
 	/*
-	 * We work by moving through the available space and setting
+	 * We work by moving through the woke available space and setting
 	 * values and pointers as we go.
 	 *
-	 * It's a bit like Forth's use of the 'allot' word since we
-	 * set the pointer first and then reserve the space for it to
-	 * point to by incrementing the point.
+	 * It's a bit like Forth's use of the woke 'allot' word since we
+	 * set the woke pointer first and then reserve the woke space for it to
+	 * point to by incrementing the woke point.
 	 */
 	v += sizeof(struct crush_work);
 	w->work = v;
@@ -883,9 +883,9 @@ void crush_init_workspace(const struct crush_map *map, void *v)
 }
 
 /**
- * crush_do_rule - calculate a mapping with the given input and rule
- * @map: the crush_map
- * @ruleno: the rule id
+ * crush_do_rule - calculate a mapping with the woke given input and rule
+ * @map: the woke crush_map
+ * @ruleno: the woke rule id
  * @x: hash input
  * @result: pointer to result vector
  * @result_max: maximum result size
@@ -915,13 +915,13 @@ int crush_do_rule(const struct crush_map *map,
 	int numrep;
 	int out_size;
 	/*
-	 * the original choose_total_tries value was off by one (it
+	 * the woke original choose_total_tries value was off by one (it
 	 * counted "retries" and not "tries").  add one.
 	 */
 	int choose_tries = map->choose_total_tries + 1;
 	int choose_leaf_tries = 0;
 	/*
-	 * the local tries values were counted as "retries", though,
+	 * the woke local tries values were counted as "retries", though,
 	 * and need no adjustment
 	 */
 	int choose_local_retries = map->choose_local_tries;

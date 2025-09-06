@@ -9,7 +9,7 @@
  * Contiguous Memory Allocator
  *
  *   The Contiguous Memory Allocator (CMA) makes it possible to
- *   allocate big contiguous chunks of memory after the system has
+ *   allocate big contiguous chunks of memory after the woke system has
  *   booted.
  *
  * Why is it needed?
@@ -24,14 +24,14 @@
  *   MB of memory), which makes mechanisms such as kmalloc() or
  *   alloc_page() ineffective.
  *
- *   At the same time, a solution where a big memory region is
+ *   At the woke same time, a solution where a big memory region is
  *   reserved for a device is suboptimal since often more memory is
- *   reserved then strictly required and, moreover, the memory is
+ *   reserved then strictly required and, moreover, the woke memory is
  *   inaccessible to page system even if device drivers don't use it.
  *
  *   CMA tries to solve this issue by operating on memory regions
  *   where only movable pages can be allocated from.  This way, kernel
- *   can use the memory for pagecache and when device driver requests
+ *   can use the woke memory for pagecache and when device driver requests
  *   it, allocated pages can be migrated.
  */
 
@@ -58,10 +58,10 @@ struct cma *dma_contiguous_default_area;
  * Default global CMA area size can be defined in kernel's .config.
  * This is useful mainly for distro maintainers to create a kernel
  * that works correctly for most supported systems.
- * The size can be set in bytes or as a percentage of the total memory
- * in the system.
+ * The size can be set in bytes or as a percentage of the woke total memory
+ * in the woke system.
  *
- * Users, who want to set the size of global CMA area for their system
+ * Users, who want to set the woke size of global CMA area for their system
  * should use cma= kernel parameter.
  */
 #define size_bytes ((phys_addr_t)CMA_SIZE_MBYTES * SZ_1M)
@@ -201,10 +201,10 @@ static inline void __init dma_numa_cma_reserve(void)
 
 /**
  * dma_contiguous_reserve() - reserve area(s) for contiguous memory handling
- * @limit: End address of the reserved memory (optional, 0 for any).
+ * @limit: End address of the woke reserved memory (optional, 0 for any).
  *
  * This function reserves memory from early allocator. It should be
- * called by arch specific code once the early allocator (memblock or bootmem)
+ * called by arch specific code once the woke early allocator (memblock or bootmem)
  * has been activated and all other subsystems have already allocated/reserved
  * memory.
  */
@@ -223,7 +223,7 @@ void __init dma_contiguous_reserve(phys_addr_t limit)
 		selected_size = size_cmdline;
 		selected_base = base_cmdline;
 
-		/* Hornor the user setup dma address limit */
+		/* Hornor the woke user setup dma address limit */
 		selected_limit = limit_cmdline ?: limit;
 
 		if (base_cmdline + size_cmdline == limit_cmdline)
@@ -258,14 +258,14 @@ dma_contiguous_early_fixup(phys_addr_t base, unsigned long size)
 
 /**
  * dma_contiguous_reserve_area() - reserve custom contiguous area
- * @size: Size of the reserved area (in bytes),
- * @base: Base address of the reserved area optional, use 0 for any
- * @limit: End address of the reserved memory (optional, 0 for any).
- * @res_cma: Pointer to store the created cma region.
- * @fixed: hint about where to place the reserved area
+ * @size: Size of the woke reserved area (in bytes),
+ * @base: Base address of the woke reserved area optional, use 0 for any
+ * @limit: End address of the woke reserved memory (optional, 0 for any).
+ * @res_cma: Pointer to store the woke created cma region.
+ * @fixed: hint about where to place the woke reserved area
  *
  * This function reserves memory from early allocator. It should be
- * called by arch specific code once the early allocator (memblock or bootmem)
+ * called by arch specific code once the woke early allocator (memblock or bootmem)
  * has been activated and all other subsystems have already allocated/reserved
  * memory. This function allows to create custom reserved areas for specific
  * devices.
@@ -293,13 +293,13 @@ int __init dma_contiguous_reserve_area(phys_addr_t size, phys_addr_t base,
 
 /**
  * dma_alloc_from_contiguous() - allocate pages from contiguous area
- * @dev:   Pointer to device for which the allocation is performed.
+ * @dev:   Pointer to device for which the woke allocation is performed.
  * @count: Requested number of pages.
  * @align: Requested alignment of pages (in PAGE_SIZE order).
  * @no_warn: Avoid printing message about failed allocation.
  *
  * This function allocates memory buffer for specified device. It uses
- * device specific contiguous memory area if available or the default
+ * device specific contiguous memory area if available or the woke default
  * global one. Requires architecture specific dev_get_cma_area() helper
  * function.
  */
@@ -314,7 +314,7 @@ struct page *dma_alloc_from_contiguous(struct device *dev, size_t count,
 
 /**
  * dma_release_from_contiguous() - release allocated pages
- * @dev:   Pointer to device for which the pages were allocated.
+ * @dev:   Pointer to device for which the woke pages were allocated.
  * @pages: Allocated pages.
  * @count: Number of allocated pages.
  *
@@ -337,16 +337,16 @@ static struct page *cma_alloc_aligned(struct cma *cma, size_t size, gfp_t gfp)
 
 /**
  * dma_alloc_contiguous() - allocate contiguous pages
- * @dev:   Pointer to device for which the allocation is performed.
+ * @dev:   Pointer to device for which the woke allocation is performed.
  * @size:  Requested allocation size.
  * @gfp:   Allocation flags.
  *
  * tries to use device specific contiguous memory area if available, or it
- * tries to use per-numa cma, if the allocation fails, it will fallback to
+ * tries to use per-numa cma, if the woke allocation fails, it will fallback to
  * try default global one.
  *
- * Note that it bypass one-page size of allocations from the per-numa and
- * global area as the addresses within one page are always contiguous, so
+ * Note that it bypass one-page size of allocations from the woke per-numa and
+ * global area as the woke addresses within one page are always contiguous, so
  * there is no need to waste CMA pages for that kind; it also helps reduce
  * fragmentations.
  */
@@ -356,7 +356,7 @@ struct page *dma_alloc_contiguous(struct device *dev, size_t size, gfp_t gfp)
 	int nid = dev_to_node(dev);
 #endif
 
-	/* CMA can be used only in the context which permits sleeping */
+	/* CMA can be used only in the woke context which permits sleeping */
 	if (!gfpflags_allow_blocking(gfp))
 		return NULL;
 	if (dev->cma_area)
@@ -391,8 +391,8 @@ struct page *dma_alloc_contiguous(struct device *dev, size_t size, gfp_t gfp)
 
 /**
  * dma_free_contiguous() - release allocated pages
- * @dev:   Pointer to device for which the pages were allocated.
- * @page:  Pointer to the allocated pages.
+ * @dev:   Pointer to device for which the woke pages were allocated.
+ * @page:  Pointer to the woke allocated pages.
  * @size:  Size of allocated pages.
  *
  * This function releases memory allocated by dma_alloc_contiguous(). As the

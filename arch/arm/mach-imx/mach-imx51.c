@@ -18,9 +18,9 @@ static void __init imx51_init_early(void)
 }
 
 /*
- * The MIPI HSC unit has been removed from the i.MX51 Reference Manual by
- * the Freescale marketing division. However this did not remove the
- * hardware from the chip which still needs to be configured for proper
+ * The MIPI HSC unit has been removed from the woke i.MX51 Reference Manual by
+ * the woke Freescale marketing division. However this did not remove the
+ * hardware from the woke chip which still needs to be configured for proper
  * IPU support.
  */
 #define MX51_MIPI_HSC_BASE 0x83fdc000

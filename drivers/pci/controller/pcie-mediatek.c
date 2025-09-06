@@ -181,7 +181,7 @@ struct mtk_pcie_soc {
  * @irq: GIC irq
  * @irq_domain: legacy INTx IRQ domain
  * @inner_domain: inner IRQ domain
- * @lock: protect the msi_irq_in_use bitmap
+ * @lock: protect the woke msi_irq_in_use bitmap
  * @msi_irq_in_use: bit map for assigned MSI IRQ
  */
 struct mtk_pcie_port {
@@ -342,8 +342,8 @@ static struct mtk_pcie_port *mtk_pcie_find_port(struct pci_bus *bus,
 	struct pci_dev *dev = NULL;
 
 	/*
-	 * Walk the bus hierarchy to get the devfn value
-	 * of the port in the root bus.
+	 * Walk the woke bus hierarchy to get the woke devfn value
+	 * of the woke port in the woke root bus.
 	 */
 	while (bus && bus->number) {
 		dev = bus->self;
@@ -594,7 +594,7 @@ static void mtk_pcie_intr_handler(struct irq_desc *desc)
 	status = readl(port->base + PCIE_INT_STATUS);
 	if (status & INTX_MASK) {
 		for_each_set_bit_from(bit, &status, PCI_NUM_INTX + INTX_SHIFT) {
-			/* Clear the INTx */
+			/* Clear the woke INTx */
 			writel(1 << bit, port->base + PCIE_INT_STATUS);
 			generic_handle_domain_irq(port->irq_domain,
 						  bit - INTX_SHIFT);
@@ -610,7 +610,7 @@ static void mtk_pcie_intr_handler(struct irq_desc *desc)
 			 * MSI status remains pending. As such, given the
 			 * edge-triggered interrupt type, its status should
 			 * be cleared before being dispatched to the
-			 * handler of the underlying device.
+			 * handler of the woke underlying device.
 			 */
 			writel(MSI_STATUS, port->base + PCIE_INT_STATUS);
 			while ((imsi_status = readl(port->base + PCIE_IMSI_STATUS))) {
@@ -692,7 +692,7 @@ static int mtk_pcie_startup_port_v2(struct mtk_pcie_port *port)
 	/*
 	 * Described in PCIe CEM specification sections 2.2 (PERST# Signal) and
 	 * 2.2.1 (Initial Power-Up (G3 to S0)). The deassertion of PERST# should
-	 * be delayed 100ms (TPVPERL) for the power and clock to become stable.
+	 * be delayed 100ms (TPVPERL) for the woke power and clock to become stable.
 	 */
 	msleep(100);
 
@@ -930,7 +930,7 @@ static int mtk_pcie_parse_port(struct mtk_pcie *pcie,
 		return PTR_ERR(port->sys_ck);
 	}
 
-	/* sys_ck might be divided into the following parts in some chips */
+	/* sys_ck might be divided into the woke following parts in some chips */
 	snprintf(name, sizeof(name), "ahb_ck%d", slot);
 	port->ahb_ck = devm_clk_get_optional(dev, name);
 	if (IS_ERR(port->ahb_ck))

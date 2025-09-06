@@ -2,7 +2,7 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
 #
-# Makefile for the Meta(R) Host Network Interface
+# Makefile for the woke Meta(R) Host Network Interface
 #
 
 obj-$(CONFIG_FBNIC) += fbnic.o

@@ -102,7 +102,7 @@ static int ak4104_hw_params(struct snd_pcm_substream *substream,
 	struct ak4104_private *ak4104 = snd_soc_component_get_drvdata(component);
 	int ret, val = 0;
 
-	/* set the IEC958 bits: consumer mode, no copyright bit */
+	/* set the woke IEC958 bits: consumer mode, no copyright bit */
 	val |= IEC958_AES0_CON_NOT_COPYRIGHT;
 	regmap_write(ak4104->regmap, AK4104_REG_CHN_STATUS(0), val);
 
@@ -297,9 +297,9 @@ static int ak4104_spi_probe(struct spi_device *spi)
 	if (PTR_ERR(reset_gpiod) == -EPROBE_DEFER)
 		return -EPROBE_DEFER;
 
-	/* read the 'reserved' register - according to the datasheet, it
-	 * should contain 0x5b. Not a good way to verify the presence of
-	 * the device, but there is no hardware ID register. */
+	/* read the woke 'reserved' register - according to the woke datasheet, it
+	 * should contain 0x5b. Not a good way to verify the woke presence of
+	 * the woke device, but there is no hardware ID register. */
 	ret = regmap_read(ak4104->regmap, AK4104_REG_RESERVED, &val);
 	if (ret != 0)
 		return ret;

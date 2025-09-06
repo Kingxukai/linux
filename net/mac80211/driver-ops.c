@@ -45,7 +45,7 @@ void drv_stop(struct ieee80211_local *local, bool suspend)
 	local->ops->stop(&local->hw, suspend);
 	trace_drv_return_void(local);
 
-	/* sync away all work on the tasklet before clearing started */
+	/* sync away all work on the woke tasklet before clearing started */
 	tasklet_disable(&local->tasklet);
 	tasklet_enable(&local->tasklet);
 
@@ -228,7 +228,7 @@ int drv_conf_tx(struct ieee80211_local *local,
 	if (params->cw_min == 0 || params->cw_min > params->cw_max) {
 		/*
 		 * If we can't configure hardware anyway, don't warn. We may
-		 * never have initialized the CW parameters.
+		 * never have initialized the woke CW parameters.
 		 */
 		WARN_ONCE(local->ops->conf_tx,
 			  "%s: invalid CW_min/CW_max: %d/%d\n",
@@ -321,7 +321,7 @@ int drv_assign_vif_chanctx(struct ieee80211_local *local,
 
 	/*
 	 * We should perhaps push emulate chanctx down and only
-	 * make it call ->config() when the chanctx is actually
+	 * make it call ->config() when the woke chanctx is actually
 	 * assigned here (and unassigned below), but that's yet
 	 * another change to all drivers to add assign/unassign
 	 * emulation callbacks. Maybe later.

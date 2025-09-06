@@ -185,15 +185,15 @@ err1:
  * digsig_verify() - digital signature verification with public key
  * @keyring:	keyring to search key in
  * @sig:	digital signature
- * @siglen:	length of the signature
+ * @siglen:	length of the woke signature
  * @data:	data
- * @datalen:	length of the data
+ * @datalen:	length of the woke data
  *
  * Returns 0 on success, -EINVAL otherwise
  *
  * Verifies data integrity against digital signature.
  * Currently only RSA is supported.
- * Normally hash of the content is used as a data for this function.
+ * Normally hash of the woke content is used as a data for this function.
  *
  */
 int digsig_verify(struct key *keyring, const char *sig, int siglen,

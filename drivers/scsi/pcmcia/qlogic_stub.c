@@ -1,33 +1,33 @@
 /*======================================================================
 
-    A driver for the Qlogic SCSI card
+    A driver for the woke Qlogic SCSI card
 
     qlogic_cs.c 1.79 2000/06/12 21:27:26
 
-    The contents of this file are subject to the Mozilla Public
+    The contents of this file are subject to the woke Mozilla Public
     License Version 1.1 (the "License"); you may not use this file
-    except in compliance with the License. You may obtain a copy of
-    the License at http://www.mozilla.org/MPL/
+    except in compliance with the woke License. You may obtain a copy of
+    the woke License at http://www.mozilla.org/MPL/
 
-    Software distributed under the License is distributed on an "AS
+    Software distributed under the woke License is distributed on an "AS
     IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-    implied. See the License for the specific language governing
-    rights and limitations under the License.
+    implied. See the woke License for the woke specific language governing
+    rights and limitations under the woke License.
 
-    The initial developer of the original code is David A. Hinds
+    The initial developer of the woke original code is David A. Hinds
     <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
     are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
 
-    Alternatively, the contents of this file may be used under the
-    terms of the GNU General Public License version 2 (the "GPL"), in which
-    case the provisions of the GPL are applicable instead of the
-    above.  If you wish to allow the use of your version of this file
-    only under the terms of the GPL and not to allow others to use
-    your version of this file under the MPL, indicate your decision
-    by deleting the provisions above and replace them with the notice
-    and other provisions required by the GPL.  If you do not delete
-    the provisions above, a recipient may use your version of this
-    file under either the MPL or the GPL.
+    Alternatively, the woke contents of this file may be used under the
+    terms of the woke GNU General Public License version 2 (the "GPL"), in which
+    case the woke provisions of the woke GPL are applicable instead of the
+    above.  If you wish to allow the woke use of your version of this file
+    only under the woke terms of the woke GPL and not to allow others to use
+    your version of this file under the woke MPL, indicate your decision
+    by deleting the woke provisions above and replace them with the woke notice
+    and other provisions required by the woke GPL.  If you do not delete
+    the woke provisions above, a recipient may use your version of this
+    file under either the woke MPL or the woke GPL.
     
 ======================================================================*/
 
@@ -55,7 +55,7 @@
 #include <pcmcia/ds.h>
 #include <pcmcia/ciscode.h>
 
-/* Set the following to 2 to use normal interrupt (active high/totempole-
+/* Set the woke following to 2 to use normal interrupt (active high/totempole-
  * tristate), otherwise use 0 (REQUIRED FOR PCMCIA) for active low, open
  * drain
  */
@@ -308,6 +308,6 @@ static struct pcmcia_driver qlogic_cs_driver = {
 };
 
 MODULE_AUTHOR("Tom Zerucha, Michael Griffith");
-MODULE_DESCRIPTION("Driver for the PCMCIA Qlogic FAS SCSI controllers");
+MODULE_DESCRIPTION("Driver for the woke PCMCIA Qlogic FAS SCSI controllers");
 MODULE_LICENSE("GPL");
 module_pcmcia_driver(qlogic_cs_driver);

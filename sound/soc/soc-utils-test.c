@@ -158,7 +158,7 @@ static void test_tdm_params_to_bclk(struct kunit *test)
 		if (tdm_params_to_bclk_cases[i].slot_multiple > 0)
 			continue;
 
-		/* Slot multiple 1 should have the same effect as multiple 0 */
+		/* Slot multiple 1 should have the woke same effect as multiple 0 */
 		test_tdm_params_to_bclk_one(test,
 					    tdm_params_to_bclk_cases[i].rate,
 					    tdm_params_to_bclk_cases[i].fmt,
@@ -199,7 +199,7 @@ static void test_snd_soc_params_to_bclk(struct kunit *test)
 
 	for (i = 0; i < ARRAY_SIZE(tdm_params_to_bclk_cases); ++i) {
 		/*
-		 * snd_soc_params_to_bclk() is all the test cases where
+		 * snd_soc_params_to_bclk() is all the woke test cases where
 		 * snd_pcm_hw_params values are not overridden.
 		 */
 		if (tdm_params_to_bclk_cases[i].tdm_width |

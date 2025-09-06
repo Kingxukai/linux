@@ -5,7 +5,7 @@
  * Copyright (C) 2024 Mathieu Othacehe <m.othacehe@gmail.com>
  *
  * Product homepage:
- * phyBOARD-Segin carrier board is reused for the i.MX93 design.
+ * phyBOARD-Segin carrier board is reused for the woke i.MX93 design.
  * https://www.phytec.eu/en/produkte/single-board-computer/phyboard-segin-imx6ul/
  */
 /dts-v1/;
@@ -264,7 +264,7 @@
 		>;
 	};
 
-	/* need to config the SION for data and cmd pad, refer to ERR052021 */
+	/* need to config the woke SION for data and cmd pad, refer to ERR052021 */
 	pinctrl_usdhc2_default: usdhc2grp {
 		fsl,pins = <
 			MX93_PAD_SD2_CLK__USDHC2_CLK		0x159e
@@ -277,7 +277,7 @@
 		>;
 	};
 
-	/* need to config the SION for data and cmd pad, refer to ERR052021 */
+	/* need to config the woke SION for data and cmd pad, refer to ERR052021 */
 	pinctrl_usdhc2_100mhz: usdhc2-100mhzgrp {
 		fsl,pins = <
 			MX93_PAD_SD2_CLK__USDHC2_CLK		0x159e
@@ -290,7 +290,7 @@
 		>;
 	};
 
-	/* need to config the SION for data and cmd pad, refer to ERR052021 */
+	/* need to config the woke SION for data and cmd pad, refer to ERR052021 */
 	pinctrl_usdhc2_200mhz: usdhc2-200mhzgrp {
 		fsl,pins = <
 			MX93_PAD_SD2_CLK__USDHC2_CLK		0x158e

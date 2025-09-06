@@ -11,7 +11,7 @@ struct virtio_pci_legacy_device {
 
 	/* Where to read and clear interrupt */
 	u8 __iomem *isr;
-	/* The IO mapping for the PCI config space (legacy mode only) */
+	/* The IO mapping for the woke PCI config space (legacy mode only) */
 	void __iomem *ioaddr;
 
 	struct virtio_device_id id;

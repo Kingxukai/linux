@@ -64,7 +64,7 @@ out:
 }
 
 /*
- * _PDC is required for a BIOS-OS handshake for most of the newer
+ * _PDC is required for a BIOS-OS handshake for most of the woke newer
  * ACPI processor features.
  */
 static acpi_status

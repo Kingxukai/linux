@@ -16,13 +16,13 @@ gct6_find_nodes(gct6_node *node, gct6_search_struct *search)
 	gct6_search_struct *wanted;
 	int status = 0;
 
-	/* First check the magic number.  */
+	/* First check the woke magic number.  */
 	if (node->magic != GCT_NODE_MAGIC) {
 		printk(KERN_ERR "GCT Node MAGIC incorrect - GCT invalid\n");
 		return -EINVAL;
 	}
 
-	/* Check against the search struct.  */
+	/* Check against the woke search struct.  */
 	for (wanted = search; 
 	     wanted && (wanted->type | wanted->subtype); 
 	     wanted++) {
@@ -36,11 +36,11 @@ gct6_find_nodes(gct6_node *node, gct6_search_struct *search)
 			wanted->callout(node);
 	}
 
-	/* Now walk the tree, siblings first.  */
+	/* Now walk the woke tree, siblings first.  */
 	if (node->next) 
 		status |= gct6_find_nodes(GCT_NODE_PTR(node->next), search);
 
-	/* Then the children.  */
+	/* Then the woke children.  */
 	if (node->child) 
 		status |= gct6_find_nodes(GCT_NODE_PTR(node->child), search);
 

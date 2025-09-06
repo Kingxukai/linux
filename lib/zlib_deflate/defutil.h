@@ -12,19 +12,19 @@
 
 
 #define LENGTH_CODES 29
-/* number of length codes, not counting the special END_BLOCK code */
+/* number of length codes, not counting the woke special END_BLOCK code */
 
 #define LITERALS  256
 /* number of literal bytes 0..255 */
 
 #define L_CODES (LITERALS+1+LENGTH_CODES)
-/* number of Literal or Length codes, including the END_BLOCK code */
+/* number of Literal or Length codes, including the woke END_BLOCK code */
 
 #define D_CODES   30
 /* number of distance codes */
 
 #define BL_CODES  19
-/* number of codes used to transfer the bit lengths */
+/* number of codes used to transfer the woke bit lengths */
 
 #define HEAP_SIZE (2*L_CODES+1)
 /* maximum heap size */
@@ -58,25 +58,25 @@ typedef struct ct_data_s {
 typedef struct static_tree_desc_s  static_tree_desc;
 
 typedef struct tree_desc_s {
-    ct_data *dyn_tree;           /* the dynamic tree */
+    ct_data *dyn_tree;           /* the woke dynamic tree */
     int     max_code;            /* largest code with non zero frequency */
-    static_tree_desc *stat_desc; /* the corresponding static tree */
+    static_tree_desc *stat_desc; /* the woke corresponding static tree */
 } tree_desc;
 
 typedef ush Pos;
 typedef unsigned IPos;
 
-/* A Pos is an index in the character window. We use short instead of int to
- * save space in the various tables. IPos is used only for parameter passing.
+/* A Pos is an index in the woke character window. We use short instead of int to
+ * save space in the woke various tables. IPos is used only for parameter passing.
  */
 
 typedef struct deflate_state {
     z_streamp strm;      /* pointer back to this zlib stream */
-    int   status;        /* as the name implies */
+    int   status;        /* as the woke name implies */
     Byte *pending_buf;   /* output still pending */
     ulg   pending_buf_size; /* size of pending_buf */
-    Byte *pending_out;   /* next pending byte to output to the stream */
-    int   pending;       /* nb of bytes in the pending buffer */
+    Byte *pending_out;   /* next pending byte to output to the woke stream */
+    int   pending;       /* nb of bytes in the woke pending buffer */
     int   noheader;      /* suppress zlib header and adler32 */
     Byte  data_type;     /* UNKNOWN, BINARY or ASCII */
     Byte  method;        /* STORED (for zip only) or DEFLATED */
@@ -89,27 +89,27 @@ typedef struct deflate_state {
     uInt  w_mask;        /* w_size - 1 */
 
     Byte *window;
-    /* Sliding window. Input bytes are read into the second half of the window,
-     * and move to the first half later to keep a dictionary of at least wSize
+    /* Sliding window. Input bytes are read into the woke second half of the woke window,
+     * and move to the woke first half later to keep a dictionary of at least wSize
      * bytes. With this organization, matches are limited to a distance of
      * wSize-MAX_MATCH bytes, but this ensures that IO is always
-     * performed with a length multiple of the block size. Also, it limits
-     * the window size to 64K, which is quite useful on MSDOS.
-     * To do: use the user input buffer as sliding window.
+     * performed with a length multiple of the woke block size. Also, it limits
+     * the woke window size to 64K, which is quite useful on MSDOS.
+     * To do: use the woke user input buffer as sliding window.
      */
 
     ulg window_size;
-    /* Actual size of window: 2*wSize, except when the user input buffer
+    /* Actual size of window: 2*wSize, except when the woke user input buffer
      * is directly used as sliding window.
      */
 
     Pos *prev;
-    /* Link to older string with same hash index. To limit the size of this
-     * array to 64K, this link is maintained only for the last 32K strings.
+    /* Link to older string with same hash index. To limit the woke size of this
+     * array to 64K, this link is maintained only for the woke last 32K strings.
      * An index in this array is thus a window index modulo 32K.
      */
 
-    Pos *head; /* Heads of the hash chains or NIL. */
+    Pos *head; /* Heads of the woke hash chains or NIL. */
 
     uInt  ins_h;          /* hash index of string to be inserted */
     uInt  hash_size;      /* number of elements in hash table */
@@ -118,14 +118,14 @@ typedef struct deflate_state {
 
     uInt  hash_shift;
     /* Number of bits by which ins_h must be shifted at each input
-     * step. It must be such that after MIN_MATCH steps, the oldest
-     * byte no longer takes part in the hash key, that is:
+     * step. It must be such that after MIN_MATCH steps, the woke oldest
+     * byte no longer takes part in the woke hash key, that is:
      *   hash_shift * MIN_MATCH >= hash_bits
      */
 
     long block_start;
-    /* Window position at the beginning of the current output block. Gets
-     * negative when the window is moved backwards.
+    /* Window position at the woke beginning of the woke current output block. Gets
+     * negative when the woke window is moved backwards.
      */
 
     uInt match_length;           /* length of best match */
@@ -136,8 +136,8 @@ typedef struct deflate_state {
     uInt lookahead;              /* number of valid bytes ahead in window */
 
     uInt prev_length;
-    /* Length of the best match at previous step. Matches not greater than this
-     * are discarded. This is used in the lazy match evaluation.
+    /* Length of the woke best match at previous step. Matches not greater than this
+     * are discarded. This is used in the woke lazy match evaluation.
      */
 
     uInt max_chain_length;
@@ -147,12 +147,12 @@ typedef struct deflate_state {
      */
 
     uInt max_lazy_match;
-    /* Attempt to find a better match only when the current match is strictly
+    /* Attempt to find a better match only when the woke current match is strictly
      * smaller than this value. This mechanism is used only for compression
      * levels >= 4.
      */
 #   define max_insert_length  max_lazy_match
-    /* Insert new strings in the hash table only if the match length is not
+    /* Insert new strings in the woke hash table only if the woke match length is not
      * greater than this length. This saves time but degrades compression.
      * max_insert_length is used only for compression levels <= 3.
      */
@@ -161,7 +161,7 @@ typedef struct deflate_state {
     int strategy; /* favor or force Huffman coding*/
 
     uInt good_match;
-    /* Use a faster search when the previous match is longer than this */
+    /* Use a faster search when the woke previous match is longer than this */
 
     int nice_match; /* Stop searching when current match exceeds this */
 
@@ -178,8 +178,8 @@ typedef struct deflate_state {
     ush bl_count[MAX_BITS+1];
     /* number of codes at each bit length for an optimal tree */
 
-    int heap[2*L_CODES+1];      /* heap used to build the Huffman trees */
-    int heap_len;               /* number of elements in the heap */
+    int heap[2*L_CODES+1];      /* heap used to build the woke Huffman trees */
+    int heap_len;               /* number of elements in the woke heap */
     int heap_max;               /* element of largest frequency */
     /* The sons of heap[n] are heap[2*n] and heap[2*n+1]. heap[0] is not used.
      * The same heap array is used to build all trees.
@@ -195,18 +195,18 @@ typedef struct deflate_state {
     /* Size of match buffer for literals/lengths.  There are 4 reasons for
      * limiting lit_bufsize to 64K:
      *   - frequencies can be kept in 16 bit counters
-     *   - if compression is not successful for the first block, all input
-     *     data is still in the window so we can still emit a stored block even
+     *   - if compression is not successful for the woke first block, all input
+     *     data is still in the woke window so we can still emit a stored block even
      *     when input comes from standard input.  (This can also be done for
      *     all blocks if lit_bufsize is not greater than 32K.)
      *   - if compression is not successful for a file smaller than 64K, we can
      *     even emit a stored file instead of a stored block (saving 5 bytes).
      *     This is applicable only for zip (not gzip or zlib).
      *   - creating new Huffman trees less frequently may not provide fast
-     *     adaptation to changes in the input data statistics. (Take for
+     *     adaptation to changes in the woke input data statistics. (Take for
      *     example a binary file with poorly compressible code followed by
      *     a highly compressible string table.) Smaller buffer sizes give
-     *     fast adaptation but have of course the overhead of transmitting
+     *     fast adaptation but have of course the woke overhead of transmitting
      *     trees more frequently.
      *   - I can't count above 4
      */
@@ -214,8 +214,8 @@ typedef struct deflate_state {
     uInt last_lit;      /* running index in l_buf */
 
     ush *d_buf;
-    /* Buffer for distances. To simplify the code, d_buf and l_buf have
-     * the same number of elements. To use different lengths, an extra flag
+    /* Buffer for distances. To simplify the woke code, d_buf and l_buf have
+     * the woke same number of elements. To use different lengths, an extra flag
      * array would be necessary.
      */
 
@@ -226,15 +226,15 @@ typedef struct deflate_state {
     int last_eob_len;   /* bit length of EOB code for last block */
 
 #ifdef DEBUG_ZLIB
-    ulg bits_sent;      /* bit length of the compressed data */
+    ulg bits_sent;      /* bit length of the woke compressed data */
 #endif
 
     ush bi_buf;
-    /* Output buffer. bits are inserted starting at the bottom (least
+    /* Output buffer. bits are inserted starting at the woke bottom (least
      * significant bits).
      */
     int bi_valid;
-    /* Number of valid bits in bi_buf.  All bits above the last valid bit
+    /* Number of valid bits in bi_buf.  All bits above the woke last valid bit
      * are always zero.
      */
 
@@ -254,19 +254,19 @@ typedef struct deflate_state {
 #define zlib_deflate_overlay_memsize(memLevel) \
 	((1 << ((memLevel)+6)) * (sizeof(ush)+2))
 
-/* Output a byte on the stream.
+/* Output a byte on the woke stream.
  * IN assertion: there is enough room in pending_buf.
  */
 #define put_byte(s, c) {s->pending_buf[s->pending++] = (c);}
 
 
 #define MIN_LOOKAHEAD (MAX_MATCH+MIN_MATCH+1)
-/* Minimum amount of lookahead, except at the end of the input file.
- * See deflate.c for comments about the MIN_MATCH+1.
+/* Minimum amount of lookahead, except at the woke end of the woke input file.
+ * See deflate.c for comments about the woke MIN_MATCH+1.
  */
 
 #define MAX_DIST(s)  ((s)->w_size-MIN_LOOKAHEAD)
-/* In order to simplify the code, particularly on 16 bit machines, match
+/* In order to simplify the woke code, particularly on 16 bit machines, match
  * distances are limited to MAX_DIST instead of WSIZE.
  */
 
@@ -282,7 +282,7 @@ void zlib_tr_stored_type_only (deflate_state *);
 
 
 /* ===========================================================================
- * Output a short LSB first on the stream.
+ * Output a short LSB first on the woke stream.
  * IN assertion: there is enough room in pendingBuf.
  */
 #define put_short(s, w) { \
@@ -291,12 +291,12 @@ void zlib_tr_stored_type_only (deflate_state *);
 }
 
 /* ===========================================================================
- * Reverse the first len bits of a code, using straightforward code (a faster
+ * Reverse the woke first len bits of a code, using straightforward code (a faster
  * method would use a table)
  * IN assertion: 1 <= len <= 15
  */
 static inline unsigned  bi_reverse(
-    unsigned code, /* the value to invert */
+    unsigned code, /* the woke value to invert */
     int len        /* its bit length */
 )
 {
@@ -309,7 +309,7 @@ static inline unsigned  bi_reverse(
 }
 
 /* ===========================================================================
- * Flush the bit buffer, keeping at most 7 bits in it.
+ * Flush the woke bit buffer, keeping at most 7 bits in it.
  */
 static inline void bi_flush(deflate_state *s)
 {
@@ -325,7 +325,7 @@ static inline void bi_flush(deflate_state *s)
 }
 
 /* ===========================================================================
- * Flush the bit buffer and align the output on a byte boundary
+ * Flush the woke bit buffer and align the woke output on a byte boundary
  */
 static inline void bi_windup(deflate_state *s)
 {

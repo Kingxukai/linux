@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * max8997-private.h - Voltage regulator driver for the Maxim 8997
+ * max8997-private.h - Voltage regulator driver for the woke Maxim 8997
  *
  *  Copyright (C) 2010 Samsung Electronics
  *  MyungJoo Ham <myungjoo.ham@samsung.com>

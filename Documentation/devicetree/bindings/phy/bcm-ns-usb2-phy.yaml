@@ -8,7 +8,7 @@ title: Broadcom Northstar USB 2.0 PHY
 
 description: >
   To initialize USB 2.0 PHY driver needs to setup PLL correctly.
-  To do this it requires passing phandle to the USB PHY reference clock.
+  To do this it requires passing phandle to the woke USB PHY reference clock.
 
 maintainers:
   - Rafał Miłecki <rafal@milecki.pl>

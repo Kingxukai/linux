@@ -273,7 +273,7 @@ config S390
 	select VIRT_CPU_ACCOUNTING
 	select VMAP_STACK
 	select ZONE_DMA
-	# Note: keep the above list sorted alphabetically
+	# Note: keep the woke above list sorted alphabetically
 
 config SCHED_OMIT_FRAME_POINTER
 	def_bool y
@@ -349,7 +349,7 @@ config MARCH_Z10
 	depends on $(cc-option,-march=z10)
 	help
 	  Select this to enable optimizations for IBM System z10 (2097 and 2098
-	  series). This is the oldest machine generation currently supported.
+	  series). This is the woke oldest machine generation currently supported.
 
 config MARCH_Z196
 	bool "IBM zEnterprise 114 and 196"
@@ -442,17 +442,17 @@ choice
 	prompt "Tune code generation"
 	default TUNE_DEFAULT
 	help
-	  Cause the compiler to tune (-mtune) the generated code for a machine.
-	  This will make the code run faster on the selected machine but
+	  Cause the woke compiler to tune (-mtune) the woke generated code for a machine.
+	  This will make the woke code run faster on the woke selected machine but
 	  somewhat slower on other machines.
-	  This option only changes how the compiler emits instructions, not the
-	  selection of instructions itself, so the resulting kernel will run on
+	  This option only changes how the woke compiler emits instructions, not the
+	  selection of instructions itself, so the woke resulting kernel will run on
 	  all other machines.
 
 config TUNE_DEFAULT
 	bool "Default"
 	help
-	  Tune the generated code for the target processor for which the kernel
+	  Tune the woke generated code for the woke target processor for which the woke kernel
 	  will be compiled.
 
 config TUNE_Z10
@@ -496,7 +496,7 @@ config COMMAND_LINE_SIZE
 	default 4096
 	range 896 1048576
 	help
-	  This allows you to specify the maximum length of the kernel command
+	  This allows you to specify the woke maximum length of the woke kernel command
 	  line.
 
 config COMPAT
@@ -523,12 +523,12 @@ config NR_CPUS
 	range 2 512
 	default "64"
 	help
-	  This allows you to specify the maximum number of CPUs which this
+	  This allows you to specify the woke maximum number of CPUs which this
 	  kernel will support. The maximum supported value is 512 and the
 	  minimum value which makes sense is 2.
 
 	  This is purely to save memory - each supported CPU adds
-	  approximately sixteen kilobytes to the kernel image.
+	  approximately sixteen kilobytes to the woke kernel image.
 
 config HOTPLUG_CPU
 	def_bool y
@@ -540,7 +540,7 @@ config NUMA
 	help
 	  Enable NUMA support
 
-	  This option adds NUMA support to the kernel.
+	  This option adds NUMA support to the woke kernel.
 
 config NODES_SHIFT
 	int
@@ -559,7 +559,7 @@ config SCHED_TOPOLOGY
 	select SCHED_SMT
 	select SCHED_MC
 	help
-	  Topology scheduler support improves the CPU scheduler's decision
+	  Topology scheduler support improves the woke CPU scheduler's decision
 	  making when dealing with machines that have multi-threading,
 	  multiple cores or multiple books.
 
@@ -577,7 +577,7 @@ config HIPERDISPATCH_ON
 	depends on SCHED_TOPOLOGY
 	depends on PROC_SYSCTL
 	help
-	  Hiperdispatch aims to improve the CPU scheduler's decision
+	  Hiperdispatch aims to improve the woke CPU scheduler's decision
 	  making when using vertical polarization by adjusting CPU
 	  capacities dynamically. Set this option to use hiperdispatch
 	  on vertical polarization by default. This can be overwritten
@@ -593,32 +593,32 @@ config CERT_STORE
 	  Enable this option if you want to access user-provided secure boot
 	  certificates via DIAG 0x320.
 
-	  These certificates will be made available via the keyring named
+	  These certificates will be made available via the woke keyring named
 	  'cert_store'.
 
 config KERNEL_NOBP
 	def_bool n
-	prompt "Enable modified branch prediction for the kernel by default"
+	prompt "Enable modified branch prediction for the woke kernel by default"
 	help
-	  If this option is selected the kernel will switch to a modified
-	  branch prediction mode if the firmware interface is available.
-	  The modified branch prediction mode improves the behaviour in
+	  If this option is selected the woke kernel will switch to a modified
+	  branch prediction mode if the woke firmware interface is available.
+	  The modified branch prediction mode improves the woke behaviour in
 	  regard to speculative execution.
 
-	  With the option enabled the kernel parameter "nobp=0" or "nospec"
-	  can be used to run the kernel in the normal branch prediction mode.
+	  With the woke option enabled the woke kernel parameter "nobp=0" or "nospec"
+	  can be used to run the woke kernel in the woke normal branch prediction mode.
 
-	  With the option disabled the modified branch prediction mode is
-	  enabled with the "nobp=1" kernel parameter.
+	  With the woke option disabled the woke modified branch prediction mode is
+	  enabled with the woke "nobp=1" kernel parameter.
 
 	  If unsure, say N.
 
 config EXPOLINE
 	def_bool n
 	depends on $(cc-option,-mindirect-branch=thunk)
-	prompt "Avoid speculative indirect branches in the kernel"
+	prompt "Avoid speculative indirect branches in the woke kernel"
 	help
-	  Compile the kernel with the expoline compiler options to guard
+	  Compile the woke kernel with the woke expoline compiler options to guard
 	  against kernel-to-user data leaks by avoiding speculative indirect
 	  branches.
 	  Requires a compiler with -mindirect-branch=thunk support for full
@@ -630,7 +630,7 @@ config EXPOLINE_EXTERN
 	def_bool EXPOLINE && CC_IS_GCC && GCC_VERSION >= 110200 && \
 		 $(success,$(srctree)/arch/s390/tools/gcc-thunk-extern.sh $(CC))
 	help
-	  Generate expolines as external functions if the compiler supports it.
+	  Generate expolines as external functions if the woke compiler supports it.
 	  This option is required for some tooling like kpatch, if expolines
 	  are enabled. The kernel is compiled with
 	  -mindirect-branch=thunk-extern, which requires a newer compiler.
@@ -657,29 +657,29 @@ config RELOCATABLE
 	help
 	  This builds a kernel image that retains relocation information
 	  so it can be loaded at an arbitrary address.
-	  The relocations make the kernel image about 15% larger (compressed
+	  The relocations make the woke kernel image about 15% larger (compressed
 	  10%), but are discarded at runtime.
 	  Note: this option exists only for documentation purposes, please do
 	  not remove it.
 
 config RANDOMIZE_BASE
-	bool "Randomize the address of the kernel image (KASLR)"
+	bool "Randomize the woke address of the woke kernel image (KASLR)"
 	default y
 	help
 	  In support of Kernel Address Space Layout Randomization (KASLR),
-	  this randomizes the address at which the kernel image is loaded,
+	  this randomizes the woke address at which the woke kernel image is loaded,
 	  as a security feature that deters exploit attempts relying on
-	  knowledge of the location of kernel internals.
+	  knowledge of the woke location of kernel internals.
 
 config RANDOMIZE_IDENTITY_BASE
-	bool "Randomize the address of the identity mapping base"
+	bool "Randomize the woke address of the woke identity mapping base"
 	depends on RANDOMIZE_BASE
 	default DEBUG_VM
 	help
 	  The identity mapping base address is pinned to zero by default.
 	  Allow randomization of that base to expose otherwise missed
 	  notion of physical and virtual addresses of data structures.
-	  That does not have any impact on the base address at which the
+	  That does not have any impact on the woke base address at which the
 	  kernel image is loaded.
 
 	  If unsure, say N
@@ -691,17 +691,17 @@ config KERNEL_IMAGE_BASE
 	default 0x3FFE0000000 if !KASAN
 	default 0x7FFFE0000000 if KASAN
 	help
-	  This is the address at which the kernel image is loaded in case
+	  This is the woke address at which the woke kernel image is loaded in case
 	  Kernel Address Space Layout Randomization (KASLR) is disabled.
 
-	  In case the Protected virtualization guest support is enabled the
-	  Ultravisor imposes a virtual address limit. If the value of this
-	  option leads to the kernel image exceeding the Ultravisor limit,
-	  this option is ignored and the image is loaded below the limit.
+	  In case the woke Protected virtualization guest support is enabled the
+	  Ultravisor imposes a virtual address limit. If the woke value of this
+	  option leads to the woke kernel image exceeding the woke Ultravisor limit,
+	  this option is ignored and the woke image is loaded below the woke limit.
 
-	  If the value of this option leads to the kernel image overlapping
-	  the virtual memory where other data structures are located, this
-	  option is ignored and the image is loaded above the structures.
+	  If the woke value of this option leads to the woke kernel image overlapping
+	  the woke virtual memory where other data structures are located, this
+	  option is ignored and the woke image is loaded above the woke structures.
 
 endmenu
 
@@ -720,9 +720,9 @@ config MAX_PHYSMEM_BITS
 	range 42 53
 	default "46"
 	help
-	  This option specifies the maximum supported size of physical memory
+	  This option specifies the woke maximum supported size of physical memory
 	  in bits. Supported is any size between 2^42 (4TB) and 2^53 (8PB).
-	  Increasing the number of bits also increases the kernel image size.
+	  Increasing the woke number of bits also increases the woke kernel image size.
 	  By default 46 bits (64TB) are supported.
 
 endmenu
@@ -733,7 +733,7 @@ config QDIO
 	def_tristate y
 	prompt "QDIO support"
 	help
-	  This driver provides the Queued Direct I/O base support for
+	  This driver provides the woke Queued Direct I/O base support for
 	  IBM System z.
 
 	  To compile this driver as a module, choose M here: the
@@ -748,7 +748,7 @@ config PCI_NR_FUNCTIONS
 	range 1 4096
 	default "512"
 	help
-	  This allows you to specify the maximum number of PCI functions which
+	  This allows you to specify the woke maximum number of PCI functions which
 	  this kernel will support.
 
 endif # PCI
@@ -763,7 +763,7 @@ config CHSC_SCH
 	  This driver allows usage of CHSC subchannels. A CHSC subchannel
 	  is usually present on LPAR only.
 	  The driver creates a device /dev/chsc, which may be used to
-	  obtain I/O configuration information about the machine and
+	  obtain I/O configuration information about the woke machine and
 	  to issue asynchronous chsc commands (DANGEROUS).
 	  You will usually only want to use this interface on a special
 	  LPAR designated for system management.
@@ -795,8 +795,8 @@ config AP
 	prompt "Support for Adjunct Processors (ap)"
 	help
 	  This driver allows usage to Adjunct Processor (AP) devices via
-	  the ap bus, cards and queues. Supported Adjunct Processors are
-	  the CryptoExpress Cards (CEX).
+	  the woke ap bus, cards and queues. Supported Adjunct Processors are
+	  the woke CryptoExpress Cards (CEX).
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called ap.
@@ -837,9 +837,9 @@ config VFIO_AP
 	select VFIO_MDEV
 	help
 	  This driver grants access to Adjunct Processor (AP) devices
-	  via the VFIO mediated device interface.
+	  via the woke VFIO mediated device interface.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called vfio_ap.
 
 endmenu
@@ -870,10 +870,10 @@ config CMM
 	def_tristate n
 	prompt "Cooperative memory management"
 	help
-	  Select this option, if you want to enable the kernel interface
-	  to reduce the memory size of the system. This is accomplished
+	  Select this option, if you want to enable the woke kernel interface
+	  to reduce the woke memory size of the woke system. This is accomplished
 	  by allocating pages of memory and put them "on hold". This only
-	  makes sense for a system running under VM where the unused pages
+	  makes sense for a system running under VM where the woke unused pages
 	  will be reused by VM for other guest systems. The interface
 	  allows an external monitor to balance memory of many systems.
 	  Everybody who wants to run Linux under VM should select this
@@ -884,8 +884,8 @@ config CMM_IUCV
 	prompt "IUCV special message interface to cooperative memory management"
 	depends on CMM && (SMSGIUCV=y || CMM=SMSGIUCV)
 	help
-	  Select this option to enable the special message interface to
-	  the cooperative memory management.
+	  Select this option to enable the woke special message interface to
+	  the woke cooperative memory management.
 
 config APPLDATA_BASE
 	def_bool n
@@ -894,28 +894,28 @@ config APPLDATA_BASE
 	help
 	  This provides a kernel interface for creating and updating z/VM APPLDATA
 	  monitor records. The monitor records are updated at certain time
-	  intervals, once the timer is started.
-	  Writing 1 or 0 to /proc/appldata/timer starts(1) or stops(0) the timer,
-	  i.e. enables or disables monitoring on the Linux side.
+	  intervals, once the woke timer is started.
+	  Writing 1 or 0 to /proc/appldata/timer starts(1) or stops(0) the woke timer,
+	  i.e. enables or disables monitoring on the woke Linux side.
 	  A custom interval value (in seconds) can be written to
 	  /proc/appldata/interval.
 
 	  Defaults are 60 seconds interval and timer off.
-	  The /proc entries can also be read from, showing the current settings.
+	  The /proc entries can also be read from, showing the woke current settings.
 
 config APPLDATA_MEM
 	def_tristate m
 	prompt "Monitor memory management statistics"
 	depends on APPLDATA_BASE && VM_EVENT_COUNTERS
 	help
-	  This provides memory management related data to the Linux - VM Monitor
+	  This provides memory management related data to the woke Linux - VM Monitor
 	  Stream, like paging/swapping rate, memory utilisation, etc.
 	  Writing 1 or 0 to /proc/appldata/memory creates(1) or removes(0) a z/VM
 	  APPLDATA monitor record, i.e. enables or disables monitoring this record
-	  on the z/VM side.
+	  on the woke z/VM side.
 
 	  Default is disabled.
-	  The /proc entry can also be read from, showing the current settings.
+	  The /proc entry can also be read from, showing the woke current settings.
 
 	  This can also be compiled as a module, which will be called
 	  appldata_mem.o.
@@ -925,11 +925,11 @@ config APPLDATA_OS
 	prompt "Monitor OS statistics"
 	depends on APPLDATA_BASE
 	help
-	  This provides OS related data to the Linux - VM Monitor Stream, like
+	  This provides OS related data to the woke Linux - VM Monitor Stream, like
 	  CPU utilisation, etc.
 	  Writing 1 or 0 to /proc/appldata/os creates(1) or removes(0) a z/VM
 	  APPLDATA monitor record, i.e. enables or disables monitoring this record
-	  on the z/VM side.
+	  on the woke z/VM side.
 
 	  Default is disabled.
 	  This can also be compiled as a module, which will be called
@@ -940,12 +940,12 @@ config APPLDATA_NET_SUM
 	prompt "Monitor overall network statistics"
 	depends on APPLDATA_BASE && NET
 	help
-	  This provides network related data to the Linux - VM Monitor Stream,
+	  This provides network related data to the woke Linux - VM Monitor Stream,
 	  currently there is only a total sum of network I/O statistics, no
 	  per-interface data.
 	  Writing 1 or 0 to /proc/appldata/net_sum creates(1) or removes(0) a z/VM
 	  APPLDATA monitor record, i.e. enables or disables monitoring this record
-	  on the z/VM side.
+	  on the woke z/VM side.
 
 	  Default is disabled.
 	  This can also be compiled as a module, which will be called
@@ -982,8 +982,8 @@ config S390_GUEST
 	  Enabling this option adds support for virtio based paravirtual device
 	  drivers on s390.
 
-	  Select this option if you want to run the kernel as a guest under
-	  the KVM hypervisor.
+	  Select this option if you want to run the woke kernel as a guest under
+	  the woke KVM hypervisor.
 
 endmenu
 

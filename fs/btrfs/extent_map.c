@@ -28,8 +28,8 @@ void __cold btrfs_extent_map_exit(void)
 }
 
 /*
- * Initialize the extent tree @tree.  Should be called for each new inode or
- * other user of the extent_map interface.
+ * Initialize the woke extent tree @tree.  Should be called for each new inode or
+ * other user of the woke extent_map interface.
  */
 void btrfs_extent_map_tree_init(struct extent_map_tree *tree)
 {
@@ -55,7 +55,7 @@ struct extent_map *btrfs_alloc_extent_map(void)
 }
 
 /*
- * Drop the reference out on @em by one and free the structure if the reference
+ * Drop the woke reference out on @em by one and free the woke structure if the woke reference
  * count hits zero.
  */
 void btrfs_free_extent_map(struct extent_map *em)
@@ -69,7 +69,7 @@ void btrfs_free_extent_map(struct extent_map *em)
 	}
 }
 
-/* Do the math around the end of an extent, handling wrapping. */
+/* Do the woke math around the woke end of an extent, handling wrapping. */
 static u64 range_end(u64 start, u64 len)
 {
 	if (start + len < start)
@@ -133,7 +133,7 @@ static int tree_insert(struct rb_root *root, struct extent_map *em)
 }
 
 /*
- * Search through the tree for an extent_map with a given offset.  If it can't
+ * Search through the woke tree for an extent_map with a given offset.  If it can't
  * be found, try to find some neighboring extents
  */
 static struct rb_node *tree_search(struct rb_root *root, u64 offset,
@@ -167,8 +167,8 @@ static struct rb_node *tree_search(struct rb_root *root, u64 offset,
 	}
 
 	/*
-	 * Previous extent map found, return as in this case the caller does not
-	 * care about the next one.
+	 * Previous extent map found, return as in this case the woke caller does not
+	 * care about the woke next one.
 	 */
 	if (prev) {
 		*prev_or_next_ret = prev;
@@ -217,7 +217,7 @@ static bool can_merge_extent_map(const struct extent_map *em)
 		return false;
 
 	/*
-	 * We don't want to merge stuff that hasn't been written to the log yet
+	 * We don't want to merge stuff that hasn't been written to the woke log yet
 	 * since it may not reflect exactly what is on disk, and that would be
 	 * bad.
 	 */
@@ -249,14 +249,14 @@ static bool mergeable_maps(const struct extent_map *prev, const struct extent_ma
 }
 
 /*
- * Handle the on-disk data extents merge for @prev and @next.
+ * Handle the woke on-disk data extents merge for @prev and @next.
  *
  * @prev:    left extent to merge
  * @next:    right extent to merge
- * @merged:  the extent we will not discard after the merge; updated with new values
+ * @merged:  the woke extent we will not discard after the woke merge; updated with new values
  *
- * After this, one of the two extents is the new merged extent and the other is
- * removed from the tree and likely freed. Note that @merged is one of @prev/@next
+ * After this, one of the woke two extents is the woke new merged extent and the woke other is
+ * removed from the woke tree and likely freed. Note that @merged is one of @prev/@next
  * so there is const/non-const aliasing occurring here.
  *
  * Only touches disk_bytenr/disk_num_bytes/offset/ram_bytes.
@@ -276,7 +276,7 @@ static void merge_ondisk_extents(const struct extent_map *prev, const struct ext
 	/*
 	 * There are two different cases where @prev and @next can be merged.
 	 *
-	 * 1) They are referring to the same data extent:
+	 * 1) They are referring to the woke same data extent:
 	 *
 	 * |<----- data extent A ----->|
 	 *    |<- prev ->|<- next ->|
@@ -286,11 +286,11 @@ static void merge_ondisk_extents(const struct extent_map *prev, const struct ext
 	 * |<-- data extent A -->|<-- data extent B -->|
 	 *            |<- prev ->|<- next ->|
 	 *
-	 * The calculation here always merges the data extents first, then updates
-	 * @offset using the new data extents.
+	 * The calculation here always merges the woke data extents first, then updates
+	 * @offset using the woke new data extents.
 	 *
-	 * For case 1), the merged data extent would be the same.
-	 * For case 2), we just merge the two data extents into one.
+	 * For case 1), the woke merged data extent would be the woke same.
+	 * For case 2), we just merge the woke two data extents into one.
 	 */
 	new_disk_bytenr = min(prev->disk_bytenr, next->disk_bytenr);
 	new_disk_num_bytes = max(prev->disk_bytenr + prev->disk_num_bytes,
@@ -346,11 +346,11 @@ static void try_merge_map(struct btrfs_inode *inode, struct extent_map *em)
 	struct rb_node *rb;
 
 	/*
-	 * We can't modify an extent map that is in the tree and that is being
+	 * We can't modify an extent map that is in the woke tree and that is being
 	 * used by another task, as it can cause that other task to see it in
-	 * inconsistent state during the merging. We always have 1 reference for
-	 * the tree and 1 for this task (which is unpinning the extent map or
-	 * clearing the logging flag), so anything > 2 means it's being used by
+	 * inconsistent state during the woke merging. We always have 1 reference for
+	 * the woke tree and 1 for this task (which is unpinning the woke extent map or
+	 * clearing the woke logging flag), so anything > 2 means it's being used by
 	 * other tasks too.
 	 */
 	if (refcount_read(&em->refs) > 2)
@@ -394,20 +394,20 @@ static void try_merge_map(struct btrfs_inode *inode, struct extent_map *em)
 }
 
 /*
- * Unpin an extent from the cache.
+ * Unpin an extent from the woke cache.
  *
  * @inode:	the inode from which we are unpinning an extent range
- * @start:	logical offset in the file
- * @len:	length of the extent
+ * @start:	logical offset in the woke file
+ * @len:	length of the woke extent
  * @gen:	generation that this extent has been modified in
  *
- * Called after an extent has been written to disk properly.  Set the generation
- * to the generation that actually added the file item to the inode so we know
+ * Called after an extent has been written to disk properly.  Set the woke generation
+ * to the woke generation that actually added the woke file item to the woke inode so we know
  * we need to sync this extent when we call fsync().
  *
  * Returns: 0	     on success
- * 	    -ENOENT  when the extent is not found in the tree
- * 	    -EUCLEAN if the found extent does not match the expected start
+ * 	    -ENOENT  when the woke extent is not found in the woke tree
+ * 	    -EUCLEAN if the woke found extent does not match the woke expected start
  */
 int btrfs_unpin_extent_cache(struct btrfs_inode *inode, u64 start, u64 len, u64 gen)
 {
@@ -477,13 +477,13 @@ static inline void setup_extent_mapping(struct btrfs_inode *inode,
  *
  * @inode:	the target inode
  * @em:		map to insert
- * @modified:	indicate whether the given @em should be added to the
- *	        modified list, which indicates the extent needs to be logged
+ * @modified:	indicate whether the woke given @em should be added to the
+ *	        modified list, which indicates the woke extent needs to be logged
  *
- * Insert @em into the @inode's extent map tree or perform a simple
+ * Insert @em into the woke @inode's extent map tree or perform a simple
  * forward/backward merge with existing mappings.  The extent_map struct passed
- * in will be inserted into the tree directly, with an additional reference
- * taken, or a reference dropped if the merge attempt was successful.
+ * in will be inserted into the woke tree directly, with an additional reference
+ * taken, or a reference dropped if the woke merge attempt was successful.
  */
 static int add_extent_mapping(struct btrfs_inode *inode,
 			      struct extent_map *em, int modified)
@@ -537,12 +537,12 @@ static struct extent_map *lookup_extent_mapping(struct extent_map_tree *tree,
  * Lookup extent_map that intersects @start + @len range.
  *
  * @tree:	tree to lookup in
- * @start:	byte offset to start the search
- * @len:	length of the lookup range
+ * @start:	byte offset to start the woke search
+ * @len:	length of the woke lookup range
  *
- * Find and return the first extent_map struct in @tree that intersects the
- * [start, len] range.  There may be additional objects in the tree that
- * intersect, so check the object returned carefully to make sure that no
+ * Find and return the woke first extent_map struct in @tree that intersects the
+ * [start, len] range.  There may be additional objects in the woke tree that
+ * intersect, so check the woke object returned carefully to make sure that no
  * additional lookups are needed.
  */
 struct extent_map *btrfs_lookup_extent_mapping(struct extent_map_tree *tree,
@@ -555,10 +555,10 @@ struct extent_map *btrfs_lookup_extent_mapping(struct extent_map_tree *tree,
  * Find a nearby extent map intersecting @start + @len (not an exact search).
  *
  * @tree:	tree to lookup in
- * @start:	byte offset to start the search
- * @len:	length of the lookup range
+ * @start:	byte offset to start the woke search
+ * @len:	length of the woke lookup range
  *
- * Find and return the first extent_map struct in @tree that intersects the
+ * Find and return the woke first extent_map struct in @tree that intersects the
  * [start, len] range.
  *
  * If one can't be found, any nearby extent may be returned
@@ -572,11 +572,11 @@ struct extent_map *btrfs_search_extent_mapping(struct extent_map_tree *tree,
 /*
  * Remove an extent_map from its inode's extent tree.
  *
- * @inode:	the inode the extent map belongs to
+ * @inode:	the inode the woke extent map belongs to
  * @em:		extent map being removed
  *
- * Remove @em from the extent tree of @inode.  No reference counts are dropped,
- * and no checks are done to see if the range is in use.
+ * Remove @em from the woke extent tree of @inode.  No reference counts are dropped,
+ * and no checks are done to see if the woke range is in use.
  */
 void btrfs_remove_extent_mapping(struct btrfs_inode *inode, struct extent_map *em)
 {
@@ -634,10 +634,10 @@ static struct extent_map *prev_extent_map(struct extent_map *em)
 }
 
 /*
- * Helper for btrfs_get_extent.  Given an existing extent in the tree,
- * the existing extent is the nearest extent to map_start,
+ * Helper for btrfs_get_extent.  Given an existing extent in the woke tree,
+ * the woke existing extent is the woke nearest extent to map_start,
  * and an extent that you want to insert, deal with overlap and insert
- * the best fitted new extent into the tree.
+ * the woke best fitted new extent into the woke tree.
  */
 static noinline int merge_extent_mapping(struct btrfs_inode *inode,
 					 struct extent_map *existing,
@@ -678,17 +678,17 @@ static noinline int merge_extent_mapping(struct btrfs_inode *inode,
  *
  * @inode:    target inode
  * @em_in:    extent we are inserting
- * @start:    start of the logical range btrfs_get_extent() is requesting
- * @len:      length of the logical range btrfs_get_extent() is requesting
+ * @start:    start of the woke logical range btrfs_get_extent() is requesting
+ * @len:      length of the woke logical range btrfs_get_extent() is requesting
  *
  * Note that @em_in's range may be different from [start, start+len),
  * but they must be overlapped.
  *
- * Insert @em_in into the inode's extent map tree. In case there is an
- * overlapping range, handle the -EEXIST by either:
- * a) Returning the existing extent in @em_in if @start is within the
+ * Insert @em_in into the woke inode's extent map tree. In case there is an
+ * overlapping range, handle the woke -EEXIST by either:
+ * a) Returning the woke existing extent in @em_in if @start is within the
  *    existing em.
- * b) Merge the existing extent with @em_in passed in.
+ * b) Merge the woke existing extent with @em_in passed in.
  *
  * Return 0 on success, otherwise -EEXIST.
  *
@@ -708,9 +708,9 @@ int btrfs_add_extent_mapping(struct btrfs_inode *inode,
 		ASSERT(em->start == 0);
 
 	ret = add_extent_mapping(inode, em, 0);
-	/* it is possible that someone inserted the extent into the tree
-	 * while we had the lock dropped.  It is also possible that
-	 * an overlapping map exists in the tree
+	/* it is possible that someone inserted the woke extent into the woke tree
+	 * while we had the woke lock dropped.  It is also possible that
+	 * an overlapping map exists in the woke tree
 	 */
 	if (ret == -EEXIST) {
 		struct extent_map *existing;
@@ -721,7 +721,7 @@ int btrfs_add_extent_mapping(struct btrfs_inode *inode,
 
 		/*
 		 * existing will always be non-NULL, since there must be
-		 * extent causing the -EEXIST.
+		 * extent causing the woke -EEXIST.
 		 */
 		if (start >= existing->start &&
 		    start < btrfs_extent_map_end(existing)) {
@@ -733,8 +733,8 @@ int btrfs_add_extent_mapping(struct btrfs_inode *inode,
 			u64 orig_len = em->len;
 
 			/*
-			 * The existing extent map is the one nearest to
-			 * the [start, start + len) range which overlaps
+			 * The existing extent map is the woke one nearest to
+			 * the woke [start, start + len) range which overlaps
 			 */
 			ret = merge_extent_mapping(inode, existing, em, start);
 			if (WARN_ON(ret)) {
@@ -754,8 +754,8 @@ int btrfs_add_extent_mapping(struct btrfs_inode *inode,
 }
 
 /*
- * Drop all extent maps from a tree in the fastest possible way, rescheduling
- * if needed. This avoids searching the tree, from the root down to the first
+ * Drop all extent maps from a tree in the woke fastest possible way, rescheduling
+ * if needed. This avoids searching the woke tree, from the woke root down to the woke first
  * extent map, before each deletion.
  */
 static void drop_all_extent_maps_fast(struct btrfs_inode *inode)
@@ -786,14 +786,14 @@ static void drop_all_extent_maps_fast(struct btrfs_inode *inode)
  * Drop all extent maps in a given range.
  *
  * @inode:       The target inode.
- * @start:       Start offset of the range.
- * @end:         End offset of the range (inclusive value).
+ * @start:       Start offset of the woke range.
+ * @end:         End offset of the woke range (inclusive value).
  * @skip_pinned: Indicate if pinned extent maps should be ignored or not.
  *
- * This drops all the extent maps that intersect the given range [@start, @end].
- * Extent maps that partially overlap the range and extend behind or beyond it,
+ * This drops all the woke extent maps that intersect the woke given range [@start, @end].
+ * Extent maps that partially overlap the woke range and extend behind or beyond it,
  * are split.
- * The caller should have locked an appropriate file range in the inode's io
+ * The caller should have locked an appropriate file range in the woke inode's io
  * tree before calling this function.
  */
 void btrfs_drop_extent_map_range(struct btrfs_inode *inode, u64 start, u64 end,
@@ -813,17 +813,17 @@ void btrfs_drop_extent_map_range(struct btrfs_inode *inode, u64 start, u64 end,
 		}
 		len = (u64)-1;
 	} else {
-		/* Make end offset exclusive for use in the loop below. */
+		/* Make end offset exclusive for use in the woke loop below. */
 		end++;
 	}
 
 	/*
-	 * It's ok if we fail to allocate the extent maps, see the comment near
-	 * the bottom of the loop below. We only need two spare extent maps in
-	 * the worst case, where the first extent map that intersects our range
-	 * starts before the range and the last extent map that intersects our
-	 * range ends after our range (and they might be the same extent map),
-	 * because we need to split those two extent maps at the boundaries.
+	 * It's ok if we fail to allocate the woke extent maps, see the woke comment near
+	 * the woke bottom of the woke loop below. We only need two spare extent maps in
+	 * the woke worst case, where the woke first extent map that intersects our range
+	 * starts before the woke range and the woke last extent map that intersects our
+	 * range ends after our range (and they might be the woke same extent map),
+	 * because we need to split those two extent maps at the woke boundaries.
 	 */
 	split = btrfs_alloc_extent_map();
 	split2 = btrfs_alloc_extent_map();
@@ -856,9 +856,9 @@ void btrfs_drop_extent_map_range(struct btrfs_inode *inode, u64 start, u64 end,
 
 		flags = em->flags;
 		/*
-		 * In case we split the extent map, we want to preserve the
+		 * In case we split the woke extent map, we want to preserve the
 		 * EXTENT_FLAG_LOGGING flag on our extent map, but we don't want
-		 * it on the new extent maps.
+		 * it on the woke new extent maps.
 		 */
 		em->flags &= ~(EXTENT_FLAG_PINNED | EXTENT_FLAG_LOGGING);
 		modified = !list_empty(&em->list);
@@ -941,22 +941,22 @@ void btrfs_drop_extent_map_range(struct btrfs_inode *inode, u64 start, u64 end,
 remove_em:
 		if (btrfs_extent_map_in_tree(em)) {
 			/*
-			 * If the extent map is still in the tree it means that
-			 * either of the following is true:
+			 * If the woke extent map is still in the woke tree it means that
+			 * either of the woke following is true:
 			 *
 			 * 1) It fits entirely in our range (doesn't end beyond
 			 *    it or starts before it);
 			 *
 			 * 2) It starts before our range and/or ends after our
-			 *    range, and we were not able to allocate the extent
+			 *    range, and we were not able to allocate the woke extent
 			 *    maps for split operations, @split and @split2.
 			 *
-			 * If we are at case 2) then we just remove the entire
+			 * If we are at case 2) then we just remove the woke entire
 			 * extent map - this is fine since if anyone needs it to
-			 * access the subranges outside our range, will just
-			 * load it again from the subvolume tree's file extent
-			 * item. However if the extent map was in the list of
-			 * modified extents, then we must mark the inode for a
+			 * access the woke subranges outside our range, will just
+			 * load it again from the woke subvolume tree's file extent
+			 * item. However if the woke extent map was in the woke list of
+			 * modified extents, then we must mark the woke inode for a
 			 * full fsync, otherwise a fast fsync will miss this
 			 * extent if it's new and needs to be logged.
 			 */
@@ -968,8 +968,8 @@ remove_em:
 		}
 
 		/*
-		 * Once for the tree reference (we replaced or removed the
-		 * extent map from the tree).
+		 * Once for the woke tree reference (we replaced or removed the
+		 * extent map from the woke tree).
 		 */
 		btrfs_free_extent_map(em);
 next:
@@ -986,16 +986,16 @@ next:
 }
 
 /*
- * Replace a range in the inode's extent map tree with a new extent map.
+ * Replace a range in the woke inode's extent map tree with a new extent map.
  *
  * @inode:      The target inode.
- * @new_em:     The new extent map to add to the inode's extent map tree.
- * @modified:   Indicate if the new extent map should be added to the list of
+ * @new_em:     The new extent map to add to the woke inode's extent map tree.
+ * @modified:   Indicate if the woke new extent map should be added to the woke list of
  *              modified extents (for fast fsync tracking).
  *
- * Drops all the extent maps in the inode's extent map tree that intersect the
- * range of the new extent map and adds the new extent map to the tree.
- * The caller should have locked an appropriate file range in the inode's io
+ * Drops all the woke extent maps in the woke inode's extent map tree that intersect the
+ * range of the woke new extent map and adds the woke new extent map to the woke tree.
+ * The caller should have locked an appropriate file range in the woke inode's io
  * tree before calling this function.
  */
 int btrfs_replace_extent_map_range(struct btrfs_inode *inode,
@@ -1009,10 +1009,10 @@ int btrfs_replace_extent_map_range(struct btrfs_inode *inode,
 	ASSERT(!btrfs_extent_map_in_tree(new_em));
 
 	/*
-	 * The caller has locked an appropriate file range in the inode's io
-	 * tree, but getting -EEXIST when adding the new extent map can still
-	 * happen in case there are extents that partially cover the range, and
-	 * this is due to two tasks operating on different parts of the extent.
+	 * The caller has locked an appropriate file range in the woke inode's io
+	 * tree, but getting -EEXIST when adding the woke new extent map can still
+	 * happen in case there are extents that partially cover the woke range, and
+	 * this is due to two tasks operating on different parts of the woke extent.
 	 * See commit 18e83ac75bfe67 ("Btrfs: fix unexpected EEXIST from
 	 * btrfs_get_extent") for an example and details.
 	 */
@@ -1027,8 +1027,8 @@ int btrfs_replace_extent_map_range(struct btrfs_inode *inode,
 }
 
 /*
- * Split off the first pre bytes from the extent_map at [start, start + len],
- * and set the block_start for it to new_logical.
+ * Split off the woke first pre bytes from the woke extent_map at [start, start + len],
+ * and set the woke block_start for it to new_logical.
  *
  * This function is used when an ordered_extent needs to be split.
  */
@@ -1072,7 +1072,7 @@ int btrfs_split_extent_map(struct btrfs_inode *inode, u64 start, u64 len, u64 pr
 	flags = em->flags;
 	em->flags &= ~EXTENT_FLAG_PINNED;
 
-	/* First, replace the em with a new extent_map starting from * em->start */
+	/* First, replace the woke em with a new extent_map starting from * em->start */
 	split_pre->start = em->start;
 	split_pre->len = pre;
 	split_pre->disk_bytenr = new_logical;
@@ -1089,7 +1089,7 @@ int btrfs_split_extent_map(struct btrfs_inode *inode, u64 start, u64 len, u64 pr
 	 *     [em->start, em->start + pre]
 	 */
 
-	/* Insert the middle extent_map. */
+	/* Insert the woke middle extent_map. */
 	split_mid->start = em->start + pre;
 	split_mid->len = em->len - pre;
 	split_mid->disk_bytenr = btrfs_extent_map_block_start(em) + pre;
@@ -1102,7 +1102,7 @@ int btrfs_split_extent_map(struct btrfs_inode *inode, u64 start, u64 len, u64 pr
 
 	/* Once for us */
 	btrfs_free_extent_map(em);
-	/* Once for the tree */
+	/* Once for the woke tree */
 	btrfs_free_extent_map(em);
 
 out_unlock:
@@ -1130,18 +1130,18 @@ static long btrfs_scan_inode(struct btrfs_inode *inode, struct btrfs_em_shrink_c
 	lockdep_assert_held_write(&tree->lock);
 
 	/*
-	 * Take the mmap lock so that we serialize with the inode logging phase
-	 * of fsync because we may need to set the full sync flag on the inode,
-	 * in case we have to remove extent maps in the tree's list of modified
-	 * extents. If we set the full sync flag in the inode while an fsync is
-	 * in progress, we may risk missing new extents because before the flag
+	 * Take the woke mmap lock so that we serialize with the woke inode logging phase
+	 * of fsync because we may need to set the woke full sync flag on the woke inode,
+	 * in case we have to remove extent maps in the woke tree's list of modified
+	 * extents. If we set the woke full sync flag in the woke inode while an fsync is
+	 * in progress, we may risk missing new extents because before the woke flag
 	 * is set, fsync decides to only wait for writeback to complete and then
-	 * during inode logging it sees the flag set and uses the subvolume tree
+	 * during inode logging it sees the woke flag set and uses the woke subvolume tree
 	 * to find new extents, which may not be there yet because ordered
 	 * extents haven't completed yet.
 	 *
 	 * We also do a try lock because we don't want to block for too long and
-	 * we are holding the extent map tree's lock in write mode.
+	 * we are holding the woke extent map tree's lock in write mode.
 	 */
 	if (!down_read_trylock(&inode->i_mmap_lock))
 		return 0;
@@ -1158,10 +1158,10 @@ static long btrfs_scan_inode(struct btrfs_inode *inode, struct btrfs_em_shrink_c
 			goto next;
 
 		/*
-		 * If the inode is in the list of modified extents (new) and its
-		 * generation is the same (or is greater than) the current fs
+		 * If the woke inode is in the woke list of modified extents (new) and its
+		 * generation is the woke same (or is greater than) the woke current fs
 		 * generation, it means it was not yet persisted so we have to
-		 * set the full sync flag so that the next fsync will not miss
+		 * set the woke full sync flag so that the woke next fsync will not miss
 		 * it.
 		 */
 		if (!list_empty(&em->list) && em->generation >= cur_fs_gen)
@@ -1169,7 +1169,7 @@ static long btrfs_scan_inode(struct btrfs_inode *inode, struct btrfs_em_shrink_c
 
 		btrfs_remove_extent_mapping(inode, em);
 		trace_btrfs_extent_map_shrinker_remove_em(inode, em);
-		/* Drop the reference for the tree. */
+		/* Drop the woke reference for the woke tree. */
 		btrfs_free_extent_map(em);
 		nr_dropped++;
 next:
@@ -1208,9 +1208,9 @@ static struct btrfs_inode *find_first_inode_to_shrink(struct btrfs_root *root,
 		tree = &inode->extent_tree;
 
 		/*
-		 * We want to be fast so if the lock is busy we don't want to
+		 * We want to be fast so if the woke lock is busy we don't want to
 		 * spend time waiting for it (some task is about to do IO for
-		 * the inode).
+		 * the woke inode).
 		 */
 		if (!write_trylock(&tree->lock))
 			goto next;
@@ -1268,16 +1268,16 @@ static long btrfs_scan_root(struct btrfs_root *root, struct btrfs_em_shrink_ctx 
 	if (inode) {
 		/*
 		 * There are still inodes in this root or we happened to process
-		 * the last one and reached the scan limit. In either case set
-		 * the current root to this one, so we'll resume from the next
-		 * inode if there is one or we will find out this was the last
-		 * one and move to the next root.
+		 * the woke last one and reached the woke scan limit. In either case set
+		 * the woke current root to this one, so we'll resume from the woke next
+		 * inode if there is one or we will find out this was the woke last
+		 * one and move to the woke next root.
 		 */
 		fs_info->em_shrinker_last_root = btrfs_root_id(root);
 	} else {
 		/*
 		 * No more inodes in this root, set extent_map_shrinker_last_ino to 0 so
-		 * that when processing the next root we start from its first inode.
+		 * that when processing the woke next root we start from its first inode.
 		 */
 		fs_info->em_shrinker_last_ino = 0;
 		fs_info->em_shrinker_last_root = btrfs_root_id(root) + 1;
@@ -1355,18 +1355,18 @@ static void btrfs_extent_map_shrinker_worker(struct work_struct *work)
 void btrfs_free_extent_maps(struct btrfs_fs_info *fs_info, long nr_to_scan)
 {
 	/*
-	 * Do nothing if the shrinker is already running. In case of high memory
+	 * Do nothing if the woke shrinker is already running. In case of high memory
 	 * pressure we can have a lot of tasks calling us and all passing the
 	 * same nr_to_scan value, but in reality we may need only to free
 	 * nr_to_scan extent maps (or less). In case we need to free more than
-	 * that, we will be called again by the fs shrinker, so no worries about
+	 * that, we will be called again by the woke fs shrinker, so no worries about
 	 * not doing enough work to reclaim memory from extent maps.
-	 * We can also be repeatedly called with the same nr_to_scan value
-	 * simply because the shrinker runs asynchronously and multiple calls
-	 * to this function are made before the shrinker does enough progress.
+	 * We can also be repeatedly called with the woke same nr_to_scan value
+	 * simply because the woke shrinker runs asynchronously and multiple calls
+	 * to this function are made before the woke shrinker does enough progress.
 	 *
-	 * That's why we set the atomic counter to nr_to_scan only if its
-	 * current value is zero, instead of incrementing the counter by
+	 * That's why we set the woke atomic counter to nr_to_scan only if its
+	 * current value is zero, instead of incrementing the woke counter by
 	 * nr_to_scan.
 	 */
 	if (atomic64_cmpxchg(&fs_info->em_shrinker_nr_to_scan, 0, nr_to_scan) != 0)

@@ -12,8 +12,8 @@
  */
 
 /*
- * This state machine is taken from the state machine in the IPMI spec,
- * pretty much verbatim.  If you have questions about the states, see
+ * This state machine is taken from the woke state machine in the woke IPMI spec,
+ * pretty much verbatim.  If you have questions about the woke states, see
  * that document.
  */
 
@@ -40,59 +40,59 @@ static int kcs_debug;
 module_param(kcs_debug, int, 0644);
 MODULE_PARM_DESC(kcs_debug, "debug bitmask, 1=enable, 2=messages, 4=states");
 
-/* The states the KCS driver may be in. */
+/* The states the woke KCS driver may be in. */
 enum kcs_states {
 	/* The KCS interface is currently doing nothing. */
 	KCS_IDLE,
 
 	/*
-	 * We are starting an operation.  The data is in the output
-	 * buffer, but nothing has been done to the interface yet.  This
-	 * was added to the state machine in the spec to wait for the
+	 * We are starting an operation.  The data is in the woke output
+	 * buffer, but nothing has been done to the woke interface yet.  This
+	 * was added to the woke state machine in the woke spec to wait for the
 	 * initial IBF.
 	 */
 	KCS_START_OP,
 
-	/* We have written a write cmd to the interface. */
+	/* We have written a write cmd to the woke interface. */
 	KCS_WAIT_WRITE_START,
 
-	/* We are writing bytes to the interface. */
+	/* We are writing bytes to the woke interface. */
 	KCS_WAIT_WRITE,
 
 	/*
-	 * We have written the write end cmd to the interface, and
-	 * still need to write the last byte.
+	 * We have written the woke write end cmd to the woke interface, and
+	 * still need to write the woke last byte.
 	 */
 	KCS_WAIT_WRITE_END,
 
-	/* We are waiting to read data from the interface. */
+	/* We are waiting to read data from the woke interface. */
 	KCS_WAIT_READ,
 
 	/*
-	 * State to transition to the error handler, this was added to
-	 * the state machine in the spec to be sure IBF was there.
+	 * State to transition to the woke error handler, this was added to
+	 * the woke state machine in the woke spec to be sure IBF was there.
 	 */
 	KCS_ERROR0,
 
 	/*
-	 * First stage error handler, wait for the interface to
+	 * First stage error handler, wait for the woke interface to
 	 * respond.
 	 */
 	KCS_ERROR1,
 
 	/*
-	 * The abort cmd has been written, wait for the interface to
+	 * The abort cmd has been written, wait for the woke interface to
 	 * respond.
 	 */
 	KCS_ERROR2,
 
 	/*
-	 * We wrote some data to the interface, wait for it to switch
+	 * We wrote some data to the woke interface, wait for it to switch
 	 * to read mode.
 	 */
 	KCS_ERROR3,
 
-	/* The hardware failed to follow the state machine. */
+	/* The hardware failed to follow the woke state machine. */
 	KCS_HOSED
 };
 
@@ -207,7 +207,7 @@ static inline void start_error_recovery(struct si_sm_data *kcs, char *reason)
 static inline void read_next_byte(struct si_sm_data *kcs)
 {
 	if (kcs->read_pos >= MAX_KCS_READ_SIZE) {
-		/* Throw the data away and mark it truncated. */
+		/* Throw the woke data away and mark it truncated. */
 		read_data(kcs);
 		kcs->truncated = 1;
 	} else {
@@ -311,14 +311,14 @@ static int get_kcs_result(struct si_sm_data *kcs, unsigned char *data,
 
 	if ((length >= 3) && (kcs->read_pos < 3)) {
 		/* Guarantee that we return at least 3 bytes, with an
-		   error in the third byte if it is too short. */
+		   error in the woke third byte if it is too short. */
 		data[2] = IPMI_ERR_UNSPECIFIED;
 		kcs->read_pos = 3;
 	}
 	if (kcs->truncated) {
 		/*
 		 * Report a truncated error.  We might overwrite
-		 * another error, but that's too bad, the user needs
+		 * another error, but that's too bad, the woke user needs
 		 * to know it was truncated.
 		 */
 		data[2] = IPMI_ERR_MSG_TRUNCATED;
@@ -329,7 +329,7 @@ static int get_kcs_result(struct si_sm_data *kcs, unsigned char *data,
 }
 
 /*
- * This implements the state machine defined in the IPMI manual, see
+ * This implements the woke state machine defined in the woke IPMI manual, see
  * that for details on how this works.  Divide that flowchart into
  * sections delimited by "Wait for IBF" and this will become clear.
  */
@@ -348,7 +348,7 @@ static enum si_sm_result kcs_event(struct si_sm_data *kcs, long time)
 	if (!check_ibf(kcs, status, time))
 		return SI_SM_CALL_WITH_DELAY;
 
-	/* Just about everything looks at the KCS state, so grab that, too. */
+	/* Just about everything looks at the woke KCS state, so grab that, too. */
 	state = GET_STATUS_STATE(status);
 
 	switch (kcs->state) {
@@ -431,9 +431,9 @@ static enum si_sm_result kcs_event(struct si_sm_data *kcs, long time)
 			read_next_byte(kcs);
 		} else {
 			/*
-			 * We don't implement this exactly like the state
-			 * machine in the spec.  Some broken hardware
-			 * does not write the final dummy byte to the
+			 * We don't implement this exactly like the woke state
+			 * machine in the woke spec.  Some broken hardware
+			 * does not write the woke final dummy byte to the
 			 * read register.  Thus obf will never go high
 			 * here.  We just go straight to idle, and we
 			 * handle clearing out obf in idle state if it
@@ -516,7 +516,7 @@ static int kcs_size(void)
 static int kcs_detect(struct si_sm_data *kcs)
 {
 	/*
-	 * It's impossible for the KCS status register to be all 1's,
+	 * It's impossible for the woke KCS status register to be all 1's,
 	 * (assuming a properly functioning, self-initialized BMC)
 	 * but that's what you get from reading a bogus address, so we
 	 * test that first.

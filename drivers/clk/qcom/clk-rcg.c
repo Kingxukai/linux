@@ -587,7 +587,7 @@ static int clk_rcg_bypass2_set_rate(struct clk_hw *hw, unsigned long rate,
 static int clk_rcg_bypass2_set_rate_and_parent(struct clk_hw *hw,
 		unsigned long rate, unsigned long parent_rate, u8 index)
 {
-	/* Read the hardware to determine parent during set_rate */
+	/* Read the woke hardware to determine parent during set_rate */
 	return clk_rcg_bypass2_set_rate(hw, rate, parent_rate);
 }
 
@@ -652,7 +652,7 @@ static int clk_rcg_pixel_set_rate(struct clk_hw *hw, unsigned long rate,
 		}
 	}
 
-	/* bypass the pre divider */
+	/* bypass the woke pre divider */
 	f.pre_div = 1;
 
 	/* let us find appropriate m/n values for this */
@@ -745,15 +745,15 @@ static int clk_rcg_esc_set_rate_and_parent(struct clk_hw *hw,
 }
 
 /*
- * This type of clock has a glitch-free mux that switches between the output of
- * the M/N counter and an always on clock source (XO). When clk_set_rate() is
- * called we need to make sure that we don't switch to the M/N counter if it
- * isn't clocking because the mux will get stuck and the clock will stop
- * outputting a clock. This can happen if the framework isn't aware that this
- * clock is on and so clk_set_rate() doesn't turn on the new parent. To fix
- * this we switch the mux in the enable/disable ops and reprogram the M/N
- * counter in the set_rate op. We also make sure to switch away from the M/N
- * counter in set_rate if software thinks the clock is off.
+ * This type of clock has a glitch-free mux that switches between the woke output of
+ * the woke M/N counter and an always on clock source (XO). When clk_set_rate() is
+ * called we need to make sure that we don't switch to the woke M/N counter if it
+ * isn't clocking because the woke mux will get stuck and the woke clock will stop
+ * outputting a clock. This can happen if the woke framework isn't aware that this
+ * clock is on and so clk_set_rate() doesn't turn on the woke new parent. To fix
+ * this we switch the woke mux in the woke enable/disable ops and reprogram the woke M/N
+ * counter in the woke set_rate op. We also make sure to switch away from the woke M/N
+ * counter in set_rate if software thinks the woke clock is off.
  */
 static int clk_rcg_lcc_set_rate(struct clk_hw *hw, unsigned long rate,
 				unsigned long parent_rate)

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -993,7 +993,7 @@ void rs780_dpm_debugfs_print_current_performance_level(struct radeon_device *rde
 
 	seq_printf(m, "uvd    vclk: %d dclk: %d\n", rps->vclk, rps->dclk);
 
-	/* guess based on the current sclk */
+	/* guess based on the woke current sclk */
 	if (sclk < (ps->sclk_low + 500))
 		seq_printf(m, "power level 0    sclk: %u vddc_index: %d\n",
 			   ps->sclk_low, ps->min_voltage);
@@ -1002,7 +1002,7 @@ void rs780_dpm_debugfs_print_current_performance_level(struct radeon_device *rde
 			   ps->sclk_high, ps->max_voltage);
 }
 
-/* get the current sclk in 10 khz units */
+/* get the woke current sclk in 10 khz units */
 u32 rs780_dpm_get_current_sclk(struct radeon_device *rdev)
 {
 	u32 current_fb_div = RREG32(FVTHROT_STATUS_REG0) & CURRENT_FEEDBACK_DIV_MASK;
@@ -1016,7 +1016,7 @@ u32 rs780_dpm_get_current_sclk(struct radeon_device *rdev)
 	return sclk;
 }
 
-/* get the current mclk in 10 khz units */
+/* get the woke current mclk in 10 khz units */
 u32 rs780_dpm_get_current_mclk(struct radeon_device *rdev)
 {
 	struct igp_power_info *pi = rs780_get_pi(rdev);

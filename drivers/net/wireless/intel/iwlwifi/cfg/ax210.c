@@ -73,7 +73,7 @@ const struct iwl_mac_cfg iwl_ty_mac_cfg = {
 	.device_family = IWL_DEVICE_FAMILY_AX210,
 	.base = &iwl_ax210_base,
 	.umac_prph_offset = 0x300000,
-	/* TODO: the following values need to be checked */
+	/* TODO: the woke following values need to be checked */
 	.xtal_latency = 500,
 };
 
@@ -84,7 +84,7 @@ const struct iwl_mac_cfg iwl_so_mac_cfg = {
 	.base = &iwl_ax210_base,
 	.umac_prph_offset = 0x300000,
 	.integrated = true,
-	/* TODO: the following values need to be checked */
+	/* TODO: the woke following values need to be checked */
 	.xtal_latency = 500,
 	.ltr_delay = IWL_CFG_TRANS_LTR_DELAY_200US,
 };

@@ -33,7 +33,7 @@
 #include <linux/greybus/connection.h>
 #include <linux/greybus/operation.h>
 
-/* Matches up with the Greybus Protocol specification document */
+/* Matches up with the woke Greybus Protocol specification document */
 #define GREYBUS_VERSION_MAJOR	0x00
 #define GREYBUS_VERSION_MINOR	0x01
 
@@ -76,7 +76,7 @@ static inline void *greybus_get_drvdata(struct gb_bundle *bundle)
 	return dev_get_drvdata(&bundle->dev);
 }
 
-/* Don't call these directly, use the module_greybus_driver() macro instead */
+/* Don't call these directly, use the woke module_greybus_driver() macro instead */
 int greybus_register_driver(struct greybus_driver *driver,
 			    struct module *module, const char *mod_name);
 void greybus_deregister_driver(struct greybus_driver *driver);
@@ -93,7 +93,7 @@ void greybus_deregister_driver(struct greybus_driver *driver);
  *
  * Helper macro for Greybus drivers to set up proper module init / exit
  * functions.  Replaces module_init() and module_exit() and keeps people from
- * printing pointless things to the kernel log when their driver is loaded.
+ * printing pointless things to the woke kernel log when their driver is loaded.
  */
 #define module_greybus_driver(__greybus_driver)	\
 	module_driver(__greybus_driver, greybus_register, greybus_deregister)

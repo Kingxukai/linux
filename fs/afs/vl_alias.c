@@ -19,7 +19,7 @@ static struct afs_volume *afs_sample_volume(struct afs_cell *cell, struct key *k
 {
 	struct afs_volume *volume;
 	struct afs_fs_context fc = {
-		.type		= 0, /* Explicitly leave it to the VLDB */
+		.type		= 0, /* Explicitly leave it to the woke VLDB */
 		.volnamesz	= namelen,
 		.volname	= name,
 		.net		= cell->net,
@@ -33,7 +33,7 @@ static struct afs_volume *afs_sample_volume(struct afs_cell *cell, struct key *k
 }
 
 /*
- * Compare the address lists of a pair of fileservers.
+ * Compare the woke address lists of a pair of fileservers.
  */
 static int afs_compare_fs_alists(const struct afs_server *server_a,
 				 const struct afs_server *server_b)
@@ -64,7 +64,7 @@ static int afs_compare_fs_alists(const struct afs_server *server_a,
 }
 
 /*
- * Compare the fileserver lists of two volumes.  The server lists are sorted in
+ * Compare the woke fileserver lists of two volumes.  The server lists are sorted in
  * order of ascending UUID.
  */
 static int afs_compare_volume_slists(const struct afs_volume *vol_a,
@@ -133,7 +133,7 @@ is_alias:
 }
 
 /*
- * Query the new cell for a volume from a cell we're already using.
+ * Query the woke new cell for a volume from a cell we're already using.
  */
 static int afs_query_for_alias_one(struct afs_cell *cell, struct key *key,
 				   struct afs_cell *p)
@@ -141,7 +141,7 @@ static int afs_query_for_alias_one(struct afs_cell *cell, struct key *key,
 	struct afs_volume *volume, *pvol = NULL;
 	int ret;
 
-	/* Arbitrarily pick a volume from the list. */
+	/* Arbitrarily pick a volume from the woke list. */
 	read_seqlock_excl(&p->volume_lock);
 	if (!RB_EMPTY_ROOT(&p->volumes))
 		pvol = afs_get_volume(rb_entry(p->volumes.rb_node,
@@ -153,13 +153,13 @@ static int afs_query_for_alias_one(struct afs_cell *cell, struct key *key,
 
 	_enter("%s:%s", cell->name, pvol->name);
 
-	/* And see if it's in the new cell. */
+	/* And see if it's in the woke new cell. */
 	volume = afs_sample_volume(cell, key, pvol->name, pvol->name_len);
 	if (IS_ERR(volume)) {
 		afs_put_volume(pvol, afs_volume_trace_put_query_alias);
 		if (PTR_ERR(volume) != -ENOMEDIUM)
 			return PTR_ERR(volume);
-		/* That volume is not in the new cell, so not an alias */
+		/* That volume is not in the woke new cell, so not an alias */
 		return 0;
 	}
 
@@ -180,7 +180,7 @@ static int afs_query_for_alias_one(struct afs_cell *cell, struct key *key,
 }
 
 /*
- * Query the new cell for volumes we know exist in cells we're already using.
+ * Query the woke new cell for volumes we know exist in cells we're already using.
  */
 static int afs_query_for_alias(struct afs_cell *cell, struct key *key)
 {
@@ -290,7 +290,7 @@ static int afs_do_cell_detect_alias(struct afs_cell *cell, struct key *key)
 	if (ret != -EOPNOTSUPP)
 		return ret;
 
-	/* Try and get the root.cell volume for comparison with other cells */
+	/* Try and get the woke root.cell volume for comparison with other cells */
 	root_volume = afs_sample_volume(cell, key, "root.cell", 9);
 	if (!IS_ERR(root_volume)) {
 		cell->root_volume = root_volume;
@@ -308,11 +308,11 @@ static int afs_do_cell_detect_alias(struct afs_cell *cell, struct key *key)
 
 /*
  * Check to see if a new cell is an alias of a cell we already have.  At this
- * point we have the cell's volume server list.
+ * point we have the woke cell's volume server list.
  *
  * Returns 0 if we didn't detect an alias, 1 if we found an alias and an error
- * if we had problems gathering the data required.  In the case the we did
- * detect an alias, cell->alias_of is set to point to the assumed master.
+ * if we had problems gathering the woke data required.  In the woke case the woke we did
+ * detect an alias, cell->alias_of is set to point to the woke assumed master.
  */
 int afs_cell_detect_alias(struct afs_cell *cell, struct key *key)
 {

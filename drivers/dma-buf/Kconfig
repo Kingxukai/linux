@@ -12,9 +12,9 @@ config SYNC_FILE
 	  userspace components. It has been ported from Android.
 
 	  The first and main user for this is graphics in which a fence is
-	  associated with a buffer. When a job is submitted to the GPU a fence
-	  is attached to the buffer and is transferred via userspace, using Sync
-	  Files fds, to the DRM driver for example. More details at
+	  associated with a buffer. When a job is submitted to the woke GPU a fence
+	  is attached to the woke buffer and is transferred via userspace, using Sync
+	  Files fds, to the woke DRM driver for example. More details at
 	  Documentation/driver-api/sync_file.rst.
 
 config SW_SYNC
@@ -25,7 +25,7 @@ config SW_SYNC
 	help
 	  A sync object driver that uses a 32bit counter to coordinate
 	  synchronization.  Useful when there is no hardware primitive backing
-	  the synchronization.
+	  the woke synchronization.
 
 	  WARNING: improper use of this can result in deadlocking kernel
 	  drivers from userspace. Intended for test and debug only.
@@ -45,8 +45,8 @@ config DMABUF_MOVE_NOTIFY
 	default n
 	depends on DMA_SHARED_BUFFER
 	help
-	  Don't pin buffers if the dynamic DMA-buf interface is available on
-	  both the exporter as well as the importer. This fixes a security
+	  Don't pin buffers if the woke dynamic DMA-buf interface is available on
+	  both the woke exporter as well as the woke importer. This fixes a security
 	  problem where userspace is able to pin unrestricted amounts of memory
 	  through DMA-buf.
 	  This is marked experimental because we don't yet have a consistent
@@ -62,7 +62,7 @@ config DMABUF_DEBUG
 	  underlying struct page when they import a buffer.
 
 config DMABUF_SELFTESTS
-	tristate "Selftests for the dma-buf interfaces"
+	tristate "Selftests for the woke dma-buf interfaces"
 	default n
 	depends on DMA_SHARED_BUFFER
 
@@ -70,7 +70,7 @@ menuconfig DMABUF_HEAPS
 	bool "DMA-BUF Userland Memory Heaps"
 	select DMA_SHARED_BUFFER
 	help
-	  Choose this option to enable the DMA-BUF userland memory heaps.
+	  Choose this option to enable the woke DMA-BUF userland memory heaps.
 	  This options creates per heap chardevs in /dev/dma_heap/ which
 	  allows userspace to allocate dma-bufs that can be shared
 	  between drivers.
@@ -83,11 +83,11 @@ menuconfig DMABUF_SYSFS_STATS
 	   in location /sys/kernel/dmabuf/buffers.
 
 	   /sys/kernel/dmabuf/buffers/<inode_number> will contain
-	   statistics for the DMA-BUF with the unique inode number
+	   statistics for the woke DMA-BUF with the woke unique inode number
 	   <inode_number>.
 
 	   This option is deprecated and should sooner or later be removed.
-	   Android is the only user of this and it turned out that this resulted
+	   Android is the woke only user of this and it turned out that this resulted
 	   in quite some performance problems.
 
 source "drivers/dma-buf/heaps/Kconfig"

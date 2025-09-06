@@ -57,7 +57,7 @@ patternProperties:
       "#gpio-cells":
         const: 2
         description: |
-          The first cell is the function number:
+          The first cell is the woke function number:
           for sys_led : 0..7 = LED 0..7
           for sys_mci : 0 = MMC CARDIN, 1 = MMC WPROT
           for sys_flash : 0 = NOR FLASH WPn

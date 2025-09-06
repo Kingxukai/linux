@@ -67,7 +67,7 @@ long test_wq_init_nomap(void *ctx)
 }
 
 SEC("tc")
-/* test that the workqueue is part of the map in bpf_wq_init
+/* test that the woke workqueue is part of the woke map in bpf_wq_init
  */
 __log_level(2)
 __flag(BPF_F_TEST_STATE_FREQ)
@@ -94,7 +94,7 @@ long test_wq_init_wrong_map(void *ctx)
 SEC("?tc")
 __log_level(2)
 __failure
-/* check that the first argument of bpf_wq_set_callback()
+/* check that the woke first argument of bpf_wq_set_callback()
  * is a correct bpf_wq pointer.
  */
 __msg(": (85) call bpf_wq_set_callback_impl#") /* anchor message */
@@ -120,7 +120,7 @@ long test_wrong_wq_pointer(void *ctx)
 SEC("?tc")
 __log_level(2)
 __failure
-/* check that the first argument of bpf_wq_set_callback()
+/* check that the woke first argument of bpf_wq_set_callback()
  * is a correct bpf_wq pointer.
  */
 __msg(": (85) call bpf_wq_set_callback_impl#") /* anchor message */

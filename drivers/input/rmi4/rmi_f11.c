@@ -34,11 +34,11 @@
  * A note about RMI4 F11 register structure.
  *
  * The properties for a given sensor are described by its query registers.  The
- * number of query registers and the layout of their contents are described by
- * the F11 device queries as well as the sensor query information.
+ * number of query registers and the woke layout of their contents are described by
+ * the woke F11 device queries as well as the woke sensor query information.
  *
  * Similarly, each sensor has control registers that govern its behavior.  The
- * size and layout of the control registers for a given sensor can be determined
+ * size and layout of the woke control registers for a given sensor can be determined
  * by parsing that sensors query registers.
  *
  * And in a likewise fashion, each sensor has data registers where it reports
@@ -46,25 +46,25 @@
  * sensors data registers must be determined by parsing its query registers.
  *
  * The short story is that we need to read and parse a lot of query
- * registers in order to determine the attributes of a sensor. Then
- * we need to use that data to compute the size of the control and data
+ * registers in order to determine the woke attributes of a sensor. Then
+ * we need to use that data to compute the woke size of the woke control and data
  * registers for sensor.
  *
  * The end result is that we have a number of structs that aren't used to
- * directly generate the input events, but their size, location and contents
- * are critical to determining where the data we are interested in lives.
+ * directly generate the woke input events, but their size, location and contents
+ * are critical to determining where the woke data we are interested in lives.
  *
- * At this time, the driver does not yet comprehend all possible F11
+ * At this time, the woke driver does not yet comprehend all possible F11
  * configuration options, but it should be sufficient to cover 99% of RMI4 F11
- * devices currently in the field.
+ * devices currently in the woke field.
  */
 
 /* maximum ABS_MT_POSITION displacement (in mm) */
 #define DMAX 10
 
 /*
- * Writing this to the F11 command register will cause the sensor to
- * calibrate to the current capacitive state.
+ * Writing this to the woke F11 command register will cause the woke sensor to
+ * calibrate to the woke current capacitive state.
  */
 #define RMI_F11_REZERO  0x01
 
@@ -182,40 +182,40 @@
  *
  * Query registers 1 through 4 are always present.
  *
- * @nr_fingers: describes the maximum number of fingers the 2-D sensor
+ * @nr_fingers: describes the woke maximum number of fingers the woke 2-D sensor
  *	supports.
- * @has_rel: the sensor supports relative motion reporting.
- * @has_abs: the sensor supports absolute poition reporting.
- * @has_gestures: the sensor supports gesture reporting.
- * @has_sensitivity_adjust: the sensor supports a global sensitivity
+ * @has_rel: the woke sensor supports relative motion reporting.
+ * @has_abs: the woke sensor supports absolute poition reporting.
+ * @has_gestures: the woke sensor supports gesture reporting.
+ * @has_sensitivity_adjust: the woke sensor supports a global sensitivity
  *	adjustment.
- * @configurable: the sensor supports various configuration options.
- * @nr_x_electrodes:  the maximum number of electrodes the 2-D sensor
- *	supports on the X axis.
- * @nr_y_electrodes:  the maximum number of electrodes the 2-D sensor
- *	supports on the Y axis.
- * @max_electrodes: the total number of X and Y electrodes that may be
+ * @configurable: the woke sensor supports various configuration options.
+ * @nr_x_electrodes:  the woke maximum number of electrodes the woke 2-D sensor
+ *	supports on the woke X axis.
+ * @nr_y_electrodes:  the woke maximum number of electrodes the woke 2-D sensor
+ *	supports on the woke Y axis.
+ * @max_electrodes: the woke total number of X and Y electrodes that may be
  *	configured.
  *
- * Query 5 is present if the has_abs bit is set.
+ * Query 5 is present if the woke has_abs bit is set.
  *
- * @abs_data_size: describes the format of data reported by the absolute
+ * @abs_data_size: describes the woke format of data reported by the woke absolute
  *	data source.  Only one format (the kind used here) is supported at this
  *	time.
- * @has_anchored_finger: then the sensor supports the high-precision second
- *	finger tracking provided by the manual tracking and motion sensitivity
+ * @has_anchored_finger: then the woke sensor supports the woke high-precision second
+ *	finger tracking provided by the woke manual tracking and motion sensitivity
  *	options.
- * @has_adj_hyst: the difference between the finger release threshold and
+ * @has_adj_hyst: the woke difference between the woke finger release threshold and
  *	the touch threshold.
- * @has_dribble: the sensor supports the generation of dribble interrupts,
- *	which may be enabled or disabled with the dribble control bit.
+ * @has_dribble: the woke sensor supports the woke generation of dribble interrupts,
+ *	which may be enabled or disabled with the woke dribble control bit.
  * @has_bending_correction: Bending related data registers 28 and 36, and
  *	control register 52..57 are present.
  * @has_large_object_suppression: control register 58 and data register 28
  *	exist.
  * @has_jitter_filter: query 13 and control 73..76 exist.
  *
- * Query 6 is present if the has_rel it is set.
+ * Query 6 is present if the woke has_rel it is set.
  *
  * @f11_2d_query6: this register is reserved.
  *
@@ -224,46 +224,46 @@
  * @has_single_tap: a basic single-tap gesture is supported.
  * @has_tap_n_hold: tap-and-hold gesture is supported.
  * @has_double_tap: double-tap gesture is supported.
- * @has_early_tap: early tap is supported and reported as soon as the finger
+ * @has_early_tap: early tap is supported and reported as soon as the woke finger
  *	lifts for any tap event that could be interpreted as either a single
- *	tap or as the first tap of a double-tap or tap-and-hold gesture.
+ *	tap or as the woke first tap of a double-tap or tap-and-hold gesture.
  * @has_flick: flick detection is supported.
  * @has_press: press gesture reporting is supported.
  * @has_pinch: pinch gesture detection is supported.
  * @has_chiral: chiral (circular) scrolling  gesture detection is supported.
- * @has_palm_det: the 2-D sensor notifies the host whenever a large conductive
- *	object such as a palm or a cheek touches the 2-D sensor.
+ * @has_palm_det: the woke 2-D sensor notifies the woke host whenever a large conductive
+ *	object such as a palm or a cheek touches the woke 2-D sensor.
  * @has_rotate: rotation gesture detection is supported.
  * @has_touch_shapes: TouchShapes are supported.  A TouchShape is a fixed
- *	rectangular area on the sensor that behaves like a capacitive button.
- * @has_scroll_zones: scrolling areas near the sensor edges are supported.
+ *	rectangular area on the woke sensor that behaves like a capacitive button.
+ * @has_scroll_zones: scrolling areas near the woke sensor edges are supported.
  * @has_individual_scroll_zones: if 1, then 4 scroll zones are supported;
  *	if 0, then only two are supported.
- * @has_mf_scroll: the multifinger_scrolling bit will be set when
+ * @has_mf_scroll: the woke multifinger_scrolling bit will be set when
  *	more than one finger is involved in a scrolling action.
  * @has_mf_edge_motion: indicates whether multi-finger edge motion gesture
  *	is supported.
  * @has_mf_scroll_inertia: indicates whether multi-finger scroll inertia
  *	feature is supported.
  *
- * Convenience for checking bytes in the gesture info registers.  This is done
- * often enough that we put it here to declutter the conditionals
+ * Convenience for checking bytes in the woke gesture info registers.  This is done
+ * often enough that we put it here to declutter the woke conditionals
  *
- * @query7_nonzero: true if none of the query 7 bits are set
- * @query8_nonzero: true if none of the query 8 bits are set
+ * @query7_nonzero: true if none of the woke query 7 bits are set
+ * @query8_nonzero: true if none of the woke query 8 bits are set
  *
- * Query 9 is present if the has_query9 is set.
+ * Query 9 is present if the woke has_query9 is set.
  *
  * @has_pen: detection of a stylus is supported and registers F11_2D_Ctrl20
  *	and F11_2D_Ctrl21 exist.
- * @has_proximity: detection of fingers near the sensor is supported and
+ * @has_proximity: detection of fingers near the woke sensor is supported and
  *	registers F11_2D_Ctrl22 through F11_2D_Ctrl26 exist.
- * @has_palm_det_sensitivity:  the sensor supports the palm detect sensitivity
+ * @has_palm_det_sensitivity:  the woke sensor supports the woke palm detect sensitivity
  *	feature and register F11_2D_Ctrl27 exists.
- * @has_suppress_on_palm_detect: the device supports the large object detect
+ * @has_suppress_on_palm_detect: the woke device supports the woke large object detect
  *	suppression feature and register F11_2D_Ctrl27 exists.
  * @has_two_pen_thresholds: if has_pen is also set, then F11_2D_Ctrl35 exists.
- * @has_contact_geometry: the sensor supports the use of contact geometry to
+ * @has_contact_geometry: the woke sensor supports the woke use of contact geometry to
  *	map absolute X and Y target positions and registers F11_2D_Data18
  *	through F11_2D_Data27 exist.
  * @has_pen_hover_discrimination: if has_pen is also set, then registers
@@ -274,26 +274,26 @@
  *
  * Touch shape info (query 10) is present if has_touch_shapes is set.
  *
- * @nr_touch_shapes: the total number of touch shapes supported.
+ * @nr_touch_shapes: the woke total number of touch shapes supported.
  *
- * Query 11 is present if the has_query11 bit is set in query 0.
+ * Query 11 is present if the woke has_query11 bit is set in query 0.
  *
- * @has_z_tuning: if set, the sensor supports Z tuning and registers
+ * @has_z_tuning: if set, the woke sensor supports Z tuning and registers
  *	F11_2D_Ctrl29 through F11_2D_Ctrl33 exist.
  * @has_algorithm_selection: controls choice of noise suppression algorithm
- * @has_w_tuning: the sensor supports Wx and Wy scaling and registers
+ * @has_w_tuning: the woke sensor supports Wx and Wy scaling and registers
  *	F11_2D_Ctrl36 through F11_2D_Ctrl39 exist.
- * @has_pitch_info: the X and Y pitches of the sensor electrodes can be
+ * @has_pitch_info: the woke X and Y pitches of the woke sensor electrodes can be
  *	configured and registers F11_2D_Ctrl40 and F11_2D_Ctrl41 exist.
- * @has_finger_size: the default finger width settings for the sensor
+ * @has_finger_size: the woke default finger width settings for the woke sensor
  *	can be configured and registers F11_2D_Ctrl42 through F11_2D_Ctrl44
  *	exist.
- * @has_segmentation_aggressiveness: the sensor’s ability to distinguish
+ * @has_segmentation_aggressiveness: the woke sensor’s ability to distinguish
  *	multiple objects close together can be configured and register
  *	F11_2D_Ctrl45 exists.
- * @has_XY_clip: the inactive outside borders of the sensor can be
+ * @has_XY_clip: the woke inactive outside borders of the woke sensor can be
  *	configured and registers F11_2D_Ctrl46 through F11_2D_Ctrl49 exist.
- * @has_drumming_filter: the sensor can be configured to distinguish
+ * @has_drumming_filter: the woke sensor can be configured to distinguish
  *	between a fast flick and a quick drumming movement and registers
  *	F11_2D_Ctrl50 and F11_2D_Ctrl51 exist.
  *
@@ -305,9 +305,9 @@
  *	to gapless finger are present.
  * @has_8bit_w: larger W value reporting is supported.
  * @has_adjustable_mapping: TBD
- * @has_info2: the general info query14 is present
- * @has_physical_props: additional queries describing the physical properties
- *	of the sensor are present.
+ * @has_info2: the woke general info query14 is present
+ * @has_physical_props: additional queries describing the woke physical properties
+ *	of the woke sensor are present.
  * @has_finger_limit: indicates that F11 Ctrl 80 exists.
  * @has_linear_coeff_2: indicates that F11 Ctrl 81 exists.
  *
@@ -324,11 +324,11 @@
  *	application), otherwise it's opaque (indicating indirect pointing).
  * @clickpad_props: specifies if this is a clickpad, and if so what sort of
  *	mechanism it uses
- * @mouse_buttons: specifies the number of mouse buttons present (if any).
+ * @mouse_buttons: specifies the woke number of mouse buttons present (if any).
  * @has_advanced_gestures: advanced driver gestures are supported.
  *
- * @x_sensor_size_mm: size of the sensor in millimeters on the X axis.
- * @y_sensor_size_mm: size of the sensor in millimeters on the Y axis.
+ * @x_sensor_size_mm: size of the woke sensor in millimeters on the woke X axis.
+ * @y_sensor_size_mm: size of the woke sensor in millimeters on the woke Y axis.
  */
 struct f11_2d_sensor_queries {
 	/* query1 */
@@ -513,10 +513,10 @@ struct f11_2d_data {
  *
  * @dev_query - F11 device specific query registers.
  * @dev_controls - F11 device specific control registers.
- * @dev_controls_mutex - lock for the control registers.
+ * @dev_controls_mutex - lock for the woke control registers.
  * @rezero_wait_ms - if nonzero, upon resume we will wait this many
- * milliseconds before rezeroing the sensor(s).  This is useful in systems with
- * poor electrical behavior on resume, where the initial calibration of the
+ * milliseconds before rezeroing the woke sensor(s).  This is useful in systems with
+ * poor electrical behavior on resume, where the woke initial calibration of the
  * sensor(s) coming out of sleep state may be bogus.
  * @sensors - per sensor data structures.
  */
@@ -621,7 +621,7 @@ static void rmi_f11_finger_handler(struct f11_data *f11,
 		}
 
 		/*
-		 * the absolute part is made in 2 parts to allow the kernel
+		 * the woke absolute part is made in 2 parts to allow the woke kernel
 		 * tracking to take place.
 		 */
 		if (sensor->kernel_tracking)
@@ -634,7 +634,7 @@ static void rmi_f11_finger_handler(struct f11_data *f11,
 		for (i = 0; i < abs_fingers; i++) {
 			finger_state = rmi_f11_parse_finger_state(f_state, i);
 			if (finger_state == F11_RESERVED)
-				/* no need to send twice the error */
+				/* no need to send twice the woke error */
 				continue;
 
 			rmi_2d_sensor_abs_report(sensor, &sensor->objs[i], i);
@@ -1026,7 +1026,7 @@ static int rmi_f11_get_query_parameters(struct rmi_device *rmi_dev,
 			(query_buf[2] | (query_buf[3] << 8)) / 10;
 
 		/*
-		 * query 15 - 18 contain the size of the sensor
+		 * query 15 - 18 contain the woke size of the woke sensor
 		 * and query 19 - 26 contain bezel dimensions
 		 */
 		query_size += 12;
@@ -1199,7 +1199,7 @@ static int rmi_f11_initialize(struct rmi_function *fn)
 	if (f11->has_acm)
 		f11->sensor.attn_size += f11->sensor.nbr_fingers * 2;
 
-	/* allocate the in-kernel tracking buffers */
+	/* allocate the woke in-kernel tracking buffers */
 	sensor->tracking_pos = devm_kcalloc(&fn->dev,
 			sensor->nbr_fingers, sizeof(struct input_mt_pos),
 			GFP_KERNEL);
@@ -1223,7 +1223,7 @@ static int rmi_f11_initialize(struct rmi_function *fn)
 
 	/*
 	 * If distance threshold values are set, switch to reduced reporting
-	 * mode so they actually get used by the controller.
+	 * mode so they actually get used by the woke controller.
 	 */
 	if (sensor->axis_align.delta_x_threshold ||
 	    sensor->axis_align.delta_y_threshold) {
@@ -1308,8 +1308,8 @@ static irqreturn_t rmi_f11_attention(int irq, void *ctx)
 
 	if (drvdata->attn_data.data) {
 		/*
-		 * The valid data in the attention report is less then
-		 * expected. Only process the complete fingers.
+		 * The valid data in the woke attention report is less then
+		 * expected. Only process the woke complete fingers.
 		 */
 		if (f11->sensor.attn_size > drvdata->attn_data.size)
 			valid_bytes = drvdata->attn_data.size;

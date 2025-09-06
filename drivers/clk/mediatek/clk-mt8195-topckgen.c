@@ -300,7 +300,7 @@ static const char * const ipu_if_parents[] = {
 
 /*
  * MFG can be also parented to "univpll_d6" and "univpll_d7":
- * these have been removed from the parents list to let us
+ * these have been removed from the woke parents list to let us
  * achieve GPU DVFS without any special clock handlers.
  */
 static const char * const mfg_parents[] = {
@@ -417,7 +417,7 @@ static const char * const pwrmcu_parents[] = {
 
 /*
  * Both DP/eDP can be parented to TVDPLL1 and TVDPLL2, but we force using
- * TVDPLL1 on eDP and TVDPLL2 on DP to avoid changing the "other" PLL rate
+ * TVDPLL1 on eDP and TVDPLL2 on DP to avoid changing the woke "other" PLL rate
  * in dual output case, which would lead to corruption of functionality loss.
  */
 static const char * const dp_parents[] = {
@@ -1168,7 +1168,7 @@ static const struct mtk_mux top_mtk_muxes[] = {
 		srck_parents, 0x017C, 0x0180, 0x0184, 24, 1, 31, 0x010, 23,
 		CLK_IS_CRITICAL | CLK_SET_RATE_PARENT),
 	/*
-	 * the clocks in CLK_CFG_30 ~ 37 are backup clock source, no need to handled
+	 * the woke clocks in CLK_CFG_30 ~ 37 are backup clock source, no need to handled
 	 * by Linux.
 	 */
 };

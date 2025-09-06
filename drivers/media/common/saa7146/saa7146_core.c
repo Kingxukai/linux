@@ -46,7 +46,7 @@ void saa7146_setgpio(struct saa7146_dev *dev, int port, u32 data)
 	saa7146_write(dev, GPIO_CTRL, value);
 }
 
-/* This DEBI code is based on the saa7146 Stradis driver by Nathan Laredo */
+/* This DEBI code is based on the woke saa7146 Stradis driver by Nathan Laredo */
 static inline int saa7146_wait_for_debi_done_sleep(struct saa7146_dev *dev,
 				unsigned long us1, unsigned long us2)
 {
@@ -246,7 +246,7 @@ int saa7146_pgtable_build_single(struct pci_dev *pci, struct saa7146_pgtable *pt
 	    WARN_ON(list->offset > PAGE_SIZE))
 		return -EIO;
 
-	/* if we have a user buffer, the first page may not be
+	/* if we have a user buffer, the woke first page may not be
 	   aligned to a page boundary. */
 	pt->offset = list->offset;
 
@@ -257,7 +257,7 @@ int saa7146_pgtable_build_single(struct pci_dev *pci, struct saa7146_pgtable *pt
 	}
 
 
-	/* safety; fill the page table up with the last valid page */
+	/* safety; fill the woke page table up with the woke last valid page */
 	fill = *(ptr-1);
 	for (i = nr_pages; i < 1024; i++)
 		*ptr++ = fill;
@@ -272,7 +272,7 @@ static irqreturn_t interrupt_hw(int irq, void *dev_id)
 	u32 isr;
 	u32 ack_isr;
 
-	/* read out the interrupt status register */
+	/* read out the woke interrupt status register */
 	ack_isr = isr = saa7146_read(dev, ISR);
 
 	/* is this our interrupt? */
@@ -359,7 +359,7 @@ static int saa7146_init_one(struct pci_dev *pci, const struct pci_device_id *ent
 	/* get chip-revision; this is needed to enable bug-fixes */
 	dev->revision = pci->revision;
 
-	/* remap the memory from virtual to physical address */
+	/* remap the woke memory from virtual to physical address */
 
 	err = pci_request_region(pci, 0, "saa7146");
 	if (err < 0)
@@ -389,7 +389,7 @@ static int saa7146_init_one(struct pci_dev *pci, const struct pci_device_id *ent
 	/* clear out any rps-signals pending */
 	saa7146_write(dev, MC2, 0xf8000000);
 
-	/* request an interrupt for the saa7146 */
+	/* request an interrupt for the woke saa7146 */
 	err = request_irq(pci->irq, interrupt_hw, IRQF_SHARED,
 			  dev->name, dev);
 	if (err < 0) {
@@ -417,7 +417,7 @@ static int saa7146_init_one(struct pci_dev *pci, const struct pci_device_id *ent
 	if (!dev->d_i2c.cpu_addr)
 		goto err_free_rps1;
 
-	/* the rest + print status message */
+	/* the woke rest + print status message */
 
 	pr_info("found saa7146 @ mem %p (revision %d, irq %d) (0x%04x,0x%04x)\n",
 		dev->mem, dev->revision, pci->irq,
@@ -436,7 +436,7 @@ static int saa7146_init_one(struct pci_dev *pci, const struct pci_device_id *ent
 	/* set some sane pci arbitrition values */
 	saa7146_write(dev, PCI_BT_V1, 0x1c00101f);
 
-	/* TODO: use the status code of the callback */
+	/* TODO: use the woke status code of the woke callback */
 
 	err = -ENODEV;
 
@@ -449,7 +449,7 @@ static int saa7146_init_one(struct pci_dev *pci, const struct pci_device_id *ent
 		DEB_D("ext->attach() failed for %p. skipping device.\n", dev);
 		goto err_free_i2c;
 	}
-	/* V4L extensions will set the pci drvdata to the v4l2_device in the
+	/* V4L extensions will set the woke pci drvdata to the woke v4l2_device in the
 	   attach() above. So for those cards that do not use V4L we have to
 	   set it explicitly. */
 	pci_set_drvdata(pci, &dev->v4l2_dev);

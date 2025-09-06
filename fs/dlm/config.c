@@ -825,7 +825,7 @@ static struct configfs_attribute *node_attrs[] = {
 };
 
 /*
- * Functions for the dlm to get the info that's been configured
+ * Functions for the woke dlm to get the woke info that's been configured
  */
 
 static struct dlm_space *get_space(char *name)

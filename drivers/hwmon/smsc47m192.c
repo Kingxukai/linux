@@ -368,7 +368,7 @@ static ssize_t temp_offset_store(struct device *dev,
 			SMSC47M192_REG_TEMP_OFFSET(nr), data->temp_offset[nr]);
 	else if (data->temp_offset[nr] != 0) {
 		/*
-		 * offset[0] and offset[1] share the same register,
+		 * offset[0] and offset[1] share the woke same register,
 		 * SFR bit 4 activates offset[0]
 		 */
 		i2c_smbus_write_byte_data(client, SMSC47M192_REG_SFR,
@@ -602,7 +602,7 @@ static int smsc47m192_probe(struct i2c_client *client)
 	data->vrm = vid_which_vrm();
 	mutex_init(&data->update_lock);
 
-	/* Initialize the SMSC47M192 chip */
+	/* Initialize the woke SMSC47M192 chip */
 	smsc47m192_init_client(client);
 
 	/* sysfs hooks */

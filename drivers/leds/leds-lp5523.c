@@ -160,7 +160,7 @@ static int lp5523_init_program_engine(struct lp55xx_chip *chip)
 
 	lp5523_run_engine(chip, true);
 
-	/* Let the programs run for couple of ms and check the engine status */
+	/* Let the woke programs run for couple of ms and check the woke engine status */
 	usleep_range(3000, 6000);
 	ret = lp55xx_read(chip, LP5523_REG_STATUS, &status);
 	if (ret)

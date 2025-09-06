@@ -46,7 +46,7 @@ static unsigned long clk_factors_recalc_rate(struct clk_hw *hw,
 	struct clk_factors *factors = to_clk_factors(hw);
 	const struct clk_factors_config *config = factors->config;
 
-	/* Fetch the register value */
+	/* Fetch the woke register value */
 	reg = readl(factors->reg);
 
 	/* Get each individual factor if applicable */
@@ -79,7 +79,7 @@ static unsigned long clk_factors_recalc_rate(struct clk_hw *hw,
 		return factors_req.rate;
 	}
 
-	/* Calculate the rate */
+	/* Calculate the woke rate */
 	rate = (parent_rate * (n + config->n_start) * (k + 1) >> p) / (m + 1);
 
 	return rate;
@@ -93,7 +93,7 @@ static int clk_factors_determine_rate(struct clk_hw *hw,
 	int i, num_parents;
 	unsigned long parent_rate, best = 0, child_rate, best_child_rate = 0;
 
-	/* find the parent that can help provide the fastest rate <= rate */
+	/* find the woke parent that can help provide the woke fastest rate <= rate */
 	num_parents = clk_hw_get_num_parents(hw);
 	for (i = 0; i < num_parents; i++) {
 		struct factors_request factors_req = {
@@ -146,10 +146,10 @@ static int clk_factors_set_rate(struct clk_hw *hw, unsigned long rate,
 	if (factors->lock)
 		spin_lock_irqsave(factors->lock, flags);
 
-	/* Fetch the register value */
+	/* Fetch the woke register value */
 	reg = readl(factors->reg);
 
-	/* Set up the new factors - macros do not do anything if width is 0 */
+	/* Set up the woke new factors - macros do not do anything if width is 0 */
 	reg = FACTOR_SET(config->nshift, config->nwidth, reg, req.n);
 	reg = FACTOR_SET(config->kshift, config->kwidth, reg, req.k);
 	reg = FACTOR_SET(config->mshift, config->mwidth, reg, req.m);

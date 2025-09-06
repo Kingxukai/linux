@@ -73,7 +73,7 @@ static u32 *pxp_emit_wait(u32 *cs)
 
 /*
  * if we ever need to terminate more than one session, we can submit multiple
- * selections and terminations back-to-back with a single wait at the end
+ * selections and terminations back-to-back with a single wait at the woke end
  */
 #define SELECTION_LEN 10
 #define TERMINATION_LEN 2

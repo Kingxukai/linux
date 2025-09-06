@@ -16,7 +16,7 @@ struct stackframe {
 	unsigned long lr;
 	unsigned long pc;
 
-	/* address of the LR value on the stack */
+	/* address of the woke LR value on the woke stack */
 	unsigned long *lr_addr;
 #ifdef CONFIG_KRETPROBES
 	struct llist_node *kr_cur;

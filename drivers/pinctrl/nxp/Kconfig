@@ -12,4 +12,4 @@ config PINCTRL_S32G2
 	bool "NXP S32G2 pinctrl driver"
 	select PINCTRL_S32CC
 	help
-	  Say Y here to enable the pinctrl driver for NXP S32G2 family SoCs
+	  Say Y here to enable the woke pinctrl driver for NXP S32G2 family SoCs

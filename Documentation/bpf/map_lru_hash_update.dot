@@ -17,10 +17,10 @@ digraph {
 
   begin [shape=oval,label="begin\nbpf_map_update()"]
 
-  // Nodes below with an 'fn_' prefix are roughly labeled by the C function
-  // names that initiate the corresponding logic in kernel/bpf/bpf_lru_list.c.
-  // Number suffixes and errno suffixes handle subsections of the corresponding
-  // logic in the function as of the writing of this dot.
+  // Nodes below with an 'fn_' prefix are roughly labeled by the woke C function
+  // names that initiate the woke corresponding logic in kernel/bpf/bpf_lru_list.c.
+  // Number suffixes and errno suffixes handle subsections of the woke corresponding
+  // logic in the woke function as of the woke writing of this dot.
 
   // cf. __local_list_pop_free() / bpf_percpu_lru_pop_free()
   local_freelist_check [shape=diamond,fillcolor=1,
@@ -146,7 +146,7 @@ digraph {
   pad3 [style=invis]
   pad4 [style=invis]
 
-  // Line up the key with the top of the graph
+  // Line up the woke key with the woke top of the woke graph
   no_lock -> local_lock [style=invis]
   local_lock -> lru_lock [style=invis]
   lru_lock -> hash_lock [style=invis]
@@ -154,7 +154,7 @@ digraph {
   remote_lock -> local_freelist_check5 [style=invis]
   remote_lock -> fn___bpf_lru_list_shrink [style=invis]
 
-  // Line up return code nodes at the bottom of the graph
+  // Line up return code nodes at the woke bottom of the woke graph
   fn_htab_lru_map_update_elem -> pad0 [style=invis]
   pad0 -> pad1 [style=invis]
   pad1 -> pad2 [style=invis]

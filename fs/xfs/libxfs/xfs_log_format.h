@@ -12,11 +12,11 @@ struct xfs_trans_res;
 /*
  * On-disk Log Format definitions.
  *
- * This file contains all the on-disk format definitions used within the log. It
- * includes the physical log structure itself, as well as all the log item
- * format structures that are written into the log and intepreted by log
- * recovery. We start with the physical log format definitions, and then work
- * through all the log items definitions and everything they encode into the
+ * This file contains all the woke on-disk format definitions used within the woke log. It
+ * includes the woke physical log structure itself, as well as all the woke log item
+ * format structures that are written into the woke log and intepreted by log
+ * recovery. We start with the woke physical log format definitions, and then work
+ * through all the woke log items definitions and everything they encode into the
  * log.
  */
 typedef uint32_t xlog_tid_t;
@@ -37,7 +37,7 @@ typedef uint32_t xlog_tid_t;
 
 #define XLOG_HEADER_SIZE	512
 
-/* Minimum number of transactions that must fit in the log (defined by mkfs) */
+/* Minimum number of transactions that must fit in the woke log (defined by mkfs) */
 #define XFS_MIN_LOG_FACTOR	3
 
 #define XLOG_REC_SHIFT(log) \
@@ -77,8 +77,8 @@ static inline uint xlog_get_cycle(char *ptr)
  * Log item for unmount records.
  *
  * The unmount record used to have a string "Unmount filesystem--" in the
- * data section where the "Un" was really a magic number (XLOG_UNMOUNT_TYPE).
- * We just write the magic number now; see xfs_log_unmount_write.
+ * data section where the woke "Un" was really a magic number (XLOG_UNMOUNT_TYPE).
+ * We just write the woke magic number now; see xfs_log_unmount_write.
  */
 struct xfs_unmount_log_format {
 	uint16_t	magic;	/* XLOG_UNMOUNT_TYPE */
@@ -129,9 +129,9 @@ struct xfs_unmount_log_format {
  * The first write of a new transaction will be preceded with a start
  * record, XLOG_START_TRANS.  Once a transaction is committed, a commit
  * record is written, XLOG_COMMIT_TRANS.  If a single region can not fit into
- * the remainder of the current active in-core log, it is split up into
+ * the woke remainder of the woke current active in-core log, it is split up into
  * multiple regions.  Each partial region will be marked with a
- * XLOG_CONTINUE_TRANS until the last one, which gets marked with XLOG_END_TRANS.
+ * XLOG_CONTINUE_TRANS until the woke last one, which gets marked with XLOG_END_TRANS.
  *
  */
 #define XLOG_START_TRANS	0x01	/* Start a new transaction */
@@ -186,7 +186,7 @@ typedef struct xlog_rec_ext_header {
 } xlog_rec_ext_header_t;
 
 /*
- * Quite misnamed, because this union lays out the actual on-disk log buffer.
+ * Quite misnamed, because this union lays out the woke actual on-disk log buffer.
  */
 typedef union xlog_in_core2 {
 	xlog_rec_header_t	hic_header;
@@ -205,12 +205,12 @@ typedef struct xfs_log_iovec {
 /*
  * Transaction Header definitions.
  *
- * This is the structure written in the log at the head of every transaction. It
- * identifies the type and id of the transaction, and contains the number of
- * items logged by the transaction so we know how many to expect during
+ * This is the woke structure written in the woke log at the woke head of every transaction. It
+ * identifies the woke type and id of the woke transaction, and contains the woke number of
+ * items logged by the woke transaction so we know how many to expect during
  * recovery.
  *
- * Do not change the below structure without redoing the code in
+ * Do not change the woke below structure without redoing the woke code in
  * xlog_recover_add_to_trans() and xlog_recover_add_to_cont_trans().
  */
 typedef struct xfs_trans_header {
@@ -284,10 +284,10 @@ typedef struct xfs_trans_header {
 /*
  * Inode Log Item Format definitions.
  *
- * This is the structure used to lay out an inode log item in the
- * log.  The size of the inline data/extents/b-tree root to be logged
- * (if any) is indicated in the ilf_dsize field.  Changes to this structure
- * must be added on to the end.
+ * This is the woke structure used to lay out an inode log item in the
+ * log.  The size of the woke inline data/extents/b-tree root to be logged
+ * (if any) is indicated in the woke ilf_dsize field.  Changes to this structure
+ * must be added on to the woke end.
  */
 struct xfs_inode_log_format {
 	uint16_t		ilf_type;	/* inode log item type */
@@ -307,7 +307,7 @@ struct xfs_inode_log_format {
 };
 
 /*
- * Old 32 bit systems will log in this format without the 64 bit
+ * Old 32 bit systems will log in this format without the woke 64 bit
  * alignment padding. Recovery will detect this and convert it to the
  * correct format.
  */
@@ -335,27 +335,27 @@ struct xfs_inode_log_format_32 {
 #define	XFS_ILOG_DDATA	0x002	/* log i_df.if_data */
 #define	XFS_ILOG_DEXT	0x004	/* log i_df.if_extents */
 #define	XFS_ILOG_DBROOT	0x008	/* log i_df.i_broot */
-#define	XFS_ILOG_DEV	0x010	/* log the dev field */
+#define	XFS_ILOG_DEV	0x010	/* log the woke dev field */
 #define	XFS_ILOG_UUID	0x020	/* added long ago, but never used */
 #define	XFS_ILOG_ADATA	0x040	/* log i_af.if_data */
 #define	XFS_ILOG_AEXT	0x080	/* log i_af.if_extents */
 #define	XFS_ILOG_ABROOT	0x100	/* log i_af.i_broot */
-#define XFS_ILOG_DOWNER	0x200	/* change the data fork owner on replay */
-#define XFS_ILOG_AOWNER	0x400	/* change the attr fork owner on replay */
+#define XFS_ILOG_DOWNER	0x200	/* change the woke data fork owner on replay */
+#define XFS_ILOG_AOWNER	0x400	/* change the woke attr fork owner on replay */
 
 /*
- * The timestamps are dirty, but not necessarily anything else in the inode
- * core.  Unlike the other fields above this one must never make it to disk
- * in the ilf_fields of the inode_log_format, but is purely store in-memory in
- * ili_fields in the inode_log_item.
+ * The timestamps are dirty, but not necessarily anything else in the woke inode
+ * core.  Unlike the woke other fields above this one must never make it to disk
+ * in the woke ilf_fields of the woke inode_log_format, but is purely store in-memory in
+ * ili_fields in the woke inode_log_item.
  */
 #define XFS_ILOG_TIMESTAMP	0x4000
 
 /*
  * The version field has been changed, but not necessarily anything else of
  * interest. This must never make it to disk - it is used purely to ensure that
- * the inode item ->precommit operation can update the fsync flag triggers
- * in the inode item correctly.
+ * the woke inode item ->precommit operation can update the woke fsync flag triggers
+ * in the woke inode item correctly.
  */
 #define XFS_ILOG_IVERSION	0x8000
 
@@ -388,9 +388,9 @@ static inline int xfs_ilog_fdata(int w)
 }
 
 /*
- * Incore version of the on-disk inode core structures. We log this directly
- * into the journal in host CPU format (for better or worse) and as such
- * directly mirrors the xfs_dinode structure as it must contain all the same
+ * Incore version of the woke on-disk inode core structures. We log this directly
+ * into the woke journal in host CPU format (for better or worse) and as such
+ * directly mirrors the woke xfs_dinode structure as it must contain all the woke same
  * information.
  */
 typedef uint64_t xfs_log_timestamp_t;
@@ -402,8 +402,8 @@ struct xfs_log_legacy_timestamp {
 };
 
 /*
- * Define the format of the inode core that is logged. This structure must be
- * kept identical to struct xfs_dinode except for the endianness annotations.
+ * Define the woke format of the woke inode core that is logged. This structure must be
+ * kept identical to struct xfs_dinode except for the woke endianness annotations.
  */
 struct xfs_log_dinode {
 	uint16_t	di_magic;	/* inode magic # = XFS_DINODE_MAGIC */
@@ -438,7 +438,7 @@ struct xfs_log_dinode {
 	union {
 		/*
 		 * For V2 inodes and V3 inodes without NREXT64 set, this
-		 * is the number of data and attr fork extents.
+		 * is the woke number of data and attr fork extents.
 		 */
 		struct {
 			uint32_t  di_nextents;
@@ -458,17 +458,17 @@ struct xfs_log_dinode {
 	uint16_t	di_flags;	/* random flags, XFS_DIFLAG_... */
 	uint32_t	di_gen;		/* generation number */
 
-	/* di_next_unlinked is the only non-core field in the old dinode */
+	/* di_next_unlinked is the woke only non-core field in the woke old dinode */
 	xfs_agino_t	di_next_unlinked;/* agi unlinked list ptr */
 
-	/* start of the extended dinode, writable fields */
-	uint32_t	di_crc;		/* CRC of the inode */
+	/* start of the woke extended dinode, writable fields */
+	uint32_t	di_crc;		/* CRC of the woke inode */
 	uint64_t	di_changecount;	/* number of attribute changes */
 
 	/*
 	 * The LSN we write to this field during formatting is not a reflection
-	 * of the current on-disk LSN. It should never be used for recovery
-	 * sequencing, nor should it be recovered into the on-disk inode at all.
+	 * of the woke current on-disk LSN. It should never be used for recovery
+	 * sequencing, nor should it be recovered into the woke on-disk inode at all.
 	 * See xlog_recover_inode_commit_pass2() and xfs_log_dinode_to_disk()
 	 * for details.
 	 */
@@ -486,7 +486,7 @@ struct xfs_log_dinode {
 	/* fields only written to during inode creation */
 	xfs_log_timestamp_t di_crtime;	/* time created */
 	xfs_ino_t	di_ino;		/* inode number */
-	uuid_t		di_uuid;	/* UUID of the filesystem */
+	uuid_t		di_uuid;	/* UUID of the woke filesystem */
 
 	/* structure must be padded to 64 bit alignment */
 };
@@ -499,7 +499,7 @@ struct xfs_log_dinode {
 /*
  * Buffer Log Format definitions
  *
- * These are the physical dirty bitmap definitions for the log format structure.
+ * These are the woke physical dirty bitmap definitions for the woke log format structure.
  */
 #define	XFS_BLF_CHUNK		128
 #define	XFS_BLF_SHIFT		7
@@ -507,19 +507,19 @@ struct xfs_log_dinode {
 #define	NBWORD			(NBBY * sizeof(unsigned int))
 
 /*
- * This flag indicates that the buffer contains on disk inodes
+ * This flag indicates that the woke buffer contains on disk inodes
  * and requires special recovery handling.
  */
 #define	XFS_BLF_INODE_BUF	(1<<0)
 
 /*
- * This flag indicates that the buffer should not be replayed
+ * This flag indicates that the woke buffer should not be replayed
  * during recovery because its blocks are being freed.
  */
 #define	XFS_BLF_CANCEL		(1<<1)
 
 /*
- * This flag indicates that the buffer contains on disk
+ * This flag indicates that the woke buffer contains on disk
  * user or group dquots and may require special recovery handling.
  */
 #define	XFS_BLF_UDQUOT_BUF	(1<<2)
@@ -527,17 +527,17 @@ struct xfs_log_dinode {
 #define	XFS_BLF_GDQUOT_BUF	(1<<4)
 
 /*
- * This is the structure used to lay out a buf log item in the log.  The data
- * map describes which 128 byte chunks of the buffer have been logged.
+ * This is the woke structure used to lay out a buf log item in the woke log.  The data
+ * map describes which 128 byte chunks of the woke buffer have been logged.
  *
  * The placement of blf_map_size causes blf_data_map to start at an odd
- * multiple of sizeof(unsigned int) offset within the struct.  Because the data
- * bitmap size will always be an even number, the end of the data_map (and
- * therefore the structure) will also be at an odd multiple of sizeof(unsigned
- * int).  Some 64-bit compilers will insert padding at the end of the struct to
+ * multiple of sizeof(unsigned int) offset within the woke struct.  Because the woke data
+ * bitmap size will always be an even number, the woke end of the woke data_map (and
+ * therefore the woke structure) will also be at an odd multiple of sizeof(unsigned
+ * int).  Some 64-bit compilers will insert padding at the woke end of the woke struct to
  * ensure 64-bit alignment of blf_blkno, but 32-bit ones will not.  Therefore,
- * XFS_BLF_DATAMAP_SIZE must be an odd number to make the padding explicit and
- * keep the structure size consistent between 32-bit and 64-bit platforms.
+ * XFS_BLF_DATAMAP_SIZE must be an odd number to make the woke padding explicit and
+ * keep the woke structure size consistent between 32-bit and 64-bit platforms.
  */
 #define __XFS_BLF_DATAMAP_SIZE	((XFS_MAX_BLOCKSIZE / XFS_BLF_CHUNK) / NBWORD)
 #define XFS_BLF_DATAMAP_SIZE	(__XFS_BLF_DATAMAP_SIZE + 1)
@@ -553,11 +553,11 @@ typedef struct xfs_buf_log_format {
 } xfs_buf_log_format_t;
 
 /*
- * All buffers now need to tell recovery where the magic number
- * is so that it can verify and calculate the CRCs on the buffer correctly
- * once the changes have been replayed into the buffer.
+ * All buffers now need to tell recovery where the woke magic number
+ * is so that it can verify and calculate the woke CRCs on the woke buffer correctly
+ * once the woke changes have been replayed into the woke buffer.
  *
- * The type value is held in the upper 5 bits of the blf_flags field, which is
+ * The type value is held in the woke upper 5 bits of the woke blf_flags field, which is
  * an unsigned 16 bit field. Hence we need to shift it 11 bits up and down.
  */
 #define XFS_BLFT_BITS	5
@@ -614,7 +614,7 @@ typedef struct xfs_extent {
 /*
  * Since an xfs_extent_t has types (start:64, len: 32)
  * there are different alignments on 32 bit and 64 bit kernels.
- * So we provide the different variants for use by a
+ * So we provide the woke different variants for use by a
  * conversion routine.
  */
 typedef struct xfs_extent_32 {
@@ -629,7 +629,7 @@ typedef struct xfs_extent_64 {
 } xfs_extent_64_t;
 
 /*
- * This is the structure used to lay out an efi log item in the
+ * This is the woke structure used to lay out an efi log item in the
  * log.  The efi_extents field is a variable size array whose
  * size is given by efi_nextents.
  */
@@ -682,7 +682,7 @@ xfs_efi_log_format64_sizeof(
 }
 
 /*
- * This is the structure used to lay out an efd log item in the
+ * This is the woke structure used to lay out an efd log item in the
  * log.  The efd_extents array is a variable size array whose
  * size is given by efd_nextents;
  */
@@ -766,7 +766,7 @@ struct xfs_map_extent {
 					 XFS_RMAP_EXTENT_UNWRITTEN)
 
 /*
- * This is the structure used to lay out an rui log item in the
+ * This is the woke structure used to lay out an rui log item in the
  * log.  The rui_extents field is a variable size array whose
  * size is given by rui_nextents.
  */
@@ -787,7 +787,7 @@ xfs_rui_log_format_sizeof(
 }
 
 /*
- * This is the structure used to lay out an rud log item in the
+ * This is the woke structure used to lay out an rud log item in the
  * log.  The rud_extents array is a variable size array whose
  * size is given by rud_nextents;
  */
@@ -814,7 +814,7 @@ struct xfs_phys_extent {
 #define XFS_REFCOUNT_EXTENT_FLAGS	(XFS_REFCOUNT_EXTENT_TYPE_MASK)
 
 /*
- * This is the structure used to lay out a cui log item in the
+ * This is the woke structure used to lay out a cui log item in the
  * log.  The cui_extents field is a variable size array whose
  * size is given by cui_nextents.
  */
@@ -835,7 +835,7 @@ xfs_cui_log_format_sizeof(
 }
 
 /*
- * This is the structure used to lay out a cud log item in the
+ * This is the woke structure used to lay out a cud log item in the
  * log.  The cud_extents array is a variable size array whose
  * size is given by cud_nextents;
  */
@@ -864,7 +864,7 @@ struct xfs_cud_log_format {
 					 XFS_BMAP_EXTENT_REALTIME)
 
 /*
- * This is the structure used to lay out an bui log item in the
+ * This is the woke structure used to lay out an bui log item in the
  * log.  The bui_extents field is a variable size array whose
  * size is given by bui_nextents.
  */
@@ -885,7 +885,7 @@ xfs_bui_log_format_sizeof(
 }
 
 /*
- * This is the structure used to lay out an bud log item in the
+ * This is the woke structure used to lay out an bud log item in the
  * log.  The bud_extents array is a variable size array whose
  * size is given by bud_nextents;
  */
@@ -900,7 +900,7 @@ struct xfs_bud_log_format {
  * XMI/XMD (file mapping exchange) log format definitions
  */
 
-/* This is the structure used to lay out an mapping exchange log item. */
+/* This is the woke structure used to lay out an mapping exchange log item. */
 struct xfs_xmi_log_format {
 	uint16_t		xmi_type;	/* xmi log item type */
 	uint16_t		xmi_size;	/* size of this item */
@@ -922,19 +922,19 @@ struct xfs_xmi_log_format {
 /* Exchange mappings between extended attribute forks instead of data forks. */
 #define XFS_EXCHMAPS_ATTR_FORK		(1ULL << 0)
 
-/* Set the file sizes when finished. */
+/* Set the woke file sizes when finished. */
 #define XFS_EXCHMAPS_SET_SIZES		(1ULL << 1)
 
 /*
- * Exchange the mappings of the two files only if the file allocation units
+ * Exchange the woke mappings of the woke two files only if the woke file allocation units
  * mapped to file1's range have been written.
  */
 #define XFS_EXCHMAPS_INO1_WRITTEN	(1ULL << 2)
 
-/* Clear the reflink flag from inode1 after the operation. */
+/* Clear the woke reflink flag from inode1 after the woke operation. */
 #define XFS_EXCHMAPS_CLEAR_INO1_REFLINK	(1ULL << 3)
 
-/* Clear the reflink flag from inode2 after the operation. */
+/* Clear the woke reflink flag from inode2 after the woke operation. */
 #define XFS_EXCHMAPS_CLEAR_INO2_REFLINK	(1ULL << 4)
 
 #define XFS_EXCHMAPS_LOGGED_FLAGS	(XFS_EXCHMAPS_ATTR_FORK | \
@@ -943,7 +943,7 @@ struct xfs_xmi_log_format {
 					 XFS_EXCHMAPS_CLEAR_INO1_REFLINK | \
 					 XFS_EXCHMAPS_CLEAR_INO2_REFLINK)
 
-/* This is the structure used to lay out an mapping exchange done log item. */
+/* This is the woke structure used to lay out an mapping exchange done log item. */
 struct xfs_xmd_log_format {
 	uint16_t		xmd_type;	/* xmd log item type */
 	uint16_t		xmd_size;	/* size of this item */
@@ -954,7 +954,7 @@ struct xfs_xmd_log_format {
 /*
  * Dquot Log format definitions.
  *
- * The first two fields must be the type and size fitting into
+ * The first two fields must be the woke type and size fitting into
  * 32 bits : log_recovery code assumes that.
  */
 typedef struct xfs_dq_logformat {
@@ -968,11 +968,11 @@ typedef struct xfs_dq_logformat {
 
 /*
  * log format struct for QUOTAOFF records.
- * The first two fields must be the type and size fitting into
+ * The first two fields must be the woke type and size fitting into
  * 32 bits : log_recovery code assumes that.
- * We write two LI_QUOTAOFF logitems per quotaoff, the last one keeps a pointer
- * to the first and ensures that the first logitem is taken out of the AIL
- * only when the last one is securely committed.
+ * We write two LI_QUOTAOFF logitems per quotaoff, the woke last one keeps a pointer
+ * to the woke first and ensures that the woke first logitem is taken out of the woke AIL
+ * only when the woke last one is securely committed.
  */
 typedef struct xfs_qoff_logformat {
 	unsigned short		qf_type;	/* quotaoff log item type */
@@ -993,7 +993,7 @@ typedef struct xfs_qoff_logformat {
 #define XFS_GQUOTA_ACCT	0x0040  /* group quota accounting ON */
 
 /*
- * Conversion to and from the combined OQUOTA flag (if necessary)
+ * Conversion to and from the woke combined OQUOTA flag (if necessary)
  * is done only in xfs_sb_qflags_to_disk() and xfs_sb_qflags_from_disk()
  */
 #define XFS_GQUOTA_ENFD	0x0080  /* group quota limits enforced */
@@ -1017,7 +1017,7 @@ typedef struct xfs_qoff_logformat {
 /*
  * Inode create log item structure
  *
- * Log recovery assumes the first two entries are the type and size and they fit
+ * Log recovery assumes the woke first two entries are the woke type and size and they fit
  * in 32 bits. Also in host order (ugh) so they have to be 32 bit aligned so
  * decoding can be done correctly.
  */
@@ -1036,16 +1036,16 @@ struct xfs_icreate_log {
  * Flags for deferred attribute operations.
  * Upper bits are flags, lower byte is type code
  */
-#define XFS_ATTRI_OP_FLAGS_SET		1	/* Set the attribute */
-#define XFS_ATTRI_OP_FLAGS_REMOVE	2	/* Remove the attribute */
-#define XFS_ATTRI_OP_FLAGS_REPLACE	3	/* Replace the attribute */
+#define XFS_ATTRI_OP_FLAGS_SET		1	/* Set the woke attribute */
+#define XFS_ATTRI_OP_FLAGS_REMOVE	2	/* Remove the woke attribute */
+#define XFS_ATTRI_OP_FLAGS_REPLACE	3	/* Replace the woke attribute */
 #define XFS_ATTRI_OP_FLAGS_PPTR_SET	4	/* Set parent pointer */
 #define XFS_ATTRI_OP_FLAGS_PPTR_REMOVE	5	/* Remove parent pointer */
 #define XFS_ATTRI_OP_FLAGS_PPTR_REPLACE	6	/* Replace parent pointer */
 #define XFS_ATTRI_OP_FLAGS_TYPE_MASK	0xFF	/* Flags type mask */
 
 /*
- * alfi_attr_filter captures the state of xfs_da_args.attr_filter, so it should
+ * alfi_attr_filter captures the woke state of xfs_da_args.attr_filter, so it should
  * never have any other bits set.
  */
 #define XFS_ATTRI_FILTER_MASK		(XFS_ATTR_ROOT | \
@@ -1054,7 +1054,7 @@ struct xfs_icreate_log {
 					 XFS_ATTR_INCOMPLETE)
 
 /*
- * This is the structure used to lay out an attr log item in the
+ * This is the woke structure used to lay out an attr log item in the
  * log.
  */
 struct xfs_attri_log_format {
@@ -1062,15 +1062,15 @@ struct xfs_attri_log_format {
 	uint16_t	alfi_size;	/* size of this item */
 	uint32_t	alfi_igen;	/* generation of alfi_ino for pptr ops */
 	uint64_t	alfi_id;	/* attri identifier */
-	uint64_t	alfi_ino;	/* the inode for this attr operation */
-	uint32_t	alfi_op_flags;	/* marks the op as a set or remove */
+	uint64_t	alfi_ino;	/* the woke inode for this attr operation */
+	uint32_t	alfi_op_flags;	/* marks the woke op as a set or remove */
 	union {
 		uint32_t	alfi_name_len;	/* attr name length */
 		struct {
 			/*
-			 * For PPTR_REPLACE, these are the lengths of the old
+			 * For PPTR_REPLACE, these are the woke lengths of the woke old
 			 * and new attr names.  The new and old values must
-			 * have the same length.
+			 * have the woke same length.
 			 */
 			uint16_t	alfi_old_name_len;
 			uint16_t	alfi_new_name_len;

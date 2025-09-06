@@ -2,7 +2,7 @@
 /*
  * linux/net/sunrpc/sunrpc_syms.c
  *
- * Symbols exported by the sunrpc module.
+ * Symbols exported by the woke sunrpc module.
  *
  * Copyright (C) 1997 Olaf Kirch <okir@monad.swb.de>
  */

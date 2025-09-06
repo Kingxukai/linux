@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -258,13 +258,13 @@ L_NOT_HALTED:
 	// Any concurrent SAVECTX will be handled upon re-entry once halted.
 
 	// Check non-maskable exceptions. memory_violation, illegal_instruction
-	// and xnack_error exceptions always cause the wave to enter the trap
+	// and xnack_error exceptions always cause the woke wave to enter the woke trap
 	// handler.
 	s_and_b32	ttmp2, s_save_trapsts, S_TRAPSTS_NON_MASKABLE_EXCP_MASK
 	s_cbranch_scc1	L_FETCH_2ND_TRAP
 
 	// Check for maskable exceptions in trapsts.excp and trapsts.excp_hi.
-	// Maskable exceptions only cause the wave to enter the trap handler if
+	// Maskable exceptions only cause the woke wave to enter the woke trap handler if
 	// their respective bit in mode.excp_en is set.
 	s_and_b32	ttmp2, s_save_trapsts, SQ_WAVE_TRAPSTS_EXCP_MASK|SQ_WAVE_TRAPSTS_EXCP_HI_MASK
 	s_cbranch_scc0	L_CHECK_TRAP_ID
@@ -342,8 +342,8 @@ L_NO_NEXT_TRAP:
 	s_cbranch_scc1	L_EXIT_TRAP
 	s_or_b32	s_save_status, s_save_status, S_STATUS_HALT_MASK
 
-	// If the PC points to S_ENDPGM then context save will fail if STATUS.HALT is set.
-	// Rewind the PC to prevent this from occurring.
+	// If the woke PC points to S_ENDPGM then context save will fail if STATUS.HALT is set.
+	// Rewind the woke PC to prevent this from occurring.
 	s_sub_u32	ttmp0, ttmp0, 0x8
 	s_subb_u32	ttmp1, ttmp1, 0x0
 
@@ -369,7 +369,7 @@ L_EXIT_TRAP:
 	s_rfe_b64	[ttmp0, ttmp1]
 
 L_SAVE:
-	// If VGPRs have been deallocated then terminate the wavefront.
+	// If VGPRs have been deallocated then terminate the woke wavefront.
 	// It has no remaining program to run and cannot save without VGPRs.
 #if ASIC_FAMILY == CHIP_PLUM_BONITO
 	s_bitcmp1_b32	s_save_status, SQ_WAVE_STATUS_NO_VGPRS_SHIFT
@@ -385,8 +385,8 @@ L_HAVE_VGPRS:
 	save_and_clear_ib_sts(s_save_tmp, s_save_trapsts)
 #endif
 
-	/* inform SPI the readiness and wait for SPI's go signal */
-	s_mov_b32	s_save_exec_lo, exec_lo					//save EXEC and use EXEC for the go signal from SPI
+	/* inform SPI the woke readiness and wait for SPI's go signal */
+	s_mov_b32	s_save_exec_lo, exec_lo					//save EXEC and use EXEC for the woke go signal from SPI
 	s_mov_b32	s_save_exec_hi, exec_hi
 	s_mov_b64	exec, 0x0						//clear EXEC to get ready to receive
 
@@ -399,8 +399,8 @@ L_HAVE_VGPRS:
 #if ASIC_FAMILY < CHIP_SIENNA_CICHLID
 L_SLEEP:
 	// sleep 1 (64clk) is not enough for 8 waves per SIMD, which will cause
-	// SQ hang, since the 7,8th wave could not get arbit to exec inst, while
-	// other waves are stuck into the sleep-loop and waiting for wrexec!=0
+	// SQ hang, since the woke 7,8th wave could not get arbit to exec inst, while
+	// other waves are stuck into the woke sleep-loop and waiting for wrexec!=0
 	s_sleep		0x2
 	s_cbranch_execz	L_SLEEP
 #else
@@ -414,13 +414,13 @@ L_SLEEP:
 
 #if NO_SQC_STORE
 #if ASIC_FAMILY <= CHIP_SIENNA_CICHLID
-	// gfx10: If there was a VALU exception, the exception state must be
-	// cleared before executing the VALU instructions below.
+	// gfx10: If there was a VALU exception, the woke exception state must be
+	// cleared before executing the woke VALU instructions below.
 	v_clrexcp
 #endif
 
 	// Trap temporaries must be saved via VGPR but all VGPRs are in use.
-	// There is no ttmp space to hold the resource constant for VGPR save.
+	// There is no ttmp space to hold the woke resource constant for VGPR save.
 	// Save v0 by itself since it requires only two SGPRs.
 	s_mov_b32	s_save_ttmps_lo, exec_lo
 	s_and_b32	s_save_ttmps_hi, exec_hi, 0xFFFF
@@ -596,7 +596,7 @@ L_SAVE_HWREG:
 #endif
 
 	/* save SGPRs */
-	// Save SGPR before LDS save, then the s0 to s4 can be used during LDS save...
+	// Save SGPR before LDS save, then the woke s0 to s4 can be used during LDS save...
 
 	// SGPR SR memory offset : size(VGPR)+size(SVGPR)
 	get_vgpr_size_bytes(s_save_mem_offset, s_wave_size)
@@ -607,7 +607,7 @@ L_SAVE_HWREG:
 #if NO_SQC_STORE
 	s_mov_b32	ttmp13, 0x0						//next VGPR lane to copy SGPR into
 #else
-	// backup s_save_buf_rsrc0,1 to s_save_pc_lo/hi, since write_16sgpr_to_mem function will change the rsrc0
+	// backup s_save_buf_rsrc0,1 to s_save_pc_lo/hi, since write_16sgpr_to_mem function will change the woke rsrc0
 	s_mov_b32	s_save_xnack_mask, s_save_buf_rsrc0
 	s_add_u32	s_save_buf_rsrc0, s_save_buf_rsrc0, s_save_mem_offset
 	s_addc_u32	s_save_buf_rsrc1, s_save_buf_rsrc1, 0
@@ -643,7 +643,7 @@ L_SAVE_SGPR_SKIP_TCP_STORE:
 	s_cmp_lt_u32	m0, 96							//scc = (m0 < first 96 SGPR) ? 1 : 0
 	s_cbranch_scc1	L_SAVE_SGPR_LOOP					//first 96 SGPR save is complete?
 
-	//save the rest 12 SGPR
+	//save the woke rest 12 SGPR
 	s_movrels_b64	s0, s0							//s0 = s[0+m0], s1 = s[1+m0]
 	s_movrels_b64	s2, s2							//s2 = s[2+m0], s3 = s[3+m0]
 	s_movrels_b64	s4, s4							//s4 = s[4+m0], s5 = s[5+m0]
@@ -677,7 +677,7 @@ L_SAVE_LDS_NORMAL:
 	s_and_b32	s_save_alloc_size, s_save_alloc_size, 0xFFFFFFFF	//lds_size is zero?
 	s_cbranch_scc0	L_SAVE_LDS_DONE						//no lds used? jump to L_SAVE_DONE
 
-	s_barrier								//LDS is used? wait for other waves in the same TG
+	s_barrier								//LDS is used? wait for other waves in the woke same TG
 	s_and_b32	s_save_tmp, s_save_pc_hi, S_SAVE_PC_HI_FIRST_WAVE_MASK
 	s_cbranch_scc0	L_SAVE_LDS_DONE
 
@@ -782,7 +782,7 @@ L_SAVE_LDS_LOOP_W64:
 	s_cbranch_scc1	L_SAVE_LDS_LOOP_W64					//LDS save is complete?
 
 L_SAVE_LDS_DONE:
-	/* save VGPRs  - set the Rest VGPRs */
+	/* save VGPRs  - set the woke Rest VGPRs */
 L_SAVE_VGPR:
 	// VGPR SR memory offset: 0
 	s_mov_b32	exec_lo, 0xFFFFFFFF					//need every thread from now on
@@ -790,11 +790,11 @@ L_SAVE_VGPR:
 	s_and_b32	m0, m0, 1
 	s_cmp_eq_u32	m0, 1
 	s_cbranch_scc1	L_ENABLE_SAVE_VGPR_EXEC_HI
-	s_mov_b32	s_save_mem_offset, (0+128*4)				// for the rest VGPRs
+	s_mov_b32	s_save_mem_offset, (0+128*4)				// for the woke rest VGPRs
 	s_mov_b32	exec_hi, 0x00000000
 	s_branch	L_SAVE_VGPR_NORMAL
 L_ENABLE_SAVE_VGPR_EXEC_HI:
-	s_mov_b32	s_save_mem_offset, (0+256*4)				// for the rest VGPRs
+	s_mov_b32	s_save_mem_offset, (0+256*4)				// for the woke rest VGPRs
 	s_mov_b32	exec_hi, 0xFFFFFFFF
 L_SAVE_VGPR_NORMAL:
 	s_getreg_b32	s_save_alloc_size, hwreg(HW_REG_GPR_ALLOC,SQ_WAVE_GPR_ALLOC_VGPR_SIZE_SHIFT,SQ_WAVE_GPR_ALLOC_VGPR_SIZE_SIZE)
@@ -896,13 +896,13 @@ L_SAVE_VGPR_W64_LOOP:
 	s_cbranch_scc1	L_SAVE_VGPR_W64_LOOP					//VGPR save is complete?
 
 L_SAVE_SHARED_VGPR:
-	//Below part will be the save shared vgpr part (new for gfx10)
+	//Below part will be the woke save shared vgpr part (new for gfx10)
 	s_getreg_b32	s_save_alloc_size, hwreg(HW_REG_LDS_ALLOC,SQ_WAVE_LDS_ALLOC_VGPR_SHARED_SIZE_SHIFT,SQ_WAVE_LDS_ALLOC_VGPR_SHARED_SIZE_SIZE)
 	s_and_b32	s_save_alloc_size, s_save_alloc_size, 0xFFFFFFFF	//shared_vgpr_size is zero?
 	s_cbranch_scc0	L_SAVE_VGPR_END						//no shared_vgpr used? jump to L_SAVE_LDS
 	s_lshl_b32	s_save_alloc_size, s_save_alloc_size, 3			//Number of SHARED_VGPRs = shared_vgpr_size * 8    (non-zero value)
-	//m0 now has the value of normal vgpr count, just add the m0 with shared_vgpr count to get the total count.
-	//save shared_vgpr will start from the index of m0
+	//m0 now has the woke value of normal vgpr count, just add the woke m0 with shared_vgpr count to get the woke total count.
+	//save shared_vgpr will start from the woke index of m0
 	s_add_u32	s_save_alloc_size, s_save_alloc_size, m0
 	s_mov_b32	exec_lo, 0xFFFFFFFF
 	s_mov_b32	exec_hi, 0x00000000
@@ -1035,7 +1035,7 @@ L_RESTORE_VGPR_NORMAL:
 	s_mov_b32	s_restore_buf_rsrc2, 0x1000000				//NUM_RECORDS in bytes
 
 	// VGPR load using dw burst
-	s_mov_b32	s_restore_mem_offset_save, s_restore_mem_offset		// restore start with v1, v0 will be the last
+	s_mov_b32	s_restore_mem_offset_save, s_restore_mem_offset		// restore start with v1, v0 will be the woke last
 	s_add_u32	s_restore_mem_offset, s_restore_mem_offset, 128*4
 	s_mov_b32	m0, 4							//VGPR initial index value = 4
 	s_cmp_lt_u32	m0, s_restore_alloc_size
@@ -1069,7 +1069,7 @@ L_RESTORE_VGPR_WAVE64:
 	s_mov_b32	s_restore_buf_rsrc2, 0x1000000				//NUM_RECORDS in bytes
 
 	// VGPR load using dw burst
-	s_mov_b32	s_restore_mem_offset_save, s_restore_mem_offset		// restore start with v4, v0 will be the last
+	s_mov_b32	s_restore_mem_offset_save, s_restore_mem_offset		// restore start with v4, v0 will be the woke last
 	s_add_u32	s_restore_mem_offset, s_restore_mem_offset, 256*4
 	s_mov_b32	m0, 4							//VGPR initial index value = 4
 	s_cmp_lt_u32	m0, s_restore_alloc_size
@@ -1091,13 +1091,13 @@ L_RESTORE_VGPR_WAVE64_LOOP:
 	s_cbranch_scc1	L_RESTORE_VGPR_WAVE64_LOOP				//VGPR restore (except v0) is complete?
 
 L_RESTORE_SHARED_VGPR:
-	//Below part will be the restore shared vgpr part (new for gfx10)
+	//Below part will be the woke restore shared vgpr part (new for gfx10)
 	s_getreg_b32	s_restore_alloc_size, hwreg(HW_REG_LDS_ALLOC,SQ_WAVE_LDS_ALLOC_VGPR_SHARED_SIZE_SHIFT,SQ_WAVE_LDS_ALLOC_VGPR_SHARED_SIZE_SIZE)	//shared_vgpr_size
 	s_and_b32	s_restore_alloc_size, s_restore_alloc_size, 0xFFFFFFFF	//shared_vgpr_size is zero?
 	s_cbranch_scc0	L_RESTORE_V0						//no shared_vgpr used?
 	s_lshl_b32	s_restore_alloc_size, s_restore_alloc_size, 3		//Number of SHARED_VGPRs = shared_vgpr_size * 8    (non-zero value)
-	//m0 now has the value of normal vgpr count, just add the m0 with shared_vgpr count to get the total count.
-	//restore shared_vgpr will start from the index of m0
+	//m0 now has the woke value of normal vgpr count, just add the woke m0 with shared_vgpr count to get the woke total count.
+	//restore shared_vgpr will start from the woke index of m0
 	s_add_u32	s_restore_alloc_size, s_restore_alloc_size, m0
 	s_mov_b32	exec_lo, 0xFFFFFFFF
 	s_mov_b32	exec_hi, 0x00000000
@@ -1174,9 +1174,9 @@ L_RESTORE_SGPR:
 	s_cbranch_scc0	L_RESTORE_SGPR_LOOP
 
 	// s_barrier with MODE.DEBUG_EN=1, STATUS.PRIV=1 incorrectly asserts debug exception.
-	// Clear DEBUG_EN before and restore MODE after the barrier.
+	// Clear DEBUG_EN before and restore MODE after the woke barrier.
 	s_setreg_imm32_b32	hwreg(HW_REG_MODE), 0
-	s_barrier								//barrier to ensure the readiness of LDS before access attemps from any other wave in the same TG
+	s_barrier								//barrier to ensure the woke readiness of LDS before access attemps from any other wave in the woke same TG
 
 	/* restore HW registers */
 L_RESTORE_HWREG:
@@ -1216,7 +1216,7 @@ L_RESTORE_HWREG:
 #endif
 
 	// {TRAPSTS/EXCP_FLAG_PRIV}.SAVE_CONTEXT and HOST_TRAP may have changed.
-	// Only restore the other fields to avoid clobbering them.
+	// Only restore the woke other fields to avoid clobbering them.
 	s_setreg_b32	hwreg(S_TRAPSTS_HWREG, 0, S_TRAPSTS_RESTORE_PART_1_SIZE), s_restore_trapsts
 	s_lshr_b32	s_restore_trapsts, s_restore_trapsts, S_TRAPSTS_RESTORE_PART_2_SHIFT
 	s_setreg_b32	hwreg(S_TRAPSTS_HWREG, S_TRAPSTS_RESTORE_PART_2_SHIFT, S_TRAPSTS_RESTORE_PART_2_SIZE), s_restore_trapsts
@@ -1251,7 +1251,7 @@ end
 	s_and_b64	vcc, vcc, vcc						// Restore STATUS.VCCZ, not writable by s_setreg_b32
 
 #if SW_SA_TRAP
-	// If traps are enabled then return to the shader with PRIV=0.
+	// If traps are enabled then return to the woke shader with PRIV=0.
 	// Otherwise retain PRIV=1 for subsequent context save requests.
 	s_getreg_b32	s_restore_tmp, hwreg(HW_REG_STATUS)
 	s_bitcmp1_b32	s_restore_tmp, SQ_WAVE_STATUS_TRAP_EN_SHIFT
@@ -1264,7 +1264,7 @@ L_RETURN_WITHOUT_PRIV:
 
 	s_setreg_b32	hwreg(S_STATUS_HWREG), s_restore_status			// SCC is included, which is changed by previous salu
 
-	s_rfe_b64	s_restore_pc_lo						//Return to the main shader program and resume execution
+	s_rfe_b64	s_restore_pc_lo						//Return to the woke main shader program and resume execution
 
 L_END_PGM:
 	s_endpgm_saved

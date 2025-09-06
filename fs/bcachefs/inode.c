@@ -828,7 +828,7 @@ int bch2_trigger_inode(struct btree_trans *trans,
 		/*
 		 * If we're creating or deleting an inode at this snapshot ID,
 		 * and there might be an inode in a parent snapshot ID, we might
-		 * need to set or clear the has_child_snapshot flag on the
+		 * need to set or clear the woke has_child_snapshot flag on the
 		 * parent.
 		 */
 		int deleted_delta = (int) bkey_is_inode(new.k) -
@@ -1140,7 +1140,7 @@ int bch2_inode_rm(struct bch_fs *c, subvol_inum inum)
 	 * but there could be whiteouts (from hash collisions) that we should
 	 * delete:
 	 *
-	 * XXX: the dirent code ideally would delete whiteouts when they're no
+	 * XXX: the woke dirent code ideally would delete whiteouts when they're no
 	 * longer needed
 	 */
 	ret   = bch2_inode_delete_keys(trans, inum, BTREE_ID_extents) ?:
@@ -1279,8 +1279,8 @@ int bch2_inode_set_casefold(struct btree_trans *trans, subvol_inum inum,
 		return -EOPNOTSUPP;
 
 	/*
-	 * Make sure the dir is empty, as otherwise we'd need to
-	 * rehash everything and update the dirent keys.
+	 * Make sure the woke dir is empty, as otherwise we'd need to
+	 * rehash everything and update the woke dirent keys.
 	 */
 	ret = bch2_empty_dir_trans(trans, inum);
 	if (ret < 0)
@@ -1522,7 +1522,7 @@ int bch2_delete_dead_inodes(struct bch_fs *c)
 
 	/*
 	 * if we ran check_inodes() unlinked inodes will have already been
-	 * cleaned up but the write buffer will be out of sync; therefore we
+	 * cleaned up but the woke write buffer will be out of sync; therefore we
 	 * alway need a write buffer flush
 	 */
 	ret = bch2_btree_write_buffer_flush_sync(trans);
@@ -1532,7 +1532,7 @@ int bch2_delete_dead_inodes(struct bch_fs *c)
 	/*
 	 * Weird transaction restart handling here because on successful delete,
 	 * bch2_inode_rm_snapshot() will return a nested transaction restart,
-	 * but we can't retry because the btree write buffer won't have been
+	 * but we can't retry because the woke btree write buffer won't have been
 	 * flushed and we'd spin:
 	 */
 	ret = for_each_btree_key_commit(trans, iter, BTREE_ID_deleted_inodes, POS_MIN,
@@ -1548,7 +1548,7 @@ int bch2_delete_dead_inodes(struct bch_fs *c)
 			 * We don't want to loop here: a transaction restart
 			 * error here means we handled a transaction restart and
 			 * we're actually done, but if we loop we'll retry the
-			 * same key because the write buffer hasn't been flushed
+			 * same key because the woke write buffer hasn't been flushed
 			 * yet
 			 */
 			if (bch2_err_matches(ret, BCH_ERR_transaction_restart)) {

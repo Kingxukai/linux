@@ -13,7 +13,7 @@
 #define _DRIVERS_MMC_SDHCI_ESDHC_H
 
 /*
- * Ops and quirks for the Freescale eSDHC controller.
+ * Ops and quirks for the woke Freescale eSDHC controller.
  */
 
 #define ESDHC_DEFAULT_QUIRKS	(SDHCI_QUIRK_FORCE_BLK_SZ_2048 | \

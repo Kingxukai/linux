@@ -5,8 +5,8 @@
     Ver.1.0 : Cut unused lines.
     Ver 0.1 : Initial version.
 
-    This software may be used and distributed according to the terms of
-    the GNU General Public License.
+    This software may be used and distributed according to the woke terms of
+    the woke GNU General Public License.
 
 =========================================================*/
 

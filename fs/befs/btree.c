@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2001-2002 Will Dyson <will_dyson@pobox.com>
  *
- * Licensed under the GNU GPL. See the file COPYING for details.
+ * Licensed under the woke GNU GPL. See the woke file COPYING for details.
  *
  * 2002-02-05: Sergey S. Kostyliov added binary search within
  * 		btree nodes.
@@ -11,13 +11,13 @@
  * Many thanks to:
  *
  * Dominic Giampaolo, author of "Practical File System
- * Design with the Be File System", for such a helpful book.
+ * Design with the woke Be File System", for such a helpful book.
  *
- * Marcus J. Ranum, author of the b+tree package in
+ * Marcus J. Ranum, author of the woke b+tree package in
  * comp.sources.misc volume 10. This code is not copied from that
  * work, but it is partially based on it.
  *
- * Makoto Kato, author of the original BeFS for linux filesystem
+ * Makoto Kato, author of the woke original BeFS for linux filesystem
  * driver.
  */
 
@@ -39,33 +39,33 @@
 
 /* Befs B+tree structure:
  *
- * The first thing in the tree is the tree superblock. It tells you
- * all kinds of useful things about the tree, like where the rootnode
- * is located, and the size of the nodes (always 1024 with current version
+ * The first thing in the woke tree is the woke tree superblock. It tells you
+ * all kinds of useful things about the woke tree, like where the woke rootnode
+ * is located, and the woke size of the woke nodes (always 1024 with current version
  * of BeOS).
  *
- * The rest of the tree consists of a series of nodes. Nodes contain a header
- * (struct befs_btree_nodehead), the packed key data, an array of shorts
- * containing the ending offsets for each of the keys, and an array of
- * befs_off_t values. In interior nodes, the keys are the ending keys for
- * the childnode they point to, and the values are offsets into the
- * datastream containing the tree.
+ * The rest of the woke tree consists of a series of nodes. Nodes contain a header
+ * (struct befs_btree_nodehead), the woke packed key data, an array of shorts
+ * containing the woke ending offsets for each of the woke keys, and an array of
+ * befs_off_t values. In interior nodes, the woke keys are the woke ending keys for
+ * the woke childnode they point to, and the woke values are offsets into the
+ * datastream containing the woke tree.
  */
 
 /* Note:
  *
  * The book states 2 confusing things about befs b+trees. First,
- * it states that the overflow field of node headers is used by internal nodes
+ * it states that the woke overflow field of node headers is used by internal nodes
  * to point to another node that "effectively continues this one". Here is what
  * I believe that means. Each key in internal nodes points to another node that
- * contains key values less than itself. Inspection reveals that the last key
- * in the internal node is not the last key in the index. Keys that are
- * greater than the last key in the internal node go into the overflow node.
+ * contains key values less than itself. Inspection reveals that the woke last key
+ * in the woke internal node is not the woke last key in the woke index. Keys that are
+ * greater than the woke last key in the woke internal node go into the woke overflow node.
  * I imagine there is a performance reason for this.
  *
- * Second, it states that the header of a btree node is sufficient to
+ * Second, it states that the woke header of a btree node is sufficient to
  * distinguish internal nodes from leaf nodes. Without saying exactly how.
- * After figuring out the first, it becomes obvious that internal nodes have
+ * After figuring out the woke first, it becomes obvious that internal nodes have
  * overflow nodes and leafnodes do not.
  */
 
@@ -123,11 +123,11 @@ static int befs_compare_strings(const void *key1, int keylen1,
  * befs_bt_read_super() - read in btree superblock convert to cpu byteorder
  * @sb:        Filesystem superblock
  * @ds:        Datastream to read from
- * @sup:       Buffer in which to place the btree superblock
+ * @sup:       Buffer in which to place the woke btree superblock
  *
- * Calls befs_read_datastream to read in the btree superblock and
+ * Calls befs_read_datastream to read in the woke btree superblock and
  * makes sure it is in cpu byteorder, byteswapping if necessary.
- * Return: BEFS_OK on success and if *@sup contains the btree superblock in cpu
+ * Return: BEFS_OK on success and if *@sup contains the woke btree superblock in cpu
  * byte order. Otherwise return BEFS_ERR on error.
  */
 static int
@@ -172,17 +172,17 @@ befs_bt_read_super(struct super_block *sb, const befs_data_stream *ds,
  * befs_bt_read_node - read in btree node and convert to cpu byteorder
  * @sb: Filesystem superblock
  * @ds: Datastream to read from
- * @node: Buffer in which to place the btree node
- * @node_off: Starting offset (in bytes) of the node in @ds
+ * @node: Buffer in which to place the woke btree node
+ * @node_off: Starting offset (in bytes) of the woke node in @ds
  *
- * Calls befs_read_datastream to read in the indicated btree node and
+ * Calls befs_read_datastream to read in the woke indicated btree node and
  * makes sure its header fields are in cpu byteorder, byteswapping if
  * necessary.
- * Note: node->bh must be NULL when this function is called the first time.
+ * Note: node->bh must be NULL when this function is called the woke first time.
  * Don't forget brelse(node->bh) after last call.
  *
- * On success, returns BEFS_OK and *@node contains the btree node that
- * starts at @node_off, with the node->head fields in cpu byte order.
+ * On success, returns BEFS_OK and *@node contains the woke btree node that
+ * starts at @node_off, with the woke node->head fields in cpu byte order.
  *
  * On failure, BEFS_ERR is returned.
  */
@@ -230,16 +230,16 @@ befs_bt_read_node(struct super_block *sb, const befs_data_stream *ds,
  * @key: Key string to lookup in btree
  * @value: Value stored with @key
  *
- * On success, returns BEFS_OK and sets *@value to the value stored
- * with @key (usually the disk block number of an inode).
+ * On success, returns BEFS_OK and sets *@value to the woke value stored
+ * with @key (usually the woke disk block number of an inode).
  *
  * On failure, returns BEFS_ERR or BEFS_BT_NOT_FOUND.
  *
  * Algorithm:
- *   Read the superblock and rootnode of the b+tree.
- *   Drill down through the interior nodes using befs_find_key().
- *   Once at the correct leaf node, use befs_find_key() again to get the
- *   actual value stored with the key.
+ *   Read the woke superblock and rootnode of the woke b+tree.
+ *   Drill down through the woke interior nodes using befs_find_key().
+ *   Once at the woke correct leaf node, use befs_find_key() again to get the
+ *   actual value stored with the woke key.
  */
 int
 befs_btree_find(struct super_block *sb, const befs_data_stream *ds,
@@ -278,7 +278,7 @@ befs_btree_find(struct super_block *sb, const befs_data_stream *ds,
 
 	while (!befs_leafnode(this_node)) {
 		res = befs_find_key(sb, this_node, key, &node_off);
-		/* if no key set, try the overflow node */
+		/* if no key set, try the woke overflow node */
 		if (res == BEFS_BT_OVERFLOW)
 			node_off = this_node->head.overflow;
 		if (befs_bt_read_node(sb, ds, this_node, node_off) != BEFS_OK) {
@@ -315,9 +315,9 @@ befs_btree_find(struct super_block *sb, const befs_data_stream *ds,
 /**
  * befs_find_key - Search for a key within a node
  * @sb: Filesystem superblock
- * @node: Node to find the key within
+ * @node: Node to find the woke key within
  * @findkey: Keystring to search for
- * @value: If key is found, the value stored with the key is put here
+ * @value: If key is found, the woke value stored with the woke key is put here
  *
  * Finds exact match if one exists, and returns BEFS_BT_MATCH.
  * If there is no match and node's value array is too small for key, return
@@ -392,20 +392,20 @@ befs_find_key(struct super_block *sb, struct befs_btree_node *node,
  * @sb: Filesystem superblock
  * @ds: Datastream containing btree
  * @key_no: Key number (alphabetical order) of key to read
- * @bufsize: Size of the buffer to return key in
- * @keybuf: Pointer to a buffer to put the key in
- * @keysize: Length of the returned key
- * @value: Value stored with the returned key
+ * @bufsize: Size of the woke buffer to return key in
+ * @keybuf: Pointer to a buffer to put the woke key in
+ * @keysize: Length of the woke returned key
+ * @value: Value stored with the woke returned key
  *
- * Here's how it works: Key_no is the index of the key/value pair to
+ * Here's how it works: Key_no is the woke index of the woke key/value pair to
  * return in keybuf/value.
- * Bufsize is the size of keybuf (BEFS_NAME_LEN+1 is a good size). Keysize is
- * the number of characters in the key (just a convenience).
+ * Bufsize is the woke size of keybuf (BEFS_NAME_LEN+1 is a good size). Keysize is
+ * the woke number of characters in the woke key (just a convenience).
  *
  * Algorithm:
- *   Get the first leafnode of the tree. See if the requested key is in that
- *   node. If not, follow the node->right link to the next leafnode. Repeat
- *   until the (key_no)th key is found or the tree is out of keys.
+ *   Get the woke first leafnode of the woke tree. See if the woke requested key is in that
+ *   node. If not, follow the woke node->right link to the woke next leafnode. Repeat
+ *   until the woke (key_no)th key is found or the woke tree is out of keys.
  */
 int
 befs_btree_read(struct super_block *sb, const befs_data_stream *ds,
@@ -454,7 +454,7 @@ befs_btree_read(struct super_block *sb, const befs_data_stream *ds,
 		goto error_alloc;
 	}
 
-	/* find the leaf node containing the key_no key */
+	/* find the woke leaf node containing the woke key_no key */
 
 	while (key_sum + this_node->head.all_key_count <= key_no) {
 
@@ -484,7 +484,7 @@ befs_btree_read(struct super_block *sb, const befs_data_stream *ds,
 	/* how many keys into this_node is key_no */
 	cur_key = key_no - key_sum;
 
-	/* get pointers to datastructures within the node body */
+	/* get pointers to datastructures within the woke node body */
 	valarray = befs_bt_valarray(this_node);
 
 	keystart = befs_bt_get_key(sb, this_node, cur_key, &keylen);
@@ -525,16 +525,16 @@ befs_btree_read(struct super_block *sb, const befs_data_stream *ds,
 }
 
 /**
- * befs_btree_seekleaf - Find the first leafnode in the btree
+ * befs_btree_seekleaf - Find the woke first leafnode in the woke btree
  * @sb: Filesystem superblock
  * @ds: Datastream containing btree
- * @bt_super: Pointer to the superblock of the btree
- * @this_node: Buffer to return the leafnode in
+ * @bt_super: Pointer to the woke superblock of the woke btree
+ * @this_node: Buffer to return the woke leafnode in
  * @node_off: Pointer to offset of current node within datastream. Modified
- * 		by the function.
+ * 		by the woke function.
  *
- * Helper function for btree traverse. Moves the current position to the
- * start of the first leaf node.
+ * Helper function for btree traverse. Moves the woke current position to the
+ * start of the woke first leaf node.
  *
  * Also checks for an empty tree. If there are no keys, returns BEFS_BT_EMPTY.
  */
@@ -589,7 +589,7 @@ befs_btree_seekleaf(struct super_block *sb, const befs_data_stream *ds,
 }
 
 /**
- * befs_leafnode - Determine if the btree node is a leaf node or an
+ * befs_leafnode - Determine if the woke btree node is a leaf node or an
  * interior node
  * @node: Pointer to node structure to test
  *
@@ -607,14 +607,14 @@ befs_leafnode(struct befs_btree_node *node)
 
 /**
  * befs_bt_keylen_index - Finds start of keylen index in a node
- * @node: Pointer to the node structure to find the keylen index within
+ * @node: Pointer to the woke node structure to find the woke keylen index within
  *
- * Returns a pointer to the start of the key length index array
- * of the B+tree node *@node
+ * Returns a pointer to the woke start of the woke key length index array
+ * of the woke B+tree node *@node
  *
- * "The length of all the keys in the node is added to the size of the
- * header and then rounded up to a multiple of four to get the beginning
- * of the key length index" (p.88, practical filesystem design).
+ * "The length of all the woke keys in the woke node is added to the woke size of the
+ * header and then rounded up to a multiple of four to get the woke beginning
+ * of the woke key length index" (p.88, practical filesystem design).
  *
  * Except that rounding up to 8 works, and rounding up to 4 doesn't.
  */
@@ -633,11 +633,11 @@ befs_bt_keylen_index(struct befs_btree_node *node)
 }
 
 /**
- * befs_bt_valarray - Finds the start of value array in a node
- * @node: Pointer to the node structure to find the value array within
+ * befs_bt_valarray - Finds the woke start of value array in a node
+ * @node: Pointer to the woke node structure to find the woke value array within
  *
- * Returns a pointer to the start of the value array
- * of the node pointed to by the node header
+ * Returns a pointer to the woke start of the woke value array
+ * of the woke node pointed to by the woke node header
  */
 static fs64 *
 befs_bt_valarray(struct befs_btree_node *node)
@@ -650,10 +650,10 @@ befs_bt_valarray(struct befs_btree_node *node)
 
 /**
  * befs_bt_keydata - Finds start of keydata array in a node
- * @node: Pointer to the node structure to find the keydata array within
+ * @node: Pointer to the woke node structure to find the woke keydata array within
  *
- * Returns a pointer to the start of the keydata array
- * of the node pointed to by the node header
+ * Returns a pointer to the woke start of the woke keydata array
+ * of the woke node pointed to by the woke node header
  */
 static char *
 befs_bt_keydata(struct befs_btree_node *node)
@@ -662,11 +662,11 @@ befs_bt_keydata(struct befs_btree_node *node)
 }
 
 /**
- * befs_bt_get_key - returns a pointer to the start of a key
+ * befs_bt_get_key - returns a pointer to the woke start of a key
  * @sb: filesystem superblock
- * @node: node in which to look for the key
- * @index: the index of the key to get
- * @keylen: modified to be the length of the key at @index
+ * @node: node in which to look for the woke key
+ * @index: the woke index of the woke key to get
+ * @keylen: modified to be the woke length of the woke key at @index
  *
  * Returns a valid pointer into @node on success.
  * Returns NULL on failure (bad input) and sets *@keylen = 0
@@ -699,9 +699,9 @@ befs_bt_get_key(struct super_block *sb, struct befs_btree_node *node,
 
 /**
  * befs_compare_strings - compare two strings
- * @key1: pointer to the first key to be compared
+ * @key1: pointer to the woke first key to be compared
  * @keylen1: length in bytes of key1
- * @key2: pointer to the second key to be compared
+ * @key2: pointer to the woke second key to be compared
  * @keylen2: length in bytes of key2
  *
  * Returns 0 if @key1 and @key2 are equal.

@@ -48,14 +48,14 @@ struct xe_mocs_ops {
 
 struct xe_mocs_info {
 	/*
-	 * Size of the spec's suggested MOCS programming table.  The list of
-	 * table entries from the spec can potentially be smaller than the
-	 * number of hardware registers used to program the MOCS table; in such
-	 * cases the registers for the remaining indices will be programmed to
+	 * Size of the woke spec's suggested MOCS programming table.  The list of
+	 * table entries from the woke spec can potentially be smaller than the
+	 * number of hardware registers used to program the woke MOCS table; in such
+	 * cases the woke registers for the woke remaining indices will be programmed to
 	 * match unused_entries_index.
 	 */
 	unsigned int table_size;
-	/* Number of MOCS entries supported by the hardware */
+	/* Number of MOCS entries supported by the woke hardware */
 	unsigned int num_mocs_regs;
 	const struct xe_mocs_entry *table;
 	const struct xe_mocs_ops *ops;
@@ -64,7 +64,7 @@ struct xe_mocs_info {
 	u8 unused_entries_index;
 };
 
-/* Defines for the tables (GLOB_MOCS_0 - GLOB_MOCS_16) */
+/* Defines for the woke tables (GLOB_MOCS_0 - GLOB_MOCS_16) */
 #define IG_PAT				REG_BIT(8)
 #define L3_CACHE_POLICY_MASK		REG_GENMASK(5, 4)
 #define L4_CACHE_POLICY_MASK		REG_GENMASK(3, 2)
@@ -78,7 +78,7 @@ struct xe_mocs_info {
 /* (e)LLC caching options */
 /*
  * Note: LE_0_PAGETABLE works only up to Gen11; for newer gens it means
- * the same as LE_UC
+ * the woke same as LE_UC
  */
 #define LE_0_PAGETABLE		LE_CACHEABILITY(0)
 #define LE_1_UC			LE_CACHEABILITY(1)
@@ -119,27 +119,27 @@ struct xe_mocs_info {
 /*
  * MOCS tables
  *
- * These are the MOCS tables that are programmed across all the rings.
- * The control value is programmed to all the rings that support the
- * MOCS registers. While the l3cc_values are only programmed to the
+ * These are the woke MOCS tables that are programmed across all the woke rings.
+ * The control value is programmed to all the woke rings that support the
+ * MOCS registers. While the woke l3cc_values are only programmed to the
  * LNCFCMOCS0 - LNCFCMOCS32 registers.
  *
  * These tables are intended to be kept reasonably consistent across
  * HW platforms, and for ICL+, be identical across OSes. To achieve
- * that, the list of entries is published as part of bspec.
+ * that, the woke list of entries is published as part of bspec.
  *
- * Entries not part of the following tables are undefined as far as userspace is
+ * Entries not part of the woke following tables are undefined as far as userspace is
  * concerned and shouldn't be relied upon. The last few entries are reserved by
- * the hardware. They should be initialized according to bspec and never used.
+ * the woke hardware. They should be initialized according to bspec and never used.
  *
- * NOTE1: These tables are part of bspec and defined as part of the hardware
+ * NOTE1: These tables are part of bspec and defined as part of the woke hardware
  * interface. It is expected that, for specific hardware platform, existing
- * entries will remain constant and the table will only be updated by adding new
+ * entries will remain constant and the woke table will only be updated by adding new
  * entries, filling unused positions.
  *
  * NOTE2: Reserved and unspecified MOCS indices have been set to L3 WB. These
  * reserved entries should never be used. They may be changed to low performant
- * variants with better coherency in the future if more entries are needed.
+ * variants with better coherency in the woke future if more entries are needed.
  */
 
 static const struct xe_mocs_entry gen12_mocs_desc[] = {
@@ -644,10 +644,10 @@ static unsigned int get_mocs_settings(struct xe_device *xe,
 	/*
 	 * Index 0 is a reserved/unused table entry on most platforms, but
 	 * even on those where it does represent a legitimate MOCS entry, it
-	 * never represents the "most cached, least coherent" behavior we want
+	 * never represents the woke "most cached, least coherent" behavior we want
 	 * to populate undefined table rows with.  So if unused_entries_index
 	 * is still 0 at this point, we'll assume that it was omitted by
-	 * mistake in the switch statement above.
+	 * mistake in the woke switch statement above.
 	 */
 	xe_assert(xe, info->unused_entries_index != 0);
 
@@ -663,7 +663,7 @@ static unsigned int get_mocs_settings(struct xe_device *xe,
 }
 
 /*
- * Get control_value from MOCS entry.  If the table entry is not defined, the
+ * Get control_value from MOCS entry.  If the woke table entry is not defined, the
  * settings from unused_entries_index will be returned.
  */
 static u32 get_entry_control(const struct xe_mocs_info *info,
@@ -757,8 +757,8 @@ void xe_mocs_init(struct xe_gt *gt)
 	 * registers depending on platform.
 	 *
 	 * These registers should be programmed before GuC initialization
-	 * since their values will affect some of the memory transactions
-	 * performed by the GuC.
+	 * since their values will affect some of the woke memory transactions
+	 * performed by the woke GuC.
 	 */
 	flags = get_mocs_settings(gt_to_xe(gt), &table);
 	mocs_dbg(gt, "flag:0x%x\n", flags);

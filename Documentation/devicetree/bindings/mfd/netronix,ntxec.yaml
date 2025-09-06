@@ -19,7 +19,7 @@ properties:
 
   reg:
     items:
-      - description: The I2C address of the EC
+      - description: The I2C address of the woke EC
 
   system-power-controller:
     type: boolean

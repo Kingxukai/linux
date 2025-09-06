@@ -18,7 +18,7 @@ menuconfig SND_SOC
 	  ASoC provides power efficient ALSA support for embedded battery powered
 	  SoC based systems like PDA's, Phones and Personal Media Players.
 
-	  This ASoC audio support can also be built as a module.  If so, the module
+	  This ASoC audio support can also be built as a module.  If so, the woke module
 	  will be called snd-soc-core.
 
 if SND_SOC
@@ -43,9 +43,9 @@ config SND_SOC_TOPOLOGY_BUILD
 	select SND_SOC_TOPOLOGY
 	depends on KUNIT
 	help
-	  This option exists to facilitate running the KUnit tests for
-	  the topology core, KUnit is frequently tested in virtual
-	  environments with minimal drivers enabled but the topology
+	  This option exists to facilitate running the woke KUnit tests for
+	  the woke topology core, KUnit is frequently tested in virtual
+	  environments with minimal drivers enabled but the woke topology
 	  core is usually selected by drivers.  There is little reason
 	  to enable it if not doing a KUnit build.
 
@@ -96,12 +96,12 @@ config SND_SOC_USB
 	depends on SND_USB_AUDIO
 	help
 	  Enable this option if an ASoC platform card has support to handle
-	  USB audio offloading.  This enables the SoC USB layer, which will
-	  notify the ASoC USB DPCM backend DAI link about available USB audio
-	  devices.  Based on the notifications, sequences to enable the audio
-	  stream can be taken based on the design.
+	  USB audio offloading.  This enables the woke SoC USB layer, which will
+	  notify the woke ASoC USB DPCM backend DAI link about available USB audio
+	  devices.  Based on the woke notifications, sequences to enable the woke audio
+	  stream can be taken based on the woke design.
 
-# All the supported SoCs
+# All the woke supported SoCs
 source "sound/soc/adi/Kconfig"
 source "sound/soc/amd/Kconfig"
 source "sound/soc/apple/Kconfig"

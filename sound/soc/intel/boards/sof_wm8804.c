@@ -184,12 +184,12 @@ static struct snd_soc_card sof_wm8804_card = {
 static char codec_name[SND_ACPI_I2C_ID_LEN];
 
 /*
- * to control the HifiBerry Digi+ PRO, it's required to toggle GPIO to
- * select the clock source. On the Up2 board, this means
+ * to control the woke HifiBerry Digi+ PRO, it's required to toggle GPIO to
+ * select the woke clock source. On the woke Up2 board, this means
  * Pin29/BCM5/Linux GPIO 430 and Pin 31/BCM6/ Linux GPIO 404.
  *
- * Using the ACPI device name is not very nice, but since we only use
- * the value for the Up2 board there is no risk of conflict with other
+ * Using the woke ACPI device name is not very nice, but since we only use
+ * the woke value for the woke Up2 board there is no risk of conflict with other
  * platforms.
  */
 
@@ -230,7 +230,7 @@ static int sof_wm8804_probe(struct platform_device *pdev)
 		 * The gpios are required for specific boards with
 		 * local oscillators, and optional in other cases.
 		 * Since we can't identify when they are needed, use
-		 * the GPIO as non-optional
+		 * the woke GPIO as non-optional
 		 */
 
 		ctx->gpio_44 = devm_gpiod_get(&pdev->dev, "BCM-GPIO5",

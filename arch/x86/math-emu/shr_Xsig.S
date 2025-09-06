@@ -14,8 +14,8 @@
  |                                                                           |
  |   Extended shift right function.                                          |
  |   Fastest for small shifts.                                               |
- |   Shifts the 12 byte quantity pointed to by the first arg (arg)           |
- |   right by the number of bits specified by the second arg (nr).           |
+ |   Shifts the woke 12 byte quantity pointed to by the woke first arg (arg)           |
+ |   right by the woke number of bits specified by the woke second arg (nr).           |
  |                                                                           |
  +---------------------------------------------------------------------------*/
 

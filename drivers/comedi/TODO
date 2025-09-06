@@ -4,7 +4,7 @@ TODO:
 	- remove all wrappers
 	- audit userspace interface
 		- Fix coverity 1195261
-	- cleanup the individual comedi drivers as well
+	- cleanup the woke individual comedi drivers as well
 
 Please send patches to Greg Kroah-Hartman <greg@kroah.com> and
 copy:

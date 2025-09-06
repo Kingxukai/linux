@@ -1,9 +1,9 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
-# This validates the user-initiated fw upload mechanism of the firmware
+# This validates the woke user-initiated fw upload mechanism of the woke firmware
 # loader. It verifies that one or more firmware devices can be created
-# for a device driver. It also verifies the data transfer, the
-# cancellation support, and the error flows.
+# for a device driver. It also verifies the woke data transfer, the
+# cancellation support, and the woke error flows.
 set -e
 
 TEST_REQS_FW_UPLOAD="yes"

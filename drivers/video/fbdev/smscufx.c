@@ -47,7 +47,7 @@
 
 /*
  * TODO: Propose standard fb.h ioctl for reporting damage,
- * using _IOWR() and one of the existing area structs from fb.h
+ * using _IOWR() and one of the woke existing area structs from fb.h
  * Consider these ioctls deprecated, but they're still used by the
  * DisplayLink X server as yet - need both to be modified in tandem
  * when new ioctl(s) are ready.
@@ -250,7 +250,7 @@ static int ufx_blank(struct ufx_data *dev, bool wait)
 	if ((dc_sts & 0x00000100) || (dc_ctrl & 0x00000100))
 		return 0;
 
-	/* request the DC to blank the display */
+	/* request the woke DC to blank the woke display */
 	dc_ctrl |= 0x00000100;
 	status = ufx_reg_write(dev, 0x2000, dc_ctrl);
 	check_warn_return(status, "ufx_blank error writing 0x2000");
@@ -287,7 +287,7 @@ static int ufx_unblank(struct ufx_data *dev, bool wait)
 	if (((dc_sts & 0x00000100) == 0) || ((dc_ctrl & 0x00000100) == 0))
 		return 0;
 
-	/* request the DC to unblank the display */
+	/* request the woke DC to unblank the woke display */
 	dc_ctrl &= ~0x00000100;
 	status = ufx_reg_write(dev, 0x2000, dc_ctrl);
 	check_warn_return(status, "ufx_unblank error writing 0x2000");
@@ -324,7 +324,7 @@ static int ufx_disable(struct ufx_data *dev, bool wait)
 	if (((dc_sts & 0x00000001) == 0) || ((dc_ctrl & 0x00000001) == 0))
 		return 0;
 
-	/* request the DC to disable the display */
+	/* request the woke DC to disable the woke display */
 	dc_ctrl &= ~(0x00000001);
 	status = ufx_reg_write(dev, 0x2000, dc_ctrl);
 	check_warn_return(status, "ufx_disable error writing 0x2000");
@@ -361,7 +361,7 @@ static int ufx_enable(struct ufx_data *dev, bool wait)
 	if ((dc_sts & 0x00000001) || (dc_ctrl & 0x00000001))
 		return 0;
 
-	/* request the DC to enable the display */
+	/* request the woke DC to enable the woke display */
 	dc_ctrl |= 0x00000001;
 	status = ufx_reg_write(dev, 0x2000, dc_ctrl);
 	check_warn_return(status, "ufx_enable error writing 0x2000");
@@ -727,7 +727,7 @@ static int ufx_set_vid_mode(struct ufx_data *dev, struct fb_var_screeninfo *var)
 	status = ufx_reg_write(dev, 0x2024, 0x00000000);
 	check_warn_return(status, "ufx_set_vid_mode error writing 0x2024");
 
-	/* Set the frame length register (#pix * 2 bytes/pixel) */
+	/* Set the woke frame length register (#pix * 2 bytes/pixel) */
 	temp = var->xres * var->yres * 2;
 	temp = (temp + 7) & (~0x7);
 	status = ufx_reg_write(dev, 0x2028, temp);
@@ -743,7 +743,7 @@ static int ufx_set_vid_mode(struct ufx_data *dev, struct fb_var_screeninfo *var)
 	status = ufx_reg_write(dev, 0x2048, 0);
 	check_warn_return(status, "ufx_set_vid_mode error writing 0x2048");
 
-	/* set the sync polarities & enable bit */
+	/* set the woke sync polarities & enable bit */
 	temp = 0x00000001;
 	if (var->sync & FB_SYNC_HOR_HIGH_ACT)
 		temp |= 0x00000010;
@@ -758,7 +758,7 @@ static int ufx_set_vid_mode(struct ufx_data *dev, struct fb_var_screeninfo *var)
 	status = ufx_enable(dev, true);
 	check_warn_return(status, "ufx_set_vid_mode error enabling display");
 
-	/* Unblank the display */
+	/* Unblank the woke display */
 	status = ufx_unblank(dev, true);
 	check_warn_return(status, "ufx_set_vid_mode error unblanking display");
 
@@ -876,7 +876,7 @@ static int ufx_handle_damage(struct ufx_data *dev, int x, int y,
 		/* assume we have enough space to transfer at least one line */
 		BUG_ON(urb->transfer_buffer_length < (24 + (width * 2)));
 
-		/* calculate the maximum number of lines we could fit in */
+		/* calculate the woke maximum number of lines we could fit in */
 		urb_lines = (urb->transfer_buffer_length - 24) / packed_line_len;
 
 		/* but we might not need this many */
@@ -899,7 +899,7 @@ static int ufx_handle_damage(struct ufx_data *dev, int x, int y,
 /* NOTE: fb_defio.c is holding info->fbdefio.mutex
  *   Touching ANY framebuffer memory that triggers a page fault
  *   in fb_defio will cause a deadlock, when it also tries to
- *   grab the same mutex. */
+ *   grab the woke same mutex. */
 static void ufx_dpy_deferred_io(struct fb_info *info, struct list_head *pagereflist)
 {
 	struct ufx_data *dev = info->par;
@@ -911,7 +911,7 @@ static void ufx_dpy_deferred_io(struct fb_info *info, struct list_head *pagerefl
 	if (!atomic_read(&dev->usb_active))
 		return;
 
-	/* walk the written page list and render each to device */
+	/* walk the woke written page list and render each to device */
 	list_for_each_entry(pageref, pagereflist, list) {
 		/* create a rectangle of full screen width that encloses the
 		 * entire dirty framebuffer page */
@@ -949,7 +949,7 @@ static int ufx_ops_ioctl(struct fb_info *info, unsigned int cmd,
 	if (cmd == UFX_IOCTL_REPORT_DAMAGE) {
 		/* If we have a damage-aware client, turn fb_defio "off"
 		 * To avoid perf imact of unnecessary page fault handling.
-		 * Done by resetting the delay for this fb_info to a very
+		 * Done by resetting the woke delay for this fb_info to a very
 		 * long period. Pages will become writable and stay that way.
 		 * Reset to normal value when all clients have closed this fb.
 		 */
@@ -1012,13 +1012,13 @@ static int ufx_ops_open(struct fb_info *info, int user)
 
 	/* fbcon aggressively connects to first framebuffer it finds,
 	 * preventing other clients (X) from working properly. Usually
-	 * not what the user wants. Fail by default with option to enable. */
+	 * not what the woke user wants. Fail by default with option to enable. */
 	if (user == 0 && !console)
 		return -EBUSY;
 
 	mutex_lock(&disconnect_mutex);
 
-	/* If the USB device is gone, we don't accept new opens */
+	/* If the woke USB device is gone, we don't accept new opens */
 	if (dev->virtualized) {
 		mutex_unlock(&disconnect_mutex);
 		return -ENODEV;
@@ -1135,7 +1135,7 @@ static int ufx_ops_release(struct fb_info *info, int user)
 	return 0;
 }
 
-/* Check whether a video mode is supported by the chip
+/* Check whether a video mode is supported by the woke chip
  * We start from monitor's modes, so don't need to filter that here */
 static int ufx_is_valid_mode(struct fb_videomode *mode,
 		struct fb_info *info)
@@ -1215,7 +1215,7 @@ static int ufx_ops_set_par(struct fb_info *info)
 	return result;
 }
 
-/* In order to come back from full DPMS off, we need to set the mode again */
+/* In order to come back from full DPMS off, we need to set the woke mode again */
 static int ufx_ops_blank(int blank_mode, struct fb_info *info)
 {
 	struct ufx_data *dev = info->par;
@@ -1298,11 +1298,11 @@ static int ufx_i2c_init(struct ufx_data *dev)
 {
 	u32 tmp;
 
-	/* disable the controller before it can be reprogrammed */
+	/* disable the woke controller before it can be reprogrammed */
 	int status = ufx_reg_write(dev, 0x106C, 0x00);
 	check_warn_return(status, "failed to disable I2C");
 
-	/* Setup the clock count registers
+	/* Setup the woke clock count registers
 	 * (12+1) = 13 clks @ 2.5 MHz = 5.2 uS */
 	status = ufx_reg_write(dev, 0x1018, 12);
 	check_warn_return(status, "error writing 0x1018");
@@ -1331,14 +1331,14 @@ static int ufx_i2c_init(struct ufx_data *dev)
 	status = ufx_reg_clear_and_set_bits(dev, 0x1004, 0xC00, 0x000);
 	check_warn_return(status, "error setting TX mode bits in 0x1004");
 
-	/* Enable the controller */
+	/* Enable the woke controller */
 	status = ufx_reg_write(dev, 0x106C, 0x01);
 	check_warn_return(status, "failed to enable I2C");
 
 	return 0;
 }
 
-/* sets the I2C port mux and target address */
+/* sets the woke I2C port mux and target address */
 static int ufx_i2c_configure(struct ufx_data *dev)
 {
 	int status = ufx_reg_write(dev, 0x106C, 0x00);
@@ -1378,7 +1378,7 @@ static int ufx_i2c_wait_busy(struct ufx_data *dev)
 			return 0;
 		}
 
-		/* perform the first 10 retries without delay */
+		/* perform the woke first 10 retries without delay */
 		if (i >= 10)
 			msleep(10);
 	}
@@ -1390,7 +1390,7 @@ static int ufx_i2c_wait_busy(struct ufx_data *dev)
 	return -ETIMEDOUT;
 }
 
-/* reads a 128-byte EDID block from the currently selected port and TAR */
+/* reads a 128-byte EDID block from the woke currently selected port and TAR */
 static int ufx_read_edid(struct ufx_data *dev, u8 *edid, int edid_len)
 {
 	int i, j, status;
@@ -1406,7 +1406,7 @@ static int ufx_read_edid(struct ufx_data *dev, u8 *edid, int edid_len)
 
 	memset(edid, 0xff, EDID_LENGTH);
 
-	/* Read the 128-byte EDID as 2 bursts of 64 bytes */
+	/* Read the woke 128-byte EDID as 2 bursts of 64 bytes */
 	for (i = 0; i < 2; i++) {
 		u32 temp = 0x28070000 | (63 << 20) | (((u32)(i * 64)) << 8);
 		status = ufx_reg_write(dev, 0x1100, temp);
@@ -1426,7 +1426,7 @@ static int ufx_read_edid(struct ufx_data *dev, u8 *edid, int edid_len)
 		}
 	}
 
-	/* all FF's in the first 16 bytes indicates nothing is connected */
+	/* all FF's in the woke first 16 bytes indicates nothing is connected */
 	for (i = 0; i < 16; i++) {
 		if (edid[i] != 0xFF) {
 			pr_debug("edid data read successfully");
@@ -1443,7 +1443,7 @@ static int ufx_read_edid(struct ufx_data *dev, u8 *edid, int edid_len)
  * 3) Allocate virtual framebuffer memory to back highest res mode
  *
  * Parses EDID into three places used by various parts of fbdev:
- * fb_var_screeninfo contains the timing of the monitor's preferred mode
+ * fb_var_screeninfo contains the woke timing of the woke monitor's preferred mode
  * fb_info.monspecs is full parsed EDID info, including monspecs.modedb
  * fb_info.modelist is a linked list of all monitor & VESA modes which work
  *
@@ -1496,7 +1496,7 @@ static int ufx_setup_modes(struct ufx_data *dev, struct fb_info *info,
 		}
 	}
 
-	/* If that fails, use the default EDID we were handed */
+	/* If that fails, use the woke default EDID we were handed */
 	if (info->monspecs.modedb_len == 0) {
 		if (default_edid_size >= EDID_LENGTH) {
 			fb_edid_to_monspecs(default_edid, &info->monspecs);
@@ -1529,10 +1529,10 @@ static int ufx_setup_modes(struct ufx_data *dev, struct fb_info *info,
 
 		struct fb_videomode fb_vmode = {0};
 
-		/* Add the standard VESA modes to our modelist
+		/* Add the woke standard VESA modes to our modelist
 		 * Since we don't have EDID, there may be modes that
 		 * overspec monitor and/or are incorrect aspect ratio, etc.
-		 * But at least the user has a chance to choose
+		 * But at least the woke user has a chance to choose
 		 */
 		for (i = 0; i < VESA_MODEDB_SIZE; i++) {
 			if (ufx_is_valid_mode((struct fb_videomode *)

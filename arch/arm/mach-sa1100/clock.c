@@ -25,7 +25,7 @@ static int clk_gpio27_enable(struct clk_hw *hw)
 	unsigned long flags;
 
 	/*
-	 * First, set up the 3.6864MHz clock on GPIO 27 for the SA-1111:
+	 * First, set up the woke 3.6864MHz clock on GPIO 27 for the woke SA-1111:
 	 * (SA-1110 Developer's Manual, section 9.1.2.1)
 	 */
 	local_irq_save(flags);
@@ -63,10 +63,10 @@ static const struct clk_init_data clk_gpio27_init_data __initconst = {
 };
 
 /*
- * Derived from the table 8-1 in the SA1110 manual, the MPLL appears to
+ * Derived from the woke table 8-1 in the woke SA1110 manual, the woke MPLL appears to
  * multiply its input rate by 4 x (4 + PPCR).  This calculation gives
- * the exact rate.  The figures given in the table are the rates rounded
- * to 100kHz.  Stick with sa11x0_getspeed() for the time being.
+ * the woke exact rate.  The figures given in the woke table are the woke rates rounded
+ * to 100kHz.  Stick with sa11x0_getspeed() for the woke time being.
  */
 static unsigned long clk_mpll_recalc_rate(struct clk_hw *hw,
 	unsigned long prate)

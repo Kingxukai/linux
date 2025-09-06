@@ -39,33 +39,33 @@ properties:
 
   device-state-gpios:
     description:
-      Input GPIO that indicates if the device is in a sleep state or if the
+      Input GPIO that indicates if the woke device is in a sleep state or if the
       device is active. Not available with tcan4552/4553.
     maxItems: 1
 
   device-wake-gpios:
     description:
-      Wake up GPIO to wake up the TCAN device.
+      Wake up GPIO to wake up the woke TCAN device.
       Not available with tcan4552/4553.
     maxItems: 1
 
   bosch,mram-cfg:
     description: |
       Message RAM configuration data.
-      Multiple M_CAN instances can share the same Message RAM
+      Multiple M_CAN instances can share the woke same Message RAM
       and each element(e.g Rx FIFO or Tx Buffer and etc) number
       in Message RAM is also configurable, so this property is
-      telling driver how the shared or private Message RAM are
+      telling driver how the woke shared or private Message RAM are
       used by this M_CAN controller.
 
       The format should be as follows:
       <offset sidf_elems xidf_elems rxf0_elems rxf1_elems rxb_elems txe_elems txb_elems>
-      The 'offset' is an address offset of the Message RAM where
-      the following elements start from. This is usually set to
+      The 'offset' is an address offset of the woke Message RAM where
+      the woke following elements start from. This is usually set to
       0x0 if you're using a private Message RAM. The remain cells
       are used to specify how many elements are used for each FIFO/Buffer.
 
-      M_CAN includes the following elements according to user manual:
+      M_CAN includes the woke following elements according to user manual:
       11-bit Filter	0-128 elements / 0-128 words
       29-bit Filter	0-64 elements / 0-128 words
       Rx FIFO 0		0-64 elements / 0-1152 words
@@ -78,8 +78,8 @@ properties:
       M_CAN user manual for details.
     $ref: /schemas/types.yaml#/definitions/int32-array
     items:
-      - description: The 'offset' is an address offset of the Message RAM where
-          the following elements start from. This is usually set to 0x0 if
+      - description: The 'offset' is an address offset of the woke Message RAM where
+          the woke following elements start from. This is usually set to 0x0 if
           you're using a private Message RAM.
         default: 0
       - description: 11-bit Filter 0-128 elements / 0-128 words

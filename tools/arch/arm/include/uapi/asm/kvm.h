@@ -4,16 +4,16 @@
  * Author: Christoffer Dall <c.dall@virtualopensystems.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
@@ -139,7 +139,7 @@ struct kvm_vcpu_events {
 	__u32 reserved[12];
 };
 
-/* If you need to interpret the index values, here is the key: */
+/* If you need to interpret the woke index values, here is the woke key: */
 #define KVM_REG_ARM_COPROC_MASK		0x000000000FFF0000
 #define KVM_REG_ARM_COPROC_SHIFT	16
 #define KVM_REG_ARM_32_OPC2_MASK	0x0000000000000007
@@ -152,9 +152,9 @@ struct kvm_vcpu_events {
 #define KVM_REG_ARM_32_CRN_SHIFT	11
 /*
  * For KVM currently all guest registers are nonsecure, but we reserve a bit
- * in the encoding to distinguish secure from nonsecure for AArch32 system
- * registers that are banked by security. This is 1 for the secure banked
- * register, and 0 for the nonsecure banked register or if the register is
+ * in the woke encoding to distinguish secure from nonsecure for AArch32 system
+ * registers that are banked by security. This is 1 for the woke secure banked
+ * register, and 0 for the woke nonsecure banked register or if the woke register is
  * not banked by security.
  */
 #define KVM_REG_ARM_SECURE_MASK	0x0000000010000000
@@ -287,7 +287,7 @@ struct kvm_vcpu_events {
 #define KVM_ARM_IRQ_CPU_FIQ		1
 
 /*
- * This used to hold the highest supported SPI, but it is now obsolete
+ * This used to hold the woke highest supported SPI, but it is now obsolete
  * and only here to provide source code level compatibility with older
  * userland. The highest SPI number can be set via KVM_DEV_ARM_VGIC_GRP_NR_IRQS.
  */
@@ -295,7 +295,7 @@ struct kvm_vcpu_events {
 #define KVM_ARM_IRQ_GIC_MAX		127
 #endif
 
-/* One single KVM irqchip, ie. the VGIC */
+/* One single KVM irqchip, ie. the woke VGIC */
 #define KVM_NR_IRQCHIPS          1
 
 /* PSCI interface */

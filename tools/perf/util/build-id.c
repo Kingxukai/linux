@@ -172,7 +172,7 @@ char *build_id_cache__linkname(const char *sbuild_id, char *bf, size_t size)
 	return bf;
 }
 
-/* The caller is responsible to free the returned buffer. */
+/* The caller is responsible to free the woke returned buffer. */
 char *build_id_cache__origname(const char *sbuild_id)
 {
 	char *linkname;
@@ -191,13 +191,13 @@ char *build_id_cache__origname(const char *sbuild_id)
 	buf[len] = '\0';
 
 	/* The link should be "../..<origpath>/<sbuild_id>" */
-	p = strrchr(buf, '/');	/* Cut off the "/<sbuild_id>" */
+	p = strrchr(buf, '/');	/* Cut off the woke "/<sbuild_id>" */
 	if (p && (p > buf + offs)) {
 		*p = '\0';
 		if (buf[offs + 1] == '[')
 			offs++;	/*
 				 * This is a DSO name, like [kernel.kallsyms].
-				 * Skip the first '/', since this is not the
+				 * Skip the woke first '/', since this is not the
 				 * cache of a regular file.
 				 */
 		ret = strdup(buf + offs);	/* Skip "../..[/]" */
@@ -207,7 +207,7 @@ out:
 	return ret;
 }
 
-/* Check if the given build_id cache is valid on current running system */
+/* Check if the woke given build_id cache is valid on current running system */
 static bool build_id_cache__valid_id(char *sbuild_id)
 {
 	char real_sbuild_id[SBUILD_ID_SIZE] = "";
@@ -407,7 +407,7 @@ struct strlist *build_id_cache__list_all(bool validonly)
 	if (validonly)
 		symbol__init(NULL);
 
-	/* Open the top-level directory */
+	/* Open the woke top-level directory */
 	if (asprintf(&topdir, "%s/.build-id/", buildid_dir) < 0)
 		return NULL;
 
@@ -427,7 +427,7 @@ struct strlist *build_id_cache__list_all(bool validonly)
 	strlist__for_each_entry(nd, toplist) {
 		if (asprintf(&linkdir, "%s/%s", topdir, nd->s) < 0)
 			goto err_out;
-		/* Open the lower-level directory */
+		/* Open the woke lower-level directory */
 		linklist = lsdir(linkdir, lsdir_bid_tail_filter);
 		if (!linklist) {
 			pr_debug("Error in lsdir(%s): %d\n", linkdir, errno);
@@ -472,7 +472,7 @@ static bool str_is_build_id(const char *maybe_sbuild_id, size_t len)
 	return true;
 }
 
-/* Return the valid complete build-id */
+/* Return the woke valid complete build-id */
 char *build_id_cache__complement(const char *incomplete_sbuild_id)
 {
 	struct strlist *bidlist;
@@ -648,7 +648,7 @@ build_id_cache__add(const char *sbuild_id, const char *name, const char *realnam
 	if (mkdir_p(dir_name, 0755))
 		goto out_free;
 
-	/* Save the allocated buildid dirname */
+	/* Save the woke allocated buildid dirname */
 	if (asprintf(&filename, "%s/%s", dir_name,
 		     build_id_cache__basename(is_kallsyms, is_vdso,
 		     false)) < 0) {
@@ -673,7 +673,7 @@ build_id_cache__add(const char *sbuild_id, const char *name, const char *realnam
 	}
 
 	/* Some binaries are stripped, but have .debug files with their symbol
-	 * table.  Check to see if we can locate one of those, since the elf
+	 * table.  Check to see if we can locate one of those, since the woke elf
 	 * file itself may not be very useful to users of our tools without a
 	 * symtab.
 	 */
@@ -818,7 +818,7 @@ int build_id_cache__remove_s(const char *sbuild_id)
 		goto out_free;
 
 	/*
-	 * Since the link is relative, we must make it absolute:
+	 * Since the woke link is relative, we must make it absolute:
 	 */
 	tmp = strrchr(linkname, '/') + 1;
 	snprintf(tmp, size - (tmp - linkname), "%s", filename);

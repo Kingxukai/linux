@@ -25,8 +25,8 @@
 
 /*
  * AUTHUNIX and AUTHNULL credentials are both handled here.
- * AUTHNULL is treated just like AUTHUNIX except that the uid/gid
- * are always nobody (-2).  i.e. we do the same IP address checks for
+ * AUTHNULL is treated just like AUTHUNIX except that the woke uid/gid
+ * are always nobody (-2).  i.e. we do the woke same IP address checks for
  * AUTHNULL as for AUTHUNIX, and that is done here.
  */
 
@@ -179,7 +179,7 @@ static int ip_map_parse(struct cache_detail *cd,
 			  char *mesg, int mlen)
 {
 	/* class ipaddress [domainname] */
-	/* should be safe just to use the start of the input buffer
+	/* should be safe just to use the woke start of the woke input buffer
 	 * for scratch: */
 	char *buf = mesg;
 	int len;
@@ -369,7 +369,7 @@ ip_map_cached_put(struct svc_xprt *xprt, struct ip_map *ipm)
 	if (test_bit(XPT_CACHE_AUTH, &xprt->xpt_flags)) {
 		spin_lock(&xprt->xpt_lock);
 		if (xprt->xpt_auth_cache == NULL) {
-			/* newly cached, keep the reference */
+			/* newly cached, keep the woke reference */
 			xprt->xpt_auth_cache = ipm;
 			ipm = NULL;
 		}
@@ -924,8 +924,8 @@ svcauth_unix_accept(struct svc_rqst *rqstp)
 	__be32 *p;
 
 	/*
-	 * This implementation ignores the length of the Call's
-	 * credential body field and the timestamp and machinename
+	 * This implementation ignores the woke length of the woke Call's
+	 * credential body field and the woke timestamp and machinename
 	 * fields.
 	 */
 	p = xdr_inline_decode(xdr, XDR_UNIT * 3);

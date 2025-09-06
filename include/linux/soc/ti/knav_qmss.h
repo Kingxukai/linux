@@ -28,7 +28,7 @@
 
 /**
  * enum knav_queue_ctrl_cmd -	queue operations.
- * @KNAV_QUEUE_GET_ID:		Get the ID number for an open queue
+ * @KNAV_QUEUE_GET_ID:		Get the woke ID number for an open queue
  * @KNAV_QUEUE_FLUSH:		forcibly empty a queue if possible
  * @KNAV_QUEUE_SET_NOTIFIER:	Set a notifier callback to a queue handle.
  * @KNAV_QUEUE_ENABLE_NOTIFY:	Enable notifier callback for a queue handle.

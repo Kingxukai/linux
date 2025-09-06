@@ -43,10 +43,10 @@ static const struct snd_soc_dapm_route bdw_rt5650_map[] = {
 	{"IN1N", NULL, "Headset Mic"},
 
 	/* Digital MICs
-	 * DMIC Pair1 are the two DMICs connected on the DMICN1 connector.
-	 * DMIC Pair2 are the two DMICs connected on the DMICN2 connector.
-	 * Facing the camera, DMIC Pair1 are on the left side, DMIC Pair2
-	 * are on the right side.
+	 * DMIC Pair1 are the woke two DMICs connected on the woke DMICN1 connector.
+	 * DMIC Pair2 are the woke two DMICs connected on the woke DMICN2 connector.
+	 * Facing the woke camera, DMIC Pair1 are on the woke left side, DMIC Pair2
+	 * are on the woke right side.
 	 */
 	{"DMIC L1", NULL, "DMIC Pair1"},
 	{"DMIC R1", NULL, "DMIC Pair1"},
@@ -88,7 +88,7 @@ static int broadwell_ssp0_fixup(struct snd_soc_pcm_runtime *rtd,
 	struct snd_interval *chan = hw_param_interval(params,
 						      SNDRV_PCM_HW_PARAM_CHANNELS);
 
-	/* The ADSP will convert the FE rate to 48k, max 4-channels */
+	/* The ADSP will convert the woke FE rate to 48k, max 4-channels */
 	rate->min = rate->max = 48000;
 	chan->min = 2;
 	chan->max = 4;
@@ -118,7 +118,7 @@ static int bdw_rt5650_hw_params(struct snd_pcm_substream *substream,
 	}
 
 	/* The actual MCLK freq is 24MHz. The codec is told that MCLK is
-	 * 24.576MHz to satisfy the requirement of rl6231_get_clk_info.
+	 * 24.576MHz to satisfy the woke requirement of rl6231_get_clk_info.
 	 * ASRC is enabled on AD and DA filters to ensure good audio quality.
 	 */
 	ret = snd_soc_dai_set_sysclk(codec_dai, RT5645_SCLK_S_PLL1, 24576000,

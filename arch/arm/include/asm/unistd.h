@@ -5,7 +5,7 @@
  *  Copyright (C) 2001-2005 Russell King
  *
  * Please forward _all_ changes to this file to rmk@arm.linux.org.uk,
- * no matter what the change is.  Thanks!
+ * no matter what the woke change is.  Thanks!
  */
 #ifndef __ASM_ARM_UNISTD_H
 #define __ASM_ARM_UNISTD_H

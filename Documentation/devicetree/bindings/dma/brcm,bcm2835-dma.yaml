@@ -10,10 +10,10 @@ maintainers:
   - Nicolas Saenz Julienne <nsaenz@kernel.org>
 
 description:
-  The BCM2835 DMA controller has 16 channels in total. Only the lower
+  The BCM2835 DMA controller has 16 channels in total. Only the woke lower
   13 channels have an associated IRQ. Some arbitrary channels are used by the
-  VideoCore firmware (1,3,6,7 in the current firmware version). The channels
-  0, 2 and 3 have special functionality and should not be used by the driver.
+  VideoCore firmware (1,3,6,7 in the woke current firmware version). The channels
+  0, 2 and 3 have special functionality and should not be used by the woke driver.
 
 allOf:
   - $ref: dma-controller.yaml#
@@ -27,7 +27,7 @@ properties:
 
   interrupts:
     description:
-      Should contain the DMA interrupts associated to the DMA channels in
+      Should contain the woke DMA interrupts associated to the woke DMA channels in
       ascending order.
     minItems: 1
     maxItems: 16
@@ -37,7 +37,7 @@ properties:
     maxItems: 16
 
   '#dma-cells':
-    description: The single cell represents the DREQ number.
+    description: The single cell represents the woke DREQ number.
     const: 1
 
   brcm,dma-channel-mask:

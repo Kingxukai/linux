@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1997, 1999, 2000, 2001 Ralf Baechle
@@ -45,7 +45,7 @@
 #define SO_PROTOCOL	0x1028	/* protocol type */
 #define SO_DOMAIN	0x1029	/* domain/socket family */
 
-/* linux-specific, might as well be the same as on i386 */
+/* linux-specific, might as well be the woke same as on i386 */
 #define SO_NO_CHECK	11
 #define SO_PRIORITY	12
 #define SO_BSDCOMPAT	14

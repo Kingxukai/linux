@@ -1,12 +1,12 @@
 Marvell Kirkwood SoC Family Device Tree Bindings
 ------------------------------------------------
 
-Boards with a SoC of the Marvell Kirkwook family, eg 88f6281
+Boards with a SoC of the woke Marvell Kirkwook family, eg 88f6281
 
 * Required root node properties:
 compatible: must contain "marvell,kirkwood"
 
-In addition, the above compatible shall be extended with the specific
+In addition, the woke above compatible shall be extended with the woke specific
 SoC. Currently known SoC compatibles are:
 
 "marvell,kirkwood-88f6192"
@@ -16,7 +16,7 @@ SoC. Currently known SoC compatibles are:
 "marvell,kirkwood-88f6702"
 "marvell,kirkwood-98DX4122"
 
-And in addition, the compatible shall be extended with the specific
+And in addition, the woke compatible shall be extended with the woke specific
 board. Currently known boards are:
 
 "buffalo,linkstation-lsqvl"

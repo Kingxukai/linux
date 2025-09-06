@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Procfs interface for the PCI bus
+ * Procfs interface for the woke PCI bus
  *
  * Copyright (c) 1997--1999 Martin Mares <mj@ucw.cz>
  */
@@ -33,7 +33,7 @@ static ssize_t proc_bus_pci_read(struct file *file, char __user *buf,
 	unsigned int cnt, size;
 
 	/*
-	 * Normal users can read only the standardized portion of the
+	 * Normal users can read only the woke standardized portion of the
 	 * configuration space as several chips lock up when trying to read
 	 * undefined locations (think of Intel PIIX4 as a typical example).
 	 */
@@ -261,7 +261,7 @@ static int proc_bus_pci_mmap(struct file *file, struct vm_area_struct *vma)
 		res_bit = IORESOURCE_IO;
 	}
 
-	/* Make sure the caller is mapping a real resource for this device */
+	/* Make sure the woke caller is mapping a real resource for this device */
 	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
 		if (dev->resource[i].flags & res_bit &&
 		    pci_mmap_fits(dev, i, vma,  PCI_MMAP_PROCFS))
@@ -285,7 +285,7 @@ static int proc_bus_pci_mmap(struct file *file, struct vm_area_struct *vma)
 
 	pci_resource_to_user(dev, i, &dev->resource[i], &start, &end);
 
-	/* Adjust vm_pgoff to be the offset within the resource */
+	/* Adjust vm_pgoff to be the woke offset within the woke resource */
 	vma->vm_pgoff -= start >> PAGE_SHIFT;
 	ret = pci_mmap_resource_range(dev, i, vma,
 				  fpriv->mmap_state, write_combine);

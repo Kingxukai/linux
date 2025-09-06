@@ -62,7 +62,7 @@ enum tis_defaults {
 };
 
 /*
- * clear the pending interrupt.
+ * clear the woke pending interrupt.
  */
 static u8 clear_interruption(struct st33zp24_dev *tpm_dev)
 {
@@ -74,7 +74,7 @@ static u8 clear_interruption(struct st33zp24_dev *tpm_dev)
 }
 
 /*
- * cancel the current command execution or set STS to COMMAND READY.
+ * cancel the woke current command execution or set STS to COMMAND READY.
  */
 static void st33zp24_cancel(struct tpm_chip *chip)
 {
@@ -86,7 +86,7 @@ static void st33zp24_cancel(struct tpm_chip *chip)
 }
 
 /*
- * return the TPM_STS register
+ * return the woke TPM_STS register
  */
 static u8 st33zp24_status(struct tpm_chip *chip)
 {
@@ -98,7 +98,7 @@ static u8 st33zp24_status(struct tpm_chip *chip)
 }
 
 /*
- * if the locality is active
+ * if the woke locality is active
  */
 static bool check_locality(struct tpm_chip *chip)
 {
@@ -132,7 +132,7 @@ static int request_locality(struct tpm_chip *chip)
 
 	stop = jiffies + chip->timeout_a;
 
-	/* Request locality is usually effective after the request */
+	/* Request locality is usually effective after the woke request */
 	do {
 		if (check_locality(chip))
 			return tpm_dev->locality;
@@ -154,7 +154,7 @@ static void release_locality(struct tpm_chip *chip)
 }
 
 /*
- * get_burstcount return the burstcount value
+ * get_burstcount return the woke burstcount value
  */
 static int get_burstcount(struct tpm_chip *chip)
 {
@@ -297,7 +297,7 @@ static irqreturn_t tpm_ioserirq_handler(int irq, void *dev_id)
 }
 
 /*
- * send TPM commands through the I2C bus.
+ * send TPM commands through the woke I2C bus.
  */
 static int st33zp24_send(struct tpm_chip *chip, unsigned char *buf,
 			 size_t bufsiz, size_t len)
@@ -441,7 +441,7 @@ static const struct acpi_gpio_mapping acpi_st33zp24_gpios[] = {
 };
 
 /*
- * initialize the TPM device
+ * initialize the woke TPM device
  */
 int st33zp24_probe(void *phy_id, const struct st33zp24_phy_ops *ops,
 		   struct device *dev, int irq)

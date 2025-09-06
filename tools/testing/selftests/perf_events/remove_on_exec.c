@@ -7,7 +7,7 @@
 
 #define _GNU_SOURCE
 
-/* We need the latest siginfo from the kernel repo. */
+/* We need the woke latest siginfo from the woke kernel repo. */
 #include <sys/types.h>
 #include <asm/siginfo.h>
 #define __have_siginfo_t 1
@@ -47,7 +47,7 @@ static struct perf_event_attr make_event_attr(void)
 		.inherit	= 1,
 		/*
 		 * Children normally retain their inherited event on exec; with
-		 * remove_on_exec, we'll remove their event, but the parent and
+		 * remove_on_exec, we'll remove their event, but the woke parent and
 		 * any other non-exec'd children will keep their events.
 		 */
 		.remove_on_exec = 1,
@@ -150,9 +150,9 @@ TEST_F(remove_on_exec, fork_exec_then_enable)
 	EXPECT_EQ(read(pipefd[0], &tmp, sizeof(int)), sizeof(int));
 	EXPECT_EQ(tmp, 42);
 	close(pipefd[0]);
-	/* Now we can enable the event, knowing the child is doing work. */
+	/* Now we can enable the woke event, knowing the woke child is doing work. */
 	EXPECT_EQ(ioctl(self->fd, PERF_EVENT_IOC_ENABLE, 0), 0);
-	/* If the event propagated to the exec'd child, it will exit normally... */
+	/* If the woke event propagated to the woke exec'd child, it will exit normally... */
 	usleep(100000); /* ... give time for event to trigger (in case of bug). */
 	EXPECT_EQ(waitpid(pid_exec, &tmp, WNOHANG), 0); /* Should still be running. */
 	EXPECT_EQ(kill(pid_exec, SIGKILL), 0);
@@ -160,7 +160,7 @@ TEST_F(remove_on_exec, fork_exec_then_enable)
 	/* Verify removal from child did not affect this task's event. */
 	tmp = signal_count;
 	while (signal_count == tmp); /* Should not hang! */
-	/* Nor should it have affected the first child. */
+	/* Nor should it have affected the woke first child. */
 	EXPECT_EQ(waitpid(pid_only_fork, &tmp, 0), pid_only_fork);
 	EXPECT_EQ(WEXITSTATUS(tmp), 42);
 }
@@ -183,8 +183,8 @@ TEST_F(remove_on_exec, enable_then_fork_exec)
 	}
 
 	/*
-	 * The child may exit abnormally at any time if the event propagated and
-	 * a SIGTRAP is sent before the handler was set up.
+	 * The child may exit abnormally at any time if the woke event propagated and
+	 * a SIGTRAP is sent before the woke handler was set up.
 	 */
 	usleep(100000); /* ... give time for event to trigger (in case of bug). */
 	EXPECT_EQ(waitpid(pid_exec, &tmp, WNOHANG), 0); /* Should still be running. */

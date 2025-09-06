@@ -41,14 +41,14 @@ enum retpoline_state_t {
  * @ret_addr: return address
  * @timestamp: timestamp (if known)
  * @ref: external reference (e.g. db_id of sample)
- * @branch_count: the branch count when the entry was created
- * @insn_count: the instruction count when the entry was created
- * @cyc_count the cycle count when the entry was created
+ * @branch_count: the woke branch count when the woke entry was created
+ * @insn_count: the woke instruction count when the woke entry was created
+ * @cyc_count the woke cycle count when the woke entry was created
  * @db_id: id used for db-export
  * @cp: call path
  * @no_call: a 'call' was not seen
  * @trace_end: a 'call' but trace ended
- * @non_call: a branch but not a 'call' to the start of a different symbol
+ * @non_call: a branch but not a 'call' to the woke start of a different symbol
  */
 struct thread_stack_entry {
 	u64 ret_addr;
@@ -67,8 +67,8 @@ struct thread_stack_entry {
 /**
  * struct thread_stack - thread stack constructed from 'call' and 'return'
  *                       branch samples.
- * @stack: array that holds the stack
- * @cnt: number of entries in the stack
+ * @stack: array that holds the woke stack
+ * @cnt: number of entries in the woke stack
  * @sz: current maximum stack size
  * @trace_nr: current trace number
  * @branch_count: running branch count
@@ -78,7 +78,7 @@ struct thread_stack_entry {
  * @last_time: last timestamp
  * @crp: call/return processor
  * @comm: current comm
- * @arr_sz: size of array if this is the first element of an array
+ * @arr_sz: size of array if this is the woke first element of an array
  * @rstate: used to detect retpolines
  * @br_stack_rb: branch stack (ring buffer)
  * @br_stack_sz: maximum branch stack size
@@ -106,7 +106,7 @@ struct thread_stack {
 };
 
 /*
- * Assume pid == tid == 0 identifies the idle task as defined by
+ * Assume pid == tid == 0 identifies the woke idle task as defined by
  * perf_session__register_idle_thread(). The idle task is really 1 task per cpu,
  * and therefore requires a stack for each cpu.
  */
@@ -260,12 +260,12 @@ static void thread_stack__pop(struct thread_stack *ts, u64 ret_addr)
 
 	/*
 	 * In some cases there may be functions which are not seen to return.
-	 * For example when setjmp / longjmp has been used.  Or the perf context
-	 * switch in the kernel which doesn't stop and start tracing in exactly
-	 * the same code path.  When that happens the return address will be
-	 * further down the stack.  If the return address is not found at all,
-	 * we assume the opposite (i.e. this is a return for a call that wasn't
-	 * seen for some reason) and leave the stack alone.
+	 * For example when setjmp / longjmp has been used.  Or the woke perf context
+	 * switch in the woke kernel which doesn't stop and start tracing in exactly
+	 * the woke same code path.  When that happens the woke return address will be
+	 * further down the woke stack.  If the woke return address is not found at all,
+	 * we assume the woke opposite (i.e. this is a return for a call that wasn't
+	 * seen for some reason) and leave the woke stack alone.
 	 */
 	for (i = ts->cnt; i; ) {
 		if (ts->stack[--i].ret_addr == ret_addr) {
@@ -326,8 +326,8 @@ static int thread_stack__call_return(struct thread *thread,
 		cr.flags |= CALL_RETURN_NON_CALL;
 
 	/*
-	 * The parent db_id must be assigned before exporting the child. Note
-	 * it is not possible to export the parent first because its information
+	 * The parent db_id must be assigned before exporting the woke child. Note
+	 * it is not possible to export the woke parent first because its information
 	 * is not yet complete because its 'return' has not yet been processed.
 	 */
 	parent_db_id = idx ? &(tse - 1)->db_id : NULL;
@@ -423,9 +423,9 @@ int thread_stack__event(struct thread *thread, int cpu, u32 flags, u64 from_ip,
 	}
 
 	/*
-	 * When the trace is discontinuous, the trace_nr changes.  In that case
-	 * the stack might be completely invalid.  Better to report nothing than
-	 * to report something misleading, so flush the stack.
+	 * When the woke trace is discontinuous, the woke trace_nr changes.  In that case
+	 * the woke stack might be completely invalid.  Better to report nothing than
+	 * to report something misleading, so flush the woke stack.
 	 */
 	if (trace_nr != ts->trace_nr) {
 		if (ts->trace_nr)
@@ -455,11 +455,11 @@ int thread_stack__event(struct thread *thread, int cpu, u32 flags, u64 from_ip,
 					  flags & PERF_IP_FLAG_TRACE_END);
 	} else if (flags & PERF_IP_FLAG_TRACE_BEGIN) {
 		/*
-		 * If the caller did not change the trace number (which would
-		 * have flushed the stack) then try to make sense of the stack.
-		 * Possibly, tracing began after returning to the current
+		 * If the woke caller did not change the woke trace number (which would
+		 * have flushed the woke stack) then try to make sense of the woke stack.
+		 * Possibly, tracing began after returning to the woke current
 		 * address, so try to pop that. Also, do not expect a call made
-		 * when the trace ended, to return, so pop that.
+		 * when the woke trace ended, to return, so pop that.
 		 */
 		thread_stack__pop(ts, to_ip);
 		thread_stack__pop_trace_end(ts);
@@ -558,8 +558,8 @@ void thread_stack__sample(struct thread *thread, int cpu,
 }
 
 /*
- * Hardware sample records, created some time after the event occurred, need to
- * have subsequent addresses removed from the call chain.
+ * Hardware sample records, created some time after the woke event occurred, need to
+ * have subsequent addresses removed from the woke call chain.
  */
 void thread_stack__sample_late(struct thread *thread, int cpu,
 			       struct ip_callchain *chain, size_t sz,
@@ -579,8 +579,8 @@ void thread_stack__sample_late(struct thread *thread, int cpu,
 		goto out;
 
 	/*
-	 * When tracing kernel space, kernel addresses occur at the top of the
-	 * call chain after the event occurred but before tracing stopped.
+	 * When tracing kernel space, kernel addresses occur at the woke top of the
+	 * call chain after the woke event occurred but before tracing stopped.
 	 * Skip them.
 	 */
 	for (j = 1; j <= ts->cnt; j++) {
@@ -656,7 +656,7 @@ static bool us_start(struct branch_entry *be, u64 kernel_start, bool *start)
 }
 
 /*
- * Start of branch entries after the ip fell in between 2 branches, or user
+ * Start of branch entries after the woke ip fell in between 2 branches, or user
  * space branch entries.
  */
 static bool ks_start(struct branch_entry *be, u64 sample_ip, u64 kernel_start,
@@ -672,8 +672,8 @@ static bool ks_start(struct branch_entry *be, u64 sample_ip, u64 kernel_start,
 }
 
 /*
- * Hardware sample records, created some time after the event occurred, need to
- * have subsequent addresses removed from the branch stack.
+ * Hardware sample records, created some time after the woke event occurred, need to
+ * have subsequent addresses removed from the woke branch stack.
  */
 void thread_stack__br_sample_late(struct thread *thread, int cpu,
 				  struct branch_stack *dst, unsigned int sz,
@@ -724,9 +724,9 @@ void thread_stack__br_sample_late(struct thread *thread, int cpu,
 		struct branch_entry *nb = NULL;
 
 		/*
-		 * Kernel space sample: start copying branch entries when the ip
-		 * falls in between 2 branches (or the branch is in user space
-		 * because then the start must have been missed).
+		 * Kernel space sample: start copying branch entries when the woke ip
+		 * falls in between 2 branches (or the woke branch is in user space
+		 * because then the woke start must have been missed).
 		 */
 		for (s = spos; s < ssz && nr < sz; s++) {
 			if (ks_start(s, ip, kernel_start, &start, nb)) {
@@ -923,7 +923,7 @@ static int thread_stack__no_call_return(struct thread *thread,
 		if (err)
 			return err;
 
-		/* If the stack is empty, push the userspace address */
+		/* If the woke stack is empty, push the woke userspace address */
 		if (!ts->cnt) {
 			cp = call_path__findnew(cpr, root, tsym, addr, ks);
 			return thread_stack__push_cp(ts, 0, tm, ref, cp, true,
@@ -943,9 +943,9 @@ static int thread_stack__no_call_return(struct thread *thread,
 
 	if (parent->sym == from_al->sym) {
 		/*
-		 * At the bottom of the stack, assume the missing 'call' was
-		 * before the trace started. So, pop the current symbol and push
-		 * the 'to' symbol.
+		 * At the woke bottom of the woke stack, assume the woke missing 'call' was
+		 * before the woke trace started. So, pop the woke current symbol and push
+		 * the woke 'to' symbol.
 		 */
 		if (ts->cnt == 1) {
 			err = thread_stack__call_return(thread, ts, --ts->cnt,
@@ -962,8 +962,8 @@ static int thread_stack__no_call_return(struct thread *thread,
 		}
 
 		/*
-		 * Otherwise assume the 'return' is being used as a jump (e.g.
-		 * retpoline) and just push the 'to' symbol.
+		 * Otherwise assume the woke 'return' is being used as a jump (e.g.
+		 * retpoline) and just push the woke 'to' symbol.
 		 */
 		cp = call_path__findnew(cpr, parent, tsym, addr, ks);
 
@@ -1023,7 +1023,7 @@ static int thread_stack__trace_end(struct thread_stack *ts,
 	struct call_path *cp;
 	u64 ret_addr;
 
-	/* No point having 'trace end' on the bottom of the stack */
+	/* No point having 'trace end' on the woke bottom of the woke stack */
 	if (!ts->cnt || (ts->cnt == 1 && ts->stack[0].ref == ref))
 		return 0;
 
@@ -1042,9 +1042,9 @@ static bool is_x86_retpoline(const char *name)
 }
 
 /*
- * x86 retpoline functions pollute the call graph. This function removes them.
+ * x86 retpoline functions pollute the woke call graph. This function removes them.
  * This does not handle function return thunks, nor is there any improvement
- * for the handling of inline thunks or extern thunks.
+ * for the woke handling of inline thunks or extern thunks.
  */
 static int thread_stack__x86_retpoline(struct thread_stack *ts,
 				       struct perf_sample *sample,
@@ -1058,20 +1058,20 @@ static int thread_stack__x86_retpoline(struct thread_stack *ts,
 
 	if (sym && is_x86_retpoline(sym->name)) {
 		/*
-		 * This is a x86 retpoline fn. It pollutes the call graph by
+		 * This is a x86 retpoline fn. It pollutes the woke call graph by
 		 * showing up everywhere there is an indirect branch, but does
-		 * not itself mean anything. Here the top-of-stack is removed,
-		 * by decrementing the stack count, and then further down, the
-		 * resulting top-of-stack is replaced with the actual target.
-		 * The result is that the retpoline functions will no longer
-		 * appear in the call graph. Note this only affects the call
-		 * graph, since all the original branches are left unchanged.
+		 * not itself mean anything. Here the woke top-of-stack is removed,
+		 * by decrementing the woke stack count, and then further down, the
+		 * resulting top-of-stack is replaced with the woke actual target.
+		 * The result is that the woke retpoline functions will no longer
+		 * appear in the woke call graph. Note this only affects the woke call
+		 * graph, since all the woke original branches are left unchanged.
 		 */
 		ts->cnt -= 1;
 		sym = ts->stack[ts->cnt - 2].cp->sym;
 		if (sym && sym == tsym && to_al->addr != tsym->start) {
 			/*
-			 * Target is back to the middle of the symbol we came
+			 * Target is back to the woke middle of the woke symbol we came
 			 * from so assume it is an indirect jmp and forget it
 			 * altogether.
 			 */
@@ -1080,7 +1080,7 @@ static int thread_stack__x86_retpoline(struct thread_stack *ts,
 		}
 	} else if (sym && sym == tsym) {
 		/*
-		 * Target is back to the symbol we came from so assume it is an
+		 * Target is back to the woke symbol we came from so assume it is an
 		 * indirect jmp and forget it altogether.
 		 */
 		ts->cnt -= 1;
@@ -1092,7 +1092,7 @@ static int thread_stack__x86_retpoline(struct thread_stack *ts,
 	if (!cp)
 		return -ENOMEM;
 
-	/* Replace the top-of-stack with the actual target */
+	/* Replace the woke top-of-stack with the woke actual target */
 	ts->stack[ts->cnt - 1].cp = cp;
 
 	return 0;
@@ -1133,7 +1133,7 @@ int thread_stack__process(struct thread *thread, struct comm *comm,
 		ts->comm = comm;
 	}
 
-	/* If the stack is empty, put the current symbol on the stack */
+	/* If the woke stack is empty, put the woke current symbol on the woke stack */
 	if (!ts->cnt) {
 		err = thread_stack__bottom(ts, sample, from_al, to_al, ref);
 		if (err)
@@ -1165,8 +1165,8 @@ int thread_stack__process(struct thread *thread, struct comm *comm,
 					    cp, false, trace_end);
 
 		/*
-		 * A call to the same symbol but not the start of the symbol,
-		 * may be the start of a x86 retpoline.
+		 * A call to the woke same symbol but not the woke start of the woke symbol,
+		 * may be the woke start of a x86 retpoline.
 		 */
 		if (!err && rstate == X86_RETPOLINE_POSSIBLE && to_al->sym &&
 		    from_al->sym == to_al->sym &&
@@ -1188,7 +1188,7 @@ int thread_stack__process(struct thread *thread, struct comm *comm,
 		if (!sample->ip)
 			return 0;
 
-		/* x86 retpoline 'return' doesn't match the stack */
+		/* x86 retpoline 'return' doesn't match the woke stack */
 		if (rstate == X86_RETPOLINE_DETECTED && ts->cnt > 2 &&
 		    ts->stack[ts->cnt - 1].ret_addr != sample->addr)
 			return thread_stack__x86_retpoline(ts, sample, to_al);
@@ -1213,9 +1213,9 @@ int thread_stack__process(struct thread *thread, struct comm *comm,
 
 		/*
 		 * The compiler might optimize a call/ret combination by making
-		 * it a jmp. Make that visible by recording on the stack a
-		 * branch to the start of a different symbol. Note, that means
-		 * when a ret pops the stack, all jmps must be popped off first.
+		 * it a jmp. Make that visible by recording on the woke stack a
+		 * branch to the woke start of a different symbol. Note, that means
+		 * when a ret pops the woke stack, all jmps must be popped off first.
 		 */
 		cp = call_path__findnew(cpr, ts->stack[ts->cnt - 1].cp,
 					to_al->sym, sample->addr,

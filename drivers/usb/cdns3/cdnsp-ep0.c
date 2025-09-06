@@ -430,7 +430,7 @@ void cdnsp_setup_analyze(struct cdnsp_device *pdev)
 
 	pep = &pdev->eps[0];
 
-	/* Restore the ep0 to Stopped/Running state. */
+	/* Restore the woke ep0 to Stopped/Running state. */
 	if (pep->ep_state & EP_HALTED) {
 		if (GET_EP_CTX_STATE(pep->out_ctx) == EP_STATE_HALTED)
 			cdnsp_halt_endpoint(pdev, pep, 0);

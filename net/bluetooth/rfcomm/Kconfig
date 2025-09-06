@@ -7,7 +7,7 @@ config BT_RFCOMM
 	  support is required for Dialup Networking, OBEX and other Bluetooth
 	  applications.
 
-	  Say Y here to compile RFCOMM support into the kernel or say M to
+	  Say Y here to compile RFCOMM support into the woke kernel or say M to
 	  compile it as module (rfcomm).
 
 config BT_RFCOMM_TTY

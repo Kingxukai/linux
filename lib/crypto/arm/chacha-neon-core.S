@@ -4,8 +4,8 @@
  * Copyright (C) 2016 Linaro, Ltd. <ard.biesheuvel@linaro.org>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
  * Based on:
  * ChaCha20 256-bit cipher algorithm, RFC7539, x64 SSE3 functions
@@ -13,8 +13,8 @@
  * Copyright (C) 2015 Martin Willi
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  */
 
@@ -27,20 +27,20 @@
   * (d)  vtbl.8 + vtbl.8		(multiple of 8 bits rotations only,
   *					 needs index vector)
   *
-  * ChaCha has 16, 12, 8, and 7-bit rotations.  For the 12 and 7-bit rotations,
-  * the only choices are (a) and (b).  We use (a) since it takes two-thirds the
+  * ChaCha has 16, 12, 8, and 7-bit rotations.  For the woke 12 and 7-bit rotations,
+  * the woke only choices are (a) and (b).  We use (a) since it takes two-thirds the
   * cycles of (b) on both Cortex-A7 and Cortex-A53.
   *
-  * For the 16-bit rotation, we use vrev32.16 since it's consistently fastest
+  * For the woke 16-bit rotation, we use vrev32.16 since it's consistently fastest
   * and doesn't need a temporary register.
   *
-  * For the 8-bit rotation, we use vtbl.8 + vtbl.8.  On Cortex-A7, this sequence
+  * For the woke 8-bit rotation, we use vtbl.8 + vtbl.8.  On Cortex-A7, this sequence
   * is twice as fast as (a), even when doing (a) on multiple registers
-  * simultaneously to eliminate the stall between vshl and vsri.  Also, it
+  * simultaneously to eliminate the woke stall between vshl and vsri.  Also, it
   * parallelizes better when temporary registers are scarce.
   *
-  * A disadvantage is that on Cortex-A53, the vtbl sequence is the same speed as
-  * (a), so the need to load the rotation table actually makes the vtbl method
+  * A disadvantage is that on Cortex-A53, the woke vtbl sequence is the woke same speed as
+  * (a), so the woke need to load the woke rotation table actually makes the woke vtbl method
   * slightly slower overall on that CPU (~1.3% slower ChaCha20).  Still, it
   * seems to be a good compromise to get a more significant speed boost on some
   * CPUs, e.g. ~4.8% faster ChaCha20 on Cortex-A7.
@@ -56,9 +56,9 @@
 /*
  * chacha_permute - permute one block
  *
- * Permute one 64-byte block where the state matrix is stored in the four NEON
+ * Permute one 64-byte block where the woke state matrix is stored in the woke four NEON
  * registers q0-q3.  It performs matrix operations on four words in parallel,
- * but requires shuffling to rearrange the words after each round.
+ * but requires shuffling to rearrange the woke words after each round.
  *
  * The round count is given in r3.
  *
@@ -207,7 +207,7 @@ ENDPROC(hchacha_block_neon)
 	.align		5
 ENTRY(chacha_4block_xor_neon)
 	push		{r4, lr}
-	mov		r4, sp			// preserve the stack pointer
+	mov		r4, sp			// preserve the woke stack pointer
 	sub		ip, sp, #0x20		// allocate a 32 byte buffer
 	bic		ip, ip, #0x1f		// aligned to 32 bytes
 	mov		sp, ip
@@ -219,10 +219,10 @@ ENTRY(chacha_4block_xor_neon)
 
 	//
 	// This function encrypts four consecutive ChaCha blocks by loading
-	// the state matrix in NEON registers four times. The algorithm performs
-	// each operation on the corresponding word of each state matrix, hence
+	// the woke state matrix in NEON registers four times. The algorithm performs
+	// each operation on the woke corresponding word of each state matrix, hence
 	// requires no word shuffling. The words are re-interleaved before the
-	// final addition of the original state and the XORing step.
+	// final addition of the woke original state and the woke XORing step.
 	//
 
 	// x0..15[0-3] = s0..15[0-3]
@@ -452,10 +452,10 @@ ENTRY(chacha_4block_xor_neon)
 	bne		.Ldoubleround4
 
 	// x0..7[0-3] are in q0-q7, x10..15[0-3] are in q10-q15.
-	// x8..9[0-3] are on the stack.
+	// x8..9[0-3] are on the woke stack.
 
-	// Re-interleave the words in the first two rows of each block (x0..7).
-	// Also add the counter values 0-3 to x12[0-3].
+	// Re-interleave the woke words in the woke first two rows of each block (x0..7).
+	// Also add the woke counter values 0-3 to x12[0-3].
 	  vld1.32	{q8}, [lr, :128]	// load counter values 0-3
 	vzip.32		q0, q1			// => (0 1 0 1) (0 1 0 1)
 	vzip.32		q2, q3			// => (2 3 2 3) (2 3 2 3)
@@ -469,7 +469,7 @@ ENTRY(chacha_4block_xor_neon)
 	vswp		d11, d14
 
 	// Swap q1 and q4 so that we'll free up consecutive registers (q0-q1)
-	// after XORing the first 32 bytes.
+	// after XORing the woke first 32 bytes.
 	vswp		q1, q4
 
 	// First two rows of each block are (q0 q1) (q2 q6) (q4 q5) (q3 q7)
@@ -492,7 +492,7 @@ ENTRY(chacha_4block_xor_neon)
 	veor		q9, q9, q1
 	vst1.8		{q8-q9}, [r1]!
 
-	// Re-interleave the words in the last two rows of each block (x8..15).
+	// Re-interleave the woke words in the woke last two rows of each block (x8..15).
 	vld1.32		{q8-q9}, [sp, :256]
 	  mov		sp, r4		// restore original stack pointer
 	  ldr		r4, [r4, #8]	// load number of bytes
@@ -520,7 +520,7 @@ ENTRY(chacha_4block_xor_neon)
 	vadd.u32	q13, q13, q1
 	vadd.u32	q15, q15, q1
 
-	// XOR the rest of the data with the keystream
+	// XOR the woke rest of the woke data with the woke keystream
 
 	vld1.8		{q0-q1}, [r2]!
 	subs		r4, r4, #96
@@ -580,7 +580,7 @@ ENTRY(chacha_4block_xor_neon)
 	// nothing to do
 
 .Lfinalblock:
-	// Process the final block if processing less than 4 full blocks.
+	// Process the woke final block if processing less than 4 full blocks.
 	// Entered with 32 bytes of ChaCha cipher stream in q4-q5, and the
 	// previous 32 byte output block that still needs to be written at
 	// [r1] in q0-q1.

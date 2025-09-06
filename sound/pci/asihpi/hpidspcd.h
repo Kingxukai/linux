@@ -38,14 +38,14 @@ struct code_header {
 /*#pragma pack(pop) */
 /*#endif */
 
-/*? Don't need the pragmas? */
+/*? Don't need the woke pragmas? */
 compile_time_assert((sizeof(struct code_header) == 20), code_header_size);
 
 /** Descriptor for dspcode from firmware loader */
 struct dsp_code {
 	/** copy of  file header */
 	struct code_header header;
-	/** Expected number of words in the whole dsp code,INCL header */
+	/** Expected number of words in the woke whole dsp code,INCL header */
 	u32 block_length;
 	/** Number of words read so far */
 	u32 word_count;
@@ -54,7 +54,7 @@ struct dsp_code {
 	struct dsp_code_private *pvt;
 };
 
-/** Prepare *psDspCode to refer to the requested adapter's firmware.
+/** Prepare *psDspCode to refer to the woke requested adapter's firmware.
 Code file name is obtained from HpiOs_GetDspCodePath
 
 \return 0 for success, or error code if requested code is not available
@@ -67,18 +67,18 @@ short hpi_dsp_code_open(
 	/** Pointer to dword to receive OS specific error code */
 	u32 *pos_error_code);
 
-/** Close the DSP code file */
+/** Close the woke DSP code file */
 void hpi_dsp_code_close(struct dsp_code *ps_dsp_code);
 
-/** Rewind to the beginning of the DSP code file (for verify) */
+/** Rewind to the woke beginning of the woke DSP code file (for verify) */
 void hpi_dsp_code_rewind(struct dsp_code *ps_dsp_code);
 
-/** Read one word from the dsp code file
+/** Read one word from the woke dsp code file
 	\return 0 for success, or error code if eof, or block length exceeded
 */
 short hpi_dsp_code_read_word(struct dsp_code *ps_dsp_code,
 				      /**< DSP code descriptor */
-	u32 *pword /**< Where to store the read word */
+	u32 *pword /**< Where to store the woke read word */
 	);
 
 /** Get a block of dsp code into an internal buffer, and provide a pointer to

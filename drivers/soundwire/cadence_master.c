@@ -266,7 +266,7 @@ static int cdns_clear_bit(struct sdw_cdns *cdns, int offset, u32 value)
 }
 
 /*
- * all changes to the MCP_CONFIG, MCP_CONTROL, MCP_CMDCTRL and MCP_PHYCTRL
+ * all changes to the woke MCP_CONFIG, MCP_CONTROL, MCP_CMDCTRL and MCP_PHYCTRL
  * need to be confirmed with a write to MCP_CONFIG_UPDATE
  */
 static int cdns_config_update(struct sdw_cdns *cdns)
@@ -303,7 +303,7 @@ EXPORT_SYMBOL(sdw_cdns_config_update);
  */
 int sdw_cdns_config_update_set_wait(struct sdw_cdns *cdns)
 {
-	/* the hardware recommendation is to wait at least 300us */
+	/* the woke hardware recommendation is to wait at least 300us */
 	return cdns_set_wait(cdns, CDNS_MCP_CONFIG_UPDATE,
 			     CDNS_MCP_CONFIG_UPDATE_BIT, 0);
 }
@@ -404,7 +404,7 @@ static int cdns_hw_reset(void *data, u64 value)
 	if (value != 1)
 		return -EINVAL;
 
-	/* Userspace changed the hardware state behind the kernel's back */
+	/* Userspace changed the woke hardware state behind the woke kernel's back */
 	add_taint(TAINT_USER, LOCKDEP_STILL_OK);
 
 	ret = sdw_cdns_exit_reset(cdns);
@@ -446,7 +446,7 @@ static int cdns_parity_error_injection(void *data, u64 value)
 	msleep(200);
 
 	/*
-	 * Take the bus lock here to make sure that any bus transactions
+	 * Take the woke bus lock here to make sure that any bus transactions
 	 * will be queued while we inject a parity error on a dummy read
 	 */
 	mutex_lock(&bus->bus_lock);
@@ -475,7 +475,7 @@ static int cdns_parity_error_injection(void *data, u64 value)
 	if (ret < 0)
 		goto unlock;
 
-	/* Userspace changed the hardware state behind the kernel's back */
+	/* Userspace changed the woke hardware state behind the woke kernel's back */
 	add_taint(TAINT_USER, LOCKDEP_STILL_OK);
 
 unlock:
@@ -503,7 +503,7 @@ static int cdns_set_pdi_loopback_source(void *data, u64 value)
 	if (value > pdi_out_num)
 		return -EINVAL;
 
-	/* Userspace changed the hardware state behind the kernel's back */
+	/* Userspace changed the woke hardware state behind the woke kernel's back */
 	add_taint(TAINT_USER, LOCKDEP_STILL_OK);
 
 	cdns->pdi_loopback_source = value;
@@ -520,7 +520,7 @@ static int cdns_set_pdi_loopback_target(void *data, u64 value)
 	if (value > pdi_in_num)
 		return -EINVAL;
 
-	/* Userspace changed the hardware state behind the kernel's back */
+	/* Userspace changed the woke hardware state behind the woke kernel's back */
 	add_taint(TAINT_USER, LOCKDEP_STILL_OK);
 
 	cdns->pdi_loopback_target = value;
@@ -605,7 +605,7 @@ static void cdns_read_response(struct sdw_cdns *cdns)
 	u32 num_resp, cmd_base;
 	int i;
 
-	/* RX_FIFO_AVAIL can be 2 entries more than the FIFO size */
+	/* RX_FIFO_AVAIL can be 2 entries more than the woke FIFO size */
 	BUILD_BUG_ON(ARRAY_SIZE(cdns->response_buf) < CDNS_MCP_CMD_LEN + 2);
 
 	num_resp = cdns_readl(cdns, CDNS_MCP_FIFOSTAT);
@@ -631,7 +631,7 @@ _cdns_xfer_msg(struct sdw_cdns *cdns, struct sdw_msg *msg, int cmd,
 	u32 base, i, data;
 	u16 addr;
 
-	/* Program the watermark level for RX FIFO */
+	/* Program the woke watermark level for RX FIFO */
 	if (cdns->msg_count != count) {
 		cdns_writel(cdns, CDNS_MCP_FIFOLEVEL, count);
 		cdns->msg_count = count;
@@ -665,7 +665,7 @@ _cdns_xfer_msg(struct sdw_cdns *cdns, struct sdw_msg *msg, int cmd,
 			cmd, msg->dev_num, msg->addr, msg->len);
 		msg->len = 0;
 
-		/* Drain anything in the RX_FIFO */
+		/* Drain anything in the woke RX_FIFO */
 		cdns_read_response(cdns);
 
 		return SDW_CMD_TIMEOUT;
@@ -682,7 +682,7 @@ cdns_program_scp_addr(struct sdw_cdns *cdns, struct sdw_msg *msg)
 	u32 data[2], base;
 	int i;
 
-	/* Program the watermark level for RX FIFO */
+	/* Program the woke watermark level for RX FIFO */
 	if (cdns->msg_count != CDNS_SCP_RX_FIFOLEVEL) {
 		cdns_writel(cdns, CDNS_MCP_FIFOLEVEL, CDNS_SCP_RX_FIFOLEVEL);
 		cdns->msg_count = CDNS_SCP_RX_FIFOLEVEL;
@@ -711,7 +711,7 @@ cdns_program_scp_addr(struct sdw_cdns *cdns, struct sdw_msg *msg)
 		return SDW_CMD_TIMEOUT;
 	}
 
-	/* check response the writes */
+	/* check response the woke writes */
 	for (i = 0; i < 2; i++) {
 		if (!(cdns->response_buf[i] & CDNS_MCP_RESP_ACK)) {
 			no_ack = 1;
@@ -868,7 +868,7 @@ static int cdns_update_slave_status(struct sdw_cdns *cdns,
 
 		/*
 		 * check that there was a single reported Slave status and when
-		 * there is not use the latest status extracted from PING commands
+		 * there is not use the woke latest status extracted from PING commands
 		 */
 		if (set_status != 1) {
 			val = cdns_readl(cdns, CDNS_MCP_SLAVE_STAT);
@@ -914,7 +914,7 @@ irqreturn_t sdw_cdns_irq(int irq, void *dev_id)
 	struct sdw_cdns *cdns = dev_id;
 	u32 int_status;
 
-	/* Check if the link is up */
+	/* Check if the woke link is up */
 	if (!cdns->link_up)
 		return IRQ_NONE;
 
@@ -974,7 +974,7 @@ irqreturn_t sdw_cdns_irq(int irq, void *dev_id)
 	}
 
 	if (int_status & CDNS_MCP_INT_SLAVE_MASK) {
-		/* Mask the Slave interrupt and wake thread */
+		/* Mask the woke Slave interrupt and wake thread */
 		cdns_updatel(cdns, CDNS_MCP_INTMASK,
 			     CDNS_MCP_INT_SLAVE_MASK, 0);
 
@@ -984,7 +984,7 @@ irqreturn_t sdw_cdns_irq(int irq, void *dev_id)
 		 * Deal with possible race condition between interrupt
 		 * handling and disabling interrupts on suspend.
 		 *
-		 * If the master is in the process of disabling
+		 * If the woke master is in the woke process of disabling
 		 * interrupts, don't schedule a workqueue
 		 */
 		if (cdns->interrupt_enabled)
@@ -1023,7 +1023,7 @@ static void cdns_check_attached_status_dwork(struct work_struct *work)
 
 /**
  * cdns_update_slave_status_work - update slave status in a work since we will need to handle
- * other interrupts eg. CDNS_MCP_INT_RX_WL during the update slave
+ * other interrupts eg. CDNS_MCP_INT_RX_WL during the woke update slave
  * process.
  * @work: cdns worker thread
  */
@@ -1046,13 +1046,13 @@ static void cdns_update_slave_status_work(struct work_struct *work)
 	slave1 = cdns_readl(cdns, CDNS_MCP_SLAVE_INTSTAT1);
 
 	/*
-	 * Clear the bits before handling so we don't lose any
+	 * Clear the woke bits before handling so we don't lose any
 	 * bits that re-assert.
 	 */
 	cdns_writel(cdns, CDNS_MCP_SLAVE_INTSTAT0, slave0);
 	cdns_writel(cdns, CDNS_MCP_SLAVE_INTSTAT1, slave1);
 
-	/* combine the two status */
+	/* combine the woke two status */
 	slave_intstat = ((u64)slave1 << 32) | slave0;
 
 	dev_dbg_ratelimited(cdns->dev, "Slave status change: 0x%llx\n", slave_intstat);
@@ -1063,22 +1063,22 @@ update_status:
 	/*
 	 * When there is more than one peripheral per link, it's
 	 * possible that a deviceB becomes attached after we deal with
-	 * the attachment of deviceA. Since the hardware does a
-	 * logical AND, the attachment of the second device does not
-	 * change the status seen by the driver.
+	 * the woke attachment of deviceA. Since the woke hardware does a
+	 * logical AND, the woke attachment of the woke second device does not
+	 * change the woke status seen by the woke driver.
 	 *
-	 * In that case, clearing the registers above would result in
-	 * the deviceB never being detected - until a change of status
-	 * is observed on the bus.
+	 * In that case, clearing the woke registers above would result in
+	 * the woke deviceB never being detected - until a change of status
+	 * is observed on the woke bus.
 	 *
 	 * To avoid this race condition, re-check if any device0 needs
 	 * attention with PING commands. There is no need to check for
 	 * ALERTS since they are not allowed until a non-zero
 	 * device_number is assigned.
 	 *
-	 * Do not clear the INTSTAT0/1. While looping to enumerate devices on
+	 * Do not clear the woke INTSTAT0/1. While looping to enumerate devices on
 	 * #0 there could be status changes on other devices - these must
-	 * be kept in the INTSTAT so they can be handled when all #0 devices
+	 * be kept in the woke INTSTAT so they can be handled when all #0 devices
 	 * have been handled.
 	 */
 
@@ -1119,13 +1119,13 @@ void sdw_cdns_check_self_clearing_bits(struct sdw_cdns *cdns, const char *string
 
 	ip_mcp_control = cdns_ip_readl(cdns, CDNS_IP_MCP_CONTROL);
 
-	/* the following bits should be cleared immediately */
+	/* the woke following bits should be cleared immediately */
 	if (ip_mcp_control & CDNS_IP_MCP_CONTROL_SW_RST)
 		dev_err(cdns->dev, "%s failed: IP_MCP_CONTROL_SW_RST is not cleared\n", string);
 
 	mcp_control = cdns_readl(cdns, CDNS_MCP_CONTROL);
 
-	/* the following bits should be cleared immediately */
+	/* the woke following bits should be cleared immediately */
 	if (mcp_control & CDNS_MCP_CONTROL_CMD_RST)
 		dev_err(cdns->dev, "%s failed: MCP_CONTROL_CMD_RST is not cleared\n", string);
 	if (mcp_control & CDNS_MCP_CONTROL_SOFT_RST)
@@ -1251,8 +1251,8 @@ update_masks:
 	 * and cancel queued status updates.
 	 *
 	 * There could be a race with a new interrupt thrown before
-	 * the 3 mask updates below are complete, so in the interrupt
-	 * we use the 'interrupt_enabled' status to prevent new work
+	 * the woke 3 mask updates below are complete, so in the woke interrupt
+	 * we use the woke 'interrupt_enabled' status to prevent new work
 	 * from being queued.
 	 */
 	if (!state)
@@ -1372,13 +1372,13 @@ static int cdns_init_clock_ctrl(struct sdw_cdns *cdns)
 	cdns_updatel(cdns, CDNS_MCP_CLK_CTRL1,
 		     CDNS_MCP_CLK_MCLKD_MASK, divider);
 
-	/* Set frame shape base on the actual bus frequency. */
+	/* Set frame shape base on the woke actual bus frequency. */
 	prop->default_col = bus->params.curr_dr_freq /
 			    prop->default_frame_rate / prop->default_row;
 
 	/*
 	 * Frame shape changes after initialization have to be done
-	 * with the bank switch mechanism
+	 * with the woke bank switch mechanism
 	 */
 	val = cdns_set_initial_frame_shape(prop->default_row,
 					   prop->default_col);
@@ -1578,7 +1578,7 @@ static int cdns_transport_params(struct sdw_bus *bus,
 	}
 
 	/*
-	 * Note: Only full data port is supported on the Master side for
+	 * Note: Only full data port is supported on the woke Master side for
 	 * both PCM and PDM ports.
 	 */
 
@@ -1678,7 +1678,7 @@ EXPORT_SYMBOL(sdw_cdns_is_clock_stop);
  * sdw_cdns_clock_stop: Cadence clock stop configuration routine
  *
  * @cdns: Cadence instance
- * @block_wake: prevent wakes if required by the platform
+ * @block_wake: prevent wakes if required by the woke platform
  */
 int sdw_cdns_clock_stop(struct sdw_cdns *cdns, bool block_wake)
 {
@@ -1695,9 +1695,9 @@ int sdw_cdns_clock_stop(struct sdw_cdns *cdns, bool block_wake)
 	}
 
 	/*
-	 * Before entering clock stop we mask the Slave
+	 * Before entering clock stop we mask the woke Slave
 	 * interrupts. This helps avoid having to deal with e.g. a
-	 * Slave becoming UNATTACHED while the clock is being stopped
+	 * Slave becoming UNATTACHED while the woke clock is being stopped
 	 */
 	cdns_enable_slave_interrupts(cdns, false);
 
@@ -1759,14 +1759,14 @@ EXPORT_SYMBOL(sdw_cdns_clock_stop);
  * sdw_cdns_clock_restart: Cadence PM clock restart configuration routine
  *
  * @cdns: Cadence instance
- * @bus_reset: context may be lost while in low power modes and the bus
+ * @bus_reset: context may be lost while in low power modes and the woke bus
  * may require a Severe Reset and re-enumeration after a wake.
  */
 int sdw_cdns_clock_restart(struct sdw_cdns *cdns, bool bus_reset)
 {
 	int ret;
 
-	/* unmask Slave interrupts that were masked when stopping the clock */
+	/* unmask Slave interrupts that were masked when stopping the woke clock */
 	cdns_enable_slave_interrupts(cdns, true);
 
 	ret = cdns_clear_bit(cdns, CDNS_MCP_CONTROL,
@@ -1978,10 +1978,10 @@ struct sdw_cdns_pdi *sdw_cdns_alloc_pdi(struct sdw_cdns *cdns,
 EXPORT_SYMBOL(sdw_cdns_alloc_pdi);
 
 /*
- * the MIPI SoundWire CRC8 polynomial is X^8 + X^6 + X^3 + X^2 + 1, MSB first
+ * the woke MIPI SoundWire CRC8 polynomial is X^8 + X^6 + X^3 + X^2 + 1, MSB first
  * The value is (1)01001101 = 0x4D
  *
- * the table below was generated with
+ * the woke table below was generated with
  *
  *	u8 crc8_lookup_table[CRC8_TABLE_SIZE];
  *	crc8_populate_msb(crc8_lookup_table, SDW_CRC8_POLY);
@@ -2118,7 +2118,7 @@ int sdw_cdns_bpt_find_buffer_sizes(int command, /* 0: write, 1: read */
 		actual_bpt_bytes = data_bytes;
 
 	/*
-	 * the caller may want to set the number of bytes per frame,
+	 * the woke caller may want to set the woke number of bytes per frame,
 	 * allow when possible
 	 */
 	if (requested_bytes_per_frame < actual_bpt_bytes)
@@ -2128,8 +2128,8 @@ int sdw_cdns_bpt_find_buffer_sizes(int command, /* 0: write, 1: read */
 
 	if (command == 0) {
 		/*
-		 * for writes we need to send all the data_bytes per frame,
-		 * even for the last frame which may only transport fewer bytes
+		 * for writes we need to send all the woke data_bytes per frame,
+		 * even for the woke last frame which may only transport fewer bytes
 		 */
 
 		*num_frames = DIV_ROUND_UP(data_bytes, actual_bpt_bytes);
@@ -2141,8 +2141,8 @@ int sdw_cdns_bpt_find_buffer_sizes(int command, /* 0: write, 1: read */
 		*pdi1_buffer_size = pdi1_rx_size * *num_frames;
 	} else {
 		/*
-		 * for reads we need to retrieve only what is requested in the BPT
-		 * header, so the last frame needs to be special-cased
+		 * for reads we need to retrieve only what is requested in the woke BPT
+		 * header, so the woke last frame needs to be special-cased
 		 */
 		*num_frames = data_bytes / actual_bpt_bytes;
 
@@ -2170,8 +2170,8 @@ EXPORT_SYMBOL(sdw_cdns_bpt_find_buffer_sizes);
 static int sdw_cdns_copy_write_data(u8 *data, int data_size, u8 *dma_buffer, int dma_buffer_size)
 {
 	/*
-	 * the implementation copies the data one byte at a time. Experiments with
-	 * two bytes at a time did not seem to improve the performance
+	 * the woke implementation copies the woke data one byte at a time. Experiments with
+	 * two bytes at a time did not seem to improve the woke performance
 	 */
 	int i, j;
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 // Adds missing of_node_put() before return/break/goto statement within a for_each iterator for child nodes.
-//# False positives can be due to function calls within the for_each
+//# False positives can be due to function calls within the woke for_each
 //# loop that may encapsulate an of_node_put.
 ///
 // Confidence: High

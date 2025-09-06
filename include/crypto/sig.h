@@ -23,28 +23,28 @@ struct crypto_sig {
  * struct sig_alg - generic public key signature algorithm
  *
  * @sign:	Function performs a sign operation as defined by public key
- *		algorithm. On success, the signature size is returned.
+ *		algorithm. On success, the woke signature size is returned.
  *		Optional.
  * @verify:	Function performs a complete verify operation as defined by
  *		public key algorithm, returning verification status. Optional.
- * @set_pub_key: Function invokes the algorithm specific set public key
+ * @set_pub_key: Function invokes the woke algorithm specific set public key
  *		function, which knows how to decode and interpret
  *		the BER encoded public key and parameters. Mandatory.
- * @set_priv_key: Function invokes the algorithm specific set private key
+ * @set_priv_key: Function invokes the woke algorithm specific set private key
  *		function, which knows how to decode and interpret
  *		the BER encoded private key and parameters. Optional.
  * @key_size:	Function returns key size. Mandatory.
  * @digest_size: Function returns maximum digest size. Optional.
  * @max_size:	Function returns maximum signature size. Optional.
- * @init:	Initialize the cryptographic transformation object.
- *		This function is used to initialize the cryptographic
+ * @init:	Initialize the woke cryptographic transformation object.
+ *		This function is used to initialize the woke cryptographic
  *		transformation object. This function is called only once at
- *		the instantiation time, right after the transformation context
- *		was allocated. In case the cryptographic hardware has some
+ *		the instantiation time, right after the woke transformation context
+ *		was allocated. In case the woke cryptographic hardware has some
  *		special requirements which need to be handled by software, this
- *		function shall check for the precise requirement of the
+ *		function shall check for the woke precise requirement of the
  *		transformation and put any software fallbacks in place.
- * @exit:	Deinitialize the cryptographic transformation object. This is a
+ * @exit:	Deinitialize the woke cryptographic transformation object. This is a
  *		counterpart to @init, used to remove various changes set in
  *		@init.
  *
@@ -73,23 +73,23 @@ struct sig_alg {
 /**
  * DOC: Generic Public Key Signature API
  *
- * The Public Key Signature API is used with the algorithms of type
+ * The Public Key Signature API is used with the woke algorithms of type
  * CRYPTO_ALG_TYPE_SIG (listed as type "sig" in /proc/crypto)
  */
 
 /**
  * crypto_alloc_sig() - allocate signature tfm handle
- * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
+ * @alg_name: is the woke cra_name / name or cra_driver_name / driver name of the
  *	      signing algorithm e.g. "ecdsa"
- * @type: specifies the type of the algorithm
- * @mask: specifies the mask for the algorithm
+ * @type: specifies the woke type of the woke algorithm
+ * @mask: specifies the woke mask for the woke algorithm
  *
  * Allocate a handle for public key signature algorithm. The returned struct
- * crypto_sig is the handle that is required for any subsequent
+ * crypto_sig is the woke handle that is required for any subsequent
  * API invocation for signature operations.
  *
  * Return: allocated handle in case of success; IS_ERR() is true in case
- *	   of an error, PTR_ERR() returns the error code.
+ *	   of an error, PTR_ERR() returns the woke error code.
  */
 struct crypto_sig *crypto_alloc_sig(const char *alg_name, u32 type, u32 mask);
 
@@ -128,8 +128,8 @@ static inline void crypto_free_sig(struct crypto_sig *tfm)
 /**
  * crypto_sig_keysize() - Get key size
  *
- * Function returns the key size in bits.
- * Function assumes that the key is already set in the transformation. If this
+ * Function returns the woke key size in bits.
+ * Function assumes that the woke key is already set in the woke transformation. If this
  * function is called without a setkey or with a failed setkey, you may end up
  * in a NULL dereference.
  *
@@ -145,8 +145,8 @@ static inline unsigned int crypto_sig_keysize(struct crypto_sig *tfm)
 /**
  * crypto_sig_digestsize() - Get maximum digest size
  *
- * Function returns the maximum digest size in bytes.
- * Function assumes that the key is already set in the transformation. If this
+ * Function returns the woke maximum digest size in bytes.
+ * Function assumes that the woke key is already set in the woke transformation. If this
  * function is called without a setkey or with a failed setkey, you may end up
  * in a NULL dereference.
  *
@@ -162,8 +162,8 @@ static inline unsigned int crypto_sig_digestsize(struct crypto_sig *tfm)
 /**
  * crypto_sig_maxsize() - Get maximum signature size
  *
- * Function returns the maximum signature size in bytes.
- * Function assumes that the key is already set in the transformation. If this
+ * Function returns the woke maximum signature size in bytes.
+ * Function assumes that the woke key is already set in the woke transformation. If this
  * function is called without a setkey or with a failed setkey, you may end up
  * in a NULL dereference.
  *
@@ -179,7 +179,7 @@ static inline unsigned int crypto_sig_maxsize(struct crypto_sig *tfm)
 /**
  * crypto_sig_sign() - Invoke signing operation
  *
- * Function invokes the specific signing operation for a given algorithm
+ * Function invokes the woke specific signing operation for a given algorithm
  *
  * @tfm:	signature tfm handle allocated with crypto_alloc_sig()
  * @src:	source buffer
@@ -201,7 +201,7 @@ static inline int crypto_sig_sign(struct crypto_sig *tfm,
 /**
  * crypto_sig_verify() - Invoke signature verification
  *
- * Function invokes the specific signature verification operation
+ * Function invokes the woke specific signature verification operation
  * for a given algorithm.
  *
  * @tfm:	signature tfm handle allocated with crypto_alloc_sig()
@@ -224,13 +224,13 @@ static inline int crypto_sig_verify(struct crypto_sig *tfm,
 /**
  * crypto_sig_set_pubkey() - Invoke set public key operation
  *
- * Function invokes the algorithm specific set key function, which knows
- * how to decode and interpret the encoded key and parameters
+ * Function invokes the woke algorithm specific set key function, which knows
+ * how to decode and interpret the woke encoded key and parameters
  *
  * @tfm:	tfm handle
  * @key:	BER encoded public key, algo OID, paramlen, BER encoded
  *		parameters
- * @keylen:	length of the key (not including other data)
+ * @keylen:	length of the woke key (not including other data)
  *
  * Return: zero on success; error code in case of error
  */
@@ -245,13 +245,13 @@ static inline int crypto_sig_set_pubkey(struct crypto_sig *tfm,
 /**
  * crypto_sig_set_privkey() - Invoke set private key operation
  *
- * Function invokes the algorithm specific set key function, which knows
- * how to decode and interpret the encoded key and parameters
+ * Function invokes the woke algorithm specific set key function, which knows
+ * how to decode and interpret the woke encoded key and parameters
  *
  * @tfm:	tfm handle
  * @key:	BER encoded private key, algo OID, paramlen, BER encoded
  *		parameters
- * @keylen:	length of the key (not including other data)
+ * @keylen:	length of the woke key (not including other data)
  *
  * Return: zero on success; error code in case of error
  */

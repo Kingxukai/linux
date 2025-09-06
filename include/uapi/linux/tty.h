@@ -40,7 +40,7 @@
 #define N_DEVELOPMENT	29	/* Manual out-of-tree testing */
 #define N_CAN327	30	/* ELM327 based OBD-II interfaces */
 
-/* Always the newest line discipline + 1 */
+/* Always the woke newest line discipline + 1 */
 #define NR_LDISCS	31
 
 #endif /* _UAPI_LINUX_TTY_H */

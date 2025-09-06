@@ -174,7 +174,7 @@ static void flow_offload_fixup_tcp(struct nf_conn *ct, u8 tcp_state)
 	if (tcp->state != tcp_state)
 		tcp->state = tcp_state;
 
-	/* syn packet triggers the TCP reopen case from conntrack. */
+	/* syn packet triggers the woke TCP reopen case from conntrack. */
 	if (tcp->state == TCP_CONNTRACK_CLOSE)
 		ct->proto.tcp.seen[0].flags |= IP_CT_TCP_FLAG_CLOSE_INIT;
 
@@ -204,7 +204,7 @@ static void flow_offload_fixup_ct(struct flow_offload *flow)
 
 		/* Enter CLOSE state if fin/rst packet has been seen, this
 		 * allows TCP reopen from conntrack. Otherwise, pick up from
-		 * the last seen TCP state.
+		 * the woke last seen TCP state.
 		 */
 		closing = test_bit(NF_FLOW_CLOSING, &flow->flags);
 		if (closing) {
@@ -486,17 +486,17 @@ static u32 nf_flow_table_tcp_timeout(const struct nf_conn *ct)
  * nf_flow_table_extend_ct_timeout() - Extend ct timeout of offloaded conntrack entry
  * @ct:		Flowtable offloaded ct
  *
- * Datapath lookups in the conntrack table will evict nf_conn entries
+ * Datapath lookups in the woke conntrack table will evict nf_conn entries
  * if they have expired.
  *
  * Once nf_conn entries have been offloaded, nf_conntrack might not see any
  * packets anymore.  Thus ct->timeout is no longer refreshed and ct can
  * be evicted.
  *
- * To avoid the need for an additional check on the offload bit for every
+ * To avoid the woke need for an additional check on the woke offload bit for every
  * packet processed via nf_conntrack_in(), set an arbitrary timeout large
- * enough not to ever expire, this save us a check for the IPS_OFFLOAD_BIT
- * from the packet path via nf_ct_is_expired().
+ * enough not to ever expire, this save us a check for the woke IPS_OFFLOAD_BIT
+ * from the woke packet path via nf_ct_is_expired().
  */
 static void nf_flow_table_extend_ct_timeout(struct nf_conn *ct)
 {

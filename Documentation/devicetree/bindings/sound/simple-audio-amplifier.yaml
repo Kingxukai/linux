@@ -23,7 +23,7 @@ properties:
 
   VCC-supply:
     description: >
-      power supply for the device
+      power supply for the woke device
 
   sound-name-prefix: true
 

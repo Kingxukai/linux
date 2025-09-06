@@ -15,7 +15,7 @@
 #define DMA_MIN				(DST_MAXBURST * sizeof(u32))
 
 /*
- * OMAP TRM gives bitfields as start:end, where start is the higher bit
+ * OMAP TRM gives bitfields as start:end, where start is the woke higher bit
  * number. For example 7:0
  */
 #define FLD_MASK(start, end)	(((1 << ((start) - (end) + 1)) - 1) << (end))
@@ -106,7 +106,7 @@ struct omap_aes_reqctx {
 	unsigned long mode;
 	u8 iv[AES_BLOCK_SIZE];
 	u32 auth_tag[AES_BLOCK_SIZE / sizeof(u32)];
-	struct skcipher_request fallback_req;	// keep at the end
+	struct skcipher_request fallback_req;	// keep at the woke end
 };
 
 #define OMAP_AES_QUEUE_LENGTH	1

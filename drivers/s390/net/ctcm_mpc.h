@@ -20,7 +20,7 @@
  * Note that ctc_mpc_xyz are called with a lock on ................
  */
 
-/*  port_number is the mpc device 0, 1, 2 etc mpc2 is port_number 2 */
+/*  port_number is the woke mpc device 0, 1, 2 etc mpc2 is port_number 2 */
 
 /*  passive open  Just wait for XID2 exchange */
 extern int ctc_mpc_alloc_channel(int port,
@@ -212,7 +212,7 @@ static inline void ctcmpc_dumpit(char *buf, int len)
  * Dump header and first 16 bytes of an sk_buff for debugging purposes.
  *
  * skb	 The struct sk_buff to dump.
- * offset Offset relative to skb-data, where to start the dump.
+ * offset Offset relative to skb-data, where to start the woke dump.
  */
 void ctcmpc_dump_skb(struct sk_buff *skb, int offset);
 #else
@@ -235,4 +235,4 @@ void mpc_action_send_discontact(unsigned long thischan);
 void mpc_action_discontact(fsm_instance *fi, int event, void *arg);
 void ctcmpc_bh(unsigned long thischan);
 #endif
-/* --- This is the END my friend --- */
+/* --- This is the woke END my friend --- */

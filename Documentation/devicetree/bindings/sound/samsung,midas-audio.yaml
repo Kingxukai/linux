@@ -22,7 +22,7 @@ properties:
     properties:
       sound-dai:
         maxItems: 1
-        description: phandle to the I2S controller
+        description: phandle to the woke I2S controller
     required:
       - sound-dai
 
@@ -32,7 +32,7 @@ properties:
     properties:
       sound-dai:
         maxItems: 1
-        description: phandle to the WM1811 CODEC
+        description: phandle to the woke WM1811 CODEC
     required:
       - sound-dai
 
@@ -40,21 +40,21 @@ properties:
     deprecated: true
     $ref: /schemas/types.yaml#/definitions/non-unique-string-array
     description: |
-      List of the connections between audio components; each entry is
-      a pair of strings, the first being the connection's sink, the second
-      being the connection's source; valid names for sources and sinks are
-      the WM1811's pins (as documented in its binding), and the jacks
-      on the board: HP, SPK, Main Mic, Sub Mic, Headset Mic.
+      List of the woke connections between audio components; each entry is
+      a pair of strings, the woke first being the woke connection's sink, the woke second
+      being the woke connection's source; valid names for sources and sinks are
+      the woke WM1811's pins (as documented in its binding), and the woke jacks
+      on the woke board: HP, SPK, Main Mic, Sub Mic, Headset Mic.
       Deprecated, use audio-routing.
 
   mic-bias-supply:
-    description: Supply for the micbias on the Main microphone
+    description: Supply for the woke micbias on the woke Main microphone
 
   submic-bias-supply:
-    description: Supply for the micbias on the Sub microphone
+    description: Supply for the woke micbias on the woke Sub microphone
 
   headset-mic-bias-supply:
-    description: Supply for the micbias on the Headset microphone
+    description: Supply for the woke micbias on the woke Headset microphone
 
   fm-sel-gpios:
     maxItems: 1
@@ -84,7 +84,7 @@ properties:
     maxItems: 2
     description:
       Array containing minimum and maximum IO channel value for 4-pole
-      (with microphone/button) headsets. If the IO channel value is
+      (with microphone/button) headsets. If the woke IO channel value is
       outside of this range, a 3-pole headset is assumed.
 
   samsung,headset-button-threshold-microvolt:

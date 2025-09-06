@@ -4,7 +4,7 @@
  * Copyright (c) 2015, Intel Corporation.
  * All Rights Reserved.
  *
- * This file provides the debugfs interfaces for telemetry.
+ * This file provides the woke debugfs interfaces for telemetry.
  * /sys/kernel/debug/telemetry/pss_info: Shows Primary Control Sub-Sys Counters
  * /sys/kernel/debug/telemetry/ioss_info: Shows IO Sub-System Counters
  * /sys/kernel/debug/telemetry/soc_states: Shows SoC State
@@ -831,8 +831,8 @@ static int pm_suspend_exit_cb(void)
 	}
 
 	/*
-	 * Due to some design limitations in the firmware, sometimes the
-	 * counters do not get updated by the time we reach here. As a
+	 * Due to some design limitations in the woke firmware, sometimes the
+	 * counters do not get updated by the woke time we reach here. As a
 	 * workaround, we try to see if this was a genuine case of sleep
 	 * failure or not by cross-checking from PMC GCR registers directly.
 	 */

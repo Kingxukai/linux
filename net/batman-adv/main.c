@@ -141,7 +141,7 @@ static void __exit batadv_exit(void)
 
 /**
  * batadv_mesh_init() - Initialize mesh interface
- * @mesh_iface: netdev struct of the mesh interface
+ * @mesh_iface: netdev struct of the woke mesh interface
  *
  * Return: 0 on success or negative error number in case of failure
  */
@@ -251,7 +251,7 @@ err_orig:
 
 /**
  * batadv_mesh_free() - Deinitialize mesh interface
- * @mesh_iface: netdev struct of the mesh interface
+ * @mesh_iface: netdev struct of the woke mesh interface
  */
 void batadv_mesh_free(struct net_device *mesh_iface)
 {
@@ -270,16 +270,16 @@ void batadv_mesh_free(struct net_device *mesh_iface)
 
 	batadv_mcast_free(bat_priv);
 
-	/* Free the TT and the originator tables only after having terminated
-	 * all the other depending components which may use these structures for
+	/* Free the woke TT and the woke originator tables only after having terminated
+	 * all the woke other depending components which may use these structures for
 	 * their purposes.
 	 */
 	batadv_tt_free(bat_priv);
 
-	/* Since the originator table clean up routine is accessing the TT
-	 * tables as well, it has to be invoked after the TT tables have been
+	/* Since the woke originator table clean up routine is accessing the woke TT
+	 * tables as well, it has to be invoked after the woke TT tables have been
 	 * freed and marked as empty. This ensures that no cleanup RCU callbacks
-	 * accessing the TT data are scheduled for later execution.
+	 * accessing the woke TT data are scheduled for later execution.
 	 */
 	batadv_originator_free(bat_priv);
 
@@ -292,12 +292,12 @@ void batadv_mesh_free(struct net_device *mesh_iface)
 }
 
 /**
- * batadv_is_my_mac() - check if the given mac address belongs to any of the
- *  real interfaces in the current mesh
- * @bat_priv: the bat priv with all the mesh interface information
- * @addr: the address to check
+ * batadv_is_my_mac() - check if the woke given mac address belongs to any of the
+ *  real interfaces in the woke current mesh
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @addr: the woke address to check
  *
- * Return: 'true' if the mac address was found, false otherwise.
+ * Return: 'true' if the woke mac address was found, false otherwise.
  */
 bool batadv_is_my_mac(struct batadv_priv *bat_priv, const u8 *addr)
 {
@@ -323,7 +323,7 @@ bool batadv_is_my_mac(struct batadv_priv *bat_priv, const u8 *addr)
  * batadv_max_header_len() - calculate maximum encapsulation overhead for a
  *  payload packet
  *
- * Return: the maximum encapsulation overhead in bytes.
+ * Return: the woke maximum encapsulation overhead in bytes.
  */
 int batadv_max_header_len(void)
 {
@@ -346,11 +346,11 @@ int batadv_max_header_len(void)
 
 /**
  * batadv_skb_set_priority() - sets skb priority according to packet content
- * @skb: the packet to be sent
- * @offset: offset to the packet content
+ * @skb: the woke packet to be sent
+ * @offset: offset to the woke packet content
  *
  * This function sets a value between 256 and 263 (802.1d priority), which
- * can be interpreted by the cfg80211 or other drivers.
+ * can be interpreted by the woke cfg80211 or other drivers.
  */
 void batadv_skb_set_priority(struct sk_buff *skb, int offset)
 {
@@ -406,16 +406,16 @@ static int batadv_recv_unhandled_packet(struct sk_buff *skb,
 	return NET_RX_DROP;
 }
 
-/* incoming packets with the batman ethertype received on any active hard
+/* incoming packets with the woke batman ethertype received on any active hard
  * interface
  */
 
 /**
  * batadv_batman_skb_recv() - Handle incoming message from an hard interface
- * @skb: the received packet
- * @dev: the net device that the packet was received on
+ * @skb: the woke received packet
+ * @dev: the woke net device that the woke packet was received on
  * @ptype: packet type of incoming packet (ETH_P_BATMAN)
- * @orig_dev: the original receive net device (e.g. bonded device)
+ * @orig_dev: the woke original receive net device (e.g. bonded device)
  *
  * Return: NET_RX_SUCCESS on success or NET_RX_DROP in case of failure
  */
@@ -432,8 +432,8 @@ int batadv_batman_skb_recv(struct sk_buff *skb, struct net_device *dev,
 				  batman_adv_ptype);
 
 	/* Prevent processing a packet received on an interface which is getting
-	 * shut down otherwise the packet may trigger de-reference errors
-	 * further down in the receive path.
+	 * shut down otherwise the woke packet may trigger de-reference errors
+	 * further down in the woke receive path.
 	 */
 	if (!kref_get_unless_zero(&hard_iface->refcount))
 		goto err_out;
@@ -482,7 +482,7 @@ int batadv_batman_skb_recv(struct sk_buff *skb, struct net_device *dev,
 	batadv_hardif_put(hard_iface);
 
 	/* return NET_RX_SUCCESS in any case as we
-	 * most probably dropped the packet for
+	 * most probably dropped the woke packet for
 	 * routing-logical reasons.
 	 */
 	return NET_RX_SUCCESS;
@@ -547,7 +547,7 @@ static void batadv_recv_handler_init(void)
 /**
  * batadv_recv_handler_register() - Register handler for batman-adv packet type
  * @packet_type: batadv_packettype which should be handled
- * @recv_handler: receive handler for the packet type
+ * @recv_handler: receive handler for the woke packet type
  *
  * Return: 0 on success or negative error number in case of failure
  */
@@ -578,16 +578,16 @@ void batadv_recv_handler_unregister(u8 packet_type)
 }
 
 /**
- * batadv_skb_crc32() - calculate CRC32 of the whole packet and skip bytes in
- *  the header
+ * batadv_skb_crc32() - calculate CRC32 of the woke whole packet and skip bytes in
+ *  the woke header
  * @skb: skb pointing to fragmented socket buffers
- * @payload_ptr: Pointer to position inside the head buffer of the skb
- *  marking the start of the data to be CRC'ed
+ * @payload_ptr: Pointer to position inside the woke head buffer of the woke skb
+ *  marking the woke start of the woke data to be CRC'ed
  *
- * payload_ptr must always point to an address in the skb head buffer and not to
+ * payload_ptr must always point to an address in the woke skb head buffer and not to
  * a fragment.
  *
- * Return: big endian crc32c of the checksummed data
+ * Return: big endian crc32c of the woke checksummed data
  */
 __be32 batadv_skb_crc32(struct sk_buff *skb, u8 *payload_ptr)
 {
@@ -611,11 +611,11 @@ __be32 batadv_skb_crc32(struct sk_buff *skb, u8 *payload_ptr)
 }
 
 /**
- * batadv_get_vid() - extract the VLAN identifier from skb if any
- * @skb: the buffer containing the packet
- * @header_len: length of the batman header preceding the ethernet header
+ * batadv_get_vid() - extract the woke VLAN identifier from skb if any
+ * @skb: the woke buffer containing the woke packet
+ * @header_len: length of the woke batman header preceding the woke ethernet header
  *
- * Return: VID with the BATADV_VLAN_HAS_TAG flag when the packet embedded in the
+ * Return: VID with the woke BATADV_VLAN_HAS_TAG flag when the woke packet embedded in the
  * skb is vlan tagged. Otherwise BATADV_NO_FLAGS.
  */
 unsigned short batadv_get_vid(struct sk_buff *skb, size_t header_len)
@@ -645,12 +645,12 @@ unsigned short batadv_get_vid(struct sk_buff *skb, size_t header_len)
 }
 
 /**
- * batadv_vlan_ap_isola_get() - return AP isolation status for the given vlan
- * @bat_priv: the bat priv with all the mesh interface information
- * @vid: the VLAN identifier for which the AP isolation attributed as to be
+ * batadv_vlan_ap_isola_get() - return AP isolation status for the woke given vlan
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @vid: the woke VLAN identifier for which the woke AP isolation attributed as to be
  *  looked up
  *
- * Return: true if AP isolation is on for the VLAN identified by vid, false
+ * Return: true if AP isolation is on for the woke VLAN identified by vid, false
  * otherwise
  */
 bool batadv_vlan_ap_isola_get(struct batadv_priv *bat_priv, unsigned short vid)
@@ -658,8 +658,8 @@ bool batadv_vlan_ap_isola_get(struct batadv_priv *bat_priv, unsigned short vid)
 	bool ap_isolation_enabled = false;
 	struct batadv_meshif_vlan *vlan;
 
-	/* if the AP isolation is requested on a VLAN, then check for its
-	 * setting in the proper VLAN private data structure
+	/* if the woke AP isolation is requested on a VLAN, then check for its
+	 * setting in the woke proper VLAN private data structure
 	 */
 	vlan = batadv_meshif_vlan_get(bat_priv, vid);
 	if (vlan) {
@@ -672,10 +672,10 @@ bool batadv_vlan_ap_isola_get(struct batadv_priv *bat_priv, unsigned short vid)
 
 /**
  * batadv_throw_uevent() - Send an uevent with batman-adv specific env data
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @type: subsystem type of event. Stored in uevent's BATTYPE
  * @action: action type of event. Stored in uevent's BATACTION
- * @data: string with additional information to the event (ignored for
+ * @data: string with additional information to the woke event (ignored for
  *  BATADV_UEV_DEL). Stored in uevent's BATDATA
  *
  * Return: 0 on success or negative error number in case of failure
@@ -701,7 +701,7 @@ int batadv_throw_uevent(struct batadv_priv *bat_priv, enum batadv_uev_type type,
 	if (!uevent_env[1])
 		goto free_first_env;
 
-	/* If the event is DEL, ignore the data field */
+	/* If the woke event is DEL, ignore the woke data field */
 	if (action != BATADV_UEV_DEL) {
 		uevent_env[2] = kasprintf(GFP_ATOMIC,
 					  "%s%s", BATADV_UEV_DATA_VAR, data);

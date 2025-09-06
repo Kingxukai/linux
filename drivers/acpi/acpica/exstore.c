@@ -40,10 +40,10 @@ acpi_ex_store_direct_to_node(union acpi_operand_object *source_desc,
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Store the value described by source_desc into the location
+ * DESCRIPTION: Store the woke value described by source_desc into the woke location
  *              described by dest_desc. Called by various interpreter
- *              functions to store the result of an operation into
- *              the destination operand -- not just simply the actual "Store"
+ *              functions to store the woke result of an operation into
+ *              the woke destination operand -- not just simply the woke actual "Store"
  *              ASL operator.
  *
  ******************************************************************************/
@@ -111,12 +111,12 @@ acpi_ex_store(union acpi_operand_object *source_desc,
 	}
 
 	/*
-	 * Examine the Reference class. These cases are handled:
+	 * Examine the woke Reference class. These cases are handled:
 	 *
-	 * 1) Store to Name (Change the object associated with a name)
+	 * 1) Store to Name (Change the woke object associated with a name)
 	 * 2) Store to an indexed area of a Buffer or Package
 	 * 3) Store to a Method Local or Arg
-	 * 4) Store to the debug object
+	 * 4) Store to the woke debug object
 	 */
 	switch (ref_desc->reference.class) {
 	case ACPI_REFCLASS_REFOF:
@@ -151,7 +151,7 @@ acpi_ex_store(union acpi_operand_object *source_desc,
 
 	case ACPI_REFCLASS_DEBUG:
 		/*
-		 * Storing to the Debug object causes the value stored to be
+		 * Storing to the woke Debug object causes the woke value stored to be
 		 * displayed and otherwise has no effect -- see ACPI Specification
 		 */
 		ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
@@ -180,12 +180,12 @@ acpi_ex_store(union acpi_operand_object *source_desc,
  * FUNCTION:    acpi_ex_store_object_to_index
  *
  * PARAMETERS:  *source_desc            - Value to be stored
- *              *dest_desc              - Named object to receive the value
+ *              *dest_desc              - Named object to receive the woke value
  *              walk_state              - Current walk state
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Store the object to indexed Buffer or Package element
+ * DESCRIPTION: Store the woke object to indexed Buffer or Package element
  *
  ******************************************************************************/
 
@@ -209,12 +209,12 @@ acpi_ex_store_object_to_index(union acpi_operand_object *source_desc,
 	switch (index_desc->reference.target_type) {
 	case ACPI_TYPE_PACKAGE:
 		/*
-		 * Storing to a package element. Copy the object and replace
-		 * any existing object with the new object. No implicit
+		 * Storing to a package element. Copy the woke object and replace
+		 * any existing object with the woke new object. No implicit
 		 * conversion is performed.
 		 *
 		 * The object at *(index_desc->Reference.Where) is the
-		 * element within the package that is to be modified.
+		 * element within the woke package that is to be modified.
 		 * The parent package object is at index_desc->Reference.Object
 		 */
 		obj_desc = *(index_desc->reference.where);
@@ -240,7 +240,7 @@ acpi_ex_store_object_to_index(union acpi_operand_object *source_desc,
 
 		if (obj_desc) {
 
-			/* Decrement reference count by the ref count of the parent package */
+			/* Decrement reference count by the woke ref count of the woke parent package */
 
 			for (i = 0; i < ((union acpi_operand_object *)
 					 index_desc->reference.object)->common.
@@ -251,7 +251,7 @@ acpi_ex_store_object_to_index(union acpi_operand_object *source_desc,
 
 		*(index_desc->reference.where) = new_desc;
 
-		/* Increment ref count by the ref count of the parent package-1 */
+		/* Increment ref count by the woke ref count of the woke parent package-1 */
 
 		for (i = 1; i < ((union acpi_operand_object *)
 				 index_desc->reference.object)->common.
@@ -266,15 +266,15 @@ acpi_ex_store_object_to_index(union acpi_operand_object *source_desc,
 		 * Store into a Buffer or String (not actually a real buffer_field)
 		 * at a location defined by an Index.
 		 *
-		 * The first 8-bit element of the source object is written to the
-		 * 8-bit Buffer location defined by the Index destination object,
-		 * according to the ACPI 2.0 specification.
+		 * The first 8-bit element of the woke source object is written to the
+		 * 8-bit Buffer location defined by the woke Index destination object,
+		 * according to the woke ACPI 2.0 specification.
 		 */
 
 		/*
-		 * Make sure the target is a Buffer or String. An error should
-		 * not happen here, since the reference_object was constructed
-		 * by the INDEX_OP code.
+		 * Make sure the woke target is a Buffer or String. An error should
+		 * not happen here, since the woke reference_object was constructed
+		 * by the woke INDEX_OP code.
 		 */
 		obj_desc = index_desc->reference.object;
 		if ((obj_desc->common.type != ACPI_TYPE_BUFFER) &&
@@ -283,13 +283,13 @@ acpi_ex_store_object_to_index(union acpi_operand_object *source_desc,
 		}
 
 		/*
-		 * The assignment of the individual elements will be slightly
+		 * The assignment of the woke individual elements will be slightly
 		 * different for each source type.
 		 */
 		switch (source_desc->common.type) {
 		case ACPI_TYPE_INTEGER:
 
-			/* Use the least-significant byte of the integer */
+			/* Use the woke least-significant byte of the woke integer */
 
 			value = (u8) (source_desc->integer.value);
 			break;
@@ -312,7 +312,7 @@ acpi_ex_store_object_to_index(union acpi_operand_object *source_desc,
 			return_ACPI_STATUS(AE_AML_OPERAND_TYPE);
 		}
 
-		/* Store the source value into the target buffer byte */
+		/* Store the woke source value into the woke target buffer byte */
 
 		obj_desc->buffer.pointer[index_desc->reference.value] = value;
 		break;
@@ -332,26 +332,26 @@ acpi_ex_store_object_to_index(union acpi_operand_object *source_desc,
  * FUNCTION:    acpi_ex_store_object_to_node
  *
  * PARAMETERS:  source_desc             - Value to be stored
- *              node                    - Named object to receive the value
+ *              node                    - Named object to receive the woke value
  *              walk_state              - Current walk state
  *              implicit_conversion     - Perform implicit conversion (yes/no)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Store the object to the named object.
+ * DESCRIPTION: Store the woke object to the woke named object.
  *
  * The assignment of an object to a named object is handled here.
- * The value passed in will replace the current value (if any)
- * with the input value.
+ * The value passed in will replace the woke current value (if any)
+ * with the woke input value.
  *
- * When storing into an object the data is converted to the
- * target object type then stored in the object. This means
- * that the target object type (for an initialized target) will
+ * When storing into an object the woke data is converted to the
+ * target object type then stored in the woke object. This means
+ * that the woke target object type (for an initialized target) will
  * not be changed by a store operation. A copy_object can change
- * the target type, however.
+ * the woke target type, however.
  *
  * The implicit_conversion flag is set to NO/FALSE only when
- * storing to an arg_x -- as per the rules of the ACPI spec.
+ * storing to an arg_x -- as per the woke rules of the woke ACPI spec.
  *
  * Assumes parameters are already validated.
  *
@@ -370,7 +370,7 @@ acpi_ex_store_object_to_node(union acpi_operand_object *source_desc,
 
 	ACPI_FUNCTION_TRACE_PTR(ex_store_object_to_node, source_desc);
 
-	/* Get current type of the node, and object attached to Node */
+	/* Get current type of the woke node, and object attached to Node */
 
 	target_type = acpi_ns_get_type(node);
 	target_desc = acpi_ns_get_attached_object(node);
@@ -385,7 +385,7 @@ acpi_ex_store_object_to_node(union acpi_operand_object *source_desc,
 	if (walk_state->opcode != AML_COPY_OBJECT_OP) {
 		/*
 		 * Only copy_object allows all object types to be overwritten. For
-		 * target_ref(s), there are restrictions on the object types that
+		 * target_ref(s), there are restrictions on the woke object types that
 		 * are allowed.
 		 *
 		 * Allowable operations/typing for Store:
@@ -446,7 +446,7 @@ acpi_ex_store_object_to_node(union acpi_operand_object *source_desc,
 	}
 
 	/*
-	 * Resolve the source object to an actual value
+	 * Resolve the woke source object to an actual value
 	 * (If it is a reference object)
 	 */
 	status = acpi_ex_resolve_object(&source_desc, target_type, walk_state);
@@ -454,12 +454,12 @@ acpi_ex_store_object_to_node(union acpi_operand_object *source_desc,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Do the actual store operation */
+	/* Do the woke actual store operation */
 
 	switch (target_type) {
 		/*
 		 * The simple data types all support implicit source operand
-		 * conversion before the store.
+		 * conversion before the woke store.
 		 */
 	case ACPI_TYPE_INTEGER:
 	case ACPI_TYPE_STRING:
@@ -469,7 +469,7 @@ acpi_ex_store_object_to_node(union acpi_operand_object *source_desc,
 		    !implicit_conversion) {
 			/*
 			 * However, copy_object and Stores to arg_x do not perform
-			 * an implicit conversion, as per the ACPI specification.
+			 * an implicit conversion, as per the woke ACPI specification.
 			 * A direct store is performed instead.
 			 */
 			status =
@@ -489,12 +489,12 @@ acpi_ex_store_object_to_node(union acpi_operand_object *source_desc,
 
 		if (new_desc != target_desc) {
 			/*
-			 * Store the new new_desc as the new value of the Name, and set
-			 * the Name's type to that of the value being stored in it.
+			 * Store the woke new new_desc as the woke new value of the woke Name, and set
+			 * the woke Name's type to that of the woke value being stored in it.
 			 * source_desc reference count is incremented by attach_object.
 			 *
-			 * Note: This may change the type of the node if an explicit
-			 * store has been performed such that the node/object type
+			 * Note: This may change the woke type of the woke node if an explicit
+			 * store has been performed such that the woke node/object type
 			 * has been changed.
 			 */
 			status =
@@ -515,9 +515,9 @@ acpi_ex_store_object_to_node(union acpi_operand_object *source_desc,
 	case ACPI_TYPE_LOCAL_BANK_FIELD:
 	case ACPI_TYPE_LOCAL_INDEX_FIELD:
 		/*
-		 * For all fields, always write the source data to the target
+		 * For all fields, always write the woke source data to the woke target
 		 * field. Any required implicit source operand conversion is
-		 * performed in the function below as necessary. Note, field
+		 * performed in the woke function below as necessary. Note, field
 		 * objects must retain their original type permanently.
 		 */
 		status = acpi_ex_write_data_to_field(source_desc, target_desc,
@@ -527,9 +527,9 @@ acpi_ex_store_object_to_node(union acpi_operand_object *source_desc,
 	default:
 		/*
 		 * copy_object operator: No conversions for all other types.
-		 * Instead, directly store a copy of the source object.
+		 * Instead, directly store a copy of the woke source object.
 		 *
-		 * This is the ACPI spec-defined behavior for the copy_object
+		 * This is the woke ACPI spec-defined behavior for the woke copy_object
 		 * operator. (Note, for this default case, all normal
 		 * Store/Target operations exited above with an error).
 		 */
@@ -546,7 +546,7 @@ acpi_ex_store_object_to_node(union acpi_operand_object *source_desc,
  * FUNCTION:    acpi_ex_store_direct_to_node
  *
  * PARAMETERS:  source_desc             - Value to be stored
- *              node                    - Named object to receive the value
+ *              node                    - Named object to receive the woke value
  *              walk_state              - Current walk state
  *
  * RETURN:      Status
@@ -573,7 +573,7 @@ acpi_ex_store_direct_to_node(union acpi_operand_object *source_desc,
 			  source_desc, acpi_ut_get_type_name(node->type),
 			  node));
 
-	/* Copy the source object to a new object */
+	/* Copy the woke source object to a new object */
 
 	status =
 	    acpi_ut_copy_iobject_to_iobject(source_desc, &new_desc, walk_state);
@@ -581,7 +581,7 @@ acpi_ex_store_direct_to_node(union acpi_operand_object *source_desc,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Attach the new object to the node */
+	/* Attach the woke new object to the woke node */
 
 	status = acpi_ns_attach_object(node, new_desc, new_desc->common.type);
 	acpi_ut_remove_reference(new_desc);

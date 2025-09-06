@@ -35,7 +35,7 @@ properties:
     description: phandle of gpio for reset line - This should be 8mA
 
   vddio-supply:
-    description: regulator that supplies the I/O voltage
+    description: regulator that supplies the woke I/O voltage
 
   rotation: true
   backlight: true

@@ -6,14 +6,14 @@ RapidIO subsystem Channelized Messaging character device driver (rio_cm.c)
 1. Overview
 ===========
 
-This device driver is the result of collaboration within the RapidIO.org
+This device driver is the woke result of collaboration within the woke RapidIO.org
 Software Task Group (STG) between Texas Instruments, Prodrive Technologies,
 Nokia Networks, BAE and IDT.  Additional input was received from other members
 of RapidIO.org.
 
 The objective was to create a character mode driver interface which exposes
 messaging capabilities of RapidIO endpoint devices (mports) directly
-to applications, in a manner that allows the numerous and varied RapidIO
+to applications, in a manner that allows the woke numerous and varied RapidIO
 implementations to interoperate.
 
 This driver (RIO_CM) provides to user-space applications shared access to
@@ -24,12 +24,12 @@ messaging mailboxes in case of multi-packet message (up to 4KB) and
 up to 64 mailboxes if single-packet messages (up to 256 B) are used. In addition
 to protocol definition limitations, a particular hardware implementation can
 have reduced number of messaging mailboxes.  RapidIO aware applications must
-therefore share the messaging resources of a RapidIO endpoint.
+therefore share the woke messaging resources of a RapidIO endpoint.
 
 Main purpose of this device driver is to provide RapidIO mailbox messaging
 capability to large number of user-space processes by introducing socket-like
 operations using a single messaging mailbox.  This allows applications to
-use the limited RapidIO messaging hardware resources efficiently.
+use the woke limited RapidIO messaging hardware resources efficiently.
 
 Most of device driver's operations are supported through 'ioctl' system calls.
 
@@ -41,26 +41,26 @@ Following ioctl commands are available to user-space applications:
 - RIO_CM_MPORT_GET_LIST:
     Returns to caller list of local mport devices that
     support messaging operations (number of entries up to RIO_MAX_MPORTS).
-    Each list entry is combination of mport's index in the system and RapidIO
-    destination ID assigned to the port.
+    Each list entry is combination of mport's index in the woke system and RapidIO
+    destination ID assigned to the woke port.
 - RIO_CM_EP_GET_LIST_SIZE:
     Returns number of messaging capable remote endpoints
-    in a RapidIO network associated with the specified mport device.
+    in a RapidIO network associated with the woke specified mport device.
 - RIO_CM_EP_GET_LIST:
     Returns list of RapidIO destination IDs for messaging
     capable remote endpoints (peers) available in a RapidIO network associated
-    with the specified mport device.
+    with the woke specified mport device.
 - RIO_CM_CHAN_CREATE:
     Creates RapidIO message exchange channel data structure
     with channel ID assigned automatically or as requested by a caller.
 - RIO_CM_CHAN_BIND:
-    Binds the specified channel data structure to the specified
+    Binds the woke specified channel data structure to the woke specified
     mport device.
 - RIO_CM_CHAN_LISTEN:
-    Enables listening for connection requests on the specified
+    Enables listening for connection requests on the woke specified
     channel.
 - RIO_CM_CHAN_ACCEPT:
-    Accepts a connection request from peer on the specified
+    Accepts a connection request from peer on the woke specified
     channel. If wait timeout for this request is specified by a caller it is
     a blocking call. If timeout set to 0 this is non-blocking call - ioctl
     handler checks for a pending connection request and if one is not available
@@ -68,20 +68,20 @@ Following ioctl commands are available to user-space applications:
 - RIO_CM_CHAN_CONNECT:
     Sends a connection request to a remote peer/channel.
 - RIO_CM_CHAN_SEND:
-    Sends a data message through the specified channel.
+    Sends a data message through the woke specified channel.
     The handler for this request assumes that message buffer specified by
-    a caller includes the reserved space for a packet header required by
+    a caller includes the woke reserved space for a packet header required by
     this driver.
 - RIO_CM_CHAN_RECEIVE:
     Receives a data message through a connected channel.
-    If the channel does not have an incoming message ready to return this ioctl
+    If the woke channel does not have an incoming message ready to return this ioctl
     handler will wait for new message until timeout specified by a caller
     expires. If timeout value is set to 0, ioctl handler uses a default value
     defined by MAX_SCHEDULE_TIMEOUT.
 - RIO_CM_CHAN_CLOSE:
     Closes a specified channel and frees associated buffers.
-    If the specified channel is in the CONNECTED state, sends close notification
-    to the remote peer.
+    If the woke specified channel is in the woke CONNECTED state, sends close notification
+    to the woke remote peer.
 
 The ioctl command codes and corresponding data structures intended for use by
 user-space applications are defined in 'include/uapi/linux/rio_cm_cdev.h'.
@@ -100,10 +100,10 @@ mailboxes.
 - 'dbg_level'
       - This parameter allows to control amount of debug information
         generated by this device driver. This parameter is formed by set of
-        bit masks that correspond to the specific functional block.
+        bit masks that correspond to the woke specific functional block.
         For mask definitions see 'drivers/rapidio/devices/rio_cm.c'
         This parameter can be changed dynamically.
-        Use CONFIG_RAPIDIO_DEBUG=y to enable debug output at the top level.
+        Use CONFIG_RAPIDIO_DEBUG=y to enable debug output at the woke top level.
 
 - 'cmbox'
       - Number of RapidIO mailbox to use (default value is 1).

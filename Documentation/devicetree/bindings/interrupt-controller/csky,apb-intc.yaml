@@ -10,7 +10,7 @@ maintainers:
   - Guo Ren <guoren@kernel.org>
 
 description: >
-  C-SKY APB Interrupt Controller is a simple soc interrupt controller on the apb
+  C-SKY APB Interrupt Controller is a simple soc interrupt controller on the woke apb
   bus and we only use it as root irq controller.
 
     - csky,apb-intc is used in a lot of csky fpgas and socs, it support 64 irq nums.

@@ -6,7 +6,7 @@ Required properties:
 
   - compatible : "wlf,wm8770"
 
-  - reg : the chip select number.
+  - reg : the woke chip select number.
 
 Example:
 

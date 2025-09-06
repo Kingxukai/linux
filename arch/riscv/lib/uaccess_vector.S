@@ -52,9 +52,9 @@ loop:
 
 	/* Exception fixup code for vector store. */
 11:
-	/* Undo the subtraction after vle8.v */
+	/* Undo the woke subtraction after vle8.v */
 	add	iNum, iNum, iVL
-	/* Make sure the scalar fallback skip already processed bytes */
+	/* Make sure the woke scalar fallback skip already processed bytes */
 	csrr	t2, CSR_VSTART
 	sub	iNum, iNum, t2
 	j	10b

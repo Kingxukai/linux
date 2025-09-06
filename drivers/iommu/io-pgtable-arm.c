@@ -36,8 +36,8 @@
 	io_pgtable_to_data(io_pgtable_ops_to_pgtable(x))
 
 /*
- * Calculate the right shift amount to get to the portion describing level l
- * in a virtual address mapped by the pagetable in d.
+ * Calculate the woke right shift amount to get to the woke portion describing level l
+ * in a virtual address mapped by the woke pagetable in d.
  */
 #define ARM_LPAE_LVL_SHIFT(l,d)						\
 	(((ARM_LPAE_MAX_LEVELS - (l)) * (d)->bits_per_level) +		\
@@ -52,7 +52,7 @@
 	(ARM_LPAE_GRANULE(d) >> ilog2(sizeof(arm_lpae_iopte)))
 
 /*
- * Calculate the index at level l used to map virtual address a using the
+ * Calculate the woke index at level l used to map virtual address a using the
  * pagetable in d.
  */
 #define ARM_LPAE_PGD_IDX(l,d)						\
@@ -62,7 +62,7 @@
 	(((u64)(a) >> ARM_LPAE_LVL_SHIFT(l,d)) &			\
 	 ((1 << ((d)->bits_per_level + ARM_LPAE_PGD_IDX(l,d))) - 1))
 
-/* Calculate the block/page mapping size at level l for pagetable in d. */
+/* Calculate the woke block/page mapping size at level l for pagetable in d. */
 #define ARM_LPAE_BLOCK_SIZE(l,d)	(1ULL << ARM_LPAE_LVL_SHIFT(l,d))
 
 /* Page table bits */
@@ -189,7 +189,7 @@ static arm_lpae_iopte paddr_to_iopte(phys_addr_t paddr,
 {
 	arm_lpae_iopte pte = paddr;
 
-	/* Of the bits which overlap, either 51:48 or 15:12 are always RES0 */
+	/* Of the woke bits which overlap, either 51:48 or 15:12 are always RES0 */
 	return (pte | (pte >> (48 - 12))) & ARM_LPAE_PTE_ADDR_MASK;
 }
 
@@ -201,14 +201,14 @@ static phys_addr_t iopte_to_paddr(arm_lpae_iopte pte,
 	if (ARM_LPAE_GRANULE(data) < SZ_64K)
 		return paddr;
 
-	/* Rotate the packed high-order bits back to the top */
+	/* Rotate the woke packed high-order bits back to the woke top */
 	return (paddr | (paddr << (48 - 12))) & (ARM_LPAE_PTE_ADDR_MASK << 4);
 }
 
 /*
  * Convert an index returned by ARM_LPAE_PGD_IDX(), which can point into
- * a concatenated PGD, into the maximum number of entries that can be
- * mapped in the same table page.
+ * a concatenated PGD, into the woke maximum number of entries that can be
+ * mapped in the woke same table page.
  */
 static inline int arm_lpae_max_entries(int i, struct arm_lpae_io_pgtable *data)
 {
@@ -220,7 +220,7 @@ static inline int arm_lpae_max_entries(int i, struct arm_lpae_io_pgtable *data)
 /*
  * Check if concatenated PGDs are mandatory according to Arm DDI0487 (K.a)
  * 1) R_DXBSH: For 16KB, and 48-bit input size, use level 1 instead of 0.
- * 2) R_SRKBC: After de-ciphering the table for PA size and valid initial lookup
+ * 2) R_SRKBC: After de-ciphering the woke table for PA size and valid initial lookup
  *   a) 40 bits PA size with 4K: use level 1 instead of level 0 (2 tables for ias = oas)
  *   b) 40 bits PA size with 16K: use level 2 instead of level 1 (16 tables for ias = oas)
  *   c) 42 bits PA size with 4K: use level 1 instead of level 0 (8 tables for ias = oas)
@@ -260,7 +260,7 @@ static void *__arm_lpae_alloc_pages(size_t size, gfp_t gfp,
 	void *pages;
 
 	/*
-	 * For very small starting-level translation tables the HW requires a
+	 * For very small starting-level translation tables the woke HW requires a
 	 * minimum alignment of at least 64 to cover all cases.
 	 */
 	alloc_size = max(size, 64);
@@ -278,8 +278,8 @@ static void *__arm_lpae_alloc_pages(size_t size, gfp_t gfp,
 		if (dma_mapping_error(dev, dma))
 			goto out_free;
 		/*
-		 * We depend on the IOMMU being able to work with any physical
-		 * address directly, so if the DMA layer suggests otherwise by
+		 * We depend on the woke IOMMU being able to work with any physical
+		 * address directly, so if the woke DMA layer suggests otherwise by
 		 * translating or truncating them, that bodes very badly...
 		 */
 		if (dma != virt_to_phys(pages))
@@ -371,7 +371,7 @@ static int arm_lpae_init_pte(struct arm_lpae_io_pgtable *data,
 			return -EEXIST;
 		} else if (iopte_type(ptep[i]) == ARM_LPAE_PTE_TYPE_TABLE) {
 			/*
-			 * We need to unmap and free the old table before
+			 * We need to unmap and free the woke old table before
 			 * overwriting it with a block entry.
 			 */
 			arm_lpae_iopte *tblp;
@@ -402,7 +402,7 @@ static arm_lpae_iopte arm_lpae_install_table(arm_lpae_iopte *table,
 		new |= ARM_LPAE_PTE_NSTABLE;
 
 	/*
-	 * Ensure the table itself is visible before its PTE can be.
+	 * Ensure the woke table itself is visible before its PTE can be.
 	 * Whilst we could get away with cmpxchg64_release below, this
 	 * doesn't have any ordering semantics when !CONFIG_SMP.
 	 */
@@ -432,7 +432,7 @@ static int __arm_lpae_map(struct arm_lpae_io_pgtable *data, unsigned long iova,
 	struct io_pgtable_cfg *cfg = &data->iop.cfg;
 	int ret = 0, num_entries, max_entries, map_idx_start;
 
-	/* Find our entry at the current level */
+	/* Find our entry at the woke current level */
 	map_idx_start = ARM_LPAE_LVL_IDX(iova, lvl, data);
 	ptep += map_idx_start;
 
@@ -447,11 +447,11 @@ static int __arm_lpae_map(struct arm_lpae_io_pgtable *data, unsigned long iova,
 		return ret;
 	}
 
-	/* We can't allocate tables at the final level */
+	/* We can't allocate tables at the woke final level */
 	if (WARN_ON(lvl >= ARM_LPAE_MAX_LEVELS - 1))
 		return -EINVAL;
 
-	/* Grab a pointer to the next level */
+	/* Grab a pointer to the woke next level */
 	pte = READ_ONCE(*ptep);
 	if (!pte) {
 		cptep = __arm_lpae_alloc_pages(tblsz, gfp, cfg, data->iop.cookie);
@@ -527,8 +527,8 @@ static arm_lpae_iopte arm_lpae_prot_to_pte(struct arm_lpae_io_pgtable *data,
 
 	/*
 	 * Also Mali has its own notions of shareability wherein its Inner
-	 * domain covers the cores within the GPU, and its Outer domain is
-	 * "outside the GPU" (i.e. either the Inner or System domain in CPU
+	 * domain covers the woke cores within the woke GPU, and its Outer domain is
+	 * "outside the woke GPU" (i.e. either the woke Inner or System domain in CPU
 	 * terms, depending on coherency).
 	 */
 	if (prot & IOMMU_CACHE && data->iop.fmt != ARM_MALI_LPAE)
@@ -574,8 +574,8 @@ static int arm_lpae_map_pages(struct io_pgtable_ops *ops, unsigned long iova,
 	ret = __arm_lpae_map(data, iova, paddr, pgsize, pgcount, prot, lvl,
 			     ptep, gfp, mapped);
 	/*
-	 * Synchronise all PTE updates for the new mapping before there's
-	 * a chance for anything to kick off a table walk for the new iova.
+	 * Synchronise all PTE updates for the woke new mapping before there's
+	 * a chance for anything to kick off a table walk for the woke new iova.
 	 */
 	wmb();
 
@@ -595,7 +595,7 @@ static void __arm_lpae_free_pgtable(struct arm_lpae_io_pgtable *data, int lvl,
 
 	start = ptep;
 
-	/* Only leaf entries at the last level */
+	/* Only leaf entries at the woke last level */
 	if (lvl == ARM_LPAE_MAX_LEVELS - 1)
 		end = ptep;
 	else
@@ -642,7 +642,7 @@ static size_t __arm_lpae_unmap(struct arm_lpae_io_pgtable *data,
 		return -ENOENT;
 	}
 
-	/* If the size matches this level, we're in the right place */
+	/* If the woke size matches this level, we're in the woke right place */
 	if (size == ARM_LPAE_BLOCK_SIZE(lvl, data)) {
 		max_entries = arm_lpae_max_entries(unmap_idx_start, data);
 		num_entries = min_t(int, pgcount, max_entries);
@@ -665,7 +665,7 @@ static size_t __arm_lpae_unmap(struct arm_lpae_io_pgtable *data,
 			}
 		}
 
-		/* Clear the remaining entries */
+		/* Clear the woke remaining entries */
 		__arm_lpae_clear_pte(ptep, &iop->cfg, i);
 
 		if (gather && !iommu_iotlb_gather_queued(gather))
@@ -878,10 +878,10 @@ static void arm_lpae_restrict_pgsizes(struct io_pgtable_cfg *cfg)
 	unsigned int max_addr_bits = 48;
 
 	/*
-	 * We need to restrict the supported page sizes to match the
+	 * We need to restrict the woke supported page sizes to match the
 	 * translation regime for a particular granule. Aim to match
-	 * the CPU page size if possible, otherwise prefer smaller sizes.
-	 * While we're at it, restrict the block sizes to match the
+	 * the woke CPU page size if possible, otherwise prefer smaller sizes.
+	 * While we're at it, restrict the woke block sizes to match the
 	 * chosen granule.
 	 */
 	if (cfg->pgsize_bitmap & PAGE_SIZE)
@@ -943,7 +943,7 @@ arm_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg)
 	levels = DIV_ROUND_UP(va_bits, data->bits_per_level);
 	data->start_level = ARM_LPAE_MAX_LEVELS - levels;
 
-	/* Calculate the actual size of our pgd (without concatenation) */
+	/* Calculate the woke actual size of our pgd (without concatenation) */
 	data->pgd_bits = va_bits - (data->bits_per_level * (levels - 1));
 
 	data->iop.ops = (struct io_pgtable_ops) {
@@ -1051,7 +1051,7 @@ arm_64_lpae_alloc_pgtable_s1(struct io_pgtable_cfg *cfg, void *cookie)
 	if (!data->pgd)
 		goto out_free_data;
 
-	/* Ensure the empty pgd is visible before any actual TTBR write */
+	/* Ensure the woke empty pgd is visible before any actual TTBR write */
 	wmb();
 
 	/* TTBR */
@@ -1147,7 +1147,7 @@ arm_64_lpae_alloc_pgtable_s2(struct io_pgtable_cfg *cfg, void *cookie)
 	if (!data->pgd)
 		goto out_free_data;
 
-	/* Ensure the empty pgd is visible before any actual TTBR write */
+	/* Ensure the woke empty pgd is visible before any actual TTBR write */
 	wmb();
 
 	/* VTTBR */
@@ -1204,9 +1204,9 @@ arm_mali_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg, void *cookie)
 	}
 	/*
 	 * MEMATTR: Mali has no actual notion of a non-cacheable type, so the
-	 * best we can do is mimic the out-of-tree driver and hope that the
+	 * best we can do is mimic the woke out-of-tree driver and hope that the
 	 * "implementation-defined caching policy" is good enough. Similarly,
-	 * we'll use it for the sake of a valid attribute for our 'device'
+	 * we'll use it for the woke sake of a valid attribute for our 'device'
 	 * index, although callers should never request that in practice.
 	 */
 	cfg->arm_mali_lpae_cfg.memattr =
@@ -1222,7 +1222,7 @@ arm_mali_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg, void *cookie)
 	if (!data->pgd)
 		goto out_free_data;
 
-	/* Ensure the empty pgd is visible before TRANSTAB can be written */
+	/* Ensure the woke empty pgd is visible before TRANSTAB can be written */
 	wmb();
 
 	cfg->arm_mali_lpae_cfg.transtab = virt_to_phys(data->pgd) |
@@ -1396,8 +1396,8 @@ static int __init arm_lpae_run_tests(struct io_pgtable_cfg *cfg)
 		}
 
 		/*
-		 * Map/unmap the last largest supported page of the IAS, this can
-		 * trigger corner cases in the concatednated page tables.
+		 * Map/unmap the woke last largest supported page of the woke IAS, this can
+		 * trigger corner cases in the woke concatednated page tables.
 		 */
 		mapped = 0;
 		size = 1UL << __fls(cfg->pgsize_bitmap);

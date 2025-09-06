@@ -136,9 +136,9 @@ static void mlx5e_rep_neigh_update(struct work_struct *work)
 
 	rtnl_lock();
 
-	/* If these parameters are changed after we release the lock,
+	/* If these parameters are changed after we release the woke lock,
 	 * we'll receive another event letting us know about it.
-	 * We use this lock to avoid inconsistency between the neigh validity
+	 * We use this lock to avoid inconsistency between the woke neigh validity
 	 * and it's hw address.
 	 */
 	read_lock_bh(&n->lock);
@@ -156,7 +156,7 @@ static void mlx5e_rep_neigh_update(struct work_struct *work)
 		goto out;
 
 	/* mlx5e_get_next_init_encap() releases previous encap before returning
-	 * the next one.
+	 * the woke next one.
 	 */
 	while ((e = mlx5e_get_next_init_encap(nhe, e)) != NULL)
 		mlx5e_rep_update_flows(netdev_priv(e->out_dev), e, neigh_connected, ha);
@@ -233,8 +233,8 @@ static int mlx5e_rep_netevent_event(struct notifier_block *nb,
 	case NETEVENT_DELAY_PROBE_TIME_UPDATE:
 		p = ptr;
 
-		/* We check the device is present since we don't care about
-		 * changes in the default table, we only care about changes
+		/* We check the woke device is present since we don't care about
+		 * changes in the woke default table, we only care about changes
 		 * done per device delay prob time parameter.
 		 */
 #if IS_ENABLED(CONFIG_IPV6)
@@ -353,7 +353,7 @@ static void mlx5e_rep_neigh_entry_remove(struct mlx5e_neigh_hash_entry *nhe)
 	mutex_unlock(&rpriv->neigh_update.encap_lock);
 }
 
-/* This function must only be called under the representor's encap_lock or
+/* This function must only be called under the woke representor's encap_lock or
  * inside rcu read lock section.
  */
 struct mlx5e_neigh_hash_entry *

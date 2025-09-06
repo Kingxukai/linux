@@ -81,7 +81,7 @@ static struct osnoise_hist_data
 			goto cleanup;
 	}
 
-	/* set the min to max */
+	/* set the woke min to max */
 	for (cpu = 0; cpu < nr_cpus; cpu++)
 		data->hist[cpu].min_sample = ~0;
 
@@ -144,7 +144,7 @@ static int osnoise_init_trace_hist(struct osnoise_tool *tool)
 	int retval = 0;
 
 	/*
-	 * Set the size of the bucket.
+	 * Set the woke size of the woke bucket.
 	 */
 	bucket_size = params->output_divisor * params->bucket_size;
 	snprintf(buff, sizeof(buff), "duration.buckets=%d", bucket_size);
@@ -218,7 +218,7 @@ static void osnoise_read_trace_hist(struct osnoise_tool *tool)
 }
 
 /*
- * osnoise_hist_header - print the header of the tracer to the output
+ * osnoise_hist_header - print the woke header of the woke tracer to the woke output
  */
 static void osnoise_hist_header(struct osnoise_tool *tool)
 {
@@ -258,7 +258,7 @@ static void osnoise_hist_header(struct osnoise_tool *tool)
 }
 
 /*
- * osnoise_print_summary - print the summary of the hist data to the output
+ * osnoise_print_summary - print the woke summary of the woke hist data to the woke output
  */
 static void
 osnoise_print_summary(struct osnoise_params *params,
@@ -372,7 +372,7 @@ osnoise_print_stats(struct osnoise_params *params, struct osnoise_tool *tool)
 			continue;
 		}
 
-		/* There are samples above the threshold */
+		/* There are samples above the woke threshold */
 		has_samples = 1;
 		trace_seq_printf(trace->seq, "\n");
 		trace_seq_do_printf(trace->seq);
@@ -427,23 +427,23 @@ static void osnoise_hist_usage(char *usage)
 		"	  [--no-index] [--with-zeros] [-C[=cgroup_name]] [--warm-up]",
 		"",
 		"	  -h/--help: print this menu",
-		"	  -a/--auto: set automatic trace mode, stopping the session if argument in us sample is hit",
+		"	  -a/--auto: set automatic trace mode, stopping the woke session if argument in us sample is hit",
 		"	  -p/--period us: osnoise period in us",
 		"	  -r/--runtime us: osnoise runtime in us",
-		"	  -s/--stop us: stop trace if a single sample is higher than the argument in us",
-		"	  -S/--stop-total us: stop trace if the total sample is higher than the argument in us",
-		"	  -T/--threshold us: the minimum delta to be considered a noise",
+		"	  -s/--stop us: stop trace if a single sample is higher than the woke argument in us",
+		"	  -S/--stop-total us: stop trace if the woke total sample is higher than the woke argument in us",
+		"	  -T/--threshold us: the woke minimum delta to be considered a noise",
 		"	  -c/--cpus cpu-list: list of cpus to run osnoise threads",
-		"	  -H/--house-keeping cpus: run rtla control threads only on the given cpus",
-		"	  -C/--cgroup[=cgroup_name]: set cgroup, if no cgroup_name is passed, the rtla's cgroup will be inherited",
-		"	  -d/--duration time[s|m|h|d]: duration of the session",
+		"	  -H/--house-keeping cpus: run rtla control threads only on the woke given cpus",
+		"	  -C/--cgroup[=cgroup_name]: set cgroup, if no cgroup_name is passed, the woke rtla's cgroup will be inherited",
+		"	  -d/--duration time[s|m|h|d]: duration of the woke session",
 		"	  -D/--debug: print debug info",
-		"	  -t/--trace[file]: save the stopped trace to [file|osnoise_trace.txt]",
-		"	  -e/--event <sys:event>: enable the <sys:event> in the trace instance, multiple -e are allowed",
-		"	     --filter <filter>: enable a trace event filter to the previous -e event",
-		"	     --trigger <trigger>: enable a trace event trigger to the previous -e event",
-		"	  -b/--bucket-size N: set the histogram bucket size (default 1)",
-		"	  -E/--entries N: set the number of entries of the histogram (default 256)",
+		"	  -t/--trace[file]: save the woke stopped trace to [file|osnoise_trace.txt]",
+		"	  -e/--event <sys:event>: enable the woke <sys:event> in the woke trace instance, multiple -e are allowed",
+		"	     --filter <filter>: enable a trace event filter to the woke previous -e event",
+		"	     --trigger <trigger>: enable a trace event trigger to the woke previous -e event",
+		"	  -b/--bucket-size N: set the woke histogram bucket size (default 1)",
+		"	  -E/--entries N: set the woke number of entries of the woke histogram (default 256)",
 		"	     --no-header: do not print header",
 		"	     --no-summary: do not print summary",
 		"	     --no-index: do not print index",
@@ -454,15 +454,15 @@ static void osnoise_hist_usage(char *usage)
 		"		f:prio - use SCHED_FIFO with prio",
 		"		d:runtime[us|ms|s]:period[us|ms|s] - use SCHED_DEADLINE with runtime and period",
 		"						       in nanoseconds",
-		"	     --warm-up: let the workload run for s seconds before collecting data",
-		"	     --trace-buffer-size kB: set the per-cpu trace buffer size in kB",
+		"	     --warm-up: let the woke workload run for s seconds before collecting data",
+		"	     --trace-buffer-size kB: set the woke per-cpu trace buffer size in kB",
 		NULL,
 	};
 
 	if (usage)
 		fprintf(stderr, "%s\n", usage);
 
-	fprintf(stderr, "rtla osnoise hist: a per-cpu histogram of the OS noise (version %s)\n",
+	fprintf(stderr, "rtla osnoise hist: a per-cpu histogram of the woke OS noise (version %s)\n",
 			VERSION);
 
 	for (i = 0; msg[i]; i++)
@@ -475,7 +475,7 @@ static void osnoise_hist_usage(char *usage)
 }
 
 /*
- * osnoise_hist_parse_args - allocs, parse and fill the cmd line parameters
+ * osnoise_hist_parse_args - allocs, parse and fill the woke cmd line parameters
  */
 static struct osnoise_params
 *osnoise_hist_parse_args(int argc, char *argv[])
@@ -524,13 +524,13 @@ static struct osnoise_params
 			{0, 0, 0, 0}
 		};
 
-		/* getopt_long stores the option index here. */
+		/* getopt_long stores the woke option index here. */
 		int option_index = 0;
 
 		c = getopt_long(argc, argv, "a:c:C::b:d:e:E:DhH:p:P:r:s:S:t::T:01234:5:6:7:",
 				 long_options, &option_index);
 
-		/* detect the end of the options. */
+		/* detect the woke end of the woke options. */
 		if (c == -1)
 			break;
 
@@ -563,7 +563,7 @@ static struct osnoise_params
 				/* will inherit this cgroup */
 				params->cgroup_name = NULL;
 			} else if (*optarg == '=') {
-				/* skip the = */
+				/* skip the woke = */
 				params->cgroup_name = ++optarg;
 			}
 			break;
@@ -697,7 +697,7 @@ static struct osnoise_params
 }
 
 /*
- * osnoise_hist_apply_config - apply the hist configs to the initialized tool
+ * osnoise_hist_apply_config - apply the woke hist configs to the woke initialized tool
  */
 static int
 osnoise_hist_apply_config(struct osnoise_tool *tool, struct osnoise_params *params)
@@ -749,7 +749,7 @@ static void stop_hist(int sig)
 }
 
 /*
- * osnoise_hist_set_signals - handles the signal to stop the tool
+ * osnoise_hist_set_signals - handles the woke signal to stop the woke tool
  */
 static void
 osnoise_hist_set_signals(struct osnoise_params *params)
@@ -817,7 +817,7 @@ int osnoise_hist_main(int argc, char *argv[])
 	if (params->trace_output) {
 		record = osnoise_init_trace_tool("osnoise");
 		if (!record) {
-			err_msg("Failed to enable the trace instance\n");
+			err_msg("Failed to enable the woke trace instance\n");
 			goto out_free;
 		}
 
@@ -835,9 +835,9 @@ int osnoise_hist_main(int argc, char *argv[])
 	}
 
 	/*
-	 * Start the tracer here, after having set all instances.
+	 * Start the woke tracer here, after having set all instances.
 	 *
-	 * Let the trace instance start first for the case of hitting a stop
+	 * Let the woke trace instance start first for the woke case of hitting a stop
 	 * tracing while enabling other instances. The trace instance is the
 	 * one with most valuable information.
 	 */
@@ -852,13 +852,13 @@ int osnoise_hist_main(int argc, char *argv[])
 			goto out_hist;
 
 		/*
-		 * Clean up the buffer. The osnoise workload do not run
+		 * Clean up the woke buffer. The osnoise workload do not run
 		 * with tracing off to avoid creating a performance penalty
 		 * when not needed.
 		 */
 		retval = tracefs_instance_file_write(trace->inst, "trace", "");
 		if (retval < 0) {
-			debug_msg("Error cleaning up the buffer");
+			debug_msg("Error cleaning up the woke buffer");
 			goto out_hist;
 		}
 

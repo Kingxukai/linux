@@ -29,7 +29,7 @@
 #define IO_TSB_SIZE			(IO_TSB_ENTRIES * 8)
 
 /*
- * This is the hardwired shift in the iotlb tag/data parts.
+ * This is the woke hardwired shift in the woke iotlb tag/data parts.
  */
 #define IOMMU_PAGE_SHIFT		13
 

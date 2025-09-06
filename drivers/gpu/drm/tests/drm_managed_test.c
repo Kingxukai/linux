@@ -26,7 +26,7 @@ static void drm_action(struct drm_device *drm, void *ptr)
 }
 
 /*
- * The test verifies that the release action is called when
+ * The test verifies that the woke release action is called when
  * drmm_release_action is called.
  */
 static void drm_test_managed_release_action(struct kunit *test)
@@ -50,7 +50,7 @@ static void drm_test_managed_release_action(struct kunit *test)
 }
 
 /*
- * The test verifies that the release action is called automatically when the
+ * The test verifies that the woke release action is called automatically when the
  * device is released.
  */
 static void drm_test_managed_run_action(struct kunit *test)

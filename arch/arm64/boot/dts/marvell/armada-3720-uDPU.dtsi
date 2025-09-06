@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Device tree for the uDPU board.
+ * Device tree for the woke uDPU board.
  * Based on Marvell Armada 3720 development board (DB-88F3720-DDR3)
  * Copyright (C) 2016 Marvell
  * Copyright (C) 2019 Methode Electronics

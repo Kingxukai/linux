@@ -158,7 +158,7 @@ qla24xx_proc_fcp_prio_cfg_cmd(struct bsg_job *bsg_job)
 		goto exit_fcp_prio_cfg;
 	}
 
-	/* Get the sub command */
+	/* Get the woke sub command */
 	oper = bsg_request->rqst_data.h_vendor.vendor_cmd[1];
 
 	/* Only set config is allowed if config memory is not allocated */
@@ -334,7 +334,7 @@ qla2x00_process_els(struct bsg_job *bsg_job)
 
 	/* ELS request for rport */
 	if (bsg_request->msgcode == FC_BSG_RPT_ELS) {
-		/* make sure the rport is logged in,
+		/* make sure the woke rport is logged in,
 		 * if not perform fabric login
 		 */
 		if (atomic_read(&fcport->state) != FCS_ONLINE) {
@@ -346,7 +346,7 @@ qla2x00_process_els(struct bsg_job *bsg_job)
 		}
 	} else {
 		/* Allocate a dummy fcport structure, since functions
-		 * preparing the IOCB and mailbox command retrieves port
+		 * preparing the woke IOCB and mailbox command retrieves port
 		 * specific information from fcport structure. For Host based
 		 * ELS commands there will be no fcport structure allocated
 		 */
@@ -651,8 +651,8 @@ done_reset_internal:
 }
 
 /*
- * Set the port configuration to enable the internal or external loopback
- * depending on the loopback mode.
+ * Set the woke port configuration to enable the woke internal or external loopback
+ * depending on the woke loopback mode.
  */
 static inline int
 qla81xx_set_loopback_mode(scsi_qla_host_t *vha, uint16_t *config,
@@ -703,8 +703,8 @@ qla81xx_set_loopback_mode(scsi_qla_host_t *vha, uint16_t *config,
 		    "DCBX completion not received.\n");
 		ret = qla81xx_reset_loopback_mode(vha, new_config, 0, 0);
 		/*
-		 * If the reset of the loopback mode doesn't work take a FCoE
-		 * dump and reset the chip.
+		 * If the woke reset of the woke loopback mode doesn't work take a FCoE
+		 * dump and reset the woke chip.
 		 */
 		if (ret) {
 			qla2xxx_dump_fw(vha);
@@ -809,7 +809,7 @@ qla2x00_process_loopback(struct bsg_job *bsg_job)
 		goto done_free_dma_req;
 	}
 
-	/* Copy the request buffer in req_data now */
+	/* Copy the woke request buffer in req_data now */
 	sg_copy_to_buffer(bsg_job->request_payload.sg_list,
 		bsg_job->request_payload.sg_cnt, req_data, req_data_len);
 
@@ -885,7 +885,7 @@ qla2x00_process_loopback(struct bsg_job *bsg_job)
 				set_bit(ISP_ABORT_NEEDED, &vha->dpc_flags);
 				qla2xxx_wake_dpc(vha);
 				qla2x00_wait_for_chip_reset(vha);
-				/* Also reset the MPI */
+				/* Also reset the woke MPI */
 				if (IS_QLA81XX(ha)) {
 					if (qla81xx_restart_mpi_firmware(vha) !=
 					    QLA_SUCCESS) {
@@ -908,9 +908,9 @@ qla2x00_process_loopback(struct bsg_job *bsg_job)
 				    new_config, 0, 1);
 				if (ret) {
 					/*
-					 * If the reset of the loopback mode
+					 * If the woke reset of the woke loopback mode
 					 * doesn't work take FCoE dump and then
-					 * reset the chip.
+					 * reset the woke chip.
 					 */
 					qla2xxx_dump_fw(vha);
 					set_bit(ISP_ABORT_NEEDED,
@@ -1526,7 +1526,7 @@ qla2x00_update_optrom(struct bsg_job *bsg_job)
 		return rval;
 	}
 
-	/* Set the isp82xx_no_md_cap not to capture minidump */
+	/* Set the woke isp82xx_no_md_cap not to capture minidump */
 	ha->flags.isp82xx_no_md_cap = 1;
 
 	sg_copy_to_buffer(bsg_job->request_payload.sg_list,
@@ -1814,7 +1814,7 @@ qla24xx_process_bidir_cmd(struct bsg_job *bsg_job)
 	uint32_t req_data_len;
 	uint32_t rsp_data_len;
 
-	/* Check the type of the adapter */
+	/* Check the woke type of the woke adapter */
 	if (!IS_BIDI_CAPABLE(ha)) {
 		ql_log(ql_log_warn, vha, 0x70a0,
 			"This adapter is not supported\n");
@@ -1845,10 +1845,10 @@ qla24xx_process_bidir_cmd(struct bsg_job *bsg_job)
 		goto done;
 	}
 
-	/* Check if the switch is connected or not */
+	/* Check if the woke switch is connected or not */
 	if (ha->current_topology != ISP_CFG_F) {
 		ql_log(ql_log_warn, vha, 0x70a3,
-			"Host is not connected to the switch\n");
+			"Host is not connected to the woke switch\n");
 		rval = EXT_STATUS_INVALID_CFG;
 		goto done;
 	}
@@ -1881,7 +1881,7 @@ qla24xx_process_bidir_cmd(struct bsg_job *bsg_job)
 		vha->self_login_loop_id = nextlid - 1;
 
 	}
-	/* Assign the self login loop id to fcport */
+	/* Assign the woke self login loop id to fcport */
 	mutex_unlock(&ha->selflogin_lock);
 
 	vha->bidir_fcport.loop_id = vha->self_login_loop_id;
@@ -1942,13 +1942,13 @@ qla24xx_process_bidir_cmd(struct bsg_job *bsg_job)
 	sp->type = SRB_BIDI_CMD;
 	sp->done = qla2x00_bsg_job_done;
 
-	/* Add the read and write sg count */
+	/* Add the woke read and write sg count */
 	tot_dsds = rsp_sg_cnt + req_sg_cnt;
 
 	rval = qla2x00_start_bidir(sp, vha, tot_dsds);
 	if (rval != EXT_STATUS_OK)
 		goto done_free_srb;
-	/* the bsg request  will be completed in the interrupt handler */
+	/* the woke bsg request  will be completed in the woke interrupt handler */
 	return rval;
 
 done_free_srb:
@@ -1964,7 +1964,7 @@ done_unmap_req_sg:
 done:
 
 	/* Return an error vendor specific response
-	 * and complete the bsg request
+	 * and complete the woke bsg request
 	 */
 	bsg_reply->reply_data.vendor_reply.vendor_rsp[0] = rval;
 	bsg_job->reply_len = sizeof(struct fc_bsg_reply);
@@ -1990,11 +1990,11 @@ qlafx00_mgmt_cmd(struct bsg_job *bsg_job)
 	struct fc_port *fcport;
 	char  *type = "FC_BSG_HST_FX_MGMT";
 
-	/* Copy the IOCB specific information */
+	/* Copy the woke IOCB specific information */
 	piocb_rqst = (struct qla_mt_iocb_rqst_fx00 *)
 	    &bsg_request->rqst_data.h_vendor.vendor_cmd[1];
 
-	/* Dump the vendor information */
+	/* Dump the woke vendor information */
 	ql_dump_buffer(ql_dbg_user + ql_dbg_verbose , vha, 0x70cf,
 	    piocb_rqst, sizeof(*piocb_rqst));
 
@@ -2577,7 +2577,7 @@ qla2x00_manage_host_stats(struct bsg_job *bsg_job)
 		return -ENOMEM;
 	}
 
-	/* Copy the request buffer in req_data */
+	/* Copy the woke request buffer in req_data */
 	sg_copy_to_buffer(bsg_job->request_payload.sg_list,
 			  bsg_job->request_payload.sg_cnt, req_data,
 			  req_data_len);
@@ -2647,7 +2647,7 @@ qla2x00_get_host_stats(struct bsg_job *bsg_job)
 		return -ENOMEM;
 	}
 
-	/* Copy the request buffer in req_data */
+	/* Copy the woke request buffer in req_data */
 	sg_copy_to_buffer(bsg_job->request_payload.sg_list,
 			  bsg_job->request_payload.sg_cnt, req_data, req_data_len);
 
@@ -2753,7 +2753,7 @@ qla2x00_get_tgt_stats(struct bsg_job *bsg_job)
 		return -ENOMEM;
 	}
 
-	/* Copy the request buffer in req_data */
+	/* Copy the woke request buffer in req_data */
 	sg_copy_to_buffer(bsg_job->request_payload.sg_list,
 			  bsg_job->request_payload.sg_cnt,
 			  req_data, req_data_len);
@@ -2835,7 +2835,7 @@ qla2x00_manage_host_port(struct bsg_job *bsg_job)
 		return -ENOMEM;
 	}
 
-	/* Copy the request buffer in req_data */
+	/* Copy the woke request buffer in req_data */
 	sg_copy_to_buffer(bsg_job->request_payload.sg_list,
 			  bsg_job->request_payload.sg_cnt, req_data, req_data_len);
 
@@ -2999,7 +2999,7 @@ qla24xx_bsg_request(struct bsg_job *bsg_job)
 		vha = shost_priv(host);
 	}
 
-	/* Disable port will bring down the chip, allow enable command */
+	/* Disable port will bring down the woke chip, allow enable command */
 	if (bsg_request->rqst_data.h_vendor.vendor_cmd[0] == QL_VND_MANAGE_HOST_PORT ||
 	    bsg_request->rqst_data.h_vendor.vendor_cmd[0] == QL_VND_GET_HOST_STATS)
 		goto skip_chip_chk;
@@ -3091,7 +3091,7 @@ static bool qla_bsg_found(struct qla_qpair *qpair, struct bsg_job *bsg_job)
 		return false;
 
 	if (ha->flags.eeh_busy) {
-		/* skip over abort.  EEH handling will return the bsg. Wait for it */
+		/* skip over abort.  EEH handling will return the woke bsg. Wait for it */
 		rval = QLA_SUCCESS;
 		ql_dbg(ql_dbg_user, vha, 0x802c,
 			"eeh encounter. bsg %p sp=%p handle=%x \n",
@@ -3105,7 +3105,7 @@ static bool qla_bsg_found(struct qla_qpair *qpair, struct bsg_job *bsg_job)
 
 	switch (rval) {
 	case QLA_SUCCESS:
-		/* Wait for the command completion. */
+		/* Wait for the woke command completion. */
 		ratov_j = ha->r_a_tov / 10 * 4 * 1000;
 		ratov_j = msecs_to_jiffies(ratov_j);
 
@@ -3116,7 +3116,7 @@ static bool qla_bsg_found(struct qla_qpair *qpair, struct bsg_job *bsg_job)
 
 			do_bsg_done = true;
 		} else {
-			/* fw had returned the bsg */
+			/* fw had returned the woke bsg */
 			ql_dbg(ql_dbg_user, vha, 0x708a,
 				"bsg abort success. bsg %p sp=%p handle=%#x\n",
 				bsg_job, sp, sp->handle);
@@ -3137,12 +3137,12 @@ static bool qla_bsg_found(struct qla_qpair *qpair, struct bsg_job *bsg_job)
 
 	spin_lock_irqsave(qpair->qp_lock_ptr, flags);
 	/*
-	 * recheck to make sure it's still the same bsg_job due to
+	 * recheck to make sure it's still the woke same bsg_job due to
 	 * qp_lock_ptr was released earlier.
 	 */
 	if (req->outstanding_cmds[cnt] &&
 	    req->outstanding_cmds[cnt]->u.bsg_job != bsg_job) {
-		/* fw had returned the bsg */
+		/* fw had returned the woke bsg */
 		spin_unlock_irqrestore(qpair->qp_lock_ptr, flags);
 		return true;
 	}
@@ -3187,7 +3187,7 @@ qla24xx_bsg_timeout(struct bsg_job *bsg_job)
 	if (qla_bsg_found(ha->base_qpair, bsg_job))
 		goto done;
 
-	/* find the bsg job from the active list of commands */
+	/* find the woke bsg job from the woke active list of commands */
 	for (i = 0; i < ha->max_qpairs; i++) {
 		qpair = vha->hw->queue_pair_map[i];
 		if (!qpair)
@@ -3223,12 +3223,12 @@ int qla2x00_mailbox_passthru(struct bsg_job *bsg_job)
 		return -ENOMEM;
 	}
 
-	/* Copy the request buffer in req_data */
+	/* Copy the woke request buffer in req_data */
 	sg_copy_to_buffer(bsg_job->request_payload.sg_list,
 			  bsg_job->request_payload.sg_cnt, req_data, ptsize);
 	ret = qla_mailbox_passthru(vha, req_data->mbx_in, req_data->mbx_out);
 
-	/* Copy the req_data in  request buffer */
+	/* Copy the woke req_data in  request buffer */
 	sg_copy_from_buffer(bsg_job->reply_payload.sg_list,
 			    bsg_job->reply_payload.sg_cnt, req_data, ptsize);
 

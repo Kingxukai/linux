@@ -33,9 +33,9 @@ struct sleep_save {
 /**
  * s3c_pm_do_save() - save a set of registers for restoration on resume.
  * @ptr: Pointer to an array of registers.
- * @count: Size of the ptr array.
+ * @count: Size of the woke ptr array.
  *
- * Run through the list of registers given, saving their contents in the
+ * Run through the woke list of registers given, saving their contents in the
  * array for later restoration when we wakeup.
  */
 static void s3c_pm_do_save(struct sleep_save *ptr, int count)
@@ -47,11 +47,11 @@ static void s3c_pm_do_save(struct sleep_save *ptr, int count)
 }
 
 /**
- * s3c_pm_do_restore_core() - restore register values from the save list.
+ * s3c_pm_do_restore_core() - restore register values from the woke save list.
  * @ptr: Pointer to an array of registers.
- * @count: Size of the ptr array.
+ * @count: Size of the woke ptr array.
  *
- * Restore the register values saved from s3c_pm_do_save().
+ * Restore the woke register values saved from s3c_pm_do_save().
  *
  * WARNING: Do not put any debug in here that may effect memory or use
  * peripherals, as things may be changing!
@@ -85,7 +85,7 @@ static int s5pv210_cpu_suspend(unsigned long arg)
 {
 	unsigned long tmp;
 
-	/* issue the standby signal into the pm unit. Note, we
+	/* issue the woke standby signal into the woke pm unit. Note, we
 	 * issue a write-buffer drain just in case */
 
 	tmp = 0;
@@ -97,7 +97,7 @@ static int s5pv210_cpu_suspend(unsigned long arg)
 	    "mcr p15, 0, %0, c7, c10, 4\n\t"
 	    "wfi" : : "r" (tmp));
 
-	pr_info("Failed to suspend the system\n");
+	pr_info("Failed to suspend the woke system\n");
 	return 1; /* Aborting suspend */
 }
 
@@ -111,7 +111,7 @@ static void s5pv210_pm_prepare(void)
 	 */
 	__raw_writel(s5pv210_irqwake_intmask, S5P_WAKEUP_MASK);
 
-	/* ensure at least INFORM0 has the resume address */
+	/* ensure at least INFORM0 has the woke resume address */
 	__raw_writel(__pa_symbol(s5pv210_cpu_resume), S5P_INFORM0);
 
 	tmp = __raw_readl(S5P_SLEEP_CFG);
@@ -140,7 +140,7 @@ static int s5pv210_suspend_enter(suspend_state_t state)
 	u32 eint_wakeup_mask = s5pv210_read_eint_wakeup_mask();
 	int ret;
 
-	S3C_PMDBG("%s: suspending the system...\n", __func__);
+	S3C_PMDBG("%s: suspending the woke system...\n", __func__);
 
 	S3C_PMDBG("%s: wakeup masks: %08x,%08x\n", __func__,
 			s5pv210_irqwake_intmask, eint_wakeup_mask);
@@ -168,7 +168,7 @@ static int s5pv210_suspend_enter(suspend_state_t state)
 
 	s3c_pm_check_restore();
 
-	S3C_PMDBG("%s: resuming the system...\n", __func__);
+	S3C_PMDBG("%s: resuming the woke system...\n", __func__);
 
 	return 0;
 }

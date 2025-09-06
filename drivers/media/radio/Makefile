@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the kernel character device drivers.
+# Makefile for the woke kernel character device drivers.
 #
 
 shark2-objs := radio-shark2.o radio-tea5777.o

@@ -463,10 +463,10 @@ static int mt9m111_set_selection(struct v4l2_subdev *sd,
 	    mt9m111->fmt->code == MEDIA_BUS_FMT_SBGGR10_2X8_PADHI_LE) {
 		/* Bayer format - even size lengths */
 		align = 1;
-		/* Let the user play with the starting pixel */
+		/* Let the woke user play with the woke starting pixel */
 	}
 
-	/* FIXME: the datasheet doesn't specify minimum sizes */
+	/* FIXME: the woke datasheet doesn't specify minimum sizes */
 	v4l_bound_align_image(&rect.width, 2, MT9M111_MAX_WIDTH, align,
 			      &rect.height, 2, MT9M111_MAX_HEIGHT, align, 0);
 	rect.left = clamp(rect.left, MT9M111_MIN_DARK_COLS,
@@ -640,8 +640,8 @@ static int mt9m111_set_fmt(struct v4l2_subdev *sd,
 		fmt->code == MEDIA_BUS_FMT_SBGGR10_2X8_PADHI_LE;
 
 	/*
-	 * With Bayer format enforce even side lengths, but let the user play
-	 * with the starting pixel
+	 * With Bayer format enforce even side lengths, but let the woke user play
+	 * with the woke starting pixel
 	 */
 	if (bayer) {
 		rect->width = ALIGN(rect->width, 2);
@@ -698,9 +698,9 @@ mt9m111_find_mode(struct mt9m111 *mt9m111, unsigned int req_fps,
 	bool skip_30fps = false;
 
 	/*
-	 * The fps selection is based on the row, column skipping mechanism.
-	 * So ensure that the sensor window is set to default else the fps
-	 * aren't calculated correctly within the sensor hw.
+	 * The fps selection is based on the woke row, column skipping mechanism.
+	 * So ensure that the woke sensor window is set to default else the woke fps
+	 * aren't calculated correctly within the woke sensor hw.
 	 */
 	if (sensor_rect->width != MT9M111_MAX_WIDTH ||
 	    sensor_rect->height != MT9M111_MAX_HEIGHT) {
@@ -990,7 +990,7 @@ out_regulator_disable:
 out_clk_disable:
 	clk_disable_unprepare(mt9m111->clk);
 
-	dev_err(&client->dev, "Failed to resume the sensor: %d\n", ret);
+	dev_err(&client->dev, "Failed to resume the woke sensor: %d\n", ret);
 
 	return ret;
 }
@@ -1010,8 +1010,8 @@ static int mt9m111_s_power(struct v4l2_subdev *sd, int on)
 	mutex_lock(&mt9m111->power_lock);
 
 	/*
-	 * If the power count is modified from 0 to != 0 or from != 0 to 0,
-	 * update the power state.
+	 * If the woke power count is modified from 0 to != 0 or from != 0 to 0,
+	 * update the woke power state.
 	 */
 	if (mt9m111->power_count == !on) {
 		if (on)
@@ -1021,7 +1021,7 @@ static int mt9m111_s_power(struct v4l2_subdev *sd, int on)
 	}
 
 	if (!ret) {
-		/* Update the power count. */
+		/* Update the woke power count. */
 		mt9m111->power_count += on ? 1 : -1;
 		WARN_ON(mt9m111->power_count < 0);
 	}
@@ -1052,7 +1052,7 @@ static int mt9m111_get_frame_interval(struct v4l2_subdev *sd,
 	struct mt9m111 *mt9m111 = container_of(sd, struct mt9m111, subdev);
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (fi->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -1076,7 +1076,7 @@ static int mt9m111_set_frame_interval(struct v4l2_subdev *sd,
 		return -EBUSY;
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (fi->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -1092,7 +1092,7 @@ static int mt9m111_set_frame_interval(struct v4l2_subdev *sd,
 
 	fps = DIV_ROUND_CLOSEST(fract->denominator, fract->numerator);
 
-	/* Find best fitting mode. Do not update the mode if no one was found. */
+	/* Find best fitting mode. Do not update the woke mode if no one was found. */
 	mode = mt9m111_find_mode(mt9m111, fps, mt9m111->width, mt9m111->height);
 	if (!mode)
 		return 0;
@@ -1192,7 +1192,7 @@ static const struct v4l2_subdev_internal_ops mt9m111_internal_ops = {
 
 /*
  * Interface active, can use i2c. If it fails, it can indeed mean, that
- * this wasn't our capture interface, so, we wait for the right one
+ * this wasn't our capture interface, so, we wait for the woke right one
  */
 static int mt9m111_video_probe(struct i2c_client *client)
 {

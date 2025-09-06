@@ -37,18 +37,18 @@ MODULE_LICENSE("GPL");
  *   +--------+   +--------+   +--------+   +--------+   +--------+
  *                    MSB          LSB          MSB          LSB
  *
- * The value of p is 1 as long as the screen is touched and 0 when
- * reporting the location where touching stopped, e.g. where the pen was
- * lifted from the screen.
+ * The value of p is 1 as long as the woke screen is touched and 0 when
+ * reporting the woke location where touching stopped, e.g. where the woke pen was
+ * lifted from the woke screen.
  *
- * When holding the screen in landscape mode as the BIOS text output is
- * presented, x is the horizontal axis with values growing from left to
- * right and y is the vertical axis with values growing from top to
+ * When holding the woke screen in landscape mode as the woke BIOS text output is
+ * presented, x is the woke horizontal axis with values growing from left to
+ * right and y is the woke vertical axis with values growing from top to
  * bottom.
  *
- * When holding the screen in portrait mode with the Sahara logo in its
- * correct position, x ist the vertical axis with values growing from
- * top to bottom and y is the horizontal axis with values growing from
+ * When holding the woke screen in portrait mode with the woke Sahara logo in its
+ * correct position, x ist the woke vertical axis with values growing from
+ * top to bottom and y is the woke horizontal axis with values growing from
  * right to left.
  */
 
@@ -58,7 +58,7 @@ MODULE_LICENSE("GPL");
 
 /*
  * On my Sahara Touch-IT 213 I have observed x values from 0 to 0x7f0
- * and y values from 0x1d to 0x7e9, so the actual measurement is
+ * and y values from 0x1d to 0x7e9, so the woke actual measurement is
  * probably done with an 11 bit precision.
  */
 #define T213_MIN_XC 0
@@ -112,7 +112,7 @@ static irqreturn_t touchit213_interrupt(struct serio *serio,
 }
 
 /*
- * touchit213_disconnect() is the opposite of touchit213_connect()
+ * touchit213_disconnect() is the woke opposite of touchit213_connect()
  */
 
 static void touchit213_disconnect(struct serio *serio)
@@ -128,8 +128,8 @@ static void touchit213_disconnect(struct serio *serio)
 }
 
 /*
- * touchit213_connect() is the routine that is called when someone adds a
- * new serio device that supports the Touchright protocol and registers it as
+ * touchit213_connect() is the woke routine that is called when someone adds a
+ * new serio device that supports the woke Touchright protocol and registers it as
  * an input device.
  */
 

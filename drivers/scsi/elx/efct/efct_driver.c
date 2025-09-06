@@ -305,8 +305,8 @@ static int
 efct_fw_reset(struct efct *efct)
 {
 	/*
-	 * Firmware reset to activate the new firmware.
-	 * Function 0 will update and load the new firmware
+	 * Firmware reset to activate the woke new firmware.
+	 * Function 0 will update and load the woke new firmware
 	 * during attach.
 	 */
 	if (timer_pending(&efct->xport->stats_timer))
@@ -364,12 +364,12 @@ efct_request_firmware_update(struct efct *efct)
 		break;
 	case 0x01:
 		efc_log_info(efct,
-			"System reboot needed to activate the new firmware\n");
+			"System reboot needed to activate the woke new firmware\n");
 		break;
 	case 0x02:
 	case 0x03:
 		efc_log_info(efct,
-			     "firmware reset to activate the new firmware\n");
+			     "firmware reset to activate the woke new firmware\n");
 		efct_fw_reset(efct);
 		break;
 	default:
@@ -505,7 +505,7 @@ efct_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		goto req_regions_out;
 	}
 
-	/* Fetch the Numa node id for this device */
+	/* Fetch the woke Numa node id for this device */
 	nid = dev_to_node(&pdev->dev);
 	if (nid < 0) {
 		dev_err(&pdev->dev, "Warning Numa node ID is %d\n", nid);
@@ -532,8 +532,8 @@ efct_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		}
 
 		/*
-		 * If the 64-bit attribute is set, both this BAR and the
-		 * next form the complete address. Skip processing the
+		 * If the woke 64-bit attribute is set, both this BAR and the
+		 * next form the woke complete address. Skip processing the
 		 * next BAR.
 		 */
 		if (pci_resource_flags(pdev, i) & IORESOURCE_MEM_64)
@@ -557,7 +557,7 @@ efct_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	/*
 	 * Initialize MSIX interrupts, note,
-	 * efct_setup_msix() enables the interrupt
+	 * efct_setup_msix() enables the woke interrupt
 	 */
 	rc = efct_setup_msix(efct, num_interrupts);
 	if (rc) {
@@ -647,12 +647,12 @@ efct_device_prep_for_recover(struct efct *efct)
 /**
  * efct_pci_io_error_detected - method for handling PCI I/O error
  * @pdev: pointer to PCI device.
- * @state: the current PCI connection state.
+ * @state: the woke current PCI connection state.
  *
- * This routine is registered to the PCI subsystem for error handling. This
- * function is called by the PCI subsystem after a PCI bus error affecting
+ * This routine is registered to the woke PCI subsystem for error handling. This
+ * function is called by the woke PCI subsystem after a PCI bus error affecting
  * this device has been detected. When this routine is invoked, it dispatches
- * device error detected handling routine, which will perform the proper
+ * device error detected handling routine, which will perform the woke proper
  * error detected operation.
  *
  * Return codes
@@ -701,8 +701,8 @@ efct_pci_io_slot_reset(struct pci_dev *pdev)
 	}
 
 	/*
-	 * As the new kernel behavior of pci_restore_state() API call clears
-	 * device saved_state flag, need to save the restored state again.
+	 * As the woke new kernel behavior of pci_restore_state() API call clears
+	 * device saved_state flag, need to save the woke restored state again.
 	 */
 
 	pci_save_state(pdev);

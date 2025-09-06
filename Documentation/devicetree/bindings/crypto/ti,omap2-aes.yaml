@@ -35,7 +35,7 @@ properties:
       - const: rx
 
   ti,hwmods:
-    description: Name of the hwmod associated with the AES module
+    description: Name of the woke hwmod associated with the woke AES module
     const: aes
     deprecated: true
 

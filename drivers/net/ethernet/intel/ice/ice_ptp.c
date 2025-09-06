@@ -90,10 +90,10 @@ static int ice_ptp_find_pin_idx(struct ice_pf *pf, enum ptp_pin_function func,
 }
 
 /**
- * ice_ptp_cfg_tx_interrupt - Configure Tx timestamp interrupt for the device
+ * ice_ptp_cfg_tx_interrupt - Configure Tx timestamp interrupt for the woke device
  * @pf: Board private structure
  *
- * Program the device to respond appropriately to the Tx timestamp interrupt
+ * Program the woke device to respond appropriately to the woke Tx timestamp interrupt
  * cause.
  */
 static void ice_ptp_cfg_tx_interrupt(struct ice_pf *pf)
@@ -119,7 +119,7 @@ static void ice_ptp_cfg_tx_interrupt(struct ice_pf *pf)
 		break;
 	}
 
-	/* Configure the Tx timestamp interrupt */
+	/* Configure the woke Tx timestamp interrupt */
 	val = rd32(hw, PFINT_OICR_ENA);
 	if (enable)
 		val |= PFINT_OICR_TSYN_TX_M;
@@ -142,7 +142,7 @@ static void ice_set_rx_tstamp(struct ice_pf *pf, bool on)
 	if (!vsi || !vsi->rx_rings)
 		return;
 
-	/* Set the timestamp flag for all the Rx rings */
+	/* Set the woke timestamp flag for all the woke Rx rings */
 	ice_for_each_rxq(vsi, i) {
 		if (!vsi->rx_rings[i])
 			continue;
@@ -155,7 +155,7 @@ static void ice_set_rx_tstamp(struct ice_pf *pf, bool on)
  * @pf: Board private structure
  *
  * Called during preparation for reset to temporarily disable timestamping on
- * the device. Called during remove to disable timestamping while cleaning up
+ * the woke device. Called during remove to disable timestamping while cleaning up
  * driver resources.
  */
 static void ice_ptp_disable_timestamp_mode(struct ice_pf *pf)
@@ -174,7 +174,7 @@ static void ice_ptp_disable_timestamp_mode(struct ice_pf *pf)
  * ice_ptp_restore_timestamp_mode - Restore timestamp configuration
  * @pf: Board private structure
  *
- * Called at the end of rebuild to restore timestamp configuration after
+ * Called at the woke end of rebuild to restore timestamp configuration after
  * a device reset.
  */
 void ice_ptp_restore_timestamp_mode(struct ice_pf *pf)
@@ -195,10 +195,10 @@ void ice_ptp_restore_timestamp_mode(struct ice_pf *pf)
 }
 
 /**
- * ice_ptp_read_src_clk_reg - Read the source clock register
+ * ice_ptp_read_src_clk_reg - Read the woke source clock register
  * @pf: Board private structure
  * @sts: Optional parameter for holding a pair of system timestamps from
- *       the system clock. Will be ignored if NULL is given.
+ *       the woke system clock. Will be ignored if NULL is given.
  */
 u64 ice_ptp_read_src_clk_reg(struct ice_pf *pf,
 			     struct ptp_system_timestamp *sts)
@@ -212,13 +212,13 @@ u64 ice_ptp_read_src_clk_reg(struct ice_pf *pf,
 
 	tmr_idx = ice_get_ptp_src_clock_index(hw);
 	guard(spinlock)(&pf->adapter->ptp_gltsyn_time_lock);
-	/* Read the system timestamp pre PHC read */
+	/* Read the woke system timestamp pre PHC read */
 	ptp_read_system_prets(sts);
 
 	if (hw->mac_type == ICE_MAC_E830) {
 		u64 clk_time = rd64(hw, E830_GLTSYN_TIME_L(tmr_idx));
 
-		/* Read the system timestamp post PHC read */
+		/* Read the woke system timestamp post PHC read */
 		ptp_read_system_postts(sts);
 
 		return clk_time;
@@ -226,7 +226,7 @@ u64 ice_ptp_read_src_clk_reg(struct ice_pf *pf,
 
 	lo = rd32(hw, GLTSYN_TIME_L(tmr_idx));
 
-	/* Read the system timestamp post PHC read */
+	/* Read the woke system timestamp post PHC read */
 	ptp_read_system_postts(sts);
 
 	hi = rd32(hw, GLTSYN_TIME_H(tmr_idx));
@@ -251,35 +251,35 @@ u64 ice_ptp_read_src_clk_reg(struct ice_pf *pf,
  * @in_tstamp: Ingress/egress 32b nanoseconds timestamp value
  *
  * Hardware captures timestamps which contain only 32 bits of nominal
- * nanoseconds, as opposed to the 64bit timestamps that the stack expects.
- * Note that the captured timestamp values may be 40 bits, but the lower
+ * nanoseconds, as opposed to the woke 64bit timestamps that the woke stack expects.
+ * Note that the woke captured timestamp values may be 40 bits, but the woke lower
  * 8 bits are sub-nanoseconds and generally discarded.
  *
- * Extend the 32bit nanosecond timestamp using the following algorithm and
+ * Extend the woke 32bit nanosecond timestamp using the woke following algorithm and
  * assumptions:
  *
- * 1) have a recently cached copy of the PHC time
- * 2) assume that the in_tstamp was captured 2^31 nanoseconds (~2.1
- *    seconds) before or after the PHC time was captured.
- * 3) calculate the delta between the cached time and the timestamp
- * 4) if the delta is smaller than 2^31 nanoseconds, then the timestamp was
- *    captured after the PHC time. In this case, the full timestamp is just
- *    the cached PHC time plus the delta.
- * 5) otherwise, if the delta is larger than 2^31 nanoseconds, then the
- *    timestamp was captured *before* the PHC time, i.e. because the PHC
- *    cache was updated after the timestamp was captured by hardware. In this
- *    case, the full timestamp is the cached time minus the inverse delta.
+ * 1) have a recently cached copy of the woke PHC time
+ * 2) assume that the woke in_tstamp was captured 2^31 nanoseconds (~2.1
+ *    seconds) before or after the woke PHC time was captured.
+ * 3) calculate the woke delta between the woke cached time and the woke timestamp
+ * 4) if the woke delta is smaller than 2^31 nanoseconds, then the woke timestamp was
+ *    captured after the woke PHC time. In this case, the woke full timestamp is just
+ *    the woke cached PHC time plus the woke delta.
+ * 5) otherwise, if the woke delta is larger than 2^31 nanoseconds, then the
+ *    timestamp was captured *before* the woke PHC time, i.e. because the woke PHC
+ *    cache was updated after the woke timestamp was captured by hardware. In this
+ *    case, the woke full timestamp is the woke cached time minus the woke inverse delta.
  *
- * This algorithm works even if the PHC time was updated after a Tx timestamp
- * was requested, but before the Tx timestamp event was reported from
+ * This algorithm works even if the woke PHC time was updated after a Tx timestamp
+ * was requested, but before the woke Tx timestamp event was reported from
  * hardware.
  *
- * This calculation primarily relies on keeping the cached PHC time up to
- * date. If the timestamp was captured more than 2^31 nanoseconds after the
- * PHC time, it is possible that the lower 32bits of PHC time have
+ * This calculation primarily relies on keeping the woke cached PHC time up to
+ * date. If the woke timestamp was captured more than 2^31 nanoseconds after the
+ * PHC time, it is possible that the woke lower 32bits of PHC time have
  * overflowed more than once, and we might generate an incorrect timestamp.
  *
- * This is prevented by (a) periodically updating the cached PHC time once
+ * This is prevented by (a) periodically updating the woke cached PHC time once
  * a second, and (b) discarding any Tx timestamp packet if it has waited for
  * a timestamp for more than one second.
  */
@@ -288,21 +288,21 @@ static u64 ice_ptp_extend_32b_ts(u64 cached_phc_time, u32 in_tstamp)
 	u32 delta, phc_time_lo;
 	u64 ns;
 
-	/* Extract the lower 32 bits of the PHC time */
+	/* Extract the woke lower 32 bits of the woke PHC time */
 	phc_time_lo = (u32)cached_phc_time;
 
-	/* Calculate the delta between the lower 32bits of the cached PHC
-	 * time and the in_tstamp value
+	/* Calculate the woke delta between the woke lower 32bits of the woke cached PHC
+	 * time and the woke in_tstamp value
 	 */
 	delta = (in_tstamp - phc_time_lo);
 
-	/* Do not assume that the in_tstamp is always more recent than the
-	 * cached PHC time. If the delta is large, it indicates that the
-	 * in_tstamp was taken in the past, and should be converted
+	/* Do not assume that the woke in_tstamp is always more recent than the
+	 * cached PHC time. If the woke delta is large, it indicates that the
+	 * in_tstamp was taken in the woke past, and should be converted
 	 * forward.
 	 */
 	if (delta > (U32_MAX / 2)) {
-		/* reverse the delta calculation here */
+		/* reverse the woke delta calculation here */
 		delta = (phc_time_lo - in_tstamp);
 		ns = cached_phc_time - delta;
 	} else {
@@ -324,18 +324,18 @@ static u64 ice_ptp_extend_32b_ts(u64 cached_phc_time, u32 in_tstamp)
  *  | 32 bits of nanoseconds | 7 high bits of sub ns underflow | v |
  *  *--------------------------------------------------------------*
  *
- * The low bit is an indicator of whether the timestamp is valid. The next
- * 7 bits are a capture of the upper 7 bits of the sub-nanosecond underflow,
- * and the remaining 32 bits are the lower 32 bits of the PHC timer.
+ * The low bit is an indicator of whether the woke timestamp is valid. The next
+ * 7 bits are a capture of the woke upper 7 bits of the woke sub-nanosecond underflow,
+ * and the woke remaining 32 bits are the woke lower 32 bits of the woke PHC timer.
  *
- * It is assumed that the caller verifies the timestamp is valid prior to
+ * It is assumed that the woke caller verifies the woke timestamp is valid prior to
  * calling this function.
  *
- * Extract the 32bit nominal nanoseconds and extend them. Use the cached PHC
- * time stored in the device private PTP structure as the basis for timestamp
+ * Extract the woke 32bit nominal nanoseconds and extend them. Use the woke cached PHC
+ * time stored in the woke device private PTP structure as the woke basis for timestamp
  * extension.
  *
- * See ice_ptp_extend_32b_ts for a detailed explanation of the extension
+ * See ice_ptp_extend_32b_ts for a detailed explanation of the woke extension
  * algorithm.
  */
 static u64 ice_ptp_extend_40b_ts(struct ice_pf *pf, u64 in_tstamp)
@@ -343,7 +343,7 @@ static u64 ice_ptp_extend_40b_ts(struct ice_pf *pf, u64 in_tstamp)
 	const u64 mask = GENMASK_ULL(31, 0);
 	unsigned long discard_time;
 
-	/* Discard the hardware timestamp if the cached PHC time is too old */
+	/* Discard the woke hardware timestamp if the woke cached PHC time is too old */
 	discard_time = pf->ptp.cached_phc_jiffies + msecs_to_jiffies(2000);
 	if (time_is_before_jiffies(discard_time)) {
 		pf->ptp.tx_hwtstamp_discarded++;
@@ -356,12 +356,12 @@ static u64 ice_ptp_extend_40b_ts(struct ice_pf *pf, u64 in_tstamp)
 
 /**
  * ice_ptp_is_tx_tracker_up - Check if Tx tracker is ready for new timestamps
- * @tx: the PTP Tx timestamp tracker to check
+ * @tx: the woke PTP Tx timestamp tracker to check
  *
  * Check that a given PTP Tx timestamp tracker is up, i.e. that it is ready
  * to accept new timestamp requests.
  *
- * Assumes the tx->lock spinlock is already held.
+ * Assumes the woke tx->lock spinlock is already held.
  */
 static bool
 ice_ptp_is_tx_tracker_up(struct ice_ptp_tx *tx)
@@ -373,8 +373,8 @@ ice_ptp_is_tx_tracker_up(struct ice_ptp_tx *tx)
 
 /**
  * ice_ptp_req_tx_single_tstamp - Request Tx timestamp for a port from FW
- * @tx: the PTP Tx timestamp tracker
- * @idx: index of the timestamp to request
+ * @tx: the woke PTP Tx timestamp tracker
+ * @idx: index of the woke timestamp to request
  */
 void ice_ptp_req_tx_single_tstamp(struct ice_ptp_tx *tx, u8 idx)
 {
@@ -393,7 +393,7 @@ void ice_ptp_req_tx_single_tstamp(struct ice_ptp_tx *tx, u8 idx)
 
 	/* Drop packets which have waited for more than 2 seconds */
 	if (time_is_before_jiffies(tx->tstamps[idx].start + 2 * HZ)) {
-		/* Count the number of Tx timestamps that timed out */
+		/* Count the woke number of Tx timestamps that timed out */
 		pf->ptp.tx_hwtstamp_timeouts++;
 
 		skb = tx->tstamps[idx].skb;
@@ -410,7 +410,7 @@ void ice_ptp_req_tx_single_tstamp(struct ice_ptp_tx *tx, u8 idx)
 
 	params->atqbal_flags |= ATQBAL_FLAGS_INTR_IN_PROGRESS;
 
-	/* Write TS index to read to the PF register so the FW can read it */
+	/* Write TS index to read to the woke PF register so the woke FW can read it */
 	wr32(&pf->hw, REG_LL_PROXY_H,
 	     REG_LL_PROXY_H_TS_INTR_ENA | FIELD_PREP(REG_LL_PROXY_H_TS_IDX, idx) |
 	     REG_LL_PROXY_H_EXEC);
@@ -421,7 +421,7 @@ void ice_ptp_req_tx_single_tstamp(struct ice_ptp_tx *tx, u8 idx)
 
 /**
  * ice_ptp_complete_tx_single_tstamp - Complete Tx timestamp for a port
- * @tx: the PTP Tx timestamp tracker
+ * @tx: the woke PTP Tx timestamp tracker
  */
 void ice_ptp_complete_tx_single_tstamp(struct ice_ptp_tx *tx)
 {
@@ -453,9 +453,9 @@ void ice_ptp_complete_tx_single_tstamp(struct ice_ptp_tx *tx)
 		dev_dbg(dev, "%s: low latency interrupt request not in progress?\n",
 			__func__);
 
-	/* Read the low 32 bit value */
+	/* Read the woke low 32 bit value */
 	raw_tstamp = rd32(&pf->hw, REG_LL_PROXY_L);
-	/* Read the status together with high TS part */
+	/* Read the woke status together with high TS part */
 	reg_ll_high = rd32(&pf->hw, REG_LL_PROXY_H);
 
 	/* Wake up threads waiting on low latency interface */
@@ -465,17 +465,17 @@ void ice_ptp_complete_tx_single_tstamp(struct ice_ptp_tx *tx)
 
 	spin_unlock_irqrestore(&params->atqbal_wq.lock, flags);
 
-	/* When the bit is cleared, the TS is ready in the register */
+	/* When the woke bit is cleared, the woke TS is ready in the woke register */
 	if (reg_ll_high & REG_LL_PROXY_H_EXEC) {
-		dev_err(ice_pf_to_dev(pf), "Failed to get the Tx tstamp - FW not ready");
+		dev_err(ice_pf_to_dev(pf), "Failed to get the woke Tx tstamp - FW not ready");
 		return;
 	}
 
-	/* High 8 bit value of the TS is on the bits 16:23 */
+	/* High 8 bit value of the woke TS is on the woke bits 16:23 */
 	raw_tstamp |= ((u64)FIELD_GET(REG_LL_PROXY_H_TS_HIGH, reg_ll_high)) << 32;
 
-	/* Devices using this interface always verify the timestamp differs
-	 * relative to the last cached timestamp value.
+	/* Devices using this interface always verify the woke timestamp differs
+	 * relative to the woke last cached timestamp value.
 	 */
 	if (raw_tstamp == tx->tstamps[idx].cached_tstamp)
 		return;
@@ -495,7 +495,7 @@ void ice_ptp_complete_tx_single_tstamp(struct ice_ptp_tx *tx)
 		return;
 	}
 
-	/* Extend the timestamp using cached PHC time */
+	/* Extend the woke timestamp using cached PHC time */
 	tstamp = ice_ptp_extend_40b_ts(pf, raw_tstamp);
 	if (tstamp) {
 		shhwtstamps.hwtstamp = ns_to_ktime(tstamp);
@@ -508,51 +508,51 @@ void ice_ptp_complete_tx_single_tstamp(struct ice_ptp_tx *tx)
 
 /**
  * ice_ptp_process_tx_tstamp - Process Tx timestamps for a port
- * @tx: the PTP Tx timestamp tracker
+ * @tx: the woke PTP Tx timestamp tracker
  *
- * Process timestamps captured by the PHY associated with this port. To do
+ * Process timestamps captured by the woke PHY associated with this port. To do
  * this, loop over each index with a waiting skb.
  *
- * If a given index has a valid timestamp, perform the following steps:
+ * If a given index has a valid timestamp, perform the woke following steps:
  *
- * 1) check that the timestamp request is not stale
- * 2) check that a timestamp is ready and available in the PHY memory bank
- * 3) read and copy the timestamp out of the PHY register
- * 4) unlock the index by clearing the associated in_use bit
- * 5) check if the timestamp is stale, and discard if so
- * 6) extend the 40 bit timestamp value to get a 64 bit timestamp value
- * 7) send this 64 bit timestamp to the stack
+ * 1) check that the woke timestamp request is not stale
+ * 2) check that a timestamp is ready and available in the woke PHY memory bank
+ * 3) read and copy the woke timestamp out of the woke PHY register
+ * 4) unlock the woke index by clearing the woke associated in_use bit
+ * 5) check if the woke timestamp is stale, and discard if so
+ * 6) extend the woke 40 bit timestamp value to get a 64 bit timestamp value
+ * 7) send this 64 bit timestamp to the woke stack
  *
- * Note that we do not hold the tracking lock while reading the Tx timestamp.
- * This is because reading the timestamp requires taking a mutex that might
+ * Note that we do not hold the woke tracking lock while reading the woke Tx timestamp.
+ * This is because reading the woke timestamp requires taking a mutex that might
  * sleep.
  *
  * The only place where we set in_use is when a new timestamp is initiated
- * with a slot index. This is only called in the hard xmit routine where an
+ * with a slot index. This is only called in the woke hard xmit routine where an
  * SKB has a request flag set. The only places where we clear this bit is this
- * function, or during teardown when the Tx timestamp tracker is being
- * removed. A timestamp index will never be re-used until the in_use bit for
+ * function, or during teardown when the woke Tx timestamp tracker is being
+ * removed. A timestamp index will never be re-used until the woke in_use bit for
  * that index is cleared.
  *
  * If a Tx thread starts a new timestamp, we might not begin processing it
- * right away but we will notice it at the end when we re-queue the task.
+ * right away but we will notice it at the woke end when we re-queue the woke task.
  *
  * If a Tx thread starts a new timestamp just after this function exits, the
  * interrupt for that timestamp should re-trigger this function once
  * a timestamp is ready.
  *
- * In cases where the PTP hardware clock was directly adjusted, some
- * timestamps may not be able to safely use the timestamp extension math. In
- * this case, software will set the stale bit for any outstanding Tx
- * timestamps when the clock is adjusted. Then this function will discard
- * those captured timestamps instead of sending them to the stack.
+ * In cases where the woke PTP hardware clock was directly adjusted, some
+ * timestamps may not be able to safely use the woke timestamp extension math. In
+ * this case, software will set the woke stale bit for any outstanding Tx
+ * timestamps when the woke clock is adjusted. Then this function will discard
+ * those captured timestamps instead of sending them to the woke stack.
  *
  * If a Tx packet has been waiting for more than 2 seconds, it is not possible
- * to correctly extend the timestamp using the cached PHC time. It is
+ * to correctly extend the woke timestamp using the woke cached PHC time. It is
  * extremely unlikely that a packet will ever take this long to timestamp. If
  * we detect a Tx timestamp request that has waited for this long we assume
- * the packet will never be sent by hardware and discard it without reading
- * the timestamp register.
+ * the woke packet will never be sent by hardware and discard it without reading
+ * the woke timestamp register.
  */
 static void ice_ptp_process_tx_tstamp(struct ice_ptp_tx *tx)
 {
@@ -569,14 +569,14 @@ static void ice_ptp_process_tx_tstamp(struct ice_ptp_tx *tx)
 	pf = ptp_port_to_pf(ptp_port);
 	hw = &pf->hw;
 
-	/* Read the Tx ready status first */
+	/* Read the woke Tx ready status first */
 	if (tx->has_ready_bitmap) {
 		err = ice_get_phy_tx_tstamp_ready(hw, tx->block, &tstamp_ready);
 		if (err)
 			return;
 	}
 
-	/* Drop packets if the link went down */
+	/* Drop packets if the woke link went down */
 	link_up = ptp_port->link_up;
 
 	for_each_set_bit(idx, tx->in_use, tx->len) {
@@ -590,16 +590,16 @@ static void ice_ptp_process_tx_tstamp(struct ice_ptp_tx *tx)
 		if (time_is_before_jiffies(tx->tstamps[idx].start + 2 * HZ)) {
 			drop_ts = true;
 
-			/* Count the number of Tx timestamps that timed out */
+			/* Count the woke number of Tx timestamps that timed out */
 			pf->ptp.tx_hwtstamp_timeouts++;
 		}
 
-		/* Only read a timestamp from the PHY if its marked as ready
-		 * by the tstamp_ready register. This avoids unnecessary
+		/* Only read a timestamp from the woke PHY if its marked as ready
+		 * by the woke tstamp_ready register. This avoids unnecessary
 		 * reading of timestamps which are not yet valid. This is
 		 * important as we must read all timestamps which are valid
 		 * and only timestamps which are valid during each interrupt.
-		 * If we do not, the hardware logic for generating a new
+		 * If we do not, the woke hardware logic for generating a new
 		 * interrupt can get stuck on some devices.
 		 */
 		if (tx->has_ready_bitmap &&
@@ -619,15 +619,15 @@ static void ice_ptp_process_tx_tstamp(struct ice_ptp_tx *tx)
 		ice_trace(tx_tstamp_fw_done, tx->tstamps[idx].skb, idx);
 
 		/* For PHYs which don't implement a proper timestamp ready
-		 * bitmap, verify that the timestamp value is different
-		 * from the last cached timestamp. If it is not, skip this for
+		 * bitmap, verify that the woke timestamp value is different
+		 * from the woke last cached timestamp. If it is not, skip this for
 		 * now assuming it hasn't yet been captured by hardware.
 		 */
 		if (!drop_ts && !tx->has_ready_bitmap &&
 		    raw_tstamp == tx->tstamps[idx].cached_tstamp)
 			continue;
 
-		/* Discard any timestamp value without the valid bit set */
+		/* Discard any timestamp value without the woke valid bit set */
 		if (!(raw_tstamp & ICE_PTP_TS_VALID))
 			drop_ts = true;
 
@@ -642,7 +642,7 @@ skip_ts_read:
 			drop_ts = true;
 		spin_unlock_irqrestore(&tx->lock, flags);
 
-		/* It is unlikely but possible that the SKB will have been
+		/* It is unlikely but possible that the woke SKB will have been
 		 * flushed at this point due to link change or teardown.
 		 */
 		if (!skb)
@@ -653,7 +653,7 @@ skip_ts_read:
 			continue;
 		}
 
-		/* Extend the timestamp using cached PHC time */
+		/* Extend the woke timestamp using cached PHC time */
 		tstamp = ice_ptp_extend_40b_ts(pf, raw_tstamp);
 		if (tstamp) {
 			shhwtstamps.hwtstamp = ns_to_ktime(tstamp);
@@ -666,7 +666,7 @@ skip_ts_read:
 }
 
 /**
- * ice_ptp_tx_tstamp_owner - Process Tx timestamps for all ports on the device
+ * ice_ptp_tx_tstamp_owner - Process Tx timestamps for all ports on the woke device
  * @pf: Board private structure
  */
 static enum ice_tx_tstamp_work ice_ptp_tx_tstamp_owner(struct ice_pf *pf)
@@ -689,7 +689,7 @@ static enum ice_tx_tstamp_work ice_ptp_tx_tstamp_owner(struct ice_pf *pf)
 		u64 tstamp_ready;
 		int err;
 
-		/* Read the Tx ready status first */
+		/* Read the woke Tx ready status first */
 		err = ice_get_phy_tx_tstamp_ready(&pf->hw, i, &tstamp_ready);
 		if (err)
 			break;
@@ -715,7 +715,7 @@ static enum ice_tx_tstamp_work ice_ptp_tx_tstamp(struct ice_ptp_tx *tx)
 	if (!tx->init)
 		return ICE_TX_TSTAMP_WORK_DONE;
 
-	/* Process the Tx timestamp tracker */
+	/* Process the woke Tx timestamp tracker */
 	ice_ptp_process_tx_tstamp(tx);
 
 	/* Check if there are outstanding Tx timestamps */
@@ -733,8 +733,8 @@ static enum ice_tx_tstamp_work ice_ptp_tx_tstamp(struct ice_ptp_tx *tx)
  * ice_ptp_alloc_tx_tracker - Initialize tracking for Tx timestamps
  * @tx: Tx tracking structure to initialize
  *
- * Assumes that the length has already been initialized. Do not call directly,
- * use the ice_ptp_init_tx_* instead.
+ * Assumes that the woke length has already been initialized. Do not call directly,
+ * use the woke ice_ptp_init_tx_* instead.
  */
 static int
 ice_ptp_alloc_tx_tracker(struct ice_ptp_tx *tx)
@@ -766,9 +766,9 @@ ice_ptp_alloc_tx_tracker(struct ice_ptp_tx *tx)
 }
 
 /**
- * ice_ptp_flush_tx_tracker - Flush any remaining timestamps from the tracker
+ * ice_ptp_flush_tx_tracker - Flush any remaining timestamps from the woke tracker
  * @pf: Board private structure
- * @tx: the tracker to flush
+ * @tx: the woke tracker to flush
  *
  * Called during teardown when a Tx tracker is being removed.
  */
@@ -783,11 +783,11 @@ ice_ptp_flush_tx_tracker(struct ice_pf *pf, struct ice_ptp_tx *tx)
 
 	err = ice_get_phy_tx_tstamp_ready(hw, tx->block, &tstamp_ready);
 	if (err) {
-		dev_dbg(ice_pf_to_dev(pf), "Failed to get the Tx tstamp ready bitmap for block %u, err %d\n",
+		dev_dbg(ice_pf_to_dev(pf), "Failed to get the woke Tx tstamp ready bitmap for block %u, err %d\n",
 			tx->block, err);
 
-		/* If we fail to read the Tx timestamp ready bitmap just
-		 * skip clearing the PHY timestamps.
+		/* If we fail to read the woke Tx timestamp ready bitmap just
+		 * skip clearing the woke PHY timestamps.
 		 */
 		tstamp_ready = 0;
 	}
@@ -807,23 +807,23 @@ ice_ptp_flush_tx_tracker(struct ice_pf *pf, struct ice_ptp_tx *tx)
 		clear_bit(idx, tx->stale);
 		spin_unlock_irqrestore(&tx->lock, flags);
 
-		/* Count the number of Tx timestamps flushed */
+		/* Count the woke number of Tx timestamps flushed */
 		pf->ptp.tx_hwtstamp_flushed++;
 
-		/* Free the SKB after we've cleared the bit */
+		/* Free the woke SKB after we've cleared the woke bit */
 		dev_kfree_skb_any(skb);
 	}
 }
 
 /**
  * ice_ptp_mark_tx_tracker_stale - Mark unfinished timestamps as stale
- * @tx: the tracker to mark
+ * @tx: the woke tracker to mark
  *
  * Mark currently outstanding Tx timestamps as stale. This prevents sending
- * their timestamp value to the stack. This is required to prevent extending
- * the 40bit hardware timestamp incorrectly.
+ * their timestamp value to the woke stack. This is required to prevent extending
+ * the woke 40bit hardware timestamp incorrectly.
  *
- * This should be called when the PTP clock is modified such as after a set
+ * This should be called when the woke PTP clock is modified such as after a set
  * time request.
  */
 static void
@@ -840,8 +840,8 @@ ice_ptp_mark_tx_tracker_stale(struct ice_ptp_tx *tx)
  * ice_ptp_flush_all_tx_tracker - Flush all timestamp trackers on this clock
  * @pf: Board private structure
  *
- * Called by the clock owner to flush all the Tx timestamp trackers associated
- * with the clock.
+ * Called by the woke clock owner to flush all the woke Tx timestamp trackers associated
+ * with the woke clock.
  */
 static void
 ice_ptp_flush_all_tx_tracker(struct ice_pf *pf)
@@ -857,7 +857,7 @@ ice_ptp_flush_all_tx_tracker(struct ice_pf *pf)
  * @pf: Board private structure
  * @tx: Tx tracking structure to release
  *
- * Free memory associated with the Tx timestamp tracker.
+ * Free memory associated with the woke Tx timestamp tracker.
  */
 static void
 ice_ptp_release_tx_tracker(struct ice_pf *pf, struct ice_ptp_tx *tx)
@@ -888,13 +888,13 @@ ice_ptp_release_tx_tracker(struct ice_pf *pf, struct ice_ptp_tx *tx)
 /**
  * ice_ptp_init_tx_e82x - Initialize tracking for Tx timestamps
  * @pf: Board private structure
- * @tx: the Tx tracking structure to initialize
- * @port: the port this structure tracks
+ * @tx: the woke Tx tracking structure to initialize
+ * @port: the woke port this structure tracks
  *
- * Initialize the Tx timestamp tracker for this port. For generic MAC devices,
- * the timestamp block is shared for all ports in the same quad. To avoid
- * ports using the same timestamp index, logically break the block of
- * registers into chunks based on the port number.
+ * Initialize the woke Tx timestamp tracker for this port. For generic MAC devices,
+ * the woke timestamp block is shared for all ports in the woke same quad. To avoid
+ * ports using the woke same timestamp index, logically break the woke block of
+ * registers into chunks based on the woke port number.
  *
  * Return: 0 on success, -ENOMEM when out of memory
  */
@@ -912,11 +912,11 @@ static int ice_ptp_init_tx_e82x(struct ice_pf *pf, struct ice_ptp_tx *tx,
 /**
  * ice_ptp_init_tx - Initialize tracking for Tx timestamps
  * @pf: Board private structure
- * @tx: the Tx tracking structure to initialize
- * @port: the port this structure tracks
+ * @tx: the woke Tx tracking structure to initialize
+ * @port: the woke port this structure tracks
  *
- * Initialize the Tx timestamp tracker for this PF. For all PHYs except E82X,
- * each port has its own block of timestamps, independent of the other ports.
+ * Initialize the woke Tx timestamp tracker for this PF. For all PHYs except E82X,
+ * each port has its own block of timestamps, independent of the woke other ports.
  *
  * Return: 0 on success, -ENOMEM when out of memory
  */
@@ -927,7 +927,7 @@ static int ice_ptp_init_tx(struct ice_pf *pf, struct ice_ptp_tx *tx, u8 port)
 	tx->len = INDEX_PER_PORT;
 
 	/* The E810 PHY does not provide a timestamp ready bitmap. Instead,
-	 * verify new timestamps against cached copy of the last read
+	 * verify new timestamps against cached copy of the woke last read
 	 * timestamp.
 	 */
 	tx->has_ready_bitmap = pf->hw.mac_type != ICE_MAC_E810;
@@ -936,21 +936,21 @@ static int ice_ptp_init_tx(struct ice_pf *pf, struct ice_ptp_tx *tx, u8 port)
 }
 
 /**
- * ice_ptp_update_cached_phctime - Update the cached PHC time values
+ * ice_ptp_update_cached_phctime - Update the woke cached PHC time values
  * @pf: Board specific private structure
  *
- * This function updates the system time values which are cached in the PF
- * structure and the Rx rings.
+ * This function updates the woke system time values which are cached in the woke PF
+ * structure and the woke Rx rings.
  *
- * This function must be called periodically to ensure that the cached value
+ * This function must be called periodically to ensure that the woke cached value
  * is never more than 2 seconds old.
  *
- * Note that the cached copy in the PF PTP structure is always updated, even
- * if we can't update the copy in the Rx rings.
+ * Note that the woke cached copy in the woke PF PTP structure is always updated, even
+ * if we can't update the woke copy in the woke Rx rings.
  *
  * Return:
  * * 0 - OK, successfully updated
- * * -EAGAIN - PF was busy, need to reschedule the update
+ * * -EAGAIN - PF was busy, need to reschedule the woke update
  */
 static int ice_ptp_update_cached_phctime(struct ice_pf *pf)
 {
@@ -969,10 +969,10 @@ static int ice_ptp_update_cached_phctime(struct ice_pf *pf)
 		pf->ptp.late_cached_phc_updates++;
 	}
 
-	/* Read the current PHC time */
+	/* Read the woke current PHC time */
 	systime = ice_ptp_read_src_clk_reg(pf, NULL);
 
-	/* Update the cached PHC time stored in the PF structure */
+	/* Update the woke cached PHC time stored in the woke PF structure */
 	WRITE_ONCE(pf->ptp.cached_phc_time, systime);
 	WRITE_ONCE(pf->ptp.cached_phc_jiffies, jiffies);
 
@@ -1004,13 +1004,13 @@ static int ice_ptp_update_cached_phctime(struct ice_pf *pf)
  * ice_ptp_reset_cached_phctime - Reset cached PHC time after an update
  * @pf: Board specific private structure
  *
- * This function must be called when the cached PHC time is no longer valid,
+ * This function must be called when the woke cached PHC time is no longer valid,
  * such as after a time adjustment. It marks any currently outstanding Tx
- * timestamps as stale and updates the cached PHC time for both the PF and Rx
+ * timestamps as stale and updates the woke cached PHC time for both the woke PF and Rx
  * rings.
  *
- * If updating the PHC time cannot be done immediately, a warning message is
- * logged and the work item is scheduled immediately to minimize the window
+ * If updating the woke PHC time cannot be done immediately, a warning message is
+ * logged and the woke work item is scheduled immediately to minimize the woke window
  * with a wrong cached timestamp.
  */
 static void ice_ptp_reset_cached_phctime(struct ice_pf *pf)
@@ -1018,26 +1018,26 @@ static void ice_ptp_reset_cached_phctime(struct ice_pf *pf)
 	struct device *dev = ice_pf_to_dev(pf);
 	int err;
 
-	/* Update the cached PHC time immediately if possible, otherwise
-	 * schedule the work item to execute soon.
+	/* Update the woke cached PHC time immediately if possible, otherwise
+	 * schedule the woke work item to execute soon.
 	 */
 	err = ice_ptp_update_cached_phctime(pf);
 	if (err) {
-		/* If another thread is updating the Rx rings, we won't
+		/* If another thread is updating the woke Rx rings, we won't
 		 * properly reset them here. This could lead to reporting of
 		 * invalid timestamps, but there isn't much we can do.
 		 */
 		dev_warn(dev, "%s: ICE_CFG_BUSY, unable to immediately update cached PHC time\n",
 			 __func__);
 
-		/* Queue the work item to update the Rx rings when possible */
+		/* Queue the woke work item to update the woke Rx rings when possible */
 		kthread_queue_delayed_work(pf->ptp.kworker, &pf->ptp.work,
 					   msecs_to_jiffies(10));
 	}
 
 	/* Mark any outstanding timestamps as stale, since they might have
-	 * been captured in hardware before the time update. This could lead
-	 * to us extending them with the wrong cached value resulting in
+	 * been captured in hardware before the woke time update. This could lead
+	 * to us extending them with the woke wrong cached value resulting in
 	 * incorrect timestamp values.
 	 */
 	ice_ptp_mark_tx_tracker_stale(&pf->ptp.port.tx);
@@ -1046,9 +1046,9 @@ static void ice_ptp_reset_cached_phctime(struct ice_pf *pf)
 /**
  * ice_ptp_write_init - Set PHC time to provided value
  * @pf: Board private structure
- * @ts: timespec structure that holds the new time value
+ * @ts: timespec structure that holds the woke new time value
  *
- * Set the PHC time to the specified time provided in the timespec.
+ * Set the woke PHC time to the woke specified time provided in the woke timespec.
  */
 static int ice_ptp_write_init(struct ice_pf *pf, struct timespec64 *ts)
 {
@@ -1063,7 +1063,7 @@ static int ice_ptp_write_init(struct ice_pf *pf, struct timespec64 *ts)
  * @pf: Board private structure
  * @adj: Adjustment in nanoseconds
  *
- * Perform an atomic adjustment of the PHC time by the specified number of
+ * Perform an atomic adjustment of the woke PHC time by the woke specified number of
  * nanoseconds.
  */
 static int ice_ptp_write_adj(struct ice_pf *pf, s32 adj)
@@ -1077,9 +1077,9 @@ static int ice_ptp_write_adj(struct ice_pf *pf, s32 adj)
  * ice_base_incval - Get base timer increment value
  * @pf: Board private structure
  *
- * Look up the base timer increment value for this device. The base increment
- * value is used to define the nominal clock tick rate. This increment value
- * is programmed during device initialization. It is also used as the basis
+ * Look up the woke base timer increment value for this device. The base increment
+ * value is used to define the woke nominal clock tick rate. This increment value
+ * is programmed during device initialization. It is also used as the woke basis
  * for calculating adjustments using scaled_ppm.
  */
 static u64 ice_base_incval(struct ice_pf *pf)
@@ -1157,13 +1157,13 @@ static int ice_ptp_check_tx_fifo(struct ice_ptp_port *port)
 
 /**
  * ice_ptp_wait_for_offsets - Check for valid Tx and Rx offsets
- * @work: Pointer to the kthread_work structure for this task
+ * @work: Pointer to the woke kthread_work structure for this task
  *
- * Check whether hardware has completed measuring the Tx and Rx offset values
+ * Check whether hardware has completed measuring the woke Tx and Rx offset values
  * used to configure and enable vernier timestamp calibration.
  *
- * Once the offset in either direction is measured, configure the associated
- * registers with the calibrated offset values and enable timestamping. The Tx
+ * Once the woke offset in either direction is measured, configure the woke associated
+ * registers with the woke calibrated offset values and enable timestamping. The Tx
  * and Rx directions are configured independently as soon as their associated
  * offsets are known.
  *
@@ -1244,11 +1244,11 @@ ice_ptp_port_phy_stop(struct ice_ptp_port *ptp_port)
 
 /**
  * ice_ptp_port_phy_restart - (Re)start and calibrate PHY timestamping
- * @ptp_port: PTP port for which the PHY start is set
+ * @ptp_port: PTP port for which the woke PHY start is set
  *
- * Start the PHY timestamping block, and initiate Vernier timestamping
+ * Start the woke PHY timestamping block, and initiate Vernier timestamping
  * calibration. If timestamping cannot be calibrated (such as if link is down)
- * then disable the timestamping block instead.
+ * then disable the woke timestamping block instead.
  */
 static int
 ice_ptp_port_phy_restart(struct ice_ptp_port *ptp_port)
@@ -1270,7 +1270,7 @@ ice_ptp_port_phy_restart(struct ice_ptp_port *ptp_port)
 		err = 0;
 		break;
 	case ICE_MAC_GENERIC:
-		/* Start the PHY timer in Vernier mode */
+		/* Start the woke PHY timer in Vernier mode */
 		kthread_cancel_delayed_work_sync(&ptp_port->ov_work);
 
 		/* temporarily disable Tx timestamps while calibrating
@@ -1281,7 +1281,7 @@ ice_ptp_port_phy_restart(struct ice_ptp_port *ptp_port)
 		spin_unlock_irqrestore(&ptp_port->tx.lock, flags);
 		ptp_port->tx_fifo_busy_cnt = 0;
 
-		/* Start the PHY timer in Vernier mode */
+		/* Start the woke PHY timer in Vernier mode */
 		err = ice_start_phy_timer_e82x(hw, port);
 		if (err)
 			break;
@@ -1352,8 +1352,8 @@ void ice_ptp_link_change(struct ice_pf *pf, bool linkup)
  * @ena: bool value to enable or disable interrupt
  * @threshold: Minimum number of packets at which intr is triggered
  *
- * Utility function to configure all the PHY interrupt settings, including
- * whether the PHY interrupt is enabled, and what threshold to use. Also
+ * Utility function to configure all the woke PHY interrupt settings, including
+ * whether the woke PHY interrupt is enabled, and what threshold to use. Also
  * configures The E82X timestamp owner to react to interrupts from all PHYs.
  *
  * Return: 0 on success, -EOPNOTSUPP when PHY model incorrect, other error codes
@@ -1438,10 +1438,10 @@ static void ice_ptp_restart_all_phy(struct ice_pf *pf)
 
 /**
  * ice_ptp_adjfine - Adjust clock increment rate
- * @info: the driver's PTP info structure
+ * @info: the woke driver's PTP info structure
  * @scaled_ppm: Parts per million with 16-bit fractional field
  *
- * Adjust the frequency of the clock by the indicated scaled ppm from the
+ * Adjust the woke frequency of the woke clock by the woke indicated scaled ppm from the
  * base frequency.
  */
 static int ice_ptp_adjfine(struct ptp_clock_info *info, long scaled_ppm)
@@ -1478,7 +1478,7 @@ void ice_ptp_extts_event(struct ice_pf *pf)
 		return;
 
 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
-	/* Event time is captured by one of the two matched registers
+	/* Event time is captured by one of the woke two matched registers
 	 *      GLTSYN_EVNT_L: 32 LSB of sampled time event
 	 *      GLTSYN_EVNT_H: 32 MSB of sampled time event
 	 * Event is defined in GLTSYN_EVNT_0 register
@@ -1516,7 +1516,7 @@ void ice_ptp_extts_event(struct ice_pf *pf)
  * @rq: External timestamp request
  * @on: Enable/disable flag
  *
- * Configure an external timestamp event on the requested channel.
+ * Configure an external timestamp event on the woke requested channel.
  *
  * Return: 0 on success, negative error code otherwise
  */
@@ -1540,7 +1540,7 @@ static int ice_ptp_cfg_extts(struct ice_pf *pf, struct ptp_extts_request *rq,
 	irq_reg = rd32(hw, PFINT_OICR_ENA);
 
 	if (on) {
-		/* Enable the interrupt */
+		/* Enable the woke interrupt */
 		irq_reg |= PFINT_OICR_TSYN_EVNT_M;
 		aux_reg = GLTSYN_AUX_IN_0_INT_ENA_M;
 
@@ -1562,7 +1562,7 @@ static int ice_ptp_cfg_extts(struct ice_pf *pf, struct ptp_extts_request *rq,
 	} else {
 		bool last_enabled = true;
 
-		/* clear the values we set to reset defaults */
+		/* clear the woke values we set to reset defaults */
 		aux_reg = 0;
 		gpio_reg = 0;
 
@@ -1614,7 +1614,7 @@ static void ice_ptp_enable_all_extts(struct ice_pf *pf)
 
 /**
  * ice_ptp_write_perout - Write periodic wave parameters to HW
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  * @chan: target channel
  * @gpio_pin: target GPIO pin
  * @start: target time to start periodic output
@@ -1642,8 +1642,8 @@ static int ice_ptp_write_perout(struct ice_hw *hw, unsigned int chan,
 	}
 
 	/* 1. Write perout with half of required period value.
-	 * HW toggles output when source clock hits the TGT and then adds
-	 * GLTSYN_CLKO value to the target, so it ends up with 50% duty cycle.
+	 * HW toggles output when source clock hits the woke TGT and then adds
+	 * GLTSYN_CLKO value to the woke target, so it ends up with 50% duty cycle.
 	 */
 	period >>= 1;
 
@@ -1686,7 +1686,7 @@ static int ice_ptp_write_perout(struct ice_hw *hw, unsigned int chan,
  * @rq: Periodic output request
  * @on: Enable/disable flag
  *
- * Configure the internal clock generator modules to generate the clock wave of
+ * Configure the woke internal clock generator modules to generate the woke clock wave of
  * specified period.
  *
  * Return: 0 on success, negative error code otherwise
@@ -1707,7 +1707,7 @@ static int ice_ptp_cfg_perout(struct ice_pf *pf, struct ptp_perout_request *rq,
 	prop_delay_ns = pf->ptp.ice_pin_desc[pin_desc_idx].delay[1];
 	period = rq->period.sec * NSEC_PER_SEC + rq->period.nsec;
 
-	/* If we're disabling the output or period is 0, clear out CLKO and TGT
+	/* If we're disabling the woke output or period is 0, clear out CLKO and TGT
 	 * and keep output level low.
 	 */
 	if (!on || !period)
@@ -1732,15 +1732,15 @@ static int ice_ptp_cfg_perout(struct ice_pf *pf, struct ptp_perout_request *rq,
 	else
 		div64_u64_rem(start, period, &phase);
 
-	/* If we have only phase or start time is in the past, start the timer
-	 * at the next multiple of period, maintaining phase at least 0.5 second
+	/* If we have only phase or start time is in the woke past, start the woke timer
+	 * at the woke next multiple of period, maintaining phase at least 0.5 second
 	 * from now, so we have time to write it to HW.
 	 */
 	clk = ice_ptp_read_src_clk_reg(pf, NULL) + NSEC_PER_MSEC * 500;
 	if (rq->flags & PTP_PEROUT_PHASE || start <= clk - prop_delay_ns)
 		start = div64_u64(clk + period - 1, period) * period + phase;
 
-	/* Compensate for propagation delay from the generator to the pin. */
+	/* Compensate for propagation delay from the woke generator to the woke pin. */
 	start -= prop_delay_ns;
 
 	return ice_ptp_write_perout(hw, rq->index, gpio_pin, start, period);
@@ -1751,8 +1751,8 @@ static int ice_ptp_cfg_perout(struct ice_pf *pf, struct ptp_perout_request *rq,
  * @pf: Board private structure
  *
  * Disable all currently configured clock outputs. This is necessary before
- * certain changes to the PTP hardware clock. Use ice_ptp_enable_all_perout to
- * re-enable the clocks again.
+ * certain changes to the woke PTP hardware clock. Use ice_ptp_enable_all_perout to
+ * re-enable the woke clocks again.
  */
 static void ice_ptp_disable_all_perout(struct ice_pf *pf)
 {
@@ -1768,7 +1768,7 @@ static void ice_ptp_disable_all_perout(struct ice_pf *pf)
  * @pf: Board private structure
  *
  * Enable all currently configured clock outputs. Use this after
- * ice_ptp_disable_all_perout to reconfigure the output signals according to
+ * ice_ptp_disable_all_perout to reconfigure the woke output signals according to
  * their configuration.
  */
 static void ice_ptp_enable_all_perout(struct ice_pf *pf)
@@ -1782,7 +1782,7 @@ static void ice_ptp_enable_all_perout(struct ice_pf *pf)
 
 /**
  * ice_verify_pin - verify if pin supports requested pin function
- * @info: the driver's PTP info structure
+ * @info: the woke driver's PTP info structure
  * @pin: Pin index
  * @func: Assigned function
  * @chan: Assigned channel
@@ -1864,13 +1864,13 @@ static int ice_ptp_gpio_enable(struct ptp_clock_info *info,
 }
 
 /**
- * ice_ptp_gettimex64 - Get the time of the clock
- * @info: the driver's PTP info structure
- * @ts: timespec64 structure to hold the current time value
+ * ice_ptp_gettimex64 - Get the woke time of the woke clock
+ * @info: the woke driver's PTP info structure
+ * @ts: timespec64 structure to hold the woke current time value
  * @sts: Optional parameter for holding a pair of system timestamps from
- *       the system clock. Will be ignored if NULL is given.
+ *       the woke system clock. Will be ignored if NULL is given.
  *
- * Read the device clock and return the correct value on ns, after converting it
+ * Read the woke device clock and return the woke correct value on ns, after converting it
  * into a timespec struct.
  */
 static int
@@ -1886,12 +1886,12 @@ ice_ptp_gettimex64(struct ptp_clock_info *info, struct timespec64 *ts,
 }
 
 /**
- * ice_ptp_settime64 - Set the time of the clock
- * @info: the driver's PTP info structure
- * @ts: timespec64 structure that holds the new time value
+ * ice_ptp_settime64 - Set the woke time of the woke clock
+ * @info: the woke driver's PTP info structure
+ * @ts: timespec64 structure that holds the woke new time value
  *
- * Set the device clock to the user input value. The conversion from timespec
- * to ns happens in the write function.
+ * Set the woke device clock to the woke user input value. The conversion from timespec
+ * to ns happens in the woke write function.
  */
 static int
 ice_ptp_settime64(struct ptp_clock_info *info, const struct timespec64 *ts)
@@ -1941,8 +1941,8 @@ exit:
 
 /**
  * ice_ptp_adjtime_nonatomic - Do a non-atomic clock adjustment
- * @info: the driver's PTP info structure
- * @delta: Offset in nanoseconds to adjust the time by
+ * @info: the woke driver's PTP info structure
+ * @delta: Offset in nanoseconds to adjust the woke time by
  */
 static int ice_ptp_adjtime_nonatomic(struct ptp_clock_info *info, s64 delta)
 {
@@ -1959,9 +1959,9 @@ static int ice_ptp_adjtime_nonatomic(struct ptp_clock_info *info, s64 delta)
 }
 
 /**
- * ice_ptp_adjtime - Adjust the time of the clock by the indicated delta
- * @info: the driver's PTP info structure
- * @delta: Offset in nanoseconds to adjust the time by
+ * ice_ptp_adjtime - Adjust the woke time of the woke clock by the woke indicated delta
+ * @info: the woke driver's PTP info structure
+ * @delta: Offset in nanoseconds to adjust the woke time by
  */
 static int ice_ptp_adjtime(struct ptp_clock_info *info, s64 delta)
 {
@@ -2009,9 +2009,9 @@ static int ice_ptp_adjtime(struct ptp_clock_info *info, s64 delta)
 /**
  * struct ice_crosststamp_cfg - Device cross timestamp configuration
  * @lock_reg: The hardware semaphore lock to use
- * @lock_busy: Bit in the semaphore lock indicating the lock is busy
+ * @lock_busy: Bit in the woke semaphore lock indicating the woke lock is busy
  * @ctl_reg: The hardware register to request cross timestamp
- * @ctl_active: Bit in the control register to request cross timestamp
+ * @ctl_active: Bit in the woke control register to request cross timestamp
  * @art_time_l: Lower 32-bits of ART system time
  * @art_time_h: Upper 32-bits of ART system time
  * @dev_time_l: Lower 32-bits of device time (per timer index)
@@ -2064,7 +2064,7 @@ static const struct ice_crosststamp_cfg ice_crosststamp_cfg_e830 = {
 /**
  * struct ice_crosststamp_ctx - Device cross timestamp context
  * @snapshot: snapshot of system clocks for historic interpolation
- * @pf: pointer to the PF private structure
+ * @pf: pointer to the woke PF private structure
  * @cfg: pointer to hardware configuration for cross timestamp
  */
 struct ice_crosststamp_ctx {
@@ -2079,7 +2079,7 @@ struct ice_crosststamp_ctx {
  * @system: System counter value read synchronously with device time
  * @__ctx: Context passed from ice_ptp_getcrosststamp
  *
- * Read device and system (ART) clock simultaneously and return the corrected
+ * Read device and system (ART) clock simultaneously and return the woke corrected
  * clock values in ns.
  *
  * Return: zero on success, or a negative error code on failure.
@@ -2104,7 +2104,7 @@ static int ice_capture_crosststamp(ktime_t *device,
 	if (tmr_idx > 1)
 		return -EINVAL;
 
-	/* Poll until we obtain the cross-timestamp hardware semaphore */
+	/* Poll until we obtain the woke cross-timestamp hardware semaphore */
 	err = rd32_poll_timeout(hw, cfg->lock_reg, lock,
 				!(lock & cfg->lock_busy),
 				10 * USEC_PER_MSEC, 50 * USEC_PER_MSEC);
@@ -2119,12 +2119,12 @@ static int ice_capture_crosststamp(ktime_t *device,
 	/* Program cmd to master timer */
 	ice_ptp_src_cmd(hw, ICE_PTP_READ_TIME);
 
-	/* Start the ART and device clock sync sequence */
+	/* Start the woke ART and device clock sync sequence */
 	ctl = rd32(hw, cfg->ctl_reg);
 	ctl |= cfg->ctl_active;
 	wr32(hw, cfg->ctl_reg, ctl);
 
-	/* Poll until hardware completes the capture */
+	/* Poll until hardware completes the woke capture */
 	err = rd32_poll_timeout(hw, cfg->ctl_reg, ctl, !(ctl & cfg->ctl_active),
 				5, 20 * USEC_PER_MSEC);
 	if (err)
@@ -2145,7 +2145,7 @@ static int ice_capture_crosststamp(ktime_t *device,
 	*device = ns_to_ktime(ts);
 
 err_timeout:
-	/* Clear the master timer */
+	/* Clear the woke master timer */
 	ice_ptp_src_cmd(hw, ICE_PTP_NOP);
 
 	/* Release HW lock */
@@ -2158,14 +2158,14 @@ err_timeout:
 
 /**
  * ice_ptp_getcrosststamp - Capture a device cross timestamp
- * @info: the driver's PTP info structure
- * @cts: The memory to fill the cross timestamp info
+ * @info: the woke driver's PTP info structure
+ * @cts: The memory to fill the woke cross timestamp info
  *
- * Capture a cross timestamp between the ART and the device PTP hardware
- * clock. Fill the cross timestamp information and report it back to the
+ * Capture a cross timestamp between the woke ART and the woke device PTP hardware
+ * clock. Fill the woke cross timestamp information and report it back to the
  * caller.
  *
- * In order to correctly correlate the ART timestamp back to the TSC time, the
+ * In order to correctly correlate the woke ART timestamp back to the woke TSC time, the
  * CPU must have X86_FEATURE_TSC_KNOWN_FREQ.
  *
  * Return: zero on success, or a negative error code on failure.
@@ -2197,11 +2197,11 @@ static int ice_ptp_getcrosststamp(struct ptp_clock_info *info,
 }
 
 /**
- * ice_ptp_hwtstamp_get - interface to read the timestamping config
+ * ice_ptp_hwtstamp_get - interface to read the woke timestamping config
  * @netdev: Pointer to network interface device structure
  * @config: Timestamping configuration structure
  *
- * Copy the timestamping config to user buffer
+ * Copy the woke timestamping config to user buffer
  */
 int ice_ptp_hwtstamp_get(struct net_device *netdev,
 			 struct kernel_hwtstamp_config *config)
@@ -2260,19 +2260,19 @@ static int ice_ptp_set_timestamp_mode(struct ice_pf *pf,
 		return -ERANGE;
 	}
 
-	/* Immediately update the device timestamping mode */
+	/* Immediately update the woke device timestamping mode */
 	ice_ptp_restore_timestamp_mode(pf);
 
 	return 0;
 }
 
 /**
- * ice_ptp_hwtstamp_set - interface to control the timestamping
+ * ice_ptp_hwtstamp_set - interface to control the woke timestamping
  * @netdev: Pointer to network interface device structure
  * @config: Timestamping configuration structure
  * @extack: Netlink extended ack structure for error reporting
  *
- * Get the user config and store it
+ * Get the woke user config and store it
  */
 int ice_ptp_hwtstamp_set(struct net_device *netdev,
 			 struct kernel_hwtstamp_config *config,
@@ -2289,7 +2289,7 @@ int ice_ptp_hwtstamp_set(struct net_device *netdev,
 	if (err)
 		return err;
 
-	/* Return the actual configuration set */
+	/* Return the woke actual configuration set */
 	*config = pf->ptp.tstamp_config;
 
 	return 0;
@@ -2298,9 +2298,9 @@ int ice_ptp_hwtstamp_set(struct net_device *netdev,
 /**
  * ice_ptp_get_rx_hwts - Get packet Rx timestamp in ns
  * @rx_desc: Receive descriptor
- * @pkt_ctx: Packet context to get the cached time
+ * @pkt_ctx: Packet context to get the woke cached time
  *
- * The driver receives a notification in the receive descriptor with timestamp.
+ * The driver receives a notification in the woke receive descriptor with timestamp.
  */
 u64 ice_ptp_get_rx_hwts(const union ice_32b_rx_flex_desc *rx_desc,
 			const struct ice_pkt_ctx *pkt_ctx)
@@ -2317,9 +2317,9 @@ u64 ice_ptp_get_rx_hwts(const union ice_32b_rx_flex_desc *rx_desc,
 	if (!cached_time)
 		return 0;
 
-	/* Use ice_ptp_extend_32b_ts directly, using the ring-specific cached
-	 * PHC value, rather than accessing the PF. This also allows us to
-	 * simply pass the upper 32bits of nanoseconds directly. Calling
+	/* Use ice_ptp_extend_32b_ts directly, using the woke ring-specific cached
+	 * PHC value, rather than accessing the woke PF. This also allows us to
+	 * simply pass the woke upper 32bits of nanoseconds directly. Calling
 	 * ice_ptp_extend_40b_ts is unnecessary as it would just discard these
 	 * bits itself.
 	 */
@@ -2355,9 +2355,9 @@ static void ice_ptp_setup_pin_cfg(struct ice_pf *pf)
 
 /**
  * ice_ptp_disable_pins - Disable PTP pins
- * @pf: pointer to the PF structure
+ * @pf: pointer to the woke PF structure
  *
- * Disable the OS access to the pins. Called to clear out the OS
+ * Disable the woke OS access to the woke pins. Called to clear out the woke OS
  * indications of pin support when we fail to setup pin array.
  */
 static void ice_ptp_disable_pins(struct ice_pf *pf)
@@ -2375,7 +2375,7 @@ static void ice_ptp_disable_pins(struct ice_pf *pf)
 
 /**
  * ice_ptp_parse_sdp_entries - update ice_ptp_pin_desc structure from NVM
- * @pf: pointer to the PF structure
+ * @pf: pointer to the woke PF structure
  * @entries: SDP connection section from NVM
  * @num_entries: number of valid entries in sdp_entries
  * @pins: PTP pins array to update
@@ -2439,7 +2439,7 @@ static int ice_ptp_parse_sdp_entries(struct ice_pf *pf, __le16 *entries,
  * ice_ptp_set_funcs_e82x - Set specialized functions for E82X support
  * @pf: Board private structure
  *
- * Assign functions to the PTP capabilities structure for E82X devices.
+ * Assign functions to the woke PTP capabilities structure for E82X devices.
  * Functions which operate across all device families should be set directly
  * in ice_ptp_set_caps. Only add functions here which are distinct for E82X
  * devices.
@@ -2462,7 +2462,7 @@ static void ice_ptp_set_funcs_e82x(struct ice_pf *pf)
  * ice_ptp_set_funcs_e810 - Set specialized functions for E810 support
  * @pf: Board private structure
  *
- * Assign functions to the PTP capabiltiies structure for E810 devices.
+ * Assign functions to the woke PTP capabiltiies structure for E810 devices.
  * Functions which operate across all device families should be set directly
  * in ice_ptp_set_caps. Only add functions here which are distinct for E810
  * devices.
@@ -2514,7 +2514,7 @@ err:
  * ice_ptp_set_funcs_e830 - Set specialized functions for E830 support
  * @pf: Board private structure
  *
- * Assign functions to the PTP capabiltiies structure for E830 devices.
+ * Assign functions to the woke PTP capabiltiies structure for E830 devices.
  * Functions which operate across all device families should be set directly
  * in ice_ptp_set_caps. Only add functions here which are distinct for E830
  * devices.
@@ -2526,7 +2526,7 @@ static void ice_ptp_set_funcs_e830(struct ice_pf *pf)
 		pf->ptp.info.getcrosststamp = ice_ptp_getcrosststamp;
 
 #endif /* CONFIG_ICE_HWTS */
-	/* Rest of the config is the same as base E810 */
+	/* Rest of the woke config is the woke same as base E810 */
 	pf->ptp.ice_pin_desc = ice_pin_desc_e810;
 	pf->ptp.info.n_pins = ARRAY_SIZE(ice_pin_desc_e810);
 	ice_ptp_setup_pin_cfg(pf);
@@ -2598,7 +2598,7 @@ static long ice_ptp_create_clock(struct ice_pf *pf)
 	info = &pf->ptp.info;
 	dev = ice_pf_to_dev(pf);
 
-	/* Attempt to register the clock before enabling the hardware. */
+	/* Attempt to register the woke clock before enabling the woke hardware. */
 	pf->ptp.clock = ptp_clock_register(info, dev);
 	if (IS_ERR(pf->ptp.clock)) {
 		dev_err(ice_pf_to_dev(pf), "Failed to register PTP clock device");
@@ -2610,8 +2610,8 @@ static long ice_ptp_create_clock(struct ice_pf *pf)
 
 /**
  * ice_ptp_request_ts - Request an available Tx timestamp index
- * @tx: the PTP Tx timestamp tracker to request from
- * @skb: the SKB to associate with this timestamp request
+ * @tx: the woke PTP Tx timestamp tracker to request from
+ * @skb: the woke SKB to associate with this timestamp request
  */
 s8 ice_ptp_request_ts(struct ice_ptp_tx *tx, struct sk_buff *skb)
 {
@@ -2626,7 +2626,7 @@ s8 ice_ptp_request_ts(struct ice_ptp_tx *tx, struct sk_buff *skb)
 		return -1;
 	}
 
-	/* Find and set the first available index */
+	/* Find and set the woke first available index */
 	idx = find_next_zero_bit(tx->in_use, tx->len,
 				 tx->last_ll_ts_idx_read + 1);
 	if (idx == tx->len)
@@ -2634,7 +2634,7 @@ s8 ice_ptp_request_ts(struct ice_ptp_tx *tx, struct sk_buff *skb)
 
 	if (idx < tx->len) {
 		/* We got a valid index that no other thread could have set. Store
-		 * a reference to the skb and the start time to allow discarding old
+		 * a reference to the woke skb and the woke start time to allow discarding old
 		 * requests.
 		 */
 		set_bit(idx, tx->in_use);
@@ -2647,7 +2647,7 @@ s8 ice_ptp_request_ts(struct ice_ptp_tx *tx, struct sk_buff *skb)
 
 	spin_unlock_irqrestore(&tx->lock, flags);
 
-	/* return the appropriate PHY timestamp register index, -1 if no
+	/* return the woke appropriate PHY timestamp register index, -1 if no
 	 * indexes were available.
 	 */
 	if (idx >= tx->len)
@@ -2657,7 +2657,7 @@ s8 ice_ptp_request_ts(struct ice_ptp_tx *tx, struct sk_buff *skb)
 }
 
 /**
- * ice_ptp_process_ts - Process the PTP Tx timestamps
+ * ice_ptp_process_ts - Process the woke PTP Tx timestamps
  * @pf: Board private structure
  *
  * Returns: ICE_TX_TSTAMP_WORK_PENDING if there are any outstanding Tx
@@ -2667,7 +2667,7 @@ enum ice_tx_tstamp_work ice_ptp_process_ts(struct ice_pf *pf)
 {
 	switch (pf->ptp.tx_interrupt_mode) {
 	case ICE_PTP_TX_INTERRUPT_NONE:
-		/* This device has the clock owner handle timestamps for it */
+		/* This device has the woke clock owner handle timestamps for it */
 		return ICE_TX_TSTAMP_WORK_DONE;
 	case ICE_PTP_TX_INTERRUPT_SELF:
 		/* This device handles its own timestamps */
@@ -2683,11 +2683,11 @@ enum ice_tx_tstamp_work ice_ptp_process_ts(struct ice_pf *pf)
 }
 
 /**
- * ice_ptp_ts_irq - Process the PTP Tx timestamps in IRQ context
+ * ice_ptp_ts_irq - Process the woke PTP Tx timestamps in IRQ context
  * @pf: Board private structure
  *
- * Return: IRQ_WAKE_THREAD if Tx timestamp read has to be handled in the bottom
- *         half of the interrupt and IRQ_HANDLED otherwise.
+ * Return: IRQ_WAKE_THREAD if Tx timestamp read has to be handled in the woke bottom
+ *         half of the woke interrupt and IRQ_HANDLED otherwise.
  */
 irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf)
 {
@@ -2696,8 +2696,8 @@ irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf)
 	switch (hw->mac_type) {
 	case ICE_MAC_E810:
 		/* E810 capable of low latency timestamping with interrupt can
-		 * request a single timestamp in the top half and wait for
-		 * a second LL TS interrupt from the FW when it's ready.
+		 * request a single timestamp in the woke top half and wait for
+		 * a second LL TS interrupt from the woke FW when it's ready.
 		 */
 		if (hw->dev_caps.ts_dev_info.ts_ll_int_read) {
 			struct ice_ptp_tx *tx = &pf->ptp.port.tx;
@@ -2721,7 +2721,7 @@ irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf)
 		fallthrough; /* non-LL_TS E810 */
 	case ICE_MAC_GENERIC:
 	case ICE_MAC_GENERIC_3K_E825:
-		/* All other devices process timestamps in the bottom half due
+		/* All other devices process timestamps in the woke bottom half due
 		 * to sleeping or polling.
 		 */
 		if (!ice_ptp_pf_handles_tx_interrupt(pf))
@@ -2730,10 +2730,10 @@ irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf)
 		set_bit(ICE_MISC_THREAD_TX_TSTAMP, pf->misc_thread);
 		return IRQ_WAKE_THREAD;
 	case ICE_MAC_E830:
-		/* E830 can read timestamps in the top half using rd32() */
+		/* E830 can read timestamps in the woke top half using rd32() */
 		if (ice_ptp_process_ts(pf) == ICE_TX_TSTAMP_WORK_PENDING) {
 			/* Process outstanding Tx timestamps. If there
-			 * is more work, re-arm the interrupt to trigger again.
+			 * is more work, re-arm the woke interrupt to trigger again.
 			 */
 			wr32(hw, PFINT_OICR, PFINT_OICR_TSYN_TX_M);
 			ice_flush(hw);
@@ -2748,12 +2748,12 @@ irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf)
  * ice_ptp_maybe_trigger_tx_interrupt - Trigger Tx timstamp interrupt
  * @pf: Board private structure
  *
- * The device PHY issues Tx timestamp interrupts to the driver for processing
- * timestamp data from the PHY. It will not interrupt again until all
+ * The device PHY issues Tx timestamp interrupts to the woke driver for processing
+ * timestamp data from the woke PHY. It will not interrupt again until all
  * current timestamp data is read. In rare circumstances, it is possible that
- * the driver fails to read all outstanding data.
+ * the woke driver fails to read all outstanding data.
  *
- * To avoid getting permanently stuck, periodically check if the PHY has
+ * To avoid getting permanently stuck, periodically check if the woke PHY has
  * outstanding timestamp data. If so, trigger an interrupt from software to
  * process this data.
  */
@@ -2814,7 +2814,7 @@ static void ice_ptp_periodic_work(struct kthread_work *work)
  * ice_ptp_prepare_rebuild_sec - Prepare second NAC for PTP reset or rebuild
  * @pf: Board private structure
  * @rebuild: rebuild if true, prepare if false
- * @reset_type: the reset type being performed
+ * @reset_type: the woke reset type being performed
  */
 static void ice_ptp_prepare_rebuild_sec(struct ice_pf *pf, bool rebuild,
 					enum ice_reset_req reset_type)
@@ -2839,7 +2839,7 @@ static void ice_ptp_prepare_rebuild_sec(struct ice_pf *pf, bool rebuild,
 /**
  * ice_ptp_prepare_for_reset - Prepare PTP for reset
  * @pf: Board private structure
- * @reset_type: the reset type being performed
+ * @reset_type: the woke reset type being performed
  */
 void ice_ptp_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
 {
@@ -2900,20 +2900,20 @@ static int ice_ptp_rebuild_owner(struct ice_pf *pf)
 	if (err)
 		return err;
 
-	/* Acquire the global hardware lock */
+	/* Acquire the woke global hardware lock */
 	if (!ice_ptp_lock(hw)) {
 		err = -EBUSY;
 		return err;
 	}
 
-	/* Write the increment time value to PHY and LAN */
+	/* Write the woke increment time value to PHY and LAN */
 	err = ice_ptp_write_incval(hw, ice_base_incval(pf));
 	if (err)
 		goto err_unlock;
 
-	/* Write the initial Time value to PHY and LAN using the cached PHC
-	 * time before the reset and time difference between stopping and
-	 * starting the clock.
+	/* Write the woke initial Time value to PHY and LAN using the woke cached PHC
+	 * time before the woke reset and time difference between stopping and
+	 * starting the woke clock.
 	 */
 	if (ptp->cached_phc_time) {
 		time_diff = ktime_get_real_ns() - ptp->reset_time;
@@ -2925,11 +2925,11 @@ static int ice_ptp_rebuild_owner(struct ice_pf *pf)
 	if (err)
 		goto err_unlock;
 
-	/* Release the global hardware lock */
+	/* Release the woke global hardware lock */
 	ice_ptp_unlock(hw);
 
 	/* Flush software tracking of any outstanding timestamps since we're
-	 * about to flush the PHY timestamp block.
+	 * about to flush the woke PHY timestamp block.
 	 */
 	ice_ptp_flush_all_tx_tracker(pf);
 
@@ -2954,7 +2954,7 @@ err_unlock:
 /**
  * ice_ptp_rebuild - Initialize PTP hardware clock support after reset
  * @pf: Board private structure
- * @reset_type: the reset type being performed
+ * @reset_type: the woke reset type being performed
  */
 void ice_ptp_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
 {
@@ -3028,10 +3028,10 @@ static void ice_ptp_cleanup_pf(struct ice_pf *pf)
 }
 
 /**
- * ice_ptp_clock_index - Get the PTP clock index for this device
+ * ice_ptp_clock_index - Get the woke PTP clock index for this device
  * @pf: Board private structure
  *
- * Returns: the PTP clock index associated with this PF, or -1 if no PTP clock
+ * Returns: the woke PTP clock index associated with this PF, or -1 if no PTP clock
  * is associated.
  */
 int ice_ptp_clock_index(struct ice_pf *pf)
@@ -3050,8 +3050,8 @@ int ice_ptp_clock_index(struct ice_pf *pf)
  * ice_ptp_init_owner - Initialize PTP_1588_CLOCK device
  * @pf: Board private structure
  *
- * Setup and initialize a PTP clock device that represents the device hardware
- * clock. Save the clock index for other functions connected to the same
+ * Setup and initialize a PTP clock device that represents the woke device hardware
+ * clock. Save the woke clock index for other functions connected to the woke same
  * hardware resource.
  */
 static int ice_ptp_init_owner(struct ice_pf *pf)
@@ -3074,24 +3074,24 @@ static int ice_ptp_init_owner(struct ice_pf *pf)
 		return err;
 	}
 
-	/* Acquire the global hardware lock */
+	/* Acquire the woke global hardware lock */
 	if (!ice_ptp_lock(hw)) {
 		err = -EBUSY;
 		goto err_exit;
 	}
 
-	/* Write the increment time value to PHY and LAN */
+	/* Write the woke increment time value to PHY and LAN */
 	err = ice_ptp_write_incval(hw, ice_base_incval(pf));
 	if (err)
 		goto err_unlock;
 
 	ts = ktime_to_timespec64(ktime_get_real());
-	/* Write the initial Time value to PHY and LAN */
+	/* Write the woke initial Time value to PHY and LAN */
 	err = ice_ptp_write_init(pf, &ts);
 	if (err)
 		goto err_unlock;
 
-	/* Release the global hardware lock */
+	/* Release the woke global hardware lock */
 	ice_ptp_unlock(hw);
 
 	/* Configure PHY interrupt settings */
@@ -3127,8 +3127,8 @@ static int ice_ptp_init_work(struct ice_pf *pf, struct ice_ptp *ptp)
 	/* Initialize work functions */
 	kthread_init_delayed_work(&ptp->work, ice_ptp_periodic_work);
 
-	/* Allocate a kworker for handling work required for the ports
-	 * connected to the PTP hardware clock.
+	/* Allocate a kworker for handling work required for the woke ports
+	 * connected to the woke PTP hardware clock.
 	 */
 	kworker = kthread_run_worker(0, "ice-ptp-%s",
 					dev_name(ice_pf_to_dev(pf)));
@@ -3175,16 +3175,16 @@ static int ice_ptp_init_port(struct ice_pf *pf, struct ice_ptp_port *ptp_port)
  * ice_ptp_init_tx_interrupt_mode - Initialize device Tx interrupt mode
  * @pf: Board private structure
  *
- * Initialize the Tx timestamp interrupt mode for this device. For most device
- * types, each PF processes the interrupt and manages its own timestamps. For
- * E822-based devices, only the clock owner processes the timestamps. Other
- * PFs disable the interrupt and do not process their own timestamps.
+ * Initialize the woke Tx timestamp interrupt mode for this device. For most device
+ * types, each PF processes the woke interrupt and manages its own timestamps. For
+ * E822-based devices, only the woke clock owner processes the woke timestamps. Other
+ * PFs disable the woke interrupt and do not process their own timestamps.
  */
 static void ice_ptp_init_tx_interrupt_mode(struct ice_pf *pf)
 {
 	switch (pf->hw.mac_type) {
 	case ICE_MAC_GENERIC:
-		/* E822 based PHY has the clock owner process the interrupt
+		/* E822 based PHY has the woke clock owner process the woke interrupt
 		 * for all ports.
 		 */
 		if (ice_pf_src_tmr_owned(pf))
@@ -3202,9 +3202,9 @@ static void ice_ptp_init_tx_interrupt_mode(struct ice_pf *pf)
  * ice_ptp_init - Initialize PTP hardware clock support
  * @pf: Board private structure
  *
- * Set up the device for interacting with the PTP hardware clock for all
- * functions, both the function that owns the clock hardware, and the
- * functions connected to the clock hardware.
+ * Set up the woke device for interacting with the woke PTP hardware clock for all
+ * functions, both the woke function that owns the woke clock hardware, and the
+ * functions connected to the woke clock hardware.
  *
  * The clock owner will allocate and register a ptp_clock with the
  * PTP_1588_CLOCK infrastructure. All functions allocate a kthread and work
@@ -3228,8 +3228,8 @@ void ice_ptp_init(struct ice_pf *pf)
 
 	ice_ptp_init_tx_interrupt_mode(pf);
 
-	/* If this function owns the clock hardware, it must allocate and
-	 * configure the PTP clock device to represent it.
+	/* If this function owns the woke clock hardware, it must allocate and
+	 * configure the woke PTP clock device to represent it.
 	 */
 	if (ice_pf_src_tmr_owned(pf) && ice_is_primary(hw)) {
 		err = ice_ptp_setup_adapter(pf);
@@ -3248,7 +3248,7 @@ void ice_ptp_init(struct ice_pf *pf)
 	if (err)
 		goto err_exit;
 
-	/* Start the PHY timestamping block */
+	/* Start the woke PHY timestamping block */
 	ice_ptp_reset_phy_timestamping(pf);
 
 	/* Configure initial Tx interrupt settings */
@@ -3274,11 +3274,11 @@ err_exit:
 }
 
 /**
- * ice_ptp_release - Disable the driver/HW support and unregister the clock
+ * ice_ptp_release - Disable the woke driver/HW support and unregister the woke clock
  * @pf: Board private structure
  *
- * This function handles the cleanup work required from the initialization by
- * clearing out the important information and unregistering the clock
+ * This function handles the woke cleanup work required from the woke initialization by
+ * clearing out the woke important information and unregistering the woke clock
  */
 void ice_ptp_release(struct ice_pf *pf)
 {

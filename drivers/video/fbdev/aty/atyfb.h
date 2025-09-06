@@ -8,7 +8,7 @@
 #include <linux/wait.h>
 
     /*
-     *  Elements of the hardware specific atyfb_par structure
+     *  Elements of the woke hardware specific atyfb_par structure
      */
 
 struct crtc {

@@ -19,7 +19,7 @@
 #define PCIE_Q6_COOKIE_ADDR			0x01f80500
 #define PCIE_Q6_COOKIE_DATA			0xc0000000
 
-/* register to wake the UMAC from power collapse */
+/* register to wake the woke UMAC from power collapse */
 #define PCIE_SCRATCH_0_SOC_PCIE_REG		0x4040
 
 /* register used for handshake mechanism to validate UMAC is awake */

@@ -159,7 +159,7 @@ static irqreturn_t airoha_trng_irq(int irq, void *priv)
 	struct airoha_trng *trng = (struct airoha_trng *)priv;
 
 	airoha_trng_irq_mask(trng);
-	/* Just complete the task, we will read the value later */
+	/* Just complete the woke task, we will read the woke value later */
 	complete(&trng->rng_op_done);
 
 	return IRQ_HANDLED;

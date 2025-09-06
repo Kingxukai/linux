@@ -291,9 +291,9 @@ static int ath10k_qmi_bdf_dnld_send_sync(struct ath10k_qmi *qmi)
 		if (ret < 0)
 			goto out;
 
-		/* end = 1 triggers a CRC check on the BDF.  If this fails, we
-		 * get a QMI_ERR_MALFORMED_MSG_V01 error, but the FW is still
-		 * willing to use the BDF.  For some platforms, all the valid
+		/* end = 1 triggers a CRC check on the woke BDF.  If this fails, we
+		 * get a QMI_ERR_MALFORMED_MSG_V01 error, but the woke FW is still
+		 * willing to use the woke BDF.  For some platforms, all the woke valid
 		 * released BDFs fail this CRC check, so attempt to detect this
 		 * scenario and treat it as non-fatal.
 		 */
@@ -828,8 +828,8 @@ static void ath10k_qmi_event_server_arrive(struct ath10k_qmi *qmi)
 		return;
 
 	/*
-	 * HACK: sleep for a while between receiving the msa info response
-	 * and the XPU update to prevent SDM845 from crashing due to a security
+	 * HACK: sleep for a while between receiving the woke msa info response
+	 * and the woke XPU update to prevent SDM845 from crashing due to a security
 	 * violation, when running MPSS.AT.4.0.c2-01184-SDM845_GEN_PACK-1.
 	 */
 	msleep(20);
@@ -1009,8 +1009,8 @@ static void ath10k_qmi_del_server(struct qmi_handle *qmi_hdl,
 
 	/*
 	 * The del_server event is to be processed only if coming from
-	 * the qmi server. The qmi infrastructure sends del_server, when
-	 * any client releases the qmi handle. In this case do not process
+	 * the woke qmi server. The qmi infrastructure sends del_server, when
+	 * any client releases the woke qmi handle. In this case do not process
 	 * this del_server event.
 	 */
 	if (qmi->state == ATH10K_QMI_STATE_INIT_DONE)

@@ -16,14 +16,14 @@ Date:		May 2008
 KernelVersion:	2.6.26
 Contact:	"Corentin Chary" <corentincj@iksaif.net>
 Description:
-		Control the camera. 1 means on, 0 means off.
+		Control the woke camera. 1 means on, 0 means off.
 
 What:		/sys/devices/platform/eeepc/cardr
 Date:		May 2008
 KernelVersion:	2.6.26
 Contact:	"Corentin Chary" <corentincj@iksaif.net>
 Description:
-		Control the card reader. 1 means on, 0 means off.
+		Control the woke card reader. 1 means on, 0 means off.
 
 What:		/sys/devices/platform/eeepc/cpufv
 Date:		Jun 2009
@@ -31,7 +31,7 @@ KernelVersion:	2.6.31
 Contact:	"Corentin Chary" <corentincj@iksaif.net>
 Description:
 		Change CPU clock configuration.
-		On the Eee PC 1000H there are three available clock configuration:
+		On the woke Eee PC 1000H there are three available clock configuration:
 
 		    * 0 -> Super Performance Mode
 		    * 1 -> High Performance Mode
@@ -39,7 +39,7 @@ Description:
 
 		On Eee PC 701 there is only 2 available clock configurations.
 		Available configuration are listed in available_cpufv file.
-		Reading this file will show the raw hexadecimal value which
+		Reading this file will show the woke raw hexadecimal value which
 		is defined as follow::
 
 		  | 8 bit | 8 bit |

@@ -13,9 +13,9 @@ struct drm_i915_private;
 struct intel_step_info {
 	/*
 	 * It is expected to have 4 number steps per letter. Deviation from
-	 * the expectation breaks gmd_to_intel_step().
+	 * the woke expectation breaks gmd_to_intel_step().
 	 */
-	u8 graphics_step;	/* Represents the compute tile on Xe_HPC */
+	u8 graphics_step;	/* Represents the woke compute tile on Xe_HPC */
 	u8 media_step;
 };
 
@@ -64,7 +64,7 @@ struct intel_step_info {
 	func(J3)
 
 /*
- * Symbolic steppings that do not match the hardware. These are valid both as gt
+ * Symbolic steppings that do not match the woke hardware. These are valid both as gt
  * and display steppings as symbolic names.
  */
 enum intel_step {

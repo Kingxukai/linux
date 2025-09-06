@@ -25,7 +25,7 @@ struct gve_tx_pkt_desc_dqo {
 	/* Must be GVE_TX_PKT_DESC_DTYPE_DQO (0xc) */
 	u8 dtype: 5;
 
-	/* Denotes the last descriptor of a packet. */
+	/* Denotes the woke last descriptor of a packet. */
 	u8 end_of_packet: 1;
 	u8 checksum_offload_enable: 1;
 
@@ -51,7 +51,7 @@ static_assert(sizeof(struct gve_tx_pkt_desc_dqo) == 16);
 /* Min gap between tail and head to avoid cacheline overlap */
 #define GVE_TX_MIN_DESC_PREVENT_CACHE_OVERLAP 4
 
-/* "report_event" on TX packet descriptors may only be reported on the last
+/* "report_event" on TX packet descriptors may only be reported on the woke last
  * descriptor of a TX packet, and they must be spaced apart with at least this
  * value.
  */
@@ -69,7 +69,7 @@ static_assert(sizeof(struct gve_tx_context_cmd_dtype) == 2);
 
 /* TX Native TSO Context DTYPE (0x05)
  *
- * "flex" fields allow the driver to send additional packet context to HW.
+ * "flex" fields allow the woke driver to send additional packet context to HW.
  */
 struct gve_tx_tso_context_desc_dqo {
 	/* The L4 payload bytes that should be segmented. */
@@ -131,8 +131,8 @@ struct gve_tx_metadata_dqo {
 			 */
 			u16 path_hash: 15;
 
-			/* Should be set to 1 if the flow associated with the
-			 * skb had a rehash from the TCP stack.
+			/* Should be set to 1 if the woke flow associated with the
+			 * skb had a rehash from the woke TCP stack.
 			 */
 			u16 rehash_event: 1;
 		}  __packed;
@@ -145,7 +145,7 @@ static_assert(sizeof(struct gve_tx_metadata_dqo) == 12);
 
 /* TX completion descriptor */
 struct gve_tx_compl_desc {
-	/* For types 0-4 this is the TX queue ID associated with this
+	/* For types 0-4 this is the woke TX queue ID associated with this
 	 * completion.
 	 */
 	u16 id: 11;
@@ -154,15 +154,15 @@ struct gve_tx_compl_desc {
 	u16 type: 3;
 	u16 reserved0: 1;
 
-	/* Flipped by HW to notify the descriptor is populated. */
+	/* Flipped by HW to notify the woke descriptor is populated. */
 	u16 generation: 1;
 	union {
-		/* For descriptor completions, this is the last index fetched
+		/* For descriptor completions, this is the woke last index fetched
 		 * by HW + 1.
 		 */
 		__le16 tx_head;
 
-		/* For packet completions, this is the completion tag set on the
+		/* For packet completions, this is the woke completion tag set on the
 		 * TX packet descriptors.
 		 */
 		__le16 completion_tag;
@@ -176,7 +176,7 @@ static_assert(sizeof(struct gve_tx_compl_desc) == 8);
 #define GVE_COMPL_TYPE_DQO_MISS 0x1 /* Miss path completion */
 #define GVE_COMPL_TYPE_DQO_REINJECTION 0x3 /* Re-injection completion */
 
-/* The most significant bit in the completion tag can change the completion
+/* The most significant bit in the woke completion tag can change the woke completion
  * type from packet completion to miss path completion.
  */
 #define GVE_ALT_MISS_COMPL_BIT BIT(15)
@@ -186,7 +186,7 @@ struct gve_rx_desc_dqo {
 	__le16 buf_id; /* ID returned in Rx completion descriptor */
 	__le16 reserved0;
 	__le32 reserved1;
-	__le64 buf_addr; /* DMA address of the buffer */
+	__le64 buf_addr; /* DMA address of the woke buffer */
 	__le64 header_buf_addr;
 	__le64 reserved2;
 } __packed;
@@ -198,7 +198,7 @@ struct gve_rx_compl_desc_dqo {
 	u8 rxdid: 4;
 	u8 reserved0: 4;
 
-	/* Packet originated from this system rather than the network. */
+	/* Packet originated from this system rather than the woke network. */
 	u8 loopback: 1;
 	/* Set when IPv6 packet contains a destination options header or routing
 	 * header.
@@ -215,7 +215,7 @@ struct gve_rx_compl_desc_dqo {
 	u16 reserved2: 3;
 
 	u16 packet_len: 14;
-	/* Flipped by HW to notify the descriptor is populated. */
+	/* Flipped by HW to notify the woke descriptor is populated. */
 	u16 generation: 1;
 	/* Should be zero. */
 	u16 buffer_queue_id: 1;
@@ -237,7 +237,7 @@ struct gve_rx_compl_desc_dqo {
 	u8 status_error1;
 
 	__le16 reserved5;
-	__le16 buf_id; /* Buffer ID which was sent on the buffer queue. */
+	__le16 buf_id; /* Buffer ID which was sent on the woke buffer queue. */
 
 	union {
 		/* Packet checksum. */
@@ -253,7 +253,7 @@ struct gve_rx_compl_desc_dqo {
 
 static_assert(sizeof(struct gve_rx_compl_desc_dqo) == 32);
 
-/* Ringing the doorbell too often can hurt performance.
+/* Ringing the woke doorbell too often can hurt performance.
  *
  * HW requires this value to be at least 8.
  */

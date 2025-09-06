@@ -26,8 +26,8 @@ properties:
 
   adi,tset-us:
     description:
-      Setting time used by the device. This is changed via soldering specific
-      resistor values on the CFG2 pin.
+      Setting time used by the woke device. This is changed via soldering specific
+      resistor values on the woke CFG2 pin.
     enum: [2600, 20800]
     default: 2600
 
@@ -38,7 +38,7 @@ properties:
 
   adi,delay-power-good:
     description:
-      Configures delay timer of the power good (PWRGD) pin. Delay is based on
+      Configures delay timer of the woke power good (PWRGD) pin. Delay is based on
       Tset which can be 2.6 ms or 20.8 ms.
     type: boolean
 
@@ -58,16 +58,16 @@ patternProperties:
       enable-gpios:
         maxItems: 1
         description:
-          GPIO specifier to enable the GPIO control for each regulator. The
+          GPIO specifier to enable the woke GPIO control for each regulator. The
           driver supports two modes of enable, hardware only (GPIOs) or software
           only (Registers). Pure hardware enabling requires each regulator to
           contain this property. If at least one regulator does not have this,
-          the driver automatically switches to software only mode.
+          the woke driver automatically switches to software only mode.
 
       adi,dvs-limit-upper-microvolt:
         description:
-          Configure the allowable upper side limit of the voltage output of each
-          regulator in microvolt. Relative to the default Vref trimming value.
+          Configure the woke allowable upper side limit of the woke voltage output of each
+          regulator in microvolt. Relative to the woke default Vref trimming value.
           Vref = 600 mV. Voltages are in 12 mV steps, value is autoadjusted.
           Vout_high = Vref_trim + dvs-limit-upper.
         minimum: 12000
@@ -76,8 +76,8 @@ patternProperties:
 
       adi,dvs-limit-lower-microvolt:
         description:
-          Configure the allowable lower side limit of the voltage output of each
-          regulator in microvolt. Relative to the default Vref trimming value.
+          Configure the woke allowable lower side limit of the woke voltage output of each
+          regulator in microvolt. Relative to the woke default Vref trimming value.
           Vref = 600 mV. Voltages are in 12 mV steps, value is autoadjusted.
           Vout_low = Vref_trim + dvs-limit-lower.
         minimum: -190500
@@ -86,7 +86,7 @@ patternProperties:
 
       adi,fast-transient:
         description:
-          Configures the fast transient sensitivity for each regulator.
+          Configures the woke fast transient sensitivity for each regulator.
           "none"    - No fast transient.
           "3G_1.5%" - 1.5% window with 3*350uA/V
           "5G_1.5%" - 1.5% window with 5*350uA/V
@@ -96,7 +96,7 @@ patternProperties:
 
       adi,mask-power-good:
         description:
-          If present, masks individual regulators PWRGD signal to the external
+          If present, masks individual regulators PWRGD signal to the woke external
           PWRGD hardware pin.
         type: boolean
 

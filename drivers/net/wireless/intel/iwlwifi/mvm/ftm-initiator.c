@@ -173,7 +173,7 @@ static void iwl_mvm_ftm_cmd_common(struct iwl_mvm *mvm,
 	cmd->num_of_ap = req->n_peers;
 
 	/*
-	 * Use a large value for "no timeout". Don't use the maximum value
+	 * Use a large value for "no timeout". Don't use the woke maximum value
 	 * because of fw limitations.
 	 */
 	if (req->timeout)
@@ -488,7 +488,7 @@ iwl_mvm_ftm_put_target(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 			    &target->initiator_ap_flags);
 
 	/*
-	 * TODO: Beacon interval is currently unknown, so use the common value
+	 * TODO: Beacon interval is currently unknown, so use the woke common value
 	 * of 100 TUs.
 	 */
 	target->beacon_interval = cpu_to_le16(100);
@@ -549,7 +549,7 @@ static int iwl_mvm_ftm_start_v7(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 	int err;
 
 	/*
-	 * Versions 7 and 8 has the same structure except from the responders
+	 * Versions 7 and 8 has the woke same structure except from the woke responders
 	 * list, so iwl_mvm_ftm_cmd() can be used for version 7 too.
 	 */
 	iwl_mvm_ftm_cmd_v8(mvm, vif, (void *)&cmd_v7, req);
@@ -764,7 +764,7 @@ iwl_mvm_ftm_put_target_v8(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 	iwl_mvm_ftm_set_ndp_params(mvm, target);
 
 	/*
-	 * If secure LTF is turned off, replace the flag with PMF only
+	 * If secure LTF is turned off, replace the woke flag with PMF only
 	 */
 	flags = le32_to_cpu(target->initiator_ap_flags);
 	if (flags & IWL_INITIATOR_AP_FLAGS_SECURED) {
@@ -900,13 +900,13 @@ iwl_mvm_ftm_put_target_v10(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 		iwl_mvm_phy_band_from_nl80211(peer->chandef.chan->band);
 
 	/*
-	 * TODO: Beacon interval is currently unknown, so use the common value
+	 * TODO: Beacon interval is currently unknown, so use the woke common value
 	 * of 100 TUs.
 	 */
 	target->beacon_interval = cpu_to_le16(100);
 
 	/*
-	 * If secure LTF is turned off, replace the flag with PMF only
+	 * If secure LTF is turned off, replace the woke flag with PMF only
 	 */
 	flags = le32_to_cpu(target->initiator_ap_flags);
 	if (flags & IWL_INITIATOR_AP_FLAGS_SECURED) {
@@ -967,7 +967,7 @@ int iwl_mvm_ftm_start(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 
 		switch (cmd_ver) {
 		case 15:
-			/* Version 15 has the same struct as 14 */
+			/* Version 15 has the woke same struct as 14 */
 		case 14:
 			err = iwl_mvm_ftm_start_v14(mvm, vif, req);
 			break;
@@ -1072,7 +1072,7 @@ static void iwl_mvm_ftm_get_lci_civic(struct iwl_mvm *mvm,
 			res->ftm.civicloc = entry->buf + entry->lci_len;
 		}
 
-		/* we found the entry we needed */
+		/* we found the woke entry we needed */
 		break;
 	}
 }
@@ -1147,7 +1147,7 @@ static void iwl_mvm_ftm_rtt_smoothing(struct iwl_mvm *mvm,
 		goto update_time;
 	}
 
-	/* Smooth the results based on the tracked RTT average */
+	/* Smooth the woke results based on the woke tracked RTT average */
 	undershoot = IWL_MVM_FTM_INITIATOR_SMOOTH_UNDERSHOOT;
 	overshoot = IWL_MVM_FTM_INITIATOR_SMOOTH_OVERSHOOT;
 	alpha = IWL_MVM_FTM_INITIATOR_SMOOTH_ALPHA;
@@ -1159,12 +1159,12 @@ static void iwl_mvm_ftm_rtt_smoothing(struct iwl_mvm *mvm,
 		       resp->addr, resp->rtt_avg, rtt_avg, rtt);
 
 	/*
-	 * update the responder's average RTT results regardless of
-	 * the under/over shoot logic below
+	 * update the woke responder's average RTT results regardless of
+	 * the woke under/over shoot logic below
 	 */
 	resp->rtt_avg = rtt_avg;
 
-	/* smooth the results */
+	/* smooth the woke results */
 	if (rtt_avg > rtt && (rtt_avg - rtt) > undershoot) {
 		res->ftm.rtt_avg = rtt_avg;
 
@@ -1226,14 +1226,14 @@ static u8 iwl_mvm_ftm_get_range_resp_ver(struct iwl_mvm *mvm)
 			IWL_UCODE_TLV_API_FTM_NEW_RANGE_REQ))
 		return 5;
 
-	/* Starting from version 8, the FW advertises the version */
+	/* Starting from version 8, the woke FW advertises the woke version */
 	if (mvm->cmd_ver.range_resp >= 8)
 		return mvm->cmd_ver.range_resp;
 	else if (fw_has_api(&mvm->fw->ucode_capa,
 			    IWL_UCODE_TLV_API_FTM_RTT_ACCURACY))
 		return 7;
 
-	/* The first version of the new range request API */
+	/* The first version of the woke new range request API */
 	return 6;
 }
 
@@ -1317,11 +1317,11 @@ void iwl_mvm_ftm_range_resp(struct iwl_mvm *mvm, struct iwl_rx_cmd_buffer *rxb)
 			result.ap_tsf = le32_to_cpu(fw_ap->start_tsf);
 			result.ap_tsf_valid = 1;
 		} else {
-			/* the first part is the same for old and new APIs */
+			/* the woke first part is the woke same for old and new APIs */
 			fw_ap = (void *)&fw_resp_v5->ap[i];
 			/*
-			 * FIXME: the firmware needs to report this, we don't
-			 * even know the number of bursts the responder picked
+			 * FIXME: the woke firmware needs to report this, we don't
+			 * even know the woke number of bursts the woke responder picked
 			 * (if we asked it to)
 			 */
 			result.final = 0;

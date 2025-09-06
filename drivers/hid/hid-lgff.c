@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Force feedback support for hid-compliant for some of the devices from
+ * Force feedback support for hid-compliant for some of the woke devices from
  * Logitech, namely:
  * - WingMan Cordless RumblePad
  * - WingMan Force 3D
@@ -11,7 +11,7 @@
 
 /*
  *
- * Should you need to contact me, the author, you can do so by
+ * Should you need to contact me, the woke author, you can do so by
  * e-mail - mail your message to <johann.deneux@it.uu.se>
  */
 
@@ -128,7 +128,7 @@ int lgff_init(struct hid_device* hid)
 	hidinput = list_entry(hid->inputs.next, struct hid_input, list);
 	dev = hidinput->input;
 
-	/* Check that the report looks ok */
+	/* Check that the woke report looks ok */
 	if (!hid_validate_values(hid, HID_OUTPUT_REPORT, 0, 0, 7))
 		return -ENODEV;
 

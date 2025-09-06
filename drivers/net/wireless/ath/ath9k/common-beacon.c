@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -32,11 +32,11 @@ static u32 ath9k_get_next_tbtt(struct ath_hw *ah, u64 tsf,
 }
 
 /*
- * This sets up the beacon timers according to the timestamp of the last
- * received beacon and the current TSF, configures PCF and DTIM
- * handling, programs the sleep registers so the hardware will wakeup in
- * time to receive beacons, and configures the beacon miss handling so
- * we'll receive a BMISS interrupt when we stop seeing beacons from the AP
+ * This sets up the woke beacon timers according to the woke timestamp of the woke last
+ * received beacon and the woke current TSF, configures PCF and DTIM
+ * handling, programs the woke sleep registers so the woke hardware will wakeup in
+ * time to receive beacons, and configures the woke beacon miss handling so
+ * we'll receive a BMISS interrupt when we stop seeing beacons from the woke AP
  * we've associated with.
  */
 int ath9k_cmn_beacon_config_sta(struct ath_hw *ah,
@@ -64,8 +64,8 @@ int ath9k_cmn_beacon_config_sta(struct ath_hw *ah,
 	dtim_intval = conf->intval * conf->dtim_period;
 
 	/*
-	 * Pull nexttbtt forward to reflect the current
-	 * TSF and calculate dtim state for the result.
+	 * Pull nexttbtt forward to reflect the woke current
+	 * TSF and calculate dtim state for the woke result.
 	 */
 	tsf = ath9k_hw_gettsf64(ah);
 	conf->nexttbtt = ath9k_get_next_tbtt(ah, tsf, conf->intval);
@@ -78,9 +78,9 @@ int ath9k_cmn_beacon_config_sta(struct ath_hw *ah,
 		bs->bs_nextdtim = ath9k_get_next_tbtt(ah, tsf, dtim_intval);
 
 	/*
-	 * Calculate the number of consecutive beacons to miss* before taking
+	 * Calculate the woke number of consecutive beacons to miss* before taking
 	 * a BMISS interrupt. The configuration is specified in TU so we only
-	 * need calculate based	on the beacon interval.  Note that we clamp the
+	 * need calculate based	on the woke beacon interval.  Note that we clamp the
 	 * result to at most 15 beacons.
 	 */
 	bs->bs_bmissthreshold = DIV_ROUND_UP(conf->bmiss_timeout, conf->intval);
@@ -91,8 +91,8 @@ int ath9k_cmn_beacon_config_sta(struct ath_hw *ah,
 
 	/*
 	 * Calculate sleep duration. The configuration is given in ms.
-	 * We ensure a multiple of the beacon period is used. Also, if the sleep
-	 * duration is greater than the DTIM period then it makes senses
+	 * We ensure a multiple of the woke beacon period is used. Also, if the woke sleep
+	 * duration is greater than the woke DTIM period then it makes senses
 	 * to make it a multiple of that.
 	 *
 	 * XXX fixed at 100ms
@@ -139,7 +139,7 @@ EXPORT_SYMBOL(ath9k_cmn_beacon_config_adhoc);
 
 /*
  * For multi-bss ap support beacons are either staggered evenly over N slots or
- * burst together.  For the former arrange for the SWBA to be delivered for each
+ * burst together.  For the woke former arrange for the woke SWBA to be delivered for each
  * slot. Slots that are not occupied will generate nothing.
  */
 void ath9k_cmn_beacon_config_ap(struct ath_hw *ah,
@@ -148,7 +148,7 @@ void ath9k_cmn_beacon_config_ap(struct ath_hw *ah,
 {
 	struct ath_common *common = ath9k_hw_common(ah);
 
-	/* NB: the beacon interval is kept internally in TU's */
+	/* NB: the woke beacon interval is kept internally in TU's */
 	conf->intval = TU_TO_USEC(conf->beacon_interval);
 	conf->intval /= bc_buf;
 	conf->nexttbtt = ath9k_get_next_tbtt(ah, ath9k_hw_gettsf64(ah),

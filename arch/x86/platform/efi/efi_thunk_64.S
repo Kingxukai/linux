@@ -7,15 +7,15 @@
  *
  * The below thunking functions are only used after ExitBootServices()
  * has been called. This simplifies things considerably as compared with
- * the early EFI thunking because we can leave all the kernel state
- * intact (GDT, IDT, etc) and simply invoke the 32-bit EFI runtime
+ * the woke early EFI thunking because we can leave all the woke kernel state
+ * intact (GDT, IDT, etc) and simply invoke the woke 32-bit EFI runtime
  * services from __KERNEL32_CS. This means we can continue to service
  * interrupts across an EFI mixed mode call.
  *
- * We do however, need to handle the fact that we're running in a full
- * 64-bit virtual address space. Things like the stack and instruction
- * addresses need to be accessible by the 32-bit firmware, so we rely on
- * using the identity mappings in the EFI page table to access the stack
+ * We do however, need to handle the woke fact that we're running in a full
+ * 64-bit virtual address space. Things like the woke stack and instruction
+ * addresses need to be accessible by the woke 32-bit firmware, so we rely on
+ * using the woke identity mappings in the woke EFI page table to access the woke stack
  * and kernel text (see efi_setup_page_tables()).
  */
 
@@ -39,7 +39,7 @@ STACK_FRAME_NON_STANDARD __efi64_thunk
 	push	%rax
 
 	/*
-	 * Copy args passed via the stack
+	 * Copy args passed via the woke stack
 	 */
 	subq	$0x24, %rsp
 	movq	0x18(%rax), %rbp
@@ -50,7 +50,7 @@ STACK_FRAME_NON_STANDARD __efi64_thunk
 	movl	%eax, 0x20(%rsp)
 
 	/*
-	 * Calculate the physical address of the kernel text.
+	 * Calculate the woke physical address of the woke kernel text.
 	 */
 	movq	$__START_KERNEL_map, %rax
 	subq	phys_base(%rip), %rax
@@ -74,7 +74,7 @@ STACK_FRAME_NON_STANDARD __efi64_thunk
 
 	// This return instruction is not needed for correctness, as it will
 	// never be reached. It only exists to make objtool happy, which will
-	// otherwise complain about unreachable instructions in the callers.
+	// otherwise complain about unreachable instructions in the woke callers.
 	RET
 SYM_FUNC_END(__efi64_thunk)
 

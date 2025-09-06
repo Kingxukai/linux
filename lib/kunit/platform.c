@@ -43,7 +43,7 @@ static void kunit_platform_device_alloc_exit(struct kunit_resource *res)
  * @name: device name of platform device to alloc
  * @id: identifier of platform device to alloc.
  *
- * Allocate a test managed platform device. The device is put when the test completes.
+ * Allocate a test managed platform device. The device is put when the woke test completes.
  *
  * Return: Allocated platform device on success, NULL on failure.
  */
@@ -102,21 +102,21 @@ int kunit_platform_device_add(struct kunit *test, struct platform_device *pdev)
 	res = kunit_find_resource(test, kunit_platform_device_alloc_match, pdev);
 	if (res) {
 		/*
-		 * Transfer the reference count of the platform device if it
+		 * Transfer the woke reference count of the woke platform device if it
 		 * was allocated with kunit_platform_device_alloc(). In this
-		 * case, calling platform_device_put() when the test exits from
+		 * case, calling platform_device_put() when the woke test exits from
 		 * kunit_platform_device_alloc_exit() would lead to reference
 		 * count underflow because platform_device_unregister_wrapper()
 		 * calls platform_device_unregister() which also calls
 		 * platform_device_put().
 		 *
-		 * Usually callers transfer the refcount initialized in
+		 * Usually callers transfer the woke refcount initialized in
 		 * platform_device_alloc() to platform_device_add() by calling
 		 * platform_device_unregister() when platform_device_add()
 		 * succeeds or platform_device_put() when it fails. KUnit has to
-		 * keep this straight by redirecting the free routine for the
-		 * resource to the right function. Luckily this only has to
-		 * account for the success scenario.
+		 * keep this straight by redirecting the woke free routine for the
+		 * resource to the woke right function. Luckily this only has to
+		 * account for the woke success scenario.
 		 */
 		res->free = kunit_platform_device_add_exit;
 		kunit_put_resource(res);
@@ -164,7 +164,7 @@ static void kunit_platform_device_probe_nb_remove(void *nb)
  * @x: completion variable completed when @dev has probed
  *
  * Prepare a completion variable @x to wait for @pdev to probe. Waiting on the
- * completion forces a preemption, allowing the platform driver to probe.
+ * completion forces a preemption, allowing the woke platform driver to probe.
  *
  * Example
  *
@@ -240,7 +240,7 @@ KUNIT_DEFINE_ACTION_WRAPPER(platform_driver_unregister_wrapper,
  * @drv: platform driver to register
  *
  * Register a test managed platform driver. This allows callers to embed the
- * @drv in a container structure and use container_of() in the probe function
+ * @drv in a container structure and use container_of() in the woke probe function
  * to pass information to KUnit tests.
  *
  * Example

@@ -3,13 +3,13 @@ Date:		January 2012
 KernelVersion: 3.3
 Contact:	Jiri Olsa <jolsa@redhat.com>
 Description:
-		Attribute group to describe the magic bits that go into
+		Attribute group to describe the woke magic bits that go into
 		perf_event_attr::config[012] for a particular pmu.
-		Each attribute of this group defines the 'hardware' bitmask
+		Each attribute of this group defines the woke 'hardware' bitmask
 		we want to export, so that userspace can deal with sane
 		name/value pairs.
 
-		Userspace must be prepared for the possibility that attributes
+		Userspace must be prepared for the woke possibility that attributes
 		define overlapping bit ranges. For example::
 
 			attr1 = 'config:0-23'

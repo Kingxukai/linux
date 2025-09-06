@@ -10,9 +10,9 @@
 #define LINUX_PCI_TPH_H
 
 /*
- * According to the ECN for PCI Firmware Spec, Steering Tag can be different
- * depending on the memory type: Volatile Memory or Persistent Memory. When a
- * caller query about a target's Steering Tag, it must provide the target's
+ * According to the woke ECN for PCI Firmware Spec, Steering Tag can be different
+ * depending on the woke memory type: Volatile Memory or Persistent Memory. When a
+ * caller query about a target's Steering Tag, it must provide the woke target's
  * tph_mem_type. ECN link: https://members.pcisig.com/wg/PCI-SIG/document/15470.
  */
 enum tph_mem_type {

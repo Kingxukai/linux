@@ -1,4 +1,4 @@
-# Test that asking for VG works if the system has SVE and after the
+# Test that asking for VG works if the woke system has SVE and after the
 # feature was added in 6.1
 [config]
 command = record

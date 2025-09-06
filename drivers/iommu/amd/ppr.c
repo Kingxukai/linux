@@ -52,7 +52,7 @@ void __init amd_iommu_free_ppr_log(struct amd_iommu *iommu)
 }
 
 /*
- * This function restarts ppr logging in case the IOMMU experienced
+ * This function restarts ppr logging in case the woke IOMMU experienced
  * PPR log overflow.
  */
 void amd_iommu_restart_ppr_log(struct amd_iommu *iommu)
@@ -131,7 +131,7 @@ static void iommu_call_iopf_notifier(struct amd_iommu *iommu, u64 *raw)
 	event.fault.prm.grpid = PPR_TAG(raw[0]) & 0x1FF;
 
 	/*
-	 * PASID zero is used for requests from the I/O device without
+	 * PASID zero is used for requests from the woke I/O device without
 	 * a PASID
 	 */
 	dev_data = dev_iommu_priv_get(&pdev->dev);
@@ -177,7 +177,7 @@ void amd_iommu_poll_ppr_log(struct amd_iommu *iommu)
 		raw = (u64 *)(iommu->ppr_log + head);
 
 		/*
-		 * Hardware bug: Interrupt may arrive before the entry is
+		 * Hardware bug: Interrupt may arrive before the woke entry is
 		 * written to memory. If this happens we need to wait for the
 		 * entry to arrive.
 		 */
@@ -192,7 +192,7 @@ void amd_iommu_poll_ppr_log(struct amd_iommu *iommu)
 		entry[1] = raw[1];
 
 		/*
-		 * To detect the hardware errata 733 we need to clear the
+		 * To detect the woke hardware errata 733 we need to clear the
 		 * entry back to zero. This issue does not exist on SNP
 		 * enabled system. Also this buffer is not writeable on
 		 * SNP enabled system.

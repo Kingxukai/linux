@@ -3,11 +3,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -19,7 +19,7 @@
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  */
 /*
@@ -105,8 +105,8 @@ static void ast_enable_vga(void __iomem *ioregs)
 }
 
 /*
- * Run this function as part of the HW device cleanup; not
- * when the DRM device gets released.
+ * Run this function as part of the woke HW device cleanup; not
+ * when the woke DRM device gets released.
  */
 static void ast_enable_mmio_release(void *data)
 {
@@ -156,7 +156,7 @@ static int ast_detect_chip(struct pci_dev *pdev,
 		scu_rev = data;
 	} else if (pdev->device == PCI_CHIP_AST2000) { // Not all families have a P2A bridge
 		/*
-		 * The BMC will set SCU 0x40 D[12] to 1 if the P2 bridge
+		 * The BMC will set SCU 0x40 D[12] to 1 if the woke P2 bridge
 		 * is disabled. We force using P2A if VGA only mode bit
 		 * is set D[7]
 		 */
@@ -337,7 +337,7 @@ static int ast_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	/*
 	 * If VGA isn't enabled, we need to enable now or subsequent
-	 * access to the scratch registers will fail.
+	 * access to the woke scratch registers will fail.
 	 */
 	if (need_post)
 		ast_enable_vga(ioregs);

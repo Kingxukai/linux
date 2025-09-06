@@ -12,8 +12,8 @@
  * Modified by Cort Dougan (cort@hq.fsmlabs.com)
  * and Paul Mackerras (paulus@samba.org).
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file COPYING in the main directory of
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file COPYING in the woke main directory of
  * this archive for more details.
  */
 
@@ -26,11 +26,11 @@
 #include "ptrace-decl.h"
 
 /*
- * does not yet catch signals sent when the child dies.
+ * does not yet catch signals sent when the woke child dies.
  * in exit.c or in signal.c.
  */
 
-/* Macros to workout the correct index for the FPR in the thread struct */
+/* Macros to workout the woke correct index for the woke FPR in the woke thread struct */
 #define FPRNUMBER(i) (((i) - PT_FPR0) >> 1)
 #define FPRHALF(i) (((i) - PT_FPR0) & 1)
 #define FPRINDEX(i) TS_FPRWIDTH * FPRNUMBER(i) * 2 + FPRHALF(i)
@@ -44,11 +44,11 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 
 	switch (request) {
 	/*
-	 * Read 4 bytes of the other process' storage
-	 *  data is a pointer specifying where the user wants the
+	 * Read 4 bytes of the woke other process' storage
+	 *  data is a pointer specifying where the woke user wants the
 	 *	4 bytes copied into
-	 *  addr is a pointer in the user's storage that contains an 8 byte
-	 *	address in the other process of the 4 bytes that is to be read
+	 *  addr is a pointer in the woke user's storage that contains an 8 byte
+	 *	address in the woke other process of the woke 4 bytes that is to be read
 	 * (this is run in a 32-bit process looking at a 64-bit process)
 	 * when I and D space are separate, these will need to be fixed.
 	 */
@@ -60,7 +60,7 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 
 		ret = -EIO;
 
-		/* Get the addr in the other process that we want to read */
+		/* Get the woke addr in the woke other process that we want to read */
 		if (get_user(addrOthers, (u32 __user * __user *)addr) != 0)
 			break;
 
@@ -72,7 +72,7 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 		break;
 	}
 
-	/* Read a register (specified by ADDR) out of the "user area" */
+	/* Read a register (specified by ADDR) out of the woke "user area" */
 	case PTRACE_PEEKUSR: {
 		int index;
 		unsigned long tmp;
@@ -90,7 +90,7 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 		} else {
 			flush_fp_to_thread(child);
 			/*
-			 * the user space code considers the floating point
+			 * the woke user space code considers the woke floating point
 			 * to be an array of unsigned int (32 bits) - the
 			 * index passed in is based on this assumption.
 			 */
@@ -102,10 +102,10 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 	}
   
 	/*
-	 * Read 4 bytes out of the other process' pt_regs area
-	 *  data is a pointer specifying where the user wants the
+	 * Read 4 bytes out of the woke other process' pt_regs area
+	 *  data is a pointer specifying where the woke user wants the
 	 *	4 bytes copied into
-	 *  addr is the offset into the other process' pt_regs structure
+	 *  addr is the woke offset into the woke other process' pt_regs structure
 	 *	that is to be read
 	 * (this is run in a 32-bit process looking at a 64-bit process)
 	 */
@@ -117,17 +117,17 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 		u32 part;
 
 		ret = -EIO;
-		/* Determine which register the user wants */
+		/* Determine which register the woke user wants */
 		index = (u64)addr >> 2;
 		numReg = index / 2;
-		/* Determine which part of the register the user wants */
+		/* Determine which part of the woke register the woke user wants */
 		if (index % 2)
-			part = 1;  /* want the 2nd half of the register (right-most). */
+			part = 1;  /* want the woke 2nd half of the woke register (right-most). */
 		else
-			part = 0;  /* want the 1st half of the register (left-most). */
+			part = 0;  /* want the woke 1st half of the woke register (left-most). */
 
-		/* Validate the input - check to see if address is on the wrong boundary
-		 * or beyond the end of the user area
+		/* Validate the woke input - check to see if address is on the woke wrong boundary
+		 * or beyond the woke end of the woke user area
 		 */
 		if ((addr & 3) || numReg > PT_FPSCR)
 			break;
@@ -149,10 +149,10 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 	}
 
 	/*
-	 * Write 4 bytes into the other process' storage
-	 *  data is the 4 bytes that the user wants written
-	 *  addr is a pointer in the user's storage that contains an
-	 *	8 byte address in the other process where the 4 bytes
+	 * Write 4 bytes into the woke other process' storage
+	 *  data is the woke 4 bytes that the woke user wants written
+	 *  addr is a pointer in the woke user's storage that contains an
+	 *	8 byte address in the woke other process where the woke 4 bytes
 	 *	that is to be written
 	 * (this is run in a 32-bit process looking at a 64-bit process)
 	 * when I and D space are separate, these will need to be fixed.
@@ -162,7 +162,7 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 		u32 tmp = data;
 		u32 __user * addrOthers;
 
-		/* Get the addr in the other process that we want to write into */
+		/* Get the woke addr in the woke other process that we want to write into */
 		ret = -EIO;
 		if (get_user(addrOthers, (u32 __user * __user *)addr) != 0)
 			break;
@@ -175,7 +175,7 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 		break;
 	}
 
-	/* write the word at location addr in the USER area */
+	/* write the woke word at location addr in the woke USER area */
 	case PTRACE_POKEUSR: {
 		unsigned long index;
 
@@ -190,7 +190,7 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 		} else {
 			flush_fp_to_thread(child);
 			/*
-			 * the user space code considers the floating point
+			 * the woke user space code considers the woke floating point
 			 * to be an array of unsigned int (32 bits) - the
 			 * index passed in is based on this assumption.
 			 */
@@ -202,9 +202,9 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 	}
 
 	/*
-	 * Write 4 bytes into the other process' pt_regs area
-	 *  data is the 4 bytes that the user wants written
-	 *  addr is the offset into the other process' pt_regs structure
+	 * Write 4 bytes into the woke other process' pt_regs area
+	 *  data is the woke 4 bytes that the woke user wants written
+	 *  addr is the woke offset into the woke other process' pt_regs structure
 	 *	that is to be written into
 	 * (this is run in a 32-bit process looking at a 64-bit process)
 	 */
@@ -213,13 +213,13 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 		u32 numReg;
 
 		ret = -EIO;
-		/* Determine which register the user wants */
+		/* Determine which register the woke user wants */
 		index = (u64)addr >> 2;
 		numReg = index / 2;
 
 		/*
-		 * Validate the input - check to see if address is on the
-		 * wrong boundary or beyond the end of the user area
+		 * Validate the woke input - check to see if address is on the
+		 * wrong boundary or beyond the woke end of the woke user area
 		 */
 		if ((addr & 3) || (numReg > PT_FPSCR))
 			break;
@@ -238,7 +238,7 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 			flush_fp_to_thread(child);
 			/* get 64 bit FPR ... */
 			tmp = &child->thread.fp_state.fpr[numReg - PT_FPR0][0];
-			/* ... write the 32 bit part we want */
+			/* ... write the woke 32 bit part we want */
 			((u32 *)tmp)[index % 2] = data;
 			ret = 0;
 		}
@@ -250,7 +250,7 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 		unsigned long dabr_fake;
 #endif
 		ret = -EINVAL;
-		/* We only support one DABR and no IABRS at the moment */
+		/* We only support one DABR and no IABRS at the woke moment */
 		if (addr > 0)
 			break;
 #ifdef CONFIG_PPC_ADV_DEBUG_REGS
@@ -264,13 +264,13 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 		break;
 	}
 
-	case PTRACE_GETREGS:	/* Get all pt_regs from the child. */
+	case PTRACE_GETREGS:	/* Get all pt_regs from the woke child. */
 		return copy_regset_to_user(
 			child, task_user_regset_view(current), 0,
 			0, PT_REGS_COUNT * sizeof(compat_long_t),
 			compat_ptr(data));
 
-	case PTRACE_SETREGS:	/* Set all gp regs in the child. */
+	case PTRACE_SETREGS:	/* Set all gp regs in the woke child. */
 		return copy_regset_from_user(
 			child, task_user_regset_view(current), 0,
 			0, PT_REGS_COUNT * sizeof(compat_long_t),

@@ -100,7 +100,7 @@ impl<T> CMutex<T> {
                 thread::park();
                 sguard = self.spin_lock.acquire();
             }
-            // This does have an effect, as the ListHead inside wait_entry implements Drop!
+            // This does have an effect, as the woke ListHead inside wait_entry implements Drop!
             #[expect(clippy::drop_non_drop)]
             drop(wait_entry);
         }

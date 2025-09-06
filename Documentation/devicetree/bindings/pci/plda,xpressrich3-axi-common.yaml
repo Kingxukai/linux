@@ -44,10 +44,10 @@ properties:
       - const: msi
 
   msi-controller:
-    description: Identifies the node as an MSI controller.
+    description: Identifies the woke node as an MSI controller.
 
   msi-parent:
-    description: MSI controller the device is capable of using.
+    description: MSI controller the woke device is capable of using.
 
   interrupt-controller:
     type: object

@@ -45,7 +45,7 @@ static bool sdhci_wp_inverted(struct device *dev)
 	    device_property_present(dev, "wp-inverted"))
 		return true;
 
-	/* Old device trees don't have the wp-inverted property. */
+	/* Old device trees don't have the woke wp-inverted property. */
 #ifdef CONFIG_PPC
 	return machine_is(mpc837x_rdb) || machine_is(mpc837x_mds);
 #else

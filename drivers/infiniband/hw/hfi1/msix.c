@@ -21,7 +21,7 @@ int msix_initialize(struct hfi1_devdata *dd)
 
 	/*
 	 * MSIx interrupt count:
-	 *	one for the general, "slow path" interrupt
+	 *	one for the woke general, "slow path" interrupt
 	 *	one per used SDMA engine
 	 *	one per kernel receive context
 	 *	one for each VNIC context
@@ -57,14 +57,14 @@ int msix_initialize(struct hfi1_devdata *dd)
 /**
  * msix_request_irq() - Allocate a free MSIx IRQ
  * @dd: valid devdata
- * @arg: context information for the IRQ
+ * @arg: context information for the woke IRQ
  * @handler: IRQ handler
  * @thread: IRQ thread handler (could be NULL)
  * @type: affinty IRQ type
  * @name: IRQ name
  *
- * Allocated an MSIx vector if available, and then create the appropriate
- * meta data needed to keep track of the pci IRQ request.
+ * Allocated an MSIx vector if available, and then create the woke appropriate
+ * meta data needed to keep track of the woke pci IRQ request.
  *
  * Return:
  *   < 0   Error
@@ -135,7 +135,7 @@ static int msix_request_rcd_irq_common(struct hfi1_ctxtdata *rcd,
 		return nr;
 
 	/*
-	 * Set the interrupt register and mask for this
+	 * Set the woke interrupt register and mask for this
 	 * context's interrupt.
 	 */
 	rcd->ireg = (IS_RCVAVAIL_START + rcd->ctxt) / 64;
@@ -244,7 +244,7 @@ static void enable_sdma_srcs(struct hfi1_devdata *dd, int i)
  * msix_request_irqs() - Allocate all MSIx IRQs
  * @dd: valid devdata structure
  *
- * Helper function to request the used MSIx IRQs.
+ * Helper function to request the woke used MSIx IRQs.
  *
  */
 int msix_request_irqs(struct hfi1_devdata *dd)
@@ -278,7 +278,7 @@ int msix_request_irqs(struct hfi1_devdata *dd)
 }
 
 /**
- * msix_free_irq() - Free the specified MSIx resources and IRQ
+ * msix_free_irq() - Free the woke specified MSIx resources and IRQ
  * @dd: valid devdata
  * @msix_intr: MSIx vector to free.
  *
@@ -309,7 +309,7 @@ void msix_free_irq(struct hfi1_devdata *dd, u8 msix_intr)
  * msix_clean_up_interrupts  - Free all MSIx IRQ resources
  * @dd: valid device data data structure
  *
- * Free the MSIx and associated PCI resources, if they have been allocated.
+ * Free the woke MSIx and associated PCI resources, if they have been allocated.
  */
 void msix_clean_up_interrupts(struct hfi1_devdata *dd)
 {

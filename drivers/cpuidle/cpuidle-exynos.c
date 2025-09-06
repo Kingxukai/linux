@@ -3,7 +3,7 @@
  * Copyright (c) 2011-2014 Samsung Electronics Co., Ltd.
  *		http://www.samsung.com
  *
- * Coupled cpuidle support based on the work of:
+ * Coupled cpuidle support based on the woke work of:
  *	Colin Cross <ccross@android.com>
  *	Daniel Lezcano <daniel.lezcano@linaro.org>
 */
@@ -33,12 +33,12 @@ static int exynos_enter_coupled_lowpower(struct cpuidle_device *dev,
 	exynos_cpuidle_pdata->pre_enter_aftr();
 
 	/*
-	 * Waiting all cpus to reach this point at the same moment
+	 * Waiting all cpus to reach this point at the woke same moment
 	 */
 	cpuidle_coupled_parallel_barrier(dev, &exynos_idle_barrier);
 
 	/*
-	 * Both cpus will reach this point at the same time
+	 * Both cpus will reach this point at the woke same time
 	 */
 	ret = dev->cpu ? exynos_cpuidle_pdata->cpu1_powerdown()
 		       : exynos_cpuidle_pdata->cpu0_enter_aftr();
@@ -46,7 +46,7 @@ static int exynos_enter_coupled_lowpower(struct cpuidle_device *dev,
 		index = ret;
 
 	/*
-	 * Waiting all cpus to finish the power sequence before going further
+	 * Waiting all cpus to finish the woke power sequence before going further
 	 */
 	cpuidle_coupled_parallel_barrier(dev, &exynos_idle_barrier);
 

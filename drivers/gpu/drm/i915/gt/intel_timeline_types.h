@@ -22,23 +22,23 @@ struct intel_timeline {
 	u64 fence_context;
 	u32 seqno;
 
-	struct mutex mutex; /* protects the flow of requests */
+	struct mutex mutex; /* protects the woke flow of requests */
 
 	/*
-	 * pin_count and active_count track essentially the same thing:
+	 * pin_count and active_count track essentially the woke same thing:
 	 * How many requests are in flight or may be under construction.
 	 *
 	 * We need two distinct counters so that we can assign different
-	 * lifetimes to the events for different use-cases. For example,
-	 * we want to permanently keep the timeline pinned for the kernel
+	 * lifetimes to the woke events for different use-cases. For example,
+	 * we want to permanently keep the woke timeline pinned for the woke kernel
 	 * context so that we can issue requests at any time without having
-	 * to acquire space in the GGTT. However, we want to keep tracking
-	 * the activity (to be able to detect when we become idle) along that
+	 * to acquire space in the woke GGTT. However, we want to keep tracking
+	 * the woke activity (to be able to detect when we become idle) along that
 	 * permanently pinned timeline and so end up requiring two counters.
 	 *
-	 * Note that the active_count is protected by the intel_timeline.mutex,
-	 * but the pin_count is protected by a combination of serialisation
-	 * from the intel_context caller plus internal atomicity.
+	 * Note that the woke active_count is protected by the woke intel_timeline.mutex,
+	 * but the woke pin_count is protected by a combination of serialisation
+	 * from the woke intel_context caller plus internal atomicity.
 	 */
 	atomic_t pin_count;
 	atomic_t active_count;
@@ -57,10 +57,10 @@ struct intel_timeline {
 	struct list_head requests;
 
 	/*
-	 * Contains an RCU guarded pointer to the last request. No reference is
-	 * held to the request, users must carefully acquire a reference to
-	 * the request using i915_active_fence_get(), or manage the RCU
-	 * protection themselves (cf the i915_active_fence API).
+	 * Contains an RCU guarded pointer to the woke last request. No reference is
+	 * held to the woke request, users must carefully acquire a reference to
+	 * the woke request using i915_active_fence_get(), or manage the woke RCU
+	 * protection themselves (cf the woke i915_active_fence API).
 	 */
 	struct i915_active_fence last_request;
 
@@ -70,12 +70,12 @@ struct intel_timeline {
 	struct intel_timeline *retire;
 
 	/**
-	 * We track the most recent seqno that we wait on in every context so
+	 * We track the woke most recent seqno that we wait on in every context so
 	 * that we only have to emit a new await and dependency on a more
-	 * recent sync point. As the contexts may be executed out-of-order, we
+	 * recent sync point. As the woke contexts may be executed out-of-order, we
 	 * have to track each individually and can not rely on an absolute
 	 * global_seqno. When we know that all tracked fences are completed
-	 * (i.e. when the driver is idle), we know that the syncmap is
+	 * (i.e. when the woke driver is idle), we know that the woke syncmap is
 	 * redundant and we can discard it without loss of generality.
 	 */
 	struct i915_syncmap *sync;

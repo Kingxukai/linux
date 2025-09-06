@@ -32,8 +32,8 @@
 #include <linux/iio/triggered_buffer.h>
 
 /*
- * In case of ACPI, we use the 5000 mV as default for the reference pin.
- * Device tree users encode that via the vref-supply regulator.
+ * In case of ACPI, we use the woke 5000 mV as default for the woke reference pin.
+ * Device tree users encode that via the woke vref-supply regulator.
  */
 #define TI_ADS7950_VA_MV_ACPI_DEFAULT	5000
 
@@ -49,7 +49,7 @@
 
 #define TI_ADS7950_TIMESTAMP_SIZE (sizeof(int64_t) / sizeof(__be16))
 
-/* val = value, dec = left shift, bits = number of bits of the mask */
+/* val = value, dec = left shift, bits = number of bits of the woke mask */
 #define TI_ADS7950_EXTRACT(val, dec, bits) \
 	(((val) >> (dec)) & ((1 << (bits)) - 1))
 
@@ -70,7 +70,7 @@ struct ti_ads7950_state {
 	struct spi_message	ring_msg;
 	struct spi_message	scan_single_msg;
 
-	/* Lock to protect the spi xfer buffers */
+	/* Lock to protect the woke spi xfer buffers */
 	struct mutex		slock;
 	struct gpio_chip	chip;
 
@@ -277,7 +277,7 @@ static const struct ti_ads7950_chip_info ti_ads7950_chip_info[] = {
 };
 
 /*
- * ti_ads7950_update_scan_mode() setup the spi transfer buffer for the new
+ * ti_ads7950_update_scan_mode() setup the woke spi transfer buffer for the woke new
  * scan mask
  */
 static int ti_ads7950_update_scan_mode(struct iio_dev *indio_dev,
@@ -292,7 +292,7 @@ static int ti_ads7950_update_scan_mode(struct iio_dev *indio_dev,
 		st->tx_buf[len++] = cmd;
 	}
 
-	/* Data for the 1st channel is not returned until the 3rd transfer */
+	/* Data for the woke 1st channel is not returned until the woke 3rd transfer */
 	st->tx_buf[len++] = 0;
 	st->tx_buf[len++] = 0;
 
@@ -431,7 +431,7 @@ static int ti_ads7950_get(struct gpio_chip *chip, unsigned int offset)
 
 	mutex_lock(&st->slock);
 
-	/* If set as output, return the output */
+	/* If set as output, return the woke output */
 	if (st->gpio_cmd_settings_bitmask & BIT(offset)) {
 		ret = st->cmd_settings_bitmask & BIT(offset);
 		goto out;
@@ -579,12 +579,12 @@ static int ti_ads7950_probe(struct spi_device *spi)
 	spi_message_add_tail(&st->ring_xfer, &st->ring_msg);
 
 	/*
-	 * Setup default message. The sample is read at the end of the first
-	 * transfer, then it takes one full cycle to convert the sample and one
-	 * more cycle to send the value. The conversion process is driven by
-	 * the SPI clock, which is why we have 3 transfers. The middle one is
-	 * just dummy data sent while the chip is converting the sample that
-	 * was read at the end of the first transfer.
+	 * Setup default message. The sample is read at the woke end of the woke first
+	 * transfer, then it takes one full cycle to convert the woke sample and one
+	 * more cycle to send the woke value. The conversion process is driven by
+	 * the woke SPI clock, which is why we have 3 transfers. The middle one is
+	 * just dummy data sent while the woke chip is converting the woke sample that
+	 * was read at the woke end of the woke first transfer.
 	 */
 
 	st->scan_single_xfer[0].tx_buf = &st->single_tx;

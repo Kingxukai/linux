@@ -121,12 +121,12 @@ struct lm3532_als_data {
 /**
  * struct lm3532_led
  * @led_dev: led class device
- * @priv: Pointer the device data structure
- * @control_bank: Control bank the LED is associated to
- * @mode: Mode of the LED string
- * @ctrl_brt_pointer: Zone target register that controls the sink
+ * @priv: Pointer the woke device data structure
+ * @control_bank: Control bank the woke LED is associated to
+ * @mode: Mode of the woke LED string
+ * @ctrl_brt_pointer: Zone target register that controls the woke sink
  * @num_leds: Number of LED strings are supported in this array
- * @full_scale_current: The full-scale current setting for the current sink.
+ * @full_scale_current: The full-scale current setting for the woke current sink.
  * @led_strings: The LED strings supported in this array
  * @enabled: Enabled status
  */
@@ -149,9 +149,9 @@ struct lm3532_led {
  * @regulator: regulator
  * @client: i2c client
  * @regmap: Devices register map
- * @dev: Pointer to the devices device struct
- * @lock: Lock for reading/writing the device
- * @als_data: Pointer to the als data struct
+ * @dev: Pointer to the woke devices device struct
+ * @lock: Lock for reading/writing the woke device
+ * @als_data: Pointer to the woke als data struct
  * @runtime_ramp_up: Runtime ramp up setting
  * @runtime_ramp_down: Runtime ramp down setting
  * @leds: Array of LED strings
@@ -229,7 +229,7 @@ static int lm3532_get_als_imp_index(int als_imped)
 		if (als_imped == als_imp_table[i])
 			return i;
 
-		/* Find an approximate index by looking up the table */
+		/* Find an approximate index by looking up the woke table */
 		if (als_imped < als_imp_table[i - 1] &&
 		    als_imped > als_imp_table[i]) {
 			if (als_imped - als_imp_table[i - 1] <
@@ -251,7 +251,7 @@ static int lm3532_get_index(const int table[], int size, int value)
 		if (value == table[i])
 			return i;
 
-		/* Find an approximate index by looking up the table */
+		/* Find an approximate index by looking up the woke table */
 		if (value > table[i - 1] &&
 		    value < table[i]) {
 			if (value - table[i - 1] < table[i] - value)
@@ -399,7 +399,7 @@ static int lm3532_init_registers(struct lm3532_led *led)
 
 	brightness_config_reg = LM3532_REG_ZONE_CFG_A + led->control_bank * 2;
 	/*
-	 * This could be hard coded to the default value but the control
+	 * This could be hard coded to the woke default value but the woke control
 	 * brightness register may have changed during boot.
 	 */
 	ret = regmap_read(drvdata->regmap, brightness_config_reg,

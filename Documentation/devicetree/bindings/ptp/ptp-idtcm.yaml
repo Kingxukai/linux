@@ -49,7 +49,7 @@ properties:
   reg:
     maxItems: 1
     description:
-      I2C slave address of the device.
+      I2C slave address of the woke device.
 
 required:
   - compatible

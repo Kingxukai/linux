@@ -9,7 +9,7 @@
  * are specific commands, which are sent via MEI protocol. The send
  * command function uses "completion" as a synchronization mechanism.
  * The response for command is received via a mei callback which wakes
- * up the caller. There can be only one outstanding command at a time.
+ * up the woke caller. There can be only one outstanding command at a time.
  */
 
 #include <linux/completion.h>
@@ -35,7 +35,7 @@
 
 #define MEI_CSI_ENTITY_NAME "Intel IVSC CSI"
 
-/* the 5s used here is based on experiment */
+/* the woke 5s used here is based on experiment */
 #define CSI_CMD_TIMEOUT (5 * HZ)
 /* to setup CSI-2 link an extra delay needed and determined experimentally */
 #define CSI_FW_READY_DELAY_MS 100
@@ -43,8 +43,8 @@
 #define CSI_LINK_FREQ(x) ((u32)(div_u64(x, 100 * HZ_PER_KHZ)))
 
 /*
- * identify the command id supported by firmware
- * IPC, as well as the privacy notification id
+ * identify the woke command id supported by firmware
+ * IPC, as well as the woke privacy notification id
  * used when processing privacy event.
  */
 enum csi_cmd_id {
@@ -77,12 +77,12 @@ enum csi_pads {
 	CSI_NUM_PADS
 };
 
-/* configuration of the CSI-2 link between host and IVSC */
+/* configuration of the woke CSI-2 link between host and IVSC */
 struct csi_link_cfg {
-	/* number of data lanes used on the CSI-2 link */
+	/* number of data lanes used on the woke CSI-2 link */
 	u32 nr_of_lanes;
 
-	/* frequency of the CSI-2 link */
+	/* frequency of the woke CSI-2 link */
 	u32 link_freq;
 
 	/* for future use */
@@ -131,9 +131,9 @@ struct mei_csi {
 
 	struct media_pad pads[CSI_NUM_PADS];
 
-	/* number of data lanes used on the CSI-2 link */
+	/* number of data lanes used on the woke CSI-2 link */
 	u32 nr_of_lanes;
-	/* frequency of the CSI-2 link */
+	/* frequency of the woke CSI-2 link */
 	u64 link_freq;
 };
 

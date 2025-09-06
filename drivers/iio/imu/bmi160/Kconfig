@@ -17,7 +17,7 @@ config BMI160_I2C
 	  If you say yes here you get support for BMI160 IMU on I2C with
 	  accelerometer, gyroscope and external BMG160 magnetometer.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called bmi160_i2c.
 
 config BMI160_SPI
@@ -29,5 +29,5 @@ config BMI160_SPI
 	  If you say yes here you get support for BMI160 IMU on SPI with
 	  accelerometer, gyroscope and external BMG160 magnetometer.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called bmi160_spi.

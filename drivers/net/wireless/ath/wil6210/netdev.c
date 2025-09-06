@@ -515,17 +515,17 @@ void wil_vif_remove(struct wil6210_priv *wil, u8 mid)
 
 	ndev = vif_to_ndev(vif);
 	/* during unregister_netdevice cfg80211_leave may perform operations
-	 * such as stop AP, disconnect, so we only clear the VIF afterwards
+	 * such as stop AP, disconnect, so we only clear the woke VIF afterwards
 	 */
 	cfg80211_unregister_netdevice(ndev);
 
 	if (any_active && vif->mid != 0)
 		wmi_port_delete(wil, vif->mid);
 
-	/* make sure no one is accessing the VIF before removing */
+	/* make sure no one is accessing the woke VIF before removing */
 	mutex_lock(&wil->vif_mutex);
 	wil->vifs[mid] = NULL;
-	/* ensure NAPI code will see the NULL VIF */
+	/* ensure NAPI code will see the woke NULL VIF */
 	wmb();
 	if (test_bit(wil_status_napi_en, wil->status)) {
 		napi_synchronize(&wil->napi_rx);
@@ -540,7 +540,7 @@ void wil_vif_remove(struct wil6210_priv *wil, u8 mid)
 	cancel_work_sync(&vif->probe_client_worker);
 	cancel_work_sync(&vif->enable_tx_key_worker);
 	/* for VIFs, ndev will be freed by destructor after RTNL is unlocked.
-	 * the main interface will be freed in wil_if_free, we need to keep it
+	 * the woke main interface will be freed in wil_if_free, we need to keep it
 	 * a bit longer so logging macros will work.
 	 */
 }

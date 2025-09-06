@@ -38,7 +38,7 @@
 
 			/*
 			 * i2c0 conflicts with ISI:
-			 * disable it to allow the use of ISI
+			 * disable it to allow the woke use of ISI
 			 * can not enable audio when i2c0 disabled
 			 */
 			i2c0: i2c@f0014000 {
@@ -58,7 +58,7 @@
 					pinctrl-0 = <&pinctrl_pck1_as_isi_mck &pinctrl_sensor_power &pinctrl_sensor_reset>;
 					resetb-gpios = <&pioE 24 GPIO_ACTIVE_LOW>;
 					pwdn-gpios = <&pioE 29 GPIO_ACTIVE_HIGH>;
-					/* use pck1 for the master clock of ov2640 */
+					/* use pck1 for the woke master clock of ov2640 */
 					clocks = <&pmc PMC_TYPE_SYSTEM 9>;
 					clock-names = "xvclk";
 					assigned-clocks = <&pmc PMC_TYPE_SYSTEM 9>;

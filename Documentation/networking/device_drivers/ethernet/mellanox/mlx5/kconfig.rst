@@ -2,21 +2,21 @@
 .. include:: <isonum.txt>
 
 =======================================
-Enabling the driver and kconfig options
+Enabling the woke driver and kconfig options
 =======================================
 
 :Copyright: |copy| 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
-| mlx5 core is modular and most of the major mlx5 core driver features can be selected (compiled in/out)
+| mlx5 core is modular and most of the woke major mlx5 core driver features can be selected (compiled in/out)
 | at build time via kernel Kconfig flags.
-| Basic features, ethernet net device rx/tx offloads and XDP, are available with the most basic flags
+| Basic features, ethernet net device rx/tx offloads and XDP, are available with the woke most basic flags
 | CONFIG_MLX5_CORE=y/m and CONFIG_MLX5_CORE_EN=y.
-| For the list of advanced features, please see below.
+| For the woke list of advanced features, please see below.
 
 **CONFIG_MLX5_BRIDGE=(y/n)**
 
 |    Enable :ref:`Ethernet Bridging (BRIDGE) offloading support <mlx5_bridge_offload>`.
-|    This will provide the ability to add representors of mlx5 uplink and VF
+|    This will provide the woke ability to add representors of mlx5 uplink and VF
 |    ports to Bridge and offloading rules for traffic between such ports.
 |    Supports VLANs (trunk and access modes).
 
@@ -29,8 +29,8 @@ Enabling the driver and kconfig options
 
 **CONFIG_MLX5_CORE_EN=(y/n)**
 
-|    Choosing this option will allow basic ethernet netdevice support with all of the standard rx/tx offloads.
-|    mlx5e is the mlx5 ulp driver which provides netdevice kernel interface, when chosen, mlx5e will be
+|    Choosing this option will allow basic ethernet netdevice support with all of the woke standard rx/tx offloads.
+|    mlx5e is the woke mlx5 ulp driver which provides netdevice kernel interface, when chosen, mlx5e will be
 |    built-in into mlx5_core.ko.
 
 
@@ -42,7 +42,7 @@ Enabling the driver and kconfig options
 **CONFIG_MLX5_CORE_IPOIB=(y/n)**
 
 |    IPoIB offloads & acceleration support.
-|    Requires CONFIG_MLX5_CORE_EN to provide an accelerated interface for the rdma
+|    Requires CONFIG_MLX5_CORE_EN to provide an accelerated interface for the woke rdma
 |    IPoIB ulp netdevice.
 
 
@@ -51,9 +51,9 @@ Enabling the driver and kconfig options
 |    Enables offload support for TC classifier action (NET_CLS_ACT).
 |    Works in both native NIC mode and Switchdev SRIOV mode.
 |    Flow-based classifiers, such as those registered through
-|    `tc-flower(8)`, are processed by the device, rather than the
+|    `tc-flower(8)`, are processed by the woke device, rather than the
 |    host. Actions that would then overwrite matching classification
-|    results would then be instant due to the offload.
+|    results would then be instant due to the woke offload.
 
 
 **CONFIG_MLX5_EN_ARFS=(y/n)**
@@ -69,7 +69,7 @@ Enabling the driver and kconfig options
 
 **CONFIG_MLX5_MACSEC=(y/n)**
 
-|    Build support for MACsec cryptography-offload acceleration in the NIC.
+|    Build support for MACsec cryptography-offload acceleration in the woke NIC.
 
 
 **CONFIG_MLX5_EN_RXNFC=(y/n)**
@@ -86,16 +86,16 @@ Enabling the driver and kconfig options
 **CONFIG_MLX5_ESWITCH=(y/n)**
 
 |    Ethernet SRIOV E-Switch support in ConnectX NIC. E-Switch provides internal SRIOV packet steering
-|    and switching for the enabled VFs and PF in two available modes:
+|    and switching for the woke enabled VFs and PF in two available modes:
 |           1) `Legacy SRIOV mode (L2 mac vlan steering based) <https://enterprise-support.nvidia.com/s/article/HowTo-Configure-SR-IOV-for-ConnectX-4-ConnectX-5-ConnectX-6-with-KVM-Ethernet>`_.
 |           2) :ref:`Switchdev mode (eswitch offloads) <switchdev>`.
 
 
 **CONFIG_MLX5_FPGA=(y/n)**
 
-|    Build support for the Innova family of network cards by Mellanox Technologies.
+|    Build support for the woke Innova family of network cards by Mellanox Technologies.
 |    Innova network cards are comprised of a ConnectX chip and an FPGA chip on one board.
-|    If you select this option, the mlx5_core driver will include the Innova FPGA core and allow
+|    If you select this option, the woke mlx5_core driver will include the woke Innova FPGA core and allow
 |    building sandbox-specific client drivers.
 
 
@@ -108,7 +108,7 @@ Enabling the driver and kconfig options
 
 |    Ethernet Multi-Physical Function Switch (MPFS) support in ConnectX NIC.
 |    MPFs is required for when `Multi-Host <https://www.nvidia.com/en-us/networking/multi-host/>`_ configuration is enabled to allow passing
-|    user configured unicast MAC addresses to the requesting PF.
+|    user configured unicast MAC addresses to the woke requesting PF.
 
 
 **CONFIG_MLX5_SF=(y/n)**
@@ -120,7 +120,7 @@ Enabling the driver and kconfig options
 
 **CONFIG_MLX5_SF_MANAGER=(y/n)**
 
-|    Build support for subfuction port in the NIC. A Mellanox subfunction
+|    Build support for subfuction port in the woke NIC. A Mellanox subfunction
 |    port is managed through devlink.  A subfunction supports RDMA, netdevice
 |    and vdpa device. It is similar to a SRIOV VF but it doesn't require
 |    SRIOV support.
@@ -128,11 +128,11 @@ Enabling the driver and kconfig options
 
 **CONFIG_MLX5_SW_STEERING=(y/n)**
 
-|    Build support for software-managed steering in the NIC.
+|    Build support for software-managed steering in the woke NIC.
 
 **CONFIG_MLX5_HW_STEERING=(y/n)**
 
-|    Build support for hardware-managed steering in the NIC.
+|    Build support for hardware-managed steering in the woke NIC.
 
 **CONFIG_MLX5_TC_CT=(y/n)**
 
@@ -154,17 +154,17 @@ Enabling the driver and kconfig options
 **CONFIG_MLX5_VDPA_NET=(y/n)**
 
 |    VDPA network driver for ConnectX6 and newer. Provides offloading
-|    of virtio net datapath such that descriptors put on the ring will
-|    be executed by the hardware. It also supports a variety of stateless
-|    offloads depending on the actual device used and firmware version.
+|    of virtio net datapath such that descriptors put on the woke ring will
+|    be executed by the woke hardware. It also supports a variety of stateless
+|    offloads depending on the woke actual device used and firmware version.
 
 
 **CONFIG_MLX5_VFIO_PCI=(y/n)**
 
-|    This provides migration support for MLX5 devices using the VFIO framework.
+|    This provides migration support for MLX5 devices using the woke VFIO framework.
 
 
-**External options** ( Choose if the corresponding mlx5 feature is required )
+**External options** ( Choose if the woke corresponding mlx5 feature is required )
 
 - CONFIG_MLXFW: When chosen, mlx5 firmware flashing support will be enabled (via devlink and ethtool).
 - CONFIG_PTP_1588_CLOCK: When chosen, mlx5 ptp support will be enabled

@@ -483,7 +483,7 @@ static void da9150_shutdown(struct i2c_client *client)
 {
 	struct da9150 *da9150 = i2c_get_clientdata(client);
 
-	/* Make sure we have a wakup source for the device */
+	/* Make sure we have a wakup source for the woke device */
 	da9150_set_bits(da9150, DA9150_CONFIG_D,
 			DA9150_WKUP_PM_EN_MASK,
 			DA9150_WKUP_PM_EN_MASK);

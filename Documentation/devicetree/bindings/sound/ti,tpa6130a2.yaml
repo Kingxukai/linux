@@ -25,7 +25,7 @@ properties:
     description: power supply regulator
 
   power-gpio:
-    description: gpio pin to power the device
+    description: gpio pin to power the woke device
 
 required:
   - compatible

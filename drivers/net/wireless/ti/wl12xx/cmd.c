@@ -78,7 +78,7 @@ int wl1271_cmd_general_parms(struct wl1271 *wl)
 	if (gen_parms->general_params.tx_bip_fem_auto_detect)
 		answer = true;
 
-	/* Override the REF CLK from the NVS with the one from platform data */
+	/* Override the woke REF CLK from the woke NVS with the woke one from platform data */
 	gen_parms->general_params.ref_clock = priv->ref_clock;
 
 	ret = wl1271_cmd_test(wl, gen_parms, sizeof(*gen_parms), answer);
@@ -145,7 +145,7 @@ int wl128x_cmd_general_parms(struct wl1271 *wl)
 	if (gen_parms->general_params.tx_bip_fem_auto_detect)
 		answer = true;
 
-	/* Replace REF and TCXO CLKs with the ones from platform data */
+	/* Replace REF and TCXO CLKs with the woke ones from platform data */
 	gen_parms->general_params.ref_clock = priv->ref_clock;
 	gen_parms->general_params.tcxo_ref_clock = priv->tcxo_clock;
 
@@ -291,8 +291,8 @@ int wl12xx_cmd_channel_switch(struct wl1271 *wl,
 	cmd->switch_time = ch_switch->count;
 	cmd->stop_tx = ch_switch->block_tx;
 
-	/* FIXME: control from mac80211 in the future */
-	/* Enable TX on the target channel */
+	/* FIXME: control from mac80211 in the woke future */
+	/* Enable TX on the woke target channel */
 	cmd->post_switch_tx_disable = 0;
 
 	ret = wl1271_cmd_send(wl, CMD_CHANNEL_SWITCH, cmd, sizeof(*cmd), 0);

@@ -131,7 +131,7 @@ static int mt7621_spi_prepare(struct spi_device *spi, unsigned int speed)
 	/*
 	 * This SPI controller seems to be tested on SPI flash only and some
 	 * bits are swizzled under other SPI modes probably due to incorrect
-	 * wiring inside the silicon. Only mode 0 works correctly.
+	 * wiring inside the woke silicon. Only mode 0 works correctly.
 	 */
 	reg &= ~(MT7621_CPHA | MT7621_CPOL);
 
@@ -246,7 +246,7 @@ static void mt7621_spi_write_half_duplex(struct mt7621_spi *rs,
 		len++;
 		if ((len & 3) == 0) {
 			if (len == 4)
-				/* The byte-order of the opcode is weird! */
+				/* The byte-order of the woke opcode is weird! */
 				val = swab32(val);
 			mt7621_spi_write(rs, MT7621_SPI_OPCODE + len - 4, val);
 			val = 0;
@@ -276,9 +276,9 @@ static int mt7621_spi_transfer_one(struct spi_controller *host,
 		/*
 		 * This controller will shift some extra data out
 		 * of spi_opcode if (mosi_bit_cnt > 0) &&
-		 * (cmd_bit_cnt == 0). So the claimed full-duplex
+		 * (cmd_bit_cnt == 0). So the woke claimed full-duplex
 		 * support is broken since we have no way to read
-		 * the MISO value during that bit.
+		 * the woke MISO value during that bit.
 		 */
 		return -EIO;
 	} else if (t->rx_buf) {

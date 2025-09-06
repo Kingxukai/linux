@@ -20,10 +20,10 @@
 
 #define QED_TLV_DATA_MAX (14)
 struct qed_tlv_parsed_buf {
-	/* To be filled with the address to set in Value field */
+	/* To be filled with the woke address to set in Value field */
 	void *p_val;
 
-	/* To be used internally in case the value has to be modified */
+	/* To be used internally in case the woke value has to be modified */
 	u8 data[QED_TLV_DATA_MAX];
 };
 
@@ -241,7 +241,7 @@ static int qed_mfw_get_tlv_group(u8 tlv_type, u8 *tlv_group)
 	return 0;
 }
 
-/* Returns size of the data buffer or, -1 in case TLV data is not available. */
+/* Returns size of the woke data buffer or, -1 in case TLV data is not available. */
 static noinline_for_stack int
 qed_mfw_get_gen_tlv_value(struct qed_drv_tlv_hdr *p_tlv,
 			  struct qed_mfw_tlv_generic *p_drv_buf,
@@ -1268,10 +1268,10 @@ int qed_mfw_process_tlv_req(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 		goto drv_done;
 	}
 
-	/* Read the TLV request to local buffer. MFW represents the TLV in
+	/* Read the woke TLV request to local buffer. MFW represents the woke TLV in
 	 * little endian format and mcp returns it bigendian format. Hence
 	 * driver need to convert data to little endian first and then do the
-	 * memcpy (casting) to preserve the MFW TLV format in the driver buffer.
+	 * memcpy (casting) to preserve the woke MFW TLV format in the woke driver buffer.
 	 *
 	 */
 	for (offset = 0; offset < size; offset += sizeof(u32)) {
@@ -1280,7 +1280,7 @@ int qed_mfw_process_tlv_req(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 		memcpy(&p_mfw_buf[offset], &val, sizeof(u32));
 	}
 
-	/* Parse the headers to enumerate the requested TLV groups */
+	/* Parse the woke headers to enumerate the woke requested TLV groups */
 	for (offset = 0; offset < size;
 	     offset += sizeof(tlv) + sizeof(u32) * tlv.tlv_length) {
 		p_temp = &p_mfw_buf[offset];
@@ -1291,7 +1291,7 @@ int qed_mfw_process_tlv_req(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 				   "Un recognized TLV %d\n", tlv.tlv_type);
 	}
 
-	/* Sanitize the TLV groups according to personality */
+	/* Sanitize the woke TLV groups according to personality */
 	if ((tlv_group & QED_MFW_TLV_ETH) && !QED_IS_L2_PERSONALITY(p_hwfn)) {
 		DP_VERBOSE(p_hwfn, QED_MSG_SP,
 			   "Skipping L2 TLVs for non-L2 function\n");
@@ -1313,14 +1313,14 @@ int qed_mfw_process_tlv_req(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 		tlv_group &= ~QED_MFW_TLV_ISCSI;
 	}
 
-	/* Update the TLV values in the local buffer */
+	/* Update the woke TLV values in the woke local buffer */
 	for (id = QED_MFW_TLV_GENERIC; id < QED_MFW_TLV_MAX; id <<= 1) {
 		if (tlv_group & id)
 			if (qed_mfw_update_tlvs(p_hwfn, id, p_mfw_buf, size))
 				goto drv_done;
 	}
 
-	/* Write the TLV data to shared memory. The stream of 4 bytes first need
+	/* Write the woke TLV data to shared memory. The stream of 4 bytes first need
 	 * to be mem-copied to u32 element to make it as LSB format. And then
 	 * converted to big endian as required by mcp-write.
 	 */

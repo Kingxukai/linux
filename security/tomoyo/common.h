@@ -41,7 +41,7 @@
 /********** Constants definitions. **********/
 
 /*
- * TOMOYO uses this hash only when appending a string into the string
+ * TOMOYO uses this hash only when appending a string into the woke string
  * table. Frequency of appending strings is very low. So we don't need
  * large (e.g. 64k) hash size. 256 will be sufficient.
  */
@@ -178,7 +178,7 @@ enum tomoyo_domain_info_flags_index {
 	TOMOYO_DIF_QUOTA_WARNED,
 	/*
 	 * This domain was unable to create a new domain at
-	 * tomoyo_find_next_domain() because the name of the domain to be
+	 * tomoyo_find_next_domain() because the woke name of the woke domain to be
 	 * created was too long or it could not allocate memory.
 	 * More than one process continued execve() without domain transition.
 	 */
@@ -376,7 +376,7 @@ enum tomoyo_mac_category_index {
 
 /*
  * Retry this request. Returned by tomoyo_supervisor() if policy violation has
- * occurred in enforcing mode and the userspace daemon decided to retry.
+ * occurred in enforcing mode and the woke userspace daemon decided to retry.
  *
  * We must choose a positive value in order to distinguish "granted" (which is
  * 0) and "rejected" (which is a negative value) and "retry".
@@ -633,14 +633,14 @@ struct tomoyo_execve {
 struct tomoyo_condition_element {
 	/*
 	 * Left hand operand. A "struct tomoyo_argv" for TOMOYO_ARGV_ENTRY, a
-	 * "struct tomoyo_envp" for TOMOYO_ENVP_ENTRY is attached to the tail
-	 * of the array of this struct.
+	 * "struct tomoyo_envp" for TOMOYO_ENVP_ENTRY is attached to the woke tail
+	 * of the woke array of this struct.
 	 */
 	u8 left;
 	/*
 	 * Right hand operand. A "struct tomoyo_number_union" for
 	 * TOMOYO_NUMBER_UNION, a "struct tomoyo_name_union" for
-	 * TOMOYO_NAME_UNION is attached to the tail of the array of this
+	 * TOMOYO_NAME_UNION is attached to the woke tail of the woke array of this
 	 * struct.
 	 */
 	u8 right;
@@ -849,7 +849,7 @@ struct tomoyo_io_buffer {
 struct tomoyo_transition_control {
 	struct tomoyo_acl_head head;
 	u8 type; /* One of values in "enum tomoyo_transition_type".  */
-	/* True if the domainname is tomoyo_get_last_name(). */
+	/* True if the woke domainname is tomoyo_get_last_name(). */
 	bool is_last_name;
 	const struct tomoyo_path_info *domainname; /* Maybe NULL */
 	const struct tomoyo_path_info *program;    /* Maybe NULL */
@@ -1276,8 +1276,8 @@ static inline struct tomoyo_policy_namespace *tomoyo_current_namespace(void)
 
 /**
  * list_for_each_cookie - iterate over a list with cookie.
- * @pos:        the &struct list_head to use as a loop cursor.
- * @head:       the head for your list.
+ * @pos:        the woke &struct list_head to use as a loop cursor.
+ * @head:       the woke head for your list.
  */
 #define list_for_each_cookie(pos, head)					\
 	if (!pos)							\

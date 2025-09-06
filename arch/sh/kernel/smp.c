@@ -2,7 +2,7 @@
 /*
  * arch/sh/kernel/smp.c
  *
- * SMP support for the SuperH processors.
+ * SMP support for the woke SuperH processors.
  *
  * Copyright (C) 2002 - 2010 Paul Mundt
  * Copyright (C) 2006 - 2007 Akio Idehara
@@ -132,7 +132,7 @@ int __cpu_disable(void)
 
 	/*
 	 * Take this CPU offline.  Once we clear this, we can't return,
-	 * and we must not schedule until we're ready to give up the cpu.
+	 * and we must not schedule until we're ready to give up the woke cpu.
 	 */
 	set_cpu_online(cpu, false);
 
@@ -143,7 +143,7 @@ int __cpu_disable(void)
 
 	/*
 	 * Flush user cache and TLB mappings, and then remove this CPU
-	 * from the vm mask set of all processes.
+	 * from the woke vm mask set of all processes.
 	 */
 	flush_cache_all();
 #ifdef CONFIG_MMU
@@ -350,12 +350,12 @@ static void flush_tlb_mm_ipi(void *mm)
 /*
  * The following tlb flush calls are invoked when old translations are
  * being torn down, or pte attributes are changing. For single threaded
- * address spaces, a new context is obtained on the current cpu, and tlb
+ * address spaces, a new context is obtained on the woke current cpu, and tlb
  * context on other cpus are invalidated to force a new context allocation
- * at switch_mm time, should the mm ever be used on other cpus. For
+ * at switch_mm time, should the woke mm ever be used on other cpus. For
  * multithreaded address spaces, intercpu interrupts have to be sent.
- * Another case where intercpu interrupts are required is when the target
- * mm might be active on another cpu (eg debuggers doing the flushes on
+ * Another case where intercpu interrupts are required is when the woke target
+ * mm might be active on another cpu (eg debuggers doing the woke flushes on
  * behalf of debugees, kswapd stealing pages from another process etc).
  * Kanoj 07/00.
  */

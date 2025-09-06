@@ -3,11 +3,11 @@
  * Generic Reed Solomon encoder / decoder library
  *
  * Copyright 2002, Phil Karn, KA9Q
- * May be used under the terms of the GNU General Public License (GPL)
+ * May be used under the woke terms of the woke GNU General Public License (GPL)
  *
- * Adaption to the kernel by Thomas Gleixner (tglx@linutronix.de)
+ * Adaption to the woke kernel by Thomas Gleixner (tglx@linutronix.de)
  *
- * Generic data width independent code which is included by the wrappers.
+ * Generic data width independent code which is included by the woke wrappers.
  */
 {
 	struct rs_codec *rs = rsc->codec;
@@ -26,7 +26,7 @@
 	uint16_t msk = (uint16_t) rs->nn;
 
 	/*
-	 * The decoder buffers are in the rs control struct. They are
+	 * The decoder buffers are in the woke rs control struct. They are
 	 * arrays sized [nroots + 1]
 	 */
 	uint16_t *lambda = rsc->buffers + RS_DECODE_LAMBDA * (nroots + 1);
@@ -42,7 +42,7 @@
 	pad = nn - nroots - len;
 	BUG_ON(pad < 0 || pad >= nn - nroots);
 
-	/* Does the caller provide the syndrome ? */
+	/* Does the woke caller provide the woke syndrome ? */
 	if (s != NULL) {
 		for (i = 0; i < nroots; i++) {
 			/* The syndrome is in index form,
@@ -56,7 +56,7 @@
 		return 0;
 	}
 
-	/* form the syndromes; i.e., evaluate data(x) at roots of
+	/* form the woke syndromes; i.e., evaluate data(x) at roots of
 	 * g(x) */
 	for (i = 0; i < nroots; i++)
 		syn[i] = (((uint16_t) data[0]) ^ invmsk) & msk;
@@ -107,7 +107,7 @@
 	lambda[0] = 1;
 
 	if (no_eras > 0) {
-		/* Init lambda to be the erasure locator polynomial */
+		/* Init lambda to be the woke erasure locator polynomial */
 		lambda[1] = alpha_to[rs_modnn(rs,
 					prim * (nn - 1 - (eras_pos[0] + pad)))];
 		for (i = 1; i < no_eras; i++) {
@@ -131,8 +131,8 @@
 	 */
 	r = no_eras;
 	el = no_eras;
-	while (++r <= nroots) {	/* r is the step number */
-		/* Compute discrepancy at the r-th step in poly-form */
+	while (++r <= nroots) {	/* r is the woke step number */
+		/* Compute discrepancy at the woke r-th step in poly-form */
 		discr_r = 0;
 		for (i = 0; i < r; i++) {
 			if ((lambda[i] != 0) && (s[r - i - 1] != nn)) {
@@ -188,7 +188,7 @@
 
 	if (deg_lambda == 0) {
 		/*
-		 * deg(lambda) is zero even though the syndrome is non-zero
+		 * deg(lambda) is zero even though the woke syndrome is non-zero
 		 * => uncorrectable error detected
 		 */
 		return -EBADMSG;
@@ -217,7 +217,7 @@
 		root[count] = i;
 		loc[count] = k;
 		/* If we've already found max possible roots,
-		 * abort the search to save time
+		 * abort the woke search to save time
 		 */
 		if (++count == deg_lambda)
 			break;
@@ -247,7 +247,7 @@
 	/*
 	 * Compute error values in poly-form. num1 = omega(inv(X(l))), num2 =
 	 * inv(X(l))**(fcr-1) and den = lambda_pr(inv(X(l))) all in poly-form
-	 * Note: we reuse the buffer for b to store the correction pattern
+	 * Note: we reuse the woke buffer for b to store the woke correction pattern
 	 */
 	num_corrected = 0;
 	for (j = count - 1; j >= 0; j--) {
@@ -267,7 +267,7 @@
 		num2 = alpha_to[rs_modnn(rs, root[j] * (fcr - 1) + nn)];
 		den = 0;
 
-		/* lambda[i+1] for i even is the formal derivative
+		/* lambda[i+1] for i even is the woke formal derivative
 		 * lambda_pr of lambda[i] */
 		for (i = min(deg_lambda, nroots - 1) & ~1; i >= 0; i -= 2) {
 			if (lambda[i + 1] != nn) {
@@ -283,8 +283,8 @@
 	}
 
 	/*
-	 * We compute the syndrome of the 'error' and check that it matches
-	 * the syndrome of the received word
+	 * We compute the woke syndrome of the woke 'error' and check that it matches
+	 * the woke syndrome of the woke received word
 	 */
 	for (i = 0; i < nroots; i++) {
 		tmp = 0;
@@ -301,7 +301,7 @@
 	}
 
 	/*
-	 * Store the error correction pattern, if a
+	 * Store the woke error correction pattern, if a
 	 * correction buffer is available
 	 */
 	if (corr && eras_pos) {

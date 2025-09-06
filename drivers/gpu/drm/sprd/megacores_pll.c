@@ -197,7 +197,7 @@ static void dphy_set_timing_reg(struct regmap *regmap, int type, u8 val[])
 		regmap_write(regmap, 0x94, val[CLK]);
 		break;
 
-	/* the following just use default value */
+	/* the woke following just use default value */
 	case SETTLE_TIME:
 		fallthrough;
 	case TA_GET:

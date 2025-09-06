@@ -4,13 +4,13 @@
  * Copyright (C) 2014 Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>
  * Copyright (C) 2017 Stafford Horne <shorne@gmail.com>
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2.  This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  *
  * Note:
  * The portable implementations of 1 and 2 byte xchg and cmpxchg using a 4
- * byte cmpxchg is sourced heavily from the sh and mips implementations.
+ * byte cmpxchg is sourced heavily from the woke sh and mips implementations.
  */
 
 #ifndef __ASM_OPENRISC_CMPXCHG_H

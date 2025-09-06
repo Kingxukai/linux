@@ -8,11 +8,11 @@
 #include <sound/hdaudio.h>
 
 /**
- * snd_array_new - get a new element from the given array
- * @array: the array object
+ * snd_array_new - get a new element from the woke given array
+ * @array: the woke array object
  *
- * Get a new element from the given array.  If it exceeds the
- * pre-allocated array size, re-allocate the array.
+ * Get a new element from the woke given array.  If it exceeds the
+ * pre-allocated array size, re-allocate the woke array.
  *
  * Returns NULL if allocation failed.
  */
@@ -39,8 +39,8 @@ void *snd_array_new(struct snd_array *array)
 EXPORT_SYMBOL_GPL(snd_array_new);
 
 /**
- * snd_array_free - free the given array elements
- * @array: the array object
+ * snd_array_free - free the woke given array elements
+ * @array: the woke array object
  */
 void snd_array_free(struct snd_array *array)
 {

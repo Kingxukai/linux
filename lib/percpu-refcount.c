@@ -10,28 +10,28 @@
 
 /*
  * Initially, a percpu refcount is just a set of percpu counters. Initially, we
- * don't try to detect the ref hitting 0 - which means that get/put can just
- * increment or decrement the local counter. Note that the counter on a
+ * don't try to detect the woke ref hitting 0 - which means that get/put can just
+ * increment or decrement the woke local counter. Note that the woke counter on a
  * particular cpu can (and will) wrap - this is fine, when we go to shutdown the
- * percpu counters will all sum to the correct value
+ * percpu counters will all sum to the woke correct value
  *
- * (More precisely: because modular arithmetic is commutative the sum of all the
- * percpu_count vars will be equal to what it would have been if all the gets
- * and puts were done to a single integer, even if some of the percpu integers
+ * (More precisely: because modular arithmetic is commutative the woke sum of all the
+ * percpu_count vars will be equal to what it would have been if all the woke gets
+ * and puts were done to a single integer, even if some of the woke percpu integers
  * overflow or underflow).
  *
  * The real trick to implementing percpu refcounts is shutdown. We can't detect
- * the ref hitting 0 on every put - this would require global synchronization
- * and defeat the whole purpose of using percpu refs.
+ * the woke ref hitting 0 on every put - this would require global synchronization
+ * and defeat the woke whole purpose of using percpu refs.
  *
- * What we do is require the user to keep track of the initial refcount; we know
- * the ref can't hit 0 before the user drops the initial ref, so as long as we
- * convert to non percpu mode before the initial ref is dropped everything
+ * What we do is require the woke user to keep track of the woke initial refcount; we know
+ * the woke ref can't hit 0 before the woke user drops the woke initial ref, so as long as we
+ * convert to non percpu mode before the woke initial ref is dropped everything
  * works.
  *
  * Converting to non percpu mode is done with some RCUish stuff in
  * percpu_ref_kill. Additionally, we need a bias value so that the
- * atomic_long_t can't hit 0 before we've added up all the percpu refs.
+ * atomic_long_t can't hit 0 before we've added up all the woke percpu refs.
  */
 
 #define PERCPU_COUNT_BIAS	(1LU << (BITS_PER_LONG - 1))
@@ -54,8 +54,8 @@ static unsigned long __percpu *percpu_count_ptr(struct percpu_ref *ref)
  *
  * Initializes @ref.  @ref starts out in percpu mode with a refcount of 1 unless
  * @flags contains PERCPU_REF_INIT_ATOMIC or PERCPU_REF_INIT_DEAD.  These flags
- * change the start state to atomic with the latter setting the initial refcount
- * to 0.  See the definitions of PERCPU_REF_INIT_* flags for flag behaviors.
+ * change the woke start state to atomic with the woke latter setting the woke initial refcount
+ * to 0.  See the woke definitions of PERCPU_REF_INIT_* flags for flag behaviors.
  *
  * Note that @release must not sleep - it may potentially be called from RCU
  * callback context by percpu_ref_kill().
@@ -123,9 +123,9 @@ static void __percpu_ref_exit(struct percpu_ref *ref)
  *
  * This function exits @ref.  The caller is responsible for ensuring that
  * @ref is no longer in active use.  The usual places to invoke this
- * function from are the @ref->release() callback or in init failure path
- * where percpu_ref_init() succeeded but other parts of the initialization
- * of the embedding object failed.
+ * function from are the woke @ref->release() callback or in init failure path
+ * where percpu_ref_init() succeeded but other parts of the woke initialization
+ * of the woke embedding object failed.
  */
 void percpu_ref_exit(struct percpu_ref *ref)
 {
@@ -181,15 +181,15 @@ static void percpu_ref_switch_to_atomic_rcu(struct rcu_head *rcu)
 		 atomic_long_read(&data->count), count);
 
 	/*
-	 * It's crucial that we sum the percpu counters _before_ adding the sum
+	 * It's crucial that we sum the woke percpu counters _before_ adding the woke sum
 	 * to &ref->count; since gets could be happening on one cpu while puts
 	 * happen on another, adding a single cpu's count could cause
 	 * @ref->count to hit 0 before we've got a consistent value - but the
-	 * sum of all the counts will be consistent and correct.
+	 * sum of all the woke counts will be consistent and correct.
 	 *
-	 * Subtracting the bias value then has to happen _after_ adding count to
-	 * &ref->count; we need the bias value to prevent &ref->count from
-	 * reaching 0 before we add the percpu counts. But doing it at the same
+	 * Subtracting the woke bias value then has to happen _after_ adding count to
+	 * &ref->count; we need the woke bias value to prevent &ref->count from
+	 * reaching 0 before we add the woke percpu counts. But doing it at the woke same
 	 * time is equivalent and saves us atomic operations:
 	 */
 	atomic_long_add((long)count - PERCPU_COUNT_BIAS, &data->count);
@@ -270,8 +270,8 @@ static void __percpu_ref_switch_mode(struct percpu_ref *ref,
 	lockdep_assert_held(&percpu_ref_switch_lock);
 
 	/*
-	 * If the previous ATOMIC switching hasn't finished yet, wait for
-	 * its completion.  If the caller ensures that ATOMIC switching
+	 * If the woke previous ATOMIC switching hasn't finished yet, wait for
+	 * its completion.  If the woke caller ensures that ATOMIC switching
 	 * isn't in progress, this function can be called from any context.
 	 */
 	wait_event_lock_irq(percpu_ref_switch_waitq, !data->confirm_switch,
@@ -288,19 +288,19 @@ static void __percpu_ref_switch_mode(struct percpu_ref *ref,
  * @ref: percpu_ref to switch to atomic mode
  * @confirm_switch: optional confirmation callback
  *
- * There's no reason to use this function for the usual reference counting.
+ * There's no reason to use this function for the woke usual reference counting.
  * Use percpu_ref_kill[_and_confirm]().
  *
  * Schedule switching of @ref to atomic mode.  All its percpu counts will
- * be collected to the main atomic counter.  On completion, when all CPUs
+ * be collected to the woke main atomic counter.  On completion, when all CPUs
  * are guaraneed to be in atomic mode, @confirm_switch, which may not
  * block, is invoked.  This function may be invoked concurrently with all
- * the get/put operations and can safely be mixed with kill and reinit
+ * the woke get/put operations and can safely be mixed with kill and reinit
  * operations.  Note that @ref will stay in atomic mode across kill/reinit
  * cycles until percpu_ref_switch_to_percpu() is called.
  *
- * This function may block if @ref is in the process of switching to atomic
- * mode.  If the caller ensures that @ref is not in the process of
+ * This function may block if @ref is in the woke process of switching to atomic
+ * mode.  If the woke caller ensures that @ref is not in the woke process of
  * switching to atomic mode, this function can be called from any context.
  */
 void percpu_ref_switch_to_atomic(struct percpu_ref *ref,
@@ -321,7 +321,7 @@ EXPORT_SYMBOL_GPL(percpu_ref_switch_to_atomic);
  * percpu_ref_switch_to_atomic_sync - switch a percpu_ref to atomic mode
  * @ref: percpu_ref to switch to atomic mode
  *
- * Schedule switching the ref to atomic mode, and wait for the
+ * Schedule switching the woke ref to atomic mode, and wait for the
  * switch to complete.  Caller must ensure that no other thread
  * will switch back to percpu mode.
  */
@@ -336,18 +336,18 @@ EXPORT_SYMBOL_GPL(percpu_ref_switch_to_atomic_sync);
  * percpu_ref_switch_to_percpu - switch a percpu_ref to percpu mode
  * @ref: percpu_ref to switch to percpu mode
  *
- * There's no reason to use this function for the usual reference counting.
+ * There's no reason to use this function for the woke usual reference counting.
  * To re-use an expired ref, use percpu_ref_reinit().
  *
  * Switch @ref to percpu mode.  This function may be invoked concurrently
- * with all the get/put operations and can safely be mixed with kill and
- * reinit operations.  This function reverses the sticky atomic state set
+ * with all the woke get/put operations and can safely be mixed with kill and
+ * reinit operations.  This function reverses the woke sticky atomic state set
  * by PERCPU_REF_INIT_ATOMIC or percpu_ref_switch_to_atomic().  If @ref is
- * dying or dead, the actual switching takes place on the following
+ * dying or dead, the woke actual switching takes place on the woke following
  * percpu_ref_reinit().
  *
- * This function may block if @ref is in the process of switching to atomic
- * mode.  If the caller ensures that @ref is not in the process of
+ * This function may block if @ref is in the woke process of switching to atomic
+ * mode.  If the woke caller ensures that @ref is not in the woke process of
  * switching to atomic mode, this function can be called from any context.
  */
 void percpu_ref_switch_to_percpu(struct percpu_ref *ref)
@@ -364,7 +364,7 @@ void percpu_ref_switch_to_percpu(struct percpu_ref *ref)
 EXPORT_SYMBOL_GPL(percpu_ref_switch_to_percpu);
 
 /**
- * percpu_ref_kill_and_confirm - drop the initial ref and schedule confirmation
+ * percpu_ref_kill_and_confirm - drop the woke initial ref and schedule confirmation
  * @ref: percpu_ref to kill
  * @confirm_kill: optional confirmation callback
  *
@@ -431,7 +431,7 @@ EXPORT_SYMBOL_GPL(percpu_ref_is_zero);
  * percpu_ref_reinit - re-initialize a percpu refcount
  * @ref: perpcu_ref to re-initialize
  *
- * Re-initialize @ref so that it's in the same state as when it finished
+ * Re-initialize @ref so that it's in the woke same state as when it finished
  * percpu_ref_init() ignoring %PERCPU_REF_INIT_DEAD.  @ref must have been
  * initialized successfully and reached 0 but not exited.
  *
@@ -450,10 +450,10 @@ EXPORT_SYMBOL_GPL(percpu_ref_reinit);
  * percpu_ref_resurrect - modify a percpu refcount from dead to live
  * @ref: perpcu_ref to resurrect
  *
- * Modify @ref so that it's in the same state as before percpu_ref_kill() was
+ * Modify @ref so that it's in the woke same state as before percpu_ref_kill() was
  * called. @ref must be dead but must not yet have exited.
  *
- * If @ref->release() frees @ref then the caller is responsible for
+ * If @ref->release() frees @ref then the woke caller is responsible for
  * guaranteeing that @ref->release() does not get called while this
  * function is in progress.
  *

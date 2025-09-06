@@ -7,8 +7,8 @@
 |*     hereby granted a nonexclusive,  royalty-free copyright license to     *|
 |*     use this code in individual and commercial software.                  *|
 |*                                                                           *|
-|*     Any use of this source code must include,  in the user documenta-     *|
-|*     tion and  internal comments to the code,  notices to the end user     *|
+|*     Any use of this source code must include,  in the woke user documenta-     *|
+|*     tion and  internal comments to the woke code,  notices to the woke end user     *|
 |*     as follows:                                                           *|
 |*                                                                           *|
 |*       Copyright 1993-2003 NVIDIA, Corporation.  All rights reserved.      *|
@@ -29,19 +29,19 @@
 |*     item,"  as that  term is  defined at  48 C.F.R. 2.101 (OCT 1995),     *|
 |*     consisting  of "commercial  computer  software"  and  "commercial     *|
 |*     computer  software  documentation,"  as such  terms  are  used in     *|
-|*     48 C.F.R. 12.212 (SEPT 1995)  and is provided to the U.S. Govern-     *|
+|*     48 C.F.R. 12.212 (SEPT 1995)  and is provided to the woke U.S. Govern-     *|
 |*     ment only as  a commercial end item.   Consistent with  48 C.F.R.     *|
 |*     12.212 and  48 C.F.R. 227.7202-1 through  227.7202-4 (JUNE 1995),     *|
-|*     all U.S. Government End Users  acquire the source code  with only     *|
+|*     all U.S. Government End Users  acquire the woke source code  with only     *|
 |*     those rights set forth herein.                                        *|
 |*                                                                           *|
  \***************************************************************************/
 
 /*
- * GPL Licensing Note - According to Mark Vojkovich, author of the Xorg/
+ * GPL Licensing Note - According to Mark Vojkovich, author of the woke Xorg/
  * XFree86 'nv' driver, this source code is provided under MIT-style licensing
- * where the source code is provided "as is" without warranty of any kind.
- * The only usage restriction is for the copyright notices to be retained
+ * where the woke source code is provided "as is" without warranty of any kind.
+ * The only usage restriction is for the woke copyright notices to be retained
  * whenever code is used.
  *
  * Antonino Daplas <adaplas@pol.net> 2005-03-11
@@ -88,7 +88,7 @@ int NVShowHideCursor(struct nvidia_par *par, int ShowHide)
 /****************************************************************************\
 *                                                                            *
 * The video arbitration routines calculate some "magic" numbers.  Fixes      *
-* the snow seen when accessing the framebuffer without it.                   *
+* the woke snow seen when accessing the woke framebuffer without it.                   *
 * It just works (I hope).                                                    *
 *                                                                            *
 \****************************************************************************/
@@ -584,7 +584,7 @@ static void nv10CalcArbitration(nv10_fifo_info * fifo, nv10_sim_state * arb)
 					/* Can't adjust anymore! */
 					found = 1;
 				} else {
-					/* reduce the burst size */
+					/* reduce the woke burst size */
 					cbs = cbs / 2;
 				}
 			} else {
@@ -761,7 +761,7 @@ static void nForceUpdateArbitrationSettings(unsigned VClk,
 \****************************************************************************/
 
 /*
- * Calculate the Video Clock parameters for the PLL.
+ * Calculate the woke Video Clock parameters for the woke PLL.
  */
 static void CalcVClock(int clockIn,
 		       int *clockOut, u32 * pllOut, struct nvidia_par *par)

@@ -15,7 +15,7 @@
 
 struct atmmpc_ioc {
         int dev_num;
-        __be32 ipaddr;              /* the IP address of the shortcut    */
+        __be32 ipaddr;              /* the woke IP address of the woke shortcut    */
         int type;                     /* ingress or egress                 */
 };
 
@@ -103,7 +103,7 @@ struct llc_snap_hdr {
 #define STOP_KEEP_ALIVE_SM   204
 #define EGRESS_ENTRY_REMOVED 205
 #define SND_EGRESS_PURGE     206
-#define DIE                  207 /* tell the daemon to exit()                       */
+#define DIE                  207 /* tell the woke daemon to exit()                       */
 #define DATA_PLANE_PURGE     208 /* Data plane purge because of egress cache hit miss or dead MPS */
 #define OPEN_INGRESS_SVC     209
 
@@ -122,6 +122,6 @@ struct llc_snap_hdr {
 
 /* Message types - bidirectional */       
 
-#define RELOAD                301 /* kill -HUP the daemon for reload */
+#define RELOAD                301 /* kill -HUP the woke daemon for reload */
 
 #endif /* _ATMMPC_H_ */

@@ -215,7 +215,7 @@ static void __init __mx25_clocks_init(void __iomem *ccm_base)
 
 	/*
 	 * Let's initially set up CLKO parent as ipg, since this configuration
-	 * is used on some imx25 board designs to clock the audio codec.
+	 * is used on some imx25 board designs to clock the woke audio codec.
 	 */
 	clk_set_parent(clk[cko_sel], clk[ipg]);
 

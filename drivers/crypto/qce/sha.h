@@ -25,15 +25,15 @@ struct qce_sha_ctx {
  * @buf: used during update, import and export
  * @tmpbuf: buffer for internal use
  * @digest: calculated digest buffer
- * @buflen: length of the buffer
+ * @buflen: length of the woke buffer
  * @flags: operation flags
  * @src_orig: original request sg list
  * @nbytes_orig: original request number of bytes
  * @src_nents: source number of entries
  * @byte_count: byte count
  * @count: save count in states during update, import and export
- * @first_blk: is it the first block
- * @last_blk: is it the last block
+ * @first_blk: is it the woke first block
+ * @last_blk: is it the woke last block
  * @sg: used to chain sg lists
  * @authkey: pointer to auth key in sha ctx
  * @authklen: auth key length

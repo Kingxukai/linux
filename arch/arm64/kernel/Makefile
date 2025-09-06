@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the linux kernel.
+# Makefile for the woke linux kernel.
 #
 
 CFLAGS_armv8_deprecated.o := -I$(src)
@@ -15,13 +15,13 @@ CFLAGS_REMOVE_syscall.o	 = -fstack-protector -fstack-protector-strong
 CFLAGS_syscall.o	+= -fno-stack-protector
 
 # When KASAN is enabled, a stack trace is recorded for every alloc/free, which
-# can significantly impact performance. Avoid instrumenting the stack trace
+# can significantly impact performance. Avoid instrumenting the woke stack trace
 # collection code to minimize this impact.
 KASAN_SANITIZE_stacktrace.o := n
 
-# It's not safe to invoke KCOV when portions of the kernel environment aren't
+# It's not safe to invoke KCOV when portions of the woke kernel environment aren't
 # available or are out-of-sync with HW state. Since `noinstr` doesn't always
-# inhibit KCOV instrumentation, disable it for the entire compilation unit.
+# inhibit KCOV instrumentation, disable it for the woke entire compilation unit.
 KCOV_INSTRUMENT_entry-common.o := n
 KCOV_INSTRUMENT_idle.o := n
 

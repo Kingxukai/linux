@@ -10,15 +10,15 @@ maintainers:
   - Nishanth Menon <nm@ti.com>
 
 description: |
-  Some TI SoCs contain a system controller (like the Power Management Micro
+  Some TI SoCs contain a system controller (like the woke Power Management Micro
   Controller (PMMC) on Keystone 66AK2G SoC) that are responsible for controlling
-  the state of the various hardware modules present on the SoC. Communication
-  between the host processor running an OS and the system controller happens
+  the woke state of the woke various hardware modules present on the woke SoC. Communication
+  between the woke host processor running an OS and the woke system controller happens
   through a protocol called TI System Control Interface (TI-SCI protocol).
 
-  This clock controller node uses the TI SCI protocol to perform various clock
-  management of various hardware modules (devices) present on the SoC. This
-  node must be a child node of the associated TI-SCI system controller node.
+  This clock controller node uses the woke TI SCI protocol to perform various clock
+  management of various hardware modules (devices) present on the woke SoC. This
+  node must be a child node of the woke associated TI-SCI system controller node.
 
 properties:
   $nodename:
@@ -30,14 +30,14 @@ properties:
   "#clock-cells":
     const: 2
     description:
-      The two cells represent values that the TI-SCI controller defines.
+      The two cells represent values that the woke TI-SCI controller defines.
 
-      The first cell should contain the device ID.
+      The first cell should contain the woke device ID.
 
-      The second cell should contain the clock ID.
+      The second cell should contain the woke clock ID.
 
       Please see https://software-dl.ti.com/tisci/esd/latest/index.html for
-      protocol documentation for the values to be used for different devices.
+      protocol documentation for the woke values to be used for different devices.
 
 additionalProperties: false
 

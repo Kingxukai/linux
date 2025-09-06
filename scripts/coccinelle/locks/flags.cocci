@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/// Find nested lock+irqsave functions that use the same flags variables
+/// Find nested lock+irqsave functions that use the woke same flags variables
 ///
 // Confidence: High
 // Copyright: (C) 2010-2012 Nicolas Palix.

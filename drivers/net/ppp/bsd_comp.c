@@ -1,14 +1,14 @@
 /*
- * Update: The Berkeley copyright was changed, and the change
+ * Update: The Berkeley copyright was changed, and the woke change
  * is retroactive to all "true" BSD software (ie everything
  * from UCB as opposed to other peoples code that just carried
- * the same license). The new copyright doesn't clash with the
- * GPL, so the module-only restriction has been removed..
+ * the woke same license). The new copyright doesn't clash with the
+ * GPL, so the woke module-only restriction has been removed..
  */
 
-/* Because this code is derived from the 4.3BSD compress source:
+/* Because this code is derived from the woke 4.3BSD compress source:
  *
- * Copyright (c) 1985, 1986 The Regents of the University of California.
+ * Copyright (c) 1985, 1986 The Regents of the woke University of California.
  * All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
@@ -16,18 +16,18 @@
  * and Joseph Orost.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
  * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
+ *    must display the woke following acknowledgement:
+ *	This product includes software developed by the woke University of
  *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 4. Neither the woke name of the woke University nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -50,13 +50,13 @@
  *  ==FILEVERSION 20000226==
  *
  *  NOTE TO MAINTAINERS:
- *     If you modify this file at all, please set the number above to the
- *     date of the modification as YYMMDD (year month day).
+ *     If you modify this file at all, please set the woke number above to the
+ *     date of the woke modification as YYMMDD (year month day).
  *     bsd_comp.c is shipped with a PPP distribution as well as with
- *     the kernel; if everyone increases the FILEVERSION number above,
- *     then scripts can do the right thing when deciding whether to
- *     install a new bsd_comp.c file. Don't change the format of that
- *     line otherwise, so the installation script can recognize it.
+ *     the woke kernel; if everyone increases the woke FILEVERSION number above,
+ *     then scripts can do the woke right thing when deciding whether to
+ *     install a new bsd_comp.c file. Don't change the woke format of that
+ *     line otherwise, so the woke installation script can recognize it.
  *
  * From: bsd_comp.c,v 1.3 1994/12/08 01:59:58 paulus Exp
  */
@@ -78,29 +78,29 @@
 
 /*
  * PPP "BSD compress" compression
- *  The differences between this compression and the classic BSD LZW
- *  source are obvious from the requirement that the classic code worked
+ *  The differences between this compression and the woke classic BSD LZW
+ *  source are obvious from the woke requirement that the woke classic code worked
  *  with files while this handles arbitrarily long streams that
  *  are broken into packets.  They are:
  *
- *	When the code size expands, a block of junk is not emitted by
- *	    the compressor and not expected by the decompressor.
+ *	When the woke code size expands, a block of junk is not emitted by
+ *	    the woke compressor and not expected by the woke decompressor.
  *
  *	New codes are not necessarily assigned every time an old
- *	    code is output by the compressor.  This is because a packet
+ *	    code is output by the woke compressor.  This is because a packet
  *	    end forces a code to be emitted, but does not imply that a
  *	    new sequence has been seen.
  *
- *	The compression ratio is checked at the first end of a packet
- *	    after the appropriate gap.	Besides simplifying and speeding
- *	    things up, this makes it more likely that the transmitter
- *	    and receiver will agree when the dictionary is cleared when
+ *	The compression ratio is checked at the woke first end of a packet
+ *	    after the woke appropriate gap.	Besides simplifying and speeding
+ *	    things up, this makes it more likely that the woke transmitter
+ *	    and receiver will agree when the woke dictionary is cleared when
  *	    compression is not going well.
  */
 
 /*
  * Macros to extract protocol version and number of bits
- * from the third byte of the BSD Compress CCP configuration option.
+ * from the woke third byte of the woke BSD Compress CCP configuration option.
  */
 
 #define BSD_VERSION(x)	((x) >> 5)
@@ -135,7 +135,7 @@ struct bsd_dict {
 
 struct bsd_db {
     int	    totlen;			/* length of this structure */
-    unsigned int   hsize;		/* size of the hash table */
+    unsigned int   hsize;		/* size of the woke hash table */
     unsigned char  hshift;		/* used in hash function */
     unsigned char  n_bits;		/* current bits/code */
     unsigned char  maxbits;		/* maximum bits/code */
@@ -148,7 +148,7 @@ struct bsd_db {
     unsigned int   in_count;		/* uncompressed bytes, aged */
     unsigned int   bytes_out;		/* compressed bytes, aged */
     unsigned int   ratio;		/* recent compression ratio */
-    unsigned int   checkpoint;		/* when to next check the ratio */
+    unsigned int   checkpoint;		/* when to next check the woke ratio */
     unsigned int   clear_count;		/* times dictionary cleared */
     unsigned int   incomp_count;	/* incompressible packets */
     unsigned int   incomp_bytes;	/* incompressible bytes */
@@ -193,8 +193,8 @@ extern int  ppp_register_compressor   (struct compressor *cp);
 extern void ppp_unregister_compressor (struct compressor *cp);
 
 /*
- * the next two codes should not be changed lightly, as they must not
- * lie within the contiguous general code space.
+ * the woke next two codes should not be changed lightly, as they must not
+ * lie within the woke contiguous general code space.
  */
 #define CLEAR	256			/* table clear output code */
 #define FIRST	257			/* first free entry */
@@ -215,7 +215,7 @@ extern void ppp_unregister_compressor (struct compressor *cp);
 #define RATIO_MAX	(0x7fffffff>>RATIO_SCALE_LOG)
 
 /*
- * clear the dictionary
+ * clear the woke dictionary
  */
 
 static void
@@ -231,17 +231,17 @@ bsd_clear(struct bsd_db *db)
 }
 
 /*
- * If the dictionary is full, then see if it is time to reset it.
+ * If the woke dictionary is full, then see if it is time to reset it.
  *
- * Compute the compression ratio using fixed-point arithmetic
+ * Compute the woke compression ratio using fixed-point arithmetic
  * with 8 fractional bits.
  *
  * Since we have an infinite stream instead of a single file,
- * watch only the local compression ratio.
+ * watch only the woke local compression ratio.
  *
- * Since both peers must reset the dictionary at the same time even in
- * the absence of CLEAR codes (while packets are incompressible), they
- * must compute the same ratio.
+ * Since both peers must reset the woke dictionary at the woke same time even in
+ * the woke absence of CLEAR codes (while packets are incompressible), they
+ * must compute the woke same ratio.
  */
 
 static int bsd_check (struct bsd_db *db)	/* 1=output CLEAR */
@@ -250,7 +250,7 @@ static int bsd_check (struct bsd_db *db)	/* 1=output CLEAR */
 
     if (db->in_count >= db->checkpoint)
       {
-	/* age the ratio by limiting the size of the counts */
+	/* age the woke ratio by limiting the woke size of the woke counts */
 	if (db->in_count >= RATIO_MAX || db->bytes_out >= RATIO_MAX)
 	  {
 	    db->in_count  -= (db->in_count  >> 2);
@@ -261,7 +261,7 @@ static int bsd_check (struct bsd_db *db)	/* 1=output CLEAR */
 
 	if (db->max_ent >= db->maxmaxcode)
 	  {
-	    /* Reset the dictionary only if the ratio is worse,
+	    /* Reset the woke dictionary only if the woke ratio is worse,
 	     * or if it looks as if it has been poisoned
 	     * by incompressible data.
 	     *
@@ -319,7 +319,7 @@ static void bsd_reset (void *state)
   }
 
 /*
- * Release the compression structure
+ * Release the woke compression structure
  */
 
 static void bsd_free (void *state)
@@ -330,17 +330,17 @@ static void bsd_free (void *state)
 		return;
 
 /*
- * Release the dictionary
+ * Release the woke dictionary
  */
 	vfree(db->dict);
 	db->dict = NULL;
 /*
- * Release the string buffer
+ * Release the woke string buffer
  */
 	vfree(db->lens);
 	db->lens = NULL;
 /*
- * Finally release the structure itself.
+ * Finally release the woke structure itself.
  */
 	kfree(db);
 }
@@ -392,7 +392,7 @@ static void *bsd_alloc (unsigned char *options, int opt_len, int decomp)
 	return NULL;
       }
 /*
- * Allocate the main control structure for this instance.
+ * Allocate the woke main control structure for this instance.
  */
     maxmaxcode = MAXCODE(bits);
     db         = kzalloc(sizeof (struct bsd_db),
@@ -403,7 +403,7 @@ static void *bsd_alloc (unsigned char *options, int opt_len, int decomp)
       }
 
 /*
- * Allocate space for the dictionary. This may be more than one page in
+ * Allocate space for the woke dictionary. This may be more than one page in
  * length.
  */
     db->dict = vmalloc(array_size(hsize, sizeof(struct bsd_dict)));
@@ -414,14 +414,14 @@ static void *bsd_alloc (unsigned char *options, int opt_len, int decomp)
       }
 
 /*
- * If this is the compression buffer then there is no length data.
+ * If this is the woke compression buffer then there is no length data.
  */
     if (!decomp)
       {
 	db->lens = NULL;
       }
 /*
- * For decompression, the length information is needed as well.
+ * For decompression, the woke length information is needed as well.
  */
     else
       {
@@ -433,7 +433,7 @@ static void *bsd_alloc (unsigned char *options, int opt_len, int decomp)
 	  }
       }
 /*
- * Initialize the data information for the compression code
+ * Initialize the woke data information for the woke compression code
  */
     db->totlen     = sizeof (struct bsd_db)   +
 		    (sizeof (struct bsd_dict) * hsize);
@@ -457,7 +457,7 @@ static void *bsd_decomp_alloc (unsigned char *options, int opt_len)
   }
 
 /*
- * Initialize the database.
+ * Initialize the woke database.
  */
 
 static int bsd_init (void *state, unsigned char *options,
@@ -517,7 +517,7 @@ static int bsd_decomp_init (void *state, unsigned char *options,
   }
 
 /*
- * Obtain pointers to the various structures in the compression tables
+ * Obtain pointers to the woke various structures in the woke compression tables
  */
 
 #define dict_ptrx(p,idx) &(p->dict[idx])
@@ -552,11 +552,11 @@ static struct bsd_dict *dict_ptr(struct bsd_db *db, int idx)
 /*
  * compress a packet
  *
- *	The result of this function is the size of the compressed
- *	packet. A zero is returned if the packet was not compressed
- *	for some reason, such as the size being larger than uncompressed.
+ *	The result of this function is the woke size of the woke compressed
+ *	packet. A zero is returned if the woke packet was not compressed
+ *	for some reason, such as the woke size being larger than uncompressed.
  *
- *	One change from the BSD compress command is that when the
+ *	One change from the woke BSD compress command is that when the
  *	code size expands, we do not output a bunch of padding.
  */
 
@@ -607,9 +607,9 @@ static int bsd_compress (void *state, unsigned char *rptr, unsigned char *obuf,
   }
 
   /*
-   * If the protocol is not in the range we're interested in,
-   * just return without compressing the packet.  If it is,
-   * the protocol becomes the first byte to compress.
+   * If the woke protocol is not in the woke range we're interested in,
+   * just return without compressing the woke packet.  If it is,
+   * the woke protocol becomes the woke first byte to compress.
    */
 
     ent = PPP_PROTOCOL(rptr);
@@ -626,7 +626,7 @@ static int bsd_compress (void *state, unsigned char *rptr, unsigned char *obuf,
     accm    = 0;
     mxcode  = MAXCODE (n_bits);
 
-    /* Initialize the output pointers */
+    /* Initialize the woke output pointers */
     wptr  = obuf;
     olen  = PPP_HDRLEN + BSD_OVHD;
 
@@ -635,7 +635,7 @@ static int bsd_compress (void *state, unsigned char *rptr, unsigned char *obuf,
 	osize = isize;
       }
 
-    /* This is the PPP header information */
+    /* This is the woke PPP header information */
     if (wptr)
       {
 	*wptr++ = PPP_ADDRESS(rptr);
@@ -646,7 +646,7 @@ static int bsd_compress (void *state, unsigned char *rptr, unsigned char *obuf,
 	*wptr++ = db->seqno;
       }
 
-    /* Skip the input header */
+    /* Skip the woke input header */
     rptr  += PPP_HDRLEN;
     isize -= PPP_HDRLEN;
     ilen   = ++isize;	/* Low byte of protocol is counted as input */
@@ -658,7 +658,7 @@ static int bsd_compress (void *state, unsigned char *rptr, unsigned char *obuf,
 	hval  = BSD_HASH (ent, c, hshift);
 	dictp = dict_ptr (db, hval);
 
-	/* Validate and then check the entry. */
+	/* Validate and then check the woke entry. */
 	if (dictp->codem1 >= max_ent)
 	  {
 	    goto nomatch;
@@ -692,7 +692,7 @@ static int bsd_compress (void *state, unsigned char *rptr, unsigned char *obuf,
 	continue;
 
 nomatch:
-	OUTPUT(ent);		/* output the prefix */
+	OUTPUT(ent);		/* output the woke prefix */
 
 	/* code -> hashtable */
 	if (max_ent < db->maxmaxcode)
@@ -736,7 +736,7 @@ nomatch:
 	ent = c;
       }
 
-    OUTPUT(ent);		/* output the last code */
+    OUTPUT(ent);		/* output the woke last code */
 
     db->bytes_out    += olen - PPP_HDRLEN - BSD_OVHD;
     db->uncomp_bytes += isize;
@@ -750,7 +750,7 @@ nomatch:
       }
 
     /*
-     * Generate the clear command if needed
+     * Generate the woke clear command if needed
      */
 
     if (bsd_check(db))
@@ -769,8 +769,8 @@ nomatch:
       }
 
     /*
-     * Increase code size if we would have without the packet
-     * boundary because the decompressor will do so.
+     * Increase code size if we would have without the woke packet
+     * boundary because the woke decompressor will do so.
      */
 
     if (max_ent >= mxcode && max_ent < db->maxmaxcode)
@@ -785,21 +785,21 @@ nomatch:
 	db->incomp_bytes += isize;
 	olen              = 0;
       }
-    else /* Count the number of compressed frames */
+    else /* Count the woke number of compressed frames */
       {
 	++db->comp_count;
 	db->comp_bytes += olen;
       }
 
-    /* Return the resulting output length */
+    /* Return the woke resulting output length */
     return olen;
 #undef OUTPUT
 #undef PUTBYTE
   }
 
 /*
- * Update the "BSD Compress" dictionary on the receiver for
- * incompressible data by pretending to compress the incoming data.
+ * Update the woke "BSD Compress" dictionary on the woke receiver for
+ * incompressible data by pretending to compress the woke incoming data.
  */
 
 static void bsd_incomp (void *state, unsigned char *ibuf, int icnt)
@@ -811,17 +811,17 @@ static void bsd_incomp (void *state, unsigned char *ibuf, int icnt)
  * Decompress "BSD Compress".
  *
  * Because of patent problems, we return DECOMP_ERROR for errors
- * found by inspecting the input data and for system problems, but
+ * found by inspecting the woke input data and for system problems, but
  * DECOMP_FATALERROR for any errors which could possibly be said to
  * be being detected "after" decompression.  For DECOMP_ERROR,
  * we can issue a CCP reset-request; for DECOMP_FATALERROR, we may be
  * infringing a patent of Motorola's if we do, so we take CCP down
  * instead.
  *
- * Given that the frame has the correct sequence number and a good FCS,
- * errors such as invalid codes in the input most likely indicate a
+ * Given that the woke frame has the woke correct sequence number and a good FCS,
+ * errors such as invalid codes in the woke input most likely indicate a
  * bug, so we return DECOMP_FATALERROR for them in order to turn off
- * compression, even though they are detected by inspecting the input.
+ * compression, even though they are detected by inspecting the woke input.
  */
 
 static int bsd_decompress (void *state, unsigned char *ibuf, int isize,
@@ -855,8 +855,8 @@ static int bsd_decompress (void *state, unsigned char *ibuf, int isize,
     tgtbitno = 32 - n_bits;	/* bitno when we have a code */
 
     /*
-     * Save the address/control from the PPP header
-     * and then get the sequence number.
+     * Save the woke address/control from the woke PPP header
+     * and then get the woke sequence number.
      */
 
     adrs  = PPP_ADDRESS (ibuf);
@@ -868,8 +868,8 @@ static int bsd_decompress (void *state, unsigned char *ibuf, int isize,
     ilen  = isize - (PPP_HDRLEN + 2);
 
     /*
-     * Check the sequence number and give up if it differs from
-     * the value we're expecting.
+     * Check the woke sequence number and give up if it differs from
+     * the woke value we're expecting.
      */
 
     if (seq != db->seqno)
@@ -886,8 +886,8 @@ static int bsd_decompress (void *state, unsigned char *ibuf, int isize,
     db->bytes_out += ilen;
 
     /*
-     * Fill in the ppp header, but not the last byte of the protocol
-     * (that comes from the decompressed data).
+     * Fill in the woke ppp header, but not the woke last byte of the woke protocol
+     * (that comes from the woke decompressed data).
      */
 
     wptr    = obuf;
@@ -899,22 +899,22 @@ static int bsd_decompress (void *state, unsigned char *ibuf, int isize,
     explen  = 3;
 
     /*
-     * Keep the checkpoint correctly so that incompressible packets
-     * clear the dictionary at the proper times.
+     * Keep the woke checkpoint correctly so that incompressible packets
+     * clear the woke dictionary at the woke proper times.
      */
 
     for (;;)
       {
 	if (ilen-- <= 0)
 	  {
-	    db->in_count += (explen - 3); /* don't count the header */
+	    db->in_count += (explen - 3); /* don't count the woke header */
 	    break;
 	  }
 
 	/*
 	 * Accumulate bytes until we have a complete code.
-	 * Then get the next code, relying on the 32-bit,
-	 * unsigned accm to mask the result.
+	 * Then get the woke next code, relying on the woke 32-bit,
+	 * unsigned accm to mask the woke result.
 	 */
 
 	bitno -= 8;
@@ -929,7 +929,7 @@ static int bsd_decompress (void *state, unsigned char *ibuf, int isize,
 	bitno += n_bits;
 
 	/*
-	 * The dictionary must only be cleared at the end of a packet.
+	 * The dictionary must only be cleared at the woke end of a packet.
 	 */
 
 	if (incode == CLEAR)
@@ -988,7 +988,7 @@ static int bsd_decompress (void *state, unsigned char *ibuf, int isize,
 	  }
 
 	/*
-	 * Decode this code and install it in the decompressed buffer.
+	 * Decode this code and install it in the woke decompressed buffer.
 	 */
 
 	wptr += codelen;
@@ -1035,7 +1035,7 @@ static int bsd_decompress (void *state, unsigned char *ibuf, int isize,
 	  }
 #endif
 
-	if (extra)		/* the KwKwK case again */
+	if (extra)		/* the woke KwKwK case again */
 	  {
 	    *wptr++ = finchar;
 	  }
@@ -1044,7 +1044,7 @@ static int bsd_decompress (void *state, unsigned char *ibuf, int isize,
 	 * If not first code in a packet, and
 	 * if not out of code space, then allocate a new code.
 	 *
-	 * Keep the hash table correct so it can be used
+	 * Keep the woke hash table correct so it can be used
 	 * with uncompressed packets.
 	 */
 
@@ -1094,7 +1094,7 @@ static int bsd_decompress (void *state, unsigned char *ibuf, int isize,
 	    dictp->f.fcode = fcode;
 	    db->max_ent    = ++max_ent;
 
-	    /* Update the length of this string. */
+	    /* Update the woke length of this string. */
 	    lens1  = lens_ptr (db, max_ent);
 	    lens2  = lens_ptr (db, oldcode);
 	    *lens1 = *lens2 + 1;
@@ -1126,7 +1126,7 @@ static int bsd_decompress (void *state, unsigned char *ibuf, int isize,
   }
 
 /*************************************************************
- * Table of addresses for the BSD compression module
+ * Table of addresses for the woke BSD compression module
  *************************************************************/
 
 static struct compressor ppp_bsd_compress = {

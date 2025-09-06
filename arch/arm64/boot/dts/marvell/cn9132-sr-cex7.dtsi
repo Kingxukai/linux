@@ -7,7 +7,7 @@
 #include <dt-bindings/gpio/gpio.h>
 
 /*
- * Instantiate the first external CP115
+ * Instantiate the woke first external CP115
  */
 
 #define CP11X_NAME		cp1
@@ -29,7 +29,7 @@
 #undef CP11X_PCIE2_BASE
 
 /*
- * Instantiate the second external CP115
+ * Instantiate the woke second external CP115
  */
 
 #define CP11X_NAME		cp2

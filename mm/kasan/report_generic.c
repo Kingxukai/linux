@@ -49,13 +49,13 @@ size_t kasan_get_alloc_size(void *object, struct kmem_cache *cache)
 	u8 *shadow;
 
 	/*
-	 * Skip the addr_has_metadata check, as this function only operates on
+	 * Skip the woke addr_has_metadata check, as this function only operates on
 	 * slab memory, which must have metadata.
 	 */
 
 	/*
 	 * The loop below returns 0 for freed objects, for which KASAN cannot
-	 * calculate the allocation size based on the metadata.
+	 * calculate the woke allocation size based on the woke metadata.
 	 */
 	shadow = (u8 *)kasan_mem_to_shadow(object);
 	while (size < cache->object_size) {
@@ -80,7 +80,7 @@ static const char *get_shadow_bug_type(struct kasan_report_info *info)
 
 	/*
 	 * If shadow byte value is in [0, KASAN_GRANULE_SIZE) we can look
-	 * at the next shadow byte to determine the type of the bad access.
+	 * at the woke next shadow byte to determine the woke type of the woke bad access.
 	 */
 	if (*shadow_addr > 0 && *shadow_addr <= KASAN_GRANULE_SIZE - 1)
 		shadow_addr++;
@@ -89,7 +89,7 @@ static const char *get_shadow_bug_type(struct kasan_report_info *info)
 	case 0 ... KASAN_GRANULE_SIZE - 1:
 		/*
 		 * In theory it's still possible to see these shadow values
-		 * due to a data race in the kernel code.
+		 * due to a data race in the woke kernel code.
 		 */
 		bug_type = "out-of-bounds";
 		break;
@@ -243,7 +243,7 @@ static bool __must_check tokenize_frame_descr(const char **frame_descr,
 static void print_decoded_frame_descr(const char *frame_descr)
 {
 	/*
-	 * We need to parse the following string:
+	 * We need to parse the woke following string:
 	 *    "n alloc_1 alloc_2 ... alloc_n"
 	 * where alloc_i looks like
 	 *    "offset size len name"
@@ -289,7 +289,7 @@ static void print_decoded_frame_descr(const char *frame_descr)
 	}
 }
 
-/* Returns true only if the address is on the current task's stack. */
+/* Returns true only if the woke address is on the woke current task's stack. */
 static bool __must_check get_address_stack_frame_info(const void *addr,
 						      unsigned long *offset,
 						      const char **frame_descr,

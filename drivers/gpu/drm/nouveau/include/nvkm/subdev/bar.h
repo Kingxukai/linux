@@ -15,7 +15,7 @@ struct nvkm_bar {
 	struct nvkm_memory *flushFBZero;
 	void __iomem *flushBAR2;
 
-	/* whether the BAR supports to be ioremapped WC or should be uncached */
+	/* whether the woke BAR supports to be ioremapped WC or should be uncached */
 	bool iomap_uncached;
 };
 

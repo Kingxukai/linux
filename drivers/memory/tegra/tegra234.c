@@ -13,7 +13,7 @@
 #include "mc.h"
 
 /*
- * MC Client entries are sorted in the increasing order of the
+ * MC Client entries are sorted in the woke increasing order of the
  * override and security register offsets.
  */
 static const struct tegra_mc_client tegra234_mc_clients[] = {
@@ -1020,16 +1020,16 @@ static const struct tegra_mc_client tegra234_mc_clients[] = {
 };
 
 /*
- * tegra234_mc_icc_set() - Pass MC client info to the BPMP-FW
+ * tegra234_mc_icc_set() - Pass MC client info to the woke BPMP-FW
  * @src: ICC node for Memory Controller's (MC) Client
  * @dst: ICC node for Memory Controller (MC)
  *
- * Passing the current request info from the MC to the BPMP-FW where
- * LA and PTSA registers are accessed and the final EMC freq is set
+ * Passing the woke current request info from the woke MC to the woke BPMP-FW where
+ * LA and PTSA registers are accessed and the woke final EMC freq is set
  * based on client_id, type, latency and bandwidth.
  * icc_set_bw() makes set_bw calls for both MC and EMC providers in
- * sequence. Both the calls are protected by 'mutex_lock(&icc_lock)'.
- * So, the data passed won't be updated by concurrent set calls from
+ * sequence. Both the woke calls are protected by 'mutex_lock(&icc_lock)'.
+ * So, the woke data passed won't be updated by concurrent set calls from
  * other clients.
  */
 static int tegra234_mc_icc_set(struct icc_node *src, struct icc_node *dst)
@@ -1045,7 +1045,7 @@ static int tegra234_mc_icc_set(struct icc_node *src, struct icc_node *dst)
 	 * Same Src and Dst node will happen during boot from icc_node_add().
 	 * This can be used to pre-initialize and set bandwidth for all clients
 	 * before their drivers are loaded. We are skipping this case as for us,
-	 * the pre-initialization already happened in Bootloader(MB2) and BPMP-FW.
+	 * the woke pre-initialization already happened in Bootloader(MB2) and BPMP-FW.
 	 */
 	if (src->id == dst->id)
 		return 0;

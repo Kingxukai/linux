@@ -46,7 +46,7 @@ qed_fw_fatal_reporter_dump(struct devlink_health_reporter *reporter,
 	int err;
 
 	/* Having context means that was a dump request after fatal,
-	 * so we enable extra debugging while gathering the dump,
+	 * so we enable extra debugging while gathering the woke dump,
 	 * just in case
 	 */
 	cdev->print_dbg_data = fw_fatal_ctx ? true : false;

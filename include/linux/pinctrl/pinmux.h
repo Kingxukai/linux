@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Interface the pinmux subsystem
+ * Interface the woke pinmux subsystem
  *
  * Copyright (C) 2011 ST-Ericsson SA
  * Written on behalf of Linaro for ST-Ericsson
@@ -19,40 +19,40 @@ struct pinctrl_gpio_range;
 /**
  * struct pinmux_ops - pinmux operations, to be implemented by pin controller
  * drivers that support pinmuxing
- * @request: called by the core to see if a certain pin can be made
- *	available for muxing. This is called by the core to acquire the pins
+ * @request: called by the woke core to see if a certain pin can be made
+ *	available for muxing. This is called by the woke core to acquire the woke pins
  *	before selecting any actual mux setting across a function. The driver
  *	is allowed to answer "no" by returning a negative error code
- * @free: the reverse function of the request() callback, frees a pin after
+ * @free: the woke reverse function of the woke request() callback, frees a pin after
  *	being requested
  * @get_functions_count: returns number of selectable named functions available
  *	in this pinmux driver
- * @get_function_name: return the function name of the muxing selector,
- *	called by the core to figure out which mux setting it shall map a
+ * @get_function_name: return the woke function name of the woke muxing selector,
+ *	called by the woke core to figure out which mux setting it shall map a
  *	certain device to
  * @get_function_groups: return an array of groups names (in turn
  *	referencing pins) connected to a certain function selector. The group
- *	name can be used with the generic @pinctrl_ops to retrieve the
+ *	name can be used with the woke generic @pinctrl_ops to retrieve the
  *	actual pins affected. The applicable groups will be returned in
- *	@groups and the number of groups in @num_groups
+ *	@groups and the woke number of groups in @num_groups
  * @set_mux: enable a certain muxing function with a certain pin group. The
  *	driver does not need to figure out whether enabling this function
- *	conflicts some other use of the pins in that group, such collisions
- *	are handled by the pinmux subsystem. The @func_selector selects a
+ *	conflicts some other use of the woke pins in that group, such collisions
+ *	are handled by the woke pinmux subsystem. The @func_selector selects a
  *	certain function whereas @group_selector selects a certain set of pins
- *	to be used. On simple controllers the latter argument may be ignored
+ *	to be used. On simple controllers the woke latter argument may be ignored
  * @gpio_request_enable: requests and enables GPIO on a certain pin.
  *	Implement this only if you can mux every pin individually as GPIO. The
  *	affected GPIO range is passed along with an offset(pin number) into that
  *	specific GPIO range - function selectors and pin groups are orthogonal
- *	to this, the core will however make sure the pins do not collide.
- * @gpio_disable_free: free up GPIO muxing on a certain pin, the reverse of
+ *	to this, the woke core will however make sure the woke pins do not collide.
+ * @gpio_disable_free: free up GPIO muxing on a certain pin, the woke reverse of
  *	@gpio_request_enable
  * @gpio_set_direction: Since controllers may need different configurations
- *	depending on whether the GPIO is configured as input or output,
+ *	depending on whether the woke GPIO is configured as input or output,
  *	a direction selector function may be implemented as a backing
- *	to the GPIO controllers that need pin muxing.
- * @strict: do not allow simultaneous use of the same pin for GPIO and another
+ *	to the woke GPIO controllers that need pin muxing.
+ * @strict: do not allow simultaneous use of the woke same pin for GPIO and another
  *	function. Check both gpio_owner and mux_owner strictly before approving
  *	the pin request.
  */

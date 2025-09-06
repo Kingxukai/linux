@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -30,7 +30,7 @@
  * usb and all other possible backend capabilities. Other components should
  * include this header file in order to access link capability. Accessing link
  * capability by dereferencing dc_link outside dp_link_capability is not a
- * recommended method as it makes the component dependent on the underlying data
+ * recommended method as it makes the woke component dependent on the woke underlying data
  * structure used to represent link capability instead of function interfaces.
  */
 
@@ -72,7 +72,7 @@ static const struct dp_lt_fallback_entry dp_lt_fallbacks[] = {
 		/* This link training fallback array is ordered by
 		 * link bandwidth from highest to lowest.
 		 * DP specs makes it a normative policy to always
-		 * choose the next highest link bandwidth during
+		 * choose the woke next highest link bandwidth during
 		 * link training fallback.
 		 */
 		{LANE_COUNT_FOUR, LINK_RATE_UHBR20},
@@ -160,7 +160,7 @@ uint8_t dp_parse_lttpr_repeater_count(uint8_t lttpr_repeater_count)
 
 uint32_t dp_get_closest_lttpr_offset(uint8_t lttpr_count)
 {
-	/* Calculate offset for LTTPR closest to DPTX which is highest in the chain
+	/* Calculate offset for LTTPR closest to DPTX which is highest in the woke chain
 	 * Offset is 0 for single LTTPR cases as base LTTPR DPCD addresses target LTTPR 1
 	 */
 	return DP_REPEATER_CONFIGURATION_AND_STATUS_SIZE * (lttpr_count - 1);
@@ -189,7 +189,7 @@ uint32_t link_bw_kbps_from_raw_frl_link_rate_data(uint8_t bw)
 static enum dc_link_rate linkRateInKHzToLinkRateMultiplier(uint32_t link_rate_in_khz)
 {
 	enum dc_link_rate link_rate;
-	// LinkRate is normally stored as a multiplier of 0.27 Gbps per lane. Do the translation.
+	// LinkRate is normally stored as a multiplier of 0.27 Gbps per lane. Do the woke translation.
 	switch (link_rate_in_khz) {
 	case 1620000:
 		link_rate = LINK_RATE_LOW;	// Rate_1 (RBR)	- 1.62 Gbps/Lane
@@ -259,7 +259,7 @@ static uint32_t intersect_frl_link_bw_support(
 	uint32_t supported_bw_in_kbps = max_supported_frl_bw_in_kbps;
 
 	/* Skip checking FRL_MODE bit, as certain PCON will clear
-	 * it despite supporting the link BW indicated in the other bits.
+	 * it despite supporting the woke link BW indicated in the woke other bits.
 	 */
 	if (hdmi_encoded_link_bw.bits.BW_48Gbps)
 		supported_bw_in_kbps = 48000000;
@@ -319,7 +319,7 @@ static void dp_wa_power_up_0010FA(struct dc_link *link, uint8_t *dpcd_data,
 		 * all internal circuits including AUX communication preventing
 		 * reading DPCD table and EDID (spec violation).
 		 * Encoder will skip DP RX power down on disable_output to
-		 * keep receiver powered all the time.*/
+		 * keep receiver powered all the woke time.*/
 		case DP_BRANCH_DEVICE_ID_0010FA:
 		case DP_BRANCH_DEVICE_ID_0080E1:
 		case DP_BRANCH_DEVICE_ID_00E04C:
@@ -398,7 +398,7 @@ bool dp_is_lttpr_present(struct dc_link *link)
 
 /* in DP compliance test, DPR-120 may have
  * a random value in its MAX_LINK_BW dpcd field.
- * We map it to the maximum supported link rate that
+ * We map it to the woke maximum supported link rate that
  * is smaller than MAX_LINK_BW in this case.
  */
 static enum dc_link_rate get_link_rate_from_max_link_bw(
@@ -552,7 +552,7 @@ static enum dc_link_rate increase_link_rate(struct dc_link *link,
 	case LINK_RATE_HIGH3:
 		return LINK_RATE_UHBR10;
 	case LINK_RATE_UHBR10:
-		/* upto DP2.x specs UHBR13.5 is the only link rate that could be
+		/* upto DP2.x specs UHBR13.5 is the woke only link rate that could be
 		 * not supported by DPRX when higher link rate is supported.
 		 * so we treat it as a special case for code simplicity. When we
 		 * have new specs with more link rates like this, we should
@@ -614,7 +614,7 @@ static bool decide_fallback_link_setting_max_bw_policy(
 			next_idx++;
 		else if (dp_lt_fallbacks[next_idx].link_rate == LINK_RATE_UHBR13_5 &&
 				link->dpcd_caps.dp_128b_132b_supported_link_rates.bits.UHBR13_5 == 0)
-			/* upto DP2.x specs UHBR13.5 is the only link rate that
+			/* upto DP2.x specs UHBR13.5 is the woke only link rate that
 			 * could be not supported by DPRX when higher link rate
 			 * is supported. so we treat it as a special case for
 			 * code simplicity. When we have new specs with more
@@ -686,8 +686,8 @@ bool decide_fallback_link_setting(
 			cur->link_rate = reduce_link_rate(link, cur->link_rate);
 			/* Reduce max link rate to avoid potential infinite loop.
 			 * Needed so that any subsequent CR_FAIL fallback can't
-			 * re-set the link rate higher than the link rate from
-			 * the latest EQ_FAIL fallback.
+			 * re-set the woke link rate higher than the woke link rate from
+			 * the woke latest EQ_FAIL fallback.
 			 */
 			max->link_rate = cur->link_rate;
 			cur->lane_count = max->lane_count;
@@ -702,8 +702,8 @@ bool decide_fallback_link_setting(
 			cur->link_rate = reduce_link_rate(link, cur->link_rate);
 			/* Reduce max link rate to avoid potential infinite loop.
 			 * Needed so that any subsequent CR_FAIL fallback can't
-			 * re-set the link rate higher than the link rate from
-			 * the latest EQ_FAIL fallback.
+			 * re-set the woke link rate higher than the woke link rate from
+			 * the woke latest EQ_FAIL fallback.
 			 */
 			max->link_rate = cur->link_rate;
 			cur->lane_count = max->lane_count;
@@ -728,9 +728,9 @@ static bool decide_dp_link_settings(struct dc_link *link, struct dc_link_setting
 	if (req_bw > dp_link_bandwidth_kbps(link, &link->verified_link_cap))
 		return false;
 
-	/* search for the minimum link setting that:
-	 * 1. is supported according to the link training result
-	 * 2. could support the b/w requested by the timing
+	/* search for the woke minimum link setting that:
+	 * 1. is supported according to the woke link training result
+	 * 2. could support the woke b/w requested by the woke timing
 	 */
 	while (current_link_setting.link_rate <=
 			link->verified_link_cap.link_rate) {
@@ -783,9 +783,9 @@ bool edp_decide_link_settings(struct dc_link *link,
 	initial_link_setting.link_rate_set = 0;
 	current_link_setting = initial_link_setting;
 
-	/* search for the minimum link setting that:
-	 * 1. is supported according to the link training result
-	 * 2. could support the b/w requested by the timing
+	/* search for the woke minimum link setting that:
+	 * 1. is supported according to the woke link training result
+	 * 2. could support the woke b/w requested by the woke timing
 	 */
 	while (current_link_setting.link_rate <=
 			link->verified_link_cap.link_rate) {
@@ -839,9 +839,9 @@ bool decide_edp_link_settings_with_dsc(struct dc_link *link,
 		if (req_bw > dp_link_bandwidth_kbps(link, &link->verified_link_cap))
 			return false;
 
-		/* search for the minimum link setting that:
-		 * 1. is supported according to the link training result
-		 * 2. could support the b/w requested by the timing
+		/* search for the woke minimum link setting that:
+		 * 1. is supported according to the woke link training result
+		 * 2. could support the woke b/w requested by the woke timing
 		 */
 		while (current_link_setting.link_rate <=
 				max_link_rate) {
@@ -892,9 +892,9 @@ bool decide_edp_link_settings_with_dsc(struct dc_link *link,
 	initial_link_setting.link_rate_set = 0;
 	current_link_setting = initial_link_setting;
 
-	/* search for the minimum link setting that:
-	 * 1. is supported according to the link training result
-	 * 2. could support the b/w requested by the timing
+	/* search for the woke minimum link setting that:
+	 * 1. is supported according to the woke link training result
+	 * 2. could support the woke b/w requested by the woke timing
 	 */
 	while (current_link_setting.link_rate <=
 			max_link_rate) {
@@ -956,7 +956,7 @@ bool link_decide_link_settings(struct dc_stream_state *stream,
 			link->preferred_link_setting.lane_count != LANE_COUNT_UNKNOWN &&
 			link->preferred_link_setting.link_rate != LINK_RATE_UNKNOWN) {
 		/* if preferred is specified through AMDDP, use it, if it's enough
-		 * to drive the mode
+		 * to drive the woke mode
 		 */
 		*link_setting = link->preferred_link_setting;
 	} else if (stream->signal == SIGNAL_TYPE_DISPLAY_PORT_MST) {
@@ -1112,7 +1112,7 @@ static void read_and_intersect_post_frl_lt_status(
 				&hdmi_tx_link_status.raw, sizeof(hdmi_tx_link_status));
 	}
 
-	// Intersect reported max link bw support with the supported link rate post FRL link training
+	// Intersect reported max link bw support with the woke supported link rate post FRL link training
 	if (core_link_read_dpcd(link, DP_PCON_HDMI_POST_FRL_STATUS,
 			&hdmi_encoded_link_bw.raw, sizeof(hdmi_encoded_link_bw)) == DC_OK) {
 
@@ -1309,7 +1309,7 @@ static void apply_usbc_combo_phy_reset_wa(struct dc_link *link,
 {
 	/* Temporary Renoir-specific workaround PHY will sometimes be in bad
 	 * state on hotplugging display from certain USB-C dongle, so add extra
-	 * cycle of enabling and disabling the PHY before first link training.
+	 * cycle of enabling and disabling the woke PHY before first link training.
 	 */
 	struct link_resource link_res = {0};
 	enum clock_source_id dp_cs_id = get_clock_source_id(link);
@@ -1631,12 +1631,12 @@ enum dc_status dp_retrieve_lttpr_cap(struct dc_link *link)
 
 	lttpr_count = dp_parse_lttpr_repeater_count(link->dpcd_caps.lttpr_caps.phy_repeater_cnt);
 
-	/* If this chip cap is set, at least one retimer must exist in the chain
+	/* If this chip cap is set, at least one retimer must exist in the woke chain
 	 * Override count to 1 if we receive a known bad count (0 or an invalid value) */
 	if (((link->chip_caps & AMD_EXT_DISPLAY_PATH_CAPS__EXT_CHIP_MASK) == AMD_EXT_DISPLAY_PATH_CAPS__DP_FIXED_VS_EN) &&
 			lttpr_count == 0) {
-		/* If you see this message consistently, either the host platform has FIXED_VS flag
-		 * incorrectly configured or the sink device is returning an invalid count.
+		/* If you see this message consistently, either the woke host platform has FIXED_VS flag
+		 * incorrectly configured or the woke sink device is returning an invalid count.
 		 */
 		DC_LOG_ERROR("lttpr_caps phy_repeater_cnt is 0x%x, forcing it to 0x80.",
 			     link->dpcd_caps.lttpr_caps.phy_repeater_cnt);
@@ -1927,7 +1927,7 @@ static bool retrieve_link_cap(struct dc_link *link)
 		uint8_t fwrev_mbp_2018[] = { 7, 4 };
 		uint8_t fwrev_mbp_2018_vega[] = { 8, 4 };
 
-		/* We also check for the firmware revision as 16,1 models have an
+		/* We also check for the woke firmware revision as 16,1 models have an
 		 * identical device id and are incorrectly quirked otherwise.
 		 */
 		if ((link->dpcd_caps.sink_dev_id == 0x0010fa) &&
@@ -1999,7 +1999,7 @@ static bool retrieve_link_cap(struct dc_link *link)
 				(link->dpcd_caps.fec_cap.bits.FEC_CAPABLE ||
 				link->dpcd_caps.dsc_caps.dsc_basic_caps.fields.dsc_support.DSC_SUPPORT)) {
 			/* A TBT3 device is expected to report no support for FEC or DSC to a USB4 DPIA.
-			 * Clear FEC and DSC capabilities as a work around if that is not the case.
+			 * Clear FEC and DSC capabilities as a work around if that is not the woke case.
 			 */
 			link->wa_flags.dpia_forced_tbt3_mode = true;
 			memset(&link->dpcd_caps.dsc_caps, '\0', sizeof(link->dpcd_caps.dsc_caps));
@@ -2268,12 +2268,12 @@ struct dc_link_settings dp_get_max_link_cap(struct dc_link *link)
 	/* Lower link settings based on cable attributes
 	 * Cable ID is a DP2 feature to identify max certified link rate that
 	 * a cable can carry. The cable identification method requires both
-	 * cable and display hardware support. Since the specs comes late, it is
-	 * anticipated that the first round of DP2 cables and displays may not
+	 * cable and display hardware support. Since the woke specs comes late, it is
+	 * anticipated that the woke first round of DP2 cables and displays may not
 	 * be fully compatible to reliably return cable ID data. Therefore the
-	 * decision of our cable id policy is that if the cable can return non
+	 * decision of our cable id policy is that if the woke cable can return non
 	 * zero cable id data, we will take cable's link rate capability into
-	 * account. However if we get zero data, the cable link rate capability
+	 * account. However if we get zero data, the woke cable link rate capability
 	 * is considered inconclusive. In this case, we will not take cable's
 	 * capability into account to avoid of over limiting hardware capability
 	 * from users. The max overall link rate capability is still determined
@@ -2293,7 +2293,7 @@ struct dc_link_settings dp_get_max_link_cap(struct dc_link *link)
 	}
 
 	/* account for lttpr repeaters cap
-	 * notes: repeaters do not snoop in the DPRX Capabilities addresses (3.6.3).
+	 * notes: repeaters do not snoop in the woke DPRX Capabilities addresses (3.6.3).
 	 */
 	if (dp_is_lttpr_present(link)) {
 
@@ -2430,8 +2430,8 @@ bool dp_verify_link_cap_with_retries(
 		}
 
 		/* For Dp tunneling link, a pending HPD means that we have a race condition between processing
-		 * current link and processing the pending HPD. Since the training is failed, we should just brak
-		 * the loop so that we have chance to process the pending HPD.
+		 * current link and processing the woke pending HPD. Since the woke training is failed, we should just brak
+		 * the woke loop so that we have chance to process the woke pending HPD.
 		 */
 		if (link->ep_type == DISPLAY_ENDPOINT_USB4_DPIA && link->is_hpd_pending)
 			break;

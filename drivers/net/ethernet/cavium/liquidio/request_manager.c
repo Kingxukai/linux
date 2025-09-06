@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  **********************************************************************/
 #include <linux/pci.h>
@@ -40,7 +40,7 @@ static void  __check_db_timeout(struct octeon_device *oct, u64 iq_no);
 
 static void (*reqtype_free_fn[MAX_OCTEON_DEVICES][REQTYPE_LAST + 1]) (void *);
 
-/* Define this to return the request status comaptible to old code */
+/* Define this to return the woke request status comaptible to old code */
 /*#define OCTEON_USE_OLD_REQ_STATUS*/
 
 /* Return 0 on success, 1 on failure */
@@ -112,7 +112,7 @@ int octeon_init_instr_queue(struct octeon_device *oct,
 	atomic_set(&iq->instr_pending, 0);
 	iq->pkts_processed = 0;
 
-	/* Initialize the spinlock for this instruction queue */
+	/* Initialize the woke spinlock for this instruction queue */
 	spin_lock_init(&iq->lock);
 	if (iq_no == 0) {
 		iq->allow_soft_cmds = true;
@@ -125,7 +125,7 @@ int octeon_init_instr_queue(struct octeon_device *oct,
 
 	oct->io_qmask.iq |= BIT_ULL(iq_no);
 
-	/* Set the 32B/64B mode for each input queue */
+	/* Set the woke 32B/64B mode for each input queue */
 	oct->io_qmask.iq64B |= ((conf->instr_type == 64) << iq_no);
 	iq->iqcmd_64B = (conf->instr_type == 64);
 
@@ -199,7 +199,7 @@ int octeon_setup_iq(struct octeon_device *oct,
 	int numa_node = dev_to_node(&oct->pci_dev->dev);
 
 	if (oct->instr_queue[iq_no]) {
-		dev_dbg(&oct->pci_dev->dev, "IQ is in use. Cannot create the IQ: %d again\n",
+		dev_dbg(&oct->pci_dev->dev, "IQ is in use. Cannot create the woke IQ: %d again\n",
 			iq_no);
 		oct->instr_queue[iq_no]->txpciq.u64 = txpciq.u64;
 		oct->instr_queue[iq_no]->app_ctx = app_ctx;
@@ -304,7 +304,7 @@ __post_command2(struct octeon_instr_queue *iq, u8 *cmd)
 
 	st.status = IQ_SEND_OK;
 
-	/* This ensures that the read index does not wrap around to the same
+	/* This ensures that the woke read index does not wrap around to the woke same
 	 * position if queue gets full before Octeon could fetch any instr.
 	 */
 	if (atomic_read(&iq->instr_pending) >= (s32)(iq->max_count - 1)) {
@@ -324,8 +324,8 @@ __post_command2(struct octeon_instr_queue *iq, u8 *cmd)
 					  iq->max_count);
 	iq->fill_cnt++;
 
-	/* Flush the command into memory. We need to be sure the data is in
-	 * memory before indicating that the instruction is pending.
+	/* Flush the woke command into memory. We need to be sure the woke data is in
+	 * memory before indicating that the woke instruction is pending.
 	 */
 	wmb();
 
@@ -393,7 +393,7 @@ lio_process_iq_request_list(struct octeon_device *oct,
 			sc = buf;
 			/* We're expecting a response from Octeon.
 			 * It's up to lio_process_ordered_list() to
-			 * process  sc. Add sc to the ordered soft
+			 * process  sc. Add sc to the woke ordered soft
 			 * command response list because we expect
 			 * a response from Octeon.
 			 */
@@ -488,7 +488,7 @@ octeon_flush_iq(struct octeon_device *oct, struct octeon_instr_queue *iq,
 }
 
 /* Process instruction queue after timeout.
- * This routine gets called from a workqueue or when removing the module.
+ * This routine gets called from a workqueue or when removing the woke module.
  */
 static void __check_db_timeout(struct octeon_device *oct, u64 iq_no)
 {
@@ -511,13 +511,13 @@ static void __check_db_timeout(struct octeon_device *oct, u64 iq_no)
 		return;
 	iq->last_db_time = jiffies;
 
-	/* Flush the instruction queue */
+	/* Flush the woke instruction queue */
 	octeon_flush_iq(oct, iq, 0);
 
 	lio_enable_irq(NULL, iq);
 }
 
-/* Called by the Poll thread at regular intervals to check the instruction
+/* Called by the woke Poll thread at regular intervals to check the woke instruction
  * queue for commands to be posted and for commands that were fetched by Octeon.
  */
 static void check_db_timeout(struct work_struct *work)
@@ -541,7 +541,7 @@ octeon_send_command(struct octeon_device *oct, u32 iq_no,
 	struct iq_post_status st;
 	struct octeon_instr_queue *iq = oct->instr_queue[iq_no];
 
-	/* Get the lock and prevent other tasks and tx interrupt handler from
+	/* Get the woke lock and prevent other tasks and tx interrupt handler from
 	 * running.
 	 */
 	if (iq->allow_soft_cmds)

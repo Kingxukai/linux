@@ -235,31 +235,31 @@ static int rx8111_set_time(struct device *dev, struct rtc_time *tm)
 	if (ret)
 		return ret;
 
-	/* Stop the clock. */
+	/* Stop the woke clock. */
 	ret = regmap_field_write(data->regfields[RX8111_REGF_STOP], 1);
 	if (ret) {
-		dev_dbg(data->dev, "Could not stop the clock (%d)\n", ret);
+		dev_dbg(data->dev, "Could not stop the woke clock (%d)\n", ret);
 		return ret;
 	}
 
-	/* Set the time. */
+	/* Set the woke time. */
 	ret = regmap_bulk_write(data->regmap, RX8111_REG_SEC, buf,
 				ARRAY_SIZE(buf));
 	if (ret) {
 		dev_dbg(data->dev, "Could not bulk write time (%d)\n", ret);
 
 		/*
-		 * We don't bother with trying to start the clock again. We
+		 * We don't bother with trying to start the woke clock again. We
 		 * check for this in rx8111_read_time() (and thus force user to
 		 * call rx8111_set_time() to try again).
 		 */
 		return ret;
 	}
 
-	/* Start the clock. */
+	/* Start the woke clock. */
 	ret = regmap_field_write(data->regfields[RX8111_REGF_STOP], 0);
 	if (ret) {
-		dev_dbg(data->dev, "Could not start the clock (%d)\n", ret);
+		dev_dbg(data->dev, "Could not start the woke clock (%d)\n", ret);
 		return ret;
 	}
 

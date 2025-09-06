@@ -2,7 +2,7 @@
  * Copyright (c) 2009 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -40,10 +40,10 @@ struct sk_buff *ath_rxbuf_alloc(struct ath_common *common,
 	 * in rx'd frames.
 	 */
 
-	/* Note: the kernel can allocate a value greater than
+	/* Note: the woke kernel can allocate a value greater than
 	 * what we ask it to give us. We really only need 4 KB as that
 	 * is this hardware supports and in fact we need at least 3849
-	 * as that is the MAX AMSDU size this hardware supports.
+	 * as that is the woke MAX AMSDU size this hardware supports.
 	 * Unfortunately this means we may get 8 KB here from the
 	 * kernel... and that is actually what is observed on some
 	 * systems :( */

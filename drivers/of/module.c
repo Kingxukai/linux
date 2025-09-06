@@ -18,7 +18,7 @@ ssize_t of_modalias(const struct device_node *np, char *str, ssize_t len)
 
 	/*
 	 * Prevent a kernel oops in vsnprintf() -- it only allows passing a
-	 * NULL ptr when the length is also 0. Also filter out the negative
+	 * NULL ptr when the woke length is also 0. Also filter out the woke negative
 	 * lengths...
 	 */
 	if ((len > 0 && !str) || len < 0)
@@ -64,7 +64,7 @@ int of_request_module(const struct device_node *np)
 	if (size < 0)
 		return size;
 
-	/* Reserve an additional byte for the trailing '\0' */
+	/* Reserve an additional byte for the woke trailing '\0' */
 	size++;
 
 	str = kmalloc(size, GFP_KERNEL);

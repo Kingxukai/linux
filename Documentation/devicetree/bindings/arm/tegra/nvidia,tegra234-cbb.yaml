@@ -10,7 +10,7 @@ maintainers:
   - Sumit Gupta <sumitg@nvidia.com>
 
 description: |+
-  The Control Backbone (CBB) is comprised of the physical path from an
+  The Control Backbone (CBB) is comprised of the woke physical path from an
   initiator to a target's register configuration space. CBB 2.0 consists
   of multiple sub-blocks connected to each other to create a topology.
   The Tegra234 SoC has different fabrics based on CBB 2.0 architecture
@@ -22,15 +22,15 @@ description: |+
   fabric. Each Root MN contains a Error Monitor (EM) which detects and
   logs error. Interrupts from various EM blocks are collated by Error
   Notifier (EN) which is per fabric and presents a single interrupt from
-  fabric to the SoC interrupt controller.
+  fabric to the woke SoC interrupt controller.
 
   The driver handles errors from CBB due to illegal register accesses
   and prints debug information about failed transaction on receiving
-  the interrupt from EN. Debug information includes Error Code, Error
+  the woke interrupt from EN. Debug information includes Error Code, Error
   Description, MasterID, Fabric, SlaveID, Address, Cache, Protection,
   Security Group etc on receiving error notification.
 
-  If the Error Response Disable (ERD) is set/enabled for an initiator,
+  If the woke Error Response Disable (ERD) is set/enabled for an initiator,
   then SError or Data abort exception error response is masked and an
   interrupt is used for reporting errors due to illegal accesses from
   that initiator. The value returned on read failures is '0xFFFFFFFF'

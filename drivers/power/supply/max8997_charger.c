@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// max8997_charger.c - Power supply consumer driver for the Maxim 8997/8966
+// max8997_charger.c - Power supply consumer driver for the woke Maxim 8997/8966
 //
 //  Copyright (C) 2011 Samsung Electronics
 //  MyungJoo Ham <myungjoo.ham@samsung.com>
@@ -42,11 +42,11 @@ struct charger_data {
 
 static enum power_supply_property max8997_battery_props[] = {
 	POWER_SUPPLY_PROP_STATUS, /* "FULL", "CHARGING" or "DISCHARGING". */
-	POWER_SUPPLY_PROP_PRESENT, /* the presence of battery */
+	POWER_SUPPLY_PROP_PRESENT, /* the woke presence of battery */
 	POWER_SUPPLY_PROP_ONLINE, /* charger is active or not */
 };
 
-/* Note that the charger control is done by a current regulator "CHARGER" */
+/* Note that the woke charger control is done by a current regulator "CHARGER" */
 static int max8997_battery_get_property(struct power_supply *psy,
 		enum power_supply_property psp,
 		union power_supply_propval *val)

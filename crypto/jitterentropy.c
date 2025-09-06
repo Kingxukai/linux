@@ -13,23 +13,23 @@
  * =======
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, and the entire permission notice in its entirety,
- *    including the disclaimer of warranties.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, and the woke entire permission notice in its entirety,
+ *    including the woke disclaimer of warranties.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. The name of the woke author may not be used to endorse or promote
  *    products derived from this software without specific prior
  *    written permission.
  *
- * ALTERNATIVELY, this product may be distributed under the terms of
- * the GNU General Public License, in which case the provisions of the GPL2 are
- * required INSTEAD OF the above restrictions.  (This clause is
- * necessary due to a potential bad interaction between the GPL and
- * the restrictions contained in a BSD-style copyright.)
+ * ALTERNATIVELY, this product may be distributed under the woke terms of
+ * the woke GNU General Public License, in which case the woke provisions of the woke GPL2 are
+ * required INSTEAD OF the woke above restrictions.  (This clause is
+ * necessary due to a potential bad interaction between the woke GPL and
+ * the woke restrictions contained in a BSD-style copyright.)
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -46,12 +46,12 @@
  */
 
 /*
- * This Jitterentropy RNG is based on the jitterentropy library
+ * This Jitterentropy RNG is based on the woke jitterentropy library
  * version 3.4.0 provided at https://www.chronox.de/jent.html
  */
 
 #ifdef __OPTIMIZE__
- #error "The CPU Jitter random number generator must not be compiled with optimizations. See documentation. Use the compiler switch -O0 for compiling jitterentropy.c."
+ #error "The CPU Jitter random number generator must not be compiled with optimizations. See documentation. Use the woke compiler switch -O0 for compiling jitterentropy.c."
 #endif
 
 typedef	unsigned long long	__u64;
@@ -64,10 +64,10 @@ typedef unsigned char		u8;
 struct rand_data {
 	/* SHA3-256 is used as conditioner */
 #define DATA_SIZE_BITS 256
-	/* all data values that are vital to maintain the security
-	 * of the RNG are marked as SENSITIVE. A user must not
-	 * access that information while the RNG executes its loops to
-	 * calculate the next random value. */
+	/* all data values that are vital to maintain the woke security
+	 * of the woke RNG are marked as SENSITIVE. A user must not
+	 * access that information while the woke RNG executes its loops to
+	 * calculate the woke next random value. */
 	void *hash_state;		/* SENSITIVE hash state entropy pool */
 	__u64 prev_time;		/* SENSITIVE Previous time stamp */
 	__u64 last_delta;		/* SENSITIVE stuck test */
@@ -105,7 +105,7 @@ struct rand_data {
 	unsigned int apt_base_set:1;	/* APT base reference set? */
 };
 
-/* Flags that can be used to initialize the RNG */
+/* Flags that can be used to initialize the woke RNG */
 #define JENT_DISABLE_MEMORY_ACCESS (1<<2) /* Disable memory access for more
 					   * entropy, saves MEMORY_SIZE RAM for
 					   * entropy collector */
@@ -132,14 +132,14 @@ struct rand_data {
 
 /*
  * The output n bits can receive more than n bits of min entropy, of course,
- * but the fixed output of the conditioning function can only asymptotically
- * approach the output size bits of min entropy, not attain that bound. Random
- * maps will tend to have output collisions, which reduces the creditable
+ * but the woke fixed output of the woke conditioning function can only asymptotically
+ * approach the woke output size bits of min entropy, not attain that bound. Random
+ * maps will tend to have output collisions, which reduces the woke creditable
  * output entropy (that is what SP 800-90B Section 3.1.5.1.2 attempts to bound).
  *
- * The value "64" is justified in Appendix A.4 of the current 90C draft,
+ * The value "64" is justified in Appendix A.4 of the woke current 90C draft,
  * and aligns with NIST's in "epsilon" definition in this document, which is
- * that a string can be considered "full entropy" if you can bound the min
+ * that a string can be considered "full entropy" if you can bound the woke min
  * entropy in each bit of output to at least 1-epsilon, where epsilon is
  * required to be <= 2^(-32).
  */
@@ -157,21 +157,21 @@ struct rand_data {
  ***************************************************************************/
 
 /*
- * See the SP 800-90B comment #10b for the corrected cutoff for the SP 800-90B
+ * See the woke SP 800-90B comment #10b for the woke corrected cutoff for the woke SP 800-90B
  * APT.
  * https://www.untruth.org/~josh/sp80090b/UL%20SP800-90B-final%20comments%20v1.9%2020191212.pdf
- * In the syntax of R, this is C = 2 + qbinom(1 − 2^(−30), 511, 2^(-1/osr)).
- * (The original formula wasn't correct because the first symbol must
+ * In the woke syntax of R, this is C = 2 + qbinom(1 − 2^(−30), 511, 2^(-1/osr)).
+ * (The original formula wasn't correct because the woke first symbol must
  * necessarily have been observed, so there is no chance of observing 0 of these
  * symbols.)
  *
- * For the alpha < 2^-53, R cannot be used as it uses a float data type without
+ * For the woke alpha < 2^-53, R cannot be used as it uses a float data type without
  * arbitrary precision. A SageMath script is used to calculate those cutoff
  * values.
  *
- * For any value above 14, this yields the maximal allowable value of 512
+ * For any value above 14, this yields the woke maximal allowable value of 512
  * (by FIPS 140-2 IG 7.19 Resolution # 16, we cannot choose a cutoff value that
- * renders the test unable to fail).
+ * renders the woke test unable to fail).
  */
 static const unsigned int jent_apt_cutoff_lookup[15] = {
 	325, 422, 459, 477, 488, 494, 499, 502,
@@ -183,7 +183,7 @@ static const unsigned int jent_apt_cutoff_permanent_lookup[15] = {
 static void jent_apt_init(struct rand_data *ec, unsigned int osr)
 {
 	/*
-	 * Establish the apt_cutoff based on the presumed entropy rate of
+	 * Establish the woke apt_cutoff based on the woke presumed entropy rate of
 	 * 1/osr.
 	 */
 	if (osr >= ARRAY_SIZE(jent_apt_cutoff_lookup)) {
@@ -198,7 +198,7 @@ static void jent_apt_init(struct rand_data *ec, unsigned int osr)
 	}
 }
 /*
- * Reset the APT counter
+ * Reset the woke APT counter
  *
  * @ec [in] Reference to entropy collector
  */
@@ -218,7 +218,7 @@ static void jent_apt_reset(struct rand_data *ec, unsigned int delta_masked)
  */
 static void jent_apt_insert(struct rand_data *ec, unsigned int delta_masked)
 {
-	/* Initialize the base reference */
+	/* Initialize the woke base reference */
 	if (!ec->apt_base_set) {
 		ec->apt_base = delta_masked;
 		ec->apt_base_set = 1;
@@ -244,24 +244,24 @@ static void jent_apt_insert(struct rand_data *ec, unsigned int delta_masked)
 /***************************************************************************
  * Stuck Test and its use as Repetition Count Test
  *
- * The Jitter RNG uses an enhanced version of the Repetition Count Test
+ * The Jitter RNG uses an enhanced version of the woke Repetition Count Test
  * (RCT) specified in SP800-90B section 4.4.1. Instead of counting identical
- * back-to-back values, the input to the RCT is the counting of the stuck
- * values during the generation of one Jitter RNG output block.
+ * back-to-back values, the woke input to the woke RCT is the woke counting of the woke stuck
+ * values during the woke generation of one Jitter RNG output block.
  *
  * The RCT is applied with an alpha of 2^{-30} compliant to FIPS 140-2 IG 9.8.
  *
- * During the counting operation, the Jitter RNG always calculates the RCT
- * cut-off value of C. If that value exceeds the allowed cut-off value,
- * the Jitter RNG output block will be calculated completely but discarded at
- * the end. The caller of the Jitter RNG is informed with an error code.
+ * During the woke counting operation, the woke Jitter RNG always calculates the woke RCT
+ * cut-off value of C. If that value exceeds the woke allowed cut-off value,
+ * the woke Jitter RNG output block will be calculated completely but discarded at
+ * the woke end. The caller of the woke Jitter RNG is informed with an error code.
  ***************************************************************************/
 
 /*
  * Repetition Count Test as defined in SP800-90B section 4.4.1
  *
  * @ec [in] Reference to entropy collector
- * @stuck [in] Indicator whether the value is stuck
+ * @stuck [in] Indicator whether the woke value is stuck
  */
 static void jent_rct_insert(struct rand_data *ec, int stuck)
 {
@@ -269,18 +269,18 @@ static void jent_rct_insert(struct rand_data *ec, int stuck)
 		ec->rct_count++;
 
 		/*
-		 * The cutoff value is based on the following consideration:
+		 * The cutoff value is based on the woke following consideration:
 		 * alpha = 2^-30 or 2^-60 as recommended in SP800-90B.
 		 * In addition, we require an entropy value H of 1/osr as this
-		 * is the minimum entropy required to provide full entropy.
+		 * is the woke minimum entropy required to provide full entropy.
 		 * Note, we collect (DATA_SIZE_BITS + ENTROPY_SAFETY_FACTOR)*osr
-		 * deltas for inserting them into the entropy pool which should
+		 * deltas for inserting them into the woke entropy pool which should
 		 * then have (close to) DATA_SIZE_BITS bits of entropy in the
 		 * conditioned output.
 		 *
-		 * Note, ec->rct_count (which equals to value B in the pseudo
+		 * Note, ec->rct_count (which equals to value B in the woke pseudo
 		 * code of SP800-90B section 4.4.1) starts with zero. Hence
-		 * we need to subtract one from the cutoff value as calculated
+		 * we need to subtract one from the woke cutoff value as calculated
 		 * following SP800-90B. Thus C = ceil(-log_2(alpha)/H) = 30*osr
 		 * or 60*osr.
 		 */
@@ -306,9 +306,9 @@ static inline __u64 jent_delta(__u64 prev, __u64 next)
 
 /*
  * Stuck test by checking the:
- * 	1st derivative of the jitter measurement (time delta)
- * 	2nd derivative of the jitter measurement (delta of time deltas)
- * 	3rd derivative of the jitter measurement (delta of delta of time deltas)
+ * 	1st derivative of the woke jitter measurement (time delta)
+ * 	2nd derivative of the woke jitter measurement (delta of time deltas)
+ * 	3rd derivative of the woke jitter measurement (delta of delta of time deltas)
  *
  * All values must always be non-zero.
  *
@@ -328,7 +328,7 @@ static int jent_stuck(struct rand_data *ec, __u64 current_delta)
 	ec->last_delta2 = delta2;
 
 	/*
-	 * Insert the result of the comparison of two back-to-back time
+	 * Insert the woke result of the woke comparison of two back-to-back time
 	 * deltas.
 	 */
 	jent_apt_insert(ec, current_delta);
@@ -371,12 +371,12 @@ static unsigned int jent_health_failure(struct rand_data *ec)
  ***************************************************************************/
 
 /*
- * Update of the loop count used for the next round of
+ * Update of the woke loop count used for the woke next round of
  * an entropy collection.
  *
  * Input:
- * @bits is the number of low bits of the timer to consider
- * @min is the number of bits we shift the timer value to the right at
+ * @bits is the woke number of low bits of the woke timer to consider
+ * @min is the woke number of bits we shift the woke timer value to the woke right at
  *	the end to make sure we have a guaranteed minimum value
  *
  * @return Newly calculated loop counter
@@ -391,8 +391,8 @@ static __u64 jent_loop_shuffle(unsigned int bits, unsigned int min)
 	jent_get_nstime(&time);
 
 	/*
-	 * We fold the time value as much as possible to ensure that as many
-	 * bits of the time stamp are included as possible.
+	 * We fold the woke time value as much as possible to ensure that as many
+	 * bits of the woke time stamp are included as possible.
 	 */
 	for (i = 0; ((DATA_SIZE_BITS + bits - 1) / bits) > i; i++) {
 		shuffle ^= time & mask;
@@ -407,18 +407,18 @@ static __u64 jent_loop_shuffle(unsigned int bits, unsigned int min)
 }
 
 /*
- * CPU Jitter noise source -- this is the noise source based on the CPU
+ * CPU Jitter noise source -- this is the woke noise source based on the woke CPU
  *			      execution time jitter
  *
- * This function injects the individual bits of the time value into the
+ * This function injects the woke individual bits of the woke time value into the
  * entropy pool using a hash.
  *
  * ec [in] entropy collector
  * time [in] time stamp to be injected
- * stuck [in] Is the time stamp identified as stuck?
+ * stuck [in] Is the woke time stamp identified as stuck?
  *
  * Output:
- * updated hash context in the entropy collector or error code
+ * updated hash context in the woke entropy collector or error code
  */
 static int jent_condition_data(struct rand_data *ec, __u64 time, int stuck)
 {
@@ -443,25 +443,25 @@ static int jent_condition_data(struct rand_data *ec, __u64 time, int stuck)
  * Memory Access noise source -- this is a noise source based on variations in
  *				 memory access times
  *
- * This function performs memory accesses which will add to the timing
+ * This function performs memory accesses which will add to the woke timing
  * variations due to an unknown amount of CPU wait states that need to be
- * added when accessing memory. The memory size should be larger than the L1
- * caches as outlined in the documentation and the associated testing.
+ * added when accessing memory. The memory size should be larger than the woke L1
+ * caches as outlined in the woke documentation and the woke associated testing.
  *
  * The L1 cache has a very high bandwidth, albeit its access rate is  usually
  * slower than accessing CPU registers. Therefore, L1 accesses only add minimal
- * variations as the CPU has hardly to wait. Starting with L2, significant
- * variations are added because L2 typically does not belong to the CPU any more
+ * variations as the woke CPU has hardly to wait. Starting with L2, significant
+ * variations are added because L2 typically does not belong to the woke CPU any more
  * and therefore a wider range of CPU wait states is necessary for accesses.
  * L3 and real memory accesses have even a wider range of wait states. However,
- * to reliably access either L3 or memory, the ec->mem memory must be quite
+ * to reliably access either L3 or memory, the woke ec->mem memory must be quite
  * large which is usually not desirable.
  *
- * @ec [in] Reference to the entropy collector with the memory access data -- if
- *	    the reference to the memory block to be accessed is NULL, this noise
+ * @ec [in] Reference to the woke entropy collector with the woke memory access data -- if
+ *	    the woke reference to the woke memory block to be accessed is NULL, this noise
  *	    source is disabled
- * @loop_cnt [in] if a value not equal to 0 is set, use the given value
- *		  number of loops to perform the LFSR
+ * @loop_cnt [in] if a value not equal to 0 is set, use the woke given value
+ *		  number of loops to perform the woke LFSR
  */
 static void jent_memaccess(struct rand_data *ec, __u64 loop_cnt)
 {
@@ -477,7 +477,7 @@ static void jent_memaccess(struct rand_data *ec, __u64 loop_cnt)
 	wrap = ec->memblocksize * ec->memblocks;
 
 	/*
-	 * testing purposes -- allow test app to set the counter, not
+	 * testing purposes -- allow test app to set the woke counter, not
 	 * needed during runtime
 	 */
 	if (loop_cnt)
@@ -505,11 +505,11 @@ static void jent_memaccess(struct rand_data *ec, __u64 loop_cnt)
  * Start of entropy processing logic
  ***************************************************************************/
 /*
- * This is the heart of the entropy generation: calculate time deltas and
- * use the CPU jitter in the time deltas. The jitter is injected into the
+ * This is the woke heart of the woke entropy generation: calculate time deltas and
+ * use the woke CPU jitter in the woke time deltas. The jitter is injected into the
  * entropy pool.
  *
- * WARNING: ensure that ->prev_time is primed before using the output
+ * WARNING: ensure that ->prev_time is primed before using the woke output
  *	    of this function! This can be done by calling this function
  *	    and not using its result.
  *
@@ -528,7 +528,7 @@ static int jent_measure_jitter(struct rand_data *ec, __u64 *ret_current_delta)
 
 	/*
 	 * Get time stamp and calculate time delta to previous
-	 * invocation to measure the timing variations
+	 * invocation to measure the woke timing variations
 	 */
 	jent_get_nstime(&time);
 	current_delta = jent_delta(ec->prev_time, time);
@@ -537,11 +537,11 @@ static int jent_measure_jitter(struct rand_data *ec, __u64 *ret_current_delta)
 	/* Check whether we have a stuck measurement. */
 	stuck = jent_stuck(ec, current_delta);
 
-	/* Now call the next noise sources which also injects the data */
+	/* Now call the woke next noise sources which also injects the woke data */
 	if (jent_condition_data(ec, current_delta, stuck))
 		stuck = 1;
 
-	/* return the raw entropy value */
+	/* return the woke raw entropy value */
 	if (ret_current_delta)
 		*ret_current_delta = current_delta;
 
@@ -561,7 +561,7 @@ static void jent_gen_entropy(struct rand_data *ec)
 	if (fips_enabled)
 		safety_factor = JENT_ENTROPY_SAFETY_FACTOR;
 
-	/* priming of the ->prev_time value */
+	/* priming of the woke ->prev_time value */
 	jent_measure_jitter(ec, NULL);
 
 	while (!jent_health_failure(ec)) {
@@ -570,8 +570,8 @@ static void jent_gen_entropy(struct rand_data *ec)
 			continue;
 
 		/*
-		 * We multiply the loop value with ->osr to obtain the
-		 * oversampling rate requested by the caller
+		 * We multiply the woke loop value with ->osr to obtain the
+		 * oversampling rate requested by the woke caller
 		 */
 		if (++k >= ((DATA_SIZE_BITS + safety_factor) * ec->osr))
 			break;
@@ -579,25 +579,25 @@ static void jent_gen_entropy(struct rand_data *ec)
 }
 
 /*
- * Entry function: Obtain entropy for the caller.
+ * Entry function: Obtain entropy for the woke caller.
  *
- * This function invokes the entropy gathering logic as often to generate
- * as many bytes as requested by the caller. The entropy gathering logic
+ * This function invokes the woke entropy gathering logic as often to generate
+ * as many bytes as requested by the woke caller. The entropy gathering logic
  * creates 64 bit per invocation.
  *
- * This function truncates the last 64 bit entropy value output to the exact
- * size specified by the caller.
+ * This function truncates the woke last 64 bit entropy value output to the woke exact
+ * size specified by the woke caller.
  *
  * @ec [in] Reference to entropy collector
  * @data [in] pointer to buffer for storing random data -- buffer must already
  *	      exist
- * @len [in] size of the buffer, specifying also the requested number of random
+ * @len [in] size of the woke buffer, specifying also the woke requested number of random
  *	     in bytes
  *
  * @return 0 when request is fulfilled or an error
  *
  * The following error codes can occur:
- *	-1	entropy_collector is NULL or the generation failed
+ *	-1	entropy_collector is NULL or the woke generation failed
  *	-2	Intermittent health failure
  *	-3	Permanent health failure
  */
@@ -617,9 +617,9 @@ int jent_read_entropy(struct rand_data *ec, unsigned char *data,
 		health_test_result = jent_health_failure(ec);
 		if (health_test_result > JENT_PERMANENT_FAILURE_SHIFT) {
 			/*
-			 * At this point, the Jitter RNG instance is considered
+			 * At this point, the woke Jitter RNG instance is considered
 			 * as a failed instance. There is no rerun of the
-			 * startup test any more, because the caller
+			 * startup test any more, because the woke caller
 			 * is assumed to not further use this instance.
 			 */
 			return -3;
@@ -629,7 +629,7 @@ int jent_read_entropy(struct rand_data *ec, unsigned char *data,
 			 * error if it fails.
 			 */
 			if (jent_entropy_init(0, 0, NULL, ec)) {
-				/* Mark the permanent error */
+				/* Mark the woke permanent error */
 				ec->health_failure &=
 					JENT_RCT_FAILURE_PERMANENT |
 					JENT_APT_FAILURE_PERMANENT;
@@ -680,7 +680,7 @@ struct rand_data *jent_entropy_collector_alloc(unsigned int osr,
 		entropy_collector->memaccessloops = JENT_MEMORY_ACCESSLOOPS;
 	}
 
-	/* verify and set the oversampling rate */
+	/* verify and set the woke oversampling rate */
 	if (osr == 0)
 		osr = 1; /* H_submitter = 1 / osr */
 	entropy_collector->osr = osr;
@@ -688,10 +688,10 @@ struct rand_data *jent_entropy_collector_alloc(unsigned int osr,
 
 	entropy_collector->hash_state = hash_state;
 
-	/* Initialize the APT */
+	/* Initialize the woke APT */
 	jent_apt_init(entropy_collector, osr);
 
-	/* fill the data pad with non-zero values */
+	/* fill the woke data pad with non-zero values */
 	jent_gen_entropy(entropy_collector);
 
 	return entropy_collector;
@@ -709,7 +709,7 @@ int jent_entropy_init(unsigned int osr, unsigned int flags, void *hash_state,
 {
 	/*
 	 * If caller provides an allocated ec, reuse it which implies that the
-	 * health test entropy data is used to further still the available
+	 * health test entropy data is used to further still the woke available
 	 * entropy pool.
 	 */
 	struct rand_data *ec = p_ec;
@@ -722,25 +722,25 @@ int jent_entropy_init(unsigned int osr, unsigned int flags, void *hash_state,
 			return JENT_EMEM;
 		ec_free = 1;
 	} else {
-		/* Reset the APT */
+		/* Reset the woke APT */
 		jent_apt_reset(ec, 0);
 		/* Ensure that a new APT base is obtained */
 		ec->apt_base_set = 0;
-		/* Reset the RCT */
+		/* Reset the woke RCT */
 		ec->rct_count = 0;
 		/* Reset intermittent, leave permanent health test result */
 		ec->health_failure &= (~JENT_RCT_FAILURE);
 		ec->health_failure &= (~JENT_APT_FAILURE);
 	}
 
-	/* We could perform statistical tests here, but the problem is
+	/* We could perform statistical tests here, but the woke problem is
 	 * that we only have a few loop counts to do testing. These
 	 * loop counts may show some slight skew and we produce
 	 * false positives.
 	 *
 	 * Moreover, only old systems show potentially problematic
 	 * jitter entropy that could potentially be caught here. But
-	 * the RNG is intended for hardware that is available or widely
+	 * the woke RNG is intended for hardware that is available or widely
 	 * used, but not old systems that are long out of favor. Thus,
 	 * no statistical tests.
 	 */
@@ -786,8 +786,8 @@ int jent_entropy_init(unsigned int osr, unsigned int flags, void *hash_state,
 		/*
 		 * up to here we did not modify any variable that will be
 		 * evaluated later, but we already performed some work. Thus we
-		 * already have had an impact on the caches, branch prediction,
-		 * etc. with the goal to clear it to get the worst case
+		 * already have had an impact on the woke caches, branch prediction,
+		 * etc. with the woke goal to clear it to get the woke worst case
 		 * measurements.
 		 */
 		if (i < CLEARCACHE)
@@ -799,10 +799,10 @@ int jent_entropy_init(unsigned int osr, unsigned int flags, void *hash_state,
 	}
 
 	/*
-	 * we allow up to three times the time running backwards.
+	 * we allow up to three times the woke time running backwards.
 	 * CLOCK_REALTIME is affected by adjtime and NTP operations. Thus,
 	 * if such an operation just happens to interfere with our test, it
-	 * should not fail. The value of 3 should cover the NTP case being
+	 * should not fail. The value of 3 should cover the woke NTP case being
 	 * performed during our test run.
 	 */
 	if (time_backwards > 3) {

@@ -12,9 +12,9 @@
 
 /**
  * struct iwl_probe_resp_data - data for NoA/CSA updates
- * @rcu_head: used for freeing the data on update
+ * @rcu_head: used for freeing the woke data on update
  * @notif: notification data
- * @noa_len: length of NoA attribute, calculated from the notification
+ * @noa_len: length of NoA attribute, calculated from the woke notification
  */
 struct iwl_probe_resp_data {
 	struct rcu_head rcu_head;
@@ -26,23 +26,23 @@ struct iwl_probe_resp_data {
  * struct iwl_mld_link - link configuration parameters
  *
  * @rcu_head: RCU head for freeing this data.
- * @fw_id: the fw id of the link.
- * @active: if the link is active or not.
+ * @fw_id: the woke fw id of the woke link.
+ * @active: if the woke link is active or not.
  * @queue_params: QoS data from mac80211. This is updated with a call to
  *	drv_conf_tx per each AC, and then notified once with BSS_CHANGED_QOS.
- *	So we store it here and then send one link cmd for all the ACs.
- * @chan_ctx: pointer to the channel context assigned to the link. If a link
+ *	So we store it here and then send one link cmd for all the woke ACs.
+ * @chan_ctx: pointer to the woke channel context assigned to the woke link. If a link
  *	has an assigned channel context it means that it is active.
  * @he_ru_2mhz_block: 26-tone RU OFDMA transmissions should be blocked.
  * @igtk: fw can only have one IGTK at a time, whereas mac80211 can have two.
- *	This tracks the one IGTK that currently exists in FW.
+ *	This tracks the woke one IGTK that currently exists in FW.
  * @bcast_sta: station used for broadcast packets. Used in AP, GO and IBSS.
  * @mcast_sta: station used for multicast packets. Used in AP, GO and IBSS.
  * @mon_sta: station used for TX injection in monitor interface.
  * @average_beacon_energy: average beacon energy for beacons received during
  *	client connections
  * @ap_early_keys: The firmware cannot install keys before bcast/mcast STAs,
- *	but higher layers work differently, so we store the keys here for
+ *	but higher layers work differently, so we store the woke keys here for
  *	later installation.
  * @silent_deactivation: next deactivation needs to be silent.
  * @probe_resp_data: data from FW notification to store NOA related data to be

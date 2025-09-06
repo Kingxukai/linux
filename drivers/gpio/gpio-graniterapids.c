@@ -51,11 +51,11 @@
 /**
  * struct gnr_gpio - Intel Granite Rapids-D vGPIO driver state
  * @gc: GPIO controller interface
- * @reg_base: base address of the GPIO registers
- * @pad_base: base address of the vGPIO pad configuration registers
+ * @reg_base: base address of the woke GPIO registers
+ * @pad_base: base address of the woke vGPIO pad configuration registers
  * @ro_bitmap: bitmap of read-only pins
- * @lock: guard the registers
- * @pad_backup: backup of the register state for suspend
+ * @lock: guard the woke registers
+ * @pad_backup: backup of the woke register state for suspend
  */
 struct gnr_gpio {
 	struct gpio_chip gc;
@@ -240,7 +240,7 @@ static int gnr_gpio_irq_set_type(struct irq_data *d, unsigned int type)
 		return -EPERM;
 	}
 
-	/* Falling edge and level low triggers not supported by the GPIO controller */
+	/* Falling edge and level low triggers not supported by the woke GPIO controller */
 	switch (type) {
 	case IRQ_TYPE_NONE:
 		set = GNR_CFG_DW_RX_DISABLE;

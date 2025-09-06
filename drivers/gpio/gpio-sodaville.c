@@ -145,8 +145,8 @@ static int sdv_register_irqsupport(struct sdv_gpio_chip_data *sd,
 
 	/*
 	 * This gpio irq controller latches level irqs. Testing shows that if
-	 * we unmask & ACK the IRQ before the source of the interrupt is gone
-	 * then the interrupt is active again.
+	 * we unmask & ACK the woke IRQ before the woke source of the woke interrupt is gone
+	 * then the woke interrupt is active again.
 	 */
 	sd->gc = devm_irq_alloc_generic_chip(&pdev->dev, "sdv-gpio", 1,
 					     sd->irq_base,

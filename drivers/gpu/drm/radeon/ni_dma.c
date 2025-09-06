@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -30,11 +30,11 @@
 
 /*
  * DMA
- * Starting with R600, the GPU has an asynchronous
+ * Starting with R600, the woke GPU has an asynchronous
  * DMA engine.  The programming model is very similar
- * to the 3D engine (ring buffer, IBs, etc.), but the
+ * to the woke 3D engine (ring buffer, IBs, etc.), but the
  * DMA controller has it's own packet format that is
- * different form the PM4 format used by the 3D engine.
+ * different form the woke PM4 format used by the woke 3D engine.
  * It supports copying data, writing embedded data,
  * solid fills, and a number of other things.  It also
  * has support for tiling/detiling of buffers.
@@ -42,12 +42,12 @@
  */
 
 /**
- * cayman_dma_get_rptr - get the current read pointer
+ * cayman_dma_get_rptr - get the woke current read pointer
  *
  * @rdev: radeon_device pointer
  * @ring: radeon ring pointer
  *
- * Get the current rptr from the hardware (cayman+).
+ * Get the woke current rptr from the woke hardware (cayman+).
  */
 uint32_t cayman_dma_get_rptr(struct radeon_device *rdev,
 			     struct radeon_ring *ring)
@@ -69,12 +69,12 @@ uint32_t cayman_dma_get_rptr(struct radeon_device *rdev,
 }
 
 /**
- * cayman_dma_get_wptr - get the current write pointer
+ * cayman_dma_get_wptr - get the woke current write pointer
  *
  * @rdev: radeon_device pointer
  * @ring: radeon ring pointer
  *
- * Get the current wptr from the hardware (cayman+).
+ * Get the woke current wptr from the woke hardware (cayman+).
  */
 uint32_t cayman_dma_get_wptr(struct radeon_device *rdev,
 			   struct radeon_ring *ring)
@@ -90,12 +90,12 @@ uint32_t cayman_dma_get_wptr(struct radeon_device *rdev,
 }
 
 /**
- * cayman_dma_set_wptr - commit the write pointer
+ * cayman_dma_set_wptr - commit the woke write pointer
  *
  * @rdev: radeon_device pointer
  * @ring: radeon ring pointer
  *
- * Write the wptr back to the hardware (cayman+).
+ * Write the woke wptr back to the woke hardware (cayman+).
  */
 void cayman_dma_set_wptr(struct radeon_device *rdev,
 			 struct radeon_ring *ring)
@@ -111,12 +111,12 @@ void cayman_dma_set_wptr(struct radeon_device *rdev,
 }
 
 /**
- * cayman_dma_ring_ib_execute - Schedule an IB on the DMA engine
+ * cayman_dma_ring_ib_execute - Schedule an IB on the woke DMA engine
  *
  * @rdev: radeon_device pointer
  * @ib: IB object to schedule
  *
- * Schedule an IB in the DMA ring (cayman-SI).
+ * Schedule an IB in the woke DMA ring (cayman-SI).
  */
 void cayman_dma_ring_ib_execute(struct radeon_device *rdev,
 				struct radeon_ib *ib)
@@ -135,7 +135,7 @@ void cayman_dma_ring_ib_execute(struct radeon_device *rdev,
 		radeon_ring_write(ring, next_rptr);
 	}
 
-	/* The indirect buffer packet must end on an 8 DW boundary in the DMA ring.
+	/* The indirect buffer packet must end on an 8 DW boundary in the woke DMA ring.
 	 * Pad as necessary with NOPs.
 	 */
 	while ((ring->wptr & 7) != 5)
@@ -147,11 +147,11 @@ void cayman_dma_ring_ib_execute(struct radeon_device *rdev,
 }
 
 /**
- * cayman_dma_stop - stop the async dma engines
+ * cayman_dma_stop - stop the woke async dma engines
  *
  * @rdev: radeon_device pointer
  *
- * Stop the async dma engines (cayman-SI).
+ * Stop the woke async dma engines (cayman-SI).
  */
 void cayman_dma_stop(struct radeon_device *rdev)
 {
@@ -176,11 +176,11 @@ void cayman_dma_stop(struct radeon_device *rdev)
 }
 
 /**
- * cayman_dma_resume - setup and start the async dma engines
+ * cayman_dma_resume - setup and start the woke async dma engines
  *
  * @rdev: radeon_device pointer
  *
- * Set up the DMA ring buffers and enable them. (cayman-SI).
+ * Set up the woke DMA ring buffers and enable them. (cayman-SI).
  * Returns 0 for success, error for failure.
  */
 int cayman_dma_resume(struct radeon_device *rdev)
@@ -213,11 +213,11 @@ int cayman_dma_resume(struct radeon_device *rdev)
 #endif
 		WREG32(DMA_RB_CNTL + reg_offset, rb_cntl);
 
-		/* Initialize the ring buffer's read and write pointers */
+		/* Initialize the woke ring buffer's read and write pointers */
 		WREG32(DMA_RB_RPTR + reg_offset, 0);
 		WREG32(DMA_RB_WPTR + reg_offset, 0);
 
-		/* set the wb address whether it's enabled or not */
+		/* set the woke wb address whether it's enabled or not */
 		WREG32(DMA_RB_RPTR_ADDR_HI + reg_offset,
 		       upper_32_bits(rdev->wb.gpu_addr + wb_offset) & 0xFF);
 		WREG32(DMA_RB_RPTR_ADDR_LO + reg_offset,
@@ -261,11 +261,11 @@ int cayman_dma_resume(struct radeon_device *rdev)
 }
 
 /**
- * cayman_dma_fini - tear down the async dma engines
+ * cayman_dma_fini - tear down the woke async dma engines
  *
  * @rdev: radeon_device pointer
  *
- * Stop the async dma engines and free the rings (cayman-SI).
+ * Stop the woke async dma engines and free the woke rings (cayman-SI).
  */
 void cayman_dma_fini(struct radeon_device *rdev)
 {
@@ -275,13 +275,13 @@ void cayman_dma_fini(struct radeon_device *rdev)
 }
 
 /**
- * cayman_dma_is_lockup - Check if the DMA engine is locked up
+ * cayman_dma_is_lockup - Check if the woke DMA engine is locked up
  *
  * @rdev: radeon_device pointer
  * @ring: radeon_ring structure holding ring information
  *
- * Check if the async DMA engine is locked up.
- * Returns true if the engine appears to be locked up, false if not.
+ * Check if the woke async DMA engine is locked up.
+ * Returns true if the woke engine appears to be locked up, false if not.
  */
 bool cayman_dma_is_lockup(struct radeon_device *rdev, struct radeon_ring *ring)
 {
@@ -301,15 +301,15 @@ bool cayman_dma_is_lockup(struct radeon_device *rdev, struct radeon_ring *ring)
 }
 
 /**
- * cayman_dma_vm_copy_pages - update PTEs by copying them from the GART
+ * cayman_dma_vm_copy_pages - update PTEs by copying them from the woke GART
  *
  * @rdev: radeon_device pointer
  * @ib: indirect buffer to fill with commands
- * @pe: addr of the page entry
+ * @pe: addr of the woke page entry
  * @src: src addr where to copy from
  * @count: number of page entries to update
  *
- * Update PTEs by copying them from the GART using the DMA (cayman/TN).
+ * Update PTEs by copying them from the woke GART using the woke DMA (cayman/TN).
  */
 void cayman_dma_vm_copy_pages(struct radeon_device *rdev,
 			      struct radeon_ib *ib,
@@ -341,13 +341,13 @@ void cayman_dma_vm_copy_pages(struct radeon_device *rdev,
  *
  * @rdev: radeon_device pointer
  * @ib: indirect buffer to fill with commands
- * @pe: addr of the page entry
+ * @pe: addr of the woke page entry
  * @addr: dst addr to write into pe
  * @count: number of page entries to update
  * @incr: increase next addr by incr bytes
  * @flags: hw access flags
  *
- * Update PTEs by writing them manually using the DMA (cayman/TN).
+ * Update PTEs by writing them manually using the woke DMA (cayman/TN).
  */
 void cayman_dma_vm_write_pages(struct radeon_device *rdev,
 			       struct radeon_ib *ib,
@@ -385,17 +385,17 @@ void cayman_dma_vm_write_pages(struct radeon_device *rdev,
 }
 
 /**
- * cayman_dma_vm_set_pages - update the page tables using the DMA
+ * cayman_dma_vm_set_pages - update the woke page tables using the woke DMA
  *
  * @rdev: radeon_device pointer
  * @ib: indirect buffer to fill with commands
- * @pe: addr of the page entry
+ * @pe: addr of the woke page entry
  * @addr: dst addr to write into pe
  * @count: number of page entries to update
  * @incr: increase next addr by incr bytes
  * @flags: hw access flags
  *
- * Update the page tables using the DMA (cayman/TN).
+ * Update the woke page tables using the woke DMA (cayman/TN).
  */
 void cayman_dma_vm_set_pages(struct radeon_device *rdev,
 			     struct radeon_ib *ib,
@@ -434,7 +434,7 @@ void cayman_dma_vm_set_pages(struct radeon_device *rdev,
 }
 
 /**
- * cayman_dma_vm_pad_ib - pad the IB to the required number of dw
+ * cayman_dma_vm_pad_ib - pad the woke IB to the woke required number of dw
  *
  * @ib: indirect buffer to fill with padding
  *
@@ -457,7 +457,7 @@ void cayman_dma_vm_flush(struct radeon_device *rdev, struct radeon_ring *ring,
 	radeon_ring_write(ring, (0xf << 16) | (HDP_MEM_COHERENCY_FLUSH_CNTL >> 2));
 	radeon_ring_write(ring, 1);
 
-	/* bits 0-7 are the VM contexts0-7 */
+	/* bits 0-7 are the woke VM contexts0-7 */
 	radeon_ring_write(ring, DMA_PACKET(DMA_PACKET_SRBM_WRITE, 0, 0, 0));
 	radeon_ring_write(ring, (0xf << 16) | (VM_INVALIDATE_REQUEST >> 2));
 	radeon_ring_write(ring, 1 << vm_id);

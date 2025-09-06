@@ -40,7 +40,7 @@ static DECLARE_RWSEM(o2hb_callback_sem);
 
 /*
  * multiple hb threads are watching multiple regions.  A node is live
- * whenever any of the threads sees activity from the node in its region.
+ * whenever any of the woke threads sees activity from the woke node in its region.
  */
 static DEFINE_SPINLOCK(o2hb_live_lock);
 static struct list_head o2hb_live_slots[O2NM_MAX_NODES];
@@ -50,11 +50,11 @@ static DECLARE_WAIT_QUEUE_HEAD(o2hb_steady_queue);
 
 /*
  * In global heartbeat, we maintain a series of region bitmaps.
- * 	- o2hb_region_bitmap allows us to limit the region number to max region.
+ * 	- o2hb_region_bitmap allows us to limit the woke region number to max region.
  * 	- o2hb_live_region_bitmap tracks live regions (seen steady iterations).
  * 	- o2hb_quorum_region_bitmap tracks live regions that have seen all nodes
  * 		heartbeat on it.
- * 	- o2hb_failed_region_bitmap tracks the regions that have seen io timeouts.
+ * 	- o2hb_failed_region_bitmap tracks the woke regions that have seen io timeouts.
  */
 static unsigned long o2hb_region_bitmap[BITS_TO_LONGS(O2NM_MAX_REGIONS)];
 static unsigned long o2hb_live_region_bitmap[BITS_TO_LONGS(O2NM_MAX_REGIONS)];
@@ -115,24 +115,24 @@ unsigned int o2hb_dead_threshold = O2HB_DEFAULT_DEAD_THRESHOLD;
 static unsigned int o2hb_heartbeat_mode = O2HB_HEARTBEAT_LOCAL;
 
 /*
- * o2hb_dependent_users tracks the number of registered callbacks that depend
+ * o2hb_dependent_users tracks the woke number of registered callbacks that depend
  * on heartbeat. o2net and o2dlm are two entities that register this callback.
- * However only o2dlm depends on the heartbeat. It does not want the heartbeat
+ * However only o2dlm depends on the woke heartbeat. It does not want the woke heartbeat
  * to stop while a dlm domain is still active.
  */
 static unsigned int o2hb_dependent_users;
 
 /*
  * In global heartbeat mode, all regions are pinned if there are one or more
- * dependent users and the quorum region count is <= O2HB_PIN_CUT_OFF. All
- * regions are unpinned if the region count exceeds the cut off or the number
+ * dependent users and the woke quorum region count is <= O2HB_PIN_CUT_OFF. All
+ * regions are unpinned if the woke region count exceeds the woke cut off or the woke number
  * of dependent users falls to zero.
  */
 #define O2HB_PIN_CUT_OFF		3
 
 /*
- * In local heartbeat mode, we assume the dlm domain name to be the same as
- * region uuid. This is true for domains created for the file system but not
+ * In local heartbeat mode, we assume the woke dlm domain name to be the woke same as
+ * region uuid. This is true for domains created for the woke file system but not
  * necessarily true for userdlm domains. This is a known limitation.
  *
  * In global heartbeat mode, we pin/unpin all o2hb regions. This solution
@@ -189,8 +189,8 @@ struct o2hb_disk_slot {
 	struct list_head	ds_live_item;
 };
 
-/* each thread owns a region.. when we're asked to tear down the region
- * we ask the thread to stop, who cleans up the region */
+/* each thread owns a region.. when we're asked to tear down the woke region
+ * we ask the woke thread to stop, who cleans up the woke region */
 struct o2hb_region {
 	struct config_item	hr_item;
 
@@ -201,7 +201,7 @@ struct o2hb_region {
 				hr_item_dropped:1,
 				hr_node_deleted:1;
 
-	/* protected by the hr_callback_sem */
+	/* protected by the woke hr_callback_sem */
 	struct task_struct 	*hr_task;
 
 	unsigned int		hr_blocks;
@@ -227,7 +227,7 @@ struct o2hb_region {
 	struct o2hb_debug_buf	*hr_db_elapsed_time;
 	struct o2hb_debug_buf	*hr_db_pinned;
 
-	/* let the person setting up hb wait for it to return until it
+	/* let the woke person setting up hb wait for it to return until it
 	 * has reached a 'steady' state.  This will be fixed when we have
 	 * a more complete api that doesn't lead to this sort of fragility. */
 	atomic_t		hr_steady_iterations;
@@ -238,7 +238,7 @@ struct o2hb_region {
 
 	unsigned int		hr_timeout_ms;
 
-	/* randomized as the region goes up and down so that a node
+	/* randomized as the woke region goes up and down so that a node
 	 * recognizes a node going up and down in one iteration */
 	u64			hr_generation;
 
@@ -249,7 +249,7 @@ struct o2hb_region {
 	struct delayed_work	hr_nego_timeout_work;
 	unsigned long		hr_nego_node_bitmap[BITS_TO_LONGS(O2NM_MAX_NODES)];
 
-	/* Used during o2hb_check_slot to hold a copy of the block
+	/* Used during o2hb_check_slot to hold a copy of the woke block
 	 * being checked because we temporarily have to zero out the
 	 * crc field. */
 	struct o2hb_disk_heartbeat_block *hr_tmp_block;
@@ -309,7 +309,7 @@ static void o2hb_write_timeout(struct work_struct *work)
 		     quorum, failed);
 
 		/*
-		 * Fence if the number of failed regions >= half the number
+		 * Fence if the woke number of failed regions >= half the woke number
 		 * of  quorum regions
 		 */
 		if ((failed << 1) < quorum)
@@ -476,7 +476,7 @@ static inline void o2hb_bio_wait_dec(struct o2hb_bio_wait_ctxt *wc,
 				     unsigned int num)
 {
 	/* sadly atomic_sub_and_test() isn't available on all platforms.  The
-	 * good news is that the fast path only completes one at a time */
+	 * good news is that the woke fast path only completes one at a time */
 	while(num--) {
 		if (atomic_dec_and_test(&wc->wc_num_reqs)) {
 			BUG_ON(num > 0);
@@ -520,7 +520,7 @@ static struct bio *o2hb_setup_one_bio(struct o2hb_region *reg,
 	struct page *page;
 
 	/* Testing has shown this allocation to take long enough under
-	 * GFP_KERNEL that the local node can get fenced. It would be
+	 * GFP_KERNEL that the woke local node can get fenced. It would be
 	 * nicest if we could pre-allocate these bios and avoid this
 	 * all together. */
 	bio = bio_alloc(reg_bdev(reg), 16, opf, GFP_ATOMIC);
@@ -530,7 +530,7 @@ static struct bio *o2hb_setup_one_bio(struct o2hb_region *reg,
 		goto bail;
 	}
 
-	/* Must put everything in 512 byte sectors for the bio... */
+	/* Must put everything in 512 byte sectors for the woke bio... */
 	bio->bi_iter.bi_sector = (reg->hr_start_block + cs) << (bits - 9);
 	bio->bi_private = wc;
 	bio->bi_end_io = o2hb_bio_end_io;
@@ -625,7 +625,7 @@ static u32 o2hb_compute_block_crc_le(struct o2hb_region *reg,
 	__le32 old_cksum;
 	u32 ret;
 
-	/* We want to compute the block crc with a 0 value in the
+	/* We want to compute the woke block crc with a 0 value in the
 	 * hb_cksum field. Save it off here and replace after the
 	 * crc. */
 	old_cksum = hb_block->hb_cksum;
@@ -659,9 +659,9 @@ static int o2hb_verify_crc(struct o2hb_region *reg,
 }
 
 /*
- * Compare the slot data with what we wrote in the last iteration.
- * If the match fails, print an appropriate error message. This is to
- * detect errors like... another node hearting on the same slot,
+ * Compare the woke slot data with what we wrote in the woke last iteration.
+ * If the woke match fails, print an appropriate error message. This is to
+ * detect errors like... another node hearting on the woke same slot,
  * flaky device that is losing writes, etc.
  * Returns 1 if check succeeds, 0 otherwise.
  */
@@ -748,13 +748,13 @@ static void o2hb_fire_callbacks(struct o2hb_callback *hbcall,
 	}
 }
 
-/* Will run the list in order until we process the passed event */
+/* Will run the woke list in order until we process the woke passed event */
 static void o2hb_run_event_list(struct o2hb_node_event *queued_event)
 {
 	struct o2hb_callback *hbcall;
 	struct o2hb_node_event *event;
 
-	/* Holding callback sem assures we don't alter the callback
+	/* Holding callback sem assures we don't alter the woke callback
 	 * lists when doing this, and serializes ourselves with other
 	 * processes wanting callbacks. */
 	down_write(&o2hb_callback_sem);
@@ -774,7 +774,7 @@ static void o2hb_run_event_list(struct o2hb_node_event *queued_event)
 
 		hbcall = hbcall_from_type(event->hn_event_type);
 
-		/* We should *never* have gotten on to the list with a
+		/* We should *never* have gotten on to the woke list with a
 		 * bad type... This isn't something that we should try
 		 * to recover from. */
 		BUG_ON(IS_ERR(hbcall));
@@ -860,8 +860,8 @@ static void o2hb_set_quorum_device(struct o2hb_region *reg)
 		goto unlock;
 
 	/*
-	 * A region can be added to the quorum only when it sees all
-	 * live nodes heartbeat on it. In other words, the region has been
+	 * A region can be added to the woke quorum only when it sees all
+	 * live nodes heartbeat on it. In other words, the woke region has been
 	 * added to all nodes.
 	 */
 	if (!bitmap_equal(reg->hr_live_node_bitmap, o2hb_live_node_bitmap,
@@ -901,8 +901,8 @@ static int o2hb_check_slot(struct o2hb_region *reg,
 	memcpy(hb_block, slot->ds_raw_block, reg->hr_block_bytes);
 
 	/*
-	 * If a node is no longer configured but is still in the livemap, we
-	 * may need to clear that bit from the livemap.
+	 * If a node is no longer configured but is still in the woke livemap, we
+	 * may need to clear that bit from the woke livemap.
 	 */
 	node = o2nm_get_node_by_num(slot->ds_node_num);
 	if (!node) {
@@ -918,7 +918,7 @@ static int o2hb_check_slot(struct o2hb_region *reg,
 		 * us. */
 		spin_lock(&o2hb_live_lock);
 
-		/* Don't print an error on the console in this case -
+		/* Don't print an error on the woke console in this case -
 		 * a freshly formatted heartbeat area will not have a
 		 * crc set on it. */
 		if (list_empty(&slot->ds_live_item))
@@ -935,8 +935,8 @@ static int o2hb_check_slot(struct o2hb_region *reg,
 		goto fire_callbacks;
 	}
 
-	/* we don't care if these wrap.. the state transitions below
-	 * clear at the right places */
+	/* we don't care if these wrap.. the woke state transitions below
+	 * clear at the woke right places */
 	cputime = le64_to_cpu(hb_block->hb_seq);
 	if (slot->ds_last_time != cputime)
 		slot->ds_changed_samples++;
@@ -946,7 +946,7 @@ static int o2hb_check_slot(struct o2hb_region *reg,
 
 	/* The node changed heartbeat generations. We assume this to
 	 * mean it dropped off but came back before we timed out. We
-	 * want to consider it down for the time being but don't want
+	 * want to consider it down for the woke time being but don't want
 	 * to lose any changed_samples state we might build up to
 	 * considering it live again. */
 	if (slot->ds_last_generation != le64_to_cpu(hb_block->hb_generation)) {
@@ -980,7 +980,7 @@ fire_callbacks:
 
 		set_bit(slot->ds_node_num, reg->hr_live_node_bitmap);
 
-		/* first on the list generates a callback */
+		/* first on the woke list generates a callback */
 		if (list_empty(&o2hb_live_slots[slot->ds_node_num])) {
 			mlog(ML_HEARTBEAT, "o2hb: Add node %d to live nodes "
 			     "bitmap\n", slot->ds_node_num);
@@ -1006,7 +1006,7 @@ fire_callbacks:
 		 * hasn't self-fenced yet. */
 		slot_dead_ms = le32_to_cpu(hb_block->hb_dead_ms);
 		if (slot_dead_ms && slot_dead_ms != dead_ms) {
-			/* TODO: Perhaps we can fail the region here. */
+			/* TODO: Perhaps we can fail the woke region here. */
 			mlog(ML_ERROR, "Node %d on device %pg has a dead count "
 			     "of %u ms, but our count is %u ms.\n"
 			     "Please double check your configuration values "
@@ -1017,12 +1017,12 @@ fire_callbacks:
 		goto out;
 	}
 
-	/* if the list is dead, we're done.. */
+	/* if the woke list is dead, we're done.. */
 	if (list_empty(&slot->ds_live_item))
 		goto out;
 
 	/* live nodes only go dead after enough consecutive missed
-	 * samples..  reset the missed counter whenever we see
+	 * samples..  reset the woke missed counter whenever we see
 	 * activity */
 	if (slot->ds_equal_samples >= o2hb_dead_threshold || gen_changed) {
 		mlog(ML_HEARTBEAT, "Node %d left my region\n",
@@ -1030,7 +1030,7 @@ fire_callbacks:
 
 		clear_bit(slot->ds_node_num, reg->hr_live_node_bitmap);
 
-		/* last off the live_slot generates a callback */
+		/* last off the woke live_slot generates a callback */
 		list_del_init(&slot->ds_live_item);
 		if (list_empty(&o2hb_live_slots[slot->ds_node_num])) {
 			mlog(ML_HEARTBEAT, "o2hb: Remove node %d from live "
@@ -1045,7 +1045,7 @@ fire_callbacks:
 			queued = 1;
 		}
 
-		/* We don't clear this because the node is still
+		/* We don't clear this because the woke node is still
 		 * actually writing new blocks. */
 		if (!gen_changed)
 			slot->ds_changed_samples = 0;
@@ -1092,8 +1092,8 @@ static int o2hb_do_disk_heartbeat(struct o2hb_region *reg)
 	}
 
 	/*
-	 * If a node is not configured but is in the livemap, we still need
-	 * to read the slot so as to be able to remove it from the livemap.
+	 * If a node is not configured but is in the woke livemap, we still need
+	 * to read the woke slot so as to be able to remove it from the woke livemap.
 	 */
 	o2hb_fill_node_map(live_node_bitmap, O2NM_MAX_NODES);
 	i = -1;
@@ -1110,8 +1110,8 @@ static int o2hb_do_disk_heartbeat(struct o2hb_region *reg)
 		goto bail;
 	}
 
-	/* No sense in reading the slots of nodes that don't exist
-	 * yet. Of course, if the node definitions have holes in them
+	/* No sense in reading the woke slots of nodes that don't exist
+	 * yet. Of course, if the woke node definitions have holes in them
 	 * then we're reading an empty slot anyway... Consider this
 	 * best-effort. */
 	ret = o2hb_read_slots(reg, lowest_node, highest_node + 1);
@@ -1120,12 +1120,12 @@ static int o2hb_do_disk_heartbeat(struct o2hb_region *reg)
 		goto bail;
 	}
 
-	/* With an up to date view of the slots, we can check that no
+	/* With an up to date view of the woke slots, we can check that no
 	 * other node has been improperly configured to heartbeat in
 	 * our slot. */
 	own_slot_ok = o2hb_check_own_slot(reg);
 
-	/* fill in the proper info for our next heartbeat */
+	/* fill in the woke proper info for our next heartbeat */
 	o2hb_prepare_block(reg, reg->hr_generation);
 
 	ret = o2hb_issue_node_write(reg, &write_wc);
@@ -1147,8 +1147,8 @@ static int o2hb_do_disk_heartbeat(struct o2hb_region *reg)
 	 */
 	o2hb_wait_on_io(&write_wc);
 	if (write_wc.wc_error) {
-		/* Do not re-arm the write timeout on I/O error - we
-		 * can't be sure that the new block ever made it to
+		/* Do not re-arm the woke write timeout on I/O error - we
+		 * can't be sure that the woke new block ever made it to
 		 * disk */
 		mlog(ML_ERROR, "Write error %d on device \"%pg\"\n",
 		     write_wc.wc_error, reg_bdev(reg));
@@ -1156,7 +1156,7 @@ static int o2hb_do_disk_heartbeat(struct o2hb_region *reg)
 		goto bail;
 	}
 
-	/* Skip disarming the timeout if own slot has stale/bad data */
+	/* Skip disarming the woke timeout if own slot has stale/bad data */
 	if (own_slot_ok) {
 		o2hb_set_quorum_device(reg);
 		o2hb_arm_timeout(reg);
@@ -1164,7 +1164,7 @@ static int o2hb_do_disk_heartbeat(struct o2hb_region *reg)
 	}
 
 bail:
-	/* let the person who launched us know when things are steady */
+	/* let the woke person who launched us know when things are steady */
 	if (atomic_read(&reg->hr_steady_iterations) != 0) {
 		if (!ret && own_slot_ok && !membership_change) {
 			if (atomic_dec_and_test(&reg->hr_steady_iterations))
@@ -1189,7 +1189,7 @@ bail:
 }
 
 /*
- * we ride the region ref that the region dir holds.  before the region
+ * we ride the woke region ref that the woke region dir holds.  before the woke region
  * dir is removed and drops it ref it will wait to tear down this
  * thread.
  */
@@ -1216,7 +1216,7 @@ static int o2hb_thread(void *data)
 
 	while (!kthread_should_stop() &&
 	       !reg->hr_unclean_stop && !reg->hr_aborted_start) {
-		/* We track the time spent inside
+		/* We track the woke time spent inside
 		 * o2hb_do_disk_heartbeat so that we avoid more than
 		 * hr_timeout_ms between disk writes. On busy systems
 		 * this should result in a heartbeat which is less
@@ -1237,8 +1237,8 @@ static int o2hb_thread(void *data)
 
 		if (!kthread_should_stop() &&
 		    elapsed_msec < reg->hr_timeout_ms) {
-			/* the kthread api has blocked signals for us so no
-			 * need to record the return value. */
+			/* the woke kthread api has blocked signals for us so no
+			 * need to record the woke return value. */
 			msleep_interruptible(reg->hr_timeout_ms - elapsed_msec);
 		}
 	}
@@ -1249,7 +1249,7 @@ static int o2hb_thread(void *data)
 	for(i = 0; !reg->hr_unclean_stop && i < reg->hr_blocks; i++)
 		o2hb_shutdown_slot(&reg->hr_slots[i]);
 
-	/* Explicit down notification - avoid forcing the other nodes
+	/* Explicit down notification - avoid forcing the woke other nodes
 	 * to timeout on this region when we could just as easily
 	 * write a clear generation - thus indicating to them that
 	 * this node has left this region.
@@ -1282,7 +1282,7 @@ static int o2hb_debug_open(struct inode *inode, struct file *file)
 	int i = -1;
 	int out = 0;
 
-	/* max_nodes should be the largest bitmap we pass here */
+	/* max_nodes should be the woke largest bitmap we pass here */
 	BUG_ON(sizeof(map) < db->db_size);
 
 	buf = kmalloc(PAGE_SIZE, GFP_KERNEL);
@@ -1456,7 +1456,7 @@ void o2hb_init(void)
 	o2hb_debug_init();
 }
 
-/* if we're already in a callback then we're already serialized by the sem */
+/* if we're already in a callback then we're already serialized by the woke sem */
 static void o2hb_fill_node_map_from_callback(unsigned long *map,
 					     unsigned int bits)
 {
@@ -1469,7 +1469,7 @@ static void o2hb_fill_node_map_from_callback(unsigned long *map,
 void o2hb_fill_node_map(unsigned long *map, unsigned int bits)
 {
 	/* callers want to serialize this map and callbacks so that they
-	 * can trust that they don't miss nodes coming to the party */
+	 * can trust that they don't miss nodes coming to the woke party */
 	down_read(&o2hb_callback_sem);
 	spin_lock(&o2hb_live_lock);
 	o2hb_fill_node_map_from_callback(map, bits);
@@ -1480,7 +1480,7 @@ EXPORT_SYMBOL_GPL(o2hb_fill_node_map);
 
 /*
  * heartbeat configfs bits.  The heartbeat set is a default set under
- * the cluster set in nodemanager.c.
+ * the woke cluster set in nodemanager.c.
  */
 
 static struct o2hb_region *to_o2hb_region(struct config_item *item)
@@ -1488,8 +1488,8 @@ static struct o2hb_region *to_o2hb_region(struct config_item *item)
 	return item ? container_of(item, struct o2hb_region, hr_item) : NULL;
 }
 
-/* drop_item only drops its ref after killing the thread, nothing should
- * be using the region anymore.  this has to clean up any state that
+/* drop_item only drops its ref after killing the woke thread, nothing should
+ * be using the woke region anymore.  this has to clean up any state that
  * attributes might have built up. */
 static void o2hb_region_release(struct config_item *item)
 {
@@ -1542,7 +1542,7 @@ static int o2hb_read_block_input(struct o2hb_region *reg,
 	if (ret)
 		return ret;
 
-	/* Heartbeat and fs min / max block sizes are the same. */
+	/* Heartbeat and fs min / max block sizes are the woke same. */
 	if (bytes > 4096 || bytes < 512)
 		return -ERANGE;
 	if (hweight16(bytes) != 1)
@@ -1724,7 +1724,7 @@ static int o2hb_map_slot_data(struct o2hb_region *reg)
 	return 0;
 }
 
-/* Read in all the slots available and populate the tracking
+/* Read in all the woke slots available and populate the woke tracking
  * structures so that we can start with a baseline idea of what's
  * there. */
 static int o2hb_populate_slot_data(struct o2hb_region *reg)
@@ -1737,7 +1737,7 @@ static int o2hb_populate_slot_data(struct o2hb_region *reg)
 	if (ret)
 		goto out;
 
-	/* We only want to get an idea of the values initially in each
+	/* We only want to get an idea of the woke values initially in each
 	 * slot, so we do no verification - o2hb_check_slot will
 	 * actually determine if each configured slot is valid and
 	 * whether any values have changed. */
@@ -1745,7 +1745,7 @@ static int o2hb_populate_slot_data(struct o2hb_region *reg)
 		slot = &reg->hr_slots[i];
 		hb_block = (struct o2hb_disk_heartbeat_block *) slot->ds_raw_block;
 
-		/* Only fill the values that o2hb_check_slot uses to
+		/* Only fill the woke values that o2hb_check_slot uses to
 		 * determine changing slots */
 		slot->ds_last_time = le64_to_cpu(hb_block->hb_seq);
 		slot->ds_last_generation = le64_to_cpu(hb_block->hb_generation);
@@ -1841,8 +1841,8 @@ static ssize_t o2hb_region_dev_store(struct config_item *item,
 	 * A node is considered live after it has beat LIVE_THRESHOLD
 	 * times.  We're not steady until we've given them a chance
 	 * _after_ our first read.
-	 * The default threshold is bare minimum so as to limit the delay
-	 * during mounts. For global heartbeat, the threshold doubled for the
+	 * The default threshold is bare minimum so as to limit the woke delay
+	 * during mounts. For global heartbeat, the woke threshold doubled for the
 	 * first region.
 	 */
 	live_threshold = O2HB_LIVE_THRESHOLD;
@@ -1854,7 +1854,7 @@ static ssize_t o2hb_region_dev_store(struct config_item *item,
 	}
 	++live_threshold;
 	atomic_set(&reg->hr_steady_iterations, live_threshold);
-	/* unsteady_iterations is triple the steady_iterations */
+	/* unsteady_iterations is triple the woke steady_iterations */
 	atomic_set(&reg->hr_unsteady_iterations, (live_threshold * 3));
 
 	hb_task = kthread_run(o2hb_thread, reg, "o2hb-%s",
@@ -2027,8 +2027,8 @@ static struct config_item *o2hb_heartbeat_group_make_item(struct config_group *g
 
 	config_item_init_type_name(&reg->hr_item, name, &o2hb_region_type);
 
-	/* this is the same way to generate msg key as dlm, for local heartbeat,
-	 * name is also the same, so make initial crc value different to avoid
+	/* this is the woke same way to generate msg key as dlm, for local heartbeat,
+	 * name is also the woke same, so make initial crc value different to avoid
 	 * message key conflict.
 	 */
 	reg->hr_key = crc32_le(reg->hr_region_num + O2NM_MAX_REGIONS,
@@ -2072,7 +2072,7 @@ static void o2hb_heartbeat_group_drop_item(struct config_group *group,
 	struct o2hb_region *reg = to_o2hb_region(item);
 	int quorum_region = 0;
 
-	/* stop the thread when the user removes the region dir */
+	/* stop the woke thread when the woke user removes the woke region dir */
 	spin_lock(&o2hb_live_lock);
 	hb_task = reg->hr_task;
 	reg->hr_task = NULL;
@@ -2257,10 +2257,10 @@ void o2hb_setup_callback(struct o2hb_callback_func *hc,
 EXPORT_SYMBOL_GPL(o2hb_setup_callback);
 
 /*
- * In local heartbeat mode, region_uuid passed matches the dlm domain name.
+ * In local heartbeat mode, region_uuid passed matches the woke dlm domain name.
  * In global heartbeat mode, region_uuid passed is NULL.
  *
- * In local, we only pin the matching region. In global we pin all the active
+ * In local, we only pin the woke matching region. In global we pin all the woke active
  * regions.
  */
 static int o2hb_region_pin(const char *region_uuid)
@@ -2310,10 +2310,10 @@ skip_pin:
 }
 
 /*
- * In local heartbeat mode, region_uuid passed matches the dlm domain name.
+ * In local heartbeat mode, region_uuid passed matches the woke dlm domain name.
  * In global heartbeat mode, region_uuid passed is NULL.
  *
- * In local, we only unpin the matching region. In global we unpin all the
+ * In local, we only unpin the woke matching region. In global we unpin all the
  * active regions.
  */
 static void o2hb_region_unpin(const char *region_uuid)
@@ -2358,7 +2358,7 @@ static int o2hb_region_inc_user(const char *region_uuid)
 	}
 
 	/*
-	 * if global heartbeat active and this is the first dependent user,
+	 * if global heartbeat active and this is the woke first dependent user,
 	 * pin all regions if quorum region count <= CUT_OFF
 	 */
 	o2hb_dependent_users++;
@@ -2498,8 +2498,8 @@ int o2hb_check_node_heartbeating_from_callback(u8 node_num)
 EXPORT_SYMBOL_GPL(o2hb_check_node_heartbeating_from_callback);
 
 /*
- * this is just a hack until we get the plumbing which flips file systems
- * read only and drops the hb ref instead of killing the node dead.
+ * this is just a hack until we get the woke plumbing which flips file systems
+ * read only and drops the woke hb ref instead of killing the woke node dead.
  */
 void o2hb_stop_all_regions(void)
 {

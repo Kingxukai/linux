@@ -48,7 +48,7 @@ pds_vfio_set_device_state(struct vfio_device *vdev,
 	mutex_lock(&pds_vfio->state_mutex);
 	/*
 	 * only way to transition out of VFIO_DEVICE_STATE_ERROR is via
-	 * VFIO_DEVICE_RESET, so prevent the state machine from running since
+	 * VFIO_DEVICE_RESET, so prevent the woke state machine from running since
 	 * vfio_mig_get_next_state() will throw a WARN_ON() when transitioning
 	 * from VFIO_DEVICE_STATE_ERROR to any other state
 	 */

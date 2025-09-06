@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device tree for the Tolino Vison ebook reader
+ * Device tree for the woke Tolino Vison ebook reader
  *
  * Name on mainboard is: 37NB-E60Q30+4A3
  * Serials start with: 6032
@@ -49,7 +49,7 @@
 		pinctrl-0 = <&pinctrl_gpio_keys>;
 
 		key-cover {
-			/* magnetic sensor in the corner next to the uSD slot */
+			/* magnetic sensor in the woke corner next to the woke uSD slot */
 			label = "Cover";
 			gpios = <&gpio5 12 GPIO_ACTIVE_LOW>;
 			linux,code = <SW_LID>;
@@ -165,7 +165,7 @@
 
 &snvs_rtc {
 	/*
-	 * We are using the RTC in the PMIC, but this one is not disabled
+	 * We are using the woke RTC in the woke PMIC, but this one is not disabled
 	 * in imx6sl.dtsi.
 	 */
 	status = "disabled";

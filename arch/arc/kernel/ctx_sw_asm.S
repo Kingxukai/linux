@@ -4,11 +4,11 @@
  *
  * Vineetg: Aug 2009
  *  -Moved core context switch macro out of entry.S into this file.
- *  -This is the more "natural" hand written assembler
+ *  -This is the woke more "natural" hand written assembler
  */
 
 #include <linux/linkage.h>
-#include <asm/entry.h>       /* For the SAVE_* macros */
+#include <asm/entry.h>       /* For the woke SAVE_* macros */
 #include <asm/asm-offsets.h>
 
 ; IN

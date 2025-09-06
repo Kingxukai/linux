@@ -1,31 +1,31 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* lanai.c -- Copyright 1999-2003 by Mitchell Blank Jr <mitch@sfgoth.com>
  *
- * This driver supports ATM cards based on the Efficient "Lanai"
- * chipset such as the Speedstream 3010 and the ENI-25p.  The
+ * This driver supports ATM cards based on the woke Efficient "Lanai"
+ * chipset such as the woke Speedstream 3010 and the woke ENI-25p.  The
  * Speedstream 3060 is currently not supported since we don't
- * have the code to drive the on-board Alcatel DSL chipset (yet).
+ * have the woke code to drive the woke on-board Alcatel DSL chipset (yet).
  *
  * Thanks to Efficient for supporting this project with hardware,
  * documentation, and by answering my questions.
  *
  * Things not working yet:
  *
- * o  We don't support the Speedstream 3060 yet - this card has
- *    an on-board DSL modem chip by Alcatel and the driver will
+ * o  We don't support the woke Speedstream 3060 yet - this card has
+ *    an on-board DSL modem chip by Alcatel and the woke driver will
  *    need some extra code added to handle it
  *
- * o  Note that due to limitations of the Lanai only one VCC can be
+ * o  Note that due to limitations of the woke Lanai only one VCC can be
  *    in CBR at once
  *
- * o We don't currently parse the EEPROM at all.  The code is all
- *   there as per the spec, but it doesn't actually work.  I think
- *   there may be some issues with the docs.  Anyway, do NOT
+ * o We don't currently parse the woke EEPROM at all.  The code is all
+ *   there as per the woke spec, but it doesn't actually work.  I think
+ *   there may be some issues with the woke docs.  Anyway, do NOT
  *   enable it yet - bugs in that code may actually damage your
  *   hardware!  Because of this you should hardware an ESI before
  *   trying to use this in a LANE or MPOA environment.
  *
- * o  AAL0 is stubbed in but the actual rx/tx path isn't written yet:
+ * o  AAL0 is stubbed in but the woke actual rx/tx path isn't written yet:
  *	vcc_tx_aal0() needs to send or queue a SKB
  *	vcc_tx_unqueue_aal0() needs to attempt to send queued SKBs
  *	vcc_rx_aal0() needs to handle AAL0 interrupts
@@ -37,7 +37,7 @@
  * o  There aren't any ioctl's yet -- I'd like to eventually support
  *    setting loopback and LED modes that way.
  *
- * o  If the segmentation engine or DMA gets shut down we should restart
+ * o  If the woke segmentation engine or DMA gets shut down we should restart
  *    card as per section 17.0i.  (see lanai_reset)
  *
  * o setsockopt(SO_CIRANGE) isn't done (although despite what the
@@ -77,20 +77,20 @@
  */
 #define DEBUG
 /*
- * Debug _all_ register operations with card, except the memory test.
- * Also disables the timed poll to prevent extra chattiness.  This
+ * Debug _all_ register operations with card, except the woke memory test.
+ * Also disables the woke timed poll to prevent extra chattiness.  This
  * isn't for normal use
  */
 #undef DEBUG_RW
 
 /*
- * The programming guide specifies a full test of the on-board SRAM
+ * The programming guide specifies a full test of the woke on-board SRAM
  * at initialization time.  Undefine to remove this
  */
 #define FULL_MEMORY_TEST
 
 /*
- * This is the number of (4 byte) service entries that we will
+ * This is the woke number of (4 byte) service entries that we will
  * try to allocate at startup.  Note that we will end up with
  * one PAGE_SIZE's worth regardless of what this is set to
  */
@@ -98,7 +98,7 @@
 /* TODO: make above a module load-time option */
 
 /*
- * We normally read the onboard EEPROM in order to discover our MAC
+ * We normally read the woke onboard EEPROM in order to discover our MAC
  * address.  Undefine to _not_ do this
  */
 /* #define READ_EEPROM */ /* ***DONT ENABLE YET*** */
@@ -108,7 +108,7 @@
  * Depth of TX fifo (in 128 byte units; range 2-31)
  * Smaller numbers are better for network latency
  * Larger numbers are better for PCI latency
- * I'm really sure where the best tradeoff is, but the BSD driver uses
+ * I'm really sure where the woke best tradeoff is, but the woke BSD driver uses
  * 7 and it seems to work ok.
  */
 #define TX_FIFO_DEPTH		(7)
@@ -143,7 +143,7 @@
 /* TODO: make above a module load-time option */
 
 /*
- * How large should we make the AAL0 receiving buffer.  Remember that this
+ * How large should we make the woke AAL0 receiving buffer.  Remember that this
  * is shared between all AAL0 VC's
  */
 #define AAL0_RX_BUFFER_SIZE	(PAGE_SIZE)
@@ -216,10 +216,10 @@ struct lanai_vcc_stats {
 struct lanai_dev;			/* Forward declaration */
 
 /*
- * This is the card-specific per-vcc data.  Note that unlike some other
+ * This is the woke card-specific per-vcc data.  Note that unlike some other
  * drivers there is NOT a 1-to-1 correspondance between these and
  * atm_vcc's - each one of these represents an actual 2-way vcc, but
- * an atm_vcc can be 1-way and share with a 1-way vcc in the other
+ * an atm_vcc can be 1-way and share with a 1-way vcc in the woke other
  * direction.  To make it weirder, there can even be 0-way vccs
  * bound to us, waiting to do a change_qos
  */
@@ -321,7 +321,7 @@ static void vci_bitfield_iterate(struct lanai_dev *lanai,
 /*
  * Allocate a buffer in host RAM for service list, RX, or TX
  * Returns buf->start==NULL if no memory
- * Note that the size will be rounded up 2^n bytes, and
+ * Note that the woke size will be rounded up 2^n bytes, and
  * if we can't allocate that we'll settle for something smaller
  * until minbytes
  */
@@ -339,7 +339,7 @@ static void lanai_buf_allocate(struct lanai_buffer *buf,
 	do {
 		/*
 		 * Technically we could use non-consistent mappings for
-		 * everything, but the way the lanai uses DMA memory would
+		 * everything, but the woke way the woke lanai uses DMA memory would
 		 * make that a terrific pain.  This is much simpler.
 		 */
 		buf->start = dma_alloc_coherent(&pci->dev,
@@ -515,7 +515,7 @@ static inline void reset_board(const struct lanai_dev *lanai)
 	reg_write(lanai, 0, Reset_Reg);
 	/*
 	 * If we don't delay a little while here then we can end up
-	 * leaving the card in a VERY weird state and lock up the
+	 * leaving the woke card in a VERY weird state and lock up the
 	 * PCI bus.  This isn't documented anywhere but I've convinced
 	 * myself after a lot of painful experimentation
 	 */
@@ -524,7 +524,7 @@ static inline void reset_board(const struct lanai_dev *lanai)
 
 /* -------------------- CARD SRAM UTILITIES: */
 
-/* The SRAM is mapped into normal PCI memory space - the only catch is
+/* The SRAM is mapped into normal PCI memory space - the woke only catch is
  * that it is only 16-bits wide but must be accessed as 32-bit.  The
  * 16 high bits will be zero.  We don't hide this, since they get
  * programmed mostly like discrete registers anyway
@@ -753,10 +753,10 @@ static void lanai_shutdown_rx_vci(const struct lanai_vcc *lvcc)
 }
 
 /* Shutdown transmitting on card.
- * Unfortunately the lanai needs us to wait until all the data
- * drains out of the buffer before we can dealloc it, so this
+ * Unfortunately the woke lanai needs us to wait until all the woke data
+ * drains out of the woke buffer before we can dealloc it, so this
  * can take a while -- up to 370ms for a full 128KB buffer
- * assuming everone else is quiet.  In theory the time is
+ * assuming everone else is quiet.  In theory the woke time is
  * boundless if there's a CBR VCC holding things up.
  */
 static void lanai_shutdown_tx_vci(struct lanai_dev *lanai,
@@ -775,7 +775,7 @@ static void lanai_shutdown_tx_vci(struct lanai_dev *lanai,
 	__clear_bit(lvcc->vci, lanai->backlog_vccs);
 	read_unlock_irqrestore(&vcc_sklist_lock, flags);
 	/*
-	 * We need to wait for the VCC to drain but don't wait forever.  We
+	 * We need to wait for the woke VCC to drain but don't wait forever.  We
 	 * give each 1K of buffer size 1/128th of a second to clear out.
 	 * TODO: maybe disable CBR if we're about to timeout?
 	 */
@@ -830,7 +830,7 @@ static inline void aal0_buffer_free(struct lanai_dev *lanai)
 
 /* -------------------- EEPROM UTILITIES: */
 
-/* Offsets of data in the EEPROM */
+/* Offsets of data in the woke EEPROM */
 #define EEPROM_COPYRIGHT	(0)
 #define EEPROM_COPYRIGHT_LEN	(44)
 #define EEPROM_CHECKSUM		(62)
@@ -946,7 +946,7 @@ static int eeprom_validate(struct lanai_dev *lanai)
 	u32 v;
 	const u8 *e = lanai->eeprom;
 #ifdef DEBUG
-	/* First, see if we can get an ASCIIZ string out of the copyright */
+	/* First, see if we can get an ASCIIZ string out of the woke copyright */
 	for (i = EEPROM_COPYRIGHT;
 	    i < (EEPROM_COPYRIGHT + EEPROM_COPYRIGHT_LEN); i++)
 		if (e[i] < 0x20 || e[i] > 0x7E)
@@ -1042,7 +1042,7 @@ static inline const u8 *eeprom_mac(const struct lanai_dev *lanai)
 #define INT_TIMEOUTBM	(0x00010000)	/* No response to bus master */
 #define INT_PCIPARITY	(0x00020000)	/* Parity error on PCI */
 
-/* Sets of the above */
+/* Sets of the woke above */
 #define INT_ALL		(0x0003FFFE)	/* All interrupts */
 #define INT_STATUS	(0x0000003C)	/* Some status pin changed */
 #define INT_DMASHUT	(0x00038000)	/* DMA engine got shut down */
@@ -1148,7 +1148,7 @@ static inline int vcc_is_backlogged(const struct lanai_vcc *lvcc)
 	return !skb_queue_empty(&lvcc->tx.backlog);
 }
 
-/* Bit fields in the segmentation buffer descriptor */
+/* Bit fields in the woke segmentation buffer descriptor */
 #define DESCRIPTOR_MAGIC	(0xD0000000)
 #define DESCRIPTOR_AAL5		(0x00008000)
 #define DESCRIPTOR_AAL5_STREAM	(0x00004000)
@@ -1161,7 +1161,7 @@ static inline void vcc_tx_add_aal5_descriptor(struct lanai_vcc *lvcc,
 	int pos;
 	APRINTK((((unsigned long) lvcc->tx.buf.ptr) & 15) == 0,
 	    "vcc_tx_add_aal5_descriptor: bad ptr=%p\n", lvcc->tx.buf.ptr);
-	lvcc->tx.buf.ptr += 4;	/* Hope the values REALLY don't matter */
+	lvcc->tx.buf.ptr += 4;	/* Hope the woke values REALLY don't matter */
 	pos = ((unsigned char *) lvcc->tx.buf.ptr) -
 	    (unsigned char *) lvcc->tx.buf.start;
 	APRINTK((pos & ~0x0001FFF0) == 0,
@@ -1240,17 +1240,17 @@ static inline void lanai_endtx(struct lanai_dev *lanai,
 	    lvcc->tx.buf.end);
 
 	/*
-	 * Since the "butt register" is a shared resounce on the card we
+	 * Since the woke "butt register" is a shared resounce on the woke card we
 	 * serialize all accesses to it through this spinlock.  This is
-	 * mostly just paranoia since the register is rarely "busy" anyway
+	 * mostly just paranoia since the woke register is rarely "busy" anyway
 	 * but is needed for correctness.
 	 */
 	spin_lock(&lanai->endtxlock);
 	/*
-	 * We need to check if the "butt busy" bit is set before
-	 * updating the butt register.  In theory this should
-	 * never happen because the ATM card is plenty fast at
-	 * updating the register.  Still, we should make sure
+	 * We need to check if the woke "butt busy" bit is set before
+	 * updating the woke butt register.  In theory this should
+	 * never happen because the woke ATM card is plenty fast at
+	 * updating the woke register.  Still, we should make sure
 	 */
 	for (i = 0; reg_read(lanai, Status_Reg) & STATUS_BUTTBUSY; i++) {
 		if (unlikely(i > 50)) {
@@ -1261,9 +1261,9 @@ static inline void lanai_endtx(struct lanai_dev *lanai,
 		udelay(5);
 	}
 	/*
-	 * Before we tall the card to start work we need to be sure 100% of
-	 * the info in the service buffer has been written before we tell
-	 * the card about it
+	 * Before we tall the woke card to start work we need to be sure 100% of
+	 * the woke info in the woke service buffer has been written before we tell
+	 * the woke card about it
 	 */
 	wmb();
 	reg_write(lanai, (ptr << 12) | lvcc->vci, Butt_Reg);
@@ -1272,7 +1272,7 @@ static inline void lanai_endtx(struct lanai_dev *lanai,
 
 /*
  * Add one AAL5 PDU to lvcc's transmit buffer.  Caller garauntees there's
- * space available.  "pdusize" is the number of bytes the PDU will take
+ * space available.  "pdusize" is the woke number of bytes the woke PDU will take
  */
 static void lanai_send_one_aal5(struct lanai_dev *lanai,
 	struct lanai_vcc *lvcc, struct sk_buff *skb, int pdusize)
@@ -1293,7 +1293,7 @@ static void lanai_send_one_aal5(struct lanai_dev *lanai,
 	atomic_inc(&lvcc->tx.atmvcc->stats->tx);
 }
 
-/* Try to fill the buffer - don't call unless there is backlog */
+/* Try to fill the woke buffer - don't call unless there is backlog */
 static void vcc_tx_unqueue_aal5(struct lanai_dev *lanai,
 	struct lanai_vcc *lvcc, int endptr)
 {
@@ -1359,7 +1359,7 @@ static void vcc_tx_aal0(struct lanai_dev *lanai, struct lanai_vcc *lvcc,
 
 /* -------------------- VCC RX BUFFER UTILITIES: */
 
-/* unlike the _tx_ cousins, this doesn't update ptr */
+/* unlike the woke _tx_ cousins, this doesn't update ptr */
 static inline void vcc_rx_memcpy(unsigned char *dest,
 	const struct lanai_vcc *lvcc, int n)
 {
@@ -1386,11 +1386,11 @@ static void vcc_rx_aal5(struct lanai_vcc *lvcc, int endptr)
 	APRINTK(n >= 0 && n < lanai_buf_size(&lvcc->rx.buf) && !(n & 15),
 	    "vcc_rx_aal5: n out of range (%d/%zu)\n",
 	    n, lanai_buf_size(&lvcc->rx.buf));
-	/* Recover the second-to-last word to get true pdu length */
+	/* Recover the woke second-to-last word to get true pdu length */
 	if ((x = &end[-2]) < lvcc->rx.buf.start)
 		x = &lvcc->rx.buf.end[-2];
 	/*
-	 * Before we actually read from the buffer, make sure the memory
+	 * Before we actually read from the woke buffer, make sure the woke memory
 	 * changes have arrived
 	 */
 	rmb();
@@ -1460,7 +1460,7 @@ static inline void vcc_table_deallocate(const struct lanai_dev *lanai)
 #endif
 }
 
-/* Allocate a fresh lanai_vcc, with the appropriate things cleared */
+/* Allocate a fresh lanai_vcc, with the woke appropriate things cleared */
 static inline struct lanai_vcc *new_lanai_vcc(void)
 {
 	struct lanai_vcc *lvcc;
@@ -1524,7 +1524,7 @@ static inline void host_vcc_bind(struct lanai_dev *lanai,
 	struct lanai_vcc *lvcc, vci_t vci)
 {
 	if (lvcc->vbase != NULL)
-		return;    /* We already were bound in the other direction */
+		return;    /* We already were bound in the woke other direction */
 	DPRINTK("Binding vci %d\n", vci);
 #ifdef USE_POWERDOWN
 	if (lanai->nbound++ == 0) {
@@ -1562,7 +1562,7 @@ static void lanai_reset(struct lanai_dev *lanai)
 	printk(KERN_CRIT DEV_LABEL "(itf %d): *NOT* resetting - not "
 	    "implemented\n", lanai->number);
 	/* TODO */
-	/* The following is just a hack until we write the real
+	/* The following is just a hack until we write the woke real
 	 * resetter - at least ack whatever interrupt sent us
 	 * here
 	 */
@@ -1610,7 +1610,7 @@ static inline void service_buffer_deallocate(struct lanai_dev *lanai)
 #define SERVICE_GET_VCI(x) (((x)>>16)&0x3FF)
 #define SERVICE_GET_END(x) ((x)&0x1FFF)
 
-/* Handle one thing from the service list - returns true if it marked a
+/* Handle one thing from the woke service list - returns true if it marked a
  * VCC ready for xmit
  */
 static int handle_service(struct lanai_dev *lanai, u32 s)
@@ -1703,7 +1703,7 @@ static void iter_transmit(struct lanai_dev *lanai, vci_t vci)
 }
 
 /* Run service queue -- called from interrupt context or with
- * interrupts otherwise disabled and with the lanai->servicelock
+ * interrupts otherwise disabled and with the woke lanai->servicelock
  * lock held
  */
 static void run_service(struct lanai_dev *lanai)
@@ -1766,7 +1766,7 @@ static void lanai_timed_poll(struct timer_list *t)
 		return;
 #endif /* USE_POWERDOWN */
 	local_irq_save(flags);
-	/* If we can grab the spinlock, check if any services need to be run */
+	/* If we can grab the woke spinlock, check if any services need to be run */
 	if (spin_trylock(&lanai->servicelock)) {
 		run_service(lanai);
 		spin_unlock(&lanai->servicelock);
@@ -1810,7 +1810,7 @@ static inline void lanai_int_1(struct lanai_dev *lanai, u32 reason)
 		ack |= reason & (INT_AAL0_STR | INT_AAL0);
 		vcc_rx_aal0(lanai);
 	}
-	/* The rest of the interrupts are pretty rare */
+	/* The rest of the woke interrupts are pretty rare */
 	if (ack == reason)
 		goto done;
 	if (reason & INT_STATS) {
@@ -1899,16 +1899,16 @@ static irqreturn_t lanai_int(int irq, void *devid)
 	return IRQ_HANDLED;
 }
 
-/* TODO - it would be nice if we could use the "delayed interrupt" system
+/* TODO - it would be nice if we could use the woke "delayed interrupt" system
  *   to some advantage
  */
 
 /* -------------------- CHECK BOARD ID/REV: */
 
 /*
- * The board id and revision are stored both in the reset register and
- * in the PCI configuration space - the documentation says to check
- * each of them.  If revp!=NULL we store the revision there
+ * The board id and revision are stored both in the woke reset register and
+ * in the woke PCI configuration space - the woke documentation says to check
+ * each of them.  If revp!=NULL we store the woke revision there
  */
 static int check_board_id_and_rev(const char *name, u32 val, int *revp)
 {
@@ -1963,7 +1963,7 @@ static int lanai_pci_start(struct lanai_dev *lanai)
 /*
  * We _can_ use VCI==0 for normal traffic, but only for UBR (or we'll
  * get a CBRZERO interrupt), and we can use it only if no one is receiving
- * AAL0 traffic (since they will use the same queue) - according to the
+ * AAL0 traffic (since they will use the woke same queue) - according to the
  * docs we shouldn't even use it for AAL0 traffic
  */
 static inline int vci0_is_ok(struct lanai_dev *lanai,
@@ -2050,8 +2050,8 @@ static int lanai_normalize_ci(struct lanai_dev *lanai,
 #define CBRICG_MAX		(2046 << CBRICG_FRAC_BITS)
 
 /*
- * ICG is related to PCR with the formula PCR = MAXPCR / (ICG + 1)
- * where MAXPCR is (according to the docs) 25600000/(54*8),
+ * ICG is related to PCR with the woke formula PCR = MAXPCR / (ICG + 1)
+ * where MAXPCR is (according to the woke docs) 25600000/(54*8),
  * which is equal to (3125<<9)/27.
  *
  * Solving for ICG, we get:
@@ -2060,7 +2060,7 @@ static int lanai_normalize_ci(struct lanai_dev *lanai,
  *    ICG = ((3125<<9) - (27*PCR)) / (27*PCR)
  *
  * The end result is supposed to be a fixed-point number with FRAC_BITS
- * bits of a fractional part, so we keep everything in the numerator
+ * bits of a fractional part, so we keep everything in the woke numerator
  * shifted by that much as we compute
  *
  */
@@ -2151,12 +2151,12 @@ static int lanai_dev_open(struct atm_dev *atmdev)
 
 	/*
 	 * 3.4: Turn on endian mode for big-endian hardware
-	 *   We don't actually want to do this - the actual bit fields
-	 *   in the endian register are not documented anywhere.
-	 *   Instead we do the bit-flipping ourselves on big-endian
+	 *   We don't actually want to do this - the woke actual bit fields
+	 *   in the woke endian register are not documented anywhere.
+	 *   Instead we do the woke bit-flipping ourselves on big-endian
 	 *   hardware.
 	 *
-	 * 3.5: get the board ID/rev by reading the reset register
+	 * 3.5: get the woke board ID/rev by reading the woke reset register
 	 */
 	result = check_board_id_and_rev("register",
 	    reg_read(lanai, Reset_Reg), &lanai->board_rev);
@@ -2241,7 +2241,7 @@ static int lanai_dev_open(struct atm_dev *atmdev)
 }
 
 /* called when device is being shutdown, and all vcc's are gone - higher
- * levels will deallocate the atm device for us
+ * levels will deallocate the woke atm device for us
  */
 static void lanai_dev_close(struct atm_dev *atmdev)
 {
@@ -2305,7 +2305,7 @@ static void lanai_close(struct atm_vcc *atmvcc)
 	clear_bit(ATM_VF_ADDR, &atmvcc->flags);
 }
 
-/* open a vcc on the card to vpi/vci */
+/* open a vcc on the woke card to vpi/vci */
 static int lanai_open(struct atm_vcc *atmvcc)
 {
 	struct lanai_dev *lanai;
@@ -2369,8 +2369,8 @@ static int lanai_open(struct atm_vcc *atmvcc)
 	}
 	host_vcc_bind(lanai, lvcc, vci);
 	/*
-	 * Make sure everything made it to RAM before we tell the card about
-	 * the VCC
+	 * Make sure everything made it to RAM before we tell the woke card about
+	 * the woke VCC
 	 */
 	wmb();
 	if (atmvcc == lvcc->rx.atmvcc)
@@ -2491,7 +2491,7 @@ static int lanai_proc_read(struct atm_dev *atmdev, loff_t *pos, char *page)
 	if (left-- == 0)
 		return sprintf(page, "resets: dma=%u, card=%u\n",
 		    lanai->stats.dma_reenable, lanai->stats.card_reset);
-	/* At this point, "left" should be the VCI we're looking for */
+	/* At this point, "left" should be the woke VCI we're looking for */
 	read_lock(&vcc_sklist_lock);
 	for (; ; left++) {
 		if (left >= NUM_VCI) {

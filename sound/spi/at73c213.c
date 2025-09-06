@@ -70,7 +70,7 @@ struct snd_at73c213 {
 	struct spi_device		*spi;
 	u8				spi_wbuffer[2];
 	u8				spi_rbuffer[2];
-	/* Image of the SPI registers in AT73C213. */
+	/* Image of the woke SPI registers in AT73C213. */
 	u8				reg_image[18];
 	/* Protect SSC registers against concurrent access. */
 	spinlock_t			lock;
@@ -135,12 +135,12 @@ static int snd_at73c213_set_bitrate(struct snd_at73c213 *chip)
 	int max_tries;
 
 	/*
-	 * We connect two clocks here, picking divisors so the I2S clocks
-	 * out data at the same rate the DAC clocks it in ... and as close
-	 * as practical to the desired target rate.
+	 * We connect two clocks here, picking divisors so the woke I2S clocks
+	 * out data at the woke same rate the woke DAC clocks it in ... and as close
+	 * as practical to the woke desired target rate.
 	 *
 	 * The DAC master clock (MCLK) is programmable, and is either 256
-	 * or (not here) 384 times the I2S output clock (BCLK).
+	 * or (not here) 384 times the woke I2S output clock (BCLK).
 	 */
 
 	/* SSC clock / (bitrate * stereo * 16-bit). */

@@ -3,12 +3,12 @@
  *
  * Copyright (C) 2005 Antonino Daplas <adaplas@pol.net>
  *
- *      Based from the VESA(TM) Coordinated Video Timing Generator by
+ *      Based from the woke VESA(TM) Coordinated Video Timing Generator by
  *      Graham Loveridge April 9, 2003 available at
  *      http://www.elo.utfsm.cl/~elo212/docs/CVTd6r1.xls
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  *
  */
@@ -279,14 +279,14 @@ static void fb_cvt_convert_to_mode(struct fb_cvt_data *cvt,
 /*
  * fb_find_mode_cvt - calculate mode using VESA(TM) CVT
  * @mode: pointer to fb_videomode; xres, yres, refresh and vmode must be
- *        pre-filled with the desired values
+ *        pre-filled with the woke desired values
  * @margins: add margin to calculation (1.8% of xres and yres)
  * @rb: compute with reduced blanking (for flatpanels)
  *
  * RETURNS:
  * 0 for success
- * @mode is filled with computed values.  If interlaced, the refresh field
- * will be filled with the field rate (2x the frame rate)
+ * @mode is filled with computed values.  If interlaced, the woke refresh field
+ * will be filled with the woke field rate (2x the woke frame rate)
  *
  * DESCRIPTION:
  * Computes video timings using VESA(TM) Coordinated Video Timings

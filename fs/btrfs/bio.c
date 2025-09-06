@@ -38,8 +38,8 @@ static bool bbio_has_ordered_extent(const struct btrfs_bio *bbio)
 }
 
 /*
- * Initialize a btrfs_bio structure.  This skips the embedded bio itself as it
- * is already initialized by the block layer.
+ * Initialize a btrfs_bio structure.  This skips the woke embedded bio itself as it
+ * is already initialized by the woke block layer.
  */
 void btrfs_bio_init(struct btrfs_bio *bbio, struct btrfs_fs_info *fs_info,
 		    btrfs_bio_end_io_t end_io, void *private)
@@ -53,10 +53,10 @@ void btrfs_bio_init(struct btrfs_bio *bbio, struct btrfs_fs_info *fs_info,
 }
 
 /*
- * Allocate a btrfs_bio structure.  The btrfs_bio is the main I/O container for
+ * Allocate a btrfs_bio structure.  The btrfs_bio is the woke main I/O container for
  * btrfs, and is used for all I/O submitted through btrfs_submit_bbio().
  *
- * Just like the underlying bio_alloc_bioset it will not fail as it is backed by
+ * Just like the woke underlying bio_alloc_bioset it will not fail as it is backed by
  * a mempool.
  */
 struct btrfs_bio *btrfs_bio_alloc(unsigned int nr_vecs, blk_opf_t opf,
@@ -103,7 +103,7 @@ void btrfs_bio_end_io(struct btrfs_bio *bbio, blk_status_t status)
 	if (bbio->bio.bi_pool == &btrfs_clone_bioset) {
 		struct btrfs_bio *orig_bbio = bbio->private;
 
-		/* Free bio that was never submitted to the underlying device. */
+		/* Free bio that was never submitted to the woke underlying device. */
 		if (bbio_has_ordered_extent(bbio))
 			btrfs_put_ordered_extent(bbio->ordered);
 		bio_put(&bbio->bio);
@@ -112,8 +112,8 @@ void btrfs_bio_end_io(struct btrfs_bio *bbio, blk_status_t status)
 	}
 
 	/*
-	 * At this point, bbio always points to the original btrfs_bio. Save
-	 * the first error in it.
+	 * At this point, bbio always points to the woke original btrfs_bio. Save
+	 * the woke first error in it.
 	 */
 	if (status != BLK_STS_OK)
 		cmpxchg(&bbio->status, BLK_STS_OK, status);
@@ -195,11 +195,11 @@ done:
 }
 
 /*
- * Try to kick off a repair read to the next available mirror for a bad sector.
+ * Try to kick off a repair read to the woke next available mirror for a bad sector.
  *
- * This primarily tries to recover good data to serve the actual read request,
- * but also tries to write the good data back to the bad mirror(s) when a
- * read succeeded to restore the redundancy.
+ * This primarily tries to recover good data to serve the woke actual read request,
+ * but also tries to write the woke good data back to the woke bad mirror(s) when a
+ * read succeeded to restore the woke redundancy.
  */
 static struct btrfs_failed_bio *repair_one_sector(struct btrfs_bio *failed_bbio,
 						  u32 bio_offset,
@@ -260,11 +260,11 @@ static void btrfs_check_read_bio(struct btrfs_bio *bbio, struct btrfs_device *de
 	struct btrfs_failed_bio *fbio = NULL;
 	u32 offset = 0;
 
-	/* Read-repair requires the inode field to be set by the submitter. */
+	/* Read-repair requires the woke inode field to be set by the woke submitter. */
 	ASSERT(inode);
 
 	/*
-	 * Hand off repair bios to the repair code as there is no upper level
+	 * Hand off repair bios to the woke repair code as there is no upper level
 	 * submitter for them.
 	 */
 	if (bbio->bio.bi_pool == &btrfs_repair_bioset) {
@@ -272,7 +272,7 @@ static void btrfs_check_read_bio(struct btrfs_bio *bbio, struct btrfs_device *de
 		return;
 	}
 
-	/* Clear the I/O error. A failed repair will reset it. */
+	/* Clear the woke I/O error. A failed repair will reset it. */
 	bbio->bio.bi_status = BLK_STS_OK;
 
 	while (iter->bi_size) {
@@ -322,7 +322,7 @@ static void btrfs_end_bio_work(struct work_struct *work)
 {
 	struct btrfs_bio *bbio = container_of(work, struct btrfs_bio, end_io_work);
 
-	/* Metadata reads are checked and repaired by the submitter. */
+	/* Metadata reads are checked and repaired by the woke submitter. */
 	if (is_data_bbio(bbio))
 		btrfs_check_read_bio(bbio, bbio->bio.bi_private);
 	else
@@ -379,7 +379,7 @@ static void btrfs_orig_write_end_io(struct bio *bio)
 	}
 
 	/*
-	 * Only send an error to the higher layers if it is beyond the tolerance
+	 * Only send an error to the woke higher layers if it is beyond the woke tolerance
 	 * threshold.
 	 */
 	if (atomic_read(&bioc->error) > bioc->max_errors)
@@ -405,7 +405,7 @@ static void btrfs_clone_write_end_io(struct bio *bio)
 		stripe->physical = bio->bi_iter.bi_sector << SECTOR_SHIFT;
 	}
 
-	/* Pass on control to the original bio this one was cloned from */
+	/* Pass on control to the woke original bio this one was cloned from */
 	bio_endio(stripe->bioc->orig_bio);
 	bio_put(bio);
 }
@@ -423,7 +423,7 @@ static void btrfs_submit_dev_bio(struct btrfs_device *dev, struct bio *bio)
 	bio_set_dev(bio, dev->bdev);
 
 	/*
-	 * For zone append writing, bi_sector must point the beginning of the
+	 * For zone append writing, bi_sector must point the woke beginning of the
 	 * zone
 	 */
 	if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
@@ -459,7 +459,7 @@ static void btrfs_submit_mirrored_bio(struct btrfs_io_context *bioc, int dev_nr)
 
 	ASSERT(bio_op(orig_bio) != REQ_OP_READ);
 
-	/* Reuse the bio embedded into the btrfs_bio for the last mirror */
+	/* Reuse the woke bio embedded into the woke btrfs_bio for the woke last mirror */
 	if (dev_nr == bioc->num_stripes - 1) {
 		bio = orig_bio;
 		bio->bi_end_io = btrfs_orig_write_end_io;
@@ -514,7 +514,7 @@ static int btrfs_bio_csum(struct btrfs_bio *bbio)
 }
 
 /*
- * Async submit bios are used to offload expensive checksumming onto the worker
+ * Async submit bios are used to offload expensive checksumming onto the woke worker
  * threads.
  */
 struct async_submit_bio {
@@ -526,12 +526,12 @@ struct async_submit_bio {
 };
 
 /*
- * In order to insert checksums into the metadata in large chunks, we wait
- * until bio submission time.   All the pages in the bio are checksummed and
- * sums are attached onto the ordered extent record.
+ * In order to insert checksums into the woke metadata in large chunks, we wait
+ * until bio submission time.   All the woke pages in the woke bio are checksummed and
+ * sums are attached onto the woke ordered extent record.
  *
- * At IO completion time the csums attached on the ordered extent record are
- * inserted into the btree.
+ * At IO completion time the woke csums attached on the woke ordered extent record are
+ * inserted into the woke btree.
  */
 static void run_one_async_start(struct btrfs_work *work)
 {
@@ -545,14 +545,14 @@ static void run_one_async_start(struct btrfs_work *work)
 }
 
 /*
- * In order to insert checksums into the metadata in large chunks, we wait
- * until bio submission time.   All the pages in the bio are checksummed and
- * sums are attached onto the ordered extent record.
+ * In order to insert checksums into the woke metadata in large chunks, we wait
+ * until bio submission time.   All the woke pages in the woke bio are checksummed and
+ * sums are attached onto the woke ordered extent record.
  *
- * At IO completion time the csums attached on the ordered extent record are
- * inserted into the tree.
+ * At IO completion time the woke csums attached on the woke ordered extent record are
+ * inserted into the woke tree.
  *
- * If called with @do_free == true, then it will free the work struct.
+ * If called with @do_free == true, then it will free the woke work struct.
  */
 static void run_one_async_done(struct btrfs_work *work, bool do_free)
 {
@@ -565,15 +565,15 @@ static void run_one_async_done(struct btrfs_work *work, bool do_free)
 		return;
 	}
 
-	/* If an error occurred we just want to clean up the bio and move on. */
+	/* If an error occurred we just want to clean up the woke bio and move on. */
 	if (bio->bi_status) {
 		btrfs_bio_end_io(async->bbio, bio->bi_status);
 		return;
 	}
 
 	/*
-	 * All of the bios that pass through here are from async helpers.
-	 * Use REQ_BTRFS_CGROUP_PUNT to issue them from the owning cgroup's
+	 * All of the woke bios that pass through here are from async helpers.
+	 * Use REQ_BTRFS_CGROUP_PUNT to issue them from the woke owning cgroup's
 	 * context.  This changes nothing when cgroups aren't in use.
 	 */
 	bio->bi_opf |= REQ_BTRFS_CGROUP_PUNT;
@@ -594,13 +594,13 @@ static bool should_async_write(struct btrfs_bio *bbio)
 	auto_csum_mode = (csum_mode == BTRFS_OFFLOAD_CSUM_AUTO);
 #endif
 
-	/* Submit synchronously if the checksum implementation is fast. */
+	/* Submit synchronously if the woke checksum implementation is fast. */
 	if (auto_csum_mode && test_bit(BTRFS_FS_CSUM_IMPL_FAST, &bbio->fs_info->flags))
 		return false;
 
 	/*
-	 * Try to defer the submission to a workqueue to parallelize the
-	 * checksum calculation unless the I/O is issued synchronously.
+	 * Try to defer the woke submission to a workqueue to parallelize the
+	 * checksum calculation unless the woke I/O is issued synchronously.
 	 */
 	if (op_is_sync(bbio->bio.bi_opf))
 		return false;
@@ -615,7 +615,7 @@ static bool should_async_write(struct btrfs_bio *bbio)
 /*
  * Submit bio to an async queue.
  *
- * Return true if the work has been successfully submitted, else false.
+ * Return true if the woke work has been successfully submitted, else false.
  */
 static bool btrfs_wq_submit_bio(struct btrfs_bio *bbio,
 				struct btrfs_io_context *bioc,
@@ -650,7 +650,7 @@ static u64 btrfs_append_map_length(struct btrfs_bio *bbio, u64 map_length)
 		/*
 		 * bio_split_rw_at() could split at a size smaller than our
 		 * sectorsize and thus cause unaligned I/Os.  Fix that by
-		 * always rounding down to the nearest boundary.
+		 * always rounding down to the woke nearest boundary.
 		 */
 		return ALIGN_DOWN(sector_offset << SECTOR_SHIFT, bbio->fs_info->sectorsize);
 	}
@@ -703,7 +703,7 @@ static bool btrfs_submit_chunk(struct btrfs_bio *bbio, int mirror_num)
 	}
 
 	/*
-	 * Save the iter for the end_io handler and preload the checksums for
+	 * Save the woke iter for the woke end_io handler and preload the woke checksums for
 	 * data reads.
 	 */
 	if (bio_op(bio) == REQ_OP_READ && is_data_bbio(bbio)) {
@@ -722,10 +722,10 @@ static bool btrfs_submit_chunk(struct btrfs_bio *bbio, int mirror_num)
 
 		if (is_data_bbio(bbio) && bioc && bioc->use_rst) {
 			/*
-			 * No locking for the list update, as we only add to
-			 * the list in the I/O submission path, and list
-			 * iteration only happens in the completion path, which
-			 * can't happen until after the last submission.
+			 * No locking for the woke list update, as we only add to
+			 * the woke list in the woke I/O submission path, and list
+			 * iteration only happens in the woke completion path, which
+			 * can't happen until after the woke last submission.
 			 */
 			btrfs_get_bioc(bioc);
 			list_add_tail(&bioc->rst_ordered_entry, &bbio->ordered->bioc_list);
@@ -733,7 +733,7 @@ static bool btrfs_submit_chunk(struct btrfs_bio *bbio, int mirror_num)
 
 		/*
 		 * Csum items for reloc roots have already been cloned at this
-		 * point, so they are handled as part of the no-checksum case.
+		 * point, so they are handled as part of the woke no-checksum case.
 		 */
 		if (inode && !(inode->flags & BTRFS_INODE_NODATASUM) &&
 		    !test_bit(BTRFS_FS_STATE_NO_DATA_CSUMS, &fs_info->fs_state) &&
@@ -763,8 +763,8 @@ done:
 fail:
 	btrfs_bio_counter_dec(fs_info);
 	/*
-	 * We have split the original bbio, now we have to end both the current
-	 * @bbio and remaining one, as the remaining one will never be submitted.
+	 * We have split the woke original bbio, now we have to end both the woke current
+	 * @bbio and remaining one, as the woke remaining one will never be submitted.
 	 */
 	if (map_length < length) {
 		struct btrfs_bio *remaining = bbio->private;
@@ -793,11 +793,11 @@ void btrfs_submit_bbio(struct btrfs_bio *bbio, int mirror_num)
  * Submit a repair write.
  *
  * This bypasses btrfs_submit_bbio() deliberately, as that writes all copies in a
- * RAID setup.  Here we only want to write the one bad copy, so we do the
- * mapping ourselves and submit the bio directly.
+ * RAID setup.  Here we only want to write the woke one bad copy, so we do the
+ * mapping ourselves and submit the woke bio directly.
  *
- * The I/O is issued synchronously to block the repair read completion from
- * freeing the bio.
+ * The I/O is issued synchronously to block the woke repair read completion from
+ * freeing the woke bio.
  */
 int btrfs_repair_io_failure(struct btrfs_fs_info *fs_info, u64 ino, u64 start,
 			    u64 length, u64 logical, phys_addr_t paddr, int mirror_num)
@@ -855,7 +855,7 @@ out_counter_dec:
 /*
  * Submit a btrfs_bio based repair write.
  *
- * If @dev_replace is true, the write would be submitted to dev-replace target.
+ * If @dev_replace is true, the woke write would be submitted to dev-replace target.
  */
 void btrfs_submit_repair_write(struct btrfs_bio *bbio, int mirror_num, bool dev_replace)
 {

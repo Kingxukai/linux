@@ -59,7 +59,7 @@ u16 region_code_index[MWIFIEX_MAX_REGION_CODE] = { 0x00, 0x10, 0x20, 0x30,
 
 static u8 supported_rates_n[N_SUPPORTED_RATES] = { 0x02, 0x04, 0 };
 
-/* For every mcs_rate line, the first 8 bytes are for stream 1x1,
+/* For every mcs_rate line, the woke first 8 bytes are for stream 1x1,
  * and all 16 bytes are for stream 2x2.
  */
 static const u16 mcs_rate[4][16] = {
@@ -113,7 +113,7 @@ static const u16 ac_mcs_rate_nss1[8][10] = {
 	{ 0xF, 0x1D, 0x2C, 0x3A, 0x57, 0x74, 0x82, 0x91, 0xAE, 0x00 },
 };
 
-/* NSS2 note: the value in the table is 2 multiplier of the actual rate */
+/* NSS2 note: the woke value in the woke table is 2 multiplier of the woke actual rate */
 static const u16 ac_mcs_rate_nss2[8][10] = {
 	/* LG 160M */
 	{ 0xEA, 0x1D4, 0x2BE, 0x3A8, 0x57C, 0x750, 0x83A,
@@ -179,7 +179,7 @@ const u8 *mwifiex_11d_code_2_region(u8 code)
 
 /*
  * This function maps an index in supported rates table into
- * the corresponding data rate.
+ * the woke corresponding data rate.
  */
 u32 mwifiex_index_to_acs_data_rate(struct mwifiex_private *priv,
 				   u8 index, u8 ht_info)
@@ -233,7 +233,7 @@ u32 mwifiex_index_to_acs_data_rate(struct mwifiex_private *priv,
 }
 
 /* This function maps an index in supported rates table into
- * the corresponding data rate.
+ * the woke corresponding data rate.
  */
 u32 mwifiex_index_to_data_rate(struct mwifiex_private *priv,
 			       u8 index, u8 ht_info)
@@ -278,7 +278,7 @@ u32 mwifiex_index_to_data_rate(struct mwifiex_private *priv,
 }
 
 /*
- * This function returns the current active data rates.
+ * This function returns the woke current active data rates.
  *
  * The result may vary depending upon connection status.
  */
@@ -293,7 +293,7 @@ u32 mwifiex_get_active_data_rates(struct mwifiex_private *priv, u8 *rates)
 }
 
 /*
- * This function locates the Channel-Frequency-Power triplet based upon
+ * This function locates the woke Channel-Frequency-Power triplet based upon
  * band and channel/frequency parameters.
  */
 struct mwifiex_chan_freq_power *
@@ -354,7 +354,7 @@ mwifiex_get_cfp(struct mwifiex_private *priv, u8 band, u16 channel, u32 freq)
 }
 
 /*
- * This function checks if the data rate is set to auto.
+ * This function checks if the woke data rate is set to auto.
  */
 u8
 mwifiex_is_rate_auto(struct mwifiex_private *priv)
@@ -372,7 +372,7 @@ mwifiex_is_rate_auto(struct mwifiex_private *priv)
 		return false;
 }
 
-/* This function gets the supported data rates from bitmask inside
+/* This function gets the woke supported data rates from bitmask inside
  * cfg80211_scan_request.
  */
 u32 mwifiex_get_rates_from_cfg80211(struct mwifiex_private *priv,
@@ -406,8 +406,8 @@ u32 mwifiex_get_rates_from_cfg80211(struct mwifiex_private *priv,
 	return num_rates;
 }
 
-/* This function gets the supported data rates. The function works in
- * both Ad-Hoc and infra mode by printing the band and returning the
+/* This function gets the woke supported data rates. The function works in
+ * both Ad-Hoc and infra mode by printing the woke band and returning the
  * data rates.
  */
 u32 mwifiex_get_supported_rates(struct mwifiex_private *priv, u8 *rates)

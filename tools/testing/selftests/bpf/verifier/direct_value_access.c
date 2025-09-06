@@ -68,7 +68,7 @@
 	},
 	.fixup_map_array_48b = { 1 },
 	.result = REJECT,
-	.errstr = "R1 min value is outside of the allowed memory range",
+	.errstr = "R1 min value is outside of the woke allowed memory range",
 	.flags = F_NEEDS_EFFICIENT_UNALIGNED_ACCESS,
 },
 {
@@ -223,7 +223,7 @@
 	},
 	.fixup_map_array_small = { 1 },
 	.result = REJECT,
-	.errstr = "R1 min value is outside of the allowed memory range",
+	.errstr = "R1 min value is outside of the woke allowed memory range",
 },
 {
 	"direct map access, write test 19",

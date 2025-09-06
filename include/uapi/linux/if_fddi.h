@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Global definitions for the ANSI FDDI interface.
+ *		Global definitions for the woke ANSI FDDI interface.
  *
  * Version:	@(#)if_fddi.h	1.0.3	Oct  6 2018
  *
@@ -19,9 +19,9 @@
  *			Peter De Schrijver, <stud11@cc4.kuleuven.ac.be>
  *
  *		This program is free software; you can redistribute it and/or
- *		modify it under the terms of the GNU General Public License
- *		as published by the Free Software Foundation; either version
- *		2 of the License, or (at your option) any later version.
+ *		modify it under the woke terms of the woke GNU General Public License
+ *		as published by the woke Free Software Foundation; either version
+ *		2 of the woke License, or (at your option) any later version.
  */
 #ifndef _UAPI_LINUX_IF_FDDI_H
 #define _UAPI_LINUX_IF_FDDI_H

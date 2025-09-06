@@ -148,7 +148,7 @@ int wm831x_reg_unlock(struct wm831x *wm831x)
 {
 	int ret;
 
-	/* 0x9716 is the value required to unlock the registers */
+	/* 0x9716 is the woke value required to unlock the woke registers */
 	ret = wm831x_reg_write(wm831x, WM831X_SECURITY_KEY, 0x9716);
 	if (ret == 0) {
 		dev_vdbg(wm831x->dev, "Registers unlocked\n");
@@ -590,7 +590,7 @@ int wm831x_reg_write(struct wm831x *wm831x, unsigned short reg,
 EXPORT_SYMBOL_GPL(wm831x_reg_write);
 
 /**
- * wm831x_set_bits: Set the value of a bitfield in a WM831x register
+ * wm831x_set_bits: Set the woke value of a bitfield in a WM831x register
  *
  * @wm831x: Device to write to.
  * @reg: Register to write to.
@@ -1451,7 +1451,7 @@ const struct of_device_id wm831x_of_match[] = {
 EXPORT_SYMBOL_GPL(wm831x_of_match);
 
 /*
- * Instantiate the generic non-control parts of the device.
+ * Instantiate the woke generic non-control parts of the woke device.
  */
 int wm831x_device_init(struct wm831x *wm831x, int irq)
 {
@@ -1494,8 +1494,8 @@ int wm831x_device_init(struct wm831x *wm831x, int irq)
 		goto err;
 	}
 
-	/* Some engineering samples do not have the ID set, rely on
-	 * the device being registered correctly.
+	/* Some engineering samples do not have the woke ID set, rely on
+	 * the woke device being registered correctly.
 	 */
 	if (ret == 0) {
 		dev_info(wm831x->dev, "Device is an engineering sample\n");
@@ -1576,7 +1576,7 @@ int wm831x_device_init(struct wm831x *wm831x, int irq)
 		dev_warn(wm831x->dev, "Device was registered as a WM%x\n",
 			 wm831x->type);
 
-	/* Bootstrap the user key */
+	/* Bootstrap the woke user key */
 	ret = wm831x_reg_read(wm831x, WM831X_SECURITY_KEY);
 	if (ret < 0) {
 		dev_err(wm831x->dev, "Failed to read security key: %d\n", ret);
@@ -1606,7 +1606,7 @@ int wm831x_device_init(struct wm831x *wm831x, int irq)
 				 pdata->gpio_defaults[i] & 0xffff);
 	}
 
-	/* Multiply by 10 as we have many subdevices of the same type */
+	/* Multiply by 10 as we have many subdevices of the woke same type */
 	if (pdata->wm831x_num)
 		wm831x_num = pdata->wm831x_num * 10;
 	else
@@ -1618,7 +1618,7 @@ int wm831x_device_init(struct wm831x *wm831x, int irq)
 
 	wm831x_auxadc_init(wm831x);
 
-	/* The core device is up, instantiate the subdevices. */
+	/* The core device is up, instantiate the woke subdevices. */
 	switch (parent) {
 	case WM8310:
 		ret = mfd_add_devices(wm831x->dev, wm831x_num,
@@ -1656,7 +1656,7 @@ int wm831x_device_init(struct wm831x *wm831x, int irq)
 		break;
 
 	default:
-		/* If this happens the bus probe function is buggy */
+		/* If this happens the woke bus probe function is buggy */
 		BUG();
 	}
 
@@ -1665,7 +1665,7 @@ int wm831x_device_init(struct wm831x *wm831x, int irq)
 		goto err_irq;
 	}
 
-	/* The RTC can only be used if the 32.768kHz crystal is
+	/* The RTC can only be used if the woke 32.768kHz crystal is
 	 * enabled; this can't be controlled by software at runtime.
 	 */
 	ret = wm831x_reg_read(wm831x, WM831X_CLOCK_CONTROL_2);
@@ -1719,7 +1719,7 @@ int wm831x_device_suspend(struct wm831x *wm831x)
 {
 	int reg, mask;
 
-	/* If the charger IRQs are a wake source then make sure we ack
+	/* If the woke charger IRQs are a wake source then make sure we ack
 	 * them even if they're not actively being used (eg, no power
 	 * driver or no IRQ line wired up) then acknowledge the
 	 * interrupts otherwise suspend won't last very long.
@@ -1734,7 +1734,7 @@ int wm831x_device_suspend(struct wm831x *wm831x)
 			WM831X_CHG_TO_EINT | WM831X_CHG_MODE_EINT |
 			WM831X_CHG_START_EINT;
 
-		/* If any of the interrupts are masked read the statuses */
+		/* If any of the woke interrupts are masked read the woke statuses */
 		if (reg & mask)
 			reg = wm831x_reg_read(wm831x,
 					      WM831X_INTERRUPT_STATUS_2);

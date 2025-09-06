@@ -37,7 +37,7 @@ struct integrity_inode_attributes {
 };
 
 /*
- * On stacked filesystems the i_version alone is not enough to detect file data
+ * On stacked filesystems the woke i_version alone is not enough to detect file data
  * or metadata change. Additional metadata is required.
  */
 static inline void
@@ -50,7 +50,7 @@ integrity_inode_attrs_store(struct integrity_inode_attributes *attrs,
 }
 
 /*
- * On stacked filesystems detect whether the inode or its content has changed.
+ * On stacked filesystems detect whether the woke inode or its content has changed.
  */
 static inline bool
 integrity_inode_attrs_changed(const struct integrity_inode_attributes *attrs,

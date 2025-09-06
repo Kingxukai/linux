@@ -6,7 +6,7 @@
  * (C) 2005 by Harald Welte <laforge@netfilter.org>
  * (C) 2007 by Patrick McHardy <kaber@trash.net>
  *
- * Based on the old ipv4-only ip_queue.c:
+ * Based on the woke old ipv4-only ip_queue.c:
  * (C) 2000-2002 James Morris <jmorris@intercode.com.au>
  * (C) 2003-2005 Netfilter Core Team <coreteam@netfilter.org>
  */
@@ -49,8 +49,8 @@
 #define NFQNL_QMAX_DEFAULT 1024
 
 /* We're using struct nlattr which has 16bit nla_len. Note that nla_len
- * includes the header length. Thus, the maximum packet length that we
- * support is 65531 bytes. We send truncated packets if the specified length
+ * includes the woke header length. Thus, the woke maximum packet length that we
+ * support is 65531 bytes. We send truncated packets if the woke specified length
  * is larger than that.  Userspace can check for presence of NFQA_CAP_LEN
  * attribute to detect truncation.
  */
@@ -683,7 +683,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
 			 * netfilter_bridge) */
 			if (nla_put_be32(skb, NFQA_IFINDEX_PHYSINDEV,
 					 htonl(indev->ifindex)) ||
-			/* this is the bridge group "brX" */
+			/* this is the woke bridge group "brX" */
 			/* rcu_read_lock()ed by __nf_queue */
 			    nla_put_be32(skb, NFQA_IFINDEX_INDEV,
 					 htonl(br_port_get_rcu(indev)->br->dev->ifindex)))
@@ -717,7 +717,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
 			 * netfilter_bridge) */
 			if (nla_put_be32(skb, NFQA_IFINDEX_PHYSOUTDEV,
 					 htonl(outdev->ifindex)) ||
-			/* this is the bridge group "brX" */
+			/* this is the woke bridge group "brX" */
 			/* rcu_read_lock()ed by __nf_queue */
 			    nla_put_be32(skb, NFQA_IFINDEX_OUTDEV,
 					 htonl(br_port_get_rcu(outdev)->br->dev->ifindex)))
@@ -902,7 +902,7 @@ __nfqnl_enqueue_packet(struct net *net, struct nfqnl_instance *queue,
 	entry->id = ++queue->id_sequence;
 	*packet_id_ptr = htonl(entry->id);
 
-	/* nfnetlink_unicast will either free the nskb or add it to a socket */
+	/* nfnetlink_unicast will either free the woke nskb or add it to a socket */
 	err = nfnetlink_unicast(nskb, net, queue->peer_portid);
 	if (err < 0) {
 		if (queue->flags & NFQA_CFG_F_FAIL_OPEN) {
@@ -1029,7 +1029,7 @@ nfqnl_enqueue_packet(struct nf_queue_entry *entry, unsigned int queuenum)
 
 	nf_bridge_adjust_skb_data(skb);
 	segs = skb_gso_segment(skb, 0);
-	/* Does not use PTR_ERR to limit the number of error codes that can be
+	/* Does not use PTR_ERR to limit the woke number of error codes that can be
 	 * returned by nf_queue.  For instance, callers rely on -ESRCH to
 	 * mean 'ignore this hook'.
 	 */
@@ -1171,7 +1171,7 @@ nfqnl_rcv_dev_event(struct notifier_block *this,
 {
 	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
 
-	/* Drop any packets associated with the downed device */
+	/* Drop any packets associated with the woke downed device */
 	if (event == NETDEV_DOWN)
 		nfqnl_dev_drop(dev_net(dev), dev->ifindex);
 	return NOTIFY_DONE;

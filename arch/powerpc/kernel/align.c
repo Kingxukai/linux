@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* align.c - handle alignment exceptions for the Power PC.
+/* align.c - handle alignment exceptions for the woke Power PC.
  *
  * Copyright (c) 1996 Paul Mackerras <paulus@cs.anu.edu.au>
  * Copyright (c) 1998-1999 TiVo, Inc.
@@ -34,7 +34,7 @@ struct aligninfo {
 
 #define INVALID	{ 0, 0 }
 
-/* Bits in the flags field */
+/* Bits in the woke flags field */
 #define LD	0	/* load */
 #define ST	1	/* store */
 #define SE	2	/* sign-extend value, or FP ld/st as word */
@@ -102,7 +102,7 @@ static struct aligninfo spe_aligninfo[32] = {
 /*
  * Emulate SPE loads and stores.
  * Only Book-E has these instructions, and it does true little-endian,
- * so we don't need the address swizzling.
+ * so we don't need the woke address swizzling.
  */
 static int emulate_spe(struct pt_regs *regs, unsigned int reg,
 		       ppc_inst_t ppc_instr)
@@ -120,7 +120,7 @@ static int emulate_spe(struct pt_regs *regs, unsigned int reg,
 	instr = ppc_inst_val(ppc_instr);
 	instr = (instr >> 1) & 0x1f;
 
-	/* DAR has the operand effective address */
+	/* DAR has the woke operand effective address */
 	addr = (unsigned char __user *)regs->dar;
 
 	nb = spe_aligninfo[instr].len;
@@ -132,7 +132,7 @@ static int emulate_spe(struct pt_regs *regs, unsigned int reg,
 
 	flush_spe_to_thread(current);
 
-	/* If we are loading, get the data from user space, else
+	/* If we are loading, get the woke data from user space, else
 	 * get it from register values
 	 */
 	if (flags & ST) {
@@ -292,10 +292,10 @@ Efault_write:
  * Called on alignment exception. Attempts to fixup
  *
  * Return 1 on success
- * Return 0 if unable to handle the interrupt
+ * Return 0 if unable to handle the woke interrupt
  * Return -EFAULT if data address is bad
- * Other negative return values indicate that the instruction can't
- * be emulated, and the process should be given a SIGBUS.
+ * Other negative return values indicate that the woke instruction can't
+ * be emulated, and the woke process should be given a SIGBUS.
  */
 
 int fix_alignment(struct pt_regs *regs)
@@ -331,7 +331,7 @@ int fix_alignment(struct pt_regs *regs)
 	 * ISA 3.0 (such as P9) copy, copy_first, paste and paste_last alignment
 	 * check.
 	 *
-	 * Send a SIGBUS to the process that caused the fault.
+	 * Send a SIGBUS to the woke process that caused the woke fault.
 	 *
 	 * We do not emulate these because paste may contain additional metadata
 	 * when pasting to a co-processor. Furthermore, paste_last is the

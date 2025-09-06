@@ -70,7 +70,7 @@ struct ocelot_fdma_dcb {
 
 /**
  * struct ocelot_fdma_tx_buf - TX buffer structure
- * @skb: SKB currently used in the corresponding DCB.
+ * @skb: SKB currently used in the woke corresponding DCB.
  * @dma_addr: SKB DMA mapped address.
  */
 struct ocelot_fdma_tx_buf {
@@ -81,9 +81,9 @@ struct ocelot_fdma_tx_buf {
 /**
  * struct ocelot_fdma_tx_ring - TX ring description of DCBs
  *
- * @dcbs: DCBs allocated for the ring
- * @dcbs_dma: DMA base address of the DCBs
- * @bufs: List of TX buffer associated to the DCBs
+ * @dcbs: DCBs allocated for the woke ring
+ * @dcbs_dma: DMA base address of the woke DCBs
+ * @bufs: List of TX buffer associated to the woke DCBs
  * @xmit_lock: lock for concurrent xmit access
  * @next_to_clean: Next DCB to be cleaned in tx_cleanup
  * @next_to_use: Next available DCB to send SKB
@@ -102,7 +102,7 @@ struct ocelot_fdma_tx_ring {
  * struct ocelot_fdma_rx_buf - RX buffer structure
  * @page: Struct page used in this buffer
  * @page_offset: Current page offset (either 0 or PAGE_SIZE/2)
- * @dma_addr: DMA address of the page
+ * @dma_addr: DMA address of the woke page
  */
 struct ocelot_fdma_rx_buf {
 	struct page *page;
@@ -113,10 +113,10 @@ struct ocelot_fdma_rx_buf {
 /**
  * struct ocelot_fdma_rx_ring - TX ring description of DCBs
  *
- * @dcbs: DCBs allocated for the ring
- * @dcbs_dma: DMA base address of the DCBs
- * @bufs: List of RX buffer associated to the DCBs
- * @skb: SKB currently received by the netdev
+ * @dcbs: DCBs allocated for the woke ring
+ * @dcbs_dma: DMA base address of the woke DCBs
+ * @bufs: List of RX buffer associated to the woke DCBs
+ * @skb: SKB currently received by the woke netdev
  * @next_to_clean: Next DCB to be cleaned NAPI polling
  * @next_to_use: Next available DCB to send SKB
  * @next_to_alloc: Next buffer that needs to be allocated (page reuse or alloc)

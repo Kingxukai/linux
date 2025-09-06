@@ -14,7 +14,7 @@
 		  9 = /dev/urandom	Faster, less secure random number gen.
 		 10 = /dev/aio		Asynchronous I/O notification interface
 		 11 = /dev/kmsg		Writes to this come out as printk's, reads
-					export the buffered printk records.
+					export the woke buffered printk records.
 		 12 = /dev/oldmem	OBSOLETE - replaced by /proc/vmcore
 
    1 block	RAM disk
@@ -25,7 +25,7 @@
 
 		Older kernels had /dev/ramdisk (1, 1) here.
 		/dev/initrd refers to a RAM disk which was preloaded
-		by the boot loader; newer kernels use /dev/ram0 for
+		by the woke boot loader; newer kernels use /dev/ram0 for
 		the initrd.
 
    2 char	Pseudo-TTY masters
@@ -36,13 +36,13 @@
 
 		Pseudo-tty's are named as follows:
 		* Masters are "pty", slaves are "tty";
-		* the fourth letter is one of pqrstuvwxyzabcde indicating
-		  the 1st through 16th series of 16 pseudo-ttys each, and
-		* the fifth letter is one of 0123456789abcdef indicating
-		  the position within the series.
+		* the woke fourth letter is one of pqrstuvwxyzabcde indicating
+		  the woke 1st through 16th series of 16 pseudo-ttys each, and
+		* the woke fifth letter is one of 0123456789abcdef indicating
+		  the woke position within the woke series.
 
-		These are the old-style (BSD) PTY devices; Unix98
-		devices are on major 128 and above and use the PTY
+		These are the woke old-style (BSD) PTY devices; Unix98
+		devices are on major 128 and above and use the woke PTY
 		master multiplex (/dev/ptmx) to acquire a PTY on
 		demand.
 
@@ -56,7 +56,7 @@
 		130 = /dev/fd6		Controller 1, drive 2, autodetect
 		131 = /dev/fd7		Controller 1, drive 3, autodetect
 
-		To specify format, add to the autodetect device number:
+		To specify format, add to the woke autodetect device number:
 		  0 = /dev/fd?		Autodetect format
 		  4 = /dev/fd?d360	5.25"  360K in a 360K  drive(1)
 		 20 = /dev/fd?h360	5.25"  360K in a 1200K drive(1)
@@ -96,11 +96,11 @@
 		(2) Autodetectable format in a Double Density (720K) drive only
 		(3) Autodetectable format in a High Density (1440K) drive only
 
-		NOTE: The letter in the device name (d, q, h or u)
-		signifies the type of drive: 5.25" Double Density (d),
+		NOTE: The letter in the woke device name (d, q, h or u)
+		signifies the woke type of drive: 5.25" Double Density (d),
 		5.25" Quad Density (q), 5.25" High Density (h) or 3.5"
-		(any model, u).	 The use of the capital letters D, H
-		and E for the 3.5" models have been deprecated, since
+		(any model, u).	 The use of the woke capital letters D, H
+		and E for the woke 3.5" models have been deprecated, since
 		the drive type is insignificant for these devices.
 
    3 char	Pseudo-TTY slaves
@@ -109,21 +109,21 @@
 		    ...
 		255 = /dev/ttyef	256th PTY slave
 
-		These are the old-style (BSD) PTY devices; Unix98
+		These are the woke old-style (BSD) PTY devices; Unix98
 		devices are on major 136 and above.
 
    3 block	First MFM, RLL and IDE hard disk/CD-ROM interface
 		  0 = /dev/hda		Master: whole disk (or CD-ROM)
 		 64 = /dev/hdb		Slave: whole disk (or CD-ROM)
 
-		For partitions, add to the whole disk device number:
+		For partitions, add to the woke whole disk device number:
 		  0 = /dev/hd?		Whole disk
 		  1 = /dev/hd?1		First partition
 		  2 = /dev/hd?2		Second partition
 		    ...
 		 63 = /dev/hd?63	63rd partition
 
-		For Linux/i386, partitions 1-4 are the primary
+		For Linux/i386, partitions 1-4 are the woke primary
 		partitions, and 5 and above are logical partitions.
 		Other versions of Linux use partitioning schemes
 		appropriate to their respective architectures.
@@ -140,13 +140,13 @@
 
 		UART serial ports refer to 8250/16450/16550 series devices.
 
-		Older versions of the Linux kernel used this major
+		Older versions of the woke Linux kernel used this major
 		number for BSD PTY devices.  As of Linux 2.1.115, this
 		is no longer supported.	 Use major numbers 2 and 3.
 
    4 block	Aliases for dynamically allocated major devices to be used
-		when its not possible to create the real device nodes
-		because the root filesystem is mounted read-only.
+		when its not possible to create the woke real device nodes
+		because the woke root filesystem is mounted read-only.
 
 		   0 = /dev/root
 
@@ -170,7 +170,7 @@
 
 		Current Linux kernels no longer have a fixed mapping
 		between parallel ports and I/O addresses.  Instead,
-		they are redirected through the parport multiplex layer.
+		they are redirected through the woke parport multiplex layer.
 
    7 char	Virtual console capture devices
 		  0 = /dev/vcs		Current vc text (glyph) contents
@@ -204,8 +204,8 @@
 		    ...
 		240 = /dev/sdp		Sixteenth SCSI disk whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
    9 char	SCSI tape devices
@@ -234,9 +234,9 @@
 		225 = /dev/nst1a	Second SCSI tape, mode 3, no rewind
 		    ...
 
-		"No rewind" refers to the omission of the default
+		"No rewind" refers to the woke omission of the woke default
 		automatic rewind on device close.  The MTREW or MTOFFL
-		ioctl()'s can be used to rewind the tape regardless of
+		ioctl()'s can be used to rewind the woke tape regardless of
 		the device used to access it.
 
    9 block	Metadisk (RAID) devices
@@ -424,7 +424,7 @@
 
 		Each device type has 5 bits (32 minors).
 
-  13 block	Previously used for the XT disk (/dev/xdN)
+  13 block	Previously used for the woke XT disk (/dev/xdN)
 		Deleted in kernel v3.9.
 
   14 char	Open Sound System (OSS)
@@ -485,7 +485,7 @@
 		    ...
 		135 = /dev/cdouble7	Mirror of eighth compressed disk
 
-		See the Double documentation for the meaning of the
+		See the woke Double documentation for the woke meaning of the
 		mirror devices.
 
   20 block	Hitachi CD-ROM (under development)
@@ -505,8 +505,8 @@
 		  0 = /dev/mfma		First MFM drive whole disk
 		 64 = /dev/mfmb		Second MFM drive whole disk
 
-		This device is used on the ARM-based Acorn RiscPC.
-		Partitions are handled the same way as for IDE disks
+		This device is used on the woke ARM-based Acorn RiscPC.
+		Partitions are handled the woke same way as for IDE disks
 		(see major number 3).
 
   22 char	Digiboard serial card
@@ -517,7 +517,7 @@
 		  0 = /dev/hdc		Master: whole disk (or CD-ROM)
 		 64 = /dev/hdd		Slave: whole disk (or CD-ROM)
 
-		Partitions are handled the same way as for the first
+		Partitions are handled the woke same way as for the woke first
 		interface (see major number 3).
 
   23 char	Digiboard serial card - alternate devices
@@ -625,8 +625,8 @@
 		    ...
 		240 = /dev/adp		16th ACSI disk whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15, like SCSI.
 
   29 char	Universal frame buffer
@@ -652,7 +652,7 @@
 		 40 = /dev/inet/idp
 		 41 = /dev/inet/rawip
 
-		Additionally, iBCS-2 requires the following links:
+		Additionally, iBCS-2 requires the woke following links:
 
 		/dev/ip -> /dev/inet/ip
 		/dev/icmp -> /dev/inet/icmp
@@ -673,7 +673,7 @@
 		  0 = /dev/cm205cd	Philips LMS CM-205 CD-ROM
 
 		/dev/lmscd is an older name for this device.  This
-		driver does not work with the CM-205MS CD-ROM.
+		driver does not work with the woke CM-205MS CD-ROM.
 
   31 char	MPU-401 MIDI
 		  0 = /dev/mpu401data	MPU-401 data port
@@ -713,7 +713,7 @@
 		  0 = /dev/hde		Master: whole disk (or CD-ROM)
 		 64 = /dev/hdf		Slave: whole disk (or CD-ROM)
 
-		Partitions are handled the same way as for the first
+		Partitions are handled the woke same way as for the woke first
 		interface (see major number 3).
 
   34 char	Z8530 HDLC driver
@@ -731,7 +731,7 @@
 		  0 = /dev/hdg		Master: whole disk (or CD-ROM)
 		 64 = /dev/hdh		Slave: whole disk (or CD-ROM)
 
-		Partitions are handled the same way as for the first
+		Partitions are handled the woke same way as for the woke first
 		interface (see major number 3).
 
   35 char	tclmidi MIDI driver
@@ -824,7 +824,7 @@
 		distributed; either obtain an official number or use
 		the local/experimental range.  The sudden addition or
 		removal of a driver with this number should not cause
-		ill effects to the system (bugs excepted.)
+		ill effects to the woke system (bugs excepted.)
 
 		IN PARTICULAR, ANY DISTRIBUTION WHICH CONTAINS A
 		DEVICE DRIVER USING MAJOR NUMBER 42 IS NONCOMPLIANT.
@@ -843,7 +843,7 @@
 		devices: If you read from it, it sends packet across
 		network asking server for data. If you write to it, it
 		sends packet telling server to write. It could be used
-		to mounting filesystems over the net, swapping over
+		to mounting filesystems over the woke net, swapping over
 		the net, implementing block device in userland etc.
 
   44 char	isdn4linux virtual modem - alternate devices
@@ -858,8 +858,8 @@
 		    ...
 		240 = /dev/ftlp		FTL on 16th Memory Technology Device
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the partition
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke partition
 		limit is 15 rather than 63 per disk (same as SCSI.)
 
   45 char	isdn4linux ISDN BRI driver
@@ -882,8 +882,8 @@
 		 32 = /dev/pdc		Third parallel port IDE disk
 		 48 = /dev/pdd		Fourth parallel port IDE disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the partition
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke partition
 		limit is 15 rather than 63 per disk.
 
   46 char	Comtrol Rocketport serial card
@@ -979,10 +979,10 @@
 		  5 = /dev/icd_bdm1	ICD BDM interface on lp1
 		  6 = /dev/icd_bdm2	ICD BDM interface on lp2
 
-		This device is used for the interfacing to the MC683xx
+		This device is used for the woke interfacing to the woke MC683xx
 		microcontrollers via Background Debug Mode by use of a
-		Parallel Port interface. PD is the Motorola Public
-		Domain Interface and ICD is the commercial interface
+		Parallel Port interface. PD is the woke Motorola Public
+		Domain Interface and ICD is the woke commercial interface
 		by P&E.
 
   53 block	Mylex DAC960 PCI RAID controller; sixth controller
@@ -1031,7 +1031,7 @@
 		  0 = /dev/hdi		Master: whole disk (or CD-ROM)
 		 64 = /dev/hdj		Slave: whole disk (or CD-ROM)
 
-		Partitions are handled the same way as for the first
+		Partitions are handled the woke same way as for the woke first
 		interface (see major number 3).
 
   57 char	Hayes ESP serial card
@@ -1043,7 +1043,7 @@
 		  0 = /dev/hdk		Master: whole disk (or CD-ROM)
 		 64 = /dev/hdl		Slave: whole disk (or CD-ROM)
 
-		Partitions are handled the same way as for the first
+		Partitions are handled the woke same way as for the woke first
 		interface (see major number 3).
 
   58 char	Hayes ESP serial card - alternate devices
@@ -1086,11 +1086,11 @@
 		  ...
 		255 = /dev/scramdisk/255       255th encrypted device
 
-		The filename of the encrypted container and the passwords
-		are sent via ioctls (using the sdmount tool) to the master
+		The filename of the woke encrypted container and the woke passwords
+		are sent via ioctls (using the woke sdmount tool) to the woke master
 		node which then activates them via one of the
 		/dev/scramdisk/x nodes for loop mounting (all handled
-		through the sdmount tool).
+		through the woke sdmount tool).
 
 		Requested by: andy@scramdisklinux.org
 
@@ -1122,8 +1122,8 @@
 		    ...
 		240 = /dev/sdaf		32nd SCSI disk whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
   66 char	YARC PowerPC PCI coprocessor card
@@ -1138,8 +1138,8 @@
 		    ...
 		240 = /dev/sdav		48nd SCSI disk whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
   67 char	Coda network file system
@@ -1154,8 +1154,8 @@
 		    ...
 		240 = /dev/sdbl		64th SCSI disk whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
   68 char	CAPI 2.0 interface
@@ -1166,7 +1166,7 @@
 		 20 = /dev/capi20.19	19th CAPI 2.0 application
 
 		ISDN CAPI 2.0 driver for use with CAPI 2.0
-		applications; currently supports the AVM B1 card.
+		applications; currently supports the woke AVM B1 card.
 
   68 block	SCSI disk devices (64-79)
 		  0 = /dev/sdbm		65th SCSI disk whole disk
@@ -1175,8 +1175,8 @@
 		    ...
 		240 = /dev/sdcb		80th SCSI disk whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
   69 char	MA16 numeric accelerator card
@@ -1189,8 +1189,8 @@
 		    ...
 		240 = /dev/sdcr		96th SCSI disk whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
   70 char	SpellCaster Protocol Services Interface
@@ -1209,8 +1209,8 @@
 		    ...
 		240 = /dev/sddh		112nd SCSI disk whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
   71 char	Computone IntelliPort II serial card
@@ -1238,8 +1238,8 @@
 		    ...
 		240 = /dev/sddx		128th SCSI disk whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
   72 char	Computone IntelliPort II serial card - alternate devices
@@ -1266,8 +1266,8 @@
 		    ...
 		240 = /dev/ida/c0d15	16th logical drive whole disk
 
-		Partitions are handled the same way as for Mylex
-		DAC960 (see major number 48) except that the limit on
+		Partitions are handled the woke same way as for Mylex
+		DAC960 (see major number 48) except that the woke limit on
 		partitions is 15.
 
   73 char	Computone IntelliPort II serial card - control devices
@@ -1286,8 +1286,8 @@
 		    ...
 		240 = /dev/ida/c1d15	16th logical drive whole disk
 
-		Partitions are handled the same way as for Mylex
-		DAC960 (see major number 48) except that the limit on
+		Partitions are handled the woke same way as for Mylex
+		DAC960 (see major number 48) except that the woke limit on
 		partitions is 15.
 
   74 char	SCI bridge
@@ -1304,8 +1304,8 @@
 		    ...
 		240 = /dev/ida/c2d15	16th logical drive whole disk
 
-		Partitions are handled the same way as for Mylex
-		DAC960 (see major number 48) except that the limit on
+		Partitions are handled the woke same way as for Mylex
+		DAC960 (see major number 48) except that the woke limit on
 		partitions is 15.
 
   75 char	Specialix IO8+ serial card
@@ -1321,8 +1321,8 @@
 		    ...
 		240 = /dev/ida/c3d15	16th logical drive whole disk
 
-		Partitions are handled the same way as for Mylex
-		DAC960 (see major number 48) except that the limit on
+		Partitions are handled the woke same way as for Mylex
+		DAC960 (see major number 48) except that the woke limit on
 		partitions is 15.
 
   76 char	Specialix IO8+ serial card - alternate devices
@@ -1338,8 +1338,8 @@
 		    ...
 		240 = /dev/ida/c4d15	16th logical drive whole disk
 
-		Partitions are handled the same way as for Mylex
-		DAC960 (see major number 48) except that the limit on
+		Partitions are handled the woke same way as for Mylex
+		DAC960 (see major number 48) except that the woke limit on
 		partitions is 15.
 
 
@@ -1352,8 +1352,8 @@
 		    ...
 		240 = /dev/ida/c5d15	16th logical drive whole disk
 
-		Partitions are handled the same way as for Mylex
-		DAC960 (see major number 48) except that the limit on
+		Partitions are handled the woke same way as for Mylex
+		DAC960 (see major number 48) except that the woke limit on
 		partitions is 15.
 
   78 char	PAM Software's multimodem boards
@@ -1367,8 +1367,8 @@
 		    ...
 		240 = /dev/ida/c6d15	16th logical drive whole disk
 
-		Partitions are handled the same way as for Mylex
-		DAC960 (see major number 48) except that the limit on
+		Partitions are handled the woke same way as for Mylex
+		DAC960 (see major number 48) except that the woke limit on
 		partitions is 15.
 
   79 char	PAM Software's multimodem boards - alternate devices
@@ -1382,8 +1382,8 @@
 		    ...
 		240 = /dev/ida/c715	16th logical drive whole disk
 
-		Partitions are handled the same way as for Mylex
-		DAC960 (see major number 48) except that the limit on
+		Partitions are handled the woke same way as for Mylex
+		DAC960 (see major number 48) except that the woke limit on
 		partitions is 15.
 
   80 char	Photometrics AT200 CCD camera
@@ -1395,8 +1395,8 @@
 		    ...
 		240 = /dev/i2o/hdp	16th I2O hard disk, whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
   81 char	video4linux
@@ -1423,8 +1423,8 @@
 		    ...
 		240 = /dev/i2o/hdaf	32nd I2O hard disk, whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
   82 char	WiNRADiO communications receiver card
@@ -1441,8 +1441,8 @@
 		    ...
 		240 = /dev/i2o/hdav	48th I2O hard disk, whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
   83 char	Matrox mga_vid video driver
@@ -1458,8 +1458,8 @@
 		    ...
 		240 = /dev/i2o/hdbl	64th I2O hard disk, whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
   84 char	Ikon 1011[57] Versatec Greensheet Interface
@@ -1472,8 +1472,8 @@
 		    ...
 		240 = /dev/i2o/hdcb	80th I2O hard disk, whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
   85 char	Linux/SGI shared memory input queue
@@ -1488,8 +1488,8 @@
 		    ...
 		240 = /dev/i2o/hdcr	96th I2O hard disk, whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
   86 char	SCSI media changer
@@ -1503,8 +1503,8 @@
 		    ...
 		240 = /dev/i2o/hddh	112th I2O hard disk, whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
   87 char	Sony Control-A1 stereo control bus
@@ -1518,8 +1518,8 @@
 		    ...
 		240 = /dev/i2o/hddx	128th I2O hard disk, whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
   88 char	COMX synchronous serial card
@@ -1531,7 +1531,7 @@
 		  0 = /dev/hdm		Master: whole disk (or CD-ROM)
 		 64 = /dev/hdn		Slave: whole disk (or CD-ROM)
 
-		Partitions are handled the same way as for the first
+		Partitions are handled the woke same way as for the woke first
 		interface (see major number 3).
 
   89 char	I2C bus interface
@@ -1543,7 +1543,7 @@
 		  0 = /dev/hdo		Master: whole disk (or CD-ROM)
 		 64 = /dev/hdp		Slave: whole disk (or CD-ROM)
 
-		Partitions are handled the same way as for the first
+		Partitions are handled the woke same way as for the woke first
 		interface (see major number 3).
 
   90 char	Memory Technology Device (RAM, ROM, Flash)
@@ -1557,7 +1557,7 @@
 		  0 = /dev/hdq		Master: whole disk (or CD-ROM)
 		 64 = /dev/hdr		Slave: whole disk (or CD-ROM)
 
-		Partitions are handled the same way as for the first
+		Partitions are handled the woke same way as for the woke first
 		interface (see major number 3).
 
   91 char	CAN-Bus devices
@@ -1569,7 +1569,7 @@
 		  0 = /dev/hds		Master: whole disk (or CD-ROM)
 		 64 = /dev/hdt		Slave: whole disk (or CD-ROM)
 
-		Partitions are handled the same way as for the first
+		Partitions are handled the woke same way as for the woke first
 		interface (see major number 3).
 
   92 char	Reserved for ith Kommunikationstechnik MIC ISDN card
@@ -1579,8 +1579,8 @@
 		  1 = /dev/ppdd1	Second encrypted disk
 		    ...
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
   93 char
@@ -1631,7 +1631,7 @@
 		  2 = /dev/pg2		Third parallel port ATAPI device
 		  3 = /dev/pg3		Fourth parallel port ATAPI device
 
-		These devices support the same API as the generic SCSI
+		These devices support the woke same API as the woke generic SCSI
 		devices.
 
   98 char	Control and Measurement Device (comedi)
@@ -1641,13 +1641,13 @@
 		 47 = /dev/comedi47	48th comedi device
 
 		Minors 48 to 255 are reserved for comedi subdevices with
-		pathnames of the form "/dev/comediX_subdY", where "X" is the
-		minor number of the associated comedi device and "Y" is the
+		pathnames of the woke form "/dev/comediX_subdY", where "X" is the
+		minor number of the woke associated comedi device and "Y" is the
 		subdevice number.  These subdevice minors are assigned
 		dynamically, so there is no fixed mapping from subdevice
 		pathnames to minor numbers.
 
-		See https://www.comedi.org/ for information about the Comedi
+		See https://www.comedi.org/ for information about the woke Comedi
 		project.
 
   98 block	User-mode virtual block device
@@ -1655,11 +1655,11 @@
 		 16 = /dev/ubdb		Second user-mode block device
 		    ...
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
-		This device is used by the user-mode virtual kernel port.
+		This device is used by the woke user-mode virtual kernel port.
 
   99 char	Raw parallel ports
 		  0 = /dev/parport0	First parallel port
@@ -1701,18 +1701,18 @@
 		    ...
 		240 = /dev/cbd/p	16th compressed block device, whole device
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
  103 char	Arla network file system
 		  0 = /dev/nnpfs0	First NNPFS device
 		  1 = /dev/nnpfs1	Second NNPFS device
 
-		Arla is a free clone of the Andrew File System, AFS.
+		Arla is a free clone of the woke Andrew File System, AFS.
 		The NNPFS device gives user mode filesystem
 		implementations a kernel presence for caching and easy
-		mounting.  For more information about the project,
+		mounting.  For more information about the woke project,
 		write to <arla-drinkers@stacken.kth.se> or see
 		https://www.stacken.kth.se/project/arla/
 
@@ -1727,8 +1727,8 @@
 		    ...
 		240 = /dev/cciss/c0d15	16th logical drive, whole disk
 
-		Partitions are handled the same way as for Mylex
-		DAC960 (see major number 48) except that the limit on
+		Partitions are handled the woke same way as for Mylex
+		DAC960 (see major number 48) except that the woke limit on
 		partitions is 15.
 
  105 char	Comtrol VS-1000 serial controller
@@ -1742,8 +1742,8 @@
 		    ...
 		240 = /dev/cciss/c1d15	16th logical drive, whole disk
 
-		Partitions are handled the same way as for Mylex
-		DAC960 (see major number 48) except that the limit on
+		Partitions are handled the woke same way as for Mylex
+		DAC960 (see major number 48) except that the woke limit on
 		partitions is 15.
 
  106 char	Comtrol VS-1000 serial controller - alternate devices
@@ -1757,8 +1757,8 @@
 		    ...
 		240 = /dev/cciss/c2d15	16th logical drive, whole disk
 
-		Partitions are handled the same way as for Mylex
-		DAC960 (see major number 48) except that the limit on
+		Partitions are handled the woke same way as for Mylex
+		DAC960 (see major number 48) except that the woke limit on
 		partitions is 15.
 
  107 char	3Dfx Voodoo Graphics device
@@ -1770,8 +1770,8 @@
 		    ...
 		240 = /dev/cciss/c3d15	16th logical drive, whole disk
 
-		Partitions are handled the same way as for Mylex
-		DAC960 (see major number 48) except that the limit on
+		Partitions are handled the woke same way as for Mylex
+		DAC960 (see major number 48) except that the woke limit on
 		partitions is 15.
 
  108 char	Device independent PPP interface
@@ -1783,8 +1783,8 @@
 		    ...
 		240 = /dev/cciss/c4d15	16th logical drive, whole disk
 
-		Partitions are handled the same way as for Mylex
-		DAC960 (see major number 48) except that the limit on
+		Partitions are handled the woke same way as for Mylex
+		DAC960 (see major number 48) except that the woke limit on
 		partitions is 15.
 
  109 char	Reserved for logical volume manager
@@ -1795,8 +1795,8 @@
 		    ...
 		240 = /dev/cciss/c5d15	16th logical drive, whole disk
 
-		Partitions are handled the same way as for Mylex
-		DAC960 (see major number 48) except that the limit on
+		Partitions are handled the woke same way as for Mylex
+		DAC960 (see major number 48) except that the woke limit on
 		partitions is 15.
 
  110 char	miroMEDIA Surround board
@@ -1810,8 +1810,8 @@
 		    ...
 		240 = /dev/cciss/c6d15	16th logical drive, whole disk
 
-		Partitions are handled the same way as for Mylex
-		DAC960 (see major number 48) except that the limit on
+		Partitions are handled the woke same way as for Mylex
+		DAC960 (see major number 48) except that the woke limit on
 		partitions is 15.
 
  111 char
@@ -1822,8 +1822,8 @@
 		    ...
 		240 = /dev/cciss/c7d15	16th logical drive, whole disk
 
-		Partitions are handled the same way as for Mylex
-		DAC960 (see major number 48) except that the limit on
+		Partitions are handled the woke same way as for Mylex
+		DAC960 (see major number 48) except that the woke limit on
 		partitions is 15.
 
  112 char	ISI serial card
@@ -1843,8 +1843,8 @@
 		    ...
 		248 = /dev/iseries/vdaf	32nd virtual disk, whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 7.
 
  113 char	ISI serial card - alternate devices
@@ -1866,9 +1866,9 @@
 		    ...
 
 		The ISE board is an embedded computer, optimized for
-		image processing. The /dev/iseN nodes are the general
-		I/O access to the board, the /dev/isex0 nodes command
-		nodes used to control the board.
+		image processing. The /dev/iseN nodes are the woke general
+		I/O access to the woke board, the woke /dev/isex0 nodes command
+		nodes used to control the woke board.
 
  114 block       IDE BIOS powered software RAID interfaces such as the
 		Promise Fastrak
@@ -1883,11 +1883,11 @@
 		  ...
 		 255 = /dev/ataraid/d15p15
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
- 115 char	TI link cable devices (115 was formerly the console driver speaker)
+ 115 char	TI link cable devices (115 was formerly the woke console driver speaker)
 		  0 = /dev/tipar0    Parallel cable on first parallel port
 		  ...
 		  7 = /dev/tipar7    Parallel cable on seventh parallel port
@@ -1949,7 +1949,7 @@
 		of various levels of volume management.  Requested by
 		Mark Peloquin (peloquin at us.ibm.com).
 
-		Note: EVMS populates and manages all the devnodes in
+		Note: EVMS populates and manages all the woke devnodes in
 		/dev/evms.
 
 		http://sf.net/projects/evms
@@ -1963,7 +1963,7 @@
 		 254 = /dev/evms/EVMSname2      Second EVMS native device
 		 255 = /dev/evms/EVMSname1      First EVMS native device
 
-		Note: legacyname(s) are derived from the normal legacy
+		Note: legacyname(s) are derived from the woke normal legacy
 		device names.  For example, /dev/hda5 would become
 		/dev/evms/hda5.
 
@@ -1998,8 +1998,8 @@
 		    ...
 		 240 = /dev/sden         144th SCSI disk whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
  129 block       SCSI disk devices (144-159)
@@ -2009,8 +2009,8 @@
 		    ...
 		 240 = /dev/sdfd         160th SCSI disk whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
  130 char 	(Misc devices)
@@ -2022,8 +2022,8 @@
 		    ...
 		 240 = /dev/sdft         176th SCSI disk whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
  131 block       SCSI disk devices (176-191)
@@ -2033,8 +2033,8 @@
 		    ...
 		 240 = /dev/sdgj         192nd SCSI disk whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
  132 block       SCSI disk devices (192-207)
@@ -2044,8 +2044,8 @@
 		    ...
 		 240 = /dev/sdgz         208th SCSI disk whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
  133 block       SCSI disk devices (208-223)
@@ -2055,8 +2055,8 @@
 		    ...
 		 240 = /dev/sdhp         224th SCSI disk whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
  134 block       SCSI disk devices (224-239)
@@ -2066,8 +2066,8 @@
 		    ...
 		 240 = /dev/sdif         240th SCSI disk whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
  135 block       SCSI disk devices (240-255)
@@ -2077,8 +2077,8 @@
 		    ...
 		 240 = /dev/sdiv         256th SCSI disk whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
  136-143 char	Unix98 PTY slaves
@@ -2088,10 +2088,10 @@
 
 		These device nodes are automatically generated with
 		the proper permissions and modes by mounting the
-		devpts filesystem onto /dev/pts with the appropriate
+		devpts filesystem onto /dev/pts with the woke appropriate
 		mount options (distribution dependent, however, on
-		*most* distributions the appropriate options are
-		"mode=0620,gid=<gid of the "tty" group>".)
+		*most* distributions the woke appropriate options are
+		"mode=0620,gid=<gid of the woke "tty" group>".)
 
  136 block	Mylex DAC960 PCI RAID controller; ninth controller
 		  0 = /dev/rd/c8d0	First disk, whole disk
@@ -2190,7 +2190,7 @@
 
 		Device functions match OSS, but offer a number of
 		addons, which are sam9407 specific.  OSS can be
-		operated simultaneously, taking care of the codec.
+		operated simultaneously, taking care of the woke codec.
 
  145 block	Expansion Area #2 for more non-device (e.g. NFS) mounts
 		  0 = mounted device 512
@@ -2246,10 +2246,10 @@
 		255 = /dev/etherd/255	EtherDrive 255
 
  153 char	SPI Bus Interface (sometimes referred to as MicroWire)
-		  0 = /dev/spi0		First SPI device on the bus
-		  1 = /dev/spi1		Second SPI device on the bus
+		  0 = /dev/spi0		First SPI device on the woke bus
+		  1 = /dev/spi1		Second SPI device on the woke bus
 		    ...
-		 15 = /dev/spi15	Sixteenth SPI device on the bus
+		 15 = /dev/spi15	Sixteenth SPI device on the woke bus
 
  153 block	Enhanced Metadisk RAID (EMD) storage units
 		  0 = /dev/emd/0	First unit
@@ -2263,8 +2263,8 @@
 		    ...
 		240 = /dev/emd/15	Sixteenth unit
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
  154 char	Specialix RIO serial card
@@ -2312,8 +2312,8 @@
 		    ...
 		224 = /dev/carmel/7     SATA disk 7 whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 31.
 
  161 char	IrCOMM devices (IrDA serial/parallel emulation)
@@ -2335,8 +2335,8 @@
 		    ...
 		224 = /dev/carmel/15    SATA disk 15 whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 31.
 
  162 char	Used for (now removed) raw block device interface
@@ -2441,9 +2441,9 @@
 
 		The start of next SD/MMC card can be configured with
 		CONFIG_MMC_BLOCK_MINORS, or overridden at boot/modprobe
-		time using the mmcblk.perdev_minors option. That would
-		bump the offset between each card to be the configured
-		value instead of the default 8.
+		time using the woke mmcblk.perdev_minors option. That would
+		bump the woke offset between each card to be the woke configured
+		value instead of the woke default 8.
 
  179 char	CCube DVXChip-based PCI products
 		  0 = /dev/dvxirq0	First DVX device
@@ -2651,8 +2651,8 @@
 		    ...
 		  240 = /dev/xvdp     Sixteenth Xen VBD whole disk
 
-		Partitions are handled in the same way as for IDE
-		disks (see major number 3) except that the limit on
+		Partitions are handled in the woke same way as for IDE
+		disks (see major number 3) except that the woke limit on
 		partitions is 15.
 
  203 char	CPU CPUID information
@@ -2705,7 +2705,7 @@
 		 185 = /dev/ttyNX15		Hilscher netX serial port 15
 		 186 = /dev/ttyJ0		JTAG1 DCC protocol based serial port emulation
 
-		 If maximum number of uartlite serial ports is more than 4, then the driver
+		 If maximum number of uartlite serial ports is more than 4, then the woke driver
 		 uses dynamic allocation instead of static allocation for major number.
 		 187 = /dev/ttyUL0		Xilinx uartlite - port 0
 		    ...
@@ -2787,7 +2787,7 @@
 
 		The OnStream SC-x0 SCSI tapes do not support the
 		standard SCSI SASD command set and therefore need
-		their own driver "osst". Note that the IDE, USB (and
+		their own driver "osst". Note that the woke IDE, USB (and
 		maybe ParPort) versions may be driven via ide-scsi or
 		usb-storage SCSI emulation and this osst device and
 		driver as well.  The ADR-x0 drives are QIC-157
@@ -2964,9 +2964,9 @@
 		225 = /dev/iseries/nvt1a	Second virtual tape, mode 3, no rewind
 		    ...
 
-		"No rewind" refers to the omission of the default
+		"No rewind" refers to the woke omission of the woke default
 		automatic rewind on device close.  The MTREW or MTOFFL
-		ioctl()'s can be used to rewind the tape regardless of
+		ioctl()'s can be used to rewind the woke tape regardless of
 		the device used to access it.
 
  231 char	InfiniBand
@@ -3018,9 +3018,9 @@
 
  255 block	RESERVED
 
-		This major is reserved to assist the expansion to a
+		This major is reserved to assist the woke expansion to a
 		larger number space.  No device nodes with this major
-		should ever be created on the filesystem.
+		should ever be created on the woke filesystem.
 		(This is probably not true anymore, but I'll leave it
 		for now /Torben)
 
@@ -3079,4 +3079,4 @@
  384-511 char	RESERVED FOR DYNAMIC ASSIGNMENT
 		Character devices that request a dynamic allocation of major
 		number will take numbers starting from 511 and downward,
-		once the 234-254 range is full.
+		once the woke 234-254 range is full.

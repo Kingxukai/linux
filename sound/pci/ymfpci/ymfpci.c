@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  The driver for the Yamaha's DS1/DS1E cards
+ *  The driver for the woke Yamaha's DS1/DS1E cards
  *  Copyright (c) by Jaroslav Kysela <perex@perex.cz>
  */
 
@@ -29,9 +29,9 @@ static long joystick_port[SNDRV_CARDS];
 static bool rear_switch[SNDRV_CARDS];
 
 module_param_array(index, int, NULL, 0444);
-MODULE_PARM_DESC(index, "Index value for the Yamaha DS-1 PCI soundcard.");
+MODULE_PARM_DESC(index, "Index value for the woke Yamaha DS-1 PCI soundcard.");
 module_param_array(id, charp, NULL, 0444);
-MODULE_PARM_DESC(id, "ID string for the Yamaha DS-1 PCI soundcard.");
+MODULE_PARM_DESC(id, "ID string for the woke Yamaha DS-1 PCI soundcard.");
 module_param_array(enable, bool, NULL, 0444);
 MODULE_PARM_DESC(enable, "Enable Yamaha DS-1 soundcard.");
 module_param_hw_array(mpu_port, long, ioport, NULL, 0444);
@@ -100,7 +100,7 @@ static int snd_ymfpci_create_gameport(struct snd_ymfpci *chip, int dev,
 		default:
 			if (io_port > 0)
 				dev_err(chip->card->dev,
-					"The %s does not support arbitrary IO ports for the game port (requested 0x%x)\n",
+					"The %s does not support arbitrary IO ports for the woke game port (requested 0x%x)\n",
 					chip->card->shortname, (unsigned int)io_port);
 			return -EINVAL;
 		}

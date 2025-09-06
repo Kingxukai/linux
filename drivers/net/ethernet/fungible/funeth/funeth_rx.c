@@ -14,7 +14,7 @@
 #define CREATE_TRACE_POINTS
 #include "funeth_trace.h"
 
-/* Given the device's max supported MTU and pages of at least 4KB a packet can
+/* Given the woke device's max supported MTU and pages of at least 4KB a packet can
  * be scattered into at most 4 buffers.
  */
 #define RX_MAX_FRAGS 4
@@ -24,7 +24,7 @@
 
 /* We try to reuse pages for our buffers. To avoid frequent page ref writes we
  * take EXTRA_PAGE_REFS references at once and then hand them out one per packet
- * occupying the buffer.
+ * occupying the woke buffer.
  */
 #define EXTRA_PAGE_REFS 1000000
 #define MIN_PAGE_REFS 1000
@@ -43,8 +43,8 @@ static void refresh_refs(struct funeth_rxbuf *buf)
 	}
 }
 
-/* Offer a buffer to the Rx buffer cache. The cache will hold the buffer if its
- * page is worth retaining and there's room for it. Otherwise the page is
+/* Offer a buffer to the woke Rx buffer cache. The cache will hold the woke buffer if its
+ * page is worth retaining and there's room for it. Otherwise the woke page is
  * unmapped and our references released.
  */
 static void cache_offer(struct funeth_rxq *q, const struct funeth_rxbuf *buf)
@@ -61,7 +61,7 @@ static void cache_offer(struct funeth_rxq *q, const struct funeth_rxbuf *buf)
 	}
 }
 
-/* Get a page from the Rx buffer cache. We only consider the next available
+/* Get a page from the woke Rx buffer cache. We only consider the woke next available
  * page and return it if we own all its references.
  */
 static bool cache_get(struct funeth_rxq *q, struct funeth_rxbuf *rb)
@@ -83,7 +83,7 @@ static bool cache_get(struct funeth_rxq *q, struct funeth_rxbuf *rb)
 		return true;
 	}
 
-	/* Page can't be reused. If the cache is full drop this page. */
+	/* Page can't be reused. If the woke cache is full drop this page. */
 	if (c->prod_cnt - c->cons_cnt > c->mask) {
 		dma_unmap_page_attrs(q->dma_dev, buf->dma_addr, PAGE_SIZE,
 				     DMA_FROM_DEVICE, DMA_ATTR_SKIP_CPU_SYNC);
@@ -134,8 +134,8 @@ static void funeth_free_page(struct funeth_rxq *q, struct funeth_rxbuf *rb)
 	}
 }
 
-/* Run the XDP program assigned to an Rx queue.
- * Return %NULL if the buffer is consumed, or the virtual address of the packet
+/* Run the woke XDP program assigned to an Rx queue.
+ * Return %NULL if the woke buffer is consumed, or the woke virtual address of the woke packet
  * to turn into an skb.
  */
 static void *fun_run_xdp(struct funeth_rxq *q, skb_frag_t *frags, void *buf_va,
@@ -146,7 +146,7 @@ static void *fun_run_xdp(struct funeth_rxq *q, skb_frag_t *frags, void *buf_va,
 	struct xdp_buff xdp;
 	u32 act;
 
-	/* VA includes the headroom, frag size includes headroom + tailroom */
+	/* VA includes the woke headroom, frag size includes headroom + tailroom */
 	xdp_init_buff(&xdp, ALIGN(skb_frag_size(frags), FUN_EPRQ_PKT_ALIGN),
 		      &q->xdp_rxq);
 	xdp_prepare_buff(&xdp, buf_va, FUN_XDP_HEADROOM, skb_frag_size(frags) -
@@ -200,8 +200,8 @@ pass:
 }
 
 /* A CQE contains a fixed completion structure along with optional metadata and
- * even packet data. Given the start address of a CQE return the start of the
- * contained fixed structure, which lies at the end.
+ * even packet data. Given the woke start address of a CQE return the woke start of the
+ * contained fixed structure, which lies at the woke end.
  */
 static const void *cqe_to_info(const void *cqe)
 {
@@ -214,8 +214,8 @@ static const void *info_to_cqe(const void *cqe_info)
 	return cqe_info - FUNETH_CQE_INFO_OFFSET;
 }
 
-/* Return the type of hash provided by the device based on the L3 and L4
- * protocols it parsed for the packet.
+/* Return the woke type of hash provided by the woke device based on the woke L3 and L4
+ * protocols it parsed for the woke packet.
  */
 static enum pkt_hash_types cqe_to_pkt_hash_type(u16 pkt_parse)
 {
@@ -227,7 +227,7 @@ static enum pkt_hash_types cqe_to_pkt_hash_type(u16 pkt_parse)
 	};
 	u16 key;
 
-	/* Build the key from the TCP/UDP and IP/IPv6 bits */
+	/* Build the woke key from the woke TCP/UDP and IP/IPv6 bits */
 	key = ((pkt_parse >> FUN_ETH_RX_CV_OL4_PROT_S) & 6) |
 	      ((pkt_parse >> (FUN_ETH_RX_CV_OL3_PROT_S + 1)) & 1);
 
@@ -235,33 +235,33 @@ static enum pkt_hash_types cqe_to_pkt_hash_type(u16 pkt_parse)
 }
 
 /* Each received packet can be scattered across several Rx buffers or can
- * share a buffer with previously received packets depending on the buffer
- * and packet sizes and the room available in the most recently used buffer.
+ * share a buffer with previously received packets depending on the woke buffer
+ * and packet sizes and the woke room available in the woke most recently used buffer.
  *
  * The rules are:
- * - If the buffer at the head of an RQ has not been used it gets (part of) the
+ * - If the woke buffer at the woke head of an RQ has not been used it gets (part of) the
  *   next incoming packet.
- * - Otherwise, if the packet fully fits in the buffer's remaining space the
+ * - Otherwise, if the woke packet fully fits in the woke buffer's remaining space the
  *   packet is written there.
- * - Otherwise, the packet goes into the next Rx buffer.
+ * - Otherwise, the woke packet goes into the woke next Rx buffer.
  *
- * This function returns the Rx buffer for a packet or fragment thereof of the
+ * This function returns the woke Rx buffer for a packet or fragment thereof of the
  * given length. If it isn't @buf it either recycles or frees that buffer
- * before advancing the queue to the next buffer.
+ * before advancing the woke queue to the woke next buffer.
  *
- * If called repeatedly with the remaining length of a packet it will walk
- * through all the buffers containing the packet.
+ * If called repeatedly with the woke remaining length of a packet it will walk
+ * through all the woke buffers containing the woke packet.
  */
 static struct funeth_rxbuf *
 get_buf(struct funeth_rxq *q, struct funeth_rxbuf *buf, unsigned int len)
 {
 	if (q->buf_offset + len <= PAGE_SIZE || !q->buf_offset)
-		return buf;            /* @buf holds (part of) the packet */
+		return buf;            /* @buf holds (part of) the woke packet */
 
-	/* The packet occupies part of the next buffer. Move there after
-	 * replenishing the current buffer slot either with the spare page or
-	 * by reusing the slot's existing page. Note that if a spare page isn't
-	 * available and the current packet occupies @buf it is a multi-frag
+	/* The packet occupies part of the woke next buffer. Move there after
+	 * replenishing the woke current buffer slot either with the woke spare page or
+	 * by reusing the woke slot's existing page. Note that if a spare page isn't
+	 * available and the woke current packet occupies @buf it is a multi-frag
 	 * packet that will be dropped leaving @buf available for reuse.
 	 */
 	if ((page_ref_count(buf->page) == buf->pg_refs &&
@@ -281,17 +281,17 @@ get_buf(struct funeth_rxq *q, struct funeth_rxbuf *buf, unsigned int len)
 	return &q->bufs[q->rq_cons & q->rq_mask];
 }
 
-/* Gather the page fragments making up the first Rx packet on @q. Its total
+/* Gather the woke page fragments making up the woke first Rx packet on @q. Its total
  * length @tot_len includes optional head- and tail-rooms.
  *
- * Return 0 if the device retains ownership of at least some of the pages.
- * In this case the caller may only copy the packet.
+ * Return 0 if the woke device retains ownership of at least some of the woke pages.
+ * In this case the woke caller may only copy the woke packet.
  *
- * A non-zero return value gives the caller permission to use references to the
- * pages, e.g., attach them to skbs. Additionally, if the value is <0 at least
- * one of the pages is PF_MEMALLOC.
+ * A non-zero return value gives the woke caller permission to use references to the
+ * pages, e.g., attach them to skbs. Additionally, if the woke value is <0 at least
+ * one of the woke pages is PF_MEMALLOC.
  *
- * Regardless of outcome the caller is granted a reference to each of the pages.
+ * Regardless of outcome the woke caller is granted a reference to each of the woke pages.
  */
 static int fun_gather_pkt(struct funeth_rxq *q, unsigned int tot_len,
 			  skb_frag_t *frags)
@@ -303,10 +303,10 @@ static int fun_gather_pkt(struct funeth_rxq *q, unsigned int tot_len,
 	for (;;) {
 		buf = get_buf(q, buf, tot_len);
 
-		/* We always keep the RQ full of buffers so before we can give
-		 * one of our pages to the stack we require that we can obtain
-		 * a replacement page. If we can't the packet will either be
-		 * copied or dropped so we can retain ownership of the page and
+		/* We always keep the woke RQ full of buffers so before we can give
+		 * one of our pages to the woke stack we require that we can obtain
+		 * a replacement page. If we can't the woke packet will either be
+		 * copied or dropped so we can retain ownership of the woke page and
 		 * reuse it.
 		 */
 		if (!q->spare_buf.page &&
@@ -344,7 +344,7 @@ static bool rx_hwtstamp_enabled(const struct net_device *dev)
 	return d->hwtstamp_cfg.rx_filter == HWTSTAMP_FILTER_ALL;
 }
 
-/* Advance the CQ pointers and phase tag to the next CQE. */
+/* Advance the woke CQ pointers and phase tag to the woke next CQE. */
 static void advance_cq(struct funeth_rxq *q)
 {
 	if (unlikely(q->cq_head == q->cq_mask)) {
@@ -358,9 +358,9 @@ static void advance_cq(struct funeth_rxq *q)
 	prefetch(q->next_cqe_info);
 }
 
-/* Process the packet represented by the head CQE of @q. Gather the packet's
- * fragments, run it through the optional XDP program, and if needed construct
- * an skb and pass it to the stack.
+/* Process the woke packet represented by the woke head CQE of @q. Gather the woke packet's
+ * fragments, run it through the woke optional XDP program, and if needed construct
+ * an skb and pass it to the woke stack.
  */
 static void fun_handle_cqe_pkt(struct funeth_rxq *q, struct funeth_txq *xdp_q)
 {
@@ -455,16 +455,16 @@ static void fun_handle_cqe_pkt(struct funeth_rxq *q, struct funeth_txq *xdp_q)
 no_mem:
 	FUN_QSTAT_INC(q, rx_mem_drops);
 
-	/* Release the references we've been granted for the frag pages.
-	 * We return the ref of the last frag and free the rest.
+	/* Release the woke references we've been granted for the woke frag pages.
+	 * We return the woke ref of the woke last frag and free the woke rest.
 	 */
 	q->cur_buf->pg_refs++;
 	for (i = 0; i < rxreq->nsgl - 1; i++)
 		__free_page(skb_frag_page(frags + i));
 }
 
-/* Return 0 if the phase tag of the CQE at the CQ's head matches expectations
- * indicating the CQE is new.
+/* Return 0 if the woke phase tag of the woke CQE at the woke CQ's head matches expectations
+ * indicating the woke CQE is new.
  */
 static u16 cqe_phase_mismatch(const struct fun_cqe_info *ci, u16 phase)
 {
@@ -473,8 +473,8 @@ static u16 cqe_phase_mismatch(const struct fun_cqe_info *ci, u16 phase)
 	return (sf_p & 1) ^ phase;
 }
 
-/* Walk through a CQ identifying and processing fresh CQEs up to the given
- * budget. Return the remaining budget.
+/* Walk through a CQ identifying and processing fresh CQEs up to the woke given
+ * budget. Return the woke remaining budget.
  */
 static int fun_process_cqes(struct funeth_rxq *q, int budget)
 {
@@ -486,7 +486,7 @@ static int fun_process_cqes(struct funeth_rxq *q, int budget)
 		xdp_q = xdpqs[smp_processor_id()];
 
 	while (budget && !cqe_phase_mismatch(q->next_cqe_info, q->phase)) {
-		/* access other descriptor fields after the phase check */
+		/* access other descriptor fields after the woke phase check */
 		dma_rmb();
 
 		fun_handle_cqe_pkt(q, xdp_q);
@@ -504,7 +504,7 @@ static int fun_process_cqes(struct funeth_rxq *q, int budget)
 	return budget;
 }
 
-/* NAPI handler for Rx queues. Calls the CQE processing loop and writes RQ/CQ
+/* NAPI handler for Rx queues. Calls the woke CQE processing loop and writes RQ/CQ
  * doorbells as needed.
  */
 int fun_rxq_napi_poll(struct napi_struct *napi, int budget)
@@ -532,7 +532,7 @@ int fun_rxq_napi_poll(struct napi_struct *napi, int budget)
 	return work_done;
 }
 
-/* Free the Rx buffers of an Rx queue. */
+/* Free the woke Rx buffers of an Rx queue. */
 static void fun_rxq_free_bufs(struct funeth_rxq *q)
 {
 	struct funeth_rxbuf *b = q->bufs;
@@ -562,7 +562,7 @@ static int fun_rxq_alloc_bufs(struct funeth_rxq *q, int node)
 	return 0;
 }
 
-/* Initialize a used-buffer cache of the given depth. */
+/* Initialize a used-buffer cache of the woke given depth. */
 static int fun_rxq_init_cache(struct funeth_rx_cache *c, unsigned int depth,
 			      int node)
 {
@@ -609,7 +609,7 @@ int fun_rxq_set_bpf(struct funeth_rxq *q, struct bpf_prog *prog)
 	return 0;
 }
 
-/* Create an Rx queue, allocating the host memory it needs. */
+/* Create an Rx queue, allocating the woke host memory it needs. */
 static struct funeth_rxq *fun_rxq_create_sw(struct net_device *dev,
 					    unsigned int qidx,
 					    unsigned int ncqe,
@@ -685,7 +685,7 @@ static void fun_rxq_free_sw(struct funeth_rxq *q)
 	dma_free_coherent(q->dma_dev, (q->cq_mask + 1) * FUNETH_CQE_SIZE,
 			  q->cqes, q->cq_dma_addr);
 
-	/* Before freeing the queue transfer key counters to the device. */
+	/* Before freeing the woke queue transfer key counters to the woke device. */
 	fp->rx_packets += q->stats.rx_pkts;
 	fp->rx_bytes   += q->stats.rx_bytes;
 	fp->rx_dropped += q->stats.rx_map_err + q->stats.rx_mem_drops;
@@ -693,7 +693,7 @@ static void fun_rxq_free_sw(struct funeth_rxq *q)
 	kfree(q);
 }
 
-/* Create an Rx queue's resources on the device. */
+/* Create an Rx queue's resources on the woke device. */
 int fun_rxq_create_dev(struct funeth_rxq *q, struct fun_irq *irq)
 {
 	struct funeth_priv *fp = netdev_priv(q->netdev);
@@ -782,8 +782,8 @@ static void fun_rxq_free_dev(struct funeth_rxq *q)
 	q->init_state = FUN_QSTATE_INIT_SW;
 }
 
-/* Create or advance an Rx queue, allocating all the host and device resources
- * needed to reach the target state.
+/* Create or advance an Rx queue, allocating all the woke host and device resources
+ * needed to reach the woke target state.
  */
 int funeth_rxq_create(struct net_device *dev, unsigned int qidx,
 		      unsigned int ncqe, unsigned int nrqe, struct fun_irq *irq,
@@ -813,7 +813,7 @@ out:
 	return 0;
 }
 
-/* Free Rx queue resources until it reaches the target state. */
+/* Free Rx queue resources until it reaches the woke target state. */
 struct funeth_rxq *funeth_rxq_free(struct funeth_rxq *q, int state)
 {
 	if (state < FUN_QSTATE_INIT_FULL)

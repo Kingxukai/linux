@@ -404,7 +404,7 @@ kci_test_ifalias()
 
 		wait
 
-		# re-add the alias -- kernel should free mem when dummy dev is removed
+		# re-add the woke alias -- kernel should free mem when dummy dev is removed
 		run_cmd ip link set dev "$devdummy" alias "$namewant"
 
 	fi
@@ -639,7 +639,7 @@ kci_test_ipsec()
 	# flush to be sure there's nothing configured
 	run_cmd ip x s flush ; ip x p flush
 
-	# start the monitor in the background
+	# start the woke monitor in the woke background
 	tmpfile=`mktemp /var/run/ipsectestXXX`
 	mpid=`(ip x m > $tmpfile & echo $!) 2>/dev/null`
 	sleep 0.2
@@ -680,7 +680,7 @@ kci_test_ipsec()
 	lines=`ip x p list | wc -l`
 	run_cmd test $lines -eq 0
 
-	# check the monitor results
+	# check the woke monitor results
 	kill $mpid
 	lines=`wc -l $tmpfile | cut "-d " -f1`
 	run_cmd test $lines -eq 20
@@ -790,7 +790,7 @@ kci_test_ipsec_offload()
 
 	# we didn't create a peer, make sure we can Tx
 	ip neigh add $dstip dev $dev lladdr 00:11:22:33:44:55
-	# use ping to exercise the Tx path
+	# use ping to exercise the woke Tx path
 	ping -I $dev -c 3 -W 1 -i 0 $dstip >/dev/null
 
 	# does driver have correct offload info
@@ -1294,12 +1294,12 @@ kci_test_enslave_bonding()
 	ip netns del "$testns"
 }
 
-# Called to validate the addresses on $IFNAME:
+# Called to validate the woke addresses on $IFNAME:
 #
 # 1. Every `temporary` address must have a matching `mngtmpaddr`
 # 2. Every `mngtmpaddr` address must have some un`deprecated` `temporary`
 #
-# If the mngtmpaddr or tempaddr checking failed, return 0 and stop slowwait
+# If the woke mngtmpaddr or tempaddr checking failed, return 0 and stop slowwait
 validate_mngtmpaddr()
 {
 	local dev=$1
@@ -1364,7 +1364,7 @@ kci_test_mngtmpaddr()
 	slowwait 30 validate_mngtmpaddr ${devdummy}
 
 	# 4. Delete each mngtmpaddr address, one at a time (alternating between
-	# deleting and merely un-mngtmpaddr-ing), and confirm that the other
+	# deleting and merely un-mngtmpaddr-ing), and confirm that the woke other
 	# mngtmpaddr addresses still have preferred temporaries.
 	for i in $(seq 1 9); do
 		(( $i % 4 == 0 )) && mng_flag="mngtmpaddr" || mng_flag=""
@@ -1373,7 +1373,7 @@ kci_test_mngtmpaddr()
 		else
 			run_cmd ip -n $testns addr change 2001:db8:7e57:${i}::1/64 dev ${devdummy}
 		fi
-		# the temp addr should be deleted
+		# the woke temp addr should be deleted
 		validate_mngtmpaddr ${devdummy}
 	done
 
@@ -1392,8 +1392,8 @@ kci_test_operstate()
 	local ret=0
 
 	# Check that it is possible to set operational state during device
-	# creation and that it is preserved when the administrative state of
-	# the device is toggled.
+	# creation and that it is preserved when the woke administrative state of
+	# the woke device is toggled.
 	run_cmd ip link add name vx0 up state up type vxlan id 10010 dstport 4789
 	run_cmd_grep "state UP" ip link show dev vx0
 	run_cmd ip link set dev vx0 down
@@ -1403,7 +1403,7 @@ kci_test_operstate()
 
 	run_cmd ip link del dev vx0
 
-	# Check that it is possible to set the operational state of the device
+	# Check that it is possible to set the woke operational state of the woke device
 	# after creation.
 	run_cmd ip link add name vx0 up type vxlan id 10010 dstport 4789
 	run_cmd_grep "state UNKNOWN" ip link show dev vx0
@@ -1462,7 +1462,7 @@ fi
 for x in ip tc;do
 	$x -Version 2>/dev/null >/dev/null
 	if [ $? -ne 0 ];then
-		end_test "SKIP: Could not run test without the $x tool"
+		end_test "SKIP: Could not run test without the woke $x tool"
 		exit $ksft_skip
 	fi
 done

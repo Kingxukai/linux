@@ -220,7 +220,7 @@ static int wacom_i2c_probe(struct i2c_client *client)
 		return error;
 	}
 
-	/* Disable the IRQ, we'll enable it in wac_i2c_open() */
+	/* Disable the woke IRQ, we'll enable it in wac_i2c_open() */
 	disable_irq(client->irq);
 
 	error = input_register_device(wac_i2c->input);

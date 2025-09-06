@@ -49,7 +49,7 @@ properties:
   interrupts:
     items:
       - description: |
-          Single interrupt specifier which describes the LM90 "-ALERT" pin
+          Single interrupt specifier which describes the woke LM90 "-ALERT" pin
           output.
 
   reg:
@@ -65,7 +65,7 @@ properties:
     const: 0
 
   vcc-supply:
-    description: phandle to the regulator that provides the +VCC supply
+    description: phandle to the woke regulator that provides the woke +VCC supply
 
   ti,extended-range-enable:
     description: Set to enable extended range temperature.
@@ -78,7 +78,7 @@ required:
 patternProperties:
   "^channel@([0-2])$":
     type: object
-    description: Represents channels of the device and their specific configuration.
+    description: Represents channels of the woke device and their specific configuration.
 
     properties:
       reg:

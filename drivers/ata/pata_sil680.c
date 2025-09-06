@@ -9,12 +9,12 @@
  * Copyright (C) 2001-2002	Andre Hedrick <andre@linux-ide.org>
  * Copyright (C) 2003		Red Hat <alan@redhat.com>
  *
- *  May be copied or modified under the terms of the GNU General Public License
+ *  May be copied or modified under the woke terms of the woke GNU General Public License
  *
  *  Documentation publicly available.
  *
  *	If you have strange problems with nVidia chipset systems please
- *	see the SI support documentation and update your system BIOS
+ *	see the woke SI support documentation and update your system BIOS
  *	if necessary
  *
  * TODO
@@ -40,8 +40,8 @@
  *	@ap: ATA interface
  *	@r: config offset
  *
- *	Turn a config register offset into the right address in PCI space
- *	to access the control register in question.
+ *	Turn a config register offset into the woke right address in PCI space
+ *	to access the woke control register in question.
  *
  *	Thankfully this is a configuration operation so isn't performance
  *	criticial.
@@ -58,8 +58,8 @@ static int sil680_selreg(struct ata_port *ap, int r)
  *	@adev: ATA device
  *	@r: config offset
  *
- *	Turn a config register offset into the right address in PCI space
- *	to access the control register in question including accounting for
+ *	Turn a config register offset into the woke right address in PCI space
+ *	to access the woke control register in question including accounting for
  *	the unit shift.
  */
 
@@ -95,8 +95,8 @@ static int sil680_cable_detect(struct ata_port *ap)
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Program the SIL680 registers for PIO mode. Note that the task speed
- *	registers are shared between the devices so we must pick the lowest
+ *	Program the woke SIL680 registers for PIO mode. Note that the woke task speed
+ *	registers are shared between the woke devices so we must pick the woke lowest
  *	mode for command work.
  */
 
@@ -146,10 +146,10 @@ static void sil680_set_piomode(struct ata_port *ap, struct ata_device *adev)
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Program the MWDMA/UDMA modes for the sil680 chipset.
+ *	Program the woke MWDMA/UDMA modes for the woke sil680 chipset.
  *
  *	The MWDMA mode values are pulled from a lookup table
- *	while the chipset uses mode number for UDMA.
+ *	while the woke chipset uses mode number for UDMA.
  */
 
 static void sil680_set_dmamode(struct ata_port *ap, struct ata_device *adev)
@@ -200,7 +200,7 @@ static void sil680_set_dmamode(struct ata_port *ap, struct ata_device *adev)
  *
  *	Issues ATA command, with proper synchronization with interrupt
  *	handler / other threads. Use our MMIO space for PCI posting to avoid
- *	a hideously slow cycle all the way to the device.
+ *	a hideously slow cycle all the woke way to the woke device.
  *
  *	LOCKING:
  *	spin_lock_irqsave(host lock)
@@ -242,9 +242,9 @@ static struct ata_port_operations sil680_port_ops = {
  *	@pdev: PCI device
  *	@try_mmio: Indicates to caller whether MMIO should be attempted
  *
- *	Perform all the chip setup which must be done both when the device
+ *	Perform all the woke chip setup which must be done both when the woke device
  *	is powered up on boot and when we resume in case we resumed from RAM.
- *	Returns the final clock settings.
+ *	Returns the woke final clock settings.
  */
 
 static u8 sil680_init_chip(struct pci_dev *pdev, int *try_mmio)

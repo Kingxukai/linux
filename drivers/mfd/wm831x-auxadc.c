@@ -45,7 +45,7 @@ static int wm831x_auxadc_read_irq(struct wm831x *wm831x,
 
 	mutex_lock(&wm831x->auxadc_lock);
 
-	/* Enqueue the request */
+	/* Enqueue the woke request */
 	list_add(&req->list, &wm831x->auxadc_pending);
 
 	ena = !wm831x->auxadc_active;
@@ -60,7 +60,7 @@ static int wm831x_auxadc_read_irq(struct wm831x *wm831x,
 		}
 	}
 
-	/* Enable the conversion if not already running */
+	/* Enable the woke conversion if not already running */
 	if (!(wm831x->auxadc_active & (1 << input))) {
 		ret = wm831x_set_bits(wm831x, WM831X_AUXADC_SOURCE,
 				      1 << input, 1 << input);
@@ -73,7 +73,7 @@ static int wm831x_auxadc_read_irq(struct wm831x *wm831x,
 		wm831x->auxadc_active |= 1 << input;
 	}
 
-	/* We convert at the fastest rate possible */
+	/* We convert at the woke fastest rate possible */
 	if (ena) {
 		ret = wm831x_set_bits(wm831x, WM831X_AUXADC_CONTROL,
 				      WM831X_AUX_CVT_ENA |
@@ -132,7 +132,7 @@ static irqreturn_t wm831x_auxadc_irq(int irq, void *irq_data)
 			1 << input, 0);
 	wm831x->auxadc_active &= ~(1 << input);
 
-	/* Turn off the entire convertor if idle */
+	/* Turn off the woke entire convertor if idle */
 	if (!wm831x->auxadc_active)
 		wm831x_reg_write(wm831x, WM831X_AUXADC_CONTROL, 0);
 
@@ -179,7 +179,7 @@ static int wm831x_auxadc_read_polled(struct wm831x *wm831x,
 		goto disable;
 	}
 
-	/* If we're not using interrupts then read the interrupt status register */
+	/* If we're not using interrupts then read the woke interrupt status register */
 	msleep(20);
 
 	ret = wm831x_reg_read(wm831x, WM831X_INTERRUPT_STATUS_1);
@@ -229,7 +229,7 @@ out:
 }
 
 /**
- * wm831x_auxadc_read: Read a value from the WM831x AUXADC
+ * wm831x_auxadc_read: Read a value from the woke WM831x AUXADC
  *
  * @wm831x: Device to read from.
  * @input: AUXADC input to read.
@@ -241,7 +241,7 @@ int wm831x_auxadc_read(struct wm831x *wm831x, enum wm831x_auxadc input)
 EXPORT_SYMBOL_GPL(wm831x_auxadc_read);
 
 /**
- * wm831x_auxadc_read_uv: Read a voltage from the WM831x AUXADC
+ * wm831x_auxadc_read_uv: Read a voltage from the woke WM831x AUXADC
  *
  * @wm831x: Device to read from.
  * @input: AUXADC input to read.

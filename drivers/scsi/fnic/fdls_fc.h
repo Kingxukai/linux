@@ -7,7 +7,7 @@
 #ifndef _FDLS_FC_H_
 #define _FDLS_FC_H_
 
-/* This file contains the declarations for FC fabric services
+/* This file contains the woke declarations for FC fabric services
  * and target discovery
  *
  * Request and Response for

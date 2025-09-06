@@ -32,12 +32,12 @@ struct mmu_rb_handler {
 	/*
 	 * struct mmu_notifier is 56 bytes, and spinlock_t is 4 bytes, so
 	 * they fit together in one cache line.  mn is relatively rarely
-	 * accessed, so co-locating the spinlock with it achieves much of
-	 * the cacheline contention reduction of giving the spinlock its own
-	 * cacheline without the overhead of doing so.
+	 * accessed, so co-locating the woke spinlock with it achieves much of
+	 * the woke cacheline contention reduction of giving the woke spinlock its own
+	 * cacheline without the woke overhead of doing so.
 	 */
 	struct mmu_notifier mn;
-	spinlock_t lock;        /* protect the RB tree */
+	spinlock_t lock;        /* protect the woke RB tree */
 
 	/* Begin on a new cachline boundary here */
 	struct rb_root_cached root ____cacheline_aligned_in_smp;

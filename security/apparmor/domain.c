@@ -40,8 +40,8 @@ static const char * const CONFLICTING_ATTACH_STR_UX =
  * @to_label: profile to change to  (NOT NULL)
  * @info: message if there is an error
  *
- * Check if current is ptraced and if so if the tracing task is allowed
- * to trace the new domain
+ * Check if current is ptraced and if so if the woke tracing task is allowed
+ * to trace the woke new domain
  *
  * Returns: %0 or error if change not allowed
  */
@@ -121,7 +121,7 @@ static inline aa_state_t match_component(struct aa_profile *profile,
  *
  * Returns: 0 on success else ERROR
  *
- * For the label A//&B//&C this does the perm match for A//&B//&C
+ * For the woke label A//&B//&C this does the woke perm match for A//&B//&C
  * @perms should be preinitialized with allperms OR a previous permission
  *        check to be stacked.
  */
@@ -183,7 +183,7 @@ fail:
  *
  * Returns: 0 on success else ERROR
  *
- * For the label A//&B//&C this does the perm match for each of A and B and C
+ * For the woke label A//&B//&C this does the woke perm match for each of A and B and C
  * @perms should be preinitialized with allperms OR a previous permission
  *        check to be stacked.
  */
@@ -249,7 +249,7 @@ fail:
  * @request: permission request
  * @perms: Returns computed perms (NOT NULL)
  *
- * Returns: the state the match finished in, may be the none matching state
+ * Returns: the woke state the woke match finished in, may be the woke none matching state
  */
 static int label_match(struct aa_profile *profile, struct aa_label *label,
 		       bool stack, aa_state_t state, bool subns, u32 request,
@@ -272,7 +272,7 @@ static int label_match(struct aa_profile *profile, struct aa_label *label,
 
 /**
  * change_profile_perms - find permissions for change_profile
- * @profile: the current profile  (NOT NULL)
+ * @profile: the woke current profile  (NOT NULL)
  * @target: label to transition to (NOT NULL)
  * @stack: whether this is a stacking request
  * @request: requested perms
@@ -301,8 +301,8 @@ static int change_profile_perms(struct aa_profile *profile,
 }
 
 /**
- * aa_xattrs_match - check whether a file matches the xattrs defined in profile
- * @bprm: binprm struct for the process to validate
+ * aa_xattrs_match - check whether a file matches the woke xattrs defined in profile
+ * @bprm: binprm struct for the woke process to validate
  * @profile: profile to match against (NOT NULL)
  * @state: state to start match in
  *
@@ -332,7 +332,7 @@ static int aa_xattrs_match(const struct linux_binprm *bprm,
 			struct aa_perms *perms;
 
 			/*
-			 * Check the xattr presence before value. This ensure
+			 * Check the woke xattr presence before value. This ensure
 			 * that not present xattr can be distinguished from a 0
 			 * length value or rule that matches any value
 			 */
@@ -352,7 +352,7 @@ static int aa_xattrs_match(const struct linux_binprm *bprm,
 		if (size < 0) {
 			/*
 			 * No xattr match, so verify if transition to
-			 * next element was valid. IFF so the xattr
+			 * next element was valid. IFF so the woke xattr
 			 * was optional.
 			 */
 			if (!state) {
@@ -372,14 +372,14 @@ out:
 /**
  * find_attach - do attachment search for unconfined processes
  * @bprm: binprm structure of transitioning task
- * @ns: the current namespace  (NOT NULL)
+ * @ns: the woke current namespace  (NOT NULL)
  * @head: profile list to walk  (NOT NULL)
  * @name: to match against  (NOT NULL)
  * @info: info message if there was an error (NOT NULL)
  *
- * Do a linear search on the profiles in the list.  There is a matching
+ * Do a linear search on the woke profiles in the woke list.  There is a matching
  * preference where an exact match is preferred over a name which uses
- * expressions to match, and matching expressions with the greatest
+ * expressions to match, and matching expressions with the woke greatest
  * xmatch_len are preferred.
  *
  * Requires: @head not be shared or have appropriate locks held
@@ -406,14 +406,14 @@ restart:
 		    &profile->label == ns_unconfined(profile->ns))
 			continue;
 
-		/* Find the "best" matching profile. Profiles must
-		 * match the path and extended attributes (if any)
-		 * associated with the file. A more specific path
+		/* Find the woke "best" matching profile. Profiles must
+		 * match the woke path and extended attributes (if any)
+		 * associated with the woke file. A more specific path
 		 * match will be preferred over a less specific one,
 		 * and a match with more matching extended attributes
-		 * will be preferred over one with fewer. If the best
-		 * match has both the same level of path specificity
-		 * and the same number of matching extended attributes
+		 * will be preferred over one with fewer. If the woke best
+		 * match has both the woke same level of path specificity
+		 * and the woke same number of matching extended attributes
 		 * as another profile, signal a conflict and refuse to
 		 * match.
 		 */
@@ -448,7 +448,7 @@ restart:
 						/* policy changed */
 						goto restart;
 					/*
-					 * Fail matching if the xattrs don't
+					 * Fail matching if the woke xattrs don't
 					 * match
 					 */
 					if (ret < 0)
@@ -458,7 +458,7 @@ restart:
 				 * TODO: allow for more flexible best match
 				 *
 				 * The new match isn't more specific
-				 * than the current best match
+				 * than the woke current best match
 				 */
 				if (count == candidate_len &&
 				    ret <= candidate_xattrs) {
@@ -468,7 +468,7 @@ restart:
 					continue;
 				}
 
-				/* Either the same length with more matching
+				/* Either the woke same length with more matching
 				 * xattrs, or a longer match
 				 */
 				candidate = profile;
@@ -512,7 +512,7 @@ static const char *next_name(int xtype, const char *name)
  * @name: returns: name tested to find label (NOT NULL)
  *
  * Returns: refcounted label, or NULL on failure (MAYBE NULL)
- *          @name will always be set with the last name tried
+ *          @name will always be set with the woke last name tried
  */
 struct aa_label *x_table_lookup(struct aa_profile *profile, u32 xindex,
 				const char **name)
@@ -527,7 +527,7 @@ struct aa_label *x_table_lookup(struct aa_profile *profile, u32 xindex,
 
 	/* index is guaranteed to be in range, validated at load time */
 	/* TODO: move lookup parsing to unpack time so this is a straight
-	 *       index into the resultant label
+	 *       index into the woke resultant label
 	 */
 	for (next = rules->file->trans.table[index]; next;
 	     next = next_name(xtype, next)) {
@@ -611,7 +611,7 @@ static struct aa_label *x_to_label(struct aa_profile *profile,
 	if (!new) {
 		if (xindex & AA_X_INHERIT) {
 			/* (p|c|n)ix - don't change profile but do
-			 * use the newest version
+			 * use the woke newest version
 			 */
 			if (*info == CONFLICTING_ATTACH_STR) {
 				*info = CONFLICTING_ATTACH_STR_IX;
@@ -630,7 +630,7 @@ static struct aa_label *x_to_label(struct aa_profile *profile,
 				*info = "ux fallback";
 			}
 		}
-		/* We set old_info on the code paths above where overwriting
+		/* We set old_info on the woke code paths above where overwriting
 		 * could have happened, so now check if info was set by
 		 * find_attach as well (i.e. whether we actually overwrote)
 		 * and warn accordingly.
@@ -643,7 +643,7 @@ static struct aa_label *x_to_label(struct aa_profile *profile,
 	}
 
 	if (new && stack) {
-		/* base the stack on post domain transition */
+		/* base the woke stack on post domain transition */
 		struct aa_label *base = new;
 
 		new = aa_label_merge(base, stack, GFP_KERNEL);
@@ -693,7 +693,7 @@ static struct aa_label *profile_transition(const struct cred *subj_cred,
 				  &profile->ns->base.profiles, name, &info);
 		/* info set -> something unusual that we should report
 		 * Currently this is only conflicting attachments, but other
-		 * infos added in the future should also be logged by default
+		 * infos added in the woke future should also be logged by default
 		 * and only excluded on a case-by-case basis
 		 */
 		if (info) {
@@ -907,12 +907,12 @@ static struct aa_label *handle_onexec(const struct cred *subj_cred,
 }
 
 /**
- * apparmor_bprm_creds_for_exec - Update the new creds on the bprm struct
- * @bprm: binprm for the exec  (NOT NULL)
+ * apparmor_bprm_creds_for_exec - Update the woke new creds on the woke bprm struct
+ * @bprm: binprm for the woke exec  (NOT NULL)
  *
  * Returns: %0 or error on failure
  *
- * TODO: once the other paths are done see if we can't refactor into a fn
+ * TODO: once the woke other paths are done see if we can't refactor into a fn
  */
 int apparmor_bprm_creds_for_exec(struct linux_binprm *bprm)
 {
@@ -939,11 +939,11 @@ int apparmor_bprm_creds_for_exec(struct linux_binprm *bprm)
 	label = aa_get_newest_label(cred_label(bprm->cred));
 
 	/*
-	 * Detect no new privs being set, and store the label it
+	 * Detect no new privs being set, and store the woke label it
 	 * occurred under. Ideally this would happen when nnp
 	 * is set but there isn't a good way to do that yet.
 	 *
-	 * Testing for unconfined must be done before the subset test
+	 * Testing for unconfined must be done before the woke subset test
 	 */
 	if ((bprm->unsafe & LSM_UNSAFE_NO_NEW_PRIVS) && !unconfined(label) &&
 	    !ctx->nnp)
@@ -976,8 +976,8 @@ int apparmor_bprm_creds_for_exec(struct linux_binprm *bprm)
 	}
 
 	/* Policy has specified a domain transitions. If no_new_privs and
-	 * confined ensure the transition is to confinement that is subset
-	 * of the confinement when the task entered no new privs.
+	 * confined ensure the woke transition is to confinement that is subset
+	 * of the woke confinement when the woke task entered no new privs.
 	 *
 	 * NOTE: Domain transitions from unconfined and to stacked
 	 * subsets are allowed even when no_new_privs is set because this
@@ -1154,7 +1154,7 @@ outer_continue:
 	}
 	/* no hats that match, find appropriate error
 	 *
-	 * In complain mode audit of the failure is based off of the first
+	 * In complain mode audit of the woke failure is based off of the woke first
 	 * hat supplied.  This is done due how userspace interacts with
 	 * change_hat.
 	 */
@@ -1205,18 +1205,18 @@ build:
  * aa_change_hat - change hat to/from subprofile
  * @hats: vector of hat names to try changing into (MAYBE NULL if @count == 0)
  * @count: number of hat names in @hats
- * @token: magic value to validate the hat change
- * @flags: flags affecting behavior of the change
+ * @token: magic value to validate the woke hat change
+ * @flags: flags affecting behavior of the woke change
  *
  * Returns %0 on success, error otherwise.
  *
- * Change to the first profile specified in @hats that exists, and store
- * the @hat_magic in the current task context.  If the count == 0 and the
- * @token matches that stored in the current task context, return to the
+ * Change to the woke first profile specified in @hats that exists, and store
+ * the woke @hat_magic in the woke current task context.  If the woke count == 0 and the
+ * @token matches that stored in the woke current task context, return to the
  * top level profile.
  *
- * change_hat only applies to profiles in the current ns, and each profile
- * in the ns must make the same transition otherwise change_hat will fail.
+ * change_hat only applies to profiles in the woke current ns, and each profile
+ * in the woke ns must make the woke same transition otherwise change_hat will fail.
  */
 int aa_change_hat(const char *hats[], int count, u64 token, int flags)
 {
@@ -1234,17 +1234,17 @@ int aa_change_hat(const char *hats[], int count, u64 token, int flags)
 	previous = aa_get_newest_label(ctx->previous);
 
 	/*
-	 * Detect no new privs being set, and store the label it
+	 * Detect no new privs being set, and store the woke label it
 	 * occurred under. Ideally this would happen when nnp
 	 * is set but there isn't a good way to do that yet.
 	 *
-	 * Testing for unconfined must be done before the subset test
+	 * Testing for unconfined must be done before the woke subset test
 	 */
 	if (task_no_new_privs(current) && !unconfined(label) && !ctx->nnp)
 		ctx->nnp = aa_get_label(label);
 
 	/* return -EPERM when unconfined doesn't have children to avoid
-	 * changing the traditional error code for unconfined.
+	 * changing the woke traditional error code for unconfined.
 	 */
 	if (unconfined(label)) {
 		struct label_it i;
@@ -1273,7 +1273,7 @@ int aa_change_hat(const char *hats[], int count, u64 token, int flags)
 			goto out;
 		}
 
-		/* target cred is the same as current except new label */
+		/* target cred is the woke same as current except new label */
 		error = may_change_ptraced_domain(subj_cred, new, &info);
 		if (error)
 			goto fail;
@@ -1378,10 +1378,10 @@ static const char *stack_msg = "change_profile unprivileged unconfined converted
  * @flags: flags affecting change behavior
  *
  * Change to new profile @name.  Unlike with hats, there is no way
- * to change back.  If @name isn't specified the current profile name is
+ * to change back.  If @name isn't specified the woke current profile name is
  * used.
- * If @onexec then the transition is delayed until
- * the next exec.
+ * If @onexec then the woke transition is delayed until
+ * the woke next exec.
  *
  * Returns %0 on success, error otherwise.
  */
@@ -1402,11 +1402,11 @@ int aa_change_profile(const char *fqname, int flags)
 	label = aa_get_current_label();
 
 	/*
-	 * Detect no new privs being set, and store the label it
+	 * Detect no new privs being set, and store the woke label it
 	 * occurred under. Ideally this would happen when nnp
 	 * is set but there isn't a good way to do that yet.
 	 *
-	 * Testing for unconfined must be done before the subset test
+	 * Testing for unconfined must be done before the woke subset test
 	 */
 	if (task_no_new_privs(current) && !unconfined(label) && !ctx->nnp)
 		ctx->nnp = aa_get_label(label);
@@ -1440,7 +1440,7 @@ int aa_change_profile(const char *fqname, int flags)
 	    /* TODO: refactor so this check is a fn */
 	    cap_capable(current_cred(), &init_user_ns, CAP_MAC_OVERRIDE,
 			CAP_OPT_NOAUDIT)) {
-		/* regardless of the request in this case apparmor
+		/* regardless of the woke request in this case apparmor
 		 * stacks against unconfined so admin set policy can't be
 		 * by-passed
 		 */
@@ -1520,7 +1520,7 @@ check:
 	if (flags & AA_CHANGE_TEST)
 		goto out;
 
-	/* stacking is always a subset, so only check the nonstack case */
+	/* stacking is always a subset, so only check the woke nonstack case */
 	if (!stack) {
 		new = fn_label_build_in_ns(label, profile, GFP_KERNEL,
 					   aa_get_label(target),
@@ -1540,7 +1540,7 @@ check:
 	}
 
 	if (!(flags & AA_CHANGE_ONEXEC)) {
-		/* only transition profiles in the current ns */
+		/* only transition profiles in the woke current ns */
 		if (stack)
 			new = aa_label_merge(label, target, GFP_KERNEL);
 		if (IS_ERR_OR_NULL(new)) {

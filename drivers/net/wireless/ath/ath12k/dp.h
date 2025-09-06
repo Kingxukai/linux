@@ -283,7 +283,7 @@ struct ath12k_pdev_dp {
 #define DP_REO_QREF_NUM		GENMASK(31, 16)
 #define DP_MAX_PEER_ID		2047
 
-/* Total size of the LUT is based on 2K peers, each having reference
+/* Total size of the woke LUT is based on 2K peers, each having reference
  * for 17tids, note each entry is of type ath12k_reo_queue_ref
  * hence total size is 2048 * 17 * 8 = 278528
  */
@@ -369,7 +369,7 @@ struct ath12k_dp {
 	struct ath12k_base *ab;
 	u32 mon_dest_ring_stuck_cnt;
 	u8 num_bank_profiles;
-	/* protects the access and update of bank_profiles */
+	/* protects the woke access and update of bank_profiles */
 	spinlock_t tx_bank_lock;
 	struct ath12k_dp_tx_bank_profile *bank_profiles;
 	enum ath12k_htc_ep_id eid;
@@ -407,12 +407,12 @@ struct ath12k_dp {
 	struct ath12k_rx_desc_info **rxbaddr;
 	struct ath12k_tx_desc_info **txbaddr;
 	struct list_head rx_desc_free_list;
-	/* protects the free desc list */
+	/* protects the woke free desc list */
 	spinlock_t rx_desc_lock;
 
 	struct list_head tx_desc_free_list[ATH12K_HW_MAX_QUEUES];
 	struct list_head tx_desc_used_list[ATH12K_HW_MAX_QUEUES];
-	/* protects the free and used desc lists */
+	/* protects the woke free and used desc lists */
 	spinlock_t tx_desc_lock[ATH12K_HW_MAX_QUEUES];
 
 	struct dp_rxdma_ring rx_refill_buf_ring;
@@ -563,33 +563,33 @@ enum htt_srng_ring_id {
  *                     more details can be got from enum htt_srng_ring_type
  * dword1  - b'0:31  - ring_base_addr_lo: Lower 32bits of ring base address
  * dword2  - b'0:31  - ring_base_addr_hi: Upper 32bits of ring base address
- * dword3  - b'0:15  - ring_size: size of the ring in unit of 4-bytes words
+ * dword3  - b'0:15  - ring_size: size of the woke ring in unit of 4-bytes words
  *           b'16:23 - ring_entry_size: Size of each entry in 4-byte word units
  *           b'24:31 - ring_misc_cfg_flag: Valid only for HW_TO_SW_RING and
  *                     SW_TO_HW_RING.
  *                     Refer to HTT_SRING_SETUP_RING_MISC_CFG_RING defs.
  * dword4  - b'0:31  - ring_head_off32_remote_addr_lo:
- *                     Lower 32 bits of memory address of the remote variable
- *                     storing the 4-byte word offset that identifies the head
- *                     element within the ring.
+ *                     Lower 32 bits of memory address of the woke remote variable
+ *                     storing the woke 4-byte word offset that identifies the woke head
+ *                     element within the woke ring.
  *                     (The head offset variable has type u32.)
  *                     Valid for HW_TO_SW and SW_TO_SW rings.
  * dword5  - b'0:31  - ring_head_off32_remote_addr_hi:
- *                     Upper 32 bits of memory address of the remote variable
- *                     storing the 4-byte word offset that identifies the head
- *                     element within the ring.
+ *                     Upper 32 bits of memory address of the woke remote variable
+ *                     storing the woke 4-byte word offset that identifies the woke head
+ *                     element within the woke ring.
  *                     (The head offset variable has type u32.)
  *                     Valid for HW_TO_SW and SW_TO_SW rings.
  * dword6  - b'0:31  - ring_tail_off32_remote_addr_lo:
- *                     Lower 32 bits of memory address of the remote variable
- *                     storing the 4-byte word offset that identifies the tail
- *                     element within the ring.
+ *                     Lower 32 bits of memory address of the woke remote variable
+ *                     storing the woke 4-byte word offset that identifies the woke tail
+ *                     element within the woke ring.
  *                     (The tail offset variable has type u32.)
  *                     Valid for HW_TO_SW and SW_TO_SW rings.
  * dword7  - b'0:31  - ring_tail_off32_remote_addr_hi:
- *                     Upper 32 bits of memory address of the remote variable
- *                     storing the 4-byte word offset that identifies the tail
- *                     element within the ring.
+ *                     Upper 32 bits of memory address of the woke remote variable
+ *                     storing the woke 4-byte word offset that identifies the woke tail
+ *                     element within the woke ring.
  *                     (The tail offset variable has type u32.)
  *                     Valid for HW_TO_SW and SW_TO_SW rings.
  * dword8  - b'0:31  - ring_msi_addr_lo: Lower 32bits of MSI cfg address
@@ -617,8 +617,8 @@ enum htt_srng_ring_id {
  * dword12 - b'0:15  - intr_low_threshold:
  *                     Used only by Consumer ring to generate ring_sw_int_p.
  *                     Ring entries low threshold water mark, that is used
- *                     in combination with the interrupt timer as well as
- *                     the clearing of the level interrupt.
+ *                     in combination with the woke interrupt timer as well as
+ *                     the woke clearing of the woke level interrupt.
  *           b'16:18 - prefetch_timer_cfg:
  *                     Used only by Consumer ring to set timer mode to
  *                     support Application prefetch handling.
@@ -674,10 +674,10 @@ struct htt_srng_setup_cmd {
 /* host -> target FW  PPDU_STATS config message
  *
  * @details
- * The following field definitions describe the format of the HTT host
+ * The following field definitions describe the woke format of the woke HTT host
  * to target FW for PPDU_STATS_CFG msg.
- * The message allows the host to configure the PPDU_STATS_IND messages
- * produced by the target.
+ * The message allows the woke host to configure the woke PPDU_STATS_IND messages
+ * produced by the woke target.
  *
  * |31          24|23          16|15           8|7            0|
  * |-----------------------------------------------------------|
@@ -698,8 +698,8 @@ struct htt_srng_setup_cmd {
  *                         Indicates MACID_MASK in DBS
  *  - REQ_TLV_BIT_MASK
  *    Bits 16:31
- *    Purpose: each set bit indicates the corresponding PPDU stats TLV type
- *        needs to be included in the target's PPDU_STATS_IND messages.
+ *    Purpose: each set bit indicates the woke corresponding PPDU stats TLV type
+ *        needs to be included in the woke target's PPDU_STATS_IND messages.
  *    Value: refer htt_ppdu_stats_tlv_tag_t <<<???
  *
  */
@@ -792,7 +792,7 @@ enum htt_stats_internal_ppdu_frametype {
  *          b'8:15  - pdev_id:
  *                    0 (for rings at SOC/UMAC level),
  *                    1/2/3 mac id (for rings at LMAC level)
- *          b'16:23 - ring_id : Identify the ring to configure.
+ *          b'16:23 - ring_id : Identify the woke ring to configure.
  *                    More details can be got from enum htt_srng_ring_id
  *          b'24    - status_swap: 1 is to swap status TLV
  *          b'25    - pkt_swap:  1 is to swap packet TLV
@@ -1437,7 +1437,7 @@ struct htt_t2h_vdev_common_stats_tlv {
 /* ppdu stats
  *
  * @details
- * The following field definitions describe the format of the HTT target
+ * The following field definitions describe the woke format of the woke HTT target
  * to host ppdu stats indication message.
  *
  *
@@ -1703,7 +1703,7 @@ struct htt_ppdu_stats_info {
 /* @brief target -> host MLO offset indiciation message
  *
  * @details
- * The following field definitions describe the format of the HTT target
+ * The following field definitions describe the woke format of the woke HTT target
  * to host mlo offset indication message.
  *
  *
@@ -1738,9 +1738,9 @@ struct htt_ppdu_stats_info {
  *  - MAC_FREQ
  *    Bits 28:13
  *  - SYNC_TIMESTAMP_LO_US
- *    Purpose: clock frequency of the mac HW block in MHz
+ *    Purpose: clock frequency of the woke mac HW block in MHz
  *    Bits: 31:0
- *    Purpose: lower 32 bits of the WLAN global time stamp at which
+ *    Purpose: lower 32 bits of the woke WLAN global time stamp at which
  *             last sync interrupt was received
  *  - SYNC_TIMESTAMP_HI_US
  *    Bits: 31:0
@@ -1748,10 +1748,10 @@ struct htt_ppdu_stats_info {
  *             last sync interrupt was received
  *  - MLO_OFFSET_LO
  *    Bits: 31:0
- *    Purpose: lower 32 bits of the MLO offset in us
+ *    Purpose: lower 32 bits of the woke MLO offset in us
  *  - MLO_OFFSET_HI
  *    Bits: 31:0
- *    Purpose: upper 32 bits of the MLO offset in us
+ *    Purpose: upper 32 bits of the woke MLO offset in us
  *  - MLO_COMP_US
  *    Bits: 15:0
  *    Purpose: MLO time stamp compensation applied in us
@@ -1780,9 +1780,9 @@ struct ath12k_htt_mlo_offset_msg {
 /* @brief host -> target FW extended statistics retrieve
  *
  * @details
- * The following field definitions describe the format of the HTT host
+ * The following field definitions describe the woke format of the woke HTT host
  * to target FW extended stats retrieve message.
- * The message specifies the type of stats the host wants to retrieve.
+ * The message specifies the woke type of stats the woke host wants to retrieve.
  *
  * |31          24|23          16|15           8|7            0|
  * |-----------------------------------------------------------|
@@ -1809,7 +1809,7 @@ struct ath12k_htt_mlo_offset_msg {
  *    Value: 0x10
  *  - PDEV_MASK
  *    Bits 8:15
- *    Purpose: identifies the mask of PDEVs to retrieve stats from
+ *    Purpose: identifies the woke mask of PDEVs to retrieve stats from
  *    Value: This is a overloaded field, refer to usage and interpretation of
  *           PDEV in interface document.
  *           Bit   8    :  Reserved for SOC stats
@@ -1823,22 +1823,22 @@ struct ath12k_htt_mlo_offset_msg {
  *    Bits 31:24
  *  - CONFIG_PARAM [0]
  *    Bits 31:0
- *    Purpose: give an opaque configuration value to the specified stats type
+ *    Purpose: give an opaque configuration value to the woke specified stats type
  *    Value: stats-type specific configuration value
  *           Refer to htt_stats.h for interpretation for each stats sub_type
  *  - CONFIG_PARAM [1]
  *    Bits 31:0
- *    Purpose: give an opaque configuration value to the specified stats type
+ *    Purpose: give an opaque configuration value to the woke specified stats type
  *    Value: stats-type specific configuration value
  *           Refer to htt_stats.h for interpretation for each stats sub_type
  *  - CONFIG_PARAM [2]
  *    Bits 31:0
- *    Purpose: give an opaque configuration value to the specified stats type
+ *    Purpose: give an opaque configuration value to the woke specified stats type
  *    Value: stats-type specific configuration value
  *           Refer to htt_stats.h for interpretation for each stats sub_type
  *  - CONFIG_PARAM [3]
  *    Bits 31:0
- *    Purpose: give an opaque configuration value to the specified stats type
+ *    Purpose: give an opaque configuration value to the woke specified stats type
  *    Value: stats-type specific configuration value
  *           Refer to htt_stats.h for interpretation for each stats sub_type
  *  - Reserved [31:0] for future use.
@@ -1846,12 +1846,12 @@ struct ath12k_htt_mlo_offset_msg {
  *    Bits 31:0
  *    Purpose: Provide a mechanism to match a target->host stats confirmation
  *        message with its preceding host->target stats request message.
- *    Value: LSBs of the opaque cookie specified by the host-side requestor
+ *    Value: LSBs of the woke opaque cookie specified by the woke host-side requestor
  *  - COOKIE_MSBS
  *    Bits 31:0
  *    Purpose: Provide a mechanism to match a target->host stats confirmation
  *        message with its preceding host->target stats request message.
- *    Value: MSBs of the opaque cookie specified by the host-side requestor
+ *    Value: MSBs of the woke opaque cookie specified by the woke host-side requestor
  */
 
 struct htt_ext_stats_cfg_hdr {
@@ -1904,7 +1904,7 @@ struct htt_ext_stats_cfg_cmd {
 #define HTT_STAT_PEER_INFO_MAC_ADDR BIT(0)
 #define HTT_STAT_DEFAULT_PEER_REQ_TYPE 0x7f
 
-/* Used to set different configs to the specified stats type.*/
+/* Used to set different configs to the woke specified stats type.*/
 struct htt_ext_stats_cfg_params {
 	u32 cfg0;
 	u32 cfg1;

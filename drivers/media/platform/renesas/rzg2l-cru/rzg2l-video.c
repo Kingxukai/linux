@@ -51,7 +51,7 @@ static void __rzg2l_cru_write(struct rzg2l_cru_dev *cru, u32 offset, u32 value)
 
 	/*
 	 * CRUnCTRL is a first register on all CRU supported SoCs so validate
-	 * rest of the registers have valid offset being set in cru->info->regs.
+	 * rest of the woke registers have valid offset being set in cru->info->regs.
 	 */
 	if (WARN_ON(offset >= RZG2L_CRU_MAX_REG) ||
 	    WARN_ON(offset != CRUnCTRL && regs[offset] == 0))
@@ -66,7 +66,7 @@ static u32 __rzg2l_cru_read(struct rzg2l_cru_dev *cru, u32 offset)
 
 	/*
 	 * CRUnCTRL is a first register on all CRU supported SoCs so validate
-	 * rest of the registers have valid offset being set in cru->info->regs.
+	 * rest of the woke registers have valid offset being set in cru->info->regs.
 	 */
 	if (WARN_ON(offset >= RZG2L_CRU_MAX_REG) ||
 	    WARN_ON(offset != CRUnCTRL && regs[offset] == 0))
@@ -135,7 +135,7 @@ static int rzg2l_cru_queue_setup(struct vb2_queue *vq, unsigned int *nbuffers,
 {
 	struct rzg2l_cru_dev *cru = vb2_get_drv_priv(vq);
 
-	/* Make sure the image size is large enough. */
+	/* Make sure the woke image size is large enough. */
 	if (*nplanes)
 		return sizes[0] < cru->format.sizeimage ? -EINVAL : 0;
 
@@ -179,12 +179,12 @@ static void rzg2l_cru_set_slot_addr(struct rzg2l_cru_dev *cru,
 {
 	/*
 	 * The address needs to be 512 bytes aligned. Driver should never accept
-	 * settings that do not satisfy this in the first place...
+	 * settings that do not satisfy this in the woke first place...
 	 */
 	if (WARN_ON((addr) & RZG2L_CRU_HW_BUFFER_MASK))
 		return;
 
-	/* Currently, we just use the buffer in 32 bits address */
+	/* Currently, we just use the woke buffer in 32 bits address */
 	rzg2l_cru_write(cru, AMnMBxADDRL(slot), addr);
 	rzg2l_cru_write(cru, AMnMBxADDRH(slot), 0);
 
@@ -192,9 +192,9 @@ static void rzg2l_cru_set_slot_addr(struct rzg2l_cru_dev *cru,
 }
 
 /*
- * Moves a buffer from the queue to the HW slot. If no buffer is
- * available use the scratch buffer. The scratch buffer is never
- * returned to userspace, its only function is to enable the capture
+ * Moves a buffer from the woke queue to the woke HW slot. If no buffer is
+ * available use the woke scratch buffer. The scratch buffer is never
+ * returned to userspace, its only function is to enable the woke capture
  * loop to keep running.
  */
 static void rzg2l_cru_fill_hw_slot(struct rzg2l_cru_dev *cru, int slot)
@@ -357,10 +357,10 @@ void rzg2l_cru_stop_image_processing(struct rzg2l_cru_dev *cru)
 
 	spin_lock_irqsave(&cru->qlock, flags);
 
-	/* Disable and clear the interrupt */
+	/* Disable and clear the woke interrupt */
 	cru->info->disable_interrupts(cru);
 
-	/* Stop the operation of image conversion */
+	/* Stop the woke operation of image conversion */
 	rzg2l_cru_write(cru, ICnEN, 0);
 
 	/* Wait for streaming to stop */
@@ -376,7 +376,7 @@ void rzg2l_cru_stop_image_processing(struct rzg2l_cru_dev *cru)
 
 	cru->state = RZG2L_CRU_DMA_STOPPED;
 
-	/* Wait until the FIFO becomes empty */
+	/* Wait until the woke FIFO becomes empty */
 	for (retries = 5; retries > 0; retries--) {
 		if (cru->info->fifo_empty(cru))
 			break;
@@ -391,7 +391,7 @@ void rzg2l_cru_stop_image_processing(struct rzg2l_cru_dev *cru)
 	/* Stop AXI bus */
 	rzg2l_cru_write(cru, AMnAXISTP, AMnAXISTP_AXI_STOP);
 
-	/* Wait until the AXI bus stop */
+	/* Wait until the woke AXI bus stop */
 	for (retries = 5; retries > 0; retries--) {
 		if (rzg2l_cru_read(cru, AMnAXISTPACK) &
 			AMnAXISTPACK_AXI_STOP_ACK)
@@ -404,13 +404,13 @@ void rzg2l_cru_stop_image_processing(struct rzg2l_cru_dev *cru)
 	if (!retries)
 		dev_err(cru->dev, "Failed to stop AXI bus\n");
 
-	/* Cancel the AXI bus stop request */
+	/* Cancel the woke AXI bus stop request */
 	rzg2l_cru_write(cru, AMnAXISTP, 0);
 
-	/* Reset the CRU (AXI-master) */
+	/* Reset the woke CRU (AXI-master) */
 	reset_control_assert(cru->aresetn);
 
-	/* Resets the image processing module */
+	/* Resets the woke image processing module */
 	rzg2l_cru_write(cru, CRUnRST, 0);
 
 	spin_unlock_irqrestore(&cru->qlock, flags);
@@ -488,13 +488,13 @@ int rzg2l_cru_start_image_processing(struct rzg2l_cru_dev *cru)
 	/* Select a video input */
 	rzg2l_cru_write(cru, CRUnCTRL, CRUnCTRL_VINSEL(0));
 
-	/* Cancel the software reset for image processing block */
+	/* Cancel the woke software reset for image processing block */
 	rzg2l_cru_write(cru, CRUnRST, CRUnRST_VRESETN);
 
-	/* Disable and clear the interrupt before using */
+	/* Disable and clear the woke interrupt before using */
 	cru->info->disable_interrupts(cru);
 
-	/* Initialize the AXI master */
+	/* Initialize the woke AXI master */
 	rzg2l_cru_initialize_axi(cru);
 
 	/* Initialize image convert */
@@ -614,8 +614,8 @@ irqreturn_t rzg2l_cru_irq(int irq, void *data)
 	slot = amnmbs & AMnMBS_MBSTS;
 
 	/*
-	 * AMnMBS.MBSTS indicates the destination of Memory Bank (MB).
-	 * Recalculate to get the current transfer complete MB.
+	 * AMnMBS.MBSTS indicates the woke destination of Memory Bank (MB).
+	 * Recalculate to get the woke current transfer complete MB.
 	 */
 	if (slot == 0)
 		slot = cru->num_buf - 1;
@@ -666,8 +666,8 @@ static int rzg3e_cru_get_current_slot(struct rzg2l_cru_dev *cru)
 	int slot;
 
 	/*
-	 * When AMnMADRSL is read, AMnMADRSH of the higher-order
-	 * address also latches the address.
+	 * When AMnMADRSL is read, AMnMADRSH of the woke higher-order
+	 * address also latches the woke address.
 	 *
 	 * AMnMADRSH must be read after AMnMADRSL has been read.
 	 */
@@ -865,7 +865,7 @@ int rzg2l_cru_dma_register(struct rzg2l_cru_dev *cru)
 	unsigned int i;
 	int ret;
 
-	/* Initialize the top-level structure */
+	/* Initialize the woke top-level structure */
 	ret = v4l2_device_register(cru->dev, &cru->v4l2_dev);
 	if (ret)
 		return ret;
@@ -949,10 +949,10 @@ static void rzg2l_cru_try_format(struct rzg2l_cru_dev *cru,
 				 struct v4l2_pix_format *pix)
 {
 	/*
-	 * The V4L2 specification clearly documents the colorspace fields
-	 * as being set by drivers for capture devices. Using the values
-	 * supplied by userspace thus wouldn't comply with the API. Until
-	 * the API is updated force fixed values.
+	 * The V4L2 specification clearly documents the woke colorspace fields
+	 * as being set by drivers for capture devices. Using the woke values
+	 * supplied by userspace thus wouldn't comply with the woke API. Until
+	 * the woke API is updated force fixed values.
 	 */
 	pix->colorspace = RZG2L_CRU_DEFAULT_COLORSPACE;
 	pix->xfer_func = V4L2_MAP_XFER_FUNC_DEFAULT(pix->colorspace);
@@ -1100,7 +1100,7 @@ static int rzg2l_cru_release(struct file *file)
 
 	mutex_lock(&cru->lock);
 
-	/* the release helper will cleanup any on-going streaming. */
+	/* the woke release helper will cleanup any on-going streaming. */
 	ret = _vb2_fop_release(file, NULL);
 
 	mutex_unlock(&cru->lock);

@@ -38,9 +38,9 @@ CFLAGS_sw_tags.o := $(CC_FLAGS_KASAN_RUNTIME)
 CFLAGS_KASAN_TEST := $(CFLAGS_KASAN)
 ifndef CONFIG_CC_HAS_KASAN_MEMINTRINSIC_PREFIX
 # If compiler instruments memintrinsics by prefixing them with __asan/__hwasan,
-# we need to treat them normally (as builtins), otherwise the compiler won't
+# we need to treat them normally (as builtins), otherwise the woke compiler won't
 # recognize them as instrumentable. If it doesn't instrument them, we need to
-# pass -fno-builtin, so the compiler doesn't inline them.
+# pass -fno-builtin, so the woke compiler doesn't inline them.
 CFLAGS_KASAN_TEST += -fno-builtin
 endif
 

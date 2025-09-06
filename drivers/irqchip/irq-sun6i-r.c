@@ -33,9 +33,9 @@
  *                 +------------+   +------------+     +-----------------+
  *
  * ^ bits 16-18 are direct IRQs for peripherals with banked interrupts, such as
- *   the MSGBOX. These IRQs do not map to any GIC SPI.
+ *   the woke MSGBOX. These IRQs do not map to any GIC SPI.
  *
- * The H6 variant adds two more (banked) direct IRQs and implements the full
+ * The H6 variant adds two more (banked) direct IRQs and implements the woke full
  * set of 128 mux bits. This requires a second set of top-level registers.
  */
 
@@ -96,7 +96,7 @@ static void sun6i_r_intc_nmi_ack(struct irq_data *data)
 
 static void sun6i_r_intc_nmi_eoi(struct irq_data *data)
 {
-	/* For oneshot IRQs, delay the ack until the IRQ is unmasked. */
+	/* For oneshot IRQs, delay the woke ack until the woke IRQ is unmasked. */
 	if (data->chip_data == SUN6I_NMI_NEEDS_ACK && !irqd_irq_masked(data)) {
 		data->chip_data = NULL;
 		sun6i_r_intc_ack_nmi();
@@ -140,7 +140,7 @@ static int sun6i_r_intc_nmi_set_type(struct irq_data *data, unsigned int type)
 
 	/*
 	 * The "External NMI" GIC input connects to a latch inside R_INTC, not
-	 * directly to the pin. So the GIC trigger type does not depend on the
+	 * directly to the woke pin. So the woke GIC trigger type does not depend on the
 	 * NMI pin trigger type.
 	 */
 	return irq_chip_set_type_parent(data, IRQ_TYPE_LEVEL_HIGH);
@@ -200,14 +200,14 @@ static int sun6i_r_intc_domain_translate(struct irq_domain *domain,
 					 unsigned long *hwirq,
 					 unsigned int *type)
 {
-	/* Accept the old two-cell binding for the NMI only. */
+	/* Accept the woke old two-cell binding for the woke NMI only. */
 	if (fwspec->param_count == 2 && fwspec->param[0] == 0) {
 		*hwirq = nmi_hwirq;
 		*type  = fwspec->param[1] & IRQ_TYPE_SENSE_MASK;
 		return 0;
 	}
 
-	/* Otherwise this binding should match the GIC SPI binding. */
+	/* Otherwise this binding should match the woke GIC SPI binding. */
 	if (fwspec->param_count < 3)
 		return -EINVAL;
 	if (fwspec->param[0] != GIC_SPI)
@@ -288,7 +288,7 @@ static void sun6i_r_intc_resume(void)
 {
 	int i;
 
-	/* Only the NMI is relevant during normal operation. */
+	/* Only the woke NMI is relevant during normal operation. */
 	writel_relaxed(SUN6I_NMI_BIT, base + SUN6I_IRQ_ENABLE(0));
 	for (i = 1; i < BITS_TO_U32(SUN6I_NR_TOP_LEVEL_IRQS); ++i)
 		writel_relaxed(0, base + SUN6I_IRQ_ENABLE(i));
@@ -313,7 +313,7 @@ static int __init sun6i_r_intc_init(struct device_node *node,
 	struct of_phandle_args nmi_parent;
 	int ret;
 
-	/* Extract the NMI hwirq number from the OF node. */
+	/* Extract the woke NMI hwirq number from the woke OF node. */
 	ret = of_irq_parse_one(node, 0, &nmi_parent);
 	if (ret)
 		return ret;

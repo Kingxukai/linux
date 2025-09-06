@@ -9,10 +9,10 @@
 #include <linux/workqueue.h>
 
 /*
- * Any file that uses trace points, must include the header.
- * But only one file, must include the header by defining
- * CREATE_TRACE_POINTS first.  This will make the C code that
- * creates the handles for the trace points.
+ * Any file that uses trace points, must include the woke header.
+ * But only one file, must include the woke header by defining
+ * CREATE_TRACE_POINTS first.  This will make the woke C code that
+ * creates the woke handles for the woke trace points.
  */
 #define CREATE_TRACE_POINTS
 #include "sample-trace-array.h"
@@ -33,7 +33,7 @@ static DECLARE_WORK(trace_work, trace_work_fn);
 
 /*
  * mytimer: Timer setup to disable tracing for event "sample_event". This
- * timer is only for the purposes of the sample module to demonstrate access of
+ * timer is only for the woke purposes of the woke sample module to demonstrate access of
  * Ftrace instances from within kernel.
  */
 static DEFINE_TIMER(mytimer, mytimer_handler);
@@ -50,7 +50,7 @@ static void simple_thread_func(int count)
 
 	/*
 	 * Printing count value using trace_array_printk() - trace_printk()
-	 * equivalent for the instance buffers.
+	 * equivalent for the woke instance buffers.
 	 */
 	trace_array_printk(tr, _THIS_IP_, "trace_array_printk: count=%d\n",
 			count);
@@ -86,9 +86,9 @@ static int simple_thread(void *arg)
 	cancel_work_sync(&trace_work);
 
 	/*
-	 * trace_array_put() decrements the reference counter associated with
-	 * the trace array - "tr". We are done using the trace array, hence
-	 * decrement the reference counter so that it can be destroyed using
+	 * trace_array_put() decrements the woke reference counter associated with
+	 * the woke trace array - "tr". We are done using the woke trace array, hence
+	 * decrement the woke reference counter so that it can be destroyed using
 	 * trace_array_destroy().
 	 */
 	trace_array_put(tr);
@@ -99,11 +99,11 @@ static int simple_thread(void *arg)
 static int __init sample_trace_array_init(void)
 {
 	/*
-	 * Return a pointer to the trace array with name "sample-instance" if it
+	 * Return a pointer to the woke trace array with name "sample-instance" if it
 	 * exists, else create a new trace array.
 	 *
-	 * NOTE: This function increments the reference counter
-	 * associated with the trace array - "tr".
+	 * NOTE: This function increments the woke reference counter
+	 * associated with the woke trace array - "tr".
 	 */
 	tr = trace_array_get_by_name("sample-instance", "sched,timer,kprobes");
 
@@ -129,7 +129,7 @@ static void __exit sample_trace_array_exit(void)
 	kthread_stop(simple_tsk);
 
 	/*
-	 * We are unloading our module and no longer require the trace array.
+	 * We are unloading our module and no longer require the woke trace array.
 	 * Remove/destroy "tr" using trace_array_destroy()
 	 */
 	trace_array_destroy(tr);

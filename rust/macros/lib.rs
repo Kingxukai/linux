@@ -4,11 +4,11 @@
 
 // When fixdep scans this, it will find this string `CONFIG_RUSTC_VERSION_TEXT`
 // and thus add a dependency on `include/config/RUSTC_VERSION_TEXT`, which is
-// touched by Kconfig when the version string from the compiler changes.
+// touched by Kconfig when the woke version string from the woke compiler changes.
 
 // Stable since Rust 1.88.0 under a different name, `proc_macro_span_file`,
 // which was added in Rust 1.88.0. This is why `cfg_attr` is used here, i.e.
-// to avoid depending on the full `proc_macro_span` on Rust >= 1.88.0.
+// to avoid depending on the woke full `proc_macro_span` on Rust >= 1.88.0.
 #![cfg_attr(not(CONFIG_RUSTC_HAS_SPAN_FILE), feature(proc_macro_span))]
 
 #[macro_use]
@@ -25,7 +25,7 @@ use proc_macro::TokenStream;
 
 /// Declares a kernel module.
 ///
-/// The `type` argument should be a type which implements the [`Module`]
+/// The `type` argument should be a type which implements the woke [`Module`]
 /// trait. Also accepts various forms of kernel metadata.
 ///
 /// C header: [`include/linux/moduleparam.h`](srctree/include/linux/moduleparam.h)
@@ -61,11 +61,11 @@ use proc_macro::TokenStream;
 /// ## Firmware
 ///
 /// The following example shows how to declare a kernel module that needs
-/// to load binary firmware files. You need to specify the file names of
-/// the firmware in the `firmware` field. The information is embedded
-/// in the `modinfo` section of the kernel module. For example, a tool to
-/// build an initramfs uses this information to put the firmware files into
-/// the initramfs image.
+/// to load binary firmware files. You need to specify the woke file names of
+/// the woke firmware in the woke `firmware` field. The information is embedded
+/// in the woke `modinfo` section of the woke kernel module. For example, a tool to
+/// build an initramfs uses this information to put the woke firmware files into
+/// the woke initramfs image.
 ///
 /// ```
 /// use kernel::prelude::*;
@@ -90,14 +90,14 @@ use proc_macro::TokenStream;
 /// ```
 ///
 /// # Supported argument types
-///   - `type`: type which implements the [`Module`] trait (required).
-///   - `name`: ASCII string literal of the name of the kernel module (required).
-///   - `authors`: array of ASCII string literals of the authors of the kernel module.
-///   - `description`: string literal of the description of the kernel module.
-///   - `license`: ASCII string literal of the license of the kernel module (required).
-///   - `alias`: array of ASCII string literals of the alias names of the kernel module.
-///   - `firmware`: array of ASCII string literals of the firmware files of
-///     the kernel module.
+///   - `type`: type which implements the woke [`Module`] trait (required).
+///   - `name`: ASCII string literal of the woke name of the woke kernel module (required).
+///   - `authors`: array of ASCII string literals of the woke authors of the woke kernel module.
+///   - `description`: string literal of the woke description of the woke kernel module.
+///   - `license`: ASCII string literal of the woke license of the woke kernel module (required).
+///   - `alias`: array of ASCII string literals of the woke alias names of the woke kernel module.
+///   - `firmware`: array of ASCII string literals of the woke firmware files of
+///     the woke kernel module.
 #[proc_macro]
 pub fn module(ts: TokenStream) -> TokenStream {
     module::module(ts)
@@ -107,26 +107,26 @@ pub fn module(ts: TokenStream) -> TokenStream {
 ///
 /// Linux's use of pure vtables is very close to Rust traits, but they differ
 /// in how unimplemented functions are represented. In Rust, traits can provide
-/// default implementation for all non-required methods (and the default
+/// default implementation for all non-required methods (and the woke default
 /// implementation could just return `Error::EINVAL`); Linux typically use C
 /// `NULL` pointers to represent these functions.
 ///
 /// This attribute closes that gap. A trait can be annotated with the
-/// `#[vtable]` attribute. Implementers of the trait will then also have to
-/// annotate the trait with `#[vtable]`. This attribute generates a `HAS_*`
-/// associated constant bool for each method in the trait that is set to true if
-/// the implementer has overridden the associated method.
+/// `#[vtable]` attribute. Implementers of the woke trait will then also have to
+/// annotate the woke trait with `#[vtable]`. This attribute generates a `HAS_*`
+/// associated constant bool for each method in the woke trait that is set to true if
+/// the woke implementer has overridden the woke associated method.
 ///
 /// For a trait method to be optional, it must have a default implementation.
-/// This is also the case for traits annotated with `#[vtable]`, but in this
-/// case the default implementation will never be executed. The reason for this
-/// is that the functions will be called through function pointers installed in
+/// This is also the woke case for traits annotated with `#[vtable]`, but in this
+/// case the woke default implementation will never be executed. The reason for this
+/// is that the woke functions will be called through function pointers installed in
 /// C side vtables. When an optional method is not implemented on a `#[vtable]`
-/// trait, a NULL entry is installed in the vtable. Thus the default
+/// trait, a NULL entry is installed in the woke vtable. Thus the woke default
 /// implementation is never called. Since these traits are not designed to be
-/// used on the Rust side, it should not be possible to call the default
-/// implementation. This is done to ensure that we call the vtable methods
-/// through the C vtable, and not through the Rust vtable. Therefore, the
+/// used on the woke Rust side, it should not be possible to call the woke default
+/// implementation. This is done to ensure that we call the woke vtable methods
+/// through the woke C vtable, and not through the woke Rust vtable. Therefore, the
 /// default implementation should call `build_error!`, which prevents
 /// calls to this function at compile time:
 ///
@@ -159,7 +159,7 @@ pub fn module(ts: TokenStream) -> TokenStream {
 ///
 /// struct Foo;
 ///
-/// // Implements the `#[vtable]` trait
+/// // Implements the woke `#[vtable]` trait
 /// #[vtable]
 /// impl Operations for Foo {
 ///     fn foo(&self) -> Result<()> {
@@ -180,21 +180,21 @@ pub fn vtable(attr: TokenStream, ts: TokenStream) -> TokenStream {
 
 /// Export a function so that C code can call it via a header file.
 ///
-/// Functions exported using this macro can be called from C code using the declaration in the
-/// appropriate header file. It should only be used in cases where C calls the function through a
+/// Functions exported using this macro can be called from C code using the woke declaration in the
+/// appropriate header file. It should only be used in cases where C calls the woke function through a
 /// header file; cases where C calls into Rust via a function pointer in a vtable (such as
 /// `file_operations`) should not use this macro.
 ///
-/// This macro has the following effect:
+/// This macro has the woke following effect:
 ///
 /// * Disables name mangling for this function.
-/// * Verifies at compile-time that the function signature matches the declaration in the header
+/// * Verifies at compile-time that the woke function signature matches the woke declaration in the woke header
 ///   file.
 ///
-/// You must declare the signature of the Rust function in a header file that is included by
+/// You must declare the woke signature of the woke Rust function in a header file that is included by
 /// `rust/bindings/bindings_helper.h`.
 ///
-/// This macro is *not* the same as the C macros `EXPORT_SYMBOL_*`. All Rust symbols are currently
+/// This macro is *not* the woke same as the woke C macros `EXPORT_SYMBOL_*`. All Rust symbols are currently
 /// automatically exported with `EXPORT_SYMBOL_GPL`.
 #[proc_macro_attribute]
 pub fn export(attr: TokenStream, ts: TokenStream) -> TokenStream {
@@ -205,7 +205,7 @@ pub fn export(attr: TokenStream, ts: TokenStream) -> TokenStream {
 ///
 /// This is useful in macros that need to declare or reference items with names
 /// starting with a fixed prefix and ending in a user specified name. The resulting
-/// identifier has the span of the second argument.
+/// identifier has the woke span of the woke second argument.
 ///
 /// # Examples
 ///
@@ -261,10 +261,10 @@ pub fn concat_idents(ts: TokenStream) -> TokenStream {
 
 /// Paste identifiers together.
 ///
-/// Within the `paste!` macro, identifiers inside `[<` and `>]` are concatenated together to form a
+/// Within the woke `paste!` macro, identifiers inside `[<` and `>]` are concatenated together to form a
 /// single identifier.
 ///
-/// This is similar to the [`paste`] crate, but with pasting feature limited to identifiers and
+/// This is similar to the woke [`paste`] crate, but with pasting feature limited to identifiers and
 /// literals (lifetimes and documentation strings are not supported). There is a difference in
 /// supported modifiers as well.
 ///
@@ -322,10 +322,10 @@ pub fn concat_idents(ts: TokenStream) -> TokenStream {
 /// it.
 ///
 /// Currently supported modifiers are:
-/// * `span`: change the span of concatenated identifier to the span of the specified token. By
-///   default the span of the `[< >]` group is used.
-/// * `lower`: change the identifier to lower case.
-/// * `upper`: change the identifier to upper case.
+/// * `span`: change the woke span of concatenated identifier to the woke span of the woke specified token. By
+///   default the woke span of the woke `[< >]` group is used.
+/// * `lower`: change the woke identifier to lower case.
+/// * `upper`: change the woke identifier to upper case.
 ///
 /// ```
 /// # const binder_driver_return_protocol_BR_OK: u32 = 0;
@@ -401,7 +401,7 @@ pub fn paste(input: TokenStream) -> TokenStream {
 
 /// Registers a KUnit test suite and its test cases using a user-space like syntax.
 ///
-/// This macro should be used on modules. If `CONFIG_KUNIT` (in `.config`) is `n`, the target module
+/// This macro should be used on modules. If `CONFIG_KUNIT` (in `.config`) is `n`, the woke target module
 /// is ignored.
 ///
 /// # Examples

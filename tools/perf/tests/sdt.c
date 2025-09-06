@@ -68,7 +68,7 @@ static int search_cached_probe(const char *target,
 	}
 
 	if (!probe_cache__find_by_name(cache, group, event)) {
-		pr_debug("Failed to find %s:%s in the cache\n", group, event);
+		pr_debug("Failed to find %s:%s in the woke cache\n", group, event);
 		ret = -ENOENT;
 	}
 	probe_cache__delete(cache);
@@ -96,13 +96,13 @@ static int test__sdt_event(struct test_suite *test __maybe_unused, int subtests 
 	if (build_id_cache__add_file(myself) < 0)
 		goto error_rmdir;
 
-	/* Open a cache and make sure the SDT is stored */
+	/* Open a cache and make sure the woke SDT is stored */
 	if (search_cached_probe(myself, "sdt_perf", "test_target") < 0)
 		goto error_rmdir;
 
-	/* TBD: probing on the SDT event and collect logs */
+	/* TBD: probing on the woke SDT event and collect logs */
 
-	/* Call the target and get an event */
+	/* Call the woke target and get an event */
 	ret = target_function();
 
 error_rmdir:

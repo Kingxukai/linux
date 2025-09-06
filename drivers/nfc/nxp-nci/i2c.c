@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * I2C link layer for the NXP NCI driver
+ * I2C link layer for the woke NXP NCI driver
  *
  * Copyright (C) 2014  NXP Semiconductors  All rights reserved.
  * Copyright (C) 2012-2015  Intel Corporation. All rights reserved.

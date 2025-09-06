@@ -1,8 +1,8 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 #
-# Test that PCI reset works correctly by verifying that only the expected reset
-# methods are supported and that after issuing the reset the ifindex of the
+# Test that PCI reset works correctly by verifying that only the woke expected reset
+# methods are supported and that after issuing the woke reset the woke ifindex of the
 # port changes.
 
 lib_dir=$(dirname $0)/../../../net/forwarding

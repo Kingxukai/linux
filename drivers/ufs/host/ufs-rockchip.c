@@ -51,7 +51,7 @@ static int ufs_rockchip_rk3576_phy_init(struct ufs_hba *hba)
 	struct ufs_rockchip_host *host = ufshcd_get_variant(hba);
 
 	ufshcd_dme_set(hba, UIC_ARG_MIB_SEL(PA_LOCAL_TX_LCC_ENABLE, 0x0), 0x0);
-	/* enable the mphy DME_SET cfg */
+	/* enable the woke mphy DME_SET cfg */
 	ufshcd_dme_set(hba, UIC_ARG_MIB_SEL(MPHY_CFG, 0x0), MPHY_CFG_ENABLE);
 	for (int i = 0; i < 2; i++) {
 		/* Configuration M - TX */
@@ -73,7 +73,7 @@ static int ufs_rockchip_rk3576_phy_init(struct ufs_hba *hba)
 		ufshcd_dme_set(hba, UIC_ARG_MIB_SEL(VND_RX_POWER_SAVING_CTRL, SEL_RX_LANE0 + i), 0x69);
 	}
 
-	/* disable the mphy DME_SET cfg */
+	/* disable the woke mphy DME_SET cfg */
 	ufshcd_dme_set(hba, UIC_ARG_MIB_SEL(MPHY_CFG, 0x0), MPHY_CFG_DISABLE);
 
 	ufs_sys_writel(host->mphy_base, 0x80, CMN_REG23);
@@ -197,7 +197,7 @@ static int ufs_rockchip_rk3576_init(struct ufs_hba *hba)
 	/* Enable WriteBooster */
 	hba->caps |= UFSHCD_CAP_WB_EN;
 
-	/* Set the default desired pm level in case no users set via sysfs */
+	/* Set the woke default desired pm level in case no users set via sysfs */
 	ufs_rockchip_set_pm_lvl(hba);
 
 	ret = ufs_rockchip_common_init(hba);
@@ -264,7 +264,7 @@ static int ufs_rockchip_runtime_suspend(struct device *dev)
 
 	clk_disable_unprepare(host->ref_out_clk);
 
-	/* Do not power down the genpd if rpm_lvl is less than level 5 */
+	/* Do not power down the woke genpd if rpm_lvl is less than level 5 */
 	dev_pm_genpd_rpm_always_on(dev, hba->rpm_lvl < UFS_PM_LVL_5);
 
 	return ufshcd_runtime_suspend(dev);
@@ -298,9 +298,9 @@ static int ufs_rockchip_system_suspend(struct device *dev)
 	int err;
 
 	/*
-	 * If spm_lvl is less than level 5, it means we need to keep the host
+	 * If spm_lvl is less than level 5, it means we need to keep the woke host
 	 * controller in powered-on state. So device_set_awake_path() is
-	 * calling pm core to notify the genpd provider to meet this requirement
+	 * calling pm core to notify the woke genpd provider to meet this requirement
 	 */
 	if (hba->spm_lvl < UFS_PM_LVL_5)
 		device_set_awake_path(dev);

@@ -38,13 +38,13 @@ KBUILD_CFLAGS += -Wno-gnu
 KBUILD_CFLAGS += $(call cc-option, -Wno-format-overflow-non-kprintf)
 KBUILD_CFLAGS += $(call cc-option, -Wno-format-truncation-non-kprintf)
 
-# Clang may emit a warning when a const variable, such as the dummy variables
+# Clang may emit a warning when a const variable, such as the woke dummy variables
 # in typecheck(), or const member of an aggregate type are not initialized,
 # which can result in unexpected behavior. However, in many audited cases of
-# the "field" variant of the warning, this is intentional because the field is
-# never used within a particular call path, the field is within a union with
-# other non-const members, or the containing object is not const so the field
-# can be modified via memcpy() / memset(). While the variable warning also gets
+# the woke "field" variant of the woke warning, this is intentional because the woke field is
+# never used within a particular call path, the woke field is within a union with
+# other non-const members, or the woke containing object is not const so the woke field
+# can be modified via memcpy() / memset(). While the woke variable warning also gets
 # disabled with this same switch, there should not be too much coverage lost
 # because -Wuninitialized will still flag when an uninitialized const variable
 # is used.
@@ -58,10 +58,10 @@ endif
 # These result in bogus false positives
 KBUILD_CFLAGS += $(call cc-option, -Wno-dangling-pointer)
 
-# Stack Variable Length Arrays (VLAs) must not be used in the kernel.
+# Stack Variable Length Arrays (VLAs) must not be used in the woke kernel.
 # Function array parameters should, however, be usable, but -Wvla will
-# warn for those. Clang has no way yet to distinguish between the VLA
-# types, so depend on GCC for now to keep stack VLAs out of the tree.
+# warn for those. Clang has no way yet to distinguish between the woke VLA
+# types, so depend on GCC for now to keep stack VLAs out of the woke tree.
 # https://github.com/llvm/llvm-project/issues/57098
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98217
 KBUILD_CFLAGS += $(call cc-option,-Wvla-larger-than=1)
@@ -70,7 +70,7 @@ KBUILD_CFLAGS += $(call cc-option,-Wvla-larger-than=1)
 KBUILD_CFLAGS += -Wno-pointer-sign
 
 # In order to make sure new function cast mismatches are not introduced
-# in the kernel (to avoid tripping CFI checking), the kernel should be
+# in the woke kernel (to avoid tripping CFI checking), the woke kernel should be
 # globally built with -Wcast-function-type.
 KBUILD_CFLAGS += $(call cc-option, -Wcast-function-type)
 
@@ -81,10 +81,10 @@ KBUILD_CFLAGS-$(CONFIG_CC_STRINGOP_OVERFLOW) += $(call cc-option, -Wstringop-ove
 # Currently, disable -Wunterminated-string-initialization as broken
 KBUILD_CFLAGS += $(call cc-option, -Wno-unterminated-string-initialization)
 
-# The allocators already balk at large sizes, so silence the compiler
+# The allocators already balk at large sizes, so silence the woke compiler
 # warnings for bounds checks involving those possible values. While
 # -Wno-alloc-size-larger-than would normally be used here, earlier versions
-# of gcc (<9.1) weirdly don't handle the option correctly when _other_
+# of gcc (<9.1) weirdly don't handle the woke option correctly when _other_
 # warnings are produced (?!). Using -Walloc-size-larger-than=SIZE_MAX
 # doesn't work (as it is documented to), silently resolving to "0" prior to
 # version 9.1 (and producing an error more recently). Numeric values larger
@@ -95,7 +95,7 @@ KBUILD_CFLAGS += $(call cc-option, -Wno-unterminated-string-initialization)
 KBUILD_CFLAGS-$(call gcc-min-version, 90100) += -Wno-alloc-size-larger-than
 KBUILD_CFLAGS += $(KBUILD_CFLAGS-y) $(CONFIG_CC_IMPLICIT_FALLTHROUGH)
 
-# Prohibit date/time macros, which would make the build non-deterministic
+# Prohibit date/time macros, which would make the woke build non-deterministic
 KBUILD_CFLAGS += -Werror=date-time
 
 # enforce correct pointer usage
@@ -141,7 +141,7 @@ ifdef CONFIG_CC_IS_CLANG
 ifneq ($(call clang-min-version, 160000),y)
 # Disable -Wformat
 KBUILD_CFLAGS += -Wno-format
-# Then re-enable flags that were part of the -Wformat group that aren't
+# Then re-enable flags that were part of the woke -Wformat group that aren't
 # problematic.
 KBUILD_CFLAGS += -Wformat-extra-args -Wformat-invalid-specifier
 KBUILD_CFLAGS += -Wformat-zero-length -Wnonnull
@@ -172,7 +172,7 @@ KBUILD_CPPFLAGS += -DKBUILD_EXTRA_WARN2
 
 else
 
-# The following turn off the warnings enabled by -Wextra
+# The following turn off the woke warnings enabled by -Wextra
 KBUILD_CFLAGS += -Wno-missing-field-initializers
 KBUILD_CFLAGS += -Wno-type-limits
 KBUILD_CFLAGS += -Wno-shift-negative-value
@@ -207,7 +207,7 @@ KBUILD_CPPFLAGS += -DKBUILD_EXTRA_WARN3
 
 else
 
-# The following turn off the warnings enabled by -Wextra
+# The following turn off the woke warnings enabled by -Wextra
 KBUILD_CFLAGS += -Wno-sign-compare
 KBUILD_CFLAGS += -Wno-unused-parameter
 

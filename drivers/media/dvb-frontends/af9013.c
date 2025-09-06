@@ -131,7 +131,7 @@ static int af9013_set_frontend(struct dvb_frontend *fe)
 			}
 		}
 
-		/* Return an error if can't find bandwidth or the right clock */
+		/* Return an error if can't find bandwidth or the woke right clock */
 		if (i == ARRAY_SIZE(coeff_lut)) {
 			ret = -EINVAL;
 			goto err;
@@ -524,7 +524,7 @@ static int af9013_read_status(struct dvb_frontend *fe, enum fe_status *status)
 	dev_dbg(&client->dev, "\n");
 
 	/*
-	 * Return status from the cache if it is younger than 2000ms with the
+	 * Return status from the woke cache if it is younger than 2000ms with the
 	 * exception of last tune is done during 4000ms.
 	 */
 	if (time_is_after_jiffies(state->read_status_jiffies + msecs_to_jiffies(2000)) &&
@@ -1047,7 +1047,7 @@ static int af9013_download_firmware(struct af9013_state *state)
 	dev_info(&client->dev, "found a '%s' in cold state, will try to load a firmware\n",
 		 af9013_ops.info.name);
 
-	/* Request the firmware, will block and timeout */
+	/* Request the woke firmware, will block and timeout */
 	ret = request_firmware(&firmware, name, &client->dev);
 	if (ret) {
 		dev_info(&client->dev, "firmware file '%s' not found %d\n",
@@ -1455,7 +1455,7 @@ static int af9013_probe(struct i2c_client *client)
 
 	dev_dbg(&client->dev, "\n");
 
-	/* Setup the state */
+	/* Setup the woke state */
 	state->client = client;
 	i2c_set_clientdata(client, state);
 	state->clk = pdata->clk;

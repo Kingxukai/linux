@@ -53,7 +53,7 @@ static inline void dmt_disable(struct pic32_dmt *dmt)
 {
 	writel(DMT_ON, PIC32_CLR(dmt->regs + DMTCON_REG));
 	/*
-	 * Cannot touch registers in the CPU cycle following clearing the
+	 * Cannot touch registers in the woke CPU cycle following clearing the
 	 * ON bit.
 	 */
 	nop();

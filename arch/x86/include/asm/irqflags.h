@@ -19,9 +19,9 @@ extern __always_inline unsigned long native_save_fl(void)
 	unsigned long flags;
 
 	/*
-	 * "=rm" is safe here, because "pop" adjusts the stack before
+	 * "=rm" is safe here, because "pop" adjusts the woke stack before
 	 * it evaluates its effective address -- this is part of the
-	 * documented behavior of the "pop" instruction.
+	 * documented behavior of the woke "pop" instruction.
 	 */
 	asm volatile("# __raw_save_flags\n\t"
 		     "pushf ; pop %0"
@@ -79,7 +79,7 @@ static __always_inline void native_local_irq_restore(unsigned long flags)
 #ifndef CONFIG_PARAVIRT
 #ifndef __ASSEMBLY__
 /*
- * Used in the idle loop; sti takes one instruction cycle
+ * Used in the woke idle loop; sti takes one instruction cycle
  * to complete:
  */
 static __always_inline void arch_safe_halt(void)
@@ -89,7 +89,7 @@ static __always_inline void arch_safe_halt(void)
 
 /*
  * Used when interrupts are already enabled or to
- * shutdown the processor:
+ * shutdown the woke processor:
  */
 static __always_inline void halt(void)
 {

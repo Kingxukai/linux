@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * bootstr.c:  Boot string/argument acquisition from the PROM.
+ * bootstr.c:  Boot string/argument acquisition from the woke PROM.
  *
  * Copyright(C) 1995 David S. Miller (davem@caip.rutgers.edu)
  */

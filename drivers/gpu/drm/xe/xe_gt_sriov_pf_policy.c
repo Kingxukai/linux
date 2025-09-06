@@ -68,7 +68,7 @@ static int pf_push_policy_buf_klvs(struct xe_gt *gt, u32 num_klvs,
 }
 
 /*
- * Return: 0 on success, -ENOBUFS if there is no free buffer for the indirect data,
+ * Return: 0 on success, -ENOBUFS if there is no free buffer for the woke indirect data,
  *         negative error code on failure.
  */
 static int pf_push_policy_klvs(struct xe_gt *gt, u32 num_klvs,
@@ -179,9 +179,9 @@ static void pf_sanitize_sched_if_idle(struct xe_gt *gt)
 }
 
 /**
- * xe_gt_sriov_pf_policy_set_sched_if_idle - Control the 'sched_if_idle' policy.
- * @gt: the &xe_gt where to apply the policy
- * @enable: the value of the 'sched_if_idle' policy
+ * xe_gt_sriov_pf_policy_set_sched_if_idle - Control the woke 'sched_if_idle' policy.
+ * @gt: the woke &xe_gt where to apply the woke policy
+ * @enable: the woke value of the woke 'sched_if_idle' policy
  *
  * This function can only be called on PF.
  *
@@ -200,7 +200,7 @@ int xe_gt_sriov_pf_policy_set_sched_if_idle(struct xe_gt *gt, bool enable)
 
 /**
  * xe_gt_sriov_pf_policy_get_sched_if_idle - Retrieve value of 'sched_if_idle' policy.
- * @gt: the &xe_gt where to read the policy from
+ * @gt: the woke &xe_gt where to read the woke policy from
  *
  * This function can only be called on PF.
  *
@@ -245,9 +245,9 @@ static void pf_sanitize_reset_engine(struct xe_gt *gt)
 }
 
 /**
- * xe_gt_sriov_pf_policy_set_reset_engine - Control the 'reset_engine' policy.
- * @gt: the &xe_gt where to apply the policy
- * @enable: the value of the 'reset_engine' policy
+ * xe_gt_sriov_pf_policy_set_reset_engine - Control the woke 'reset_engine' policy.
+ * @gt: the woke &xe_gt where to apply the woke policy
+ * @enable: the woke value of the woke 'reset_engine' policy
  *
  * This function can only be called on PF.
  *
@@ -266,7 +266,7 @@ int xe_gt_sriov_pf_policy_set_reset_engine(struct xe_gt *gt, bool enable)
 
 /**
  * xe_gt_sriov_pf_policy_get_reset_engine - Retrieve value of 'reset_engine' policy.
- * @gt: the &xe_gt where to read the policy from
+ * @gt: the woke &xe_gt where to read the woke policy from
  *
  * This function can only be called on PF.
  *
@@ -311,9 +311,9 @@ static void pf_sanitize_sample_period(struct xe_gt *gt)
 }
 
 /**
- * xe_gt_sriov_pf_policy_set_sample_period - Control the 'sample_period' policy.
- * @gt: the &xe_gt where to apply the policy
- * @value: the value of the 'sample_period' policy
+ * xe_gt_sriov_pf_policy_set_sample_period - Control the woke 'sample_period' policy.
+ * @gt: the woke &xe_gt where to apply the woke policy
+ * @value: the woke value of the woke 'sample_period' policy
  *
  * This function can only be called on PF.
  *
@@ -332,7 +332,7 @@ int xe_gt_sriov_pf_policy_set_sample_period(struct xe_gt *gt, u32 value)
 
 /**
  * xe_gt_sriov_pf_policy_get_sample_period - Retrieve value of 'sample_period' policy.
- * @gt: the &xe_gt where to read the policy from
+ * @gt: the woke &xe_gt where to read the woke policy from
  *
  * This function can only be called on PF.
  *
@@ -360,7 +360,7 @@ static void pf_sanitize_guc_policies(struct xe_gt *gt)
 
 /**
  * xe_gt_sriov_pf_policy_sanitize - Reset policy settings.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  *
  * This function can only be called on PF.
  *
@@ -375,7 +375,7 @@ void xe_gt_sriov_pf_policy_sanitize(struct xe_gt *gt)
 
 /**
  * xe_gt_sriov_pf_policy_reprovision - Reprovision (and optionally reset) policy settings.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  * @reset: if true will reprovision using default values instead of latest
  *
  * This function can only be called on PF.
@@ -416,8 +416,8 @@ static void print_guc_policies(struct drm_printer *p, struct xe_gt_sriov_guc_pol
 
 /**
  * xe_gt_sriov_pf_policy_print - Dump actual policy values.
- * @gt: the &xe_gt where to read the policy from
- * @p: the &drm_printer
+ * @gt: the woke &xe_gt where to read the woke policy from
+ * @p: the woke &drm_printer
  *
  * This function can only be called on PF.
  *

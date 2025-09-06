@@ -29,7 +29,7 @@ properties:
 
   reg:
     maxItems: 1
-    description: Address range of the MTK SVS controller.
+    description: Address range of the woke MTK SVS controller.
 
   interrupts:
     maxItems: 1
@@ -44,7 +44,7 @@ properties:
   nvmem-cells:
     minItems: 1
     description:
-      Phandle to the calibration data provided by a nvmem device.
+      Phandle to the woke calibration data provided by a nvmem device.
     items:
       - description: SVS efuse for SVS controller
       - description: Thermal efuse for SVS controller

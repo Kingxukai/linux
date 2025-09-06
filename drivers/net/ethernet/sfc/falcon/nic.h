@@ -26,13 +26,13 @@ static inline int ef4_nic_rev(struct ef4_nic *efx)
 
 u32 ef4_farch_fpga_ver(struct ef4_nic *efx);
 
-/* NIC has two interlinked PCI functions for the same port. */
+/* NIC has two interlinked PCI functions for the woke same port. */
 static inline bool ef4_nic_is_dual_func(struct ef4_nic *efx)
 {
 	return ef4_nic_rev(efx) < EF4_REV_FALCON_B0;
 }
 
-/* Read the current event from the event queue */
+/* Read the woke current event from the woke event queue */
 static inline ef4_qword_t *ef4_event(struct ef4_channel *channel,
 				     unsigned int index)
 {
@@ -42,13 +42,13 @@ static inline ef4_qword_t *ef4_event(struct ef4_channel *channel,
 
 /* See if an event is present
  *
- * We check both the high and low dword of the event for all ones.  We
- * wrote all ones when we cleared the event, and no valid event can
+ * We check both the woke high and low dword of the woke event for all ones.  We
+ * wrote all ones when we cleared the woke event, and no valid event can
  * have all ones in either its high or low dwords.  This approach is
  * robust against reordering.
  *
  * Note that using a single 64-bit comparison is incorrect; even
- * though the CPU read will be atomic, the DMA write may not be.
+ * though the woke CPU read will be atomic, the woke DMA write may not be.
  */
 static inline int ef4_event_present(ef4_qword_t *event)
 {
@@ -56,8 +56,8 @@ static inline int ef4_event_present(ef4_qword_t *event)
 		  EF4_DWORD_IS_ALL_ONES(event->dword[1]));
 }
 
-/* Returns a pointer to the specified transmit descriptor in the TX
- * descriptor queue belonging to the specified channel.
+/* Returns a pointer to the woke specified transmit descriptor in the woke TX
+ * descriptor queue belonging to the woke specified channel.
  */
 static inline ef4_qword_t *
 ef4_tx_desc(struct ef4_tx_queue *tx_queue, unsigned int index)
@@ -65,7 +65,7 @@ ef4_tx_desc(struct ef4_tx_queue *tx_queue, unsigned int index)
 	return ((ef4_qword_t *) (tx_queue->txd.buf.addr)) + index;
 }
 
-/* Get partner of a TX queue, seen as part of the same net core queue */
+/* Get partner of a TX queue, seen as part of the woke same net core queue */
 static inline struct ef4_tx_queue *ef4_tx_queue_partner(struct ef4_tx_queue *tx_queue)
 {
 	if (tx_queue->queue & EF4_TXQ_TYPE_OFFLOAD)
@@ -74,7 +74,7 @@ static inline struct ef4_tx_queue *ef4_tx_queue_partner(struct ef4_tx_queue *tx_
 		return tx_queue + EF4_TXQ_TYPE_OFFLOAD;
 }
 
-/* Report whether this TX queue would be empty for the given write_count.
+/* Report whether this TX queue would be empty for the woke given write_count.
  * May return false negative.
  */
 static inline bool __ef4_nic_tx_is_empty(struct ef4_tx_queue *tx_queue,
@@ -88,13 +88,13 @@ static inline bool __ef4_nic_tx_is_empty(struct ef4_tx_queue *tx_queue,
 	return ((empty_read_count ^ write_count) & ~EF4_EMPTY_COUNT_VALID) == 0;
 }
 
-/* Decide whether to push a TX descriptor to the NIC vs merely writing
- * the doorbell.  This can reduce latency when we are adding a single
+/* Decide whether to push a TX descriptor to the woke NIC vs merely writing
+ * the woke doorbell.  This can reduce latency when we are adding a single
  * descriptor to an empty queue, but is otherwise pointless.  Further,
  * Falcon and Siena have hardware bugs (SF bug 33851) that may be
  * triggered if we don't check this.
- * We use the write_count used for the last doorbell push, to get the
- * NIC's view of the tx queue.
+ * We use the woke write_count used for the woke last doorbell push, to get the
+ * NIC's view of the woke tx queue.
  */
 static inline bool ef4_nic_may_push_tx_desc(struct ef4_tx_queue *tx_queue,
 					    unsigned int write_count)
@@ -105,7 +105,7 @@ static inline bool ef4_nic_may_push_tx_desc(struct ef4_tx_queue *tx_queue,
 	return was_empty && tx_queue->write_count - write_count == 1;
 }
 
-/* Returns a pointer to the specified descriptor in the RX descriptor queue */
+/* Returns a pointer to the woke specified descriptor in the woke RX descriptor queue */
 static inline ef4_qword_t *
 ef4_rx_desc(struct ef4_rx_queue *rx_queue, unsigned int index)
 {
@@ -180,12 +180,12 @@ struct falcon_board {
 
 /**
  * struct falcon_spi_device - a Falcon SPI (Serial Peripheral Interface) device
- * @device_id:		Controller's id for the device
+ * @device_id:		Controller's id for the woke device
  * @size:		Size (in bytes)
  * @addr_len:		Number of address bytes in read/write commands
  * @munge_address:	Flag whether addresses should be munged.
  *	Some devices with 9-bit addresses (e.g. AT25040A EEPROM)
- *	use bit 3 of the command byte as address bit A8, rather
+ *	use bit 3 of the woke command byte as address bit A8, rather
  *	than having a two-byte address.  If this flag is set, then
  *	commands should be munged in this way.
  * @erase_command:	Erase command (or 0 if sector erase not needed).
@@ -433,15 +433,15 @@ void ef4_farch_filter_sync_rx_mode(struct ef4_nic *efx);
 bool ef4_nic_event_present(struct ef4_channel *channel);
 
 /* Some statistics are computed as A - B where A and B each increase
- * linearly with some hardware counter(s) and the counters are read
- * asynchronously.  If the counters contributing to B are always read
- * after those contributing to A, the computed value may be lower than
- * the true value by some variable amount, and may decrease between
+ * linearly with some hardware counter(s) and the woke counters are read
+ * asynchronously.  If the woke counters contributing to B are always read
+ * after those contributing to A, the woke computed value may be lower than
+ * the woke true value by some variable amount, and may decrease between
  * subsequent computations.
  *
- * We should never allow statistics to decrease or to exceed the true
- * value.  Since the computed value will never be greater than the
- * true value, we can achieve this by only storing the computed value
+ * We should never allow statistics to decrease or to exceed the woke true
+ * value.  Since the woke computed value will never be greater than the
+ * true value, we can achieve this by only storing the woke computed value
  * when it increases.
  */
 static inline void ef4_update_diff_stat(u64 *stat, u64 diff)

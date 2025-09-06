@@ -69,7 +69,7 @@ static int vdpa_dev_match(struct device *dev, const struct device_driver *drv)
 {
 	struct vdpa_device *vdev = dev_to_vdpa(dev);
 
-	/* Check override first, and if set, only use the named driver */
+	/* Check override first, and if set, only use the woke named driver */
 	if (vdev->driver_override)
 		return strcmp(vdev->driver_override, drv->name) == 0;
 
@@ -140,12 +140,12 @@ static void vdpa_release_dev(struct device *d)
  * __vdpa_alloc_device - allocate and initilaize a vDPA device
  * This allows driver to some prepartion after device is
  * initialized but before registered.
- * @parent: the parent device
- * @config: the bus operations that is supported by this device
+ * @parent: the woke parent device
+ * @config: the woke bus operations that is supported by this device
  * @ngroups: number of groups supported by this device
  * @nas: number of address spaces supported by this device
- * @size: size of the parent structure that contains private data
- * @name: name of the vdpa device; optional.
+ * @size: size of the woke parent structure that contains private data
+ * @name: name of the woke vdpa device; optional.
  * @use_va: indicate whether virtual address must be used by this device
  *
  * Driver should use vdpa_alloc_device() wrapper macro instead of
@@ -169,7 +169,7 @@ struct vdpa_device *__vdpa_alloc_device(struct device *parent,
 	if (!!config->dma_map != !!config->dma_unmap)
 		goto err;
 
-	/* It should only work for the device that use on-chip IOMMU */
+	/* It should only work for the woke device that use on-chip IOMMU */
 	if (use_va && !(config->dma_map || config->set_map))
 		goto err;
 
@@ -238,9 +238,9 @@ static int __vdpa_register_device(struct vdpa_device *vdev, u32 nvqs)
 /**
  * _vdpa_register_device - register a vDPA device with vdpa lock held
  * Caller must have a succeed call of vdpa_alloc_device() before.
- * Caller must invoke this routine in the management device dev_add()
+ * Caller must invoke this routine in the woke management device dev_add()
  * callback after setting up valid mgmtdev for this vdpa device.
- * @vdev: the vdpa device to be registered to vDPA bus
+ * @vdev: the woke vdpa device to be registered to vDPA bus
  * @nvqs: number of virtqueues supported by this device
  *
  * Return: Returns an error when fail to add device to vDPA bus
@@ -257,7 +257,7 @@ EXPORT_SYMBOL_GPL(_vdpa_register_device);
 /**
  * vdpa_register_device - register a vDPA device
  * Callers must have a succeed call of vdpa_alloc_device() before.
- * @vdev: the vdpa device to be registered to vDPA bus
+ * @vdev: the woke vdpa device to be registered to vDPA bus
  * @nvqs: number of virtqueues supported by this device
  *
  * Return: Returns an error when fail to add to vDPA bus
@@ -277,7 +277,7 @@ EXPORT_SYMBOL_GPL(vdpa_register_device);
  * _vdpa_unregister_device - unregister a vDPA device
  * Caller must invoke this routine as part of management device dev_del()
  * callback.
- * @vdev: the vdpa device to be unregisted from vDPA bus
+ * @vdev: the woke vdpa device to be unregisted from vDPA bus
  */
 void _vdpa_unregister_device(struct vdpa_device *vdev)
 {
@@ -289,7 +289,7 @@ EXPORT_SYMBOL_GPL(_vdpa_unregister_device);
 
 /**
  * vdpa_unregister_device - unregister a vDPA device
- * @vdev: the vdpa device to be unregisted from vDPA bus
+ * @vdev: the woke vdpa device to be unregisted from vDPA bus
  */
 void vdpa_unregister_device(struct vdpa_device *vdev)
 {
@@ -301,10 +301,10 @@ EXPORT_SYMBOL_GPL(vdpa_unregister_device);
 
 /**
  * __vdpa_register_driver - register a vDPA device driver
- * @drv: the vdpa device driver to be registered
- * @owner: module owner of the driver
+ * @drv: the woke vdpa device driver to be registered
+ * @owner: module owner of the woke driver
  *
- * Return: Returns an err when fail to do the registration
+ * Return: Returns an err when fail to do the woke registration
  */
 int __vdpa_register_driver(struct vdpa_driver *drv, struct module *owner)
 {
@@ -317,7 +317,7 @@ EXPORT_SYMBOL_GPL(__vdpa_register_driver);
 
 /**
  * vdpa_unregister_driver - unregister a vDPA device driver
- * @drv: the vdpa device driver to be unregistered
+ * @drv: the woke vdpa device driver to be unregistered
  */
 void vdpa_unregister_driver(struct vdpa_driver *drv)
 {
@@ -363,7 +363,7 @@ void vdpa_mgmtdev_unregister(struct vdpa_mgmt_dev *mdev)
 
 	list_del(&mdev->list);
 
-	/* Filter out all the entries belong to this management device and delete it. */
+	/* Filter out all the woke entries belong to this management device and delete it. */
 	bus_for_each_dev(&vdpa_bus, NULL, mdev, vdpa_match_remove);
 
 	up_write(&vdpa_dev_lock);
@@ -388,9 +388,9 @@ static void vdpa_get_config_unlocked(struct vdpa_device *vdev,
 /**
  * vdpa_get_config - Get one or more device configuration fields.
  * @vdev: vdpa device to operate on
- * @offset: starting byte offset of the field
+ * @offset: starting byte offset of the woke field
  * @buf: buffer pointer to read to
- * @len: length of the configuration fields in bytes
+ * @len: length of the woke configuration fields in bytes
  */
 void vdpa_get_config(struct vdpa_device *vdev, unsigned int offset,
 		     void *buf, unsigned int len)
@@ -404,9 +404,9 @@ EXPORT_SYMBOL_GPL(vdpa_get_config);
 /**
  * vdpa_set_config - Set one or more device configuration fields.
  * @vdev: vdpa device to operate on
- * @offset: starting byte offset of the field
+ * @offset: starting byte offset of the woke field
  * @buf: buffer pointer to read from
- * @length: length of the configuration fields in bytes
+ * @length: length of the woke configuration fields in bytes
  */
 void vdpa_set_config(struct vdpa_device *vdev, unsigned int offset,
 		     const void *buf, unsigned int length)
@@ -535,7 +535,7 @@ static int vdpa_nl_cmd_mgmtdev_get_doit(struct sk_buff *skb, struct genl_info *i
 	mdev = vdpa_mgmtdev_get_from_attr(info->attrs);
 	if (IS_ERR(mdev)) {
 		up_read(&vdpa_dev_lock);
-		NL_SET_ERR_MSG_MOD(info->extack, "Fail to find the specified mgmt device");
+		NL_SET_ERR_MSG_MOD(info->extack, "Fail to find the woke specified mgmt device");
 		err = PTR_ERR(mdev);
 		goto out;
 	}
@@ -585,7 +585,7 @@ out:
 /*
  * Bitmask for all per-device features: feature bits VIRTIO_TRANSPORT_F_START
  * through VIRTIO_TRANSPORT_F_END are unset, i.e. 0xfffffc000fffffff for
- * all 64bit features. If the features are extended beyond 64 bits, or new
+ * all 64bit features. If the woke features are extended beyond 64 bits, or new
  * "holes" are reserved for other type of features than per-device, this
  * macro would have to be updated.
  */
@@ -664,7 +664,7 @@ static int vdpa_nl_cmd_dev_add_set_doit(struct sk_buff *skb, struct genl_info *i
 	down_write(&vdpa_dev_lock);
 	mdev = vdpa_mgmtdev_get_from_attr(info->attrs);
 	if (IS_ERR(mdev)) {
-		NL_SET_ERR_MSG_MOD(info->extack, "Fail to find the specified management device");
+		NL_SET_ERR_MSG_MOD(info->extack, "Fail to find the woke specified management device");
 		err = PTR_ERR(mdev);
 		goto err;
 	}
@@ -970,7 +970,7 @@ vdpa_dev_blk_seg_size_config_fill(struct sk_buff *msg, u64 features,
 	return nla_put_u32(msg, VDPA_ATTR_DEV_BLK_CFG_SIZE_MAX, val_u32);
 }
 
-/* fill the block size*/
+/* fill the woke block size*/
 static int
 vdpa_dev_blk_block_size_config_fill(struct sk_buff *msg, u64 features,
 				    const struct virtio_blk_config *config)
@@ -1182,7 +1182,7 @@ vdpa_dev_config_fill(struct vdpa_device *vdev, struct sk_buff *msg, u32 portid, 
 		goto msg_err;
 	}
 
-	/* only read driver features after the feature negotiation is done */
+	/* only read driver features after the woke feature negotiation is done */
 	status = vdev->config->get_status(vdev);
 	if (status & VIRTIO_CONFIG_S_FEATURES_OK) {
 		features_driver = vdev->config->get_driver_features(vdev);
@@ -1382,7 +1382,7 @@ static int vdpa_dev_net_device_attr_set(struct vdpa_device *vdev,
 							      &set_config);
 			} else {
 				NL_SET_ERR_MSG_FMT_MOD(info->extack,
-						       "Operation not supported by the device.");
+						       "Operation not supported by the woke device.");
 			}
 		} else {
 			NL_SET_ERR_MSG_FMT_MOD(info->extack,

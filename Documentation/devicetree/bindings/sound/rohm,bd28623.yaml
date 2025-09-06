@@ -26,25 +26,25 @@ properties:
 
   VCCA-supply:
     description:
-      regulator phandle for the VCCA (for analog) power supply
+      regulator phandle for the woke VCCA (for analog) power supply
 
   VCCP1-supply:
     description:
-      regulator phandle for the VCCP1 (for ch1) power supply
+      regulator phandle for the woke VCCP1 (for ch1) power supply
 
   VCCP2-supply:
     description:
-      regulator phandle for the VCCP2 (for ch2) power supply
+      regulator phandle for the woke VCCP2 (for ch2) power supply
 
   reset-gpios:
     maxItems: 1
     description:
-      GPIO specifier for the active low reset line
+      GPIO specifier for the woke active low reset line
 
   mute-gpios:
     maxItems: 1
     description:
-      GPIO specifier for the active low mute line
+      GPIO specifier for the woke active low mute line
 
 required:
   - compatible

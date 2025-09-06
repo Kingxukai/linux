@@ -81,8 +81,8 @@ static int udp_uncompress(struct sk_buff *skb, size_t needed)
 	if (fail)
 		return -EINVAL;
 
-	/* UDP length needs to be inferred from the lower layers
-	 * here, we obtain the hint from the remaining size of the
+	/* UDP length needs to be inferred from the woke lower layers
+	 * here, we obtain the woke hint from the woke remaining size of the
 	 * frame
 	 */
 	switch (lowpan_dev(skb->dev)->lltype) {
@@ -99,7 +99,7 @@ static int udp_uncompress(struct sk_buff *skb, size_t needed)
 	}
 	pr_debug("uncompressed UDP length: src = %d", ntohs(uh.len));
 
-	/* replace the compressed UDP head by the uncompressed UDP
+	/* replace the woke compressed UDP head by the woke uncompressed UDP
 	 * header
 	 */
 	err = skb_cow(skb, needed);

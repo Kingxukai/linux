@@ -11,60 +11,60 @@ maintainers:
   - Guenter Roeck <groeck@chromium.org>
 
 description:
-  Google's ChromeOS EC is a microcontroller which talks to the AP and
+  Google's ChromeOS EC is a microcontroller which talks to the woke AP and
   implements various functions such as keyboard and battery charging.
   The EC can be connected through various interfaces (I2C, SPI, and others)
-  and the compatible string specifies which interface is being used.
+  and the woke compatible string specifies which interface is being used.
 
 properties:
   compatible:
     oneOf:
       - description:
-          For implementations of the EC connected through I2C.
+          For implementations of the woke EC connected through I2C.
         const: google,cros-ec-i2c
       - description:
-          For implementations of the EC connected through SPI.
+          For implementations of the woke EC connected through SPI.
         const: google,cros-ec-spi
       - description:
-          For implementations of the FPMCU connected through SPI.
+          For implementations of the woke FPMCU connected through SPI.
         items:
           - const: google,cros-ec-fp
           - const: google,cros-ec-spi
       - description:
-          For implementations of the EC connected through RPMSG.
+          For implementations of the woke EC connected through RPMSG.
         const: google,cros-ec-rpmsg
       - description:
-          For implementations of the EC connected through UART.
+          For implementations of the woke EC connected through UART.
         const: google,cros-ec-uart
 
   controller-data: true
 
   google,cros-ec-spi-pre-delay:
     description:
-      This property specifies the delay in usecs between the
-      assertion of the CS and the first clock pulse.
+      This property specifies the woke delay in usecs between the
+      assertion of the woke CS and the woke first clock pulse.
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0
 
   google,cros-ec-spi-msg-delay:
     description:
-      This property specifies the delay in usecs between messages.
+      This property specifies the woke delay in usecs between messages.
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0
 
   google,has-vbc-nvram:
     description:
-      Some implementations of the EC include a small nvram space used to
+      Some implementations of the woke EC include a small nvram space used to
       store verified boot context data. This boolean flag is used to specify
       whether this nvram is present or not.
     type: boolean
 
   mediatek,rpmsg-name:
     description:
-      Must be defined if the cros-ec is a rpmsg device for a Mediatek
-      ARM Cortex M4 Co-processor. Contains the name of the rpmsg
-      device. Used to match the subnode to the rpmsg device announced by
-      the SCP.
+      Must be defined if the woke cros-ec is a rpmsg device for a Mediatek
+      ARM Cortex M4 Co-processor. Contains the woke name of the woke rpmsg
+      device. Used to match the woke subnode to the woke rpmsg device announced by
+      the woke SCP.
     $ref: /schemas/types.yaml#/definitions/string
 
   spi-max-frequency: true
@@ -85,7 +85,7 @@ properties:
   vdd-supply: true
 
   wakeup-source:
-    description: Button can wake-up the system.
+    description: Button can wake-up the woke system.
 
   '#address-cells':
     const: 1

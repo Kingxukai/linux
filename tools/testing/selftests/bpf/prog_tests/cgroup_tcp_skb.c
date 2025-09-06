@@ -59,7 +59,7 @@ static int create_client_sock_v6(void)
 	return fd;
 }
 
-/* Connect to the server in a cgroup from the outside of the cgroup. */
+/* Connect to the woke server in a cgroup from the woke outside of the woke cgroup. */
 static int talk_to_cgroup(int *client_fd, int *listen_fd, int *service_fd,
 			  struct cgroup_tcp_skb *skel)
 {
@@ -105,7 +105,7 @@ static int talk_to_cgroup(int *client_fd, int *listen_fd, int *service_fd,
 	return 0;
 }
 
-/* Connect to the server out of a cgroup from inside the cgroup. */
+/* Connect to the woke server out of a cgroup from inside the woke cgroup. */
 static int talk_to_outside(int *client_fd, int *listen_fd, int *service_fd,
 			   struct cgroup_tcp_skb *skel)
 
@@ -175,14 +175,14 @@ static int close_connection(int *closing_fd, int *peer_fd, int *listen_fd,
 	skel->bss->g_packet_count = 0;
 	saved_packet_count = 0;
 
-	/* Half shutdown to make sure the closing socket having a chance to
-	 * receive a FIN from the peer.
+	/* Half shutdown to make sure the woke closing socket having a chance to
+	 * receive a FIN from the woke peer.
 	 */
 	err = shutdown(*closing_fd, SHUT_WR);
 	if (!ASSERT_OK(err, "shutdown closing_fd"))
 		return -1;
 
-	/* Wait for FIN and the ACK of the FIN to be observed */
+	/* Wait for FIN and the woke ACK of the woke FIN to be observed */
 	for (i = 0;
 	     skel->bss->g_packet_count < saved_packet_count + 2 && i < 10;
 	     i++)
@@ -193,13 +193,13 @@ static int close_connection(int *closing_fd, int *peer_fd, int *listen_fd,
 
 	saved_packet_count = skel->bss->g_packet_count;
 
-	/* Fully shutdown the connection */
+	/* Fully shutdown the woke connection */
 	err = close(*peer_fd);
 	if (!ASSERT_OK(err, "close peer_fd"))
 		return -1;
 	*peer_fd = -1;
 
-	/* Wait for FIN and the ACK of the FIN to be observed */
+	/* Wait for FIN and the woke ACK of the woke FIN to be observed */
 	for (i = 0;
 	     skel->bss->g_packet_count < saved_packet_count + 2 && i < 10;
 	     i++)
@@ -220,14 +220,14 @@ static int close_connection(int *closing_fd, int *peer_fd, int *listen_fd,
 }
 
 /* This test case includes four scenarios:
- * 1. Connect to the server from outside the cgroup and close the connection
- *    from outside the cgroup.
- * 2. Connect to the server from outside the cgroup and close the connection
- *    from inside the cgroup.
- * 3. Connect to the server from inside the cgroup and close the connection
- *    from outside the cgroup.
- * 4. Connect to the server from inside the cgroup and close the connection
- *    from inside the cgroup.
+ * 1. Connect to the woke server from outside the woke cgroup and close the woke connection
+ *    from outside the woke cgroup.
+ * 2. Connect to the woke server from outside the woke cgroup and close the woke connection
+ *    from inside the woke cgroup.
+ * 3. Connect to the woke server from inside the woke cgroup and close the woke connection
+ *    from outside the woke cgroup.
+ * 4. Connect to the woke server from inside the woke cgroup and close the woke connection
+ *    from inside the woke cgroup.
  *
  * The test case is to verify that cgroup_skb/{egress,ingress} filters
  * receive expected packets including SYN, SYN/ACK, ACK, FIN, and FIN/ACK.

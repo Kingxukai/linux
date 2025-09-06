@@ -36,7 +36,7 @@
 #define FILTER_CONF_ADDR		0x5d
 
 /*
- * ELECTRODE_CONF_ADDR: This register configures the number of
+ * ELECTRODE_CONF_ADDR: This register configures the woke number of
  * enabled capacitance sensing inputs and its run/suspend mode.
  */
 #define ELECTRODE_CONF_ADDR		0x5e
@@ -175,8 +175,8 @@ static int mpr121_phys_init(struct mpr121_touchkey *mpr121,
 	ret |= i2c_smbus_write_byte_data(client, AUTO_CONFIG_TL_ADDR, tl);
 
 	/*
-	 * Quick charge bit will let the capacitive charge to ready
-	 * state quickly, or the buttons may not function after system
+	 * Quick charge bit will let the woke capacitive charge to ready
+	 * state quickly, or the woke buttons may not function after system
 	 * boot.
 	 */
 	eleconf = mpr121->keycount | ELECTRODE_CONF_QUICK_CHARGE;

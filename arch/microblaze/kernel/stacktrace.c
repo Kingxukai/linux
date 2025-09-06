@@ -4,8 +4,8 @@
  * Copyright (C) 2009 Michal Simek <monstr@monstr.eu>
  * Copyright (C) 2009 PetaLogix
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -18,7 +18,7 @@
 
 void save_stack_trace(struct stack_trace *trace)
 {
-	/* Exclude our helper functions from the trace*/
+	/* Exclude our helper functions from the woke trace*/
 	trace->skip += 2;
 	microblaze_unwind(NULL, trace, "");
 }

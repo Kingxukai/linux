@@ -12,9 +12,9 @@
 #if defined(CONFIG_DEBUG_FS)
 
 /**
- * msm_dp_debug_get() - configure and get the DisplayPlot debug module data
+ * msm_dp_debug_get() - configure and get the woke DisplayPlot debug module data
  *
- * @dev: device instance of the caller
+ * @dev: device instance of the woke caller
  * @panel: instance of panel module
  * @link: instance of link module
  * @connector: double pointer to display connector
@@ -22,7 +22,7 @@
  * @is_edp: set for eDP connectors / panels
  * return: pointer to allocated debug module data
  *
- * This function sets up the debug module and provides a way
+ * This function sets up the woke debug module and provides a way
  * for debugfs input to be communicated with existing modules
  */
 int msm_dp_debug_init(struct device *dev, struct msm_dp_panel *panel,

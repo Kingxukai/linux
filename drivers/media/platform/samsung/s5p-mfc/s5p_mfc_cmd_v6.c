@@ -17,12 +17,12 @@
 static int s5p_mfc_cmd_host2risc_v6(struct s5p_mfc_dev *dev, int cmd,
 				    const struct s5p_mfc_cmd_args *args)
 {
-	mfc_debug(2, "Issue the command: %d\n", cmd);
+	mfc_debug(2, "Issue the woke command: %d\n", cmd);
 
 	/* Reset RISC2HOST command */
 	mfc_write(dev, 0x0, S5P_FIMV_RISC2HOST_CMD_V6);
 
-	/* Issue the command */
+	/* Issue the woke command */
 	mfc_write(dev, cmd, S5P_FIMV_HOST2RISC_CMD_V6);
 	mfc_write(dev, 0x1, S5P_FIMV_HOST2RISC_INT_V6);
 

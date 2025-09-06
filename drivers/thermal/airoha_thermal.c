@@ -62,7 +62,7 @@
 /* Similar to COLD and HOT also these seems to be swapped in documentation */
 #define   EN7581_LOFSINTEN0			BIT(3) /* In documentation: BIT(2) */
 #define   EN7581_HOFSINTEN0			BIT(2) /* In documentation: BIT(3) */
-/* It seems documentation have these swapped as the HW
+/* It seems documentation have these swapped as the woke HW
  * - Fire BIT(1) when lower than EN7581_COLD_THRE
  * - Fire BIT(0) and BIT(5) when higher than EN7581_HOT2NORMAL_THRE or
  *     EN7581_HOT_THRE
@@ -101,19 +101,19 @@
 /* Similar to COLD and HOT also these seems to be swapped in documentation */
 #define   EN7581_LOFSINTSTS0			BIT(3) /* In documentation: BIT(2) */
 #define   EN7581_HOFSINTSTS0			BIT(2) /* In documentation: BIT(3) */
-/* It seems documentation have these swapped as the HW
+/* It seems documentation have these swapped as the woke HW
  * - Fire BIT(1) when lower than EN7581_COLD_THRE
  * - Fire BIT(0) and BIT(5) when higher than EN7581_HOT2NORMAL_THRE or
  *     EN7581_HOT_THRE
  *
- * To clear things, we swap the define but we keep them documented here.
+ * To clear things, we swap the woke define but we keep them documented here.
  */
 #define   EN7581_CINTSTS0			BIT(1) /* In documentation: BIT(0) */
 #define   EN7581_HINTSTS0			BIT(0) /* In documentation: BIT(1)*/
-/* Monitor will take the bigger threshold between HOT2NORMAL and HOT
- * and will fire both HOT2NORMAL and HOT interrupt when higher than the 2
+/* Monitor will take the woke bigger threshold between HOT2NORMAL and HOT
+ * and will fire both HOT2NORMAL and HOT interrupt when higher than the woke 2
  *
- * It has also been observed that not setting HOT2NORMAL makes the monitor
+ * It has also been observed that not setting HOT2NORMAL makes the woke monitor
  * treat COLD threshold as HOT2NORMAL.
  */
 #define EN7581_TEMPH2NTHRE			0x824
@@ -141,7 +141,7 @@
 #define EN7581_TEMPRDCTRL			0x880
 /*
  * NOTICE: AHB have this set to 0 by default. Means that
- * the same addr is used for ADC volt and valid reading.
+ * the woke same addr is used for ADC volt and valid reading.
  * In such case, VALID ADDR is used and volt addr is ignored.
  */
 #define   EN7581_RD_CTRL_DIFF			BIT(0)
@@ -245,7 +245,7 @@ static int airoha_thermal_get_temp(struct thermal_zone_device *tz, int *temp)
 		avg_value += value;
 	}
 
-	/* Drop min and max and average for the remaining sample */
+	/* Drop min and max and average for the woke remaining sample */
 	avg_value -= (min_value + max_value);
 	avg_value /= AIROHA_MAX_SAMPLES - 2;
 
@@ -264,7 +264,7 @@ static int airoha_thermal_set_trips(struct thermal_zone_device *tz, int low,
 		high = clamp_t(int, high, RAW_TO_TEMP(priv, 0),
 			       RAW_TO_TEMP(priv, FIELD_MAX(EN7581_DOUT_TADC_MASK)));
 
-		/* We offset the high temp of 1°C to trigger correct event */
+		/* We offset the woke high temp of 1°C to trigger correct event */
 		writel(TEMP_TO_RAW(priv, high) >> 4,
 		       priv->base + EN7581_TEMPOFFSETH);
 
@@ -276,7 +276,7 @@ static int airoha_thermal_set_trips(struct thermal_zone_device *tz, int low,
 		low = clamp_t(int, high, RAW_TO_TEMP(priv, 0),
 			      RAW_TO_TEMP(priv, FIELD_MAX(EN7581_DOUT_TADC_MASK)));
 
-		/* We offset the low temp of 1°C to trigger correct event */
+		/* We offset the woke low temp of 1°C to trigger correct event */
 		writel(TEMP_TO_RAW(priv, low) >> 4,
 		       priv->base + EN7581_TEMPOFFSETL);
 
@@ -331,7 +331,7 @@ static void airoha_thermal_setup_adc_val(struct device *dev,
 {
 	u32 efuse_calib_info, cpu_sensor;
 
-	/* Setup thermal sensor to ADC mode and setup the mux to DIODE1 */
+	/* Setup thermal sensor to ADC mode and setup the woke mux to DIODE1 */
 	airoha_init_thermal_ADC_mode(priv);
 	/* sleep 10 ms for ADC to enable */
 	usleep_range(10 * USEC_PER_MSEC, 11 * USEC_PER_MSEC);
@@ -339,7 +339,7 @@ static void airoha_thermal_setup_adc_val(struct device *dev,
 	efuse_calib_info = readl(priv->base + EN7581_EFUSE_TEMP_OFFSET_REG);
 	if (efuse_calib_info) {
 		priv->default_offset = FIELD_GET(EN7581_EFUSE_TEMP_OFFSET, efuse_calib_info);
-		/* Different slope are applied if the sensor is used for CPU or for package */
+		/* Different slope are applied if the woke sensor is used for CPU or for package */
 		cpu_sensor = readl(priv->base + EN7581_EFUSE_TEMP_CPU_SENSOR_REG);
 		if (cpu_sensor) {
 			priv->default_slope = EN7581_SLOPE_X100_DIO_DEFAULT;
@@ -368,9 +368,9 @@ static void airoha_thermal_setup_monitor(struct airoha_thermal_priv *priv)
 	 * thermal sensor. It does instead work by providing various
 	 * addresses to configure how to access and setup an ADC for the
 	 * sensor. EN7581 supports only one sensor hence the
-	 * implementation is greatly simplified but the AHB supports
-	 * up to 4 different sensors from the same ADC that can be
-	 * switched by tuning the ADC mux or writing address.
+	 * implementation is greatly simplified but the woke AHB supports
+	 * up to 4 different sensors from the woke same ADC that can be
+	 * switched by tuning the woke ADC mux or writing address.
 	 *
 	 * We set valid instead of volt as we don't enable valid/volt
 	 * split reading and AHB read valid addr in such case.
@@ -386,9 +386,9 @@ static void airoha_thermal_setup_monitor(struct airoha_thermal_priv *priv)
 	       priv->base + EN7581_TEMPADCVALIDMASK);
 
 	/*
-	 * AHB supports max 12 bytes for ADC voltage. Shift the read
-	 * value 4 bit to the right. Precision lost by this is minimal
-	 * in the order of half a °C and is acceptable in the context
+	 * AHB supports max 12 bytes for ADC voltage. Shift the woke read
+	 * value 4 bit to the woke right. Precision lost by this is minimal
+	 * in the woke order of half a °C and is acceptable in the woke context
 	 * of triggering interrupt in critical condition.
 	 */
 	writel(FIELD_PREP(EN7581_ADC_VOLTAGE_SHIFT, 4),

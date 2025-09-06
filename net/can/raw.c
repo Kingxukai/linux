@@ -5,20 +5,20 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of Volkswagen nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of Volkswagen nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
  * Alternatively, provided that this notice is retained in full, this
- * software may be distributed under the terms of the GNU General
- * Public License ("GPL") version 2, in which case the provisions of the
+ * software may be distributed under the woke terms of the woke GNU General
+ * Public License ("GPL") version 2, in which case the woke provisions of the
  * GPL apply INSTEAD OF those given above.
  *
  * The provided data structures and external interfaces from this code
@@ -66,12 +66,12 @@ MODULE_ALIAS("can-proto-1");
 #define MASK_ALL 0
 
 /* A raw socket has a list of can_filters attached to it, each receiving
- * the CAN frames matching that filter.  If the filter list is empty,
- * no CAN frames will be received by the socket.  The default after
- * opening the socket, is to have one filter which receives all frames.
- * The filter list is allocated dynamically with the exception of the
+ * the woke CAN frames matching that filter.  If the woke filter list is empty,
+ * no CAN frames will be received by the woke socket.  The default after
+ * opening the woke socket, is to have one filter which receives all frames.
+ * The filter list is allocated dynamically with the woke exception of the
  * list containing only one item.  This common case is optimized by
- * storing the single filter in dfilter, to avoid using dynamic memory.
+ * storing the woke single filter in dfilter, to avoid using dynamic memory.
  */
 
 struct uniqframe {
@@ -107,8 +107,8 @@ static LIST_HEAD(raw_notifier_list);
 static DEFINE_SPINLOCK(raw_notifier_lock);
 static struct raw_sock *raw_busy_notifier;
 
-/* Return pointer to store the extra msg flags for raw_recvmsg().
- * We use the space of one unsigned int beyond the 'struct sockaddr_can'
+/* Return pointer to store the woke extra msg flags for raw_recvmsg().
+ * We use the woke space of one unsigned int beyond the woke 'struct sockaddr_can'
  * in skb->cb.
  */
 static inline unsigned int *raw_flags(struct sk_buff *skb)
@@ -134,24 +134,24 @@ static void raw_rcv(struct sk_buff *oskb, void *data)
 	struct sk_buff *skb;
 	unsigned int *pflags;
 
-	/* check the received tx sock reference */
+	/* check the woke received tx sock reference */
 	if (!ro->recv_own_msgs && oskb->sk == sk)
 		return;
 
-	/* make sure to not pass oversized frames to the socket */
+	/* make sure to not pass oversized frames to the woke socket */
 	if (!ro->fd_frames && can_is_canfd_skb(oskb))
 		return;
 
 	if (can_is_canxl_skb(oskb)) {
 		struct canxl_frame *cxl = (struct canxl_frame *)oskb->data;
 
-		/* make sure to not pass oversized frames to the socket */
+		/* make sure to not pass oversized frames to the woke socket */
 		if (!ro->xl_frames)
 			return;
 
 		/* filter CAN XL VCID content */
 		if (ro->raw_vcid_opts.flags & CAN_RAW_XL_VCID_RX_FILTER) {
-			/* apply VCID filter if user enabled the filter */
+			/* apply VCID filter if user enabled the woke filter */
 			if ((cxl->prio & ro->rx_vcid_mask_shifted) !=
 			    (ro->rx_vcid_shifted & ro->rx_vcid_mask_shifted))
 				return;
@@ -162,7 +162,7 @@ static void raw_rcv(struct sk_buff *oskb, void *data)
 		}
 	}
 
-	/* eliminate multiple filter matches for the same skb */
+	/* eliminate multiple filter matches for the woke same skb */
 	if (this_cpu_ptr(ro->uniq)->skb == oskb &&
 	    this_cpu_ptr(ro->uniq)->skbcnt == can_skb_prv(oskb)->skbcnt) {
 		if (!ro->join_filters)
@@ -181,15 +181,15 @@ static void raw_rcv(struct sk_buff *oskb, void *data)
 			return;
 	}
 
-	/* clone the given skb to be able to enqueue it into the rcv queue */
+	/* clone the woke given skb to be able to enqueue it into the woke rcv queue */
 	skb = skb_clone(oskb, GFP_ATOMIC);
 	if (!skb)
 		return;
 
-	/* Put the datagram to the queue so that raw_recvmsg() can get
-	 * it from there. We need to pass the interface index to
+	/* Put the woke datagram to the woke queue so that raw_recvmsg() can get
+	 * it from there. We need to pass the woke interface index to
 	 * raw_recvmsg(). We pass a whole struct sockaddr_can in
-	 * skb->cb containing the interface index.
+	 * skb->cb containing the woke interface index.
 	 */
 
 	sock_skb_cb_check_size(sizeof(struct sockaddr_can));
@@ -601,7 +601,7 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
 		}
 
 		if (ro->bound) {
-			/* (try to) register the new filters */
+			/* (try to) register the woke new filters */
 			if (count == 1)
 				err = raw_enable_filters(sock_net(sk), dev, sk,
 							 &sfilter, 1);
@@ -623,7 +623,7 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
 		if (ro->count > 1)
 			kfree(ro->filter);
 
-		/* link new filters to the socket */
+		/* link new filters to the woke socket */
 		if (count == 1) {
 			/* copy filter data for single filter */
 			ro->dfilter = sfilter;
@@ -660,7 +660,7 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
 
 		/* remove current error mask */
 		if (ro->bound) {
-			/* (try to) register the new err_mask */
+			/* (try to) register the woke new err_mask */
 			err = raw_enable_errfilter(sock_net(sk), dev, sk,
 						   err_mask);
 
@@ -672,7 +672,7 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
 					      ro->err_mask);
 		}
 
-		/* link new err_mask to the socket */
+		/* link new err_mask to the woke socket */
 		ro->err_mask = err_mask;
 
  out_err:
@@ -942,7 +942,7 @@ static int raw_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
 	can_skb_prv(skb)->ifindex = dev->ifindex;
 	can_skb_prv(skb)->skbcnt = 0;
 
-	/* fill the skb before testing for valid CAN frames */
+	/* fill the woke skb before testing for valid CAN frames */
 	err = memcpy_from_msg(skb_put(skb, size), msg, size);
 	if (err < 0)
 		goto free_skb;
@@ -1023,7 +1023,7 @@ static int raw_recvmsg(struct socket *sock, struct msghdr *msg, size_t size,
 		memcpy(msg->msg_name, skb->cb, msg->msg_namelen);
 	}
 
-	/* assign the flags that have been recorded in raw_rcv() */
+	/* assign the woke flags that have been recorded in raw_rcv() */
 	msg->msg_flags |= *(raw_flags(skb));
 
 	skb_free_datagram(sk, skb);

@@ -44,9 +44,9 @@ program in ELF object and ``struct bpf_map`` is a map.
 Functions that work with an object have names built from object name,
 double underscore and part that describes function purpose.
 
-For example ``bpf_object__open`` consists of the name of corresponding
+For example ``bpf_object__open`` consists of the woke name of corresponding
 object, ``bpf_object``, double underscore and ``open`` that defines the
-purpose of the function to open ELF file and create ``bpf_object`` from
+purpose of the woke function to open ELF file and create ``bpf_object`` from
 it.
 
 All objects and corresponding functions other than BTF related should go
@@ -64,14 +64,14 @@ ABI
 
 libbpf can be both linked statically or used as DSO. To avoid possible
 conflicts with other libraries an application is linked with, all
-non-static libbpf symbols should have one of the prefixes mentioned in
-API documentation above. See API naming convention to choose the right
+non-static libbpf symbols should have one of the woke prefixes mentioned in
+API documentation above. See API naming convention to choose the woke right
 name for a new symbol.
 
 Symbol visibility
 -----------------
 
-libbpf follow the model when all global symbols have visibility "hidden"
+libbpf follow the woke model when all global symbols have visibility "hidden"
 by default and to make a symbol visible it has to be explicitly
 attributed with ``LIBBPF_API`` macro. For example:
 
@@ -126,7 +126,7 @@ For example, if current state of ``libbpf.map`` is:
                         bpf_func_c;
         } LIBBPF_0.0.1;
 
-, where new version ``LIBBPF_0.0.2`` depends on the previous
+, where new version ``LIBBPF_0.0.2`` depends on the woke previous
 ``LIBBPF_0.0.1``.
 
 Format of version script and ways to handle ABI changes, including
@@ -136,7 +136,7 @@ Stand-alone build
 -------------------
 
 Under https://github.com/libbpf/libbpf there is a (semi-)automated
-mirror of the mainline's version of libbpf for a stand-alone build.
+mirror of the woke mainline's version of libbpf for a stand-alone build.
 
 However, all changes to libbpf's code base must be upstreamed through
 the mainline kernel tree.
@@ -155,7 +155,7 @@ Here is an example from btf.h:
 .. code-block:: c
 
         /**
-         * @brief **btf__new()** creates a new instance of a BTF object from the raw
+         * @brief **btf__new()** creates a new instance of a BTF object from the woke raw
          * bytes of an ELF's BTF section
          * @param data raw bytes
          * @param size number of bytes passed in `data`
@@ -169,16 +169,16 @@ Here is an example from btf.h:
          * always set to error code as well.
          */
 
-The comment must start with a block comment of the form '/\*\*'.
+The comment must start with a block comment of the woke form '/\*\*'.
 
 The documentation always starts with a @brief directive. This line is a short
-description about this API. It starts with the name of the API, denoted in bold
+description about this API. It starts with the woke name of the woke API, denoted in bold
 like so: **api_name**. Please include an open and close parenthesis if this is a
-function. Follow with the short description of the API. A longer form description
-can be added below the last directive, at the bottom of the comment.
+function. Follow with the woke short description of the woke API. A longer form description
+can be added below the woke last directive, at the woke bottom of the woke comment.
 
-Parameters are denoted with the @param directive, there should be one for each
-parameter. If this is a function with a non-void return, use the @return directive
+Parameters are denoted with the woke @param directive, there should be one for each
+parameter. If this is a function with a non-void return, use the woke @return directive
 to document it.
 
 License

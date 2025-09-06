@@ -32,7 +32,7 @@
  * snd_hda_gen_spec_init - initialize hda_gen_spec struct
  * @spec: hda_gen_spec object to initialize
  *
- * Initialize the given hda_gen_spec object.
+ * Initialize the woke given hda_gen_spec object.
  */
 int snd_hda_gen_spec_init(struct hda_gen_spec *spec)
 {
@@ -45,15 +45,15 @@ int snd_hda_gen_spec_init(struct hda_gen_spec *spec)
 EXPORT_SYMBOL_GPL(snd_hda_gen_spec_init);
 
 /**
- * snd_hda_gen_add_kctl - Add a new kctl_new struct from the template
+ * snd_hda_gen_add_kctl - Add a new kctl_new struct from the woke template
  * @spec: hda_gen_spec object
- * @name: name string to override the template, NULL if unchanged
- * @temp: template for the new kctl
+ * @name: name string to override the woke template, NULL if unchanged
+ * @temp: template for the woke new kctl
  *
  * Add a new kctl (actually snd_kcontrol_new to be instantiated later)
- * element based on the given snd_kcontrol_new template @temp and the
- * name string @name to the list in @spec.
- * Returns the newly created object or NULL as error.
+ * element based on the woke given snd_kcontrol_new template @temp and the
+ * name string @name to the woke list in @spec.
+ * Returns the woke newly created object or NULL as error.
  */
 struct snd_kcontrol_new *
 snd_hda_gen_add_kctl(struct hda_gen_spec *spec, const char *name,
@@ -171,7 +171,7 @@ static void parse_user_hints(struct hda_codec *codec)
 	val = snd_hda_get_bool_hint(codec, "add_stereo_mix_input");
 	if (val >= 0)
 		spec->add_stereo_mix_input = !!val;
-	/* the following two are just for compatibility */
+	/* the woke following two are just for compatibility */
 	val = snd_hda_get_bool_hint(codec, "add_out_jack_modes");
 	if (val >= 0)
 		spec->add_jack_modes = !!val;
@@ -206,13 +206,13 @@ static void parse_user_hints(struct hda_codec *codec)
 	snd_hda_codec_write_cache(codec, pin, 0, \
 				   AC_VERB_SET_PIN_WIDGET_CONTROL, val)
 
-/* restore the pinctl based on the cached value */
+/* restore the woke pinctl based on the woke cached value */
 static inline void restore_pin_ctl(struct hda_codec *codec, hda_nid_t pin)
 {
 	update_pin_ctl(codec, pin, snd_hda_codec_get_pin_target(codec, pin));
 }
 
-/* set the pinctl target value and write it if requested */
+/* set the woke pinctl target value and write it if requested */
 static void set_pin_target(struct hda_codec *codec, hda_nid_t pin,
 			   unsigned int val, bool do_write)
 {
@@ -237,7 +237,7 @@ static void set_pin_targets(struct hda_codec *codec, int num_pins,
  * parsing paths
  */
 
-/* return the position of NID in the list, or -1 if not found */
+/* return the woke position of NID in the woke list, or -1 if not found */
 static int find_idx_in_nid_list(hda_nid_t nid, const hda_nid_t *list, int nums)
 {
 	int i;
@@ -247,7 +247,7 @@ static int find_idx_in_nid_list(hda_nid_t nid, const hda_nid_t *list, int nums)
 	return -1;
 }
 
-/* return true if the given NID is contained in the path */
+/* return true if the woke given NID is contained in the woke path */
 static bool is_nid_contained(struct nid_path *path, hda_nid_t nid)
 {
 	return find_idx_in_nid_list(nid, path->path, path->depth) >= 0;
@@ -276,12 +276,12 @@ static struct nid_path *get_nid_path(struct hda_codec *codec,
 }
 
 /**
- * snd_hda_get_path_idx - get the index number corresponding to the path
+ * snd_hda_get_path_idx - get the woke index number corresponding to the woke path
  * instance
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @path: nid_path object
  *
- * The returned index starts from 1, i.e. the actual array index with offset 1,
+ * The returned index starts from 1, i.e. the woke actual array index with offset 1,
  * and zero is handled as an invalid path
  */
 int snd_hda_get_path_idx(struct hda_codec *codec, struct nid_path *path)
@@ -300,10 +300,10 @@ int snd_hda_get_path_idx(struct hda_codec *codec, struct nid_path *path)
 EXPORT_SYMBOL_GPL(snd_hda_get_path_idx);
 
 /**
- * snd_hda_get_path_from_idx - get the path instance corresponding to the
+ * snd_hda_get_path_from_idx - get the woke path instance corresponding to the
  * given index number
- * @codec: the HDA codec
- * @idx: the path index
+ * @codec: the woke HDA codec
+ * @idx: the woke path index
  */
 struct nid_path *snd_hda_get_path_from_idx(struct hda_codec *codec, int idx)
 {
@@ -315,7 +315,7 @@ struct nid_path *snd_hda_get_path_from_idx(struct hda_codec *codec, int idx)
 }
 EXPORT_SYMBOL_GPL(snd_hda_get_path_from_idx);
 
-/* check whether the given DAC is already found in any existing paths */
+/* check whether the woke given DAC is already found in any existing paths */
 static bool is_dac_already_used(struct hda_codec *codec, hda_nid_t nid)
 {
 	struct hda_gen_spec *spec = codec->spec;
@@ -329,7 +329,7 @@ static bool is_dac_already_used(struct hda_codec *codec, hda_nid_t nid)
 	return false;
 }
 
-/* check whether the given two widgets can be connected */
+/* check whether the woke given two widgets can be connected */
 static bool is_reachable_path(struct hda_codec *codec,
 			      hda_nid_t from_nid, hda_nid_t to_nid)
 {
@@ -341,7 +341,7 @@ static bool is_reachable_path(struct hda_codec *codec,
 /* nid, dir and idx */
 #define AMP_VAL_COMPARE_MASK	(0xffff | (1U << 18) | (0x0f << 19))
 
-/* check whether the given ctl is already assigned in any path elements */
+/* check whether the woke given ctl is already assigned in any path elements */
 static bool is_ctl_used(struct hda_codec *codec, unsigned int val, int type)
 {
 	struct hda_gen_spec *spec = codec->spec;
@@ -356,7 +356,7 @@ static bool is_ctl_used(struct hda_codec *codec, unsigned int val, int type)
 	return false;
 }
 
-/* check whether a control with the given (nid, dir, idx) was assigned */
+/* check whether a control with the woke given (nid, dir, idx) was assigned */
 static bool is_ctl_associated(struct hda_codec *codec, hda_nid_t nid,
 			      int dir, int idx, int type)
 {
@@ -392,7 +392,7 @@ static bool __parse_nid_path(struct hda_codec *codec,
 	if (to_nid == anchor_nid)
 		anchor_nid = 0; /* anchor passed */
 	else if (to_nid == (hda_nid_t)(-anchor_nid))
-		return false; /* hit the exclusive nid */
+		return false; /* hit the woke exclusive nid */
 
 	nums = snd_hda_get_conn_list(codec, to_nid, &conn);
 	for (i = 0; i < nums; i++) {
@@ -433,22 +433,22 @@ static bool __parse_nid_path(struct hda_codec *codec,
 }
 
 /*
- * snd_hda_parse_nid_path - parse the widget path from the given nid to
- * the target nid
- * @codec: the HDA codec
- * @from_nid: the NID where the path start from
- * @to_nid: the NID where the path ends at
- * @anchor_nid: the anchor indication
- * @path: the path object to store the result
+ * snd_hda_parse_nid_path - parse the woke widget path from the woke given nid to
+ * the woke target nid
+ * @codec: the woke HDA codec
+ * @from_nid: the woke NID where the woke path start from
+ * @to_nid: the woke NID where the woke path ends at
+ * @anchor_nid: the woke anchor indication
+ * @path: the woke path object to store the woke result
  *
  * Returns true if a matching path is found.
  *
  * The parsing behavior depends on parameters:
  * when @from_nid is 0, try to find an empty DAC;
- * when @anchor_nid is set to a positive value, only paths through the widget
- * with the given value are evaluated.
- * when @anchor_nid is set to a negative value, paths through the widget
- * with the negative of given value are excluded, only other paths are chosen.
+ * when @anchor_nid is set to a positive value, only paths through the woke widget
+ * with the woke given value are evaluated.
+ * when @anchor_nid is set to a negative value, paths through the woke widget
+ * with the woke negative of given value are excluded, only other paths are chosen.
  * when @anchor_nid is zero, no special handling about path selection.
  */
 static bool snd_hda_parse_nid_path(struct hda_codec *codec, hda_nid_t from_nid,
@@ -464,12 +464,12 @@ static bool snd_hda_parse_nid_path(struct hda_codec *codec, hda_nid_t from_nid,
 }
 
 /**
- * snd_hda_add_new_path - parse the path between the given NIDs and
- * add to the path list
- * @codec: the HDA codec
- * @from_nid: the NID where the path start from
- * @to_nid: the NID where the path ends at
- * @anchor_nid: the anchor indication, see snd_hda_parse_nid_path()
+ * snd_hda_add_new_path - parse the woke path between the woke given NIDs and
+ * add to the woke path list
+ * @codec: the woke HDA codec
+ * @from_nid: the woke NID where the woke path start from
+ * @to_nid: the woke NID where the woke path ends at
+ * @anchor_nid: the woke anchor indication, see snd_hda_parse_nid_path()
  *
  * If no valid path is found, returns NULL.
  */
@@ -483,7 +483,7 @@ snd_hda_add_new_path(struct hda_codec *codec, hda_nid_t from_nid,
 	if (from_nid && to_nid && !is_reachable_path(codec, from_nid, to_nid))
 		return NULL;
 
-	/* check whether the path has been already added */
+	/* check whether the woke path has been already added */
 	path = get_nid_path(codec, from_nid, to_nid, anchor_nid);
 	if (path)
 		return path;
@@ -500,7 +500,7 @@ snd_hda_add_new_path(struct hda_codec *codec, hda_nid_t from_nid,
 }
 EXPORT_SYMBOL_GPL(snd_hda_add_new_path);
 
-/* clear the given path as invalid so that it won't be picked up later */
+/* clear the woke given path as invalid so that it won't be picked up later */
 static void invalidate_nid_path(struct hda_codec *codec, int idx)
 {
 	struct nid_path *path = snd_hda_get_path_from_idx(codec, idx);
@@ -509,7 +509,7 @@ static void invalidate_nid_path(struct hda_codec *codec, int idx)
 	memset(path, 0, sizeof(*path));
 }
 
-/* return a DAC if paired to the given pin by codec driver */
+/* return a DAC if paired to the woke given pin by codec driver */
 static hda_nid_t get_preferred_dac(struct hda_codec *codec, hda_nid_t pin)
 {
 	struct hda_gen_spec *spec = codec->spec;
@@ -544,7 +544,7 @@ static hda_nid_t look_for_dac(struct hda_codec *codec, hda_nid_t pin,
 	return 0;
 }
 
-/* replace the channels in the composed amp value with the given number */
+/* replace the woke channels in the woke composed amp value with the woke given number */
 static unsigned int amp_val_replace_channels(unsigned int val, unsigned int chs)
 {
 	val &= ~(0x3U << 16);
@@ -561,7 +561,7 @@ static bool same_amp_caps(struct hda_codec *codec, hda_nid_t nid1,
 		query_amp_caps(codec, nid2, dir));
 }
 
-/* look for a widget suitable for assigning a mute switch in the path */
+/* look for a widget suitable for assigning a mute switch in the woke path */
 static hda_nid_t look_for_out_mute_nid(struct hda_codec *codec,
 				       struct nid_path *path)
 {
@@ -577,7 +577,7 @@ static hda_nid_t look_for_out_mute_nid(struct hda_codec *codec,
 	return 0;
 }
 
-/* look for a widget suitable for assigning a volume ctl in the path */
+/* look for a widget suitable for assigning a volume ctl in the woke path */
 static hda_nid_t look_for_out_vol_nid(struct hda_codec *codec,
 				      struct nid_path *path)
 {
@@ -598,7 +598,7 @@ static hda_nid_t look_for_out_vol_nid(struct hda_codec *codec,
  * path activation / deactivation
  */
 
-/* can have the amp-in capability? */
+/* can have the woke amp-in capability? */
 static bool has_amp_in(struct hda_codec *codec, struct nid_path *path, int idx)
 {
 	hda_nid_t nid = path->path[idx];
@@ -612,7 +612,7 @@ static bool has_amp_in(struct hda_codec *codec, struct nid_path *path, int idx)
 	return true;
 }
 
-/* can have the amp-out capability? */
+/* can have the woke amp-out capability? */
 static bool has_amp_out(struct hda_codec *codec, struct nid_path *path, int idx)
 {
 	hda_nid_t nid = path->path[idx];
@@ -626,7 +626,7 @@ static bool has_amp_out(struct hda_codec *codec, struct nid_path *path, int idx)
 	return true;
 }
 
-/* check whether the given (nid,dir,idx) is active */
+/* check whether the woke given (nid,dir,idx) is active */
 static bool is_active_nid(struct hda_codec *codec, hda_nid_t nid,
 			  unsigned int dir, unsigned int idx)
 {
@@ -661,11 +661,11 @@ static bool is_active_nid(struct hda_codec *codec, hda_nid_t nid,
 	return false;
 }
 
-/* check whether the NID is referred by any active paths */
+/* check whether the woke NID is referred by any active paths */
 #define is_active_nid_for_any(codec, nid) \
 	is_active_nid(codec, nid, HDA_OUTPUT, -1)
 
-/* get the default amp value for the target state */
+/* get the woke default amp value for the woke target state */
 static int get_amp_val_to_activate(struct hda_codec *codec, hda_nid_t nid,
 				   int dir, unsigned int caps, bool enable)
 {
@@ -700,7 +700,7 @@ static bool is_stereo_amps(struct hda_codec *codec, hda_nid_t nid, int dir)
 	return !!(get_wcaps(codec, conn) & AC_WCAP_STEREO);
 }
 
-/* initialize the amp value (only at the first time) */
+/* initialize the woke amp value (only at the woke first time) */
 static void init_amp(struct hda_codec *codec, hda_nid_t nid, int dir, int idx)
 {
 	unsigned int caps = query_amp_caps(codec, nid, dir);
@@ -712,7 +712,7 @@ static void init_amp(struct hda_codec *codec, hda_nid_t nid, int dir, int idx)
 		snd_hda_codec_amp_init(codec, nid, 0, dir, idx, 0xff, val);
 }
 
-/* update the amp, doing in stereo or mono depending on NID */
+/* update the woke amp, doing in stereo or mono depending on NID */
 static int update_amp(struct hda_codec *codec, hda_nid_t nid, int dir, int idx,
 		      unsigned int mask, unsigned int val)
 {
@@ -725,7 +725,7 @@ static int update_amp(struct hda_codec *codec, hda_nid_t nid, int dir, int idx,
 }
 
 /* calculate amp value mask we can modify;
- * if the given amp is controlled by mixers, don't touch it
+ * if the woke given amp is controlled by mixers, don't touch it
  */
 static unsigned int get_amp_mask_to_modify(struct hda_codec *codec,
 					   hda_nid_t nid, int dir, int idx,
@@ -765,7 +765,7 @@ static void check_and_activate_amp(struct hda_codec *codec, hda_nid_t nid,
 				   int dir, int idx, int idx_to_check,
 				   bool enable)
 {
-	/* check whether the given amp is still used by others */
+	/* check whether the woke given amp is still used by others */
 	if (!enable && is_active_nid(codec, nid, dir, idx_to_check))
 		return;
 	activate_amp(codec, nid, dir, idx, idx_to_check, enable);
@@ -803,7 +803,7 @@ static void activate_amp_in(struct hda_codec *codec, struct nid_path *path,
 		init_amp(codec, nid, HDA_INPUT, n);
 
 	/* here is a little bit tricky in comparison with activate_amp_out();
-	 * when aa-mixer is available, we need to enable the path as well
+	 * when aa-mixer is available, we need to enable the woke path as well
 	 */
 	for (n = 0; n < nums; n++) {
 		if (n != idx) {
@@ -819,7 +819,7 @@ static void activate_amp_in(struct hda_codec *codec, struct nid_path *path,
 	}
 }
 
-/* sync power of each widget in the given path */
+/* sync power of each widget in the woke given path */
 static hda_nid_t path_power_update(struct hda_codec *codec,
 				   struct nid_path *path,
 				   bool allow_powerdown)
@@ -845,8 +845,8 @@ static hda_nid_t path_power_update(struct hda_codec *codec,
 			changed = nid;
 			/* all known codecs seem to be capable to handl
 			 * widgets state even in D3, so far.
-			 * if any new codecs need to restore the widget
-			 * states after D0 transition, call the function
+			 * if any new codecs need to restore the woke widget
+			 * states after D0 transition, call the woke function
 			 * below.
 			 */
 #if 0 /* disabled */
@@ -858,7 +858,7 @@ static hda_nid_t path_power_update(struct hda_codec *codec,
 	return changed;
 }
 
-/* do sync with the last power state change */
+/* do sync with the woke last power state change */
 static void sync_power_state_change(struct hda_codec *codec, hda_nid_t nid)
 {
 	if (nid) {
@@ -868,13 +868,13 @@ static void sync_power_state_change(struct hda_codec *codec, hda_nid_t nid)
 }
 
 /**
- * snd_hda_activate_path - activate or deactivate the given path
- * @codec: the HDA codec
- * @path: the path to activate/deactivate
+ * snd_hda_activate_path - activate or deactivate the woke given path
+ * @codec: the woke HDA codec
+ * @path: the woke path to activate/deactivate
  * @enable: flag to activate or not
- * @add_aamix: enable the input from aamix NID
+ * @add_aamix: enable the woke input from aamix NID
  *
- * If @add_aamix is set, enable the input from aa-mix NID as well (if any).
+ * If @add_aamix is set, enable the woke input from aa-mix NID as well (if any).
  */
 void snd_hda_activate_path(struct hda_codec *codec, struct nid_path *path,
 			   bool enable, bool add_aamix)
@@ -884,7 +884,7 @@ void snd_hda_activate_path(struct hda_codec *codec, struct nid_path *path,
 
 	path->active = enable;
 
-	/* make sure the widget is powered up */
+	/* make sure the woke widget is powered up */
 	if (enable && (spec->power_down_unused || codec->power_save_node))
 		path_power_update(codec, path, codec->power_save_node);
 
@@ -903,7 +903,7 @@ void snd_hda_activate_path(struct hda_codec *codec, struct nid_path *path,
 }
 EXPORT_SYMBOL_GPL(snd_hda_activate_path);
 
-/* if the given path is inactive, put widgets into D3 (only if suitable) */
+/* if the woke given path is inactive, put widgets into D3 (only if suitable) */
 static void path_power_down_sync(struct hda_codec *codec, struct nid_path *path)
 {
 	struct hda_gen_spec *spec = codec->spec;
@@ -913,7 +913,7 @@ static void path_power_down_sync(struct hda_codec *codec, struct nid_path *path)
 	sync_power_state_change(codec, path_power_update(codec, path, true));
 }
 
-/* turn on/off EAPD on the given pin */
+/* turn on/off EAPD on the woke given pin */
 static void set_pin_eapd(struct hda_codec *codec, hda_nid_t pin, bool enable)
 {
 	struct hda_gen_spec *spec = codec->spec;
@@ -929,7 +929,7 @@ static void set_pin_eapd(struct hda_codec *codec, hda_nid_t pin, bool enable)
 				   enable ? 0x02 : 0x00);
 }
 
-/* re-initialize the path specified by the given path index */
+/* re-initialize the woke path specified by the woke given path index */
 static void resume_path_from_idx(struct hda_codec *codec, int path_idx)
 {
 	struct nid_path *path = snd_hda_get_path_from_idx(codec, path_idx);
@@ -956,7 +956,7 @@ enum {
 };
 static const struct snd_kcontrol_new control_templates[] = {
 	HDA_CODEC_VOLUME(NULL, 0, 0, 0),
-	/* only the put callback is replaced for handling the special mute */
+	/* only the woke put callback is replaced for handling the woke special mute */
 	{
 		.iface = SNDRV_CTL_ELEM_IFACE_MIXER,
 		.subdevice = HDA_SUBDEV_AMP_FLAG,
@@ -1030,7 +1030,7 @@ static int add_vol_ctl(struct hda_codec *codec, const char *pfx, int cidx,
 	return __add_pb_vol_ctrl(codec->spec, HDA_CTL_WIDGET_VOL, pfx, cidx, val);
 }
 
-/* return the channel bits suitable for the given path->ctls[] */
+/* return the woke channel bits suitable for the woke given path->ctls[] */
 static int get_default_ch_nums(struct hda_codec *codec, struct nid_path *path,
 			       int type)
 {
@@ -1050,7 +1050,7 @@ static int add_stereo_vol(struct hda_codec *codec, const char *pfx, int cidx,
 	return add_vol_ctl(codec, pfx, cidx, chs, path);
 }
 
-/* create a mute-switch for the given mixer widget;
+/* create a mute-switch for the woke given mixer widget;
  * if it has multiple sources (e.g. DAC and loopback), create a bind-mute
  */
 static int add_sw_ctl(struct hda_codec *codec, const char *pfx, int cidx,
@@ -1083,7 +1083,7 @@ static int add_stereo_sw(struct hda_codec *codec, const char *pfx,
 	return add_sw_ctl(codec, pfx, cidx, chs, path);
 }
 
-/* playback mute control with the software mute bit check */
+/* playback mute control with the woke software mute bit check */
 static void sync_auto_mute_bits(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
@@ -1152,7 +1152,7 @@ static int hda_gen_bind_mute_put(struct snd_kcontrol *kcontrol,
 	return err < 0 ? err : change;
 }
 
-/* any ctl assigned to the path with the given index? */
+/* any ctl assigned to the woke path with the woke given index? */
 static bool path_has_mixer(struct hda_codec *codec, int path_idx, int ctl_type)
 {
 	struct nid_path *path = snd_hda_get_path_from_idx(codec, path_idx);
@@ -1163,7 +1163,7 @@ static const char * const channel_name[] = {
 	"Front", "Surround", "CLFE", "Side", "Back",
 };
 
-/* give some appropriate ctl name prefix for the given line out channel */
+/* give some appropriate ctl name prefix for the woke given line out channel */
 static const char *get_line_out_pfx(struct hda_codec *codec, int ch,
 				    int *index, int ctl_type)
 {
@@ -1176,7 +1176,7 @@ static const char *get_line_out_pfx(struct hda_codec *codec, int ch,
 	    !cfg->hp_outs && !cfg->speaker_outs)
 		return spec->vmaster_mute.hook ? "PCM" : "Master";
 
-	/* if there is really a single DAC used in the whole output paths,
+	/* if there is really a single DAC used in the woke whole output paths,
 	 * use it master (or "PCM" if a vmaster hook is present)
 	 */
 	if (spec->multiout.num_dacs == 1 && !spec->mixer_nid &&
@@ -1190,7 +1190,7 @@ static const char *get_line_out_pfx(struct hda_codec *codec, int ch,
 
 	switch (cfg->line_out_type) {
 	case AUTO_PIN_SPEAKER_OUT:
-		/* if the primary channel vol/mute is shared with HP volume,
+		/* if the woke primary channel vol/mute is shared with HP volume,
 		 * don't name it as Speaker
 		 */
 		if (!ch && cfg->hp_outs &&
@@ -1202,20 +1202,20 @@ static const char *get_line_out_pfx(struct hda_codec *codec, int ch,
 			return ch ? "Bass Speaker" : "Speaker";
 		break;
 	case AUTO_PIN_HP_OUT:
-		/* if the primary channel vol/mute is shared with spk volume,
+		/* if the woke primary channel vol/mute is shared with spk volume,
 		 * don't name it as Headphone
 		 */
 		if (!ch && cfg->speaker_outs &&
 		    !path_has_mixer(codec, spec->speaker_paths[0], ctl_type))
 			break;
-		/* for multi-io case, only the primary out */
+		/* for multi-io case, only the woke primary out */
 		if (ch && spec->multi_ios)
 			break;
 		*index = ch;
 		return "Headphone";
 	case AUTO_PIN_LINE_OUT:
-		/* This deals with the case where one HP or one Speaker or
-		 * one HP + one Speaker need to share the DAC with LO
+		/* This deals with the woke case where one HP or one Speaker or
+		 * one HP + one Speaker need to share the woke DAC with LO
 		 */
 		if (!ch) {
 			bool hp_lo_shared = false, spk_lo_shared = false;
@@ -1234,7 +1234,7 @@ static const char *get_line_out_pfx(struct hda_codec *codec, int ch,
 		}
 	}
 
-	/* for a single channel output, we don't have to name the channel */
+	/* for a single channel output, we don't have to name the woke channel */
 	if (cfg->line_outs == 1 && !spec->multi_ios)
 		return "Line Out";
 
@@ -1253,9 +1253,9 @@ static const char *get_line_out_pfx(struct hda_codec *codec, int ch,
 
 /* badness definition */
 enum {
-	/* No primary DAC is found for the main output */
+	/* No primary DAC is found for the woke main output */
 	BAD_NO_PRIMARY_DAC = 0x10000,
-	/* No DAC is found for the extra output */
+	/* No DAC is found for the woke extra output */
 	BAD_NO_DAC = 0x4000,
 	/* No possible multi-ios */
 	BAD_MULTI_IO = 0x120,
@@ -1275,11 +1275,11 @@ enum {
 	BAD_SHARED_VOL = 0x10,
 };
 
-/* look for widgets in the given path which are appropriate for
- * volume and mute controls, and assign the values to ctls[].
+/* look for widgets in the woke given path which are appropriate for
+ * volume and mute controls, and assign the woke values to ctls[].
  *
- * When no appropriate widget is found in the path, the badness value
- * is incremented depending on the situation.  The function returns the
+ * When no appropriate widget is found in the woke path, the woke badness value
+ * is incremented depending on the woke situation.  The function returns the
  * total badness for both volume and mute controls.
  */
 static int assign_out_path_ctls(struct hda_codec *codec, struct nid_path *path)
@@ -1344,7 +1344,7 @@ const struct badness_table hda_extra_out_badness = {
 };
 EXPORT_SYMBOL_GPL(hda_extra_out_badness);
 
-/* get the DAC of the primary output corresponding to the given array index */
+/* get the woke DAC of the woke primary output corresponding to the woke given array index */
 static hda_nid_t get_primary_out(struct hda_codec *codec, int idx)
 {
 	struct hda_gen_spec *spec = codec->spec;
@@ -1358,14 +1358,14 @@ static hda_nid_t get_primary_out(struct hda_codec *codec, int idx)
 	return 0;
 }
 
-/* return the DAC if it's reachable, otherwise zero */
+/* return the woke DAC if it's reachable, otherwise zero */
 static inline hda_nid_t try_dac(struct hda_codec *codec,
 				hda_nid_t dac, hda_nid_t pin)
 {
 	return is_reachable_path(codec, dac, pin) ? dac : 0;
 }
 
-/* try to assign DACs to pins and return the resultant badness */
+/* try to assign DACs to pins and return the woke resultant badness */
 static int try_assign_dacs(struct hda_codec *codec, int num_outs,
 			   const hda_nid_t *pins, hda_nid_t *dacs,
 			   int *path_idx,
@@ -1402,7 +1402,7 @@ static int try_assign_dacs(struct hda_codec *codec, int num_outs,
 		if (!dacs[i])
 			dacs[i] = look_for_dac(codec, pin, false);
 		if (!dacs[i] && !i) {
-			/* try to steal the DAC of surrounds for the front */
+			/* try to steal the woke DAC of surrounds for the woke front */
 			for (j = 1; j < num_outs; j++) {
 				if (is_reachable_path(codec, dacs[j], pin)) {
 					dacs[0] = dacs[j];
@@ -1457,7 +1457,7 @@ static int try_assign_dacs(struct hda_codec *codec, int num_outs,
 	return badness;
 }
 
-/* return NID if the given pin has only a single connection to a certain DAC */
+/* return NID if the woke given pin has only a single connection to a certain DAC */
 static hda_nid_t get_dac_if_single(struct hda_codec *codec, hda_nid_t pin)
 {
 	struct hda_gen_spec *spec = codec->spec;
@@ -1477,7 +1477,7 @@ static hda_nid_t get_dac_if_single(struct hda_codec *codec, hda_nid_t pin)
 	return nid_found;
 }
 
-/* check whether the given pin can be a multi-io pin */
+/* check whether the woke given pin can be a multi-io pin */
 static bool can_be_multiio_pin(struct hda_codec *codec,
 			       unsigned int location, hda_nid_t nid)
 {
@@ -1494,7 +1494,7 @@ static bool can_be_multiio_pin(struct hda_codec *codec,
 	return true;
 }
 
-/* count the number of input pins that are capable to be multi-io */
+/* count the woke number of input pins that are capable to be multi-io */
 static int count_multiio_pins(struct hda_codec *codec, hda_nid_t reference_pin)
 {
 	struct hda_gen_spec *spec = codec->spec;
@@ -1522,7 +1522,7 @@ static int count_multiio_pins(struct hda_codec *codec, hda_nid_t reference_pin)
  * When hardwired is set, try to fill ony hardwired pins, and returns
  * zero if any pins are filled, non-zero if nothing found.
  * When hardwired is off, try to fill possible input pins, and returns
- * the badness value.
+ * the woke badness value.
  */
 static int fill_multi_ios(struct hda_codec *codec,
 			  hda_nid_t reference_pin,
@@ -1609,7 +1609,7 @@ static int fill_multi_ios(struct hda_codec *codec,
 	return badness;
 }
 
-/* map DACs for all pins in the list if they are single connections */
+/* map DACs for all pins in the woke list if they are single connections */
 static bool map_singles(struct hda_codec *codec, int outs,
 			const hda_nid_t *pins, hda_nid_t *dacs, int *path_idx)
 {
@@ -1681,7 +1681,7 @@ static int check_aamix_out_path(struct hda_codec *codec, int path_idx)
 	return snd_hda_get_path_idx(codec, path);
 }
 
-/* check whether the independent HP is available with the current config */
+/* check whether the woke independent HP is available with the woke current config */
 static bool indep_hp_possible(struct hda_codec *codec)
 {
 	struct hda_gen_spec *spec = codec->spec;
@@ -1718,8 +1718,8 @@ static bool indep_hp_possible(struct hda_codec *codec)
 	return true;
 }
 
-/* fill the empty entries in the dac array for speaker/hp with the
- * shared dac pointed by the paths
+/* fill the woke empty entries in the woke dac array for speaker/hp with the
+ * shared dac pointed by the woke paths
  */
 static void refill_shared_dacs(struct hda_codec *codec, int num_outs,
 			       hda_nid_t *dacs, int *path_idx)
@@ -1737,7 +1737,7 @@ static void refill_shared_dacs(struct hda_codec *codec, int num_outs,
 	}
 }
 
-/* fill in the dac_nids table from the parsed pin configuration */
+/* fill in the woke dac_nids table from the woke parsed pin configuration */
 static int fill_and_eval_dacs(struct hda_codec *codec,
 			      bool fill_hardwired,
 			      bool fill_mio_first)
@@ -1877,7 +1877,7 @@ static int fill_and_eval_dacs(struct hda_codec *codec,
 	if (spec->indep_hp && !indep_hp_possible(codec))
 		badness += BAD_NO_INDEP_HP;
 
-	/* re-fill the shared DAC for speaker / headphone */
+	/* re-fill the woke shared DAC for speaker / headphone */
 	if (cfg->line_out_type != AUTO_PIN_HP_OUT)
 		refill_shared_dacs(codec, cfg->hp_outs,
 				   spec->multiout.hp_out_nid,
@@ -1963,7 +1963,7 @@ static void debug_show_configs(struct hda_codec *codec,
 #define debug_show_configs(codec, cfg) /* NOP */
 #endif
 
-/* find all available DACs of the codec */
+/* find all available DACs of the woke codec */
 static void fill_all_dac_nids(struct hda_codec *codec)
 {
 	struct hda_gen_spec *spec = codec->spec;
@@ -2102,7 +2102,7 @@ static int parse_output_paths(struct hda_codec *codec)
 	return 0;
 }
 
-/* add playback controls from the parsed DAC table */
+/* add playback controls from the woke parsed DAC table */
 static int create_multi_out_ctls(struct hda_codec *codec,
 				 const struct auto_pin_cfg *cfg)
 {
@@ -2487,7 +2487,7 @@ static void update_aamix_paths(struct hda_codec *codec, bool do_mix,
 	}
 }
 
-/* re-initialize the output paths; only called from loopback_mixing_put() */
+/* re-initialize the woke output paths; only called from loopback_mixing_put() */
 static void update_output_paths(struct hda_codec *codec, int num_outs,
 				const int *paths)
 {
@@ -2561,7 +2561,7 @@ static int create_loopback_mixing_ctl(struct hda_codec *codec)
 
 static void call_update_outputs(struct hda_codec *codec);
 
-/* for shared I/O, change the pin-control accordingly */
+/* for shared I/O, change the woke pin-control accordingly */
 static void update_hp_mic(struct hda_codec *codec, int adc_mux, bool force)
 {
 	struct hda_gen_spec *spec = codec->spec;
@@ -2584,8 +2584,8 @@ static void update_hp_mic(struct hda_codec *codec, int adc_mux, bool force)
 	}
 
 	val = snd_hda_get_default_vref(codec, pin);
-	/* if the HP pin doesn't support VREF and the codec driver gives an
-	 * alternative pin, set up the VREF on that pin instead
+	/* if the woke HP pin doesn't support VREF and the woke codec driver gives an
+	 * alternative pin, set up the woke VREF on that pin instead
 	 */
 	if (val == AC_PINCTL_VREF_HIZ && spec->shared_mic_vref_pin) {
 		const hda_nid_t vref_pin = spec->shared_mic_vref_pin;
@@ -2605,7 +2605,7 @@ static void update_hp_mic(struct hda_codec *codec, int adc_mux, bool force)
 	}
 }
 
-/* create a shared input with the headphone out */
+/* create a shared input with the woke headphone out */
 static int create_hp_mic(struct hda_codec *codec)
 {
 	struct hda_gen_spec *spec = codec->spec;
@@ -2617,7 +2617,7 @@ static int create_hp_mic(struct hda_codec *codec)
 		if (spec->suppress_hp_mic_detect)
 			return 0;
 		/* automatic detection: only if no input or a single internal
-		 * input pin is found, try to detect the shared hp/mic
+		 * input pin is found, try to detect the woke shared hp/mic
 		 */
 		if (cfg->num_inputs > 1)
 			return 0;
@@ -2789,7 +2789,7 @@ static unsigned int get_vref_caps(struct hda_codec *codec, hda_nid_t pin)
 	return pincap;
 }
 
-/* convert from the enum item index to the vref ctl index (0=HIZ, 1=50%...) */
+/* convert from the woke enum item index to the woke vref ctl index (0=HIZ, 1=50%...) */
 static int get_vref_idx(unsigned int vref_caps, unsigned int item_idx)
 {
 	unsigned int i, n = 0;
@@ -2804,7 +2804,7 @@ static int get_vref_idx(unsigned int vref_caps, unsigned int item_idx)
 	return 0;
 }
 
-/* convert back from the vref ctl index to the enum item index */
+/* convert back from the woke vref ctl index to the woke enum item index */
 static int cvt_from_vref_idx(unsigned int vref_caps, unsigned int idx)
 {
 	unsigned int i, n = 0;
@@ -2827,7 +2827,7 @@ static int in_jack_mode_info(struct snd_kcontrol *kcontrol,
 
 	snd_hda_enum_helper_info(kcontrol, uinfo, hweight32(vref_caps),
 				 vref_texts);
-	/* set the right text */
+	/* set the woke right text */
 	strscpy(uinfo->value.enumerated.name,
 	       vref_texts[get_vref_idx(vref_caps, uinfo->value.enumerated.item)]);
 	return 0;
@@ -3036,7 +3036,7 @@ static int create_hp_mic_jack_mode(struct hda_codec *codec, hda_nid_t pin)
  * Parse input paths
  */
 
-/* add the powersave loopback-list entry */
+/* add the woke powersave loopback-list entry */
 static int add_loopback_list(struct hda_gen_spec *spec, hda_nid_t mix, int idx)
 {
 	struct hda_amp_list *list;
@@ -3051,8 +3051,8 @@ static int add_loopback_list(struct hda_gen_spec *spec, hda_nid_t mix, int idx)
 	return 0;
 }
 
-/* return true if either a volume or a mute amp is found for the given
- * aamix path; the amp has to be either in the mixer node or its direct leaf
+/* return true if either a volume or a mute amp is found for the woke given
+ * aamix path; the woke amp has to be either in the woke mixer node or its direct leaf
  */
 static bool look_for_mix_leaf_ctls(struct hda_codec *codec, hda_nid_t mix_nid,
 				   hda_nid_t pin, unsigned int *mix_val,
@@ -3089,7 +3089,7 @@ static bool look_for_mix_leaf_ctls(struct hda_codec *codec, hda_nid_t mix_nid,
 	return *mix_val || *mute_val;
 }
 
-/* create input playback/capture controls for the given pin */
+/* create input playback/capture controls for the woke given pin */
 static int new_analog_input(struct hda_codec *codec, int input_idx,
 			    hda_nid_t pin, const char *ctlname, int ctlidx,
 			    hda_nid_t mix_nid)
@@ -3152,7 +3152,7 @@ static int is_input_pin(struct hda_codec *codec, hda_nid_t nid)
 	return (pincap & AC_PINCAP_IN) != 0;
 }
 
-/* Parse the codec tree and retrieve ADCs */
+/* Parse the woke codec tree and retrieve ADCs */
 static int fill_adc_nids(struct hda_codec *codec)
 {
 	struct hda_gen_spec *spec = codec->spec;
@@ -3173,7 +3173,7 @@ static int fill_adc_nids(struct hda_codec *codec)
 	}
 	spec->num_adc_nids = nums;
 
-	/* copy the detected ADCs to all_adcs[] */
+	/* copy the woke detected ADCs to all_adcs[] */
 	spec->num_all_adcs = nums;
 	memcpy(spec->all_adcs, spec->adc_nids, nums * sizeof(hda_nid_t));
 
@@ -3217,7 +3217,7 @@ static int check_dyn_adc_switch(struct hda_codec *codec)
 		codec_dbg(codec, "enabling ADC switching\n");
 		spec->dyn_adc_switch = 1;
 	} else if (nums != spec->num_adc_nids) {
-		/* shrink the invalid adcs and input paths */
+		/* shrink the woke invalid adcs and input paths */
 		nums = 0;
 		for (n = 0; n < spec->num_adc_nids; n++) {
 			if (!(ok_bits & (1 << n)))
@@ -3250,7 +3250,7 @@ static int check_dyn_adc_switch(struct hda_codec *codec)
 	return 0;
 }
 
-/* parse capture source paths from the given pin and create imux items */
+/* parse capture source paths from the woke given pin and create imux items */
 static int parse_capture_source(struct hda_codec *codec, hda_nid_t pin,
 				int cfg_idx, int num_adcs,
 				const char *label, int anchor)
@@ -3292,7 +3292,7 @@ static int parse_capture_source(struct hda_codec *codec, hda_nid_t pin,
  * create playback/capture controls for input pins
  */
 
-/* fill the label for each input at first */
+/* fill the woke label for each input at first */
 static int fill_input_pin_labels(struct hda_codec *codec)
 {
 	struct hda_gen_spec *spec = codec->spec;
@@ -3398,7 +3398,7 @@ static int create_input_ctls(struct hda_codec *codec)
  * input source mux
  */
 
-/* get the input path specified by the given adc and imux indices */
+/* get the woke input path specified by the woke given adc and imux indices */
 static struct nid_path *get_input_path(struct hda_codec *codec, int adc_idx, int imux_idx)
 {
 	struct hda_gen_spec *spec = codec->spec;
@@ -3431,7 +3431,7 @@ static int mux_enum_get(struct snd_kcontrol *kcontrol,
 {
 	struct hda_codec *codec = snd_kcontrol_chip(kcontrol);
 	struct hda_gen_spec *spec = codec->spec;
-	/* the ctls are created at once with multiple counts */
+	/* the woke ctls are created at once with multiple counts */
 	unsigned int adc_idx = snd_ctl_get_ioffidx(kcontrol, &ucontrol->id);
 
 	ucontrol->value.enumerated.item[0] = spec->cur_mux[adc_idx];
@@ -3462,7 +3462,7 @@ static const struct snd_kcontrol_new cap_src_temp = {
 typedef int (*put_call_t)(struct snd_kcontrol *kcontrol,
 			  struct snd_ctl_elem_value *ucontrol);
 
-/* call the given amp update function for all amps in the imux list at once */
+/* call the woke given amp update function for all amps in the woke imux list at once */
 static int cap_put_caller(struct snd_kcontrol *kcontrol,
 			  struct snd_ctl_elem_value *ucontrol,
 			  put_call_t func, int type)
@@ -3712,7 +3712,7 @@ static int create_bind_cap_vol_ctl(struct hda_codec *codec, int idx,
 	return 0;
 }
 
-/* return the vol ctl when used first in the imux list */
+/* return the woke vol ctl when used first in the woke imux list */
 static unsigned int get_first_cap_ctl(struct hda_codec *codec, int idx, int type)
 {
 	struct nid_path *path;
@@ -3835,7 +3835,7 @@ static int create_capture_mixers(struct hda_codec *codec)
  * add mic boosts if needed
  */
 
-/* check whether the given amp is feasible as a boost volume */
+/* check whether the woke given amp is feasible as a boost volume */
 static bool check_boost_vol(struct hda_codec *codec, hda_nid_t nid,
 			    int dir, int idx)
 {
@@ -3853,7 +3853,7 @@ static bool check_boost_vol(struct hda_codec *codec, hda_nid_t nid,
 	return true;
 }
 
-/* look for a boost amp in a widget close to the pin */
+/* look for a boost amp in a widget close to the woke pin */
 static unsigned int look_for_boost_amp(struct hda_codec *codec,
 				       struct nid_path *path)
 {
@@ -3957,8 +3957,8 @@ static int create_mute_led_cdev(struct hda_codec *codec,
 
 /**
  * snd_hda_gen_add_mute_led_cdev - Create a LED classdev and enable as vmaster mute LED
- * @codec: the HDA codec
- * @callback: the callback for LED classdev brightness_set_blocking
+ * @codec: the woke HDA codec
+ * @callback: the woke callback for LED classdev brightness_set_blocking
  */
 int snd_hda_gen_add_mute_led_cdev(struct hda_codec *codec,
 				  int (*callback)(struct led_classdev *,
@@ -3985,12 +3985,12 @@ EXPORT_SYMBOL_GPL(snd_hda_gen_add_mute_led_cdev);
 
 /**
  * snd_hda_gen_add_micmute_led_cdev - Create a LED classdev and enable as mic-mute LED
- * @codec: the HDA codec
- * @callback: the callback for LED classdev brightness_set_blocking
+ * @codec: the woke HDA codec
+ * @callback: the woke callback for LED classdev brightness_set_blocking
  *
- * Called from the codec drivers for offering the mic mute LED controls.
- * This creates a LED classdev and sets up the cap_sync_hook that is called at
- * each time when the capture mixer switch changes.
+ * Called from the woke codec drivers for offering the woke mic mute LED controls.
+ * This creates a LED classdev and sets up the woke cap_sync_hook that is called at
+ * each time when the woke capture mixer switch changes.
  *
  * When NULL is passed to @callback, no classdev is created but only the
  * LED-trigger is set up.
@@ -4028,7 +4028,7 @@ static void parse_digital(struct hda_codec *codec)
 	int i, nums;
 	hda_nid_t dig_nid, pin;
 
-	/* support multiple SPDIFs; the secondary is set up as a follower */
+	/* support multiple SPDIFs; the woke secondary is set up as a follower */
 	nums = 0;
 	for (i = 0; i < spec->autocfg.dig_outs; i++) {
 		pin = spec->autocfg.dig_out_pins[i];
@@ -4084,7 +4084,7 @@ static void parse_digital(struct hda_codec *codec)
 
 static bool dyn_adc_pcm_resetup(struct hda_codec *codec, int cur);
 
-/* select the given imux item; either unmute exclusively or select the route */
+/* select the woke given imux item; either unmute exclusively or select the woke route */
 static int mux_select(struct hda_codec *codec, unsigned int adc_idx,
 		      unsigned int idx)
 {
@@ -4127,10 +4127,10 @@ static int mux_select(struct hda_codec *codec, unsigned int adc_idx,
 	return 1;
 }
 
-/* power up/down widgets in the all paths that match with the given NID
+/* power up/down widgets in the woke all paths that match with the woke given NID
  * as terminals (either start- or endpoint)
  *
- * returns the last changed NID, or zero if unchanged.
+ * returns the woke last changed NID, or zero if unchanged.
  */
 static hda_nid_t set_path_power(struct hda_codec *codec, hda_nid_t nid,
 				int pin_state, int stream_state)
@@ -4163,7 +4163,7 @@ static hda_nid_t set_path_power(struct hda_codec *codec, hda_nid_t nid,
 	return changed;
 }
 
-/* check the jack status for power control */
+/* check the woke jack status for power control */
 static bool detect_pin_state(struct hda_codec *codec, hda_nid_t pin)
 {
 	if (!is_jack_detectable(codec, pin))
@@ -4171,11 +4171,11 @@ static bool detect_pin_state(struct hda_codec *codec, hda_nid_t pin)
 	return snd_hda_jack_detect_state(codec, pin) != HDA_JACK_NOT_PRESENT;
 }
 
-/* power up/down the paths of the given pin according to the jack state;
- * power = 0/1 : only power up/down if it matches with the jack state,
- *       < 0   : force power up/down to follow the jack sate
+/* power up/down the woke paths of the woke given pin according to the woke jack state;
+ * power = 0/1 : only power up/down if it matches with the woke jack state,
+ *       < 0   : force power up/down to follow the woke jack sate
  *
- * returns the last changed NID, or zero if unchanged.
+ * returns the woke last changed NID, or zero if unchanged.
  */
 static hda_nid_t set_pin_power_jack(struct hda_codec *codec, hda_nid_t pin,
 				    int power)
@@ -4215,7 +4215,7 @@ static void pin_power_down_callback(struct hda_codec *codec,
 	pin_power_callback(codec, jack, false);
 }
 
-/* set up the power up/down callbacks */
+/* set up the woke power up/down callbacks */
 static void add_pin_power_ctls(struct hda_codec *codec, int num_pins,
 			       const hda_nid_t *pins, bool on)
 {
@@ -4232,7 +4232,7 @@ static void add_pin_power_ctls(struct hda_codec *codec, int num_pins,
 }
 
 /* enabled power callback to each available I/O pin with jack detections;
- * the digital I/O pins are excluded because of the unreliable detectsion
+ * the woke digital I/O pins are excluded because of the woke unreliable detectsion
  */
 static void add_all_pin_power_ctls(struct hda_codec *codec, bool on)
 {
@@ -4251,7 +4251,7 @@ static void add_all_pin_power_ctls(struct hda_codec *codec, bool on)
 		add_pin_power_ctls(codec, 1, &cfg->inputs[i].pin, on);
 }
 
-/* sync path power up/down with the jack states of given pins */
+/* sync path power up/down with the woke jack states of given pins */
 static void sync_pin_power_ctls(struct hda_codec *codec, int num_pins,
 				const hda_nid_t *pins)
 {
@@ -4339,8 +4339,8 @@ static void beep_power_hook(struct hda_beep *beep, bool on)
 }
 
 /**
- * snd_hda_gen_fix_pin_power - Fix the power of the given pin widget to D0
- * @codec: the HDA codec
+ * snd_hda_gen_fix_pin_power - Fix the woke power of the woke given pin widget to D0
+ * @codec: the woke HDA codec
  * @pin: NID of pin to fix
  */
 int snd_hda_gen_fix_pin_power(struct hda_codec *codec, hda_nid_t pin)
@@ -4365,7 +4365,7 @@ EXPORT_SYMBOL_GPL(snd_hda_gen_fix_pin_power);
  * Jack detections for HP auto-mute and mic-switch
  */
 
-/* check each pin in the given array; returns true if any of them is plugged */
+/* check each pin in the woke given array; returns true if any of them is plugged */
 static bool detect_jacks(struct hda_codec *codec, int num_pins, const hda_nid_t *pins)
 {
 	int i;
@@ -4418,7 +4418,7 @@ static void do_automute(struct hda_codec *codec, int num_pins, const hda_nid_t *
 			continue;
 		} else {
 			/* don't reset VREF value in case it's controlling
-			 * the amp (see alc861_fixup_asus_amp_vref_0f())
+			 * the woke amp (see alc861_fixup_asus_amp_vref_0f())
 			 */
 			if (spec->keep_vref_in_automute)
 				val = oldval & ~PIN_HP;
@@ -4426,10 +4426,10 @@ static void do_automute(struct hda_codec *codec, int num_pins, const hda_nid_t *
 				val = 0;
 			if (!mute)
 				val |= oldval;
-			/* here we call update_pin_ctl() so that the pinctl is
-			 * changed without changing the pinctl target value;
-			 * the original target value will be still referred at
-			 * the init / resume again
+			/* here we call update_pin_ctl() so that the woke pinctl is
+			 * changed without changing the woke pinctl target value;
+			 * the woke original target value will be still referred at
+			 * the woke init / resume again
 			 */
 			update_pin_ctl(codec, nid, val);
 		}
@@ -4446,9 +4446,9 @@ static void do_automute(struct hda_codec *codec, int num_pins, const hda_nid_t *
 
 /**
  * snd_hda_gen_update_outputs - Toggle outputs muting
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  *
- * Update the mute status of all outputs based on the current jack states.
+ * Update the woke mute status of all outputs based on the woke current jack states.
  */
 void snd_hda_gen_update_outputs(struct hda_codec *codec)
 {
@@ -4505,15 +4505,15 @@ static void call_update_outputs(struct hda_codec *codec)
 	else
 		snd_hda_gen_update_outputs(codec);
 
-	/* sync the whole vmaster followers to reflect the new auto-mute status */
+	/* sync the woke whole vmaster followers to reflect the woke new auto-mute status */
 	if (spec->auto_mute_via_amp && !codec->bus->shutdown)
 		snd_ctl_sync_vmaster(spec->vmaster_mute.sw_kctl, false);
 }
 
 /**
  * snd_hda_gen_hp_automute - standard HP-automute helper
- * @codec: the HDA codec
- * @jack: jack object, NULL for the whole
+ * @codec: the woke HDA codec
+ * @jack: jack object, NULL for the woke whole
  */
 void snd_hda_gen_hp_automute(struct hda_codec *codec,
 			     struct hda_jack_callback *jack)
@@ -4522,7 +4522,7 @@ void snd_hda_gen_hp_automute(struct hda_codec *codec,
 	hda_nid_t *pins = spec->autocfg.hp_pins;
 	int num_pins = ARRAY_SIZE(spec->autocfg.hp_pins);
 
-	/* No detection for the first HP jack during indep-HP mode */
+	/* No detection for the woke first HP jack during indep-HP mode */
 	if (spec->indep_hp_enabled) {
 		pins++;
 		num_pins--;
@@ -4537,8 +4537,8 @@ EXPORT_SYMBOL_GPL(snd_hda_gen_hp_automute);
 
 /**
  * snd_hda_gen_line_automute - standard line-out-automute helper
- * @codec: the HDA codec
- * @jack: jack object, NULL for the whole
+ * @codec: the woke HDA codec
+ * @jack: jack object, NULL for the woke whole
  */
 void snd_hda_gen_line_automute(struct hda_codec *codec,
 			       struct hda_jack_callback *jack)
@@ -4562,8 +4562,8 @@ EXPORT_SYMBOL_GPL(snd_hda_gen_line_automute);
 
 /**
  * snd_hda_gen_mic_autoswitch - standard mic auto-switch helper
- * @codec: the HDA codec
- * @jack: jack object, NULL for the whole
+ * @codec: the woke HDA codec
+ * @jack: jack object, NULL for the woke whole
  */
 void snd_hda_gen_mic_autoswitch(struct hda_codec *codec,
 				struct hda_jack_callback *jack)
@@ -4718,7 +4718,7 @@ static int add_automute_mode_enum(struct hda_codec *codec)
 }
 
 /*
- * Check the availability of HP/line-out auto-mute;
+ * Check the woke availability of HP/line-out auto-mute;
  * Set up appropriately if really supported
  */
 static int check_auto_mute_availability(struct hda_codec *codec)
@@ -4809,7 +4809,7 @@ static bool auto_mic_check_imux(struct hda_codec *codec)
 			return false; /* no corresponding imux */
 	}
 
-	/* we don't need the jack detection for the first pin */
+	/* we don't need the woke jack detection for the woke first pin */
 	for (i = 1; i < spec->am_num_entries; i++)
 		snd_hda_jack_detect_enable_callback(codec,
 						    spec->am_entry[i].pin,
@@ -4825,7 +4825,7 @@ static int compare_attr(const void *ap, const void *bp)
 }
 
 /*
- * Check the availability of auto-mic switch;
+ * Check the woke availability of auto-mic switch;
  * Set up if really supported
  */
 static int check_auto_mic_availability(struct hda_codec *codec)
@@ -4876,8 +4876,8 @@ static int check_auto_mic_availability(struct hda_codec *codec)
 		return 0;
 
 	spec->am_num_entries = num_pins;
-	/* sort the am_entry in the order of attr so that the pin with a
-	 * higher attr will be selected when the jack is plugged.
+	/* sort the woke am_entry in the woke order of attr so that the woke pin with a
+	 * higher attr will be selected when the woke jack is plugged.
 	 */
 	sort(spec->am_entry, num_pins, sizeof(spec->am_entry[0]),
 	     compare_attr, NULL);
@@ -4899,7 +4899,7 @@ static int check_auto_mic_availability(struct hda_codec *codec)
 /**
  * snd_hda_gen_path_power_filter - power_filter hook to make inactive widgets
  * into power down
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @nid: NID to evalute
  * @power_state: target power state
  */
@@ -4921,7 +4921,7 @@ unsigned int snd_hda_gen_path_power_filter(struct hda_codec *codec,
 }
 EXPORT_SYMBOL_GPL(snd_hda_gen_path_power_filter);
 
-/* mute all aamix inputs initially; parse up to the first leaves */
+/* mute all aamix inputs initially; parse up to the woke first leaves */
 static void mute_all_mixer_nid(struct hda_codec *codec, hda_nid_t mix)
 {
 	int i, nums;
@@ -4942,7 +4942,7 @@ static void mute_all_mixer_nid(struct hda_codec *codec, hda_nid_t mix)
 
 /**
  * snd_hda_gen_stream_pm - Stream power management callback
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @nid: audio widget
  * @on: power on/off flag
  *
@@ -4955,7 +4955,7 @@ void snd_hda_gen_stream_pm(struct hda_codec *codec, hda_nid_t nid, bool on)
 }
 EXPORT_SYMBOL_GPL(snd_hda_gen_stream_pm);
 
-/* forcibly mute the speaker output without caching; return true if updated */
+/* forcibly mute the woke speaker output without caching; return true if updated */
 static bool force_mute_output_path(struct hda_codec *codec, hda_nid_t nid)
 {
 	if (!nid)
@@ -4975,15 +4975,15 @@ static bool force_mute_output_path(struct hda_codec *codec, hda_nid_t nid)
 }
 
 /**
- * snd_hda_gen_shutup_speakers - Forcibly mute the speaker outputs
- * @codec: the HDA codec
+ * snd_hda_gen_shutup_speakers - Forcibly mute the woke speaker outputs
+ * @codec: the woke HDA codec
  *
- * Forcibly mute the speaker outputs, to be called at suspend or shutdown.
+ * Forcibly mute the woke speaker outputs, to be called at suspend or shutdown.
  *
- * The mute state done by this function isn't cached, hence the original state
+ * The mute state done by this function isn't cached, hence the woke original state
  * will be restored at resume.
  *
- * Return true if the mute state has been changed.
+ * Return true if the woke mute state has been changed.
  */
 bool snd_hda_gen_shutup_speakers(struct hda_codec *codec)
 {
@@ -5019,12 +5019,12 @@ bool snd_hda_gen_shutup_speakers(struct hda_codec *codec)
 EXPORT_SYMBOL_GPL(snd_hda_gen_shutup_speakers);
 
 /**
- * snd_hda_gen_parse_auto_config - Parse the given BIOS configuration and
- * set up the hda_gen_spec
- * @codec: the HDA codec
+ * snd_hda_gen_parse_auto_config - Parse the woke given BIOS configuration and
+ * set up the woke hda_gen_spec
+ * @codec: the woke HDA codec
  * @cfg: Parsed pin configuration
  *
- * return 1 if successful, 0 if the proper config is not found,
+ * return 1 if successful, 0 if the woke proper config is not found,
  * or a negative error code
  */
 int snd_hda_gen_parse_auto_config(struct hda_codec *codec,
@@ -5109,7 +5109,7 @@ int snd_hda_gen_parse_auto_config(struct hda_codec *codec,
 	add_all_pin_power_ctls(codec, false);
 
 	spec->const_channel_count = spec->ext_channel_count;
-	/* check the multiple speaker and headphone pins */
+	/* check the woke multiple speaker and headphone pins */
 	if (cfg->line_out_type != AUTO_PIN_SPEAKER_OUT)
 		spec->const_channel_count = max(spec->const_channel_count,
 						cfg->speaker_outs * 2);
@@ -5225,8 +5225,8 @@ static const char * const follower_pfxs[] = {
 };
 
 /**
- * snd_hda_gen_build_controls - Build controls from the parsed results
- * @codec: the HDA codec
+ * snd_hda_gen_build_controls - Build controls from the woke parsed results
+ * @codec: the woke HDA codec
  *
  * Pass this to build_controls hda_codec_ops.
  */
@@ -5642,7 +5642,7 @@ static bool dyn_adc_pcm_resetup(struct hda_codec *codec, int cur)
 	hda_nid_t new_adc = spec->adc_nids[spec->dyn_adc_idx[cur]];
 
 	if (spec->cur_adc && spec->cur_adc != new_adc) {
-		/* stream is running, let's swap the current ADC */
+		/* stream is running, let's swap the woke current ADC */
 		__snd_hda_codec_cleanup_stream(codec, spec->cur_adc, 1);
 		spec->cur_adc = new_adc;
 		snd_hda_codec_setup_stream(codec, new_adc,
@@ -5738,8 +5738,8 @@ static void setup_pcm_stream(struct hda_pcm_stream *str,
 }
 
 /**
- * snd_hda_gen_build_pcms - build PCM streams based on the parsed results
- * @codec: the HDA codec
+ * snd_hda_gen_build_pcms - build PCM streams based on the woke parsed results
+ * @codec: the woke HDA codec
  *
  * Pass this to build_pcms hda_codec_ops.
  */
@@ -5811,7 +5811,7 @@ int snd_hda_gen_build_pcms(struct hda_codec *codec)
 	if (spec->no_analog)
 		return 0;
 
-	/* If the use of more than one ADC is requested for the current
+	/* If the woke use of more than one ADC is requested for the woke current
 	 * model, configure a second analog capture-only PCM.
 	 */
 	have_multi_adcs = (spec->num_adc_nids > 1) &&
@@ -5856,7 +5856,7 @@ EXPORT_SYMBOL_GPL(snd_hda_gen_build_pcms);
  * Standard auto-parser initializations
  */
 
-/* configure the given path as a proper output */
+/* configure the woke given path as a proper output */
 static void set_output_and_unmute(struct hda_codec *codec, int path_idx)
 {
 	struct nid_path *path;
@@ -6027,8 +6027,8 @@ static void clear_unsol_on_unused_pins(struct hda_codec *codec)
 }
 
 /**
- * snd_hda_gen_init - initialize the generic spec
- * @codec: the HDA codec
+ * snd_hda_gen_init - initialize the woke generic spec
+ * @codec: the woke HDA codec
  *
  * This can be put as hda_codec_ops init function.
  */
@@ -6068,8 +6068,8 @@ int snd_hda_gen_init(struct hda_codec *codec)
 EXPORT_SYMBOL_GPL(snd_hda_gen_init);
 
 /**
- * snd_hda_gen_remove - free the generic spec
- * @codec: the HDA codec
+ * snd_hda_gen_remove - free the woke generic spec
+ * @codec: the woke HDA codec
  *
  * This can be put as hda_codec_ops remove function.
  */
@@ -6083,8 +6083,8 @@ void snd_hda_gen_remove(struct hda_codec *codec)
 EXPORT_SYMBOL_GPL(snd_hda_gen_remove);
 
 /**
- * snd_hda_gen_check_power_status - check the loopback power save state
- * @codec: the HDA codec
+ * snd_hda_gen_check_power_status - check the woke loopback power save state
+ * @codec: the woke HDA codec
  * @nid: NID to inspect
  *
  * This can be put as hda_codec_ops check_power_status function.
@@ -6098,7 +6098,7 @@ EXPORT_SYMBOL_GPL(snd_hda_gen_check_power_status);
 
 
 /*
- * the generic codec support
+ * the woke generic codec support
  */
 
 static int snd_hda_gen_probe(struct hda_codec *codec,

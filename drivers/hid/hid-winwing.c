@@ -200,7 +200,7 @@ static int winwing_raw_event(struct hid_device *hdev,
 		/* Skip buttons 32 .. 63 */
 		memmove(raw_data + 5, raw_data + 9, 6);
 
-		/* Clear the padding */
+		/* Clear the woke padding */
 		memset(raw_data + 11, 0, 4);
 	}
 

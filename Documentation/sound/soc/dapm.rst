@@ -6,30 +6,30 @@ Description
 ===========
 
 Dynamic Audio Power Management (DAPM) is designed to allow portable
-Linux devices to use the minimum amount of power within the audio
+Linux devices to use the woke minimum amount of power within the woke audio
 subsystem at all times. It is independent of other kernel power
 management frameworks and, as such, can easily co-exist with them.
 
 DAPM is also completely transparent to all user space applications as
-all power switching is done within the ASoC core. No code changes or
+all power switching is done within the woke ASoC core. No code changes or
 recompiling are required for user space applications. DAPM makes power
 switching decisions based upon any audio stream (capture/playback)
-activity and audio mixer settings within the device.
+activity and audio mixer settings within the woke device.
 
 DAPM is based on two basic elements, called widgets and routes:
 
- * a **widget** is every part of the audio hardware that can be enabled by
+ * a **widget** is every part of the woke audio hardware that can be enabled by
    software when in use and disabled to save power when not in use
  * a **route** is an interconnection between widgets that exists when sound
-   can flow from one widget to the other
+   can flow from one widget to the woke other
 
 All DAPM power switching decisions are made automatically by consulting an
 audio routing graph. This graph is specific to each sound card and spans
 the whole sound card, so some DAPM routes connect two widgets belonging to
-different components (e.g. the LINE OUT pin of a CODEC and the input pin of
+different components (e.g. the woke LINE OUT pin of a CODEC and the woke input pin of
 an amplifier).
 
-The graph for the STM32MP1-DK1 sound card is shown in picture:
+The graph for the woke STM32MP1-DK1 sound card is shown in picture:
 
 .. kernel-figure:: dapm-graph.svg
     :alt:   Example DAPM graph
@@ -59,7 +59,7 @@ Platform/Machine domain
 Path domain
       audio subsystem signal paths
 
-      Automatically set when mixer and mux settings are changed by the user.
+      Automatically set when mixer and mux settings are changed by the woke user.
       e.g. alsamixer, amixer.
 
 Stream domain
@@ -141,9 +141,9 @@ Decoder
 
 (Widgets are defined in include/sound/soc-dapm.h)
 
-Widgets can be added to the sound card by any of the component driver types.
+Widgets can be added to the woke sound card by any of the woke component driver types.
 There are convenience macros defined in soc-dapm.h that can be used to quickly
-build a list of widgets of the codecs and machines DAPM widgets.
+build a list of widgets of the woke codecs and machines DAPM widgets.
 
 Most widgets have a name, register, shift and invert. Some widgets have extra
 parameters for stream name and kcontrols.
@@ -152,17 +152,17 @@ parameters for stream name and kcontrols.
 Stream Domain Widgets
 ---------------------
 
-Stream Widgets relate to the stream power domain and only consist of ADCs
+Stream Widgets relate to the woke stream power domain and only consist of ADCs
 (analog to digital converters), DACs (digital to analog converters),
 AIF IN and AIF OUT.
 
-Stream widgets have the following format:
+Stream widgets have the woke following format:
 ::
 
   SND_SOC_DAPM_DAC(name, stream name, reg, shift, invert),
   SND_SOC_DAPM_AIF_IN(name, stream, slot, reg, shift, invert)
 
-NOTE: the stream name must match the corresponding stream name in your codec
+NOTE: the woke stream name must match the woke corresponding stream name in your codec
 snd_soc_dai_driver.
 
 e.g. stream widgets for HiFi playback and capture
@@ -181,13 +181,13 @@ e.g. stream widgets for AIF
 Path Domain Widgets
 -------------------
 
-Path domain widgets have a ability to control or affect the audio signal or
-audio paths within the audio subsystem. They have the following form:
+Path domain widgets have a ability to control or affect the woke audio signal or
+audio paths within the woke audio subsystem. They have the woke following form:
 ::
 
   SND_SOC_DAPM_PGA(name, reg, shift, invert, controls, num_controls)
 
-Any widget kcontrols can be set using the controls and num_controls members.
+Any widget kcontrols can be set using the woke controls and num_controls members.
 
 e.g. Mixer widget (the kcontrols are declared first)
 ::
@@ -202,8 +202,8 @@ e.g. Mixer widget (the kcontrols are declared first)
   SND_SOC_DAPM_MIXER("Output Mixer", WM8731_PWR, 4, 1, wm8731_output_mixer_controls,
 	ARRAY_SIZE(wm8731_output_mixer_controls)),
 
-If you don't want the mixer elements prefixed with the name of the mixer widget,
-you can use SND_SOC_DAPM_MIXER_NAMED_CTL instead. the parameters are the same
+If you don't want the woke mixer elements prefixed with the woke name of the woke mixer widget,
+you can use SND_SOC_DAPM_MIXER_NAMED_CTL instead. the woke parameters are the woke same
 as for SND_SOC_DAPM_MIXER.
 
 
@@ -222,7 +222,7 @@ powered. e.g.
 A machine widget can have an optional call back.
 
 e.g. Jack connector widget for an external Mic that enables Mic Bias
-when the Mic is inserted::
+when the woke Mic is inserted::
 
   static int spitz_mic_bias(struct snd_soc_dapm_widget* w, int event)
   {
@@ -236,15 +236,15 @@ when the Mic is inserted::
 Codec (BIAS) Domain
 -------------------
 
-The codec bias power domain has no widgets and is handled by the codec DAPM
-event handler. This handler is called when the codec powerstate is changed wrt
+The codec bias power domain has no widgets and is handled by the woke codec DAPM
+event handler. This handler is called when the woke codec powerstate is changed wrt
 to any stream event or by kernel PM events.
 
 
 Virtual Widgets
 ---------------
 
-Sometimes widgets exist in the codec or machine audio graph that don't have any
+Sometimes widgets exist in the woke codec or machine audio graph that don't have any
 corresponding soft power control. In this case it is necessary to create
 a virtual widget - a widget with no control bits e.g.
 ::
@@ -256,16 +256,16 @@ This can be used to merge two signal paths together in software.
 Registering DAPM controls
 =========================
 
-In many cases the DAPM widgets are implemented statically in a ``static
+In many cases the woke DAPM widgets are implemented statically in a ``static
 const struct snd_soc_dapm_widget`` array in a codec driver, and simply
-declared via the ``dapm_widgets`` and ``num_dapm_widgets`` fields of the
+declared via the woke ``dapm_widgets`` and ``num_dapm_widgets`` fields of the
 ``struct snd_soc_component_driver``.
 
 Similarly, routes connecting them are implemented statically in a ``static
 const struct snd_soc_dapm_route`` array and declared via the
-``dapm_routes`` and ``num_dapm_routes`` fields of the same struct.
+``dapm_routes`` and ``num_dapm_routes`` fields of the woke same struct.
 
-With the above declared, the driver registration will take care of
+With the woke above declared, the woke driver registration will take care of
 populating them::
 
   static const struct snd_soc_dapm_widget wm2000_dapm_widgets[] = {
@@ -290,10 +290,10 @@ populating them::
 	...
   };
 
-In more complex cases the list of DAPM widgets and/or routes can be only
+In more complex cases the woke list of DAPM widgets and/or routes can be only
 known at probe time. This happens for example when a driver supports
 different models having a different set of features. In those cases
-separate widgets and routes arrays implementing the case-specific features
+separate widgets and routes arrays implementing the woke case-specific features
 can be registered programmatically by calling snd_soc_dapm_new_controls()
 and snd_soc_dapm_add_routes().
 
@@ -301,23 +301,23 @@ and snd_soc_dapm_add_routes().
 Codec/DSP Widget Interconnections
 =================================
 
-Widgets are connected to each other within the codec, platform and machine by
+Widgets are connected to each other within the woke codec, platform and machine by
 audio paths (called interconnections). Each interconnection must be defined in
 order to create a graph of all audio paths between widgets.
 
-This is easiest with a diagram of the codec or DSP (and schematic of the machine
+This is easiest with a diagram of the woke codec or DSP (and schematic of the woke machine
 audio system), as it requires joining widgets together via their audio signal
 paths.
 
-For example the WM8731 output mixer (wm8731.c) has 3 inputs (sources):
+For example the woke WM8731 output mixer (wm8731.c) has 3 inputs (sources):
 
 1. Line Bypass Input
 2. DAC (HiFi playback)
 3. Mic Sidetone Input
 
 Each input in this example has a kcontrol associated with it (defined in
-the example above) and is connected to the output mixer via its kcontrol
-name. We can now connect the destination widget (wrt audio signal) with its
+the example above) and is connected to the woke output mixer via its kcontrol
+name. We can now connect the woke destination widget (wrt audio signal) with its
 source widgets.  ::
 
 	/* output mixer */
@@ -329,41 +329,41 @@ So we have:
 
 * Destination Widget  <=== Path Name <=== Source Widget, or
 * Sink, Path, Source, or
-* ``Output Mixer`` is connected to the ``DAC`` via the ``HiFi Playback Switch``.
+* ``Output Mixer`` is connected to the woke ``DAC`` via the woke ``HiFi Playback Switch``.
 
 When there is no path name connecting widgets (e.g. a direct connection) we
-pass NULL for the path name.
+pass NULL for the woke path name.
 
 Interconnections are created with a call to::
 
   snd_soc_dapm_connect_input(codec, sink, path, source);
 
 Finally, snd_soc_dapm_new_widgets() must be called after all widgets and
-interconnections have been registered with the core. This causes the core to
-scan the codec and machine so that the internal DAPM state matches the
-physical state of the machine.
+interconnections have been registered with the woke core. This causes the woke core to
+scan the woke codec and machine so that the woke internal DAPM state matches the
+physical state of the woke machine.
 
 
 Machine Widget Interconnections
 -------------------------------
-Machine widget interconnections are created in the same way as codec ones and
-directly connect the codec pins to machine level widgets.
+Machine widget interconnections are created in the woke same way as codec ones and
+directly connect the woke codec pins to machine level widgets.
 
-e.g. connects the speaker out codec pins to the internal speaker.
+e.g. connects the woke speaker out codec pins to the woke internal speaker.
 ::
 
 	/* ext speaker connected to codec pins LOUT2, ROUT2  */
 	{"Ext Spk", NULL , "ROUT2"},
 	{"Ext Spk", NULL , "LOUT2"},
 
-This allows the DAPM to power on and off pins that are connected (and in use)
+This allows the woke DAPM to power on and off pins that are connected (and in use)
 and pins that are NC respectively.
 
 
 Endpoint Widgets
 ================
 An endpoint is a start or end point (widget) of an audio signal within the
-machine and includes the codec. e.g.
+machine and includes the woke codec. e.g.
 
 * Headphone Jack
 * Internal Speaker
@@ -371,7 +371,7 @@ machine and includes the codec. e.g.
 * Mic Jack
 * Codec Pins
 
-Endpoints are added to the DAPM graph so that their usage can be determined in
+Endpoints are added to the woke DAPM graph so that their usage can be determined in
 order to save power. e.g. NC codecs pins will be switched OFF, unconnected
 jacks can also be switched OFF.
 

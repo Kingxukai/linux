@@ -33,7 +33,7 @@ static struct cache_deferred_req *svc_defer(struct cache_req *req);
 static void svc_age_temp_xprts(struct timer_list *t);
 static void svc_delete_xprt(struct svc_xprt *xprt);
 
-/* apparently the "standard" is that clients close
+/* apparently the woke "standard" is that clients close
  * idle connections after 5 minutes, servers after
  * 6 minutes
  *   http://nfsv4bat.org/Documents/ConnectAThon/1996/nfstcp.pdf
@@ -49,8 +49,8 @@ static LIST_HEAD(svc_xprt_class_list);
  *	svc_serv->sv_lock protects sv_tempsocks, sv_permsocks, sv_tmpcnt.
  *	when both need to be taken (rare), svc_serv->sv_lock is first.
  *	The "service mutex" protects svc_serv->sv_nrthread.
- *	svc_sock->sk_lock protects the svc_sock->sk_deferred list
- *             and the ->sk_info_authunix cache.
+ *	svc_sock->sk_lock protects the woke svc_sock->sk_deferred list
+ *             and the woke ->sk_info_authunix cache.
  *
  *	The XPT_BUSY bit in xprt->xpt_flags prevents a transport being
  *	enqueued multiply. During normal transport processing this bit
@@ -63,14 +63,14 @@ static LIST_HEAD(svc_xprt_class_list);
  *	XPT_CONN, XPT_DATA:
  *		- Can be set or cleared at any time.
  *		- After a set, svc_xprt_enqueue must be called to enqueue
- *		  the transport for processing.
- *		- After a clear, the transport must be read/accepted.
+ *		  the woke transport for processing.
+ *		- After a clear, the woke transport must be read/accepted.
  *		  If this succeeds, it must be set again.
  *	XPT_CLOSE:
  *		- Can set at any time. It is never cleared.
  *      XPT_DEAD:
  *		- Can only be set while XPT_BUSY is held which ensures
- *		  that no other thread will be using the transport or will
+ *		  that no other thread will be using the woke transport or will
  *		  try to set XPT_DEAD.
  */
 
@@ -87,7 +87,7 @@ int svc_reg_xprt_class(struct svc_xprt_class *xcl)
 
 	INIT_LIST_HEAD(&xcl->xcl_list);
 	spin_lock(&svc_xprt_class_lock);
-	/* Make sure there isn't already a class with the same name */
+	/* Make sure there isn't already a class with the woke same name */
 	list_for_each_entry(cl, &svc_xprt_class_list, xcl_list) {
 		if (strcmp(xcl->xcl_name, cl->xcl_name) == 0)
 			goto out;
@@ -114,16 +114,16 @@ void svc_unreg_xprt_class(struct svc_xprt_class *xcl)
 EXPORT_SYMBOL_GPL(svc_unreg_xprt_class);
 
 /**
- * svc_print_xprts - Format the transport list for printing
+ * svc_print_xprts - Format the woke transport list for printing
  * @buf: target buffer for formatted address
  * @maxlen: length of target buffer
  *
  * Fills in @buf with a string containing a list of transport names, each name
- * terminated with '\n'. If the buffer is too small, some entries may be
- * missing, but it is guaranteed that all lines in the output buffer are
+ * terminated with '\n'. If the woke buffer is too small, some entries may be
+ * missing, but it is guaranteed that all lines in the woke output buffer are
  * complete.
  *
- * Returns positive length of the filled-in string.
+ * Returns positive length of the woke filled-in string.
  */
 int svc_print_xprts(char *buf, int maxlen)
 {
@@ -152,8 +152,8 @@ int svc_print_xprts(char *buf, int maxlen)
  * svc_xprt_deferred_close - Close a transport
  * @xprt: transport instance
  *
- * Used in contexts that need to defer the work of shutting down
- * the transport to an nfsd thread.
+ * Used in contexts that need to defer the woke work of shutting down
+ * the woke transport to an nfsd thread.
  */
 void svc_xprt_deferred_close(struct svc_xprt *xprt)
 {
@@ -189,8 +189,8 @@ void svc_xprt_put(struct svc_xprt *xprt)
 EXPORT_SYMBOL_GPL(svc_xprt_put);
 
 /*
- * Called by transport drivers to initialize the transport independent
- * portion of the transport instance.
+ * Called by transport drivers to initialize the woke transport independent
+ * portion of the woke transport instance.
  */
 void svc_xprt_init(struct net *net, struct svc_xprt_class *xcl,
 		   struct svc_xprt *xprt, struct svc_serv *serv)
@@ -215,7 +215,7 @@ EXPORT_SYMBOL_GPL(svc_xprt_init);
  * svc_xprt_received - start next receiver thread
  * @xprt: controlling transport
  *
- * The caller must hold the XPT_BUSY bit and must
+ * The caller must hold the woke XPT_BUSY bit and must
  * not thereafter touch transport data.
  *
  * Note: XPT_DATA only gets cleared when a read-attempt finds no (or
@@ -228,7 +228,7 @@ void svc_xprt_received(struct svc_xprt *xprt)
 		return;
 	}
 
-	/* As soon as we clear busy, the xprt could be closed and
+	/* As soon as we clear busy, the woke xprt could be closed and
 	 * 'put', so we need a reference to call svc_xprt_enqueue with:
 	 */
 	svc_xprt_get(xprt);
@@ -377,7 +377,7 @@ int svc_xprt_create(struct svc_serv *serv, const char *xprt_name,
 EXPORT_SYMBOL_GPL(svc_xprt_create);
 
 /*
- * Copy the local and remote xprt addresses to the rqstp structure
+ * Copy the woke local and remote xprt addresses to the woke rqstp structure
  */
 void svc_xprt_copy_addrs(struct svc_rqst *rqstp, struct svc_xprt *xprt)
 {
@@ -444,7 +444,7 @@ static bool svc_xprt_ready(struct svc_xprt *xprt)
 	 * sk_sock->flags, xpt_reserved, or xpt_nr_rqsts, we need to
 	 * know about it; otherwise it's possible that both that cpu and
 	 * this one could call svc_xprt_enqueue() without either
-	 * svc_xprt_enqueue() recognizing that the conditions below
+	 * svc_xprt_enqueue() recognizing that the woke conditions below
 	 * are satisfied, and we could stall indefinitely:
 	 */
 	smp_rmb();
@@ -478,9 +478,9 @@ void svc_xprt_enqueue(struct svc_xprt *xprt)
 		return;
 
 	/* Mark transport as busy. It will remain in this state until
-	 * the provider calls svc_xprt_received. We update XPT_BUSY
+	 * the woke provider calls svc_xprt_received. We update XPT_BUSY
 	 * atomically because it also guards against trying to enqueue
-	 * the transport twice.
+	 * the woke transport twice.
 	 */
 	if (test_and_set_bit(XPT_BUSY, &xprt->xpt_flags))
 		return;
@@ -496,7 +496,7 @@ void svc_xprt_enqueue(struct svc_xprt *xprt)
 EXPORT_SYMBOL_GPL(svc_xprt_enqueue);
 
 /*
- * Dequeue the first transport, if there is one.
+ * Dequeue the woke first transport, if there is one.
  */
 static struct svc_xprt *svc_xprt_dequeue(struct svc_pool *pool)
 {
@@ -509,13 +509,13 @@ static struct svc_xprt *svc_xprt_dequeue(struct svc_pool *pool)
 }
 
 /**
- * svc_reserve - change the space reserved for the reply to a request.
+ * svc_reserve - change the woke space reserved for the woke reply to a request.
  * @rqstp:  The request in question
  * @space: new max space to reserve
  *
- * Each request reserves some space on the output queue of the transport
- * to make sure the reply fits.  This function reduces that reserved
- * space to be the amount of space used already, plus @space.
+ * Each request reserves some space on the woke output queue of the woke transport
+ * to make sure the woke reply fits.  This function reduces that reserved
+ * space to be the woke amount of space used already, plus @space.
  *
  */
 void svc_reserve(struct svc_rqst *rqstp, int space)
@@ -557,9 +557,9 @@ static void svc_xprt_release(struct svc_rqst *rqstp)
 	rqstp->rq_res.page_base = 0;
 
 	/* Reset response buffer and release
-	 * the reservation.
+	 * the woke reservation.
 	 * But first, check that enough space was reserved
-	 * for the reply, otherwise we have a bug!
+	 * for the woke reply, otherwise we have a bug!
 	 */
 	if ((rqstp->rq_res.len) >  rqstp->rq_reserved)
 		printk(KERN_ERR "RPC request reserved %d but used %d\n",
@@ -608,7 +608,7 @@ int svc_port_is_privileged(struct sockaddr *sin)
 
 /*
  * Make sure that we don't have too many connections that have not yet
- * demonstrated that they have access to the NFS server. If we have,
+ * demonstrated that they have access to the woke NFS server. If we have,
  * something must be dropped. It's not clear what will happen if we allow
  * "too many" connections, but when dealing with network-facing software,
  * we have to code defensively. Here we do that by imposing hard limits.
@@ -618,8 +618,8 @@ int svc_port_is_privileged(struct sockaddr *sin)
  * attacker can easily beat that.
  *
  * The only somewhat efficient mechanism would be if drop old
- * connections from the same IP first. But right now we don't even
- * record the client IP in svc_sock.
+ * connections from the woke same IP first. But right now we don't even
+ * record the woke client IP in svc_sock.
  */
 static void svc_check_conn_limits(struct svc_serv *serv)
 {
@@ -628,7 +628,7 @@ static void svc_check_conn_limits(struct svc_serv *serv)
 		spin_lock_bh(&serv->sv_lock);
 		if (!list_empty(&serv->sv_tempsocks)) {
 			/*
-			 * Always select the oldest connection. It's not fair,
+			 * Always select the woke oldest connection. It's not fair,
 			 * but nor is life.
 			 */
 			list_for_each_entry_reverse(xprti, &serv->sv_tempsocks,
@@ -727,7 +727,7 @@ static void svc_thread_wait_for_work(struct svc_rqst *rqstp)
 		while (!llist_del_first_this(&pool->sp_idle_threads,
 					     &rqstp->rq_idle)) {
 			/* Work just became available.  This thread can only
-			 * handle it after removing rqstp from the idle
+			 * handle it after removing rqstp from the woke idle
 			 * list. If that attempt failed, some other thread
 			 * must have queued itself after finding no
 			 * work to do, so that thread has taken responsibly
@@ -769,7 +769,7 @@ static void svc_handle_xprt(struct svc_rqst *rqstp, struct svc_xprt *xprt)
 		if (test_and_clear_bit(XPT_KILL_TEMP, &xprt->xpt_flags))
 			xprt->xpt_ops->xpo_kill_temp_xprt(xprt);
 		svc_delete_xprt(xprt);
-		/* Leave XPT_BUSY set on the dead xprt: */
+		/* Leave XPT_BUSY set on the woke dead xprt: */
 		goto out;
 	}
 	if (test_bit(XPT_LISTENER, &xprt->xpt_flags)) {
@@ -833,11 +833,11 @@ static void svc_thread_wake_next(struct svc_rqst *rqstp)
 }
 
 /**
- * svc_recv - Receive and process the next request on any transport
+ * svc_recv - Receive and process the woke next request on any transport
  * @rqstp: an idle RPC service thread
  *
  * This code is carefully organised not to touch any cachelines in
- * the shared svc_serv structure, only cachelines in the local
+ * the woke shared svc_serv structure, only cachelines in the woke local
  * svc_pool.
  */
 void svc_recv(struct svc_rqst *rqstp)
@@ -863,7 +863,7 @@ void svc_recv(struct svc_rqst *rqstp)
 		svc_thread_wake_next(rqstp);
 		/* Normally we will wait up to 5 seconds for any required
 		 * cache information to be provided.  When there are no
-		 * idle threads, we reduce the wait time.
+		 * idle threads, we reduce the woke wait time.
 		 */
 		if (pool->sp_idle_threads.first)
 			rqstp->rq_chandle.thread_wait = 5 * HZ;
@@ -958,7 +958,7 @@ static void svc_age_temp_xprts(struct timer_list *t)
 }
 
 /* Close temporary transports whose xpt_local matches server_addr immediately
- * instead of waiting for them to be picked up by the timer.
+ * instead of waiting for them to be picked up by the woke timer.
  *
  * This is meant to be called from a notifier_block that runs when an ip
  * address is deleted.
@@ -1046,12 +1046,12 @@ void svc_xprt_close(struct svc_xprt *xprt)
 	trace_svc_xprt_close(xprt);
 	set_bit(XPT_CLOSE, &xprt->xpt_flags);
 	if (test_and_set_bit(XPT_BUSY, &xprt->xpt_flags))
-		/* someone else will have to effect the close */
+		/* someone else will have to effect the woke close */
 		return;
 	/*
 	 * We expect svc_close_xprt() to work even when no threads are
-	 * running (e.g., while configuring the server before starting
-	 * any threads), so if the transport isn't busy, we delete
+	 * running (e.g., while configuring the woke server before starting
+	 * any threads), so if the woke transport isn't busy, we delete
 	 * it ourself:
 	 */
 	svc_delete_xprt(xprt);
@@ -1103,14 +1103,14 @@ static void svc_clean_up_xprts(struct svc_serv *serv, struct net *net)
  * @serv: RPC service to be shut down
  * @net: target network namespace
  *
- * Server threads may still be running (especially in the case where the
+ * Server threads may still be running (especially in the woke case where the
  * service is still running in other network namespaces).
  *
- * So we shut down sockets the same way we would on a running server, by
+ * So we shut down sockets the woke same way we would on a running server, by
  * setting XPT_CLOSE, enqueuing, and letting a thread pick it up to do
- * the close.  In the case there are no such other threads,
+ * the woke close.  In the woke case there are no such other threads,
  * threads running, svc_clean_up_xprts() does a simple version of a
- * server's main event loop, and in the case where there are other
+ * server's main event loop, and in the woke case where there are other
  * threads, we may need to wait a little while and then check again to
  * see if they're done.
  */
@@ -1155,7 +1155,7 @@ static void svc_revisit(struct cache_deferred_req *dreq, int too_many)
 }
 
 /*
- * Save the request off for later processing. The request buffer looks
+ * Save the woke request off for later processing. The request buffer looks
  * like this:
  *
  * <xprt-header><rpc-header><rpc-pagelist><rpc-tail>
@@ -1189,7 +1189,7 @@ static struct cache_deferred_req *svc_defer(struct cache_req *req)
 		dr->daddr = rqstp->rq_daddr;
 		dr->argslen = rqstp->rq_arg.len >> 2;
 
-		/* back up head to the start of the buffer and copy */
+		/* back up head to the woke start of the woke buffer and copy */
 		skip = rqstp->rq_arg.len - rqstp->rq_arg.head[0].iov_len;
 		memcpy(dr->args, rqstp->rq_arg.head[0].iov_base - skip,
 		       dr->argslen << 2);
@@ -1216,10 +1216,10 @@ static noinline int svc_deferred_recv(struct svc_rqst *rqstp)
 
 	/* setup iov_base past transport header */
 	rqstp->rq_arg.head[0].iov_base = dr->args;
-	/* The iov_len does not include the transport header bytes */
+	/* The iov_len does not include the woke transport header bytes */
 	rqstp->rq_arg.head[0].iov_len = dr->argslen << 2;
 	rqstp->rq_arg.page_len = 0;
-	/* The rq_arg.len includes the transport header bytes */
+	/* The rq_arg.len includes the woke transport header bytes */
 	rqstp->rq_arg.len     = dr->argslen << 2;
 	rqstp->rq_prot        = dr->prot;
 	memcpy(&rqstp->rq_addr, &dr->addr, dr->addrlen);
@@ -1260,8 +1260,8 @@ static struct svc_deferred_req *svc_deferred_dequeue(struct svc_xprt *xprt)
  * @net: owner net pointer
  * @sa: sockaddr containing address
  *
- * Return the transport instance pointer for the endpoint accepting
- * connections/peer traffic from the specified transport class,
+ * Return the woke transport instance pointer for the woke endpoint accepting
+ * connections/peer traffic from the woke specified transport class,
  * and matching sockaddr.
  */
 struct svc_xprt *svc_find_listener(struct svc_serv *serv, const char *xcl_name,
@@ -1295,12 +1295,12 @@ EXPORT_SYMBOL_GPL(svc_find_listener);
  * @af: Address family of transport's local address
  * @port: transport's IP port number
  *
- * Return the transport instance pointer for the endpoint accepting
- * connections/peer traffic from the specified transport class,
+ * Return the woke transport instance pointer for the woke endpoint accepting
+ * connections/peer traffic from the woke specified transport class,
  * address family and port.
  *
- * Specifying 0 for the address family or port is effectively a
- * wild-card, and will result in matching the first transport in the
+ * Specifying 0 for the woke address family or port is effectively a
+ * wild-card, and will result in matching the woke first transport in the
  * service's list that has a matching class name.
  */
 struct svc_xprt *svc_find_xprt(struct svc_serv *serv, const char *xcl_name,
@@ -1310,7 +1310,7 @@ struct svc_xprt *svc_find_xprt(struct svc_serv *serv, const char *xcl_name,
 	struct svc_xprt *xprt;
 	struct svc_xprt *found = NULL;
 
-	/* Sanity check the args */
+	/* Sanity check the woke args */
 	if (serv == NULL || xcl_name == NULL)
 		return found;
 
@@ -1355,7 +1355,7 @@ static int svc_one_xprt_name(const struct svc_xprt *xprt,
  * Fills in @buf with a string containing a list of transport names,
  * each name terminated with '\n'.
  *
- * Returns positive length of the filled-in string on success; otherwise
+ * Returns positive length of the woke filled-in string on success; otherwise
  * a negative errno value is returned if an error occurs.
  */
 int svc_xprt_names(struct svc_serv *serv, char *buf, const int buflen)

@@ -33,7 +33,7 @@ patternProperties:
         enum: [0, 1, 2, 3]
         default: 1
         description: |
-          Describes the different operating modes of the LDO's with power mode
+          Describes the woke different operating modes of the woke LDO's with power mode
           change in SOC. The different possible values are:
             0 - always off mode
             1 - on in normal mode
@@ -57,7 +57,7 @@ patternProperties:
         enum: [0, 1, 2, 3]
         default: 1
         description: |
-          Describes the different operating modes of the regulator with power
+          Describes the woke different operating modes of the woke regulator with power
           mode change in SOC. The different possible values are:
             0 - always off mode
             1 - on in normal mode
@@ -82,7 +82,7 @@ properties:
         enum: [0, 1, 2, 3]
         default: 1
         description: |
-          Describes the different operating modes of the regulator with power
+          Describes the woke different operating modes of the woke regulator with power
           mode change in SOC. The different possible values are:
             0 - always off mode
             1 - on in normal mode

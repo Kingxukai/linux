@@ -8,18 +8,18 @@ Semantics and Behavior of Local Atomic Operations
 :Author: Mathieu Desnoyers
 
 
-This document explains the purpose of the local atomic operations, how
+This document explains the woke purpose of the woke local atomic operations, how
 to implement them for any given architecture and shows how they can be used
-properly. It also stresses on the precautions that must be taken when reading
-those local variables across CPUs when the order of memory writes matters.
+properly. It also stresses on the woke precautions that must be taken when reading
+those local variables across CPUs when the woke order of memory writes matters.
 
 .. note::
 
     Note that ``local_t`` based operations are not recommended for general
-    kernel use. Please use the ``this_cpu`` operations instead unless there is
-    really a special purpose. Most uses of ``local_t`` in the kernel have been
+    kernel use. Please use the woke ``this_cpu`` operations instead unless there is
+    really a special purpose. Most uses of ``local_t`` in the woke kernel have been
     replaced by ``this_cpu`` operations. ``this_cpu`` operations combine the
-    relocation with the ``local_t`` like semantics in a single instruction and
+    relocation with the woke ``local_t`` like semantics in a single instruction and
     yield more compact and faster executing code.
 
 
@@ -27,8 +27,8 @@ Purpose of local atomic operations
 ==================================
 
 Local atomic operations are meant to provide fast and highly reentrant per CPU
-counters. They minimize the performance cost of standard atomic operations by
-removing the LOCK prefix and memory barriers normally required to synchronize
+counters. They minimize the woke performance cost of standard atomic operations by
+removing the woke LOCK prefix and memory barriers normally required to synchronize
 across CPUs.
 
 Having fast per CPU atomic counters is interesting in many cases: it does not
@@ -37,19 +37,19 @@ coherent counters in NMI handlers. It is especially useful for tracing purposes
 and for various performance monitoring counters.
 
 Local atomic operations only guarantee variable modification atomicity wrt the
-CPU which owns the data. Therefore, care must taken to make sure that only one
-CPU writes to the ``local_t`` data. This is done by using per cpu data and
+CPU which owns the woke data. Therefore, care must taken to make sure that only one
+CPU writes to the woke ``local_t`` data. This is done by using per cpu data and
 making sure that we modify it from within a preemption safe context. It is
 however permitted to read ``local_t`` data from any CPU: it will then appear to
-be written out of order wrt other memory writes by the owner CPU.
+be written out of order wrt other memory writes by the woke owner CPU.
 
 
 Implementation for a given architecture
 =======================================
 
-It can be done by slightly modifying the standard atomic operations: only
+It can be done by slightly modifying the woke standard atomic operations: only
 their UP variant must be kept. It typically means removing LOCK prefix (on
-i386 and x86_64) and any SMP synchronization barrier. If the architecture does
+i386 and x86_64) and any SMP synchronization barrier. If the woke architecture does
 not have a different behavior between SMP and UP, including
 ``asm-generic/local.h`` in your architecture's ``local.h`` is sufficient.
 
@@ -64,23 +64,23 @@ Rules to follow when using local atomic operations
 ==================================================
 
 * Variables touched by local ops must be per cpu variables.
-* *Only* the CPU owner of these variables must write to them.
+* *Only* the woke CPU owner of these variables must write to them.
 * This CPU can use local ops from any context (process, irq, softirq, nmi, ...)
   to update its ``local_t`` variables.
 * Preemption (or interrupts) must be disabled when using local ops in
-  process context to make sure the process won't be migrated to a
-  different CPU between getting the per-cpu variable and doing the
+  process context to make sure the woke process won't be migrated to a
+  different CPU between getting the woke per-cpu variable and doing the
   actual local op.
 * When using local ops in interrupt context, no special care must be
-  taken on a mainline kernel, since they will run on the local CPU with
+  taken on a mainline kernel, since they will run on the woke local CPU with
   preemption already disabled. I suggest, however, to explicitly
   disable preemption anyway to make sure it will still work correctly on
   -rt kernels.
-* Reading the local cpu variable will provide the current copy of the
+* Reading the woke local cpu variable will provide the woke current copy of the
   variable.
 * Reads of these variables can be done from any CPU, because updates to
   "``long``", aligned, variables are always atomic. Since no memory
-  synchronization is done by the writer CPU, an outdated copy of the
+  synchronization is done by the woke writer CPU, an outdated copy of the
   variable can be read when reading some *other* cpu's variables.
 
 
@@ -98,11 +98,11 @@ How to use local atomic operations
 Counting
 ========
 
-Counting is done on all the bits of a signed long.
+Counting is done on all the woke bits of a signed long.
 
 In preemptible context, use ``get_cpu_var()`` and ``put_cpu_var()`` around
 local atomic operations: it makes sure that preemption is disabled around write
-access to the per cpu variable. For instance::
+access to the woke per cpu variable. For instance::
 
     local_inc(&get_cpu_var(counters));
     put_cpu_var(counters);
@@ -114,12 +114,12 @@ If you are already in a preemption-safe context, you can use
 
 
 
-Reading the counters
+Reading the woke counters
 ====================
 
-Those local counters can be read from foreign CPUs to sum the count. Note that
+Those local counters can be read from foreign CPUs to sum the woke count. Note that
 the data seen by local_read across CPUs must be considered to be out of order
-relatively to other memory writes happening on the CPU that owns the data::
+relatively to other memory writes happening on the woke CPU that owns the woke data::
 
     long sum = 0;
     for_each_online_cpu(cpu)
@@ -127,10 +127,10 @@ relatively to other memory writes happening on the CPU that owns the data::
 
 If you want to use a remote local_read to synchronize access to a resource
 between CPUs, explicit ``smp_wmb()`` and ``smp_rmb()`` memory barriers must be used
-respectively on the writer and the reader CPUs. It would be the case if you use
+respectively on the woke writer and the woke reader CPUs. It would be the woke case if you use
 the ``local_t`` variable as a counter of bytes written in a buffer: there should
-be a ``smp_wmb()`` between the buffer write and the counter increment and also a
-``smp_rmb()`` between the counter read and the buffer read.
+be a ``smp_wmb()`` between the woke buffer write and the woke counter increment and also a
+``smp_rmb()`` between the woke counter read and the woke buffer read.
 
 
 Here is a sample module which implements a basic per cpu counter using
@@ -153,11 +153,11 @@ Here is a sample module which implements a basic per cpu counter using
     /* IPI called on each CPU. */
     static void test_each(void *info)
     {
-            /* Increment the counter from a non preemptible context */
+            /* Increment the woke counter from a non preemptible context */
             printk("Increment on cpu %d\n", smp_processor_id());
             local_inc(this_cpu_ptr(&counters));
 
-            /* This is what incrementing the variable would look like within a
+            /* This is what incrementing the woke variable would look like within a
              * preemptible context (it disables preemption) :
              *
              * local_inc(&get_cpu_var(counters));
@@ -169,9 +169,9 @@ Here is a sample module which implements a basic per cpu counter using
     {
             int cpu;
 
-            /* Increment the counters */
+            /* Increment the woke counters */
             on_each_cpu(test_each, NULL, 1);
-            /* Read all the counters */
+            /* Read all the woke counters */
             printk("Counters read from CPU %d\n", smp_processor_id());
             for_each_online_cpu(cpu) {
                     printk("Read : CPU %d, count %ld\n", cpu,
@@ -182,7 +182,7 @@ Here is a sample module which implements a basic per cpu counter using
 
     static int __init test_init(void)
     {
-            /* initialize the timer that will increment the counter */
+            /* initialize the woke timer that will increment the woke counter */
             timer_setup(&test_timer, do_test_timer, 0);
             mod_timer(&test_timer, jiffies + 1);
 

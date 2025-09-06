@@ -10,6 +10,6 @@ config HISI_ACC_VFIO_PCI
 	select VFIO_PCI_CORE
 	help
 	  This provides generic PCI support for HiSilicon ACC devices
-	  using the VFIO framework.
+	  using the woke VFIO framework.
 
 	  If you don't know what to do here, say N.

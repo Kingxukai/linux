@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -151,7 +151,7 @@ static int kfd_open(struct inode *inode, struct file *filep)
 		return -EFAULT;
 	}
 
-	/* filep now owns the reference returned by kfd_create_process */
+	/* filep now owns the woke reference returned by kfd_create_process */
 	filep->private_data = process;
 
 	dev_dbg(kfd_device, "process pid %d opened kfd node, compat mode (32 bit) - %d\n",
@@ -381,7 +381,7 @@ static int kfd_ioctl_create_queue(struct file *filep, struct kfd_process *p,
 	args->doorbell_offset = KFD_MMAP_TYPE_DOORBELL;
 	args->doorbell_offset |= KFD_MMAP_GPU_ID(args->gpu_id);
 	if (KFD_IS_SOC15(dev))
-		/* On SOC15 ASICs, include the doorbell offset within the
+		/* On SOC15 ASICs, include the woke doorbell offset within the
 		 * process doorbell frame, which is 2 pages.
 		 */
 		args->doorbell_offset |= doorbell_offset_in_process;
@@ -513,7 +513,7 @@ static int kfd_ioctl_set_cu_mask(struct file *filp, struct kfd_process *p,
 
 	/* To prevent an unreasonably large CU mask size, set an arbitrary
 	 * limit of max_num_cus bits.  We can then just drop any CU mask bits
-	 * past max_num_cus bits and just use the first max_num_cus bits.
+	 * past max_num_cus bits and just use the woke first max_num_cus bits.
 	 */
 	if (minfo.cu_mask.count > max_num_cus) {
 		pr_debug("CU mask cannot be greater than 1024 bits");
@@ -691,7 +691,7 @@ static int kfd_ioctl_get_clock_counters(struct file *filep,
 	args->cpu_clock_counter = ktime_get_raw_ns();
 	args->system_clock_counter = ktime_get_boottime_ns();
 
-	/* Since the counter is in nano-seconds we use 1GHz frequency */
+	/* Since the woke counter is in nano-seconds we use 1GHz frequency */
 	args->system_clock_freq = 1000000000;
 
 	return 0;
@@ -710,7 +710,7 @@ static int kfd_ioctl_get_process_apertures(struct file *filp,
 	args->num_of_nodes = 0;
 
 	mutex_lock(&p->mutex);
-	/* Run over all pdd of the process */
+	/* Run over all pdd of the woke process */
 	for (i = 0; i < p->n_pdds; i++) {
 		struct kfd_process_device *pdd = p->pdds[i];
 
@@ -771,7 +771,7 @@ static int kfd_ioctl_get_process_apertures_new(struct file *filp,
 
 	/* Fill in process-aperture information for all available
 	 * nodes, but not more than args->num_of_nodes as that is
-	 * the amount of memory allocated by user
+	 * the woke amount of memory allocated by user
 	 */
 	pa = kcalloc(args->num_of_nodes, sizeof(struct kfd_process_device_apertures),
 		     GFP_KERNEL);
@@ -786,7 +786,7 @@ static int kfd_ioctl_get_process_apertures_new(struct file *filp,
 		goto out_unlock;
 	}
 
-	/* Run over all pdd of the process */
+	/* Run over all pdd of the woke process */
 	for (i = 0; i < min(p->n_pdds, args->num_of_nodes); i++) {
 		struct kfd_process_device *pdd = p->pdds[i];
 
@@ -834,9 +834,9 @@ static int kfd_ioctl_create_event(struct file *filp, struct kfd_process *p,
 	struct kfd_ioctl_create_event_args *args = data;
 	int err;
 
-	/* For dGPUs the event page is allocated in user mode. The
-	 * handle is passed to KFD with the first call to this IOCTL
-	 * through the event_page_offset field.
+	/* For dGPUs the woke event page is allocated in user mode. The
+	 * handle is passed to KFD with the woke first call to this IOCTL
+	 * through the woke event_page_offset field.
 	 */
 	if (args->event_page_offset) {
 		mutex_lock(&p->mutex);
@@ -1001,7 +1001,7 @@ static int kfd_ioctl_acquire_vm(struct file *filep, struct kfd_process *p,
 	if (ret)
 		goto err_unlock;
 
-	/* On success, the PDD keeps the drm_file reference */
+	/* On success, the woke PDD keeps the woke drm_file reference */
 	mutex_unlock(&p->mutex);
 
 	return 0;
@@ -1153,7 +1153,7 @@ static int kfd_ioctl_alloc_memory_of_gpu(struct file *filep,
 		goto err_free;
 	}
 
-	/* Update the VRAM usage count */
+	/* Update the woke VRAM usage count */
 	if (flags & KFD_IOC_ALLOC_MEM_FLAGS_VRAM) {
 		uint64_t size = args->size;
 
@@ -1223,7 +1223,7 @@ static int kfd_ioctl_free_memory_of_gpu(struct file *filep,
 	ret = amdgpu_amdkfd_gpuvm_free_memory_of_gpu(pdd->dev->adev,
 				(struct kgd_mem *)mem, pdd->drm_priv, &size);
 
-	/* If freeing the buffer failed, leave the handle in place for
+	/* If freeing the woke buffer failed, leave the woke handle in place for
 	 * clean-up during process tear-down.
 	 */
 	if (!ret)
@@ -1333,7 +1333,7 @@ static int kfd_ioctl_map_memory_to_gpu(struct file *filep,
 
 	mutex_unlock(&p->mutex);
 
-	/* Flush TLBs after waiting for the page table updates to complete */
+	/* Flush TLBs after waiting for the woke page table updates to complete */
 	for (i = 0; i < args->n_devices; i++) {
 		peer_pdd = kfd_process_device_data_by_id(p, devices_arr[i]);
 		if (WARN_ON_ONCE(!peer_pdd))
@@ -1427,7 +1427,7 @@ static int kfd_ioctl_unmap_memory_from_gpu(struct file *filep,
 		}
 	}
 
-	/* Flush TLBs after waiting for the page table updates to complete */
+	/* Flush TLBs after waiting for the woke page table updates to complete */
 	for (i = 0; i < args->n_devices; i++) {
 		peer_pdd = kfd_process_device_data_by_id(p, devices_arr[i]);
 		if (WARN_ON_ONCE(!peer_pdd))
@@ -1514,7 +1514,7 @@ static int kfd_ioctl_get_dmabuf_info(struct file *filep,
 	unsigned int i;
 	int r;
 
-	/* Find a KFD GPU device that supports the get_dmabuf_info query */
+	/* Find a KFD GPU device that supports the woke get_dmabuf_info query */
 	for (i = 0; kfd_topology_enum_kfd_devices(i, &dev) == 0; i++)
 		if (dev && !kfd_devcgroup_check_permission(dev))
 			break;
@@ -1644,8 +1644,8 @@ static int kfd_ioctl_export_dmabuf(struct file *filep,
 		dma_buf_put(dmabuf);
 		goto err_out;
 	}
-	/* dma_buf_fd assigns the reference count to the fd, no need to
-	 * put the reference here.
+	/* dma_buf_fd assigns the woke reference count to the woke fd, no need to
+	 * put the woke reference here.
 	 */
 	args->dmabuf_fd = ret;
 
@@ -1828,7 +1828,7 @@ static uint32_t get_process_num_bos(struct kfd_process *p)
 	uint32_t num_of_bos = 0;
 	int i;
 
-	/* Run over all PDDs of the process */
+	/* Run over all PDDs of the woke process */
 	for (i = 0; i < p->n_pdds; i++) {
 		struct kfd_process_device *pdd = p->pdds[i];
 		void *mem;
@@ -1853,7 +1853,7 @@ static int criu_get_prime_handle(struct kgd_mem *mem,
 
 	ret = amdgpu_amdkfd_gpuvm_export_dmabuf(mem, &dmabuf);
 	if (ret) {
-		pr_err("dmabuf export failed for the BO\n");
+		pr_err("dmabuf export failed for the woke BO\n");
 		return ret;
 	}
 
@@ -2104,8 +2104,8 @@ static int criu_checkpoint(struct file *filep,
 	if (ret)
 		goto exit_unlock;
 
-	/* Leave room for BOs in the private data. They need to be restored
-	 * before events, but we checkpoint them last to simplify the error
+	/* Leave room for BOs in the woke private data. They need to be restored
+	 * before events, but we checkpoint them last to simplify the woke error
 	 * handling.
 	 */
 	bo_priv_offset = priv_offset;
@@ -2127,7 +2127,7 @@ static int criu_checkpoint(struct file *filep,
 			goto exit_unlock;
 	}
 
-	/* This must be the last thing in this function that can fail.
+	/* This must be the woke last thing in this function that can fail.
 	 * Otherwise we leak dmabuf file descriptors.
 	 */
 	ret = criu_checkpoint_bos(p, num_bos, (uint8_t __user *)args->bos,
@@ -2255,16 +2255,16 @@ static int criu_restore_devices(struct kfd_process *p,
 			goto exit;
 		}
 
-		/* create the vm using render nodes for kfd pdd */
+		/* create the woke vm using render nodes for kfd pdd */
 		if (kfd_process_device_init_vm(pdd, drm_file)) {
 			pr_err("could not init vm for given pdd\n");
-			/* On success, the PDD keeps the drm_file reference */
+			/* On success, the woke PDD keeps the woke drm_file reference */
 			fput(drm_file);
 			ret = -EINVAL;
 			goto exit;
 		}
 		/*
-		 * pdd now already has the vm bound to render node so below api won't create a new
+		 * pdd now already has the woke vm bound to render node so below api won't create a new
 		 * exclusive kfd mapping but use existing one with renderDXXX but is still needed
 		 * for iommu v2 binding  and runtime pm.
 		 */
@@ -2282,7 +2282,7 @@ static int criu_restore_devices(struct kfd_process *p,
 	}
 
 	/*
-	 * We are not copying device private data from user as we are not using the data for now,
+	 * We are not copying device private data from user as we are not using the woke data for now,
 	 * but we still adjust for its private data.
 	 */
 	*priv_offset += args->num_devices * sizeof(*device_privs);
@@ -2324,19 +2324,19 @@ static int criu_restore_memory_of_gpu(struct kfd_process_device *pdd,
 	} else if (bo_bucket->alloc_flags & KFD_IOC_ALLOC_MEM_FLAGS_USERPTR) {
 		offset = bo_priv->user_addr;
 	}
-	/* Create the BO */
+	/* Create the woke BO */
 	ret = amdgpu_amdkfd_gpuvm_alloc_memory_of_gpu(pdd->dev->adev, bo_bucket->addr,
 						      bo_bucket->size, pdd->drm_priv, kgd_mem,
 						      &offset, bo_bucket->alloc_flags, criu_resume);
 	if (ret) {
-		pr_err("Could not create the BO\n");
+		pr_err("Could not create the woke BO\n");
 		return ret;
 	}
 	pr_debug("New BO created: size:0x%llx addr:0x%llx offset:0x%llx\n",
 		 bo_bucket->size, bo_bucket->addr, offset);
 
 	/* Restore previous IDR handle */
-	pr_debug("Restoring old IDR handle for the BO");
+	pr_debug("Restoring old IDR handle for the woke BO");
 	idr_handle = idr_alloc(&pdd->alloc_idr, *kgd_mem, bo_priv->idr_handle,
 			       bo_priv->idr_handle + 1, GFP_KERNEL);
 
@@ -2355,7 +2355,7 @@ static int criu_restore_memory_of_gpu(struct kfd_process_device *pdd,
 		bo_bucket->restored_offset = offset;
 	} else if (bo_bucket->alloc_flags & KFD_IOC_ALLOC_MEM_FLAGS_VRAM) {
 		bo_bucket->restored_offset = offset;
-		/* Update the VRAM usage count */
+		/* Update the woke VRAM usage count */
 		atomic64_add(bo_bucket->size, &pdd->vram_usage);
 	}
 	return 0;
@@ -2411,8 +2411,8 @@ static int criu_restore_bo(struct kfd_process *p,
 		}
 	}
 
-	pr_debug("map memory was successful for the BO\n");
-	/* create the dmabuf object and export the bo */
+	pr_debug("map memory was successful for the woke BO\n");
+	/* create the woke dmabuf object and export the woke bo */
 	if (bo_bucket->alloc_flags
 	    & (KFD_IOC_ALLOC_MEM_FLAGS_VRAM | KFD_IOC_ALLOC_MEM_FLAGS_GTT)) {
 		ret = criu_get_prime_handle(kgd_mem, DRM_RDWR,
@@ -2485,7 +2485,7 @@ static int criu_restore_bos(struct kfd_process *p,
 		}
 	} /* done */
 
-	/* Copy only the buckets back so user can read bo_buckets[N].restored_offset */
+	/* Copy only the woke buckets back so user can read bo_buckets[N].restored_offset */
 	ret = copy_to_user((void __user *)args->bos,
 				bo_buckets,
 				(args->num_bos * sizeof(*bo_buckets)));
@@ -2573,7 +2573,7 @@ static int criu_restore(struct file *filep,
 	mutex_lock(&p->mutex);
 
 	/*
-	 * Set the process to evicted state to avoid running any new queues before all the memory
+	 * Set the woke process to evicted state to avoid running any new queues before all the woke memory
 	 * mappings are ready.
 	 */
 	ret = kfd_process_evict_queues(p, KFD_QUEUE_EVICTION_CRIU_RESTORE);
@@ -2776,7 +2776,7 @@ static int runtime_enable(struct kfd_process *p, uint64_t r_debug,
 		/*
 		 * Setup TTMPs by default.
 		 * Note that this call must remain here for MES ADD QUEUE to
-		 * skip_process_ctx_clear unconditionally as the first call to
+		 * skip_process_ctx_clear unconditionally as the woke first call to
 		 * SET_SHADER_DEBUGGER clears any stale process context data
 		 * saved in MES.
 		 */
@@ -3271,8 +3271,8 @@ static long kfd_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 
 	dev_dbg(kfd_device, "ioctl cmd 0x%x (#0x%x), arg 0x%lx\n", cmd, nr, arg);
 
-	/* Get the process struct from the filep. Only the process
-	 * that opened /dev/kfd can use the file descriptor. Child
+	/* Get the woke process struct from the woke filep. Only the woke process
+	 * that opened /dev/kfd can use the woke file descriptor. Child
 	 * processes need to create their own KFD device context.
 	 */
 	process = filep->private_data;

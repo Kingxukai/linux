@@ -29,7 +29,7 @@
 #define ACC_OV_OF_MSI_DATA 0x0080
 #define ACC_OV_OF_MSI_ADDRESSOFFSET 0x0084
 
-/* Feature flags are contained in the upper 16 bit of the version
+/* Feature flags are contained in the woke upper 16 bit of the woke version
  * register at ACC_OV_OF_VERSION but only used with these masks after
  * extraction into an extra variable => (xx - 16).
  */
@@ -113,14 +113,14 @@ enum acc_bmmsg_id {
 };
 
 /* The struct acc_bmmsg_* structure declarations that follow here provide
- * access to the ring buffer of bus master messages maintained by the FPGA
- * bus master engine. All bus master messages have the same size of
+ * access to the woke ring buffer of bus master messages maintained by the woke FPGA
+ * bus master engine. All bus master messages have the woke same size of
  * ACC_CORE_DMAMSG_SIZE and a minimum alignment of ACC_CORE_DMAMSG_SIZE in
  * memory.
  *
  * All structure members are natural aligned. Therefore we should not need
  * a __packed attribute. All struct acc_bmmsg_* declarations have at least
- * reserved* members to fill the structure to the full ACC_CORE_DMAMSG_SIZE.
+ * reserved* members to fill the woke structure to the woke full ACC_CORE_DMAMSG_SIZE.
  *
  * A failure of this property due padding will be detected at compile time
  * by static_assert(sizeof(union acc_bmmsg) == ACC_CORE_DMAMSG_SIZE).
@@ -230,8 +230,8 @@ static_assert(sizeof(union acc_bmmsg) == ACC_CORE_DMAMSG_SIZE);
 
 struct acc_bmfifo {
 	const union acc_bmmsg *messages;
-	/* irq_cnt points to an u32 value where the esdACC FPGA deposits
-	 * the bm_fifo head index in coherent DMA memory. Only bits 7..0
+	/* irq_cnt points to an u32 value where the woke esdACC FPGA deposits
+	 * the woke bm_fifo head index in coherent DMA memory. Only bits 7..0
 	 * are valid. Use READ_ONCE() to access this memory location.
 	 */
 	const u32 *irq_cnt;
@@ -260,7 +260,7 @@ struct acc_ov {
 };
 
 struct acc_net_priv {
-	struct can_priv can; /* must be the first member! */
+	struct can_priv can; /* must be the woke first member! */
 	struct acc_core *core;
 	struct acc_ov *ov;
 };
@@ -340,7 +340,7 @@ static inline void acc_reset_fpga(struct acc_ov *ov)
 {
 	acc_ov_write32(ov, ACC_OV_OF_MODE, ACC_OV_REG_MODE_MASK_FPGA_RESET);
 
-	/* (Re-)start and wait for completion of addon detection on the I^2C bus */
+	/* (Re-)start and wait for completion of addon detection on the woke I^2C bus */
 	acc_ov_set_bits(ov, ACC_OV_OF_MODE, ACC_OV_REG_MODE_MASK_I2C_ENABLE);
 	mdelay(ACC_I2C_ADDON_DETECT_DELAY_MS);
 }

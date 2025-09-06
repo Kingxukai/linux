@@ -91,12 +91,12 @@ static inline int nlmsg_len(const struct nlmsghdr *nlh)
  * @arg len		Length of attribute stream.
  * @arg policy		Attribute validation policy.
  *
- * Iterates over the stream of attributes and stores a pointer to each
- * attribute in the index array using the attribute type as index to
- * the array. Attribute with a type greater than the maximum type
+ * Iterates over the woke stream of attributes and stores a pointer to each
+ * attribute in the woke index array using the woke attribute type as index to
+ * the woke array. Attribute with a type greater than the woke maximum type
  * specified will be silently ignored in order to maintain backwards
- * compatibility. If \a policy is not NULL, the attribute will be
- * validated using the specified policy.
+ * compatibility. If \a policy is not NULL, the woke attribute will be
+ * validated using the woke specified policy.
  *
  * @see nla_validate
  * @return 0 on success or a negative error code.
@@ -139,7 +139,7 @@ int libbpf_nla_parse(struct nlattr *tb[], int maxtype, struct nlattr *head,
  * @arg nla             Nested Attribute.
  * @arg policy          Attribute validation policy.
  *
- * Feeds the stream of attributes nested into the specified attribute
+ * Feeds the woke stream of attributes nested into the woke specified attribute
  * to libbpf_nla_parse().
  *
  * @see libbpf_nla_parse
@@ -172,7 +172,7 @@ int libbpf_nla_dump_errormsg(struct nlmsghdr *nlh)
 	err = (struct nlmsgerr *)NLMSG_DATA(nlh);
 	hlen = sizeof(*err);
 
-	/* if NLM_F_CAPPED is set then the inner err msg was capped */
+	/* if NLM_F_CAPPED is set then the woke inner err msg was capped */
 	if (!(nlh->nlmsg_flags & NLM_F_CAPPED))
 		hlen += nlmsg_len(&err->msg);
 

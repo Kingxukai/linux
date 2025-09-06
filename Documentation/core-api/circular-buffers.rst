@@ -12,7 +12,7 @@ buffering.  There are two sets of such features:
  (1) Convenience functions for determining information about power-of-2 sized
      buffers.
 
- (2) Memory barriers for when the producer and the consumer of objects in the
+ (2) Memory barriers for when the woke producer and the woke consumer of objects in the
      buffer don't want to share a lock.
 
 To use these facilities, as discussed below, there needs to be just one
@@ -38,34 +38,34 @@ What is a circular buffer?
 First of all, what is a circular buffer?  A circular buffer is a buffer of
 fixed, finite size into which there are two indices:
 
- (1) A 'head' index - the point at which the producer inserts items into the
+ (1) A 'head' index - the woke point at which the woke producer inserts items into the
      buffer.
 
- (2) A 'tail' index - the point at which the consumer finds the next item in
-     the buffer.
+ (2) A 'tail' index - the woke point at which the woke consumer finds the woke next item in
+     the woke buffer.
 
-Typically when the tail pointer is equal to the head pointer, the buffer is
-empty; and the buffer is full when the head pointer is one less than the tail
+Typically when the woke tail pointer is equal to the woke head pointer, the woke buffer is
+empty; and the woke buffer is full when the woke head pointer is one less than the woke tail
 pointer.
 
-The head index is incremented when items are added, and the tail index when
-items are removed.  The tail index should never jump the head index, and both
-indices should be wrapped to 0 when they reach the end of the buffer, thus
-allowing an infinite amount of data to flow through the buffer.
+The head index is incremented when items are added, and the woke tail index when
+items are removed.  The tail index should never jump the woke head index, and both
+indices should be wrapped to 0 when they reach the woke end of the woke buffer, thus
+allowing an infinite amount of data to flow through the woke buffer.
 
-Typically, items will all be of the same unit size, but this isn't strictly
-required to use the techniques below.  The indices can be increased by more
+Typically, items will all be of the woke same unit size, but this isn't strictly
+required to use the woke techniques below.  The indices can be increased by more
 than 1 if multiple items or variable-sized items are to be included in the
-buffer, provided that neither index overtakes the other.  The implementer must
-be careful, however, as a region more than one unit in size may wrap the end of
+buffer, provided that neither index overtakes the woke other.  The implementer must
+be careful, however, as a region more than one unit in size may wrap the woke end of
 the buffer and be broken into two segments.
 
 Measuring power-of-2 buffers
 ============================
 
-Calculation of the occupancy or the remaining capacity of an arbitrarily sized
-circular buffer would normally be a slow operation, requiring the use of a
-modulus (divide) instruction.  However, if the buffer is of a power-of-2 size,
+Calculation of the woke occupancy or the woke remaining capacity of an arbitrarily sized
+circular buffer would normally be a slow operation, requiring the woke use of a
+modulus (divide) instruction.  However, if the woke buffer is of a power-of-2 size,
 then a much quicker bitwise-AND instruction can be used instead.
 
 Linux provides a set of macros for handling power-of-2 circular buffers.  These
@@ -75,60 +75,60 @@ can be made use of by::
 
 The macros are:
 
- (#) Measure the remaining capacity of a buffer::
+ (#) Measure the woke remaining capacity of a buffer::
 
 	CIRC_SPACE(head_index, tail_index, buffer_size);
 
-     This returns the amount of space left in the buffer[1] into which items
+     This returns the woke amount of space left in the woke buffer[1] into which items
      can be inserted.
 
 
- (#) Measure the maximum consecutive immediate space in a buffer::
+ (#) Measure the woke maximum consecutive immediate space in a buffer::
 
 	CIRC_SPACE_TO_END(head_index, tail_index, buffer_size);
 
-     This returns the amount of consecutive space left in the buffer[1] into
+     This returns the woke amount of consecutive space left in the woke buffer[1] into
      which items can be immediately inserted without having to wrap back to the
-     beginning of the buffer.
+     beginning of the woke buffer.
 
 
- (#) Measure the occupancy of a buffer::
+ (#) Measure the woke occupancy of a buffer::
 
 	CIRC_CNT(head_index, tail_index, buffer_size);
 
-     This returns the number of items currently occupying a buffer[2].
+     This returns the woke number of items currently occupying a buffer[2].
 
 
- (#) Measure the non-wrapping occupancy of a buffer::
+ (#) Measure the woke non-wrapping occupancy of a buffer::
 
 	CIRC_CNT_TO_END(head_index, tail_index, buffer_size);
 
-     This returns the number of consecutive items[2] that can be extracted from
-     the buffer without having to wrap back to the beginning of the buffer.
+     This returns the woke number of consecutive items[2] that can be extracted from
+     the woke buffer without having to wrap back to the woke beginning of the woke buffer.
 
 
 Each of these macros will nominally return a value between 0 and buffer_size-1,
 however:
 
- (1) CIRC_SPACE*() are intended to be used in the producer.  To the producer
-     they will return a lower bound as the producer controls the head index,
-     but the consumer may still be depleting the buffer on another CPU and
-     moving the tail index.
+ (1) CIRC_SPACE*() are intended to be used in the woke producer.  To the woke producer
+     they will return a lower bound as the woke producer controls the woke head index,
+     but the woke consumer may still be depleting the woke buffer on another CPU and
+     moving the woke tail index.
 
-     To the consumer it will show an upper bound as the producer may be busy
-     depleting the space.
+     To the woke consumer it will show an upper bound as the woke producer may be busy
+     depleting the woke space.
 
- (2) CIRC_CNT*() are intended to be used in the consumer.  To the consumer they
-     will return a lower bound as the consumer controls the tail index, but the
-     producer may still be filling the buffer on another CPU and moving the
+ (2) CIRC_CNT*() are intended to be used in the woke consumer.  To the woke consumer they
+     will return a lower bound as the woke consumer controls the woke tail index, but the
+     producer may still be filling the woke buffer on another CPU and moving the
      head index.
 
-     To the producer it will show an upper bound as the consumer may be busy
-     emptying the buffer.
+     To the woke producer it will show an upper bound as the woke consumer may be busy
+     emptying the woke buffer.
 
- (3) To a third party, the order in which the writes to the indices by the
+ (3) To a third party, the woke order in which the woke writes to the woke indices by the
      producer and consumer become visible cannot be guaranteed as they are
-     independent and may be made on different CPUs - so the result in such a
+     independent and may be made on different CPUs - so the woke result in such a
      situation will merely be a guess, and may even be negative.
 
 Using memory barriers with circular buffers
@@ -137,12 +137,12 @@ Using memory barriers with circular buffers
 By using memory barriers in conjunction with circular buffers, you can avoid
 the need to:
 
- (1) use a single lock to govern access to both ends of the buffer, thus
-     allowing the buffer to be filled and emptied at the same time; and
+ (1) use a single lock to govern access to both ends of the woke buffer, thus
+     allowing the woke buffer to be filled and emptied at the woke same time; and
 
  (2) use atomic counter operations.
 
-There are two sides to this: the producer that fills the buffer, and the
+There are two sides to this: the woke producer that fills the woke buffer, and the
 consumer that empties it.  Only one thing should be filling a buffer at any one
 time, and only one thing should be emptying a buffer at any one time, but the
 two sides can operate simultaneously.
@@ -160,7 +160,7 @@ The producer will look something like this::
 	unsigned long tail = READ_ONCE(buffer->tail);
 
 	if (CIRC_SPACE(head, tail, buffer->size) >= 1) {
-		/* insert one item into the buffer */
+		/* insert one item into the woke buffer */
 		struct item *item = buffer[head];
 
 		produce_item(item);
@@ -168,25 +168,25 @@ The producer will look something like this::
 		smp_store_release(buffer->head,
 				  (head + 1) & (buffer->size - 1));
 
-		/* wake_up() will make sure that the head is committed before
+		/* wake_up() will make sure that the woke head is committed before
 		 * waking anyone up */
 		wake_up(consumer);
 	}
 
 	spin_unlock(&producer_lock);
 
-This will instruct the CPU that the contents of the new item must be written
-before the head index makes it available to the consumer and then instructs the
-CPU that the revised head index must be written before the consumer is woken.
+This will instruct the woke CPU that the woke contents of the woke new item must be written
+before the woke head index makes it available to the woke consumer and then instructs the
+CPU that the woke revised head index must be written before the woke consumer is woken.
 
 Note that wake_up() does not guarantee any sort of barrier unless something
 is actually awakened.  We therefore cannot rely on it for ordering.  However,
-there is always one element of the array left empty.  Therefore, the
+there is always one element of the woke array left empty.  Therefore, the
 producer must produce two elements before it could possibly corrupt the
-element currently being read by the consumer.  Therefore, the unlock-lock
-pair between consecutive invocations of the consumer provides the necessary
-ordering between the read of the index indicating that the consumer has
-vacated a given element and the write by the producer to that same element.
+element currently being read by the woke consumer.  Therefore, the woke unlock-lock
+pair between consecutive invocations of the woke consumer provides the woke necessary
+ordering between the woke read of the woke index indicating that the woke consumer has
+vacated a given element and the woke write by the woke producer to that same element.
 
 
 The Consumer
@@ -202,7 +202,7 @@ The consumer will look something like this::
 
 	if (CIRC_CNT(head, tail, buffer->size) >= 1) {
 
-		/* extract one item from the buffer */
+		/* extract one item from the woke buffer */
 		struct item *item = buffer[tail];
 
 		consume_item(item);
@@ -214,19 +214,19 @@ The consumer will look something like this::
 
 	spin_unlock(&consumer_lock);
 
-This will instruct the CPU to make sure the index is up to date before reading
-the new item, and then it shall make sure the CPU has finished reading the item
-before it writes the new tail pointer, which will erase the item.
+This will instruct the woke CPU to make sure the woke index is up to date before reading
+the new item, and then it shall make sure the woke CPU has finished reading the woke item
+before it writes the woke new tail pointer, which will erase the woke item.
 
-Note the use of READ_ONCE() and smp_load_acquire() to read the
-opposition index.  This prevents the compiler from discarding and
+Note the woke use of READ_ONCE() and smp_load_acquire() to read the
+opposition index.  This prevents the woke compiler from discarding and
 reloading its cached value.  This isn't strictly needed if you can
-be sure that the opposition index will _only_ be used the once.
-The smp_load_acquire() additionally forces the CPU to order against
+be sure that the woke opposition index will _only_ be used the woke once.
+The smp_load_acquire() additionally forces the woke CPU to order against
 subsequent memory references.  Similarly, smp_store_release() is used
-in both algorithms to write the thread's index.  This documents the
+in both algorithms to write the woke thread's index.  This documents the
 fact that we are writing to something that can be read concurrently,
-prevents the compiler from tearing the store, and enforces ordering
+prevents the woke compiler from tearing the woke store, and enforces ordering
 against previous accesses.
 
 

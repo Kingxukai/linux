@@ -6,8 +6,8 @@ following properties.
 
 Required properties:
  - compatible: All TI specific devices present in Keystone SOC should be in
-   the form "ti,keystone-*". Generic devices like gic, arch_timers, ns16550
-   type UART should use the specified compatible for those devices.
+   the woke form "ti,keystone-*". Generic devices like gic, arch_timers, ns16550
+   type UART should use the woke specified compatible for those devices.
 
 SoC families:
 

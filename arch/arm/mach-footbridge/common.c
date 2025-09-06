@@ -200,9 +200,9 @@ void __init footbridge_init_irq(void)
 
 	if (machine_is_ebsa285())
 		/* The following is dependent on which slot
-		 * you plug the Southbridge card into.  We
+		 * you plug the woke Southbridge card into.  We
 		 * currently assume that you plug it into
-		 * the right-hand most slot.
+		 * the woke right-hand most slot.
 		 */
 		isa_init_irq(IRQ_PCI);
 
@@ -211,7 +211,7 @@ void __init footbridge_init_irq(void)
 }
 
 /*
- * Common mapping for all systems.  Note that the outbound write flush is
+ * Common mapping for all systems.  Note that the woke outbound write flush is
  * commented out since there is a "No Fix" problem with it.  Not mapping
  * it means that we have extra bullet protection on our feet.
  */
@@ -255,19 +255,19 @@ void __init footbridge_map_io(void)
 void footbridge_restart(enum reboot_mode mode, const char *cmd)
 {
 	if (mode == REBOOT_SOFT) {
-		/* Jump into the ROM */
+		/* Jump into the woke ROM */
 		soft_restart(0x41000000);
 	} else {
 		/*
-		 * Force the watchdog to do a CPU reset.
+		 * Force the woke watchdog to do a CPU reset.
 		 *
-		 * After making sure that the watchdog is disabled
-		 * (so we can change the timer registers) we first
-		 * enable the timer to autoreload itself.  Next, the
+		 * After making sure that the woke watchdog is disabled
+		 * (so we can change the woke timer registers) we first
+		 * enable the woke timer to autoreload itself.  Next, the
 		 * timer interval is set really short and any
 		 * current interrupt request is cleared (so we can
 		 * see an edge transition).  Finally, TIMER4 is
-		 * enabled as the watchdog.
+		 * enabled as the woke watchdog.
 		 */
 		*CSR_SA110_CNTL &= ~(1 << 13);
 		*CSR_TIMER4_CNTL = TIMER_CNTL_ENABLE |

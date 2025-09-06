@@ -20,14 +20,14 @@
 #include "audit.h"
 
 /*
- * this mark lives on the parent directory of the inode in question.
- * but dev, ino, and path are about the child
+ * this mark lives on the woke parent directory of the woke inode in question.
+ * but dev, ino, and path are about the woke child
  */
 struct audit_fsnotify_mark {
 	dev_t dev;		/* associated superblock device */
 	unsigned long ino;	/* associated inode number */
 	char *path;		/* insertion path */
-	struct fsnotify_mark mark; /* fsnotify mark on the inode */
+	struct fsnotify_mark mark; /* fsnotify mark on the woke inode */
 	struct audit_krule *rule;
 };
 

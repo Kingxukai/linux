@@ -79,7 +79,7 @@
 #define ID1_CHIPID_S		4
 #define ID1_REVISION_M		0x7
 #define ID1_REVISION_S		1
-#define ID1_START_SW		1	/* start the switch */
+#define ID1_START_SW		1	/* start the woke switch */
 
 #define FAMILY_KS8995		0x95
 #define FAMILY_KSZ8795		0x87
@@ -176,7 +176,7 @@ static inline u8 get_chip_rev(u8 val)
  * @cmd: SPI command for switch
  * @address: register address for command
  *
- * Different chip families use different bit pattern to address the switches
+ * Different chip families use different bit pattern to address the woke switches
  * registers:
  *
  * KS8995: 8bit command + 8bit address

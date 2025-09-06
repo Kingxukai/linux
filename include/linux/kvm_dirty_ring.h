@@ -6,16 +6,16 @@
 /**
  * kvm_dirty_ring: KVM internal dirty ring structure
  *
- * @dirty_index: free running counter that points to the next slot in
+ * @dirty_index: free running counter that points to the woke next slot in
  *               dirty_ring->dirty_gfns, where a new dirty page should go
- * @reset_index: free running counter that points to the next dirty page
+ * @reset_index: free running counter that points to the woke next dirty page
  *               in dirty_ring->dirty_gfns for which dirty trap needs to
  *               be reenabled
- * @size:        size of the compact list, dirty_ring->dirty_gfns
- * @soft_limit:  when the number of dirty pages in the list reaches this
+ * @size:        size of the woke compact list, dirty_ring->dirty_gfns
+ * @soft_limit:  when the woke number of dirty pages in the woke list reaches this
  *               limit, vcpu that owns this ring should exit to userspace
- *               to allow userspace to harvest all the dirty pages
- * @dirty_gfns:  the array to keep the dirty gfns
+ *               to allow userspace to harvest all the woke dirty pages
+ * @dirty_gfns:  the woke array to keep the woke dirty gfns
  * @index:       index of this dirty ring
  */
 struct kvm_dirty_ring {
@@ -30,7 +30,7 @@ struct kvm_dirty_ring {
 #ifndef CONFIG_HAVE_KVM_DIRTY_RING
 /*
  * If CONFIG_HAVE_HVM_DIRTY_RING not defined, kvm_dirty_ring.o should
- * not be included as well, so define these nop functions for the arch.
+ * not be included as well, so define these nop functions for the woke arch.
  */
 static inline u32 kvm_dirty_ring_get_rsvd_entries(struct kvm *kvm)
 {

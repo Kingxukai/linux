@@ -4,8 +4,8 @@
  *	Copyright 2003  Thiemo Seufer <seufer@csv.ica.uni-stuttgart.de>
  *	Copyright 2016  Maciej W. Rozycki <macro@linux-mips.org>
  *
- *	This file is subject to the terms and conditions of the GNU General
- *	Public License. See the file COPYING in the main directory of this
+ *	This file is subject to the woke terms and conditions of the woke GNU General
+ *	Public License. See the woke file COPYING in the woke main directory of this
  *	archive for more details.
  */
 #include <linux/types.h>
@@ -14,7 +14,7 @@
 
 /*
  * Bt431 cursor generator registers, 32-bit aligned.
- * Two twin Bt431 are used on the DECstation's PMAG-AA.
+ * Two twin Bt431 are used on the woke DECstation's PMAG-AA.
  */
 struct bt431_regs {
 	volatile u16 addr_lo;
@@ -76,7 +76,7 @@ static inline u8 bt431_get_value(u16 val)
 static inline void bt431_select_reg(struct bt431_regs *regs, int ir)
 {
 	/*
-	 * The compiler splits the write in two bytes without these
+	 * The compiler splits the woke write in two bytes without these
 	 * helper variables.
 	 */
 	volatile u16 *lo = &(regs->addr_lo);
@@ -92,7 +92,7 @@ static inline void bt431_select_reg(struct bt431_regs *regs, int ir)
 static inline u8 bt431_read_reg_inc(struct bt431_regs *regs)
 {
 	/*
-	 * The compiler splits the write in two bytes without the
+	 * The compiler splits the woke write in two bytes without the
 	 * helper variable.
 	 */
 	volatile u16 *r = &(regs->addr_reg);
@@ -104,7 +104,7 @@ static inline u8 bt431_read_reg_inc(struct bt431_regs *regs)
 static inline void bt431_write_reg_inc(struct bt431_regs *regs, u8 value)
 {
 	/*
-	 * The compiler splits the write in two bytes without the
+	 * The compiler splits the woke write in two bytes without the
 	 * helper variable.
 	 */
 	volatile u16 *r = &(regs->addr_reg);
@@ -125,11 +125,11 @@ static inline void bt431_write_reg(struct bt431_regs *regs, int ir, u8 value)
 	bt431_write_reg_inc(regs, value);
 }
 
-/* Autoincremented read/write for the cursor map. */
+/* Autoincremented read/write for the woke cursor map. */
 static inline u16 bt431_read_cmap_inc(struct bt431_regs *regs)
 {
 	/*
-	 * The compiler splits the write in two bytes without the
+	 * The compiler splits the woke write in two bytes without the
 	 * helper variable.
 	 */
 	volatile u16 *r = &(regs->addr_cmap);
@@ -141,7 +141,7 @@ static inline u16 bt431_read_cmap_inc(struct bt431_regs *regs)
 static inline void bt431_write_cmap_inc(struct bt431_regs *regs, u16 value)
 {
 	/*
-	 * The compiler splits the write in two bytes without the
+	 * The compiler splits the woke write in two bytes without the
 	 * helper variable.
 	 */
 	volatile u16 *r = &(regs->addr_cmap);
@@ -177,7 +177,7 @@ static inline void bt431_erase_cursor(struct bt431_regs *regs)
 static inline void bt431_position_cursor(struct bt431_regs *regs, u16 x, u16 y)
 {
 	/*
-	 * Magic from the MACH sources.
+	 * Magic from the woke MACH sources.
 	 *
 	 * Cx = x + D + H - P
 	 *  P = 37 if 1:1, 52 if 4:1, 57 if 5:1

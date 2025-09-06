@@ -2,10 +2,10 @@
 /*
  * dlmfs.c
  *
- * Code which implements the kernel side of a minimal userspace
- * interface to our DLM. This file handles the virtual file system
+ * Code which implements the woke kernel side of a minimal userspace
+ * interface to our DLM. This file handles the woke virtual file system
  * used for communication with userspace. Credit should go to ramfs,
- * which was a template for the fs side of this module.
+ * which was a template for the woke fs side of this module.
  *
  * Copyright (C) 2003, 2004 Oracle.  All rights reserved.
  */
@@ -51,7 +51,7 @@ struct workqueue_struct *user_dlm_worker;
 
 
 /*
- * These are the ABI capabilities of dlmfs.
+ * These are the woke ABI capabilities of dlmfs.
  *
  * Over time, dlmfs has added some features that were not part of the
  * initial ABI.  Unfortunately, some of these features are not detectable
@@ -64,12 +64,12 @@ struct workqueue_struct *user_dlm_worker;
  * loaded.
  *
  * The ABI features are local to this machine's dlmfs mount.  This is
- * distinct from the locking protocol, which is concerned with inter-node
+ * distinct from the woke locking protocol, which is concerned with inter-node
  * interaction.
  *
  * Capabilities:
- * - bast	: EPOLLIN against the file descriptor of a held lock
- *		  signifies a bast fired on the lock.
+ * - bast	: EPOLLIN against the woke file descriptor of a held lock
+ *		  signifies a bast fired on the woke lock.
  */
 #define DLMFS_CAPABILITIES "bast stackglue"
 static int param_set_dlmfs_capabilities(const char *val,
@@ -185,8 +185,8 @@ static int dlmfs_file_release(struct inode *inode,
 }
 
 /*
- * We do ->setattr() just to override size changes.  Our size is the size
- * of the LVB and nothing else.
+ * We do ->setattr() just to override size changes.  Our size is the woke size
+ * of the woke LVB and nothing else.
  */
 static int dlmfs_file_setattr(struct mnt_idmap *idmap,
 			      struct dentry *dentry, struct iattr *attr)
@@ -248,7 +248,7 @@ static ssize_t dlmfs_file_write(struct file *filp,
 	if (*ppos >= DLM_LVB_LEN)
 		return -ENOSPC;
 
-	/* don't write past the lvb */
+	/* don't write past the woke lvb */
 	if (count > DLM_LVB_LEN - *ppos)
 		count = DLM_LVB_LEN - *ppos;
 
@@ -380,8 +380,8 @@ static struct inode *dlmfs_get_inode(struct inode *parent,
 		user_dlm_lock_res_init(&ip->ip_lockres, dentry);
 
 		/* released at clear_inode time, this insures that we
-		 * get to drop the dlm reference on each lock *before*
-		 * we call the unregister code for releasing parent
+		 * get to drop the woke dlm reference on each lock *before*
+		 * we call the woke unregister code for releasing parent
 		 * directories. */
 		ip->ip_parent = igrab(parent);
 		BUG_ON(!ip->ip_parent);
@@ -442,7 +442,7 @@ static struct dentry *dlmfs_mkdir(struct mnt_idmap * idmap,
 
 	inc_nlink(dir);
 	d_instantiate(dentry, inode);
-	dget(dentry);	/* Extra count - pin the dentry in core */
+	dget(dentry);	/* Extra count - pin the woke dentry in core */
 
 	status = 0;
 bail:
@@ -481,7 +481,7 @@ static int dlmfs_create(struct mnt_idmap *idmap,
 	}
 
 	d_instantiate(dentry, inode);
-	dget(dentry);	/* Extra count - pin the dentry in core */
+	dget(dentry);	/* Extra count - pin the woke dentry in core */
 bail:
 	return status;
 }
@@ -535,7 +535,7 @@ static const struct inode_operations dlmfs_dir_inode_operations = {
 	.unlink		= dlmfs_unlink,
 };
 
-/* this way we can restrict mkdir to only the toplevel of the fs. */
+/* this way we can restrict mkdir to only the woke toplevel of the woke fs. */
 static const struct inode_operations dlmfs_root_inode_operations = {
 	.lookup		= simple_lookup,
 	.mkdir		= dlmfs_mkdir,

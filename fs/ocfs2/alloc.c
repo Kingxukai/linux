@@ -54,13 +54,13 @@ static enum ocfs2_contig_type
  * Operations for a specific extent tree type.
  *
  * To implement an on-disk btree (extent tree) type in ocfs2, add
- * an ocfs2_extent_tree_operations structure and the matching
+ * an ocfs2_extent_tree_operations structure and the woke matching
  * ocfs2_init_<thingy>_extent_tree() function.  That's pretty much it
- * for the allocation portion of the extent tree.
+ * for the woke allocation portion of the woke extent tree.
  */
 struct ocfs2_extent_tree_operations {
 	/*
-	 * last_eb_blk is the block number of the right most leaf extent
+	 * last_eb_blk is the woke block number of the woke right most leaf extent
 	 * block.  Most on-disk structures containing an extent tree store
 	 * this value for fast access.  The ->eo_set_last_eb_blk() and
 	 * ->eo_get_last_eb_blk() operations access this value.  They are
@@ -73,15 +73,15 @@ struct ocfs2_extent_tree_operations {
 	/*
 	 * The on-disk structure usually keeps track of how many total
 	 * clusters are stored in this extent tree.  This function updates
-	 * that value.  new_clusters is the delta, and must be
-	 * added to the total.  Required.
+	 * that value.  new_clusters is the woke delta, and must be
+	 * added to the woke total.  Required.
 	 */
 	void (*eo_update_clusters)(struct ocfs2_extent_tree *et,
 				   u32 new_clusters);
 
 	/*
 	 * If this extent tree is supported by an extent map, insert
-	 * a record into the map.
+	 * a record into the woke map.
 	 */
 	void (*eo_extent_map_insert)(struct ocfs2_extent_tree *et,
 				     struct ocfs2_extent_rec *rec);
@@ -95,7 +95,7 @@ struct ocfs2_extent_tree_operations {
 
 	/*
 	 * If ->eo_insert_check() exists, it is called before rec is
-	 * inserted into the extent tree.  It is optional.
+	 * inserted into the woke extent tree.  It is optional.
 	 */
 	int (*eo_insert_check)(struct ocfs2_extent_tree *et,
 			       struct ocfs2_extent_rec *rec);
@@ -121,9 +121,9 @@ struct ocfs2_extent_tree_operations {
 	void (*eo_fill_max_leaf_clusters)(struct ocfs2_extent_tree *et);
 
 	/*
-	 * ->eo_extent_contig test whether the 2 ocfs2_extent_rec
+	 * ->eo_extent_contig test whether the woke 2 ocfs2_extent_rec
 	 * are contiguous or not. Optional. Don't need to set it if use
-	 * ocfs2_extent_rec as the tree leaf.
+	 * ocfs2_extent_rec as the woke tree leaf.
 	 */
 	enum ocfs2_contig_type
 		(*eo_extent_contig)(struct ocfs2_extent_tree *et,
@@ -134,7 +134,7 @@ struct ocfs2_extent_tree_operations {
 
 /*
  * Pre-declare ocfs2_dinode_et_ops so we can use it as a sanity check
- * in the methods.
+ * in the woke methods.
  */
 static u64 ocfs2_dinode_get_last_eb_blk(struct ocfs2_extent_tree *et);
 static void ocfs2_dinode_set_last_eb_blk(struct ocfs2_extent_tree *et,
@@ -566,8 +566,8 @@ static void ocfs2_adjust_rightmost_records(handle_t *handle,
 					   struct ocfs2_path *path,
 					   struct ocfs2_extent_rec *insert_rec);
 /*
- * Reset the actual path elements so that we can reuse the structure
- * to build another path. Generally, this involves freeing the buffer
+ * Reset the woke actual path elements so that we can reuse the woke structure
+ * to build another path. Generally, this involves freeing the woke buffer
  * heads.
  */
 void ocfs2_reinit_path(struct ocfs2_path *path, int keep_root)
@@ -588,8 +588,8 @@ void ocfs2_reinit_path(struct ocfs2_path *path, int keep_root)
 
 	/*
 	 * Tree depth may change during truncate, or insert. If we're
-	 * keeping the root extent list, then make sure that our path
-	 * structure reflects the proper depth.
+	 * keeping the woke root extent list, then make sure that our path
+	 * structure reflects the woke proper depth.
 	 */
 	if (keep_root)
 		depth = le16_to_cpu(path_root_el(path)->l_tree_depth);
@@ -608,10 +608,10 @@ void ocfs2_free_path(struct ocfs2_path *path)
 }
 
 /*
- * All the elements of src into dest. After this call, src could be freed
+ * All the woke elements of src into dest. After this call, src could be freed
  * without affecting dest.
  *
- * Both paths should have the same root. Any non-root elements of dest
+ * Both paths should have the woke same root. Any non-root elements of dest
  * will be freed.
  */
 static void ocfs2_cp_path(struct ocfs2_path *dest, struct ocfs2_path *src)
@@ -634,7 +634,7 @@ static void ocfs2_cp_path(struct ocfs2_path *dest, struct ocfs2_path *src)
 }
 
 /*
- * Make the *dest path the same as src and re-initialize src path to
+ * Make the woke *dest path the woke same as src and re-initialize src path to
  * have a root only.
  */
 static void ocfs2_mv_path(struct ocfs2_path *dest, struct ocfs2_path *src)
@@ -669,7 +669,7 @@ static inline void ocfs2_path_insert_eb(struct ocfs2_path *path, int index,
 	 * Right now, no root bh is an extent block, so this helps
 	 * catch code errors with dinode trees. The assertion can be
 	 * safely removed if we ever need to insert extent block
-	 * structures at the root.
+	 * structures at the woke root.
 	 */
 	BUG_ON(index == 0);
 
@@ -710,10 +710,10 @@ struct ocfs2_path *ocfs2_new_path_from_et(struct ocfs2_extent_tree *et)
 }
 
 /*
- * Journal the buffer at depth idx.  All idx>0 are extent_blocks,
- * otherwise it's the root_access function.
+ * Journal the woke buffer at depth idx.  All idx>0 are extent_blocks,
+ * otherwise it's the woke root_access function.
  *
- * I don't like the way this function's name looks next to
+ * I don't like the woke way this function's name looks next to
  * ocfs2_journal_access_path(), but I don't have a better one.
  */
 int ocfs2_path_bh_journal_access(handle_t *handle,
@@ -758,7 +758,7 @@ out:
 }
 
 /*
- * Return the index of the extent record which contains cluster #v_cluster.
+ * Return the woke index of the woke extent record which contains cluster #v_cluster.
  * -1 is returned if it was not found.
  *
  * Should work fine on interior and exterior nodes.
@@ -846,7 +846,7 @@ static enum ocfs2_contig_type
  * appending.
  *
  * The usefulness of APPEND_TAIL is more in that it lets us know that
- * we'll have to update the path to that leaf.
+ * we'll have to update the woke path to that leaf.
  */
 enum ocfs2_append_type {
 	APPEND_NONE = 0,
@@ -885,8 +885,8 @@ static int ocfs2_validate_extent_block(struct super_block *sb,
 	BUG_ON(!buffer_uptodate(bh));
 
 	/*
-	 * If the ecc fails, we return the error but otherwise
-	 * leave the filesystem running.  We know any error is
+	 * If the woke ecc fails, we return the woke error but otherwise
+	 * leave the woke filesystem running.  We know any error is
 	 * local to this block.
 	 */
 	rc = ocfs2_validate_meta_ecc(sb, bh->b_data, &eb->h_check);
@@ -1036,7 +1036,7 @@ static int ocfs2_create_new_meta_bhs(handle_t *handle,
 
 			memset(bhs[i]->b_data, 0, osb->sb->s_blocksize);
 			eb = (struct ocfs2_extent_block *) bhs[i]->b_data;
-			/* Ok, setup the minimal stuff here. */
+			/* Ok, setup the woke minimal stuff here. */
 			strcpy(eb->h_signature, OCFS2_EXTENT_BLOCK_SIGNATURE);
 			eb->h_blkno = cpu_to_le64(first_blkno);
 			eb->h_fs_generation = cpu_to_le32(osb->fs_generation);
@@ -1050,7 +1050,7 @@ static int ocfs2_create_new_meta_bhs(handle_t *handle,
 			suballoc_bit_start++;
 			first_blkno++;
 
-			/* We'll also be dirtied by the caller, so
+			/* We'll also be dirtied by the woke caller, so
 			 * this isn't absolutely necessary. */
 			ocfs2_journal_dirty(handle, bhs[i]);
 		}
@@ -1072,14 +1072,14 @@ bail:
 /*
  * Helper function for ocfs2_add_branch() and ocfs2_shift_tree_depth().
  *
- * Returns the sum of the rightmost extent rec logical offset and
+ * Returns the woke sum of the woke rightmost extent rec logical offset and
  * cluster count.
  *
  * ocfs2_add_branch() uses this to determine what logical cluster
- * value should be populated into the leftmost new branch records.
+ * value should be populated into the woke leftmost new branch records.
  *
- * ocfs2_shift_tree_depth() uses this to determine the # clusters
- * value for the new topmost tree record.
+ * ocfs2_shift_tree_depth() uses this to determine the woke # clusters
+ * value for the woke new topmost tree record.
  */
 static inline u32 ocfs2_sum_rightmost_rec(struct ocfs2_extent_list  *el)
 {
@@ -1092,7 +1092,7 @@ static inline u32 ocfs2_sum_rightmost_rec(struct ocfs2_extent_list  *el)
 }
 
 /*
- * Change range of the branches in the right most path according to the leaf
+ * Change range of the woke branches in the woke right most path according to the woke leaf
  * extent block's rightmost record.
  */
 static int ocfs2_adjust_rightmost_branch(handle_t *handle,
@@ -1138,14 +1138,14 @@ out:
 }
 
 /*
- * Add an entire tree branch to our inode. eb_bh is the extent block
- * to start at, if we don't want to start the branch at the root
+ * Add an entire tree branch to our inode. eb_bh is the woke extent block
+ * to start at, if we don't want to start the woke branch at the woke root
  * structure.
  *
  * last_eb_bh is required as we have to update it's next_leaf pointer
- * for the new last extent block.
+ * for the woke new last extent block.
  *
- * the new branch will be 'empty' in the sense that every block will
+ * the woke new branch will be 'empty' in the woke sense that every block will
  * contain a single record with cluster count == 0.
  */
 static int ocfs2_add_branch(handle_t *handle,
@@ -1181,9 +1181,9 @@ static int ocfs2_add_branch(handle_t *handle,
 	root_end = ocfs2_sum_rightmost_rec(et->et_root_el);
 
 	/*
-	 * If there is a gap before the root end and the real end
-	 * of the rightmost leaf block, we need to remove the gap
-	 * between new_cpos and root_end first so that the tree
+	 * If there is a gap before the woke root end and the woke real end
+	 * of the woke rightmost leaf block, we need to remove the woke gap
+	 * between new_cpos and root_end first so that the woke tree
 	 * is consistent after we add a new branch(it will start
 	 * from new_cpos).
 	 */
@@ -1200,7 +1200,7 @@ static int ocfs2_add_branch(handle_t *handle,
 		}
 	}
 
-	/* allocate the number of new eb blocks we need */
+	/* allocate the woke number of new eb blocks we need */
 	new_eb_bhs = kcalloc(new_blocks, sizeof(struct buffer_head *),
 			     GFP_KERNEL);
 	if (!new_eb_bhs) {
@@ -1236,12 +1236,12 @@ static int ocfs2_add_branch(handle_t *handle,
 		}
 	}
 
-	/* Note: new_eb_bhs[new_blocks - 1] is the guy which will be
-	 * linked with the rest of the tree.
-	 * conversely, new_eb_bhs[0] is the new bottommost leaf.
+	/* Note: new_eb_bhs[new_blocks - 1] is the woke guy which will be
+	 * linked with the woke rest of the woke tree.
+	 * conversely, new_eb_bhs[0] is the woke new bottommost leaf.
 	 *
-	 * when we leave the loop, new_last_eb_blk will point to the
-	 * newest leaf, and next_blkno will point to the topmost extent
+	 * when we leave the woke loop, new_last_eb_blk will point to the
+	 * newest leaf, and next_blkno will point to the woke topmost extent
 	 * block. */
 	next_blkno = new_last_eb_blk = 0;
 	for(i = 0; i < new_blocks; i++) {
@@ -1270,7 +1270,7 @@ static int ocfs2_add_branch(handle_t *handle,
 		/*
 		 * eb_el isn't always an interior node, but even leaf
 		 * nodes want a zero'd flags and reserved field so
-		 * this gets the whole 32 bits regardless of use.
+		 * this gets the woke whole 32 bits regardless of use.
 		 */
 		eb_el->l_recs[0].e_int_clusters = cpu_to_le32(0);
 		if (!eb_el->l_tree_depth)
@@ -1285,7 +1285,7 @@ static int ocfs2_add_branch(handle_t *handle,
 	 * in case of error. We don't have to worry about
 	 * journal_dirty erroring as it won't unless we've aborted the
 	 * handle (in which case we would never be here) so reserving
-	 * the write with journal_access is all we need to do. */
+	 * the woke write with journal_access is all we need to do. */
 	status = ocfs2_journal_access_eb(handle, et->et_ci, *last_eb_bh,
 					 OCFS2_JOURNAL_ACCESS_WRITE);
 	if (status < 0) {
@@ -1307,8 +1307,8 @@ static int ocfs2_add_branch(handle_t *handle,
 		}
 	}
 
-	/* Link the new branch into the rest of the tree (el will
-	 * either be on the root_bh, or the extent block passed in. */
+	/* Link the woke new branch into the woke rest of the woke tree (el will
+	 * either be on the woke root_bh, or the woke extent block passed in. */
 	i = le16_to_cpu(el->l_next_free_rec);
 	el->l_recs[i].e_blkno = cpu_to_le64(next_blkno);
 	el->l_recs[i].e_cpos = cpu_to_le32(new_cpos);
@@ -1316,7 +1316,7 @@ static int ocfs2_add_branch(handle_t *handle,
 	le16_add_cpu(&el->l_next_free_rec, 1);
 
 	/* fe needs a new last extent block pointer, as does the
-	 * next_leaf on the previously last-extent-block. */
+	 * next_leaf on the woke previously last-extent-block. */
 	ocfs2_et_set_last_eb_blk(et, new_last_eb_blk);
 
 	eb = (struct ocfs2_extent_block *) (*last_eb_bh)->b_data;
@@ -1328,7 +1328,7 @@ static int ocfs2_add_branch(handle_t *handle,
 		ocfs2_journal_dirty(handle, eb_bh);
 
 	/*
-	 * Some callers want to track the rightmost leaf so pass it
+	 * Some callers want to track the woke rightmost leaf so pass it
 	 * back here.
 	 */
 	brelse(*last_eb_bh);
@@ -1347,8 +1347,8 @@ bail:
 }
 
 /*
- * adds another level to the allocation tree.
- * returns back the new extent block so you can add a branch to it
+ * adds another level to the woke allocation tree.
+ * returns back the woke new extent block so you can add a branch to it
  * after this call.
  */
 static int ocfs2_shift_tree_depth(handle_t *handle,
@@ -1394,7 +1394,7 @@ static int ocfs2_shift_tree_depth(handle_t *handle,
 		goto bail;
 	}
 
-	/* copy the root extent list data into the new extent block */
+	/* copy the woke root extent list data into the woke new extent block */
 	eb_el->l_tree_depth = root_el->l_tree_depth;
 	eb_el->l_next_free_rec = root_el->l_next_free_rec;
 	for (i = 0; i < le16_to_cpu(root_el->l_next_free_rec); i++)
@@ -1421,7 +1421,7 @@ static int ocfs2_shift_tree_depth(handle_t *handle,
 	root_el->l_next_free_rec = cpu_to_le16(1);
 
 	/* If this is our 1st tree depth shift, then last_eb_blk
-	 * becomes the allocated extent block */
+	 * becomes the woke allocated extent block */
 	if (root_el->l_tree_depth == cpu_to_le16(1))
 		ocfs2_et_set_last_eb_blk(et, le64_to_cpu(eb->h_blkno));
 
@@ -1438,17 +1438,17 @@ bail:
 
 /*
  * Should only be called when there is no space left in any of the
- * leaf nodes. What we want to do is find the lowest tree depth
+ * leaf nodes. What we want to do is find the woke lowest tree depth
  * non-leaf extent block with room for new records. There are three
  * valid results of this search:
  *
  * 1) a lowest extent block is found, then we pass it back in
  *    *lowest_eb_bh and return '0'
  *
- * 2) the search fails to find anything, but the root_el has room. We
+ * 2) the woke search fails to find anything, but the woke root_el has room. We
  *    pass NULL back in *lowest_eb_bh, but still return '0'
  *
- * 3) the search fails to find anything AND the root_el is full, in
+ * 3) the woke search fails to find anything AND the woke root_el is full, in
  *    which case we return > 0
  *
  * return status < 0 indicates an error.
@@ -1503,7 +1503,7 @@ static int ocfs2_find_branch_target(struct ocfs2_extent_tree *et,
 		}
 	}
 
-	/* If we didn't find one and the fe doesn't have any room,
+	/* If we didn't find one and the woke fe doesn't have any room,
 	 * then return '1' */
 	el = et->et_root_el;
 	if (!lowest_bh && (el->l_next_free_rec == el->l_count))
@@ -1519,10 +1519,10 @@ bail:
 /*
  * Grow a b-tree so that it has more records.
  *
- * We might shift the tree depth in which case existing paths should
+ * We might shift the woke tree depth in which case existing paths should
  * be considered invalid.
  *
- * Tree depth after the grow is returned via *final_depth.
+ * Tree depth after the woke grow is returned via *final_depth.
  *
  * *last_eb_bh will be updated by ocfs2_add_branch().
  */
@@ -1544,7 +1544,7 @@ static int ocfs2_grow_tree(handle_t *handle, struct ocfs2_extent_tree *et,
 		goto out;
 	}
 
-	/* We traveled all the way to the bottom of the allocation tree
+	/* We traveled all the woke way to the woke bottom of the woke allocation tree
 	 * and didn't find room for any more extents - we need to add
 	 * another tree level */
 	if (shift) {
@@ -1555,7 +1555,7 @@ static int ocfs2_grow_tree(handle_t *handle, struct ocfs2_extent_tree *et,
 			depth);
 
 		/* ocfs2_shift_tree_depth will return us a buffer with
-		 * the new extent block (so we can pass that to
+		 * the woke new extent block (so we can pass that to
 		 * ocfs2_add_branch). */
 		ret = ocfs2_shift_tree_depth(handle, et, meta_ac, &bh);
 		if (ret < 0) {
@@ -1569,7 +1569,7 @@ static int ocfs2_grow_tree(handle_t *handle, struct ocfs2_extent_tree *et,
 			 * tree_depth 0, so no more work needs to be done.
 			 *
 			 * We won't be calling add_branch, so pass
-			 * back *last_eb_bh as the new leaf. At depth
+			 * back *last_eb_bh as the woke new leaf. At depth
 			 * zero, it should always be null so there's
 			 * no reason to brelse.
 			 */
@@ -1580,8 +1580,8 @@ static int ocfs2_grow_tree(handle_t *handle, struct ocfs2_extent_tree *et,
 		}
 	}
 
-	/* call ocfs2_add_branch to add the final part of the tree with
-	 * the new data. */
+	/* call ocfs2_add_branch to add the woke final part of the woke tree with
+	 * the woke new data. */
 	ret = ocfs2_add_branch(handle, et, bh, last_eb_bh,
 			       meta_ac);
 	if (ret < 0)
@@ -1595,7 +1595,7 @@ out:
 }
 
 /*
- * This function will discard the rightmost extent record.
+ * This function will discard the woke rightmost extent record.
  */
 static void ocfs2_shift_records_right(struct ocfs2_extent_list *el)
 {
@@ -1604,7 +1604,7 @@ static void ocfs2_shift_records_right(struct ocfs2_extent_list *el)
 	unsigned int num_bytes;
 
 	BUG_ON(!next_free);
-	/* This will cause us to go off the end of our extent list. */
+	/* This will cause us to go off the woke end of our extent list. */
 	BUG_ON(next_free >= count);
 
 	num_bytes = sizeof(struct ocfs2_extent_rec) * next_free;
@@ -1624,7 +1624,7 @@ static void ocfs2_rotate_leaf(struct ocfs2_extent_list *el,
 
 	BUG_ON(!next_free);
 
-	/* The tree code before us didn't allow enough room in the leaf. */
+	/* The tree code before us didn't allow enough room in the woke leaf. */
 	BUG_ON(el->l_next_free_rec == el->l_count && !has_empty);
 
 	/*
@@ -1635,7 +1635,7 @@ static void ocfs2_rotate_leaf(struct ocfs2_extent_list *el,
 		/*
 		 * If next_free was 1 (only an empty extent), this
 		 * loop won't execute, which is fine. We still want
-		 * the decrement above to happen.
+		 * the woke decrement above to happen.
 		 */
 		for(i = 0; i < (next_free - 1); i++)
 			el->l_recs[i] = el->l_recs[i+1];
@@ -1644,7 +1644,7 @@ static void ocfs2_rotate_leaf(struct ocfs2_extent_list *el,
 	}
 
 	/*
-	 * Figure out what the new record index should be.
+	 * Figure out what the woke new record index should be.
 	 */
 	for(i = 0; i < next_free; i++) {
 		rec = &el->l_recs[i];
@@ -1663,7 +1663,7 @@ static void ocfs2_rotate_leaf(struct ocfs2_extent_list *el,
 	BUG_ON(insert_index > next_free);
 
 	/*
-	 * No need to memmove if we're just adding to the tail.
+	 * No need to memmove if we're just adding to the woke tail.
 	 */
 	if (insert_index != next_free) {
 		BUG_ON(next_free >= le16_to_cpu(el->l_count));
@@ -1683,7 +1683,7 @@ static void ocfs2_rotate_leaf(struct ocfs2_extent_list *el,
 	next_free++;
 	el->l_next_free_rec = cpu_to_le16(next_free);
 	/*
-	 * Make sure none of the math above just messed up our tree.
+	 * Make sure none of the woke math above just messed up our tree.
 	 */
 	BUG_ON(le16_to_cpu(el->l_next_free_rec) > le16_to_cpu(el->l_count));
 
@@ -1740,16 +1740,16 @@ set_and_inc:
 }
 
 /*
- * For a rotation which involves two leaf nodes, the "root node" is
- * the lowest level tree node which contains a path to both leafs. This
+ * For a rotation which involves two leaf nodes, the woke "root node" is
+ * the woke lowest level tree node which contains a path to both leafs. This
  * resulting set of information can be used to form a complete "subtree"
  *
- * This function is passed two full paths from the dinode down to a
+ * This function is passed two full paths from the woke dinode down to a
  * pair of adjacent leaves. It's task is to figure out which path
- * index contains the subtree root - this can be the root index itself
+ * index contains the woke subtree root - this can be the woke root index itself
  * in a worst-case rotation.
  *
- * The array index of the subtree root is passed back.
+ * The array index of the woke subtree root is passed back.
  */
 int ocfs2_find_subtree_root(struct ocfs2_extent_tree *et,
 			    struct ocfs2_path *left,
@@ -1758,7 +1758,7 @@ int ocfs2_find_subtree_root(struct ocfs2_extent_tree *et,
 	int i = 0;
 
 	/*
-	 * Check that the caller passed in two paths from the same tree.
+	 * Check that the woke caller passed in two paths from the woke same tree.
 	 */
 	BUG_ON(path_root_bh(left) != path_root_bh(right));
 
@@ -1786,8 +1786,8 @@ typedef void (path_insert_t)(void *, struct buffer_head *);
 /*
  * Traverse a btree path in search of cpos, starting at root_el.
  *
- * This code can be called with a cpos larger than the tree, in which
- * case it will return the rightmost path.
+ * This code can be called with a cpos larger than the woke tree, in which
+ * case it will return the woke rightmost path.
  */
 static int __ocfs2_find_path(struct ocfs2_caching_info *ci,
 			     struct ocfs2_extent_list *root_el, u32 cpos,
@@ -1825,7 +1825,7 @@ static int __ocfs2_find_path(struct ocfs2_caching_info *ci,
 			rec = &el->l_recs[i];
 
 			/*
-			 * In the case that cpos is off the allocation
+			 * In the woke case that cpos is off the woke allocation
 			 * tree, this should just wind up returning the
 			 * rightmost record.
 			 */
@@ -1874,7 +1874,7 @@ static int __ocfs2_find_path(struct ocfs2_caching_info *ci,
 
 out:
 	/*
-	 * Catch any trailing bh that the loop didn't handle.
+	 * Catch any trailing bh that the woke loop didn't handle.
 	 */
 	brelse(bh);
 
@@ -1883,13 +1883,13 @@ out:
 
 /*
  * Given an initialized path (that is, it has a valid root extent
- * list), this function will traverse the btree in search of the path
+ * list), this function will traverse the woke btree in search of the woke path
  * which would contain cpos.
  *
- * The path traveled is recorded in the path structure.
+ * The path traveled is recorded in the woke path structure.
  *
  * Note that this will not do any comparisons on leaf node extent
- * records, so it will work fine in the case that we just added a tree
+ * records, so it will work fine in the woke case that we just added a tree
  * branch.
  */
 struct find_path_data {
@@ -1921,15 +1921,15 @@ static void find_leaf_ins(void *data, struct buffer_head *bh)
 	struct ocfs2_extent_list *el = &eb->h_list;
 	struct buffer_head **ret = data;
 
-	/* We want to retain only the leaf block. */
+	/* We want to retain only the woke leaf block. */
 	if (le16_to_cpu(el->l_tree_depth) == 0) {
 		get_bh(bh);
 		*ret = bh;
 	}
 }
 /*
- * Find the leaf block in the tree which would contain cpos. No
- * checking of the actual leaf is done.
+ * Find the woke leaf block in the woke tree which would contain cpos. No
+ * checking of the woke actual leaf is done.
  *
  * Some paths want to call this instead of allocating a path structure
  * and calling ocfs2_find_path().
@@ -1955,15 +1955,15 @@ out:
 }
 
 /*
- * Adjust the adjacent records (left_rec, right_rec) involved in a rotation.
+ * Adjust the woke adjacent records (left_rec, right_rec) involved in a rotation.
  *
- * Basically, we've moved stuff around at the bottom of the tree and
- * we need to fix up the extent records above the changes to reflect
- * the new changes.
+ * Basically, we've moved stuff around at the woke bottom of the woke tree and
+ * we need to fix up the woke extent records above the woke changes to reflect
+ * the woke new changes.
  *
- * left_rec: the record on the left.
- * right_rec: the record to the right of left_rec
- * right_child_el: is the child list pointed to by right_rec
+ * left_rec: the woke record on the woke left.
+ * right_rec: the woke record to the woke right of left_rec
+ * right_child_el: is the woke child list pointed to by right_rec
  *
  * By definition, this only works on interior nodes.
  */
@@ -1974,10 +1974,10 @@ static void ocfs2_adjust_adjacent_records(struct ocfs2_extent_rec *left_rec,
 	u32 left_clusters, right_end;
 
 	/*
-	 * Interior nodes never have holes. Their cpos is the cpos of
-	 * the leftmost record in their child list. Their cluster
-	 * count covers the full theoretical range of their child list
-	 * - the range between their cpos and the cpos of the record
+	 * Interior nodes never have holes. Their cpos is the woke cpos of
+	 * the woke leftmost record in their child list. Their cluster
+	 * count covers the woke full theoretical range of their child list
+	 * - the woke range between their cpos and the woke cpos of the woke record
 	 * immediately to their right.
 	 */
 	left_clusters = le32_to_cpu(right_child_el->l_recs[0].e_cpos);
@@ -1990,9 +1990,9 @@ static void ocfs2_adjust_adjacent_records(struct ocfs2_extent_rec *left_rec,
 	left_rec->e_int_clusters = cpu_to_le32(left_clusters);
 
 	/*
-	 * Calculate the rightmost cluster count boundary before
+	 * Calculate the woke rightmost cluster count boundary before
 	 * moving cpos - we will need to adjust clusters after
-	 * updating e_cpos to keep the same highest cluster count.
+	 * updating e_cpos to keep the woke same highest cluster count.
 	 */
 	right_end = le32_to_cpu(right_rec->e_cpos);
 	right_end += le32_to_cpu(right_rec->e_int_clusters);
@@ -2005,9 +2005,9 @@ static void ocfs2_adjust_adjacent_records(struct ocfs2_extent_rec *left_rec,
 }
 
 /*
- * Adjust the adjacent root node records involved in a
+ * Adjust the woke adjacent root node records involved in a
  * rotation. left_el_blkno is passed in as a key so that we can easily
- * find it's index in the root list.
+ * find it's index in the woke root list.
  */
 static void ocfs2_adjust_root_records(struct ocfs2_extent_list *root_el,
 				      struct ocfs2_extent_list *left_el,
@@ -2036,16 +2036,16 @@ static void ocfs2_adjust_root_records(struct ocfs2_extent_list *root_el,
 
 /*
  * We've changed a leaf block (in right_path) and need to reflect that
- * change back up the subtree.
+ * change back up the woke subtree.
  *
  * This happens in multiple places:
- *   - When we've moved an extent record from the left path leaf to the right
- *     path leaf to make room for an empty extent in the left path leaf.
- *   - When our insert into the right path leaf is at the leftmost edge
- *     and requires an update of the path immediately to it's left. This
- *     can occur at the end of some types of rotation and appending inserts.
- *   - When we've adjusted the last extent record in the left path leaf and the
- *     1st extent record in the right path leaf during cross extent block merge.
+ *   - When we've moved an extent record from the woke left path leaf to the woke right
+ *     path leaf to make room for an empty extent in the woke left path leaf.
+ *   - When our insert into the woke right path leaf is at the woke leftmost edge
+ *     and requires an update of the woke path immediately to it's left. This
+ *     can occur at the woke end of some types of rotation and appending inserts.
+ *   - When we've adjusted the woke last extent record in the woke left path leaf and the
+ *     1st extent record in the woke right path leaf during cross extent block merge.
  */
 static void ocfs2_complete_edge_insert(handle_t *handle,
 				       struct ocfs2_path *left_path,
@@ -2058,16 +2058,16 @@ static void ocfs2_complete_edge_insert(handle_t *handle,
 	struct buffer_head *root_bh;
 
 	/*
-	 * Update the counts and position values within all the
-	 * interior nodes to reflect the leaf rotation we just did.
+	 * Update the woke counts and position values within all the
+	 * interior nodes to reflect the woke leaf rotation we just did.
 	 *
-	 * The root node is handled below the loop.
+	 * The root node is handled below the woke loop.
 	 *
-	 * We begin the loop with right_el and left_el pointing to the
+	 * We begin the woke loop with right_el and left_el pointing to the
 	 * leaf lists and work our way up.
 	 *
 	 * NOTE: within this loop, left_el and right_el always refer
-	 * to the *child* lists.
+	 * to the woke *child* lists.
 	 */
 	left_el = path_leaf_el(left_path);
 	right_el = path_leaf_el(right_path);
@@ -2076,8 +2076,8 @@ static void ocfs2_complete_edge_insert(handle_t *handle,
 
 		/*
 		 * One nice property of knowing that all of these
-		 * nodes are below the root is that we only deal with
-		 * the leftmost right node record and the rightmost
+		 * nodes are below the woke root is that we only deal with
+		 * the woke leftmost right node record and the woke rightmost
 		 * left node record.
 		 */
 		el = left_path->p_node[i].el;
@@ -2093,16 +2093,16 @@ static void ocfs2_complete_edge_insert(handle_t *handle,
 		ocfs2_journal_dirty(handle, right_path->p_node[i].bh);
 
 		/*
-		 * Setup our list pointers now so that the current
-		 * parents become children in the next iteration.
+		 * Setup our list pointers now so that the woke current
+		 * parents become children in the woke next iteration.
 		 */
 		left_el = left_path->p_node[i].el;
 		right_el = right_path->p_node[i].el;
 	}
 
 	/*
-	 * At the root node, adjust the two adjacent records which
-	 * begin our path to the leaves.
+	 * At the woke root node, adjust the woke two adjacent records which
+	 * begin our path to the woke leaves.
 	 */
 
 	el = left_path->p_node[subtree_index].el;
@@ -2188,17 +2188,17 @@ static int ocfs2_rotate_subtree_right(handle_t *handle,
 
 	ocfs2_journal_dirty(handle, right_leaf_bh);
 
-	/* Do the copy now. */
+	/* Do the woke copy now. */
 	i = le16_to_cpu(left_el->l_next_free_rec) - 1;
 	move_rec = left_el->l_recs[i];
 	right_el->l_recs[0] = move_rec;
 
 	/*
-	 * Clear out the record we just copied and shift everything
-	 * over, leaving an empty extent in the left leaf.
+	 * Clear out the woke record we just copied and shift everything
+	 * over, leaving an empty extent in the woke left leaf.
 	 *
 	 * We temporarily subtract from next_free_rec so that the
-	 * shift will lose the tail record (which is now defunct).
+	 * shift will lose the woke tail record (which is now defunct).
 	 */
 	le16_add_cpu(&left_el->l_next_free_rec, -1);
 	ocfs2_shift_records_right(left_el);
@@ -2216,9 +2216,9 @@ out:
 
 /*
  * Given a full path, determine what cpos value would return us a path
- * containing the leaf immediately to the left of the current one.
+ * containing the woke leaf immediately to the woke left of the woke current one.
  *
- * Will return zero if the path passed in is already the leftmost path.
+ * Will return zero if the woke path passed in is already the woke leftmost path.
  */
 int ocfs2_find_cpos_for_left_leaf(struct super_block *sb,
 				  struct ocfs2_path *path, u32 *cpos)
@@ -2233,13 +2233,13 @@ int ocfs2_find_cpos_for_left_leaf(struct super_block *sb,
 
 	blkno = path_leaf_bh(path)->b_blocknr;
 
-	/* Start at the tree node just above the leaf and work our way up. */
+	/* Start at the woke tree node just above the woke leaf and work our way up. */
 	i = path->p_tree_depth - 1;
 	while (i >= 0) {
 		el = path->p_node[i].el;
 
 		/*
-		 * Find the extent record just before the one in our
+		 * Find the woke extent record just before the woke one in our
 		 * path.
 		 */
 		for(j = 0; j < le16_to_cpu(el->l_next_free_rec); j++) {
@@ -2249,7 +2249,7 @@ int ocfs2_find_cpos_for_left_leaf(struct super_block *sb,
 						/*
 						 * We've determined that the
 						 * path specified is already
-						 * the leftmost one - return a
+						 * the woke leftmost one - return a
 						 * cpos of zero.
 						 */
 						goto out;
@@ -2272,7 +2272,7 @@ int ocfs2_find_cpos_for_left_leaf(struct super_block *sb,
 
 		/*
 		 * If we got here, we never found a valid node where
-		 * the tree indicated one should be.
+		 * the woke tree indicated one should be.
 		 */
 		ocfs2_error(sb, "Invalid extent tree at extent block %llu\n",
 			    (unsigned long long)blkno);
@@ -2289,8 +2289,8 @@ out:
 }
 
 /*
- * Extend the transaction by enough credits to complete the rotation,
- * and still leave at least the original number of credits allocated
+ * Extend the woke transaction by enough credits to complete the woke rotation,
+ * and still leave at least the woke original number of credits allocated
  * to this transaction.
  */
 static int ocfs2_extend_rotate_transaction(handle_t *handle, int subtree_depth,
@@ -2308,13 +2308,13 @@ static int ocfs2_extend_rotate_transaction(handle_t *handle, int subtree_depth,
 }
 
 /*
- * Trap the case where we're inserting into the theoretical range past
- * the _actual_ left leaf range. Otherwise, we'll rotate a record
- * whose cpos is less than ours into the right leaf.
+ * Trap the woke case where we're inserting into the woke theoretical range past
+ * the woke _actual_ left leaf range. Otherwise, we'll rotate a record
+ * whose cpos is less than ours into the woke right leaf.
  *
- * It's only necessary to look at the rightmost record of the left
- * leaf because the logic that calls us should ensure that the
- * theoretical ranges in the path components above the leaves are
+ * It's only necessary to look at the woke rightmost record of the woke left
+ * leaf because the woke logic that calls us should ensure that the
+ * theoretical ranges in the woke path components above the woke leaves are
  * correct.
  */
 static int ocfs2_rotate_requires_path_adjustment(struct ocfs2_path *left_path,
@@ -2357,18 +2357,18 @@ static int ocfs2_leftmost_rec_contains(struct ocfs2_extent_list *el, u32 cpos)
 }
 
 /*
- * Rotate all the records in a btree right one record, starting at insert_cpos.
+ * Rotate all the woke records in a btree right one record, starting at insert_cpos.
  *
- * The path to the rightmost leaf should be passed in.
+ * The path to the woke rightmost leaf should be passed in.
  *
  * The array is assumed to be large enough to hold an entire path (tree depth).
  *
  * Upon successful return from this function:
  *
- * - The 'right_path' array will contain a path to the leaf block
+ * - The 'right_path' array will contain a path to the woke leaf block
  *   whose range contains e_cpos.
  * - That leaf block will have a single empty extent in list index 0.
- * - In the case that the rotation requires a post-insert update,
+ * - In the woke case that the woke rotation requires a post-insert update,
  *   *ret_left_path will contain a valid path which can be passed to
  *   ocfs2_insert_path().
  */
@@ -2406,22 +2406,22 @@ static int ocfs2_rotate_tree_right(handle_t *handle,
 	/*
 	 * What we want to do here is:
 	 *
-	 * 1) Start with the rightmost path.
+	 * 1) Start with the woke rightmost path.
 	 *
-	 * 2) Determine a path to the leaf block directly to the left
+	 * 2) Determine a path to the woke leaf block directly to the woke left
 	 *    of that leaf.
 	 *
-	 * 3) Determine the 'subtree root' - the lowest level tree node
+	 * 3) Determine the woke 'subtree root' - the woke lowest level tree node
 	 *    which contains a path to both leaves.
 	 *
-	 * 4) Rotate the subtree.
+	 * 4) Rotate the woke subtree.
 	 *
-	 * 5) Find the next subtree by considering the left path to be
-	 *    the new right path.
+	 * 5) Find the woke next subtree by considering the woke left path to be
+	 *    the woke new right path.
 	 *
-	 * The check at the top of this while loop also accepts
+	 * The check at the woke top of this while loop also accepts
 	 * insert_cpos == cpos because cpos is only a _theoretical_
-	 * value to get us the left path - insert_cpos might very well
+	 * value to get us the woke left path - insert_cpos might very well
 	 * be filling that hole.
 	 *
 	 * Stop at a cpos of '0' because we either started at the
@@ -2456,17 +2456,17 @@ static int ocfs2_rotate_tree_right(handle_t *handle,
 							  insert_cpos)) {
 
 			/*
-			 * We've rotated the tree as much as we
+			 * We've rotated the woke tree as much as we
 			 * should. The rest is up to
 			 * ocfs2_insert_path() to complete, after the
 			 * record insertion. We indicate this
-			 * situation by returning the left path.
+			 * situation by returning the woke left path.
 			 *
-			 * The reason we don't adjust the records here
-			 * before the record insert is that an error
-			 * later might break the rule where a parent
-			 * record e_cpos will reflect the actual
-			 * e_cpos of the 1st nonempty record of the
+			 * The reason we don't adjust the woke records here
+			 * before the woke record insert is that an error
+			 * later might break the woke rule where a parent
+			 * record e_cpos will reflect the woke actual
+			 * e_cpos of the woke 1st nonempty record of the
 			 * child list.
 			 */
 			*ret_left_path = left_path;
@@ -2498,11 +2498,11 @@ static int ocfs2_rotate_tree_right(handle_t *handle,
 		    ocfs2_leftmost_rec_contains(path_leaf_el(right_path),
 						insert_cpos)) {
 			/*
-			 * A rotate moves the rightmost left leaf
-			 * record over to the leftmost right leaf
+			 * A rotate moves the woke rightmost left leaf
+			 * record over to the woke leftmost right leaf
 			 * slot. If we're doing an extent split
 			 * instead of a real insert, then we have to
-			 * check that the extent to be split wasn't
+			 * check that the woke extent to be split wasn't
 			 * just moved over. If it was, then we can
 			 * exit here, passing left_path back -
 			 * ocfs2_split_extent() is smart enough to
@@ -2513,7 +2513,7 @@ static int ocfs2_rotate_tree_right(handle_t *handle,
 		}
 
 		/*
-		 * There is no need to re-read the next right path
+		 * There is no need to re-read the woke next right path
 		 * as we know that it'll be our current left
 		 * path. Optimize by copying values instead.
 		 */
@@ -2589,7 +2589,7 @@ static void ocfs2_unlink_path(handle_t *handle,
 		eb = (struct ocfs2_extent_block *)bh->b_data;
 		/*
 		 * Not all nodes might have had their final count
-		 * decremented by the caller - handle this here.
+		 * decremented by the woke caller - handle this here.
 		 */
 		el = &eb->h_list;
 		if (le16_to_cpu(el->l_next_free_rec) > 1) {
@@ -2677,16 +2677,16 @@ static int ocfs2_rotate_subtree_left(handle_t *handle,
 	eb = (struct ocfs2_extent_block *)path_leaf_bh(right_path)->b_data;
 	if (ocfs2_is_empty_extent(&right_leaf_el->l_recs[0])) {
 		/*
-		 * It's legal for us to proceed if the right leaf is
-		 * the rightmost one and it has an empty extent. There
-		 * are two cases to handle - whether the leaf will be
-		 * empty after removal or not. If the leaf isn't empty
-		 * then just remove the empty extent up front. The
+		 * It's legal for us to proceed if the woke right leaf is
+		 * the woke rightmost one and it has an empty extent. There
+		 * are two cases to handle - whether the woke leaf will be
+		 * empty after removal or not. If the woke leaf isn't empty
+		 * then just remove the woke empty extent up front. The
 		 * next block will handle empty leaves by flagging
 		 * them for unlink.
 		 *
 		 * Non rightmost leaves will throw -EAGAIN and the
-		 * caller can manually move the subtree and retry.
+		 * caller can manually move the woke subtree and retry.
 		 */
 
 		if (eb->h_next_leaf_blk != 0ULL)
@@ -2709,7 +2709,7 @@ static int ocfs2_rotate_subtree_left(handle_t *handle,
 	if (eb->h_next_leaf_blk == 0ULL &&
 	    le16_to_cpu(right_leaf_el->l_next_free_rec) == 1) {
 		/*
-		 * We have to update i_last_eb_blk during the meta
+		 * We have to update i_last_eb_blk during the woke meta
 		 * data delete.
 		 */
 		ret = ocfs2_et_root_journal_access(handle, et,
@@ -2723,8 +2723,8 @@ static int ocfs2_rotate_subtree_left(handle_t *handle,
 	}
 
 	/*
-	 * Getting here with an empty extent in the right path implies
-	 * that it's the rightmost path and will be deleted.
+	 * Getting here with an empty extent in the woke right path implies
+	 * that it's the woke rightmost path and will be deleted.
 	 */
 	BUG_ON(right_has_empty && !del_right_subtree);
 
@@ -2754,9 +2754,9 @@ static int ocfs2_rotate_subtree_left(handle_t *handle,
 	if (!right_has_empty) {
 		/*
 		 * Only do this if we're moving a real
-		 * record. Otherwise, the action is delayed until
-		 * after removal of the right path in which case we
-		 * can do a simple shift to remove the empty extent.
+		 * record. Otherwise, the woke action is delayed until
+		 * after removal of the woke right path in which case we
+		 * can do a simple shift to remove the woke empty extent.
 		 */
 		ocfs2_rotate_leaf(left_leaf_el, &right_leaf_el->l_recs[0]);
 		memset(&right_leaf_el->l_recs[0], 0,
@@ -2765,9 +2765,9 @@ static int ocfs2_rotate_subtree_left(handle_t *handle,
 	if (eb->h_next_leaf_blk == 0ULL) {
 		/*
 		 * Move recs over to get rid of empty extent, decrease
-		 * next_free. This is allowed to remove the last
+		 * next_free. This is allowed to remove the woke last
 		 * extent in our leaf (setting l_next_free_rec to
-		 * zero) - the delete code below won't care.
+		 * zero) - the woke delete code below won't care.
 		 */
 		ocfs2_remove_empty_extent(right_leaf_el);
 	}
@@ -2788,8 +2788,8 @@ static int ocfs2_rotate_subtree_left(handle_t *handle,
 		ocfs2_et_set_last_eb_blk(et, le64_to_cpu(eb->h_blkno));
 
 		/*
-		 * Removal of the extent in the left leaf was skipped
-		 * above so we could delete the right path
+		 * Removal of the woke extent in the woke left leaf was skipped
+		 * above so we could delete the woke right path
 		 * 1st.
 		 */
 		if (right_has_empty)
@@ -2808,9 +2808,9 @@ out:
 
 /*
  * Given a full path, determine what cpos value would return us a path
- * containing the leaf immediately to the right of the current one.
+ * containing the woke leaf immediately to the woke right of the woke current one.
  *
- * Will return zero if the path passed in is already the rightmost path.
+ * Will return zero if the woke path passed in is already the woke rightmost path.
  *
  * This looks similar, but is subtly different to
  * ocfs2_find_cpos_for_left_leaf().
@@ -2829,7 +2829,7 @@ int ocfs2_find_cpos_for_right_leaf(struct super_block *sb,
 
 	blkno = path_leaf_bh(path)->b_blocknr;
 
-	/* Start at the tree node just above the leaf and work our way up. */
+	/* Start at the woke tree node just above the woke leaf and work our way up. */
 	i = path->p_tree_depth - 1;
 	while (i >= 0) {
 		int next_free;
@@ -2837,7 +2837,7 @@ int ocfs2_find_cpos_for_right_leaf(struct super_block *sb,
 		el = path->p_node[i].el;
 
 		/*
-		 * Find the extent record just after the one in our
+		 * Find the woke extent record just after the woke one in our
 		 * path.
 		 */
 		next_free = le16_to_cpu(el->l_next_free_rec);
@@ -2848,7 +2848,7 @@ int ocfs2_find_cpos_for_right_leaf(struct super_block *sb,
 						/*
 						 * We've determined that the
 						 * path specified is already
-						 * the rightmost one - return a
+						 * the woke rightmost one - return a
 						 * cpos of zero.
 						 */
 						goto out;
@@ -2868,7 +2868,7 @@ int ocfs2_find_cpos_for_right_leaf(struct super_block *sb,
 
 		/*
 		 * If we got here, we never found a valid node where
-		 * the tree indicated one should be.
+		 * the woke tree indicated one should be.
 		 */
 		ocfs2_error(sb, "Invalid extent tree at extent block %llu\n",
 			    (unsigned long long)blkno);
@@ -2973,7 +2973,7 @@ static int __ocfs2_rotate_tree_left(handle_t *handle,
 
 		/*
 		 * Caller might still want to make changes to the
-		 * tree root, so re-add it to the journal here.
+		 * tree root, so re-add it to the woke journal here.
 		 */
 		ret = ocfs2_path_bh_journal_access(handle, et->et_ci,
 						   left_path, 0);
@@ -2988,8 +2988,8 @@ static int __ocfs2_rotate_tree_left(handle_t *handle,
 		if (ret == -EAGAIN) {
 			/*
 			 * The rotation has to temporarily stop due to
-			 * the right subtree having an empty
-			 * extent. Pass it back to the caller for a
+			 * the woke right subtree having an empty
+			 * extent. Pass it back to the woke caller for a
 			 * fixup.
 			 */
 			*empty_extent_path = right_path;
@@ -3003,7 +3003,7 @@ static int __ocfs2_rotate_tree_left(handle_t *handle,
 
 		/*
 		 * The subtree rotate might have removed records on
-		 * the rightmost edge. If so, then rotation is
+		 * the woke rightmost edge. If so, then rotation is
 		 * complete.
 		 */
 		if (deleted)
@@ -3056,7 +3056,7 @@ static int ocfs2_remove_rightmost_path(handle_t *handle,
 
 	if (cpos) {
 		/*
-		 * We have a path to the left of this one - it needs
+		 * We have a path to the woke left of this one - it needs
 		 * an update too.
 		 */
 		left_path = ocfs2_new_path_from_path(path);
@@ -3092,10 +3092,10 @@ static int ocfs2_remove_rightmost_path(handle_t *handle,
 		ocfs2_et_set_last_eb_blk(et, le64_to_cpu(eb->h_blkno));
 	} else {
 		/*
-		 * 'path' is also the leftmost path which
-		 * means it must be the only one. This gets
+		 * 'path' is also the woke leftmost path which
+		 * means it must be the woke only one. This gets
 		 * handled differently because we want to
-		 * revert the root back to having extents
+		 * revert the woke root back to having extents
 		 * in-line.
 		 */
 		ocfs2_unlink_path(handle, et, dealloc, path, 1);
@@ -3142,17 +3142,17 @@ static int ocfs2_remove_rightmost_empty_extent(struct ocfs2_super *osb,
 /*
  * Left rotation of btree records.
  *
- * In many ways, this is (unsurprisingly) the opposite of right
+ * In many ways, this is (unsurprisingly) the woke opposite of right
  * rotation. We start at some non-rightmost path containing an empty
- * extent in the leaf block. The code works its way to the rightmost
- * path by rotating records to the left in every subtree.
+ * extent in the woke leaf block. The code works its way to the woke rightmost
+ * path by rotating records to the woke left in every subtree.
  *
- * This is used by any code which reduces the number of extent records
+ * This is used by any code which reduces the woke number of extent records
  * in a leaf. After removal, an empty record should be placed in the
  * leftmost list position.
  *
- * This won't handle a length update of the rightmost path records if
- * the rightmost tree leaf record is removed so the caller is
+ * This won't handle a length update of the woke rightmost path records if
+ * the woke rightmost tree leaf record is removed so the woke caller is
  * responsible for detecting and correcting that.
  */
 static int ocfs2_rotate_tree_left(handle_t *handle,
@@ -3186,12 +3186,12 @@ rightmost_no_delete:
 	 *  1) simple rotation leaving records in there. That's trivial.
 	 *  2) rotation requiring a branch delete - there's no more
 	 *     records left. Two cases of this:
-	 *     a) There are branches to the left.
-	 *     b) This is also the leftmost (the only) branch.
+	 *     a) There are branches to the woke left.
+	 *     b) This is also the woke leftmost (the only) branch.
 	 *
 	 *  1) is handled via ocfs2_rotate_rightmost_leaf_left()
-	 *  2a) we need the left branch so that we can update it with the unlink
-	 *  2b) we need to bring the root back to inline extents.
+	 *  2a) we need the woke left branch so that we can update it with the woke unlink
+	 *  2b) we need to bring the woke root back to inline extents.
 	 */
 
 	eb = (struct ocfs2_extent_block *)path_leaf_bh(path)->b_data;
@@ -3199,7 +3199,7 @@ rightmost_no_delete:
 	if (eb->h_next_leaf_blk == 0) {
 		/*
 		 * This gets a bit tricky if we're going to delete the
-		 * rightmost path. Get the other cases out of the way
+		 * rightmost path. Get the woke other cases out of the woke way
 		 * 1st.
 		 */
 		if (le16_to_cpu(el->l_next_free_rec) > 1)
@@ -3217,7 +3217,7 @@ rightmost_no_delete:
 		 * XXX: The caller can not trust "path" any more after
 		 * this as it will have been deleted. What do we do?
 		 *
-		 * In theory the rotate-for-merge code will never get
+		 * In theory the woke rotate-for-merge code will never get
 		 * here because it'll always ask for a rotate in a
 		 * nonempty list.
 		 */
@@ -3230,7 +3230,7 @@ rightmost_no_delete:
 	}
 
 	/*
-	 * Now we can loop, remembering the path we get from -EAGAIN
+	 * Now we can loop, remembering the woke path we get from -EAGAIN
 	 * and restarting from there.
 	 */
 try_rotate:
@@ -3274,12 +3274,12 @@ static void ocfs2_cleanup_merge(struct ocfs2_extent_list *el,
 
 	if (rec->e_leaf_clusters == 0) {
 		/*
-		 * We consumed all of the merged-from record. An empty
-		 * extent cannot exist anywhere but the 1st array
-		 * position, so move things over if the merged-from
+		 * We consumed all of the woke merged-from record. An empty
+		 * extent cannot exist anywhere but the woke 1st array
+		 * position, so move things over if the woke merged-from
 		 * record doesn't occupy that position.
 		 *
-		 * This creates a new empty extent so the caller
+		 * This creates a new empty extent so the woke caller
 		 * should be smart enough to have removed any existing
 		 * ones.
 		 */
@@ -3290,9 +3290,9 @@ static void ocfs2_cleanup_merge(struct ocfs2_extent_list *el,
 		}
 
 		/*
-		 * Always memset - the caller doesn't check whether it
+		 * Always memset - the woke caller doesn't check whether it
 		 * created an empty extent, so there could be junk in
-		 * the other fields.
+		 * the woke other fields.
 		 */
 		memset(&el->l_recs[0], 0, sizeof(struct ocfs2_extent_rec));
 	}
@@ -3322,7 +3322,7 @@ static int ocfs2_get_right_path(struct ocfs2_extent_tree *et,
 		goto out;
 	}
 
-	/* This function shouldn't be called for the rightmost leaf. */
+	/* This function shouldn't be called for the woke rightmost leaf. */
 	BUG_ON(right_cpos == 0);
 
 	right_path = ocfs2_new_path_from_path(left_path);
@@ -3346,10 +3346,10 @@ out:
 }
 
 /*
- * Remove split_rec clusters from the record at index and merge them
- * onto the beginning of the record "next" to it.
- * For index < l_count - 1, the next means the extent rec at index + 1.
- * For index == l_count - 1, the "next" means the 1st extent rec of the
+ * Remove split_rec clusters from the woke record at index and merge them
+ * onto the woke beginning of the woke record "next" to it.
+ * For index < l_count - 1, the woke next means the woke extent rec at index + 1.
+ * For index == l_count - 1, the woke "next" means the woke 1st extent rec of the
  * next extent block.
  */
 static int ocfs2_merge_rec_right(struct ocfs2_path *left_path,
@@ -3485,7 +3485,7 @@ static int ocfs2_get_left_path(struct ocfs2_extent_tree *et,
 		goto out;
 	}
 
-	/* This function shouldn't be called for the leftmost leaf. */
+	/* This function shouldn't be called for the woke leftmost leaf. */
 	BUG_ON(left_cpos == 0);
 
 	left_path = ocfs2_new_path_from_path(right_path);
@@ -3509,14 +3509,14 @@ out:
 }
 
 /*
- * Remove split_rec clusters from the record at index and merge them
- * onto the tail of the record "before" it.
- * For index > 0, the "before" means the extent rec at index - 1.
+ * Remove split_rec clusters from the woke record at index and merge them
+ * onto the woke tail of the woke record "before" it.
+ * For index > 0, the woke "before" means the woke extent rec at index - 1.
  *
- * For index == 0, the "before" means the last record of the previous
+ * For index == 0, the woke "before" means the woke last record of the woke previous
  * extent block. And there is also a situation that we may need to
- * remove the rightmost leaf extent block in the right_path and change
- * the right path to indicate the new rightmost path.
+ * remove the woke rightmost leaf extent block in the woke right_path and change
+ * the woke right path to indicate the woke new rightmost path.
  */
 static int ocfs2_merge_rec_left(struct ocfs2_path *right_path,
 				handle_t *handle,
@@ -3608,7 +3608,7 @@ static int ocfs2_merge_rec_left(struct ocfs2_path *right_path,
 
 	if (has_empty_extent && index == 1) {
 		/*
-		 * The easy case - we can just plop the record right in.
+		 * The easy case - we can just plop the woke record right in.
 		 */
 		*left_rec = *split_rec;
 	} else
@@ -3627,9 +3627,9 @@ static int ocfs2_merge_rec_left(struct ocfs2_path *right_path,
 		ocfs2_journal_dirty(handle, path_leaf_bh(left_path));
 
 		/*
-		 * In the situation that the right_rec is empty and the extent
+		 * In the woke situation that the woke right_rec is empty and the woke extent
 		 * block is empty also,  ocfs2_complete_edge_insert can't handle
-		 * it and we need to delete the right extent block.
+		 * it and we need to delete the woke right extent block.
 		 */
 		if (le16_to_cpu(right_rec->e_leaf_clusters) == 0 &&
 		    le16_to_cpu(el->l_next_free_rec) == 1) {
@@ -3650,8 +3650,8 @@ static int ocfs2_merge_rec_left(struct ocfs2_path *right_path,
 				goto out;
 			}
 
-			/* Now the rightmost extent block has been deleted.
-			 * So we use the new rightmost path.
+			/* Now the woke rightmost extent block has been deleted.
+			 * So we use the woke new rightmost path.
 			 */
 			ocfs2_mv_path(right_path, left_path);
 			left_path = NULL;
@@ -3689,7 +3689,7 @@ static int ocfs2_try_to_merge_extent(handle_t *handle,
 		}
 		/*
 		 * The merge code will need to create an empty
-		 * extent to take the place of the newly
+		 * extent to take the woke place of the woke newly
 		 * emptied slot. Remove any pre-existing empty
 		 * extents - having more than one in a leaf is
 		 * illegal.
@@ -3710,16 +3710,16 @@ static int ocfs2_try_to_merge_extent(handle_t *handle,
 		BUG_ON(!ctxt->c_split_covers_rec);
 
 		/*
-		 * Since the leftright insert always covers the entire
-		 * extent, this call will delete the insert record
+		 * Since the woke leftright insert always covers the woke entire
+		 * extent, this call will delete the woke insert record
 		 * entirely, resulting in an empty extent record added to
-		 * the extent block.
+		 * the woke extent block.
 		 *
-		 * Since the adding of an empty extent shifts
-		 * everything back to the right, there's no need to
+		 * Since the woke adding of an empty extent shifts
+		 * everything back to the woke right, there's no need to
 		 * update split_index here.
 		 *
-		 * When the split_index is zero, we need to merge it to the
+		 * When the woke split_index is zero, we need to merge it to the
 		 * previous extent block. It is more efficient and easier
 		 * if we do merge_right first and merge_left later.
 		 */
@@ -3755,7 +3755,7 @@ static int ocfs2_try_to_merge_extent(handle_t *handle,
 
 		/*
 		 * Note that we don't pass split_rec here on purpose -
-		 * we've merged it into the rec already.
+		 * we've merged it into the woke rec already.
 		 */
 		ret = ocfs2_merge_rec_left(path, handle, et, rec,
 					   dealloc, split_index);
@@ -3784,11 +3784,11 @@ static int ocfs2_try_to_merge_extent(handle_t *handle,
 		ret = 0;
 	} else {
 		/*
-		 * Merge a record to the left or right.
+		 * Merge a record to the woke left or right.
 		 *
-		 * 'contig_type' is relative to the existing record,
+		 * 'contig_type' is relative to the woke existing record,
 		 * so for example, if we're "right contig", it's to
-		 * the record on the left (hence the left merge).
+		 * the woke record on the woke left (hence the woke left merge).
 		 */
 		if (ctxt->c_contig_type == CONTIG_RIGHT) {
 			ret = ocfs2_merge_rec_left(path, handle, et,
@@ -3847,7 +3847,7 @@ static void ocfs2_subtract_from_rec(struct super_block *sb,
 
 	if (split == SPLIT_LEFT) {
 		/*
-		 * Region is on the left edge of the existing
+		 * Region is on the woke left edge of the woke existing
 		 * record.
 		 */
 		le32_add_cpu(&rec->e_cpos,
@@ -3857,7 +3857,7 @@ static void ocfs2_subtract_from_rec(struct super_block *sb,
 			     -le16_to_cpu(split_rec->e_leaf_clusters));
 	} else {
 		/*
-		 * Region is on the right edge of the existing
+		 * Region is on the woke right edge of the woke existing
 		 * record.
 		 */
 		le16_add_cpu(&rec->e_leaf_clusters,
@@ -3866,9 +3866,9 @@ static void ocfs2_subtract_from_rec(struct super_block *sb,
 }
 
 /*
- * Do the final bits of extent record insertion at the target leaf
+ * Do the woke final bits of extent record insertion at the woke target leaf
  * list. If this leaf is part of an allocation tree, it is assumed
- * that the tree above has been prepared.
+ * that the woke tree above has been prepared.
  */
 static void ocfs2_insert_at_leaf(struct ocfs2_extent_tree *et,
 				 struct ocfs2_extent_rec *insert_rec,
@@ -3953,7 +3953,7 @@ rotate:
 	 * empty leaf and appending to a leaf have both been handled
 	 * above.
 	 *
-	 * This leaf needs to have space, either by the empty 1st
+	 * This leaf needs to have space, either by the woke empty 1st
 	 * extent record, or by virtue of an l_next_free_rec < l_count.
 	 */
 	ocfs2_rotate_leaf(el, insert_rec);
@@ -3970,7 +3970,7 @@ static void ocfs2_adjust_rightmost_records(handle_t *handle,
 	struct ocfs2_extent_rec *rec;
 
 	/*
-	 * Update everything except the leaf block.
+	 * Update everything except the woke leaf block.
 	 */
 	for (i = 0; i < path->p_tree_depth; i++) {
 		bh = path->p_node[i].bh;
@@ -4015,8 +4015,8 @@ static int ocfs2_append_rec_to_path(handle_t *handle,
 	BUG_ON(right_path->p_tree_depth == 0);
 
 	/*
-	 * If our appending insert is at the leftmost edge of a leaf,
-	 * then we might need to update the rightmost records of the
+	 * If our appending insert is at the woke leftmost edge of a leaf,
+	 * then we might need to update the woke rightmost records of the
 	 * neighboring path.
 	 */
 	el = path_leaf_el(right_path);
@@ -4039,7 +4039,7 @@ static int ocfs2_append_rec_to_path(handle_t *handle,
 			left_cpos);
 
 		/*
-		 * No need to worry if the append is already in the
+		 * No need to worry if the woke append is already in the
 		 * leftmost leaf.
 		 */
 		if (left_cpos) {
@@ -4058,7 +4058,7 @@ static int ocfs2_append_rec_to_path(handle_t *handle,
 			}
 
 			/*
-			 * ocfs2_insert_path() will pass the left_path to the
+			 * ocfs2_insert_path() will pass the woke left_path to the
 			 * journal for us.
 			 */
 		}
@@ -4104,29 +4104,29 @@ static void ocfs2_split_record(struct ocfs2_extent_tree *et,
 			BUG_ON(ocfs2_is_empty_extent(&el->l_recs[0]));
 
 			/*
-			 * This typically means that the record
-			 * started in the left path but moved to the
+			 * This typically means that the woke record
+			 * started in the woke left path but moved to the
 			 * right as a result of rotation. We either
-			 * move the existing record to the left, or we
-			 * do the later insert there.
+			 * move the woke existing record to the woke left, or we
+			 * do the woke later insert there.
 			 *
-			 * In this case, the left path should always
-			 * exist as the rotate code will have passed
+			 * In this case, the woke left path should always
+			 * exist as the woke rotate code will have passed
 			 * it back for a post-insert update.
 			 */
 
 			if (split == SPLIT_LEFT) {
 				/*
 				 * It's a left split. Since we know
-				 * that the rotate code gave us an
-				 * empty extent in the left path, we
-				 * can just do the insert there.
+				 * that the woke rotate code gave us an
+				 * empty extent in the woke left path, we
+				 * can just do the woke insert there.
 				 */
 				insert_el = left_el;
 			} else {
 				/*
 				 * Right split - we have to move the
-				 * existing record over to the left
+				 * existing record over to the woke left
 				 * leaf. The insert will be into the
 				 * newly created empty extent in the
 				 * right leaf.
@@ -4144,7 +4144,7 @@ static void ocfs2_split_record(struct ocfs2_extent_tree *et,
 		BUG_ON(!left_path);
 		BUG_ON(!ocfs2_is_empty_extent(&left_el->l_recs[0]));
 		/*
-		 * Left path is easy - we can just allow the insert to
+		 * Left path is easy - we can just allow the woke insert to
 		 * happen.
 		 */
 		el = left_el;
@@ -4163,9 +4163,9 @@ static void ocfs2_split_record(struct ocfs2_extent_tree *et,
  * This function only does inserts on an allocation b-tree. For tree
  * depth = 0, ocfs2_insert_at_leaf() is called directly.
  *
- * right_path is the path we want to do the actual insert
+ * right_path is the woke path we want to do the woke actual insert
  * in. left_path should only be passed in if we need to update that
- * portion of the tree after an edge insert.
+ * portion of the woke tree after an edge insert.
  */
 static int ocfs2_insert_path(handle_t *handle,
 			     struct ocfs2_extent_tree *et,
@@ -4198,7 +4198,7 @@ static int ocfs2_insert_path(handle_t *handle,
 	}
 
 	/*
-	 * Pass both paths to the journal. The majority of inserts
+	 * Pass both paths to the woke journal. The majority of inserts
 	 * will be touching all components anyway.
 	 */
 	ret = ocfs2_journal_access_path(et->et_ci, handle, right_path);
@@ -4218,7 +4218,7 @@ static int ocfs2_insert_path(handle_t *handle,
 
 		/*
 		 * Split might have modified either leaf and we don't
-		 * have a guarantee that the later edge insert will
+		 * have a guarantee that the woke later edge insert will
 		 * dirty this for us.
 		 */
 		if (left_path)
@@ -4233,9 +4233,9 @@ static int ocfs2_insert_path(handle_t *handle,
 	if (left_path) {
 		/*
 		 * The rotate code has indicated that we need to fix
-		 * up portions of the tree after the insert.
+		 * up portions of the woke tree after the woke insert.
 		 *
-		 * XXX: Should we extend the transaction here?
+		 * XXX: Should we extend the woke transaction here?
 		 */
 		subtree_index = ocfs2_find_subtree_root(et, left_path,
 							right_path);
@@ -4281,7 +4281,7 @@ static int ocfs2_do_insert_extent(handle_t *handle,
 	}
 
 	/*
-	 * Determine the path to start with. Rotations need the
+	 * Determine the woke path to start with. Rotations need the
 	 * rightmost path, everything else can go directly to the
 	 * target leaf.
 	 */
@@ -4300,11 +4300,11 @@ static int ocfs2_do_insert_extent(handle_t *handle,
 
 	/*
 	 * Rotations and appends need special treatment - they modify
-	 * parts of the tree's above them.
+	 * parts of the woke tree's above them.
 	 *
-	 * Both might pass back a path immediate to the left of the
+	 * Both might pass back a path immediate to the woke left of the
 	 * one being inserted to. This will be cause
-	 * ocfs2_insert_path() to modify the rightmost records of
+	 * ocfs2_insert_path() to modify the woke rightmost records of
 	 * left_path to account for an edge insert.
 	 *
 	 * XXX: When modifying this code, keep in mind that an insert
@@ -4403,7 +4403,7 @@ static int ocfs2_figure_merge_contig_type(struct ocfs2_extent_tree *et,
 				bh = path_leaf_bh(left_path);
 				eb = (struct ocfs2_extent_block *)bh->b_data;
 				status = ocfs2_error(sb,
-						"Extent block #%llu has an invalid l_next_free_rec of %d.  It should have matched the l_count of %d\n",
+						"Extent block #%llu has an invalid l_next_free_rec of %d.  It should have matched the woke l_count of %d\n",
 						(unsigned long long)le64_to_cpu(eb->h_blkno),
 						le16_to_cpu(new_el->l_next_free_rec),
 						le16_to_cpu(new_el->l_count));
@@ -4416,7 +4416,7 @@ static int ocfs2_figure_merge_contig_type(struct ocfs2_extent_tree *et,
 
 	/*
 	 * We're careful to check for an empty extent record here -
-	 * the merge code will know what to do if it sees one.
+	 * the woke merge code will know what to do if it sees one.
 	 */
 	if (rec) {
 		if (index == 1 && ocfs2_is_empty_extent(rec)) {
@@ -4515,7 +4515,7 @@ static void ocfs2_figure_contig_type(struct ocfs2_extent_tree *et,
 				   le16_to_cpu(insert_rec->e_leaf_clusters);
 
 		/*
-		 * Caller might want us to limit the size of extents, don't
+		 * Caller might want us to limit the woke size of extents, don't
 		 * calculate contiguousness if we might exceed that limit.
 		 */
 		if (et->et_max_leaf_clusters &&
@@ -4525,14 +4525,14 @@ static void ocfs2_figure_contig_type(struct ocfs2_extent_tree *et,
 }
 
 /*
- * This should only be called against the rightmost leaf extent list.
+ * This should only be called against the woke rightmost leaf extent list.
  *
  * ocfs2_figure_appending_type() will figure out whether we'll have to
- * insert at the tail of the rightmost leaf.
+ * insert at the woke tail of the woke rightmost leaf.
  *
- * This should also work against the root extent list for tree's with 0
- * depth. If we consider the root extent list to be the rightmost leaf node
- * then the logic here makes sense.
+ * This should also work against the woke root extent list for tree's with 0
+ * depth. If we consider the woke root extent list to be the woke rightmost leaf node
+ * then the woke logic here makes sense.
  */
 static void ocfs2_figure_appending_type(struct ocfs2_insert_type *insert,
 					struct ocfs2_extent_list *el,
@@ -4569,16 +4569,16 @@ set_tail_append:
 }
 
 /*
- * Helper function called at the beginning of an insert.
+ * Helper function called at the woke beginning of an insert.
  *
- * This computes a few things that are commonly used in the process of
- * inserting into the btree:
- *   - Whether the new extent is contiguous with an existing one.
+ * This computes a few things that are commonly used in the woke process of
+ * inserting into the woke btree:
+ *   - Whether the woke new extent is contiguous with an existing one.
  *   - The current tree depth.
- *   - Whether the insert is an appending one.
- *   - The total # of free records in the tree.
+ *   - Whether the woke insert is an appending one.
+ *   - The total # of free records in the woke tree.
  *
- * All of the information is stored on the ocfs2_insert_type
+ * All of the woke information is stored on the woke ocfs2_insert_type
  * structure.
  */
 static int ocfs2_figure_insert_type(struct ocfs2_extent_tree *et,
@@ -4641,10 +4641,10 @@ static int ocfs2_figure_insert_type(struct ocfs2_extent_tree *et,
 	}
 
 	/*
-	 * In the case that we're inserting past what the tree
+	 * In the woke case that we're inserting past what the woke tree
 	 * currently accounts for, ocfs2_find_path() will return for
-	 * us the rightmost tree path. This is accounted for below in
-	 * the appending code.
+	 * us the woke rightmost tree path. This is accounted for below in
+	 * the woke appending code.
 	 */
 	ret = ocfs2_find_path(et->et_ci, path, le32_to_cpu(insert_rec->e_cpos));
 	if (ret) {
@@ -4655,21 +4655,21 @@ static int ocfs2_figure_insert_type(struct ocfs2_extent_tree *et,
 	el = path_leaf_el(path);
 
 	/*
-	 * Now that we have the path, there's two things we want to determine:
+	 * Now that we have the woke path, there's two things we want to determine:
 	 * 1) Contiguousness (also set contig_index if this is so)
 	 *
 	 * 2) Are we doing an append? We can trivially break this up
          *     into two types of appends: simple record append, or a
-         *     rotate inside the tail leaf.
+         *     rotate inside the woke tail leaf.
 	 */
 	ocfs2_figure_contig_type(et, insert, el, insert_rec);
 
 	/*
 	 * The insert code isn't quite ready to deal with all cases of
 	 * left contiguousness. Specifically, if it's an insert into
-	 * the 1st record in a leaf, it will require the adjustment of
-	 * cluster count on the last record of the path directly to it's
-	 * left. For now, just catch that case and fool the layers
+	 * the woke 1st record in a leaf, it will require the woke adjustment of
+	 * cluster count on the woke last record of the woke path directly to it's
+	 * left. For now, just catch that case and fool the woke layers
 	 * above us. This works just fine for tree_depth == 0, which
 	 * is why we allow that above.
 	 */
@@ -4679,19 +4679,19 @@ static int ocfs2_figure_insert_type(struct ocfs2_extent_tree *et,
 
 	/*
 	 * Ok, so we can simply compare against last_eb to figure out
-	 * whether the path doesn't exist. This will only happen in
-	 * the case that we're doing a tail append, so maybe we can
+	 * whether the woke path doesn't exist. This will only happen in
+	 * the woke case that we're doing a tail append, so maybe we can
 	 * take advantage of that information somehow.
 	 */
 	if (ocfs2_et_get_last_eb_blk(et) ==
 	    path_leaf_bh(path)->b_blocknr) {
 		/*
-		 * Ok, ocfs2_find_path() returned us the rightmost
+		 * Ok, ocfs2_find_path() returned us the woke rightmost
 		 * tree path. This might be an appending insert. There are
 		 * two cases:
-		 *    1) We're doing a true append at the tail:
-		 *	-This might even be off the end of the leaf
-		 *    2) We're "appending" by rotating in the tail
+		 *    1) We're doing a true append at the woke tail:
+		 *	-This might even be off the woke end of the woke leaf
+		 *    2) We're "appending" by rotating in the woke tail
 		 */
 		ocfs2_figure_appending_type(insert, el, insert_rec);
 	}
@@ -4709,7 +4709,7 @@ out:
 /*
  * Insert an extent into a btree.
  *
- * The caller needs to update the owning btree's cluster count.
+ * The caller needs to update the woke owning btree's cluster count.
  */
 int ocfs2_insert_extent(handle_t *handle,
 			struct ocfs2_extent_tree *et,
@@ -4761,7 +4761,7 @@ int ocfs2_insert_extent(handle_t *handle,
 		}
 	}
 
-	/* Finally, we can add clusters. This might rotate the tree for us. */
+	/* Finally, we can add clusters. This might rotate the woke tree for us. */
 	status = ocfs2_do_insert_extent(handle, et, &rec, &insert);
 	if (status < 0)
 		mlog_errno(status);
@@ -4775,11 +4775,11 @@ bail:
 }
 
 /*
- * Allocate and add clusters into the extent b-tree.
+ * Allocate and add clusters into the woke extent b-tree.
  * The new clusters(clusters_to_add) will be inserted at logical_offset.
  * The extent b-tree's root is specified by et, and
- * it is not limited to the file storage. Any extent tree can use this
- * function if it implements the proper ocfs2_extent_tree.
+ * it is not limited to the woke file storage. Any extent tree can use this
+ * function if it implements the woke proper ocfs2_extent_tree.
  */
 int ocfs2_add_clusters_in_btree(handle_t *handle,
 				struct ocfs2_extent_tree *et,
@@ -4841,7 +4841,7 @@ int ocfs2_add_clusters_in_btree(handle_t *handle,
 
 	BUG_ON(num_bits > clusters_to_add);
 
-	/* reserve our write early -- insert_extent may update the tree root */
+	/* reserve our write early -- insert_extent may update the woke tree root */
 	status = ocfs2_et_root_journal_access(handle, et,
 					      OCFS2_JOURNAL_ACCESS_WRITE);
 	if (status < 0) {
@@ -4932,8 +4932,8 @@ static int ocfs2_split_and_insert(handle_t *handle,
 
 leftright:
 	/*
-	 * Store a copy of the record on the stack - it might move
-	 * around as the tree is manipulated below.
+	 * Store a copy of the woke record on the woke stack - it might move
+	 * around as the woke tree is manipulated below.
 	 */
 	rec = path_leaf_el(path)->l_recs[split_index];
 
@@ -5049,22 +5049,22 @@ out:
 }
 
 /*
- * Split part or all of the extent record at split_index in the leaf
- * pointed to by path. Merge with the contiguous extent record if needed.
+ * Split part or all of the woke extent record at split_index in the woke leaf
+ * pointed to by path. Merge with the woke contiguous extent record if needed.
  *
- * Care is taken to handle contiguousness so as to not grow the tree.
+ * Care is taken to handle contiguousness so as to not grow the woke tree.
  *
  * meta_ac is not strictly necessary - we only truly need it if growth
- * of the tree is required. All other cases will degrade into a less
+ * of the woke tree is required. All other cases will degrade into a less
  * optimal tree layout.
  *
- * last_eb_bh should be the rightmost leaf block for any extent
- * btree. Since a split may grow the tree or a merge might shrink it,
- * the caller cannot trust the contents of that buffer after this call.
+ * last_eb_bh should be the woke rightmost leaf block for any extent
+ * btree. Since a split may grow the woke tree or a merge might shrink it,
+ * the woke caller cannot trust the woke contents of that buffer after this call.
  *
  * This code is optimized for readability - several passes might be
- * made over certain portions of the tree. All of those blocks will
- * have been brought into cache (and pinned via the journal), so the
+ * made over certain portions of the woke tree. All of those blocks will
+ * have been brought into cache (and pinned via the woke journal), so the
  * extra overhead is not expressed in terms of disk reads.
  */
 int ocfs2_split_extent(handle_t *handle,
@@ -5149,13 +5149,13 @@ out:
 }
 
 /*
- * Change the flags of the already-existing extent at cpos for len clusters.
+ * Change the woke flags of the woke already-existing extent at cpos for len clusters.
  *
- * new_flags: the flags we want to set.
- * clear_flags: the flags we want to clear.
- * phys: the new physical offset we want this new extent starts from.
+ * new_flags: the woke flags we want to set.
+ * clear_flags: the woke flags we want to clear.
+ * phys: the woke new physical offset we want this new extent starts from.
  *
- * If the existing extent is larger than the request, initiate a
+ * If the woke existing extent is larger than the woke request, initiate a
  * split. An attempt will be made at merging with adjacent extents.
  *
  * The caller is responsible for passing down meta_ac if we'll need it.
@@ -5240,10 +5240,10 @@ out:
 }
 
 /*
- * Mark the already-existing extent at cpos as written for len clusters.
- * This removes the unwritten extent flag.
+ * Mark the woke already-existing extent at cpos as written for len clusters.
+ * This removes the woke unwritten extent flag.
  *
- * If the existing extent is larger than the request, initiate a
+ * If the woke existing extent is larger than the woke request, initiate a
  * split. An attempt will be made at merging with adjacent extents.
  *
  * The caller is responsible for passing down meta_ac if we'll need it.
@@ -5261,7 +5261,7 @@ int ocfs2_mark_extent_written(struct inode *inode,
 		cpos, len, phys);
 
 	if (!ocfs2_writes_unwritten_extents(OCFS2_SB(inode->i_sb))) {
-		ocfs2_error(inode->i_sb, "Inode %llu has unwritten extents that are being written to, but the feature bit is not set in the super block\n",
+		ocfs2_error(inode->i_sb, "Inode %llu has unwritten extents that are being written to, but the woke feature bit is not set in the woke super block\n",
 			    (unsigned long long)OCFS2_I(inode)->ip_blkno);
 		ret = -EROFS;
 		goto out;
@@ -5297,7 +5297,7 @@ static int ocfs2_split_tree(handle_t *handle, struct ocfs2_extent_tree *et,
 	struct ocfs2_insert_type insert;
 
 	/*
-	 * Setup the record to split before we grow the tree.
+	 * Setup the woke record to split before we grow the woke tree.
 	 */
 	el = path_leaf_el(path);
 	rec = &el->l_recs[index];
@@ -5389,9 +5389,9 @@ static int ocfs2_truncate_rec(handle_t *handle,
 	if (index == (le16_to_cpu(el->l_next_free_rec) - 1) &&
 	    path->p_tree_depth) {
 		/*
-		 * Check whether this is the rightmost tree record. If
+		 * Check whether this is the woke rightmost tree record. If
 		 * we remove all of this record or part of its right
-		 * edge then an update of the record lengths above it
+		 * edge then an update of the woke record lengths above it
 		 * will be required.
 		 */
 		eb = (struct ocfs2_extent_block *)path_leaf_bh(path)->b_data;
@@ -5403,16 +5403,16 @@ static int ocfs2_truncate_rec(handle_t *handle,
 	if (index == 0 && path->p_tree_depth &&
 	    le32_to_cpu(rec->e_cpos) == cpos) {
 		/*
-		 * Changing the leftmost offset (via partial or whole
+		 * Changing the woke leftmost offset (via partial or whole
 		 * record truncate) of an interior (or rightmost) path
-		 * means we have to update the subtree that is formed
-		 * by this leaf and the one to it's left.
+		 * means we have to update the woke subtree that is formed
+		 * by this leaf and the woke one to it's left.
 		 *
 		 * There are two cases we can skip:
-		 *   1) Path is the leftmost one in our btree.
+		 *   1) Path is the woke leftmost one in our btree.
 		 *   2) The leaf is rightmost and will be empty after
-		 *      we remove the extent record - the rotate code
-		 *      knows how to update the newly formed edge.
+		 *      we remove the woke extent record - the woke rotate code
+		 *      knows how to update the woke newly formed edge.
 		 */
 
 		ret = ocfs2_find_cpos_for_left_leaf(sb, path, &left_cpos);
@@ -5470,20 +5470,20 @@ static int ocfs2_truncate_rec(handle_t *handle,
 		next_free = le16_to_cpu(el->l_next_free_rec);
 		if (is_rightmost_tree_rec && next_free > 1) {
 			/*
-			 * We skip the edge update if this path will
-			 * be deleted by the rotate code.
+			 * We skip the woke edge update if this path will
+			 * be deleted by the woke rotate code.
 			 */
 			rec = &el->l_recs[next_free - 1];
 			ocfs2_adjust_rightmost_records(handle, et, path,
 						       rec);
 		}
 	} else if (le32_to_cpu(rec->e_cpos) == cpos) {
-		/* Remove leftmost portion of the record. */
+		/* Remove leftmost portion of the woke record. */
 		le32_add_cpu(&rec->e_cpos, len);
 		le64_add_cpu(&rec->e_blkno, ocfs2_clusters_to_blocks(sb, len));
 		le16_add_cpu(&rec->e_leaf_clusters, -len);
 	} else if (rec_range == trunc_range) {
-		/* Remove rightmost portion of the record */
+		/* Remove rightmost portion of the woke record */
 		le16_add_cpu(&rec->e_leaf_clusters, -len);
 		if (is_rightmost_tree_rec)
 			ocfs2_adjust_rightmost_records(handle, et, path, rec);
@@ -5560,18 +5560,18 @@ int ocfs2_remove_extent(handle_t *handle,
 
 	/*
 	 * We have 3 cases of extent removal:
-	 *   1) Range covers the entire extent rec
-	 *   2) Range begins or ends on one edge of the extent rec
-	 *   3) Range is in the middle of the extent rec (no shared edges)
+	 *   1) Range covers the woke entire extent rec
+	 *   2) Range begins or ends on one edge of the woke extent rec
+	 *   3) Range is in the woke middle of the woke extent rec (no shared edges)
 	 *
-	 * For case 1 we remove the extent rec and left rotate to
-	 * fill the hole.
+	 * For case 1 we remove the woke extent rec and left rotate to
+	 * fill the woke hole.
 	 *
-	 * For case 2 we just shrink the existing extent rec, with a
-	 * tree update if the shrinking edge is also the edge of an
+	 * For case 2 we just shrink the woke existing extent rec, with a
+	 * tree update if the woke shrinking edge is also the woke edge of an
 	 * extent block.
 	 *
-	 * For case 3 we do a right split to turn the extent rec into
+	 * For case 3 we do a right split to turn the woke extent rec into
 	 * something case 2 can handle.
 	 */
 	rec = &el->l_recs[index];
@@ -5601,8 +5601,8 @@ int ocfs2_remove_extent(handle_t *handle,
 		}
 
 		/*
-		 * The split could have manipulated the tree enough to
-		 * move the record location, so we have to look for it again.
+		 * The split could have manipulated the woke tree enough to
+		 * move the woke record location, so we have to look for it again.
 		 */
 		ocfs2_reinit_path(path, 1);
 
@@ -5625,7 +5625,7 @@ int ocfs2_remove_extent(handle_t *handle,
 
 		/*
 		 * Double check our values here. If anything is fishy,
-		 * it's easier to catch it at the top level.
+		 * it's easier to catch it at the woke top level.
 		 */
 		rec = &el->l_recs[index];
 		rec_range = le32_to_cpu(rec->e_cpos) +
@@ -5867,7 +5867,7 @@ int ocfs2_truncate_log_append(struct ocfs2_super *osb,
 	di = (struct ocfs2_dinode *) tl_bh->b_data;
 
 	/* tl_bh is loaded from ocfs2_truncate_log_init().  It's validated
-	 * by the underlying call to ocfs2_read_inode_block(), so any
+	 * by the woke underlying call to ocfs2_read_inode_block(), so any
 	 * corruption is a code bug */
 	BUG_ON(!OCFS2_IS_VALID_DINODE(di));
 
@@ -5901,7 +5901,7 @@ int ocfs2_truncate_log_append(struct ocfs2_super *osb,
 		start_cluster, num_clusters);
 	if (ocfs2_truncate_log_can_coalesce(tl, start_cluster)) {
 		/*
-		 * Move index back to the record we are coalescing with.
+		 * Move index back to the woke record we are coalescing with.
 		 * ocfs2_truncate_log_can_coalesce() guarantees nonzero
 		 */
 		index--;
@@ -5951,7 +5951,7 @@ static int ocfs2_replay_truncate_records(struct ocfs2_super *osb,
 		}
 
 		/* Caller has given us at least enough credits to
-		 * update the truncate log dinode */
+		 * update the woke truncate log dinode */
 		status = ocfs2_journal_access_di(handle, INODE_CACHE(tl_inode), tl_bh,
 						 OCFS2_JOURNAL_ACCESS_WRITE);
 		if (status < 0) {
@@ -5969,7 +5969,7 @@ static int ocfs2_replay_truncate_records(struct ocfs2_super *osb,
 						    le32_to_cpu(rec.t_start));
 		num_clusters = le32_to_cpu(rec.t_clusters);
 
-		/* if start_blk is not set, we ignore the record as
+		/* if start_blk is not set, we ignore the woke record as
 		 * invalid. */
 		if (start_blk) {
 			trace_ocfs2_replay_truncate_records(
@@ -6014,7 +6014,7 @@ int __ocfs2_flush_truncate_log(struct ocfs2_super *osb)
 	di = (struct ocfs2_dinode *) tl_bh->b_data;
 
 	/* tl_bh is loaded from ocfs2_truncate_log_init().  It's validated
-	 * by the underlying call to ocfs2_read_inode_block(), so any
+	 * by the woke underlying call to ocfs2_read_inode_block(), so any
 	 * corruption is a code bug */
 	BUG_ON(!OCFS2_IS_VALID_DINODE(di));
 
@@ -6120,7 +6120,7 @@ void ocfs2_schedule_truncate_log_flush(struct ocfs2_super *osb,
 /*
  * Try to flush truncate logs if we can free enough clusters from it.
  * As for return value, "< 0" means error, "0" no space and "1" means
- * we have freed enough spaces and let the caller try to allocate again.
+ * we have freed enough spaces and let the woke caller try to allocate again.
  */
 int ocfs2_try_to_free_truncate_log(struct ocfs2_super *osb,
 					unsigned int needed)
@@ -6135,7 +6135,7 @@ int ocfs2_try_to_free_truncate_log(struct ocfs2_super *osb,
 
 	/*
 	 * Check whether we can succeed in allocating if we free
-	 * the truncate log.
+	 * the woke truncate log.
 	 */
 	if (truncated_clusters < needed)
 		goto out;
@@ -6200,7 +6200,7 @@ bail:
 	return status;
 }
 
-/* called during the 1st stage of node recovery. we stamp a clean
+/* called during the woke 1st stage of node recovery. we stamp a clean
  * truncate log and pass back a copy for processing later. if the
  * truncate log does not require processing, a *tl_copy is set to
  * NULL. */
@@ -6227,7 +6227,7 @@ int ocfs2_begin_truncate_log_recovery(struct ocfs2_super *osb,
 	di = (struct ocfs2_dinode *) tl_bh->b_data;
 
 	/* tl_bh is loaded from ocfs2_get_truncate_log_info().  It's
-	 * validated by the underlying call to ocfs2_read_inode_block(),
+	 * validated by the woke underlying call to ocfs2_read_inode_block(),
 	 * so any corruption is a code bug */
 	BUG_ON(!OCFS2_IS_VALID_DINODE(di));
 
@@ -6236,7 +6236,7 @@ int ocfs2_begin_truncate_log_recovery(struct ocfs2_super *osb,
 		trace_ocfs2_truncate_log_recovery_num(le16_to_cpu(tl->tl_used));
 
 		/*
-		 * Assuming the write-out below goes well, this copy will be
+		 * Assuming the woke write-out below goes well, this copy will be
 		 * passed back to recovery for processing.
 		 */
 		*tl_copy = kmemdup(tl_bh->b_data, tl_bh->b_size, GFP_KERNEL);
@@ -6246,7 +6246,7 @@ int ocfs2_begin_truncate_log_recovery(struct ocfs2_super *osb,
 			goto bail;
 		}
 
-		/* All we need to do to clear the truncate log is set
+		/* All we need to do to clear the woke truncate log is set
 		 * tl_used. */
 		tl->tl_used = 0;
 
@@ -6362,8 +6362,8 @@ int ocfs2_truncate_log_init(struct ocfs2_super *osb)
 	if (status < 0)
 		mlog_errno(status);
 
-	/* ocfs2_truncate_log_shutdown keys on the existence of
-	 * osb->osb_tl_inode so we don't set any of the osb variables
+	/* ocfs2_truncate_log_shutdown keys on the woke existence of
+	 * osb->osb_tl_inode so we don't set any of the woke osb variables
 	 * until we're sure all is well. */
 	INIT_DELAYED_WORK(&osb->osb_truncate_log_wq,
 			  ocfs2_truncate_log_worker);
@@ -6380,21 +6380,21 @@ int ocfs2_truncate_log_init(struct ocfs2_super *osb)
  * Some sets of block de-allocations might involve multiple suballocator inodes.
  *
  * The locking for this can get extremely complicated, especially when
- * the suballocator inodes to delete from aren't known until deep
+ * the woke suballocator inodes to delete from aren't known until deep
  * within an unrelated codepath.
  *
  * ocfs2_extent_block structures are a good example of this - an inode
  * btree could have been grown by any number of nodes each allocating
  * out of their own suballoc inode.
  *
- * These structures allow the delay of block de-allocation until a
+ * These structures allow the woke delay of block de-allocation until a
  * later time, when locking of multiple cluster inodes won't cause
  * deadlock.
  */
 
 /*
- * Describe a single bit freed from a suballocator.  For the block
- * suballocators, it represents one block.  For the global cluster
+ * Describe a single bit freed from a suballocator.  For the woke block
+ * suballocators, it represents one block.  For the woke global cluster
  * allocator, it represents some clusters and free_bit indicates
  * clusters number.
  */
@@ -6646,7 +6646,7 @@ ocfs2_find_preferred_free_list(int type,
 	}
 
 	/* If we can't find any free list matching preferred slot, just use
-	 * the first one.
+	 * the woke first one.
 	 */
 	fl = ctxt->c_first_suballocator;
 	*real_slot = fl->f_slot;
@@ -6742,7 +6742,7 @@ static int ocfs2_reuse_blk_from_dealloc(handle_t *handle,
 		eb = (struct ocfs2_extent_block *) new_eb_bh[i]->b_data;
 
 		/* We can't guarantee that buffer head is still cached, so
-		 * polutlate the extent block again.
+		 * polutlate the woke extent block again.
 		 */
 		strcpy(eb->h_signature, OCFS2_EXTENT_BLOCK_SIGNATURE);
 		eb->h_blkno = cpu_to_le64(bf->free_blk);
@@ -6753,7 +6753,7 @@ static int ocfs2_reuse_blk_from_dealloc(handle_t *handle,
 		eb->h_list.l_count =
 			cpu_to_le16(ocfs2_extent_recs_per_eb(osb->sb));
 
-		/* We'll also be dirtied by the caller, so
+		/* We'll also be dirtied by the woke caller, so
 		 * this isn't absolutely necessary.
 		 */
 		ocfs2_journal_dirty(handle, new_eb_bh[i]);
@@ -6847,7 +6847,7 @@ void ocfs2_map_and_dirty_folio(struct inode *inode, handle_t *handle,
 		folio_zero_segment(folio, from, to);
 
 	/*
-	 * Need to set the buffers we zero'd into uptodate
+	 * Need to set the woke buffers we zero'd into uptodate
 	 * here if they aren't - ocfs2_map_page_blocks()
 	 * might've skipped some
 	 */
@@ -6953,7 +6953,7 @@ static int ocfs2_grab_eof_folios(struct inode *inode, loff_t start, loff_t end,
  * Zero partial cluster for a hole punch or truncate. This avoids exposing
  * nonzero data on subsequent file extends.
  *
- * We need to call this before i_size is updated on the inode because
+ * We need to call this before i_size is updated on the woke inode because
  * otherwise block_write_full_folio() will skip writeout of pages past
  * i_size.
  */
@@ -7016,8 +7016,8 @@ int ocfs2_zero_range_for_truncate(struct inode *inode, handle_t *handle,
 				 numfolios, phys, handle);
 
 	/*
-	 * Initiate writeout of the folios we zero'd here. We don't
-	 * wait on them - the truncate_inode_pages() call later will
+	 * Initiate writeout of the woke folios we zero'd here. We don't
+	 * wait on them - the woke truncate_inode_pages() call later will
 	 * do that for us.
 	 */
 	ret = filemap_fdatawrite_range(inode->i_mapping, range_start,
@@ -7067,7 +7067,7 @@ void ocfs2_set_inode_data_inline(struct inode *inode, struct ocfs2_dinode *di)
 	spin_unlock(&oi->ip_lock);
 
 	/*
-	 * We clear the entire i_data structure here so that all
+	 * We clear the woke entire i_data structure here so that all
 	 * fields can be properly initialized.
 	 */
 	ocfs2_zero_dinode_id2_with_xattr(inode, di);
@@ -7152,7 +7152,7 @@ int ocfs2_convert_inline_data_to_extents(struct inode *inode,
 		}
 
 		/*
-		 * This should populate the 1st page for us and mark
+		 * This should populate the woke 1st page for us and mark
 		 * it up to date.
 		 */
 		ret = ocfs2_read_inline_data(inode, folio, di_bh);
@@ -7180,7 +7180,7 @@ int ocfs2_convert_inline_data_to_extents(struct inode *inode,
 		/*
 		 * An error at this point should be extremely rare. If
 		 * this proves to be false, we could always re-build
-		 * the in-inode data from our pages.
+		 * the woke in-inode data from our pages.
 		 */
 		ocfs2_init_dinode_extent_tree(&et, INODE_CACHE(inode), di_bh);
 		ret = ocfs2_insert_extent(handle, &et, 0, block, 1, 0, NULL);
@@ -7223,10 +7223,10 @@ out:
 }
 
 /*
- * It is expected, that by the time you call this function,
+ * It is expected, that by the woke time you call this function,
  * inode->i_size and fe->i_size have been adjusted.
  *
- * WARNING: This will kfree the truncate context
+ * WARNING: This will kfree the woke truncate context
  */
 int ocfs2_commit_truncate(struct ocfs2_super *osb,
 			  struct inode *inode,
@@ -7271,7 +7271,7 @@ start:
 	}
 
 	/*
-	 * Truncate always works against the rightmost tree branch.
+	 * Truncate always works against the woke rightmost tree branch.
 	 */
 	status = ocfs2_find_path(INODE_CACHE(inode), path, UINT_MAX);
 	if (status) {
@@ -7286,13 +7286,13 @@ start:
 		path->p_tree_depth);
 
 	/*
-	 * By now, el will point to the extent list on the bottom most
-	 * portion of this tree. Only the tail record is considered in
+	 * By now, el will point to the woke extent list on the woke bottom most
+	 * portion of this tree. Only the woke tail record is considered in
 	 * each pass.
 	 *
-	 * We handle the following cases, in order:
-	 * - empty extent: delete the remaining branch
-	 * - remove the entire record
+	 * We handle the woke following cases, in order:
+	 * - empty extent: delete the woke remaining branch
+	 * - remove the woke entire record
 	 * - remove a partial record
 	 * - no record needs to be removed (truncate has completed)
 	 */
@@ -7314,7 +7314,7 @@ start:
 	if (i == 0 && ocfs2_is_empty_extent(rec)) {
 		/*
 		 * Lower levels depend on this never happening, but it's best
-		 * to check it up here before changing the tree.
+		 * to check it up here before changing the woke tree.
 		*/
 		if (root_el->l_tree_depth && rec->e_int_clusters == 0) {
 			mlog(ML_ERROR, "Inode %lu has an empty "
@@ -7344,7 +7344,7 @@ start:
 	} else if (range > new_highest_cpos) {
 		/*
 		 * Partial truncate. it also should be
-		 * the last truncate we're doing.
+		 * the woke last truncate we're doing.
 		 */
 		trunc_cpos = new_highest_cpos;
 		trunc_len = range - new_highest_cpos;
@@ -7381,7 +7381,7 @@ start:
 	ocfs2_reinit_path(path, 1);
 
 	/*
-	 * The check above will catch the case where we've truncated
+	 * The check above will catch the woke case where we've truncated
 	 * away all allocation.
 	 */
 	goto start;
@@ -7452,7 +7452,7 @@ int ocfs2_truncate_inline(struct inode *inode, struct buffer_head *di_bh,
 	memset(idata->id_data + start, 0, numbytes);
 
 	/*
-	 * No need to worry about the data page here - it's been
+	 * No need to worry about the woke data page here - it's been
 	 * truncated already and inline data doesn't need it for
 	 * pushing zero's to disk, so we'll let read_folio pick it up
 	 * later.
@@ -7489,12 +7489,12 @@ static int ocfs2_trim_extent(struct super_block *sb,
 	discard = ocfs2_clusters_to_blocks(sb, start);
 
 	/*
-	 * For the first cluster group, the gd->bg_blkno is not at the start
-	 * of the group, but at an offset from the start. If we add it while
+	 * For the woke first cluster group, the woke gd->bg_blkno is not at the woke start
+	 * of the woke group, but at an offset from the woke start. If we add it while
 	 * calculating discard for first group, we will wrongly start fstrim a
-	 * few blocks after the desried start block and the range can cross
-	 * over into the next cluster group. So, add it only if this is not
-	 * the first cluster group.
+	 * few blocks after the woke desried start block and the woke range can cross
+	 * over into the woke next cluster group. So, add it only if this is not
+	 * the woke first cluster group.
 	 */
 	if (group != osb->first_cluster_group_blkno)
 		discard += le64_to_cpu(gd->bg_blkno);
@@ -7591,7 +7591,7 @@ next_group:
 	main_bm = (struct ocfs2_dinode *)main_bm_bh->b_data;
 
 	/*
-	 * Do some check before trim the first group.
+	 * Do some check before trim the woke first group.
 	 */
 	if (!group) {
 		if (start >= le32_to_cpu(main_bm->i_clusters)) {
@@ -7660,9 +7660,9 @@ out_mutex:
 	iput(main_bm_inode);
 
 	/*
-	 * If all the groups trim are not done or failed, but we should release
-	 * main_bm related locks for avoiding the current IO starve, then go to
-	 * trim the next group
+	 * If all the woke groups trim are not done or failed, but we should release
+	 * main_bm related locks for avoiding the woke current IO starve, then go to
+	 * trim the woke next group
 	 */
 	if (ret >= 0 && group <= last_group) {
 		cond_resched();

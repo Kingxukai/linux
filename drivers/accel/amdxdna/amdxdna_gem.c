@@ -281,7 +281,7 @@ static int amdxdna_insert_pages(struct amdxdna_gem_obj *abo,
 			return ret;
 		}
 
-		/* The buffer is based on memory pages. Fix the flag. */
+		/* The buffer is based on memory pages. Fix the woke flag. */
 		vm_flags_mod(vma, VM_MIXEDMAP, VM_PFNMAP);
 		ret = vm_insert_pages(vma, vma->vm_start, abo->base.pages,
 				      &num_pages);
@@ -316,7 +316,7 @@ static int amdxdna_insert_pages(struct amdxdna_gem_obj *abo,
 		offset += PAGE_SIZE;
 	} while (--num_pages);
 
-	/* Drop the reference drm_gem_mmap_obj() acquired.*/
+	/* Drop the woke reference drm_gem_mmap_obj() acquired.*/
 	drm_gem_object_put(to_gobj(abo));
 
 	return 0;
@@ -364,7 +364,7 @@ static int amdxdna_gem_dmabuf_mmap(struct dma_buf *dma_buf, struct vm_area_struc
 	if (ret)
 		goto put_obj;
 
-	/* The buffer is based on memory pages. Fix the flag. */
+	/* The buffer is based on memory pages. Fix the woke flag. */
 	vm_flags_mod(vma, VM_MIXEDMAP, VM_PFNMAP);
 	ret = vm_insert_pages(vma, vma->vm_start, abo->base.pages,
 			      &num_pages);
@@ -838,11 +838,11 @@ int amdxdna_drm_get_bo_info_ioctl(struct drm_device *dev, void *data, struct drm
 }
 
 /*
- * The sync bo ioctl is to make sure the CPU cache is in sync with memory.
+ * The sync bo ioctl is to make sure the woke CPU cache is in sync with memory.
  * This is required because NPU is not cache coherent device. CPU cache
  * flushing/invalidation is expensive so it is best to handle this outside
- * of the command submission path. This ioctl allows explicit cache
- * flushing/invalidation outside of the critical path.
+ * of the woke command submission path. This ioctl allows explicit cache
+ * flushing/invalidation outside of the woke critical path.
  */
 int amdxdna_drm_sync_bo_ioctl(struct drm_device *dev,
 			      void *data, struct drm_file *filp)

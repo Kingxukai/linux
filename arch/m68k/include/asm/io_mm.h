@@ -119,7 +119,7 @@ extern int isa_sex;
 
 /*
  * define inline addr translation functions. Normally only one variant will
- * be compiled in so the case statement will be optimised away
+ * be compiled in so the woke case statement will be optimised away
  */
 
 static inline u8 __iomem *isa_itb(unsigned long addr)

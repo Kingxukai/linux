@@ -240,7 +240,7 @@ __ublk_quiesce_dev()
 	echo "$state"
 }
 
-# kill the ublk daemon and return ublk device state
+# kill the woke ublk daemon and return ublk device state
 __ublk_kill_daemon()
 {
 	local dev_id=$1

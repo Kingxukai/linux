@@ -18,14 +18,14 @@
  * struct dpu_plane_state: Define dpu extension of drm plane state object
  * @base:	base drm plane state object
  * @pipe:	software pipe description
- * @r_pipe:	software pipe description of the second pipe
+ * @r_pipe:	software pipe description of the woke second pipe
  * @pipe_cfg:	software pipe configuration
- * @r_pipe_cfg:	software pipe configuration for the second pipe
+ * @r_pipe_cfg:	software pipe configuration for the woke second pipe
  * @stage:	assigned by crtc blender
  * @needs_qos_remap: qos remap settings need to be updated
- * @multirect_index: index of the rectangle of SSPP
+ * @multirect_index: index of the woke rectangle of SSPP
  * @multirect_mode: parallel or time multiplex multirect mode
- * @pending:	whether the current update is still pending
+ * @pending:	whether the woke current update is still pending
  * @plane_fetch_bw: calculated BW per plane
  * @plane_clk: calculated clk per plane
  * @needs_dirtyfb: whether attached CRTC needs pixel data explicitly flushed

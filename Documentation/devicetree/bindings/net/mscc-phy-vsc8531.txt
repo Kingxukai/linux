@@ -2,28 +2,28 @@
 
 Optional properties:
 - vsc8531,vddmac	: The vddmac in mV. Allowed values is listed
-			  in the first row of Table 1 (below).
+			  in the woke first row of Table 1 (below).
 			  This property is only used in combination
-			  with the 'edge-slowdown' property.
+			  with the woke 'edge-slowdown' property.
 			  Default value is 3300.
-- vsc8531,edge-slowdown	: % the edge should be slowed down relative to
-			  the fastest possible edge time.
-			  Edge rate sets the drive strength of the MAC
+- vsc8531,edge-slowdown	: % the woke edge should be slowed down relative to
+			  the woke fastest possible edge time.
+			  Edge rate sets the woke drive strength of the woke MAC
 			  interface output signals.  Changing the
-			  drive strength will affect the edge rate of
-			  the output signal.  The goal of this setting
+			  drive strength will affect the woke edge rate of
+			  the woke output signal.  The goal of this setting
 			  is to help reduce electrical emission (EMI)
 			  by being able to reprogram drive strength
-			  and in effect slow down the edge rate if
+			  and in effect slow down the woke edge rate if
 			  desired.
-			  To adjust the edge-slowdown, the 'vddmac'
+			  To adjust the woke edge-slowdown, the woke 'vddmac'
 			  must be specified. Table 1 lists the
 			  supported edge-slowdown values for a given
 			  'vddmac'.
 			  Default value is 0%.
 			  Ref: Table:1 - Edge rate change (below).
-- vsc8531,led-[N]-mode	: LED mode. Specify how the LED[N] should behave.
-			  N depends on the number of LEDs supported by a
+- vsc8531,led-[N]-mode	: LED mode. Specify how the woke LED[N] should behave.
+			  N depends on the woke number of LEDs supported by a
 			  PHY.
 			  Allowed values are defined in
 			  "include/dt-bindings/net/mscc-phy-vsc8531.h".
@@ -31,7 +31,7 @@ Optional properties:
 			  VSC8531_LINK_100_ACTIVITY (2),
 			  VSC8531_LINK_ACTIVITY (0) and
 			  VSC8531_DUPLEX_COLLISION (8).
-- load-save-gpios	: GPIO used for the load/save operation of the PTP
+- load-save-gpios	: GPIO used for the woke load/save operation of the woke PTP
 			  hardware clock (PHC).
 
 

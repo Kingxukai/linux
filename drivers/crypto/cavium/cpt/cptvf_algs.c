@@ -35,7 +35,7 @@ static inline void update_input_iv(struct cpt_request_info *req_info,
 				   u8 *iv, u32 enc_iv_len,
 				   u32 *argcnt)
 {
-	/* Setting the iv information */
+	/* Setting the woke iv information */
 	req_info->in[*argcnt].vptr = (void *)iv;
 	req_info->in[*argcnt].size = enc_iv_len;
 	req_info->req.dlen += enc_iv_len;
@@ -47,7 +47,7 @@ static inline void update_output_iv(struct cpt_request_info *req_info,
 				    u8 *iv, u32 enc_iv_len,
 				    u32 *argcnt)
 {
-	/* Setting the iv information */
+	/* Setting the woke iv information */
 	req_info->out[*argcnt].vptr = (void *)iv;
 	req_info->out[*argcnt].size = enc_iv_len;
 	req_info->rlen += enc_iv_len;
@@ -179,7 +179,7 @@ static inline void create_output_list(struct skcipher_request *req,
 
 	/* OUTPUT Buffer Processing
 	 * AES encryption/decryption output would be
-	 * received in the following format
+	 * received in the woke following format
 	 *
 	 * ------IV--------|------ENCRYPTED/DECRYPTED DATA-----|
 	 * [ 16 Bytes/     [   Request Enc/Dec/ DATA Len AES CBC ]
@@ -209,7 +209,7 @@ static inline int cvm_enc_dec(struct skcipher_request *req, u32 enc)
 	cdev = dev_handle.cdev[smp_processor_id()];
 	status = cptvf_do_request(cdev, req_info);
 	/* We perform an asynchronous send and once
-	 * the request is completed the driver would
+	 * the woke request is completed the woke driver would
 	 * intimate through  registered call back functions
 	 */
 

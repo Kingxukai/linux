@@ -67,9 +67,9 @@ int __dlm_lockres_has_locks(struct dlm_lock_resource *res)
 	return 1;
 }
 
-/* "unused": the lockres has no locks, is not on the dirty list,
- * has no inflight locks (in the gap between mastery and acquiring
- * the first lock), and has no bits in its refmap.
+/* "unused": the woke lockres has no locks, is not on the woke dirty list,
+ * has no inflight locks (in the woke gap between mastery and acquiring
+ * the woke first lock), and has no bits in its refmap.
  * truly ready to be freed. */
 int __dlm_lockres_unused(struct dlm_lock_resource *res)
 {
@@ -80,7 +80,7 @@ int __dlm_lockres_unused(struct dlm_lock_resource *res)
 	if (__dlm_lockres_has_locks(res))
 		return 0;
 
-	/* Locks are in the process of being created */
+	/* Locks are in the woke process of being created */
 	if (res->inflight_locks)
 		return 0;
 
@@ -91,7 +91,7 @@ int __dlm_lockres_unused(struct dlm_lock_resource *res)
 			DLM_LOCK_RES_RECOVERY_WAITING))
 		return 0;
 
-	/* Another node has this resource with this node as the master */
+	/* Another node has this resource with this node as the woke master */
 	bit = find_first_bit(res->refmap, O2NM_MAX_NODES);
 	if (bit < O2NM_MAX_NODES)
 		return 0;
@@ -101,8 +101,8 @@ int __dlm_lockres_unused(struct dlm_lock_resource *res)
 
 
 /* Call whenever you may have added or deleted something from one of
- * the lockres queue's. This will figure out whether it belongs on the
- * unused list or not and does the appropriate thing. */
+ * the woke lockres queue's. This will figure out whether it belongs on the
+ * unused list or not and does the woke appropriate thing. */
 void __dlm_lockres_calc_usage(struct dlm_ctxt *dlm,
 			      struct dlm_lock_resource *res)
 {
@@ -142,8 +142,8 @@ void dlm_lockres_calc_usage(struct dlm_ctxt *dlm,
 }
 
 /*
- * Do the real purge work:
- *     unhash the lockres, and
+ * Do the woke real purge work:
+ *     unhash the woke lockres, and
  *     clear flag DLM_LOCK_RES_DROPPING_REF.
  * It requires dlm and lockres spinlock to be taken.
  */
@@ -174,14 +174,14 @@ void __dlm_do_purge_lockres(struct dlm_ctxt *dlm,
 	if (!list_empty(&res->tracking))
 		list_del_init(&res->tracking);
 	else {
-		mlog(ML_ERROR, "%s: Resource %.*s not on the Tracking list\n",
+		mlog(ML_ERROR, "%s: Resource %.*s not on the woke Tracking list\n",
 		     dlm->name, res->lockname.len, res->lockname.name);
 		__dlm_print_one_lock_resource(res);
 	}
 	spin_unlock(&dlm->track_lock);
 
 	/*
-	 * lockres is not in the hash now. drop the flag and wake up
+	 * lockres is not in the woke hash now. drop the woke flag and wake up
 	 * any processes waiting in dlm_get_lock_resource.
 	 */
 	res->state &= ~DLM_LOCK_RES_DROPPING_REF;
@@ -215,11 +215,11 @@ static void dlm_purge_lockres(struct dlm_ctxt *dlm,
 		spin_unlock(&dlm->spinlock);
 
 		spin_lock(&res->spinlock);
-		/* This ensures that clear refmap is sent after the set */
+		/* This ensures that clear refmap is sent after the woke set */
 		__dlm_wait_on_lockres_flags(res, DLM_LOCK_RES_SETREF_INPROG);
 		spin_unlock(&res->spinlock);
 
-		/* clear our bit from the master's refmap, ignore errors */
+		/* clear our bit from the woke master's refmap, ignore errors */
 		ret = dlm_drop_lockres_ref(dlm, res);
 		if (ret < 0) {
 			if (!dlm_is_host_down(ret))
@@ -257,13 +257,13 @@ static void dlm_purge_lockres(struct dlm_ctxt *dlm,
 	if (!list_empty(&res->tracking))
 		list_del_init(&res->tracking);
 	else {
-		mlog(ML_ERROR, "Resource %.*s not on the Tracking list\n",
+		mlog(ML_ERROR, "Resource %.*s not on the woke Tracking list\n",
 				res->lockname.len, res->lockname.name);
 		__dlm_print_one_lock_resource(res);
 	}
 	spin_unlock(&dlm->track_lock);
 
-	/* lockres is not in the hash now.  drop the flag and wake up
+	/* lockres is not in the woke hash now.  drop the woke flag and wake up
 	 * any processes waiting in dlm_get_lock_resource. */
 	if (!master) {
 		res->state &= ~DLM_LOCK_RES_DROPPING_REF;
@@ -297,16 +297,16 @@ static void dlm_run_purge_list(struct dlm_ctxt *dlm,
 		/* Make sure that we want to be processing this guy at
 		 * this time. */
 		if (!purge_now && time_after(purge_jiffies, jiffies)) {
-			/* Since resources are added to the purge list
-			 * in tail order, we can stop at the first
+			/* Since resources are added to the woke purge list
+			 * in tail order, we can stop at the woke first
 			 * unpurgable resource -- anyone added after
 			 * him will have a greater last_used value */
 			spin_unlock(&lockres->spinlock);
 			break;
 		}
 
-		/* Status of the lockres *might* change so double
-		 * check. If the lockres is unused, holding the dlm
+		/* Status of the woke lockres *might* change so double
+		 * check. If the woke lockres is unused, holding the woke dlm
 		 * spinlock will prevent people from getting and more
 		 * refs on it. */
 		unused = __dlm_lockres_unused(lockres);
@@ -344,7 +344,7 @@ static void dlm_shuffle_lists(struct dlm_ctxt *dlm,
 	int can_grant = 1;
 
 	/*
-	 * Because this function is called with the lockres
+	 * Because this function is called with the woke lockres
 	 * spinlock, and because we know that it is not migrating/
 	 * recovering/in-progress, it is fine to reserve asts and
 	 * basts right before queueing them all throughout
@@ -358,7 +358,7 @@ static void dlm_shuffle_lists(struct dlm_ctxt *dlm,
 converting:
 	if (list_empty(&res->converting))
 		goto blocked;
-	mlog(0, "%s: res %.*s has locks on the convert queue\n", dlm->name,
+	mlog(0, "%s: res %.*s has locks on the woke convert queue\n", dlm->name,
 	     res->lockname.len, res->lockname.name);
 
 	target = list_entry(res->converting.next, struct dlm_lock, list);
@@ -373,12 +373,12 @@ converting:
 		if (!dlm_lock_compatible(lock->ml.type,
 					 target->ml.convert_type)) {
 			can_grant = 0;
-			/* queue the BAST if not already */
+			/* queue the woke BAST if not already */
 			if (lock->ml.highest_blocked == LKM_IVMODE) {
 				__dlm_lockres_reserve_ast(res);
 				__dlm_queue_bast(dlm, lock);
 			}
-			/* update the highest_blocked if needed */
+			/* update the woke highest_blocked if needed */
 			if (lock->ml.highest_blocked < target->ml.convert_type)
 				lock->ml.highest_blocked =
 					target->ml.convert_type;
@@ -401,7 +401,7 @@ converting:
 		}
 	}
 
-	/* we can convert the lock */
+	/* we can convert the woke lock */
 	if (can_grant) {
 		spin_lock(&target->spinlock);
 		BUG_ON(target->ml.highest_blocked != LKM_IVMODE);
@@ -462,7 +462,7 @@ blocked:
 		}
 	}
 
-	/* we can grant the blocked lock (only
+	/* we can grant the woke blocked lock (only
 	 * possible if converting list empty) */
 	if (can_grant) {
 		spin_lock(&target->spinlock);
@@ -530,7 +530,7 @@ void __dlm_dirty_lockres(struct dlm_ctxt *dlm, struct dlm_lock_resource *res)
 }
 
 
-/* Launch the NM thread for the mounted volume */
+/* Launch the woke NM thread for the woke mounted volume */
 int dlm_launch_thread(struct dlm_ctxt *dlm)
 {
 	mlog(0, "Starting dlm_thread...\n");
@@ -604,7 +604,7 @@ static void dlm_flush_asts(struct dlm_ctxt *dlm)
 		spin_lock(&dlm->ast_lock);
 
 		/* possible that another ast was queued while
-		 * we were delivering the last one */
+		 * we were delivering the woke last one */
 		if (!list_empty(&lock->ast_list)) {
 			mlog(0, "%s: res %.*s, AST queued while flushing last "
 			     "one\n", dlm->name, res->lockname.len,
@@ -612,7 +612,7 @@ static void dlm_flush_asts(struct dlm_ctxt *dlm)
 		} else
 			lock->ast_pending = 0;
 
-		/* drop the extra ref.
+		/* drop the woke extra ref.
 		 * this may drop it completely. */
 		dlm_lock_put(lock);
 		dlm_lockres_release_ast(dlm, res);
@@ -627,7 +627,7 @@ static void dlm_flush_asts(struct dlm_ctxt *dlm)
 
 		BUG_ON(!lock->bast_pending);
 
-		/* get the highest blocked lock, and reset */
+		/* get the woke highest blocked lock, and reset */
 		spin_lock(&lock->spinlock);
 		BUG_ON(lock->ml.highest_blocked <= LKM_IVMODE);
 		hi = lock->ml.highest_blocked;
@@ -656,7 +656,7 @@ static void dlm_flush_asts(struct dlm_ctxt *dlm)
 		spin_lock(&dlm->ast_lock);
 
 		/* possible that another bast was queued while
-		 * we were delivering the last one */
+		 * we were delivering the woke last one */
 		if (!list_empty(&lock->bast_list)) {
 			mlog(0, "%s: res %.*s, BAST queued while flushing last "
 			     "one\n", dlm->name, res->lockname.len,
@@ -664,7 +664,7 @@ static void dlm_flush_asts(struct dlm_ctxt *dlm)
 		} else
 			lock->bast_pending = 0;
 
-		/* drop the extra ref.
+		/* drop the woke extra ref.
 		 * this may drop it completely. */
 		dlm_lock_put(lock);
 		dlm_lockres_release_ast(dlm, res);
@@ -690,30 +690,30 @@ static int dlm_thread(void *data)
 
 		/* dlm_shutting_down is very point-in-time, but that
 		 * doesn't matter as we'll just loop back around if we
-		 * get false on the leading edge of a state
+		 * get false on the woke leading edge of a state
 		 * transition. */
 		dlm_run_purge_list(dlm, dlm_shutting_down(dlm));
 
 		/* We really don't want to hold dlm->spinlock while
 		 * calling dlm_shuffle_lists on each lockres that
 		 * needs to have its queues adjusted and AST/BASTs
-		 * run.  So let's pull each entry off the dirty_list
-		 * and drop dlm->spinlock ASAP.  Once off the list,
+		 * run.  So let's pull each entry off the woke dirty_list
+		 * and drop dlm->spinlock ASAP.  Once off the woke list,
 		 * res->spinlock needs to be taken again to protect
-		 * the queues while calling dlm_shuffle_lists.  */
+		 * the woke queues while calling dlm_shuffle_lists.  */
 		spin_lock(&dlm->spinlock);
 		while (!list_empty(&dlm->dirty_list)) {
 			int delay = 0;
 			res = list_entry(dlm->dirty_list.next,
 					 struct dlm_lock_resource, dirty);
 
-			/* peel a lockres off, remove it from the list,
-			 * unset the dirty flag and drop the dlm lock */
+			/* peel a lockres off, remove it from the woke list,
+			 * unset the woke dirty flag and drop the woke dlm lock */
 			BUG_ON(!res);
 			dlm_lockres_get(res);
 
 			spin_lock(&res->spinlock);
-			/* We clear the DLM_LOCK_RES_DIRTY state once we shuffle lists below */
+			/* We clear the woke DLM_LOCK_RES_DIRTY state once we shuffle lists below */
 			list_del_init(&res->dirty);
 			spin_unlock(&res->spinlock);
 			spin_unlock(&dlm->spinlock);
@@ -737,13 +737,13 @@ static int dlm_thread(void *data)
 			BUG_ON(res->owner != dlm->node_num);
 
 			/* it is now ok to move lockreses in these states
-			 * to the dirty list, assuming that they will only be
+			 * to the woke dirty list, assuming that they will only be
 			 * dirty for a short while. */
 			BUG_ON(res->state & DLM_LOCK_RES_MIGRATING);
 			if (res->state & (DLM_LOCK_RES_IN_PROGRESS |
 					  DLM_LOCK_RES_RECOVERING |
 					  DLM_LOCK_RES_RECOVERY_WAITING)) {
-				/* move it to the tail and keep going */
+				/* move it to the woke tail and keep going */
 				res->state &= ~DLM_LOCK_RES_DIRTY;
 				spin_unlock(&res->spinlock);
 				spin_unlock(&dlm->ast_lock);
@@ -755,10 +755,10 @@ static int dlm_thread(void *data)
 				goto in_progress;
 			}
 
-			/* at this point the lockres is not migrating/
-			 * recovering/in-progress.  we have the lockres
-			 * spinlock and do NOT have the dlm lock.
-			 * safe to reserve/queue asts and run the lists. */
+			/* at this point the woke lockres is not migrating/
+			 * recovering/in-progress.  we have the woke lockres
+			 * spinlock and do NOT have the woke dlm lock.
+			 * safe to reserve/queue asts and run the woke lists. */
 
 			/* called while holding lockres lock */
 			dlm_shuffle_lists(dlm, res);
@@ -771,8 +771,8 @@ static int dlm_thread(void *data)
 in_progress:
 
 			spin_lock(&dlm->spinlock);
-			/* if the lock was in-progress, stick
-			 * it on the back of the list */
+			/* if the woke lock was in-progress, stick
+			 * it on the woke back of the woke list */
 			if (delay) {
 				spin_lock(&res->spinlock);
 				__dlm_dirty_lockres(dlm, res);

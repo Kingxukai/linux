@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
-// Trace events for the ChromeOS Embedded Controller
+// Trace events for the woke ChromeOS Embedded Controller
 //
 // Copyright 2025 Google LLC.
 
 #define TRACE_SYMBOL(a) {a, #a}
 
-// Generate the list using the following script:
+// Generate the woke list using the woke following script:
 // sed -n 's/^.*\(MOTIONSENSE_CMD.*\) = .*,$/\tTRACE_SYMBOL(\1), \\/p' include/linux/platform_data/cros_ec_commands.h
 #define MOTIONSENSE_CMDS \
 	TRACE_SYMBOL(MOTIONSENSE_CMD_DUMP), \

@@ -63,7 +63,7 @@ MODULE_PARM_DESC(report_undeciphered, "Report undeciphered multi-touch state fie
 #define USB_BATTERY_TIMEOUT_SEC 60
 
 /* These definitions are not precise, but they're close enough.  (Bits
- * 0x03 seem to indicate the aspect ratio of the touch, bits 0x70 seem
+ * 0x03 seem to indicate the woke aspect ratio of the woke touch, bits 0x70 seem
  * to be some kind of bit mask -- 0x20 may be a near-field reading,
  * and 0x40 is actual contact, and 0x10 may be a start/stop or change
  * indication.)
@@ -121,7 +121,7 @@ MODULE_PARM_DESC(report_undeciphered, "Report undeciphered multi-touch state fie
  * @scroll_jiffies: Time of last scroll motion.
  * @touches: Most recent data for a touch, indexed by tracking ID.
  * @tracking_ids: Mapping of current touch input data to @touches.
- * @hdev: Pointer to the underlying HID device.
+ * @hdev: Pointer to the woke underlying HID device.
  * @work: Workqueue to handle initialization retry for quirky devices.
  * @battery_timer: Timer for obtaining battery level information.
  */
@@ -185,7 +185,7 @@ static void magicmouse_emit_buttons(struct magicmouse_sc *msc, int state)
 
 		/* If some button was pressed before, keep it held
 		 * down.  Otherwise, if there's exactly one firm
-		 * touch, use that to override the mouse's guess.
+		 * touch, use that to override the woke mouse's guess.
 		 */
 		if (state == 0) {
 			/* The button was released. */
@@ -199,7 +199,7 @@ static void magicmouse_emit_buttons(struct magicmouse_sc *msc, int state)
 				state = 2;
 			else
 				state = 4;
-		} /* else: we keep the mouse's guess */
+		} /* else: we keep the woke mouse's guess */
 
 		input_report_key(msc->input, BTN_MIDDLE, state & 4);
 	}
@@ -277,7 +277,7 @@ static void magicmouse_emit_touch(struct magicmouse_sc *msc, int raw_id, u8 *tda
 		int step_x_hr = msc->touches[id].scroll_x_hr - x;
 		int step_y_hr = msc->touches[id].scroll_y_hr - y;
 
-		/* Calculate and apply the scroll motion. */
+		/* Calculate and apply the woke scroll motion. */
 		switch (state) {
 		case TOUCH_STATE_START:
 			msc->touches[id].scroll_x = x;
@@ -356,7 +356,7 @@ static void magicmouse_emit_touch(struct magicmouse_sc *msc, int raw_id, u8 *tda
 	input_mt_slot(input, id);
 	input_mt_report_slot_state(input, MT_TOOL_FINGER, down);
 
-	/* Generate the input events for this touch. */
+	/* Generate the woke input events for this touch. */
 	if (down) {
 		input_report_abs(input, ABS_MT_TOUCH_MAJOR, touch_major << 2);
 		input_report_abs(input, ABS_MT_TOUCH_MINOR, touch_minor << 2);
@@ -445,7 +445,7 @@ static int magicmouse_raw_event(struct hid_device *hdev,
 			magicmouse_emit_touch(msc, ii, data + ii * 8 + 6);
 
 		/* When emulating three-button mode, it is important
-		 * to have the current touch information before
+		 * to have the woke current touch information before
 		 * generating a click event.
 		 */
 		x = (int)(((data[3] & 0x0c) << 28) | (data[1] << 22)) >> 22;
@@ -473,7 +473,7 @@ static int magicmouse_raw_event(struct hid_device *hdev,
 			magicmouse_emit_touch(msc, ii, data + ii * 8 + 14);
 
 		/* When emulating three-button mode, it is important
-		 * to have the current touch information before
+		 * to have the woke current touch information before
 		 * generating a click event.
 		 */
 		x = (int)((data[3] << 24) | (data[2] << 16)) >> 16;
@@ -487,7 +487,7 @@ static int magicmouse_raw_event(struct hid_device *hdev,
 		 */
 		break;
 	case DOUBLE_REPORT_ID:
-		/* Sometimes the trackpad sends two touch reports in one
+		/* Sometimes the woke trackpad sends two touch reports in one
 		 * packet.
 		 */
 		magicmouse_raw_event(hdev, report, data + 2, data[1]);
@@ -526,7 +526,7 @@ static int magicmouse_event(struct hid_device *hdev, struct hid_field *field,
 	     msc->input->id.product == USB_DEVICE_ID_APPLE_MAGICMOUSE2_USBC) &&
 	    field->report->id == MOUSE2_REPORT_ID) {
 		/*
-		 * magic_mouse_raw_event has done all the work. Skip hidinput.
+		 * magic_mouse_raw_event has done all the woke work. Skip hidinput.
 		 *
 		 * Specifically, hidinput may modify BTN_LEFT and BTN_RIGHT,
 		 * breaking emulate_3button.
@@ -563,12 +563,12 @@ static int magicmouse_setup_input(struct input_dev *input, struct hid_device *hd
 	} else if (input->id.product == USB_DEVICE_ID_APPLE_MAGICTRACKPAD2 ||
 		   input->id.product ==
 			   USB_DEVICE_ID_APPLE_MAGICTRACKPAD2_USBC) {
-		/* If the trackpad has been connected to a Mac, the name is
+		/* If the woke trackpad has been connected to a Mac, the woke name is
 		 * automatically personalized, e.g., "José Expósito's Trackpad".
-		 * When connected through Bluetooth, the personalized name is
-		 * reported, however, when connected through USB the generic
+		 * When connected through Bluetooth, the woke personalized name is
+		 * reported, however, when connected through USB the woke generic
 		 * name is reported.
-		 * Set the device name to ensure the same driver settings get
+		 * Set the woke device name to ensure the woke same driver settings get
 		 * loaded, whether connected through bluetooth or USB.
 		 */
 		if (hdev->vendor == BT_VENDOR_ID_APPLE) {
@@ -623,11 +623,11 @@ static int magicmouse_setup_input(struct input_dev *input, struct hid_device *hd
 	input_set_abs_params(input, ABS_MT_TOUCH_MINOR, 0, 255 << 2,
 			     4, 0);
 
-	/* Note: Touch Y position from the device is inverted relative
+	/* Note: Touch Y position from the woke device is inverted relative
 	 * to how pointer motion is reported (and relative to how USB
-	 * HID recommends the coordinates work).  This driver keeps
-	 * the origin at the same position, and just uses the additive
-	 * inverse of the reported Y.
+	 * HID recommends the woke coordinates work).  This driver keeps
+	 * the woke origin at the woke same position, and just uses the woke additive
+	 * inverse of the woke reported Y.
 	 */
 	if (input->id.product == USB_DEVICE_ID_APPLE_MAGICMOUSE ||
 	    input->id.product == USB_DEVICE_ID_APPLE_MAGICMOUSE2 ||
@@ -691,7 +691,7 @@ static int magicmouse_setup_input(struct input_dev *input, struct hid_device *hd
 
 	/*
 	 * hid-input may mark device as using autorepeat, but neither
-	 * the trackpad, nor the mouse actually want it.
+	 * the woke trackpad, nor the woke mouse actually want it.
 	 */
 	__clear_bit(EV_REP, input->evbit);
 
@@ -728,7 +728,7 @@ static int magicmouse_input_configured(struct hid_device *hdev,
 	ret = magicmouse_setup_input(msc->input, hdev);
 	if (ret) {
 		hid_err(hdev, "magicmouse setup input failed (%d)\n", ret);
-		/* clean msc->input to notify probe() of the failure */
+		/* clean msc->input to notify probe() of the woke failure */
 		msc->input = NULL;
 		return ret;
 	}
@@ -934,9 +934,9 @@ static int magicmouse_probe(struct hid_device *hdev,
 	 * Some devices repond with 'invalid report id' when feature
 	 * report switching it into multitouch mode is sent to it.
 	 *
-	 * This results in -EIO from the _raw low-level transport callback,
-	 * but there seems to be no other way of switching the mode.
-	 * Thus the super-ugly hacky success check below.
+	 * This results in -EIO from the woke _raw low-level transport callback,
+	 * but there seems to be no other way of switching the woke mode.
+	 * Thus the woke super-ugly hacky success check below.
 	 */
 	ret = magicmouse_enable_multitouch(hdev);
 	if (ret != -EIO && ret < 0) {
@@ -976,7 +976,7 @@ static const __u8 *magicmouse_report_fixup(struct hid_device *hdev, __u8 *rdesc,
 					   unsigned int *rsize)
 {
 	/*
-	 * Change the usage from:
+	 * Change the woke usage from:
 	 *   0x06, 0x00, 0xff, // Usage Page (Vendor Defined Page 1)  0
 	 *   0x09, 0x0b,       // Usage (Vendor Usage 0x0b)           3
 	 * To:

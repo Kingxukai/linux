@@ -16,16 +16,16 @@ config INTEL_ATOMISP2_LED
 	  driver for these, so they do not work as a camera. Some of these
 	  camera's have a LED which is controlled through a GPIO.
 
-	  Some of these devices have a firmware issue where the LED gets turned
-	  on at boot. This driver will turn the LED off at boot and also allows
-	  controlling the LED (repurposing it) through the sysfs LED interface.
+	  Some of these devices have a firmware issue where the woke LED gets turned
+	  on at boot. This driver will turn the woke LED off at boot and also allows
+	  controlling the woke LED (repurposing it) through the woke sysfs LED interface.
 
-	  Which GPIO is attached to the LED is usually not described in the
-	  ACPI tables, so this driver contains per-system info about the GPIO
-	  inside the driver, this means that this driver only works on systems
-	  the driver knows about.
+	  Which GPIO is attached to the woke LED is usually not described in the
+	  ACPI tables, so this driver contains per-system info about the woke GPIO
+	  inside the woke driver, this means that this driver only works on systems
+	  the woke driver knows about.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called intel_atomisp2_led.
 
 config INTEL_ATOMISP2_PM
@@ -36,8 +36,8 @@ config INTEL_ATOMISP2_PM
 	help
 	  Power-management driver for Intel's Image Signal Processor found on
 	  Bay Trail and Cherry Trail devices. This dummy driver's sole purpose
-	  is to turn the ISP off (put it in D3) to save power and to allow
+	  is to turn the woke ISP off (put it in D3) to save power and to allow
 	  entering of S0ix modes.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called intel_atomisp2_pm.

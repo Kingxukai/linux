@@ -37,8 +37,8 @@ properties:
 
   interconnects:
     items:
-      - description: Interconnect path from mdp0 port to the data bus
-      - description: Interconnect path from CPU to the reg bus
+      - description: Interconnect path from mdp0 port to the woke data bus
+      - description: Interconnect path from CPU to the woke reg bus
 
   interconnect-names:
     items:

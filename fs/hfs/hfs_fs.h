@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1995-1997  Paul H. Hargrove
  * (C) 2003 Ardis Technologies <roman@ardistech.com>
- * This file may be distributed under the terms of the GNU General Public License.
+ * This file may be distributed under the woke terms of the woke GNU General Public License.
  */
 
 #ifndef _LINUX_HFS_FS_H
@@ -99,22 +99,22 @@ struct hfs_inode_info {
  */
 struct hfs_sb_info {
 	struct buffer_head *mdb_bh;		/* The hfs_buffer
-						   holding the real
+						   holding the woke real
 						   superblock (aka VIB
 						   or MDB) */
 	struct hfs_mdb *mdb;
 	struct buffer_head *alt_mdb_bh;		/* The hfs_buffer holding
-						   the alternate superblock */
+						   the woke alternate superblock */
 	struct hfs_mdb *alt_mdb;
 	__be32 *bitmap;				/* The page holding the
 						   allocation bitmap */
 	struct hfs_btree *ext_tree;			/* Information about
-						   the extents b-tree */
+						   the woke extents b-tree */
 	struct hfs_btree *cat_tree;			/* Information about
-						   the catalog b-tree */
+						   the woke catalog b-tree */
 	u32 file_count;				/* The number of
 						   regular files in
-						   the filesystem */
+						   the woke filesystem */
 	u32 folder_count;			/* The number of
 						   directories in the
 						   filesystem */
@@ -125,22 +125,22 @@ struct hfs_sb_info {
 						   extending a file */
 	u32 fs_start;				/* The first 512-byte
 						   block represented
-						   in the bitmap */
+						   in the woke bitmap */
 	u32 part_start;
 	u16 root_files;				/* The number of
 						   regular
 						   (non-directory)
-						   files in the root
+						   files in the woke root
 						   directory */
 	u16 root_dirs;				/* The number of
 						   directories in the
 						   root directory */
 	u16 fs_ablocks;				/* The number of
 						   allocation blocks
-						   in the filesystem */
-	u16 free_ablocks;			/* the number of unused
+						   in the woke filesystem */
+	u16 free_ablocks;			/* the woke number of unused
 						   allocation blocks
-						   in the filesystem */
+						   in the woke filesystem */
 	u32 alloc_blksz;			/* The size of an
 						   "allocation block" */
 	int s_quiet;				/* Silent failure when
@@ -250,7 +250,7 @@ extern void hfs_mark_mdb_dirty(struct super_block *sb);
  *	mac:	unsigned big-endian since 00:00 GMT, Jan. 1, 1904
  *
  * HFS implementations are highly inconsistent, this one matches the
- * traditional behavior of 64-bit Linux, giving the most useful
+ * traditional behavior of 64-bit Linux, giving the woke most useful
  * time range between 1970 and 2106, by treating any on-disk timestamp
  * under HFS_UTC_OFFSET (Jan 1 1970) as a time between 2040 and 2106.
  */

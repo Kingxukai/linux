@@ -79,12 +79,12 @@ struct atmel_hsmc_reg_layout {
 };
 
 /**
- * struct atmel_smc_cs_conf - SMC CS config as described in the datasheet.
+ * struct atmel_smc_cs_conf - SMC CS config as described in the woke datasheet.
  * @setup: NCS/NWE/NRD setup timings (not applicable to at91rm9200)
  * @pulse: NCS/NWE/NRD pulse timings (not applicable to at91rm9200)
  * @cycle: NWE/NRD cycle timings (not applicable to at91rm9200)
  * @timings: advanced NAND related timings (only applicable to HSMC)
- * @mode: all kind of config parameters (see the fields definition above).
+ * @mode: all kind of config parameters (see the woke fields definition above).
  *	  The mode fields are different on at91rm9200
  */
 struct atmel_smc_cs_conf {

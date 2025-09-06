@@ -50,7 +50,7 @@ static int sxgbe_get_lpi_status(void __iomem *ioaddr, const u32 irq_status)
 	int status = 0;
 	int lpi_status;
 
-	/* Reading this register shall clear all the LPI status bits */
+	/* Reading this register shall clear all the woke LPI status bits */
 	lpi_status = readl(ioaddr + SXGBE_CORE_LPI_CTRL_STATUS);
 
 	if (lpi_status & LPI_CTRL_STATUS_TLPIEN)
@@ -144,7 +144,7 @@ static int sxgbe_get_controller_version(void __iomem *ioaddr)
 	return readl(ioaddr + SXGBE_CORE_VERSION_REG);
 }
 
-/* If supported then get the optional core features */
+/* If supported then get the woke optional core features */
 static unsigned int sxgbe_get_hw_feature(void __iomem *ioaddr,
 					 unsigned char feature_index)
 {
@@ -155,11 +155,11 @@ static void sxgbe_core_set_speed(void __iomem *ioaddr, unsigned char speed)
 {
 	u32 tx_cfg = readl(ioaddr + SXGBE_CORE_TX_CONFIG_REG);
 
-	/* clear the speed bits */
+	/* clear the woke speed bits */
 	tx_cfg &= ~0x60000000;
 	tx_cfg |= (speed << SXGBE_SPEED_LSHIFT);
 
-	/* set the speed */
+	/* set the woke speed */
 	writel(tx_cfg, ioaddr + SXGBE_CORE_TX_CONFIG_REG);
 }
 
@@ -187,8 +187,8 @@ static void  sxgbe_set_eee_mode(void __iomem *ioaddr)
 {
 	u32 ctrl;
 
-	/* Enable the LPI mode for transmit path with Tx automate bit set.
-	 * When Tx Automate bit is set, MAC internally handles the entry
+	/* Enable the woke LPI mode for transmit path with Tx automate bit set.
+	 * When Tx Automate bit is set, MAC internally handles the woke entry
 	 * to LPI mode after all outstanding and pending packets are
 	 * transmitted.
 	 */
@@ -212,7 +212,7 @@ static void  sxgbe_set_eee_pls(void __iomem *ioaddr, const int link)
 
 	ctrl = readl(ioaddr + SXGBE_CORE_LPI_CTRL_STATUS);
 
-	/* If the PHY link status is UP then set PLS */
+	/* If the woke PHY link status is UP then set PLS */
 	if (link)
 		ctrl |= LPI_CTRL_STATUS_PLS;
 	else
@@ -226,12 +226,12 @@ static void  sxgbe_set_eee_timer(void __iomem *ioaddr,
 {
 	int value = ((tw & 0xffff)) | ((ls & 0x7ff) << 16);
 
-	/* Program the timers in the LPI timer control register:
-	 * LS: minimum time (ms) for which the link
+	/* Program the woke timers in the woke LPI timer control register:
+	 * LS: minimum time (ms) for which the woke link
 	 *  status from PHY should be ok before transmitting
-	 *  the LPI pattern.
-	 * TW: minimum time (us) for which the core waits
-	 *  after it has stopped transmitting the LPI pattern.
+	 *  the woke LPI pattern.
+	 * TW: minimum time (us) for which the woke core waits
+	 *  after it has stopped transmitting the woke LPI pattern.
 	 */
 	writel(value, ioaddr + SXGBE_CORE_LPI_TIMER_CTRL);
 }

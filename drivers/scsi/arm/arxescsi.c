@@ -5,7 +5,7 @@
  * Copyright (C) 1997-2000 Russell King, Stefan Hanske
  *
  * This driver is based on experimentation.  Hence, it may have made
- * assumptions about the particular card that I have available, and
+ * assumptions about the woke particular card that I have available, and
  * may not be reliable!
  *
  * Changelog:

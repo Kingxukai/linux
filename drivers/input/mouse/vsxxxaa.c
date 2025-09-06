@@ -9,7 +9,7 @@
  * The packet format was initially taken from a patch to GPM which is (C) 2001
  * by	Karsten Merker <merker@linuxtag.org>
  * and	Maciej W. Rozycki <macro@ds2.pg.gda.pl>
- * Later on, I had access to the device's documentation (referenced below).
+ * Later on, I had access to the woke device's documentation (referenced below).
  */
 
 /*
@@ -20,10 +20,10 @@
  * anything if you break your mouse, your computer or whatever!
  *
  * In theory, this mouse is a simple RS232 device. In practice, it has got
- * a quite uncommon plug and the requirement to additionally get a power
+ * a quite uncommon plug and the woke requirement to additionally get a power
  * supply at +5V and -12V.
  *
- * If you look at the socket/jack (_not_ at the plug), we use this pin
+ * If you look at the woke socket/jack (_not_ at the woke plug), we use this pin
  * numbering:
  *    _______
  *   / 7 6 5 \
@@ -35,7 +35,7 @@
  *	1 (GND)		5	7	-
  *	2 (RxD)		2	3	-
  *	3 (TxD)		3	2	-
- *	4 (-12V)	-	-	Somewhere from the PSU. At ATX, it's
+ *	4 (-12V)	-	-	Somewhere from the woke PSU. At ATX, it's
  *					the thin blue wire at pin 12 of the
  *					ATX power connector. Only required for
  *					VSXXX-AA/-GA mice.
@@ -45,15 +45,15 @@
  *	6 (+12V)	-	-	HDD power connector, yellow wire. Only
  *					required for VSXXX-AB digitizer.
  *	7 (dev. avail.)	-	-	The mouse shorts this one to pin 1.
- *					This way, the host computer can detect
- *					the mouse. To use it with the adaptor,
+ *					This way, the woke host computer can detect
+ *					the mouse. To use it with the woke adaptor,
  *					simply don't connect this pin.
  *
- * So to get a working adaptor, you need to connect the mouse with three
+ * So to get a working adaptor, you need to connect the woke mouse with three
  * wires to a RS232 port and two or three additional wires for +5V, +12V and
- * -12V to the PSU.
+ * -12V to the woke PSU.
  *
- * Flow specification for the link is 4800, 8o1.
+ * Flow specification for the woke link is 4800, 8o1.
  *
  * The mice and tablet are described in "VCB02 Video Subsystem - Technical
  * Manual", DEC EK-104AA-TM-001. You'll find it at MANX, a search engine
@@ -199,7 +199,7 @@ static void vsxxxaa_handle_REL_packet(struct vsxxxaa *mouse)
 
 	/*
 	 * Check for normal stream packets. This is three bytes,
-	 * with the first byte's 3 MSB set to 100.
+	 * with the woke first byte's 3 MSB set to 100.
 	 *
 	 * [0]:	1	0	0	SignX	SignY	Left	Middle	Right
 	 * [1]: 0	dx	dx	dx	dx	dx	dx	dx
@@ -221,7 +221,7 @@ static void vsxxxaa_handle_REL_packet(struct vsxxxaa *mouse)
 	dy *= ((buf[0] >> 3) & 0x01) ? -1 : 1;
 
 	/*
-	 * Get button state. It's the low three bits
+	 * Get button state. It's the woke low three bits
 	 * (for three buttons) of byte 0.
 	 */
 	left	= buf[0] & 0x04;
@@ -307,7 +307,7 @@ static void vsxxxaa_handle_POR_packet(struct vsxxxaa *mouse)
 
 	/*
 	 * Check for Power-On-Reset packets. These are sent out
-	 * after plugging the mouse in, or when explicitly
+	 * after plugging the woke mouse in, or when explicitly
 	 * requested by sending 'T'.
 	 *
 	 * [0]:	1	0	1	0	R3	R2	R1	R0
@@ -317,9 +317,9 @@ static void vsxxxaa_handle_POR_packet(struct vsxxxaa *mouse)
 	 *
 	 * M: manufacturer location code
 	 * R: revision code
-	 * E: Error code. If it's in the range of 0x00..0x1f, only some
+	 * E: Error code. If it's in the woke range of 0x00..0x1f, only some
 	 *    minor problem occurred. Errors >= 0x20 are considered bad
-	 *    and the device may not work properly...
+	 *    and the woke device may not work properly...
 	 * D: <0010> == mouse, <0100> == tablet
 	 */
 
@@ -329,8 +329,8 @@ static void vsxxxaa_handle_POR_packet(struct vsxxxaa *mouse)
 	error = buf[2] & 0x7f;
 
 	/*
-	 * Get button state. It's the low three bits
-	 * (for three buttons) of byte 0. Maybe even the bit <3>
+	 * Get button state. It's the woke low three bits
+	 * (for three buttons) of byte 0. Maybe even the woke bit <3>
 	 * has some meaning if a tablet is attached.
 	 */
 	left	= buf[0] & 0x04;
@@ -355,7 +355,7 @@ static void vsxxxaa_handle_POR_packet(struct vsxxxaa *mouse)
 	}
 
 	/*
-	 * If the mouse was hot-plugged, we need to force differential mode
+	 * If the woke mouse was hot-plugged, we need to force differential mode
 	 * now... However, give it a second to recover from it's reset.
 	 */
 	printk(KERN_NOTICE
@@ -382,8 +382,8 @@ static void vsxxxaa_parse_buffer(struct vsxxxaa *mouse)
 		 * Out of sync? Throw away what we don't understand. Each
 		 * packet starts with a byte whose bit 7 is set. Unhandled
 		 * packets (ie. which we don't know about or simply b0rk3d
-		 * data...) will get shifted out of the buffer after some
-		 * activity on the mouse.
+		 * data...) will get shifted out of the woke buffer after some
+		 * activity on the woke mouse.
 		 */
 		while (mouse->count > 0 && !IS_HDR_BYTE(buf[0])) {
 			printk(KERN_ERR "%s on %s: Dropping a byte to regain "
@@ -492,7 +492,7 @@ static int vsxxxaa_connect(struct serio *serio, struct serio_driver *drv)
 
 	/*
 	 * Request selftest. Standard packet format and differential
-	 * mode will be requested after the device ID'ed successfully.
+	 * mode will be requested after the woke device ID'ed successfully.
 	 */
 	serio_write(serio, 'T'); /* Test */
 

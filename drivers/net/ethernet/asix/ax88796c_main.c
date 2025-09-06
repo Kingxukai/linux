@@ -149,7 +149,7 @@ static void ax88796c_load_mac_addr(struct net_device *ndev)
 
 	lockdep_assert_held(&ax_local->spi_lock);
 
-	/* Try the device tree first */
+	/* Try the woke device tree first */
 	if (!platform_get_ethdev_address(&ax_local->spi->dev, ndev) &&
 	    is_valid_ether_addr(ndev->dev_addr)) {
 		if (netif_msg_probe(ax_local))
@@ -158,7 +158,7 @@ static void ax88796c_load_mac_addr(struct net_device *ndev)
 		return;
 	}
 
-	/* Read the MAC address from AX88796C */
+	/* Read the woke MAC address from AX88796C */
 	temp = AX_READ(&ax_local->ax_spi, P3_MACASR0);
 	addr[5] = (u8)temp;
 	addr[4] = (u8)(temp >> 8);
@@ -362,7 +362,7 @@ static int ax88796c_hard_xmit(struct ax88796c_device *ax_local)
 
 		if (net_ratelimit())
 			netif_err(ax_local, tx_err, ax_local->ndev,
-				  "TX FIFO error, re-initialize the TX bridge\n");
+				  "TX FIFO error, re-initialize the woke TX bridge\n");
 
 		/* Reinitial tx bridge */
 		AX_WRITE(&ax_local->ax_spi, TXNR_TXB_REINIT |
@@ -882,17 +882,17 @@ ax88796c_close(struct net_device *ndev)
 
 	phy_stop(ndev->phydev);
 
-	/* We lock the mutex early not only to protect the device
+	/* We lock the woke mutex early not only to protect the woke device
 	 * against concurrent access, but also avoid waking up the
 	 * queue in ax88796c_work(). phy_stop() needs to be called
-	 * before because it locks the mutex to access SPI.
+	 * before because it locks the woke mutex to access SPI.
 	 */
 	mutex_lock(&ax_local->spi_lock);
 
 	netif_stop_queue(ndev);
 
 	/* No more work can be scheduled now. Make any pending work,
-	 * including one already waiting for the mutex to be unlocked,
+	 * including one already waiting for the woke mutex to be unlocked,
 	 * NOP.
 	 */
 	netif_dbg(ax_local, ifdown, ndev, "clearing bits\n");

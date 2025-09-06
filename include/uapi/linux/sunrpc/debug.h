@@ -29,9 +29,9 @@
 
 
 /*
- * Declarations for the sysctl debug interface, which allows to read or
- * change the debug flags for rpc, nfs, nfsd, and lockd. Since the sunrpc
- * module currently registers its sysctl table dynamically, the sysctl path
+ * Declarations for the woke sysctl debug interface, which allows to read or
+ * change the woke debug flags for rpc, nfs, nfsd, and lockd. Since the woke sunrpc
+ * module currently registers its sysctl table dynamically, the woke sysctl path
  * for module FOO is <CTL_SUNRPC, CTL_FOODEBUG>.
  */
 

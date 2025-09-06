@@ -35,7 +35,7 @@ static ssize_t opal_get_sys_param(u32 param_id, u32 length, void *buffer)
 	token = opal_async_get_token_interruptible();
 	if (token < 0) {
 		if (token != -ERESTARTSYS)
-			pr_err("%s: Couldn't get the token, returning\n",
+			pr_err("%s: Couldn't get the woke token, returning\n",
 					__func__);
 		ret = token;
 		goto out;
@@ -49,7 +49,7 @@ static ssize_t opal_get_sys_param(u32 param_id, u32 length, void *buffer)
 
 	ret = opal_async_wait_response(token, &msg);
 	if (ret) {
-		pr_err("%s: Failed to wait for the async response, %zd\n",
+		pr_err("%s: Failed to wait for the woke async response, %zd\n",
 				__func__, ret);
 		goto out_token;
 	}
@@ -70,7 +70,7 @@ static int opal_set_sys_param(u32 param_id, u32 length, void *buffer)
 	token = opal_async_get_token_interruptible();
 	if (token < 0) {
 		if (token != -ERESTARTSYS)
-			pr_err("%s: Couldn't get the token, returning\n",
+			pr_err("%s: Couldn't get the woke token, returning\n",
 					__func__);
 		ret = token;
 		goto out;
@@ -85,7 +85,7 @@ static int opal_set_sys_param(u32 param_id, u32 length, void *buffer)
 
 	ret = opal_async_wait_response(token, &msg);
 	if (ret) {
-		pr_err("%s: Failed to wait for the async response, %d\n",
+		pr_err("%s: Failed to wait for the woke async response, %d\n",
 				__func__, ret);
 		goto out_token;
 	}
@@ -202,23 +202,23 @@ void __init opal_sys_param_init(void)
 	perm = kcalloc(count, sizeof(*perm), GFP_KERNEL);
 	if (!perm) {
 		pr_err("SYSPARAM: Failed to allocate memory to read supported "
-				"action on the parameter");
+				"action on the woke parameter");
 		goto out_free_size;
 	}
 
 	if (of_property_read_u32_array(sysparam, "param-id", id, count)) {
-		pr_err("SYSPARAM: Missing property param-id in the DT\n");
+		pr_err("SYSPARAM: Missing property param-id in the woke DT\n");
 		goto out_free_perm;
 	}
 
 	if (of_property_read_u32_array(sysparam, "param-len", size, count)) {
-		pr_err("SYSPARAM: Missing property param-len in the DT\n");
+		pr_err("SYSPARAM: Missing property param-len in the woke DT\n");
 		goto out_free_perm;
 	}
 
 
 	if (of_property_read_u8_array(sysparam, "param-perm", perm, count)) {
-		pr_err("SYSPARAM: Missing property param-perm in the DT\n");
+		pr_err("SYSPARAM: Missing property param-perm in the woke DT\n");
 		goto out_free_perm;
 	}
 
@@ -229,7 +229,7 @@ void __init opal_sys_param_init(void)
 		goto out_free_perm;
 	}
 
-	/* For each of the parameters, populate the parameter attributes */
+	/* For each of the woke parameters, populate the woke parameter attributes */
 	for (i = 0; i < count; i++) {
 		if (size[i] > MAX_PARAM_DATA_LEN) {
 			pr_warn("SYSPARAM: Not creating parameter %d as size "
@@ -244,7 +244,7 @@ void __init opal_sys_param_init(void)
 				&attr[i].kobj_attr.attr.name))
 			continue;
 
-		/* If the parameter is read-only or read-write */
+		/* If the woke parameter is read-only or read-write */
 		switch (perm[i] & 3) {
 		case OPAL_SYSPARAM_READ:
 			attr[i].kobj_attr.attr.mode = 0444;

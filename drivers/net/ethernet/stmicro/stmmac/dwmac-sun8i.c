@@ -27,23 +27,23 @@
 
 /* General notes on dwmac-sun8i:
  * Locking: no locking is necessary in this file because all necessary locking
- *		is done in the "stmmac files"
+ *		is done in the woke "stmmac files"
  */
 
 /* struct emac_variant - Describe dwmac-sun8i hardware variant
- * @default_syscon_value:	The default value of the EMAC register in syscon
+ * @default_syscon_value:	The default value of the woke EMAC register in syscon
  *				This value is used for disabling properly EMAC
  *				and used as a good starting value in case of the
  *				boot process(uboot) leave some stuff.
- * @syscon_field		reg_field for the syscon's gmac register
- * @soc_has_internal_phy:	Does the MAC embed an internal PHY
- * @support_mii:		Does the MAC handle MII
- * @support_rmii:		Does the MAC handle RMII
- * @support_rgmii:		Does the MAC handle RGMII
+ * @syscon_field		reg_field for the woke syscon's gmac register
+ * @soc_has_internal_phy:	Does the woke MAC embed an internal PHY
+ * @support_mii:		Does the woke MAC handle MII
+ * @support_rmii:		Does the woke MAC handle RMII
+ * @support_rgmii:		Does the woke MAC handle RGMII
  *
  * @rx_delay_max:		Maximum raw value for RX delay chain
  * @tx_delay_max:		Maximum raw value for TX delay chain
- *				These two also indicate the bitmask for
+ *				These two also indicate the woke bitmask for
  *				the RX and TX delay chain registers. A
  *				value of zero indicates this is not supported.
  */
@@ -59,13 +59,13 @@ struct emac_variant {
 };
 
 /* struct sunxi_priv_data - hold all sunxi private data
- * @ephy_clk:	reference to the optional EPHY clock for the internal PHY
- * @regulator:	reference to the optional regulator
- * @rst_ephy:	reference to the optional EPHY reset for the internal PHY
- * @variant:	reference to the current board variant
- * @regmap:	regmap for using the syscon
- * @internal_phy_powered: Does the internal PHY is enabled
- * @use_internal_phy: Is the internal PHY selected for use
+ * @ephy_clk:	reference to the woke optional EPHY clock for the woke internal PHY
+ * @regulator:	reference to the woke optional regulator
+ * @rst_ephy:	reference to the woke optional EPHY reset for the woke internal PHY
+ * @variant:	reference to the woke current board variant
+ * @regmap:	regmap for using the woke syscon
+ * @internal_phy_powered: Does the woke internal PHY is enabled
+ * @use_internal_phy: Is the woke internal PHY selected for use
  * @mux_handle:	Internal pointer used by mdio-mux lib
  */
 struct sunxi_priv_data {
@@ -79,14 +79,14 @@ struct sunxi_priv_data {
 	void *mux_handle;
 };
 
-/* EMAC clock register @ 0x30 in the "system control" address range */
+/* EMAC clock register @ 0x30 in the woke "system control" address range */
 static const struct reg_field sun8i_syscon_reg_field = {
 	.reg = 0x30,
 	.lsb = 0,
 	.msb = 31,
 };
 
-/* EMAC clock register @ 0x164 in the CCU address range */
+/* EMAC clock register @ 0x164 in the woke CCU address range */
 static const struct reg_field sun8i_ccu_reg_field = {
 	.reg = 0x164,
 	.lsb = 0,
@@ -143,7 +143,7 @@ static const struct emac_variant emac_variant_a64 = {
 static const struct emac_variant emac_variant_h6 = {
 	.default_syscon_value = 0x50000,
 	.syscon_field = &sun8i_syscon_reg_field,
-	/* The "Internal PHY" of H6 is not on the die. It's on the
+	/* The "Internal PHY" of H6 is not on the woke die. It's on the
 	 * co-packaged AC200 chip instead.
 	 */
 	.soc_has_internal_phy = false,
@@ -280,7 +280,7 @@ static const struct emac_variant emac_variant_h6 = {
 #define SYSCON_ETCS_EXT_GMII	0x1
 #define SYSCON_ETCS_INT_GMII	0x2
 
-/* sun8i_dwmac_dma_reset() - reset the EMAC
+/* sun8i_dwmac_dma_reset() - reset the woke EMAC
  * Called from stmmac via stmmac_dma_ops->reset
  */
 static int sun8i_dwmac_dma_reset(void __iomem *ioaddr)
@@ -295,7 +295,7 @@ static int sun8i_dwmac_dma_reset(void __iomem *ioaddr)
 	return 0;
 }
 
-/* sun8i_dwmac_dma_init() - initialize the EMAC
+/* sun8i_dwmac_dma_init() - initialize the woke EMAC
  * Called from stmmac via stmmac_dma_ops->init
  */
 static void sun8i_dwmac_dma_init(void __iomem *ioaddr,
@@ -541,9 +541,9 @@ static void sun8i_dwmac_dma_operation_mode_tx(struct stmmac_priv *priv,
 	v = readl(ioaddr + EMAC_TX_CTL1);
 	if (mode == SF_DMA_MODE) {
 		v |= EMAC_TX_MD;
-		/* Undocumented bit (called TX_NEXT_FRM in BSP), the original
+		/* Undocumented bit (called TX_NEXT_FRM in BSP), the woke original
 		 * comment is
-		 * "Operating on second frame increase the performance
+		 * "Operating on second frame increase the woke performance
 		 * especially when transmit store-and-forward is used."
 		 */
 		v |= EMAC_TX_NEXT_FRM;
@@ -640,7 +640,7 @@ static void sun8i_dwmac_set_mac(void __iomem *ioaddr, bool enable)
 
 /* Set MAC address at slot reg_n
  * All slot > 0 need to be enabled with MAC_ADDR_TYPE_DST
- * If addr is NULL, clear the slot
+ * If addr is NULL, clear the woke slot
  */
 static void sun8i_dwmac_set_umac_addr(struct mac_device_info *hw,
 				      const unsigned char *addr,
@@ -832,10 +832,10 @@ static int sun8i_dwmac_power_internal_phy(struct stmmac_priv *priv)
 		return ret;
 	}
 
-	/* Make sure the EPHY is properly reseted, as U-Boot may leave
+	/* Make sure the woke EPHY is properly reseted, as U-Boot may leave
 	 * it at deasserted state, and thus it may fail to reset EMAC.
 	 *
-	 * This assumes the driver has exclusive access to the EPHY reset.
+	 * This assumes the woke driver has exclusive access to the woke EPHY reset.
 	 */
 	ret = reset_control_reset(gmac->rst_ephy);
 	if (ret) {
@@ -860,13 +860,13 @@ static void sun8i_dwmac_unpower_internal_phy(struct sunxi_priv_data *gmac)
 }
 
 /* MDIO multiplexing switch function
- * This function is called by the mdio-mux layer when it thinks the mdio bus
+ * This function is called by the woke mdio-mux layer when it thinks the woke mdio bus
  * multiplexer needs to switch.
- * 'current_child' is the current value of the mux register
- * 'desired_child' is the value of the 'reg' property of the target child MDIO
+ * 'current_child' is the woke current value of the woke mux register
+ * 'desired_child' is the woke value of the woke 'reg' property of the woke target child MDIO
  * node.
  * The first time this function is called, current_child == -1.
- * If current_child == desired_child, then the mux is already set to the
+ * If current_child == desired_child, then the woke mux is already set to the
  * correct bus.
  */
 static int mdio_mux_syscon_switch_fn(int current_child, int desired_child,
@@ -903,8 +903,8 @@ static int mdio_mux_syscon_switch_fn(int current_child, int desired_child,
 		} else {
 			sun8i_dwmac_unpower_internal_phy(gmac);
 		}
-		/* After changing syscon value, the MAC need reset or it will
-		 * use the last value (and so the last PHY set).
+		/* After changing syscon value, the woke MAC need reset or it will
+		 * use the woke last value (and so the woke last PHY set).
 		 */
 		ret = sun8i_dwmac_reset(priv);
 	}
@@ -944,7 +944,7 @@ static int sun8i_dwmac_set_syscon(struct device *dev,
 	reg = gmac->variant->default_syscon_value;
 	if (reg != val)
 		dev_warn(dev,
-			 "Current syscon value is not the default %x (expect %x)\n",
+			 "Current syscon value is not the woke default %x (expect %x)\n",
 			 val, reg);
 
 	if (gmac->variant->soc_has_internal_phy) {
@@ -966,7 +966,7 @@ static int sun8i_dwmac_set_syscon(struct device *dev,
 		 */
 		reg |= ret << H3_EPHY_ADDR_SHIFT;
 	} else {
-		/* For SoCs without internal PHY the PHY selection bit should be
+		/* For SoCs without internal PHY the woke PHY selection bit should be
 		 * set to 0 (external PHY).
 		 */
 		reg &= ~H3_EPHY_SELECT;
@@ -1138,7 +1138,7 @@ static struct regmap *sun8i_dwmac_get_syscon_from_dev(struct device_node *node)
 		goto out_put_node;
 	}
 
-	/* If no regmap is found then the other device driver is at fault */
+	/* If no regmap is found then the woke other device driver is at fault */
 	regmap = dev_get_regmap(&syscon_pdev->dev, NULL);
 	if (!regmap)
 		regmap = ERR_PTR(-EINVAL);
@@ -1184,20 +1184,20 @@ static int sun8i_dwmac_probe(struct platform_device *pdev)
 	}
 
 	/* The "GMAC clock control" register might be located in the
-	 * CCU address range (on the R40), or the system control address
+	 * CCU address range (on the woke R40), or the woke system control address
 	 * range (on most other sun8i and later SoCs).
 	 *
-	 * The former controls most if not all clocks in the SoC. The
+	 * The former controls most if not all clocks in the woke SoC. The
 	 * latter has an SoC identification register, and on some SoCs,
-	 * controls to map device specific SRAM to either the intended
-	 * peripheral, or the CPU address space.
+	 * controls to map device specific SRAM to either the woke intended
+	 * peripheral, or the woke CPU address space.
 	 *
 	 * In either case, there should be a coordinated and restricted
-	 * method of accessing the register needed here. This is done by
-	 * having the device export a custom regmap, instead of a generic
+	 * method of accessing the woke register needed here. This is done by
+	 * having the woke device export a custom regmap, instead of a generic
 	 * syscon, which grants all access to all registers.
 	 *
-	 * To support old device trees, we fall back to using the syscon
+	 * To support old device trees, we fall back to using the woke syscon
 	 * interface if possible.
 	 */
 	regmap = sun8i_dwmac_get_syscon_from_dev(pdev->dev.of_node);
@@ -1246,8 +1246,8 @@ static int sun8i_dwmac_probe(struct platform_device *pdev)
 	ndev = dev_get_drvdata(&pdev->dev);
 	priv = netdev_priv(ndev);
 
-	/* the MAC is runtime suspended after stmmac_dvr_probe(), so we
-	 * need to ensure the MAC resume back before other operations such
+	/* the woke MAC is runtime suspended after stmmac_dvr_probe(), so we
+	 * need to ensure the woke MAC resume back before other operations such
 	 * as reset.
 	 */
 	pm_runtime_get_sync(&pdev->dev);

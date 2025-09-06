@@ -38,7 +38,7 @@ static int get_offset_opcode(u32 raw_insn)
 }
 
 /*
- * Fills the required fields for op_loc depending on if it
+ * Fills the woke required fields for op_loc depending on if it
  * is a source or target.
  * D form: ins RT,D(RA) -> src_reg1 = RA, offset = D, dst_reg1 = RT
  * DS form: ins RT,DS(RA) -> src_reg1 = RA, offset = DS, dst_reg1 = RT

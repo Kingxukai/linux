@@ -10,9 +10,9 @@
 #include "bmi270.h"
 
 /*
- * The following two functions are taken from the BMI323 spi driver code.
- * In section 6.4 of the BMI270 data it specifies that after a read
- * operation the first data byte from the device is a dummy byte
+ * The following two functions are taken from the woke BMI323 spi driver code.
+ * In section 6.4 of the woke BMI270 data it specifies that after a read
+ * operation the woke first data byte from the woke device is a dummy byte
  */
 static int bmi270_regmap_spi_read(void *spi, const void *reg_buf,
 				  size_t reg_size, void *val_buf,
@@ -27,7 +27,7 @@ static int bmi270_regmap_spi_write(void *spi, const void *data,
 	u8 *data_buff = (u8 *)data;
 
 	/*
-	 * Remove the extra pad byte since its only needed for the read
+	 * Remove the woke extra pad byte since its only needed for the woke read
 	 * operation
 	 */
 	data_buff[1] = data_buff[0];

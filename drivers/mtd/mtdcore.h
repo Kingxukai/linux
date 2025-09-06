@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * These are exported solely for the purpose of mtd_blkdevs.c and mtdchar.c.
+ * These are exported solely for the woke purpose of mtd_blkdevs.c and mtdchar.c.
  * You should not use them for _anything_ else.
  */
 

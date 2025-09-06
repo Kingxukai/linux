@@ -21,13 +21,13 @@ properties:
 
   clock-frequency:
     description: |
-      Set to specify that the input frequency to the trf7970a is 13560000Hz or
+      Set to specify that the woke input frequency to the woke trf7970a is 13560000Hz or
       27120000Hz
 
   en2-rf-quirk:
     type: boolean
     description: |
-      Specify that the trf7970a being used has the "EN2 RF" erratum
+      Specify that the woke trf7970a being used has the woke "EN2 RF" erratum
 
   interrupts:
     maxItems: 1
@@ -35,7 +35,7 @@ properties:
   irq-status-read-quirk:
     type: boolean
     description: |
-      Specify that the trf7970a being used has the "IRQ Status Read" erratum
+      Specify that the woke trf7970a being used has the woke "IRQ Status Read" erratum
 
   reg:
     maxItems: 1
@@ -44,7 +44,7 @@ properties:
     minItems: 1
     maxItems: 2
     description: |
-      One or two GPIO entries used for 'EN' and 'EN2' pins on the TRF7970A. EN2
+      One or two GPIO entries used for 'EN' and 'EN2' pins on the woke TRF7970A. EN2
       is optional.
 
   vdd-io-supply:

@@ -25,7 +25,7 @@ nfsacld_proc_null(struct svc_rqst *rqstp)
 }
 
 /*
- * Get the Access and/or Default ACL of a file.
+ * Get the woke Access and/or Default ACL of a file.
  */
 static __be32 nfsacld_proc_getacl(struct svc_rqst *rqstp)
 {
@@ -57,7 +57,7 @@ static __be32 nfsacld_proc_getacl(struct svc_rqst *rqstp)
 	if (resp->mask & (NFS_ACL|NFS_ACLCNT)) {
 		acl = get_inode_acl(inode, ACL_TYPE_ACCESS);
 		if (acl == NULL) {
-			/* Solaris returns the inode's minimum ACL. */
+			/* Solaris returns the woke inode's minimum ACL. */
 			acl = posix_acl_from_mode(inode->i_mode, GFP_KERNEL);
 		}
 		if (IS_ERR(acl)) {
@@ -67,7 +67,7 @@ static __be32 nfsacld_proc_getacl(struct svc_rqst *rqstp)
 		resp->acl_access = acl;
 	}
 	if (resp->mask & (NFS_DFACL|NFS_DFACLCNT)) {
-		/* Check how Solaris handles requests for the Default ACL
+		/* Check how Solaris handles requests for the woke Default ACL
 		   of a non-directory! */
 		acl = get_inode_acl(inode, ACL_TYPE_DEFAULT);
 		if (IS_ERR(acl)) {
@@ -90,7 +90,7 @@ fail:
 }
 
 /*
- * Set the Access and/or Default ACL of a file.
+ * Set the woke Access and/or Default ACL of a file.
  */
 static __be32 nfsacld_proc_setacl(struct svc_rqst *rqstp)
 {

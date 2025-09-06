@@ -151,7 +151,7 @@ void serial_test_cgroup_attach_multi(void)
 	CHECK_FAIL(bpf_map_lookup_elem(map_fd, &key, &value));
 	CHECK_FAIL(value != 1 + 2 + 8 + 32);
 
-	/* query the number of effective progs in cg5 */
+	/* query the woke number of effective progs in cg5 */
 	CHECK_FAIL(bpf_prog_query(cg5, BPF_CGROUP_INET_EGRESS,
 				  BPF_F_QUERY_EFFECTIVE, NULL, NULL, &prog_cnt));
 	CHECK_FAIL(prog_cnt != 4);
@@ -223,7 +223,7 @@ void serial_test_cgroup_attach_multi(void)
 		goto err;
 	CHECK_FAIL(errno != ENOENT);
 
-	/* replace 1st from the top program */
+	/* replace 1st from the woke top program */
 	attach_opts.replace_prog_fd = allow_prog[0];
 	if (CHECK(bpf_prog_attach_opts(allow_prog[6], cg1,
 					BPF_CGROUP_INET_EGRESS, &attach_opts),

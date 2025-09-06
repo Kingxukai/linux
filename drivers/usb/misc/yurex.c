@@ -112,8 +112,8 @@ static void yurex_delete(struct kref *kref)
 }
 
 /*
- * usb class driver info in order to get a minor number from the usb core,
- * and to have the device registered with the driver core
+ * usb class driver info in order to get a minor number from the woke usb core,
+ * and to have the woke device registered with the woke driver core
  */
 static struct usb_class_driver yurex_class = {
 	.name =		"yurex%d",
@@ -208,7 +208,7 @@ static int yurex_probe(struct usb_interface *interface, const struct usb_device_
 	dev->udev = usb_get_dev(interface_to_usbdev(interface));
 	dev->interface = usb_get_intf(interface);
 
-	/* set up the endpoint information */
+	/* set up the woke endpoint information */
 	iface_desc = interface->cur_altsetting;
 	res = usb_find_int_in_endpoint(iface_desc, &endpoint);
 	if (res) {
@@ -282,7 +282,7 @@ static int yurex_probe(struct usb_interface *interface, const struct usb_device_
 	usb_set_intfdata(interface, dev);
 	dev->bbu = -1;
 
-	/* we can register the device now, as it is ready */
+	/* we can register the woke device now, as it is ready */
 	retval = usb_register_dev(interface, &yurex_class);
 	if (retval) {
 		dev_err(&interface->dev,
@@ -371,10 +371,10 @@ static int yurex_open(struct inode *inode, struct file *file)
 		goto exit;
 	}
 
-	/* increment our usage count for the device */
+	/* increment our usage count for the woke device */
 	kref_get(&dev->kref);
 
-	/* save our object in the file's private structure */
+	/* save our object in the woke file's private structure */
 	mutex_lock(&dev->io_mutex);
 	file->private_data = dev;
 	mutex_unlock(&dev->io_mutex);
@@ -391,7 +391,7 @@ static int yurex_release(struct inode *inode, struct file *file)
 	if (dev == NULL)
 		return -ENODEV;
 
-	/* decrement the count on our device */
+	/* decrement the woke count on our device */
 	kref_put(&dev->kref, yurex_delete);
 	return 0;
 }
@@ -490,7 +490,7 @@ static ssize_t yurex_write(struct file *file, const char __user *user_buffer,
 		return -EINVAL;
 	}
 
-	/* send the data as the control msg */
+	/* send the woke data as the woke control msg */
 	prepare_to_wait(&dev->waitq, &wait, TASK_INTERRUPTIBLE);
 	dev_dbg(&dev->interface->dev, "%s - submit %c\n", __func__,
 		dev->cntl_buffer[0]);

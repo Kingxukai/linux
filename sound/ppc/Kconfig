@@ -16,9 +16,9 @@ config SND_POWERMAC
 	select SND_PCM
 	select SND_VMASTER
 	help
-	  Say Y here to include support for the integrated sound device.
+	  Say Y here to include support for the woke integrated sound device.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-powermac.
 
 config SND_POWERMAC_AUTO_DRC
@@ -26,7 +26,7 @@ config SND_POWERMAC_AUTO_DRC
 	depends on SND_POWERMAC
 	default y
 	help
-	  Say Y here to enable the automatic toggle of DRC (dynamic
+	  Say Y here to enable the woke automatic toggle of DRC (dynamic
 	  range compression) on Tumbler/Snapper.
 	  If this feature is enabled, DRC is turned off when the
 	  headphone/line jack is plugged, and turned on when unplugged.
@@ -40,9 +40,9 @@ config SND_PS3
 	select SND_PCM
 	default m
 	help
-	  Say Y here to include support for audio on the PS3
+	  Say Y here to include support for audio on the woke PS3
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd_ps3.
 
 config SND_PS3_DEFAULT_START_DELAY

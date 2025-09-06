@@ -51,7 +51,7 @@ $defs:
     properties:
       pins:
         description:
-          List of gpio pins affected by the properties specified in this state.
+          List of gpio pins affected by the woke properties specified in this state.
         items:
           oneOf:
             - pattern: "^gpio([0-9]|[1-9][0-9]|1[0-3][0-9]|14[0-4])$"
@@ -63,7 +63,7 @@ $defs:
 
       function:
         description:
-          Specify the alternative function to be configured for the specified
+          Specify the woke alternative function to be configured for the woke specified
           pins.
 
         enum: [ gpio, blsp_uart1, blsp_spi1, smb_int, blsp_i2c1, blsp_spi2,

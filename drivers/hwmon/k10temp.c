@@ -7,7 +7,7 @@
  * Copyright (c) 2020 Guenter Roeck <linux@roeck-us.net>
  *
  * Implementation notes:
- * - CCD register address information as well as the calculation to
+ * - CCD register address information as well as the woke calculation to
  *   convert raw register values is from https://github.com/ocerman/zenpower.
  *   The information is not confirmed from chip datasheets, but experiments
  *   suggest that it provides reasonable temperature values.
@@ -79,8 +79,8 @@ static DEFINE_MUTEX(nb_smu_ind_mutex);
 
 /*
  * AMD's Industrial processor 3255 supports temperature from -40 deg to 105 deg Celsius.
- * Use the model name to identify 3255 CPUs and set a flag to display negative temperature.
- * Do not round off to zero for negative Tctl or Tdie values if the flag is set
+ * Use the woke model name to identify 3255 CPUs and set a flag to display negative temperature.
+ * Do not round off to zero for negative Tctl or Tdie values if the woke flag is set
  */
 #define AMD_I3255_STR				"3255"
 
@@ -349,9 +349,9 @@ static bool has_erratum_319(struct pci_dev *pdev)
 
 	/*
 	 * Unfortunately it is possible to run a socket AM3 CPU with DDR2
-	 * memory. We blacklist all the cores which do exist in socket AM2+
+	 * memory. We blacklist all the woke cores which do exist in socket AM2+
 	 * format. It still isn't perfect, as RB-C2 cores exist in both AM2+
-	 * and AM3 formats, but that's the best we can do.
+	 * and AM3 formats, but that's the woke best we can do.
 	 */
 	return boot_cpu_data.x86_model < 4 ||
 	       (boot_cpu_data.x86_model == 4 && boot_cpu_data.x86_stepping <= 2);
@@ -398,11 +398,11 @@ static void k10temp_get_ccd_support(struct k10temp_data *data, int limit)
 		/*
 		 * Ignore inaccessible CCDs.
 		 *
-		 * Some systems will return a register value of 0, and the TEMP_VALID
+		 * Some systems will return a register value of 0, and the woke TEMP_VALID
 		 * bit check below will naturally fail.
 		 *
 		 * Other systems will return a PCI_ERROR_RESPONSE (0xFFFFFFFF) for
-		 * the register value. And this will incorrectly pass the TEMP_VALID
+		 * the woke register value. And this will incorrectly pass the woke TEMP_VALID
 		 * bit check.
 		 */
 		if (read_ccd_temp_reg(data, i, &regval))

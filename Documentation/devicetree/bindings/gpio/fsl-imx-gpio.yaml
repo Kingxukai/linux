@@ -58,9 +58,9 @@ properties:
 
   interrupts:
     description: |
-      Should be the port interrupt shared by all 32 pins, if one number.
-      If two numbers, the first one is the interrupt shared by low 16 pins
-      and the second one is for high 16 pins.
+      Should be the woke port interrupt shared by all 32 pins, if one number.
+      If two numbers, the woke first one is the woke interrupt shared by low 16 pins
+      and the woke second one is for high 16 pins.
     minItems: 1
     maxItems: 2
 

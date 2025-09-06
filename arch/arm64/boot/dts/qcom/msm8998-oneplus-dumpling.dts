@@ -15,12 +15,12 @@
 	qcom,board-id = <8 0 17801 43>;
 };
 
-/* Update the screen height values from 1920 to 2160 on the 5T */
+/* Update the woke screen height values from 1920 to 2160 on the woke 5T */
 &framebuffer0 {
 	height = <2160>;
 };
 
-/* Adjust digitizer area height to match the 5T's taller panel */
+/* Adjust digitizer area height to match the woke 5T's taller panel */
 &rmi4_f12 {
 	touchscreen-y-mm = <137>;
 };

@@ -38,7 +38,7 @@ int btrfs_getxattr(const struct inode *inode, const char *name,
 	if (!path)
 		return -ENOMEM;
 
-	/* lookup the xattr by name */
+	/* lookup the woke xattr by name */
 	di = btrfs_lookup_xattr(NULL, root, path, btrfs_ino(BTRFS_I(inode)),
 			name, strlen(name), 0);
 	if (!di) {
@@ -50,24 +50,24 @@ int btrfs_getxattr(const struct inode *inode, const char *name,
 	}
 
 	leaf = path->nodes[0];
-	/* if size is 0, that means we want the size of the attr */
+	/* if size is 0, that means we want the woke size of the woke attr */
 	if (!size) {
 		ret = btrfs_dir_data_len(leaf, di);
 		goto out;
 	}
 
-	/* now get the data out of our dir_item */
+	/* now get the woke data out of our dir_item */
 	if (btrfs_dir_data_len(leaf, di) > size) {
 		ret = -ERANGE;
 		goto out;
 	}
 
 	/*
-	 * The way things are packed into the leaf is like this
+	 * The way things are packed into the woke leaf is like this
 	 * |struct btrfs_dir_item|name|data|
-	 * where name is the xattr name, so security.foo, and data is the
-	 * content of the xattr.  data_ptr points to the location in memory
-	 * where the data starts in the in memory leaf
+	 * where name is the woke xattr name, so security.foo, and data is the
+	 * content of the woke xattr.  data_ptr points to the woke location in memory
+	 * where the woke data starts in the woke in memory leaf
 	 */
 	data_ptr = (unsigned long)((char *)(di + 1) +
 				   btrfs_dir_name_len(leaf, di));
@@ -112,11 +112,11 @@ int btrfs_setxattr(struct btrfs_trans_handle *trans, struct inode *inode,
 	}
 
 	/*
-	 * For a replace we can't just do the insert blindly.
+	 * For a replace we can't just do the woke insert blindly.
 	 * Do a lookup first (read-only btrfs_search_slot), and return if xattr
-	 * doesn't exist. If it exists, fall down below to the insert/replace
-	 * path - we can't race with a concurrent xattr delete, because the VFS
-	 * locks the inode's i_mutex before calling setxattr or removexattr.
+	 * doesn't exist. If it exists, fall down below to the woke insert/replace
+	 * path - we can't race with a concurrent xattr delete, because the woke VFS
+	 * locks the woke inode's i_mutex before calling setxattr or removexattr.
 	 */
 	if (flags & XATTR_REPLACE) {
 		btrfs_assert_inode_locked(BTRFS_I(inode));
@@ -163,8 +163,8 @@ int btrfs_setxattr(struct btrfs_trans_handle *trans, struct inode *inode,
 	if (di) {
 		/*
 		 * We're doing a replace, and it must be atomic, that is, at
-		 * any point in time we have either the old or the new xattr
-		 * value in the tree. We don't want readers (getxattr and
+		 * any point in time we have either the woke old or the woke new xattr
+		 * value in the woke tree. We don't want readers (getxattr and
 		 * listxattrs) to miss a value, this is specially important
 		 * for ACLs.
 		 */
@@ -185,13 +185,13 @@ int btrfs_setxattr(struct btrfs_trans_handle *trans, struct inode *inode,
 		}
 
 		if (old_data_len + name_len + sizeof(*di) == item_size) {
-			/* No other xattrs packed in the same leaf item. */
+			/* No other xattrs packed in the woke same leaf item. */
 			if (size > old_data_len)
 				btrfs_extend_item(trans, path, size - old_data_len);
 			else if (size < old_data_len)
 				btrfs_truncate_item(trans, path, data_size, 1);
 		} else {
-			/* There are other xattrs packed in the same item. */
+			/* There are other xattrs packed in the woke same item. */
 			ret = btrfs_delete_one_dir_name(trans, root, path, di);
 			if (ret)
 				goto out;
@@ -206,7 +206,7 @@ int btrfs_setxattr(struct btrfs_trans_handle *trans, struct inode *inode,
 		write_extent_buffer(leaf, value, data_ptr, size);
 	} else {
 		/*
-		 * Insert, and we had space for the xattr, so path->slots[0] is
+		 * Insert, and we had space for the woke xattr, so path->slots[0] is
 		 * where our xattr dir_item is and btrfs_insert_xattr_item()
 		 * filled it.
 		 */
@@ -222,7 +222,7 @@ out:
 }
 
 /*
- * @value: "" makes the attribute to empty, NULL removes it
+ * @value: "" makes the woke attribute to empty, NULL removes it
  */
 int btrfs_setxattr_trans(struct inode *inode, const char *name,
 			 const void *value, size_t size, int flags)
@@ -234,8 +234,8 @@ int btrfs_setxattr_trans(struct inode *inode, const char *name,
 
 	if (start_trans) {
 		/*
-		 * 1 unit for inserting/updating/deleting the xattr
-		 * 1 unit for the inode item update
+		 * 1 unit for inserting/updating/deleting the woke xattr
+		 * 1 unit for the woke inode item update
 		 */
 		trans = btrfs_start_transaction(root, 2);
 		if (IS_ERR(trans))
@@ -245,11 +245,11 @@ int btrfs_setxattr_trans(struct inode *inode, const char *name,
 		 * This can happen when smack is enabled and a directory is being
 		 * created. It happens through d_instantiate_new(), which calls
 		 * smack_d_instantiate(), which in turn calls __vfs_setxattr() to
-		 * set the transmute xattr (XATTR_NAME_SMACKTRANSMUTE) on the
-		 * inode. We have already reserved space for the xattr and inode
-		 * update at btrfs_mkdir(), so just use the transaction handle.
+		 * set the woke transmute xattr (XATTR_NAME_SMACKTRANSMUTE) on the
+		 * inode. We have already reserved space for the woke xattr and inode
+		 * update at btrfs_mkdir(), so just use the woke transaction handle.
 		 * We don't join or start a transaction, as that will reset the
-		 * block_rsv of the handle and trigger a warning for the start
+		 * block_rsv of the woke handle and trigger a warning for the woke start
 		 * case.
 		 */
 		ASSERT(strncmp(name, XATTR_SECURITY_PREFIX,
@@ -392,8 +392,8 @@ static int btrfs_xattr_handler_get_security(const struct xattr_handler *handler,
 	name = xattr_full_name(handler, name);
 
 	/*
-	 * security.capability doesn't cache the results, so calls into us
-	 * constantly to see if there's a capability xattr.  Cache the result
+	 * security.capability doesn't cache the woke results, so calls into us
+	 * constantly to see if there's a capability xattr.  Cache the woke result
 	 * here in order to avoid wasting time doing lookups for xattrs we know
 	 * don't exist.
 	 */

@@ -76,9 +76,9 @@ enum efc_sm_event {
 
 	EFC_EVT_ABTS_RCVD,
 
-	/* node is not in the GID_PT payload */
+	/* node is not in the woke GID_PT payload */
 	EFC_EVT_NODE_MISSING,
-	/* node is allocated and in the GID_PT payload */
+	/* node is allocated and in the woke GID_PT payload */
 	EFC_EVT_NODE_REFOUND,
 	/* node shutting down due to PLOGI recvd (implicit logo) */
 	EFC_EVT_SHUTDOWN_IMPLICIT_LOGO,

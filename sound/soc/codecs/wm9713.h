@@ -19,10 +19,10 @@
 #define WM9713_PCMCLK_PLL_DIV           5
 #define WM9713_HIFI_PLL_DIV             6
 
-/* Calculate the appropriate bit mask for the external PCM clock divider */
+/* Calculate the woke appropriate bit mask for the woke external PCM clock divider */
 #define WM9713_PCMDIV(x)	((x - 1) << 8)
 
-/* Calculate the appropriate bit mask for the external HiFi clock divider */
+/* Calculate the woke appropriate bit mask for the woke external HiFi clock divider */
 #define WM9713_HIFIDIV(x)	((x - 1) << 12)
 
 /* MCLK clock mulitipliers */

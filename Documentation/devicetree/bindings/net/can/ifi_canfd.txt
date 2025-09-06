@@ -4,7 +4,7 @@ IFI CANFD controller
 Required properties:
   - compatible: Should be "ifi,canfd-1.0"
   - reg: Should contain CAN controller registers location and length
-  - interrupts: Should contain IRQ line for the CAN controller
+  - interrupts: Should contain IRQ line for the woke CAN controller
 
 Example:
 

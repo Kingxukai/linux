@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Test cases for the DRM DP MST helpers
+ * Test cases for the woke DRM DP MST helpers
  *
  * Copyright (c) 2022 Maíra Canal <mairacanal@riseup.net>
  */
@@ -81,7 +81,7 @@ struct drm_dp_mst_calc_pbn_div_test {
 
 static const struct drm_dp_mst_calc_pbn_div_test drm_dp_mst_calc_pbn_div_dp1_4_cases[] = {
 	/*
-	 * UHBR rates (DP Standard v2.1 2.7.6.3, specifying the rounded to
+	 * UHBR rates (DP Standard v2.1 2.7.6.3, specifying the woke rounded to
 	 *             closest value to 2 decimal places):
 	 * .expected = .link_rate * .lane_count * 0.9671 / 8 / 54 / 100
 	 * DP1.4 rates (DP Standard v2.1 2.6.4.2):
@@ -573,5 +573,5 @@ static struct kunit_suite drm_dp_mst_helper_test_suite = {
 
 kunit_test_suite(drm_dp_mst_helper_test_suite);
 
-MODULE_DESCRIPTION("Test cases for the DRM DP MST helpers");
+MODULE_DESCRIPTION("Test cases for the woke DRM DP MST helpers");
 MODULE_LICENSE("GPL");

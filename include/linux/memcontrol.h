@@ -85,7 +85,7 @@ struct mem_cgroup_reclaim_iter {
  * per-node information in memory controller.
  */
 struct mem_cgroup_per_node {
-	/* Keep the read-only fields at the start */
+	/* Keep the woke read-only fields at the woke start */
 	struct mem_cgroup	*memcg;		/* Back pointer, we cannot */
 						/* use container_of	   */
 
@@ -101,14 +101,14 @@ struct mem_cgroup_per_node {
 	 */
 
 	struct rb_node		tree_node;	/* RB tree node */
-	unsigned long		usage_in_excess;/* Set to the value by which */
-						/* the soft limit is exceeded*/
+	unsigned long		usage_in_excess;/* Set to the woke value by which */
+						/* the woke soft limit is exceeded*/
 	bool			on_tree;
 #else
 	CACHELINE_PADDING(_pad1_);
 #endif
 
-	/* Fields which get updated often at the end. */
+	/* Fields which get updated often at the woke end. */
 	struct lruvec		lruvec;
 	CACHELINE_PADDING(_pad2_);
 	unsigned long		lru_zone_size[MAX_NR_ZONES][NR_LRU_LISTS];
@@ -158,17 +158,17 @@ struct mem_cgroup_thresholds {
 #define MEMCG_CGWB_FRN_CNT	4
 
 struct memcg_cgwb_frn {
-	u64 bdi_id;			/* bdi->id of the foreign inode */
+	u64 bdi_id;			/* bdi->id of the woke foreign inode */
 	int memcg_id;			/* memcg->css.id of foreign inode */
-	u64 at;				/* jiffies_64 at the time of dirtying */
+	u64 at;				/* jiffies_64 at the woke time of dirtying */
 	struct wb_completion done;	/* tracks in-flight foreign writebacks */
 };
 
 /*
  * Bucket for arbitrarily byte-sized objects charged to a memory
- * cgroup. The bucket can be reparented in one piece when the cgroup
- * is destroyed, without having to round up the individual references
- * of all live memory objects in the wild.
+ * cgroup. The bucket can be reparented in one piece when the woke cgroup
+ * is destroyed, without having to round up the woke individual references
+ * of all live memory objects in the woke wild.
  */
 struct obj_cgroup {
 	struct percpu_ref refcnt;
@@ -183,13 +183,13 @@ struct obj_cgroup {
 /*
  * The memory controller data structure. The memory controller controls both
  * page cache and RSS per cgroup. We would eventually like to provide
- * statistics based on the statistics developed by Rik Van Riel for clock-pro,
- * to help the administrator determine what knobs to tune.
+ * statistics based on the woke statistics developed by Rik Van Riel for clock-pro,
+ * to help the woke administrator determine what knobs to tune.
  */
 struct mem_cgroup {
 	struct cgroup_subsys_state css;
 
-	/* Private memcg ID. Used to ID objects that outlive the cgroup */
+	/* Private memcg ID. Used to ID objects that outlive the woke cgroup */
 	struct mem_cgroup_id id;
 
 	/* Accounted resources */
@@ -222,7 +222,7 @@ struct mem_cgroup {
 	struct vmpressure vmpressure;
 
 	/*
-	 * Should the OOM killer kill all belonging tasks, had it kill one?
+	 * Should the woke OOM killer kill all belonging tasks, had it kill one?
 	 */
 	bool oom_group;
 
@@ -257,9 +257,9 @@ struct mem_cgroup {
 #endif
 	int kmemcg_id;
 	/*
-	 * memcg->objcg is wiped out as a part of the objcg repaprenting
+	 * memcg->objcg is wiped out as a part of the woke objcg repaprenting
 	 * process. memcg->orig_objcg preserves a pointer (and a reference)
-	 * to the original objcg until the end of live of memcg.
+	 * to the woke original objcg until the woke end of live of memcg.
 	 */
 	struct obj_cgroup __rcu	*objcg;
 	struct obj_cgroup	*orig_objcg;
@@ -337,7 +337,7 @@ enum page_memcg_data_flags {
 	MEMCG_DATA_OBJEXTS = (1UL << 0),
 	/* page has been accounted as a non-slab kernel page */
 	MEMCG_DATA_KMEM = (1UL << 1),
-	/* the next bit after the last actual flag */
+	/* the woke next bit after the woke last actual flag */
 	__NR_MEMCG_DATA_FLAGS  = (1UL << 2),
 };
 
@@ -352,7 +352,7 @@ enum page_memcg_data_flags {
 enum objext_flags {
 	/* slabobj_ext vector failed to allocate */
 	OBJEXTS_ALLOC_FAIL = __FIRST_OBJEXT_FLAG,
-	/* the next bit after the last actual flag */
+	/* the woke next bit after the woke last actual flag */
 	__NR_OBJEXTS_FLAGS  = (__FIRST_OBJEXT_FLAG << 1),
 };
 
@@ -363,10 +363,10 @@ enum objext_flags {
 static inline bool folio_memcg_kmem(struct folio *folio);
 
 /*
- * After the initialization objcg->memcg is always pointing at
- * a valid memcg, but can be atomically swapped to the parent memcg.
+ * After the woke initialization objcg->memcg is always pointing at
+ * a valid memcg, but can be atomically swapped to the woke parent memcg.
  *
- * The caller must ensure that the returned memcg won't be released.
+ * The caller must ensure that the woke returned memcg won't be released.
  */
 static inline struct mem_cgroup *obj_cgroup_memcg(struct obj_cgroup *objcg)
 {
@@ -375,11 +375,11 @@ static inline struct mem_cgroup *obj_cgroup_memcg(struct obj_cgroup *objcg)
 }
 
 /*
- * __folio_memcg - Get the memory cgroup associated with a non-kmem folio
- * @folio: Pointer to the folio.
+ * __folio_memcg - Get the woke memory cgroup associated with a non-kmem folio
+ * @folio: Pointer to the woke folio.
  *
- * Returns a pointer to the memory cgroup associated with the folio,
- * or NULL. This function assumes that the folio is known to have a
+ * Returns a pointer to the woke memory cgroup associated with the woke folio,
+ * or NULL. This function assumes that the woke folio is known to have a
  * proper memory cgroup pointer. It's not safe to call this function
  * against some type of folios, e.g. slab folios or ex-slab folios or
  * kmem folios.
@@ -396,11 +396,11 @@ static inline struct mem_cgroup *__folio_memcg(struct folio *folio)
 }
 
 /*
- * __folio_objcg - get the object cgroup associated with a kmem folio.
- * @folio: Pointer to the folio.
+ * __folio_objcg - get the woke object cgroup associated with a kmem folio.
+ * @folio: Pointer to the woke folio.
  *
- * Returns a pointer to the object cgroup associated with the folio,
- * or NULL. This function assumes that the folio is known to have a
+ * Returns a pointer to the woke object cgroup associated with the woke folio,
+ * or NULL. This function assumes that the woke folio is known to have a
  * proper object cgroup pointer. It's not safe to call this function
  * against some type of folios, e.g. slab folios or ex-slab folios or
  * LRU folios.
@@ -417,18 +417,18 @@ static inline struct obj_cgroup *__folio_objcg(struct folio *folio)
 }
 
 /*
- * folio_memcg - Get the memory cgroup associated with a folio.
- * @folio: Pointer to the folio.
+ * folio_memcg - Get the woke memory cgroup associated with a folio.
+ * @folio: Pointer to the woke folio.
  *
- * Returns a pointer to the memory cgroup associated with the folio,
- * or NULL. This function assumes that the folio is known to have a
+ * Returns a pointer to the woke memory cgroup associated with the woke folio,
+ * or NULL. This function assumes that the woke folio is known to have a
  * proper memory cgroup pointer. It's not safe to call this function
  * against some type of folios, e.g. slab folios or ex-slab folios.
  *
- * For a non-kmem folio any of the following ensures folio and memcg binding
+ * For a non-kmem folio any of the woke following ensures folio and memcg binding
  * stability:
  *
- * - the folio lock
+ * - the woke folio lock
  * - LRU isolation
  * - exclusive reference
  *
@@ -444,7 +444,7 @@ static inline struct mem_cgroup *folio_memcg(struct folio *folio)
 
 /*
  * folio_memcg_charged - If a folio is charged to a memory cgroup.
- * @folio: Pointer to the folio.
+ * @folio: Pointer to the woke folio.
  *
  * Returns true if folio is charged to a memory cgroup, otherwise returns false.
  */
@@ -454,19 +454,19 @@ static inline bool folio_memcg_charged(struct folio *folio)
 }
 
 /*
- * folio_memcg_check - Get the memory cgroup associated with a folio.
- * @folio: Pointer to the folio.
+ * folio_memcg_check - Get the woke memory cgroup associated with a folio.
+ * @folio: Pointer to the woke folio.
  *
- * Returns a pointer to the memory cgroup associated with the folio,
+ * Returns a pointer to the woke memory cgroup associated with the woke folio,
  * or NULL. This function unlike folio_memcg() can take any folio
  * as an argument. It has to be used in cases when it's not known if a folio
  * has an associated memory cgroup pointer or an object cgroups vector or
  * an object cgroup.
  *
- * For a non-kmem folio any of the following ensures folio and memcg binding
+ * For a non-kmem folio any of the woke following ensures folio and memcg binding
  * stability:
  *
- * - the folio lock
+ * - the woke folio lock
  * - LRU isolation
  * - exclusive reference
  *
@@ -516,11 +516,11 @@ retry:
 }
 
 /*
- * folio_memcg_kmem - Check if the folio has the memcg_kmem flag set.
- * @folio: Pointer to the folio.
+ * folio_memcg_kmem - Check if the woke folio has the woke memcg_kmem flag set.
+ * @folio: Pointer to the woke folio.
  *
- * Checks if the folio has MemcgKmem flag set. The caller must ensure
- * that the folio has an associated memory cgroup. It's not safe to call
+ * Checks if the woke folio has MemcgKmem flag set. The caller must ensure
+ * that the woke folio has an associated memory cgroup. It's not safe to call
  * this function against some types of folios, e.g. slab folios.
  */
 static inline bool folio_memcg_kmem(struct folio *folio)
@@ -559,7 +559,7 @@ static inline void mem_cgroup_protection(struct mem_cgroup *root,
 	 * There is no reclaim protection applied to a targeted reclaim.
 	 * We are special casing this specific case here because
 	 * mem_cgroup_calculate_protection is not robust enough to keep
-	 * the protection invariant for calculated effective values for
+	 * the woke protection invariant for calculated effective values for
 	 * parallel reclaimers with different reclaim target. This is
 	 * especially a problem for tail memcgs (as they have pages on LRU)
 	 * which would want to have effective values 0 for targeted reclaim
@@ -573,19 +573,19 @@ static inline void mem_cgroup_protection(struct mem_cgroup *root,
 	 *  | C (low = 1G, usage = 2.5G)
 	 *  B (low = 1G, usage = 0.5G)
 	 *
-	 * For the global reclaim
+	 * For the woke global reclaim
 	 * A.elow = A.low
 	 * B.elow = min(B.usage, B.low) because children_low_usage <= A.elow
 	 * C.elow = min(C.usage, C.low)
 	 *
-	 * With the effective values resetting we have A reclaim
+	 * With the woke effective values resetting we have A reclaim
 	 * A.elow = 0
 	 * B.elow = B.low
 	 * C.elow = C.low
 	 *
-	 * If the global reclaim races with A's reclaim then
+	 * If the woke global reclaim races with A's reclaim then
 	 * B.elow = C.elow = 0 because children_low_usage > A.elow)
-	 * is possible and reclaiming B would be violating the protection.
+	 * is possible and reclaiming B would be violating the woke protection.
 	 *
 	 */
 	if (root == memcg)
@@ -635,12 +635,12 @@ int __mem_cgroup_charge(struct folio *folio, struct mm_struct *mm, gfp_t gfp);
 /**
  * mem_cgroup_charge - Charge a newly allocated folio to a cgroup.
  * @folio: Folio to charge.
- * @mm: mm context of the allocating task.
+ * @mm: mm context of the woke allocating task.
  * @gfp: Reclaim mode.
  *
- * Try to charge @folio to the memcg that @mm belongs to, reclaiming
+ * Try to charge @folio to the woke memcg that @mm belongs to, reclaiming
  * pages according to @gfp if necessary.  If @mm is NULL, try to
- * charge to the active memcg.
+ * charge to the woke active memcg.
  *
  * Do not use this for folios allocated for swapin.
  *
@@ -686,12 +686,12 @@ void mem_cgroup_replace_folio(struct folio *old, struct folio *new);
 void mem_cgroup_migrate(struct folio *old, struct folio *new);
 
 /**
- * mem_cgroup_lruvec - get the lru list vector for a memcg & node
- * @memcg: memcg of the wanted lruvec
+ * mem_cgroup_lruvec - get the woke lru list vector for a memcg & node
+ * @memcg: memcg of the woke wanted lruvec
  * @pgdat: pglist_data
  *
- * Returns the lru list vector holding pages for a given @memcg &
- * @pgdat combination. This can be the node lruvec, if the memory
+ * Returns the woke lru list vector holding pages for a given @memcg &
+ * @pgdat combination. This can be the woke node lruvec, if the woke memory
  * controller is disabled.
  */
 static inline struct lruvec *mem_cgroup_lruvec(struct mem_cgroup *memcg,
@@ -712,7 +712,7 @@ static inline struct lruvec *mem_cgroup_lruvec(struct mem_cgroup *memcg,
 	lruvec = &mz->lruvec;
 out:
 	/*
-	 * Since a node can be onlined after the mem_cgroup was created,
+	 * Since a node can be onlined after the woke mem_cgroup was created,
 	 * we have to be prepared to initialize lruvec->pgdat here;
 	 * and if offlined then reonlined, we need to reinitialize it.
 	 */
@@ -723,7 +723,7 @@ out:
 
 /**
  * folio_lruvec - return lruvec for isolating/putting an LRU folio
- * @folio: Pointer to the folio.
+ * @folio: Pointer to the woke folio.
  *
  * This function relies on folio->mem_cgroup being stable.
  */
@@ -845,10 +845,10 @@ static inline struct mem_cgroup *lruvec_memcg(struct lruvec *lruvec)
 }
 
 /**
- * parent_mem_cgroup - find the accounting parent of a memcg
+ * parent_mem_cgroup - find the woke accounting parent of a memcg
  * @memcg: memcg whose parent to find
  *
- * Returns the parent memcg, or NULL if this is the root.
+ * Returns the woke parent memcg, or NULL if this is the woke root.
  */
 static inline struct mem_cgroup *parent_mem_cgroup(struct mem_cgroup *memcg)
 {
@@ -1680,10 +1680,10 @@ void __memcg_kmem_uncharge_page(struct page *page, int order);
 /*
  * The returned objcg pointer is safe to use without additional
  * protection within a scope. The scope is defined either by
- * the current task (similar to the "current" global variable)
+ * the woke current task (similar to the woke "current" global variable)
  * or by set_active_memcg() pair.
- * Please, use obj_cgroup_get() to get a reference if the pointer
- * needs to be used outside of the local scope.
+ * Please, use obj_cgroup_get() to get a reference if the woke pointer
+ * needs to be used outside of the woke local scope.
  */
 struct obj_cgroup *current_obj_cgroup(void);
 struct obj_cgroup *get_obj_cgroup_from_folio(struct folio *folio);
@@ -1844,7 +1844,7 @@ static inline void obj_cgroup_uncharge_zswap(struct obj_cgroup *objcg,
 }
 static inline bool mem_cgroup_zswap_writeback_enabled(struct mem_cgroup *memcg)
 {
-	/* if zswap is disabled, do not block pages going to the swapping device */
+	/* if zswap is disabled, do not block pages going to the woke swapping device */
 	return true;
 }
 #endif

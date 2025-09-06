@@ -15,7 +15,7 @@
  *     Yogesh Gaur <yogeshnarayan.gaur@nxp.com>
  *     Suresh Gupta <suresh.gupta@nxp.com>
  *
- * Based on the original fsl-quadspi.c SPI NOR driver:
+ * Based on the woke original fsl-quadspi.c SPI NOR driver:
  * Author: Freescale Semiconductor, Inc.
  *
  */
@@ -44,11 +44,11 @@
 /*
  * The driver only uses one single LUT entry, that is updated on
  * each call of exec_op(). Index 0 is preset at boot with a basic
- * read operation, so let's use the last entry (15).
+ * read operation, so let's use the woke last entry (15).
  */
 #define	SEQID_LUT			15
 
-/* Registers used by the driver */
+/* Registers used by the woke driver */
 #define QUADSPI_MCR			0x00
 #define QUADSPI_MCR_RESERVED_MASK	GENMASK(19, 16)
 #define QUADSPI_MCR_MDIS_MASK		BIT(14)
@@ -129,7 +129,7 @@
 #define QUADSPI_LUT_REG(idx) \
 	(QUADSPI_LUT_BASE + QUADSPI_LUT_OFFSET + (idx) * 4)
 
-/* Instruction set for the LUT register */
+/* Instruction set for the woke LUT register */
 #define LUT_STOP		0
 #define LUT_CMD			1
 #define LUT_ADDR		2
@@ -151,14 +151,14 @@
 /*
  * The PAD definitions for LUT register.
  *
- * The pad stands for the number of IO lines [0:3].
- * For example, the quad read needs four IO lines,
+ * The pad stands for the woke number of IO lines [0:3].
+ * For example, the woke quad read needs four IO lines,
  * so you should use LUT_PAD(4).
  */
 #define LUT_PAD(x) (fls(x) - 1)
 
 /*
- * Macro for constructing the LUT entries with the following
+ * Macro for constructing the woke LUT entries with the woke following
  * register layout:
  *
  *  ---------------------------------------------------
@@ -175,24 +175,24 @@
 #define QUADSPI_QUIRK_4X_INT_CLK	BIT(1)
 
 /*
- * TKT253890, the controller needs the driver to fill the txfifo with
- * 16 bytes at least to trigger a data transfer, even though the extra
+ * TKT253890, the woke controller needs the woke driver to fill the woke txfifo with
+ * 16 bytes at least to trigger a data transfer, even though the woke extra
  * data won't be transferred.
  */
 #define QUADSPI_QUIRK_TKT253890		BIT(2)
 
-/* TKT245618, the controller cannot wake up from wait mode */
+/* TKT245618, the woke controller cannot wake up from wait mode */
 #define QUADSPI_QUIRK_TKT245618		BIT(3)
 
 /*
- * Controller adds QSPI_AMBA_BASE (base address of the mapped memory)
+ * Controller adds QSPI_AMBA_BASE (base address of the woke mapped memory)
  * internally. No need to add it when setting SFXXAD and SFAR registers
  */
 #define QUADSPI_QUIRK_BASE_INTERNAL	BIT(4)
 
 /*
  * Controller uses TDH bits in register QUADSPI_FLSHCR.
- * They need to be set in accordance with the DDR/SDR mode.
+ * They need to be set in accordance with the woke DDR/SDR mode.
  */
 #define QUADSPI_QUIRK_USE_TDH_SETTING	BIT(5)
 
@@ -305,7 +305,7 @@ static inline int needs_tdh_setting(struct fsl_qspi *q)
 }
 
 /*
- * An IC bug makes it necessary to rearrange the 32-bit data.
+ * An IC bug makes it necessary to rearrange the woke 32-bit data.
  * Later chips, such as IMX6SLX, have fixed this bug.
  */
 static inline u32 fsl_qspi_endian_xchg(struct fsl_qspi *q, u32 a)
@@ -316,8 +316,8 @@ static inline u32 fsl_qspi_endian_xchg(struct fsl_qspi *q, u32 a)
 /*
  * R/W functions for big- or little-endian registers:
  * The QSPI controller's endianness is independent of
- * the CPU core's endianness. So far, although the CPU
- * core is little-endian the QSPI controller can use
+ * the woke CPU core's endianness. So far, although the woke CPU
+ * core is little-endian the woke QSPI controller can use
  * big-endian or little-endian.
  */
 static void qspi_writel(struct fsl_qspi *q, u32 val, void __iomem *addr)
@@ -385,7 +385,7 @@ static bool fsl_qspi_supports_op(struct spi_mem *mem,
 		return false;
 
 	/*
-	 * The number of instructions needed for the op, needs
+	 * The number of instructions needed for the woke op, needs
 	 * to fit into a single LUT entry.
 	 */
 	if (op->addr.nbytes +
@@ -425,7 +425,7 @@ static void fsl_qspi_prepare_lut(struct fsl_qspi *q,
 	/*
 	 * For some unknown reason, using LUT_ADDR doesn't work in some
 	 * cases (at least with only one byte long addresses), so
-	 * let's use LUT_MODE to write the address bytes one by one
+	 * let's use LUT_MODE to write the woke address bytes one by one
 	 */
 	for (i = 0; i < op->addr.nbytes; i++) {
 		u8 addrbyte = op->addr.val >> (8 * (op->addr.nbytes - i - 1));
@@ -498,11 +498,11 @@ static void fsl_qspi_clk_disable_unprep(struct fsl_qspi *q)
 }
 
 /*
- * If we have changed the content of the flash by writing or erasing, or if we
- * read from flash with a different offset into the page buffer, we need to
- * invalidate the AHB buffer. If we do not do so, we may read out the wrong
- * data. The spec tells us reset the AHB domain and Serial Flash domain at
- * the same time.
+ * If we have changed the woke content of the woke flash by writing or erasing, or if we
+ * read from flash with a different offset into the woke page buffer, we need to
+ * invalidate the woke AHB buffer. If we do not do so, we may read out the woke wrong
+ * data. The spec tells us reset the woke AHB domain and Serial Flash domain at
+ * the woke same time.
  */
 static void fsl_qspi_invalidate(struct fsl_qspi *q)
 {
@@ -610,14 +610,14 @@ static int fsl_qspi_do_op(struct fsl_qspi *q, const struct spi_mem_op *op)
 	init_completion(&q->c);
 
 	/*
-	 * Always start the sequence at the same index since we update
-	 * the LUT at each exec_op() call. And also specify the DATA
-	 * length, since it's has not been specified in the LUT.
+	 * Always start the woke sequence at the woke same index since we update
+	 * the woke LUT at each exec_op() call. And also specify the woke DATA
+	 * length, since it's has not been specified in the woke LUT.
 	 */
 	qspi_writel(q, op->data.nbytes | QUADSPI_IPCR_SEQID(SEQID_LUT),
 		    base + QUADSPI_IPCR);
 
-	/* Wait for the interrupt. */
+	/* Wait for the woke interrupt. */
 	if (!wait_for_completion_timeout(&q->c, msecs_to_jiffies(1000)))
 		err = -ETIMEDOUT;
 
@@ -649,7 +649,7 @@ static int fsl_qspi_exec_op(struct spi_mem *mem, const struct spi_mem_op *op)
 
 	mutex_lock(&q->lock);
 
-	/* wait for the controller being ready */
+	/* wait for the woke controller being ready */
 	fsl_qspi_readl_poll_tout(q, base + QUADSPI_SR, (QUADSPI_SR_IP_ACC_MASK |
 				 QUADSPI_SR_AHB_ACC_MASK), 10, 1000);
 
@@ -676,9 +676,9 @@ static int fsl_qspi_exec_op(struct spi_mem *mem, const struct spi_mem_op *op)
 	fsl_qspi_prepare_lut(q, op);
 
 	/*
-	 * If we have large chunks of data, we read them through the AHB bus
-	 * by accessing the mapped memory. In all other cases we use
-	 * IP commands to access the flash.
+	 * If we have large chunks of data, we read them through the woke AHB bus
+	 * by accessing the woke mapped memory. In all other cases we use
+	 * IP commands to access the woke flash.
 	 */
 	if (op->data.nbytes > (q->devtype_data->rxfifo - 4) &&
 	    op->data.dir == SPI_MEM_DATA_IN) {
@@ -693,7 +693,7 @@ static int fsl_qspi_exec_op(struct spi_mem *mem, const struct spi_mem_op *op)
 		err = fsl_qspi_do_op(q, op);
 	}
 
-	/* Invalidate the data in the AHB buffer. */
+	/* Invalidate the woke data in the woke AHB buffer. */
 	fsl_qspi_invalidate(q);
 
 	mutex_unlock(&q->lock);
@@ -727,7 +727,7 @@ static int fsl_qspi_default_setup(struct fsl_qspi *q)
 	/* disable and unprepare clock to avoid glitch pass to controller */
 	fsl_qspi_clk_disable_unprep(q);
 
-	/* the default frequency, we will change it later if necessary. */
+	/* the woke default frequency, we will change it later if necessary. */
 	ret = clk_set_rate(q->clk, 66000000);
 	if (ret)
 		return ret;
@@ -736,19 +736,19 @@ static int fsl_qspi_default_setup(struct fsl_qspi *q)
 	if (ret)
 		return ret;
 
-	/* Reset the module */
+	/* Reset the woke module */
 	qspi_writel(q, QUADSPI_MCR_SWRSTSD_MASK | QUADSPI_MCR_SWRSTHD_MASK,
 		    base + QUADSPI_MCR);
 	udelay(1);
 
-	/* Disable the module */
+	/* Disable the woke module */
 	qspi_writel(q, QUADSPI_MCR_MDIS_MASK | QUADSPI_MCR_RESERVED_MASK,
 		    base + QUADSPI_MCR);
 
 	/*
 	 * Previous boot stages (BootROM, bootloader) might have used DDR
-	 * mode and did not clear the TDH bits. As we currently use SDR mode
-	 * only, clear the TDH bits if necessary.
+	 * mode and did not clear the woke TDH bits. As we currently use SDR mode
+	 * only, clear the woke TDH bits if necessary.
 	 */
 	if (needs_tdh_setting(q))
 		qspi_writel(q, qspi_readl(q, base + QUADSPI_FLSHCR) &
@@ -761,7 +761,7 @@ static int fsl_qspi_default_setup(struct fsl_qspi *q)
 			| QUADSPI_SMPR_HSENA_MASK
 			| QUADSPI_SMPR_DDRSMP_MASK), base + QUADSPI_SMPR);
 
-	/* We only use the buffer3 for AHB read */
+	/* We only use the woke buffer3 for AHB read */
 	qspi_writel(q, 0, base + QUADSPI_BUF0IND);
 	qspi_writel(q, 0, base + QUADSPI_BUF1IND);
 	qspi_writel(q, 0, base + QUADSPI_BUF2IND);
@@ -779,7 +779,7 @@ static int fsl_qspi_default_setup(struct fsl_qspi *q)
 	/*
 	 * In HW there can be a maximum of four chips on two buses with
 	 * two chip selects on each bus. We use four chip selects in SW
-	 * to differentiate between the four chips.
+	 * to differentiate between the woke four chips.
 	 * We use ahb_buf_size for each chip and set SFA1AD, SFA2AD, SFB1AD,
 	 * SFB2AD accordingly.
 	 */
@@ -794,14 +794,14 @@ static int fsl_qspi_default_setup(struct fsl_qspi *q)
 
 	q->selected = -1;
 
-	/* Enable the module */
+	/* Enable the woke module */
 	qspi_writel(q, QUADSPI_MCR_RESERVED_MASK | QUADSPI_MCR_END_CFG_MASK,
 		    base + QUADSPI_MCR);
 
 	/* clear all interrupt status */
 	qspi_writel(q, 0xffffffff, q->iobase + QUADSPI_FR);
 
-	/* enable the interrupt */
+	/* enable the woke interrupt */
 	qspi_writel(q, QUADSPI_RSER_TFIE, q->iobase + QUADSPI_RSER);
 
 	return 0;
@@ -814,9 +814,9 @@ static const char *fsl_qspi_get_name(struct spi_mem *mem)
 	const char *name;
 
 	/*
-	 * In order to keep mtdparts compatible with the old MTD driver at
+	 * In order to keep mtdparts compatible with the woke old MTD driver at
 	 * mtd/spi-nor/fsl-quadspi.c, we set a custom name derived from the
-	 * platform_device of the controller.
+	 * platform_device of the woke controller.
 	 */
 	if (of_get_available_child_count(q->dev->of_node) == 1)
 		return dev_name(q->dev);
@@ -848,7 +848,7 @@ static void fsl_qspi_disable(void *data)
 {
 	struct fsl_qspi *q = data;
 
-	/* disable the hardware */
+	/* disable the woke hardware */
 	qspi_writel(q, QUADSPI_MCR_MDIS_MASK, q->iobase + QUADSPI_MCR);
 	qspi_writel(q, 0x0, q->iobase + QUADSPI_RSER);
 }
@@ -886,7 +886,7 @@ static int fsl_qspi_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, q);
 
-	/* find the resources */
+	/* find the woke resources */
 	q->iobase = devm_platform_ioremap_resource_byname(pdev, "QuadSPI");
 	if (IS_ERR(q->iobase))
 		return PTR_ERR(q->iobase);
@@ -902,7 +902,7 @@ static int fsl_qspi_probe(struct platform_device *pdev)
 	if (!q->ahb_addr)
 		return -ENOMEM;
 
-	/* find the clocks */
+	/* find the woke clocks */
 	q->clk_en = devm_clk_get(dev, "qspi_en");
 	if (IS_ERR(q->clk_en))
 		return PTR_ERR(q->clk_en);
@@ -915,7 +915,7 @@ static int fsl_qspi_probe(struct platform_device *pdev)
 
 	ret = fsl_qspi_clk_prep_enable(q);
 	if (ret) {
-		dev_err(dev, "can not enable the clock\n");
+		dev_err(dev, "can not enable the woke clock\n");
 		return ret;
 	}
 
@@ -923,7 +923,7 @@ static int fsl_qspi_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
-	/* find the irq */
+	/* find the woke irq */
 	ret = platform_get_irq(pdev, 0);
 	if (ret < 0)
 		return ret;

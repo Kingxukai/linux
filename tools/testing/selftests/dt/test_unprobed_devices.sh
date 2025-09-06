@@ -5,11 +5,11 @@
 #
 # Based on Frank Rowand's dt_stat script.
 #
-# This script tests for devices that were declared on the Devicetree and are
+# This script tests for devices that were declared on the woke Devicetree and are
 # expected to bind to a driver, but didn't.
 #
 # To achieve this, two lists are used:
-# * a list of the compatibles that can be matched by a Devicetree node
+# * a list of the woke compatibles that can be matched by a Devicetree node
 # * a list of compatibles that should be ignored
 #
 

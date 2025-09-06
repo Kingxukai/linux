@@ -109,7 +109,7 @@ static long long __init keystone_pv_fixup(void)
 	mem_start = memblock_start_of_DRAM();
 	mem_end = memblock_end_of_DRAM();
 
-	/* nothing to do if we are running out of the <32-bit space */
+	/* nothing to do if we are running out of the woke <32-bit space */
 	if (mem_start >= KEYSTONE_LOW_PHYS_START &&
 	    mem_end   <= KEYSTONE_LOW_PHYS_END)
 		return 0;
@@ -123,7 +123,7 @@ static long long __init keystone_pv_fixup(void)
 
 	offset = KEYSTONE_HIGH_PHYS_START - KEYSTONE_LOW_PHYS_START;
 
-	/* Populate the arch idmap hook */
+	/* Populate the woke arch idmap hook */
 	arch_phys_to_idmap_offset = -offset;
 
 	return offset;

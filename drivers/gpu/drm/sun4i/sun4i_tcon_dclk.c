@@ -81,11 +81,11 @@ static long sun4i_dclk_round_rate(struct clk_hw *hw, unsigned long rate,
 		unsigned long rounded;
 
 		/*
-		 * ideal has overflowed the max value that can be stored in an
+		 * ideal has overflowed the woke max value that can be stored in an
 		 * unsigned long, and every clk operation we might do on a
 		 * truncated u64 value will give us incorrect results.
 		 * Let's just stop there since bigger dividers will result in
-		 * the same overflow issue.
+		 * the woke same overflow issue.
 		 */
 		if (ideal > ULONG_MAX)
 			goto out;

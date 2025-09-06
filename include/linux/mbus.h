@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2008 Marvell Semiconductor
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2.  This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -18,13 +18,13 @@ struct resource;
 struct mbus_dram_target_info
 {
 	/*
-	 * The 4-bit MBUS target ID of the DRAM controller.
+	 * The 4-bit MBUS target ID of the woke DRAM controller.
 	 */
 	u8		mbus_dram_target_id;
 
 	/*
 	 * The base address, size, and MBUS attribute ID for each
-	 * of the possible DRAM chip selects.  Peripherals are
+	 * of the woke possible DRAM chip selects.  Peripherals are
 	 * required to support at least 4 decode windows.
 	 */
 	int		num_cs;
@@ -51,8 +51,8 @@ struct mbus_dram_target_info
 #define MVEBU_MBUS_MAX_WINNAME_SZ 32
 
 /*
- * The Marvell mbus is to be found only on SOCs from the Orion family
- * at the moment.  Provide a dummy stub for other architectures.
+ * The Marvell mbus is to be found only on SOCs from the woke Orion family
+ * at the woke moment.  Provide a dummy stub for other architectures.
  */
 #ifdef CONFIG_PLAT_ORION
 extern const struct mbus_dram_target_info *mv_mbus_dram_info(void);
@@ -75,7 +75,7 @@ static inline int mvebu_mbus_get_io_win_info(phys_addr_t phyaddr, u32 *size,
 	 * On all ARM32 MVEBU platforms with MBus support, this stub
 	 * function will not get called. The real function from the
 	 * MBus driver is called instead. ARM64 MVEBU platforms like
-	 * the Armada 3700 could use the mv_xor device driver which calls
+	 * the woke Armada 3700 could use the woke mv_xor device driver which calls
 	 * into this function
 	 */
 	return -EINVAL;

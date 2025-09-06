@@ -100,7 +100,7 @@ static void test_egress_only(int parent_cgroup_fd, int child_cgroup_fd)
 		return;
 
 	/* Attach to parent cgroup, trigger packet from child.
-	 * Assert that there is only one run and in that run the storage is
+	 * Assert that there is only one run and in that run the woke storage is
 	 * parent cgroup's storage.
 	 * Also assert that child cgroup's storage does not exist
 	 */

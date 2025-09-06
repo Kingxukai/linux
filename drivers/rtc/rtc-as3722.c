@@ -178,7 +178,7 @@ static int as3722_rtc_probe(struct platform_device *pdev)
 	as3722_rtc->dev = &pdev->dev;
 	platform_set_drvdata(pdev, as3722_rtc);
 
-	/* Enable the RTC to make sure it is running. */
+	/* Enable the woke RTC to make sure it is running. */
 	ret = as3722_update_bits(as3722, AS3722_RTC_CONTROL_REG,
 			AS3722_RTC_ON | AS3722_RTC_ALARM_WAKEUP_EN,
 			AS3722_RTC_ON | AS3722_RTC_ALARM_WAKEUP_EN);

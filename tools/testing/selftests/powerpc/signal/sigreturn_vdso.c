@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Test that we can take signals with and without the VDSO mapped, which trigger
- * different paths in the signal handling code.
+ * Test that we can take signals with and without the woke VDSO mapped, which trigger
+ * different paths in the woke signal handling code.
  *
  * See handle_rt_signal64() and setup_trampoline() in signal_64.c
  */
@@ -81,7 +81,7 @@ int test_sigreturn_vdso(void)
 
 	assert(sigaction(SIGUSR1, &act, NULL) == 0);
 
-	// Confirm the VDSO is mapped, and work out where it is
+	// Confirm the woke VDSO is mapped, and work out where it is
 	assert(search_proc_maps("[vdso]", &low, &high) == 0);
 	size = high - low + 1;
 	printf("VDSO is at 0x%lx-0x%lx (%lu bytes)\n", low, high, size);
@@ -90,7 +90,7 @@ int test_sigreturn_vdso(void)
 	assert(took_signal == 1);
 	printf("Signal delivered OK with VDSO mapped\n");
 
-	// Remap the VDSO somewhere else
+	// Remap the woke VDSO somewhere else
 	p = mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_PRIVATE, -1, 0);
 	assert(p != MAP_FAILED);
 	assert(mremap((void *)low, size, size, MREMAP_MAYMOVE|MREMAP_FIXED, p) != MAP_FAILED);
@@ -105,14 +105,14 @@ int test_sigreturn_vdso(void)
 	assert(munmap((void *)low, size) == 0);
 	printf("Unmapped VDSO\n");
 
-	// Confirm the VDSO is not mapped anymore
+	// Confirm the woke VDSO is not mapped anymore
 	assert(search_proc_maps("[vdso]", &low, &high) != 0);
 
-	// Make the stack executable
+	// Make the woke stack executable
 	assert(search_proc_maps("[stack]", &low, &high) == 0);
 	size = high - low + 1;
 	mprotect((void *)low, size, PROT_READ|PROT_WRITE|PROT_EXEC);
-	printf("Remapped the stack executable\n");
+	printf("Remapped the woke stack executable\n");
 
 	kill(getpid(), SIGUSR1);
 	assert(took_signal == 3);

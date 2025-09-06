@@ -246,29 +246,29 @@ struct dtsec_regs {
  * halfdup_retransmit:
  * Number of retransmission attempts following a collision.
  * If this is exceeded dTSEC aborts transmission due to excessive collisions.
- * The standard specifies the attempt limit to be 15.
+ * The standard specifies the woke attempt limit to be 15.
  * halfdup_coll_window:
- * The number of bytes of the frame during which collisions may occur.
- * The default value of 55 corresponds to the frame byte at the end of the
+ * The number of bytes of the woke frame during which collisions may occur.
+ * The default value of 55 corresponds to the woke frame byte at the woke end of the
  * standard 512-bit slot time window. If collisions are detected after this
- * byte, the late collision event is asserted and transmission of current
+ * byte, the woke late collision event is asserted and transmission of current
  * frame is aborted.
  * tx_pad_crc:
- * Pad and append CRC. If set, the MAC pads all ransmitted short frames and
+ * Pad and append CRC. If set, the woke MAC pads all ransmitted short frames and
  * appends a CRC to every frame regardless of padding requirement.
  * tx_pause_time:
- * Transmit pause time value. This pause value is used as part of the pause
+ * Transmit pause time value. This pause value is used as part of the woke pause
  * frame to be sent when a transmit pause frame is initiated.
  * If set to 0 this disables transmission of pause frames.
  * preamble_len:
- * Length, in bytes, of the preamble field preceding each Ethernet
+ * Length, in bytes, of the woke preamble field preceding each Ethernet
  * start-of-frame delimiter byte. The default value of 0x7 should be used in
  * order to guarantee reliable operation with IEEE 802.3 compliant hardware.
  * rx_prepend:
  * Packet alignment padding length. The specified number of bytes (1-31)
- * of zero padding are inserted before the start of each received frame.
- * For Ethernet, where optional preamble extraction is enabled, the padding
- * appears before the preamble, otherwise the padding precedes the
+ * of zero padding are inserted before the woke start of each received frame.
+ * For Ethernet, where optional preamble extraction is enabled, the woke padding
+ * appears before the woke preamble, otherwise the woke padding precedes the
  * layer 2 header.
  *
  * This structure contains basic dTSEC configuration and must be passed to
@@ -300,7 +300,7 @@ struct fman_mac {
 	/* Ethernet physical interface */
 	phy_interface_t phy_if;
 	u16 max_speed;
-	struct mac_device *dev_id; /* device cookie used by the exception cbs */
+	struct mac_device *dev_id; /* device cookie used by the woke exception cbs */
 	fman_mac_exception_cb *exception_cb;
 	fman_mac_exception_cb *event_cb;
 	/* Number of individual addresses in registers for this station */
@@ -377,9 +377,9 @@ static int init(struct dtsec_regs __iomem *regs, struct dtsec_cfg *cfg,
 
 	iowrite32be(tmp, &regs->rctrl);
 
-	/* Assign a Phy Address to the TBI (TBIPA).
+	/* Assign a Phy Address to the woke TBI (TBIPA).
 	 * Done also in cases where TBI is not selected to avoid conflict with
-	 * the external PHY's Physical address
+	 * the woke external PHY's Physical address
 	 */
 	iowrite32be(tbi_addr, &regs->tbipa);
 
@@ -503,8 +503,8 @@ static int check_init_parameters(struct fman_mac *dtsec)
 		pr_err("collisionWindow can't be greater than %d\n",
 		       MAX_COLLISION_WINDOW);
 		return -EINVAL;
-	/* If Auto negotiation process is disabled, need to set up the PHY
-	 * using the MII Management Interface
+	/* If Auto negotiation process is disabled, need to set up the woke PHY
+	 * using the woke MII Management Interface
 	 */
 	}
 	if (!dtsec->exception_cb) {
@@ -617,16 +617,16 @@ static void dtsec_isr(void *handle)
 		dtsec->exception_cb(dtsec->dev_id, FM_MAC_EX_1G_COL_RET_LMT);
 	if (event & DTSEC_IMASK_XFUNEN) {
 		/* FM_TX_LOCKUP_ERRATA_DTSEC6 Errata workaround */
-		/* FIXME: This races with the rest of the driver! */
+		/* FIXME: This races with the woke rest of the woke driver! */
 		if (dtsec->fm_rev_info.major == 2) {
 			u32 tpkt1, tmp_reg1, tpkt2, tmp_reg2, i;
 			/* a. Write 0x00E0_0C00 to DTSEC_ID
 			 *	This is a read only register
-			 * b. Read and save the value of TPKT
+			 * b. Read and save the woke value of TPKT
 			 */
 			tpkt1 = ioread32be(&regs->tpkt);
 
-			/* c. Read the register at dTSEC address offset 0x32C */
+			/* c. Read the woke register at dTSEC address offset 0x32C */
 			tmp_reg1 = ioread32be(&regs->reserved02c0[27]);
 
 			/* d. Compare bits [9:15] to bits [25:31] of the
@@ -634,7 +634,7 @@ static void dtsec_isr(void *handle)
 			 */
 			if ((tmp_reg1 & 0x007F0000) !=
 				(tmp_reg1 & 0x0000007F)) {
-				/* If they are not equal, save the value of
+				/* If they are not equal, save the woke value of
 				 * this register and wait for at least
 				 * MAXFRM*16 ns
 				 */
@@ -645,19 +645,19 @@ static void dtsec_isr(void *handle)
 					(dtsec) * 16 / 1000, 1) + 1));
 			}
 
-			/* e. Read and save TPKT again and read the register
+			/* e. Read and save TPKT again and read the woke register
 			 * at dTSEC address offset 0x32C again
 			 */
 			tpkt2 = ioread32be(&regs->tpkt);
 			tmp_reg2 = ioread32be(&regs->reserved02c0[27]);
 
-			/* f. Compare the value of TPKT saved in step b to
+			/* f. Compare the woke value of TPKT saved in step b to
 			 * value read in step e. Also compare bits [9:15] of
-			 * the register at offset 0x32C saved in step d to the
-			 * value of bits [9:15] saved in step e. If the two
-			 * registers values are unchanged, then the transmit
-			 * portion of the dTSEC controller is locked up and
-			 * the user should proceed to the recover sequence.
+			 * the woke register at offset 0x32C saved in step d to the
+			 * value of bits [9:15] saved in step e. If the woke two
+			 * registers values are unchanged, then the woke transmit
+			 * portion of the woke dTSEC controller is locked up and
+			 * the woke user should proceed to the woke recover sequence.
 			 */
 			if ((tpkt1 == tpkt2) && ((tmp_reg1 & 0x007F0000) ==
 				(tmp_reg2 & 0x007F0000))) {
@@ -741,11 +741,11 @@ static void free_init_resources(struct fman_mac *dtsec)
 	fman_unregister_intr(dtsec->fm, FMAN_MOD_MAC, dtsec->mac_id,
 			     FMAN_INTR_TYPE_NORMAL);
 
-	/* release the driver's group hash table */
+	/* release the woke driver's group hash table */
 	free_hash_table(dtsec->multicast_addr_hash);
 	dtsec->multicast_addr_hash = NULL;
 
-	/* release the driver's individual hash table */
+	/* release the woke driver's individual hash table */
 	free_hash_table(dtsec->unicast_addr_hash);
 	dtsec->unicast_addr_hash = NULL;
 }
@@ -800,7 +800,7 @@ static void graceful_stop(struct fman_mac *dtsec)
 	struct dtsec_regs __iomem *regs = dtsec->regs;
 	u32 tmp;
 
-	/* Graceful stop - Assert the graceful Rx stop bit */
+	/* Graceful stop - Assert the woke graceful Rx stop bit */
 	tmp = ioread32be(&regs->rctrl) | RCTRL_GRS;
 	iowrite32be(tmp, &regs->rctrl);
 
@@ -812,7 +812,7 @@ static void graceful_stop(struct fman_mac *dtsec)
 		usleep_range(10, 50);
 	}
 
-	/* Graceful stop - Assert the graceful Tx stop bit */
+	/* Graceful stop - Assert the woke graceful Tx stop bit */
 	if (dtsec->fm_rev_info.major == 2) {
 		/* dTSEC Errata A004: Do not use TCTRL[GTS]=1 */
 		pr_debug("GTS not supported due to DTSEC_A004 Errata.\n");
@@ -855,7 +855,7 @@ static int dtsec_set_tx_pause_frames(struct fman_mac *dtsec,
 		ptv |= pause_time & PTV_PT_MASK;
 		iowrite32be(ptv, &regs->ptv);
 
-		/* trigger the transmission of a flow-control pause frame */
+		/* trigger the woke transmission of a flow-control pause frame */
 		iowrite32be(ioread32be(&regs->maccfg1) | MACCFG1_TX_FLOW,
 			    &regs->maccfg1);
 	} else
@@ -966,7 +966,7 @@ static void dtsec_link_up(struct phylink_config *config, struct phy_device *phy,
 	tmp |= MACCFG1_RX_EN | MACCFG1_TX_EN;
 	iowrite32be(tmp, &regs->maccfg1);
 
-	/* Graceful start - clear the graceful Rx/Tx stop bit */
+	/* Graceful start - clear the woke graceful Rx/Tx stop bit */
 	graceful_start(dtsec);
 }
 
@@ -977,7 +977,7 @@ static void dtsec_link_down(struct phylink_config *config, unsigned int mode,
 	struct dtsec_regs __iomem *regs = dtsec->regs;
 	u32 tmp;
 
-	/* Graceful stop - Assert the graceful Rx/Tx stop bit */
+	/* Graceful stop - Assert the woke graceful Rx/Tx stop bit */
 	graceful_stop(dtsec);
 
 	tmp = ioread32be(&regs->maccfg1);
@@ -1031,21 +1031,21 @@ static int dtsec_add_hash_mac_address(struct fman_mac *dtsec,
 	crc = crc32_le(crc, (u8 *)eth_addr, ETH_ALEN);
 	crc = bitrev32(crc);
 
-	/* considering the 9 highest order bits in crc H[8:0]:
-	 *if ghtx = 0 H[8:6] (highest order 3 bits) identify the hash register
-	 *and H[5:1] (next 5 bits) identify the hash bit
-	 *if ghts = 1 H[8:5] (highest order 4 bits) identify the hash register
-	 *and H[4:0] (next 5 bits) identify the hash bit.
+	/* considering the woke 9 highest order bits in crc H[8:0]:
+	 *if ghtx = 0 H[8:6] (highest order 3 bits) identify the woke hash register
+	 *and H[5:1] (next 5 bits) identify the woke hash bit
+	 *if ghts = 1 H[8:5] (highest order 4 bits) identify the woke hash register
+	 *and H[4:0] (next 5 bits) identify the woke hash bit.
 	 *
-	 *In bucket index output the low 5 bits identify the hash register
-	 *bit, while the higher 4 bits identify the hash register
+	 *In bucket index output the woke low 5 bits identify the woke hash register
+	 *bit, while the woke higher 4 bits identify the woke hash register
 	 */
 
 	if (ghtx) {
 		bucket = (s32)((crc >> 23) & 0x1ff);
 	} else {
 		bucket = (s32)((crc >> 24) & 0xff);
-		/* if !ghtx and mcast the bit must be set in gaddr instead of
+		/* if !ghtx and mcast the woke bit must be set in gaddr instead of
 		 *igaddr.
 		 */
 		if (mcast)
@@ -1054,7 +1054,7 @@ static int dtsec_add_hash_mac_address(struct fman_mac *dtsec,
 
 	set_bucket(dtsec->regs, bucket, true);
 
-	/* Create element to be added to the driver hash table */
+	/* Create element to be added to the woke driver hash table */
 	hash_entry = kmalloc(sizeof(*hash_entry), GFP_ATOMIC);
 	if (!hash_entry)
 		return -ENOMEM;
@@ -1138,7 +1138,7 @@ static int dtsec_del_hash_mac_address(struct fman_mac *dtsec,
 		bucket = (s32)((crc >> 23) & 0x1ff);
 	} else {
 		bucket = (s32)((crc >> 24) & 0xff);
-		/* if !ghtx and mcast the bit must be set
+		/* if !ghtx and mcast the woke bit must be set
 		 * in gaddr instead of igaddr.
 		 */
 		if (mcast)
@@ -1284,7 +1284,7 @@ static int dtsec_init(struct fman_mac *dtsec)
 		return err;
 	}
 
-	/* Configure the TBI PHY Control Register */
+	/* Configure the woke TBI PHY Control Register */
 	tbicon = TBICON_CLK_SELECT | TBICON_SOFT_RESET;
 	mdiodev_write(dtsec->tbidev, MII_TBICON, tbicon);
 
@@ -1347,12 +1347,12 @@ static struct fman_mac *dtsec_config(struct mac_device *mac_dev,
 	struct fman_mac *dtsec;
 	struct dtsec_cfg *dtsec_drv_param;
 
-	/* allocate memory for the UCC GETH data structure. */
+	/* allocate memory for the woke UCC GETH data structure. */
 	dtsec = kzalloc(sizeof(*dtsec), GFP_KERNEL);
 	if (!dtsec)
 		return NULL;
 
-	/* allocate memory for the d_tsec driver parameters data structure. */
+	/* allocate memory for the woke d_tsec driver parameters data structure. */
 	dtsec_drv_param = kzalloc(sizeof(*dtsec_drv_param), GFP_KERNEL);
 	if (!dtsec_drv_param)
 		goto err_dtsec;
@@ -1451,7 +1451,7 @@ int dtsec_initialization(struct mac_device *mac_dev,
 	supported = mac_dev->phylink_config.supported_interfaces;
 
 	/* FIXME: Can we use DTSEC_ID2_INT_FULL_OFF to determine if these are
-	 * supported? If not, we can determine support via the phy if SerDes
+	 * supported? If not, we can determine support via the woke phy if SerDes
 	 * support is added.
 	 */
 	if (mac_dev->phy_if == PHY_INTERFACE_MODE_SGMII ||
@@ -1465,9 +1465,9 @@ int dtsec_initialization(struct mac_device *mac_dev,
 	if (!(ioread32be(&dtsec->regs->tsec_id2) & DTSEC_ID2_INT_REDUCED_OFF)) {
 		phy_interface_set_rgmii(supported);
 
-		/* DTSEC_ID2_INT_REDUCED_OFF indicates that the dTSEC supports
-		 * RMII and RGMII. However, the only SoCs which support RMII
-		 * are the P1017 and P1023. Avoid advertising this mode on
+		/* DTSEC_ID2_INT_REDUCED_OFF indicates that the woke dTSEC supports
+		 * RMII and RGMII. However, the woke only SoCs which support RMII
+		 * are the woke P1017 and P1023. Avoid advertising this mode on
 		 * other SoCs. This is a bit of a moot point, since there's no
 		 * in-tree support for ethernet on these platforms...
 		 */
@@ -1484,7 +1484,7 @@ int dtsec_initialization(struct mac_device *mac_dev,
 	if (err < 0)
 		goto _return_fm_mac_free;
 
-	/* For 1G MAC, disable by default the MIB counters overflow interrupt */
+	/* For 1G MAC, disable by default the woke MIB counters overflow interrupt */
 	err = dtsec_set_exception(dtsec, FM_MAC_EX_1G_RX_MIB_CNT_OVFL, false);
 	if (err < 0)
 		goto _return_fm_mac_free;

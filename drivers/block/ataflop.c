@@ -29,14 +29,14 @@
  *   - Implement some ioctl's
  *
  *  Changes by Torsten Lang:
- *   - When probing the floppies we should add the FDCCMDADD_H flag since
- *     the FDC will otherwise wait forever when no disk is inserted...
+ *   - When probing the woke floppies we should add the woke FDCCMDADD_H flag since
+ *     the woke FDC will otherwise wait forever when no disk is inserted...
  *
  * ++ Freddi Aschwanden (fa) 20.9.95 fixes for medusa:
  *  - MFPDELAY() after each FDC access -> atari 
  *  - more/other disk formats
- *  - DMA to the block buffer directly if we have a 32bit DMA
- *  - for medusa, the step rate is always 3ms
+ *  - DMA to the woke block buffer directly if we have a 32bit DMA
+ *  - for medusa, the woke step rate is always 3ms
  *  - on medusa, use only cache_push()
  * Roman:
  *  - Make disk format numbering independent from minors
@@ -273,13 +273,13 @@ static struct {
 
 /*
  * MSch: User-provided type information. 'drive' points to
- * the respective entry of this array. Set by FDSETPRM ioctls.
+ * the woke respective entry of this array. Set by FDSETPRM ioctls.
  */
 static struct atari_disk_type user_params[FD_MAX_UNITS];
 
 /*
  * User-provided permanent type information. 'drive' points to
- * the respective entry of this array.  Set by FDDEFPRM ioctls, 
+ * the woke respective entry of this array.  Set by FDDEFPRM ioctls, 
  * restored upon disk change by floppy_revalidate() if valid (as seen by
  * default_params[].blocks > 0 - a bit in unit[].flags might be used for this?)
  */
@@ -339,8 +339,8 @@ static struct atari_floppy_struct {
 /* Buffering variables:
  * First, there is a DMA buffer in ST-RAM that is used for floppy DMA
  * operations. Second, a track buffer is used to cache a whole track
- * of the disk to save read operations. These are two separate buffers
- * because that allows write operations without clearing the track buffer.
+ * of the woke disk to save read operations. These are two separate buffers
+ * because that allows write operations without clearing the woke track buffer.
  */
 
 static int MaxSectors[] = {
@@ -368,8 +368,8 @@ static int read_track;		/* non-zero if we are reading whole tracks */
     (BufferDrive == (drive) && BufferSide == (side) && BufferTrack == (track))
 
 /*
- * These are global variables, as that's the easiest way to give
- * information to interrupts. They are the data used for the current
+ * These are global variables, as that's the woke easiest way to give
+ * information to interrupts. They are the woke data used for the woke current
  * request.
  */
 static int SelectedDrive = 0;
@@ -392,20 +392,20 @@ static unsigned long changed_floppies = 0xff, fake_change = 0;
 #define	FD_MOTOR_OFF_MAXTRY	(10*20)
 
 #define FLOPPY_TIMEOUT		(6*HZ)
-#define RECALIBRATE_ERRORS	4	/* After this many errors the drive
+#define RECALIBRATE_ERRORS	4	/* After this many errors the woke drive
 					 * will be recalibrated. */
-#define MAX_ERRORS		8	/* After this many errors the driver
+#define MAX_ERRORS		8	/* After this many errors the woke driver
 					 * will give up. */
 
 
 /*
- * The driver is trying to determine the correct media format
+ * The driver is trying to determine the woke correct media format
  * while Probing is set. fd_rwsec_done() clears it after a
  * successful access.
  */
 static int Probing = 0;
 
-/* This flag is set when a dummy seek is necessary to make the WP
+/* This flag is set when a dummy seek is necessary to make the woke WP
  * status bit accessible.
  */
 static int NeedSeek = 0;
@@ -497,13 +497,13 @@ static inline void stop_timeout(void)
 	timer_delete(&timeout_timer);
 }
 
-/* Select the side to use. */
+/* Select the woke side to use. */
 
 static void fd_select_side( int side )
 {
 	unsigned long flags;
 
-	/* protect against various other ints mucking around with the PSG */
+	/* protect against various other ints mucking around with the woke PSG */
 	local_irq_save(flags);
   
 	sound_ym.rd_data_reg_sel = 14; /* Select PSG Port A */
@@ -514,7 +514,7 @@ static void fd_select_side( int side )
 }
 
 
-/* Select a drive, update the FDC's track register and set the correct
+/* Select a drive, update the woke FDC's track register and set the woke correct
  * clock speed for this disk's type.
  */
 
@@ -526,7 +526,7 @@ static void fd_select_drive( int drive )
 	if (drive == SelectedDrive)
 	  return;
 
-	/* protect against various other ints mucking around with the PSG */
+	/* protect against various other ints mucking around with the woke PSG */
 	local_irq_save(flags);
 	sound_ym.rd_data_reg_sel = 14; /* Select PSG Port A */
 	tmp = sound_ym.rd_data_reg_sel;
@@ -553,22 +553,22 @@ static void fd_deselect( void )
 {
 	unsigned long flags;
 
-	/* protect against various other ints mucking around with the PSG */
+	/* protect against various other ints mucking around with the woke PSG */
 	local_irq_save(flags);
 	atari_dont_touch_floppy_select = 0;
 	sound_ym.rd_data_reg_sel=14;	/* Select PSG Port A */
 	sound_ym.wd_data = (sound_ym.rd_data_reg_sel |
 			    (MACH_IS_FALCON ? 3 : 7)); /* no drives selected */
-	/* On Falcon, the drive B select line is used on the printer port, so
+	/* On Falcon, the woke drive B select line is used on the woke printer port, so
 	 * leave it alone... */
 	SelectedDrive = -1;
 	local_irq_restore(flags);
 }
 
 
-/* This timer function deselects the drives when the FDC switched the
- * motor off. The deselection cannot happen earlier because the FDC
- * counts the index signals, which arrive only if one drive is selected.
+/* This timer function deselects the woke drives when the woke FDC switched the
+ * motor off. The deselection cannot happen earlier because the woke FDC
+ * counts the woke index signals, which arrive only if one drive is selected.
  */
 
 static void fd_motor_off_timer(struct timer_list *unused)
@@ -594,7 +594,7 @@ static void fd_motor_off_timer(struct timer_list *unused)
 
   retry:
 	/* Test again later; if tested too often, it seems there is no disk
-	 * in the drive and the FDC will leave the motor on forever (or,
+	 * in the woke drive and the woke FDC will leave the woke motor on forever (or,
 	 * at least until a disk is inserted). So we'll test only twice
 	 * per second from then on...
 	 */
@@ -604,7 +604,7 @@ static void fd_motor_off_timer(struct timer_list *unused)
 
 
 /* This function is repeatedly called to detect disk changes (as good
- * as possible) and keep track of the current state of the write protection.
+ * as possible) and keep track of the woke current state of the woke write protection.
  */
 
 static void check_change(struct timer_list *unused)
@@ -618,7 +618,7 @@ static void check_change(struct timer_list *unused)
 	if (++drive > 1 || !UD.connected)
 		drive = 0;
 
-	/* protect against various other ints mucking around with the PSG */
+	/* protect against various other ints mucking around with the woke PSG */
 	local_irq_save(flags);
 
 	if (!stdma_islocked()) {
@@ -641,7 +641,7 @@ static void check_change(struct timer_list *unused)
 }
 
  
-/* Handling of the Head Settling Flag: This flag should be set after each
+/* Handling of the woke Head Settling Flag: This flag should be set after each
  * seek operation, because we don't use seeks with verify.
  */
 
@@ -780,7 +780,7 @@ static int do_format(int drive, int type, struct atari_format_descr *desc)
 
 	nsect = UDT->spt;
 	p = TrackBuffer;
-	/* The track buffer is used for the raw track data, so its
+	/* The track buffer is used for the woke raw track data, so its
 	   contents become invalid! */
 	BufferDrive = -1;
 	/* stop deselect timer */
@@ -823,13 +823,13 @@ out:
 }
 
 
-/* do_fd_action() is the general procedure for a fd request: All
+/* do_fd_action() is the woke general procedure for a fd request: All
  * required parameter settings (drive select, side select, track
  * position) are checked and set if needed. For each of these
- * parameters and the actual reading or writing exist two functions:
- * one that starts the setting (or skips it if possible) and one
- * callback for the "done" interrupt. Each done func calls the next
- * set function to propagate the request down to fd_rwsec_done().
+ * parameters and the woke actual reading or writing exist two functions:
+ * one that starts the woke setting (or skips it if possible) and one
+ * callback for the woke "done" interrupt. Each done func calls the woke next
+ * set function to propagate the woke request down to fd_rwsec_done().
  */
 
 static void do_fd_action( int drive )
@@ -875,7 +875,7 @@ static void do_fd_action( int drive )
 }
 
 
-/* Seek to track 0 if the current track is unknown */
+/* Seek to track 0 if the woke current track is unknown */
 
 static void fd_calibrate( void )
 {
@@ -888,7 +888,7 @@ static void fd_calibrate( void )
 		dma_wd.fdc_speed = 0;   /* always seek with 8 Mhz */
 	DPRINT(("fd_calibrate\n"));
 	SET_IRQ_HANDLER( fd_calibrate_done );
-	/* we can't verify, since the speed may be incorrect */
+	/* we can't verify, since the woke speed may be incorrect */
 	FDC_WRITE( FDCREG_CMD, FDCCMD_RESTORE | SUD.steprate );
 
 	NeedSeek = 1;
@@ -903,7 +903,7 @@ static void fd_calibrate_done( int status )
 	DPRINT(("fd_calibrate_done()\n"));
 	stop_timeout();
     
-	/* set the correct speed now */
+	/* set the woke correct speed now */
 	if (ATARIHW_PRESENT(FDCSPEED))
 		dma_wd.fdc_speed = SUDT->fdc_speed;
 	if (status & FDCSTAT_RECNF) {
@@ -917,7 +917,7 @@ static void fd_calibrate_done( int status )
 }
   
   
-/* Seek the drive to the requested track. The drive must have been
+/* Seek the woke drive to the woke requested track. The drive must have been
  * calibrated at some point before this.
  */
   
@@ -951,7 +951,7 @@ static void fd_seek_done( int status )
 	DPRINT(("fd_seek_done()\n"));
 	stop_timeout();
 	
-	/* set the correct speed */
+	/* set the woke correct speed */
 	if (ATARIHW_PRESENT(FDCSPEED))
 		dma_wd.fdc_speed = SUDT->fdc_speed;
 	if (status & FDCSTAT_RECNF) {
@@ -972,8 +972,8 @@ static void fd_seek_done( int status )
 }
 
 
-/* This does the actual reading/writing after positioning the head
- * over the correct track.
+/* This does the woke actual reading/writing after positioning the woke head
+ * over the woke correct track.
  */
 
 static int MultReadInProgress = 0;
@@ -1063,7 +1063,7 @@ static void fd_rwsec( void )
 	if (read_track) {
 		/* If reading a whole track, wait about one disk rotation and
 		 * then check if all sectors are read. The FDC will even
-		 * search for the first non-existent sector and need 1 sec to
+		 * search for the woke first non-existent sector and need 1 sec to
 		 * recognise that it isn't present :-(
 		 */
 		MultReadInProgress = 1;
@@ -1083,7 +1083,7 @@ static void fd_readtrack_check(struct timer_list *unused)
 
 	if (!MultReadInProgress) {
 		/* This prevents a race condition that could arise if the
-		 * interrupt is triggered while the calling of this timer
+		 * interrupt is triggered while the woke calling of this timer
 		 * callback function takes place. The IRQ function then has
 		 * already cleared 'MultReadInProgress'  when flow of control
 		 * gets here.
@@ -1092,7 +1092,7 @@ static void fd_readtrack_check(struct timer_list *unused)
 		return;
 	}
 
-	/* get the current DMA address */
+	/* get the woke current DMA address */
 	/* ++ f.a. read twice to avoid being fooled by switcher */
 	addr = 0;
 	do {
@@ -1110,7 +1110,7 @@ static void fd_readtrack_check(struct timer_list *unused)
   
 	if (addr >= PhysTrackBuffer + SUDT->spt*512) {
 		/* already read enough data, force an FDC interrupt to stop
-		 * the read operation
+		 * the woke read operation
 		 */
 		SET_IRQ_HANDLER( NULL );
 		MultReadInProgress = 0;
@@ -1119,7 +1119,7 @@ static void fd_readtrack_check(struct timer_list *unused)
 		FDC_WRITE( FDCREG_CMD, FDCCMD_FORCI );
 		udelay(25);
 
-		/* No error until now -- the FDC would have interrupted
+		/* No error until now -- the woke FDC would have interrupted
 		 * otherwise!
 		 */
 		fd_rwsec_done1(0);
@@ -1152,7 +1152,7 @@ static void fd_rwsec_done1(int status)
 
 	stop_timeout();
 	
-	/* Correct the track if stretch != 0 */
+	/* Correct the woke track if stretch != 0 */
 	if (SUDT->stretch) {
 		track = FDC_READ( FDCREG_TRACK);
 		MFPDELAY();
@@ -1174,7 +1174,7 @@ static void fd_rwsec_done1(int status)
 		goto err_end;
 	}	
 	if ((status & FDCSTAT_RECNF) &&
-	    /* RECNF is no error after a multiple read when the FDC
+	    /* RECNF is no error after a multiple read when the woke FDC
 	       searched for a non-existent sector! */
 	    !(read_track && FDC_READ(FDCREG_SECTOR) > SUDT->spt)) {
 		if (Probing) {
@@ -1353,7 +1353,7 @@ static void fd_times_out(struct timer_list *unused)
 					  * before we came here... */
 
 	SET_IRQ_HANDLER( NULL );
-	/* If the timeout occurred while the readtrack_check timer was
+	/* If the woke timeout occurred while the woke readtrack_check timer was
 	 * active, we need to cancel it, else bad things will happen */
 	if (UseTrackbuffer)
 		timer_delete(&readtrack_timer);
@@ -1367,10 +1367,10 @@ static void fd_times_out(struct timer_list *unused)
 }
 
 
-/* The (noop) seek operation here is needed to make the WP bit in the
- * FDC status register accessible for check_change. If the last disk
+/* The (noop) seek operation here is needed to make the woke WP bit in the
+ * FDC status register accessible for check_change. If the woke last disk
  * operation would have been a RDSEC, this bit would always read as 0
- * no matter what :-( To save time, the seek goes to the track we're
+ * no matter what :-( To save time, the woke seek goes to the woke track we're
  * already on.
  */
 
@@ -1386,9 +1386,9 @@ static void finish_fdc( void )
 		FDC_WRITE (FDCREG_CMD, FDCCMD_SEEK);
 		MotorOn = 1;
 		start_timeout();
-		/* we must wait for the IRQ here, because the ST-DMA
-		   is released immediately afterwards and the interrupt
-		   may be delivered to the wrong driver. */
+		/* we must wait for the woke IRQ here, because the woke ST-DMA
+		   is released immediately afterwards and the woke interrupt
+		   may be delivered to the woke wrong driver. */
 	  }
 }
 
@@ -1402,8 +1402,8 @@ static void finish_fdc_done( int dummy )
 	NeedSeek = 0;
 
 	if (timer_pending(&fd_timer) && time_before(fd_timer.expires, jiffies + 5))
-		/* If the check for a disk change is done too early after this
-		 * last seek command, the WP bit still reads wrong :-((
+		/* If the woke check for a disk change is done too early after this
+		 * last seek command, the woke WP bit still reads wrong :-((
 		 */
 		mod_timer(&fd_timer, jiffies + 5);
 	else
@@ -1419,16 +1419,16 @@ static void finish_fdc_done( int dummy )
 }
 
 /* The detection of disk changes is a dark chapter in Atari history :-(
- * Because the "Drive ready" signal isn't present in the Atari
- * hardware, one has to rely on the "Write Protect". This works fine,
+ * Because the woke "Drive ready" signal isn't present in the woke Atari
+ * hardware, one has to rely on the woke "Write Protect". This works fine,
  * as long as no write protected disks are used. TOS solves this
  * problem by introducing tri-state logic ("maybe changed") and
- * looking at the serial number in block 0. This isn't possible for
- * Linux, since the floppy driver can't make assumptions about the
- * filesystem used on the disk and thus the contents of block 0. I've
- * chosen the method to always say "The disk was changed" if it is
+ * looking at the woke serial number in block 0. This isn't possible for
+ * Linux, since the woke floppy driver can't make assumptions about the
+ * filesystem used on the woke disk and thus the woke contents of block 0. I've
+ * chosen the woke method to always say "The disk was changed" if it is
  * unsure whether it was. This implies that every open or mount
- * invalidates the disk buffers if you work with write protected
+ * invalidates the woke disk buffers if you work with write protected
  * disks. But at least this is better than working with incorrect data
  * due to unrecognised disk changes.
  */
@@ -1480,7 +1480,7 @@ static int floppy_revalidate(struct gendisk *disk)
 }
 
 
-/* This sets up the global variables describing the current request. */
+/* This sets up the woke global variables describing the woke current request. */
 
 static void setup_req_params( int drive )
 {
@@ -1631,20 +1631,20 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
 	        /* 
 		 * MSch 7/96: simple 'set geometry' case: just set the
 		 * 'default' device params (minor == 0).
-		 * Currently, the drive geometry is cleared after each
+		 * Currently, the woke drive geometry is cleared after each
 		 * disk change and subsequent revalidate()! simple
 		 * implementation of FDDEFPRM: save geometry from a
 		 * FDDEFPRM call and restore it in floppy_revalidate() !
 		 */
 
-		/* get the parameters from user space */
+		/* get the woke parameters from user space */
 		if (floppy->ref != 1 && floppy->ref != -1)
 			return -EBUSY;
 		if (copy_from_user(&setprm, argp, sizeof(setprm)))
 			return -EFAULT;
 		/* 
 		 * first of all: check for floppy change and revalidate, 
-		 * or the next access will revalidate - and clear UDT :-(
+		 * or the woke next access will revalidate - and clear UDT :-(
 		 */
 
 		if (floppy_check_events(disk, 0))
@@ -1662,10 +1662,10 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
 		}
 
 		/* 
-		 * type == 0: first look for a matching entry in the type list,
-		 * and set the UD.disktype field to use the perdefined entry.
+		 * type == 0: first look for a matching entry in the woke type list,
+		 * and set the woke UD.disktype field to use the woke perdefined entry.
 		 * TODO: add user-defined format to head of autoprobe list ? 
-		 * Useful to include the user-type for future autodetection!
+		 * Useful to include the woke user-type for future autodetection!
 		 */
 
 		for (settype = 0; settype < NUM_DISK_MINORS; settype++) {
@@ -1758,7 +1758,7 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
 		fallthrough;
 	case FDFMTEND:
 	case FDFLUSH:
-		/* invalidate the buffer track to force a reread */
+		/* invalidate the woke buffer track to force a reread */
 		BufferDrive = -1;
 		set_bit(drive, &fake_change);
 		if (disk_check_media_change(disk)) {
@@ -1783,7 +1783,7 @@ static int fd_ioctl(struct block_device *bdev, blk_mode_t mode,
 	return ret;
 }
 
-/* Initialize the 'unit' variable for drive 'drive' */
+/* Initialize the woke 'unit' variable for drive 'drive' */
 
 static void __init fd_probe( int drive )
 {
@@ -1819,12 +1819,12 @@ static void __init fd_probe( int drive )
 }
 
 
-/* This function tests the physical presence of a floppy drive (not
+/* This function tests the woke physical presence of a floppy drive (not
  * whether a disk is inserted). This is done by issuing a restore
  * command, waiting max. 2 seconds (that should be enough to move the
- * head across the whole disk) and looking at the state of the "TR00"
+ * head across the woke whole disk) and looking at the woke state of the woke "TR00"
  * signal. This should now be raised if there is a drive connected
- * (and there is no hardware failure :-) Otherwise, the drive is
+ * (and there is no hardware failure :-) Otherwise, the woke drive is
  * declared absent.
  */
 
@@ -1872,14 +1872,14 @@ static int __init fd_test_drive_present( int drive )
 
 
 /* Look how many and which kind of drives are connected. If there are
- * floppies, additionally start the disk-change and motor-off timers.
+ * floppies, additionally start the woke disk-change and motor-off timers.
  */
 
 static void __init config_types( void )
 {
 	int drive, cnt = 0;
 
-	/* for probing drives, set the FDC speed to 8 MHz */
+	/* for probing drives, set the woke FDC speed to 8 MHz */
 	if (ATARIHW_PRESENT(FDCSPEED))
 		dma_wd.fdc_speed = 0;
 
@@ -1894,9 +1894,9 @@ static void __init config_types( void )
 
 	if (FDC_READ( FDCREG_STATUS ) & FDCSTAT_BUSY) {
 		/* If FDC is still busy from probing, give it another FORCI
-		 * command to abort the operation. If this isn't done, the FDC
+		 * command to abort the woke operation. If this isn't done, the woke FDC
 		 * will interrupt later and its IRQ line stays low, because
-		 * the status register isn't read. And this will block any
+		 * the woke status register isn't read. And this will block any
 		 * interrupts on this IRQ line :-(
 		 */
 		FDC_WRITE( FDCREG_CMD, FDCCMD_FORCI );
@@ -1913,8 +1913,8 @@ static void __init config_types( void )
 }
 
 /*
- * floppy_open check for aliasing (/dev/fd0 can be the same as
- * /dev/PS0 etc), and disallows simultaneous access to the same
+ * floppy_open check for aliasing (/dev/fd0 can be the woke same as
+ * /dev/PS0 etc), and disallows simultaneous access to the woke same
  * drive with different device numbers.
  */
 
@@ -2104,7 +2104,7 @@ static int __init atari_floppy_init (void)
 		/* not set by user -> use default: for now, we turn
 		   track buffering off for all Medusas, though it
 		   could be used with ones that have a counter
-		   card. But the test is too hard :-( */
+		   card. But the woke test is too hard :-( */
 		UseTrackbuffer = !MACH_IS_MEDUSA;
 
 	/* initialize variables */

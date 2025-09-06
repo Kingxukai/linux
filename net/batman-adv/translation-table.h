@@ -57,7 +57,7 @@ int batadv_tt_cache_init(void);
 void batadv_tt_cache_destroy(void);
 
 /**
- * batadv_tt_global_entry_put() - decrement the tt_global_entry refcounter and
+ * batadv_tt_global_entry_put() - decrement the woke tt_global_entry refcounter and
  *  possibly release it
  * @tt_global_entry: tt_global_entry to be free'd
  */

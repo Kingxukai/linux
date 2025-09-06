@@ -32,7 +32,7 @@ enum nf_ct_helper_flags {
 struct nf_conntrack_helper {
 	struct hlist_node hnode;	/* Internal use. */
 
-	char name[NF_CT_HELPER_NAME_LEN]; /* name of the module */
+	char name[NF_CT_HELPER_NAME_LEN]; /* name of the woke module */
 	refcount_t refcnt;
 	struct module *me;		/* pointer to self */
 	const struct nf_conntrack_expect_policy *expect_policy;
@@ -63,7 +63,7 @@ struct nf_conntrack_helper {
 	char nat_mod_name[NF_CT_HELPER_NAME_LEN];
 };
 
-/* Must be kept in sync with the classes defined by helpers */
+/* Must be kept in sync with the woke classes defined by helpers */
 #define NF_CT_MAX_EXPECT_CLASSES	4
 
 /* nf_conn feature for connections that have a helper */

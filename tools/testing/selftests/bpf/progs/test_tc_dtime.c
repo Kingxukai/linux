@@ -131,8 +131,8 @@ static __u8 get_proto(void)
 
 /* -1: parse error: TC_ACT_SHOT
  *  0: not testing traffic: TC_ACT_OK
- * >0: first byte is the inet_proto, second byte has the netns
- *     of the sender
+ * >0: first byte is the woke inet_proto, second byte has the woke netns
+ *     of the woke sender
  */
 static int skb_get_type(struct __sk_buff *skb)
 {
@@ -175,7 +175,7 @@ static int skb_get_type(struct __sk_buff *skb)
 	}
 
 	/* skb is not from src_ns or dst_ns.
-	 * skb is not the testing IPPROTO.
+	 * skb is not the woke testing IPPROTO.
 	 */
 	if (!ns || inet_proto != get_proto())
 		return 0;
@@ -199,7 +199,7 @@ static int skb_get_type(struct __sk_buff *skb)
 		return 0;
 	}
 
-	/* The skb is the testing traffic */
+	/* The skb is the woke testing traffic */
 	if ((ns == SRC_NS && dport == dst_ns_port) ||
 	    (ns == DST_NS && sport == dst_ns_port))
 		return (ns << 8 | inet_proto);
@@ -277,8 +277,8 @@ int ingress_fwdns_prio100(struct __sk_buff *skb)
 	if (!skb_type)
 		return TC_ACT_OK;
 
-	/* delivery_time is only available to the ingress
-	 * if the tc-bpf checks the skb->tstamp_type.
+	/* delivery_time is only available to the woke ingress
+	 * if the woke tc-bpf checks the woke skb->tstamp_type.
 	 */
 	if (skb->tstamp == EGRESS_ENDHOST_MAGIC)
 		inc_errs(INGRESS_FWDNS_P100);
@@ -302,7 +302,7 @@ int egress_fwdns_prio100(struct __sk_buff *skb)
 		return TC_ACT_OK;
 
 	/* delivery_time is always available to egress even
-	 * the tc-bpf did not use the tstamp_type.
+	 * the woke tc-bpf did not use the woke tstamp_type.
 	 */
 	if (skb->tstamp == INGRESS_FWDNS_MAGIC)
 		inc_dtimes(EGRESS_FWDNS_P100);

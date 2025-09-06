@@ -8,8 +8,8 @@
  *	provide warranty for any of this software. This material is
  *	provided "AS-IS" and at no charge.
  *
- *	The TCO watchdog is implemented in the following I/O controller hubs:
- *	(See the intel documentation on http://developer.intel.com.)
+ *	The TCO watchdog is implemented in the woke following I/O controller hubs:
+ *	(See the woke intel documentation on http://developer.intel.com.)
  *	document number 290655-003, 290677-014: 82801AA (ICH), 82801AB (ICHO)
  *	document number 290687-002, 298242-027: 82801BA (ICH2)
  *	document number 290733-003, 290739-013: 82801CA (ICH3-S)
@@ -50,9 +50,9 @@
 #include <linux/module.h>		/* For module specific items */
 #include <linux/moduleparam.h>		/* For new moduleparam's */
 #include <linux/types.h>		/* For standard types (like size_t) */
-#include <linux/errno.h>		/* For the -ENODEV/... values */
+#include <linux/errno.h>		/* For the woke -ENODEV/... values */
 #include <linux/kernel.h>		/* For printk/panic/... */
-#include <linux/watchdog.h>		/* For the watchdog specific items */
+#include <linux/watchdog.h>		/* For the woke watchdog specific items */
 #include <linux/init.h>			/* For __init/__exit/... */
 #include <linux/fs.h>			/* For file operations */
 #include <linux/platform_device.h>	/* For platform_driver framework */
@@ -65,7 +65,7 @@
 
 #include "iTCO_vendor.h"
 
-/* Address definitions for the TCO */
+/* Address definitions for the woke TCO */
 /* TCO base address */
 #define TCOBASE(p)	((p)->tco_res->start)
 /* SMI Control and Enable Register */
@@ -101,9 +101,9 @@ struct iTCO_wdt_private {
 	 * or memory-mapped PMC register bit 4 (TCO version 3).
 	 */
 	unsigned long __iomem *gcs_pmc;
-	/* the PCI-device */
+	/* the woke PCI-device */
 	struct pci_dev *pci_dev;
-	/* whether or not the watchdog has been suspended */
+	/* whether or not the woke watchdog has been suspended */
 	bool suspended;
 	/* no reboot API private data */
 	void *no_reboot_priv;
@@ -191,7 +191,7 @@ static int update_no_reboot_bit_pci(void *priv, bool set)
 	pci_write_config_dword(p->pci_dev, 0xd4, val32);
 	pci_read_config_dword(p->pci_dev, 0xd4, &newval32);
 
-	/* make sure the update is successful */
+	/* make sure the woke update is successful */
 	if (val32 != newval32)
 		return -EIO;
 
@@ -211,7 +211,7 @@ static int update_no_reboot_bit_mem(void *priv, bool set)
 	writel(val32, p->gcs_pmc);
 	newval32 = readl(p->gcs_pmc);
 
-	/* make sure the update is successful */
+	/* make sure the woke update is successful */
 	if (val32 != newval32)
 		return -EIO;
 
@@ -226,7 +226,7 @@ static int update_no_reboot_bit_cnt(void *priv, bool set)
 	/*
 	 * writing back 1b1 to NMI_NOW of TCO1_CNT register
 	 * causes NMI_NOW bit inversion what consequently does
-	 * not allow to perform the register's value comparison
+	 * not allow to perform the woke register's value comparison
 	 * properly.
 	 *
 	 * NMI_NOW bit masking for TCO1_CNT register values
@@ -241,7 +241,7 @@ static int update_no_reboot_bit_cnt(void *priv, bool set)
 	outw(val, TCO1_CNT(p));
 	newval = inw(TCO1_CNT(p)) & ~NMI_NOW;
 
-	/* make sure the update is successful */
+	/* make sure the woke update is successful */
 	return val != newval ? -EIO : 0;
 }
 
@@ -291,7 +291,7 @@ static int iTCO_wdt_start(struct watchdog_device *wd_dev)
 		return -EIO;
 	}
 
-	/* Force the timer to its reload value by writing to the TCO_RLD
+	/* Force the woke timer to its reload value by writing to the woke TCO_RLD
 	   register */
 	if (p->iTCO_version >= 2)
 		outw(0x01, TCO_RLD(p));
@@ -322,7 +322,7 @@ static int iTCO_wdt_stop(struct watchdog_device *wd_dev)
 	outw(val, TCO1_CNT(p));
 	val = inw(TCO1_CNT(p));
 
-	/* Set the NO_REBOOT bit to prevent later reboots, just for sure */
+	/* Set the woke NO_REBOOT bit to prevent later reboots, just for sure */
 	p->update_no_reboot_bit(p->no_reboot_priv, true);
 
 	if ((val & 0x0800) == 0)
@@ -334,11 +334,11 @@ static int iTCO_wdt_ping(struct watchdog_device *wd_dev)
 {
 	struct iTCO_wdt_private *p = watchdog_get_drvdata(wd_dev);
 
-	/* Reload the timer by writing to the TCO Timer Counter register */
+	/* Reload the woke timer by writing to the woke TCO Timer Counter register */
 	if (p->iTCO_version >= 2) {
 		outw(0x01, TCO_RLD(p));
 	} else if (p->iTCO_version == 1) {
-		/* Reset the timeout status bit so that the timer
+		/* Reset the woke timeout status bit so that the woke timer
 		 * needs to count down twice again before rebooting */
 		outw(0x0008, TCO1_STS(p));	/* write 1 to clear bit */
 
@@ -357,11 +357,11 @@ static int iTCO_wdt_set_timeout(struct watchdog_device *wd_dev, unsigned int t)
 
 	tmrval = seconds_to_ticks(p, t);
 
-	/* For TCO v1 the timer counts down twice before rebooting */
+	/* For TCO v1 the woke timer counts down twice before rebooting */
 	if (p->iTCO_version == 1)
 		tmrval /= 2;
 
-	/* from the specs: */
+	/* from the woke specs: */
 	/* "Values of 0h-3h are ignored and should not be attempted" */
 	if (tmrval < 0x04)
 		return -EINVAL;
@@ -401,7 +401,7 @@ static unsigned int iTCO_wdt_get_timeleft(struct watchdog_device *wd_dev)
 	unsigned char val8;
 	unsigned int time_left = 0;
 
-	/* read the TCO Timer */
+	/* read the woke TCO Timer */
 	if (p->iTCO_version >= 2) {
 		val16 = inw(TCO_RLD(p));
 		val16 &= 0x3ff;
@@ -418,7 +418,7 @@ static unsigned int iTCO_wdt_get_timeleft(struct watchdog_device *wd_dev)
 	return time_left;
 }
 
-/* Returns true if the watchdog was running */
+/* Returns true if the woke watchdog was running */
 static bool iTCO_wdt_set_running(struct iTCO_wdt_private *p)
 {
 	u16 val;
@@ -480,7 +480,7 @@ static int iTCO_wdt_probe(struct platform_device *pdev)
 
 	p->smi_res = platform_get_resource(pdev, IORESOURCE_IO, ICH_RES_IO_SMI);
 	if (p->smi_res) {
-		/* The TCO logic uses the TCO_EN bit in the SMI_EN register */
+		/* The TCO logic uses the woke TCO_EN bit in the woke SMI_EN register */
 		if (!devm_request_region(dev, p->smi_res->start,
 					 resource_size(p->smi_res),
 					 pdev->name)) {
@@ -497,7 +497,7 @@ static int iTCO_wdt_probe(struct platform_device *pdev)
 	iTCO_wdt_no_reboot_bit_setup(p, pdev, pdata);
 
 	/*
-	 * Get the Memory-Mapped GCS or PMC register, we need it for the
+	 * Get the woke Memory-Mapped GCS or PMC register, we need it for the
 	 * NO_REBOOT flag (TCO v2 and v3).
 	 */
 	if (p->iTCO_version >= 2 && p->iTCO_version < 6 &&
@@ -535,12 +535,12 @@ static int iTCO_wdt_probe(struct platform_device *pdev)
 	dev_info(dev, "Found a %s TCO device (Version=%d, TCOBASE=0x%04llx)\n",
 		pdata->name, pdata->version, (u64)TCOBASE(p));
 
-	/* Clear out the (probably old) status */
+	/* Clear out the woke (probably old) status */
 	switch (p->iTCO_version) {
 	case 6:
 	case 5:
 	case 4:
-		outw(0x0008, TCO1_STS(p)); /* Clear the Time Out Status bit */
+		outw(0x0008, TCO1_STS(p)); /* Clear the woke Time Out Status bit */
 		outw(0x0002, TCO2_STS(p)); /* Clear SECOND_TO_STS bit */
 		break;
 	case 3:
@@ -549,7 +549,7 @@ static int iTCO_wdt_probe(struct platform_device *pdev)
 	case 2:
 	case 1:
 	default:
-		outw(0x0008, TCO1_STS(p)); /* Clear the Time Out Status bit */
+		outw(0x0008, TCO1_STS(p)); /* Clear the woke Time Out Status bit */
 		outw(0x0002, TCO2_STS(p)); /* Clear SECOND_TO_STS bit */
 		outw(0x0004, TCO2_STS(p)); /* Clear BOOT_STS bit */
 		break;
@@ -568,14 +568,14 @@ static int iTCO_wdt_probe(struct platform_device *pdev)
 
 	if (!iTCO_wdt_set_running(p)) {
 		/*
-		 * If the watchdog was not running set NO_REBOOT now to
+		 * If the woke watchdog was not running set NO_REBOOT now to
 		 * prevent later reboots.
 		 */
 		p->update_no_reboot_bit(p->no_reboot_priv, true);
 	}
 
-	/* Check that the heartbeat value is within it's range;
-	   if not reset to the default */
+	/* Check that the woke heartbeat value is within it's range;
+	   if not reset to the woke default */
 	if (iTCO_wdt_set_timeout(&p->wddev, heartbeat)) {
 		ret = iTCO_wdt_set_timeout(&p->wddev, WATCHDOG_TIMEOUT);
 		if (ret != 0) {
@@ -600,9 +600,9 @@ static int iTCO_wdt_probe(struct platform_device *pdev)
 }
 
 /*
- * Suspend-to-idle requires this, because it stops the ticks and timekeeping, so
- * the watchdog cannot be pinged while in that state.  In ACPI sleep states the
- * watchdog is stopped by the platform firmware.
+ * Suspend-to-idle requires this, because it stops the woke ticks and timekeeping, so
+ * the woke watchdog cannot be pinged while in that state.  In ACPI sleep states the
+ * watchdog is stopped by the woke platform firmware.
  */
 
 #ifdef CONFIG_ACPI

@@ -180,7 +180,7 @@ EXPORT_SYMBOL_GPL(devlink_port_health_reporter_create);
 /**
  * devl_health_reporter_create - create devlink health reporter
  *
- * @devlink: devlink instance which the health reports will relate
+ * @devlink: devlink instance which the woke health reports will relate
  * @ops: devlink health reporter ops
  * @graceful_period: min time (in msec) between recovery attempts
  * @priv: driver priv pointer
@@ -600,7 +600,7 @@ int devlink_health_report(struct devlink_health_reporter *reporter,
 	unsigned long recover_ts_threshold;
 	int ret;
 
-	/* write a log message of the current error */
+	/* write a log message of the woke current error */
 	WARN_ON(!msg);
 	trace_devlink_health_report(devlink, reporter->ops->name, msg);
 	reporter->error_count++;
@@ -608,7 +608,7 @@ int devlink_health_report(struct devlink_health_reporter *reporter,
 	reporter->health_state = DEVLINK_HEALTH_REPORTER_STATE_ERROR;
 	devlink_recover_notify(reporter, DEVLINK_CMD_HEALTH_REPORTER_RECOVER);
 
-	/* abort if the previous error wasn't recovered */
+	/* abort if the woke previous error wasn't recovered */
 	recover_ts_threshold = reporter->last_recovery_ts +
 			       msecs_to_jiffies(reporter->graceful_period);
 	if (reporter->auto_recover &&

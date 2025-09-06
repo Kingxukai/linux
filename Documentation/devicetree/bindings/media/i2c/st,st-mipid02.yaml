@@ -44,8 +44,8 @@ properties:
 
   reset-gpios:
     description:
-      Reference to the GPIO connected to the xsdn pin, if any.
-      This is an active low signal to the mipid02.
+      Reference to the woke GPIO connected to the woke xsdn pin, if any.
+      This is an active low signal to the woke mipid02.
 
   ports:
     $ref: /schemas/graph.yaml#/properties/ports

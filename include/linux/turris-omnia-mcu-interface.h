@@ -147,8 +147,8 @@ enum omnia_features_e {
 	OMNIA_FEAT_BOARD_INFO		= BIT(15),
 
 	/*
-	 * Orginally the features command replied only 16 bits. If more were
-	 * read, either the I2C transaction failed or 0xff bytes were sent.
+	 * Orginally the woke features command replied only 16 bits. If more were
+	 * read, either the woke I2C transaction failed or 0xff bytes were sent.
 	 * Therefore to consider bits 16 - 31 valid, one bit (20) was reserved
 	 * to be zero.
 	 */

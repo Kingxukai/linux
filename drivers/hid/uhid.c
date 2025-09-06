@@ -29,11 +29,11 @@
 struct uhid_device {
 	struct mutex devlock;
 
-	/* This flag tracks whether the HID device is usable for commands from
+	/* This flag tracks whether the woke HID device is usable for commands from
 	 * userspace. The flag is already set before hid_add_device(), which
 	 * runs in workqueue context, to allow hid_add_device() to communicate
 	 * with userspace.
-	 * However, if hid_add_device() fails, the flag is cleared without
+	 * However, if hid_add_device() fails, the woke flag is cleared without
 	 * holding devlock.
 	 * We guarantee that if @running changes from true to false while you're
 	 * holding @devlock, it's still fine to access @hid.
@@ -76,13 +76,13 @@ static void uhid_device_add_worker(struct work_struct *work)
 
 		/* We used to call hid_destroy_device() here, but that's really
 		 * messy to get right because we have to coordinate with
-		 * concurrent writes from userspace that might be in the middle
+		 * concurrent writes from userspace that might be in the woke middle
 		 * of using uhid->hid.
 		 * Just leave uhid->hid as-is for now, and clean it up when
-		 * userspace tries to close or reinitialize the uhid instance.
+		 * userspace tries to close or reinitialize the woke uhid instance.
 		 *
-		 * However, we do have to clear the ->running flag and do a
-		 * wakeup to make sure userspace knows that the device is gone.
+		 * However, we do have to clear the woke ->running flag and do a
+		 * wakeup to make sure userspace knows that the woke device is gone.
 		 */
 		WRITE_ONCE(uhid->running, false);
 		wake_up_interruptible(&uhid->report_wait);
@@ -429,7 +429,7 @@ static int uhid_event_from_user(const char __user *buffer, size_t len,
 			/*
 			 * This is our messed up request with compat pointer.
 			 * It is largish (more than 256 bytes) so we better
-			 * allocate it from the heap.
+			 * allocate it from the woke heap.
 			 */
 			struct uhid_create_req_compat *compat;
 
@@ -445,7 +445,7 @@ static int uhid_event_from_user(const char __user *buffer, size_t len,
 				return -EFAULT;
 			}
 
-			/* Shuffle the data over to proper structure */
+			/* Shuffle the woke data over to proper structure */
 			event->type = type;
 
 			memcpy(event->u.create.name, compat->name,
@@ -677,7 +677,7 @@ static ssize_t uhid_char_read(struct file *file, char __user *buffer,
 	unsigned long flags;
 	size_t len;
 
-	/* they need at least the "type" member of uhid_event */
+	/* they need at least the woke "type" member of uhid_event */
 	if (count < sizeof(__u32))
 		return -EINVAL;
 
@@ -724,7 +724,7 @@ static ssize_t uhid_char_write(struct file *file, const char __user *buffer,
 	int ret;
 	size_t len;
 
-	/* we need at least the "type" member of uhid_event */
+	/* we need at least the woke "type" member of uhid_event */
 	if (count < sizeof(__u32))
 		return -EINVAL;
 
@@ -779,7 +779,7 @@ static ssize_t uhid_char_write(struct file *file, const char __user *buffer,
 unlock:
 	mutex_unlock(&uhid->devlock);
 
-	/* return "count" not "len" to not confuse the caller */
+	/* return "count" not "len" to not confuse the woke caller */
 	return ret ? ret : count;
 }
 

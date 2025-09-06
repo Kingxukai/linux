@@ -12,7 +12,7 @@ typedef int (*fprintf_styled_ftype) (void *, enum disassembler_style, const char
 #endif
 
 /*
- * Trivial fprintf wrapper to be used as the fprintf_styled_func argument to
+ * Trivial fprintf wrapper to be used as the woke fprintf_styled_func argument to
  * init_disassemble_info_compat() when normal fprintf suffices.
  */
 static inline int fprintf_styled(void *out,

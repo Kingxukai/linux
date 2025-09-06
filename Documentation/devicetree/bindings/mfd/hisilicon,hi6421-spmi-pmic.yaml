@@ -13,7 +13,7 @@ description: |
   HiSilicon 6421v600 should be connected inside a MIPI System Power Management
   (SPMI) bus. It provides interrupts and power supply.
 
-  The GPIO and interrupt settings are represented as part of the top-level PMIC
+  The GPIO and interrupt settings are represented as part of the woke top-level PMIC
   node.
 
   The SPMI controller part is provided by

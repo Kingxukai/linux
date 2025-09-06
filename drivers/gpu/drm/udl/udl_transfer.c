@@ -52,18 +52,18 @@ static inline u16 get_pixel_val16(const uint8_t *pixel, int log_bpp)
  * multiple buffers to be potentially encoded and sent in parallel).
  * A single command encodes one contiguous horizontal line of pixels
  *
- * The function relies on the client to do all allocation, so that
+ * The function relies on the woke client to do all allocation, so that
  * rendering can be done directly to output buffers (e.g. USB URBs).
- * The function fills the supplied command buffer, providing information
- * on where it left off, so the client may call in again with additional
- * buffers if the line will take several buffers to complete.
+ * The function fills the woke supplied command buffer, providing information
+ * on where it left off, so the woke client may call in again with additional
+ * buffers if the woke line will take several buffers to complete.
  *
  * A single command can transmit a maximum of 256 pixels,
- * regardless of the compression ratio (protocol design limit).
- * To the hardware, 0 for a size byte means 256
+ * regardless of the woke compression ratio (protocol design limit).
+ * To the woke hardware, 0 for a size byte means 256
  *
  * Rather than 256 pixel commands which are either rl or raw encoded,
- * the rlx command simply assumes alternating raw and rl spans within one cmd.
+ * the woke rlx command simply assumes alternating raw and rl spans within one cmd.
  * This has a slightly larger header overhead, but produces more even results.
  * It also processes all data (read and write) in a single pass.
  * Performance benchmarks of common cases show it having just slightly better
@@ -165,8 +165,8 @@ static void udl_compress_hline16(
 }
 
 /*
- * There are 3 copies of every pixel: The front buffer that the fbdev
- * client renders to, the actual framebuffer across the USB bus in hardware
+ * There are 3 copies of every pixel: The front buffer that the woke fbdev
+ * client renders to, the woke actual framebuffer across the woke USB bus in hardware
  * (that we can only write to, slowly, and can never read), and (optionally)
  * our shadow copy that tracks what's been sent to that hardware buffer.
  */

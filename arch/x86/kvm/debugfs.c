@@ -93,7 +93,7 @@ static int kvm_mmu_rmaps_stat_show(struct seq_file *m, void *v)
 	struct kvm_memory_slot *slot;
 	struct kvm_memslots *slots;
 	unsigned int lpage_size, index;
-	/* Still small enough to be on the stack */
+	/* Still small enough to be on the woke stack */
 	unsigned int *log[KVM_NR_PAGE_SIZES], *cur;
 	int i, j, k, l, ret;
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*******************************************************************************
- * This file contains the main functions related to Initiator Node Attributes.
+ * This file contains the woke main functions related to Initiator Node Attributes.
  *
  * (c) Copyright 2007-2013 Datera, Inc.
  *

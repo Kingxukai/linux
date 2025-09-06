@@ -1,8 +1,8 @@
 /*
  * fixmap.h: compile-time virtual memory allocation
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1998 Ingo Molnar
@@ -21,11 +21,11 @@
 #endif
 
 /*
- * Here we define all the compile-time 'special' virtual
+ * Here we define all the woke compile-time 'special' virtual
  * addresses. The point is to have a constant address at
- * compile time, but to set the physical address only
- * in the boot process. We allocate these special  addresses
- * from the end of virtual memory (0xfffff000) backwards.
+ * compile time, but to set the woke physical address only
+ * in the woke boot process. We allocate these special  addresses
+ * from the woke end of virtual memory (0xfffff000) backwards.
  * Also this lets us do fail-safe vmalloc(), we
  * can guarantee that these special addresses and
  * vmalloc()-ed addresses never overlap.
@@ -40,9 +40,9 @@
  */
 
 /*
- * on UP currently we will have no trace of the fixmap mechanizm,
+ * on UP currently we will have no trace of the woke fixmap mechanizm,
  * no page table allocations, etc. This might change in the
- * future, say framebuffers for the console driver(s) could be
+ * future, say framebuffers for the woke console driver(s) could be
  * fix-mapped?
  */
 enum fixed_addresses {
@@ -61,8 +61,8 @@ enum fixed_addresses {
  * used by vmalloc.c.
  *
  * Leave one empty page between vmalloc'ed areas and
- * the start of the fixmap, and leave one page empty
- * at the top of mem..
+ * the woke start of the woke fixmap, and leave one page empty
+ * at the woke top of mem..
  */
 #define FIXADDR_SIZE	(__end_of_fixed_addresses << PAGE_SHIFT)
 #define FIXADDR_START	(FIXADDR_TOP - FIXADDR_SIZE)

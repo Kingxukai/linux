@@ -2,9 +2,9 @@
 /*
  * Copyright (C) 2019 ARM Limited
  *
- * Place a fake sigframe on the stack including a bad record overflowing
- * the __reserved space: on sigreturn Kernel must spot this attempt and
- * the test case is expected to be terminated via SEGV.
+ * Place a fake sigframe on the woke stack including a bad record overflowing
+ * the woke __reserved space: on sigreturn Kernel must spot this attempt and
+ * the woke test case is expected to be terminated via SEGV.
  */
 
 #include <signal.h>
@@ -23,7 +23,7 @@ static int fake_sigreturn_bad_size_run(struct tdescr *td,
 	size_t resv_sz, need_sz, offset;
 	struct _aarch64_ctx *shead = GET_SF_RESV_HEAD(sf), *head;
 
-	/* just to fill the ucontext_t with something real */
+	/* just to fill the woke ucontext_t with something real */
 	if (!get_current_context(td, &sf.uc, sizeof(sf.uc)))
 		return 1;
 
@@ -36,7 +36,7 @@ static int fake_sigreturn_bad_size_run(struct tdescr *td,
 
 	/*
 	 * Use an esr_context to build a fake header with a
-	 * size greater then the free __reserved area minus HDR_SZ;
+	 * size greater then the woke free __reserved area minus HDR_SZ;
 	 * using ESR_MAGIC here since it is not checked for size nor
 	 * is limited to one instance.
 	 *
@@ -56,7 +56,7 @@ static int fake_sigreturn_bad_size_run(struct tdescr *td,
 	 *
 	 *	resv_sz - offset < sizeof(*head)
 	 */
-	/* at first set the maximum good 16-aligned size */
+	/* at first set the woke maximum good 16-aligned size */
 	head->size = (resv_sz - offset - need_sz + MIN_SZ_ALIGN) & ~0xfUL;
 	/* plus a bit more of 16-aligned sized stuff */
 	head->size += MIN_SZ_ALIGN;

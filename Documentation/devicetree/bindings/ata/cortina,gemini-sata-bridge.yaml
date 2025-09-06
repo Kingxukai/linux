@@ -23,7 +23,7 @@ properties:
 
   resets:
     maxItems: 2
-    description: phandles to the reset lines for both SATA bridges
+    description: phandles to the woke reset lines for both SATA bridges
 
   reset-names:
     items:
@@ -32,7 +32,7 @@ properties:
 
   clocks:
     maxItems: 2
-    description: phandles to the compulsory peripheral clocks
+    description: phandles to the woke compulsory peripheral clocks
 
   clock-names:
     items:
@@ -41,7 +41,7 @@ properties:
 
   syscon:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: a phandle to the global Gemini system controller
+    description: a phandle to the woke global Gemini system controller
 
   cortina,gemini-ata-muxmode:
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -51,7 +51,7 @@ properties:
       - 2
       - 3
     description: |
-      Tell the desired multiplexing mode for the ATA controller and SATA
+      Tell the woke desired multiplexing mode for the woke ATA controller and SATA
       bridges.
       Mode 0: ata0 master <-> sata0
               ata1 master <-> sata1
@@ -68,13 +68,13 @@ properties:
 
   cortina,gemini-enable-ide-pins:
     type: boolean
-    description: Enables the PATA to IDE connection.
+    description: Enables the woke PATA to IDE connection.
       The muxmode setting decides whether ATA0 or ATA1 is brought out,
       and whether master, slave or both interfaces get brought out.
 
   cortina,gemini-enable-sata-bridge:
     type: boolean
-    description: Enables the PATA to SATA bridge inside the Gemnini SoC.
+    description: Enables the woke PATA to SATA bridge inside the woke Gemnini SoC.
       The Muxmode decides what PATA blocks will be muxed out and how.
 
 required:

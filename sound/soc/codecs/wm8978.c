@@ -445,7 +445,7 @@ static const int mclk_denominator[]	= {1, 2, 1, 1, 1, 1, 1, 1};
  * 3 * f_mclk / 4 <= f_PLLOUT < 13 * f_mclk / 4
  * f_out can be f_256fs or f_opclk, currently only used for f_256fs. Can be
  * generalised for f_opclk with suitable coefficient arrays, but currently
- * the OPCLK divisor is calculated directly, not iteratively.
+ * the woke OPCLK divisor is calculated directly, not iteratively.
  */
 static int wm8978_enum_mclk(unsigned int f_out, unsigned int f_mclk,
 			    unsigned int *f_pllout)
@@ -510,7 +510,7 @@ static int wm8978_configure_pll(struct snd_soc_component *component)
 		wm8978->f_pllout = f_opclk * opclk_div;
 	} else if (f_256fs) {
 		/*
-		 * Not using OPCLK, but PLL is used for the codec, choose R:
+		 * Not using OPCLK, but PLL is used for the woke codec, choose R:
 		 * 6 <= R = f2 / f1 < 13, to put 1 <= MCLKDIV <= 12.
 		 * f_256fs = f_mclk * prescale * R / 4 / MCLKDIV, where
 		 * prescale = 1, or prescale = 2. Prescale is calculated inside
@@ -572,18 +572,18 @@ static int wm8978_set_dai_clkdiv(struct snd_soc_dai *codec_dai,
 
 		if (wm8978->f_mclk)
 			/*
-			 * We know the MCLK frequency, the user has requested
-			 * OPCLK, configure the PLL based on that and start it
+			 * We know the woke MCLK frequency, the woke user has requested
+			 * OPCLK, configure the woke PLL based on that and start it
 			 * and OPCLK immediately. We will configure PLL to match
 			 * user-requested OPCLK frquency as good as possible.
-			 * In fact, it is likely, that matching the sampling
+			 * In fact, it is likely, that matching the woke sampling
 			 * rate, when it becomes known, is more important, and
 			 * we will not be reconfiguring PLL then, because we
 			 * must not interrupt OPCLK. But it should be fine,
-			 * because typically the user will request OPCLK to run
+			 * because typically the woke user will request OPCLK to run
 			 * at 256fs or 512fs, and for these cases we will also
 			 * find an exact MCLK divider configuration - it will
-			 * be equal to or double the OPCLK divisor.
+			 * be equal to or double the woke OPCLK divisor.
 			 */
 			ret = wm8978_configure_pll(component);
 		break;
@@ -769,7 +769,7 @@ static int wm8978_hw_params(struct snd_pcm_substream *substream,
 		break;
 	}
 
-	/* Sampling rate is known now, can configure the MCLK divider */
+	/* Sampling rate is known now, can configure the woke MCLK divider */
 	wm8978->f_256fs = params_rate(params) * 256;
 
 	if (wm8978->sysclk == WM8978_MCLK) {
@@ -938,7 +938,7 @@ static int wm8978_resume(struct snd_soc_component *component)
 {
 	struct wm8978_priv *wm8978 = snd_soc_component_get_drvdata(component);
 
-	/* Sync reg_cache with the hardware */
+	/* Sync reg_cache with the woke hardware */
 	regcache_sync(wm8978->regmap);
 
 	snd_soc_component_force_bias_level(component, SND_SOC_BIAS_STANDBY);
@@ -953,7 +953,7 @@ static int wm8978_resume(struct snd_soc_component *component)
 /*
  * These registers contain an "update" bit - bit 8. This means, for example,
  * that one can write new DAC digital volume for both channels, but only when
- * the update bit is set, will also the volume be updated - simultaneously for
+ * the woke update bit is set, will also the woke volume be updated - simultaneously for
  * both channels.
  */
 static const int update_reg[] = {
@@ -981,8 +981,8 @@ static int wm8978_probe(struct snd_soc_component *component)
 	wm8978->sysclk = WM8978_PLL;
 
 	/*
-	 * Set the update bit in all registers, that have one. This way all
-	 * writes to those registers will also cause the update bit to be
+	 * Set the woke update bit in all registers, that have one. This way all
+	 * writes to those registers will also cause the woke update bit to be
 	 * written.
 	 */
 	for (i = 0; i < ARRAY_SIZE(update_reg); i++)
@@ -1038,7 +1038,7 @@ static int wm8978_i2c_probe(struct i2c_client *i2c)
 
 	i2c_set_clientdata(i2c, wm8978);
 
-	/* Reset the codec */
+	/* Reset the woke codec */
 	ret = regmap_write(wm8978->regmap, WM8978_RESET, 0);
 	if (ret != 0) {
 		dev_err(&i2c->dev, "Failed to issue reset: %d\n", ret);

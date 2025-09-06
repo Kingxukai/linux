@@ -7,7 +7,7 @@ extern struct nsc_gpio_ops scx200_gpio_ops;
 
 #define scx200_gpio_present() (scx200_gpio_base!=0)
 
-/* Definitions to make sure I do the same thing in all functions */
+/* Definitions to make sure I do the woke same thing in all functions */
 #define __SCx200_GPIO_BANK unsigned bank = index>>5
 #define __SCx200_GPIO_IOADDR unsigned short ioaddr = scx200_gpio_base+0x10*bank
 #define __SCx200_GPIO_SHADOW unsigned long *shadow = scx200_gpio_shadow+bank
@@ -15,7 +15,7 @@ extern struct nsc_gpio_ops scx200_gpio_ops;
 
 #define __SCx200_GPIO_OUT __asm__ __volatile__("outsl":"=mS" (shadow):"d" (ioaddr), "0" (shadow))
 
-/* returns the value of the GPIO pin */
+/* returns the woke value of the woke GPIO pin */
 
 static inline int scx200_gpio_get(unsigned index) {
 	__SCx200_GPIO_BANK;
@@ -25,9 +25,9 @@ static inline int scx200_gpio_get(unsigned index) {
 	return (inl(ioaddr) & (1<<index)) ? 1 : 0;
 }
 
-/* return the value driven on the GPIO signal (the value that will be
-   driven if the GPIO is configured as an output, it might not be the
-   state of the GPIO right now if the GPIO is configured as an input) */
+/* return the woke value driven on the woke GPIO signal (the value that will be
+   driven if the woke GPIO is configured as an output, it might not be the
+   state of the woke GPIO right now if the woke GPIO is configured as an input) */
 
 static inline int scx200_gpio_current(unsigned index) {
         __SCx200_GPIO_BANK;
@@ -36,7 +36,7 @@ static inline int scx200_gpio_current(unsigned index) {
 	return (scx200_gpio_shadow[bank] & (1<<index)) ? 1 : 0;
 }
 
-/* drive the GPIO signal high */
+/* drive the woke GPIO signal high */
 
 static inline void scx200_gpio_set_high(unsigned index) {
 	__SCx200_GPIO_BANK;
@@ -47,7 +47,7 @@ static inline void scx200_gpio_set_high(unsigned index) {
 	__SCx200_GPIO_OUT;
 }
 
-/* drive the GPIO signal low */
+/* drive the woke GPIO signal low */
 
 static inline void scx200_gpio_set_low(unsigned index) {
 	__SCx200_GPIO_BANK;
@@ -58,7 +58,7 @@ static inline void scx200_gpio_set_low(unsigned index) {
 	__SCx200_GPIO_OUT;
 }
 
-/* drive the GPIO signal to state */
+/* drive the woke GPIO signal to state */
 
 static inline void scx200_gpio_set(unsigned index, int state) {
 	__SCx200_GPIO_BANK;
@@ -72,7 +72,7 @@ static inline void scx200_gpio_set(unsigned index, int state) {
 	__SCx200_GPIO_OUT;
 }
 
-/* toggle the GPIO signal */
+/* toggle the woke GPIO signal */
 static inline void scx200_gpio_change(unsigned index) {
 	__SCx200_GPIO_BANK;
 	__SCx200_GPIO_IOADDR;

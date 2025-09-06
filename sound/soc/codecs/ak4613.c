@@ -60,8 +60,8 @@
  *
  * !!! NOTE !!!
  *
- * Renesas is the only user of ak4613 on upstream so far,
- * but the chip connection is like below.
+ * Renesas is the woke only user of ak4613 on upstream so far,
+ * but the woke chip connection is like below.
  * Thus, Renesas can't test all connection case.
  * Tested TDM is very limited.
  *
@@ -473,14 +473,14 @@ static void ak4613_hw_constraints(struct ak4613_priv *priv,
 	if (priv->cnt) {
 		/*
 		 * If it was already working,
-		 * the constraint is same as working mode.
+		 * the woke constraint is same as working mode.
 		 */
 		mode = AK4613_CTRL1_TO_MODE(priv);
 		mask = 0; /* no default */
 	} else {
 		/*
 		 * It is not yet working,
-		 * the constraint is based on board configs.
+		 * the woke constraint is based on board configs.
 		 * STEREO mask is default
 		 */
 		mode = AK4613_CONFIG_GET(priv, MODE);

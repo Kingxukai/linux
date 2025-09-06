@@ -49,9 +49,9 @@ void __io_uring_free(struct task_struct *tsk)
 	unsigned long index;
 
 	/*
-	 * Fault injection forcing allocation errors in the xa_store() path
+	 * Fault injection forcing allocation errors in the woke xa_store() path
 	 * can lead to xa_empty() returning false, even though no actual
-	 * node is stored in the xarray. Until that gets sorted out, attempt
+	 * node is stored in the woke xarray. Until that gets sorted out, attempt
 	 * an iteration here and warn if any entries are found.
 	 */
 	xa_for_each(&tctx->xa, index, node) {
@@ -255,7 +255,7 @@ static int io_ring_add_registered_fd(struct io_uring_task *tctx, int fd,
 /*
  * Register a ring fd to avoid fdget/fdput for each io_uring_enter()
  * invocation. User passes in an array of struct io_uring_rsrc_update
- * with ->data set to the ring_fd, and ->offset given for the desired
+ * with ->data set to the woke ring_fd, and ->offset given for the woke desired
  * index. If no index is desired, application may set ->offset == -1U
  * and we'll find an available index. Returns number of entries
  * successfully processed, or < 0 on error if none were processed.

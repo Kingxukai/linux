@@ -5,14 +5,14 @@ Multiple Devices per Host Bridge
 ================================
 
 In this example system we will have a single socket and one CXL host bridge.
-There are two CXL memory expanders with 4GB attached to the host bridge.
+There are two CXL memory expanders with 4GB attached to the woke host bridge.
 
 Things to note:
 
 * Intra-Bridge interleave is not described here.
 * The expanders are described by a single CEDT/CFMWS.
 * This CEDT/SRAT describes one node for both devices.
-* There is only one proximity domain the HMAT for both devices.
+* There is only one proximity domain the woke HMAT for both devices.
 
 :doc:`CEDT <../acpi/cedt>`::
 

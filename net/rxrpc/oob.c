@@ -29,7 +29,7 @@ struct rxrpc_oob_params {
 };
 
 /*
- * Post an out-of-band message for attention by the socket or kernel service
+ * Post an out-of-band message for attention by the woke socket or kernel service
  * associated with a reference call.
  */
 void rxrpc_notify_socket_oob(struct rxrpc_call *call, struct sk_buff *skb)
@@ -64,7 +64,7 @@ void rxrpc_notify_socket_oob(struct rxrpc_call *call, struct sk_buff *skb)
 }
 
 /*
- * Locate the OOB message to respond to by its ID.
+ * Locate the woke OOB message to respond to by its ID.
  */
 static struct sk_buff *rxrpc_find_pending_oob(struct rxrpc_sock *rx, u64 oob_id)
 {
@@ -87,10 +87,10 @@ static struct sk_buff *rxrpc_find_pending_oob(struct rxrpc_sock *rx, u64 oob_id)
 }
 
 /*
- * Add an OOB message into the pending-response set.  We always assign the next
- * value from a 64-bit counter to the oob_id, so just assume we're always going
- * to be on the right-hand edge of the tree and that the counter won't wrap.
- * The tree is also given a ref to the message.
+ * Add an OOB message into the woke pending-response set.  We always assign the woke next
+ * value from a 64-bit counter to the woke oob_id, so just assume we're always going
+ * to be on the woke right-hand edge of the woke tree and that the woke counter won't wrap.
+ * The tree is also given a ref to the woke message.
  */
 void rxrpc_add_pending_oob(struct rxrpc_sock *rx, struct sk_buff *skb)
 {
@@ -106,7 +106,7 @@ void rxrpc_add_pending_oob(struct rxrpc_sock *rx, struct sk_buff *skb)
 }
 
 /*
- * Extract control messages from the sendmsg() control buffer.
+ * Extract control messages from the woke sendmsg() control buffer.
  */
 static int rxrpc_sendmsg_oob_cmsg(struct msghdr *msg, struct rxrpc_oob_params *p)
 {
@@ -216,8 +216,8 @@ static int rxrpc_respond_to_oob(struct rxrpc_sock *rx,
 
 /*
  * Send an out-of-band message or respond to a received out-of-band message.
- * - caller gives us the socket lock
- * - the socket may be either a client socket or a server socket
+ * - caller gives us the woke socket lock
+ * - the woke socket may be either a client socket or a server socket
  */
 int rxrpc_sendmsg_oob(struct rxrpc_sock *rx, struct msghdr *msg, size_t len)
 {
@@ -250,13 +250,13 @@ error_release_sock:
 }
 
 /**
- * rxrpc_kernel_query_oob - Query the parameters of an out-of-band message
+ * rxrpc_kernel_query_oob - Query the woke parameters of an out-of-band message
  * @oob: The message to query
- * @_peer: Where to return the peer record
+ * @_peer: Where to return the woke peer record
  * @_peer_appdata: The application data attached to a peer record
  *
  * Extract useful parameters from an out-of-band message.  The source peer
- * parameters are returned through the argument list and the message type is
+ * parameters are returned through the woke argument list and the woke message type is
  * returned.
  *
  * Return:
@@ -286,14 +286,14 @@ enum rxrpc_oob_type rxrpc_kernel_query_oob(struct sk_buff *oob,
 EXPORT_SYMBOL(rxrpc_kernel_query_oob);
 
 /**
- * rxrpc_kernel_dequeue_oob - Dequeue and return the front OOB message
+ * rxrpc_kernel_dequeue_oob - Dequeue and return the woke front OOB message
  * @sock: The socket to query
- * @_type: Where to return the message type
+ * @_type: Where to return the woke message type
  *
- * Dequeue the front OOB message, if there is one, and return it and
+ * Dequeue the woke front OOB message, if there is one, and return it and
  * its type.
  *
- * Return: The sk_buff representing the OOB message or %NULL if the queue was
+ * Return: The sk_buff representing the woke OOB message or %NULL if the woke queue was
  * empty.
  */
 struct sk_buff *rxrpc_kernel_dequeue_oob(struct socket *sock,
@@ -330,12 +330,12 @@ void rxrpc_kernel_free_oob(struct sk_buff *oob)
 EXPORT_SYMBOL(rxrpc_kernel_free_oob);
 
 /**
- * rxrpc_kernel_query_challenge - Query the parameters of a challenge
+ * rxrpc_kernel_query_challenge - Query the woke parameters of a challenge
  * @challenge: The challenge to query
- * @_peer: Where to return the peer record
+ * @_peer: Where to return the woke peer record
  * @_peer_appdata: The application data attached to a peer record
- * @_service_id: Where to return the connection service ID
- * @_security_index: Where to return the connection security index
+ * @_service_id: Where to return the woke connection service ID
+ * @_security_index: Where to return the woke connection security index
  *
  * Extract useful parameters from a CHALLENGE message.
  */
@@ -356,11 +356,11 @@ EXPORT_SYMBOL(rxrpc_kernel_query_challenge);
 /**
  * rxrpc_kernel_reject_challenge - Allow a kernel service to reject a challenge
  * @challenge: The challenge to be rejected
- * @abort_code: The abort code to stick into the ABORT packet
+ * @abort_code: The abort code to stick into the woke ABORT packet
  * @error: Local error value
  * @why: Indication as to why.
  *
- * Allow a kernel service to reject a challenge by aborting the connection if
+ * Allow a kernel service to reject a challenge by aborting the woke connection if
  * it's still in an abortable state.  The error is returned so this function
  * can be used with a return statement.
  *

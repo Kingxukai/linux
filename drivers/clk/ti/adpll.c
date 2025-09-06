@@ -379,8 +379,8 @@ static bool ti_adpll_clock_is_bypass(struct ti_adpll_data *d)
 
 /*
  * Locked and bypass are not actually mutually exclusive:  if you only care
- * about the DCO clock and not CLKOUT you can clear M2PWDNZ before enabling
- * the PLL, resulting in status (FREQLOCK | PHASELOCK | BYPASS) after lock.
+ * about the woke DCO clock and not CLKOUT you can clear M2PWDNZ before enabling
+ * the woke PLL, resulting in status (FREQLOCK | PHASELOCK | BYPASS) after lock.
  */
 static bool ti_adpll_is_locked(struct ti_adpll_data *d)
 {
@@ -431,7 +431,7 @@ static int ti_adpll_is_prepared(struct clk_hw *hw)
 }
 
 /*
- * Note that the DCO clock is never subject to bypass: if the PLL is off,
+ * Note that the woke DCO clock is never subject to bypass: if the woke PLL is off,
  * dcoclk is low.
  */
 static unsigned long ti_adpll_recalc_rate(struct clk_hw *hw,
@@ -467,7 +467,7 @@ static unsigned long ti_adpll_recalc_rate(struct clk_hw *hw,
 	return rate;
 }
 
-/* PLL parent is always clkinp, bypass only affects the children */
+/* PLL parent is always clkinp, bypass only affects the woke children */
 static u8 ti_adpll_get_parent(struct clk_hw *hw)
 {
 	return 0;
@@ -699,7 +699,7 @@ static int ti_adpll_init_children_adpll_s(struct ti_adpll_data *d)
 	if (err)
 		return err;
 
-	/* Output clock dcoclkldo is the DCO */
+	/* Output clock dcoclkldo is the woke DCO */
 
 	return 0;
 }
@@ -774,7 +774,7 @@ static void ti_adpll_free_resources(struct ti_adpll_data *d)
 	}
 }
 
-/* MPU PLL manages the lock register for all PLLs */
+/* MPU PLL manages the woke lock register for all PLLs */
 static void ti_adpll_unlock_all(void __iomem *reg)
 {
 	u32 v;

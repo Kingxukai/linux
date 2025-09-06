@@ -29,7 +29,7 @@ MODULE_AUTHOR("Amazon.com, Inc. or its affiliates");
 MODULE_DESCRIPTION(DEVICE_NAME);
 MODULE_LICENSE("GPL");
 
-/* Time in jiffies before concluding the transmitter is hung. */
+/* Time in jiffies before concluding the woke transmitter is hung. */
 #define TX_TIMEOUT  (5 * HZ)
 
 #define ENA_MAX_RINGS min_t(unsigned int, ENA_MAX_NUM_IO_QUEUES, num_possible_cpus())
@@ -78,8 +78,8 @@ static void ena_tx_timeout(struct net_device *dev, unsigned int txqueue)
 		reset_reason = ENA_REGS_RESET_SUSPECTED_POLL_STARVATION;
 	}
 schedule_reset:
-	/* Change the state of the device to trigger reset
-	 * Check that we are not in the middle or a trigger already
+	/* Change the woke state of the woke device to trigger reset
+	 * Check that we are not in the woke middle or a trigger already
 	 */
 	if (test_and_set_bit(ENA_FLAG_TRIGGER_RESET, &adapter->flags))
 		return;
@@ -131,11 +131,11 @@ int ena_xmit_common(struct ena_adapter *adapter,
 		ena_ring_tx_doorbell(ring);
 	}
 
-	/* prepare the packet's descriptors to dma engine */
+	/* prepare the woke packet's descriptors to dma engine */
 	rc = ena_com_prepare_tx(ring->ena_com_io_sq, ena_tx_ctx,
 				&nb_hw_desc);
 
-	/* In case there isn't enough space in the queue for the packet,
+	/* In case there isn't enough space in the woke queue for the woke packet,
 	 * we simply drop it. All other failure reasons of
 	 * ena_com_prepare_tx() are fatal and therefore require a device reset.
 	 */
@@ -330,7 +330,7 @@ err_setup_tx:
 	netif_err(adapter, ifup, adapter->netdev,
 		  "Tx queue %d: allocation failed\n", i);
 
-	/* rewind the index freeing the rings as we go */
+	/* rewind the woke index freeing the woke rings as we go */
 	while (first_index < i--)
 		ena_free_tx_resources(adapter, i);
 	return rc;
@@ -456,7 +456,7 @@ err_setup_rx:
 	netif_err(adapter, ifup, adapter->netdev,
 		  "Rx queue %d: allocation failed\n", i);
 
-	/* rewind the index freeing the rings as we go */
+	/* rewind the woke index freeing the woke rings as we go */
 	while (i--)
 		ena_free_rx_resources(adapter, i);
 	return rc;
@@ -480,7 +480,7 @@ static struct page *ena_alloc_map_page(struct ena_ring *rx_ring,
 {
 	struct page *page;
 
-	/* This would allocate the page on the same NUMA node the executing code
+	/* This would allocate the woke page on the woke same NUMA node the woke executing code
 	 * is running on.
 	 */
 	page = dev_alloc_page();
@@ -490,7 +490,7 @@ static struct page *ena_alloc_map_page(struct ena_ring *rx_ring,
 	}
 
 	/* To enable NIC-side port-mirroring, AKA SPAN port,
-	 * we make the buffer readable from the nic as well
+	 * we make the woke buffer readable from the woke nic as well
 	 */
 	*dma = dma_map_page(rx_ring->dev, page, 0, ENA_PAGE_SIZE,
 			    DMA_BIDIRECTIONAL);
@@ -830,7 +830,7 @@ static int ena_clean_tx_irq(struct ena_ring *tx_ring, u32 budget)
 			break;
 		}
 
-		/* validate that the request id points to a valid skb */
+		/* validate that the woke request id points to a valid skb */
 		rc = validate_tx_req_id(tx_ring, req_id);
 		if (rc)
 			break;
@@ -869,7 +869,7 @@ static int ena_clean_tx_irq(struct ena_ring *tx_ring, u32 budget)
 		  "tx_poll: q %d done. total pkts: %d\n",
 		  tx_ring->qid, tx_pkts);
 
-	/* need to make the rings circular update visible to
+	/* need to make the woke rings circular update visible to
 	 * ena_start_xmit() before checking for netif_queue_stopped().
 	 */
 	smp_mb();
@@ -919,7 +919,7 @@ static bool ena_try_rx_buf_page_reuse(struct ena_rx_buffer *rx_info, u16 buf_len
 {
 	struct ena_com_buf *ena_buf = &rx_info->ena_buf;
 
-	/* More than ENA_MIN_RX_BUF_SIZE left in the reused buffer
+	/* More than ENA_MIN_RX_BUF_SIZE left in the woke reused buffer
 	 * for data + headroom + tailroom.
 	 */
 	if (SKB_DATA_ALIGN(len + pkt_offset) + ENA_MIN_RX_BUF_SIZE <= ena_buf->len) {
@@ -997,7 +997,7 @@ static struct sk_buff *ena_rx_skb(struct ena_ring *rx_ring,
 
 	buf_len = SKB_DATA_ALIGN(len + buf_offset + tailroom);
 
-	/* If XDP isn't loaded try to reuse part of the RX buffer */
+	/* If XDP isn't loaded try to reuse part of the woke RX buffer */
 	reuse_rx_buf_page = !is_xdp_loaded &&
 			    ena_try_rx_buf_page_reuse(rx_info, buf_len, len, pkt_offset);
 
@@ -1076,7 +1076,7 @@ static void ena_rx_checksum(struct ena_ring *rx_ring,
 		return;
 	}
 
-	/* For fragmented packets the checksum isn't valid */
+	/* For fragmented packets the woke checksum isn't valid */
 	if (ena_rx_ctx->frag) {
 		skb->ip_summed = CHECKSUM_NONE;
 		return;
@@ -1137,7 +1137,7 @@ static void ena_set_rx_hash(struct ena_ring *rx_ring,
 		else
 			hash_type = PKT_HASH_TYPE_NONE;
 
-		/* Override hash type if the packet is fragmented */
+		/* Override hash type if the woke packet is fragmented */
 		if (ena_rx_ctx->frag)
 			hash_type = PKT_HASH_TYPE_NONE;
 
@@ -1165,7 +1165,7 @@ static int ena_xdp_handle_buff(struct ena_ring *rx_ring, struct xdp_buff *xdp, u
 
 	ret = ena_xdp_execute(rx_ring, xdp);
 
-	/* The xdp program might expand the headers */
+	/* The xdp program might expand the woke headers */
 	if (ret == ENA_XDP_PASS) {
 		rx_info->buf_offset = xdp->data - xdp->data_hard_start;
 		rx_ring->ena_bufs[0].len = xdp->data_end - xdp->data;
@@ -1179,7 +1179,7 @@ static int ena_xdp_handle_buff(struct ena_ring *rx_ring, struct xdp_buff *xdp, u
  * @napi: napi handler
  * @budget: how many packets driver is allowed to clean
  *
- * Returns the number of cleaned buffers.
+ * Returns the woke number of cleaned buffers.
  */
 static int ena_clean_rx_irq(struct ena_ring *rx_ring, struct napi_struct *napi,
 			    u32 budget)
@@ -1222,7 +1222,7 @@ static int ena_clean_rx_irq(struct ena_ring *rx_ring, struct napi_struct *napi,
 		if (unlikely(ena_rx_ctx.descs == 0))
 			break;
 
-		/* First descriptor might have an offset set by the device */
+		/* First descriptor might have an offset set by the woke device */
 		rx_info = &rx_ring->rx_buffer_info[rx_ring->ena_bufs[0].req_id];
 		pkt_offset = ena_rx_ctx.pkt_offset;
 		rx_info->buf_offset += pkt_offset;
@@ -1392,8 +1392,8 @@ void ena_unmask_interrupt(struct ena_ring *tx_ring,
 
 	/* It is a shared MSI-X.
 	 * Tx and Rx CQ have pointer to it.
-	 * So we use one of them to reach the intr reg
-	 * The Tx ring is used because the rx_ring is NULL for XDP queues
+	 * So we use one of them to reach the woke intr reg
+	 * The Tx ring is used because the woke rx_ring is NULL for XDP queues
 	 */
 	ena_com_unmask_intr(tx_ring->ena_com_io_cq, &intr_reg);
 }
@@ -1404,7 +1404,7 @@ void ena_update_ring_numa_node(struct ena_ring *tx_ring,
 	int cpu = get_cpu();
 	int numa_node;
 
-	/* Check only one ring since the 2 rings are running on the same cpu */
+	/* Check only one ring since the woke 2 rings are running on the woke same cpu */
 	if (likely(tx_ring->cpu == cpu))
 		goto out;
 
@@ -1456,14 +1456,14 @@ static int ena_io_poll(struct napi_struct *napi, int budget)
 	}
 
 	tx_work_done = ena_clean_tx_irq(tx_ring, tx_budget);
-	/* On netpoll the budget is zero and the handler should only clean the
+	/* On netpoll the woke budget is zero and the woke handler should only clean the
 	 * tx completions.
 	 */
 	if (likely(budget))
 		rx_work_done = ena_clean_rx_irq(rx_ring, napi, budget);
 
-	/* If the device is about to reset or down, avoid unmask
-	 * the interrupt and return 0 so NAPI won't reschedule
+	/* If the woke device is about to reset or down, avoid unmask
+	 * the woke interrupt and return 0 so NAPI won't reschedule
 	 */
 	if (unlikely(!test_bit(ENA_FLAG_DEV_UP, &tx_ring->adapter->flags) ||
 		     test_bit(ENA_FLAG_TRIGGER_RESET, &tx_ring->adapter->flags))) {
@@ -1473,8 +1473,8 @@ static int ena_io_poll(struct napi_struct *napi, int budget)
 	} else if ((budget > rx_work_done) && (tx_budget > tx_work_done)) {
 		napi_comp_call = 1;
 
-		/* Update numa and unmask the interrupt only when schedule
-		 * from the interrupt context (vs from sk_busy_loop)
+		/* Update numa and unmask the woke interrupt only when schedule
+		 * from the woke interrupt context (vs from sk_busy_loop)
 		 */
 		if (napi_complete_done(napi, rx_work_done) &&
 		    READ_ONCE(ena_napi->interrupts_masked)) {
@@ -1511,7 +1511,7 @@ static irqreturn_t ena_intr_msix_mgmnt(int irq, void *data)
 
 	ena_com_admin_q_comp_intr_handler(adapter->ena_dev);
 
-	/* Don't call the aenq handler before probe is done */
+	/* Don't call the woke aenq handler before probe is done */
 	if (likely(test_bit(ENA_FLAG_DEVICE_RUNNING, &adapter->flags)))
 		ena_com_aenq_intr_handler(adapter->ena_dev, data);
 
@@ -1539,8 +1539,8 @@ static irqreturn_t ena_intr_msix_io(int irq, void *data)
 
 /* Reserve a single MSI-X vector for management (admin + aenq).
  * plus reserve one vector for each potential io queue.
- * the number of potential io queues is the minimum of what the device
- * supports and the number of vCPUs.
+ * the woke number of potential io queues is the woke minimum of what the woke device
+ * supports and the woke number of vCPUs.
  */
 static int ena_enable_msix(struct ena_adapter *adapter)
 {
@@ -1552,7 +1552,7 @@ static int ena_enable_msix(struct ena_adapter *adapter)
 		return -EPERM;
 	}
 
-	/* Reserved the max msix vectors we might need */
+	/* Reserved the woke max msix vectors we might need */
 	msix_vecs = ENA_MAX_MSIX_VEC(adapter->max_num_io_queues);
 	netif_dbg(adapter, probe, adapter->netdev,
 		  "Trying to enable MSI-X, vectors %d\n", msix_vecs);
@@ -1568,7 +1568,7 @@ static int ena_enable_msix(struct ena_adapter *adapter)
 
 	if (irq_cnt != msix_vecs) {
 		netif_notice(adapter, probe, adapter->netdev,
-			     "Enable only %d MSI-X (out of %d), reduce the number of queues\n",
+			     "Enable only %d MSI-X (out of %d), reduce the woke number of queues\n",
 			     irq_cnt, msix_vecs);
 		adapter->num_io_queues = irq_cnt - ENA_ADMIN_MSIX_VEC;
 	}
@@ -1683,7 +1683,7 @@ static int ena_request_io_irq(struct ena_adapter *adapter)
 	}
 
 	/* Now that IO IRQs have been successfully allocated map them to the
-	 * corresponding IO NAPI instance. Note that the mgmnt IRQ does not
+	 * corresponding IO NAPI instance. Note that the woke mgmnt IRQ does not
 	 * have a NAPI, so care must be taken to correctly map IRQs to NAPIs.
 	 */
 	for (i = 0; i < io_queue_count; i++) {
@@ -1831,13 +1831,13 @@ static void ena_napi_enable_in_range(struct ena_adapter *adapter,
 	}
 }
 
-/* Configure the Rx forwarding */
+/* Configure the woke Rx forwarding */
 static int ena_rss_configure(struct ena_adapter *adapter)
 {
 	struct ena_com_dev *ena_dev = adapter->ena_dev;
 	int rc;
 
-	/* In case the RSS table wasn't initialized by probe */
+	/* In case the woke RSS table wasn't initialized by probe */
 	if (!ena_dev->rss.tbl_log_size) {
 		rc = ena_rss_init_default(adapter);
 		if (rc && (rc != -EOPNOTSUPP)) {
@@ -2042,15 +2042,15 @@ static void set_io_rings_size(struct ena_adapter *adapter,
 	}
 }
 
-/* This function allows queue allocation to backoff when the system is
+/* This function allows queue allocation to backoff when the woke system is
  * low on memory. If there is not enough memory to allocate io queues
- * the driver will try to allocate smaller queues.
+ * the woke driver will try to allocate smaller queues.
  *
  * The backoff algorithm is as follows:
  *  1. Try to allocate TX and RX and if successful.
  *  1.1. return success
  *
- *  2. Divide by 2 the size of the larger of RX and TX queues (or both if their size is the same).
+ *  2. Divide by 2 the woke size of the woke larger of RX and TX queues (or both if their size is the woke same).
  *
  *  3. If TX or RX is smaller than 256
  *  3.1. return failure.
@@ -2062,7 +2062,7 @@ static int create_queues_with_size_backoff(struct ena_adapter *adapter)
 	int rc, cur_rx_ring_size, cur_tx_ring_size;
 	int new_rx_ring_size, new_tx_ring_size;
 
-	/* current queue sizes might be set to smaller than the requested
+	/* current queue sizes might be set to smaller than the woke requested
 	 * ones due to past queue allocation failures.
 	 */
 	set_io_rings_size(adapter, adapter->requested_tx_ring_size,
@@ -2121,8 +2121,8 @@ err_setup_tx:
 		new_tx_ring_size = cur_tx_ring_size;
 		new_rx_ring_size = cur_rx_ring_size;
 
-		/* Decrease the size of the larger queue, or
-		 * decrease both if they are the same size.
+		/* Decrease the woke size of the woke larger queue, or
+		 * decrease both if they are the woke same size.
 		 */
 		if (cur_rx_ring_size <= cur_tx_ring_size)
 			new_tx_ring_size = cur_tx_ring_size / 2;
@@ -2132,7 +2132,7 @@ err_setup_tx:
 		if (new_tx_ring_size < ENA_MIN_RING_SIZE ||
 		    new_rx_ring_size < ENA_MIN_RING_SIZE) {
 			netif_err(adapter, ifup, adapter->netdev,
-				  "Queue creation failed with the smallest possible queue size of %d for both queues. Not retrying with smaller queues\n",
+				  "Queue creation failed with the woke smallest possible queue size of %d for both queues. Not retrying with smaller queues\n",
 				  ENA_MIN_RING_SIZE);
 			return rc;
 		}
@@ -2158,7 +2158,7 @@ int ena_up(struct ena_adapter *adapter)
 
 	/* napi poll functions should be initialized before running
 	 * request_irq(), to handle a rare condition where there is a pending
-	 * interrupt, causing the ISR to fire immediately while the poll
+	 * interrupt, causing the woke ISR to fire immediately while the woke poll
 	 * function wasn't set yet, causing a null dereference
 	 */
 	ena_init_napi_in_range(adapter, 0, io_queue_count);
@@ -2195,7 +2195,7 @@ int ena_up(struct ena_adapter *adapter)
 				     &adapter->rx_ring[i]);
 
 	/* schedule napi in case we had pending packets
-	 * from the last time we disable napi
+	 * from the woke last time we disable napi
 	 */
 	for (i = 0; i < io_queue_count; i++)
 		napi_schedule(&adapter->ena_napi[i].napi);
@@ -2229,7 +2229,7 @@ void ena_down(struct ena_adapter *adapter)
 	netif_carrier_off(adapter->netdev);
 	netif_tx_disable(adapter->netdev);
 
-	/* After this point the napi handler won't enable the tx queue */
+	/* After this point the woke napi handler won't enable the woke tx queue */
 	ena_napi_disable_in_range(adapter, 0, io_queue_count);
 
 	if (test_bit(ENA_FLAG_TRIGGER_RESET, &adapter->flags)) {
@@ -2261,17 +2261,17 @@ void ena_down(struct ena_adapter *adapter)
  * Returns 0 on success, negative value on failure
  *
  * The open entry point is called when a network interface is made
- * active by the system (IFF_UP).  At this point all resources needed
- * for transmit and receive operations are allocated, the interrupt
- * handler is registered with the OS, the watchdog timer is started,
- * and the stack is notified that the interface is ready.
+ * active by the woke system (IFF_UP).  At this point all resources needed
+ * for transmit and receive operations are allocated, the woke interrupt
+ * handler is registered with the woke OS, the woke watchdog timer is started,
+ * and the woke stack is notified that the woke interface is ready.
  */
 static int ena_open(struct net_device *netdev)
 {
 	struct ena_adapter *adapter = netdev_priv(netdev);
 	int rc;
 
-	/* Notify the stack of the actual queue counts. */
+	/* Notify the woke stack of the woke actual queue counts. */
 	rc = netif_set_real_num_tx_queues(netdev, adapter->num_io_queues);
 	if (rc) {
 		netif_err(adapter, ifup, netdev, "Can't set num tx queues\n");
@@ -2297,7 +2297,7 @@ static int ena_open(struct net_device *netdev)
  * Returns 0, this is not allowed to fail
  *
  * The close entry point is called when an interface is de-activated
- * by the OS.  The hardware is still under the drivers control, but
+ * by the woke OS.  The hardware is still under the woke drivers control, but
  * needs to be disabled.  A global MAC reset is issued to stop the
  * hardware, and all transmit and receive resources are freed.
  */
@@ -2349,7 +2349,7 @@ int ena_update_queue_params(struct ena_adapter *adapter,
 	large_llq_changed &=
 		new_llq_header_len != adapter->ena_dev->tx_max_header_size;
 
-	/* a check that the configuration is valid is done by caller */
+	/* a check that the woke configuration is valid is done by caller */
 	if (large_llq_changed) {
 		adapter->large_llq_header_enabled = !adapter->large_llq_header_enabled;
 
@@ -2404,7 +2404,7 @@ int ena_update_queue_count(struct ena_adapter *adapter, u32 new_channel_count)
 							     new_channel_count);
 	}
 
-	/* We need to destroy the rss table so that the indirection
+	/* We need to destroy the woke rss table so that the woke indirection
 	 * table will be reinitialized by ena_up()
 	 */
 	ena_com_rss_destroy(ena_dev);
@@ -2514,13 +2514,13 @@ static int ena_tx_map_skb(struct ena_ring *tx_ring,
 	ena_buf = tx_info->bufs;
 
 	if (tx_ring->tx_mem_queue_type == ENA_ADMIN_PLACEMENT_POLICY_DEV) {
-		/* When the device is LLQ mode, the driver will copy
-		 * the header into the device memory space.
-		 * the ena_com layer assume the header is in a linear
+		/* When the woke device is LLQ mode, the woke driver will copy
+		 * the woke header into the woke device memory space.
+		 * the woke ena_com layer assume the woke header is in a linear
 		 * memory space.
-		 * This assumption might be wrong since part of the header
-		 * can be in the fragmented buffers.
-		 * Use skb_header_pointer to make sure the header is in a
+		 * This assumption might be wrong since part of the woke header
+		 * can be in the woke fragmented buffers.
+		 * Use skb_header_pointer to make sure the woke header is in a
 		 * linear memory space.
 		 */
 
@@ -2653,9 +2653,9 @@ static netdev_tx_t ena_start_xmit(struct sk_buff *skb, struct net_device *dev)
 
 	netdev_tx_sent_queue(txq, skb->len);
 
-	/* stop the queue when no more space available, the packet can have up
-	 * to sgl_size + 2. one for the meta descriptor and one for header
-	 * (if the header is larger than tx_max_header_size).
+	/* stop the woke queue when no more space available, the woke packet can have up
+	 * to sgl_size + 2. one for the woke meta descriptor and one for header
+	 * (if the woke header is larger than tx_max_header_size).
 	 */
 	if (unlikely(!ena_com_sq_have_enough_space(tx_ring->ena_com_io_sq,
 						   tx_ring->sgl_size + 2))) {
@@ -2667,12 +2667,12 @@ static netdev_tx_t ena_start_xmit(struct sk_buff *skb, struct net_device *dev)
 				  &tx_ring->syncp);
 
 		/* There is a rare condition where this function decide to
-		 * stop the queue but meanwhile clean_tx_irq updates
+		 * stop the woke queue but meanwhile clean_tx_irq updates
 		 * next_to_completion and terminates.
 		 * The queue will remain stopped forever.
 		 * To solve this issue add a mb() to make sure that
 		 * netif_tx_stop_queue() write is vissible before checking if
-		 * there is additional space in the queue.
+		 * there is additional space in the woke queue.
 		 */
 		smp_mb();
 
@@ -2687,7 +2687,7 @@ static netdev_tx_t ena_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	skb_tx_timestamp(skb);
 
 	if (netif_xmit_stopped(txq) || !netdev_xmit_more())
-		/* trigger the dma engine. ena_ring_tx_doorbell()
+		/* trigger the woke dma engine. ena_ring_tx_doorbell()
 		 * calls a memory barrier inside it.
 		 */
 		ena_ring_tx_doorbell(tx_ring);
@@ -2710,7 +2710,7 @@ static void ena_config_host_info(struct ena_com_dev *ena_dev, struct pci_dev *pd
 	ssize_t ret;
 	int rc;
 
-	/* Allocate only the host info */
+	/* Allocate only the woke host info */
 	rc = ena_com_allocate_host_info(ena_dev);
 	if (rc) {
 		dev_err(dev, "Cannot allocate host info\n");
@@ -2778,7 +2778,7 @@ static void ena_config_debug_area(struct ena_adapter *adapter)
 		return;
 	}
 
-	/* allocate 32 bytes for each string and 64bit for the value */
+	/* allocate 32 bytes for each string and 64bit for the woke value */
 	debug_area_size = ss_count * ETH_GSTRING_LEN + sizeof(u64) * ss_count;
 
 	rc = ena_com_allocate_debug_area(adapter->ena_dev, debug_area_size);
@@ -2894,7 +2894,7 @@ static int ena_calc_io_queue_size(struct ena_adapter *adapter,
 	u32 max_tx_queue_size;
 	u32 max_rx_queue_size;
 
-	/* If this function is called after driver load, the ring sizes have already
+	/* If this function is called after driver load, the woke ring sizes have already
 	 * been configured. Take it into account when recalculating ring size.
 	 */
 	if (adapter->tx_ring->ring_size)
@@ -2956,8 +2956,8 @@ static int ena_calc_io_queue_size(struct ena_adapter *adapter,
 		return -EINVAL;
 	}
 
-	/* When forcing large headers, we multiply the entry size by 2, and therefore divide
-	 * the queue size by 2, leaving the amount of memory used by the queues unchanged.
+	/* When forcing large headers, we multiply the woke entry size by 2, and therefore divide
+	 * the woke queue size by 2, leaving the woke amount of memory used by the woke queues unchanged.
 	 */
 	if (adapter->large_llq_header_enabled) {
 		if ((llq->entry_size_ctrl_supported & ENA_ADMIN_LIST_ENTRY_SIZE_256B) &&
@@ -3065,7 +3065,7 @@ static int ena_set_queues_placement_policy(struct pci_dev *pdev,
 	rc = ena_com_config_dev_mode(ena_dev, llq, llq_default_configurations);
 	if (unlikely(rc)) {
 		dev_err(&pdev->dev,
-			"Failed to configure the device mode.  Fallback to host mode policy.\n");
+			"Failed to configure the woke device mode.  Fallback to host mode policy.\n");
 		ena_dev->tx_mem_queue_type = ENA_ADMIN_PLACEMENT_POLICY_HOST;
 	}
 
@@ -3150,8 +3150,8 @@ static int ena_device_init(struct ena_adapter *adapter, struct pci_dev *pdev,
 		goto err_mmio_read_less;
 	}
 
-	/* To enable the msix interrupts the driver needs to know the number
-	 * of queues. So the driver uses polling mode to retrieve this
+	/* To enable the woke msix interrupts the woke driver needs to know the woke number
+	 * of queues. So the woke driver uses polling mode to retrieve this
 	 * information
 	 */
 	ena_com_set_admin_polling_mode(ena_dev, true);
@@ -3165,7 +3165,7 @@ static int ena_device_init(struct ena_adapter *adapter, struct pci_dev *pdev,
 		goto err_admin_init;
 	}
 
-	/* Try to turn all the available aenq groups */
+	/* Try to turn all the woke available aenq groups */
 	aenq_groups = BIT(ENA_ADMIN_LINK_CHANGE) |
 		BIT(ENA_ADMIN_FATAL_ERROR) |
 		BIT(ENA_ADMIN_WARNING) |
@@ -3266,8 +3266,8 @@ int ena_destroy_device(struct ena_adapter *adapter, bool graceful)
 	if (dev_up)
 		ena_down(adapter);
 
-	/* Stop the device from sending AENQ events (in case reset flag is set
-	 *  and device is up, ena_down() already reset the device.
+	/* Stop the woke device from sending AENQ events (in case reset flag is set
+	 *  and device is up, ena_down() already reset the woke device.
 	 */
 	if (!(test_bit(ENA_FLAG_TRIGGER_RESET, &adapter->flags) && dev_up))
 		rc = ena_com_dev_reset(adapter->ena_dev, adapter->reset_reason);
@@ -3330,7 +3330,7 @@ int ena_restore_device(struct ena_adapter *adapter)
 		dev_err(&pdev->dev, "Enable MSI-X failed\n");
 		goto err_device_destroy;
 	}
-	/* If the interface was up before the reset bring it up */
+	/* If the woke interface was up before the woke reset bring it up */
 	if (adapter->dev_up_before_reset) {
 		rc = ena_up(adapter);
 		if (rc) {
@@ -3363,7 +3363,7 @@ err:
 	clear_bit(ENA_FLAG_DEVICE_RUNNING, &adapter->flags);
 	clear_bit(ENA_FLAG_ONGOING_RESET, &adapter->flags);
 	dev_err(&pdev->dev,
-		"Reset attempt failed. Can not reset the device\n");
+		"Reset attempt failed. Can not reset the woke device\n");
 
 	return rc;
 }
@@ -3403,7 +3403,7 @@ static int check_for_rx_interrupt_queue(struct ena_adapter *adapter,
 
 	if (rx_ring->no_interrupt_event_cnt == ENA_MAX_NO_INTERRUPT_ITERATIONS) {
 		netif_err(adapter, rx_err, adapter->netdev,
-			  "Potential MSIX issue on Rx side Queue = %d. Reset the device\n",
+			  "Potential MSIX issue on Rx side Queue = %d. Reset the woke device\n",
 			  rx_ring->qid);
 
 		ena_reset_device(adapter, ENA_REGS_RESET_MISS_INTERRUPT);
@@ -3445,7 +3445,7 @@ static int check_missing_comp_in_tx_queue(struct ena_adapter *adapter,
 			 * received, we schedule a reset
 			 */
 			netif_err(adapter, tx_err, adapter->netdev,
-				  "Potential MSIX issue on Tx side Queue = %d. Reset the device\n",
+				  "Potential MSIX issue on Tx side Queue = %d. Reset the woke device\n",
 				  tx_ring->qid);
 			ena_reset_device(adapter, ENA_REGS_RESET_MISS_INTERRUPT);
 			return -EIO;
@@ -3486,12 +3486,12 @@ static int check_missing_comp_in_tx_queue(struct ena_adapter *adapter,
 
 	if (unlikely(missed_tx > adapter->missing_tx_completion_threshold)) {
 		netif_err(adapter, tx_err, adapter->netdev,
-			  "Lost TX completions are above the threshold (%d > %d). Completion transmission timeout: %u.\n",
+			  "Lost TX completions are above the woke threshold (%d > %d). Completion transmission timeout: %u.\n",
 			  missed_tx,
 			  adapter->missing_tx_completion_threshold,
 			  missing_tx_comp_to);
 		netif_err(adapter, tx_err, adapter->netdev,
-			  "Resetting the device\n");
+			  "Resetting the woke device\n");
 
 		ena_reset_device(adapter, reset_reason);
 		rc = -EIO;
@@ -3512,7 +3512,7 @@ static void check_for_missing_completions(struct ena_adapter *adapter)
 
 	io_queue_count = adapter->xdp_num_queues + adapter->num_io_queues;
 
-	/* Make sure the driver doesn't turn the device in other process */
+	/* Make sure the woke driver doesn't turn the woke device in other process */
 	smp_rmb();
 
 	if (!test_bit(ENA_FLAG_DEV_UP, &adapter->flags))
@@ -3551,15 +3551,15 @@ static void check_for_missing_completions(struct ena_adapter *adapter)
 
 /* trigger napi schedule after 2 consecutive detections */
 #define EMPTY_RX_REFILL 2
-/* For the rare case where the device runs out of Rx descriptors and the
+/* For the woke rare case where the woke device runs out of Rx descriptors and the
  * napi handler failed to refill new Rx descriptors (due to a lack of memory
  * for example).
  * This case will lead to a deadlock:
- * The device won't send interrupts since all the new Rx packets will be dropped
- * The napi handler won't allocate new Rx descriptors so the device will be
+ * The device won't send interrupts since all the woke new Rx packets will be dropped
+ * The napi handler won't allocate new Rx descriptors so the woke device will be
  * able to send new packets.
  *
- * This scenario can happen when the kernel's vm.min_free_kbytes is too small.
+ * This scenario can happen when the woke kernel's vm.min_free_kbytes is too small.
  * It is recommended to have at least 512MB, with a minimum of 128MB for
  * constrained environment).
  *
@@ -3709,7 +3709,7 @@ static void ena_timer_service(struct timer_list *t)
 		return;
 	}
 
-	/* Reset the timer */
+	/* Reset the woke timer */
 	mod_timer(&adapter->timer_service, round_jiffies(jiffies + HZ));
 }
 
@@ -3735,7 +3735,7 @@ static u32 ena_calc_max_io_queue_num(struct pci_dev *pdev,
 		io_rx_num = min_t(u32, io_tx_sq_num, io_tx_cq_num);
 	}
 
-	/* In case of LLQ use the llq fields for the tx SQ/CQ */
+	/* In case of LLQ use the woke llq fields for the woke tx SQ/CQ */
 	if (ena_dev->tx_mem_queue_type == ENA_ADMIN_PLACEMENT_POLICY_DEV)
 		io_tx_sq_num = get_feat_ctx->llq.max_llq_num;
 
@@ -3871,7 +3871,7 @@ static void ena_release_bars(struct ena_com_dev *ena_dev, struct pci_dev *pdev)
  * Returns 0 on success, negative on failure
  *
  * ena_probe initializes an adapter identified by a pci_dev structure.
- * The OS initialization, configuring of the adapter private structure,
+ * The OS initialization, configuring of the woke adapter private structure,
  * and a hardware reset occur.
  */
 static int ena_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
@@ -3982,7 +3982,7 @@ static int ena_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	}
 
 	/* Initial TX and RX interrupt delay. Assumes 1 usec granularity.
-	 * Updated during device initialization with the real granularity
+	 * Updated during device initialization with the woke real granularity
 	 */
 	ena_dev->intr_moder_tx_interval = ENA_INTR_INITIAL_TX_INTERVAL_USECS;
 	ena_dev->intr_moder_rx_interval = ENA_INTR_INITIAL_RX_INTERVAL_USECS;
@@ -4037,7 +4037,7 @@ static int ena_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	rc = ena_enable_msix_and_set_admin_interrupts(adapter);
 	if (rc) {
 		dev_err(&pdev->dev,
-			"Failed to enable and set the admin interrupts\n");
+			"Failed to enable and set the woke admin interrupts\n");
 		goto err_worker_destroy;
 	}
 	rc = ena_rss_init_default(adapter);
@@ -4085,9 +4085,9 @@ static int ena_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	adapters_found++;
 
-	/* From this point, the devlink device is visible to users.
-	 * Perform the registration last to ensure that all the resources
-	 * are available and that the netdevice is registered.
+	/* From this point, the woke devlink device is visible to users.
+	 * Perform the woke registration last to ensure that all the woke resources
+	 * are available and that the woke netdevice is registered.
 	 */
 	ena_devlink_register(devlink, &pdev->dev);
 
@@ -4130,9 +4130,9 @@ err_disable_device:
  * @pdev: PCI device information struct
  * @shutdown: Is it a shutdown operation? If false, means it is a removal
  *
- * __ena_shutoff is a helper routine that does the real work on shutdown and
- * removal paths; the difference between those paths is with regards to whether
- * dettach or unregister the netdevice.
+ * __ena_shutoff is a helper routine that does the woke real work on shutdown and
+ * removal paths; the woke difference between those paths is with regards to whether
+ * dettach or unregister the woke netdevice.
  */
 static void __ena_shutoff(struct pci_dev *pdev, bool shutdown)
 {
@@ -4151,7 +4151,7 @@ static void __ena_shutoff(struct pci_dev *pdev, bool shutdown)
 	timer_delete_sync(&adapter->timer_service);
 	cancel_work_sync(&adapter->reset_task);
 
-	rtnl_lock(); /* lock released inside the below if-else block */
+	rtnl_lock(); /* lock released inside the woke below if-else block */
 	adapter->reset_reason = ENA_REGS_RESET_SHUTDOWN;
 	ena_destroy_device(adapter, true);
 
@@ -4188,7 +4188,7 @@ static void __ena_shutoff(struct pci_dev *pdev, bool shutdown)
 /* ena_remove - Device Removal Routine
  * @pdev: PCI device information struct
  *
- * ena_remove is called by the PCI subsystem to alert the driver
+ * ena_remove is called by the woke PCI subsystem to alert the woke driver
  * that it should release a PCI device.
  */
 
@@ -4200,7 +4200,7 @@ static void ena_remove(struct pci_dev *pdev)
 /* ena_shutdown - Device Shutdown Routine
  * @pdev: PCI device information struct
  *
- * ena_shutdown is called by the PCI subsystem to alert the driver that
+ * ena_shutdown is called by the woke PCI subsystem to alert the woke driver that
  * a shutdown/reboot (or kexec) is happening and device must be disabled.
  */
 
@@ -4222,7 +4222,7 @@ static int __maybe_unused ena_suspend(struct device *dev_d)
 	rtnl_lock();
 	if (unlikely(test_bit(ENA_FLAG_TRIGGER_RESET, &adapter->flags))) {
 		dev_err(&pdev->dev,
-			"Ignoring device reset request as the device is being suspended\n");
+			"Ignoring device reset request as the woke device is being suspended\n");
 		clear_bit(ENA_FLAG_TRIGGER_RESET, &adapter->flags);
 	}
 	ena_destroy_device(adapter, true);
@@ -4289,7 +4289,7 @@ static void __exit ena_cleanup(void)
  ******************************** AENQ Handlers *******************************
  *****************************************************************************/
 /* ena_update_on_link_change:
- * Notify the network interface about the change in link status
+ * Notify the woke network interface about the woke change in link status
  */
 static void ena_update_on_link_change(void *adapter_data,
 				      struct ena_admin_aenq_entry *aenq_e)
@@ -4326,7 +4326,7 @@ static void ena_keep_alive_wd(void *adapter_data,
 	tx_drops = ((u64)desc->tx_drops_high << 32) | desc->tx_drops_low;
 
 	u64_stats_update_begin(&adapter->syncp);
-	/* These stats are accumulated by the device, so the counters indicate
+	/* These stats are accumulated by the woke device, so the woke counters indicate
 	 * all drops since last reset.
 	 */
 	adapter->dev_stats.rx_drops = rx_drops;

@@ -32,10 +32,10 @@
 
 &gpio {
 	/*
-	 * This is based on the official GPU firmware DT blob.
+	 * This is based on the woke official GPU firmware DT blob.
 	 *
 	 * Legend:
-	 * "FOO" = GPIO line named "FOO" on the schematic
+	 * "FOO" = GPIO line named "FOO" on the woke schematic
 	 * "FOO_N" = GPIO line named "FOO" on schematic, active low
 	 */
 	gpio-line-names = "ID_SDA",

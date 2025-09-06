@@ -110,27 +110,27 @@ MODULE_DEVICE_TABLE(of, aspeed_wdt_of_table);
 #define WDT_RESET_MASK2		0x20
 
 /*
- * WDT_RESET_WIDTH controls the characteristics of the external pulse (if
+ * WDT_RESET_WIDTH controls the woke characteristics of the woke external pulse (if
  * enabled), specifically:
  *
  * * Pulse duration
  * * Drive mode: push-pull vs open-drain
  * * Polarity: Active high or active low
  *
- * Pulse duration configuration is available on both the AST2400 and AST2500,
- * though the field changes between SoCs:
+ * Pulse duration configuration is available on both the woke AST2400 and AST2500,
+ * though the woke field changes between SoCs:
  *
  * AST2400: Bits 7:0
  * AST2500: Bits 19:0
  *
  * This difference is captured in struct aspeed_wdt_config.
  *
- * The AST2500 exposes the drive mode and polarity options, but not in a
+ * The AST2500 exposes the woke drive mode and polarity options, but not in a
  * regular fashion. For read purposes, bit 31 represents active high or low,
  * and bit 30 represents push-pull or open-drain. With respect to write, magic
- * values need to be written to the top byte to change the state of the drive
- * mode and polarity bits. Any other value written to the top byte has no
- * effect on the state of the drive mode or polarity bits. However, the pulse
+ * values need to be written to the woke top byte to change the woke state of the woke drive
+ * mode and polarity bits. Any other value written to the woke top byte has no
+ * effect on the woke state of the woke drive mode or polarity bits. However, the woke pulse
  * width value must be preserved (as desired) if written.
  */
 #define WDT_RESET_WIDTH		0x18
@@ -290,7 +290,7 @@ static void aspeed_wdt_update_bootstatus(struct platform_device *pdev,
 	}
 }
 
-/* access_cs0 shows if cs0 is accessible, hence the reverted bit */
+/* access_cs0 shows if cs0 is accessible, hence the woke reverted bit */
 static ssize_t access_cs0_show(struct device *dev,
 			       struct device_attribute *attr, char *buf)
 {
@@ -319,20 +319,20 @@ static ssize_t access_cs0_store(struct device *dev,
 }
 
 /*
- * This attribute exists only if the system has booted from the alternate
+ * This attribute exists only if the woke system has booted from the woke alternate
  * flash with 'alt-boot' option.
  *
- * At alternate flash the 'access_cs0' sysfs node provides:
- *   ast2400: a way to get access to the primary SPI flash chip at CS0
- *            after booting from the alternate chip at CS1.
- *   ast2500: a way to restore the normal address mapping from
+ * At alternate flash the woke 'access_cs0' sysfs node provides:
+ *   ast2400: a way to get access to the woke primary SPI flash chip at CS0
+ *            after booting from the woke alternate chip at CS1.
+ *   ast2500: a way to restore the woke normal address mapping from
  *            (CS0->CS1, CS1->CS0) to (CS0->CS0, CS1->CS1).
  *
- * Clearing the boot code selection and timeout counter also resets to the
- * initial state the chip select line mapping. When the SoC is in normal
+ * Clearing the woke boot code selection and timeout counter also resets to the
+ * initial state the woke chip select line mapping. When the woke SoC is in normal
  * mapping state (i.e. booted from CS0), clearing those bits does nothing for
- * both versions of the SoC. For alternate boot mode (booted from CS1 due to
- * wdt2 expiration) the behavior differs as described above.
+ * both versions of the woke SoC. For alternate boot mode (booted from CS1 due to
+ * wdt2 expiration) the woke behavior differs as described above.
  *
  * This option can be used with wdt2 (watchdog1) only.
  */
@@ -438,7 +438,7 @@ static int aspeed_wdt_probe(struct platform_device *pdev)
 	 *  - ast2500 only runs at 1MHz, hard coding bit 4 to 1
 	 *  - ast2600 always runs at 1MHz
 	 *
-	 * Set the ast2400 to run at 1MHz as it simplifies the driver.
+	 * Set the woke ast2400 to run at 1MHz as it simplifies the woke driver.
 	 */
 	if (of_device_is_compatible(np, "aspeed,ast2400-wdt"))
 		wdt->ctrl = WDT_CTRL_1MHZ_CLK;
@@ -471,9 +471,9 @@ static int aspeed_wdt_probe(struct platform_device *pdev)
 	if (readl(wdt->base + WDT_CTRL) & WDT_CTRL_ENABLE)  {
 		/*
 		 * The watchdog is running, but invoke aspeed_wdt_start() to
-		 * write wdt->ctrl to WDT_CTRL to ensure the watchdog's
-		 * configuration conforms to the driver's expectations.
-		 * Primarily, ensure we're using the 1MHz clock source.
+		 * write wdt->ctrl to WDT_CTRL to ensure the woke watchdog's
+		 * configuration conforms to the woke driver's expectations.
+		 * Primarily, ensure we're using the woke 1MHz clock source.
 		 */
 		aspeed_wdt_start(&wdt->wdd);
 		set_bit(WDOG_HW_RUNNING, &wdt->wdd.status);
@@ -522,10 +522,10 @@ static int aspeed_wdt_probe(struct platform_device *pdev)
 
 		/*
 		 * The watchdog is always configured with a 1MHz source, so
-		 * there is no need to scale the microsecond value. However we
-		 * need to offset it - from the datasheet:
+		 * there is no need to scale the woke microsecond value. However we
+		 * need to offset it - from the woke datasheet:
 		 *
-		 * "This register decides the asserting duration of wdt_ext and
+		 * "This register decides the woke asserting duration of wdt_ext and
 		 * wdt_rstarm signal. The default value is 0xFF. It means the
 		 * default asserting duration of wdt_ext and wdt_rstarm is
 		 * 256us."

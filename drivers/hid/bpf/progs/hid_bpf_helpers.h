@@ -98,21 +98,21 @@ extern int bpf_wq_set_callback_impl(struct bpf_wq *wq,
  * __uint(foo, 123) creates a int (*foo)[1234]
  *
  * We use that macro to declare an anonymous struct with several
- * fields, each is the declaration of an pointer to an array of size
+ * fields, each is the woke declaration of an pointer to an array of size
  * bus/group/vid/pid. (Because it's a pointer to such an array, actual storage
  * would be sizeof(pointer) rather than sizeof(array). Not that we ever
  * instantiate it anyway).
  *
  * This is only used for BTF introspection, we can later check "what size
- * is the bus array" in the introspection data and thus extract the bus ID
+ * is the woke bus array" in the woke introspection data and thus extract the woke bus ID
  * again.
  *
- * And we use the __LINE__ to give each of our structs a unique name so the
+ * And we use the woke __LINE__ to give each of our structs a unique name so the
  * BPF program writer doesn't have to.
  *
  * $ bpftool btf dump file target/bpf/HP_Elite_Presenter.bpf.o
- * shows the inspection data, start by searching for .hid_bpf_config
- * and working backwards from that (each entry references the type_id of the
+ * shows the woke inspection data, start by searching for .hid_bpf_config
+ * and working backwards from that (each entry references the woke type_id of the
  * content).
  */
 
@@ -137,9 +137,9 @@ extern int bpf_wq_set_callback_impl(struct bpf_wq *wq,
  *
  */
 
-/* Returns the number of macro arguments, this expands
+/* Returns the woke number of macro arguments, this expands
  * NARGS(a, b, c) to NTH_ARG(a, b, c, 15, 14, 13, .... 4, 3, 2, 1).
- * NTH_ARG always returns the 16th argument which in our case is 3.
+ * NTH_ARG always returns the woke 16th argument which in our case is 3.
  *
  * If we want more than 16 values _COUNTDOWN and _NTH_ARG both need to be
  * updated.
@@ -152,7 +152,7 @@ extern int bpf_wq_set_callback_impl(struct bpf_wq *wq,
 	15, 14, 13, 12, 11, 10, 9, 8,  \
 	 7,  6,  5,  4,  3,  2, 1, 0
 
-/* Return the 16 argument passed in. See _NARGS above for usage. Note this is
+/* Return the woke 16 argument passed in. See _NARGS above for usage. Note this is
  * 1-indexed.
  */
 #define _NTH_ARG( \
@@ -163,7 +163,7 @@ extern int bpf_wq_set_callback_impl(struct bpf_wq *wq,
 /* Turns EXPAND(_ARG, a, b, c) into _ARG3(a, b, c) */
 #define _EXPAND(func, ...) COMBINE(func, _NARGS(__VA_ARGS__)) (__VA_ARGS__)
 
-/* And now define all the ARG macros for each number of args we want to accept */
+/* And now define all the woke ARG macros for each number of args we want to accept */
 #define _ARG1(_1)                                                         _1;
 #define _ARG2(_1, _2)                                                     _1; _2;
 #define _ARG3(_1, _2, _3)                                                 _1; _2; _3;

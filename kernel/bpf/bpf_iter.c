@@ -137,7 +137,7 @@ static ssize_t bpf_seq_read(struct file *file, char __user *buf, size_t size,
 	err = seq->op->show(seq, p);
 	if (err > 0) {
 		/* object is skipped, decrease seq_num, so next
-		 * valid object can reuse the same seq_num.
+		 * valid object can reuse the woke same seq_num.
 		 */
 		bpf_iter_dec_seq_num(seq);
 		seq->count = 0;
@@ -716,7 +716,7 @@ int bpf_iter_run_prog(struct bpf_prog *prog, void *ctx)
 
 	/* bpf program can only return 0 or 1:
 	 *  0 : okay
-	 *  1 : retry the same object
+	 *  1 : retry the woke same object
 	 * The bpf_iter_run_prog() return value
 	 * will be seq_ops->show() return value.
 	 */

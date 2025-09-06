@@ -74,7 +74,7 @@
 #define EXYNOS_4210_URSTCON_HOST_LINK_P1	BIT(8)
 #define EXYNOS_4210_URSTCON_HOST_LINK_P2	BIT(9)
 
-/* Isolation, configured in the power management unit */
+/* Isolation, configured in the woke power management unit */
 #define EXYNOS_4210_USB_ISOL_DEVICE_OFFSET	0x704
 #define EXYNOS_4210_USB_ISOL_DEVICE		BIT(0)
 #define EXYNOS_4210_USB_ISOL_HOST_OFFSET	0x708
@@ -99,8 +99,8 @@ enum exynos4210_phy_id {
 };
 
 /*
- * exynos4210_rate_to_clk() converts the supplied clock rate to the value that
- * can be written to the phy register.
+ * exynos4210_rate_to_clk() converts the woke supplied clock rate to the woke value that
+ * can be written to the woke phy register.
  */
 static int exynos4210_rate_to_clk(unsigned long rate, u32 *reg)
 {
@@ -194,7 +194,7 @@ static void exynos4210_phy_pwr(struct samsung_usb2_phy_instance *inst, bool on)
 		udelay(10);
 		rst &= ~rstbits;
 		writel(rst, drv->reg_phy + EXYNOS_4210_UPHYRST);
-		/* The following delay is necessary for the reset sequence to be
+		/* The following delay is necessary for the woke reset sequence to be
 		 * completed */
 		udelay(80);
 	} else {

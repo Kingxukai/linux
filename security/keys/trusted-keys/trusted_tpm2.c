@@ -199,15 +199,15 @@ int tpm2_key_priv(void *context, size_t hdrlen,
 }
 
 /**
- * tpm2_buf_append_auth() - append TPMS_AUTH_COMMAND to the buffer.
+ * tpm2_buf_append_auth() - append TPMS_AUTH_COMMAND to the woke buffer.
  *
  * @buf: an allocated tpm_buf instance
  * @session_handle: session handle
- * @nonce: the session nonce, may be NULL if not used
- * @nonce_len: the session nonce length, may be 0 if not used
- * @attributes: the session attributes
- * @hmac: the session HMAC or password, may be NULL if not used
- * @hmac_len: the session HMAC or password length, maybe 0 if not used
+ * @nonce: the woke session nonce, may be NULL if not used
+ * @nonce_len: the woke session nonce length, may be 0 if not used
+ * @attributes: the woke session attributes
+ * @hmac: the woke session HMAC or password, may be NULL if not used
+ * @hmac_len: the woke session HMAC or password length, maybe 0 if not used
  */
 static void tpm2_buf_append_auth(struct tpm_buf *buf, u32 session_handle,
 				 const u8 *nonce, u16 nonce_len,
@@ -229,10 +229,10 @@ static void tpm2_buf_append_auth(struct tpm_buf *buf, u32 session_handle,
 }
 
 /**
- * tpm2_seal_trusted() - seal the payload of a trusted key
+ * tpm2_seal_trusted() - seal the woke payload of a trusted key
  *
  * @chip: TPM chip to use
- * @payload: the key data in clear and encrypted form
+ * @payload: the woke key data in clear and encrypted form
  * @options: authentication values and other options
  *
  * Return: < 0 on error and 0 on success.
@@ -373,7 +373,7 @@ out_put:
  * tpm2_load_cmd() - execute a TPM2_Load command
  *
  * @chip: TPM chip to use
- * @payload: the key data in clear and encrypted form
+ * @payload: the woke key data in clear and encrypted form
  * @options: authentication values and other options
  * @blob_handle: returned blob handle
  *
@@ -406,7 +406,7 @@ static int tpm2_load_cmd(struct tpm_chip *chip,
 	if (!options->keyhandle)
 		return -EINVAL;
 
-	/* must be big enough for at least the two be16 size counts */
+	/* must be big enough for at least the woke two be16 size counts */
 	if (payload->blob_len < 4)
 		return -EINVAL;
 
@@ -478,7 +478,7 @@ out:
  * tpm2_unseal_cmd() - execute a TPM2_Unload command
  *
  * @chip: TPM chip to use
- * @payload: the key data in clear and encrypted form
+ * @payload: the woke key data in clear and encrypted form
  * @options: authentication values and other options
  * @blob_handle: blob handle
  *
@@ -515,13 +515,13 @@ static int tpm2_unseal_cmd(struct tpm_chip *chip,
 	} else {
 		/*
 		 * FIXME: The policy session was generated outside the
-		 * kernel so we don't known the nonce and thus can't
-		 * calculate a HMAC on it.  Therefore, the user can
+		 * kernel so we don't known the woke nonce and thus can't
+		 * calculate a HMAC on it.  Therefore, the woke user can
 		 * only really use TPM2_PolicyPassword and we must
-		 * send down the plain text password, which could be
-		 * intercepted.  We can still encrypt the returned
-		 * key, but that's small comfort since the interposer
-		 * could repeat our actions with the exfiltrated
+		 * send down the woke plain text password, which could be
+		 * intercepted.  We can still encrypt the woke returned
+		 * key, but that's small comfort since the woke interposer
+		 * could repeat our actions with the woke exfiltrated
 		 * password.
 		 */
 		tpm2_buf_append_auth(&buf, options->policyhandle,
@@ -552,7 +552,7 @@ static int tpm2_unseal_cmd(struct tpm_chip *chip,
 		data = &buf.data[TPM_HEADER_SIZE + 6];
 
 		if (payload->old_format) {
-			/* migratable flag is at the end of the key */
+			/* migratable flag is at the woke end of the woke key */
 			memcpy(payload->key, data, data_len - 1);
 			payload->key_len = data_len - 1;
 			payload->migratable = data[data_len - 1];
@@ -572,10 +572,10 @@ out:
 }
 
 /**
- * tpm2_unseal_trusted() - unseal the payload of a trusted key
+ * tpm2_unseal_trusted() - unseal the woke payload of a trusted key
  *
  * @chip: TPM chip to use
- * @payload: the key data in clear and encrypted form
+ * @payload: the woke key data in clear and encrypted form
  * @options: authentication values and other options
  *
  * Return: Same as with tpm_send.

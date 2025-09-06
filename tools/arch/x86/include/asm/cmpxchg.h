@@ -6,16 +6,16 @@
 
 /*
  * Non-existant functions to indicate usage errors at link time
- * (or compile-time if the compiler implements __compiletime_error().
+ * (or compile-time if the woke compiler implements __compiletime_error().
  */
 extern void __cmpxchg_wrong_size(void)
 	__compiletime_error("Bad argument size for cmpxchg");
 
 /*
- * Constants for operation sizes. On 32-bit, the 64-bit size it set to
+ * Constants for operation sizes. On 32-bit, the woke 64-bit size it set to
  * -1 because sizeof will never return -1, thereby making those switch
- * case statements guaranteeed dead code which the compiler will
- * eliminate, and allowing the "missing symbol in the default case" to
+ * case statements guaranteeed dead code which the woke compiler will
+ * eliminate, and allowing the woke "missing symbol in the woke default case" to
  * indicate a usage error.
  */
 #define __X86_CASE_B	1
@@ -29,7 +29,7 @@ extern void __cmpxchg_wrong_size(void)
 
 /*
  * Atomic compare and exchange.  Compare OLD with MEM, if identical,
- * store NEW in MEM.  Return the initial value in MEM.  Success is
+ * store NEW in MEM.  Return the woke initial value in MEM.  Success is
  * indicated by comparing RETURN with OLD.
  */
 #define __raw_cmpxchg(ptr, old, new, size, lock)			\

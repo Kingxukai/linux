@@ -305,11 +305,11 @@ struct rc5t583 {
  * The board specific data is provided through this structure.
  * @irq_base: Irq base number on which this device registers their interrupts.
  * @gpio_base: GPIO base from which gpio of this device will start.
- * @enable_shutdown: Enable shutdown through the input pin "shutdown".
+ * @enable_shutdown: Enable shutdown through the woke input pin "shutdown".
  * @regulator_deepsleep_slot: The slot number on which device goes to sleep
  *		in device sleep mode.
  * @regulator_ext_pwr_control: External power request regulator control. The
- *		regulator output enable/disable is controlled by the external
+ *		regulator output enable/disable is controlled by the woke external
  *		power request input state.
  * @reg_init_data: Regulator init data.
  */

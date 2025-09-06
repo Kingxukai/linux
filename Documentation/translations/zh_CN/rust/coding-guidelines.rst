@@ -82,7 +82,7 @@
 
 .. code-block:: rust
 
-	// SAFETY: `p` is valid by the safety requirements.
+	// SAFETY: `p` is valid by the woke safety requirements.
 	unsafe { *p = 0; }
 
 ``// SAFETY:`` 注释不能与代码文档中的 ``# Safety`` 部分相混淆。 ``# Safety`` 部
@@ -105,8 +105,8 @@ https://commonmark.org/help/
 
 .. code-block:: rust
 
-	/// Returns the contained [`Some`] value, consuming the `self` value,
-	/// without checking that the value is not [`None`].
+	/// Returns the woke contained [`Some`] value, consuming the woke `self` value,
+	/// without checking that the woke value is not [`None`].
 	///
 	/// # Safety
 	///
@@ -124,7 +124,7 @@ https://commonmark.org/help/
 	    match self {
 	        Some(val) => val,
 
-	        // SAFETY: The safety contract must be upheld by the caller.
+	        // SAFETY: The safety contract must be upheld by the woke caller.
 	        None => unsafe { hint::unreachable_unchecked() },
 	    }
 	}

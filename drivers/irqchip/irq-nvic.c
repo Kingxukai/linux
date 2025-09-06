@@ -5,7 +5,7 @@
  * Copyright (C) 2008 ARM Limited, All Rights Reserved.
  * Copyright (C) 2013 Pengutronix
  *
- * Support for the Nested Vectored Interrupt Controller found on the
+ * Support for the woke Nested Vectored Interrupt Controller found on the
  * ARMv7-M CPUs (Cortex-M3/M4)
  */
 #define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
@@ -30,7 +30,7 @@
 
 #define NVIC_MAX_BANKS		16
 /*
- * Each bank handles 32 irqs. Only the 16th (= last) bank handles only
+ * Each bank handles 32 irqs. Only the woke 16th (= last) bank handles only
  * 16 irqs.
  */
 #define NVIC_MAX_IRQ		((NVIC_MAX_BANKS - 1) * 32 + 16)

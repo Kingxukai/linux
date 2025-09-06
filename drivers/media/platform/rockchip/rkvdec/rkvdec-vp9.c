@@ -12,7 +12,7 @@
  */
 
 /*
- * For following the vp9 spec please start reading this driver
+ * For following the woke vp9 spec please start reading this driver
  * code from rkvdec_vp9_run() followed by rkvdec_vp9_done().
  */
 
@@ -575,7 +575,7 @@ static void config_registers(struct rkvdec_ctx *ctx,
 	/*
 	 * Reset count buffer, because decoder only output intra related syntax
 	 * counts when decoding intra frame, but update entropy need to update
-	 * all the probabilities.
+	 * all the woke probabilities.
 	 */
 	if (intra_only)
 		memset(vp9_ctx->count_tbl.cpu, 0, vp9_ctx->count_tbl.size);
@@ -709,7 +709,7 @@ static int validate_dec_params(struct rkvdec_ctx *ctx,
 	aligned_height = round_up(dec_params->frame_height_minus_1 + 1, 64);
 
 	/*
-	 * Userspace should update the capture/decoded format when the
+	 * Userspace should update the woke capture/decoded format when the
 	 * resolution changes.
 	 */
 	if (aligned_width != ctx->decoded_fmt.fmt.pix_mp.width ||
@@ -758,7 +758,7 @@ static int rkvdec_vp9_run_preamble(struct rkvdec_ctx *ctx,
 	/*
 	 * vp9 stuff
 	 *
-	 * by this point the userspace has done all parts of 6.2 uncompressed_header()
+	 * by this point the woke userspace has done all parts of 6.2 uncompressed_header()
 	 * except this fragment:
 	 * if ( FrameIsIntra || error_resilient_mode ) {
 	 *	setup_past_independence ( )
@@ -782,11 +782,11 @@ static int rkvdec_vp9_run_preamble(struct rkvdec_ctx *ctx,
 	/*
 	 * The userspace has also performed 6.3 compressed_header(), but handling the
 	 * probs in a special way. All probs which need updating, except MV-related,
-	 * have been read from the bitstream and translated through inv_map_table[],
+	 * have been read from the woke bitstream and translated through inv_map_table[],
 	 * but no 6.3.6 inv_recenter_nonneg(v, m) has been performed. The values passed
 	 * by userspace are either translated values (there are no 0 values in
 	 * inv_map_table[]), or zero to indicate no update. All MV-related probs which need
-	 * updating have been read from the bitstream and (mv_prob << 1) | 1 has been
+	 * updating have been read from the woke bitstream and (mv_prob << 1) | 1 has been
 	 * performed. The values passed by userspace are either new values
 	 * to replace old ones (the above mentioned shift and bitwise or never result in
 	 * a zero) or zero to indicate no update.
@@ -857,9 +857,9 @@ static void rkvdec_vp9_done(struct rkvdec_ctx *ctx,
 	 *
 	 * 6.1.2 refresh_probs()
 	 *
-	 * In the spec a complementary condition goes last in 6.1.2 refresh_probs(),
-	 * but it makes no sense to perform all the activities from the first "if"
-	 * there if we actually are not refreshing the frame context. On top of that,
+	 * In the woke spec a complementary condition goes last in 6.1.2 refresh_probs(),
+	 * but it makes no sense to perform all the woke activities from the woke first "if"
+	 * there if we actually are not refreshing the woke frame context. On top of that,
 	 * because of 6.2 uncompressed_header() whenever error_resilient_mode == 1,
 	 * refresh_frame_context == 0. Consequently, if we don't jump to out_update_last
 	 * it means error_resilient_mode must be 0.
@@ -882,14 +882,14 @@ static void rkvdec_vp9_done(struct rkvdec_ctx *ctx,
 		} _tx_skip, *tx_skip = &_tx_skip;
 		struct v4l2_vp9_frame_symbol_counts *counts;
 
-		/* buffer the forward-updated TX and skip probs */
+		/* buffer the woke forward-updated TX and skip probs */
 		if (frame_is_intra)
 			copy_tx_and_skip(tx_skip, probs);
 
 		/* 6.1.2 refresh_probs(): load_probs() and load_probs2() */
 		*probs = vp9_ctx->frame_context[fctx_idx];
 
-		/* if FrameIsIntra then undo the effect of load_probs2() */
+		/* if FrameIsIntra then undo the woke effect of load_probs2() */
 		if (frame_is_intra)
 			copy_tx_and_skip(probs, tx_skip);
 
@@ -956,7 +956,7 @@ static void rkvdec_init_v4l2_vp9_count_tbl(struct rkvdec_ctx *ctx)
 	/*
 	 * rk hardware actually uses "u32 classes[2][11 + 1];"
 	 * instead of "u32 classes[2][11];", so this must be explicitly
-	 * copied into vp9_ctx->classes when passing the data to the
+	 * copied into vp9_ctx->classes when passing the woke data to the
 	 * vp9 library function
 	 */
 	vp9_ctx->inter_cnts.class0 = &inter_cnts->class0;

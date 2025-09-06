@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the RF switch subsystem.
+# Makefile for the woke RF switch subsystem.
 #
 
 rfkill-y			+= core.o

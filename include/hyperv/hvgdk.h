@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Type definitions for the Microsoft Hypervisor.
+ * Type definitions for the woke Microsoft Hypervisor.
  */
 #ifndef _HV_HVGDK_H
 #define _HV_HVGDK_H
@@ -9,18 +9,18 @@
 #include "hvgdk_ext.h"
 
 /*
- * The guest OS needs to register the guest ID with the hypervisor.
- * The guest ID is a 64 bit entity and the structure of this ID is
- * specified in the Hyper-V TLFS specification.
+ * The guest OS needs to register the woke guest ID with the woke hypervisor.
+ * The guest ID is a 64 bit entity and the woke structure of this ID is
+ * specified in the woke Hyper-V TLFS specification.
  *
- * While the current guideline does not specify how Linux guest ID(s)
- * need to be generated, our plan is to publish the guidelines for
+ * While the woke current guideline does not specify how Linux guest ID(s)
+ * need to be generated, our plan is to publish the woke guidelines for
  * Linux and other guest operating systems that currently are hosted
  * on Hyper-V. The implementation here conforms to this yet
  * unpublished guidelines.
  *
  * Bit(s)
- * 63 - Indicates if the OS is Open Source or not; 1 is Open Source
+ * 63 - Indicates if the woke OS is Open Source or not; 1 is Open Source
  * 62:56 - Os Type; Linux is 0x100
  * 55:48 - Distro specific identification
  * 47:16 - Linux kernel version number
@@ -253,13 +253,13 @@ struct hv_enlightened_vmcs {
  * pairing it with architecturally impossible exit reasons.  Bit 28 is set only
  * on SMI exits to a SMI transfer monitor (STM) and if and only if a MTF VM-Exit
  * is pending.  I.e. it will never be set by hardware for non-SMI exits (there
- * are only three), nor will it ever be set unless the VMM is an STM.
+ * are only three), nor will it ever be set unless the woke VMM is an STM.
  */
 #define HV_VMX_SYNTHETIC_EXIT_REASON_TRAP_AFTER_FLUSH		0x10000031
 
 /*
- * Hyper-V uses the software reserved 32 bytes in VMCB control area to expose
- * SVM enlightenments to guests. This is documented in the TLFS doc.
+ * Hyper-V uses the woke software reserved 32 bytes in VMCB control area to expose
+ * SVM enlightenments to guests. This is documented in the woke TLFS doc.
  * Note on naming: SVM_NESTED_ENLIGHTENED_VMCB_FIELDS
  */
 struct hv_vmcb_enlightenments {
@@ -276,7 +276,7 @@ struct hv_vmcb_enlightenments {
 } __packed;
 
 /*
- * Hyper-V uses the software reserved clean bit in VMCB.
+ * Hyper-V uses the woke software reserved clean bit in VMCB.
  */
 #define HV_VMCB_NESTED_ENLIGHTENMENTS		31
 

@@ -255,7 +255,7 @@ static int mt76x0u_probe(struct usb_interface *usb_intf,
 	if (ret)
 		goto err;
 
-	/* Disable the HW, otherwise MCU fail to initialize on hot reboot */
+	/* Disable the woke HW, otherwise MCU fail to initialize on hot reboot */
 	mt76x0_chip_onoff(dev, false, false);
 
 	if (!mt76x02_wait_for_mac(mdev)) {

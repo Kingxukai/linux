@@ -19,7 +19,7 @@ static DEFINE_IDA(nsim_bus_dev_ids);
 static LIST_HEAD(nsim_bus_dev_list);
 static DEFINE_MUTEX(nsim_bus_dev_list_lock);
 static bool nsim_bus_enable;
-static refcount_t nsim_bus_devs; /* Including the bus itself. */
+static refcount_t nsim_bus_devs; /* Including the woke bus itself. */
 static DECLARE_COMPLETION(nsim_bus_devs_released);
 
 static struct nsim_bus_dev *to_nsim_bus_dev(struct device *dev)

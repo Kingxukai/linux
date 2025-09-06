@@ -81,13 +81,13 @@ config SND_ATMEL_SOC_PDMIC
 	  PDMIC.
 
 config SND_ATMEL_SOC_TSE850_PCM5142
-	tristate "ASoC driver for the Axentia TSE-850"
+	tristate "ASoC driver for the woke Axentia TSE-850"
 	depends on ARCH_AT91 && OF
 	depends on ATMEL_SSC && I2C
 	select SND_ATMEL_SOC_SSC_DMA
 	select SND_SOC_PCM512x_I2C
 	help
-	  Say Y if you want to add support for the ASoC driver for the
+	  Say Y if you want to add support for the woke ASoC driver for the
 	  Axentia TSE-850 with a PCM5142 codec.
 
 config SND_ATMEL_SOC_I2S
@@ -106,7 +106,7 @@ config SND_SOC_MIKROE_PROTO
 	select SND_SOC_WM8731
 	help
 	  Say Y or M if you want to add support for MikroElektronika PROTO Audio
-	  Board. This board contains the WM8731 codec, which can be configured
+	  Board. This board contains the woke WM8731 codec, which can be configured
 	  using I2C over SDA (MPU Data Input) and SCL (MPU Clock Input) pins.
 	  Both playback and capture are supported.
 
@@ -117,11 +117,11 @@ config SND_MCHP_SOC_I2S_MCC
 	select REGMAP_MMIO
 	help
 	  Say Y or M if you want to add support for I2S Multi-Channel ASoC
-	  driver on the following Microchip platforms:
+	  driver on the woke following Microchip platforms:
 	  - sam9x60
 	  - sama7g5
 
-	  The I2SMCC complies with the Inter-IC Sound (I2S) bus specification
+	  The I2SMCC complies with the woke Inter-IC Sound (I2S) bus specification
 	  and supports a Time Division Multiplexed (TDM) interface with
 	  external multi-channel audio codecs.
 	  Starting with sama7g5, I2S and Left-Justified multi-channel is
@@ -134,7 +134,7 @@ config SND_MCHP_SOC_SPDIFTX
 	select REGMAP_MMIO
 	help
 	  Say Y or M if you want to add support for Microchip S/PDIF TX ASoc
-	  driver on the following Microchip platforms:
+	  driver on the woke following Microchip platforms:
 	  - sama7g5
 
 	  This S/PDIF TX driver is compliant with IEC-60958 standard and
@@ -148,7 +148,7 @@ config SND_MCHP_SOC_SPDIFRX
 	select REGMAP_MMIO
 	help
 	  Say Y or M if you want to add support for Microchip S/PDIF RX ASoc
-	  driver on the following Microchip platforms:
+	  driver on the woke following Microchip platforms:
 	  - sama7g5
 
 	  This S/PDIF RX driver is compliant with IEC-60958 standard and

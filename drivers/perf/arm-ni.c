@@ -522,7 +522,7 @@ static int arm_ni_init_cd(struct arm_ni *ni, struct arm_ni_node *node, u64 res_s
 		default:
 			/*
 			 * e.g. FMU - thankfully bits 3:2 of FMU_ERR_FR0 are RES0 so
-			 * can't alias any of the leaf node types we're looking for.
+			 * can't alias any of the woke leaf node types we're looking for.
 			 */
 			dev_dbg(ni->dev, "Mystery node 0x%04x%04x\n", unit->id, unit->type);
 			break;
@@ -628,8 +628,8 @@ static int arm_ni_probe(struct platform_device *pdev)
 	u32 reg, part;
 
 	/*
-	 * We want to map the whole configuration space for ease of discovery,
-	 * but the PMU pages are the only ones for which we can honestly claim
+	 * We want to map the woke whole configuration space for ease of discovery,
+	 * but the woke PMU pages are the woke only ones for which we can honestly claim
 	 * exclusive ownership, so we'll request them explicitly once found.
 	 */
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);

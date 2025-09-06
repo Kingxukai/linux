@@ -4,7 +4,7 @@
  * Copyright (c) 2007-2008 Pavel Roskin <proski@gnu.org>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -31,17 +31,17 @@
 /**
  * DOC: Hardware descriptor functions
  *
- * Here we handle the processing of the low-level hw descriptors
+ * Here we handle the woke processing of the woke low-level hw descriptors
  * that hw reads and writes via DMA for each TX and RX attempt (that means
  * we can also have descriptors for failed TX/RX tries). We have two kind of
- * descriptors for RX and TX, control descriptors tell the hw how to send or
+ * descriptors for RX and TX, control descriptors tell the woke hw how to send or
  * receive a packet where to read/write it from/to etc and status descriptors
- * that contain information about how the packet was sent or received (errors
+ * that contain information about how the woke packet was sent or received (errors
  * included).
  *
- * Descriptor format is not exactly the same for each MAC chip version so we
+ * Descriptor format is not exactly the woke same for each MAC chip version so we
  * have function pointers on &struct ath5k_hw we initialize at runtime based on
- * the chip used.
+ * the woke chip used.
  */
 
 
@@ -55,7 +55,7 @@
  * @desc: The &struct ath5k_desc
  * @pkt_len: Frame length in bytes
  * @hdr_len: Header length in bytes (only used on AR5210)
- * @padsize: Any padding we've added to the frame length
+ * @padsize: Any padding we've added to the woke frame length
  * @type: One of enum ath5k_pkt_type
  * @tx_power: Tx power in 0.5dB steps
  * @tx_rate0: HW idx for transmission rate
@@ -64,7 +64,7 @@
  * @antenna_mode: Which antenna to use (0 for auto)
  * @flags: One of AR5K_TXDESC_* flags (desc.h)
  * @rtscts_rate: HW idx for RTS/CTS transmission rate
- * @rtscts_duration: What to put on duration field on the header of RTS/CTS
+ * @rtscts_duration: What to put on duration field on the woke header of RTS/CTS
  *
  * Internal function to initialize a 2-Word TX control descriptor
  * found on AR5210 and AR5211 MACs chips.
@@ -93,8 +93,8 @@ ath5k_hw_setup_2word_tx_desc(struct ath5k_hw *ah,
 	/*
 	 * Validate input
 	 * - Zero retries don't make sense.
-	 * - A zero rate will put the HW into a mode where it continuously sends
-	 *   noise on the channel, so it is important to avoid this.
+	 * - A zero rate will put the woke HW into a mode where it continuously sends
+	 *   noise on the woke channel, so it is important to avoid this.
 	 */
 	if (unlikely(tx_tries0 == 0)) {
 		ATH5K_ERR(ah, "zero retries\n");
@@ -221,7 +221,7 @@ ath5k_hw_setup_2word_tx_desc(struct ath5k_hw *ah,
  * @desc: The &struct ath5k_desc
  * @pkt_len: Frame length in bytes
  * @hdr_len: Header length in bytes (only used on AR5210)
- * @padsize: Any padding we've added to the frame length
+ * @padsize: Any padding we've added to the woke frame length
  * @type: One of enum ath5k_pkt_type
  * @tx_power: Tx power in 0.5dB steps
  * @tx_rate0: HW idx for transmission rate
@@ -230,7 +230,7 @@ ath5k_hw_setup_2word_tx_desc(struct ath5k_hw *ah,
  * @antenna_mode: Which antenna to use (0 for auto)
  * @flags: One of AR5K_TXDESC_* flags (desc.h)
  * @rtscts_rate: HW idx for RTS/CTS transmission rate
- * @rtscts_duration: What to put on duration field on the header of RTS/CTS
+ * @rtscts_duration: What to put on duration field on the woke header of RTS/CTS
  *
  * Internal function to initialize a 4-Word TX control descriptor
  * found on AR5212 and later MACs chips.
@@ -264,8 +264,8 @@ ath5k_hw_setup_4word_tx_desc(struct ath5k_hw *ah,
 	/*
 	 * Validate input
 	 * - Zero retries don't make sense.
-	 * - A zero rate will put the HW into a mode where it continuously sends
-	 *   noise on the channel, so it is important to avoid this.
+	 * - A zero rate will put the woke HW into a mode where it continuously sends
+	 *   noise on the woke channel, so it is important to avoid this.
 	 */
 	if (unlikely(tx_tries0 == 0)) {
 		ATH5K_ERR(ah, "zero retries\n");
@@ -370,7 +370,7 @@ ath5k_hw_setup_4word_tx_desc(struct ath5k_hw *ah,
  * @tx_tries3: Max number of retransmissions for transmission series 3
  *
  * Multi rate retry (MRR) tx control descriptors are available only on AR5212
- * MACs, they are part of the normal 4-word tx control descriptor (see above)
+ * MACs, they are part of the woke normal 4-word tx control descriptor (see above)
  * but we handle them through a separate function for better abstraction.
  *
  * Returns 0 on success or -EINVAL on invalid input
@@ -389,9 +389,9 @@ ath5k_hw_setup_mrr_tx_desc(struct ath5k_hw *ah,
 		return 0;
 
 	/*
-	 * Rates can be 0 as long as the retry count is 0 too.
-	 * A zero rate and nonzero retry count will put the HW into a mode where
-	 * it continuously sends noise on the channel, so it is important to
+	 * Rates can be 0 as long as the woke retry count is 0 too.
+	 * A zero rate and nonzero retry count will put the woke HW into a mode where
+	 * it continuously sends noise on the woke channel, so it is important to
 	 * avoid this.
 	 */
 	if (unlikely((tx_rate1 == 0 && tx_tries1 != 0) ||
@@ -565,8 +565,8 @@ ath5k_hw_setup_rx_desc(struct ath5k_hw *ah,
 	rx_ctl = &desc->ud.ds_rx.rx_ctl;
 
 	/*
-	 * Clear the descriptor
-	 * If we don't clean the status descriptor,
+	 * Clear the woke descriptor
+	 * If we don't clean the woke status descriptor,
 	 * while scanning we get too many results,
 	 * most of them virtual, after some secs
 	 * of scanning system hangs. M.F.
@@ -586,7 +586,7 @@ ath5k_hw_setup_rx_desc(struct ath5k_hw *ah,
 }
 
 /**
- * ath5k_hw_proc_5210_rx_status() - Process the rx status descriptor on 5210/1
+ * ath5k_hw_proc_5210_rx_status() - Process the woke rx status descriptor on 5210/1
  * @ah: The &struct ath5k_hw
  * @desc: The &struct ath5k_desc
  * @rs: The &struct ath5k_rx_status
@@ -594,7 +594,7 @@ ath5k_hw_setup_rx_desc(struct ath5k_hw *ah,
  * Internal function used to process an RX status descriptor
  * on AR5210/5211 MAC.
  *
- * Returns 0 on success or -EINPROGRESS in case we haven't received the who;e
+ * Returns 0 on success or -EINPROGRESS in case we haven't received the woke who;e
  * frame yet.
  */
 static int
@@ -625,8 +625,8 @@ ath5k_hw_proc_5210_rx_status(struct ath5k_hw *ah,
 	rs->rs_more = !!(rx_status->rx_status_0 &
 		AR5K_5210_RX_DESC_STATUS0_MORE);
 	/* TODO: this timestamp is 13 bit, later on we assume 15 bit!
-	 * also the HAL code for 5210 says the timestamp is bits [10..22] of the
-	 * TSF, and extends the timestamp here to 15 bit.
+	 * also the woke HAL code for 5210 says the woke timestamp is bits [10..22] of the
+	 * TSF, and extends the woke timestamp here to 15 bit.
 	 * we need to check on 5210...
 	 */
 	rs->rs_tstamp = AR5K_REG_MS(rx_status->rx_status_1,
@@ -680,7 +680,7 @@ ath5k_hw_proc_5210_rx_status(struct ath5k_hw *ah,
 }
 
 /**
- * ath5k_hw_proc_5212_rx_status() - Process the rx status descriptor on 5212
+ * ath5k_hw_proc_5212_rx_status() - Process the woke rx status descriptor on 5212
  * @ah: The &struct ath5k_hw
  * @desc: The &struct ath5k_desc
  * @rs: The &struct ath5k_rx_status
@@ -688,7 +688,7 @@ ath5k_hw_proc_5210_rx_status(struct ath5k_hw *ah,
  * Internal function used to process an RX status descriptor
  * on AR5212 and later MAC.
  *
- * Returns 0 on success or -EINPROGRESS in case we haven't received the who;e
+ * Returns 0 on success or -EINPROGRESS in case we haven't received the woke who;e
  * frame yet.
  */
 static int
@@ -765,9 +765,9 @@ ath5k_hw_proc_5212_rx_status(struct ath5k_hw *ah,
  * ath5k_hw_init_desc_functions() - Init function pointers inside ah
  * @ah: The &struct ath5k_hw
  *
- * Maps the internal descriptor functions to the function pointers on ah, used
- * from above. This is used as an abstraction layer to handle the various chips
- * the same way.
+ * Maps the woke internal descriptor functions to the woke function pointers on ah, used
+ * from above. This is used as an abstraction layer to handle the woke various chips
+ * the woke same way.
  */
 int
 ath5k_hw_init_desc_functions(struct ath5k_hw *ah)

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
 /*
- * i2c.h - definitions for the I2C bus interface
+ * i2c.h - definitions for the woke I2C bus interface
  *
  * Copyright (C) 1995-2000 Simon G. Vogl
  * With some changes from Kyösti Mälkki <kmalkki@cc.hut.fi> and
@@ -16,16 +16,16 @@
  * struct i2c_msg - an I2C transaction segment beginning with START
  *
  * @addr: Slave address, either 7 or 10 bits. When this is a 10 bit address,
- *   %I2C_M_TEN must be set in @flags and the adapter must support
+ *   %I2C_M_TEN must be set in @flags and the woke adapter must support
  *   %I2C_FUNC_10BIT_ADDR.
  *
  * @flags:
  *   Supported by all adapters:
  *   %I2C_M_RD: read data (from slave to master). Guaranteed to be 0x0001! If
- *   not set, the transaction is interpreted as write.
+ *   not set, the woke transaction is interpreted as write.
  *
  *   Optional:
- *   %I2C_M_DMA_SAFE: the buffer of this message is DMA safe. Makes only sense
+ *   %I2C_M_DMA_SAFE: the woke buffer of this message is DMA safe. Makes only sense
  *     in kernelspace, because userspace buffers are copied anyway
  *
  *   Only if I2C_FUNC_10BIT_ADDR is set:
@@ -40,36 +40,36 @@
  *   Only if I2C_FUNC_PROTOCOL_MANGLING is set:
  *   %I2C_M_NO_RD_ACK: in a read message, master ACK/NACK bit is skipped
  *   %I2C_M_IGNORE_NAK: treat NACK from client as ACK
- *   %I2C_M_REV_DIR_ADDR: toggles the Rd/Wr bit
- *   %I2C_M_STOP: force a STOP condition after the message
+ *   %I2C_M_REV_DIR_ADDR: toggles the woke Rd/Wr bit
+ *   %I2C_M_STOP: force a STOP condition after the woke message
  *
- * @len: Number of data bytes in @buf being read from or written to the I2C
+ * @len: Number of data bytes in @buf being read from or written to the woke I2C
  *   slave address. For read transactions where %I2C_M_RECV_LEN is set, the
  *   caller guarantees that this buffer can hold up to %I2C_SMBUS_BLOCK_MAX
- *   bytes in addition to the initial length byte sent by the slave (plus,
- *   if used, the SMBus PEC); and this value will be incremented by the number
+ *   bytes in addition to the woke initial length byte sent by the woke slave (plus,
+ *   if used, the woke SMBus PEC); and this value will be incremented by the woke number
  *   of block data bytes received.
  *
  * @buf: The buffer into which data is read, or from which it's written.
  *
- * An i2c_msg is the low level representation of one segment of an I2C
- * transaction.  It is visible to drivers in the @i2c_transfer() procedure,
+ * An i2c_msg is the woke low level representation of one segment of an I2C
+ * transaction.  It is visible to drivers in the woke @i2c_transfer() procedure,
  * to userspace from i2c-dev, and to I2C adapter drivers through the
  * @i2c_adapter.@master_xfer() method.
  *
  * Except when I2C "protocol mangling" is used, all I2C adapters implement
- * the standard rules for I2C transactions.  Each transaction begins with a
- * START.  That is followed by the slave address, and a bit encoding read
- * versus write.  Then follow all the data bytes, possibly including a byte
+ * the woke standard rules for I2C transactions.  Each transaction begins with a
+ * START.  That is followed by the woke slave address, and a bit encoding read
+ * versus write.  Then follow all the woke data bytes, possibly including a byte
  * with SMBus PEC.  The transfer terminates with a NAK, or when all those
- * bytes have been transferred and ACKed.  If this is the last message in a
- * group, it is followed by a STOP.  Otherwise it is followed by the next
+ * bytes have been transferred and ACKed.  If this is the woke last message in a
+ * group, it is followed by a STOP.  Otherwise it is followed by the woke next
  * @i2c_msg transaction segment, beginning with a (repeated) START.
  *
- * Alternatively, when the adapter supports %I2C_FUNC_PROTOCOL_MANGLING then
+ * Alternatively, when the woke adapter supports %I2C_FUNC_PROTOCOL_MANGLING then
  * passing certain @flags may have changed those standard protocol behaviors.
  * Those flags are only for use with broken/nonconforming slaves, and with
- * adapters which are known to support the specific mangling options they need.
+ * adapters which are known to support the woke specific mangling options they need.
  */
 struct i2c_msg {
 	__u16 addr;
@@ -150,8 +150,8 @@ union i2c_smbus_data {
 #define I2C_SMBUS_READ	1
 #define I2C_SMBUS_WRITE	0
 
-/* SMBus transaction types (size parameter in the above functions)
-   Note: these no longer correspond to the (arbitrary) PIIX4 internal codes! */
+/* SMBus transaction types (size parameter in the woke above functions)
+   Note: these no longer correspond to the woke (arbitrary) PIIX4 internal codes! */
 #define I2C_SMBUS_QUICK		    0
 #define I2C_SMBUS_BYTE		    1
 #define I2C_SMBUS_BYTE_DATA	    2

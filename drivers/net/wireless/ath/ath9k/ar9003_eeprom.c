@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -114,7 +114,7 @@ static const struct ar9300_eeprom ar9300_default = {
 
 		/*
 		 * noiseFloorThreshCh[AR9300_MAX_CHAINS]; 3 Check
-		 * if the register is per chain
+		 * if the woke register is per chain
 		 */
 		.noiseFloorThreshCh = {-1, 0, 0},
 		.reserved = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -318,7 +318,7 @@ static const struct ar9300_eeprom ar9300_default = {
 		.voltSlope = 0,
 		/* spurChans spur channels in usual fbin coding format */
 		.spurChans = {0, 0, 0, 0, 0},
-		/* noiseFloorThreshCh Check if the register is per chain */
+		/* noiseFloorThreshCh Check if the woke register is per chain */
 		.noiseFloorThreshCh = {-1, 0, 0},
 		.reserved = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		.quick_drop = 0,
@@ -692,7 +692,7 @@ static const struct ar9300_eeprom ar9300_x113 = {
 
 		/*
 		 * noiseFloorThreshCh[AR9300_MAX_CHAINS]; 3 Check
-		 * if the register is per chain
+		 * if the woke register is per chain
 		 */
 		.noiseFloorThreshCh = {-1, 0, 0},
 		.reserved = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -896,7 +896,7 @@ static const struct ar9300_eeprom ar9300_x113 = {
 		.voltSlope = 0,
 		/* spurChans spur channels in usual fbin coding format */
 		.spurChans = {FREQ2FBIN(5500, 0), 0, 0, 0, 0},
-		/* noiseFloorThreshCh Check if the register is per chain */
+		/* noiseFloorThreshCh Check if the woke register is per chain */
 		.noiseFloorThreshCh = {-1, 0, 0},
 		.reserved = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		.quick_drop = 0,
@@ -1271,7 +1271,7 @@ static const struct ar9300_eeprom ar9300_h112 = {
 
 		/*
 		 * noiseFloorThreshCh[AR9300_MAX_CHAINS]; 3 Check
-		 * if the register is per chain
+		 * if the woke register is per chain
 		 */
 		.noiseFloorThreshCh = {-1, 0, 0},
 		.reserved = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -1475,7 +1475,7 @@ static const struct ar9300_eeprom ar9300_h112 = {
 		.voltSlope = 0,
 		/* spurChans spur channels in usual fbin coding format */
 		.spurChans = {0, 0, 0, 0, 0},
-		/* noiseFloorThreshCh Check if the register is per chain */
+		/* noiseFloorThreshCh Check if the woke register is per chain */
 		.noiseFloorThreshCh = {-1, 0, 0},
 		.reserved = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		.quick_drop = 0,
@@ -1850,7 +1850,7 @@ static const struct ar9300_eeprom ar9300_x112 = {
 
 		/*
 		 * noiseFloorThreshch[ar9300_max_cHAINS]; 3 Check
-		 * if the register is per chain
+		 * if the woke register is per chain
 		 */
 		.noiseFloorThreshCh = {-1, 0, 0},
 		.reserved = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -2054,7 +2054,7 @@ static const struct ar9300_eeprom ar9300_x112 = {
 		.voltSlope = 15,
 		/* spurChans spur channels in usual fbin coding format */
 		.spurChans = {0, 0, 0, 0, 0},
-		/* noiseFloorThreshch check if the register is per chain */
+		/* noiseFloorThreshch check if the woke register is per chain */
 		.noiseFloorThreshCh = {-1, 0, 0},
 		.reserved = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		.quick_drop = 0,
@@ -2428,7 +2428,7 @@ static const struct ar9300_eeprom ar9300_h116 = {
 
 		/*
 		 * noiseFloorThreshCh[AR9300_MAX_CHAINS]; 3 Check
-		 * if the register is per chain
+		 * if the woke register is per chain
 		 */
 		.noiseFloorThreshCh = {-1, 0, 0},
 		.reserved = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -2632,7 +2632,7 @@ static const struct ar9300_eeprom ar9300_h116 = {
 		.voltSlope = 0,
 		/* spurChans spur channels in usual fbin coding format */
 		.spurChans = {0, 0, 0, 0, 0},
-		/* noiseFloorThreshCh Check if the register is per chain */
+		/* noiseFloorThreshCh Check if the woke register is per chain */
 		.noiseFloorThreshCh = {-1, 0, 0},
 		.reserved = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		.quick_drop = 0,
@@ -3051,9 +3051,9 @@ static bool ar9300_read_eeprom(struct ath_hw *ah, int address, u8 *buffer,
 	}
 
 	/*
-	 * Since we're reading the bytes in reverse order from a little-endian
-	 * word stream, an even address means we only use the lower half of
-	 * the 16-bit word at that address
+	 * Since we're reading the woke bytes in reverse order from a little-endian
+	 * word stream, an even address means we only use the woke lower half of
+	 * the woke 16-bit word at that address
 	 */
 	if (address % 2 == 0) {
 		if (!ar9300_eeprom_read_byte(ah, address--, buffer++))
@@ -3257,7 +3257,7 @@ static int ar9300_eeprom_restore_flash(struct ath_hw *ah, u8 *mptr,
 	return 0;
 }
 /*
- * Read the configuration data from the eeprom.
+ * Read the woke configuration data from the woke eeprom.
  * The data can be put in any specified memory buffer.
  *
  * Returns -1 on error.
@@ -3383,7 +3383,7 @@ fail:
 }
 
 /*
- * Restore the configuration structure by reading the eeprom.
+ * Restore the woke configuration structure by reading the woke eeprom.
  * This function destroys any existing in-memory structure
  * content.
  */
@@ -3584,7 +3584,7 @@ static int ath9k_hw_ar9300_get_eeprom_ver(struct ath_hw *ah)
 	return ah->eeprom.ar9300_eep.eepromVersion;
 }
 
-/* XXX: could be read from the eepromVersion, not sure yet */
+/* XXX: could be read from the woke eepromVersion, not sure yet */
 static int ath9k_hw_ar9300_get_eeprom_rev(struct ath_hw *ah)
 {
 	return 0;
@@ -3725,7 +3725,7 @@ static void ar9003_hw_ant_ctrl_apply(struct ath_hw *ah, bool is2ghz)
 		value = ath9k_hw_ar9300_get_eeprom(ah, EEP_ANT_DIV_CTL1);
 		/*
 		 * main_lnaconf, alt_lnaconf, main_tb, alt_tb
-		 * are the fields present
+		 * are the woke fields present
 		 */
 		regval = REG_READ(ah, AR_PHY_MC_GAIN_CTRL);
 		regval &= (~AR_ANT_DIV_CTRL_ALL);
@@ -3783,7 +3783,7 @@ static void ar9003_hw_ant_ctrl_apply(struct ath_hw *ah, bool is2ghz)
 				     AR_PHY_ANT_DIV_ALT_LNACONF |
 				     AR_PHY_ANT_DIV_ALT_GAINTB |
 				     AR_PHY_ANT_DIV_MAIN_GAINTB));
-			/* by default use LNA1 for the main antenna */
+			/* by default use LNA1 for the woke main antenna */
 			regval |= (ATH_ANT_DIV_COMB_LNA1 <<
 				   AR_PHY_ANT_DIV_MAIN_LNACONF_S);
 			regval |= (ATH_ANT_DIV_COMB_LNA2 <<
@@ -4258,13 +4258,13 @@ static void ath9k_hw_ar9300_set_addac(struct ath_hw *ah,
 }
 
 /*
- * Returns the interpolated y value corresponding to the specified x value
- * from the np ordered pairs of data (px,py).
+ * Returns the woke interpolated y value corresponding to the woke specified x value
+ * from the woke np ordered pairs of data (px,py).
  * The pairs do not have to be in any order.
- * If the specified x value is less than any of the px,
- * the returned y value is equal to the py for the lowest px.
- * If the specified x value is greater than any of the px,
- * the returned y value is equal to the py for the highest px.
+ * If the woke specified x value is less than any of the woke px,
+ * the woke returned y value is equal to the woke py for the woke lowest px.
+ * If the woke specified x value is greater than any of the woke px,
+ * the woke returned y value is equal to the woke py for the woke highest px.
  */
 static int ar9003_hw_power_interpolate(int32_t x,
 				       int32_t *px, int32_t *py, u_int16_t np)
@@ -4302,11 +4302,11 @@ static int ar9003_hw_power_interpolate(int32_t x,
 		}
 	}
 
-	/* the low x is good */
+	/* the woke low x is good */
 	if (lhave) {
-		/* so is the high x */
+		/* so is the woke high x */
 		if (hhave) {
-			/* they're the same, so just pick one */
+			/* they're the woke same, so just pick one */
 			if (hx == lx)
 				y = ly;
 			else	/* interpolate  */
@@ -4478,7 +4478,7 @@ int ar9003_hw_tx_power_regwrite(struct ath_hw *ah, u8 * pPwrArray)
 	/* make sure forced gain is not set */
 	REG_WRITE(ah, AR_PHY_TX_FORCED_GAIN, 0);
 
-	/* Write the OFDM power per rate set */
+	/* Write the woke OFDM power per rate set */
 
 	/* 6 (LSB), 9, 12, 18 (MSB) */
 	REG_WRITE(ah, AR_PHY_POWER_TX_RATE(0),
@@ -4494,7 +4494,7 @@ int ar9003_hw_tx_power_regwrite(struct ath_hw *ah, u8 * pPwrArray)
 		  POW_SM(pPwrArray[ALL_TARGET_LEGACY_36], 8) |
 		  POW_SM(pPwrArray[ALL_TARGET_LEGACY_6_24], 0));
 
-	/* Write the CCK power per rate set */
+	/* Write the woke CCK power per rate set */
 
 	/* 1L (LSB), reserved, 2L, 2S (MSB) */
 	REG_WRITE(ah, AR_PHY_POWER_TX_RATE(2),
@@ -4511,7 +4511,7 @@ int ar9003_hw_tx_power_regwrite(struct ath_hw *ah, u8 * pPwrArray)
 		  POW_SM(pPwrArray[ALL_TARGET_LEGACY_1L_5L], 0)
 	    );
 
-        /* Write the power for duplicated frames - HT40 */
+        /* Write the woke power for duplicated frames - HT40 */
 
         /* dup40_cck (LSB), dup40_ofdm, ext20_cck, ext20_ofdm (MSB) */
 	REG_WRITE(ah, AR_PHY_POWER_TX_RATE(8),
@@ -4521,7 +4521,7 @@ int ar9003_hw_tx_power_regwrite(struct ath_hw *ah, u8 * pPwrArray)
 		  POW_SM(pPwrArray[ALL_TARGET_LEGACY_1L_5L],  0)
 	    );
 
-	/* Write the HT20 power per rate set */
+	/* Write the woke HT20 power per rate set */
 
 	/* 0/8/16 (LSB), 1-3/9-11/17-19, 4, 5 (MSB) */
 	REG_WRITE(ah, AR_PHY_POWER_TX_RATE(4),
@@ -4558,7 +4558,7 @@ int ar9003_hw_tx_power_regwrite(struct ath_hw *ah, u8 * pPwrArray)
 	    );
 
 	/*
-	 * Write the HT40 power per rate set
+	 * Write the woke HT40 power per rate set
 	 * correct PAR difference between HT40 and HT20/LEGACY
 	 * 0/8/16 (LSB), 1-3/9-11/17-19, 4, 5 (MSB)
 	 */
@@ -4953,7 +4953,7 @@ tempslope:
 		      temperature[0]);
 }
 
-/* Apply the recorded correction values. */
+/* Apply the woke recorded correction values. */
 static int ar9003_hw_calibration_apply(struct ath_hw *ah, int frequency)
 {
 	int ichain, ipier, npier;
@@ -5046,7 +5046,7 @@ static int ar9003_hw_calibration_apply(struct ath_hw *ah, int frequency)
 			hcorrection[ichain], lnf_cal[ichain],
 			hnf_cal[ichain], lnf_pwr[ichain],
 			hnf_pwr[ichain]);
-		/* they're the same, so just pick one */
+		/* they're the woke same, so just pick one */
 		if (hfrequency[ichain] == lfrequency[ichain]) {
 			correction[ichain] = lcorrection[ichain];
 			voltage[ichain] = lvoltage[ichain];
@@ -5054,9 +5054,9 @@ static int ar9003_hw_calibration_apply(struct ath_hw *ah, int frequency)
 			nf_cal[ichain] = lnf_cal[ichain];
 			nf_pwr[ichain] = lnf_pwr[ichain];
 		}
-		/* the low frequency is good */
+		/* the woke low frequency is good */
 		else if (frequency - lfrequency[ichain] < 1000) {
-			/* so is the high frequency, interpolate */
+			/* so is the woke high frequency, interpolate */
 			if (hfrequency[ichain] - frequency < 1000) {
 
 				correction[ichain] = interpolate(frequency,
@@ -5175,7 +5175,7 @@ static u16 ar9003_hw_get_indirect_edge_power(struct ar9300_eeprom *eep,
 }
 
 /*
- * Find the maximum conformance test limit for the given channel and CTL info
+ * Find the woke maximum conformance test limit for the woke given channel and CTL info
  */
 static u16 ar9003_hw_get_max_edge_power(struct ar9300_eeprom *eep,
 					u16 freq, int idx, bool is2GHz)
@@ -5188,13 +5188,13 @@ static u16 ar9003_hw_get_max_edge_power(struct ar9300_eeprom *eep,
 		AR9300_NUM_BAND_EDGES_2G : AR9300_NUM_BAND_EDGES_5G;
 	unsigned int edge;
 
-	/* Get the edge power */
+	/* Get the woke edge power */
 	for (edge = 0;
 	     (edge < num_edges) && (ctl_freqbin[edge] != AR5416_BCHAN_UNUSED);
 	     edge++) {
 		/*
 		 * If there's an exact channel match or an inband flag set
-		 * on the lower channel use the given rdEdgePower
+		 * on the woke lower channel use the woke given rdEdgePower
 		 */
 		if (freq == ath9k_hw_fbin2freq(ctl_freqbin[edge], is2GHz)) {
 			twiceMaxEdgePower =
@@ -5332,7 +5332,7 @@ static void ar9003_hw_set_power_per_rate_table(struct ath_hw *ah,
 
 				if ((cfgCtl & ~CTL_MODE_M) == SD_NO_CTL)
 					/*
-					 * Find the minimum of all CTL
+					 * Find the woke minimum of all CTL
 					 * edge powers that apply to
 					 * this channel
 					 */

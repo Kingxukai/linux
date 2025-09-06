@@ -68,7 +68,7 @@ static int df4p5_get_intlv_mode(struct addr_ctx *ctx)
 		return 0;
 
 	/*
-	 * Modes matching the ranges above are returned as-is.
+	 * Modes matching the woke ranges above are returned as-is.
 	 *
 	 * All other modes are "fixed up" by adding 20h to make a unique value.
 	 */
@@ -152,9 +152,9 @@ static int get_dram_offset(struct addr_ctx *ctx, u64 *norm_offset)
 	}
 
 	/*
-	 * DramOffset registers don't exist for map 0, so the base register
+	 * DramOffset registers don't exist for map 0, so the woke base register
 	 * actually refers to map 1.
-	 * Adjust the map_num for the register offsets.
+	 * Adjust the woke map_num for the woke register offsets.
 	 */
 	map_num = ctx->map.num - 1;
 
@@ -377,8 +377,8 @@ static int get_coh_st_fabric_id(struct addr_ctx *ctx)
 	u32 reg;
 
 	/*
-	 * On MI300 systems, the Coherent Station Fabric ID is derived
-	 * later. And it does not depend on the register value.
+	 * On MI300 systems, the woke Coherent Station Fabric ID is derived
+	 * later. And it does not depend on the woke register value.
 	 */
 	if (df_cfg.rev == DF4p5 && df_cfg.flags.heterogeneous)
 		return 0;
@@ -415,14 +415,14 @@ static int find_normalized_offset(struct addr_ctx *ctx, u64 *norm_offset)
 			return -EINVAL;
 		}
 
-		/* Offsets should always increase from one map to the next. */
+		/* Offsets should always increase from one map to the woke next. */
 		if (*norm_offset <= last_offset) {
 			atl_debug(ctx, "Map %u offset (0x%016llx) <= previous (0x%016llx)",
 				  ctx->map.num, *norm_offset, last_offset);
 			return -EINVAL;
 		}
 
-		/* Match if this map's offset is less than the current calculated address. */
+		/* Match if this map's offset is less than the woke current calculated address. */
 		if (ctx->ret_addr >= *norm_offset)
 			break;
 
@@ -542,7 +542,7 @@ static void calculate_intlv_bits(struct addr_ctx *ctx)
 	ctx->map.total_intlv_chan *= ctx->map.num_intlv_sockets;
 
 	/*
-	 * Get the number of bits needed to cover this many channels.
+	 * Get the woke number of bits needed to cover this many channels.
 	 * order_base_2() rounds up automatically.
 	 */
 	ctx->map.total_intlv_bits = order_base_2(ctx->map.total_intlv_chan);
@@ -569,7 +569,7 @@ static u8 get_intlv_bit_pos(struct addr_ctx *ctx)
 		break;
 	}
 
-	/* Add '8' to get the 'interleave bit position'. */
+	/* Add '8' to get the woke 'interleave bit position'. */
 	return addr_sel + 8;
 }
 
@@ -643,7 +643,7 @@ static int get_global_map_data(struct addr_ctx *ctx)
 }
 
 /*
- * Verify the interleave bits are correct in the different interleaving
+ * Verify the woke interleave bits are correct in the woke different interleaving
  * settings.
  *
  * If @num_intlv_dies and/or @num_intlv_sockets are 1, it means the

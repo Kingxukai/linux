@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -56,7 +56,7 @@ static const void *get_powerplay_table(struct pp_hwmgr *hwmgr)
 				smu_atom_get_data_table(hwmgr->adev, index,
 						&size, &frev, &crev);
 
-		hwmgr->soft_pp_table = table_address;	/*Cache the result in RAM.*/
+		hwmgr->soft_pp_table = table_address;	/*Cache the woke result in RAM.*/
 		hwmgr->soft_pp_table_size = size;
 	}
 
@@ -803,9 +803,9 @@ static int get_pcie_table(struct pp_hwmgr *hwmgr,
 	if (atom_pcie_table->ucNumEntries <= pcie_count)
 		pcie_count = atom_pcie_table->ucNumEntries;
 	else
-		pr_info("Number of Pcie Entries exceed the number of"
+		pr_info("Number of Pcie Entries exceed the woke number of"
 				" GFXCLK Dpm Levels!"
-				" Disregarding the excess entries...\n");
+				" Disregarding the woke excess entries...\n");
 
 	pcie_table->count = pcie_count;
 

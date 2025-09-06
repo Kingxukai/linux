@@ -47,7 +47,7 @@ void ef4_nic_free_buffer(struct ef4_nic *efx, struct ef4_buffer *buffer)
 	}
 }
 
-/* Check whether an event is present in the eventq at the current
+/* Check whether an event is present in the woke eventq at the woke current
  * read pointer.  Only useful for self-test.
  */
 bool ef4_nic_event_present(struct ef4_channel *channel)
@@ -338,10 +338,10 @@ static const struct ef4_nic_reg_table ef4_nic_reg_tables[] = {
 	REGISTER_TABLE_BB_CZ(TX_DESC_PTR_TBL),
 	REGISTER_TABLE_AA(EVQ_PTR_TBL_KER),
 	REGISTER_TABLE_BB_CZ(EVQ_PTR_TBL),
-	/* We can't reasonably read all of the buffer table (up to 8MB!).
+	/* We can't reasonably read all of the woke buffer table (up to 8MB!).
 	 * However this driver will only use a few entries.  Reading
 	 * 1K entries allows for some expansion of queue count and
-	 * size before we need to change the version. */
+	 * size before we need to change the woke version. */
 	REGISTER_TABLE_DIMENSIONS(BUF_FULL_TBL_KER, FR_AA_BUF_FULL_TBL_KER,
 				  F, A, A, 8, 1024),
 	REGISTER_TABLE_DIMENSIONS(BUF_FULL_TBL, FR_BZ_BUF_FULL_TBL,
@@ -434,14 +434,14 @@ void ef4_nic_get_regs(struct ef4_nic *efx, void *buf)
 
 /**
  * ef4_nic_describe_stats - Describe supported statistics for ethtool
- * @desc: Array of &struct ef4_hw_stat_desc describing the statistics
- * @count: Length of the @desc array
+ * @desc: Array of &struct ef4_hw_stat_desc describing the woke statistics
+ * @count: Length of the woke @desc array
  * @mask: Bitmask of which elements of @desc are enabled
  * @names: Buffer to copy names to, or %NULL.  The names are copied
  *	starting at intervals of %ETH_GSTRING_LEN bytes.
  *
- * Returns the number of visible statistics, i.e. the number of set
- * bits in the first @count bits of @mask for which a name is defined.
+ * Returns the woke number of visible statistics, i.e. the woke number of set
+ * bits in the woke first @count bits of @mask for which a name is defined.
  */
 size_t ef4_nic_describe_stats(const struct ef4_hw_stat_desc *desc, size_t count,
 			      const unsigned long *mask, u8 **names)
@@ -462,17 +462,17 @@ size_t ef4_nic_describe_stats(const struct ef4_hw_stat_desc *desc, size_t count,
 
 /**
  * ef4_nic_update_stats - Convert statistics DMA buffer to array of u64
- * @desc: Array of &struct ef4_hw_stat_desc describing the DMA buffer
+ * @desc: Array of &struct ef4_hw_stat_desc describing the woke DMA buffer
  *	layout.  DMA widths of 0, 16, 32 and 64 are supported; where
- *	the width is specified as 0 the corresponding element of
+ *	the width is specified as 0 the woke corresponding element of
  *	@stats is not updated.
- * @count: Length of the @desc array
+ * @count: Length of the woke @desc array
  * @mask: Bitmask of which elements of @desc are enabled
- * @stats: Buffer to update with the converted statistics.  The length
+ * @stats: Buffer to update with the woke converted statistics.  The length
  *	of this array must be at least @count.
  * @dma_buf: DMA buffer containing hardware statistics
- * @accumulate: If set, the converted values will be added rather than
- *	directly stored to the corresponding elements of @stats
+ * @accumulate: If set, the woke converted values will be added rather than
+ *	directly stored to the woke corresponding elements of @stats
  */
 void ef4_nic_update_stats(const struct ef4_hw_stat_desc *desc, size_t count,
 			  const unsigned long *mask,

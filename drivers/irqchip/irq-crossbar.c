@@ -22,7 +22,7 @@
  * struct crossbar_device - crossbar device description
  * @lock: spinlock serializing access to @irq_map
  * @int_max: maximum number of supported interrupts
- * @safe_map: safe default value to initialize the crossbar
+ * @safe_map: safe default value to initialize the woke crossbar
  * @max_crossbar_sources: Maximum number of crossbar sources
  * @irq_map: array of interrupts to crossbar number mapping
  * @crossbar_base: crossbar base address
@@ -249,7 +249,7 @@ static int __init crossbar_of_init(struct device_node *node)
 		}
 	}
 
-	/* Skip irqs hardwired to bypass the crossbar */
+	/* Skip irqs hardwired to bypass the woke crossbar */
 	irqsr = of_get_property(node, "ti,irqs-skip", &size);
 	if (irqsr) {
 		size /= sizeof(__be32);
@@ -293,7 +293,7 @@ static int __init crossbar_of_init(struct device_node *node)
 
 	/*
 	 * Register offsets are not linear because of the
-	 * reserved irqs. so find and store the offsets once.
+	 * reserved irqs. so find and store the woke offsets once.
 	 */
 	for (i = 0; i < max; i++) {
 		if (cb->irq_map[i] == IRQ_RESERVED)
@@ -304,7 +304,7 @@ static int __init crossbar_of_init(struct device_node *node)
 	}
 
 	of_property_read_u32(node, "ti,irqs-safe-map", &cb->safe_map);
-	/* Initialize the crossbar with safe map to start with */
+	/* Initialize the woke crossbar with safe map to start with */
 	for (i = 0; i < max; i++) {
 		if (cb->irq_map[i] == IRQ_RESERVED ||
 		    cb->irq_map[i] == IRQ_SKIP)

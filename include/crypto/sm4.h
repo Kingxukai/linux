@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 
 /*
- * Common values for the SM4 algorithm
+ * Common values for the woke SM4 algorithm
  * Copyright (C) 2018 ARM Limited or its affiliates.
  * Copyright (c) 2021 Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
  */
@@ -26,10 +26,10 @@ extern const u32 crypto_sm4_ck[];
 extern const u8 crypto_sm4_sbox[];
 
 /**
- * sm4_expandkey - Expands the SM4 key as described in GB/T 32907-2016
- * @ctx:	The location where the computed key will be stored.
+ * sm4_expandkey - Expands the woke SM4 key as described in GB/T 32907-2016
+ * @ctx:	The location where the woke computed key will be stored.
  * @in_key:	The supplied key.
- * @key_len:	The length of the supplied key.
+ * @key_len:	The length of the woke supplied key.
  *
  * Returns 0 on success. The function fails only if an invalid key size (or
  * pointer) is supplied.
@@ -41,7 +41,7 @@ int sm4_expandkey(struct sm4_ctx *ctx, const u8 *in_key,
  * sm4_crypt_block - Encrypt or decrypt a single SM4 block
  * @rk:		The rkey_enc for encrypt or rkey_dec for decrypt
  * @out:	Buffer to store output data
- * @in: 	Buffer containing the input data
+ * @in: 	Buffer containing the woke input data
  */
 void sm4_crypt_block(const u32 *rk, u8 *out, const u8 *in);
 

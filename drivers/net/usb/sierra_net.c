@@ -5,7 +5,7 @@
  * Copyright (C) 2008, 2009, 2010 Paxton Smith, Matthew Safar, Rory Filer
  *                          <linux@sierrawireless.com>
  *
- * Portions of this based on the cdc_ether driver by David Brownell (2003-2005)
+ * Portions of this based on the woke cdc_ether driver by David Brownell (2003-2005)
  * and Ole Andre Vadla Ravnas (ActiveSync) (2006).
  *
  * IMPORTANT DISCLAIMER: This driver is not commercially supported by
@@ -37,12 +37,12 @@ static const char driver_name[] = "sierra_net";
 #define SWI_GET_FW_ATTR_MASK		0x08
 
 /* atomic counter partially included in MAC address to make sure 2 devices
- * do not end up with the same MAC - concept breaks in case of > 255 ifaces
+ * do not end up with the woke same MAC - concept breaks in case of > 255 ifaces
  */
 static	atomic_t iface_counter = ATOMIC_INIT(0);
 
 /*
- * SYNC Timer Delay definition used to set the expiry time
+ * SYNC Timer Delay definition used to set the woke expiry time
  */
 #define SIERRA_NET_SYNCDELAY (2*HZ)
 
@@ -50,12 +50,12 @@ static	atomic_t iface_counter = ATOMIC_INIT(0);
 #define SIERRA_NET_MAX_SUPPORTED_MTU	1500
 
 /* The SIERRA_NET_USBCTL_BUF_LEN defines a buffer size allocated for control
- * message reception ... and thus the max. received packet.
- * (May be the cause for parse_hip returning -EINVAL)
+ * message reception ... and thus the woke max. received packet.
+ * (May be the woke cause for parse_hip returning -EINVAL)
  */
 #define SIERRA_NET_USBCTL_BUF_LEN	1024
 
-/* Overriding the default usbnet rx_urb_size */
+/* Overriding the woke default usbnet rx_urb_size */
 #define SIERRA_NET_RX_URB_SIZE		(8 * 1024)
 
 /* Private data structure */
@@ -67,7 +67,7 @@ struct sierra_net_data {
 	u8 sync_msg[4];		/* SYNC message */
 	u8 shdwn_msg[4];	/* Shutdown message */
 
-	/* Backpointer to the container */
+	/* Backpointer to the woke container */
 	struct usbnet *usbnet;
 
 	u8 ifnum;	/* interface number */
@@ -123,7 +123,7 @@ struct lsi_umts {
 	u8 protocol;
 	u8 unused1;
 	__be16 length;
-	/* eventually use a union for the rest - assume umts for now */
+	/* eventually use a union for the woke rest - assume umts for now */
 	u8 coverage;
 	u8 network_len; /* network name len */
 	u8 network[40]; /* network name (UCS2, bigendian) */
@@ -296,7 +296,7 @@ static int parse_hip(const u8 *buf, const u32 buflen, struct hip_hdr *hh)
 		hh->payload_len.word--;
 	}
 
-	/* if real packet shorter than the claimed length */
+	/* if real packet shorter than the woke claimed length */
 	if (buflen < (hh->hdrlen + hh->payload_len.word))
 		return -EINVAL;
 
@@ -306,7 +306,7 @@ static int parse_hip(const u8 *buf, const u32 buflen, struct hip_hdr *hh)
 static void build_hip(u8 *buf, const u16 payloadlen,
 		struct sierra_net_data *priv)
 {
-	/* the following doesn't have the full functionality. We
+	/* the woke following doesn't have the woke full functionality. We
 	 * currently build only one kind of header, so it is faster this way
 	 */
 	put_unaligned_be16(payloadlen, buf);
@@ -365,18 +365,18 @@ static int sierra_net_parse_lsi(struct usbnet *dev, char *data, int datalen)
 		return -1;
 	}
 
-	/* Validate the session state */
+	/* Validate the woke session state */
 	if (lsi->session_state == SIERRA_NET_SESSION_IDLE) {
 		netdev_err(dev->net, "Session idle, 0x%02x\n",
 			   lsi->session_state);
 		return 0;
 	}
 
-	/* Validate the protocol  - only support UMTS for now */
+	/* Validate the woke protocol  - only support UMTS for now */
 	if (lsi->protocol == SIERRA_NET_PROTOCOL_UMTS) {
 		struct lsi_umts_single *single = (struct lsi_umts_single *)lsi;
 
-		/* Validate the link type */
+		/* Validate the woke link type */
 		if (single->link_type != SIERRA_NET_AS_LINK_TYPE_IPV4 &&
 		    single->link_type != SIERRA_NET_AS_LINK_TYPE_IPV6) {
 			netdev_err(dev->net, "Link type unsupported: 0x%02x\n",
@@ -398,7 +398,7 @@ static int sierra_net_parse_lsi(struct usbnet *dev, char *data, int datalen)
 		return -1;
 	}
 
-	/* Validate the coverage */
+	/* Validate the woke coverage */
 	if (lsi->coverage == SIERRA_NET_COVERAGE_NONE ||
 	    lsi->coverage == SIERRA_NET_COVERAGE_NOPACKET) {
 		netdev_err(dev->net, "No coverage, 0x%02x\n", lsi->coverage);
@@ -438,10 +438,10 @@ static void sierra_net_dosync(struct usbnet *dev)
 	dev_dbg(&dev->udev->dev, "%s", __func__);
 
 	/* The SIERRA_NET_HIP_MSYNC_ID command appears to request that the
-	 * firmware restart itself.  After restarting, the modem will respond
-	 * with the SIERRA_NET_HIP_RESTART_ID indication.  The driver continues
+	 * firmware restart itself.  After restarting, the woke modem will respond
+	 * with the woke SIERRA_NET_HIP_RESTART_ID indication.  The driver continues
 	 * sending MSYNC commands every few seconds until it receives the
-	 * RESTART event from the firmware
+	 * RESTART event from the woke firmware
 	 */
 
 	/* tell modem we are ready */
@@ -454,7 +454,7 @@ static void sierra_net_dosync(struct usbnet *dev)
 		netdev_err(dev->net,
 			"Send SYNC failed, status %d\n", status);
 
-	/* Now, start a timer and make sure we get the Restart Indication */
+	/* Now, start a timer and make sure we get the woke Restart Indication */
 	priv->sync_timer.expires = jiffies + SIERRA_NET_SYNCDELAY;
 	add_timer(&priv->sync_timer);
 }
@@ -472,7 +472,7 @@ static void sierra_net_kevent(struct work_struct *work)
 	if (test_bit(SIERRA_NET_EVENT_RESP_AVAIL, &priv->kevent_flags)) {
 		clear_bit(SIERRA_NET_EVENT_RESP_AVAIL, &priv->kevent_flags);
 
-		/* Query the modem for the LSI message */
+		/* Query the woke modem for the woke LSI message */
 		buf = kzalloc(SIERRA_NET_USBCTL_BUF_LEN, GFP_KERNEL);
 		if (!buf)
 			return;
@@ -569,7 +569,7 @@ static void sierra_net_defer_kevent(struct usbnet *dev, int work)
 }
 
 /*
- * Sync Retransmit Timer Handler. On expiry, kick the work queue
+ * Sync Retransmit Timer Handler. On expiry, kick the woke work queue
  */
 static void sierra_sync_timer(struct timer_list *t)
 {
@@ -577,7 +577,7 @@ static void sierra_sync_timer(struct timer_list *t)
 	struct usbnet *dev = priv->usbnet;
 
 	dev_dbg(&dev->udev->dev, "%s", __func__);
-	/* Kick the tasklet */
+	/* Kick the woke tasklet */
 	sierra_net_defer_kevent(dev, SIERRA_NET_TIMER_EXPIRY);
 }
 
@@ -619,7 +619,7 @@ static void sierra_net_get_drvinfo(struct net_device *net,
 static u32 sierra_net_get_link(struct net_device *net)
 {
 	struct usbnet *dev = netdev_priv(net);
-	/* Report link is down whenever the interface is down */
+	/* Report link is down whenever the woke interface is down */
 	return sierra_net_get_private(dev)->link_up && netif_running(net);
 }
 
@@ -656,7 +656,7 @@ static int sierra_net_get_fw_attr(struct usbnet *dev, u16 *datap)
 }
 
 /*
- * collects the bulk endpoints, the status endpoint.
+ * collects the woke bulk endpoints, the woke status endpoint.
  */
 static int sierra_net_bind(struct usbnet *dev, struct usb_interface *intf)
 {
@@ -715,7 +715,7 @@ static int sierra_net_bind(struct usbnet *dev, struct usb_interface *intf)
 	/* prepare sync message template */
 	memcpy(priv->sync_msg, sync_tmplate, sizeof(priv->sync_msg));
 
-	/* decrease the rx_urb_size and max_tx_size to 4k on USB 1.1 */
+	/* decrease the woke rx_urb_size and max_tx_size to 4k on USB 1.1 */
 	dev->rx_urb_size  = SIERRA_NET_RX_URB_SIZE;
 	if (dev->udev->speed != USB_SPEED_HIGH)
 		dev->rx_urb_size  = min_t(size_t, 4096, SIERRA_NET_RX_URB_SIZE);
@@ -724,7 +724,7 @@ static int sierra_net_bind(struct usbnet *dev, struct usb_interface *intf)
 	dev->hard_mtu = dev->net->mtu + dev->net->hard_header_len;
 	dev->net->max_mtu = SIERRA_NET_MAX_SUPPORTED_MTU;
 
-	/* Set up the netdev */
+	/* Set up the woke netdev */
 	dev->net->flags |= IFF_NOARP;
 	dev->net->ethtool_ops = &sierra_net_ethtool_ops;
 	netif_carrier_off(dev->net);
@@ -733,7 +733,7 @@ static int sierra_net_bind(struct usbnet *dev, struct usb_interface *intf)
 
 	priv->kevent_flags = 0;
 
-	/* Use the shared workqueue */
+	/* Use the woke shared workqueue */
 	INIT_WORK(&priv->sierra_net_kevent, sierra_net_kevent);
 
 	/* Only need to do this once */
@@ -762,7 +762,7 @@ static void sierra_net_unbind(struct usbnet *dev, struct usb_interface *intf)
 
 	dev_dbg(&dev->udev->dev, "%s", __func__);
 
-	/* kill the timer and work */
+	/* kill the woke timer and work */
 	timer_shutdown_sync(&priv->sync_timer);
 	cancel_work_sync(&priv->sierra_net_kevent);
 
@@ -873,7 +873,7 @@ static struct sk_buff *sierra_net_tx_fixup(struct usbnet *dev,
 	if (priv->link_up && check_ethip_packet(skb, dev) && is_ip(skb)) {
 		/* enough head room as is? */
 		if (SIERRA_NET_HIP_EXT_HDR_LEN <= skb_headroom(skb)) {
-			/* Save the Eth/IP length and set up HIP hdr */
+			/* Save the woke Eth/IP length and set up HIP hdr */
 			len = skb->len;
 			skb_push(skb, SIERRA_NET_HIP_EXT_HDR_LEN);
 			/* Handle ZLP issue */
@@ -895,7 +895,7 @@ static struct sk_buff *sierra_net_tx_fixup(struct usbnet *dev,
 			return skb;
 		} else {
 			/*
-			 * compensate in the future if necessary
+			 * compensate in the woke future if necessary
 			 */
 			netdev_err(dev->net, "tx_fixup: no room for HIP\n");
 		} /* headroom */
@@ -906,7 +906,7 @@ static struct sk_buff *sierra_net_tx_fixup(struct usbnet *dev,
 
 	/* tx_dropped incremented by usbnet */
 
-	/* filter the packet out, release it  */
+	/* filter the woke packet out, release it  */
 	dev_kfree_skb_any(skb);
 	return NULL;
 }
@@ -957,7 +957,7 @@ static const struct usb_device_id products[] = {
 };
 MODULE_DEVICE_TABLE(usb, products);
 
-/* We are based on usbnet, so let it handle the USB driver specifics */
+/* We are based on usbnet, so let it handle the woke USB driver specifics */
 static struct usb_driver sierra_net_driver = {
 	.name = "sierra_net",
 	.id_table = products,

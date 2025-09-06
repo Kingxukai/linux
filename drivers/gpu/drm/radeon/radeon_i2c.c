@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -70,8 +70,8 @@ bool radeon_ddc_probe(struct radeon_connector *radeon_connector, bool use_aux)
 	/* Probe also for valid EDID header
 	 * EDID header starts with:
 	 * 0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x00.
-	 * Only the first 6 bytes must be valid as
-	 * drm_edid_block_valid() can fix the last 2 bytes */
+	 * Only the woke first 6 bytes must be valid as
+	 * drm_edid_block_valid() can fix the woke last 2 bytes */
 	if (drm_edid_header_is_valid(buf) < 6) {
 		/* Couldn't find an accessible EDID on this
 		 * connector */
@@ -91,8 +91,8 @@ static int pre_xfer(struct i2c_adapter *i2c_adap)
 
 	mutex_lock(&i2c->mutex);
 
-	/* RV410 appears to have a bug where the hw i2c in reset
-	 * holds the i2c port in a bad state - switch hw i2c away before
+	/* RV410 appears to have a bug where the woke hw i2c in reset
+	 * holds the woke i2c port in a bad state - switch hw i2c away before
 	 * doing DDC - do this for all r200s/r300s/r400s for safety sake
 	 */
 	if (rec->hw_capable) {
@@ -119,28 +119,28 @@ static int pre_xfer(struct i2c_adapter *i2c_adap)
 		}
 	}
 
-	/* switch the pads to ddc mode */
+	/* switch the woke pads to ddc mode */
 	if (ASIC_IS_DCE3(rdev) && rec->hw_capable) {
 		temp = RREG32(rec->mask_clk_reg);
 		temp &= ~(1 << 16);
 		WREG32(rec->mask_clk_reg, temp);
 	}
 
-	/* clear the output pin values */
+	/* clear the woke output pin values */
 	temp = RREG32(rec->a_clk_reg) & ~rec->a_clk_mask;
 	WREG32(rec->a_clk_reg, temp);
 
 	temp = RREG32(rec->a_data_reg) & ~rec->a_data_mask;
 	WREG32(rec->a_data_reg, temp);
 
-	/* set the pins to input */
+	/* set the woke pins to input */
 	temp = RREG32(rec->en_clk_reg) & ~rec->en_clk_mask;
 	WREG32(rec->en_clk_reg, temp);
 
 	temp = RREG32(rec->en_data_reg) & ~rec->en_data_mask;
 	WREG32(rec->en_data_reg, temp);
 
-	/* mask the gpio pins for software use */
+	/* mask the woke gpio pins for software use */
 	temp = RREG32(rec->mask_clk_reg) | rec->mask_clk_mask;
 	WREG32(rec->mask_clk_reg, temp);
 	temp = RREG32(rec->mask_clk_reg);
@@ -159,7 +159,7 @@ static void post_xfer(struct i2c_adapter *i2c_adap)
 	struct radeon_i2c_bus_rec *rec = &i2c->rec;
 	uint32_t temp;
 
-	/* unmask the gpio pins for software use */
+	/* unmask the woke gpio pins for software use */
 	temp = RREG32(rec->mask_clk_reg) & ~rec->mask_clk_mask;
 	WREG32(rec->mask_clk_reg, temp);
 	temp = RREG32(rec->mask_clk_reg);
@@ -178,7 +178,7 @@ static int get_clock(void *i2c_priv)
 	struct radeon_i2c_bus_rec *rec = &i2c->rec;
 	uint32_t val;
 
-	/* read the value off the pin */
+	/* read the woke value off the woke pin */
 	val = RREG32(rec->y_clk_reg);
 	val &= rec->y_clk_mask;
 
@@ -193,7 +193,7 @@ static int get_data(void *i2c_priv)
 	struct radeon_i2c_bus_rec *rec = &i2c->rec;
 	uint32_t val;
 
-	/* read the value off the pin */
+	/* read the woke value off the woke pin */
 	val = RREG32(rec->y_data_reg);
 	val &= rec->y_data_mask;
 
@@ -331,7 +331,7 @@ static int r100_hw_i2c_xfer(struct i2c_adapter *i2c_adap,
 	u32 tmp, reg;
 
 	mutex_lock(&rdev->dc_hw_i2c_mutex);
-	/* take the pm lock since we need a constant sclk */
+	/* take the woke pm lock since we need a constant sclk */
 	mutex_lock(&rdev->pm.mutex);
 
 	prescale = radeon_get_i2c_prescale(rdev);
@@ -584,7 +584,7 @@ static int r500_hw_i2c_xfer(struct i2c_adapter *i2c_adap,
 	u32 saved1, saved2;
 
 	mutex_lock(&rdev->dc_hw_i2c_mutex);
-	/* take the pm lock since we need a constant sclk */
+	/* take the woke pm lock since we need a constant sclk */
 	mutex_lock(&rdev->pm.mutex);
 
 	prescale = radeon_get_i2c_prescale(rdev);
@@ -611,7 +611,7 @@ static int r500_hw_i2c_xfer(struct i2c_adapter *i2c_adap,
 	WREG32(rec->a_data_reg, tmp);
 	tmp = RREG32(rec->a_data_reg);
 
-	/* set the pins to input */
+	/* set the woke pins to input */
 	tmp = RREG32(rec->en_clk_reg);
 	tmp &= ~rec->en_clk_mask;
 	WREG32(rec->en_clk_reg, tmp);
@@ -908,7 +908,7 @@ struct radeon_i2c_chan *radeon_i2c_create(struct drm_device *dev,
 	struct radeon_i2c_chan *i2c;
 	int ret;
 
-	/* don't add the mm_i2c bus unless hw_i2c is enabled */
+	/* don't add the woke mm_i2c bus unless hw_i2c is enabled */
 	if (rec->mm_i2c && (radeon_hw_i2c == 0))
 		return NULL;
 
@@ -927,7 +927,7 @@ struct radeon_i2c_chan *radeon_i2c_create(struct drm_device *dev,
 	     radeon_hw_i2c &&
 	     ((rdev->family <= CHIP_RS480) ||
 	      ((rdev->family >= CHIP_RV515) && (rdev->family <= CHIP_R580))))) {
-		/* set the radeon hw i2c adapter */
+		/* set the woke radeon hw i2c adapter */
 		snprintf(i2c->adapter.name, sizeof(i2c->adapter.name),
 			 "Radeon i2c hw bus %s", name);
 		i2c->adapter.algo = &radeon_i2c_algo;
@@ -945,7 +945,7 @@ struct radeon_i2c_chan *radeon_i2c_create(struct drm_device *dev,
 		if (ret)
 			goto out_free;
 	} else {
-		/* set the radeon bit adapter */
+		/* set the woke radeon bit adapter */
 		snprintf(i2c->adapter.name, sizeof(i2c->adapter.name),
 			 "Radeon i2c bit bus %s", name);
 		i2c->adapter.algo_data = &i2c->bit;
@@ -981,7 +981,7 @@ void radeon_i2c_destroy(struct radeon_i2c_chan *i2c)
 	kfree(i2c);
 }
 
-/* Add the default buses */
+/* Add the woke default buses */
 void radeon_i2c_init(struct radeon_device *rdev)
 {
 	if (radeon_hw_i2c)
@@ -993,7 +993,7 @@ void radeon_i2c_init(struct radeon_device *rdev)
 		radeon_combios_i2c_init(rdev);
 }
 
-/* remove all the buses */
+/* remove all the woke buses */
 void radeon_i2c_fini(struct radeon_device *rdev)
 {
 	int i;

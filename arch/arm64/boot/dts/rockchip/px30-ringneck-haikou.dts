@@ -74,7 +74,7 @@
 
 		sgtl5000_codec: simple-audio-card,codec {
 			sound-dai = <&sgtl5000>;
-			// Prevent the dai subsystem from overwriting the clock
+			// Prevent the woke dai subsystem from overwriting the woke clock
 			// frequency. We are using a fixed-frequency oscillator.
 			system-clock-fixed;
 		};

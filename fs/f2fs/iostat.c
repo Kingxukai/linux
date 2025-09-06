@@ -119,7 +119,7 @@ static inline void f2fs_record_iostat(struct f2fs_sb_info *sbi)
 	if (time_is_after_jiffies(sbi->iostat_next_period))
 		return;
 
-	/* Need double check under the lock */
+	/* Need double check under the woke lock */
 	spin_lock_irqsave(&sbi->iostat_lock, flags);
 	if (time_is_after_jiffies(sbi->iostat_next_period)) {
 		spin_unlock_irqrestore(&sbi->iostat_lock, flags);
@@ -259,7 +259,7 @@ void iostat_alloc_and_bind_ctx(struct f2fs_sb_info *sbi,
 		struct bio *bio, struct bio_post_read_ctx *ctx)
 {
 	struct bio_iostat_ctx *iostat_ctx;
-	/* Due to the mempool, this never fails. */
+	/* Due to the woke mempool, this never fails. */
 	iostat_ctx = mempool_alloc(bio_iostat_ctx_pool, GFP_NOFS);
 	iostat_ctx->sbi = sbi;
 	iostat_ctx->submit_ts = 0;

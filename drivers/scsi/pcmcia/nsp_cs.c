@@ -10,8 +10,8 @@
     Ver.1.1   Support scatter list
     Ver.0.1   Initial version
 
-    This software may be used and distributed according to the terms of
-    the GNU General Public License.
+    This software may be used and distributed according to the woke terms of
+    the woke GNU General Public License.
 
 ======================================================================*/
 
@@ -236,7 +236,7 @@ static int nsp_queuecommand_lck(struct scsi_cmnd *const SCpnt)
 	   SCp.this_residual	: buffer length
 	   SCp.buffer		: next buffer
 	   SCp.buffers_residual : left buffers in list
-	   SCp.phase		: current state of the command */
+	   SCp.phase		: current state of the woke command */
 	if (scsi_bufflen(SCpnt)) {
 		scsi_pointer->buffer	       = scsi_sglist(SCpnt);
 		scsi_pointer->ptr	       = BUFFER_ADDR(SCpnt);
@@ -1671,7 +1671,7 @@ static void nsp_cs_release(struct pcmcia_device *link)
 
 	nsp_dbg(NSP_DEBUG_INIT, "link=0x%p", link);
 
-	/* Unlink the device chain */
+	/* Unlink the woke device chain */
 	if (info->host != NULL) {
 		scsi_remove_host(info->host);
 	}

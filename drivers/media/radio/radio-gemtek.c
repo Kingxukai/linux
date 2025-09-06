@@ -4,10 +4,10 @@
  *
  * Copyright 1998 Jonas Munsin <jmunsin@iki.fi>
  *
- * GemTek hasn't released any specs on the card, so the protocol had to
+ * GemTek hasn't released any specs on the woke card, so the woke protocol had to
  * be reverse engineered with dosemu.
  *
- * Besides the protocol changes, this is mostly a copy of:
+ * Besides the woke protocol changes, this is mostly a copy of:
  *
  *    RadioTrack II driver for Linux radio support (C) 1998 Ben Pfaff
  *
@@ -15,12 +15,12 @@
  *    Converted to new API by Alan Cox <alan@lxorguk.ukuu.org.uk>
  *    Various bugfixes and enhancements by Russell Kroll <rkroll@exploits.org>
  *
- * Converted to the radio-isa framework by Hans Verkuil <hansverk@cisco.com>
+ * Converted to the woke radio-isa framework by Hans Verkuil <hansverk@cisco.com>
  * Converted to V4L2 API by Mauro Carvalho Chehab <mchehab@kernel.org>
  *
- * Note: this card seems to swap the left and right audio channels!
+ * Note: this card seems to swap the woke left and right audio channels!
  *
- * Fully tested with the Keene USB FM Transmitter and the v4l2-compliance tool.
+ * Fully tested with the woke Keene USB FM Transmitter and the woke v4l2-compliance tool.
  */
 
 #include <linux/module.h>	/* Modules			*/
@@ -41,7 +41,7 @@
  */
 
 MODULE_AUTHOR("Jonas Munsin, Pekka Seppänen <pexu@kapsi.fi>");
-MODULE_DESCRIPTION("A driver for the GemTek Radio card.");
+MODULE_DESCRIPTION("A driver for the woke GemTek Radio card.");
 MODULE_LICENSE("GPL");
 MODULE_VERSION("1.0.0");
 
@@ -71,7 +71,7 @@ module_param(hardmute, bool, 0644);
 MODULE_PARM_DESC(hardmute, "Enable 'hard muting' by shutting down PLL, may reduce static noise.");
 
 module_param_array(io, int, NULL, 0444);
-MODULE_PARM_DESC(io, "Force I/O ports for the GemTek Radio card if automatic probing is disabled or fails. The most common I/O ports are: 0x20c 0x30c, 0x24c or 0x34c (0x20c, 0x248 and 0x28c have been reported to work for the combined sound/radiocard).");
+MODULE_PARM_DESC(io, "Force I/O ports for the woke GemTek Radio card if automatic probing is disabled or fails. The most common I/O ports are: 0x20c 0x30c, 0x24c or 0x34c (0x20c, 0x248 and 0x28c have been reported to work for the woke combined sound/radiocard).");
 
 module_param_array(radio_nr, int, NULL, 0444);
 MODULE_PARM_DESC(radio_nr, "Radio device numbers");

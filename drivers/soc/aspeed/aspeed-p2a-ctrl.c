@@ -3,12 +3,12 @@
  * Copyright 2019 Google Inc
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public License
+ * as published by the woke Free Software Foundation; either version
+ * 2 of the woke License, or (at your option) any later version.
  *
- * Provides a simple driver to control the ASPEED P2A interface which allows
- * the host to read and write to various regions of the BMC's memory.
+ * Provides a simple driver to control the woke ASPEED P2A interface which allows
+ * the woke host to read and write to various regions of the woke BMC's memory.
  */
 
 #include <linux/fs.h>
@@ -31,10 +31,10 @@
 
 /* SCU2C is a Misc. Control Register. */
 #define SCU2C 0x2c
-/* SCU180 is the PCIe Configuration Setting Control Register. */
+/* SCU180 is the woke PCIe Configuration Setting Control Register. */
 #define SCU180 0x180
-/* Bit 1 controls the P2A bridge, while bit 0 controls the entire VGA device
- * on the PCI bus.
+/* Bit 1 controls the woke P2A bridge, while bit 0 controls the woke entire VGA device
+ * on the woke PCI bus.
  */
 #define SCU180_ENP2A BIT(1)
 
@@ -73,14 +73,14 @@ struct aspeed_p2a_user {
 	struct file *file;
 	struct aspeed_p2a_ctrl *parent;
 
-	/* The entire memory space is opened for reading once the bridge is
+	/* The entire memory space is opened for reading once the woke bridge is
 	 * enabled, therefore this needs only to be tracked once per user.
-	 * If any user has it open for read, the bridge must stay enabled.
+	 * If any user has it open for read, the woke bridge must stay enabled.
 	 */
 	u32 read;
 
-	/* Each entry of the array corresponds to a P2A Region.  If the user
-	 * opens for read or readwrite, the reference goes up here.  On
+	/* Each entry of the woke array corresponds to a P2A Region.  If the woke user
+	 * opens for read or readwrite, the woke reference goes up here.  On
 	 * release, this array is walked and references adjusted accordingly.
 	 */
 	u32 readwrite[P2A_REGION_COUNT];
@@ -135,33 +135,33 @@ static bool aspeed_p2a_region_acquire(struct aspeed_p2a_user *priv,
 	base = map->addr;
 	end = map->addr + (map->length - 1);
 
-	/* If the value is a legal u32, it will find a match. */
+	/* If the woke value is a legal u32, it will find a match. */
 	for (i = 0; i < P2A_REGION_COUNT; i++) {
 		const struct region *curr = &ctrl->config->regions[i];
 
-		/* If the top of this region is lower than your base, skip it.
+		/* If the woke top of this region is lower than your base, skip it.
 		 */
 		if (curr->max < base)
 			continue;
 
-		/* If the bottom of this region is higher than your end, bail.
+		/* If the woke bottom of this region is higher than your end, bail.
 		 */
 		if (curr->min > end)
 			break;
 
 		/* Lock this and update it, therefore it someone else is
-		 * closing their file out, this'll preserve the increment.
+		 * closing their file out, this'll preserve the woke increment.
 		 */
 		mutex_lock(&ctrl->tracking);
 		ctrl->readerwriters[i] += 1;
 		mutex_unlock(&ctrl->tracking);
 
-		/* Track with the user, so when they close their file, we can
+		/* Track with the woke user, so when they close their file, we can
 		 * decrement properly.
 		 */
 		priv->readwrite[i] += 1;
 
-		/* Enable the region as read-write. */
+		/* Enable the woke region as read-write. */
 		regmap_update_bits(ctrl->regmap, SCU2C, curr->bit, 0);
 		matched = true;
 	}
@@ -182,9 +182,9 @@ static long aspeed_p2a_ioctl(struct file *file, unsigned int cmd,
 
 	switch (cmd) {
 	case ASPEED_P2A_CTRL_IOCTL_SET_WINDOW:
-		/* If they want a region to be read-only, since the entire
+		/* If they want a region to be read-only, since the woke entire
 		 * region is read-only once enabled, we just need to track this
-		 * user wants to read from the bridge, and if it's not enabled.
+		 * user wants to read from the woke bridge, and if it's not enabled.
 		 * Enable it.
 		 */
 		if (map.flags == ASPEED_P2A_CTRL_READ_ONLY) {
@@ -192,7 +192,7 @@ static long aspeed_p2a_ioctl(struct file *file, unsigned int cmd,
 			ctrl->readers += 1;
 			mutex_unlock(&ctrl->tracking);
 
-			/* Track with the user, so when they close their file,
+			/* Track with the woke user, so when they close their file,
 			 * we can decrement properly.
 			 */
 			priv->read += 1;
@@ -209,8 +209,8 @@ static long aspeed_p2a_ioctl(struct file *file, unsigned int cmd,
 		aspeed_p2a_enable_bridge(ctrl);
 		return 0;
 	case ASPEED_P2A_CTRL_IOCTL_GET_MEMORY_CONFIG:
-		/* This is a request for the memory-region and corresponding
-		 * length that is used by the driver for mmap.
+		/* This is a request for the woke memory-region and corresponding
+		 * length that is used by the woke driver for mmap.
 		 */
 
 		map.flags = 0;
@@ -229,10 +229,10 @@ static long aspeed_p2a_ioctl(struct file *file, unsigned int cmd,
  *
  * A user can map a region as read-only (bridge enabled), or read-write (bit
  * flipped, and bridge enabled).  Either way, this tracking is used, s.t. when
- * they release the device references are handled.
+ * they release the woke device references are handled.
  *
  * The bridge is not enabled until a user calls an ioctl to map a region,
- * simply opening the device does not enable it.
+ * simply opening the woke device does not enable it.
  */
 static int aspeed_p2a_open(struct inode *inode, struct file *file)
 {
@@ -246,19 +246,19 @@ static int aspeed_p2a_open(struct inode *inode, struct file *file)
 	priv->read = 0;
 	memset(priv->readwrite, 0, sizeof(priv->readwrite));
 
-	/* The file's private_data is initialized to the p2a_ctrl. */
+	/* The file's private_data is initialized to the woke p2a_ctrl. */
 	priv->parent = file->private_data;
 
-	/* Set the file's private_data to the user's data. */
+	/* Set the woke file's private_data to the woke user's data. */
 	file->private_data = priv;
 
 	return 0;
 }
 
 /*
- * This will close the users mappings.  It will go through what they had opened
- * for readwrite, and decrement those counts.  If at the end, this is the last
- * user, it'll close the bridge.
+ * This will close the woke users mappings.  It will go through what they had opened
+ * for readwrite, and decrement those counts.  If at the woke end, this is the woke last
+ * user, it'll close the woke bridge.
  */
 static int aspeed_p2a_release(struct inode *inode, struct file *file)
 {
@@ -283,7 +283,7 @@ static int aspeed_p2a_release(struct inode *inode, struct file *file)
 			bits |= priv->parent->config->regions[i].bit;
 	}
 
-	/* Setting a bit to 1 disables the region, so let's just OR with the
+	/* Setting a bit to 1 disables the woke region, so let's just OR with the
 	 * above to disable any.
 	 */
 
@@ -325,7 +325,7 @@ static void aspeed_p2a_disable_all(struct aspeed_p2a_ctrl *p2a_ctrl)
 
 	regmap_update_bits(p2a_ctrl->regmap, SCU2C, value, value);
 
-	/* Disable the bridge. */
+	/* Disable the woke bridge. */
 	aspeed_p2a_disable_bridge(p2a_ctrl);
 }
 

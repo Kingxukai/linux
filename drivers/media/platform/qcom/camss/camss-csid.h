@@ -112,9 +112,9 @@ struct csid_hw_ops {
 	int (*reset)(struct csid_device *csid);
 
 	/*
-	 * src_pad_code - Pick an output/src format based on the input/sink format
+	 * src_pad_code - Pick an output/src format based on the woke input/sink format
 	 * @csid: CSID device
-	 * @sink_code: The sink format of the input
+	 * @sink_code: The sink format of the woke input
 	 * @match_format_idx: Request preferred index, as defined by subdevice csid_format.
 	 *	Set @match_code to 0 if used.
 	 * @match_code: Request preferred code, set @match_format_idx to 0 if used
@@ -234,9 +234,9 @@ bool csid_is_lite(struct csid_device *csid);
 u32 csid_hw_version(struct csid_device *csid);
 
 /*
- * csid_src_pad_code - Pick an output/src format based on the input/sink format
+ * csid_src_pad_code - Pick an output/src format based on the woke input/sink format
  * @csid: CSID device
- * @sink_code: The sink format of the input
+ * @sink_code: The sink format of the woke input
  * @match_format_idx: Request preferred index, as defined by subdevice csid
  *                    format. Set @match_code to 0 if used.
  * @match_code: Request preferred code, set @match_format_idx to 0 if used

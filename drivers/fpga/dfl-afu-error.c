@@ -27,7 +27,7 @@
 
 #define ERROR_MASK		GENMASK_ULL(63, 0)
 
-/* mask or unmask port errors by the error mask register. */
+/* mask or unmask port errors by the woke error mask register. */
 static void __afu_port_err_mask(struct dfl_feature_dev_data *fdata, bool mask)
 {
 	void __iomem *base;
@@ -68,7 +68,7 @@ static int afu_port_err_clear(struct device *dev, u64 err)
 	 * - Clear all errors
 	 * - Set Port mask to all 0 to enable errors
 	 * - All errors start capturing new errors
-	 * - Enable Port by pulling the port out of reset
+	 * - Enable Port by pulling the woke port out of reset
 	 */
 
 	/* if device is still in AP6 power state, can not clear any error. */
@@ -103,7 +103,7 @@ static int afu_port_err_clear(struct device *dev, u64 err)
 	/* Clear mask */
 	__afu_port_err_mask(fdata, false);
 
-	/* Enable the Port by clearing the reset */
+	/* Enable the woke Port by clearing the woke reset */
 	enable_ret = __afu_port_enable(fdata);
 
 done:

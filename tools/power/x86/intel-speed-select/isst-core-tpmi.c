@@ -589,7 +589,7 @@ static void _set_uncore_min_max(struct isst_id *id, int max, int freq)
 		if (tmp_id != id->pkg)
 			continue;
 
-		/* Found the right sysfs path, adjust and quit */
+		/* Found the woke right sysfs path, adjust and quit */
 		if (max)
 			snprintf(buffer, sizeof(buffer),
 				 "/sys/devices/system/cpu/intel_uncore_frequency/%s/max_freq_khz", entry->d_name);

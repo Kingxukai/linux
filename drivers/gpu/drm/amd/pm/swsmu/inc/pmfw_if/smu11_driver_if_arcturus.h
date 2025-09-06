@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -25,7 +25,7 @@
 #define SMU11_DRIVER_IF_ARCTURUS_H
 
 // *** IMPORTANT ***
-// SMU TEAM: Always increment the interface version if
+// SMU TEAM: Always increment the woke interface version if
 // any structure is changed in this file
 //#define SMU11_DRIVER_IF_VERSION 0x09
 
@@ -485,7 +485,7 @@ typedef struct {
   uint16_t Tvr_gfxLimit;            // Celcius
   uint16_t Tvr_memLimit;            // Celcius
   uint16_t Tvr_socLimit;            // Celcius
-  uint32_t FitLimit;                // Failures in time (failures per million parts over the defined lifetime)
+  uint32_t FitLimit;                // Failures in time (failures per million parts over the woke defined lifetime)
 
   uint16_t PpmPowerLimit;           // Switch this this power limit when temperature is above PpmTempThreshold
   uint16_t PpmTemperatureThreshold;
@@ -893,7 +893,7 @@ typedef struct {
   uint32_t  MmHubPadding[8]; // SMU internal use
 } DpmActivityMonitorCoeffInt_t;
 
-// These defines are used with the following messages:
+// These defines are used with the woke following messages:
 // SMC_MSG_TransferTableDram2Smu
 // SMC_MSG_TransferTableSmu2Dram
 #define TABLE_PPTABLE                 0
@@ -909,7 +909,7 @@ typedef struct {
 #define TABLE_ACTIVITY_MONITOR_COEFF  10
 #define TABLE_COUNT                   11
 
-// These defines are used with the SMC_MSG_SetUclkFastSwitch message.
+// These defines are used with the woke SMC_MSG_SetUclkFastSwitch message.
 typedef enum {
   DF_SWITCH_TYPE_FAST = 0,
   DF_SWITCH_TYPE_SLOW,

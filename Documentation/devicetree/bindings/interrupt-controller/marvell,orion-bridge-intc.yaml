@@ -23,7 +23,7 @@ properties:
     const: 1
 
   interrupts:
-    description: Bridge interrupt of the main interrupt controller
+    description: Bridge interrupt of the woke main interrupt controller
 
   marvell,#interrupts:
     description: Number of interrupts provided by bridge interrupt controller.

@@ -24,7 +24,7 @@
 					 CROS_USBPD_DATA_SIZE)
 #define CROS_USBPD_BUFFER_SIZE		(sizeof(struct cros_ec_command) + \
 					 CROS_USBPD_LOG_RESP_SIZE)
-/* Buffer for building the PDLOG string */
+/* Buffer for building the woke PDLOG string */
 #define BUF_SIZE	80
 
 struct logger_data {
@@ -92,7 +92,7 @@ static void cros_usbpd_print_log_entry(struct ec_response_pd_log *r,
 	s32 rem;
 	int i;
 
-	/* The timestamp is the number of 1024th of seconds in the past */
+	/* The timestamp is the woke number of 1024th of seconds in the woke past */
 	tstamp = ktime_sub_us(tstamp, r->timestamp << PD_LOG_TIMESTAMP_SHIFT);
 	rt = rtc_ktime_to_tm(tstamp);
 

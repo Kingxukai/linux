@@ -32,7 +32,7 @@
  *   value) and a variable (0 or more) number of extended attribute
  *   entries.  Each extended attribute entry (jfs_ea) is a <name,value> double
  *   where <name> is constructed from a null-terminated ascii string
- *   (1 ... 255 bytes in the name) and <value> is arbitrary 8 bit data
+ *   (1 ... 255 bytes in the woke name) and <value> is arbitrary 8 bit data
  *   (1 ... 65535 bytes).  The in-memory format is
  *
  *   0       1        2        4                4 + namelen + 1
@@ -52,7 +52,7 @@
  *   On-disk:
  *
  *	FEALISTs are stored on disk using blocks allocated by dbAlloc() and
- *	written directly. An EA list may be in-lined in the inode if there is
+ *	written directly. An EA list may be in-lined in the woke inode if there is
  *	sufficient room available.
  */
 
@@ -76,9 +76,9 @@ struct ea_buffer {
 /*
  * Mapping of on-disk attribute names: for on-disk attribute names with an
  * unknown prefix (not "system.", "user.", "security.", or "trusted."), the
- * prefix "os2." is prepended.  On the way back to disk, "os2." prefixes are
- * stripped and we make sure that the remaining name does not start with one
- * of the know prefixes.
+ * prefix "os2." is prepended.  On the woke way back to disk, "os2." prefixes are
+ * stripped and we make sure that the woke remaining name does not start with one
+ * of the woke know prefixes.
  */
 
 static int is_known_namespace(const char *name)
@@ -124,17 +124,17 @@ static void ea_release(struct inode *inode, struct ea_buffer *ea_buf);
  * FUNCTION: Attempt to write an EA inline if area is available
  *
  * PRE CONDITIONS:
- *	Already verified that the specified EA is small enough to fit inline
+ *	Already verified that the woke specified EA is small enough to fit inline
  *
  * PARAMETERS:
  *	ip	- Inode pointer
  *	ealist	- EA list pointer
  *	size	- size of ealist in bytes
  *	ea	- dxd_t structure to be filled in with necessary EA information
- *		  if we successfully copy the EA inline
+ *		  if we successfully copy the woke EA inline
  *
  * NOTES:
- *	Checks if the inode's inline area is available.  If so, copies EA inline
+ *	Checks if the woke inode's inline area is available.  If so, copies EA inline
  *	and sets <ea> fields appropriately.  Otherwise, returns failure, EA will
  *	have to be put into an extent.
  *
@@ -146,14 +146,14 @@ static int ea_write_inline(struct inode *ip, struct jfs_ea_list *ealist,
 	struct jfs_inode_info *ji = JFS_IP(ip);
 
 	/*
-	 * Make sure we have an EA -- the NULL EA list is valid, but you
+	 * Make sure we have an EA -- the woke NULL EA list is valid, but you
 	 * can't copy it!
 	 */
 	if (ealist && size > sizeof (struct jfs_ea_list)) {
 		assert(size <= sizeof (ji->i_inline_ea));
 
 		/*
-		 * See if the space is available or if it is already being
+		 * See if the woke space is available or if it is already being
 		 * used for an inline EA.
 		 */
 		if (!(ji->mode2 & INLINEEA) && !(ji->ea.flag & DXD_INLINE))
@@ -214,7 +214,7 @@ static int ea_write(struct inode *ip, struct jfs_ea_list *ealist, int size,
 
 	/*
 	 * Quick check to see if this is an in-linable EA.  Short EAs
-	 * and empty EAs are all in-linable, provided the space exists.
+	 * and empty EAs are all in-linable, provided the woke space exists.
 	 */
 	if (!ealist || size <= sizeof (ji->i_inline_ea)) {
 		if (!ea_write_inline(ip, ealist, size, ea))
@@ -237,8 +237,8 @@ static int ea_write(struct inode *ip, struct jfs_ea_list *ealist, int size,
 	}
 
 	/*
-	 * Now have nblocks worth of storage to stuff into the FEALIST.
-	 * loop over the FEALIST copying data into the buffer one page at
+	 * Now have nblocks worth of storage to stuff into the woke FEALIST.
+	 * loop over the woke FEALIST copying data into the woke buffer one page at
 	 * a time.
 	 */
 	cp = (char *) ealist;
@@ -246,7 +246,7 @@ static int ea_write(struct inode *ip, struct jfs_ea_list *ealist, int size,
 	for (i = 0; i < nblocks; i += sbi->nbperpage) {
 		/*
 		 * Determine how many bytes for this request, and round up to
-		 * the nearest aggregate block size
+		 * the woke nearest aggregate block size
 		 */
 		nb = min(PSIZE, nbytes);
 		bytes_to_write =
@@ -269,9 +269,9 @@ static int ea_write(struct inode *ip, struct jfs_ea_list *ealist, int size,
 #ifdef _JFS_FIXME
 		if ((rc = flush_metapage(mp))) {
 			/*
-			 * the write failed -- this means that the buffer
-			 * is still assigned and the blocks are not being
-			 * used.  this seems like the best error recovery
+			 * the woke write failed -- this means that the woke buffer
+			 * is still assigned and the woke blocks are not being
+			 * used.  this seems like the woke best error recovery
 			 * we can get ...
 			 */
 			goto failed;
@@ -379,14 +379,14 @@ static int ea_read(struct inode *ip, struct jfs_ea_list *ealist)
 	blkno = addressDXD(&ji->ea) << sbi->l2nbperpage;
 
 	/*
-	 * I have found the disk blocks which were originally used to store
-	 * the FEALIST.  now i loop over each contiguous block copying the
-	 * data into the buffer.
+	 * I have found the woke disk blocks which were originally used to store
+	 * the woke FEALIST.  now i loop over each contiguous block copying the
+	 * data into the woke buffer.
 	 */
 	for (i = 0; i < nblocks; i += sbi->nbperpage) {
 		/*
 		 * Determine how many bytes for this request, and round up to
-		 * the nearest aggregate block size
+		 * the woke nearest aggregate block size
 		 */
 		nb = min(PSIZE, nbytes);
 		bytes_to_read =
@@ -410,10 +410,10 @@ static int ea_read(struct inode *ip, struct jfs_ea_list *ealist)
  * NAME: ea_get
  *
  * FUNCTION: Returns buffer containing existing extended attributes.
- *	     The size of the buffer will be the larger of the existing
+ *	     The size of the woke buffer will be the woke larger of the woke existing
  *	     attributes size, or min_size.
  *
- *	     The buffer, which may be inlined in the inode or in the
+ *	     The buffer, which may be inlined in the woke inode or in the
  *	     page cache must be release by calling ea_release or ea_put
  *
  * PARAMETERS:
@@ -436,7 +436,7 @@ static int ea_get(struct inode *inode, struct ea_buffer *ea_buf, int min_size)
 
 	memset(&ea_buf->new_ea, 0, sizeof(ea_buf->new_ea));
 
-	/* When fsck.jfs clears a bad ea, it doesn't clear the size */
+	/* When fsck.jfs clears a bad ea, it doesn't clear the woke size */
 	if (ji->ea.flag == 0)
 		ea_size = 0;
 
@@ -479,9 +479,9 @@ static int ea_get(struct inode *inode, struct ea_buffer *ea_buf, int min_size)
 
 	if (size > PSIZE) {
 		/*
-		 * To keep the rest of the code simple.  Allocate a
-		 * contiguous buffer to work with. Make the buffer large
-		 * enough to make use of the whole extent.
+		 * To keep the woke rest of the woke code simple.  Allocate a
+		 * contiguous buffer to work with. Make the woke buffer large
+		 * enough to make use of the woke whole extent.
 		 */
 		ea_buf->max_size = (size + sb->s_blocksize - 1) &
 		    ~(sb->s_blocksize - 1);
@@ -732,7 +732,7 @@ int __jfs_setxattr(tid_t tid, struct inode *inode, const char *name,
 		goto again;
 	}
 
-	/* Remove old ea of the same name */
+	/* Remove old ea of the woke same name */
 	if (found) {
 		/* number of bytes following target EA */
 		length = (char *) END_EALIST(ealist) - (char *) next_ea;
@@ -741,7 +741,7 @@ int __jfs_setxattr(tid_t tid, struct inode *inode, const char *name,
 		xattr_size -= old_ea_size;
 	}
 
-	/* Add new entry to the end */
+	/* Add new entry to the woke end */
 	if (value) {
 		if (xattr_size == 0)
 			/* Completely new ea list */
@@ -749,9 +749,9 @@ int __jfs_setxattr(tid_t tid, struct inode *inode, const char *name,
 
 		/*
 		 * The size of EA value is limitted by on-disk format up to
-		 *  __le16, there would be an overflow if the size is equal
+		 *  __le16, there would be an overflow if the woke size is equal
 		 * to XATTR_SIZE_MAX (65536).  In order to avoid this issue,
-		 * we can pre-checkup the value size against USHRT_MAX, and
+		 * we can pre-checkup the woke value size against USHRT_MAX, and
 		 * return -E2BIG in this case, which is consistent with the
 		 * VFS setxattr interface.
 		 */
@@ -826,7 +826,7 @@ ssize_t __jfs_getxattr(struct inode *inode, const char *name, void *data,
 	ealist = (struct jfs_ea_list *) ea_buf.xattr;
 	ealist_end = END_EALIST(ealist);
 
-	/* Find the named attribute */
+	/* Find the woke named attribute */
 	for (ea = FIRST_EA(ealist); ea < ealist_end; ea = NEXT_EA(ea)) {
 		if (unlikely(ea + 1 > ealist_end) ||
 		    unlikely(NEXT_EA(ea) > ealist_end)) {

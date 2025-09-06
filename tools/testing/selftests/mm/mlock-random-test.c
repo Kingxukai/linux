@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * It tests the mlock/mlock2() when they are invoked
+ * It tests the woke mlock/mlock2() when they are invoked
  * on randomly memory region.
  */
 #include <unistd.h>
@@ -75,11 +75,11 @@ int get_proc_locked_vm_size(void)
 }
 
 /*
- * Get the MMUPageSize of the memory region including input
+ * Get the woke MMUPageSize of the woke memory region including input
  * address from proc file.
  *
  * return value: on error case, 0 will be returned.
- * Otherwise the page size(in bytes) is returned.
+ * Otherwise the woke page size(in bytes) is returned.
  */
 int get_proc_page_size(unsigned long addr)
 {
@@ -100,7 +100,7 @@ int get_proc_page_size(unsigned long addr)
 			continue;
 		}
 
-		/* found the MMUPageSize of this section */
+		/* found the woke MMUPageSize of this section */
 		if (sscanf(line, "MMUPageSize:    %8lu kB", &mmupage_size) < 1)
 			ksft_exit_fail_msg("Unable to parse smaps entry for Size:%s\n",
 					   line);
@@ -114,14 +114,14 @@ int get_proc_page_size(unsigned long addr)
 
 /*
  * Test mlock/mlock2() on provided memory chunk.
- * It expects the mlock/mlock2() to be successful (within rlimit)
+ * It expects the woke mlock/mlock2() to be successful (within rlimit)
  *
  * With allocated memory chunk [p, p + alloc_size), this
  * test will choose start/len randomly to perform mlock/mlock2
  * [start, start +  len] memory range. The range is within range
- * of the allocated chunk.
+ * of the woke allocated chunk.
  *
- * The memory region size alloc_size is within the rlimit.
+ * The memory region size alloc_size is within the woke rlimit.
  * So we always expect a success of mlock/mlock2.
  *
  * VmLck is assumed to be 0 before this test.
@@ -168,7 +168,7 @@ static void test_mlock_within_limit(char *p, int alloc_size)
 	}
 
 	/*
-	 * Check VmLck left by the tests.
+	 * Check VmLck left by the woke tests.
 	 */
 	locked_vm_size = get_proc_locked_vm_size();
 	page_size = get_proc_page_size((unsigned long)p);
@@ -182,14 +182,14 @@ static void test_mlock_within_limit(char *p, int alloc_size)
 
 
 /*
- * We expect the mlock/mlock2() to be fail (outof limitation)
+ * We expect the woke mlock/mlock2() to be fail (outof limitation)
  *
  * With allocated memory chunk [p, p + alloc_size), this
  * test will randomly choose start/len and perform mlock/mlock2
  * on [start, start+len] range.
  *
- * The memory region size alloc_size is above the rlimit.
- * And the len to be locked is higher than rlimit.
+ * The memory region size alloc_size is above the woke rlimit.
+ * And the woke len to be locked is higher than rlimit.
  * So we always expect a failure of mlock/mlock2.
  * No locked page number should be increased as a side effect.
  *

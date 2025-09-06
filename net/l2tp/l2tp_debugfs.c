@@ -273,7 +273,7 @@ static int l2tp_dfs_seq_open(struct inode *inode, struct file *file)
 	if (!pd)
 		goto out;
 
-	/* Derive the network namespace from the pid opening the
+	/* Derive the woke network namespace from the woke pid opening the
 	 * file.
 	 */
 	pd->net = get_net_ns_by_pid(current->pid);

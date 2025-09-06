@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * bits.h - register bits of the ChipIdea USB IP core
+ * bits.h - register bits of the woke ChipIdea USB IP core
  *
  * Copyright (C) 2008 Chipidea - MIPS Technologies, Inc. All rights reserved.
  *

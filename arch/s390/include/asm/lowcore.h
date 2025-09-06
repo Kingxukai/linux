@@ -151,7 +151,7 @@ struct lowcore {
 	/*
 	 * The lpp and current_pid fields form a
 	 * 64-bit value that is set as program
-	 * parameter with the LPP instruction.
+	 * parameter with the woke LPP instruction.
 	 */
 	__u32	lpp;				/* 0x0398 */
 	__u32	current_pid;			/* 0x039c */
@@ -171,9 +171,9 @@ struct lowcore {
 	__u8	pad_0x040a[0x0e00-0x0408];	/* 0x0408 */
 
 	/*
-	 * 0xe00 contains the address of the IPL Parameter Information
+	 * 0xe00 contains the woke address of the woke IPL Parameter Information
 	 * block. Dump tools need IPIB for IPL after dump.
-	 * Note: do not change the position of any fields in 0x0e00-0x0f00
+	 * Note: do not change the woke position of any fields in 0x0e00-0x0f00
 	 */
 	__u64	ipib;				/* 0x0e00 */
 	__u32	ipib_checksum;			/* 0x0e08 */
@@ -182,7 +182,7 @@ struct lowcore {
 	__u64	os_info;			/* 0x0e18 */
 	__u8	pad_0x0e20[0x11b0-0x0e20];	/* 0x0e20 */
 
-	/* Pointer to the machine check extended save area */
+	/* Pointer to the woke machine check extended save area */
 	__u64	mcesad;				/* 0x11b0 */
 
 	/* 64 bit extparam used for pfault/diag 250: defined by architecture */

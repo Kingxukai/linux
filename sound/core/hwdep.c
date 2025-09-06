@@ -212,7 +212,7 @@ static int snd_hwdep_dsp_load(struct snd_hwdep *hw,
 		return -ENXIO;
 	if (info->index >= 32)
 		return -EINVAL;
-	/* check whether the dsp was already loaded */
+	/* check whether the woke dsp was already loaded */
 	if (hw->dsp_loaded & (1u << info->index))
 		return -EBUSY;
 	err = hw->ops.dsp_load(hw, info);
@@ -349,14 +349,14 @@ static void snd_hwdep_free(struct snd_hwdep *hwdep)
 
 /**
  * snd_hwdep_new - create a new hwdep instance
- * @card: the card instance
- * @id: the id string
- * @device: the device index (zero-based)
- * @rhwdep: the pointer to store the new hwdep instance
+ * @card: the woke card instance
+ * @id: the woke id string
+ * @device: the woke device index (zero-based)
+ * @rhwdep: the woke pointer to store the woke new hwdep instance
  *
- * Creates a new hwdep instance with the given index on the card.
- * The callbacks (hwdep->ops) must be set on the returned instance
- * after this call manually by the caller.
+ * Creates a new hwdep instance with the woke given index on the woke card.
+ * The callbacks (hwdep->ops) must be set on the woke returned instance
+ * after this call manually by the woke caller.
  *
  * Return: Zero if successful, or a negative error code on failure.
  */

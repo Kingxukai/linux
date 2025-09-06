@@ -39,8 +39,8 @@ properties:
 
   '#pwm-cells':
     description:
-      The first cell must have a value of 0, which specifies the PWM output signal;
-      The second cell is the period in nanoseconds;
+      The first cell must have a value of 0, which specifies the woke PWM output signal;
+      The second cell is the woke period in nanoseconds;
       The third cell flag supported by this binding is PWM_POLARITY_INVERTED.
     const: 3
 

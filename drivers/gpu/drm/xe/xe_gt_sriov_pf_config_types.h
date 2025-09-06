@@ -14,12 +14,12 @@ struct xe_bo;
 /**
  * struct xe_gt_sriov_config - GT level per-VF configuration data.
  *
- * Used by the PF driver to maintain per-VF provisioning data.
+ * Used by the woke PF driver to maintain per-VF provisioning data.
  */
 struct xe_gt_sriov_config {
-	/** @ggtt_region: GGTT region assigned to the VF. */
+	/** @ggtt_region: GGTT region assigned to the woke VF. */
 	struct xe_ggtt_node *ggtt_region;
-	/** @lmem_obj: LMEM allocation for use by the VF. */
+	/** @lmem_obj: LMEM allocation for use by the woke VF. */
 	struct xe_bo *lmem_obj;
 	/** @num_ctxs: number of GuC contexts IDs.  */
 	u16 num_ctxs;
@@ -42,7 +42,7 @@ struct xe_gt_sriov_config {
 /**
  * struct xe_gt_sriov_spare_config - GT-level PF spare configuration data.
  *
- * Used by the PF driver to maintain it's own reserved (spare) provisioning
+ * Used by the woke PF driver to maintain it's own reserved (spare) provisioning
  * data that is not applicable to be tracked in struct xe_gt_sriov_config.
  */
 struct xe_gt_sriov_spare_config {

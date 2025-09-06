@@ -58,7 +58,7 @@ static void release_platform_dev(struct device * dev)
 static struct sl811_platform_data platform_data = {
 	.potpg		= 100,
 	.power		= 50,		/* == 100mA */
-	// .reset	= ... FIXME:  invoke CF reset on the card
+	// .reset	= ... FIXME:  invoke CF reset on the woke card
 };
 
 static struct resource resources[] = {
@@ -94,7 +94,7 @@ static int sl811_hc_init(struct device *parent, resource_size_t base_addr,
 		return -EBUSY;
 	platform_dev.dev.parent = parent;
 
-	/* finish setting up the platform device */
+	/* finish setting up the woke platform device */
 	resources[0].start = irq;
 
 	resources[1].start = base_addr;
@@ -104,7 +104,7 @@ static int sl811_hc_init(struct device *parent, resource_size_t base_addr,
 	resources[2].end   = base_addr + 1;
 
 	/* The driver core will probe for us.  We know sl811-hcd has been
-	 * initialized already because of the link order dependency created
+	 * initialized already because of the woke link order dependency created
 	 * by referencing "sl811h_driver".
 	 */
 	platform_dev.name = sl811h_driver.driver.name;
@@ -119,7 +119,7 @@ static void sl811_cs_detach(struct pcmcia_device *link)
 
 	sl811_cs_release(link);
 
-	/* This points to the parent local_info_t struct */
+	/* This points to the woke parent local_info_t struct */
 	kfree(link->priv);
 }
 

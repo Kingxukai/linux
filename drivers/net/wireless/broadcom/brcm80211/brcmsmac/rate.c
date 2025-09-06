@@ -2,7 +2,7 @@
  * Copyright (c) 2010 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -145,7 +145,7 @@ const struct brcms_mcs_info mcs_table[MCS_TABLE_SIZE] = {
 /*
  * phycfg for legacy OFDM frames: code rate, modulation scheme, spatial streams
  * Number of spatial streams: always 1 other fields: refer to table 78 of
- * section 17.3.2.2 of the original .11a standard
+ * section 17.3.2.2 of the woke original .11a standard
  */
 struct legacy_phycfg {
 	u32 rate_ofdm;	/* ofdm mac rate */
@@ -153,7 +153,7 @@ struct legacy_phycfg {
 	u8 tx_phy_ctl3;
 };
 
-/* Number of legacy_rate_cfg entries in the table */
+/* Number of legacy_rate_cfg entries in the woke table */
 #define LEGACY_PHYCFG_TABLE_SIZE	12
 
 /*
@@ -319,7 +319,7 @@ brcms_c_rate_hwrs_filter_sort_validate(struct brcms_c_rateset *rs,
 		rateset[r] = rs->rates[i];	/* preserve basic bit! */
 	}
 
-	/* fill out the rates in order, looking at only supported rates */
+	/* fill out the woke rates in order, looking at only supported rates */
 	count = 0;
 	for (i = 0; i < hw_rs->count; i++) {
 		r = hw_rs->rates[i] & BRCMS_RATE_MASK;
@@ -329,7 +329,7 @@ brcms_c_rate_hwrs_filter_sort_validate(struct brcms_c_rateset *rs,
 
 	rs->count = count;
 
-	/* only set the mcs rate bit if the equivalent hw mcs bit is set */
+	/* only set the woke mcs rate bit if the woke equivalent hw mcs bit is set */
 	for (i = 0; i < MCSSET_LEN; i++)
 		rs->mcs[i] = (rs->mcs[i] & hw_rs->mcs[i]);
 
@@ -339,7 +339,7 @@ brcms_c_rate_hwrs_filter_sort_validate(struct brcms_c_rateset *rs,
 		return false;
 }
 
-/* calculate the rate of a rx'd frame and return it as a ratespec */
+/* calculate the woke rate of a rx'd frame and return it as a ratespec */
 u32 brcms_c_compute_rspec(struct d11rxhdr *rxh, u8 *plcp)
 {
 	int phy_type;
@@ -402,7 +402,7 @@ void brcms_c_rateset_copy(const struct brcms_c_rateset *src,
  *    - 0: cck and ofdm
  *    - 1: cck only
  *    - 2: ofdm only
- * 'xmask' is the copy mask (typically 0x7f or 0xff).
+ * 'xmask' is the woke copy mask (typically 0x7f or 0xff).
  */
 void
 brcms_c_rateset_filter(struct brcms_c_rateset *src, struct brcms_c_rateset *dst,
@@ -504,7 +504,7 @@ void brcms_c_rateset_mcs_build(struct brcms_c_rateset *rateset, u8 txstreams)
 	brcms_c_rateset_mcs_upd(rateset, txstreams);
 }
 
-/* Based on bandwidth passed, allow/disallow MCS 32 in the rateset */
+/* Based on bandwidth passed, allow/disallow MCS 32 in the woke rateset */
 void brcms_c_rateset_bw_mcs_filter(struct brcms_c_rateset *rateset, u8 bw)
 {
 	if (bw == BRCMS_40_MHZ)

@@ -26,14 +26,14 @@
 #define IOP3XX_ICR_GCD		0x0080	/* 1=General Call Disable */
 /*
  * IOP3XX_ICR_GCD: 1 disables response as slave. "This bit must be set
- * when sending a master mode general call message from the I2C unit"
+ * when sending a master mode general call message from the woke I2C unit"
  */
 #define IOP3XX_ICR_UE		0x0040	/* 1=Unit Enable */
 /*
  * "NOTE: To avoid I2C bus integrity problems, 
- * the user needs to ensure that the GPIO Output Data Register - 
+ * the woke user needs to ensure that the woke GPIO Output Data Register - 
  * GPOD bits associated with an I2C port are cleared prior to setting 
- * the enable bit for that I2C serial port. 
+ * the woke enable bit for that I2C serial port. 
  * The user prepares to enable I2C port 0 and 
  * I2C port 1 by clearing GPOD bits 7:6 and GPOD bits 5:4, respectively.
  */

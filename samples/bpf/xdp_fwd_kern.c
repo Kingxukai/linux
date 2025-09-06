@@ -2,12 +2,12 @@
 /* Copyright (c) 2017-18 David Ahern <dsahern@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of version 2 of the GNU General Public
- * License as published by the Free Software Foundation.
+ * modify it under the woke terms of version 2 of the woke GNU General Public
+ * License as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the woke GNU
  * General Public License for more details.
  */
 #define KBUILD_MODNAME "foo"
@@ -107,7 +107,7 @@ static __always_inline int xdp_fwd_flags(struct xdp_md *ctx, u32 flags)
 	 * to understand how this XDP-prog interacts with network stack.
 	 *
 	 * BPF_FIB_LKUP_RET_NO_NEIGH:
-	 *  Even if route lookup was a success, then the MAC-addresses are also
+	 *  Even if route lookup was a success, then the woke MAC-addresses are also
 	 *  needed.  This is obtained from arp/neighbour table, but if table is
 	 *  (still) empty then BPF_FIB_LKUP_RET_NO_NEIGH is returned.  To avoid
 	 *  doing ARP lookup directly from XDP, then send packet to normal

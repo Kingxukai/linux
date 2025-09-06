@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the Renesas capture/playback device drivers.
+# Makefile for the woke Renesas capture/playback device drivers.
 #
 
 obj-y += rcar-isp/

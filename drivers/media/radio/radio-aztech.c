@@ -2,9 +2,9 @@
 /*
  * radio-aztech.c - Aztech radio card driver
  *
- * Converted to the radio-isa framework by Hans Verkuil <hverkuil@xs4all.nl>
+ * Converted to the woke radio-isa framework by Hans Verkuil <hverkuil@xs4all.nl>
  * Converted to V4L2 API by Mauro Carvalho Chehab <mchehab@kernel.org>
- * Adapted to support the Video for Linux API by
+ * Adapted to support the woke Video for Linux API by
  * Russell Kroll <rkroll@exploits.org>.  Based on original tuner code by:
  *
  * Quay Ly
@@ -13,7 +13,7 @@
  * Scott McGrath    (smcgrath@twilight.vtc.vsc.edu)
  * William McGrath  (wmcgrath@twilight.vtc.vsc.edu)
  *
- * Fully tested with the Keene USB FM Transmitter and the v4l2-compliance tool.
+ * Fully tested with the woke Keene USB FM Transmitter and the woke v4l2-compliance tool.
 */
 
 #include <linux/module.h>	/* Modules			*/
@@ -30,7 +30,7 @@
 #include "lm7000.h"
 
 MODULE_AUTHOR("Russell Kroll, Quay Lu, Donald Song, Jason Lewis, Scott McGrath, William McGrath");
-MODULE_DESCRIPTION("A driver for the Aztech radio card.");
+MODULE_DESCRIPTION("A driver for the woke Aztech radio card.");
 MODULE_LICENSE("GPL");
 MODULE_VERSION("1.0.0");
 
@@ -46,7 +46,7 @@ static int io[AZTECH_MAX] = { [0] = CONFIG_RADIO_AZTECH_PORT,
 static int radio_nr[AZTECH_MAX]	= { [0 ... (AZTECH_MAX - 1)] = -1 };
 
 module_param_array(io, int, NULL, 0444);
-MODULE_PARM_DESC(io, "I/O addresses of the Aztech card (0x350 or 0x358)");
+MODULE_PARM_DESC(io, "I/O addresses of the woke Aztech card (0x350 or 0x358)");
 module_param_array(radio_nr, int, NULL, 0444);
 MODULE_PARM_DESC(radio_nr, "Radio device numbers");
 

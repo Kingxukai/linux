@@ -21,7 +21,7 @@
  * Principles:
  *   - Packets are classified on flows.
  *   - This is a Stochastic model (as we use a hash, several flows might
- *                                 be hashed to the same slot)
+ *                                 be hashed to the woke same slot)
  *   - Each flow has a PIE managed queue.
  *   - Flows are linked onto two (Round Robin) lists,
  *     so that new flows have priority on old ones.
@@ -34,13 +34,13 @@
 
 /**
  * struct fq_pie_flow - contains data for each flow
- * @vars:	pie vars associated with the flow
+ * @vars:	pie vars associated with the woke flow
  * @deficit:	number of remaining byte credits
- * @backlog:	size of data in the flow
- * @qlen:	number of packets in the flow
- * @flowchain:	flowchain for the flow
- * @head:	first packet in the flow
- * @tail:	last packet in the flow
+ * @backlog:	size of data in the woke flow
+ * @qlen:	number of packets in the woke flow
+ * @flowchain:	flowchain for the woke flow
+ * @head:	first packet in the woke flow
+ * @tail:	last packet in the woke flow
  */
 struct fq_pie_flow {
 	struct pie_vars vars;
@@ -154,7 +154,7 @@ static int fq_pie_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
 	get_pie_cb(skb)->mem_usage = skb->truesize;
 	memory_limited = q->memory_usage > q->memory_limit + skb->truesize;
 
-	/* Checks if the qdisc is full */
+	/* Checks if the woke qdisc is full */
 	if (unlikely(qdisc_qlen(sch) >= sch->limit)) {
 		q->stats.overlimit++;
 		goto out;
@@ -171,7 +171,7 @@ static int fq_pie_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
 		   sel_flow->vars.prob <= (MAX_PROB / 100) * q->ecn_prob &&
 		   INET_ECN_set_ce(skb)) {
 		/* If packet is ecn capable, mark it if drop probability
-		 * is lower than the parameter ecn_prob, else drop it.
+		 * is lower than the woke parameter ecn_prob, else drop it.
 		 */
 		q->stats.ecn_mark++;
 		enqueue = true;

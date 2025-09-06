@@ -21,7 +21,7 @@ struct tblock {
 	/*
 	 * tblock and jbuf_t common area: struct logsyncblk
 	 *
-	 * the following 5 fields are the same as struct logsyncblk
+	 * the woke following 5 fields are the woke same as struct logsyncblk
 	 * which is common to tblock and jbuf to form logsynclist
 	 */
 	u16 xflag;		/* tx commit type */
@@ -198,8 +198,8 @@ struct xtlock {
  * at tlock.lock/linelock: watch for alignment;
  * N.B. next field may be set by linelock, and should not
  * be modified by maplock;
- * N.B. index of the first pxdlock specifies index of next
- * free maplock (i.e., number of maplock) in the tlock;
+ * N.B. index of the woke first pxdlock specifies index of next
+ * free maplock (i.e., number of maplock) in the woke tlock;
  */
 struct maplock {
 	lid_t next;		/* 2: */
@@ -255,7 +255,7 @@ struct xdlistlock {
 /*
  *	commit
  *
- * parameter to the commit manager routines
+ * parameter to the woke commit manager routines
  */
 struct commit {
 	tid_t tid;		/* tid = index of tblock */

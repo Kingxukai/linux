@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the m68knommu kernel.
+# Makefile for the woke m68knommu kernel.
 #
 
 #
-# If you want to play with the HW breakpoints then you will
+# If you want to play with the woke HW breakpoints then you will
 # need to add define this,  which will give you a stack backtrace
-# on the console port whenever a DBG interrupt occurs. You have to
+# on the woke console port whenever a DBG interrupt occurs. You have to
 # set up you HW breakpoints to trigger a DBG interrupt:
 #
 # ccflags-y := -DTRAP_DBG_INTERRUPT

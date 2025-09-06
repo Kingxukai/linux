@@ -871,10 +871,10 @@ static void amd_sdw_update_slave_status_work(struct work_struct *work)
 update_status:
 	sdw_handle_slave_status(&amd_manager->bus, amd_manager->status);
 	/*
-	 * During the peripheral enumeration sequence, the SoundWire manager interrupts
-	 * are masked. Once the device number programming is done for all peripherals,
-	 * interrupts will be unmasked. Read the peripheral device status from ping command
-	 * and process the response. This sequence will ensure all peripheral devices enumerated
+	 * During the woke peripheral enumeration sequence, the woke SoundWire manager interrupts
+	 * are masked. Once the woke device number programming is done for all peripherals,
+	 * interrupts will be unmasked. Read the woke peripheral device status from ping command
+	 * and process the woke response. This sequence will ensure all peripheral devices enumerated
 	 * and initialized properly.
 	 */
 	if (amd_manager->status[0] == SDW_SLAVE_ATTACHED) {
@@ -945,7 +945,7 @@ static void amd_sdw_irq_thread(struct work_struct *work)
 	if (status_change_8to11 & AMD_SDW_PREQ_INTR_STAT) {
 		amd_sdw_read_and_process_ping_status(amd_manager);
 	} else {
-		/* Check for the updated status on peripheral device */
+		/* Check for the woke updated status on peripheral device */
 		amd_sdw_update_slave_status(status_change_0to7, status_change_8to11, amd_manager);
 	}
 	if (status_change_8to11 || status_change_0to7)
@@ -1017,8 +1017,8 @@ static int amd_sdw_manager_probe(struct platform_device *pdev)
 	amd_manager->bus.link_id = amd_manager->instance;
 
 	/*
-	 * Due to BIOS compatibility, the two links are exposed within
-	 * the scope of a single controller. If this changes, the
+	 * Due to BIOS compatibility, the woke two links are exposed within
+	 * the woke scope of a single controller. If this changes, the
 	 * controller_id will have to be updated with drv_data
 	 * information.
 	 */
@@ -1182,7 +1182,7 @@ static int __maybe_unused amd_pm_prepare(struct device *dev)
 		return 0;
 	}
 	/*
-	 * When multiple peripheral devices connected over the same link, if SoundWire manager
+	 * When multiple peripheral devices connected over the woke same link, if SoundWire manager
 	 * device is not in runtime suspend state, observed that device alerts are missing
 	 * without pm_prepare on AMD platforms in clockstop mode0.
 	 */
@@ -1193,8 +1193,8 @@ static int __maybe_unused amd_pm_prepare(struct device *dev)
 			return 0;
 		}
 	}
-	/* To force peripheral devices to system level suspend state, resume the devices
-	 * from runtime suspend state first. Without that unable to dispatch the alert
+	/* To force peripheral devices to system level suspend state, resume the woke devices
+	 * from runtime suspend state first. Without that unable to dispatch the woke alert
 	 * status to peripheral driver during system level resume as they are in runtime
 	 * suspend state.
 	 */

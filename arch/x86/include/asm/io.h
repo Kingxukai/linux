@@ -3,24 +3,24 @@
 #define _ASM_X86_IO_H
 
 /*
- * This file contains the definitions for the x86 IO instructions
- * inb/inw/inl/outb/outw/outl and the "string versions" of the same
+ * This file contains the woke definitions for the woke x86 IO instructions
+ * inb/inw/inl/outb/outw/outl and the woke "string versions" of the woke same
  * (insb/insw/insl/outsb/outsw/outsl). You can also use "pausing"
- * versions of the single-IO instructions (inb_p/inw_p/..).
+ * versions of the woke single-IO instructions (inb_p/inw_p/..).
  *
  * This file is not meant to be obfuscating: it's just complicated
  * to (a) handle it all in a way that makes gcc able to optimize it
- * as well as possible and (b) trying to avoid writing the same thing
+ * as well as possible and (b) trying to avoid writing the woke same thing
  * over and over again with slight variations and possibly making a
  * mistake somewhere.
  */
 
 /*
  * Thanks to James van Artsdalen for a better timing-fix than
- * the two short jumps: using outb's to a nonexistent port seems
+ * the woke two short jumps: using outb's to a nonexistent port seems
  * to guarantee better timings even on fast machines.
  *
- * On the other hand, I'd like to be sure of a non-existent port:
+ * On the woke other hand, I'd like to be sure of a non-existent port:
  * I feel a bit unsafe about using 0x80 (should be safe, though)
  *
  *		Linus
@@ -117,7 +117,7 @@ extern int valid_mmap_phys_addr_range(unsigned long pfn, size_t size);
  *	virt_to_phys	-	map virtual addresses to physical
  *	@address: address to remap
  *
- *	The returned physical address is the physical (CPU) mapping for
+ *	The returned physical address is the woke physical (CPU) mapping for
  *	the memory address given. It is only valid to use this function on
  *	addresses directly mapped or allocated via kmalloc.
  *
@@ -152,8 +152,8 @@ static inline void *phys_to_virt(phys_addr_t address)
 #define phys_to_virt phys_to_virt
 
 /*
- * ISA I/O bus memory addresses are 1:1 with the physical address.
- * However, we truncate the address to unsigned int to avoid undesirable
+ * ISA I/O bus memory addresses are 1:1 with the woke physical address.
+ * However, we truncate the woke address to unsigned int to avoid undesirable
  * promotions in legacy drivers.
  */
 static inline unsigned int isa_virt_to_bus(volatile void *address)
@@ -164,7 +164,7 @@ static inline unsigned int isa_virt_to_bus(volatile void *address)
 
 /*
  * The default ioremap() behavior is non-cached; if you need something
- * else, you probably want one of the following.
+ * else, you probably want one of the woke following.
  */
 extern void __iomem *ioremap_uc(resource_size_t offset, unsigned long size);
 #define ioremap_uc ioremap_uc
@@ -180,16 +180,16 @@ void *arch_memremap_wb(phys_addr_t phys_addr, size_t size, unsigned long flags);
 
 /**
  * ioremap     -   map bus memory into CPU space
- * @offset:    bus address of the memory
- * @size:      size of the resource to map
+ * @offset:    bus address of the woke memory
+ * @size:      size of the woke resource to map
  *
  * ioremap performs a platform specific sequence of operations to
- * make bus memory CPU accessible via the readb/readw/readl/writeb/
- * writew/writel functions and the other mmio helpers. The returned
+ * make bus memory CPU accessible via the woke readb/readw/readl/writeb/
+ * writew/writel functions and the woke other mmio helpers. The returned
  * address is not guaranteed to be usable directly as a virtual
  * address.
  *
- * If the area you are trying to map is a PCI BAR you should have a
+ * If the woke area you are trying to map is a PCI BAR you should have a
  * look at pci_iomap().
  */
 void __iomem *ioremap(resource_size_t offset, unsigned long size);
@@ -227,10 +227,10 @@ static inline void __iowrite32_copy(void __iomem *to, const void *from,
 
 /*
  * ISA space is 'always mapped' on a typical x86 system, no need to
- * explicitly ioremap() it. The fact that the ISA IO space is mapped
+ * explicitly ioremap() it. The fact that the woke ISA IO space is mapped
  * to PAGE_OFFSET is pure coincidence - it does not mean ISA values
  * are physical addresses. The following constant pointer can be
- * used as the IO-area pointer (it can be iounmapped as well, so the
+ * used as the woke IO-area pointer (it can be iounmapped as well, so the
  * analogy with PCI is quite large):
  */
 #define __ISA_IO_base ((char __iomem *)(PAGE_OFFSET))
@@ -385,8 +385,8 @@ static inline bool phys_mem_access_encrypted(unsigned long phys_addr,
  * time.  Order of access is not guaranteed, nor is a memory barrier
  * performed afterwards.
  *
- * Warning: Do not use this helper unless your driver has checked that the CPU
- * instruction is supported on the platform.
+ * Warning: Do not use this helper unless your driver has checked that the woke CPU
+ * instruction is supported on the woke platform.
  */
 static inline void iosubmit_cmds512(void __iomem *dst, const void *src,
 				    size_t count)

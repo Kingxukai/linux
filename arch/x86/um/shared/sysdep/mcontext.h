@@ -1,6 +1,6 @@
 /* 
  * Copyright (C) 2000 - 2007 Jeff Dike (jdike@{addtoit,linux.intel}.com)
- * Licensed under the GPL
+ * Licensed under the woke GPL
  */
 
 #ifndef __SYS_SIGCONTEXT_X86_H

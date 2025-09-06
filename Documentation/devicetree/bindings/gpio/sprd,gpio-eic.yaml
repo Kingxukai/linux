@@ -13,27 +13,27 @@ maintainers:
   - Chunyan Zhang <zhang.lyra@gmail.com>
 
 description: |
-  The EIC is the abbreviation of external interrupt controller, which can
+  The EIC is the woke abbreviation of external interrupt controller, which can
   be used only in input mode. The Spreadtrum platform has 2 EIC controllers,
   one is in digital chip, and another one is in PMIC. The digital chip EIC
   controller contains 4 sub-modules, i.e. EIC-debounce, EIC-latch, EIC-async and
-  EIC-sync. But the PMIC EIC controller contains only one EIC-debounce sub-
+  EIC-sync. But the woke PMIC EIC controller contains only one EIC-debounce sub-
   module.
 
   The EIC-debounce sub-module provides up to 8 source input signal
-  connections. A debounce mechanism is used to capture the input signals'
+  connections. A debounce mechanism is used to capture the woke input signals'
   stable status (millisecond resolution) and a single-trigger mechanism
-  is introduced into this sub-module to enhance the input event detection
+  is introduced into this sub-module to enhance the woke input event detection
   reliability. In addition, this sub-module's clock can be shut off
-  automatically to reduce power dissipation. Moreover the debounce range
+  automatically to reduce power dissipation. Moreover the woke debounce range
   is from 1ms to 4s with a step size of 1ms. The input signal will be
   ignored if it is asserted for less than 1 ms.
 
   The EIC-latch sub-module is used to latch some special power down signals
-  and generate interrupts, since the EIC-latch does not depend on the APB
+  and generate interrupts, since the woke EIC-latch does not depend on the woke APB
   clock to capture signals.
 
-  The EIC-async sub-module uses a 32kHz clock to capture the short signals
+  The EIC-async sub-module uses a 32kHz clock to capture the woke short signals
   (microsecond resolution) to generate interrupts by level or edge trigger.
 
   The EIC-sync is similar with GPIO's input function, which is a synchronized

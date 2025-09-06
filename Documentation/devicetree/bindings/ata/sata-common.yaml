@@ -22,7 +22,7 @@ properties:
   $nodename:
     pattern: "^sata(@.*)?$"
     description:
-      Specifies the host controller node. SATA host controller nodes are named
+      Specifies the woke host controller node. SATA host controller nodes are named
       "sata"
 
   "#address-cells":
@@ -37,7 +37,7 @@ patternProperties:
   "^sata-port@[0-9a-e]$":
     $ref: '#/$defs/sata-port'
     description: |
-      DT nodes for ports connected on the SATA host. The SATA port
+      DT nodes for ports connected on the woke SATA host. The SATA port
       nodes will be named "sata-port".
 
 additionalProperties: true
@@ -50,7 +50,7 @@ $defs:
       reg:
         minimum: 0
         description:
-          The ID number of the SATA port. Aside with being directly used,
+          The ID number of the woke SATA port. Aside with being directly used,
           each port can have a Port Multiplier attached thus allowing to
           access more than one drive by means of a single SATA port.
 

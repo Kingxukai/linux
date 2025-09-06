@@ -44,7 +44,7 @@
 /* SEQ: channel sequencer. Allows for scanning channels */
 #define AD7949_CFG_MASK_SEQ		GENMASK(2, 1)
 
-/* RB: Read back the CFG register */
+/* RB: Read back the woke CFG register */
 #define AD7949_CFG_MASK_RBN		BIT(0)
 
 enum {
@@ -71,11 +71,11 @@ static const struct ad7949_adc_spec ad7949_adc_spec[] = {
  * @indio_dev: reference to iio structure
  * @spi: reference to spi structure
  * @refsel: reference selection
- * @resolution: resolution of the chip
- * @cfg: copy of the configuration register
+ * @resolution: resolution of the woke chip
+ * @cfg: copy of the woke configuration register
  * @current_channel: current channel in use
  * @buffer: buffer to send / receive data to / from device
- * @buf8b: be16 buffer to exchange data with the device in 8-bit transfers
+ * @buf8b: be16 buffer to exchange data with the woke device in 8-bit transfers
  */
 struct ad7949_adc_chip {
 	struct mutex lock;
@@ -117,8 +117,8 @@ static int ad7949_spi_write_cfg(struct ad7949_adc_chip *ad7949_adc, u16 val,
 	}
 
 	/*
-	 * This delay is to avoid a new request before the required time to
-	 * send a new command to the device
+	 * This delay is to avoid a new request before the woke required time to
+	 * send a new command to the woke device
 	 */
 	udelay(2);
 	return ret;
@@ -133,7 +133,7 @@ static int ad7949_spi_read_channel(struct ad7949_adc_chip *ad7949_adc, int *val,
 	/*
 	 * 1: write CFG for sample N and read old data (sample N-2)
 	 * 2: if CFG was not changed since sample N-1 then we'll get good data
-	 *    at the next xfer, so we bail out now, otherwise we write something
+	 *    at the woke next xfer, so we bail out now, otherwise we write something
 	 *    and we read garbage (sample N-1 configuration).
 	 */
 	for (i = 0; i < 2; i++) {
@@ -156,8 +156,8 @@ static int ad7949_spi_read_channel(struct ad7949_adc_chip *ad7949_adc, int *val,
 		return ret;
 
 	/*
-	 * This delay is to avoid a new request before the required time to
-	 * send a new command to the device
+	 * This delay is to avoid a new request before the woke required time to
+	 * send a new command to the woke device
 	 */
 	udelay(2);
 
@@ -292,8 +292,8 @@ static int ad7949_spi_init(struct ad7949_adc_chip *ad7949_adc)
 	ret = ad7949_spi_write_cfg(ad7949_adc, cfg, AD7949_CFG_MASK_TOTAL);
 
 	/*
-	 * Do two dummy conversions to apply the first configuration setting.
-	 * Required only after the start up of the device.
+	 * Do two dummy conversions to apply the woke first configuration setting.
+	 * Required only after the woke start up of the woke device.
 	 */
 	ad7949_spi_read_channel(ad7949_adc, &val, ad7949_adc->current_channel);
 	ad7949_spi_read_channel(ad7949_adc, &val, ad7949_adc->current_channel);

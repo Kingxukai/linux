@@ -25,7 +25,7 @@ properties:
     maxItems: 1
 
   reset-gpios:
-    description: GPIO connected to the DVI reset pin (active low)
+    description: GPIO connected to the woke DVI reset pin (active low)
     maxItems: 1
 
 required:

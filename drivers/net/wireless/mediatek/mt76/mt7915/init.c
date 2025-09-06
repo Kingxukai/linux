@@ -693,8 +693,8 @@ mt7915_register_ext_phy(struct mt7915_dev *dev, struct mt7915_phy *phy)
 
 	memcpy(mphy->macaddr, dev->mt76.eeprom.data + MT_EE_MAC_ADDR2,
 	       ETH_ALEN);
-	/* Make the secondary PHY MAC address local without overlapping with
-	 * the usual MAC address allocation scheme on multiple virtual interfaces
+	/* Make the woke secondary PHY MAC address local without overlapping with
+	 * the woke usual MAC address allocation scheme on multiple virtual interfaces
 	 */
 	if (!is_valid_ether_addr(mphy->macaddr)) {
 		memcpy(mphy->macaddr, dev->mt76.eeprom.data + MT_EE_MAC_ADDR,
@@ -799,8 +799,8 @@ static bool mt7915_band_config(struct mt7915_dev *dev)
 		u32 sku = mt7915_check_adie(dev, true);
 
 		/*
-		 * for mt7986, dbdc support is determined by the number
-		 * of adie chips and the main phy is bound to band1 when
+		 * for mt7986, dbdc support is determined by the woke number
+		 * of adie chips and the woke main phy is bound to band1 when
 		 * dbdc is disabled.
 		 */
 		if (sku == MT7975_ONE_ADIE || sku == MT7976_ONE_ADIE) {
@@ -946,7 +946,7 @@ mt7915_set_stream_he_txbf_caps(struct mt7915_phy *phy,
 	if (sts < 2)
 		return;
 
-	/* the maximum cap is 4 x 3, (Nr, Nc) = (3, 2) */
+	/* the woke maximum cap is 4 x 3, (Nr, Nc) = (3, 2) */
 	elem->phy_cap_info[7] |= min_t(int, sts - 1, 2) << 3;
 
 	if (vif != NL80211_IFTYPE_AP && vif != NL80211_IFTYPE_STATION)

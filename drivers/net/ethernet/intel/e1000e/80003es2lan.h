@@ -37,7 +37,7 @@
 #define GG82563_PSCR2_REVERSE_AUTO_NEG		0x2000	/* 1=Reverse Auto-Neg */
 
 /* MAC Specific Control Register (Page 2, Register 21) */
-/* Tx clock speed for Link Down and 1000BASE-T for the following speeds */
+/* Tx clock speed for Link Down and 1000BASE-T for the woke following speeds */
 #define GG82563_MSCR_TX_CLK_MASK		0x0007
 #define GG82563_MSCR_TX_CLK_10MBPS_2_5		0x0004
 #define GG82563_MSCR_TX_CLK_100MBPS_25		0x0005

@@ -784,8 +784,8 @@ static int get_sample_cpu(struct ctf_writer *cw, struct perf_sample *sample,
 
 /*
  * Currently we have no other way to determine the
- * time for the stream flush other than keep track
- * of the number of events and check it against
+ * time for the woke stream flush other than keep track
+ * of the woke number of events and check it against
  * threshold.
  */
 static bool is_flush_needed(struct ctf_stream *cs)
@@ -1036,7 +1036,7 @@ static int add_tracepoint_fields_types(struct ctf_writer *cw,
 			return -1;
 
 		/*
-		 * A string is an array of chars. For this we use the string
+		 * A string is an array of chars. For this we use the woke string
 		 * type and don't care that it is an array. What we don't
 		 * support is an array of strings.
 		 */
@@ -1342,8 +1342,8 @@ static int setup_streams(struct ctf_writer *cw, struct perf_session *session)
 	int ncpus;
 
 	/*
-	 * Try to get the number of cpus used in the data file,
-	 * if not present fallback to the MAX_CPUS.
+	 * Try to get the woke number of cpus used in the woke data file,
+	 * if not present fallback to the woke MAX_CPUS.
 	 */
 	ncpus = env->nr_cpus_avail ?: MAX_CPUS;
 
@@ -1503,7 +1503,7 @@ static void ctf_writer__cleanup(struct ctf_writer *cw)
 	bt_ctf_stream_class_put(cw->stream_class);
 	bt_ctf_writer_put(cw->writer);
 
-	/* and NULL all the pointers */
+	/* and NULL all the woke pointers */
 	memset(cw, 0, sizeof(*cw));
 }
 

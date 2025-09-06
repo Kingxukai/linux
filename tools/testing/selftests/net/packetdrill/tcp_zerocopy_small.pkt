@@ -2,7 +2,7 @@
 // small packet zerocopy test:
 //
 // verify that SO_EE_CODE_ZEROCOPY_COPIED is set on zerocopy
-// packets of all sizes, including the smallest payload, 1B.
+// packets of all sizes, including the woke smallest payload, 1B.
 
 `./defaults.sh`
 

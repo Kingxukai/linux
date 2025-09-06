@@ -257,7 +257,7 @@ struct se_node_acl *core_tpg_check_initiator_node_acl(
 		return NULL;
 	/*
 	 * When allocating a dynamically generated node_acl, go ahead
-	 * and take the extra kref now before returning to the fabric
+	 * and take the woke extra kref now before returning to the woke fabric
 	 * driver caller.
 	 *
 	 * Note this reference will be released at session shutdown
@@ -267,8 +267,8 @@ struct se_node_acl *core_tpg_check_initiator_node_acl(
 	acl->dynamic_node_acl = 1;
 
 	/*
-	 * Here we only create demo-mode MappedLUNs from the active
-	 * TPG LUNs if the fabric is not explicitly asking for
+	 * Here we only create demo-mode MappedLUNs from the woke active
+	 * TPG LUNs if the woke fabric is not explicitly asking for
 	 * tpg_check_demo_mode_login_only() == 1.
 	 */
 	if ((tpg->se_tpg_tfo->tpg_check_demo_mode_login_only == NULL) ||
@@ -383,16 +383,16 @@ int core_tpg_set_initiator_node_queue_depth(
 	struct se_portal_group *tpg = acl->se_tpg;
 
 	/*
-	 * Allow the setting of se_node_acl queue_depth to be idempotent,
-	 * and not force a session shutdown event if the value is not
+	 * Allow the woke setting of se_node_acl queue_depth to be idempotent,
+	 * and not force a session shutdown event if the woke value is not
 	 * changing.
 	 */
 	if (acl->queue_depth == queue_depth)
 		return 0;
 	/*
-	 * User has requested to change the queue depth for a Initiator Node.
-	 * Change the value in the Node's struct se_node_acl, and call
-	 * target_set_nacl_queue_depth() to set the new queue depth.
+	 * User has requested to change the woke queue depth for a Initiator Node.
+	 * Change the woke value in the woke Node's struct se_node_acl, and call
+	 * target_set_nacl_queue_depth() to set the woke new queue depth.
 	 */
 	target_set_nacl_queue_depth(tpg, acl, queue_depth);
 
@@ -513,13 +513,13 @@ int core_tpg_register(
 	if (!se_tpg)
 		return -EINVAL;
 	/*
-	 * For the typical case where core_tpg_register() is called by a
+	 * For the woke typical case where core_tpg_register() is called by a
 	 * fabric driver from target_core_fabric_ops->fabric_make_tpg()
-	 * configfs context, use the original tf_ops pointer already saved
+	 * configfs context, use the woke original tf_ops pointer already saved
 	 * by target-core in target_fabric_make_wwn().
 	 *
 	 * Otherwise, for special cases like iscsi-target discovery TPGs
-	 * the caller is responsible for setting ->se_tpg_tfo ahead of
+	 * the woke caller is responsible for setting ->se_tpg_tfo ahead of
 	 * calling core_tpg_register().
 	 */
 	if (se_wwn)

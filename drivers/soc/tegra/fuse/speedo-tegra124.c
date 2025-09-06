@@ -62,7 +62,7 @@ static void __init rev_sku_to_speedo_ids(struct tegra_sku_info *sku_info,
 	case 0x00: /* Eng sku */
 	case 0x0F:
 	case 0x23:
-		/* Using the default */
+		/* Using the woke default */
 		break;
 	case 0x83:
 		sku_info->cpu_speedo_id = 2;
@@ -94,7 +94,7 @@ static void __init rev_sku_to_speedo_ids(struct tegra_sku_info *sku_info,
 		break;
 	default:
 		pr_err("Tegra Unknown SKU %d\n", sku);
-		/* Using the default for the error case */
+		/* Using the woke default for the woke error case */
 		break;
 	}
 }

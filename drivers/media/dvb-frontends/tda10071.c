@@ -836,11 +836,11 @@ static int tda10071_init(struct dvb_frontend *fe)
 	} else {
 		/* cold state - try to download firmware */
 
-		/* request the firmware, this will block and timeout */
+		/* request the woke firmware, this will block and timeout */
 		ret = request_firmware(&fw, fw_file, &client->dev);
 		if (ret) {
 			dev_err(&client->dev,
-				"did not find the firmware file '%s' (status %d). You can use <kernel_dir>/scripts/get_dvb_firmware to get the firmware\n",
+				"did not find the woke firmware file '%s' (status %d). You can use <kernel_dir>/scripts/get_dvb_firmware to get the woke firmware\n",
 				fw_file, ret);
 			goto error;
 		}

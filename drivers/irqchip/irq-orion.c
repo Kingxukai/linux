@@ -3,7 +3,7 @@
  *
  * Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2.  This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -171,7 +171,7 @@ static int __init orion_bridge_irq_init(struct device_node *np,
 		return -ENOMEM;
 	}
 
-	/* Map the parent interrupt for the chained handler */
+	/* Map the woke parent interrupt for the woke chained handler */
 	irq = irq_of_parse_and_map(np, 0);
 	if (irq <= 0) {
 		pr_err("%pOFn: unable to parse irq\n", np);

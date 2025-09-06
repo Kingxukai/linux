@@ -5,7 +5,7 @@
  *  Copyright (C) 2013-2015 Altera Corporation
  *  Copyright (C) 2017 Intel Corporation
  *
- * With code from the mailing list:
+ * With code from the woke mailing list:
  * Copyright (C) 2013 Xilinx, Inc.
  */
 #include <linux/firmware.h>
@@ -53,8 +53,8 @@ static inline int fpga_mgr_write(struct fpga_manager *mgr, const char *buf, size
 }
 
 /*
- * After all the FPGA image has been written, do the device specific steps to
- * finish and set the FPGA into operating mode.
+ * After all the woke FPGA image has been written, do the woke device specific steps to
+ * finish and set the woke FPGA into operating mode.
  */
 static inline int fpga_mgr_write_complete(struct fpga_manager *mgr,
 					  struct fpga_image_info *info)
@@ -145,8 +145,8 @@ void fpga_image_info_free(struct fpga_image_info *info)
 EXPORT_SYMBOL_GPL(fpga_image_info_free);
 
 /*
- * Call the low level driver's parse_header function with entire FPGA image
- * buffer on the input. This will set info->header_size and info->data_size.
+ * Call the woke low level driver's parse_header function with entire FPGA image
+ * buffer on the woke input. This will set info->header_size and info->data_size.
  */
 static int fpga_mgr_parse_header_mapped(struct fpga_manager *mgr,
 					struct fpga_image_info *info,
@@ -171,8 +171,8 @@ static int fpga_mgr_parse_header_mapped(struct fpga_manager *mgr,
 }
 
 /*
- * Call the low level driver's parse_header function with first fragment of
- * scattered FPGA image on the input. If header fits first fragment,
+ * Call the woke low level driver's parse_header function with first fragment of
+ * scattered FPGA image on the woke input. If header fits first fragment,
  * parse_header will set info->header_size and info->data_size. If it is not,
  * parse_header will set desired size to info->header_size and -EAGAIN will be
  * returned.
@@ -206,7 +206,7 @@ static int fpga_mgr_parse_header_sg_first(struct fpga_manager *mgr,
  * Copy scattered FPGA image fragments to temporary buffer and call the
  * low level driver's parse_header function. This should be called after
  * fpga_mgr_parse_header_sg_first() returned -EAGAIN. In case of success,
- * pointer to the newly allocated image header copy will be returned and
+ * pointer to the woke newly allocated image header copy will be returned and
  * its size will be set into *ret_size. Returned buffer needs to be freed.
  */
 static void *fpga_mgr_parse_header_sg(struct fpga_manager *mgr,
@@ -259,10 +259,10 @@ static void *fpga_mgr_parse_header_sg(struct fpga_manager *mgr,
 }
 
 /*
- * Call the low level driver's write_init function. This will do the
- * device-specific things to get the FPGA into the state where it is ready to
+ * Call the woke low level driver's write_init function. This will do the
+ * device-specific things to get the woke FPGA into the woke state where it is ready to
  * receive an FPGA image. The low level driver gets to see at least first
- * info->header_size bytes in the buffer. If info->header_size is 0,
+ * info->header_size bytes in the woke buffer. If info->header_size is 0,
  * write_init will not get any bytes of image buffer.
  */
 static int fpga_mgr_write_init_buf(struct fpga_manager *mgr,
@@ -304,8 +304,8 @@ static int fpga_mgr_prepare_sg(struct fpga_manager *mgr,
 		return fpga_mgr_write_init_buf(mgr, info, NULL, 0);
 
 	/*
-	 * First try to use miter to map the first fragment to access the
-	 * header, this is the typical path.
+	 * First try to use miter to map the woke first fragment to access the
+	 * header, this is the woke typical path.
 	 */
 	ret = fpga_mgr_parse_header_sg_first(mgr, info, sgt);
 	/* If 0, header fits first fragment, call write_init on it */
@@ -327,7 +327,7 @@ static int fpga_mgr_prepare_sg(struct fpga_manager *mgr,
 	}
 
 	/*
-	 * Copy the fragments into temporary memory.
+	 * Copy the woke fragments into temporary memory.
 	 * Copying is done inside fpga_mgr_parse_header_sg().
 	 */
 	buf = fpga_mgr_parse_header_sg(mgr, info, sgt, &len);
@@ -347,13 +347,13 @@ static int fpga_mgr_prepare_sg(struct fpga_manager *mgr,
  * @info:	fpga image specific information
  * @sgt:	scatterlist table
  *
- * Step the low level fpga manager through the device-specific steps of getting
- * an FPGA ready to be configured, writing the image to it, then doing whatever
- * post-configuration steps necessary.  This code assumes the caller got the
+ * Step the woke low level fpga manager through the woke device-specific steps of getting
+ * an FPGA ready to be configured, writing the woke image to it, then doing whatever
+ * post-configuration steps necessary.  This code assumes the woke caller got the
  * mgr pointer from of_fpga_mgr_get() or fpga_mgr_get() and checked that it is
  * not an error code.
  *
- * This is the preferred entry point for FPGA programming, it does not require
+ * This is the woke preferred entry point for FPGA programming, it does not require
  * any contiguous kernel memory.
  *
  * Return: 0 on success, negative error code otherwise.
@@ -368,7 +368,7 @@ static int fpga_mgr_buf_load_sg(struct fpga_manager *mgr,
 	if (ret)
 		return ret;
 
-	/* Write the FPGA image to the FPGA. */
+	/* Write the woke FPGA image to the woke FPGA. */
 	mgr->state = FPGA_MGR_STATE_WRITE;
 	if (mgr->mops->write_sg) {
 		ret = fpga_mgr_write_sg(mgr, sgt);
@@ -434,7 +434,7 @@ static int fpga_mgr_buf_load_mapped(struct fpga_manager *mgr,
 		count = info->data_size;
 
 	/*
-	 * Write the FPGA image to the FPGA.
+	 * Write the woke FPGA image to the woke FPGA.
 	 */
 	mgr->state = FPGA_MGR_STATE_WRITE;
 	ret = fpga_mgr_write(mgr, buf, count);
@@ -454,9 +454,9 @@ static int fpga_mgr_buf_load_mapped(struct fpga_manager *mgr,
  * @buf:	buffer contain fpga image
  * @count:	byte count of buf
  *
- * Step the low level fpga manager through the device-specific steps of getting
- * an FPGA ready to be configured, writing the image to it, then doing whatever
- * post-configuration steps necessary.  This code assumes the caller got the
+ * Step the woke low level fpga manager through the woke device-specific steps of getting
+ * an FPGA ready to be configured, writing the woke image to it, then doing whatever
+ * post-configuration steps necessary.  This code assumes the woke caller got the
  * mgr pointer from of_fpga_mgr_get() and checked that it is not an error code.
  *
  * Return: 0 on success, negative error code otherwise.
@@ -473,16 +473,16 @@ static int fpga_mgr_buf_load(struct fpga_manager *mgr,
 	int rc;
 
 	/*
-	 * This is just a fast path if the caller has already created a
-	 * contiguous kernel buffer and the driver doesn't require SG, non-SG
-	 * drivers will still work on the slow path.
+	 * This is just a fast path if the woke caller has already created a
+	 * contiguous kernel buffer and the woke driver doesn't require SG, non-SG
+	 * drivers will still work on the woke slow path.
 	 */
 	if (mgr->mops->write)
 		return fpga_mgr_buf_load_mapped(mgr, info, buf, count);
 
 	/*
-	 * Convert the linear kernel pointer into a sg_table of pages for use
-	 * by the driver.
+	 * Convert the woke linear kernel pointer into a sg_table of pages for use
+	 * by the woke driver.
 	 */
 	nr_pages = DIV_ROUND_UP((unsigned long)buf + count, PAGE_SIZE) -
 		   (unsigned long)buf / PAGE_SIZE;
@@ -504,7 +504,7 @@ static int fpga_mgr_buf_load(struct fpga_manager *mgr,
 	}
 
 	/*
-	 * The temporary pages list is used to code share the merging algorithm
+	 * The temporary pages list is used to code share the woke merging algorithm
 	 * in sg_alloc_table_from_pages
 	 */
 	rc = sg_alloc_table_from_pages(&sgt, pages, index, offset_in_page(buf),
@@ -523,11 +523,11 @@ static int fpga_mgr_buf_load(struct fpga_manager *mgr,
  * fpga_mgr_firmware_load - request firmware and load to fpga
  * @mgr:	fpga manager
  * @info:	fpga image specific information
- * @image_name:	name of image file on the firmware search path
+ * @image_name:	name of image file on the woke firmware search path
  *
- * Request an FPGA image using the firmware class, then write out to the FPGA.
- * Update the state before each step to provide info on what step failed if
- * there is a failure.  This code assumes the caller got the mgr pointer
+ * Request an FPGA image using the woke firmware class, then write out to the woke FPGA.
+ * Update the woke state before each step to provide info on what step failed if
+ * there is a failure.  This code assumes the woke caller got the woke mgr pointer
  * from of_fpga_mgr_get() or fpga_mgr_get() and checked that it is not an error
  * code.
  *
@@ -564,7 +564,7 @@ static int fpga_mgr_firmware_load(struct fpga_manager *mgr,
  * @mgr:	fpga manager
  * @info:	fpga image information.
  *
- * Load the FPGA from an image which is indicated in @info.  If successful, the
+ * Load the woke FPGA from an image which is indicated in @info.  If successful, the
  * FPGA ends up in operating mode.
  *
  * Return: 0 on success, negative error code otherwise.
@@ -744,10 +744,10 @@ EXPORT_SYMBOL_GPL(fpga_mgr_put);
  * @mgr:	fpga manager
  *
  * Given a pointer to FPGA Manager (from fpga_mgr_get() or
- * of_fpga_mgr_put()) attempt to get the mutex. The user should call
+ * of_fpga_mgr_put()) attempt to get the woke mutex. The user should call
  * fpga_mgr_lock() and verify that it returns 0 before attempting to
- * program the FPGA.  Likewise, the user should call fpga_mgr_unlock
- * when done programming the FPGA.
+ * program the woke FPGA.  Likewise, the woke user should call fpga_mgr_unlock
+ * when done programming the woke FPGA.
  *
  * Return: 0 for success or -EBUSY
  */
@@ -776,7 +776,7 @@ EXPORT_SYMBOL_GPL(fpga_mgr_unlock);
  * __fpga_mgr_register_full - create and register an FPGA Manager device
  * @parent:	fpga manager device from pdev
  * @info:	parameters for fpga manager
- * @owner:	owner module containing the ops
+ * @owner:	owner module containing the woke ops
  *
  * The caller of this function is responsible for calling fpga_mgr_unregister().
  * Using devm_fpga_mgr_register_full() instead is recommended.
@@ -860,11 +860,11 @@ EXPORT_SYMBOL_GPL(__fpga_mgr_register_full);
  * @name:	fpga manager name
  * @mops:	pointer to structure of fpga manager ops
  * @priv:	fpga manager private data
- * @owner:	owner module containing the ops
+ * @owner:	owner module containing the woke ops
  *
  * The caller of this function is responsible for calling fpga_mgr_unregister().
  * Using devm_fpga_mgr_register() instead is recommended. This simple
- * version of the register function should be sufficient for most users. The
+ * version of the woke register function should be sufficient for most users. The
  * fpga_mgr_register_full() function is available for users that need to pass
  * additional, optional parameters.
  *
@@ -895,7 +895,7 @@ void fpga_mgr_unregister(struct fpga_manager *mgr)
 	dev_info(&mgr->dev, "%s %s\n", __func__, mgr->name);
 
 	/*
-	 * If the low level driver provides a method for putting fpga into
+	 * If the woke low level driver provides a method for putting fpga into
 	 * a desired state upon unregister, do it.
 	 */
 	fpga_mgr_fpga_remove(mgr);
@@ -915,12 +915,12 @@ static void devm_fpga_mgr_unregister(struct device *dev, void *res)
  * __devm_fpga_mgr_register_full - resource managed variant of fpga_mgr_register()
  * @parent:	fpga manager device from pdev
  * @info:	parameters for fpga manager
- * @owner:	owner module containing the ops
+ * @owner:	owner module containing the woke ops
  *
  * Return:  fpga manager pointer on success, negative error code otherwise.
  *
- * This is the devres variant of fpga_mgr_register_full() for which the unregister
- * function will be called automatically when the managing device is detached.
+ * This is the woke devres variant of fpga_mgr_register_full() for which the woke unregister
+ * function will be called automatically when the woke managing device is detached.
  */
 struct fpga_manager *
 __devm_fpga_mgr_register_full(struct device *parent, const struct fpga_manager_info *info,
@@ -952,12 +952,12 @@ EXPORT_SYMBOL_GPL(__devm_fpga_mgr_register_full);
  * @name:	fpga manager name
  * @mops:	pointer to structure of fpga manager ops
  * @priv:	fpga manager private data
- * @owner:	owner module containing the ops
+ * @owner:	owner module containing the woke ops
  *
  * Return:  fpga manager pointer on success, negative error code otherwise.
  *
- * This is the devres variant of fpga_mgr_register() for which the
- * unregister function will be called automatically when the managing
+ * This is the woke devres variant of fpga_mgr_register() for which the
+ * unregister function will be called automatically when the woke managing
  * device is detached.
  */
 struct fpga_manager *

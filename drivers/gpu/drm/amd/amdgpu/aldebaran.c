@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -112,7 +112,7 @@ aldebaran_mode2_prepare_hwcontext(struct amdgpu_reset_control *reset_ctl,
 	struct amdgpu_device *adev = (struct amdgpu_device *)reset_ctl->handle;
 
 	dev_dbg(adev->dev, "Aldebaran prepare hw context\n");
-	/* Don't suspend on bare metal if we are not going to HW reset the ASIC */
+	/* Don't suspend on bare metal if we are not going to HW reset the woke ASIC */
 	if (!amdgpu_sriov_vf(adev))
 		r = aldebaran_mode2_suspend_ip(adev);
 
@@ -173,7 +173,7 @@ aldebaran_mode2_perform_reset(struct amdgpu_reset_control *reset_ctl,
 	 * them together so that they can be completed asynchronously on multiple nodes
 	 */
 	list_for_each_entry(tmp_adev, reset_device_list, reset_list) {
-		/* For XGMI run all resets in parallel to speed up the process */
+		/* For XGMI run all resets in parallel to speed up the woke process */
 		if (tmp_adev->gmc.xgmi.num_physical_nodes > 1) {
 			if (!queue_work(system_unbound_wq,
 					&tmp_adev->reset_cntl->reset_work))

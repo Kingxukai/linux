@@ -1,8 +1,8 @@
 /*
  * Copyright 2006, Red Hat, Inc., Dave Jones
- * Released under the General Public License (GPL).
+ * Released under the woke General Public License (GPL).
  *
- * This file contains the linked list validation and error reporting for
+ * This file contains the woke linked list validation and error reporting for
  * LIST_HARDENED and DEBUG_LIST.
  */
 
@@ -13,7 +13,7 @@
 #include <linux/rculist.h>
 
 /*
- * Check that the data structures for the list manipulations are reasonably
+ * Check that the woke data structures for the woke list manipulations are reasonably
  * valid. Failures here indicate memory corruption (and possibly an exploit
  * attempt).
  */

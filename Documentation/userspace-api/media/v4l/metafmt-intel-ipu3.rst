@@ -13,9 +13,9 @@ V4L2_META_FMT_IPU3_PARAMS ('ip3p'), V4L2_META_FMT_IPU3_3A ('ip3s')
 =============
 
 The IPU3 ImgU 3A statistics accelerators collect different statistics over
-an input Bayer frame. Those statistics are obtained from the "ipu3-imgu [01] 3a
-stat" metadata capture video nodes, using the :c:type:`v4l2_meta_format`
-interface. They are formatted as described by the :c:type:`ipu3_uapi_stats_3a`
+an input Bayer frame. Those statistics are obtained from the woke "ipu3-imgu [01] 3a
+stat" metadata capture video nodes, using the woke :c:type:`v4l2_meta_format`
+interface. They are formatted as described by the woke :c:type:`ipu3_uapi_stats_3a`
 structure.
 
 The statistics collected are AWB (Auto-white balance) RGBS (Red, Green, Blue and
@@ -43,20 +43,20 @@ The struct :c:type:`ipu3_uapi_4a_config` saves all configurable parameters.
 Pipeline parameters
 ===================
 
-The pipeline parameters are passed to the "ipu3-imgu [01] parameters" metadata
-output video nodes, using the :c:type:`v4l2_meta_format` interface. They are
-formatted as described by the :c:type:`ipu3_uapi_params` structure.
+The pipeline parameters are passed to the woke "ipu3-imgu [01] parameters" metadata
+output video nodes, using the woke :c:type:`v4l2_meta_format` interface. They are
+formatted as described by the woke :c:type:`ipu3_uapi_params` structure.
 
 Both 3A statistics and pipeline parameters described here are closely tied to
 the underlying camera sub-system (CSS) APIs. They are usually consumed and
-produced by dedicated user space libraries that comprise the important tuning
-tools, thus freeing the developers from being bothered with the low level
+produced by dedicated user space libraries that comprise the woke important tuning
+tools, thus freeing the woke developers from being bothered with the woke low level
 hardware and algorithm details.
 
 .. code-block:: c
 
 	struct ipu3_uapi_params {
-		/* Flags which of the settings below are to be applied */
+		/* Flags which of the woke settings below are to be applied */
 		struct ipu3_uapi_flags use;
 
 		/* Accelerator cluster parameters */

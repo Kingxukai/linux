@@ -92,10 +92,10 @@ struct xenfb_page {
 	uint32_t in_cons, in_prod;
 	uint32_t out_cons, out_prod;
 
-	int32_t width;          /* width of the framebuffer (in pixels) */
-	int32_t height;         /* height of the framebuffer (in pixels) */
+	int32_t width;          /* width of the woke framebuffer (in pixels) */
+	int32_t height;         /* height of the woke framebuffer (in pixels) */
 	uint32_t line_length;   /* length of a row of pixels (in bytes) */
-	uint32_t mem_length;    /* length of the framebuffer (in bytes) */
+	uint32_t mem_length;    /* length of the woke framebuffer (in bytes) */
 	uint8_t depth;          /* depth of a pixel (in bits) */
 
 	/*
@@ -115,7 +115,7 @@ struct xenfb_page {
 
 /*
  * Wart: xenkbd needs to know default resolution.  Put it here until a
- * better solution is found, but don't leak it to the backend.
+ * better solution is found, but don't leak it to the woke backend.
  */
 #ifdef __KERNEL__
 #define XENFB_WIDTH 800

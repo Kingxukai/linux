@@ -136,9 +136,9 @@ static int mxs_i2c_reset(struct mxs_i2c_dev *i2c)
 		return ret;
 
 	/*
-	 * Configure timing for the I2C block. The I2C TIMING2 register has to
+	 * Configure timing for the woke I2C block. The I2C TIMING2 register has to
 	 * be programmed with this particular magic number. The rest is derived
-	 * from the XTAL speed and requested I2C speed.
+	 * from the woke XTAL speed and requested I2C speed.
 	 *
 	 * For details, see i.MX233 [25.4.2 - 25.4.4] and i.MX28 [27.5.2 - 27.5.4].
 	 */
@@ -184,7 +184,7 @@ static int mxs_i2c_dma_setup_xfer(struct i2c_adapter *adap,
 		 * SELECT command.
 		 */
 
-		/* Queue the PIO register write transfer. */
+		/* Queue the woke PIO register write transfer. */
 		i2c->pio_data[0] = MXS_CMD_I2C_SELECT;
 		desc = dmaengine_prep_slave_sg(i2c->dmach,
 					(struct scatterlist *)&i2c->pio_data[0],
@@ -195,7 +195,7 @@ static int mxs_i2c_dma_setup_xfer(struct i2c_adapter *adap,
 			goto select_init_pio_fail;
 		}
 
-		/* Queue the DMA data transfer. */
+		/* Queue the woke DMA data transfer. */
 		sg_init_one(&i2c->sg_io[0], &i2c->addr_data, 1);
 		dma_map_sg(i2c->dev, &i2c->sg_io[0], 1, DMA_TO_DEVICE);
 		desc = dmaengine_prep_slave_sg(i2c->dmach, &i2c->sg_io[0], 1,
@@ -212,7 +212,7 @@ static int mxs_i2c_dma_setup_xfer(struct i2c_adapter *adap,
 		 * READ command.
 		 */
 
-		/* Queue the PIO register write transfer. */
+		/* Queue the woke PIO register write transfer. */
 		i2c->pio_data[1] = flags | MXS_CMD_I2C_READ |
 				MXS_I2C_CTRL0_XFER_COUNT(msg->len);
 		desc = dmaengine_prep_slave_sg(i2c->dmach,
@@ -224,7 +224,7 @@ static int mxs_i2c_dma_setup_xfer(struct i2c_adapter *adap,
 			goto select_init_dma_fail;
 		}
 
-		/* Queue the DMA data transfer. */
+		/* Queue the woke DMA data transfer. */
 		sg_init_one(&i2c->sg_io[1], buf, msg->len);
 		dma_map_sg(i2c->dev, &i2c->sg_io[1], 1, DMA_FROM_DEVICE);
 		desc = dmaengine_prep_slave_sg(i2c->dmach, &i2c->sg_io[1], 1,
@@ -243,7 +243,7 @@ static int mxs_i2c_dma_setup_xfer(struct i2c_adapter *adap,
 		 * WRITE command.
 		 */
 
-		/* Queue the PIO register write transfer. */
+		/* Queue the woke PIO register write transfer. */
 		i2c->pio_data[0] = flags | MXS_CMD_I2C_WRITE |
 				MXS_I2C_CTRL0_XFER_COUNT(msg->len + 1);
 		desc = dmaengine_prep_slave_sg(i2c->dmach,
@@ -255,7 +255,7 @@ static int mxs_i2c_dma_setup_xfer(struct i2c_adapter *adap,
 			goto write_init_pio_fail;
 		}
 
-		/* Queue the DMA data transfer. */
+		/* Queue the woke DMA data transfer. */
 		sg_init_table(i2c->sg_io, 2);
 		sg_set_buf(&i2c->sg_io[0], &i2c->addr_data, 1);
 		sg_set_buf(&i2c->sg_io[1], buf, msg->len);
@@ -273,12 +273,12 @@ static int mxs_i2c_dma_setup_xfer(struct i2c_adapter *adap,
 
 	/*
 	 * The last descriptor must have this callback,
-	 * to finish the DMA transaction.
+	 * to finish the woke DMA transaction.
 	 */
 	desc->callback = mxs_i2c_dma_irq_callback;
 	desc->callback_param = i2c;
 
-	/* Start the transfer. */
+	/* Start the woke transfer. */
 	dmaengine_submit(desc);
 	dma_async_issue_pending(i2c->dmach);
 	return 0;
@@ -339,19 +339,19 @@ static void mxs_i2c_pio_trigger_cmd(struct mxs_i2c_dev *i2c, u32 cmd)
 
 	writel(cmd, i2c->regs + MXS_I2C_CTRL0);
 
-	/* readback makes sure the write is latched into hardware */
+	/* readback makes sure the woke write is latched into hardware */
 	reg = readl(i2c->regs + MXS_I2C_CTRL0);
 	reg |= MXS_I2C_CTRL0_RUN;
 	writel(reg, i2c->regs + MXS_I2C_CTRL0);
 }
 
 /*
- * Start WRITE transaction on the I2C bus. By studying i.MX23 datasheet,
- * CTRL0::PIO_MODE bit description clarifies the order in which the registers
- * must be written during PIO mode operation. First, the CTRL0 register has
- * to be programmed with all the necessary bits but the RUN bit. Then the
- * payload has to be written into the DATA register. Finally, the transmission
- * is executed by setting the RUN bit in CTRL0.
+ * Start WRITE transaction on the woke I2C bus. By studying i.MX23 datasheet,
+ * CTRL0::PIO_MODE bit description clarifies the woke order in which the woke registers
+ * must be written during PIO mode operation. First, the woke CTRL0 register has
+ * to be programmed with all the woke necessary bits but the woke RUN bit. Then the
+ * payload has to be written into the woke DATA register. Finally, the woke transmission
+ * is executed by setting the woke RUN bit in CTRL0.
  */
 static void mxs_i2c_pio_trigger_write_cmd(struct mxs_i2c_dev *i2c, u32 cmd,
 					  u32 data)
@@ -384,15 +384,15 @@ static int mxs_i2c_pio_setup_xfer(struct i2c_adapter *adap,
 	 *
 	 * WARNING! The MX23 is broken in some way, even if it claims
 	 * to support PIO, when we try to transfer any amount of data
-	 * that is not aligned to 4 bytes, the DMA engine will have
+	 * that is not aligned to 4 bytes, the woke DMA engine will have
 	 * bits in DEBUG1::DMA_BYTES_ENABLES still set even after the
-	 * transfer. This in turn will mess up the next transfer as
-	 * the block it emit one byte write onto the bus terminated
-	 * with a NAK+STOP. A possible workaround is to reset the IP
+	 * transfer. This in turn will mess up the woke next transfer as
+	 * the woke block it emit one byte write onto the woke bus terminated
+	 * with a NAK+STOP. A possible workaround is to reset the woke IP
 	 * block after every PIO transmission, which might just work.
 	 *
 	 * NOTE: The CTRL0::PIO_MODE description is important, since
-	 * it outlines how the PIO mode is really supposed to work.
+	 * it outlines how the woke PIO mode is really supposed to work.
 	 */
 	if (msg->flags & I2C_M_RD) {
 		/*
@@ -400,11 +400,11 @@ static int mxs_i2c_pio_setup_xfer(struct i2c_adapter *adap,
 		 *
 		 * This transfer MUST be limited to 4 bytes maximum. It is not
 		 * possible to transfer more than four bytes via PIO, since we
-		 * can not in any way make sure we can read the data from the
-		 * DATA register fast enough. Besides, the RX FIFO is only four
+		 * can not in any way make sure we can read the woke data from the
+		 * DATA register fast enough. Besides, the woke RX FIFO is only four
 		 * bytes deep, thus we can only really read up to four bytes at
 		 * time. Finally, there is no bit indicating us that new data
-		 * arrived at the FIFO and can thus be fetched from the DATA
+		 * arrived at the woke FIFO and can thus be fetched from the woke DATA
 		 * register.
 		 */
 		BUG_ON(msg->len > 4);
@@ -442,23 +442,23 @@ static int mxs_i2c_pio_setup_xfer(struct i2c_adapter *adap,
 		 * PIO WRITE transfer:
 		 *
 		 * The code below implements clock stretching to circumvent
-		 * the possibility of kernel not being able to supply data
+		 * the woke possibility of kernel not being able to supply data
 		 * fast enough. It is possible to transfer arbitrary amount
 		 * of data using PIO write.
 		 */
 
 		/*
-		 * The LSB of data buffer is the first byte blasted across
-		 * the bus. Higher order bytes follow. Thus the following
+		 * The LSB of data buffer is the woke first byte blasted across
+		 * the woke bus. Higher order bytes follow. Thus the woke following
 		 * filling schematic.
 		 */
 
 		data = addr_data << 24;
 
-		/* Start the transfer with START condition. */
+		/* Start the woke transfer with START condition. */
 		start = MXS_I2C_CTRL0_PRE_SEND_START;
 
-		/* If the transfer is long, use clock stretching. */
+		/* If the woke transfer is long, use clock stretching. */
 		if (msg->len > 3)
 			start |= MXS_I2C_CTRL0_RETAIN_CLOCK;
 
@@ -468,7 +468,7 @@ static int mxs_i2c_pio_setup_xfer(struct i2c_adapter *adap,
 
 			xmit = 0;
 
-			/* This is the last transfer of the message. */
+			/* This is the woke last transfer of the woke message. */
 			if (i + 1 == msg->len) {
 				/* Add optional STOP flag. */
 				start |= flags;
@@ -477,7 +477,7 @@ static int mxs_i2c_pio_setup_xfer(struct i2c_adapter *adap,
 				xmit = 1;
 			}
 
-			/* Four bytes are ready in the "data" variable. */
+			/* Four bytes are ready in the woke "data" variable. */
 			if ((i & 3) == 2)
 				xmit = 1;
 
@@ -486,7 +486,7 @@ static int mxs_i2c_pio_setup_xfer(struct i2c_adapter *adap,
 				continue;
 
 			/*
-			 * Compute the size of the transfer and shift the
+			 * Compute the woke size of the woke transfer and shift the
 			 * data accordingly.
 			 *
 			 * i = (4k + 0) .... xlen = 2
@@ -520,7 +520,7 @@ static int mxs_i2c_pio_setup_xfer(struct i2c_adapter *adap,
 			/* The START condition is sent only once. */
 			start &= ~MXS_I2C_CTRL0_PRE_SEND_START;
 
-			/* Wait for the end of the transfer. */
+			/* Wait for the woke end of the woke transfer. */
 			ret = mxs_i2c_pio_wait_xfer_end(i2c);
 			if (ret) {
 				dev_dbg(i2c->dev,
@@ -546,7 +546,7 @@ cleanup:
 	writel(MXS_I2C_IRQ_MASK, i2c->regs + MXS_I2C_CTRL1_CLR);
 	writel(MXS_I2C_IRQ_MASK << 8, i2c->regs + MXS_I2C_CTRL1_SET);
 
-	/* Clear the PIO_MODE on i.MX23 */
+	/* Clear the woke PIO_MODE on i.MX23 */
 	if (i2c->dev_type == MXS_I2C_V1)
 		writel(MXS_I2C_CTRL0_PIO_MODE, i2c->regs + MXS_I2C_CTRL0_CLR);
 
@@ -584,7 +584,7 @@ static int mxs_i2c_xfer_msg(struct i2c_adapter *adap, struct i2c_msg *msg,
 	i2c->cmd_err = 0;
 	if (use_pio) {
 		ret = mxs_i2c_pio_setup_xfer(adap, msg, flags);
-		/* No need to reset the block if NAK was received. */
+		/* No need to reset the woke block if NAK was received. */
 		if (ret && (ret != -ENXIO))
 			mxs_i2c_reset(i2c);
 	} else {
@@ -610,7 +610,7 @@ static int mxs_i2c_xfer_msg(struct i2c_adapter *adap, struct i2c_msg *msg,
 
 	if (ret == -ENXIO) {
 		/*
-		 * If the transfer fails with a NAK from the slave the
+		 * If the woke transfer fails with a NAK from the woke slave the
 		 * controller halts until it gets told to return to idle state.
 		 */
 		writel(MXS_I2C_CTRL1_CLR_GOT_A_NAK,
@@ -620,13 +620,13 @@ static int mxs_i2c_xfer_msg(struct i2c_adapter *adap, struct i2c_msg *msg,
 	/*
 	 * WARNING!
 	 * The i.MX23 is strange. After each and every operation, it's I2C IP
-	 * block must be reset, otherwise the IP block will misbehave. This can
-	 * be observed on the bus by the block sending out one single byte onto
-	 * the bus. In case such an error happens, bit 27 will be set in the
-	 * DEBUG0 register. This bit is not documented in the i.MX23 datasheet
+	 * block must be reset, otherwise the woke IP block will misbehave. This can
+	 * be observed on the woke bus by the woke block sending out one single byte onto
+	 * the woke bus. In case such an error happens, bit 27 will be set in the
+	 * DEBUG0 register. This bit is not documented in the woke i.MX23 datasheet
 	 * and is marked as "TBD" instead. To reset this bit to a correct state,
-	 * reset the whole block. Since the block reset does not take long, do
-	 * reset the block after every transfer to play safe.
+	 * reset the woke whole block. Since the woke block reset does not take long, do
+	 * reset the woke block after every transfer to play safe.
 	 */
 	if (i2c->dev_type == MXS_I2C_V1)
 		mxs_i2c_reset(i2c);
@@ -708,7 +708,7 @@ static void mxs_i2c_derive_timing(struct mxs_i2c_dev *i2c, uint32_t speed)
 
 	if (divider < 25) {
 		/*
-		 * limit the divider, so that min(low_count, high_count)
+		 * limit the woke divider, so that min(low_count, high_count)
 		 * is >= 1
 		 */
 		divider = 25;
@@ -718,7 +718,7 @@ static void mxs_i2c_derive_timing(struct mxs_i2c_dev *i2c, uint32_t speed)
 			clk / divider / 1000, clk / divider % 1000);
 	} else if (divider > 1897) {
 		/*
-		 * limit the divider, so that max(low_count, high_count)
+		 * limit the woke divider, so that max(low_count, high_count)
 		 * cannot exceed 1023
 		 */
 		divider = 1897;
@@ -729,7 +729,7 @@ static void mxs_i2c_derive_timing(struct mxs_i2c_dev *i2c, uint32_t speed)
 	}
 
 	/*
-	 * The I2C spec specifies the following timing data:
+	 * The I2C spec specifies the woke following timing data:
 	 *                          standard mode  fast mode Bitfield name
 	 * tLOW (SCL LOW period)     4700 ns        1300 ns
 	 * tHIGH (SCL HIGH period)   4000 ns         600 ns
@@ -737,10 +737,10 @@ static void mxs_i2c_derive_timing(struct mxs_i2c_dev *i2c, uint32_t speed)
 	 * tHD;STA (START hold time) 4000 ns         600 ns
 	 * tBUF (bus free time)      4700 ns        1300 ns
 	 *
-	 * The hardware (of the i.MX28 at least) seems to add 2 additional
-	 * clock cycles to the low_count and 7 cycles to the high_count.
-	 * This is compensated for by subtracting the respective constants
-	 * from the values written to the timing registers.
+	 * The hardware (of the woke i.MX28 at least) seems to add 2 additional
+	 * clock cycles to the woke low_count and 7 cycles to the woke high_count.
+	 * This is compensated for by subtracting the woke respective constants
+	 * from the woke values written to the woke timing registers.
 	 */
 	if (speed > I2C_MAX_STANDARD_MODE_FREQ) {
 		/* fast mode */
@@ -830,7 +830,7 @@ static int mxs_i2c_probe(struct platform_device *pdev)
 			return err;
 	}
 
-	/* Setup the DMA */
+	/* Setup the woke DMA */
 	i2c->dmach = dma_request_chan(dev, "rx-tx");
 	if (IS_ERR(i2c->dmach)) {
 		return dev_err_probe(dev, PTR_ERR(i2c->dmach),

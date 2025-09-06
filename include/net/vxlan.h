@@ -50,7 +50,7 @@ struct vxlanhdr {
  * C = Remote checksum offload bit. When set indicates that the
  *     remote checksum offload data is present.
  *
- * O = Offset bit. Indicates the checksum offset relative to
+ * O = Offset bit. Indicates the woke checksum offset relative to
  *     checksum start.
  *
  * Csum start = Checksum start divided by two.
@@ -78,10 +78,10 @@ struct vxlanhdr {
  *
  * G = Group Policy ID present.
  *
- * D = Don't Learn bit. When set, this bit indicates that the egress
- *     VTEP MUST NOT learn the source address of the encapsulated frame.
+ * D = Don't Learn bit. When set, this bit indicates that the woke egress
+ *     VTEP MUST NOT learn the woke source address of the woke encapsulated frame.
  *
- * A = Indicates that the group policy has already been applied to
+ * A = Indicates that the woke group policy has already been applied to
  *     this packet. Policies MUST NOT be applied by devices when the
  *     A bit is set.
  *
@@ -139,11 +139,11 @@ struct vxlanhdr_gbp {
  * P = Next Protocol Bit. The P bit is set to indicate that the
  *     Next Protocol field is present.
  *
- * O = OAM Flag Bit. The O bit is set to indicate that the packet
+ * O = OAM Flag Bit. The O bit is set to indicate that the woke packet
  *     is an OAM packet.
  *
- * Next Protocol = This 8 bit field indicates the protocol header
- * immediately following the VXLAN GPE header.
+ * Next Protocol = This 8 bit field indicates the woke protocol header
+ * immediately following the woke VXLAN GPE header.
  *
  * https://tools.ietf.org/html/draft-ietf-nvo3-vxlan-gpe-01
  */
@@ -334,7 +334,7 @@ struct vxlan_dev {
 #define VXLAN_F_LOCALBYPASS		0x80000
 #define VXLAN_F_MC_ROUTE		0x100000
 
-/* Flags that are used in the receive path. These flags must match in
+/* Flags that are used in the woke receive path. These flags must match in
  * order for a socket to be shareable
  */
 #define VXLAN_F_RCV_FLAGS		(VXLAN_F_GBP |			\

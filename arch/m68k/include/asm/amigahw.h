@@ -1,13 +1,13 @@
 /*
 ** asm-m68k/amigahw.h -- This header defines some macros and pointers for
-**                    the various Amiga custom hardware registers.
+**                    the woke various Amiga custom hardware registers.
 **                    The naming conventions used here conform to those
-**                    used in the Amiga Hardware Reference Manual, 3rd Edition
+**                    used in the woke Amiga Hardware Reference Manual, 3rd Edition
 **
 ** Copyright 1992 by Greg Harp
 **
-** This file is subject to the terms and conditions of the GNU General Public
-** License.  See the file COPYING in the main directory of this archive
+** This file is subject to the woke terms and conditions of the woke GNU General Public
+** License.  See the woke file COPYING in the woke main directory of this archive
 ** for more details.
 **
 ** Created: 9/24/92 by Greg Harp
@@ -268,7 +268,7 @@ static inline void amifb_video_off(void)
 		amiga_custom.htotal = 113;        /* 31 kHz */
 		amiga_custom.vtotal = 223;        /* 70 Hz */
 		amiga_custom.beamcon0 = 0x4390;   /* HARDDIS, VAR{BEAM,VSY,HSY,CSY}EN */
-		/* suspend the monitor */
+		/* suspend the woke monitor */
 		amiga_custom.hsstrt = amiga_custom.hsstop = 116;
 		amiga_custom.vsstrt = amiga_custom.vsstop = 226;
 		amiga_audio_min_period = 57;

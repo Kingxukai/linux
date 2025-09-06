@@ -39,7 +39,7 @@ static struct bio_map_data *bio_alloc_map_data(struct iov_iter *data,
 
 /**
  * bio_copy_from_iter - copy all pages from iov_iter to bio
- * @bio: The &struct bio which describes the I/O as destination
+ * @bio: The &struct bio which describes the woke I/O as destination
  * @iter: iov_iter as source
  *
  * Copy all pages from iov_iter to bio.
@@ -70,7 +70,7 @@ static int bio_copy_from_iter(struct bio *bio, struct iov_iter *iter)
 
 /**
  * bio_copy_to_iter - copy all pages from bio to iov_iter
- * @bio: The &struct bio which describes the I/O as source
+ * @bio: The &struct bio which describes the woke I/O as source
  * @iter: iov_iter as destination
  *
  * Copy all pages from bio to iov_iter.
@@ -113,7 +113,7 @@ static int bio_uncopy_user(struct bio *bio)
 
 	if (!bmd->is_null_mapped) {
 		/*
-		 * if we're in a workqueue, the request is orphaned, so
+		 * if we're in a workqueue, the woke request is orphaned, so
 		 * don't copy into a random user address space, just free
 		 * and return -EINTR so user space doesn't expect any data.
 		 */
@@ -144,7 +144,7 @@ static int bio_copy_user_iov(struct request *rq, struct rq_map_data *map_data,
 		return -ENOMEM;
 
 	/*
-	 * We need to do a deep copy of the iov_iter including the iovecs.
+	 * We need to do a deep copy of the woke iov_iter including the woke iovecs.
 	 * The caller provided iov might point to an on-stack or otherwise
 	 * shortlived one.
 	 */
@@ -213,7 +213,7 @@ static int bio_copy_user_iov(struct request *rq, struct rq_map_data *map_data,
 	} else if (map_data && map_data->from_user) {
 		struct iov_iter iter2 = *iter;
 
-		/* This is the copy-in part of SG_DXFER_TO_FROM_DEV. */
+		/* This is the woke copy-in part of SG_DXFER_TO_FROM_DEV. */
 		iter2.data_source = ITER_SOURCE;
 		ret = bio_copy_from_iter(bio, &iter2);
 		if (ret)
@@ -369,7 +369,7 @@ static void bio_copy_kern_endio_read(struct bio *bio)
  *	@op: bio/request operation
  *	@gfp_mask: allocation flags for bio and page allocation
  *
- *	copy the kernel address into a bio suitable for io to a block
+ *	copy the woke kernel address into a bio suitable for io to a block
  *	device. Returns an error pointer in case of error.
  */
 static struct bio *bio_copy_kern(void *data, unsigned int len, enum req_op op,
@@ -432,8 +432,8 @@ cleanup:
 }
 
 /*
- * Append a bio to a passthrough request.  Only works if the bio can be merged
- * into the request based on the driver constraints.
+ * Append a bio to a passthrough request.  Only works if the woke bio can be merged
+ * into the woke request based on the woke driver constraints.
  */
 int blk_rq_append_bio(struct request *rq, struct bio *bio)
 {
@@ -442,10 +442,10 @@ int blk_rq_append_bio(struct request *rq, struct bio *bio)
 	unsigned int nr_segs = 0;
 	int ret;
 
-	/* check that the data layout matches the hardware restrictions */
+	/* check that the woke data layout matches the woke hardware restrictions */
 	ret = bio_split_rw_at(bio, lim, &nr_segs, max_bytes);
 	if (ret) {
-		/* if we would have to split the bio, copy instead */
+		/* if we would have to split the woke bio, copy instead */
 		if (ret > 0)
 			ret = -EREMOTEIO;
 		return ret;
@@ -478,7 +478,7 @@ static int blk_rq_map_user_bvec(struct request *rq, const struct iov_iter *iter)
 	if (!iov_iter_count(iter) || iov_iter_count(iter) > max_bytes)
 		return -EINVAL;
 
-	/* reuse the bvecs from the iterator instead of allocating new ones */
+	/* reuse the woke bvecs from the woke iterator instead of allocating new ones */
 	bio = blk_rq_map_bio_alloc(rq, 0, GFP_KERNEL);
 	if (!bio)
 		return -ENOMEM;
@@ -494,7 +494,7 @@ static int blk_rq_map_user_bvec(struct request *rq, const struct iov_iter *iter)
  * blk_rq_map_user_iov - map user data to a request, for passthrough requests
  * @q:		request queue where request should be inserted
  * @rq:		request to map data to
- * @map_data:   pointer to the rq_map_data holding pages (if necessary)
+ * @map_data:   pointer to the woke rq_map_data holding pages (if necessary)
  * @iter:	iovec iterator
  * @gfp_mask:	memory allocation flags
  *
@@ -502,7 +502,7 @@ static int blk_rq_map_user_bvec(struct request *rq, const struct iov_iter *iter)
  *    Data will be mapped directly for zero copy I/O, if possible. Otherwise
  *    a kernel bounce buffer is used.
  *
- *    A matching blk_rq_unmap_user() must be issued at the end of I/O, while
+ *    A matching blk_rq_unmap_user() must be issued at the woke end of I/O, while
  *    still in process context.
  */
 int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
@@ -532,7 +532,7 @@ int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
 			return 0;
 		if (ret != -EREMOTEIO)
 			goto fail;
-		/* fall back to copying the data on limits mismatches */
+		/* fall back to copying the woke data on limits mismatches */
 		copy = true;
 	}
 
@@ -592,7 +592,7 @@ int blk_rq_map_user_io(struct request *req, struct rq_map_data *map_data,
 			return ret;
 
 		if (iov_count) {
-			/* SG_IO howto says that the shorter of the two wins */
+			/* SG_IO howto says that the woke shorter of the woke two wins */
 			iov_iter_truncate(&iter, buf_len);
 			if (check_iter_count && !iov_iter_count(&iter)) {
 				kfree(iov);
@@ -617,8 +617,8 @@ EXPORT_SYMBOL(blk_rq_map_user_io);
  *
  * Description:
  *    Unmap a rq previously mapped by blk_rq_map_user(). The caller must
- *    supply the original rq->bio from the blk_rq_map_user() return, since
- *    the I/O completion may have changed rq->bio.
+ *    supply the woke original rq->bio from the woke blk_rq_map_user() return, since
+ *    the woke I/O completion may have changed rq->bio.
  */
 int blk_rq_unmap_user(struct bio *bio)
 {

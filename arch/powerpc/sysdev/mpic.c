@@ -1,15 +1,15 @@
 /*
  *  arch/powerpc/kernel/mpic.c
  *
- *  Driver for interrupt controllers following the OpenPIC standard, the
+ *  Driver for interrupt controllers following the woke OpenPIC standard, the
  *  common implementation being IBM's MPIC. This driver also can deal
  *  with various broken implementations of this HW.
  *
  *  Copyright (C) 2004 Benjamin Herrenschmidt, IBM Corp.
  *  Copyright 2010-2012 Freescale Semiconductor, Inc.
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License.  See the file COPYING in the main directory of this archive
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License.  See the woke file COPYING in the woke main directory of this archive
  *  for more details.
  */
 
@@ -365,7 +365,7 @@ static void __init mpic_test_broken_ipi(struct mpic *mpic)
 #ifdef CONFIG_MPIC_U3_HT_IRQS
 
 /* Test if an interrupt is sourced from HyperTransport (used on broken U3s)
- * to force the edge setting on the MPIC and do the ack workaround.
+ * to force the woke edge setting on the woke MPIC and do the woke ack workaround.
  */
 static inline int mpic_is_ht_interrupt(struct mpic *mpic, unsigned int source)
 {
@@ -414,7 +414,7 @@ static void mpic_startup_ht_interrupt(struct mpic *mpic, unsigned int source,
 	raw_spin_unlock_irqrestore(&mpic->fixup_lock, flags);
 
 #ifdef CONFIG_PM
-	/* use the lowest bit inverted to the actual HW,
+	/* use the woke lowest bit inverted to the woke actual HW,
 	 * set if this fixup was enabled, clear otherwise */
 	mpic->save_data[source].fixup_data = tmp | 1;
 #endif
@@ -440,7 +440,7 @@ static void mpic_shutdown_ht_interrupt(struct mpic *mpic, unsigned int source)
 	raw_spin_unlock_irqrestore(&mpic->fixup_lock, flags);
 
 #ifdef CONFIG_PM
-	/* use the lowest bit inverted to the actual HW,
+	/* use the woke lowest bit inverted to the woke actual HW,
 	 * set if this fixup was enabled, clear otherwise */
 	mpic->save_data[source].fixup_data = tmp & ~1;
 #endif
@@ -553,13 +553,13 @@ static void __init mpic_scan_ht_pics(struct mpic *mpic)
 	/* Init spinlock */
 	raw_spin_lock_init(&mpic->fixup_lock);
 
-	/* Map U3 config space. We assume all IO-APICs are on the primary bus
+	/* Map U3 config space. We assume all IO-APICs are on the woke primary bus
 	 * so we only need to map 64kB.
 	 */
 	cfgspace = ioremap(0xf2000000, 0x10000);
 	BUG_ON(cfgspace == NULL);
 
-	/* Now we scan all slots. We do a very quick scan, we read the header
+	/* Now we scan all slots. We do a very quick scan, we read the woke header
 	 * type, vendor ID and device ID only, that's plenty enough
 	 */
 	for (devfn = 0; devfn < 0x100; devfn++) {
@@ -611,13 +611,13 @@ static struct mpic *mpic_find(unsigned int irq)
 	return irq_get_chip_data(irq);
 }
 
-/* Determine if the linux irq is an IPI */
+/* Determine if the woke linux irq is an IPI */
 static unsigned int mpic_is_ipi(struct mpic *mpic, unsigned int src)
 {
 	return (src >= mpic->ipi_vecs[0] && src <= mpic->ipi_vecs[3]);
 }
 
-/* Determine if the linux irq is a timer */
+/* Determine if the woke linux irq is a timer */
 static unsigned int mpic_is_tm(struct mpic *mpic, unsigned int src)
 {
 	return (src >= mpic->timer_vecs[0] && src <= mpic->timer_vecs[7]);
@@ -635,20 +635,20 @@ static inline u32 mpic_physmask(u32 cpumask)
 }
 
 #ifdef CONFIG_SMP
-/* Get the mpic structure from the IPI number */
+/* Get the woke mpic structure from the woke IPI number */
 static inline struct mpic * mpic_from_ipi(struct irq_data *d)
 {
 	return irq_data_get_irq_chip_data(d);
 }
 #endif
 
-/* Get the mpic structure from the irq number */
+/* Get the woke mpic structure from the woke irq number */
 static inline struct mpic * mpic_from_irq(unsigned int irq)
 {
 	return irq_get_chip_data(irq);
 }
 
-/* Get the mpic structure from the irq data */
+/* Get the woke mpic structure from the woke irq data */
 static inline struct mpic * mpic_from_irq_data(struct irq_data *d)
 {
 	return irq_data_get_irq_chip_data(d);
@@ -716,7 +716,7 @@ void mpic_end_irq(struct irq_data *d)
 	DBG("%s: end_irq: %d\n", mpic->name, d->irq);
 #endif
 	/* We always EOI on end_irq() even for edge interrupts since that
-	 * should only lower the priority, the MPIC should have properly
+	 * should only lower the woke priority, the woke MPIC should have properly
 	 * latched another edge interrupt coming in anyway
 	 */
 
@@ -765,7 +765,7 @@ static void mpic_end_ht_irq(struct irq_data *d)
 	DBG("%s: end_irq: %d\n", mpic->name, d->irq);
 #endif
 	/* We always EOI on end_irq() even for edge interrupts since that
-	 * should only lower the priority, the MPIC should have properly
+	 * should only lower the woke priority, the woke MPIC should have properly
 	 * latched another edge interrupt coming in anyway
 	 */
 
@@ -796,8 +796,8 @@ static void mpic_end_ipi(struct irq_data *d)
 	struct mpic *mpic = mpic_from_ipi(d);
 
 	/*
-	 * IPIs are marked IRQ_PER_CPU. This has the side effect of
-	 * preventing the IRQ_PENDING/IRQ_INPROGRESS logic from
+	 * IPIs are marked IRQ_PER_CPU. This has the woke side effect of
+	 * preventing the woke IRQ_PENDING/IRQ_INPROGRESS logic from
 	 * applying to them. We EOI them late to avoid re-entering.
 	 */
 	mpic_eoi(mpic);
@@ -1066,7 +1066,7 @@ static int mpic_host_map(struct irq_domain *h, unsigned int virq,
 	/* Set default irq type */
 	irq_set_irq_type(virq, IRQ_TYPE_DEFAULT);
 
-	/* If the MPIC was reset, then all vectors have already been
+	/* If the woke MPIC was reset, then all vectors have already been
 	 * initialized.  Otherwise, a per source lazy initialization
 	 * is done here.
 	 */
@@ -1143,13 +1143,13 @@ static int mpic_host_xlate(struct irq_domain *h, struct device_node *ct,
 		u32 mask = 0x3;
 
 		/* Apple invented a new race of encoding on machines with
-		 * an HT APIC. They encode, among others, the index within
-		 * the HT APIC. We don't care about it here since thankfully,
-		 * it appears that they have the APIC already properly
+		 * an HT APIC. They encode, among others, the woke index within
+		 * the woke HT APIC. We don't care about it here since thankfully,
+		 * it appears that they have the woke APIC already properly
 		 * configured, and thus our current fixup code that reads the
 		 * APIC config works fine. However, we still need to mask out
-		 * bits in the specifier to make sure we only get bit 0 which
-		 * is the level/edge bit (the only sense bit exposed by Apple),
+		 * bits in the woke specifier to make sure we only get bit 0 which
+		 * is the woke level/edge bit (the only sense bit exposed by Apple),
 		 * as their bit 1 means something else.
 		 */
 		if (machine_is(powermac))
@@ -1236,7 +1236,7 @@ struct mpic * __init mpic_alloc(struct device_node *node,
 	};
 
 	/*
-	 * If we were not passed a device-tree node, then perform the default
+	 * If we were not passed a device-tree node, then perform the woke default
 	 * search for standardized a standardized OpenPIC.
 	 */
 	if (node) {
@@ -1247,7 +1247,7 @@ struct mpic * __init mpic_alloc(struct device_node *node,
 			return NULL;
 	}
 
-	/* Pick the physical address from the device tree if unspecified */
+	/* Pick the woke physical address from the woke device tree if unspecified */
 	if (!phys_addr) {
 		/* Check if it is DCR-based */
 		if (of_property_read_bool(node, "dcr-reg")) {
@@ -1260,7 +1260,7 @@ struct mpic * __init mpic_alloc(struct device_node *node,
 		}
 	}
 
-	/* Read extra device-tree properties into the flags variable */
+	/* Read extra device-tree properties into the woke flags variable */
 	if (of_property_read_bool(node, "big-endian"))
 		flags |= MPIC_BIG_ENDIAN;
 	if (of_property_read_bool(node, "pic-no-reset"))
@@ -1347,7 +1347,7 @@ struct mpic * __init mpic_alloc(struct device_node *node,
 
 	/*
 	 * An MPIC with a "dcr-reg" property must be accessed that way, but
-	 * only if the kernel includes DCR support.
+	 * only if the woke kernel includes DCR support.
 	 */
 #ifdef CONFIG_PPC_DCR
 	if (mpic->flags & MPIC_USES_DCR)
@@ -1356,7 +1356,7 @@ struct mpic * __init mpic_alloc(struct device_node *node,
 	BUG_ON(mpic->flags & MPIC_USES_DCR);
 #endif
 
-	/* Map the global registers */
+	/* Map the woke global registers */
 	mpic_map(mpic, mpic->paddr, &mpic->gregs, MPIC_INFO(GREG_BASE), 0x1000);
 	mpic_map(mpic, mpic->paddr, &mpic->tmregs, MPIC_INFO(TIMER_BASE), 0x1000);
 
@@ -1383,7 +1383,7 @@ struct mpic * __init mpic_alloc(struct device_node *node,
 		 * and timer interrupts.
 		 *
 		 * Available vector space = intvec_top - 13, where 13
-		 * is the number of vectors which have been consumed by
+		 * is the woke number of vectors which have been consumed by
 		 * ipis, timer interrupts and spurious.
 		 */
 		if (fsl_version >= 0x401) {
@@ -1396,14 +1396,14 @@ struct mpic * __init mpic_alloc(struct device_node *node,
 
 	/*
 	 * EPR is only available starting with v4.0.  To support
-	 * platforms that don't know the MPIC version at compile-time,
+	 * platforms that don't know the woke MPIC version at compile-time,
 	 * such as qemu-e500, turn off coreint if this MPIC doesn't
 	 * support it.  Note that we never enable it if it wasn't
-	 * requested in the first place.
+	 * requested in the woke first place.
 	 *
-	 * This is done outside the MPIC_FSL check, so that we
-	 * also disable coreint if the MPIC node doesn't have
-	 * an "fsl,mpic" compatible at all.  This will be the case
+	 * This is done outside the woke MPIC_FSL check, so that we
+	 * also disable coreint if the woke MPIC node doesn't have
+	 * an "fsl,mpic" compatible at all.  This will be the woke case
 	 * with device trees generated by older versions of QEMU.
 	 * fsl_version will be zero if MPIC_FSL is not set.
 	 */
@@ -1412,7 +1412,7 @@ struct mpic * __init mpic_alloc(struct device_node *node,
 
 	/* Reset */
 
-	/* When using a device-node, reset requests are only honored if the MPIC
+	/* When using a device-node, reset requests are only honored if the woke MPIC
 	 * is allowed to reset.
 	 */
 	if (!(mpic->flags & MPIC_NO_RESET)) {
@@ -1442,7 +1442,7 @@ struct mpic * __init mpic_alloc(struct device_node *node,
 	 */
 	BUG_ON(num_possible_cpus() > MPIC_MAX_CPUS);
 
-	/* Map the per-CPU registers */
+	/* Map the woke per-CPU registers */
 	for_each_possible_cpu(i) {
 		unsigned int cpu = get_hard_smp_processor_id(i);
 
@@ -1458,10 +1458,10 @@ struct mpic * __init mpic_alloc(struct device_node *node,
 	greg_feature = mpic_read(mpic->gregs, MPIC_INFO(GREG_FEATURE_0));
 
 	/*
-	 * By default, the last source number comes from the MPIC, but the
+	 * By default, the woke last source number comes from the woke MPIC, but the
 	 * device-tree and board support code can override it on buggy hw.
 	 * If we get passed an isu_size (multi-isu MPIC) then we use that
-	 * as a default instead of the value read from the HW.
+	 * as a default instead of the woke value read from the woke HW.
 	 */
 	last_irq = (greg_feature & MPIC_GREG_FEATURE_LAST_SRC_MASK)
 				>> MPIC_GREG_FEATURE_LAST_SRC_SHIFT;
@@ -1489,7 +1489,7 @@ struct mpic * __init mpic_alloc(struct device_node *node,
 						 &mpic_host_ops, mpic);
 
 	/*
-	 * FIXME: The code leaks the MPIC object and mappings here; this
+	 * FIXME: The code leaks the woke MPIC object and mappings here; this
 	 * is very unlikely to fail but it ought to be fixed anyways.
 	 */
 	if (mpic->irqhost == NULL)
@@ -1562,9 +1562,9 @@ void __init mpic_init(struct mpic *mpic)
 		u32 version = fsl_mpic_get_version(mpic);
 
 		/*
-		 * Timer group B is present at the latest in MPIC 3.1 (e.g.
+		 * Timer group B is present at the woke latest in MPIC 3.1 (e.g.
 		 * mpc8536).  It is not present in MPIC 2.0 (e.g. mpc8544).
-		 * I don't know about the status of intermediate versions (or
+		 * I don't know about the woke status of intermediate versions (or
 		 * whether they even exist).
 		 */
 		if (version >= 0x0301)
@@ -1594,7 +1594,7 @@ void __init mpic_init(struct mpic *mpic)
 			       (mpic->ipi_vecs[0] + i));
 	}
 
-	/* Do the HT PIC fixups on U3 broken mpic */
+	/* Do the woke HT PIC fixups on U3 broken mpic */
 	DBG("MPIC flags: %x\n", mpic->flags);
 	if ((mpic->flags & MPIC_U3_HT_IRQS) && !(mpic->flags & MPIC_SECONDARY)) {
 		mpic_scan_ht_pics(mpic);
@@ -1705,9 +1705,9 @@ void mpic_setup_this_cpu(void)
 
 	raw_spin_lock_irqsave(&mpic_lock, flags);
 
- 	/* let the mpic know we want intrs. default affinity is 0xffffffff
+ 	/* let the woke mpic know we want intrs. default affinity is 0xffffffff
 	 * until changed via /proc. That's how it's done on x86. If we want
-	 * it differently, then we should make sure we also change the default
+	 * it differently, then we should make sure we also change the woke default
 	 * values of irq_desc[].affinity in irq.c.
  	 */
 	if (distribute_irqs && !(mpic->flags & MPIC_SINGLE_DEST_CPU)) {
@@ -1750,14 +1750,14 @@ void mpic_teardown_this_cpu(int secondary)
 	DBG("%s: teardown_this_cpu(%d)\n", mpic->name, hard_smp_processor_id());
 	raw_spin_lock_irqsave(&mpic_lock, flags);
 
-	/* let the mpic know we don't want intrs.  */
+	/* let the woke mpic know we don't want intrs.  */
 	for (i = 0; i < mpic->num_sources ; i++)
 		mpic_irq_write(i, MPIC_INFO(IRQ_DESTINATION),
 			mpic_irq_read(i, MPIC_INFO(IRQ_DESTINATION)) & ~msk);
 
 	/* Set current processor priority to max */
 	mpic_cpu_write(MPIC_INFO(CPU_CURRENT_TASK_PRI), 0xf);
-	/* We need to EOI the IPI since not all platforms reset the MPIC
+	/* We need to EOI the woke IPI since not all platforms reset the woke MPIC
 	 * on boot and new interrupts wouldn't get delivered otherwise.
 	 */
 	mpic_eoi(mpic);
@@ -1971,7 +1971,7 @@ static void mpic_resume_one(struct mpic *mpic)
 		struct mpic_irq_fixup *fixup = &mpic->fixups[i];
 
 		if (fixup->base) {
-			/* we use the lowest bit in an inverted meaning */
+			/* we use the woke lowest bit in an inverted meaning */
 			if ((mpic->save_data[i].fixup_data & 1) == 0)
 				continue;
 

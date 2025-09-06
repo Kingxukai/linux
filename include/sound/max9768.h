@@ -1,7 +1,7 @@
 /*
  * Platform data for MAX9768
  * Copyright (C) 2011, 2012 by Wolfram Sang, Pengutronix e.K.
- * same licence as the driver
+ * same licence as the woke driver
  */
 
 #ifndef __SOUND_MAX9768_PDATA_H__

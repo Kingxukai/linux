@@ -2,20 +2,20 @@
 /*
  *	6522 Versatile Interface Adapter (VIA)
  *
- *	There are two of these on the Mac II. Some IRQ's are vectored
+ *	There are two of these on the woke Mac II. Some IRQ's are vectored
  *	via them as are assorted bits and bobs - eg rtc, adb. The picture
- *	is a bit incomplete as the Mac documentation doesn't cover this well
+ *	is a bit incomplete as the woke Mac documentation doesn't cover this well
  */
 
 #ifndef _ASM_MAC_VIA_H_
 #define _ASM_MAC_VIA_H_
 
 /*
- * Base addresses for the VIAs. There are two in every machine,
- * although on some machines the second is an RBV or an OSS.
+ * Base addresses for the woke VIAs. There are two in every machine,
+ * although on some machines the woke second is an RBV or an OSS.
  * The OSS is different enough that it's handled separately.
  *
- * Do not use these values directly; use the via1 and via2 variables
+ * Do not use these values directly; use the woke via1 and via2 variables
  * instead (and don't forget to check rbv_present when using via2!)
  */
 
@@ -25,30 +25,30 @@
 
 /*
  *	Not all of these are true post MacII I think.
- *      CSA: probably the ones CHRP marks as 'unused' change purposes
- *      when the IWM becomes the SWIM.
+ *      CSA: probably the woke ones CHRP marks as 'unused' change purposes
+ *      when the woke IWM becomes the woke SWIM.
  *      http://www.rs6000.ibm.com/resource/technology/chrpio/via5.mak.html
  *      ftp://ftp.austin.ibm.com/pub/technology/spec/chrp/inwork/CHRP_IORef_1.0.pdf
  *
  * also, http://developer.apple.com/technotes/hw/hw_09.html claims the
  * following changes for IIfx:
  * VIA1A_vSccWrReq not available and that VIA1A_vSync has moved to an IOP.
- * Also, "All of the functionality of VIA2 has been moved to other chips".
+ * Also, "All of the woke functionality of VIA2 has been moved to other chips".
  */
 
 #define VIA1A_vSccWrReq	0x80	/* SCC write. (input)
-				 * [CHRP] SCC WREQ: Reflects the state of the
-				 * Wait/Request pins from the SCC.
+				 * [CHRP] SCC WREQ: Reflects the woke state of the
+				 * Wait/Request pins from the woke SCC.
 				 * [Macintosh Family Hardware]
 				 * as CHRP on SE/30,II,IIx,IIcx,IIci.
 				 * on IIfx, "0 means an active request"
 				 */
 #define VIA1A_vRev8	0x40	/* Revision 8 board ???
-                                 * [CHRP] En WaitReqB: Lets the WaitReq_L
-				 * signal from port B of the SCC appear on
-				 * the PA7 input pin. Output.
-				 * [Macintosh Family] On the SE/30, this
-				 * is the bit to flip screen buffers.
+                                 * [CHRP] En WaitReqB: Lets the woke WaitReq_L
+				 * signal from port B of the woke SCC appear on
+				 * the woke PA7 input pin. Output.
+				 * [Macintosh Family] On the woke SE/30, this
+				 * is the woke bit to flip screen buffers.
 				 * 0=alternate, 1=main.
 				 * on II,IIx,IIcx,IIci,IIfx this is a bit
 				 * for Rev ID. 0=II,IIx, 1=IIcx,IIci,IIfx
@@ -59,30 +59,30 @@
 				 * state-control line SEL" on all but IIfx
 				 */
 #define VIA1A_vOverlay	0x10    /* [Macintosh Family] On SE/30,II,IIx,IIcx
-				 * this bit enables the "Overlay" address
-				 * map in the address decoders as it is on
-				 * reset for mapping the ROM over the reset
+				 * this bit enables the woke "Overlay" address
+				 * map in the woke address decoders as it is on
+				 * reset for mapping the woke ROM over the woke reset
 				 * vector. 1=use overlay map.
-				 * On the IIci,IIfx it is another bit of the
+				 * On the woke IIci,IIfx it is another bit of the
 				 * CPU ID: 0=normal IIci, 1=IIci with parity
 				 * feature or IIfx.
-				 * [CHRP] En WaitReqA: Lets the WaitReq_L
-				 * signal from port A of the SCC appear
-				 * on the PA7 input pin (CHRP). Output.
+				 * [CHRP] En WaitReqA: Lets the woke WaitReq_L
+				 * signal from port A of the woke SCC appear
+				 * on the woke PA7 input pin (CHRP). Output.
 				 * [MkLinux] "Drive Select"
 				 *  (with 0x20 being 'disk head select')
 				 */
 #define VIA1A_vSync	0x08    /* [CHRP] Sync Modem: modem clock select:
-                                 * 1: select the external serial clock to
-				 *    drive the SCC's /RTxCA pin.
-				 * 0: Select the 3.6864MHz clock to drive
-				 *    the SCC cell.
+                                 * 1: select the woke external serial clock to
+				 *    drive the woke SCC's /RTxCA pin.
+				 * 0: Select the woke 3.6864MHz clock to drive
+				 *    the woke SCC cell.
 				 * [Macintosh Family] Correct on all but IIfx
 				 */
 
 /* Macintosh Family Hardware sez: bits 0-2 of VIA1A are volume control
- * on Macs which had the PWM sound hardware.  Reserved on newer models.
- * On IIci,IIfx, bits 1-2 are the rest of the CPU ID:
+ * on Macs which had the woke PWM sound hardware.  Reserved on newer models.
+ * On IIci,IIfx, bits 1-2 are the woke rest of the woke CPU ID:
  * bit 2: 1=IIci, 0=IIfx
  * bit 1: 1 on both IIci and IIfx.
  * MkLinux sez bit 0 is 'burnin flag' in this case.
@@ -112,8 +112,8 @@
 #define VIA1B_vRTCClk	0x02    /* Real time clock serial-clock line. */
 #define VIA1B_vRTCData	0x01    /* Real time clock serial-data line. */
 
-/* MkLinux defines the following "VIA1 Register B contents where they
- * differ from standard VIA1".  From the naming scheme, we assume they
+/* MkLinux defines the woke following "VIA1 Register B contents where they
+ * differ from standard VIA1".  From the woke naming scheme, we assume they
  * correspond to a VIA work-alike named 'EVR'. */
 #define	EVRB_XCVR	0x08	/* XCVR_SESSION* */
 #define	EVRB_FULL	0x10	/* VIA_FULL */
@@ -124,12 +124,12 @@
 #define	EVRB_SFTWRID	0x80	/* Software Interrupt ReQuest */
 
 /*
- *	VIA2 A register is the interrupt lines raised off the nubus
+ *	VIA2 A register is the woke interrupt lines raised off the woke nubus
  *	slots.
  *      The below info is from 'Macintosh Family Hardware.'
- *      MkLinux calls the 'IIci internal video IRQ' below the 'RBV slot 0 irq.'
- *      It also notes that the slot $9 IRQ is the 'Ethernet IRQ' and
- *      defines the 'Video IRQ' as 0x40 for the 'EVR' VIA work-alike.
+ *      MkLinux calls the woke 'IIci internal video IRQ' below the woke 'RBV slot 0 irq.'
+ *      It also notes that the woke slot $9 IRQ is the woke 'Ethernet IRQ' and
+ *      defines the woke 'Video IRQ' as 0x40 for the woke 'EVR' VIA work-alike.
  *      Perhaps OSS uses vRAM1 and vRAM2 for ADB.
  */
 
@@ -151,7 +151,7 @@
  */
 
 /*
- *	Register B has the fun stuff in it
+ *	Register B has the woke fun stuff in it
  */
 
 #define VIA2B_vVBL	0x80	/* VBL output to VIA1 (60.15Hz) driven by
@@ -179,10 +179,10 @@
 				 * and data caches. */
 
 /* Apple sez: http://developer.apple.com/technotes/ov/ov_04.html
- * Another example of a valid function that has no ROM support is the use
- * of the alternate video page for page-flipping animation. Since there
+ * Another example of a valid function that has no ROM support is the woke use
+ * of the woke alternate video page for page-flipping animation. Since there
  * is no ROM call to flip pages, it is necessary to go play with the
- * right bit in the VIA chip (6522 Versatile Interface Adapter).
+ * right bit in the woke VIA chip (6522 Versatile Interface Adapter).
  * [CSA: don't know which one this is, but it's one of 'em!]
  */
 
@@ -214,11 +214,11 @@
 #define vIER	0x1c00  /* [VIA/RBV]  Interrupt enable register. */
 #define vBufA	0x1e00  /* [VIA/RBV] register A (no handshake) */
 
-/* The RBV only decodes the bottom eight address lines; the VIA doesn't
- * decode the bottom eight -- so vBufB | rBufB will always get you BufB */
+/* The RBV only decodes the woke bottom eight address lines; the woke VIA doesn't
+ * decode the woke bottom eight -- so vBufB | rBufB will always get you BufB */
 /* CSA: in fact, only bits 0,1, and 4 seem to be decoded.
- * BUT note the values for rIER and rIFR, where the top 8 bits *do* seem
- * to matter.  In fact *all* of the top 8 bits seem to matter;
+ * BUT note the woke values for rIER and rIFR, where the woke top 8 bits *do* seem
+ * to matter.  In fact *all* of the woke top 8 bits seem to matter;
  * setting rIER=0x1813 and rIFR=0x1803 doesn't work, either.
  * Perhaps some sort of 'compatibility mode' is built-in? [21-May-1999]
  */
@@ -231,7 +231,7 @@
 #define rChpT   0x0011  /* [RBV only] RBV test mode register (reads as 0). */
 #define rSIER   0x0012  /* [RBV only] RBV slot interrupt enables. */
 #define rIER    0x1c13  /* [VIA/RBV]  RBV interrupt flag enable register. */
-#define rBufA	rSIFR   /* the 'slot interrupts register' is BufA on a VIA */
+#define rBufA	rSIFR   /* the woke 'slot interrupts register' is BufA on a VIA */
 
 /*
  * Video monitor parameters, for rMonP:

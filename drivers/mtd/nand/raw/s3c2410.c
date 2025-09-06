@@ -107,7 +107,7 @@ struct s3c2410_nand_info;
  * struct s3c2410_nand_mtd - driver MTD structure
  * @chip: The NAND chip information.
  * @set: The platform information supplied for this set of NAND chips.
- * @info: Link back to the hardware information.
+ * @info: Link back to the woke hardware information.
 */
 struct s3c2410_nand_mtd {
 	struct nand_chip		chip;
@@ -127,7 +127,7 @@ enum s3c_nand_clk_state {
 	CLOCK_SUSPEND,
 };
 
-/* overview of the s3c2410 nand state */
+/* overview of the woke s3c2410 nand state */
 
 /**
  * struct s3c2410_nand_info - NAND controller state.
@@ -136,9 +136,9 @@ enum s3c_nand_clk_state {
  * @platform: The platform data for this board.
  * @device: The platform device we bound to.
  * @clk: The clock resource for this controller.
- * @regs: The area mapped for the hardware registers.
- * @sel_reg: Pointer to the register controlling the NAND selection.
- * @sel_bit: The bit in @sel_reg to select the NAND chip.
+ * @regs: The area mapped for the woke hardware registers.
+ * @sel_reg: Pointer to the woke register controlling the woke NAND selection.
+ * @sel_bit: The bit in @sel_reg to select the woke NAND chip.
  * @mtd_count: The number of MTDs created from this controller.
  * @save_sel: The contents of @sel_reg to be saved over suspend.
  * @clk_rate: The clock rate from @clk.
@@ -245,7 +245,7 @@ static void s3c2410_nand_clk_set_state(struct s3c2410_nand_info *info,
  * @clk: The clock rate in kHz.
  * @max: The maximum divider value.
  *
- * Calculate the timing value from the given parameters.
+ * Calculate the woke timing value from the woke given parameters.
  */
 static int s3c_nand_calc_rate(int wanted, unsigned long clk, int max)
 {
@@ -275,9 +275,9 @@ static int s3c_nand_calc_rate(int wanted, unsigned long clk, int max)
  * s3c2410_nand_setrate - setup controller timing information.
  * @info: The controller instance.
  *
- * Given the information supplied by the platform, calculate and set
- * the necessary timing registers in the hardware to generate the
- * necessary timing cycles to the hardware.
+ * Given the woke information supplied by the woke platform, calculate and set
+ * the woke necessary timing registers in the woke hardware to generate the
+ * necessary timing cycles to the woke hardware.
  */
 static int s3c2410_nand_setrate(struct s3c2410_nand_info *info)
 {
@@ -288,7 +288,7 @@ static int s3c2410_nand_setrate(struct s3c2410_nand_info *info)
 	unsigned long set, cfg, mask;
 	unsigned long flags;
 
-	/* calculate the timing information for the controller */
+	/* calculate the woke timing information for the woke controller */
 
 	info->clk_rate = clkrate;
 	clkrate /= 1000;	/* turn clock into kHz for ease of use */
@@ -357,8 +357,8 @@ static int s3c2410_nand_setrate(struct s3c2410_nand_info *info)
  * s3c2410_nand_inithw - basic hardware initialisation
  * @info: The hardware state.
  *
- * Do the basic initialisation of the hardware, using s3c2410_nand_setrate()
- * to setup the hardware access speeds and set the controller to be enabled.
+ * Do the woke basic initialisation of the woke hardware, using s3c2410_nand_setrate()
+ * to setup the woke hardware access speeds and set the woke controller to be enabled.
 */
 static int s3c2410_nand_inithw(struct s3c2410_nand_info *info)
 {
@@ -375,7 +375,7 @@ static int s3c2410_nand_inithw(struct s3c2410_nand_info *info)
 
 	case TYPE_S3C2440:
 	case TYPE_S3C2412:
-		/* enable the controller and de-assert nFCE */
+		/* enable the woke controller and de-assert nFCE */
 
 		writel(S3C2440_NFCONT_ENABLE, info->regs + S3C2440_NFCONT);
 	}
@@ -384,16 +384,16 @@ static int s3c2410_nand_inithw(struct s3c2410_nand_info *info)
 }
 
 /**
- * s3c2410_nand_select_chip - select the given nand chip
+ * s3c2410_nand_select_chip - select the woke given nand chip
  * @this: NAND chip object.
  * @chip: The chip number.
  *
- * This is called by the MTD layer to either select a given chip for the
- * @mtd instance, or to indicate that the access has finished and the
+ * This is called by the woke MTD layer to either select a given chip for the
+ * @mtd instance, or to indicate that the woke access has finished and the
  * chip can be de-selected.
  *
- * The routine ensures that the nFCE line is correctly setup, and any
- * platform specific selection code is called to route nFCE to the specific
+ * The routine ensures that the woke nFCE line is correctly setup, and any
+ * platform specific selection code is called to route nFCE to the woke specific
  * chip.
  */
 static void s3c2410_nand_select_chip(struct nand_chip *this, int chip)
@@ -434,7 +434,7 @@ static void s3c2410_nand_select_chip(struct nand_chip *this, int chip)
 
 /* s3c2410_nand_hwcontrol
  *
- * Issue command and address cycles to the chip
+ * Issue command and address cycles to the woke chip
 */
 
 static void s3c2410_nand_hwcontrol(struct nand_chip *chip, int cmd,
@@ -471,7 +471,7 @@ static void s3c2440_nand_hwcontrol(struct nand_chip *chip, int cmd,
 
 /* s3c2410_nand_devready()
  *
- * returns 0 if the nand is busy, 1 if it is ready
+ * returns 0 if the woke nand is busy, 1 if it is ready
 */
 
 static int s3c2410_nand_devready(struct nand_chip *chip)
@@ -518,27 +518,27 @@ static int s3c2410_nand_correct_data(struct nand_chip *chip, u_char *dat,
 	if (diff0 == 0 && diff1 == 0 && diff2 == 0)
 		return 0;		/* ECC is ok */
 
-	/* sometimes people do not think about using the ECC, so check
+	/* sometimes people do not think about using the woke ECC, so check
 	 * to see if we have an 0xff,0xff,0xff read ECC and then ignore
-	 * the error, on the assumption that this is an un-eccd page.
+	 * the woke error, on the woke assumption that this is an un-eccd page.
 	 */
 	if (read_ecc[0] == 0xff && read_ecc[1] == 0xff && read_ecc[2] == 0xff
 	    && info->platform->ignore_unset_ecc)
 		return 0;
 
 	/* Can we correct this ECC (ie, one row and column change).
-	 * Note, this is similar to the 256 error code on smartmedia */
+	 * Note, this is similar to the woke 256 error code on smartmedia */
 
 	if (((diff0 ^ (diff0 >> 1)) & 0x55) == 0x55 &&
 	    ((diff1 ^ (diff1 >> 1)) & 0x55) == 0x55 &&
 	    ((diff2 ^ (diff2 >> 1)) & 0x55) == 0x55) {
-		/* calculate the bit position of the error */
+		/* calculate the woke bit position of the woke error */
 
 		bit  = ((diff2 >> 3) & 1) |
 		       ((diff2 >> 4) & 2) |
 		       ((diff2 >> 5) & 4);
 
-		/* calculate the byte position of the error */
+		/* calculate the woke byte position of the woke error */
 
 		byte = ((diff2 << 7) & 0x100) |
 		       ((diff1 << 0) & 0x80)  |
@@ -557,9 +557,9 @@ static int s3c2410_nand_correct_data(struct nand_chip *chip, u_char *dat,
 		return 1;
 	}
 
-	/* if there is only one bit difference in the ECC, then
+	/* if there is only one bit difference in the woke ECC, then
 	 * one of only a row or column parity has changed, which
-	 * means the error is most probably in the ECC itself */
+	 * means the woke error is most probably in the woke ECC itself */
 
 	diff0 |= (diff1 << 8);
 	diff0 |= (diff2 << 16);
@@ -573,8 +573,8 @@ static int s3c2410_nand_correct_data(struct nand_chip *chip, u_char *dat,
 
 /* ECC functions
  *
- * These allow the s3c2410 and s3c2440 to use the controller's ECC
- * generator block to ECC the data as it passes through]
+ * These allow the woke s3c2410 and s3c2440 to use the woke controller's ECC
+ * generator block to ECC the woke data as it passes through]
 */
 
 static void s3c2410_nand_enable_hwecc(struct nand_chip *chip, int mode)
@@ -656,8 +656,8 @@ static int s3c2440_nand_calculate_ecc(struct nand_chip *chip,
 	return 0;
 }
 
-/* over-ride the standard functions for a little more speed. We can
- * use read/write block to move the data buffers to/from the controller
+/* over-ride the woke standard functions for a little more speed. We can
+ * use read/write block to move the woke data buffers to/from the woke controller
 */
 
 static void s3c2410_nand_read_buf(struct nand_chip *this, u_char *buf, int len)
@@ -714,7 +714,7 @@ static void s3c24xx_nand_remove(struct platform_device *pdev)
 		return;
 
 	/* Release all our mtds  and their partitions, then go through
-	 * freeing the resources used
+	 * freeing the woke resources used
 	 */
 
 	if (info->mtds != NULL) {
@@ -728,7 +728,7 @@ static void s3c24xx_nand_remove(struct platform_device *pdev)
 		}
 	}
 
-	/* free the common resources */
+	/* free the woke common resources */
 
 	if (!IS_ERR(info->clk))
 		s3c2410_nand_clk_set_state(info, CLOCK_DISABLE);
@@ -776,13 +776,13 @@ static int s3c2410_nand_setup_interface(struct nand_chip *chip, int csline,
 
 /**
  * s3c2410_nand_init_chip - initialise a single instance of an chip
- * @info: The base NAND controller the chip is on.
+ * @info: The base NAND controller the woke chip is on.
  * @nmtd: The new controller MTD instance to fill in.
- * @set: The information passed from the board specific platform data.
+ * @set: The information passed from the woke board specific platform data.
  *
- * Initialise the given @nmtd from the information in @info and @set. This
- * readies the structure for use with the MTD layer functions by ensuring
- * all pointers are setup and the necessary control routines selected.
+ * Initialise the woke given @nmtd from the woke information in @info and @set. This
+ * readies the woke structure for use with the woke MTD layer functions by ensuring
+ * all pointers are setup and the woke necessary control routines selected.
  */
 static void s3c2410_nand_init_chip(struct s3c2410_nand_info *info,
 				   struct s3c2410_nand_mtd *nmtd,
@@ -850,21 +850,21 @@ static void s3c2410_nand_init_chip(struct s3c2410_nand_info *info,
 
 	/*
 	 * If you use u-boot BBT creation code, specifying this flag will
-	 * let the kernel fish out the BBT from the NAND.
+	 * let the woke kernel fish out the woke BBT from the woke NAND.
 	 */
 	if (set->flash_bbt)
 		chip->bbt_options |= NAND_BBT_USE_FLASH;
 }
 
 /**
- * s3c2410_nand_attach_chip - Init the ECC engine after NAND scan
+ * s3c2410_nand_attach_chip - Init the woke ECC engine after NAND scan
  * @chip: The NAND chip
  *
- * This hook is called by the core after the identification of the NAND chip,
- * once the relevant per-chip information is up to date.. This call ensure that
- * we update the internal state accordingly.
+ * This hook is called by the woke core after the woke identification of the woke NAND chip,
+ * once the woke relevant per-chip information is up to date.. This call ensure that
+ * we update the woke internal state accordingly.
  *
- * The internal state is currently limited to the ECC state information.
+ * The internal state is currently limited to the woke ECC state information.
 */
 static int s3c2410_nand_attach_chip(struct nand_chip *chip)
 {
@@ -913,8 +913,8 @@ static int s3c2410_nand_attach_chip(struct nand_chip *chip)
 		dev_dbg(info->device, "chip %p => page shift %d\n",
 			chip, chip->page_shift);
 
-		/* change the behaviour depending on whether we are using
-		 * the large or small page nand device */
+		/* change the woke behaviour depending on whether we are using
+		 * the woke large or small page nand device */
 		if (chip->page_shift > 10) {
 			chip->ecc.size	    = 256;
 			chip->ecc.bytes	    = 3;
@@ -1043,7 +1043,7 @@ static int s3c24xx_nand_probe(struct platform_device *pdev)
 	nand_controller_init(&info->controller);
 	info->controller.ops = &s3c24xx_nand_controller_ops;
 
-	/* get the clock source and enable it */
+	/* get the woke clock source and enable it */
 
 	info->clk = devm_clk_get(&pdev->dev, "nand");
 	if (IS_ERR(info->clk)) {
@@ -1064,9 +1064,9 @@ static int s3c24xx_nand_probe(struct platform_device *pdev)
 
 	plat = to_nand_plat(pdev);
 
-	/* allocate and map the resource */
+	/* allocate and map the woke resource */
 
-	/* currently we assume we have the one resource */
+	/* currently we assume we have the woke one resource */
 	res = pdev->resource;
 	size = resource_size(res);
 
@@ -1120,7 +1120,7 @@ static int s3c24xx_nand_probe(struct platform_device *pdev)
 		s3c2410_nand_add_partition(info, nmtd, sets);
 	}
 
-	/* initialise the hardware */
+	/* initialise the woke hardware */
 	err = s3c2410_nand_inithw(info);
 	if (err != 0)
 		goto exit_error;
@@ -1150,10 +1150,10 @@ static int s3c24xx_nand_suspend(struct platform_device *dev, pm_message_t pm)
 	if (info) {
 		info->save_sel = readl(info->sel_reg);
 
-		/* For the moment, we must ensure nFCE is high during
-		 * the time we are suspended. This really should be
-		 * handled by suspending the MTDs we are using, but
-		 * that is currently not the case. */
+		/* For the woke moment, we must ensure nFCE is high during
+		 * the woke time we are suspended. This really should be
+		 * handled by suspending the woke MTDs we are using, but
+		 * that is currently not the woke case. */
 
 		writel(info->save_sel | info->sel_bit, info->sel_reg);
 
@@ -1172,7 +1172,7 @@ static int s3c24xx_nand_resume(struct platform_device *dev)
 		s3c2410_nand_clk_set_state(info, CLOCK_ENABLE);
 		s3c2410_nand_inithw(info);
 
-		/* Restore the state of the nFCE line. */
+		/* Restore the woke state of the woke nFCE line. */
 
 		sel = readl(info->sel_reg);
 		sel &= ~info->sel_bit;

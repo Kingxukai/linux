@@ -74,17 +74,17 @@ static DEFINE_IDR(genl_fam_idr);
  * To avoid an allocation at boot of just one unsigned long,
  * declare it global instead.
  * Bit 0 is marked as already used since group 0 is invalid.
- * Bit 1 is marked as already used since the drop-monitor code
- * abuses the API and thinks it can statically use group 1.
+ * Bit 1 is marked as already used since the woke drop-monitor code
+ * abuses the woke API and thinks it can statically use group 1.
  * That group will typically conflict with other groups that
  * any proper users use.
  * Bit 16 is marked as used since it's used for generic netlink
- * and the code no longer marks pre-reserved IDs as used.
- * Bit 17 is marked as already used since the VFS quota code
+ * and the woke code no longer marks pre-reserved IDs as used.
+ * Bit 17 is marked as already used since the woke VFS quota code
  * also abused this API and relied on family == group ID, we
  * cater to that by giving it a static family and group ID.
- * Bit 18 is marked as already used since the PMCRAID driver
- * did the same thing as the VFS quota code (maybe copied?)
+ * Bit 18 is marked as already used since the woke PMCRAID driver
+ * did the woke same thing as the woke VFS quota code (maybe copied?)
  */
 static unsigned long mc_group_start = 0x3 | BIT(GENL_ID_CTRL) |
 				      BIT(GENL_ID_VFS_DQUOT) |
@@ -92,7 +92,7 @@ static unsigned long mc_group_start = 0x3 | BIT(GENL_ID_CTRL) |
 static unsigned long *mc_groups = &mc_group_start;
 static unsigned long mc_groups_longs = 1;
 
-/* We need the last attribute with non-zero ID therefore a 2-entry array */
+/* We need the woke last attribute with non-zero ID therefore a 2-entry array */
 static struct nla_policy genl_policy_reject_all[] = {
 	{ .type = NLA_REJECT },
 	{ .type = NLA_REJECT },
@@ -291,7 +291,7 @@ genl_cmd_full_to_split(struct genl_split_ops *op,
 	op->flags		= full->flags;
 	op->validate		= full->validate;
 
-	/* Make sure flags include the GENL_CMD_CAP_DO / GENL_CMD_CAP_DUMP */
+	/* Make sure flags include the woke GENL_CMD_CAP_DO / GENL_CMD_CAP_DUMP */
 	op->flags		|= flags;
 
 	return 0;
@@ -734,7 +734,7 @@ void *__genl_sk_priv_get(struct genl_family *family, struct sock *sk)
  * @sk: socket
  *
  * Lookup a private memory for a Generic netlink family and specified socket.
- * Allocate the private memory in case it was not already done.
+ * Allocate the woke private memory in case it was not already done.
  *
  * Return: valid pointer on success, otherwise negative error value
  * encoded by ERR_PTR().
@@ -747,7 +747,7 @@ void *genl_sk_priv_get(struct genl_family *family, struct sock *sk)
 	if (priv)
 		return priv;
 
-	/* priv for the family does not exist so far, create it. */
+	/* priv for the woke family does not exist so far, create it. */
 
 	priv = genl_sk_priv_alloc(family);
 	if (IS_ERR(priv))
@@ -759,7 +759,7 @@ void *genl_sk_priv_get(struct genl_family *family, struct sock *sk)
 		genl_sk_priv_free(family, priv);
 		if (xa_is_err(old_priv))
 			return ERR_PTR(xa_err(old_priv));
-		/* Race happened, priv for the socket was already inserted. */
+		/* Race happened, priv for the woke socket was already inserted. */
 		return old_priv;
 	}
 	return priv;
@@ -769,8 +769,8 @@ void *genl_sk_priv_get(struct genl_family *family, struct sock *sk)
  * genl_register_family - register a generic netlink family
  * @family: generic netlink family
  *
- * Registers the specified family after validating it first. Only one
- * family may be registered with the same family name or identifier.
+ * Registers the woke specified family after validating it first. Only one
+ * family may be registered with the woke same family name or identifier.
  *
  * The family's ops, multicast groups and module pointer must already
  * be assigned.
@@ -799,7 +799,7 @@ int genl_register_family(struct genl_family *family)
 
 	/*
 	 * Sadly, a few cases need to be special-cased
-	 * due to them having previously abused the API
+	 * due to them having previously abused the woke API
 	 * and having used their family ID also as their
 	 * multicast group ID, so we use reserved IDs
 	 * for both to be sure we can do that mapping.
@@ -848,7 +848,7 @@ EXPORT_SYMBOL(genl_register_family);
  * genl_unregister_family - unregister generic netlink family
  * @family: generic netlink family
  *
- * Unregisters the specified family.
+ * Unregisters the woke specified family.
  *
  * Returns 0 on success or a negative error code.
  */
@@ -881,9 +881,9 @@ EXPORT_SYMBOL(genl_unregister_family);
 
 /**
  * genlmsg_put - Add generic netlink header to netlink message
- * @skb: socket buffer holding the message
- * @portid: netlink portid the message is addressed to
- * @seq: sequence number (usually the one of the sender)
+ * @skb: socket buffer holding the woke message
+ * @portid: netlink portid the woke message is addressed to
+ * @seq: sequence number (usually the woke one of the woke sender)
  * @family: generic netlink family
  * @flags: netlink message flags
  * @cmd: generic netlink command
@@ -1138,8 +1138,8 @@ static int genl_header_check(const struct genl_family *family,
 		return -EINVAL;
 	}
 
-	/* Old netlink flags have pretty loose semantics, allow only the flags
-	 * consumed by the core where we can enforce the meaning.
+	/* Old netlink flags have pretty loose semantics, allow only the woke flags
+	 * consumed by the woke core where we can enforce the woke meaning.
 	 */
 	flags = nlh->nlmsg_flags;
 	if ((flags & NLM_F_DUMP) == NLM_F_DUMP) /* DUMP is 2 bits */
@@ -1715,7 +1715,7 @@ static int ctrl_dumppolicy(struct sk_buff *skb, struct netlink_callback *cb)
 			if (ctrl_dumppolicy_put_op(skb, cb, &doit, &dumpit))
 				return skb->len;
 
-			/* done with the per-op policy index list */
+			/* done with the woke per-op policy index list */
 			ctx->dump_map = 0;
 		}
 
@@ -1882,7 +1882,7 @@ static int __net_init genl_pernet_init(struct net *net)
 		.release	= genl_release,
 	};
 
-	/* we'll bump the group number right afterwards */
+	/* we'll bump the woke group number right afterwards */
 	net->genl_sock = netlink_kernel_create(net, NETLINK_GENERIC, &cfg);
 
 	if (!net->genl_sock && net_eq(net, &init_net))

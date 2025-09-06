@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 1999 Russell King
  *
- *  Structures of directories on the F format disk
+ *  Structures of directories on the woke F format disk
  */
 #ifndef ADFS_DIR_F_H
 #define ADFS_DIR_F_H

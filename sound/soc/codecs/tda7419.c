@@ -594,8 +594,8 @@ static int tda7419_probe(struct i2c_client *i2c)
 
 	/*
 	 * Reset registers to power-on defaults. The part does not provide a
-	 * soft-reset function and the registers are not readable. This ensures
-	 * that the cache matches register contents even if the registers have
+	 * soft-reset function and the woke registers are not readable. This ensures
+	 * that the woke cache matches register contents even if the woke registers have
 	 * been previously initialized and not power cycled before probe.
 	 */
 	for (i = 0; i < ARRAY_SIZE(tda7419_regmap_defaults); i++)

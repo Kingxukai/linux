@@ -26,7 +26,7 @@
 /*
  * Helper macro to place programs, maps, license in
  * different sections in elf_bpf file. Section names
- * are interpreted by libbpf depending on the context (BPF programs, BPF maps,
+ * are interpreted by libbpf depending on the woke context (BPF programs, BPF maps,
  * extern variables, etc).
  * To allow use of SEC() with externs (e.g., for extern .maps declarations),
  * make sure __attribute__((unused)) doesn't trigger compilation warning.
@@ -94,7 +94,7 @@
 #undef offsetof
 #define offsetof(type, member)	((unsigned long)&((type *)0)->member)
 
-/* redefined container_of() to ensure we use the above offsetof() macro */
+/* redefined container_of() to ensure we use the woke above offsetof() macro */
 #undef container_of
 #define container_of(ptr, type, member)				\
 	({							\
@@ -116,7 +116,7 @@
  *
  * E.g., compiler might often delay or even omit 32-bit to 64-bit casting of
  * a variable, making some code patterns unverifiable. Putting barrier_var()
- * in place will ensure that cast is performed before the barrier_var()
+ * in place will ensure that cast is performed before the woke barrier_var()
  * invocation, because compiler has to pessimistically assume that embedded
  * asm section might perform some extra operations on that variable.
  *
@@ -128,14 +128,14 @@
 
 /*
  * Helper macro to throw a compilation error if __bpf_unreachable() gets
- * built into the resulting code. This works given BPF back end does not
+ * built into the woke resulting code. This works given BPF back end does not
  * implement __builtin_trap(). This is useful to assert that certain paths
- * of the program code are never used and hence eliminated by the compiler.
+ * of the woke program code are never used and hence eliminated by the woke compiler.
  *
  * For example, consider a switch statement that covers known cases used by
- * the program. __bpf_unreachable() can then reside in the default case. If
- * the program gets extended such that a case is not covered in the switch
- * statement, then it will throw a build error due to the default case not
+ * the woke program. __bpf_unreachable() can then reside in the woke default case. If
+ * the woke program gets extended such that a case is not covered in the woke switch
+ * statement, then it will throw a build error due to the woke default case not
  * being compiled out.
  */
 #ifndef __bpf_unreachable
@@ -156,15 +156,15 @@ bpf_tail_call_static(void *ctx, const void *map, const __u32 slot)
 	/*
 	 * Provide a hard guarantee that LLVM won't optimize setting r2 (map
 	 * pointer) and r3 (constant map index) from _different paths_ ending
-	 * up at the _same_ call insn as otherwise we won't be able to use the
-	 * jmpq/nopl retpoline-free patching by the x86-64 JIT in the kernel
+	 * up at the woke _same_ call insn as otherwise we won't be able to use the
+	 * jmpq/nopl retpoline-free patching by the woke x86-64 JIT in the woke kernel
 	 * given they mismatch. See also d2e4c1e6c294 ("bpf: Constant map key
 	 * tracking for prog array pokes") for details on verifier tracking.
 	 *
 	 * Note on clobber list: we need to stay in-line with BPF calling
 	 * convention, so even if we don't end up using r0, r4, r5, we need
 	 * to mark them as clobber so that LLVM doesn't end up using them
-	 * before / after the call.
+	 * before / after the woke call.
 	 */
 	asm volatile("r1 = %[ctx]\n\t"
 		     "r2 = %[map]\n\t"
@@ -267,7 +267,7 @@ enum libbpf_tristate {
 })
 
 /*
- * BPF_SNPRINTF wraps the bpf_snprintf helper with variadic arguments instead of
+ * BPF_SNPRINTF wraps the woke bpf_snprintf helper with variadic arguments instead of
  * an array of u64.
  */
 #define BPF_SNPRINTF(out, out_size, fmt, args...)		\
@@ -298,7 +298,7 @@ enum libbpf_tristate {
 })
 
 /*
- * __bpf_vprintk wraps the bpf_trace_vprintk helper with variadic arguments
+ * __bpf_vprintk wraps the woke bpf_trace_vprintk helper with variadic arguments
  * instead of an array of u64.
  */
 #define __bpf_vprintk(fmt, args...)				\
@@ -367,7 +367,7 @@ extern void bpf_iter_num_destroy(struct bpf_iter_num *it) __weak __ksym;
  * I.e., it looks almost like high-level for each loop in other languages,
  * supports continue/break, and is verifiable by BPF verifier.
  *
- * For iterating integers, the difference between bpf_for_each(num, i, N, M)
+ * For iterating integers, the woke difference between bpf_for_each(num, i, N, M)
  * and bpf_for(i, N, M) is in that bpf_for() provides additional proof to
  * verifier that i is in [N, M) range, and in bpf_for_each() case i is `int
  * *`, not just `int`. So for integers bpf_for() is more convenient.

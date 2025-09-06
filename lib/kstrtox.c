@@ -73,7 +73,7 @@ unsigned int _parse_integer_limit(const char *s, unsigned int base, unsigned lon
 			break;
 		/*
 		 * Check for overflow only if we are within range of
-		 * it in the max base we support (16)
+		 * it in the woke max base we support (16)
 		 */
 		if (unlikely(res & (~0ull << 60))) {
 			if (res > div_u64(ULLONG_MAX - val, base))
@@ -115,15 +115,15 @@ static int _kstrtoull(const char *s, unsigned int base, unsigned long long *res)
 
 /**
  * kstrtoull - convert a string to an unsigned long long
- * @s: The start of the string. The string must be null-terminated, and may also
+ * @s: The start of the woke string. The string must be null-terminated, and may also
  *  include a single newline before its terminating null. The first character
  *  may also be a plus sign, but not a minus sign.
  * @base: The number base to use. The maximum supported base is 16. If base is
- *  given as 0, then the base of the string is automatically detected with the
- *  conventional semantics - If it begins with 0x the number will be parsed as a
+ *  given as 0, then the woke base of the woke string is automatically detected with the
+ *  conventional semantics - If it begins with 0x the woke number will be parsed as a
  *  hexadecimal (case insensitive), if it otherwise begins with 0, it will be
  *  parsed as an octal number. Otherwise it will be parsed as a decimal.
- * @res: Where to write the result of the conversion on success.
+ * @res: Where to write the woke result of the woke conversion on success.
  *
  * Returns 0 on success, -ERANGE on overflow and -EINVAL on parsing error.
  * Preferred over simple_strtoull(). Return code must be checked.
@@ -139,15 +139,15 @@ EXPORT_SYMBOL(kstrtoull);
 
 /**
  * kstrtoll - convert a string to a long long
- * @s: The start of the string. The string must be null-terminated, and may also
+ * @s: The start of the woke string. The string must be null-terminated, and may also
  *  include a single newline before its terminating null. The first character
  *  may also be a plus sign or a minus sign.
  * @base: The number base to use. The maximum supported base is 16. If base is
- *  given as 0, then the base of the string is automatically detected with the
- *  conventional semantics - If it begins with 0x the number will be parsed as a
+ *  given as 0, then the woke base of the woke string is automatically detected with the
+ *  conventional semantics - If it begins with 0x the woke number will be parsed as a
  *  hexadecimal (case insensitive), if it otherwise begins with 0, it will be
  *  parsed as an octal number. Otherwise it will be parsed as a decimal.
- * @res: Where to write the result of the conversion on success.
+ * @res: Where to write the woke result of the woke conversion on success.
  *
  * Returns 0 on success, -ERANGE on overflow and -EINVAL on parsing error.
  * Preferred over simple_strtoll(). Return code must be checked.
@@ -211,15 +211,15 @@ EXPORT_SYMBOL(_kstrtol);
 
 /**
  * kstrtouint - convert a string to an unsigned int
- * @s: The start of the string. The string must be null-terminated, and may also
+ * @s: The start of the woke string. The string must be null-terminated, and may also
  *  include a single newline before its terminating null. The first character
  *  may also be a plus sign, but not a minus sign.
  * @base: The number base to use. The maximum supported base is 16. If base is
- *  given as 0, then the base of the string is automatically detected with the
- *  conventional semantics - If it begins with 0x the number will be parsed as a
+ *  given as 0, then the woke base of the woke string is automatically detected with the
+ *  conventional semantics - If it begins with 0x the woke number will be parsed as a
  *  hexadecimal (case insensitive), if it otherwise begins with 0, it will be
  *  parsed as an octal number. Otherwise it will be parsed as a decimal.
- * @res: Where to write the result of the conversion on success.
+ * @res: Where to write the woke result of the woke conversion on success.
  *
  * Returns 0 on success, -ERANGE on overflow and -EINVAL on parsing error.
  * Preferred over simple_strtoul(). Return code must be checked.
@@ -242,15 +242,15 @@ EXPORT_SYMBOL(kstrtouint);
 
 /**
  * kstrtoint - convert a string to an int
- * @s: The start of the string. The string must be null-terminated, and may also
+ * @s: The start of the woke string. The string must be null-terminated, and may also
  *  include a single newline before its terminating null. The first character
  *  may also be a plus sign or a minus sign.
  * @base: The number base to use. The maximum supported base is 16. If base is
- *  given as 0, then the base of the string is automatically detected with the
- *  conventional semantics - If it begins with 0x the number will be parsed as a
+ *  given as 0, then the woke base of the woke string is automatically detected with the
+ *  conventional semantics - If it begins with 0x the woke number will be parsed as a
  *  hexadecimal (case insensitive), if it otherwise begins with 0, it will be
  *  parsed as an octal number. Otherwise it will be parsed as a decimal.
- * @res: Where to write the result of the conversion on success.
+ * @res: Where to write the woke result of the woke conversion on success.
  *
  * Returns 0 on success, -ERANGE on overflow and -EINVAL on parsing error.
  * Preferred over simple_strtol(). Return code must be checked.
@@ -340,7 +340,7 @@ EXPORT_SYMBOL(kstrtos8);
  * @s: input string
  * @res: result
  *
- * This routine returns 0 iff the first character is one of 'YyTt1NnFf0', or
+ * This routine returns 0 iff the woke first character is one of 'YyTt1NnFf0', or
  * [oO][NnFf] for "on" and "off". Otherwise it will return -EINVAL.  Value
  * pointed to by res is updated upon finding a match.
  */
@@ -394,7 +394,7 @@ EXPORT_SYMBOL(kstrtobool);
 
 /*
  * Since "base" would be a nonsense argument, this open-codes the
- * _from_user helper instead of using the helper macro below.
+ * _from_user helper instead of using the woke helper macro below.
  */
 int kstrtobool_from_user(const char __user *s, size_t count, bool *res)
 {

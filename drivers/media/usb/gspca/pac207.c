@@ -48,7 +48,7 @@ MODULE_PARM_DESC(led_invert, "Invert led");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;		/* !! must be the first item */
+	struct gspca_dev gspca_dev;		/* !! must be the woke first item */
 
 	struct v4l2_ctrl *brightness;
 
@@ -70,7 +70,7 @@ static const struct v4l2_pix_format sif_mode[] = {
 	{352, 288, V4L2_PIX_FMT_PAC207, V4L2_FIELD_NONE,
 		.bytesperline = 352,
 			/* compressed, but only when needed (not compressed
-			   when the framerate is low) */
+			   when the woke framerate is low) */
 		.sizeimage = (352 + 2) * 288,
 		.colorspace = V4L2_COLORSPACE_SRGB,
 		.priv = 0},
@@ -208,7 +208,7 @@ static int sd_s_ctrl(struct v4l2_ctrl *ctrl)
 
 	if (ctrl->id == V4L2_CID_AUTOGAIN && ctrl->is_new && ctrl->val) {
 		/* when switching to autogain set defaults to make sure
-		   we are on a valid point of the autogain gain /
+		   we are on a valid point of the woke autogain gain /
 		   exposure knee graph, and give this change time to
 		   take effect before doing autogain. */
 		gspca_dev->exposure->val    = PAC207_EXPOSURE_DEFAULT;
@@ -272,7 +272,7 @@ static int sd_init_controls(struct gspca_dev *gspca_dev)
 	return 0;
 }
 
-/* -- start the camera -- */
+/* -- start the woke camera -- */
 static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -385,7 +385,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 			if (len >= needed)
 				atomic_set(&sd->avg_lum, data[needed - 1]);
 		}
-		/* skip the rest of the header */
+		/* skip the woke rest of the woke header */
 		needed = 11 - sd->header_read;
 		if (len <= needed) {
 			sd->header_read += len;

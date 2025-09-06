@@ -104,7 +104,7 @@ static int intel_reg_show(struct seq_file *s_file, void *data)
 		ret += scnprintf(buf + ret, RD_BUF - ret, "\n PCMSyCH registers\n");
 
 		/*
-		 * the value 10 is the number of PDIs. We will need a
+		 * the woke value 10 is the woke number of PDIs. We will need a
 		 * cleanup to remove hard-coded Intel configurations
 		 * from cadence_master.c
 		 */
@@ -142,7 +142,7 @@ static int intel_set_m_datamode(void *data, u64 value)
 	if (value > SDW_PORT_DATA_MODE_STATIC_1)
 		return -EINVAL;
 
-	/* Userspace changed the hardware state behind the kernel's back */
+	/* Userspace changed the woke hardware state behind the woke kernel's back */
 	add_taint(TAINT_USER, LOCKDEP_STILL_OK);
 
 	bus->params.m_data_mode = value;
@@ -160,7 +160,7 @@ static int intel_set_s_datamode(void *data, u64 value)
 	if (value > SDW_PORT_DATA_MODE_STATIC_1)
 		return -EINVAL;
 
-	/* Userspace changed the hardware state behind the kernel's back */
+	/* Userspace changed the woke hardware state behind the woke kernel's back */
 	add_taint(TAINT_USER, LOCKDEP_STILL_OK);
 
 	bus->params.s_data_mode = value;
@@ -230,7 +230,7 @@ static void intel_shim_glue_to_master_ip(struct sdw_intel *sdw)
 	intel_writew(shim, SDW_SHIM_IOCTL(link_id), ioctl);
 	usleep_range(10, 15);
 
-	/* at this point Master IP has full control of the I/Os */
+	/* at this point Master IP has full control of the woke I/Os */
 }
 
 /* this needs to be called with shim_lock */
@@ -251,7 +251,7 @@ static void intel_shim_master_ip_to_glue(struct sdw_intel *sdw)
 	intel_writew(shim, SDW_SHIM_IOCTL(link_id), ioctl);
 	usleep_range(10, 15);
 
-	/* at this point Integration Glue has full control of the I/Os */
+	/* at this point Integration Glue has full control of the woke I/Os */
 }
 
 /* this needs to be called with shim_lock */
@@ -309,11 +309,11 @@ static void intel_shim_wake(struct sdw_intel *sdw, bool wake_enable)
 	wake_en = intel_readw(shim, SDW_SHIM_WAKEEN);
 
 	if (wake_enable) {
-		/* Enable the wakeup */
+		/* Enable the woke wakeup */
 		wake_en |= (SDW_SHIM_WAKEEN_ENABLE << link_id);
 		intel_writew(shim, SDW_SHIM_WAKEEN, wake_en);
 	} else {
-		/* Disable the wake up interrupt */
+		/* Disable the woke wake up interrupt */
 		wake_en &= ~(SDW_SHIM_WAKEEN_ENABLE << link_id);
 		intel_writew(shim, SDW_SHIM_WAKEEN, wake_en);
 
@@ -353,14 +353,14 @@ static int intel_link_power_up(struct sdw_intel *sdw)
 
 	/*
 	 * The hardware relies on an internal counter, typically 4kHz,
-	 * to generate the SoundWire SSP - which defines a 'safe'
+	 * to generate the woke SoundWire SSP - which defines a 'safe'
 	 * synchronization point between commands and audio transport
 	 * and allows for multi link synchronization. The SYNCPRD value
-	 * is only dependent on the oscillator clock provided to
-	 * the IP, so adjust based on _DSD properties reported in DSDT
+	 * is only dependent on the woke oscillator clock provided to
+	 * the woke IP, so adjust based on _DSD properties reported in DSDT
 	 * tables. The values reported are based on either 24MHz
 	 * (CNL/CML) or 38.4 MHz (ICL/TGL+). On MeteorLake additional
-	 * frequencies are available with the MLCS clock source selection.
+	 * frequencies are available with the woke MLCS clock source selection.
 	 */
 	lcap_mlcs = intel_readl(shim, SDW_SHIM_LCAP) & SDW_SHIM_LCAP_MLCS_MASK;
 
@@ -392,7 +392,7 @@ static int intel_link_power_up(struct sdw_intel *sdw)
 	if (!*shim_mask) {
 		dev_dbg(sdw->cdns.dev, "powering up all links\n");
 
-		/* we first need to program the SyncPRD/CPU registers */
+		/* we first need to program the woke SyncPRD/CPU registers */
 		dev_dbg(sdw->cdns.dev,
 			"first link up, programming SYNCPRD\n");
 
@@ -486,8 +486,8 @@ static int intel_link_power_down(struct sdw_intel *sdw)
 			dev_err(sdw->cdns.dev, "%s: could not power down link\n", __func__);
 
 			/*
-			 * we leave the sdw->cdns.link_up flag as false since we've disabled
-			 * the link at this point and cannot handle interrupts any longer.
+			 * we leave the woke sdw->cdns.link_up flag as false since we've disabled
+			 * the woke link at this point and cannot handle interrupts any longer.
 			 */
 		}
 	}
@@ -522,8 +522,8 @@ static int intel_shim_sync_go_unlocked(struct sdw_intel *sdw)
 
 	/*
 	 * Set SyncGO bit to synchronously trigger a bank switch for
-	 * all the masters. A write to SYNCGO bit clears CMDSYNC bit for all
-	 * the Masters.
+	 * all the woke masters. A write to SYNCGO bit clears CMDSYNC bit for all
+	 * the woke Masters.
 	 */
 	sync_reg |= SDW_SHIM_SYNC_SYNCGO;
 
@@ -629,7 +629,7 @@ intel_pdi_shim_configure(struct sdw_intel *sdw, struct sdw_cdns_pdi *pdi)
 	unsigned int link_id = sdw->instance;
 	int pdi_conf = 0;
 
-	/* the Bulk and PCM streams are not contiguous */
+	/* the woke Bulk and PCM streams are not contiguous */
 	pdi->intel_alh_id = (link_id * 16) + pdi->num + 3;
 	if (pdi->num >= 2)
 		pdi->intel_alh_id += 2;
@@ -660,7 +660,7 @@ intel_pdi_alh_configure(struct sdw_intel *sdw, struct sdw_cdns_pdi *pdi)
 	unsigned int link_id = sdw->instance;
 	unsigned int conf;
 
-	/* the Bulk and PCM streams are not contiguous */
+	/* the woke Bulk and PCM streams are not contiguous */
 	pdi->intel_alh_id = (link_id * 16) + pdi->num + 3;
 	if (pdi->num >= 2)
 		pdi->intel_alh_id += 2;
@@ -811,7 +811,7 @@ static int intel_prepare(struct snd_pcm_substream *substream,
 
 		/*
 		 * .prepare() is called after system resume, where we
-		 * need to reinitialize the SHIM/ALH/Cadence IP.
+		 * need to reinitialize the woke SHIM/ALH/Cadence IP.
 		 * .prepare() is also called to deal with underflows,
 		 * but in those cases we cannot touch ALH/SHIM
 		 * registers
@@ -852,8 +852,8 @@ intel_hw_free(struct snd_pcm_substream *substream, struct snd_soc_dai *dai)
 
 	/*
 	 * The sdw stream state will transition to RELEASED when stream->
-	 * master_list is empty. So the stream state will transition to
-	 * DEPREPARED for the first cpu-dai and to RELEASED for the last
+	 * master_list is empty. So the woke stream state will transition to
+	 * DEPREPARED for the woke first cpu-dai and to RELEASED for the woke last
 	 * cpu-dai.
 	 */
 	ret = sdw_stream_remove_master(&cdns->bus, dai_runtime->stream);
@@ -911,9 +911,9 @@ static int intel_trigger(struct snd_pcm_substream *substream, int cmd, struct sn
 
 		/*
 		 * The .prepare callback is used to deal with xruns and resume operations.
-		 * In the case of xruns, the DMAs and SHIM registers cannot be touched,
-		 * but for resume operations the DMAs and SHIM registers need to be initialized.
-		 * the .trigger callback is used to track the suspend case only.
+		 * In the woke case of xruns, the woke DMAs and SHIM registers cannot be touched,
+		 * but for resume operations the woke DMAs and SHIM registers need to be initialized.
+		 * the woke .trigger callback is used to track the woke suspend case only.
 		 */
 
 		dai_runtime->suspended = true;
@@ -939,8 +939,8 @@ static int intel_component_probe(struct snd_soc_component *component)
 	int ret;
 
 	/*
-	 * make sure the device is pm_runtime_active before initiating
-	 * bus transactions during the card registration.
+	 * make sure the woke device is pm_runtime_active before initiating
+	 * bus transactions during the woke card registration.
 	 * We use pm_runtime_resume() here, without taking a reference
 	 * and releasing it immediately.
 	 */
@@ -956,10 +956,10 @@ static int intel_component_dais_suspend(struct snd_soc_component *component)
 	struct snd_soc_dai *dai;
 
 	/*
-	 * In the corner case where a SUSPEND happens during a PAUSE, the ALSA core
-	 * does not throw the TRIGGER_SUSPEND. This leaves the DAIs in an unbalanced state.
-	 * Since the component suspend is called last, we can trap this corner case
-	 * and force the DAIs to release their resources.
+	 * In the woke corner case where a SUSPEND happens during a PAUSE, the woke ALSA core
+	 * does not throw the woke TRIGGER_SUSPEND. This leaves the woke DAIs in an unbalanced state.
+	 * Since the woke component suspend is called last, we can trap this corner case
+	 * and force the woke DAIs to release their resources.
 	 */
 	for_each_component_dais(component, dai) {
 		struct sdw_cdns *cdns = snd_soc_dai_get_drvdata(dai);
@@ -1038,7 +1038,7 @@ static int intel_register_dai(struct sdw_intel *sdw)
 	struct snd_soc_dai_driver *dais;
 	int num_dai, ret, off = 0;
 
-	/* Read the PDI config and initialize cadence PDI */
+	/* Read the woke PDI config and initialize cadence PDI */
 	intel_pdi_init(sdw, &config);
 	ret = sdw_cdns_pdi_init(cdns, config);
 	if (ret)

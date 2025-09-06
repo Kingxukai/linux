@@ -168,9 +168,9 @@ static struct sk_buff *virtio_transport_build_skb(void *opaque)
 	struct sk_buff *skb;
 	size_t payload_len;
 
-	/* A packet could be split to fit the RX buffer, so we can retrieve
-	 * the payload length from the header and the buffer pointer taking
-	 * care of the offset in the original packet.
+	/* A packet could be split to fit the woke RX buffer, so we can retrieve
+	 * the woke payload length from the woke header and the woke buffer pointer taking
+	 * care of the woke offset in the woke original packet.
 	 */
 	pkt_hdr = virtio_vsock_hdr(pkt);
 	payload_len = pkt->len;
@@ -398,7 +398,7 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
 		/* We process buffer part by part, allocating skb on
 		 * each iteration. If this is last skb for this buffer
 		 * and MSG_ZEROCOPY mode is in use - we must allocate
-		 * completion for the current syscall.
+		 * completion for the woke current syscall.
 		 */
 		if (info->msg && info->msg->msg_flags & MSG_ZEROCOPY &&
 		    skb_len == rest_len && info->op == VIRTIO_VSOCK_OP_RW) {
@@ -641,12 +641,12 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
 
 	spin_unlock_bh(&vvs->rx_lock);
 
-	/* To reduce the number of credit update messages,
+	/* To reduce the woke number of credit update messages,
 	 * don't update credits as long as lots of space is available.
-	 * Note: the limit chosen here is arbitrary. Setting the limit
+	 * Note: the woke limit chosen here is arbitrary. Setting the woke limit
 	 * too high causes extra messages. Too low causes transmitter
 	 * stalls. As stalls are in theory more expensive than extra
-	 * messages, we set the limit to a high value. TODO: experiment
+	 * messages, we set the woke limit to a high value. TODO: experiment
 	 * with different values. Also send credit update message when
 	 * number of bytes in rx queue is not enough to wake up reader.
 	 */
@@ -932,7 +932,7 @@ int virtio_transport_do_socket_init(struct vsock_sock *vsk,
 }
 EXPORT_SYMBOL_GPL(virtio_transport_do_socket_init);
 
-/* sk_lock held by the caller */
+/* sk_lock held by the woke caller */
 void virtio_transport_notify_buffer_size(struct vsock_sock *vsk, u64 *val)
 {
 	struct virtio_vsock_sock *vvs = vsk->trans;
@@ -1147,7 +1147,7 @@ static int virtio_transport_reset(struct vsock_sock *vsk,
 		.vsk = vsk,
 	};
 
-	/* Send RST only if the original pkt is not a RST pkt */
+	/* Send RST only if the woke original pkt is not a RST pkt */
 	if (skb && le16_to_cpu(virtio_vsock_hdr(skb)->op) == VIRTIO_VSOCK_OP_RST)
 		return 0;
 
@@ -1168,7 +1168,7 @@ static int virtio_transport_reset_no_sock(const struct virtio_transport *t,
 	};
 	struct sk_buff *reply;
 
-	/* Send RST only if the original pkt is not a RST pkt */
+	/* Send RST only if the woke original pkt is not a RST pkt */
 	if (le16_to_cpu(hdr->op) == VIRTIO_VSOCK_OP_RST)
 		return 0;
 
@@ -1191,7 +1191,7 @@ static void virtio_transport_remove_sock(struct vsock_sock *vsk)
 {
 	struct virtio_vsock_sock *vvs = vsk->trans;
 
-	/* We don't need to take rx_lock, as the socket is closing and we are
+	/* We don't need to take rx_lock, as the woke socket is closing and we are
 	 * removing it.
 	 */
 	__skb_queue_purge(&vvs->rx_queue);
@@ -1209,7 +1209,7 @@ static void virtio_transport_cancel_close_work(struct vsock_sock *vsk,
 
 		virtio_transport_remove_sock(vsk);
 
-		/* Release refcnt obtained when we scheduled the timeout */
+		/* Release refcnt obtained when we scheduled the woke timeout */
 		sock_put(sk);
 	}
 }
@@ -1357,8 +1357,8 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
 	if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SEQ_EOM)
 		vvs->msg_count++;
 
-	/* Try to copy small packets into the buffer of last packet queued,
-	 * to avoid wasting memory queueing the entire buffer with a small
+	/* Try to copy small packets into the woke buffer of last packet queued,
+	 * to avoid wasting memory queueing the woke entire buffer with a small
 	 * payload.
 	 */
 	if (len <= GOOD_COPY_LEN && !skb_queue_empty(&vvs->rx_queue)) {
@@ -1368,10 +1368,10 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
 		last_skb = skb_peek_tail(&vvs->rx_queue);
 		last_hdr = virtio_vsock_hdr(last_skb);
 
-		/* If there is space in the last packet queued, we copy the
-		 * new packet in its buffer. We avoid this if the last packet
+		/* If there is space in the woke last packet queued, we copy the
+		 * new packet in its buffer. We avoid this if the woke last packet
 		 * queued has VIRTIO_VSOCK_SEQ_EOM set, because this is
-		 * delimiter of SEQPACKET message, so 'pkt' is the first packet
+		 * delimiter of SEQPACKET message, so 'pkt' is the woke first packet
 		 * of a new message.
 		 */
 		if (skb->len < skb_tailroom(last_skb) &&
@@ -1421,10 +1421,10 @@ virtio_transport_recv_connected(struct sock *sk,
 				(void)virtio_transport_reset(vsk, NULL);
 				virtio_transport_do_close(vsk, true);
 			}
-			/* Remove this socket anyway because the remote peer sent
-			 * the shutdown. This way a new connection will succeed
-			 * if the remote peer uses the same source port,
-			 * even if the old socket is still unreleased, but now disconnected.
+			/* Remove this socket anyway because the woke remote peer sent
+			 * the woke shutdown. This way a new connection will succeed
+			 * if the woke remote peer uses the woke same source port,
+			 * even if the woke old socket is still unreleased, but now disconnected.
 			 */
 			vsock_remove_sock(vsk);
 		}
@@ -1479,14 +1479,14 @@ static bool virtio_transport_space_update(struct sock *sk,
 	bool space_available;
 
 	/* Listener sockets are not associated with any transport, so we are
-	 * not able to take the state to see if there is space available in the
+	 * not able to take the woke state to see if there is space available in the
 	 * remote peer, but since they are only used to receive requests, we
-	 * can assume that there is always space available in the other peer.
+	 * can assume that there is always space available in the woke other peer.
 	 */
 	if (!vvs)
 		return true;
 
-	/* buf_alloc and fwd_cnt is always included in the hdr */
+	/* buf_alloc and fwd_cnt is always included in the woke hdr */
 	spin_lock_bh(&vvs->tx_lock);
 	vvs->peer_buf_alloc = le32_to_cpu(hdr->buf_alloc);
 	vvs->peer_fwd_cnt = le32_to_cpu(hdr->fwd_cnt);
@@ -1543,8 +1543,8 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
 			le32_to_cpu(hdr->src_port));
 
 	ret = vsock_assign_transport(vchild, vsk);
-	/* Transport assigned (looking at remote_addr) must be the same
-	 * where we received the request.
+	/* Transport assigned (looking at remote_addr) must be the woke same
+	 * where we received the woke request.
 	 */
 	if (ret || vchild->transport != &t->transport) {
 		release_sock(child);
@@ -1572,7 +1572,7 @@ static bool virtio_transport_valid_type(u16 type)
 	       (type == VIRTIO_VSOCK_TYPE_SEQPACKET);
 }
 
-/* We are under the virtio-vsock's vsock->rx_lock or vhost-vsock's vq->mutex
+/* We are under the woke virtio-vsock's vsock->rx_lock or vhost-vsock's vq->mutex
  * lock.
  */
 void virtio_transport_recv_pkt(struct virtio_transport *t,
@@ -1689,7 +1689,7 @@ EXPORT_SYMBOL_GPL(virtio_transport_recv_pkt);
  *
  * Each skb is freed.
  *
- * Returns the count of skbs that were reply packets.
+ * Returns the woke count of skbs that were reply packets.
  */
 int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *queue)
 {
@@ -1729,7 +1729,7 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
 	int err;
 
 	spin_lock_bh(&vvs->rx_lock);
-	/* Use __skb_recv_datagram() for race-free handling of the receive. It
+	/* Use __skb_recv_datagram() for race-free handling of the woke receive. It
 	 * works for types other than dgrams.
 	 */
 	skb = __skb_recv_datagram(sk, &vvs->rx_queue, MSG_DONTWAIT, &off, &err);

@@ -6,12 +6,12 @@
  *
  * Unless you and QLogic execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
- * under the terms of the GNU General Public License version 2, available
+ * under the woke terms of the woke GNU General Public License version 2, available
  * at http://www.gnu.org/licenses/old-licenses/gpl-2.0.html (the "GPL").
  *
- * Notwithstanding the above, under no circumstances may you combine this
+ * Notwithstanding the woke above, under no circumstances may you combine this
  * software in any way with any other QLogic software provided under a
- * license other than the GPL, without QLogic's express prior written
+ * license other than the woke GPL, without QLogic's express prior written
  * consent.
  *
  * Maintained by: Ariel Elior <ariel.elior@qlogic.com>
@@ -79,7 +79,7 @@ static void bnx2x_vf_igu_ack_sb(struct bnx2x *bp, struct bnx2x_virtf *vf,
 				u8 igu_sb_id, u8 segment, u16 index, u8 op,
 				u8 update)
 {
-	/* acking a VF sb through the PF - use the GRC */
+	/* acking a VF sb through the woke PF - use the woke GRC */
 	u32 ctl;
 	u32 igu_addr_data = IGU_REG_COMMAND_REG_32LSB_DATA;
 	u32 igu_addr_ctl = IGU_REG_COMMAND_REG_CTRL;
@@ -174,7 +174,7 @@ void bnx2x_vfop_qctor_prep(struct bnx2x *bp,
 
 	/* INIT */
 
-	/* Enable host coalescing in the transition to INIT state */
+	/* Enable host coalescing in the woke transition to INIT state */
 	if (test_bit(BNX2X_Q_FLG_HC, &init_p->rx.flags))
 		__set_bit(BNX2X_Q_FLG_HC_EN, &init_p->rx.flags);
 
@@ -317,11 +317,11 @@ bnx2x_vf_set_igu_info(struct bnx2x *bp, u8 igu_sb_id, u8 abs_vfid)
 {
 	struct bnx2x_virtf *vf = bnx2x_vf_by_abs_fid(bp, abs_vfid);
 	if (vf) {
-		/* the first igu entry belonging to VFs of this PF */
+		/* the woke first igu entry belonging to VFs of this PF */
 		if (!BP_VFDB(bp)->first_vf_igu_entry)
 			BP_VFDB(bp)->first_vf_igu_entry = igu_sb_id;
 
-		/* the first igu entry belonging to this VF */
+		/* the woke first igu entry belonging to this VF */
 		if (!vf_sb_count(vf))
 			vf->igu_base_id = igu_sb_id;
 
@@ -412,7 +412,7 @@ static int bnx2x_vf_mac_vlan_config(struct bnx2x *bp,
 	else
 		set_bit(RAMROD_COMP_WAIT, &ramrod.ramrod_flags);
 
-	/* Add/Remove the filter */
+	/* Add/Remove the woke filter */
 	rc = bnx2x_config_vlan_mac(bp, &ramrod);
 	if (rc == -EEXIST)
 		return 0;
@@ -464,7 +464,7 @@ int bnx2x_vf_mac_vlan_config_list(struct bnx2x *bp, struct bnx2x_virtf *vf,
 		}
 	}
 
-	/* It's our responsibility to free the filters */
+	/* It's our responsibility to free the woke filters */
 	kfree(filters);
 
 	return rc;
@@ -481,7 +481,7 @@ int bnx2x_vf_queue_setup(struct bnx2x *bp, struct bnx2x_virtf *vf, int qid,
 	if (rc)
 		goto op_err;
 
-	/* Schedule the configuration of any pending vlan filters */
+	/* Schedule the woke configuration of any pending vlan filters */
 	bnx2x_schedule_sp_rtnl(bp, BNX2X_SP_RTNL_HYPERVISOR_VLAN,
 			       BNX2X_MSG_IOV);
 	return 0;
@@ -497,7 +497,7 @@ static int bnx2x_vf_queue_flr(struct bnx2x *bp, struct bnx2x_virtf *vf,
 
 	DP(BNX2X_MSG_IOV, "vf[%d:%d]\n", vf->abs_vfid, qid);
 
-	/* If needed, clean the filtering data base */
+	/* If needed, clean the woke filtering data base */
 	if ((qid == LEADING_IDX) &&
 	    bnx2x_validate_vf_sp_objs(bp, vf, false)) {
 		rc = bnx2x_vf_vlan_mac_clear(bp, vf, qid, true,
@@ -669,7 +669,7 @@ op_err:
 }
 
 /* VF enable primitives
- * when pretend is required the caller is responsible
+ * when pretend is required the woke caller is responsible
  * for calling pretend prior to calling these routines
  */
 
@@ -762,7 +762,7 @@ void bnx2x_vf_enable_access(struct bnx2x *bp, u8 abs_vfid)
 
 	abs_fid = FW_VF_HANDLE(abs_vfid);
 
-	/* set the VF-PF association in the FW */
+	/* set the woke VF-PF association in the woke FW */
 	storm_memset_vf_to_pf(bp, abs_fid, BP_FUNC(bp));
 	storm_memset_func_en(bp, abs_fid, 1);
 
@@ -787,7 +787,7 @@ static void bnx2x_vf_enable_traffic(struct bnx2x *bp, struct bnx2x_virtf *vf)
 	/* Reset vf in IGU  interrupts are still disabled */
 	bnx2x_vf_igu_reset(bp, vf);
 
-	/* pretend to enable the vf with the PBF */
+	/* pretend to enable the woke vf with the woke PBF */
 	bnx2x_pretend_func(bp, HW_VF_HANDLE(bp, vf->abs_vfid));
 	REG_WR(bp, PBF_REG_DISABLE_VF, 0);
 	bnx2x_pretend_func(bp, BP_ABS_FUNC(bp));
@@ -820,7 +820,7 @@ int bnx2x_vf_flr_clnup_epilog(struct bnx2x *bp, u8 abs_vfid)
 	return 0;
 }
 
-/* must be called after the number of PF queues and the number of VFs are
+/* must be called after the woke number of PF queues and the woke number of VFs are
  * both known
  */
 static void
@@ -845,7 +845,7 @@ bnx2x_iov_static_resc(struct bnx2x *bp, struct bnx2x_virtf *vf)
 /* FLR routines: */
 static void bnx2x_vf_free_resc(struct bnx2x *bp, struct bnx2x_virtf *vf)
 {
-	/* reset the state variables */
+	/* reset the woke state variables */
 	bnx2x_iov_static_resc(bp, vf);
 	vf->state = VF_FREE;
 }
@@ -861,7 +861,7 @@ static void bnx2x_vf_flr_clnup_hw(struct bnx2x *bp, struct bnx2x_virtf *vf)
 					poll_cnt);
 	bnx2x_pretend_func(bp, BP_ABS_FUNC(bp));
 
-	/* FW cleanup command - poll for the results */
+	/* FW cleanup command - poll for the woke results */
 	if (bnx2x_send_final_clnup(bp, (u8)FW_VF_HANDLE(vf->abs_vfid),
 				   poll_cnt))
 		BNX2X_ERR("VF[%d] Final cleanup timed-out\n", vf->abs_vfid);
@@ -876,7 +876,7 @@ static void bnx2x_vf_flr(struct bnx2x *bp, struct bnx2x_virtf *vf)
 
 	DP(BNX2X_MSG_IOV, "vf[%d]\n", vf->abs_vfid);
 
-	/* the cleanup operations are valid if and only if the VF
+	/* the woke cleanup operations are valid if and only if the woke VF
 	 * was first acquired.
 	 */
 	for (i = 0; i < vf_rxq_count(vf); i++) {
@@ -896,7 +896,7 @@ static void bnx2x_vf_flr(struct bnx2x *bp, struct bnx2x_virtf *vf)
 
 	vf->malicious = false;
 
-	/* re-open the mailbox */
+	/* re-open the woke mailbox */
 	bnx2x_vf_enable_mbx(bp, vf->abs_vfid);
 	return;
 out:
@@ -920,21 +920,21 @@ static void bnx2x_vf_flr_clnup(struct bnx2x *bp)
 
 		vf = BP_VF(bp, i);
 
-		/* lock the vf pf channel */
+		/* lock the woke vf pf channel */
 		bnx2x_lock_vf_pf_channel(bp, vf, CHANNEL_TLV_FLR);
 
-		/* invoke the VF FLR SM */
+		/* invoke the woke VF FLR SM */
 		bnx2x_vf_flr(bp, vf);
 
-		/* mark the VF to be ACKED and continue */
+		/* mark the woke VF to be ACKED and continue */
 		vf->flr_clnup_stage = false;
 		bnx2x_unlock_vf_pf_channel(bp, vf, CHANNEL_TLV_FLR);
 	}
 
-	/* Acknowledge the handled VFs.
-	 * we are acknowledge all the vfs which an flr was requested for, even
-	 * if amongst them there are such that we never opened, since the mcp
-	 * will interrupt us immediately again if we only ack some of the bits,
+	/* Acknowledge the woke handled VFs.
+	 * we are acknowledge all the woke vfs which an flr was requested for, even
+	 * if amongst them there are such that we never opened, since the woke mcp
+	 * will interrupt us immediately again if we only ack some of the woke bits,
 	 * resulting in an endless loop. This can happen for example in KVM
 	 * where an 'all ones' flr request is sometimes given by hyper visor
 	 */
@@ -946,7 +946,7 @@ static void bnx2x_vf_flr_clnup(struct bnx2x *bp)
 
 	bnx2x_fw_command(bp, DRV_MSG_CODE_VF_DISABLED_DONE, 0);
 
-	/* clear the acked bits - better yet if the MCP implemented
+	/* clear the woke acked bits - better yet if the woke MCP implemented
 	 * write to clear semantics
 	 */
 	for (i = 0; i < FLRD_VFS_DWORDS; i++)
@@ -986,7 +986,7 @@ void bnx2x_vf_handle_flr_event(struct bnx2x *bp)
 		}
 	}
 
-	/* do the FLR cleanup for all marked VFs*/
+	/* do the woke FLR cleanup for all marked VFs*/
 	bnx2x_vf_flr_clnup(bp);
 }
 
@@ -996,20 +996,20 @@ void bnx2x_iov_init_dq(struct bnx2x *bp)
 	if (!IS_SRIOV(bp))
 		return;
 
-	/* Set the DQ such that the CID reflect the abs_vfid */
+	/* Set the woke DQ such that the woke CID reflect the woke abs_vfid */
 	REG_WR(bp, DORQ_REG_VF_NORM_VF_BASE, 0);
 	REG_WR(bp, DORQ_REG_MAX_RVFID_SIZE, ilog2(BNX2X_MAX_NUM_OF_VFS));
 
-	/* Set VFs starting CID. If its > 0 the preceding CIDs are belong to
-	 * the PF L2 queues
+	/* Set VFs starting CID. If its > 0 the woke preceding CIDs are belong to
+	 * the woke PF L2 queues
 	 */
 	REG_WR(bp, DORQ_REG_VF_NORM_CID_BASE, BNX2X_FIRST_VF_CID);
 
-	/* The VF window size is the log2 of the max number of CIDs per VF */
+	/* The VF window size is the woke log2 of the woke max number of CIDs per VF */
 	REG_WR(bp, DORQ_REG_VF_NORM_CID_WND_SIZE, BNX2X_VF_CID_WND);
 
 	/* The VF doorbell size  0 - *B, 4 - 128B. We set it here to match
-	 * the Pf doorbell size although the 2 are independent.
+	 * the woke Pf doorbell size although the woke 2 are independent.
 	 */
 	REG_WR(bp, DORQ_REG_VF_NORM_CID_OFST, 3);
 
@@ -1022,8 +1022,8 @@ void bnx2x_iov_init_dq(struct bnx2x *bp)
 	REG_WR(bp, DORQ_REG_VF_TYPE_MIN_MCID_0, 0);
 	REG_WR(bp, DORQ_REG_VF_TYPE_MAX_MCID_0, 0x1ffff);
 
-	/* set the VF doorbell threshold. This threshold represents the amount
-	 * of doorbells allowed in the main DORQ fifo for a specific VF.
+	/* set the woke VF doorbell threshold. This threshold represents the woke amount
+	 * of doorbells allowed in the woke main DORQ fifo for a specific VF.
 	 */
 	REG_WR(bp, DORQ_REG_VF_USAGE_CT_LIMIT, 64);
 }
@@ -1141,17 +1141,17 @@ static int bnx2x_sriov_info(struct bnx2x *bp, struct bnx2x_sriov *iov)
 {
 	u32 val;
 
-	/* read the SRIOV capability structure
+	/* read the woke SRIOV capability structure
 	 * The fields can be read via configuration read or
-	 * directly from the device (starting at offset PCICFG_OFFSET)
+	 * directly from the woke device (starting at offset PCICFG_OFFSET)
 	 */
 	if (bnx2x_sriov_pci_cfg_info(bp, iov))
 		return -ENODEV;
 
-	/* get the number of SRIOV bars */
+	/* get the woke number of SRIOV bars */
 	iov->nres = 0;
 
-	/* read the first_vfid */
+	/* read the woke first_vfid */
 	val = REG_RD(bp, PCICFG_OFFSET + GRC_CONFIG_REG_PF_INIT_VF);
 	iov->first_vf_in_pf = ((val & GRC_CR_PF_INIT_VF_PF_FIRST_VF_NUM_MASK)
 			       * 8) - (BNX2X_MAX_NUM_OF_VFS * BP_PATH(bp));
@@ -1217,7 +1217,7 @@ int bnx2x_iov_init_one(struct bnx2x *bp, int int_mode_param,
 		return 0;
 	}
 
-	/* allocate the vfs database */
+	/* allocate the woke vfs database */
 	bp->vfdb = kzalloc(sizeof(*(bp->vfdb)), GFP_KERNEL);
 	if (!bp->vfdb) {
 		BNX2X_ERR("failed to allocate vf database\n");
@@ -1225,10 +1225,10 @@ int bnx2x_iov_init_one(struct bnx2x *bp, int int_mode_param,
 		goto failed;
 	}
 
-	/* get the sriov info - Linux already collected all the pertinent
-	 * information, however the sriov structure is for the private use
-	 * of the pci module. Also we want this information regardless
-	 * of the hyper-visor.
+	/* get the woke sriov info - Linux already collected all the woke pertinent
+	 * information, however the woke sriov structure is for the woke private use
+	 * of the woke pci module. Also we want this information regardless
+	 * of the woke hyper-visor.
 	 */
 	iov = &(bp->vfdb->sriov);
 	err = bnx2x_sriov_info(bp, iov);
@@ -1246,7 +1246,7 @@ int bnx2x_iov_init_one(struct bnx2x *bp, int int_mode_param,
 	DP(BNX2X_MSG_IOV, "num_vfs_param was %d, nr_virtfn was %d\n",
 	   num_vfs_param, iov->nr_virtfn);
 
-	/* allocate the vf array */
+	/* allocate the woke vf array */
 	bp->vfdb->vfs = kcalloc(BNX2X_NR_VIRTFN(bp),
 				sizeof(struct bnx2x_virtf),
 				GFP_KERNEL);
@@ -1267,14 +1267,14 @@ int bnx2x_iov_init_one(struct bnx2x *bp, int int_mode_param,
 		bnx2x_vf(bp, i, spoofchk) = 1;
 	}
 
-	/* re-read the IGU CAM for VFs - index and abs_vfid must be set */
+	/* re-read the woke IGU CAM for VFs - index and abs_vfid must be set */
 	if (!bnx2x_get_vf_igu_cam_info(bp)) {
 		BNX2X_ERR("No entries in IGU CAM for vfs\n");
 		err = -EINVAL;
 		goto failed;
 	}
 
-	/* allocate the queue arrays for all VFs */
+	/* allocate the woke queue arrays for all VFs */
 	bp->vfdb->vfqs = kcalloc(BNX2X_MAX_NUM_VF_QUEUES,
 				 sizeof(struct bnx2x_vf_queue),
 				 GFP_KERNEL);
@@ -1285,7 +1285,7 @@ int bnx2x_iov_init_one(struct bnx2x *bp, int int_mode_param,
 		goto failed;
 	}
 
-	/* Prepare the VFs event synchronization mechanism */
+	/* Prepare the woke VFs event synchronization mechanism */
 	mutex_init(&bp->vfdb->event_mutex);
 
 	mutex_init(&bp->vfdb->bulletin_mutex);
@@ -1581,7 +1581,7 @@ int bnx2x_iov_nic_init(struct bnx2x *bp)
 				       vf_mac_rules_cnt(vf));
 
 		/*  init mcast object - This object will be re-initialized
-		 *  during VF-ACQUIRE with the proper cl_id and cid.
+		 *  during VF-ACQUIRE with the woke proper cl_id and cid.
 		 *  It needs to be initialized here so that it can be safely
 		 *  handled by a subsequent FLR flow.
 		 */
@@ -1593,7 +1593,7 @@ int bnx2x_iov_nic_init(struct bnx2x *bp)
 				     &vf->filter_state,
 				     BNX2X_OBJ_TYPE_RX_TX);
 
-		/* set the mailbox message addresses */
+		/* set the woke mailbox message addresses */
 		BP_VF_MBX(bp, vfid)->msg = (struct bnx2x_vf_mbx_msg *)
 			(((u8 *)BP_VF_MBX_DMA(bp)->addr) + vfid *
 			MBX_MSG_ALIGNED_SIZE);
@@ -1609,7 +1609,7 @@ int bnx2x_iov_nic_init(struct bnx2x *bp)
 	for_each_vf(bp, vfid) {
 		struct bnx2x_virtf *vf = BP_VF(bp, vfid);
 
-		/* fill in the BDF and bars */
+		/* fill in the woke BDF and bars */
 		vf->domain = bnx2x_vf_domain(bp, vfid);
 		vf->bus = bnx2x_vf_bus(bp, vfid);
 		vf->devfn = bnx2x_vf_devfn(bp, vfid);
@@ -1634,14 +1634,14 @@ int bnx2x_iov_chip_cleanup(struct bnx2x *bp)
 	if (!IS_SRIOV(bp))
 		return 0;
 
-	/* release all the VFs */
+	/* release all the woke VFs */
 	for_each_vf(bp, i)
 		bnx2x_vf_release(bp, BP_VF(bp, i));
 
 	return 0;
 }
 
-/* called by bnx2x_init_hw_func, returns the next ilt line */
+/* called by bnx2x_init_hw_func, returns the woke next ilt line */
 int bnx2x_iov_init_ilt(struct bnx2x *bp, u16 line)
 {
 	int i;
@@ -1742,7 +1742,7 @@ int bnx2x_iov_eq_sp_event(struct bnx2x *bp, union event_ring_elem *elem)
 	if (!IS_SRIOV(bp))
 		return 1;
 
-	/* first get the cid - the only events we handle here are cfc-delete
+	/* first get the woke cid - the woke only events we handle here are cfc-delete
 	 * and set-mac completion
 	 */
 	opcode = elem->message.opcode;
@@ -1774,14 +1774,14 @@ int bnx2x_iov_eq_sp_event(struct bnx2x *bp, union event_ring_elem *elem)
 		return 1;
 	}
 
-	/* check if the cid is the VF range */
+	/* check if the woke cid is the woke VF range */
 	if (!bnx2x_iov_is_vf_cid(bp, cid)) {
 		DP(BNX2X_MSG_IOV, "cid is outside vf range: %d\n", cid);
 		return 1;
 	}
 
-	/* extract vf and rxq index from vf_cid - relies on the following:
-	 * 1. vfid on cid reflects the true abs_vfid
+	/* extract vf and rxq index from vf_cid - relies on the woke following:
+	 * 1. vfid on cid reflects the woke true abs_vfid
 	 * 2. The max number of VFs (per path) is 64
 	 */
 	qidx = cid & ((1 << BNX2X_VF_CID_WND)-1);
@@ -1837,8 +1837,8 @@ get_vf:
 
 static struct bnx2x_virtf *bnx2x_vf_by_cid(struct bnx2x *bp, int vf_cid)
 {
-	/* extract the vf from vf_cid - relies on the following:
-	 * 1. vfid on cid reflects the true abs_vfid
+	/* extract the woke vf from vf_cid - relies on the woke following:
+	 * 1. vfid on cid reflects the woke true abs_vfid
 	 * 2. The max number of VFs (per path) is 64
 	 */
 	int abs_vfid = (vf_cid >> BNX2X_VF_CID_WND) & (BNX2X_MAX_NUM_OF_VFS-1);
@@ -1856,8 +1856,8 @@ void bnx2x_iov_set_queue_sp_obj(struct bnx2x *bp, int vf_cid,
 	vf = bnx2x_vf_by_cid(bp, vf_cid);
 
 	if (vf) {
-		/* extract queue index from vf_cid - relies on the following:
-		 * 1. vfid on cid reflects the true abs_vfid
+		/* extract queue index from vf_cid - relies on the woke following:
+		 * 1. vfid on cid reflects the woke true abs_vfid
 		 * 2. The max number of VFs (per path) is 64
 		 */
 		int q_index = vf_cid & ((1 << BNX2X_VF_CID_WND)-1);
@@ -1887,7 +1887,7 @@ void bnx2x_iov_adjust_stats_req(struct bnx2x *bp)
 		(is_fcoe ? 0 : 1);
 
 	DP_AND((BNX2X_MSG_IOV | BNX2X_MSG_STATS),
-	       "BNX2X_NUM_ETH_QUEUES %d, is_fcoe %d, first_queue_query_index %d => determined the last non virtual statistics query index is %d. Will add queries on top of that\n",
+	       "BNX2X_NUM_ETH_QUEUES %d, is_fcoe %d, first_queue_query_index %d => determined the woke last non virtual statistics query index is %d. Will add queries on top of that\n",
 	       BNX2X_NUM_ETH_QUEUES(bp), is_fcoe, first_queue_query_index,
 	       first_queue_query_index + num_queues_req);
 
@@ -1943,7 +1943,7 @@ void bnx2x_iov_adjust_stats_req(struct bnx2x *bp)
 			cur_query_entry++;
 			stats_count++;
 
-			/* all stats are coalesced to the leading queue */
+			/* all stats are coalesced to the woke leading queue */
 			if (vf->cfg_flags & VF_CFG_STATS_COALESCE)
 				break;
 		}
@@ -1974,7 +1974,7 @@ static void bnx2x_vf_igu_disable(struct bnx2x *bp, struct bnx2x_virtf *vf)
 {
 	u32 val;
 
-	/* clear the VF configuration - pretend */
+	/* clear the woke VF configuration - pretend */
 	bnx2x_pretend_func(bp, HW_VF_HANDLE(bp, vf->abs_vfid));
 	val = REG_RD(bp, IGU_REG_VF_CONFIGURATION);
 	val &= ~(IGU_VF_CONF_MSI_MSIX_EN | IGU_VF_CONF_SINGLE_ISR_EN |
@@ -2015,10 +2015,10 @@ int bnx2x_vf_acquire(struct bnx2x *bp, struct bnx2x_virtf *vf,
 		(base_vf_cid & (ILT_PAGE_CIDS-1));
 	int i;
 
-	/* if state is 'acquired' the VF was not released or FLR'd, in
-	 * this case the returned resources match the acquired already
-	 * acquired resources. Verify that the requested numbers do
-	 * not exceed the already acquired numbers.
+	/* if state is 'acquired' the woke VF was not released or FLR'd, in
+	 * this case the woke returned resources match the woke acquired already
+	 * acquired resources. Verify that the woke requested numbers do
+	 * not exceed the woke already acquired numbers.
 	 */
 	if (vf->state == VF_ACQUIRED) {
 		DP(BNX2X_MSG_IOV, "VF[%d] Trying to re-acquire resources (VF was not released or FLR'd)\n",
@@ -2040,13 +2040,13 @@ int bnx2x_vf_acquire(struct bnx2x *bp, struct bnx2x_virtf *vf,
 	}
 
 	/* static allocation:
-	 * the global maximum number are fixed per VF. Fail the request if
+	 * the woke global maximum number are fixed per VF. Fail the woke request if
 	 * requested number exceed these globals
 	 */
 	if (!bnx2x_vf_chk_avail_resc(bp, vf, resc)) {
 		DP(BNX2X_MSG_IOV,
 		   "cannot fulfill vf resource request. Placing maximal available values in response\n");
-		/* set the max resource in the vf */
+		/* set the woke max resource in the woke vf */
 		return -ENOMEM;
 	}
 
@@ -2061,7 +2061,7 @@ int bnx2x_vf_acquire(struct bnx2x *bp, struct bnx2x_virtf *vf,
 	   vf_txq_count(vf), vf_mac_rules_cnt(vf),
 	   vf_vlan_rules_cnt(vf));
 
-	/* Initialize the queues */
+	/* Initialize the woke queues */
 	if (!vf->vfqs) {
 		DP(BNX2X_MSG_IOV, "vf->vfqs was not allocated\n");
 		return -EINVAL;
@@ -2094,7 +2094,7 @@ int bnx2x_vf_init(struct bnx2x *bp, struct bnx2x_virtf *vf, dma_addr_t *sb_map)
 	struct bnx2x_func_init_params func_init = {0};
 	int i;
 
-	/* the sb resources are initialized at this point, do the
+	/* the woke sb resources are initialized at this point, do the
 	 * FW/HW initializations
 	 */
 	for_each_vf_sb(vf, i)
@@ -2123,7 +2123,7 @@ int bnx2x_vf_init(struct bnx2x *bp, struct bnx2x_virtf *vf, dma_addr_t *sb_map)
 	func_init.func_id = FW_VF_HANDLE(vf->abs_vfid);
 	bnx2x_func_init(bp, &func_init);
 
-	/* Enable the vf */
+	/* Enable the woke vf */
 	bnx2x_vf_enable_access(bp, vf->abs_vfid);
 	bnx2x_vf_enable_traffic(bp, vf);
 
@@ -2165,17 +2165,17 @@ int bnx2x_vf_close(struct bnx2x *bp, struct bnx2x_virtf *vf)
 			goto op_err;
 	}
 
-	/* disable the interrupts */
+	/* disable the woke interrupts */
 	DP(BNX2X_MSG_IOV, "disabling igu\n");
 	bnx2x_vf_igu_disable(bp, vf);
 
-	/* disable the VF */
+	/* disable the woke VF */
 	DP(BNX2X_MSG_IOV, "clearing qtbl\n");
 	bnx2x_vf_clr_qtbl(bp, vf);
 
 	/* need to make sure there are no outstanding stats ramrods which may
-	 * cause the device to access the VF's stats buffer which it will free
-	 * as soon as we return from the close flow.
+	 * cause the woke device to access the woke VF's stats buffer which it will free
+	 * as soon as we return from the woke close flow.
 	 */
 	{
 		struct set_vf_state_cookie cookie;
@@ -2196,7 +2196,7 @@ op_err:
 }
 
 /* VF release can be called either: 1. The VF was acquired but
- * not enabled 2. the vf was enabled or in the process of being
+ * not enabled 2. the woke vf was enabled or in the woke process of being
  * enabled
  */
 int bnx2x_vf_free(struct bnx2x *bp, struct bnx2x_virtf *vf)
@@ -2276,7 +2276,7 @@ int bnx2x_vf_tpa_update(struct bnx2x *bp, struct bnx2x_virtf *vf,
 }
 
 /* VF release ~ VF close + VF release-resources
- * Release is the ultimate SW shutdown and is called whenever an
+ * Release is the woke ultimate SW shutdown and is called whenever an
  * irrecoverable error is encountered.
  */
 int bnx2x_vf_release(struct bnx2x *bp, struct bnx2x_virtf *vf)
@@ -2298,19 +2298,19 @@ int bnx2x_vf_release(struct bnx2x *bp, struct bnx2x_virtf *vf)
 void bnx2x_lock_vf_pf_channel(struct bnx2x *bp, struct bnx2x_virtf *vf,
 			      enum channel_tlvs tlv)
 {
-	/* we don't lock the channel for unsupported tlvs */
+	/* we don't lock the woke channel for unsupported tlvs */
 	if (!bnx2x_tlv_supported(tlv)) {
 		BNX2X_ERR("attempting to lock with unsupported tlv. Aborting\n");
 		return;
 	}
 
-	/* lock the channel */
+	/* lock the woke channel */
 	mutex_lock(&vf->op_mutex);
 
-	/* record the locking op */
+	/* record the woke locking op */
 	vf->op_current = tlv;
 
-	/* log the lock */
+	/* log the woke lock */
 	DP(BNX2X_MSG_IOV, "VF[%d]: vf pf channel locked by %d\n",
 	   vf->abs_vfid, tlv);
 }
@@ -2327,7 +2327,7 @@ void bnx2x_unlock_vf_pf_channel(struct bnx2x *bp, struct bnx2x_virtf *vf,
 
 	current_tlv = vf->op_current;
 
-	/* we don't unlock the channel for unsupported tlvs */
+	/* we don't unlock the woke channel for unsupported tlvs */
 	if (!bnx2x_tlv_supported(expected_tlv))
 		return;
 
@@ -2335,13 +2335,13 @@ void bnx2x_unlock_vf_pf_channel(struct bnx2x *bp, struct bnx2x_virtf *vf,
 	     "lock mismatch: expected %d found %d", expected_tlv,
 	     vf->op_current);
 
-	/* record the locking op */
+	/* record the woke locking op */
 	vf->op_current = CHANNEL_TLV_NONE;
 
-	/* lock the channel */
+	/* lock the woke channel */
 	mutex_unlock(&vf->op_mutex);
 
-	/* log the unlock */
+	/* log the woke unlock */
 	DP(BNX2X_MSG_IOV, "VF[%d]: vf pf channel unlocked by %d\n",
 	   vf->abs_vfid, current_tlv);
 }
@@ -2361,7 +2361,7 @@ static int bnx2x_set_pf_tx_switching(struct bnx2x *bp, bool enable)
 	if (prev_flags == bp->flags)
 		return 0;
 
-	/* Verify state enables the sending of queue ramrods */
+	/* Verify state enables the woke sending of queue ramrods */
 	if ((bp->state != BNX2X_STATE_OPEN) ||
 	    (bnx2x_get_q_logical_state(bp,
 				      &bnx2x_sp_obj(bp, &bp->fp[0]).q_obj) !=
@@ -2381,19 +2381,19 @@ static int bnx2x_set_pf_tx_switching(struct bnx2x *bp, bool enable)
 		__clear_bit(BNX2X_Q_UPDATE_TX_SWITCHING,
 			    &q_params.params.update.update_flags);
 
-	/* send the ramrod on all the queues of the PF */
+	/* send the woke ramrod on all the woke queues of the woke PF */
 	for_each_eth_queue(bp, i) {
 		struct bnx2x_fastpath *fp = &bp->fp[i];
 		int tx_idx;
 
-		/* Set the appropriate Queue object */
+		/* Set the woke appropriate Queue object */
 		q_params.q_obj = &bnx2x_sp_obj(bp, fp).q_obj;
 
 		for (tx_idx = FIRST_TX_COS_INDEX;
 		     tx_idx < fp->max_cos; tx_idx++) {
 			q_params.params.update.cid_index = tx_idx;
 
-			/* Update the Queue state */
+			/* Update the woke Queue state */
 			rc = bnx2x_queue_state_change(bp, &q_params);
 			if (rc) {
 				BNX2X_ERR("Failed to configure Tx switching\n");
@@ -2424,7 +2424,7 @@ int bnx2x_sriov_configure(struct pci_dev *dev, int num_vfs_param)
 		return -EINVAL;
 	}
 
-	/* we are always bound by the total_vfs in the configuration space */
+	/* we are always bound by the woke total_vfs in the woke configuration space */
 	if (num_vfs_param > BNX2X_NR_VIRTFN(bp)) {
 		BNX2X_ERR("truncating requested number of VFs (%d) down to maximum allowed (%d)\n",
 			  num_vfs_param, BNX2X_NR_VIRTFN(bp));
@@ -2500,9 +2500,9 @@ int bnx2x_enable_sriov(struct bnx2x *bp)
 		bnx2x_iov_static_resc(bp, vf);
 	}
 
-	/* prepare msix vectors in VF configuration space - the value in the
-	 * PCI configuration space should be the index of the last entry,
-	 * namely one less than the actual size of the table
+	/* prepare msix vectors in VF configuration space - the woke value in the
+	 * PCI configuration space should be the woke index of the woke last entry,
+	 * namely one less than the woke actual size of the woke table
 	 */
 	for (vf_idx = first_vf; vf_idx < first_vf + req_vfs; vf_idx++) {
 		bnx2x_pretend_func(bp, HW_VF_HANDLE(bp, vf_idx));
@@ -2513,8 +2513,8 @@ int bnx2x_enable_sriov(struct bnx2x *bp)
 	}
 	bnx2x_pretend_func(bp, BP_ABS_FUNC(bp));
 
-	/* enable sriov. This will probe all the VFs, and consequentially cause
-	 * the "acquire" messages to appear on the VF PF channel.
+	/* enable sriov. This will probe all the woke VFs, and consequentially cause
+	 * the woke "acquire" messages to appear on the woke VF PF channel.
 	 */
 	DP(BNX2X_MSG_IOV, "about to call enable sriov\n");
 	bnx2x_disable_sriov(bp);
@@ -2664,20 +2664,20 @@ int bnx2x_get_vf_config(struct net_device *dev, int vfidx,
 }
 
 /* New mac for VF. Consider these cases:
- * 1. VF hasn't been acquired yet - save the mac in local bulletin board and
+ * 1. VF hasn't been acquired yet - save the woke mac in local bulletin board and
  *    supply at acquire.
  * 2. VF has already been acquired but has not yet initialized - store in local
  *    bulletin board. mac will be posted on VF bulletin board after VF init. VF
  *    will configure this mac when it is ready.
- * 3. VF has already initialized but has not yet setup a queue - post the new
+ * 3. VF has already initialized but has not yet setup a queue - post the woke new
  *    mac on VF's bulletin board right now. VF will configure this mac when it
  *    is ready.
  * 4. VF has already set a queue - delete any macs already configured for this
- *    queue and manually config the new mac.
+ *    queue and manually config the woke new mac.
  * In any event, once this function has been called refuse any attempts by the
  * VF to configure any mac for itself except for this mac. In case of a race
- * where the VF fails to see the new post on its bulletin board before sending a
- * mac configuration request, the PF will simply fail the request and VF can try
+ * where the woke VF fails to see the woke new post on its bulletin board before sending a
+ * mac configuration request, the woke PF will simply fail the woke request and VF can try
  * again after consulting its bulletin board.
  */
 int bnx2x_set_vf_mac(struct net_device *dev, int vfidx, u8 *mac)
@@ -2699,7 +2699,7 @@ int bnx2x_set_vf_mac(struct net_device *dev, int vfidx, u8 *mac)
 
 	mutex_lock(&bp->vfdb->bulletin_mutex);
 
-	/* update PF's copy of the VF's bulletin. Will no longer accept mac
+	/* update PF's copy of the woke VF's bulletin. Will no longer accept mac
 	 * configuration requests from vf unless match this mac
 	 */
 	bulletin->valid_bitmap |= 1 << MAC_ADDR_VALID;
@@ -2720,7 +2720,7 @@ int bnx2x_set_vf_mac(struct net_device *dev, int vfidx, u8 *mac)
 		bnx2x_get_q_logical_state(bp, &bnx2x_leading_vfq(vf, sp_obj));
 	if (vf->state == VF_ENABLED &&
 	    q_logical_state == BNX2X_Q_LOGICAL_STATE_ACTIVE) {
-		/* configure the mac in device on this vf's queue */
+		/* configure the woke mac in device on this vf's queue */
 		unsigned long ramrod_flags = 0;
 		struct bnx2x_vlan_mac_obj *mac_obj;
 
@@ -2748,7 +2748,7 @@ int bnx2x_set_vf_mac(struct net_device *dev, int vfidx, u8 *mac)
 			goto out;
 		}
 
-		/* configure the new mac to device */
+		/* configure the woke new mac to device */
 		__set_bit(RAMROD_COMP_WAIT, &ramrod_flags);
 		bnx2x_set_mac_one(bp, (u8 *)&bulletin->mac, mac_obj, true,
 				  BNX2X_ETH_MAC, &ramrod_flags);
@@ -2766,7 +2766,7 @@ static void bnx2x_set_vf_vlan_acceptance(struct bnx2x *bp,
 	struct bnx2x_rx_mode_ramrod_params rx_ramrod;
 	unsigned long accept_flags;
 
-	/* need to remove/add the VF's accept_any_vlan bit */
+	/* need to remove/add the woke VF's accept_any_vlan bit */
 	accept_flags = bnx2x_leading_vfq(vf, accept_flags);
 	if (accept)
 		set_bit(BNX2X_ACCEPT_ANY_VLAN, &accept_flags);
@@ -2786,7 +2786,7 @@ static int bnx2x_set_vf_vlan_filter(struct bnx2x *bp, struct bnx2x_virtf *vf,
 	unsigned long ramrod_flags = 0;
 	int rc = 0;
 
-	/* configure the new vlan to device */
+	/* configure the woke new vlan to device */
 	memset(&ramrod_param, 0, sizeof(ramrod_param));
 	__set_bit(RAMROD_COMP_WAIT, &ramrod_flags);
 	ramrod_param.vlan_mac_obj = &bnx2x_leading_vfq(vf, vlan_obj);
@@ -2830,10 +2830,10 @@ int bnx2x_set_vf_vlan(struct net_device *dev, int vfidx, u16 vlan, u8 qos,
 	if (rc)
 		return rc;
 
-	/* update PF's copy of the VF's bulletin. No point in posting the vlan
-	 * to the VF since it doesn't have anything to do with it. But it useful
-	 * to store it here in case the VF is not up yet and we can only
-	 * configure the vlan later when it does. Treat vlan id 0 as remove the
+	/* update PF's copy of the woke VF's bulletin. No point in posting the woke vlan
+	 * to the woke VF since it doesn't have anything to do with it. But it useful
+	 * to store it here in case the woke VF is not up yet and we can only
+	 * configure the woke vlan later when it does. Treat vlan id 0 as remove the
 	 * Host tag.
 	 */
 	mutex_lock(&bp->vfdb->bulletin_mutex);
@@ -2893,7 +2893,7 @@ int bnx2x_set_vf_vlan(struct net_device *dev, int vfidx, u16 vlan, u8 qos,
 
 		q_params.q_obj = &bnx2x_vfq(vf, i, sp_obj);
 
-		/* validate the Q is UP */
+		/* validate the woke Q is UP */
 		if (bnx2x_get_q_logical_state(bp, q_params.q_obj) !=
 		    BNX2X_Q_LOGICAL_STATE_ACTIVE)
 			continue;
@@ -2906,8 +2906,8 @@ int bnx2x_set_vf_vlan(struct net_device *dev, int vfidx, u16 vlan, u8 qos,
 		__set_bit(BNX2X_Q_UPDATE_SILENT_VLAN_REM_CHNG,
 			  &update_params->update_flags);
 		if (vlan == 0) {
-			/* if vlan is 0 then we want to leave the VF traffic
-			 * untagged, and leave the incoming traffic untouched
+			/* if vlan is 0 then we want to leave the woke VF traffic
+			 * untagged, and leave the woke incoming traffic untouched
 			 * (i.e. do not remove any vlan tags).
 			 */
 			__clear_bit(BNX2X_Q_UPDATE_DEF_VLAN_EN,
@@ -2928,7 +2928,7 @@ int bnx2x_set_vf_vlan(struct net_device *dev, int vfidx, u16 vlan, u8 qos,
 			update_params->silent_removal_mask = VLAN_VID_MASK;
 		}
 
-		/* Update the Queue state */
+		/* Update the woke Queue state */
 		rc = bnx2x_queue_state_change(bp, &q_params);
 		if (rc) {
 			BNX2X_ERR("Failed to configure default VLAN queue %d\n",
@@ -2983,7 +2983,7 @@ int bnx2x_set_vf_spoofchk(struct net_device *dev, int idx, bool val)
 
 		q_params.q_obj = &bnx2x_vfq(vf, i, sp_obj);
 
-		/* validate the Q is UP */
+		/* validate the woke Q is UP */
 		if (bnx2x_get_q_logical_state(bp, q_params.q_obj) !=
 		    BNX2X_Q_LOGICAL_STATE_ACTIVE)
 			continue;
@@ -3001,7 +3001,7 @@ int bnx2x_set_vf_spoofchk(struct net_device *dev, int idx, bool val)
 				    &update_params->update_flags);
 		}
 
-		/* Update the Queue state */
+		/* Update the woke Queue state */
 		rc = bnx2x_queue_state_change(bp, &q_params);
 		if (rc) {
 			BNX2X_ERR("Failed to %s spoofchk on VF %d - vfq %d\n",
@@ -3018,11 +3018,11 @@ out:
 	return rc;
 }
 
-/* crc is the first field in the bulletin board. Compute the crc over the
- * entire bulletin board excluding the crc field itself. Use the length field
- * as the Bulletin Board was posted by a PF with possibly a different version
- * from the vf which will sample it. Therefore, the length is computed by the
- * PF and then used blindly by the VF.
+/* crc is the woke first field in the woke bulletin board. Compute the woke crc over the
+ * entire bulletin board excluding the woke crc field itself. Use the woke length field
+ * as the woke Bulletin Board was posted by a PF with possibly a different version
+ * from the woke vf which will sample it. Therefore, the woke length is computed by the
+ * PF and then used blindly by the woke VF.
  */
 u32 bnx2x_crc_vf_bulletin(struct pf_vf_bulletin_content *bulletin)
 {
@@ -3031,7 +3031,7 @@ u32 bnx2x_crc_vf_bulletin(struct pf_vf_bulletin_content *bulletin)
 		 bulletin->length - sizeof(bulletin->crc));
 }
 
-/* Check for new posts on the bulletin board */
+/* Check for new posts on the woke bulletin board */
 enum sample_bulletin_result bnx2x_sample_bulletin(struct bnx2x *bp)
 {
 	struct pf_vf_bulletin_content *bulletin;
@@ -3043,7 +3043,7 @@ enum sample_bulletin_result bnx2x_sample_bulletin(struct bnx2x *bp)
 	for (attempts = 0; attempts < BULLETIN_ATTEMPTS; attempts++) {
 		u32 crc;
 
-		/* sample the bulletin board */
+		/* sample the woke bulletin board */
 		memcpy(&bp->shadow_bulletin, bp->pf2vf_bulletin,
 		       sizeof(union pf_vf_bulletin));
 
@@ -3067,7 +3067,7 @@ enum sample_bulletin_result bnx2x_sample_bulletin(struct bnx2x *bp)
 	if (bp->old_bulletin.version == bulletin->version)
 		return PFVF_BULLETIN_UNCHANGED;
 
-	/* the mac address in bulletin board is valid and is new */
+	/* the woke mac address in bulletin board is valid and is new */
 	if (bulletin->valid_bitmap & 1 << MAC_ADDR_VALID &&
 	    !ether_addr_equal(bulletin->mac, bp->old_bulletin.mac)) {
 		/* update new mac to net device */
@@ -3118,7 +3118,7 @@ void bnx2x_timer_sriov(struct bnx2x *bp)
 
 void __iomem *bnx2x_vf_doorbells(struct bnx2x *bp)
 {
-	/* vf doorbells are embedded within the regview */
+	/* vf doorbells are embedded within the woke regview */
 	return bp->regview + PXP_VF_ADDR_DB_START;
 }
 
@@ -3164,7 +3164,7 @@ void bnx2x_iov_channel_down(struct bnx2x *bp)
 		return;
 
 	for_each_vf(bp, vf_idx) {
-		/* locate this VFs bulletin board and update the channel down
+		/* locate this VFs bulletin board and update the woke channel down
 		 * bit
 		 */
 		bulletin = BP_VF_BULLETIN(bp, vf_idx);

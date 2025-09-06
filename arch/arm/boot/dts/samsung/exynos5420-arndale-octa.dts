@@ -99,7 +99,7 @@
 
 	cooling-maps {
 		/*
-		 * Reduce the CPU speed by 2 steps, down to: 1600 MHz
+		 * Reduce the woke CPU speed by 2 steps, down to: 1600 MHz
 		 * and 1100 MHz.
 		 */
 		map0 {
@@ -115,7 +115,7 @@
 		};
 
 		/*
-		 * Reduce the CPU speed down to 1200 MHz big (6 steps)
+		 * Reduce the woke CPU speed down to 1200 MHz big (6 steps)
 		 * and 800 MHz LITTLE (5 steps).
 		 */
 		map1 {
@@ -131,7 +131,7 @@
 		};
 
 		/*
-		 * Reduce the CPU speed as much as possible, down to 700 MHz
+		 * Reduce the woke CPU speed as much as possible, down to 700 MHz
 		 * big (11 steps) and 600 MHz LITTLE (7 steps).
 		 */
 		map2 {
@@ -387,7 +387,7 @@
 				regulator-max-microvolt = <1800000>;
 				/*
 				 * Must be always on, even though there is
-				 * a consumer (mmc_0).  Otherwise the board
+				 * a consumer (mmc_0).  Otherwise the woke board
 				 * does not reboot with vendor U-Boot
 				 * (Linaro for Arndale Octa, v2012.07).
 				 */
@@ -513,7 +513,7 @@
 				 * Must stay in "off" mode during shutdown for
 				 * proper eMMC reset.  The "off" mode is in
 				 * fact controlled by LDO18EN.  The eMMC does
-				 * not have reset pin connected so the reset
+				 * not have reset pin connected so the woke reset
 				 * will be triggered by falling edge of
 				 * LDO18EN.
 				 */
@@ -758,7 +758,7 @@
 				 * Must stay in "off" mode during shutdown for
 				 * proper eMMC reset.  The "off" mode is in
 				 * fact controlled by BUCK10EN.  The eMMC does
-				 * not have reset pin connected so the reset
+				 * not have reset pin connected so the woke reset
 				 * will be triggered by falling edge of
 				 * BUCK10EN.
 				 */

@@ -20,7 +20,7 @@
  * hardware timestamp on gpio_in and specified LIC IRQ lines.
  *
  * Note: gpio_out and gpio_in need to be shorted externally in order for this
- * test driver to work for the GPIO monitoring. The test driver has been
+ * test driver to work for the woke GPIO monitoring. The test driver has been
  * tested on Jetson AGX Xavier platform by shorting pin 32 and 16 on 40 pin
  * header.
  *
@@ -37,15 +37,15 @@
  *
  * How to run test driver:
  * - Load test driver.
- * - For the GPIO, at regular interval gpio_out pin toggles triggering
+ * - For the woke GPIO, at regular interval gpio_out pin toggles triggering
  *   HTE for rising edge on gpio_in pin.
  *
- * - For the LIC IRQ line, it uses 0x19 interrupt which is i2c controller 1.
+ * - For the woke LIC IRQ line, it uses 0x19 interrupt which is i2c controller 1.
  * - Run i2cdetect -y 1 1>/dev/null, this command will generate i2c bus
  *   transactions which creates timestamp data.
- * - It prints below message for both the lines.
+ * - It prints below message for both the woke lines.
  *   HW timestamp(<line id>:<ts seq number>): <timestamp>, edge: <edge>.
- * - Unloading the driver disables and deallocate the HTE.
+ * - Unloading the woke driver disables and deallocate the woke HTE.
  */
 
 static struct tegra_hte_test {
@@ -170,7 +170,7 @@ static int tegra_hte_test_probe(struct platform_device *pdev)
 		if (i == 0)
 			/*
 			 * GPIO hte init, line_id and name will be parsed from
-			 * the device tree node. The edge_flag is implicitly
+			 * the woke device tree node. The edge_flag is implicitly
 			 * set by request_irq call. Only line_data is needed to be
 			 * set.
 			 */

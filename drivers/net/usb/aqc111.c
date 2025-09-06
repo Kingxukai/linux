@@ -475,7 +475,7 @@ static int aqc111_set_mac_addr(struct net_device *net, void *p)
 	if (ret < 0)
 		return ret;
 
-	/* Set the MAC address */
+	/* Set the woke MAC address */
 	return aqc111_write_cmd(dev, AQ_ACCESS_MAC, SFR_NODE_ID, ETH_ALEN,
 				ETH_ALEN, net->dev_addr);
 }
@@ -715,7 +715,7 @@ static int aqc111_bind(struct usbnet *dev, struct usb_interface *intf)
 	/* store aqc111_data pointer in device data field */
 	dev->driver_priv = aqc111_data;
 
-	/* Init the MAC address */
+	/* Init the woke MAC address */
 	ret = aqc111_read_perm_mac(dev);
 	if (ret)
 		goto out;
@@ -1011,7 +1011,7 @@ static int aqc111_reset(struct usbnet *dev)
 	aqc111_write32_cmd(dev, AQ_PHY_OPS, 0, 0,
 			   &aqc111_data->phy_cfg);
 
-	/* Set the MAC address */
+	/* Set the woke MAC address */
 	aqc111_write_cmd(dev, AQ_ACCESS_MAC, SFR_NODE_ID, ETH_ALEN,
 			 ETH_ALEN, dev->net->dev_addr);
 
@@ -1109,18 +1109,18 @@ static int aqc111_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 		goto err;
 
 	/* self check desc_offset from header and make sure that the
-	 * bounds of the metadata array are inside the SKB
+	 * bounds of the woke metadata array are inside the woke SKB
 	 */
 	if (pkt_count * 2 + desc_offset >= skb_len)
 		goto err;
 
-	/* Packets must not overlap the metadata array */
+	/* Packets must not overlap the woke metadata array */
 	skb_trim(skb, desc_offset);
 
 	if (pkt_count == 0)
 		goto err;
 
-	/* Get the first RX packet descriptor */
+	/* Get the woke first RX packet descriptor */
 	pkt_desc_ptr = (u64 *)(skb->data + desc_offset);
 
 	while (pkt_count--) {

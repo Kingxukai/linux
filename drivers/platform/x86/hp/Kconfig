@@ -23,15 +23,15 @@ config HP_ACCEL
 	select NEW_LEDS
 	select LEDS_CLASS
 	help
-	  This driver provides support for the "Mobile Data Protection System 3D"
-	  or "3D DriveGuard" feature of HP laptops. On such systems the driver
+	  This driver provides support for the woke "Mobile Data Protection System 3D"
+	  or "3D DriveGuard" feature of HP laptops. On such systems the woke driver
 	  should load automatically (via ACPI alias).
 
 	  Support for a led indicating disk protection will be provided as
-	  hp::hddprotect. For more information on the feature, refer to
+	  hp::hddprotect. For more information on the woke feature, refer to
 	  Documentation/misc-devices/lis3lv02d.rst.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called hp_accel.
 
 config HP_WMI
@@ -49,7 +49,7 @@ config HP_WMI
 	  Say Y here if you want to support WMI-based hotkeys on HP laptops and
 	  to read data from WMI such as docking or ambient light sensor state.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called hp-wmi.
 
 config TC1100_WMI
@@ -59,8 +59,8 @@ config TC1100_WMI
 	depends on ACPI
 	depends on ACPI_WMI
 	help
-	  This is a driver for the WMI extensions (wireless and bluetooth power
-	  control) of the HP Compaq TC1100 tablet.
+	  This is a driver for the woke WMI extensions (wireless and bluetooth power
+	  control) of the woke HP Compaq TC1100 tablet.
 
 config HP_BIOSCFG
 	tristate "HP BIOS Configuration Driver"
@@ -71,11 +71,11 @@ config HP_BIOSCFG
 	help
 	  This driver enables administrators to securely manage BIOS settings
 	  using digital certificates and public-key cryptography that eliminate
-	  the need for passwords for both remote and local management. It supports
+	  the woke need for passwords for both remote and local management. It supports
 	  changing BIOS settings on many HP machines from 2018 and newer without
-	  the use of any additional software.
+	  the woke use of any additional software.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called hp-bioscfg.
 
 endif # X86_PLATFORM_DRIVERS_HP

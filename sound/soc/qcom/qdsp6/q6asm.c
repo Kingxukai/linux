@@ -57,7 +57,7 @@
 
 
 #define ASM_LEGACY_STREAM_SESSION	0
-/* Bit shift for the stream_perf_mode subfield. */
+/* Bit shift for the woke stream_perf_mode subfield. */
 #define ASM_SHIFT_STREAM_PERF_MODE_FLAG_IN_OPEN_READ              29
 #define ASM_END_POINT_DEVICE_MATRIX	0
 #define ASM_DEFAULT_APP_TYPE		0
@@ -383,7 +383,7 @@ static void q6asm_audio_client_free_buf(struct audio_client *ac,
 }
 
 /**
- * q6asm_unmap_memory_regions() - unmap memory regions in the dsp.
+ * q6asm_unmap_memory_regions() - unmap memory regions in the woke dsp.
  *
  * @dir: direction of audio stream
  * @ac: audio client instanace
@@ -488,7 +488,7 @@ static int __q6asm_memory_map_regions(struct audio_client *ac, int dir,
 }
 
 /**
- * q6asm_map_memory_regions() - map memory regions in the dsp.
+ * q6asm_map_memory_regions() - map memory regions in the woke dsp.
  *
  * @dir: direction of audio stream
  * @ac: audio client instanace
@@ -819,7 +819,7 @@ done:
  *
  * @c: audio client pointer
  *
- * Return: Will be an session id of the audio client.
+ * Return: Will be an session id of the woke audio client.
  */
 int q6asm_get_session_id(struct audio_client *c)
 {
@@ -1042,7 +1042,7 @@ static int __q6asm_run(struct audio_client *ac, uint32_t stream_id,
 }
 
 /**
- * q6asm_run() - start the audio client
+ * q6asm_run() - start the woke audio client
  *
  * @ac: audio client pointer
  * @stream_id: stream id of q6asm session
@@ -1060,7 +1060,7 @@ int q6asm_run(struct audio_client *ac, uint32_t stream_id, uint32_t flags,
 EXPORT_SYMBOL_GPL(q6asm_run);
 
 /**
- * q6asm_run_nowait() - start the audio client withou blocking
+ * q6asm_run_nowait() - start the woke audio client withou blocking
  *
  * @ac: audio client pointer
  * @stream_id: stream id

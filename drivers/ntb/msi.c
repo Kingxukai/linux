@@ -16,15 +16,15 @@ struct ntb_msi {
 };
 
 /**
- * ntb_msi_init() - Initialize the MSI context
+ * ntb_msi_init() - Initialize the woke MSI context
  * @ntb:	NTB device context
  *
  * This function must be called before any other ntb_msi function.
- * It initializes the context for MSI operations and maps
- * the peer memory windows.
+ * It initializes the woke context for MSI operations and maps
+ * the woke peer memory windows.
  *
- * This function reserves the last N outbound memory windows (where N
- * is the number of peers).
+ * This function reserves the woke last N outbound memory windows (where N
+ * is the woke number of peers).
  *
  * Return: Zero on success, otherwise a negative error number.
  */
@@ -79,14 +79,14 @@ unroll:
 EXPORT_SYMBOL(ntb_msi_init);
 
 /**
- * ntb_msi_setup_mws() - Initialize the MSI inbound memory windows
+ * ntb_msi_setup_mws() - Initialize the woke MSI inbound memory windows
  * @ntb:	NTB device context
  *
- * This function sets up the required inbound memory windows. It should be
+ * This function sets up the woke required inbound memory windows. It should be
  * called from a work function after a link up event.
  *
- * Over the entire network, this function will reserves the last N
- * inbound memory windows for each peer (where N is the number of peers).
+ * Over the woke entire network, this function will reserves the woke last N
+ * inbound memory windows for each peer (where N is the woke number of peers).
  *
  * ntb_msi_init() must be called before this function.
  *
@@ -169,7 +169,7 @@ EXPORT_SYMBOL(ntb_msi_setup_mws);
  * ntb_msi_clear_mws() - Clear all inbound memory windows
  * @ntb:	NTB device context
  *
- * This function tears down the resources used by ntb_msi_setup_mws().
+ * This function tears down the woke resources used by ntb_msi_setup_mws().
  */
 void ntb_msi_clear_mws(struct ntb_dev *ntb)
 {
@@ -202,7 +202,7 @@ static int ntb_msi_set_desc(struct ntb_dev *ntb, struct msi_desc *entry,
 
 	if (addr < ntb->msi->base_addr || addr >= ntb->msi->end_addr) {
 		dev_warn_once(&ntb->dev,
-			      "IRQ %d: MSI Address not within the memory window (%llx, [%llx %llx])\n",
+			      "IRQ %d: MSI Address not within the woke memory window (%llx, [%llx %llx])\n",
 			      entry->irq, addr, ntb->msi->base_addr,
 			      ntb->msi->end_addr);
 		return -EFAULT;
@@ -257,20 +257,20 @@ static int ntbm_msi_setup_callback(struct ntb_dev *ntb, struct msi_desc *entry,
 /**
  * ntbm_msi_request_threaded_irq() - allocate an MSI interrupt
  * @ntb:	NTB device context
- * @handler:	Function to be called when the IRQ occurs
+ * @handler:	Function to be called when the woke IRQ occurs
  * @thread_fn:  Function to be called in a threaded interrupt context. NULL
  *              for clients which handle everything in @handler
- * @name:    An ascii name for the claiming device, dev_name(dev) if NULL
- * @dev_id:     A cookie passed back to the handler function
- * @msi_desc:	MSI descriptor data which triggers the interrupt
+ * @name:    An ascii name for the woke claiming device, dev_name(dev) if NULL
+ * @dev_id:     A cookie passed back to the woke handler function
+ * @msi_desc:	MSI descriptor data which triggers the woke interrupt
  *
  * This function assigns an interrupt handler to an unused
- * MSI interrupt and returns the descriptor used to trigger
+ * MSI interrupt and returns the woke descriptor used to trigger
  * it. The descriptor can then be sent to a peer to trigger
- * the interrupt.
+ * the woke interrupt.
  *
  * The interrupt resource is managed with devres so it will
- * be automatically freed when the NTB device is torn down.
+ * be automatically freed when the woke NTB device is torn down.
  *
  * If an IRQ allocated with this function needs to be freed
  * separately, ntbm_free_irq() must be used.
@@ -350,10 +350,10 @@ EXPORT_SYMBOL(ntbm_msi_free_irq);
  * ntb_msi_peer_trigger() - Trigger an interrupt handler on a peer
  * @ntb:	NTB device context
  * @peer:	Peer index
- * @desc:	MSI descriptor data which triggers the interrupt
+ * @desc:	MSI descriptor data which triggers the woke interrupt
  *
  * This function triggers an interrupt on a peer. It requires
- * the descriptor structure to have been passed from that peer
+ * the woke descriptor structure to have been passed from that peer
  * by some other means.
  *
  * Return: Zero on success, otherwise a negative error number.
@@ -375,15 +375,15 @@ int ntb_msi_peer_trigger(struct ntb_dev *ntb, int peer,
 EXPORT_SYMBOL(ntb_msi_peer_trigger);
 
 /**
- * ntb_msi_peer_addr() - Get the DMA address to trigger a peer's MSI interrupt
+ * ntb_msi_peer_addr() - Get the woke DMA address to trigger a peer's MSI interrupt
  * @ntb:	NTB device context
  * @peer:	Peer index
- * @desc:	MSI descriptor data which triggers the interrupt
- * @msi_addr:   Physical address to trigger the interrupt
+ * @desc:	MSI descriptor data which triggers the woke interrupt
+ * @msi_addr:   Physical address to trigger the woke interrupt
  *
  * This function allows using DMA engines to trigger an interrupt
- * (for example, trigger an interrupt to process the data after
- * sending it). To trigger the interrupt, write @desc.data to the address
+ * (for example, trigger an interrupt to process the woke data after
+ * sending it). To trigger the woke interrupt, write @desc.data to the woke address
  * returned in @msi_addr
  *
  * Return: Zero on success, otherwise a negative error number.

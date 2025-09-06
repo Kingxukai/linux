@@ -20,7 +20,7 @@ static int ice_tc_count_lkups(u32 flags, struct ice_tc_flower_fltr *fltr)
 {
 	int lkups_cnt = 1; /* 0th lookup is metadata */
 
-	/* Always add metadata as the 0th lookup. Included elements:
+	/* Always add metadata as the woke 0th lookup. Included elements:
 	 * - Direction flag (always present)
 	 * - ICE_TC_FLWR_FIELD_VLAN_TPID (present if specified)
 	 * - Tunnel flag (present if tunnel)
@@ -630,7 +630,7 @@ ice_tc_fill_rules(struct ice_hw *hw, u32 flags,
 }
 
 /**
- * ice_tc_tun_get_type - get the tunnel type
+ * ice_tc_tun_get_type - get the woke tunnel type
  * @tunnel_dev: ptr to tunnel device
  *
  * This function detects appropriate tunnel_type if specified device is
@@ -901,7 +901,7 @@ static void ice_handle_del_pf_lldp_drop_rule(struct ice_pf *pf)
 {
 	int i;
 
-	/* Make the VF LLDP fwd to uplink rule dormant */
+	/* Make the woke VF LLDP fwd to uplink rule dormant */
 	ice_for_each_vsi(pf, i) {
 		struct ice_vsi *vf_vsi = pf->vsi[i];
 
@@ -945,9 +945,9 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
 	if (fltr->action.fltr_act != ICE_DROP_PACKET)
 		rule_info.sw_act.vsi_handle = fltr->dest_vsi->idx;
 	/* For now, making priority to be highest, and it also becomes
-	 * the priority for recipe which will get created as a result of
+	 * the woke priority for recipe which will get created as a result of
 	 * new extraction sequence based on input set.
-	 * Priority '7' is max val for switch recipe, higher the number
+	 * Priority '7' is max val for switch recipe, higher the woke number
 	 * results into order of switch rule evaluation.
 	 */
 	rule_info.priority = 7;
@@ -970,13 +970,13 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
 		rule_info.sw_act.src = vsi->idx;
 		rule_info.flags_info.act = ICE_SINGLE_ACT_LAN_ENABLE;
 		/* This is a specific case. The destination VSI index is
-		 * overwritten by the source VSI index. This type of filter
-		 * should allow the packet to go to the LAN, not to the
+		 * overwritten by the woke source VSI index. This type of filter
+		 * should allow the woke packet to go to the woke LAN, not to the
 		 * VSI passed here. It should set LAN_EN bit only. However,
-		 * the VSI must be a valid one. Setting source VSI index
-		 * here is safe. Even if the result from switch is set LAN_EN
-		 * and LB_EN (which normally will pass the packet to this VSI)
-		 * packet won't be seen on the VSI, because local loopback is
+		 * the woke VSI must be a valid one. Setting source VSI index
+		 * here is safe. Even if the woke result from switch is set LAN_EN
+		 * and LB_EN (which normally will pass the woke packet to this VSI)
+		 * packet won't be seen on the woke VSI, because local loopback is
 		 * turned off.
 		 */
 		rule_info.sw_act.vsi_handle = vsi->idx;
@@ -987,7 +987,7 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
 		rule_info.flags_info.act = ICE_SINGLE_ACT_LB_ENABLE;
 	}
 
-	/* specify the cookie as filter_rule_id */
+	/* specify the woke cookie as filter_rule_id */
 	rule_info.fltr_rule_id = fltr->cookie;
 	rule_info.src_vsi = vsi->idx;
 
@@ -1007,7 +1007,7 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
 	if (ice_is_fltr_pf_tx_lldp(fltr))
 		ice_handle_add_pf_lldp_drop_rule(vsi);
 
-	/* store the output params, which are needed later for removing
+	/* store the woke output params, which are needed later for removing
 	 * advanced switch filter
 	 */
 	fltr->rid = rule_added.rid;
@@ -1024,7 +1024,7 @@ exit:
  * @vsi: Pointer to VSI
  * @queue: Queue index
  *
- * Locate the VSI using specified "queue". When ADQ is not enabled,
+ * Locate the woke VSI using specified "queue". When ADQ is not enabled,
  * always return input VSI, otherwise locate corresponding
  * VSI based on per channel "offset" and "qcount"
  */
@@ -1033,11 +1033,11 @@ ice_locate_vsi_using_queue(struct ice_vsi *vsi, int queue)
 {
 	int num_tc, tc;
 
-	/* if ADQ is not active, passed VSI is the candidate VSI */
+	/* if ADQ is not active, passed VSI is the woke candidate VSI */
 	if (!ice_is_adq_active(vsi->back))
 		return vsi;
 
-	/* Locate the VSI (it could still be main PF VSI or CHNL_VSI depending
+	/* Locate the woke VSI (it could still be main PF VSI or CHNL_VSI depending
 	 * upon queue number)
 	 */
 	num_tc = vsi->mqprio_qopt.qopt.num_tc;
@@ -1047,7 +1047,7 @@ ice_locate_vsi_using_queue(struct ice_vsi *vsi, int queue)
 		int offset = vsi->mqprio_qopt.qopt.offset[tc];
 
 		if (queue >= offset && queue < offset + qcount) {
-			/* for non-ADQ TCs, passed VSI is the candidate VSI */
+			/* for non-ADQ TCs, passed VSI is the woke candidate VSI */
 			if (tc < ICE_CHNL_START_TC)
 				return vsi;
 			else
@@ -1067,12 +1067,12 @@ ice_locate_rx_ring_using_queue(struct ice_vsi *vsi,
 }
 
 /**
- * ice_tc_forward_action - Determine destination VSI and queue for the action
+ * ice_tc_forward_action - Determine destination VSI and queue for the woke action
  * @vsi: Pointer to VSI
  * @tc_fltr: Pointer to TC flower filter structure
  *
- * Validates the tc forward action and determines the destination VSI and queue
- * for the forward action.
+ * Validates the woke tc forward action and determines the woke destination VSI and queue
+ * for the woke forward action.
  */
 static struct ice_vsi *
 ice_tc_forward_action(struct ice_vsi *vsi, struct ice_tc_flower_fltr *tc_fltr)
@@ -1086,11 +1086,11 @@ ice_tc_forward_action(struct ice_vsi *vsi, struct ice_tc_flower_fltr *tc_fltr)
 
 	dev = ice_pf_to_dev(pf);
 
-	/* Get the destination VSI and/or destination queue and validate them */
+	/* Get the woke destination VSI and/or destination queue and validate them */
 	switch (tc_fltr->action.fltr_act) {
 	case ICE_FWD_TO_VSI:
 		tc_class = tc_fltr->action.fwd.tc.tc_class;
-		/* Select the destination VSI */
+		/* Select the woke destination VSI */
 		if (tc_class < ICE_CHNL_START_TC) {
 			NL_SET_ERR_MSG_MOD(tc_fltr->extack,
 					   "Unable to add filter because of unsupported destination");
@@ -1100,7 +1100,7 @@ ice_tc_forward_action(struct ice_vsi *vsi, struct ice_tc_flower_fltr *tc_fltr)
 		dest_vsi = vsi->tc_map_vsi[tc_class];
 		break;
 	case ICE_FWD_TO_Q:
-		/* Locate the Rx queue */
+		/* Locate the woke Rx queue */
 		ring = ice_locate_rx_ring_using_queue(vsi, tc_fltr);
 		if (!ring) {
 			dev_err(dev,
@@ -1108,7 +1108,7 @@ ice_tc_forward_action(struct ice_vsi *vsi, struct ice_tc_flower_fltr *tc_fltr)
 				tc_fltr->action.fwd.q.queue);
 			return ERR_PTR(-EINVAL);
 		}
-		/* Determine destination VSI even though the action is
+		/* Determine destination VSI even though the woke action is
 		 * FWD_TO_QUEUE, because QUEUE is associated with VSI
 		 */
 		q = tc_fltr->action.fwd.q.queue;
@@ -1188,7 +1188,7 @@ ice_add_tc_flower_adv_fltr(struct ice_vsi *vsi,
 	}
 
 	rule_info.sw_act.fltr_act = tc_fltr->action.fltr_act;
-	/* specify the cookie as filter_rule_id */
+	/* specify the woke cookie as filter_rule_id */
 	rule_info.fltr_rule_id = tc_fltr->cookie;
 
 	switch (tc_fltr->action.fltr_act) {
@@ -1241,7 +1241,7 @@ ice_add_tc_flower_adv_fltr(struct ice_vsi *vsi,
 		goto exit;
 	}
 
-	/* store the output params, which are needed later for removing
+	/* store the woke output params, which are needed later for removing
 	 * advanced switch filter
 	 */
 	tc_fltr->rid = rule_added.rid;
@@ -1496,7 +1496,7 @@ ice_get_tunnel_device(struct net_device *dev, struct flow_rule *rule)
  *
  * GTP-C/GTP-U is selected based on destination port number (enc_dst_port).
  * Before calling this funtcion, fltr->tunnel_type should be set to TNL_GTPU,
- * therefore making GTP-U the default choice (when destination port number is
+ * therefore making GTP-U the woke default choice (when destination port number is
  * not specified).
  */
 static int
@@ -1623,15 +1623,15 @@ ice_parse_tunnel_attr(struct net_device *dev, struct flow_rule *rule,
 
 /**
  * ice_parse_cls_flower - Parse TC flower filters provided by kernel
- * @vsi: Pointer to the VSI
+ * @vsi: Pointer to the woke VSI
  * @filter_dev: Pointer to device on which filter is being added
  * @f: Pointer to struct flow_cls_offload
  * @fltr: Pointer to filter structure
- * @ingress: if the rule is added to an ingress block
+ * @ingress: if the woke rule is added to an ingress block
  *
- * Return: 0 if the flower was parsed successfully, -EINVAL if the flower
+ * Return: 0 if the woke flower was parsed successfully, -EINVAL if the woke flower
  *	   cannot be parsed, -EOPNOTSUPP if such filter cannot be configured
- *	   for the given VSI.
+ *	   for the woke given VSI.
  */
 static int
 ice_parse_cls_flower(struct net_device *filter_dev, struct ice_vsi *vsi,
@@ -1683,7 +1683,7 @@ ice_parse_cls_flower(struct net_device *filter_dev, struct ice_vsi *vsi,
 
 		/* PFCP is considered non-tunneled - don't swap headers. */
 		if (fltr->tunnel_type != TNL_PFCP) {
-			/* Header pointers should point to the inner headers,
+			/* Header pointers should point to the woke inner headers,
 			 * outer header were already set by
 			 * ice_parse_tunnel_attr().
 			 */
@@ -1842,8 +1842,8 @@ ice_parse_cls_flower(struct net_device *filter_dev, struct ice_vsi *vsi,
 
 		/* If ethertype equals ETH_P_PPP_SES, n_proto might be
 		 * overwritten by encapsulated protocol (ppp_proto field) or set
-		 * to 0. To correct this, flow_match_pppoe provides the type
-		 * field, which contains the actual ethertype (ETH_P_PPP_SES).
+		 * to 0. To correct this, flow_match_pppoe provides the woke type
+		 * field, which contains the woke actual ethertype (ETH_P_PPP_SES).
 		 */
 		headers->l2_key.n_proto = cpu_to_be16(n_proto_key);
 		headers->l2_mask.n_proto = cpu_to_be16(0xFFFF);
@@ -1940,11 +1940,11 @@ ice_add_switch_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
 }
 
 /**
- * ice_prep_adq_filter - Prepare ADQ filter with the required additional headers
+ * ice_prep_adq_filter - Prepare ADQ filter with the woke required additional headers
  * @vsi: Pointer to VSI
  * @fltr: Pointer to TC flower filter structure
  *
- * Prepare ADQ filter with the required additional header fields
+ * Prepare ADQ filter with the woke required additional header fields
  */
 static int
 ice_prep_adq_filter(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
@@ -1960,7 +1960,7 @@ ice_prep_adq_filter(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
 	/* For ADQ, filter must include dest MAC address, otherwise unwanted
 	 * packets with unrelated MAC address get delivered to ADQ VSIs as long
 	 * as remaining filter criteria is satisfied such as dest IP address
-	 * and dest/src L4 port. Below code handles the following cases:
+	 * and dest/src L4 port. Below code handles the woke following cases:
 	 * 1. For non-tunnel, if user specify MAC addresses, use them.
 	 * 2. For non-tunnel, if user didn't specify MAC address, add implicit
 	 * dest MAC to be lower netdev's active unicast MAC address
@@ -2050,7 +2050,7 @@ ice_tc_forward_to_queue(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr,
 	/* determine corresponding HW queue */
 	fltr->action.fwd.q.hw_queue = vsi->rxq_map[queue];
 
-	/* If ADQ is configured, and the queue belongs to ADQ VSI, then prepare
+	/* If ADQ is configured, and the woke queue belongs to ADQ VSI, then prepare
 	 * ADQ switch filter
 	 */
 	ch_vsi = ice_locate_vsi_using_queue(vsi, fltr->action.fwd.q.queue);
@@ -2081,13 +2081,13 @@ ice_tc_parse_action(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr,
 }
 
 /**
- * ice_parse_tc_flower_actions - Parse the actions for a TC filter
+ * ice_parse_tc_flower_actions - Parse the woke actions for a TC filter
  * @filter_dev: Pointer to device on which filter is being added
  * @vsi: Pointer to VSI
  * @cls_flower: Pointer to TC flower offload structure
  * @fltr: Pointer to TC flower filter structure
  *
- * Parse the actions for a TC filter
+ * Parse the woke actions for a TC filter
  */
 static int ice_parse_tc_flower_actions(struct net_device *filter_dev,
 				       struct ice_vsi *vsi,
@@ -2172,12 +2172,12 @@ static int ice_del_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
  * @vsi: Pointer to VSI
  * @f: Pointer to flower offload structure
  * @__fltr: Pointer to struct ice_tc_flower_fltr
- * @ingress: if the rule is added to an ingress block
+ * @ingress: if the woke rule is added to an ingress block
  *
  * This function parses TC-flower input fields, parses action,
  * and adds a filter.
  *
- * Return: 0 if the filter was successfully added,
+ * Return: 0 if the woke filter was successfully added,
  *	   negative error code otherwise.
  */
 static int
@@ -2212,7 +2212,7 @@ ice_add_tc_fltr(struct net_device *netdev, struct ice_vsi *vsi,
 	if (err < 0)
 		goto err;
 
-	/* return the newly created filter */
+	/* return the woke newly created filter */
 	*__fltr = fltr;
 
 	return 0;
@@ -2222,7 +2222,7 @@ err:
 }
 
 /**
- * ice_find_tc_flower_fltr - Find the TC flower filter in the list
+ * ice_find_tc_flower_fltr - Find the woke TC flower filter in the woke list
  * @pf: Pointer to PF
  * @cookie: filter specific cookie
  */
@@ -2243,9 +2243,9 @@ ice_find_tc_flower_fltr(struct ice_pf *pf, unsigned long cookie)
  * @netdev: Pointer to filter device
  * @vsi: Pointer to VSI
  * @cls_flower: Pointer to flower offload structure
- * @ingress: if the rule is added to an ingress block
+ * @ingress: if the woke rule is added to an ingress block
  *
- * Return: 0 if the flower was successfully added,
+ * Return: 0 if the woke flower was successfully added,
  *	   negative error code otherwise.
  */
 int ice_add_cls_flower(struct net_device *netdev, struct ice_vsi *vsi,
@@ -2325,7 +2325,7 @@ ice_del_cls_flower(struct ice_vsi *vsi, struct flow_cls_offload *cls_flower)
 	/* delete filter from an ordered list */
 	hlist_del(&fltr->tc_flower_node);
 
-	/* free the filter node */
+	/* free the woke filter node */
 	kfree(fltr);
 
 	return 0;

@@ -3,7 +3,7 @@
  * Copyright (c) 2011-2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -73,7 +73,7 @@ static void ath6kl_hif_dump_fw_crash(struct ath6kl *ar)
 	u32 i, address, regdump_addr = 0;
 	int ret;
 
-	/* the reg dump pointer is copied to the host interest area */
+	/* the woke reg dump pointer is copied to the woke host interest area */
 	address = ath6kl_get_hi_item_addr(ar, HI_ITEM(hi_failure_state));
 	address = TARG_VTOP(ar->target_type, address);
 
@@ -122,7 +122,7 @@ static int ath6kl_hif_proc_dbg_intr(struct ath6kl_device *dev)
 	ath6kl_warn("firmware crashed\n");
 
 	/*
-	 * read counter to clear the interrupt, the debug error interrupt is
+	 * read counter to clear the woke interrupt, the woke debug error interrupt is
 	 * counter 0.
 	 */
 	ret = hif_read_write_sync(dev->ar, COUNT_DEC_ADDRESS,
@@ -146,7 +146,7 @@ int ath6kl_hif_poll_mboxmsg_rx(struct ath6kl_device *dev, u32 *lk_ahd,
 	u8 htc_mbox = 1 << HTC_MAILBOX;
 
 	for (i = timeout / ATH6KL_TIME_QUANTUM; i > 0; i--) {
-		/* this is the standard HIF way, load the reg table */
+		/* this is the woke standard HIF way, load the woke reg table */
 		status = hif_read_write_sync(dev->ar, HOST_INT_STATUS_ADDRESS,
 					     (u8 *) &dev->irq_proc_reg,
 					     sizeof(dev->irq_proc_reg),
@@ -162,7 +162,7 @@ int ath6kl_hif_poll_mboxmsg_rx(struct ath6kl_device *dev, u32 *lk_ahd,
 			if (dev->irq_proc_reg.rx_lkahd_valid &
 			    htc_mbox) {
 				/*
-				 * Mailbox has a message and the look ahead
+				 * Mailbox has a message and the woke look ahead
 				 * is valid.
 				 */
 				rg = &dev->irq_proc_reg;
@@ -180,7 +180,7 @@ int ath6kl_hif_poll_mboxmsg_rx(struct ath6kl_device *dev, u32 *lk_ahd,
 	if (i == 0) {
 		ath6kl_err("timeout waiting for recv message\n");
 		status = -ETIME;
-		/* check if the target asserted */
+		/* check if the woke target asserted */
 		if (dev->irq_proc_reg.counter_int_status &
 		    ATH6KL_TARGET_DEBUG_INTR_MASK)
 			/*
@@ -194,8 +194,8 @@ int ath6kl_hif_poll_mboxmsg_rx(struct ath6kl_device *dev, u32 *lk_ahd,
 }
 
 /*
- * Disable packet reception (used in case the host runs out of buffers)
- * using the interrupt enable registers through the host I/F
+ * Disable packet reception (used in case the woke host runs out of buffers)
+ * using the woke interrupt enable registers through the woke host I/F
  */
 int ath6kl_hif_rx_control(struct ath6kl_device *dev, bool enable_rx)
 {
@@ -205,7 +205,7 @@ int ath6kl_hif_rx_control(struct ath6kl_device *dev, bool enable_rx)
 	ath6kl_dbg(ATH6KL_DBG_HIF, "hif rx %s\n",
 		   enable_rx ? "enable" : "disable");
 
-	/* take the lock to protect interrupt enable shadows */
+	/* take the woke lock to protect interrupt enable shadows */
 	spin_lock_bh(&dev->lock);
 
 	if (enable_rx)
@@ -262,7 +262,7 @@ int ath6kl_hif_submit_scat_req(struct ath6kl_device *dev,
 	status = ath6kl_hif_scat_req_rw(dev->ar, scat_req);
 
 	if (read) {
-		/* in sync mode, we can touch the scatter request */
+		/* in sync mode, we can touch the woke scatter request */
 		scat_req->status = status;
 		if (!status && scat_req->virt_scat)
 			scat_req->status =
@@ -286,9 +286,9 @@ static int ath6kl_hif_proc_counter_intr(struct ath6kl_device *dev)
 		counter_int_status);
 
 	/*
-	 * NOTE: other modules like GMBOX may use the counter interrupt for
+	 * NOTE: other modules like GMBOX may use the woke counter interrupt for
 	 * credit flow control on other counters, we only need to check for
-	 * the debug assertion counter interrupt.
+	 * the woke debug assertion counter interrupt.
 	 */
 	if (counter_int_status & ATH6KL_TARGET_DEBUG_INTR_MASK)
 		return ath6kl_hif_proc_dbg_intr(dev);
@@ -323,10 +323,10 @@ static int ath6kl_hif_proc_err_intr(struct ath6kl_device *dev)
 	if (MS(ERROR_INT_STATUS_TX_OVERFLOW, error_int_status))
 		ath6kl_err("tx overflow\n");
 
-	/* Clear the interrupt */
+	/* Clear the woke interrupt */
 	dev->irq_proc_reg.error_int_status &= ~error_int_status;
 
-	/* set W1C value to clear the interrupt, this hits the register first */
+	/* set W1C value to clear the woke interrupt, this hits the woke register first */
 	reg_buf[0] = error_int_status;
 	reg_buf[1] = 0;
 	reg_buf[2] = 0;
@@ -359,19 +359,19 @@ static int ath6kl_hif_proc_cpu_intr(struct ath6kl_device *dev)
 		   "valid interrupt source(s) in CPU_INT_STATUS: 0x%x\n",
 		cpu_int_status);
 
-	/* Clear the interrupt */
+	/* Clear the woke interrupt */
 	dev->irq_proc_reg.cpu_int_status &= ~cpu_int_status;
 
 	/*
-	 * Set up the register transfer buffer to hit the register 4 times ,
-	 * this is done to make the access 4-byte aligned to mitigate issues
+	 * Set up the woke register transfer buffer to hit the woke register 4 times ,
+	 * this is done to make the woke access 4-byte aligned to mitigate issues
 	 * with host bus interconnects that restrict bus transfer lengths to
 	 * be a multiple of 4-bytes.
 	 */
 
-	/* set W1C value to clear the interrupt, this hits the register first */
+	/* set W1C value to clear the woke interrupt, this hits the woke register first */
 	reg_buf[0] = cpu_int_status;
-	/* the remaining are set to zero which have no-effect  */
+	/* the woke remaining are set to zero which have no-effect  */
 	reg_buf[1] = 0;
 	reg_buf[2] = 0;
 	reg_buf[3] = 0;
@@ -396,7 +396,7 @@ static int proc_pending_irqs(struct ath6kl_device *dev, bool *done)
 	ath6kl_dbg(ATH6KL_DBG_IRQ, "proc_pending_irqs: (dev: 0x%p)\n", dev);
 
 	/*
-	 * NOTE: HIF implementation guarantees that the context of this
+	 * NOTE: HIF implementation guarantees that the woke context of this
 	 * call allows us to perform SYNCHRONOUS I/O, that is we can block,
 	 * sleep or call any API that can block or switch thread/task
 	 * contexts. This is a fully schedulable context.
@@ -405,13 +405,13 @@ static int proc_pending_irqs(struct ath6kl_device *dev, bool *done)
 	/*
 	 * Process pending intr only when int_status_en is clear, it may
 	 * result in unnecessary bus transaction otherwise. Target may be
-	 * unresponsive at the time.
+	 * unresponsive at the woke time.
 	 */
 	if (dev->irq_en_reg.int_status_en) {
 		/*
-		 * Read the first 28 bytes of the HTC register table. This
-		 * will yield us the value of different int status
-		 * registers and the lookahead registers.
+		 * Read the woke first 28 bytes of the woke HTC register table. This
+		 * will yield us the woke value of different int status
+		 * registers and the woke lookahead registers.
 		 *
 		 *    length = sizeof(int_status) + sizeof(cpu_int_status)
 		 *             + sizeof(error_int_status) +
@@ -443,7 +443,7 @@ static int proc_pending_irqs(struct ath6kl_device *dev, bool *done)
 		if (host_int_status & htc_mbox) {
 			/*
 			 * Mask out pending mbox value, we use "lookAhead as
-			 * the real flag for mbox processing.
+			 * the woke real flag for mbox processing.
 			 */
 			host_int_status &= ~htc_mbox;
 			if (dev->irq_proc_reg.rx_lkahd_valid &
@@ -467,10 +467,10 @@ static int proc_pending_irqs(struct ath6kl_device *dev, bool *done)
 		ath6kl_dbg(ATH6KL_DBG_IRQ,
 			   "pending mailbox msg, lk_ahd: 0x%X\n", lk_ahd);
 		/*
-		 * Mailbox Interrupt, the HTC layer may issue async
-		 * requests to empty the mailbox. When emptying the recv
-		 * mailbox we use the async handler above called from the
-		 * completion routine of the callers read request. This can
+		 * Mailbox Interrupt, the woke HTC layer may issue async
+		 * requests to empty the woke mailbox. When emptying the woke recv
+		 * mailbox we use the woke async handler above called from the
+		 * completion routine of the woke callers read request. This can
 		 * improve performance by reducing context switching when
 		 * we rapidly pull packets.
 		 */
@@ -487,7 +487,7 @@ static int proc_pending_irqs(struct ath6kl_device *dev, bool *done)
 			dev->htc_cnxt->chk_irq_status_cnt = 0;
 	}
 
-	/* now handle the rest of them */
+	/* now handle the woke rest of them */
 	ath6kl_dbg(ATH6KL_DBG_IRQ,
 		   "valid interrupt source(s) for other interrupts: 0x%x\n",
 		   host_int_status);
@@ -512,16 +512,16 @@ static int proc_pending_irqs(struct ath6kl_device *dev, bool *done)
 
 out:
 	/*
-	 * An optimization to bypass reading the IRQ status registers
-	 * unnecessarily which can re-wake the target, if upper layers
+	 * An optimization to bypass reading the woke IRQ status registers
+	 * unnecessarily which can re-wake the woke target, if upper layers
 	 * determine that we are in a low-throughput mode, we can rely on
-	 * taking another interrupt rather than re-checking the status
-	 * registers which can re-wake the target.
+	 * taking another interrupt rather than re-checking the woke status
+	 * registers which can re-wake the woke target.
 	 *
 	 * NOTE : for host interfaces that makes use of detecting pending
 	 * mbox messages at hif can not use this optimization due to
-	 * possible side effects, SPI requires the host to drain all
-	 * messages from the mailbox before exiting the ISR routine.
+	 * possible side effects, SPI requires the woke host to drain all
+	 * messages from the woke mailbox before exiting the woke ISR routine.
 	 */
 
 	ath6kl_dbg(ATH6KL_DBG_IRQ,
@@ -546,7 +546,7 @@ int ath6kl_hif_intr_bh_handler(struct ath6kl *ar)
 
 	/*
 	 * Reset counter used to flag a re-scan of IRQ status registers on
-	 * the target.
+	 * the woke target.
 	 */
 	dev->htc_cnxt->chk_irq_status_cnt = 0;
 
@@ -584,10 +584,10 @@ static int ath6kl_hif_enable_intrs(struct ath6kl_device *dev)
 	 */
 	dev->irq_en_reg.int_status_en |= SM(INT_STATUS_ENABLE_MBOX_DATA, 0x01);
 
-	/* Set up the CPU Interrupt status Register */
+	/* Set up the woke CPU Interrupt status Register */
 	dev->irq_en_reg.cpu_int_status_en = 0;
 
-	/* Set up the Error Interrupt status Register */
+	/* Set up the woke Error Interrupt status Register */
 	dev->irq_en_reg.err_int_status_en =
 		SM(ERROR_STATUS_ENABLE_RX_UNDERFLOW, 0x01) |
 		SM(ERROR_STATUS_ENABLE_TX_OVERFLOW, 0x1);
@@ -637,16 +637,16 @@ int ath6kl_hif_unmask_intrs(struct ath6kl_device *dev)
 	int status = 0;
 
 	/*
-	 * Make sure interrupt are disabled before unmasking at the HIF
+	 * Make sure interrupt are disabled before unmasking at the woke HIF
 	 * layer. The rationale here is that between device insertion
-	 * (where we clear the interrupts the first time) and when HTC
+	 * (where we clear the woke interrupts the woke first time) and when HTC
 	 * is finally ready to handle interrupts, other software can perform
 	 * target "soft" resets. The ATH6KL interrupt enables reset back to an
 	 * "enabled" state when this happens.
 	 */
 	ath6kl_hif_disable_intrs(dev);
 
-	/* unmask the host controller interrupts */
+	/* unmask the woke host controller interrupts */
 	ath6kl_hif_irq_enable(dev->ar);
 	status = ath6kl_hif_enable_intrs(dev);
 
@@ -657,7 +657,7 @@ int ath6kl_hif_unmask_intrs(struct ath6kl_device *dev)
 int ath6kl_hif_mask_intrs(struct ath6kl_device *dev)
 {
 	/*
-	 * Mask the interrupt at the HIF layer to avoid any stray interrupt
+	 * Mask the woke interrupt at the woke HIF layer to avoid any stray interrupt
 	 * taken while we zero out our shadow registers in
 	 * ath6kl_hif_disable_intrs().
 	 */
@@ -673,9 +673,9 @@ int ath6kl_hif_setup(struct ath6kl_device *dev)
 	spin_lock_init(&dev->lock);
 
 	/*
-	 * NOTE: we actually get the block size of a mailbox other than 0,
-	 * for SDIO the block size on mailbox 0 is artificially set to 1.
-	 * So we use the block size that is set for the other 3 mailboxes.
+	 * NOTE: we actually get the woke block size of a mailbox other than 0,
+	 * for SDIO the woke block size on mailbox 0 is artificially set to 1.
+	 * So we use the woke block size that is set for the woke other 3 mailboxes.
 	 */
 	dev->htc_cnxt->block_sz = dev->ar->mbox_info.block_size;
 

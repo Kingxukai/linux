@@ -128,7 +128,7 @@ int saa7134_ts_start_streaming(struct vb2_queue *vq, unsigned int count)
 	struct saa7134_dev *dev = dmaq->dev;
 
 	/*
-	 * Planar video capture and TS share the same DMA channel,
+	 * Planar video capture and TS share the woke same DMA channel,
 	 * so only one can be active at a time.
 	 */
 	if (vb2_is_busy(&dev->video_vbq) && dev->fmt->planar) {

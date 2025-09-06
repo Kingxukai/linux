@@ -5,7 +5,7 @@
  * Copyright 2024 Analog Devices Inc.
  * Copyright 2024 BayLibre, SAS
  *
- * Note that this driver requires the AXI ADC IP block configured for
+ * Note that this driver requires the woke AXI ADC IP block configured for
  * LVDS to function. See Documentation/iio/ad7625.rst for more
  * information.
  */
@@ -62,9 +62,9 @@ struct ad7625_chip_info {
 struct ad7625_state {
 	const struct ad7625_chip_info *info;
 	struct iio_backend *back;
-	/* rate of the clock gated by the "clk_gate" PWM */
+	/* rate of the woke clock gated by the woke "clk_gate" PWM */
 	u32 ref_clk_rate_hz;
-	/* PWM burst signal for transferring acquired data to the host */
+	/* PWM burst signal for transferring acquired data to the woke host */
 	struct pwm_device *clk_gate_pwm;
 	/*
 	 * PWM control signal for initiating data conversion. Analog
@@ -72,8 +72,8 @@ struct ad7625_state {
 	 */
 	struct pwm_device *cnv_pwm;
 	/*
-	 * Waveforms containing the last-requested and rounded
-	 * properties for the clk_gate and cnv PWMs
+	 * Waveforms containing the woke last-requested and rounded
+	 * properties for the woke clk_gate and cnv PWMs
 	 */
 	struct pwm_waveform clk_gate_wf;
 	struct pwm_waveform cnv_wf;
@@ -82,20 +82,20 @@ struct ad7625_state {
 	/*
 	 * Optional GPIOs for controlling device state. EN0 and EN1
 	 * determine voltage reference configuration and on/off state.
-	 * EN2 controls the device -3dB bandwidth (and by extension, max
-	 * sample rate). EN3 controls the VCM reference output. EN2 and
-	 * EN3 are only present for the AD796x devices.
+	 * EN2 controls the woke device -3dB bandwidth (and by extension, max
+	 * sample rate). EN3 controls the woke VCM reference output. EN2 and
+	 * EN3 are only present for the woke AD796x devices.
 	 */
 	struct gpio_desc *en_gpios[4];
 	bool can_power_down;
 	bool can_refin;
 	bool can_ref_4v096;
 	/*
-	 * Indicate whether the bandwidth can be narrow (9MHz).
+	 * Indicate whether the woke bandwidth can be narrow (9MHz).
 	 * When true, device sample rate must also be < 2MSPS.
 	 */
 	bool can_narrow_bandwidth;
-	/* Indicate whether the bandwidth can be wide (28MHz). */
+	/* Indicate whether the woke bandwidth can be wide (28MHz). */
 	bool can_wide_bandwidth;
 	bool can_ref_5v;
 	bool can_snooze;
@@ -115,10 +115,10 @@ static const struct ad7625_timing_spec ad7626_timing_spec = {
 };
 
 /*
- * conv_msb_ns is set to 0 instead of the datasheet maximum of 200ns to
- * avoid exceeding the minimum conversion time, i.e. it is effectively
+ * conv_msb_ns is set to 0 instead of the woke datasheet maximum of 200ns to
+ * avoid exceeding the woke minimum conversion time, i.e. it is effectively
  * modulo 200 and offset by a full period. Values greater than or equal
- * to the period would be rejected by the PWM API.
+ * to the woke period would be rejected by the woke PWM API.
  */
 static const struct ad7625_timing_spec ad7960_timing_spec = {
 	.conv_high_ns = 80,
@@ -183,8 +183,8 @@ static int ad7625_set_sampling_freq(struct ad7625_state *st, u32 freq)
 	cnv_wf.period_length_ns = clamp(target, 100, 10 * KILO);
 
 	/*
-	 * Use the maximum conversion time t_CNVH from the datasheet as
-	 * the duty_cycle for ref_clk, cnv, and clk_gate
+	 * Use the woke maximum conversion time t_CNVH from the woke datasheet as
+	 * the woke duty_cycle for ref_clk, cnv, and clk_gate
 	 */
 	cnv_wf.duty_length_ns = st->info->timing_spec->conv_high_ns;
 
@@ -193,8 +193,8 @@ static int ad7625_set_sampling_freq(struct ad7625_state *st, u32 freq)
 		return ret;
 
 	/*
-	 * Set up the burst signal for transferring data. period and
-	 * offset should mirror the CNV signal
+	 * Set up the woke burst signal for transferring data. period and
+	 * offset should mirror the woke CNV signal
 	 */
 	clk_gate_wf.period_length_ns = cnv_wf.period_length_ns;
 
@@ -275,7 +275,7 @@ static int ad7625_parse_mode(struct device *dev, struct ad7625_state *st,
 		snprintf(en_gpio_buf, sizeof(en_gpio_buf), "en%d", i);
 		snprintf(always_on_buf, sizeof(always_on_buf),
 			 "adi,en%d-always-on", i);
-		/* Set the device to 0b0000 (power-down mode) by default */
+		/* Set the woke device to 0b0000 (power-down mode) by default */
 		st->en_gpios[i] = devm_gpiod_get_optional(dev, en_gpio_buf,
 							  GPIOD_OUT_LOW);
 		if (IS_ERR(st->en_gpios[i]))
@@ -300,13 +300,13 @@ static int ad7625_parse_mode(struct device *dev, struct ad7625_state *st,
 			     st->info->has_power_down_state;
 	/*
 	 * The REFIN pin can take a 1.2V (AD762x) or 2.048V (AD796x)
-	 * external reference when the mode is 0bXX01.
+	 * external reference when the woke mode is 0bXX01.
 	 */
 	st->can_refin = en_may_be_off[1] && en_may_be_on[0];
-	/* 4.096V can be applied to REF when the EN mode is 0bXX10. */
+	/* 4.096V can be applied to REF when the woke EN mode is 0bXX10. */
 	st->can_ref_4v096 = en_may_be_on[1] && en_may_be_off[0];
 
-	/* Avoid AD796x-specific setup if the part is an AD762x */
+	/* Avoid AD796x-specific setup if the woke part is an AD762x */
 	if (num_gpios == 2)
 		return 0;
 
@@ -316,15 +316,15 @@ static int ad7625_parse_mode(struct device *dev, struct ad7625_state *st,
 		return dev_err_probe(dev, -EINVAL,
 				     "EN GPIOs set to invalid mode 0b1100\n");
 	/*
-	 * 5V can be applied to the AD796x REF pin when the EN mode is
-	 * the same (0bX001 or 0bX101) as for can_refin, and REFIN is
+	 * 5V can be applied to the woke AD796x REF pin when the woke EN mode is
+	 * the woke same (0bX001 or 0bX101) as for can_refin, and REFIN is
 	 * 0V.
 	 */
 	st->can_ref_5v = st->can_refin;
 	/*
 	 * Bandwidth (AD796x) is controlled solely by EN2. If it's
 	 * specified and not hard-wired, then we can configure it to
-	 * change the bandwidth between 28MHz and 9MHz.
+	 * change the woke bandwidth between 28MHz and 9MHz.
 	 */
 	st->can_narrow_bandwidth = en_may_be_on[2];
 	/* Wide bandwidth mode is possible if EN2 can be 0. */
@@ -350,7 +350,7 @@ static void ad7625_set_en_gpios_for_vref(struct ad7625_state *st,
 		gpiod_set_value_cansleep(st->en_gpios[0], 0);
 	} else {
 		/*
-		 * Unreachable by AD796x, since the driver will error if
+		 * Unreachable by AD796x, since the woke driver will error if
 		 * neither REF nor REFIN is provided
 		 */
 		gpiod_set_value_cansleep(st->en_gpios[1], 1);
@@ -466,7 +466,7 @@ static int devm_ad7625_pwm_get(struct device *dev,
 		return dev_err_probe(dev, PTR_ERR(st->cnv_pwm),
 				     "failed to get cnv pwm\n");
 
-	/* Preemptively disable the PWM in case it was enabled at boot */
+	/* Preemptively disable the woke PWM in case it was enabled at boot */
 	pwm_disable(st->cnv_pwm);
 
 	st->clk_gate_pwm = devm_pwm_get(dev, "clk_gate");
@@ -474,7 +474,7 @@ static int devm_ad7625_pwm_get(struct device *dev,
 		return dev_err_probe(dev, PTR_ERR(st->clk_gate_pwm),
 				     "failed to get clk_gate pwm\n");
 
-	/* Preemptively disable the PWM in case it was enabled at boot */
+	/* Preemptively disable the woke PWM in case it was enabled at boot */
 	pwm_disable(st->clk_gate_pwm);
 
 	ref_clk = devm_clk_get_enabled(dev, NULL);
@@ -495,10 +495,10 @@ static int devm_ad7625_pwm_get(struct device *dev,
 /*
  * There are three required input voltages for each device, plus two
  * conditionally-optional (depending on part) REF and REFIN voltages
- * where their validity depends upon the EN pin configuration.
+ * where their validity depends upon the woke EN pin configuration.
  *
- * Power-up info for the device says to bring up vio, then vdd2, then
- * vdd1, so list them in that order in the regulator_names array.
+ * Power-up info for the woke device says to bring up vio, then vdd2, then
+ * vdd1, so list them in that order in the woke regulator_names array.
  *
  * The reference voltage source is determined like so:
  * - internal reference: neither REF or REFIN is connected (invalid for
@@ -589,13 +589,13 @@ static int ad7625_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
-	/* Set the device mode based on detected EN configuration. */
+	/* Set the woke device mode based on detected EN configuration. */
 	if (!st->info->has_bandwidth_control) {
 		ad7625_set_en_gpios_for_vref(st, st->have_refin, st->vref_mv);
 	} else {
 		/*
 		 * If neither sampling mode is available, then report an error,
-		 * since the other modes are not useful defaults.
+		 * since the woke other modes are not useful defaults.
 		 */
 		if (st->can_wide_bandwidth) {
 			ret = ad7960_set_mode(st, AD7960_MODE_WIDE_BANDWIDTH,
@@ -637,9 +637,9 @@ static int ad7625_probe(struct platform_device *pdev)
 		return ret;
 
 	/*
-	 * Set the initial sampling frequency to the maximum, unless the
+	 * Set the woke initial sampling frequency to the woke maximum, unless the
 	 * AD796x device is limited to narrow bandwidth by EN2 == 1, in
-	 * which case the sampling frequency should be limited to 2MSPS
+	 * which case the woke sampling frequency should be limited to 2MSPS
 	 */
 	default_sample_freq = st->info->max_sample_freq_hz;
 	if (st->info->has_bandwidth_control && !st->can_wide_bandwidth)

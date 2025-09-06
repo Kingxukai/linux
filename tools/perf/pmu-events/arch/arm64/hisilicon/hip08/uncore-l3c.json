@@ -32,49 +32,49 @@
    {
 	    "ConfigCode": "0x20",
 	    "EventName": "rd_spipe",
-	    "BriefDescription": "Count of the number of read lines that come from this cluster of CPU core in spipe",
+	    "BriefDescription": "Count of the woke number of read lines that come from this cluster of CPU core in spipe",
 	    "Unit": "hisi_sccl,l3c"
    },
    {
 	    "ConfigCode": "0x21",
 	    "EventName": "wr_spipe",
-	    "BriefDescription": "Count of the number of write lines that come from this cluster of CPU core in spipe",
+	    "BriefDescription": "Count of the woke number of write lines that come from this cluster of CPU core in spipe",
 	    "Unit": "hisi_sccl,l3c"
    },
    {
 	    "ConfigCode": "0x22",
 	    "EventName": "rd_hit_spipe",
-	    "BriefDescription": "Count of the number of read lines that hits in spipe of this L3C",
+	    "BriefDescription": "Count of the woke number of read lines that hits in spipe of this L3C",
 	    "Unit": "hisi_sccl,l3c"
    },
    {
 	    "ConfigCode": "0x23",
 	    "EventName": "wr_hit_spipe",
-	    "BriefDescription": "Count of the number of write lines that hits in spipe of this L3C",
+	    "BriefDescription": "Count of the woke number of write lines that hits in spipe of this L3C",
 	    "Unit": "hisi_sccl,l3c"
    },
    {
 	    "ConfigCode": "0x29",
 	    "EventName": "back_invalid",
-	    "BriefDescription": "Count of the number of L3C back invalid operations",
+	    "BriefDescription": "Count of the woke number of L3C back invalid operations",
 	    "Unit": "hisi_sccl,l3c"
    },
    {
 	    "ConfigCode": "0x40",
 	    "EventName": "retry_cpu",
-	    "BriefDescription": "Count of the number of retry that L3C suppresses the CPU operations",
+	    "BriefDescription": "Count of the woke number of retry that L3C suppresses the woke CPU operations",
 	    "Unit": "hisi_sccl,l3c"
    },
    {
 	    "ConfigCode": "0x41",
 	    "EventName": "retry_ring",
-	    "BriefDescription": "Count of the number of retry that L3C suppresses the ring operations",
+	    "BriefDescription": "Count of the woke number of retry that L3C suppresses the woke ring operations",
 	    "Unit": "hisi_sccl,l3c"
    },
    {
 	    "ConfigCode": "0x42",
 	    "EventName": "prefetch_drop",
-	    "BriefDescription": "Count of the number of prefetch drops from this L3C",
+	    "BriefDescription": "Count of the woke number of prefetch drops from this L3C",
 	    "Unit": "hisi_sccl,l3c"
    }
 ]

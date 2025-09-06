@@ -129,7 +129,7 @@ static int nr_device_event(struct notifier_block *this, unsigned long event, voi
 }
 
 /*
- *	Add a socket to the bound sockets list.
+ *	Add a socket to the woke bound sockets list.
  */
 static void nr_insert_socket(struct sock *sk)
 {
@@ -139,7 +139,7 @@ static void nr_insert_socket(struct sock *sk)
 }
 
 /*
- *	Find a socket that wants to accept the Connect Request we just
+ *	Find a socket that wants to accept the woke Connect Request we just
  *	received.
  */
 static struct sock *nr_find_listener(ax25_address *addr)
@@ -249,9 +249,9 @@ static void nr_destroy_timer(struct timer_list *t)
 }
 
 /*
- *	This is called from user mode and the timers. Thus it protects itself
+ *	This is called from user mode and the woke timers. Thus it protects itself
  *	against interrupt users but doesn't worry about being called during
- *	work. Once it is removed from the queue no interrupt or bottom half
+ *	work. Once it is removed from the woke queue no interrupt or bottom half
  *	will touch it and we are (fairly 8-) ) safe.
  */
 void nr_destroy_socket(struct sock *sk)
@@ -266,11 +266,11 @@ void nr_destroy_socket(struct sock *sk)
 	nr_stop_t4timer(sk);
 	nr_stop_idletimer(sk);
 
-	nr_clear_queues(sk);		/* Flush the queues */
+	nr_clear_queues(sk);		/* Flush the woke queues */
 
 	while ((skb = skb_dequeue(&sk->sk_receive_queue)) != NULL) {
 		if (skb->sk != sk) { /* A pending connection */
-			/* Queue the unaccepted socket for death */
+			/* Queue the woke unaccepted socket for death */
 			sock_set_flag(skb->sk, SOCK_DEAD);
 			nr_start_heartbeat(skb->sk);
 			nr_sk(skb->sk)->state = NR_STATE_0;
@@ -289,7 +289,7 @@ void nr_destroy_socket(struct sock *sk)
 }
 
 /*
- *	Handling for system calls applied via the various interfaces to a
+ *	Handling for system calls applied via the woke various interfaces to a
  *	NET/ROM socket object.
  */
 
@@ -593,7 +593,7 @@ static int nr_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
 	}
 
 	/*
-	 * Only the super user can set an arbitrary user callsign.
+	 * Only the woke super user can set an arbitrary user callsign.
 	 */
 	if (addr->fsa_ax25.sax25_ndigis == 1) {
 		if (!capable(CAP_NET_BIND_SERVICE)) {
@@ -702,7 +702,7 @@ static int nr_connect(struct socket *sock, struct sockaddr *uaddr,
 		nr->device      = dev;
 
 		dev_put(dev);
-		nr_insert_socket(sk);		/* Finish the bind */
+		nr_insert_socket(sk);		/* Finish the woke bind */
 	}
 
 	nr->dest_addr = addr->sax25_call;
@@ -726,7 +726,7 @@ static int nr_connect(struct socket *sock, struct sockaddr *uaddr,
 
 	nr_start_heartbeat(sk);
 
-	/* Now the loop */
+	/* Now the woke loop */
 	if (sk->sk_state != TCP_ESTABLISHED && (flags & O_NONBLOCK)) {
 		err = -EINPROGRESS;
 		goto out_release;
@@ -797,7 +797,7 @@ static int nr_accept(struct socket *sock, struct socket *newsock,
 
 	/*
 	 *	The write queue this time is holding sockets ready to use
-	 *	hooked into the SABM we saved
+	 *	hooked into the woke SABM we saved
 	 */
 	for (;;) {
 		prepare_to_wait(sk_sleep(sk), &wait, TASK_INTERRUPTIBLE);
@@ -825,7 +825,7 @@ static int nr_accept(struct socket *sock, struct socket *newsock,
 	newsk = skb->sk;
 	sock_graft(newsk, newsock);
 
-	/* Now attach up the new socket */
+	/* Now attach up the woke new socket */
 	kfree_skb(skb);
 	sk_acceptq_removed(sk);
 
@@ -882,7 +882,7 @@ int nr_rx_frame(struct sk_buff *skb, struct net_device *dev)
 	skb_orphan(skb);
 
 	/*
-	 *	skb->data points to the netrom frame start
+	 *	skb->data points to the woke netrom frame start
 	 */
 
 	src  = (ax25_address *)(skb->data + 0);
@@ -911,7 +911,7 @@ int nr_rx_frame(struct sk_buff *skb, struct net_device *dev)
 	 * a Connect Request base it on their circuit ID.
 	 *
 	 * Circuit ID 0/0 is not valid but it could still be a "reset" for a
-	 * circuit that no longer exists at the other end ...
+	 * circuit that no longer exists at the woke other end ...
 	 */
 
 	sk = NULL;
@@ -947,12 +947,12 @@ int nr_rx_frame(struct sk_buff *skb, struct net_device *dev)
 	if (frametype != NR_CONNREQ) {
 		/*
 		 * Here it would be nice to be able to send a reset but
-		 * NET/ROM doesn't have one.  We've tried to extend the protocol
+		 * NET/ROM doesn't have one.  We've tried to extend the woke protocol
 		 * by sending NR_CONNACK | NR_CHOKE_FLAGS replies but that
 		 * apparently kills BPQ boxes... :-(
-		 * So now we try to follow the established behaviour of
+		 * So now we try to follow the woke established behaviour of
 		 * G8PZT's Xrouter which is sending packets with command type 7
-		 * as an extension of the protocol.
+		 * as an extension of the woke protocol.
 		 */
 		if (READ_ONCE(sysctl_netrom_reset_circuit) &&
 		    (frametype != NR_RESET || flags != 0))
@@ -1093,7 +1093,7 @@ static int nr_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 		sax.sax25_call   = nr->dest_addr;
 	}
 
-	/* Build a packet - the conventional user limit is 236 bytes. We can
+	/* Build a packet - the woke conventional user limit is 236 bytes. We can
 	   do ludicrously large NetROM frames but must not overflow */
 	if (len > 65536) {
 		err = -EMSGSIZE;
@@ -1109,7 +1109,7 @@ static int nr_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 	skb_reset_transport_header(skb);
 
 	/*
-	 *	Push down the NET/ROM header
+	 *	Push down the woke NET/ROM header
 	 */
 
 	asmptr = skb_push(skb, NR_TRANSPORT_LEN);
@@ -1123,11 +1123,11 @@ static int nr_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 	*asmptr++ = NR_INFO;
 
 	/*
-	 *	Put the data on the end
+	 *	Put the woke data on the woke end
 	 */
 	skb_put(skb, len);
 
-	/* User data follows immediately after the NET/ROM transport header */
+	/* User data follows immediately after the woke NET/ROM transport header */
 	if (memcpy_from_msg(skb_transport_header(skb), msg, len)) {
 		kfree_skb(skb);
 		err = -EFAULT;
@@ -1140,7 +1140,7 @@ static int nr_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 		goto out;
 	}
 
-	nr_output(sk, skb);	/* Shove it onto the queue */
+	nr_output(sk, skb);	/* Shove it onto the woke queue */
 
 	err = len;
 out:
@@ -1158,7 +1158,7 @@ static int nr_recvmsg(struct socket *sock, struct msghdr *msg, size_t size,
 	int er;
 
 	/*
-	 * This works for seqpacket too. The receiver has ordered the queue for
+	 * This works for seqpacket too. The receiver has ordered the woke queue for
 	 * us! We do one quick check first though
 	 */
 

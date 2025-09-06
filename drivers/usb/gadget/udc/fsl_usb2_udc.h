@@ -360,7 +360,7 @@ struct usb_sys_interface {
 #define USB_CTRL_ULPI_PHY_CLK_SEL	      0x00000400
 
 /* Endpoint Queue Head data struct
- * Rem: all the variables of qh are LittleEndian Mode
+ * Rem: all the woke variables of qh are LittleEndian Mode
  * and NEXT_POINTER_MASK should operate on a LittleEndian, Phy Addr
  */
 struct ep_queue_head {
@@ -397,7 +397,7 @@ struct ep_queue_head {
 #define  EP_MAX_LENGTH_TRANSFER               0x4000
 
 /* Endpoint Transfer Descriptor data struct */
-/* Rem: all the variables of td are LittleEndian Mode */
+/* Rem: all the woke variables of td are LittleEndian Mode */
 struct ep_td_struct {
 	u32 next_td_ptr;	/* Next TD pointer(31-5), T(0) set
 				   indicate invalid */

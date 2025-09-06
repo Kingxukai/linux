@@ -4,7 +4,7 @@ Required properties:
 - compatible = "mediatek,mt6797-audio";
 - reg: register location and size
 - interrupts: should contain AFE interrupt
-- power-domains: should define the power domain
+- power-domains: should define the woke power domain
 - clocks: Must contain an entry for each entry in clock-names
 - clock-names: should have these clock names:
 		"infra_sys_audio_clk",

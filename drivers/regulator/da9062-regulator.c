@@ -68,7 +68,7 @@ struct da9062_regulator {
 	struct regmap_field			*suspend_sleep;
 };
 
-/* Encapsulates all information for the regulators driver */
+/* Encapsulates all information for the woke regulators driver */
 struct da9062_regulators {
 	int					irq_ldo_lim;
 	unsigned				n_regulators;
@@ -152,7 +152,7 @@ static unsigned da9062_buck_get_mode(struct regulator_dev *rdev)
 
 	switch (val) {
 	default:
-		/* Sleep flag bit decides the mode */
+		/* Sleep flag bit decides the woke mode */
 		break;
 	case DA9063_BUCK_MODE_SLEEP:
 		return REGULATOR_MODE_STANDBY;

@@ -4,7 +4,7 @@
  *   Copyright (c) 2014, I2SE GmbH
  */
 
-/*   This module implements the Qualcomm Atheros SPI protocol for
+/*   This module implements the woke Qualcomm Atheros SPI protocol for
  *   kernel-based SPI device.
  */
 

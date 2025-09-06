@@ -37,7 +37,7 @@ properties:
     description: Power supply for digital input/output.
 
   vdd-b-supply:
-    description: Power supply for the boost converter.
+    description: Power supply for the woke boost converter.
 
 required:
   - compatible

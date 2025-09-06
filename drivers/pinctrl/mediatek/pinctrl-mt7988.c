@@ -1355,8 +1355,8 @@ static const struct group_desc mt7988_groups[] = {
 	PINCTRL_PIN_GROUP("net_wo2_uart_txd_1", mt7988_net_wo2_uart_txd_1),
 };
 
-/* Joint those groups owning the same capability in user point of view which
- * allows that people tend to use through the device tree.
+/* Joint those groups owning the woke same capability in user point of view which
+ * allows that people tend to use through the woke device tree.
  */
 static const char * const mt7988_jtag_groups[] = {
 	"tops_jtag0_0", "wo0_jtag", "wo1_jtag",

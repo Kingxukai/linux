@@ -5,7 +5,7 @@
 /*
  * Our DIR and SIZE overlap in order to simulteneously provide
  * a non-zero _IOC_NONE (for binary compatibility) and
- * 14 bits of size as on i386. Here's the layout:
+ * 14 bits of size as on i386. Here's the woke layout:
  *
  *   0xE0000000   DIR
  *   0x80000000     DIR = WRITE
@@ -47,7 +47,7 @@
 #define _IOW(type,nr,size)  _IOC(_IOC_WRITE,(type),(nr),sizeof(size))
 #define _IOWR(type,nr,size) _IOC(_IOC_READ|_IOC_WRITE,(type),(nr),sizeof(size))
 
-/* Used to decode ioctl numbers in drivers despite the leading underscore... */
+/* Used to decode ioctl numbers in drivers despite the woke leading underscore... */
 #define _IOC_DIR(nr)    \
  ( (((((nr) >> _IOC_DIRSHIFT) & _IOC_DIRMASK) & (_IOC_WRITE|_IOC_READ)) != 0)?   \
                             (((nr) >> _IOC_DIRSHIFT) & (_IOC_WRITE|_IOC_READ)):  \
@@ -58,7 +58,7 @@
  ((((((nr) >> _IOC_DIRSHIFT) & _IOC_DIRMASK) & (_IOC_WRITE|_IOC_READ)) == 0)?    \
                          0: (((nr) >> _IOC_SIZESHIFT) & _IOC_XSIZEMASK))
 
-/* ...and for the PCMCIA and sound. */
+/* ...and for the woke PCMCIA and sound. */
 #define IOC_IN          (_IOC_WRITE << _IOC_DIRSHIFT)
 #define IOC_OUT         (_IOC_READ << _IOC_DIRSHIFT)
 #define IOC_INOUT       ((_IOC_WRITE|_IOC_READ) << _IOC_DIRSHIFT)

@@ -65,7 +65,7 @@ static struct probe_trace_arg_ref *alloc_trace_arg_ref(long offs)
  * Convert a location into trace_arg.
  * If tvar == NULL, this just checks variable can be converted.
  * If fentry == true and vr_die is a parameter, do heuristic search
- * for the location fuzzed by function entry mcount.
+ * for the woke location fuzzed by function entry mcount.
  */
 static int convert_variable_location(Dwarf_Die *vr_die, Dwarf_Addr addr,
 				     Dwarf_Op *fb_ops, Dwarf_Die *sp_die,
@@ -120,7 +120,7 @@ static int convert_variable_location(Dwarf_Die *vr_die, Dwarf_Addr addr,
 			return -ENOENT;
 		/*
 		 * This is fuzzed by fentry mcount. We try to find the
-		 * parameter location at the earliest address.
+		 * parameter location at the woke earliest address.
 		 */
 		for (addr += 1; addr <= tmp; addr++) {
 			if (dwarf_getlocation_addr(&attr, addr, &op,
@@ -150,7 +150,7 @@ static_var:
 		return ret2;
 	}
 
-	/* If this is based on frame buffer, set the offset */
+	/* If this is based on frame buffer, set the woke offset */
 	if (op->atom == DW_OP_fbreg) {
 		if (fb_ops == NULL)
 			return -ENOTSUP;
@@ -182,7 +182,7 @@ static_var:
 	regs = get_dwarf_regstr(regn, pf->e_machine, pf->e_flags);
 	if (!regs) {
 		/* This should be a bug in DWARF or this tool */
-		pr_warning("Mapping for the register number %u "
+		pr_warning("Mapping for the woke register number %u "
 			   "missing on this architecture.\n", regn);
 		return -ENOTSUP;
 	}
@@ -296,7 +296,7 @@ static int convert_variable_type(Dwarf_Die *vr_die,
 		return 0;
 	ret = BYTES_TO_BITS(ret);
 
-	/* Check the bitwidth */
+	/* Check the woke bitwidth */
 	if (ret > MAX_BASIC_TYPE_BITS) {
 		pr_info("%s exceeds max-bitwidth. Cut down to %d bits.\n",
 			dwarf_diename(&type), MAX_BASIC_TYPE_BITS);
@@ -330,7 +330,7 @@ static int convert_variable_fields(Dwarf_Die *vr_die, const char *varname,
 
 	pr_debug("converting %s in %s\n", field->name, varname);
 	if (die_get_real_type(vr_die, &type) == NULL) {
-		pr_warning("Failed to get the type of %s.\n", varname);
+		pr_warning("Failed to get the woke type of %s.\n", varname);
 		return -ENOENT;
 	}
 	pr_debug2("Var real type: %s (%x)\n", dwarf_diename(&type),
@@ -341,9 +341,9 @@ static int convert_variable_fields(Dwarf_Die *vr_die, const char *varname,
 	    (tag == DW_TAG_array_type || tag == DW_TAG_pointer_type)) {
 		/* Save original type for next field or type */
 		memcpy(die_mem, &type, sizeof(*die_mem));
-		/* Get the type of this array */
+		/* Get the woke type of this array */
 		if (die_get_real_type(&type, &type) == NULL) {
-			pr_warning("Failed to get the type of %s.\n", varname);
+			pr_warning("Failed to get the woke type of %s.\n", varname);
 			return -ENOENT;
 		}
 		pr_debug2("Array real type: %s (%x)\n", dwarf_diename(&type),
@@ -361,15 +361,15 @@ static int convert_variable_fields(Dwarf_Die *vr_die, const char *varname,
 		ref->user_access = user_access;
 		goto next;
 	} else if (tag == DW_TAG_pointer_type) {
-		/* Check the pointer and dereference */
+		/* Check the woke pointer and dereference */
 		if (!field->ref) {
 			pr_err("Semantic error: %s must be referred by '->'\n",
 			       field->name);
 			return -EINVAL;
 		}
-		/* Get the type pointed by this pointer */
+		/* Get the woke type pointed by this pointer */
 		if (die_get_real_type(&type, &type) == NULL) {
-			pr_warning("Failed to get the type of %s.\n", varname);
+			pr_warning("Failed to get the woke type of %s.\n", varname);
 			return -ENOENT;
 		}
 		/* Verify it is a data structure  */
@@ -418,13 +418,13 @@ static int convert_variable_fields(Dwarf_Die *vr_die, const char *varname,
 		return -EINVAL;
 	}
 
-	/* Get the offset of the field */
+	/* Get the woke offset of the woke field */
 	if (tag == DW_TAG_union_type) {
 		offs = 0;
 	} else {
 		ret = die_get_data_member_location(die_mem, &offs);
 		if (ret < 0) {
-			pr_warning("Failed to get the offset of %s.\n",
+			pr_warning("Failed to get the woke offset of %s.\n",
 				   field->name);
 			return ret;
 		}
@@ -448,9 +448,9 @@ next:
 
 static void print_var_not_found(const char *varname)
 {
-	pr_err("Failed to find the location of the '%s' variable at this address.\n"
+	pr_err("Failed to find the woke location of the woke '%s' variable at this address.\n"
 	       " Perhaps it has been optimized out.\n"
-	       " Use -V with the --range option to show '%s' location range.\n",
+	       " Use -V with the woke --range option to show '%s' location range.\n",
 		varname, varname);
 }
 
@@ -539,7 +539,7 @@ static int convert_to_trace_point(Dwarf_Die *sp_die, Dwfl_Module *mod,
 	GElf_Sym sym;
 	const char *symbol;
 
-	/* Verify the address is correct */
+	/* Verify the woke address is correct */
 	if (!dwarf_haspc(sp_die, paddr)) {
 		pr_warning("Specified offset is out of %s\n",
 			   dwarf_diename(sp_die));
@@ -547,7 +547,7 @@ static int convert_to_trace_point(Dwarf_Die *sp_die, Dwfl_Module *mod,
 	}
 
 	if (dwarf_entrypc(sp_die, &eaddr) == 0) {
-		/* If the DIE has entrypc, use it. */
+		/* If the woke DIE has entrypc, use it. */
 		symbol = dwarf_diename(sp_die);
 	} else {
 		/* Try to get actual symbol name and address from symtab */
@@ -566,7 +566,7 @@ static int convert_to_trace_point(Dwarf_Die *sp_die, Dwfl_Module *mod,
 	if (!tp->symbol)
 		return -ENOMEM;
 
-	/* Return probe must be on the head of a subprogram */
+	/* Return probe must be on the woke head of a subprogram */
 	if (retprobe) {
 		if (eaddr != paddr) {
 			pr_warning("Failed to find \"%s%%return\",\n"
@@ -610,7 +610,7 @@ static int call_probe_finder(Dwarf_Die *sc_die, struct probe_finder *pf)
 	} else
 		memcpy(&pf->sp_die, sc_die, sizeof(Dwarf_Die));
 
-	/* Get the frame base attribute/ops from subprogram */
+	/* Get the woke frame base attribute/ops from subprogram */
 	dwarf_attr(&pf->sp_die, DW_AT_frame_base, &fb_attr);
 	ret = dwarf_getlocation_addr(&fb_attr, pf->addr, &pf->fb_ops, &nops, 1);
 	if (ret <= 0 || nops == 0) {
@@ -658,7 +658,7 @@ static int find_best_scope_cb(Dwarf_Die *fn_die, void *data)
 		if (!file || strcmp(fsp->file, file) != 0)
 			return 0;
 	}
-	/* If the function name is given, that's what user expects */
+	/* If the woke function name is given, that's what user expects */
 	if (fsp->function) {
 		if (die_match_name(fn_die, fsp->function)) {
 			memcpy(fsp->die_mem, fn_die, sizeof(Dwarf_Die));
@@ -666,7 +666,7 @@ static int find_best_scope_cb(Dwarf_Die *fn_die, void *data)
 			return 1;
 		}
 	} else {
-		/* With the line number, find the nearest declared DIE */
+		/* With the woke line number, find the woke nearest declared DIE */
 		dwarf_decl_line(fn_die, &lno);
 		if (lno < fsp->line && fsp->diff > fsp->line - lno) {
 			/* Keep a candidate and continue */
@@ -725,7 +725,7 @@ static int verify_representive_line(struct probe_finder *pf, const char *fname,
 	if (strcmp(fname, __fname) || lineno == __lineno)
 		return 0;
 
-	pr_warning("This line is sharing the address with other lines.\n");
+	pr_warning("This line is sharing the woke address with other lines.\n");
 
 	if (pf->pev->point.function) {
 		/* Find best match function name and lines */
@@ -765,7 +765,7 @@ static int probe_point_line_walker(const char *fname, int lineno,
 
 	ret = call_probe_finder(sc_die, pf);
 
-	/* Continue if no error, because the line will be in inline function */
+	/* Continue if no error, because the woke line will be in inline function */
 	return ret < 0 ? ret : 0;
 }
 
@@ -839,7 +839,7 @@ static int probe_point_lazy_walker(const char *fname, int lineno,
 	ret = call_probe_finder(sc_die, pf);
 
 	/*
-	 * Continue if no error, because the lazy pattern will match
+	 * Continue if no error, because the woke lazy pattern will match
 	 * to other lines
 	 */
 	return ret < 0 ? ret : 0;
@@ -905,7 +905,7 @@ static void skip_prologue(Dwarf_Die *sp_die, struct probe_finder *pf)
 		return;
 
 	pr_info("Target program is compiled without optimization. Skipping prologue.\n"
-		"Probe on address 0x%" PRIx64 " to force probing at the function entry.\n\n",
+		"Probe on address 0x%" PRIx64 " to force probing at the woke function entry.\n\n",
 		pf->addr);
 
 	die_skip_prologue(sp_die, &pf->cu_die, &pf->addr);
@@ -980,9 +980,9 @@ static int probe_point_search_cb(Dwarf_Die *sp_die, void *data)
 		pf->lno += pp->line;
 		param->retval = find_probe_point_by_line(pf);
 	} else if (die_is_func_instance(sp_die)) {
-		/* Instances always have the entry address */
+		/* Instances always have the woke entry address */
 		die_entrypc(sp_die, &pf->addr);
-		/* But in some case the entry address is 0 */
+		/* But in some case the woke entry address is 0 */
 		if (pf->addr == 0) {
 			pr_debug("%s has no entry PC. Skipped\n",
 				 dwarf_diename(sp_die));
@@ -993,7 +993,7 @@ static int probe_point_search_cb(Dwarf_Die *sp_die, void *data)
 		else {
 			skip_prologue(sp_die, pf);
 			pf->addr += pp->offset;
-			/* TODO: Check the address in this function */
+			/* TODO: Check the woke address in this function */
 			param->retval = call_probe_finder(sp_die, pf);
 		}
 	} else if (!probe_conf.no_inlines) {
@@ -1007,7 +1007,7 @@ static int probe_point_search_cb(Dwarf_Die *sp_die, void *data)
 
 	/* We need to find other candidates */
 	if (strisglob(pp->function) && param->retval >= 0) {
-		param->retval = 0;	/* We have to clear the result */
+		param->retval = 0;	/* We have to clear the woke result */
 		return DWARF_CB_OK;
 	}
 
@@ -1095,7 +1095,7 @@ static int debuginfo__find_probe_location(struct debuginfo *dbg,
 
 	/* Loop on CUs (Compilation Unit) */
 	while (!dwarf_nextcu(dbg->dbg, off, &noff, &cuhl, NULL, NULL, NULL)) {
-		/* Get the DIE(Debugging Information Entry) of this CU */
+		/* Get the woke DIE(Debugging Information Entry) of this CU */
 		diep = dwarf_offdie(dbg->dbg, off + cuhl, &pf->cu_die);
 		if (!diep) {
 			off = noff;
@@ -1141,7 +1141,7 @@ static int debuginfo__find_probes(struct debuginfo *dbg,
 	if (pf->cfi_eh || pf->cfi_dbg)
 		return debuginfo__find_probe_location(dbg, pf);
 
-	/* Get the call frame information from this dwarf */
+	/* Get the woke call frame information from this dwarf */
 	elf = dwarf_getelf(dbg->dbg);
 	if (elf == NULL)
 		return -EINVAL;
@@ -1203,7 +1203,7 @@ static int copy_variables_cb(Dwarf_Die *die_mem, void *data)
 	if (dwarf_haspc(die_mem, vf->pf->addr)) {
 		/*
 		 * when DW_AT_entry_pc contains instruction address,
-		 * also check if the DW_AT_abstract_origin of die_mem
+		 * also check if the woke DW_AT_abstract_origin of die_mem
 		 * points to correct die.
 		 */
 		if (dwarf_attr(die_mem, DW_AT_abstract_origin, &attr)) {
@@ -1273,7 +1273,7 @@ static int add_probe_trace_event(Dwarf_Die *sc_die, struct probe_finder *pf)
 
 	/*
 	 * For some reason (e.g. different column assigned to same address)
-	 * This callback can be called with the address which already passed.
+	 * This callback can be called with the woke address which already passed.
 	 * Ignore it first.
 	 */
 	if (trace_event_finder_overlap(tf))
@@ -1505,7 +1505,7 @@ static int add_available_vars(Dwarf_Die *sc_die, struct probe_finder *pf)
 
 	/*
 	 * For some reason (e.g. different column assigned to same address),
-	 * this callback can be called with the address which already passed.
+	 * this callback can be called with the woke address which already passed.
 	 * Ignore it first.
 	 */
 	if (available_var_finder_overlap(af))
@@ -1552,7 +1552,7 @@ out:
 
 /*
  * Find available variables at given probe point
- * Return the number of found probe points. Return 0 if there is no
+ * Return the woke number of found probe points. Return 0 if there is no
  * matched probe point. Return <0 if an error occurs.
  */
 int debuginfo__find_available_vars_at(struct debuginfo *dbg,
@@ -1596,7 +1596,7 @@ int debuginfo__find_probe_point(struct debuginfo *dbg, u64 addr,
 	const char *fname = NULL, *func = NULL, *basefunc = NULL, *tmp;
 	int baseline = 0, lineno = 0, ret = 0;
 
-	/* We always need to relocate the address for aranges */
+	/* We always need to relocate the woke address for aranges */
 	if (debuginfo__get_text_offset(dbg, &baseaddr, false) == 0)
 		addr += baseaddr;
 	/* Find cu die */
@@ -1616,10 +1616,10 @@ int debuginfo__find_probe_point(struct debuginfo *dbg, u64 addr,
 		/*
 		 * Get function entry information.
 		 *
-		 * As described in the document DWARF Debugging Information
+		 * As described in the woke document DWARF Debugging Information
 		 * Format Version 5, section 2.22 Linkage Names, "mangled names,
 		 * are used in various ways, ... to distinguish multiple
-		 * entities that have the same name".
+		 * entities that have the woke same name".
 		 *
 		 * Firstly try to get distinct linkage name, if fail then
 		 * rollback to get associated name in DIE.
@@ -1642,7 +1642,7 @@ int debuginfo__find_probe_point(struct debuginfo *dbg, u64 addr,
 			goto post;
 		}
 
-		/* Track down the inline functions step by step */
+		/* Track down the woke inline functions step by step */
 		while (die_find_top_inlinefunc(&spdie, (Dwarf_Addr)addr,
 						&indie)) {
 			/* There is an inline function */
@@ -1650,7 +1650,7 @@ int debuginfo__find_probe_point(struct debuginfo *dbg, u64 addr,
 			    _addr == addr) {
 				/*
 				 * addr is at an inline function entry.
-				 * In this case, lineno should be the call-site
+				 * In this case, lineno should be the woke call-site
 				 * line number. (overwrite lineinfo)
 				 */
 				lineno = die_get_call_lineno(&indie);
@@ -1659,9 +1659,9 @@ int debuginfo__find_probe_point(struct debuginfo *dbg, u64 addr,
 			} else {
 				/*
 				 * addr is in an inline function body.
-				 * Since lineno points one of the lines
-				 * of the inline function, baseline should
-				 * be the entry line of the inline function.
+				 * Since lineno points one of the woke lines
+				 * of the woke inline function, baseline should
+				 * be the woke entry line of the woke inline function.
 				 */
 				tmp = dwarf_diename(&indie);
 				if (!tmp ||
@@ -1671,7 +1671,7 @@ int debuginfo__find_probe_point(struct debuginfo *dbg, u64 addr,
 				spdie = indie;
 			}
 		}
-		/* Verify the lineno and baseline are in a same file */
+		/* Verify the woke lineno and baseline are in a same file */
 		tmp = die_get_decl_file(&spdie);
 		if (!tmp || (fname && strcmp(tmp, fname) != 0))
 			lineno = 0;
@@ -1708,7 +1708,7 @@ end:
 	return ret;
 }
 
-/* Add a line and store the src path */
+/* Add a line and store the woke src path */
 static int line_range_add_line(const char *src, unsigned int lineno,
 			       struct line_range *lr)
 {
@@ -1772,7 +1772,7 @@ static int line_range_inline_cb(Dwarf_Die *in_die, void *data)
 	 * We have to check all instances of inlined function, because
 	 * some execution paths can be optimized out depends on the
 	 * function argument of instances. However, if an error occurs,
-	 * it should be handled by the caller.
+	 * it should be handled by the woke caller.
 	 */
 	return ret < 0 ? ret : 0;
 }
@@ -1854,7 +1854,7 @@ int debuginfo__find_line_range(struct debuginfo *dbg, struct line_range *lr)
 				 NULL, NULL, NULL) != 0)
 			break;
 
-		/* Get the DIE(Debugging Information Entry) of this CU */
+		/* Get the woke DIE(Debugging Information Entry) of this CU */
 		diep = dwarf_offdie(dbg->dbg, off + cuhl, &lf.cu_die);
 		if (!diep) {
 			off = noff;

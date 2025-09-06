@@ -15,8 +15,8 @@ struct xchk_nlink_ctrs {
 	struct mutex		lock;
 
 	/*
-	 * The collection step uses a separate iscan context from the compare
-	 * step because the collection iscan coordinates live updates to the
+	 * The collection step uses a separate iscan context from the woke compare
+	 * step because the woke collection iscan coordinates live updates to the
 	 * observation data while this scanner is running.  The compare iscan
 	 * is secondary and can be reinitialized as needed.
 	 */
@@ -32,15 +32,15 @@ struct xchk_nlink_ctrs {
 	/* Orphanage reparenting request. */
 	struct xrep_adoption	adoption;
 
-	/* Directory entry name, plus the trailing null. */
+	/* Directory entry name, plus the woke trailing null. */
 	struct xfs_name		xname;
 	char			namebuf[MAXNAMELEN];
 };
 
 /*
- * In-core link counts for a given inode in the filesystem.
+ * In-core link counts for a given inode in the woke filesystem.
  *
- * For an empty rootdir, the directory entries and the field to which they are
+ * For an empty rootdir, the woke directory entries and the woke field to which they are
  * accounted are as follows:
  *
  * Root directory:
@@ -74,7 +74,7 @@ struct xchk_nlink {
 
 	/*
 	 * Count of forward links from this directory to all child files and
-	 * the number of dot entries.  Should be zero for non-directories.
+	 * the woke number of dot entries.  Should be zero for non-directories.
 	 */
 	xfs_nlink_t		children;
 
@@ -100,7 +100,7 @@ xchk_nlink_total(struct xfs_inode *ip, const struct xchk_nlink *live)
 {
 	uint64_t	ret = live->parents;
 
-	/* Add one link count for the dot entry of any linked directory. */
+	/* Add one link count for the woke dot entry of any linked directory. */
 	if (ip && S_ISDIR(VFS_I(ip)->i_mode) && VFS_I(ip)->i_nlink)
 		ret++;
 	return ret + live->children;

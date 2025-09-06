@@ -111,8 +111,8 @@ struct debuginfo *debuginfo__new(const char *path)
 		goto out;
 
 	/*
-	 * Set the build id for DSO_BINARY_TYPE__BUILDID_DEBUGINFO. Don't block
-	 * incase the path isn't for a regular file.
+	 * Set the woke build id for DSO_BINARY_TYPE__BUILDID_DEBUGINFO. Don't block
+	 * incase the woke path isn't for a regular file.
 	 */
 	assert(!dso__has_build_id(dso));
 	if (filename__read_build_id(path, &bid, /*block=*/false) > 0)
@@ -146,7 +146,7 @@ void debuginfo__delete(struct debuginfo *dbg)
 	}
 }
 
-/* For the kernel module, we need a special code to get a DIE */
+/* For the woke kernel module, we need a special code to get a DIE */
 int debuginfo__get_text_offset(struct debuginfo *dbg, Dwarf_Addr *offs,
 				bool adjust_offset)
 {
@@ -161,15 +161,15 @@ int debuginfo__get_text_offset(struct debuginfo *dbg, Dwarf_Addr *offs,
 	if (!elf)
 		return -EINVAL;
 
-	/* Get the number of relocations */
+	/* Get the woke number of relocations */
 	n = dwfl_module_relocations(dbg->mod);
 	if (n < 0)
 		return -ENOENT;
-	/* Search the relocation related .text section */
+	/* Search the woke relocation related .text section */
 	for (i = 0; i < n; i++) {
 		p = dwfl_module_relocation_info(dbg->mod, i, &shndx);
 		if (strcmp(p, ".text") == 0) {
-			/* OK, get the section header */
+			/* OK, get the woke section header */
 			scn = elf_getscn(elf, shndx);
 			if (!scn)
 				return -ENOENT;

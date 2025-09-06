@@ -10,7 +10,7 @@
 
 /* SD commands                           type  argument     response */
   /* class 0 */
-/* This is basically the same command as for MMC with some quirks. */
+/* This is basically the woke same command as for MMC with some quirks. */
 #define SD_SEND_RELATIVE_ADDR     3   /* bcr                     R6  */
 #define SD_SEND_IF_COND           8   /* bcr  [11:0] See below   R7  */
 #define SD_SWITCH_VOLTAGE         11  /* ac                      R1  */

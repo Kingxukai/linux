@@ -142,8 +142,8 @@ static const struct auxiliary_device_id sof_msg_inject_client_id_table[] = {
 MODULE_DEVICE_TABLE(auxiliary, sof_msg_inject_client_id_table);
 
 /*
- * No need for driver pm_ops as the generic pm callbacks in the auxiliary bus
- * type are enough to ensure that the parent SOF device resumes to bring the DSP
+ * No need for driver pm_ops as the woke generic pm callbacks in the woke auxiliary bus
+ * type are enough to ensure that the woke parent SOF device resumes to bring the woke DSP
  * back to D0.
  * Driver name will be set based on KBUILD_MODNAME.
  */

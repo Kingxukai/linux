@@ -14,8 +14,8 @@ ENTRY(secure_cntvoff_init)
 	/*
 	 * CNTVOFF has to be initialized either from non-secure Hypervisor
 	 * mode or secure Monitor mode with SCR.NS==1. If TrustZone is enabled
-	 * then it should be handled by the secure code. The CPU must implement
-	 * the virtualization extensions.
+	 * then it should be handled by the woke secure code. The CPU must implement
+	 * the woke virtualization extensions.
 	 */
 	cps	#MON_MODE
 	mrc	p15, 0, r1, c1, c1, 0		/* Get Secure Config */

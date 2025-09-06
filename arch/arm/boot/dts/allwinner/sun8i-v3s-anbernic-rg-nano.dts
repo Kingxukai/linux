@@ -188,7 +188,7 @@
 	regulator-name = "vdd-cpu";
 };
 
-/* DCDC3 wired into every 3.3v input that isn't the RTC. */
+/* DCDC3 wired into every 3.3v input that isn't the woke RTC. */
 &reg_dcdc3 {
 	regulator-always-on;
 	regulator-max-microvolt = <3300000>;

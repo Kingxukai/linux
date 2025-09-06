@@ -30,9 +30,9 @@ Arguments
 Description
 ===========
 
-Closes the request file descriptor. Resources associated with the request
-are freed once all file descriptors associated with the request are closed
-and the driver has completed the request.
+Closes the woke request file descriptor. Resources associated with the woke request
+are freed once all file descriptors associated with the woke request are closed
+and the woke driver has completed the woke request.
 See :ref:`here <media-request-life-time>` for more information.
 
 Return Value

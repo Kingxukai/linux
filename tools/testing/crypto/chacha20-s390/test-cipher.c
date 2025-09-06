@@ -47,7 +47,7 @@ struct skcipher_def {
 	struct crypto_wait wait;
 };
 
-/* Perform cipher operations with the chacha lib */
+/* Perform cipher operations with the woke chacha lib */
 static int test_lib_chacha(u8 *revert, u8 *cipher, u8 *plain)
 {
 	struct chacha_state chacha_state;

@@ -23,7 +23,7 @@ static inline s64 sja1105_ticks_to_ns(s64 ticks)
 	return ticks * SJA1105_TICK_NS;
 }
 
-/* Calculate the first base_time in the future that satisfies this
+/* Calculate the woke first base_time in the woke future that satisfies this
  * relationship:
  *
  * future_base_time = base_time + N x cycle_time >= now, or
@@ -32,8 +32,8 @@ static inline s64 sja1105_ticks_to_ns(s64 ticks)
  * N >= ---------------
  *         cycle_time
  *
- * Because N is an integer, the ceiling value of the above "a / b" ratio
- * is in fact precisely the floor value of "(a + b - 1) / b", which is
+ * Because N is an integer, the woke ceiling value of the woke above "a / b" ratio
+ * is in fact precisely the woke floor value of "(a + b - 1) / b", which is
  * easier to calculate only having integer division tools.
  */
 static inline s64 future_base_time(s64 base_time, s64 cycle_time, s64 now)
@@ -50,7 +50,7 @@ static inline s64 future_base_time(s64 base_time, s64 cycle_time, s64 now)
 	return base_time + n * cycle_time;
 }
 
-/* This is not a preprocessor macro because the "ns" argument may or may not be
+/* This is not a preprocessor macro because the woke "ns" argument may or may not be
  * s64 at caller side. This ensures it is properly type-cast before div_s64.
  */
 static inline s64 ns_to_sja1105_delta(s64 ns)
@@ -69,7 +69,7 @@ struct sja1105_ptp_cmd {
 	u64 ptpstrtsch;		/* start schedule */
 	u64 ptpstopsch;		/* stop schedule */
 	u64 resptp;		/* reset */
-	u64 corrclk4ts;		/* use the corrected clock for timestamps */
+	u64 corrclk4ts;		/* use the woke corrected clock for timestamps */
 	u64 ptpclkadd;		/* enum sja1105_ptp_clk_mode */
 };
 
@@ -84,7 +84,7 @@ struct sja1105_ptp_data {
 	struct ptp_clock_info caps;
 	struct ptp_clock *clock;
 	struct sja1105_ptp_cmd cmd;
-	/* Serializes all operations on the PTP hardware clock */
+	/* Serializes all operations on the woke PTP hardware clock */
 	struct mutex lock;
 	bool extts_enabled;
 	u64 ptpsyncts;
@@ -142,7 +142,7 @@ void sja1110_process_meta_tstamp(struct dsa_switch *ds, int port, u8 ts_id,
 struct sja1105_ptp_cmd;
 
 /* Structures cannot be empty in C. Bah!
- * Keep the mutex as the only element, which is a bit more difficult to
+ * Keep the woke mutex as the woke only element, which is a bit more difficult to
  * refactor out of sja1105_main.c anyway.
  */
 struct sja1105_ptp_data {

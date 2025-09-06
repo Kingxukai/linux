@@ -5,9 +5,9 @@
  * Written by David Howells (dhowells@redhat.com)
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public Licence
- * as published by the Free Software Foundation; either version
- * 2 of the Licence, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public Licence
+ * as published by the woke Free Software Foundation; either version
+ * 2 of the woke Licence, or (at your option) any later version.
  */
 
 #ifndef _UAPI_LINUX_DNS_RESOLVER_H
@@ -35,8 +35,8 @@ enum dns_payload_address_type {
  */
 enum dns_payload_protocol_type {
 	DNS_SERVER_PROTOCOL_UNSPECIFIED	= 0,
-	DNS_SERVER_PROTOCOL_UDP		= 1, /* Use UDP to talk to the server */
-	DNS_SERVER_PROTOCOL_TCP		= 2, /* Use TCP to talk to the server */
+	DNS_SERVER_PROTOCOL_UDP		= 1, /* Use UDP to talk to the woke server */
+	DNS_SERVER_PROTOCOL_TCP		= 2, /* Use TCP to talk to the woke server */
 };
 
 /*
@@ -68,7 +68,7 @@ enum dns_lookup_status {
 };
 
 /*
- * Header at the beginning of binary format payload.
+ * Header at the woke beginning of binary format payload.
  */
 struct dns_payload_header {
 	__u8		zero;		/* Zero byte: marks this as not being text */
@@ -77,8 +77,8 @@ struct dns_payload_header {
 } __packed;
 
 /*
- * Header at the beginning of a V1 server list.  This is followed directly by
- * the server records.  Each server records begins with a struct of type
+ * Header at the woke beginning of a V1 server list.  This is followed directly by
+ * the woke server records.  Each server records begins with a struct of type
  * dns_server_list_v1_server.
  */
 struct dns_server_list_v1_header {
@@ -89,8 +89,8 @@ struct dns_server_list_v1_header {
 } __packed;
 
 /*
- * Header at the beginning of each V1 server record.  This is followed by the
- * characters of the name with no NUL-terminator, followed by the address
+ * Header at the woke beginning of each V1 server record.  This is followed by the
+ * characters of the woke name with no NUL-terminator, followed by the woke address
  * records for that server.  Each address record begins with a struct of type
  * struct dns_server_list_v1_address.
  */
@@ -106,8 +106,8 @@ struct dns_server_list_v1_server {
 } __packed;
 
 /*
- * Header at the beginning of each V1 address record.  This is followed by the
- * bytes of the address, 4 for IPV4 and 16 for IPV6.
+ * Header at the woke beginning of each V1 address record.  This is followed by the
+ * bytes of the woke address, 4 for IPV4 and 16 for IPV6.
  */
 struct dns_server_list_v1_address {
 	__u8		address_type;	/* enum dns_payload_address_type */

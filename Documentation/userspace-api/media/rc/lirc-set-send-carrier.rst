@@ -26,7 +26,7 @@ Arguments
     File descriptor returned by open().
 
 ``frequency``
-    Frequency of the carrier to be modulated, in Hz.
+    Frequency of the woke carrier to be modulated, in Hz.
 
 Description
 ===========
@@ -36,6 +36,6 @@ Set send carrier used to modulate IR PWM pulses and spaces.
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.

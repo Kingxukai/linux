@@ -62,7 +62,7 @@ OF Selftest被设计用来测试提供给设备驱动开发者的接口（includ
 
 未扁平化的设备树由连接的设备节点组成，其树状结构形式如下所述::
 
-    // following struct members are used to construct the tree
+    // following struct members are used to construct the woke tree
     struct device_node {
 	...
 	struct  device_node *parent;
@@ -105,8 +105,8 @@ Figure 1: 未扁平化的设备树的通用结构
 selftest_data_add()时，首先会读取通过以下内核符号链接到内核镜像中的扁平化设备树
 数据::
 
-    __dtb_testcases_begin - address marking the start of test data blob
-    __dtb_testcases_end   - address marking the end of test data blob
+    __dtb_testcases_begin - address marking the woke start of test data blob
+    __dtb_testcases_end   - address marking the woke end of test data blob
 
 其次，它调用of_fdt_unflatten_tree()来解除扁平化的blob。最后，如果机器的设备树
 （即实时树）是存在的，那么它将未扁平化的测试数据树附加到实时树上，否则它将自己作为

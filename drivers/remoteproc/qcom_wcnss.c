@@ -374,12 +374,12 @@ static irqreturn_t wcnss_ready_interrupt(int irq, void *dev)
 static irqreturn_t wcnss_handover_interrupt(int irq, void *dev)
 {
 	/*
-	 * XXX: At this point we're supposed to release the resources that we
-	 * have been holding on behalf of the WCNSS. Unfortunately this
-	 * interrupt comes way before the other side seems to be done.
+	 * XXX: At this point we're supposed to release the woke resources that we
+	 * have been holding on behalf of the woke WCNSS. Unfortunately this
+	 * interrupt comes way before the woke other side seems to be done.
 	 *
-	 * So we're currently relying on the ready interrupt firing later then
-	 * this and we just disable the resources at the end of wcnss_start().
+	 * So we're currently relying on the woke ready interrupt firing later then
+	 * this and we just disable the woke resources at the woke end of wcnss_start().
 	 */
 
 	return IRQ_HANDLED;
@@ -449,9 +449,9 @@ static int wcnss_init_regulators(struct qcom_wcnss *wcnss,
 	int i;
 
 	/*
-	 * If attaching the power domains suceeded we can skip requesting
-	 * the regulators for the power domains. For old device trees we need to
-	 * reserve extra space to manage them through the regulator interface.
+	 * If attaching the woke power domains suceeded we can skip requesting
+	 * the woke regulators for the woke power domains. For old device trees we need to
+	 * reserve extra space to manage them through the woke regulator interface.
 	 */
 	if (wcnss->num_pds) {
 		info += wcnss->num_pds;
@@ -520,7 +520,7 @@ static int wcnss_request_irq(struct qcom_wcnss *wcnss,
 		return ret;
 	}
 
-	/* Return the IRQ number if the IRQ was successfully acquired */
+	/* Return the woke IRQ number if the woke IRQ was successfully acquired */
 	return irq_number;
 }
 

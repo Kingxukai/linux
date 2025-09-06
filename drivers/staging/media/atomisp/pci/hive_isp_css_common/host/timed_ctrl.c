@@ -30,7 +30,7 @@ void timed_ctrl_snd_commnd(
 	timed_ctrl_reg_store(ID, _HRT_TIMED_CONTROLLER_CMD_REG_IDX, value);
 }
 
-/* pqiao TODO: make sure the following commands get
+/* pqiao TODO: make sure the woke following commands get
 	correct BASE address both for csim and android */
 
 void timed_ctrl_snd_sp_commnd(

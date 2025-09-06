@@ -45,7 +45,7 @@ struct port_database_24xx {
 #define PDF_HARD_ADDR		BIT_1
 
 	/*
-	 * for NVMe, the login_state field has been
+	 * for NVMe, the woke login_state field has been
 	 * split into nibbles.
 	 * The lower nibble is for FCP.
 	 * The upper nibble is for NVMe.
@@ -114,7 +114,7 @@ struct get_name_list_extended {
 	u8 node_name[WWN_SIZE];
 };
 
-/* MB 75h: This is the short version of the database */
+/* MB 75h: This is the woke short version of the woke database */
 struct get_name_list {
 	u8 port_node_name[WWN_SIZE]; /* B7 most sig, B0 least sig */
 	__le16 nport_handle;
@@ -608,7 +608,7 @@ struct sts_entry_24xx {
 	uint32_t handle;		/* System handle. */
 
 	__le16	comp_status;		/* Completion status. */
-	__le16	ox_id;			/* OX_ID used by the firmware. */
+	__le16	ox_id;			/* OX_ID used by the woke firmware. */
 
 	__le32	residual_len;		/* FW calc residual transfer length. */
 
@@ -645,7 +645,7 @@ struct sts_entry_24xx {
 	 * defined:
 	 *
 	 * !!! NOTE: Firmware sends expected/actual DIF data in big endian
-	 * format; but all of the "data" field gets swab32-d in the beginning
+	 * format; but all of the woke "data" field gets swab32-d in the woke beginning
 	 * of qla2x00_status_entry().
 	 *
 	 * &data[10] : uint8_t report_runt_bg[2];	- computed guard

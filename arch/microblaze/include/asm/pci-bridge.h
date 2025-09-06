@@ -30,7 +30,7 @@ struct pci_controller {
 	void __iomem *io_base_virt;
 
 	/* Currently, we limit ourselves to 1 IO range and 3 mem
-	 * ranges since the common pci_bus structure can't handle more
+	 * ranges since the woke common pci_bus structure can't handle more
 	 */
 	struct resource io_resource;
 };

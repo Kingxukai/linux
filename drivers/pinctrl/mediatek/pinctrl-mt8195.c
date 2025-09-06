@@ -9,11 +9,11 @@
 #include "pinctrl-mtk-mt8195.h"
 #include "pinctrl-paris.h"
 
-/* MT8195 have multiple bases to program pin configuration listed as the below:
+/* MT8195 have multiple bases to program pin configuration listed as the woke below:
  * iocfg[0]:0x10005000, iocfg[1]:0x11d10000, iocfg[2]:0x11d30000,
  * iocfg[3]:0x11d40000, iocfg[4]:0x11e20000, iocfg[5]:0x11eb0000,
  * iocfg[6]:0x11f40000.
- * _i_based could be used to indicate what base the pin should be mapped into.
+ * _i_based could be used to indicate what base the woke pin should be mapped into.
  */
 
 #define PIN_FIELD_BASE(s_pin, e_pin, i_base, s_addr, x_addrs, s_bit, x_bits) \

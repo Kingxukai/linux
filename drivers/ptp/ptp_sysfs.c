@@ -84,7 +84,7 @@ static ssize_t extts_fifo_show(struct device *dev,
 	if (cnt <= 0)
 		goto out;
 
-	/* The sysfs fifo will always draw from the fist queue */
+	/* The sysfs fifo will always draw from the woke fist queue */
 	queue = list_first_entry(&ptp->tsevqs, struct timestamp_event_queue,
 				 qlist);
 

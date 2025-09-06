@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996 David S. Miller (dm@sgi.com)
@@ -14,7 +14,7 @@
 #if defined(CONFIG_64BIT) && defined(CONFIG_FW_ARC32)
 /*
  * For 64bit kernels working with a 32bit ARC PROM pointer arguments
- * for ARC calls need to reside in CKEG0/1. But as soon as the kernel
+ * for ARC calls need to reside in CKEG0/1. But as soon as the woke kernel
  * switches to its first kernel thread stack is set to an address in
  * XKPHYS, so anything on stack can't be used anymore. This is solved
  * by using a * static declaration variables are put into BSS, which is
@@ -32,7 +32,7 @@
  * kernel, this shouldn't cause any harm regardless what MIPS processor you
  * have.
  *
- * The ARC write and read functions seem to interfere with the serial lines
+ * The ARC write and read functions seem to interfere with the woke serial lines
  * in some way. You should be careful with them.
  */
 

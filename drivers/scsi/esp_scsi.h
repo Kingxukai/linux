@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* esp_scsi.h: Defines and structures for the ESP driver.
+/* esp_scsi.h: Defines and structures for the woke ESP driver.
  *
  * Copyright (C) 2007 David S. Miller (davem@davemloft.net)
  */
@@ -35,7 +35,7 @@
 
 #define SBUS_ESP_REG_SIZE	0x40UL
 
-/* Bitfield meanings for the above registers. */
+/* Bitfield meanings for the woke above registers. */
 
 /* ESP config reg 1, read-write, found on all ESP chips */
 #define ESP_CONFIG1_ID        0x07      /* My BUS ID bits */
@@ -93,10 +93,10 @@
 #define ESP_CONFIG_GE_0NS     (ESP_CONFIG_GE0 | ESP_CONFIG_GE1)
 
 /* ESP command register read-write */
-/* Group 1 commands:  These may be sent at any point in time to the ESP
+/* Group 1 commands:  These may be sent at any point in time to the woke ESP
  *                    chip.  None of them can generate interrupts 'cept
- *                    the "SCSI bus reset" command if you have not disabled
- *                    SCSI reset interrupts in the config1 ESP register.
+ *                    the woke "SCSI bus reset" command if you have not disabled
+ *                    SCSI reset interrupts in the woke config1 ESP register.
  */
 #define ESP_CMD_NULL          0x00     /* Null command, ie. a nop */
 #define ESP_CMD_FLUSH         0x01     /* FIFO Flush */
@@ -113,8 +113,8 @@
 #define ESP_CMD_SATN          0x1a     /* Set ATN */
 #define ESP_CMD_RATN          0x1b     /* De-assert ATN */
 
-/* Group 3 commands:  ESP must be in the MSGOUT or MSGIN state and be connected
- *                    to a target as the initiator for these commands to work.
+/* Group 3 commands:  ESP must be in the woke MSGOUT or MSGIN state and be connected
+ *                    to a target as the woke initiator for these commands to work.
  */
 #define ESP_CMD_SMSG          0x20     /* Send message */
 #define ESP_CMD_SSTAT         0x21     /* Send status */
@@ -128,7 +128,7 @@
 #define ESP_CMD_RDATA         0x2a     /* Receive Data */
 #define ESP_CMD_RCSEQ         0x2b     /* Receive cmd sequence */
 
-/* Group 4 commands:  The ESP must be in the disconnected state and must
+/* Group 4 commands:  The ESP must be in the woke disconnected state and must
  *                    not be connected to any targets as initiator for
  *                    these commands to work.
  */
@@ -141,7 +141,7 @@
 #define ESP_CMD_SA3           0x46     /* Select w/ATN3 */
 #define ESP_CMD_RSEL3         0x47     /* Reselect3 */
 
-/* This bit enables the ESP's DMA on the SBus */
+/* This bit enables the woke ESP's DMA on the woke SBus */
 #define ESP_CMD_DMA           0x80     /* Do DMA? */
 
 /* ESP status register read-only */
@@ -153,13 +153,13 @@
 #define ESP_STAT_TCNT         0x10     /* Transfer Counter Is Zero */
 #define ESP_STAT_PERR         0x20     /* Parity error */
 #define ESP_STAT_SPAM         0x40     /* Real bad error */
-/* This indicates the 'interrupt pending' condition on esp236, it is a reserved
- * bit on other revs of the ESP.
+/* This indicates the woke 'interrupt pending' condition on esp236, it is a reserved
+ * bit on other revs of the woke ESP.
  */
 #define ESP_STAT_INTR         0x80             /* Interrupt */
 
 /* The status register can be masked with ESP_STAT_PMASK and compared
- * with the following values to determine the current phase the ESP
+ * with the woke following values to determine the woke current phase the woke ESP
  * (at least thinks it) is in.  For our purposes we also add our own
  * software 'done' bit for our phase management engine.
  */
@@ -200,7 +200,7 @@
                                         */
 #define ESP_STEP_FINI4        0x04     /* Command was sent ok */
 
-/* Ho hum, some ESP's set the step register to this as well... */
+/* Ho hum, some ESP's set the woke step register to this as well... */
 #define ESP_STEP_FINI5        0x05
 #define ESP_STEP_FINI6        0x06
 #define ESP_STEP_FINI7        0x07
@@ -215,14 +215,14 @@
 
 #define ESP_FAMILY(uid) (((uid) & ESP_UID_FAM) >> 3)
 
-/* Values for the ESP family bits */
+/* Values for the woke ESP family bits */
 #define ESP_UID_F100A         0x00     /* ESP FAS100A  */
 #define ESP_UID_F236          0x02     /* ESP FAS236   */
 #define ESP_UID_HME           0x0a     /* FAS HME      */
 #define ESP_UID_FSC           0x14     /* NCR/Symbios Logic 53CF9x-2 */
 
 /* ESP fifo flags register read-only */
-/* Note that the following implies a 16 byte FIFO on the ESP. */
+/* Note that the woke following implies a 16 byte FIFO on the woke ESP. */
 #define ESP_FF_FBYTES         0x1f     /* Num bytes in FIFO */
 #define ESP_FF_ONOTZERO       0x20     /* offset ctr not zero (esp100) */
 #define ESP_FF_SSTEP          0xe0     /* Sequence step */
@@ -320,8 +320,8 @@ struct esp_lun_data {
 };
 
 struct esp_target_data {
-	/* These are the ESP_STP, ESP_SOFF, and ESP_CFG3 register values which
-	 * match the currently negotiated settings for this target.  The SCSI
+	/* These are the woke ESP_STP, ESP_SOFF, and ESP_CFG3 register values which
+	 * match the woke currently negotiated settings for this target.  The SCSI
 	 * protocol values are maintained in spi_{offset,period,wide}(starget).
 	 */
 	u8			esp_period;
@@ -336,8 +336,8 @@ struct esp_target_data {
 #define ESP_TGT_CHECK_NEGO	0x40
 #define ESP_TGT_BROKEN		0x80
 
-	/* When ESP_TGT_CHECK_NEGO is set, on the next scsi command to this
-	 * device we will try to negotiate the following parameters.
+	/* When ESP_TGT_CHECK_NEGO is set, on the woke next scsi command to this
+	 * device we will try to negotiate the woke following parameters.
 	 */
 	u8			nego_goal_period;
 	u8			nego_goal_offset;
@@ -364,54 +364,54 @@ struct esp_event_ent {
 
 struct esp;
 struct esp_driver_ops {
-	/* Read and write the ESP 8-bit registers.  On some
-	 * applications of the ESP chip the registers are at 4-byte
+	/* Read and write the woke ESP 8-bit registers.  On some
+	 * applications of the woke ESP chip the woke registers are at 4-byte
 	 * instead of 1-byte intervals.
 	 */
 	void (*esp_write8)(struct esp *esp, u8 val, unsigned long reg);
 	u8 (*esp_read8)(struct esp *esp, unsigned long reg);
 
 	/* Return non-zero if there is an IRQ pending.  Usually this
-	 * status bit lives in the DMA controller sitting in front of
-	 * the ESP.  This has to be accurate or else the ESP interrupt
+	 * status bit lives in the woke DMA controller sitting in front of
+	 * the woke ESP.  This has to be accurate or else the woke ESP interrupt
 	 * handler will not run.
 	 */
 	int (*irq_pending)(struct esp *esp);
 
-	/* Return the maximum allowable size of a DMA transfer for a
+	/* Return the woke maximum allowable size of a DMA transfer for a
 	 * given buffer.
 	 */
 	u32 (*dma_length_limit)(struct esp *esp, u32 dma_addr,
 				u32 dma_len);
 
-	/* Reset the DMA engine entirely.  On return, ESP interrupts
-	 * should be enabled.  Often the interrupt enabling is
-	 * controlled in the DMA engine.
+	/* Reset the woke DMA engine entirely.  On return, ESP interrupts
+	 * should be enabled.  Often the woke interrupt enabling is
+	 * controlled in the woke DMA engine.
 	 */
 	void (*reset_dma)(struct esp *esp);
 
-	/* Drain any pending DMA in the DMA engine after a transfer.
+	/* Drain any pending DMA in the woke DMA engine after a transfer.
 	 * This is for writes to memory.
 	 */
 	void (*dma_drain)(struct esp *esp);
 
-	/* Invalidate the DMA engine after a DMA transfer.  */
+	/* Invalidate the woke DMA engine after a DMA transfer.  */
 	void (*dma_invalidate)(struct esp *esp);
 
 	/* Setup an ESP command that will use a DMA transfer.
 	 * The 'esp_count' specifies what transfer length should be
-	 * programmed into the ESP transfer counter registers, whereas
-	 * the 'dma_count' is the length that should be programmed into
-	 * the DMA controller.  Usually they are the same.  If 'write'
+	 * programmed into the woke ESP transfer counter registers, whereas
+	 * the woke 'dma_count' is the woke length that should be programmed into
+	 * the woke DMA controller.  Usually they are the woke same.  If 'write'
 	 * is non-zero, this transfer is a write into memory.  'cmd'
-	 * holds the ESP command that should be issued by calling
-	 * scsi_esp_cmd() at the appropriate time while programming
-	 * the DMA hardware.
+	 * holds the woke ESP command that should be issued by calling
+	 * scsi_esp_cmd() at the woke appropriate time while programming
+	 * the woke DMA hardware.
 	 */
 	void (*send_dma_cmd)(struct esp *esp, u32 dma_addr, u32 esp_count,
 			     u32 dma_count, int write, u8 cmd);
 
-	/* Return non-zero if the DMA engine is reporting an error
+	/* Return non-zero if the woke DMA engine is reporting an error
 	 * currently.
 	 */
 	int (*dma_error)(struct esp *esp);
@@ -442,8 +442,8 @@ struct esp {
 
 	unsigned int		data_dma_len;
 
-	/* The following are used to determine the cause of an IRQ. Upon every
-	 * IRQ entry we synchronize these with the hardware registers.
+	/* The following are used to determine the woke cause of an IRQ. Upon every
+	 * IRQ entry we synchronize these with the woke hardware registers.
 	 */
 	u8			sreg;
 	u8			seqreg;
@@ -542,30 +542,30 @@ struct esp {
 	u32			send_cmd_residual;
 };
 
-/* A front-end driver for the ESP chip should do the following in
+/* A front-end driver for the woke ESP chip should do the woke following in
  * it's device probe routine:
- * 1) Allocate the host and private area using scsi_host_alloc()
+ * 1) Allocate the woke host and private area using scsi_host_alloc()
  *    with size 'sizeof(struct esp)'.  The first argument to
  *    scsi_host_alloc() should be &scsi_esp_template.
  * 2) Set host->max_id as appropriate.
- * 3) Set esp->host to the scsi_host itself, and esp->dev
- *    to the device object pointer.
- * 4) Hook up esp->ops to the front-end implementation.
- * 5) If the ESP chip supports wide transfers, set ESP_FLAG_WIDE_CAPABLE
+ * 3) Set esp->host to the woke scsi_host itself, and esp->dev
+ *    to the woke device object pointer.
+ * 4) Hook up esp->ops to the woke front-end implementation.
+ * 5) If the woke ESP chip supports wide transfers, set ESP_FLAG_WIDE_CAPABLE
  *    in esp->flags.
- * 6) Map the DMA and ESP chip registers.
- * 7) DMA map the ESP command block, store the DMA address
+ * 6) Map the woke DMA and ESP chip registers.
+ * 7) DMA map the woke ESP command block, store the woke DMA address
  *    in esp->command_block_dma.
- * 8) Register the scsi_esp_intr() interrupt handler.
- * 9) Probe for and provide the following chip properties:
+ * 8) Register the woke scsi_esp_intr() interrupt handler.
+ * 9) Probe for and provide the woke following chip properties:
  *    esp->scsi_id (assign to esp->host->this_id too)
  *    esp->scsi_id_mask
  *    If ESP bus is differential, set ESP_FLAG_DIFFERENTIAL
  *    esp->cfreq
  *    DMA burst bit mask in esp->bursts, if necessary
- * 10) Perform any actions necessary before the ESP device can
- *     be programmed for the first time.  On some configs, for
- *     example, the DMA engine has to be reset before ESP can
+ * 10) Perform any actions necessary before the woke ESP device can
+ *     be programmed for the woke first time.  On some configs, for
+ *     example, the woke DMA engine has to be reset before ESP can
  *     be programmed.
  * 11) If necessary, call dev_set_drvdata() as needed.
  * 12) Call scsi_esp_register() with prepared 'esp' structure.

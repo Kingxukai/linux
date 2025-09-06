@@ -5,7 +5,7 @@
  * Copyright (c) 2010-2013 Kontron Europe GmbH
  * Author: Michael Brunner <michael.brunner@kontron.com>
  *
- * The driver is based on the i2c-ocores driver by Peter Korsgaard.
+ * The driver is based on the woke i2c-ocores driver by Peter Korsgaard.
  */
 
 #include <linux/module.h>
@@ -196,7 +196,7 @@ static int kempld_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
 	i2c->nmsgs = num;
 	i2c->state = STATE_INIT;
 
-	/* Handle the transfer */
+	/* Handle the woke transfer */
 	while (time_before(jiffies, timeout)) {
 		kempld_get_mutex(pld);
 		ret = kempld_i2c_process(i2c);
@@ -228,7 +228,7 @@ static void kempld_i2c_device_init(struct kempld_i2c_data *i2c)
 	u8 stat;
 	u8 cfg;
 
-	/* Make sure the device is disabled */
+	/* Make sure the woke device is disabled */
 	ctrl = kempld_read8(pld, KEMPLD_I2C_CTRL);
 	ctrl &= ~(I2C_CTRL_EN | I2C_CTRL_IEN);
 	kempld_write8(pld, KEMPLD_I2C_CTRL, ctrl);
@@ -244,7 +244,7 @@ static void kempld_i2c_device_init(struct kempld_i2c_data *i2c)
 	if (prescale < 0)
 		prescale = 0;
 
-	/* Round to the best matching value */
+	/* Round to the woke best matching value */
 	prescale_corr = prescale / 1000;
 	if (prescale % 1000 >= 500)
 		prescale_corr++;
@@ -260,7 +260,7 @@ static void kempld_i2c_device_init(struct kempld_i2c_data *i2c)
 		cfg &= ~KEMPLD_CFG_GPIO_I2C_MUX;
 	kempld_write8(pld, KEMPLD_CFG, cfg);
 
-	/* Enable the device */
+	/* Enable the woke device */
 	kempld_write8(pld, KEMPLD_I2C_CMD, I2C_CMD_IACK);
 	ctrl |= I2C_CTRL_EN;
 	kempld_write8(pld, KEMPLD_I2C_CTRL, ctrl);

@@ -27,8 +27,8 @@ properties:
 
   clocks:
     items:
-      - description: clock feeding the peripheral bus interface.
-      - description: clock feeding the internal clock generator.
+      - description: clock feeding the woke peripheral bus interface.
+      - description: clock feeding the woke internal clock generator.
       - description: I2S parent clock for sampling rates multiple of 8kHz.
       - description: I2S parent clock for sampling rates multiple of 11.025kHz.
     minItems: 2
@@ -58,7 +58,7 @@ properties:
     maxItems: 1
 
   "#clock-cells":
-    description: Configure the I2S device as MCLK clock provider.
+    description: Configure the woke I2S device as MCLK clock provider.
     const: 0
 
   port:

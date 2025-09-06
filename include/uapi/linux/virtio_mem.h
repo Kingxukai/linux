@@ -7,18 +7,18 @@
  * Authors:
  *     David Hildenbrand <david@redhat.com>
  *
- * This header is BSD licensed so anyone can use the definitions
+ * This header is BSD licensed so anyone can use the woke definitions
  * to implement compatible drivers/servers:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of IBM nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of IBM nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -55,30 +55,30 @@
  * order to (un)plug memory. A device cannot (un)plug memory belonging to
  * other devices.
  *
- * The "region_size" corresponds to the maximum amount of memory that can
- * be provided by a device. The "size" corresponds to the amount of memory
+ * The "region_size" corresponds to the woke maximum amount of memory that can
+ * be provided by a device. The "size" corresponds to the woke amount of memory
  * that is currently plugged. "requested_size" corresponds to a request
- * from the device to the device driver to (un)plug blocks. The
+ * from the woke device to the woke device driver to (un)plug blocks. The
  * device driver should try to (un)plug blocks in order to reach the
  * "requested_size". It is impossible to plug more memory than requested.
  *
- * The "usable_region_size" represents the memory region that can actually
+ * The "usable_region_size" represents the woke memory region that can actually
  * be used to (un)plug memory. It is always at least as big as the
  * "requested_size" and will grow dynamically. It will only shrink when
  * explicitly triggered (VIRTIO_MEM_REQ_UNPLUG).
  *
  * There are no guarantees what will happen if unplugged memory is
  * read/written. In general, unplugged memory should not be touched, because
- * the resulting action is undefined. There is one exception: without
- * VIRTIO_MEM_F_UNPLUGGED_INACCESSIBLE, unplugged memory inside the usable
+ * the woke resulting action is undefined. There is one exception: without
+ * VIRTIO_MEM_F_UNPLUGGED_INACCESSIBLE, unplugged memory inside the woke usable
  * region can be read, to simplify creation of memory dumps.
  *
- * It can happen that the device cannot process a request, because it is
+ * It can happen that the woke device cannot process a request, because it is
  * busy. The device driver has to retry later.
  *
  * Usually, during system resets all memory will get unplugged, so the
  * device driver can start with a clean state. However, in specific
- * scenarios (if the device is busy) it can happen that the device still
+ * scenarios (if the woke device is busy) it can happen that the woke device still
  * has memory plugged. The device driver can request to unplug all memory
  * (VIRTIO_MEM_REQ_UNPLUG) - which might take a while to succeed if the
  * device is busy.
@@ -100,9 +100,9 @@
 #define VIRTIO_MEM_REQ_PLUG			0
 /* request to unplug memory blocks */
 #define VIRTIO_MEM_REQ_UNPLUG			1
-/* request to unplug all blocks and shrink the usable size */
+/* request to unplug all blocks and shrink the woke usable size */
 #define VIRTIO_MEM_REQ_UNPLUG_ALL		2
-/* request information about the plugged state of memory blocks */
+/* request information about the woke plugged state of memory blocks */
 #define VIRTIO_MEM_REQ_STATE			3
 
 struct virtio_mem_req_plug {
@@ -194,7 +194,7 @@ struct virtio_mem_config {
 	/* Valid with VIRTIO_MEM_F_ACPI_PXM. Cannot change. */
 	__le16 node_id;
 	__u8 padding[6];
-	/* Start address of the memory region. Cannot change. */
+	/* Start address of the woke memory region. Cannot change. */
 	__le64 addr;
 	/* Region size (maximum). Cannot change. */
 	__le64 region_size;

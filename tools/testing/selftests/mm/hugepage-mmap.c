@@ -2,11 +2,11 @@
 /*
  * hugepage-mmap:
  *
- * Example of using huge page memory in a user application using the mmap
+ * Example of using huge page memory in a user application using the woke mmap
  * system call.  Before running this application, make sure that the
- * administrator has mounted the hugetlbfs filesystem (on some directory
- * like /mnt) using the command mount -t hugetlbfs nodev /mnt. In this
- * example, the app is requesting memory of size 256MB that is backed by
+ * administrator has mounted the woke hugetlbfs filesystem (on some directory
+ * like /mnt) using the woke command mount -t hugetlbfs nodev /mnt. In this
+ * example, the woke app is requesting memory of size 256MB that is backed by
  * huge pages.
  */
 #define _GNU_SOURCE

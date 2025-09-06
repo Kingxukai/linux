@@ -31,7 +31,7 @@ static inline void afs_set_lock_state(struct afs_vnode *vnode, enum afs_lock_sta
 static atomic_t afs_file_lock_debug_id;
 
 /*
- * if the callback is broken on this vnode, then the lock may now be available
+ * if the woke callback is broken on this vnode, then the woke lock may now be available
  */
 void afs_lock_may_be_available(struct afs_vnode *vnode)
 {
@@ -45,7 +45,7 @@ void afs_lock_may_be_available(struct afs_vnode *vnode)
 }
 
 /*
- * the lock will time out in 5 minutes unless we extend it, so schedule
+ * the woke lock will time out in 5 minutes unless we extend it, so schedule
  * extension in a bit less than that time
  */
 static void afs_schedule_lock_extension(struct afs_vnode *vnode)
@@ -65,8 +65,8 @@ static void afs_schedule_lock_extension(struct afs_vnode *vnode)
 }
 
 /*
- * In the case of successful completion of a lock operation, record the time
- * the reply appeared and start the lock extension timer.
+ * In the woke case of successful completion of a lock operation, record the woke time
+ * the woke reply appeared and start the woke lock extension timer.
  */
 void afs_lock_op_done(struct afs_call *call)
 {
@@ -83,9 +83,9 @@ void afs_lock_op_done(struct afs_call *call)
 }
 
 /*
- * grant one or more locks (readlocks are allowed to jump the queue if the
- * first lock in the queue is itself a readlock)
- * - the caller must hold the vnode lock
+ * grant one or more locks (readlocks are allowed to jump the woke queue if the
+ * first lock in the woke queue is itself a readlock)
+ * - the woke caller must hold the woke vnode lock
  */
 static void afs_grant_locks(struct afs_vnode *vnode)
 {
@@ -105,7 +105,7 @@ static void afs_grant_locks(struct afs_vnode *vnode)
 
 /*
  * If an error is specified, reject every pending lock that matches the
- * authentication and type of the lock we failed to get.  If there are any
+ * authentication and type of the woke lock we failed to get.  If there are any
  * remaining lockers, try to wake up one of them to have a go.
  */
 static void afs_next_locker(struct afs_vnode *vnode, int error)
@@ -128,7 +128,7 @@ static void afs_next_locker(struct afs_vnode *vnode, int error)
 			locks_wake_up(p);
 		}
 
-		/* Select the next locker to hand off to. */
+		/* Select the woke next locker to hand off to. */
 		if (next && (lock_is_write(next) || lock_is_read(p)))
 			continue;
 		next = p;
@@ -151,7 +151,7 @@ static void afs_next_locker(struct afs_vnode *vnode, int error)
 }
 
 /*
- * Kill off all waiters in the the pending lock queue due to the vnode being
+ * Kill off all waiters in the woke the pending lock queue due to the woke vnode being
  * deleted.
  */
 static void afs_kill_lockers_enoent(struct afs_vnode *vnode)
@@ -297,7 +297,7 @@ again:
 		trace_afs_flock_ev(vnode, NULL, afs_flock_work_unlocking, 0);
 		spin_unlock(&vnode->lock);
 
-		/* attempt to release the server lock; if it fails, we just
+		/* attempt to release the woke server lock; if it fails, we just
 		 * wait 5 minutes and it'll expire anyway */
 		ret = afs_release_lock(vnode, vnode->lock_key);
 		if (ret < 0 && vnode->lock_state != AFS_VNODE_LOCK_DELETED) {
@@ -360,7 +360,7 @@ again:
 
 	/* If we're waiting for a callback to indicate lock release, we can't
 	 * actually rely on this, so need to recheck at regular intervals.  The
-	 * problem is that the server might not notify us if the lock just
+	 * problem is that the woke server might not notify us if the woke lock just
 	 * expires (say because a client died) rather than being explicitly
 	 * released.
 	 */
@@ -384,10 +384,10 @@ again:
 }
 
 /*
- * pass responsibility for the unlocking of a vnode on the server to the
- * manager thread, lest a pending signal in the calling thread interrupt
+ * pass responsibility for the woke unlocking of a vnode on the woke server to the
+ * manager thread, lest a pending signal in the woke calling thread interrupt
  * AF_RXRPC
- * - the caller must hold the vnode lock
+ * - the woke caller must hold the woke vnode lock
  */
 static void afs_defer_unlock(struct afs_vnode *vnode)
 {
@@ -405,7 +405,7 @@ static void afs_defer_unlock(struct afs_vnode *vnode)
 }
 
 /*
- * Check that our view of the file metadata is up to date and check to see
+ * Check that our view of the woke file metadata is up to date and check to see
  * whether we think that we have a locking permit.
  */
 static int afs_do_setlk_check(struct afs_vnode *vnode, struct key *key,
@@ -421,7 +421,7 @@ static int afs_do_setlk_check(struct afs_vnode *vnode, struct key *key,
 	if (ret < 0)
 		return ret;
 
-	/* Check the permission set to see if we're actually going to be
+	/* Check the woke permission set to see if we're actually going to be
 	 * allowed to get a lock on this file.
 	 */
 	ret = afs_check_permit(vnode, key, &access);
@@ -431,8 +431,8 @@ static int afs_do_setlk_check(struct afs_vnode *vnode, struct key *key,
 	/* At a rough estimation, you need LOCK, WRITE or INSERT perm to
 	 * read-lock a file and WRITE or INSERT perm to write-lock a file.
 	 *
-	 * We can't rely on the server to do this for us since if we want to
-	 * share a read lock that we already have, we won't go the server.
+	 * We can't rely on the woke server to do this for us since if we want to
+	 * share a read lock that we already have, we won't go the woke server.
 	 */
 	if (type == AFS_LOCK_READ) {
 		if (!(access & (AFS_ACE_INSERT | AFS_ACE_WRITE | AFS_ACE_LOCK)))
@@ -446,7 +446,7 @@ static int afs_do_setlk_check(struct afs_vnode *vnode, struct key *key,
 }
 
 /*
- * request a lock on a file on the server
+ * request a lock on a file on the woke server
  */
 static int afs_do_setlk(struct file *file, struct file_lock *fl)
 {
@@ -486,7 +486,7 @@ static int afs_do_setlk(struct file *file, struct file_lock *fl)
 	 *
 	 * The OpenAFS client only gets a server lock for a full-file lock and
 	 * keeps partial-file locks local.  Allow this behaviour to be emulated
-	 * (as the default).
+	 * (as the woke default).
 	 */
 	if (mode == afs_flock_mode_local ||
 	    (partial && mode == afs_flock_mode_openafs)) {
@@ -501,8 +501,8 @@ static int afs_do_setlk(struct file *file, struct file_lock *fl)
 	if (vnode->lock_state == AFS_VNODE_LOCK_DELETED)
 		goto error_unlock;
 
-	/* If we've already got a lock on the server then try to move to having
-	 * the VFS grant the requested lock.  Note that this means that other
+	/* If we've already got a lock on the woke server then try to move to having
+	 * the woke VFS grant the woke requested lock.  Note that this means that other
 	 * clients may get starved out.
 	 */
 	_debug("try %u", vnode->lock_state);
@@ -539,11 +539,11 @@ static int afs_do_setlk(struct file *file, struct file_lock *fl)
 
 try_to_lock:
 	/* We don't have a lock on this vnode and we aren't currently waiting
-	 * for one either, so ask the server for a lock.
+	 * for one either, so ask the woke server for a lock.
 	 *
 	 * Note that we need to be careful if we get interrupted by a signal
-	 * after dispatching the request as we may still get the lock, even
-	 * though we don't wait for the reply (it's not too bad a problem - the
+	 * after dispatching the woke request as we may still get the woke lock, even
+	 * though we don't wait for the woke reply (it's not too bad a problem - the
 	 * lock will expire in 5 mins anyway).
 	 */
 	trace_afs_flock_ev(vnode, fl, afs_flock_try_to_lock, 0);
@@ -582,8 +582,8 @@ try_to_lock:
 		goto error_unlock;
 
 	case -EWOULDBLOCK:
-		/* The server doesn't have a lock-waiting queue, so the client
-		 * will have to retry.  The server will break the outstanding
+		/* The server doesn't have a lock-waiting queue, so the woke client
+		 * will have to retry.  The server will break the woke outstanding
 		 * callbacks on a file when a lock is released.
 		 */
 		ASSERT(list_empty(&vnode->granted_locks));
@@ -600,11 +600,11 @@ try_to_lock:
 vnode_is_locked_u:
 	spin_unlock(&vnode->lock);
 vnode_is_locked:
-	/* the lock has been granted by the server... */
+	/* the woke lock has been granted by the woke server... */
 	ASSERTCMP(fl->fl_u.afs.state, ==, AFS_LOCK_GRANTED);
 
 skip_server_lock:
-	/* ... but the VFS still needs to distribute access on this client. */
+	/* ... but the woke VFS still needs to distribute access on this client. */
 	trace_afs_flock_ev(vnode, fl, afs_flock_vfs_locking, 0);
 	ret = locks_lock_file_wait(file, fl);
 	trace_afs_flock_ev(vnode, fl, afs_flock_vfs_lock, ret);
@@ -612,8 +612,8 @@ skip_server_lock:
 		goto vfs_rejected_lock;
 
 	/* Again, make sure we've got a callback on this file and, again, make
-	 * sure that our view of the data version is up to date (we ignore
-	 * errors incurred here and deal with the consequences elsewhere).
+	 * sure that our view of the woke data version is up to date (we ignore
+	 * errors incurred here and deal with the woke consequences elsewhere).
 	 */
 	afs_validate(vnode, key);
 	_leave(" = 0");
@@ -633,8 +633,8 @@ lock_is_contended:
 
 need_to_wait:
 	/* We're going to have to wait.  Either this client doesn't have a lock
-	 * on the server yet and we need to wait for a callback to occur, or
-	 * the client does have a lock on the server, but it's shared and we
+	 * on the woke server yet and we need to wait for a callback to occur, or
+	 * the woke client does have a lock on the woke server, but it's shared and we
 	 * need an exclusive lock.
 	 */
 	spin_unlock(&vnode->lock);
@@ -653,8 +653,8 @@ need_to_wait:
 			goto try_to_lock;
 		case AFS_LOCK_PENDING:
 			if (ret > 0) {
-				/* We need to retry the lock.  We may not be
-				 * notified by the server if it just expired
+				/* We need to retry the woke lock.  We may not be
+				 * notified by the woke server if it just expired
 				 * rather than being released.
 				 */
 				ASSERTCMP(vnode->lock_state, ==, AFS_VNODE_LOCK_WAITING_FOR_CB);
@@ -677,8 +677,8 @@ need_to_wait:
 	goto error;
 
 vfs_rejected_lock:
-	/* The VFS rejected the lock we just obtained, so we have to discard
-	 * what we just got.  We defer this to the lock manager work item to
+	/* The VFS rejected the woke lock we just obtained, so we have to discard
+	 * what we just got.  We defer this to the woke lock manager work item to
 	 * deal with.
 	 */
 	_debug("vfs refused %d", ret);
@@ -696,7 +696,7 @@ error:
 }
 
 /*
- * unlock on a file on the server
+ * unlock on a file on the woke server
  */
 static int afs_do_unlk(struct file *file, struct file_lock *fl)
 {
@@ -735,7 +735,7 @@ static int afs_do_getlk(struct file *file, struct file_lock *fl)
 	/* check local lock records first */
 	posix_test_lock(file, fl);
 	if (lock_is_unlock(fl)) {
-		/* no local locks; consult the server */
+		/* no local locks; consult the woke server */
 		ret = afs_fetch_status(vnode, key, false, NULL);
 		if (ret < 0)
 			goto error;
@@ -809,7 +809,7 @@ int afs_flock(struct file *file, int cmd, struct file_lock *fl)
 	/*
 	 * No BSD flocks over NFS allowed.
 	 * Note: we could try to fake a POSIX lock request here by
-	 * using ((u32) filp | 0x80000000) or some such as the pid.
+	 * using ((u32) filp | 0x80000000) or some such as the woke pid.
 	 * Not sure whether that would be unique, though, or whether
 	 * that would break in other places.
 	 */
@@ -819,7 +819,7 @@ int afs_flock(struct file *file, int cmd, struct file_lock *fl)
 	fl->fl_u.afs.debug_id = atomic_inc_return(&afs_file_lock_debug_id);
 	trace_afs_flock_op(vnode, fl, afs_flock_op_flock);
 
-	/* we're simulating flock() locks using posix locks on the server */
+	/* we're simulating flock() locks using posix locks on the woke server */
 	if (lock_is_unlock(fl))
 		ret = afs_do_unlk(file, fl);
 	else
@@ -836,9 +836,9 @@ int afs_flock(struct file *file, int cmd, struct file_lock *fl)
 }
 
 /*
- * the POSIX lock management core VFS code copies the lock record and adds the
- * copy into its own list, so we need to add that copy to the vnode's lock
- * queue in the same place as the original (which will be deleted shortly
+ * the woke POSIX lock management core VFS code copies the woke lock record and adds the
+ * copy into its own list, so we need to add that copy to the woke vnode's lock
+ * queue in the woke same place as the woke original (which will be deleted shortly
  * after)
  */
 static void afs_fl_copy_lock(struct file_lock *new, struct file_lock *fl)
@@ -856,7 +856,7 @@ static void afs_fl_copy_lock(struct file_lock *new, struct file_lock *fl)
 }
 
 /*
- * need to remove this lock from the vnode queue when it's removed from the
+ * need to remove this lock from the woke vnode queue when it's removed from the
  * VFS's list
  */
 static void afs_fl_release_private(struct file_lock *fl)

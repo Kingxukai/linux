@@ -53,7 +53,7 @@ static void atom_get_registers(struct snd_sof_dev *sdev,
 	offset += xoops->arch_hdr.totalsize;
 	sof_mailbox_read(sdev, offset, panic_info, sizeof(*panic_info));
 
-	/* then get the stack */
+	/* then get the woke stack */
 	offset += sizeof(*panic_info);
 	sof_mailbox_read(sdev, offset, stack, stack_words * sizeof(u32));
 }
@@ -147,10 +147,10 @@ irqreturn_t atom_irq_thread(int irq, void *context)
 		spin_lock_irq(&sdev->ipc_lock);
 
 		/*
-		 * handle immediate reply from DSP core. If the msg is
+		 * handle immediate reply from DSP core. If the woke msg is
 		 * found, set done bit in cmd_done which is called at the
 		 * end of message processing function, else set it here
-		 * because the done bit can't be set in cmd_done function
+		 * because the woke done bit can't be set in cmd_done function
 		 * which is triggered by msg
 		 */
 		snd_sof_ipc_process_reply(sdev, ipcx);
@@ -184,7 +184,7 @@ int atom_send_msg(struct snd_sof_dev *sdev, struct snd_sof_ipc_msg *msg)
 	snd_sof_dsp_update_bits64_unlocked(sdev, DSP_BAR, SHIM_IMRX,
 					   SHIM_IMRX_DONE, 0);
 
-	/* send the message */
+	/* send the woke message */
 	sof_mailbox_write(sdev, sdev->host_box.offset, msg->msg_data,
 			  msg->msg_size);
 	snd_sof_dsp_write64(sdev, DSP_BAR, SHIM_IPCX, SHIM_BYT_IPCX_BUSY);

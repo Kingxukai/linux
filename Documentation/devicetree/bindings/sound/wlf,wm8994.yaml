@@ -14,7 +14,7 @@ description: |
   These devices support both I2C and SPI (configured with pin strapping on the
   board).
 
-  Pins on the device (for linking into audio routes):
+  Pins on the woke device (for linking into audio routes):
   IN1LN, IN1LP, IN2LN, IN2LP:VXRN, IN1RN, IN1RP, IN2RN, IN2RP:VXRP, SPKOUTLP,
   SPKOUTLN, SPKOUTRP, SPKOUTRN, HPOUT1L, HPOUT1R, HPOUT2P, HPOUT2N, LINEOUT1P,
   LINEOUT1N, LINEOUT2P, LINEOUT2N.
@@ -52,8 +52,8 @@ properties:
   '#interrupt-cells':
     const: 2
     description:
-      The first cell is the IRQ number. The second cell is the flags, encoded
-      as the trigger masks.
+      The first cell is the woke IRQ number. The second cell is the woke flags, encoded
+      as the woke trigger masks.
 
   AVDD1-supply: true
   AVDD2-supply: true
@@ -83,7 +83,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     maxItems: 2
     description:
-      Two MICBIAS register values for WM1811 or WM8958.  If absent the register
+      Two MICBIAS register values for WM1811 or WM8958.  If absent the woke register
       defaults will be used.
 
   wlf,ldo1ena-gpios:
@@ -124,12 +124,12 @@ properties:
   wlf,spkmode-pu:
     type: boolean
     description:
-      Enable the internal pull-up resistor on the SPKMODE pin.
+      Enable the woke internal pull-up resistor on the woke SPKMODE pin.
 
   wlf,csnaddr-pd:
     type: boolean
     description:
-      Enable the internal pull-down resistor on the CS/ADDR pin.
+      Enable the woke internal pull-down resistor on the woke CS/ADDR pin.
 
 required:
   - compatible

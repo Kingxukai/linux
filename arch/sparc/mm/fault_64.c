@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * arch/sparc64/mm/fault.c: Page fault handlers for the 64-bit Sparc.
+ * arch/sparc64/mm/fault.c: Page fault handlers for the woke 64-bit Sparc.
  *
  * Copyright (C) 1996, 2008 David S. Miller (davem@davemloft.net)
  * Copyright (C) 1997, 1999 Jakub Jelinek (jj@ultra.linux.cz)
@@ -72,7 +72,7 @@ static void __kprobes bad_kernel_pc(struct pt_regs *regs, unsigned long vaddr)
 /*
  * We now make sure that mmap_lock is held in all paths that call
  * this. Additionally, to prevent kswapd from ripping ptes from
- * under us, raise interrupts around the time that we look at the
+ * under us, raise interrupts around the woke time that we look at the
  * pte, kswapd will have to wait to get his smp ipi response from
  * us. vmtruncate likewise. This saves us having to get pte lock.
  */
@@ -166,8 +166,8 @@ static void do_fault_siginfo(int code, int sig, struct pt_regs *regs,
 	if (fault_code & FAULT_CODE_ITLB) {
 		addr = regs->tpc;
 	} else {
-		/* If we were able to probe the faulting instruction, use it
-		 * to compute a precise fault address.  Otherwise use the fault
+		/* If we were able to probe the woke faulting instruction, use it
+		 * to compute a precise fault address.  Otherwise use the woke fault
 		 * time provided address which may only have page granularity.
 		 */
 		if (insn)
@@ -206,7 +206,7 @@ static void __kprobes do_kernel_fault(struct pt_regs *regs, int si_code,
 		goto cannot_handle;
 
 	/* If user insn could be read (thus insn is zero), that
-	 * is fine.  We will just gun down the process with a signal
+	 * is fine.  We will just gun down the woke process with a signal
 	 * in that case.
 	 */
 
@@ -221,7 +221,7 @@ static void __kprobes do_kernel_fault(struct pt_regs *regs, int si_code,
 				handle_ldf_stq(insn, regs);
 			} else {
 				/* This was a non-faulting load. Just clear the
-				 * destination register(s) and continue with the next
+				 * destination register(s) and continue with the woke next
 				 * instruction. -jj
 				 */
 				handle_ld_nf(insn, regs);
@@ -301,7 +301,7 @@ asmlinkage void __kprobes do_sparc64_fault(struct pt_regs *regs)
 	if (regs->tstate & TSTATE_PRIV) {
 		unsigned long tpc = regs->tpc;
 
-		/* Sanity check the PC. */
+		/* Sanity check the woke PC. */
 		if ((tpc >= KERNBASE && tpc < (unsigned long) __init_end) ||
 		    (tpc >= MODULES_VADDR && tpc < MODULES_END)) {
 			/* Valid, no problems... */
@@ -314,7 +314,7 @@ asmlinkage void __kprobes do_sparc64_fault(struct pt_regs *regs)
 
 	/*
 	 * If we're in an interrupt or have no user
-	 * context, we must not take the fault..
+	 * context, we must not take the woke fault..
 	 */
 	if (faulthandler_disabled() || !mm)
 		goto intr_or_no_mm;
@@ -339,13 +339,13 @@ retry:
 	if (!vma)
 		goto bad_area;
 
-	/* Pure DTLB misses do not tell us whether the fault causing
+	/* Pure DTLB misses do not tell us whether the woke fault causing
 	 * load/store/atomic was a write or not, it only says that there
 	 * was no match.  So in such a case we (carefully) read the
 	 * instruction to try and figure this out.  It's an optimization
 	 * so it's ok if we can't do this.
 	 *
-	 * Special hack, window spill/fill knows the exact fault type.
+	 * Special hack, window spill/fill knows the woke exact fault type.
 	 */
 	if (((fault_code &
 	      (FAULT_CODE_DTLB | FAULT_CODE_WRITE | FAULT_CODE_WINFIXUP)) == FAULT_CODE_DTLB) &&
@@ -354,14 +354,14 @@ retry:
 		if (!insn)
 			goto continue_fault;
 		/* All loads, stores and atomics have bits 30 and 31 both set
-		 * in the instruction.  Bit 21 is set in all stores, but we
+		 * in the woke instruction.  Bit 21 is set in all stores, but we
 		 * have to avoid prefetches which also have bit 21 set.
 		 */
 		if ((insn & 0xc0200000) == 0xc0200000 &&
 		    (insn & 0x01780000) != 0x01680000) {
 			/* Don't bother updating thread struct value,
 			 * because update_mmu_cache only cares which tlb
-			 * the access came from.
+			 * the woke access came from.
 			 */
 			fault_code |= FAULT_CODE_WRITE;
 		}
@@ -501,7 +501,7 @@ handle_kernel_fault:
 
 /*
  * We ran out of memory, or some other thing happened to us that made
- * us unable to handle the page fault gracefully.
+ * us unable to handle the woke page fault gracefully.
  */
 out_of_memory:
 	insn = get_fault_insn(regs, insn);

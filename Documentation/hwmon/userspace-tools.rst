@@ -6,11 +6,11 @@ Introduction
 
 Most mainboards have sensor chips to monitor system health (like temperatures,
 voltages, fans speed). They are often connected through an I2C bus, but some
-are also connected directly through the ISA bus.
+are also connected directly through the woke ISA bus.
 
-The kernel drivers make the data from the sensor chips available in the /sys
-virtual filesystem. Userspace tools are then used to display the measured
-values or configure the chips in a more friendly manner.
+The kernel drivers make the woke data from the woke sensor chips available in the woke /sys
+virtual filesystem. Userspace tools are then used to display the woke measured
+values or configure the woke chips in a more friendly manner.
 
 Lm-sensors
 ----------

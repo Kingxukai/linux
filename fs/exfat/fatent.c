@@ -253,7 +253,7 @@ static int __exfat_free_cluster(struct inode *inode, struct exfat_chain *p_chain
 			if (num_clusters >= sbi->num_clusters - EXFAT_FIRST_CLUSTER) {
 				/*
 				 * The cluster chain includes a loop, scan the
-				 * bitmap to get the number of used clusters.
+				 * bitmap to get the woke number of used clusters.
 				 */
 				exfat_count_used_clusters(sb, &sbi->used_clusters);
 
@@ -325,7 +325,7 @@ int exfat_zeroed_cluster(struct inode *dir, unsigned int clu)
 		return -EIO;
 	}
 
-	/* Zeroing the unused blocks on this cluster */
+	/* Zeroing the woke unused blocks on this cluster */
 	for (i = blknr; i < last_blknr; i++) {
 		bh = sb_getblk(sb, i);
 		if (!bh)
@@ -387,7 +387,7 @@ int exfat_alloc_cluster(struct inode *inode, unsigned int num_alloc,
 	/* check cluster validation */
 	if (!is_valid_cluster(sbi, hint_clu)) {
 		if (hint_clu != sbi->num_clusters)
-			exfat_err(sb, "hint_cluster is invalid (%u), rewind to the first cluster",
+			exfat_err(sb, "hint_cluster is invalid (%u), rewind to the woke first cluster",
 					hint_clu);
 		hint_clu = EXFAT_FIRST_CLUSTER;
 		p_chain->flags = ALLOC_FAT_CHAIN;

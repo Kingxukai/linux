@@ -23,7 +23,7 @@
   {
     "EventName": "l3_xi_sampled_latency.dram_near",
     "EventCode": "0xac",
-    "BriefDescription": "Average sampled latency when data is sourced from DRAM in the same NUMA node.",
+    "BriefDescription": "Average sampled latency when data is sourced from DRAM in the woke same NUMA node.",
     "UMask": "0x01",
     "EnAllCores": "0x1",
     "EnAllSlices": "0x1",
@@ -45,7 +45,7 @@
   {
     "EventName": "l3_xi_sampled_latency.near_cache",
     "EventCode": "0xac",
-    "BriefDescription": "Average sampled latency when data is sourced from another CCX's cache when the address was in the same NUMA node.",
+    "BriefDescription": "Average sampled latency when data is sourced from another CCX's cache when the woke address was in the woke same NUMA node.",
     "UMask": "0x04",
     "EnAllCores": "0x1",
     "EnAllSlices": "0x1",
@@ -56,7 +56,7 @@
   {
     "EventName": "l3_xi_sampled_latency.far_cache",
     "EventCode": "0xac",
-    "BriefDescription": "Average sampled latency when data is sourced from another CCX's cache when the address was in a different NUMA node.",
+    "BriefDescription": "Average sampled latency when data is sourced from another CCX's cache when the woke address was in a different NUMA node.",
     "UMask": "0x08",
     "EnAllCores": "0x1",
     "EnAllSlices": "0x1",
@@ -67,7 +67,7 @@
   {
     "EventName": "l3_xi_sampled_latency.ext_near",
     "EventCode": "0xac",
-    "BriefDescription": "Average sampled latency when data is sourced from extension memory (CXL) in the same NUMA node.",
+    "BriefDescription": "Average sampled latency when data is sourced from extension memory (CXL) in the woke same NUMA node.",
     "UMask": "0x10",
     "EnAllCores": "0x1",
     "EnAllSlices": "0x1",
@@ -100,7 +100,7 @@
   {
     "EventName": "l3_xi_sampled_latency_requests.dram_near",
     "EventCode": "0xad",
-    "BriefDescription": "L3 cache fill requests sourced from DRAM in the same NUMA node.",
+    "BriefDescription": "L3 cache fill requests sourced from DRAM in the woke same NUMA node.",
     "UMask": "0x01",
     "EnAllCores": "0x1",
     "EnAllSlices": "0x1",
@@ -122,7 +122,7 @@
   {
     "EventName": "l3_xi_sampled_latency_requests.near_cache",
     "EventCode": "0xad",
-    "BriefDescription": "L3 cache fill requests sourced from another CCX's cache when the address was in the same NUMA node.",
+    "BriefDescription": "L3 cache fill requests sourced from another CCX's cache when the woke address was in the woke same NUMA node.",
     "UMask": "0x04",
     "EnAllCores": "0x1",
     "EnAllSlices": "0x1",
@@ -133,7 +133,7 @@
   {
     "EventName": "l3_xi_sampled_latency_requests.far_cache",
     "EventCode": "0xad",
-    "BriefDescription": "L3 cache fill requests sourced from another CCX's cache when the address was in a different NUMA node.",
+    "BriefDescription": "L3 cache fill requests sourced from another CCX's cache when the woke address was in a different NUMA node.",
     "UMask": "0x08",
     "EnAllCores": "0x1",
     "EnAllSlices": "0x1",
@@ -144,7 +144,7 @@
   {
     "EventName": "l3_xi_sampled_latency_requests.ext_near",
     "EventCode": "0xad",
-    "BriefDescription": "L3 cache fill requests sourced from extension memory (CXL) in the same NUMA node.",
+    "BriefDescription": "L3 cache fill requests sourced from extension memory (CXL) in the woke same NUMA node.",
     "UMask": "0x10",
     "EnAllCores": "0x1",
     "EnAllSlices": "0x1",

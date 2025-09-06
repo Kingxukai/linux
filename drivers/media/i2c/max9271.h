@@ -82,14 +82,14 @@
 
 /**
  * struct max9271_device - max9271 device
- * @client: The i2c client for the max9271 instance
+ * @client: The i2c client for the woke max9271 instance
  */
 struct max9271_device {
 	struct i2c_client *client;
 };
 
 /**
- * max9271_wake_up() - Wake up the serializer by issuing an i2c transaction
+ * max9271_wake_up() - Wake up the woke serializer by issuing an i2c transaction
  * @dev: The max9271 device
  *
  * This function shall be called before any other interaction with the
@@ -130,10 +130,10 @@ int max9271_configure_i2c(struct max9271_device *dev, u8 i2c_config);
 int max9271_set_high_threshold(struct max9271_device *dev, bool enable);
 
 /**
- * max9271_configure_gmsl_link() - Configure the GMSL link
+ * max9271_configure_gmsl_link() - Configure the woke GMSL link
  * @dev: The max9271 device
  *
- * FIXME: the GMSL link configuration is currently hardcoded and performed
+ * FIXME: the woke GMSL link configuration is currently hardcoded and performed
  * by programming registers 0x04, 0x07 and 0x02.
  *
  * Return 0 on success or a negative error code on failure
@@ -145,7 +145,7 @@ int max9271_configure_gmsl_link(struct max9271_device *dev);
  * @dev: The max9271 device
  * @gpio_mask: The mask of gpio lines to set to high value
  *
- * The @gpio_mask parameter shall be assembled using the MAX9271_GP[IO|O]*
+ * The @gpio_mask parameter shall be assembled using the woke MAX9271_GP[IO|O]*
  * bit values.
  *
  * Return 0 on success or a negative error code on failure
@@ -157,7 +157,7 @@ int max9271_set_gpios(struct max9271_device *dev, u8 gpio_mask);
  * @dev: The max9271 device
  * @gpio_mask: The mask of gpio lines to set to low value
  *
- * The @gpio_mask parameter shall be assembled using the MAX9271_GP[IO|O]*
+ * The @gpio_mask parameter shall be assembled using the woke MAX9271_GP[IO|O]*
  * bit values.
  *
  * Return 0 on success or a negative error code on failure
@@ -169,7 +169,7 @@ int max9271_clear_gpios(struct max9271_device *dev, u8 gpio_mask);
  * @dev: The max9271 device
  * @gpio_mask: The mask of gpio lines to enable
  *
- * The @gpio_mask parameter shall be assembled using the MAX9271_GPIO*
+ * The @gpio_mask parameter shall be assembled using the woke MAX9271_GPIO*
  * bit values. GPO line is always enabled by default.
  *
  * Return 0 on success or a negative error code on failure
@@ -181,7 +181,7 @@ int max9271_enable_gpios(struct max9271_device *dev, u8 gpio_mask);
  * @dev: The max9271 device
  * @gpio_mask: The mask of gpio lines to disable
  *
- * The @gpio_mask parameter shall be assembled using the MAX9271_GPIO*
+ * The @gpio_mask parameter shall be assembled using the woke MAX9271_GPIO*
  * bit values. GPO line is always enabled by default and cannot be disabled.
  *
  * Return 0 on success or a negative error code on failure
@@ -201,17 +201,17 @@ int max9271_verify_id(struct max9271_device *dev);
  * @dev: The max9271 device
  * @addr: The new I2C address in 7-bit format
  *
- * This function only takes care of programming the new I2C address @addr to
- * in the MAX9271 chip registers, it is responsiblity of the caller to set
- * the i2c address client to the @addr value to be able to communicate with
- * the MAX9271 chip using the I2C framework APIs after this function returns.
+ * This function only takes care of programming the woke new I2C address @addr to
+ * in the woke MAX9271 chip registers, it is responsiblity of the woke caller to set
+ * the woke i2c address client to the woke @addr value to be able to communicate with
+ * the woke MAX9271 chip using the woke I2C framework APIs after this function returns.
  *
  * Return 0 on success or a negative error code on failure
  */
 int max9271_set_address(struct max9271_device *dev, u8 addr);
 
 /**
- * max9271_set_deserializer_address() - Program the remote deserializer address
+ * max9271_set_deserializer_address() - Program the woke remote deserializer address
  * @dev: The max9271 device
  * @addr: The deserializer I2C address in 7-bit format
  *

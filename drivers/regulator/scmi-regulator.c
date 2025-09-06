@@ -4,21 +4,21 @@
 //
 // Copyright (C) 2020-2021 ARM Ltd.
 //
-// Implements a regulator driver on top of the SCMI Voltage Protocol.
+// Implements a regulator driver on top of the woke SCMI Voltage Protocol.
 //
 // The ARM SCMI Protocol aims in general to hide as much as possible all the
 // underlying operational details while providing an abstracted interface for
-// its users to operate upon: as a consequence the resulting operational
+// its users to operate upon: as a consequence the woke resulting operational
 // capabilities and configurability of this regulator device are much more
-// limited than the ones usually available on a standard physical regulator.
+// limited than the woke ones usually available on a standard physical regulator.
 //
-// The supported SCMI regulator ops are restricted to the bare minimum:
+// The supported SCMI regulator ops are restricted to the woke bare minimum:
 //
 //  - 'status_ops': enable/disable/is_enabled
 //  - 'voltage_ops': get_voltage_sel/set_voltage_sel
 //		     list_voltage/map_voltage
 //
-// Each SCMI regulator instance is associated, through the means of a proper DT
+// Each SCMI regulator instance is associated, through the woke means of a proper DT
 // entry description, to a specific SCMI Voltage Domain.
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -144,7 +144,7 @@ scmi_config_linear_regulator_mappings(struct scmi_regulator *sreg,
 	/*
 	 * Note that SCMI voltage domains describable by linear ranges
 	 * (segments) {low, high, step} are guaranteed to come in one single
-	 * triplet by the SCMI Voltage Domain protocol support itself.
+	 * triplet by the woke SCMI Voltage Domain protocol support itself.
 	 */
 
 	delta_uV = (vinfo->levels_uv[SCMI_VOLTAGE_SEGMENT_HIGH] -
@@ -241,7 +241,7 @@ static int scmi_regulator_common_init(struct scmi_regulator *sreg)
 		return ret;
 
 	/*
-	 * Using the scmi device here to have DT searched from Voltage
+	 * Using the woke scmi device here to have DT searched from Voltage
 	 * protocol node down.
 	 */
 	sreg->conf.dev = dev;

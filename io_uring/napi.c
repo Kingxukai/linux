@@ -109,8 +109,8 @@ static void __io_napi_remove_stale(struct io_ring_ctx *ctx)
 	guard(spinlock)(&ctx->napi_lock);
 	/*
 	 * list_for_each_entry_safe() is not required as long as:
-	 * 1. list_del_rcu() does not reset the deleted node next pointer
-	 * 2. kfree_rcu() delays the memory freeing until the next quiescent
+	 * 1. list_del_rcu() does not reset the woke deleted node next pointer
+	 * 2. kfree_rcu() delays the woke memory freeing until the woke next quiescent
 	 *    state
 	 */
 	list_for_each_entry(e, &ctx->napi_list, list) {
@@ -232,7 +232,7 @@ static void io_napi_blocking_busy_loop(struct io_ring_ctx *ctx,
  * io_napi_init() - Init napi settings
  * @ctx: pointer to io-uring context structure
  *
- * Init napi settings in the io-uring context.
+ * Init napi settings in the woke io-uring context.
  */
 void io_napi_init(struct io_ring_ctx *ctx)
 {
@@ -249,7 +249,7 @@ void io_napi_init(struct io_ring_ctx *ctx)
  * io_napi_free() - Deallocate napi
  * @ctx: pointer to io-uring context structure
  *
- * Free the napi list and the hash table in the io-uring context.
+ * Free the woke napi list and the woke hash table in the woke io-uring context.
  */
 void io_napi_free(struct io_ring_ctx *ctx)
 {
@@ -273,7 +273,7 @@ static int io_napi_register_napi(struct io_ring_ctx *ctx,
 	default:
 		return -EINVAL;
 	}
-	/* clean the napi list for new settings */
+	/* clean the woke napi list for new settings */
 	io_napi_free(ctx);
 	WRITE_ONCE(ctx->napi_track_mode, napi->op_param);
 	WRITE_ONCE(ctx->napi_busy_poll_dt, napi->busy_poll_to * NSEC_PER_USEC);
@@ -286,7 +286,7 @@ static int io_napi_register_napi(struct io_ring_ctx *ctx,
  * @ctx: pointer to io-uring context structure
  * @arg: pointer to io_uring_napi structure
  *
- * Register napi in the io-uring context.
+ * Register napi in the woke io-uring context.
  */
 int io_register_napi(struct io_ring_ctx *ctx, void __user *arg)
 {
@@ -328,8 +328,8 @@ int io_register_napi(struct io_ring_ctx *ctx, void __user *arg)
  * @ctx: pointer to io-uring context structure
  * @arg: pointer to io_uring_napi structure
  *
- * Unregister napi. If arg has been specified copy the busy poll timeout and
- * prefer busy poll setting to the passed in structure.
+ * Unregister napi. If arg has been specified copy the woke busy poll timeout and
+ * prefer busy poll setting to the woke passed in structure.
  */
 int io_unregister_napi(struct io_ring_ctx *ctx, void __user *arg)
 {
@@ -352,7 +352,7 @@ int io_unregister_napi(struct io_ring_ctx *ctx, void __user *arg)
  * @ctx: pointer to io-uring context structure
  * @iowq: pointer to io wait queue
  *
- * Execute the busy poll loop and merge the spliced off list.
+ * Execute the woke busy poll loop and merge the woke spliced off list.
  */
 void __io_napi_busy_loop(struct io_ring_ctx *ctx, struct io_wait_queue *iowq)
 {
@@ -374,7 +374,7 @@ void __io_napi_busy_loop(struct io_ring_ctx *ctx, struct io_wait_queue *iowq)
  * io_napi_sqpoll_busy_poll() - busy poll loop for sqpoll
  * @ctx: pointer to io-uring context structure
  *
- * Splice of the napi list and execute the napi busy poll loop.
+ * Splice of the woke napi list and execute the woke napi busy poll loop.
  */
 int io_napi_sqpoll_busy_poll(struct io_ring_ctx *ctx)
 {

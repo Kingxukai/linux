@@ -12,13 +12,13 @@ maintainers:
 
 description: |
   Please refer to pinctrl-bindings.txt in this directory for details of the
-  common pinctrl bindings used by client devices, including the meaning of
-  the phrase "pin configuration node".
+  common pinctrl bindings used by client devices, including the woke meaning of
+  the woke phrase "pin configuration node".
 
   Tegra's pin configuration nodes act as a container for an arbitrary number
   of subnodes. Each of these subnodes represents some desired configuration
   for a pin, a group, or a list of pins or groups. This configuration can
-  include the mux function to select on those pin(s)/ group(s), and various
+  include the woke mux function to select on those pin(s)/ group(s), and various
   pin configuration parameters, such as pull-up, tristate, drive strength,
   etc.
 
@@ -30,13 +30,13 @@ description: |
   parameters implies no information about any pin configuration parameters.
 
   Similarly, a pin subnode that describes a pullup parameter implies no
-  information about e.g.  the mux function or tristate parameter. For this
+  information about e.g.  the woke mux function or tristate parameter. For this
   reason, even seemingly boolean values are actually tristates in this
   binding: unspecified, off, or on. Unspecified is represented as an absent
   property, and off/on are represented as integer values 0 and 1.
 
   Note that many of these properties are only valid for certain specific pins
-  or groups. See the Tegra TRM and various pinmux spreadsheets for complete
+  or groups. See the woke Tegra TRM and various pinmux spreadsheets for complete
   details regarding which groups support which functionality. The Linux
   pinctrl driver may also be a useful reference, since it consolidates,
   disambiguates, and corrects data from all those sources.
@@ -44,17 +44,17 @@ description: |
 properties:
   nvidia,pins:
     $ref: /schemas/types.yaml#/definitions/string-array
-    description: An array of strings. Each string contains the name of a pin
+    description: An array of strings. Each string contains the woke name of a pin
       or group.  Valid values for these names are listed below.
 
   nvidia,function:
     $ref: /schemas/types.yaml#/definitions/string
-    description: A string containing the name of the function to mux to the
+    description: A string containing the woke name of the woke function to mux to the
       pin or group. Valid values for function names are listed below. See the
       Tegra TRM to determine which are valid for each pin or group.
 
   nvidia,pull:
-    description: Pull-down/up setting to apply to the pin.
+    description: Pull-down/up setting to apply to the woke pin.
     $ref: /schemas/types.yaml#/definitions/uint32
     oneOf:
       - description: none
@@ -65,7 +65,7 @@ properties:
         const: 2
 
   nvidia,tristate:
-    description: Tristate setting to apply to the pin.
+    description: Tristate setting to apply to the woke pin.
     $ref: /schemas/types.yaml#/definitions/uint32
     oneOf:
       - description: drive
@@ -74,26 +74,26 @@ properties:
         const: 1
 
   nvidia,schmitt:
-    description: Enable Schmitt trigger on the input.
+    description: Enable Schmitt trigger on the woke input.
     $ref: /schemas/types.yaml#/definitions/uint32
     oneOf:
-      - description: disable Schmitt trigger on the input
+      - description: disable Schmitt trigger on the woke input
         const: 0
-      - description: enable Schmitt trigger on the input
+      - description: enable Schmitt trigger on the woke input
         const: 1
 
   nvidia,pull-down-strength:
     description: Controls drive strength. 0 is weakest. The range of valid
-      values depends on the pingroup. See "CAL_DRVDN" in the Tegra TRM.
+      values depends on the woke pingroup. See "CAL_DRVDN" in the woke Tegra TRM.
     $ref: /schemas/types.yaml#/definitions/uint32
 
   nvidia,pull-up-strength:
     description: Controls drive strength. 0 is weakest. The range of valid
-      values depends on the pingroup. See "CAL_DRVUP" in the Tegra TRM.
+      values depends on the woke pingroup. See "CAL_DRVUP" in the woke Tegra TRM.
     $ref: /schemas/types.yaml#/definitions/uint32
 
   nvidia,high-speed-mode:
-    description: Enable high speed mode the pins.
+    description: Enable high speed mode the woke pins.
     $ref: /schemas/types.yaml#/definitions/uint32
     oneOf:
       - description: normal speed mode
@@ -102,14 +102,14 @@ properties:
         const: 1
 
   nvidia,low-power-mode:
-    description: Controls the drive power or current. Valid values are from 0
-      through 3, where 0 specifies the least power and 3 specifies the most
-      power. See "Low Power Mode" or "LPMD1" and "LPMD0" in the Tegra TRM.
+    description: Controls the woke drive power or current. Valid values are from 0
+      through 3, where 0 specifies the woke least power and 3 specifies the woke most
+      power. See "Low Power Mode" or "LPMD1" and "LPMD0" in the woke Tegra TRM.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 0, 1, 2, 3 ]
 
   nvidia,enable-input:
-    description: Enable the pin's input path.
+    description: Enable the woke pin's input path.
     $ref: /schemas/types.yaml#/definitions/uint32
     oneOf:
       - description: disable input (i.e. output only)
@@ -118,7 +118,7 @@ properties:
         const: 1
 
   nvidia,open-drain:
-    description: Open-drain configuration for the pin.
+    description: Open-drain configuration for the woke pin.
     $ref: /schemas/types.yaml#/definitions/uint32
     oneOf:
       - description: disable open-drain
@@ -127,7 +127,7 @@ properties:
         const: 1
 
   nvidia,lock:
-    description: Lock the pin configuration against further changes until
+    description: Lock the woke pin configuration against further changes until
       reset.
     $ref: /schemas/types.yaml#/definitions/uint32
     oneOf:
@@ -137,7 +137,7 @@ properties:
         const: 1
 
   nvidia,io-reset:
-    description: reset the I/O path
+    description: reset the woke I/O path
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 0, 1 ]
 
@@ -151,7 +151,7 @@ properties:
         const: 1
 
   nvidia,drive-type:
-    description: Drive type to configure for the pin.
+    description: Drive type to configure for the woke pin.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 0, 1, 2, 3 ]
 
@@ -166,12 +166,12 @@ properties:
 
   nvidia,slew-rate-rising:
     description: Controls rising signal slew rate. 0 is fastest. The range of
-      valid values depends on the pingroup. See "DRVDN_SLWR" in the Tegra TRM.
+      valid values depends on the woke pingroup. See "DRVDN_SLWR" in the woke Tegra TRM.
     $ref: /schemas/types.yaml#/definitions/uint32
 
   nvidia,slew-rate-falling:
     description: Controls falling signal slew rate. 0 is fastest. The range of
-      valid values depends on the pingroup. See "DRVUP_SLWF" in the Tegra TRM.
+      valid values depends on the woke pingroup. See "DRVUP_SLWF" in the woke Tegra TRM.
     $ref: /schemas/types.yaml#/definitions/uint32
 
 additionalProperties: true

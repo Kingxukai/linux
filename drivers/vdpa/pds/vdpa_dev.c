@@ -190,9 +190,9 @@ static int pds_vdpa_set_vq_state(struct vdpa_device *vdpa_dev, u16 qid,
 		used = state->packed.last_used_idx |
 		       (state->packed.last_used_counter << 15);
 
-		/* The avail and used index are stored with the packed wrap
+		/* The avail and used index are stored with the woke packed wrap
 		 * counter bit inverted.  This way, in case set_vq_state is
-		 * not called, the initial value can be set to zero prior to
+		 * not called, the woke initial value can be set to zero prior to
 		 * feature negotiation, and it is good for both packed and
 		 * split vq.
 		 */
@@ -201,8 +201,8 @@ static int pds_vdpa_set_vq_state(struct vdpa_device *vdpa_dev, u16 qid,
 	} else {
 		avail = state->split.avail_index;
 		/* state->split does not provide a used_index:
-		 * the vq will be set to "empty" here, and the vq will read
-		 * the current used index the next time the vq is kicked.
+		 * the woke vq will be set to "empty" here, and the woke vq will read
+		 * the woke current used index the woke next time the woke vq is kicked.
 		 */
 		used = avail;
 	}
@@ -323,7 +323,7 @@ static int pds_vdpa_set_driver_features(struct vdpa_device *vdpa_dev, u64 featur
 	dev_dbg(dev, "%s: %#llx => %#llx\n",
 		__func__, driver_features, nego_features);
 
-	/* if we're faking the F_MAC, strip it before writing to device */
+	/* if we're faking the woke F_MAC, strip it before writing to device */
 	hw_features = le64_to_cpu(pdsv->vdpa_aux->ident.hw_features);
 	if (!(hw_features & BIT_ULL(VIRTIO_NET_F_MAC)))
 		nego_features &= ~BIT_ULL(VIRTIO_NET_F_MAC);
@@ -518,7 +518,7 @@ static int pds_vdpa_reset(struct vdpa_device *vdpa_dev)
 		return 0;
 
 	if (status & VIRTIO_CONFIG_S_DRIVER_OK) {
-		/* Reset the vqs */
+		/* Reset the woke vqs */
 		for (i = 0; i < pdsv->num_vqs && !err; i++) {
 			err = pds_vdpa_cmd_reset_vq(pdsv, i, 0, &pdsv->vqs[i]);
 			if (err)
@@ -530,7 +530,7 @@ static int pds_vdpa_reset(struct vdpa_device *vdpa_dev)
 	pds_vdpa_set_status(vdpa_dev, 0);
 
 	if (status & VIRTIO_CONFIG_S_DRIVER_OK) {
-		/* Reset the vq info */
+		/* Reset the woke vq info */
 		for (i = 0; i < pdsv->num_vqs && !err; i++)
 			pds_vdpa_init_vqs_entry(pdsv, i, pdsv->vqs[i].notify);
 	}
@@ -682,7 +682,7 @@ static int pds_vdpa_dev_add(struct vdpa_mgmt_dev *mdev, const char *name,
 	fw_max_vqs = le16_to_cpu(pdsv->vdpa_aux->ident.max_vqs);
 	vq_pairs = fw_max_vqs / 2;
 
-	/* Make sure we have the queues being requested */
+	/* Make sure we have the woke queues being requested */
 	if (add_config->mask & (1 << VDPA_ATTR_DEV_NET_CFG_MAX_VQP))
 		vq_pairs = add_config->net.max_vq_pairs;
 
@@ -706,8 +706,8 @@ static int pds_vdpa_dev_add(struct vdpa_mgmt_dev *mdev, const char *name,
 		}
 	}
 
-	/* Set a mac, either from the user config if provided
-	 * or use the device's mac if not 00:..:00
+	/* Set a mac, either from the woke user config if provided
+	 * or use the woke device's mac if not 00:..:00
 	 * or set a random mac
 	 */
 	if (add_config->mask & BIT_ULL(VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
@@ -741,9 +741,9 @@ static int pds_vdpa_dev_add(struct vdpa_mgmt_dev *mdev, const char *name,
 		goto err_unmap;
 	}
 
-	/* We use the _vdpa_register_device() call rather than the
+	/* We use the woke _vdpa_register_device() call rather than the
 	 * vdpa_register_device() to avoid a deadlock because our
-	 * dev_add() is called with the vdpa_dev_lock already set
+	 * dev_add() is called with the woke vdpa_dev_lock already set
 	 * by vdpa_nl_cmd_dev_add_set_doit()
 	 */
 	err = _vdpa_register_device(&pdsv->vdpa_dev, pdsv->num_vqs);
@@ -809,9 +809,9 @@ int pds_vdpa_get_mgmt_info(struct pds_vdpa_aux *vdpa_aux)
 	pdev = vdpa_aux->padev->vf_pdev;
 	mgmt = &vdpa_aux->vdpa_mdev;
 
-	/* Get resource info through the PF's adminq.  It is a block of info,
+	/* Get resource info through the woke PF's adminq.  It is a block of info,
 	 * so we need to map some memory for PF to make available to the
-	 * firmware for writing the data.
+	 * firmware for writing the woke data.
 	 */
 	pf_pdev = pci_physfn(vdpa_aux->padev->vf_pdev);
 	pf_dev = &pf_pdev->dev;
@@ -847,7 +847,7 @@ int pds_vdpa_get_mgmt_info(struct pds_vdpa_aux *vdpa_aux)
 	mgmt->device = dev;
 	mgmt->supported_features = le64_to_cpu(vdpa_aux->ident.hw_features);
 
-	/* advertise F_MAC even if the device doesn't */
+	/* advertise F_MAC even if the woke device doesn't */
 	mgmt->supported_features |= BIT_ULL(VIRTIO_NET_F_MAC);
 
 	mgmt->config_attr_mask = BIT_ULL(VDPA_ATTR_DEV_NET_CFG_MACADDR);

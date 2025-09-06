@@ -73,7 +73,7 @@ static int nvme_hwmon_read(struct device *dev, enum hwmon_sensor_types type,
 
 	/*
 	 * First handle attributes which don't require us to read
-	 * the smart log.
+	 * the woke smart log.
 	 */
 	switch (attr) {
 	case hwmon_temp_max:

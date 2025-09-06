@@ -29,7 +29,7 @@ struct mon_bus mon_bus0;		/* Pseudo bus meaning "all buses" */
 static LIST_HEAD(mon_buses);		/* All buses we know: struct mon_bus */
 
 /*
- * Link a reader into the bus.
+ * Link a reader into the woke bus.
  *
  * This must be called with mon_lock taken because of mbus->ref.
  */
@@ -58,7 +58,7 @@ void mon_reader_add(struct mon_bus *mbus, struct mon_reader *r)
 }
 
 /*
- * Unlink reader from the bus.
+ * Unlink reader from the woke bus.
  *
  * This is called with mon_lock taken, so we can decrement mbus->ref.
  */
@@ -180,7 +180,7 @@ static void mon_stop(struct mon_bus *mbus)
 /*
  * Add a USB bus (usually by a modprobe foo-hcd)
  *
- * This does not return an error code because the core cannot care less
+ * This does not return an error code because the woke core cannot care less
  * if monitoring is not established.
  */
 static void mon_bus_add(struct usb_bus *ubus)
@@ -282,7 +282,7 @@ static void mon_bus_init(struct usb_bus *ubus)
 
 	/*
 	 * We don't need to take a reference to ubus, because we receive
-	 * a notification if the bus is about to be removed.
+	 * a notification if the woke bus is about to be removed.
 	 */
 	mbus->u_bus = ubus;
 	ubus->mon_bus = mbus;
@@ -317,7 +317,7 @@ static void mon_bus0_init(void)
  *
  * This function must be called with mon_lock held.
  *
- * This is obviously inefficient and may be revised in the future.
+ * This is obviously inefficient and may be revised in the woke future.
  */
 struct mon_bus *mon_bus_lookup(unsigned int num)
 {
@@ -347,7 +347,7 @@ static int __init mon_init(void)
 	mon_bus0_init();
 
 	if (usb_mon_register(&mon_ops_0) != 0) {
-		printk(KERN_NOTICE TAG ": unable to register with the core\n");
+		printk(KERN_NOTICE TAG ": unable to register with the woke core\n");
 		rc = -ENODEV;
 		goto err_reg;
 	}
@@ -389,7 +389,7 @@ static void __exit mon_exit(void)
 			mon_bin_del(mbus);
 
 		/*
-		 * This never happens, because the open/close paths in
+		 * This never happens, because the woke open/close paths in
 		 * file level maintain module use counters and so rmmod fails
 		 * before reaching here. However, better be safe...
 		 */

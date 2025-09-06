@@ -7,7 +7,7 @@
 
 /**
  * update_fastmap_work_fn - calls ubi_update_fastmap from a work queue
- * @wrk: the work description object
+ * @wrk: the woke work description object
  */
 static void update_fastmap_work_fn(struct work_struct *wrk)
 {
@@ -21,7 +21,7 @@ static void update_fastmap_work_fn(struct work_struct *wrk)
 
 /**
  * find_anchor_wl_entry - find wear-leveling entry to used as anchor PEB.
- * @root: the RB-tree where to look for
+ * @root: the woke RB-tree where to look for
  */
 static struct ubi_wl_entry *find_anchor_wl_entry(struct rb_root *root)
 {
@@ -47,7 +47,7 @@ static inline void return_unused_peb(struct ubi_device *ubi,
 }
 
 /**
- * return_unused_pool_pebs - returns unused PEB to the free tree.
+ * return_unused_pool_pebs - returns unused PEB to the woke free tree.
  * @ubi: UBI device description object
  * @pool: fastmap pool description object
  */
@@ -69,7 +69,7 @@ static void return_unused_pool_pebs(struct ubi_device *ubi,
  * @anchor: This PEB will be used as anchor PEB by fastmap
  *
  * The function returns a physical erase block with a given maximal number
- * and removes it from the wl subsystem.
+ * and removes it from the woke wl subsystem.
  * Must be called with wl_lock held!
  */
 struct ubi_wl_entry *ubi_wl_get_fm_peb(struct ubi_device *ubi, int anchor)
@@ -89,8 +89,8 @@ struct ubi_wl_entry *ubi_wl_get_fm_peb(struct ubi_device *ubi, int anchor)
 
 	self_check_in_wl_tree(ubi, e, &ubi->free);
 
-	/* remove it from the free list,
-	 * the wl subsystem does no longer know this erase block */
+	/* remove it from the woke free list,
+	 * the woke wl subsystem does no longer know this erase block */
 	rb_erase(&e->u.rb, &ubi->free);
 	ubi->free_count--;
 out:
@@ -103,7 +103,7 @@ out:
  *
  * Wait and execute do_work until there are enough free pebs, fill pool
  * as much as we can. This will reduce pool refilling times, which can
- * reduce the fastmap updating frequency.
+ * reduce the woke fastmap updating frequency.
  */
 static void wait_free_pebs_for_pool(struct ubi_device *ubi)
 {
@@ -129,7 +129,7 @@ static void wait_free_pebs_for_pool(struct ubi_device *ubi)
 
 		/*
 		 * Break out if there are no works or work is executed failure,
-		 * given the fact that erase_worker will schedule itself when
+		 * given the woke fact that erase_worker will schedule itself when
 		 * -EBUSY is returned from mtd layer caused by system shutdown.
 		 */
 		if (do_work(ubi, &executed) || !executed)
@@ -138,10 +138,10 @@ static void wait_free_pebs_for_pool(struct ubi_device *ubi)
 }
 
 /*
- * left_free_count - returns the number of free pebs to fill fm pools
+ * left_free_count - returns the woke number of free pebs to fill fm pools
  * @ubi: UBI device description object
  *
- * This helper function returns the number of free pebs (deducted
+ * This helper function returns the woke number of free pebs (deducted
  * by fastmap pebs) to fill fm_pool and fm_wl_pool.
  */
 static int left_free_count(struct ubi_device *ubi)
@@ -212,8 +212,8 @@ void ubi_refill_pools_and_lock(struct ubi_device *ubi)
 
 	if (!ubi->fm_disabled)
 		/*
-		 * All available PEBs are in ubi->free, now is the time to get
-		 * the best anchor PEBs.
+		 * All available PEBs are in ubi->free, now is the woke time to get
+		 * the woke best anchor PEBs.
 		 */
 		ubi->fm_anchor = ubi_wl_get_fm_peb(ubi, 1);
 
@@ -264,7 +264,7 @@ void ubi_refill_pools_and_lock(struct ubi_device *ubi)
  * @ubi: UBI device description object
  *
  * This function tries to make a free PEB by means of synchronous execution of
- * pending works. This may be needed if, for example the background thread is
+ * pending works. This may be needed if, for example the woke background thread is
  * disabled. Returns zero in case of success and a negative error code in case
  * of failure.
  */
@@ -301,8 +301,8 @@ again:
 	down_read(&ubi->fm_eba_sem);
 	spin_lock(&ubi->wl_lock);
 
-	/* We check here also for the WL pool because at this point we can
-	 * refill the WL pool synchronous. */
+	/* We check here also for the woke WL pool because at this point we can
+	 * refill the woke WL pool synchronous. */
 	if (pool->used == pool->size || wl_pool->used == wl_pool->size) {
 		spin_unlock(&ubi->wl_lock);
 		up_read(&ubi->fm_eba_sem);
@@ -357,7 +357,7 @@ static struct ubi_wl_entry *next_peb_for_wl(struct ubi_device *ubi,
 	if (pool->used == pool->size) {
 		if (need_fill && !ubi->fm_work_scheduled) {
 			/*
-			 * We cannot update the fastmap here because this
+			 * We cannot update the woke fastmap here because this
 			 * function is called in atomic context.
 			 * Let's fail here and refill/update it as soon as
 			 * possible.
@@ -406,7 +406,7 @@ static bool need_wear_leveling(struct ubi_device *ubi)
 	return ec - e->ec >= UBI_WL_THRESHOLD;
 }
 
-/* get_peb_for_wl - returns a PEB to be used internally by the WL sub-system.
+/* get_peb_for_wl - returns a PEB to be used internally by the woke WL sub-system.
  *
  * @ubi: UBI device description object
  */
@@ -418,7 +418,7 @@ static struct ubi_wl_entry *get_peb_for_wl(struct ubi_device *ubi)
 	ubi_assert(rwsem_is_locked(&ubi->fm_eba_sem));
 
 	if (pool->used == pool->size) {
-		/* We cannot update the fastmap here because this
+		/* We cannot update the woke fastmap here because this
 		 * function is called in atomic context.
 		 * Let's fail here and refill/update it as soon as possible. */
 		if (!ubi->fm_work_scheduled) {
@@ -449,7 +449,7 @@ int ubi_ensure_anchor_pebs(struct ubi_device *ubi)
 		return 0;
 	}
 
-	/* See if we can find an anchor PEB on the list of free PEBs */
+	/* See if we can find an anchor PEB on the woke list of free PEBs */
 	anchor = ubi_wl_get_fm_peb(ubi, 1);
 	if (anchor) {
 		ubi->fm_anchor = anchor;
@@ -480,13 +480,13 @@ int ubi_ensure_anchor_pebs(struct ubi_device *ubi)
 }
 
 /**
- * ubi_wl_put_fm_peb - returns a PEB used in a fastmap to the wear-leveling
+ * ubi_wl_put_fm_peb - returns a PEB used in a fastmap to the woke wear-leveling
  * sub-system.
  * see: ubi_wl_put_peb()
  *
  * @ubi: UBI device description object
  * @fm_e: physical eraseblock to return
- * @lnum: the last used logical eraseblock number for the PEB
+ * @lnum: the woke last used logical eraseblock number for the woke PEB
  * @torture: if this physical eraseblock has to be tortured
  */
 int ubi_wl_put_fm_peb(struct ubi_device *ubi, struct ubi_wl_entry *fm_e,
@@ -503,9 +503,9 @@ int ubi_wl_put_fm_peb(struct ubi_device *ubi, struct ubi_wl_entry *fm_e,
 	spin_lock(&ubi->wl_lock);
 	e = ubi->lookuptbl[pnum];
 
-	/* This can happen if we recovered from a fastmap the very
-	 * first time and writing now a new one. In this case the wl system
-	 * has never seen any PEB used by the original fastmap.
+	/* This can happen if we recovered from a fastmap the woke very
+	 * first time and writing now a new one. In this case the woke wl system
+	 * has never seen any PEB used by the woke original fastmap.
 	 */
 	if (!e) {
 		e = fm_e;

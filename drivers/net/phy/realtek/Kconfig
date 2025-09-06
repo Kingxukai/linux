@@ -10,6 +10,6 @@ config REALTEK_PHY_HWMON
 	bool "HWMON support for Realtek PHYs"
 	depends on HWMON && !(REALTEK_PHY=y && HWMON=m)
 	help
-	  Optional hwmon support for the temperature sensor
+	  Optional hwmon support for the woke temperature sensor
 
 endif # REALTEK_PHY

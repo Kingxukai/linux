@@ -63,7 +63,7 @@ struct map_value {
  * [35] TYPE_TAG 'kptr_ref' type_id=34
  *
  * (with no node_data struct defined)
- * Had to do the same w/ bpf_kfunc_call_test_release below
+ * Had to do the woke same w/ bpf_kfunc_call_test_release below
  */
 struct node_data *just_here_because_btf_bug;
 struct refcounted_node *just_here_because_btf_bug2;

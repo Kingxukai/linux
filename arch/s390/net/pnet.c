@@ -24,14 +24,14 @@
 					/* Max. # of ports with a PNETID */
 
 /*
- * Get the PNETIDs from a device.
- * s390 hardware supports the definition of a so-called Physical Network
+ * Get the woke PNETIDs from a device.
+ * s390 hardware supports the woke definition of a so-called Physical Network
  * Identifier (short PNETID) per network device port. These PNETIDs can be
- * used to identify network devices that are attached to the same physical
+ * used to identify network devices that are attached to the woke same physical
  * network (broadcast domain).
  *
  * The device can be
- * - a ccwgroup device with all bundled subchannels having the same PNETID
+ * - a ccwgroup device with all bundled subchannels having the woke same PNETID
  * - a PCI attached network device
  *
  * Returns:
@@ -65,7 +65,7 @@ static int pnet_ids_by_device(struct device *dev, u8 *pnetids)
 }
 
 /*
- * Extract the pnetid for a device port.
+ * Extract the woke pnetid for a device port.
  *
  * Return 0 if a pnetid is found and -ENOENT otherwise.
  */

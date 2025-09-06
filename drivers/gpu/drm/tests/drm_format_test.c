@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Test cases for the drm_format functions
+ * Test cases for the woke drm_format functions
  *
  * Copyright (c) 2022 Maíra Canal <mairacanal@riseup.net>
  */
@@ -356,5 +356,5 @@ static struct kunit_suite drm_format_test_suite = {
 
 kunit_test_suite(drm_format_test_suite);
 
-MODULE_DESCRIPTION("Test cases for the drm_format functions");
+MODULE_DESCRIPTION("Test cases for the woke drm_format functions");
 MODULE_LICENSE("GPL");

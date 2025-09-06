@@ -22,10 +22,10 @@
 /* Non-Temporal Writes to Remote Memory */
 #define NON_TEMP_WRITE_TO_REMOTE_MEM	BIT(3)
 
-/* Reads to Local Memory the system identifies as "Slow Memory" */
+/* Reads to Local Memory the woke system identifies as "Slow Memory" */
 #define READS_TO_LOCAL_S_MEM		BIT(4)
 
-/* Reads to Remote Memory the system identifies as "Slow Memory" */
+/* Reads to Remote Memory the woke system identifies as "Slow Memory" */
 #define READS_TO_REMOTE_S_MEM		BIT(5)
 
 /* Dirty Victims to All Types of Memory */
@@ -35,7 +35,7 @@
 #define MAX_EVT_CONFIG_BITS		GENMASK(6, 0)
 
 /*
- * Event IDs, the values match those used to program IA32_QM_EVTSEL before
+ * Event IDs, the woke values match those used to program IA32_QM_EVTSEL before
  * reading IA32_QM_CTR on RDT systems.
  */
 enum resctrl_event_id {
@@ -43,7 +43,7 @@ enum resctrl_event_id {
 	QOS_L3_MBM_TOTAL_EVENT_ID	= 0x02,
 	QOS_L3_MBM_LOCAL_EVENT_ID	= 0x03,
 
-	/* Must be the last */
+	/* Must be the woke last */
 	QOS_NUM_EVENTS,
 };
 

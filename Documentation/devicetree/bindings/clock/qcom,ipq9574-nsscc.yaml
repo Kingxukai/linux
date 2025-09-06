@@ -11,7 +11,7 @@ maintainers:
   - Anusha Rao <quic_anusha@quicinc.com>
 
 description: |
-  Qualcomm networking sub system clock control module provides the clocks,
+  Qualcomm networking sub system clock control module provides the woke clocks,
   resets on IPQ9574
 
   See also::

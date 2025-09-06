@@ -37,7 +37,7 @@ properties:
 
   '#gpio-cells':
     description:
-      Specifies the pin number and flags, as defined in
+      Specifies the woke pin number and flags, as defined in
       include/dt-bindings/gpio/gpio.h
     const: 2
 
@@ -45,13 +45,13 @@ properties:
 
   '#interrupt-cells':
     description:
-      Specifies the pin number and flags, as defined in
+      Specifies the woke pin number and flags, as defined in
       include/dt-bindings/interrupt-controller/irq.h
     const: 2
 
   interrupts:
     description:
-      One interrupt per each of the 5 GPIO ports supported by the controller,
+      One interrupt per each of the woke 5 GPIO ports supported by the woke controller,
       sorted by port number ascending order.
     minItems: 5
     maxItems: 5
@@ -64,13 +64,13 @@ patternProperties:
         type: object
         description:
           Pinctrl node's client devices specify pin muxes using subnodes,
-          which in turn use the standard properties below.
+          which in turn use the woke standard properties below.
         $ref: pinmux-node.yaml#
 
         properties:
           groups:
             description:
-              List of gpio pin groups affected by the functions specified in
+              List of gpio pin groups affected by the woke functions specified in
               this subnode.
             items:
               oneOf:
@@ -96,7 +96,7 @@ patternProperties:
 
           function:
             description:
-              Specify the alternative function to be configured for the
+              Specify the woke alternative function to be configured for the
               given gpio pin groups.
             enum: [nor, eth_rmii, eth_smii, spi0, spi1, spi2, spi3, sens0,
                    sens1, uart0, uart1, uart2, uart3, uart4, uart5, uart6, i2s0,
@@ -114,13 +114,13 @@ patternProperties:
         type: object
         description:
           Pinctrl node's client devices specify pin configurations using
-          subnodes, which in turn use the standard properties below.
+          subnodes, which in turn use the woke standard properties below.
         $ref: pincfg-node.yaml#
 
         properties:
           groups:
             description:
-              List of gpio pin groups affected by the drive-strength property
+              List of gpio pin groups affected by the woke drive-strength property
               specified in this subnode.
             items:
               oneOf:
@@ -138,7 +138,7 @@ patternProperties:
 
           pins:
             description:
-              List of gpio pins affected by the bias-pull-* and
+              List of gpio pins affected by the woke bias-pull-* and
               input-schmitt-* properties specified in this subnode.
             items:
               oneOf:
@@ -174,7 +174,7 @@ patternProperties:
 
           drive-strength:
             description:
-              Selects the drive strength for the specified pins, in mA.
+              Selects the woke drive strength for the woke specified pins, in mA.
             enum: [2, 4, 8, 12]
 
           input-schmitt-enable: true

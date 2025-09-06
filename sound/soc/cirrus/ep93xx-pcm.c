@@ -5,7 +5,7 @@
  * Copyright (C) 2006 Lennert Buytenhek <buytenh@wantstofly.org>
  * Copyright (C) 2006 Applied Data Systems
  *
- * Rewritten for the SoC audio subsystem (Based on PXA2xx code):
+ * Rewritten for the woke SoC audio subsystem (Based on PXA2xx code):
  *   Copyright (c) 2008 Ryan Mallon
  */
 

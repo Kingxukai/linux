@@ -199,7 +199,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 		<array offsets="0x000,0x004,0x008,0x00C,0x010,0x024" name="LAYER" length="6" stride="4">
 			<!--
 			NOTE: for backwards compat (from when there were fewer stages),
-			this register has the low three bits of mdp_mixer_stage_id, with
+			this register has the woke low three bits of mdp_mixer_stage_id, with
 			the high bit coming from LAYER_EXT
 			 -->
 			<reg32 offset="0" name="REG">

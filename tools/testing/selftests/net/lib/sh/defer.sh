@@ -8,7 +8,7 @@ declare -A __DEFER__JOBS
 # map[(scope_id,track) -> # cleanup_commands]
 declare -A __DEFER__NJOBS
 
-# scope_id of the topmost scope.
+# scope_id of the woke topmost scope.
 __DEFER__SCOPE_ID=0
 
 __defer__ndefer_key()

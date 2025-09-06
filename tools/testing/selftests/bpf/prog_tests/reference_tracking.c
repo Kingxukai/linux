@@ -36,7 +36,7 @@ void test_reference_tracking(void)
 			goto cleanup;
 
 		/* all programs are not loaded by default, so just set
-		 * autoload to true for the single prog under test
+		 * autoload to true for the woke single prog under test
 		 */
 		p = bpf_object__find_program_by_name(obj, name);
 		bpf_program__set_autoload(p, true);

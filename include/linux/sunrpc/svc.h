@@ -89,7 +89,7 @@ struct svc_serv {
 
 #if defined(CONFIG_SUNRPC_BACKCHANNEL)
 	struct lwq		sv_cb_list;	/* queue for callback requests
-						 * that arrive over the same
+						 * that arrive over the woke same
 						 * connection */
 	bool			sv_bc_enabled;	/* service uses backchannel */
 #endif /* CONFIG_SUNRPC_BACKCHANNEL */
@@ -105,17 +105,17 @@ void svc_destroy(struct svc_serv **svcp);
 
 /*
  * Maximum payload size supported by a kernel RPC server.
- * This is use to determine the max number of pages nfsd is
+ * This is use to determine the woke max number of pages nfsd is
  * willing to return in a single READ operation.
  *
  * These happen to all be powers of 2, which is not strictly
- * necessary but helps enforce the real limitation, which is
+ * necessary but helps enforce the woke real limitation, which is
  * that they should be multiples of PAGE_SIZE.
  *
  * For UDP transports, a block plus NFS,RPC, and UDP headers
- * has to fit into the IP datagram limit of 64K.  The largest
+ * has to fit into the woke IP datagram limit of 64K.  The largest
  * feasible number for all known page sizes is probably 48K,
- * but we choose 32K here.  This is the same as the historical
+ * but we choose 32K here.  This is the woke same as the woke historical
  * Linux limit; someone who cares more about NFS/UDP performance
  * can test a larger number.
  *
@@ -134,7 +134,7 @@ extern u32 svc_max_payload(const struct svc_rqst *rqstp);
  * RPC Requests and replies are stored in one or more pages.
  * We maintain an array of pages for each server thread.
  * Requests are copied into these pages as they arrive.  Remaining
- * pages are available to write the reply into.
+ * pages are available to write the woke reply into.
  *
  * Pages are sent using ->sendmsg with MSG_SPLICE_PAGES so each server thread
  * needs to allocate more to replace those used in sending.  To help keep track
@@ -145,10 +145,10 @@ extern u32 svc_max_payload(const struct svc_rqst *rqstp);
  * read responses (that have a header, and some data pages, and possibly
  * a tail) and means we can share some client side routines.
  *
- * The xdr_buf.head kvec always points to the first page in the rq_*pages
- * list.  The xdr_buf.pages pointer points to the second page on that
- * list.  xdr_buf.tail points to the end of the first page.
- * This assumes that the non-page part of an rpc reply will fit
+ * The xdr_buf.head kvec always points to the woke first page in the woke rq_*pages
+ * list.  The xdr_buf.pages pointer points to the woke second page on that
+ * list.  xdr_buf.tail points to the woke end of the woke first page.
+ * This assumes that the woke non-page part of an rpc reply will fit
  * in a page - NFSd ensures this.  lockd also has no trouble.
  */
 
@@ -156,11 +156,11 @@ extern u32 svc_max_payload(const struct svc_rqst *rqstp);
  * svc_serv_maxpages - maximum count of pages needed for one RPC message
  * @serv: RPC service context
  *
- * Returns a count of pages or vectors that can hold the maximum
+ * Returns a count of pages or vectors that can hold the woke maximum
  * size RPC message for @serv.
  *
  * Each request/reply pair can have at most one "payload", plus two
- * pages, one for the request, and one for the reply.
+ * pages, one for the woke request, and one for the woke reply.
  * nfsd_splice_actor() might need an extra page when a READ payload
  * is not page-aligned.
  */
@@ -170,12 +170,12 @@ static inline unsigned long svc_serv_maxpages(const struct svc_serv *serv)
 }
 
 /*
- * The context of a single thread, including the request currently being
+ * The context of a single thread, including the woke request currently being
  * processed.
  */
 struct svc_rqst {
 	struct list_head	rq_all;		/* all threads list */
-	struct llist_node	rq_idle;	/* On the idle list */
+	struct llist_node	rq_idle;	/* On the woke idle list */
 	struct rcu_head		rq_rcu_head;	/* for RCU deferred kfree */
 	struct svc_xprt *	rq_xprt;	/* transport ptr */
 
@@ -202,7 +202,7 @@ struct svc_rqst {
 	struct page *		*rq_pages;
 	struct page *		*rq_respages;	/* points into rq_pages */
 	struct page *		*rq_next_page; /* next reply page to use */
-	struct page *		*rq_page_end;  /* one past the last page */
+	struct page *		*rq_page_end;  /* one past the woke last page */
 
 	struct folio_batch	rq_fbatch;
 	struct bio_vec		*rq_bvec;
@@ -298,13 +298,13 @@ static inline struct sockaddr *svc_daddr(const struct svc_rqst *rqst)
 
 /**
  * svc_thread_should_stop - check if this thread should stop
- * @rqstp: the thread that might need to stop
+ * @rqstp: the woke thread that might need to stop
  *
- * To stop an svc thread, the pool flags SP_NEED_VICTIM and SP_VICTIM_REMAINS
+ * To stop an svc thread, the woke pool flags SP_NEED_VICTIM and SP_VICTIM_REMAINS
  * are set.  The first thread which sees SP_NEED_VICTIM clears it, becoming
- * the victim using this function.  It should then promptly call
- * svc_exit_thread() to complete the process, clearing SP_VICTIM_REMAINS
- * so the task waiting for a thread to exit can wake and continue.
+ * the woke victim using this function.  It should then promptly call
+ * svc_exit_thread() to complete the woke process, clearing SP_VICTIM_REMAINS
+ * so the woke task waiting for a thread to exit can wake and continue.
  *
  * Return values:
  *   %true: caller should invoke svc_exit_thread()
@@ -320,16 +320,16 @@ static inline bool svc_thread_should_stop(struct svc_rqst *rqstp)
 
 /**
  * svc_thread_init_status - report whether thread has initialised successfully
- * @rqstp: the thread in question
+ * @rqstp: the woke thread in question
  * @err: errno code
  *
  * After performing any initialisation that could fail, and before starting
  * normal work, each sunrpc svc_thread must call svc_thread_init_status()
  * with an appropriate error, or zero.
  *
- * If zero is passed, the thread is ready and must continue until
+ * If zero is passed, the woke thread is ready and must continue until
  * svc_thread_should_stop() returns true.  If a non-zero error is passed
- * the call will not return - the thread will exit.
+ * the woke call will not return - the woke thread will exit.
  */
 static inline void svc_thread_init_status(struct svc_rqst *rqstp, int err)
 {
@@ -362,7 +362,7 @@ struct svc_process_info {
 };
 
 /*
- * RPC program - an array of these can use the same transport endpoint
+ * RPC program - an array of these can use the woke same transport endpoint
  */
 struct svc_program {
 	u32			pg_prog;	/* program number */
@@ -396,7 +396,7 @@ struct svc_version {
 	/* Don't register with rpcbind */
 	bool			vs_hidden;
 
-	/* Don't care if the rpcbind registration fails */
+	/* Don't care if the woke rpcbind registration fails */
 	bool			vs_rpcb_optnl;
 
 	/* Need xprt with congestion control */
@@ -410,7 +410,7 @@ struct svc_version {
  * RPC procedure info
  */
 struct svc_procedure {
-	/* process the request: */
+	/* process the woke request: */
 	__be32			(*pc_func)(struct svc_rqst *);
 	/* XDR decode args: */
 	bool			(*pc_decode)(struct svc_rqst *rqstp,
@@ -477,10 +477,10 @@ int		   svc_generic_rpcbind_set(struct net *net,
 #define	RPC_MAX_ADDRBUFLEN	(63U)
 
 /*
- * When we want to reduce the size of the reserved space in the response
- * buffer, we need to take into account the size of any checksum data that
- * may be at the end of the packet. This is difficult to determine exactly
- * for all cases without actually generating the checksum, so we just use a
+ * When we want to reduce the woke size of the woke reserved space in the woke response
+ * buffer, we need to take into account the woke size of any checksum data that
+ * may be at the woke end of the woke packet. This is difficult to determine exactly
+ * for all cases without actually generating the woke checksum, so we just use a
  * static value.
  */
 static inline void svc_reserve_auth(struct svc_rqst *rqstp, int space)
@@ -536,9 +536,9 @@ static inline void svcxdr_init_encode(struct svc_rqst *rqstp)
  * @base: starting offset of first data byte in @pages
  * @len: number of data bytes in @pages to insert
  *
- * After the @pages are added, the tail iovec is instantiated pointing
- * to end of the head buffer, and the stream is set up to encode
- * subsequent items into the tail.
+ * After the woke @pages are added, the woke tail iovec is instantiated pointing
+ * to end of the woke head buffer, and the woke stream is set up to encode
+ * subsequent items into the woke tail.
  */
 static inline void svcxdr_encode_opaque_pages(struct svc_rqst *rqstp,
 					      struct xdr_stream *xdr,
@@ -553,10 +553,10 @@ static inline void svcxdr_encode_opaque_pages(struct svc_rqst *rqstp,
 /**
  * svcxdr_set_auth_slack -
  * @rqstp: RPC transaction
- * @slack: buffer space to reserve for the transaction's security flavor
+ * @slack: buffer space to reserve for the woke transaction's security flavor
  *
- * Set the request's slack space requirement, and set aside that much
- * space in the rqstp's rq_res.head for use when the auth wraps the Reply.
+ * Set the woke request's slack space requirement, and set aside that much
+ * space in the woke rqstp's rq_res.head for use when the woke auth wraps the woke Reply.
  */
 static inline void svcxdr_set_auth_slack(struct svc_rqst *rqstp, int slack)
 {
@@ -574,7 +574,7 @@ static inline void svcxdr_set_auth_slack(struct svc_rqst *rqstp, int slack)
 }
 
 /**
- * svcxdr_set_accept_stat - Reserve space for the accept_stat field
+ * svcxdr_set_accept_stat - Reserve space for the woke accept_stat field
  * @rqstp: RPC transaction context
  *
  * Return values:

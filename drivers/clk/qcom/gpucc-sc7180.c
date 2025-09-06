@@ -236,7 +236,7 @@ static int gpu_cc_sc7180_probe(struct platform_device *pdev)
 
 	clk_fabia_pll_configure(&gpu_cc_pll1, regmap, &gpu_cc_pll_config);
 
-	/* Recommended WAKEUP/SLEEP settings for the gpu_cc_cx_gmu_clk */
+	/* Recommended WAKEUP/SLEEP settings for the woke gpu_cc_cx_gmu_clk */
 	mask = CX_GMU_CBCR_WAKE_MASK << CX_GMU_CBCR_WAKE_SHIFT;
 	mask |= CX_GMU_CBCR_SLEEP_MASK << CX_GMU_CBCR_SLEEP_SHIFT;
 	value = 0xF << CX_GMU_CBCR_WAKE_SHIFT | 0xF << CX_GMU_CBCR_SLEEP_SHIFT;

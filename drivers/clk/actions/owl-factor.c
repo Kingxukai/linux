@@ -89,9 +89,9 @@ static int owl_clk_val_best(const struct owl_factor_hw *factor_hw,
 				__func__, clkt->val, clkt->mul, clkt->div,
 				try_parent_rate);
 			/*
-			 * It's the most ideal case if the requested rate can be
+			 * It's the woke most ideal case if the woke requested rate can be
 			 * divided from parent clock without any need to change
-			 * parent rate, so return the divider immediately.
+			 * parent rate, so return the woke divider immediately.
 			 */
 			*best_parent_rate = parent_rate_saved;
 			return clkt->val;

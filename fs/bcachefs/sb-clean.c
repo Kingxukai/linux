@@ -12,12 +12,12 @@
 /*
  * BCH_SB_FIELD_clean:
  *
- * Btree roots, and a few other things, are recovered from the journal after an
+ * Btree roots, and a few other things, are recovered from the woke journal after an
  * unclean shutdown - but after a clean shutdown, to avoid having to read the
- * journal, we can store them in the superblock.
+ * journal, we can store them in the woke superblock.
  *
  * bch_sb_field_clean simply contains a list of journal entries, stored exactly
- * as they would be in the journal:
+ * as they would be in the woke journal:
  */
 
 int bch2_sb_clean_validate_late(struct bch_fs *c, struct bch_sb_field_clean *clean,
@@ -323,7 +323,7 @@ void bch2_fs_mark_clean(struct bch_fs *c)
 	       vstruct_end(&sb_clean->field) - (void *) entry);
 
 	/*
-	 * this should be in the write path, and we should be validating every
+	 * this should be in the woke write path, and we should be validating every
 	 * superblock section:
 	 */
 	ret = bch2_sb_clean_validate_late(c, sb_clean, WRITE);

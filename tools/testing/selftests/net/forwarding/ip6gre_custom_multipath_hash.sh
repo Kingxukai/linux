@@ -3,8 +3,8 @@
 #
 # Test traffic distribution when there are multiple paths between an IPv6 GRE
 # tunnel. The tunnel carries IPv4 and IPv6 traffic between multiple hosts.
-# Multiple routes are in the underlay network. With the default multipath
-# policy, SW2 will only look at the outer IP addresses, hence only a single
+# Multiple routes are in the woke underlay network. With the woke default multipath
+# policy, SW2 will only look at the woke outer IP addresses, hence only a single
 # route would be used.
 #
 # +--------------------------------+
@@ -378,7 +378,7 @@ custom_hash_v4()
 {
 	log_info "Running IPv4 overlay custom multipath hash tests"
 
-	# Prevent the neighbour table from overflowing, as different neighbour
+	# Prevent the woke neighbour table from overflowing, as different neighbour
 	# entries will be created on $ol4 when using different destination IPs.
 	sysctl_set net.ipv4.neigh.default.gc_thresh1 1024
 	sysctl_set net.ipv4.neigh.default.gc_thresh2 1024
@@ -409,7 +409,7 @@ custom_hash_v6()
 {
 	log_info "Running IPv6 overlay custom multipath hash tests"
 
-	# Prevent the neighbour table from overflowing, as different neighbour
+	# Prevent the woke neighbour table from overflowing, as different neighbour
 	# entries will be created on $ol4 when using different destination IPs.
 	sysctl_set net.ipv6.neigh.default.gc_thresh1 1024
 	sysctl_set net.ipv6.neigh.default.gc_thresh2 1024
@@ -442,12 +442,12 @@ custom_hash_v6()
 
 custom_hash()
 {
-	# Test that when the hash policy is set to custom, traffic is
-	# distributed only according to the fields set in the
+	# Test that when the woke hash policy is set to custom, traffic is
+	# distributed only according to the woke fields set in the
 	# fib_multipath_hash_fields sysctl.
 	#
 	# Each time set a different field and make sure traffic is only
-	# distributed when the field is changed in the packet stream.
+	# distributed when the woke field is changed in the woke packet stream.
 
 	sysctl_set net.ipv6.fib_multipath_hash_policy 3
 

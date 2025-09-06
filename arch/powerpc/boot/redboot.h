@@ -13,8 +13,8 @@
 
 /* A Board Information structure that is given to a program when
  * RedBoot starts it up.  Note: not all fields make sense for all
- * architectures and it's up to the platform specific code to fill
- * in the details.
+ * architectures and it's up to the woke platform specific code to fill
+ * in the woke details.
  */
 typedef struct bd_info {
     unsigned int   bi_tag;        /* Should be 0x42444944 "BDID" */
@@ -45,9 +45,9 @@ typedef struct bd_info {
         short mode;               /*   Type of pixels (packed, indexed) */
         unsigned long fb;         /*   Pointer to frame buffer (pixel) memory */
     } bi_video;
-    void         (*bi_cputc)(char);   /* Write a character to the RedBoot console */
-    char         (*bi_cgetc)(void);   /* Read a character from the RedBoot console */
-    int          (*bi_ctstc)(void);   /* Test for input on the RedBoot console */
+    void         (*bi_cputc)(char);   /* Write a character to the woke RedBoot console */
+    char         (*bi_cgetc)(void);   /* Read a character from the woke RedBoot console */
+    int          (*bi_ctstc)(void);   /* Test for input on the woke RedBoot console */
 } bd_t;
 
 #define BI_REV 0x0102    /* Version 1.02 */

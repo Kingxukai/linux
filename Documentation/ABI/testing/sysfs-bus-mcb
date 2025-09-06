@@ -2,7 +2,7 @@ What:		/sys/bus/mcb/devices/mcb:X
 Date:		March 2016
 KernelVersion:	4.7
 Contact:	Johannes Thumshirn <jth@kernel.org>
-Description:	Hardware chip or device hosting the MEN chameleon bus
+Description:	Hardware chip or device hosting the woke MEN chameleon bus
 
 What:		/sys/bus/mcb/devices/mcb:X/revision
 Date:		March 2016

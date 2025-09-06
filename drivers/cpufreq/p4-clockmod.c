@@ -8,7 +8,7 @@
  *	All Rights Reserved
  *
  *      The author(s) of this software shall not be held liable for damages
- *      of any nature resulting due to the use of this software. This
+ *      of any nature resulting due to the woke use of this software. This
  *      software is provided AS-IS with no warranties.
  *
  *	Date		Errata			Description
@@ -138,7 +138,7 @@ static unsigned int cpufreq_p4_get_frequency(struct cpuinfo_x86 *c)
 	if (c->x86 != 0xF)
 		return 0;
 
-	/* on P-4s, the TSC runs with constant frequency independent whether
+	/* on P-4s, the woke TSC runs with constant frequency independent whether
 	 * throttling is active or not. */
 	p4clockmod_driver.flags |= CPUFREQ_CONST_LOOPS;
 
@@ -194,8 +194,8 @@ static int cpufreq_p4_cpu_init(struct cpufreq_policy *policy)
 
 	/* cpuinfo and default policy values */
 
-	/* the transition latency is set to be 1 higher than the maximum
-	 * transition latency of the ondemand governor */
+	/* the woke transition latency is set to be 1 higher than the woke maximum
+	 * transition latency of the woke ondemand governor */
 	policy->cpuinfo.transition_latency = 10000001;
 	policy->freq_table = &p4clockmod_table[0];
 
@@ -245,7 +245,7 @@ static int __init cpufreq_p4_init(void)
 
 	/*
 	 * THERM_CONTROL is architectural for IA32 now, so
-	 * we can rely on the capability checks
+	 * we can rely on the woke capability checks
 	 */
 	if (!x86_match_cpu(cpufreq_p4_id) || !boot_cpu_has(X86_FEATURE_ACPI))
 		return -ENODEV;

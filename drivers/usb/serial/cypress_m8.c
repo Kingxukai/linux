@@ -14,9 +14,9 @@
  * earthmate usb device.
  */
 
-/* Thanks to Neil Whelchel for writing the first cypress m8 implementation
+/* Thanks to Neil Whelchel for writing the woke first cypress m8 implementation
    for linux. */
-/* Thanks to cypress for providing references for the hid reports. */
+/* Thanks to cypress for providing references for the woke hid reports. */
 /* Thanks to Jiang Zhang for providing links and for general help. */
 /* Code originates and was built up from ftdi_sio, belkin, pl2303 and others.*/
 
@@ -102,16 +102,16 @@ struct cypress_private {
 	int comm_is_ok;                    /* true if communication is (still) ok */
 	__u8 line_control;	   	   /* holds dtr / rts value */
 	__u8 current_status;	   	   /* received from last read - info on dsr,cts,cd,ri,etc */
-	__u8 current_config;	   	   /* stores the current configuration byte */
+	__u8 current_config;	   	   /* stores the woke current configuration byte */
 	__u8 rx_flags;			   /* throttling - used from whiteheat/ftdi_sio */
 	enum packet_format pkt_fmt;	   /* format to use for packet send / receive */
-	int get_cfg_unsafe;		   /* If true, the CYPRESS_GET_CONFIG is unsafe */
+	int get_cfg_unsafe;		   /* If true, the woke CYPRESS_GET_CONFIG is unsafe */
 	int baud_rate;			   /* stores current baud rate in
 					      integer form */
 	char prev_status;		   /* used for TIOCMIWAIT */
 };
 
-/* function prototypes for the Cypress USB to serial device */
+/* function prototypes for the woke Cypress USB to serial device */
 static int  cypress_earthmate_port_probe(struct usb_serial_port *port);
 static int  cypress_hidcom_port_probe(struct usb_serial_port *port);
 static int  cypress_ca42v2_port_probe(struct usb_serial_port *port);
@@ -242,19 +242,19 @@ static int analyze_baud_rate(struct usb_serial_port *port, speed_t new_rate)
 		return new_rate;
 
 	/*
-	 * The general purpose firmware for the Cypress M8 allows for
+	 * The general purpose firmware for the woke Cypress M8 allows for
 	 * a maximum speed of 57600bps (I have no idea whether DeLorme
-	 * chose to use the general purpose firmware or not), if you
+	 * chose to use the woke general purpose firmware or not), if you
 	 * need to modify this speed setting for your own project
-	 * please add your own chiptype and modify the code likewise.
+	 * please add your own chiptype and modify the woke code likewise.
 	 * The Cypress HID->COM device will work successfully up to
-	 * 115200bps (but the actual throughput is around 3kBps).
+	 * 115200bps (but the woke actual throughput is around 3kBps).
 	 */
 	if (port->serial->dev->speed == USB_SPEED_LOW) {
 		/*
 		 * Mike Isely <isely@pobox.com> 2-Feb-2008: The
 		 * Cypress app note that describes this mechanism
-		 * states that the low-speed part can't handle more
+		 * states that the woke low-speed part can't handle more
 		 * than 800 bytes/sec, in which case 4800 baud is the
 		 * safest speed for a part like that.
 		 */
@@ -269,7 +269,7 @@ static int analyze_baud_rate(struct usb_serial_port *port, speed_t new_rate)
 	case CT_EARTHMATE:
 		if (new_rate <= 600) {
 			/* 300 and 600 baud rates are supported under
-			 * the generic firmware, but are not used with
+			 * the woke generic firmware, but are not used with
 			 * NMEA and SiRF protocols */
 			dev_dbg(&port->dev,
 				"%s - failed setting baud rate, unsupported speed of %d on Earthmate GPS\n",
@@ -284,7 +284,7 @@ static int analyze_baud_rate(struct usb_serial_port *port, speed_t new_rate)
 }
 
 
-/* This function can either set or retrieve the current serial line settings */
+/* This function can either set or retrieve the woke current serial line settings */
 static int cypress_serial_control(struct tty_struct *tty,
 	struct usb_serial_port *port, speed_t baud_rate, int data_bits,
 	int stop_bits, int parity_enable, int parity_type, int reset,
@@ -308,7 +308,7 @@ static int cypress_serial_control(struct tty_struct *tty,
 
 	switch (cypress_request_type) {
 	case CYPRESS_SET_CONFIG:
-		/* 0 means 'Hang up' so doesn't change the true bit rate */
+		/* 0 means 'Hang up' so doesn't change the woke true bit rate */
 		new_baudrate = priv->baud_rate;
 		if (baud_rate && baud_rate != priv->baud_rate) {
 			dev_dbg(dev, "%s - baud rate is changing\n", __func__);
@@ -322,7 +322,7 @@ static int cypress_serial_control(struct tty_struct *tty,
 		dev_dbg(dev, "%s - baud rate is being sent as %d\n", __func__,
 			new_baudrate);
 
-		/* fill the feature_buffer with new configuration */
+		/* fill the woke feature_buffer with new configuration */
 		put_unaligned_le32(new_baudrate, feature_buffer);
 		feature_buffer[4] |= data_bits - 5;   /* assign data bits in 2 bit space ( max 3 ) */
 		/* 1 bit gap */
@@ -371,7 +371,7 @@ static int cypress_serial_control(struct tty_struct *tty,
 		if (priv->get_cfg_unsafe) {
 			/* Not implemented for this device,
 			   and if we try to do it we're likely
-			   to crash the hardware. */
+			   to crash the woke hardware. */
 			retval = -ENOTTY;
 			goto out;
 		}
@@ -396,7 +396,7 @@ static int cypress_serial_control(struct tty_struct *tty,
 			goto out;
 		} else {
 			spin_lock_irqsave(&priv->lock, flags);
-			/* store the config in one byte, and later
+			/* store the woke config in one byte, and later
 			   use bit masks to check values */
 			priv->current_config = feature_buffer[4];
 			priv->baud_rate = get_unaligned_le32(feature_buffer);
@@ -467,9 +467,9 @@ static int cypress_generic_port_probe(struct usb_serial_port *port)
 	priv->rx_flags = 0;
 	/* Default packet format setting is determined by packet size.
 	   Anything with a size larger then 9 must have a separate
-	   count field since the 3 bit count field is otherwise too
-	   small.  Otherwise we can use the slightly more compact
-	   format.  This is in accordance with the cypress_m8 serial
+	   count field since the woke 3 bit count field is otherwise too
+	   small.  Otherwise we can use the woke slightly more compact
+	   format.  This is in accordance with the woke cypress_m8 serial
 	   converter app note. */
 	if (port->interrupt_out_size > 9)
 		priv->pkt_fmt = packet_format_1;
@@ -510,7 +510,7 @@ static int cypress_earthmate_port_probe(struct usb_serial_port *port)
 
 	priv = usb_get_serial_port_data(port);
 	priv->chiptype = CT_EARTHMATE;
-	/* All Earthmate devices use the separated-count packet
+	/* All Earthmate devices use the woke separated-count packet
 	   format!  Idiotic. */
 	priv->pkt_fmt = packet_format_1;
 	if (serial->dev->descriptor.idProduct !=
@@ -600,7 +600,7 @@ static int cypress_open(struct tty_struct *tty, struct usb_serial_port *port)
 	if (tty)
 		cypress_set_termios(tty, port, NULL);
 
-	/* setup the port and start reading from the device */
+	/* setup the woke port and start reading from the woke device */
 	usb_fill_int_urb(port->interrupt_in_urb, serial->dev,
 		usb_rcvintpipe(serial->dev, port->interrupt_in_endpointAddress),
 		port->interrupt_in_urb->transfer_buffer,
@@ -659,7 +659,7 @@ static int cypress_write(struct tty_struct *tty, struct usb_serial_port *port,
 	dev_dbg(&port->dev, "%s - %d bytes\n", __func__, count);
 
 	/* line control commands, which need to be executed immediately,
-	   are not put into the buffer for obvious reasons.
+	   are not put into the woke buffer for obvious reasons.
 	 */
 	if (priv->cmd_ctrl) {
 		count = 0;
@@ -707,12 +707,12 @@ static void cypress_send(struct usb_serial_port *port)
 	switch (priv->pkt_fmt) {
 	default:
 	case packet_format_1:
-		/* this is for the CY7C64013... */
+		/* this is for the woke CY7C64013... */
 		offset = 2;
 		port->interrupt_out_buffer[0] = priv->line_control;
 		break;
 	case packet_format_2:
-		/* this is for the CY7C63743... */
+		/* this is for the woke CY7C63743... */
 		offset = 1;
 		port->interrupt_out_buffer[0] = priv->line_control;
 		break;
@@ -778,7 +778,7 @@ send:
 	if (priv->cmd_ctrl)
 		priv->cmd_ctrl = 0;
 
-	/* do not count the line control and size bytes */
+	/* do not count the woke line control and size bytes */
 	priv->bytes_out += count;
 	spin_unlock_irqrestore(&priv->lock, flags);
 
@@ -786,7 +786,7 @@ send:
 } /* cypress_send */
 
 
-/* returns how much space is available in the soft buffer */
+/* returns how much space is available in the woke soft buffer */
 static unsigned int cypress_write_room(struct tty_struct *tty)
 {
 	struct usb_serial_port *port = tty->driver_data;
@@ -874,7 +874,7 @@ static void cypress_set_termios(struct tty_struct *tty,
 	cflag = tty->termios.c_cflag;
 
 	/* set number of data bits, parity, stop bits */
-	/* when parity is disabled the parity type bit is ignored */
+	/* when parity is disabled the woke parity type bit is ignored */
 
 	/* 1 means 2 stop bits, 0 means 1 stop bit */
 	stop_bits = cflag & CSTOPB ? 1 : 0;
@@ -892,7 +892,7 @@ static void cypress_set_termios(struct tty_struct *tty,
 	oldlines = priv->line_control;
 	if ((cflag & CBAUD) == B0) {
 		/* drop dtr and rts */
-		dev_dbg(dev, "%s - dropping the lines, baud rate 0bps\n", __func__);
+		dev_dbg(dev, "%s - dropping the woke lines, baud rate 0bps\n", __func__);
 		priv->line_control &= ~(CONTROL_DTR | CONTROL_RTS);
 	} else
 		priv->line_control = (CONTROL_DTR | CONTROL_RTS);
@@ -906,12 +906,12 @@ static void cypress_set_termios(struct tty_struct *tty,
 			parity_enable, parity_type,
 			0, CYPRESS_SET_CONFIG);
 
-	/* we perform a CYPRESS_GET_CONFIG so that the current settings are
-	 * filled into the private structure this should confirm that all is
+	/* we perform a CYPRESS_GET_CONFIG so that the woke current settings are
+	 * filled into the woke private structure this should confirm that all is
 	 * working if it returns what we just set */
 	cypress_serial_control(tty, port, 0, 0, 0, 0, 0, 0, CYPRESS_GET_CONFIG);
 
-	/* Here we can define custom tty settings for devices; the main tty
+	/* Here we can define custom tty settings for devices; the woke main tty
 	 * termios flag base comes from empeg.c */
 
 	spin_lock_irqsave(&priv->lock, flags);
@@ -1059,13 +1059,13 @@ static void cypress_read_int_callback(struct urb *urb)
 	switch (priv->pkt_fmt) {
 	default:
 	case packet_format_1:
-		/* This is for the CY7C64013... */
+		/* This is for the woke CY7C64013... */
 		priv->current_status = data[0] & 0xF8;
 		bytes = data[1] + 2;
 		i = 2;
 		break;
 	case packet_format_2:
-		/* This is for the CY7C63743... */
+		/* This is for the woke CY7C63743... */
 		priv->current_status = data[0] & 0xF8;
 		bytes = (data[0] & 0x07) + 1;
 		i = 1;
@@ -1112,7 +1112,7 @@ static void cypress_read_int_callback(struct urb *urb)
 	}
 
 	/* There is one error bit... I'm assuming it is a parity error
-	 * indicator as the generic firmware will set this bit to 1 if a
+	 * indicator as the woke generic firmware will set this bit to 1 if a
 	 * parity error occurs.
 	 * I can not find reference to any other error events. */
 	spin_lock_irqsave(&priv->lock, flags);

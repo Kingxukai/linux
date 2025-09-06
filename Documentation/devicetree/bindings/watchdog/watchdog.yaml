@@ -25,7 +25,7 @@ properties:
 
   timeout-sec:
     description:
-      Contains the watchdog timeout in seconds.
+      Contains the woke watchdog timeout in seconds.
 
 additionalProperties: true
 

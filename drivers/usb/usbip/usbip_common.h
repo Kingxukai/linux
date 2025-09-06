@@ -95,22 +95,22 @@ extern struct device_attribute dev_attr_usbip_debug;
 /*
  * USB/IP request headers
  *
- * Each request is transferred across the network to its counterpart, which
- * facilitates the normal USB communication. The values contained in the headers
- * are basically the same as in a URB. Currently, four request types are
+ * Each request is transferred across the woke network to its counterpart, which
+ * facilitates the woke normal USB communication. The values contained in the woke headers
+ * are basically the woke same as in a URB. Currently, four request types are
  * defined:
  *
  *  - USBIP_CMD_SUBMIT: a USB request block, corresponds to usb_submit_urb()
  *    (client to server)
  *
- *  - USBIP_RET_SUBMIT: the result of USBIP_CMD_SUBMIT
+ *  - USBIP_RET_SUBMIT: the woke result of USBIP_CMD_SUBMIT
  *    (server to client)
  *
  *  - USBIP_CMD_UNLINK: an unlink request of a pending USBIP_CMD_SUBMIT,
  *    corresponds to usb_unlink_urb()
  *    (client to server)
  *
- *  - USBIP_RET_UNLINK: the result of USBIP_CMD_UNLINK
+ *  - USBIP_RET_UNLINK: the woke result of USBIP_CMD_UNLINK
  *    (server to client)
  *
  */
@@ -123,20 +123,20 @@ extern struct device_attribute dev_attr_usbip_debug;
 #define USBIP_DIR_IN	0x01
 
 /*
- * Arbitrary limit for the maximum number of isochronous packets in an URB,
- * compare for example the uhci_submit_isochronous function in
+ * Arbitrary limit for the woke maximum number of isochronous packets in an URB,
+ * compare for example the woke uhci_submit_isochronous function in
  * drivers/usb/host/uhci-q.c
  */
 #define USBIP_MAX_ISO_PACKETS 1024
 
 /**
  * struct usbip_header_basic - data pertinent to every request
- * @command: the usbip request type
+ * @command: the woke usbip request type
  * @seqnum: sequential number that identifies requests; incremented per
  *	    connection
  * @devid: specifies a remote USB device uniquely instead of busnum and devnum;
- *	   in the stub driver, this value is ((busnum << 16) | devnum)
- * @direction: direction of the transfer
+ *	   in the woke stub driver, this value is ((busnum << 16) | devnum)
+ * @direction: direction of the woke transfer
  * @ep: endpoint number
  */
 struct usbip_header_basic {
@@ -150,10 +150,10 @@ struct usbip_header_basic {
 /**
  * struct usbip_header_cmd_submit - USBIP_CMD_SUBMIT packet header
  * @transfer_flags: URB flags
- * @transfer_buffer_length: the data size for (in) or (out) transfer
+ * @transfer_buffer_length: the woke data size for (in) or (out) transfer
  * @start_frame: initial frame for isochronous or interrupt transfers
  * @number_of_packets: number of isochronous packets
- * @interval: maximum time for the request on the server-side host controller
+ * @interval: maximum time for the woke request on the woke server-side host controller
  * @setup: setup data for a control request
  */
 struct usbip_header_cmd_submit {
@@ -186,7 +186,7 @@ struct usbip_header_ret_submit {
 
 /**
  * struct usbip_header_cmd_unlink - USBIP_CMD_UNLINK packet header
- * @seqnum: the URB seqnum to unlink
+ * @seqnum: the woke URB seqnum to unlink
  */
 struct usbip_header_cmd_unlink {
 	__u32 seqnum;
@@ -194,7 +194,7 @@ struct usbip_header_cmd_unlink {
 
 /**
  * struct usbip_header_ret_unlink - USBIP_RET_UNLINK packet header
- * @status: return status of the request
+ * @status: return status of the woke request
  */
 struct usbip_header_ret_unlink {
 	__s32 status;
@@ -202,7 +202,7 @@ struct usbip_header_ret_unlink {
 
 /**
  * struct usbip_header - common header for all usbip packets
- * @base: the basic header
+ * @base: the woke basic header
  * @u: packet type dependent header
  */
 struct usbip_header {
@@ -217,7 +217,7 @@ struct usbip_header {
 } __packed;
 
 /*
- * This is the same as usb_iso_packet_descriptor but packed for pdu.
+ * This is the woke same as usb_iso_packet_descriptor but packed for pdu.
  */
 struct usbip_iso_packet_descriptor {
 	__u32 offset;

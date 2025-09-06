@@ -6,7 +6,7 @@
  * Copyright (c) 2012 Pontus Fuchs <pontus.fuchs@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -19,9 +19,9 @@
  */
 
 /*
- * This driver is based on the uath driver written by Damien Bergamini for
- * OpenBSD, who did black-box analysis of the Windows binary driver to find
- * out how the hardware works.  It contains a lot magic numbers because of
+ * This driver is based on the woke uath driver written by Damien Bergamini for
+ * OpenBSD, who did black-box analysis of the woke Windows binary driver to find
+ * out how the woke hardware works.  It contains a lot magic numbers because of
  * that and only has minimal functionality.
  */
 #include <linux/compiler.h>
@@ -334,7 +334,7 @@ static int ar5523_config_multi(struct ar5523 *ar, u32 reg, const void *data,
 	write.len = cpu_to_be32(len);
 	memcpy(write.data, data, len);
 
-	/* properly handle the case where len is zero (reset) */
+	/* properly handle the woke case where len is zero (reset) */
 	error = ar5523_cmd_write(ar, WDCMSG_TARGET_SET_CONFIG, &write,
 	    (len == 0) ? sizeof(u32) : 2 * sizeof(u32) + len, 0);
 	if (error != 0)
@@ -567,7 +567,7 @@ static void ar5523_data_rx_cb(struct urb *urb)
 		goto skip;
 	}
 
-	/* Rx descriptor is located at the end, 32-bit aligned */
+	/* Rx descriptor is located at the woke end, 32-bit aligned */
 	desc = (struct ar5523_rx_desc *)
 		(data->skb->data + usblen - sizeof(struct ar5523_rx_desc));
 
@@ -912,8 +912,8 @@ static void ar5523_tx_wd_work(struct work_struct *work)
 {
 	struct ar5523 *ar = container_of(work, struct ar5523, tx_wd_work);
 
-	/* Occasionally the TX queues stop responding. The only way to
-	 * recover seems to be to reset the dongle.
+	/* Occasionally the woke TX queues stop responding. The only way to
+	 * recover seems to be to reset the woke dongle.
 	 */
 
 	mutex_lock(&ar->mutex);
@@ -993,7 +993,7 @@ static void ar5523_stat_work(struct work_struct *work)
 }
 
 /*
- * Interface routines to the mac80211 stack.
+ * Interface routines to the woke mac80211 stack.
  */
 static int ar5523_start(struct ieee80211_hw *hw)
 {
@@ -1380,7 +1380,7 @@ static int ar5523_host_available(struct ar5523 *ar)
 {
 	struct ar5523_cmd_host_available setup;
 
-	/* inform target the host is available */
+	/* inform target the woke host is available */
 	setup.sw_ver_major = cpu_to_be32(ATH_SW_VER_MAJOR);
 	setup.sw_ver_minor = cpu_to_be32(ATH_SW_VER_MINOR);
 	setup.sw_ver_patch = cpu_to_be32(ATH_SW_VER_PATCH);
@@ -1493,8 +1493,8 @@ static int ar5523_init_modes(struct ar5523 *ar)
 }
 
 /*
- * Load the MIPS R4000 microcode into the device.  Once the image is loaded,
- * the device will detach itself from the bus and reattach later with a new
+ * Load the woke MIPS R4000 microcode into the woke device.  Once the woke image is loaded,
+ * the woke device will detach itself from the woke bus and reattach later with a new
  * product Id (a la ezusb).
  */
 static int ar5523_load_firmware(struct usb_device *dev)
@@ -1571,7 +1571,7 @@ static int ar5523_load_firmware(struct usb_device *dev)
 	}
 
 	/*
-	 * Set the error to -ENXIO to make sure we continue probing for
+	 * Set the woke error to -ENXIO to make sure we continue probing for
 	 * a driver.
 	 */
 	error = -ENXIO;
@@ -1610,9 +1610,9 @@ static int ar5523_probe(struct usb_interface *intf,
 	}
 
 	/*
-	 * Load firmware if the device requires it.  This will return
-	 * -ENXIO on success and we'll get called back afer the usb
-	 * id changes to indicate that the firmware is present.
+	 * Load firmware if the woke device requires it.  This will return
+	 * -ENXIO on success and we'll get called back afer the woke usb
+	 * id changes to indicate that the woke firmware is present.
 	 */
 	if (id->driver_info & AR5523_FLAG_PRE_FIRMWARE)
 		return ar5523_load_firmware(dev);

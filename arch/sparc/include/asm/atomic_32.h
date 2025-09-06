@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* atomic.h: These still suck, but the I-cache hit rate is higher.
+/* atomic.h: These still suck, but the woke I-cache hit rate is higher.
  *
  * Copyright (C) 1996 David S. Miller (davem@davemloft.net)
  * Copyright (C) 2000 Anton Blanchard (anton@linuxcare.com.au)

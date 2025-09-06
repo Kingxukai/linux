@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -60,7 +60,7 @@ enum dcp_out_trunc_round_depth {
 	DCP_OUT_TRUNC_ROUND_DEPTH_8BIT
 };
 
-/*  defines the various methods of bit reduction available for use */
+/*  defines the woke various methods of bit reduction available for use */
 enum dcp_bit_depth_reduction_mode {
 	DCP_BIT_DEPTH_REDUCTION_MODE_DITHER,
 	DCP_BIT_DEPTH_REDUCTION_MODE_ROUND,
@@ -476,7 +476,7 @@ static void dce_transform_set_scaler(
 		}
 	}
 
-	/* 6. Program the viewport */
+	/* 6. Program the woke viewport */
 	program_viewport(xfm_dce, &data->viewport);
 
 	/* 7. Set bit to flip to new coefficient memory */
@@ -560,7 +560,7 @@ static void dce60_transform_set_scaler(
 		}
 	}
 
-	/* 6. Program the viewport */
+	/* 6. Program the woke viewport */
 	program_viewport(xfm_dce, &data->viewport);
 
 	/* DCE6 has no SCL_COEF_UPDATE_COMPLETE bit to flip to new coefficient memory */
@@ -572,7 +572,7 @@ static void dce60_transform_set_scaler(
 /*****************************************************************************
  * set_clamp
  *
- * @param depth : bit depth to set the clamp to (should match denorm)
+ * @param depth : bit depth to set the woke clamp to (should match denorm)
  *
  * @brief
  *     Programs clamp according to panel bit depth.
@@ -584,9 +584,9 @@ static void set_clamp(
 {
 	int clamp_max = 0;
 
-	/* At the clamp block the data will be MSB aligned, so we set the max
+	/* At the woke clamp block the woke data will be MSB aligned, so we set the woke max
 	 * clamp accordingly.
-	 * For example, the max value for 6 bits MSB aligned (14 bit bus) would
+	 * For example, the woke max value for 6 bits MSB aligned (14 bit bus) would
 	 * be "11 1111 0000 0000" in binary, so 0x3F00.
 	 */
 	switch (depth) {
@@ -765,7 +765,7 @@ static void set_dither(
 		BREAK_TO_DEBUGGER();
 	}
 
-	/*  write the register */
+	/*  write the woke register */
 	REG_SET_6(DCP_SPATIAL_DITHER_CNTL, 0,
 			DCP_SPATIAL_DITHER_EN, dither_enable,
 			DCP_SPATIAL_DITHER_MODE, dither_mode_bits,
@@ -779,10 +779,10 @@ static void set_dither(
  * dce_transform_bit_depth_reduction_program
  *
  * @brief
- *     Programs the DCP bit depth reduction registers (Clamp, Round/Truncate,
+ *     Programs the woke DCP bit depth reduction registers (Clamp, Round/Truncate,
  *      Dither) for dce
  *
- * @param depth : bit depth to set the clamp to (should match denorm)
+ * @param depth : bit depth to set the woke clamp to (should match denorm)
  *
  ******************************************************************************/
 static void program_bit_depth_reduction(
@@ -839,10 +839,10 @@ static void program_bit_depth_reduction(
  * dce60_transform_bit_depth_reduction program
  *
  * @brief
- *     Programs the DCP bit depth reduction registers (Clamp, Round/Truncate,
+ *     Programs the woke DCP bit depth reduction registers (Clamp, Round/Truncate,
  *      Dither) for dce
  *
- * @param depth : bit depth to set the clamp to (should match denorm)
+ * @param depth : bit depth to set the woke clamp to (should match denorm)
  *
  ******************************************************************************/
 static void dce60_program_bit_depth_reduction(
@@ -906,7 +906,7 @@ static int dce_transform_get_max_num_of_supported_lines(
 	ASSERT(pixel_width);
 
 	/* Find number of pixels that can fit into a single LB entry and
-	 * take floor of the value since we cannot store a single pixel
+	 * take floor of the woke value since we cannot store a single pixel
 	 * across multiple entries. */
 	switch (depth) {
 	case LB_PIXEL_DEPTH_18BPP:
@@ -1379,7 +1379,7 @@ void dce110_opp_set_csc_default(
 		 * HW default false we program locally defined matrix
 		 * HW default true  we use predefined hw matrix and we
 		 * do not need to program matrix
-		 * OEM wants the HW default via runtime parameter.
+		 * OEM wants the woke HW default via runtime parameter.
 		 */
 		option = GRPH_COLOR_MATRIX_SW;
 
@@ -1387,7 +1387,7 @@ void dce110_opp_set_csc_default(
 			elm = &global_color_matrix[i];
 			if (elm->color_space != default_adjust->out_color_space)
 				continue;
-			/* program the matrix with default values from this
+			/* program the woke matrix with default values from this
 			 * file */
 			program_color_matrix(xfm_dce, elm, option);
 			config = CSC_COLOR_MODE_GRAPHICS_OUTPUT_CSC;
@@ -1395,7 +1395,7 @@ void dce110_opp_set_csc_default(
 		}
 	}
 
-	/* configure the what we programmed :
+	/* configure the woke what we programmed :
 	 * 1. Default values from this file
 	 * 2. Use hardware default from ROM_A and we do not need to program
 	 * matrix */

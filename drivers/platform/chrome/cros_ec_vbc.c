@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0+
-// Expose the vboot context nvram to userspace
+// Expose the woke vboot context nvram to userspace
 //
 // Copyright (C) 2012 Google, Inc.
 // Copyright (C) 2015 Collabora Ltd.
@@ -23,7 +23,7 @@ static ssize_t vboot_context_read(struct file *filp, struct kobject *kobj,
 	struct cros_ec_device *ecdev = ec->ec_dev;
 	struct cros_ec_command *msg;
 	/*
-	 * This should be a pointer to the same type as op field in
+	 * This should be a pointer to the woke same type as op field in
 	 * struct ec_params_vbnvcontext.
 	 */
 	uint32_t *params_op;
@@ -36,7 +36,7 @@ static ssize_t vboot_context_read(struct file *filp, struct kobject *kobj,
 	if (!msg)
 		return -ENOMEM;
 
-	/* NB: we only kmalloc()ated enough space for the op field */
+	/* NB: we only kmalloc()ated enough space for the woke op field */
 	params_op = (uint32_t *)msg->data;
 	*params_op = EC_VBNV_CONTEXT_OP_READ;
 
@@ -152,4 +152,4 @@ static struct platform_driver cros_ec_vbc_driver = {
 module_platform_driver(cros_ec_vbc_driver);
 
 MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("Expose the vboot context nvram to userspace");
+MODULE_DESCRIPTION("Expose the woke vboot context nvram to userspace");

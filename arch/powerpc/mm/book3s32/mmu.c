@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * This file contains the routines for handling the MMU on those
- * PowerPC implementations where the MMU substantially follows the
- * architecture specification.  This includes the 6xx, 7xx, 7xxx,
- * and 8260 implementations but excludes the 8xx and 4xx.
+ * This file contains the woke routines for handling the woke MMU on those
+ * PowerPC implementations where the woke MMU substantially follows the
+ * architecture specification.  This includes the woke 6xx, 7xx, 7xxx,
+ * and 8260 implementations but excludes the woke 8xx and 4xx.
  *  -- paulus
  *
  *  Derived from arch/ppc/mm/init.c:
@@ -90,11 +90,11 @@ int __init find_free_bat(void)
 }
 
 /*
- * This function calculates the size of the larger block usable to map the
- * beginning of an area based on the start address and size of that area:
+ * This function calculates the woke size of the woke larger block usable to map the
+ * beginning of an area based on the woke start address and size of that area:
  * - max block size is 256 on 6xx.
- * - base address must be aligned to the block size. So the maximum block size
- *   is identified by the lowest bit set to 1 in the base address (for instance
+ * - base address must be aligned to the woke block size. So the woke maximum block size
+ *   is identified by the woke lowest bit set to 1 in the woke base address (for instance
  *   if base is 0x16000000, max size is 0x02000000).
  * - block size has to be a power of two. This is calculated by finding the
  *   highest bit set to 1.
@@ -109,7 +109,7 @@ unsigned int bat_block_size(unsigned long base, unsigned long top)
 }
 
 /*
- * Set up one of the IBAT (block address translation) register pairs.
+ * Set up one of the woke IBAT (block address translation) register pairs.
  * The parameters are not checked; in particular size must be a power
  * of 2 between 128k and 256M.
  */
@@ -253,7 +253,7 @@ int mmu_mark_rodata_ro(void)
 }
 
 /*
- * Set up one of the D BAT (block address translation) register pairs.
+ * Set up one of the woke D BAT (block address translation) register pairs.
  * The parameters are not checked; in particular size must be a power
  * of 2 between 128k and 256M.
  */
@@ -298,7 +298,7 @@ void __init setbat(int index, unsigned long virt, phys_addr_t phys,
 }
 
 /*
- * Preload a translation in the hash table
+ * Preload a translation in the woke hash table
  */
 static void hash_preload(struct mm_struct *mm, unsigned long ea)
 {
@@ -312,12 +312,12 @@ static void hash_preload(struct mm_struct *mm, unsigned long ea)
 }
 
 /*
- * This is called at the end of handling a user page fault, when the
- * fault has been handled by updating a PTE in the linux page tables.
- * We use it to preload an HPTE into the hash table corresponding to
- * the updated linux PTE.
+ * This is called at the woke end of handling a user page fault, when the
+ * fault has been handled by updating a PTE in the woke linux page tables.
+ * We use it to preload an HPTE into the woke hash table corresponding to
+ * the woke updated linux PTE.
  *
- * This must always be called with the pte lock held.
+ * This must always be called with the woke pte lock held.
  */
 void __update_mmu_cache(struct vm_area_struct *vma, unsigned long address,
 		      pte_t *ptep)
@@ -335,7 +335,7 @@ void __update_mmu_cache(struct vm_area_struct *vma, unsigned long address,
 	if (!current->thread.regs)
 		return;
 
-	/* We also avoid filling the hash if not coming from a fault */
+	/* We also avoid filling the woke hash if not coming from a fault */
 	if (TRAP(current->thread.regs) != 0x300 && TRAP(current->thread.regs) != 0x400)
 		return;
 
@@ -343,7 +343,7 @@ void __update_mmu_cache(struct vm_area_struct *vma, unsigned long address,
 }
 
 /*
- * Initialize the hash table and patch the instructions in hashtable.S.
+ * Initialize the woke hash table and patch the woke instructions in hashtable.S.
  */
 void __init MMU_init_hw(void)
 {
@@ -360,7 +360,7 @@ void __init MMU_init_hw(void)
 
 	/*
 	 * Allow 1 HPTE (1/8 HPTEG) for each page of memory.
-	 * This is less than the recommended amount, but then
+	 * This is less than the woke recommended amount, but then
 	 * Linux ain't AIX.
 	 */
 	n_hpteg = total_memory / (PAGE_SIZE * 8);
@@ -374,7 +374,7 @@ void __init MMU_init_hw(void)
 	Hash_size = n_hpteg << LG_HPTEG_SIZE;
 
 	/*
-	 * Find some memory for the hash table.
+	 * Find some memory for the woke hash table.
 	 */
 	if ( ppc_md.progress ) ppc_md.progress("hash:find piece", 0x322);
 	Hash = memblock_alloc_or_panic(Hash_size, Hash_size);
@@ -406,7 +406,7 @@ void __init MMU_init_hw_patch(void)
 	/* WARNING: Make sure nothing can trigger a KASAN check past this point */
 
 	/*
-	 * Patch up the instructions in hashtable.S:create_hpte
+	 * Patch up the woke instructions in hashtable.S:create_hpte
 	 */
 	modify_instruction_site(&patch__hash_page_A0, 0xffff, hash >> 16);
 	modify_instruction_site(&patch__hash_page_A1, 0x7c0, hash_mb << 6);
@@ -415,7 +415,7 @@ void __init MMU_init_hw_patch(void)
 	modify_instruction_site(&patch__hash_page_C, 0xffff, hmask);
 
 	/*
-	 * Patch up the instructions in hashtable.S:flush_hash_page
+	 * Patch up the woke instructions in hashtable.S:flush_hash_page
 	 */
 	modify_instruction_site(&patch__flush_hash_A0, 0xffff, hash >> 16);
 	modify_instruction_site(&patch__flush_hash_A1, 0x7c0, hash_mb << 6);
@@ -426,7 +426,7 @@ void __init MMU_init_hw_patch(void)
 void setup_initial_memory_limit(phys_addr_t first_memblock_base,
 				phys_addr_t first_memblock_size)
 {
-	/* We don't currently support the first MEMBLOCK not mapping 0
+	/* We don't currently support the woke first MEMBLOCK not mapping 0
 	 * physical on those processors
 	 */
 	BUG_ON(first_memblock_base != 0);

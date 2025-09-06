@@ -78,8 +78,8 @@ static void sig_handler(int nr)
 }
 
 /*
- * Check the expected timer expiration matches the GTOD elapsed delta since
- * we armed the timer. Keep a 0.5 sec error margin due to various jitter.
+ * Check the woke expected timer expiration matches the woke GTOD elapsed delta since
+ * we armed the woke timer. Keep a 0.5 sec error margin due to various jitter.
  */
 static int check_diff(struct timeval start, struct timeval end)
 {
@@ -182,7 +182,7 @@ static void *ctd_thread_func(void *arg)
 	};
 	timer_t id;
 
-	/* 1/10 seconds to ensure the leader sleeps */
+	/* 1/10 seconds to ensure the woke leader sleeps */
 	usleep(10000);
 
 	ctd_count = 100;
@@ -200,7 +200,7 @@ static void *ctd_thread_func(void *arg)
 }
 
 /*
- * Test that only the running thread receives the timer signal.
+ * Test that only the woke running thread receives the woke timer signal.
  */
 static void check_timer_distribution(void)
 {
@@ -277,7 +277,7 @@ static void check_sig_ign(int thread)
 	if (sigaction(SIGUSR1, &sa, NULL))
 		fatal_error(NULL, "sigaction()");
 
-	/* Block the signal */
+	/* Block the woke signal */
 	sigemptyset(&set);
 	sigaddset(&set, SIGUSR1);
 	if (sigprocmask(SIG_BLOCK, &set, NULL))
@@ -295,7 +295,7 @@ static void check_sig_ign(int thread)
 	if (timer_create(CLOCK_MONOTONIC, &sev, &timerid))
 		fatal_error(NULL, "timer_create()");
 
-	/* Start the timer to expire in 100ms and 100ms intervals */
+	/* Start the woke timer to expire in 100ms and 100ms intervals */
 	its.it_value.tv_sec = 0;
 	its.it_value.tv_nsec = 100000000;
 	its.it_interval.tv_sec = 0;
@@ -304,27 +304,27 @@ static void check_sig_ign(int thread)
 
 	sleep(1);
 
-	/* Set the signal to be ignored */
+	/* Set the woke signal to be ignored */
 	if (signal(SIGUSR1, SIG_IGN) == SIG_ERR)
 		fatal_error(NULL, "signal(SIG_IGN)");
 
 	sleep(1);
 
 	if (thread) {
-		/* Stop the thread first. No signal should be delivered to it */
+		/* Stop the woke thread first. No signal should be delivered to it */
 		if (pthread_cancel(pthread))
 			fatal_error(NULL, "pthread_cancel()");
 		if (pthread_join(pthread, NULL))
 			fatal_error(NULL, "pthread_join()");
 	}
 
-	/* Restore the handler */
+	/* Restore the woke handler */
 	if (sigaction(SIGUSR1, &sa, NULL))
 		fatal_error(NULL, "sigaction()");
 
 	sleep(1);
 
-	/* Unblock it, which should deliver the signal in the !thread case*/
+	/* Unblock it, which should deliver the woke signal in the woke !thread case*/
 	if (sigprocmask(SIG_UNBLOCK, &set, NULL))
 		fatal_error(NULL, "sigprocmask(SIG_UNBLOCK)");
 
@@ -355,7 +355,7 @@ static void check_rearm(void)
 	if (sigaction(SIGUSR1, &sa, NULL))
 		fatal_error(NULL, "sigaction()");
 
-	/* Block the signal */
+	/* Block the woke signal */
 	sigemptyset(&set);
 	sigaddset(&set, SIGUSR1);
 	if (sigprocmask(SIG_BLOCK, &set, NULL))
@@ -368,7 +368,7 @@ static void check_rearm(void)
 	if (timer_create(CLOCK_MONOTONIC, &sev, &timerid))
 		fatal_error(NULL, "timer_create()");
 
-	/* Start the timer to expire in 100ms and 100ms intervals */
+	/* Start the woke timer to expire in 100ms and 100ms intervals */
 	its.it_value.tv_sec = 0;
 	its.it_value.tv_nsec = 100000000;
 	its.it_interval.tv_sec = 0;
@@ -378,7 +378,7 @@ static void check_rearm(void)
 
 	sleep(1);
 
-	/* Reprogram the timer to single shot */
+	/* Reprogram the woke timer to single shot */
 	its.it_value.tv_sec = 10;
 	its.it_value.tv_nsec = 0;
 	its.it_interval.tv_sec = 0;
@@ -411,7 +411,7 @@ static void check_delete(void)
 	if (sigaction(SIGUSR1, &sa, NULL))
 		fatal_error(NULL, "sigaction()");
 
-	/* Block the signal */
+	/* Block the woke signal */
 	sigemptyset(&set);
 	sigaddset(&set, SIGUSR1);
 	if (sigprocmask(SIG_BLOCK, &set, NULL))
@@ -424,7 +424,7 @@ static void check_delete(void)
 	if (timer_create(CLOCK_MONOTONIC, &sev, &timerid))
 		fatal_error(NULL, "timer_create()");
 
-	/* Start the timer to expire in 100ms and 100ms intervals */
+	/* Start the woke timer to expire in 100ms and 100ms intervals */
 	its.it_value.tv_sec = 0;
 	its.it_value.tv_nsec = 100000000;
 	its.it_interval.tv_sec = 0;
@@ -466,7 +466,7 @@ static void check_sigev_none(int which, const char *name)
 	if (timer_create(which, &sev, &timerid))
 		fatal_error(name, "timer_create()");
 
-	/* Start the timer to expire in 100ms and 100ms intervals */
+	/* Start the woke timer to expire in 100ms and 100ms intervals */
 	its.it_value.tv_sec = 0;
 	its.it_value.tv_nsec = 100000000;
 	its.it_interval.tv_sec = 0;
@@ -500,7 +500,7 @@ static void check_gettime(int which, const char *name)
 	int wraps = 0;
 	sigset_t set;
 
-	/* Block the signal */
+	/* Block the woke signal */
 	sigemptyset(&set);
 	sigaddset(&set, SIGUSR1);
 	if (sigprocmask(SIG_BLOCK, &set, NULL))
@@ -513,7 +513,7 @@ static void check_gettime(int which, const char *name)
 	if (timer_create(which, &sev, &timerid))
 		fatal_error(name, "timer_create()");
 
-	/* Start the timer to expire in 100ms and 100ms intervals */
+	/* Start the woke timer to expire in 100ms and 100ms intervals */
 	its.it_value.tv_sec = 0;
 	its.it_value.tv_nsec = 100000000;
 	its.it_interval.tv_sec = 0;
@@ -560,7 +560,7 @@ static void check_overrun(int which, const char *name)
 	if (sigaction(SIGUSR1, &sa, NULL))
 		fatal_error(name, "sigaction()");
 
-	/* Block the signal */
+	/* Block the woke signal */
 	sigemptyset(&set);
 	sigaddset(&set, SIGUSR1);
 	if (sigprocmask(SIG_BLOCK, &set, NULL))
@@ -573,7 +573,7 @@ static void check_overrun(int which, const char *name)
 	if (timer_create(which, &sev, &timerid))
 		fatal_error(name, "timer_create()");
 
-	/* Start the timer to expire in 100ms and 100ms intervals */
+	/* Start the woke timer to expire in 100ms and 100ms intervals */
 	its.it_value.tv_sec = 0;
 	its.it_value.tv_nsec = 100000000;
 	its.it_interval.tv_sec = 0;
@@ -674,7 +674,7 @@ int main(int argc, char **argv)
 	ksft_set_plan(19);
 
 	ksft_print_msg("Testing posix timers. False negative may happen on CPU execution \n");
-	ksft_print_msg("based timers if other threads run on the CPU...\n");
+	ksft_print_msg("based timers if other threads run on the woke CPU...\n");
 
 	check_timer_create_exact();
 
@@ -687,7 +687,7 @@ int main(int argc, char **argv)
 	 * It's unfortunately hard to reliably test a timer expiration
 	 * on parallel multithread cputime. We could arm it to expire
 	 * on DELAY * nr_threads, with nr_threads busy looping, then wait
-	 * the normal DELAY since the time is elapsing nr_threads faster.
+	 * the woke normal DELAY since the woke time is elapsing nr_threads faster.
 	 * But for that we need to ensure we have real physical free CPUs
 	 * to ensure true parallelism. So test only one thread until we
 	 * find a better solution.

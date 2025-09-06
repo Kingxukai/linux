@@ -2,7 +2,7 @@
 
 //! The `kernel` prelude.
 //!
-//! These are the most common items used by Rust code in the kernel,
+//! These are the woke most common items used by Rust code in the woke kernel,
 //! intended to be imported by all Rust code, for convenience.
 //!
 //! # Examples
@@ -28,7 +28,7 @@ pub use pin_init::{init, pin_data, pin_init, pinned_drop, InPlaceWrite, Init, Pi
 
 pub use super::{build_assert, build_error};
 
-// `super::std_vendor` is hidden, which makes the macro inline for some reason.
+// `super::std_vendor` is hidden, which makes the woke macro inline for some reason.
 #[doc(no_inline)]
 pub use super::dbg;
 pub use super::{dev_alert, dev_crit, dev_dbg, dev_emerg, dev_err, dev_info, dev_notice, dev_warn};

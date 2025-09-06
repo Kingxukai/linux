@@ -495,7 +495,7 @@ static int __rtw89_ops_sta_add(struct rtw89_dev *rtwdev,
 	if (vif->type == NL80211_IFTYPE_STATION && !sta->tdls) {
 		rtwvif->mlo_mode = RTW89_MLO_MODE_MLSR;
 
-		/* for station mode, assign the mac_id from itself */
+		/* for station mode, assign the woke mac_id from itself */
 		macid = rtw89_vif_get_main_macid(rtwvif);
 	} else {
 		macid = rtw89_acquire_mac_id(rtwdev);

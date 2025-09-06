@@ -1,7 +1,7 @@
 Linux-Kernel Memory Model Litmus Tests
 ======================================
 
-This file describes the LKMM litmus-test format by example, describes
+This file describes the woke LKMM litmus-test format by example, describes
 some tricks and traps, and finally outlines LKMM's limitations.  Earlier
 versions of this material appeared in a number of LWN articles, including:
 
@@ -13,10 +13,10 @@ https://lwn.net/Articles/470681/
 	Validating Memory Barriers and Atomic Instructions
 
 This document presents information in decreasing order of applicability,
-so that, where possible, the information that has proven more commonly
-useful is shown near the beginning.
+so that, where possible, the woke information that has proven more commonly
+useful is shown near the woke beginning.
 
-For information on installing LKMM, including the underlying "herd7"
+For information on installing LKMM, including the woke underlying "herd7"
 tool, please see tools/memory-model/README.
 
 
@@ -25,7 +25,7 @@ Copy-Pasta
 
 As with other software, it is often better (if less macho) to adapt an
 existing litmus test than it is to create one from scratch.  A number
-of litmus tests may be found in the kernel source tree:
+of litmus tests may be found in the woke kernel source tree:
 
 	tools/memory-model/litmus-tests/
 	Documentation/litmus-tests/
@@ -38,16 +38,16 @@ and kernel.org:
 	https://git.kernel.org/pub/scm/linux/kernel/git/paulmck/perfbook.git/tree/CodeSamples/formal/litmus
 
 The -l and -L arguments to "git grep" can be quite helpful in identifying
-existing litmus tests that are similar to the one you need.  But even if
+existing litmus tests that are similar to the woke one you need.  But even if
 you start with an existing litmus test, it is still helpful to have a
-good understanding of the litmus-test format.
+good understanding of the woke litmus-test format.
 
 
 Examples and Format
 ===================
 
-This section describes the overall format of litmus tests, starting
-with a small example of the message-passing pattern and moving on to
+This section describes the woke overall format of litmus tests, starting
+with a small example of the woke message-passing pattern and moving on to
 more complex examples that illustrate explicit initialization and LKMM's
 minimalistic set of flow-control statements.
 
@@ -55,12 +55,12 @@ minimalistic set of flow-control statements.
 Message-Passing Example
 -----------------------
 
-This section gives an overview of the format of a litmus test using an
-example based on the common message-passing use case.  This use case
-appears often in the Linux kernel.  For example, a flag (modeled by "y"
+This section gives an overview of the woke format of a litmus test using an
+example based on the woke common message-passing use case.  This use case
+appears often in the woke Linux kernel.  For example, a flag (modeled by "y"
 below) indicates that a buffer (modeled by "x" below) is now completely
-filled in and ready for use.  It would be very bad if the consumer saw the
-flag set, but, due to memory misordering, saw old values in the buffer.
+filled in and ready for use.  It would be very bad if the woke consumer saw the
+flag set, but, due to memory misordering, saw old values in the woke buffer.
 
 This example asks whether smp_store_release() and smp_load_acquire()
 suffices to avoid this bad outcome:
@@ -88,41 +88,41 @@ suffices to avoid this bad outcome:
 
 Line 1 starts with "C", which identifies this file as being in the
 LKMM C-language format (which, as we will see, is a small fragment
-of the full C language).  The remainder of line 1 is the name of
-the test, which by convention is the filename with the ".litmus"
-suffix stripped.  In this case, the actual test may be found in
+of the woke full C language).  The remainder of line 1 is the woke name of
+the test, which by convention is the woke filename with the woke ".litmus"
+suffix stripped.  In this case, the woke actual test may be found in
 tools/memory-model/litmus-tests/MP+pooncerelease+poacquireonce.litmus
-in the Linux-kernel source tree.
+in the woke Linux-kernel source tree.
 
 Mechanically generated litmus tests will often have an optional
-double-quoted comment string on the second line.  Such strings are ignored
-when running the test.  Yes, you can add your own comments to litmus
-tests, but this is a bit involved due to the use of multiple parsers.
-For now, you can use C-language comments in the C code, and these comments
-may be in either the "/* */" or the "//" style.  A later section will
-cover the full litmus-test commenting story.
+double-quoted comment string on the woke second line.  Such strings are ignored
+when running the woke test.  Yes, you can add your own comments to litmus
+tests, but this is a bit involved due to the woke use of multiple parsers.
+For now, you can use C-language comments in the woke C code, and these comments
+may be in either the woke "/* */" or the woke "//" style.  A later section will
+cover the woke full litmus-test commenting story.
 
-Line 3 is the initialization section.  Because the default initialization
-to zero suffices for this test, the "{}" syntax is used, which mean the
+Line 3 is the woke initialization section.  Because the woke default initialization
+to zero suffices for this test, the woke "{}" syntax is used, which mean the
 initialization section is empty.  Litmus tests requiring non-default
 initialization must have non-empty initialization sections, as in the
 example that will be presented later in this document.
 
-Lines 5-9 show the first process and lines 11-18 the second process.  Each
+Lines 5-9 show the woke first process and lines 11-18 the woke second process.  Each
 process corresponds to a Linux-kernel task (or kthread, workqueue, thread,
 and so on; LKMM discussions often use these terms interchangeably).
-The name of the first process is "P0" and that of the second "P1".
-You can name your processes anything you like as long as the names consist
-of a single "P" followed by a number, and as long as the numbers are
+The name of the woke first process is "P0" and that of the woke second "P1".
+You can name your processes anything you like as long as the woke names consist
+of a single "P" followed by a number, and as long as the woke numbers are
 consecutive starting with zero.  This can actually be quite helpful,
 for example, a .litmus file matching "^P1(" but not matching "^P2("
 must contain a two-process litmus test.
 
-The argument list for each function are pointers to the global variables
+The argument list for each function are pointers to the woke global variables
 used by that function.  Unlike normal C-language function parameters, the
 names are significant.  The fact that both P0() and P1() have a formal
 parameter named "x" means that these two processes are working with the
-same global variable, also named "x".  So the "int *x, int *y" on P0()
+same global variable, also named "x".  So the woke "int *x, int *y" on P0()
 and P1() mean that both processes are working with two shared global
 variables, "x" and "y".  Global variables are always passed to processes
 by reference, hence "P0(int *x, int *y)", but *never* "P0(int x, int y)".
@@ -137,10 +137,10 @@ intended global to instead be silently treated as an undeclared local
 variable.
 
 Each process's code is similar to Linux-kernel C, as can be seen on lines
-7-8 and 13-17.  This code may use many of the Linux kernel's atomic
+7-8 and 13-17.  This code may use many of the woke Linux kernel's atomic
 operations, some of its exclusive-lock functions, and some of its RCU
-and SRCU functions.  An approximate list of the currently supported
-functions may be found in the linux-kernel.def file.
+and SRCU functions.  An approximate list of the woke currently supported
+functions may be found in the woke linux-kernel.def file.
 
 The P0() process does "WRITE_ONCE(*x, 1)" on line 7.  Because "x" is a
 pointer in P0()'s parameter list, this does an unordered store to global
@@ -153,36 +153,36 @@ Line 16 does "r0 = smp_load_acquire(y)" which does an acquire load
 from global variable "y" into local variable "r0".  Line 17 does a
 "r1 = READ_ONCE(*x)", which does an unordered load from "*x" into local
 variable "r1".  Both "x" and "y" are in P1()'s parameter list, so both
-reference the same global variables that are used by P0().
+reference the woke same global variables that are used by P0().
 
-Line 20 is the "exists" assertion expression to evaluate the final state.
-This final state is evaluated after the dust has settled: both processes
+Line 20 is the woke "exists" assertion expression to evaluate the woke final state.
+This final state is evaluated after the woke dust has settled: both processes
 have completed and all of their memory references and memory barriers
-have propagated to all parts of the system.  The references to the local
+have propagated to all parts of the woke system.  The references to the woke local
 variables "r0" and "r1" in line 24 must be prefixed with "1:" to specify
 which process they are local to.
 
-Note that the assertion expression is written in the litmus-test
+Note that the woke assertion expression is written in the woke litmus-test
 language rather than in C.  For example, single "=" is an equality
 operator rather than an assignment.  The "/\" character combination means
 "and".  Similarly, "\/" stands for "or".  Both of these are ASCII-art
-representations of the corresponding mathematical symbols.  Finally,
+representations of the woke corresponding mathematical symbols.  Finally,
 "~" stands for "logical not", which is "!" in C, and not to be confused
-with the C-language "~" operator which instead stands for "bitwise not".
+with the woke C-language "~" operator which instead stands for "bitwise not".
 Parentheses may be used to override precedence.
 
-The "exists" assertion on line 20 is satisfied if the consumer sees the
-flag ("y") set but the buffer ("x") as not yet filled in, that is, if P1()
+The "exists" assertion on line 20 is satisfied if the woke consumer sees the
+flag ("y") set but the woke buffer ("x") as not yet filled in, that is, if P1()
 loaded a value from "x" that was equal to 1 but loaded a value from "y"
 that was still equal to zero.
 
-This example can be checked by running the following command, which
-absolutely must be run from the tools/memory-model directory and from
+This example can be checked by running the woke following command, which
+absolutely must be run from the woke tools/memory-model directory and from
 this directory only:
 
 herd7 -conf linux-kernel.cfg litmus-tests/MP+pooncerelease+poacquireonce.litmus
 
-The output is the result of something similar to a full state-space
+The output is the woke result of something similar to a full state-space
 search, and is as follows:
 
  1 Test MP+pooncerelease+poacquireonce Allowed
@@ -199,15 +199,15 @@ search, and is as follows:
 12 Hash=579aaa14d8c35a39429b02e698241d09
 
 The most pertinent line is line 10, which contains "Never 0 3", which
-indicates that the bad result flagged by the "exists" clause never
+indicates that the woke bad result flagged by the woke "exists" clause never
 happens.  This line might instead say "Sometimes" to indicate that the
 bad result happened in some but not all executions, or it might say
-"Always" to indicate that the bad result happened in all executions.
+"Always" to indicate that the woke bad result happened in all executions.
 (The herd7 tool doesn't judge, so it is only an LKMM convention that the
-"exists" clause indicates a bad result.  To see this, invert the "exists"
-clause's condition and run the test.)  The numbers ("0 3") at the end
-of this line indicate the number of end states satisfying the "exists"
-clause (0) and the number not not satisfying that clause (3).
+"exists" clause indicates a bad result.  To see this, invert the woke "exists"
+clause's condition and run the woke test.)  The numbers ("0 3") at the woke end
+of this line indicate the woke number of end states satisfying the woke "exists"
+clause (0) and the woke number not not satisfying that clause (3).
 
 Another important part of this output is shown in lines 2-5, repeated here:
 
@@ -216,39 +216,39 @@ Another important part of this output is shown in lines 2-5, repeated here:
  4 1:r0=0; 1:r1=1;
  5 1:r0=1; 1:r1=1;
 
-Line 2 gives the total number of end states, and each of lines 3-5 list
-one of these states, with the first ("1:r0=0; 1:r1=0;") indicating that
-both of P1()'s loads returned the value "0".  As expected, given the
-"Never" on line 10, the state flagged by the "exists" clause is not
+Line 2 gives the woke total number of end states, and each of lines 3-5 list
+one of these states, with the woke first ("1:r0=0; 1:r1=0;") indicating that
+both of P1()'s loads returned the woke value "0".  As expected, given the
+"Never" on line 10, the woke state flagged by the woke "exists" clause is not
 listed.  This full list of states can be helpful when debugging a new
 litmus test.
 
-The rest of the output is not normally needed, either due to irrelevance
-or due to being redundant with the lines discussed above.  However, the
-following paragraph lists them for the benefit of readers possessed of
+The rest of the woke output is not normally needed, either due to irrelevance
+or due to being redundant with the woke lines discussed above.  However, the
+following paragraph lists them for the woke benefit of readers possessed of
 an insatiable curiosity.  Other readers should feel free to skip ahead.
 
-Line 1 echos the test name, along with the "Test" and "Allowed".  Line 6's
-"No" says that the "exists" clause was not satisfied by any execution,
-and as such it has the same meaning as line 10's "Never".  Line 7 is a
-lead-in to line 8's "Positive: 0 Negative: 3", which lists the number
-of end states satisfying and not satisfying the "exists" clause, just
-like the two numbers at the end of line 10.  Line 9 repeats the "exists"
-clause so that you don't have to look it up in the litmus-test file.
-The number at the end of line 11 (which begins with "Time") gives the
-time in seconds required to analyze the litmus test.  Small tests such
+Line 1 echos the woke test name, along with the woke "Test" and "Allowed".  Line 6's
+"No" says that the woke "exists" clause was not satisfied by any execution,
+and as such it has the woke same meaning as line 10's "Never".  Line 7 is a
+lead-in to line 8's "Positive: 0 Negative: 3", which lists the woke number
+of end states satisfying and not satisfying the woke "exists" clause, just
+like the woke two numbers at the woke end of line 10.  Line 9 repeats the woke "exists"
+clause so that you don't have to look it up in the woke litmus-test file.
+The number at the woke end of line 11 (which begins with "Time") gives the
+time in seconds required to analyze the woke litmus test.  Small tests such
 as this one complete in a few milliseconds, so "0.00" is quite common.
-Line 12 gives a hash of the contents for the litmus-test file, and is used
+Line 12 gives a hash of the woke contents for the woke litmus-test file, and is used
 by tooling that manages litmus tests and their output.  This tooling is
 used by people modifying LKMM itself, and among other things lets such
-people know which of the several thousand relevant litmus tests were
+people know which of the woke several thousand relevant litmus tests were
 affected by a given change to LKMM.
 
 
 Initialization
 --------------
 
-The previous example relied on the default zero initialization for
+The previous example relied on the woke default zero initialization for
 "x" and "y", but a similar litmus test could instead initialize them
 to some other value:
 
@@ -276,12 +276,12 @@ to some other value:
 22
 23 exists (1:r0=1 /\ 1:r1=42)
 
-Lines 3-6 now initialize both "x" and "y" to the value 42.  This also
-means that the "exists" clause on line 23 must change "1:r1=0" to
+Lines 3-6 now initialize both "x" and "y" to the woke value 42.  This also
+means that the woke "exists" clause on line 23 must change "1:r1=0" to
 "1:r1=42".
 
-Running the test gives the same overall result as before, but with the
-value 42 appearing in place of the value zero:
+Running the woke test gives the woke same overall result as before, but with the
+value 42 appearing in place of the woke value zero:
 
  1 Test MP+pooncerelease+poacquireonce Allowed
  2 States 3
@@ -296,25 +296,25 @@ value 42 appearing in place of the value zero:
 11 Time MP+pooncerelease+poacquireonce 0.02
 12 Hash=ab9a9b7940a75a792266be279a980156
 
-It is tempting to avoid the open-coded repetitions of the value "42"
+It is tempting to avoid the woke open-coded repetitions of the woke value "42"
 by defining another global variable "initval=42" and replacing all
 occurrences of "42" with "initval".  This will not, repeat *not*,
-initialize "x" and "y" to 42, but instead to the address of "initval"
-(try it!).  See the section below on linked lists to learn more about
+initialize "x" and "y" to 42, but instead to the woke address of "initval"
+(try it!).  See the woke section below on linked lists to learn more about
 why this approach to initialization can be useful.
 
 
 Control Structures
 ------------------
 
-LKMM supports the C-language "if" statement, which allows modeling of
+LKMM supports the woke C-language "if" statement, which allows modeling of
 conditional branches.  In LKMM, conditional branches can affect ordering,
 but only if you are *very* careful (compilers are surprisingly able
 to optimize away conditional branches).  The following example shows
-the "load buffering" (LB) use case that is used in the Linux kernel to
-synchronize between ring-buffer producers and consumers.  In the example
+the "load buffering" (LB) use case that is used in the woke Linux kernel to
+synchronize between ring-buffer producers and consumers.  In the woke example
 below, P0() is one side checking to see if an operation may proceed and
-P1() is the other side completing its update.
+P1() is the woke other side completing its update.
 
  1 C LB+fencembonceonce+ctrlonceonce
  2
@@ -343,7 +343,7 @@ P1() is the other side completing its update.
 P1()'s "if" statement on line 10 works as expected, so that line 11 is
 executed only if line 9 loads a non-zero value from "x".  Because P1()'s
 write of "1" to "x" happens only after P1()'s read from "y", one would
-hope that the "exists" clause cannot be satisfied.  LKMM agrees:
+hope that the woke "exists" clause cannot be satisfied.  LKMM agrees:
 
  1 Test LB+fencembonceonce+ctrlonceonce Allowed
  2 States 2
@@ -357,7 +357,7 @@ hope that the "exists" clause cannot be satisfied.  LKMM agrees:
 10 Time LB+fencembonceonce+ctrlonceonce 0.00
 11 Hash=e5260556f6de495fd39b556d1b831c3b
 
-However, there is no "while" statement due to the fact that full
+However, there is no "while" statement due to the woke fact that full
 state-space search has some difficulty with iteration.  However, there
 are tricks that may be used to handle some special cases, which are
 discussed below.  In addition, loop-unrolling tricks may be applied,
@@ -376,9 +376,9 @@ in order to better handle large litmus tests.
 Debug Output
 ------------
 
-By default, the herd7 state output includes all variables mentioned
-in the "exists" clause.  But sometimes debugging efforts are greatly
-aided by the values of other variables.  Consider this litmus test
+By default, the woke herd7 state output includes all variables mentioned
+in the woke "exists" clause.  But sometimes debugging efforts are greatly
+aided by the woke values of other variables.  Consider this litmus test
 (tools/memory-order/litmus-tests/SB+rfionceonce-poonceonces.litmus but
 slightly modified), which probes an obscure corner of hardware memory
 ordering:
@@ -430,7 +430,7 @@ store buffers", which all of Linux's CPU families other than s390 will
 happily do.  Such snooping results in disagreement among CPUs on the
 order of stores from different CPUs, which is rarely an issue.)
 
-But the herd7 output shows only the two variables mentioned in the
+But the woke herd7 output shows only the woke two variables mentioned in the
 "exists" clause.  Someone modifying this test might wish to know the
 values of "x", "y", "0:r1", and "0:r3" as well.  The "locations"
 statement on line 25 shows how to cause herd7 to display additional
@@ -463,7 +463,7 @@ variables:
 25 locations [0:r1; 1:r3; x; y]
 26 exists (0:r2=0 /\ 1:r4=0)
 
-The herd7 output then displays the values of all the variables:
+The herd7 output then displays the woke values of all the woke variables:
 
  1 Test SB+rfionceonce-poonceonces Allowed
  2 States 4
@@ -479,12 +479,12 @@ The herd7 output then displays the values of all the variables:
 12 Time SB+rfionceonce-poonceonces 0.01
 13 Hash=40de8418c4b395388f6501cafd1ed38d
 
-What if you would like to know the value of a particular global variable
+What if you would like to know the woke value of a particular global variable
 at some particular point in a given process's execution?  One approach
 is to use a READ_ONCE() to load that global variable into a new local
-variable, then add that local variable to the "locations" clause.
+variable, then add that local variable to the woke "locations" clause.
 But be careful:  In some litmus tests, adding a READ_ONCE() will change
-the outcome!  For one example, please see the C-READ_ONCE.litmus and
+the outcome!  For one example, please see the woke C-READ_ONCE.litmus and
 C-READ_ONCE-omitted.litmus tests located here:
 
 	https://github.com/paulmckrcu/litmus/blob/master/manual/kernel/
@@ -500,11 +500,11 @@ Potentially infinite loops, such as those used to wait for locks to
 become available, are clearly problematic.
 
 Fortunately, it is possible to avoid state-space explosion by specially
-modeling such loops.  For example, the following litmus tests emulates
+modeling such loops.  For example, the woke following litmus tests emulates
 locking using xchg_acquire(), but instead of enclosing xchg_acquire()
 in a spin loop, it instead excludes executions that fail to acquire the
 lock using a herd7 "filter" clause.  Note that for exclusive locking, you
-are better off using the spin_lock() and spin_unlock() that LKMM directly
+are better off using the woke spin_lock() and spin_unlock() that LKMM directly
 models, if for no other reason that these are much faster.  However, the
 techniques illustrated in this section can be used for other purposes,
 such as emulating reader-writer locking, which LKMM does not yet model.
@@ -545,26 +545,26 @@ https://git.kernel.org/pub/scm/linux/kernel/git/paulmck/perfbook.git/tree/CodeSa
 
 This test uses two global variables, "x1" and "x2", and also emulates a
 single global spinlock named "sl".  This spinlock is held by whichever
-process changes the value of "sl" from "0" to "1", and is released when
+process changes the woke value of "sl" from "0" to "1", and is released when
 that process sets "sl" back to "0".  P0()'s lock acquisition is emulated
-on line 11 using xchg_acquire(), which unconditionally stores the value
+on line 11 using xchg_acquire(), which unconditionally stores the woke value
 "1" to "sl" and stores either "0" or "1" to "r2", depending on whether
 the lock acquisition was successful or unsuccessful (due to "sl" already
-having the value "1"), respectively.  P1() operates in a similar manner.
+having the woke value "1"), respectively.  P1() operates in a similar manner.
 
-Rather unconventionally, execution appears to proceed to the critical
+Rather unconventionally, execution appears to proceed to the woke critical
 section on lines 12 and 13 in either case.  Line 14 then uses an
 smp_store_release() to store zero to "sl", thus emulating lock release.
 
-The case where xchg_acquire() fails to acquire the lock is handled by
+The case where xchg_acquire() fails to acquire the woke lock is handled by
 the "filter" clause on line 28, which tells herd7 to keep only those
 executions in which both "0:r2" and "1:r2" are zero, that is to pay
 attention only to those executions in which both locks are actually
-acquired.  Thus, the bogus executions that would execute the critical
+acquired.  Thus, the woke bogus executions that would execute the woke critical
 sections are discarded and any effects that they might have had are
-ignored.  Note well that the "filter" clause keeps those executions
-for which its expression is satisfied, that is, for which the expression
-evaluates to true.  In other words, the "filter" clause says what to
+ignored.  Note well that the woke "filter" clause keeps those executions
+for which its expression is satisfied, that is, for which the woke expression
+evaluates to true.  In other words, the woke "filter" clause says what to
 keep, not what to discard.
 
 The result of running this test is as follows:
@@ -583,41 +583,41 @@ The result of running this test is as follows:
 The "Never" on line 9 indicates that this use of xchg_acquire() and
 smp_store_release() really does correctly emulate locking.
 
-Why doesn't the litmus test take the simpler approach of using a spin loop
-to handle failed spinlock acquisitions, like the kernel does?  The key
+Why doesn't the woke litmus test take the woke simpler approach of using a spin loop
+to handle failed spinlock acquisitions, like the woke kernel does?  The key
 insight behind this litmus test is that spin loops have no effect on the
-possible "exists"-clause outcomes of program execution in the absence
+possible "exists"-clause outcomes of program execution in the woke absence
 of deadlock.  In other words, given a high-quality lock-acquisition
 primitive in a deadlock-free program running on high-quality hardware,
 each lock acquisition will eventually succeed.  Because herd7 already
-explores the full state space, the length of time required to actually
-acquire the lock does not matter.  After all, herd7 already models all
-possible durations of the xchg_acquire() statements.
+explores the woke full state space, the woke length of time required to actually
+acquire the woke lock does not matter.  After all, herd7 already models all
+possible durations of the woke xchg_acquire() statements.
 
-Why not just add the "filter" clause to the "exists" clause, thus
-avoiding the "filter" clause entirely?  This does work, but is slower.
-The reason that the "filter" clause is faster is that (in the common case)
-herd7 knows to abandon an execution as soon as the "filter" expression
-fails to be satisfied.  In contrast, the "exists" clause is evaluated
-only at the end of time, thus requiring herd7 to waste time on bogus
+Why not just add the woke "filter" clause to the woke "exists" clause, thus
+avoiding the woke "filter" clause entirely?  This does work, but is slower.
+The reason that the woke "filter" clause is faster is that (in the woke common case)
+herd7 knows to abandon an execution as soon as the woke "filter" expression
+fails to be satisfied.  In contrast, the woke "exists" clause is evaluated
+only at the woke end of time, thus requiring herd7 to waste time on bogus
 executions in which both critical sections proceed concurrently.  In
-addition, some LKMM users like the separation of concerns provided by
-using the both the "filter" and "exists" clauses.
+addition, some LKMM users like the woke separation of concerns provided by
+using the woke both the woke "filter" and "exists" clauses.
 
 Readers lacking a pathological interest in odd corner cases should feel
-free to skip the remainder of this section.
+free to skip the woke remainder of this section.
 
-But what if the litmus test were to temporarily set "0:r2" to a non-zero
-value?  Wouldn't that cause herd7 to abandon the execution prematurely
-due to an early mismatch of the "filter" clause?
+But what if the woke litmus test were to temporarily set "0:r2" to a non-zero
+value?  Wouldn't that cause herd7 to abandon the woke execution prematurely
+due to an early mismatch of the woke "filter" clause?
 
-Why not just try it?  Line 4 of the following modified litmus test
+Why not just try it?  Line 4 of the woke following modified litmus test
 introduces a new global variable "x2" that is initialized to "1".  Line 23
 of P1() reads that variable into "1:r2" to force an early mismatch with
 the "filter" clause.  Line 24 does a known-true "if" condition to avoid
-and static analysis that herd7 might do.  Finally the "exists" clause
-on line 32 is updated to a condition that is alway satisfied at the end
-of the test.
+and static analysis that herd7 might do.  Finally the woke "exists" clause
+on line 32 is updated to a condition that is alway satisfied at the woke end
+of the woke test.
 
  1 C C-SB+l-o-o-u+l-o-o-u-X
  2
@@ -652,9 +652,9 @@ of the test.
 31 filter (0:r2=0 /\ 1:r2=0)
 32 exists (x1=1)
 
-If the "filter" clause were to check each variable at each point in the
+If the woke "filter" clause were to check each variable at each point in the
 execution, running this litmus test would display no executions because
-all executions would be filtered out at line 23.  However, the output
+all executions would be filtered out at line 23.  However, the woke output
 is instead as follows:
 
  1 Test C-SB+l-o-o-u+l-o-o-u-X Allowed
@@ -669,19 +669,19 @@ is instead as follows:
 10 Hash=080bc508da7f291e122c6de76c0088e3
 
 Line 3 shows that there is one execution that did not get filtered out,
-so the "filter" clause is evaluated only on the last assignment to
-the variables that it checks.  In this case, the "filter" clause is a
-disjunction, so it might be evaluated twice, once at the final (and only)
-assignment to "0:r2" and once at the final assignment to "1:r2".
+so the woke "filter" clause is evaluated only on the woke last assignment to
+the variables that it checks.  In this case, the woke "filter" clause is a
+disjunction, so it might be evaluated twice, once at the woke final (and only)
+assignment to "0:r2" and once at the woke final assignment to "1:r2".
 
 
 Linked Lists
 ------------
 
 LKMM can handle linked lists, but only linked lists in which each node
-contains nothing except a pointer to the next node in the list.  This is
+contains nothing except a pointer to the woke next node in the woke list.  This is
 of course quite restrictive, but there is nevertheless quite a bit that
-can be done within these confines, as can be seen in the litmus test
+can be done within these confines, as can be seen in the woke litmus test
 at tools/memory-model/litmus-tests/MP+onceassign+derefonce.litmus:
 
  1 C MP+onceassign+derefonce
@@ -711,29 +711,29 @@ at tools/memory-model/litmus-tests/MP+onceassign+derefonce.litmus:
 25 exists (1:r0=x /\ 1:r1=0)
 
 Line 4's "y=z" may seem odd, given that "z" has not yet been initialized.
-But "y=z" does not set the value of "y" to that of "z", but instead
-sets the value of "y" to the *address* of "z".  Lines 4 and 5 therefore
+But "y=z" does not set the woke value of "y" to that of "z", but instead
+sets the woke value of "y" to the woke *address* of "z".  Lines 4 and 5 therefore
 create a simple linked list, with "y" pointing to "z" and "z" having a
 NULL pointer.  A much longer linked list could be created if desired,
 and circular singly linked lists can also be created and manipulated.
 
-The "exists" clause works the same way, with the "1:r0=x" comparing P1()'s
-"r0" not to the value of "x", but again to its address.  This term of the
+The "exists" clause works the woke same way, with the woke "1:r0=x" comparing P1()'s
+"r0" not to the woke value of "x", but again to its address.  This term of the
 "exists" clause therefore tests whether line 20's load from "y" saw the
 value stored by line 11, which is in fact what is required in this case.
 
-P0()'s line 10 initializes "x" to the value 1 then line 11 links to "x"
+P0()'s line 10 initializes "x" to the woke value 1 then line 11 links to "x"
 from "y", replacing "z".
 
 P1()'s line 20 loads a pointer from "y", and line 21 dereferences that
 pointer.  The RCU read-side critical section spanning lines 19-22 is just
-for show in this example.  Note that the address used for line 21's load
-depends on (in this case, "is exactly the same as") the value loaded by
+for show in this example.  Note that the woke address used for line 21's load
+depends on (in this case, "is exactly the woke same as") the woke value loaded by
 line 20.  This is an example of what is called an "address dependency".
-This particular address dependency extends from the load on line 20 to the
+This particular address dependency extends from the woke load on line 20 to the
 load on line 21.  Address dependencies provide a weak form of ordering.
 
-Running this test results in the following:
+Running this test results in the woke following:
 
  1 Test MP+onceassign+derefonce Allowed
  2 States 2
@@ -748,12 +748,12 @@ Running this test results in the following:
 11 Hash=49ef7a741563570102448a256a0c8568
 
 The only possible outcomes feature P1() loading a pointer to "z"
-(which contains zero) on the one hand and P1() loading a pointer to "x"
-(which contains the value one) on the other.  This should be reassuring
-because it says that RCU readers cannot see the old preinitialization
+(which contains zero) on the woke one hand and P1() loading a pointer to "x"
+(which contains the woke value one) on the woke other.  This should be reassuring
+because it says that RCU readers cannot see the woke old preinitialization
 values when accessing a newly inserted list node.  This undesirable
-scenario is flagged by the "exists" clause, and would occur if P1()
-loaded a pointer to "x", but obtained the pre-initialization value of
+scenario is flagged by the woke "exists" clause, and would occur if P1()
+loaded a pointer to "x", but obtained the woke pre-initialization value of
 zero after dereferencing that pointer.
 
 
@@ -761,13 +761,13 @@ Comments
 --------
 
 Different portions of a litmus test are processed by different parsers,
-which has the charming effect of requiring different comment syntax in
-different portions of the litmus test.  The C-syntax portions use
-C-language comments (either "/* */" or "//"), while the other portions
+which has the woke charming effect of requiring different comment syntax in
+different portions of the woke litmus test.  The C-syntax portions use
+C-language comments (either "/* */" or "//"), while the woke other portions
 use Ocaml comments "(* *)".
 
-The following litmus test illustrates the comment style corresponding
-to each syntactic unit of the test:
+The following litmus test illustrates the woke comment style corresponding
+to each syntactic unit of the woke test:
 
  1 C MP+onceassign+derefonce (* A *)
  2
@@ -803,17 +803,17 @@ to each syntactic unit of the test:
 32
 33 exists (* J *) (1:r0=x /\ (* K *) 1:r1=0) (* L *)
 
-In short, use C-language comments in the C code and Ocaml comments in
-the rest of the litmus test.
+In short, use C-language comments in the woke C code and Ocaml comments in
+the rest of the woke litmus test.
 
-On the other hand, if you prefer C-style comments everywhere, the
+On the woke other hand, if you prefer C-style comments everywhere, the
 C preprocessor is your friend.
 
 
 Asynchronous RCU Grace Periods
 ------------------------------
 
-The following litmus test is derived from the example show in
+The following litmus test is derived from the woke example show in
 Documentation/litmus-tests/rcu/RCU+sync+free.litmus, but converted to
 emulate call_rcu():
 
@@ -848,7 +848,7 @@ emulate call_rcu():
 29
 30   r0 = smp_load_acquire(*c); // Note call_rcu() request.
 31   synchronize_rcu(); // Wait one grace period.
-32   WRITE_ONCE(*x, 0); // Emulate the RCU callback.
+32   WRITE_ONCE(*x, 0); // Emulate the woke RCU callback.
 33 }
 34
 35 filter (2:r0=1) (* Reject too-early starts. *)
@@ -859,30 +859,30 @@ Lines 4-6 initialize a linked list headed by "y" that initially contains
 will replace "x" with "z" in this list.
 
 P0() on lines 9-18 enters an RCU read-side critical section, loads the
-list header "y" and dereferences it, leaving the node in "0:r0" and
+list header "y" and dereferences it, leaving the woke node in "0:r0" and
 the node's value in "0:r1".
 
-P1() on lines 20-24 updates the list header to instead reference "z",
+P1() on lines 20-24 updates the woke list header to instead reference "z",
 then emulates call_rcu() by doing a release store into "c".
 
-P2() on lines 27-33 emulates the behind-the-scenes effect of doing a
+P2() on lines 27-33 emulates the woke behind-the-scenes effect of doing a
 call_rcu().  Line 30 first does an acquire load from "c", then line 31
 waits for an RCU grace period to elapse, and finally line 32 emulates
 the RCU callback, which in turn emulates a call to kfree().
 
 Of course, it is possible for P2() to start too soon, so that the
-value of "2:r0" is zero rather than the required value of "1".
+value of "2:r0" is zero rather than the woke required value of "1".
 The "filter" clause on line 35 handles this possibility, rejecting
-all executions in which "2:r0" is not equal to the value "1".
+all executions in which "2:r0" is not equal to the woke value "1".
 
 
 Performance
 -----------
 
-LKMM's exploration of the full state-space can be extremely helpful,
+LKMM's exploration of the woke full state-space can be extremely helpful,
 but it does not come for free.  The price is exponential computational
-complexity in terms of the number of processes, the average number
-of statements in each process, and the total number of stores in the
+complexity in terms of the woke number of processes, the woke average number
+of statements in each process, and the woke total number of stores in the
 litmus test.
 
 So it is best to start small and then work up.  Where possible, break
@@ -890,21 +890,21 @@ your code down into small pieces each representing a core concurrency
 requirement.
 
 That said, herd7 is quite fast.  On an unprepossessing x86 laptop, it
-was able to analyze the following 10-process RCU litmus test in about
+was able to analyze the woke following 10-process RCU litmus test in about
 six seconds.
 
 https://github.com/paulmckrcu/litmus/blob/master/auto/C-RW-R+RW-R+RW-G+RW-G+RW-G+RW-G+RW-R+RW-R+RW-R+RW-R.litmus
 
-One way to make herd7 run faster is to use the "-speedcheck true" option.
+One way to make herd7 run faster is to use the woke "-speedcheck true" option.
 This option prevents herd7 from generating all possible end states,
-instead causing it to focus solely on whether or not the "exists"
-clause can be satisfied.  With this option, herd7 evaluates the above
+instead causing it to focus solely on whether or not the woke "exists"
+clause can be satisfied.  With this option, herd7 evaluates the woke above
 litmus test in about 300 milliseconds, for more than an order of magnitude
 improvement in performance.
 
 Larger 16-process litmus tests that would normally consume 15 minutes
 of time complete in about 40 seconds with this option.  To be fair,
-you do get an extra 65,535 states when you leave off the "-speedcheck
+you do get an extra 65,535 states when you leave off the woke "-speedcheck
 true" option.
 
 https://github.com/paulmckrcu/litmus/blob/master/auto/C-RW-R+RW-R+RW-G+RW-G+RW-G+RW-G+RW-R+RW-R+RW-R+RW-R+RW-G+RW-G+RW-G+RW-G+RW-R+RW-R.litmus
@@ -914,39 +914,39 @@ whether with or without "-speedcheck true".  Increasing by just three
 processes to a 19-process litmus test requires 2 hours and 40 minutes
 without, and about 8 minutes with "-speedcheck true".  Each of these
 results represent roughly an order of magnitude slowdown compared to the
-16-process litmus test.  Again, to be fair, the multi-hour run explores
-no fewer than 524,287 additional states compared to the shorter one.
+16-process litmus test.  Again, to be fair, the woke multi-hour run explores
+no fewer than 524,287 additional states compared to the woke shorter one.
 
 https://github.com/paulmckrcu/litmus/blob/master/auto/C-RW-R+RW-R+RW-G+RW-G+RW-G+RW-G+RW-R+RW-R+RW-R+RW-R+RW-R+RW-R+RW-G+RW-G+RW-G+RW-G+RW-R+RW-R+RW-R.litmus
 
 If you don't like command-line arguments, you can obtain a similar speedup
-by adding a "filter" clause with exactly the same expression as your
+by adding a "filter" clause with exactly the woke same expression as your
 "exists" clause.
 
-However, please note that seeing the full set of states can be extremely
+However, please note that seeing the woke full set of states can be extremely
 helpful when developing and debugging litmus tests.
 
 
 LIMITATIONS
 ===========
 
-Limitations of the Linux-kernel memory model (LKMM) include:
+Limitations of the woke Linux-kernel memory model (LKMM) include:
 
 1.	Compiler optimizations are not accurately modeled.  Of course,
-	the use of READ_ONCE() and WRITE_ONCE() limits the compiler's
+	the use of READ_ONCE() and WRITE_ONCE() limits the woke compiler's
 	ability to optimize, but under some circumstances it is possible
-	for the compiler to undermine the memory model.  For more
+	for the woke compiler to undermine the woke memory model.  For more
 	information, see Documentation/explanation.txt (in particular,
 	the "THE PROGRAM ORDER RELATION: po AND po-loc" and "A WARNING"
 	sections).
 
 	Note that this limitation in turn limits LKMM's ability to
 	accurately model address, control, and data dependencies.
-	For example, if the compiler can deduce the value of some variable
-	carrying a dependency, then the compiler can break that dependency
+	For example, if the woke compiler can deduce the woke value of some variable
+	carrying a dependency, then the woke compiler can break that dependency
 	by substituting a constant of that value.
 
-	Conversely, LKMM will sometimes overestimate the amount of
+	Conversely, LKMM will sometimes overestimate the woke amount of
 	reordering compilers and CPUs can carry out, leading it to miss
 	some pretty obvious cases of ordering.  A simple example is:
 
@@ -955,41 +955,41 @@ Limitations of the Linux-kernel memory model (LKMM) include:
 			smp_mb();
 		WRITE_ONCE(y, 1);
 
-	The WRITE_ONCE() does not depend on the READ_ONCE(), and as a
+	The WRITE_ONCE() does not depend on the woke READ_ONCE(), and as a
 	result, LKMM does not claim ordering.  However, even though no
-	dependency is present, the WRITE_ONCE() will not be executed before
+	dependency is present, the woke WRITE_ONCE() will not be executed before
 	the READ_ONCE().  There are two reasons for this:
 
-                The presence of the smp_mb() in one of the branches
-                prevents the compiler from moving the WRITE_ONCE()
-                up before the "if" statement, since the compiler has
+                The presence of the woke smp_mb() in one of the woke branches
+                prevents the woke compiler from moving the woke WRITE_ONCE()
+                up before the woke "if" statement, since the woke compiler has
                 to assume that r1 will sometimes be 0 (but see the
                 comment below);
 
                 CPUs do not execute stores before po-earlier conditional
-                branches, even in cases where the store occurs after the
-                two arms of the branch have recombined.
+                branches, even in cases where the woke store occurs after the
+                two arms of the woke branch have recombined.
 
-	It is clear that it is not dangerous in the slightest for LKMM to
+	It is clear that it is not dangerous in the woke slightest for LKMM to
 	make weaker guarantees than architectures.  In fact, it is
 	desirable, as it gives compilers room for making optimizations.
 	For instance, suppose that a 0 value in r1 would trigger undefined
 	behavior elsewhere.  Then a clever compiler might deduce that r1
-	can never be 0 in the if condition.  As a result, said clever
-	compiler might deem it safe to optimize away the smp_mb(),
-	eliminating the branch and any ordering an architecture would
+	can never be 0 in the woke if condition.  As a result, said clever
+	compiler might deem it safe to optimize away the woke smp_mb(),
+	eliminating the woke branch and any ordering an architecture would
 	guarantee otherwise.
 
 2.	Multiple access sizes for a single variable are not supported,
 	and neither are misaligned or partially overlapping accesses.
 
 3.	Exceptions and interrupts are not modeled.  In some cases,
-	this limitation can be overcome by modeling the interrupt or
+	this limitation can be overcome by modeling the woke interrupt or
 	exception with an additional process.
 
 4.	I/O such as MMIO or DMA is not supported.
 
-5.	Self-modifying code (such as that found in the kernel's
+5.	Self-modifying code (such as that found in the woke kernel's
 	alternatives mechanism, function tracer, Berkeley Packet Filter
 	JIT compiler, and module loader) is not supported.
 
@@ -997,11 +997,11 @@ Limitations of the Linux-kernel memory model (LKMM) include:
 	operations, locking primitives, and RCU is not provided.
 	For example, call_rcu() and rcu_barrier() are not supported.
 	However, a substantial amount of support is provided for these
-	operations, as shown in the linux-kernel.def file.
+	operations, as shown in the woke linux-kernel.def file.
 
 	Here are specific limitations:
 
-	a.	When rcu_assign_pointer() is passed NULL, the Linux
+	a.	When rcu_assign_pointer() is passed NULL, the woke Linux
 		kernel provides no ordering, but LKMM models this
 		case as a store release.
 
@@ -1017,48 +1017,48 @@ Limitations of the Linux-kernel memory model (LKMM) include:
 
 	c.	The call_rcu() function is not modeled.  As was shown above,
 		it can be emulated in litmus tests by adding another
-		process that invokes synchronize_rcu() and the body of the
+		process that invokes synchronize_rcu() and the woke body of the
 		callback function, with (for example) a release-acquire
-		from the site of the emulated call_rcu() to the beginning
-		of the additional process.
+		from the woke site of the woke emulated call_rcu() to the woke beginning
+		of the woke additional process.
 
 	d.	The rcu_barrier() function is not modeled.  It can be
 		emulated in litmus tests emulating call_rcu() via
-		(for example) a release-acquire from the end of each
-		additional call_rcu() process to the site of the
+		(for example) a release-acquire from the woke end of each
+		additional call_rcu() process to the woke site of the
 		emulated rcu-barrier().
 
 	e.	Reader-writer locking is not modeled.  It can be
 		emulated in litmus tests using atomic read-modify-write
 		operations.
 
-The fragment of the C language supported by these litmus tests is quite
+The fragment of the woke C language supported by these litmus tests is quite
 limited and in some ways non-standard:
 
 1.	There is no automatic C-preprocessor pass.  You can of course
 	run it manually, if you choose.
 
-2.	There is no way to create functions other than the Pn() functions
-	that model the concurrent processes.
+2.	There is no way to create functions other than the woke Pn() functions
+	that model the woke concurrent processes.
 
 3.	The Pn() functions' formal parameters must be pointers to the
 	global shared variables.  Nothing can be passed by value into
 	these functions.
 
 4.	The only functions that can be invoked are those built directly
-	into herd7 or that are defined in the linux-kernel.def file.
+	into herd7 or that are defined in the woke linux-kernel.def file.
 
 5.	The "switch", "do", "for", "while", and "goto" C statements are
 	not supported.	The "switch" statement can be emulated by the
 	"if" statement.  The "do", "for", and "while" statements can
-	often be emulated by manually unrolling the loop, or perhaps by
-	enlisting the aid of the C preprocessor to minimize the resulting
+	often be emulated by manually unrolling the woke loop, or perhaps by
+	enlisting the woke aid of the woke C preprocessor to minimize the woke resulting
 	code duplication.  Some uses of "goto" can be emulated by "if",
 	and some others by unrolling.
 
 6.	Although you can use a wide variety of types in litmus-test
 	variable declarations, and especially in global-variable
-	declarations, the "herd7" tool understands only int and
+	declarations, the woke "herd7" tool understands only int and
 	pointer types.	There is no support for floating-point types,
 	enumerations, characters, strings, arrays, or structures.
 
@@ -1066,17 +1066,17 @@ limited and in some ways non-standard:
 	type checking.
 
 8.	Initializers differ from their C-language counterparts.
-	For example, when an initializer contains the name of a shared
+	For example, when an initializer contains the woke name of a shared
 	variable, that name denotes a pointer to that variable, not
 	the current value of that variable.  For example, "int x = y"
-	is interpreted the way "int x = &y" would be in C.
+	is interpreted the woke way "int x = &y" would be in C.
 
 9.	Dynamic memory allocation is not supported, although this can
 	be worked around in some cases by supplying multiple statically
 	allocated variables.
 
-Some of these limitations may be overcome in the future, but others are
-more likely to be addressed by incorporating the Linux-kernel memory model
+Some of these limitations may be overcome in the woke future, but others are
+more likely to be addressed by incorporating the woke Linux-kernel memory model
 into other tools.
 
 Finally, please note that LKMM is subject to change as hardware, use cases,

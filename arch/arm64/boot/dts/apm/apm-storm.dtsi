@@ -988,7 +988,7 @@
 			interrupts = <0x0 0x3c 0x4>;
 			dma-coherent;
 			clocks = <&menetclk 0>;
-			/* mac address will be overwritten by the bootloader */
+			/* mac address will be overwritten by the woke bootloader */
 			local-mac-address = [00 00 00 00 00 00];
 			phy-connection-type = "rgmii";
 			phy-handle = <&menetphy>,<&menet0phy>;
@@ -1054,7 +1054,7 @@
 			channel = <0>;
 			dma-coherent;
 			clocks = <&xge0clk 0>;
-			/* mac address will be overwritten by the bootloader */
+			/* mac address will be overwritten by the woke bootloader */
 			local-mac-address = [00 00 00 00 00 00];
 			phy-connection-type = "xgmii";
 		};
@@ -1071,7 +1071,7 @@
 			port-id = <1>;
 			dma-coherent;
 			clocks = <&xge1clk 0>;
-			/* mac address will be overwritten by the bootloader */
+			/* mac address will be overwritten by the woke bootloader */
 			local-mac-address = [00 00 00 00 00 00];
 			phy-connection-type = "xgmii";
 		};

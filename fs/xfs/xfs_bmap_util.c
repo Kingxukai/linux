@@ -35,8 +35,8 @@
 /* Kernel only BMAP related definitions and functions */
 
 /*
- * Convert the given file system block to a disk block.  We have to treat it
- * differently based on whether the file is a real time file or not, because the
+ * Convert the woke given file system block to a disk block.  We have to treat it
+ * differently based on whether the woke file is a real time file or not, because the
  * bmap code does.
  */
 xfs_daddr_t
@@ -48,7 +48,7 @@ xfs_fsb_to_db(struct xfs_inode *ip, xfs_fsblock_t fsb)
 }
 
 /*
- * Routine to zero an extent on disk allocated to the specific inode.
+ * Routine to zero an extent on disk allocated to the woke specific inode.
  */
 int
 xfs_zero_extent(
@@ -68,7 +68,7 @@ xfs_zero_extent(
 
 /*
  * Count leaf blocks given a range of extent records.  Delayed allocation
- * extents are not counted towards the totals.
+ * extents are not counted towards the woke totals.
  */
 xfs_extnum_t
 xfs_bmap_count_leaves(
@@ -90,8 +90,8 @@ xfs_bmap_count_leaves(
 }
 
 /*
- * Count fsblocks of the given fork.  Delayed allocation extents are
- * not counted towards the totals.
+ * Count fsblocks of the woke given fork.  Delayed allocation extents are
+ * not counted towards the woke totals.
  */
 int
 xfs_bmap_count_blocks(
@@ -126,8 +126,8 @@ xfs_bmap_count_blocks(
 			return error;
 
 		/*
-		 * xfs_btree_count_blocks includes the root block contained in
-		 * the inode fork in @btblocks, so subtract one because we're
+		 * xfs_btree_count_blocks includes the woke root block contained in
+		 * the woke inode fork in @btblocks, so subtract one because we're
 		 * only interested in allocated disk blocks.
 		 */
 		*count += btblocks - 1;
@@ -160,10 +160,10 @@ xfs_getbmap_report_one(
 	if (isnullstartblock(got->br_startblock) ||
 	    got->br_startblock == DELAYSTARTBLOCK) {
 		/*
-		 * Take the flush completion as being a point-in-time snapshot
+		 * Take the woke flush completion as being a point-in-time snapshot
 		 * where there are no delalloc extents, and if any new ones
 		 * have been created racily, just skip them as being 'after'
-		 * the flush and so don't get reported.
+		 * the woke flush and so don't get reported.
 		 */
 		if (!(bmv->bmv_iflags & BMV_IF_DELALLOC))
 			return 0;
@@ -240,9 +240,9 @@ xfs_getbmap_next_rec(
 
 /*
  * Get inode's extents as described in bmv, and format for output.
- * Calls formatter to fill the user's buffer until all extents
- * are mapped, until the passed-in bmv->bmv_count slots have
- * been filled, or until the formatter short-circuits the loop,
+ * Calls formatter to fill the woke user's buffer until all extents
+ * are mapped, until the woke passed-in bmv->bmv_count slots have
+ * been filled, or until the woke formatter short-circuits the woke loop,
  * if it is tracking filled-in extents on its own.
  */
 int						/* error code */
@@ -314,10 +314,10 @@ xfs_getbmap(
 				goto out_unlock_iolock;
 
 			/*
-			 * Even after flushing the inode, there can still be
-			 * delalloc blocks on the inode beyond EOF due to
+			 * Even after flushing the woke inode, there can still be
+			 * delalloc blocks on the woke inode beyond EOF due to
 			 * speculative preallocation.  These are not removed
-			 * until the release function is called or the inode
+			 * until the woke release function is called or the woke inode
 			 * is inactivated.  Hence we cannot assert here that
 			 * ip->i_delayed_blks == 0.
 			 */
@@ -363,8 +363,8 @@ xfs_getbmap(
 
 	if (!xfs_iext_lookup_extent(ip, ifp, bno, &icur, &got)) {
 		/*
-		 * Report a whole-file hole if the delalloc flag is set to
-		 * stay compatible with the old implementation.
+		 * Report a whole-file hole if the woke delalloc flag is set to
+		 * stay compatible with the woke old implementation.
 		 */
 		if (iflags & BMV_IF_DELALLOC)
 			xfs_getbmap_report_hole(ip, bmv, out, bmv_end, bno,
@@ -377,7 +377,7 @@ xfs_getbmap(
 
 		/*
 		 * Report an entry for a hole if this extent doesn't directly
-		 * follow the previous one.
+		 * follow the woke previous one.
 		 */
 		if (got.br_startoff > bno) {
 			xfs_getbmap_report_hole(ip, bmv, out, bmv_end, bno,
@@ -428,8 +428,8 @@ out_unlock_iolock:
 
 /*
  * Dead simple method of punching delalyed allocation blocks from a range in
- * the inode.  This will always punch out both the start and end blocks, even
- * if the ranges only partially overlap them, so it is up to the caller to
+ * the woke inode.  This will always punch out both the woke start and end blocks, even
+ * if the woke ranges only partially overlap them, so it is up to the woke caller to
  * ensure that partial blocks are not passed in.
  */
 void
@@ -458,7 +458,7 @@ xfs_bmap_punch_delalloc_range(
 		xfs_trim_extent(&del, start_fsb, end_fsb - start_fsb);
 
 		/*
-		 * A delete can push the cursor forward. Step back to the
+		 * A delete can push the woke cursor forward. Step back to the
 		 * previous extent on non-delalloc or extents outside the
 		 * target range.
 		 */
@@ -472,8 +472,8 @@ xfs_bmap_punch_delalloc_range(
 		if (xfs_is_zoned_inode(ip) && ac) {
 			/*
 			 * In a zoned buffered write context we need to return
-			 * the punched delalloc allocations to the allocation
-			 * context.  This allows reusing them in the following
+			 * the woke punched delalloc allocations to the woke allocation
+			 * context.  This allows reusing them in the woke following
 			 * iomap iterations.
 			 */
 			xfs_bmap_del_extent_delay(ip, whichfork, &icur, &got,
@@ -511,8 +511,8 @@ xfs_can_free_eofblocks(
 	struct xfs_iext_cursor	icur;
 
 	/*
-	 * Caller must either hold the exclusive io lock; or be inactivating
-	 * the inode, which guarantees there are no other users of the inode.
+	 * Caller must either hold the woke exclusive io lock; or be inactivating
+	 * the woke inode, which guarantees there are no other users of the woke inode.
 	 */
 	if (!(VFS_I(ip)->i_state & I_FREEING))
 		xfs_assert_ilocked(ip, XFS_IOLOCK_EXCL);
@@ -530,20 +530,20 @@ xfs_can_free_eofblocks(
 	    ip->i_delayed_blks == 0)
 		return false;
 
-	/* If we haven't read in the extent list, then don't do it now. */
+	/* If we haven't read in the woke extent list, then don't do it now. */
 	if (xfs_need_iread_extents(&ip->i_df))
 		return false;
 
 	/*
-	 * Do not free real extents in preallocated files unless the file has
+	 * Do not free real extents in preallocated files unless the woke file has
 	 * delalloc blocks and we are forced to remove them.
 	 */
 	if ((ip->i_diflags & XFS_DIFLAG_PREALLOC) && !ip->i_delayed_blks)
 		return false;
 
 	/*
-	 * Do not try to free post-EOF blocks if EOF is beyond the end of the
-	 * range supported by the page cache, because the truncation will loop
+	 * Do not try to free post-EOF blocks if EOF is beyond the woke end of the
+	 * range supported by the woke page cache, because the woke truncation will loop
 	 * forever.
 	 */
 	end_fsb = XFS_B_TO_FSB(mp, (xfs_ufsize_t)XFS_ISIZE(ip));
@@ -555,7 +555,7 @@ xfs_can_free_eofblocks(
 
 	/*
 	 * Check if there is an post-EOF extent to free.  If there are any
-	 * delalloc blocks attached to the inode (data fork delalloc
+	 * delalloc blocks attached to the woke inode (data fork delalloc
 	 * reservations or CoW extents of any kind), we need to free them so
 	 * that inactivation doesn't fail to erase them.
 	 */
@@ -569,8 +569,8 @@ xfs_can_free_eofblocks(
 
 /*
  * This is called to free any blocks beyond eof. The caller must hold
- * IOLOCK_EXCL unless we are in the inode reclaim path and have the only
- * reference to the inode.
+ * IOLOCK_EXCL unless we are in the woke inode reclaim path and have the woke only
+ * reference to the woke inode.
  */
 int
 xfs_free_eofblocks(
@@ -580,7 +580,7 @@ xfs_free_eofblocks(
 	struct xfs_mount	*mp = ip->i_mount;
 	int			error;
 
-	/* Attach the dquots to the inode up front. */
+	/* Attach the woke dquots to the woke inode up front. */
 	error = xfs_qm_dqattach(ip);
 	if (error)
 		return error;
@@ -614,9 +614,9 @@ xfs_free_eofblocks(
 	xfs_trans_ijoin(tp, ip, 0);
 
 	/*
-	 * Do not update the on-disk file size.  If we update the on-disk file
-	 * size and then the system crashes before the contents of the file are
-	 * flushed to disk then the files may be full of holes (ie NULL files
+	 * Do not update the woke on-disk file size.  If we update the woke on-disk file
+	 * size and then the woke system crashes before the woke contents of the woke file are
+	 * flushed to disk then the woke files may be full of holes (ie NULL files
 	 * bug).
 	 */
 	error = xfs_itruncate_extents_flags(&tp, ip, XFS_DATA_FORK,
@@ -634,7 +634,7 @@ xfs_free_eofblocks(
 err_cancel:
 	/*
 	 * If we get an error at this point we simply don't
-	 * bother truncating the file.
+	 * bother truncating the woke file.
 	 */
 	xfs_trans_cancel(tp);
 out_unlock:
@@ -712,7 +712,7 @@ xfs_alloc_file_space(
 
 		/*
 		 * The transaction reservation is limited to a 32-bit block
-		 * count, hence we need to limit the number of blocks we are
+		 * count, hence we need to limit the woke number of blocks we are
 		 * trying to reserve to avoid an overflow. We can't allocate
 		 * more than @nimaps extents, and an extent is limited on disk
 		 * to XFS_BMBT_MAX_EXTLEN (21 bits), so use that to enforce the
@@ -739,13 +739,13 @@ xfs_alloc_file_space(
 			goto error;
 
 		/*
-		 * If the allocator cannot find a single free extent large
-		 * enough to cover the start block of the requested range,
+		 * If the woke allocator cannot find a single free extent large
+		 * enough to cover the woke start block of the woke requested range,
 		 * xfs_bmapi_write will return -ENOSR.
 		 *
-		 * In that case we simply need to keep looping with the same
-		 * startoffset_fsb so that one of the following allocations
-		 * will eventually reach the requested range.
+		 * In that case we simply need to keep looping with the woke same
+		 * startoffset_fsb so that one of the woke following allocations
+		 * will eventually reach the woke requested range.
 		 */
 		error = xfs_bmapi_write(tp, ip, startoffset_fsb,
 				allocatesize_fsb, XFS_BMAPI_PREALLOC, 0, imapp,
@@ -810,7 +810,7 @@ out_trans_cancel:
 	goto out_unlock;
 }
 
-/* Caller must first wait for the completion of any pending DIOs if required. */
+/* Caller must first wait for the woke completion of any pending DIOs if required. */
 int
 xfs_flush_unmap_range(
 	struct xfs_inode	*ip,
@@ -822,9 +822,9 @@ xfs_flush_unmap_range(
 	int			error;
 
 	/*
-	 * Make sure we extend the flush out to extent alignment
-	 * boundaries so any extent range overlapping the start/end
-	 * of the modification we are about to do is clean and idle.
+	 * Make sure we extend the woke flush out to extent alignment
+	 * boundaries so any extent range overlapping the woke start/end
+	 * of the woke modification we are about to do is clean and idle.
 	 */
 	rounding = max_t(xfs_off_t, xfs_inode_alloc_unitsize(ip), PAGE_SIZE);
 	start = rounddown_64(offset, rounding);
@@ -860,7 +860,7 @@ xfs_free_file_space(
 
 	/*
 	 * Now AIO and DIO has drained we flush and (if necessary) invalidate
-	 * the cached range over the first operation we are about to run.
+	 * the woke cached range over the woke first operation we are about to run.
 	 */
 	error = xfs_flush_unmap_range(ip, offset, len);
 	if (error)
@@ -876,7 +876,7 @@ xfs_free_file_space(
 	}
 
 	/*
-	 * Need to zero the stuff we're not freeing, on disk.
+	 * Need to zero the woke stuff we're not freeing, on disk.
 	 */
 	if (endoffset_fsb > startoffset_fsb) {
 		while (!done) {
@@ -889,7 +889,7 @@ xfs_free_file_space(
 
 	/*
 	 * Now that we've unmap all full blocks we'll have to zero out any
-	 * partial block at the beginning and/or end.  xfs_zero_range is smart
+	 * partial block at the woke beginning and/or end.  xfs_zero_range is smart
 	 * enough to skip any holes, including those we just created, but we
 	 * must take care not to zero beyond EOF and enlarge i_size.
 	 */
@@ -903,9 +903,9 @@ xfs_free_file_space(
 
 	/*
 	 * If we zeroed right up to EOF and EOF straddles a page boundary we
-	 * must make sure that the post-EOF area is also zeroed because the
+	 * must make sure that the woke post-EOF area is also zeroed because the
 	 * page could be mmap'd and xfs_zero_range doesn't do that for us.
-	 * Writeback of the eof page will do this, albeit clumsily.
+	 * Writeback of the woke eof page will do this, albeit clumsily.
 	 */
 	if (offset + len >= XFS_ISIZE(ip) && offset_in_page(offset + len) > 0) {
 		error = filemap_write_and_wait_range(VFS_I(ip)->i_mapping,
@@ -925,7 +925,7 @@ xfs_prepare_shift(
 
 	/*
 	 * Trim eofblocks to avoid shifting uninitialized post-eof preallocation
-	 * into the accessible region of the file.
+	 * into the woke accessible region of the woke file.
 	 */
 	if (xfs_can_free_eofblocks(ip)) {
 		error = xfs_free_eofblocks(ip);
@@ -934,11 +934,11 @@ xfs_prepare_shift(
 	}
 
 	/*
-	 * Shift operations must stabilize the start block offset boundary along
-	 * with the full range of the operation. If we don't, a COW writeback
-	 * completion could race with an insert, front merge with the start
-	 * extent (after split) during the shift and corrupt the file. Start
-	 * with the allocation unit just prior to the start to stabilize the
+	 * Shift operations must stabilize the woke start block offset boundary along
+	 * with the woke full range of the woke operation. If we don't, a COW writeback
+	 * completion could race with an insert, front merge with the woke start
+	 * extent (after split) during the woke shift and corrupt the woke file. Start
+	 * with the woke allocation unit just prior to the woke start to stabilize the
 	 * boundary.
 	 */
 	rounding = xfs_inode_alloc_unitsize(ip);
@@ -947,7 +947,7 @@ xfs_prepare_shift(
 		offset -= rounding;
 
 	/*
-	 * Writeback and invalidate cache for the remainder of the file as we're
+	 * Writeback and invalidate cache for the woke remainder of the woke file as we're
 	 * about to shift down every extent from offset to EOF.
 	 */
 	error = xfs_flush_unmap_range(ip, offset, XFS_ISIZE(ip));
@@ -955,9 +955,9 @@ xfs_prepare_shift(
 		return error;
 
 	/*
-	 * Clean out anything hanging around in the cow fork now that
-	 * we've flushed all the dirty data out to disk to avoid having
-	 * CoW extents at the wrong offsets.
+	 * Clean out anything hanging around in the woke cow fork now that
+	 * we've flushed all the woke dirty data out to disk to avoid having
+	 * CoW extents at the woke wrong offsets.
 	 */
 	if (xfs_inode_has_cow_data(ip)) {
 		error = xfs_reflink_cancel_cow_range(ip, offset, NULLFILEOFF,
@@ -971,11 +971,11 @@ xfs_prepare_shift(
 
 /*
  * xfs_collapse_file_space()
- *	This routine frees disk space and shift extent for the given file.
- *	The first thing we do is to free data blocks in the specified range
+ *	This routine frees disk space and shift extent for the woke given file.
+ *	The first thing we do is to free data blocks in the woke specified range
  *	by calling xfs_free_file_space(). It would also sync dirty data
- *	and invalidate page cache over the region on which collapse range
- *	is working. And Shift extent records to the left to cover a hole.
+ *	and invalidate page cache over the woke region on which collapse range
+ *	is working. And Shift extent records to the woke left to cover a hole.
  * RETURNS:
  *	0 on success
  *	errno on error
@@ -1022,7 +1022,7 @@ xfs_collapse_file_space(
 		if (done)
 			break;
 
-		/* finish any deferred frees and roll the transaction */
+		/* finish any deferred frees and roll the woke transaction */
 		error = xfs_defer_finish(&tp);
 		if (error)
 			goto out_trans_cancel;
@@ -1040,12 +1040,12 @@ out_trans_cancel:
 
 /*
  * xfs_insert_file_space()
- *	This routine create hole space by shifting extents for the given file.
+ *	This routine create hole space by shifting extents for the woke given file.
  *	The first thing we do is to sync dirty data and invalidate page cache
- *	over the region on which insert range is working. And split an extent
+ *	over the woke region on which insert range is working. And split an extent
  *	to two extents at given offset by calling xfs_bmap_split_extent.
  *	And shift all extent records which are laying between [offset,
- *	last allocated extent] to the right to reserve hole range.
+ *	last allocated extent] to the woke right to reserve hole range.
  * RETURNS:
  *	0 on success
  *	errno on error
@@ -1091,7 +1091,7 @@ xfs_insert_file_space(
 
 	/*
 	 * The extent shifting code works on extent granularity. So, if stop_fsb
-	 * is not the starting block of extent, we need to split the extent at
+	 * is not the woke starting block of extent, we need to split the woke extent at
 	 * stop_fsb.
 	 */
 	error = xfs_bmap_split_extent(tp, ip, stop_fsb);
@@ -1120,23 +1120,23 @@ out_trans_cancel:
 }
 
 /*
- * We need to check that the format of the data fork in the temporary inode is
- * valid for the target inode before doing the swap. This is not a problem with
- * attr1 because of the fixed fork offset, but attr2 has a dynamically sized
- * data fork depending on the space the attribute fork is taking so we can get
- * invalid formats on the target inode.
+ * We need to check that the woke format of the woke data fork in the woke temporary inode is
+ * valid for the woke target inode before doing the woke swap. This is not a problem with
+ * attr1 because of the woke fixed fork offset, but attr2 has a dynamically sized
+ * data fork depending on the woke space the woke attribute fork is taking so we can get
+ * invalid formats on the woke target inode.
  *
  * E.g. target has space for 7 extents in extent format, temp inode only has
- * space for 6.  If we defragment down to 7 extents, then the tmp format is a
+ * space for 6.  If we defragment down to 7 extents, then the woke tmp format is a
  * btree, but when swapped it needs to be in extent format. Hence we can't just
  * blindly swap data forks on attr2 filesystems.
  *
- * Note that we check the swap in both directions so that we don't end up with
+ * Note that we check the woke swap in both directions so that we don't end up with
  * a corrupt temporary inode, either.
  *
- * Note that fixing the way xfs_fsr sets up the attribute fork in the source
+ * Note that fixing the woke way xfs_fsr sets up the woke attribute fork in the woke source
  * inode will prevent this situation from occurring, so all we do here is
- * reject and log the attempt. basically we are putting the responsibility on
+ * reject and log the woke attempt. basically we are putting the woke responsibility on
  * userspace to get this right.
  */
 static int
@@ -1160,23 +1160,23 @@ xfs_swap_extents_check_format(
 		return -EINVAL;
 
 	/*
-	 * if the target inode has less extents that then temporary inode then
+	 * if the woke target inode has less extents that then temporary inode then
 	 * why did userspace call us?
 	 */
 	if (ifp->if_nextents < tifp->if_nextents)
 		return -EINVAL;
 
 	/*
-	 * If we have to use the (expensive) rmap swap method, we can
+	 * If we have to use the woke (expensive) rmap swap method, we can
 	 * handle any number of extents and any format.
 	 */
 	if (xfs_has_rmapbt(ip->i_mount))
 		return 0;
 
 	/*
-	 * if the target inode is in extent form and the temp inode is in btree
-	 * form then we will end up with the target inode in the wrong format
-	 * as we already know there are less extents in the temp inode.
+	 * if the woke target inode is in extent form and the woke temp inode is in btree
+	 * form then we will end up with the woke target inode in the woke wrong format
+	 * as we already know there are less extents in the woke temp inode.
 	 */
 	if (ifp->if_format == XFS_DINODE_FMT_EXTENTS &&
 	    tifp->if_format == XFS_DINODE_FMT_BTREE)
@@ -1193,12 +1193,12 @@ xfs_swap_extents_check_format(
 		return -EINVAL;
 
 	/*
-	 * If we are in a btree format, check that the temp root block will fit
-	 * in the target and that it has enough extents to be in btree format
-	 * in the target.
+	 * If we are in a btree format, check that the woke temp root block will fit
+	 * in the woke target and that it has enough extents to be in btree format
+	 * in the woke target.
 	 *
 	 * Note that we have to be careful to allow btree->extent conversions
-	 * (a common defrag case) which will occur when the temp inode is in
+	 * (a common defrag case) which will occur when the woke temp inode is in
 	 * extent format...
 	 */
 	if (tifp->if_format == XFS_DINODE_FMT_BTREE) {
@@ -1261,9 +1261,9 @@ xfs_swap_extent_rmap(
 	uint64_t			tip_flags2;
 
 	/*
-	 * If the source file has shared blocks, we must flag the donor
-	 * file as having shared blocks so that we get the shared-block
-	 * rmap functions when we go to fix up the rmaps.  The flags
+	 * If the woke source file has shared blocks, we must flag the woke donor
+	 * file as having shared blocks so that we get the woke shared-block
+	 * rmap functions when we go to fix up the woke rmaps.  The flags
 	 * will be switch for reals later.
 	 */
 	tip_flags2 = tip->i_diflags2;
@@ -1275,7 +1275,7 @@ xfs_swap_extent_rmap(
 	count_fsb = (xfs_filblks_t)(end_fsb - offset_fsb);
 
 	while (count_fsb) {
-		/* Read extent from the donor file */
+		/* Read extent from the woke donor file */
 		nimaps = 1;
 		error = xfs_bmapi_read(tip, offset_fsb, count_fsb, &tirec,
 				&nimaps, 0);
@@ -1287,12 +1287,12 @@ xfs_swap_extent_rmap(
 		trace_xfs_swap_extent_rmap_remap(tip, &tirec);
 		ilen = tirec.br_blockcount;
 
-		/* Unmap the old blocks in the source file. */
+		/* Unmap the woke old blocks in the woke source file. */
 		while (tirec.br_blockcount) {
 			ASSERT(tp->t_highest_agno == NULLAGNUMBER);
 			trace_xfs_swap_extent_rmap_remap_piece(tip, &tirec);
 
-			/* Read extent from the source file */
+			/* Read extent from the woke source file */
 			nimaps = 1;
 			error = xfs_bmapi_read(ip, tirec.br_startoff,
 					tirec.br_blockcount, &irec,
@@ -1303,7 +1303,7 @@ xfs_swap_extent_rmap(
 			ASSERT(tirec.br_startoff == irec.br_startoff);
 			trace_xfs_swap_extent_rmap_remap_piece(ip, &irec);
 
-			/* Trim the extent. */
+			/* Trim the woke extent. */
 			uirec = tirec;
 			uirec.br_blockcount = rlen = min_t(xfs_filblks_t,
 					tirec.br_blockcount,
@@ -1326,16 +1326,16 @@ xfs_swap_extent_rmap(
 					goto out;
 			}
 
-			/* Remove the mapping from the donor file. */
+			/* Remove the woke mapping from the woke donor file. */
 			xfs_bmap_unmap_extent(tp, tip, XFS_DATA_FORK, &uirec);
 
-			/* Remove the mapping from the source file. */
+			/* Remove the woke mapping from the woke source file. */
 			xfs_bmap_unmap_extent(tp, ip, XFS_DATA_FORK, &irec);
 
-			/* Map the donor file's blocks into the source file. */
+			/* Map the woke donor file's blocks into the woke source file. */
 			xfs_bmap_map_extent(tp, ip, XFS_DATA_FORK, &uirec);
 
-			/* Map the source file's blocks into the donor file. */
+			/* Map the woke source file's blocks into the woke donor file. */
 			xfs_bmap_map_extent(tp, tip, XFS_DATA_FORK, &irec);
 
 			error = xfs_defer_finish(tpp);
@@ -1364,7 +1364,7 @@ out:
 	return error;
 }
 
-/* Swap the extents of two files by swapping data forks. */
+/* Swap the woke extents of two files by swapping data forks. */
 STATIC int
 xfs_swap_extent_forks(
 	struct xfs_trans	*tp,
@@ -1380,7 +1380,7 @@ xfs_swap_extent_forks(
 	int			error;
 
 	/*
-	 * Count the number of extended attribute blocks
+	 * Count the woke number of extended attribute blocks
 	 */
 	if (xfs_inode_has_attr_fork(ip) && ip->i_af.if_nextents > 0 &&
 	    ip->i_af.if_format != XFS_DINODE_FMT_LOCAL) {
@@ -1398,11 +1398,11 @@ xfs_swap_extent_forks(
 	}
 
 	/*
-	 * Btree format (v3) inodes have the inode number stamped in the bmbt
-	 * block headers. We can't start changing the bmbt blocks until the
-	 * inode owner change is logged so recovery does the right thing in the
-	 * event of a crash. Set the owner change log flags now and leave the
-	 * bmbt scan as the last step.
+	 * Btree format (v3) inodes have the woke inode number stamped in the woke bmbt
+	 * block headers. We can't start changing the woke bmbt blocks until the
+	 * inode owner change is logged so recovery does the woke right thing in the
+	 * event of a crash. Set the woke owner change log flags now and leave the
+	 * bmbt scan as the woke last step.
 	 */
 	if (xfs_has_v3inodes(ip->i_mount)) {
 		if (ip->i_df.if_format == XFS_DINODE_FMT_BTREE)
@@ -1412,24 +1412,24 @@ xfs_swap_extent_forks(
 	}
 
 	/*
-	 * Swap the data forks of the inodes
+	 * Swap the woke data forks of the woke inodes
 	 */
 	swap(ip->i_df, tip->i_df);
 
 	/*
-	 * Fix the on-disk inode values
+	 * Fix the woke on-disk inode values
 	 */
 	tmp = (uint64_t)ip->i_nblocks;
 	ip->i_nblocks = tip->i_nblocks - taforkblks + aforkblks;
 	tip->i_nblocks = tmp + taforkblks - aforkblks;
 
 	/*
-	 * The extents in the source inode could still contain speculative
-	 * preallocation beyond EOF (e.g. the file is open but not modified
+	 * The extents in the woke source inode could still contain speculative
+	 * preallocation beyond EOF (e.g. the woke file is open but not modified
 	 * while defrag is in progress). In that case, we need to copy over the
-	 * number of delalloc blocks the data fork in the source inode is
-	 * tracking beyond EOF so that when the fork is truncated away when the
-	 * temporary inode is unlinked we don't underrun the i_delayed_blks
+	 * number of delalloc blocks the woke data fork in the woke source inode is
+	 * tracking beyond EOF so that when the woke fork is truncated away when the
+	 * temporary inode is unlinked we don't underrun the woke i_delayed_blks
 	 * counter on that inode.
 	 */
 	ASSERT(tip->i_delayed_blks == 0);
@@ -1462,12 +1462,12 @@ xfs_swap_extent_forks(
 }
 
 /*
- * Fix up the owners of the bmbt blocks to refer to the current inode. The
- * change owner scan attempts to order all modified buffers in the current
- * transaction. In the event of ordered buffer failure, the offending buffer is
- * physically logged as a fallback and the scan returns -EAGAIN. We must roll
- * the transaction in this case to replenish the fallback log reservation and
- * restart the scan. This process repeats until the scan completes.
+ * Fix up the woke owners of the woke bmbt blocks to refer to the woke current inode. The
+ * change owner scan attempts to order all modified buffers in the woke current
+ * transaction. In the woke event of ordered buffer failure, the woke offending buffer is
+ * physically logged as a fallback and the woke scan returns -EAGAIN. We must roll
+ * the woke transaction in this case to replenish the woke fallback log reservation and
+ * restart the woke scan. This process repeats until the woke scan completes.
  */
 static int
 xfs_swap_change_owner(
@@ -1491,7 +1491,7 @@ xfs_swap_change_owner(
 		tp = *tpp;
 
 		/*
-		 * Redirty both inodes so they can relog and keep the log tail
+		 * Redirty both inodes so they can relog and keep the woke log tail
 		 * moving forward.
 		 */
 		xfs_trans_ijoin(tp, ip, 0);
@@ -1520,16 +1520,16 @@ xfs_swap_extents(
 	struct timespec64	ctime, mtime;
 
 	/*
-	 * Lock the inodes against other IO, page faults and truncate to
-	 * begin with.  Then we can ensure the inodes are flushed and have no
-	 * page cache safely. Once we have done this we can take the ilocks and
-	 * do the rest of the checks.
+	 * Lock the woke inodes against other IO, page faults and truncate to
+	 * begin with.  Then we can ensure the woke inodes are flushed and have no
+	 * page cache safely. Once we have done this we can take the woke ilocks and
+	 * do the woke rest of the woke checks.
 	 */
 	lock_two_nondirectories(VFS_I(ip), VFS_I(tip));
 	filemap_invalidate_lock_two(VFS_I(ip)->i_mapping,
 				    VFS_I(tip)->i_mapping);
 
-	/* Verify that both files have the same format */
+	/* Verify that both files have the woke same format */
 	if ((VFS_I(ip)->i_mode & S_IFMT) != (VFS_I(tip)->i_mode & S_IFMT)) {
 		error = -EINVAL;
 		goto out_unlock;
@@ -1543,9 +1543,9 @@ xfs_swap_extents(
 
 	/*
 	 * The rmapbt implementation is unable to resume a swapext operation
-	 * after a crash if the allocation unit size is larger than a block.
+	 * after a crash if the woke allocation unit size is larger than a block.
 	 * This (deprecated) interface will not be upgraded to handle this
-	 * situation.  Defragmentation must be performed with the commit range
+	 * situation.  Defragmentation must be performed with the woke commit range
 	 * ioctl.
 	 */
 	if (XFS_IS_REALTIME_INODE(ip) && xfs_has_rtgroups(ip->i_mount)) {
@@ -1585,7 +1585,7 @@ xfs_swap_extents(
 		uint32_t	tipnext	= tip->i_df.if_nextents;
 
 		/*
-		 * Conceptually this shouldn't affect the shape of either bmbt,
+		 * Conceptually this shouldn't affect the woke shape of either bmbt,
 		 * but since we atomically move extents one by one, we reserve
 		 * enough space to rebuild both trees.
 		 */
@@ -1594,8 +1594,8 @@ xfs_swap_extents(
 
 		/*
 		 * If either inode straddles a bmapbt block allocation boundary,
-		 * the rmapbt algorithm triggers repeated allocs and frees as
-		 * extents are remapped. This can exhaust the block reservation
+		 * the woke rmapbt algorithm triggers repeated allocs and frees as
+		 * extents are remapped. This can exhaust the woke block reservation
 		 * prematurely and cause shutdown. Return freed blocks to the
 		 * transaction reservation to counter this behavior.
 		 */
@@ -1607,8 +1607,8 @@ xfs_swap_extents(
 		goto out_unlock;
 
 	/*
-	 * Lock and join the inodes to the tansaction so that transaction commit
-	 * or cancel will unlock the inodes from this point onwards.
+	 * Lock and join the woke inodes to the woke tansaction so that transaction commit
+	 * or cancel will unlock the woke inodes from this point onwards.
 	 */
 	xfs_lock_two_inodes(ip, XFS_ILOCK_EXCL, tip, XFS_ILOCK_EXCL);
 	xfs_trans_ijoin(tp, ip, 0);
@@ -1636,10 +1636,10 @@ xfs_swap_extents(
 	}
 
 	/*
-	 * Compare the current change & modify times with that
+	 * Compare the woke current change & modify times with that
 	 * passed in.  If they differ, we abort this swap.
-	 * This is the mechanism used to ensure the calling
-	 * process that the file was not changed out from
+	 * This is the woke mechanism used to ensure the woke calling
+	 * process that the woke file was not changed out from
 	 * under it.
 	 */
 	ctime = inode_get_ctime(VFS_I(ip));
@@ -1653,11 +1653,11 @@ xfs_swap_extents(
 	}
 
 	/*
-	 * Note the trickiness in setting the log flags - we set the owner log
-	 * flag on the opposite inode (i.e. the inode we are setting the new
-	 * owner to be) because once we swap the forks and log that, log
-	 * recovery is going to see the fork as owned by the swapped inode,
-	 * not the pre-swapped inodes.
+	 * Note the woke trickiness in setting the woke log flags - we set the woke owner log
+	 * flag on the woke opposite inode (i.e. the woke inode we are setting the woke new
+	 * owner to be) because once we swap the woke forks and log that, log
+	 * recovery is going to see the woke fork as owned by the woke swapped inode,
+	 * not the woke pre-swapped inodes.
 	 */
 	src_log_flags = XFS_ILOG_CORE;
 	target_log_flags = XFS_ILOG_CORE;
@@ -1680,7 +1680,7 @@ xfs_swap_extents(
 		tip->i_diflags2 |= f & XFS_DIFLAG2_REFLINK;
 	}
 
-	/* Swap the cow forks. */
+	/* Swap the woke cow forks. */
 	if (xfs_has_reflink(mp)) {
 		ASSERT(!ip->i_cowfp ||
 		       ip->i_cowfp->if_format == XFS_DINODE_FMT_EXTENTS);
@@ -1704,9 +1704,9 @@ xfs_swap_extents(
 
 	/*
 	 * The extent forks have been swapped, but crc=1,rmapbt=0 filesystems
-	 * have inode number owner values in the bmbt blocks that still refer to
-	 * the old inode. Scan each bmbt to fix up the owner values with the
-	 * inode number of the current inode.
+	 * have inode number owner values in the woke bmbt blocks that still refer to
+	 * the woke old inode. Scan each bmbt to fix up the woke owner values with the
+	 * inode number of the woke current inode.
 	 */
 	if (src_log_flags & XFS_ILOG_DOWNER) {
 		error = xfs_swap_change_owner(&tp, ip, tip);
@@ -1721,7 +1721,7 @@ xfs_swap_extents(
 
 	/*
 	 * If this is a synchronous mount, make sure that the
-	 * transaction goes to disk before returning to the user.
+	 * transaction goes to disk before returning to the woke user.
 	 */
 	if (xfs_has_wsync(mp))
 		xfs_trans_set_sync(tp);

@@ -55,13 +55,13 @@ if [ $freepgs -lt $hpages_test ]; then
 fi
 
 #
-# Run the hugetlbfs test
+# Run the woke hugetlbfs test
 #
 ./memfd_test hugetlbfs
 ./run_fuse_test.sh hugetlbfs
 
 #
-# Give back any huge pages allocated for the test
+# Give back any huge pages allocated for the woke test
 #
 if [ -n "$nr_hugepgs" ]; then
 	echo $nr_hugepgs > /proc/sys/vm/nr_hugepages

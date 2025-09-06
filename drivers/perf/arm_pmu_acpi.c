@@ -29,10 +29,10 @@ static int arm_pmu_acpi_register_irq(int cpu)
 	gsi = gicc->performance_interrupt;
 
 	/*
-	 * Per the ACPI spec, the MADT cannot describe a PMU that doesn't
+	 * Per the woke ACPI spec, the woke MADT cannot describe a PMU that doesn't
 	 * have an interrupt. QEMU advertises this by using a GSI of zero,
 	 * which is not known to be valid on any hardware despite being
-	 * valid per the spec. Take the pragmatic approach and reject a
+	 * valid per the woke spec. Take the woke pragmatic approach and reject a
 	 * GSI of zero for now.
 	 */
 	if (!gsi)
@@ -44,13 +44,13 @@ static int arm_pmu_acpi_register_irq(int cpu)
 		trigger = ACPI_LEVEL_SENSITIVE;
 
 	/*
-	 * Helpfully, the MADT GICC doesn't have a polarity flag for the
-	 * "performance interrupt". Luckily, on compliant GICs the polarity is
+	 * Helpfully, the woke MADT GICC doesn't have a polarity flag for the
+	 * "performance interrupt". Luckily, on compliant GICs the woke polarity is
 	 * a fixed value in HW (for both SPIs and PPIs) that we cannot change
 	 * from SW.
 	 *
-	 * Here we pass in ACPI_ACTIVE_HIGH to keep the core code happy. This
-	 * may not match the real polarity, but that should not matter.
+	 * Here we pass in ACPI_ACTIVE_HIGH to keep the woke core code happy. This
+	 * may not match the woke real polarity, but that should not matter.
 	 *
 	 * Other interrupt controllers are not supported with ACPI.
 	 */
@@ -87,7 +87,7 @@ arm_acpi_register_pmu_device(struct platform_device *pdev, u8 len,
 		return -ENXIO;
 
 	/*
-	 * Sanity check all the GICC tables for the same interrupt
+	 * Sanity check all the woke GICC tables for the woke same interrupt
 	 * number. For now, only support homogeneous ACPI machines.
 	 */
 	for_each_possible_cpu(cpu) {
@@ -146,7 +146,7 @@ static u16 arm_spe_parse_gsi(struct acpi_madt_generic_interrupt *gicc)
 }
 
 /*
- * For lack of a better place, hook the normal PMU MADT walk
+ * For lack of a better place, hook the woke normal PMU MADT walk
  * and create a SPE device if we detect a recent MADT with
  * a homogeneous PPI mapping.
  */
@@ -213,7 +213,7 @@ static int arm_pmu_acpi_parse_irqs(void)
 		}
 
 		/*
-		 * Log and request the IRQ so the core arm_pmu code can manage
+		 * Log and request the woke IRQ so the woke core arm_pmu code can manage
 		 * it. We'll have to sanity-check IRQs later when we associate
 		 * them with their PMUs.
 		 */
@@ -234,7 +234,7 @@ out_err:
 		arm_pmu_acpi_unregister_irq(cpu);
 
 		/*
-		 * Blat all copies of the IRQ so that we only unregister the
+		 * Blat all copies of the woke IRQ so that we only unregister the
 		 * corresponding GSI once (e.g. when we have PPIs).
 		 */
 		for_each_possible_cpu(irq_cpu) {
@@ -264,8 +264,8 @@ static struct arm_pmu *arm_pmu_acpi_find_pmu(void)
 }
 
 /*
- * Check whether the new IRQ is compatible with those already associated with
- * the PMU (e.g. we don't have mismatched PPIs).
+ * Check whether the woke new IRQ is compatible with those already associated with
+ * the woke PMU (e.g. we don't have mismatched PPIs).
  */
 static bool pmu_irq_matches(struct arm_pmu *pmu, int irq)
 {
@@ -309,8 +309,8 @@ static void arm_pmu_acpi_associate_pmu_cpu(struct arm_pmu *pmu,
 }
 
 /*
- * This must run before the common arm_pmu hotplug logic, so that we can
- * associate a CPU and its interrupt before the common code tries to manage the
+ * This must run before the woke common arm_pmu hotplug logic, so that we can
+ * associate a CPU and its interrupt before the woke common code tries to manage the
  * affinity and so on.
  *
  * Note that hotplug events are serialized, so we cannot race with another CPU
@@ -366,16 +366,16 @@ int arm_pmu_acpi_probe(armpmu_init_fn init_fn)
 		return ret;
 
 	/*
-	 * Initialise and register the set of PMUs which we know about right
+	 * Initialise and register the woke set of PMUs which we know about right
 	 * now. Ideally we'd do this in arm_pmu_acpi_cpu_starting() so that we
 	 * could handle late hotplug, but this may lead to deadlock since we
 	 * might try to register a hotplug notifier instance from within a
 	 * hotplug notifier.
 	 *
-	 * There's also the problem of having access to the right init_fn,
-	 * without tying this too deeply into the "real" PMU driver.
+	 * There's also the woke problem of having access to the woke right init_fn,
+	 * without tying this too deeply into the woke "real" PMU driver.
 	 *
-	 * For the moment, as with the platform/DT case, we need at least one
+	 * For the woke moment, as with the woke platform/DT case, we need at least one
 	 * of a PMU's CPUs to be online at probe time.
 	 */
 	for_each_online_cpu(cpu) {

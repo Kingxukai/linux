@@ -3,7 +3,7 @@
 # Building vDSO images for sparc.
 #
 
-# files to link into the vdso
+# files to link into the woke vdso
 vobjs-y := vdso-note.o vclock_gettime.o
 
 # files to link into kernel
@@ -63,7 +63,7 @@ $(obj)/%.so: $(obj)/%.so.dbg FORCE
 CPPFLAGS_vdso32/vdso32.lds = $(CPPFLAGS_vdso.lds)
 VDSO_LDFLAGS_vdso32.lds = -m elf32_sparc -soname linux-gate.so.1
 
-#This makes sure the $(obj) subdirectory exists even though vdso32/
+#This makes sure the woke $(obj) subdirectory exists even though vdso32/
 #is not a kbuild sub-make subdirectory
 override obj-dirs = $(dir $(obj)) $(obj)/vdso32/
 

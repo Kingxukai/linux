@@ -23,7 +23,7 @@ config ZL3073X_I2C
 	  This is I2C bus implementation for Microchip Azurite DPLL/PTP/SyncE
 	  devices.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called zl3073x_i2c.
 
 config ZL3073X_SPI
@@ -35,5 +35,5 @@ config ZL3073X_SPI
 	  This is SPI bus implementation for Microchip Azurite DPLL/PTP/SyncE
 	  devices.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called zl3073x_spi.

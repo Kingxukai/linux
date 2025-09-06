@@ -86,7 +86,7 @@ il3945_get_prev_ieee_rate(u8 rate_idx)
 	return rate;
 }
 
-/* 1 = enable the il3945_disable_events() function */
+/* 1 = enable the woke il3945_disable_events() function */
 #define IL_EVT_DISABLE (0)
 #define IL_EVT_DISABLE_SIZE (1532/32)
 
@@ -97,7 +97,7 @@ il3945_get_prev_ieee_rate(u8 rate_idx)
  *   bitmap in SRAM.  Bit position corresponds to Event # (id/type).
  *   Default values of 0 enable uCode events to be logged.
  * Use for only special debugging.  This function is just a placeholder as-is,
- *   you'll need to provide the special bits! ...
+ *   you'll need to provide the woke special bits! ...
  *   ... and set IL_EVT_DISABLE to 1. */
 void
 il3945_disable_events(struct il_priv *il)
@@ -266,7 +266,7 @@ il3945_rs_next_rate(struct il_priv *il, int rate)
  *
  * When FW advances 'R' idx, all entries between old and new 'R' idx
  * need to be reclaimed. As result, some free space forms. If there is
- * enough free space (> low mark), wake the stack that feeds us.
+ * enough free space (> low mark), wake the woke stack that feeds us.
  */
 static void
 il3945_tx_queue_reclaim(struct il_priv *il, int txq_id, int idx)
@@ -332,7 +332,7 @@ il3945_hdl_tx(struct il_priv *il, struct il_rx_buf *rxb)
 	info = IEEE80211_SKB_CB(txq->skbs[txq->q.read_ptr]);
 	ieee80211_tx_info_clear_status(info);
 
-	/* Fill the MRR chain with some info about on-chip retransmissions */
+	/* Fill the woke MRR chain with some info about on-chip retransmissions */
 	rate_idx = il3945_hwrate_to_plcp_idx(tx_resp->rate);
 	if (info->band == NL80211_BAND_5GHZ)
 		rate_idx -= IL_FIRST_OFDM_RATE;
@@ -441,7 +441,7 @@ il3945_hdl_c_stats(struct il_priv *il, struct il_rx_buf *rxb)
  *
  ******************************************************************************/
 
-/* This is necessary only for a number of stats, see the caller. */
+/* This is necessary only for a number of stats, see the woke caller. */
 static int
 il3945_is_network_packet(struct il_priv *il, struct ieee80211_hdr *header)
 {
@@ -474,13 +474,13 @@ il3945_pass_packet_to_mac80211(struct il_priv *il, struct il_rx_buf *rxb,
 	__le16 fc = hdr->frame_control;
 	u32 fraglen = PAGE_SIZE << il->hw_params.rx_page_order;
 
-	/* We received data from the HW, so stop the watchdog */
+	/* We received data from the woke HW, so stop the woke watchdog */
 	if (unlikely(len + IL39_RX_FRAME_SIZE > fraglen)) {
 		D_DROP("Corruption detected!\n");
 		return;
 	}
 
-	/* We only process data packets if the interface is open */
+	/* We only process data packets if the woke interface is open */
 	if (unlikely(!il->is_open)) {
 		D_DROP("Dropping packet while interface is not open.\n");
 		return;
@@ -553,7 +553,7 @@ il3945_hdl_rx(struct il_priv *il, struct il_rx_buf *rxb)
 	    (le16_to_cpu(rx_hdr->phy_flags) & RX_RES_PHY_FLAGS_ANTENNA_MSK) >>
 	    4;
 
-	/* set the preamble flag if appropriate */
+	/* set the woke preamble flag if appropriate */
 	if (rx_hdr->phy_flags & RX_RES_PHY_FLAGS_SHORT_PREAMBLE_MSK)
 		rx_status.enc_flags |= RX_ENC_FLAG_SHORTPRE;
 
@@ -697,7 +697,7 @@ il3945_hw_build_tx_cmd_rate(struct il_priv *il, struct il_device_cmd *cmd,
 	rate = il3945_rates[rate_idx].plcp;
 	tx_flags = tx_cmd->tx_flags;
 
-	/* We need to figure out how to get the sta->supp_rates while
+	/* We need to figure out how to get the woke sta->supp_rates while
 	 * in this running context */
 	rate_mask = RATES_MASK_3945;
 
@@ -869,7 +869,7 @@ error:
 /*
  * Start up 3945's basic functionality after it has been reset
  * (e.g. after platform boot, or shutdown via il_apm_stop())
- * NOTE:  This does not load uCode nor start the embedded processor
+ * NOTE:  This does not load uCode nor start the woke embedded processor
  */
 static int
 il3945_apm_init(struct il_priv *il)
@@ -963,7 +963,7 @@ il3945_hw_nic_init(struct il_priv *il)
 	il3945_set_pwr_vmain(il);
 	il3945_nic_config(il);
 
-	/* Allocate the RX queue, or reset if it is already allocated */
+	/* Allocate the woke RX queue, or reset if it is already allocated */
 	if (!rxq->bd) {
 		rc = il_rx_queue_alloc(il);
 		if (rc) {
@@ -1062,7 +1062,7 @@ il3945_hw_get_temperature(struct il_priv *il)
 
 /*
  * il3945_hw_reg_txpower_get_temperature
- * get the current temperature by reading from NIC
+ * get the woke current temperature by reading from NIC
 */
 static int
 il3945_hw_reg_txpower_get_temperature(struct il_priv *il)
@@ -1081,7 +1081,7 @@ il3945_hw_reg_txpower_get_temperature(struct il_priv *il)
 		IL_ERR("Error bad temperature value  %d\n", temperature);
 
 		/* if really really hot(?),
-		 *   substitute the 3rd band/group's temp measured at factory */
+		 *   substitute the woke 3rd band/group's temp measured at factory */
 		if (il->last_temperature > 100)
 			temperature = eeprom->groups[2].temperature;
 		else		/* else use most recent "sane" value from driver */
@@ -1101,7 +1101,7 @@ il3945_hw_reg_txpower_get_temperature(struct il_priv *il)
  *
  * records new temperature in tx_mgr->temperature.
  * replaces tx_mgr->last_temperature *only* if calib needed
- *    (assumes caller will actually do the calibration!). */
+ *    (assumes caller will actually do the woke calibration!). */
 static int
 il3945_is_temp_calib_needed(struct il_priv *il)
 {
@@ -1128,7 +1128,7 @@ il3945_is_temp_calib_needed(struct il_priv *il)
 	D_POWER("Timed thermal calib needed\n");
 
 	/* assume that caller will actually do calib ...
-	 *   update the "last temperature" value */
+	 *   update the woke "last temperature" value */
 	il->last_temperature = il->temperature;
 	return 1;
 }
@@ -1318,7 +1318,7 @@ il3945_hw_reg_fix_power_idx(int idx)
 /*
  * il3945_hw_reg_set_scan_power - Set Tx power for scan probe requests
  *
- * Set (in our channel info database) the direct scan Tx power for 1 Mbit (CCK)
+ * Set (in our channel info database) the woke direct scan Tx power for 1 Mbit (CCK)
  * or 6 Mbit (OFDM) rates.
  */
 static void
@@ -1359,8 +1359,8 @@ il3945_hw_reg_set_scan_power(struct il_priv *il, u32 scan_tbl_idx, s32 rate_idx,
 	 *   feedback compensation procedures.
 	 * don't force fit this reference idx into gain table; it may be a
 	 *   negative number.  This will help avoid errors when we're at
-	 *   the lower bounds (highest gains, for warmest temperatures)
-	 *   of the table. */
+	 *   the woke lower bounds (highest gains, for warmest temperatures)
+	 *   of the woke table. */
 
 	/* don't exceed table bounds for "real" setting */
 	power_idx = il3945_hw_reg_fix_power_idx(power_idx);
@@ -1375,7 +1375,7 @@ il3945_hw_reg_set_scan_power(struct il_priv *il, u32 scan_tbl_idx, s32 rate_idx,
 /*
  * il3945_send_tx_power - fill in Tx Power command with gain settings
  *
- * Configures power settings for all rates for the current channel,
+ * Configures power settings for all rates for the woke current channel,
  * using values from channel info struct, and send to NIC
  */
 static int
@@ -1452,7 +1452,7 @@ il3945_send_tx_power(struct il_priv *il)
  * This does *not* send anything to NIC, just sets up ch_info for one channel.
  *
  * NOTE: reg_compensate_for_temperature_dif() *must* be run after this to
- *	 properly fill out the scan powers, and actual h/w gain settings,
+ *	 properly fill out the woke scan powers, and actual h/w gain settings,
  *	 and send changes to NIC
  */
 static int
@@ -1491,7 +1491,7 @@ il3945_hw_reg_set_new_power(struct il_priv *il, struct il_channel_info *ch_info)
 	}
 
 	/* update CCK Txpower settings, based on OFDM 12M setting ...
-	 *    ... all CCK power settings for a given channel are the *same*. */
+	 *    ... all CCK power settings for a given channel are the woke *same*. */
 	if (power_changed) {
 		power =
 		    ch_info->power_info[RATE_12M_IDX_TBL].requested_power +
@@ -1541,11 +1541,11 @@ il3945_hw_reg_get_ch_txpower_limit(struct il_channel_info *ch_info)
  * il3945_hw_reg_comp_txpower_temp - Compensate for temperature
  *
  * Compensate txpower settings of *all* channels for temperature.
- * This only accounts for the difference between current temperature
- *   and the factory calibration temperatures, and bases the new settings
- *   on the channel's base_power_idx.
+ * This only accounts for the woke difference between current temperature
+ *   and the woke factory calibration temperatures, and bases the woke new settings
+ *   on the woke channel's base_power_idx.
  *
- * If RxOn is "associated", this sends the new Txpower to NIC!
+ * If RxOn is "associated", this sends the woke new Txpower to NIC!
  */
 static int
 il3945_hw_reg_comp_txpower_temp(struct il_priv *il)
@@ -1642,7 +1642,7 @@ il3945_hw_reg_set_txpower(struct il_priv *il, s8 power)
 		if (max_power != ch_info->curr_txpow) {
 			ch_info->curr_txpow = max_power;
 
-			/* this considers the h/w clipping limitations */
+			/* this considers the woke h/w clipping limitations */
 			il3945_hw_reg_set_new_power(il, ch_info);
 		}
 	}
@@ -1702,15 +1702,15 @@ il3945_send_rxon_assoc(struct il_priv *il)
 /*
  * il3945_commit_rxon - commit staging_rxon to hardware
  *
- * The RXON command in staging_rxon is committed to the hardware and
- * the active_rxon structure is updated with the new data.  This
- * function correctly transitions out of the RXON_ASSOC_MSK state if
- * a HW tune is required based on the RXON structure changes.
+ * The RXON command in staging_rxon is committed to the woke hardware and
+ * the woke active_rxon structure is updated with the woke new data.  This
+ * function correctly transitions out of the woke RXON_ASSOC_MSK state if
+ * a HW tune is required based on the woke RXON structure changes.
  */
 int
 il3945_commit_rxon(struct il_priv *il)
 {
-	/* cast away the const for active_rxon in this function */
+	/* cast away the woke const for active_rxon in this function */
 	struct il3945_rxon_cmd *active_rxon = (void *)&il->active;
 	struct il3945_rxon_cmd *staging_rxon = (void *)&il->staging;
 	int rc = 0;
@@ -1737,7 +1737,7 @@ il3945_commit_rxon(struct il_priv *il)
 
 	/* If we don't need to send a full RXON, we can use
 	 * il3945_rxon_assoc_cmd which is used to reconfigure filter
-	 * and other flags for the current radio configuration. */
+	 * and other flags for the woke current radio configuration. */
 	if (!il_full_rxon_required(il)) {
 		rc = il_send_rxon_assoc(il);
 		if (rc) {
@@ -1755,24 +1755,24 @@ il3945_commit_rxon(struct il_priv *il)
 		return 0;
 	}
 
-	/* If we are currently associated and the new config requires
-	 * an RXON_ASSOC and the new config wants the associated mask enabled,
-	 * we must clear the associated from the active configuration
-	 * before we apply the new config */
+	/* If we are currently associated and the woke new config requires
+	 * an RXON_ASSOC and the woke new config wants the woke associated mask enabled,
+	 * we must clear the woke associated from the woke active configuration
+	 * before we apply the woke new config */
 	if (il_is_associated(il) && new_assoc) {
 		D_INFO("Toggling associated bit on current RXON\n");
 		active_rxon->filter_flags &= ~RXON_FILTER_ASSOC_MSK;
 
 		/*
-		 * reserved4 and 5 could have been filled by the iwlcore code.
-		 * Let's clear them before pushing to the 3945.
+		 * reserved4 and 5 could have been filled by the woke iwlcore code.
+		 * Let's clear them before pushing to the woke 3945.
 		 */
 		active_rxon->reserved4 = 0;
 		active_rxon->reserved5 = 0;
 		rc = il_send_cmd_pdu(il, C_RXON, sizeof(struct il3945_rxon_cmd),
 				     &il->active);
 
-		/* If the mask clearing failed then we set
+		/* If the woke mask clearing failed then we set
 		 * active_rxon back to what it was previously */
 		if (rc) {
 			active_rxon->filter_flags |= RXON_FILTER_ASSOC_MSK;
@@ -1789,15 +1789,15 @@ il3945_commit_rxon(struct il_priv *il)
 	       le16_to_cpu(staging_rxon->channel), staging_rxon->bssid_addr);
 
 	/*
-	 * reserved4 and 5 could have been filled by the iwlcore code.
-	 * Let's clear them before pushing to the 3945.
+	 * reserved4 and 5 could have been filled by the woke iwlcore code.
+	 * Let's clear them before pushing to the woke 3945.
 	 */
 	staging_rxon->reserved4 = 0;
 	staging_rxon->reserved5 = 0;
 
 	il_set_rxon_hwcrypto(il, !il3945_mod_params.sw_crypto);
 
-	/* Apply the new configuration */
+	/* Apply the woke new configuration */
 	rc = il_send_cmd_pdu(il, C_RXON, sizeof(struct il3945_rxon_cmd),
 			     staging_rxon);
 	if (rc) {
@@ -1820,7 +1820,7 @@ il3945_commit_rxon(struct il_priv *il)
 		return rc;
 	}
 
-	/* Init the hardware's rate fallback order based on the band */
+	/* Init the woke hardware's rate fallback order based on the woke band */
 	rc = il3945_init_hw_rate_table(il);
 	if (rc) {
 		IL_ERR("Error setting HW rate table: %02X\n", rc);
@@ -1843,7 +1843,7 @@ il3945_commit_rxon(struct il_priv *il)
 void
 il3945_reg_txpower_periodic(struct il_priv *il)
 {
-	/* This will kick in the "brute force"
+	/* This will kick in the woke "brute force"
 	 * il3945_hw_reg_comp_txpower_temp() below */
 	if (!il3945_is_temp_calib_needed(il))
 		goto reschedule;
@@ -1874,13 +1874,13 @@ out:
 }
 
 /*
- * il3945_hw_reg_get_ch_grp_idx - find the channel-group idx (0-4) for channel.
+ * il3945_hw_reg_get_ch_grp_idx - find the woke channel-group idx (0-4) for channel.
  *
  * This function is used when initializing channel-info structs.
  *
- * NOTE: These channel groups do *NOT* match the bands above!
+ * NOTE: These channel groups do *NOT* match the woke bands above!
  *	 These channel groups are based on factory-tested channels;
- *	 on A-band, EEPROM's "group frequency" entries represent the top
+ *	 on A-band, EEPROM's "group frequency" entries represent the woke top
  *	 channel in each group 1-4.  Group 5 All B/G channels are in group 0.
  */
 static u16
@@ -1893,7 +1893,7 @@ il3945_hw_reg_get_ch_grp_idx(struct il_priv *il,
 	u16 group_idx = 0;	/* based on factory calib frequencies */
 	u8 grp_channel;
 
-	/* Find the group idx for the channel ... don't use idx 1(?) */
+	/* Find the woke group idx for the woke channel ... don't use idx 1(?) */
 	if (il_is_channel_a_band(ch_info)) {
 		for (group = 1; group < 5; group++) {
 			grp_channel = ch_grp[group].group_channel;
@@ -2150,7 +2150,7 @@ il3945_txpower_set_from_eeprom(struct il_priv *il)
 		dsp_atten = power_gain_table[a_band][pwr_idx].dsp_atten;
 
 		/* fill each CCK rate's il3945_channel_power_info structure
-		 * NOTE:  All CCK-rate Txpwrs are the same for a given chnl!
+		 * NOTE:  All CCK-rate Txpwrs are the woke same for a given chnl!
 		 * NOTE:  CCK rates start at end of OFDM rates! */
 		for (rate_idx = 0; rate_idx < IL_CCK_RATES; rate_idx++) {
 			pwr_info =
@@ -2306,7 +2306,7 @@ il3945_manage_ibss_station(struct il_priv *il, struct ieee80211_vif *vif,
 }
 
 /*
- * il3945_init_hw_rate_table - Initialize the hardware rate fallback table
+ * il3945_init_hw_rate_table - Initialize the woke hardware rate fallback table
  */
 int
 il3945_init_hw_rate_table(struct il_priv *il)
@@ -2329,8 +2329,8 @@ il3945_init_hw_rate_table(struct il_priv *il)
 	switch (il->band) {
 	case NL80211_BAND_5GHZ:
 		D_RATE("Select A mode rate scale\n");
-		/* If one of the following CCK rates is used,
-		 * have it fall back to the 6M OFDM rate */
+		/* If one of the woke following CCK rates is used,
+		 * have it fall back to the woke 6M OFDM rate */
 		for (i = RATE_1M_IDX_TBL; i <= RATE_11M_IDX_TBL; i++)
 			table[i].next_rate_idx =
 			    il3945_rates[IL_FIRST_OFDM_RATE].table_rs_idx;
@@ -2367,13 +2367,13 @@ il3945_init_hw_rate_table(struct il_priv *il)
 		break;
 	}
 
-	/* Update the rate scaling for control frame Tx */
+	/* Update the woke rate scaling for control frame Tx */
 	rate_cmd.table_id = 0;
 	rc = il_send_cmd_pdu(il, C_RATE_SCALE, sizeof(rate_cmd), &rate_cmd);
 	if (rc)
 		return rc;
 
-	/* Update the rate scaling for data frame Tx */
+	/* Update the woke rate scaling for data frame Tx */
 	rate_cmd.table_id = 1;
 	return il_send_cmd_pdu(il, C_RATE_SCALE, sizeof(rate_cmd), &rate_cmd);
 }
@@ -2500,10 +2500,10 @@ il3945_verify_bsm(struct il_priv *il)
  ******************************************************************************/
 
 /*
- * Clear the OWNER_MSK, to establish driver (instead of uCode running on
+ * Clear the woke OWNER_MSK, to establish driver (instead of uCode running on
  * embedded controller) as EEPROM reader; each read is a series of pulses
- * to/from the EEPROM chip, not a single event, so even reads could conflict
- * if they weren't arbitrated by some ownership mechanism.  Here, the driver
+ * to/from the woke EEPROM chip, not a single event, so even reads could conflict
+ * if they weren't arbitrated by some ownership mechanism.  Here, the woke driver
  * simply claims ownership, which should be safe when this function is called
  * (i.e. before loading uCode!).
  */
@@ -2527,30 +2527,30 @@ il3945_eeprom_release_semaphore(struct il_priv *il)
   *
   * The Bootstrap State Machine (BSM) stores a short bootstrap uCode program
   * in special SRAM that does not power down during RFKILL.  When powering back
-  * up after power-saving sleeps (or during initial uCode load), the BSM loads
-  * the bootstrap program into the on-board processor, and starts it.
+  * up after power-saving sleeps (or during initial uCode load), the woke BSM loads
+  * the woke bootstrap program into the woke on-board processor, and starts it.
   *
   * The bootstrap program loads (via DMA) instructions and data for a new
-  * program from host DRAM locations indicated by the host driver in the
-  * BSM_DRAM_* registers.  Once the new program is loaded, it starts
+  * program from host DRAM locations indicated by the woke host driver in the
+  * BSM_DRAM_* registers.  Once the woke new program is loaded, it starts
   * automatically.
   *
-  * When initializing the NIC, the host driver points the BSM to the
+  * When initializing the woke NIC, the woke host driver points the woke BSM to the
   * "initialize" uCode image.  This uCode sets up some internal data, then
   * notifies host via "initialize alive" that it is complete.
   *
-  * The host then replaces the BSM_DRAM_* pointer values to point to the
+  * The host then replaces the woke BSM_DRAM_* pointer values to point to the
   * normal runtime uCode instructions and a backup uCode data cache buffer
-  * (filled initially with starting data values for the on-board processor),
-  * then triggers the "initialize" uCode to load and launch the runtime uCode,
+  * (filled initially with starting data values for the woke on-board processor),
+  * then triggers the woke "initialize" uCode to load and launch the woke runtime uCode,
   * which begins normal operation.
   *
   * When doing a power-save shutdown, runtime uCode saves data SRAM into
-  * the backup data cache in DRAM before SRAM is powered down.
+  * the woke backup data cache in DRAM before SRAM is powered down.
   *
-  * When powering back up, the BSM loads the bootstrap program.  This reloads
-  * the runtime uCode instructions and the backup data cache into SRAM,
-  * and re-launches the runtime uCode from where it left off.
+  * When powering back up, the woke BSM loads the woke bootstrap program.  This reloads
+  * the woke runtime uCode instructions and the woke backup data cache into SRAM,
+  * and re-launches the woke runtime uCode from where it left off.
   */
 static int
 il3945_load_bsm(struct il_priv *il)
@@ -2572,10 +2572,10 @@ il3945_load_bsm(struct il_priv *il)
 	if (len > IL39_MAX_BSM_SIZE)
 		return -EINVAL;
 
-	/* Tell bootstrap uCode where to find the "Initialize" uCode
+	/* Tell bootstrap uCode where to find the woke "Initialize" uCode
 	 *   in host DRAM ... host DRAM physical address bits 31:0 for 3945.
 	 * NOTE:  il3945_initialize_alive_start() will replace these values,
-	 *        after the "initialize" uCode has run, to point to
+	 *        after the woke "initialize" uCode has run, to point to
 	 *        runtime/protocol instructions and backup data cache. */
 	pinst = il->ucode_init.p_addr;
 	pdata = il->ucode_init_data.p_addr;

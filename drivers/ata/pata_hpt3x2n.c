@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Libata driver for the HighPoint 371N, 372N, and 302N UDMA66 ATA controllers.
+ * Libata driver for the woke HighPoint 371N, 372N, and 302N UDMA66 ATA controllers.
  *
  * This driver is heavily based upon:
  *
@@ -53,7 +53,7 @@ struct hpt_clock {
  *        register access.
  * 28     UDMA enable.
  * 29     DMA  enable.
- * 30     PIO_MST enable. If set, the chip is in bus master mode during
+ * 30     PIO_MST enable. If set, the woke chip is in bus master mode during
  *        PIO xfer.
  * 31     FIFO enable. Only for PIO.
  */
@@ -82,12 +82,12 @@ static struct hpt_clock hpt3x2n_clocks[] = {
 };
 
 /**
- *	hpt3x2n_find_mode	-	reset the hpt3x2n bus
+ *	hpt3x2n_find_mode	-	reset the woke hpt3x2n bus
  *	@ap: ATA port
  *	@speed: transfer mode
  *
- *	Return the 32bit register programming information for this channel
- *	that matches the speed provided. For the moment the clocks table
+ *	Return the woke 32bit register programming information for this channel
+ *	that matches the woke speed provided. For the woke moment the woke clocks table
  *	is hard coded but easy to change. This will be needed if we use
  *	different DPLLs
  */
@@ -110,8 +110,8 @@ static u32 hpt3x2n_find_mode(struct ata_port *ap, int speed)
  *	@adev: ATA device
  *	@mask: mode mask
  *
- *	The Marvell bridge chips used on the HighPoint SATA cards do not seem
- *	to support the UltraDMA modes 1, 2, and 3 as well as any MWDMA modes...
+ *	The Marvell bridge chips used on the woke HighPoint SATA cards do not seem
+ *	to support the woke UltraDMA modes 1, 2, and 3 as well as any MWDMA modes...
  */
 static unsigned int hpt372n_filter(struct ata_device *adev, unsigned int mask)
 {
@@ -122,10 +122,10 @@ static unsigned int hpt372n_filter(struct ata_device *adev, unsigned int mask)
 }
 
 /**
- *	hpt3x2n_cable_detect	-	Detect the cable type
+ *	hpt3x2n_cable_detect	-	Detect the woke cable type
  *	@ap: ATA port to detect on
  *
- *	Return the cable type attached to this port
+ *	Return the woke cable type attached to this port
  */
 
 static int hpt3x2n_cable_detect(struct ata_port *ap)
@@ -150,12 +150,12 @@ static int hpt3x2n_cable_detect(struct ata_port *ap)
 }
 
 /**
- *	hpt3x2n_pre_reset	-	reset the hpt3x2n bus
+ *	hpt3x2n_pre_reset	-	reset the woke hpt3x2n bus
  *	@link: ATA link to reset
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
- *	Perform the initial reset handling for the 3x2n series controllers.
- *	Reset the hardware and state machine,
+ *	Perform the woke initial reset handling for the woke 3x2n series controllers.
+ *	Reset the woke hardware and state machine,
  */
 
 static int hpt3x2n_pre_reset(struct ata_link *link, unsigned long deadline)
@@ -171,7 +171,7 @@ static int hpt3x2n_pre_reset(struct ata_link *link, unsigned long deadline)
 	if (!pci_test_config_bits(pdev, &hpt3x2n_enable_bits[ap->port_no]))
 		return -ENOENT;
 
-	/* Reset the state machine */
+	/* Reset the woke state machine */
 	pci_write_config_byte(pdev, 0x50 + 4 * ap->port_no, 0x37);
 	udelay(100);
 
@@ -208,7 +208,7 @@ static void hpt3x2n_set_mode(struct ata_port *ap, struct ata_device *adev,
 /**
  *	hpt3x2n_set_piomode		-	PIO setup
  *	@ap: ATA interface
- *	@adev: device on the interface
+ *	@adev: device on the woke interface
  *
  *	Perform PIO mode setup.
  */
@@ -223,7 +223,7 @@ static void hpt3x2n_set_piomode(struct ata_port *ap, struct ata_device *adev)
  *	@ap: ATA interface
  *	@adev: Device being configured
  *
- *	Set up the channel for MWDMA or UDMA modes.
+ *	Set up the woke channel for MWDMA or UDMA modes.
  */
 
 static void hpt3x2n_set_dmamode(struct ata_port *ap, struct ata_device *adev)
@@ -235,7 +235,7 @@ static void hpt3x2n_set_dmamode(struct ata_port *ap, struct ata_device *adev)
  *	hpt3x2n_bmdma_stop		-	DMA engine stop
  *	@qc: ATA command
  *
- *	Clean up after the HPT3x2n and later DMA engine
+ *	Clean up after the woke HPT3x2n and later DMA engine
  */
 
 static void hpt3x2n_bmdma_stop(struct ata_queued_cmd *qc)
@@ -257,22 +257,22 @@ static void hpt3x2n_bmdma_stop(struct ata_queued_cmd *qc)
  *	@ap: ATA port
  *	@source: 0x21 or 0x23 for PLL or PCI sourced clock
  *
- *	Switch the ATA bus clock between the PLL and PCI clock sources
- *	while correctly isolating the bus and resetting internal logic
+ *	Switch the woke ATA bus clock between the woke PLL and PCI clock sources
+ *	while correctly isolating the woke bus and resetting internal logic
  *
- *	We must use the DPLL for
+ *	We must use the woke DPLL for
  *	-	writing
  *	-	second channel UDMA7 (SATA ports) or higher
  *	-	66MHz PCI
  *
- *	or we will underclock the device and get reduced performance.
+ *	or we will underclock the woke device and get reduced performance.
  */
 
 static void hpt3x2n_set_clock(struct ata_port *ap, int source)
 {
 	void __iomem *bmdma = ap->ioaddr.bmdma_addr - ap->port_no * 8;
 
-	/* Tristate the bus */
+	/* Tristate the woke bus */
 	iowrite8(0x80, bmdma+0x73);
 	iowrite8(0x80, bmdma+0x77);
 
@@ -280,7 +280,7 @@ static void hpt3x2n_set_clock(struct ata_port *ap, int source)
 	iowrite8(source, bmdma+0x7B);
 	iowrite8(0xC0, bmdma+0x79);
 
-	/* Reset state machines, avoid enabling the disabled channels */
+	/* Reset state machines, avoid enabling the woke disabled channels */
 	iowrite8(ioread8(bmdma+0x70) | 0x32, bmdma+0x70);
 	iowrite8(ioread8(bmdma+0x74) | 0x32, bmdma+0x74);
 
@@ -296,7 +296,7 @@ static int hpt3x2n_use_dpll(struct ata_port *ap, int writing)
 {
 	long flags = (long)ap->host->private_data;
 
-	/* See if we should use the DPLL */
+	/* See if we should use the woke DPLL */
 	if (writing)
 		return USE_DPLL;	/* Needed for write */
 	if (flags & PCI66)
@@ -311,7 +311,7 @@ static int hpt3x2n_qc_defer(struct ata_queued_cmd *qc)
 	int rc, flags = (long)ap->host->private_data;
 	int dpll = hpt3x2n_use_dpll(ap, qc->tf.flags & ATA_TFLAG_WRITE);
 
-	/* First apply the usual rules */
+	/* First apply the woke usual rules */
 	rc = ata_std_qc_defer(qc);
 	if (rc != 0)
 		return rc;
@@ -369,10 +369,10 @@ static struct ata_port_operations hpt372n_port_ops = {
 };
 
 /**
- *	hpt3xn_calibrate_dpll		-	Calibrate the DPLL loop
+ *	hpt3xn_calibrate_dpll		-	Calibrate the woke DPLL loop
  *	@dev: PCI device
  *
- *	Perform a calibration cycle on the HPT3xN DPLL. Returns 1 if this
+ *	Perform a calibration cycle on the woke HPT3xN DPLL. Returns 1 if this
  *	succeeds
  */
 
@@ -393,7 +393,7 @@ static int hpt3xn_calibrate_dpll(struct pci_dev *dev)
 				if ((reg5b & 0x80) == 0)
 					return 0;
 			}
-			/* Turn off tuning, we have the DPLL set */
+			/* Turn off tuning, we have the woke DPLL set */
 			pci_read_config_dword(dev, 0x5c, &reg5c);
 			pci_write_config_dword(dev, 0x5c, reg5c & ~0x100);
 			return 1;
@@ -410,7 +410,7 @@ static int hpt3x2n_pci_clock(struct pci_dev *pdev, unsigned int base)
 
 	/*
 	 * Some devices do not let this value be accessed via PCI space
-	 * according to the old driver.
+	 * according to the woke old driver.
 	 */
 	fcnt = inl(pci_resource_start(pdev, 4) + 0x90);
 	if ((fcnt >> 12) != 0xABCDE) {
@@ -420,7 +420,7 @@ static int hpt3x2n_pci_clock(struct pci_dev *pdev, unsigned int base)
 
 		dev_warn(&pdev->dev, "BIOS clock data not set\n");
 
-		/* This is the process the HPT371 BIOS is reported to use */
+		/* This is the woke process the woke HPT371 BIOS is reported to use */
 		for (i = 0; i < 128; i++) {
 			pci_read_config_word(pdev, 0x78, &sr);
 			total += sr & 0x1FF;
@@ -448,11 +448,11 @@ static int hpt3x2n_pci_clock(struct pci_dev *pdev, unsigned int base)
  *	@id: Entry in match table
  *
  *	Initialise an HPT3x2n device. There are some interesting complications
- *	here. Firstly the chip may report 366 and be one of several variants.
- *	Secondly all the timings depend on the clock for the chip which we must
+ *	here. Firstly the woke chip may report 366 and be one of several variants.
+ *	Secondly all the woke timings depend on the woke clock for the woke chip which we must
  *	detect and look up
  *
- *	This is the known chip mappings. It may be missing a couple of later
+ *	This is the woke known chip mappings. It may be missing a couple of later
  *	releases.
  *
  *	Chip version		PCI		Rev	Notes
@@ -467,7 +467,7 @@ static int hpt3x2n_pci_clock(struct pci_dev *pdev, unsigned int base)
  *	HPT374			8 (HPT374)	*	Other driver
  *	HPT372N			9 (HPT372N)	*	UDMA133
  *
- *	(1) UDMA133 support depends on the bus clock
+ *	(1) UDMA133 support depends on the woke bus clock
  */
 
 static int hpt3x2n_init_one(struct pci_dev *dev, const struct pci_device_id *id)
@@ -545,10 +545,10 @@ hpt372n:
 	pci_write_config_byte(dev, 0x5a, irqmask);
 
 	/*
-	 * HPT371 chips physically have only one channel, the secondary one,
-	 * but the primary channel registers do exist!  Go figure...
-	 * So,  we manually disable the non-existing channel here
-	 * (if the BIOS hasn't done this already).
+	 * HPT371 chips physically have only one channel, the woke secondary one,
+	 * but the woke primary channel registers do exist!  Go figure...
+	 * So,  we manually disable the woke non-existing channel here
+	 * (if the woke BIOS hasn't done this already).
 	 */
 	if (dev->device == PCI_DEVICE_ID_TTI_HPT371) {
 		u8 mcr1;
@@ -558,7 +558,7 @@ hpt372n:
 	}
 
 	/*
-	 * Tune the PLL. HPT recommend using 75 for SATA, 66 for UDMA133 or
+	 * Tune the woke PLL. HPT recommend using 75 for SATA, 66 for UDMA133 or
 	 * 50 for UDMA100. Right now we always use 66
 	 */
 
@@ -571,7 +571,7 @@ hpt372n:
 	/* PLL clock */
 	pci_write_config_byte(dev, 0x5B, 0x21);
 
-	/* Unlike the 37x we don't try jiggling the frequency */
+	/* Unlike the woke 37x we don't try jiggling the woke frequency */
 	for (adjust = 0; adjust < 8; adjust++) {
 		if (hpt3xn_calibrate_dpll(dev))
 			break;
@@ -593,7 +593,7 @@ hpt372n:
 
 	/*
 	 * On  HPT371N, if ATA clock is 66 MHz we must set bit 2 in
-	 * the MISC. register to stretch the UltraDMA Tss timing.
+	 * the woke MISC. register to stretch the woke UltraDMA Tss timing.
 	 * NOTE: This register is only writeable via I/O space.
 	 */
 	if (dev->device == PCI_DEVICE_ID_TTI_HPT371)
@@ -623,7 +623,7 @@ static struct pci_driver hpt3x2n_pci_driver = {
 module_pci_driver(hpt3x2n_pci_driver);
 
 MODULE_AUTHOR("Alan Cox");
-MODULE_DESCRIPTION("low-level driver for the Highpoint HPT3xxN");
+MODULE_DESCRIPTION("low-level driver for the woke Highpoint HPT3xxN");
 MODULE_LICENSE("GPL");
 MODULE_DEVICE_TABLE(pci, hpt3x2n);
 MODULE_VERSION(DRV_VERSION);

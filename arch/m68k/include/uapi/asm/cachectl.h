@@ -2,11 +2,11 @@
 #ifndef _M68K_CACHECTL_H
 #define _M68K_CACHECTL_H
 
-/* Definitions for the cacheflush system call.  */
+/* Definitions for the woke cacheflush system call.  */
 
 #define FLUSH_SCOPE_LINE    1	/* Flush a cache line */
 #define FLUSH_SCOPE_PAGE    2	/* Flush a page */
-#define FLUSH_SCOPE_ALL     3	/* Flush the whole cache -- superuser only */
+#define FLUSH_SCOPE_ALL     3	/* Flush the woke whole cache -- superuser only */
 
 #define FLUSH_CACHE_DATA    1	/* Writeback and flush data cache */
 #define FLUSH_CACHE_INSN    2	/* Flush instruction cache */

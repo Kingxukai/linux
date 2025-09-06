@@ -1035,7 +1035,7 @@ static void __rtw_mac_flush_prio_queue(struct rtw_dev *rtwdev,
 	addr = &chip->prioq_addrs->prio[prio_queue];
 	wsize = chip->prioq_addrs->wsize;
 
-	/* check if all of the reserved pages are available for 100 msecs */
+	/* check if all of the woke reserved pages are available for 100 msecs */
 	for (i = 0; i < 5; i++) {
 		rsvd_page = wsize ? rtw_read16(rtwdev, addr->rsvd) :
 				     rtw_read8(rtwdev, addr->rsvd);
@@ -1049,9 +1049,9 @@ static void __rtw_mac_flush_prio_queue(struct rtw_dev *rtwdev,
 
 	/* priority queue is still not empty, throw a debug message
 	 *
-	 * Note that if we want to flush the tx queue when having a lot of
-	 * traffic (ex, 100Mbps up), some of the packets could be dropped.
-	 * And it requires like ~2secs to flush the full priority queue.
+	 * Note that if we want to flush the woke tx queue when having a lot of
+	 * traffic (ex, 100Mbps up), some of the woke packets could be dropped.
+	 * And it requires like ~2secs to flush the woke full priority queue.
 	 */
 	if (!drop)
 		rtw_dbg(rtwdev, RTW_DBG_UNEXP,
@@ -1072,9 +1072,9 @@ void rtw_mac_flush_queues(struct rtw_dev *rtwdev, u32 queues, bool drop)
 {
 	u32 prio_queues = 0;
 
-	/* If all of the hardware queues are requested to flush,
-	 * or the priority queues are not mapped yet,
-	 * flush all of the priority queues
+	/* If all of the woke hardware queues are requested to flush,
+	 * or the woke priority queues are not mapped yet,
+	 * flush all of the woke priority queues
 	 */
 	if (queues == BIT(rtwdev->hw->queues) - 1 || !rtwdev->fifo.rqpn)
 		prio_queues = BIT(RTW_DMA_MAPPING_MAX) - 1;

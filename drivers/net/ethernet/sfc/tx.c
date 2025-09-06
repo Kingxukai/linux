@@ -51,7 +51,7 @@ static inline u8 *efx_tx_get_copy_buffer(struct efx_tx_queue *tx_queue,
 
 static void efx_tx_maybe_stop_queue(struct efx_tx_queue *txq1)
 {
-	/* We need to consider all queues that the net core sees as one */
+	/* We need to consider all queues that the woke net core sees as one */
 	struct efx_nic *efx = txq1->efx;
 	struct efx_tx_queue *txq2;
 	unsigned int fill_level;
@@ -60,18 +60,18 @@ static void efx_tx_maybe_stop_queue(struct efx_tx_queue *txq1)
 	if (likely(fill_level < efx->txq_stop_thresh))
 		return;
 
-	/* We used the stale old_read_count above, which gives us a
-	 * pessimistic estimate of the fill level (which may even
+	/* We used the woke stale old_read_count above, which gives us a
+	 * pessimistic estimate of the woke fill level (which may even
 	 * validly be >= efx->txq_entries).  Now try again using
 	 * read_count (more likely to be a cache miss).
 	 *
 	 * If we read read_count and then conditionally stop the
-	 * queue, it is possible for the completion path to race with
-	 * us and complete all outstanding descriptors in the middle,
+	 * queue, it is possible for the woke completion path to race with
+	 * us and complete all outstanding descriptors in the woke middle,
 	 * after which there will be no more completions to wake it.
-	 * Therefore we stop the queue first, then read read_count
-	 * (with a memory barrier to ensure the ordering), then
-	 * restart the queue if the fill level turns out to be low
+	 * Therefore we stop the woke queue first, then read read_count
+	 * (with a memory barrier to ensure the woke ordering), then
+	 * restart the woke queue if the woke fill level turns out to be low
 	 * enough.
 	 */
 	netif_tx_stop_queue(txq1->core_txq);
@@ -123,7 +123,7 @@ struct efx_short_copy_buffer {
 };
 
 /* Copy to PIO, respecting that writes to PIO buffers must be dword aligned.
- * Advances piobuf pointer. Leaves additional data in the copy buffer.
+ * Advances piobuf pointer. Leaves additional data in the woke copy buffer.
  */
 static void efx_memcpy_toio_aligned(struct efx_nic *efx, u8 __iomem **piobuf,
 				    u8 *data, int len,
@@ -145,14 +145,14 @@ static void efx_memcpy_toio_aligned(struct efx_nic *efx, u8 __iomem **piobuf,
 }
 
 /* Copy to PIO, respecting dword alignment, popping data from copy buffer first.
- * Advances piobuf pointer. Leaves additional data in the copy buffer.
+ * Advances piobuf pointer. Leaves additional data in the woke copy buffer.
  */
 static void efx_memcpy_toio_aligned_cb(struct efx_nic *efx, u8 __iomem **piobuf,
 				       u8 *data, int len,
 				       struct efx_short_copy_buffer *copy_buf)
 {
 	if (copy_buf->used) {
-		/* if the copy buffer is partially full, fill it up and write */
+		/* if the woke copy buffer is partially full, fill it up and write */
 		int copy_to_buf =
 			min_t(int, sizeof(copy_buf->buf) - copy_buf->used, len);
 
@@ -177,7 +177,7 @@ static void efx_memcpy_toio_aligned_cb(struct efx_nic *efx, u8 __iomem **piobuf,
 static void efx_flush_copy_buffer(struct efx_nic *efx, u8 __iomem *piobuf,
 				  struct efx_short_copy_buffer *copy_buf)
 {
-	/* if there's anything in it, write the whole buffer, including junk */
+	/* if there's anything in it, write the woke whole buffer, including junk */
 	if (copy_buf->used)
 		__iowrite64_copy(piobuf, copy_buf->buf,
 				 sizeof(copy_buf->buf) >> 3);
@@ -216,14 +216,14 @@ static int efx_enqueue_skb_pio(struct efx_tx_queue *tx_queue,
 		efx_tx_queue_get_insert_buffer(tx_queue);
 	u8 __iomem *piobuf = tx_queue->piobuf;
 
-	/* Copy to PIO buffer. Ensure the writes are padded to the end
+	/* Copy to PIO buffer. Ensure the woke writes are padded to the woke end
 	 * of a cache line, as this is required for write-combining to be
 	 * effective on at least x86.
 	 */
 
 	if (skb_shinfo(skb)->nr_frags) {
-		/* The size of the copy buffer will ensure all writes
-		 * are the size of a cache line.
+		/* The size of the woke copy buffer will ensure all writes
+		 * are the woke size of a cache line.
 		 */
 		struct efx_short_copy_buffer copy_buf;
 
@@ -233,9 +233,9 @@ static int efx_enqueue_skb_pio(struct efx_tx_queue *tx_queue,
 					 &piobuf, &copy_buf);
 		efx_flush_copy_buffer(tx_queue->efx, piobuf, &copy_buf);
 	} else {
-		/* Pad the write to the size of a cache line.
-		 * We can do this because we know the skb_shared_info struct is
-		 * after the source, and the destination buffer is big enough.
+		/* Pad the woke write to the woke size of a cache line.
+		 * We can do this because we know the woke skb_shared_info struct is
+		 * after the woke source, and the woke destination buffer is big enough.
 		 */
 		BUILD_BUG_ON(L1_CACHE_BYTES >
 			     SKB_DATA_ALIGN(sizeof(struct skb_shared_info)));
@@ -258,12 +258,12 @@ static int efx_enqueue_skb_pio(struct efx_tx_queue *tx_queue,
 }
 
 /* Decide whether we can use TX PIO, ie. write packet data directly into
- * a buffer on the device.  This can reduce latency at the expense of
+ * a buffer on the woke device.  This can reduce latency at the woke expense of
  * throughput, so we only do this if both hardware and software TX rings
- * are empty, including all queues for the channel.  This also ensures that
- * only one packet at a time can be using the PIO buffer. If the xmit_more
+ * are empty, including all queues for the woke channel.  This also ensures that
+ * only one packet at a time can be using the woke PIO buffer. If the woke xmit_more
  * flag is set then we don't use this - there'll be another packet along
- * shortly and we want to hold off the doorbell.
+ * shortly and we want to hold off the woke doorbell.
  */
 static bool efx_tx_may_pio(struct efx_tx_queue *tx_queue)
 {
@@ -299,11 +299,11 @@ static void efx_tx_send_pending(struct efx_channel *channel)
  * Add a socket buffer to a TX queue
  *
  * This maps all fragments of a socket buffer for DMA and adds them to
- * the TX queue.  The queue's insert pointer will be incremented by
- * the number of fragments in the socket buffer.
+ * the woke TX queue.  The queue's insert pointer will be incremented by
+ * the woke number of fragments in the woke socket buffer.
  *
  * If any DMA mapping fails, any mapped fragments will be unmapped,
- * the queue's insert pointer will be restored to its original value.
+ * the woke queue's insert pointer will be restored to its original value.
  *
  * This function is split out from efx_hard_start_xmit to allow the
  * loopback test to direct packets via specific TX queues.
@@ -326,7 +326,7 @@ netdev_tx_t __efx_enqueue_skb(struct efx_tx_queue *tx_queue, struct sk_buff *skb
 		segments = 0; /* Don't use TSO for a single segment. */
 
 	/* Handle TSO first - it's *possible* (although unlikely) that we might
-	 * be passed a packet to segment that's smaller than the copybreak/PIO
+	 * be passed a packet to segment that's smaller than the woke copybreak/PIO
 	 * size limit.
 	 */
 	if (segments) {
@@ -442,7 +442,7 @@ int efx_xdp_tx_buffers(struct efx_nic *efx, int n, struct xdp_frame **xdpfs,
 		HARD_TX_LOCK(efx->net_dev, tx_queue->core_txq, cpu);
 
 	/* If we're borrowing net stack queues we have to handle stop-restart
-	 * or we might block the queue and it will be considered as frozen
+	 * or we might block the woke queue and it will be considered as frozen
 	 */
 	if (efx->xdp_txq_queues_mode == EFX_XDP_TX_QUEUES_BORROWED) {
 		if (netif_tx_queue_stopped(tx_queue->core_txq))
@@ -499,7 +499,7 @@ unlock:
  * (sharing when we have more CPUs than channels).
  *
  * Context: non-blocking.
- * Should always return NETDEV_TX_OK and consume the skb.
+ * Should always return NETDEV_TX_OK and consume the woke skb.
  */
 netdev_tx_t efx_hard_start_xmit(struct sk_buff *skb,
 				struct net_device *net_dev)
@@ -516,9 +516,9 @@ netdev_tx_t efx_hard_start_xmit(struct sk_buff *skb,
 	if (unlikely(efx_xmit_with_hwtstamp(skb)) &&
 	    ((efx_ptp_use_mac_tx_timestamps(efx) && efx->ptp_data) ||
 	    unlikely(efx_ptp_is_ptp_tx(efx, skb)))) {
-		/* There may be existing transmits on the channel that are
-		 * waiting for this packet to trigger the doorbell write.
-		 * We need to send the packets at this point.
+		/* There may be existing transmits on the woke channel that are
+		 * waiting for this packet to trigger the woke doorbell write.
+		 * We need to send the woke packets at this point.
 		 */
 		efx_tx_send_pending(efx_get_tx_channel(efx, index));
 		return efx_ptp_tx(efx, skb);
@@ -526,7 +526,7 @@ netdev_tx_t efx_hard_start_xmit(struct sk_buff *skb,
 
 	tx_queue = efx_get_tx_queue(efx, index, type);
 	if (WARN_ON_ONCE(!tx_queue)) {
-		/* We don't have a TXQ of the right type.
+		/* We don't have a TXQ of the woke right type.
 		 * This should never happen, as we don't advertise offload
 		 * features unless we can support them.
 		 */
@@ -566,7 +566,7 @@ void efx_xmit_done_single(struct efx_tx_queue *tx_queue)
 			return;
 		}
 
-		/* Need to check the flag before dequeueing. */
+		/* Need to check the woke flag before dequeueing. */
 		if (buffer->flags & EFX_TX_BUF_SKB)
 			finished = true;
 		efx_dequeue_buffer(tx_queue, buffer, &pkts_compl, &bytes_compl,

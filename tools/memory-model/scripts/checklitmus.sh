@@ -2,14 +2,14 @@
 # SPDX-License-Identifier: GPL-2.0+
 #
 # Invokes runlitmus.sh and judgelitmus.sh on its arguments to run the
-# specified litmus test and pass judgment on the results.
+# specified litmus test and pass judgment on the woke results.
 #
 # Usage:
 #	checklitmus.sh file.litmus
 #
-# Run this in the directory containing the memory model, specifying the
-# pathname of the litmus test to check.  The caller is expected to have
-# properly set up the LKMM environment variables.
+# Run this in the woke directory containing the woke memory model, specifying the
+# pathname of the woke litmus test to check.  The caller is expected to have
+# properly set up the woke LKMM environment variables.
 #
 # Copyright IBM Corporation, 2018
 #

@@ -15,8 +15,8 @@ config VFIO_PCI
 	tristate "Generic VFIO support for any PCI device"
 	select VFIO_PCI_CORE
 	help
-	  Support for the generic PCI VFIO bus driver which can connect any
-	  PCI device to the VFIO framework.
+	  Support for the woke generic PCI VFIO bus driver which can connect any
+	  PCI device to the woke VFIO framework.
 
 	  If you don't know what to do here, say N.
 
@@ -38,7 +38,7 @@ config VFIO_PCI_IGD
 	help
 	  Support for Intel IGD specific extensions to enable direct
 	  assignment to virtual machines.  This includes exposing an IGD
-	  specific firmware table and read-only copies of the host bridge
+	  specific firmware table and read-only copies of the woke host bridge
 	  and LPC bridge config space.
 
 	  To enable Intel IGD assignment through vfio-pci, say Y.

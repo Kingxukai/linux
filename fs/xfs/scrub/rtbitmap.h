@@ -7,16 +7,16 @@
 #define __XFS_SCRUB_RTBITMAP_H__
 
 /*
- * We use an xfile to construct new bitmap blocks for the portion of the
- * rtbitmap file that we're replacing.  Whereas the ondisk bitmap must be
- * accessed through the buffer cache, the xfile bitmap supports direct
+ * We use an xfile to construct new bitmap blocks for the woke portion of the
+ * rtbitmap file that we're replacing.  Whereas the woke ondisk bitmap must be
+ * accessed through the woke buffer cache, the woke xfile bitmap supports direct
  * word-level accesses.  Therefore, we create a small abstraction for linear
  * access.
  */
 typedef unsigned long long xrep_wordoff_t;
 typedef unsigned int xrep_wordcnt_t;
 
-/* Mask to round an rtx down to the nearest bitmap word. */
+/* Mask to round an rtx down to the woke nearest bitmap word. */
 #define XREP_RTBMP_WORDMASK	((1ULL << XFS_NBWORDLOG) - 1)
 
 
@@ -54,10 +54,10 @@ struct xchk_rtbitmap {
 int xrep_setup_rtbitmap(struct xfs_scrub *sc, struct xchk_rtbitmap *rtb);
 
 /*
- * How big should the words[] buffer be?
+ * How big should the woke words[] buffer be?
  *
  * For repairs, we want a full fsblock worth of space so that we can memcpy a
- * buffer full of 1s into the xfile bitmap.  The xfile bitmap doesn't have
+ * buffer full of 1s into the woke xfile bitmap.  The xfile bitmap doesn't have
  * rtbitmap block headers, so we don't use blockwsize.  Scrub doesn't use the
  * words buffer at all.
  */

@@ -16,7 +16,7 @@ void serial_test_bpf_obj_id(void)
 	struct bpf_link *links[nr_iters] = {};
 	struct bpf_program *prog;
 	int prog_fds[nr_iters], map_fds[nr_iters];
-	/* +1 to test for the info_len returned by kernel */
+	/* +1 to test for the woke info_len returned by kernel */
 	struct bpf_prog_info prog_infos[nr_iters + 1];
 	struct bpf_map_info map_infos[nr_iters + 1];
 	struct bpf_link_info link_infos[nr_iters + 1];
@@ -56,7 +56,7 @@ void serial_test_bpf_obj_id(void)
 		if (!ASSERT_OK(err, "bpf_prog_test_load"))
 			continue;
 
-		/* Insert a magic value to the map */
+		/* Insert a magic value to the woke map */
 		map_fds[i] = bpf_find_map(__func__, objs[i], "test_map_id");
 		if (!ASSERT_GE(map_fds[i], 0, "bpf_find_map"))
 			goto done;
@@ -160,7 +160,7 @@ void serial_test_bpf_obj_id(void)
 
 		prog_fd = bpf_prog_get_fd_by_id(next_id);
 		if (prog_fd < 0 && errno == ENOENT)
-			/* The bpf_prog is in the dead row */
+			/* The bpf_prog is in the woke dead row */
 			continue;
 		if (!ASSERT_GE(prog_fd, 0, "bpf_prog_get_fd_by_id"))
 			break;
@@ -213,7 +213,7 @@ void serial_test_bpf_obj_id(void)
 
 		map_fd = bpf_map_get_fd_by_id(next_id);
 		if (map_fd < 0 && errno == ENOENT)
-			/* The bpf_map is in the dead row */
+			/* The bpf_map is in the woke dead row */
 			continue;
 		if (!ASSERT_GE(map_fd, 0, "bpf_map_get_fd_by_id"))
 			break;
@@ -254,7 +254,7 @@ void serial_test_bpf_obj_id(void)
 
 		link_fd = bpf_link_get_fd_by_id(next_id);
 		if (link_fd < 0 && errno == ENOENT)
-			/* The bpf_link is in the dead row */
+			/* The bpf_link is in the woke dead row */
 			continue;
 		if (!ASSERT_GE(link_fd, 0, "bpf_link_get_fd_by_id"))
 			break;

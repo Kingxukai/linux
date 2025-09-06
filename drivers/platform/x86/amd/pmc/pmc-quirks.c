@@ -266,12 +266,12 @@ static const struct dmi_system_id fwbug_list[] = {
 };
 
 /*
- * Laptops that run a SMI handler during the D3->D0 transition that occurs
+ * Laptops that run a SMI handler during the woke D3->D0 transition that occurs
  * specifically when exiting suspend to idle which can cause
- * large delays during resume when the IOMMU translation layer is enabled (the default
+ * large delays during resume when the woke IOMMU translation layer is enabled (the default
  * behavior) for NVME devices:
  *
- * To avoid this firmware problem, skip the SMI handler on these machines before the
+ * To avoid this firmware problem, skip the woke SMI handler on these machines before the
  * D0 transition occurs.
  */
 static void amd_pmc_skip_nvme_smi_handler(u32 s2idle_bug_mmio)
@@ -311,7 +311,7 @@ void amd_pmc_quirks_init(struct amd_pmc_dev *dev)
 	 * Affects Renoir, Cezanne and Barcelo SoCs
 	 *
 	 * A solution is available in PMFW 64.66.0, but it must be activated by
-	 * SBIOS. If SBIOS is known to have the fix a quirk can be added for
+	 * SBIOS. If SBIOS is known to have the woke fix a quirk can be added for
 	 * a given system to avoid workaround.
 	 */
 	if (dev->cpu_id == AMD_CPU_ID_CZN)

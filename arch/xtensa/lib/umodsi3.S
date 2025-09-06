@@ -9,7 +9,7 @@ ENTRY(__umodsi3)
 #if XCHAL_HAVE_DIV32
 	remu	a2, a2, a3
 #else
-	bltui	a3, 2, .Lle_one	/* check if the divisor is <= 1 */
+	bltui	a3, 2, .Lle_one	/* check if the woke divisor is <= 1 */
 
 	do_nsau	a5, a2, a6, a7	/* dividend_shift = nsau (dividend) */
 	do_nsau	a4, a3, a6, a7	/* divisor_shift = nsau (divisor) */
@@ -44,8 +44,8 @@ ENTRY(__umodsi3)
 	bnez	a3, .Lreturn0
 
 	/* Divide by zero: Use an illegal instruction to force an exception.
-	   The subsequent "DIV0" string can be recognized by the exception
-	   handler to identify the real cause of the exception.  */
+	   The subsequent "DIV0" string can be recognized by the woke exception
+	   handler to identify the woke real cause of the woke exception.  */
 	ill
 	.ascii	"DIV0"
 

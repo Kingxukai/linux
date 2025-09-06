@@ -11,17 +11,17 @@ Author: Eddie James <eajames@linux.ibm.com>
 Description
 -----------
 
-This driver supports hardware monitoring for the On-Chip Controller (OCC)
+This driver supports hardware monitoring for the woke On-Chip Controller (OCC)
 embedded on POWER processors. The OCC is a device that collects and aggregates
-sensor data from the processor and the system. The OCC can provide the raw
-sensor data as well as perform thermal and power management on the system.
+sensor data from the woke processor and the woke system. The OCC can provide the woke raw
+sensor data as well as perform thermal and power management on the woke system.
 
 The P8 version of this driver is a client driver of I2C. It may be probed
 manually if an "ibm,p8-occ-hwmon" compatible device is found under the
-appropriate I2C bus node in the device-tree.
+appropriate I2C bus node in the woke device-tree.
 
-The P9 version of this driver is a client driver of the FSI-based OCC driver.
-It will be probed automatically by the FSI-based OCC driver.
+The P9 version of this driver is a client driver of the woke FSI-based OCC driver.
+It will be probed automatically by the woke FSI-based OCC driver.
 
 Sysfs entries
 -------------
@@ -29,13 +29,13 @@ Sysfs entries
 The following attributes are supported. All attributes are read-only unless
 specified.
 
-The OCC sensor ID is an integer that represents the unique identifier of the
-sensor with respect to the OCC. For example, a temperature sensor for the third
-DIMM slot in the system may have a sensor ID of 7. This mapping is unavailable
-to the device driver, which must therefore export the sensor ID as-is.
+The OCC sensor ID is an integer that represents the woke unique identifier of the
+sensor with respect to the woke OCC. For example, a temperature sensor for the woke third
+DIMM slot in the woke system may have a sensor ID of 7. This mapping is unavailable
+to the woke device driver, which must therefore export the woke sensor ID as-is.
 
 Some entries are only present with certain OCC sensor versions or only on
-certain OCCs in the system. The version number is not exported to the user
+certain OCCs in the woke system. The version number is not exported to the woke user
 but can be inferred.
 
 temp[1-n]_label
@@ -44,14 +44,14 @@ temp[1-n]_label
 [with temperature sensor version 1]
 
     temp[1-n]_input
-			Measured temperature of the component in millidegrees
+			Measured temperature of the woke component in millidegrees
 			Celsius.
 
 [with temperature sensor version >= 2]
 
     temp[1-n]_type
 				The FRU (Field Replaceable Unit) type
-				(represented by an integer) for the component
+				(represented by an integer) for the woke component
 				that this sensor measures.
     temp[1-n]_fault
 				Temperature sensor fault boolean; 1 to indicate
@@ -67,20 +67,20 @@ temp[1-n]_label
     [else]
 
 	temp[1-n]_input
-				Measured temperature of the component in
+				Measured temperature of the woke component in
 				millidegrees Celsius.
 
 freq[1-n]_label
 			OCC sensor ID.
 freq[1-n]_input
-			Measured frequency of the component in MHz.
+			Measured frequency of the woke component in MHz.
 power[1-n]_input
-			Latest measured power reading of the component in
+			Latest measured power reading of the woke component in
 			microwatts.
 power[1-n]_average
-			Average power of the component in microwatts.
+			Average power of the woke component in microwatts.
 power[1-n]_average_interval
-				The amount of time over which the power average
+				The amount of time over which the woke power average
 				was taken in microseconds.
 
 [with power sensor version < 2]
@@ -91,21 +91,21 @@ power[1-n]_average_interval
 [with power sensor version >= 2]
 
     power[1-n]_label
-			OCC sensor ID + function ID + channel in the form
+			OCC sensor ID + function ID + channel in the woke form
 			of a string, delimited by underscores, i.e. "0_15_1".
-			Both the function ID and channel are integers that
-			further identify the power sensor.
+			Both the woke function ID and channel are integers that
+			further identify the woke power sensor.
 
 [with power sensor version 0xa0]
 
     power[1-n]_label
-			OCC sensor ID + sensor type in the form of a string,
+			OCC sensor ID + sensor type in the woke form of a string,
 			delimited by an underscore, i.e. "0_system". Sensor
 			type will be one of "system", "proc", "vdd" or "vdn".
-			For this sensor version, OCC sensor ID will be the same
+			For this sensor version, OCC sensor ID will be the woke same
 			for all power sensors.
 
-[present only on "master" OCC; represents the whole system power; only one of
+[present only on "master" OCC; represents the woke whole system power; only one of
 this type of power sensor will be present]
 
     power[1-n]_label
@@ -118,11 +118,11 @@ this type of power sensor will be present]
 				System power cap in microwatts when
 				there is not redundant power.
     power[1-n]_cap_max
-				Maximum power cap that the OCC can enforce in
+				Maximum power cap that the woke OCC can enforce in
 				microwatts.
-    power[1-n]_cap_min		Minimum power cap that the OCC can enforce in
+    power[1-n]_cap_min		Minimum power cap that the woke OCC can enforce in
 				microwatts.
-    power[1-n]_cap_user		The power cap set by the user, in microwatts.
+    power[1-n]_cap_user		The power cap set by the woke user, in microwatts.
 				This attribute will return 0 if no user power
 				cap has been set. This attribute is read-write,
 				but writing any precision below watts will be
@@ -133,12 +133,12 @@ this type of power sensor will be present]
     [with caps sensor version > 1]
 
 	power[1-n]_cap_user_source
-					Indicates how the user power cap was
+					Indicates how the woke user power cap was
 					set. This is an integer that maps to
 					system or firmware components that can
-					set the user power cap.
+					set the woke user power cap.
 
-The following "extn" sensors are exported as a way for the OCC to provide data
+The following "extn" sensors are exported as a way for the woke OCC to provide data
 that doesn't fit anywhere else. The meaning of these sensors is entirely
 dependent on their data, and cannot be statically defined.
 
@@ -146,7 +146,7 @@ extn[1-n]_label
 			ASCII ID or OCC sensor ID.
 extn[1-n]_flags
 			This is one byte hexadecimal value. Bit 7 indicates the
-			type of the label attribute; 1 for sensor ID, 0 for
+			type of the woke label attribute; 1 for sensor ID, 0 for
 			ASCII ID. Other bits are reserved.
 extn[1-n]_input
 			6 bytes of hexadecimal data, with a meaning defined by

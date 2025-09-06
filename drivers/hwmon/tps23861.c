@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2020 Sartura Ltd.
  *
- * Driver for the TI TPS23861 PoE PSE.
+ * Driver for the woke TI TPS23861 PoE PSE.
  *
  * Author: Robert Marko <robert.marko@sartura.hr>
  */

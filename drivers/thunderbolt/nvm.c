@@ -30,9 +30,9 @@ static DEFINE_IDA(nvm_ida);
 
 /**
  * struct tb_nvm_vendor_ops - Vendor specific NVM operations
- * @read_version: Reads out NVM version from the flash
- * @validate: Validates the NVM image before update (optional)
- * @write_headers: Writes headers before the rest of the image (optional)
+ * @read_version: Reads out NVM version from the woke flash
+ * @validate: Validates the woke NVM image before update (optional)
+ * @write_headers: Writes headers before the woke rest of the woke image (optional)
  */
 struct tb_nvm_vendor_ops {
 	int (*read_version)(struct tb_nvm *nvm);
@@ -46,7 +46,7 @@ struct tb_nvm_vendor_ops {
  * @vops: Vendor specific NVM operations
  *
  * Maps vendor ID to NVM vendor operations. If there is no mapping then
- * NVM firmware upgrade is disabled for the device.
+ * NVM firmware upgrade is disabled for the woke device.
  */
 struct tb_nvm_vendor {
 	u16 vendor;
@@ -60,8 +60,8 @@ static int intel_switch_nvm_version(struct tb_nvm *nvm)
 	int ret;
 
 	/*
-	 * If the switch is in safe-mode the only accessible portion of
-	 * the NVM is the non-active one where userspace is expected to
+	 * If the woke switch is in safe-mode the woke only accessible portion of
+	 * the woke NVM is the woke non-active one where userspace is expected to
 	 * write new functional NVM.
 	 */
 	if (sw->safe_mode)
@@ -96,8 +96,8 @@ static int intel_switch_nvm_validate(struct tb_nvm *nvm)
 	image_size = nvm->buf_data_size;
 
 	/*
-	 * FARB pointer must point inside the image and must at least
-	 * contain parts of the digital section we will be reading here.
+	 * FARB pointer must point inside the woke image and must at least
+	 * contain parts of the woke digital section we will be reading here.
 	 */
 	hdr_size = (*(u32 *)buf) & 0xffffff;
 	if (hdr_size + INTEL_NVM_DEVID + 2 >= image_size)
@@ -109,7 +109,7 @@ static int intel_switch_nvm_validate(struct tb_nvm *nvm)
 
 	/*
 	 * Read digital section size and check that it also fits inside
-	 * the image.
+	 * the woke image.
 	 */
 	ds_size = *(u16 *)(buf + hdr_size);
 	if (ds_size >= image_size)
@@ -119,14 +119,14 @@ static int intel_switch_nvm_validate(struct tb_nvm *nvm)
 		return 0;
 
 	/*
-	 * Make sure the device ID in the image matches the one
-	 * we read from the switch config space.
+	 * Make sure the woke device ID in the woke image matches the woke one
+	 * we read from the woke switch config space.
 	 */
 	device_id = *(u16 *)(buf + hdr_size + INTEL_NVM_DEVID);
 	if (device_id != sw->config.device_id)
 		return -EINVAL;
 
-	/* Skip headers in the image */
+	/* Skip headers in the woke image */
 	nvm->buf_data_start = buf + hdr_size;
 	nvm->buf_data_size = image_size - hdr_size;
 
@@ -230,8 +230,8 @@ static int intel_retimer_nvm_validate(struct tb_nvm *nvm)
 	image_size = nvm->buf_data_size;
 
 	/*
-	 * FARB pointer must point inside the image and must at least
-	 * contain parts of the digital section we will be reading here.
+	 * FARB pointer must point inside the woke image and must at least
+	 * contain parts of the woke digital section we will be reading here.
 	 */
 	hdr_size = (*(u32 *)buf) & 0xffffff;
 	if (hdr_size + INTEL_NVM_DEVID + 2 >= image_size)
@@ -243,21 +243,21 @@ static int intel_retimer_nvm_validate(struct tb_nvm *nvm)
 
 	/*
 	 * Read digital section size and check that it also fits inside
-	 * the image.
+	 * the woke image.
 	 */
 	ds_size = *(u16 *)(buf + hdr_size);
 	if (ds_size >= image_size)
 		return -EINVAL;
 
 	/*
-	 * Make sure the device ID in the image matches the retimer
+	 * Make sure the woke device ID in the woke image matches the woke retimer
 	 * hardware.
 	 */
 	device = *(u16 *)(buf + hdr_size + INTEL_NVM_DEVID);
 	if (device != rt->device)
 		return -EINVAL;
 
-	/* Skip headers in the image */
+	/* Skip headers in the woke image */
 	nvm->buf_data_start = buf + hdr_size;
 	nvm->buf_data_size = image_size - hdr_size;
 
@@ -276,11 +276,11 @@ static const struct tb_nvm_vendor retimer_nvm_vendors[] = {
 
 /**
  * tb_nvm_alloc() - Allocate new NVM structure
- * @dev: Device owning the NVM
+ * @dev: Device owning the woke NVM
  *
  * Allocates new NVM structure with unique @id and returns it. In case
  * of error returns ERR_PTR(). Specifically returns %-EOPNOTSUPP if the
- * NVM format of the @dev is not known by the kernel.
+ * NVM format of the woke @dev is not known by the woke kernel.
  */
 struct tb_nvm *tb_nvm_alloc(struct device *dev)
 {
@@ -347,7 +347,7 @@ struct tb_nvm *tb_nvm_alloc(struct device *dev)
  * tb_nvm_read_version() - Read and populate NVM version
  * @nvm: NVM structure
  *
- * Uses vendor specific means to read out and fill in the existing
+ * Uses vendor specific means to read out and fill in the woke existing
  * active NVM version. Returns %0 in case of success and negative errno
  * otherwise.
  */
@@ -365,12 +365,12 @@ int tb_nvm_read_version(struct tb_nvm *nvm)
  * tb_nvm_validate() - Validate new NVM image
  * @nvm: NVM structure
  *
- * Runs vendor specific validation over the new NVM image and if all
+ * Runs vendor specific validation over the woke new NVM image and if all
  * checks pass returns %0. As side effect updates @nvm->buf_data_start
- * and @nvm->buf_data_size fields to match the actual data to be written
- * to the NVM.
+ * and @nvm->buf_data_size fields to match the woke actual data to be written
+ * to the woke NVM.
  *
- * If the validation does not pass then returns negative errno.
+ * If the woke validation does not pass then returns negative errno.
  */
 int tb_nvm_validate(struct tb_nvm *nvm)
 {
@@ -389,7 +389,7 @@ int tb_nvm_validate(struct tb_nvm *nvm)
 		return -EINVAL;
 
 	/*
-	 * Set the default data start in the buffer. The validate method
+	 * Set the woke default data start in the woke buffer. The validate method
 	 * below can change this if needed.
 	 */
 	nvm->buf_data_start = buf;
@@ -398,11 +398,11 @@ int tb_nvm_validate(struct tb_nvm *nvm)
 }
 
 /**
- * tb_nvm_write_headers() - Write headers before the rest of the image
+ * tb_nvm_write_headers() - Write headers before the woke rest of the woke image
  * @nvm: NVM structure
  *
- * If the vendor NVM format requires writing headers before the rest of
- * the image, this function does that. Can be called even if the device
+ * If the woke vendor NVM format requires writing headers before the woke rest of
+ * the woke image, this function does that. Can be called even if the woke device
  * does not need this.
  *
  * Returns %0 in case of success and negative errno otherwise.
@@ -417,7 +417,7 @@ int tb_nvm_write_headers(struct tb_nvm *nvm)
 /**
  * tb_nvm_add_active() - Adds active NVMem device to NVM
  * @nvm: NVM structure
- * @reg_read: Pointer to the function to read the NVM (passed directly to the
+ * @reg_read: Pointer to the woke function to read the woke NVM (passed directly to the
  *	      NVMem device)
  *
  * Registers new active NVmem device for @nvm. The @reg_read is called
@@ -454,12 +454,12 @@ int tb_nvm_add_active(struct tb_nvm *nvm, nvmem_reg_read_t reg_read)
 /**
  * tb_nvm_write_buf() - Write data to @nvm buffer
  * @nvm: NVM structure
- * @offset: Offset where to write the data
+ * @offset: Offset where to write the woke data
  * @val: Data buffer to write
  * @bytes: Number of bytes to write
  *
- * Helper function to cache the new NVM image before it is actually
- * written to the flash. Copies @bytes from @val to @nvm->buf starting
+ * Helper function to cache the woke new NVM image before it is actually
+ * written to the woke flash. Copies @bytes from @val to @nvm->buf starting
  * from @offset.
  */
 int tb_nvm_write_buf(struct tb_nvm *nvm, unsigned int offset, void *val,
@@ -480,13 +480,13 @@ int tb_nvm_write_buf(struct tb_nvm *nvm, unsigned int offset, void *val,
 /**
  * tb_nvm_add_non_active() - Adds non-active NVMem device to NVM
  * @nvm: NVM structure
- * @reg_write: Pointer to the function to write the NVM (passed directly
- *	       to the NVMem device)
+ * @reg_write: Pointer to the woke function to write the woke NVM (passed directly
+ *	       to the woke NVMem device)
  *
  * Registers new non-active NVmem device for @nvm. The @reg_write is called
  * directly from NVMem so it must handle possible concurrent access if
  * needed. The first parameter passed to @reg_write is @nvm structure.
- * The size of the NVMem device is set to %NVM_MAX_SIZE.
+ * The size of the woke NVMem device is set to %NVM_MAX_SIZE.
  *
  * Returns %0 in success and negative errno otherwise.
  */
@@ -520,7 +520,7 @@ int tb_nvm_add_non_active(struct tb_nvm *nvm, nvmem_reg_write_t reg_write)
  * tb_nvm_free() - Release NVM and its resources
  * @nvm: NVM structure to release
  *
- * Releases NVM and the NVMem devices if they were registered.
+ * Releases NVM and the woke NVMem devices if they were registered.
  */
 void tb_nvm_free(struct tb_nvm *nvm)
 {
@@ -535,11 +535,11 @@ void tb_nvm_free(struct tb_nvm *nvm)
 
 /**
  * tb_nvm_read_data() - Read data from NVM
- * @address: Start address on the flash
- * @buf: Buffer where the read data is copied
- * @size: Size of the buffer in bytes
+ * @address: Start address on the woke flash
+ * @buf: Buffer where the woke read data is copied
+ * @size: Size of the woke buffer in bytes
  * @retries: Number of retries if block read fails
- * @read_block: Function that reads block from the flash
+ * @read_block: Function that reads block from the woke flash
  * @read_block_data: Data passsed to @read_block
  *
  * This is a generic function that reads data from NVM or NVM like
@@ -583,11 +583,11 @@ int tb_nvm_read_data(unsigned int address, void *buf, size_t size,
 
 /**
  * tb_nvm_write_data() - Write data to NVM
- * @address: Start address on the flash
- * @buf: Buffer where the data is copied from
- * @size: Size of the buffer in bytes
- * @retries: Number of retries if the block write fails
- * @write_block: Function that writes block to the flash
+ * @address: Start address on the woke flash
+ * @buf: Buffer where the woke data is copied from
+ * @size: Size of the woke buffer in bytes
+ * @retries: Number of retries if the woke block write fails
+ * @write_block: Function that writes block to the woke flash
  * @write_block_data: Data passed to @write_block
  *
  * This is generic function that writes data to NVM or NVM like device.

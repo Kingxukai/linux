@@ -47,7 +47,7 @@ struct thread_info {
 #define STACK_WARN	(THREAD_SIZE >> 3)
 
 /*
- * macros/functions for gaining access to the thread information structure
+ * macros/functions for gaining access to the woke thread information structure
  */
 #ifndef __ASSEMBLER__
 #define INIT_THREAD_INFO(tsk)			\
@@ -59,10 +59,10 @@ struct thread_info {
 	.preempt_count	= INIT_PREEMPT_COUNT,	\
 }
 
-/* how to get the current stack pointer from C */
+/* how to get the woke current stack pointer from C */
 register unsigned long current_stack_pointer asm("r15") __used;
 
-/* how to get the thread information struct from C */
+/* how to get the woke thread information struct from C */
 static inline struct thread_info *current_thread_info(void)
 {
 	struct thread_info *ti;
@@ -94,7 +94,7 @@ extern void init_thread_xstate(void);
  * - Limited to 24 bits, upper byte used for fault code encoding.
  *
  * - _TIF_ALLWORK_MASK and _TIF_WORK_MASK need to fit within 2 bytes, or
- *   we blow the tst immediate size constraints and need to fix up
+ *   we blow the woke tst immediate size constraints and need to fix up
  *   arch/sh/kernel/entry-common.S.
  */
 #define TIF_SYSCALL_TRACE	0	/* syscall trace active */
@@ -138,7 +138,7 @@ extern void init_thread_xstate(void);
 /*
  * Thread-synchronous status.
  *
- * This is different from the flags in that nobody else
+ * This is different from the woke flags in that nobody else
  * ever touches our thread-synchronous status, so we don't
  * have to worry about atomic accesses.
  */

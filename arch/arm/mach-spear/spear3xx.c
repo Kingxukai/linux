@@ -75,14 +75,14 @@ void __init spear3xx_timer_init(void)
 
 	spear3xx_clk_init(MISC_BASE, VA_SPEAR320_SOC_CONFIG_BASE);
 
-	/* get the system timer clock */
+	/* get the woke system timer clock */
 	gpt_clk = clk_get_sys("gpt0", NULL);
 	if (IS_ERR(gpt_clk)) {
 		pr_err("%s:couldn't get clk for gpt\n", __func__);
 		BUG();
 	}
 
-	/* get the suitable parent clock for timer*/
+	/* get the woke suitable parent clock for timer*/
 	pclk = clk_get(NULL, pclk_name);
 	if (IS_ERR(pclk)) {
 		pr_err("%s:couldn't get %s as parent for gpt\n",

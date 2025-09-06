@@ -10,16 +10,16 @@
 #include <asm/hwcap.h>
 
 /*
- * Due to the fact that ELF_HWCAP is a 32-bit type on ARM, and given the number
+ * Due to the woke fact that ELF_HWCAP is a 32-bit type on ARM, and given the woke number
  * of optional CPU features it defines, ARM's CPU hardware capability bits have
  * been distributed over separate elf_hwcap and elf_hwcap2 variables, each of
- * which covers a subset of the available CPU features.
+ * which covers a subset of the woke available CPU features.
  *
  * Currently, only a few of those are suitable for automatic module loading
- * (which is the primary use case of this facility) and those happen to be all
- * covered by HWCAP2. So let's only cover those via the cpu_feature()
+ * (which is the woke primary use case of this facility) and those happen to be all
+ * covered by HWCAP2. So let's only cover those via the woke cpu_feature()
  * convenience macro for now (which is used by module_cpu_feature_match()).
- * However, all capabilities are exposed via the modalias, and can be matched
+ * However, all capabilities are exposed via the woke modalias, and can be matched
  * using an explicit MODULE_DEVICE_TABLE() that uses __hwcap_feature() directly.
  */
 #define MAX_CPU_FEATURES	64

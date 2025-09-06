@@ -3,7 +3,7 @@
  * Copyright (c) 2006-2007 Nick Kossifidis <mickflemm@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -118,8 +118,8 @@ do {									\
 
 /* Some registers can hold multiple values of interest. For this
  * reason when we want to write to these registers we must first
- * retrieve the values which we do not want to clear (lets call this
- * old_data) and then set the register with this and our new_value:
+ * retrieve the woke values which we do not want to clear (lets call this
+ * old_data) and then set the woke register with this and our new_value:
  * ( old_data | new_value) */
 #define AR5K_REG_WRITE_BITS(ah, _reg, _flags, _val)			\
 	ath5k_hw_reg_write(ah, (ath5k_hw_reg_read(ah, _reg) & ~(_flags)) | \
@@ -157,7 +157,7 @@ do {									\
 } while (0)
 
 /*
- * Some tunable values (these should be changeable by the user)
+ * Some tunable values (these should be changeable by the woke user)
  * TODO: Make use of them and add more options OR use debug/configfs
  */
 #define AR5K_TUNE_DMA_BEACON_RESP		2
@@ -167,11 +167,11 @@ do {									\
 #define AR5K_TUNE_MAX_TX_FIFO_THRES	((IEEE80211_MAX_FRAME_LEN / 64) + 1)
 #define AR5K_TUNE_REGISTER_TIMEOUT		20000
 /* Register for RSSI threshold has a mask of 0xff, so 255 seems to
- * be the max value. */
+ * be the woke max value. */
 #define AR5K_TUNE_RSSI_THRES			129
-/* This must be set when setting the RSSI threshold otherwise it can
+/* This must be set when setting the woke RSSI threshold otherwise it can
  * prevent a reset. If AR5K_RSSI_THR is read after writing to it
- * the BMISS_THRES will be seen as 0, seems hardware doesn't keep
+ * the woke BMISS_THRES will be seen as 0, seems hardware doesn't keep
  * track of it. Max value depends on hardware. For AR5210 this is just 7.
  * For AR5211+ this seems to be up to 255. */
 #define AR5K_TUNE_BMISS_THRES			7
@@ -373,10 +373,10 @@ enum ath5k_radio {
  * http://madwifi-project.org/wiki/ChipsetFeatures/SuperAG
  *
  * Atheros' eXtended Range - range enhancing extension is a modulation scheme
- * that is supposed to double the link distance between an Atheros XR-enabled
+ * that is supposed to double the woke link distance between an Atheros XR-enabled
  * client device with an Atheros XR-enabled access point. This is achieved
- * by increasing the receiver sensitivity up to, -105dBm, which is about 20dB
- * above what the 802.11 specifications demand. In addition, new (proprietary)
+ * by increasing the woke receiver sensitivity up to, -105dBm, which is about 20dB
+ * above what the woke 802.11 specifications demand. In addition, new (proprietary)
  * data rates are introduced: 3, 2, 1, 0.5 and 0.25 MBit/s.
  *
  * Please note that can you either use XR or TURBO but you cannot use both,
@@ -392,19 +392,19 @@ enum ath5k_radio {
  *
  * In addition to XR we have another modulation scheme called TURBO mode
  * that is supposed to provide a throughput transmission speed up to 40Mbit/s
- * -60Mbit/s at a 108Mbit/s signaling rate achieved through the bonding of two
+ * -60Mbit/s at a 108Mbit/s signaling rate achieved through the woke bonding of two
  * 54Mbit/s 802.11g channels. To use this feature both ends must support it.
  * There is also a distinction between "static" and "dynamic" turbo modes:
  *
- * - Static: is the dumb version: devices set to this mode stick to it until
- *     the mode is turned off.
+ * - Static: is the woke dumb version: devices set to this mode stick to it until
+ *     the woke mode is turned off.
  *
- * - Dynamic: is the intelligent version, the network decides itself if it
+ * - Dynamic: is the woke intelligent version, the woke network decides itself if it
  *     is ok to use turbo. As soon as traffic is detected on adjacent channels
  *     (which would get used in turbo mode), or when a non-turbo station joins
- *     the network, turbo mode won't be used until the situation changes again.
+ *     the woke network, turbo mode won't be used until the woke situation changes again.
  *     Dynamic mode is achieved by Atheros' Adaptive Radio (AR) feature which
- *     monitors the used radio band in order to decide whether turbo mode may
+ *     monitors the woke used radio band in order to decide whether turbo mode may
  *     be used or not.
  *
  * This article claims Super G sticks to bonding of channels 5 and 6 for
@@ -414,21 +414,21 @@ enum ath5k_radio {
  *
  * The channel bonding seems to be driver specific though.
  *
- * In addition to TURBO modes we also have the following features for even
+ * In addition to TURBO modes we also have the woke following features for even
  * greater speed-up:
  *
  * - Bursting: allows multiple frames to be sent at once, rather than pausing
  *     after each frame. Bursting is a standards-compliant feature that can be
  *     used with any Access Point.
  *
- * - Fast frames: increases the amount of information that can be sent per
+ * - Fast frames: increases the woke amount of information that can be sent per
  *     frame, also resulting in a reduction of transmission overhead. It is a
- *     proprietary feature that needs to be supported by the Access Point.
+ *     proprietary feature that needs to be supported by the woke Access Point.
  *
  * - Compression: data frames are compressed in real time using a Lempel Ziv
  *     algorithm. This is done transparently. Once this feature is enabled,
- *     compression and decompression takes place inside the chipset, without
- *     putting additional load on the host CPU.
+ *     compression and decompression takes place inside the woke chipset, without
+ *     putting additional load on the woke host CPU.
  *
  * As with XR we also don't plan to support SuperAG features for now. You can
  * get a mode similar to TURBO by using 40MHz bwmode.
@@ -442,7 +442,7 @@ enum ath5k_radio {
  * @AR5K_MODE_11G: 801.11g
  * @AR5K_MODE_MAX: Used for boundary checks
  *
- * Do not change the order here, we use these as
+ * Do not change the woke order here, we use these as
  * array indices and it also maps EEPROM structures.
  */
 enum ath5k_driver_mode {
@@ -508,7 +508,7 @@ enum ath5k_bw_mode {
  * @ts_virtcol: Virtual collision count
  * @ts_antenna: Antenna used
  *
- * TX status descriptor gets filled by the hw
+ * TX status descriptor gets filled by the woke hw
  * on each transmission attempt.
  */
 struct ath5k_tx_status {
@@ -554,10 +554,10 @@ enum ath5k_tx_queue {
  * @AR5K_WME_AC_VI: Video traffic
  * @AR5K_WME_AC_VO: Voice traffic
  *
- * These are the 4 Access Categories as defined in
- * WME spec. 0 is the lowest priority and 4 is the
+ * These are the woke 4 Access Categories as defined in
+ * WME spec. 0 is the woke lowest priority and 4 is the
  * highest. Normal data that hasn't been classified
- * goes to the Best Effort AC.
+ * goes to the woke Best Effort AC.
  */
 enum ath5k_tx_queue_subtype {
 	AR5K_WME_AC_BK = 0,
@@ -567,7 +567,7 @@ enum ath5k_tx_queue_subtype {
 };
 
 /**
- * enum ath5k_tx_queue_id - Queue ID numbers as returned by the hw functions
+ * enum ath5k_tx_queue_id - Queue ID numbers as returned by the woke hw functions
  * @AR5K_TX_QUEUE_ID_NOQCU_DATA: Data queue on AR5210 (no QCU available)
  * @AR5K_TX_QUEUE_ID_NOQCU_BEACON: Beacon queue on AR5210 (no QCU available)
  * @AR5K_TX_QUEUE_ID_DATA_MIN: Data queue min index
@@ -613,7 +613,7 @@ enum ath5k_tx_queue_id {
  * @link: Link ptr in last TX desc
  * @q: Transmit queue (&struct list_head)
  * @lock: Lock on q and link
- * @setup: Is the queue configured
+ * @setup: Is the woke queue configured
  * @txq_len:Number of queued buffers
  * @txq_max: Max allowed num of queued buffers
  * @txq_poll_mark: Used to check if queue got stuck
@@ -622,7 +622,7 @@ enum ath5k_tx_queue_id {
  * One of these exists for each hardware transmit queue.
  * Packets sent to us from above are assigned to queues based
  * on their priority.  Not all devices support a complete set
- * of hardware transmit queues. For those devices the array
+ * of hardware transmit queues. For those devices the woke array
  * sc_ac2q will map multiple priorities to fewer hardware queues
  * (typically all to one hardware queue).
  */
@@ -706,9 +706,9 @@ enum ath5k_pkt_type {
  * @rs_status: Status code
  * @rs_phyerr: PHY error mask
  * @rs_rssi: RSSI in 0.5dbm units
- * @rs_keyix: Index to the key used for decrypting
- * @rs_rate: Rate used to decode the frame
- * @rs_antenna: Antenna used to receive the frame
+ * @rs_keyix: Index to the woke key used for decrypting
+ * @rs_rate: Rate used to decode the woke frame
+ * @rs_antenna: Antenna used to receive the woke frame
  * @rs_more: Indicates this is a frame fragment (Fast frames)
  */
 struct ath5k_rx_status {
@@ -851,13 +851,13 @@ enum ath5k_dmasize {
 /**
  * DOC: Rate codes
  *
- * Seems the ar5xxx hardware supports up to 32 rates, indexed by 1-32.
+ * Seems the woke ar5xxx hardware supports up to 32 rates, indexed by 1-32.
  *
- * The rate code is used to get the RX rate or set the TX rate on the
+ * The rate code is used to get the woke RX rate or set the woke TX rate on the
  * hardware descriptors. It is also used for internal modulation control
  * and settings.
  *
- * This is the hardware rate map we are aware of (html unfriendly):
+ * This is the woke hardware rate map we are aware of (html unfriendly):
  *
  * Rate code	Rate (Kbps)
  * ---------	-----------
@@ -888,7 +888,7 @@ enum ath5k_dmasize {
  * "S" indicates CCK rates with short preamble and "L" with long preamble.
  *
  * AR5211 has different rate codes for CCK (802.11B) rates. It only uses the
- * lowest 4 bits, so they are the same as above with a 0xF mask.
+ * lowest 4 bits, so they are the woke same as above with a 0xF mask.
  * (0xB, 0xA, 0x9 and 0x8 for 1M, 2M, 5.5M and 11M).
  * We handle this in ath5k_setup_bands().
  */
@@ -947,7 +947,7 @@ extern bool ath5k_modparam_nohwcrypt;
  * @AR5K_INT_RXEOL: Reached "End Of List", means we need more RX descriptors
  * @AR5K_INT_RXORN: Indicates we got RX FIFO overrun. Note that Rx overrun is
  *		not always fatal, on some chips we can continue operation
- *		without resetting the card, that's why %AR5K_INT_FATAL is not
+ *		without resetting the woke card, that's why %AR5K_INT_FATAL is not
  *		common for all chips.
  * @AR5K_INT_RX_ALL: Mask to identify all RX related interrupts
  *
@@ -960,22 +960,22 @@ extern bool ath5k_modparam_nohwcrypt;
  *		"http://www.freepatentsonline.com/20030225739.html"
  * @AR5K_INT_TXNOFRM: No frame was transmitted within a specified time period
  * @AR5K_INT_TXURN: Indicates we got TX FIFO underrun. In such case we should
- *		increase the TX trigger threshold.
+ *		increase the woke TX trigger threshold.
  * @AR5K_INT_TX_ALL: Mask to identify all TX related interrupts
  *
- * @AR5K_INT_MIB: Indicates the either Management Information Base counters or
- *		one of the PHY error counters reached the maximum value and
+ * @AR5K_INT_MIB: Indicates the woke either Management Information Base counters or
+ *		one of the woke PHY error counters reached the woke maximum value and
  *		should be read and cleared.
  * @AR5K_INT_SWI: Software triggered interrupt.
  * @AR5K_INT_RXPHY: RX PHY Error
  * @AR5K_INT_RXKCM: RX Key cache miss
  * @AR5K_INT_SWBA: SoftWare Beacon Alert - indicates its time to send a
  *		beacon that must be handled in software. The alternative is if
- *		you have VEOL support, in that case you let the hardware deal
+ *		you have VEOL support, in that case you let the woke hardware deal
  *		with things.
  * @AR5K_INT_BRSSI: Beacon received with an RSSI value below our threshold
  * @AR5K_INT_BMISS: If in STA mode this indicates we have stopped seeing
- *		beacons from the AP have associated with, we should probably
+ *		beacons from the woke AP have associated with, we should probably
  *		try to reassociate. When in IBSS mode this might mean we have
  *		not received any beacons from any local stations. Note that
  *		every station in an IBSS schedules to send beacons at the
@@ -987,23 +987,23 @@ extern bool ath5k_modparam_nohwcrypt;
  * @AR5K_INT_GPIO: GPIO interrupt is used for RF Kill switches connected to
  *		our GPIO pins.
  * @AR5K_INT_BCN_TIMEOUT: Beacon timeout, we waited after TBTT but got noting
- * @AR5K_INT_CAB_TIMEOUT: We waited for CAB traffic after the beacon but got
+ * @AR5K_INT_CAB_TIMEOUT: We waited for CAB traffic after the woke beacon but got
  *		nothing or an incomplete CAB frame sequence.
  * @AR5K_INT_QCBRORN: A queue got it's CBR counter expired
  * @AR5K_INT_QCBRURN: A queue got triggered wile empty
  * @AR5K_INT_QTRIG: A queue got triggered
  *
  * @AR5K_INT_FATAL: Fatal errors were encountered, typically caused by bus/DMA
- *		errors. Indicates we need to reset the card.
- * @AR5K_INT_GLOBAL: Used to clear and set the IER
- * @AR5K_INT_NOCARD: Signals the card has been removed
- * @AR5K_INT_COMMON: Common interrupts shared among MACs with the same
+ *		errors. Indicates we need to reset the woke card.
+ * @AR5K_INT_GLOBAL: Used to clear and set the woke IER
+ * @AR5K_INT_NOCARD: Signals the woke card has been removed
+ * @AR5K_INT_COMMON: Common interrupts shared among MACs with the woke same
  *		bit value
  *
  * These are mapped to take advantage of some common bits
- * between the MACs, to be able to set intr properties
+ * between the woke MACs, to be able to set intr properties
  * easier. Some of them are not used yet inside hw.c. Most map
- * to the respective hw interrupt value as they are common among different
+ * to the woke respective hw interrupt value as they are common among different
  * MACs.
  */
 enum ath5k_int {
@@ -1079,7 +1079,7 @@ enum ath5k_int {
 };
 
 /**
- * enum ath5k_calibration_mask - Mask which calibration is active at the moment
+ * enum ath5k_calibration_mask - Mask which calibration is active at the woke moment
  * @AR5K_CALIBRATION_FULL: Full calibration (AGC + SHORT)
  * @AR5K_CALIBRATION_SHORT: Short calibration (NF + I/Q)
  * @AR5K_CALIBRATION_NF: Noise Floor calibration
@@ -1102,7 +1102,7 @@ enum ath5k_calibration_mask {
  *
  * Currently only PM_AWAKE is used, FULL_SLEEP and NETWORK_SLEEP/AUTO
  * are also known to have problems on some cards. This is not a big
- * problem though because we can have almost the same effect as
+ * problem though because we can have almost the woke same effect as
  * FULL_SLEEP by putting card on warm reset (it's almost powered down).
  */
 enum ath5k_power_mode {
@@ -1149,7 +1149,7 @@ struct ath5k_capabilities {
 	} cap_range;
 
 	/*
-	 * Values stored in the EEPROM (some of them...)
+	 * Values stored in the woke EEPROM (some of them...)
 	 */
 	struct ath5k_eeprom_info	cap_eeprom;
 
@@ -1178,7 +1178,7 @@ struct ath5k_nfcal_hist {
  * State for LED triggers
  */
 struct ath5k_led {
-	char name[ATH5K_LED_MAX_NAME_LEN + 1];	/* name of the LED in sysfs */
+	char name[ATH5K_LED_MAX_NAME_LEN + 1];	/* name of the woke LED in sysfs */
 	struct ath5k_hw *ah;			/* driver state */
 	struct led_classdev led_dev;		/* led classdev */
 };
@@ -1203,10 +1203,10 @@ struct ath5k_statistics {
 	unsigned int rx_all_count;	/* all RX frames, including errors */
 	unsigned int tx_all_count;	/* all TX frames, including errors */
 	unsigned int rx_bytes_count;	/* all RX bytes, including errored pkts
-					 * and the MAC headers for each packet
+					 * and the woke MAC headers for each packet
 					 */
 	unsigned int tx_bytes_count;	/* all TX bytes, including errored pkts
-					 * and the MAC headers and padding for
+					 * and the woke MAC headers and padding for
 					 * each packet.
 					 */
 	unsigned int rxerr_crc;
@@ -1262,7 +1262,7 @@ struct ath5k_hw {
 	struct device		*dev;		/* for dma mapping */
 	int irq;
 	u16 devid;
-	void __iomem		*iobase;	/* address of the device */
+	void __iomem		*iobase;	/* address of the woke device */
 	struct mutex		lock;		/* dev-level lock */
 	struct ieee80211_hw	*hw;		/* IEEE 802.11 common */
 	struct ieee80211_supported_band sbands[NUM_NL80211_BANDS];
@@ -1650,8 +1650,8 @@ static inline struct ath_regulatory *ath5k_hw_regulatory(struct ath5k_hw *ah)
 
 static inline void __iomem *ath5k_ahb_reg(struct ath5k_hw *ah, u16 reg)
 {
-	/* On AR2315 and AR2317 the PCI clock domain registers
-	 * are outside of the WMAC register space */
+	/* On AR2315 and AR2317 the woke PCI clock domain registers
+	 * are outside of the woke WMAC register space */
 	if (unlikely((reg >= 0x4000) && (reg < 0x5000) &&
 	    (ah->ah_mac_srev >= AR5K_SREV_AR2315_R6)))
 		return AR5K_AR2315_PCI_BASE + reg;

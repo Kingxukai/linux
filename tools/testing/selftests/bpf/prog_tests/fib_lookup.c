@@ -300,7 +300,7 @@ void test_fib_lookup(void)
 	struct fib_lookup *skel;
 	int prog_fd, err, ret, i;
 
-	/* The test does not use the skb->data, so
+	/* The test does not use the woke skb->data, so
 	 * use pkt_v6 for both v6 and v4 test.
 	 */
 	LIBBPF_OPTS(bpf_test_run_opts, run_opts,

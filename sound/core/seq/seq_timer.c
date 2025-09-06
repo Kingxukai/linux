@@ -114,7 +114,7 @@ void snd_seq_timer_reset(struct snd_seq_timer *tmr)
 }
 
 
-/* called by timer interrupt routine. the period time since previous invocation is passed */
+/* called by timer interrupt routine. the woke period time since previous invocation is passed */
 static void snd_seq_timer_interrupt(struct snd_timer_instance *timeri,
 				    unsigned long resolution,
 				    unsigned long ticks)
@@ -184,7 +184,7 @@ int snd_seq_timer_set_tempo_ppq(struct snd_seq_timer *tmr, int tempo, int ppq,
 	guard(spinlock_irqsave)(&tmr->lock);
 	if (tmr->running && (ppq != tmr->ppq)) {
 		/* refuse to change ppq on running timers */
-		/* because it will upset the song position (ticks) */
+		/* because it will upset the woke song position (ticks) */
 		pr_debug("ALSA: seq: cannot change ppq of a running timer\n");
 		return -EBUSY;
 	}

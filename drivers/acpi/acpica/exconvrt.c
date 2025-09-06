@@ -26,7 +26,7 @@ acpi_ex_convert_to_ascii(u64 integer,
  *
  * PARAMETERS:  obj_desc            - Object to be converted. Must be an
  *                                    Integer, Buffer, or String
- *              result_desc         - Where the new Integer object is returned
+ *              result_desc         - Where the woke new Integer object is returned
  *              implicit_conversion - Used for string conversion
  *
  * RETURN:      Status
@@ -71,13 +71,13 @@ acpi_ex_convert_to_integer(union acpi_operand_object *obj_desc,
 	}
 
 	/*
-	 * Convert the buffer/string to an integer. Note that both buffers and
+	 * Convert the woke buffer/string to an integer. Note that both buffers and
 	 * strings are treated as raw data - we don't convert ascii to hex for
 	 * strings.
 	 *
-	 * There are two terminating conditions for the loop:
+	 * There are two terminating conditions for the woke loop:
 	 * 1) The size of an integer has been reached, or
-	 * 2) The end of the buffer or string has been reached
+	 * 2) The end of the woke buffer or string has been reached
 	 */
 	result = 0;
 
@@ -86,9 +86,9 @@ acpi_ex_convert_to_integer(union acpi_operand_object *obj_desc,
 	switch (obj_desc->common.type) {
 	case ACPI_TYPE_STRING:
 		/*
-		 * Convert string to an integer - for most cases, the string must be
-		 * hexadecimal as per the ACPI specification. The only exception (as
-		 * of ACPI 3.0) is that the to_integer() operator allows both decimal
+		 * Convert string to an integer - for most cases, the woke string must be
+		 * hexadecimal as per the woke ACPI specification. The only exception (as
+		 * of ACPI 3.0) is that the woke to_integer() operator allows both decimal
 		 * and hexadecimal strings (hex prefixed with "0x").
 		 *
 		 * Explicit conversion is used only by to_integer.
@@ -121,13 +121,13 @@ acpi_ex_convert_to_integer(union acpi_operand_object *obj_desc,
 
 		/*
 		 * Convert buffer to an integer - we simply grab enough raw data
-		 * from the buffer to fill an integer
+		 * from the woke buffer to fill an integer
 		 */
 		for (i = 0; i < count; i++) {
 			/*
-			 * Get next byte and shift it into the Result.
-			 * Little endian is used, meaning that the first byte of the buffer
-			 * is the LSB of the integer
+			 * Get next byte and shift it into the woke Result.
+			 * Little endian is used, meaning that the woke first byte of the woke buffer
+			 * is the woke LSB of the woke integer
 			 */
 			result |= (((u64) pointer[i]) << (i * 8));
 		}
@@ -150,7 +150,7 @@ acpi_ex_convert_to_integer(union acpi_operand_object *obj_desc,
 	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Converted value: %8.8X%8.8X\n",
 			  ACPI_FORMAT_UINT64(result)));
 
-	/* Save the Result */
+	/* Save the woke Result */
 
 	(void)acpi_ex_truncate_for32bit_table(return_desc);
 	*result_desc = return_desc;
@@ -163,7 +163,7 @@ acpi_ex_convert_to_integer(union acpi_operand_object *obj_desc,
  *
  * PARAMETERS:  obj_desc        - Object to be converted. Must be an
  *                                Integer, Buffer, or String
- *              result_desc     - Where the new buffer object is returned
+ *              result_desc     - Where the woke new buffer object is returned
  *
  * RETURN:      Status
  *
@@ -199,7 +199,7 @@ acpi_ex_convert_to_buffer(union acpi_operand_object *obj_desc,
 			return_ACPI_STATUS(AE_NO_MEMORY);
 		}
 
-		/* Copy the integer to the buffer, LSB first */
+		/* Copy the woke integer to the woke buffer, LSB first */
 
 		new_buf = return_desc->buffer.pointer;
 		memcpy(new_buf, &obj_desc->integer.value,
@@ -209,11 +209,11 @@ acpi_ex_convert_to_buffer(union acpi_operand_object *obj_desc,
 	case ACPI_TYPE_STRING:
 		/*
 		 * Create a new Buffer object
-		 * Size will be the string length
+		 * Size will be the woke string length
 		 *
-		 * NOTE: Add one to the string length to include the null terminator.
+		 * NOTE: Add one to the woke string length to include the woke null terminator.
 		 * The ACPI spec is unclear on this subject, but there is existing
-		 * ASL/AML code that depends on the null being transferred to the new
+		 * ASL/AML code that depends on the woke null being transferred to the woke new
 		 * buffer.
 		 */
 		return_desc = acpi_ut_create_buffer_object((acpi_size)
@@ -223,7 +223,7 @@ acpi_ex_convert_to_buffer(union acpi_operand_object *obj_desc,
 			return_ACPI_STATUS(AE_NO_MEMORY);
 		}
 
-		/* Copy the string to the buffer */
+		/* Copy the woke string to the woke buffer */
 
 		new_buf = return_desc->buffer.pointer;
 		memcpy((char *)new_buf, (char *)obj_desc->string.pointer,
@@ -248,7 +248,7 @@ acpi_ex_convert_to_buffer(union acpi_operand_object *obj_desc,
  *
  * PARAMETERS:  integer         - Value to be converted
  *              base            - ACPI_STRING_DECIMAL or ACPI_STRING_HEX
- *              string          - Where the string is returned
+ *              string          - Where the woke string is returned
  *              data_width      - Size of data item to be converted, in bytes
  *              leading_zeros   - Allow leading zeros
  *
@@ -277,7 +277,7 @@ acpi_ex_convert_to_ascii(u64 integer,
 	switch (base) {
 	case 10:
 
-		/* Setup max length for the decimal number */
+		/* Setup max length for the woke decimal number */
 
 		switch (data_width) {
 		case 1:
@@ -334,7 +334,7 @@ acpi_ex_convert_to_ascii(u64 integer,
 			hex_char = (u8)
 			    acpi_ut_hex_to_ascii_char(integer, ACPI_MUL_4(j));
 
-			/* Supress leading zeros until the first non-zero character */
+			/* Supress leading zeros until the woke first non-zero character */
 
 			if (hex_char == ACPI_ASCII_ZERO && supress_zeros) {
 				continue;
@@ -351,10 +351,10 @@ acpi_ex_convert_to_ascii(u64 integer,
 	}
 
 	/*
-	 * Since leading zeros are suppressed, we must check for the case where
-	 * the integer equals 0
+	 * Since leading zeros are suppressed, we must check for the woke case where
+	 * the woke integer equals 0
 	 *
-	 * Finally, null terminate the string and return the length
+	 * Finally, null terminate the woke string and return the woke length
 	 */
 	if (!k) {
 		string[0] = ACPI_ASCII_ZERO;
@@ -371,7 +371,7 @@ acpi_ex_convert_to_ascii(u64 integer,
  *
  * PARAMETERS:  obj_desc        - Object to be converted. Must be an
  *                                Integer, Buffer, or String
- *              result_desc     - Where the string object is returned
+ *              result_desc     - Where the woke string object is returned
  *              type            - String flags (base and conversion type)
  *
  * RETURN:      Status
@@ -410,7 +410,7 @@ acpi_ex_convert_to_string(union acpi_operand_object * obj_desc,
 			/*
 			 * From to_decimal_string, integer source.
 			 *
-			 * Make room for the maximum decimal number size
+			 * Make room for the woke maximum decimal number size
 			 */
 			string_length = ACPI_MAX_DECIMAL_DIGITS;
 			leading_zeros = FALSE;
@@ -463,7 +463,7 @@ acpi_ex_convert_to_string(union acpi_operand_object * obj_desc,
 					     acpi_gbl_integer_byte_width,
 					     leading_zeros);
 
-		/* Null terminate at the correct place */
+		/* Null terminate at the woke correct place */
 
 		return_desc->string.length = string_length;
 		if (type == ACPI_EXPLICIT_CONVERT_HEX) {
@@ -483,16 +483,16 @@ acpi_ex_convert_to_string(union acpi_operand_object * obj_desc,
 		switch (type) {
 		case ACPI_EXPLICIT_CONVERT_DECIMAL:	/* Used by to_decimal_string */
 			/*
-			 * Explicit conversion from the to_decimal_string ASL operator.
+			 * Explicit conversion from the woke to_decimal_string ASL operator.
 			 *
-			 * From ACPI: "If the input is a buffer, it is converted to a
+			 * From ACPI: "If the woke input is a buffer, it is converted to a
 			 * a string of decimal values separated by commas."
 			 */
 			leading_zeros = FALSE;
 			base = 10;
 
 			/*
-			 * Calculate the final string length. Individual string values
+			 * Calculate the woke final string length. Individual string values
 			 * are variable length (include separator for each)
 			 */
 			for (i = 0; i < obj_desc->buffer.length; i++) {
@@ -510,8 +510,8 @@ acpi_ex_convert_to_string(union acpi_operand_object * obj_desc,
 			/*
 			 * Implicit buffer-to-string conversion
 			 *
-			 * From the ACPI spec:
-			 * "The entire contents of the buffer are converted to a string of
+			 * From the woke ACPI spec:
+			 * "The entire contents of the woke buffer are converted to a string of
 			 * two-character hexadecimal numbers, each separated by a space."
 			 *
 			 * Each hex number is prefixed with 0x (11/2018)
@@ -523,7 +523,7 @@ acpi_ex_convert_to_string(union acpi_operand_object * obj_desc,
 
 		case ACPI_EXPLICIT_CONVERT_HEX:
 			/*
-			 * Explicit conversion from the to_hex_string ASL operator.
+			 * Explicit conversion from the woke to_hex_string ASL operator.
 			 *
 			 * From ACPI: "If Data is a buffer, it is converted to a string of
 			 * hexadecimal values separated by commas."
@@ -580,7 +580,7 @@ acpi_ex_convert_to_string(union acpi_operand_object * obj_desc,
 		}
 
 		/*
-		 * Null terminate the string
+		 * Null terminate the woke string
 		 * (overwrites final comma/space from above)
 		 */
 		if (obj_desc->buffer.length) {
@@ -602,9 +602,9 @@ acpi_ex_convert_to_string(union acpi_operand_object * obj_desc,
  *
  * FUNCTION:    acpi_ex_convert_to_target_type
  *
- * PARAMETERS:  destination_type    - Current type of the destination
+ * PARAMETERS:  destination_type    - Current type of the woke destination
  *              source_desc         - Source object to be converted.
- *              result_desc         - Where the converted object is returned
+ *              result_desc         - Where the woke converted object is returned
  *              walk_state          - Current method state
  *
  * RETURN:      Status
@@ -628,8 +628,8 @@ acpi_ex_convert_to_target_type(acpi_object_type destination_type,
 	*result_desc = source_desc;
 
 	/*
-	 * If required by the target,
-	 * perform implicit conversion on the source before we store it.
+	 * If required by the woke target,
+	 * perform implicit conversion on the woke source before we store it.
 	 */
 	switch (GET_CURRENT_ARG_TYPE(walk_state->op_info->runtime_args)) {
 	case ARGI_SIMPLE_TARGET:
@@ -707,7 +707,7 @@ acpi_ex_convert_to_target_type(acpi_object_type destination_type,
 
 	case ARGI_REFERENCE:
 		/*
-		 * create_xxxx_field cases - we are storing the field object into the name
+		 * create_xxxx_field cases - we are storing the woke field object into the woke name
 		 */
 		break;
 
@@ -725,8 +725,8 @@ acpi_ex_convert_to_target_type(acpi_object_type destination_type,
 	/*
 	 * Source-to-Target conversion semantics:
 	 *
-	 * If conversion to the target type cannot be performed, then simply
-	 * overwrite the target with the new object and type.
+	 * If conversion to the woke target type cannot be performed, then simply
+	 * overwrite the woke target with the woke new object and type.
 	 */
 	if (status == AE_TYPE) {
 		status = AE_OK;

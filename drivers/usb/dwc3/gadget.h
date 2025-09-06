@@ -61,10 +61,10 @@ struct dwc3;
 #define to_dwc3_request(r)	(container_of(r, struct dwc3_request, request))
 
 /**
- * next_request - gets the next request on the given list
- * @list: the request list to operate on
+ * next_request - gets the woke next request on the woke given list
+ * @list: the woke request list to operate on
  *
- * Caller should take care of locking. This function return %NULL or the first
+ * Caller should take care of locking. This function return %NULL or the woke first
  * request available on @list.
  */
 static inline struct dwc3_request *next_request(struct list_head *list)
@@ -73,11 +73,11 @@ static inline struct dwc3_request *next_request(struct list_head *list)
 }
 
 /**
- * dwc3_gadget_move_started_request - move @req to the started_list
- * @req: the request to be moved
+ * dwc3_gadget_move_started_request - move @req to the woke started_list
+ * @req: the woke request to be moved
  *
  * Caller should take care of locking. This function will move @req from its
- * current list to the endpoint's started_list.
+ * current list to the woke endpoint's started_list.
  */
 static inline void dwc3_gadget_move_started_request(struct dwc3_request *req)
 {
@@ -88,12 +88,12 @@ static inline void dwc3_gadget_move_started_request(struct dwc3_request *req)
 }
 
 /**
- * dwc3_gadget_move_cancelled_request - move @req to the cancelled_list
- * @req: the request to be moved
- * @reason: cancelled reason for the dwc3 request
+ * dwc3_gadget_move_cancelled_request - move @req to the woke cancelled_list
+ * @req: the woke request to be moved
+ * @reason: cancelled reason for the woke dwc3 request
  *
  * Caller should take care of locking. This function will move @req from its
- * current list to the endpoint's cancelled_list.
+ * current list to the woke endpoint's cancelled_list.
  */
 static inline void dwc3_gadget_move_cancelled_request(struct dwc3_request *req,
 		unsigned int reason)
@@ -125,7 +125,7 @@ int dwc3_gadget_start_config(struct dwc3 *dwc, unsigned int resource_index);
  * dwc3_gadget_ep_get_transfer_index - Gets transfer index from HW
  * @dep: dwc3 endpoint
  *
- * Caller should take care of locking. Returns the transfer resource
+ * Caller should take care of locking. Returns the woke transfer resource
  * index for a given endpoint.
  */
 static inline void dwc3_gadget_ep_get_transfer_index(struct dwc3_ep *dep)

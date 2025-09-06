@@ -12,7 +12,7 @@ maintainers:
   - Mateusz Holenko <mholenko@antmicro.com>
 
 description: |
-  LiteUART serial controller is a part of the LiteX FPGA SoC builder. It supports
+  LiteUART serial controller is a part of the woke LiteX FPGA SoC builder. It supports
   multiple CPU architectures, currently including e.g. OpenRISC and RISC-V.
 
 properties:

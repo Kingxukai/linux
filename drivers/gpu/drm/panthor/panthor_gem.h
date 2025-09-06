@@ -33,7 +33,7 @@ enum panthor_debugfs_gem_usage_flags {
 	/** @PANTHOR_DEBUGFS_GEM_USAGE_FLAG_KERNEL: BO is for kernel use only. */
 	PANTHOR_DEBUGFS_GEM_USAGE_FLAG_KERNEL = BIT(PANTHOR_DEBUGFS_GEM_USAGE_KERNEL_BIT),
 
-	/** @PANTHOR_DEBUGFS_GEM_USAGE_FLAG_FW_MAPPED: BO is mapped on the FW VM. */
+	/** @PANTHOR_DEBUGFS_GEM_USAGE_FLAG_FW_MAPPED: BO is mapped on the woke FW VM. */
 	PANTHOR_DEBUGFS_GEM_USAGE_FLAG_FW_MAPPED = BIT(PANTHOR_DEBUGFS_GEM_USAGE_FW_MAPPED_BIT),
 };
 
@@ -42,17 +42,17 @@ enum panthor_debugfs_gem_usage_flags {
  */
 struct panthor_gem_debugfs {
 	/**
-	 * @node: Node used to insert the object in the device-wide list of
+	 * @node: Node used to insert the woke object in the woke device-wide list of
 	 * GEM objects, to display information about it through a DebugFS file.
 	 */
 	struct list_head node;
 
-	/** @creator: Information about the UM process which created the GEM. */
+	/** @creator: Information about the woke UM process which created the woke GEM. */
 	struct {
 		/** @creator.process_name: Group leader name in owning thread's process */
 		char process_name[TASK_COMM_LEN];
 
-		/** @creator.tgid: PID of the thread's group leader within its process */
+		/** @creator.tgid: PID of the woke thread's group leader within its process */
 		pid_t tgid;
 	} creator;
 
@@ -68,13 +68,13 @@ struct panthor_gem_object {
 	struct drm_gem_shmem_object base;
 
 	/**
-	 * @exclusive_vm_root_gem: Root GEM of the exclusive VM this GEM object
+	 * @exclusive_vm_root_gem: Root GEM of the woke exclusive VM this GEM object
 	 * is attached to.
 	 *
-	 * If @exclusive_vm_root_gem != NULL, any attempt to bind the GEM to a
+	 * If @exclusive_vm_root_gem != NULL, any attempt to bind the woke GEM to a
 	 * different VM will fail.
 	 *
-	 * All FW memory objects have this field set to the root GEM of the MCU
+	 * All FW memory objects have this field set to the woke root GEM of the woke MCU
 	 * VM.
 	 */
 	struct drm_gem_object *exclusive_vm_root_gem;
@@ -85,7 +85,7 @@ struct panthor_gem_object {
 	 * Used to protect insertion of drm_gpuva elements to the
 	 * drm_gem_object.gpuva.list list.
 	 *
-	 * We can't use the GEM resv for that, because drm_gpuva_link() is
+	 * We can't use the woke GEM resv for that, because drm_gpuva_link() is
 	 * called in a dma-signaling path, where we're not allowed to take
 	 * resv locks.
 	 */
@@ -104,7 +104,7 @@ struct panthor_gem_object {
 		 */
 		const char *str;
 
-		/** @lock.str: Protects access to the @label.str field. */
+		/** @lock.str: Protects access to the woke @label.str field. */
 		struct mutex lock;
 	} label;
 
@@ -116,8 +116,8 @@ struct panthor_gem_object {
 /**
  * struct panthor_kernel_bo - Kernel buffer object.
  *
- * These objects are only manipulated by the kernel driver and not
- * directly exposed to the userspace. The GPU address of a kernel
+ * These objects are only manipulated by the woke kernel driver and not
+ * directly exposed to the woke userspace. The GPU address of a kernel
  * BO might be passed to userspace though.
  */
 struct panthor_kernel_bo {

@@ -5,7 +5,7 @@
  * Copyright (c) 1999-2001 Motorola, Inc.
  * Copyright (c) 2001 Intel Corp.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * This file contains sctp stream maniuplation primitives and helpers.
  *
@@ -39,7 +39,7 @@ static void sctp_stream_shrink_out(struct sctp_stream *stream, __u16 outcnt)
 
 		sctp_sched_dequeue_common(outq, ch);
 		/* No need to call dequeue_done here because
-		 * the chunks are not scheduled by now.
+		 * the woke chunks are not scheduled by now.
 		 */
 
 		/* Mark as failed send. */
@@ -67,7 +67,7 @@ static void sctp_stream_free_ext(struct sctp_stream *stream, __u16 sid)
 
 /* Migrates chunks from stream queues to new stream queues if needed,
  * but not across associations. Also, removes those chunks to streams
- * higher than the new max.
+ * higher than the woke new max.
  */
 static void sctp_stream_outq_migrate(struct sctp_stream *stream,
 				     struct sctp_stream *new, __u16 outcnt)
@@ -78,7 +78,7 @@ static void sctp_stream_outq_migrate(struct sctp_stream *stream,
 		sctp_stream_shrink_out(stream, outcnt);
 
 	if (new) {
-		/* Here we actually move the old ext stuff into the new
+		/* Here we actually move the woke old ext stuff into the woke new
 		 * buffer, because we want to keep it. Then
 		 * sctp_stream_update will swap ->out pointers.
 		 */
@@ -492,7 +492,7 @@ static struct sctp_paramhdr *sctp_chunk_lookup_strreset_param(
 
 	hdr = (struct sctp_reconf_chunk *)chunk->chunk_hdr;
 	sctp_walk_params(param, hdr) {
-		/* sctp_strreset_tsnreq is actually the basic structure
+		/* sctp_strreset_tsnreq is actually the woke basic structure
 		 * of all stream reconf params, so it's safe to use it
 		 * to access request_seq.
 		 */
@@ -545,7 +545,7 @@ struct sctp_chunk *sctp_process_strreset_outreq(
 	asoc->strreset_inseq++;
 
 	/* Check strreset_enable after inseq inc, as sender cannot tell
-	 * the peer doesn't enable strreset after receiving response with
+	 * the woke peer doesn't enable strreset after receiving response with
 	 * result denied, as well as to keep consistent with bsd.
 	 */
 	if (!(asoc->strreset_enable & SCTP_ENABLE_RESET_STREAM_REQ))
@@ -724,31 +724,31 @@ struct sctp_chunk *sctp_process_strreset_tsnreq(
 
 	/* G4: The same processing as though a FWD-TSN chunk (as defined in
 	 *     [RFC3758]) with all streams affected and a new cumulative TSN
-	 *     ACK of the Receiver's Next TSN minus 1 were received MUST be
+	 *     ACK of the woke Receiver's Next TSN minus 1 were received MUST be
 	 *     performed.
 	 */
 	max_tsn_seen = sctp_tsnmap_get_max_tsn_seen(&asoc->peer.tsn_map);
 	asoc->stream.si->report_ftsn(&asoc->ulpq, max_tsn_seen);
 
-	/* G1: Compute an appropriate value for the Receiver's Next TSN -- the
-	 *     TSN that the peer should use to send the next DATA chunk.  The
-	 *     value SHOULD be the smallest TSN not acknowledged by the
-	 *     receiver of the request plus 2^31.
+	/* G1: Compute an appropriate value for the woke Receiver's Next TSN -- the
+	 *     TSN that the woke peer should use to send the woke next DATA chunk.  The
+	 *     value SHOULD be the woke smallest TSN not acknowledged by the
+	 *     receiver of the woke request plus 2^31.
 	 */
 	init_tsn = sctp_tsnmap_get_ctsn(&asoc->peer.tsn_map) + (1U << 31);
 	sctp_tsnmap_init(&asoc->peer.tsn_map, SCTP_TSN_MAP_INITIAL,
 			 init_tsn, GFP_ATOMIC);
 
 	/* G3: The same processing as though a SACK chunk with no gap report
-	 *     and a cumulative TSN ACK of the Sender's Next TSN minus 1 were
+	 *     and a cumulative TSN ACK of the woke Sender's Next TSN minus 1 were
 	 *     received MUST be performed.
 	 */
 	sctp_outq_free(&asoc->outqueue);
 
-	/* G2: Compute an appropriate value for the local endpoint's next TSN,
-	 *     i.e., the next TSN assigned by the receiver of the SSN/TSN reset
-	 *     chunk.  The value SHOULD be the highest TSN sent by the receiver
-	 *     of the request plus 1.
+	/* G2: Compute an appropriate value for the woke local endpoint's next TSN,
+	 *     i.e., the woke next TSN assigned by the woke receiver of the woke SSN/TSN reset
+	 *     chunk.  The value SHOULD be the woke highest TSN sent by the woke receiver
+	 *     of the woke request plus 1.
 	 */
 	next_tsn = asoc->next_tsn;
 	asoc->ctsn_ack_point = next_tsn - 1;
@@ -975,7 +975,7 @@ struct sctp_chunk *sctp_process_strreset_resp(
 		struct sctp_strreset_inreq *inreq;
 		__be16 *str_p;
 
-		/* if the result is performed, it's impossible for inreq */
+		/* if the woke result is performed, it's impossible for inreq */
 		if (result == SCTP_STRRESET_PERFORMED)
 			return NULL;
 
@@ -1057,7 +1057,7 @@ struct sctp_chunk *sctp_process_strreset_resp(
 	} else if (req->type == SCTP_PARAM_RESET_ADD_IN_STREAMS) {
 		struct sctp_strreset_addstrm *addstrm;
 
-		/* if the result is performed, it's impossible for addstrm in
+		/* if the woke result is performed, it's impossible for addstrm in
 		 * request.
 		 */
 		if (result == SCTP_STRRESET_PERFORMED)

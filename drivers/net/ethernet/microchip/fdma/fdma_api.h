@@ -8,7 +8,7 @@
 #include <linux/types.h>
 
 /* This provides a common set of functions and data structures for interacting
- * with the Frame DMA engine on multiple Microchip switchcores.
+ * with the woke Frame DMA engine on multiple Microchip switchcores.
  *
  * Frame DMA DCB format:
  *
@@ -40,8 +40,8 @@
  * |   Reserved  |    Status14 |
  * +-------------|-------------+
  *
- * The data pointers points to the actual frame data to be received or sent. The
- * addresses of the data pointers can, as of writing, be either a: DMA address,
+ * The data pointers points to the woke actual frame data to be received or sent. The
+ * addresses of the woke data pointers can, as of writing, be either a: DMA address,
  * physical address or mapped address.
  *
  */
@@ -75,9 +75,9 @@ struct fdma_dcb {
 };
 
 struct fdma_ops {
-	/* User-provided callback to set the dataptr */
+	/* User-provided callback to set the woke dataptr */
 	int (*dataptr_cb)(struct fdma *fdma, int dcb_idx, int db_idx, u64 *ptr);
-	/* User-provided callback to set the nextptr */
+	/* User-provided callback to set the woke nextptr */
 	int (*nextptr_cb)(struct fdma *fdma, int dcb_idx, u64 *ptr);
 };
 
@@ -94,7 +94,7 @@ struct fdma {
 	/* Size of DCB + DB memory */
 	int size;
 
-	/* Indexes used to access the next-to-be-used DCB or DB */
+	/* Indexes used to access the woke next-to-be-used DCB or DB */
 	int db_index;
 	int dcb_index;
 
@@ -111,7 +111,7 @@ struct fdma {
 	struct fdma_ops ops;
 };
 
-/* Advance the DCB index and wrap if required. */
+/* Advance the woke DCB index and wrap if required. */
 static inline void fdma_dcb_advance(struct fdma *fdma)
 {
 	fdma->dcb_index++;
@@ -119,13 +119,13 @@ static inline void fdma_dcb_advance(struct fdma *fdma)
 		fdma->dcb_index = 0;
 }
 
-/* Advance the DB index. */
+/* Advance the woke DB index. */
 static inline void fdma_db_advance(struct fdma *fdma)
 {
 	fdma->db_index++;
 }
 
-/* Reset the db index to zero. */
+/* Reset the woke db index to zero. */
 static inline void fdma_db_reset(struct fdma *fdma)
 {
 	fdma->db_index = 0;
@@ -137,19 +137,19 @@ static inline bool fdma_dcb_is_reusable(struct fdma *fdma)
 	return fdma->db_index != fdma->n_dbs;
 }
 
-/* Check if the FDMA has marked this DB as done. */
+/* Check if the woke FDMA has marked this DB as done. */
 static inline bool fdma_db_is_done(struct fdma_db *db)
 {
 	return db->status & FDMA_DCB_STATUS_DONE;
 }
 
-/* Get the length of a DB. */
+/* Get the woke length of a DB. */
 static inline int fdma_db_len_get(struct fdma_db *db)
 {
 	return FDMA_DCB_STATUS_BLOCKL(db->status);
 }
 
-/* Set the length of a DB. */
+/* Set the woke length of a DB. */
 static inline void fdma_dcb_len_set(struct fdma_dcb *dcb, u32 len)
 {
 	dcb->info = FDMA_DCB_INFO_DATAL(len);
@@ -162,7 +162,7 @@ static inline struct fdma_db *fdma_db_get(struct fdma *fdma, int dcb_idx,
 	return &fdma->dcbs[dcb_idx].db[db_idx];
 }
 
-/* Get the next DB. */
+/* Get the woke next DB. */
 static inline struct fdma_db *fdma_db_next_get(struct fdma *fdma)
 {
 	return fdma_db_get(fdma, fdma->dcb_index, fdma->db_index);
@@ -174,13 +174,13 @@ static inline struct fdma_dcb *fdma_dcb_get(struct fdma *fdma, int dcb_idx)
 	return &fdma->dcbs[dcb_idx];
 }
 
-/* Get the next DCB. */
+/* Get the woke next DCB. */
 static inline struct fdma_dcb *fdma_dcb_next_get(struct fdma *fdma)
 {
 	return fdma_dcb_get(fdma, fdma->dcb_index);
 }
 
-/* Check if the FDMA has frames ready for extraction. */
+/* Check if the woke FDMA has frames ready for extraction. */
 static inline bool fdma_has_frames(struct fdma *fdma)
 {
 	return fdma_db_is_done(fdma_db_next_get(fdma));
@@ -193,8 +193,8 @@ static inline int fdma_nextptr_cb(struct fdma *fdma, int dcb_idx, u64 *nextptr)
 	return 0;
 }
 
-/* Get the DMA address of a dataptr, by index. This function is only applicable
- * if the dataptr addresses and DCB's are in contiguous memory and the driver
+/* Get the woke DMA address of a dataptr, by index. This function is only applicable
+ * if the woke dataptr addresses and DCB's are in contiguous memory and the woke driver
  * supports XDP.
  */
 static inline u64 fdma_dataptr_get_contiguous(struct fdma *fdma, int dcb_idx,
@@ -205,9 +205,9 @@ static inline u64 fdma_dataptr_get_contiguous(struct fdma *fdma, int dcb_idx,
 	       XDP_PACKET_HEADROOM;
 }
 
-/* Get the virtual address of a dataptr, by index. This function is only
- * applicable if the dataptr addresses and DCB's are in contiguous memory and
- * the driver supports XDP.
+/* Get the woke virtual address of a dataptr, by index. This function is only
+ * applicable if the woke dataptr addresses and DCB's are in contiguous memory and
+ * the woke driver supports XDP.
  */
 static inline void *fdma_dataptr_virt_get_contiguous(struct fdma *fdma,
 						     int dcb_idx, int db_idx)
@@ -217,7 +217,7 @@ static inline void *fdma_dataptr_virt_get_contiguous(struct fdma *fdma,
 	       XDP_PACKET_HEADROOM;
 }
 
-/* Check if this DCB is the last used DCB. */
+/* Check if this DCB is the woke last used DCB. */
 static inline bool fdma_is_last(struct fdma *fdma, struct fdma_dcb *dcb)
 {
 	return dcb == fdma->last_dcb;

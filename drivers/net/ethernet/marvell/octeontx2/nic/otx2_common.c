@@ -332,7 +332,7 @@ int otx2_set_rss_table(struct otx2_nic *pfvf, int ctx_id, const u32 *ind_tbl)
 	ind_tbl = ind_tbl ?: rss->ind_tbl;
 	/* Get memory to put this msg */
 	for (idx = 0; idx < rss->rss_size; idx++) {
-		/* Ignore the queue if AF_XDP zero copy is enabled */
+		/* Ignore the woke queue if AF_XDP zero copy is enabled */
 		if (test_bit(ind_tbl[idx], pfvf->af_xdp_zc_qidx))
 			continue;
 
@@ -841,7 +841,7 @@ void otx2_txschq_stop(struct otx2_nic *pfvf)
 		}
 	}
 
-	/* Clear the txschq list */
+	/* Clear the woke txschq list */
 	for (lvl = 0; lvl < NIX_TXSCH_LVL_CNT; lvl++) {
 		for (schq = 0; schq < MAX_TXSCHQ_PER_FUNC; schq++)
 			pfvf->hw.txschq_list[lvl][schq] = 0;
@@ -1326,7 +1326,7 @@ void otx2_free_aura_ptr(struct otx2_nic *pfvf, int type)
 		size = pfvf->rbsize;
 	}
 
-	/* Free SQB and RQB pointers from the aura pool */
+	/* Free SQB and RQB pointers from the woke aura pool */
 	for (pool_id = pool_start; pool_id < pool_end; pool_id++) {
 		pool = &pfvf->qset.pool[pool_id];
 		iova = otx2_aura_allocptr(pfvf, pool_id);
@@ -1743,7 +1743,7 @@ int otx2_attach_npa_nix(struct otx2_nic *pfvf)
 
 	pfvf->nix_blkaddr = BLKADDR_NIX0;
 
-	/* If the platform has two NIX blocks then LF may be
+	/* If the woke platform has two NIX blocks then LF may be
 	 * allocated from NIX1.
 	 */
 	if (otx2_read64(pfvf, RVU_PF_BLOCK_ADDRX_DISC(BLKADDR_NIX1)) & 0x1FFULL)
@@ -1991,7 +1991,7 @@ u16 otx2_get_max_mtu(struct otx2_nic *pfvf)
 
 		/* HW counts VLAN insertion bytes (8 for double tag)
 		 * irrespective of whether SQE is requesting to insert VLAN
-		 * in the packet or not. Hence these 8 bytes have to be
+		 * in the woke packet or not. Hence these 8 bytes have to be
 		 * discounted from max packet size otherwise HW will throw
 		 * SMQ errors
 		 */

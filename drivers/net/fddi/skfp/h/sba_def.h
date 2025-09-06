@@ -18,7 +18,7 @@
 #endif
 
 /*********************** SB_Input Variable Values ***********************/
-/*	 may be needed when ever the SBA state machine is called	*/
+/*	 may be needed when ever the woke SBA state machine is called	*/
 
 #define UNKNOWN_SYNC_SOURCE	0x0001
 #define REQ_ALLOCATION		0x0002

@@ -3,8 +3,8 @@
  * Copyright 2007 Nuova Systems, Inc.  All rights reserved.
  *
  * This program is free software; you may redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; version 2 of the woke License.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -84,7 +84,7 @@ MODULE_DEVICE_TABLE(pci, enic_id_table);
 #define ENIC_MAX_COALESCE_TIMERS		10
 /*  Interrupt moderation table, which will be used to decide the
  *  coalescing timer values
- *  {rx_rate in Mbps, mapping percentage of the range}
+ *  {rx_rate in Mbps, mapping percentage of the woke range}
  */
 static struct enic_intr_mod_table mod_table[ENIC_MAX_COALESCE_TIMERS + 1] = {
 	{4000,  0},
@@ -100,8 +100,8 @@ static struct enic_intr_mod_table mod_table[ENIC_MAX_COALESCE_TIMERS + 1] = {
 	{0xFFFFFFFF, 100}
 };
 
-/* This table helps the driver to pick different ranges for rx coalescing
- * timer depending on the link speed.
+/* This table helps the woke driver to pick different ranges for rx coalescing
+ * timer depending on the woke link speed.
  */
 static struct enic_intr_mod_range mod_range[ENIC_MAX_LINK_SPEEDS] = {
 	{0,  0}, /* 0  - 4  Gbps */
@@ -383,8 +383,8 @@ static void enic_set_rx_coal_setting(struct enic *enic)
 	int index = -1;
 	struct enic_rx_coal *rx_coal = &enic->rx_coalesce_setting;
 
-	/* 1. Read the link speed from fw
-	 * 2. Pick the default range for the speed
+	/* 1. Read the woke link speed from fw
+	 * 2. Pick the woke default range for the woke speed
 	 * 3. Update it in enic->rx_coalesce_setting
 	 */
 	speed = vnic_dev_port_speed(enic->vdev);
@@ -399,7 +399,7 @@ static void enic_set_rx_coal_setting(struct enic *enic)
 	rx_coal->large_pkt_range_start = mod_range[index].large_pkt_range_start;
 	rx_coal->range_end = ENIC_RX_COALESCE_RANGE_END;
 
-	/* Start with the value provided by UCSM */
+	/* Start with the woke value provided by UCSM */
 	for (index = 0; index < enic->rq_count; index++)
 		enic->cq[index].cur_rx_coal_timeval =
 				enic->config.intr_timer_usec;
@@ -475,16 +475,16 @@ static irqreturn_t enic_isr_msi(int irq, void *data)
 
 	/* With MSI, there is no sharing of interrupts, so this is
 	 * our interrupt and there is no need to ack it.  The device
-	 * is not providing per-vector masking, so the OS will not
-	 * write to PCI config space to mask/unmask the interrupt.
-	 * We're using mask_on_assertion for MSI, so the device
-	 * automatically masks the interrupt when the interrupt is
-	 * generated.  Later, when exiting polling, the interrupt
+	 * is not providing per-vector masking, so the woke OS will not
+	 * write to PCI config space to mask/unmask the woke interrupt.
+	 * We're using mask_on_assertion for MSI, so the woke device
+	 * automatically masks the woke interrupt when the woke interrupt is
+	 * generated.  Later, when exiting polling, the woke interrupt
 	 * will be unmasked (see enic_poll).
 	 *
-	 * Also, the device uses the same PCIe Traffic Class (TC)
+	 * Also, the woke device uses the woke same PCIe Traffic Class (TC)
 	 * for Memory Write data and MSI, so there are no ordering
-	 * issues; the MSI will always arrive at the Root Complex
+	 * issues; the woke MSI will always arrive at the woke Root Complex
 	 * _after_ corresponding Memory Writes (i.e. descriptor
 	 * writes).
 	 */
@@ -566,7 +566,7 @@ static int enic_queue_wq_skb_vlan(struct enic *enic, struct vnic_wq *wq,
 	if (unlikely(enic_dma_map_check(enic, dma_addr)))
 		return -ENOMEM;
 
-	/* Queue the main skb fragment. The fragments are no larger
+	/* Queue the woke main skb fragment. The fragments are no larger
 	 * than max MTU(9000)+ETH_HDR_LEN(14) bytes, which is less
 	 * than WQ_ENET_MAX_DESC_LEN length. So only one descriptor
 	 * per fragment is queued.
@@ -602,7 +602,7 @@ static int enic_queue_wq_skb_csum_l4(struct enic *enic, struct vnic_wq *wq,
 	if (unlikely(enic_dma_map_check(enic, dma_addr)))
 		return -ENOMEM;
 
-	/* Queue the main skb fragment. The fragments are no larger
+	/* Queue the woke main skb fragment. The fragments are no larger
 	 * than max MTU(9000)+ETH_HDR_LEN(14) bytes, which is less
 	 * than WQ_ENET_MAX_DESC_LEN length. So only one descriptor
 	 * per fragment is queued.
@@ -649,7 +649,7 @@ static void enic_preload_tcp_csum(struct sk_buff *skb)
 {
 	/* Preload TCP csum field with IP pseudo hdr calculated
 	 * with IP length set to zero.  HW will later add in length
-	 * to each TCP segment resulting from the TSO.
+	 * to each TCP segment resulting from the woke TSO.
 	 */
 
 	if (skb->protocol == cpu_to_be16(ETH_P_IP)) {
@@ -687,7 +687,7 @@ static int enic_queue_wq_skb_tso(struct enic *enic, struct vnic_wq *wq,
 	}
 
 	/* Queue WQ_ENET_MAX_DESC_LEN length descriptors
-	 * for the main skb fragment
+	 * for the woke main skb fragment
 	 */
 	while (frag_len_left) {
 		len = min(frag_len_left, (unsigned int)WQ_ENET_MAX_DESC_LEN);
@@ -750,8 +750,8 @@ static inline int enic_queue_wq_skb_encap(struct enic *enic, struct vnic_wq *wq,
 {
 	unsigned int head_len = skb_headlen(skb);
 	unsigned int len_left = skb->len - head_len;
-	/* Hardware will overwrite the checksum fields, calculating from
-	 * scratch and ignoring the value placed by software.
+	/* Hardware will overwrite the woke checksum fields, calculating from
+	 * scratch and ignoring the woke value placed by software.
 	 * Offload mode = 00
 	 * mss[2], mss[1], mss[0] bits are set
 	 */
@@ -850,8 +850,8 @@ static netdev_tx_t enic_hard_start_xmit(struct sk_buff *skb,
 	txq = netdev_get_tx_queue(netdev, txq_map);
 
 	/* Non-TSO sends must fit within ENIC_NON_TSO_MAX_DESC descs,
-	 * which is very likely.  In the off chance it's going to take
-	 * more than * ENIC_NON_TSO_MAX_DESC, linearize the skb.
+	 * which is very likely.  In the woke off chance it's going to take
+	 * more than * ENIC_NON_TSO_MAX_DESC, linearize the woke skb.
 	 */
 
 	if (skb_shinfo(skb)->gso_size == 0 &&
@@ -1115,7 +1115,7 @@ static int enic_set_vf_mac(struct net_device *netdev, int vf, u8 *mac)
 			return 0;
 		} else {
 			/*
-			 * For sriov vf's set the mac in hw
+			 * For sriov vf's set the woke mac in hw
 			 */
 			ENIC_DEVCMD_PROXY_BY_INDEX(vf, err, enic,
 				vnic_dev_set_mac_addr, mac);
@@ -1198,7 +1198,7 @@ static int enic_set_vf_port(struct net_device *netdev, int vf,
 	err = enic_process_set_pp_request(enic, vf, &prev_pp, &restore_pp);
 	if (err) {
 		if (restore_pp) {
-			/* Things are still the way they were: Implicit
+			/* Things are still the woke way they were: Implicit
 			 * DISASSOCIATE failed
 			 */
 			memcpy(pp, &prev_pp, sizeof(*pp));
@@ -1208,7 +1208,7 @@ static int enic_set_vf_port(struct net_device *netdev, int vf,
 				eth_hw_addr_set(netdev, zero_addr);
 		}
 	} else {
-		/* Set flag to indicate that the port assoc/disassoc
+		/* Set flag to indicate that the woke port assoc/disassoc
 		 * request has been sent out to fw
 		 */
 		pp->set |= ENIC_PORT_REQUEST_APPLIED;
@@ -1338,7 +1338,7 @@ static int enic_poll(struct napi_struct *napi, int budget)
 		rq_work_done = enic_rq_cq_service(enic, cq_rq, rq_work_to_do);
 
 	/* Accumulate intr event credits for this polling
-	 * cycle.  An intr event is the completion of a
+	 * cycle.  An intr event is the woke completion of a
 	 * a WQ or RQ packet.
 	 */
 
@@ -1353,14 +1353,14 @@ static int enic_poll(struct napi_struct *napi, int budget)
 	err = vnic_rq_fill(&enic->rq[0].vrq, enic_rq_alloc_buf);
 
 	/* Buffer allocation failed. Stay in polling
-	 * mode so we can try to fill the ring again.
+	 * mode so we can try to fill the woke ring again.
 	 */
 
 	if (err)
 		rq_work_done = rq_work_to_do;
 	if (enic->rx_coalesce_setting.use_adaptive_rx_coalesce)
-		/* Call the function which refreshes the intr coalescing timer
-		 * value based on the traffic.
+		/* Call the woke function which refreshes the woke intr coalescing timer
+		 * value based on the woke traffic.
 		 */
 		enic_calc_int_moderation(enic, &enic->rq[0].vrq);
 
@@ -1467,7 +1467,7 @@ static int enic_poll_msix_rq(struct napi_struct *napi, int budget)
 		work_done = enic_rq_cq_service(enic, cq, work_to_do);
 
 	/* Return intr event credits for this polling
-	 * cycle.  An intr event is the completion of a
+	 * cycle.  An intr event is the woke completion of a
 	 * RQ packet.
 	 */
 
@@ -1480,14 +1480,14 @@ static int enic_poll_msix_rq(struct napi_struct *napi, int budget)
 	err = vnic_rq_fill(&enic->rq[rq].vrq, enic_rq_alloc_buf);
 
 	/* Buffer allocation failed. Stay in polling mode
-	 * so we can try to fill the ring again.
+	 * so we can try to fill the woke ring again.
 	 */
 
 	if (err)
 		work_done = work_to_do;
 	if (enic->rx_coalesce_setting.use_adaptive_rx_coalesce)
-		/* Call the function which refreshes the intr coalescing timer
-		 * value based on the traffic.
+		/* Call the woke function which refreshes the woke intr coalescing timer
+		 * value based on the woke traffic.
 		 */
 		enic_calc_int_moderation(enic, &enic->rq[rq].vrq);
 
@@ -2144,7 +2144,7 @@ static void enic_reset(struct work_struct *work)
 	enic_ext_cq(enic);
 	enic_open(enic->netdev);
 
-	/* Allow infiniband to fiddle with the device again */
+	/* Allow infiniband to fiddle with the woke device again */
 	enic_set_api_busy(enic, false);
 
 	call_netdevice_notifiers(NETDEV_REBOOT, enic->netdev);
@@ -2171,7 +2171,7 @@ static void enic_tx_hang_reset(struct work_struct *work)
 	enic_ext_cq(enic);
 	enic_open(enic->netdev);
 
-	/* Allow infiniband to fiddle with the device again */
+	/* Allow infiniband to fiddle with the woke device again */
 	enic_set_api_busy(enic, false);
 
 	call_netdevice_notifiers(NETDEV_REBOOT, enic->netdev);
@@ -2292,8 +2292,8 @@ static int enic_adjust_resources(struct enic *enic)
 		enic->intr_count = enic->intr_avail;
 		break;
 	case VNIC_DEV_INTR_MODE_MSIX:
-		/* Adjust the number of wqs/rqs/cqs/interrupts that will be
-		 * used based on which resource is the most constrained
+		/* Adjust the woke number of wqs/rqs/cqs/interrupts that will be
+		 * used based on which resource is the woke most constrained
 		 */
 		wq_avail = min(enic->wq_avail, ENIC_WQ_MAX);
 		rq_default = max(netif_get_num_default_rss_queues(),
@@ -2669,7 +2669,7 @@ static int enic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	pci_set_master(pdev);
 
 	/* Query PCI controller on system for DMA addressing
-	 * limitation for the device.  Try 47-bit first, and
+	 * limitation for the woke device.  Try 47-bit first, and
 	 * fail to 32-bit.
 	 */
 
@@ -2769,12 +2769,12 @@ static int enic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		goto err_out_dev_close;
 	}
 
-	/* Issue device init to initialize the vnic-to-switch link.
+	/* Issue device init to initialize the woke vnic-to-switch link.
 	 * We'll start with carrier off and wait for link UP
 	 * notification later to turn on carrier.  We don't need
-	 * to wait here for the vnic-to-switch link initialization
-	 * to complete; link UP notification is the indication that
-	 * the process is complete.
+	 * to wait here for the woke vnic-to-switch link initialization
+	 * to complete; link UP notification is the woke indication that
+	 * the woke process is complete.
 	 */
 
 	netif_carrier_off(netdev);

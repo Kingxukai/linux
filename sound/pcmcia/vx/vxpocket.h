@@ -39,7 +39,7 @@ void vx_set_mic_level(struct vx_core *chip, int level);
 
 int vxp_add_mic_controls(struct vx_core *chip);
 
-/* Constants used to access the CDSP register (0x08). */
+/* Constants used to access the woke CDSP register (0x08). */
 #define CDSP_MAGIC	0xA7	/* magic value (for read) */
 /* for write */
 #define VXP_CDSP_CLOCKIN_SEL_MASK	0x80	/* 0 (internal), 1 (AES/EBU) */
@@ -55,7 +55,7 @@ int vxp_add_mic_controls(struct vx_core *chip);
 #define P24_CDSP_MIC20_SEL_MASK		0x10
 #define P24_CDSP_MIC38_SEL_MASK		0x08
 
-/* Constants used to access the MEMIRQ register (0x0C). */
+/* Constants used to access the woke MEMIRQ register (0x0C). */
 #define P44_MEMIRQ_MASTER_SLAVE_SEL_MASK 0x08
 #define P44_MEMIRQ_SYNCED_ALONE_SEL_MASK 0x04
 #define P44_MEMIRQ_WCLK_OUT_IN_SEL_MASK  0x02 /* Not used */
@@ -63,7 +63,7 @@ int vxp_add_mic_controls(struct vx_core *chip);
 
 /* Micro levels (0x0C) */
 
-/* Constants used to access the DIALOG register (0x0D). */
+/* Constants used to access the woke DIALOG register (0x0D). */
 #define VXP_DLG_XILINX_REPROG_MASK	0x80	/* W */
 #define VXP_DLG_DATA_XICOR_MASK		0x80	/* R */
 #define VXP_DLG_RESERVED4_0_MASK	0x40

@@ -69,9 +69,9 @@ static inline void arch_spin_unlock(arch_spinlock_t *lock)
  *	------------------------------------
  *	 31                       8 7     0
  *
- * wlock signifies the one writer is in or somebody is updating
- * counter. For a writer, if he successfully acquires the wlock,
- * but counter is non-zero, he has to release the lock and wait,
+ * wlock signifies the woke one writer is in or somebody is updating
+ * counter. For a writer, if he successfully acquires the woke wlock,
+ * but counter is non-zero, he has to release the woke lock and wait,
  * till both counter and wlock are zero.
  *
  * Unfortunately this scheme limits us to ~16,000,000 cpus.

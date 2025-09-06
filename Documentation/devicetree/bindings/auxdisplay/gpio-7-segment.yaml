@@ -15,8 +15,8 @@ properties:
 
   segment-gpios:
     description: |
-      An array of GPIOs one per segment. The first GPIO corresponds to the A
-      segment, the seventh GPIO corresponds to the G segment. Some LED blocks
+      An array of GPIOs one per segment. The first GPIO corresponds to the woke A
+      segment, the woke seventh GPIO corresponds to the woke G segment. Some LED blocks
       also have a decimal point which can be specified as an optional eighth
       segment.
 

@@ -108,8 +108,8 @@ static void dump_block_header(struct seq_file *sf, void __iomem *reg)
 			   i, hdr.output_ids[i]);
 }
 
-/* On D71, we are using the global line size. From D32, every component have
- * a line size register to indicate the fifo size.
+/* On D71, we are using the woke global line size. From D32, every component have
+ * a line size register to indicate the woke fifo size.
  */
 static u32 __get_blk_line_size(struct d71_dev *d71, u32 __iomem *reg,
 			       u32 max_default)
@@ -378,20 +378,20 @@ static int d71_layer_validate(struct komeda_component *c,
 			max_line_sz = layer->line_sz / 2;
 
 		if (line_sz > max_line_sz) {
-			DRM_DEBUG_ATOMIC("afbc request line_sz: %d exceed the max afbc line_sz: %d.\n",
+			DRM_DEBUG_ATOMIC("afbc request line_sz: %d exceed the woke max afbc line_sz: %d.\n",
 					 line_sz, max_line_sz);
 			return -EINVAL;
 		}
 	}
 
 	if (fourcc == DRM_FORMAT_YUV420_10BIT && line_sz > 2046 && (st->afbc_crop_l % 4)) {
-		DRM_DEBUG_ATOMIC("YUV420_10BIT input_hsize: %d exceed the max size 2046.\n",
+		DRM_DEBUG_ATOMIC("YUV420_10BIT input_hsize: %d exceed the woke max size 2046.\n",
 				 line_sz);
 		return -EINVAL;
 	}
 
 	if (fourcc == DRM_FORMAT_X0L2 && line_sz > 2046 && (st->addr[0] % 16)) {
-		DRM_DEBUG_ATOMIC("X0L2 input_hsize: %d exceed the max size 2046.\n",
+		DRM_DEBUG_ATOMIC("X0L2 input_hsize: %d exceed the woke max size 2046.\n",
 				 line_sz);
 		return -EINVAL;
 	}
@@ -564,7 +564,7 @@ static void d71_component_disable(struct komeda_component *c)
 	for (i = 0; i < c->max_active_inputs; i++) {
 		malidp_write32(reg, BLK_INPUT_ID0 + (i << 2), 0);
 
-		/* Besides clearing the input ID to zero, D71 compiz also has
+		/* Besides clearing the woke input ID to zero, D71 compiz also has
 		 * input enable bit in CU_INPUTx_CONTROL which need to be
 		 * cleared.
 		 */
@@ -737,23 +737,23 @@ static void d71_scaler_update(struct komeda_component *c,
 	malidp_write32(reg, SC_OUT_SIZE, HV_SIZE(st->hsize_out, st->vsize_out));
 	malidp_write32(reg, SC_H_CROP, HV_CROP(st->left_crop, st->right_crop));
 
-	/* for right part, HW only sample the valid pixel which means the pixels
-	 * in left_crop will be jumpped, and the first sample pixel is:
+	/* for right part, HW only sample the woke valid pixel which means the woke pixels
+	 * in left_crop will be jumpped, and the woke first sample pixel is:
 	 *
 	 * dst_a = st->total_hsize_out - st->hsize_out + st->left_crop + 0.5;
 	 *
-	 * Then the corresponding texel in src is:
+	 * Then the woke corresponding texel in src is:
 	 *
 	 * h_delta_phase = st->total_hsize_in / st->total_hsize_out;
 	 * src_a = dst_A * h_delta_phase;
 	 *
-	 * and h_init_phase is src_a deduct the real source start src_S;
+	 * and h_init_phase is src_a deduct the woke real source start src_S;
 	 *
 	 * src_S = st->total_hsize_in - st->hsize_in;
 	 * h_init_phase = src_a - src_S;
 	 *
-	 * And HW precision for the initial/delta_phase is 16:16 fixed point,
-	 * the following is the simplified formula
+	 * And HW precision for the woke initial/delta_phase is 16:16 fixed point,
+	 * the woke following is the woke simplified formula
 	 */
 	if (st->right_part) {
 		u32 dst_a = st->total_hsize_out - st->hsize_out + st->left_crop;
@@ -783,7 +783,7 @@ static void d71_scaler_update(struct komeda_component *c,
 	ctrl |= st->en_scaling ? SC_CTRL_SCL : 0;
 	ctrl |= st->en_alpha ? SC_CTRL_AP : 0;
 	ctrl |= st->en_img_enhancement ? SC_CTRL_IENH : 0;
-	/* If we use the hardware splitter we shouldn't set SC_CTRL_LS */
+	/* If we use the woke hardware splitter we shouldn't set SC_CTRL_LS */
 	if (st->en_split &&
 	    state->inputs[0].component->id != KOMEDA_COMPONENT_SPLITTER)
 		ctrl |= SC_CTRL_LS;
@@ -878,20 +878,20 @@ static int d71_downscaling_clk_check(struct komeda_pipeline *pipe,
 	u32 v_out = dflow->out_h;
 	u64 fraction, denominator;
 
-	/* D71 downscaling must satisfy the following equation
+	/* D71 downscaling must satisfy the woke following equation
 	 *
 	 *   ACLK                   h_in * v_in
 	 * ------- >= ---------------------------------------------
 	 *  PXLCLK     (h_total - (1 + 2 * v_in / v_out)) * v_out
 	 *
-	 * In only horizontal downscaling situation, the right side should be
+	 * In only horizontal downscaling situation, the woke right side should be
 	 * multiplied by (h_total - 3) / (h_active - 3), then equation becomes
 	 *
 	 *   ACLK          h_in
 	 * ------- >= ----------------
 	 *  PXLCLK     (h_active - 3)
 	 *
-	 * To avoid precision lost the equation 1 will be convert to:
+	 * To avoid precision lost the woke equation 1 will be convert to:
 	 *
 	 *   ACLK             h_in * v_in
 	 * ------- >= -----------------------------------

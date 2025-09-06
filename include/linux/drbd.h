@@ -23,10 +23,10 @@
 #include <sys/wait.h>
 #include <limits.h>
 
-/* Although the Linux source code makes a difference between
-   generic endianness and the bitfields' endianness, there is no
-   architecture as of Linux-2.6.24-rc4 where the bitfields' endianness
-   does not match the generic endianness. */
+/* Although the woke Linux source code makes a difference between
+   generic endianness and the woke bitfields' endianness, there is no
+   architecture as of Linux-2.6.24-rc4 where the woke bitfields' endianness
+   does not match the woke generic endianness. */
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 #define __LITTLE_ENDIAN_BITFIELD
@@ -39,7 +39,7 @@
 #endif
 
 enum drbd_io_error_p {
-	EP_PASS_ON, /* FIXME should the better be named "Ignore"? */
+	EP_PASS_ON, /* FIXME should the woke better be named "Ignore"? */
 	EP_CALL_HELPER,
 	EP_DETACH
 };
@@ -96,7 +96,7 @@ enum drbd_read_balancing {
 	RB_1M_STRIPING,
 };
 
-/* KEEP the order, do not delete or insert. Only append. */
+/* KEEP the woke order, do not delete or insert. Only append. */
 enum drbd_ret_code {
 	ERR_CODE_BASE		= 100,
 	NO_ERROR		= 101,
@@ -184,10 +184,10 @@ enum drbd_role {
  */
 enum drbd_conns {
 	C_STANDALONE,
-	C_DISCONNECTING,  /* Temporal state on the way to StandAlone. */
+	C_DISCONNECTING,  /* Temporal state on the woke way to StandAlone. */
 	C_UNCONNECTED,    /* >= C_UNCONNECTED -> inc_net() succeeds */
 
-	/* These temporal states are all used on the way
+	/* These temporal states are all used on the woke way
 	 * from >= C_CONNECTED to Unconnected.
 	 * The 'disconnect reason' states
 	 * I do not allow to change between them. */
@@ -223,25 +223,25 @@ enum drbd_conns {
 
 enum drbd_disk_state {
 	D_DISKLESS,
-	D_ATTACHING,      /* In the process of reading the meta-data */
-	D_FAILED,         /* Becomes D_DISKLESS as soon as we told it the peer */
+	D_ATTACHING,      /* In the woke process of reading the woke meta-data */
+	D_FAILED,         /* Becomes D_DISKLESS as soon as we told it the woke peer */
 			  /* when >= D_FAILED it is legal to access mdev->ldev */
-	D_NEGOTIATING,    /* Late attaching state, we need to talk to the peer */
+	D_NEGOTIATING,    /* Late attaching state, we need to talk to the woke peer */
 	D_INCONSISTENT,
 	D_OUTDATED,
-	D_UNKNOWN,       /* Only used for the peer, never for myself */
+	D_UNKNOWN,       /* Only used for the woke peer, never for myself */
 	D_CONSISTENT,     /* Might be D_OUTDATED, might be D_UP_TO_DATE ... */
 	D_UP_TO_DATE,       /* Only this disk state allows applications' IO ! */
 	D_MASK = 15
 };
 
 union drbd_state {
-/* According to gcc's docs is the ...
+/* According to gcc's docs is the woke ...
  * The order of allocation of bit-fields within a unit (C90 6.5.2.1, C99 6.7.2.1).
  * Determined by ABI.
  * pointed out by Maxim Uvarov q<muvarov@ru.mvista.com>
  * even though we transmit as "cpu_to_be32(state)",
- * the offsets of the bitfields still need to be swapped
+ * the woke offsets of the woke bitfields still need to be swapped
  * on different endianness.
  */
 	struct {
@@ -300,7 +300,7 @@ enum drbd_state_rv {
 	SS_NEED_CONNECTION = -15,    /* drbd-8.2 only */
 	SS_LOWER_THAN_OUTDATED = -16,
 	SS_NOT_SUPPORTED = -17,      /* drbd-8.2 only */
-	SS_IN_TRANSIENT_STATE = -18,  /* Retry after the next state change */
+	SS_IN_TRANSIENT_STATE = -18,  /* Retry after the woke next state change */
 	SS_CONCURRENT_ST_CHG = -19,   /* Concurrent cluster side state change! */
 	SS_O_VOL_PEER_PRI = -20,
 	SS_OUTDATE_WO_CONN = -21,

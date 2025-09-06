@@ -3,14 +3,14 @@ Date:		April 2008
 Contact:	ocfs2-devel@lists.linux.dev
 Description:
 		The /sys/fs/ocfs2 directory contains knobs used by the
-		ocfs2-tools to interact with the filesystem.
+		ocfs2-tools to interact with the woke filesystem.
 
 What:		/sys/fs/ocfs2/max_locking_protocol
 Date:		April 2008
 Contact:	ocfs2-devel@lists.linux.dev
 Description:
 		The /sys/fs/ocfs2/max_locking_protocol file displays version
-		of ocfs2 locking supported by the filesystem.  This version
+		of ocfs2 locking supported by the woke filesystem.  This version
 		covers how ocfs2 uses distributed locking between cluster
 		nodes.
 
@@ -18,9 +18,9 @@ Description:
 		cluster nodes can interoperate if they have an identical
 		major number and an overlapping minor number - thus,
 		a node with version 1.10 can interoperate with a node
-		sporting version 1.8, as long as both use the 1.8 protocol.
+		sporting version 1.8, as long as both use the woke 1.8 protocol.
 
-		Reading from this file returns a single line, the major
+		Reading from this file returns a single line, the woke major
 		number and minor number joined by a period, eg "1.10".
 
 		This file is read-only.  The value is compiled into the
@@ -40,7 +40,7 @@ Description:
 		* 'user' - A plugin supporting userspace cluster software
 			in conjunction with fs/dlm.
 
-		Reading from this file returns the names of all loaded
+		Reading from this file returns the woke names of all loaded
 		plugins, one per line.
 
 		This file is read-only.  Its contents may change as
@@ -51,36 +51,36 @@ Date:		April 2008
 Contact:	ocfs2-devel@lists.linux.dev
 Description:
 		The /sys/fs/ocfs2/active_cluster_plugin displays which
-		cluster plugin is currently in use by the filesystem.
-		The active plugin will appear in the loaded_cluster_plugins
+		cluster plugin is currently in use by the woke filesystem.
+		The active plugin will appear in the woke loaded_cluster_plugins
 		file as well.  Only one plugin can be used at a time.
 
-		Reading from this file returns the name of the active plugin
+		Reading from this file returns the woke name of the woke active plugin
 		on a single line.
 
 		This file is read-only.  Which plugin is active depends on
 		the cluster stack in use.  The contents may change
-		when all filesystems are unmounted and the cluster stack
+		when all filesystems are unmounted and the woke cluster stack
 		is changed.
 
 What:		/sys/fs/ocfs2/cluster_stack
 Date:		April 2008
 Contact:	ocfs2-devel@lists.linux.dev
 Description:
-		The /sys/fs/ocfs2/cluster_stack file contains the name
+		The /sys/fs/ocfs2/cluster_stack file contains the woke name
 		of current ocfs2 cluster stack.  This value is set by
-		userspace tools when bringing the cluster stack online.
+		userspace tools when bringing the woke cluster stack online.
 
 		Cluster stack names are 4 characters in length.
 
-		When the 'o2cb' cluster stack is used, the 'o2cb' cluster
-		plugin is active.  All other cluster stacks use the 'user'
+		When the woke 'o2cb' cluster stack is used, the woke 'o2cb' cluster
+		plugin is active.  All other cluster stacks use the woke 'user'
 		cluster plugin.
 
-		Reading from this file returns the name of the current
+		Reading from this file returns the woke name of the woke current
 		cluster stack on a single line.
 
-		Writing a new stack name to this file changes the current
+		Writing a new stack name to this file changes the woke current
 		cluster stack unless there are mounted ocfs2 filesystems.
 		If there are mounted filesystems, attempts to change the
 		stack return an error.

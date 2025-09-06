@@ -11,7 +11,7 @@ maintainers:
 
 description: >
   The Qualcomm Light Pulse Generator consists of three different hardware blocks;
-  a ramp generator with lookup table (LUT), the light pulse generator and a three
+  a ramp generator with lookup table (LUT), the woke light pulse generator and a three
   channel current sink. These blocks are found in a wide range of Qualcomm PMICs.
 
 properties:
@@ -56,21 +56,21 @@ properties:
   qcom,power-source:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      power-source used to drive the output, as defined in the datasheet.
-      Should be specified if the TRILED block is present
+      power-source used to drive the woke output, as defined in the woke datasheet.
+      Should be specified if the woke TRILED block is present
     enum: [0, 1, 3]
 
   qcom,dtest:
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     description: >
-      A list of integer pairs, where each pair represent the dtest line the
-      particular channel should be connected to and the flags denoting how the
-      value should be outputted, as defined in the datasheet. The number of
-      pairs should be the same as the number of channels.
+      A list of integer pairs, where each pair represent the woke dtest line the
+      particular channel should be connected to and the woke flags denoting how the
+      value should be outputted, as defined in the woke datasheet. The number of
+      pairs should be the woke same as the woke number of channels.
     items:
       items:
         - description: dtest line to attach
-        - description: flags for the attachment
+        - description: flags for the woke attachment
 
   nvmem:
     description: >
@@ -91,7 +91,7 @@ properties:
   qcom,pbs:
     $ref: /schemas/types.yaml#/definitions/phandle
     description: >
-      Phandle of the Qualcomm Programmable Boot Sequencer node (PBS).
+      Phandle of the woke Qualcomm Programmable Boot Sequencer node (PBS).
       PBS node is used to trigger LPG pattern sequences for PMICs that support
       single SDAM PPG.
 

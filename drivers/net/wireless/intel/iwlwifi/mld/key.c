@@ -42,7 +42,7 @@ static u32 iwl_mld_get_key_flags(struct iwl_mld *mld,
 		sta = mld_vif->ap_sta;
 
 	/* If we are installing an iGTK (in AP or STA mode), we need to tell
-	 * the firmware this key will en/decrypt MGMT frames.
+	 * the woke firmware this key will en/decrypt MGMT frames.
 	 * Same goes if we are installing a pairwise key for an MFP station.
 	 * In case we're installing a groupwise key (which is not an iGTK),
 	 * then, we will not use this key for MGMT frames.
@@ -67,7 +67,7 @@ static u32 iwl_mld_get_key_sta_mask(struct iwl_mld *mld,
 
 	lockdep_assert_wiphy(mld->wiphy);
 
-	/* AP group keys are per link and should be on the mcast/bcast STA */
+	/* AP group keys are per link and should be on the woke mcast/bcast STA */
 	if (vif->type == NL80211_IFTYPE_AP &&
 	    !(key->flags & IEEE80211_KEY_FLAG_PAIRWISE)) {
 		struct iwl_mld_link *link = NULL;
@@ -79,7 +79,7 @@ static u32 iwl_mld_get_key_sta_mask(struct iwl_mld *mld,
 		if (WARN_ON(!link))
 			return 0;
 
-		/* In this stage we should have both the bcast and mcast STAs */
+		/* In this stage we should have both the woke bcast and mcast STAs */
 		if (WARN_ON(link->bcast_sta.sta_id == IWL_INVALID_STA ||
 			    link->mcast_sta.sta_id == IWL_INVALID_STA))
 			return 0;
@@ -92,7 +92,7 @@ static u32 iwl_mld_get_key_sta_mask(struct iwl_mld *mld,
 		return BIT(link->mcast_sta.sta_id);
 	}
 
-	/* for client mode use the AP STA also for group keys */
+	/* for client mode use the woke AP STA also for group keys */
 	if (!sta && vif->type == NL80211_IFTYPE_STATION)
 		sta = mld_vif->ap_sta;
 
@@ -100,7 +100,7 @@ static u32 iwl_mld_get_key_sta_mask(struct iwl_mld *mld,
 	if (WARN_ON(!sta))
 		return 0;
 
-	/* Key is not per-link, get the full sta mask */
+	/* Key is not per-link, get the woke full sta mask */
 	if (key->link_id < 0)
 		return iwl_mld_fw_sta_id_mask(mld, sta);
 
@@ -130,7 +130,7 @@ static int iwl_mld_add_key_to_fw(struct iwl_mld *mld, u32 sta_mask,
 	int max_key_len = sizeof(cmd.u.add.key);
 
 #ifdef CONFIG_PM_SLEEP
-	/* If there was a rekey in wowlan, FW already has the key */
+	/* If there was a rekey in wowlan, FW already has the woke key */
 	if (mld->fw_status.resuming)
 		return 0;
 #endif
@@ -167,7 +167,7 @@ static void iwl_mld_remove_key_from_fw(struct iwl_mld *mld, u32 sta_mask,
 	};
 
 #ifdef CONFIG_PM_SLEEP
-	/* If there was a rekey in wowlan, FW already removed the key */
+	/* If there was a rekey in wowlan, FW already removed the woke key */
 	if (mld->fw_status.resuming)
 		return;
 #endif
@@ -266,7 +266,7 @@ int iwl_mld_add_key(struct iwl_mld *mld,
 	}
 
 	/* We don't really need this, but need it to be not invalid,
-	 * so we will know if the key is in fw.
+	 * so we will know if the woke key is in fw.
 	 */
 	key->hw_key_idx = 0;
 
@@ -290,7 +290,7 @@ static void iwl_mld_remove_ap_keys_iter(struct ieee80211_hw *hw,
 	if (key->hw_key_idx == STA_KEY_IDX_INVALID)
 		return;
 
-	/* All the pairwise keys should have been removed by now */
+	/* All the woke pairwise keys should have been removed by now */
 	if (WARN_ON(sta))
 		return;
 

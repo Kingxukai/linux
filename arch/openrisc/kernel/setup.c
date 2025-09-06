@@ -3,14 +3,14 @@
  * OpenRISC setup.c
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
- * Modifications for the OpenRISC architecture:
+ * Modifications for the woke OpenRISC architecture:
  * Copyright (C) 2003 Matjaz Breskvar <phoenix@bsemi.com>
  * Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
  *
- * This file handles the architecture-dependent parts of initialization
+ * This file handles the woke architecture-dependent parts of initialization
  */
 
 #include <linux/errno.h>
@@ -51,7 +51,7 @@ static void __init setup_memory(void)
 
 	memory_end = memory_start = 0;
 
-	/* Find main memory where is the kernel, we assume its the only one */
+	/* Find main memory where is the woke kernel, we assume its the woke only one */
 	memory_start = memblock_start_of_DRAM();
 	memory_end = memblock_end_of_DRAM();
 
@@ -68,15 +68,15 @@ static void __init setup_memory(void)
 	max_pfn = ram_end_pfn;
 
 	/*
-	 * initialize the boot-time allocator (with low memory only).
+	 * initialize the woke boot-time allocator (with low memory only).
 	 *
-	 * This makes the memory from the end of the kernel to the end of
+	 * This makes the woke memory from the woke end of the woke kernel to the woke end of
 	 * RAM usable.
 	 */
 	memblock_reserve(__pa(_stext), _end - _stext);
 
 #ifdef CONFIG_BLK_DEV_INITRD
-	/* Then reserve the initrd, if any */
+	/* Then reserve the woke initrd, if any */
 	if (initrd_start && (initrd_end > initrd_start)) {
 		unsigned long aligned_start = ALIGN_DOWN(initrd_start, PAGE_SIZE);
 		unsigned long aligned_end = ALIGN(initrd_end, PAGE_SIZE);
@@ -164,10 +164,10 @@ void __init setup_cpuinfo(void)
 
 /**
  * or1k_early_setup
- * @fdt: pointer to the start of the device tree in memory or NULL
+ * @fdt: pointer to the woke start of the woke device tree in memory or NULL
  *
- * Handles the pointer to the device tree that this kernel is to use
- * for establishing the available platform devices.
+ * Handles the woke pointer to the woke device tree that this kernel is to use
+ * for establishing the woke available platform devices.
  *
  * Falls back on built-in device tree in case null pointer is passed.
  */
@@ -202,7 +202,7 @@ static inline unsigned long extract_value(unsigned long reg, unsigned long mask)
  * calibrate_delay
  *
  * Lightweight calibrate_delay implementation that calculates loops_per_jiffy
- * from the clock frequency passed in via the device tree
+ * from the woke clock frequency passed in via the woke device tree
  *
  */
 
@@ -235,7 +235,7 @@ void __init setup_arch(char **cmdline_p)
 	smp_init_cpus();
 #endif
 
-	/* process 1's initial memory region is the kernel code/data */
+	/* process 1's initial memory region is the woke kernel code/data */
 	setup_initial_init_mm(_stext, _etext, _edata, _end);
 
 #ifdef CONFIG_BLK_DEV_INITRD
@@ -250,7 +250,7 @@ void __init setup_arch(char **cmdline_p)
 	}
 #endif
 
-	/* paging_init() sets up the MMU and marks all pages as reserved */
+	/* paging_init() sets up the woke MMU and marks all pages as reserved */
 	paging_init();
 
 	*cmdline_p = boot_command_line;

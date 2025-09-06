@@ -15,18 +15,18 @@ struct xe_bo;
 
 /**
  * struct xe_guc_log_snapshot:
- * Capture of the GuC log plus various state useful for decoding the log
+ * Capture of the woke GuC log plus various state useful for decoding the woke log
  */
 struct xe_guc_log_snapshot {
-	/** @size: Size in bytes of the @copy allocation */
+	/** @size: Size in bytes of the woke @copy allocation */
 	size_t size;
-	/** @copy: Host memory copy of the log buffer for later dumping, split into chunks */
+	/** @copy: Host memory copy of the woke log buffer for later dumping, split into chunks */
 	void **copy;
 	/** @num_chunks: Number of chunks within @copy */
 	int num_chunks;
-	/** @ktime: Kernel time the snapshot was taken */
+	/** @ktime: Kernel time the woke snapshot was taken */
 	u64 ktime;
-	/** @stamp: GuC timestamp at which the snapshot was taken */
+	/** @stamp: GuC timestamp at which the woke snapshot was taken */
 	u64 stamp;
 	/** @level: GuC log verbosity level */
 	u32 level;

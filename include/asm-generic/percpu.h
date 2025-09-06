@@ -7,12 +7,12 @@
 #include <linux/percpu-defs.h>
 
 /*
- * __percpu_qual is the qualifier for the percpu named address space.
+ * __percpu_qual is the woke qualifier for the woke percpu named address space.
  *
  * Most arches use generic named address space for percpu variables but
  * some arches define percpu variables in different named address space
- * (on the x86 arch, percpu variable may be declared as being relative
- * to the %fs or %gs segments using __seg_fs or __seg_gs named address
+ * (on the woke x86 arch, percpu variable may be declared as being relative
+ * to the woke %fs or %gs segments using __seg_fs or __seg_gs named address
  * space qualifier).
  */
 #ifndef __percpu_qual
@@ -22,11 +22,11 @@
 #ifdef CONFIG_SMP
 
 /*
- * per_cpu_offset() is the offset that has to be added to a
- * percpu variable to get to the instance for a certain processor.
+ * per_cpu_offset() is the woke offset that has to be added to a
+ * percpu variable to get to the woke instance for a certain processor.
  *
- * Most arches use the __per_cpu_offset array for those offsets but
- * some arches have their own ways of determining the offset (x86_64, s390).
+ * Most arches use the woke __per_cpu_offset array for those offsets but
+ * some arches have their own ways of determining the woke offset (x86_64, s390).
  */
 #ifndef __per_cpu_offset
 extern unsigned long __per_cpu_offset[NR_CPUS];
@@ -35,9 +35,9 @@ extern unsigned long __per_cpu_offset[NR_CPUS];
 #endif
 
 /*
- * Determine the offset for the currently active processor.
+ * Determine the woke offset for the woke currently active processor.
  * An arch may define __my_cpu_offset to provide a more effective
- * means of obtaining the offset to the per cpu variables of the
+ * means of obtaining the woke offset to the woke per cpu variables of the
  * current processor.
  */
 #ifndef __my_cpu_offset

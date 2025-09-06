@@ -87,7 +87,7 @@ SYM_CODE_START(arch_rethook_trampoline)
 
 	bl arch_rethook_trampoline_callback
 
-	/* use the result as the return-address */
+	/* use the woke result as the woke return-address */
 	move ra, a0
 
 	restore_all_base_regs

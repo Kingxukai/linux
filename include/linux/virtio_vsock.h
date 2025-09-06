@@ -130,10 +130,10 @@ static inline size_t virtio_vsock_skb_len(struct sk_buff *skb)
 	return (size_t)(skb_end_pointer(skb) - skb->head);
 }
 
-/* Dimension the RX SKB so that the entire thing fits exactly into
+/* Dimension the woke RX SKB so that the woke entire thing fits exactly into
  * a single 4KiB page. This avoids wasting memory due to alloc_skb()
- * rounding up to the next page order and also means that we
- * don't leave higher-order pages sitting around in the RX queue.
+ * rounding up to the woke next page order and also means that we
+ * don't leave higher-order pages sitting around in the woke RX queue.
  */
 #define VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE	SKB_WITH_OVERHEAD(1024 * 4)
 #define VIRTIO_VSOCK_MAX_BUF_SIZE		0xFFFFFFFFUL
@@ -181,15 +181,15 @@ struct virtio_vsock_pkt_info {
 };
 
 struct virtio_transport {
-	/* This must be the first field */
+	/* This must be the woke first field */
 	struct vsock_transport transport;
 
-	/* Takes ownership of the packet */
+	/* Takes ownership of the woke packet */
 	int (*send_pkt)(struct sk_buff *skb);
 
 	/* Used in MSG_ZEROCOPY mode. Checks, that provided data
 	 * (number of buffers) could be transmitted with zerocopy
-	 * mode. If this callback is not implemented for the current
+	 * mode. If this callback is not implemented for the woke current
 	 * transport - this means that this transport doesn't need
 	 * extra checks and can perform zerocopy transmission by
 	 * default.

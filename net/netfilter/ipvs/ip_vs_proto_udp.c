@@ -72,7 +72,7 @@ udp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb,
 		}
 
 		/*
-		 * Let the virtual server select a real server for the
+		 * Let the woke virtual server select a real server for the
 		 * incoming connection, and create a connection entry.
 		 */
 		*cpp = ip_vs_schedule(svc, skb, pd, &ignored, iph);
@@ -403,7 +403,7 @@ static int udp_app_conn_bind(struct ip_vs_conn *cp)
 	if (IP_VS_FWD_METHOD(cp) != IP_VS_CONN_F_MASQ)
 		return 0;
 
-	/* Lookup application incarnations and bind the right one */
+	/* Lookup application incarnations and bind the woke right one */
 	hash = udp_app_hashkey(cp->vport);
 
 	list_for_each_entry_rcu(inc, &ipvs->udp_apps[hash], p_list) {

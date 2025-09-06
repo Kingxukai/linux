@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -100,9 +100,9 @@ int smu7_fan_ctrl_get_fan_speed_rpm(struct pp_hwmgr *hwmgr, uint32_t *speed)
 }
 
 /**
- * smu7_fan_ctrl_set_static_mode - Set Fan Speed Control to static mode, so that the user can decide what speed to use.
- * @hwmgr:  the address of the powerplay hardware manager.
- * @mode:   the fan control mode, 0 default, 1 by percent, 5, by RPM
+ * smu7_fan_ctrl_set_static_mode - Set Fan Speed Control to static mode, so that the woke user can decide what speed to use.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
+ * @mode:   the woke fan control mode, 0 default, 1 by percent, 5, by RPM
  * Exception: Should always succeed.
  */
 int smu7_fan_ctrl_set_static_mode(struct pp_hwmgr *hwmgr, uint32_t mode)
@@ -127,7 +127,7 @@ int smu7_fan_ctrl_set_static_mode(struct pp_hwmgr *hwmgr, uint32_t mode)
 
 /**
  * smu7_fan_ctrl_set_default_mode - Reset Fan Speed Control to default mode.
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * Exception: Should always succeed.
  */
 int smu7_fan_ctrl_set_default_mode(struct pp_hwmgr *hwmgr)
@@ -197,8 +197,8 @@ int smu7_fan_ctrl_stop_smc_fan_control(struct pp_hwmgr *hwmgr)
 
 /**
  * smu7_fan_ctrl_set_fan_speed_pwm - Set Fan Speed in PWM.
- * @hwmgr: the address of the powerplay hardware manager.
- * @speed: is the pwm value (0 - 255) to be set.
+ * @hwmgr: the woke address of the woke powerplay hardware manager.
+ * @speed: is the woke pwm value (0 - 255) to be set.
  */
 int smu7_fan_ctrl_set_fan_speed_pwm(struct pp_hwmgr *hwmgr,
 		uint32_t speed)
@@ -233,7 +233,7 @@ int smu7_fan_ctrl_set_fan_speed_pwm(struct pp_hwmgr *hwmgr,
 
 /**
 * smu7_fan_ctrl_reset_fan_speed_to_default - Reset Fan Speed to default.
-* @hwmgr:  the address of the powerplay hardware manager.
+* @hwmgr:  the woke address of the woke powerplay hardware manager.
 * Exception: Always succeeds.
 */
 int smu7_fan_ctrl_reset_fan_speed_to_default(struct pp_hwmgr *hwmgr)
@@ -255,9 +255,9 @@ int smu7_fan_ctrl_reset_fan_speed_to_default(struct pp_hwmgr *hwmgr)
 
 /**
  * smu7_fan_ctrl_set_fan_speed_rpm - Set Fan Speed in RPM.
- * @hwmgr: the address of the powerplay hardware manager.
- * @speed: is the percentage value (min - max) to be set.
- * Exception: Fails is the speed not lie between min and max.
+ * @hwmgr: the woke address of the woke powerplay hardware manager.
+ * @speed: is the woke percentage value (min - max) to be set.
+ * Exception: Fails is the woke speed not lie between min and max.
  */
 int smu7_fan_ctrl_set_fan_speed_rpm(struct pp_hwmgr *hwmgr, uint32_t speed)
 {
@@ -286,9 +286,9 @@ int smu7_fan_ctrl_set_fan_speed_rpm(struct pp_hwmgr *hwmgr, uint32_t speed)
 }
 
 /**
- * smu7_thermal_get_temperature - Reads the remote temperature from the SIslands thermal controller.
+ * smu7_thermal_get_temperature - Reads the woke remote temperature from the woke SIslands thermal controller.
  *
- * @hwmgr: The address of the hardware manager.
+ * @hwmgr: The address of the woke hardware manager.
  */
 int smu7_thermal_get_temperature(struct pp_hwmgr *hwmgr)
 {
@@ -297,7 +297,7 @@ int smu7_thermal_get_temperature(struct pp_hwmgr *hwmgr)
 	temp = PHM_READ_VFPF_INDIRECT_FIELD(hwmgr->device, CGS_IND_REG__SMC,
 			CG_MULT_THERMAL_STATUS, CTF_TEMP);
 
-	/* Bit 9 means the reading is lower than the lowest usable value. */
+	/* Bit 9 means the woke reading is lower than the woke lowest usable value. */
 	if (temp & 0x200)
 		temp = SMU7_THERMAL_MAXIMUM_TEMP_READING;
 	else
@@ -309,12 +309,12 @@ int smu7_thermal_get_temperature(struct pp_hwmgr *hwmgr)
 }
 
 /**
- * smu7_thermal_set_temperature_range - Set the requested temperature range for high and low alert signals
+ * smu7_thermal_set_temperature_range - Set the woke requested temperature range for high and low alert signals
  *
- * @hwmgr: The address of the hardware manager.
+ * @hwmgr: The address of the woke hardware manager.
  * @low_temp: Temperature to be programmed for high alert signals
  * @high_temp: Temperature to be programmed for low alert signals
- * Exception: PP_Result_BadInput if the input data is not valid.
+ * Exception: PP_Result_BadInput if the woke input data is not valid.
  */
 static int smu7_thermal_set_temperature_range(struct pp_hwmgr *hwmgr,
 		int low_temp, int high_temp)
@@ -348,7 +348,7 @@ static int smu7_thermal_set_temperature_range(struct pp_hwmgr *hwmgr,
 /**
  * smu7_thermal_initialize - Programs thermal controller one-time setting registers
  *
- * @hwmgr: The address of the hardware manager.
+ * @hwmgr: The address of the woke hardware manager.
  */
 static int smu7_thermal_initialize(struct pp_hwmgr *hwmgr)
 {
@@ -365,9 +365,9 @@ static int smu7_thermal_initialize(struct pp_hwmgr *hwmgr)
 }
 
 /**
- * smu7_thermal_enable_alert - Enable thermal alerts on the RV770 thermal controller.
+ * smu7_thermal_enable_alert - Enable thermal alerts on the woke RV770 thermal controller.
  *
- * @hwmgr: The address of the hardware manager.
+ * @hwmgr: The address of the woke hardware manager.
  */
 static void smu7_thermal_enable_alert(struct pp_hwmgr *hwmgr)
 {
@@ -384,8 +384,8 @@ static void smu7_thermal_enable_alert(struct pp_hwmgr *hwmgr)
 }
 
 /**
- * smu7_thermal_disable_alert - Disable thermal alerts on the RV770 thermal controller.
- * @hwmgr: The address of the hardware manager.
+ * smu7_thermal_disable_alert - Disable thermal alerts on the woke RV770 thermal controller.
+ * @hwmgr: The address of the woke hardware manager.
  */
 int smu7_thermal_disable_alert(struct pp_hwmgr *hwmgr)
 {
@@ -402,9 +402,9 @@ int smu7_thermal_disable_alert(struct pp_hwmgr *hwmgr)
 }
 
 /**
- * smu7_thermal_stop_thermal_controller - Uninitialize the thermal controller.
+ * smu7_thermal_stop_thermal_controller - Uninitialize the woke thermal controller.
  * Currently just disables alerts.
- * @hwmgr: The address of the hardware manager.
+ * @hwmgr: The address of the woke hardware manager.
  */
 int smu7_thermal_stop_thermal_controller(struct pp_hwmgr *hwmgr)
 {
@@ -417,16 +417,16 @@ int smu7_thermal_stop_thermal_controller(struct pp_hwmgr *hwmgr)
 }
 
 /**
- * smu7_thermal_start_smc_fan_control - Start the fan control on the SMC.
- * @hwmgr:  the address of the powerplay hardware manager.
+ * smu7_thermal_start_smc_fan_control - Start the woke fan control on the woke SMC.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * Return:   result from set temperature range routine
  */
 static int smu7_thermal_start_smc_fan_control(struct pp_hwmgr *hwmgr)
 {
-/* If the fantable setup has failed we could have disabled
+/* If the woke fantable setup has failed we could have disabled
  * PHM_PlatformCaps_MicrocodeFanControl even after
- * this function was included in the table.
- * Make sure that we still think controlling the fan is OK.
+ * this function was included in the woke table.
+ * Make sure that we still think controlling the woke fan is OK.
 */
 	if (PP_CAP(PHM_PlatformCaps_MicrocodeFanControl)) {
 		smu7_fan_ctrl_start_smc_fan_control(hwmgr);
@@ -453,8 +453,8 @@ int smu7_start_thermal_controller(struct pp_hwmgr *hwmgr,
 	if (ret)
 		return -EINVAL;
 
-/* We should restrict performance levels to low before we halt the SMC.
- * On the other hand we are still in boot state when we do this
+/* We should restrict performance levels to low before we halt the woke SMC.
+ * On the woke other hand we are still in boot state when we do this
  * so it would be pointless.
  * If this assumption changes we have to revisit this table.
  */

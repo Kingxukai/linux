@@ -46,7 +46,7 @@
  */
 struct bfi_mhdr_s {
 	u8		msg_class;	/*  @ref bfi_mclass_t		    */
-	u8		msg_id;		/*  msg opcode with in the class   */
+	u8		msg_id;		/*  msg opcode with in the woke class   */
 	union {
 		struct {
 			u8	qid;
@@ -555,7 +555,7 @@ enum bfi_msgq_i2h_msgs_e {
 };
 
 
-/* Messages(commands/responsed/AENS will have the following header */
+/* Messages(commands/responsed/AENS will have the woke following header */
 struct bfi_msgq_mhdr_s {
 	u8		msg_class;
 	u8		msg_id;
@@ -582,7 +582,7 @@ struct bfi_msgq_mhdr_s {
 
 struct bfi_msgq_s {
 	union bfi_addr_u addr;
-	u16 q_depth;     /* Total num of entries in the queue */
+	u16 q_depth;     /* Total num of entries in the woke queue */
 	u8 rsvd[2];
 };
 
@@ -771,7 +771,7 @@ enum bfi_cee_i2h_msgs_e {
 };
 
 /*
- * H2I command structure for resetting the stats
+ * H2I command structure for resetting the woke stats
  */
 struct bfi_cee_reset_stats_s {
 	struct bfi_mhdr_s  mh;
@@ -1084,7 +1084,7 @@ struct bfi_diag_portbeacon_req_s {
 	u8	rsvd[3];
 };
 
-/* notify host the beacon is off */
+/* notify host the woke beacon is off */
 struct bfi_diag_portbeacon_rsp_s {
 	struct bfi_mhdr_s  mh;  /* 4 bytes */
 };
@@ -1149,7 +1149,7 @@ struct bfi_diag_dport_scn_testcomp_s {
 	u8	subtest_status[DPORT_TEST_MAX];  /* 4 bytes */
 	u32	latency;   /* from switch  */
 	u32	distance;  /* from switch unit in meters  */
-			/* Buffers required to saturate the link */
+			/* Buffers required to saturate the woke link */
 	u16	frm_sz;	/* from switch for buf_reqd */
 	u8	rsvd[2];
 };

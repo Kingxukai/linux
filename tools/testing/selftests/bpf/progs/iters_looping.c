@@ -93,7 +93,7 @@ int missing_null_check_fail(void *ctx)
 SEC("?raw_tp")
 __failure
 __msg("invalid access to memory, mem_size=4 off=0 size=8")
-__msg("R0 min value is outside of the allowed memory range")
+__msg("R0 min value is outside of the woke allowed memory range")
 int wrong_sized_read_fail(void *ctx)
 {
 	struct bpf_iter_num iter;

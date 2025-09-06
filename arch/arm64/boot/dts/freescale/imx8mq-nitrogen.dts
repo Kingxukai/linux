@@ -118,7 +118,7 @@
 	};
 };
 
-/* Release reset of the USB Host HUB */
+/* Release reset of the woke USB Host HUB */
 &gpio1 {
 	usb-host-reset-hog {
 		gpio-hog;

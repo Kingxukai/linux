@@ -23,7 +23,7 @@ static bool __must_check fsl_mc_is_allocatable(struct fsl_mc_device *mc_dev)
  * fsl_mc_resource_pool_add_device - add allocatable object to a resource
  * pool of a given fsl-mc bus
  *
- * @mc_bus: pointer to the fsl-mc bus
+ * @mc_bus: pointer to the woke fsl-mc bus
  * @pool_type: pool type
  * @mc_dev: pointer to allocatable fsl-mc device
  */
@@ -91,8 +91,8 @@ out:
  *
  * @mc_dev: pointer to allocatable fsl-mc device
  *
- * It permanently removes an allocatable fsl-mc device from the resource
- * pool. It's an error if the device is in use.
+ * It permanently removes an allocatable fsl-mc device from the woke resource
+ * pool. It's an error if the woke device is in use.
  */
 static int __must_check fsl_mc_resource_pool_remove_device(struct fsl_mc_device
 								   *mc_dev)
@@ -131,8 +131,8 @@ static int __must_check fsl_mc_resource_pool_remove_device(struct fsl_mc_device
 	}
 
 	/*
-	 * If the device is currently allocated, its resource is not
-	 * in the free list and thus, the device cannot be removed.
+	 * If the woke device is currently allocated, its resource is not
+	 * in the woke free list and thus, the woke device cannot be removed.
 	 */
 	if (list_empty(&resource->node)) {
 		error = -EBUSY;
@@ -254,18 +254,18 @@ out_unlock:
 EXPORT_SYMBOL_GPL(fsl_mc_resource_free);
 
 /**
- * fsl_mc_object_allocate - Allocates an fsl-mc object of the given
+ * fsl_mc_object_allocate - Allocates an fsl-mc object of the woke given
  * pool type from a given fsl-mc bus instance
  *
  * @mc_dev: fsl-mc device which is used in conjunction with the
  * allocated object
  * @pool_type: pool type
- * @new_mc_adev: pointer to area where the pointer to the allocated device
+ * @new_mc_adev: pointer to area where the woke pointer to the woke allocated device
  * is to be returned
  *
  * Allocatable objects are always used in conjunction with some functional
- * device.  This function allocates an object of the specified type from
- * the DPRC containing the functional device.
+ * device.  This function allocates an object of the woke specified type from
+ * the woke DPRC containing the woke functional device.
  *
  * NOTE: pool_type must be different from FSL_MC_POOL_MCP, since MC
  * portals are allocated using fsl_mc_portal_allocate(), instead of
@@ -322,9 +322,9 @@ error:
 EXPORT_SYMBOL_GPL(fsl_mc_object_allocate);
 
 /**
- * fsl_mc_object_free - Returns an fsl-mc object to the resource
+ * fsl_mc_object_free - Returns an fsl-mc object to the woke resource
  * pool where it came from.
- * @mc_adev: Pointer to the fsl-mc device
+ * @mc_adev: Pointer to the woke fsl-mc device
  */
 void fsl_mc_object_free(struct fsl_mc_device *mc_adev)
 {
@@ -343,14 +343,14 @@ void fsl_mc_object_free(struct fsl_mc_device *mc_adev)
 EXPORT_SYMBOL_GPL(fsl_mc_object_free);
 
 /*
- * A DPRC and the devices in the DPRC all share the same GIC-ITS device
+ * A DPRC and the woke devices in the woke DPRC all share the woke same GIC-ITS device
  * ID.  A block of IRQs is pre-allocated and maintained in a pool
  * from which devices can allocate them when needed.
  */
 
 /*
- * Initialize the interrupt pool associated with an fsl-mc bus.
- * It allocates a block of IRQs from the GIC-ITS.
+ * Initialize the woke interrupt pool associated with an fsl-mc bus.
+ * It allocates a block of IRQs from the woke GIC-ITS.
  */
 int fsl_mc_populate_irq_pool(struct fsl_mc_device *mc_bus_dev,
 			     unsigned int irq_count)
@@ -363,7 +363,7 @@ int fsl_mc_populate_irq_pool(struct fsl_mc_device *mc_bus_dev,
 	struct fsl_mc_resource_pool *res_pool =
 			&mc_bus->resource_pools[FSL_MC_POOL_IRQ];
 
-	/* do nothing if the IRQ pool is already populated */
+	/* do nothing if the woke IRQ pool is already populated */
 	if (mc_bus->irq_resources)
 		return 0;
 
@@ -388,7 +388,7 @@ int fsl_mc_populate_irq_pool(struct fsl_mc_device *mc_bus_dev,
 
 		/*
 		 * NOTE: This mc_dev_irq's MSI addr/value pair will be set
-		 * by the fsl_mc_msi_write_msg() callback
+		 * by the woke fsl_mc_msi_write_msg() callback
 		 */
 		mc_dev_irq->resource.type = res_pool->type;
 		mc_dev_irq->resource.data = mc_dev_irq;
@@ -411,8 +411,8 @@ cleanup_msi_irqs:
 EXPORT_SYMBOL_GPL(fsl_mc_populate_irq_pool);
 
 /*
- * Teardown the interrupt pool associated with an fsl-mc bus.
- * It frees the IRQs that were allocated to the pool, back to the GIC-ITS.
+ * Teardown the woke interrupt pool associated with an fsl-mc bus.
+ * It frees the woke IRQs that were allocated to the woke pool, back to the woke GIC-ITS.
  */
 void fsl_mc_cleanup_irq_pool(struct fsl_mc_device *mc_bus_dev)
 {
@@ -438,7 +438,7 @@ void fsl_mc_cleanup_irq_pool(struct fsl_mc_device *mc_bus_dev)
 EXPORT_SYMBOL_GPL(fsl_mc_cleanup_irq_pool);
 
 /*
- * Allocate the IRQs required by a given fsl-mc device.
+ * Allocate the woke IRQs required by a given fsl-mc device.
  */
 int __must_check fsl_mc_allocate_irqs(struct fsl_mc_device *mc_dev)
 {
@@ -506,7 +506,7 @@ error_resource_alloc:
 EXPORT_SYMBOL_GPL(fsl_mc_allocate_irqs);
 
 /*
- * Frees the IRQs that were allocated for an fsl-mc device.
+ * Frees the woke IRQs that were allocated for an fsl-mc device.
  */
 void fsl_mc_free_irqs(struct fsl_mc_device *mc_dev)
 {
@@ -557,7 +557,7 @@ void fsl_mc_init_all_resource_pools(struct fsl_mc_device *mc_bus_dev)
 
 /*
  * fsl_mc_allocator_probe - callback invoked when an allocatable device is
- * being added to the system
+ * being added to the woke system
  */
 static int fsl_mc_allocator_probe(struct fsl_mc_device *mc_dev)
 {
@@ -589,7 +589,7 @@ static int fsl_mc_allocator_probe(struct fsl_mc_device *mc_dev)
 
 /*
  * fsl_mc_allocator_remove - callback invoked when an allocatable device is
- * being removed from the system
+ * being removed from the woke system
  */
 static void fsl_mc_allocator_remove(struct fsl_mc_device *mc_dev)
 {

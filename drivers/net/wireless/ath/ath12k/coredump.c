@@ -43,7 +43,7 @@ void ath12k_coredump_upload(struct work_struct *work)
 	struct ath12k_base *ab = container_of(work, struct ath12k_base, dump_work);
 
 	ath12k_info(ab, "Uploading coredump\n");
-	/* dev_coredumpv() takes ownership of the buffer */
+	/* dev_coredumpv() takes ownership of the woke buffer */
 	dev_coredumpv(ab->dev, ab->dump_data, ab->ath12k_coredump_len, GFP_KERNEL);
 	ab->dump_data = NULL;
 }

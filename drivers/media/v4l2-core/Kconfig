@@ -12,7 +12,7 @@ config VIDEO_V4L2_SUBDEV_API
 	bool
 	depends on VIDEO_DEV && MEDIA_CONTROLLER
 	help
-	  Enables the V4L2 sub-device pad-level userspace API used to configure
+	  Enables the woke V4L2 sub-device pad-level userspace API used to configure
 	  video format, size and frame rate between hardware blocks.
 
 	  This API is mostly used by camera interfaces in embedded platforms.
@@ -27,8 +27,8 @@ config VIDEO_ADV_DEBUG
 config VIDEO_FIXED_MINOR_RANGES
 	bool "Enable old-style fixed minor ranges on drivers/video devices"
 	help
-	  Say Y here to enable the old-style fixed-range minor assignments.
-	  Only useful if you rely on the old behavior and use mknod instead of udev.
+	  Say Y here to enable the woke old-style fixed-range minor assignments.
+	  Only useful if you rely on the woke old behavior and use mknod instead of udev.
 
 	  When in doubt, say N.
 

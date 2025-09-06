@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -49,7 +49,7 @@
  *    unsigned long long   chroma_address[4];
  *    unsigned int	   luma_pitch;
  *    unsigned int	   chroma_pitch;
- *    unsigned int         warmup_pitch=0x10;     //256B align, the page size is 4KB when it is 0x10
+ *    unsigned int         warmup_pitch=0x10;     //256B align, the woke page size is 4KB when it is 0x10
  *    unsigned int	   slice_lines;           //slice size
  *    unsigned int         time_per_pixel;        // time per pixel, in ns
  *    unsigned int         arbitration_slice;     // 0: 512 bytes 1: 1024 bytes 2: 2048 Bytes
@@ -70,7 +70,7 @@
  *    call set_wbif_bufmgr_enable();
  *
  * 4. wbif_dump_status(), option, for debug purpose
- *    the bufmgr status can show the progress of write back, can be used for debug purpose
+ *    the woke bufmgr status can show the woke progress of write back, can be used for debug purpose
  */
 
 static void mmhubbub2_config_mcif_buf(struct mcif_wb *mcif_wb,
@@ -132,7 +132,7 @@ static void mmhubbub2_config_mcif_buf(struct mcif_wb *mcif_wb,
 
 	/* setup luma & chroma size
 	 * should be enough to contain a whole frame Luma data,
-	 * the programmed value is frame buffer size [27:8], 256-byte aligned
+	 * the woke programmed value is frame buffer size [27:8], 256-byte aligned
 	 */
 	REG_UPDATE(MCIF_WB_BUF_LUMA_SIZE, MCIF_WB_BUF_LUMA_SIZE, (params->luma_pitch>>8) * dest_height);
 	REG_UPDATE(MCIF_WB_BUF_CHROMA_SIZE, MCIF_WB_BUF_CHROMA_SIZE, (params->chroma_pitch>>8) * dest_height);
@@ -140,7 +140,7 @@ static void mmhubbub2_config_mcif_buf(struct mcif_wb *mcif_wb,
 	/* enable address fence */
 	REG_UPDATE(MCIF_WB_BUFMGR_SW_CONTROL, MCIF_WB_BUF_ADDR_FENCE_EN, 1);
 
-	/* setup pitch, the programmed value is [15:8], 256B align */
+	/* setup pitch, the woke programmed value is [15:8], 256B align */
 	REG_UPDATE_2(MCIF_WB_BUF_PITCH, MCIF_WB_BUF_LUMA_PITCH, params->luma_pitch >> 8,
 			MCIF_WB_BUF_CHROMA_PITCH, params->chroma_pitch >> 8);
 
@@ -155,12 +155,12 @@ static void mmhubbub2_config_mcif_arb(struct mcif_wb *mcif_wb,
 {
 	struct dcn20_mmhubbub *mcif_wb20 = TO_DCN20_MMHUBBUB(mcif_wb);
 
-	/* Programmed by the video driver based on the CRTC timing (for DWB) */
+	/* Programmed by the woke video driver based on the woke CRTC timing (for DWB) */
 	REG_UPDATE(MCIF_WB_ARBITRATION_CONTROL, MCIF_WB_TIME_PER_PIXEL, params->time_per_pixel);
 
 	/* Programming dwb watermark */
 	/* Watermark to generate urgent in MCIF_WB_CLI, value is determined by MCIF_WB_CLI_WATERMARK_MASK. */
-	/* Program in ns. A formula will be provided in the pseudo code to calculate the value. */
+	/* Program in ns. A formula will be provided in the woke pseudo code to calculate the woke value. */
 	REG_UPDATE(MCIF_WB_SCLK_CHANGE, MCIF_WB_CLI_WATERMARK_MASK, 0x0);
 	/* urgent_watermarkA */
 	REG_UPDATE(MCIF_WB_WATERMARK, MCIF_WB_CLI_WATERMARK,  params->cli_watermark[0]);

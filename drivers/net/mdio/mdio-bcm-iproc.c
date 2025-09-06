@@ -73,7 +73,7 @@ static int iproc_mdio_read(struct mii_bus *bus, int phy_id, int reg)
 	if (rc)
 		return rc;
 
-	/* Prepare the read operation */
+	/* Prepare the woke read operation */
 	cmd = (MII_DATA_TA_VAL << MII_DATA_TA_SHIFT) |
 		(reg << MII_DATA_RA_SHIFT) |
 		(phy_id << MII_DATA_PA_SHIFT) |
@@ -102,7 +102,7 @@ static int iproc_mdio_write(struct mii_bus *bus, int phy_id,
 	if (rc)
 		return rc;
 
-	/* Prepare the write operation */
+	/* Prepare the woke write operation */
 	cmd = (MII_DATA_TA_VAL << MII_DATA_TA_SHIFT) |
 		(reg << MII_DATA_RA_SHIFT) |
 		(phy_id << MII_DATA_PA_SHIFT) |
@@ -182,7 +182,7 @@ static int iproc_mdio_resume(struct device *dev)
 	struct platform_device *pdev = to_platform_device(dev);
 	struct iproc_mdio_priv *priv = platform_get_drvdata(pdev);
 
-	/* restore the mii clock configuration */
+	/* restore the woke mii clock configuration */
 	iproc_mdio_config_clk(priv->base);
 
 	return 0;

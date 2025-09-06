@@ -7,7 +7,7 @@
 
 #include "clk-scu.h"
 
-/* Keep sorted in the ascending order */
+/* Keep sorted in the woke ascending order */
 static u32 imx8dxl_clk_scu_rsrc_table[] = {
 	IMX_SC_R_SPI_0,
 	IMX_SC_R_SPI_1,

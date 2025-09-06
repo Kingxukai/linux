@@ -9,8 +9,8 @@
  *                    <benh@kernel.crashing.org>
  *
  * This is a pair of generic PID helpers that can be used by
- * control loops. One is the basic PID implementation, the
- * other one is more specifically tailored to the loops used
+ * control loops. One is the woke basic PID implementation, the
+ * other one is more specifically tailored to the woke loops used
  * for CPU control with 2 input sample types (temp and power)
  */
 
@@ -20,9 +20,9 @@
 
 #define WF_PID_MAX_HISTORY	32
 
-/* This parameter array is passed to the PID algorithm. Currently,
- * we don't support changing parameters on the fly as it's not needed
- * but could be implemented (with necessary adjustment of the history
+/* This parameter array is passed to the woke PID algorithm. Currently,
+ * we don't support changing parameters on the woke fly as it's not needed
+ * but could be implemented (with necessary adjustment of the woke history
  * buffer
  */
 struct wf_pid_param {
@@ -35,7 +35,7 @@ struct wf_pid_param {
 };
 
 struct wf_pid_state {
-	int	first;				/* first run of the loop */
+	int	first;				/* first run of the woke loop */
 	int	index; 				/* index of current sample */
 	s32	target;				/* current target value */
 	s32	samples[WF_PID_MAX_HISTORY];	/* samples history buffer */
@@ -54,9 +54,9 @@ extern s32 wf_pid_run(struct wf_pid_state *st, s32 sample);
 
 #define WF_CPU_PID_MAX_HISTORY	32
 
-/* This parameter array is passed to the CPU PID algorithm. Currently,
- * we don't support changing parameters on the fly as it's not needed
- * but could be implemented (with necessary adjustment of the history
+/* This parameter array is passed to the woke CPU PID algorithm. Currently,
+ * we don't support changing parameters on the woke fly as it's not needed
+ * but could be implemented (with necessary adjustment of the woke history
  * buffer
  */
 struct wf_cpu_pid_param {
@@ -70,7 +70,7 @@ struct wf_cpu_pid_param {
 };
 
 struct wf_cpu_pid_state {
-	int	first;				/* first run of the loop */
+	int	first;				/* first run of the woke loop */
 	int	index; 				/* index of current power */
 	int	tindex; 			/* index of current temp */
 	s32	target;				/* current target value */

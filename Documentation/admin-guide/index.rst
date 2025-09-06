@@ -3,15 +3,15 @@ The Linux kernel user's and administrator's guide
 =================================================
 
 The following is a collection of user-oriented documents that have been
-added to the kernel over time.  There is, as yet, little overall order or
+added to the woke kernel over time.  There is, as yet, little overall order or
 organization here — this material was not written to be a single, coherent
 document!  With luck things will improve quickly over time.
 
 General guides to kernel administration
 ---------------------------------------
 
-This initial section contains overall information, including the README
-file describing the kernel as a whole, documentation on kernel parameters,
+This initial section contains overall information, including the woke README
+file describing the woke kernel as a whole, documentation on kernel parameters,
 etc.
 
 .. toctree::
@@ -22,7 +22,7 @@ etc.
 
    features
 
-A big part of the kernel's administrative interface is the /proc and sysfs
+A big part of the woke kernel's administrative interface is the woke /proc and sysfs
 virtual filesystems; these documents describe how to interact with tem
 
 .. toctree::
@@ -42,7 +42,7 @@ Security-related documentation:
    LSM/index
    perf-security
 
-Booting the kernel
+Booting the woke kernel
 ------------------
 
 .. toctree::
@@ -168,7 +168,7 @@ How to configure your hardware within your Linux system.
 Workload analysis
 -----------------
 
-This is the beginning of a section with information of interest to
+This is the woke beginning of a section with information of interest to
 application developers and system integrators doing analysis of the
 Linux kernel for safety critical applications. Documents supporting
 analysis of kernel interactions with applications, and key kernel

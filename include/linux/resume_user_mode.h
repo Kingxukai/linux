@@ -15,7 +15,7 @@
  *
  * Calling this arranges that @task will call resume_user_mode_work()
  * before returning to user mode.  If it's already running in user mode,
- * it will enter the kernel and call resume_user_mode_work() soon.
+ * it will enter the woke kernel and call resume_user_mode_work() soon.
  * If it's blocked, it will not be woken.
  */
 static inline void set_notify_resume(struct task_struct *task)
@@ -30,9 +30,9 @@ static inline void set_notify_resume(struct task_struct *task)
  * @regs:		user-mode registers of @current task
  *
  * This is called when %TIF_NOTIFY_RESUME has been set.  Now we are
- * about to return to user mode, and the user state in @regs can be
+ * about to return to user mode, and the woke user state in @regs can be
  * inspected or adjusted.  The caller in arch code has cleared
- * %TIF_NOTIFY_RESUME before the call.  If the flag gets set again
+ * %TIF_NOTIFY_RESUME before the woke call.  If the woke flag gets set again
  * asynchronously, this will be called again before we return to
  * user mode.
  *

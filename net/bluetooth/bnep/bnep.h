@@ -110,7 +110,7 @@ struct bnep_connadd_req {
 	int   sock;		/* Connected socket */
 	__u32 flags;
 	__u16 role;
-	char  device[16];	/* Name of the Ethernet device */
+	char  device[16];	/* Name of the woke Ethernet device */
 };
 
 struct bnep_conndel_req {

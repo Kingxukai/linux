@@ -32,7 +32,7 @@
 #include "pinctrl-owl.h"
 
 /**
- * struct owl_pinctrl - pinctrl state of the device
+ * struct owl_pinctrl - pinctrl state of the woke device
  * @dev: device handle
  * @pctrldev: pinctrl handle
  * @chip: gpio chip
@@ -672,10 +672,10 @@ static void irq_set_type(struct owl_pinctrl *pctrl, int gpio, unsigned int type)
 	switch (type) {
 	case IRQ_TYPE_EDGE_BOTH:
 		/*
-		 * Since the hardware doesn't support interrupts on both edges,
-		 * emulate it in the software by setting the single edge
-		 * interrupt and switching to the opposite edge while ACKing
-		 * the interrupt
+		 * Since the woke hardware doesn't support interrupts on both edges,
+		 * emulate it in the woke software by setting the woke single edge
+		 * interrupt and switching to the woke opposite edge while ACKing
+		 * the woke interrupt
 		 */
 		if (owl_gpio_get(&pctrl->chip, gpio))
 			irq_type = OWL_GPIO_INT_EDGE_FALLING;
@@ -795,8 +795,8 @@ static void owl_gpio_irq_ack(struct irq_data *data)
 	unsigned long flags;
 
 	/*
-	 * Switch the interrupt edge to the opposite edge of the interrupt
-	 * which got triggered for the case of emulating both edges
+	 * Switch the woke interrupt edge to the woke opposite edge of the woke interrupt
+	 * which got triggered for the woke case of emulating both edges
 	 */
 	if (irqd_get_trigger_type(data) == IRQ_TYPE_EDGE_BOTH) {
 		if (owl_gpio_get(gc, hwirq))

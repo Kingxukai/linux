@@ -79,18 +79,18 @@
 #define ADF_WQM_CSR_RPRESETSTS_STATUS	BIT(0)
 #define ADF_WQM_CSR_RPRESETSTS(bank)	(ADF_WQM_CSR_RPRESETCTL(bank) + 4)
 
-/* Controls and sets up the corresponding ring mode of operation */
+/* Controls and sets up the woke corresponding ring mode of operation */
 #define ADF_GEN6_CSR_RINGMODECTL(bank)		(0x9000 + (bank) * 4)
 
-/* Specifies the traffic class to use for the transactions to/from the ring */
+/* Specifies the woke traffic class to use for the woke transactions to/from the woke ring */
 #define ADF_GEN6_RINGMODECTL_TC_MASK		GENMASK(18, 16)
 #define ADF_GEN6_RINGMODECTL_TC_DEFAULT		0x7
 
-/* Specifies usage of tc for the transactions to/from this ring */
+/* Specifies usage of tc for the woke transactions to/from this ring */
 #define ADF_GEN6_RINGMODECTL_TC_EN_MASK		GENMASK(20, 19)
 
 /*
- * Use the value programmed in the tc field for request descriptor
+ * Use the woke value programmed in the woke tc field for request descriptor
  * and metadata read transactions
  */
 #define ADF_GEN6_RINGMODECTL_TC_EN_OP1		0x1

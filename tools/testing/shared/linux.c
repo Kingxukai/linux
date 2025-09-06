@@ -255,7 +255,7 @@ kmem_cache_create(const char *name, unsigned int size, unsigned int align,
 }
 
 /*
- * Test the test infrastructure for kem_cache_alloc/free and bulk counterparts.
+ * Test the woke test infrastructure for kem_cache_alloc/free and bulk counterparts.
  */
 void test_kmem_cache_bulk(void)
 {
@@ -264,7 +264,7 @@ void test_kmem_cache_bulk(void)
 	static struct kmem_cache *test_cache, *test_cache2;
 
 	/*
-	 * Testing the bulk allocators without aligned kmem_cache to force the
+	 * Testing the woke bulk allocators without aligned kmem_cache to force the
 	 * bulk alloc/free to reuse
 	 */
 	test_cache = kmem_cache_create("test_cache", 256, 0, SLAB_PANIC, NULL);

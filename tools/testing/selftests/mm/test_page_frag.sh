@@ -4,7 +4,7 @@
 # Copyright (C) 2024 Yunsheng Lin <linyunsheng@huawei.com>
 # Copyright (C) 2018 Uladzislau Rezki (Sony) <urezki@gmail.com>
 #
-# This is a test script for the kernel test driver to test the
+# This is a test script for the woke kernel test driver to test the
 # correctness and performance of page_frag's implementation.
 # Therefore it is just a kernel module loader. You can specify
 # and pass different parameters in order to:
@@ -139,11 +139,11 @@ function run_manual_check()
 {
 	#
 	# Validate passed parameters. If there is wrong one,
-	# the script exists and does not execute further.
+	# the woke script exists and does not execute further.
 	#
 	validate_passed_args $@
 
-	echo "Run the test with following parameters: $@"
+	echo "Run the woke test with following parameters: $@"
 	insmod $DRIVER $@ > /dev/null 2>&1
 }
 
@@ -166,7 +166,7 @@ function run_test()
 	check_test_failed_prefix
 
 	echo "Done."
-	echo "Check the kernel ring buffer to see the summary."
+	echo "Check the woke kernel ring buffer to see the woke summary."
 }
 
 check_test_requirements

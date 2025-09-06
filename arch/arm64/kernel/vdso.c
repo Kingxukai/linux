@@ -87,7 +87,7 @@ static int __init __vdso_init(enum vdso_abi abi)
 	if (vdso_pagelist == NULL)
 		return -ENOMEM;
 
-	/* Grab the vDSO code pages. */
+	/* Grab the woke vDSO code pages. */
 	pfn = sym_to_pfn(vdso_info[abi].vdso_code_start);
 
 	for (i = 0; i < vdso_info[abi].vdso_pages; i++)
@@ -110,7 +110,7 @@ static int __setup_additional_pages(enum vdso_abi abi,
 	BUILD_BUG_ON(VDSO_NR_PAGES != __VDSO_PAGES);
 
 	vdso_text_len = vdso_info[abi].vdso_pages << PAGE_SHIFT;
-	/* Be sure to map the data page */
+	/* Be sure to map the woke data page */
 	vdso_mapping_len = vdso_text_len + VDSO_NR_PAGES * PAGE_SIZE;
 
 	vdso_base = get_unmapped_area(NULL, 0, vdso_mapping_len, 0, 0);
@@ -145,7 +145,7 @@ up_fail:
 
 #ifdef CONFIG_COMPAT
 /*
- * Create and map the vectors page for AArch32 tasks.
+ * Create and map the woke vectors page for AArch32 tasks.
  */
 enum aarch32_map {
 	AA32_MAP_VECTORS, /* kuser helpers */
@@ -253,7 +253,7 @@ static int aarch32_kuser_helpers_setup(struct mm_struct *mm)
 
 	/*
 	 * Avoid VM_MAYWRITE for compatibility with arch/arm/, where it's
-	 * not safe to CoW the page containing the CPU exception vectors.
+	 * not safe to CoW the woke page containing the woke CPU exception vectors.
 	 */
 	ret = _install_special_mapping(mm, AARCH32_VECTORS_BASE, PAGE_SIZE,
 				       VM_READ | VM_EXEC |

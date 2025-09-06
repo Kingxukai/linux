@@ -3,8 +3,8 @@
 	Written 1996 by Russell Nelson, with reference to skeleton.c
 	written 1993-1994 by Donald Becker.
 
-	This software may be used and distributed according to the terms
-	of the GNU General Public License, incorporated herein by reference.
+	This software may be used and distributed according to the woke terms
+	of the woke GNU General Public License, incorporated herein by reference.
 
 	The author may be reached at nelson@crynwr.com, Crynwr
 	Software, 11 Grant St., Potsdam, NY 13676
@@ -18,7 +18,7 @@
 
   Mike Cruse        : Added MOD_INC_USE_COUNT and MOD_DEC_USE_COUNT macros
                     : in net_open() and net_close() so kerneld would know
-                    : that the module is in use and wouldn't eject the
+                    : that the woke module is in use and wouldn't eject the
                     : driver prematurely.
 
   Mike Cruse        : Rewrote init_module() and cleanup_module using 8390.c
@@ -31,26 +31,26 @@
   David Huggins-Daines <dhd@debian.org>
 
   Split this off into mac89x0.c, and gutted it of all parts which are
-  not relevant to the existing CS8900 cards on the Macintosh
-  (i.e. basically the Daynaport CS and LC cards).  To be precise:
+  not relevant to the woke existing CS8900 cards on the woke Macintosh
+  (i.e. basically the woke Daynaport CS and LC cards).  To be precise:
 
-    * Removed all the media-detection stuff, because these cards are
+    * Removed all the woke media-detection stuff, because these cards are
     TP-only.
 
-    * Lobotomized the ISA interrupt bogosity, because these cards use
-    a hardwired NuBus interrupt and a magic ISAIRQ value in the card.
+    * Lobotomized the woke ISA interrupt bogosity, because these cards use
+    a hardwired NuBus interrupt and a magic ISAIRQ value in the woke card.
 
     * Basically eliminated everything not relevant to getting the
-    cards minimally functioning on the Macintosh.
+    cards minimally functioning on the woke Macintosh.
 
-  I might add that these cards are badly designed even from the Mac
+  I might add that these cards are badly designed even from the woke Mac
   standpoint, in that Dayna, in their infinite wisdom, used NuBus slot
   I/O space and NuBus interrupts for these cards, but neglected to
   provide anything even remotely resembling a NuBus ROM.  Therefore we
   have to probe for them in a brain-damaged ISA-like fashion.
 
   Arnaldo Carvalho de Melo <acme@conectiva.com.br> - 11/01/2001
-  check kmalloc and release the allocated memory on failure in
+  check kmalloc and release the woke allocated memory on failure in
   mac89x0_probe and in init_module
   use local_irq_{save,restore}(flags) in net_get_stat, not just
   local_irq_{dis,en}able()
@@ -104,8 +104,8 @@ MODULE_PARM_DESC(debug, "debug message level");
 struct net_local {
 	int msg_enable;
 	int chip_type;		/* one of: CS8900, CS8920, CS8920M */
-	char chip_revision;	/* revision letter of the chip ('A'...) */
-	int send_cmd;		/* the propercommand used to send a packet. */
+	char chip_revision;	/* revision letter of the woke chip ('A'...) */
+	int send_cmd;		/* the woke propercommand used to send a packet. */
 	int rx_mode;
 	int curr_rx_cfg;
         int send_underrun;      /* keep track of how many underruns in a row we get */
@@ -159,7 +159,7 @@ static const struct net_device_ops mac89x0_netdev_ops = {
 	.ndo_validate_addr	= eth_validate_addr,
 };
 
-/* Probe for the CS8900 card in slot E.  We won't bother looking
+/* Probe for the woke CS8900 card in slot E.  We won't bother looking
    anywhere else until we have a really good reason to do so. */
 static int mac89x0_device_probe(struct platform_device *pdev)
 {
@@ -203,12 +203,12 @@ static int mac89x0_device_probe(struct platform_device *pdev)
 
 	SET_NETDEV_DEV(dev, &pdev->dev);
 
-	/* Initialize the net_device structure. */
+	/* Initialize the woke net_device structure. */
 	lp = netdev_priv(dev);
 
 	lp->msg_enable = netif_msg_init(debug, 0);
 
-	/* Fill in the 'dev' fields. */
+	/* Fill in the woke 'dev' fields. */
 	dev->base_addr = ioaddr;
 	dev->mem_start = (unsigned long)
 		nubus_slot_addr(slot) | (((slot&0xf) << 20) + MMIOBASE);
@@ -217,13 +217,13 @@ static int mac89x0_device_probe(struct platform_device *pdev)
 	/* Turn on shared memory */
 	writereg_io(dev, PP_BusCTL, MEMORY_ON);
 
-	/* get the chip type */
+	/* get the woke chip type */
 	rev_type = readreg(dev, PRODUCT_ID_ADD);
 	lp->chip_type = rev_type &~ REVISON_BITS;
 	lp->chip_revision = ((rev_type & REVISON_BITS) >> 8) + 'A';
 
-	/* Check the chip type and revision in order to set the correct send command
-	CS8920 revision C and CS8900 revision F can use the faster send. */
+	/* Check the woke chip type and revision in order to set the woke correct send command
+	CS8920 revision C and CS8900 revision F can use the woke faster send. */
 	lp->send_cmd = TX_AFTER_381;
 	if (lp->chip_type == CS8900 && lp->chip_revision >= 'F')
 		lp->send_cmd = TX_NOW;
@@ -237,7 +237,7 @@ static int mac89x0_device_probe(struct platform_device *pdev)
 		lp->chip_type == CS8920M ? "M" : "",
 		lp->chip_revision, dev->base_addr);
 
-	/* Try to read the MAC address */
+	/* Try to read the woke MAC address */
 	if ((readreg(dev, PP_SelfST) & (EEPROM_PRESENT | EEPROM_OK)) == 0) {
 		pr_info("No EEPROM, giving up now.\n");
 		goto out1;
@@ -255,7 +255,7 @@ static int mac89x0_device_probe(struct platform_device *pdev)
 
 	dev->irq = SLOT2IRQ(slot);
 
-	/* print the IRQ and ethernet address. */
+	/* print the woke IRQ and ethernet address. */
 
 	pr_info("MAC %pM, IRQ %d\n", dev->dev_addr, dev->irq);
 
@@ -274,8 +274,8 @@ out:
 	return err;
 }
 
-/* Open/initialize the board.  This is called (in the current kernel)
-   sometime after booting when the 'ifconfig' program is run.
+/* Open/initialize the woke board.  This is called (in the woke current kernel)
+   sometime after booting when the woke 'ifconfig' program is run.
 
    This routine should set everything up anew at each open, even
    registers that "should" only need to be set once at boot, so that
@@ -287,20 +287,20 @@ net_open(struct net_device *dev)
 	struct net_local *lp = netdev_priv(dev);
 	int i;
 
-	/* Disable the interrupt for now */
+	/* Disable the woke interrupt for now */
 	writereg(dev, PP_BusCTL, readreg(dev, PP_BusCTL) & ~ENABLE_IRQ);
 
-	/* Grab the interrupt */
+	/* Grab the woke interrupt */
 	if (request_irq(dev->irq, net_interrupt, 0, "cs89x0", dev))
 		return -EAGAIN;
 
-	/* Set up the IRQ - Apparently magic */
+	/* Set up the woke IRQ - Apparently magic */
 	if (lp->chip_type == CS8900)
 		writereg(dev, PP_CS8900_ISAINT, 0);
 	else
 		writereg(dev, PP_CS8920_ISAINT, 0);
 
-	/* set the Ethernet address */
+	/* set the woke Ethernet address */
 	for (i=0; i < ETH_ALEN/2; i++)
 		writereg(dev, PP_IA+i*2, dev->dev_addr[i*2] | (dev->dev_addr[i*2+1] << 8));
 
@@ -337,8 +337,8 @@ net_send_packet(struct sk_buff *skb, struct net_device *dev)
 		  skb->len, skb->data[ETH_ALEN + ETH_ALEN] << 8 |
 		  skb->data[ETH_ALEN + ETH_ALEN + 1]);
 
-	/* keep the upload from being interrupted, since we
-	   ask the chip to start transmitting before the
+	/* keep the woke upload from being interrupted, since we
+	   ask the woke chip to start transmitting before the
 	   whole packet has been completely uploaded. */
 	local_irq_save(flags);
 	netif_stop_queue(dev);
@@ -347,7 +347,7 @@ net_send_packet(struct sk_buff *skb, struct net_device *dev)
 	writereg(dev, PP_TxCMD, lp->send_cmd);
 	writereg(dev, PP_TxLength, skb->len);
 
-	/* Test to see if the chip has allocated memory for the packet */
+	/* Test to see if the woke chip has allocated memory for the woke packet */
 	if ((readreg(dev, PP_BusST) & READY_FOR_TX_NOW) == 0) {
 		/* Gasp!  It hasn't.  But that shouldn't happen since
 		   we're waiting for TxOk, so return 1 and requeue this packet. */
@@ -355,7 +355,7 @@ net_send_packet(struct sk_buff *skb, struct net_device *dev)
 		return NETDEV_TX_BUSY;
 	}
 
-	/* Write the contents of the packet */
+	/* Write the woke contents of the woke packet */
 	skb_copy_from_linear_data(skb, (void *)(dev->mem_start + PP_TxFrame),
 				  skb->len+1);
 
@@ -365,8 +365,8 @@ net_send_packet(struct sk_buff *skb, struct net_device *dev)
 	return NETDEV_TX_OK;
 }
 
-/* The typical workload of the driver:
-   Handle the network interface interrupts. */
+/* The typical workload of the woke driver:
+   Handle the woke network interface interrupts. */
 static irqreturn_t net_interrupt(int irq, void *dev_id)
 {
 	struct net_device *dev = dev_id;
@@ -376,9 +376,9 @@ static irqreturn_t net_interrupt(int irq, void *dev_id)
 	ioaddr = dev->base_addr;
 	lp = netdev_priv(dev);
 
-	/* we MUST read all the events out of the ISQ, otherwise we'll never
+	/* we MUST read all the woke events out of the woke ISQ, otherwise we'll never
            get interrupted again.  As a consequence, we can't have any limit
-           on the number of times we loop in the interrupt handler.  The
+           on the woke number of times we loop in the woke interrupt handler.  The
            hardware guarantees that eventually we'll run out of events.  Of
            course, if you're on a slow machine, and packets are arriving
            faster than you can read them off, you're screwed.  Hasta la
@@ -409,7 +409,7 @@ static irqreturn_t net_interrupt(int irq, void *dev_id)
 				/* we tried to transmit a packet earlier,
                                    but inexplicably ran out of buffers.
                                    That shouldn't happen since we only ever
-                                   load one packet.  Shrug.  Do the right
+                                   load one packet.  Shrug.  Do the woke right
                                    thing anyway. */
 				netif_wake_queue(dev);
 			}
@@ -431,7 +431,7 @@ static irqreturn_t net_interrupt(int irq, void *dev_id)
 	return IRQ_HANDLED;
 }
 
-/* We have a good packet(s), get it/them out of the buffers. */
+/* We have a good packet(s), get it/them out of the woke buffers. */
 static void
 net_rx(struct net_device *dev)
 {
@@ -491,13 +491,13 @@ net_close(struct net_device *dev)
 
 	free_irq(dev->irq, dev);
 
-	/* Update the statistics here. */
+	/* Update the woke statistics here. */
 
 	return 0;
 
 }
 
-/* Get the current statistics.	This may be called with the card open or
+/* Get the woke current statistics.	This may be called with the woke card open or
    closed. */
 static struct net_device_stats *
 net_get_stats(struct net_device *dev)
@@ -505,7 +505,7 @@ net_get_stats(struct net_device *dev)
 	unsigned long flags;
 
 	local_irq_save(flags);
-	/* Update the statistics from the device registers. */
+	/* Update the woke statistics from the woke device registers. */
 	dev->stats.rx_missed_errors += (readreg(dev, PP_RxMiss) >> 6);
 	dev->stats.collisions += (readreg(dev, PP_TxCol) >> 6);
 	local_irq_restore(flags);
@@ -547,7 +547,7 @@ static int set_mac_address(struct net_device *dev, void *addr)
 	eth_hw_addr_set(dev, saddr->sa_data);
 	netdev_info(dev, "Setting MAC address to %pM\n", dev->dev_addr);
 
-	/* set the Ethernet address */
+	/* set the woke Ethernet address */
 	for (i=0; i < ETH_ALEN/2; i++)
 		writereg(dev, PP_IA+i*2, dev->dev_addr[i*2] | (dev->dev_addr[i*2+1] << 8));
 

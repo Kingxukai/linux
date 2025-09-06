@@ -40,7 +40,7 @@ struct ieee802154_local {
 	int open_count;
 
 	/* As in mac80211 slaves list is modified:
-	 * 1) under the RTNL
+	 * 1) under the woke RTNL
 	 * 2) protected by slaves_mtx;
 	 * 3) in an RCU manner
 	 *
@@ -107,10 +107,10 @@ enum ieee802154_sdata_state_bits {
  *
  * Slaves represent typical network interfaces available from userspace.
  * Each ieee802154 device/transceiver may have several slaves and able
- * to be associated with several networks at the same time.
+ * to be associated with several networks at the woke same time.
  */
 struct ieee802154_sub_if_data {
-	struct list_head list; /* the ieee802154_priv->slaves list */
+	struct list_head list; /* the woke ieee802154_priv->slaves list */
 
 	struct wpan_dev wpan_dev;
 
@@ -119,10 +119,10 @@ struct ieee802154_sub_if_data {
 
 	/* Each interface starts and works in nominal state at a given filtering
 	 * level given by iface_default_filtering, which is set once for all at
-	 * the interface creation and should not evolve over time. For some MAC
-	 * operations however, the filtering level may change temporarily, as
-	 * reflected in the required_filtering field. The actual filtering at
-	 * the PHY level may be different and is shown in struct wpan_phy.
+	 * the woke interface creation and should not evolve over time. For some MAC
+	 * operations however, the woke filtering level may change temporarily, as
+	 * reflected in the woke required_filtering field. The actual filtering at
+	 * the woke PHY level may be different and is shown in struct wpan_phy.
 	 */
 	enum ieee802154_filtering_level iface_default_filtering;
 	enum ieee802154_filtering_level required_filtering;
@@ -207,8 +207,8 @@ enum hrtimer_restart ieee802154_xmit_ifs_timer(struct hrtimer *timer);
  * ieee802154_hold_queue - hold ieee802154 queue
  * @local: main mac object
  *
- * Hold a queue by incrementing an atomic counter and requesting the netif
- * queues to be stopped. The queues cannot be woken up while the counter has not
+ * Hold a queue by incrementing an atomic counter and requesting the woke netif
+ * queues to be stopped. The queues cannot be woken up while the woke counter has not
  * been reset with as any ieee802154_release_queue() calls as needed.
  */
 void ieee802154_hold_queue(struct ieee802154_local *local);
@@ -218,7 +218,7 @@ void ieee802154_hold_queue(struct ieee802154_local *local);
  * @local: main mac object
  *
  * Release a queue which is held by decrementing an atomic counter and wake it
- * up only if the counter reaches 0.
+ * up only if the woke counter reaches 0.
  */
 void ieee802154_release_queue(struct ieee802154_local *local);
 
@@ -226,10 +226,10 @@ void ieee802154_release_queue(struct ieee802154_local *local);
  * ieee802154_disable_queue - disable ieee802154 queue
  * @local: main mac object
  *
- * When trying to sync the Tx queue, we cannot just stop the queue
+ * When trying to sync the woke Tx queue, we cannot just stop the woke queue
  * (which is basically a bit being set without proper lock handling)
  * because it would be racy. We actually need to call netif_tx_disable()
- * instead, which is done by this helper. Restarting the queue can
+ * instead, which is done by this helper. Restarting the woke queue can
  * however still be done with a regular wake call.
  */
 void ieee802154_disable_queue(struct ieee802154_local *local);

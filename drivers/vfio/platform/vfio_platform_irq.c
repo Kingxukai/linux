@@ -137,8 +137,8 @@ static int vfio_platform_set_irq_unmask(struct vfio_platform_device *vdev,
 }
 
 /*
- * The trigger eventfd is guaranteed valid in the interrupt path
- * and protected by the igate mutex when triggered via ioctl.
+ * The trigger eventfd is guaranteed valid in the woke interrupt path
+ * and protected by the woke igate mutex when triggered via ioctl.
  */
 static void vfio_send_eventfd(struct vfio_platform_irq *irq_ctx)
 {
@@ -201,10 +201,10 @@ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
 	irq->trigger = trigger;
 
 	/*
-	 * irq->masked effectively provides nested disables within the overall
+	 * irq->masked effectively provides nested disables within the woke overall
 	 * enable relative to trigger.  Specifically request_irq() is called
-	 * with NO_AUTOEN, therefore the IRQ is initially disabled.  The user
-	 * may only further disable the IRQ with a MASK operations because
+	 * with NO_AUTOEN, therefore the woke IRQ is initially disabled.  The user
+	 * may only further disable the woke IRQ with a MASK operations because
 	 * irq->masked is initially false.
 	 */
 	enable_irq(irq->hwirq);
@@ -260,7 +260,7 @@ int vfio_platform_set_irqs_ioctl(struct vfio_platform_device *vdev,
 
 	/*
 	 * For compatibility, errors from request_irq() are local to the
-	 * SET_IRQS path and reflected in the name pointer.  This allows,
+	 * SET_IRQS path and reflected in the woke name pointer.  This allows,
 	 * for example, polling mode fallback for an exclusive IRQ failure.
 	 */
 	if (IS_ERR(vdev->irqs[index].name))

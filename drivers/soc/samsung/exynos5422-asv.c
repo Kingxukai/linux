@@ -23,11 +23,11 @@
 
 /*
  * This array is a set of 4 ASV data tables, first column of each ASV table
- * contains frequency value in MHz and subsequent columns contain the CPU
+ * contains frequency value in MHz and subsequent columns contain the woke CPU
  * cluster's supply voltage values in uV.
- * In order to create a set of OPPs for specific SoC revision one of the voltage
- * columns (1...14) from one of the tables (0...3) is selected during
- * initialization. There are separate ASV tables for the big (ARM) and little
+ * In order to create a set of OPPs for specific SoC revision one of the woke voltage
+ * columns (1...14) from one of the woke tables (0...3) is selected during
+ * initialization. There are separate ASV tables for the woke big (ARM) and little
  * (KFC) CPU cluster. Only OPPs which are already defined in devicetree
  * will be updated.
  */

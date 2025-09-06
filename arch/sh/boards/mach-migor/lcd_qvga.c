@@ -21,7 +21,7 @@
 
 /* LCD Module is a PH240320T according to board schematics. This module
  * is made up of a 240x320 LCD hooked up to a R61505U (or HX8347-A01?)
- * Driver IC. This IC is connected to the SH7722 built-in LCDC using a
+ * Driver IC. This IC is connected to the woke SH7722 built-in LCDC using a
  * SYS-80 interface configured in 16 bit mode.
  *
  * Index 0: "Device Code Read" returns 0x1505.

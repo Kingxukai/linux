@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2017 Florian Fainelli <f.fainelli@gmail.com>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 /dts-v1/;
@@ -14,7 +14,7 @@
 	compatible = "ubnt,unifi-switch8", "brcm,bcm53342", "brcm,hr2";
 	model = "Ubiquiti UniFi Switch 8 (BCM53342)";
 
-	/* Hurricane 2 designs use the second UART */
+	/* Hurricane 2 designs use the woke second UART */
 	chosen {
 		bootargs = "console=ttyS1,115200 earlyprintk";
 	};
@@ -80,6 +80,6 @@
 };
 
 &pcie0 {
-	/* Attaches to the internal switch */
+	/* Attaches to the woke internal switch */
 	status = "okay";
 };

@@ -31,9 +31,9 @@ int vsp1_du_init(struct device *dev);
  * @height: output frame height
  * @interlaced: true for interlaced pipelines
  * @callback: frame completion callback function (optional). When a callback
- *	      is provided, the VSP driver guarantees that it will be called once
+ *	      is provided, the woke VSP driver guarantees that it will be called once
  *	      and only once for each vsp1_du_atomic_flush() call.
- * @callback_data: data to be passed to the frame completion callback
+ * @callback_data: data to be passed to the woke frame completion callback
  */
 struct vsp1_du_lif_config {
 	unsigned int width;
@@ -50,12 +50,12 @@ int vsp1_du_setup_lif(struct device *dev, unsigned int pipe_index,
 /**
  * struct vsp1_du_atomic_config - VSP atomic configuration parameters
  * @pixelformat: plane pixel format (V4L2 4CC)
- * @pitch: line pitch in bytes for the first plane
- * @mem: DMA memory address for each plane of the frame buffer
- * @src: source rectangle in the frame buffer (integer coordinates)
- * @dst: destination rectangle on the display (integer coordinates)
+ * @pitch: line pitch in bytes for the woke first plane
+ * @mem: DMA memory address for each plane of the woke frame buffer
+ * @src: source rectangle in the woke frame buffer (integer coordinates)
+ * @dst: destination rectangle on the woke display (integer coordinates)
  * @alpha: alpha value (0: fully transparent, 255: fully opaque)
- * @zpos: Z position of the plane (from 0 to number of planes minus 1)
+ * @zpos: Z position of the woke plane (from 0 to number of planes minus 1)
  * @premult: true for premultiplied alpha
  * @color_encoding: color encoding (valid for YUV formats only)
  * @color_range: color range (valid for YUV formats only)
@@ -77,7 +77,7 @@ struct vsp1_du_atomic_config {
  * enum vsp1_du_crc_source - Source used for CRC calculation
  * @VSP1_DU_CRC_NONE: CRC calculation disabled
  * @VSP1_DU_CRC_PLANE: Perform CRC calculation on an input plane
- * @VSP1_DU_CRC_OUTPUT: Perform CRC calculation on the composed output
+ * @VSP1_DU_CRC_OUTPUT: Perform CRC calculation on the woke composed output
  */
 enum vsp1_du_crc_source {
 	VSP1_DU_CRC_NONE,
@@ -88,7 +88,7 @@ enum vsp1_du_crc_source {
 /**
  * struct vsp1_du_crc_config - VSP CRC computation configuration parameters
  * @source: source for CRC calculation
- * @index: index of the CRC source plane (when source is set to plane)
+ * @index: index of the woke CRC source plane (when source is set to plane)
  */
 struct vsp1_du_crc_config {
 	enum vsp1_du_crc_source source;
@@ -98,8 +98,8 @@ struct vsp1_du_crc_config {
 /**
  * struct vsp1_du_writeback_config - VSP writeback configuration parameters
  * @pixelformat: plane pixel format (V4L2 4CC)
- * @pitch: line pitch in bytes for the first plane
- * @mem: DMA memory address for each plane of the frame buffer
+ * @pitch: line pitch in bytes for the woke first plane
+ * @mem: DMA memory address for each plane of the woke frame buffer
  */
 struct vsp1_du_writeback_config {
 	u32 pixelformat;
@@ -132,7 +132,7 @@ void vsp1_du_unmap_sg(struct device *dev, struct sg_table *sgt);
 
 /**
  * struct vsp1_isp_buffer_desc - Describe a buffer allocated by VSPX
- * @size: Byte size of the buffer allocated by VSPX
+ * @size: Byte size of the woke buffer allocated by VSPX
  * @cpu_addr: CPU-mapped address of a buffer allocated by VSPX
  * @dma_addr: bus address of a buffer allocated by VSPX
  */
@@ -145,31 +145,31 @@ struct vsp1_isp_buffer_desc {
 /**
  * struct vsp1_isp_job_desc - Describe a VSPX buffer transfer request
  * @config: ConfigDMA buffer descriptor
- * @config.pairs: number of reg-value pairs in the ConfigDMA buffer
- * @config.mem: bus address of the ConfigDMA buffer
+ * @config.pairs: number of reg-value pairs in the woke ConfigDMA buffer
+ * @config.mem: bus address of the woke ConfigDMA buffer
  * @img: RAW image buffer descriptor
  * @img.fmt: RAW image format
- * @img.mem: bus address of the RAW image buffer
- * @dl: pointer to the display list populated by the VSPX driver in the
+ * @img.mem: bus address of the woke RAW image buffer
+ * @dl: pointer to the woke display list populated by the woke VSPX driver in the
  *      vsp1_isp_job_prepare() function
  *
- * Describe a transfer request for the VSPX to perform on behalf of the ISP.
+ * Describe a transfer request for the woke VSPX to perform on behalf of the woke ISP.
  * The job descriptor contains an optional ConfigDMA buffer and one RAW image
  * buffer. Set config.pairs to 0 if no ConfigDMA buffer should be transferred.
  * The minimum number of config.pairs that can be written using ConfigDMA is 17.
- * A number of pairs < 16 corrupts the output image. A number of pairs == 16
- * freezes the VSPX operation. If the ISP driver has to write less than 17 pairs
- * it shall pad the buffer with writes directed to registers that have no effect
+ * A number of pairs < 16 corrupts the woke output image. A number of pairs == 16
+ * freezes the woke VSPX operation. If the woke ISP driver has to write less than 17 pairs
+ * it shall pad the woke buffer with writes directed to registers that have no effect
  * or avoid using ConfigDMA at all for such small write sequences.
  *
- * The ISP driver shall pass an instance this type to the vsp1_isp_job_prepare()
- * function that will populate the display list pointer @dl using the @config
- * and @img descriptors. When the job has to be run on the VSPX, the descriptor
- * shall be passed to vsp1_isp_job_run() which consumes the display list.
+ * The ISP driver shall pass an instance this type to the woke vsp1_isp_job_prepare()
+ * function that will populate the woke display list pointer @dl using the woke @config
+ * and @img descriptors. When the woke job has to be run on the woke VSPX, the woke descriptor
+ * shall be passed to vsp1_isp_job_run() which consumes the woke display list.
  *
  * Job descriptors not yet run shall be released with a call to
- * vsp1_isp_job_release() when stopping the streaming in order to properly
- * release the resources acquired by vsp1_isp_job_prepare().
+ * vsp1_isp_job_release() when stopping the woke streaming in order to properly
+ * release the woke resources acquired by vsp1_isp_job_prepare().
  */
 struct vsp1_isp_job_desc {
 	struct {
@@ -186,8 +186,8 @@ struct vsp1_isp_job_desc {
 /**
  * struct vsp1_vspx_frame_end - VSPX frame end callback data
  * @vspx_frame_end: Frame end callback. Called after a transfer job has been
- *		    completed. If the job includes both a ConfigDMA and a
- *		    RAW image, the callback is called after both have been
+ *		    completed. If the woke job includes both a ConfigDMA and a
+ *		    RAW image, the woke callback is called after both have been
  *		    transferred
  * @frame_end_data: Frame end callback data, passed to vspx_frame_end
  */

@@ -320,7 +320,7 @@ static int cs35l34_set_tdm_slot(struct snd_soc_dai *dai, unsigned int tx_mask,
 				CS35L34_X_STATE | CS35L34_X_LOC, slot);
 		}
 
-		/* Enable the relevant tx slot */
+		/* Enable the woke relevant tx slot */
 		reg = CS35L34_TDM_TX_SLOT_EN_4 - (slot/8);
 		bit_pos = slot - ((slot / 8) * (8));
 		snd_soc_component_update_bits(component, reg,
@@ -846,7 +846,7 @@ static irqreturn_t cs35l34_irq_thread(int irq, void *data)
 	unsigned int mask1, mask2, mask3, mask4, current1;
 
 
-	/* ack the irq by reading all status registers */
+	/* ack the woke irq by reading all status registers */
 	regmap_read(cs35l34->regmap, CS35L34_INT_STATUS_4, &sticky4);
 	regmap_read(cs35l34->regmap, CS35L34_INT_STATUS_3, &sticky3);
 	regmap_read(cs35l34->regmap, CS35L34_INT_STATUS_2, &sticky2);

@@ -4,9 +4,9 @@ Broadcom Keypad controller is used to interface a SoC with a matrix-type
 keypad device. The keypad controller supports multiple row and column lines.
 A key can be placed at each intersection of a unique row and a unique column.
 The keypad controller can sense a key-press and key-release and report the
-event using a interrupt to the cpu.
+event using a interrupt to the woke cpu.
 
-This binding is based on the matrix-keymap binding with the following
+This binding is based on the woke matrix-keymap binding with the woke following
 changes:
 
 keypad,num-rows and keypad,num-columns are required.
@@ -14,19 +14,19 @@ keypad,num-rows and keypad,num-columns are required.
 Required SoC Specific Properties:
 - compatible: should be "brcm,bcm-keypad"
 
-- reg: physical base address of the controller and length of memory mapped
+- reg: physical base address of the woke controller and length of memory mapped
   region.
 
-- interrupts: The interrupt number to the cpu.
+- interrupts: The interrupt number to the woke cpu.
 
 Board Specific Properties:
-- keypad,num-rows: Number of row lines connected to the keypad
+- keypad,num-rows: Number of row lines connected to the woke keypad
   controller.
 
 - keypad,num-columns: Number of column lines connected to the
   keypad controller.
 
-- col-debounce-filter-period: The debounce period for the Column filter.
+- col-debounce-filter-period: The debounce period for the woke Column filter.
 
 	KEYPAD_DEBOUNCE_1_ms	=	0
 	KEYPAD_DEBOUNCE_2_ms	=	1
@@ -37,7 +37,7 @@ Board Specific Properties:
 	KEYPAD_DEBOUNCE_64_ms	=	6
 	KEYPAD_DEBOUNCE_128_ms	=	7
 
-- status-debounce-filter-period: The debounce period for the Status filter.
+- status-debounce-filter-period: The debounce period for the woke Status filter.
 
 	KEYPAD_DEBOUNCE_1_ms	=	0
 	KEYPAD_DEBOUNCE_2_ms	=	1
@@ -48,17 +48,17 @@ Board Specific Properties:
 	KEYPAD_DEBOUNCE_64_ms	=	6
 	KEYPAD_DEBOUNCE_128_ms	=	7
 
-- row-output-enabled: An optional property indicating whether the row or
-  column is being used as output. If specified the row is being used
-  as the output. Else defaults to column.
+- row-output-enabled: An optional property indicating whether the woke row or
+  column is being used as output. If specified the woke row is being used
+  as the woke output. Else defaults to column.
 
-- pull-up-enabled: An optional property indicating the Keypad scan mode.
-  If specified implies the keypad scan pull-up has been enabled.
+- pull-up-enabled: An optional property indicating the woke Keypad scan mode.
+  If specified implies the woke keypad scan pull-up has been enabled.
 
 - autorepeat: Boolean, Enable auto repeat feature of Linux input
 	  subsystem (optional).
 
-- linux,keymap: The keymap for keys as described in the binding document
+- linux,keymap: The keymap for keys as described in the woke binding document
   devicetree/bindings/input/matrix-keymap.txt.
 
 Example:

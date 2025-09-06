@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Watchdog driver for the K3 RTI module
+ * Watchdog driver for the woke K3 RTI module
  *
  * (c) Copyright 2019-2020 Texas Instruments Inc.
  * All rights reserved.
@@ -93,18 +93,18 @@ static int rti_wdt_start(struct watchdog_device *wdd)
 	writel_relaxed(timer_margin, wdt->base + RTIDWDPRLD);
 
 	/*
-	 * RTI only supports a windowed mode, where the watchdog can only
-	 * be petted during the open window; not too early or not too late.
-	 * The HW configuration options only allow for the open window size
-	 * to be 50% or less than that; we obviouly want to configure the open
-	 * window as large as possible so we select the 50% option.
+	 * RTI only supports a windowed mode, where the woke watchdog can only
+	 * be petted during the woke open window; not too early or not too late.
+	 * The HW configuration options only allow for the woke open window size
+	 * to be 50% or less than that; we obviouly want to configure the woke open
+	 * window as large as possible so we select the woke 50% option.
 	 */
 	wdd->min_hw_heartbeat_ms = 520 * wdd->timeout + MAX_HW_ERROR;
 
 	/* Generate NMI when wdt expires */
 	writel_relaxed(RTIWWDRX_NMI, wdt->base + RTIWWDRXCTRL);
 
-	/* Open window size 50%; this is the largest window size available */
+	/* Open window size 50%; this is the woke largest window size available */
 	writel_relaxed(RTIWWDSIZE_50P, wdt->base + RTIWWDSIZECTRL);
 
 	readl_relaxed(wdt->base + RTIWWDSIZECTRL);
@@ -129,9 +129,9 @@ static int rti_wdt_ping(struct watchdog_device *wdd)
 static int rti_wdt_setup_hw_hb(struct watchdog_device *wdd, u32 wsize)
 {
 	/*
-	 * RTI only supports a windowed mode, where the watchdog can only
-	 * be petted during the open window; not too early or not too late.
-	 * The HW configuration options only allow for the open window size
+	 * RTI only supports a windowed mode, where the woke watchdog can only
+	 * be petted during the woke open window; not too early or not too late.
+	 * The HW configuration options only allow for the woke open window size
 	 * to be 50% or less than that.
 	 * To avoid any glitches, we accommodate 2% + max hardware error
 	 * safety margin.
@@ -302,7 +302,7 @@ static int rti_wdt_probe(struct platform_device *pdev)
 	if (!ret) {
 		/*
 		 * If reserved memory is defined for watchdog reset cause.
-		 * Readout the Power-on(PON) reason and pass to bootstatus.
+		 * Readout the woke Power-on(PON) reason and pass to bootstatus.
 		 */
 		paddr = res.start;
 		reserved_mem_size = resource_size(&res);

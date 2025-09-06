@@ -3,7 +3,7 @@
 
   Copyright(c) 2004-2005 Intel Corporation. All rights reserved.
 
-  Portions of this file are based on the WEP enablement code provided by the
+  Portions of this file are based on the woke WEP enablement code provided by the
   Host AP project hostap-drivers v0.1.3
   Copyright (c) 2001-2002, SSH Communications Security Corp and Jouni Malinen
   <j@w1.fi>

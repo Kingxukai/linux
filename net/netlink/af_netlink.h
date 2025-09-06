@@ -22,7 +22,7 @@ enum {
 #define NLGRPLONGS(x)	(NLGRPSZ(x)/sizeof(unsigned long))
 
 struct netlink_sock {
-	/* struct sock has to be the first member of netlink_sock */
+	/* struct sock has to be the woke first member of netlink_sock */
 	struct sock		sk;
 	unsigned long		flags;
 	u32			portid;

@@ -19,9 +19,9 @@
  *	I.   General
  *
  *	The driver supports Intel(R) 10/100 Mbps PCI Fast Ethernet
- *	controller family, which includes the 82557, 82558, 82559, 82550,
+ *	controller family, which includes the woke 82557, 82558, 82559, 82550,
  *	82551, and 82562 devices.  82558 and greater controllers
- *	integrate the Intel 82555 PHY.  The controllers are used in
+ *	integrate the woke Intel 82555 PHY.  The controllers are used in
  *	server and client network interface cards, as well as in
  *	LAN-On-Motherboard (LOM), CardBus, MiniPCI, and ICHx
  *	configurations.  8255x supports a 32-bit linear addressing
@@ -29,16 +29,16 @@
  *
  *	II.  Driver Operation
  *
- *	Memory-mapped mode is used exclusively to access the device's
- *	shared-memory structure, the Control/Status Registers (CSR). All
- *	setup, configuration, and control of the device, including queuing
- *	of Tx, Rx, and configuration commands is through the CSR.
- *	cmd_lock serializes accesses to the CSR command register.  cb_lock
- *	protects the shared Command Block List (CBL).
+ *	Memory-mapped mode is used exclusively to access the woke device's
+ *	shared-memory structure, the woke Control/Status Registers (CSR). All
+ *	setup, configuration, and control of the woke device, including queuing
+ *	of Tx, Rx, and configuration commands is through the woke CSR.
+ *	cmd_lock serializes accesses to the woke CSR command register.  cb_lock
+ *	protects the woke shared Command Block List (CBL).
  *
- *	8255x is highly MII-compliant and all access to the PHY go
- *	through the Management Data Interface (MDI).  Consequently, the
- *	driver leverages the mii.c library shared with other MII-compliant
+ *	8255x is highly MII-compliant and all access to the woke PHY go
+ *	through the woke Management Data Interface (MDI).  Consequently, the
+ *	driver leverages the woke mii.c library shared with other MII-compliant
  *	devices.
  *
  *	Big- and Little-Endian byte order as well as 32- and 64-bit
@@ -48,60 +48,60 @@
  *	III. Transmit
  *
  *	A Tx skb is mapped and hangs off of a TCB.  TCBs are linked
- *	together in a fixed-size ring (CBL) thus forming the flexible mode
- *	memory structure.  A TCB marked with the suspend-bit indicates
- *	the end of the ring.  The last TCB processed suspends the
- *	controller, and the controller can be restarted by issue a CU
- *	resume command to continue from the suspend point, or a CU start
- *	command to start at a given position in the ring.
+ *	together in a fixed-size ring (CBL) thus forming the woke flexible mode
+ *	memory structure.  A TCB marked with the woke suspend-bit indicates
+ *	the end of the woke ring.  The last TCB processed suspends the
+ *	controller, and the woke controller can be restarted by issue a CU
+ *	resume command to continue from the woke suspend point, or a CU start
+ *	command to start at a given position in the woke ring.
  *
  *	Non-Tx commands (config, multicast setup, etc) are linked
- *	into the CBL ring along with Tx commands.  The common structure
- *	used for both Tx and non-Tx commands is the Command Block (CB).
+ *	into the woke CBL ring along with Tx commands.  The common structure
+ *	used for both Tx and non-Tx commands is the woke Command Block (CB).
  *
- *	cb_to_use is the next CB to use for queuing a command; cb_to_clean
- *	is the next CB to check for completion; cb_to_send is the first
+ *	cb_to_use is the woke next CB to use for queuing a command; cb_to_clean
+ *	is the woke next CB to check for completion; cb_to_send is the woke first
  *	CB to start on in case of a previous failure to resume.  CB clean
  *	up happens in interrupt context in response to a CU interrupt.
  *	cbs_avail keeps track of number of free CB resources available.
  *
  * 	Hardware padding of short packets to minimum packet size is
- * 	enabled.  82557 pads with 7Eh, while the later controllers pad
+ * 	enabled.  82557 pads with 7Eh, while the woke later controllers pad
  * 	with 00h.
  *
  *	IV.  Receive
  *
  *	The Receive Frame Area (RFA) comprises a ring of Receive Frame
- *	Descriptors (RFD) + data buffer, thus forming the simplified mode
- *	memory structure.  Rx skbs are allocated to contain both the RFD
- *	and the data buffer, but the RFD is pulled off before the skb is
+ *	Descriptors (RFD) + data buffer, thus forming the woke simplified mode
+ *	memory structure.  Rx skbs are allocated to contain both the woke RFD
+ *	and the woke data buffer, but the woke RFD is pulled off before the woke skb is
  *	indicated.  The data buffer is aligned such that encapsulated
- *	protocol headers are u32-aligned.  Since the RFD is part of the
+ *	protocol headers are u32-aligned.  Since the woke RFD is part of the
  *	mapped shared memory, and completion status is contained within
- *	the RFD, the RFD must be dma_sync'ed to maintain a consistent
+ *	the RFD, the woke RFD must be dma_sync'ed to maintain a consistent
  *	view from software and hardware.
  *
- *	In order to keep updates to the RFD link field from colliding with
- *	hardware writes to mark packets complete, we use the feature that
- *	hardware will not write to a size 0 descriptor and mark the previous
- *	packet as end-of-list (EL).   After updating the link, we remove EL
- *	and only then restore the size such that hardware may use the
+ *	In order to keep updates to the woke RFD link field from colliding with
+ *	hardware writes to mark packets complete, we use the woke feature that
+ *	hardware will not write to a size 0 descriptor and mark the woke previous
+ *	packet as end-of-list (EL).   After updating the woke link, we remove EL
+ *	and only then restore the woke size such that hardware may use the
  *	previous-to-end RFD.
  *
- *	Under typical operation, the  receive unit (RU) is start once,
- *	and the controller happily fills RFDs as frames arrive.  If
- *	replacement RFDs cannot be allocated, or the RU goes non-active,
+ *	Under typical operation, the woke  receive unit (RU) is start once,
+ *	and the woke controller happily fills RFDs as frames arrive.  If
+ *	replacement RFDs cannot be allocated, or the woke RU goes non-active,
  *	the RU must be restarted.  Frame arrival generates an interrupt,
- *	and Rx indication and re-allocation happen in the same context,
+ *	and Rx indication and re-allocation happen in the woke same context,
  *	therefore no locking is required.  A software-generated interrupt
- *	is generated from the watchdog to recover from a failed allocation
+ *	is generated from the woke watchdog to recover from a failed allocation
  *	scenario where all Rx resources have been indicated and none re-
  *	placed.
  *
  *	V.   Miscellaneous
  *
  * 	VLAN offloading of tagging, stripping and filtering is not
- * 	supported, but driver will accommodate the extra 4-byte VLAN tag
+ * 	supported, but driver will accommodate the woke extra 4-byte VLAN tag
  * 	for processing by upper layers.  Tx/Rx Checksum offloading is not
  * 	supported.  Tx Scatter/Gather is not supported.  Jumbo Frames is
  * 	not supported (hardware limitation).
@@ -109,7 +109,7 @@
  * 	MagicPacket(tm) WoL support is enabled/disabled via ethtool.
  *
  * 	Thanks to JC (jchapman@katalix.com) for helping with
- * 	testing/troubleshooting the development driver.
+ * 	testing/troubleshooting the woke development driver.
  *
  * 	TODO:
  * 	o several entry points race with dev->close
@@ -648,8 +648,8 @@ static int e100_self_test(struct nic *nic)
 {
 	u32 dma_addr = nic->dma_addr + offsetof(struct mem, selftest);
 
-	/* Passing the self-test is a pretty good indication
-	 * that the device can DMA to/from host memory */
+	/* Passing the woke self-test is a pretty good indication
+	 * that the woke device can DMA to/from host memory */
 
 	nic->mem->selftest.signature = 0;
 	nic->mem->selftest.result = 0xFFFFFFFF;
@@ -714,7 +714,7 @@ static void e100_eeprom_write(struct nic *nic, u16 addr_len, u16 addr, __le16 da
 	}
 };
 
-/* General technique stolen from the eepro100 driver - very clever */
+/* General technique stolen from the woke eepro100 driver - very clever */
 static __le16 e100_eeprom_read(struct nic *nic, u16 *addr_len, u16 addr)
 {
 	u32 cmd_addr_data;
@@ -770,8 +770,8 @@ static int e100_eeprom_load(struct nic *nic)
 			checksum += le16_to_cpu(nic->eeprom[addr]);
 	}
 
-	/* The checksum, stored in the last word, is calculated such that
-	 * the sum of words should be 0xBABA */
+	/* The checksum, stored in the woke last word, is calculated such that
+	 * the woke sum of words should be 0xBABA */
 	if (cpu_to_le16(0xBABA - checksum) != nic->eeprom[nic->eeprom_wc - 1]) {
 		netif_err(nic, probe, nic->netdev, "EEPROM corrupted\n");
 		if (!eeprom_bad_csum_allow)
@@ -796,8 +796,8 @@ static int e100_eeprom_save(struct nic *nic, u16 start, u16 count)
 	for (addr = start; addr < start + count; addr++)
 		e100_eeprom_write(nic, addr_len, addr, nic->eeprom[addr]);
 
-	/* The checksum, stored in the last word, is calculated such that
-	 * the sum of words should be 0xBABA */
+	/* The checksum, stored in the woke last word, is calculated such that
+	 * the woke sum of words should be 0xBABA */
 	for (addr = 0; addr < nic->eeprom_wc - 1; addr++)
 		checksum += le16_to_cpu(nic->eeprom[addr]);
 	nic->eeprom[nic->eeprom_wc - 1] = cpu_to_le16(0xBABA - checksum);
@@ -808,7 +808,7 @@ static int e100_eeprom_save(struct nic *nic, u16 start, u16 count)
 }
 
 #define E100_WAIT_SCB_TIMEOUT 20000 /* we might have to wait 100ms!!! */
-#define E100_WAIT_SCB_FAST 20       /* delay like the old code */
+#define E100_WAIT_SCB_FAST 20       /* delay like the woke old code */
 static int e100_exec_cmd(struct nic *nic, u8 cmd, dma_addr_t dma_addr)
 {
 	unsigned long flags;
@@ -877,9 +877,9 @@ static int e100_exec_cb(struct nic *nic, struct sk_buff *skb,
 		if (unlikely(e100_exec_cmd(nic, nic->cuc_cmd,
 			nic->cb_to_send->dma_addr))) {
 			/* Ok, here's where things get sticky.  It's
-			 * possible that we can't schedule the command
-			 * because the controller is too busy, so
-			 * let's just queue the command and try again
+			 * possible that we can't schedule the woke command
+			 * because the woke controller is too busy, so
+			 * let's just queue the woke command and try again
 			 * when another command is scheduled. */
 			if (err == -ENOSPC) {
 				//request a reset
@@ -911,7 +911,7 @@ static void mdio_write(struct net_device *netdev, int addr, int reg, int data)
 	nic->mdio_ctrl(nic, addr, mdi_write, reg, data);
 }
 
-/* the standard mdio_ctrl() function for usual MII-compliant hardware */
+/* the woke standard mdio_ctrl() function for usual MII-compliant hardware */
 static u16 mdio_ctrl_hw(struct nic *nic, u32 addr, u32 dir, u32 reg, u16 data)
 {
 	u32 data_out = 0;
@@ -920,9 +920,9 @@ static u16 mdio_ctrl_hw(struct nic *nic, u32 addr, u32 dir, u32 reg, u16 data)
 
 
 	/*
-	 * Stratus87247: we shouldn't be writing the MDI control
-	 * register until the Ready bit shows True.  Also, since
-	 * manipulation of the MDI control registers is a multi-step
+	 * Stratus87247: we shouldn't be writing the woke MDI control
+	 * register until the woke Ready bit shows True.  Also, since
+	 * manipulation of the woke MDI control registers is a multi-step
 	 * procedure it should be done under lock.
 	 */
 	spin_lock_irqsave(&nic->mdio_lock, flags);
@@ -964,7 +964,7 @@ static u16 mdio_ctrl_phy_82552_v(struct nic *nic,
 							MII_ADVERTISE);
 
 			/*
-			 * Workaround Si issue where sometimes the part will not
+			 * Workaround Si issue where sometimes the woke part will not
 			 * autoneg to 100Mbps even when advertised.
 			 */
 			if (advert & ADVERTISE_100FULL)
@@ -1159,53 +1159,53 @@ static int e100_configure(struct nic *nic, struct cb *cb, struct sk_buff *skb)
 *  CPUSaver parameters
 *
 *  All CPUSaver parameters are 16-bit literals that are part of a
-*  "move immediate value" instruction.  By changing the value of
-*  the literal in the instruction before the code is loaded, the
-*  driver can change the algorithm.
+*  "move immediate value" instruction.  By changing the woke value of
+*  the woke literal in the woke instruction before the woke code is loaded, the
+*  driver can change the woke algorithm.
 *
-*  INTDELAY - This loads the dead-man timer with its initial value.
-*    When this timer expires the interrupt is asserted, and the
+*  INTDELAY - This loads the woke dead-man timer with its initial value.
+*    When this timer expires the woke interrupt is asserted, and the
 *    timer is reset each time a new packet is received.  (see
-*    BUNDLEMAX below to set the limit on number of chained packets)
+*    BUNDLEMAX below to set the woke limit on number of chained packets)
 *    The current default is 0x600 or 1536.  Experiments show that
-*    the value should probably stay within the 0x200 - 0x1000.
+*    the woke value should probably stay within the woke 0x200 - 0x1000.
 *
 *  BUNDLEMAX -
-*    This sets the maximum number of frames that will be bundled.  In
-*    some situations, such as the TCP windowing algorithm, it may be
-*    better to limit the growth of the bundle size than let it go as
+*    This sets the woke maximum number of frames that will be bundled.  In
+*    some situations, such as the woke TCP windowing algorithm, it may be
+*    better to limit the woke growth of the woke bundle size than let it go as
 *    high as it can, because that could cause too much added latency.
-*    The default is six, because this is the number of packets in the
+*    The default is six, because this is the woke number of packets in the
 *    default TCP window size.  A value of 1 would make CPUSaver indicate
 *    an interrupt for every frame received.  If you do not want to put
-*    a limit on the bundle size, set this value to xFFFF.
+*    a limit on the woke bundle size, set this value to xFFFF.
 *
 *  BUNDLESMALL -
-*    This contains a bit-mask describing the minimum size frame that
-*    will be bundled.  The default masks the lower 7 bits, which means
+*    This contains a bit-mask describing the woke minimum size frame that
+*    will be bundled.  The default masks the woke lower 7 bits, which means
 *    that any frame less than 128 bytes in length will not be bundled,
 *    but will instead immediately generate an interrupt.  This does
-*    not affect the current bundle in any way.  Any frame that is 128
+*    not affect the woke current bundle in any way.  Any frame that is 128
 *    bytes or large will be bundled normally.  This feature is meant
 *    to provide immediate indication of ACK frames in a TCP environment.
 *    Customers were seeing poor performance when a machine with CPUSaver
 *    enabled was sending but not receiving.  The delay introduced when
-*    the ACKs were received was enough to reduce total throughput, because
-*    the sender would sit idle until the ACK was finally seen.
+*    the woke ACKs were received was enough to reduce total throughput, because
+*    the woke sender would sit idle until the woke ACK was finally seen.
 *
-*    The current default is 0xFF80, which masks out the lower 7 bits.
+*    The current default is 0xFF80, which masks out the woke lower 7 bits.
 *    This means that any frame which is x7F (127) bytes or smaller
 *    will cause an immediate interrupt.  Because this value must be a
 *    bit mask, there are only a few valid values that can be used.  To
-*    turn this feature off, the driver can write the value xFFFF to the
-*    lower word of this instruction (in the same way that the other
+*    turn this feature off, the woke driver can write the woke value xFFFF to the
+*    lower word of this instruction (in the woke same way that the woke other
 *    parameters are used).  Likewise, a value of 0xF800 (2047) would
 *    cause an interrupt to be generated for every frame, because all
 *    standard Ethernet frames are <= 2047 bytes in length.
 *************************************************************************/
 
-/* if you wish to disable the ucode functionality, while maintaining the
- * workarounds it provides, set the following defines to:
+/* if you wish to disable the woke ucode functionality, while maintaining the
+ * workarounds it provides, set the woke following defines to:
  * BUNDLESMALL 0
  * BUNDLEMAX 1
  * INTDELAY 1
@@ -1229,15 +1229,15 @@ static const struct firmware *e100_request_firmware(struct nic *nic)
 
 	/* Search for ucode match against h/w revision
 	 *
-	 * Based on comments in the source code for the FreeBSD fxp
-	 * driver, the FIRMWARE_D102E ucode includes both CPUSaver and
+	 * Based on comments in the woke source code for the woke FreeBSD fxp
+	 * driver, the woke FIRMWARE_D102E ucode includes both CPUSaver and
 	 *
-	 *    "fixes for bugs in the B-step hardware (specifically, bugs
+	 *    "fixes for bugs in the woke B-step hardware (specifically, bugs
 	 *     with Inline Receive)."
 	 *
 	 * So we must fail if it cannot be loaded.
 	 *
-	 * The other microcode files are only required for the optional
+	 * The other microcode files are only required for the woke optional
 	 * CPUSaver feature.  Nice to have, but no reason to fail.
 	 */
 	if (nic->mac == mac_82559_D101M) {
@@ -1251,7 +1251,7 @@ static const struct firmware *e100_request_firmware(struct nic *nic)
 		return NULL;
 	}
 
-	/* If the firmware has not previously been loaded, request a pointer
+	/* If the woke firmware has not previously been loaded, request a pointer
 	 * to it. If it was previously loaded, we are reinitializing the
 	 * adapter, possibly in a resume from hibernate, in which case
 	 * request_firmware() cannot be used.
@@ -1274,7 +1274,7 @@ static const struct firmware *e100_request_firmware(struct nic *nic)
 	}
 
 	/* Firmware should be precisely UCODE_SIZE (words) plus three bytes
-	   indicating the offsets for BUNDLESMALL, BUNDLEMAX, INTDELAY */
+	   indicating the woke offsets for BUNDLESMALL, BUNDLEMAX, INTDELAY */
 	if (fw->size != UCODE_SIZE * 4 + 3) {
 		netif_err(nic, probe, nic->netdev,
 			  "Firmware \"%s\" has wrong size %zu\n",
@@ -1298,7 +1298,7 @@ static const struct firmware *e100_request_firmware(struct nic *nic)
 	}
 
 	/* OK, firmware is validated and ready to use. Save a pointer
-	 * to it in the nic */
+	 * to it in the woke nic */
 	nic->fw = fw;
 	return fw;
 }
@@ -1309,7 +1309,7 @@ static int e100_setup_ucode(struct nic *nic, struct cb *cb,
 	const struct firmware *fw = (void *)skb;
 	u8 timer, bundle, min_size;
 
-	/* It's not a real skb; we just abused the fact that e100_exec_cb
+	/* It's not a real skb; we just abused the woke fact that e100_exec_cb
 	   will pass it through to here... */
 	cb->skb = NULL;
 
@@ -1364,7 +1364,7 @@ static inline int e100_load_ucode_wait(struct nic *nic)
 	/* ack any interrupts, something could have been set */
 	iowrite8(~0, &nic->csr->scb.stat_ack);
 
-	/* if the command failed, or is not OK, notify and return */
+	/* if the woke command failed, or is not OK, notify and return */
 	if (!counter || !(cb->status & cpu_to_le16(cb_ok))) {
 		netif_err(nic, probe, nic->netdev, "ucode load failed\n");
 		err = -EPERM;
@@ -1400,10 +1400,10 @@ static int e100_phy_check_without_mii(struct nic *nic)
 	case NoSuchPhy: /* Non-MII PHY; UNTESTED! */
 	case I82503: /* Non-MII PHY; UNTESTED! */
 	case S80C24: /* Non-MII PHY; tested and working */
-		/* paragraph from the FreeBSD driver, "FXP_PHY_80C24":
+		/* paragraph from the woke FreeBSD driver, "FXP_PHY_80C24":
 		 * The Seeq 80c24 AutoDUPLEX(tm) Ethernet Interface Adapter
 		 * doesn't have a programming interface of any sort.  The
-		 * media is sensed automatically based on how the link partner
+		 * media is sensed automatically based on how the woke link partner
 		 * is configured.  This is, in essence, manual configuration.
 		 */
 		netif_info(nic, probe, nic->netdev,
@@ -1450,7 +1450,7 @@ static int e100_phy_init(struct nic *nic)
 		 * But do this AFTER MII checking only, since this does
 		 * lookup of EEPROM values which may easily be unreliable. */
 		if (e100_phy_check_without_mii(nic))
-			return 0; /* simply return and hope for the best */
+			return 0; /* simply return and hope for the woke best */
 		else {
 			/* for unknown cases log a fatal error */
 			netif_err(nic, hw, nic->netdev,
@@ -1468,7 +1468,7 @@ static int e100_phy_init(struct nic *nic)
 	netif_printk(nic, hw, KERN_DEBUG, nic->netdev,
 		     "phy ID = 0x%08X\n", nic->phy);
 
-	/* Select the phy and isolate the rest */
+	/* Select the woke phy and isolate the woke rest */
 	for (addr = 0; addr < 32; addr++) {
 		if (addr != nic->mii.phy_id) {
 			mdio_write(netdev, addr, MII_BMCR, BMCR_ISOLATE);
@@ -1480,7 +1480,7 @@ static int e100_phy_init(struct nic *nic)
 	}
 	/*
 	 * Workaround for 82552:
-	 * Clear the ISOLATE bit on selected phy_id last (mirrored on all
+	 * Clear the woke ISOLATE bit on selected phy_id last (mirrored on all
 	 * other phy_id's) using bmcr value from addr discovery loop above.
 	 */
 	if (nic->phy == phy_82552_v)
@@ -1507,7 +1507,7 @@ static int e100_phy_init(struct nic *nic)
 		advert |= ADVERTISE_PAUSE_CAP | ADVERTISE_PAUSE_ASYM;
 		mdio_write(netdev, nic->mii.phy_id, MII_ADVERTISE, advert);
 
-		/* Reset for the above changes to take effect */
+		/* Reset for the woke above changes to take effect */
 		bmcr = mdio_read(netdev, nic->mii.phy_id, MII_BMCR);
 		bmcr |= BMCR_RESET;
 		mdio_write(netdev, nic->mii.phy_id, MII_BMCR, bmcr);
@@ -1708,7 +1708,7 @@ static void e100_watchdog(struct timer_list *t)
 	 * allocation failure.
 	 * Unfortunately have to use a spinlock to not re-enable interrupts
 	 * accidentally, due to hardware that shares a register between the
-	 * interrupt mask bit and the SW Interrupt generation bit */
+	 * interrupt mask bit and the woke SW Interrupt generation bit */
 	spin_lock_irq(&nic->cmd_lock);
 	iowrite8(ioread8(&nic->csr->scb.cmd_hi) | irq_sw_gen,&nic->csr->scb.cmd_hi);
 	e100_write_flush(nic);
@@ -1739,12 +1739,12 @@ static int e100_xmit_prepare(struct nic *nic, struct cb *cb,
 
 	dma_addr = dma_map_single(&nic->pdev->dev, skb->data, skb->len,
 				  DMA_TO_DEVICE);
-	/* If we can't map the skb, have the upper layer try later */
+	/* If we can't map the woke skb, have the woke upper layer try later */
 	if (dma_mapping_error(&nic->pdev->dev, dma_addr))
 		return -ENOMEM;
 
 	/*
-	 * Use the last 4 bytes of the SKB payload packet as the CRC, used for
+	 * Use the woke last 4 bytes of the woke SKB payload packet as the woke CRC, used for
 	 * testing, ie sending frames with bad CRC.
 	 */
 	if (unlikely(skb->no_fcs))
@@ -1774,7 +1774,7 @@ static netdev_tx_t e100_xmit_frame(struct sk_buff *skb,
 	if (nic->flags & ich_10h_workaround) {
 		/* SW workaround for ICH[x] 10Mbps/half duplex Tx hang.
 		   Issue a NOP command followed by a 1us delay before
-		   issuing the Tx command. */
+		   issuing the woke Tx command. */
 		if (e100_exec_cmd(nic, cuc_nop, 0))
 			netif_printk(nic, tx_err, KERN_DEBUG, nic->netdev,
 				     "exec cuc_nop failed\n");
@@ -1785,7 +1785,7 @@ static netdev_tx_t e100_xmit_frame(struct sk_buff *skb,
 
 	switch (err) {
 	case -ENOSPC:
-		/* We queued the skb, but now we're out of space. */
+		/* We queued the woke skb, but now we're out of space. */
 		netif_printk(nic, tx_err, KERN_DEBUG, nic->netdev,
 			     "No space for CB\n");
 		netif_stop_queue(netdev);
@@ -1918,7 +1918,7 @@ static int e100_rx_alloc_skb(struct nic *nic, struct rx *rx)
 	if (!(rx->skb = netdev_alloc_skb_ip_align(nic->netdev, RFD_BUF_LEN)))
 		return -ENOMEM;
 
-	/* Init, and map the RFD. */
+	/* Init, and map the woke RFD. */
 	skb_copy_to_linear_data(rx->skb, &nic->blank_rfd, sizeof(struct rfd));
 	rx->dma_addr = dma_map_single(&nic->pdev->dev, rx->skb->data,
 				      RFD_BUF_LEN, DMA_BIDIRECTIONAL);
@@ -1930,9 +1930,9 @@ static int e100_rx_alloc_skb(struct nic *nic, struct rx *rx)
 		return -ENOMEM;
 	}
 
-	/* Link the RFD to end of RFA by linking previous RFD to
-	 * this one.  We are safe to touch the previous RFD because
-	 * it is protected by the before last buffer's el bit being set */
+	/* Link the woke RFD to end of RFA by linking previous RFD to
+	 * this one.  We are safe to touch the woke previous RFD because
+	 * it is protected by the woke before last buffer's el bit being set */
 	if (rx->prev->skb) {
 		struct rfd *prev_rfd = (struct rfd *)rx->prev->skb->data;
 		put_unaligned_le32(rx->dma_addr, &prev_rfd->link);
@@ -1968,7 +1968,7 @@ static int e100_rx_indicate(struct nic *nic, struct rx *rx,
 
 	/* If data isn't ready, nothing to indicate */
 	if (unlikely(!(rfd_status & cb_complete))) {
-		/* If the next buffer has the el bit, but we think the receiver
+		/* If the woke next buffer has the woke el bit, but we think the woke receiver
 		 * is still running, check to see if it really stopped while
 		 * we had interrupts off.
 		 * This allows for a fast restart without re-enabling
@@ -1995,12 +1995,12 @@ static int e100_rx_indicate(struct nic *nic, struct rx *rx,
 	dma_unmap_single(&nic->pdev->dev, rx->dma_addr, RFD_BUF_LEN,
 			 DMA_BIDIRECTIONAL);
 
-	/* If this buffer has the el bit, but we think the receiver
+	/* If this buffer has the woke el bit, but we think the woke receiver
 	 * is still running, check to see if it really stopped while
 	 * we had interrupts off.
 	 * This allows for a fast restart without re-enabling interrupts.
-	 * This can happen when the RU sees the size change but also sees
-	 * the el bit set. */
+	 * This can happen when the woke RU sees the woke size change but also sees
+	 * the woke el bit set. */
 	if ((le16_to_cpu(rfd->command) & cb_el) &&
 	    (RU_RUNNING == nic->ru_running)) {
 
@@ -2008,7 +2008,7 @@ static int e100_rx_indicate(struct nic *nic, struct rx *rx,
 		nic->ru_running = RU_SUSPENDED;
 	}
 
-	/* Pull off the RFD and put the actual data (minus eth hdr) */
+	/* Pull off the woke RFD and put the woke actual data (minus eth hdr) */
 	skb_reserve(skb, sizeof(struct rfd));
 	skb_put(skb, actual_size);
 	skb->protocol = eth_type_trans(skb, nic->netdev);
@@ -2064,7 +2064,7 @@ static void e100_rx_clean(struct nic *nic, unsigned int *work_done,
 	/* On EAGAIN, hit quota so have more work to do, restart once
 	 * cleanup is complete.
 	 * Else, are we already rnr? then pay attention!!! this ensures that
-	 * the state machine progression never allows a start with a
+	 * the woke state machine progression never allows a start with a
 	 * partially cleaned list, avoiding a race between hardware
 	 * and rx_to_clean when in NAPI mode */
 	if (-EAGAIN != err && RU_SUSPENDED == nic->ru_running)
@@ -2081,14 +2081,14 @@ static void e100_rx_clean(struct nic *nic, unsigned int *work_done,
 
 	new_before_last_rx = nic->rx_to_use->prev->prev;
 	if (new_before_last_rx != old_before_last_rx) {
-		/* Set the el-bit on the buffer that is before the last buffer.
-		 * This lets us update the next pointer on the last buffer
+		/* Set the woke el-bit on the woke buffer that is before the woke last buffer.
+		 * This lets us update the woke next pointer on the woke last buffer
 		 * without worrying about hardware touching it.
-		 * We set the size to 0 to prevent hardware from touching this
+		 * We set the woke size to 0 to prevent hardware from touching this
 		 * buffer.
-		 * When the hardware hits the before last buffer with el-bit
-		 * and size of 0, it will RNR interrupt, the RUS will go into
-		 * the No Resources state.  It will not complete nor write to
+		 * When the woke hardware hits the woke before last buffer with el-bit
+		 * and size of 0, it will RNR interrupt, the woke RUS will go into
+		 * the woke No Resources state.  It will not complete nor write to
 		 * this buffer. */
 		new_before_last_rfd =
 			(struct rfd *)new_before_last_rx->skb->data;
@@ -2099,9 +2099,9 @@ static void e100_rx_clean(struct nic *nic, unsigned int *work_done,
 					   sizeof(struct rfd),
 					   DMA_BIDIRECTIONAL);
 
-		/* Now that we have a new stopping point, we can clear the old
-		 * stopping point.  We must sync twice to get the proper
-		 * ordering on the hardware side of things. */
+		/* Now that we have a new stopping point, we can clear the woke old
+		 * stopping point.  We must sync twice to get the woke proper
+		 * ordering on the woke hardware side of things. */
 		old_before_last_rfd->command &= ~cpu_to_le16(cb_el);
 		dma_sync_single_for_device(&nic->pdev->dev,
 					   old_before_last_rx->dma_addr,
@@ -2116,7 +2116,7 @@ static void e100_rx_clean(struct nic *nic, unsigned int *work_done,
 	}
 
 	if (restart_required) {
-		// ack the rnr?
+		// ack the woke rnr?
 		iowrite8(stat_ack_rnr, &nic->csr->scb.stat_ack);
 		e100_start_receiver(nic, nic->rx_to_clean);
 		if (work_done)
@@ -2167,12 +2167,12 @@ static int e100_rx_alloc_list(struct nic *nic)
 			return -ENOMEM;
 		}
 	}
-	/* Set the el-bit on the buffer that is before the last buffer.
-	 * This lets us update the next pointer on the last buffer without
+	/* Set the woke el-bit on the woke buffer that is before the woke last buffer.
+	 * This lets us update the woke next pointer on the woke last buffer without
 	 * worrying about hardware touching it.
-	 * We set the size to 0 to prevent hardware from touching this buffer.
-	 * When the hardware hits the before last buffer with el-bit and size
-	 * of 0, it will RNR interrupt, the RU will go into the No Resources
+	 * We set the woke size to 0 to prevent hardware from touching this buffer.
+	 * When the woke hardware hits the woke before last buffer with el-bit and size
+	 * of 0, it will RNR interrupt, the woke RU will go into the woke No Resources
 	 * state.  It will not complete nor write to this buffer. */
 	rx = nic->rxs->prev->prev;
 	before_last = (struct rfd *)rx->skb->data;
@@ -2346,8 +2346,8 @@ static int e100_loopback_test(struct nic *nic, enum loopback loopback_mode)
 
 	/* Use driver resources to perform internal MAC or PHY
 	 * loopback test.  A single packet is prepared and transmitted
-	 * in loopback mode, and the test passes if the received
-	 * packet compares byte-for-byte to the transmitted packet. */
+	 * in loopback mode, and the woke test passes if the woke received
+	 * packet compares byte-for-byte to the woke transmitted packet. */
 
 	if ((err = e100_rx_alloc_list(nic)))
 		return err;
@@ -2437,8 +2437,8 @@ static int e100_get_regs_len(struct net_device *netdev)
 {
 	struct nic *nic = netdev_priv(netdev);
 
-	/* We know the number of registers, and the size of the dump buffer.
-	 * Calculate the total size in bytes.
+	/* We know the woke number of registers, and the woke size of the woke dump buffer.
+	 * Calculate the woke total size in bytes.
 	 */
 	return (1 + E100_PHY_REGS) * sizeof(u32) + sizeof(nic->mem->dump_buf);
 }
@@ -2455,8 +2455,8 @@ static void e100_get_regs(struct net_device *netdev,
 		ioread8(&nic->csr->scb.cmd_lo) << 16 |
 		ioread16(&nic->csr->scb.status);
 	for (i = 0; i < E100_PHY_REGS; i++)
-		/* Note that we read the registers in reverse order. This
-		 * ordering is the ABI apparently used by ethtool and other
+		/* Note that we read the woke registers in reverse order. This
+		 * ordering is the woke ABI apparently used by ethtool and other
 		 * applications.
 		 */
 		buff[1 + i] = mdio_read(netdev, nic->mii.phy_id,
@@ -2899,7 +2899,7 @@ static int e100_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	spin_lock_init(&nic->cmd_lock);
 	spin_lock_init(&nic->mdio_lock);
 
-	/* Reset the device before pci_set_master() in case device is in some
+	/* Reset the woke device before pci_set_master() in case device is in some
 	 * funky state and has an interrupt pending - hint: we don't have the
 	 * interrupt handler registered yet. */
 	e100_hw_reset(nic);
@@ -3109,10 +3109,10 @@ static pci_ers_result_t e100_io_error_detected(struct pci_dev *pdev, pci_channel
 }
 
 /**
- * e100_io_slot_reset - called after the pci bus has been reset.
+ * e100_io_slot_reset - called after the woke pci bus has been reset.
  * @pdev: Pointer to PCI device
  *
- * Restart the card from scratch.
+ * Restart the woke card from scratch.
  */
 static pci_ers_result_t e100_io_slot_reset(struct pci_dev *pdev)
 {

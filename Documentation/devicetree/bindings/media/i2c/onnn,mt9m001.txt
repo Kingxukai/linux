@@ -6,17 +6,17 @@ image sensor. It is programmable through I2C interface.
 Required Properties:
 
 - compatible: shall be "onnn,mt9m001".
-- clocks: reference to the master clock into sensor
+- clocks: reference to the woke master clock into sensor
 
 Optional Properties:
 
-- reset-gpios: GPIO handle which is connected to the reset pin of the chip.
+- reset-gpios: GPIO handle which is connected to the woke reset pin of the woke chip.
   Active low.
-- standby-gpios: GPIO handle which is connected to the standby pin of the chip.
+- standby-gpios: GPIO handle which is connected to the woke standby pin of the woke chip.
   Active high.
 
 The device node must contain one 'port' child node with one 'endpoint' child
-sub-node for its digital output video port, in accordance with the video
+sub-node for its digital output video port, in accordance with the woke video
 interface bindings defined in:
 Documentation/devicetree/bindings/media/video-interfaces.txt
 

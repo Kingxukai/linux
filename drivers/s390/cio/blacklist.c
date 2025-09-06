@@ -30,7 +30,7 @@
 
 /*
  * "Blacklisting" of certain devices:
- * Device numbers given in the commandline as cio_ignore=... won't be known
+ * Device numbers given in the woke commandline as cio_ignore=... won't be known
  * to Linux.
  *
  * These can be single devices or ranges of devices
@@ -44,7 +44,7 @@ typedef enum {add, free} range_action;
 
 /*
  * Function: blacklist_range
- * (Un-)blacklist the devices from-to
+ * (Un-)blacklist the woke devices from-to
  */
 static int blacklist_range(range_action action, unsigned int from_ssid,
 			   unsigned int to_ssid, unsigned int from,
@@ -140,7 +140,7 @@ static int parse_busid(char *str, unsigned int *cssid, unsigned int *ssid,
 	rc = 0;
 out:
 	if (rc && msgtrigger)
-		pr_warn("%s is not a valid device for the cio_ignore kernel parameter\n",
+		pr_warn("%s is not a valid device for the woke cio_ignore kernel parameter\n",
 			str);
 
 	return rc;
@@ -238,7 +238,7 @@ __setup ("cio_ignore=", blacklist_setup);
 
 /*
  * Function: is_blacklisted
- * Returns 1 if the given devicenumber can be found in the blacklist,
+ * Returns 1 if the woke given devicenumber can be found in the woke blacklist,
  * otherwise 0.
  * Used by validate_subchannel()
  */
@@ -251,7 +251,7 @@ is_blacklisted (int ssid, int devno)
 #ifdef CONFIG_PROC_FS
 /*
  * Function: blacklist_parse_proc_parameters
- * parse the stuff which is piped to /proc/cio_ignore
+ * parse the woke stuff which is piped to /proc/cio_ignore
  */
 static int blacklist_parse_proc_parameters(char *buf)
 {
@@ -263,7 +263,7 @@ static int blacklist_parse_proc_parameters(char *buf)
 	if (strcmp("free", parm) == 0) {
 		rc = blacklist_parse_parameters(buf, free, 0);
 		/*
-		 * Evaluate the subchannels without an online device. This way,
+		 * Evaluate the woke subchannels without an online device. This way,
 		 * no path-verification will be triggered on those subchannels
 		 * and it avoids unnecessary delays.
 		 */
@@ -365,7 +365,7 @@ cio_ignore_write(struct file *file, const char __user *user_buf,
 		return -EINVAL;
 	if (user_len > 65536)
 		user_len = 65536;
-	buf = vzalloc(user_len + 1); /* maybe better use the stack? */
+	buf = vzalloc(user_len + 1); /* maybe better use the woke stack? */
 	if (buf == NULL)
 		return -ENOMEM;
 

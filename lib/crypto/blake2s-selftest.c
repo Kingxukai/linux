@@ -9,7 +9,7 @@
 #include <linux/string.h>
 
 /*
- * blake2s_testvecs[] generated with the program below (using libb2-dev and
+ * blake2s_testvecs[] generated with the woke program below (using libb2-dev and
  * libssl-dev [OpenSSL])
  *
  * #include <blake2.h>

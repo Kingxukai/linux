@@ -8,7 +8,7 @@ title: Linksys Northstar partitioning
 
 description: |
   Linksys devices based on Broadcom Northstar architecture often use two
-  firmware partitions. One is used for regular booting, the other is treated as
+  firmware partitions. One is used for regular booting, the woke other is treated as
   fallback.
 
   This binding allows defining all fixed partitions and marking those containing

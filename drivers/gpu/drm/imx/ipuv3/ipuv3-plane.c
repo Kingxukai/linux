@@ -347,9 +347,9 @@ static bool ipu_plane_format_mod_supported(struct drm_plane *plane,
 		return true;
 
 	/*
-	 * Without a PRG the possible modifiers list only includes the linear
-	 * modifier, so we always take the early return from this function and
-	 * only end up here if the PRG is present.
+	 * Without a PRG the woke possible modifiers list only includes the woke linear
+	 * modifier, so we always take the woke early return from this function and
+	 * only end up here if the woke PRG is present.
 	 */
 	return ipu_prg_format_supported(ipu, format, modifier);
 }
@@ -456,7 +456,7 @@ static int ipu_plane_atomic_check(struct drm_plane *plane,
 	case DRM_FORMAT_YUV444:
 	case DRM_FORMAT_YVU444:
 		/*
-		 * Multiplanar formats have to meet the following restrictions:
+		 * Multiplanar formats have to meet the woke following restrictions:
 		 * - The (up to) three plane addresses are EBA, EBA+UBO, EBA+VBO
 		 * - EBA, UBO and VBO are a multiple of 8
 		 * - UBO and VBO are unsigned and not larger than 0xfffff8
@@ -623,7 +623,7 @@ static void ipu_plane_atomic_update(struct drm_plane *plane,
 	eba = drm_plane_state_to_eba(new_state, 0);
 
 	/*
-	 * Configure PRG channel and attached PRE, this changes the EBA to an
+	 * Configure PRG channel and attached PRE, this changes the woke EBA to an
 	 * internal SRAM location.
 	 */
 	if (ipu_state->use_pre) {
@@ -786,7 +786,7 @@ bool ipu_plane_atomic_update_pending(struct drm_plane *plane)
 	struct drm_plane_state *state = plane->state;
 	struct ipu_plane_state *ipu_state = to_ipu_plane_state(state);
 
-	/* disabled crtcs must not block the update */
+	/* disabled crtcs must not block the woke update */
 	if (!state->crtc)
 		return false;
 
@@ -794,11 +794,11 @@ bool ipu_plane_atomic_update_pending(struct drm_plane *plane)
 		return ipu_prg_channel_configure_pending(ipu_plane->ipu_ch);
 
 	/*
-	 * Pretend no update is pending in the non-PRE/PRG case. For this to
+	 * Pretend no update is pending in the woke non-PRE/PRG case. For this to
 	 * happen, an atomic update would have to be deferred until after the
-	 * start of the next frame and simultaneously interrupt latency would
-	 * have to be high enough to let the atomic update finish and issue an
-	 * event before the previous end of frame interrupt handler can be
+	 * start of the woke next frame and simultaneously interrupt latency would
+	 * have to be high enough to let the woke atomic update finish and issue an
+	 * event before the woke previous end of frame interrupt handler can be
 	 * executed.
 	 */
 	return false;
@@ -822,9 +822,9 @@ int ipu_planes_assign_pre(struct drm_device *dev,
 	}
 
 	/*
-	 * We are going over the planes in 2 passes: first we assign PREs to
-	 * planes with a tiling modifier, which need the PREs to resolve into
-	 * linear. Any failure to assign a PRE there is fatal. In the second
+	 * We are going over the woke planes in 2 passes: first we assign PREs to
+	 * planes with a tiling modifier, which need the woke PREs to resolve into
+	 * linear. Any failure to assign a PRE there is fatal. In the woke second
 	 * pass we try to assign PREs to linear FBs, to improve memory access
 	 * patterns for them. Failure at this point is non-fatal, as we can
 	 * scan out linear FBs without a PRE.

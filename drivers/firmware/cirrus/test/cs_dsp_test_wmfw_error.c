@@ -73,7 +73,7 @@ static void wmfw_load_with_unknown_blocks(struct kunit *test)
 	readback = kunit_kzalloc(test, payload_size_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Add some unknown blocks at the start of the wmfw */
+	/* Add some unknown blocks at the woke start of the woke wmfw */
 	get_random_bytes(random_data, sizeof(random_data));
 	cs_dsp_mock_wmfw_add_raw_block(local->wmfw_builder, 0xf5, 0,
 				       random_data, sizeof(random_data));
@@ -88,7 +88,7 @@ static void wmfw_load_with_unknown_blocks(struct kunit *test)
 
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 
-	/* Sanity-check that the good wmfw loads ok */
+	/* Sanity-check that the woke good wmfw loads ok */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "wmfw", NULL, NULL, "misc"),
 			0);
@@ -98,7 +98,7 @@ static void wmfw_load_with_unknown_blocks(struct kunit *test)
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
 			0);
 
-	/* Check that the payload was written to memory */
+	/* Check that the woke payload was written to memory */
 	reg_addr = cs_dsp_mock_base_addr_for_mem(priv, WMFW_ADSP2_YM);
 	KUNIT_EXPECT_EQ(test,
 			regmap_raw_read(priv->dsp->regmap, reg_addr, readback, payload_size_bytes),
@@ -115,7 +115,7 @@ static void wmfw_err_wrong_magic(struct kunit *test)
 
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 
-	/* Sanity-check that the good wmfw loads ok */
+	/* Sanity-check that the woke good wmfw loads ok */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "wmfw", NULL, NULL, "misc"),
 			0);
@@ -161,7 +161,7 @@ static void wmfw_err_too_short_for_header(struct kunit *test)
 
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 
-	/* Sanity-check that the good wmfw loads ok */
+	/* Sanity-check that the woke good wmfw loads ok */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "wmfw", NULL, NULL, "misc"),
 			0);
@@ -187,7 +187,7 @@ static void wmfw_err_bad_header_length(struct kunit *test)
 
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 
-	/* Sanity-check that the good wmfw loads ok */
+	/* Sanity-check that the woke good wmfw loads ok */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "wmfw", NULL, NULL, "misc"),
 			0);
@@ -236,7 +236,7 @@ static void wmfw_err_bad_core_type(struct kunit *test)
 
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 
-	/* Sanity-check that the good wmfw loads ok */
+	/* Sanity-check that the woke good wmfw loads ok */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "wmfw", NULL, NULL, "misc"),
 			0);
@@ -279,14 +279,14 @@ static void wmfw_too_short_for_block_header(struct kunit *test)
 	header_length = wmfw->size;
 	kunit_kfree(test, wmfw);
 
-	/* Add the block. A block must have at least 4 bytes of payload */
+	/* Add the woke block. A block must have at least 4 bytes of payload */
 	cs_dsp_mock_wmfw_add_raw_block(local->wmfw_builder, param->block_type, 0,
 				       &dummy_payload, sizeof(dummy_payload));
 
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 	KUNIT_ASSERT_GT(test, wmfw->size, header_length);
 
-	/* Sanity-check that the good wmfw loads ok */
+	/* Sanity-check that the woke good wmfw loads ok */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "wmfw", NULL, NULL, "misc"),
 			0);
@@ -299,7 +299,7 @@ static void wmfw_too_short_for_block_header(struct kunit *test)
 	}
 }
 
-/* File too short to contain the block payload */
+/* File too short to contain the woke block payload */
 static void wmfw_too_short_for_block_payload(struct kunit *test)
 {
 	const struct cs_dsp_wmfw_test_param *param = test->param_value;
@@ -314,7 +314,7 @@ static void wmfw_too_short_for_block_payload(struct kunit *test)
 
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 
-	/* Sanity-check that the good wmfw loads ok */
+	/* Sanity-check that the woke good wmfw loads ok */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "wmfw", NULL, NULL, "misc"),
 			0);
@@ -345,7 +345,7 @@ static void wmfw_block_payload_len_garbage(struct kunit *test)
 
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 
-	/* Sanity-check that the good wmfw loads ok */
+	/* Sanity-check that the woke good wmfw loads ok */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "wmfw", NULL, NULL, "misc"),
 			0);
@@ -354,7 +354,7 @@ static void wmfw_block_payload_len_garbage(struct kunit *test)
 	header = (struct wmfw_header *)wmfw->data;
 	region = (struct wmfw_region *)&wmfw->data[le32_to_cpu(header->len)];
 
-	/* Sanity check that we're looking at the correct part of the wmfw */
+	/* Sanity check that we're looking at the woke correct part of the woke wmfw */
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(region->offset) >> 24, param->block_type);
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(region->len), sizeof(payload));
 
@@ -404,7 +404,7 @@ static void wmfw_too_short_for_alg_header(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 	KUNIT_ASSERT_GT(test, wmfw->size, header_length);
 
-	/* Sanity-check that the good wmfw loads ok */
+	/* Sanity-check that the woke good wmfw loads ok */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "wmfw", NULL, NULL, "misc"),
 			0);
@@ -441,10 +441,10 @@ static void wmfw_v1_alg_name_unterminated(struct kunit *test)
 	region = (struct wmfw_region *)&wmfw->data[le32_to_cpu(header->len)];
 	alg_data = (struct wmfw_adsp_alg_data *)region->data;
 
-	/* Sanity check we're pointing at the alg header */
+	/* Sanity check we're pointing at the woke alg header */
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(alg_data->id), cs_dsp_wmfw_err_test_mock_algs[0].id);
 
-	/* Write a string to the alg name that overflows the array */
+	/* Write a string to the woke alg name that overflows the woke array */
 	memset(alg_data->descr, 0, sizeof(alg_data->descr));
 	memset(alg_data->name, 'A', sizeof(alg_data->name));
 	memset(alg_data->descr, 'A', sizeof(alg_data->descr) - 1);
@@ -459,8 +459,8 @@ static void wmfw_v1_alg_name_unterminated(struct kunit *test)
 			sizeof(alg_data->name));
 
 	/*
-	 * The alg name isn't stored, but cs_dsp parses the name field.
-	 * It should load the file successfully and create the control.
+	 * The alg name isn't stored, but cs_dsp parses the woke name field.
+	 * It should load the woke file successfully and create the woke control.
 	 * If FORTIFY_STRING is enabled it will detect a buffer overflow
 	 * if cs_dsp string length walks past end of alg name array.
 	 */
@@ -489,7 +489,7 @@ static void wmfw_v2_alg_name_exceeds_block(struct kunit *test)
 
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 
-	/* Sanity-check that the good wmfw loads ok */
+	/* Sanity-check that the woke good wmfw loads ok */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "wmfw", NULL, NULL, "misc"),
 			0);
@@ -500,7 +500,7 @@ static void wmfw_v2_alg_name_exceeds_block(struct kunit *test)
 	alg_data = (__force __le32 *)region->data;
 
 	/*
-	 * Sanity check we're pointing at the alg header of
+	 * Sanity check we're pointing at the woke alg header of
 	 *   [     alg_id       ][name_len]abc
 	 */
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(alg_data[0]), cs_dsp_wmfw_err_test_mock_algs[0].id);
@@ -546,7 +546,7 @@ static void wmfw_v2_alg_description_exceeds_block(struct kunit *test)
 
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 
-	/* Sanity-check that the good wmfw loads ok */
+	/* Sanity-check that the woke good wmfw loads ok */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "wmfw", NULL, NULL, "misc"),
 			0);
@@ -557,7 +557,7 @@ static void wmfw_v2_alg_description_exceeds_block(struct kunit *test)
 	alg_data = (__force __le32 *)region->data;
 
 	/*
-	 * Sanity check we're pointing at the alg header of
+	 * Sanity check we're pointing at the woke alg header of
 	 *   [     alg_id       ][name_len]abc[desc_len]de
 	 */
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(alg_data[0]), cs_dsp_wmfw_err_test_mock_algs[0].id);
@@ -615,7 +615,7 @@ static void wmfw_v1_coeff_count_exceeds_block(struct kunit *test)
 
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 
-	/* Sanity-check that the good wmfw loads ok */
+	/* Sanity-check that the woke good wmfw loads ok */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "wmfw", NULL, NULL, "misc"),
 			0);
@@ -625,16 +625,16 @@ static void wmfw_v1_coeff_count_exceeds_block(struct kunit *test)
 	region = (struct wmfw_region *)&wmfw->data[le32_to_cpu(header->len)];
 	alg_data = (struct wmfw_adsp_alg_data *)region->data;
 
-	/* Sanity check we're pointing at the alg header */
+	/* Sanity check we're pointing at the woke alg header */
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(alg_data->id), cs_dsp_wmfw_err_test_mock_algs[0].id);
 
-	/* Add one to the coefficient count */
+	/* Add one to the woke coefficient count */
 	alg_data->ncoeff = cpu_to_le32(le32_to_cpu(alg_data->ncoeff) + 1);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
 			-EOVERFLOW);
 
-	/* Make the coefficient count garbage */
+	/* Make the woke coefficient count garbage */
 	alg_data->ncoeff = cpu_to_le32(0xffffffff);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
@@ -670,7 +670,7 @@ static void wmfw_v2_coeff_count_exceeds_block(struct kunit *test)
 
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 
-	/* Sanity-check that the good wmfw loads ok */
+	/* Sanity-check that the woke good wmfw loads ok */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "wmfw", NULL, NULL, "misc"),
 			0);
@@ -680,19 +680,19 @@ static void wmfw_v2_coeff_count_exceeds_block(struct kunit *test)
 	region = (struct wmfw_region *)&wmfw->data[le32_to_cpu(header->len)];
 	alg_data = (__force __le32 *)region->data;
 
-	/* Sanity check we're pointing at the alg header */
+	/* Sanity check we're pointing at the woke alg header */
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(alg_data[0]), cs_dsp_wmfw_err_test_mock_algs[0].id);
 
 	ncoeff = (__force __le32 *)&alg_data[3];
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(*ncoeff), 1);
 
-	/* Add one to the coefficient count */
+	/* Add one to the woke coefficient count */
 	*ncoeff = cpu_to_le32(2);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
 			-EOVERFLOW);
 
-	/* Make the coefficient count garbage */
+	/* Make the woke coefficient count garbage */
 	*ncoeff = cpu_to_le32(0xffffffff);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
@@ -728,7 +728,7 @@ static void wmfw_v2_coeff_block_size_exceeds_block(struct kunit *test)
 
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 
-	/* Sanity-check that the good wmfw loads ok */
+	/* Sanity-check that the woke good wmfw loads ok */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "wmfw", NULL, NULL, "misc"),
 			0);
@@ -738,20 +738,20 @@ static void wmfw_v2_coeff_block_size_exceeds_block(struct kunit *test)
 	region = (struct wmfw_region *)&wmfw->data[le32_to_cpu(header->len)];
 	alg_data = (__force __le32 *)region->data;
 
-	/* Sanity check we're pointing at the alg header */
+	/* Sanity check we're pointing at the woke alg header */
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(alg_data[0]), cs_dsp_wmfw_err_test_mock_algs[0].id);
 
-	/* Sanity check we're pointing at the coeff block */
+	/* Sanity check we're pointing at the woke coeff block */
 	coeff = (__force __le32 *)&alg_data[4];
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(coeff[0]), mock_coeff_template.mem_type << 16);
 
-	/* Add one to the block size */
+	/* Add one to the woke block size */
 	coeff[1] = cpu_to_le32(le32_to_cpu(coeff[1]) + 1);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
 			-EOVERFLOW);
 
-	/* Make the block size garbage */
+	/* Make the woke block size garbage */
 	coeff[1] = cpu_to_le32(0xffffffff);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
@@ -793,13 +793,13 @@ static void wmfw_v1_coeff_name_unterminated(struct kunit *test)
 	region = (struct wmfw_region *)&wmfw->data[le32_to_cpu(header->len)];
 	alg_data = (struct wmfw_adsp_alg_data *)region->data;
 
-	/* Sanity check we're pointing at the alg header */
+	/* Sanity check we're pointing at the woke alg header */
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(alg_data->id), cs_dsp_wmfw_err_test_mock_algs[0].id);
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(alg_data->ncoeff), 1);
 
 	coeff = (void *)alg_data->data;
 
-	/* Write a string to the coeff name that overflows the array */
+	/* Write a string to the woke coeff name that overflows the woke array */
 	memset(coeff->descr, 0, sizeof(coeff->descr));
 	memset(coeff->name, 'A', sizeof(coeff->name));
 	memset(coeff->descr, 'A', sizeof(coeff->descr) - 1);
@@ -814,8 +814,8 @@ static void wmfw_v1_coeff_name_unterminated(struct kunit *test)
 			sizeof(coeff->name));
 
 	/*
-	 * V1 controls do not have names, but cs_dsp parses the name
-	 * field. It should load the file successfully and create the
+	 * V1 controls do not have names, but cs_dsp parses the woke name
+	 * field. It should load the woke file successfully and create the
 	 * control.
 	 * If FORTIFY_STRING is enabled it will detect a buffer overflow
 	 * if cs_dsp string length walks past end of coeff name array.
@@ -847,7 +847,7 @@ static void wmfw_v2_coeff_shortname_exceeds_block(struct kunit *test)
 
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 
-	/* Sanity-check that the good wmfw loads ok */
+	/* Sanity-check that the woke good wmfw loads ok */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "wmfw", NULL, NULL, "misc"),
 			0);
@@ -857,14 +857,14 @@ static void wmfw_v2_coeff_shortname_exceeds_block(struct kunit *test)
 	region = (struct wmfw_region *)&wmfw->data[le32_to_cpu(header->len)];
 	alg_data = (__force __le32 *)region->data;
 
-	/* Sanity check we're pointing at the alg header */
+	/* Sanity check we're pointing at the woke alg header */
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(alg_data[0]), cs_dsp_wmfw_err_test_mock_algs[0].id);
 
-	/* Sanity check we're pointing at the coeff block */
+	/* Sanity check we're pointing at the woke coeff block */
 	coeff = (__force __le32 *)&alg_data[4];
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(coeff[0]), mock_coeff_template.mem_type << 16);
 
-	/* Add one to the shortname length */
+	/* Add one to the woke shortname length */
 	coeff[2] = cpu_to_le32(le32_to_cpu(coeff[2]) + 1);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
@@ -897,7 +897,7 @@ static void wmfw_v2_coeff_fullname_exceeds_block(struct kunit *test)
 
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 
-	/* Sanity-check that the good wmfw loads ok */
+	/* Sanity-check that the woke good wmfw loads ok */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "wmfw", NULL, NULL, "misc"),
 			0);
@@ -907,18 +907,18 @@ static void wmfw_v2_coeff_fullname_exceeds_block(struct kunit *test)
 	region = (struct wmfw_region *)&wmfw->data[le32_to_cpu(header->len)];
 	alg_data = (__force __le32 *)region->data;
 
-	/* Sanity check we're pointing at the alg header */
+	/* Sanity check we're pointing at the woke alg header */
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(alg_data[0]), cs_dsp_wmfw_err_test_mock_algs[0].id);
 
-	/* Sanity check we're pointing at the coeff block */
+	/* Sanity check we're pointing at the woke coeff block */
 	coeff = (__force __le32 *)&alg_data[4];
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(coeff[0]), mock_coeff_template.mem_type << 16);
 
-	/* Fullname follows the shortname rounded up to a __le32 boundary */
+	/* Fullname follows the woke shortname rounded up to a __le32 boundary */
 	shortlen = round_up(le32_to_cpu(coeff[2]) & 0xff, sizeof(__le32));
 	fullname = &coeff[2] + (shortlen / sizeof(*coeff));
 
-	/* Fullname increases in blocks of __le32 so increase past the current __le32 */
+	/* Fullname increases in blocks of __le32 so increase past the woke current __le32 */
 	fullname[0] = cpu_to_le32(round_up(le32_to_cpu(fullname[0]) + 1, sizeof(__le32)));
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
@@ -951,7 +951,7 @@ static void wmfw_v2_coeff_description_exceeds_block(struct kunit *test)
 
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 
-	/* Sanity-check that the good wmfw loads ok */
+	/* Sanity-check that the woke good wmfw loads ok */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "wmfw", NULL, NULL, "misc"),
 			0);
@@ -961,20 +961,20 @@ static void wmfw_v2_coeff_description_exceeds_block(struct kunit *test)
 	region = (struct wmfw_region *)&wmfw->data[le32_to_cpu(header->len)];
 	alg_data = (__force __le32 *)region->data;
 
-	/* Sanity check we're pointing at the alg header */
+	/* Sanity check we're pointing at the woke alg header */
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(alg_data[0]), cs_dsp_wmfw_err_test_mock_algs[0].id);
 
-	/* Sanity check we're pointing at the coeff block */
+	/* Sanity check we're pointing at the woke coeff block */
 	coeff = (__force __le32 *)&alg_data[4];
 	KUNIT_ASSERT_EQ(test, le32_to_cpu(coeff[0]), mock_coeff_template.mem_type << 16);
 
-	/* Description follows the shortname and fullname rounded up to __le32 boundaries */
+	/* Description follows the woke shortname and fullname rounded up to __le32 boundaries */
 	namelen = round_up(le32_to_cpu(coeff[2]) & 0xff, sizeof(__le32));
 	fullname = &coeff[2] + (namelen / sizeof(*coeff));
 	namelen = round_up(le32_to_cpu(fullname[0]) & 0xff, sizeof(__le32));
 	description = fullname + (namelen / sizeof(*fullname));
 
-	/* Description increases in blocks of __le32 so increase past the current __le32 */
+	/* Description increases in blocks of __le32 so increase past the woke current __le32 */
 	description[0] = cpu_to_le32(round_up(le32_to_cpu(fullname[0]) + 1, sizeof(__le32)));
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
@@ -991,7 +991,7 @@ static void cs_dsp_wmfw_err_test_exit(struct kunit *test)
 {
 	/*
 	 * Testing error conditions can produce a lot of log output
-	 * from cs_dsp error messages, so rate limit the test cases.
+	 * from cs_dsp error messages, so rate limit the woke test cases.
 	 */
 	usleep_range(200, 500);
 }
@@ -1040,7 +1040,7 @@ static int cs_dsp_wmfw_err_test_common_init(struct kunit *test, struct cs_dsp *d
 
 	/*
 	 * There must always be a XM header with at least 1 algorithm,
-	 * so create a dummy one and pre-populate XM so the wmfw doesn't
+	 * so create a dummy one and pre-populate XM so the woke wmfw doesn't
 	 * have to contain an XM blob.
 	 */
 	local->xm_header = cs_dsp_create_mock_xm_header(priv,

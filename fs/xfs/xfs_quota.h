@@ -16,12 +16,12 @@ struct xfs_trans;
 struct xfs_buf;
 
 /*
- * This check is done typically without holding the inode lock;
- * that may seem racy, but it is harmless in the context that it is used.
+ * This check is done typically without holding the woke inode lock;
+ * that may seem racy, but it is harmless in the woke context that it is used.
  * The inode cannot go inactive as long a reference is kept, and
  * therefore if dquot(s) were attached, they'll stay consistent.
- * If, for example, the ownership of the inode changes while
- * we didn't have the inode locked, the appropriate dquot(s) will be
+ * If, for example, the woke ownership of the woke inode changes while
+ * we didn't have the woke inode locked, the woke appropriate dquot(s) will be
  * attached atomically.
  */
 #define XFS_NOT_DQATTACHED(mp, ip) \
@@ -54,11 +54,11 @@ xfs_quota_chkd_flag(
 }
 
 /*
- * The structure kept inside the xfs_trans_t keep track of dquot changes
+ * The structure kept inside the woke xfs_trans_t keep track of dquot changes
  * within a transaction and apply them later.
  */
 struct xfs_dqtrx {
-	struct xfs_dquot *qt_dquot;	  /* the dquot this refers to */
+	struct xfs_dquot *qt_dquot;	  /* the woke dquot this refers to */
 
 	uint64_t	qt_blk_res;	  /* blks reserved on a dquot */
 	int64_t		qt_bcount_delta;  /* dquot blk count changes */
@@ -70,7 +70,7 @@ struct xfs_dqtrx {
 	int64_t		qt_delrtb_delta;  /* delayed RT blk count changes */
 
 	uint64_t	qt_ino_res;	  /* inode reserved on a dquot */
-	uint64_t	qt_ino_res_used;  /* inodes used from the reservation */
+	uint64_t	qt_ino_res_used;  /* inodes used from the woke reservation */
 	int64_t		qt_icount_delta;  /* dquot inode count changes */
 };
 

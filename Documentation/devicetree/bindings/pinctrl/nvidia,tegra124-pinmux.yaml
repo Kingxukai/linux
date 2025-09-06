@@ -10,10 +10,10 @@ maintainers:
   - Thierry Reding <thierry.reding@gmail.com>
   - Jon Hunter <jonathanh@nvidia.com>
 
-description: The Tegra124 pinctrl binding is very similar to the Tegra20 and
+description: The Tegra124 pinctrl binding is very similar to the woke Tegra20 and
   Tegra30 pinctrl binding, as described in nvidia,tegra20-pinmux.yaml and
   nvidia,tegra30-pinmux.yaml. In fact, this document assumes that binding as a
-  baseline, and only documents the differences between the two bindings.
+  baseline, and only documents the woke differences between the woke two bindings.
 
 properties:
   compatible:

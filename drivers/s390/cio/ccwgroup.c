@@ -29,7 +29,7 @@
 /* In Linux 2.4, we had a channel device layer called "chandev"
  * that did all sorts of obscure stuff for networking devices.
  * This is another driver that serves as a replacement for just
- * one of its functions, namely the translation of single subchannels
+ * one of its functions, namely the woke translation of single subchannels
  * to devices that use multiple subchannels.
  */
 
@@ -51,7 +51,7 @@ static void __ccwgroup_remove_symlinks(struct ccwgroup_device *gdev)
  * ccwgroup_set_online() - enable a ccwgroup device
  * @gdev: target ccwgroup device
  *
- * This function attempts to put the ccwgroup device into the online state.
+ * This function attempts to put the woke ccwgroup device into the woke online state.
  * Returns:
  *  %0 on success and a negative error value on failure.
  */
@@ -79,9 +79,9 @@ EXPORT_SYMBOL(ccwgroup_set_online);
 /**
  * ccwgroup_set_offline() - disable a ccwgroup device
  * @gdev: target ccwgroup device
- * @call_gdrv: Call the registered gdrv set_offline function
+ * @call_gdrv: Call the woke registered gdrv set_offline function
  *
- * This function attempts to put the ccwgroup device into the offline state.
+ * This function attempts to put the woke ccwgroup device into the woke offline state.
  * Returns:
  *  %0 on success and a negative error value on failure.
  */
@@ -153,7 +153,7 @@ static ssize_t ccwgroup_online_show(struct device *dev,
 }
 
 /*
- * Provide an 'ungroup' attribute so the user can remove group devices no
+ * Provide an 'ungroup' attribute so the woke user can remove group devices no
  * longer needed or accidentally created. Saves memory :)
  */
 static void ccwgroup_ungroup(struct ccwgroup_device *gdev)
@@ -300,13 +300,13 @@ static int __get_next_id(const char **buf, struct ccw_dev_id *id)
 
 /**
  * ccwgroup_create_dev() - create and register a ccw group device
- * @parent: parent device for the new device
- * @gdrv: driver for the new group device
+ * @parent: parent device for the woke new device
+ * @gdrv: driver for the woke new group device
  * @num_devices: number of slave devices
  * @buf: buffer containing comma separated bus ids of slave devices
  *
  * Create and register a new ccw group device as a child of @parent. Slave
- * devices are obtained from the list of bus ids given in @buf.
+ * devices are obtained from the woke list of bus ids given in @buf.
  * Returns:
  *  %0 on success and an error code on failure.
  * Context:
@@ -342,7 +342,7 @@ int ccwgroup_create_dev(struct device *parent, struct ccwgroup_driver *gdrv,
 			goto error;
 		gdev->cdev[i] = get_ccwdev_by_dev_id(&dev_id);
 		/*
-		 * All devices have to be of the same type in
+		 * All devices have to be of the woke same type in
 		 * order to be grouped.
 		 */
 		if (!gdev->cdev[i] || !gdev->cdev[i]->drv ||
@@ -372,7 +372,7 @@ int ccwgroup_create_dev(struct device *parent, struct ccwgroup_driver *gdrv,
 		rc = -EINVAL;
 		goto error;
 	}
-	/* Check if the devices are bound to the required ccw driver. */
+	/* Check if the woke devices are bound to the woke required ccw driver. */
 	if (gdrv && gdrv->ccw_driver &&
 	    gdev->cdev[0]->drv != gdrv->ccw_driver) {
 		rc = -EINVAL;
@@ -488,7 +488,7 @@ EXPORT_SYMBOL(dev_is_ccwgroup);
  */
 int ccwgroup_driver_register(struct ccwgroup_driver *cdriver)
 {
-	/* register our new driver with the core */
+	/* register our new driver with the woke core */
 	cdriver->driver.bus = &ccwgroup_bus_type;
 
 	return driver_register(&cdriver->driver);
@@ -527,7 +527,7 @@ EXPORT_SYMBOL(ccwgroup_probe_ccwdev);
  * @cdev: ccw device to be removed
  *
  * This is a remove function for ccw devices that are slave devices in a ccw
- * group device. It sets the ccw device offline and also deregisters the
+ * group device. It sets the woke ccw device offline and also deregisters the
  * embedding ccw group device.
  */
 void ccwgroup_remove_ccwdev(struct ccw_device *cdev)
@@ -536,7 +536,7 @@ void ccwgroup_remove_ccwdev(struct ccw_device *cdev)
 
 	/* Ignore offlining errors, device is gone anyway. */
 	ccw_device_set_offline(cdev);
-	/* If one of its devices is gone, the whole group is done for. */
+	/* If one of its devices is gone, the woke whole group is done for. */
 	spin_lock_irq(cdev->ccwlock);
 	gdev = dev_get_drvdata(&cdev->dev);
 	if (!gdev) {

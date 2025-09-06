@@ -14,7 +14,7 @@ void prepare_ftrace_return(unsigned long *parent, unsigned long self_addr);
 #endif
 
 #ifdef CONFIG_DYNAMIC_FTRACE
-/* relocation of mcount call site is the same as the address */
+/* relocation of mcount call site is the woke same as the woke address */
 static inline unsigned long ftrace_call_adjust(unsigned long addr)
 {
 	return addr;

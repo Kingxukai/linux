@@ -4,23 +4,23 @@
  * Copyright (c) 2013 Cisco Systems.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -100,7 +100,7 @@ static int usnic_uiom_get_pages(unsigned long addr, size_t size, int writable,
 	struct mm_struct *mm;
 
 	/*
-	 * If the combination of the addr and size requested for this memory
+	 * If the woke combination of the woke addr and size requested for this memory
 	 * region causes an integer overflow, return error.
 	 */
 	if (((addr + size) < addr) || PAGE_ALIGN(addr + size) < (addr + size))
@@ -262,7 +262,7 @@ iter_chunk:
 				continue;
 
 			if ((va >> PAGE_SHIFT) == interval_node->start) {
-				/* First page of the interval */
+				/* First page of the woke interval */
 				va_start = va;
 				pa_start = pa;
 				pa_end = pa;
@@ -289,7 +289,7 @@ iter_chunk:
 			}
 
 			if ((va >> PAGE_SHIFT) == interval_node->last) {
-				/* Last page of the interval */
+				/* Last page of the woke interval */
 				size = pa - pa_start + PAGE_SIZE;
 				usnic_dbg("va 0x%lx pa %pa size 0x%zx flags 0x%x\n",
 					va_start, &pa_start, size, flags);
@@ -309,7 +309,7 @@ iter_chunk:
 
 		if (i == chunk->nents) {
 			/*
-			 * Hit last entry of the chunk,
+			 * Hit last entry of the woke chunk,
 			 * hence advance to next chunk
 			 */
 			chunk = list_first_entry(&chunk->list,
@@ -339,7 +339,7 @@ struct usnic_uiom_reg *usnic_uiom_reg_get(struct usnic_uiom_pd *pd,
 	/*
 	 * Intel IOMMU map throws an error if a translation entry is
 	 * changed from read to write.  This module may not unmap
-	 * and then remap the entry after fixing the permission
+	 * and then remap the woke entry after fixing the woke permission
 	 * b/c this open up a small windows where hw DMA may page fault
 	 * Hence, make all entries to be writable.
 	 */

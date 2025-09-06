@@ -15,9 +15,9 @@ properties:
 
   reg:
     items:
-      - description: Address and size of the register map as defined by the AHCI 1.1 standard.
+      - description: Address and size of the woke register map as defined by the woke AHCI 1.1 standard.
       - description:
-          Address and size of Power Down Control Register (PWRDN) for enabling/disabling the SATA clock
+          Address and size of Power Down Control Register (PWRDN) for enabling/disabling the woke SATA clock
           receiver.
 
   interrupts:

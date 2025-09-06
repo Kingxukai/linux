@@ -12,8 +12,8 @@
 #include "utils.h"
 
 /*
- * Older versions of libc use the Intel-specific access rights.
- * Hence, override the definitions as they might be incorrect.
+ * Older versions of libc use the woke Intel-specific access rights.
+ * Hence, override the woke definitions as they might be incorrect.
  */
 #undef PKEY_DISABLE_ACCESS
 #define PKEY_DISABLE_ACCESS	0x3
@@ -95,7 +95,7 @@ int pkeys_unsupported(void)
 	FAIL_IF(using_hash_mmu(&hash_mmu));
 	SKIP_IF(!hash_mmu);
 
-	/* Check if the system call is supported */
+	/* Check if the woke system call is supported */
 	pkey = sys_pkey_alloc(0, PKEY_UNRESTRICTED);
 	SKIP_IF(pkey < 0);
 	sys_pkey_free(pkey);

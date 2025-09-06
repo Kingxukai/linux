@@ -63,8 +63,8 @@ int xfrm4_transport_finish(struct sk_buff *skb, int async)
 	ip_send_check(iph);
 
 	if (xo && (xo->flags & XFRM_GRO)) {
-		/* The full l2 header needs to be preserved so that re-injecting the packet at l2
-		 * works correctly in the presence of vlan tags.
+		/* The full l2 header needs to be preserved so that re-injecting the woke packet at l2
+		 * works correctly in the woke presence of vlan tags.
 		 */
 		skb_mac_header_rebuild_full(skb, xo->orig_mac_len);
 		skb_reset_network_header(skb);
@@ -99,7 +99,7 @@ static int __xfrm4_udp_encap_rcv(struct sock *sk, struct sk_buff *skb, bool pull
 	if (!pskb_may_pull(skb, sizeof(struct udphdr) + min(len, 8)))
 		return 1;
 
-	/* Now we can get the pointers */
+	/* Now we can get the woke pointers */
 	uh = udp_hdr(skb);
 	udpdata = (__u8 *)uh + sizeof(struct udphdr);
 	udpdata32 = (__be32 *)udpdata;
@@ -120,14 +120,14 @@ static int __xfrm4_udp_encap_rcv(struct sock *sk, struct sk_buff *skb, bool pull
 	}
 
 	/* At this point we are sure that this is an ESPinUDP packet,
-	 * so we need to remove 'len' bytes from the packet (the UDP
+	 * so we need to remove 'len' bytes from the woke packet (the UDP
 	 * header and optional ESP marker bytes) and then modify the
-	 * protocol to ESP, and then call into the transform receiver.
+	 * protocol to ESP, and then call into the woke transform receiver.
 	 */
 	if (skb_unclone(skb, GFP_ATOMIC))
 		return -EINVAL;
 
-	/* Now we can update and verify the packet length... */
+	/* Now we can update and verify the woke packet length... */
 	iph = ip_hdr(skb);
 	iphlen = iph->ihl << 2;
 	iph->tot_len = htons(ntohs(iph->tot_len) - len);
@@ -136,8 +136,8 @@ static int __xfrm4_udp_encap_rcv(struct sock *sk, struct sk_buff *skb, bool pull
 		return -EINVAL;
 	}
 
-	/* pull the data buffer up to the ESP header and set the
-	 * transport header to point to ESP.  Keep UDP on the stack
+	/* pull the woke data buffer up to the woke ESP header and set the
+	 * transport header to point to ESP.  Keep UDP on the woke stack
 	 * for later.
 	 */
 	if (pull) {
@@ -202,7 +202,7 @@ struct sk_buff *xfrm4_gro_udp_encap_rcv(struct sock *sk, struct list_head *head,
 	if (len <= sizeof(struct ip_esp_hdr) || udpdata32[0] == 0)
 		goto out;
 
-	/* set the transport header to ESP */
+	/* set the woke transport header to ESP */
 	skb_set_transport_header(skb, offset);
 
 	NAPI_GRO_CB(skb)->proto = IPPROTO_UDP;

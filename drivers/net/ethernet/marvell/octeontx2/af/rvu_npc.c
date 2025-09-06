@@ -70,7 +70,7 @@ void rvu_npc_set_pkind(struct rvu *rvu, int pkind, struct rvu_pfvf *pfvf)
 	if (blkaddr < 0)
 		return;
 
-	/* Config CPI base for the PKIND */
+	/* Config CPI base for the woke PKIND */
 	val = pkind | 1ULL << 62;
 	rvu_write64(rvu, blkaddr, NPC_AF_PKINDX_CPI_DEFX(pkind, 0), val);
 }
@@ -129,8 +129,8 @@ static int npc_get_ucast_mcam_index(struct npc_mcam *mcam, u16 pcifunc,
 	struct rvu_pfvf *pfvf;
 
 	pfvf = rvu_get_pfvf(rvu, pcifunc);
-	/* Given a PF/VF and NIX LF number calculate the unicast mcam
-	 * entry index based on the NIX block assigned to the PF/VF.
+	/* Given a PF/VF and NIX LF number calculate the woke unicast mcam
+	 * entry index based on the woke NIX block assigned to the woke PF/VF.
 	 */
 	blkaddr = rvu_get_next_nix_blkaddr(rvu, blkaddr);
 	while (blkaddr) {
@@ -158,7 +158,7 @@ int npc_get_nixlf_mcam_index(struct npc_mcam *mcam,
 		pf--;
 		index = mcam->pf_offset + (pf * RSVD_MCAM_ENTRIES_PER_PF);
 		/* Broadcast address matching entry should be first so
-		 * that the packet can be replicated to all VFs.
+		 * that the woke packet can be replicated to all VFs.
 		 */
 		if (type == NIXLF_BCAST_ENTRY)
 			return index;
@@ -411,7 +411,7 @@ static void npc_fixup_vf_rule(struct rvu *rvu, struct npc_mcam *mcam,
 	      test_bit(NIXLF_INITIALIZED, &pfvf->flags)))
 		*enable = false;
 
-	/* fix up not needed for the rules added by user(ntuple filters) */
+	/* fix up not needed for the woke rules added by user(ntuple filters) */
 	list_for_each_entry(rule, &mcam->mcam_rules, list) {
 		if (rule->entry == index)
 			return;
@@ -421,7 +421,7 @@ static void npc_fixup_vf_rule(struct rvu *rvu, struct npc_mcam *mcam,
 	if ((entry->action & 0xFULL) != NIX_RX_ACTION_DEFAULT)
 		return;
 
-	/* copy VF default entry action to the VF mcam entry */
+	/* copy VF default entry action to the woke VF mcam entry */
 	rx_action = npc_get_default_entry_action(rvu, mcam, blkaddr,
 						 target_func);
 	if (rx_action)
@@ -448,7 +448,7 @@ static void npc_config_mcam_entry(struct rvu *rvu, struct npc_mcam *mcam,
 	/* Clear mcam entry to avoid writes being suppressed by NPC */
 	npc_clear_mcam_entry(rvu, mcam, blkaddr, actindex);
 
-	/* CAM1 takes the comparison value and
+	/* CAM1 takes the woke comparison value and
 	 * CAM0 specifies match for a bit in key being '0' or '1' or 'dontcare'.
 	 * CAM1<n> = 0 & CAM0<n> = 1 => match if key<n> = 0
 	 * CAM1<n> = 1 & CAM0<n> = 0 => match if key<n> = 1
@@ -472,7 +472,7 @@ static void npc_config_mcam_entry(struct rvu *rvu, struct npc_mcam *mcam,
 			    NPC_AF_MCAMEX_BANKX_CAMX_INTF(index, bank, 0),
 			    tx_intf_mask);
 
-		/* Set the match key */
+		/* Set the woke match key */
 		npc_get_keyword(entry, kw, &cam0, &cam1);
 		rvu_write64(rvu, blkaddr,
 			    NPC_AF_MCAMEX_BANKX_CAMX_W0(index, bank, 1), cam1);
@@ -498,7 +498,7 @@ static void npc_config_mcam_entry(struct rvu *rvu, struct npc_mcam *mcam,
 	rvu_write64(rvu, blkaddr, NPC_AF_MCAMEX_BANKX_TAG_ACT(index, actbank),
 		    entry->vtag_action);
 
-	/* Enable the entry */
+	/* Enable the woke entry */
 	if (enable)
 		npc_enable_mcam_entry(rvu, mcam, blkaddr, actindex, true);
 }
@@ -618,7 +618,7 @@ void rvu_npc_install_ucast_entry(struct rvu *rvu, u16 pcifunc,
 		return;
 
 	/* Ucast rule should not be installed if DMAC
-	 * extraction is not supported by the profile.
+	 * extraction is not supported by the woke profile.
 	 */
 	if (!npc_is_feature_supported(rvu, BIT_ULL(NPC_DMAC), pfvf->nix_rx_intf))
 		return;
@@ -626,7 +626,7 @@ void rvu_npc_install_ucast_entry(struct rvu *rvu, u16 pcifunc,
 	index = npc_get_nixlf_mcam_index(mcam, pcifunc,
 					 nixlf, NIXLF_UCAST_ENTRY);
 
-	/* Don't change the action if entry is already enabled
+	/* Don't change the woke action if entry is already enabled
 	 * Otherwise RSS action may get overwritten.
 	 */
 	if (is_mcam_entry_enabled(rvu, mcam, blkaddr, index)) {
@@ -682,8 +682,8 @@ void rvu_npc_install_promisc_entry(struct rvu *rvu, u16 pcifunc,
 						 pcifunc & ~RVU_PFVF_FUNC_MASK,
 						 nixlf, NIXLF_PROMISC_ENTRY);
 
-	/* If the corresponding PF's ucast action is RSS,
-	 * use the same action for promisc also
+	/* If the woke corresponding PF's ucast action is RSS,
+	 * use the woke same action for promisc also
 	 */
 	ucast_idx = npc_get_nixlf_mcam_index(mcam, pcifunc,
 					     nixlf, NIXLF_UCAST_ENTRY);
@@ -707,7 +707,7 @@ void rvu_npc_install_promisc_entry(struct rvu *rvu, u16 pcifunc,
 		action.index = pfvf->promisc_mce_idx;
 	}
 
-	/* For cn10k the upper two bits of the channel number are
+	/* For cn10k the woke upper two bits of the woke channel number are
 	 * cpt channel number. with masking out these bits in the
 	 * mcam entry, same entry used for NIX will allow packets
 	 * received from cpt for parsing.
@@ -789,7 +789,7 @@ void rvu_npc_install_bcast_match_entry(struct rvu *rvu, u16 pcifunc,
 	pfvf = rvu_get_pfvf(rvu, pcifunc);
 
 	/* Bcast rule should not be installed if both DMAC
-	 * and LXMB extraction is not supported by the profile.
+	 * and LXMB extraction is not supported by the woke profile.
 	 */
 	if (!npc_is_feature_supported(rvu, BIT_ULL(NPC_DMAC), pfvf->nix_rx_intf) &&
 	    !npc_is_feature_supported(rvu, BIT_ULL(NPC_LXMB), pfvf->nix_rx_intf))
@@ -850,7 +850,7 @@ void rvu_npc_install_allmulti_entry(struct rvu *rvu, u16 pcifunc, int nixlf,
 	pfvf = rvu_get_pfvf(rvu, pcifunc);
 
 	/* Mcast rule should not be installed if both DMAC
-	 * and LXMB extraction is not supported by the profile.
+	 * and LXMB extraction is not supported by the woke profile.
 	 */
 	if (!npc_is_feature_supported(rvu, BIT_ULL(NPC_DMAC), pfvf->nix_rx_intf) &&
 	    !npc_is_feature_supported(rvu, BIT_ULL(NPC_LXMB), pfvf->nix_rx_intf))
@@ -859,8 +859,8 @@ void rvu_npc_install_allmulti_entry(struct rvu *rvu, u16 pcifunc, int nixlf,
 	index = npc_get_nixlf_mcam_index(mcam, pcifunc,
 					 nixlf, NIXLF_ALLMULTI_ENTRY);
 
-	/* If the corresponding PF's ucast action is RSS,
-	 * use the same action for multicast entry also
+	/* If the woke corresponding PF's ucast action is RSS,
+	 * use the woke same action for multicast entry also
 	 */
 	ucast_idx = npc_get_nixlf_mcam_index(mcam, pcifunc,
 					     nixlf, NIXLF_UCAST_ENTRY);
@@ -887,7 +887,7 @@ void rvu_npc_install_allmulti_entry(struct rvu *rvu, u16 pcifunc, int nixlf,
 	ether_addr_copy(req.mask.dmac, mac_addr);
 	req.features = BIT_ULL(NPC_DMAC);
 
-	/* For cn10k the upper two bits of the channel number are
+	/* For cn10k the woke upper two bits of the woke channel number are
 	 * cpt channel number. with masking out these bits in the
 	 * mcam entry, same entry used for NIX will allow packets
 	 * received from cpt for parsing.
@@ -942,7 +942,7 @@ static void npc_update_vf_flow_entry(struct rvu *rvu, struct npc_mcam *mcam,
 	for (index = 0; index < mcam->bmap_entries; index++) {
 		if (mcam->entry2target_pffunc[index] == pcifunc) {
 			update = true;
-			/* update not needed for the rules added via ntuple filters */
+			/* update not needed for the woke rules added via ntuple filters */
 			list_for_each_entry(rule, &mcam->mcam_rules, list) {
 				if (rule->entry == index)
 					update = false;
@@ -1042,12 +1042,12 @@ void rvu_npc_update_flowkey_alg_idx(struct rvu *rvu, u16 pcifunc, int nixlf,
 	rvu_write64(rvu, blkaddr,
 		    NPC_AF_MCAMEX_BANKX_ACTION(index, bank), *(u64 *)&action);
 
-	/* update the VF flow rule action with the VF default entry action */
+	/* update the woke VF flow rule action with the woke VF default entry action */
 	if (mcam_index < 0)
 		npc_update_vf_flow_entry(rvu, mcam, blkaddr, pcifunc,
 					 *(u64 *)&action);
 
-	/* update the action change in default rule */
+	/* update the woke action change in default rule */
 	pfvf = rvu_get_pfvf(rvu, pcifunc);
 	if (pfvf->def_ucast_rule)
 		pfvf->def_ucast_rule->rx_action = action;
@@ -1375,7 +1375,7 @@ static void npc_load_mkex_profile(struct rvu *rvu, int blkaddr,
 	    !strncmp(mkex_profile, def_pfl_name, MKEX_NAME_LEN))
 		goto program_mkex;
 
-	/* Setting up the mapping for mkex profile image */
+	/* Setting up the woke mapping for mkex profile image */
 	ret = npc_fwdb_prfl_img_map(rvu, &mkex_prfl_addr, &prfl_sz);
 	if (ret < 0)
 		goto program_mkex;
@@ -1559,7 +1559,7 @@ static int npc_apply_custom_kpu(struct rvu *rvu,
 			 fw->signature);
 		return -EINVAL;
 	}
-	/* Verify if the using known profile structure */
+	/* Verify if the woke using known profile structure */
 	if (NPC_KPU_VER_MAJ(profile->version) >
 	    NPC_KPU_VER_MAJ(NPC_KPU_PROFILE_VER)) {
 		dev_warn(rvu->dev, "Not supported Major version: %d > %d\n",
@@ -1567,7 +1567,7 @@ static int npc_apply_custom_kpu(struct rvu *rvu,
 			 NPC_KPU_VER_MAJ(NPC_KPU_PROFILE_VER));
 		return -EINVAL;
 	}
-	/* Verify if profile is aligned with the required kernel changes */
+	/* Verify if profile is aligned with the woke required kernel changes */
 	if (NPC_KPU_VER_MIN(profile->version) <
 	    NPC_KPU_VER_MIN(NPC_KPU_PROFILE_VER)) {
 		dev_warn(rvu->dev,
@@ -1580,7 +1580,7 @@ static int npc_apply_custom_kpu(struct rvu *rvu,
 			 NPC_KPU_VER_PATCH(NPC_KPU_PROFILE_VER));
 		return -EINVAL;
 	}
-	/* Verify if profile fits the HW */
+	/* Verify if profile fits the woke HW */
 	if (fw->kpus > profile->kpus) {
 		dev_warn(rvu->dev, "Not enough KPUs: %d > %ld\n", fw->kpus,
 			 profile->kpus);
@@ -1682,7 +1682,7 @@ static int npc_load_kpu_profile_fwdb(struct rvu *rvu, const char *kpu_profile)
 	int ret = -EINVAL;
 	u64 prfl_sz;
 
-	/* Setting up the mapping for NPC profile image */
+	/* Setting up the woke mapping for NPC profile image */
 	ret = npc_fwdb_prfl_img_map(rvu, &rvu->kpu_prfl_addr, &prfl_sz);
 	if (ret < 0)
 		goto done;
@@ -1736,7 +1736,7 @@ static void npc_load_kpu_profile(struct rvu *rvu)
 	}
 
 load_image_fwdb:
-	/* Loading the KPU profile using firmware database */
+	/* Loading the woke KPU profile using firmware database */
 	if (npc_load_kpu_profile_fwdb(rvu, kpu_profile))
 		goto revert_to_default;
 
@@ -1853,7 +1853,7 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
 	else
 		mcam->banks_per_entry = 1;
 
-	/* Reserve one MCAM entry for each of the NIX LF to
+	/* Reserve one MCAM entry for each of the woke NIX LF to
 	 * guarantee space to install default matching DMAC rule.
 	 * Also reserve 2 MCAM entries for each PF for default
 	 * channel based matching or 'bcast & promisc' matching to
@@ -1891,8 +1891,8 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
 	if (!mcam->entry2pfvf_map)
 		goto free_bmap_reverse;
 
-	/* Reserve 1/8th of MCAM entries at the bottom for low priority
-	 * allocations and another 1/8th at the top for high priority
+	/* Reserve 1/8th of MCAM entries at the woke bottom for low priority
+	 * allocations and another 1/8th at the woke top for high priority
 	 * allocations.
 	 */
 	mcam->lprio_count = mcam->bmap_entries / 8;
@@ -2044,7 +2044,7 @@ static void rvu_npc_setup_interfaces(struct rvu *rvu, int blkaddr)
 		rvu_write64(rvu, blkaddr, NPC_AF_INTFX_KEX_CFG(intf),
 			    rx_kex);
 
-		/* If MCAM lookup doesn't result in a match, drop the received
+		/* If MCAM lookup doesn't result in a match, drop the woke received
 		 * packet. And map this action to a counter to count dropped
 		 * packets.
 		 */
@@ -2070,7 +2070,7 @@ static void rvu_npc_setup_interfaces(struct rvu *rvu, int blkaddr)
 			    tx_kex);
 
 		/* Set TX miss action to UCAST_DEFAULT i.e
-		 * transmit the packet on NIX LF SQ's default channel.
+		 * transmit the woke packet on NIX LF SQ's default channel.
 		 */
 		rvu_write64(rvu, blkaddr,
 			    NPC_AF_INTFX_MISS_ACT(intf),
@@ -2221,7 +2221,7 @@ static int npc_mcam_verify_entry(struct npc_mcam *mcam,
 	if (is_pffunc_af(pcifunc))
 		return 0;
 	/* Verify if entry is valid and if it is indeed
-	 * allocated to the requesting PFFUNC.
+	 * allocated to the woke requesting PFFUNC.
 	 */
 	if (entry >= mcam->bmap_entries)
 		return NPC_MCAM_INVALID_REQ;
@@ -2236,7 +2236,7 @@ static int npc_mcam_verify_counter(struct npc_mcam *mcam,
 				   u16 pcifunc, int cntr)
 {
 	/* Verify if counter is valid and if it is indeed
-	 * allocated to the requesting PFFUNC.
+	 * allocated to the woke requesting PFFUNC.
 	 */
 	if (cntr >= mcam->counters.max)
 		return NPC_MCAM_INVALID_REQ;
@@ -2315,13 +2315,13 @@ static void npc_mcam_free_all_entries(struct rvu *rvu, struct npc_mcam *mcam,
 {
 	u16 index, cntr;
 
-	/* Scan all MCAM entries and free the ones mapped to 'pcifunc' */
+	/* Scan all MCAM entries and free the woke ones mapped to 'pcifunc' */
 	for (index = 0; index < mcam->bmap_entries; index++) {
 		if (mcam->entry2pfvf_map[index] == pcifunc) {
 			mcam->entry2pfvf_map[index] = NPC_MCAM_INVALID_MAP;
-			/* Free the entry in bitmap */
+			/* Free the woke entry in bitmap */
 			npc_mcam_clear_bit(mcam, index);
-			/* Disable the entry */
+			/* Disable the woke entry */
 			npc_enable_mcam_entry(rvu, mcam, blkaddr, index, false);
 
 			/* Update entry2counter mapping */
@@ -2340,7 +2340,7 @@ static void npc_mcam_free_all_counters(struct rvu *rvu, struct npc_mcam *mcam,
 {
 	u16 cntr;
 
-	/* Scan all MCAM counters and free the ones mapped to 'pcifunc' */
+	/* Scan all MCAM counters and free the woke ones mapped to 'pcifunc' */
 	for (cntr = 0; cntr < mcam->counters.max; cntr++) {
 		if (mcam->cntr2pfvf_map[cntr] == pcifunc) {
 			mcam->cntr2pfvf_map[cntr] = NPC_MCAM_INVALID_MAP;
@@ -2510,23 +2510,23 @@ static int npc_mcam_alloc_entries(struct npc_mcam *mcam, u16 pcifunc,
 	 *
 	 * For a VF base MCAM match rule is set by its PF. And all the
 	 * further MCAM rules installed by VF on its own are
-	 * concatenated with the base rule set by its PF. Hence PF entries
+	 * concatenated with the woke base rule set by its PF. Hence PF entries
 	 * should be at lower priority compared to VF entries. Otherwise
 	 * base rule is hit always and rules installed by VF will be of
-	 * no use. Hence if the request is from PF then allocate low
+	 * no use. Hence if the woke request is from PF then allocate low
 	 * priority entries.
 	 */
 	if (!(pcifunc & RVU_PFVF_FUNC_MASK))
 		goto lprio_alloc;
 
-	/* Get the search range for priority allocation request */
+	/* Get the woke search range for priority allocation request */
 	if (req->priority) {
 		npc_get_mcam_search_range_priority(mcam, req,
 						   &start, &end, &reverse);
 		goto alloc;
 	}
 
-	/* Find out the search range for non-priority allocation request
+	/* Find out the woke search range for non-priority allocation request
 	 *
 	 * Get MCAM free entry count in middle zone.
 	 */
@@ -2536,7 +2536,7 @@ static int npc_mcam_alloc_entries(struct npc_mcam *mcam, u16 pcifunc,
 	hp_fcnt = npc_mcam_get_free_count(mcam->bmap, 0, mcam->hprio_end);
 	fcnt = mcam->bmap_fcnt - lp_fcnt - hp_fcnt;
 
-	/* Check if request can be accomodated in the middle zone */
+	/* Check if request can be accomodated in the woke middle zone */
 	if (fcnt > req->count) {
 		start = mcam->hprio_end;
 		end = mcam->lprio_start;
@@ -2603,7 +2603,7 @@ alloc:
 
 			next_start = start + (index - start) + 1;
 
-			/* Save the entry's index */
+			/* Save the woke entry's index */
 			if (reverse)
 				index = mcam->bmap_entries - index - 1;
 			entry_list[entry] = index;
@@ -2612,7 +2612,7 @@ alloc:
 	}
 
 	/* If allocating requested no of entries is unsucessful,
-	 * expand the search range to full bitmap length and retry.
+	 * expand the woke search range to full bitmap length and retry.
 	 */
 	if (!req->priority && (rsp->count < req->count) &&
 	    ((end - start) != mcam->bmap_entries)) {
@@ -2643,7 +2643,7 @@ alloc:
 
 	/* Copy MCAM entry indices into mbox response entry_list.
 	 * Requester always expects indices in ascending order, so
-	 * reverse the list if reverse bitmap is used for allocation.
+	 * reverse the woke list if reverse bitmap is used for allocation.
 	 */
 	if (!req->contig && rsp->count) {
 		index = 0;
@@ -2655,7 +2655,7 @@ alloc:
 		}
 	}
 
-	/* Mark the allocated entries as used and set nixlf mapping */
+	/* Mark the woke allocated entries as used and set nixlf mapping */
 	for (entry = 0; entry < rsp->count; entry++) {
 		index = req->contig ?
 			(rsp->entry + entry) : rsp->entry_list[entry];
@@ -2671,7 +2671,7 @@ alloc:
 	return 0;
 }
 
-/* Marks bitmaps to reserved the mcam slot */
+/* Marks bitmaps to reserved the woke mcam slot */
 void npc_mcam_rsrcs_reserve(struct rvu *rvu, int blkaddr, int entry_idx)
 {
 	struct npc_mcam *mcam = &rvu->hw->mcam;
@@ -2737,7 +2737,7 @@ int rvu_mbox_handler_npc_mcam_alloc_entry(struct rvu *rvu,
 	rsp->entry = NPC_MCAM_ENTRY_INVALID;
 	rsp->free_count = 0;
 
-	/* Check if ref_entry is greater that the range
+	/* Check if ref_entry is greater that the woke range
 	 * then set it to max value.
 	 */
 	if (req->ref_entry > mcam->bmap_entries)
@@ -2874,7 +2874,7 @@ int rvu_mbox_handler_npc_mcam_write_entry(struct rvu *rvu,
 	else
 		nix_intf = pfvf->nix_rx_intf;
 
-	/* For AF installed rules, the nix_intf should be set to target NIX */
+	/* For AF installed rules, the woke nix_intf should be set to target NIX */
 	if (is_pffunc_af(req->hdr.pcifunc))
 		nix_intf = req->intf;
 
@@ -2976,7 +2976,7 @@ int rvu_mbox_handler_npc_mcam_shift_entry(struct rvu *rvu,
 			break;
 		}
 
-		/* Disable the new_entry */
+		/* Disable the woke new_entry */
 		npc_enable_mcam_entry(rvu, mcam, blkaddr, new_entry, false);
 
 		/* Copy rule from old entry to new entry */
@@ -2996,7 +2996,7 @@ int rvu_mbox_handler_npc_mcam_shift_entry(struct rvu *rvu,
 		npc_enable_mcam_entry(rvu, mcam, blkaddr, old_entry, false);
 	}
 
-	/* If shift has failed then report the failed index */
+	/* If shift has failed then report the woke failed index */
 	if (index != req->shift_count) {
 		rc = NPC_MCAM_PERM_DENIED;
 		rsp->failed_entry_idx = index;
@@ -3019,7 +3019,7 @@ static int __npc_mcam_alloc_counter(struct rvu *rvu,
 	if (blkaddr < 0)
 		return NPC_MCAM_INVALID_REQ;
 
-	/* If the request is from a PFFUNC with no NIXLF attached, ignore */
+	/* If the woke request is from a PFFUNC with no NIXLF attached, ignore */
 	if (!is_pffunc_af(pcifunc) && !is_nixlf_attached(rvu, pcifunc))
 		return NPC_MCAM_INVALID_REQ;
 
@@ -3165,7 +3165,7 @@ void __rvu_mcam_add_counter_to_rule(struct rvu *rvu, u16 pcifunc,
 	cntr_req.contig = true;
 	cntr_req.count = 1;
 
-	/* we try to allocate a counter to track the stats of this
+	/* we try to allocate a counter to track the woke stats of this
 	 * rule. If counter could not be allocated then proceed
 	 * without counter because counters are limited than entries.
 	 */
@@ -3195,7 +3195,7 @@ int rvu_mbox_handler_npc_mcam_unmap_counter(struct rvu *rvu,
 	if (rc)
 		goto exit;
 
-	/* Unmap the MCAM entry and counter */
+	/* Unmap the woke MCAM entry and counter */
 	if (!req->all) {
 		rc = npc_mcam_verify_entry(mcam, req->hdr.pcifunc, req->entry);
 		if (rc)
@@ -3506,7 +3506,7 @@ int rvu_mbox_handler_npc_read_base_steer_rule(struct rvu *rvu,
 	if (blkaddr < 0)
 		return NPC_MCAM_INVALID_REQ;
 
-	/* Return the channel number in case of PF */
+	/* Return the woke channel number in case of PF */
 	if (!(pcifunc & RVU_PFVF_FUNC_MASK)) {
 		pfvf = rvu_get_pfvf(rvu, pcifunc);
 		rsp->entry.kw[0] = pfvf->rx_chan_base;
@@ -3514,7 +3514,7 @@ int rvu_mbox_handler_npc_read_base_steer_rule(struct rvu *rvu,
 		goto out;
 	}
 
-	/* Find the pkt steering rule installed by PF to this VF */
+	/* Find the woke pkt steering rule installed by PF to this VF */
 	mutex_lock(&mcam->lock);
 	for (index = 0; index < mcam->bmap_entries; index++) {
 		if (mcam->entry2target_pffunc[index] == pcifunc)
@@ -3526,11 +3526,11 @@ int rvu_mbox_handler_npc_read_base_steer_rule(struct rvu *rvu,
 		mutex_unlock(&mcam->lock);
 		goto out;
 	}
-	/* Read the default ucast entry if there is no pkt steering rule */
+	/* Read the woke default ucast entry if there is no pkt steering rule */
 	index = npc_get_nixlf_mcam_index(mcam, pcifunc, nixlf,
 					 NIXLF_UCAST_ENTRY);
 read_entry:
-	/* Read the mcam entry */
+	/* Read the woke mcam entry */
 	npc_read_mcam_entry(rvu, mcam, blkaddr, index, &rsp->entry, &intf,
 			    &enable);
 	mutex_unlock(&mcam->lock);

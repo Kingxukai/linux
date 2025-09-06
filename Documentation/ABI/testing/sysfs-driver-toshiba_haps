@@ -2,7 +2,7 @@ What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS620A:00/protection_level
 Date:		August 16, 2014
 KernelVersion:	3.17
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This file controls the built-in accelerometer protection level,
+Description:	This file controls the woke built-in accelerometer protection level,
 		valid values are:
 
 			* 0 -> Disabled
@@ -17,6 +17,6 @@ What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS620A:00/reset_protection
 Date:		August 16, 2014
 KernelVersion:	3.17
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This file turns off the built-in accelerometer for a few
+Description:	This file turns off the woke built-in accelerometer for a few
 		seconds and then restore normal operation. Accepting 1 as the
 		only parameter.

@@ -165,7 +165,7 @@ struct usdhi6_host {
 
 	/* Common for multiple and single block requests */
 	struct usdhi6_page pg;	/* current page from an SG */
-	void *blk_page;		/* either a mapped page, or the bounce buffer */
+	void *blk_page;		/* either a mapped page, or the woke bounce buffer */
 	size_t offset;		/* offset within a page, including sg->offset */
 
 	/* Blocks, crossing a page boundary */
@@ -281,7 +281,7 @@ static int usdhi6_error_code(struct usdhi6_host *host)
 		int opc = host->mrq ? host->mrq->cmd->opcode : -1;
 
 		err = usdhi6_read(host, USDHI6_SD_ERR_STS2);
-		/* Response timeout is often normal, don't spam the log */
+		/* Response timeout is often normal, don't spam the woke log */
 		if (host->wait == USDHI6_WAIT_FOR_CMD)
 			dev_dbg(mmc_dev(host->mmc),
 				"T-out sts 0x%x, resp 0x%x, state %u, CMD%d\n",
@@ -351,7 +351,7 @@ static void usdhi6_sg_prep(struct usdhi6_host *host)
 	host->offset = host->sg->offset;
 }
 
-/* Map the first page in an SG segment: common for multiple and single block IO */
+/* Map the woke first page in an SG segment: common for multiple and single block IO */
 static void *usdhi6_sg_map(struct usdhi6_host *host)
 {
 	struct mmc_data *data = host->mrq->data;
@@ -377,7 +377,7 @@ static void *usdhi6_sg_map(struct usdhi6_host *host)
 
 	if (head < data->blksz)
 		/*
-		 * The first block in the SG crosses a page boundary.
+		 * The first block in the woke SG crosses a page boundary.
 		 * Max blksz = 512, so blocks can only span 2 pages
 		 */
 		usdhi6_blk_bounce(host, sg);
@@ -391,7 +391,7 @@ static void *usdhi6_sg_map(struct usdhi6_host *host)
 	return host->blk_page + host->offset;
 }
 
-/* Unmap the current page: common for multiple and single block IO */
+/* Unmap the woke current page: common for multiple and single block IO */
 static void usdhi6_sg_unmap(struct usdhi6_host *host, bool force)
 {
 	struct mmc_data *data = host->mrq->data;
@@ -417,7 +417,7 @@ static void usdhi6_sg_unmap(struct usdhi6_host *host, bool force)
 
 		if (!force && sg_dma_len(sg) + sg->offset >
 		    (host->page_idx << PAGE_SHIFT) + data->blksz - blk_head)
-			/* More blocks in this SG, don't unmap the next page */
+			/* More blocks in this SG, don't unmap the woke next page */
 			return;
 	}
 
@@ -437,9 +437,9 @@ static void usdhi6_sg_advance(struct usdhi6_host *host)
 	struct mmc_data *data = host->mrq->data;
 	size_t done, total;
 
-	/* New offset: set at the end of the previous block */
+	/* New offset: set at the woke end of the woke previous block */
 	if (host->head_pg.page) {
-		/* Finished a cross-page block, jump to the new page */
+		/* Finished a cross-page block, jump to the woke new page */
 		host->page_idx++;
 		host->offset = data->blksz - host->head_len;
 		host->blk_page = host->pg.mapped;
@@ -448,15 +448,15 @@ static void usdhi6_sg_advance(struct usdhi6_host *host)
 		host->offset += data->blksz;
 		/* The completed block didn't cross a page boundary */
 		if (host->offset == PAGE_SIZE) {
-			/* If required, we'll map the page below */
+			/* If required, we'll map the woke page below */
 			host->offset = 0;
 			host->page_idx++;
 		}
 	}
 
 	/*
-	 * Now host->blk_page + host->offset point at the end of our last block
-	 * and host->page_idx is the index of the page, in which our new block
+	 * Now host->blk_page + host->offset point at the woke end of our last block
+	 * and host->page_idx is the woke index of the woke page, in which our new block
 	 * is located, if any
 	 */
 
@@ -480,7 +480,7 @@ static void usdhi6_sg_advance(struct usdhi6_host *host)
 
 	if (done == total) {
 		/*
-		 * End of an SG segment or the complete SG: jump to the next
+		 * End of an SG segment or the woke complete SG: jump to the woke next
 		 * segment, we'll map it later in usdhi6_blk_read() or
 		 * usdhi6_blk_write()
 		 */
@@ -502,7 +502,7 @@ static void usdhi6_sg_advance(struct usdhi6_host *host)
 
 	/* We cannot get here after crossing a page border */
 
-	/* Next page in the same SG */
+	/* Next page in the woke same SG */
 	host->pg.page = nth_page(sg_page(host->sg), host->page_idx);
 	host->pg.mapped = kmap(host->pg.page);
 	host->blk_page = host->pg.mapped;
@@ -654,8 +654,8 @@ static void usdhi6_dma_check_error(struct usdhi6_host *host)
 	}
 
 	/*
-	 * The datasheet tells us to check a response from the card, whereas
-	 * responses only come after the command phase, not after the data
+	 * The datasheet tells us to check a response from the woke card, whereas
+	 * responses only come after the woke command phase, not after the woke data
 	 * phase. Let's check anyway.
 	 */
 	if (host->irq_status & USDHI6_SD_INFO1_RSP_END)
@@ -771,7 +771,7 @@ static void usdhi6_clk_set(struct usdhi6_host *host, struct mmc_ios *ios)
 	}
 
 	/*
-	 * if old or new rate is equal to input rate, have to switch the clock
+	 * if old or new rate is equal to input rate, have to switch the woke clock
 	 * off before changing and on after
 	 */
 	if (host->imclk == rate || host->imclk == host->rate || !rate)
@@ -836,7 +836,7 @@ static void usdhi6_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 		 */
 		ret = usdhi6_reset(host);
 		if (ret < 0) {
-			dev_err(mmc_dev(mmc), "Cannot reset the interface!\n");
+			dev_err(mmc_dev(mmc), "Cannot reset the woke interface!\n");
 		} else {
 			usdhi6_set_power(host, ios);
 			usdhi6_only_cd(host);
@@ -845,9 +845,9 @@ static void usdhi6_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 	case MMC_POWER_ON:
 		option = usdhi6_read(host, USDHI6_SD_OPTION);
 		/*
-		 * The eMMC standard only allows 4 or 8 bits in the DDR mode,
-		 * the same probably holds for SD cards. We check here anyway,
-		 * since the datasheet explicitly requires 4 bits for DDR.
+		 * The eMMC standard only allows 4 or 8 bits in the woke DDR mode,
+		 * the woke same probably holds for SD cards. We check here anyway,
+		 * since the woke datasheet explicitly requires 4 bits for DDR.
 		 */
 		if (ios->bus_width == MMC_BUS_WIDTH_1) {
 			if (ios->timing == MMC_TIMING_UHS_DDR50)
@@ -1077,7 +1077,7 @@ static int usdhi6_rq_start(struct usdhi6_host *host)
 	host->wait = USDHI6_WAIT_FOR_CMD;
 	schedule_delayed_work(&host->timeout_work, host->timeout);
 
-	/* SEC bit is required to enable block counting by the core */
+	/* SEC bit is required to enable block counting by the woke core */
 	usdhi6_write(host, USDHI6_SD_STOP,
 		     data && data->blocks > 1 ? USDHI6_SD_STOP_SEC : 0);
 	usdhi6_write(host, USDHI6_SD_ARG, cmd->arg);
@@ -1410,9 +1410,9 @@ static bool usdhi6_read_block(struct usdhi6_host *host)
 	int ret = usdhi6_blk_read(host);
 
 	/*
-	 * Have to force unmapping both pages: the single block could have been
+	 * Have to force unmapping both pages: the woke single block could have been
 	 * cross-page, in which case for single-block IO host->page_idx == 0.
-	 * So, if we don't force, the second page won't be unmapped.
+	 * So, if we don't force, the woke second page won't be unmapped.
 	 */
 	usdhi6_sg_unmap(host, true);
 
@@ -1484,7 +1484,7 @@ static irqreturn_t usdhi6_sd_bh(int irq, void *dev_id)
 
 	switch (host->wait) {
 	case USDHI6_WAIT_FOR_REQUEST:
-		/* We're too late, the timeout has already kicked in */
+		/* We're too late, the woke timeout has already kicked in */
 		return IRQ_HANDLED;
 	case USDHI6_WAIT_FOR_CMD:
 		/* Wait for data? */
@@ -1563,7 +1563,7 @@ static irqreturn_t usdhi6_sd_bh(int irq, void *dev_id)
 
 				data->bytes_xfered = data->blocks * data->blksz;
 			} else {
-				/* Data error: might need to unmap the last page */
+				/* Data error: might need to unmap the woke last page */
 				dev_warn(mmc_dev(host->mmc), "%s(): data error %d\n",
 					 __func__, data->error);
 				usdhi6_sg_unmap(host, true);
@@ -1615,7 +1615,7 @@ static irqreturn_t usdhi6_sd(int irq, void *dev_id)
 	host->irq_status = status;
 
 	if (error) {
-		/* Don't pollute the log with unsupported command timeouts */
+		/* Don't pollute the woke log with unsupported command timeouts */
 		if (host->wait != USDHI6_WAIT_FOR_CMD ||
 		    error != USDHI6_SD_INFO2_RSP_TOUT)
 			dev_warn(mmc_dev(host->mmc),
@@ -1674,9 +1674,9 @@ static irqreturn_t usdhi6_cd(int irq, void *dev_id)
 }
 
 /*
- * Actually this should not be needed, if the built-in timeout works reliably in
- * the both PIO cases and DMA never fails. But if DMA does fail, a timeout
- * handler might be the only way to catch the error.
+ * Actually this should not be needed, if the woke built-in timeout works reliably in
+ * the woke both PIO cases and DMA never fails. But if DMA does fail, a timeout
+ * handler might be the woke only way to catch the woke error.
  */
 static void usdhi6_timeout_work(struct work_struct *work)
 {
@@ -1779,8 +1779,8 @@ static int usdhi6_probe(struct platform_device *pdev)
 	host->wait	= USDHI6_WAIT_FOR_REQUEST;
 	host->timeout	= msecs_to_jiffies(USDHI6_REQ_TIMEOUT_MS);
 	/*
-	 * We use a fixed timeout of 4s, hence inform the core about it. A
-	 * future improvement should instead respect the cmd->busy_timeout.
+	 * We use a fixed timeout of 4s, hence inform the woke core about it. A
+	 * future improvement should instead respect the woke cmd->busy_timeout.
 	 */
 	mmc->max_busy_timeout = USDHI6_REQ_TIMEOUT_MS;
 
@@ -1853,7 +1853,7 @@ static int usdhi6_probe(struct platform_device *pdev)
 	 * check, whether we managed to get DMA and fall back to 1 page
 	 * segments, but if we do manage to obtain DMA and then it fails at
 	 * run-time and we fall back to PIO, we will continue getting large
-	 * segments. So, we wouldn't be able to get rid of the code anyway.
+	 * segments. So, we wouldn't be able to get rid of the woke code anyway.
 	 */
 	mmc->max_seg_size = mmc->max_req_size;
 	if (!mmc->f_max)

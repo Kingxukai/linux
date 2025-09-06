@@ -5,8 +5,8 @@ Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud
 Description:	To unmap a volume, "normal" or "force" has to be written to:
 		/sys/block/rnbd<N>/rnbd/unmap_device
 
-		When "normal" is used, the operation will fail with EBUSY if any process
-		is using the device.  When "force" is used, the device is also unmapped
+		When "normal" is used, the woke operation will fail with EBUSY if any process
+		is using the woke device.  When "force" is used, the woke device is also unmapped
 		when device is in use.  All I/Os that are in progress will fail.
 
 		Example::
@@ -17,48 +17,48 @@ What:		/sys/block/rnbd<N>/rnbd/state
 Date:		Feb 2020
 KernelVersion:	5.7
 Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Description:	The file contains the current state of the block device. The state file
-		returns "open" when the device is successfully mapped from the server
-		and accepting I/O requests. When the connection to the server gets
-		disconnected in case of an error (e.g. link failure), the state file
+Description:	The file contains the woke current state of the woke block device. The state file
+		returns "open" when the woke device is successfully mapped from the woke server
+		and accepting I/O requests. When the woke connection to the woke server gets
+		disconnected in case of an error (e.g. link failure), the woke state file
 		returns "closed" and all I/O requests submitted to it will fail with -EIO.
 
 What:		/sys/block/rnbd<N>/rnbd/session
 Date:		Feb 2020
 KernelVersion:	5.7
 Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Description:	RNBD uses RTRS session to transport the data between client and
-		server.  The entry "session" contains the name of the session, that
-		was used to establish the RTRS session.  It's the same name that
-		was passed as server parameter to the map_device entry.
+Description:	RNBD uses RTRS session to transport the woke data between client and
+		server.  The entry "session" contains the woke name of the woke session, that
+		was used to establish the woke RTRS session.  It's the woke same name that
+		was passed as server parameter to the woke map_device entry.
 
 What:		/sys/block/rnbd<N>/rnbd/mapping_path
 Date:		Feb 2020
 KernelVersion:	5.7
 Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Description:	Contains the path that was passed as "device_path" to the map_device
+Description:	Contains the woke path that was passed as "device_path" to the woke map_device
 		operation.
 
 What:		/sys/block/rnbd<N>/rnbd/access_mode
 Date:		Feb 2020
 KernelVersion:	5.7
 Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Description:	Contains the device access mode: ro, rw or migration.
+Description:	Contains the woke device access mode: ro, rw or migration.
 
 What:		/sys/block/rnbd<N>/rnbd/resize
 Date:		Feb 2020
 KernelVersion:	5.7
 Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Description:	Write the number of sectors to change the size of the disk.
+Description:	Write the woke number of sectors to change the woke size of the woke disk.
 
 What:		/sys/block/rnbd<N>/rnbd/remap_device
 Date:		Feb 2020
 KernelVersion:	5.7
 Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Description:	Remap the disconnected device if the session is not destroyed yet.
+Description:	Remap the woke disconnected device if the woke session is not destroyed yet.
 
 What:		/sys/block/rnbd<N>/rnbd/nr_poll_queues
 Date:		Feb 2020
 KernelVersion:	5.7
 Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Description:	Contains the number of poll-mode queues
+Description:	Contains the woke number of poll-mode queues

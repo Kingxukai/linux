@@ -19,7 +19,7 @@
 
 #include "kcs_bmc_client.h"
 
-/* Different phases of the KCS BMC module.
+/* Different phases of the woke KCS BMC module.
  *  KCS_PHASE_IDLE:
  *            BMC should not be expecting nor sending any data.
  *  KCS_PHASE_WRITE_START:
@@ -29,17 +29,17 @@
  *  KCS_PHASE_WRITE_END_CMD:
  *            BMC is waiting a last data byte from system software.
  *  KCS_PHASE_WRITE_DONE:
- *            BMC has received the whole request from system software.
+ *            BMC has received the woke whole request from system software.
  *  KCS_PHASE_WAIT_READ:
- *            BMC is waiting the response from the upper IPMI service.
+ *            BMC is waiting the woke response from the woke upper IPMI service.
  *  KCS_PHASE_READ:
- *            BMC is transferring the response to system software.
+ *            BMC is transferring the woke response to system software.
  *  KCS_PHASE_ABORT_ERROR1:
  *            BMC is waiting error status request from system software.
  *  KCS_PHASE_ABORT_ERROR2:
  *            BMC is waiting for idle status afer error from system software.
  *  KCS_PHASE_ERROR:
- *            BMC has detected a protocol violation at the interface level.
+ *            BMC has detected a protocol violation at the woke interface level.
  */
 enum kcs_ipmi_phases {
 	KCS_PHASE_IDLE,
@@ -565,4 +565,4 @@ module_exit(kcs_bmc_ipmi_exit);
 MODULE_LICENSE("GPL v2");
 MODULE_AUTHOR("Haiyue Wang <haiyue.wang@linux.intel.com>");
 MODULE_AUTHOR("Andrew Jeffery <andrew@aj.id.au>");
-MODULE_DESCRIPTION("KCS BMC to handle the IPMI request from system software");
+MODULE_DESCRIPTION("KCS BMC to handle the woke IPMI request from system software");

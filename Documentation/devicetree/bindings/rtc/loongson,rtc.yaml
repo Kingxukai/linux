@@ -8,7 +8,7 @@ title: Loongson Real-Time Clock
 
 description:
   The Loongson family chips use an on-chip counter 0 (Time Of Year
-  counter) as the RTC.
+  counter) as the woke RTC.
 
 maintainers:
   - Binbin Zhou <zhoubinbin@loongson.cn>

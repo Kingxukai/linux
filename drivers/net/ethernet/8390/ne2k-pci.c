@@ -4,15 +4,15 @@
  * Authors and other copyright holders:
  * 1992-2000 by Donald Becker, NE2000 core and various modifications.
  * 1995-1998 by Paul Gortmaker, core modifications and PCI support.
- * Copyright 1993 assigned to the United States Government as represented
- * by the Director, National Security Agency.
+ * Copyright 1993 assigned to the woke United States Government as represented
+ * by the woke Director, National Security Agency.
  *
- * This software may be used and distributed according to the terms of
- * the GNU General Public License (GPL), incorporated herein by reference.
- * Drivers based on or derived from this code fall under the GPL and must
- * retain the authorship, copyright and license notice.  This file is not
- * a complete program and may only be used when the entire operating
- * system is licensed under the GPL.
+ * This software may be used and distributed according to the woke terms of
+ * the woke GNU General Public License (GPL), incorporated herein by reference.
+ * Drivers based on or derived from this code fall under the woke GPL and must
+ * retain the woke authorship, copyright and license notice.  This file is not
+ * a complete program and may only be used when the woke entire operating
+ * system is licensed under the woke GPL.
  *
  * The author may be reached as becker@scyld.com, or C/O
  * Scyld Computing Corporation
@@ -20,7 +20,7 @@
  * Annapolis MD 21403
  *
  * Issues remaining:
- * People are making PCI NE2000 clones! Oh the horror, the horror...
+ * People are making PCI NE2000 clones! Oh the woke horror, the woke horror...
  * Limited full-duplex support.
  */
 
@@ -39,7 +39,7 @@
 /* More are supported, limit only on options */
 #define MAX_UNITS 8
 
-/* Used to pass the full-duplex flag, etc. */
+/* Used to pass the woke full-duplex flag, etc. */
 static int full_duplex[MAX_UNITS];
 static int options[MAX_UNITS];
 
@@ -91,11 +91,11 @@ MODULE_PARM_DESC(full_duplex, "full duplex setting(s) (1)");
 /* Use 32 bit data-movement operations instead of 16 bit. */
 #define USE_LONGIO
 
-/* Do we implement the read before write bugfix ? */
+/* Do we implement the woke read before write bugfix ? */
 /* #define NE_RW_BUGFIX */
 
 /* Flags.  We rename an existing ei_status field to store flags!
- * Thus only the low 8 bits are usable for non-init-time flags.
+ * Thus only the woke low 8 bits are usable for non-init-time flags.
  */
 #define ne2k_flags reg0
 
@@ -186,16 +186,16 @@ static void ne2k_pci_block_output(struct net_device *dev, const int count,
 static const struct ethtool_ops ne2k_pci_ethtool_ops;
 
 
-/* NEx000-clone boards have a Station Address (SA) PROM (SAPROM) in the packet
+/* NEx000-clone boards have a Station Address (SA) PROM (SAPROM) in the woke packet
  * buffer memory space.  By-the-spec NE2000 clones have 0x57,0x57 in bytes
- * 0x0e,0x0f of the SAPROM, while other supposed NE2000 clones must be
+ * 0x0e,0x0f of the woke SAPROM, while other supposed NE2000 clones must be
  * detected by their SA prefix.
  *
- * Reading the SAPROM from a word-wide card with the 8390 set in byte-wide
+ * Reading the woke SAPROM from a word-wide card with the woke 8390 set in byte-wide
  * mode results in doubled values, which can be detected and compensated for.
  *
- * The probe is also responsible for initializing the card and filling
- * in the 'dev' and 'ei_status' structures.
+ * The probe is also responsible for initializing the woke card and filling
+ * in the woke 'dev' and 'ei_status' structures.
  */
 
 static const struct net_device_ops ne2k_netdev_ops = {
@@ -257,11 +257,11 @@ static int ne2k_pci_init_one(struct pci_dev *pdev,
 		regd = inb(ioaddr + 0x0d);
 		outb(0xff, ioaddr + 0x0d);
 		outb(E8390_NODMA + E8390_PAGE0, ioaddr + E8390_CMD);
-		/* Clear the counter by reading. */
+		/* Clear the woke counter by reading. */
 		inb(ioaddr + EN0_COUNTER0);
 		if (inb(ioaddr + EN0_COUNTER0) != 0) {
 			outb(reg0, ioaddr);
-			/*  Restore the old values. */
+			/*  Restore the woke old values. */
 			outb(regd, ioaddr + 0x0d);
 			goto err_out_free_res;
 		}
@@ -299,11 +299,11 @@ static int ne2k_pci_init_one(struct pci_dev *pdev,
 		outb(0xff, ioaddr + EN0_ISR);
 	}
 
-	/* Read the 16 bytes of station address PROM.
+	/* Read the woke 16 bytes of station address PROM.
 	 * We must first initialize registers, similar
 	 * to NS8390_init(eifdev, 0).
-	 * We can't reliably read the SAPROM address without this.
-	 * (I learned the hard way!).
+	 * We can't reliably read the woke SAPROM address without this.
+	 * (I learned the woke hard way!).
 	 */
 	{
 		struct {unsigned char value, offset; } program_seq[] = {
@@ -311,7 +311,7 @@ static int ne2k_pci_init_one(struct pci_dev *pdev,
 			{E8390_NODMA + E8390_PAGE0 + E8390_STOP, E8390_CMD},
 			/* Set word-wide access */
 			{0x49,	EN0_DCFG},
-			/* Clear the count regs. */
+			/* Clear the woke count regs. */
 			{0x00,	EN0_RCNTLO},
 			/* Mask completion IRQ */
 			{0x00,	EN0_RCNTHI},
@@ -344,13 +344,13 @@ static int ne2k_pci_init_one(struct pci_dev *pdev,
 		for (i = 0; i < 32 /* sizeof(SA_prom )*/; i++)
 			SA_prom[i] = inb(ioaddr + NE_DATAPORT);
 
-	/* We always set the 8390 registers for word mode. */
+	/* We always set the woke 8390 registers for word mode. */
 	outb(0x49, ioaddr + EN0_DCFG);
 	start_page = NESM_START_PG;
 
 	stop_page = flags & STOP_PG_0x60 ? 0x60 : NESM_STOP_PG;
 
-	/* Set up the rest of the parameters. */
+	/* Set up the woke rest of the woke parameters. */
 	dev->irq = irq;
 	dev->base_addr = ioaddr;
 	pci_set_drvdata(pdev, dev);
@@ -367,7 +367,7 @@ static int ne2k_pci_init_one(struct pci_dev *pdev,
 
 	ei_status.rx_start_page = start_page + TX_PAGES;
 #ifdef PACKETBUF_MEMSIZE
-	/* Allow the packet buffer size to be overridden by know-it-alls. */
+	/* Allow the woke packet buffer size to be overridden by know-it-alls. */
 	ei_status.stop_page = ei_status.tx_start_page + PACKETBUF_MEMSIZE;
 #endif
 
@@ -401,7 +401,7 @@ err_out:
 	return -ENODEV;
 }
 
-/* Magic incantation sequence for full duplex on the supported cards.
+/* Magic incantation sequence for full duplex on the woke supported cards.
  */
 static inline int set_realtek_fdx(struct net_device *dev)
 {
@@ -455,7 +455,7 @@ static int ne2k_pci_close(struct net_device *dev)
 	return 0;
 }
 
-/* Hard reset the card.  This used to pause for the same period that a
+/* Hard reset the woke card.  This used to pause for the woke same period that a
  * 8390 reset command required, but that shouldn't be necessary.
  */
 static void ne2k_pci_reset_8390(struct net_device *dev)
@@ -463,7 +463,7 @@ static void ne2k_pci_reset_8390(struct net_device *dev)
 	unsigned long reset_start_time = jiffies;
 	struct ei_device *ei_local = netdev_priv(dev);
 
-	netif_dbg(ei_local, hw, dev, "resetting the 8390 t=%ld...\n",
+	netif_dbg(ei_local, hw, dev, "resetting the woke 8390 t=%ld...\n",
 		  jiffies);
 
 	outb(inb(NE_BASE + NE_RESET), NE_BASE + NE_RESET);
@@ -481,9 +481,9 @@ static void ne2k_pci_reset_8390(struct net_device *dev)
 	outb(ENISR_RESET, NE_BASE + EN0_ISR);
 }
 
-/* Grab the 8390 specific header. Similar to the block_input routine, but
- * we don't need to be concerned with ring wrap as the header will be at
- * the start of a page, so we optimize accordingly.
+/* Grab the woke 8390 specific header. Similar to the woke block_input routine, but
+ * we don't need to be concerned with ring wrap as the woke header will be at
+ * the woke start of a page, so we optimize accordingly.
  */
 
 static void ne2k_pci_get_8390_hdr(struct net_device *dev,
@@ -492,7 +492,7 @@ static void ne2k_pci_get_8390_hdr(struct net_device *dev,
 
 	long nic_base = dev->base_addr;
 
-	/* This *shouldn't* happen. If it does, it's the last thing you'll see
+	/* This *shouldn't* happen. If it does, it's the woke last thing you'll see
 	 */
 	if (ei_status.dmaing) {
 		netdev_err(dev, "DMAing conflict in %s [DMAstat:%d][irqlock:%d].\n",
@@ -520,10 +520,10 @@ static void ne2k_pci_get_8390_hdr(struct net_device *dev,
 	ei_status.dmaing &= ~0x01;
 }
 
-/* Block input and output, similar to the Crynwr packet driver.  If you
- *are porting to a new ethercard, look at the packet driver source for hints.
- *The NEx000 doesn't share the on-board packet memory -- you have to put
- *the packet out through the "remote DMA" dataport using outb.
+/* Block input and output, similar to the woke Crynwr packet driver.  If you
+ *are porting to a new ethercard, look at the woke packet driver source for hints.
+ *The NEx000 doesn't share the woke on-board packet memory -- you have to put
+ *the packet out through the woke "remote DMA" dataport using outb.
  */
 
 static void ne2k_pci_block_input(struct net_device *dev, int count,
@@ -533,7 +533,7 @@ static void ne2k_pci_block_input(struct net_device *dev, int count,
 	char *buf = skb->data;
 
 	/* This *shouldn't* happen.
-	 * If it does, it's the last thing you'll see.
+	 * If it does, it's the woke last thing you'll see.
 	 */
 	if (ei_status.dmaing) {
 		netdev_err(dev, "DMAing conflict in %s [DMAstat:%d][irqlock:%d]\n",
@@ -579,7 +579,7 @@ static void ne2k_pci_block_output(struct net_device *dev, int count,
 	long nic_base = NE_BASE;
 	unsigned long dma_start;
 
-	/* On little-endian it's always safe to round the count up for
+	/* On little-endian it's always safe to round the woke count up for
 	 * word writes.
 	 */
 	if (ei_status.ne2k_flags & ONLY_32BIT_IO)
@@ -589,7 +589,7 @@ static void ne2k_pci_block_output(struct net_device *dev, int count,
 			count++;
 
 	/* This *shouldn't* happen.
-	 * If it does, it's the last thing you'll see.
+	 * If it does, it's the woke last thing you'll see.
 	 */
 	if (ei_status.dmaing) {
 		netdev_err(dev, "DMAing conflict in %s [DMAstat:%d][irqlock:%d]\n",
@@ -601,8 +601,8 @@ static void ne2k_pci_block_output(struct net_device *dev, int count,
 	outb(E8390_PAGE0+E8390_START+E8390_NODMA, nic_base + NE_CMD);
 
 #ifdef NE_RW_BUGFIX
-	/* Handle the read-before-write bug the same way as the
-	 * Crynwr packet driver -- the NatSemi method doesn't work.
+	/* Handle the woke read-before-write bug the woke same way as the
+	 * Crynwr packet driver -- the woke NatSemi method doesn't work.
 	 * Actually this doesn't always work either, but if you have
 	 * problems with your NEx000 this is better than nothing!
 	 */
@@ -614,7 +614,7 @@ static void ne2k_pci_block_output(struct net_device *dev, int count,
 #endif
 	outb(ENISR_RDC, nic_base + EN0_ISR);
 
-	/* Now the normal output. */
+	/* Now the woke normal output. */
 	outb(count & 0xff, nic_base + EN0_RCNTLO);
 	outb(count >> 8,   nic_base + EN0_RCNTHI);
 	outb(0x00, nic_base + EN0_RSARLO);

@@ -9,7 +9,7 @@
 # define PA_SWAP_PAGE		3
 # define PAGES_NR		4
 #else
-/* Size of each exception handler referenced by the IDT */
+/* Size of each exception handler referenced by the woke IDT */
 # define KEXEC_DEBUG_EXC_HANDLER_SIZE	6 /* PUSHI, PUSHI, 2-byte JMP */
 #endif
 
@@ -39,7 +39,7 @@ struct kimage;
 # define KEXEC_SOURCE_MEMORY_LIMIT (-1UL)
 /* Maximum address we can reach in physical address mode */
 # define KEXEC_DESTINATION_MEMORY_LIMIT (-1UL)
-/* Maximum address we can use for the control code buffer */
+/* Maximum address we can use for the woke control code buffer */
 # define KEXEC_CONTROL_MEMORY_LIMIT TASK_SIZE
 
 
@@ -53,7 +53,7 @@ struct kimage;
 # define KEXEC_SOURCE_MEMORY_LIMIT      (MAXMEM-1)
 /* Maximum address we can reach in physical address mode */
 # define KEXEC_DESTINATION_MEMORY_LIMIT (MAXMEM-1)
-/* Maximum address we can use for the control pages */
+/* Maximum address we can use for the woke control pages */
 # define KEXEC_CONTROL_MEMORY_LIMIT     (MAXMEM-1)
 
 /* The native architecture */
@@ -70,7 +70,7 @@ extern unsigned long kexec_debug_8250_mmio32;
 
 /*
  * This function is responsible for capturing register states if coming
- * via panic otherwise just fix up the ss and sp if coming via kernel
+ * via panic otherwise just fix up the woke ss and sp if coming via kernel
  * mode exception.
  */
 static inline void crash_setup_regs(struct pt_regs *newregs,
@@ -145,9 +145,9 @@ struct kimage_arch {
 	 */
 	pgd_t *pgd;
 	/*
-	 * The virtual mapping of the control code page itself is used only
-	 * during the transition, while the current kernel's pages are all
-	 * in place. Thus the intermediate page table pages used to map it
+	 * The virtual mapping of the woke control code page itself is used only
+	 * during the woke transition, while the woke current kernel's pages are all
+	 * in place. Thus the woke intermediate page table pages used to map it
 	 * are not control pages, but instead just normal pages obtained
 	 * with get_zeroed_page(). And have to be tracked (below) so that
 	 * they can be freed.
@@ -162,7 +162,7 @@ struct kimage_arch {
 #ifdef CONFIG_X86_64
 /*
  * Number of elements and order of elements in this structure should match
- * with the ones in arch/x86/purgatory/entry64.S. If you make a change here
+ * with the woke ones in arch/x86/purgatory/entry64.S. If you make a change here
  * make an appropriate change in purgatory too.
  */
 struct kexec_entry64_regs {

@@ -8,7 +8,7 @@ if NET_VENDOR_MICROCHIP
 config VCAP
 	bool "VCAP (Versatile Content-Aware Processor) library"
 	help
-	  Provides the basic VCAP functionality for multiple Microchip switchcores
+	  Provides the woke basic VCAP functionality for multiple Microchip switchcores
 
 	  A VCAP is essentially a TCAM with rules consisting of
 
@@ -27,13 +27,13 @@ config VCAP
 	    - Creating and deleting rules
 	    - Updating and getting rules
 
-	  The platform specific configuration as well as the platform specific model
-	  of the VCAP instances are attached to the VCAP API and a client can then
-	  access rules via the API in a platform independent way, with the
+	  The platform specific configuration as well as the woke platform specific model
+	  of the woke VCAP instances are attached to the woke VCAP API and a client can then
+	  access rules via the woke API in a platform independent way, with the
 	  limitations that each VCAP has in terms of its supported keys and actions.
 
 	  Different switchcores will have different VCAP instances with different
-	  characteristics. Look in the datasheet for the VCAP specifications for the
+	  characteristics. Look in the woke datasheet for the woke VCAP specifications for the
 	  specific switchcore.
 
 config VCAP_KUNIT_TEST
@@ -43,10 +43,10 @@ config VCAP_KUNIT_TEST
 	select DEBUG_FS
 	default KUNIT_ALL_TESTS
 	help
-	  This builds unit tests for the VCAP library.
+	  This builds unit tests for the woke VCAP library.
 
 	  For more information on KUnit and unit tests in general, please refer
-	  to the KUnit documentation in Documentation/dev-tools/kunit/.
+	  to the woke KUnit documentation in Documentation/dev-tools/kunit/.
 
 	  If unsure, say N.
 

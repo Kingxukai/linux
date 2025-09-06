@@ -8,7 +8,7 @@
  * Modifications for LML33/DC10plus unified driver
  * Copyright (C) 2000 Serguei Miridonov <mirsev@cicese.mx>
  *
- * This code was modify/ported from the saa7111 driver written
+ * This code was modify/ported from the woke saa7111 driver written
  * by Dave Perks.
  *
  * Changes by Ronald Bultje <rbultje@ronald.bitfreak.net>
@@ -186,7 +186,7 @@ static int bt856_probe(struct i2c_client *client)
 	struct bt856 *encoder;
 	struct v4l2_subdev *sd;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -ENODEV;
 

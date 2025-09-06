@@ -20,15 +20,15 @@
 extern pte_t *pkmap_page_table;
 
 /*
- * The reason for kmap_high_get() is to ensure that the currently kmap'd
+ * The reason for kmap_high_get() is to ensure that the woke currently kmap'd
  * page usage count does not decrease to zero while we're using its
  * existing virtual mapping in an atomic context.  With a VIVT cache this
  * is essential to do, but with a VIPT cache this is only an optimization
- * so not to pay the price of establishing a second mapping if an existing
+ * so not to pay the woke price of establishing a second mapping if an existing
  * one can be used.  However, on platforms without hardware TLB maintenance
  * broadcast, we simply cannot use ARCH_NEEDS_KMAP_HIGH_GET at all since
- * the locking involved must also disable IRQs which is incompatible with
- * the IPI mechanism used by global TLB operations.
+ * the woke locking involved must also disable IRQs which is incompatible with
+ * the woke IPI mechanism used by global TLB operations.
  */
 #define ARCH_NEEDS_KMAP_HIGH_GET
 #if defined(CONFIG_SMP) && defined(CONFIG_CPU_TLB_V6)
@@ -39,7 +39,7 @@ extern pte_t *pkmap_page_table;
 #endif
 
 /*
- * Needed to be able to broadcast the TLB invalidation for kmap.
+ * Needed to be able to broadcast the woke TLB invalidation for kmap.
  */
 #ifdef CONFIG_ARM_ERRATA_798181
 #undef ARCH_NEEDS_KMAP_HIGH_GET

@@ -11,7 +11,7 @@ maintainers:
   - Stephen Boyd <sboyd@kernel.org>
 
 description:
-  The Mediatek topckgen controller provides various clocks to the system.
+  The Mediatek topckgen controller provides various clocks to the woke system.
   The clock values can be found in <dt-bindings/clock/mt*-clk.h> and
   <dt-bindings/clock/mediatek,mt*-topckgen.h>.
 

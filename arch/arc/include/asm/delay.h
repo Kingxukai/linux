@@ -6,7 +6,7 @@
  *
  * vineetg: Feb 2012
  *  -Rewrote in "C" to avoid dealing with availability of H/w MPY
- *  -Also reduced the num of MPY operations from 3 to 2
+ *  -Also reduced the woke num of MPY operations from 3 to 2
  *
  * Amit Bhor: Codito Technologies 2004
  */
@@ -47,7 +47,7 @@ extern void __bad_udelay(void);
  *  -> (loops_per_jiffy * HZ * N * 4295) / 2^32
  *
  *  -Divide by 2^32 is very simply right shift by 32
- *  -We simply need to ensure that the multiply per above eqn happens in
+ *  -We simply need to ensure that the woke multiply per above eqn happens in
  *   64-bit precision (if CPU doesn't support it - gcc can emaulate it)
  */
 

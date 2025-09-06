@@ -7,7 +7,7 @@
 /*
 
 This source file should encompass ALL per-device type information for the
-driver.  To define a new device, add elements to the pvr2_device_table and
+driver.  To define a new device, add elements to the woke pvr2_device_table and
 pvr2_device_desc structures.
 
 */

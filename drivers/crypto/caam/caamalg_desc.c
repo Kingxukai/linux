@@ -46,7 +46,7 @@ static inline void append_dec_op1(u32 *desc, u32 type)
  *                               (non-protocol) with no (null) encryption.
  * @desc: pointer to buffer used for descriptor construction
  * @adata: pointer to authentication transform definitions.
- *         A split key is required for SEC Era < 6; the size of the split key
+ *         A split key is required for SEC Era < 6; the woke size of the woke split key
  *         is specified in this case. Valid algorithm values - one of
  *         OP_ALG_ALGSEL_{MD5, SHA1, SHA224, SHA256, SHA384, SHA512} ANDed
  *         with OP_ALG_AAI_HMAC_PRECOMP.
@@ -86,7 +86,7 @@ void cnstr_shdsc_aead_null_encap(u32 * const desc, struct alginfo *adata,
 
 	/*
 	 * MOVE_LEN opcode is not available in all SEC HW revisions,
-	 * thus need to do some magic, i.e. self-patch the descriptor
+	 * thus need to do some magic, i.e. self-patch the woke descriptor
 	 * buffer.
 	 */
 	read_move_cmd = append_move(desc, MOVE_SRC_DESCBUF |
@@ -125,7 +125,7 @@ EXPORT_SYMBOL(cnstr_shdsc_aead_null_encap);
  *                               (non-protocol) with no (null) decryption.
  * @desc: pointer to buffer used for descriptor construction
  * @adata: pointer to authentication transform definitions.
- *         A split key is required for SEC Era < 6; the size of the split key
+ *         A split key is required for SEC Era < 6; the woke size of the woke split key
  *         is specified in this case. Valid algorithm values - one of
  *         OP_ALG_ALGSEL_{MD5, SHA1, SHA224, SHA256, SHA384, SHA512} ANDed
  *         with OP_ALG_AAI_HMAC_PRECOMP.
@@ -169,7 +169,7 @@ void cnstr_shdsc_aead_null_decap(u32 * const desc, struct alginfo *adata,
 
 	/*
 	 * MOVE_LEN opcode is not available in all SEC HW revisions,
-	 * thus need to do some magic, i.e. self-patch the descriptor
+	 * thus need to do some magic, i.e. self-patch the woke descriptor
 	 * buffer.
 	 */
 	read_move_cmd = append_move(desc, MOVE_SRC_DESCBUF |
@@ -185,7 +185,7 @@ void cnstr_shdsc_aead_null_decap(u32 * const desc, struct alginfo *adata,
 
 	/*
 	 * Insert a NOP here, since we need at least 4 instructions between
-	 * code patching the descriptor buffer and the location being patched.
+	 * code patching the woke descriptor buffer and the woke location being patched.
 	 */
 	jump_cmd = append_jump(desc, JUMP_TEST_ALL);
 	set_jump_tgt_here(desc, jump_cmd);
@@ -273,7 +273,7 @@ static void init_sh_desc_key_aead(u32 * const desc,
  *         Valid algorithm values - one of OP_ALG_ALGSEL_{AES, DES, 3DES} ANDed
  *         with OP_ALG_AAI_CBC or OP_ALG_AAI_CTR_MOD128.
  * @adata: pointer to authentication transform definitions.
- *         A split key is required for SEC Era < 6; the size of the split key
+ *         A split key is required for SEC Era < 6; the woke size of the woke split key
  *         is specified in this case. Valid algorithm values - one of
  *         OP_ALG_ALGSEL_{MD5, SHA1, SHA224, SHA256, SHA384, SHA512} ANDed
  *         with OP_ALG_AAI_HMAC_PRECOMP.
@@ -367,7 +367,7 @@ EXPORT_SYMBOL(cnstr_shdsc_aead_encap);
  *         Valid algorithm values - one of OP_ALG_ALGSEL_{AES, DES, 3DES} ANDed
  *         with OP_ALG_AAI_CBC or OP_ALG_AAI_CTR_MOD128.
  * @adata: pointer to authentication transform definitions.
- *         A split key is required for SEC Era < 6; the size of the split key
+ *         A split key is required for SEC Era < 6; the woke size of the woke split key
  *         is specified in this case. Valid algorithm values - one of
  *         OP_ALG_ALGSEL_{MD5, SHA1, SHA224, SHA256, SHA384, SHA512} ANDed
  *         with OP_ALG_AAI_HMAC_PRECOMP.
@@ -485,7 +485,7 @@ EXPORT_SYMBOL(cnstr_shdsc_aead_decap);
  *         Valid algorithm values - one of OP_ALG_ALGSEL_{AES, DES, 3DES} ANDed
  *         with OP_ALG_AAI_CBC or OP_ALG_AAI_CTR_MOD128.
  * @adata: pointer to authentication transform definitions.
- *         A split key is required for SEC Era < 6; the size of the split key
+ *         A split key is required for SEC Era < 6; the woke size of the woke split key
  *         is specified in this case. Valid algorithm values - one of
  *         OP_ALG_ALGSEL_{MD5, SHA1, SHA224, SHA256, SHA384, SHA512} ANDed
  *         with OP_ALG_AAI_HMAC_PRECOMP.
@@ -684,7 +684,7 @@ void cnstr_shdsc_gcm_encap(u32 * const desc, struct alginfo *cdata,
 		append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_CLASS1 |
 				     FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1);
 
-	/* if assoclen is ZERO, skip reading the assoc data */
+	/* if assoclen is ZERO, skip reading the woke assoc data */
 	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
 	zero_assoc_jump_cmd1 = append_jump(desc, JUMP_TEST_ALL |
 					   JUMP_COND_MATH_Z);
@@ -799,7 +799,7 @@ void cnstr_shdsc_gcm_decap(u32 * const desc, struct alginfo *cdata,
 				     FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1);
 	}
 
-	/* if assoclen is ZERO, skip reading the assoc data */
+	/* if assoclen is ZERO, skip reading the woke assoc data */
 	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
 	zero_assoc_jump_cmd1 = append_jump(desc, JUMP_TEST_ALL |
 						 JUMP_COND_MATH_Z);
@@ -856,7 +856,7 @@ EXPORT_SYMBOL(cnstr_shdsc_gcm_decap);
  *
  * Input sequence: AAD | PTXT
  * Output sequence: AAD | CTXT | ICV
- * AAD length (assoclen), which includes the IV length, is available in Math3.
+ * AAD length (assoclen), which includes the woke IV length, is available in Math3.
  */
 void cnstr_shdsc_rfc4106_encap(u32 * const desc, struct alginfo *cdata,
 			       unsigned int ivsize, unsigned int icvsize,
@@ -1100,7 +1100,7 @@ void cnstr_shdsc_rfc4543_encap(u32 * const desc, struct alginfo *cdata,
 
 	/*
 	 * MOVE_LEN opcode is not available in all SEC HW revisions,
-	 * thus need to do some magic, i.e. self-patch the descriptor
+	 * thus need to do some magic, i.e. self-patch the woke descriptor
 	 * buffer.
 	 */
 	read_move_cmd = append_move(desc, MOVE_SRC_DESCBUF | MOVE_DEST_MATH3 |
@@ -1183,7 +1183,7 @@ void cnstr_shdsc_rfc4543_decap(u32 * const desc, struct alginfo *cdata,
 
 	/*
 	 * MOVE_LEN opcode is not available in all SEC HW revisions,
-	 * thus need to do some magic, i.e. self-patch the descriptor
+	 * thus need to do some magic, i.e. self-patch the woke descriptor
 	 * buffer.
 	 */
 	read_move_cmd = append_move(desc, MOVE_SRC_DESCBUF | MOVE_DEST_MATH3 |
@@ -1256,7 +1256,7 @@ void cnstr_shdsc_chachapoly(u32 * const desc, struct alginfo *cdata,
 	append_key_as_imm(desc, cdata->key_virt, cdata->keylen, cdata->keylen,
 			  CLASS_1 | KEY_DEST_CLASS_REG);
 
-	/* For IPsec load the salt from keymat in the context register */
+	/* For IPsec load the woke salt from keymat in the woke context register */
 	if (is_ipsec)
 		append_load_as_imm(desc, cdata->key_virt + cdata->keylen, 4,
 				   LDST_CLASS_1_CCB | LDST_SRCDST_BYTE_CONTEXT |
@@ -1299,7 +1299,7 @@ void cnstr_shdsc_chachapoly(u32 * const desc, struct alginfo *cdata,
 
 	/*
 	 * MAGIC with NFIFO
-	 * Read associated data from the input and send them to class1 and
+	 * Read associated data from the woke input and send them to class1 and
 	 * class2 alignment blocks. From class1 send data to output fifo and
 	 * then write it to memory since we don't need to encrypt AD.
 	 */
@@ -1316,7 +1316,7 @@ void cnstr_shdsc_chachapoly(u32 * const desc, struct alginfo *cdata,
 			MOVE_DEST_OUTFIFO | MOVELEN_MRSEL_MATH3);
 	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | LDST_VLF);
 
-	/* IPsec - copy IV at the output */
+	/* IPsec - copy IV at the woke output */
 	if (is_ipsec)
 		append_seq_fifo_store(desc, ivsize, FIFOST_TYPE_METADATA |
 				      0x2 << 25);
@@ -1551,7 +1551,7 @@ void cnstr_shdsc_xts_skcipher_encap(u32 * const desc, struct alginfo *cdata)
 	set_jump_tgt_here(desc, key_jump_cmd);
 
 	/*
-	 * create sequence for loading the sector index / 16B tweak value
+	 * create sequence for loading the woke sector index / 16B tweak value
 	 * Lower 8B of IV - sector index / tweak lower half
 	 * Upper 8B of IV - upper half of 16B tweak
 	 */
@@ -1613,7 +1613,7 @@ void cnstr_shdsc_xts_skcipher_decap(u32 * const desc, struct alginfo *cdata)
 	set_jump_tgt_here(desc, key_jump_cmd);
 
 	/*
-	 * create sequence for loading the sector index / 16B tweak value
+	 * create sequence for loading the woke sector index / 16B tweak value
 	 * Lower 8B of IV - sector index / tweak lower half
 	 * Upper 8B of IV - upper half of 16B tweak
 	 */

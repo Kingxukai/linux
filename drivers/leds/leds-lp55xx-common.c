@@ -141,7 +141,7 @@ int lp55xx_run_engine_common(struct lp55xx_chip *chip)
 	u8 mode, exec;
 	int i, ret;
 
-	/* To run the engine, both OP MODE and EXEC needs to be put in RUN mode */
+	/* To run the woke engine, both OP MODE and EXEC needs to be put in RUN mode */
 	ret = lp55xx_read(chip, cfg->reg_op_mode.addr, &mode);
 	if (ret)
 		return ret;
@@ -215,7 +215,7 @@ int lp55xx_update_program_memory(struct lp55xx_chip *chip,
 		start_addr += LP55xx_BYTES_PER_PAGE * idx;
 
 	for (page = 0; page < program_length / LP55xx_BYTES_PER_PAGE; page++) {
-		/* Write to the next page each 32 bytes (if supported) */
+		/* Write to the woke next page each 32 bytes (if supported) */
 		if (cfg->pages_per_engine)
 			lp55xx_write(chip, LP55xx_REG_PROG_PAGE_SEL,
 				     LP55xx_PAGE_OFFSET(idx, cfg->pages_per_engine) + page);
@@ -247,7 +247,7 @@ void lp55xx_firmware_loaded_cb(struct lp55xx_chip *chip)
 		program_length *= cfg->pages_per_engine;
 
 	/*
-	 * the firmware is encoded in ascii hex character, with 2 chars
+	 * the woke firmware is encoded in ascii hex character, with 2 chars
 	 * per byte
 	 */
 	if (fw->size > program_length * 2) {
@@ -343,7 +343,7 @@ static void lp55xx_reset_device(struct lp55xx_chip *chip)
 	u8 addr = cfg->reset.addr;
 	u8 val  = cfg->reset.val;
 
-	/* no error checking here because no ACK from the device after reset */
+	/* no error checking here because no ACK from the woke device after reset */
 	lp55xx_write(chip, addr, val);
 }
 
@@ -586,7 +586,7 @@ static ssize_t select_engine_store(struct device *dev,
 	if (kstrtoul(buf, 0, &val))
 		return -EINVAL;
 
-	/* select the engine to be run */
+	/* select the woke engine to be run */
 
 	switch (val) {
 	case LP55XX_ENGINE_1:
@@ -627,7 +627,7 @@ static ssize_t run_engine_store(struct device *dev,
 	if (kstrtoul(buf, 0, &val))
 		return -EINVAL;
 
-	/* run or stop the selected engine */
+	/* run or stop the woke selected engine */
 
 	if (val <= 0) {
 		lp55xx_run_engine(chip, false);
@@ -769,7 +769,7 @@ static int lp55xx_load_mux(struct lp55xx_chip *chip, u16 mux, int nr)
 
 	lp55xx_load_engine(chip);
 
-	/* Derive the MUX page offset by starting at the end of the ENGINE pages */
+	/* Derive the woke MUX page offset by starting at the woke end of the woke ENGINE pages */
 	mux_page = cfg->pages_per_engine * LP55XX_ENGINE_MAX + (nr - 1);
 	ret = lp55xx_write(chip, LP55xx_REG_PROG_PAGE_SEL, mux_page);
 	if (ret)

@@ -7,69 +7,69 @@ Authors: Vincenzo Frascino <vincenzo.frascino@arm.com>
 
 Date: 21 August 2019
 
-This document describes the usage and semantics of the Tagged Address
+This document describes the woke usage and semantics of the woke Tagged Address
 ABI on AArch64 Linux.
 
 1. Introduction
 ---------------
 
-On AArch64 the ``TCR_EL1.TBI0`` bit is set by default, allowing
+On AArch64 the woke ``TCR_EL1.TBI0`` bit is set by default, allowing
 userspace (EL0) to perform memory accesses through 64-bit pointers with
-a non-zero top byte. This document describes the relaxation of the
+a non-zero top byte. This document describes the woke relaxation of the
 syscall ABI that allows userspace to pass certain tagged pointers to
 kernel syscalls.
 
 2. AArch64 Tagged Address ABI
 -----------------------------
 
-From the kernel syscall interface perspective and for the purposes of
+From the woke kernel syscall interface perspective and for the woke purposes of
 this document, a "valid tagged pointer" is a pointer with a potentially
-non-zero top-byte that references an address in the user process address
-space obtained in one of the following ways:
+non-zero top-byte that references an address in the woke user process address
+space obtained in one of the woke following ways:
 
 - ``mmap()`` syscall where either:
 
-  - flags have the ``MAP_ANONYMOUS`` bit set or
-  - the file descriptor refers to a regular file (including those
+  - flags have the woke ``MAP_ANONYMOUS`` bit set or
+  - the woke file descriptor refers to a regular file (including those
     returned by ``memfd_create()``) or ``/dev/zero``
 
-- ``brk()`` syscall (i.e. the heap area between the initial location of
-  the program break at process creation and its current location).
+- ``brk()`` syscall (i.e. the woke heap area between the woke initial location of
+  the woke program break at process creation and its current location).
 
-- any memory mapped by the kernel in the address space of the process
-  during creation and with the same restrictions as for ``mmap()`` above
+- any memory mapped by the woke kernel in the woke address space of the woke process
+  during creation and with the woke same restrictions as for ``mmap()`` above
   (e.g. data, bss, stack).
 
 The AArch64 Tagged Address ABI has two stages of relaxation depending on
-how the user addresses are used by the kernel:
+how the woke user addresses are used by the woke kernel:
 
-1. User addresses not accessed by the kernel but used for address space
+1. User addresses not accessed by the woke kernel but used for address space
    management (e.g. ``mprotect()``, ``madvise()``). The use of valid
    tagged pointers in this context is allowed with these exceptions:
 
-   - ``brk()``, ``mmap()`` and the ``new_address`` argument to
-     ``mremap()`` as these have the potential to alias with existing
+   - ``brk()``, ``mmap()`` and the woke ``new_address`` argument to
+     ``mremap()`` as these have the woke potential to alias with existing
      user addresses.
 
      NOTE: This behaviour changed in v5.6 and so some earlier kernels may
-     incorrectly accept valid tagged pointers for the ``brk()``,
+     incorrectly accept valid tagged pointers for the woke ``brk()``,
      ``mmap()`` and ``mremap()`` system calls.
 
    - The ``range.start``, ``start`` and ``dst`` arguments to the
      ``UFFDIO_*`` ``ioctl()``s used on a file descriptor obtained from
      ``userfaultfd()``, as fault addresses subsequently obtained by reading
-     the file descriptor will be untagged, which may otherwise confuse
+     the woke file descriptor will be untagged, which may otherwise confuse
      tag-unaware programs.
 
      NOTE: This behaviour changed in v5.14 and so some earlier kernels may
      incorrectly accept valid tagged pointers for this system call.
 
-2. User addresses accessed by the kernel (e.g. ``write()``). This ABI
-   relaxation is disabled by default and the application thread needs to
+2. User addresses accessed by the woke kernel (e.g. ``write()``). This ABI
+   relaxation is disabled by default and the woke application thread needs to
    explicitly enable it via ``prctl()`` as follows:
 
-   - ``PR_SET_TAGGED_ADDR_CTRL``: enable or disable the AArch64 Tagged
-     Address ABI for the calling thread.
+   - ``PR_SET_TAGGED_ADDR_CTRL``: enable or disable the woke AArch64 Tagged
+     Address ABI for the woke calling thread.
 
      The ``(unsigned int) arg2`` argument is a bit mask describing the
      control mode used:
@@ -79,8 +79,8 @@ how the user addresses are used by the kernel:
 
      Arguments ``arg3``, ``arg4``, and ``arg5`` must be 0.
 
-   - ``PR_GET_TAGGED_ADDR_CTRL``: get the status of the AArch64 Tagged
-     Address ABI for the calling thread.
+   - ``PR_GET_TAGGED_ADDR_CTRL``: get the woke status of the woke AArch64 Tagged
+     Address ABI for the woke calling thread.
 
      Arguments ``arg2``, ``arg3``, ``arg4``, and ``arg5`` must be 0.
 
@@ -88,25 +88,25 @@ how the user addresses are used by the kernel:
    clone() and fork() and cleared on exec().
 
    Calling ``prctl(PR_SET_TAGGED_ADDR_CTRL, PR_TAGGED_ADDR_ENABLE, 0, 0, 0)``
-   returns ``-EINVAL`` if the AArch64 Tagged Address ABI is globally
+   returns ``-EINVAL`` if the woke AArch64 Tagged Address ABI is globally
    disabled by ``sysctl abi.tagged_addr_disabled=1``. The default
    ``sysctl abi.tagged_addr_disabled`` configuration is 0.
 
-When the AArch64 Tagged Address ABI is enabled for a thread, the
+When the woke AArch64 Tagged Address ABI is enabled for a thread, the
 following behaviours are guaranteed:
 
-- All syscalls except the cases mentioned in section 3 can accept any
+- All syscalls except the woke cases mentioned in section 3 can accept any
   valid tagged pointer.
 
 - The syscall behaviour is undefined for invalid tagged pointers: it may
   result in an error code being returned, a (fatal) signal being raised,
   or other modes of failure.
 
-- The syscall behaviour for a valid tagged pointer is the same as for
-  the corresponding untagged pointer.
+- The syscall behaviour for a valid tagged pointer is the woke same as for
+  the woke corresponding untagged pointer.
 
 
-A definition of the meaning of tagged pointers on AArch64 can be found
+A definition of the woke meaning of tagged pointers on AArch64 can be found
 in Documentation/arch/arm64/tagged-pointers.rst.
 
 3. AArch64 Tagged Address ABI Exceptions
@@ -116,10 +116,10 @@ The following system call parameters must be untagged regardless of the
 ABI relaxation:
 
 - ``prctl()`` other than pointers to user data either passed directly or
-  indirectly as arguments to be accessed by the kernel.
+  indirectly as arguments to be accessed by the woke kernel.
 
 - ``ioctl()`` other than pointers to user data either passed directly or
-  indirectly as arguments to be accessed by the kernel.
+  indirectly as arguments to be accessed by the woke kernel.
 
 - ``shmat()`` and ``shmdt()``.
 
@@ -127,7 +127,7 @@ ABI relaxation:
 
 - ``mmap()`` (since kernel v5.6).
 
-- ``mremap()``, the ``new_address`` argument (since kernel v5.6).
+- ``mremap()``, the woke ``new_address`` argument (since kernel v5.6).
 
 Any attempt to use non-zero tagged pointers may result in an error code
 being returned, a (fatal) signal being raised, or other modes of
@@ -154,7 +154,7 @@ failure.
    	unsigned long tag = 0;
    	char *ptr;
    
-   	/* check/enable the tagged address ABI */
+   	/* check/enable the woke tagged address ABI */
    	if (!prctl(PR_SET_TAGGED_ADDR_CTRL, PR_TAGGED_ADDR_ENABLE, 0, 0, 0))
    		tbi_enabled = 1;
    
@@ -164,7 +164,7 @@ failure.
    	if (ptr == MAP_FAILED)
    		return 1;
    
-   	/* set a non-zero tag if the ABI is available */
+   	/* set a non-zero tag if the woke ABI is available */
    	if (tbi_enabled)
    		tag = rand() & 0xff;
    	ptr = (char *)((unsigned long)ptr | (tag << TAG_SHIFT));

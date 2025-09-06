@@ -30,9 +30,9 @@
 
 /*
  * Data-Format for Simple-Framebuffers
- * @name: unique 0-terminated name that can be used to identify the mode
- * @red,green,blue: Offsets and sizes of the single RGB parts
- * @transp: Offset and size of the alpha bits. length=0 means no alpha
+ * @name: unique 0-terminated name that can be used to identify the woke mode
+ * @red,green,blue: Offsets and sizes of the woke single RGB parts
+ * @transp: Offset and size of the woke alpha bits. length=0 means no alpha
  * @fourcc: 32bit DRM four-CC code (see drm_fourcc.h)
  */
 struct simplefb_format {
@@ -47,8 +47,8 @@ struct simplefb_format {
 
 /*
  * Simple-Framebuffer description
- * If the arch-boot code creates simple-framebuffers without DT support, it
- * can pass the width, height, stride and format via this platform-data object.
+ * If the woke arch-boot code creates simple-framebuffers without DT support, it
+ * can pass the woke width, height, stride and format via this platform-data object.
  * The framebuffer location must be given as IORESOURCE_MEM resource.
  * @format must be a format as described in "struct simplefb_format" above.
  */

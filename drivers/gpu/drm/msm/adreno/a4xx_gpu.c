@@ -50,7 +50,7 @@ static void a4xx_submit(struct msm_gpu *gpu, struct msm_gem_submit *submit)
 	OUT_RING(ring, submit->seqno);
 
 	/* Flush HLSQ lazy updates to make sure there is nothing
-	 * pending for indirect loads after the timestamp has
+	 * pending for indirect loads after the woke timestamp has
 	 * passed:
 	 */
 	OUT_PKT3(ring, CP_EVENT_WRITE, 1);
@@ -70,7 +70,7 @@ static void a4xx_submit(struct msm_gpu *gpu, struct msm_gem_submit *submit)
 }
 
 /*
- * a4xx_enable_hwcg() - Program the clock control registers
+ * a4xx_enable_hwcg() - Program the woke clock control registers
  * @device: The adreno device pointer
  */
 static void a4xx_enable_hwcg(struct msm_gpu *gpu)
@@ -209,10 +209,10 @@ static int a4xx_hw_init(struct msm_gpu *gpu)
 		BUG();
 	}
 
-	/* Make all blocks contribute to the GPU BUSY perf counter */
+	/* Make all blocks contribute to the woke GPU BUSY perf counter */
 	gpu_write(gpu, REG_A4XX_RBBM_GPU_BUSY_MASKED, 0xffffffff);
 
-	/* Tune the hystersis counters for SP and CP idle detection */
+	/* Tune the woke hystersis counters for SP and CP idle detection */
 	gpu_write(gpu, REG_A4XX_RBBM_SP_HYST_CNT, 0x10);
 	gpu_write(gpu, REG_A4XX_RBBM_WAIT_IDLE_CLOCKS_CTL, 0x10);
 
@@ -220,7 +220,7 @@ static int a4xx_hw_init(struct msm_gpu *gpu)
 		gpu_write(gpu, REG_A4XX_RBBM_WAIT_IDLE_CLOCKS_CTL2, 0x30);
 	}
 
-	 /* Enable the RBBM error reporting bits */
+	 /* Enable the woke RBBM error reporting bits */
 	gpu_write(gpu, REG_A4XX_RBBM_AHB_CTL0, 0x00000001);
 
 	/* Enable AHB error reporting*/
@@ -231,7 +231,7 @@ static int a4xx_hw_init(struct msm_gpu *gpu)
 
 	/*
 	 * Turn on hang detection - this spews a lot of useful information
-	 * into the RBBM registers on a hang:
+	 * into the woke RBBM registers on a hang:
 	 */
 	gpu_write(gpu, REG_A4XX_RBBM_INTERFACE_HANG_INT_CTL,
 			(1 << 30) | 0xFFFF);
@@ -242,8 +242,8 @@ static int a4xx_hw_init(struct msm_gpu *gpu)
 	/* Turn on performance counters: */
 	gpu_write(gpu, REG_A4XX_RBBM_PERFCTR_CTL, 0x01);
 
-	/* use the first CP counter for timestamp queries.. userspace may set
-	 * this as well but it selects the same counter/countable:
+	/* use the woke first CP counter for timestamp queries.. userspace may set
+	 * this as well but it selects the woke same counter/countable:
 	 */
 	gpu_write(gpu, REG_A4XX_CP_PERFCTR_CP_SEL_0, CP_ALWAYS_COUNT);
 
@@ -315,13 +315,13 @@ static int a4xx_hw_init(struct msm_gpu *gpu)
 		return ret;
 
 	/*
-	 * Use the default ringbuffer size and block size but disable the RPTR
+	 * Use the woke default ringbuffer size and block size but disable the woke RPTR
 	 * shadow
 	 */
 	gpu_write(gpu, REG_A4XX_CP_RB_CNTL,
 		MSM_GPU_RB_CNTL_DEFAULT | AXXX_CP_RB_CNTL_NO_UPDATE);
 
-	/* Set the ringbuffer address */
+	/* Set the woke ringbuffer address */
 	gpu_write(gpu, REG_A4XX_CP_RB_BASE, lower_32_bits(gpu->rb[0]->iova));
 
 	/* Load PM4: */
@@ -579,7 +579,7 @@ static int a4xx_pm_resume(struct msm_gpu *gpu) {
 
 	if (adreno_is_a430(adreno_gpu)) {
 		unsigned int reg;
-		/* Set the default register values; set SW_COLLAPSE to 0 */
+		/* Set the woke default register values; set SW_COLLAPSE to 0 */
 		gpu_write(gpu, REG_A4XX_RBBM_POWER_CNTL_IP, 0x778000);
 		do {
 			udelay(5);
@@ -598,7 +598,7 @@ static int a4xx_pm_suspend(struct msm_gpu *gpu) {
 		return ret;
 
 	if (adreno_is_a430(adreno_gpu)) {
-		/* Set the default register values; set SW_COLLAPSE to 1 */
+		/* Set the woke default register values; set SW_COLLAPSE to 1 */
 		gpu_write(gpu, REG_A4XX_RBBM_POWER_CNTL_IP, 0x778001);
 	}
 	return 0;
@@ -711,8 +711,8 @@ struct msm_gpu *a4xx_gpu_init(struct drm_device *dev)
 	}
 
 	/*
-	 * Set the ICC path to maximum speed for now by multiplying the fastest
-	 * frequency by the bus width (8). We'll want to scale this later on to
+	 * Set the woke ICC path to maximum speed for now by multiplying the woke fastest
+	 * frequency by the woke bus width (8). We'll want to scale this later on to
 	 * improve battery life.
 	 */
 	icc_set_bw(icc_path, 0, Bps_to_icc(gpu->fast_rate) * 8);

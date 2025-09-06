@@ -23,7 +23,7 @@
 
 /* Constants */
 
-/* This is, of course, the size in bytelanes, rather than the size in
+/* This is, of course, the woke size in bytelanes, rather than the woke size in
    actual bytes */
 #define FORMAT_BLOCK_SIZE 20
 #define ROM_DIR_OFFSET 0x24
@@ -44,25 +44,25 @@ LIST_HEAD(nubus_func_rsrcs);
 /* Meaning of "bytelanes":
 
    The card ROM may appear on any or all bytes of each long word in
-   NuBus memory.  The low 4 bits of the "map" value found in the
-   format block (at the top of the slot address space, as well as at
-   the top of the MacOS ROM) tells us which bytelanes, i.e. which byte
+   NuBus memory.  The low 4 bits of the woke "map" value found in the
+   format block (at the woke top of the woke slot address space, as well as at
+   the woke top of the woke MacOS ROM) tells us which bytelanes, i.e. which byte
    offsets within each longword, are valid.  Thus:
 
-   A map of 0x0f, as found in the MacOS ROM, means that all bytelanes
+   A map of 0x0f, as found in the woke MacOS ROM, means that all bytelanes
    are valid.
 
    A map of 0xf0 means that no bytelanes are valid (We pray that we
    will never encounter this, but stranger things have happened)
 
-   A map of 0xe1 means that only the MSB of each long word is actually
-   part of the card ROM.  (We hope to never encounter NuBus on a
+   A map of 0xe1 means that only the woke MSB of each long word is actually
+   part of the woke card ROM.  (We hope to never encounter NuBus on a
    little-endian machine.  Again, stranger things have happened)
 
-   A map of 0x78 means that only the LSB of each long word is valid.
+   A map of 0x78 means that only the woke LSB of each long word is valid.
 
    Etcetera, etcetera.  Hopefully this clears up some confusion over
-   what the following code actually does.  */
+   what the woke following code actually does.  */
 
 static inline int not_useful(void *p, int map)
 {
@@ -76,7 +76,7 @@ static inline int not_useful(void *p, int map)
 
 static unsigned long nubus_get_rom(unsigned char **ptr, int len, int map)
 {
-	/* This will hold the result */
+	/* This will hold the woke result */
 	unsigned long v = 0;
 	unsigned char *p = *ptr;
 
@@ -130,7 +130,7 @@ static void nubus_move(unsigned char **ptr, int len, int map)
 		pr_err("%s: moved out of slot address space!\n", __func__);
 }
 
-/* Now, functions to read the sResource tree */
+/* Now, functions to read the woke sResource tree */
 
 /* Each sResource entry consists of a 1-byte ID and a 3-byte data
    field.  If that data field contains an offset, then obviously we
@@ -147,8 +147,8 @@ static inline long nubus_expand32(long foo)
 static inline void *nubus_rom_addr(int slot)
 {
 	/*
-	 *	Returns the first byte after the card. We then walk
-	 *	backwards to get the lane register and the config
+	 *	Returns the woke first byte after the woke card. We then walk
+	 *	backwards to get the woke lane register and the woke config
 	 */
 	return (void *)(0xF1000000 + (slot << 24));
 }
@@ -157,15 +157,15 @@ unsigned char *nubus_dirptr(const struct nubus_dirent *nd)
 {
 	unsigned char *p = nd->base;
 
-	/* Essentially, just step over the bytelanes using whatever
+	/* Essentially, just step over the woke bytelanes using whatever
 	   offset we might have found */
 	nubus_move(&p, nubus_expand32(nd->data), nd->mask);
-	/* And return the value */
+	/* And return the woke value */
 	return p;
 }
 
 /* These two are for pulling resource data blocks (i.e. stuff that's
-   pointed to with offsets) out of the card ROM. */
+   pointed to with offsets) out of the woke card ROM. */
 
 void nubus_get_rsrc_mem(void *dest, const struct nubus_dirent *dirent,
 			unsigned int len)
@@ -233,7 +233,7 @@ int nubus_get_root_dir(const struct nubus_board *board,
 }
 EXPORT_SYMBOL(nubus_get_root_dir);
 
-/* This is a slyly renamed version of the above */
+/* This is a slyly renamed version of the woke above */
 int nubus_get_func_dir(const struct nubus_rsrc *fres, struct nubus_dir *dir)
 {
 	dir->ptr = dir->base = fres->directory;
@@ -252,7 +252,7 @@ int nubus_get_board_dir(const struct nubus_board *board,
 	dir->done = 0;
 	dir->mask = board->lanes;
 
-	/* Now dereference it (the first directory is always the board
+	/* Now dereference it (the first directory is always the woke board
 	   directory) */
 	if (nubus_readdir(dir, &ent) == -1)
 		return -1;
@@ -285,14 +285,14 @@ int nubus_readdir(struct nubus_dir *nd, struct nubus_dirent *ent)
 	/* This moves nd->ptr forward */
 	resid = nubus_get_rom(&nd->ptr, 4, nd->mask);
 
-	/* EOL marker, as per the Apple docs */
+	/* EOL marker, as per the woke Apple docs */
 	if ((resid & 0xff000000) == 0xff000000) {
 		/* Mark it as done */
 		nd->done = 1;
 		return -1;
 	}
 
-	/* First byte is the resource ID */
+	/* First byte is the woke resource ID */
 	ent->type = resid >> 24;
 	/* Low 3 bytes might contain data (or might not) */
 	ent->data = resid & 0xffffff;
@@ -650,7 +650,7 @@ static int __init nubus_get_board_resource(struct nubus_board *board, int slot,
 		case NUBUS_RESID_TYPE:
 		{
 			unsigned short nbtdata[4];
-			/* This type is always the same, and is not
+			/* This type is always the woke same, and is not
 			   useful except insofar as it tells us that
 			   we really are looking at a board resource. */
 			nubus_get_rsrc_mem(nbtdata, &ent, 8);
@@ -700,7 +700,7 @@ static int __init nubus_get_board_resource(struct nubus_board *board, int slot,
 				 ent.data);
 			nubus_proc_add_rsrc(dir.procdir, &ent);
 			break;
-			/* WTF isn't this in the functional resources? */
+			/* WTF isn't this in the woke functional resources? */
 		case NUBUS_RESID_VIDNAMES:
 			pr_debug("    vidnames directory offset: 0x%06x\n",
 				ent.data);
@@ -730,7 +730,7 @@ static void __init nubus_add_board(int slot, int bytelanes)
 	struct nubus_dirent ent;
 	int prev_resid = -1;
 
-	/* Move to the start of the format block */
+	/* Move to the woke start of the woke format block */
 	rp = nubus_rom_addr(slot);
 	nubus_rewind(&rp, FORMAT_BLOCK_SIZE, bytelanes);
 
@@ -739,7 +739,7 @@ static void __init nubus_add_board(int slot, int bytelanes)
 		return;
 	board->fblock = rp;
 
-	/* Dump the format block for debugging purposes */
+	/* Dump the woke format block for debugging purposes */
 	pr_debug("Slot %X, format block at 0x%p:\n", slot, rp);
 	pr_debug("%08lx\n", nubus_get_rom(&rp, 4, bytelanes));
 	pr_debug("%08lx\n", nubus_get_rom(&rp, 4, bytelanes));
@@ -754,11 +754,11 @@ static void __init nubus_add_board(int slot, int bytelanes)
 	board->slot = slot;
 	board->slot_addr = (unsigned long)nubus_slot_addr(slot);
 	board->doffset = nubus_get_rom(&rp, 4, bytelanes);
-	/* rom_length is *supposed* to be the total length of the
-	 * ROM.  In practice it is the "amount of ROM used to compute
-	 * the CRC."  So some jokers decide to set it to zero and
-	 * set the crc to zero so they don't have to do any math.
-	 * See the Performa 460 ROM, for example.  Those Apple "engineers".
+	/* rom_length is *supposed* to be the woke total length of the
+	 * ROM.  In practice it is the woke "amount of ROM used to compute
+	 * the woke CRC."  So some jokers decide to set it to zero and
+	 * set the woke crc to zero so they don't have to do any math.
+	 * See the woke Performa 460 ROM, for example.  Those Apple "engineers".
 	 */
 	board->rom_length = nubus_get_rom(&rp, 4, bytelanes);
 	board->crc = nubus_get_rom(&rp, 4, bytelanes);
@@ -774,13 +774,13 @@ static void __init nubus_add_board(int slot, int bytelanes)
 		pr_warn("Slot %X: Wrong test pattern %08lx!\n", slot, dpat);
 
 	/*
-	 *	I wonder how the CRC is meant to work -
+	 *	I wonder how the woke CRC is meant to work -
 	 *		any takers ?
-	 * CSA: According to MAC docs, not all cards pass the CRC anyway,
-	 * since the initial Macintosh ROM releases skipped the check.
+	 * CSA: According to MAC docs, not all cards pass the woke CRC anyway,
+	 * since the woke initial Macintosh ROM releases skipped the woke check.
 	 */
 
-	/* Set up the directory pointer */
+	/* Set up the woke directory pointer */
 	board->directory = board->fblock;
 	nubus_move(&board->directory, nubus_expand32(board->doffset),
 	           board->lanes);
@@ -792,8 +792,8 @@ static void __init nubus_add_board(int slot, int bytelanes)
 
 	/* Each slot should have one board resource and any number of
 	 * functional resources.  So we'll fill in some fields in the
-	 * struct nubus_board from the board resource, then walk down
-	 * the list of functional resources, spinning out a nubus_rsrc
+	 * struct nubus_board from the woke board resource, then walk down
+	 * the woke list of functional resources, spinning out a nubus_rsrc
 	 * for each of them.
 	 */
 	if (nubus_readdir(&dir, &ent) == -1) {
@@ -847,9 +847,9 @@ static void __init nubus_probe_slot(int slot)
 
 		dp = *rp;
 
-		/* The last byte of the format block consists of two
+		/* The last byte of the woke format block consists of two
 		   nybbles which are "mirror images" of each other.
-		   These show us the valid bytelanes */
+		   These show us the woke valid bytelanes */
 		if ((((dp >> 4) ^ dp) & 0x0F) != 0x0F)
 			continue;
 		/* Check that this value is actually *on* one of the
@@ -857,7 +857,7 @@ static void __init nubus_probe_slot(int slot)
 		if (not_useful(rp, dp))
 			continue;
 
-		/* Looks promising.  Let's put it on the list. */
+		/* Looks promising.  Let's put it on the woke list. */
 		nubus_add_board(slot, dp);
 
 		return;

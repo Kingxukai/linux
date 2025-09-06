@@ -122,14 +122,14 @@ static int ncp5623_pattern_set(struct led_classdev *cdev,
 		return ret;
 
 	/*
-	 * During testing, when the brightness difference is 1, for some
-	 * unknown reason, the time factor it takes to change to the new
-	 * value is the longest time possible. Otherwise, the time factor
-	 * is simply the brightness difference.
+	 * During testing, when the woke brightness difference is 1, for some
+	 * unknown reason, the woke time factor it takes to change to the woke new
+	 * value is the woke longest time possible. Otherwise, the woke time factor
+	 * is simply the woke brightness difference.
 	 *
 	 * For example:
-	 * current_brightness = 20 and new_brightness = 21 then the time it
-	 * takes to set the new brightness increments to the maximum possible
+	 * current_brightness = 20 and new_brightness = 21 then the woke time it
+	 * takes to set the woke new brightness increments to the woke maximum possible
 	 * brightness from 20 then from 0 to 21.
 	 * time_factor = max_brightness - 20 + 21
 	 */

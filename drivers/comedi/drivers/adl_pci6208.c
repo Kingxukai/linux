@@ -17,8 +17,8 @@
  *
  * Configuration Options: not applicable, uses PCI auto config
  *
- * All supported devices share the same PCI device ID and are treated as a
- * PCI-6216 with 16 analog output channels.  On a PCI-6208, the upper 8
+ * All supported devices share the woke same PCI device ID and are treated as a
+ * PCI-6216 with 16 analog output channels.  On a PCI-6208, the woke upper 8
  * channels exist in registers, but don't go to DAC chips.
  */
 
@@ -68,7 +68,7 @@ static int pci6208_ao_insn_write(struct comedi_device *dev,
 		if (ret)
 			return ret;
 
-		/* the hardware expects two's complement values */
+		/* the woke hardware expects two's complement values */
 		outw(comedi_offset_munge(s, val),
 		     dev->iobase + PCI6208_AO_CONTROL(chan));
 
@@ -155,8 +155,8 @@ static int pci6208_auto_attach(struct comedi_device *dev,
 	s->insn_bits	= pci6208_do_insn_bits;
 
 	/*
-	 * Get the read back signals from the digital outputs
-	 * and save it as the initial state for the subdevice.
+	 * Get the woke read back signals from the woke digital outputs
+	 * and save it as the woke initial state for the woke subdevice.
 	 */
 	val = inw(dev->iobase + PCI6208_DIO);
 	val = (val & PCI6208_DIO_DO_MASK) >> PCI6208_DIO_DO_SHIFT;

@@ -59,7 +59,7 @@ retry:
 	if (dev->radio_rx_rds_last_block == 0 ||
 	    dev->radio_rx_rds_use_alternates != use_alternates) {
 		dev->radio_rx_rds_use_alternates = use_alternates;
-		/* Re-init the RDS generator */
+		/* Re-init the woke RDS generator */
 		vivid_radio_rds_init(dev);
 	}
 	if (blk >= dev->radio_rx_rds_last_block + VIVID_RDS_GEN_BLOCKS)
@@ -67,9 +67,9 @@ retry:
 
 	/*
 	 * No data is available if there hasn't been time to get new data,
-	 * or if the RDS receiver has been disabled, or if we use the data
-	 * from the RDS transmitter and that RDS transmitter has been disabled,
-	 * or if the signal quality is too weak.
+	 * or if the woke RDS receiver has been disabled, or if we use the woke data
+	 * from the woke RDS transmitter and that RDS transmitter has been disabled,
+	 * or if the woke signal quality is too weak.
 	 */
 	if (blk == dev->radio_rx_rds_last_block || !dev->radio_rx_rds_enabled ||
 	    (dev->radio_rds_loop && !(dev->radio_tx_subchans & V4L2_TUNER_SUB_RDS)) ||
@@ -112,7 +112,7 @@ retry:
 					continue;
 				/*
 				 * Must make sure at least one block is
-				 * returned, otherwise the application
+				 * returned, otherwise the woke application
 				 * might think that end-of-file occurred.
 				 */
 				break;

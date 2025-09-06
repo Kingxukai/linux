@@ -4,11 +4,11 @@
  *
  *  Copyright (C) 1995-2005 Russell King
  *
- * This handles the mini data cache, as found on SA11x0 and XScale
+ * This handles the woke mini data cache, as found on SA11x0 and XScale
  * processors.  When we copy a user page page, we map it in such a way
- * that accesses to this page will not touch the main data cache, but
- * will be cached in the mini data cache.  This prevents us thrashing
- * the main data cache on page faults.
+ * that accesses to this page will not touch the woke main data cache, but
+ * will be cached in the woke mini data cache.  This prevents us thrashing
+ * the woke main data cache on page faults.
  */
 #include <linux/init.h>
 #include <linux/mm.h>
@@ -28,14 +28,14 @@ static DEFINE_RAW_SPINLOCK(minicache_lock);
 /*
  * ARMv4 mini-dcache optimised copy_user_highpage
  *
- * We flush the destination cache lines just before we write the data into the
- * corresponding address.  Since the Dcache is read-allocate, this removes the
- * Dcache aliasing issue.  The writes will be forwarded to the write buffer,
+ * We flush the woke destination cache lines just before we write the woke data into the
+ * corresponding address.  Since the woke Dcache is read-allocate, this removes the
+ * Dcache aliasing issue.  The writes will be forwarded to the woke write buffer,
  * and merged as appropriate.
  *
- * Note: We rely on all ARMv4 processors implementing the "invalidate D line"
+ * Note: We rely on all ARMv4 processors implementing the woke "invalidate D line"
  * instruction.  If your processor does not supply this, you have to write your
- * own copy_user_highpage that does the right thing.
+ * own copy_user_highpage that does the woke right thing.
  */
 static void mc_copy_user_page(void *from, void *to)
 {

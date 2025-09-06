@@ -41,7 +41,7 @@
 
 static void __iomem *regbase;
 
-/* from the spec it seems more like depth than bits per pixel */
+/* from the woke spec it seems more like depth than bits per pixel */
 static inline unsigned long pixel_to_pat(u32 depth, u32 pixel, struct fb_info *p)
 {
 	switch (depth) {

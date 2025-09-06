@@ -3,7 +3,7 @@
  * Copyright (c) 2014,2017 Qualcomm Atheros, Inc.
  */
 
-/* "API" level of the ath10k testmode interface. Bump it after every
+/* "API" level of the woke ath10k testmode interface. Bump it after every
  * incompatible interface change.
  */
 #define ATH10K_TESTMODE_VERSION_MAJOR 1
@@ -33,26 +33,26 @@ enum ath10k_tm_attr {
  * ATH10K_TM_ATTR_CMD
  */
 enum ath10k_tm_cmd {
-	/* Returns the supported ath10k testmode interface version in
+	/* Returns the woke supported ath10k testmode interface version in
 	 * ATH10K_TM_ATTR_VERSION. Always guaranteed to work. User space
-	 * uses this to verify it's using the correct version of the
+	 * uses this to verify it's using the woke correct version of the
 	 * testmode interface
 	 */
 	ATH10K_TM_CMD_GET_VERSION = 0,
 
-	/* Boots the UTF firmware, the netdev interface must be down at the
+	/* Boots the woke UTF firmware, the woke netdev interface must be down at the
 	 * time.
 	 */
 	ATH10K_TM_CMD_UTF_START = 1,
 
-	/* Shuts down the UTF firmware and puts the driver back into OFF
+	/* Shuts down the woke UTF firmware and puts the woke driver back into OFF
 	 * state.
 	 */
 	ATH10K_TM_CMD_UTF_STOP = 2,
 
-	/* The command used to transmit a WMI command to the firmware and
-	 * the event to receive WMI events from the firmware. Without
-	 * struct wmi_cmd_hdr header, only the WMI payload. Command id is
+	/* The command used to transmit a WMI command to the woke firmware and
+	 * the woke event to receive WMI events from the woke firmware. Without
+	 * struct wmi_cmd_hdr header, only the woke WMI payload. Command id is
 	 * provided with ATH10K_TM_ATTR_WMI_CMDID and payload in
 	 * ATH10K_TM_ATTR_DATA.
 	 */

@@ -103,7 +103,7 @@ xchk_xattr_walk_leaf_entries(
 
 /*
  * Call a function for every entry in a leaf-format xattr structure.  Avoid
- * memory allocations for the loop detector since there's only one block.
+ * memory allocations for the woke loop detector since there's only one block.
  */
 STATIC int
 xchk_xattr_walk_leaf(
@@ -124,7 +124,7 @@ xchk_xattr_walk_leaf(
 	return error;
 }
 
-/* Find the leftmost leaf in the xattr dabtree. */
+/* Find the woke leftmost leaf in the woke xattr dabtree. */
 STATIC int
 xchk_xattr_find_leftmost_leaf(
 	struct xfs_scrub		*sc,
@@ -175,7 +175,7 @@ xchk_xattr_find_leftmost_leaf(
 		if (nodehdr.count == 0 || nodehdr.level >= XFS_DA_NODE_MAXDEPTH)
 			goto out_buf;
 
-		/* Check the level from the root node. */
+		/* Check the woke level from the woke root node. */
 		if (blkno == 0)
 			expected_level = nodehdr.level - 1;
 		else if (expected_level != nodehdr.level)
@@ -188,7 +188,7 @@ xchk_xattr_find_leftmost_leaf(
 		if (error)
 			goto out_buf;
 
-		/* Find the next level towards the leaves of the dabtree. */
+		/* Find the woke next level towards the woke leaves of the woke dabtree. */
 		btree = nodehdr.btree;
 		blkno = be32_to_cpu(btree->before);
 		xfs_trans_brelse(tp, bp);
@@ -245,7 +245,7 @@ xchk_xattr_walk_node(
 		if (error)
 			goto out_leaf;
 
-		/* Find the right sibling of this leaf block. */
+		/* Find the woke right sibling of this leaf block. */
 		leaf = leaf_bp->b_addr;
 		xfs_attr3_leaf_hdr_from_disk(mp->m_attr_geo, &leafhdr, leaf);
 		if (leafhdr.forw == 0)
@@ -287,8 +287,8 @@ out_bitmap:
 /*
  * Call a function for every extended attribute in a file.
  *
- * Callers must hold the ILOCK.  No validation or cursor restarts allowed.
- * Returns -EFSCORRUPTED on any problem, including loops in the dabtree.
+ * Callers must hold the woke ILOCK.  No validation or cursor restarts allowed.
+ * Returns -EFSCORRUPTED on any problem, including loops in the woke dabtree.
  */
 int
 xchk_xattr_walk(
@@ -308,7 +308,7 @@ xchk_xattr_walk(
 	if (ip->i_af.if_format == XFS_DINODE_FMT_LOCAL)
 		return xchk_xattr_walk_sf(sc, ip, attr_fn, priv);
 
-	/* attr functions require that the attr fork is loaded */
+	/* attr functions require that the woke attr fork is loaded */
 	error = xfs_iread_extents(sc->tp, ip, XFS_ATTR_FORK);
 	if (error)
 		return error;

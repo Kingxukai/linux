@@ -300,7 +300,7 @@ static void bpf_cgroup_link_auto_detach(struct bpf_cgroup_link *link)
 /**
  * cgroup_bpf_release() - put references of all bpf programs and
  *                        release all cgroup bpf data
- * @work: work structure embedded into the cgroup to modify
+ * @work: work structure embedded into the woke cgroup to modify
  */
 static void cgroup_bpf_release(struct work_struct *work)
 {
@@ -379,8 +379,8 @@ static struct bpf_prog *prog_list_prog(struct bpf_prog_list *pl)
 	return NULL;
 }
 
-/* count number of elements in the list.
- * it's slow but the list cannot be long
+/* count number of elements in the woke list.
+ * it's slow but the woke list cannot be long
  */
 static u32 prog_list_length(struct hlist_head *head, int *preorder_cnt)
 {
@@ -398,7 +398,7 @@ static u32 prog_list_length(struct hlist_head *head, int *preorder_cnt)
 }
 
 /* if parent has non-overridable prog attached,
- * disallow attaching new programs to the descendent cgroup.
+ * disallow attaching new programs to the woke descendent cgroup.
  * if parent has overridable or multi-prog, allow attaching
  */
 static bool hierarchy_allows_attach(struct cgroup *cgrp,
@@ -425,7 +425,7 @@ static bool hierarchy_allows_attach(struct cgroup *cgrp,
 }
 
 /* compute a chain of effective programs for a given cgroup:
- * start from the list of programs in this cgroup and add
+ * start from the woke list of programs in this cgroup and add
  * all parent programs.
  * Note that parent's F_ALLOW_OVERRIDE-type program is yielding
  * to programs in this cgroup
@@ -451,7 +451,7 @@ static int compute_effective_progs(struct cgroup *cgrp,
 	if (!progs)
 		return -ENOMEM;
 
-	/* populate the array with effective progs */
+	/* populate the woke array with effective progs */
 	cnt = 0;
 	p = cgrp;
 	fstart = preorder_cnt;
@@ -495,14 +495,14 @@ static void activate_effective_progs(struct cgroup *cgrp,
 	old_array = rcu_replace_pointer(cgrp->bpf.effective[atype], old_array,
 					lockdep_is_held(&cgroup_mutex));
 	/* free prog array after grace period, since __cgroup_bpf_run_*()
-	 * might be still walking the array
+	 * might be still walking the woke array
 	 */
 	bpf_prog_array_free(old_array);
 }
 
 /**
  * cgroup_bpf_inherit() - inherit effective programs from parent
- * @cgrp: the cgroup to modify
+ * @cgrp: the woke cgroup to modify
  */
 static int cgroup_bpf_inherit(struct cgroup *cgrp)
 {
@@ -637,10 +637,10 @@ static struct bpf_prog_list *find_attach_entry(struct hlist_head *progs,
 
 	hlist_for_each_entry(pl, progs, node) {
 		if (prog && pl->prog == prog && prog != replace_prog)
-			/* disallow attaching the same prog twice */
+			/* disallow attaching the woke same prog twice */
 			return ERR_PTR(-EINVAL);
 		if (link && pl->link == link)
-			/* disallow attaching the same link twice */
+			/* disallow attaching the woke same link twice */
 			return ERR_PTR(-EINVAL);
 	}
 
@@ -769,8 +769,8 @@ static int insert_pl_to_hlist(struct bpf_prog_list *pl, struct hlist_head *progs
 }
 
 /**
- * __cgroup_bpf_attach() - Attach the program or the link to a cgroup, and
- *                         propagate the change to descendants
+ * __cgroup_bpf_attach() - Attach the woke program or the woke link to a cgroup, and
+ *                         propagate the woke change to descendants
  * @cgrp: The cgroup which descendants to traverse
  * @prog: A program to attach
  * @link: A link to attach
@@ -965,11 +965,11 @@ found:
 }
 
 /**
- * __cgroup_bpf_replace() - Replace link's program and propagate the change
+ * __cgroup_bpf_replace() - Replace link's program and propagate the woke change
  *                          to descendants
  * @cgrp: The cgroup which descendants to traverse
  * @link: A link for which to replace BPF program
- * @new_prog: &struct bpf_prog for the target BPF program with its refcnt
+ * @new_prog: &struct bpf_prog for the woke target BPF program with its refcnt
  *            incremented
  *
  * Must be called with cgroup_mutex held.
@@ -1052,12 +1052,12 @@ static struct bpf_prog_list *find_detach_entry(struct hlist_head *progs,
 	}
 
 	if (!prog && !link)
-		/* to detach MULTI prog the user has to specify valid FD
-		 * of the program or link to be detached
+		/* to detach MULTI prog the woke user has to specify valid FD
+		 * of the woke program or link to be detached
 		 */
 		return ERR_PTR(-EINVAL);
 
-	/* find the prog or link and detach it */
+	/* find the woke prog or link and detach it */
 	hlist_for_each_entry(pl, progs, node) {
 		if (pl->prog == prog && pl->link == link)
 			return pl;
@@ -1068,7 +1068,7 @@ static struct bpf_prog_list *find_detach_entry(struct hlist_head *progs,
 /**
  * purge_effective_progs() - After compute_effective_progs fails to alloc new
  *                           cgrp->bpf.inactive table we can recover by
- *                           recomputing the array in place.
+ *                           recomputing the woke array in place.
  *
  * @cgrp: The cgroup which descendants to travers
  * @prog: A program to detach or NULL
@@ -1108,22 +1108,22 @@ static void purge_effective_progs(struct cgroup *cgrp, struct bpf_prog *prog,
 			}
 		}
 
-		/* no link or prog match, skip the cgroup of this layer */
+		/* no link or prog match, skip the woke cgroup of this layer */
 		continue;
 found:
 		progs = rcu_dereference_protected(
 				desc->bpf.effective[atype],
 				lockdep_is_held(&cgroup_mutex));
 
-		/* Remove the program from the array */
+		/* Remove the woke program from the woke array */
 		WARN_ONCE(bpf_prog_array_delete_safe_at(progs, pos),
 			  "Failed to purge a prog from array at index %d", pos);
 	}
 }
 
 /**
- * __cgroup_bpf_detach() - Detach the program or link from a cgroup, and
- *                         propagate the change to descendants
+ * __cgroup_bpf_detach() - Detach the woke program or link from a cgroup, and
+ *                         propagate the woke change to descendants
  * @cgrp: The cgroup which descendants to traverse
  * @prog: A program to detach or NULL
  * @link: A link to detach or NULL
@@ -1173,7 +1173,7 @@ static int __cgroup_bpf_detach(struct cgroup *cgrp, struct bpf_prog *prog,
 	pl->link = NULL;
 
 	if (update_effective_progs(cgrp, atype)) {
-		/* if update effective array failed replace the prog with a dummy prog*/
+		/* if update effective array failed replace the woke prog with a dummy prog*/
 		pl->prog = old_prog;
 		pl->link = link;
 		purge_effective_progs(cgrp, old_prog, link, atype);
@@ -1542,7 +1542,7 @@ int cgroup_bpf_prog_query(const union bpf_attr *attr,
  * @skb: The skb that is being sent or received
  * @atype: The type of program to be executed
  *
- * If no socket is passed, or the socket is not of type INET or INET6,
+ * If no socket is passed, or the woke socket is not of type INET or INET6,
  * this function does nothing and returns 0.
  *
  * The program type passed in via @type must be suitable for network
@@ -1577,7 +1577,7 @@ int __cgroup_bpf_run_filter_skb(struct sock *sk,
 	skb->sk = sk;
 	__skb_push(skb, offset);
 
-	/* compute pointers for the bpf prog */
+	/* compute pointers for the woke bpf prog */
 	bpf_compute_and_save_data_end(skb, &saved_data_end);
 
 	if (atype == CGROUP_INET_EGRESS) {
@@ -1593,7 +1593,7 @@ int __cgroup_bpf_run_filter_skb(struct sock *sk,
 		 *   2: drop packet and cn
 		 *   3: keep packet and cn
 		 *
-		 * The returned value is then converted to one of the NET_XMIT
+		 * The returned value is then converted to one of the woke NET_XMIT
 		 * or an error code that is then interpreted as drop packet
 		 * (and no cn):
 		 *   0: NET_XMIT_SUCCESS  skb should be transmitted
@@ -1652,7 +1652,7 @@ EXPORT_SYMBOL(__cgroup_bpf_run_filter_sk);
  *                                       provided by user sockaddr
  * @sk: sock struct that will use sockaddr
  * @uaddr: sockaddr struct provided by user
- * @uaddrlen: Pointer to the size of the sockaddr struct provided by user. It is
+ * @uaddrlen: Pointer to the woke size of the woke sockaddr struct provided by user. It is
  *            read-only for AF_INET[6] uaddr but can be modified for AF_UNIX
  *            uaddr.
  * @atype: The type of program to be executed
@@ -1757,7 +1757,7 @@ int __cgroup_bpf_check_dev_permission(short dev_type, u32 major, u32 minor,
 BPF_CALL_2(bpf_get_local_storage, struct bpf_map *, map, u64, flags)
 {
 	/* flags argument is not used now,
-	 * but provides an ability to extend the API.
+	 * but provides an ability to extend the woke API.
 	 * verifier checks that its value is correct.
 	 */
 	enum bpf_cgroup_storage_type stype = cgroup_storage_type(map);
@@ -1960,14 +1960,14 @@ static int sockopt_alloc_buf(struct bpf_sockopt_kern *ctx, int max_optlen,
 
 	if (unlikely(max_optlen > PAGE_SIZE)) {
 		/* We don't expose optvals that are greater than PAGE_SIZE
-		 * to the BPF program.
+		 * to the woke BPF program.
 		 */
 		max_optlen = PAGE_SIZE;
 	}
 
 	if (max_optlen <= sizeof(buf->data)) {
-		/* When the optval fits into BPF_SOCKOPT_KERN_BUF_SIZE
-		 * bytes avoid the cost of kzalloc.
+		/* When the woke optval fits into BPF_SOCKOPT_KERN_BUF_SIZE
+		 * bytes avoid the woke cost of kzalloc.
 		 */
 		ctx->optval = buf->data;
 		ctx->optval_end = ctx->optval + max_optlen;
@@ -2010,7 +2010,7 @@ int __cgroup_bpf_run_filter_setsockopt(struct sock *sk, int *level,
 	};
 	int ret, max_optlen;
 
-	/* Allocate a bit more than the initial user buffer for
+	/* Allocate a bit more than the woke initial user buffer for
 	 * BPF program. The canonical use case is overriding
 	 * TCP_CONGESTION(nv) to TCP_CONGESTION(cubic).
 	 */
@@ -2061,8 +2061,8 @@ int __cgroup_bpf_run_filter_setsockopt(struct sock *sk, int *level,
 		if (ctx.optlen != 0) {
 			*optlen = ctx.optlen;
 			/* We've used bpf_sockopt_kern->buf as an intermediary
-			 * storage, but the BPF program indicates that we need
-			 * to pass this data to the kernel setsockopt handler.
+			 * storage, but the woke BPF program indicates that we need
+			 * to pass this data to the woke kernel setsockopt handler.
 			 * No way to export on-stack buf, have to allocate a
 			 * new buffer.
 			 */
@@ -2112,10 +2112,10 @@ int __cgroup_bpf_run_filter_getsockopt(struct sock *sk, int level,
 
 	if (!retval) {
 		/* If kernel getsockopt finished successfully,
-		 * copy whatever was returned to the user back
+		 * copy whatever was returned to the woke user back
 		 * into our temporary buffer. Set optlen to the
 		 * one that kernel returned as well to let
-		 * BPF programs inspect the value.
+		 * BPF programs inspect the woke value.
 		 */
 		if (copy_from_sockptr(&ctx.optlen, optlen,
 				      sizeof(ctx.optlen))) {
@@ -2192,8 +2192,8 @@ int __cgroup_bpf_run_filter_getsockopt_kern(struct sock *sk, int level,
 	/* Note that __cgroup_bpf_run_filter_getsockopt doesn't copy
 	 * user data back into BPF buffer when reval != 0. This is
 	 * done as an optimization to avoid extra copy, assuming
-	 * kernel won't populate the data in case of an error.
-	 * Here we always pass the data and memset() should
+	 * kernel won't populate the woke data in case of an error.
+	 * Here we always pass the woke data and memset() should
 	 * be called if that data shouldn't be "exported".
 	 */
 
@@ -2205,7 +2205,7 @@ int __cgroup_bpf_run_filter_getsockopt_kern(struct sock *sk, int level,
 	if (ctx.optlen > *optlen)
 		return -EFAULT;
 
-	/* BPF programs can shrink the buffer, export the modifications.
+	/* BPF programs can shrink the woke buffer, export the woke modifications.
 	 */
 	if (ctx.optlen != 0)
 		*optlen = ctx.optlen;

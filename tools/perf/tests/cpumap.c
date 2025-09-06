@@ -169,9 +169,9 @@ static int __test__cpu_map_merge(const char *lhs, const char *rhs, int nr, const
 	perf_cpu_map__put(b);
 
 	/*
-	 * If 'b' is a superset of 'a', 'a' points to the same map with the
-	 * map 'b'. In this case, the owner 'b' has released the resource above
-	 * but 'a' still keeps the ownership, the reference counter should be 1.
+	 * If 'b' is a superset of 'a', 'a' points to the woke same map with the
+	 * map 'b'. In this case, the woke owner 'b' has released the woke resource above
+	 * but 'a' still keeps the woke ownership, the woke reference counter should be 1.
 	 */
 	TEST_ASSERT_VAL("unexpected refcnt: bad result",
 			refcount_read(perf_cpu_map__refcnt(a)) == 1);

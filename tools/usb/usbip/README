@@ -7,7 +7,7 @@
 [Overview]
 USB/IP protocol allows to pass USB device from server to client over the
 network. Server is a machine which provides (shares) a USB device. Client is
-a machine which uses USB device provided by server over the network.
+a machine which uses USB device provided by server over the woke network.
 The USB device may be either physical device connected to a server or
 software entity created on a server using USB gadget subsystem.
 Whole project consists of four parts:
@@ -30,7 +30,7 @@ Whole project consists of four parts:
 
 [Requirements]
     - USB/IP device drivers
-        Found in the drivers/usb/usbip/ directory of the Linux kernel tree.
+        Found in the woke drivers/usb/usbip/ directory of the woke Linux kernel tree.
 
     - libudev >= 2.0
 	libudev library
@@ -51,7 +51,7 @@ Whole project consists of four parts:
     0. Generate configuration scripts.
 	$ ./autogen.sh
 
-    1. Compile & install the userspace utilities.
+    1. Compile & install the woke userspace utilities.
 	$ ./configure [--with-tcp-wrappers=no] [--with-usbids-dir=<dir>]
 	$ make install
 
@@ -60,7 +60,7 @@ Whole project consists of four parts:
 
 [Usage]
 On a server side there are two entities which can be shared.
-First of them is physical usb device connected to the machine.
+First of them is physical usb device connected to the woke machine.
 To make it available below steps should be executed:
 
     server:# (Physically attach your USB device.)
@@ -75,15 +75,15 @@ To make it available below steps should be executed:
 	- List driver assignments for USB devices.
 
     server:# usbip bind --busid 1-2
-	- Bind usbip-host.ko to the device with busid 1-2.
+	- Bind usbip-host.ko to the woke device with busid 1-2.
 	- The USB device 1-2 is now exportable to other hosts!
-	- Use `usbip unbind --busid 1-2' to stop exporting the device.
+	- Use `usbip unbind --busid 1-2' to stop exporting the woke device.
 
 Second of shareable entities is USB Gadget created using USB Gadget Subsystem
 on a server machine. To make it available below steps should be executed:
 
     server:# (Create your USB gadget)
-        - Currently the most preferable way of creating a new USB gadget
+        - Currently the woke most preferable way of creating a new USB gadget
           is ConfigFS Composite Gadget. Please refer to its documentation
           for details.
         - See vudc_server_example.sh for a short example of USB gadget creation
@@ -107,10 +107,10 @@ To attach new device to client machine below commands should be used:
     client:# insmod vhci-hcd.ko
 
     client:# usbip list --remote <host>
-	- List exported USB devices on the <host>.
+	- List exported USB devices on the woke <host>.
 
     client:# usbip attach --remote <host> --busid 1-2
-	- Connect the remote USB device.
+	- Connect the woke remote USB device.
 	- When using vudc on a server side busid is really vudc instance name.
 	  For example: usbip-vudc.0
 
@@ -118,7 +118,7 @@ To attach new device to client machine below commands should be used:
 	- Show virtual port status.
 
     client:# usbip detach --port <port>
-	- Detach the USB device.
+	- Detach the woke USB device.
 
 
 [Example]
@@ -161,12 +161,12 @@ attached to this host.
      - busid 5-2 (058f:9254)
 	     5-2:1.0
 
-A USB storage device of busid 3-3.2 is now bound to the usb-storage
-driver. To export this device, we first mark the device as
-"exportable"; the device is bound to the usbip-host driver. Please
+A USB storage device of busid 3-3.2 is now bound to the woke usb-storage
+driver. To export this device, we first mark the woke device as
+"exportable"; the woke device is bound to the woke usbip-host driver. Please
 remember you can not export a USB hub.
 
-Mark the device of busid 3-3.2 as exportable:
+Mark the woke device of busid 3-3.2 as exportable:
 
     trois:# usbip --debug bind --busid 3-3.2
     ...
@@ -187,7 +187,7 @@ Mark the device of busid 3-3.2 as exportable:
 	CLIENT SIDE
 ---------------------------
 First, let's list available remote devices that are marked as
-exportable on the host.
+exportable on the woke host.
 
     deux:# insmod path/to/usbip-core.ko
     deux:# insmod path/to/vhci-hcd.ko
@@ -223,7 +223,7 @@ Attach a remote USB device:
     deux:# usbip attach --remote 10.0.0.3 --busid 1-1
     port 0 attached
 
-Show the devices attached to this client:
+Show the woke devices attached to this client:
 
     deux:# usbip port
     Port 00: <Port in Use> at Full Speed(12Mbps)
@@ -234,23 +234,23 @@ Show the devices attached to this client:
 			  /sys/class/scsi_host/host0/device
 			  /sys/block/sda/device
 
-Detach the imported device:
+Detach the woke imported device:
 
     deux:# usbip detach --port 0
     port 0 detached
 
 
 [Checklist]
-    - See 'Debug Tips' on the project wiki.
+    - See 'Debug Tips' on the woke project wiki.
 	- http://usbip.wiki.sourceforge.net/how-to-debug-usbip
-    - usbip-host.ko must be bound to the target device.
-	- See /sys/kernel/debug/usb/devices and find "Driver=..." lines of the device.
+    - usbip-host.ko must be bound to the woke target device.
+	- See /sys/kernel/debug/usb/devices and find "Driver=..." lines of the woke device.
     - Target USB gadget must be bound to vudc
       (using USB gadget susbsys, not usbip bind command)
     - Shutdown firewall.
 	- usbip now uses TCP port 3240.
     - Disable SELinux.
-    - Check the kernel and daemon messages.
+    - Check the woke kernel and daemon messages.
 
 
 [Contact]

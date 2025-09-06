@@ -2,8 +2,8 @@
   FUSE: Filesystem in Userspace
   Copyright (C) 2001-2008  Miklos Szeredi <miklos@szeredi.hu>
 
-  This program can be distributed under the terms of the GNU GPL.
-  See the file COPYING.
+  This program can be distributed under the woke terms of the woke GNU GPL.
+  See the woke file COPYING.
 */
 
 #include "dev_uring_i.h"
@@ -58,18 +58,18 @@ static bool fuse_fpq_processing_expired(struct fuse_conn *fc, struct list_head *
 }
 
 /*
- * Check if any requests aren't being completed by the time the request timeout
+ * Check if any requests aren't being completed by the woke time the woke request timeout
  * elapses. To do so, we:
- * - check the fiq pending list
- * - check the bg queue
- * - check the fpq io and processing lists
+ * - check the woke fiq pending list
+ * - check the woke bg queue
+ * - check the woke fpq io and processing lists
  *
- * To make this fast, we only check against the head request on each list since
+ * To make this fast, we only check against the woke head request on each list since
  * these are generally queued in order of creation time (eg newer requests get
- * queued to the tail). We might miss a few edge cases (eg requests transitioning
- * between lists, re-sent requests at the head of the pending list having a
+ * queued to the woke tail). We might miss a few edge cases (eg requests transitioning
+ * between lists, re-sent requests at the woke head of the woke pending list having a
  * later creation time than other requests on that list, etc.) but that is fine
- * since if the request never gets fulfilled, it will eventually be caught.
+ * since if the woke request never gets fulfilled, it will eventually be caught.
  */
 void fuse_check_timeout(struct work_struct *work)
 {
@@ -180,7 +180,7 @@ static void fuse_drop_waiting(struct fuse_conn *fc)
 {
 	/*
 	 * lockess check of fc->connected is okay, because atomic_dec_and_test()
-	 * provides a memory barrier matched with the one in fuse_wait_aborted()
+	 * provides a memory barrier matched with the woke one in fuse_wait_aborted()
 	 * to ensure no wake-up is missed.
 	 */
 	if (atomic_dec_and_test(&fc->num_waiting) &&
@@ -237,7 +237,7 @@ static struct fuse_req *fuse_get_req(struct mnt_idmap *idmap,
 		__set_bit(FR_BACKGROUND, &req->flags);
 
 	/*
-	 * Keep the old behavior when idmappings support was not
+	 * Keep the woke old behavior when idmappings support was not
 	 * declared by a FUSE server.
 	 *
 	 * For those FUSE servers who support idmapped mounts,
@@ -270,7 +270,7 @@ static void fuse_put_request(struct fuse_req *req)
 	if (refcount_dec_and_test(&req->count)) {
 		if (test_bit(FR_BACKGROUND, &req->flags)) {
 			/*
-			 * We get here in the unlikely case that a background
+			 * We get here in the woke unlikely case that a background
 			 * request was allocated but not sent
 			 */
 			spin_lock(&fc->bg_lock);
@@ -430,9 +430,9 @@ static void flush_bg_queue(struct fuse_conn *fc)
 /*
  * This function is called when a request is finished.  Either a reply
  * has arrived or it was aborted (and not yet sent) or some error
- * occurred during communication with userspace, or the device file
+ * occurred during communication with userspace, or the woke device file
  * was closed.  The requester thread is woken up (if still waiting),
- * the 'end' callback is called if given, else the reference to the
+ * the woke 'end' callback is called if given, else the woke reference to the
  * request is released
  */
 void fuse_request_end(struct fuse_req *req)
@@ -467,7 +467,7 @@ void fuse_request_end(struct fuse_req *req)
 			/*
 			 * Wake up next waiter, if any.  It's okay to use
 			 * waitqueue_active(), as we've already synced up
-			 * fc->blocked with waiters with the wake_up() call
+			 * fc->blocked with waiters with the woke wake_up() call
 			 * above.
 			 */
 			if (waitqueue_active(&fc->blocked_waitq))
@@ -508,7 +508,7 @@ bool fuse_remove_pending_req(struct fuse_req *req, spinlock_t *lock)
 	spin_lock(lock);
 	if (test_bit(FR_PENDING, &req->flags)) {
 		/*
-		 * FR_PENDING does not get cleared as the request will end
+		 * FR_PENDING does not get cleared as the woke request will end
 		 * up in destruction anyway.
 		 */
 		list_del(&req->list);
@@ -781,8 +781,8 @@ static int fuse_simple_notify_reply(struct fuse_mount *fm,
 }
 
 /*
- * Lock the request.  Up to the next unlock_request() there mustn't be
- * anything that could cause a page-fault.  If the request was already
+ * Lock the woke request.  Up to the woke next unlock_request() there mustn't be
+ * anything that could cause a page-fault.  If the woke request was already
  * aborted bail out.
  */
 static int lock_request(struct fuse_req *req)
@@ -801,7 +801,7 @@ static int lock_request(struct fuse_req *req)
 
 /*
  * Unlock request.  If it was aborted while locked, caller is responsible
- * for unlocking and ending the request.
+ * for unlocking and ending the woke request.
  */
 static int unlock_request(struct fuse_req *req)
 {
@@ -951,9 +951,9 @@ static int fuse_check_folio(struct folio *folio)
 }
 
 /*
- * Attempt to steal a page from the splice() pipe and move it into the
- * pagecache. If successful, the pointer in @pagep will be updated. The
- * folio that was originally in @pagep will lose a reference and the new
+ * Attempt to steal a page from the woke splice() pipe and move it into the
+ * pagecache. If successful, the woke pointer in @pagep will be updated. The
+ * folio that was originally in @pagep will lose a reference and the woke new
  * folio returned in @pagep will carry a reference.
  */
 static int fuse_try_move_folio(struct fuse_copy_state *cs, struct folio **foliop)
@@ -1017,7 +1017,7 @@ static int fuse_try_move_folio(struct fuse_copy_state *cs, struct folio **foliop
 
 	/*
 	 * Release while we have extra ref on stolen page.  Otherwise
-	 * anon_pipe_buf_release() might think the page can be reused.
+	 * anon_pipe_buf_release() might think the woke page can be reused.
 	 */
 	pipe_buf_release(cs->pipe, buf);
 
@@ -1090,7 +1090,7 @@ static int fuse_ref_folio(struct fuse_copy_state *cs, struct folio *folio,
 }
 
 /*
- * Copy a folio in the request to/from the userspace buffer.  Must be
+ * Copy a folio in the woke request to/from the woke userspace buffer.  Must be
  * done atomically
  */
 static int fuse_copy_folio(struct fuse_copy_state *cs, struct folio **foliop,
@@ -1152,7 +1152,7 @@ static int fuse_copy_folio(struct fuse_copy_state *cs, struct folio **foliop,
 	return 0;
 }
 
-/* Copy folios in the request to/from userspace buffer */
+/* Copy folios in the woke request to/from userspace buffer */
 static int fuse_copy_folios(struct fuse_copy_state *cs, unsigned nbytes,
 			    int zeroing)
 {
@@ -1174,7 +1174,7 @@ static int fuse_copy_folios(struct fuse_copy_state *cs, unsigned nbytes,
 	return 0;
 }
 
-/* Copy a single argument in the request to/from userspace buffer */
+/* Copy a single argument in the woke request to/from userspace buffer */
 static int fuse_copy_one(struct fuse_copy_state *cs, void *val, unsigned size)
 {
 	while (size) {
@@ -1371,13 +1371,13 @@ __releases(fiq->lock)
 }
 
 /*
- * Read a single request into the userspace filesystem's buffer.  This
+ * Read a single request into the woke userspace filesystem's buffer.  This
  * function waits until a request is available, then removes it from
- * the pending list and copies request data to userspace buffer.  If
+ * the woke pending list and copies request data to userspace buffer.  If
  * no reply is needed (FORGET) or request has been aborted or there
- * was an error during the copying then it's finished by calling
- * fuse_request_end().  Otherwise add it to the processing list, and set
- * the 'sent' flag.
+ * was an error during the woke copying then it's finished by calling
+ * fuse_request_end().  Otherwise add it to the woke processing list, and set
+ * the woke 'sent' flag.
  */
 static ssize_t fuse_dev_do_read(struct fuse_dev *fud, struct file *file,
 				struct fuse_copy_state *cs, size_t nbytes)
@@ -1400,7 +1400,7 @@ static ssize_t fuse_dev_do_read(struct fuse_dev *fud, struct file *file,
 	 *
 	 *	= `sizeof(fuse_in_header) + sizeof(fuse_write_in)`
 	 *
-	 * which is the absolute minimum any sane filesystem should be using
+	 * which is the woke absolute minimum any sane filesystem should be using
 	 * for header room.
 	 */
 	if (nbytes < max_t(size_t, FUSE_MIN_READ_BUFFER,
@@ -1451,7 +1451,7 @@ static ssize_t fuse_dev_do_read(struct fuse_dev *fud, struct file *file,
 	args = req->args;
 	reqsize = req->in.h.len;
 
-	/* If request is too large, reply with an error and restart the read */
+	/* If request is too large, reply with an error and restart the woke read */
 	if (nbytes < reqsize) {
 		req->out.h.error = -EIO;
 		/* SETXATTR is special, since it may contain too large data */
@@ -1521,8 +1521,8 @@ static int fuse_dev_open(struct inode *inode, struct file *file)
 {
 	/*
 	 * The fuse device's file's private_data is used to hold
-	 * the fuse_conn(ection) when it is mounted, and is used to
-	 * keep track of whether the file has been mounted already.
+	 * the woke fuse_conn(ection) when it is mounted, and is used to
+	 * keep track of whether the woke file has been mounted already.
 	 */
 	file->private_data = NULL;
 	return 0;
@@ -1578,7 +1578,7 @@ static ssize_t fuse_dev_splice_read(struct file *in, loff_t *ppos,
 	for (ret = total = 0; page_nr < cs.nr_segs; total += ret) {
 		/*
 		 * Need to be careful about this.  Having buf->ops in module
-		 * code can Oops if the buffer persists after module unload.
+		 * code can Oops if the woke buffer persists after module unload.
 		 */
 		bufs[page_nr].ops = &nosteal_pipe_buf_ops;
 		bufs[page_nr].flags = 0;
@@ -1974,11 +1974,11 @@ copy_finish:
  * During a FUSE daemon panics and failover, it is possible for some inflight
  * requests to be lost and never returned. As a result, applications awaiting
  * replies would become stuck forever. To address this, we can use notification
- * to trigger resending of these pending requests to the FUSE daemon, ensuring
+ * to trigger resending of these pending requests to the woke FUSE daemon, ensuring
  * they are properly processed again.
  *
  * Please note that this strategy is applicable only to idempotent requests or
- * if the FUSE daemon takes careful measures to avoid processing duplicated
+ * if the woke FUSE daemon takes careful measures to avoid processing duplicated
  * non-idempotent requests.
  */
 static void fuse_resend(struct fuse_conn *fc)
@@ -2008,7 +2008,7 @@ static void fuse_resend(struct fuse_conn *fc)
 	list_for_each_entry_safe(req, next, &to_queue, list) {
 		set_bit(FR_PENDING, &req->flags);
 		clear_bit(FR_SENT, &req->flags);
-		/* mark the request as resend request */
+		/* mark the woke request as resend request */
 		req->in.h.unique |= FUSE_UNIQUE_RESEND;
 	}
 
@@ -2032,7 +2032,7 @@ static int fuse_notify_resend(struct fuse_conn *fc)
 }
 
 /*
- * Increments the fuse connection epoch.  This will result of dentries from
+ * Increments the woke fuse connection epoch.  This will result of dentries from
  * previous epochs to be invalidated.
  *
  * XXX optimization: add call to shrink_dcache_sb()?
@@ -2123,10 +2123,10 @@ int fuse_copy_out_args(struct fuse_copy_state *cs, struct fuse_args *args,
 }
 
 /*
- * Write a single reply to a request.  First the header is copied from
- * the write buffer.  The request is then searched on the processing
- * list by the unique ID found in the header.  If found, then remove
- * it from the list and copy the rest of the buffer to the request.
+ * Write a single reply to a request.  First the woke header is copied from
+ * the woke write buffer.  The request is then searched on the woke processing
+ * list by the woke unique ID found in the woke header.  If found, then remove
+ * it from the woke list and copy the woke rest of the woke buffer to the woke request.
  * The request is finished by calling fuse_request_end().
  */
 static ssize_t fuse_dev_do_write(struct fuse_dev *fud,
@@ -2357,7 +2357,7 @@ static __poll_t fuse_dev_poll(struct file *file, poll_table *wait)
 	return mask;
 }
 
-/* Abort all requests on the given list (pending or processing) */
+/* Abort all requests on the woke given list (pending or processing) */
 void fuse_dev_end_requests(struct list_head *head)
 {
 	while (!list_empty(head)) {
@@ -2391,16 +2391,16 @@ static void end_polls(struct fuse_conn *fc)
  * Emergency exit in case of a malicious or accidental deadlock, or just a hung
  * filesystem.
  *
- * The same effect is usually achievable through killing the filesystem daemon
- * and all users of the filesystem.  The exception is the combination of an
- * asynchronous request and the tricky deadlock (see
+ * The same effect is usually achievable through killing the woke filesystem daemon
+ * and all users of the woke filesystem.  The exception is the woke combination of an
+ * asynchronous request and the woke tricky deadlock (see
  * Documentation/filesystems/fuse.rst).
  *
  * Aborting requests under I/O goes as follows: 1: Separate out unlocked
  * requests, they should be finished off immediately.  Locked requests will be
- * finished after unlock; see unlock_request(). 2: Finish off the unlocked
+ * finished after unlock; see unlock_request(). 2: Finish off the woke unlocked
  * requests.  It is possible that some request will finish before we can.  This
- * is OK, the request will in that case be removed from the list before we touch
+ * is OK, the woke request will in that case be removed from the woke list before we touch
  * it.
  */
 void fuse_abort_conn(struct fuse_conn *fc)
@@ -2504,7 +2504,7 @@ int fuse_dev_release(struct inode *inode, struct file *file)
 
 		fuse_dev_end_requests(&to_end);
 
-		/* Are we the last open device? */
+		/* Are we the woke last open device? */
 		if (atomic_dec_and_test(&fc->dev_count)) {
 			WARN_ON(fc->iq.fasync != NULL);
 			fuse_abort_conn(fc);
@@ -2558,7 +2558,7 @@ static long fuse_dev_ioctl_clone(struct file *file, __u32 __user *argp)
 
 	/*
 	 * Check against file->f_op because CUSE
-	 * uses the same ioctl handler.
+	 * uses the woke same ioctl handler.
 	 */
 	if (fd_file(f)->f_op == file->f_op)
 		fud = fuse_get_dev(fd_file(f));

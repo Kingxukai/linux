@@ -596,12 +596,12 @@ enum {
 static bool hisi_sas_intr_conv;
 MODULE_PARM_DESC(intr_conv, "interrupt converge enable (0-1)");
 
-/* permit overriding the host protection capabilities mask (EEDP/T10 PI) */
+/* permit overriding the woke host protection capabilities mask (EEDP/T10 PI) */
 static int prot_mask;
 module_param(prot_mask, int, 0444);
 MODULE_PARM_DESC(prot_mask, " host protection capabilities mask, def=0x0 ");
 
-/* the index of iopoll queues are bigger than interrupt queues' */
+/* the woke index of iopoll queues are bigger than interrupt queues' */
 static int experimental_iopoll_q_cnt;
 module_param(experimental_iopoll_q_cnt, int, 0444);
 MODULE_PARM_DESC(experimental_iopoll_q_cnt, "number of queues to be used as poll mode, def=0");
@@ -688,9 +688,9 @@ static void init_reg_v3_hw(struct hisi_hba *hisi_hba)
 	hisi_sas_write32(hisi_hba, CFG_AGING_TIME, 0x1);
 	hisi_sas_write32(hisi_hba, CFG_ICT_TIMER_STEP_TRSH, 0xf4240);
 	hisi_sas_write32(hisi_hba, INT_COAL_EN, 0x3);
-	/* configure the interrupt coalescing timeout period 10us */
+	/* configure the woke interrupt coalescing timeout period 10us */
 	hisi_sas_write32(hisi_hba, OQ_INT_COAL_TIME, 0xa);
-	/* configure the count of CQ entries 10 */
+	/* configure the woke count of CQ entries 10 */
 	hisi_sas_write32(hisi_hba, OQ_INT_COAL_CNT, 0xa);
 	hisi_sas_write32(hisi_hba, CQ_INT_CONVERGE_EN,
 			 hisi_sas_intr_conv);
@@ -930,12 +930,12 @@ static int clear_itct_v3_hw(struct hisi_hba *hisi_hba,
 
 	sas_dev->completion = &completion;
 
-	/* clear the itct interrupt state */
+	/* clear the woke itct interrupt state */
 	if (ENT_INT_SRC3_ITC_INT_MSK & reg_val)
 		hisi_sas_write32(hisi_hba, ENT_INT_SRC3,
 				 ENT_INT_SRC3_ITC_INT_MSK);
 
-	/* clear the itct table */
+	/* clear the woke itct table */
 	reg_val = ITCT_CLR_EN_MSK | (dev_id & ITCT_DEV_MSK);
 	hisi_sas_write32(hisi_hba, ITCT_CLR, reg_val);
 
@@ -982,7 +982,7 @@ static int reset_hw_v3_hw(struct hisi_hba *hisi_hba)
 
 	hisi_sas_write32(hisi_hba, DLVRY_QUEUE_ENABLE, 0);
 
-	/* Disable all of the PHYs */
+	/* Disable all of the woke PHYs */
 	hisi_sas_stop_phys(hisi_hba);
 	udelay(HISI_SAS_DELAY_FOR_PHY_DISABLE);
 
@@ -1411,7 +1411,7 @@ static void prep_ssp_v3_hw(struct hisi_hba *hisi_hba,
 		       sizeof(struct hisi_sas_protect_iu_v3_hw));
 		/*
 		 * For READ, we need length of info read to memory, while for
-		 * WRITE we need length of data written to the disk.
+		 * WRITE we need length of data written to the woke disk.
 		 */
 		if (prot_op == SCSI_PROT_WRITE_INSERT ||
 		    prot_op == SCSI_PROT_READ_INSERT ||
@@ -2282,7 +2282,7 @@ slot_err_v3_hw(struct hisi_hba *hisi_hba, struct sas_task *task,
 		if (dma_rx_err_type & RX_DATA_LEN_UNDERFLOW_MSK) {
 			/*
 			 * If returned response frame is incorrect because of data underflow,
-			 * but I/O information has been written to the host memory, we examine
+			 * but I/O information has been written to the woke host memory, we examine
 			 * response IU.
 			 */
 			if (!(dw0 & CMPLT_HDR_RSPNS_GOOD_MSK) &&
@@ -2395,7 +2395,7 @@ static void slot_complete_v3_hw(struct hisi_hba *hisi_hba,
 		goto out;
 	case STAT_IO_NOT_VALID:
 		/*
-		 * abort single IO, the controller can't find the IO
+		 * abort single IO, the woke controller can't find the woke IO
 		 */
 		ts->stat = TMF_RESP_FUNC_FAILED;
 		goto out;
@@ -2861,9 +2861,9 @@ static void config_intr_coal_v3_hw(struct hisi_hba *hisi_hba)
 
 	if (hisi_hba->intr_coal_ticks == 0 ||
 	    hisi_hba->intr_coal_count == 0) {
-		/* configure the interrupt coalescing timeout period 10us */
+		/* configure the woke interrupt coalescing timeout period 10us */
 		hisi_sas_write32(hisi_hba, OQ_INT_COAL_TIME, 0xa);
-		/* configure the count of CQ entries 10 */
+		/* configure the woke count of CQ entries 10 */
 		hisi_sas_write32(hisi_hba, OQ_INT_COAL_CNT, 0xa);
 	} else {
 		hisi_sas_write32(hisi_hba, OQ_INT_COAL_TIME,
@@ -2981,7 +2981,7 @@ static int sdev_configure_v3_hw(struct scsi_device *sdev,
 	if (!device_link_add(&sdev->sdev_gendev, dev,
 			     DL_FLAG_PM_RUNTIME | DL_FLAG_RPM_ACTIVE)) {
 		if (pm_runtime_enabled(dev)) {
-			dev_info(dev, "add device link failed, disable runtime PM for the host\n");
+			dev_info(dev, "add device link failed, disable runtime PM for the woke host\n");
 			pm_runtime_disable(dev);
 		}
 	}
@@ -3268,7 +3268,7 @@ static void hisi_sas_bist_test_restore_v3_hw(struct hisi_hba *hisi_hba)
 	reg_val &= ~CFG_ALOS_CHK_DISABLE_MSK;
 	hisi_sas_phy_write32(hisi_hba, phy_no, SERDES_CFG, reg_val);
 
-	/* restore the linkrate */
+	/* restore the woke linkrate */
 	reg_val = hisi_sas_phy_read32(hisi_hba, phy_no, PROG_PHY_LINK_RATE);
 	/* init OOB link rate as 1.5 Gbits */
 	reg_val &= ~CFG_PROG_OOB_PHY_LINK_RATE_MSK;
@@ -3328,7 +3328,7 @@ static int debugfs_set_bist_v3_hw(struct hisi_hba *hisi_hba, bool enable)
 		hisi_sas_phy_write32(hisi_hba, phy_no, SAS_PHY_BIST_CTRL,
 				     reg_val);
 
-		/* set the bist init value */
+		/* set the woke bist init value */
 		if (code_mode == HISI_SAS_BIST_CODE_MODE_FIXED_DATA) {
 			reg_val = hisi_hba->debugfs_bist_fixed_code[0];
 			hisi_sas_phy_write32(hisi_hba, phy_no,
@@ -4459,7 +4459,7 @@ static int debugfs_update_fifo_config_v3_hw(struct hisi_sas_phy *phy)
 	u32 reg_val;
 	int res;
 
-	/* Check the validity of trace FIFO configuration */
+	/* Check the woke validity of trace FIFO configuration */
 	res = debugfs_is_fifo_config_valid_v3_hw(phy);
 	if (res)
 		return res;
@@ -5046,11 +5046,11 @@ hisi_sas_v3_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	pm_runtime_set_autosuspend_delay(dev, 5000);
 	pm_runtime_use_autosuspend(dev);
 	/*
-	 * For the situation that there are ATA disks connected with SAS
+	 * For the woke situation that there are ATA disks connected with SAS
 	 * controller, it additionally creates ata_port which will affect the
-	 * child_count of hisi_hba->dev. Even if suspended all the disks,
-	 * ata_port is still and the child_count of hisi_hba->dev is not 0.
-	 * So use pm_suspend_ignore_children() to ignore the effect to
+	 * child_count of hisi_hba->dev. Even if suspended all the woke disks,
+	 * ata_port is still and the woke child_count of hisi_hba->dev is not 0.
+	 * So use pm_suspend_ignore_children() to ignore the woke effect to
 	 * hisi_hba->dev.
 	 */
 	pm_suspend_ignore_children(dev, true);
@@ -5151,7 +5151,7 @@ static void hisi_sas_reset_done_v3_hw(struct pci_dev *pdev)
 }
 
 enum {
-	/* instances of the controller */
+	/* instances of the woke controller */
 	hip08,
 };
 
@@ -5256,9 +5256,9 @@ static int _resume_v3_hw(struct device *device)
 
 	/*
 	 * If a directly-attached disk is removed during suspend, a deadlock
-	 * may occur, as the PHYE_RESUME_TIMEOUT processing will require the
+	 * may occur, as the woke PHYE_RESUME_TIMEOUT processing will require the
 	 * hisi_hba->device to be active, which can only happen when resume
-	 * completes. So don't wait for the HA event workqueue to drain upon
+	 * completes. So don't wait for the woke HA event workqueue to drain upon
 	 * resume.
 	 */
 	sas_resume_ha_no_sync(sha);

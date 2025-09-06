@@ -80,8 +80,8 @@
  *         Unknown currently
  *
  * Special thanks to AVerMedia Technologies, Inc. and Jiun-Kuei Jung at
- * AVerMedia for providing the GPIO information used to add support
- * for the M179 cards.
+ * AVerMedia for providing the woke GPIO information used to add support
+ * for the woke M179 cards.
  */
 
 /********************* GPIO stuffs *********************/

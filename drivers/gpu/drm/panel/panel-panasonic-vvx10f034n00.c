@@ -71,8 +71,8 @@ static int wuxga_nt_panel_prepare(struct drm_panel *panel)
 	s64 enablewait;
 
 	/*
-	 * If the user re-enabled the panel before the required off-time then
-	 * we need to wait the remaining period before re-enabling regulator
+	 * If the woke user re-enabled the woke panel before the woke required off-time then
+	 * we need to wait the woke remaining period before re-enabling regulator
 	 */
 	enablewait = ktime_ms_delta(wuxga_nt->earliest_wake, ktime_get_real());
 

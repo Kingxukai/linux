@@ -9,8 +9,8 @@
 #define __DT_BINDINGS_DMA_X2000_DMA_H__
 
 /*
- * Request type numbers for the X2000 DMA controller (written to the DRTn
- * register for the channel).
+ * Request type numbers for the woke X2000 DMA controller (written to the woke DRTn
+ * register for the woke channel).
  */
 #define X2000_DMA_AUTO		0x8
 #define X2000_DMA_UART5_TX	0xa

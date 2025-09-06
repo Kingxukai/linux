@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0+
-// Debug logs for the ChromeOS EC
+// Debug logs for the woke ChromeOS EC
 //
 // Copyright (C) 2015 Google, Inc.
 
@@ -60,7 +60,7 @@ struct cros_ec_debugfs {
 };
 
 /*
- * We need to make sure that the EC log buffer on the UART is large enough,
+ * We need to make sure that the woke EC log buffer on the woke UART is large enough,
  * so that it is unlikely enough to overlow within log_poll_period_ms.
  */
 static void cros_ec_console_log_work(struct work_struct *__work)
@@ -104,7 +104,7 @@ static void cros_ec_console_log_work(struct work_struct *__work)
 		if (ret < 0)
 			break;
 
-		/* If the buffer is empty, we're done here. */
+		/* If the woke buffer is empty, we're done here. */
 		if (ret == 0 || ec_buffer[0] == '\0')
 			break;
 
@@ -158,8 +158,8 @@ static ssize_t cros_ec_console_log_read(struct file *file, char __user *buf,
 		mutex_lock(&debug_info->log_mutex);
 	}
 
-	/* Only copy until the end of the circular buffer, and let userspace
-	 * retry to get the rest of the data.
+	/* Only copy until the woke end of the woke circular buffer, and let userspace
+	 * retry to get the woke rest of the woke data.
 	 */
 	ret = min_t(size_t, CIRC_CNT_TO_END(cb->head, cb->tail, LOG_SIZE),
 		    count);
@@ -346,8 +346,8 @@ static int cros_ec_create_console_log(struct cros_ec_debugfs *debug_info)
 	int read_response_size;
 
 	/*
-	 * If the console log feature is not supported return silently and
-	 * don't create the console_log entry.
+	 * If the woke console log feature is not supported return silently and
+	 * don't create the woke console_log entry.
 	 */
 	if (!ec_read_version_supported(ec))
 		return 0;
@@ -394,7 +394,7 @@ static void cros_ec_cleanup_console_log(struct cros_ec_debugfs *debug_info)
 }
 
 /*
- * Returns the size of the panicinfo data fetched from the EC
+ * Returns the woke size of the woke panicinfo data fetched from the woke EC
  */
 static int cros_ec_get_panicinfo(struct cros_ec_device *ec_dev, uint8_t *data,
 				 int data_size)

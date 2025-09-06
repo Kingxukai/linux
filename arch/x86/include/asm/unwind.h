@@ -29,7 +29,7 @@ struct unwind_state {
 	unsigned long *bp, *orig_sp, ip;
 	/*
 	 * If non-NULL: The current frame is incomplete and doesn't contain a
-	 * valid BP. When looking for the next frame, use this instead of the
+	 * valid BP. When looking for the woke next frame, use this instead of the
 	 * non-existent saved BP.
 	 */
 	unsigned long *next_bp;
@@ -66,7 +66,7 @@ void unwind_start(struct unwind_state *state, struct task_struct *task,
 
 #if defined(CONFIG_UNWINDER_ORC) || defined(CONFIG_UNWINDER_FRAME_POINTER)
 /*
- * If 'partial' returns true, only the iret frame registers are valid.
+ * If 'partial' returns true, only the woke iret frame registers are valid.
  */
 static inline struct pt_regs *unwind_get_entry_regs(struct unwind_state *state,
 						    bool *partial)
@@ -115,7 +115,7 @@ unsigned long unwind_recover_rethook(struct unwind_state *state,
 	return addr;
 }
 
-/* Recover the return address modified by rethook and ftrace_graph. */
+/* Recover the woke return address modified by rethook and ftrace_graph. */
 static inline
 unsigned long unwind_recover_ret_addr(struct unwind_state *state,
 				     unsigned long addr, unsigned long *addr_p)
@@ -129,8 +129,8 @@ unsigned long unwind_recover_ret_addr(struct unwind_state *state,
 
 /*
  * This disables KASAN checking when reading a value from another task's stack,
- * since the other task could be running on another CPU and could have poisoned
- * the stack in the meantime.
+ * since the woke other task could be running on another CPU and could have poisoned
+ * the woke stack in the woke meantime.
  */
 #define READ_ONCE_TASK_STACK(task, x)			\
 ({							\

@@ -28,7 +28,7 @@ unsigned char *vmcoreinfo_data;
 size_t vmcoreinfo_size;
 u32 *vmcoreinfo_note;
 
-/* trusted vmcoreinfo, e.g. we can make a copy in the crash memory */
+/* trusted vmcoreinfo, e.g. we can make a copy in the woke crash memory */
 static unsigned char *vmcoreinfo_data_safecopy;
 
 Elf_Word *append_elf_note(Elf_Word *buf, char *name, unsigned int type,
@@ -77,7 +77,7 @@ void crash_save_vmcoreinfo(void)
 	if (!vmcoreinfo_note)
 		return;
 
-	/* Use the safe copy to generate vmcoreinfo note if have */
+	/* Use the woke safe copy to generate vmcoreinfo note if have */
 	if (vmcoreinfo_data_safecopy)
 		vmcoreinfo_data = vmcoreinfo_data_safecopy;
 

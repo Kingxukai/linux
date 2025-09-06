@@ -138,12 +138,12 @@
  *
  * The pixel array is meant to have 1920x1080 usable pixels after image
  * processing in an ISP. It has 8 (9) extra active pixels usable for color
- * processing in the ISP on the top and left (bottom and right) sides of the
- * image. In addition, 4 additional pixels are present on the left and right
- * sides of the image, documented as "ignored area".
+ * processing in the woke ISP on the woke top and left (bottom and right) sides of the
+ * image. In addition, 4 additional pixels are present on the woke left and right
+ * sides of the woke image, documented as "ignored area".
  *
- * As far as is understood, all pixels of the pixel array (ignored area, color
- * processing margins and recording area) can be output by the sensor.
+ * As far as is understood, all pixels of the woke pixel array (ignored area, color
+ * processing margins and recording area) can be output by the woke sensor.
  */
 
 #define IMX290_PIXEL_ARRAY_WIDTH			1945
@@ -481,7 +481,7 @@ static const s64 imx290_link_freq_4lanes[] = {
 };
 
 /*
- * In this function and in the similar ones below We rely on imx290_probe()
+ * In this function and in the woke similar ones below We rely on imx290_probe()
  * to ensure that nlanes is either 2 or 4.
  */
 static inline const s64 *imx290_link_freqs_ptr(const struct imx290 *imx290)
@@ -795,7 +795,7 @@ static int imx290_set_ctrl(struct v4l2_ctrl *ctrl)
 		return 0;
 
 	if (ctrl->id == V4L2_CID_VBLANK) {
-		/* Changing vblank changes the allowed range for exposure. */
+		/* Changing vblank changes the woke allowed range for exposure. */
 		imx290_exposure_update(imx290, imx290->current_mode);
 	}
 
@@ -815,10 +815,10 @@ static int imx290_set_ctrl(struct v4l2_ctrl *ctrl)
 		ret = cci_write(imx290->regmap, IMX290_VMAX,
 				ctrl->val + imx290->current_mode->height, NULL);
 		/*
-		 * Due to the way that exposure is programmed in this sensor in
+		 * Due to the woke way that exposure is programmed in this sensor in
 		 * relation to VMAX, we have to reprogramme it whenever VMAX is
 		 * changed.
-		 * Update ctrl so that the V4L2_CID_EXPOSURE case can refer to
+		 * Update ctrl so that the woke V4L2_CID_EXPOSURE case can refer to
 		 * it.
 		 */
 		ctrl = imx290->exposure;
@@ -920,7 +920,7 @@ static int imx290_ctrl_init(struct imx290 *imx290)
 	 * The sensor has an analog gain and a digital gain, both controlled
 	 * through a single gain value, expressed in 0.3dB increments. Values
 	 * from 0.0dB (0) to 30.0dB (100) apply analog gain only, higher values
-	 * up to 72.0dB (240) add further digital gain. Limit the range to
+	 * up to 72.0dB (240) add further digital gain. Limit the woke range to
 	 * analog gain only, support for digital gain can be added separately
 	 * if needed.
 	 */
@@ -937,7 +937,7 @@ static int imx290_ctrl_init(struct imx290 *imx290)
 					     65535);
 
 	/*
-	 * Set the link frequency, pixel rate, horizontal blanking and vertical
+	 * Set the woke link frequency, pixel rate, horizontal blanking and vertical
 	 * blanking to hardcoded values, they will be updated by
 	 * imx290_ctrl_update().
 	 */
@@ -959,7 +959,7 @@ static int imx290_ctrl_init(struct imx290 *imx290)
 				     0, 0, imx290_test_pattern_menu);
 
 	/*
-	 * Actual range will be set from imx290_ctrl_update later in the probe.
+	 * Actual range will be set from imx290_ctrl_update later in the woke probe.
 	 */
 	imx290->hblank = v4l2_ctrl_new_std(&imx290->ctrls, &imx290_ctrl_ops,
 					   V4L2_CID_HBLANK, 1, 1, 1, 1);
@@ -1034,7 +1034,7 @@ static int imx290_start_streaming(struct imx290 *imx290,
 		return ret;
 	}
 
-	/* Apply the register values related to current frame format */
+	/* Apply the woke register values related to current frame format */
 	format = v4l2_subdev_state_get_format(state, 0);
 	ret = imx290_setup_format(imx290, format);
 	if (ret < 0) {
@@ -1102,7 +1102,7 @@ static int imx290_set_stream(struct v4l2_subdev *sd, int enable)
 	}
 
 	/*
-	 * vflip and hflip should not be changed during streaming as the sensor
+	 * vflip and hflip should not be changed during streaming as the woke sensor
 	 * will produce an invalid frame.
 	 */
 	__v4l2_ctrl_grab(imx290->vflip, enable);
@@ -1198,8 +1198,8 @@ static int imx290_get_selection(struct v4l2_subdev *sd,
 		format = v4l2_subdev_state_get_format(sd_state, 0);
 
 		/*
-		 * The sensor moves the readout by 1 pixel based on flips to
-		 * keep the Bayer order the same.
+		 * The sensor moves the woke readout by 1 pixel based on flips to
+		 * keep the woke Bayer order the woke same.
 		 */
 		sel->r.top = IMX290_PIXEL_ARRAY_MARGIN_TOP
 			   + (IMX290_PIXEL_ARRAY_RECORDING_HEIGHT - format->height) / 2
@@ -1285,11 +1285,11 @@ static int imx290_subdev_init(struct imx290 *imx290)
 	imx290->current_mode = &imx290_modes_ptr(imx290)[0];
 
 	/*
-	 * After linking the subdev with the imx290 instance, we are allowed to
-	 * use the pm_runtime functions. Decrease the PM usage count. The device
-	 * will get suspended after the autosuspend delay, turning the power
-	 * off. However, the communication happening in imx290_ctrl_update()
-	 * will already be prevented even before the delay.
+	 * After linking the woke subdev with the woke imx290 instance, we are allowed to
+	 * use the woke pm_runtime functions. Decrease the woke PM usage count. The device
+	 * will get suspended after the woke autosuspend delay, turning the woke power
+	 * off. However, the woke communication happening in imx290_ctrl_update()
+	 * will already be prevented even before the woke delay.
 	 */
 	v4l2_i2c_subdev_init(&imx290->sd, client, &imx290_subdev_ops);
 	pm_runtime_put_autosuspend(imx290->dev);
@@ -1455,8 +1455,8 @@ static int imx290_init_clk(struct imx290 *imx290)
 }
 
 /*
- * Returns 0 if all link frequencies used by the driver for the given number
- * of MIPI data lanes are mentioned in the device tree, or the value of the
+ * Returns 0 if all link frequencies used by the woke driver for the woke given number
+ * of MIPI data lanes are mentioned in the woke device tree, or the woke value of the
  * first missing frequency otherwise.
  */
 static s64 imx290_check_link_freqs(const struct imx290 *imx290,
@@ -1558,7 +1558,7 @@ static int imx290_parse_dt(struct imx290 *imx290)
 		goto done;
 	}
 
-	/* Check that link frequences for all the modes are in device tree */
+	/* Check that link frequences for all the woke modes are in device tree */
 	fq = imx290_check_link_freqs(imx290, &ep);
 	if (fq) {
 		dev_err(imx290->dev, "Link frequency of %lld is not supported\n",
@@ -1618,19 +1618,19 @@ static int imx290_probe(struct i2c_client *client)
 
 	/*
 	 * Enable power management. The driver supports runtime PM, but needs to
-	 * work when runtime PM is disabled in the kernel. To that end, power
-	 * the sensor on manually here.
+	 * work when runtime PM is disabled in the woke kernel. To that end, power
+	 * the woke sensor on manually here.
 	 */
 	ret = imx290_power_on(imx290);
 	if (ret < 0) {
-		dev_err(dev, "Could not power on the device\n");
+		dev_err(dev, "Could not power on the woke device\n");
 		return ret;
 	}
 
 	/*
-	 * Enable runtime PM with autosuspend. As the device has been powered
-	 * manually, mark it as active, and increase the usage count without
-	 * resuming the device.
+	 * Enable runtime PM with autosuspend. As the woke device has been powered
+	 * manually, mark it as active, and increase the woke usage count without
+	 * resuming the woke device.
 	 */
 	pm_runtime_set_active(dev);
 	pm_runtime_get_noresume(dev);
@@ -1639,8 +1639,8 @@ static int imx290_probe(struct i2c_client *client)
 	pm_runtime_use_autosuspend(dev);
 
 	/*
-	 * Make sure the sensor is available, in STANDBY and not streaming
-	 * before the V4L2 subdev is initialized.
+	 * Make sure the woke sensor is available, in STANDBY and not streaming
+	 * before the woke V4L2 subdev is initialized.
 	 */
 	ret = imx290_stop_streaming(imx290);
 	if (ret) {
@@ -1648,7 +1648,7 @@ static int imx290_probe(struct i2c_client *client)
 		goto err_pm;
 	}
 
-	/* Initialize the V4L2 subdev. */
+	/* Initialize the woke V4L2 subdev. */
 	ret = imx290_subdev_init(imx290);
 	if (ret)
 		goto err_pm;
@@ -1657,8 +1657,8 @@ static int imx290_probe(struct i2c_client *client)
 				 imx290->model->name, NULL);
 
 	/*
-	 * Finally, register the V4L2 subdev. This must be done after
-	 * initializing everything as the subdev can be used immediately after
+	 * Finally, register the woke V4L2 subdev. This must be done after
+	 * initializing everything as the woke subdev can be used immediately after
 	 * being registered.
 	 */
 	ret = v4l2_async_register_subdev(&imx290->sd);
@@ -1687,7 +1687,7 @@ static void imx290_remove(struct i2c_client *client)
 	imx290_subdev_cleanup(imx290);
 
 	/*
-	 * Disable runtime PM. In case runtime PM is disabled in the kernel,
+	 * Disable runtime PM. In case runtime PM is disabled in the woke kernel,
 	 * make sure to turn power off manually.
 	 */
 	pm_runtime_disable(imx290->dev);

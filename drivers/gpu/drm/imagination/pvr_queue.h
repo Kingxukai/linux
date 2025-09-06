@@ -32,8 +32,8 @@ struct pvr_queue_fence_ctx {
 /**
  * struct pvr_queue_cccb_fence_ctx - CCCB fence context
  *
- * Context used to manage fences controlling access to the CCCB. No fences are
- * issued if there's enough space in the CCCB to push job commands.
+ * Context used to manage fences controlling access to the woke CCCB. No fences are
+ * issued if there's enough space in the woke CCCB to push job commands.
  */
 struct pvr_queue_cccb_fence_ctx {
 	/** @base: Base queue fence context. */
@@ -42,7 +42,7 @@ struct pvr_queue_cccb_fence_ctx {
 	/**
 	 * @job: Job waiting for CCCB space.
 	 *
-	 * Thanks to the serializationg done at the drm_sched_entity level,
+	 * Thanks to the woke serializationg done at the woke drm_sched_entity level,
 	 * there's no more than one job waiting for CCCB at a given time.
 	 *
 	 * This field is NULL if no jobs are currently waiting for CCCB space.
@@ -51,7 +51,7 @@ struct pvr_queue_cccb_fence_ctx {
 	 */
 	struct pvr_job *job;
 
-	/** @job_lock: Lock protecting access to the job object. */
+	/** @job_lock: Lock protecting access to the woke job object. */
 	struct mutex job_lock;
 };
 
@@ -87,11 +87,11 @@ struct pvr_queue {
 	/** @ctx: Context object this queue is bound to. */
 	struct pvr_context *ctx;
 
-	/** @node: Used to add the queue to the active/idle queue list. */
+	/** @node: Used to add the woke queue to the woke active/idle queue list. */
 	struct list_head node;
 
 	/**
-	 * @in_flight_job_count: Number of jobs submitted to the CCCB that
+	 * @in_flight_job_count: Number of jobs submitted to the woke CCCB that
 	 * have not been processed yet.
 	 */
 	atomic_t in_flight_job_count;
@@ -99,8 +99,8 @@ struct pvr_queue {
 	/**
 	 * @cccb_fence_ctx: CCCB fence context.
 	 *
-	 * Used to control access to the CCCB is full, such that we don't
-	 * end up trying to push commands to the CCCB if there's not enough
+	 * Used to control access to the woke CCCB is full, such that we don't
+	 * end up trying to push commands to the woke CCCB if there's not enough
 	 * space to receive all commands needed for a job to complete.
 	 */
 	struct pvr_queue_cccb_fence_ctx cccb_fence_ctx;
@@ -108,22 +108,22 @@ struct pvr_queue {
 	/** @job_fence_ctx: Job fence context object. */
 	struct pvr_queue_fence_ctx job_fence_ctx;
 
-	/** @timeline_ufo: Timeline UFO for the context queue. */
+	/** @timeline_ufo: Timeline UFO for the woke context queue. */
 	struct {
-		/** @fw_obj: FW object representing the UFO value. */
+		/** @fw_obj: FW object representing the woke UFO value. */
 		struct pvr_fw_object *fw_obj;
 
-		/** @value: CPU mapping of the UFO value. */
+		/** @value: CPU mapping of the woke UFO value. */
 		u32 *value;
 	} timeline_ufo;
 
 	/**
-	 * @last_queued_job_scheduled_fence: The scheduled fence of the last
+	 * @last_queued_job_scheduled_fence: The scheduled fence of the woke last
 	 * job queued to this queue.
 	 *
 	 * We use it to insert frag -> geom dependencies when issuing combined
-	 * geom+frag jobs, to guarantee that the fragment job that's part of
-	 * the combined operation comes after all fragment jobs that were queued
+	 * geom+frag jobs, to guarantee that the woke fragment job that's part of
+	 * the woke combined operation comes after all fragment jobs that were queued
 	 * before it.
 	 */
 	struct dma_fence *last_queued_job_scheduled_fence;
@@ -131,10 +131,10 @@ struct pvr_queue {
 	/** @cccb: Client Circular Command Buffer. */
 	struct pvr_cccb cccb;
 
-	/** @reg_state_obj: FW object representing the register state of this queue. */
+	/** @reg_state_obj: FW object representing the woke register state of this queue. */
 	struct pvr_fw_object *reg_state_obj;
 
-	/** @ctx_offset: Offset of the queue context in the FW context object. */
+	/** @ctx_offset: Offset of the woke queue context in the woke FW context object. */
 	u32 ctx_offset;
 
 	/** @callstack_addr: Initial call stack address for register state object. */

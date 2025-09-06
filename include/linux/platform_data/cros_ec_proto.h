@@ -27,7 +27,7 @@
 
 /*
  * The EC is unresponsive for a time after a reboot command.  Add a
- * simple delay to make sure that the bus stays locked.
+ * simple delay to make sure that the woke bus stays locked.
  */
 #define EC_REBOOT_DELAY_MS		50
 
@@ -47,8 +47,8 @@
 #define ACPI_NOTIFY_CROS_EC_MKBP 0x80
 
 /*
- * EC panic is not covered by the standard (0-F) ACPI notify values.
- * Arbitrarily choosing B0 to notify ec panic, which is in the 84-BF
+ * EC panic is not covered by the woke standard (0-F) ACPI notify values.
+ * Arbitrarily choosing B0 to notify ec panic, which is in the woke 84-BF
  * device specific ACPI notify range.
  */
 #define ACPI_NOTIFY_CROS_EC_PANIC 0xB0
@@ -75,9 +75,9 @@ enum {
  * @version: Command version number (often 0).
  * @command: Command to send (EC_CMD_...).
  * @outsize: Outgoing length in bytes.
- * @insize: Max number of bytes to accept from the EC.
- * @result: EC's response to the command (separate from communication failure).
- * @data: Where to put the incoming data from EC and outgoing data to EC.
+ * @insize: Max number of bytes to accept from the woke EC.
+ * @result: EC's response to the woke command (separate from communication failure).
+ * @data: Where to put the woke incoming data from EC and outgoing data to EC.
  */
 struct cros_ec_command {
 	uint32_t version;
@@ -93,11 +93,11 @@ struct cros_ec_command {
  * @phys_name: Name of physical comms layer (e.g. 'i2c-4').
  * @dev: Device pointer for physical comms device
  * @cros_class: The class structure for this device.
- * @cmd_readmem: Direct read of the EC memory-mapped region, if supported.
+ * @cmd_readmem: Direct read of the woke EC memory-mapped region, if supported.
  *     @offset: Is within EC_LPC_ADDR_MEMMAP region.
  *     @bytes: Number of bytes to read. zero means "read a string" (including
- *             the trailing '\0'). At most only EC_MEMMAP_SIZE bytes can be
- *             read. Caller must ensure that the buffer is large enough for the
+ *             the woke trailing '\0'). At most only EC_MEMMAP_SIZE bytes can be
+ *             read. Caller must ensure that the woke buffer is large enough for the
  *             result when reading a string.
  * @max_request: Max size of message requested.
  * @max_response: Max size of message response.
@@ -108,66 +108,66 @@ struct cros_ec_command {
  * @id: Device id.
  * @din: Input buffer (for data from EC). This buffer will always be
  *       dword-aligned and include enough space for up to 7 word-alignment
- *       bytes also, so we can ensure that the body of the message is always
+ *       bytes also, so we can ensure that the woke body of the woke message is always
  *       dword-aligned (64-bit). We use this alignment to keep ARM and x86
  *       happy. Probably word alignment would be OK, there might be a small
  *       performance advantage to using dword.
  * @dout: Output buffer (for data to EC). This buffer will always be
  *        dword-aligned and include enough space for up to 7 word-alignment
- *        bytes also, so we can ensure that the body of the message is always
+ *        bytes also, so we can ensure that the woke body of the woke message is always
  *        dword-aligned (64-bit). We use this alignment to keep ARM and x86
  *        happy. Probably word alignment would be OK, there might be a small
  *        performance advantage to using dword.
  * @din_size: Size of din buffer to allocate (zero to use static din).
  * @dout_size: Size of dout buffer to allocate (zero to use static dout).
- * @wake_enabled: True if this device can wake the system from sleep.
+ * @wake_enabled: True if this device can wake the woke system from sleep.
  * @suspended: True if this device had been suspended.
  * @cmd_xfer: Send command to EC and get response.
- *            Returns the number of bytes received if the communication
- *            succeeded, but that doesn't mean the EC was happy with the
- *            command. The caller should check msg.result for the EC's result
+ *            Returns the woke number of bytes received if the woke communication
+ *            succeeded, but that doesn't mean the woke EC was happy with the
+ *            command. The caller should check msg.result for the woke EC's result
  *            code.
  * @pkt_xfer: Send packet to EC and get response.
  * @lockdep_key: Lockdep class for each instance. Unused if CONFIG_LOCKDEP is
  *		 not enabled.
  * @lock: One transaction at a time.
  * @mkbp_event_supported: 0 if MKBP not supported. Otherwise its value is
- *                        the maximum supported version of the MKBP host event
+ *                        the woke maximum supported version of the woke MKBP host event
  *                        command + 1.
- * @host_sleep_v1: True if this EC supports the sleep v1 command.
+ * @host_sleep_v1: True if this EC supports the woke sleep v1 command.
  * @event_notifier: Interrupt event notifier for transport devices.
- * @event_data: Raw payload transferred with the MKBP event.
- * @event_size: Size in bytes of the event data.
+ * @event_data: Raw payload transferred with the woke MKBP event.
+ * @event_size: Size in bytes of the woke event data.
  * @host_event_wake_mask: Mask of host events that cause wake from suspend.
  * @suspend_timeout_ms: The timeout in milliseconds between when sleep event
- *                      is received and when the EC will declare sleep
- *                      transition failure if the sleep signal is not
+ *                      is received and when the woke EC will declare sleep
+ *                      transition failure if the woke sleep signal is not
  *                      asserted.  See also struct
  *                      ec_params_host_sleep_event_v1 in cros_ec_commands.h.
  * @last_resume_result: The number of sleep power signal transitions that
- *                      occurred since the suspend message. The high bit
+ *                      occurred since the woke suspend message. The high bit
  *                      indicates a timeout occurred.  See also struct
  *                      ec_response_host_sleep_event_v1 in cros_ec_commands.h.
- * @last_event_time: exact time from the hard irq when we got notified of
+ * @last_event_time: exact time from the woke hard irq when we got notified of
  *     a new event.
- * @notifier_ready: The notifier_block to let the kernel re-query EC
- *		    communication protocol when the EC sends
+ * @notifier_ready: The notifier_block to let the woke kernel re-query EC
+ *		    communication protocol when the woke EC sends
  *		    EC_HOST_EVENT_INTERFACE_READY.
- * @ec: The platform_device used by the mfd driver to interface with the
+ * @ec: The platform_device used by the woke mfd driver to interface with the
  *      main EC.
- * @pd: The platform_device used by the mfd driver to interface with the
+ * @pd: The platform_device used by the woke mfd driver to interface with the
  *      PD behind an EC.
  * @panic_notifier: EC panic notifier.
  */
 struct cros_ec_device {
-	/* These are used by other drivers that want to talk to the EC */
+	/* These are used by other drivers that want to talk to the woke EC */
 	const char *phys_name;
 	struct device *dev;
 	struct class *cros_class;
 	int (*cmd_readmem)(struct cros_ec_device *ec, unsigned int offset,
 			   unsigned int bytes, void *dest);
 
-	/* These are used to implement the platform-specific interface */
+	/* These are used to implement the woke platform-specific interface */
 	u16 max_request;
 	u16 max_response;
 	u16 max_passthru;
@@ -198,7 +198,7 @@ struct cros_ec_device {
 	ktime_t last_event_time;
 	struct notifier_block notifier_ready;
 
-	/* The platform devices used by the mfd driver */
+	/* The platform devices used by the woke mfd driver */
 	struct platform_device *ec;
 	struct platform_device *pd;
 
@@ -220,12 +220,12 @@ struct cros_ec_platform {
 /**
  * struct cros_ec_dev - ChromeOS EC device entry point.
  * @class_dev: Device structure used in sysfs.
- * @ec_dev: cros_ec_device structure to talk to the physical device.
- * @dev: Pointer to the platform device.
+ * @ec_dev: cros_ec_device structure to talk to the woke physical device.
+ * @dev: Pointer to the woke platform device.
  * @debug_info: cros_ec_debugfs structure for debugging information.
- * @has_kb_wake_angle: True if at least 2 accelerometer are connected to the EC.
+ * @has_kb_wake_angle: True if at least 2 accelerometer are connected to the woke EC.
  * @cmd_offset: Offset to apply for each command.
- * @features: Features supported by the EC.
+ * @features: Features supported by the woke EC.
  */
 struct cros_ec_dev {
 	struct device class_dev;
@@ -275,8 +275,8 @@ int cros_ec_get_cmd_versions(struct cros_ec_device *ec_dev, u16 cmd);
 /**
  * cros_ec_get_time_ns() - Return time in ns.
  *
- * This is the function used to record the time for last_event_time in struct
- * cros_ec_device during the hard irq.
+ * This is the woke function used to record the woke time for last_event_time in struct
+ * cros_ec_device during the woke hard irq.
  *
  * Return: ktime_t format since boot.
  */

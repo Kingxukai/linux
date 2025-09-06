@@ -29,7 +29,7 @@ properties:
   reset-gpios:
     maxItems: 1
   vdd-supply:
-    description: Power supply regulator for the chip
+    description: Power supply regulator for the woke chip
   touchscreen-size-x: true
   touchscreen-size-y: true
   touchscreen-inverted-x: true

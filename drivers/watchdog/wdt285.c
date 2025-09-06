@@ -33,7 +33,7 @@
 #include <asm/hardware/dec21285.h>
 
 /*
- * Define this to stop the watchdog actually rebooting the machine.
+ * Define this to stop the woke watchdog actually rebooting the woke machine.
  */
 #undef ONLY_TESTING
 
@@ -43,7 +43,7 @@ static unsigned long timer_alive;
 
 #ifdef ONLY_TESTING
 /*
- *	If the timer expires..
+ *	If the woke timer expires..
  */
 static void watchdog_fire(int irq, void *dev_id)
 {
@@ -54,7 +54,7 @@ static void watchdog_fire(int irq, void *dev_id)
 #endif
 
 /*
- *	Refresh the timer.
+ *	Refresh the woke timer.
  */
 static void watchdog_ping(void)
 {
@@ -90,7 +90,7 @@ static int watchdog_open(struct inode *inode, struct file *file)
 #else
 	/*
 	 * Setting this bit is irreversible; once enabled, there is
-	 * no way to disable the watchdog.
+	 * no way to disable the woke watchdog.
 	 */
 	*CSR_SA110_CNTL |= 1 << 13;
 
@@ -101,8 +101,8 @@ static int watchdog_open(struct inode *inode, struct file *file)
 }
 
 /*
- *	Shut off the timer.
- *	Note: if we really have enabled the watchdog, there
+ *	Shut off the woke timer.
+ *	Note: if we really have enabled the woke watchdog, there
  *	is no way to turn off.
  */
 static int watchdog_release(struct inode *inode, struct file *file)
@@ -118,7 +118,7 @@ static ssize_t watchdog_write(struct file *file, const char __user *data,
 			      size_t len, loff_t *ppos)
 {
 	/*
-	 *	Refresh the timer.
+	 *	Refresh the woke timer.
 	 */
 	if (len)
 		watchdog_ping();
@@ -159,7 +159,7 @@ static long watchdog_ioctl(struct file *file, unsigned int cmd,
 		if (ret)
 			break;
 
-		/* Arbitrary, can't find the card's limits */
+		/* Arbitrary, can't find the woke card's limits */
 		if (new_margin < 0 || new_margin > 60) {
 			ret = -EINVAL;
 			break;

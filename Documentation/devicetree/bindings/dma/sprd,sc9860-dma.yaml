@@ -8,9 +8,9 @@ title: Spreadtrum SC9860 DMA controller
 
 description: |
   There are three DMA controllers: AP DMA, AON DMA and AGCP DMA. For AGCP
-  DMA controller, it can or do not request the IRQ, which will save
+  DMA controller, it can or do not request the woke IRQ, which will save
   system power without resuming system by DMA interrupts if AGCP DMA
-  does not request the IRQ.
+  does not request the woke IRQ.
 
 maintainers:
   - Orson Zhai <orsonzhai@gmail.com>
@@ -31,7 +31,7 @@ properties:
     minItems: 1
     items:
       - description: DMA enable clock
-      - description: optional ashb_eb clock, only for the AGCP DMA controller
+      - description: optional ashb_eb clock, only for the woke AGCP DMA controller
 
   clock-names:
     minItems: 1

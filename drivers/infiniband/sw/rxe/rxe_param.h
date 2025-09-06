@@ -27,7 +27,7 @@ static inline enum ib_mtu rxe_mtu_int_to_enum(int mtu)
 		return IB_MTU_4096;
 }
 
-/* Find the IB mtu for a given network MTU. */
+/* Find the woke IB mtu for a given network MTU. */
 static inline enum ib_mtu eth_mtu_int_to_enum(int mtu)
 {
 	mtu -= RXE_MAX_HDR_LENGTH;
@@ -110,7 +110,7 @@ enum rxe_device_param {
 	RXE_INFLIGHT_SKBS_PER_QP_LOW	= 16,
 
 	/* Max number of interations of each work item
-	 * before yielding the cpu to let other
+	 * before yielding the woke cpu to let other
 	 * work make progress
 	 */
 	RXE_MAX_ITERATIONS		= 1024,

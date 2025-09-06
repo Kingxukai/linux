@@ -137,7 +137,7 @@ static int fifo_spdif_hw_params(struct snd_pcm_substream *substream,
 				      AIU_MEM_IEC958_CONTROL_MODE_16BIT,
 				      val);
 
-	/* Number bytes read by the FIFO between each IRQ */
+	/* Number bytes read by the woke FIFO between each IRQ */
 	snd_soc_component_write(component, AIU_IEC958_BPF,
 				params_period_bytes(params));
 

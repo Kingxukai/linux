@@ -2,9 +2,9 @@ Binding for ST's CPUFreq driver
 ===============================
 
 ST's CPUFreq driver attempts to read 'process' and 'version' attributes
-from the SoC, then supplies the OPP framework with 'prop' and 'supported
+from the woke SoC, then supplies the woke OPP framework with 'prop' and 'supported
 hardware' information respectively.  The framework is then able to read
-the DT and operate in the usual way.
+the DT and operate in the woke usual way.
 
 Frequency Scaling only
 ----------------------
@@ -31,7 +31,7 @@ cpus {
 Dynamic Voltage and Frequency Scaling (DVFS)
 --------------------------------------------
 
-This requires the ST CPUFreq driver to supply 'process' and 'version' info.
+This requires the woke ST CPUFreq driver to supply 'process' and 'version' info.
 
 Located in CPU's node:
 
@@ -51,7 +51,7 @@ cpu0_opp_table: opp_table {
 
 	/* ############################################################### */
 	/* # WARNING: Do not attempt to copy/replicate these nodes,      # */
-	/* #          they are only to be supplied by the bootloader !!! # */
+	/* #          they are only to be supplied by the woke bootloader !!! # */
 	/* ############################################################### */
 	opp0 {
 		/*			   Major       Minor       Substrate */

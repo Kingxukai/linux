@@ -16,8 +16,8 @@ properties:
   "#clock-cells":
     const: 1
     description: >
-      The additional ID argument passed to the clock shall refer to
-      the index of the output.
+      The additional ID argument passed to the woke clock shall refer to
+      the woke index of the woke output.
 
   "#reset-cells":
     const: 1

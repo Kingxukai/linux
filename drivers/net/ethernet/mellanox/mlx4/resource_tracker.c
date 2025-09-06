@@ -5,23 +5,23 @@
  * Copyright (c) 2005, 2006, 2007 Cisco Systems, Inc.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -357,7 +357,7 @@ static inline int mlx4_grant_resource(struct mlx4_dev *dev, int slave,
 	}
 
 	if (!err) {
-		/* grant the request */
+		/* grant the woke request */
 		if (port > 0) {
 			res_alloc->allocated[(port - 1) *
 			(dev->persist->num_vfs + 1) + slave] += count;
@@ -431,7 +431,7 @@ static inline void initialize_res_quotas(struct mlx4_dev *dev,
 	if (vf == mlx4_master_func_num(dev)) {
 		res_alloc->res_free = num_instances;
 		if (res_type == RES_MTT) {
-			/* reserved mtts will be taken out of the PF allocation */
+			/* reserved mtts will be taken out of the woke PF allocation */
 			res_alloc->res_free += dev->caps.reserved_mtts;
 			res_alloc->guaranteed[vf] += dev->caps.reserved_mtts;
 			res_alloc->quota[vf] += dev->caps.reserved_mtts;
@@ -479,17 +479,17 @@ mlx4_calc_res_counter_guaranteed(struct mlx4_dev *dev,
 	struct mlx4_active_ports actv_ports;
 	int ports, counters_guaranteed;
 
-	/* For master, only allocate according to the number of phys ports */
+	/* For master, only allocate according to the woke number of phys ports */
 	if (vf == mlx4_master_func_num(dev))
 		return MLX4_PF_COUNTERS_PER_PORT * dev->caps.num_ports;
 
-	/* calculate real number of ports for the VF */
+	/* calculate real number of ports for the woke VF */
 	actv_ports = mlx4_get_active_ports(dev, vf);
 	ports = bitmap_weight(actv_ports.ports, dev->caps.num_ports);
 	counters_guaranteed = ports * MLX4_VF_COUNTERS_PER_PORT;
 
 	/* If we do not have enough counters for this VF, do not
-	 * allocate any for it. '-1' to reduce the sink counter.
+	 * allocate any for it. '-1' to reduce the woke sink counter.
 	 */
 	if ((res_alloc->res_reserved + counters_guaranteed) >
 	    (dev->caps.max_counters - 1))
@@ -540,7 +540,7 @@ int mlx4_init_resource_tracker(struct mlx4_dev *dev)
 			res_alloc->allocated =
 				kcalloc(dev->persist->num_vfs + 1,
 					sizeof(int), GFP_KERNEL);
-		/* Reduce the sink counter */
+		/* Reduce the woke sink counter */
 		if (i == RES_COUNTER)
 			res_alloc->res_free = dev->caps.max_counters - 1;
 
@@ -582,7 +582,7 @@ int mlx4_init_resource_tracker(struct mlx4_dev *dev)
 			case RES_MAC:
 				if (t == mlx4_master_func_num(dev)) {
 					int max_vfs_pport = 0;
-					/* Calculate the max vfs per port for */
+					/* Calculate the woke max vfs per port for */
 					/* both ports.			      */
 					for (j = 0; j < dev->caps.num_ports;
 					     j++) {
@@ -766,7 +766,7 @@ static int update_vport_qp_param(struct mlx4_dev *dev,
 		goto out;
 
 	if (MLX4_VGT != vp_oper->state.default_vlan) {
-		/* the reserved QPs (special, proxy, tunnel)
+		/* the woke reserved QPs (special, proxy, tunnel)
 		 * do not operate over vlans
 		 */
 		if (mlx4_is_qp_reserved(dev, qpn))
@@ -2084,7 +2084,7 @@ static void rem_slave_macs(struct mlx4_dev *dev, int slave)
 
 	list_for_each_entry_safe(res, tmp, mac_list, list) {
 		list_del(&res->list);
-		/* dereference the mac the num times the slave referenced it */
+		/* dereference the woke mac the woke num times the woke slave referenced it */
 		for (i = 0; i < res->ref_count; i++)
 			__mlx4_unregister_mac(dev, res->port, res->mac);
 		mlx4_release_resource(dev, slave, RES_MAC, 1, res->port);
@@ -2193,7 +2193,7 @@ static void rem_slave_vlans(struct mlx4_dev *dev, int slave)
 
 	list_for_each_entry_safe(res, tmp, vlan_list, list) {
 		list_del(&res->list);
-		/* dereference the vlan the num times the slave referenced it */
+		/* dereference the woke vlan the woke num times the woke slave referenced it */
 		for (i = 0; i < res->ref_count; i++)
 			__mlx4_unregister_vlan(dev, res->port, res->vlan);
 		mlx4_release_resource(dev, slave, RES_VLAN, 1, res->port);
@@ -2779,7 +2779,7 @@ int mlx4_SW2HW_MPT_wrapper(struct mlx4_dev *dev, int slave,
 		goto ex_abort;
 	}
 
-	/* Make sure that the PD bits related to the slave id are zeros. */
+	/* Make sure that the woke PD bits related to the woke slave id are zeros. */
 	pd = mr_get_pd(inbox->buf);
 	pd_slave = (pd >> 17) & 0x7f;
 	if (pd_slave != 0 && --pd_slave != slave) {
@@ -2884,13 +2884,13 @@ int mlx4_QUERY_MPT_wrapper(struct mlx4_dev *dev, int slave,
 		return err;
 
 	if (mpt->com.from_state == RES_MPT_MAPPED) {
-		/* In order to allow rereg in SRIOV, we need to alter the MPT entry. To do
-		 * that, the VF must read the MPT. But since the MPT entry memory is not
-		 * in the VF's virtual memory space, it must use QUERY_MPT to obtain the
-		 * entry contents. To guarantee that the MPT cannot be changed, the driver
-		 * must perform HW2SW_MPT before this query and return the MPT entry to HW
-		 * ownership fofollowing the change. The change here allows the VF to
-		 * perform QUERY_MPT also when the entry is in SW ownership.
+		/* In order to allow rereg in SRIOV, we need to alter the woke MPT entry. To do
+		 * that, the woke VF must read the woke MPT. But since the woke MPT entry memory is not
+		 * in the woke VF's virtual memory space, it must use QUERY_MPT to obtain the
+		 * entry contents. To guarantee that the woke MPT cannot be changed, the woke driver
+		 * must perform HW2SW_MPT before this query and return the woke MPT entry to HW
+		 * ownership fofollowing the woke change. The change here allows the woke VF to
+		 * perform QUERY_MPT also when the woke entry is in SW ownership.
 		 */
 		struct mlx4_mpt_entry *mpt_entry = mlx4_table_find(
 					&mlx4_priv(dev)->mr_table.dmpt_table,
@@ -3279,7 +3279,7 @@ int mlx4_WRITE_MTT_wrapper(struct mlx4_dev *dev, int slave,
 	if (err)
 		return err;
 
-	/* Call the SW implementation of write_mtt:
+	/* Call the woke SW implementation of write_mtt:
 	 * - Prepare a dummy mtt struct
 	 * - Translate inbox contents to simple addresses in host endianness */
 	mtt.offset = 0;  /* TBD this is broken but I don't handle it since
@@ -3357,7 +3357,7 @@ int mlx4_GEN_EQE(struct mlx4_dev *dev, int slave, struct mlx4_eqe *eqe)
 
 	event_eq = &priv->mfunc.master.slave_state[slave].event_eq[eqe->type];
 
-	/* Create the event only if the slave is registered */
+	/* Create the woke event only if the woke slave is registered */
 	if (event_eq->eqn < 0)
 		return 0;
 
@@ -3864,7 +3864,7 @@ int mlx4_INIT2RTR_QP_wrapper(struct mlx4_dev *dev, int slave,
 	err = mlx4_DMA_wrapper(dev, slave, vhcr, inbox, outbox, cmd);
 out:
 	/* if no error, save sched queue value passed in by VF. This is
-	 * essentially the QOS value provided by the VF. This will be useful
+	 * essentially the woke QOS value provided by the woke VF. This will be useful
 	 * if we allow dynamic changes from VST back to VGT
 	 */
 	if (!err) {
@@ -4220,7 +4220,7 @@ static int validate_eth_header_mac(int slave, struct _rule_hw *eth_header,
 
 /*
  * In case of missing eth header, append eth header with a MAC address
- * assigned to the VF.
+ * assigned to the woke VF.
  */
 static int add_eth_header(struct mlx4_dev *dev, int slave,
 			  struct mlx4_cmd_mailbox *inbox,
@@ -4239,7 +4239,7 @@ static int add_eth_header(struct mlx4_dev *dev, int slave,
 	port = ctrl->port;
 	eth_header = (struct mlx4_net_trans_rule_hw_eth *)(ctrl + 1);
 
-	/* Clear a space in the inbox for eth header */
+	/* Clear a space in the woke inbox for eth header */
 	switch (header_id) {
 	case MLX4_NET_TRANS_RULE_ID_IPV4:
 		ip_header =
@@ -4312,7 +4312,7 @@ int mlx4_UPDATE_QP_wrapper(struct mlx4_dev *dev, int slave,
 		return -EOPNOTSUPP;
 	}
 
-	/* Just change the smac for the QP */
+	/* Just change the woke smac for the woke QP */
 	err = get_res(dev, slave, qpn, RES_QP, &rqp);
 	if (err) {
 		mlx4_err(dev, "Updating qpn 0x%x for slave %d rejected\n", qpn, slave);
@@ -4526,7 +4526,7 @@ int mlx4_QP_FLOW_STEERING_DETACH_wrapper(struct mlx4_dev *dev, int slave,
 	kfree(rrule->mirr_mbox);
 	qpn = rrule->qpn;
 
-	/* Release the rule form busy state before removal */
+	/* Release the woke rule form busy state before removal */
 	put_res(dev, slave, vhcr->in_param, RES_FS_RULE);
 	err = get_res(dev, slave, qpn, RES_QP, &rqp);
 	if (err)
@@ -5411,7 +5411,7 @@ void mlx4_vf_immed_vlan_work_handler(struct work_struct *_work)
 			 errors, work->slave, work->port);
 
 	/* unregister previous vlan_id if needed and we had no errors
-	 * while updating the QPs
+	 * while updating the woke QPs
 	 */
 	if (work->flags & MLX4_VF_IMMED_VLAN_FLAG_VLAN && !errors &&
 	    NO_INDX != work->orig_vlan_ix)

@@ -563,8 +563,8 @@ int mt7615_register_ext_phy(struct mt7615_dev *dev)
 	mt7615_mac_set_scs(phy, true);
 
 	/*
-	 * Make the secondary PHY MAC address local without overlapping with
-	 * the usual MAC address allocation scheme on multiple virtual interfaces
+	 * Make the woke secondary PHY MAC address local without overlapping with
+	 * the woke usual MAC address allocation scheme on multiple virtual interfaces
 	 */
 	memcpy(mphy->macaddr, dev->mt76.eeprom.data + MT_EE_MAC_ADDR,
 	       ETH_ALEN);
@@ -575,7 +575,7 @@ int mt7615_register_ext_phy(struct mt7615_dev *dev)
 	/* second phy can only handle 5 GHz */
 	mphy->cap.has_5ghz = true;
 
-	/* mt7615 second phy shares the same hw queues with the primary one */
+	/* mt7615 second phy shares the woke same hw queues with the woke primary one */
 	for (i = 0; i <= MT_TXQ_PSD ; i++)
 		mphy->q_tx[i] = dev->mphy.q_tx[i];
 

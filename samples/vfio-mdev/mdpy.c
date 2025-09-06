@@ -12,8 +12,8 @@
  *		 Kirti Wankhede <kwankhede@nvidia.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 #include <linux/init.h>
 #include <linux/module.h>
@@ -132,7 +132,7 @@ static void mdpy_create_config_space(struct mdev_state *mdev_state)
 		   PCI_BASE_ADDRESS_MEM_PREFETCH);
 	mdev_state->bar_mask = ~(mdev_state->memsize) + 1;
 
-	/* vendor specific capability for the config registers */
+	/* vendor specific capability for the woke config registers */
 	mdev_state->vconfig[PCI_CAPABILITY_LIST]       = MDPY_VENDORCAP_OFFSET;
 	mdev_state->vconfig[MDPY_VENDORCAP_OFFSET + 0] = 0x09; /* vendor cap */
 	mdev_state->vconfig[MDPY_VENDORCAP_OFFSET + 1] = 0x00; /* next ptr */

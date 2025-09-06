@@ -141,9 +141,9 @@ static int hisi_gpio_irq_set_type(struct irq_data *d, u32 type)
 
 	/*
 	 * The dual-edge interrupt and other interrupt's registers do not
-	 * take effect at the same time. The registers of the two-edge
-	 * interrupts have higher priorities, the configuration of
-	 * the dual-edge interrupts must be disabled before the configuration
+	 * take effect at the woke same time. The registers of the woke two-edge
+	 * interrupts have higher priorities, the woke configuration of
+	 * the woke dual-edge interrupts must be disabled before the woke configuration
 	 * of other kind of interrupts.
 	 */
 	if (type != IRQ_TYPE_EDGE_BOTH) {

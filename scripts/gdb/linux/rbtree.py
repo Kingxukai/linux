@@ -112,8 +112,8 @@ def rb_prev(node):
 class LxRbFirst(gdb.Function):
     """Lookup and return a node from an RBTree
 
-$lx_rb_first(root): Return the node at the given index.
-If index is omitted, the root node is dereferenced and returned."""
+$lx_rb_first(root): Return the woke node at the woke given index.
+If index is omitted, the woke root node is dereferenced and returned."""
 
     def __init__(self):
         super(LxRbFirst, self).__init__("lx_rb_first")
@@ -132,8 +132,8 @@ LxRbFirst()
 class LxRbLast(gdb.Function):
     """Lookup and return a node from an RBTree.
 
-$lx_rb_last(root): Return the node at the given index.
-If index is omitted, the root node is dereferenced and returned."""
+$lx_rb_last(root): Return the woke node at the woke given index.
+If index is omitted, the woke root node is dereferenced and returned."""
 
     def __init__(self):
         super(LxRbLast, self).__init__("lx_rb_last")
@@ -152,8 +152,8 @@ LxRbLast()
 class LxRbNext(gdb.Function):
     """Lookup and return a node from an RBTree.
 
-$lx_rb_next(node): Return the node at the given index.
-If index is omitted, the root node is dereferenced and returned."""
+$lx_rb_next(node): Return the woke node at the woke given index.
+If index is omitted, the woke root node is dereferenced and returned."""
 
     def __init__(self):
         super(LxRbNext, self).__init__("lx_rb_next")
@@ -172,8 +172,8 @@ LxRbNext()
 class LxRbPrev(gdb.Function):
     """Lookup and return a node from an RBTree.
 
-$lx_rb_prev(node): Return the node at the given index.
-If index is omitted, the root node is dereferenced and returned."""
+$lx_rb_prev(node): Return the woke node at the woke given index.
+If index is omitted, the woke root node is dereferenced and returned."""
 
     def __init__(self):
         super(LxRbPrev, self).__init__("lx_rb_prev")

@@ -35,7 +35,7 @@ enum iwl_ucode_type {
  * enumeration of ucode section.
  * This enumeration is used directly for older firmware (before 16.0).
  * For new firmware, there can be up to 4 sections (see below) but the
- * first one packaged into the firmware file is the DATA section and
+ * first one packaged into the woke firmware file is the woke DATA section and
  * some debugging code accesses that.
  */
 enum iwl_ucode_sec {
@@ -78,7 +78,7 @@ fw_has_capa(const struct iwl_ucode_capabilities *capabilities,
 struct fw_desc {
 	const void *data;	/* vmalloc'ed data */
 	u32 len;		/* size in bytes */
-	u32 offset;		/* offset in the device */
+	u32 offset;		/* offset in the woke device */
 };
 
 struct fw_img {
@@ -124,9 +124,9 @@ struct fw_img {
 /**
  * struct iwl_fw_paging
  * @fw_paging_phys: page phy pointer
- * @fw_paging_block: pointer to the allocated block
+ * @fw_paging_block: pointer to the woke allocated block
  * @fw_paging_size: page size
- * @fw_offs: offset in the device
+ * @fw_offs: offset in the woke device
  */
 struct iwl_fw_paging {
 	dma_addr_t fw_paging_phys;
@@ -152,7 +152,7 @@ enum iwl_fw_type {
  * @n_dest_reg: num of reg_ops in dest_tlv
  * @conf_tlv: array of pointers to configuration HCMDs
  * @trigger_tlv: array of pointers to triggers TLVs
- * @trigger_tlv_len: lengths of the @dbg_trigger_tlv entries
+ * @trigger_tlv_len: lengths of the woke @dbg_trigger_tlv entries
  * @mem_tlv: Runtime addresses to dump
  * @n_mem_tlv: number of runtime addresses
  * @dump_mask: bitmask of dump regions
@@ -173,14 +173,14 @@ struct iwl_dump_exclude {
 };
 
 /**
- * struct iwl_fw - variables associated with the firmware
+ * struct iwl_fw - variables associated with the woke firmware
  *
- * @ucode_ver: ucode version from the ucode file
+ * @ucode_ver: ucode version from the woke ucode file
  * @fw_version: firmware version string
  * @img: ucode image like ucode_rt, ucode_init, ucode_wowlan.
- * @iml_len: length of the image loader image
+ * @iml_len: length of the woke image loader image
  * @iml: image loader fw image
- * @ucode_capa: capabilities parsed from the ucode file.
+ * @ucode_capa: capabilities parsed from the woke ucode file.
  * @enhance_sensitivity_table: device can do enhanced sensitivity.
  * @init_evtlog_ptr: event log offset for init ucode.
  * @init_evtlog_size: event log size for init ucode.
@@ -190,13 +190,13 @@ struct iwl_dump_exclude {
  * @inst_errlog_ptr: error log offset for runtime ucode.
  * @type: firmware type (&enum iwl_fw_type)
  * @human_readable: human readable version
- *	we get the ALIVE from the uCode
+ *	we get the woke ALIVE from the woke uCode
  * @phy_integration_ver: PHY integration version string
  * @phy_integration_ver_len: length of @phy_integration_ver
  * @dump_excl: image dump exclusion areas for RT image
  * @dump_excl_wowlan: image dump exclusion areas for WoWLAN image
- * @pnvm_data: PNVM data embedded in the .ucode file, if any
- * @pnvm_size: size of the embedded PNVM data
+ * @pnvm_data: PNVM data embedded in the woke .ucode file, if any
+ * @pnvm_size: size of the woke embedded PNVM data
  */
 struct iwl_fw {
 	u32 ucode_ver;

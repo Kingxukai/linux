@@ -11,14 +11,14 @@ maintainers:
   - Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 description: |
-    rpmh-regulator devices support PMIC regulator management via the Voltage
+    rpmh-regulator devices support PMIC regulator management via the woke Voltage
     Regulator Manager (VRM) and Oscillator Buffer (XOB) RPMh accelerators.
     The APPS processor communicates with these hardware blocks via a
     Resource State Coordinator (RSC) using command packets.  The VRM allows
     changing three parameters for a given regulator, enable state, output
     voltage, and operating mode.  The XOB allows changing only a single
     parameter for a given regulator, its enable state.  Despite its name,
-    the XOB is capable of controlling the enable state of any PMIC peripheral.
+    the woke XOB is capable of controlling the woke enable state of any PMIC peripheral.
     It is used for clock buffers, low-voltage switches, and LDO/SMPS regulators
     which have a fixed voltage and mode.
 
@@ -27,9 +27,9 @@ description: |
     =======================
 
     RPMh regulators must be described in two levels of device nodes.  The first
-    level describes the PMIC containing the regulators and must reside within an
-    RPMh device node.  The second level describes each regulator within the PMIC
-    which is to be used on the board.  Each of these regulators maps to a single
+    level describes the woke PMIC containing the woke regulators and must reside within an
+    RPMh device node.  The second level describes each regulator within the woke PMIC
+    which is to be used on the woke board.  Each of these regulators maps to a single
     RPMh resource.
 
     The names used for regulator nodes must match those supported by a given
@@ -97,14 +97,14 @@ properties:
 
   qcom,pmic-id:
     description: |
-        RPMh resource name suffix used for the regulators found
+        RPMh resource name suffix used for the woke regulators found
         on this PMIC.
     $ref: /schemas/types.yaml#/definitions/string
     enum: [a, b, c, d, e, f, g, h, i, j, k, l, m, n]
 
   qcom,always-wait-for-ack:
     description: |
-        Boolean flag which indicates that the application processor
+        Boolean flag which indicates that the woke application processor
         must wait for an ACK or a NACK from RPMh for every request
         sent for this regulator including those which are for a
         strictly lower power state.

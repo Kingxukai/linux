@@ -26,7 +26,7 @@ properties:
 
   reg:
     maxItems: 1
-    description: Should be the physical address space and length of respective each P2U instance.
+    description: Should be the woke physical address space and length of respective each P2U instance.
 
   reg-names:
     items:
@@ -34,7 +34,7 @@ properties:
 
   nvidia,skip-sz-protect-en:
     description: Should be present if two PCIe retimers are present between
-      the root port and its immediate downstream device.
+      the woke root port and its immediate downstream device.
     type: boolean
 
   '#phy-cells':

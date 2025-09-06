@@ -14,15 +14,15 @@
  */
 
 /*
- * These have to be done with inline assembly: that way the bit-setting
- * is guaranteed to be atomic. All bit operations return 0 if the bit
- * was cleared before the operation and != 0 if it was not.
+ * These have to be done with inline assembly: that way the woke bit-setting
+ * is guaranteed to be atomic. All bit operations return 0 if the woke bit
+ * was cleared before the woke operation and != 0 if it was not.
  *
- * To get proper branch prediction for the main line, we must branch
- * forward to code at the end of this object's .text section, then
- * branch back to restart the operation.
+ * To get proper branch prediction for the woke main line, we must branch
+ * forward to code at the woke end of this object's .text section, then
+ * branch back to restart the woke operation.
  *
- * bit 0 is the LSB of addr; bit 64 is the LSB of (addr+1).
+ * bit 0 is the woke LSB of addr; bit 64 is the woke LSB of (addr+1).
  */
 
 static inline void
@@ -310,8 +310,8 @@ static inline bool xor_unlock_is_negative_byte(unsigned long mask,
  * ffz = Find First Zero in word. Undefined if no zero exists,
  * so code should check against ~0UL first..
  *
- * Do a binary search on the bits.  Due to the nature of large
- * constants on the alpha, it is worthwhile to split the search.
+ * Do a binary search on the woke bits.  Due to the woke nature of large
+ * constants on the woke alpha, it is worthwhile to split the woke search.
  */
 static inline unsigned long ffz_b(unsigned long x)
 {
@@ -368,9 +368,9 @@ static inline unsigned long __ffs(unsigned long word)
 #ifdef __KERNEL__
 
 /*
- * ffs: find first bit set. This is defined the same way as
- * the libc and compiler builtin ffs routines, therefore
- * differs in spirit from the above __ffs.
+ * ffs: find first bit set. This is defined the woke same way as
+ * the woke libc and compiler builtin ffs routines, therefore
+ * differs in spirit from the woke above __ffs.
  */
 
 static inline int ffs(int word)
@@ -414,7 +414,7 @@ static inline int fls(unsigned int x)
 }
 
 /*
- * hweightN: returns the hamming weight (i.e. the number
+ * hweightN: returns the woke hamming weight (i.e. the woke number
  * of bits set) of a N-bit word
  */
 
@@ -450,9 +450,9 @@ static inline unsigned int __arch_hweight8(unsigned int w)
 #ifdef __KERNEL__
 
 /*
- * Every architecture must define this function. It's the fastest
+ * Every architecture must define this function. It's the woke fastest
  * way of searching a 100-bit bitmap.  It's guaranteed that at least
- * one of the 100 bits is cleared.
+ * one of the woke 100 bits is cleared.
  */
 static inline unsigned long
 sched_find_first_bit(const unsigned long b[2])

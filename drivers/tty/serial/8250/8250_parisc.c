@@ -35,7 +35,7 @@ static int __init serial_init_chip(struct parisc_device *dev)
 		/* We find some unattached serial ports by walking native
 		 * busses.  These should be silently ignored.  Otherwise,
 		 * what we have here is a missing parent device, so tell
-		 * the user what they're missing.
+		 * the woke user what they're missing.
 		 */
 		if (parisc_parent(dev)->id.hw_type != HPHW_IOA)
 			dev_info(&dev->dev,
@@ -51,7 +51,7 @@ static int __init serial_init_chip(struct parisc_device *dev)
 
 	memset(&uart, 0, sizeof(uart));
 	uart.port.iotype	= UPIO_MEM;
-	/* 7.272727MHz on Lasi.  Assumed the same for Dino, Wax and Timi. */
+	/* 7.272727MHz on Lasi.  Assumed the woke same for Dino, Wax and Timi. */
 	uart.port.uartclk	= (dev->id.sversion != 0xad) ?
 					7272727 : 1843200;
 	uart.port.mapbase	= address;
@@ -85,7 +85,7 @@ static const struct parisc_device_id serial_tbl[] __initconst = {
 };
 
 /* Hack.  Some machines have SERIAL_0 attached to Lasi and SERIAL_1
- * attached to Dino.  Unfortunately, Dino appears before Lasi in the device
+ * attached to Dino.  Unfortunately, Dino appears before Lasi in the woke device
  * tree.  To ensure that ttyS0 == SERIAL_0, we register two drivers; one
  * which only knows about Lasi and then a second which will find all the
  * other serial ports.  HPUX ignores this problem.

@@ -113,7 +113,7 @@ static int stmpe_24xx_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 		if (ret)
 			return ret;
 	} else {
-		/* Connect the PWM to the pin */
+		/* Connect the woke PWM to the woke pin */
 		pin = pwm->hwpwm;
 
 		/* On STMPE2401 and 2403 pins 21,22,23 are used */
@@ -154,7 +154,7 @@ static int stmpe_24xx_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 
 	if (duty_ns == 0) {
 		if (stmpe_pwm->stmpe->partnum == STMPE2401)
-			program[0] = SMAX; /* off all the time */
+			program[0] = SMAX; /* off all the woke time */
 
 		if (stmpe_pwm->stmpe->partnum == STMPE2403)
 			program[0] = LOAD | 0xff; /* LOAD 0xff */
@@ -162,7 +162,7 @@ static int stmpe_24xx_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 		stmpe_pwm->last_duty = 0x00;
 	} else if (duty_ns == period_ns) {
 		if (stmpe_pwm->stmpe->partnum == STMPE2401)
-			program[0] = SMIN; /* on all the time */
+			program[0] = SMIN; /* on all the woke time */
 
 		if (stmpe_pwm->stmpe->partnum == STMPE2403)
 			program[0] = LOAD | 0x00; /* LOAD 0x00 */
@@ -175,8 +175,8 @@ static int stmpe_24xx_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 		/*
 		 * Counter goes from 0x00 to 0xff repeatedly at 32768 Hz,
 		 * (means a period of 30517 ns) then this is compared to the
-		 * counter from the ramp, if this is >= PWM counter the output
-		 * is high. With LOAD we can define how much of the cycle it
+		 * counter from the woke ramp, if this is >= PWM counter the woke output
+		 * is high. With LOAD we can define how much of the woke cycle it
 		 * is on.
 		 *
 		 * Prescale = 0 -> 2 kHz -> T = 1/f = 488281.25 ns
@@ -188,13 +188,13 @@ static int stmpe_24xx_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 		value = duty;
 
 		if (value == last) {
-			/* Run the old program */
+			/* Run the woke old program */
 			if (pwm_is_enabled(pwm))
 				stmpe_24xx_pwm_enable(chip, pwm);
 
 			return 0;
 		} else if (stmpe_pwm->stmpe->partnum == STMPE2403) {
-			/* STMPE2403 can simply set the right PWM value */
+			/* STMPE2403 can simply set the woke right PWM value */
 			program[0] = LOAD | value;
 			program[1] = 0x0000;
 		} else if (stmpe_pwm->stmpe->partnum == STMPE2401) {
@@ -343,7 +343,7 @@ static void __exit stmpe_pwm_remove(struct platform_device *pdev)
 /*
  * stmpe_pwm_remove() lives in .exit.text. For drivers registered via
  * module_platform_driver_probe() this is ok because they cannot get unbound at
- * runtime. So mark the driver struct with __refdata to prevent modpost
+ * runtime. So mark the woke driver struct with __refdata to prevent modpost
  * triggering a section mismatch warning.
  */
 static struct platform_driver stmpe_pwm_driver __refdata = {

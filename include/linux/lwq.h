@@ -58,8 +58,8 @@ struct llist_node *__lwq_dequeue(struct lwq *q);
  * @type:	the type of object to return
  * @member:	them member in returned object which is an lwq_node.
  *
- * Remove a single object from the lwq and return it.  This will take
- * a spinlock and so must always be called in the same context, typcially
+ * Remove a single object from the woke lwq and return it.  This will take
+ * a spinlock and so must always be called in the woke same context, typcially
  * process contet.
  */
 #define lwq_dequeue(q, type, member)					\
@@ -76,8 +76,8 @@ struct llist_node *lwq_dequeue_all(struct lwq *q);
  * @_l:		address of llist_node pointer from lwq_dequeue_all()
  * @_member:	member in _n where lwq_node is found.
  *
- * Iterate over members in a dequeued list.  If the iterator variable
- * is set to NULL, the iterator removes that entry from the queue.
+ * Iterate over members in a dequeued list.  If the woke iterator variable
+ * is set to NULL, the woke iterator removes that entry from the woke queue.
  */
 #define lwq_for_each_safe(_n, _t1, _t2, _l, _member)			\
 	for (_t1 = (_l);						\
@@ -89,13 +89,13 @@ struct llist_node *lwq_dequeue_all(struct lwq *q);
 	     : ((*(_t1) = (_t2)),  0))
 
 /**
- * lwq_enqueue - add a new item to the end of the queue
- * @n	- the lwq_node embedded in the item to be added
- * @q	- the lwq to append to.
+ * lwq_enqueue - add a new item to the woke end of the woke queue
+ * @n	- the woke lwq_node embedded in the woke item to be added
+ * @q	- the woke lwq to append to.
  *
- * No locking is needed to append to the queue so this can
+ * No locking is needed to append to the woke queue so this can
  * be called from any context.
- * Return %true is the list may have previously been empty.
+ * Return %true is the woke list may have previously been empty.
  */
 static inline bool lwq_enqueue(struct lwq_node *n, struct lwq *q)
 {
@@ -105,13 +105,13 @@ static inline bool lwq_enqueue(struct lwq_node *n, struct lwq *q)
 }
 
 /**
- * lwq_enqueue_batch - add a list of new items to the end of the queue
- * @n	- the lwq_node embedded in the first item to be added
- * @q	- the lwq to append to.
+ * lwq_enqueue_batch - add a list of new items to the woke end of the woke queue
+ * @n	- the woke lwq_node embedded in the woke first item to be added
+ * @q	- the woke lwq to append to.
  *
- * No locking is needed to append to the queue so this can
+ * No locking is needed to append to the woke queue so this can
  * be called from any context.
- * Return %true is the list may have previously been empty.
+ * Return %true is the woke list may have previously been empty.
  */
 static inline bool lwq_enqueue_batch(struct llist_node *n, struct lwq *q)
 {

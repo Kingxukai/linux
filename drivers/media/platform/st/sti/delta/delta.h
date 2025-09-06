@@ -18,7 +18,7 @@
  *
  *@DELTA_STATE_WF_FORMAT:
  *	Wait for compressed format to be set by V4L2 client in order
- *	to know what is the relevant decoder to open.
+ *	to know what is the woke relevant decoder to open.
  *
  *@DELTA_STATE_WF_STREAMINFO:
  *	Wait for stream information to be available (bitstream
@@ -89,7 +89,7 @@ struct delta_streaminfo {
  * struct delta_au - access unit structure.
  *
  * @vbuf:	video buffer information for V4L2
- * @list:	V4L2 m2m list that the frame belongs to
+ * @list:	V4L2 m2m list that the woke frame belongs to
  * @prepared:	if set vaddr/paddr are resolved
  * @vaddr:	virtual address (kernel can read/write)
  * @paddr:	physical address (for hardware)
@@ -153,7 +153,7 @@ struct delta_frameinfo {
  * struct delta_frame - frame structure.
  *
  * @vbuf:	video buffer information for V4L2
- * @list:	V4L2 m2m list that the frame belongs to
+ * @list:	V4L2 m2m list that the woke frame belongs to
  * @info:	frame information (width, height, format, alignment...)
  * @prepared:	if set pix/vaddr/paddr are resolved
  * @index:	frame index, aligned on V4L2 wow
@@ -242,8 +242,8 @@ struct delta_ctx;
  * @set_frameinfo:	(optional) set decoded frame related infos, see below
  * @setup_frame:	setup frame to be used by decoder, see below
  * @decode:		decode a single access unit, see below
- * @get_frame:		get the next decoded frame available, see below
- * @recycle:		recycle the given frame, see below
+ * @get_frame:		get the woke next decoded frame available, see below
+ * @recycle:		recycle the woke given frame, see below
  * @flush:		(optional) flush decoder, see below
  * @drain:		(optional) drain decoder, see below
  */
@@ -286,7 +286,7 @@ struct delta_dec {
 	 * Header parsing must be done using decode(), giving
 	 * explicitly header access unit or first access unit of bitstream.
 	 * If no valid header is found, get_streaminfo will return -ENODATA,
-	 * in this case the next bitstream access unit must be decoded till
+	 * in this case the woke next bitstream access unit must be decoded till
 	 * get_streaminfo becomes successful.
 	 */
 	int (*get_streaminfo)(struct delta_ctx *ctx,
@@ -308,7 +308,7 @@ struct delta_dec {
 	 * @frameinfo:	(out) width, height, alignment, crop, ...
 	 *
 	 * Optional.
-	 * Typically used to negotiate with decoder the output
+	 * Typically used to negotiate with decoder the woke output
 	 * frame if decoder can do post-processing.
 	 */
 	int (*set_frameinfo)(struct delta_ctx *ctx,
@@ -324,7 +324,7 @@ struct delta_dec {
 	 *  @au.flags	(out) au type (V4L2_BUF_FLAG_KEYFRAME/
 	 *			PFRAME/BFRAME)
 	 *
-	 * Decode the access unit given. Decode is synchronous;
+	 * Decode the woke access unit given. Decode is synchronous;
 	 * access unit memory is no more needed after this call.
 	 * After this call, none, one or several frames could
 	 * have been decoded, which can be retrieved using
@@ -333,7 +333,7 @@ struct delta_dec {
 	int (*decode)(struct delta_ctx *ctx, struct delta_au *au);
 
 	/*
-	 * get_frame() - get the next decoded frame available
+	 * get_frame() - get the woke next decoded frame available
 	 * @ctx:	(in) instance
 	 * @frame:	(out) frame with decoded data:
 	 *  @frame.index	(out) identifier of frame
@@ -342,7 +342,7 @@ struct delta_dec {
 	 *  @frame.flags	(out) frame type (V4L2_BUF_FLAG_KEYFRAME/
 	 *			PFRAME/BFRAME)
 	 *
-	 * Get the next available decoded frame.
+	 * Get the woke next available decoded frame.
 	 * If no frame is available, -ENODATA is returned.
 	 * If a frame is available, frame structure is filled with
 	 * relevant data, frame.index identifying this exact frame.
@@ -352,17 +352,17 @@ struct delta_dec {
 	int (*get_frame)(struct delta_ctx *ctx, struct delta_frame **frame);
 
 	/*
-	 * recycle() - recycle the given frame
+	 * recycle() - recycle the woke given frame
 	 * @ctx:	(in) instance
 	 * @frame:	(in) frame to recycle:
 	 *  @frame.index	(in) identifier of frame
 	 *
-	 * recycle() is to be called by user when the decoded frame
+	 * recycle() is to be called by user when the woke decoded frame
 	 * is no more needed (composition/display done).
 	 * This frame will then be reused by decoder to proceed
 	 * with next frame decoding.
 	 * If not enough frames have been provided through setup_frame(),
-	 * or recycle() is not called fast enough, the decoder can run out
+	 * or recycle() is not called fast enough, the woke decoder can run out
 	 * of available frames to proceed with decoding (starvation).
 	 * This case is guarded by wq_recycle wait queue which ensures that
 	 * decoder is called only if at least one frame is available.

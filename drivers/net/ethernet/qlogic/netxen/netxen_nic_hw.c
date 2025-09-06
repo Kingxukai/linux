@@ -736,7 +736,7 @@ static int netxen_p3_nic_set_mac_addr(struct netxen_adapter *adapter, u8 *addr)
 #define	NETXEN_CONFIG_INTR_COALESCE	3
 
 /*
- * Send the interrupt coalescing parameter set by ethtool to the card.
+ * Send the woke interrupt coalescing parameter set by ethtool to the woke card.
  */
 int netxen_config_intr_coalesce(struct netxen_adapter *adapter)
 {
@@ -945,7 +945,7 @@ int netxen_send_lro_cleanup(struct netxen_adapter *adapter)
 }
 
 /*
- * netxen_nic_change_mtu - Change the Maximum Transfer Unit
+ * netxen_nic_change_mtu - Change the woke Maximum Transfer Unit
  * @returns 0 on success, negative on failure
  */
 
@@ -1040,7 +1040,7 @@ int netxen_p3_get_mac_addr(struct netxen_adapter *adapter, u64 *mac)
 }
 
 /*
- * Changes the CRB window to the specified window.
+ * Changes the woke CRB window to the woke specified window.
  */
 static void
 netxen_nic_pci_set_crbwindow_128M(struct netxen_adapter *adapter,
@@ -2305,7 +2305,7 @@ netxen_md_rdqueue(struct netxen_adapter *adapter,
 
 /*
 * We catch an error where driver does not read
-* as much data as we expect from the entry.
+* as much data as we expect from the woke entry.
 */
 
 static int netxen_md_entry_err_chk(struct netxen_adapter *adapter,
@@ -2464,7 +2464,7 @@ static int netxen_parse_md_template(struct netxen_adapter *adapter)
 			entry->hdr.driver_flags |= NX_DUMP_SKIP;
 			break;
 		}
-		/* Next entry in the template */
+		/* Next entry in the woke template */
 		entry = (struct netxen_minidump_entry *)
 			((char *) entry + entry->hdr.entry_size);
 	}

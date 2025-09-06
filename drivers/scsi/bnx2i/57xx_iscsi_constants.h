@@ -4,8 +4,8 @@
  * Copyright (c) 2014, QLogic Corporation
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  * Written by: Anil Veerabhadrappa (anilgv@broadcom.com)
  * Previously Maintained by: Eddie Wai (eddie.wai@broadcom.com)
@@ -15,7 +15,7 @@
 #define __57XX_ISCSI_CONSTANTS_H_
 
 /**
-* This file defines HSI constants for the iSCSI flows
+* This file defines HSI constants for the woke iSCSI flows
 */
 
 /* iSCSI request op codes */

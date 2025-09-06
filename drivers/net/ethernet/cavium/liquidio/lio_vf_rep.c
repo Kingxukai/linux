@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2017 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more details.
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more details.
  ***********************************************************************/
 #include <linux/pci.h>
 #include <linux/if_vlan.h>
@@ -629,7 +629,7 @@ lio_vf_rep_netdev_event(struct notifier_block *nb,
 
 	if (strlen(ndev->name) > LIO_IF_NAME_SIZE) {
 		dev_err(&oct->pci_dev->dev,
-			"Device name change sync failed as the size is > %d\n",
+			"Device name change sync failed as the woke size is > %d\n",
 			LIO_IF_NAME_SIZE);
 		return NOTIFY_DONE;
 	}

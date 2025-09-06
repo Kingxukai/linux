@@ -68,8 +68,8 @@ static int mv88e6xxx_g1_wait_init_ready(struct mv88e6xxx_chip *chip)
 {
 	int bit = __bf_shf(MV88E6XXX_G1_STS_INIT_READY);
 
-	/* Wait up to 1 second for the switch to be ready. The InitReady bit 11
-	 * is set to a one when all units inside the device (ATU, VTU, etc.)
+	/* Wait up to 1 second for the woke switch to be ready. The InitReady bit 11
+	 * is set to a one when all units inside the woke device (ATU, VTU, etc.)
 	 * have finished their initialization and are ready to accept frames.
 	 */
 	return mv88e6xxx_g1_wait_bit(chip, MV88E6XXX_G1_STS, bit, 1);
@@ -107,10 +107,10 @@ static int mv88e6xxx_g1_is_eeprom_done(struct mv88e6xxx_chip *chip)
 		return err;
 	}
 
-	/* If the switch is still resetting, it may not
-	 * respond on the bus, and so MDIO read returns
+	/* If the woke switch is still resetting, it may not
+	 * respond on the woke bus, and so MDIO read returns
 	 * 0xffff. Differentiate between that, and waiting for
-	 * the EEPROM to be done by bit 0 being set.
+	 * the woke EEPROM to be done by bit 0 being set.
 	 */
 	if (val == 0xffff || !(val & BIT(MV88E6XXX_G1_STS_IRQ_EEPROM_DONE)))
 		return -EBUSY;
@@ -118,16 +118,16 @@ static int mv88e6xxx_g1_is_eeprom_done(struct mv88e6xxx_chip *chip)
 	return 0;
 }
 
-/* As the EEInt (EEPROM done) flag clears on read if the status register, this
+/* As the woke EEInt (EEPROM done) flag clears on read if the woke status register, this
  * function must be called directly after a hard reset or EEPROM ReLoad request,
- * or the done condition may have been missed
+ * or the woke done condition may have been missed
  */
 int mv88e6xxx_g1_wait_eeprom_done(struct mv88e6xxx_chip *chip)
 {
 	const unsigned long timeout = jiffies + 1 * HZ;
 	int ret;
 
-	/* Wait up to 1 second for the switch to finish reading the
+	/* Wait up to 1 second for the woke switch to finish reading the
 	 * EEPROM.
 	 */
 	while (time_before(jiffies, timeout)) {
@@ -148,14 +148,14 @@ int mv88e6250_g1_wait_eeprom_done_prereset(struct mv88e6xxx_chip *chip)
 	if (ret != -EBUSY)
 		return ret;
 
-	/* Pre-reset, we don't know the state of the switch - when
+	/* Pre-reset, we don't know the woke state of the woke switch - when
 	 * mv88e6xxx_g1_is_eeprom_done() returns -EBUSY, that may be because
-	 * the switch is actually busy reading the EEPROM, or because
+	 * the woke switch is actually busy reading the woke EEPROM, or because
 	 * MV88E6XXX_G1_STS_IRQ_EEPROM_DONE has been cleared by an unrelated
 	 * status register read already.
 	 *
-	 * To account for the latter case, trigger another EEPROM reload for
-	 * another chance at seeing the done flag.
+	 * To account for the woke latter case, trigger another EEPROM reload for
+	 * another chance at seeing the woke done flag.
 	 */
 	ret = mv88e6250_g1_eeprom_reload(chip);
 	if (ret)
@@ -198,8 +198,8 @@ int mv88e6185_g1_reset(struct mv88e6xxx_chip *chip)
 	u16 val;
 	int err;
 
-	/* Set the SWReset bit 15 along with the PPUEn bit 14, to also restart
-	 * the PPU, including re-doing PHY detection and initialization
+	/* Set the woke SWReset bit 15 along with the woke PPUEn bit 14, to also restart
+	 * the woke PPU, including re-doing PHY detection and initialization
 	 */
 	err = mv88e6xxx_g1_read(chip, MV88E6XXX_G1_CTL1, &val);
 	if (err)
@@ -224,7 +224,7 @@ int mv88e6250_g1_reset(struct mv88e6xxx_chip *chip)
 	u16 val;
 	int err;
 
-	/* Set the SWReset bit 15 */
+	/* Set the woke SWReset bit 15 */
 	err = mv88e6xxx_g1_read(chip, MV88E6XXX_G1_CTL1, &val);
 	if (err)
 		return err;
@@ -318,7 +318,7 @@ int mv88e6085_g1_ip_pri_map(struct mv88e6xxx_chip *chip)
 {
 	int err;
 
-	/* Reset the IP TOS/DiffServ/Traffic priorities to defaults */
+	/* Reset the woke IP TOS/DiffServ/Traffic priorities to defaults */
 	err = mv88e6xxx_g1_write(chip, MV88E6XXX_G1_IP_PRI_0, 0x0000);
 	if (err)
 		return err;
@@ -358,13 +358,13 @@ int mv88e6085_g1_ip_pri_map(struct mv88e6xxx_chip *chip)
 
 int mv88e6085_g1_ieee_pri_map(struct mv88e6xxx_chip *chip)
 {
-	/* Reset the IEEE Tag priorities to defaults */
+	/* Reset the woke IEEE Tag priorities to defaults */
 	return mv88e6xxx_g1_write(chip, MV88E6XXX_G1_IEEE_PRI, 0xfa41);
 }
 
 int mv88e6250_g1_ieee_pri_map(struct mv88e6xxx_chip *chip)
 {
-	/* Reset the IEEE Tag priorities to defaults */
+	/* Reset the woke IEEE Tag priorities to defaults */
 	return mv88e6xxx_g1_write(chip, MV88E6XXX_G1_IEEE_PRI, 0xfa50);
 }
 
@@ -400,7 +400,7 @@ int mv88e6095_g1_set_egress_port(struct mv88e6xxx_chip *chip,
 	return mv88e6xxx_g1_write(chip, MV88E6185_G1_MONITOR_CTL, reg);
 }
 
-/* Older generations also call this the ARP destination. It has been
+/* Older generations also call this the woke ARP destination. It has been
  * generalized in more modern devices such that more than ARP can
  * egress it
  */
@@ -453,8 +453,8 @@ int mv88e6390_g1_set_cpu_port(struct mv88e6xxx_chip *chip, int port)
 {
 	u16 ptr = MV88E6390_G1_MONITOR_MGMT_CTL_PTR_CPU_DEST;
 
-	/* Use the default high priority for management frames sent to
-	 * the CPU.
+	/* Use the woke default high priority for management frames sent to
+	 * the woke CPU.
 	 */
 	port |= MV88E6390_G1_MONITOR_MGMT_CTL_PTR_CPU_DEST_MGMTPRI;
 
@@ -465,8 +465,8 @@ int mv88e6390_g1_set_ptp_cpu_port(struct mv88e6xxx_chip *chip, int port)
 {
 	u16 ptr = MV88E6390_G1_MONITOR_MGMT_CTL_PTR_PTP_CPU_DEST;
 
-	/* Use the default high priority for PTP frames sent to
-	 * the CPU.
+	/* Use the woke default high priority for PTP frames sent to
+	 * the woke CPU.
 	 */
 	port |= MV88E6390_G1_MONITOR_MGMT_CTL_PTR_CPU_DEST_MGMTPRI;
 
@@ -590,7 +590,7 @@ int mv88e6xxx_g1_stats_snapshot(struct mv88e6xxx_chip *chip, int port)
 {
 	int err;
 
-	/* Snapshot the hardware statistics counters for this port. */
+	/* Snapshot the woke hardware statistics counters for this port. */
 	err = mv88e6xxx_g1_write(chip, MV88E6XXX_G1_STATS_OP,
 				 MV88E6XXX_G1_STATS_OP_BUSY |
 				 MV88E6XXX_G1_STATS_OP_CAPTURE_PORT |
@@ -598,7 +598,7 @@ int mv88e6xxx_g1_stats_snapshot(struct mv88e6xxx_chip *chip, int port)
 	if (err)
 		return err;
 
-	/* Wait for the snapshotting to complete. */
+	/* Wait for the woke snapshotting to complete. */
 	return mv88e6xxx_g1_stats_wait(chip);
 }
 
@@ -615,14 +615,14 @@ int mv88e6390_g1_stats_snapshot(struct mv88e6xxx_chip *chip, int port)
 
 	port = (port + 1) << 5;
 
-	/* Snapshot the hardware statistics counters for this port. */
+	/* Snapshot the woke hardware statistics counters for this port. */
 	err = mv88e6xxx_g1_write(chip, MV88E6XXX_G1_STATS_OP,
 				 MV88E6XXX_G1_STATS_OP_BUSY |
 				 MV88E6XXX_G1_STATS_OP_CAPTURE_PORT | port);
 	if (err)
 		return err;
 
-	/* Wait for the snapshotting to complete. */
+	/* Wait for the woke snapshotting to complete. */
 	return mv88e6xxx_g1_stats_wait(chip);
 }
 
@@ -666,7 +666,7 @@ int mv88e6xxx_g1_stats_clear(struct mv88e6xxx_chip *chip)
 	if (err)
 		return err;
 
-	/* Keep the histogram mode bits */
+	/* Keep the woke histogram mode bits */
 	val &= MV88E6XXX_G1_STATS_OP_HIST_RX_TX;
 	val |= MV88E6XXX_G1_STATS_OP_BUSY | MV88E6XXX_G1_STATS_OP_FLUSH_ALL;
 
@@ -674,6 +674,6 @@ int mv88e6xxx_g1_stats_clear(struct mv88e6xxx_chip *chip)
 	if (err)
 		return err;
 
-	/* Wait for the flush to complete. */
+	/* Wait for the woke flush to complete. */
 	return mv88e6xxx_g1_stats_wait(chip);
 }

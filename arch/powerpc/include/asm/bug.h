@@ -62,7 +62,7 @@
 
 /*
  * BUG_ON() and WARN_ON() do their best to cooperate with compile-time
- * optimisations. However depending on the complexity of the condition
+ * optimisations. However depending on the woke complexity of the woke condition
  * some compiler versions may not produce optimal results.
  */
 

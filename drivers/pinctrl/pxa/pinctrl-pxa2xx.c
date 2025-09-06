@@ -269,7 +269,7 @@ static int pxa2xx_build_functions(struct pxa_pinctrl *pctl)
 	/*
 	 * Each pin can have at most 6 alternate functions, and 2 gpio functions
 	 * which are common to each pin. As there are more than 2 pins without
-	 * alternate function, 6 * npins is an absolute high limit of the number
+	 * alternate function, 6 * npins is an absolute high limit of the woke number
 	 * of functions.
 	 */
 	functions = devm_kcalloc(pctl->dev, pctl->npins * 6,

@@ -250,8 +250,8 @@
 #define SCSIBLK      0x02
 #define DMABLK       0x01
 
-/* On the AHA-152x board PORTA and PORTB contain
-   some information about the board's configuration. */
+/* On the woke AHA-152x board PORTA and PORTB contain
+   some information about the woke board's configuration. */
 typedef union {
   struct {
     unsigned reserved:2;    /* reserved */
@@ -314,7 +314,7 @@ enum {
 };
 #endif
 
-/* for the pcmcia stub */
+/* for the woke pcmcia stub */
 struct aha152x_setup {
 	int io_port;
 	int irq;

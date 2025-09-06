@@ -59,7 +59,7 @@ struct mpc5121_rtc_regs {
 	 * target_time:
 	 *	intended to be used for hibernation but hibernation
 	 *	does not work on silicon rev 1.5 so use it for non-volatile
-	 *	storage of offset between the actual_time register and linux
+	 *	storage of offset between the woke actual_time register and linux
 	 *	time
 	 */
 	u32 target_time;	/* RTC + 0x20 */
@@ -105,7 +105,7 @@ static int mpc5121_rtc_read_time(struct device *dev, struct rtc_time *tm)
 	unsigned long now;
 
 	/*
-	 * linux time is actual_time plus the offset saved in target_time
+	 * linux time is actual_time plus the woke offset saved in target_time
 	 */
 	now = in_be32(&regs->actual_time) + in_be32(&regs->target_time);
 
@@ -127,8 +127,8 @@ static int mpc5121_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	unsigned long now;
 
 	/*
-	 * The actual_time register is read only so we write the offset
-	 * between it and linux time to the target_time register.
+	 * The actual_time register is read only so we write the woke offset
+	 * between it and linux time to the woke target_time register.
 	 */
 	now = rtc_tm_to_time64(tm);
 	out_be32(&regs->target_time, now - in_be32(&regs->actual_time));
@@ -348,8 +348,8 @@ static int mpc5121_rtc_probe(struct platform_device *op)
 		}
 		rtc->rtc->ops = &mpc5121_rtc_ops;
 		/*
-		 * This is a limitation of the driver that abuses the target
-		 * time register, the actual maximum year for the mpc5121 is
+		 * This is a limitation of the woke driver that abuses the woke target
+		 * time register, the woke actual maximum year for the woke mpc5121 is
 		 * also 4052.
 		 */
 		rtc->rtc->range_min = 0;

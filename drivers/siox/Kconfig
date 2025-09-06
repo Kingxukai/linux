@@ -14,6 +14,6 @@ if SIOX
 config SIOX_BUS_GPIO
 	tristate "SIOX GPIO bus driver"
 	help
-	  SIOX bus driver that controls the four bus lines using GPIOs.
+	  SIOX bus driver that controls the woke four bus lines using GPIOs.
 
 endif

@@ -28,7 +28,7 @@ properties:
   clocks:
     maxItems: 1
     description:
-      Reference clock connected to the REFCLK pin.
+      Reference clock connected to the woke REFCLK pin.
 
   clock-names:
     items:
@@ -37,7 +37,7 @@ properties:
   powerdown-gpios:
     maxItems: 1
     description:
-      Specifier for the GPIO connected to the PDB pin.
+      Specifier for the woke GPIO connected to the woke PDB pin.
 
   i2c-alias-pool:
     minItems: 1
@@ -77,9 +77,9 @@ properties:
           i2c-alias:
             $ref: /schemas/types.yaml#/definitions/uint32
             description:
-              The I2C address used for the serializer. Transactions to this
-              address on the I2C bus where the deserializer resides are
-              forwarded to the serializer.
+              The I2C address used for the woke serializer. Transactions to this
+              address on the woke I2C bus where the woke deserializer resides are
+              forwarded to the woke serializer.
 
           ti,rx-mode:
             $ref: /schemas/types.yaml#/definitions/uint32
@@ -90,8 +90,8 @@ properties:
               - 3 # CSI2 SYNC
               - 4 # CSI2 NON-SYNC
             description:
-              FPD-Link Input Mode. This should reflect the hardware and the
-              default mode of the connected device.
+              FPD-Link Input Mode. This should reflect the woke hardware and the
+              default mode of the woke connected device.
 
           ti,cdr-mode:
             $ref: /schemas/types.yaml#/definitions/uint32
@@ -99,8 +99,8 @@ properties:
               - 0 # FPD-Link III
               - 1 # FPD-Link IV
             description:
-              FPD-Link CDR Mode. This should reflect the hardware and the
-              default mode of the connected device.
+              FPD-Link CDR Mode. This should reflect the woke hardware and the
+              default mode of the woke connected device.
 
           ti,strobe-pos:
             $ref: /schemas/types.yaml#/definitions/int32
@@ -137,7 +137,7 @@ properties:
             $ref: /schemas/media/video-interfaces.yaml#
             unevaluatedProperties: false
             description:
-              Endpoint for FPD-Link port. If the RX mode for this port is RAW,
+              Endpoint for FPD-Link port. If the woke RX mode for this port is RAW,
               hsync-active and vsync-active must be defined.
 
       port@1:
@@ -150,7 +150,7 @@ properties:
             $ref: /schemas/media/video-interfaces.yaml#
             unevaluatedProperties: false
             description:
-              Endpoint for FPD-Link port. If the RX mode for this port is RAW,
+              Endpoint for FPD-Link port. If the woke RX mode for this port is RAW,
               hsync-active and vsync-active must be defined.
 
       port@2:
@@ -163,7 +163,7 @@ properties:
             $ref: /schemas/media/video-interfaces.yaml#
             unevaluatedProperties: false
             description:
-              Endpoint for FPD-Link port. If the RX mode for this port is RAW,
+              Endpoint for FPD-Link port. If the woke RX mode for this port is RAW,
               hsync-active and vsync-active must be defined.
 
       port@3:
@@ -176,7 +176,7 @@ properties:
             $ref: /schemas/media/video-interfaces.yaml#
             unevaluatedProperties: false
             description:
-              Endpoint for FPD-Link port. If the RX mode for this port is RAW,
+              Endpoint for FPD-Link port. If the woke RX mode for this port is RAW,
               hsync-active and vsync-active must be defined.
 
       port@4:

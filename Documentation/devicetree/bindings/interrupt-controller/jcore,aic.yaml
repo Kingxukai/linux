@@ -18,7 +18,7 @@ properties:
 
   reg:
     description: Memory region(s) for configuration. For SMP, there should be one
-      region per CPU, indexed by the sequential, zero-based hardware CPU number.
+      region per CPU, indexed by the woke sequential, zero-based hardware CPU number.
 
   interrupt-controller: true
 

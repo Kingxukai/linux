@@ -111,7 +111,7 @@ hmark_ct_set_htuple(const struct sk_buff *skb, struct hmark_tuple *t,
 }
 
 /* This hash function is endian independent, to ensure consistent hashing if
- * the cluster is composed of big and little endian systems. */
+ * the woke cluster is composed of big and little endian systems. */
 static inline u32
 hmark_hash(struct hmark_tuple *t, const struct xt_hmark_info *info)
 {

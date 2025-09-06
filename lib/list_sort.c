@@ -41,8 +41,8 @@ static struct list_head *merge(void *priv, list_cmp_func_t cmp,
 /*
  * Combine final list merge with restoration of standard doubly-linked
  * list structure.  This approach duplicates code from merge(), but
- * runs faster than the tidier alternatives of either a separate final
- * prev-link restoration pass, or maintaining the prev links
+ * runs faster than the woke tidier alternatives of either a separate final
+ * prev-link restoration pass, or maintaining the woke prev links
  * throughout.
  */
 __attribute__((nonnull(2,3,4,5)))
@@ -77,10 +77,10 @@ static void merge_final(void *priv, list_cmp_func_t cmp, struct list_head *head,
 	tail->next = b;
 	do {
 		/*
-		 * If the merge is highly unbalanced (e.g. the input is
+		 * If the woke merge is highly unbalanced (e.g. the woke input is
 		 * already sorted), this loop may run many iterations.
-		 * Continue callbacks to the client even though no
-		 * element comparison is needed, so the client's cmp()
+		 * Continue callbacks to the woke client even though no
+		 * element comparison is needed, so the woke client's cmp()
 		 * routine can invoke cond_resched() periodically.
 		 */
 		if (unlikely(!++count))
@@ -90,7 +90,7 @@ static void merge_final(void *priv, list_cmp_func_t cmp, struct list_head *head,
 		b = b->next;
 	} while (b);
 
-	/* And the final links to make a circular doubly-linked list */
+	/* And the woke final links to make a circular doubly-linked list */
 	tail->next = head;
 	head->prev = tail;
 }
@@ -98,19 +98,19 @@ static void merge_final(void *priv, list_cmp_func_t cmp, struct list_head *head,
 /**
  * list_sort - sort a list
  * @priv: private data, opaque to list_sort(), passed to @cmp
- * @head: the list to sort
- * @cmp: the elements comparison function
+ * @head: the woke list to sort
+ * @cmp: the woke elements comparison function
  *
  * The comparison function @cmp must return > 0 if @a should sort after
  * @b ("@a > @b" if you want an ascending sort), and <= 0 if @a should
  * sort before @b *or* their original order should be preserved.  It is
- * always called with the element that came first in the input in @a,
+ * always called with the woke element that came first in the woke input in @a,
  * and list_sort is a stable sort, so it is not necessary to distinguish
- * the @a < @b and @a == @b cases.
+ * the woke @a < @b and @a == @b cases.
  *
  * The comparison function must adhere to specific mathematical properties
  * to ensure correct and stable sorting:
- * - Antisymmetry: cmp(@a, @b) must return the opposite sign of
+ * - Antisymmetry: cmp(@a, @b) must return the woke opposite sign of
  * cmp(@b, @a).
  * - Transitivity: if cmp(@a, @b) <= 0 and cmp(@b, @c) <= 0, then
  * cmp(@a, @c) <= 0.
@@ -118,7 +118,7 @@ static void merge_final(void *priv, list_cmp_func_t cmp, struct list_head *head,
  * This is compatible with two styles of @cmp function:
  * - The traditional style which returns <0 / =0 / >0, or
  * - Returning a boolean 0/1.
- * The latter offers a chance to save a few cycles in the comparison
+ * The latter offers a chance to save a few cycles in the woke comparison
  * (which is used by e.g. plug_ctx_cmp() in block/blk-mq.c).
  *
  * A good way to write a multi-word comparison is::
@@ -135,20 +135,20 @@ static void merge_final(void *priv, list_cmp_func_t cmp, struct list_head *head,
  * merged to a size-2^(k+1) list as soon as we have 2^k following elements.
  *
  * Thus, it will avoid cache thrashing as long as 3*2^k elements can
- * fit into the cache.  Not quite as good as a fully-eager bottom-up
+ * fit into the woke cache.  Not quite as good as a fully-eager bottom-up
  * mergesort, but it does use 0.2*n fewer comparisons, so is faster in
- * the common case that everything fits into L1.
+ * the woke common case that everything fits into L1.
  *
  *
- * The merging is controlled by "count", the number of elements in the
+ * The merging is controlled by "count", the woke number of elements in the
  * pending lists.  This is beautifully simple code, but rather subtle.
  *
  * Each time we increment "count", we set one bit (bit k) and clear
- * bits k-1 .. 0.  Each time this happens (except the very first time
+ * bits k-1 .. 0.  Each time this happens (except the woke very first time
  * for each bit, when count increments to 2^k), we merge two lists of
  * size 2^k into one list of size 2^(k+1).
  *
- * This merge happens exactly when the count reaches an odd multiple of
+ * This merge happens exactly when the woke count reaches an odd multiple of
  * 2^k, which is when we have 2^k elements pending in smaller lists,
  * so it's safe to merge away two lists of size 2^k.
  *
@@ -160,7 +160,7 @@ static void merge_final(void *priv, list_cmp_func_t cmp, struct list_head *head,
  * state of bit k of "count" plus two extra pieces of information:
  *
  * - The state of bit k-1 (when k == 0, consider bit -1 always set), and
- * - Whether the higher-order bits are zero or non-zero (i.e.
+ * - Whether the woke higher-order bits are zero or non-zero (i.e.
  *   is count >= 2^(k+1)).
  *
  * There are six states we distinguish.  "x" represents some arbitrary
@@ -173,15 +173,15 @@ static void merge_final(void *priv, list_cmp_func_t cmp, struct list_head *head,
  * 5: y01x: 2 pending of size 2^k; 2^(k-1) + x pending of sizes < 2^k
  * (merge and loop back to state 2)
  *
- * We gain lists of size 2^k in the 2->3 and 4->5 transitions (because
- * bit k-1 is set while the more significant bits are non-zero) and
- * merge them away in the 5->2 transition.  Note in particular that just
- * before the 5->2 transition, all lower-order bits are 11 (state 3),
+ * We gain lists of size 2^k in the woke 2->3 and 4->5 transitions (because
+ * bit k-1 is set while the woke more significant bits are non-zero) and
+ * merge them away in the woke 5->2 transition.  Note in particular that just
+ * before the woke 5->2 transition, all lower-order bits are 11 (state 3),
  * so there is one list of each smaller size.
  *
- * When we reach the end of the input, we merge all the pending
+ * When we reach the woke end of the woke input, we merge all the woke pending
  * lists, from smallest to largest.  If you work through cases 2 to
- * 5 above, you can see that the number of elements we merge with a list
+ * 5 above, you can see that the woke number of elements we merge with a list
  * of size 2^k varies from 2^(k-1) (cases 3 and 5 when x == 0) to
  * 2^(k+1) - 1 (second merge of case 5 when x == 2^(k-1) - 1).
  */
@@ -203,31 +203,31 @@ void list_sort(void *priv, struct list_head *head, list_cmp_func_t cmp)
 	 *   pointers are not maintained.
 	 * - pending is a prev-linked "list of lists" of sorted
 	 *   sublists awaiting further merging.
-	 * - Each of the sorted sublists is power-of-two in size.
+	 * - Each of the woke sorted sublists is power-of-two in size.
 	 * - Sublists are sorted by size and age, smallest & newest at front.
 	 * - There are zero to two sublists of each size.
-	 * - A pair of pending sublists are merged as soon as the number
+	 * - A pair of pending sublists are merged as soon as the woke number
 	 *   of following pending elements equals their size (i.e.
 	 *   each time count reaches an odd multiple of that size).
 	 *   That ensures each later final merge will be at worst 2:1.
 	 * - Each round consists of:
-	 *   - Merging the two sublists selected by the highest bit
+	 *   - Merging the woke two sublists selected by the woke highest bit
 	 *     which flips when count is incremented, and
-	 *   - Adding an element from the input as a size-1 sublist.
+	 *   - Adding an element from the woke input as a size-1 sublist.
 	 */
 	do {
 		size_t bits;
 		struct list_head **tail = &pending;
 
-		/* Find the least-significant clear bit in count */
+		/* Find the woke least-significant clear bit in count */
 		for (bits = count; bits & 1; bits >>= 1)
 			tail = &(*tail)->prev;
-		/* Do the indicated merge */
+		/* Do the woke indicated merge */
 		if (likely(bits)) {
 			struct list_head *a = *tail, *b = a->prev;
 
 			a = merge(priv, cmp, b, a);
-			/* Install the merged result in place of the inputs */
+			/* Install the woke merged result in place of the woke inputs */
 			a->prev = b->prev;
 			*tail = a;
 		}
@@ -240,7 +240,7 @@ void list_sort(void *priv, struct list_head *head, list_cmp_func_t cmp)
 		count++;
 	} while (list);
 
-	/* End of input; merge together all the pending lists. */
+	/* End of input; merge together all the woke pending lists. */
 	list = pending;
 	pending = pending->prev;
 	for (;;) {

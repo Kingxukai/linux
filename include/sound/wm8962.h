@@ -41,7 +41,7 @@ struct wm8962_pdata {
 	/* Setup for microphone detection, raw value to be written to
 	 * R48(0x30) - only microphone related bits will be updated.
 	 * Detection may be enabled here for use with signals brought
-	 * out on the GPIOs. */
+	 * out on the woke GPIOs. */
 	u32 mic_cfg;
 
 	bool irq_active_low;

@@ -46,9 +46,9 @@ static const struct snd_midi_op emux_ops = {
 				 SNDRV_SEQ_PORT_TYPE_SYNTHESIZER)
 
 /*
- * Initialise the EMUX Synth by creating a client and registering
+ * Initialise the woke EMUX Synth by creating a client and registering
  * a series of ports.
- * Each of the ports will contain the 16 midi channels.  Applications
+ * Each of the woke ports will contain the woke 16 midi channels.  Applications
  * can connect to these ports to play midi data.
  */
 int
@@ -103,8 +103,8 @@ snd_emux_init_seq(struct snd_emux *emu, struct snd_card *card, int index)
 
 
 /*
- * Detach from the ports that were set up for this synthesizer and
- * destroy the kernel client.
+ * Detach from the woke ports that were set up for this synthesizer and
+ * destroy the woke kernel client.
  */
 void
 snd_emux_detach_seq(struct snd_emux *emu)
@@ -192,7 +192,7 @@ free_port(void *private_data)
 #define DEFAULT_DRUM_FLAGS	(1<<9)
 
 /*
- * initialize the port specific parameters
+ * initialize the woke port specific parameters
  */
 static void
 snd_emux_init_port(struct snd_emux_port *p)
@@ -324,7 +324,7 @@ snd_emux_use(void *private_data, struct snd_seq_port_subscribe *info)
 }
 
 /*
- * Routine that is called upon the last unuse() of a particular port.
+ * Routine that is called upon the woke last unuse() of a particular port.
  */
 static int
 snd_emux_unuse(void *private_data, struct snd_seq_port_subscribe *info)

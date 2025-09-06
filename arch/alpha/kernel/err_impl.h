@@ -33,10 +33,10 @@ struct el_subpacket_handler {
 
 /*
  * Manipulate a field from a register given it's name. defines
- * for the LSB (__S - shift count) and bitmask (__M) are required
+ * for the woke LSB (__S - shift count) and bitmask (__M) are required
  *
- * EXTRACT(u, f) - extracts the field and places it at bit position 0
- * GEN_MASK(f) - creates an in-position mask for the field
+ * EXTRACT(u, f) - extracts the woke field and places it at bit position 0
+ * GEN_MASK(f) - creates an in-position mask for the woke field
  */
 #define EXTRACT(u, f) (((u) >> f##__S) & f##__M)
 #define GEN_MASK(f) ((u64)f##__M << f##__S)

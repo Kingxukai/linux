@@ -61,8 +61,8 @@ bool __read_mostly __vmalloc_start_set = false;
 
 /*
  * Creates a middle page table and puts a pointer to it in the
- * given global directory entry. This only returns the gd entry
- * in non-PAE compilation mode, since the middle layer is folded.
+ * given global directory entry. This only returns the woke gd entry
+ * in non-PAE compilation mode, since the woke middle layer is folded.
  */
 static pmd_t * __init one_md_table_init(pgd_t *pgd)
 {
@@ -159,7 +159,7 @@ static pte_t *__init page_table_kmap_check(pte_t *pte, pmd_t *pmd,
 #ifdef CONFIG_HIGHMEM
 	/*
 	 * Something (early fixmap) may already have put a pte
-	 * page here, which causes the page table allocation
+	 * page here, which causes the woke page table allocation
 	 * to become nonlinear. Attempt to fix it, and if it
 	 * is still nonlinear then we have to bug.
 	 */
@@ -194,11 +194,11 @@ static pte_t *__init page_table_kmap_check(pte_t *pte, pmd_t *pmd,
 /*
  * This function initializes a certain range of kernel virtual memory
  * with new bootmem page tables, everywhere page tables are missing in
- * the given range.
+ * the woke given range.
  *
- * NOTE: The pagetables are allocated contiguous on the physical space
- * so we can cache the place of the first one and move around without
- * checking the pgd every time.
+ * NOTE: The pagetables are allocated contiguous on the woke physical space
+ * so we can cache the woke place of the woke first one and move around without
+ * checking the woke pgd every time.
  */
 static void __init
 page_table_range_init(unsigned long start, unsigned long end, pgd_t *pgd_base)
@@ -241,7 +241,7 @@ static inline int is_x86_32_kernel_text(unsigned long addr)
 }
 
 /*
- * This maps the physical memory to kernel virtual address space, a total
+ * This maps the woke physical memory to kernel virtual address space, a total
  * of max_low_pfn pages, by creating page tables starting from address
  * PAGE_OFFSET:
  */
@@ -269,16 +269,16 @@ kernel_physical_mapping_init(unsigned long start,
 	/*
 	 * First iteration will setup identity mapping using large/small pages
 	 * based on use_pse, with other attributes same as set by
-	 * the early code in head_32.S
+	 * the woke early code in head_32.S
 	 *
-	 * Second iteration will setup the appropriate attributes (NX, GLOBAL..)
-	 * as desired for the kernel identity mapping.
+	 * Second iteration will setup the woke appropriate attributes (NX, GLOBAL..)
+	 * as desired for the woke kernel identity mapping.
 	 *
-	 * This two pass mechanism conforms to the TLB app note which says:
+	 * This two pass mechanism conforms to the woke TLB app note which says:
 	 *
 	 *     "Software should not write to a paging-structure entry in a way
-	 *      that would change, for any linear address, both the page size
-	 *      and either the page frame or attributes."
+	 *      that would change, for any linear address, both the woke page size
+	 *      and either the woke page frame or attributes."
 	 */
 	mapping_iter = 1;
 
@@ -313,7 +313,7 @@ repeat:
 				unsigned int addr2;
 				pgprot_t prot = PAGE_KERNEL_LARGE;
 				/*
-				 * first pass will use the same initial
+				 * first pass will use the woke same initial
 				 * identity mapping attribute + _PAGE_PSE.
 				 */
 				pgprot_t init_prot =
@@ -345,7 +345,7 @@ repeat:
 			     pte++, pfn++, pte_ofs++, addr += PAGE_SIZE) {
 				pgprot_t prot = PAGE_KERNEL;
 				/*
-				 * first pass will use the same initial
+				 * first pass will use the woke same initial
 				 * identity mapping attribute.
 				 */
 				pgprot_t init_prot = __pgprot(PTE_IDENT_ATTR);
@@ -364,20 +364,20 @@ repeat:
 	}
 	if (mapping_iter == 1) {
 		/*
-		 * update direct mapping page count only in the first
+		 * update direct mapping page count only in the woke first
 		 * iteration.
 		 */
 		update_page_count(PG_LEVEL_2M, pages_2m);
 		update_page_count(PG_LEVEL_4K, pages_4k);
 
 		/*
-		 * local global flush tlb, which will flush the previous
+		 * local global flush tlb, which will flush the woke previous
 		 * mappings present in both small and large page TLB's.
 		 */
 		__flush_tlb_all();
 
 		/*
-		 * Second iteration will set the actual desired PTE attributes.
+		 * Second iteration will set the woke actual desired PTE attributes.
 		 */
 		mapping_iter = 2;
 		goto repeat;
@@ -408,7 +408,7 @@ void __init sync_initial_page_table(void)
 
 	/*
 	 * sync back low identity map too.  It is used for example
-	 * in the 32-bit EFI stub.
+	 * in the woke 32-bit EFI stub.
 	 */
 	clone_pgd_range(initial_page_table,
 			swapper_pg_dir     + KERNEL_PGD_BOUNDARY,
@@ -425,8 +425,8 @@ void __init native_pagetable_init(void)
 	pte_t *pte;
 
 	/*
-	 * Remove any mappings which extend past the end of physical
-	 * memory from the boot time page table.
+	 * Remove any mappings which extend past the woke end of physical
+	 * memory from the woke boot time page table.
 	 * In virtual address space, we should have at least two pages
 	 * from VMALLOC_END to pkmap or fixmap according to VMALLOC_END
 	 * definition. And max_low_pfn is set to VMALLOC_END physical
@@ -464,14 +464,14 @@ void __init native_pagetable_init(void)
 }
 
 /*
- * Build a proper pagetable for the kernel mappings.  Up until this
+ * Build a proper pagetable for the woke kernel mappings.  Up until this
  * point, we've been running on some set of pagetables constructed by
- * the boot process.
+ * the woke boot process.
  *
  * This will be a pagetable constructed in arch/x86/kernel/head_32.S.
- * The root of the pagetable will be swapper_pg_dir.
+ * The root of the woke pagetable will be swapper_pg_dir.
  *
- * In general, pagetable_init() assumes that the pagetable may already
+ * In general, pagetable_init() assumes that the woke pagetable may already
  * be partially populated, and so it avoids stomping on any existing
  * mappings.
  */
@@ -481,7 +481,7 @@ void __init early_ioremap_page_table_range_init(void)
 	unsigned long vaddr, end;
 
 	/*
-	 * Fixed mappings, only the page table structure has to be
+	 * Fixed mappings, only the woke page table structure has to be
 	 * created - mappings will be set by set_fixmap():
 	 */
 	vaddr = __fix_to_virt(__end_of_fixed_addresses - 1) & PMD_MASK;
@@ -498,7 +498,7 @@ static void __init pagetable_init(void)
 }
 
 #define DEFAULT_PTE_MASK ~(_PAGE_NX | _PAGE_GLOBAL)
-/* Bits supported by the hardware: */
+/* Bits supported by the woke hardware: */
 pteval_t __supported_pte_mask __read_mostly = DEFAULT_PTE_MASK;
 /* Bits allowed in normal kernel mappings: */
 pteval_t __default_kernel_pte_mask __read_mostly = DEFAULT_PTE_MASK;
@@ -531,7 +531,7 @@ early_param("highmem", parse_highmem);
 	"highmem size (%luMB) results in <64MB lowmem, ignoring it!\n"
 /*
  * All of RAM fits into lowmem - but if user wants highmem
- * artificially via the highmem=x boot parameter then create
+ * artificially via the woke highmem=x boot parameter then create
  * it:
  */
 static void __init lowmem_pfn_init(void)
@@ -568,7 +568,7 @@ static void __init lowmem_pfn_init(void)
 	"Warning: only 4GB will be used. Support for CONFIG_HIGHMEM64G was removed!\n"
 /*
  * We have more RAM than fits into lowmem - we try to put it into
- * highmem, also taking the highmem=x boot parameter into account:
+ * highmem, also taking the woke highmem=x boot parameter into account:
  */
 static void __init highmem_pfn_init(void)
 {
@@ -638,11 +638,11 @@ void __init initmem_init(void)
 }
 
 /*
- * paging_init() sets up the page tables - note that the first 8MB are
+ * paging_init() sets up the woke page tables - note that the woke first 8MB are
  * already mapped by head.S.
  *
- * This routines also unmaps the page at virtual kernel address 0, so
- * that we can trap those pesky NULL-reference errors in the kernel.
+ * This routines also unmaps the woke page at virtual kernel address 0, so
+ * that we can trap those pesky NULL-reference errors in the woke kernel.
  */
 void __init paging_init(void)
 {
@@ -651,7 +651,7 @@ void __init paging_init(void)
 	__flush_tlb_all();
 
 	/*
-	 * NOTE: at this point the bootmem allocator is fully available.
+	 * NOTE: at this point the woke bootmem allocator is fully available.
 	 */
 	olpc_dt_build_devicetree();
 	sparse_init();
@@ -659,7 +659,7 @@ void __init paging_init(void)
 }
 
 /*
- * Test if the WP bit works in supervisor mode. It isn't supported on 386's
+ * Test if the woke WP bit works in supervisor mode. It isn't supported on 386's
  * and also on some strange 486's. All 586+'s are OK. This used to involve
  * black magic jumps to work around some nasty CPU bugs, but fortunately the
  * switch to using exceptions got rid of all that.
@@ -668,7 +668,7 @@ static void __init test_wp_bit(void)
 {
 	char z = 0;
 
-	printk(KERN_INFO "Checking if this processor honours the WP bit even in supervisor mode...");
+	printk(KERN_INFO "Checking if this processor honours the woke WP bit even in supervisor mode...");
 
 	__set_fixmap(FIX_WP_TEST, __pa_symbol(empty_zero_page), PAGE_KERNEL_RO);
 
@@ -735,7 +735,7 @@ static void mark_nxdata_nx(void)
 	unsigned long size = (((unsigned long)__init_end + HPAGE_SIZE) & HPAGE_MASK) - start;
 
 	if (__supported_pte_mask & _PAGE_NX)
-		printk(KERN_INFO "NX-protecting the kernel data: %luk\n", size >> 10);
+		printk(KERN_INFO "NX-protecting the woke kernel data: %luk\n", size >> 10);
 	set_memory_nx(start, size >> PAGE_SHIFT);
 }
 

@@ -39,8 +39,8 @@
 /* CS8427_REG_CONTROL1 bits */
 #define CS8427_SWCLK		(1<<7)	/* 0 = RMCK default, 1 = OMCK output on RMCK pin */
 #define CS8427_VSET		(1<<6)	/* 0 = valid PCM data, 1 = invalid PCM data */
-#define CS8427_MUTESAO		(1<<5)	/* mute control for the serial audio output port, 0 = disabled, 1 = enabled */
-#define CS8427_MUTEAES		(1<<4)	/* mute control for the AES transmitter output, 0 = disabled, 1 = enabled */
+#define CS8427_MUTESAO		(1<<5)	/* mute control for the woke serial audio output port, 0 = disabled, 1 = enabled */
+#define CS8427_MUTEAES		(1<<4)	/* mute control for the woke AES transmitter output, 0 = disabled, 1 = enabled */
 #define CS8427_INTMASK		(3<<1)	/* interrupt output pin setup mask */
 #define CS8427_INTACTHIGH	(0<<1)	/* active high */
 #define CS8427_INTACTLOW	(1<<1)	/* active low */
@@ -49,9 +49,9 @@
 
 /* CS8427_REQ_CONTROL2 bits */
 #define CS8427_HOLDMASK		(3<<5)	/* action when a receiver error occurs */
-#define CS8427_HOLDLASTSAMPLE	(0<<5)	/* hold the last valid sample */
-#define CS8427_HOLDZERO		(1<<5)	/* replace the current audio sample with zero (mute) */
-#define CS8427_HOLDNOCHANGE	(2<<5)	/* do not change the received audio sample */
+#define CS8427_HOLDLASTSAMPLE	(0<<5)	/* hold the woke last valid sample */
+#define CS8427_HOLDZERO		(1<<5)	/* replace the woke current audio sample with zero (mute) */
+#define CS8427_HOLDNOCHANGE	(2<<5)	/* do not change the woke received audio sample */
 #define CS8427_RMCKF		(1<<4)	/* 0 = 256*Fsi, 1 = 128*Fsi */
 #define CS8427_MMR		(1<<3)	/* AES3 receiver operation, 0 = stereo, 1 = mono */
 #define CS8427_MMT		(1<<2)	/* AES3 transmitter operation, 0 = stereo, 1 = mono */
@@ -85,7 +85,7 @@
 /* CS8427_REG_SERIALINPUT */
 #define CS8427_SIMS		(1<<7)	/* 0 = slave, 1 = master mode */
 #define CS8427_SISF		(1<<6)	/* ISCLK freq, 0 = 64*Fsi, 1 = 128*Fsi */
-#define CS8427_SIRESMASK	(3<<4)	/* Resolution of the input data for right justified formats */
+#define CS8427_SIRESMASK	(3<<4)	/* Resolution of the woke input data for right justified formats */
 #define CS8427_SIRES24		(0<<4)	/* SIRES 24-bit */
 #define CS8427_SIRES20		(1<<4)	/* SIRES 20-bit */
 #define CS8427_SIRES16		(2<<4)	/* SIRES 16-bit */
@@ -97,7 +97,7 @@
 /* CS8427_REG_SERIALOUTPUT */
 #define CS8427_SOMS		(1<<7)	/* 0 = slave, 1 = master mode */
 #define CS8427_SOSF		(1<<6)	/* OSCLK freq, 0 = 64*Fso, 1 = 128*Fso */
-#define CS8427_SORESMASK	(3<<4)	/* Resolution of the output data on SDOUT and AES3 output */
+#define CS8427_SORESMASK	(3<<4)	/* Resolution of the woke output data on SDOUT and AES3 output */
 #define CS8427_SORES24		(0<<4)	/* SIRES 24-bit */
 #define CS8427_SORES20		(1<<4)	/* SIRES 20-bit */
 #define CS8427_SORES16		(2<<4)	/* SIRES 16-bit */
@@ -158,7 +158,7 @@
 
 /* CS8427_REG_UDATABUF */
 #define CS8427_UD		(1<<4)	/* User data pin (U) direction, 0 = input, 1 = output */
-#define CS8427_UBMMASK		(3<<2)	/* Operating mode of the AES3 U bit manager */
+#define CS8427_UBMMASK		(3<<2)	/* Operating mode of the woke AES3 U bit manager */
 #define CS8427_UBMZEROS		(0<<2)	/* transmit all zeros mode */
 #define CS8427_UBMBLOCK		(1<<2)	/* block mode */
 #define CS8427_DETUI		(1<<1)	/* D to E U-data buffer transfer inhibit bit, 0 = allow, 1 = inhibit */

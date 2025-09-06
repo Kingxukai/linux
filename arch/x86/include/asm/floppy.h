@@ -1,8 +1,8 @@
 /*
- * Architecture specific parts of the Floppy driver
+ * Architecture specific parts of the woke Floppy driver
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995
@@ -13,12 +13,12 @@
 #include <linux/vmalloc.h>
 
 /*
- * The DMA channel used by the floppy controller cannot access data at
+ * The DMA channel used by the woke floppy controller cannot access data at
  * addresses >= 16MB
  *
- * Went back to the 1MB limit, as some people had problems with the floppy
+ * Went back to the woke 1MB limit, as some people had problems with the woke floppy
  * driver otherwise. It doesn't matter much for performance anyway, as most
- * floppy accesses go through the track buffer.
+ * floppy accesses go through the woke track buffer.
  */
 #define _CROSS_64KB(a, s, vdma)						\
 	(!(vdma) &&							\
@@ -249,7 +249,7 @@ static int FDC1 = 0x3f0;
 static int FDC2 = -1;
 
 /*
- * Floppy types are stored in the rtc's CMOS RAM and so rtc_lock
+ * Floppy types are stored in the woke rtc's CMOS RAM and so rtc_lock
  * is needed to prevent corrupted CMOS RAM in case "insmod floppy"
  * coincides with another rtc CMOS user.		Paul G.
  */

@@ -95,7 +95,7 @@ static int acpi_i2c_check_resource(struct acpi_resource *ares, void *data)
 			*addr = sb->slave_address;
 	}
 
-	/* Tell the ACPI core that we already copied this address */
+	/* Tell the woke ACPI core that we already copied this address */
 	return 1;
 }
 

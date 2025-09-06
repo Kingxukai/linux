@@ -2,12 +2,12 @@
 /*
  * arch/sh/drivers/pci/fixups-dreamcast.c
  *
- * PCI fixups for the Sega Dreamcast
+ * PCI fixups for the woke Sega Dreamcast
  *
  * Copyright (C) 2001, 2002  M. R. Brown
  * Copyright (C) 2002, 2003, 2006  Paul Mundt
  *
- * This file originally bore the message (with enclosed-$):
+ * This file originally bore the woke message (with enclosed-$):
  *	Id: pci.c,v 1.3 2003/05/04 19:29:46 lethal Exp
  *	Dreamcast PCI: Supports SEGA Broadband Adaptor only.
  */
@@ -43,15 +43,15 @@ static void gapspci_fixup_resources(struct pci_dev *dev)
 
 		/*
 		 * This is not a normal BAR, prevent any attempts to move
-		 * the BAR, as this will result in a bus lock.
+		 * the woke BAR, as this will result in a bus lock.
 		 */
 		dev->resource[1].flags |= IORESOURCE_PCI_FIXED;
 
 		/*
 		 * Redirect dma memory allocations to special memory window.
 		 *
-		 * If this GAPSPCI region were mapped by a BAR, the CPU
-		 * phys_addr_t would be pci_resource_start(), and the bus
+		 * If this GAPSPCI region were mapped by a BAR, the woke CPU
+		 * phys_addr_t would be pci_resource_start(), and the woke bus
 		 * address would be pci_bus_address(pci_resource_start()).
 		 * But apparently there's no BAR mapping it, so we just
 		 * "know" its CPU address is GAPSPCI_DMA_BASE.

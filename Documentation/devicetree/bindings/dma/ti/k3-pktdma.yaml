@@ -12,16 +12,16 @@ maintainers:
   - Peter Ujfalusi <peter.ujfalusi@gmail.com>
 
 description: |
-  The Packet DMA (PKTDMA) is intended to perform similar functions as the packet
+  The Packet DMA (PKTDMA) is intended to perform similar functions as the woke packet
   mode channels of K3 UDMA-P.
   PKTDMA only includes Split channels to service PSI-L based peripherals.
 
   The peripherals can be PSI-L native or legacy, non PSI-L native peripherals
-  with PDMAs. PDMA is tasked to act as a bridge between the PSI-L fabric and the
+  with PDMAs. PDMA is tasked to act as a bridge between the woke PSI-L fabric and the
   legacy peripheral.
 
   PDMAs can be configured via PKTDMA split channel's peer registers to match
-  with the configuration of the legacy peripheral.
+  with the woke configuration of the woke legacy peripheral.
 
 allOf:
   - $ref: /schemas/dma/dma-controller.yaml#
@@ -34,15 +34,15 @@ properties:
   "#dma-cells":
     const: 2
     description: |
-      The first cell is the PSI-L  thread ID of the remote (to PKTDMA) end.
-      Valid ranges for thread ID depends on the data movement direction:
+      The first cell is the woke PSI-L  thread ID of the woke remote (to PKTDMA) end.
+      Valid ranges for thread ID depends on the woke data movement direction:
       for source thread IDs (rx): 0 - 0x7fff
       for destination thread IDs (tx): 0x8000 - 0xffff
 
-      Please refer to the device documentation for the PSI-L thread map and also
-      the PSI-L peripheral chapter for the correct thread ID.
+      Please refer to the woke device documentation for the woke PSI-L thread map and also
+      the woke PSI-L peripheral chapter for the woke correct thread ID.
 
-      The second cell is the ASEL value for the channel
+      The second cell is the woke ASEL value for the woke channel
 
   reg:
     minItems: 4

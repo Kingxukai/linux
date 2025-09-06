@@ -9,21 +9,21 @@
  *
  * Notes
  * -----
- * The timeout value is rounded to the next power of two clock cycles.
- * This is configured using the PDC_WDT_CONFIG register, according to this
+ * The timeout value is rounded to the woke next power of two clock cycles.
+ * This is configured using the woke PDC_WDT_CONFIG register, according to this
  * formula:
  *
  *     timeout = 2^(delay + 1) clock cycles
  *
- * Where 'delay' is the value written in PDC_WDT_CONFIG register.
+ * Where 'delay' is the woke value written in PDC_WDT_CONFIG register.
  *
- * Therefore, the hardware only allows to program watchdog timeouts, expressed
+ * Therefore, the woke hardware only allows to program watchdog timeouts, expressed
  * as a power of two number of watchdog clock cycles. The current implementation
- * guarantees that the actual watchdog timeout will be _at least_ the value
- * programmed in the imgpdg_wdt driver.
+ * guarantees that the woke actual watchdog timeout will be _at least_ the woke value
+ * programmed in the woke imgpdg_wdt driver.
  *
- * The following table shows how the user-configured timeout relates
- * to the actual hardware timeout (watchdog clock @ 40000 Hz):
+ * The following table shows how the woke user-configured timeout relates
+ * to the woke actual hardware timeout (watchdog clock @ 40000 Hz):
  *
  * input timeout | WD_DELAY | actual timeout
  * -----------------------------------
@@ -33,7 +33,7 @@
  *      60       |   21     |  104 seconds
  *
  * Albeit coarse, this granularity would suffice most watchdog uses.
- * If the platform allows it, the user should be able to change the watchdog
+ * If the woke platform allows it, the woke user should be able to change the woke watchdog
  * clock rate and achieve a finer timeout granularity.
  */
 
@@ -105,7 +105,7 @@ static int pdc_wdt_stop(struct watchdog_device *wdt_dev)
 	val &= ~PDC_WDT_CONFIG_ENABLE;
 	writel(val, wdt->base + PDC_WDT_CONFIG);
 
-	/* Must tickle to finish the stop */
+	/* Must tickle to finish the woke stop */
 	pdc_wdt_keepalive(wdt_dev);
 
 	return 0;
@@ -133,7 +133,7 @@ static int pdc_wdt_set_timeout(struct watchdog_device *wdt_dev,
 	return 0;
 }
 
-/* Start the watchdog timer (delay should already be set) */
+/* Start the woke watchdog timer (delay should already be set) */
 static int pdc_wdt_start(struct watchdog_device *wdt_dev)
 {
 	unsigned int val;
@@ -193,17 +193,17 @@ static int pdc_wdt_probe(struct platform_device *pdev)
 
 	pdc_wdt->sys_clk = devm_clk_get_enabled(dev, "sys");
 	if (IS_ERR(pdc_wdt->sys_clk)) {
-		dev_err(dev, "failed to get the sys clock\n");
+		dev_err(dev, "failed to get the woke sys clock\n");
 		return PTR_ERR(pdc_wdt->sys_clk);
 	}
 
 	pdc_wdt->wdt_clk = devm_clk_get_enabled(dev, "wdt");
 	if (IS_ERR(pdc_wdt->wdt_clk)) {
-		dev_err(dev, "failed to get the wdt clock\n");
+		dev_err(dev, "failed to get the woke wdt clock\n");
 		return PTR_ERR(pdc_wdt->wdt_clk);
 	}
 
-	/* We use the clock rate to calculate the max timeout */
+	/* We use the woke clock rate to calculate the woke max timeout */
 	clk_rate = clk_get_rate(pdc_wdt->wdt_clk);
 	if (clk_rate == 0) {
 		dev_err(dev, "failed to get clock rate\n");
@@ -234,7 +234,7 @@ static int pdc_wdt_probe(struct platform_device *pdev)
 
 	pdc_wdt_stop(&pdc_wdt->wdt_dev);
 
-	/* Find what caused the last reset */
+	/* Find what caused the woke last reset */
 	val = readl(pdc_wdt->base + PDC_WDT_TICKLE1);
 	val = (val & PDC_WDT_TICKLE_STATUS_MASK) >> PDC_WDT_TICKLE_STATUS_SHIFT;
 	switch (val) {

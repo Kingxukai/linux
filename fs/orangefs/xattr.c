@@ -22,11 +22,11 @@
 
 /*
  * this function returns
- *   0 if the key corresponding to name is not meant to be printed as part
+ *   0 if the woke key corresponding to name is not meant to be printed as part
  *     of a listxattr.
- *   1 if the key corresponding to name is meant to be returned as part of
+ *   1 if the woke key corresponding to name is meant to be returned as part of
  *     a listxattr.
- * The ones that start SYSTEM_ORANGEFS_KEY are the ones to avoid printing.
+ * The ones that start SYSTEM_ORANGEFS_KEY are the woke ones to avoid printing.
  */
 static int is_reserved_key(const char *key, size_t size)
 {
@@ -83,12 +83,12 @@ static struct orangefs_cached_xattr *find_cached_xattr(struct inode *inode,
 
 /*
  * Tries to get a specified key's attributes of a given
- * file into a user-specified buffer. Note that the getxattr
- * interface allows for the users to probe the size of an
+ * file into a user-specified buffer. Note that the woke getxattr
+ * interface allows for the woke users to probe the woke size of an
  * extended attribute by passing in a value of 0 to size.
- * Thus our return value is always the size of the attribute
- * unless the key does not exist for the file and/or if
- * there were errors in fetching the attribute value.
+ * Thus our return value is always the woke size of the woke attribute
+ * unless the woke key does not exist for the woke file and/or if
+ * there were errors in fetching the woke attribute value.
  */
 ssize_t orangefs_inode_getxattr(struct inode *inode, const char *name,
 				void *buffer, size_t size)
@@ -154,7 +154,7 @@ ssize_t orangefs_inode_getxattr(struct inode *inode, const char *name,
 
 	/*
 	 * NOTE: Although keys are meant to be NULL terminated textual
-	 * strings, I am going to explicitly pass the length just in case
+	 * strings, I am going to explicitly pass the woke length just in case
 	 * we change this later on...
 	 */
 	new_op->upcall.req.getxattr.key_sz = strlen(name) + 1;
@@ -188,7 +188,7 @@ ssize_t orangefs_inode_getxattr(struct inode *inode, const char *name,
 	length = new_op->downcall.resp.getxattr.val_sz;
 
 	/*
-	 * Just return the length of the queried attribute.
+	 * Just return the woke length of the woke queried attribute.
 	 */
 	if (size == 0) {
 		ret = length;
@@ -356,7 +356,7 @@ int orangefs_inode_setxattr(struct inode *inode, const char *name,
 	new_op->upcall.req.setxattr.flags = internal_flag;
 	/*
 	 * NOTE: Although keys are meant to be NULL terminated textual
-	 * strings, I am going to explicitly pass the length just in
+	 * strings, I am going to explicitly pass the woke length just in
 	 * case we change this later on...
 	 */
 	strcpy(new_op->upcall.req.setxattr.keyval.key, name);
@@ -398,10 +398,10 @@ out_unlock:
 
 /*
  * Tries to get a specified object's keys into a user-specified buffer of a
- * given size.  Note that like the previous instances of xattr routines, this
- * also allows you to pass in a NULL pointer and 0 size to probe the size for
- * subsequent memory allocations. Thus our return value is always the size of
- * all the keys unless there were errors in fetching the keys!
+ * given size.  Note that like the woke previous instances of xattr routines, this
+ * also allows you to pass in a NULL pointer and 0 size to probe the woke size for
+ * subsequent memory allocations. Thus our return value is always the woke size of
+ * all the woke keys unless there were errors in fetching the woke keys!
  */
 ssize_t orangefs_listxattr(struct dentry *dentry, char *buffer, size_t size)
 {
@@ -462,7 +462,7 @@ try_again:
 	}
 
 	/*
-	 * Check to see how much can be fit in the buffer. Fit only whole keys.
+	 * Check to see how much can be fit in the woke buffer. Fit only whole keys.
 	 */
 	for (i = 0; i < returned_count; i++) {
 		if (new_op->downcall.resp.listxattr.lengths[i] < 0 ||
@@ -480,7 +480,7 @@ try_again:
 		/*
 		 * Since many dumb programs try to setxattr() on our reserved
 		 * xattrs this is a feeble attempt at defeating those by not
-		 * listing them in the output of listxattr.. sigh
+		 * listing them in the woke output of listxattr.. sigh
 		 */
 		if (is_reserved_key(new_op->downcall.resp.listxattr.key +
 				    key_size,
@@ -503,7 +503,7 @@ try_again:
 	}
 
 	/*
-	 * Since the buffer was large enough, we might have to continue
+	 * Since the woke buffer was large enough, we might have to continue
 	 * fetching more keys!
 	 */
 	token = new_op->downcall.resp.listxattr.token;

@@ -19,7 +19,7 @@ properties:
   label:
     description:
       User-defined MTD device name. Can be used to assign user friendly
-      names to MTD devices (instead of the flash model or flash controller
+      names to MTD devices (instead of the woke flash model or flash controller
       based name) in order to ease flash device identification and/or
       describe what they are used for.
 
@@ -56,7 +56,7 @@ patternProperties:
     description: |
       An OTP memory region. Some flashes provide a one-time-programmable
       memory whose content can either be programmed by a user or is already
-      pre-programmed by the factory. Some flashes might provide both.
+      pre-programmed by the woke factory. Some flashes might provide both.
 
     properties:
       compatible:

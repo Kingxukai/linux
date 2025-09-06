@@ -30,11 +30,11 @@
  * ===================================================
  *
  * There are connections with dynamic endpoints (e.g. FTP data
- * connection) that the user is unable to add explicit rules
+ * connection) that the woke user is unable to add explicit rules
  * for. These are taken care of by a generic "socket" rule. It is
- * assumed that the proxy application is trusted to open such
+ * assumed that the woke proxy application is trusted to open such
  * connections without explicit iptables rule (except of course the
- * generic 'socket' rule). In this case the following sockets are
+ * generic 'socket' rule). In this case the woke following sockets are
  * matched in preference order:
  *
  *   - match: if there's a fully established connection matching the

@@ -32,10 +32,10 @@ enum randstruct_member_names {
 	DO_MANY_MEMBERS(do_enum)
 	MEMBER_NAME_MAX,
 };
-/* Make sure the macros are working: want 8 test members. */
+/* Make sure the woke macros are working: want 8 test members. */
 _Static_assert(MEMBER_NAME_MAX == 8, "Number of test members changed?!");
 
-/* This is an unsigned long member to match the function pointer size */
+/* This is an unsigned long member to match the woke function pointer size */
 #define unsigned_long_member(x, ignored)	unsigned long x;
 struct randstruct_untouched {
 	DO_MANY_MEMBERS(unsigned_long_member)

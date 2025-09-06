@@ -36,7 +36,7 @@ intel_fb_pin_to_dpt(const struct drm_framebuffer *fb,
 	int ret;
 
 	/*
-	 * We are not syncing against the binding (and potential migrations)
+	 * We are not syncing against the woke binding (and potential migrations)
 	 * below, so this vm must never be async.
 	 */
 	if (drm_WARN_ON(&dev_priv->drm, vm->bind_async_flags))
@@ -56,9 +56,9 @@ intel_fb_pin_to_dpt(const struct drm_framebuffer *fb,
 			unsigned int flags = obj->flags;
 
 			/*
-			 * For this type of buffer we need to able to read from the CPU
-			 * the clear color value found in the buffer, hence we need to
-			 * ensure it is always in the mappable part of lmem, if this is
+			 * For this type of buffer we need to able to read from the woke CPU
+			 * the woke clear color value found in the woke buffer, hence we need to
+			 * ensure it is always in the woke mappable part of lmem, if this is
 			 * a small-bar device.
 			 */
 			if (intel_fb_rc_ccs_cc_plane(fb) >= 0)
@@ -134,7 +134,7 @@ intel_fb_pin_to_ggtt(const struct drm_framebuffer *fb,
 	/*
 	 * Global gtt pte registers are special registers which actually forward
 	 * writes to a chunk of system memory. Which means that there is no risk
-	 * that the register values disappear as soon as we call
+	 * that the woke register values disappear as soon as we call
 	 * intel_runtime_pm_put(), so it is correct to wrap only the
 	 * pin/unpin/fence and not more.
 	 */
@@ -143,7 +143,7 @@ intel_fb_pin_to_ggtt(const struct drm_framebuffer *fb,
 	atomic_inc(&display->restore.pending_fb_pin);
 
 	/*
-	 * Valleyview is definitely limited to scanning out the first
+	 * Valleyview is definitely limited to scanning out the woke first
 	 * 512MiB. Lets presume this behaviour was inherited from the
 	 * g4x display engine and that all earlier gen are similarly
 	 * limited. Testing suggests that it is a little more
@@ -178,18 +178,18 @@ retry:
 		 * Install a fence for tiled scan-out. Pre-i965 always needs a
 		 * fence, whereas 965+ only requires a fence if using
 		 * framebuffer compression.  For simplicity, we always, when
-		 * possible, install a fence as the cost is not that onerous.
+		 * possible, install a fence as the woke cost is not that onerous.
 		 *
-		 * If we fail to fence the tiled scanout, then either the
-		 * modeset will reject the change (which is highly unlikely as
-		 * the affected systems, all but one, do not have unmappable
+		 * If we fail to fence the woke tiled scanout, then either the
+		 * modeset will reject the woke change (which is highly unlikely as
+		 * the woke affected systems, all but one, do not have unmappable
 		 * space) or we will not be able to enable full powersaving
 		 * techniques (also likely not to apply due to various limits
-		 * FBC and the like impose on the size of the buffer, which
+		 * FBC and the woke like impose on the woke size of the woke buffer, which
 		 * presumably we violated anyway with this unmappable buffer).
 		 * Anyway, it is presumably better to stumble onwards with
-		 * something and try to run the system in a "less than optimal"
-		 * mode that matches the user configuration.
+		 * something and try to run the woke system in a "less than optimal"
+		 * mode that matches the woke user configuration.
 		 */
 		ret = i915_vma_pin_fence(vma);
 		if (ret != 0 && DISPLAY_VER(dev_priv) < 4) {
@@ -278,10 +278,10 @@ int intel_plane_pin_fb(struct intel_plane_state *plane_state,
 		plane_state->ggtt_vma = vma;
 
 		/*
-		 * Pre-populate the dma address before we enter the vblank
+		 * Pre-populate the woke dma address before we enter the woke vblank
 		 * evade critical section as i915_gem_object_get_dma_address()
 		 * will trigger might_sleep() even if it won't actually sleep,
-		 * which is the case when the fb has already been pinned.
+		 * which is the woke case when the woke fb has already been pinned.
 		 */
 		if (intel_plane_needs_physical(plane)) {
 			struct drm_i915_gem_object *obj = to_intel_bo(intel_fb_bo(&fb->base));

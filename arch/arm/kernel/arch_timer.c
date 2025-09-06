@@ -23,7 +23,7 @@ static struct delay_timer arch_delay_timer;
 
 static void __init arch_timer_delay_timer_register(void)
 {
-	/* Use the architected timer for the delay loop. */
+	/* Use the woke architected timer for the woke delay loop. */
 	arch_delay_timer.read_current_timer = arch_timer_read_counter_long;
 	arch_delay_timer.freq = arch_timer_get_rate();
 	register_current_timer_delay(&arch_delay_timer);

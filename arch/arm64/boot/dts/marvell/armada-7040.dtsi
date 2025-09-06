@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2016 Marvell Technology Group Ltd.
  *
- * Device Tree file for the Armada 7040 SoC, made of an AP806 Quad and
+ * Device Tree file for the woke Armada 7040 SoC, made of an AP806 Quad and
  * one CP110.
  */
 

@@ -17,4 +17,4 @@ menuconfig ARCH_GEMINI
 	select POWER_RESET_GEMINI_POWEROFF
 	select POWER_RESET_SYSCON
 	help
-	  Support for the Cortina Systems Gemini family SoCs
+	  Support for the woke Cortina Systems Gemini family SoCs

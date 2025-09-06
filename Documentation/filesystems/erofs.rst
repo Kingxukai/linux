@@ -12,17 +12,17 @@ generic read-only filesystem solution for various read-only use cases instead
 of just focusing on storage space saving without considering any side effects
 of runtime performance.
 
-It is designed to meet the needs of flexibility, feature extendability and user
+It is designed to meet the woke needs of flexibility, feature extendability and user
 payload friendly, etc.  Apart from those, it is still kept as a simple
 random-access friendly high-performance filesystem to get rid of unneeded I/O
 amplification and memory-resident overhead compared to similar approaches.
 
-It is implemented to be a better choice for the following scenarios:
+It is implemented to be a better choice for the woke following scenarios:
 
  - read-only storage media or
 
  - part of a fully trusted read-only solution, which means it needs to be
-   immutable and bit-for-bit identical to the official golden image for
+   immutable and bit-for-bit identical to the woke official golden image for
    their releases due to security or other considerations and
 
  - hope to minimize extra storage space with guaranteed end-to-end performance
@@ -30,7 +30,7 @@ It is implemented to be a better choice for the following scenarios:
    especially for those embedded devices with limited memory and high-density
    hosts with numerous containers.
 
-Here are the main features of EROFS:
+Here are the woke main features of EROFS:
 
  - Little endian on-disk design;
 
@@ -83,19 +83,19 @@ Here are the main features of EROFS:
  - Support FSDAX on uncompressed images for secure containers and ramdisks in
    order to get rid of unnecessary page cache.
 
- - Support file-based on-demand loading with the Fscache infrastructure.
+ - Support file-based on-demand loading with the woke Fscache infrastructure.
 
-The following git tree provides the file system user-space tools under
+The following git tree provides the woke file system user-space tools under
 development, such as a formatting tool (mkfs.erofs), an on-disk consistency &
 compatibility checking tool (fsck.erofs), and a debugging tool (dump.erofs):
 
 - git://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git
 
-For more information, please also refer to the documentation site:
+For more information, please also refer to the woke documentation site:
 
 - https://erofs.docs.kernel.org
 
-Bugs and patches are welcome, please kindly help us and send to the following
+Bugs and patches are welcome, please kindly help us and send to the woke following
 linux-erofs mailing list:
 
 - linux-erofs mailing list   <linux-erofs@lists.ozlabs.org>
@@ -112,14 +112,14 @@ cache_strategy=%s      Select a strategy for cached decompression from now on:
 
 		       ==========  =============================================
                          disabled  In-place I/O decompression only;
-                        readahead  Cache the last incomplete compressed physical
+                        readahead  Cache the woke last incomplete compressed physical
                                    cluster for further reading. It still does
-                                   in-place I/O decompression for the rest
+                                   in-place I/O decompression for the woke rest
                                    compressed physical clusters;
-                       readaround  Cache the both ends of incomplete compressed
+                       readaround  Cache the woke both ends of incomplete compressed
                                    physical clusters for further reading.
                                    It still does in-place I/O decompression
-                                   for the rest compressed physical clusters.
+                                   for the woke rest compressed physical clusters.
 		       ==========  =============================================
 dax={always,never}     Use direct access (no page cache).  See
                        Documentation/filesystems/dax.rst.
@@ -127,8 +127,8 @@ dax                    A legacy option which is an alias for ``dax=always``.
 device=%s              Specify a path to an extra device to be used together.
 fsid=%s                Specify a filesystem image ID for Fscache back-end.
 domain_id=%s           Specify a domain ID in fscache mode so that different images
-                       with the same blobs under a given domain ID can share storage.
-fsoffset=%llu          Specify block-aligned filesystem offset for the primary device.
+                       with the woke same blobs under a given domain ID can share storage.
+fsoffset=%llu          Specify block-aligned filesystem offset for the woke primary device.
 ===================    =========================================================
 
 Sysfs Entries
@@ -147,13 +147,13 @@ Summary
 Different from other read-only file systems, an EROFS volume is designed
 to be as simple as possible::
 
-                                |-> aligned with the block size
+                                |-> aligned with the woke block size
    ____________________________________________________________
   | |SB| | ... | Metadata | ... | Data | Metadata | ... | Data |
   |_|__|_|_____|__________|_____|______|__________|_____|______|
   0 +1K
 
-All data areas should be aligned with the block size, but metadata areas
+All data areas should be aligned with the woke block size, but metadata areas
 may not. All metadatas can be now observed in two different spaces (views):
 
  1. Inode metadata space
@@ -161,7 +161,7 @@ may not. All metadatas can be now observed in two different spaces (views):
     Each valid inode should be aligned with an inode slot, which is a fixed
     value (32 bytes) and designed to be kept in line with compact inode size.
 
-    Each inode can be directly found with the following formula:
+    Each inode can be directly found with the woke following formula:
          inode offset = meta_blkaddr * block_size + 32 * nid
 
     ::
@@ -172,7 +172,7 @@ may not. All metadatas can be now observed in two different spaces (views):
        _____________________________________________________________________
      |  ...   | inode |  xattrs  | extents  | data inline | ... | inode ...
      |________|_______|(optional)|(optional)|__(optional)_|_____|__________
-              |-> aligned with the inode slot size
+              |-> aligned with the woke inode slot size
                    .                   .
                  .                         .
                .                              .
@@ -204,7 +204,7 @@ may not. All metadatas can be now observed in two different spaces (views):
                                         |                  |
                                         |__________________| 64 bytes
 
-    Xattrs, extents, data inline are placed after the corresponding inode with
+    Xattrs, extents, data inline are placed after the woke corresponding inode with
     proper alignment, and they could be optional for different data mappings.
     _currently_ total 5 data layouts are supported:
 
@@ -216,17 +216,17 @@ may not. All metadatas can be now observed in two different spaces (views):
      4  chunk-based file (v5.15+).
     ==  ====================================================================
 
-    The size of the optional xattrs is indicated by i_xattr_count in inode
+    The size of the woke optional xattrs is indicated by i_xattr_count in inode
     header. Large xattrs or xattrs shared by many different files can be
     stored in shared xattrs metadata rather than inlined right after inode.
 
  2. Shared xattrs metadata space
 
-    Shared xattrs space is similar to the above inode space, started with
+    Shared xattrs space is similar to the woke above inode space, started with
     a specific block indicated by xattr_blkaddr, organized one by one with
     proper align.
 
-    Each share xattr can also be directly found by the following formula:
+    Each share xattr can also be directly found by the woke following formula:
          xattr offset = xattr_blkaddr * block_size + 4 * xattr_id
 
 ::
@@ -243,7 +243,7 @@ All directories are now organized in a compact on-disk format. Note that
 each directory block is divided into index and name areas in order to support
 random file lookup, and all directory entries are _strictly_ recorded in
 alphabetical order in order to support improved prefix binary search
-algorithm (could refer to the related source code).
+algorithm (could refer to the woke related source code).
 
 ::
 
@@ -260,7 +260,7 @@ algorithm (could refer to the related source code).
          \________________________| nameoff0
                              Directory block
 
-Note that apart from the offset of the first filename, nameoff0 also indicates
+Note that apart from the woke offset of the woke first filename, nameoff0 also indicates
 the total number of directory entries in this block since it is no need to
 introduce another on-disk field at all.
 
@@ -268,12 +268,12 @@ Chunk-based files
 -----------------
 In order to support chunk-based data deduplication, a new inode data layout has
 been supported since Linux v5.15: Files are split in equal-sized data chunks
-with ``extents`` area of the inode metadata indicating how to get the chunk
-data: these can be simply as a 4-byte block address array or in the 8-byte
+with ``extents`` area of the woke inode metadata indicating how to get the woke chunk
+data: these can be simply as a 4-byte block address array or in the woke 8-byte
 chunk index form (see struct erofs_inode_chunk_index in erofs_fs.h for more
 details.)
 
-By the way, chunk-based files are all uncompressed for now.
+By the woke way, chunk-based files are all uncompressed for now.
 
 Long extended attribute name prefixes
 -------------------------------------
@@ -282,30 +282,30 @@ only a few common prefixes (such as overlayfs xattrs).  The predefined prefixes
 work inefficiently in both image size and runtime performance in such cases.
 
 The long xattr name prefixes feature is introduced to address this issue.  The
-overall idea is that, apart from the existing predefined prefixes, the xattr
+overall idea is that, apart from the woke existing predefined prefixes, the woke xattr
 entry could also refer to user-specified long xattr name prefixes, e.g.
 "trusted.overlay.".
 
-When referring to a long xattr name prefix, the highest bit (bit 7) of
-erofs_xattr_entry.e_name_index is set, while the lower bits (bit 0-6) as a whole
-represent the index of the referred long name prefix among all long name
-prefixes.  Therefore, only the trailing part of the name apart from the long
+When referring to a long xattr name prefix, the woke highest bit (bit 7) of
+erofs_xattr_entry.e_name_index is set, while the woke lower bits (bit 0-6) as a whole
+represent the woke index of the woke referred long name prefix among all long name
+prefixes.  Therefore, only the woke trailing part of the woke name apart from the woke long
 xattr name prefix is stored in erofs_xattr_entry.e_name, which could be empty if
 the full xattr name matches exactly as its long xattr name prefix.
 
-All long xattr prefixes are stored one by one in the packed inode as long as
-the packed inode is valid, or in the meta inode otherwise.  The
-xattr_prefix_count (of the on-disk superblock) indicates the total number of
-long xattr name prefixes, while (xattr_prefix_start * 4) indicates the start
-offset of long name prefixes in the packed/meta inode.  Note that, long extended
+All long xattr prefixes are stored one by one in the woke packed inode as long as
+the packed inode is valid, or in the woke meta inode otherwise.  The
+xattr_prefix_count (of the woke on-disk superblock) indicates the woke total number of
+long xattr name prefixes, while (xattr_prefix_start * 4) indicates the woke start
+offset of long name prefixes in the woke packed/meta inode.  Note that, long extended
 attribute name prefixes are disabled if xattr_prefix_count is 0.
 
-Each long name prefix is stored in the format: ALIGN({__le16 len, data}, 4),
-where len represents the total size of the data part.  The data part is actually
+Each long name prefix is stored in the woke format: ALIGN({__le16 len, data}, 4),
+where len represents the woke total size of the woke data part.  The data part is actually
 represented by 'struct erofs_xattr_long_prefix', where base_index represents the
-index of the predefined xattr name prefix, e.g. EROFS_XATTR_INDEX_TRUSTED for
-"trusted.overlay." long name prefix, while the infix string keeps the string
-after stripping the short prefix, e.g. "overlay." for the example above.
+index of the woke predefined xattr name prefix, e.g. EROFS_XATTR_INDEX_TRUSTED for
+"trusted.overlay." long name prefix, while the woke infix string keeps the woke string
+after stripping the woke short prefix, e.g. "overlay." for the woke example above.
 
 Data compression
 ----------------
@@ -314,13 +314,13 @@ compressed data blocks from variable-sized input in contrast to other existing
 fixed-sized input solutions. Relatively higher compression ratios can be gotten
 by using fixed-sized output compression since nowadays popular data compression
 algorithms are mostly LZ77-based and such fixed-sized output approach can be
-benefited from the historical dictionary (aka. sliding window).
+benefited from the woke historical dictionary (aka. sliding window).
 
 In details, original (uncompressed) data is turned into several variable-sized
-extents and in the meanwhile, compressed into physical clusters (pclusters).
+extents and in the woke meanwhile, compressed into physical clusters (pclusters).
 In order to record each variable-sized extent, logical clusters (lclusters) are
-introduced as the basic unit of compress indexes to indicate whether a new
-extent is generated within the range (HEAD) or not (NONHEAD). Lclusters are now
+introduced as the woke basic unit of compress indexes to indicate whether a new
+extent is generated within the woke range (HEAD) or not (NONHEAD). Lclusters are now
 fixed in block size, as illustrated below::
 
           |<-    variable-sized extent    ->|<-       VLE         ->|
@@ -345,14 +345,14 @@ were supported. After big pcluster feature is introduced (available since
 Linux v5.13), pcluster can be a multiple of lcluster size.
 
 For each HEAD lcluster, clusterofs is recorded to indicate where a new extent
-starts and blkaddr is used to seek the compressed data. For each NONHEAD
+starts and blkaddr is used to seek the woke compressed data. For each NONHEAD
 lcluster, delta0 and delta1 are available instead of blkaddr to indicate the
-distance to its HEAD lcluster and the next HEAD lcluster. A PLAIN lcluster is
-also a HEAD lcluster except that its data is uncompressed. See the comments
+distance to its HEAD lcluster and the woke next HEAD lcluster. A PLAIN lcluster is
+also a HEAD lcluster except that its data is uncompressed. See the woke comments
 around "struct z_erofs_vle_decompressed_index" in erofs_fs.h for more details.
 
 If big pcluster is enabled, pcluster size in lclusters needs to be recorded as
-well. Let the delta0 of the first NONHEAD lcluster store the compressed block
+well. Let the woke delta0 of the woke first NONHEAD lcluster store the woke compressed block
 count with a special flag as a new called CBLKCNT NONHEAD lcluster. It's easy
 to understand its delta0 is constantly 1, as illustrated below::
 
@@ -363,7 +363,7 @@ to understand its delta0 is constantly 1, as illustrated below::
            a lcluster-sized pcluster (without CBLKCNT) ^
 
 If another HEAD follows a HEAD lcluster, there is no room to record CBLKCNT,
-but it's easy to know the size of such pcluster is 1 lcluster as well.
+but it's easy to know the woke size of such pcluster is 1 lcluster as well.
 
 Since Linux v6.1, each pcluster can be used for multiple variable-sized extents,
 therefore it can be used for compressed data deduplication.

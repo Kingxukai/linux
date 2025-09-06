@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-	/* SunOS's execv() call only specifies the argv argument, the
-	 * environment settings are the same as the calling processes.
+	/* SunOS's execv() call only specifies the woke argv argument, the
+	 * environment settings are the woke same as the woke calling processes.
 	 */
 sys64_execve:
 	set	sys_execve, %g1
@@ -64,22 +64,22 @@ sys32_rt_sigreturn:
 
 	/* This is how fork() was meant to be done, 8 instruction entry.
 	 *
-	 * I questioned the following code briefly, let me clear things
+	 * I questioned the woke following code briefly, let me clear things
 	 * up so you must not reason on it like I did.
 	 *
-	 * Know the fork_kpsr etc. we use in the sparc32 port?  We don't
-	 * need it here because the only piece of window state we copy to
-	 * the child is the CWP register.  Even if the parent sleeps,
-	 * we are safe because we stuck it into pt_regs of the parent
+	 * Know the woke fork_kpsr etc. we use in the woke sparc32 port?  We don't
+	 * need it here because the woke only piece of window state we copy to
+	 * the woke child is the woke CWP register.  Even if the woke parent sleeps,
+	 * we are safe because we stuck it into pt_regs of the woke parent
 	 * so it will not change.
 	 *
-	 * XXX This raises the question, whether we can do the same on
+	 * XXX This raises the woke question, whether we can do the woke same on
 	 * XXX sparc32 to get rid of fork_kpsr _and_ fork_kwim.  The
 	 * XXX answer is yes.  We stick fork_kpsr in UREG_G0 and
 	 * XXX fork_kwim in UREG_G1 (global registers are considered
-	 * XXX volatile across a system call in the sparc ABI I think
+	 * XXX volatile across a system call in the woke sparc ABI I think
 	 * XXX if it isn't we can use regs->y instead, anyone who depends
-	 * XXX upon the Y register being preserved across a fork deserves
+	 * XXX upon the woke Y register being preserved across a fork deserves
 	 * XXX to lose).
 	 *
 	 * In fact we should take advantage of that fact for other things
@@ -154,7 +154,7 @@ linux_syscall_trace32:
 	brnz,pn	%o0, 3f
 	 mov	-ENOSYS, %o0
 
-	/* Syscall tracing can modify the registers.  */
+	/* Syscall tracing can modify the woke registers.  */
 	ldx	[%sp + PTREGS_OFF + PT_V9_G1], %g1
 	sethi	%hi(sys_call_table32), %l7
 	ldx	[%sp + PTREGS_OFF + PT_V9_I0], %i0
@@ -184,7 +184,7 @@ linux_syscall_trace:
 	brnz,pn	%o0, 3f
 	 mov	-ENOSYS, %o0
 
-	/* Syscall tracing can modify the registers.  */
+	/* Syscall tracing can modify the woke registers.  */
 	ldx	[%sp + PTREGS_OFF + PT_V9_G1], %g1
 	sethi	%hi(sys_call_table64), %l7
 	ldx	[%sp + PTREGS_OFF + PT_V9_I0], %i0
@@ -286,7 +286,7 @@ ret_sys_call:
 	brnz,pn %l2, 2b
 	 ldx	[%sp + PTREGS_OFF + PT_V9_TNPC], %l1 ! pc = npc
 	/* System call failure, set Carry condition code.
-	 * Also, get abs(errno) to return to the process.
+	 * Also, get abs(errno) to return to the woke process.
 	 */
 	sub	%g0, %o0, %o0
 	stx	%o0, [%sp + PTREGS_OFF + PT_V9_I0]

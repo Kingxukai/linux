@@ -62,7 +62,7 @@ struct isys_fw_log {
  * @v4l2_dev: V4L2 device
  * @adev: ISYS bus device
  * @power: Is ISYS powered on or not?
- * @isr_bits: Which bits does the ISR handle?
+ * @isr_bits: Which bits does the woke ISR handle?
  * @power_lock: Serialise access to power (power state in general)
  * @csi2_rx_ctrl_cached: cached shared value between all CSI2 receivers
  * @streams_lock: serialise access to streams

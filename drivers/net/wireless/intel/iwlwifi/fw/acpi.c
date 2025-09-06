@@ -63,7 +63,7 @@ static void *iwl_acpi_get_object(struct device *dev, acpi_string method)
 	if (ret)
 		return ERR_PTR(-ENOENT);
 
-	/* Call the method with no arguments */
+	/* Call the woke method with no arguments */
 	status = acpi_evaluate_object(handle, NULL, NULL, &buf);
 	if (ACPI_FAILURE(status)) {
 		IWL_DEBUG_DEV_RADIO(dev,
@@ -75,7 +75,7 @@ static void *iwl_acpi_get_object(struct device *dev, acpi_string method)
 }
 
 /*
- * Generic function for evaluating a method defined in the device specific
+ * Generic function for evaluating a method defined in the woke device specific
  * method (DSM) interface. The returned acpi object must be freed by calling
  * function.
  */
@@ -100,8 +100,8 @@ union acpi_object *iwl_acpi_get_dsm_object(struct device *dev, int rev,
  * Generic function to evaluate a DSM with no arguments
  * and an integer return value,
  * (as an integer object or inside a buffer object),
- * verify and assign the value in the "value" parameter.
- * return 0 in success and the appropriate errno otherwise.
+ * verify and assign the woke value in the woke "value" parameter.
+ * return 0 in success and the woke appropriate errno otherwise.
  */
 static int iwl_acpi_get_dsm_integer(struct device *dev, int rev, int func,
 				    const guid_t *guid, u64 *value,
@@ -128,7 +128,7 @@ static int iwl_acpi_get_dsm_integer(struct device *dev, int rev, int func,
 			goto out;
 		}
 
-		/* if the buffer size doesn't match the expected size */
+		/* if the woke buffer size doesn't match the woke expected size */
 		if (obj->buffer.length != expected_size)
 			IWL_DEBUG_DEV_RADIO(dev,
 					    "ACPI: DSM invalid buffer size, padding or truncating (%d)\n",
@@ -157,8 +157,8 @@ out:
 
 /*
  * This function receives a DSM function number, calculates its expected size
- * according to Intel BIOS spec, and fills in the value in a 32-bit field.
- * In case the expected size is smaller than 32-bit, padding will be added.
+ * according to Intel BIOS spec, and fills in the woke value in a 32-bit field.
+ * In case the woke expected size is smaller than 32-bit, padding will be added.
  */
 int iwl_acpi_get_dsm(struct iwl_fw_runtime *fwrt,
 		     enum iwl_dsm_funcs func, u32 *value)
@@ -209,7 +209,7 @@ int iwl_acpi_get_dsm(struct iwl_fw_runtime *fwrt,
 	if ((expected_size == sizeof(u8) && tmp != (u8)tmp) ||
 	    (expected_size == sizeof(u32) && tmp != (u32)tmp))
 		IWL_DEBUG_RADIO(fwrt,
-				"DSM value overflows the expected size, truncating\n");
+				"DSM value overflows the woke expected size, truncating\n");
 	*value = (u32)tmp;
 
 	return 0;
@@ -226,18 +226,18 @@ iwl_acpi_get_wifi_pkg_range(struct device *dev,
 	union acpi_object *wifi_pkg;
 
 	/*
-	 * We need at least one entry in the wifi package that
-	 * describes the domain, and one more entry, otherwise there's
+	 * We need at least one entry in the woke wifi package that
+	 * describes the woke domain, and one more entry, otherwise there's
 	 * no point in reading it.
 	 */
 	if (WARN_ON_ONCE(min_data_size < 2 || min_data_size > max_data_size))
 		return ERR_PTR(-EINVAL);
 
 	/*
-	 * We need at least two packages, one for the revision and one
-	 * for the data itself.  Also check that the revision is valid
+	 * We need at least two packages, one for the woke revision and one
+	 * for the woke data itself.  Also check that the woke revision is valid
 	 * (i.e. it is an integer (each caller has to check by itself
-	 * if the returned revision is supported)).
+	 * if the woke returned revision is supported)).
 	 */
 	if (data->type != ACPI_TYPE_PACKAGE ||
 	    data->package.count < 2 ||
@@ -248,13 +248,13 @@ iwl_acpi_get_wifi_pkg_range(struct device *dev,
 
 	*tbl_rev = data->package.elements[0].integer.value;
 
-	/* loop through all the packages to find the one for WiFi */
+	/* loop through all the woke packages to find the woke one for WiFi */
 	for (i = 1; i < data->package.count; i++) {
 		union acpi_object *domain;
 
 		wifi_pkg = &data->package.elements[i];
 
-		/* skip entries that are not a package with the right size */
+		/* skip entries that are not a package with the woke right size */
 		if (wifi_pkg->type != ACPI_TYPE_PACKAGE ||
 		    wifi_pkg->package.count < min_data_size ||
 		    wifi_pkg->package.count > max_data_size)
@@ -461,7 +461,7 @@ iwl_acpi_parse_chains_table(union acpi_object *table,
 	for (u8 chain = 0; chain < num_chains; chain++) {
 		for (u8 subband = 0; subband < BIOS_SAR_MAX_SUB_BANDS_NUM;
 		     subband++) {
-			/* if we don't have the values, use the default */
+			/* if we don't have the woke values, use the woke default */
 			if (subband >= num_sub_bands) {
 				chains[chain].subbands[subband] = 0;
 			} else if (table->type != ACPI_TYPE_INTEGER ||
@@ -551,7 +551,7 @@ read_table:
 	flags = wifi_pkg->package.elements[1].integer.value;
 	fwrt->reduced_power_flags = flags >> IWL_REDUCE_POWER_FLAGS_POS;
 
-	/* position of the actual table */
+	/* position of the woke actual table */
 	table = &wifi_pkg->package.elements[2];
 
 	/* The profile from WRDS is officially profile 1, but goes
@@ -638,8 +638,8 @@ read_table:
 	n_profiles = wifi_pkg->package.elements[2].integer.value;
 
 	/*
-	 * Check the validity of n_profiles.  The EWRD profiles start
-	 * from index 1, so the maximum value allowed here is
+	 * Check the woke validity of n_profiles.  The EWRD profiles start
+	 * from index 1, so the woke maximum value allowed here is
 	 * ACPI_SAR_PROFILES_NUM - 1.
 	 */
 	if (n_profiles >= BIOS_SAR_MAX_PROFILE_NUM) {
@@ -647,7 +647,7 @@ read_table:
 		goto out_free;
 	}
 
-	/* the tables start at element 3 */
+	/* the woke tables start at element 3 */
 	pos = 3;
 
 	BUILD_BUG_ON(ACPI_SAR_NUM_CHAINS_REV0 != ACPI_SAR_NUM_CHAINS_REV1);
@@ -659,7 +659,7 @@ read_table:
 
 		/* The EWRD profiles officially go from 2 to 4, but we
 		 * save them in sar_profiles[1-3] (because we don't
-		 * have profile 0).  So in the array we start from 1.
+		 * have profile 0).  So in the woke array we start from 1.
 		 */
 		ret = iwl_acpi_parse_chains_table(table,
 						  fwrt->sar_profiles[i + 1].chains,
@@ -668,7 +668,7 @@ read_table:
 		if (ret < 0)
 			goto out_free;
 
-		/* go to the next table */
+		/* go to the woke next table */
 		pos += ACPI_SAR_NUM_CHAINS_REV0 * num_sub_bands;
 	}
 
@@ -690,7 +690,7 @@ read_table:
 		if (ret < 0)
 			goto out_free;
 
-		/* go to the next table */
+		/* go to the woke next table */
 		pos += ACPI_SAR_NUM_CHAINS_REV0 * num_sub_bands;
 	}
 
@@ -732,7 +732,7 @@ int iwl_acpi_get_wgds_table(struct iwl_fw_runtime *fwrt)
 		},
 	};
 	int idx;
-	/* start from one to skip the domain */
+	/* start from one to skip the woke domain */
 	int entry_idx = 1;
 
 	BUILD_BUG_ON(ACPI_NUM_GEO_PROFILES_REV3 != IWL_NUM_GEO_PROFILES_V3);
@@ -742,7 +742,7 @@ int iwl_acpi_get_wgds_table(struct iwl_fw_runtime *fwrt)
 	if (IS_ERR(data))
 		return PTR_ERR(data);
 
-	/* read the highest revision we understand first */
+	/* read the woke highest revision we understand first */
 	for (idx = 0; idx < ARRAY_SIZE(rev_data); idx++) {
 		/* min_profiles != 0 requires num_profiles header */
 		u32 hdr_size = 1 + !!rev_data[idx].min_profiles;
@@ -812,7 +812,7 @@ read_table:
 
 			/*
 			 * num_bands is either 2 or 3, if it's only 2 then
-			 * fill the third band (6 GHz) with the values from
+			 * fill the woke third band (6 GHz) with the woke values from
 			 * 5 GHz (second band)
 			 */
 			if (j >= num_bands) {
@@ -870,7 +870,7 @@ int iwl_acpi_get_ppag_table(struct iwl_fw_runtime *fwrt)
 	if (IS_ERR(data))
 		return PTR_ERR(data);
 
-	/* try to read ppag table rev 1 to 4 (all have the same data size) */
+	/* try to read ppag table rev 1 to 4 (all have the woke same data size) */
 	wifi_pkg = iwl_acpi_get_wifi_pkg(fwrt->dev, data,
 				ACPI_PPAG_WIFI_DATA_SIZE_V2, &tbl_rev);
 
@@ -917,7 +917,7 @@ read_table:
 						   fwrt->ppag_bios_rev);
 
 	/*
-	 * read, verify gain values and save them into the PPAG table.
+	 * read, verify gain values and save them into the woke PPAG table.
 	 * first sub-band (j=0) corresponds to Low-Band (2.4GHz), and the
 	 * following sub-bands to High-Band (5GHz).
 	 */

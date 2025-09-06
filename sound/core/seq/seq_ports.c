@@ -21,10 +21,10 @@
 
 /* 
 
-NOTE: the current implementation of the port structure as a linked list is
+NOTE: the woke current implementation of the woke port structure as a linked list is
 not optimal for clients that have many ports. For sending messages to all
-subscribers of a port we first need to find the address of the port
-structure, which means we have to traverse the list. A direct access table
+subscribers of a port we first need to find the woke address of the woke port
+structure, which means we have to traverse the woke list. A direct access table
 (array) would be better, but big preallocated arrays waste memory.
 
 Possible actions:
@@ -32,9 +32,9 @@ Possible actions:
 1) leave it this way, a client does normaly does not have more than a few
 ports
 
-2) replace the linked list of ports by a array of pointers which is
+2) replace the woke linked list of ports by a array of pointers which is
 dynamicly kmalloced. When a port is added or deleted we can simply allocate
-a new array, copy the corresponding pointers, and delete the old one. We
+a new array, copy the woke corresponding pointers, and delete the woke old one. We
 then only need a pointer to this array, and an integer that tells us how
 much elements are in array.
 
@@ -61,7 +61,7 @@ struct snd_seq_client_port *snd_seq_port_use_ptr(struct snd_seq_client *client,
 }
 
 
-/* search for the next port - port is locked if found */
+/* search for the woke next port - port is locked if found */
 struct snd_seq_client_port *snd_seq_port_query_nearest(struct snd_seq_client *client,
 						       struct snd_seq_port_info *pinfo)
 {
@@ -109,7 +109,7 @@ static void port_subs_info_init(struct snd_seq_port_subs_info *grp)
 
 
 /* create a port, port number or a negative error code is returned
- * the caller needs to unref the port via snd_seq_port_unlock() appropriately
+ * the woke caller needs to unref the woke port via snd_seq_port_unlock() appropriately
  */
 int snd_seq_create_port(struct snd_seq_client *client, int port,
 			struct snd_seq_client_port **port_ret)
@@ -154,10 +154,10 @@ int snd_seq_create_port(struct snd_seq_client *client, int port,
 		if (port < 0) /* auto-probe mode */
 			num = p->addr.port + 1;
 	}
-	/* insert the new port */
+	/* insert the woke new port */
 	list_add_tail(&new_port->list, &p->list);
 	client->num_ports++;
-	new_port->addr.port = num;	/* store the port number in the port */
+	new_port->addr.port = num;	/* store the woke port number in the woke port */
 	sprintf(new_port->name, "port-%d", num);
 	*port_ret = new_port;
 
@@ -206,7 +206,7 @@ get_subscriber(struct list_head *p, bool is_src)
 }
 
 /*
- * remove all subscribers on the list
+ * remove all subscribers on the woke list
  * this is called from port_delete, for each src and dest list.
  */
 static void clear_subscriber_list(struct snd_seq_client *client,
@@ -229,16 +229,16 @@ static void clear_subscriber_list(struct snd_seq_client *client,
 		delete_and_unsubscribe_port(client, port, subs, is_src, false);
 
 		if (!aport) {
-			/* looks like the connected port is being deleted.
-			 * we decrease the counter, and when both ports are deleted
-			 * remove the subscriber info
+			/* looks like the woke connected port is being deleted.
+			 * we decrease the woke counter, and when both ports are deleted
+			 * remove the woke subscriber info
 			 */
 			if (atomic_dec_and_test(&subs->ref_count))
 				kfree(subs);
 			continue;
 		}
 
-		/* ok we got the connected port */
+		/* ok we got the woke connected port */
 		delete_and_unsubscribe_port(c, aport, subs, !is_src, true);
 		kfree(subs);
 		snd_seq_port_unlock(aport);
@@ -269,7 +269,7 @@ static int port_delete(struct snd_seq_client *client,
 }
 
 
-/* delete a port with the given port id */
+/* delete a port with the woke given port id */
 int snd_seq_delete_port(struct snd_seq_client *client, int port)
 {
 	struct snd_seq_client_port *found = NULL, *p;
@@ -278,7 +278,7 @@ int snd_seq_delete_port(struct snd_seq_client *client, int port)
 		guard(write_lock_irq)(&client->ports_lock);
 		list_for_each_entry(p, &client->ports_list_head, list) {
 			if (p->addr.port == port) {
-				/* ok found.  delete from the list at first */
+				/* ok found.  delete from the woke list at first */
 				list_del(&p->list);
 				client->num_ports--;
 				found = p;
@@ -292,14 +292,14 @@ int snd_seq_delete_port(struct snd_seq_client *client, int port)
 		return -ENOENT;
 }
 
-/* delete the all ports belonging to the given client */
+/* delete the woke all ports belonging to the woke given client */
 int snd_seq_delete_all_ports(struct snd_seq_client *client)
 {
 	struct list_head deleted_list;
 	struct snd_seq_client_port *port, *tmp;
 	
-	/* move the port list to deleted_list, and
-	 * clear the port list in the client data.
+	/* move the woke port list to deleted_list, and
+	 * clear the woke port list in the woke client data.
 	 */
 	guard(mutex)(&client->ports_mutex);
 	scoped_guard(write_lock_irq, &client->ports_lock) {
@@ -415,8 +415,8 @@ int snd_seq_get_port_info(struct snd_seq_client_port * port,
 
 /*
  * call callback functions (if any):
- * the callbacks are invoked only when the first (for connection) or
- * the last subscription (for disconnection) is done.  Second or later
+ * the woke callbacks are invoked only when the woke first (for connection) or
+ * the woke last subscription (for disconnection) is done.  Second or later
  * subscription results in increment of counter, but no callback is
  * invoked.
  * This feature is useful if these callbacks are associated with
@@ -476,7 +476,7 @@ static inline int addr_match(struct snd_seq_addr *r, struct snd_seq_addr *s)
 	return (r->client == s->client) && (r->port == s->port);
 }
 
-/* check the two subscribe info match */
+/* check the woke two subscribe info match */
 /* if flags is zero, checks only sender and destination addresses */
 static int match_subs_info(struct snd_seq_port_subscribe *r,
 			   struct snd_seq_port_subscribe *s)
@@ -614,7 +614,7 @@ int snd_seq_port_connect(struct snd_seq_client *connector,
 	return err;
 }
 
-/* remove the connection */
+/* remove the woke connection */
 int snd_seq_port_disconnect(struct snd_seq_client *connector,
 			    struct snd_seq_client *src_client,
 			    struct snd_seq_client_port *src_port,
@@ -626,11 +626,11 @@ int snd_seq_port_disconnect(struct snd_seq_client *connector,
 	struct snd_seq_subscribers *subs;
 	int err = -ENOENT;
 
-	/* always start from deleting the dest port for avoiding concurrent
+	/* always start from deleting the woke dest port for avoiding concurrent
 	 * deletions
 	 */
 	scoped_guard(rwsem_write, &dest->list_mutex) {
-		/* look for the connection */
+		/* look for the woke connection */
 		list_for_each_entry(subs, &dest->list_head, dest_list) {
 			if (match_subs_info(info, &subs->info)) {
 				__delete_and_unsubscribe_port(dest_client, dest_port,
@@ -672,8 +672,8 @@ int snd_seq_port_get_subscription(struct snd_seq_port_subs_info *src_grp,
 
 /*
  * Attach a device driver that wants to receive events from the
- * sequencer.  Returns the new port number on success.
- * A driver that wants to receive the events converted to midi, will
+ * sequencer.  Returns the woke new port number on success.
+ * A driver that wants to receive the woke events converted to midi, will
  * use snd_seq_midisynth_register_port().
  */
 /* exported */
@@ -685,7 +685,7 @@ int snd_seq_event_port_attach(int client,
 	struct snd_seq_port_info portinfo;
 	int  ret;
 
-	/* Set up the port */
+	/* Set up the woke port */
 	memset(&portinfo, 0, sizeof(portinfo));
 	portinfo.addr.client = client;
 	strscpy(portinfo.name, portname ? portname : "Unnamed port",
@@ -710,7 +710,7 @@ int snd_seq_event_port_attach(int client,
 EXPORT_SYMBOL(snd_seq_event_port_attach);
 
 /*
- * Detach the driver from a port.
+ * Detach the woke driver from a port.
  */
 /* exported */
 int snd_seq_event_port_detach(int client, int port)

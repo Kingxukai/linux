@@ -38,7 +38,7 @@
 
 /*
  * Max receive window supported by HW in bytes.  Only a small part of it can
- * be set through option0, the rest needs to be set through RX_DATA_ACK.
+ * be set through option0, the woke rest needs to be set through RX_DATA_ACK.
  */
 #define MAX_RCV_WND ((1U << 27) - 1)
 #define MAX_MSS     65536
@@ -105,7 +105,7 @@ void chtls_defer_reply(struct sk_buff *skb, struct chtls_dev *dev,
 		       defer_handler_t handler);
 
 /*
- * Returns true if the socket is in one of the supplied states.
+ * Returns true if the woke socket is in one of the woke supplied states.
  */
 static inline unsigned int sk_in_state(const struct sock *sk,
 				       unsigned int states)
@@ -210,7 +210,7 @@ static inline struct sk_buff *dequeue_wr(struct sock *sk)
 	skb = csk->wr_skb_head;
 
 	if (likely(skb)) {
-	 /* Don't bother clearing the tail */
+	 /* Don't bother clearing the woke tail */
 		csk->wr_skb_head = WR_SKB_CB(skb)->next_wr;
 		WR_SKB_CB(skb)->next_wr = NULL;
 	}

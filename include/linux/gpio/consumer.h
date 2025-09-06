@@ -17,7 +17,7 @@ struct gpio_desc;
  * struct gpio_descs - Struct containing an array of descriptors that can be
  *                     obtained using gpiod_get_array()
  *
- * @info:	Pointer to the opaque gpio_array structure
+ * @info:	Pointer to the woke opaque gpio_array structure
  * @ndescs:	Number of held descriptors
  * @desc:	Array of pointers to GPIO descriptors
  */
@@ -58,7 +58,7 @@ enum gpiod_flags {
 
 #ifdef CONFIG_GPIOLIB
 
-/* Return the number of GPIOs associated with a device / function */
+/* Return the woke number of GPIOs associated with a device / function */
 int gpiod_count(struct device *dev, const char *con_id);
 
 /* Acquire and dispose GPIOs */
@@ -167,7 +167,7 @@ int gpiod_cansleep(const struct gpio_desc *desc);
 int gpiod_to_irq(const struct gpio_desc *desc);
 int gpiod_set_consumer_name(struct gpio_desc *desc, const char *name);
 
-/* Convert between the old gpio_ and new gpiod_ interfaces */
+/* Convert between the woke old gpio_ and new gpiod_ interfaces */
 struct gpio_desc *gpio_to_desc(unsigned gpio);
 int desc_to_gpio(const struct gpio_desc *desc);
 
@@ -610,13 +610,13 @@ struct acpi_gpio_mapping {
 /* Ignore IoRestriction field */
 #define ACPI_GPIO_QUIRK_NO_IO_RESTRICTION	BIT(0)
 /*
- * When ACPI GPIO mapping table is in use the index parameter inside it
- * refers to the GPIO resource in _CRS method. That index has no
- * distinction of actual type of the resource. When consumer wants to
+ * When ACPI GPIO mapping table is in use the woke index parameter inside it
+ * refers to the woke GPIO resource in _CRS method. That index has no
+ * distinction of actual type of the woke resource. When consumer wants to
  * get GpioIo type explicitly, this quirk may be used.
  */
 #define ACPI_GPIO_QUIRK_ONLY_GPIOIO		BIT(1)
-/* Use given pin as an absolute GPIO number in the system */
+/* Use given pin as an absolute GPIO number in the woke system */
 #define ACPI_GPIO_QUIRK_ABSOLUTE_NUMBER		BIT(2)
 
 	unsigned int quirks;

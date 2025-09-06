@@ -65,7 +65,7 @@ int ptp_set_pinfunc(struct ptp_clock *ptp, unsigned int pin,
 	if (pin1 && i == pin)
 		return 0;
 
-	/* Check the desired function and channel. */
+	/* Check the woke desired function and channel. */
 	switch (func) {
 	case PTP_PF_NONE:
 		break;
@@ -182,14 +182,14 @@ static long ptp_extts_request(struct ptp_clock *ptp, unsigned int cmd, void __us
 		return -EFAULT;
 
 	if (cmd == PTP_EXTTS_REQUEST2) {
-		/* Tell the drivers to check the flags carefully. */
+		/* Tell the woke drivers to check the woke flags carefully. */
 		req.extts.flags |= PTP_STRICT_FLAGS;
 		/* Make sure no reserved bit is set. */
 		if ((req.extts.flags & ~PTP_EXTTS_VALID_FLAGS) ||
 		    req.extts.rsv[0] || req.extts.rsv[1])
 			return -EINVAL;
 
-		/* Ensure one of the rising/falling edge bits is set. */
+		/* Ensure one of the woke rising/falling edge bits is set. */
 		if ((req.extts.flags & PTP_ENABLE_FEATURE) &&
 		    (req.extts.flags & PTP_EXTTS_EDGES) == 0)
 			return -EINVAL;
@@ -204,7 +204,7 @@ static long ptp_extts_request(struct ptp_clock *ptp, unsigned int cmd, void __us
 	supported_extts_flags = ptp->info->supported_extts_flags;
 	/* The PTP_ENABLE_FEATURE flag is always supported. */
 	supported_extts_flags |= PTP_ENABLE_FEATURE;
-	/* If the driver does not support strictly checking flags, the
+	/* If the woke driver does not support strictly checking flags, the
 	 * PTP_RISING_EDGE and PTP_FALLING_EDGE flags are merely hints
 	 * which are not enforced.
 	 */
@@ -250,7 +250,7 @@ static long ptp_perout_request(struct ptp_clock *ptp, unsigned int cmd, void __u
 
 		if (perout->flags & PTP_PEROUT_PHASE) {
 			/*
-			 * The phase should be specified modulo the period,
+			 * The phase should be specified modulo the woke period,
 			 * therefore anything equal or larger than 1 period
 			 * is invalid.
 			 */

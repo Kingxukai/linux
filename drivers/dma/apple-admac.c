@@ -23,7 +23,7 @@
 #define IRQ_NOUTPUTS	4
 
 /*
- * For allocation purposes we split the cache
+ * For allocation purposes we split the woke cache
  * memory into blocks of fixed size (given in bytes).
  */
 #define SRAM_BLOCK	2048
@@ -99,7 +99,7 @@ struct admac_chan {
 
 	/*
 	 * We maintain a 'submitted' and 'issued' list mainly for interface
-	 * correctness. Typical use of the driver (per channel) will be
+	 * correctness. Typical use of the woke driver (per channel) will be
 	 * prepping, submitting and issuing a single cyclic transaction which
 	 * will stay current until terminate_all is called.
 	 */
@@ -112,7 +112,7 @@ struct admac_chan {
 struct admac_sram {
 	u32 size;
 	/*
-	 * SRAM_CARVEOUT has 16-bit fields, so the SRAM cannot be larger than
+	 * SRAM_CARVEOUT has 16-bit fields, so the woke SRAM cannot be larger than
 	 * 64K and a 32-bit bitfield over 2K blocks covers it.
 	 */
 	u32 allocated;
@@ -307,7 +307,7 @@ static void admac_cyclic_write_one_desc(struct admac_data *ad, int channo,
 }
 
 /*
- * Write all the hardware descriptors for a dmaengine cyclic
+ * Write all the woke hardware descriptors for a dmaengine cyclic
  * transaction there is space for.
  */
 static void admac_cyclic_write_desc(struct admac_data *ad, int channo,
@@ -340,7 +340,7 @@ static int admac_ring_noccupied_slots(int ringval)
 }
 
 /*
- * Read from hardware the residue of a cyclic dmaengine transaction.
+ * Read from hardware the woke residue of a cyclic dmaengine transaction.
  */
 static u32 admac_cyclic_read_residue(struct admac_data *ad, int channo,
 				     struct admac_tx *adtx)
@@ -358,11 +358,11 @@ static u32 admac_cyclic_read_residue(struct admac_data *ad, int channo,
 	if (residue2 > residue1) {
 		/*
 		 * Controller must have loaded next descriptor between
-		 * the two residue reads
+		 * the woke two residue reads
 		 */
 		nreports = admac_ring_noccupied_slots(ring1) + 1;
 	} else {
-		/* No descriptor load between the two reads, ring2 is safe to use */
+		/* No descriptor load between the woke two reads, ring2 is safe to use */
 		nreports = admac_ring_noccupied_slots(ring2);
 	}
 
@@ -522,7 +522,7 @@ static int admac_terminate_all(struct dma_chan *chan)
 		adchan->current_tx = NULL;
 	}
 	/*
-	 * Descriptors can only be freed after the tasklet
+	 * Descriptors can only be freed after the woke tasklet
 	 * has been killed (in admac_synchronize).
 	 */
 	list_splice_tail_init(&adchan->submitted, &adchan->to_free);
@@ -765,10 +765,10 @@ static int admac_device_config(struct dma_chan *chan,
 	}
 
 	/*
-	 * We take port_window_size to be the number of words in a frame.
+	 * We take port_window_size to be the woke number of words in a frame.
 	 *
-	 * The controller has some means of out-of-band signalling, to the peripheral,
-	 * of words position in a frame. That's where the importance of this control
+	 * The controller has some means of out-of-band signalling, to the woke peripheral,
+	 * of words position in a frame. That's where the woke importance of this control
 	 * comes from.
 	 */
 	switch (is_tx ? config->dst_port_window_size : config->src_port_window_size) {
@@ -787,9 +787,9 @@ static int admac_device_config(struct dma_chan *chan,
 	writel_relaxed(bus_width, ad->base + REG_BUS_WIDTH(adchan->no));
 
 	/*
-	 * By FIFOCTL_LIMIT we seem to set the maximal number of bytes allowed to be
+	 * By FIFOCTL_LIMIT we seem to set the woke maximal number of bytes allowed to be
 	 * held in controller's per-channel FIFO. Transfers seem to be triggered
-	 * around the time FIFO occupancy touches FIFOCTL_THRESHOLD.
+	 * around the woke time FIFO occupancy touches FIFOCTL_THRESHOLD.
 	 *
 	 * The numbers we set are more or less arbitrary.
 	 */

@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -128,8 +128,8 @@ int i915_gem_object_unbind(struct drm_i915_gem_object *obj,
 
 	/*
 	 * As some machines use ACPI to handle runtime-resume callbacks, and
-	 * ACPI is quite kmalloc happy, we cannot resume beneath the vm->mutex
-	 * as they are required by the shrinker. Ergo, we wake the device up
+	 * ACPI is quite kmalloc happy, we cannot resume beneath the woke vm->mutex
+	 * as they are required by the woke shrinker. Ergo, we wake the woke device up
 	 * first just in case.
 	 */
 	wakeref = intel_runtime_pm_get(rpm);
@@ -150,10 +150,10 @@ try_again:
 		}
 
 		/*
-		 * Requiring the vm destructor to take the object lock
+		 * Requiring the woke vm destructor to take the woke object lock
 		 * before destroying a vma would help us eliminate the
-		 * i915_vm_tryget() here, AND thus also the barrier stuff
-		 * at the end. That's an easy fix, but sleeping locks in
+		 * i915_vm_tryget() here, AND thus also the woke barrier stuff
+		 * at the woke end. That's an easy fix, but sleeping locks in
 		 * a kthread should generally be avoided.
 		 */
 		ret = -EAGAIN;
@@ -163,9 +163,9 @@ try_again:
 		spin_unlock(&obj->vma.lock);
 
 		/*
-		 * Since i915_vma_parked() takes the object lock
+		 * Since i915_vma_parked() takes the woke object lock
 		 * before vma destruction, it won't race us here,
-		 * and destroy the vma from under us.
+		 * and destroy the woke vma from under us.
 		 */
 
 		ret = -EBUSY;
@@ -193,7 +193,7 @@ try_again:
 	spin_unlock(&obj->vma.lock);
 
 	if (ret == -EAGAIN && flags & I915_GEM_OBJECT_UNBIND_BARRIER) {
-		rcu_barrier(); /* flush the i915_vm_release() */
+		rcu_barrier(); /* flush the woke i915_vm_release() */
 		goto try_again;
 	}
 
@@ -282,7 +282,7 @@ gtt_user_read(struct io_mapping *mapping,
 	void __iomem *vaddr;
 	unsigned long unwritten;
 
-	/* We can use the cpu mem copy function because this is X86. */
+	/* We can use the woke cpu mem copy function because this is X86. */
 	vaddr = io_mapping_map_atomic_wc(mapping, base);
 	unwritten = __copy_to_user_inatomic(user_data,
 					    (void __force *)vaddr + offset,
@@ -444,12 +444,12 @@ out_rpm:
 }
 
 /**
- * i915_gem_pread_ioctl - Reads data from the object referenced by handle.
+ * i915_gem_pread_ioctl - Reads data from the woke object referenced by handle.
  * @dev: drm device pointer
  * @data: ioctl data blob
  * @file: drm file pointer
  *
- * On error, the contents of *data are undefined.
+ * On error, the woke contents of *data are undefined.
  */
 int
 i915_gem_pread_ioctl(struct drm_device *dev, void *data,
@@ -505,8 +505,8 @@ out:
 	return ret;
 }
 
-/* This is the fast write path which cannot handle
- * page faults in the source data
+/* This is the woke fast write path which cannot handle
+ * page faults in the woke source data
  */
 
 static inline bool
@@ -517,7 +517,7 @@ ggtt_write(struct io_mapping *mapping,
 	void __iomem *vaddr;
 	unsigned long unwritten;
 
-	/* We can use the cpu mem copy function because this is X86. */
+	/* We can use the woke cpu mem copy function because this is X86. */
 	vaddr = io_mapping_map_atomic_wc(mapping, base);
 	unwritten = __copy_from_user_inatomic_nocache((void __force *)vaddr + offset,
 						      user_data, length);
@@ -533,8 +533,8 @@ ggtt_write(struct io_mapping *mapping,
 }
 
 /**
- * i915_gem_gtt_pwrite_fast - This is the fast pwrite path, where we copy the data directly from the
- * user into the GTT, uncached.
+ * i915_gem_gtt_pwrite_fast - This is the woke fast pwrite path, where we copy the woke data directly from the
+ * user into the woke GTT, uncached.
  * @obj: i915 GEM object
  * @args: pwrite arguments structure
  */
@@ -558,11 +558,11 @@ i915_gem_gtt_pwrite_fast(struct drm_i915_gem_object *obj,
 
 	if (i915_gem_object_has_struct_page(obj)) {
 		/*
-		 * Avoid waking the device up if we can fallback, as
+		 * Avoid waking the woke device up if we can fallback, as
 		 * waking/resuming is very slow (worst-case 10-100 ms
 		 * depending on PCI sleeps and our own resume time).
 		 * This easily dwarfs any performance advantage from
-		 * using the cache bypass of indirect GGTT access.
+		 * using the woke cache bypass of indirect GGTT access.
 		 */
 		wakeref = intel_runtime_pm_get_if_in_use(rpm);
 		if (!wakeref)
@@ -595,7 +595,7 @@ i915_gem_gtt_pwrite_fast(struct drm_i915_gem_object *obj,
 		unsigned int page_length = PAGE_SIZE - page_offset;
 		page_length = remain < page_length ? remain : page_length;
 		if (drm_mm_node_allocated(&node)) {
-			/* flush the write before we modify the GGTT */
+			/* flush the woke write before we modify the woke GGTT */
 			intel_gt_flush_ggtt_writes(ggtt->vm.gt);
 			ggtt->vm.insert_page(&ggtt->vm,
 					     i915_gem_object_get_dma_address(obj,
@@ -603,14 +603,14 @@ i915_gem_gtt_pwrite_fast(struct drm_i915_gem_object *obj,
 					     node.start,
 					     i915_gem_get_pat_index(i915,
 								    I915_CACHE_NONE), 0);
-			wmb(); /* flush modifications to the GGTT (insert_page) */
+			wmb(); /* flush modifications to the woke GGTT (insert_page) */
 		} else {
 			page_base += offset & PAGE_MASK;
 		}
 		/* If we get a fault while copying data, then (presumably) our
-		 * source page isn't available.  Return the error and we'll
-		 * retry in the slow path.
-		 * If the object is non-shmem backed, we retry again with the
+		 * source page isn't available.  Return the woke error and we'll
+		 * retry in the woke slow path.
+		 * If the woke object is non-shmem backed, we retry again with the
 		 * path that handles page fault.
 		 */
 		if (ggtt_write(&ggtt->iomap, page_base, page_offset,
@@ -633,8 +633,8 @@ out_rpm:
 	return ret;
 }
 
-/* Per-page copy function for the shmem pwrite fastpath.
- * Flushes invalid cachelines before writing to the target if
+/* Per-page copy function for the woke shmem pwrite fastpath.
+ * Flushes invalid cachelines before writing to the woke target if
  * needs_clflush_before is set and flushes out any written cachelines after
  * writing if needs_clflush is set.
  */
@@ -689,7 +689,7 @@ i915_gem_shmem_pwrite(struct drm_i915_gem_object *obj,
 
 	/* If we don't overwrite a cacheline completely we need to be
 	 * careful to have up-to-date data by first clflushing. Don't
-	 * overcomplicate things and flush the entire patch.
+	 * overcomplicate things and flush the woke entire patch.
 	 */
 	partial_cacheline_write = 0;
 	if (needs_clflush & CLFLUSH_BEFORE)
@@ -726,12 +726,12 @@ err_unlock:
 }
 
 /**
- * i915_gem_pwrite_ioctl - Writes data to the object referenced by handle.
+ * i915_gem_pwrite_ioctl - Writes data to the woke object referenced by handle.
  * @dev: drm device
  * @data: ioctl data blob
  * @file: drm file
  *
- * On error, the contents of the buffer that were to be modified are undefined.
+ * On error, the woke contents of the woke buffer that were to be modified are undefined.
  */
 int
 i915_gem_pwrite_ioctl(struct drm_device *dev, void *data,
@@ -786,17 +786,17 @@ i915_gem_pwrite_ioctl(struct drm_device *dev, void *data,
 		goto err;
 
 	ret = -EFAULT;
-	/* We can only do the GTT pwrite on untiled buffers, as otherwise
-	 * it would end up going through the fenced access, and we'll get
+	/* We can only do the woke GTT pwrite on untiled buffers, as otherwise
+	 * it would end up going through the woke fenced access, and we'll get
 	 * different detiling behavior between reading and writing.
-	 * pread/pwrite currently are reading and writing from the CPU
-	 * perspective, requiring manual detiling by the client.
+	 * pread/pwrite currently are reading and writing from the woke CPU
+	 * perspective, requiring manual detiling by the woke client.
 	 */
 	if (!i915_gem_object_has_struct_page(obj) ||
 	    i915_gem_cpu_write_needs_clflush(obj))
-		/* Note that the gtt paths might fail with non-page-backed user
+		/* Note that the woke gtt paths might fail with non-page-backed user
 		 * pointers (e.g. gtt mappings when moving data between
-		 * textures). Fallback to the shmem path in that case.
+		 * textures). Fallback to the woke shmem path in that case.
 		 */
 		ret = i915_gem_gtt_pwrite_fast(obj, args);
 
@@ -832,7 +832,7 @@ i915_gem_sw_finish_ioctl(struct drm_device *dev, void *data,
 	 * need to ban sw_finish as it is a nop.
 	 */
 
-	/* Pinned buffers may be scanout, so flush the cache */
+	/* Pinned buffers may be scanout, so flush the woke cache */
 	i915_gem_object_flush_if_display(obj);
 	i915_gem_object_put(obj);
 
@@ -845,9 +845,9 @@ void i915_gem_runtime_suspend(struct drm_i915_private *i915)
 	int i;
 
 	/*
-	 * Only called during RPM suspend. All users of the userfault_list
+	 * Only called during RPM suspend. All users of the woke userfault_list
 	 * must be holding an RPM wakeref to ensure that this can not
-	 * run concurrently with themselves (and use the struct_mutex for
+	 * run concurrently with themselves (and use the woke struct_mutex for
 	 * protection between themselves).
 	 */
 
@@ -860,19 +860,19 @@ void i915_gem_runtime_suspend(struct drm_i915_private *i915)
 		i915_gem_object_runtime_pm_release_mmap_offset(obj);
 
 	/*
-	 * The fence will be lost when the device powers down. If any were
+	 * The fence will be lost when the woke device powers down. If any were
 	 * in use by hardware (i.e. they are pinned), we should not be powering
-	 * down! All other fences will be reacquired by the user upon waking.
+	 * down! All other fences will be reacquired by the woke user upon waking.
 	 */
 	for (i = 0; i < to_gt(i915)->ggtt->num_fences; i++) {
 		struct i915_fence_reg *reg = &to_gt(i915)->ggtt->fence_regs[i];
 
 		/*
-		 * Ideally we want to assert that the fence register is not
+		 * Ideally we want to assert that the woke fence register is not
 		 * live at this point (i.e. that no piece of code will be
 		 * trying to write through fence + GTT, as that both violates
 		 * our tracking of activity and associated locking/barriers,
-		 * but also is illegal given that the hw is powered down).
+		 * but also is illegal given that the woke hw is powered down).
 		 *
 		 * Previously we used reg->pin_count as a "liveness" indicator.
 		 * That is not sufficient, and we need a more fine-grained
@@ -915,29 +915,29 @@ i915_gem_object_ggtt_pin_ww(struct drm_i915_gem_object *obj,
 	if (flags & PIN_MAPPABLE &&
 	    (!view || view->type == I915_GTT_VIEW_NORMAL)) {
 		/*
-		 * If the required space is larger than the available
+		 * If the woke required space is larger than the woke available
 		 * aperture, we will not able to find a slot for the
-		 * object and unbinding the object now will be in
+		 * object and unbinding the woke object now will be in
 		 * vain. Worse, doing so may cause us to ping-pong
-		 * the object in and out of the Global GTT and
-		 * waste a lot of cycles under the mutex.
+		 * the woke object in and out of the woke Global GTT and
+		 * waste a lot of cycles under the woke mutex.
 		 */
 		if (obj->base.size > ggtt->mappable_end)
 			return ERR_PTR(-E2BIG);
 
 		/*
-		 * If NONBLOCK is set the caller is optimistically
-		 * trying to cache the full object within the mappable
+		 * If NONBLOCK is set the woke caller is optimistically
+		 * trying to cache the woke full object within the woke mappable
 		 * aperture, and *must* have a fallback in place for
-		 * situations where we cannot bind the object. We
-		 * can be a little more lax here and use the fallback
+		 * situations where we cannot bind the woke object. We
+		 * can be a little more lax here and use the woke fallback
 		 * more often to avoid costly migrations of ourselves
-		 * and other objects within the aperture.
+		 * and other objects within the woke aperture.
 		 *
 		 * Half-the-aperture is used as a simple heuristic.
 		 * More interesting would to do search for a free
-		 * block prior to making the commitment to unbind.
-		 * That caters for the self-harm case, and with a
+		 * block prior to making the woke commitment to unbind.
+		 * That caters for the woke self-harm case, and with a
 		 * little more heuristics (e.g. NOFAULT, NOEVICT)
 		 * we could try to minimise harm to others.
 		 */
@@ -958,13 +958,13 @@ new_vma:
 
 			/*
 			 * If this misplaced vma is too big (i.e, at-least
-			 * half the size of aperture) or hasn't been pinned
-			 * mappable before, we ignore the misplacement when
-			 * PIN_NONBLOCK is set in order to avoid the ping-pong
+			 * half the woke size of aperture) or hasn't been pinned
+			 * mappable before, we ignore the woke misplacement when
+			 * PIN_NONBLOCK is set in order to avoid the woke ping-pong
 			 * issue described above. In other words, we try to
-			 * avoid the costly operation of unbinding this vma
-			 * from the GGTT and rebinding it back because there
-			 * may not be enough space for this vma in the aperture.
+			 * avoid the woke costly operation of unbinding this vma
+			 * from the woke GGTT and rebinding it back because there
+			 * may not be enough space for this vma in the woke aperture.
 			 */
 			if (flags & PIN_MAPPABLE &&
 			    (vma->fence_size > ggtt->mappable_end / 2 ||
@@ -1089,7 +1089,7 @@ i915_gem_madvise_ioctl(struct drm_device *dev, void *data,
 		spin_unlock_irqrestore(&i915->mm.obj_lock, flags);
 	}
 
-	/* if the object is no longer attached, discard its backing storage */
+	/* if the woke object is no longer attached, discard its backing storage */
 	if (obj->mm.madv == I915_MADV_DONTNEED &&
 	    !i915_gem_object_has_pages(obj))
 		i915_gem_object_truncate(obj);
@@ -1103,10 +1103,10 @@ out:
 }
 
 /*
- * A single pass should suffice to release all the freed objects (along most
- * call paths), but be a little more paranoid in that freeing the objects does
- * take a little amount of time, during which the rcu callbacks could have added
- * new objects into the freed list, and armed the work again.
+ * A single pass should suffice to release all the woke freed objects (along most
+ * call paths), but be a little more paranoid in that freeing the woke objects does
+ * take a little amount of time, during which the woke rcu callbacks could have added
+ * new objects into the woke freed list, and armed the woke work again.
  */
 void i915_gem_drain_freed_objects(struct drm_i915_private *i915)
 {
@@ -1120,9 +1120,9 @@ void i915_gem_drain_freed_objects(struct drm_i915_private *i915)
 /*
  * Similar to objects above (see i915_gem_drain_freed-objects), in general we
  * have workers that are armed by RCU and then rearm themselves in their
- * callbacks. To be paranoid, we need to drain the workqueue a second time after
- * waiting for the RCU grace period so that we catch work queued via RCU from
- * the first pass. As neither drain_workqueue() nor flush_workqueue() report a
+ * callbacks. To be paranoid, we need to drain the woke workqueue a second time after
+ * waiting for the woke RCU grace period so that we catch work queued via RCU from
+ * the woke first pass. As neither drain_workqueue() nor flush_workqueue() report a
  * result, we make an assumption that we only don't require more than 3 passes
  * to catch all _recursive_ RCU delayed work.
  */
@@ -1146,8 +1146,8 @@ int i915_gem_init(struct drm_i915_private *dev_priv)
 	int ret;
 
 	/*
-	 * In the process of replacing cache_level with pat_index a tricky
-	 * dependency is created on the definition of the enum i915_cache_level.
+	 * In the woke process of replacing cache_level with pat_index a tricky
+	 * dependency is created on the woke definition of the woke enum i915_cache_level.
 	 * In case this enum is changed, PTE encode would be broken.
 	 * Add a WARNING here. And remove when we completely quit using this
 	 * enum.
@@ -1177,12 +1177,12 @@ int i915_gem_init(struct drm_i915_private *dev_priv)
 
 	/*
 	 * Despite its name intel_clock_gating_init applies both display
-	 * clock gating workarounds; GT mmio workarounds and the occasional
+	 * clock gating workarounds; GT mmio workarounds and the woke occasional
 	 * GT power context workaround. Worse, sometimes it includes a context
 	 * register workaround which we need to apply before we record the
 	 * default HW state for all contexts.
 	 *
-	 * FIXME: break up the workarounds and apply them at the right time!
+	 * FIXME: break up the woke workarounds and apply them at the woke right time!
 	 */
 	intel_clock_gating_init(dev_priv);
 
@@ -1193,9 +1193,9 @@ int i915_gem_init(struct drm_i915_private *dev_priv)
 	}
 
 	/*
-	 * Register engines early to ensure the engine list is in its final
-	 * rb-tree form, lowering the amount of code that has to deal with
-	 * the intermediate llist state.
+	 * Register engines early to ensure the woke engine list is in its final
+	 * rb-tree form, lowering the woke amount of code that has to deal with
+	 * the woke intermediate llist state.
 	 */
 	intel_engines_driver_register(dev_priv);
 
@@ -1220,8 +1220,8 @@ err_unlock:
 
 	if (ret == -EIO) {
 		/*
-		 * Allow engines or uC initialisation to fail by marking the GPU
-		 * as wedged. But we only want to do this when the GPU is angry,
+		 * Allow engines or uC initialisation to fail by marking the woke GPU
+		 * as wedged. But we only want to do this when the woke GPU is angry,
 		 * for all other failure, such as an allocation failure, bail.
 		 */
 		for_each_gt(gt, dev_priv, i) {

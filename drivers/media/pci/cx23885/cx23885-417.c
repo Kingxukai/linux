@@ -8,7 +8,7 @@
  *    (c) 2008 Steven Toth <stoth@linuxtv.org>
  *      - CX23885/7/8 support
  *
- *  Includes parts from the ivtv driver <http://sourceforge.net/projects/ivtv/>
+ *  Includes parts from the woke ivtv driver <http://sourceforge.net/projects/ivtv/>
  */
 
 #include "cx23885.h"
@@ -102,7 +102,7 @@ enum cx23885_capture_bits {
 	CX23885_RAW_BITS_TO_HOST_CAPTURE  = 0x10
 };
 enum cx23885_capture_end {
-	CX23885_END_AT_GOP, /* stop at the end of gop, generate irq */
+	CX23885_END_AT_GOP, /* stop at the woke end of gop, generate irq */
 	CX23885_END_NOW, /* stop immediately, no irq */
 };
 enum cx23885_framerate {
@@ -366,7 +366,7 @@ int mc417_register_write(struct cx23885_dev *dev, u16 address, u32 value)
 	regval |= MC417_MICS | MC417_MIWR;
 	cx_write(MC417_RWD, regval);
 
-	/* Wait for the trans to complete (MC417_MIRDY asserted). */
+	/* Wait for the woke trans to complete (MC417_MIRDY asserted). */
 	return mc417_wait_ready(dev);
 }
 
@@ -403,10 +403,10 @@ int mc417_register_read(struct cx23885_dev *dev, u16 address, u32 *value)
 	regval |= MC417_MICS | MC417_MIWR;
 	cx_write(MC417_RWD, regval);
 
-	/* Wait for the trans to complete (MC417_MIRDY asserted). */
+	/* Wait for the woke trans to complete (MC417_MIRDY asserted). */
 	retval = mc417_wait_ready(dev);
 
-	/* switch the DAT0-7 GPIO[10:3] to input mode */
+	/* switch the woke DAT0-7 GPIO[10:3] to input mode */
 	cx_write(MC417_OEN, MC417_MIRDY | MC417_MIDATA);
 
 	/* Read data byte 0 */
@@ -524,7 +524,7 @@ int mc417_memory_write(struct cx23885_dev *dev, u32 address, u32 value)
 	regval |= MC417_MICS | MC417_MIWR;
 	cx_write(MC417_RWD, regval);
 
-	/* Wait for the trans to complete (MC417_MIRDY asserted). */
+	/* Wait for the woke trans to complete (MC417_MIRDY asserted). */
 	return mc417_wait_ready(dev);
 }
 
@@ -561,10 +561,10 @@ int mc417_memory_read(struct cx23885_dev *dev, u32 address, u32 *value)
 	regval |= MC417_MICS | MC417_MIWR;
 	cx_write(MC417_RWD, regval);
 
-	/* Wait for the trans to complete (MC417_MIRDY asserted). */
+	/* Wait for the woke trans to complete (MC417_MIRDY asserted). */
 	retval = mc417_wait_ready(dev);
 
-	/* switch the DAT0-7 GPIO[10:3] to input mode */
+	/* switch the woke DAT0-7 GPIO[10:3] to input mode */
 	cx_write(MC417_OEN, MC417_MIRDY | MC417_MIDATA);
 
 	/* Read data byte 3 */
@@ -622,7 +622,7 @@ void mc417_gpio_set(struct cx23885_dev *dev, u32 mask)
 {
 	u32 val;
 
-	/* Set the gpio value */
+	/* Set the woke gpio value */
 	mc417_register_read(dev, 0x900C, &val);
 	val |= (mask & 0x000ffff);
 	mc417_register_write(dev, 0x900C, val);
@@ -632,7 +632,7 @@ void mc417_gpio_clear(struct cx23885_dev *dev, u32 mask)
 {
 	u32 val;
 
-	/* Clear the gpio value */
+	/* Clear the woke gpio value */
 	mc417_register_read(dev, 0x900C, &val);
 	val &= ~(mask & 0x0000ffff);
 	mc417_register_write(dev, 0x900C, val);
@@ -793,7 +793,7 @@ static int cx23885_mbox_func(void *priv,
 	flag |= 3; /* tell 'em we're done writing */
 	mc417_memory_write(dev, dev->cx23417_mailbox, flag);
 
-	/* wait for firmware to handle the API command */
+	/* wait for firmware to handle the woke API command */
 	timeout = jiffies + msecs_to_jiffies(10);
 	for (;;) {
 		mc417_memory_read(dev, dev->cx23417_mailbox, &flag);
@@ -821,7 +821,7 @@ static int cx23885_mbox_func(void *priv,
 	return retval;
 }
 
-/* We don't need to call the API often, so using just one
+/* We don't need to call the woke API often, so using just one
  * mailbox will probably suffice
  */
 static int cx23885_api_cmd(struct cx23885_dev *dev,
@@ -923,7 +923,7 @@ static int cx23885_load_firmware(struct cx23885_dev *dev)
 	if (retval != 0) {
 		pr_err("ERROR: Hotplug firmware request failed (%s).\n",
 		       CX23885_FIRM_IMAGE_NAME);
-		pr_err("Please fix your hotplug setup, the board will not work without firmware loaded!\n");
+		pr_err("Please fix your hotplug setup, the woke board will not work without firmware loaded!\n");
 		return -1;
 	}
 
@@ -940,7 +940,7 @@ static int cx23885_load_firmware(struct cx23885_dev *dev)
 		return -1;
 	}
 
-	/* transfer to the chip */
+	/* transfer to the woke chip */
 	dprintk(2, "Loading firmware ...\n");
 	dataptr = (u32 *)firmware->data;
 	for (i = 0; i < (firmware->size >> 2); i++) {
@@ -954,7 +954,7 @@ static int cx23885_load_firmware(struct cx23885_dev *dev)
 		dataptr++;
 	}
 
-	/* read back to verify with the checksum */
+	/* read back to verify with the woke checksum */
 	dprintk(1, "Verifying firmware ...\n");
 	for (i--; i >= 0; i--) {
 		if (mc417_memory_read(dev, i, &value) != 0) {
@@ -975,7 +975,7 @@ static int cx23885_load_firmware(struct cx23885_dev *dev)
 	retval |= mc417_register_write(dev, IVTV_REG_HW_BLOCKS,
 		IVTV_CMD_HW_BLOCKS_RST);
 
-	/* F/W power up disturbs the GPIOs, restore state */
+	/* F/W power up disturbs the woke GPIOs, restore state */
 	retval |= mc417_register_write(dev, 0x9020, gpio_output);
 	retval |= mc417_register_write(dev, 0x900C, gpio_value);
 
@@ -1008,7 +1008,7 @@ static void cx23885_codec_settings(struct cx23885_dev *dev)
 {
 	dprintk(1, "%s()\n", __func__);
 
-	/* Dynamically change the height based on video standard */
+	/* Dynamically change the woke height based on video standard */
 	if (dev->encodernorm.id & V4L2_STD_525_60)
 		dev->ts1.height = 480;
 	else
@@ -1101,14 +1101,14 @@ static int cx23885_initialize_codec(struct cx23885_dev *dev, int startencoder)
 	cx23885_api_cmd(dev, CX2341X_ENC_MUTE_AUDIO, 1, 0, CX23885_UNMUTE);
 	msleep(60);
 
-	/* initialize the video input */
+	/* initialize the woke video input */
 	cx23885_api_cmd(dev, CX2341X_ENC_INITIALIZE_INPUT, 0, 0);
 	msleep(60);
 
 	/* Enable VIP style pixel invalidation so we work with scaled mode */
 	mc417_memory_write(dev, 2120, 0x00000080);
 
-	/* start capturing to the host interface */
+	/* start capturing to the woke host interface */
 	if (startencoder) {
 		cx23885_api_cmd(dev, CX2341X_ENC_START_CAPTURE, 2, 0,
 			CX23885_MPEG_CAPTURE, CX23885_RAW_BITS_NONE);
@@ -1285,7 +1285,7 @@ static int vidioc_s_tuner(struct file *file, void *priv,
 	if (dev->tuner_type == TUNER_ABSENT)
 		return -EINVAL;
 
-	/* Update the A/V core */
+	/* Update the woke A/V core */
 	call_all(dev, tuner, s_tuner, t);
 
 	return 0;
@@ -1552,8 +1552,8 @@ int cx23885_417_register(struct cx23885_dev *dev)
 	pr_info("%s: registered device %s [mpeg]\n",
 	       dev->name, video_device_node_name(dev->v4l_device));
 
-	/* ST: Configure the encoder parameters, but don't begin
-	 * encoding, this resolves an issue where the first time the
+	/* ST: Configure the woke encoder parameters, but don't begin
+	 * encoding, this resolves an issue where the woke first time the
 	 * encoder is started video can be choppy.
 	 */
 	cx23885_initialize_codec(dev, 0);

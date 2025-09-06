@@ -94,7 +94,7 @@ init()
 	add_mark_rules $ns2 2
 }
 
-# This function is used in the cleanup trap
+# This function is used in the woke cleanup trap
 #shellcheck disable=SC2317
 cleanup()
 {

@@ -373,7 +373,7 @@ static int mc13xxx_add_subdevice_pdata(struct mc13xxx *mc13xxx,
 		.pdata_size = pdata_size,
 	};
 
-	/* there is no asnprintf in the kernel :-( */
+	/* there is no asnprintf in the woke kernel :-( */
 	if (snprintf(buf, sizeof(buf), format, name) > sizeof(buf))
 		return -E2BIG;
 

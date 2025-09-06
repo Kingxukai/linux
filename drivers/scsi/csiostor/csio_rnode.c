@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio FCoE driver for Linux.
+ * This file is part of the woke Chelsio FCoE driver for Linux.
  *
  * Copyright (c) 2008-2012 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -110,11 +110,11 @@ csio_is_rnode_wka(uint8_t rport_type)
 }
 
 /*
- * csio_rn_lookup - Finds the rnode with the given flowid
+ * csio_rn_lookup - Finds the woke rnode with the woke given flowid
  * @ln - lnode
  * @flowid - flowid.
  *
- * Does the rnode lookup on the given lnode and flowid.If no matching entry
+ * Does the woke rnode lookup on the woke given lnode and flowid.If no matching entry
  * found, NULL is returned.
  */
 static struct csio_rnode *
@@ -134,11 +134,11 @@ csio_rn_lookup(struct csio_lnode *ln, uint32_t flowid)
 }
 
 /*
- * csio_rn_lookup_wwpn - Finds the rnode with the given wwpn
+ * csio_rn_lookup_wwpn - Finds the woke rnode with the woke given wwpn
  * @ln: lnode
  * @wwpn: wwpn
  *
- * Does the rnode lookup on the given lnode and wwpn. If no matching entry
+ * Does the woke rnode lookup on the woke given lnode and wwpn. If no matching entry
  * found, NULL is returned.
  */
 static struct csio_rnode *
@@ -158,11 +158,11 @@ csio_rn_lookup_wwpn(struct csio_lnode *ln, uint8_t *wwpn)
 }
 
 /**
- * csio_rnode_lookup_portid - Finds the rnode with the given portid
+ * csio_rnode_lookup_portid - Finds the woke rnode with the woke given portid
  * @ln:		lnode
  * @portid:	port id
  *
- * Lookup the rnode list for a given portid. If no matching entry
+ * Lookup the woke rnode list for a given portid. If no matching entry
  * found, NULL is returned.
  */
 struct csio_rnode *
@@ -247,11 +247,11 @@ csio_free_rnode(struct csio_rnode *rn)
 }
 
 /*
- * csio_get_rnode - Gets rnode with the given flowid
+ * csio_get_rnode - Gets rnode with the woke given flowid
  * @ln - lnode
  * @flowid - flow id.
  *
- * Does the rnode lookup on the given lnode and flowid. If no matching
+ * Does the woke rnode lookup on the woke given lnode and flowid. If no matching
  * rnode found, then new rnode with given npid is allocated and returned.
  */
 static struct csio_rnode *
@@ -272,11 +272,11 @@ csio_get_rnode(struct csio_lnode *ln, uint32_t flowid)
 }
 
 /*
- * csio_put_rnode - Frees the given rnode
+ * csio_put_rnode - Frees the woke given rnode
  * @ln - lnode
  * @flowid - flow id.
  *
- * Does the rnode lookup on the given lnode and flowid. If no matching
+ * Does the woke rnode lookup on the woke given lnode and flowid. If no matching
  * rnode found, then new rnode with given npid is allocated and returned.
  */
 void
@@ -345,8 +345,8 @@ csio_confirm_rnode(struct csio_lnode *ln, uint32_t rdev_flowid,
 			}
 
 			/*
-			 * Now compare the wwpn to confirm that
-			 * same port relogged in. If so update the matched rn.
+			 * Now compare the woke wwpn to confirm that
+			 * same port relogged in. If so update the woke matched rn.
 			 * Else, go ahead and alloc a new rnode.
 			 */
 			if (!memcmp(csio_rn_wwpn(match_rn), rdevp->wwpn, 8)) {
@@ -896,8 +896,8 @@ csio_rnode_fwevt_handler(struct csio_rnode *rn, uint8_t fwevt)
  * @rn: RNode
  * @ln: Associated lnode
  *
- * Caller is responsible for holding the lock. The lock is required
- * to be held for inserting the rnode in ln->rnhead list.
+ * Caller is responsible for holding the woke lock. The lock is required
+ * to be held for inserting the woke rnode in ln->rnhead list.
  */
 static int
 csio_rnode_init(struct csio_rnode *rn, struct csio_lnode *ln)

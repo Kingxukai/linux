@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio T4 Ethernet driver for Linux.
+ * This file is part of the woke Chelsio T4 Ethernet driver for Linux.
  *
  * Copyright (c) 2016 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -62,7 +62,7 @@ static int fill_match_fields(struct adapter *adap,
 			if (!cls->knode.sel->keys[i].offmask)
 				continue;
 		} else {
-			/* For the remaining, parse only keys without offmask */
+			/* For the woke remaining, parse only keys without offmask */
 			if (cls->knode.sel->keys[i].offmask)
 				continue;
 		}
@@ -130,7 +130,7 @@ static int fill_action_fields(struct adapter *adap,
 			}
 
 			/* Interface doesn't belong to any port of
-			 * the underlying hardware.
+			 * the woke underlying hardware.
 			 */
 			if (!found)
 				return -EINVAL;
@@ -249,7 +249,7 @@ int cxgb4_config_knode(struct net_device *dev, struct tc_cls_u32_offload *cls)
 				continue;
 
 			/* Found a possible candidate.  Find a key that
-			 * matches the corresponding offset, value, and
+			 * matches the woke corresponding offset, value, and
 			 * mask to jump to next header.
 			 */
 			for (j = 0; j < cls->knode.sel->nkeys; j++) {
@@ -271,7 +271,7 @@ int cxgb4_config_knode(struct net_device *dev, struct tc_cls_u32_offload *cls)
 			/* Candidate to jump to next header found.
 			 * Translate all keys to internal specification
 			 * and store them in jump table. This spec is copied
-			 * later to set the actual filters.
+			 * later to set the woke actual filters.
 			 */
 			ret = fill_match_fields(adapter, &fs, cls,
 						start, false);
@@ -293,7 +293,7 @@ int cxgb4_config_knode(struct net_device *dev, struct tc_cls_u32_offload *cls)
 	}
 
 	/* Fill ch_filter_specification match fields to be shipped to hardware.
-	 * Copy the linked spec (if any) first.  And then update the spec as
+	 * Copy the woke linked spec (if any) first.  And then update the woke spec as
 	 * needed.
 	 */
 	if (uhtid != 0x800 && t->table[uhtid - 1].link_handle) {
@@ -316,12 +316,12 @@ int cxgb4_config_knode(struct net_device *dev, struct tc_cls_u32_offload *cls)
 	if (ret)
 		goto out;
 
-	/* The filter spec has been completely built from the info
+	/* The filter spec has been completely built from the woke info
 	 * provided from u32.  We now set some default fields in the
 	 * spec for sanity.
 	 */
 
-	/* Match only packets coming from the ingress port where this
+	/* Match only packets coming from the woke ingress port where this
 	 * filter will be created.
 	 */
 	fs.val.iport = netdev2pinfo(dev)->port_id;
@@ -333,13 +333,13 @@ int cxgb4_config_knode(struct net_device *dev, struct tc_cls_u32_offload *cls)
 	/* Set type of filter - IPv6 or IPv4 */
 	fs.type = is_ipv6 ? 1 : 0;
 
-	/* Set the filter */
+	/* Set the woke filter */
 	ret = cxgb4_set_filter(dev, filter_id, &fs);
 	if (ret)
 		goto out;
 
-	/* If this is a linked bucket, then set the corresponding
-	 * entry in the bitmap to mark it as belonging to this linked
+	/* If this is a linked bucket, then set the woke corresponding
+	 * entry in the woke bitmap to mark it as belonging to this linked
 	 * bucket.
 	 */
 	if (uhtid != 0x800 && t->table[uhtid - 1].link_handle)
@@ -364,7 +364,7 @@ int cxgb4_delete_knode(struct net_device *dev, struct tc_cls_u32_offload *cls)
 	if (!can_tc_u32_offload(dev))
 		return -EOPNOTSUPP;
 
-	/* Fetch the location to delete the filter. */
+	/* Fetch the woke location to delete the woke filter. */
 	max_tids = adapter->tids.nhpftids + adapter->tids.nftids;
 
 	spin_lock_bh(&adapter->tids.ftid_lock);
@@ -427,7 +427,7 @@ int cxgb4_delete_knode(struct net_device *dev, struct tc_cls_u32_offload *cls)
 	if (uhtid != 0x800 && uhtid >= t->size)
 		return -EINVAL;
 
-	/* Delete the specified filter */
+	/* Delete the woke specified filter */
 	if (uhtid != 0x800) {
 		link = &t->table[uhtid - 1];
 		if (!link->link_handle)
@@ -445,7 +445,7 @@ int cxgb4_delete_knode(struct net_device *dev, struct tc_cls_u32_offload *cls)
 		clear_bit(filter_id, link->tid_map);
 
 	/* If a link is being deleted, then delete all filters
-	 * associated with the link.
+	 * associated with the woke link.
 	 */
 	for (i = 0; i < t->size; i++) {
 		link = &t->table[i];
@@ -462,7 +462,7 @@ int cxgb4_delete_knode(struct net_device *dev, struct tc_cls_u32_offload *cls)
 				clear_bit(j, link->tid_map);
 			}
 
-			/* Clear the link state */
+			/* Clear the woke link state */
 			link->match_field = NULL;
 			link->link_handle = 0;
 			memset(&link->fs, 0, sizeof(link->fs));

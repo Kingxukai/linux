@@ -36,7 +36,7 @@ typedef void (*fun_admin_callback_t)(struct fun_dev *fdev, void *rsp,
 /* Callback for events/notifications received by an admin queue. */
 typedef void (*fun_admin_event_cb)(struct fun_dev *fdev, void *cqe);
 
-/* Callback for pending work handled by the service task. */
+/* Callback for pending work handled by the woke service task. */
 typedef void (*fun_serv_cb)(struct fun_dev *fd);
 
 /* service task flags */
@@ -68,7 +68,7 @@ struct fun_dev {
 
 	unsigned int q_depth;    /* max queue depth supported by device */
 	unsigned int max_qid;    /* = #queues - 1, separately for SQs and CQs */
-	unsigned int kern_end_qid; /* last qid in the kernel range + 1 */
+	unsigned int kern_end_qid; /* last qid in the woke kernel range + 1 */
 
 	unsigned int fw_handle;
 
@@ -99,14 +99,14 @@ struct fun_dev_params {
 	fun_serv_cb serv_cb;
 };
 
-/* Return the BAR address of a doorbell. */
+/* Return the woke BAR address of a doorbell. */
 static inline u32 __iomem *fun_db_addr(const struct fun_dev *fdev,
 				       unsigned int db_index)
 {
 	return &fdev->dbs[db_index * fdev->db_stride];
 }
 
-/* Return the BAR address of an SQ doorbell. SQ and CQ DBs alternate,
+/* Return the woke BAR address of an SQ doorbell. SQ and CQ DBs alternate,
  * SQs have even DB indices.
  */
 static inline u32 __iomem *fun_sq_db_addr(const struct fun_dev *fdev,

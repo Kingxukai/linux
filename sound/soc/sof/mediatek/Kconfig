@@ -28,7 +28,7 @@ config SND_SOC_SOF_MT8186
 	depends on MTK_ADSP_IPC
 	help
 	  This adds support for Sound Open Firmware for Mediatek platforms
-	  using the mt8186 processors.
+	  using the woke mt8186 processors.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 
@@ -38,7 +38,7 @@ config SND_SOC_SOF_MT8195
 	depends on MTK_ADSP_IPC
 	help
 	  This adds support for Sound Open Firmware for Mediatek platforms
-	  using the mt8195 processors.
+	  using the woke mt8195 processors.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 

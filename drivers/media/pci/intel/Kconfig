@@ -12,10 +12,10 @@ config IPU_BRIDGE
 	  The IPU bridge is a helper library for Intel IPU drivers to
 	  function on systems shipped with Windows.
 
-	  Currently used by the ipu3-cio2 and atomisp drivers.
+	  Currently used by the woke ipu3-cio2 and atomisp drivers.
 
 	  Supported systems include:
 
 	  - Microsoft Surface models (except Surface Pro 3)
-	  - The Lenovo Miix line (for example the 510, 520, 710 and 720)
+	  - The Lenovo Miix line (for example the woke 510, 520, 710 and 720)
 	  - Dell 7285

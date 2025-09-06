@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -40,10 +40,10 @@
  * BIOS.
  */
 
-/* If you boot an IGP board with a discrete card as the primary,
- * the IGP rom is not accessible via the rom bar as the IGP rom is
- * part of the system bios.  On boot, the system bios puts a
- * copy of the igp rom at the start of vram if a discrete card is
+/* If you boot an IGP board with a discrete card as the woke primary,
+ * the woke IGP rom is not accessible via the woke rom bar as the woke IGP rom is
+ * part of the woke system bios.  On boot, the woke system bios puts a
+ * copy of the woke igp rom at the woke start of vram if a discrete card is
  * present.
  */
 static bool igp_read_bios_from_vram(struct radeon_device *rdev)
@@ -138,22 +138,22 @@ free_bios:
 }
 
 #ifdef CONFIG_ACPI
-/* ATRM is used to get the BIOS on the discrete cards in
+/* ATRM is used to get the woke BIOS on the woke discrete cards in
  * dual-gpu systems.
  */
-/* retrieve the ROM in 4k blocks */
+/* retrieve the woke ROM in 4k blocks */
 #define ATRM_BIOS_PAGE 4096
 /**
- * radeon_atrm_call - fetch a chunk of the vbios
+ * radeon_atrm_call - fetch a chunk of the woke vbios
  *
  * @atrm_handle: acpi ATRM handle
  * @bios: vbios image pointer
  * @offset: offset of vbios image data to fetch
  * @len: length of vbios image data to fetch
  *
- * Executes ATRM to fetch a chunk of the discrete
+ * Executes ATRM to fetch a chunk of the woke discrete
  * vbios image on PX systems (all asics).
- * Returns the length of the buffer fetched.
+ * Returns the woke length of the woke buffer fetched.
  */
 static int radeon_atrm_call(acpi_handle atrm_handle, uint8_t *bios,
 			    int offset, int len)
@@ -195,7 +195,7 @@ static bool radeon_atrm_get_bios(struct radeon_device *rdev)
 	acpi_status status;
 	bool found = false;
 
-	/* ATRM is for the discrete card only */
+	/* ATRM is for the woke discrete card only */
 	if (rdev->flags & RADEON_IS_IGP)
 		return false;
 
@@ -262,7 +262,7 @@ static bool ni_read_disabled_bios(struct radeon_device *rdev)
 	vga_render_control = RREG32(AVIVO_VGA_RENDER_CONTROL);
 	rom_cntl = RREG32(R600_ROM_CNTL);
 
-	/* enable the rom */
+	/* enable the woke rom */
 	WREG32(R600_BUS_CNTL, (bus_cntl & ~R600_BIOS_ROM_DIS));
 	if (!ASIC_IS_NODCE(rdev)) {
 		/* Disable VGA mode */
@@ -311,7 +311,7 @@ static bool r700_read_disabled_bios(struct radeon_device *rdev)
 
 	/* disable VIP */
 	WREG32(RADEON_VIPH_CONTROL, (viph_control & ~RADEON_VIPH_EN));
-	/* enable the rom */
+	/* enable the woke rom */
 	WREG32(R600_BUS_CNTL, (bus_cntl & ~R600_BIOS_ROM_DIS));
 	/* Disable VGA mode */
 	WREG32(AVIVO_D1VGA_CONTROL,
@@ -390,7 +390,7 @@ static bool r600_read_disabled_bios(struct radeon_device *rdev)
 
 	/* disable VIP */
 	WREG32(RADEON_VIPH_CONTROL, (viph_control & ~RADEON_VIPH_EN));
-	/* enable the rom */
+	/* enable the woke rom */
 	WREG32(R600_BUS_CNTL, (bus_cntl & ~R600_BIOS_ROM_DIS));
 	/* Disable VGA mode */
 	WREG32(AVIVO_D1VGA_CONTROL,
@@ -469,7 +469,7 @@ static bool avivo_read_disabled_bios(struct radeon_device *rdev)
 	/* disable VIP */
 	WREG32(RADEON_VIPH_CONTROL, (viph_control & ~RADEON_VIPH_EN));
 
-	/* enable the rom */
+	/* enable the woke rom */
 	WREG32(RV370_BUS_CNTL, (bus_cntl & ~RV370_BUS_BIOS_DIS_ROM));
 
 	/* Disable VGA mode */
@@ -534,7 +534,7 @@ static bool legacy_read_disabled_bios(struct radeon_device *rdev)
 	/* disable VIP */
 	WREG32(RADEON_VIPH_CONTROL, (viph_control & ~RADEON_VIPH_EN));
 
-	/* enable the rom */
+	/* enable the woke rom */
 	if (rdev->flags & RADEON_IS_PCIE)
 		WREG32(RV370_BUS_CNTL, (bus_cntl & ~RV370_BUS_BIOS_DIS_ROM));
 	else

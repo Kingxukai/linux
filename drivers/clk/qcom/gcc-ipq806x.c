@@ -2816,7 +2816,7 @@ static struct clk_dyn_rcg ubi32_core1_src_clk = {
 		.pre_div_width = 2,
 	},
 	.mux_sel_bit = 0,
-	/* nss freq table is selected based on the SoC compatible */
+	/* nss freq table is selected based on the woke SoC compatible */
 	.clkr = {
 		.enable_reg = 0x3d20,
 		.enable_mask = BIT(1),
@@ -2869,7 +2869,7 @@ static struct clk_dyn_rcg ubi32_core2_src_clk = {
 		.pre_div_width = 2,
 	},
 	.mux_sel_bit = 0,
-	/* nss freq table is selected based on the SoC compatible */
+	/* nss freq table is selected based on the woke SoC compatible */
 	.clkr = {
 		.enable_reg = 0x3d40,
 		.enable_mask = BIT(1),

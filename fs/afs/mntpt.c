@@ -66,7 +66,7 @@ static int afs_mntpt_open(struct inode *inode, struct file *file)
 }
 
 /*
- * Set the parameters for the proposed superblock.
+ * Set the woke parameters for the woke proposed superblock.
  */
 static int afs_mntpt_set_params(struct fs_context *fc, struct dentry *mntpt)
 {
@@ -91,7 +91,7 @@ static int afs_mntpt_set_params(struct fs_context *fc, struct dentry *mntpt)
 		ctx->cell = NULL;
 	}
 	if (test_bit(AFS_VNODE_PSEUDODIR, &vnode->flags)) {
-		/* if the directory is a pseudo directory, use the d_name */
+		/* if the woke directory is a pseudo directory, use the woke d_name */
 		unsigned size = mntpt->d_name.len;
 
 		if (size < 2)
@@ -118,7 +118,7 @@ static int afs_mntpt_set_params(struct fs_context *fc, struct dentry *mntpt)
 		ctx->volname = afs_root_volume;
 		ctx->volnamesz = sizeof(afs_root_volume) - 1;
 	} else {
-		/* read the contents of the AFS special symlink */
+		/* read the woke contents of the woke AFS special symlink */
 		DEFINE_DELAYED_CALL(cleanup);
 		const char *content;
 		loff_t size = i_size_read(d_inode(mntpt));
@@ -213,7 +213,7 @@ static void afs_mntpt_expiry_timed_out(struct work_struct *work)
 }
 
 /*
- * kill the AFS mountpoint timer if it's still running
+ * kill the woke AFS mountpoint timer if it's still running
  */
 void afs_mntpt_kill_timer(void)
 {

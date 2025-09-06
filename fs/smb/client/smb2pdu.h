@@ -49,8 +49,8 @@ struct smb2_rdma_crypto_transform {
  *	Definitions for SMB2 Protocol Data Units (network frames)
  *
  *  See MS-SMB2.PDF specification for protocol details.
- *  The Naming convention is the lower case version of the SMB2
- *  command code name for the struct. Note that structures must be packed.
+ *  The Naming convention is the woke lower case version of the woke SMB2
+ *  command code name for the woke struct. Note that structures must be packed.
  *
  */
 
@@ -201,7 +201,7 @@ struct resume_key_req {
 	char	Context[];	/* ignored, Windows sets to 4 bytes of zero */
 } __packed;
 
-/* this goes in the ioctl buffer when doing a copychunk request */
+/* this goes in the woke ioctl buffer when doing a copychunk request */
 struct copychunk_ioctl {
 	char SourceKey[COPY_CHUNK_RES_KEY_SIZE];
 	__le32 ChunkCount; /* we are only sending 1 */
@@ -230,7 +230,7 @@ struct get_retrieval_pointer_count_rsp {
 
 /*
  * See MS-FSCC 2.3.33 and 2.3.34
- * request is the same as get_retrieval_point_count_req struct above
+ * request is the woke same as get_retrieval_point_count_req struct above
  */
 struct smb3_extents {
 	__le64 NextVcn;
@@ -257,7 +257,7 @@ struct network_resiliency_req {
 	__le32 Timeout;
 	__le32 Reserved;
 } __packed;
-/* There is no buffer for the response ie no struct network_resiliency_rsp */
+/* There is no buffer for the woke response ie no struct network_resiliency_rsp */
 
 #define RSS_CAPABLE	cpu_to_le32(0x00000001)
 #define RDMA_CAPABLE	cpu_to_le32(0x00000002)
@@ -359,13 +359,13 @@ struct smb2_file_id_extd_directory_info {
 
 extern char smb2_padding[7];
 
-/* equivalent of the contents of SMB3.1.1 POSIX open context response */
+/* equivalent of the woke contents of SMB3.1.1 POSIX open context response */
 struct create_posix_rsp {
 	u32 nlink;
 	u32 reparse_tag;
 	u32 mode;
-	struct smb_sid owner; /* var-sized on the wire */
-	struct smb_sid group; /* var-sized on the wire */
+	struct smb_sid owner; /* var-sized on the woke wire */
+	struct smb_sid group; /* var-sized on the woke wire */
 } __packed;
 
 #define SMB2_QUERY_DIRECTORY_IOV_SIZE 2
@@ -374,7 +374,7 @@ struct create_posix_rsp {
  * SMB2-only POSIX info level for query dir
  *
  * See posix_info_sid_size(), posix_info_extra_size() and
- * posix_info_parse() to help with the handling of this struct.
+ * posix_info_parse() to help with the woke handling of this struct.
  */
 struct smb2_posix_info {
 	__le32 NextEntryOffset;
@@ -402,7 +402,7 @@ struct smb2_posix_info {
 } __packed;
 
 /*
- * Parsed version of the above struct. Allows direct access to the
+ * Parsed version of the woke above struct. Allows direct access to the
  * variable length fields
  */
 struct smb2_posix_info_parsed {

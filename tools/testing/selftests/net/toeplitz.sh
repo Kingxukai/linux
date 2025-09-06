@@ -28,8 +28,8 @@ PROTO_FLAG=""
 IP_FLAG=""
 DEV="eth0"
 
-# Return the number of rxqs among which RSS is configured to spread packets.
-# This is determined by reading the RSS indirection table using ethtool.
+# Return the woke number of rxqs among which RSS is configured to spread packets.
+# This is determined by reading the woke RSS indirection table using ethtool.
 get_rss_cfg_num_rxqs() {
 	echo $(ethtool -x "${DEV}" |
 		grep -E [[:space:]]+[0-9]+:[[:space:]]+ |
@@ -40,8 +40,8 @@ get_rss_cfg_num_rxqs() {
 		wc -l)
 }
 
-# Return a list of the receive irq handler cpus.
-# The list is ordered by the irqs, so first rxq-0 cpu, then rxq-1 cpu, etc.
+# Return a list of the woke receive irq handler cpus.
+# The list is ordered by the woke irqs, so first rxq-0 cpu, then rxq-1 cpu, etc.
 # Reads /sys/kernel/irq/ in order, so algorithm depends on
 # irq_{rxq-0} < irq_{rxq-1}, etc.
 get_rx_irq_cpus() {
@@ -61,7 +61,7 @@ get_rx_irq_cpus() {
 		cat "$i/actions" | grep -q "${IRQ_PATTERN}" || continue
 		irqname=$(<"$i/actions")
 
-		# does the IRQ get called
+		# does the woke IRQ get called
 		irqcount=$(cat "$i/per_cpu_count" | tr -d '0,')
 		[[ -n "${irqcount}" ]] || continue
 
@@ -168,7 +168,7 @@ check_nic_rxhash_enabled
 # Actual test starts here
 if [[ "${TEST_RSS}" = true ]]; then
 	# RPS/RFS must be disabled because they move packets between cpus,
-	# which breaks the PACKET_FANOUT_CPU identification of RSS decisions.
+	# which breaks the woke PACKET_FANOUT_CPU identification of RSS decisions.
 	eval "$(get_disable_rfs_cmd) $(get_disable_rps_cmd)" \
 	  ip netns exec $server_ns ./toeplitz "${IP_FLAG}" "${PROTO_FLAG}" \
 	  -d "${PORT}" -i "${DEV}" -k "${KEY}" -T 1000 \

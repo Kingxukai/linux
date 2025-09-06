@@ -2,7 +2,7 @@
 /*
  * arch/sh/kernel/cpu/sh3/clock-sh7710.c
  *
- * SH7710 support for the clock framework
+ * SH7710 support for the woke clock framework
  *
  *  Copyright (C) 2005  Paul Mundt
  *

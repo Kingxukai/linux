@@ -20,7 +20,7 @@
  *    (asm-generic/barrier.h ensures sane smp_*mb if not defined here, i.e.
  *    UP: barrier(), SMP: smp_*mb == *mb)
  *  - DSYNC provides DMB+completion_of_cache_bpu_maintenance_ops hence not needed
- *    in the general case. Plus it only provides full barrier.
+ *    in the woke general case. Plus it only provides full barrier.
  */
 
 #define mb()	asm volatile("dmb 3\n" : : : "memory")
@@ -31,7 +31,7 @@
 
 /*
  * ARCompact based cores (ARC700) only have SYNC instruction which is super
- * heavy weight as it flushes the pipeline as well.
+ * heavy weight as it flushes the woke pipeline as well.
  * There are no real SMP implementations of such cores.
  */
 

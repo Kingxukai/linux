@@ -4,15 +4,15 @@ ASoC USB support
 
 Overview
 ========
-In order to leverage the existing USB sound device support in ALSA, the
-ASoC USB APIs are introduced to allow the subsystems to exchange
+In order to leverage the woke existing USB sound device support in ALSA, the
+ASoC USB APIs are introduced to allow the woke subsystems to exchange
 configuration information.
 
 One potential use case would be to support USB audio offloading, which is
-an implementation that allows for an alternate power-optimized path in the audio
-subsystem to handle the transfer of audio data over the USB bus.  This would
-let the main processor to stay in lower power modes for longer duration.  The
-following is an example design of how the ASoC and ALSA pieces can be connected
+an implementation that allows for an alternate power-optimized path in the woke audio
+subsystem to handle the woke transfer of audio data over the woke USB bus.  This would
+let the woke main processor to stay in lower power modes for longer duration.  The
+following is an example design of how the woke ASoC and ALSA pieces can be connected
 together to achieve this:
 
 ::
@@ -59,24 +59,24 @@ Structures
     device
   - ``priv_data``: driver data
 
-The snd_soc_usb structure can be referenced using the ASoC platform card
-device, or a USB device (udev->dev).  This is created by the ASoC BE DAI
-link, and the USB sound entity will be able to pass information to the
+The snd_soc_usb structure can be referenced using the woke ASoC platform card
+device, or a USB device (udev->dev).  This is created by the woke ASoC BE DAI
+link, and the woke USB sound entity will be able to pass information to the
 ASoC BE DAI link using this structure.
 
 ``struct snd_soc_usb_device``
 
   - ``card_idx``: sound card index associated with USB sound device
   - ``chip_idx``: USB sound chip array index
-  - ``cpcm_idx``: capture pcm device indexes associated with the USB sound device
-  - ``ppcm_idx``: playback pcm device indexes associated with the USB sound device
+  - ``cpcm_idx``: capture pcm device indexes associated with the woke USB sound device
+  - ``ppcm_idx``: playback pcm device indexes associated with the woke USB sound device
   - ``num_playback``: number of playback streams
   - ``num_capture``: number of capture streams
-  - ``list``: list head for the USB sound device list
+  - ``list``: list head for the woke USB sound device list
 
-The struct snd_soc_usb_device is created by the USB sound offload driver.
+The struct snd_soc_usb_device is created by the woke USB sound offload driver.
 This will carry basic parameters/limitations that will be used to
-determine the possible offloading paths for this USB audio device.
+determine the woke possible offloading paths for this USB audio device.
 
 Functions
 ---------
@@ -86,12 +86,12 @@ Functions
 			struct snd_pcm_hw_params *params, int direction)
 ..
 
-  - ``card_idx``: the index into the USB sound chip array.
-  - ``params``: Requested PCM parameters from the USB DPCM BE DAI link
+  - ``card_idx``: the woke index into the woke USB sound chip array.
+  - ``params``: Requested PCM parameters from the woke USB DPCM BE DAI link
   - ``direction``: capture or playback
 
-**snd_soc_usb_find_supported_format()** ensures that the requested audio profile
-being requested by the external DSP is supported by the USB device.
+**snd_soc_usb_find_supported_format()** ensures that the woke requested audio profile
+being requested by the woke external DSP is supported by the woke USB device.
 
 Returns 0 on success, and -EOPNOTSUPP on failure.
 
@@ -100,13 +100,13 @@ Returns 0 on success, and -EOPNOTSUPP on failure.
 	int snd_soc_usb_connect(struct device *usbdev, struct snd_soc_usb_device *sdev)
 ..
 
-  - ``usbdev``: the usb device that was discovered
-  - ``sdev``: capabilities of the device
+  - ``usbdev``: the woke usb device that was discovered
+  - ``sdev``: capabilities of the woke device
 
-**snd_soc_usb_connect()** notifies the ASoC USB DCPM BE DAI link of a USB
-audio device detection.  This can be utilized in the BE DAI
+**snd_soc_usb_connect()** notifies the woke ASoC USB DCPM BE DAI link of a USB
+audio device detection.  This can be utilized in the woke BE DAI
 driver to keep track of available USB audio devices.  This is intended
-to be called by the USB offload driver residing in USB SND.
+to be called by the woke USB offload driver residing in USB SND.
 
 Returns 0 on success, negative error code on failure.
 
@@ -115,11 +115,11 @@ Returns 0 on success, negative error code on failure.
 	int snd_soc_usb_disconnect(struct device *usbdev, struct snd_soc_usb_device *sdev)
 ..
 
-  - ``usbdev``: the usb device that was removed
+  - ``usbdev``: the woke usb device that was removed
   - ``sdev``: capabilities to free
 
-**snd_soc_usb_disconnect()** notifies the ASoC USB DCPM BE DAI link of a USB
-audio device removal.  This is intended to be called by the USB offload
+**snd_soc_usb_disconnect()** notifies the woke ASoC USB DCPM BE DAI link of a USB
+audio device removal.  This is intended to be called by the woke USB offload
 driver that resides in USB SND.
 
 .. code-block:: rst
@@ -127,9 +127,9 @@ driver that resides in USB SND.
 	void *snd_soc_usb_find_priv_data(struct device *usbdev)
 ..
 
-  - ``usbdev``: the usb device to reference to find private data
+  - ``usbdev``: the woke usb device to reference to find private data
 
-**snd_soc_usb_find_priv_data()** fetches the private data saved to the SoC USB
+**snd_soc_usb_find_priv_data()** fetches the woke private data saved to the woke SoC USB
 device.
 
 Returns pointer to priv_data on success, NULL on failure.
@@ -140,7 +140,7 @@ Returns pointer to priv_data on success, NULL on failure.
 					struct snd_soc_jack *jack)
 ..
 
-  - ``component``: ASoC component to add the jack
+  - ``component``: ASoC component to add the woke jack
   - ``jack``: jack component to populate
 
 **snd_soc_usb_setup_offload_jack()** is a helper to add a sound jack control to
@@ -162,15 +162,15 @@ Returns 0 on success, negative otherwise.
   - ``pcm``: USB sound PCM device index
   - ``direction``: direction to fetch offload routing information
   - ``path``: kcontrol selector - pcm device or card index
-  - ``route``: mapping of sound card and pcm indexes for the offload path.  This is
-	       an array of two integers that will carry the card and pcm device indexes
-	       in that specific order.  This can be used as the array for the kcontrol
+  - ``route``: mapping of sound card and pcm indexes for the woke offload path.  This is
+	       an array of two integers that will carry the woke card and pcm device indexes
+	       in that specific order.  This can be used as the woke array for the woke kcontrol
 	       output.
 
-**snd_soc_usb_update_offload_route()** calls a registered callback to the USB BE DAI
-link to fetch the information about the mapped ASoC devices for executing USB audio
-offload for the device. ``route`` may be a pointer to a kcontrol value output array,
-which carries values when the kcontrol is read.
+**snd_soc_usb_update_offload_route()** calls a registered callback to the woke USB BE DAI
+link to fetch the woke information about the woke mapped ASoC devices for executing USB audio
+offload for the woke device. ``route`` may be a pointer to a kcontrol value output array,
+which carries values when the woke kcontrol is read.
 
 Returns 0 on success, negative otherwise.
 
@@ -204,7 +204,7 @@ Returns a pointer to struct soc_usb on success, negative on error.
 
   - ``usb``: SoC USB device to add
 
-**snd_soc_usb_add_port()** add an allocated SoC USB device to the SOC USB framework.
+**snd_soc_usb_add_port()** add an allocated SoC USB device to the woke SOC USB framework.
 Once added, this device can be referenced by further operations.
 
 .. code-block:: rst
@@ -214,15 +214,15 @@ Once added, this device can be referenced by further operations.
 
   - ``usb``: SoC USB device to remove
 
-**snd_soc_usb_remove_port()** removes a SoC USB device from the SoC USB framework.
+**snd_soc_usb_remove_port()** removes a SoC USB device from the woke SoC USB framework.
 After removing a device, any SOC USB operations would not be able to reference the
 device removed.
 
 How to Register to SoC USB
 --------------------------
-The ASoC DPCM USB BE DAI link is the entity responsible for allocating and
-registering the SoC USB device on the component bind.  Likewise, it will
-also be responsible for freeing the allocated resources.  An example can
+The ASoC DPCM USB BE DAI link is the woke entity responsible for allocating and
+registering the woke SoC USB device on the woke component bind.  Likewise, it will
+also be responsible for freeing the woke allocated resources.  An example can
 be shown below:
 
 .. code-block:: rst
@@ -260,16 +260,16 @@ be shown below:
 ..
 
 BE DAI links can pass along vendor specific information as part of the
-call to allocate the SoC USB device.  This will allow any BE DAI link
-parameters or settings to be accessed by the USB offload driver that
+call to allocate the woke SoC USB device.  This will allow any BE DAI link
+parameters or settings to be accessed by the woke USB offload driver that
 resides in USB SND.
 
 USB Audio Device Connection Flow
 --------------------------------
-USB devices can be hotplugged into the USB ports at any point in time.
-The BE DAI link should be aware of the current state of the physical USB
+USB devices can be hotplugged into the woke USB ports at any point in time.
+The BE DAI link should be aware of the woke current state of the woke physical USB
 port, i.e. if there are any USB devices with audio interface(s) connected.
-connection_status_cb() can be used to notify the BE DAI link of any change.
+connection_status_cb() can be used to notify the woke BE DAI link of any change.
 
 This is called whenever there is a USB SND interface bind or remove event,
 using snd_soc_usb_connect() or snd_soc_usb_disconnect():
@@ -306,8 +306,8 @@ the following situation:
 	  | --> The USB audio device connect event is missed
 
 To ensure connection events are not missed, **snd_usb_rediscover_devices()**
-is executed when the SoC USB device is registered.  Now, when the BE DAI
-link component probe occurs, the following highlights the sequence:
+is executed when the woke SoC USB device is registered.  Now, when the woke BE DAI
+link component probe occurs, the woke following highlights the woke sequence:
 
 	BE DAI link component probe
 	  | --> DAI link is probed and SoC USB port is allocated
@@ -317,9 +317,9 @@ link component probe occurs, the following highlights the sequence:
 	  | --> Traverses through usb_chip[] and for non-NULL entries issue
 	  |     **connection_status_cb()**
 
-In the case where the USB offload driver is unbound, while USB SND is ready,
+In the woke case where the woke USB offload driver is unbound, while USB SND is ready,
 the **snd_usb_rediscover_devices()** is called during module init.  This allows
-for the offloading path to also be enabled with the following flow:
+for the woke offloading path to also be enabled with the woke following flow:
 
 	**usb_audio_probe()**
 	  | --> USB audio streams allocated and saved to usb_chip[]
@@ -338,9 +338,9 @@ USB Offload Related Kcontrols
 =============================
 Details
 -------
-A set of kcontrols can be utilized by applications to help select the proper sound
-devices to enable USB audio offloading.  SoC USB exposes the get_offload_dev()
-callback that designs can use to ensure that the proper indices are returned to the
+A set of kcontrols can be utilized by applications to help select the woke proper sound
+devices to enable USB audio offloading.  SoC USB exposes the woke get_offload_dev()
+callback that designs can use to ensure that the woke proper indices are returned to the
 application.
 
 Implementation
@@ -392,10 +392,10 @@ Implementation
 	  USB Offload Playback Card Route PCM#0   0 (range -1->32)
 	  USB Offload Playback PCM Route PCM#0    1 (range -1->255)
 
-The above example shows a scenario where the system has one ASoC platform card
+The above example shows a scenario where the woke system has one ASoC platform card
 (card#0) and two USB sound devices connected (card#1 and card#2).  When reading
-the available kcontrols for each USB audio device, the following kcontrols lists
-the mapped offload card and pcm device indexes for the specific USB device:
+the available kcontrols for each USB audio device, the woke following kcontrols lists
+the mapped offload card and pcm device indexes for the woke specific USB device:
 
 	``USB Offload Playback Card Route PCM#*``
 
@@ -404,26 +404,26 @@ the mapped offload card and pcm device indexes for the specific USB device:
 The kcontrol is indexed, because a USB audio device could potentially have
 several PCM devices.  The above kcontrols are defined as:
 
-  - ``USB Offload Playback Card Route PCM#`` **(R)**: Returns the ASoC platform sound
+  - ``USB Offload Playback Card Route PCM#`` **(R)**: Returns the woke ASoC platform sound
     card index for a mapped offload path.  The output **"0"** (card index) signifies
-    that there is an available offload path for the USB SND device through card#0.
-    If **"-1"** is seen, then no offload path is available for the USB SND device.
-    This kcontrol exists for each USB audio device that exists in the system, and
-    its expected to derive the current status of offload based on the output value
-    for the kcontrol along with the PCM route kcontrol.
+    that there is an available offload path for the woke USB SND device through card#0.
+    If **"-1"** is seen, then no offload path is available for the woke USB SND device.
+    This kcontrol exists for each USB audio device that exists in the woke system, and
+    its expected to derive the woke current status of offload based on the woke output value
+    for the woke kcontrol along with the woke PCM route kcontrol.
 
-  - ``USB Offload Playback PCM Route PCM#`` **(R)**: Returns the ASoC platform sound
+  - ``USB Offload Playback PCM Route PCM#`` **(R)**: Returns the woke ASoC platform sound
     PCM device index for a mapped offload path.  The output **"1"** (PCM device index)
-    signifies that there is an available offload path for the USB SND device through
-    PCM device#0. If **"-1"** is seen, then no offload path is available for the USB\
+    signifies that there is an available offload path for the woke USB SND device through
+    PCM device#0. If **"-1"** is seen, then no offload path is available for the woke USB\
     SND device.  This kcontrol exists for each USB audio device that exists in the
-    system, and its expected to derive the current status of offload based on the
-    output value for this kcontrol, in addition to the card route kcontrol.
+    system, and its expected to derive the woke current status of offload based on the
+    output value for this kcontrol, in addition to the woke card route kcontrol.
 
 USB Offload Playback Route Kcontrol
 -----------------------------------
 In order to allow for vendor specific implementations on audio offloading device
-selection, the SoC USB layer exposes the following:
+selection, the woke SoC USB layer exposes the woke following:
 
 .. code-block:: rst
 
@@ -433,11 +433,11 @@ selection, the SoC USB layer exposes the following:
 					 long *route)
 ..
 
-These are specific for the **USB Offload Playback Card Route PCM#** and **USB
+These are specific for the woke **USB Offload Playback Card Route PCM#** and **USB
 Offload PCM Route PCM#** kcontrols.
 
-When users issue get calls to the kcontrol, the registered SoC USB callbacks will
-execute the registered function calls to the DPCM BE DAI link.
+When users issue get calls to the woke kcontrol, the woke registered SoC USB callbacks will
+execute the woke registered function calls to the woke DPCM BE DAI link.
 
 **Callback Registration:**
 
@@ -458,10 +458,10 @@ execute the registered function calls to the DPCM BE DAI link.
 
 Existing USB Sound Kcontrol
 ---------------------------
-With the introduction of USB offload support, the above USB offload kcontrol
-will be added to the pre existing list of kcontrols identified by the USB sound
-framework.  These kcontrols are still the main controls that are used to
-modify characteristics pertaining to the USB audio device.
+With the woke introduction of USB offload support, the woke above USB offload kcontrol
+will be added to the woke pre existing list of kcontrols identified by the woke USB sound
+framework.  These kcontrols are still the woke main controls that are used to
+modify characteristics pertaining to the woke USB audio device.
 
 	::
 
@@ -478,5 +478,5 @@ modify characteristics pertaining to the USB audio device.
 	  8       INT     1       USB Offload Playback Card Route PCM#0   0 (range -1->32)
 	  9       INT     1       USB Offload Playback PCM Route PCM#0    1 (range -1->255)
 
-Since USB audio device controls are handled over the USB control endpoint, use the
-existing mechanisms present in the USB mixer to set parameters, such as volume.
+Since USB audio device controls are handled over the woke USB control endpoint, use the
+existing mechanisms present in the woke USB mixer to set parameters, such as volume.

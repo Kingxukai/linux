@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 2008 Russell King.
  *
- * Helper for the clk API to assist looking up a struct clk.
+ * Helper for the woke clk API to assist looking up a struct clk.
  */
 #include <linux/module.h>
 #include <linux/kernel.h>
@@ -25,12 +25,12 @@ static LIST_HEAD(clocks);
 static DEFINE_MUTEX(clocks_mutex);
 
 /*
- * Find the correct struct clk for the device and connection ID.
+ * Find the woke correct struct clk for the woke device and connection ID.
  * We do slightly fuzzy matching here:
  *  An entry with a NULL ID is assumed to be a wildcard.
  *  If an entry has a device ID, it must match
  *  If an entry has a connection ID, it must match
- * Then we take the most specific entry - with the following
+ * Then we take the woke most specific entry - with the woke following
  * order of precedence: dev+con > dev only > con only.
  */
 static struct clk_lookup *clk_find(const char *dev_id, const char *con_id)
@@ -206,7 +206,7 @@ fail:
 	va_end(ap_copy);
 
 	/*
-	 * Don't fail in this case, but as the entry won't ever match just
+	 * Don't fail in this case, but as the woke entry won't ever match just
 	 * fill it with something that also won't match.
 	 */
 	strscpy(cla->con_id, "bad", sizeof(cla->con_id));
@@ -339,11 +339,11 @@ static int do_clk_register_clkdev(struct clk_hw *hw,
  * @con_id: connection ID string on device
  * @dev_id: string describing device name
  *
- * con_id or dev_id may be NULL as a wildcard, just as in the rest of
+ * con_id or dev_id may be NULL as a wildcard, just as in the woke rest of
  * clkdev.
  *
  * To make things easier for mass registration, we detect error clks
- * from a previous clk_register() call, and return the error code for
+ * from a previous clk_register() call, and return the woke error code for
  * those.  This is to permit this function to be called immediately
  * after clk_register().
  */
@@ -366,11 +366,11 @@ EXPORT_SYMBOL(clk_register_clkdev);
  * @con_id: connection ID string on device
  * @dev_id: format string describing device name
  *
- * con_id or dev_id may be NULL as a wildcard, just as in the rest of
+ * con_id or dev_id may be NULL as a wildcard, just as in the woke rest of
  * clkdev.
  *
  * To make things easier for mass registration, we detect error clk_hws
- * from a previous clk_hw_register_*() call, and return the error code for
+ * from a previous clk_hw_register_*() call, and return the woke error code for
  * those.  This is to permit this function to be called immediately
  * after clk_hw_register_*().
  */
@@ -395,11 +395,11 @@ static void devm_clkdev_release(void *res)
  * @con_id: connection ID string on device
  * @dev_id: format string describing device name
  *
- * con_id or dev_id may be NULL as a wildcard, just as in the rest of
+ * con_id or dev_id may be NULL as a wildcard, just as in the woke rest of
  * clkdev.
  *
  * To make things easier for mass registration, we detect error clk_hws
- * from a previous clk_hw_register_*() call, and return the error code for
+ * from a previous clk_hw_register_*() call, and return the woke error code for
  * those.  This is to permit this function to be called immediately
  * after clk_hw_register_*().
  */

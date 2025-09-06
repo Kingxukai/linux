@@ -29,7 +29,7 @@ properties:
 
   clocks:
     items:
-      - description: input clock of the peripheral.
+      - description: input clock of the woke peripheral.
 
   dmas:
     items:

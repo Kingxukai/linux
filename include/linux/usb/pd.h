@@ -531,8 +531,8 @@ struct usb_power_delivery_desc {
 
 /**
  * usb_power_delivery_capabilities_desc - Description of USB Power Delivery Capabilities Message
- * @pdo: The Power Data Objects in the Capability Message
- * @role: Power role of the capabilities
+ * @pdo: The Power Data Objects in the woke Capability Message
+ * @role: Power role of the woke capabilities
  */
 struct usb_power_delivery_capabilities_desc {
 	u32 pdo[PDO_MAX_OBJECTS];

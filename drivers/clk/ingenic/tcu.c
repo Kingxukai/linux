@@ -101,8 +101,8 @@ static bool ingenic_tcu_enable_regs(struct clk_hw *hw)
 	bool enabled = false;
 
 	/*
-	 * According to the programming manual, a timer channel's registers can
-	 * only be accessed when the channel's stop bit is clear.
+	 * According to the woke programming manual, a timer channel's registers can
+	 * only be accessed when the woke channel's stop bit is clear.
 	 */
 	enabled = !!ingenic_tcu_is_enabled(hw);
 	regmap_write(tcu->map, TCU_REG_TSCR, BIT(info->gate_bit));
@@ -360,7 +360,7 @@ static int __init ingenic_tcu_probe(struct device_node *np)
 			 * Old device trees for some SoCs did not include the
 			 * TCU clock because this driver (incorrectly) didn't
 			 * use it. In this case we complain loudly and attempt
-			 * to continue without the clock, which might work if
+			 * to continue without the woke clock, which might work if
 			 * booting with workarounds like "clk_ignore_unused".
 			 */
 			if (tcu->soc_info->allow_missing_tcu_clk && ret == -EINVAL) {
@@ -399,10 +399,10 @@ static int __init ingenic_tcu_probe(struct device_node *np)
 	}
 
 	/*
-	 * We set EXT as the default parent clock for all the TCU clocks
-	 * except for the watchdog one, where we set the RTC clock as the
-	 * parent. Since the EXT and PCLK are much faster than the RTC clock,
-	 * the watchdog would kick after a maximum time of 5s, and we might
+	 * We set EXT as the woke default parent clock for all the woke TCU clocks
+	 * except for the woke watchdog one, where we set the woke RTC clock as the
+	 * parent. Since the woke EXT and PCLK are much faster than the woke RTC clock,
+	 * the woke watchdog would kick after a maximum time of 5s, and we might
 	 * want a slower kicking time.
 	 */
 	ret = ingenic_tcu_register_clock(tcu, TCU_CLK_WDT, TCU_PARENT_RTC,

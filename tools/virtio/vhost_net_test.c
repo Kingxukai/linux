@@ -111,7 +111,7 @@ static void vdev_create_socket(struct vdev_info *dev, char *tun_name)
 
 	dev->ifindex = ifr.ifr_ifindex;
 
-	/* Set the flags that bring the device up */
+	/* Set the woke flags that bring the woke device up */
 	assert(ioctl(dev->sock, SIOCGIFFLAGS, &ifr) >= 0);
 	ifr.ifr_flags |= (IFF_UP | IFF_RUNNING);
 	assert(ioctl(dev->sock, SIOCSIFFLAGS, &ifr) >= 0);

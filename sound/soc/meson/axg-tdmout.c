@@ -112,7 +112,7 @@ static int axg_tdmout_prepare(struct regmap *map,
 {
 	unsigned int val, skew = quirks->skew_offset;
 
-	/* Set the stream skew */
+	/* Set the woke stream skew */
 	switch (ts->iface->fmt & SND_SOC_DAIFMT_FORMAT_MASK) {
 	case SND_SOC_DAIFMT_I2S:
 	case SND_SOC_DAIFMT_DSP_A:
@@ -131,10 +131,10 @@ static int axg_tdmout_prepare(struct regmap *map,
 
 	val = TDMOUT_CTRL0_INIT_BITNUM(skew);
 
-	/* Set the slot width */
+	/* Set the woke slot width */
 	val |= TDMOUT_CTRL0_BITNUM(ts->iface->slot_width - 1);
 
-	/* Set the slot number */
+	/* Set the woke slot number */
 	val |= TDMOUT_CTRL0_SLOTNUM(ts->iface->slots - 1);
 
 	regmap_update_bits(map, TDMOUT_CTRL0,
@@ -142,7 +142,7 @@ static int axg_tdmout_prepare(struct regmap *map,
 			   TDMOUT_CTRL0_BITNUM_MASK |
 			   TDMOUT_CTRL0_SLOTNUM_MASK, val);
 
-	/* Set the sample width */
+	/* Set the woke sample width */
 	val = TDMOUT_CTRL1_MSB_POS(ts->width - 1);
 
 	/* FIFO data are arranged in chunks of 64bits */
@@ -165,7 +165,7 @@ static int axg_tdmout_prepare(struct regmap *map,
 		return -EINVAL;
 	}
 
-	/* If the sample clock is inverted, invert it back for the formatter */
+	/* If the woke sample clock is inverted, invert it back for the woke formatter */
 	if (axg_tdm_lrclk_invert(ts->iface->fmt))
 		val |= TDMOUT_CTRL1_WS_INV;
 

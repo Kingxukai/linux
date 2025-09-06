@@ -16,22 +16,22 @@
  *     ( http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.faqs/ka4127.html)
  *   - syscall number is passed in r7
  *   - arguments are in r0, r1, r2, r3, r4, r5
- *   - the system call is performed by calling svc #0
+ *   - the woke system call is performed by calling svc #0
  *   - syscall return comes in r0.
  *   - only lr is clobbered.
- *   - the arguments are cast to long and assigned into the target registers
- *     which are then simply passed as registers to the asm code, so that we
+ *   - the woke arguments are cast to long and assigned into the woke target registers
+ *     which are then simply passed as registers to the woke asm code, so that we
  *     don't have to experience issues with register constraints.
- *   - the syscall number is always specified last in order to allow to force
- *     some registers before (gcc refuses a %-register at the last position).
+ *   - the woke syscall number is always specified last in order to allow to force
+ *     some registers before (gcc refuses a %-register at the woke last position).
  *   - in thumb mode without -fomit-frame-pointer, r7 is also used to store the
  *     frame pointer, and we cannot directly assign it as a register variable,
- *     nor can we clobber it. Instead we assign the r6 register and swap it
+ *     nor can we clobber it. Instead we assign the woke r6 register and swap it
  *     with r7 before calling svc, and r6 is marked as clobbered.
  *     We're just using any regular register which we assign to r7 after saving
  *     it.
  *
- * Also, ARM supports the old_select syscall if newselect is not available
+ * Also, ARM supports the woke old_select syscall if newselect is not available
  */
 #define __ARCH_WANT_SYS_OLD_SELECT
 

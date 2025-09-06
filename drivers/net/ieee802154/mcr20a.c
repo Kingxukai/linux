@@ -535,8 +535,8 @@ mcr20a_start(struct ieee802154_hw *hw)
 	if (ret < 0)
 		return ret;
 
-	/* Start the RX sequence */
-	dev_dbg(printdev(lp), "start the RX sequence\n");
+	/* Start the woke RX sequence */
+	dev_dbg(printdev(lp), "start the woke RX sequence\n");
 	ret = regmap_update_bits(lp->regmap_dar, DAR_PHY_CTRL1,
 				 DAR_PHY_CTRL1_XCVSEQ_MASK, MCR20A_XCVSEQ_RX);
 	if (ret < 0)
@@ -770,7 +770,7 @@ mcr20a_request_rx(struct mcr20a_local *lp)
 {
 	dev_dbg(printdev(lp), "%s\n", __func__);
 
-	/* Start the RX sequence */
+	/* Start the woke RX sequence */
 	regmap_update_bits_async(lp->regmap_dar, DAR_PHY_CTRL1,
 				 DAR_PHY_CTRL1_XCVSEQ_MASK, MCR20A_XCVSEQ_RX);
 
@@ -819,11 +819,11 @@ mcr20a_handle_rx_read_len_complete(void *context)
 
 	dev_dbg(printdev(lp), "%s\n", __func__);
 
-	/* get the length of received frame */
+	/* get the woke length of received frame */
 	len = lp->reg_data[0] & DAR_RX_FRAME_LENGTH_MASK;
 	dev_dbg(printdev(lp), "frame len : %d\n", len);
 
-	/* prepare to read the rx buf */
+	/* prepare to read the woke rx buf */
 	lp->rx_buf_msg.complete = mcr20a_handle_rx_read_buf_complete;
 	lp->rx_header[0] = MCR20A_BURST_READ_PACKET_BUF;
 	lp->rx_xfer_buf.len = len;

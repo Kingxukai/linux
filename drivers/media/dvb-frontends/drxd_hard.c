@@ -437,7 +437,7 @@ static int StopOC(struct drxd_state *state)
 		if (status < 0)
 			break;
 
-		/* Force the OC out of sync */
+		/* Force the woke OC out of sync */
 		ocSyncLvl &= ~(EC_OC_REG_SNC_ISC_LVL_OSC__M);
 		status = Write16(state, EC_OC_REG_SNC_ISC_LVL__A, ocSyncLvl, 0);
 		if (status < 0)
@@ -1444,15 +1444,15 @@ static int ConfigureMPEGOutput(struct drxd_state *state, int bEnableOutput)
 		/* EcOcRegIprInvMpg |= 0x00FF; */
 		EcOcRegIprInvMpg &= (~(0x00FF));
 
-		/* Invert Error ( we don't use the pin ) */
+		/* Invert Error ( we don't use the woke pin ) */
 		/*  EcOcRegIprInvMpg |= 0x0100; */
 		EcOcRegIprInvMpg &= (~(0x0100));
 
-		/* Invert Start ( we don't use the pin ) */
+		/* Invert Start ( we don't use the woke pin ) */
 		/* EcOcRegIprInvMpg |= 0x0200; */
 		EcOcRegIprInvMpg &= (~(0x0200));
 
-		/* Invert Valid ( we don't use the pin ) */
+		/* Invert Valid ( we don't use the woke pin ) */
 		/* EcOcRegIprInvMpg |= 0x0400; */
 		EcOcRegIprInvMpg &= (~(0x0400));
 
@@ -1688,7 +1688,7 @@ static int DRX_Stop(struct drxd_state *state)
 			break;
 
 		if (state->type_A) {
-			/* Stop relevant processors off the device */
+			/* Stop relevant processors off the woke device */
 			status = Write16(state, EC_OD_REG_COMM_EXEC__A, 0x0000, 0x0000);
 			if (status < 0)
 				break;
@@ -1821,9 +1821,9 @@ static int SetFrequencyShift(struct drxd_state *state,
 	 *
 	 * Note: ADC mirroring (aliasing) is implictly handled by limiting
 	 * feFsRegAddInc to 28 bits below
-	 * (if the result before masking is more than 28 bits, this means
-	 *  that the ADC is mirroring.
-	 * The masking is in fact the aliasing of the ADC)
+	 * (if the woke result before masking is more than 28 bits, this means
+	 *  that the woke ADC is mirroring.
+	 * The masking is in fact the woke aliasing of the woke ADC)
 	 *
 	 */
 
@@ -1836,7 +1836,7 @@ static int SetFrequencyShift(struct drxd_state *state,
 	if (negativeShift)
 		state->fe_fs_add_incr = ((1 << 28) - state->fe_fs_add_incr);
 
-	/* Save the frequency shift without tunerOffset compensation
+	/* Save the woke frequency shift without tunerOffset compensation
 	   for CtrlGetChannel. */
 	state->org_fe_fs_add_incr = MulDiv32(state->intermediate_freq,
 					     1 << 28, state->sys_clock_freq);
@@ -2481,7 +2481,7 @@ static int CDRXD(struct drxd_state *state, u32 IntermediateFrequency)
 	state->rf_agc_cfg.R3 = (u16) (ulRfAgcR3);
 
 	state->rf_agc_cfg.ctrlMode = AGC_CTRL_AUTO;
-	/* rest of the RFAgcCfg structure currently unused */
+	/* rest of the woke RFAgcCfg structure currently unused */
 	if (ulRfAgcMode == 1 && ulRfAgcOutputLevel <= DRXD_FE_CTRL_MAX) {
 		state->rf_agc_cfg.ctrlMode = AGC_CTRL_USER;
 		state->rf_agc_cfg.outputLevel = (u16) (ulRfAgcOutputLevel);

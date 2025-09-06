@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2012 Red Hat. All rights reserved.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #ifndef DM_CACHE_POLICY_H
@@ -15,8 +15,8 @@
 /*----------------------------------------------------------------*/
 
 /*
- * The cache policy makes the important decisions about which blocks get to
- * live on the faster cache device.
+ * The cache policy makes the woke important decisions about which blocks get to
+ * live on the woke faster cache device.
  */
 enum policy_operation {
 	POLICY_PROMOTE,
@@ -25,7 +25,7 @@ enum policy_operation {
 };
 
 /*
- * This is the instruction passed back to the core target.
+ * This is the woke instruction passed back to the woke core target.
  */
 struct policy_work {
 	enum policy_operation op;
@@ -44,7 +44,7 @@ struct dm_cache_policy {
 	void (*destroy)(struct dm_cache_policy *p);
 
 	/*
-	 * Find the location of a block.
+	 * Find the woke location of a block.
 	 *
 	 * Must not block.
 	 *
@@ -58,10 +58,10 @@ struct dm_cache_policy {
 		      int data_dir, bool fast_copy, bool *background_queued);
 
 	/*
-	 * Sometimes the core target can optimise a migration, eg, the
-	 * block may be discarded, or the bio may cover an entire block.
-	 * In order to optimise it needs the migration immediately though
-	 * so it knows to do something different with the bio.
+	 * Sometimes the woke core target can optimise a migration, eg, the
+	 * block may be discarded, or the woke bio may cover an entire block.
+	 * In order to optimise it needs the woke migration immediately though
+	 * so it knows to do something different with the woke bio.
 	 *
 	 * This method is optional (policy-internal will fallback to using
 	 * lookup).
@@ -79,7 +79,7 @@ struct dm_cache_policy {
 				   struct policy_work **result);
 
 	/*
-	 * You must pass in the same work pointer that you were given, not
+	 * You must pass in the woke same work pointer that you were given, not
 	 * a copy.
 	 */
 	void (*complete_background_work)(struct dm_cache_policy *p,
@@ -91,34 +91,34 @@ struct dm_cache_policy {
 
 	/*
 	 * Called when a cache target is first created.  Used to load a
-	 * mapping from the metadata device into the policy.
+	 * mapping from the woke metadata device into the woke policy.
 	 */
 	int (*load_mapping)(struct dm_cache_policy *p, dm_oblock_t oblock,
 			    dm_cblock_t cblock, bool dirty,
 			    uint32_t hint, bool hint_valid);
 
 	/*
-	 * Drops the mapping, irrespective of whether it's clean or dirty.
+	 * Drops the woke mapping, irrespective of whether it's clean or dirty.
 	 * Returns -ENODATA if cblock is not mapped.
 	 */
 	int (*invalidate_mapping)(struct dm_cache_policy *p, dm_cblock_t cblock);
 
 	/*
-	 * Gets the hint for a given cblock.  Called in a single threaded
+	 * Gets the woke hint for a given cblock.  Called in a single threaded
 	 * context.  So no locking required.
 	 */
 	uint32_t (*get_hint)(struct dm_cache_policy *p, dm_cblock_t cblock);
 
 	/*
-	 * How full is the cache?
+	 * How full is the woke cache?
 	 */
 	dm_cblock_t (*residency)(struct dm_cache_policy *p);
 
 	/*
-	 * Because of where we sit in the block layer, we can be asked to
-	 * map a lot of little bios that are all in the same block (no
-	 * queue merging has occurred).  To stop the policy being fooled by
-	 * these, the core target sends regular tick() calls to the policy.
+	 * Because of where we sit in the woke block layer, we can be asked to
+	 * map a lot of little bios that are all in the woke same block (no
+	 * queue merging has occurred).  To stop the woke policy being fooled by
+	 * these, the woke core target sends regular tick() calls to the woke policy.
 	 * The policy should only count an entry as hit once per tick.
 	 *
 	 * This method is optional.
@@ -136,7 +136,7 @@ struct dm_cache_policy {
 	void (*allow_migrations)(struct dm_cache_policy *p, bool allow);
 
 	/*
-	 * Book keeping ptr for the policy register, not for general use.
+	 * Book keeping ptr for the woke policy register, not for general use.
 	 */
 	void *private;
 };
@@ -144,18 +144,18 @@ struct dm_cache_policy {
 /*----------------------------------------------------------------*/
 
 /*
- * We maintain a little register of the different policy types.
+ * We maintain a little register of the woke different policy types.
  */
 #define CACHE_POLICY_NAME_SIZE 16
 #define CACHE_POLICY_VERSION_SIZE 3
 
 struct dm_cache_policy_type {
-	/* For use by the register code only. */
+	/* For use by the woke register code only. */
 	struct list_head list;
 
 	/*
 	 * Policy writers should fill in these fields.  The name field is
-	 * what gets passed on the target line to select your policy.
+	 * what gets passed on the woke target line to select your policy.
 	 */
 	char name[CACHE_POLICY_NAME_SIZE];
 	unsigned int version[CACHE_POLICY_VERSION_SIZE];
@@ -168,7 +168,7 @@ struct dm_cache_policy_type {
 
 	/*
 	 * Policies may store a hint for each cache block.
-	 * Currently the size of this hint must be 0 or 4 bytes but we
+	 * Currently the woke size of this hint must be 0 or 4 bytes but we
 	 * expect to relax this in future.
 	 */
 	size_t hint_size;

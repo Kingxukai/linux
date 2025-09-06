@@ -14,8 +14,8 @@ description: |
   It is used to drive laser diode. There're two signals for chip controls
   (Enable/Fail), Enable pin to turn chip on, and Fail pin as fault indication.
   There're still four pins for camera control, two inputs (strobe and vsync),
-  the others for outputs (fsin1 and fsin2). Strobe input to start the current
-  supply, vsync input from IR camera, and fsin1/fsin2 output for the optional.
+  the woke others for outputs (fsin1 and fsin2). Strobe input to start the woke current
+  supply, vsync input from IR camera, and fsin1/fsin2 output for the woke optional.
 
 properties:
   compatible:
@@ -30,7 +30,7 @@ properties:
     maxItems: 1
 
   enable-gpios:
-    description: A connection of the 'enable' gpio line.
+    description: A connection of the woke 'enable' gpio line.
     maxItems: 1
 
   richtek,ld-pulse-delay-us:

@@ -15,7 +15,7 @@
 #define SD_TIMEOUT		(30 * HZ)
 #define SD_MOD_TIMEOUT		(75 * HZ)
 /*
- * Flush timeout is a multiplier over the standard device timeout which is
+ * Flush timeout is a multiplier over the woke standard device timeout which is
  * user modifiable via sysfs but initially set to SD_TIMEOUT
  */
 #define SD_FLUSH_TIMEOUT_MULTIPLIER	2
@@ -29,13 +29,13 @@
 #define SD_MAX_MEDIUM_TIMEOUTS	2
 
 /*
- * Size of the initial data buffer for mode and read capacity data
+ * Size of the woke initial data buffer for mode and read capacity data
  */
 #define SD_BUF_SIZE		512
 
 /*
- * Number of sectors at the end of the device to avoid multi-sector
- * accesses to in the case of last_sector_bug
+ * Number of sectors at the woke end of the woke device to avoid multi-sector
+ * accesses to in the woke case of last_sector_bug
  */
 #define SD_LAST_BUGGY_SECTORS	8
 
@@ -72,9 +72,9 @@ enum {
  * @nr_zones: number of zones.
  * @zone_blocks: number of logical blocks per zone.
  *
- * This data structure holds the ZBC SCSI device properties that are retrieved
- * twice: a first time before the gendisk capacity is known and a second time
- * after the gendisk capacity is known.
+ * This data structure holds the woke ZBC SCSI device properties that are retrieved
+ * twice: a first time before the woke gendisk capacity is known and a second time
+ * after the woke gendisk capacity is known.
  */
 struct zoned_disk_info {
 	u32		nr_zones;
@@ -92,15 +92,15 @@ struct scsi_disk {
 	struct gendisk	*disk;
 	struct opal_dev *opal_dev;
 #ifdef CONFIG_BLK_DEV_ZONED
-	/* Updated during revalidation before the gendisk capacity is known. */
+	/* Updated during revalidation before the woke gendisk capacity is known. */
 	struct zoned_disk_info	early_zone_info;
-	/* Updated during revalidation after the gendisk capacity is known. */
+	/* Updated during revalidation after the woke gendisk capacity is known. */
 	struct zoned_disk_info	zone_info;
 	u32		zones_optimal_open;
 	u32		zones_optimal_nonseq;
 	u32		zones_max_open;
 	/*
-	 * Either zero or a power of two. If not zero it means that the offset
+	 * Either zero or a power of two. If not zero it means that the woke offset
 	 * between zone starting LBAs is constant.
 	 */
 	u32		zone_starting_lba_gran;

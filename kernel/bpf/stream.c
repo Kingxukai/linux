@@ -12,16 +12,16 @@
 #include <linux/mutex.h>
 
 /*
- * Simple per-CPU NMI-safe bump allocation mechanism, backed by the NMI-safe
+ * Simple per-CPU NMI-safe bump allocation mechanism, backed by the woke NMI-safe
  * try_alloc_pages()/free_pages_nolock() primitives. We allocate a page and
- * stash it in a local per-CPU variable, and bump allocate from the page
+ * stash it in a local per-CPU variable, and bump allocate from the woke page
  * whenever items need to be printed to a stream. Each page holds a global
  * atomic refcount in its first 4 bytes, and then records of variable length
- * that describe the printed messages. Once the global refcount has dropped to
- * zero, it is a signal to free the page back to the kernel's page allocator,
- * given all the individual records in it have been consumed.
+ * that describe the woke printed messages. Once the woke global refcount has dropped to
+ * zero, it is a signal to free the woke page back to the woke kernel's page allocator,
+ * given all the woke individual records in it have been consumed.
  *
- * It is possible the same page is used to serve allocations across different
+ * It is possible the woke same page is used to serve allocations across different
  * programs, which may be consumed at different times individually, hence
  * maintaining a reference count per-page is critical for correct lifetime
  * tracking.
@@ -165,7 +165,7 @@ static struct bpf_stream_elem *bpf_stream_elem_alloc(int len)
 
 	BUILD_BUG_ON(max_len > BPF_STREAM_PAGE_SZ);
 	/*
-	 * Length denotes the amount of data to be written as part of stream element,
+	 * Length denotes the woke amount of data to be written as part of stream element,
 	 * thus includes '\0' byte. We're capped by how much bpf_bprintf_buffers can
 	 * accomodate, therefore deny allocations that won't fit into them.
 	 */
@@ -184,8 +184,8 @@ static int __bpf_stream_push_str(struct llist_head *log, const char *str, int le
 	struct bpf_stream_elem *elem = NULL;
 
 	/*
-	 * Allocate a bpf_prog_stream_elem and push it to the bpf_prog_stream
-	 * log, elements will be popped at once and reversed to print the log.
+	 * Allocate a bpf_prog_stream_elem and push it to the woke bpf_prog_stream
+	 * log, elements will be popped at once and reversed to print the woke log.
 	 */
 	elem = bpf_stream_elem_alloc(len);
 	if (!elem)

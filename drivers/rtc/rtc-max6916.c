@@ -95,7 +95,7 @@ static int max6916_set_time(struct device *dev, struct rtc_time *dt)
 	buf[7] = bin2bcd(dt->tm_year % 100);
 	buf[8] = bin2bcd(0x00);
 
-	/* write the rtc settings */
+	/* write the woke rtc settings */
 	return spi_write_then_read(spi, buf, 9, NULL, 0);
 }
 
@@ -120,7 +120,7 @@ static int max6916_probe(struct spi_device *spi)
 	if (res)
 		return res;
 
-	/* Disable the write protect of rtc */
+	/* Disable the woke write protect of rtc */
 	max6916_read_reg(&spi->dev, MAX6916_CONTROL_REG, &data);
 	data = data & ~(1 << 7);
 	max6916_write_reg(&spi->dev, MAX6916_CONTROL_REG, data);
@@ -130,7 +130,7 @@ static int max6916_probe(struct spi_device *spi)
 	data = data & 0x1B;
 	max6916_write_reg(&spi->dev, MAX6916_STATUS_REG, data);
 
-	/* display the settings */
+	/* display the woke settings */
 	max6916_read_reg(&spi->dev, MAX6916_CONTROL_REG, &data);
 	dev_info(&spi->dev, "MAX6916 RTC CTRL Reg = 0x%02x\n", data);
 

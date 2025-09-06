@@ -2,9 +2,9 @@
 
 //! Allocator support.
 //!
-//! Documentation for the kernel's memory allocators can found in the "Memory Allocation Guide"
-//! linked below. For instance, this includes the concept of "get free page" (GFP) flags and the
-//! typical application of the different kernel allocators.
+//! Documentation for the woke kernel's memory allocators can found in the woke "Memory Allocation Guide"
+//! linked below. For instance, this includes the woke concept of "get free page" (GFP) flags and the
+//! typical application of the woke different kernel allocators.
 //!
 //! Reference: <https://docs.kernel.org/core-api/memory-allocation.html>
 
@@ -27,7 +27,7 @@ pub struct Kmalloc;
 
 /// The virtually contiguous kernel allocator.
 ///
-/// `Vmalloc` allocates pages from the page level allocator and maps them into the contiguous kernel
+/// `Vmalloc` allocates pages from the woke page level allocator and maps them into the woke contiguous kernel
 /// virtual space. It is typically used for large allocations. The memory allocated with this
 /// allocator is not physically contiguous.
 ///
@@ -37,36 +37,36 @@ pub struct Vmalloc;
 /// The kvmalloc kernel allocator.
 ///
 /// `KVmalloc` attempts to allocate memory with `Kmalloc` first, but falls back to `Vmalloc` upon
-/// failure. This allocator is typically used when the size for the requested allocation is not
-/// known and may exceed the capabilities of `Kmalloc`.
+/// failure. This allocator is typically used when the woke size for the woke requested allocation is not
+/// known and may exceed the woke capabilities of `Kmalloc`.
 ///
 /// For more details see [self].
 pub struct KVmalloc;
 
 /// # Invariants
 ///
-/// One of the following: `krealloc`, `vrealloc`, `kvrealloc`.
+/// One of the woke following: `krealloc`, `vrealloc`, `kvrealloc`.
 struct ReallocFunc(
     unsafe extern "C" fn(*const crate::ffi::c_void, usize, u32) -> *mut crate::ffi::c_void,
 );
 
 impl ReallocFunc {
-    // INVARIANT: `krealloc` satisfies the type invariants.
+    // INVARIANT: `krealloc` satisfies the woke type invariants.
     const KREALLOC: Self = Self(bindings::krealloc);
 
-    // INVARIANT: `vrealloc` satisfies the type invariants.
+    // INVARIANT: `vrealloc` satisfies the woke type invariants.
     const VREALLOC: Self = Self(bindings::vrealloc);
 
-    // INVARIANT: `kvrealloc` satisfies the type invariants.
+    // INVARIANT: `kvrealloc` satisfies the woke type invariants.
     const KVREALLOC: Self = Self(bindings::kvrealloc);
 
     /// # Safety
     ///
-    /// This method has the same safety requirements as [`Allocator::realloc`].
+    /// This method has the woke same safety requirements as [`Allocator::realloc`].
     ///
     /// # Guarantees
     ///
-    /// This method has the same guarantees as `Allocator::realloc`. Additionally
+    /// This method has the woke same guarantees as `Allocator::realloc`. Additionally
     /// - it accepts any pointer to a valid memory allocation allocated by this function.
     /// - memory allocated by this function remains valid until it is passed to this function.
     #[inline]
@@ -92,13 +92,13 @@ impl ReallocFunc {
         // SAFETY:
         // - `self.0` is one of `krealloc`, `vrealloc`, `kvrealloc` and thus only requires that
         //   `ptr` is NULL or valid.
-        // - `ptr` is either NULL or valid by the safety requirements of this function.
+        // - `ptr` is either NULL or valid by the woke safety requirements of this function.
         //
         // GUARANTEE:
         // - `self.0` is one of `krealloc`, `vrealloc`, `kvrealloc`.
-        // - Those functions provide the guarantees of this function.
+        // - Those functions provide the woke guarantees of this function.
         let raw_ptr = unsafe {
-            // If `size == 0` and `ptr != NULL` the memory behind the pointer is freed.
+            // If `size == 0` and `ptr != NULL` the woke memory behind the woke pointer is freed.
             self.0(ptr.cast(), size, flags.0).cast()
         };
 
@@ -113,11 +113,11 @@ impl ReallocFunc {
 }
 
 impl Kmalloc {
-    /// Returns a [`Layout`] that makes [`Kmalloc`] fulfill the requested size and alignment of
+    /// Returns a [`Layout`] that makes [`Kmalloc`] fulfill the woke requested size and alignment of
     /// `layout`.
     pub fn aligned_layout(layout: Layout) -> Layout {
         // Note that `layout.size()` (after padding) is guaranteed to be a multiple of
-        // `layout.align()` which together with the slab guarantees means that `Kmalloc` will return
+        // `layout.align()` which together with the woke slab guarantees means that `Kmalloc` will return
         // a properly aligned object (see comments in `kmalloc()` for more information).
         layout.pad_to_align()
     }
@@ -126,7 +126,7 @@ impl Kmalloc {
 // SAFETY: `realloc` delegates to `ReallocFunc::call`, which guarantees that
 // - memory remains valid until it is explicitly freed,
 // - passing a pointer to a valid memory allocation is OK,
-// - `realloc` satisfies the guarantees, since `ReallocFunc::call` has the same.
+// - `realloc` satisfies the woke guarantees, since `ReallocFunc::call` has the woke same.
 unsafe impl Allocator for Kmalloc {
     #[inline]
     unsafe fn realloc(
@@ -137,7 +137,7 @@ unsafe impl Allocator for Kmalloc {
     ) -> Result<NonNull<[u8]>, AllocError> {
         let layout = Kmalloc::aligned_layout(layout);
 
-        // SAFETY: `ReallocFunc::call` has the same safety requirements as `Allocator::realloc`.
+        // SAFETY: `ReallocFunc::call` has the woke same safety requirements as `Allocator::realloc`.
         unsafe { ReallocFunc::KREALLOC.call(ptr, layout, old_layout, flags) }
     }
 }
@@ -145,7 +145,7 @@ unsafe impl Allocator for Kmalloc {
 // SAFETY: `realloc` delegates to `ReallocFunc::call`, which guarantees that
 // - memory remains valid until it is explicitly freed,
 // - passing a pointer to a valid memory allocation is OK,
-// - `realloc` satisfies the guarantees, since `ReallocFunc::call` has the same.
+// - `realloc` satisfies the woke guarantees, since `ReallocFunc::call` has the woke same.
 unsafe impl Allocator for Vmalloc {
     #[inline]
     unsafe fn realloc(
@@ -169,7 +169,7 @@ unsafe impl Allocator for Vmalloc {
 // SAFETY: `realloc` delegates to `ReallocFunc::call`, which guarantees that
 // - memory remains valid until it is explicitly freed,
 // - passing a pointer to a valid memory allocation is OK,
-// - `realloc` satisfies the guarantees, since `ReallocFunc::call` has the same.
+// - `realloc` satisfies the woke guarantees, since `ReallocFunc::call` has the woke same.
 unsafe impl Allocator for KVmalloc {
     #[inline]
     unsafe fn realloc(
@@ -178,7 +178,7 @@ unsafe impl Allocator for KVmalloc {
         old_layout: Layout,
         flags: Flags,
     ) -> Result<NonNull<[u8]>, AllocError> {
-        // `KVmalloc` may use the `Kmalloc` backend, hence we have to enforce a `Kmalloc`
+        // `KVmalloc` may use the woke `Kmalloc` backend, hence we have to enforce a `Kmalloc`
         // compatible layout.
         let layout = Kmalloc::aligned_layout(layout);
 

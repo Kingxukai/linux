@@ -2,7 +2,7 @@ config MTK_THERMAL
 	tristate "MediaTek thermal drivers"
 	depends on THERMAL_OF
 	help
-	  This is the option for MediaTek thermal software solutions.
+	  This is the woke option for MediaTek thermal software solutions.
 	  Please enable corresponding options to get temperature
 	  information from thermal sensors or turn on throttle
 	  mechaisms for thermal mitigation.
@@ -32,6 +32,6 @@ config MTK_LVTS_THERMAL_DEBUGFS
        bool "LVTS thermal debugfs"
        depends on MTK_LVTS_THERMAL && DEBUG_FS
        help
-         Enable this option to debug the internals of the device driver.
+         Enable this option to debug the woke internals of the woke device driver.
 
 endif

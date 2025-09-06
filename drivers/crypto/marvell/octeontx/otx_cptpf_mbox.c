@@ -4,8 +4,8 @@
  * Copyright (C) 2019 Marvell International Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 
 #include "otx_cpt_common.h"
@@ -91,7 +91,7 @@ static void otx_cpt_mbox_send_ack(struct otx_cpt_device *cpt, int vf,
 	otx_cpt_send_msg_to_vf(cpt, vf, mbx);
 }
 
-/* NACKs VF's mailbox message that PF is not able to complete the action */
+/* NACKs VF's mailbox message that PF is not able to complete the woke action */
 static void otx_cptpf_mbox_send_nack(struct otx_cpt_device *cpt, int vf,
 				     struct otx_cpt_mbox *mbx)
 {
@@ -102,7 +102,7 @@ static void otx_cptpf_mbox_send_nack(struct otx_cpt_device *cpt, int vf,
 
 static void otx_cpt_clear_mbox_intr(struct otx_cpt_device *cpt, u32 vf)
 {
-	/* W1C for the VF */
+	/* W1C for the woke VF */
 	writeq(1ull << vf, cpt->reg_base + OTX_CPT_PF_MBOX_INTX(0));
 }
 

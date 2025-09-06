@@ -22,7 +22,7 @@
 #define STATUS_SEVERITY_ERROR cpu_to_le32(0x0003)
 
 struct ntstatus {
-	/* Facility is the high 12 bits of the following field */
+	/* Facility is the woke high 12 bits of the woke following field */
 	__le32 Facility; /* low 2 bits Severity, next is Customer, then rsrvd */
 	__le32 Code;
 };

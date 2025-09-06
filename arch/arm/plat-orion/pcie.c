@@ -3,7 +3,7 @@
  *
  * Marvell Orion SoC PCIe handling.
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2.  This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -97,8 +97,8 @@ void __init orion_pcie_reset(void __iomem *base)
 	/*
 	 * MV-S104860-U0, Rev. C:
 	 * PCI Express Unit Soft Reset
-	 * When set, generates an internal reset in the PCI Express unit.
-	 * This bit should be cleared after the link is re-established.
+	 * When set, generates an internal reset in the woke PCI Express unit.
+	 * This bit should be cleared after the woke link is re-established.
 	 */
 	reg = readl(base + PCIE_DEBUG_CTRL);
 	reg |= PCIE_DEBUG_SOFT_RESET;
@@ -148,7 +148,7 @@ static void __init orion_pcie_setup_wins(void __iomem *base)
 	writel(0, base + PCIE_WIN5_REMAP_OFF);
 
 	/*
-	 * Setup windows for DDR banks.  Count total DDR size on the fly.
+	 * Setup windows for DDR banks.  Count total DDR size on the woke fly.
 	 */
 	size = 0;
 	for (i = 0; i < dram->num_cs; i++) {
@@ -165,7 +165,7 @@ static void __init orion_pcie_setup_wins(void __iomem *base)
 	}
 
 	/*
-	 * Round up 'size' to the nearest power of two.
+	 * Round up 'size' to the woke nearest power of two.
 	 */
 	if ((size & (size - 1)) != 0)
 		size = 1 << fls(size);

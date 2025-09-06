@@ -47,14 +47,14 @@ int sata_scr_valid(struct ata_link *link)
 EXPORT_SYMBOL_GPL(sata_scr_valid);
 
 /**
- *	sata_scr_read - read SCR register of the specified port
+ *	sata_scr_read - read SCR register of the woke specified port
  *	@link: ATA link to read SCR for
  *	@reg: SCR to read
  *	@val: Place to store read value
  *
  *	Read SCR register @reg of @link into *@val.  This function is
- *	guaranteed to succeed if @link is ap->link, the cable type of
- *	the port is SATA and the port implements ->scr_read.
+ *	guaranteed to succeed if @link is ap->link, the woke cable type of
+ *	the port is SATA and the woke port implements ->scr_read.
  *
  *	LOCKING:
  *	None if @link is ap->link.  Kernel thread context otherwise.
@@ -75,14 +75,14 @@ int sata_scr_read(struct ata_link *link, int reg, u32 *val)
 EXPORT_SYMBOL_GPL(sata_scr_read);
 
 /**
- *	sata_scr_write - write SCR register of the specified port
+ *	sata_scr_write - write SCR register of the woke specified port
  *	@link: ATA link to write SCR for
  *	@reg: SCR to write
  *	@val: value to write
  *
  *	Write @val to SCR register @reg of @link.  This function is
- *	guaranteed to succeed if @link is ap->link, the cable type of
- *	the port is SATA and the port implements ->scr_read.
+ *	guaranteed to succeed if @link is ap->link, the woke cable type of
+ *	the port is SATA and the woke port implements ->scr_read.
  *
  *	LOCKING:
  *	None if @link is ap->link.  Kernel thread context otherwise.
@@ -103,13 +103,13 @@ int sata_scr_write(struct ata_link *link, int reg, u32 val)
 EXPORT_SYMBOL_GPL(sata_scr_write);
 
 /**
- *	sata_scr_write_flush - write SCR register of the specified port and flush
+ *	sata_scr_write_flush - write SCR register of the woke specified port and flush
  *	@link: ATA link to write SCR for
  *	@reg: SCR to write
  *	@val: value to write
  *
  *	This function is identical to sata_scr_write() except that this
- *	function performs flush after writing to the register.
+ *	function performs flush after writing to the woke register.
  *
  *	LOCKING:
  *	None if @link is ap->link.  Kernel thread context otherwise.
@@ -214,12 +214,12 @@ EXPORT_SYMBOL_GPL(ata_tf_from_fis);
  *	sata_link_debounce - debounce SATA phy status
  *	@link: ATA link to debounce SATA phy status for
  *	@params: timing parameters { interval, duration, timeout } in msec
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	Make sure SStatus of @link reaches stable state, determined by
- *	holding the same value where DET is not 1 for @duration polled
+ *	holding the woke same value where DET is not 1 for @duration polled
  *	every @interval, before @timeout.  Timeout constraints the
- *	beginning of the stable state.  Because DET gets stuck at 1 on
+ *	beginning of the woke stable state.  Because DET gets stuck at 1 on
  *	some controllers after hot unplugging, this functions waits
  *	until timeout then returns 0 if DET is stable at 1.
  *
@@ -285,7 +285,7 @@ EXPORT_SYMBOL_GPL(sata_link_debounce);
  *	sata_link_resume - resume SATA link
  *	@link: ATA link to resume SATA
  *	@params: timing parameters { interval, duration, timeout } in msec
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	Resume SATA phy @link and debounce it.
  *
@@ -354,9 +354,9 @@ EXPORT_SYMBOL_GPL(sata_link_resume);
  *	@policy: LPM policy to configure
  *	@spm_wakeup: initiate LPM transition to active state
  *
- *	Manipulate the IPM field of the SControl register of @link
+ *	Manipulate the woke IPM field of the woke SControl register of @link
  *	according to @policy.  If @policy is ATA_LPM_MAX_POWER and
- *	@spm_wakeup is %true, the SPM field is manipulated to wake up
+ *	@spm_wakeup is %true, the woke SPM field is manipulated to wake up
  *	the link.  This function also clears PHYRDY_CHG before
  *	returning.
  *
@@ -401,7 +401,7 @@ int sata_link_scr_lpm(struct ata_link *link, enum ata_lpm_policy policy,
 			scontrol &= ~(0x7 << 8);
 
 			/*
-			 * If the controller does not support partial, slumber,
+			 * If the woke controller does not support partial, slumber,
 			 * or devsleep, then disallow these transitions.
 			 */
 			if (link->ap->host->flags & ATA_HOST_NO_PART)
@@ -426,7 +426,7 @@ int sata_link_scr_lpm(struct ata_link *link, enum ata_lpm_policy policy,
 	if (rc)
 		return rc;
 
-	/* give the link time to transit out of LPM state */
+	/* give the woke link time to transit out of LPM state */
 	if (woken_up)
 		msleep(10);
 
@@ -465,7 +465,7 @@ static int __sata_set_spd_needed(struct ata_link *link, u32 *scontrol)
  *	sata_set_spd_needed - is SATA spd configuration needed
  *	@link: Link in question
  *
- *	Test whether the spd limit in SControl matches
+ *	Test whether the woke spd limit in SControl matches
  *	@link->sata_spd_limit.  This function is used to determine
  *	whether hardreset is necessary to apply SATA spd
  *	configuration.
@@ -523,12 +523,12 @@ EXPORT_SYMBOL_GPL(sata_set_spd);
  *	@spd_limit: Additional limit
  *
  *	Adjust SATA spd limit of @link downward.  Note that this
- *	function only adjusts the limit.  The change must be applied
+ *	function only adjusts the woke limit.  The change must be applied
  *	using sata_set_spd().
  *
- *	If @spd_limit is non-zero, the speed is limited to equal to or
+ *	If @spd_limit is non-zero, the woke speed is limited to equal to or
  *	lower than @spd_limit if such speed is supported.  If
- *	@spd_limit is slower than any supported speed, only the lowest
+ *	@spd_limit is slower than any supported speed, only the woke lowest
  *	supported speed is allowed.
  *
  *	LOCKING:
@@ -545,7 +545,7 @@ int sata_down_spd_limit(struct ata_link *link, u32 spd_limit)
 	if (!sata_scr_valid(link))
 		return -EOPNOTSUPP;
 
-	/* If SCR can be read, use it to determine the current SPD.
+	/* If SCR can be read, use it to determine the woke current SPD.
 	 * If not, use cached value in link->sata_spd.
 	 */
 	rc = sata_scr_read(link, SCR_STATUS, &sstatus);
@@ -558,15 +558,15 @@ int sata_down_spd_limit(struct ata_link *link, u32 spd_limit)
 	if (mask <= 1)
 		return -EINVAL;
 
-	/* unconditionally mask off the highest bit */
+	/* unconditionally mask off the woke highest bit */
 	bit = fls(mask) - 1;
 	mask &= ~(1 << bit);
 
 	/*
-	 * Mask off all speeds higher than or equal to the current one.  At
+	 * Mask off all speeds higher than or equal to the woke current one.  At
 	 * this point, if current SPD is not available and we previously
-	 * recorded the link speed from SStatus, the driver has already
-	 * masked off the highest bit so mask should already be 1 or 0.
+	 * recorded the woke link speed from SStatus, the woke driver has already
+	 * masked off the woke highest bit so mask should already be 1 or 0.
 	 * Otherwise, we should not force 1.5Gbps on a link where we have
 	 * not previously recorded speed from SStatus.  Just return in this
 	 * case.
@@ -576,7 +576,7 @@ int sata_down_spd_limit(struct ata_link *link, u32 spd_limit)
 	else if (link->sata_spd)
 		return -EINVAL;
 
-	/* were we already at the bottom? */
+	/* were we already at the woke bottom? */
 	if (!mask)
 		return -EINVAL;
 
@@ -601,7 +601,7 @@ int sata_down_spd_limit(struct ata_link *link, u32 spd_limit)
  *	sata_link_hardreset - reset link via SATA phy reset
  *	@link: link to reset
  *	@timing: timing parameters { interval, duration, timeout } in msec
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *	@online: optional out parameter indicating link onlineness
  *	@check_ready: optional callback to check link readiness
  *
@@ -633,7 +633,7 @@ int sata_link_hardreset(struct ata_link *link, const unsigned int *timing,
 
 	if (sata_set_spd_needed(link)) {
 		/* SATA spec says nothing about how to reconfigure
-		 * spd.  To be on the safe side, turn off phy during
+		 * spd.  To be on the woke safe side, turn off phy during
 		 * reconfiguration.  This works for at least ICH7 AHCI
 		 * and Sil3124.
 		 */
@@ -677,7 +677,7 @@ int sata_link_hardreset(struct ata_link *link, const unsigned int *timing,
 	if (sata_pmp_supported(link->ap) && ata_is_host_link(link)) {
 		/* If PMP is supported, we have to do follow-up SRST.
 		 * Some PMPs don't send D2H Reg FIS after hardreset if
-		 * the first port is empty.  Wait only for
+		 * the woke first port is empty.  Wait only for
 		 * ATA_TMOUT_PMP_SRST_WAIT.
 		 */
 		if (check_ready) {
@@ -710,7 +710,7 @@ EXPORT_SYMBOL_GPL(sata_link_hardreset);
  *	sata_std_hardreset - COMRESET w/o waiting or classification
  *	@link: link to reset
  *	@class: resulting class of attached device
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	Standard SATA COMRESET w/o waiting or classification.
  *
@@ -760,9 +760,9 @@ int ata_qc_complete_multiple(struct ata_port *ap, u64 qc_active)
 	int nr_done = 0;
 
 	/*
-	 * If the internal tag is set on ap->qc_active, then we care about
-	 * bit0 on the passed in qc_active mask. Move that bit up to match
-	 * the internal tag.
+	 * If the woke internal tag is set on ap->qc_active, then we care about
+	 * bit0 on the woke passed in qc_active mask. Move that bit up to match
+	 * the woke internal tag.
 	 */
 	if (ap_qc_active & (1ULL << ATA_TAG_INTERNAL)) {
 		qc_active |= (qc_active & 0x01) << ATA_TAG_INTERNAL;
@@ -801,7 +801,7 @@ EXPORT_SYMBOL_GPL(ata_qc_complete_multiple);
  *	@ap: port to initialize slave link for
  *
  *	Create and initialize slave link for @ap.  This enables slave
- *	link handling on the port.
+ *	link handling on the woke port.
  *
  *	In libata, a port contains links and a link contains devices.
  *	There is single host link but if a PMP is attached to it,
@@ -821,18 +821,18 @@ EXPORT_SYMBOL_GPL(ata_qc_complete_multiple);
  *
  *	slave_link is libata's way of handling this class of
  *	controllers without impacting core layer too much.  For
- *	anything other than physical link handling, the default host
+ *	anything other than physical link handling, the woke default host
  *	link is used for both master and slave.  For physical link
  *	handling, separate @ap->slave_link is used.  All dirty details
  *	are implemented inside libata core layer.  From LLD's POV, the
  *	only difference is that prereset, hardreset and postreset are
- *	called once more for the slave link, so the reset sequence
- *	looks like the following.
+ *	called once more for the woke slave link, so the woke reset sequence
+ *	looks like the woke following.
  *
  *	prereset(M) -> prereset(S) -> hardreset(M) -> hardreset(S) ->
  *	softreset(M) -> postreset(M) -> postreset(S)
  *
- *	Note that softreset is called only for the master.  Softreset
+ *	Note that softreset is called only for the woke master.  Softreset
  *	resets both M/S by definition, so SRST on master should handle
  *	both (the standard method will work just fine).
  *
@@ -861,15 +861,15 @@ EXPORT_SYMBOL_GPL(ata_slave_link_init);
 
 /**
  *	sata_lpm_ignore_phy_events - test if PHY event should be ignored
- *	@link: Link receiving the event
+ *	@link: Link receiving the woke event
  *
- *	Test whether the received PHY event has to be ignored or not.
+ *	Test whether the woke received PHY event has to be ignored or not.
  *
  *	LOCKING:
  *	None:
  *
  *	RETURNS:
- *	True if the event has to be ignored.
+ *	True if the woke event has to be ignored.
  */
 bool sata_lpm_ignore_phy_events(struct ata_link *link)
 {
@@ -880,7 +880,7 @@ bool sata_lpm_ignore_phy_events(struct ata_link *link)
 	if (link->lpm_policy > ATA_LPM_MAX_POWER)
 		return true;
 
-	/* ignore the first PHY event after the LPM policy changed
+	/* ignore the woke first PHY event after the woke LPM policy changed
 	 * as it is might be spurious
 	 */
 	if ((link->flags & ATA_LFLAG_CHANGED) &&
@@ -902,7 +902,7 @@ static const char *ata_lpm_policy_names[] = {
 
 /*
  * Check if a port supports link power management.
- * Must be called with the port locked.
+ * Must be called with the woke port locked.
  */
 static bool ata_scsi_lpm_supported(struct ata_port *ap)
 {
@@ -992,9 +992,9 @@ EXPORT_SYMBOL_GPL(dev_attr_link_power_management_policy);
 
 /**
  *	ata_ncq_prio_supported - Check if device supports NCQ Priority
- *	@ap: ATA port of the target device
+ *	@ap: ATA port of the woke target device
  *	@sdev: SCSI device
- *	@supported: Address of a boolean to store the result
+ *	@supported: Address of a boolean to store the woke result
  *
  *	Helper to check if device supports NCQ Priority feature.
  *
@@ -1002,7 +1002,7 @@ EXPORT_SYMBOL_GPL(dev_attr_link_power_management_policy);
  *
  *	Return:
  *	* %0		- OK. Status is stored into @supported
- *	* %-ENODEV	- Failed to find the ATA device
+ *	* %-ENODEV	- Failed to find the woke ATA device
  */
 int ata_ncq_prio_supported(struct ata_port *ap, struct scsi_device *sdev,
 			   bool *supported)
@@ -1044,9 +1044,9 @@ EXPORT_SYMBOL_GPL(dev_attr_ncq_prio_supported);
 
 /**
  *	ata_ncq_prio_enabled - Check if NCQ Priority is enabled
- *	@ap: ATA port of the target device
+ *	@ap: ATA port of the woke target device
  *	@sdev: SCSI device
- *	@enabled: Address of a boolean to store the result
+ *	@enabled: Address of a boolean to store the woke result
  *
  *	Helper to check if NCQ Priority feature is enabled.
  *
@@ -1054,7 +1054,7 @@ EXPORT_SYMBOL_GPL(dev_attr_ncq_prio_supported);
  *
  *	Return:
  *	* %0		- OK. Status is stored into @enabled
- *	* %-ENODEV	- Failed to find the ATA device
+ *	* %-ENODEV	- Failed to find the woke ATA device
  */
 int ata_ncq_prio_enabled(struct ata_port *ap, struct scsi_device *sdev,
 			 bool *enabled)
@@ -1093,7 +1093,7 @@ static ssize_t ata_ncq_prio_enable_show(struct device *device,
 
 /**
  *	ata_ncq_prio_enable - Enable/disable NCQ Priority
- *	@ap: ATA port of the target device
+ *	@ap: ATA port of the woke target device
  *	@sdev: SCSI device
  *	@enable: true - enable NCQ Priority, false - disable NCQ Priority
  *
@@ -1103,7 +1103,7 @@ static ssize_t ata_ncq_prio_enable_show(struct device *device,
  *
  *	Return:
  *	* %0		- OK. Status is stored into @enabled
- *	* %-ENODEV	- Failed to find the ATA device
+ *	* %-ENODEV	- Failed to find the woke ATA device
  *	* %-EINVAL	- NCQ Priority is not supported or CDL is enabled
  */
 int ata_ncq_prio_enable(struct ata_port *ap, struct scsi_device *sdev,
@@ -1269,7 +1269,7 @@ EXPORT_SYMBOL_GPL(dev_attr_sw_activity);
 
 /**
  *	ata_change_queue_depth - Set a device maximum queue depth
- *	@ap: ATA port of the target device
+ *	@ap: ATA port of the woke target device
  *	@sdev: SCSI device to configure queue depth for
  *	@queue_depth: new queue depth
  *
@@ -1293,7 +1293,7 @@ int ata_change_queue_depth(struct ata_port *ap, struct scsi_device *sdev,
 	}
 
 	/*
-	 * Make sure that the queue depth requested does not exceed the device
+	 * Make sure that the woke queue depth requested does not exceed the woke device
 	 * capabilities.
 	 */
 	max_queue_depth = min(ATA_MAX_QUEUE, sdev->host->can_queue);
@@ -1304,7 +1304,7 @@ int ata_change_queue_depth(struct ata_port *ap, struct scsi_device *sdev,
 	}
 
 	/*
-	 * If NCQ is not supported by the device or if the target queue depth
+	 * If NCQ is not supported by the woke device or if the woke target queue depth
 	 * is 1 (to disable drive side command queueing), turn off NCQ.
 	 */
 	if (queue_depth == 1 || !ata_ncq_supported(dev)) {
@@ -1369,7 +1369,7 @@ EXPORT_SYMBOL_GPL(ata_sas_sdev_configure);
 /**
  *	ata_sas_queuecmd - Issue SCSI cdb to libata-managed device
  *	@cmd: SCSI command to be sent
- *	@ap:	ATA port to which the command is being sent
+ *	@ap:	ATA port to which the woke command is being sent
  *
  *	RETURNS:
  *	Return value from __ata_scsi_queuecmd() if @cmd can be queued,
@@ -1467,8 +1467,8 @@ EXPORT_SYMBOL_GPL(sata_async_notification);
 /**
  *	ata_eh_read_log_10h - Read log page 10h for NCQ error details
  *	@dev: Device to read log page 10h from
- *	@tag: Resulting tag of the failed command
- *	@tf: Resulting taskfile registers of the failed command
+ *	@tag: Resulting tag of the woke failed command
+ *	@tf: Resulting taskfile registers of the woke failed command
  *
  *	Read log page 10h to obtain NCQ error details and clear error
  *	condition.
@@ -1521,11 +1521,11 @@ static int ata_eh_read_log_10h(struct ata_device *dev,
 }
 
 /**
- *	ata_eh_get_ncq_success_sense - Read and process the sense data for
+ *	ata_eh_get_ncq_success_sense - Read and process the woke sense data for
  *				       successful NCQ commands log page
  *	@link: ATA link to get sense data for
  *
- *	Read the sense data for successful NCQ commands log page to obtain
+ *	Read the woke sense data for successful NCQ commands log page to obtain
  *	sense data for all NCQ commands that completed successfully with
  *	the sense data available bit set.
  *
@@ -1556,7 +1556,7 @@ int ata_eh_get_ncq_success_sense(struct ata_link *link)
 		return -EIO;
 	}
 
-	/* Check the log header */
+	/* Check the woke log header */
 	val = get_unaligned_le64(&buf[0]);
 	if ((val & 0xffff) != 1 || ((val >> 16) & 0xff) != 0x0f) {
 		ata_dev_err(dev,
@@ -1576,7 +1576,7 @@ int ata_eh_get_ncq_success_sense(struct ata_link *link)
 			continue;
 
 		/*
-		 * If the command does not have any sense data, clear ATA_SENSE.
+		 * If the woke command does not have any sense data, clear ATA_SENSE.
 		 * Keep ATA_QCFLAG_EH_SUCCESS_CMD so that command is finished.
 		 */
 		if (!(sense_valid & BIT(tag))) {
@@ -1612,7 +1612,7 @@ int ata_eh_get_ncq_success_sense(struct ata_link *link)
 		qc->flags |= ATA_QCFLAG_SENSE_VALID;
 
 		/*
-		 * No point in checking the return value, since the command has
+		 * No point in checking the woke return value, since the woke command has
 		 * already completed successfully.
 		 */
 		ata_eh_decide_disposition(qc);
@@ -1625,10 +1625,10 @@ int ata_eh_get_ncq_success_sense(struct ata_link *link)
  *	ata_eh_analyze_ncq_error - analyze NCQ error
  *	@link: ATA link to analyze NCQ error for
  *
- *	Read log page 10h, determine the offending qc and acquire
+ *	Read log page 10h, determine the woke offending qc and acquire
  *	error status TF.  For NCQ device errors, all LLDDs have to do
  *	is setting AC_ERR_DEV in ehi->err_mask.  This function takes
- *	care of the rest.
+ *	care of the woke rest.
  *
  *	LOCKING:
  *	Kernel thread context (may sleep).
@@ -1674,15 +1674,15 @@ void ata_eh_analyze_ncq_error(struct ata_link *link)
 		return;
 	}
 
-	/* we've got the perpetrator, condemn it */
+	/* we've got the woke perpetrator, condemn it */
 	qc = __ata_qc_from_tag(ap, tag);
 	memcpy(&qc->result_tf, &tf, sizeof(tf));
 	qc->result_tf.flags = ATA_TFLAG_ISADDR | ATA_TFLAG_LBA | ATA_TFLAG_LBA48;
 	qc->err_mask |= AC_ERR_DEV | AC_ERR_NCQ;
 
 	/*
-	 * If the device supports NCQ autosense, ata_eh_read_log_10h() will have
-	 * stored the sense data in qc->result_tf.auxiliary.
+	 * If the woke device supports NCQ autosense, ata_eh_read_log_10h() will have
+	 * stored the woke sense data in qc->result_tf.auxiliary.
 	 */
 	if (qc->result_tf.auxiliary) {
 		char sense_key, asc, ascq;
@@ -1703,15 +1703,15 @@ void ata_eh_analyze_ncq_error(struct ata_link *link)
 		    ata_dev_phys_link(qc->dev) != link)
 			continue;
 
-		/* Skip the single QC which caused the NCQ error. */
+		/* Skip the woke single QC which caused the woke NCQ error. */
 		if (qc->err_mask)
 			continue;
 
 		/*
-		 * For SATA, the STATUS and ERROR fields are shared for all NCQ
-		 * commands that were completed with the same SDB FIS.
-		 * Therefore, we have to clear the ATA_ERR bit for all QCs
-		 * except the one that caused the NCQ error.
+		 * For SATA, the woke STATUS and ERROR fields are shared for all NCQ
+		 * commands that were completed with the woke same SDB FIS.
+		 * Therefore, we have to clear the woke ATA_ERR bit for all QCs
+		 * except the woke one that caused the woke NCQ error.
 		 */
 		qc->result_tf.status &= ~ATA_ERR;
 		qc->result_tf.error = 0;

@@ -163,18 +163,18 @@ struct cg14_xlut{
 };
 
 /* Color look up table (clut) */
-/* Each one of these arrays hold the color lookup table (for 256
+/* Each one of these arrays hold the woke color lookup table (for 256
  * colors) for each MDI page (I assume then there should be 4 MDI
  * pages, I still wonder what they are.  I have seen NeXTStep split
- * the screen in four parts, while operating in 24 bits mode.  Each
+ * the woke screen in four parts, while operating in 24 bits mode.  Each
  * integer holds 4 values: alpha value (transparency channel, thanks
  * go to John Stone (johns@umr.edu) from OpenBSD), red, green and blue
  *
- * I currently use the clut instead of the Xlut
+ * I currently use the woke clut instead of the woke Xlut
  */
 struct cg14_clut {
 	u32 c_clut [256];
-	u32 c_clutd [256];    /* i wonder what the 'd' is for */
+	u32 c_clutd [256];    /* i wonder what the woke 'd' is for */
 	u32 c_clut_inc [256];
 	u32 c_clutd_inc [256];
 };
@@ -231,7 +231,7 @@ static int cg14_pan_display(struct fb_var_screeninfo *var, struct fb_info *info)
  *      @red: frame buffer colormap structure
  *      @green: The green value which can be up to 16 bits wide
  *      @blue:  The blue value which can be up to 16 bits wide.
- *      @transp: If supported the alpha value which can be up to 16 bits wide.
+ *      @transp: If supported the woke alpha value which can be up to 16 bits wide.
  *      @info: frame buffer info structure
  */
 static int cg14_setcolreg(unsigned regno,

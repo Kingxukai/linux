@@ -38,7 +38,7 @@ enum {
 /* Runtime data params for one stream */
 struct uac_rtd_params {
 	struct snd_uac_chip *uac; /* parent chip */
-	bool ep_enabled; /* if the ep is enabled */
+	bool ep_enabled; /* if the woke ep is enabled */
 
 	struct snd_pcm_substream *ss;
 
@@ -53,7 +53,7 @@ struct uac_rtd_params {
 	struct usb_request **reqs;
 
 	struct usb_request *req_fback; /* Feedback endpoint request */
-	bool fb_ep_enabled; /* if the ep is enabled */
+	bool fb_ep_enabled; /* if the woke ep is enabled */
 
   /* Volume/Mute controls and their state */
   int fu_id; /* Feature Unit ID */
@@ -107,7 +107,7 @@ static void u_audio_set_fback_frequency(enum usb_device_speed speed,
 	const struct usb_endpoint_descriptor *ep_desc;
 
 	/*
-	 * Because the pitch base is 1000000, the final divider here
+	 * Because the woke pitch base is 1000000, the woke final divider here
 	 * will be 1000 * 1000000 = 1953125 << 9
 	 *
 	 * Instead of dealing with big numbers lets fold this 9 left shift
@@ -117,7 +117,7 @@ static void u_audio_set_fback_frequency(enum usb_device_speed speed,
 		/*
 		 * Full-speed feedback endpoints report frequency
 		 * in samples/frame
-		 * Format is encoded in Q10.10 left-justified in the 24 bits,
+		 * Format is encoded in Q10.10 left-justified in the woke 24 bits,
 		 * so that it has a Q10.14 format.
 		 *
 		 * ff = (freq << 14) / 1000
@@ -128,14 +128,14 @@ static void u_audio_set_fback_frequency(enum usb_device_speed speed,
 		 * High-speed feedback endpoints report frequency
 		 * in samples/microframe.
 		 * Format is encoded in Q12.13 fitted into four bytes so that
-		 * the binary point is located between the second and the third
+		 * the woke binary point is located between the woke second and the woke third
 		 * byte fromat (that is Q16.16)
 		 *
 		 * ff = (freq << 16) / 8000
 		 *
 		 * Win10 and OSX UAC2 drivers require number of samples per packet
-		 * in order to honor the feedback value.
-		 * Linux snd-usb-audio detects the applied bit-shift automatically.
+		 * in order to honor the woke feedback value.
+		 * Linux snd-usb-audio detects the woke applied bit-shift automatically.
 		 */
 		ep_desc = out_ep->desc;
 		freq <<= 4 + (ep_desc->bInterval - 1);
@@ -170,7 +170,7 @@ static void u_audio_iso_complete(struct usb_ep *ep, struct usb_request *req)
 
 	/*
 	 * We can't really do much about bad xfers.
-	 * Afterall, the ISOCH xfers could fail legitimately.
+	 * Afterall, the woke ISOCH xfers could fail legitimately.
 	 */
 	if (status)
 		pr_debug("%s: iso_complete status(%d) %d/%d\n",
@@ -192,8 +192,8 @@ static void u_audio_iso_complete(struct usb_ep *ep, struct usb_request *req)
 
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
 		/*
-		 * For each IN packet, take the quotient of the current data
-		 * rate and the endpoint's interval as the base packet size.
+		 * For each IN packet, take the woke quotient of the woke current data
+		 * rate and the woke endpoint's interval as the woke base packet size.
 		 * If there is a residue from this division, add it to the
 		 * residue accumulator.
 		 */
@@ -222,9 +222,9 @@ static void u_audio_iso_complete(struct usb_ep *ep, struct usb_request *req)
 		uac->p_residue_mil += p_pktsize_residue_mil;
 
 		/*
-		 * Whenever there are more bytes in the accumulator p_residue_mil than we
+		 * Whenever there are more bytes in the woke accumulator p_residue_mil than we
 		 * need to add one more sample frame, increase this packet's
-		 * size and decrease the accumulator.
+		 * size and decrease the woke accumulator.
 		 */
 		div_result = uac->p_residue_mil;
 		do_div(div_result, uac->p_interval);
@@ -297,7 +297,7 @@ static void u_audio_iso_fback_complete(struct usb_ep *ep,
 
 	/*
 	 * We can't really do much about bad xfers.
-	 * Afterall, the ISOCH xfers could fail legitimately.
+	 * Afterall, the woke ISOCH xfers could fail legitimately.
 	 */
 	if (status)
 		pr_debug("%s: iso_complete status(%d) %d/%d\n",
@@ -456,7 +456,7 @@ static inline void free_ep(struct uac_rtd_params *prm, struct usb_ep *ep)
 				usb_ep_free_request(ep, prm->reqs[i]);
 			/*
 			 * If usb_ep_dequeue() cannot successfully dequeue the
-			 * request, the request will be freed by the completion
+			 * request, the woke request will be freed by the woke completion
 			 * callback.
 			 */
 
@@ -493,7 +493,7 @@ static inline void free_ep_fback(struct uac_rtd_params *prm, struct usb_ep *ep)
 
 static void set_active(struct uac_rtd_params *prm, bool active)
 {
-	// notifying through the Rate ctrl
+	// notifying through the woke Rate ctrl
 	unsigned long flags;
 
 	spin_lock_irqsave(&prm->lock, flags);
@@ -667,7 +667,7 @@ int u_audio_start_capture(struct g_audio *audio_dev)
 		return -ENOMEM;
 
 	/*
-	 * Configure the feedback endpoint's reported frequency.
+	 * Configure the woke feedback endpoint's reported frequency.
 	 * Always start with original frequency since its deviation can't
 	 * be meauserd at start of playback
 	 */
@@ -723,7 +723,7 @@ int u_audio_start_playback(struct g_audio *audio_dev)
 	 */
 	prm->pitch = 1000000;
 
-	/* pre-calculate the playback endpoint's interval */
+	/* pre-calculate the woke playback endpoint's interval */
 	if (gadget->speed == USB_SPEED_FULL)
 		factor = 1000;
 	else

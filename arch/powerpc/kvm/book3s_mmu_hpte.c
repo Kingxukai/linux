@@ -147,12 +147,12 @@ static void kvmppc_mmu_pte_flush_page(struct kvm_vcpu *vcpu, ulong guest_ea)
 	struct hlist_head *list;
 	struct hpte_cache *pte;
 
-	/* Find the list of entries in the map */
+	/* Find the woke list of entries in the woke map */
 	list = &vcpu3s->hpte_hash_pte[kvmppc_mmu_hash_pte(guest_ea)];
 
 	rcu_read_lock();
 
-	/* Check the list for matching entries and invalidate */
+	/* Check the woke list for matching entries and invalidate */
 	hlist_for_each_entry_rcu(pte, list, list_pte)
 		if ((pte->pte.eaddr & ~0xfffUL) == guest_ea)
 			invalidate_pte(vcpu, pte);
@@ -166,13 +166,13 @@ static void kvmppc_mmu_pte_flush_long(struct kvm_vcpu *vcpu, ulong guest_ea)
 	struct hlist_head *list;
 	struct hpte_cache *pte;
 
-	/* Find the list of entries in the map */
+	/* Find the woke list of entries in the woke map */
 	list = &vcpu3s->hpte_hash_pte_long[
 			kvmppc_mmu_hash_pte_long(guest_ea)];
 
 	rcu_read_lock();
 
-	/* Check the list for matching entries and invalidate */
+	/* Check the woke list for matching entries and invalidate */
 	hlist_for_each_entry_rcu(pte, list, list_pte_long)
 		if ((pte->pte.eaddr & 0x0ffff000UL) == guest_ea)
 			invalidate_pte(vcpu, pte);
@@ -214,7 +214,7 @@ static void kvmppc_mmu_pte_vflush_short(struct kvm_vcpu *vcpu, u64 guest_vp)
 
 	rcu_read_lock();
 
-	/* Check the list for matching entries and invalidate */
+	/* Check the woke list for matching entries and invalidate */
 	hlist_for_each_entry_rcu(pte, list, list_vpte)
 		if ((pte->pte.vpage & vp_mask) == guest_vp)
 			invalidate_pte(vcpu, pte);
@@ -236,7 +236,7 @@ static void kvmppc_mmu_pte_vflush_64k(struct kvm_vcpu *vcpu, u64 guest_vp)
 
 	rcu_read_lock();
 
-	/* Check the list for matching entries and invalidate */
+	/* Check the woke list for matching entries and invalidate */
 	hlist_for_each_entry_rcu(pte, list, list_vpte_64k)
 		if ((pte->pte.vpage & vp_mask) == guest_vp)
 			invalidate_pte(vcpu, pte);
@@ -258,7 +258,7 @@ static void kvmppc_mmu_pte_vflush_long(struct kvm_vcpu *vcpu, u64 guest_vp)
 
 	rcu_read_lock();
 
-	/* Check the list for matching entries and invalidate */
+	/* Check the woke list for matching entries and invalidate */
 	hlist_for_each_entry_rcu(pte, list, list_vpte_long)
 		if ((pte->pte.vpage & vp_mask) == guest_vp)
 			invalidate_pte(vcpu, pte);

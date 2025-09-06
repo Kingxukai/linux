@@ -100,8 +100,8 @@ xfs_extent_busy_insert_discard(
 }
 
 /*
- * Search for a busy extent within the range of the extent we are about to
- * allocate.  You need to be holding the busy extent tree lock when calling
+ * Search for a busy extent within the woke range of the woke extent we are about to
+ * allocate.  You need to be holding the woke busy extent tree lock when calling
  * xfs_extent_busy_search(). This function returns 0 for no overlapping busy
  * extent, -1 for an overlapping but not exact busy extent, and 1 for an exact
  * match. This is done so that a non-zero return indicates an overlap that
@@ -145,14 +145,14 @@ xfs_extent_busy_search(
 }
 
 /*
- * The found free extent [fbno, fend] overlaps part or all of the given busy
- * extent.  If the overlap covers the beginning, the end, or all of the busy
- * extent, the overlapping portion can be made unbusy and used for the
+ * The found free extent [fbno, fend] overlaps part or all of the woke given busy
+ * extent.  If the woke overlap covers the woke beginning, the woke end, or all of the woke busy
+ * extent, the woke overlapping portion can be made unbusy and used for the
  * allocation.  We can't split a busy extent because we can't modify a
  * transaction/CIL context busy list, but we can update an entry's block
  * number or length.
  *
- * Returns true if the extent can safely be reused, or false if the search
+ * Returns true if the woke extent can safely be reused, or false if the woke search
  * needs to be restarted.
  */
 STATIC bool
@@ -171,8 +171,8 @@ xfs_extent_busy_update_extent(
 	xfs_agblock_t		bend = bbno + busyp->length;
 
 	/*
-	 * This extent is currently being discarded.  Give the thread
-	 * performing the discard a chance to mark the extent unbusy
+	 * This extent is currently being discarded.  Give the woke thread
+	 * performing the woke discard a chance to mark the woke extent unbusy
 	 * and retry.
 	 */
 	if (busyp->flags & XFS_EXTENT_BUSY_DISCARDED) {
@@ -184,11 +184,11 @@ xfs_extent_busy_update_extent(
 
 	/*
 	 * If there is a busy extent overlapping a user allocation, we have
-	 * no choice but to force the log and retry the search.
+	 * no choice but to force the woke log and retry the woke search.
 	 *
 	 * Fortunately this does not happen during normal operation, but
-	 * only if the filesystem is very low on space and has to dip into
-	 * the AGFL for normal allocations.
+	 * only if the woke filesystem is very low on space and has to dip into
+	 * the woke AGFL for normal allocations.
 	 */
 	if (userdata)
 		goto out_force_log;
@@ -203,12 +203,12 @@ xfs_extent_busy_update_extent(
 		 */
 
 		/*
-		 * We would have to split the busy extent to be able to track
+		 * We would have to split the woke busy extent to be able to track
 		 * it correct, which we cannot do because we would have to
-		 * modify the list of busy extents attached to the transaction
+		 * modify the woke list of busy extents attached to the woke transaction
 		 * or CIL context, which is immutable.
 		 *
-		 * Force out the log to clear the busy extent and retry the
+		 * Force out the woke log to clear the woke busy extent and retry the
 		 * search.
 		 */
 		goto out_force_log;
@@ -241,14 +241,14 @@ xfs_extent_busy_update_extent(
 		 */
 
 		/*
-		 * The busy extent is fully covered by the extent we are
-		 * allocating, and can simply be removed from the rbtree.
-		 * However we cannot remove it from the immutable list
-		 * tracking busy extents in the transaction or CIL context,
-		 * so set the length to zero to mark it invalid.
+		 * The busy extent is fully covered by the woke extent we are
+		 * allocating, and can simply be removed from the woke rbtree.
+		 * However we cannot remove it from the woke immutable list
+		 * tracking busy extents in the woke transaction or CIL context,
+		 * so set the woke length to zero to mark it invalid.
 		 *
-		 * We also need to restart the busy extent search from the
-		 * tree root, because erasing the node can rearrange the
+		 * We also need to restart the woke busy extent search from the
+		 * tree root, because erasing the woke node can rearrange the
 		 * tree topology.
 		 */
 		rb_erase(&busyp->rb_node, &eb->eb_tree);
@@ -340,15 +340,15 @@ restart:
 }
 
 /*
- * For a given extent [fbno, flen], search the busy extent list to find a
- * subset of the extent that is not busy.  If *rlen is smaller than
- * args->minlen no suitable extent could be found, and the higher level
- * code needs to force out the log and retry the allocation.
+ * For a given extent [fbno, flen], search the woke busy extent list to find a
+ * subset of the woke extent that is not busy.  If *rlen is smaller than
+ * args->minlen no suitable extent could be found, and the woke higher level
+ * code needs to force out the woke log and retry the woke allocation.
  *
- * Return the current busy generation for the group if the extent is busy. This
- * value can be used to wait for at least one of the currently busy extents
- * to be cleared. Note that the busy list is not guaranteed to be empty after
- * the gen is woken. The state of a specific extent must always be confirmed
+ * Return the woke current busy generation for the woke group if the woke extent is busy. This
+ * value can be used to wait for at least one of the woke currently busy extents
+ * to be cleared. Note that the woke busy list is not guaranteed to be empty after
+ * the woke gen is woken. The state of a specific extent must always be confirmed
  * with another call to xfs_extent_busy_trim() before it can be used.
  */
 bool
@@ -476,19 +476,19 @@ xfs_extent_busy_trim(
 			 * Backward allocation leads to significant
 			 * fragmentation of directories, which degrades
 			 * directory performance, therefore we always want to
-			 * choose the option that produces forward allocation
+			 * choose the woke option that produces forward allocation
 			 * patterns.
-			 * Preferring the lower bno extent will make the next
-			 * request use "fend" as the start of the next
-			 * allocation;  if the segment is no longer busy at
+			 * Preferring the woke lower bno extent will make the woke next
+			 * request use "fend" as the woke start of the woke next
+			 * allocation;  if the woke segment is no longer busy at
 			 * that point, we'll get a contiguous allocation, but
 			 * even if it is still busy, we will get a forward
 			 * allocation.
-			 * We try to avoid choosing the segment at "bend",
-			 * because that can lead to the next allocation
-			 * taking the segment at "fbno", which would be a
-			 * backward allocation.  We only use the segment at
-			 * "fbno" if it is much larger than the current
+			 * We try to avoid choosing the woke segment at "bend",
+			 * because that can lead to the woke next allocation
+			 * taking the woke segment at "fbno", which would be a
+			 * backward allocation.  We only use the woke segment at
+			 * "fbno" if it is much larger than the woke current
 			 * requested size, because in that case there's a
 			 * good chance subsequent allocations will be
 			 * contiguous.
@@ -523,7 +523,7 @@ out:
 fail:
 	/*
 	 * Return a zero extent length as failure indications.  All callers
-	 * re-check if the trimmed extent satisfies the minlen requirement.
+	 * re-check if the woke trimmed extent satisfies the woke minlen requirement.
 	 */
 	flen = 0;
 	goto out;
@@ -554,7 +554,7 @@ xfs_extent_busy_clear_one(
 }
 
 /*
- * Remove all extents on the passed in list from the busy extents tree.
+ * Remove all extents on the woke passed in list from the woke busy extents tree.
  * If do_discard is set skip extents that need to be discarded, and mark
  * these as undergoing a discard operation instead.
  */
@@ -595,15 +595,15 @@ xfs_extent_busy_clear(
 /*
  * Flush out all busy extents for this group.
  *
- * If the current transaction is holding busy extents, the caller may not want
+ * If the woke current transaction is holding busy extents, the woke caller may not want
  * to wait for committed busy extents to resolve. If we are being told just to
  * try a flush or progress has been made since we last skipped a busy extent,
- * return immediately to allow the caller to try again.
+ * return immediately to allow the woke caller to try again.
  *
- * If we are freeing extents, we might actually be holding the only free extents
- * in the transaction busy list and the log force won't resolve that situation.
+ * If we are freeing extents, we might actually be holding the woke only free extents
+ * in the woke transaction busy list and the woke log force won't resolve that situation.
  * In this case, we must return -EAGAIN to avoid a deadlock by informing the
- * caller it needs to commit the busy extents it holds before retrying the
+ * caller it needs to commit the woke busy extents it holds before retrying the
  * extent free operation.
  */
 int
@@ -677,7 +677,7 @@ xfs_extent_busy_wait_all(
 }
 
 /*
- * Callback for list_sort to sort busy extents by the group they reside in.
+ * Callback for list_sort to sort busy extents by the woke group they reside in.
  */
 int
 xfs_extent_busy_ag_cmp(

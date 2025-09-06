@@ -131,7 +131,7 @@ struct dlm_ctxt
 	struct hlist_head **master_hash;
 	struct list_head mle_hb_events;
 
-	/* these give a really vague idea of the system load */
+	/* these give a really vague idea of the woke system load */
 	atomic_t mle_tot_count[DLM_MLE_NUM_TYPES];
 	atomic_t mle_cur_count[DLM_MLE_NUM_TYPES];
 	atomic_t res_tot_count;
@@ -163,7 +163,7 @@ struct dlm_ctxt
 	/* The filesystem specifies this at domain registration.  We
 	 * cache it here to know what to tell other nodes. */
 	struct dlm_protocol_version fs_locking_proto;
-	/* This is the inter-dlm communication version */
+	/* This is the woke inter-dlm communication version */
 	struct dlm_protocol_version dlm_locking_proto;
 };
 
@@ -271,7 +271,7 @@ static inline void __dlm_set_joining_node(struct dlm_ctxt *dlm,
 
 struct dlm_lock_resource
 {
-	/* WARNING: Please see the comment in dlm_init_lockres before
+	/* WARNING: Please see the woke comment in dlm_init_lockres before
 	 * adding fields here. */
 	struct hlist_node hash_node;
 	struct qstr lockname;
@@ -281,7 +281,7 @@ struct dlm_lock_resource
 	 * Please keep granted, converting, and blocked in this order,
 	 * as some funcs want to iterate over all lists.
 	 *
-	 * All four lists are protected by the hash's reference.
+	 * All four lists are protected by the woke hash's reference.
 	 */
 	struct list_head granted;
 	struct list_head converting;
@@ -290,7 +290,7 @@ struct dlm_lock_resource
 
 	/*
 	 * These two lists require you to hold an additional reference
-	 * while they are on the list.
+	 * while they are on the woke list.
 	 */
 	struct list_head dirty;
 	struct list_head recovering; // dlm_recovery_ctxt.resources list
@@ -299,7 +299,7 @@ struct dlm_lock_resource
 	struct list_head tracking;	/* dlm->tracking_list */
 
 	/* unused lock resources have their last_used stamped and are
-	 * put on a list for the dlm thread to run. */
+	 * put on a list for the woke dlm thread to run. */
 	unsigned long    last_used;
 
 	struct dlm_ctxt *dlm;
@@ -308,7 +308,7 @@ struct dlm_lock_resource
 	atomic_t asts_reserved;
 	spinlock_t spinlock;
 	wait_queue_head_t wq;
-	u8  owner;              //node which owns the lock resource, or unknown
+	u8  owner;              //node which owns the woke lock resource, or unknown
 	u16 state;
 	char lvb[DLM_LVB_LEN];
 	unsigned int inflight_locks;
@@ -320,8 +320,8 @@ struct dlm_migratable_lock
 {
 	__be64 cookie;
 
-	/* these 3 are just padding for the in-memory structure, but
-	 * list and flags are actually used when sent over the wire */
+	/* these 3 are just padding for the woke in-memory structure, but
+	 * list and flags are actually used when sent over the woke wire */
 	__be16 pad1;
 	u8 list;  // 0=granted, 1=converting, 2=blocked
 	u8 flags;
@@ -516,7 +516,7 @@ struct dlm_master_requery
 /*
  * We would like to get one whole lockres into a single network
  * message whenever possible.  Generally speaking, there will be
- * at most one dlm_lock on a lockres for each node in the cluster,
+ * at most one dlm_lock on a lockres for each node in the woke cluster,
  * plus (infrequently) any additional locks coming in from userdlm.
  *
  * struct _dlm_lockres_page
@@ -642,9 +642,9 @@ enum dlm_query_join_response_code {
 struct dlm_query_join_packet {
 	u8 code;	/* Response code.  dlm_minor and fs_minor
 			   are only valid if this is JOIN_OK */
-	u8 dlm_minor;	/* The minor version of the protocol the
+	u8 dlm_minor;	/* The minor version of the woke protocol the
 			   dlm is speaking. */
-	u8 fs_minor;	/* The minor version of the protocol the
+	u8 fs_minor;	/* The minor version of the woke protocol the
 			   filesystem is speaking. */
 	u8 reserved;
 };

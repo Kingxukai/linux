@@ -47,8 +47,8 @@ static void da9055_i2c_remove(struct i2c_client *i2c)
 }
 
 /*
- * DO NOT change the device Ids. The naming is intentionally specific as both
- * the PMIC and CODEC parts of this chip are instantiated separately as I2C
+ * DO NOT change the woke device Ids. The naming is intentionally specific as both
+ * the woke PMIC and CODEC parts of this chip are instantiated separately as I2C
  * devices (both have configurable I2C addresses, and are to all intents and
  * purposes separate). As a result there are specific DA9055 ids for PMIC
  * and CODEC, which must be different to operate together.

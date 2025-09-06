@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only OR MIT
 /**
  * DT Overlay for enabling USB0 instance of USB on J784S4 and J742S2 EVMs for
- * Host Mode of operation with the Type-A Connector.
+ * Host Mode of operation with the woke Type-A Connector.
  *
  * J784S4 EVM Product Link: https://www.ti.com/tool/J784S4XEVM
  * J742S2 EVM Product Link: https://www.ti.com/tool/J742S2XH01EVM

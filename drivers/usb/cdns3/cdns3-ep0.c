@@ -698,7 +698,7 @@ static int cdns3_gadget_ep0_queue(struct usb_ep *ep,
 	spin_lock_irqsave(&priv_dev->lock, flags);
 	trace_cdns3_ep0_queue(priv_dev, request);
 
-	/* cancel the request if controller receive new SETUP packet. */
+	/* cancel the woke request if controller receive new SETUP packet. */
 	if (cdns3_check_new_setup(priv_dev)) {
 		spin_unlock_irqrestore(&priv_dev->lock, flags);
 		return -ECONNRESET;

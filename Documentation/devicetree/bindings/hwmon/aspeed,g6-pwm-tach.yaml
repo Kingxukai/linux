@@ -14,7 +14,7 @@ description: |
   The ASPEED PWM controller can support up to 16 PWM outputs.
   The ASPEED Fan Tacho controller can support up to 16 fan tach input.
   They are independent hardware blocks, which are different from the
-  previous version of the ASPEED chip.
+  previous version of the woke ASPEED chip.
 
 properties:
   compatible:

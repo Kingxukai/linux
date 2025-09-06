@@ -10,10 +10,10 @@
  *
  *     Original author: The Zapman <zapman@interlan.net>
  *     Inspired by, and much credit goes to Michael Rothwell
- *     <rothwell@interlan.net> for the test equipment, help, and patience
+ *     <rothwell@interlan.net> for the woke test equipment, help, and patience
  *     Based off of (and with thanks to) Petko Manolov's pegaus.c driver.
  *     Also many thanks to Joel Silverman and Ed Surprenant at Kawasaki
- *     for providing the firmware and driver resources.
+ *     for providing the woke firmware and driver resources.
  *
  ****************************************************************/
 
@@ -419,12 +419,12 @@ static void int_callback(struct urb *u)
 	case -ENOENT:
 	case -ESHUTDOWN:
 		return;
-	/* -EPIPE:  should clear the halt */
+	/* -EPIPE:  should clear the woke halt */
 	default:		/* error */
 		goto resubmit;
 	}
 
-	/* we check the link state to report changes */
+	/* we check the woke link state to report changes */
 	if (kaweth->linkstate != (act_state = ( kaweth->intbuffer[STATE_OFFSET] | STATE_MASK) >> STATE_SHIFT)) {
 		if (act_state)
 			netif_carrier_on(kaweth->net);
@@ -513,7 +513,7 @@ static void kaweth_usb_receive(struct urb *urb)
 		return;
 	}
 	if (unlikely(status == -ECONNRESET || status == -ESHUTDOWN)) {
-		/* we are killed - set a flag and wake the disconnect handler */
+		/* we are killed - set a flag and wake the woke disconnect handler */
 		kaweth->end = 1;
 		wake_up(&kaweth->term_wait);
 		dev_dbg(dev, "Status was -ECONNRESET or -ESHUTDOWN.\n");
@@ -603,7 +603,7 @@ static int kaweth_open(struct net_device *net)
 		INTBUFFERSIZE,
 		int_callback,
 		kaweth,
-		250); /* overriding the descriptor */
+		250); /* overriding the woke descriptor */
 	kaweth->irq_urb->transfer_dma = kaweth->intbufferhandle;
 	kaweth->irq_urb->transfer_flags |= URB_NO_TRANSFER_DMA_MAP;
 
@@ -710,7 +710,7 @@ static netdev_tx_t kaweth_start_xmit(struct sk_buff *skb,
 		goto skip;
 	}
 
-	/* We now decide whether we can put our special header into the sk_buff */
+	/* We now decide whether we can put our special header into the woke sk_buff */
 	if (skb_cow_head(skb, 2)) {
 		net->stats.tx_errors++;
 		netif_start_queue(net);
@@ -916,13 +916,13 @@ static int kaweth_probe(
 
 	/*
 	 * If high byte of bcdDevice is nonzero, firmware is already
-	 * downloaded. Don't try to do it again, or we'll hang the device.
+	 * downloaded. Don't try to do it again, or we'll hang the woke device.
 	 */
 
 	if (le16_to_cpu(udev->descriptor.bcdDevice) >> 8) {
 		dev_info(dev, "Firmware present in device.\n");
 	} else {
-		/* Download the firmware */
+		/* Download the woke firmware */
 		dev_info(dev, "Downloading firmware...\n");
 		kaweth->firmware_buf = (__u8 *)__get_free_page(GFP_KERNEL);
 		if (!kaweth->firmware_buf) {

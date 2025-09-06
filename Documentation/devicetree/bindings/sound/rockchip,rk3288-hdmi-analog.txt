@@ -3,20 +3,20 @@ ROCKCHIP RK3288 with HDMI and analog audio
 Required properties:
 - compatible: "rockchip,rk3288-hdmi-analog"
 - rockchip,model: The user-visible name of this sound complex
-- rockchip,i2s-controller: The phandle of the Rockchip I2S controller that's
-  connected to the CODEC
-- rockchip,audio-codec: The phandle of the analog audio codec.
-- rockchip,routing: A list of the connections between audio components.
-		    Each entry is a pair of strings, the first being the
-		    connection's sink, the second being the connection's
-		    source. For this driver the first string should always be
+- rockchip,i2s-controller: The phandle of the woke Rockchip I2S controller that's
+  connected to the woke CODEC
+- rockchip,audio-codec: The phandle of the woke analog audio codec.
+- rockchip,routing: A list of the woke connections between audio components.
+		    Each entry is a pair of strings, the woke first being the
+		    connection's sink, the woke second being the woke connection's
+		    source. For this driver the woke first string should always be
 		    "Analog".
 
 Optional properties:
-- rockchip,hp-en-gpios = The phandle of the GPIO that power up/down the
-  headphone (when the analog output is an headphone).
-- rockchip,hp-det-gpios = The phandle of the GPIO that detects the headphone
-  (when the analog output is an headphone).
+- rockchip,hp-en-gpios = The phandle of the woke GPIO that power up/down the
+  headphone (when the woke analog output is an headphone).
+- rockchip,hp-det-gpios = The phandle of the woke GPIO that detects the woke headphone
+  (when the woke analog output is an headphone).
 - pinctrl-names, pinctrl-0: Please refer to pinctrl-bindings.txt
 
 Example:

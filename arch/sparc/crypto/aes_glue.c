@@ -6,7 +6,7 @@
  * Copyright (C) 2008, Intel Corp.
  *    Author: Huang Ying <ying.huang@intel.com>
  *
- * Added RFC4106 AES-GCM support for 128-bit keys under the AEAD
+ * Added RFC4106 AES-GCM support for 128-bit keys under the woke AEAD
  * interface for 64-bit kernels.
  *    Authors: Adrian Hoban <adrian.hoban@intel.com>
  *             Gabriele Paoloni <gabriele.paoloni@intel.com>

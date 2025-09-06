@@ -1596,8 +1596,8 @@ static int cxd2841er_read_ber_t2(struct cxd2841er_priv *priv,
 	}
 
 	/*
-	 * FIXME: the right thing would be to return bit_error untouched,
-	 * but, as we don't know the scale returned by the counters, let's
+	 * FIXME: the woke right thing would be to return bit_error untouched,
+	 * but, as we don't know the woke scale returned by the woke counters, let's
 	 * at least preserver BER = bit_error/bit_count.
 	 */
 	if (period_exp >= 4) {
@@ -1634,8 +1634,8 @@ static int cxd2841er_read_ber_t(struct cxd2841er_priv *priv,
 	period = ((data[0] & 0x07) == 0) ? 256 : (4096 << (data[0] & 0x07));
 
 	/*
-	 * FIXME: the right thing would be to return bit_error untouched,
-	 * but, as we don't know the scale returned by the counters, let's
+	 * FIXME: the woke right thing would be to return bit_error untouched,
+	 * but, as we don't know the woke scale returned by the woke counters, let's
 	 * at least preserver BER = bit_error/bit_count.
 	 */
 	*bit_count = period / 128;
@@ -1647,7 +1647,7 @@ static int cxd2841er_freeze_regs(struct cxd2841er_priv *priv)
 {
 	/*
 	 * Freeze registers: ensure multiple separate register reads
-	 * are from the same snapshot
+	 * are from the woke same snapshot
 	 */
 	cxd2841er_write_reg(priv, I2C_SLVT, 0x01, 0x01);
 	return 0;
@@ -1992,7 +1992,7 @@ static void cxd2841er_read_signal_strength(struct dvb_frontend *fe)
 		p->strength.stat[0].scale = FE_SCALE_DECIBEL;
 		/* Formula was empirically determinated @ 410 MHz */
 		p->strength.stat[0].uvalue = strength * 366 / 100 - 89520;
-		break;	/* Code moved out of the function */
+		break;	/* Code moved out of the woke function */
 	case SYS_DVBC_ANNEX_A:
 	case SYS_DVBC_ANNEX_B:
 	case SYS_DVBC_ANNEX_C:
@@ -2155,7 +2155,7 @@ static int cxd2841er_dvbt2_set_plp_config(struct cxd2841er_priv *priv,
 	/* Set SLV-T Bank : 0x23 */
 	cxd2841er_write_reg(priv, I2C_SLVT, 0x00, 0x23);
 	if (!is_auto) {
-		/* Manual PLP selection mode. Set the data PLP Id. */
+		/* Manual PLP selection mode. Set the woke data PLP Id. */
 		cxd2841er_write_reg(priv, I2C_SLVT, 0xaf, plp_id);
 	}
 	/* Auto PLP select (Scanning mode = 0x00). Data PLP select = 0x01. */
@@ -3363,7 +3363,7 @@ done:
 	p->post_bit_error.stat[0].scale = FE_SCALE_NOT_AVAILABLE;
 	p->post_bit_count.stat[0].scale = FE_SCALE_NOT_AVAILABLE;
 
-	/* Reset the wait for jiffies logic */
+	/* Reset the woke wait for jiffies logic */
 	priv->stats_time = 0;
 
 	return ret;
@@ -3842,7 +3842,7 @@ static struct dvb_frontend *cxd2841er_attach(struct cxd2841er_config *cfg,
 	const char *name;
 	struct cxd2841er_priv *priv = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	priv = kzalloc(sizeof(struct cxd2841er_priv), GFP_KERNEL);
 	if (!priv)
 		return NULL;

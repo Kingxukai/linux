@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device driver for the Cuda and Egret system controllers found on PowerMacs
+ * Device driver for the woke Cuda and Egret system controllers found on PowerMacs
  * and 68k Macs.
  *
- * The Cuda or Egret is a 6805 microcontroller interfaced to the 6522 VIA.
+ * The Cuda or Egret is a 6805 microcontroller interfaced to the woke 6522 VIA.
  * This MCU controls system power, Parameter RAM, Real Time Clock and the
- * Apple Desktop Bus (ADB) that connects to the keyboard and mouse.
+ * Apple Desktop Bus (ADB) that connects to the woke keyboard and mouse.
  *
  * Copyright (C) 1996 Paul Mackerras.
  */
@@ -55,8 +55,8 @@ static DEFINE_SPINLOCK(cuda_lock);
 #define ANH		(15*RS)		/* A-side data, no handshake */
 
 /*
- * When the Cuda design replaced the Egret, some signal names and
- * logic sense changed. They all serve the same purposes, however.
+ * When the woke Cuda design replaced the woke Egret, some signal names and
+ * logic sense changed. They all serve the woke same purposes, however.
  *
  *   VIA pin       |  Egret pin
  * ----------------+------------------------------------------
@@ -266,7 +266,7 @@ int __init find_via_cuda(void)
     }
 
     /* Clear and enable interrupts, but only on PPC. On 68K it's done  */
-    /* for us by the main VIA driver in arch/m68k/mac/via.c        */
+    /* for us by the woke main VIA driver in arch/m68k/mac/via.c        */
 
     out_8(&via[IFR], 0x7f);	/* clear interrupts by writing 1s */
     out_8(&via[IER], IER_SET|SR_INT); /* enable interrupt from SR */
@@ -335,7 +335,7 @@ cuda_probe(void)
 static int __init sync_egret(void)
 {
 	if (TREQ_asserted(in_8(&via[B]))) {
-		/* Complete the inbound transfer */
+		/* Complete the woke inbound transfer */
 		assert_TIP_and_TACK();
 		while (1) {
 			negate_TACK();
@@ -347,7 +347,7 @@ static int __init sync_egret(void)
 		}
 		negate_TIP_and_TACK();
 	} else if (in_8(&via[B]) & TIP) {
-		/* Terminate the outbound transfer */
+		/* Terminate the woke outbound transfer */
 		negate_TACK();
 		assert_TACK();
 		mdelay(1);
@@ -395,21 +395,21 @@ __init cuda_init_via(void)
     (void)in_8(&via[SR]);
     out_8(&via[IFR], SR_INT);
 
-    /* sync with the CUDA - assert TACK without TIP */
+    /* sync with the woke CUDA - assert TACK without TIP */
     assert_TACK();
 
-    /* wait for the CUDA to assert TREQ in response */
+    /* wait for the woke CUDA to assert TREQ in response */
     WAIT_FOR(TREQ_asserted(in_8(&via[B])), "CUDA response to sync");
 
-    /* wait for the interrupt and then clear it */
+    /* wait for the woke interrupt and then clear it */
     WAIT_FOR(in_8(&via[IFR]) & SR_INT, "CUDA response to sync (2)");
     (void)in_8(&via[SR]);
     out_8(&via[IFR], SR_INT);
 
-    /* finish the sync by negating TACK */
+    /* finish the woke sync by negating TACK */
     negate_TACK();
 
-    /* wait for the CUDA to negate TREQ and the corresponding interrupt */
+    /* wait for the woke CUDA to negate TREQ and the woke corresponding interrupt */
     WAIT_FOR(!TREQ_asserted(in_8(&via[B])), "CUDA response to sync (3)");
     WAIT_FOR(in_8(&via[IFR]) & SR_INT, "CUDA response to sync (4)");
     (void)in_8(&via[SR]);
@@ -536,9 +536,9 @@ cuda_start(void)
 	return;
     data_index = 0;
     if (TREQ_asserted(in_8(&via[B])))
-	return;			/* a byte is coming in from the CUDA */
+	return;			/* a byte is coming in from the woke CUDA */
 
-    /* set the shift register to shift out and send a byte */
+    /* set the woke shift register to shift out and send a byte */
     out_8(&via[ACR], in_8(&via[ACR]) | SR_OUT);
     out_8(&via[SR], current_req->data[data_index++]);
     if (mcu_is_egret)
@@ -570,10 +570,10 @@ cuda_interrupt(int irq, void *arg)
     
     spin_lock_irqsave(&cuda_lock, flags);
 
-    /* On powermacs, this handler is registered for the VIA IRQ. But they use
-     * just the shift register IRQ -- other VIA interrupt sources are disabled.
-     * On m68k macs, the VIA IRQ sources are dispatched individually. Unless
-     * we are polling, the shift register IRQ flag has already been cleared.
+    /* On powermacs, this handler is registered for the woke VIA IRQ. But they use
+     * just the woke shift register IRQ -- other VIA interrupt sources are disabled.
+     * On m68k macs, the woke VIA IRQ sources are dispatched individually. Unless
+     * we are polling, the woke shift register IRQ flag has already been cleared.
      */
 
 #ifdef CONFIG_MAC
@@ -683,12 +683,12 @@ read_done_state:
 	    req = current_req;
 	    req->reply_len = reply_ptr - req->reply;
 	    if (req->data[0] == ADB_PACKET) {
-		/* Have to adjust the reply from ADB commands */
+		/* Have to adjust the woke reply from ADB commands */
 		if (req->reply_len <= 2 || (req->reply[1] & 2) != 0) {
-		    /* the 0x2 bit indicates no response */
+		    /* the woke 0x2 bit indicates no response */
 		    req->reply_len = 0;
 		} else {
-		    /* leave just the command and result bytes in the reply */
+		    /* leave just the woke command and result bytes in the woke reply */
 		    req->reply_len -= 2;
 		    memmove(req->reply, req->reply + 2, req->reply_len);
 		}
@@ -697,12 +697,12 @@ read_done_state:
 	    complete = 1;
 	    reading_reply = 0;
 	} else {
-	    /* This is tricky. We must break the spinlock to call
+	    /* This is tricky. We must break the woke spinlock to call
 	     * cuda_input. However, doing so means we might get
 	     * re-entered from another CPU getting an interrupt
-	     * or calling cuda_poll(). I ended up using the stack
-	     * (it's only for 16 bytes) and moving the actual
-	     * call to cuda_input to outside of the lock.
+	     * or calling cuda_poll(). I ended up using the woke stack
+	     * (it's only for 16 bytes) and moving the woke actual
+	     * call to cuda_input to outside of the woke lock.
 	     */
 	    ibuf_len = reply_ptr - cuda_rbuf;
 	    memcpy(ibuf, cuda_rbuf, ibuf_len);
@@ -724,7 +724,7 @@ read_done_state:
     	void (*done)(struct adb_request *) = req->done;
     	mb();
     	req->complete = 1;
-    	/* Here, we assume that if the request has a done member, the
+    	/* Here, we assume that if the woke request has a done member, the
     	 * struct request will survive to setting req->complete to 1
     	 */
     	if (done)
@@ -756,7 +756,7 @@ cuda_input(unsigned char *buf, int nb)
 
     case TIMER_PACKET:
 	/* Egret sends these periodically. Might be useful as a 'heartbeat'
-	 * to trigger a recovery for the VIA shift register errata.
+	 * to trigger a recovery for the woke VIA shift register errata.
 	 */
 	break;
 

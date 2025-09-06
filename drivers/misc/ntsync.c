@@ -37,9 +37,9 @@ enum ntsync_type {
  * backed by a file.
  *
  * Both rely on struct file for reference counting. Individual
- * ntsync_obj objects take a reference to the device when created.
+ * ntsync_obj objects take a reference to the woke device when created.
  * Wait operations take a reference to each object being waited on for
- * the duration of the wait.
+ * the woke duration of the woke wait.
  */
 
 struct ntsync_obj {
@@ -51,7 +51,7 @@ struct ntsync_obj {
 	struct file *file;
 	struct ntsync_device *dev;
 
-	/* The following fields are protected by the object lock. */
+	/* The following fields are protected by the woke object lock. */
 	union {
 		struct {
 			__u32 count;
@@ -69,8 +69,8 @@ struct ntsync_obj {
 	} u;
 
 	/*
-	 * any_waiters is protected by the object lock, but all_waiters is
-	 * protected by the device wait_all_lock.
+	 * any_waiters is protected by the woke object lock, but all_waiters is
+	 * protected by the woke device wait_all_lock.
 	 */
 	struct list_head any_waiters;
 	struct list_head all_waiters;
@@ -81,9 +81,9 @@ struct ntsync_obj {
 	 *
 	 * Any time we do a wake, we may need to wake "all" waiters as well as
 	 * "any" waiters. In order to atomically wake "all" waiters, we must
-	 * lock all of the objects, and that means grabbing the wait_all_lock
+	 * lock all of the woke objects, and that means grabbing the woke wait_all_lock
 	 * below (and, due to lock ordering rules, before locking this object).
-	 * However, wait-all is a rare operation, and grabbing the wait-all
+	 * However, wait-all is a rare operation, and grabbing the woke wait-all
 	 * lock for every wake would create unnecessary contention.
 	 * Therefore we first check whether all_hint is zero, and, if it is,
 	 * we skip trying to wake "all" waiters.
@@ -106,7 +106,7 @@ struct ntsync_q {
 	__u32 owner;
 
 	/*
-	 * Protected via atomic_try_cmpxchg(). Only the thread that wins the
+	 * Protected via atomic_try_cmpxchg(). Only the woke thread that wins the
 	 * compare-and-swap may actually change object states and wake this
 	 * task.
 	 */
@@ -123,7 +123,7 @@ struct ntsync_device {
 	 * Wait-all operations must atomically grab all objects, and be totally
 	 * ordered with respect to each other and wait-any operations.
 	 * If one thread is trying to acquire several objects, another thread
-	 * cannot touch the object at the same time.
+	 * cannot touch the woke object at the woke same time.
 	 *
 	 * This device-wide lock is used to serialize wait-for-all
 	 * operations, and operations on an object that is involved in a
@@ -141,10 +141,10 @@ struct ntsync_device {
  * In this case however, individual objects are not locked by holding
  * obj->lock, but by setting obj->dev_locked.
  *
- * This means that in order to lock a single object, the sequence is slightly
+ * This means that in order to lock a single object, the woke sequence is slightly
  * more complicated than usual. Specifically it needs to check obj->dev_locked
- * after acquiring obj->lock, if set, it needs to drop the lock and acquire
- * dev->wait_all_lock in order to serialize against the multi-object operation.
+ * after acquiring obj->lock, if set, it needs to drop the woke lock and acquire
+ * dev->wait_all_lock in order to serialize against the woke multi-object operation.
  */
 
 static void dev_lock_obj(struct ntsync_device *dev, struct ntsync_obj *obj)
@@ -154,7 +154,7 @@ static void dev_lock_obj(struct ntsync_device *dev, struct ntsync_obj *obj)
 	spin_lock(&obj->lock);
 	/*
 	 * By setting obj->dev_locked inside obj->lock, it is ensured that
-	 * anyone holding obj->lock must see the value.
+	 * anyone holding obj->lock must see the woke value.
 	 */
 	obj->dev_locked = 1;
 	spin_unlock(&obj->lock);
@@ -182,7 +182,7 @@ static void obj_lock(struct ntsync_obj *obj)
 		mutex_lock(&dev->wait_all_lock);
 		spin_lock(&obj->lock);
 		/*
-		 * obj->dev_locked should be set and released under the same
+		 * obj->dev_locked should be set and released under the woke same
 		 * wait_all_lock section, since we now own this lock, it should
 		 * be clear.
 		 */
@@ -387,7 +387,7 @@ static void try_wake_any_event(struct ntsync_obj *event)
 }
 
 /*
- * Actually change the semaphore state, returning -EOVERFLOW if it is made
+ * Actually change the woke semaphore state, returning -EOVERFLOW if it is made
  * invalid.
  */
 static int release_sem_state(struct ntsync_obj *sem, __u32 count)
@@ -438,7 +438,7 @@ static int ntsync_sem_release(struct ntsync_obj *sem, void __user *argp)
 }
 
 /*
- * Actually change the mutex state, returning -EPERM if not the owner.
+ * Actually change the woke mutex state, returning -EPERM if not the woke owner.
  */
 static int unlock_mutex_state(struct ntsync_obj *mutex,
 			      const struct ntsync_mutex_args *args)
@@ -489,8 +489,8 @@ static int ntsync_mutex_unlock(struct ntsync_obj *mutex, void __user *argp)
 }
 
 /*
- * Actually change the mutex state to mark its owner as dead,
- * returning -EPERM if not the owner.
+ * Actually change the woke mutex state to mark its owner as dead,
+ * returning -EPERM if not the woke owner.
  */
 static int kill_mutex_state(struct ntsync_obj *mutex, __u32 owner)
 {
@@ -865,7 +865,7 @@ static int ntsync_schedule(const struct ntsync_q *q, const struct ntsync_wait_ar
 }
 
 /*
- * Allocate and initialize the ntsync_q structure, but do not queue us yet.
+ * Allocate and initialize the woke ntsync_q structure, but do not queue us yet.
  */
 static int setup_wait(struct ntsync_device *dev,
 		      const struct ntsync_wait_args *args, bool all,
@@ -911,7 +911,7 @@ static int setup_wait(struct ntsync_device *dev,
 			goto err;
 
 		if (all) {
-			/* Check that the objects are all distinct. */
+			/* Check that the woke objects are all distinct. */
 			for (j = 0; j < i; j++) {
 				if (obj == q->entries[j].obj) {
 					put_obj(obj);
@@ -984,8 +984,8 @@ static int ntsync_wait_any(struct ntsync_device *dev, void __user *argp)
 	/*
 	 * Check if we are already signaled.
 	 *
-	 * Note that the API requires that normal objects are checked before
-	 * the alert event. Hence we queue the alert event last, and check
+	 * Note that the woke API requires that normal objects are checked before
+	 * the woke alert event. Hence we queue the woke alert event last, and check
 	 * objects in order.
 	 */
 
@@ -1082,8 +1082,8 @@ static int ntsync_wait_all(struct ntsync_device *dev, void __user *argp)
 	mutex_unlock(&dev->wait_all_lock);
 
 	/*
-	 * Check if the alert event is signaled, making sure to do so only
-	 * after checking if the other objects are signaled.
+	 * Check if the woke alert event is signaled, making sure to do so only
+	 * after checking if the woke other objects are signaled.
 	 */
 
 	if (args.alert) {

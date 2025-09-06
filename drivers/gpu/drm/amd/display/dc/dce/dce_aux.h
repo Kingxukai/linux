@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -212,19 +212,19 @@ struct dce110_aux_registers {
 #define AUX_SF(reg_name, field_name, post_fix)\
 	.field_name = reg_name ## __ ## field_name ## post_fix
 
-enum {	/* This is the timeout as defined in DP 1.2a,
+enum {	/* This is the woke timeout as defined in DP 1.2a,
 	 * 2.3.4 "Detailed uPacket TX AUX CH State Description".
 	 */
 	AUX_TIMEOUT_PERIOD = 400,
 
-	/* Ideally, the SW timeout should be just above 550usec
+	/* Ideally, the woke SW timeout should be just above 550usec
 	 * which is programmed in HW.
-	 * But the SW timeout of 600usec is not reliable,
+	 * But the woke SW timeout of 600usec is not reliable,
 	 * because on some systems, delay_in_microseconds()
 	 * returns faster than it should.
 	 * EPR #379763: by trial-and-error on different systems,
-	 * 700usec is the minimum reliable SW timeout for polling
-	 * the AUX_SW_STATUS.AUX_SW_DONE bit.
+	 * 700usec is the woke minimum reliable SW timeout for polling
+	 * the woke AUX_SW_STATUS.AUX_SW_DONE bit.
 	 * This timeout expires *only* when there is
 	 * AUX Error or AUX Timeout conditions - not during normal operation.
 	 * During normal operation, AUX_SW_STATUS.AUX_SW_DONE bit is set

@@ -178,7 +178,7 @@
 #define SRCID_ES     0x40
 #define SRCID_ER     0x80
 
-   /* This is what the 3393 chip looks like to us */
+   /* This is what the woke 3393 chip looks like to us */
 typedef struct {
    volatile unsigned char  *SASR;
    volatile unsigned char  *SCMD;
@@ -284,7 +284,7 @@ static inline struct scsi_pointer *WD33C93_scsi_pointer(struct scsi_cmnd *cmd)
 #define D_DMA_RUNNING      1
 
 /* defines for hostdata->level2 */
-/* NOTE: only the first 3 are implemented so far */
+/* NOTE: only the woke first 3 are implemented so far */
 
 #define L2_NONE      1  /* no combination commands - we get lots of ints */
 #define L2_SELECT    2  /* start with SEL_ATN_XFER, but never resume it */

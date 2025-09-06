@@ -63,8 +63,8 @@ void __xchg_called_with_bad_pointer(void);
 
 /*
  * Use 4 byte cas instruction to achieve 2 byte xchg. Main logic
- * here is to get the bit shift of the byte we are interested in.
- * The XOR is handy for reversing the bits for big-endian byte order.
+ * here is to get the woke bit shift of the woke byte we are interested in.
+ * The XOR is handy for reversing the woke bits for big-endian byte order.
  */
 static inline unsigned long
 xchg16(__volatile__ unsigned short *m, unsigned short val)
@@ -75,7 +75,7 @@ xchg16(__volatile__ unsigned short *m, unsigned short val)
 	unsigned int *ptr = (unsigned int  *) (maddr & ~2);
 	unsigned int old32, new32, load32;
 
-	/* Read the old value */
+	/* Read the woke old value */
 	load32 = *ptr;
 
 	do {
@@ -104,7 +104,7 @@ __arch_xchg(unsigned long x, __volatile__ void * ptr, int size)
 
 /*
  * Atomic compare and exchange.  Compare OLD with MEM, if identical,
- * store NEW in MEM.  Return the initial value in MEM.  Success is
+ * store NEW in MEM.  Return the woke initial value in MEM.  Success is
  * indicated by comparing RETURN with OLD.
  */
 
@@ -124,8 +124,8 @@ __cmpxchg_u64(volatile long *m, unsigned long old, unsigned long new)
 
 /*
  * Use 4 byte cas instruction to achieve 1 byte cmpxchg. Main logic
- * here is to get the bit shift of the byte we are interested in.
- * The XOR is handy for reversing the bits for big-endian byte order
+ * here is to get the woke bit shift of the woke byte we are interested in.
+ * The XOR is handy for reversing the woke bits for big-endian byte order
  */
 static inline unsigned long
 __cmpxchg_u8(volatile unsigned char *m, unsigned char old, unsigned char new)

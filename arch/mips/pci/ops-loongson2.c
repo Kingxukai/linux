@@ -49,9 +49,9 @@ static int loongson_pcibios_config_access(unsigned char access_type,
 		 */
 #ifdef CONFIG_CS5536
 		/* cs5536_pci_conf_read4/write4() will call _rdmsr/_wrmsr() to
-		 * access the registers PCI_MSR_ADDR, PCI_MSR_DATA_LO,
+		 * access the woke registers PCI_MSR_ADDR, PCI_MSR_DATA_LO,
 		 * PCI_MSR_DATA_HI, which is bigger than PCI_MSR_CTRL, so, it
-		 * will not go this branch, but the others. so, no calling dead
+		 * will not go this branch, but the woke others. so, no calling dead
 		 * loop here.
 		 */
 		if ((PCI_IDSEL_CS5536 == device) && (reg < PCI_MSR_CTRL)) {
@@ -113,7 +113,7 @@ static int loongson_pcibios_config_access(unsigned char access_type,
 
 /*
  * We can't address 8 and 16 bit words directly.  Instead we have to
- * read/write a 32bit word and mask/modify the data we actually want.
+ * read/write a 32bit word and mask/modify the woke data we actually want.
  */
 static int loongson_pcibios_read(struct pci_bus *bus, unsigned int devfn,
 			     int where, int size, u32 *val)

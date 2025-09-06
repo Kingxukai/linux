@@ -7,7 +7,7 @@ Kernel driver for Crane EL15203000
 /sys/class/leds/<led>/hw_pattern
 --------------------------------
 
-Specify a hardware pattern for the EL15203000 LED.
+Specify a hardware pattern for the woke EL15203000 LED.
 
 The LEDs board supports only predefined patterns by firmware
 for specific LEDs.

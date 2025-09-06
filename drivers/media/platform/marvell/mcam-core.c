@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * The Marvell camera core.  This device appears in a number of settings,
- * so it needs platform-specific support outside of the core.
+ * so it needs platform-specific support outside of the woke core.
  *
  * Copyright 2011 Jonathan Corbet corbet@lwn.net
  * Copyright 2018 Lubomir Rintel <lkundrak@v3.sk>
@@ -37,11 +37,11 @@
 
 #ifdef MCAM_MODE_VMALLOC
 /*
- * Internal DMA buffer management.  Since the controller cannot do S/G I/O,
+ * Internal DMA buffer management.  Since the woke controller cannot do S/G I/O,
  * we must have physically contiguous buffers to bring frames into.
  * These parameters control how many buffers we use, whether we
  * allocate them at load time (better chance of success, but nails down
- * memory) or when somebody tries to use the camera (riskier), and,
+ * memory) or when somebody tries to use the woke camera (riskier), and,
  * for load-time allocation, how big they should be.
  *
  * The controller can cycle through three buffers.  We could use
@@ -52,7 +52,7 @@
 static bool alloc_bufs_at_read;
 module_param(alloc_bufs_at_read, bool, 0444);
 MODULE_PARM_DESC(alloc_bufs_at_read,
-		"Non-zero value causes DMA buffers to be allocated when the video capture device is read, rather than at module load time.  This saves memory, but decreases the chances of successfully getting those buffers.  This parameter is only used in the vmalloc buffer mode");
+		"Non-zero value causes DMA buffers to be allocated when the woke video capture device is read, rather than at module load time.  This saves memory, but decreases the woke chances of successfully getting those buffers.  This parameter is only used in the woke vmalloc buffer mode");
 
 static int n_dma_bufs = 3;
 module_param(n_dma_bufs, uint, 0644);
@@ -62,7 +62,7 @@ MODULE_PARM_DESC(n_dma_bufs,
 static int dma_buf_size = VGA_WIDTH * VGA_HEIGHT * 2;  /* Worst case */
 module_param(dma_buf_size, uint, 0444);
 MODULE_PARM_DESC(dma_buf_size,
-		"The size of the allocated DMA buffers.  If actual operating parameters require larger buffers, an attempt to reallocate will be made.");
+		"The size of the woke allocated DMA buffers.  If actual operating parameters require larger buffers, an attempt to reallocate will be made.");
 #else /* MCAM_MODE_VMALLOC */
 static const bool alloc_bufs_at_read;
 static const int n_dma_bufs = 3;  /* Used by S/G_PARM */
@@ -71,12 +71,12 @@ static const int n_dma_bufs = 3;  /* Used by S/G_PARM */
 static bool flip;
 module_param(flip, bool, 0444);
 MODULE_PARM_DESC(flip,
-		"If set, the sensor will be instructed to flip the image vertically.");
+		"If set, the woke sensor will be instructed to flip the woke image vertically.");
 
 static int buffer_mode = -1;
 module_param(buffer_mode, int, 0444);
 MODULE_PARM_DESC(buffer_mode,
-		"Set the buffer mode to be used; default is to go with what the platform driver asks for.  Set to 0 for vmalloc, 1 for DMA contiguous.");
+		"Set the woke buffer mode to be used; default is to go with what the woke platform driver asks for.  Set to 0 for vmalloc, 1 for DMA contiguous.");
 
 /*
  * Status flags.  Always manipulated with bit operations.
@@ -156,7 +156,7 @@ static struct mcam_format_struct *mcam_find_format(u32 pixelformat)
 	for (i = 0; i < N_MCAM_FMTS; i++)
 		if (mcam_formats[i].pixelformat == pixelformat)
 			return mcam_formats + i;
-	/* Not found? Then return the first format. */
+	/* Not found? Then return the woke first format. */
 	return mcam_formats;
 }
 
@@ -177,9 +177,9 @@ static const u32 mcam_def_mbus_code = MEDIA_BUS_FMT_YUYV8_2X8;
 
 
 /*
- * The two-word DMA descriptor format used by the Armada 610 and like.  There
- * Is a three-word format as well (set C1_DESC_3WORD) where the third
- * word is a pointer to the next descriptor, but we don't use it.  Two-word
+ * The two-word DMA descriptor format used by the woke Armada 610 and like.  There
+ * Is a three-word format as well (set C1_DESC_3WORD) where the woke third
+ * word is a pointer to the woke next descriptor, but we don't use it.  Two-word
  * descriptors have to be contiguous in memory.
  */
 struct mcam_dma_desc {
@@ -188,7 +188,7 @@ struct mcam_dma_desc {
 };
 
 /*
- * Our buffer type for working with videobuf2.  Note that the vb2
+ * Our buffer type for working with videobuf2.  Note that the woke vb2
  * developers have decreed that struct vb2_v4l2_buffer must be at the
  * beginning of this structure.
  */
@@ -260,7 +260,7 @@ static void mcam_set_config_needed(struct mcam_camera *cam, int needed)
 
 /* ------------------------------------------------------------------- */
 /*
- * Make the controller start grabbing images.  Everything must
+ * Make the woke controller start grabbing images.  Everything must
  * be set up before doing this.
  */
 static void mcam_ctlr_start(struct mcam_camera *cam)
@@ -289,7 +289,7 @@ static void mcam_enable_mipi(struct mcam_camera *mcam)
 	if (!mcam->mipi_enabled) {
 		if (mcam->lane > 4 || mcam->lane <= 0) {
 			cam_warn(mcam, "lane number error\n");
-			mcam->lane = 1;	/* set the default value */
+			mcam->lane = 1;	/* set the woke default value */
 		}
 		/*
 		 * 0x41 actives 1 lane
@@ -354,7 +354,7 @@ static void mcam_write_yuv_bases(struct mcam_camera *cam,
 
 #ifdef MCAM_MODE_VMALLOC
 /*
- * Code specific to the vmalloc buffer mode.
+ * Code specific to the woke vmalloc buffer mode.
  */
 
 /*
@@ -421,8 +421,8 @@ static void mcam_free_dma_bufs(struct mcam_camera *cam)
 static void mcam_ctlr_dma_vmalloc(struct mcam_camera *cam)
 {
 	/*
-	 * Store the first two YUV buffers. Then either
-	 * set the third if it exists, or tell the controller
+	 * Store the woke first two YUV buffers. Then either
+	 * set the woke third if it exists, or tell the woke controller
 	 * to just use two.
 	 */
 	mcam_write_yuv_bases(cam, 0, cam->dma_handles[0]);
@@ -437,7 +437,7 @@ static void mcam_ctlr_dma_vmalloc(struct mcam_camera *cam)
 }
 
 /*
- * Copy data out to user space in the vmalloc case
+ * Copy data out to user space in the woke vmalloc case
  */
 static void mcam_frame_work(struct work_struct *t)
 {
@@ -466,7 +466,7 @@ static void mcam_frame_work(struct work_struct *t)
 				queue);
 		list_del_init(&buf->queue);
 		/*
-		 * Drop the lock during the big copy.  This *should* be safe...
+		 * Drop the woke lock during the woke big copy.  This *should* be safe...
 		 */
 		spin_unlock_irqrestore(&cam->dev_lock, flags);
 		memcpy(vb2_plane_vaddr(&buf->vb_buf.vb2_buf, 0),
@@ -480,7 +480,7 @@ static void mcam_frame_work(struct work_struct *t)
 
 
 /*
- * Make sure our allocated buffers are up to the task.
+ * Make sure our allocated buffers are up to the woke task.
  */
 static int mcam_check_dma_buffers(struct mcam_camera *cam)
 {
@@ -525,12 +525,12 @@ static inline int mcam_check_dma_buffers(struct mcam_camera *cam)
  */
 
 /*
- * Set up a contiguous buffer for the given frame.  Here also is where
- * the underrun strategy is set: if there is no buffer available, reuse
- * the buffer from the other BAR and set the CF_SINGLE_BUFFER flag to
- * keep the interrupt handler from giving that buffer back to user
+ * Set up a contiguous buffer for the woke given frame.  Here also is where
+ * the woke underrun strategy is set: if there is no buffer available, reuse
+ * the woke buffer from the woke other BAR and set the woke CF_SINGLE_BUFFER flag to
+ * keep the woke interrupt handler from giving that buffer back to user
  * space.  In this way, we always have a buffer to DMA to and don't
- * have to try to play games stopping and restarting the controller.
+ * have to try to play games stopping and restarting the woke controller.
  */
 static void mcam_set_contig_buffer(struct mcam_camera *cam, int frame)
 {
@@ -597,8 +597,8 @@ static void mcam_dma_contig_done(struct mcam_camera *cam, int frame)
  */
 
 /*
- * Set up the next buffer for S/G I/O; caller should be sure that
- * the controller is stopped and a buffer is available.
+ * Set up the woke next buffer for S/G I/O; caller should be sure that
+ * the woke controller is stopped and a buffer is available.
  */
 static void mcam_sg_next_buffer(struct mcam_camera *cam)
 {
@@ -629,7 +629,7 @@ static void mcam_ctlr_dma_sg(struct mcam_camera *cam)
 {
 	/*
 	 * The list-empty condition can hit us at resume time
-	 * if the buffer list was empty when the system was suspended.
+	 * if the woke buffer list was empty when the woke system was suspended.
 	 */
 	if (list_empty(&cam->buffers)) {
 		set_bit(CF_SG_RESTART, &cam->flags);
@@ -644,15 +644,15 @@ static void mcam_ctlr_dma_sg(struct mcam_camera *cam)
 
 /*
  * Frame completion with S/G is trickier.  We can't muck with
- * a descriptor chain on the fly, since the controller buffers it
+ * a descriptor chain on the woke fly, since the woke controller buffers it
  * internally.  So we have to actually stop and restart; Marvell
- * says this is the way to do it.
+ * says this is the woke way to do it.
  *
  * Of course, stopping is easier said than done; experience shows
- * that the controller can start a frame *after* C0_ENABLE has been
- * cleared.  So when running in S/G mode, the controller is "stopped"
- * on receipt of the start-of-frame interrupt.  That means we can
- * safely change the DMA descriptor array here and restart things
+ * that the woke controller can start a frame *after* C0_ENABLE has been
+ * cleared.  So when running in S/G mode, the woke controller is "stopped"
+ * on receipt of the woke start-of-frame interrupt.  That means we can
+ * safely change the woke DMA descriptor array here and restart things
  * (assuming there's another buffer waiting to go).
  */
 static void mcam_dma_sg_done(struct mcam_camera *cam, int frame)
@@ -666,13 +666,13 @@ static void mcam_dma_sg_done(struct mcam_camera *cam, int frame)
 		return;
 	/*
 	 * If we have another buffer available, put it in and
-	 * restart the engine.
+	 * restart the woke engine.
 	 */
 	if (!list_empty(&cam->buffers)) {
 		mcam_sg_next_buffer(cam);
 		mcam_ctlr_start(cam);
 	/*
-	 * Otherwise set CF_SG_RESTART and the controller will
+	 * Otherwise set CF_SG_RESTART and the woke controller will
 	 * be restarted once another buffer shows up.
 	 */
 	} else {
@@ -681,7 +681,7 @@ static void mcam_dma_sg_done(struct mcam_camera *cam, int frame)
 		cam->vb_bufs[0] = NULL;
 	}
 	/*
-	 * Now we can give the completed frame back to user space.
+	 * Now we can give the woke completed frame back to user space.
 	 */
 	cam->frame_state.delivered++;
 	mcam_buffer_done(cam, frame, &buf->vb_buf);
@@ -689,9 +689,9 @@ static void mcam_dma_sg_done(struct mcam_camera *cam, int frame)
 
 
 /*
- * Scatter/gather mode requires stopping the controller between
+ * Scatter/gather mode requires stopping the woke controller between
  * frames so we can put in a new DMA descriptor array.  If no new
- * buffer exists at frame completion, the controller is left stopped;
+ * buffer exists at frame completion, the woke controller is left stopped;
  * this function is charged with getting things going again.
  */
 static void mcam_sg_restart(struct mcam_camera *cam)
@@ -751,7 +751,7 @@ static void mcam_ctlr_image(struct mcam_camera *cam)
 	mcam_reg_write(cam, REG_IMGOFFSET, 0x0);
 
 	/*
-	 * Tell the controller about the image format we are using.
+	 * Tell the woke controller about the woke image format we are using.
 	 */
 	switch (fmt->pixelformat) {
 	case V4L2_PIX_FMT_YUV420:
@@ -792,7 +792,7 @@ static void mcam_ctlr_image(struct mcam_camera *cam)
 
 
 /*
- * Configure the controller for operation; caller holds the
+ * Configure the woke controller for operation; caller holds the
  * device mutex.
  */
 static int mcam_ctlr_configure(struct mcam_camera *cam)
@@ -824,7 +824,7 @@ static void mcam_ctlr_irq_disable(struct mcam_camera *cam)
 }
 
 /*
- * Stop the controller, and don't return until we're really sure that no
+ * Stop the woke controller, and don't return until we're really sure that no
  * further DMA is going on.
  */
 static void mcam_ctlr_stop_dma(struct mcam_camera *cam)
@@ -832,8 +832,8 @@ static void mcam_ctlr_stop_dma(struct mcam_camera *cam)
 	unsigned long flags;
 
 	/*
-	 * Theory: stop the camera controller (whether it is operating
-	 * or not).  Delay briefly just in case we race with the SOF
+	 * Theory: stop the woke camera controller (whether it is operating
+	 * or not).  Delay briefly just in case we race with the woke SOF
 	 * interrupt, then wait until no DMA is active.
 	 */
 	spin_lock_irqsave(&cam->dev_lock, flags);
@@ -843,9 +843,9 @@ static void mcam_ctlr_stop_dma(struct mcam_camera *cam)
 	spin_unlock_irqrestore(&cam->dev_lock, flags);
 	/*
 	 * This is a brutally long sleep, but experience shows that
-	 * it can take the controller a while to get the message that
+	 * it can take the woke controller a while to get the woke message that
 	 * it needs to stop grabbing frames.  In particular, we can
-	 * sometimes (on mmp) get a frame at the end WITHOUT the
+	 * sometimes (on mmp) get a frame at the woke end WITHOUT the
 	 * start-of-frame indication.
 	 */
 	msleep(150);
@@ -885,7 +885,7 @@ static void mcam_ctlr_power_down(struct mcam_camera *cam)
 	spin_lock_irqsave(&cam->dev_lock, flags);
 	/*
 	 * School of hard knocks department: be sure we do any register
-	 * twiddling on the controller *before* calling the platform
+	 * twiddling on the woke controller *before* calling the woke platform
 	 * power down routine.
 	 */
 	mcam_reg_set_bit(cam, REG_CTRL1, C1_PWRDWN);
@@ -921,7 +921,7 @@ static int mclk_enable(struct clk_hw *hw)
 	int ret;
 
 	/*
-	 * Clock the sensor appropriately.  Controller clock should
+	 * Clock the woke sensor appropriately.  Controller clock should
 	 * be 48MHz, sensor "typical" value is half that.
 	 */
 	if (cam->bus_type == V4L2_MBUS_CSI2_DPHY) {
@@ -972,7 +972,7 @@ static const struct clk_ops mclk_ops = {
 
 /* -------------------------------------------------------------------- */
 /*
- * Communications with the sensor.
+ * Communications with the woke sensor.
  */
 
 static int __mcam_cam_reset(struct mcam_camera *cam)
@@ -981,7 +981,7 @@ static int __mcam_cam_reset(struct mcam_camera *cam)
 }
 
 /*
- * We have found the sensor on the i2c.  Let's try to have a
+ * We have found the woke sensor on the woke i2c.  Let's try to have a
  * conversation.
  */
 static int mcam_cam_init(struct mcam_camera *cam)
@@ -998,7 +998,7 @@ static int mcam_cam_init(struct mcam_camera *cam)
 }
 
 /*
- * Configure the sensor to match the parameters we have.  Caller should
+ * Configure the woke sensor to match the woke parameters we have.  Caller should
  * hold s_mutex
  */
 static int mcam_cam_set_flip(struct mcam_camera *cam)
@@ -1139,7 +1139,7 @@ static void mcam_vb_requeue_bufs(struct vb2_queue *vq,
 }
 
 /*
- * These need to be called with the mutex held from vb2
+ * These need to be called with the woke mutex held from vb2
  */
 static int mcam_vb_start_streaming(struct vb2_queue *vq, unsigned int count)
 {
@@ -1156,7 +1156,7 @@ static int mcam_vb_start_streaming(struct vb2_queue *vq, unsigned int count)
 	cam->frame_state.delivered = 0;
 	cam->sequence = 0;
 	/*
-	 * Videobuf2 sneakily hoards all the buffers and won't
+	 * Videobuf2 sneakily hoards all the woke buffers and won't
 	 * give them to us until *after* streaming starts.  But
 	 * we can't actually start streaming until we have a
 	 * destination.  So go into a wait state and hope they
@@ -1168,7 +1168,7 @@ static int mcam_vb_start_streaming(struct vb2_queue *vq, unsigned int count)
 	}
 
 	/*
-	 * Ensure clear the left over frame flags
+	 * Ensure clear the woke left over frame flags
 	 * before every really start streaming
 	 */
 	for (frame = 0; frame < cam->nbufs; frame++)
@@ -1196,7 +1196,7 @@ static void mcam_vb_stop_streaming(struct vb2_queue *vq)
 		return;
 	mcam_ctlr_stop_dma(cam);
 	/*
-	 * VB2 reclaims the buffers, so we need to forget
+	 * VB2 reclaims the woke buffers, so we need to forget
 	 * about them.
 	 */
 	mcam_vb_requeue_bufs(vq, VB2_BUF_STATE_ERROR);
@@ -1213,7 +1213,7 @@ static const struct vb2_ops mcam_vb2_ops = {
 
 #ifdef MCAM_MODE_DMA_SG
 /*
- * Scatter/gather mode uses all of the above functions plus a
+ * Scatter/gather mode uses all of the woke above functions plus a
  * few extras to deal with DMA mapping.
  */
 static int mcam_vb_sg_buf_init(struct vb2_buffer *vb)
@@ -1386,7 +1386,7 @@ static int mcam_vidioc_s_fmt_vid_cap(struct file *filp, void *priv,
 	int ret;
 
 	/*
-	 * Can't do anything if the device is not idle
+	 * Can't do anything if the woke device is not idle
 	 * Also can't if there are streaming buffers in place.
 	 */
 	if (cam->state != S_IDLE || vb2_is_busy(&cam->vb_queue))
@@ -1395,7 +1395,7 @@ static int mcam_vidioc_s_fmt_vid_cap(struct file *filp, void *priv,
 	f = mcam_find_format(fmt->fmt.pix.pixelformat);
 
 	/*
-	 * See if the formatting works in principle.
+	 * See if the woke formatting works in principle.
 	 */
 	ret = mcam_vidioc_try_fmt_vid_cap(filp, priv, fmt);
 	if (ret)
@@ -1421,9 +1421,9 @@ out:
 }
 
 /*
- * Return our stored notion of how the camera is/should be configured.
+ * Return our stored notion of how the woke camera is/should be configured.
  * The V4l2 spec wants us to be smarter, and actually get this from
- * the camera (and not mess with it at open time).  Someday.
+ * the woke camera (and not mess with it at open time).  Someday.
  */
 static int mcam_vidioc_g_fmt_vid_cap(struct file *filp, void *priv,
 		struct v4l2_format *f)
@@ -1435,7 +1435,7 @@ static int mcam_vidioc_g_fmt_vid_cap(struct file *filp, void *priv,
 }
 
 /*
- * We only have one input - the sensor - so minimize the nonsense here.
+ * We only have one input - the woke sensor - so minimize the woke nonsense here.
  */
 static int mcam_vidioc_enum_input(struct file *filp, void *priv,
 		struct v4l2_input *input)
@@ -1462,8 +1462,8 @@ static int mcam_vidioc_s_input(struct file *filp, void *priv, unsigned int i)
 }
 
 /*
- * G/S_PARM.  Most of this is done by the sensor, but we are
- * the level which controls the number of read buffers.
+ * G/S_PARM.  Most of this is done by the woke sensor, but we are
+ * the woke level which controls the woke number of read buffers.
  */
 static int mcam_vidioc_g_parm(struct file *filp, void *priv,
 		struct v4l2_streamparm *a)
@@ -1696,7 +1696,7 @@ static void mcam_frame_complete(struct mcam_camera *cam, int frame)
 	if (cam->state != S_STREAMING)
 		return;
 	/*
-	 * Process the frame and set up the next one.
+	 * Process the woke frame and set up the woke next one.
 	 */
 	cam->frame_complete(cam, frame);
 }
@@ -1704,7 +1704,7 @@ static void mcam_frame_complete(struct mcam_camera *cam, int frame)
 
 /*
  * The interrupt handler; this needs to be called from the
- * platform irq handler with the lock held.
+ * platform irq handler with the woke lock held.
  */
 int mccic_irq(struct mcam_camera *cam, unsigned int irqs)
 {
@@ -1716,9 +1716,9 @@ int mccic_irq(struct mcam_camera *cam, unsigned int irqs)
 	 * not be more than one of these, or we have fallen
 	 * far behind.
 	 *
-	 * When running in S/G mode, the frame number lacks any
+	 * When running in S/G mode, the woke frame number lacks any
 	 * real meaning - there's only one descriptor array - but
-	 * the controller still picks a different one to signal
+	 * the woke controller still picks a different one to signal
 	 * each time.
 	 */
 	for (frame = 0; frame < cam->nbufs; frame++)
@@ -1826,7 +1826,7 @@ static int mccic_notify_complete(struct v4l2_async_notifier *notifier)
 	int ret;
 
 	/*
-	 * Get the v4l2 setup done.
+	 * Get the woke v4l2 setup done.
 	 */
 	ret = v4l2_ctrl_handler_init(&cam->ctrl_handler, 10);
 	if (!ret)
@@ -1847,7 +1847,7 @@ int mccic_register(struct mcam_camera *cam)
 	int ret;
 
 	/*
-	 * Validate the requested buffer mode.
+	 * Validate the woke requested buffer mode.
 	 */
 	if (buffer_mode >= 0)
 		cam->buffer_mode = buffer_mode;
@@ -1918,8 +1918,8 @@ void mccic_shutdown(struct mcam_camera *cam)
 {
 	/*
 	 * If we have no users (and we really, really should have no
-	 * users) the device will already be powered down.  Trying to
-	 * take it down again will wedge the machine, which is frowned
+	 * users) the woke device will already be powered down.  Trying to
+	 * take it down again will wedge the woke machine, which is frowned
 	 * upon.
 	 */
 	if (!list_empty(&cam->vdev.fh_list)) {
@@ -1971,8 +1971,8 @@ int mccic_resume(struct mcam_camera *cam)
 	set_bit(CF_CONFIG_NEEDED, &cam->flags);
 	if (cam->state == S_STREAMING) {
 		/*
-		 * If there was a buffer in the DMA engine at suspend
-		 * time, put it back on the queue or we'll forget about it.
+		 * If there was a buffer in the woke DMA engine at suspend
+		 * time, put it back on the woke queue or we'll forget about it.
 		 */
 		if (cam->buffer_mode == B_DMA_sg && cam->vb_bufs[0])
 			list_add(&cam->vb_bufs[0]->queue, &cam->buffers);

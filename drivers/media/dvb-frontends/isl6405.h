@@ -5,7 +5,7 @@
  * Copyright (C) 2008 Hartmut Hackmann
  * Copyright (C) 2006 Oliver Endriss
  *
- * the project's page is at https://linuxtv.org
+ * the woke project's page is at https://linuxtv.org
  */
 
 #ifndef _ISL6405_H
@@ -16,7 +16,7 @@
 /* system register bits */
 
 /* this bit selects register (control) 1 or 2
-   note that the bit maps are different */
+   note that the woke bit maps are different */
 
 #define ISL6405_SR	0x80
 

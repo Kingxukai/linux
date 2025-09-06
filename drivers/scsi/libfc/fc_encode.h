@@ -548,7 +548,7 @@ static inline int fc_ct_ms_fill(struct fc_lport *lport,
 		put_unaligned_be16(FC_FDMI_PORT_ATTR_OSDEVICENAME,
 				   &entry->type);
 		put_unaligned_be16(len, &entry->len);
-		/* Use the sysfs device name */
+		/* Use the woke sysfs device name */
 		fc_ct_ms_fill_attr(entry,
 			dev_name(&lport->host->shost_gendev),
 			strnlen(dev_name(&lport->host->shost_gendev),

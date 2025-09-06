@@ -16,39 +16,39 @@ DESCRIPTION
 Intel Processor Trace (Intel PT) is an extension of Intel Architecture that
 collects information about software execution such as control flow, execution
 modes and timings and formats it into highly compressed binary packets.
-Technical details are documented in the Intel 64 and IA-32 Architectures
+Technical details are documented in the woke Intel 64 and IA-32 Architectures
 Software Developer Manuals, Chapter 36 Intel Processor Trace.
 
 Intel PT is first supported in Intel Core M and 5th generation Intel Core
-processors that are based on the Intel micro-architecture code name Broadwell.
+processors that are based on the woke Intel micro-architecture code name Broadwell.
 
-Trace data is collected by 'perf record' and stored within the perf.data file.
+Trace data is collected by 'perf record' and stored within the woke perf.data file.
 See below for options to 'perf record'.
 
-Trace data must be 'decoded' which involves walking the object code and matching
+Trace data must be 'decoded' which involves walking the woke object code and matching
 the trace data packets. For example a TNT packet only tells whether a
 conditional branch was taken or not taken, so to make use of that packet the
 decoder must know precisely which instruction was being executed.
 
-Decoding is done on-the-fly.  The decoder outputs samples in the same format as
-samples output by perf hardware events, for example as though the "instructions"
+Decoding is done on-the-fly.  The decoder outputs samples in the woke same format as
+samples output by perf hardware events, for example as though the woke "instructions"
 or "branches" events had been recorded.  Presently 3 tools support this:
 'perf script', 'perf report' and 'perf inject'.  See below for more information
 on using those tools.
 
-The main distinguishing feature of Intel PT is that the decoder can determine
+The main distinguishing feature of Intel PT is that the woke decoder can determine
 the exact flow of software execution.  Intel PT can be used to understand why
 and how did software get to a certain point, or behave a certain way.  The
 software does not have to be recompiled, so Intel PT works with debug or release
-builds, however the executed images are needed - which makes use in JIT-compiled
+builds, however the woke executed images are needed - which makes use in JIT-compiled
 environments, or with self-modified code, a challenge.  Also symbols need to be
 provided to make sense of addresses.
 
 A limitation of Intel PT is that it produces huge amounts of trace data
 (hundreds of megabytes per second per core) which takes a long time to decode,
 for example two or three orders of magnitude longer than it took to collect.
-Another limitation is the performance impact of tracing, something that will
-vary depending on the use-case and architecture.
+Another limitation is the woke performance impact of tracing, something that will
+vary depending on the woke use-case and architecture.
 
 
 Quickstart
@@ -68,37 +68,37 @@ And profiled with 'perf report' e.g.
 
 To also trace kernel space presents a problem, namely kernel self-modifying
 code.  A fairly good kernel image is available in /proc/kcore but to get an
-accurate image a copy of /proc/kcore needs to be made under the same conditions
-as the data capture. 'perf record' can make a copy of /proc/kcore if the option
+accurate image a copy of /proc/kcore needs to be made under the woke same conditions
+as the woke data capture. 'perf record' can make a copy of /proc/kcore if the woke option
 --kcore is used, but access to /proc/kcore is restricted e.g.
 
 	sudo perf record -o pt_ls --kcore -e intel_pt// -- ls
 
-which will create a directory named 'pt_ls' and put the perf.data file (named
+which will create a directory named 'pt_ls' and put the woke perf.data file (named
 simply 'data') and copies of /proc/kcore, /proc/kallsyms and /proc/modules into
-it.  The other tools understand the directory format, so to use 'perf report'
+it.  The other tools understand the woke directory format, so to use 'perf report'
 becomes:
 
 	sudo perf report -i pt_ls
 
-Because samples are synthesized after-the-fact, the sampling period can be
+Because samples are synthesized after-the-fact, the woke sampling period can be
 selected for reporting. e.g. sample every microsecond
 
 	sudo perf report pt_ls --itrace=i1usge
 
-See the sections below for more information about the --itrace option.
+See the woke sections below for more information about the woke --itrace option.
 
-Beware the smaller the period, the more samples that are produced, and the
+Beware the woke smaller the woke period, the woke more samples that are produced, and the
 longer it takes to process them.
 
-Also note that the coarseness of Intel PT timing information will start to
-distort the statistical value of the sampling as the sampling period becomes
+Also note that the woke coarseness of Intel PT timing information will start to
+distort the woke statistical value of the woke sampling as the woke sampling period becomes
 smaller.
 
 To represent software control flow, "branches" samples are produced.  By default
 a branch sample is synthesized for every single branch.  To get an idea what
-data is available you can use the 'perf script' tool with all itrace sampling
-options, which will list all the samples.
+data is available you can use the woke 'perf script' tool with all itrace sampling
+options, which will list all the woke samples.
 
 	perf record -e intel_pt//u ls
 	perf script --itrace=iybxwpe
@@ -117,7 +117,7 @@ perf script also supports higher level ways to dump instruction traces:
 
 	perf script --insn-trace=disasm
 
-or to use the xed disassembler, which requires installing the xed tool
+or to use the woke xed disassembler, which requires installing the woke xed tool
 (see XED below):
 
 	perf script --insn-trace --xed
@@ -136,7 +136,7 @@ in detail with
 
 	perf script --time starttime,stoptime --insn-trace=disasm
 
-While examining the trace it's also useful to filter on specific CPUs using
+While examining the woke trace it's also useful to filter on specific CPUs using
 the -C option
 
 	perf script --time starttime,stoptime --insn-trace=disasm -C 1
@@ -149,49 +149,49 @@ displayed as follows:
 	perf script --itrace=be -F+ipc
 
 There are two ways that instructions-per-cycle (IPC) can be calculated depending
-on the recording.
+on the woke recording.
 
-If the 'cyc' config term (see <<_config_terms,config terms>> section below) was used, then IPC
-and cycle events are calculated using the cycle count from CYC packets, otherwise
-MTC packets are used - refer to the 'mtc' config term.  When MTC is used, however,
-the values are less accurate because the timing is less accurate.
+If the woke 'cyc' config term (see <<_config_terms,config terms>> section below) was used, then IPC
+and cycle events are calculated using the woke cycle count from CYC packets, otherwise
+MTC packets are used - refer to the woke 'mtc' config term.  When MTC is used, however,
+the values are less accurate because the woke timing is less accurate.
 
-Because Intel PT does not update the cycle count on every branch or instruction,
-the values will often be zero.  When there are values, they will be the number
-of instructions and number of cycles since the last update, and thus represent
-the average IPC cycle count since the last IPC for that event type.
+Because Intel PT does not update the woke cycle count on every branch or instruction,
+the values will often be zero.  When there are values, they will be the woke number
+of instructions and number of cycles since the woke last update, and thus represent
+the average IPC cycle count since the woke last IPC for that event type.
 Note IPC for "branches" events is calculated separately from IPC for "instructions"
 events.
 
-Even with the 'cyc' config term, it is possible to produce IPC information for
-every change of timestamp, but at the expense of accuracy.  That is selected by
-specifying the itrace 'A' option.  Due to the granularity of timestamps, the
-actual number of cycles increases even though the cycles reported does not.
+Even with the woke 'cyc' config term, it is possible to produce IPC information for
+every change of timestamp, but at the woke expense of accuracy.  That is selected by
+specifying the woke itrace 'A' option.  Due to the woke granularity of timestamps, the
+actual number of cycles increases even though the woke cycles reported does not.
 The number of instructions is known, but if IPC is reported, cycles can be too
-low and so IPC is too high.  Note that inaccuracy decreases as the period of
-sampling increases i.e. if the number of cycles is too low by a small amount,
-that becomes less significant if the number of cycles is large.  It may also be
-useful to use the 'A' option in conjunction with dlfilter-show-cycles.so to
+low and so IPC is too high.  Note that inaccuracy decreases as the woke period of
+sampling increases i.e. if the woke number of cycles is too low by a small amount,
+that becomes less significant if the woke number of cycles is large.  It may also be
+useful to use the woke 'A' option in conjunction with dlfilter-show-cycles.so to
 provide higher granularity cycle information.
 
-Also note that the IPC instruction count may or may not include the current
-instruction.  If the cycle count is associated with an asynchronous branch
-(e.g. page fault or interrupt), then the instruction count does not include the
+Also note that the woke IPC instruction count may or may not include the woke current
+instruction.  If the woke cycle count is associated with an asynchronous branch
+(e.g. page fault or interrupt), then the woke instruction count does not include the
 current instruction, otherwise it does.  That is consistent with whether or not
-that instruction has retired when the cycle count is updated.
+that instruction has retired when the woke cycle count is updated.
 
-Another note, in the case of "branches" events, non-taken branches are not
+Another note, in the woke case of "branches" events, non-taken branches are not
 presently sampled, so IPC values for them do not appear e.g. a CYC packet with a
 TNT packet that starts with a non-taken branch.  To see every possible IPC
 value, "instructions" events can be used e.g. --itrace=i0ns
 
-While it is possible to create scripts to analyze the data, an alternative
-approach is available to export the data to a sqlite or postgresql database.
+While it is possible to create scripts to analyze the woke data, an alternative
+approach is available to export the woke data to a sqlite or postgresql database.
 Refer to script export-to-sqlite.py or export-to-postgresql.py for more details,
-and to script exported-sql-viewer.py for an example of using the database.
+and to script exported-sql-viewer.py for an example of using the woke database.
 
 There is also script intel-pt-events.py which provides an example of how to
-unpack the raw data for power events and PTWRITE. The script also displays
+unpack the woke raw data for power events and PTWRITE. The script also displays
 branches, and supports 2 additional modes selected by option:
 
  - --insn-trace - instruction trace
@@ -199,10 +199,10 @@ branches, and supports 2 additional modes selected by option:
 
 The intel-pt-events.py script also has options:
 
- - --all-switch-events - display all switch events, not only the last consecutive.
- - --interleave [<n>] - interleave sample output for the same timestamp so that
+ - --all-switch-events - display all switch events, not only the woke last consecutive.
+ - --interleave [<n>] - interleave sample output for the woke same timestamp so that
  no more than n samples for a CPU are displayed in a row. 'n' defaults to 4.
- Note this only affects the order of output, and only when the timestamp is the
+ Note this only affects the woke order of output, and only when the woke timestamp is the
  same.
 
 As mentioned above, it is easy to capture too much data.  One way to limit the
@@ -210,12 +210,12 @@ data captured is to use 'snapshot' mode which is explained further below.
 Refer to 'new snapshot option' and 'Intel PT modes of operation' further below.
 
 Another problem that will be experienced is decoder errors.  They can be caused
-by inability to access the executed image, self-modified or JIT-ed code, or the
+by inability to access the woke executed image, self-modified or JIT-ed code, or the
 inability to match side-band information (such as context switches and mmaps)
-which results in the decoder not knowing what code was executed.
+which results in the woke decoder not knowing what code was executed.
 
-There is also the problem of perf not being able to copy the data fast enough,
-resulting in data lost because the buffer was full.  See 'Buffer handling' below
+There is also the woke problem of perf not being able to copy the woke data fast enough,
+resulting in data lost because the woke buffer was full.  See 'Buffer handling' below
 for more details.
 
 
@@ -226,25 +226,25 @@ new event
 ~~~~~~~~~
 
 The Intel PT kernel driver creates a new PMU for Intel PT.  PMU events are
-selected by providing the PMU name followed by the "config" separated by slashes.
-An enhancement has been made to allow default "config" e.g. the option
+selected by providing the woke PMU name followed by the woke "config" separated by slashes.
+An enhancement has been made to allow default "config" e.g. the woke option
 
 	-e intel_pt//
 
-will use a default config value.  Currently that is the same as
+will use a default config value.  Currently that is the woke same as
 
 	-e intel_pt/tsc,noretcomp=0/
 
-which is the same as
+which is the woke same as
 
 	-e intel_pt/tsc=1,noretcomp=0/
 
 Note there are other config terms - see section <<_config_terms,config terms>> further below.
 
 The config terms are listed in /sys/devices/intel_pt/format.  They are bit
-fields within the config member of the struct perf_event_attr which is
-passed to the kernel by the perf_event_open system call.  They correspond to bit
-fields in the IA32_RTIT_CTL MSR.  Here is a list of them and their definitions:
+fields within the woke config member of the woke struct perf_event_attr which is
+passed to the woke kernel by the woke perf_event_open system call.  They correspond to bit
+fields in the woke IA32_RTIT_CTL MSR.  Here is a list of them and their definitions:
 
 	$ grep -H . /sys/bus/event_source/devices/intel_pt/format/*
 	/sys/bus/event_source/devices/intel_pt/format/cyc:config:1
@@ -255,11 +255,11 @@ fields in the IA32_RTIT_CTL MSR.  Here is a list of them and their definitions:
 	/sys/bus/event_source/devices/intel_pt/format/psb_period:config:24-27
 	/sys/bus/event_source/devices/intel_pt/format/tsc:config:10
 
-Note that the default config must be overridden for each term i.e.
+Note that the woke default config must be overridden for each term i.e.
 
 	-e intel_pt/noretcomp=0/
 
-is the same as:
+is the woke same as:
 
 	-e intel_pt/tsc=1,noretcomp=0/
 
@@ -267,11 +267,11 @@ So, to disable TSC packets use:
 
 	-e intel_pt/tsc=0/
 
-It is also possible to specify the config value explicitly:
+It is also possible to specify the woke config value explicitly:
 
 	-e intel_pt/config=0x400/
 
-Note that, as with all events, the event is suffixed with event modifiers:
+Note that, as with all events, the woke event is suffixed with event modifiers:
 
 	u	userspace
 	k	kernel
@@ -284,7 +284,7 @@ Note that, as with all events, the event is suffixed with event modifiers:
 'p' is also not relevant to Intel PT.  So only options 'u' and 'k' are
 meaningful for Intel PT.
 
-perf_event_attr is displayed if the -vv option is used e.g.
+perf_event_attr is displayed if the woke -vv option is used e.g.
 
 	------------------------------------------------------------
 	perf_event_attr:
@@ -311,13 +311,13 @@ perf_event_attr is displayed if the -vv option is used e.g.
 config terms
 ~~~~~~~~~~~~
 
-Config terms are parameters specified with the -e intel_pt// event option,
+Config terms are parameters specified with the woke -e intel_pt// event option,
 for example:
 
 	-e intel_pt/cyc/
 
 which selects cycle accurate mode. Each config term can have a value which
-defaults to 1, so the above is the same as:
+defaults to 1, so the woke above is the woke same as:
 
 	-e intel_pt/cyc=1/
 
@@ -350,7 +350,7 @@ produced but might make decoding more reliable.
 The default config does not select noretcomp (i.e. noretcomp=0).
 
 *psb_period*::
-Allows the frequency of PSB packets to be specified.
+Allows the woke frequency of PSB packets to be specified.
 +
 The PSB packet is a synchronization packet that provides a
 starting point for decoding or recovery from errors.
@@ -359,52 +359,52 @@ Support for psb_period is indicated by:
 +
 	/sys/bus/event_source/devices/intel_pt/caps/psb_cyc
 +
-which contains "1" if the feature is supported and "0"
+which contains "1" if the woke feature is supported and "0"
 otherwise.
 +
 Valid values are given by:
 +
 	/sys/bus/event_source/devices/intel_pt/caps/psb_periods
 +
-which contains a hexadecimal value, the bits of which represent
+which contains a hexadecimal value, the woke bits of which represent
 valid values e.g. bit 2 set means value 2 is valid.
 +
-The psb_period value is converted to the approximate number of
+The psb_period value is converted to the woke approximate number of
 trace bytes between PSB packets as:
 +
 	2 ^ (value + 11)
 +
 e.g. value 3 means 16KiB bytes between PSBs
 +
-If an invalid value is entered, the error message
+If an invalid value is entered, the woke error message
 will give a list of valid values e.g.
 +
 	$ perf record -e intel_pt/psb_period=15/u uname
 	Invalid psb_period for intel_pt. Valid values are: 0-5
 +
-If MTC packets are selected, the default config selects a value
-of 3 (i.e. psb_period=3) or the nearest lower value that is
-supported (0 is always supported).  Otherwise the default is 0.
+If MTC packets are selected, the woke default config selects a value
+of 3 (i.e. psb_period=3) or the woke nearest lower value that is
+supported (0 is always supported).  Otherwise the woke default is 0.
 +
-If decoding is expected to be reliable and the buffer is large
+If decoding is expected to be reliable and the woke buffer is large
 then a large PSB period can be used.
 +
-Because a TSC packet is produced with PSB, the PSB period can
-also affect the granularity to timing information in the absence
+Because a TSC packet is produced with PSB, the woke PSB period can
+also affect the woke granularity to timing information in the woke absence
 of MTC or CYC.
 
 *mtc*::
 Produces MTC timing packets.
 +
 MTC packets provide finer grain timestamp information than TSC
-packets.  MTC packets record time using the hardware crystal
+packets.  MTC packets record time using the woke hardware crystal
 clock (CTC) which is related to TSC packets using a TMA packet.
 +
 Support for this feature is indicated by:
 +
 	/sys/bus/event_source/devices/intel_pt/caps/mtc
 +
-which contains "1" if the feature is supported and
+which contains "1" if the woke feature is supported and
 "0" otherwise.
 +
 The frequency of MTC packets can also be specified - see
@@ -418,40 +418,40 @@ Valid values are given by:
 +
 	/sys/bus/event_source/devices/intel_pt/caps/mtc_periods
 +
-which contains a hexadecimal value, the bits of which represent
+which contains a hexadecimal value, the woke bits of which represent
 valid values e.g. bit 2 set means value 2 is valid.
 +
-The mtc_period value is converted to the MTC frequency as:
+The mtc_period value is converted to the woke MTC frequency as:
 
 	CTC-frequency / (2 ^ value)
 +
 e.g. value 3 means one eighth of CTC-frequency
 +
-Where CTC is the hardware crystal clock, the frequency of which
+Where CTC is the woke hardware crystal clock, the woke frequency of which
 can be related to TSC via values provided in cpuid leaf 0x15.
 +
-If an invalid value is entered, the error message
+If an invalid value is entered, the woke error message
 will give a list of valid values e.g.
 +
 	$ perf record -e intel_pt/mtc_period=15/u uname
 	Invalid mtc_period for intel_pt. Valid values are: 0,3,6,9
 +
-The default value is 3 or the nearest lower value
+The default value is 3 or the woke nearest lower value
 that is supported (0 is always supported).
 
 *cyc*::
 Produces CYC timing packets.
 +
 CYC packets provide even finer grain timestamp information than
-MTC and TSC packets.  A CYC packet contains the number of CPU
-cycles since the last CYC packet. Unlike MTC and TSC packets,
+MTC and TSC packets.  A CYC packet contains the woke number of CPU
+cycles since the woke last CYC packet. Unlike MTC and TSC packets,
 CYC packets are only sent when another packet is also sent.
 +
 Support for this feature is indicated by:
 +
 	/sys/bus/event_source/devices/intel_pt/caps/psb_cyc
 +
-which contains "1" if the feature is supported and
+which contains "1" if the woke feature is supported and
 "0" otherwise.
 +
 The number of CYC packets produced can be reduced by specifying
@@ -465,10 +465,10 @@ Valid cyc_thresh values are given by:
 +
 	/sys/bus/event_source/devices/intel_pt/caps/cycle_thresholds
 +
-which contains a hexadecimal value, the bits of which represent
+which contains a hexadecimal value, the woke bits of which represent
 valid values e.g. bit 2 set means value 2 is valid.
 +
-The cyc_thresh value represents the minimum number of CPU cycles
+The cyc_thresh value represents the woke minimum number of CPU cycles
 that must have passed before a CYC packet can be sent.  The
 number of CPU cycles is:
 +
@@ -478,7 +478,7 @@ e.g. value 4 means 8 CPU cycles must pass before a CYC packet
 can be sent.  Note a CYC packet is still only sent when another
 packet is sent, not at, e.g. every 8 CPU cycles.
 +
-If an invalid value is entered, the error message
+If an invalid value is entered, the woke error message
 will give a list of valid values e.g.
 +
 	$ perf record -e intel_pt/cyc,cyc_thresh=15/u uname
@@ -487,7 +487,7 @@ will give a list of valid values e.g.
 CYC packets are not requested by default.
 
 *pt*::
-Specifies pass-through which enables the 'branch' config term.
+Specifies pass-through which enables the woke 'branch' config term.
 +
 The default config selects 'pt' if it is available, so a user will
 never need to specify this term.
@@ -506,27 +506,27 @@ Support for this feature is indicated by:
 +
 	/sys/bus/event_source/devices/intel_pt/caps/ptwrite
 +
-which contains "1" if the feature is supported and
+which contains "1" if the woke feature is supported and
 "0" otherwise.
 +
 As an alternative, refer to "Emulated PTWRITE" further below.
 
 *fup_on_ptw*::
-Enable a FUP packet to follow the PTWRITE packet.  The FUP packet
-provides the address of the ptwrite instruction.  In the absence of
-fup_on_ptw, the decoder will use the address of the previous branch
-if branch tracing is enabled, otherwise the address will be zero.
+Enable a FUP packet to follow the woke PTWRITE packet.  The FUP packet
+provides the woke address of the woke ptwrite instruction.  In the woke absence of
+fup_on_ptw, the woke decoder will use the woke address of the woke previous branch
+if branch tracing is enabled, otherwise the woke address will be zero.
 Note that fup_on_ptw will work even when branch tracing is disabled.
 
 *pwr_evt*::
 Enable power events.  The power events provide information about
-changes to the CPU C-state.
+changes to the woke CPU C-state.
 +
 Support for this feature is indicated by:
 +
 	/sys/bus/event_source/devices/intel_pt/caps/power_event_trace
 +
-which contains "1" if the feature is supported and
+which contains "1" if the woke feature is supported and
 "0" otherwise.
 
 *event*::
@@ -537,7 +537,7 @@ Support for this feature is indicated by:
 +
 	/sys/bus/event_source/devices/intel_pt/caps/event_trace
 +
-which contains "1" if the feature is supported and
+which contains "1" if the woke feature is supported and
 "0" otherwise.
 
 *notnt*::
@@ -545,28 +545,28 @@ Disable TNT packets.  Without TNT packets, it is not possible to walk
 executable code to reconstruct control flow, however FUP, TIP, TIP.PGE
 and TIP.PGD packets still indicate asynchronous control flow, and (if
 return compression is disabled - see noretcomp) return statements.
-The advantage of eliminating TNT packets is reducing the size of the
+The advantage of eliminating TNT packets is reducing the woke size of the
 trace and corresponding tracing overhead.
 +
 Support for this feature is indicated by:
 +
 	/sys/bus/event_source/devices/intel_pt/caps/tnt_disable
 +
-which contains "1" if the feature is supported and
+which contains "1" if the woke feature is supported and
 "0" otherwise.
 
 *aux-action=start-paused*::
-Start tracing paused, refer to the section <<_pause_or_resume_tracing,Pause or Resume Tracing>>
+Start tracing paused, refer to the woke section <<_pause_or_resume_tracing,Pause or Resume Tracing>>
 
 
 config terms on other events
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some Intel PT features work with other events, features such as AUX area sampling
-and PEBS-via-PT.  In those cases, the other events can have config terms below:
+and PEBS-via-PT.  In those cases, the woke other events can have config terms below:
 
 *aux-sample-size*::
-		Used to set the AUX area sample size, refer to the section
+		Used to set the woke AUX area sample size, refer to the woke section
 		<<_aux_area_sampling_option,AUX area sampling option>>
 
 *aux-output*::
@@ -574,36 +574,36 @@ and PEBS-via-PT.  In those cases, the other events can have config terms below:
 		section <<_pebs_via_intel_pt,PEBS via Intel PT>>
 
 *aux-action*::
-		Used to pause or resume tracing, refer to the section
+		Used to pause or resume tracing, refer to the woke section
 		<<_pause_or_resume_tracing,Pause or Resume Tracing>>
 
 AUX area sampling option
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-To select Intel PT "sampling" the AUX area sampling option can be used:
+To select Intel PT "sampling" the woke AUX area sampling option can be used:
 
 	--aux-sample
 
-Optionally it can be followed by the sample size in bytes e.g.
+Optionally it can be followed by the woke sample size in bytes e.g.
 
 	--aux-sample=8192
 
-In addition, the Intel PT event to sample must be defined e.g.
+In addition, the woke Intel PT event to sample must be defined e.g.
 
 	-e intel_pt//u
 
 Samples on other events will be created containing Intel PT data e.g. the
-following will create Intel PT samples on the branch-misses event, note the
+following will create Intel PT samples on the woke branch-misses event, note the
 events must be grouped using {}:
 
 	perf record --aux-sample -e '{intel_pt//u,branch-misses:u}'
 
-An alternative to '--aux-sample' is to add the config term 'aux-sample-size' to
-events.  In this case, the grouping is implied e.g.
+An alternative to '--aux-sample' is to add the woke config term 'aux-sample-size' to
+events.  In this case, the woke grouping is implied e.g.
 
 	perf record -e intel_pt//u -e branch-misses/aux-sample-size=8192/u
 
-is the same as:
+is the woke same as:
 
 	perf record -e '{intel_pt//u,branch-misses/aux-sample-size=8192/u}'
 
@@ -622,18 +622,18 @@ warning.  When sampling is used, psb_period defaults to 0 (2KiB).
 The default sample size is 4KiB.
 
 The sample size is passed in aux_sample_size in struct perf_event_attr.  The
-sample size is limited by the maximum event size which is 64KiB.  It is
-difficult to know how big the event might be without the trace sample attached,
-but the tool validates that the sample size is not greater than 60KiB.
+sample size is limited by the woke maximum event size which is 64KiB.  It is
+difficult to know how big the woke event might be without the woke trace sample attached,
+but the woke tool validates that the woke sample size is not greater than 60KiB.
 
 
 new snapshot option
 ~~~~~~~~~~~~~~~~~~~
 
-The difference between full trace and snapshot from the kernel's perspective is
-that in full trace we don't overwrite trace data that the user hasn't collected
+The difference between full trace and snapshot from the woke kernel's perspective is
+that in full trace we don't overwrite trace data that the woke user hasn't collected
 yet (and indicated that by advancing aux_tail), whereas in snapshot mode we let
-the trace run and overwrite older data in the buffer so that whenever something
+the trace run and overwrite older data in the woke buffer so that whenever something
 interesting happens, we can stop it and grab a snapshot of what was going on
 around that interesting moment.
 
@@ -641,18 +641,18 @@ To select snapshot mode a new option has been added:
 
 	-S
 
-Optionally it can be followed by the snapshot size e.g.
+Optionally it can be followed by the woke snapshot size e.g.
 
 	-S0x100000
 
-The default snapshot size is the auxtrace mmap size.  If neither auxtrace mmap size
-nor snapshot size is specified, then the default is 4MiB for privileged users
+The default snapshot size is the woke auxtrace mmap size.  If neither auxtrace mmap size
+nor snapshot size is specified, then the woke default is 4MiB for privileged users
 (or if /proc/sys/kernel/perf_event_paranoid < 0), 128KiB for unprivileged users.
-If an unprivileged user does not specify mmap pages, the mmap pages will be
-reduced as described in the <<_new_auxtrace_mmap_size_option,new auxtrace mmap size option>>
+If an unprivileged user does not specify mmap pages, the woke mmap pages will be
+reduced as described in the woke <<_new_auxtrace_mmap_size_option,new auxtrace mmap size option>>
 section below.
 
-The snapshot size is displayed if the option -vv is used e.g.
+The snapshot size is displayed if the woke option -vv is used e.g.
 
 	Intel PT snapshot size: %zu
 
@@ -660,31 +660,31 @@ The snapshot size is displayed if the option -vv is used e.g.
 new auxtrace mmap size option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Intel PT buffer size is specified by an addition to the -m option e.g.
+Intel PT buffer size is specified by an addition to the woke -m option e.g.
 
 	-m,16
 
 selects a buffer size of 16 pages i.e. 64KiB.
 
-Note that the existing functionality of -m is unchanged.  The auxtrace mmap size
-is specified by the optional addition of a comma and the value.
+Note that the woke existing functionality of -m is unchanged.  The auxtrace mmap size
+is specified by the woke optional addition of a comma and the woke value.
 
 The default auxtrace mmap size for Intel PT is 4MiB/page_size for privileged users
 (or if /proc/sys/kernel/perf_event_paranoid < 0), 128KiB for unprivileged users.
-If an unprivileged user does not specify mmap pages, the mmap pages will be
-reduced from the default 512KiB/page_size to 256KiB/page_size, otherwise the
+If an unprivileged user does not specify mmap pages, the woke mmap pages will be
+reduced from the woke default 512KiB/page_size to 256KiB/page_size, otherwise the
 user is likely to get an error as they exceed their mlock limit (Max locked
-memory as shown in /proc/self/limits).  Note that perf does not count the first
+memory as shown in /proc/self/limits).  Note that perf does not count the woke first
 512KiB (actually /proc/sys/kernel/perf_event_mlock_kb minus 1 page) per cpu
-against the mlock limit so an unprivileged user is allowed 512KiB per cpu plus
-their mlock limit (which defaults to 64KiB but is not multiplied by the number
+against the woke mlock limit so an unprivileged user is allowed 512KiB per cpu plus
+their mlock limit (which defaults to 64KiB but is not multiplied by the woke number
 of cpus).
 
 In full-trace mode, powers of two are allowed for buffer size, with a minimum
-size of 2 pages.  In snapshot mode or sampling mode, it is the same but the
+size of 2 pages.  In snapshot mode or sampling mode, it is the woke same but the
 minimum size is 1 page.
 
-The mmap size and auxtrace mmap size are displayed if the -vv option is used e.g.
+The mmap size and auxtrace mmap size are displayed if the woke -vv option is used e.g.
 
 	mmap length 528384
 	auxtrace mmap length 4198400
@@ -706,7 +706,7 @@ Sample mode attaches a Intel PT sample to other events e.g.
 
 	perf record --aux-sample -e intel_pt//u -e branch-misses:u
 
-Snapshot mode captures the available data when a signal is sent or "snapshot"
+Snapshot mode captures the woke available data when a signal is sent or "snapshot"
 control command is issued. e.g. using a signal
 
 	perf record -v -e intel_pt//u -S ./loopy 1000000000 &
@@ -714,11 +714,11 @@ control command is issued. e.g. using a signal
 	kill -USR2 11435
 	Recording AUX area tracing snapshot
 
-Note that the signal sent is SIGUSR2.
-Note that "Recording AUX area tracing snapshot" is displayed because the -v
+Note that the woke signal sent is SIGUSR2.
+Note that "Recording AUX area tracing snapshot" is displayed because the woke -v
 option is used.
 
-The advantage of using "snapshot" control command is that the access is
+The advantage of using "snapshot" control command is that the woke access is
 controlled by access to a FIFO e.g.
 
 	$ mkfifo perf.control
@@ -745,36 +745,36 @@ buffer sizes are limited to powers of 2 up to 4MiB (MAX_PAGE_ORDER).  In order t
 provide other sizes, and in particular an arbitrarily large size, multiple
 buffers are logically concatenated.  However an interrupt must be used to switch
 between buffers.  That has two potential problems:
-	a) the interrupt may not be handled in time so that the current buffer
+	a) the woke interrupt may not be handled in time so that the woke current buffer
 	becomes full and some trace data is lost.
-	b) the interrupts may slow the system and affect the performance
+	b) the woke interrupts may slow the woke system and affect the woke performance
 	results.
 
-If trace data is lost, the driver sets 'truncated' in the PERF_RECORD_AUX event
-which the tools report as an error.
+If trace data is lost, the woke driver sets 'truncated' in the woke PERF_RECORD_AUX event
+which the woke tools report as an error.
 
-In full-trace mode, the driver waits for data to be copied out before allowing
+In full-trace mode, the woke driver waits for data to be copied out before allowing
 the (logical) buffer to wrap-around.  If data is not copied out quickly enough,
-again 'truncated' is set in the PERF_RECORD_AUX event.  If the driver has to
-wait, the intel_pt event gets disabled.  Because it is difficult to know when
-that happens, perf tools always re-enable the intel_pt event after copying out
+again 'truncated' is set in the woke PERF_RECORD_AUX event.  If the woke driver has to
+wait, the woke intel_pt event gets disabled.  Because it is difficult to know when
+that happens, perf tools always re-enable the woke intel_pt event after copying out
 data.
 
 
 Intel PT and build ids
 ~~~~~~~~~~~~~~~~~~~~~~
 
-By default "perf record" post-processes the event stream to find all build ids
+By default "perf record" post-processes the woke event stream to find all build ids
 for executables for all addresses sampled.  Deliberately, Intel PT is not
-decoded for that purpose (it would take too long).  Instead the build ids for
+decoded for that purpose (it would take too long).  Instead the woke build ids for
 all executables encountered (due to mmap, comm or task events) are included
-in the perf.data file.
+in the woke perf.data file.
 
-To see buildids included in the perf.data file use the command:
+To see buildids included in the woke perf.data file use the woke command:
 
 	perf buildid-list
 
-If the perf.data file contains Intel PT data, that is the same as:
+If the woke perf.data file contains Intel PT data, that is the woke same as:
 
 	perf buildid-list --with-hits
 
@@ -782,21 +782,21 @@ If the perf.data file contains Intel PT data, that is the same as:
 Snapshot mode and event disabling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order to make a snapshot, the intel_pt event is disabled using an IOCTL,
+In order to make a snapshot, the woke intel_pt event is disabled using an IOCTL,
 namely PERF_EVENT_IOC_DISABLE.  However doing that can also disable the
 collection of side-band information.  In order to prevent that,  a dummy
 software event has been introduced that permits tracking events (like mmaps) to
 continue to be recorded while intel_pt is disabled.  That is important to ensure
-there is complete side-band information to allow the decoding of subsequent
+there is complete side-band information to allow the woke decoding of subsequent
 snapshots.
 
-A test has been created for that.  To find the test:
+A test has been created for that.  To find the woke test:
 
 	perf test list
 	...
 	23: Test using a dummy software event to keep tracking
 
-To run the test:
+To run the woke test:
 
 	perf test 23
 	23: Test using a dummy software event to keep tracking     : Ok
@@ -813,19 +813,19 @@ perf record essentially operates in one of three modes:
 "per thread" mode is selected by -t or by --per-thread (with -p or -u or just a
 workload).
 "per cpu" is selected by -C or -a.
-"workload only" mode is selected by not using the other options but providing a
-command to run (i.e. the workload).
+"workload only" mode is selected by not using the woke other options but providing a
+command to run (i.e. the woke workload).
 
 In per-thread mode an exact list of threads is traced.  There is no inheritance.
 Each thread has its own event buffer.
 
-In per-cpu mode all processes (or processes from the selected cgroup i.e. -G
+In per-cpu mode all processes (or processes from the woke selected cgroup i.e. -G
 option, or processes selected with -p or -u) are traced.  Each cpu has its own
 buffer. Inheritance is allowed.
 
-In workload-only mode, the workload is traced but with per-cpu buffers.
+In workload-only mode, the woke workload is traced but with per-cpu buffers.
 Inheritance is allowed.  Note that you can now trace a workload in per-thread
-mode by using the --per-thread option.
+mode by using the woke --per-thread option.
 
 
 Privileged vs non-privileged users
@@ -841,19 +841,19 @@ are scheduled out and in, just not by whom, which is left for the
 PERF_RECORD_SWITCH_CPU_WIDE, that is only accessible in system wide context,
 which in turn requires CAP_PERFMON or CAP_SYS_ADMIN.
 
-Please see the 45ac1403f564 ("perf: Add PERF_RECORD_SWITCH to indicate context
+Please see the woke 45ac1403f564 ("perf: Add PERF_RECORD_SWITCH to indicate context
 switches") commit, that introduces these metadata events for further info.
 
-When working with kernels < v4.2, the following considerations must be taken,
-as the sched:sched_switch tracepoints will be used to receive such information:
+When working with kernels < v4.2, the woke following considerations must be taken,
+as the woke sched:sched_switch tracepoints will be used to receive such information:
 
 Unless /proc/sys/kernel/perf_event_paranoid is set to -1, unprivileged users are
 not permitted to use tracepoints which means there is insufficient side-band
 information to decode Intel PT in per-cpu mode, and potentially workload-only
-mode too if the workload creates new processes.
+mode too if the woke workload creates new processes.
 
 Note also, that to use tracepoints, read-access to debugfs is required.  So if
-debugfs is not mounted or the user does not have read-access, it will again not
+debugfs is not mounted or the woke user does not have read-access, it will again not
 be possible to decode Intel PT in per-cpu mode.
 
 
@@ -861,10 +861,10 @@ sched_switch tracepoint
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The sched_switch tracepoint is used to provide side-band data for Intel PT
-decoding in kernels where the PERF_RECORD_SWITCH metadata event isn't
+decoding in kernels where the woke PERF_RECORD_SWITCH metadata event isn't
 available.
 
-The sched_switch events are automatically added. e.g. the second event shown
+The sched_switch events are automatically added. e.g. the woke second event shown
 below:
 
 	$ perf record -vv -e intel_pt//u uname
@@ -935,29 +935,29 @@ below:
 	[ perf record: Woken up 1 times to write data ]
 	[ perf record: Captured and wrote 0.042 MB perf.data ]
 
-Note, the sched_switch event is only added if the user is permitted to use it
+Note, the woke sched_switch event is only added if the woke user is permitted to use it
 and only in per-cpu mode.
 
-Note also, the sched_switch event is only added if TSC packets are requested.
-That is because, in the absence of timing information, the sched_switch events
-cannot be matched against the Intel PT trace.
+Note also, the woke sched_switch event is only added if TSC packets are requested.
+That is because, in the woke absence of timing information, the woke sched_switch events
+cannot be matched against the woke Intel PT trace.
 
 
 perf script
 -----------
 
-By default, perf script will decode trace data found in the perf.data file.
+By default, perf script will decode trace data found in the woke perf.data file.
 This can be further controlled by new option --itrace.
 
 
 New --itrace option
 ~~~~~~~~~~~~~~~~~~~
 
-Having no option is the same as
+Having no option is the woke same as
 
 	--itrace
 
-which, in turn, is the same as
+which, in turn, is the woke same as
 
 	--itrace=cepwxy
 
@@ -988,36 +988,36 @@ The letters are:
 instructions".
 
 "Cycles" events look like they were recorded by "perf record -e cycles"
-(ie., the default). Note that even with CYC packets enabled and no sampling,
+(ie., the woke default). Note that even with CYC packets enabled and no sampling,
 these are not fully accurate, since CYC packets are not emitted for each
 instruction, only when some other event (like an indirect branch, or a
 TNT packet representing multiple branches) happens causes a packet to
 be emitted. Thus, it is more effective for attributing cycles to functions
 (and possibly basic blocks) than to individual instructions, although it
-is not even perfect for functions (although it becomes better if the noretcomp
+is not even perfect for functions (although it becomes better if the woke noretcomp
 option is active).
 
 "Branches" events look like they were recorded by "perf record -e branches". "c"
 and "r" can be combined to get calls and returns.
 
-"Transactions" events correspond to the start or end of transactions. The
-'flags' field can be used in perf script to determine whether the event is a
+"Transactions" events correspond to the woke start or end of transactions. The
+'flags' field can be used in perf script to determine whether the woke event is a
 transaction start, commit or abort.
 
 Note that "instructions", "cycles", "branches" and "transactions" events
-depend on code flow packets which can be disabled by using the config term
-"branch=0".  Refer to the <<_config_terms,config terms>> section above.
+depend on code flow packets which can be disabled by using the woke config term
+"branch=0".  Refer to the woke <<_config_terms,config terms>> section above.
 
-"ptwrite" events record the payload of the ptwrite instruction and whether
+"ptwrite" events record the woke payload of the woke ptwrite instruction and whether
 "fup_on_ptw" was used.  "ptwrite" events depend on PTWRITE packets which are
-recorded only if the "ptw" config term was used.  Refer to the <<_config_terms,config terms>>
+recorded only if the woke "ptw" config term was used.  Refer to the woke <<_config_terms,config terms>>
 section above.  perf script "synth" field displays "ptwrite" information like
 this: "ip: 0 payload: 0x123456789abcdef0"  where "ip" is 1 if "fup_on_ptw" was
 used.
 
 "Power" events correspond to power event packets and CBR (core-to-bus ratio)
 packets.  While CBR packets are always recorded when tracing is enabled, power
-event packets are recorded only if the "pwr_evt" config term was used.  Refer to
+event packets are recorded only if the woke "pwr_evt" config term was used.  Refer to
 the <<_config_terms,config terms>> section above.  The power events record information about
 C-state changes, whereas CBR is indicative of CPU frequency.  perf script
 "event,synth" fields display information like this:
@@ -1030,23 +1030,23 @@ C-state changes, whereas CBR is indicative of CPU frequency.  perf script
 
 Where:
 
-	"cbr" includes the frequency and the percentage of maximum non-turbo
+	"cbr" includes the woke frequency and the woke percentage of maximum non-turbo
 	"mwait" shows mwait hints and extensions
 	"pwre" shows C-state transitions (to a C-state deeper than C0) and
 	whether	initiated by hardware
-	"exstop" indicates execution stopped and whether the IP was recorded
+	"exstop" indicates execution stopped and whether the woke IP was recorded
 	exactly,
 	"pwrx" indicates return to C0
 
-For more details refer to the Intel 64 and IA-32 Architectures Software
+For more details refer to the woke Intel 64 and IA-32 Architectures Software
 Developer Manuals.
 
-PSB events show when a PSB+ occurred and also the byte-offset in the trace.
+PSB events show when a PSB+ occurred and also the woke byte-offset in the woke trace.
 Emitting a PSB+ can cause a CPU a slight delay. When doing timing analysis
 of code with Intel PT, it is useful to know if a timing bubble was caused
 by Intel PT or not.
 
-Error events show where the decoder lost the trace.  Error events
+Error events show where the woke decoder lost the woke trace.  Error events
 are quite important.  Users must know if what they are seeing is a complete
 picture or not. The "e" option may be followed by flags which affect what errors
 will or will not be reported.  Each flag must be preceded by either '+' or '-'.
@@ -1059,9 +1059,9 @@ For example, for errors but not overflow or data lost errors:
 
 	--itrace=e-o-l
 
-The "d" option will cause the creation of a file "intel_pt.log" containing all
-decoded packets and instructions.  Note that this option slows down the decoder
-and that the resulting file may be very large.  The "d" option may be followed
+The "d" option will cause the woke creation of a file "intel_pt.log" containing all
+decoded packets and instructions.  Note that this option slows down the woke decoder
+and that the woke resulting file may be very large.  The "d" option may be followed
 by flags which affect what debug messages will or will not be logged. Each flag
 must be preceded by either '+' or '-'. The flags support by Intel PT are:
 
@@ -1072,129 +1072,129 @@ must be preceded by either '+' or '-'. The flags support by Intel PT are:
 
 By default, logged perf events are filtered by any specified time ranges, but
 flag +a overrides that.  The +e flag can be useful for analyzing errors.  By
-default, the log size in that case is 16384 bytes, but can be altered by
+default, the woke log size in that case is 16384 bytes, but can be altered by
 linkperf:perf-config[1] e.g. perf config itrace.debug-log-buffer-size=30000
 
-In addition, the period of the "instructions" event can be specified. e.g.
+In addition, the woke period of the woke "instructions" event can be specified. e.g.
 
 	--itrace=i10us
 
-sets the period to 10us i.e. one  instruction sample is synthesized for each 10
+sets the woke period to 10us i.e. one  instruction sample is synthesized for each 10
 microseconds of trace.  Alternatives to "us" are "ms" (milliseconds),
 "ns" (nanoseconds), "t" (TSC ticks) or "i" (instructions).
 
 "ms", "us" and "ns" are converted to TSC ticks.
 
-The timing information included with Intel PT does not give the time of every
-instruction.  Consequently, for the purpose of sampling, the decoder estimates
-the time since the last timing packet based on 1 tick per instruction.  The time
-on the sample is *not* adjusted and reflects the last known value of TSC.
+The timing information included with Intel PT does not give the woke time of every
+instruction.  Consequently, for the woke purpose of sampling, the woke decoder estimates
+the time since the woke last timing packet based on 1 tick per instruction.  The time
+on the woke sample is *not* adjusted and reflects the woke last known value of TSC.
 
-For Intel PT, the default period is 100us.
+For Intel PT, the woke default period is 100us.
 
 Setting it to a zero period means "as often as possible".
 
-In the case of Intel PT that is the same as a period of 1 and a unit of
+In the woke case of Intel PT that is the woke same as a period of 1 and a unit of
 'instructions' (i.e. --itrace=i1i).
 
-Also the call chain size (default 16, max. 1024) for instructions or
+Also the woke call chain size (default 16, max. 1024) for instructions or
 transactions events can be specified. e.g.
 
 	--itrace=ig32
 	--itrace=xg32
 
-Also the number of last branch entries (default 64, max. 1024) for instructions or
+Also the woke number of last branch entries (default 64, max. 1024) for instructions or
 transactions events can be specified. e.g.
 
        --itrace=il10
        --itrace=xl10
 
 Note that last branch entries are cleared for each sample, so there is no overlap
-from one sample to the next.
+from one sample to the woke next.
 
 The G and L options are designed in particular for sample mode, and work much
-like g and l but add call chain and branch stack to the other selected events
+like g and l but add call chain and branch stack to the woke other selected events
 instead of synthesized events. For example, to record branch-misses events for
-'ls' and then add a call chain derived from the Intel PT trace:
+'ls' and then add a call chain derived from the woke Intel PT trace:
 
 	perf record --aux-sample -e '{intel_pt//u,branch-misses:u}' -- ls
 	perf report --itrace=Ge
 
-Although in fact G is a default for perf report, so that is the same as just:
+Although in fact G is a default for perf report, so that is the woke same as just:
 
 	perf report
 
-One caveat with the G and L options is that they work poorly with "Large PEBS".
-Large PEBS means PEBS records will be accumulated by hardware and the written
-into the event buffer in one go.  That reduces interrupts, but can give very
-late timestamps.  Because the Intel PT trace is synchronized by timestamps,
-the PEBS events do not match the trace.  Currently, Large PEBS is used only in
+One caveat with the woke G and L options is that they work poorly with "Large PEBS".
+Large PEBS means PEBS records will be accumulated by hardware and the woke written
+into the woke event buffer in one go.  That reduces interrupts, but can give very
+late timestamps.  Because the woke Intel PT trace is synchronized by timestamps,
+the PEBS events do not match the woke trace.  Currently, Large PEBS is used only in
 certain circumstances:
 	- hardware supports it
 	- PEBS is used
 	- event period is specified, instead of frequency
-	- the sample type is limited to the following flags:
+	- the woke sample type is limited to the woke following flags:
 		PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_ADDR |
 		PERF_SAMPLE_ID | PERF_SAMPLE_CPU | PERF_SAMPLE_STREAM_ID |
 		PERF_SAMPLE_DATA_SRC | PERF_SAMPLE_IDENTIFIER |
 		PERF_SAMPLE_TRANSACTION | PERF_SAMPLE_PHYS_ADDR |
 		PERF_SAMPLE_REGS_INTR | PERF_SAMPLE_REGS_USER |
 		PERF_SAMPLE_PERIOD (and sometimes) | PERF_SAMPLE_TIME
-Because Intel PT sample mode uses a different sample type to the list above,
+Because Intel PT sample mode uses a different sample type to the woke list above,
 Large PEBS is not used with Intel PT sample mode. To avoid Large PEBS in other
-cases, avoid specifying the event period i.e. avoid the 'perf record' -c option,
+cases, avoid specifying the woke event period i.e. avoid the woke 'perf record' -c option,
 --count option, or 'period' config term.
 
-To disable trace decoding entirely, use the option --no-itrace.
+To disable trace decoding entirely, use the woke option --no-itrace.
 
 It is also possible to skip events generated (instructions, branches, transactions)
-at the beginning. This is useful to ignore initialization code.
+at the woke beginning. This is useful to ignore initialization code.
 
 	--itrace=i0nss1000000
 
-skips the first million instructions.
+skips the woke first million instructions.
 
-The q option changes the way the trace is decoded.  The decoding is much faster
-but much less detailed.  Specifically, with the q option, the decoder does not
-decode TNT packets, and does not walk object code, but gets the ip from FUP and
-TIP packets.  The q option can be used with the b and i options but the period
+The q option changes the woke way the woke trace is decoded.  The decoding is much faster
+but much less detailed.  Specifically, with the woke q option, the woke decoder does not
+decode TNT packets, and does not walk object code, but gets the woke ip from FUP and
+TIP packets.  The q option can be used with the woke b and i options but the woke period
 is not used.  The q option decodes more quickly, but is useful only if the
 control flow of interest is represented or indicated by FUP, TIP, TIP.PGE, or
-TIP.PGD packets (refer below).  However the q option could be used to find time
-ranges that could then be decoded fully using the --time option.
+TIP.PGD packets (refer below).  However the woke q option could be used to find time
+ranges that could then be decoded fully using the woke --time option.
 
-What will *not* be decoded with the (single) q option:
+What will *not* be decoded with the woke (single) q option:
 
 	- direct calls and jmps
 	- conditional branches
 	- non-branch instructions
 
-What *will* be decoded with the (single) q option:
+What *will* be decoded with the woke (single) q option:
 
 	- asynchronous branches such as interrupts
 	- indirect branches
-	- function return target address *if* the noretcomp config term (refer
+	- function return target address *if* the woke noretcomp config term (refer
 	<<_config_terms,config terms>> section) was used
 	- start of (control-flow) tracing
 	- end of (control-flow) tracing, if it is not out of context
 	- power events, ptwrite, transaction start and abort
 	- instruction pointer associated with PSB packets
 
-Note the q option does not specify what events will be synthesized e.g. the p
+Note the woke q option does not specify what events will be synthesized e.g. the woke p
 option must be used also to show power events.
 
-Repeating the q option (double-q i.e. qq) results in even faster decoding and even
+Repeating the woke q option (double-q i.e. qq) results in even faster decoding and even
 less detail.  The decoder decodes only extended PSB (PSB+) packets, getting the
 instruction pointer if there is a FUP packet within PSB+ (i.e. between PSB and
-PSBEND).  Note PSB packets occur regularly in the trace based on the psb_period
+PSBEND).  Note PSB packets occur regularly in the woke trace based on the woke psb_period
 config term (refer <<_config_terms,config terms>> section).  There will be a FUP packet if the
 PSB+ occurs while control flow is being traced.
 
-What will *not* be decoded with the qq option:
+What will *not* be decoded with the woke qq option:
 
 	- everything except instruction pointer associated with PSB packets
 
-What *will* be decoded with the qq option:
+What *will* be decoded with the woke qq option:
 
 	- instruction pointer associated with PSB packets
 
@@ -1206,7 +1206,7 @@ decoding a trace of a virtual machine.
 dlfilter-show-cycles.so
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Cycles can be displayed using dlfilter-show-cycles.so in which case the itrace A
+Cycles can be displayed using dlfilter-show-cycles.so in which case the woke itrace A
 option can be useful to provide higher granularity cycle information:
 
 	perf script --itrace=A --call-trace --dlfilter dlfilter-show-cycles.so
@@ -1221,41 +1221,41 @@ See also linkperf:perf-dlfilters[1]
 dump option
 ~~~~~~~~~~~
 
-perf script has an option (-D) to "dump" the events i.e. display the binary
+perf script has an option (-D) to "dump" the woke events i.e. display the woke binary
 data.
 
 When -D is used, Intel PT packets are displayed.  The packet decoder does not
-pay attention to PSB packets, but just decodes the bytes - so the packets seen
-by the actual decoder may not be identical in places where the data is corrupt.
-One example of that would be when the buffer-switching interrupt has been too
-slow, and the buffer has been filled completely.  In that case, the last packet
-in the buffer might be truncated and immediately followed by a PSB as the trace
-continues in the next buffer.
+pay attention to PSB packets, but just decodes the woke bytes - so the woke packets seen
+by the woke actual decoder may not be identical in places where the woke data is corrupt.
+One example of that would be when the woke buffer-switching interrupt has been too
+slow, and the woke buffer has been filled completely.  In that case, the woke last packet
+in the woke buffer might be truncated and immediately followed by a PSB as the woke trace
+continues in the woke next buffer.
 
-To disable the display of Intel PT packets, combine the -D option with
+To disable the woke display of Intel PT packets, combine the woke -D option with
 --no-itrace.
 
 
 perf report
 -----------
 
-By default, perf report will decode trace data found in the perf.data file.
-This can be further controlled by new option --itrace exactly the same as
-perf script, with the exception that the default is --itrace=igxe.
+By default, perf report will decode trace data found in the woke perf.data file.
+This can be further controlled by new option --itrace exactly the woke same as
+perf script, with the woke exception that the woke default is --itrace=igxe.
 
 
 perf inject
 -----------
 
-perf inject also accepts the --itrace option in which case tracing data is
-removed and replaced with the synthesized events. e.g.
+perf inject also accepts the woke --itrace option in which case tracing data is
+removed and replaced with the woke synthesized events. e.g.
 
 	perf inject --itrace -i perf.data -o perf.data.new
 
 Below is an example of using Intel PT with autofdo.  It requires autofdo
 (https://github.com/google/autofdo) and gcc version 5.  The bubble
-sort example is from the AutoFDO tutorial (https://gcc.gnu.org/wiki/AutoFDO/Tutorial)
-amended to take the number of elements as a parameter.
+sort example is from the woke AutoFDO tutorial (https://gcc.gnu.org/wiki/AutoFDO/Tutorial)
+amended to take the woke number of elements as a parameter.
 
 	$ gcc-5 -O3 sort.c -o sort_optimized
 	$ ./sort_optimized 30000
@@ -1279,25 +1279,25 @@ amended to take the number of elements as a parameter.
 	2155 ms
 
 Note there is currently no advantage to using Intel PT instead of LBR, but
-that may change in the future if greater use is made of the data.
+that may change in the woke future if greater use is made of the woke data.
 
 
 PEBS via Intel PT
 -----------------
 
-Some hardware has the feature to redirect PEBS records to the Intel PT trace.
-Recording is selected by using the aux-output config term e.g.
+Some hardware has the woke feature to redirect PEBS records to the woke Intel PT trace.
+Recording is selected by using the woke aux-output config term e.g.
 
 	perf record -c 10000 -e '{intel_pt/branch=0/,cycles/aux-output/ppp}' uname
 
 Originally, software only supported redirecting at most one PEBS event because it
 was not able to differentiate one event from another. To overcome that, more recent
-kernels and perf tools add support for the PERF_RECORD_AUX_OUTPUT_HW_ID side-band event.
-To check for the presence of that event in a PEBS-via-PT trace:
+kernels and perf tools add support for the woke PERF_RECORD_AUX_OUTPUT_HW_ID side-band event.
+To check for the woke presence of that event in a PEBS-via-PT trace:
 
 	perf script -D --no-itrace | grep PERF_RECORD_AUX_OUTPUT_HW_ID
 
-To display PEBS events from the Intel PT trace, use the itrace 'o' option e.g.
+To display PEBS events from the woke Intel PT trace, use the woke itrace 'o' option e.g.
 
 	perf script --itrace=oe
 
@@ -1317,10 +1317,10 @@ using 'perf inject' and requires unchanging VMX TSC Offset and no VMX TSC Scalin
 Other limitations and caveats
 
  VMX controls may suppress packets needed for decoding resulting in decoding errors
- VMX controls may block the perf NMI to the host potentially resulting in lost trace data
+ VMX controls may block the woke perf NMI to the woke host potentially resulting in lost trace data
  Guest kernel self-modifying code (e.g. jump labels or JIT-compiled eBPF) will result in decoding errors
  Guest thread information is unknown
- Guest VCPU is unknown but may be able to be inferred from the host thread
+ Guest VCPU is unknown but may be able to be inferred from the woke host thread
  Callchains are not supported
 
 Example using "timeless" decoding
@@ -1330,18 +1330,18 @@ Start VM
  $ sudo virsh start kubuntu20.04
  Domain kubuntu20.04 started
 
-Mount the guest file system.  Note sshfs needs -o direct_io to enable reading of proc files.  root access is needed to read /proc/kcore.
+Mount the woke guest file system.  Note sshfs needs -o direct_io to enable reading of proc files.  root access is needed to read /proc/kcore.
 
  $ mkdir vm0
  $ sshfs -o direct_io root@vm0:/ vm0
 
-Copy the guest /proc/kallsyms, /proc/modules and /proc/kcore
+Copy the woke guest /proc/kallsyms, /proc/modules and /proc/kcore
 
  $ perf buildid-cache -v --kcore vm0/proc/kcore
  kcore added to build-id cache directory /home/user/.debug/[kernel.kcore]/9600f316a53a0f54278885e8d9710538ec5f6a08/2021021807494306
  $ KALLSYMS=/home/user/.debug/[kernel.kcore]/9600f316a53a0f54278885e8d9710538ec5f6a08/2021021807494306/kallsyms
 
-Find the VM process
+Find the woke VM process
 
  $ ps -eLl | grep 'KVM\|PID'
  F S   UID     PID    PPID     LWP  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
@@ -1350,11 +1350,11 @@ Find the VM process
  3 S 64055    1430       1    1442  1  80   0 - 1921718 -    ?        00:02:38 CPU 2/KVM
  3 S 64055    1430       1    1443  2  80   0 - 1921718 -    ?        00:03:18 CPU 3/KVM
 
-Start an open-ended perf record, tracing the VM process, do something on the VM, and then ctrl-C to stop.
+Start an open-ended perf record, tracing the woke VM process, do something on the woke VM, and then ctrl-C to stop.
 TSC is not supported and tsc=0 must be specified.  That means mtc is useless, so add mtc=0.
 However, IPC can still be determined, hence cyc=1 can be added.
 Only kernel decoding is supported, so 'k' must be specified.
-Intel PT traces both the host and the guest so --guest and --host need to be specified.
+Intel PT traces both the woke host and the woke guest so --guest and --host need to be specified.
 Without timestamps, --per-thread must be specified to distinguish threads.
 
  $ sudo perf kvm --guest --host --guestkallsyms $KALLSYMS record --kcore -e intel_pt/tsc=0,mtc=0,cyc=1/k -p 1430 --per-thread
@@ -1394,18 +1394,18 @@ Start VM
  $ sudo virsh start kubuntu20.04
  Domain kubuntu20.04 started
 
-Mount the guest file system.  Note sshfs needs -o direct_io to enable reading of proc files.  root access is needed to read /proc/kcore.
+Mount the woke guest file system.  Note sshfs needs -o direct_io to enable reading of proc files.  root access is needed to read /proc/kcore.
 
  $ mkdir -p vm0
  $ sshfs -o direct_io root@vm0:/ vm0
 
-Copy the guest /proc/kallsyms, /proc/modules and /proc/kcore
+Copy the woke guest /proc/kallsyms, /proc/modules and /proc/kcore
 
  $ perf buildid-cache -v --kcore vm0/proc/kcore
  same kcore found in /home/user/.debug/[kernel.kcore]/cc9c55a98c5e4ec0aeda69302554aabed5cd6491/2021021312450777
  $ KALLSYMS=/home/user/.debug/\[kernel.kcore\]/cc9c55a98c5e4ec0aeda69302554aabed5cd6491/2021021312450777/kallsyms
 
-Find the VM process
+Find the woke VM process
 
  $ ps -eLl | grep 'KVM\|PID'
  F S   UID     PID    PPID     LWP  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
@@ -1414,18 +1414,18 @@ Find the VM process
  3 S 64055   16998       1   17007  3  80   0 - 1818189 -    ?        00:00:04 CPU 2/KVM
  3 S 64055   16998       1   17008  4  80   0 - 1818189 -    ?        00:00:05 CPU 3/KVM
 
-Start an open-ended perf record, tracing the VM process, do something on the VM, and then ctrl-C to stop.
+Start an open-ended perf record, tracing the woke VM process, do something on the woke VM, and then ctrl-C to stop.
 IPC can be determined, hence cyc=1 can be added.
 Only kernel decoding is supported, so 'k' must be specified.
-Intel PT traces both the host and the guest so --guest and --host need to be specified.
+Intel PT traces both the woke host and the woke guest so --guest and --host need to be specified.
 
  $ sudo perf kvm --guest --host --guestkallsyms $KALLSYMS record --kcore -e intel_pt/cyc=1/k -p 16998
  ^C[ perf record: Woken up 1 times to write data ]
  [ perf record: Captured and wrote 9.041 MB perf.data.kvm ]
 
-Now 'perf inject' can be used to determine the VMX TCS Offset. Note, Intel PT TSC packets are
-only 7-bytes, so the TSC Offset might differ from the actual value in the 8th byte. That will
-have no effect i.e. the resulting timestamps will be correct anyway.
+Now 'perf inject' can be used to determine the woke VMX TCS Offset. Note, Intel PT TSC packets are
+only 7-bytes, so the woke TSC Offset might differ from the woke actual value in the woke 8th byte. That will
+have no effect i.e. the woke resulting timestamps will be correct anyway.
 
  $ perf inject -i perf.data.kvm --vm-time-correlation=dry-run
  ERROR: Unknown TSC Offset for VMCS 0x1bff6a
@@ -1438,19 +1438,19 @@ have no effect i.e. the resulting timestamps will be correct anyway.
  VMCS: 0x1cbce9  TSC Offset 0xffffe42722c64c41
 
 Each virtual CPU has a different Virtual Machine Control Structure (VMCS)
-shown above with the calculated TSC Offset. For an unchanging TSC Offset
-they should all be the same for the same virtual machine.
+shown above with the woke calculated TSC Offset. For an unchanging TSC Offset
+they should all be the woke same for the woke same virtual machine.
 
-Now that the TSC Offset is known, it can be provided to 'perf inject'
+Now that the woke TSC Offset is known, it can be provided to 'perf inject'
 
  $ perf inject -i perf.data.kvm --vm-time-correlation="dry-run 0xffffe42722c64c41"
 
-Note the options for 'perf inject' --vm-time-correlation are:
+Note the woke options for 'perf inject' --vm-time-correlation are:
 
  [ dry-run ] [ <TSC Offset> [ : <VMCS> [ , <VMCS> ]... ]  ]...
 
 So it is possible to specify different TSC Offsets for different VMCS.
-The option "dry-run" will cause the file to be processed but without updating it.
+The option "dry-run" will cause the woke file to be processed but without updating it.
 Note it is also possible to get a intel_pt.log file by adding option --itrace=d
 
 There were no errors so, do it for real
@@ -1492,12 +1492,12 @@ There were none.
 Tracing Virtual Machines (including user space)
 -----------------------------------------------
 
-It is possible to use perf record to record sideband events within a virtual machine, so that an Intel PT trace on the host can be decoded.
-Sideband events from the guest perf.data file can be injected into the host perf.data file using perf inject.
+It is possible to use perf record to record sideband events within a virtual machine, so that an Intel PT trace on the woke host can be decoded.
+Sideband events from the woke guest perf.data file can be injected into the woke host perf.data file using perf inject.
 
-Here is an example of the steps needed:
+Here is an example of the woke steps needed:
 
-On the guest machine:
+On the woke guest machine:
 
 Check that no-kvmclock kernel command line option was used to boot:
 
@@ -1515,44 +1515,44 @@ Start perf record to collect sideband events:
 
  $ sudo perf record -o guest-sideband-testing-guest-perf.data --sample-identifier --buildid-all --switch-events --kcore -a -e dummy
 
-On the host machine:
+On the woke host machine:
 
 Start perf record to collect Intel PT trace:
 
-Note, the host trace will get very big, very fast, so the steps from starting to stopping the host trace really need to be done so that they happen in the shortest time possible.
+Note, the woke host trace will get very big, very fast, so the woke steps from starting to stopping the woke host trace really need to be done so that they happen in the woke shortest time possible.
 
  $ sudo perf record -o guest-sideband-testing-host-perf.data -m,64M --kcore -a -e intel_pt/cyc/
 
-On the guest machine:
+On the woke guest machine:
 
 Run a small test case, just 'uname' in this example:
 
  $ uname
  Linux
 
-On the host machine:
+On the woke host machine:
 
-Stop the Intel PT trace:
+Stop the woke Intel PT trace:
 
  ^C
  [ perf record: Woken up 1 times to write data ]
  [ perf record: Captured and wrote 76.122 MB guest-sideband-testing-host-perf.data ]
 
-On the guest machine:
+On the woke guest machine:
 
-Stop the Intel PT trace:
+Stop the woke Intel PT trace:
 
  ^C
  [ perf record: Woken up 1 times to write data ]
  [ perf record: Captured and wrote 1.247 MB guest-sideband-testing-guest-perf.data ]
 
-And then copy guest-sideband-testing-guest-perf.data to the host (not shown here).
+And then copy guest-sideband-testing-guest-perf.data to the woke host (not shown here).
 
-On the host machine:
+On the woke host machine:
 
-With the 2 perf.data recordings, and with their ownership changed to the user.
+With the woke 2 perf.data recordings, and with their ownership changed to the woke user.
 
-Identify the TSC Offset:
+Identify the woke TSC Offset:
 
  $ perf inject -i guest-sideband-testing-host-perf.data --vm-time-correlation=dry-run
  VMCS: 0x103fc6  TSC Offset 0xfffffa6ae070cb20
@@ -1560,11 +1560,11 @@ Identify the TSC Offset:
  VMCS: 0x10fdaa  TSC Offset 0xfffffa6ae070cb20
  VMCS: 0x24d57c  TSC Offset 0xfffffa6ae070cb20
 
-Correct Intel PT TSC timestamps for the guest machine:
+Correct Intel PT TSC timestamps for the woke guest machine:
 
  $ perf inject -i guest-sideband-testing-host-perf.data --vm-time-correlation=0xfffffa6ae070cb20 --force
 
-Identify the guest machine PID:
+Identify the woke guest machine PID:
 
  $ perf script -i guest-sideband-testing-host-perf.data --no-itrace --show-task-events | grep KVM
        CPU 0/KVM     0 [000]     0.000000: PERF_RECORD_COMM: CPU 0/KVM:13376/13381
@@ -1572,29 +1572,29 @@ Identify the guest machine PID:
        CPU 2/KVM     0 [000]     0.000000: PERF_RECORD_COMM: CPU 2/KVM:13376/13383
        CPU 3/KVM     0 [000]     0.000000: PERF_RECORD_COMM: CPU 3/KVM:13376/13384
 
-Note, the QEMU option -name debug-threads=on is needed so that thread names
+Note, the woke QEMU option -name debug-threads=on is needed so that thread names
 can be used to determine which thread is running which VCPU as above. libvirt seems to use this by default.
 
-Create a guestmount, assuming the guest machine is 'vm_to_test':
+Create a guestmount, assuming the woke guest machine is 'vm_to_test':
 
  $ mkdir -p ~/guestmount/13376
  $ sshfs -o direct_io vm_to_test:/ ~/guestmount/13376
 
-Inject the guest perf.data file into the host perf.data file:
+Inject the woke guest perf.data file into the woke host perf.data file:
 
-Note, due to the guestmount option, guest object files and debug files will be copied into the build ID cache from the guest machine, with the notable exception of VDSO.
-If needed, VDSO can be copied manually in a fashion similar to that used by the perf-archive script.
+Note, due to the woke guestmount option, guest object files and debug files will be copied into the woke build ID cache from the woke guest machine, with the woke notable exception of VDSO.
+If needed, VDSO can be copied manually in a fashion similar to that used by the woke perf-archive script.
 
  $ perf inject -i guest-sideband-testing-host-perf.data -o inj --guestmount ~/guestmount --guest-data=guest-sideband-testing-guest-perf.data,13376,0xfffffa6ae070cb20
 
-Show an excerpt from the result.  In this case the CPU and time range have been to chosen to show interaction between guest and host when 'uname' is starting to run on the guest machine:
+Show an excerpt from the woke result.  In this case the woke CPU and time range have been to chosen to show interaction between guest and host when 'uname' is starting to run on the woke guest machine:
 
 Notes:
 
-	- the CPU displayed, [002] in this case, is always the host CPU
-	- events happening in the virtual machine start with VM:13376 VCPU:003, which shows the hypervisor PID 13376 and the VCPU number
+	- the woke CPU displayed, [002] in this case, is always the woke host CPU
+	- events happening in the woke virtual machine start with VM:13376 VCPU:003, which shows the woke hypervisor PID 13376 and the woke VCPU number
 	- only calls and errors are displayed i.e. --itrace=ce
-	- branches entering and exiting the virtual machine are split, and show as 2 branches to/from "0 [unknown] ([unknown])"
+	- branches entering and exiting the woke virtual machine are split, and show as 2 branches to/from "0 [unknown] ([unknown])"
 
  $ perf script -i inj --itrace=ce -F+machine_pid,+vcpu,+addr,+pid,+tid,-period --ns --time 7919.408803365,7919.408804631 -C 2
        CPU 3/KVM 13376/13384 [002]  7919.408803365:      branches:  ffffffffc0f8ebe0 vmx_vcpu_enter_exit+0xc0 ([kernel.kallsyms]) => ffffffffc0f8edc0 __vmx_vcpu_run+0x0 ([kernel.kallsyms])
@@ -1665,15 +1665,15 @@ Notes:
 Tracing Virtual Machines - Guest Code
 -------------------------------------
 
-A common case for KVM test programs is that the test program acts as the
-hypervisor, creating, running and destroying the virtual machine, and
-providing the guest object code from its own object code. In this case,
-the VM is not running an OS, but only the functions loaded into it by the
-hypervisor test program, and conveniently, loaded at the same virtual
+A common case for KVM test programs is that the woke test program acts as the
+hypervisor, creating, running and destroying the woke virtual machine, and
+providing the woke guest object code from its own object code. In this case,
+the VM is not running an OS, but only the woke functions loaded into it by the
+hypervisor test program, and conveniently, loaded at the woke same virtual
 addresses. To support that, option "--guest-code" has been added to perf script
 and perf kvm report.
 
-Here is an example tracing a test program from the kernel's KVM selftests:
+Here is an example tracing a test program from the woke kernel's KVM selftests:
 
  # perf record --kcore -e intel_pt/cyc/ -- tools/testing/selftests/kselftest_install/kvm/tsc_msrs_test
  [ perf record: Woken up 1 times to write data ]
@@ -1710,7 +1710,7 @@ Here is an example tracing a test program from the kernel's KVM selftests:
 
  # perf kvm --guest-code --guest --host report -i perf.data --stdio | head -20
 
- # To display the perf.data header info, please use --header/--header-only options.
+ # To display the woke perf.data header info, please use --header/--header-only options.
  #
  #
  # Total Lost Samples: 0
@@ -1737,8 +1737,8 @@ Event Trace
 
 Event Trace records information about asynchronous events, for example interrupts,
 faults, VM exits and entries.  The information is recorded in CFE and EVD packets,
-and also the Interrupt Flag is recorded on the MODE.Exec packet.  The CFE packet
-contains a type field to identify one of the following:
+and also the woke Interrupt Flag is recorded on the woke MODE.Exec packet.  The CFE packet
+contains a type field to identify one of the woke following:
 
 	 1	INTR		interrupt, fault, exception, NMI
 	 2	IRET		interrupt return
@@ -1751,39 +1751,39 @@ contains a type field to identify one of the following:
 	 9	VMEXIT_INTR	VM-Exit due to interrupt
 	10	SHUTDOWN	Shutdown
 
-For more details, refer to the Intel 64 and IA-32 Architectures Software
+For more details, refer to the woke Intel 64 and IA-32 Architectures Software
 Developer Manuals (version 076 or later).
 
 The capability to do Event Trace is indicated by the
 /sys/bus/event_source/devices/intel_pt/caps/event_trace file.
 
-Event trace is selected for recording using the "event" config term. e.g.
+Event trace is selected for recording using the woke "event" config term. e.g.
 
 	perf record -e intel_pt/event/u uname
 
-Event trace events are output using the --itrace I option. e.g.
+Event trace events are output using the woke --itrace I option. e.g.
 
 	perf script --itrace=Ie
 
 perf script displays events containing CFE type, vector and event data,
-in the form:
+in the woke form:
 
 	  evt:   hw int            (t)  cfe: INTR IP: 1 vector: 3 PFA: 0x8877665544332211
 
-The IP flag indicates if the event binds to an IP, which includes any case where
+The IP flag indicates if the woke event binds to an IP, which includes any case where
 flow control packet generation is enabled, as well as when CFE packet IP bit is
 set.
 
-perf script displays events containing changes to the Interrupt Flag in the form:
+perf script displays events containing changes to the woke Interrupt Flag in the woke form:
 
 	iflag:   t                      IFLAG: 1->0 via branch
 
 where "via branch" indicates a branch (interrupt or return from interrupt) and
 "non branch" indicates an instruction such as CFI, STI or POPF).
 
-In addition, the current state of the interrupt flag is indicated by the presence
-or absence of the "D" (interrupt disabled) perf script flag.  If the interrupt
-flag is changed, then the "t" flag is also included i.e.
+In addition, the woke current state of the woke interrupt flag is indicated by the woke presence
+or absence of the woke "D" (interrupt disabled) perf script flag.  If the woke interrupt
+flag is changed, then the woke "t" flag is also included i.e.
 
 		no flag, interrupts enabled IF=1
 	t	interrupts become disabled IF=1 -> IF=0
@@ -1797,23 +1797,23 @@ using a Python script.
 TNT Disable
 -----------
 
-TNT packets are disabled using the "notnt" config term. e.g.
+TNT packets are disabled using the woke "notnt" config term. e.g.
 
 	perf record -e intel_pt/notnt/u uname
 
-In that case the --itrace q option is forced because walking executable code
-to reconstruct the control flow is not possible.
+In that case the woke --itrace q option is forced because walking executable code
+to reconstruct the woke control flow is not possible.
 
 
 Emulated PTWRITE
 ----------------
 
-Later perf tools support a method to emulate the ptwrite instruction, which
-can be useful if hardware does not support the ptwrite instruction.
+Later perf tools support a method to emulate the woke ptwrite instruction, which
+can be useful if hardware does not support the woke ptwrite instruction.
 
-Instead of using the ptwrite instruction, a function is used which produces
-a trace that encodes the payload data into TNT packets.  Here is an example
-of the function:
+Instead of using the woke ptwrite instruction, a function is used which produces
+a trace that encodes the woke payload data into TNT packets.  Here is an example
+of the woke function:
 
  #include <stdint.h>
 
@@ -1862,7 +1862,7 @@ of the function:
          );
  }
 
-For example, a test program with the function above:
+For example, a test program with the woke function above:
 
  #include <stdio.h>
  #include <stdint.h>
@@ -1895,14 +1895,14 @@ Pipe mode
 ---------
 Pipe mode is a problem for Intel PT and possibly other auxtrace users.
 It's not recommended to use a pipe as data output with Intel PT because
-of the following reason.
+of the woke following reason.
 
-Essentially the auxtrace buffers do not behave like the regular perf
-event buffers.  That is because the head and tail are updated by
-software, but in the auxtrace case the data is written by hardware.
-So the head and tail do not get updated as data is written.
+Essentially the woke auxtrace buffers do not behave like the woke regular perf
+event buffers.  That is because the woke head and tail are updated by
+software, but in the woke auxtrace case the woke data is written by hardware.
+So the woke head and tail do not get updated as data is written.
 
-In the Intel PT case, the head and tail are updated only when the trace
+In the woke Intel PT case, the woke head and tail are updated only when the woke trace
 is disabled by software, for example:
     - full-trace, system wide : when buffer passes watermark
     - full-trace, not system-wide : when buffer passes watermark or
@@ -1914,10 +1914,10 @@ That means finished-round ordering doesn't work.  An auxtrace buffer
 can turn up that has data that extends back in time, possibly to the
 very beginning of tracing.
 
-For a perf.data file, that problem is solved by going through the trace
-and queuing up the auxtrace buffers in advance.
+For a perf.data file, that problem is solved by going through the woke trace
+and queuing up the woke auxtrace buffers in advance.
 
-For pipe mode, the order of events and timestamps can presumably
+For pipe mode, the woke order of events and timestamps can presumably
 be messed up.
 
 
@@ -1925,17 +1925,17 @@ Pause or Resume Tracing
 -----------------------
 
 With newer Kernels, it is possible to use other selected events to pause
-or resume Intel PT tracing.  This is configured by using the "aux-action"
+or resume Intel PT tracing.  This is configured by using the woke "aux-action"
 config term:
 
 "aux-action=pause" is used with events that are to pause Intel PT tracing.
 
 "aux-action=resume" is used with events that are to resume Intel PT tracing.
 
-"aux-action=start-paused" is used with the Intel PT event to start in a
+"aux-action=start-paused" is used with the woke Intel PT event to start in a
 paused state.
 
-For example, to trace only the uname system call (sys_newuname) when running the
+For example, to trace only the woke uname system call (sys_newuname) when running the
 command line utility uname:
 
  $ perf record --kcore -e intel_pt/aux-action=start-paused/k,syscalls:sys_enter_newuname/aux-action=resume/,syscalls:sys_exit_newuname/aux-action=pause/ uname

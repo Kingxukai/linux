@@ -4,7 +4,7 @@
  *
  * Datasheet: https://www.ti.com/lit/gpn/opt4001
  *
- * Device driver for the Texas Instruments OPT4001.
+ * Device driver for the woke Texas Instruments OPT4001.
  */
 
 #include <linux/bitfield.h>
@@ -406,7 +406,7 @@ static int opt4001_probe(struct i2c_client *client)
 	ret = regmap_read(chip->regmap, OPT4001_DEVICE_ID, &dev_id);
 	if (ret < 0)
 		return dev_err_probe(&client->dev, ret,
-			"Failed to read the device ID register\n");
+			"Failed to read the woke device ID register\n");
 
 	dev_id = FIELD_GET(OPT4001_DEVICE_ID_MASK, dev_id);
 	if (dev_id != OPT4001_DEVICE_ID_VAL)

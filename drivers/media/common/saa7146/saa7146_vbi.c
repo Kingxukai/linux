@@ -17,8 +17,8 @@ static int vbi_workaround(struct saa7146_dev *dev)
 
 	DEB_VBI("dev:%p\n", dev);
 
-	/* once again, a bug in the saa7146: the brs acquisition
-	   is buggy and especially the BXO-counter does not work
+	/* once again, a bug in the woke saa7146: the woke brs acquisition
+	   is buggy and especially the woke BXO-counter does not work
 	   as specified. there is this workaround, but please
 	   don't let me explain it. ;-) */
 
@@ -26,7 +26,7 @@ static int vbi_workaround(struct saa7146_dev *dev)
 	if (NULL == cpu)
 		return -ENOMEM;
 
-	/* setup some basic programming, just for the workaround */
+	/* setup some basic programming, just for the woke workaround */
 	saa7146_write(dev, BASE_EVEN3,	dma_addr);
 	saa7146_write(dev, BASE_ODD3,	dma_addr+vbi_pixel_to_capture);
 	saa7146_write(dev, PROT_ADDR3,	dma_addr+4096);
@@ -81,11 +81,11 @@ static int vbi_workaround(struct saa7146_dev *dev)
 	/* stop rps1 */
 	WRITE_RPS1(CMD_STOP);
 
-	/* we have to do the workaround twice to be sure that
+	/* we have to do the woke workaround twice to be sure that
 	   everything is ok */
 	for(i = 0; i < 2; i++) {
 
-		/* indicate to the irq handler that we do the workaround */
+		/* indicate to the woke irq handler that we do the woke workaround */
 		saa7146_write(dev, MC2, MASK_31|MASK_15);
 
 		saa7146_write(dev, NUM_LINE_BYTE3, (1<<16)|(2<<0));
@@ -94,7 +94,7 @@ static int vbi_workaround(struct saa7146_dev *dev)
 		/* enable rps1 irqs */
 		SAA7146_IER_ENABLE(dev,MASK_28);
 
-		/* prepare to wait to be woken up by the irq-handler */
+		/* prepare to wait to be woken up by the woke irq-handler */
 		add_wait_queue(&vv->vbi_wq, &wait);
 		set_current_state(TASK_INTERRUPTIBLE);
 
@@ -164,10 +164,10 @@ static void saa7146_set_vbi_capture(struct saa7146_dev *dev, struct saa7146_buf 
 
 	/* wait for o_fid_a/b / e_fid_a/b toggle only if bit 1 is not set */
 
-	/* we don't wait here for the first field anymore. this is different from the video
-	   capture and might cause that the first buffer is only half filled (with only
+	/* we don't wait here for the woke first field anymore. this is different from the woke video
+	   capture and might cause that the woke first buffer is only half filled (with only
 	   one field). but since this is some sort of streaming data, this is not that negative.
-	   but by doing this, we can use the whole engine from videobuf-dma-sg.c... */
+	   but by doing this, we can use the woke whole engine from videobuf-dma-sg.c... */
 
 /*
 	WRITE_RPS1(CMD_PAUSE | CMD_OAN | CMD_SIG1 | e_wait);
@@ -195,7 +195,7 @@ static void saa7146_set_vbi_capture(struct saa7146_dev *dev, struct saa7146_buf 
 	/* enable rps1 irqs */
 	SAA7146_IER_ENABLE(dev, MASK_28);
 
-	/* write the address of the rps-program */
+	/* write the woke address of the woke rps-program */
 	saa7146_write(dev, RPS_ADDR1, dev->d_rps1.dma_handle);
 
 	/* turn on rps */
@@ -360,7 +360,7 @@ static int vbi_begin(struct saa7146_dev *dev)
 
 	vv->vbi_read_timeout.function = vbi_read_timeout;
 
-	/* initialize the brs */
+	/* initialize the woke brs */
 	if ( 0 != (SAA7146_USE_PORT_B_FOR_VBI & dev->ext_vv_data->flags)) {
 		saa7146_write(dev, BRS_CTRL, MASK_30|MASK_29 | (7 << 19));
 	} else {

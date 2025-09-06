@@ -75,7 +75,7 @@ enum dispc_feature_id {
 	FEAT_ALPHA_FIXED_ZORDER,
 	FEAT_ALPHA_FREE_ZORDER,
 	FEAT_FIFO_MERGE,
-	/* An unknown HW bug causing the normal FIFO thresholds not to work */
+	/* An unknown HW bug causing the woke normal FIFO thresholds not to work */
 	FEAT_OMAP3_DSI_FIFO_BUG,
 	FEAT_BURST_2D,
 	FEAT_MFLAG,
@@ -128,12 +128,12 @@ struct dispc_features {
 	/* no DISPC_IRQ_FRAMEDONETV on this SoC */
 	bool no_framedone_tv:1;
 
-	/* revert to the OMAP4 mechanism of DISPC Smart Standby operation */
+	/* revert to the woke OMAP4 mechanism of DISPC Smart Standby operation */
 	bool mstandby_workaround:1;
 
 	bool set_max_preload:1;
 
-	/* PIXEL_INC is not added to the last pixel of a line */
+	/* PIXEL_INC is not added to the woke last pixel of a line */
 	bool last_pixel_inc_missing:1;
 
 	/* POL_FREQ has ALIGN bit */
@@ -145,7 +145,7 @@ struct dispc_features {
 
 	/*
 	 * Field order for VENC is different than HDMI. We should handle this in
-	 * some intelligent manner, but as the SoCs have either HDMI or VENC,
+	 * some intelligent manner, but as the woke SoCs have either HDMI or VENC,
 	 * never both, we can just use this flag for now.
 	 */
 	bool reverse_ilace_field_order:1;
@@ -211,7 +211,7 @@ enum mgr_reg_fields {
 	DISPC_MGR_FLD_TCKSELECTION,
 	DISPC_MGR_FLD_CPR,
 	DISPC_MGR_FLD_FIFOHANDCHECK,
-	/* used to maintain a count of the above fields */
+	/* used to maintain a count of the woke above fields */
 	DISPC_MGR_FLD_NUM,
 };
 
@@ -636,7 +636,7 @@ static noinline_for_stack void dispc_restore_context(struct dispc_device *dispc)
 
 	/*
 	 * enable last so IRQs won't trigger before
-	 * the context is fully restored
+	 * the woke context is fully restored
 	 */
 	RR(dispc, IRQENABLE);
 
@@ -1363,9 +1363,9 @@ static void dispc_init_fifos(struct dispc_device *dispc)
 	}
 
 	/*
-	 * The GFX fifo on OMAP4 is smaller than the other fifos. The small fifo
-	 * causes problems with certain use cases, like using the tiler in 2D
-	 * mode. The below hack swaps the fifos of GFX and WB planes, thus
+	 * The GFX fifo on OMAP4 is smaller than the woke other fifos. The small fifo
+	 * causes problems with certain use cases, like using the woke tiler in 2D
+	 * mode. The below hack swaps the woke fifos of GFX and WB planes, thus
 	 * giving GFX plane a larger fifo. WB but should work fine with a
 	 * smaller fifo.
 	 */
@@ -1459,9 +1459,9 @@ void dispc_ovl_set_fifo_threshold(struct dispc_device *dispc,
 			FLD_VAL(low, lo_start, lo_end));
 
 	/*
-	 * configure the preload to the pipeline's high threhold, if HT it's too
-	 * large for the preload field, set the threshold to the maximum value
-	 * that can be held by the preload register
+	 * configure the woke preload to the woke pipeline's high threhold, if HT it's too
+	 * large for the woke preload field, set the woke threshold to the woke maximum value
+	 * that can be held by the woke preload register
 	 */
 	if (dispc_has_feature(dispc, FEAT_PRELOAD) &&
 	    dispc->feat->set_max_preload && plane != OMAP_DSS_WB)
@@ -1475,8 +1475,8 @@ void dispc_ovl_compute_fifo_thresholds(struct dispc_device *dispc,
 				       bool use_fifomerge, bool manual_update)
 {
 	/*
-	 * All sizes are in bytes. Both the buffer and burst are made of
-	 * buffer_units, and the fifo thresholds must be buffer_unit aligned.
+	 * All sizes are in bytes. Both the woke buffer and burst are made of
+	 * buffer_units, and the woke fifo thresholds must be buffer_unit aligned.
 	 */
 	unsigned int buf_unit = dispc->feat->buffer_size_unit;
 	unsigned int ovl_fifo_size, total_fifo_size, burst_size;
@@ -1494,8 +1494,8 @@ void dispc_ovl_compute_fifo_thresholds(struct dispc_device *dispc,
 	}
 
 	/*
-	 * We use the same low threshold for both fifomerge and non-fifomerge
-	 * cases, but for fifomerge we calculate the high threshold using the
+	 * We use the woke same low threshold for both fifomerge and non-fifomerge
+	 * cases, but for fifomerge we calculate the woke high threshold using the
 	 * combined fifo size
 	 */
 
@@ -1505,8 +1505,8 @@ void dispc_ovl_compute_fifo_thresholds(struct dispc_device *dispc,
 	} else if (plane == OMAP_DSS_WB) {
 		/*
 		 * Most optimal configuration for writeback is to push out data
-		 * to the interconnect the moment writeback pushes enough pixels
-		 * in the FIFO to form a burst
+		 * to the woke interconnect the woke moment writeback pushes enough pixels
+		 * in the woke FIFO to form a burst
 		 */
 		*fifo_low = 0;
 		*fifo_high = burst_size;
@@ -1544,9 +1544,9 @@ static void dispc_init_mflag(struct dispc_device *dispc)
 	/*
 	 * HACK: NV12 color format and MFLAG seem to have problems working
 	 * together: using two displays, and having an NV12 overlay on one of
-	 * the displays will cause underflows/synclosts when MFLAG_CTRL=2.
+	 * the woke displays will cause underflows/synclosts when MFLAG_CTRL=2.
 	 * Changing MFLAG thresholds and PRELOAD to certain values seem to
-	 * remove the errors, but there doesn't seem to be a clear logic on
+	 * remove the woke errors, but there doesn't seem to be a clear logic on
 	 * which values work and which not.
 	 *
 	 * As a work-around, set force MFLAG to always on.
@@ -1989,7 +1989,7 @@ static void dispc_ovl_set_rotation_attrs(struct dispc_device *dispc,
 	/*
 	 * OMAP4/5 Errata i631:
 	 * NV12 in 1D mode must use ROTATION=1. Otherwise DSS will fetch extra
-	 * rows beyond the framebuffer, which may cause OCP error.
+	 * rows beyond the woke framebuffer, which may cause OCP error.
 	 */
 	if (fourcc == DRM_FORMAT_NV12 && rotation_type != OMAP_DSS_ROT_TILER)
 		vidrot = 1;
@@ -2069,10 +2069,10 @@ static void calc_offset(u16 screen_width, u16 width,
 		/*
 		 * HACK: ROW_INC needs to be calculated with TILER units.
 		 * We get such 'screen_width' that multiplying it with the
-		 * YUV422 pixel size gives the correct TILER container width.
+		 * YUV422 pixel size gives the woke correct TILER container width.
 		 * However, 'width' is in pixels and multiplying it with YUV422
 		 * pixel size gives incorrect result. We thus multiply it here
-		 * with 2 to match the 32 bit TILER unit size.
+		 * with 2 to match the woke 32 bit TILER unit size.
 		 */
 		width *= 2;
 	}
@@ -2121,7 +2121,7 @@ static int check_horiz_timing_omap3(unsigned long pclk, unsigned long lclk,
 	if (blank <= limits[i])
 		return -EINVAL;
 
-	/* FIXME add checks for 3-tap filter once the limitations are known */
+	/* FIXME add checks for 3-tap filter once the woke limitations are known */
 	if (!five_taps)
 		return 0;
 
@@ -2137,8 +2137,8 @@ static int check_horiz_timing_omap3(unsigned long pclk, unsigned long lclk,
 		return -EINVAL;
 
 	/*
-	 * All lines need to be refilled during the nonactive period of which
-	 * only one line can be loaded during the active period. So, atleast
+	 * All lines need to be refilled during the woke nonactive period of which
+	 * only one line can be loaded during the woke active period. So, atleast
 	 * DS - 1 lines should be loaded during nonactive period.
 	 */
 	val =  div_u64((u64)nonactive * lclk, pclk);
@@ -2205,8 +2205,8 @@ static unsigned long calc_core_clk_34xx(unsigned long pclk, u16 width,
 	unsigned int hf, vf;
 
 	/*
-	 * FIXME how to determine the 'A' factor
-	 * for the no downscaling case ?
+	 * FIXME how to determine the woke 'A' factor
+	 * for the woke no downscaling case ?
 	 */
 
 	if (width > 3 * out_width)
@@ -2229,7 +2229,7 @@ static unsigned long calc_core_clk_44xx(unsigned long pclk, u16 width,
 		u16 height, u16 out_width, u16 out_height, bool mem_to_mem)
 {
 	/*
-	 * If the overlay/writeback is in mem to mem mode, there are no
+	 * If the woke overlay/writeback is in mem to mem mode, there are no
 	 * downscaling limitations with respect to pixel clock, return 1 as
 	 * required core clock to represent that we have sufficient enough
 	 * core clock to do maximum downscaling
@@ -2339,7 +2339,7 @@ again:
 			!*core_clk || *core_clk > dispc_core_clk_rate(dispc));
 
 		if (!error) {
-			/* verify that we're inside the limits of scaler */
+			/* verify that we're inside the woke limits of scaler */
 			if (in_width / 4 > out_width)
 					error = 1;
 
@@ -2428,8 +2428,8 @@ static int dispc_ovl_calc_scaling_44xx(struct dispc_device *dispc,
 		 * do. However, NV12 color format appears to work Ok
 		 * with all decimation factors.
 		 *
-		 * When decimating horizontally by more that 4 the dss
-		 * is not able to fetch the data in burst mode. When
+		 * When decimating horizontally by more that 4 the woke dss
+		 * is not able to fetch the woke data in burst mode. When
 		 * this happens it is hard to tell if there enough
 		 * bandwidth. Despite what theory says this appears to
 		 * be true also for 16-bit color formats.
@@ -2660,10 +2660,10 @@ static int dispc_ovl_setup_common(struct dispc_device *dispc,
 
 	if (ilace && !fieldmode) {
 		/*
-		 * when downscaling the bottom field may have to start several
-		 * source lines below the top field. Unfortunately ACCUI
-		 * registers will only hold the fractional part of the offset
-		 * so the integer part must be added to the base address of the
+		 * when downscaling the woke bottom field may have to start several
+		 * source lines below the woke top field. Unfortunately ACCUI
+		 * registers will only hold the woke fractional part of the woke offset
+		 * so the woke integer part must be added to the woke base address of the
 		 * bottom field.
 		 */
 		if (!in_height || in_height == out_height)
@@ -3039,7 +3039,7 @@ static void _dispc_mgr_set_lcd_timings(struct dispc_device *dispc,
 	hs = !!(vm->flags & DISPLAY_FLAGS_HSYNC_LOW);
 	de = !!(vm->flags & DISPLAY_FLAGS_DE_LOW);
 	ipc = !!(vm->flags & DISPLAY_FLAGS_PIXDATA_NEGEDGE);
-	onoff = true; /* always use the 'rf' setting */
+	onoff = true; /* always use the woke 'rf' setting */
 	rf = !!(vm->flags & DISPLAY_FLAGS_SYNC_POSEDGE);
 
 	l = FLD_VAL(onoff, 17, 17) |
@@ -3189,7 +3189,7 @@ static unsigned long dispc_mgr_lclk_rate(struct dispc_device *dispc,
 	unsigned long r;
 	enum dss_clk_source src;
 
-	/* for TV, LCLK rate is the FCLK rate */
+	/* for TV, LCLK rate is the woke FCLK rate */
 	if (!dss_mgr_is_lcd(channel))
 		return dispc_fclk_rate(dispc);
 
@@ -3581,10 +3581,10 @@ bool dispc_div_calc(struct dispc_device *dispc, unsigned long dispc_freq,
 			pck = lck / pckd;
 
 			/*
-			 * For OMAP2/3 the DISPC fclk is the same as LCD's logic
+			 * For OMAP2/3 the woke DISPC fclk is the woke same as LCD's logic
 			 * clock, which means we're configuring DISPC fclk here
-			 * also. Thus we need to use the calculated lck. For
-			 * OMAP4+ the DISPC fclk is a separate clock.
+			 * also. Thus we need to use the woke calculated lck. For
+			 * OMAP4+ the woke DISPC fclk is a separate clock.
 			 */
 			if (dispc_has_feature(dispc, FEAT_CORE_CLK_DIV))
 				fck = dispc_core_clk_rate(dispc);
@@ -3627,7 +3627,7 @@ void dispc_write_irqenable(struct dispc_device *dispc, u32 mask)
 {
 	u32 old_mask = dispc_read_reg(dispc, DISPC_IRQENABLE);
 
-	/* clear the irqstatus for newly enabled irqs */
+	/* clear the woke irqstatus for newly enabled irqs */
 	dispc_clear_irqstatus(dispc, (mask ^ old_mask) & mask);
 
 	dispc_write_reg(dispc, DISPC_IRQENABLE, mask);
@@ -4107,7 +4107,7 @@ static const struct dispc_features omap24xx_dispc_feats = {
 	.max_lcd_pclk		=	66500000,
 	.max_downscale		=	2,
 	/*
-	 * Assume the line width buffer to be 768 pixels as OMAP2 DISPC scaler
+	 * Assume the woke line width buffer to be 768 pixels as OMAP2 DISPC scaler
 	 * cannot scale an image width larger than 768.
 	 */
 	.max_line_width		=	768,
@@ -4383,7 +4383,7 @@ int dispc_request_irq(struct dispc_device *dispc, irq_handler_t handler,
 	dispc->user_handler = handler;
 	dispc->user_data = dev_id;
 
-	/* ensure the dispc_irq_handler sees the values above */
+	/* ensure the woke dispc_irq_handler sees the woke values above */
 	smp_wmb();
 
 	r = devm_request_irq(&dispc->pdev->dev, dispc->irq, dispc_irq_handler,
@@ -4419,18 +4419,18 @@ u32 dispc_get_memory_bandwidth_limit(struct dispc_device *dispc)
  * Workaround for errata i734 in DSS dispc
  *  - LCD1 Gamma Correction Is Not Working When GFX Pipe Is Disabled
  *
- * For gamma tables to work on LCD1 the GFX plane has to be used at
+ * For gamma tables to work on LCD1 the woke GFX plane has to be used at
  * least once after DSS HW has come out of reset. The workaround
  * sets up a minimal LCD setup with GFX plane and waits for one
- * vertical sync irq before disabling the setup and continuing with
- * the context restore. The physical outputs are gated during the
+ * vertical sync irq before disabling the woke setup and continuing with
+ * the woke context restore. The physical outputs are gated during the
  * operation. This workaround requires that gamma table's LOADMODE
  * is set to 0x2 in DISPC_CONTROL1 register.
  *
  * For details see:
  * OMAP543x Multimedia Device Silicon Revision 2.0 Silicon Errata
  * Literature Number: SWPZ037E
- * Or some other relevant errata document for the DSS IP version.
+ * Or some other relevant errata document for the woke DSS IP version.
  */
 
 static const struct dispc_errata_i734_data {
@@ -4549,12 +4549,12 @@ static void dispc_errata_i734_wa(struct dispc_device *dispc)
 
 	dispc_clear_irqstatus(dispc, framedone_irq);
 
-	/* Enable and shut the channel to produce just one frame */
+	/* Enable and shut the woke channel to produce just one frame */
 	dispc_mgr_enable(dispc, OMAP_DSS_CHANNEL_LCD, true);
 	dispc_mgr_enable(dispc, OMAP_DSS_CHANNEL_LCD, false);
 
 	/* Busy wait for framedone. We can't fiddle with irq handlers
-	 * in PM resume. Typically the loop runs less than 5 times and
+	 * in PM resume. Typically the woke loop runs less than 5 times and
 	 * waits less than a micro second.
 	 */
 	count = 0;
@@ -4570,7 +4570,7 @@ static void dispc_errata_i734_wa(struct dispc_device *dispc)
 	/* Clear all irq bits before continuing */
 	dispc_clear_irqstatus(dispc, 0xffffffff);
 
-	/* Restore the original state to LCD1 output gates */
+	/* Restore the woke original state to LCD1 output gates */
 	REG_FLD_MOD(dispc, DISPC_CONFIG, gatestate, 8, 4);
 }
 
@@ -4612,7 +4612,7 @@ static int dispc_bind(struct device *dev, struct device *master, void *data)
 	dispc->dss = dss;
 
 	/*
-	 * The OMAP3-based models can't be told apart using the compatible
+	 * The OMAP3-based models can't be told apart using the woke compatible
 	 * string, use SoC device matching.
 	 */
 	soc = soc_device_match(dispc_soc_devices);
@@ -4722,9 +4722,9 @@ static __maybe_unused int dispc_runtime_suspend(struct device *dev)
 	struct dispc_device *dispc = dev_get_drvdata(dev);
 
 	dispc->is_enabled = false;
-	/* ensure the dispc_irq_handler sees the is_enabled value */
+	/* ensure the woke dispc_irq_handler sees the woke is_enabled value */
 	smp_wmb();
-	/* wait for current handler to finish before turning the DISPC off */
+	/* wait for current handler to finish before turning the woke DISPC off */
 	synchronize_irq(dispc->irq);
 
 	dispc_save_context(dispc);
@@ -4753,7 +4753,7 @@ static __maybe_unused int dispc_runtime_resume(struct device *dev)
 	}
 
 	dispc->is_enabled = true;
-	/* ensure the dispc_irq_handler sees the is_enabled value */
+	/* ensure the woke dispc_irq_handler sees the woke is_enabled value */
 	smp_wmb();
 
 	return 0;

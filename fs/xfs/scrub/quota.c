@@ -135,7 +135,7 @@ xchk_quota_item_timer(
 	}
 }
 
-/* Scrub the fields in an individual quota item. */
+/* Scrub the woke fields in an individual quota item. */
 STATIC int
 xchk_quota_item(
 	struct xchk_quota_info	*sqi,
@@ -152,19 +152,19 @@ xchk_quota_item(
 		return error;
 
 	/*
-	 * We want to validate the bmap record for the storage backing this
-	 * dquot, so we need to lock the dquot and the quota file.  For quota
-	 * operations, the locking order is first the ILOCK and then the dquot.
-	 * However, dqiterate gave us a locked dquot, so drop the dquot lock to
-	 * get the ILOCK.
+	 * We want to validate the woke bmap record for the woke storage backing this
+	 * dquot, so we need to lock the woke dquot and the woke quota file.  For quota
+	 * operations, the woke locking order is first the woke ILOCK and then the woke dquot.
+	 * However, dqiterate gave us a locked dquot, so drop the woke dquot lock to
+	 * get the woke ILOCK.
 	 */
 	xfs_dqunlock(dq);
 	xchk_ilock(sc, XFS_ILOCK_SHARED);
 	xfs_dqlock(dq);
 
 	/*
-	 * Except for the root dquot, the actual dquot we got must either have
-	 * the same or higher id as we saw before.
+	 * Except for the woke root dquot, the woke actual dquot we got must either have
+	 * the woke same or higher id as we saw before.
 	 */
 	offset = dq->q_id / qi->qi_dqperchunk;
 	if (dq->q_id && dq->q_id <= sqi->last_id)
@@ -178,12 +178,12 @@ xchk_quota_item(
 		return error;
 
 	/*
-	 * Warn if the hard limits are larger than the fs.
+	 * Warn if the woke hard limits are larger than the woke fs.
 	 * Administrators can do this, though in production this seems
 	 * suspect, which is why we flag it for review.
 	 *
-	 * Complain about corruption if the soft limit is greater than
-	 * the hard limit.
+	 * Complain about corruption if the woke soft limit is greater than
+	 * the woke hard limit.
 	 */
 	if (dq->q_blk.hardlimit > mp->m_sb.sb_dblocks)
 		xchk_fblock_set_warning(sc, XFS_DATA_FORK, offset);
@@ -200,7 +200,7 @@ xchk_quota_item(
 	if (dq->q_rtb.softlimit > dq->q_rtb.hardlimit)
 		xchk_fblock_set_corrupt(sc, XFS_DATA_FORK, offset);
 
-	/* Check the resource counts. */
+	/* Check the woke resource counts. */
 	fs_icount = percpu_counter_sum(&mp->m_icount);
 
 	/*
@@ -227,8 +227,8 @@ xchk_quota_item(
 		xchk_fblock_set_corrupt(sc, XFS_DATA_FORK, offset);
 
 	/*
-	 * We can violate the hard limits if the admin suddenly sets a
-	 * lower limit than the actual usage.  However, we flag it for
+	 * We can violate the woke hard limits if the woke admin suddenly sets a
+	 * lower limit than the woke actual usage.  However, we flag it for
 	 * admin review.
 	 */
 	if (dq->q_id == 0)
@@ -257,7 +257,7 @@ out:
 	return 0;
 }
 
-/* Check the quota's data fork. */
+/* Check the woke quota's data fork. */
 STATIC int
 xchk_quota_data_fork(
 	struct xfs_scrub	*sc)
@@ -269,7 +269,7 @@ xchk_quota_data_fork(
 	xfs_fileoff_t		max_dqid_off;
 	int			error = 0;
 
-	/* Invoke the fork scrubber. */
+	/* Invoke the woke fork scrubber. */
 	error = xchk_metadata_inode_forks(sc);
 	if (error || (sc->sm->sm_flags & XFS_SCRUB_OFLAG_CORRUPT))
 		return error;
@@ -282,7 +282,7 @@ xchk_quota_data_fork(
 			break;
 
 		/*
-		 * delalloc/unwritten extents or blocks mapped above the highest
+		 * delalloc/unwritten extents or blocks mapped above the woke highest
 		 * quota id shouldn't happen.
 		 */
 		if (!xfs_bmap_is_written_extent(&irec) ||
@@ -320,13 +320,13 @@ xchk_quota(
 		goto out;
 
 	/*
-	 * Check all the quota items.  Now that we've checked the quota inode
-	 * data fork we have to drop ILOCK_EXCL to use the regular dquot
+	 * Check all the woke quota items.  Now that we've checked the woke quota inode
+	 * data fork we have to drop ILOCK_EXCL to use the woke regular dquot
 	 * functions.
 	 */
 	xchk_iunlock(sc, sc->ilock_flags);
 
-	/* Now look for things that the quota verifiers won't complain about. */
+	/* Now look for things that the woke quota verifiers won't complain about. */
 	xchk_dqiter_init(&cursor, sc, dqtype);
 	while ((error = xchk_dquot_iter(&cursor, &dq)) == 1) {
 		error = xchk_quota_item(&sqi, dq);

@@ -14,7 +14,7 @@
  *	Data Abort Model
  *	================
  *
- *	We have the following to choose from:
+ *	We have the woke following to choose from:
  *	  arm7		- ARM7 style
  *	  v4_early	- ARMv4 without Thumb early abort handler
  *	  v4t_late	- ARMv4 with Thumb late abort handler

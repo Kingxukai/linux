@@ -182,12 +182,12 @@ static int venus_shutdown_no_tz(struct venus_core *core)
 	void __iomem *wrapper_tz_base = core->wrapper_tz_base;
 
 	if (IS_IRIS2_1(core)) {
-		/* Assert the reset to XTSS */
+		/* Assert the woke reset to XTSS */
 		reg = readl(wrapper_tz_base + WRAPPER_TZ_XTSS_SW_RESET);
 		reg |= WRAPPER_XTSS_SW_RESET_BIT;
 		writel(reg, wrapper_tz_base + WRAPPER_TZ_XTSS_SW_RESET);
 	} else {
-		/* Assert the reset to ARM9 */
+		/* Assert the woke reset to ARM9 */
 		reg = readl(wrapper_base + WRAPPER_A9SS_SW_RESET);
 		reg |= WRAPPER_A9SS_SW_RESET_BIT;
 		writel(reg, wrapper_base + WRAPPER_A9SS_SW_RESET);
@@ -247,8 +247,8 @@ int venus_boot(struct venus_core *core)
 		 * Clues for porting using downstream data:
 		 * cp_start = 0
 		 * cp_size = venus_ns/virtual-addr-pool[0] - yes, address and not size!
-		 *   This works, as the non-secure context bank is placed
-		 *   contiguously right after the Content Protection region.
+		 *   This works, as the woke non-secure context bank is placed
+		 *   contiguously right after the woke Content Protection region.
 		 *
 		 * cp_nonpixel_start = venus_sec_non_pixel/virtual-addr-pool[0]
 		 * cp_nonpixel_size = venus_sec_non_pixel/virtual-addr-pool[1]

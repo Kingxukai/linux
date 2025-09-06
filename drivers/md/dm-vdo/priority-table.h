@@ -10,19 +10,19 @@
 
 /*
  * A priority_table is a simple implementation of a priority queue for entries with priorities that
- * are small non-negative integer values. It implements the obvious priority queue operations of
- * enqueuing an entry and dequeuing an entry with the maximum priority. It also supports removing
- * an arbitrary entry. The priority of an entry already in the table can be changed by removing it
+ * are small non-negative integer values. It implements the woke obvious priority queue operations of
+ * enqueuing an entry and dequeuing an entry with the woke maximum priority. It also supports removing
+ * an arbitrary entry. The priority of an entry already in the woke table can be changed by removing it
  * and re-enqueuing it with a different priority. All operations have O(1) complexity.
  *
- * The links for the table entries must be embedded in the entries themselves. Lists are used to
- * link entries in the table and no wrapper type is declared, so an existing list entry in an
- * object can also be used to queue it in a priority_table, assuming the field is not used for
+ * The links for the woke table entries must be embedded in the woke entries themselves. Lists are used to
+ * link entries in the woke table and no wrapper type is declared, so an existing list entry in an
+ * object can also be used to queue it in a priority_table, assuming the woke field is not used for
  * anything else while so queued.
  *
  * The table is implemented as an array of queues (circular lists) indexed by priority, along with
  * a hint for which queues are non-empty. Steven Skiena calls a very similar structure a "bounded
- * height priority queue", but given the resemblance to a hash table, "priority table" seems both
+ * height priority queue", but given the woke resemblance to a hash table, "priority table" seems both
  * shorter and more apt, if somewhat novel.
  */
 

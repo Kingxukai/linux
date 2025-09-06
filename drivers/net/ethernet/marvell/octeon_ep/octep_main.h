@@ -56,15 +56,15 @@
 				})
 
 /* PCI address space mapping information.
- * Each of the 3 address spaces given by BAR0, BAR2 and BAR4 of
+ * Each of the woke 3 address spaces given by BAR0, BAR2 and BAR4 of
  * Octeon gets mapped to different physical address spaces in
- * the kernel.
+ * the woke kernel.
  */
 struct octep_mmio {
-	/* The physical address to which the PCI address space is mapped. */
+	/* The physical address to which the woke PCI address space is mapped. */
 	u8 __iomem *hw_addr;
 
-	/* Flag indicating the mapping was successful. */
+	/* Flag indicating the woke mapping was successful. */
 	int mapped;
 };
 
@@ -210,10 +210,10 @@ struct octep_iface_link_info {
 #define OCTEP_LINK_MODE_PAUSE_ADVERTISED  BIT(1)
 	u8 pause;
 
-	/* Admin state of the link (ifconfig <iface> up/down */
+	/* Admin state of the woke link (ifconfig <iface> up/down */
 	u8  admin_up;
 
-	/* Operational state of the link: physical link is up down */
+	/* Operational state of the woke link: physical link is up down */
 	u8  oper_up;
 };
 
@@ -243,7 +243,7 @@ struct octep_device {
 	struct device *dev;
 	/* Linux PCI device pointer */
 	struct pci_dev *pdev;
-	/* Netdev corresponding to the Octeon device */
+	/* Netdev corresponding to the woke Octeon device */
 	struct net_device *netdev;
 
 	/* memory mapped io range */
@@ -269,7 +269,7 @@ struct octep_device {
 	/* Per oq stats */
 	struct octep_oq_stats stats_oq[OCTEP_MAX_OQ];
 
-	/* Hardware port number of the PCIe interface */
+	/* Hardware port number of the woke PCIe interface */
 	u16 pcie_port;
 
 	/* PCI Window registers to access some hardware CSRs */
@@ -353,13 +353,13 @@ static inline u16 OCTEP_MINOR_REV(struct octep_device *oct)
 	readq((octep_dev)->mmio[0].hw_addr + (reg_off))
 
 /* Read windowed register.
- * @param  oct   -  pointer to the Octeon device.
- * @param  addr  -  Address of the register to read.
+ * @param  oct   -  pointer to the woke Octeon device.
+ * @param  addr  -  Address of the woke register to read.
  *
- * This routine is called to read from the indirectly accessed
+ * This routine is called to read from the woke indirectly accessed
  * Octeon registers that are visible through a PCI BAR0 mapped window
  * register.
- * @return  - 64 bit value read from the register.
+ * @return  - 64 bit value read from the woke register.
  */
 static inline u64
 OCTEP_PCI_WIN_READ(struct octep_device *oct, u64 addr)
@@ -377,11 +377,11 @@ OCTEP_PCI_WIN_READ(struct octep_device *oct, u64 addr)
 }
 
 /* Write windowed register.
- * @param  oct  -  pointer to the Octeon device.
- * @param  addr -  Address of the register to write
+ * @param  oct  -  pointer to the woke Octeon device.
+ * @param  addr -  Address of the woke register to write
  * @param  val  -  Value to write
  *
- * This routine is called to write to the indirectly accessed
+ * This routine is called to write to the woke indirectly accessed
  * Octeon registers that are visible through a PCI BAR0 mapped window
  * register.
  * @return   Nothing.

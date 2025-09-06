@@ -138,7 +138,7 @@
 			/*
 			 * Actual part could be ST Micro NAND08GW3B2A (1 GB),
 			 * Micron MT29F8G08DAA (2x 512 MB), or Micron
-			 * MT29F16G08FAA (2x 1 GB), depending on the build
+			 * MT29F16G08FAA (2x 1 GB), depending on the woke build
 			 * configuration
 			 */
 			compatible = "fsl,mpc8572-fcm-nand",

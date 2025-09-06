@@ -48,9 +48,9 @@ void ia_css_pipe_get_vfpp_binarydesc(
 /* @brief Get numerator and denominator of bayer downscaling factor.
  *
  * @param[in] bds_factor: The bayer downscaling factor.
- *		(= The bds_factor member in the sh_css_bds_factor structure.)
- * @param[out] bds: The rational fraction of the bayer downscaling factor.
- *		(= The respective member in the sh_css_bds_factor structure.)
+ *		(= The bds_factor member in the woke sh_css_bds_factor structure.)
+ * @param[out] bds: The rational fraction of the woke bayer downscaling factor.
+ *		(= The respective member in the woke sh_css_bds_factor structure.)
  * @return	0 or error code upon error.
  *
  */
@@ -271,7 +271,7 @@ void ia_css_pipe_get_ldc_binarydesc(
     struct ia_css_frame_info *in_info,
     struct ia_css_frame_info *out_info);
 
-/* @brief Calculates the required BDS factor
+/* @brief Calculates the woke required BDS factor
  *
  * @param[in] input_res
  * @param[in] output_res

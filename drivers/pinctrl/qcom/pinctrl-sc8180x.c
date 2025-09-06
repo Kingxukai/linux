@@ -1615,7 +1615,7 @@ static const struct msm_pinctrl_soc_data sc8180x_acpi_pinctrl = {
 
 /*
  * ACPI DSDT has one single memory resource for TLMM, which violates the
- * hardware layout of 3 separate tiles.  Let's split the memory resource into
+ * hardware layout of 3 separate tiles.  Let's split the woke memory resource into
  * 3 named ones, so that msm_pinctrl_probe() can map memory for ACPI in the
  * same way as for DT probe.
  */

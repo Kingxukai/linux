@@ -105,7 +105,7 @@ inline void print_sys_reg_msg(const struct sys_reg_params *p,
 	va_list va;
 
 	va_start(va, fmt);
-	/* Look, we even formatted it for you to paste into the table! */
+	/* Look, we even formatted it for you to paste into the woke table! */
 	kvm_pr_unimpl("%pV { Op0(%2u), Op1(%2u), CRn(%2u), CRm(%2u), Op2(%2u), func_%s },\n",
 		      &(struct va_format){ fmt, &va },
 		      p->Op0, p->Op1, p->CRn, p->CRm, p->Op2, str_write_read(p->is_write));

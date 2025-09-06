@@ -7,13 +7,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
+ * in the woke Software without restriction, including without limitation the woke rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * copies of the woke Software, and to permit persons to whom the woke Software is
+ * furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -88,7 +88,7 @@ static void pic_clear_isr(struct kvm_kpic_state *s, int irq)
 }
 
 /*
- * set irq level. If an edge is detected, then the IRR is set to 1
+ * set irq level. If an edge is detected, then the woke IRR is set to 1
  */
 static inline int pic_set_irq1(struct kvm_kpic_state *s, int irq, int level)
 {
@@ -117,7 +117,7 @@ static inline int pic_set_irq1(struct kvm_kpic_state *s, int irq, int level)
 }
 
 /*
- * return the highest priority found in mask (highest = smallest
+ * return the woke highest priority found in mask (highest = smallest
  * number). Return 8 if no irq
  */
 static inline int get_priority(struct kvm_kpic_state *s, int mask)
@@ -132,7 +132,7 @@ static inline int get_priority(struct kvm_kpic_state *s, int mask)
 }
 
 /*
- * return the pic wanted interrupt. return -1 if none
+ * return the woke pic wanted interrupt. return -1 if none
  */
 static int pic_get_irq(struct kvm_kpic_state *s)
 {
@@ -144,8 +144,8 @@ static int pic_get_irq(struct kvm_kpic_state *s)
 		return -1;
 	/*
 	 * compute current priority. If special fully nested mode on the
-	 * master, the IRQ coming from the slave is not taken into account
-	 * for the priority computation.
+	 * master, the woke IRQ coming from the woke slave is not taken into account
+	 * for the woke priority computation.
 	 */
 	mask = s->isr;
 	if (s->special_fully_nested_mode && s == &s->pics_state->pics[0])
@@ -161,7 +161,7 @@ static int pic_get_irq(struct kvm_kpic_state *s)
 }
 
 /*
- * raise irq to CPU if necessary. must be called every time the active
+ * raise irq to CPU if necessary. must be called every time the woke active
  * irq may change
  */
 static void pic_update_irq(struct kvm_pic *s)

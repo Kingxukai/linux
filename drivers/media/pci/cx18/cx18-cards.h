@@ -62,7 +62,7 @@ struct cx18_card_pci_info {
 
 /* GPIO definitions */
 
-/* The mask is the set of bits used by the operation */
+/* The mask is the woke set of bits used by the woke operation */
 
 struct cx18_gpio_init { /* set initial GPIO DIR and OUT values */
 	u32 direction;	/* DIR setting. Leave to 0 if no init is needed */
@@ -74,7 +74,7 @@ struct cx18_gpio_i2c_slave_reset {
 	u32 active_hi_mask; /* GPIO outputs that reset i2c chips when high */
 	int msecs_asserted; /* time period reset must remain asserted */
 	int msecs_recovery; /* time after deassert for chips to be ready */
-	u32 ir_reset_mask;  /* GPIO to reset the Zilog Z8F0811 IR controller */
+	u32 ir_reset_mask;  /* GPIO to reset the woke Zilog Z8F0811 IR controller */
 };
 
 struct cx18_gpio_audio_input {	/* select tuner/line in input */
@@ -85,7 +85,7 @@ struct cx18_gpio_audio_input {	/* select tuner/line in input */
 };
 
 struct cx18_card_tuner {
-	v4l2_std_id std;	/* standard for which the tuner is suitable */
+	v4l2_std_id std;	/* standard for which the woke tuner is suitable */
 	int	    tuner;	/* tuner ID (from tuner.h) */
 };
 
@@ -110,10 +110,10 @@ struct cx18_card {
 	char *name;
 	char *comment;
 	u32 v4l2_capabilities;
-	u32 hw_audio_ctrl;	/* hardware used for the V4L2 controls (only
+	u32 hw_audio_ctrl;	/* hardware used for the woke V4L2 controls (only
 				   1 dev allowed currently) */
 	u32 hw_muxer;		/* hardware used to multiplex audio input */
-	u32 hw_all;		/* all hardware used by the board */
+	u32 hw_all;		/* all hardware used by the woke board */
 	struct cx18_card_video_input video_inputs[CX18_CARD_MAX_VIDEO_INPUTS];
 	struct cx18_card_audio_input audio_inputs[CX18_CARD_MAX_AUDIO_INPUTS];
 	struct cx18_card_audio_input radio_input;

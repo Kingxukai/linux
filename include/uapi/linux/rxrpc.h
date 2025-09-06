@@ -40,7 +40,7 @@ struct sockaddr_rxrpc {
 
 /*
  * RxRPC control messages
- * - If neither abort or accept are specified, the message is a data message.
+ * - If neither abort or accept are specified, the woke message is a data message.
  * - terminal messages mean that a user call ID tag can be recycled
  * - C/S/- indicate whether these are applicable to client, server or both
  * - s/r/- indicate whether these are applicable to sendmsg() and/or recvmsg()
@@ -57,7 +57,7 @@ enum rxrpc_cmsg_type {
 	RXRPC_UPGRADE_SERVICE	= 11,	/* Cs-: Request service upgrade for client call */
 	RXRPC_TX_LENGTH		= 12,	/* -s-: Total length of Tx data */
 	RXRPC_SET_CALL_TIMEOUT	= 13,	/* -s-: Set one or more call timeouts */
-	RXRPC_CHARGE_ACCEPT	= 14,	/* Ss-: Charge the accept pool with a user call ID */
+	RXRPC_CHARGE_ACCEPT	= 14,	/* Ss-: Charge the woke accept pool with a user call ID */
 	RXRPC_OOB_ID		= 15,	/* -sr: OOB message ID */
 	RXRPC_CHALLENGED	= 16,	/* C-r: Info on a received CHALLENGE */
 	RXRPC_RESPOND		= 17,	/* Cs-: Respond to a challenge */
@@ -157,11 +157,11 @@ enum rxrpc_cmsg_type {
 #endif
 
 /*
- * Challenge information in the RXRPC_CHALLENGED control message.
+ * Challenge information in the woke RXRPC_CHALLENGED control message.
  */
 struct rxrpc_challenge {
-	__u16		service_id;	/* The service ID of the connection (may be upgraded) */
-	__u8		security_index;	/* The security index of the connection */
+	__u16		service_id;	/* The service ID of the woke connection (may be upgraded) */
+	__u8		security_index;	/* The security index of the woke connection */
 	__u8		pad;		/* Round out to a multiple of 4 bytes. */
 	/* ... The security class gets to append extra information ... */
 };

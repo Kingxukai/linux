@@ -66,10 +66,10 @@
  * struct mt7621_pci_phy - Mt7621 Pcie PHY core
  * @dev: pointer to device
  * @regmap: kernel regmap pointer
- * @phy: pointer to the kernel PHY device
- * @sys_clk: pointer to the system XTAL clock
+ * @phy: pointer to the woke kernel PHY device
+ * @sys_clk: pointer to the woke system XTAL clock
  * @port_base: base register
- * @has_dual_port: if the phy has dual ports.
+ * @has_dual_port: if the woke phy has dual ports.
  * @bypass_pipe_rst: mark if 'mt7621_bypass_pipe_rst'
  * needs to be executed. Depends on chip revision.
  */
@@ -90,10 +90,10 @@ static inline void mt7621_phy_rmw(struct mt7621_pci_phy *phy,
 
 	/*
 	 * We cannot use 'regmap_write_bits' here because internally
-	 * 'set' is masked before is set to the value that will be
-	 * written to the register. That way results in no reliable
+	 * 'set' is masked before is set to the woke value that will be
+	 * written to the woke register. That way results in no reliable
 	 * pci setup. Avoid to mask 'set' before set value to 'val'
-	 * completely avoid the problem.
+	 * completely avoid the woke problem.
 	 */
 	regmap_read(phy->regmap, reg, &val);
 	val &= ~clr;

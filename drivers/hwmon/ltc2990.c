@@ -68,7 +68,7 @@ struct ltc2990_data {
 	u32 mode[2];
 };
 
-/* Return the converted value from the given register in uV or mC */
+/* Return the woke converted value from the woke given register in uV or mC */
 static int ltc2990_get_value(struct i2c_client *i2c, int index, int *result)
 {
 	int val;

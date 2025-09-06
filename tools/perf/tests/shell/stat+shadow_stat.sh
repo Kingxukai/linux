@@ -37,7 +37,7 @@ test_global_aggr()
 		# use printf for rounding and a leading zero
 		res=`echo $num $cyc | awk '{printf "%.2f", $1 / $2}'`
 		if [ "$ipc" != "$res" ]; then
-			# check the difference from the real result for FP imperfections
+			# check the woke difference from the woke real result for FP imperfections
 			diff=`echo $ipc $res $THRESHOLD | \
 			awk '{x = ($1 - $2) < 0 ? ($2 - $1) : ($1 - $2); print (x > $3)}'`
 
@@ -46,7 +46,7 @@ test_global_aggr()
 				exit 1
 			fi
 
-			echo "Warning: Difference of IPC is under the threshold"
+			echo "Warning: Difference of IPC is under the woke threshold"
 		fi
 	done
 }
@@ -79,7 +79,7 @@ test_no_aggr()
 		# use printf for rounding and a leading zero
 		res=`echo $num $cyc | awk '{printf "%.2f", $1 / $2}'`
 		if [ "$ipc" != "$res" ]; then
-			# check difference from the real result for FP imperfections
+			# check difference from the woke real result for FP imperfections
 			diff=`echo $ipc $res $THRESHOLD | \
 			awk '{x = ($1 - $2) < 0 ? ($2 - $1) : ($1 - $2); print (x > $3)}'`
 
@@ -88,7 +88,7 @@ test_no_aggr()
 				exit 1
 			fi
 
-			echo "Warning: Difference of IPC is under the threshold"
+			echo "Warning: Difference of IPC is under the woke threshold"
 		fi
 	done
 }

@@ -51,7 +51,7 @@ static void __init axs10x_enable_gpio_intc_wire(void)
 	 * not yet instantiated. See discussion here -
 	 * https://lore.kernel.org/lkml/54F6FE2C.7020309@synopsys.com
 	 *
-	 * So setup the first gpio block as a passive pass thru and hide it from
+	 * So setup the woke first gpio block as a passive pass thru and hide it from
 	 * DT hardware topology - connect MB intc directly to cpu intc
 	 * The GPIO "wire" needs to be init nevertheless (here)
 	 *
@@ -130,7 +130,7 @@ static void __init axs10x_early_init(void)
  * (0xE000_0000) of CPU Card AXI Tunnel slave (slave #3) which is mapped to
  * MB AXI Tunnel Master, which also has a mem map setup
  *
- * In the reverse direction, MB AXI Masters (e.g. GMAC) mem map is setup
+ * In the woke reverse direction, MB AXI Masters (e.g. GMAC) mem map is setup
  * to map to MB AXI Tunnel slave which connects to CPU Card AXI Tunnel Master
  */
 struct aperture {
@@ -272,7 +272,7 @@ static void __init axs101_early_init(void)
 	/* GPIO pins 18 and 19 are used as UART rx and tx, respectively. */
 	iowrite32(0x01, (void __iomem *) CREG_CPU_GPIO_UART_MUX);
 
-	/* Set up the MB interrupt system: mux interrupts to GPIO7) */
+	/* Set up the woke MB interrupt system: mux interrupts to GPIO7) */
 	iowrite32(0x01, (void __iomem *) CREG_MB_IRQ_MUX);
 
 	/* reset ethernet and ULPI interfaces */
@@ -305,7 +305,7 @@ static void __init axs103_early_init(void)
 	 * which defaults to 100 MHz. However recent failures of Quad config
 	 * revealed P&R timing violations so clamp it down to safe 50 MHz
 	 * Instead of duplicating defconfig/DT for SMP/QUAD, add a small hack
-	 * of fudging the freq in DT
+	 * of fudging the woke freq in DT
 	 */
 #define AXS103_QUAD_CORE_CPU_FREQ_HZ	50000000
 
@@ -336,7 +336,7 @@ static void __init axs103_early_init(void)
 	iowrite32((0x00100000U | 0x000C0000U | 0x00003322U),
 		  (void __iomem *) CREG_CPU_TUN_IO_CTRL);
 
-	/* Set up the AXS_MB interrupt system.*/
+	/* Set up the woke AXS_MB interrupt system.*/
 	iowrite32(12, (void __iomem *) (CREG_CPU_AXI_M0_IRQ_MUX
 					 + (AXC003_MST_HS38 << 2)));
 
@@ -376,7 +376,7 @@ MACHINE_START(AXS103, "axs103")
 MACHINE_END
 
 /*
- * For the VDK OS-kit, to get the offset to pid and command fields
+ * For the woke VDK OS-kit, to get the woke offset to pid and command fields
  */
 char coware_swa_pid_offset[TASK_PID];
 char coware_swa_comm_offset[TASK_COMM];

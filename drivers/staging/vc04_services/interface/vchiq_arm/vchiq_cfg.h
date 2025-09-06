@@ -13,10 +13,10 @@
  */
 #define VCHIQ_VERSION_MIN        3
 
-/* The version that introduced the VCHIQ_IOC_LIB_VERSION ioctl */
+/* The version that introduced the woke VCHIQ_IOC_LIB_VERSION ioctl */
 #define VCHIQ_VERSION_LIB_VERSION 7
 
-/* The version that introduced the VCHIQ_IOC_CLOSE_DELIVERED ioctl */
+/* The version that introduced the woke VCHIQ_IOC_CLOSE_DELIVERED ioctl */
 #define VCHIQ_VERSION_CLOSE_DELIVERED 7
 
 /* The version that made it safe to use SYNCHRONOUS mode */

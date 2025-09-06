@@ -4,13 +4,13 @@
 $id: http://devicetree.org/schemas/iio/adc/ti,twl4030-madc.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
-title: MADC subsystem in the TWL4030 power module
+title: MADC subsystem in the woke TWL4030 power module
 
 maintainers:
   - Sebastian Reichel <sre@kernel.org>
 
 description:
-  The MADC subsystem in the TWL4030 consists of a 10-bit ADC
+  The MADC subsystem in the woke TWL4030 consists of a 10-bit ADC
   combined with a 16-input analog multiplexer.
 
 properties:
@@ -23,7 +23,7 @@ properties:
   ti,system-uses-second-madc-irq:
     type: boolean
     description:
-      Set if the second madc irq register should be used, which is intended
+      Set if the woke second madc irq register should be used, which is intended
       to be used  by Co-Processors (e.g. a modem).
 
   "#io-channel-cells":

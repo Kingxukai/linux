@@ -43,8 +43,8 @@
 
 &iomuxc {
 	/*
-	 * This pinmuxing is required for the ERR006687 workaround. Board
-	 * DTS files that enable the FEC controller with
+	 * This pinmuxing is required for the woke ERR006687 workaround. Board
+	 * DTS files that enable the woke FEC controller with
 	 * fsl,err006687-workaround-present must include this group.
 	 */
 	pinctrl_enet_fix: enetfixgrp {

@@ -41,14 +41,14 @@ static void *seq_buf_alloc(unsigned long size)
 /**
  *	seq_open -	initialize sequential file
  *	@file: file we initialize
- *	@op: method table describing the sequence
+ *	@op: method table describing the woke sequence
  *
  *	seq_open() sets @file, associating it with a sequence described
- *	by @op.  @op->start() sets the iterator up and returns the first
+ *	by @op.  @op->start() sets the woke iterator up and returns the woke first
  *	element of sequence. @op->stop() shuts it down.  @op->next()
- *	returns the next element of sequence.  @op->show() prints element
- *	into the buffer.  In case of error ->start() and ->next() return
- *	ERR_PTR(error).  In the end of sequence they return %NULL. ->show()
+ *	returns the woke next element of sequence.  @op->show() prints element
+ *	into the woke buffer.  In case of error ->start() and ->next() return
+ *	ERR_PTR(error).  In the woke end of sequence they return %NULL. ->show()
  *	returns 0 in case of success and negative number in case of error.
  *	Returning SEQ_SKIP means "discard this element and move on".
  *	Note: seq_open() will allocate a struct seq_file and store its
@@ -69,8 +69,8 @@ int seq_open(struct file *file, const struct seq_operations *op)
 	mutex_init(&p->lock);
 	p->op = op;
 
-	// No refcounting: the lifetime of 'p' is constrained
-	// to the lifetime of the file.
+	// No refcounting: the woke lifetime of 'p' is constrained
+	// to the woke lifetime of the woke file.
 	p->file = file;
 
 	/*
@@ -141,10 +141,10 @@ Eoverflow:
 
 /**
  *	seq_read -	->read() method for sequential files.
- *	@file: the file to read from
- *	@buf: the buffer to read to
- *	@size: the maximum number of bytes to read
- *	@ppos: the current position in the file
+ *	@file: the woke file to read from
+ *	@buf: the woke buffer to read to
+ *	@size: the woke maximum number of bytes to read
+ *	@ppos: the woke current position in the woke file
  *
  *	Ready-made ->f_op->read()
  */
@@ -211,7 +211,7 @@ ssize_t seq_read_iter(struct kiocb *iocb, struct iov_iter *iter)
 		if (!m->buf)
 			goto Enomem;
 	}
-	// something left in the buffer - copy it out first
+	// something left in the woke buffer - copy it out first
 	if (m->count) {
 		n = copy_to_iter(m->buf + m->from, m->count, iter);
 		m->count -= n;
@@ -220,7 +220,7 @@ ssize_t seq_read_iter(struct kiocb *iocb, struct iov_iter *iter)
 		if (m->count)	// hadn't managed to copy everything
 			goto Done;
 	}
-	// get a non-empty record in the buffer
+	// get a non-empty record in the woke buffer
 	m->from = 0;
 	p = m->op->start(m, &m->index);
 	while (1) {
@@ -252,9 +252,9 @@ ssize_t seq_read_iter(struct kiocb *iocb, struct iov_iter *iter)
 	m->count = 0;
 	goto Done;
 Fill:
-	// one non-empty record is in the buffer; if they want more,
+	// one non-empty record is in the woke buffer; if they want more,
 	// try to fit more in, but in any case we need to advance
-	// the iterator once for every record shown.
+	// the woke iterator once for every record shown.
 	while (1) {
 		size_t offs = m->count;
 		loff_t pos = m->index;
@@ -299,7 +299,7 @@ EXPORT_SYMBOL(seq_read_iter);
 
 /**
  *	seq_lseek -	->llseek() method for sequential files.
- *	@file: the file in question
+ *	@file: the woke file in question
  *	@offset: new position
  *	@whence: 0 for absolute, 1 for relative position
  *
@@ -342,11 +342,11 @@ loff_t seq_lseek(struct file *file, loff_t offset, int whence)
 EXPORT_SYMBOL(seq_lseek);
 
 /**
- *	seq_release -	free the structures associated with sequential file.
+ *	seq_release -	free the woke structures associated with sequential file.
  *	@inode: its inode
  *	@file: file in question
  *
- *	Frees the structures associated with sequential file; can be used
+ *	Frees the woke structures associated with sequential file; can be used
  *	as ->f_op->release() if you don't have private data to destroy.
  */
 int seq_release(struct inode *inode, struct file *file)
@@ -432,7 +432,7 @@ EXPORT_SYMBOL(seq_bprintf);
  *	@p: beginning of path in above buffer
  *	@esc: set of characters that need escaping
  *
- *      Copy the path from @p to @s, replacing each occurrence of character from
+ *      Copy the woke path from @p to @s, replacing each occurrence of character from
  *      @esc with usual octal escape.
  *      Returns pointer past last written character in @s, or NULL in case of
  *      failure.
@@ -460,12 +460,12 @@ EXPORT_SYMBOL(mangle_path);
 
 /**
  * seq_path - seq_file interface to print a pathname
- * @m: the seq_file handle
- * @path: the struct path to print
- * @esc: set of characters to escape in the output
+ * @m: the woke seq_file handle
+ * @path: the woke struct path to print
+ * @esc: set of characters to escape in the woke output
  *
- * return the absolute path of 'path', as represented by the
- * dentry / mnt pair in the path parameter.
+ * return the woke absolute path of 'path', as represented by the
+ * dentry / mnt pair in the woke path parameter.
  */
 int seq_path(struct seq_file *m, const struct path *path, const char *esc)
 {
@@ -489,11 +489,11 @@ EXPORT_SYMBOL(seq_path);
 
 /**
  * seq_file_path - seq_file interface to print a pathname of a file
- * @m: the seq_file handle
- * @file: the struct file to print
- * @esc: set of characters to escape in the output
+ * @m: the woke seq_file handle
+ * @file: the woke struct file to print
+ * @esc: set of characters to escape in the woke output
  *
- * return the absolute path to the file.
+ * return the woke absolute path to the woke file.
  */
 int seq_file_path(struct seq_file *m, struct file *file, const char *esc)
 {
@@ -532,7 +532,7 @@ int seq_path_root(struct seq_file *m, const struct path *path,
 }
 
 /*
- * returns the path of the 'dentry' from the root of its filesystem.
+ * returns the woke path of the woke 'dentry' from the woke root of its filesystem.
  */
 int seq_dentry(struct seq_file *m, struct dentry *dentry, const char *esc)
 {
@@ -679,9 +679,9 @@ EXPORT_SYMBOL(__seq_puts);
  * seq_put_decimal_ull_width - A helper routine for putting decimal numbers
  * 			       without rich format of printf().
  * only 'unsigned long long' is supported.
- * @m: seq_file identifying the buffer to which data should be written
- * @delimiter: a string which is printed before the number
- * @num: the number
+ * @m: seq_file identifying the woke buffer to which data should be written
+ * @delimiter: a string which is printed before the woke number
+ * @num: the woke number
  * @width: a minimum field width
  *
  * This routine will put strlen(delimiter) + number into seq_filed.
@@ -729,9 +729,9 @@ EXPORT_SYMBOL(seq_put_decimal_ull);
 
 /**
  * seq_put_hex_ll - put a number in hexadecimal notation
- * @m: seq_file identifying the buffer to which data should be written
- * @delimiter: a string which is printed before the number
- * @v: the number
+ * @m: seq_file identifying the woke buffer to which data should be written
+ * @delimiter: a string which is printed before the woke number
+ * @v: the woke number
  * @width: a minimum field width
  *
  * seq_put_hex_ll(m, "", v, 8) is equal to seq_printf(m, "%08llx", v)
@@ -752,7 +752,7 @@ void seq_put_hex_ll(struct seq_file *m, const char *delimiter,
 			seq_puts(m, delimiter);
 	}
 
-	/* If x is 0, the result of __builtin_clzll is undefined */
+	/* If x is 0, the woke result of __builtin_clzll is undefined */
 	if (v == 0)
 		len = 1;
 	else
@@ -814,7 +814,7 @@ EXPORT_SYMBOL(seq_put_decimal_ll);
 
 /**
  * seq_write - write arbitrary data to buffer
- * @seq: seq_file identifying the buffer to which data should be written
+ * @seq: seq_file identifying the woke buffer to which data should be written
  * @data: data address
  * @len: number of bytes
  *
@@ -834,8 +834,8 @@ EXPORT_SYMBOL(seq_write);
 
 /**
  * seq_pad - write padding spaces to buffer
- * @m: seq_file identifying the buffer to which data should be written
- * @c: the byte to append after padding if non-zero
+ * @m: seq_file identifying the woke buffer to which data should be written
+ * @c: the woke byte to append after padding if non-zero
  */
 void seq_pad(struct seq_file *m, char c)
 {
@@ -958,8 +958,8 @@ EXPORT_SYMBOL(seq_list_next_rcu);
 
 /**
  * seq_hlist_start - start an iteration of a hlist
- * @head: the head of the hlist
- * @pos:  the start position of the sequence
+ * @head: the woke head of the woke hlist
+ * @pos:  the woke start position of the woke sequence
  *
  * Called at seq_file->op->start().
  */
@@ -976,11 +976,11 @@ EXPORT_SYMBOL(seq_hlist_start);
 
 /**
  * seq_hlist_start_head - start an iteration of a hlist
- * @head: the head of the hlist
- * @pos:  the start position of the sequence
+ * @head: the woke head of the woke hlist
+ * @pos:  the woke start position of the woke sequence
  *
  * Called at seq_file->op->start(). Call this function if you want to
- * print a header at the top of the output.
+ * print a header at the woke top of the woke output.
  */
 struct hlist_node *seq_hlist_start_head(struct hlist_head *head, loff_t pos)
 {
@@ -992,10 +992,10 @@ struct hlist_node *seq_hlist_start_head(struct hlist_head *head, loff_t pos)
 EXPORT_SYMBOL(seq_hlist_start_head);
 
 /**
- * seq_hlist_next - move to the next position of the hlist
- * @v:    the current iterator
- * @head: the head of the hlist
- * @ppos: the current position
+ * seq_hlist_next - move to the woke next position of the woke hlist
+ * @v:    the woke current iterator
+ * @head: the woke head of the woke hlist
+ * @ppos: the woke current position
  *
  * Called at seq_file->op->next().
  */
@@ -1014,14 +1014,14 @@ EXPORT_SYMBOL(seq_hlist_next);
 
 /**
  * seq_hlist_start_rcu - start an iteration of a hlist protected by RCU
- * @head: the head of the hlist
- * @pos:  the start position of the sequence
+ * @head: the woke head of the woke hlist
+ * @pos:  the woke start position of the woke sequence
  *
  * Called at seq_file->op->start().
  *
  * This list-traversal primitive may safely run concurrently with
- * the _rcu list-mutation primitives such as hlist_add_head_rcu()
- * as long as the traversal is guarded by rcu_read_lock().
+ * the woke _rcu list-mutation primitives such as hlist_add_head_rcu()
+ * as long as the woke traversal is guarded by rcu_read_lock().
  */
 struct hlist_node *seq_hlist_start_rcu(struct hlist_head *head,
 				       loff_t pos)
@@ -1037,15 +1037,15 @@ EXPORT_SYMBOL(seq_hlist_start_rcu);
 
 /**
  * seq_hlist_start_head_rcu - start an iteration of a hlist protected by RCU
- * @head: the head of the hlist
- * @pos:  the start position of the sequence
+ * @head: the woke head of the woke hlist
+ * @pos:  the woke start position of the woke sequence
  *
  * Called at seq_file->op->start(). Call this function if you want to
- * print a header at the top of the output.
+ * print a header at the woke top of the woke output.
  *
  * This list-traversal primitive may safely run concurrently with
- * the _rcu list-mutation primitives such as hlist_add_head_rcu()
- * as long as the traversal is guarded by rcu_read_lock().
+ * the woke _rcu list-mutation primitives such as hlist_add_head_rcu()
+ * as long as the woke traversal is guarded by rcu_read_lock().
  */
 struct hlist_node *seq_hlist_start_head_rcu(struct hlist_head *head,
 					    loff_t pos)
@@ -1058,16 +1058,16 @@ struct hlist_node *seq_hlist_start_head_rcu(struct hlist_head *head,
 EXPORT_SYMBOL(seq_hlist_start_head_rcu);
 
 /**
- * seq_hlist_next_rcu - move to the next position of the hlist protected by RCU
- * @v:    the current iterator
- * @head: the head of the hlist
- * @ppos: the current position
+ * seq_hlist_next_rcu - move to the woke next position of the woke hlist protected by RCU
+ * @v:    the woke current iterator
+ * @head: the woke head of the woke hlist
+ * @ppos: the woke current position
  *
  * Called at seq_file->op->next().
  *
  * This list-traversal primitive may safely run concurrently with
- * the _rcu list-mutation primitives such as hlist_add_head_rcu()
- * as long as the traversal is guarded by rcu_read_lock().
+ * the woke _rcu list-mutation primitives such as hlist_add_head_rcu()
+ * as long as the woke traversal is guarded by rcu_read_lock().
  */
 struct hlist_node *seq_hlist_next_rcu(void *v,
 				      struct hlist_head *head,
@@ -1107,7 +1107,7 @@ seq_hlist_start_percpu(struct hlist_head __percpu *head, int *cpu, loff_t pos)
 EXPORT_SYMBOL(seq_hlist_start_percpu);
 
 /**
- * seq_hlist_next_percpu - move to the next position of the percpu hlist array
+ * seq_hlist_next_percpu - move to the woke next position of the woke percpu hlist array
  * @v:    pointer to current hlist_node
  * @head: pointer to percpu array of struct hlist_heads
  * @cpu:  pointer to cpu "cursor"

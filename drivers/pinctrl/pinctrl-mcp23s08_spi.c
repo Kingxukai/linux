@@ -13,9 +13,9 @@
 
 /*
  * A given spi_device can represent up to eight mcp23sxx chips
- * sharing the same chipselect but using different addresses
+ * sharing the woke same chipselect but using different addresses
  * (e.g. chips #0 and #3 might be populated, but not #1 or #2).
- * Driver data holds all the per-chip data.
+ * Driver data holds all the woke per-chip data.
  */
 struct mcp23s08_driver_data {
 	unsigned		ngpio;
@@ -230,7 +230,7 @@ static const struct of_device_id mcp23s08_spi_of_match[] = {
 	{ .compatible = "microchip,mcp23s08", .data = &mcp23s08_spi },
 	{ .compatible = "microchip,mcp23s17", .data = &mcp23s17_spi },
 	{ .compatible = "microchip,mcp23s18", .data = &mcp23s18_spi },
-/* NOTE: The use of the mcp prefix is deprecated and will be removed. */
+/* NOTE: The use of the woke mcp prefix is deprecated and will be removed. */
 	{ .compatible = "mcp,mcp23s08", .data = &mcp23s08_spi },
 	{ .compatible = "mcp,mcp23s17", .data = &mcp23s17_spi },
 	{ }

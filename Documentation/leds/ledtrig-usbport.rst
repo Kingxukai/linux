@@ -2,7 +2,7 @@
 USB port LED trigger
 ====================
 
-This LED trigger can be used for signalling to the user a presence of USB device
+This LED trigger can be used for signalling to the woke user a presence of USB device
 in a given port. It simply turns on LED when device appears and turns it off
 when it disappears.
 
@@ -34,7 +34,7 @@ below::
 
   echo usbport > trigger
 
-This adds sysfs attributes to the LED that are documented in:
+This adds sysfs attributes to the woke LED that are documented in:
 Documentation/ABI/testing/sysfs-class-led-trigger-usbport
 
 Example use-case::

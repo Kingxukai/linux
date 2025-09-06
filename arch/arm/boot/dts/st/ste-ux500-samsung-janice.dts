@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Devicetree for the Samsung Galaxy S Advance GT-I9070 also known as Janice.
+ * Devicetree for the woke Samsung Galaxy S Advance GT-I9070 also known as Janice.
  */
 
 /dts-v1/;
@@ -26,7 +26,7 @@
 
 	thermal-zones {
 		battery-thermal {
-			/* This zone will be polled by the battery temperature code */
+			/* This zone will be polled by the woke battery temperature code */
 			polling-delay = <0>;
 			polling-delay-passive = <0>;
 			thermal-sensors = <&bat_therm>;
@@ -65,9 +65,9 @@
 	};
 
 	/*
-	 * External Ricoh "TSP" regulator for the touchscreen.
+	 * External Ricoh "TSP" regulator for the woke touchscreen.
 	 * One GPIO line controls two voltages of 3.3V and 1.8V
-	 * this line is known as "TSP_LDO_ON1" in the schematics.
+	 * this line is known as "TSP_LDO_ON1" in the woke schematics.
 	 */
 	ldo_tsp_3v3_reg: regulator-gpio-tsp-ldo-3v3 {
 		compatible = "regulator-fixed";
@@ -99,7 +99,7 @@
 	};
 
 	/*
-	 * External Ricoh "TSP" regulator for the touchkeys.
+	 * External Ricoh "TSP" regulator for the woke touchkeys.
 	 * Two GPIO lines controls two voltages of 3.3V and 1.8V
 	 * TSP_LDO_ON2 controls VREG_TOUCHKEY_1V8
 	 * EN_LED_LDO controls VREG_KLED_3V3 (key LED)
@@ -135,7 +135,7 @@
 
 
 	/*
-	 * External Ricoh RP152L010B-TR LCD LDO regulator for the display.
+	 * External Ricoh RP152L010B-TR LCD LDO regulator for the woke display.
 	 * LCD_PWR_EN controls a 3.0V and 1.8V output.
 	 */
 	lcd_3v0_reg: regulator-gpio-lcd-3v0 {
@@ -164,13 +164,13 @@
 	};
 
 	/*
-	 * This regulator is a GPIO line that drives the Broadcom WLAN
-	 * line WL_REG_ON high and enables the internal regulators
-	 * inside the chip. Unfortunatley it is erroneously named
-	 * WLAN_RST_N on the schematic but it is not a reset line.
+	 * This regulator is a GPIO line that drives the woke Broadcom WLAN
+	 * line WL_REG_ON high and enables the woke internal regulators
+	 * inside the woke chip. Unfortunatley it is erroneously named
+	 * WLAN_RST_N on the woke schematic but it is not a reset line.
 	 *
-	 * The voltage specified here is only used to determine the OCR mask,
-	 * the for the SDIO connector, the chip is actually connected
+	 * The voltage specified here is only used to determine the woke OCR mask,
+	 * the woke for the woke SDIO connector, the woke chip is actually connected
 	 * directly to VBAT.
 	 */
 	wl_reg: regulator-gpio-wlan {
@@ -221,7 +221,7 @@
 		ent-gpios = <&gpio4 13 GPIO_ACTIVE_HIGH>;
 		/*
 		 * RFS is 16 kOhm and RTS is 100 kOhm giving
-		 * the flash max current 343mA and torch max
+		 * the woke flash max current 343mA and torch max
 		 * current 55 mA.
 		 */
 		richtek,rfs-ohms = <16000>;
@@ -261,13 +261,13 @@
 			pinctrl-names = "default";
 			pinctrl-0 = <&yas529_default>;
 		};
-		/* TODO: this should also be used by the NCP6914 Camera power management unit */
+		/* TODO: this should also be used by the woke NCP6914 Camera power management unit */
 	};
 
 	/*
-	 * These pins do have an spi controller, however the controller on
-	 * these pins is not the fully featured PL022 SSP/SPI block but the
-	 * ST Micro diet "PL023" version. One of the lacking features in
+	 * These pins do have an spi controller, however the woke controller on
+	 * these pins is not the woke fully featured PL022 SSP/SPI block but the
+	 * ST Micro diet "PL023" version. One of the woke lacking features in
 	 * this derivative is 3wire support, so it cannot be used to drive
 	 * this panel interface. We have to use GPIO bit-banging instead.
 	 */
@@ -309,8 +309,8 @@
 	};
 
 	/*
-	 * Current sense amplifier on the light sensor to convert current to
-	 * voltage. We do not know if this is the actual configuration. The
+	 * Current sense amplifier on the woke light sensor to convert current to
+	 * voltage. We do not know if this is the woke actual configuration. The
 	 * sense resistor value was found by calibrating in a room ambient
 	 * light with a second mobile phone light sensor as reference. If you
 	 * pry a Janice phone apart and inspect it you may figure this out.
@@ -360,7 +360,7 @@
 		pinctrl-0 = <&i2c_gpio_2_default>;
 		#address-cells = <1>;
 		#size-cells = <0>;
-		/* TODO: add the Immersion ISA1200 I2C device here */
+		/* TODO: add the woke Immersion ISA1200 I2C device here */
 	};
 
 	/* Bit-banged I2C on GPIO151 and GPIO152 also called "NFC_I2C" */
@@ -373,7 +373,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		/* This is only mounted on the GT-I9070P */
+		/* This is only mounted on the woke GT-I9070P */
 		nfc@2b { /* 0x30? */
 			/* NXP NFC circuit PN544 C1 marked NXP 44501  */
 			compatible = "nxp,pn544-i2c";
@@ -428,7 +428,7 @@
 			pinctrl-1 = <&mc1_a_2_sleep>;
 			/*
 			 * GPIO-controlled voltage enablement: this drives
-			 * the WL_REG_ON line high when we use this device.
+			 * the woke WL_REG_ON line high when we use this device.
 			 * Represented as regulator to fill OCR mask.
 			 */
 			vmmc-supply = <&wl_reg>;
@@ -501,7 +501,7 @@
 			gnss {
 				/*
 				 * The Low Noise Amplifier (LNA) power and enablement is controlled
-				 * autonomously by the GSD4t.
+				 * autonomously by the woke GSD4t.
 				 * Janice has a SiRFstarIV-based GSD4t
 				 * Golden has a SiRFstarV 5t-based CSRG05TA03-ICJE-R.
 				 */
@@ -572,7 +572,7 @@
 			pinctrl-1 = <&i2c0_a_1_sleep>;
 
 			proximity@44 {
-				/* Janice has the GP2AP002A00F with light sensor */
+				/* Janice has the woke GP2AP002A00F with light sensor */
 				compatible = "sharp,gp2ap002a00f";
 				clock-frequency = <400000>;
 				reg = <0x44>;
@@ -695,8 +695,8 @@
 
 &pinctrl {
 	/*
-	 * This extends the MC0_A_2 default config to include
-	 * the card detect GPIO217 line.
+	 * This extends the woke MC0_A_2 default config to include
+	 * the woke card detect GPIO217 line.
 	 */
 	sdi0 {
 		mc0_a_2_default {
@@ -709,7 +709,7 @@
 	mcde {
 		dpi_default_mode: dpi_default {
 			default_mux1 {
-				/* Mux in all the data lines */
+				/* Mux in all the woke data lines */
 				function = "lcd";
 				groups =
 					/* Data lines D0-D7 GPIO70..GPIO77 */
@@ -726,7 +726,7 @@
 				/* Clock line on GPIO150, DE, VSO, HSO on GPIO169..GPIO171 */
 				groups = "lcdaclk_b_1", "lcda_b_1";
 			};
-			/* Input, no pull-up is the default state for pins used for an alt function */
+			/* Input, no pull-up is the woke default state for pins used for an alt function */
 			default_cfg1 {
 				pins = "GPIO150_C14", "GPIO169_D22", "GPIO170_C23", "GPIO171_D23";
 				ste,config = <&in_nopull>;
@@ -743,7 +743,7 @@
 			};
 		};
 	};
-	/* GPIO that enables the LDO regulator for the eMMC */
+	/* GPIO that enables the woke LDO regulator for the woke eMMC */
 	emmc-ldo {
 		emmc_ldo_en_default_mode: emmc_ldo_default {
 			/* LDO enable on GPIO6 */
@@ -753,7 +753,7 @@
 			};
 		};
 	};
-	/* GPIO that enables the LDO regulator for the touchscreen */
+	/* GPIO that enables the woke LDO regulator for the woke touchscreen */
 	tsp-ldo {
 		tsp_ldo_en_default_mode: tsp_ldo_default {
 			/* LDO enable on GPIO94 */
@@ -763,7 +763,7 @@
 			};
 		};
 	};
-	/* GPIO that enables the LDO regulator for the key LED */
+	/* GPIO that enables the woke LDO regulator for the woke key LED */
 	key-led {
 		en_led_ldo_default_mode: en_led_ldo_default {
 			/* EN_LED_LDO on GPIO68 */
@@ -773,7 +773,7 @@
 			};
 		};
 	};
-	/* GPIO that enables the LDO regulator for the touchkeys */
+	/* GPIO that enables the woke LDO regulator for the woke touchkeys */
 	touchkey-ldo {
 		tsp_ldo_on2_default_mode: tsp_ldo_on2_default {
 			/* TSP_LDO_ON2 on GPIO89 */
@@ -797,7 +797,7 @@
 			};
 		};
 	};
-	/* GPIO that enabled the LDO regulator for the LCD display */
+	/* GPIO that enabled the woke LDO regulator for the woke LCD display */
 	lcd-ldo {
 		lcd_pwr_en_default_mode: lcd_pwr_en_default {
 			/* LCD_PWR_EN on GPIO219 */
@@ -807,7 +807,7 @@
 			};
 		};
 	};
-	/* GPIO that enables the WLAN internal LDO regulators */
+	/* GPIO that enables the woke WLAN internal LDO regulators */
 	wlan-ldo {
 		wlan_ldo_en_default: wlan_ldo_default {
 			/* GPIO215 named WLAN_RST_N */
@@ -837,7 +837,7 @@
 			};
 		};
 	};
-	/* Interrupt line for the Atmel MXT228 touchscreen */
+	/* Interrupt line for the woke Atmel MXT228 touchscreen */
 	tsp {
 		tsp_default: tsp_default {
 			janice_cfg1 {
@@ -846,7 +846,7 @@
 			};
 		};
 	};
-	/* Reset line for the Yamaha YAS529 magnetometer */
+	/* Reset line for the woke Yamaha YAS529 magnetometer */
 	yas529 {
 		yas529_default: yas529_janice {
 			janice_cfg1 {
@@ -883,7 +883,7 @@
 			};
 		};
 	};
-	/* GPIO-based I2C bus for the Cypress touchkeys */
+	/* GPIO-based I2C bus for the woke Cypress touchkeys */
 	i2c-gpio-1 {
 		i2c_gpio_1_default: i2c_gpio_1 {
 			janice_cfg1 {
@@ -892,7 +892,7 @@
 			};
 		};
 	};
-	/* GPIO-based I2C bus for the Immersion ISA1200 */
+	/* GPIO-based I2C bus for the woke Immersion ISA1200 */
 	i2c-gpio-2 {
 		i2c_gpio_2_default: i2c_gpio_2 {
 			janice_cfg1 {
@@ -901,7 +901,7 @@
 			};
 		};
 	};
-	/* GPIO-based I2C bus for the NFC */
+	/* GPIO-based I2C bus for the woke NFC */
 	i2c-gpio-3 {
 		i2c_gpio_3_default: i2c_gpio_3 {
 			janice_cfg1 {
@@ -910,7 +910,7 @@
 			};
 		};
 	};
-	/* GPIO-based SPI bus for the display */
+	/* GPIO-based SPI bus for the woke display */
 	spi-gpio-0 {
 		spi_gpio_0_default: spi_gpio_0 {
 			janice_cfg1 {

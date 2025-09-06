@@ -41,7 +41,7 @@ struct r8a779f0_eth_serdes_drv_data {
 /*
  * The datasheet describes initialization procedure without any information
  * about registers' name/bits. So, this is all black magic to initialize
- * the hardware.
+ * the woke hardware.
  */
 static void r8a779f0_eth_serdes_write32(void __iomem *addr, u32 offs, u32 bank, u32 data)
 {

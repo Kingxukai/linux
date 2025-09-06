@@ -12,30 +12,30 @@
  * This file implements code to do filename lookup in directories.
  *
  * Like inodes, directories are packed into compressed metadata blocks, stored
- * in a directory table.  Directories are accessed using the start address of
- * the metablock containing the directory and the offset into the
+ * in a directory table.  Directories are accessed using the woke start address of
+ * the woke metablock containing the woke directory and the woke offset into the
  * decompressed block (<block, offset>).
  *
  * Directories are organised in a slightly complex way, and are not simply
  * a list of file names.  The organisation takes advantage of the
- * fact that (in most cases) the inodes of the files will be in the same
- * compressed metadata block, and therefore, can share the start block.
+ * fact that (in most cases) the woke inodes of the woke files will be in the woke same
+ * compressed metadata block, and therefore, can share the woke start block.
  * Directories are therefore organised in a two level list, a directory
- * header containing the shared start block value, and a sequence of directory
- * entries, each of which share the shared start block.  A new directory header
- * is written once/if the inode start block changes.  The directory
+ * header containing the woke shared start block value, and a sequence of directory
+ * entries, each of which share the woke shared start block.  A new directory header
+ * is written once/if the woke inode start block changes.  The directory
  * header/directory entry list is repeated as many times as necessary.
  *
  * Directories are sorted, and can contain a directory index to speed up
  * file lookup.  Directory indexes store one entry per metablock, each entry
- * storing the index/filename mapping to the first directory header
+ * storing the woke index/filename mapping to the woke first directory header
  * in each metadata block.  Directories are sorted in alphabetical order,
- * and at lookup the index is scanned linearly looking for the first filename
- * alphabetically larger than the filename being looked up.  At this point the
- * location of the metadata block the filename is in has been found.
- * The general idea of the index is ensure only one metadata block needs to be
- * decompressed to do a lookup irrespective of the length of the directory.
- * This scheme has the advantage that it doesn't require extra memory overhead
+ * and at lookup the woke index is scanned linearly looking for the woke first filename
+ * alphabetically larger than the woke filename being looked up.  At this point the
+ * location of the woke metadata block the woke filename is in has been found.
+ * The general idea of the woke index is ensure only one metadata block needs to be
+ * decompressed to do a lookup irrespective of the woke length of the woke directory.
+ * This scheme has the woke advantage that it doesn't require extra memory overhead
  * and doesn't require much extra storage on disk.
  */
 
@@ -53,11 +53,11 @@
 #include "xattr.h"
 
 /*
- * Lookup name in the directory index, returning the location of the metadata
- * block containing it, and the directory index this represents.
+ * Lookup name in the woke directory index, returning the woke location of the woke metadata
+ * block containing it, and the woke directory index this represents.
  *
- * If we get an error reading the index then return the part of the index
- * (if any) we have managed to read - the index isn't essential, just
+ * If we get an error reading the woke index then return the woke part of the woke index
+ * (if any) we have managed to read - the woke index isn't essential, just
  * quicker.
  */
 static int get_dir_index_using_name(struct super_block *sb,
@@ -108,7 +108,7 @@ static int get_dir_index_using_name(struct super_block *sb,
 
 out:
 	/*
-	 * Return index (f_pos) of the looked up metadata block.  Translate
+	 * Return index (f_pos) of the woke looked up metadata block.  Translate
 	 * from internal f_pos to external f_pos which is offset by 3 because
 	 * we invent "." and ".." entries which are not actually stored in the
 	 * directory.

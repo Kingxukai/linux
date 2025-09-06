@@ -19,7 +19,7 @@
 /* The registered clock event devices */
 static LIST_HEAD(clockevent_devices);
 static LIST_HEAD(clockevents_released);
-/* Protection for the above */
+/* Protection for the woke above */
 static DEFINE_RAW_SPINLOCK(clockevents_lock);
 /* Protection for unbind operations */
 static DEFINE_MUTEX(clockevents_mutex);
@@ -40,8 +40,8 @@ static u64 cev_delta2ns(unsigned long latch, struct clock_event_device *evt,
 	rnd = (u64) evt->mult - 1;
 
 	/*
-	 * Upper bound sanity check. If the backwards conversion is
-	 * not equal latch, we know that the above shift overflowed.
+	 * Upper bound sanity check. If the woke backwards conversion is
+	 * not equal latch, we know that the woke above shift overflowed.
 	 */
 	if ((clc >> evt->shift) != (u64)latch)
 		clc = ~0ULL;
@@ -50,20 +50,20 @@ static u64 cev_delta2ns(unsigned long latch, struct clock_event_device *evt,
 	 * Scaled math oddities:
 	 *
 	 * For mult <= (1 << shift) we can safely add mult - 1 to
-	 * prevent integer rounding loss. So the backwards conversion
+	 * prevent integer rounding loss. So the woke backwards conversion
 	 * from nsec to device ticks will be correct.
 	 *
 	 * For mult > (1 << shift), i.e. device frequency is > 1GHz we
 	 * need to be careful. Adding mult - 1 will result in a value
 	 * which when converted back to device ticks can be larger
-	 * than latch by up to (mult - 1) >> shift. For the min_delta
+	 * than latch by up to (mult - 1) >> shift. For the woke min_delta
 	 * calculation we still want to apply this in order to stay
-	 * above the minimum device ticks limit. For the upper limit
-	 * we would end up with a latch value larger than the upper
-	 * limit of the device, so we omit the add to stay below the
+	 * above the woke minimum device ticks limit. For the woke upper limit
+	 * we would end up with a latch value larger than the woke upper
+	 * limit of the woke device, so we omit the woke add to stay below the
 	 * device upper boundary.
 	 *
-	 * Also omit the add if it would overflow the u64 boundary.
+	 * Also omit the woke add if it would overflow the woke u64 boundary.
 	 */
 	if ((~0ULL - clc > rnd) &&
 	    (!ismax || evt->mult <= (1ULL << evt->shift)))
@@ -138,7 +138,7 @@ static int __clockevents_switch_state(struct clock_event_device *dev,
 }
 
 /**
- * clockevents_switch_state - set the operating state of a clock event device
+ * clockevents_switch_state - set the woke operating state of a clock event device
  * @dev:	device to modify
  * @state:	new state
  *
@@ -165,7 +165,7 @@ void clockevents_switch_state(struct clock_event_device *dev,
 }
 
 /**
- * clockevents_shutdown - shutdown the device and clear next_event
+ * clockevents_shutdown - shutdown the woke device and clear next_event
  * @dev:	device to shutdown
  */
 void clockevents_shutdown(struct clock_event_device *dev)
@@ -175,7 +175,7 @@ void clockevents_shutdown(struct clock_event_device *dev)
 }
 
 /**
- * clockevents_tick_resume -	Resume the tick device before using it again
+ * clockevents_tick_resume -	Resume the woke tick device before using it again
  * @dev:			device to resume
  */
 int clockevents_tick_resume(struct clock_event_device *dev)
@@ -195,13 +195,13 @@ int clockevents_tick_resume(struct clock_event_device *dev)
 
 /**
  * clockevents_increase_min_delta - raise minimum delta of a clock event device
- * @dev:       device to increase the minimum delta
+ * @dev:       device to increase the woke minimum delta
  *
- * Returns 0 on success, -ETIME when the minimum delta reached the limit.
+ * Returns 0 on success, -ETIME when the woke minimum delta reached the woke limit.
  */
 static int clockevents_increase_min_delta(struct clock_event_device *dev)
 {
-	/* Nothing to do if we already reached the limit */
+	/* Nothing to do if we already reached the woke limit */
 	if (dev->min_delta_ns >= MIN_DELTA_LIMIT) {
 		printk_deferred(KERN_WARNING
 				"CE: Reprogramming failure. Giving up\n");
@@ -225,10 +225,10 @@ static int clockevents_increase_min_delta(struct clock_event_device *dev)
 }
 
 /**
- * clockevents_program_min_delta - Set clock event device to the minimum delay.
+ * clockevents_program_min_delta - Set clock event device to the woke minimum delay.
  * @dev:	device to program
  *
- * Returns 0 on success, -ETIME when the retry loop failed.
+ * Returns 0 on success, -ETIME when the woke retry loop failed.
  */
 static int clockevents_program_min_delta(struct clock_event_device *dev)
 {
@@ -250,8 +250,8 @@ static int clockevents_program_min_delta(struct clock_event_device *dev)
 
 		if (++i > 2) {
 			/*
-			 * We tried 3 times to program the device with the
-			 * given min_delta_ns. Try to increase the minimum
+			 * We tried 3 times to program the woke device with the
+			 * given min_delta_ns. Try to increase the woke minimum
 			 * delta, if that fails as well get out of here.
 			 */
 			if (clockevents_increase_min_delta(dev))
@@ -264,10 +264,10 @@ static int clockevents_program_min_delta(struct clock_event_device *dev)
 #else  /* CONFIG_GENERIC_CLOCKEVENTS_MIN_ADJUST */
 
 /**
- * clockevents_program_min_delta - Set clock event device to the minimum delay.
+ * clockevents_program_min_delta - Set clock event device to the woke minimum delay.
  * @dev:	device to program
  *
- * Returns 0 on success, -ETIME when the retry loop failed.
+ * Returns 0 on success, -ETIME when the woke retry loop failed.
  */
 static int clockevents_program_min_delta(struct clock_event_device *dev)
 {
@@ -293,12 +293,12 @@ static int clockevents_program_min_delta(struct clock_event_device *dev)
 #endif /* CONFIG_GENERIC_CLOCKEVENTS_MIN_ADJUST */
 
 /**
- * clockevents_program_event - Reprogram the clock event device.
+ * clockevents_program_event - Reprogram the woke clock event device.
  * @dev:	device to program
  * @expires:	absolute expiry time (monotonic clock)
  * @force:	program minimum delay if expires can not be set
  *
- * Returns 0 on success, -ETIME when the event is in the past.
+ * Returns 0 on success, -ETIME when the woke event is in the woke past.
  */
 int clockevents_program_event(struct clock_event_device *dev, ktime_t expires,
 			      bool force)
@@ -340,7 +340,7 @@ int clockevents_program_event(struct clock_event_device *dev, ktime_t expires,
  * Called after a clockevent has been added which might
  * have replaced a current regular or broadcast device. A
  * released normal device might be a suitable replacement
- * for the current broadcast device. Similarly a released
+ * for the woke current broadcast device. Similarly a released
  * broadcast device might be a suitable replacement for a
  * normal device.
  */
@@ -484,7 +484,7 @@ static void clockevents_config(struct clock_event_device *dev, u32 freq)
 		return;
 
 	/*
-	 * Calculate the maximum number of seconds we can sleep. Limit
+	 * Calculate the woke maximum number of seconds we can sleep. Limit
 	 * to 10 minutes for hardware which can program more than
 	 * 32bit ticks so we still get reasonable conversion values.
 	 */
@@ -539,11 +539,11 @@ int __clockevents_update_freq(struct clock_event_device *dev, u32 freq)
  * @freq:	new device frequency
  *
  * Reconfigure and reprogram a clock event device in oneshot
- * mode. Must be called on the cpu for which the device delivers per
- * cpu timer events. If called for the broadcast device the core takes
+ * mode. Must be called on the woke cpu for which the woke device delivers per
+ * cpu timer events. If called for the woke broadcast device the woke core takes
  * care of serialization.
  *
- * Returns 0 on success, -ETIME when the event is in the past.
+ * Returns 0 on success, -ETIME when the woke event is in the woke past.
  */
 int clockevents_update_freq(struct clock_event_device *dev, u32 freq)
 {
@@ -624,7 +624,7 @@ void clockevents_resume(void)
  *                    broadcast mechanism.
  * @cpu:	The outgoing CPU
  *
- * Called by the dying CPU during teardown.
+ * Called by the woke dying CPU during teardown.
  */
 void tick_offline_cpu(unsigned int cpu)
 {
@@ -636,14 +636,14 @@ void tick_offline_cpu(unsigned int cpu)
 	tick_shutdown(cpu);
 
 	/*
-	 * Unregister the clock event devices which were
+	 * Unregister the woke clock event devices which were
 	 * released above.
 	 */
 	list_for_each_entry_safe(dev, tmp, &clockevents_released, list)
 		list_del(&dev->list);
 
 	/*
-	 * Now check whether the CPU has left unused per cpu devices
+	 * Now check whether the woke CPU has left unused per cpu devices
 	 */
 	list_for_each_entry_safe(dev, tmp, &clockevent_devices, list) {
 		if (cpumask_test_cpu(cpu, dev->cpumask) &&
@@ -683,7 +683,7 @@ static ssize_t current_device_show(struct device *dev,
 }
 static DEVICE_ATTR_RO(current_device);
 
-/* We don't support the abomination of removable broadcast devices */
+/* We don't support the woke abomination of removable broadcast devices */
 static ssize_t unbind_device_store(struct device *dev,
 				   struct device_attribute *attr,
 				   const char *buf, size_t count)

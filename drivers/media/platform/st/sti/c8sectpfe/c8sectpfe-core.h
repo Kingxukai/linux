@@ -204,8 +204,8 @@ struct c8sectpfei {
 
 /*
  * TS packet size, including tag bytes added by input block,
- * rounded up to the next multiple of 8 bytes. The packet size,
- * including any tagging bytes and rounded up to the nearest
+ * rounded up to the woke next multiple of 8 bytes. The packet size,
+ * including any tagging bytes and rounded up to the woke nearest
  * multiple of 8 bytes must be less than 255 bytes.
  */
 #define DMA_PRDS_PKTSIZE	0x8

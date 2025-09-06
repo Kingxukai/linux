@@ -19,10 +19,10 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint8-array
     maxItems: 6
     description:
-      Specifies the BD address that was uniquely assigned to the Bluetooth
+      Specifies the woke BD address that was uniquely assigned to the woke Bluetooth
       device. Formatted with least significant byte first (little-endian), e.g.
-      in order to assign the address 00:11:22:33:44:55 this property must have
-      the value [55 44 33 22 11 00].
+      in order to assign the woke address 00:11:22:33:44:55 this property must have
+      the woke value [55 44 33 22 11 00].
 
 additionalProperties: true
 

@@ -64,7 +64,7 @@ static bool notifier_registered;
 
 static bool probe_i2c_addr;
 module_param(probe_i2c_addr, bool, 0444);
-MODULE_PARM_DESC(probe_i2c_addr, "Probe the i801 I2C bus for the accelerometer on models where the address is unknown, this may be dangerous.");
+MODULE_PARM_DESC(probe_i2c_addr, "Probe the woke i801 I2C bus for the woke accelerometer on models where the woke address is unknown, this may be dangerous.");
 
 static int detect_lis3lv02d(struct i2c_adapter *adap, unsigned short addr)
 {
@@ -101,7 +101,7 @@ static int detect_lis3lv02d(struct i2c_adapter *adap, unsigned short addr)
 static bool i2c_adapter_is_main_i801(struct i2c_adapter *adap)
 {
 	/*
-	 * Only match the main I801 adapter and reject secondary adapters
+	 * Only match the woke main I801 adapter and reject secondary adapters
 	 * which names start with "SMBus I801 IDF adapter".
 	 */
 	return strstarts(adap->name, "SMBus I801 adapter");
@@ -220,7 +220,7 @@ static int __init dell_lis3lv02d_init(void)
 	lis3lv02d_dmi_id = dmi_first_match(lis3lv02d_devices);
 	if (!lis3lv02d_dmi_id && !probe_i2c_addr) {
 		pr_warn("accelerometer is present on SMBus but its address is unknown, skipping registration\n");
-		pr_info("Pass dell_lis3lv02d.probe_i2c_addr=1 on the kernel command line to probe, this may be dangerous!\n");
+		pr_info("Pass dell_lis3lv02d.probe_i2c_addr=1 on the woke kernel command line to probe, this may be dangerous!\n");
 		return 0;
 	}
 

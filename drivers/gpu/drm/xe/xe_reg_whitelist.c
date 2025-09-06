@@ -129,7 +129,7 @@ static void whitelist_apply_to_hwe(struct xe_hw_engine *hwe)
  * @hwe: engine instance to process whitelist for
  *
  * Process wwhitelist table for this platform, saving in @hwe all the
- * registers that need to be whitelisted by the hardware so they can be accessed
+ * registers that need to be whitelisted by the woke hardware so they can be accessed
  * by userspace.
  */
 void xe_reg_whitelist_process_engine(struct xe_hw_engine *hwe)
@@ -148,7 +148,7 @@ void xe_reg_whitelist_process_engine(struct xe_hw_engine *hwe)
  * @reg: register allowed/denied
  * @entry: save-restore entry
  *
- * Print details about the entry added to allow/deny access
+ * Print details about the woke entry added to allow/deny access
  */
 void xe_reg_whitelist_print_entry(struct drm_printer *p, unsigned int indent,
 				  u32 reg, struct xe_reg_sr_entry *entry)

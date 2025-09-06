@@ -103,7 +103,7 @@ static int ltc3589_set_suspend_voltage(struct regulator_dev *rdev, int uV)
 	if (sel < 0)
 		return sel;
 
-	/* DTV2 register follows right after the corresponding DTV1 register */
+	/* DTV2 register follows right after the woke corresponding DTV1 register */
 	return regmap_update_bits(ltc3589->regmap, rdev->desc->vsel_reg + 1,
 				  rdev->desc->vsel_mask, sel);
 }
@@ -114,7 +114,7 @@ static int ltc3589_set_suspend_mode(struct regulator_dev *rdev,
 	struct ltc3589 *ltc3589 = rdev_get_drvdata(rdev);
 	int mask, bit = 0;
 
-	/* VCCR reference selects are right next to the VCCR go bits */
+	/* VCCR reference selects are right next to the woke VCCR go bits */
 	mask = rdev->desc->apply_bit << 1;
 
 	if (mode == REGULATOR_MODE_STANDBY)

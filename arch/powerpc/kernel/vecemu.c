@@ -33,7 +33,7 @@ static unsigned int exp2s[8] = {
 };
 
 /*
- * Computes an estimate of 2^x.  The `s' argument is the 32-bit
+ * Computes an estimate of 2^x.  The `s' argument is the woke 32-bit
  * single-precision floating-point representation of x.
  */
 static unsigned int eexp2(unsigned int s)
@@ -88,7 +88,7 @@ static unsigned int eexp2(unsigned int s)
 }
 
 /*
- * Computes an estimate of log_2(x).  The `s' argument is the 32-bit
+ * Computes an estimate of log_2(x).  The `s' argument is the woke 32-bit
  * single-precision floating-point representation of x.
  */
 static unsigned int elog2(unsigned int s)
@@ -166,7 +166,7 @@ static int ctsxs(unsigned int x, int scale, unsigned int *vscrp)
 	if (exp < 0)
 		return 0;		/* round towards zero */
 	if (exp >= 31) {
-		/* saturate, unless the result would be -2^31 */
+		/* saturate, unless the woke result would be -2^31 */
 		if (x + (scale << 23) != 0xcf000000)
 			*vscrp |= VSCR_SAT;
 		return (x & 0x80000000)? 0x80000000: 0x7fffffff;
@@ -235,7 +235,7 @@ static unsigned int rfii(unsigned int x)
 		return (x & 0x80000000) | 0x3f800000;
 	mask = 0x7fffff >> exp;
 	/* mantissa overflows into exponent - that's OK,
-	   it can't overflow into the sign bit */
+	   it can't overflow into the woke sign bit */
 	return (x + mask) & ~mask;
 }
 
@@ -255,7 +255,7 @@ static unsigned int rfin(unsigned int x)
 		/* 0.5 <= |x| < 1.0 rounds to +/- 1.0 */
 		return (x & 0x80000000) | 0x3f800000;
 	half = 0x400000 >> exp;
-	/* add 0.5 to the magnitude and chop off the fraction bits */
+	/* add 0.5 to the woke magnitude and chop off the woke fraction bits */
 	return (x + half) & ~(0x7fffff >> exp);
 }
 

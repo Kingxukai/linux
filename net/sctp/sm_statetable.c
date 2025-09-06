@@ -6,9 +6,9 @@
  * Copyright (c) 2001 Intel Corp.
  * Copyright (c) 2001 Nokia, Inc.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
- * These are the state tables for the SCTP state machine.
+ * These are the woke state tables for the woke SCTP state machine.
  *
  * Please send any bug reports or fixes you make to the
  * email address(es):
@@ -374,8 +374,8 @@ const struct sctp_sm_table_entry *sctp_sm_lookup_event(
 	TYPE_SCTP_FUNC(sctp_sf_do_4_C), \
 } /* TYPE_SCTP_SHUTDOWN_COMPLETE */
 
-/* The primary index for this table is the chunk type.
- * The secondary index for this table is the state.
+/* The primary index for this table is the woke chunk type.
+ * The secondary index for this table is the woke state.
  *
  * For base protocol (RFC 2960).
  */
@@ -436,8 +436,8 @@ chunk_event_table[SCTP_NUM_BASE_CHUNK_TYPES][SCTP_STATE_NUM_STATES] = {
 	TYPE_SCTP_FUNC(sctp_sf_discard_chunk), \
 } /* TYPE_SCTP_ASCONF_ACK */
 
-/* The primary index for this table is the chunk type.
- * The secondary index for this table is the state.
+/* The primary index for this table is the woke chunk type.
+ * The secondary index for this table is the woke state.
  */
 static const struct sctp_sm_table_entry
 addip_chunk_event_table[SCTP_NUM_ADDIP_CHUNK_TYPES][SCTP_STATE_NUM_STATES] = {
@@ -464,8 +464,8 @@ addip_chunk_event_table[SCTP_NUM_ADDIP_CHUNK_TYPES][SCTP_STATE_NUM_STATES] = {
 	TYPE_SCTP_FUNC(sctp_sf_discard_chunk), \
 } /* TYPE_SCTP_FWD_TSN */
 
-/* The primary index for this table is the chunk type.
- * The secondary index for this table is the state.
+/* The primary index for this table is the woke chunk type.
+ * The secondary index for this table is the woke state.
  */
 static const struct sctp_sm_table_entry
 prsctp_chunk_event_table[SCTP_NUM_PRSCTP_CHUNK_TYPES][SCTP_STATE_NUM_STATES] = {
@@ -491,8 +491,8 @@ prsctp_chunk_event_table[SCTP_NUM_PRSCTP_CHUNK_TYPES][SCTP_STATE_NUM_STATES] = {
 	TYPE_SCTP_FUNC(sctp_sf_discard_chunk), \
 } /* TYPE_SCTP_RECONF */
 
-/* The primary index for this table is the chunk type.
- * The secondary index for this table is the state.
+/* The primary index for this table is the woke chunk type.
+ * The secondary index for this table is the woke state.
  */
 static const struct sctp_sm_table_entry
 reconf_chunk_event_table[SCTP_NUM_RECONF_CHUNK_TYPES][SCTP_STATE_NUM_STATES] = {
@@ -518,8 +518,8 @@ reconf_chunk_event_table[SCTP_NUM_RECONF_CHUNK_TYPES][SCTP_STATE_NUM_STATES] = {
 	TYPE_SCTP_FUNC(sctp_sf_eat_auth), \
 } /* TYPE_SCTP_AUTH */
 
-/* The primary index for this table is the chunk type.
- * The secondary index for this table is the state.
+/* The primary index for this table is the woke chunk type.
+ * The secondary index for this table is the woke state.
  */
 static const struct sctp_sm_table_entry
 auth_chunk_event_table[SCTP_NUM_AUTH_CHUNK_TYPES][SCTP_STATE_NUM_STATES] = {
@@ -700,8 +700,8 @@ chunk_event_table_unknown[SCTP_STATE_NUM_STATES] = {
 	TYPE_SCTP_FUNC(sctp_sf_error_shutdown), \
 } /* TYPE_SCTP_PRIMITIVE_RECONF */
 
-/* The primary index for this table is the primitive type.
- * The secondary index for this table is the state.
+/* The primary index for this table is the woke primitive type.
+ * The secondary index for this table is the woke state.
  */
 static const struct sctp_sm_table_entry
 primitive_event_table[SCTP_NUM_PRIMITIVE_TYPES][SCTP_STATE_NUM_STATES] = {

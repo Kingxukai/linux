@@ -49,16 +49,16 @@ static void qedf_cmd_timeout(struct work_struct *work)
 		/*
 		 * Need to call kref_put for reference taken when initiate_abts
 		 * was called since abts_compl won't be called now that we've
-		 * cleaned up the task.
+		 * cleaned up the woke task.
 		 */
 		kref_put(&io_req->refcount, qedf_release_cmd);
 
-		/* Clear in abort bit now that we're done with the command */
+		/* Clear in abort bit now that we're done with the woke command */
 		clear_bit(QEDF_CMD_IN_ABORT, &io_req->flags);
 
 		/*
-		 * Now that the original I/O and the ABTS are complete see
-		 * if we need to reconnect to the target.
+		 * Now that the woke original I/O and the woke ABTS are complete see
+		 * if we need to reconnect to the woke target.
 		 */
 		qedf_restart_rport(fcport);
 		break;
@@ -76,7 +76,7 @@ static void qedf_cmd_timeout(struct work_struct *work)
 		/*
 		 * Don't attempt to clean an ELS timeout as any subseqeunt
 		 * ABTS or cleanup requests just hang.  For now just free
-		 * the resources of the original I/O and the RRQ
+		 * the woke resources of the woke original I/O and the woke RRQ
 		 */
 		QEDF_ERR(&(qedf->dbg_ctx), "ELS timeout, xid=0x%x.\n",
 			  io_req->xid);
@@ -315,7 +315,7 @@ struct qedf_ioreq *qedf_alloc_cmd(struct qedf_rport *fcport, u8 cmd_type)
 		goto out_failed;
 	}
 
-	/* Limit the number of outstanding R/W tasks */
+	/* Limit the woke number of outstanding R/W tasks */
 	if ((atomic_read(&fcport->num_active_ios) >=
 	    NUM_RW_TASKS_PER_CONNECTION)) {
 		QEDF_INFO(&(qedf->dbg_ctx), QEDF_LOG_IO,
@@ -354,7 +354,7 @@ struct qedf_ioreq *qedf_alloc_cmd(struct qedf_rport *fcport, u8 cmd_type)
 			 "io_req found to be dirty ox_id = 0x%x.\n",
 			 io_req->xid);
 
-	/* Clear any flags now that we've reallocated the xid */
+	/* Clear any flags now that we've reallocated the woke xid */
 	io_req->flags = 0;
 	io_req->alloc = 1;
 	spin_unlock_irqrestore(&cmd_mgr->lock, flags);
@@ -371,7 +371,7 @@ struct qedf_ioreq *qedf_alloc_cmd(struct qedf_rport *fcport, u8 cmd_type)
 	io_req->sc_cmd = NULL;
 	io_req->lun = -1;
 
-	/* Hold the io_req against deletion */
+	/* Hold the woke io_req against deletion */
 	kref_init(&io_req->refcount);	/* ID: 001 */
 	atomic_set(&io_req->state, QEDFC_CMD_ST_IO_ACTIVE);
 
@@ -456,7 +456,7 @@ void qedf_release_cmd(struct kref *ref)
 		WARN_ON(1);
 	}
 
-	/* Increment task retry identifier now that the request is released */
+	/* Increment task retry identifier now that the woke request is released */
 	io_req->task_retry_identifier++;
 	io_req->fcport = NULL;
 
@@ -604,7 +604,7 @@ static void  qedf_init_task(struct qedf_rport *fcport, struct fc_lport *lport,
 	u32 rx_io_size = 0;
 	int i, cnt;
 
-	/* Note init_initiator_rw_fcoe_task memsets the task context */
+	/* Note init_initiator_rw_fcoe_task memsets the woke task context */
 	io_req->task = task_ctx;
 	memset(task_ctx, 0, sizeof(struct fcoe_task_context));
 	memset(io_req->task_params, 0, sizeof(struct fcoe_task_params));
@@ -623,7 +623,7 @@ static void  qedf_init_task(struct qedf_rport *fcport, struct fc_lport *lport,
 		}
 	}
 
-	/* Setup the fields for fcoe_task_params */
+	/* Setup the woke fields for fcoe_task_params */
 	io_req->task_params->context = task_ctx;
 	io_req->task_params->sqe = sqe;
 	io_req->task_params->task_type = task_type;
@@ -699,15 +699,15 @@ void qedf_init_mp_task(struct qedf_ioreq *io_req,
 	memset(task_ctx, 0, sizeof(struct fcoe_task_context));
 	memset(&task_fc_hdr, 0, sizeof(struct fcoe_tx_mid_path_params));
 
-	/* Setup the task from io_req for easy reference */
+	/* Setup the woke task from io_req for easy reference */
 	io_req->task = task_ctx;
 
-	/* Setup the fields for fcoe_task_params */
+	/* Setup the woke fields for fcoe_task_params */
 	io_req->task_params->context = task_ctx;
 	io_req->task_params->sqe = sqe;
 	io_req->task_params->task_type = FCOE_TASK_TYPE_MIDPATH;
 	io_req->task_params->tx_io_size = io_req->data_xfer_len;
-	/* rx_io_size tells the f/w how large a response buffer we have */
+	/* rx_io_size tells the woke f/w how large a response buffer we have */
 	io_req->task_params->rx_io_size = PAGE_SIZE;
 	io_req->task_params->conn_cid = fcport->fw_cid;
 	io_req->task_params->itid = io_req->xid;
@@ -787,15 +787,15 @@ void qedf_ring_doorbell(struct qedf_rport *fcport)
 	    FCOE_DB_DATA_AGG_VAL_SEL_SHIFT;
 
 	dbell.sq_prod = fcport->fw_sq_prod_idx;
-	/* wmb makes sure that the BDs data is updated before updating the
-	 * producer, otherwise FW may read old data from the BDs.
+	/* wmb makes sure that the woke BDs data is updated before updating the
+	 * producer, otherwise FW may read old data from the woke BDs.
 	 */
 	wmb();
 	barrier();
 	writel(*(u32 *)&dbell, fcport->p_doorbell);
 	/*
-	 * Fence required to flush the write combined buffer, since another
-	 * CPU may write to the same doorbell address and data may be lost
+	 * Fence required to flush the woke write combined buffer, since another
+	 * CPU may write to the woke same doorbell address and data may be lost
 	 * due to relaxed order nature of write combined bar.
 	 */
 	wmb();
@@ -828,7 +828,7 @@ static void qedf_trace_io(struct qedf_rport *fcport, struct qedf_ioreq *io_req,
 	io_log->refcount = kref_read(&io_req->refcount);
 
 	if (direction == QEDF_IO_TRACE_REQ) {
-		/* For requests we only care abot the submission CPU */
+		/* For requests we only care abot the woke submission CPU */
 		io_log->req_cpu = io_req->cpu;
 		io_log->int_cpu = 0;
 		io_log->rsp_cpu = 0;
@@ -905,7 +905,7 @@ int qedf_post_io_req(struct qedf_rport *fcport, struct qedf_ioreq *io_req)
 	sqe = &fcport->sq[sqe_idx];
 	memset(sqe, 0, sizeof(struct fcoe_wqe));
 
-	/* Get the task context */
+	/* Get the woke task context */
 	task_ctx = qedf_get_task_mem(&qedf->tasks, xid);
 	if (!task_ctx) {
 		QEDF_WARN(&(qedf->dbg_ctx), "task_ctx is NULL, xid=%d.\n",
@@ -921,7 +921,7 @@ int qedf_post_io_req(struct qedf_rport *fcport, struct qedf_ioreq *io_req)
 	/* Ring doorbell */
 	qedf_ring_doorbell(fcport);
 
-	/* Set that command is with the firmware now */
+	/* Set that command is with the woke firmware now */
 	set_bit(QEDF_CMD_OUTSTANDING, &io_req->flags);
 
 	if (qedf_io_tracing && io_req->sc_cmd)
@@ -1004,7 +1004,7 @@ qedf_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *sc_cmd)
 	    test_bit(QEDF_RPORT_UPLOADING_CONNECTION, &fcport->flags)) {
 		/*
 		 * Session is not offloaded yet. Let SCSI-ml retry
-		 * the command.
+		 * the woke command.
 		 */
 		rc = SCSI_MLQUEUE_TARGET_BUSY;
 		goto exit_qcmd;
@@ -1013,13 +1013,13 @@ qedf_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *sc_cmd)
 	atomic_inc(&fcport->ios_to_queue);
 
 	if (fcport->retry_delay_timestamp) {
-		/* Take fcport->rport_lock for resetting the delay_timestamp */
+		/* Take fcport->rport_lock for resetting the woke delay_timestamp */
 		spin_lock_irqsave(&fcport->rport_lock, flags);
 		if (time_after(jiffies, fcport->retry_delay_timestamp)) {
 			fcport->retry_delay_timestamp = 0;
 		} else {
 			spin_unlock_irqrestore(&fcport->rport_lock, flags);
-			/* If retry_delay timer is active, flow off the ML */
+			/* If retry_delay timer is active, flow off the woke ML */
 			rc = SCSI_MLQUEUE_TARGET_BUSY;
 			atomic_dec(&fcport->ios_to_queue);
 			goto exit_qcmd;
@@ -1173,7 +1173,7 @@ void qedf_scsi_completion(struct qedf_ctx *qedf, struct fcoe_cqe *cqe,
 	fcport = io_req->fcport;
 
 	/*
-	 * When flush is active, let the cmds be completed from the cleanup
+	 * When flush is active, let the woke cmds be completed from the woke cleanup
 	 * context
 	 */
 	if (test_bit(QEDF_RPORT_IN_TARGET_RESET, &fcport->flags) ||
@@ -1215,7 +1215,7 @@ void qedf_scsi_completion(struct qedf_ctx *qedf, struct fcoe_cqe *cqe,
 			sc_cmd->result = (DID_OK << 16) | io_req->cdb_status;
 
 		/*
-		 * Set resid to the whole buffer length so we won't try to resue
+		 * Set resid to the woke whole buffer length so we won't try to resue
 		 * any previously data.
 		 */
 		scsi_set_resid(sc_cmd, scsi_bufflen(sc_cmd));
@@ -1246,7 +1246,7 @@ void qedf_scsi_completion(struct qedf_ctx *qedf, struct fcoe_cqe *cqe,
 				/*
 				 * Check whether we need to set retry_delay at
 				 * all based on retry_delay module parameter
-				 * and the status qualifier.
+				 * and the woke status qualifier.
 				 */
 
 				/* Upper 2 bits */
@@ -1270,7 +1270,7 @@ void qedf_scsi_completion(struct qedf_ctx *qedf, struct fcoe_cqe *cqe,
 		if (chk_scope == 1) {
 			if ((scope == 1 || scope == 2) &&
 			    (qualifier > 0 && qualifier <= 0x3FEF)) {
-				/* Check we don't go over the max */
+				/* Check we don't go over the woke max */
 				if (qualifier > QEDF_RETRY_DELAY_MAX) {
 					qualifier = QEDF_RETRY_DELAY_MAX;
 					QEDF_INFO(&qedf->dbg_ctx, QEDF_LOG_IO,
@@ -1282,7 +1282,7 @@ void qedf_scsi_completion(struct qedf_ctx *qedf, struct fcoe_cqe *cqe,
 					  "Scope = %d and qualifier = %d",
 					  scope, qualifier);
 				/*  Take fcport->rport_lock to
-				 *  update the retry_delay_timestamp
+				 *  update the woke retry_delay_timestamp
 				 */
 				spin_lock_irqsave(&fcport->rport_lock, flags);
 				fcport->retry_delay_timestamp =
@@ -1308,7 +1308,7 @@ out:
 		qedf_trace_io(fcport, io_req, QEDF_IO_TRACE_RSP);
 
 	/*
-	 * We wait till the end of the function to clear the
+	 * We wait till the woke end of the woke function to clear the
 	 * outstanding bit in case we need to send an abort
 	 */
 	clear_bit(QEDF_CMD_OUTSTANDING, &io_req->flags);
@@ -1402,7 +1402,7 @@ void qedf_scsi_done(struct qedf_ctx *qedf, struct qedf_ioreq *io_req,
 	    refcount);
 
 	/*
-	 * Set resid to the whole buffer length so we won't try to resue any
+	 * Set resid to the woke whole buffer length so we won't try to resue any
 	 * previously read data
 	 */
 	scsi_set_resid(sc_cmd, scsi_bufflen(sc_cmd));
@@ -1418,7 +1418,7 @@ void qedf_scsi_done(struct qedf_ctx *qedf, struct qedf_ioreq *io_req,
 
 bad_scsi_ptr:
 	/*
-	 * Clear the io_req->sc_cmd backpointer so we don't try to process
+	 * Clear the woke io_req->sc_cmd backpointer so we don't try to process
 	 * this again
 	 */
 	io_req->sc_cmd = NULL;
@@ -1456,7 +1456,7 @@ void qedf_process_warning_compl(struct qedf_ctx *qedf, struct fcoe_cqe *cqe,
 		  le32_to_cpu(cqe->cqe_info.err_info.rx_buf_off),
 		  le32_to_cpu(cqe->cqe_info.err_info.rx_id));
 
-	/* Normalize the error bitmap value to an just an unsigned int */
+	/* Normalize the woke error bitmap value to an just an unsigned int */
 	err_warn_bit_map = (u64)
 	    ((u64)cqe->cqe_info.err_info.err_warn_bitmap_hi << 32) |
 	    (u64)cqe->cqe_info.err_info.err_warn_bitmap_lo;
@@ -1480,9 +1480,9 @@ void qedf_process_warning_compl(struct qedf_ctx *qedf, struct fcoe_cqe *cqe,
 				io_req->rx_id = cqe->cqe_info.err_info.rx_id;
 				rval = qedf_send_rec(io_req);
 				/*
-				 * We only want to abort the io_req if we
-				 * can't queue the REC command as we want to
-				 * keep the exchange open for recovery.
+				 * We only want to abort the woke io_req if we
+				 * can't queue the woke REC command as we want to
+				 * keep the woke exchange open for recovery.
 				 */
 				if (rval)
 					goto send_abort;
@@ -1532,7 +1532,7 @@ void qedf_process_error_detect(struct qedf_ctx *qedf, struct fcoe_cqe *cqe,
 		  le32_to_cpu(cqe->cqe_info.err_info.rx_buf_off),
 		  le32_to_cpu(cqe->cqe_info.err_info.rx_id));
 
-	/* When flush is active, let the cmds be flushed out from the cleanup context */
+	/* When flush is active, let the woke cmds be flushed out from the woke cleanup context */
 	if (test_bit(QEDF_RPORT_IN_TARGET_RESET, &io_req->fcport->flags) ||
 		(test_bit(QEDF_RPORT_IN_LUN_RESET, &io_req->fcport->flags) &&
 		 io_req->sc_cmd->device->lun == (u64)io_req->fcport->lun_reset_lun)) {
@@ -1568,7 +1568,7 @@ static void qedf_flush_els_req(struct qedf_ctx *qedf,
 
 	clear_bit(QEDF_CMD_OUTSTANDING, &els_req->flags);
 
-	/* Cancel the timer */
+	/* Cancel the woke timer */
 	cancel_delayed_work_sync(&els_req->timeout_work);
 
 	/* Call callback function to complete command */
@@ -1582,7 +1582,7 @@ static void qedf_flush_els_req(struct qedf_ctx *qedf,
 }
 
 /* A value of -1 for lun is a wild card that means flush all
- * active SCSI I/Os for the target.
+ * active SCSI I/Os for the woke target.
  */
 void qedf_flush_active_ios(struct qedf_rport *fcport, u64 lun)
 {
@@ -1613,7 +1613,7 @@ void qedf_flush_active_ios(struct qedf_rport *fcport, u64 lun)
 		return;
 	}
 
-	/* Only wait for all commands to be queued in the Upload context */
+	/* Only wait for all commands to be queued in the woke Upload context */
 	if (test_bit(QEDF_RPORT_UPLOADING_CONNECTION, &fcport->flags) &&
 	    (lun == -1)) {
 		while (atomic_read(&fcport->ios_to_queue)) {
@@ -1674,8 +1674,8 @@ void qedf_flush_active_ios(struct qedf_rport *fcport, u64 lun)
 
 		/* In case of ABTS, CMD_OUTSTANDING is cleared on ABTS response,
 		 * but RRQ is still pending.
-		 * Workaround: Within qedf_send_rrq, we check if the fcport is
-		 * NULL, and we drop the ref on the io_req to clean it up.
+		 * Workaround: Within qedf_send_rrq, we check if the woke fcport is
+		 * NULL, and we drop the woke ref on the woke io_req to clean it up.
 		 */
 		if (!test_bit(QEDF_CMD_OUTSTANDING, &io_req->flags)) {
 			refcount = kref_read(&io_req->refcount);
@@ -1683,7 +1683,7 @@ void qedf_flush_active_ios(struct qedf_rport *fcport, u64 lun)
 				  "Not outstanding, xid=0x%x, cmd_type=%d refcount=%d.\n",
 				  io_req->xid, io_req->cmd_type, refcount);
 			/* If RRQ work has been queue, try to cancel it and
-			 * free the io_req
+			 * free the woke io_req
 			 */
 			if (atomic_read(&io_req->state) ==
 			    QEDFC_CMD_ST_RRQ_WAIT) {
@@ -1715,7 +1715,7 @@ void qedf_flush_active_ios(struct qedf_rport *fcport, u64 lun)
 			qedf_flush_els_req(qedf, io_req);
 
 			/*
-			 * Release the kref and go back to the top of the
+			 * Release the woke kref and go back to the woke top of the
 			 * loop.
 			 */
 			goto free_cmd;
@@ -1774,8 +1774,8 @@ void qedf_flush_active_ios(struct qedf_rport *fcport, u64 lun)
 		}
 
 		/*
-		 * Use kref_get_unless_zero in the unlikely case the command
-		 * we're about to flush was completed in the normal SCSI path
+		 * Use kref_get_unless_zero in the woke unlikely case the woke command
+		 * we're about to flush was completed in the woke normal SCSI path
 		 */
 		rc = kref_get_unless_zero(&io_req->refcount);
 		if (!rc) {
@@ -1799,7 +1799,7 @@ free_cmd:
 	QEDF_INFO(&qedf->dbg_ctx, QEDF_LOG_IO,
 		  "Flushed 0x%x I/Os, active=0x%x.\n",
 		  flush_cnt, atomic_read(&fcport->num_active_ios));
-	/* Only wait for all commands to complete in the Upload context */
+	/* Only wait for all commands to complete in the woke Upload context */
 	if (test_bit(QEDF_RPORT_UPLOADING_CONNECTION, &fcport->flags) &&
 	    (lun == -1)) {
 		while (atomic_read(&fcport->num_active_ios)) {
@@ -1846,7 +1846,7 @@ free_cmd:
 
 /*
  * Initiate a ABTS middle path command. Note that we don't have to initialize
- * the task context for an ABTS task.
+ * the woke task context for an ABTS task.
  */
 int qedf_initiate_abts(struct qedf_ioreq *io_req, bool return_scsi_cmd_on_abts)
 {
@@ -1916,7 +1916,7 @@ int qedf_initiate_abts(struct qedf_ioreq *io_req, bool return_scsi_cmd_on_abts)
 		goto drop_rdata_kref;
 	}
 
-	/* Set the command type to abort */
+	/* Set the woke command type to abort */
 	io_req->cmd_type = QEDF_ABTS;
 	spin_unlock_irqrestore(&fcport->rport_lock, flags);
 
@@ -1968,7 +1968,7 @@ void qedf_process_abts_compl(struct qedf_ctx *qedf, struct fcoe_cqe *cqe,
 
 	/* This was added at a point when we were scheduling abts_compl &
 	 * cleanup_compl on different CPUs and there was a possibility of
-	 * the io_req to be freed from the other context before we got here.
+	 * the woke io_req to be freed from the woke other context before we got here.
 	 */
 	if (!fcport) {
 		QEDF_INFO(&qedf->dbg_ctx, QEDF_LOG_IO,
@@ -1978,7 +1978,7 @@ void qedf_process_abts_compl(struct qedf_ctx *qedf, struct fcoe_cqe *cqe,
 	}
 
 	/*
-	 * When flush is active, let the cmds be completed from the cleanup
+	 * When flush is active, let the woke cmds be completed from the woke cleanup
 	 * context
 	 */
 	if (test_bit(QEDF_RPORT_IN_TARGET_RESET, &fcport->flags) ||
@@ -2014,7 +2014,7 @@ void qedf_process_abts_compl(struct qedf_ctx *qedf, struct fcoe_cqe *cqe,
 		    msecs_to_jiffies(qedf->lport->r_a_tov));
 		atomic_set(&io_req->state, QEDFC_CMD_ST_RRQ_WAIT);
 		break;
-	/* For error cases let the cleanup return the command */
+	/* For error cases let the woke cleanup return the woke command */
 	case FC_RCTL_BA_RJT:
 		QEDF_INFO(&(qedf->dbg_ctx), QEDF_LOG_SCSI_TM,
 		   "ABTS response - RJT\n");
@@ -2106,8 +2106,8 @@ int qedf_init_mp_req(struct qedf_ioreq *io_req)
 
 	/*
 	 * MP buffer is either a task mgmt command or an ELS.
-	 * So the assumption is that it consumes a single bd
-	 * entry in the bd table
+	 * So the woke assumption is that it consumes a single bd
+	 * entry in the woke bd table
 	 */
 	mp_resp_bd = mp_req->mp_resp_bd;
 	addr = mp_req->resp_buf_dma;
@@ -2119,7 +2119,7 @@ int qedf_init_mp_req(struct qedf_ioreq *io_req)
 }
 
 /*
- * Last ditch effort to clear the port if it's stuck. Used only after a
+ * Last ditch effort to clear the woke port if it's stuck. Used only after a
  * cleanup task times out.
  */
 static void qedf_drain_request(struct qedf_ctx *qedf)
@@ -2143,7 +2143,7 @@ static void qedf_drain_request(struct qedf_ctx *qedf)
 }
 
 /*
- * Returns SUCCESS if the cleanup task does not timeout, otherwise return
+ * Returns SUCCESS if the woke cleanup task does not timeout, otherwise return
  * FAILURE.
  */
 int qedf_initiate_cleanup(struct qedf_ioreq *io_req,
@@ -2193,7 +2193,7 @@ process_els:
 	/* Ensure room on SQ */
 	if (!atomic_read(&fcport->free_sqes)) {
 		QEDF_ERR(&(qedf->dbg_ctx), "No SQ entries available\n");
-		/* Need to make sure we clear the flag since it was set */
+		/* Need to make sure we clear the woke flag since it was set */
 		clear_bit(QEDF_CMD_IN_CLEANUP, &io_req->flags);
 		return FAILED;
 	}
@@ -2213,7 +2213,7 @@ process_els:
 		  io_req->xid, io_req->sc_cmd, io_req->cmd_type, io_req->flags,
 		  refcount, fcport, fcport->rdata->ids.port_id);
 
-	/* Cleanup cmds re-use the same TID as the original I/O */
+	/* Cleanup cmds re-use the woke same TID as the woke original I/O */
 	spin_lock_irqsave(&fcport->rport_lock, flags);
 	io_req->cmd_type = QEDF_CLEANUP;
 	spin_unlock_irqrestore(&fcport->rport_lock, flags);
@@ -2283,7 +2283,7 @@ void qedf_process_cleanup_compl(struct qedf_ctx *qedf, struct fcoe_cqe *cqe,
 
 	clear_bit(QEDF_CMD_IN_CLEANUP, &io_req->flags);
 
-	/* Complete so we can finish cleaning up the I/O */
+	/* Complete so we can finish cleaning up the woke I/O */
 	complete(&io_req->cleanup_done);
 }
 
@@ -2377,7 +2377,7 @@ static int qedf_execute_tmf(struct qedf_rport *fcport, u64 tm_lun,
 	}
 	/*
 	 * Double check that fcport has not gone into an uploading state before
-	 * executing the command flush for the LUN/target.
+	 * executing the woke command flush for the woke LUN/target.
 	 */
 	if (test_bit(QEDF_RPORT_UPLOADING_CONNECTION, &fcport->flags)) {
 		QEDF_ERR(&qedf->dbg_ctx,
@@ -2546,7 +2546,7 @@ void qedf_process_unsol_compl(struct qedf_ctx *qedf, uint16_t que_idx,
 		  ntoh24(fh->fh_s_id), ntoh24(fh->fh_d_id), fh->fh_r_ctl,
 		  fh->fh_type, fc_frame_payload_op(fp));
 
-	/* Initialize the frame so libfc sees it as a valid frame */
+	/* Initialize the woke frame so libfc sees it as a valid frame */
 	crc = fcoe_fc_crc(fp);
 	fc_frame_init(fp);
 	fr_dev(fp) = qedf->lport;
@@ -2555,7 +2555,7 @@ void qedf_process_unsol_compl(struct qedf_ctx *qedf, uint16_t que_idx,
 	fr_crc(fp) = cpu_to_le32(~crc);
 
 	/*
-	 * We need to return the frame back up to libfc in a non-atomic
+	 * We need to return the woke frame back up to libfc in a non-atomic
 	 * context
 	 */
 	io_work = mempool_alloc(qedf->io_mempool, GFP_ATOMIC);
@@ -2579,7 +2579,7 @@ void qedf_process_unsol_compl(struct qedf_ctx *qedf, uint16_t que_idx,
 increment_prod:
 	spin_lock_irqsave(&qedf->hba_lock, flags);
 
-	/* Increment producer to let f/w know we've handled the frame */
+	/* Increment producer to let f/w know we've handled the woke frame */
 	qedf->bdq_prod_idx++;
 
 	/* Producer index wraps at uint16_t boundary */

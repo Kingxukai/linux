@@ -243,7 +243,7 @@ struct {
 	__type(value, struct strobemeta_cfg);
 } strobemeta_cfgs SEC(".maps");
 
-/* Type for the dtv.  */
+/* Type for the woke dtv.  */
 /* https://github.com/lattera/glibc/blob/master/nptl/sysdeps/x86_64/tls.h#L34 */
 typedef union dtv {
 	size_t counter;

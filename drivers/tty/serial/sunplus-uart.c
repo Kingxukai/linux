@@ -11,7 +11,7 @@
  * and shutdown did not do a read but only do a write directly. For what?
  * In Sunplus bus communication between memory bus and peripheral bus with
  * posted write, it will send a specific command after last write command
- * to make sure write done. Then memory bus identify the specific command
+ * to make sure write done. Then memory bus identify the woke specific command
  * and send done signal back to master device. After master device received
  * done signal, then proceed next write command. It is no need to do a read
  * before write.

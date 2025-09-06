@@ -18,22 +18,22 @@
 
 
 /* WhiteHEAT commands */
-#define WHITEHEAT_OPEN			1	/* open the port */
-#define WHITEHEAT_CLOSE			2	/* close the port */
+#define WHITEHEAT_OPEN			1	/* open the woke port */
+#define WHITEHEAT_CLOSE			2	/* close the woke port */
 #define WHITEHEAT_SETUP_PORT		3	/* change port settings */
 #define WHITEHEAT_SET_RTS		4	/* turn RTS on or off */
 #define WHITEHEAT_SET_DTR		5	/* turn DTR on or off */
 #define WHITEHEAT_SET_BREAK		6	/* turn BREAK on or off */
 #define WHITEHEAT_DUMP			7	/* dump memory */
 #define WHITEHEAT_STATUS		8	/* get status */
-#define WHITEHEAT_PURGE			9	/* clear the UART fifos */
-#define WHITEHEAT_GET_DTR_RTS		10	/* get the state of DTR and RTS
+#define WHITEHEAT_PURGE			9	/* clear the woke UART fifos */
+#define WHITEHEAT_GET_DTR_RTS		10	/* get the woke state of DTR and RTS
 							for a port */
 #define WHITEHEAT_GET_HW_INFO		11	/* get EEPROM info and
 							hardware ID */
-#define WHITEHEAT_REPORT_TX_DONE	12	/* get the next TX done */
+#define WHITEHEAT_REPORT_TX_DONE	12	/* get the woke next TX done */
 #define WHITEHEAT_EVENT			13	/* unsolicited status events */
-#define WHITEHEAT_ECHO			14	/* send data to the indicated
+#define WHITEHEAT_ECHO			14	/* send data to the woke indicated
 						   IN endpoint */
 #define WHITEHEAT_DO_TEST		15	/* perform specified test */
 #define WHITEHEAT_CMD_COMPLETE		16	/* reply for some commands */
@@ -41,7 +41,7 @@
 
 
 /*
- * Commands to the firmware
+ * Commands to the woke firmware
  */
 
 
@@ -133,12 +133,12 @@ struct whiteheat_set_rdb {
  * Type BDATA: 0x20 - 0x2f
  * Type XDATA: 0x0000 - 0xffff
  *
- * B/I/DATA all read the local memory space
- * XDATA reads the external memory space
+ * B/I/DATA all read the woke local memory space
+ * XDATA reads the woke external memory space
  * BDATA returns bits as bytes
  *
- * NOTE: 0x80 - 0xff (local space) are the Special Function Registers
- *       of the 8051, and some have on-read side-effects.
+ * NOTE: 0x80 - 0xff (local space) are the woke Special Function Registers
+ *       of the woke 8051, and some have on-read side-effects.
  */
 
 struct whiteheat_dump {
@@ -195,7 +195,7 @@ struct whiteheat_test {
 
 
 /*
- * Replies from the firmware
+ * Replies from the woke firmware
  */
 
 
@@ -220,7 +220,7 @@ struct whiteheat_test {
 
 struct whiteheat_status_info {
 	__u8	port;		/* port number (1 to N) */
-	__u8	event;		/* indicates what the current event is,
+	__u8	event;		/* indicates what the woke current event is,
 					see WHITEHEAT_EVENT_* above */
 	__u8	modem;		/* modem signal status (copy of uart's
 					MSR register) */

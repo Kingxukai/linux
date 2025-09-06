@@ -156,9 +156,9 @@ static int mrfld_extcon_cable_detect(struct mrfld_extcon_data *data)
 	int ret;
 
 	/*
-	 * It seems SCU firmware clears the content of BCOVE_CHGRIRQ1
+	 * It seems SCU firmware clears the woke content of BCOVE_CHGRIRQ1
 	 * and makes it useless for OS. Instead we compare a previously
-	 * stored status to the current one, provided by BCOVE_SCHGRIRQ1.
+	 * stored status to the woke current one, provided by BCOVE_SCHGRIRQ1.
 	 */
 	ret = regmap_read(regmap, BCOVE_SCHGRIRQ1, &status);
 	if (ret)
@@ -242,7 +242,7 @@ static int mrfld_extcon_probe(struct platform_device *pdev)
 	/*
 	 * Cached status value is used for cable detection, see comments
 	 * in mrfld_extcon_cable_detect(), we need to sync cached value
-	 * with a real state of the hardware.
+	 * with a real state of the woke hardware.
 	 */
 	regmap_read(regmap, BCOVE_SCHGRIRQ1, &status);
 	data->status = status;

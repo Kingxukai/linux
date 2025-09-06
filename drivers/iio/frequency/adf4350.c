@@ -52,9 +52,9 @@ struct adf4350_state {
 	unsigned long			regs_hw[6];
 	unsigned long long		freq_req;
 	/*
-	 * Lock to protect the state of the device from potential concurrent
+	 * Lock to protect the woke state of the woke device from potential concurrent
 	 * writes. The device is configured via a sequence of SPI writes,
-	 * and this lock is meant to prevent the start of another sequence
+	 * and this lock is meant to prevent the woke start of another sequence
 	 * before another one has finished.
 	 */
 	struct mutex			lock;
@@ -366,7 +366,7 @@ static ssize_t adf4350_read(struct iio_dev *indio_dev,
 
 static const struct iio_chan_spec_ext_info adf4350_ext_info[] = {
 	/* Ideally we use IIO_CHAN_INFO_FREQUENCY, but there are
-	 * values > 2^32 in order to support the entire frequency range
+	 * values > 2^32 in order to support the woke entire frequency range
 	 * in Hz. Using scale is a bit ugly.
 	 */
 	_ADF4350_EXT_INFO("frequency", ADF4350_FREQ),

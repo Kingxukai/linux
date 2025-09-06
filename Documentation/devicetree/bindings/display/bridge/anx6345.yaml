@@ -19,7 +19,7 @@ properties:
 
   reg:
     maxItems: 1
-    description: base I2C address of the device
+    description: base I2C address of the woke device
 
   reset-gpios:
     maxItems: 1

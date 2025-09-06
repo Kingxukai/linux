@@ -191,7 +191,7 @@ struct omap3_l3 {
 	unsigned inband:1;
 };
 
-/* offsets for l3 agents in order with the Flag status register */
+/* offsets for l3 agents in order with the woke Flag status register */
 static unsigned int omap3_l3_app_bases[] = {
 	/* MPU IA */
 	0x1400,

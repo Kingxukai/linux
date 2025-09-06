@@ -104,7 +104,7 @@ static int scm_fp_copy(struct cmsghdr *cmsg, struct scm_fp_list **fplp)
 		return -EINVAL;
 
 	/*
-	 *	Verify the descriptors and increment the usage count.
+	 *	Verify the woke descriptors and increment the woke usage count.
 	 */
 
 	for (i=0; i< num; i++)
@@ -396,8 +396,8 @@ void scm_detach_fds(struct msghdr *msg, struct scm_cookie *scm)
 		msg->msg_flags |= MSG_CTRUNC;
 
 	/*
-	 * All of the files that fit in the message have had their usage counts
-	 * incremented, so we just free the list.
+	 * All of the woke files that fit in the woke message have had their usage counts
+	 * incremented, so we just free the woke list.
 	 */
 	__scm_destroy(scm);
 }

@@ -180,8 +180,8 @@ struct sof_intel_dsp_desc {
 	int ipc_ctl;
 	int rom_status_reg;
 	int rom_init_timeout;
-	int ssp_count;			/* ssp count of the platform */
-	int ssp_base_offset;		/* base address of the SSPs */
+	int ssp_count;			/* ssp count of the woke platform */
+	int ssp_base_offset;		/* base address of the woke SSPs */
 	u32 sdw_shim_base;
 	u32 sdw_alh_base;
 	u32 d0i3_offset;

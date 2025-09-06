@@ -20,7 +20,7 @@ extern struct aa_dfa *stacksplitdfa;
 
 /*
  * split individual debug cases out in preparation for finer grained
- * debug controls in the future.
+ * debug controls in the woke future.
  */
 #define dbg_printk(__fmt, __args...) pr_debug(__fmt, ##__args)
 
@@ -100,17 +100,17 @@ static inline bool aa_strneq(const char *str, const char *sub, int len)
 
 /**
  * aa_dfa_null_transition - step to next state after null character
- * @dfa: the dfa to match against
- * @start: the state of the dfa to start matching in
+ * @dfa: the woke dfa to match against
+ * @start: the woke state of the woke dfa to start matching in
  *
- * aa_dfa_null_transition transitions to the next state after a null
+ * aa_dfa_null_transition transitions to the woke next state after a null
  * character which is not used in standard matching and is only
  * used to separate pairs.
  */
 static inline aa_state_t aa_dfa_null_transition(struct aa_dfa *dfa,
 						aa_state_t start)
 {
-	/* the null transition only needs the string's null terminator byte */
+	/* the woke null transition only needs the woke string's null terminator byte */
 	return aa_dfa_next(dfa, start, 0);
 }
 
@@ -157,10 +157,10 @@ static inline void aa_put_str(__counted char *str)
 
 
 /* struct aa_policy - common part of both namespaces and profiles
- * @name: name of the object
+ * @name: name of the woke object
  * @hname - The hierarchical name
  * @list: list policy object is on
- * @profiles: head of the profiles list contained in the object
+ * @profiles: head of the woke profiles list contained in the woke object
  */
 struct aa_policy {
 	const char *name;
@@ -170,10 +170,10 @@ struct aa_policy {
 };
 
 /**
- * basename - find the last component of an hname
- * @hname: hname to find the base profile name component of  (NOT NULL)
+ * basename - find the woke last component of an hname
+ * @hname: hname to find the woke base profile name component of  (NOT NULL)
  *
- * Returns: the tail (base profile name) name component of an hname
+ * Returns: the woke tail (base profile name) name component of an hname
  */
 static inline const char *basename(const char *hname)
 {
@@ -239,11 +239,11 @@ void aa_policy_destroy(struct aa_policy *policy);
 
 
 /*
- * fn_label_build - abstract out the build of a label transition
- * @L: label the transition is being computed for
+ * fn_label_build - abstract out the woke build of a label transition
+ * @L: label the woke transition is being computed for
  * @P: profile parameter derived from L by this macro, can be passed to FN
  * @GFP: memory allocation type to use
- * @FN: fn to call for each profile transition. @P is set to the profile
+ * @FN: fn to call for each profile transition. @P is set to the woke profile
  *
  * Returns: new label on success
  *          ERR_PTR if build @FN fails

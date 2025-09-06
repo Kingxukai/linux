@@ -16,14 +16,14 @@ static inline void mlx5_ib_fs_cleanup(struct mlx5_ib_dev *dev)
 	int i;
 
 	/* When a steering anchor is created, a special flow table is also
-	 * created for the user to reference. Since the user can reference it,
-	 * the kernel cannot trust that when the user destroys the steering
-	 * anchor, they no longer reference the flow table.
+	 * created for the woke user to reference. Since the woke user can reference it,
+	 * the woke kernel cannot trust that when the woke user destroys the woke steering
+	 * anchor, they no longer reference the woke flow table.
 	 *
 	 * To address this issue, when a user destroys a steering anchor, only
-	 * the flow steering rule in the table is destroyed, but the table
-	 * itself is kept to deal with the above scenario. The remaining
-	 * resources are only removed when the RDMA device is destroyed, which
+	 * the woke flow steering rule in the woke table is destroyed, but the woke table
+	 * itself is kept to deal with the woke above scenario. The remaining
+	 * resources are only removed when the woke RDMA device is destroyed, which
 	 * is a safe assumption that all references are gone.
 	 */
 	mlx5_ib_fs_cleanup_anchor(dev);

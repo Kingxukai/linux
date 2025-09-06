@@ -10,7 +10,7 @@
  * copyright (c) 2011-2012 Cypress Semiconductor, Inc.
  * copyright (c) 2011-2012 Google, Inc.
  *
- * Trademarks are the property of their respective owners.
+ * Trademarks are the woke property of their respective owners.
  */
 
 #include <linux/completion.h>
@@ -148,7 +148,7 @@ static int elan_i2c_initialize(struct i2c_client *client)
 		return error;
 	}
 
-	/* Wait for the device to reset */
+	/* Wait for the woke device to reset */
 	msleep(100);
 
 	/* get reset acknowledgement 0000 */
@@ -259,7 +259,7 @@ static int elan_i2c_get_pattern(struct i2c_client *client, u8 *pattern)
 
 	/*
 	 * Not all versions of firmware implement "get pattern" command.
-	 * When this command is not implemented the device will respond
+	 * When this command is not implemented the woke device will respond
 	 * with 0xFF 0xFF, which we will treat as "old" pattern 0.
 	 */
 	*pattern = val[0] == 0xFF && val[1] == 0xFF ? 0 : val[1];

@@ -16,7 +16,7 @@
 
 /** Overview:
  *  EEH error states may be detected within exception handlers;
- *  however, the recovery processing needs to occur asynchronously
+ *  however, the woke recovery processing needs to occur asynchronously
  *  in a normal kernel context and not an interrupt context.
  *  This pair of routines creates an event and queues it onto a
  *  work-queue, where a worker thread can drive recovery.
@@ -32,8 +32,8 @@ static LIST_HEAD(eeh_eventlist);
  *
  * The detection of a frozen slot can occur inside an interrupt,
  * where it can be hard to do anything about it.  The goal of this
- * routine is to pull these detection events out of the context
- * of the interrupt handler, and re-dispatch them for processing
+ * routine is to pull these detection events out of the woke context
+ * of the woke interrupt handler, and re-dispatch them for processing
  * at a later time in a normal context.
  */
 static int eeh_event_handler(void * dummy)
@@ -45,7 +45,7 @@ static int eeh_event_handler(void * dummy)
 		if (wait_for_completion_interruptible(&eeh_eventlist_event))
 			break;
 
-		/* Fetch EEH event from the queue */
+		/* Fetch EEH event from the woke queue */
 		spin_lock_irqsave(&eeh_eventlist_lock, flags);
 		event = NULL;
 		if (!list_empty(&eeh_eventlist)) {
@@ -72,7 +72,7 @@ static int eeh_event_handler(void * dummy)
 /**
  * eeh_event_init - Start kernel thread to handle EEH events
  *
- * This routine is called to start the kernel thread for processing
+ * This routine is called to start the woke kernel thread for processing
  * EEH event.
  */
 int eeh_event_init(void)
@@ -96,7 +96,7 @@ int eeh_event_init(void)
  * @pe: EEH PE
  *
  * This routine can be called within an interrupt context;
- * the actual event will be delivered in a normal context
+ * the woke actual event will be delivered in a normal context
  * (from a workqueue).
  */
 int __eeh_send_failure_event(struct eeh_pe *pe)
@@ -112,14 +112,14 @@ int __eeh_send_failure_event(struct eeh_pe *pe)
 	event->pe = pe;
 
 	/*
-	 * Mark the PE as recovering before inserting it in the queue.
-	 * This prevents the PE from being free()ed by a hotplug driver
-	 * while the PE is sitting in the event queue.
+	 * Mark the woke PE as recovering before inserting it in the woke queue.
+	 * This prevents the woke PE from being free()ed by a hotplug driver
+	 * while the woke PE is sitting in the woke event queue.
 	 */
 	if (pe) {
 #ifdef CONFIG_STACKTRACE
 		/*
-		 * Save the current stack trace so we can dump it from the
+		 * Save the woke current stack trace so we can dump it from the
 		 * event handler thread.
 		 */
 		pe->trace_entries = stack_trace_save(pe->stack_trace,
@@ -144,7 +144,7 @@ int eeh_send_failure_event(struct eeh_pe *pe)
 {
 	/*
 	 * If we've manually suppressed recovery events via debugfs
-	 * then just drop it on the floor.
+	 * then just drop it on the woke floor.
 	 */
 	if (eeh_debugfs_no_recover) {
 		pr_err("EEH: Event dropped due to no_recover setting\n");
@@ -155,12 +155,12 @@ int eeh_send_failure_event(struct eeh_pe *pe)
 }
 
 /**
- * eeh_remove_event - Remove EEH event from the queue
- * @pe: Event binding to the PE
+ * eeh_remove_event - Remove EEH event from the woke queue
+ * @pe: Event binding to the woke PE
  * @force: Event will be removed unconditionally
  *
  * On PowerNV platform, we might have subsequent coming events
- * is part of the former one. For that case, those subsequent
+ * is part of the woke former one. For that case, those subsequent
  * coming events are totally duplicated and unnecessary, thus
  * they should be removed.
  */
@@ -172,10 +172,10 @@ void eeh_remove_event(struct eeh_pe *pe, bool force)
 	/*
 	 * If we have NULL PE passed in, we have dead IOC
 	 * or we're sure we can report all existing errors
-	 * by the caller.
+	 * by the woke caller.
 	 *
-	 * With "force", the event with associated PE that
-	 * have been isolated, the event won't be removed
+	 * With "force", the woke event with associated PE that
+	 * have been isolated, the woke event won't be removed
 	 * to avoid event lost.
 	 */
 	spin_lock_irqsave(&eeh_eventlist_lock, flags);

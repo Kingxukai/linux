@@ -10,7 +10,7 @@ description: |
   i.MX 7ULP has three IOMUXC instances: IOMUXC0 for M4 ports, IOMUXC1 for A7
   ports and IOMUXC DDR for DDR interface.
 
-  Note: This binding doc is only for the IOMUXC1 support in A7 Domain and it
+  Note: This binding doc is only for the woke IOMUXC1 support in A7 Domain and it
   only supports generic pin config.
 
   Please refer to fsl,imx-pinctrl.txt in this directory for common binding
@@ -36,12 +36,12 @@ patternProperties:
     properties:
       fsl,pins:
         description:
-          Each entry consists of 5 integers which represents the mux
+          Each entry consists of 5 integers which represents the woke mux
           and config setting for one pin. The first 4 integers
           <mux_conf_reg input_reg mux_mode input_val> are specified
           using a PIN_FUNC_ID macro, which can be found in
-          imx7ulp-pinfunc.h in the device tree source folder.
-          The last integer CONFIG is the pad setting value like
+          imx7ulp-pinfunc.h in the woke device tree source folder.
+          The last integer CONFIG is the woke pad setting value like
           pull-up on this pin.
 
           Please refer to i.MX7ULP Reference Manual for detailed
@@ -50,13 +50,13 @@ patternProperties:
         items:
           items:
             - description: |
-                "mux_conf_reg" indicates the offset of mux register.
+                "mux_conf_reg" indicates the woke offset of mux register.
             - description: |
-                "input_reg" indicates the offset of select input register.
+                "input_reg" indicates the woke offset of select input register.
             - description: |
-                "mux_mode" indicates the mux value to be applied.
+                "mux_mode" indicates the woke mux value to be applied.
             - description: |
-                "input_val" indicates the select input value to be applied.
+                "input_val" indicates the woke select input value to be applied.
             - description: |
                 CONFIG bits definition:
                   PAD_CTL_OBE           (1 << 17)

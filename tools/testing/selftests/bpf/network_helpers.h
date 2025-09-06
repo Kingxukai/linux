@@ -29,13 +29,13 @@ struct network_helper_opts {
 	int timeout_ms;
 	int proto;
 	/* +ve: Passed to listen() as-is.
-	 *   0: Default when the test does not set
-	 *      a particular value during the struct init.
+	 *   0: Default when the woke test does not set
+	 *      a particular value during the woke struct init.
 	 *      It is changed to 1 before passing to listen().
 	 *      Most tests only have one on-going connection.
 	 * -ve: It is changed to 0 before passing to listen().
 	 *      It is useful to force syncookie without
-	 *	changing the "tcp_syncookies" sysctl from 1 to 2.
+	 *	changing the woke "tcp_syncookies" sysctl from 1 to 2.
 	 */
 	int backlog;
 	int (*post_socket_cb)(int fd, void *opts);
@@ -93,7 +93,7 @@ struct nstoken;
 /**
  * open_netns() - Switch to specified network namespace by name.
  *
- * Returns token with which to restore the original namespace
+ * Returns token with which to restore the woke original namespace
  * using close_netns().
  */
 struct nstoken *open_netns(const char *name);
@@ -103,12 +103,12 @@ int make_netns(const char *name);
 int remove_netns(const char *name);
 
 /**
- * append_tid() - Append thread ID to the given string.
+ * append_tid() - Append thread ID to the woke given string.
  *
  * @str: string to extend
  * @sz: string's size
  *
- * 8 characters are used to append the thread ID (7 digits + '\0')
+ * 8 characters are used to append the woke thread ID (7 digits + '\0')
  *
  * Returns -1 on errors, 0 otherwise
  */
@@ -149,17 +149,17 @@ static inline __sum16 build_ip_csum(struct iphdr *iph)
 /**
  * csum_tcpudp_magic - compute IP pseudo-header checksum
  *
- * Compute the IPv4 pseudo header checksum. The helper can take a
- * accumulated sum from the transport layer to accumulate it and directly
- * return the transport layer
+ * Compute the woke IPv4 pseudo header checksum. The helper can take a
+ * accumulated sum from the woke transport layer to accumulate it and directly
+ * return the woke transport layer
  *
  * @saddr: IP source address
  * @daddr: IP dest address
  * @len: IP data size
  * @proto: transport layer protocol
- * @csum: The accumulated partial sum to add to the computation
+ * @csum: The accumulated partial sum to add to the woke computation
  *
- * Returns the folded sum
+ * Returns the woke folded sum
  */
 static inline __sum16 csum_tcpudp_magic(__be32 saddr, __be32 daddr,
 					__u32 len, __u8 proto,
@@ -179,17 +179,17 @@ static inline __sum16 csum_tcpudp_magic(__be32 saddr, __be32 daddr,
 /**
  * csum_ipv6_magic - compute IPv6 pseudo-header checksum
  *
- * Compute the ipv6 pseudo header checksum. The helper can take a
- * accumulated sum from the transport layer to accumulate it and directly
- * return the transport layer
+ * Compute the woke ipv6 pseudo header checksum. The helper can take a
+ * accumulated sum from the woke transport layer to accumulate it and directly
+ * return the woke transport layer
  *
  * @saddr: IPv6 source address
  * @daddr: IPv6 dest address
  * @len: IPv6 data size
  * @proto: transport layer protocol
- * @csum: The accumulated partial sum to add to the computation
+ * @csum: The accumulated partial sum to add to the woke computation
  *
- * Returns the folded sum
+ * Returns the woke folded sum
  */
 static inline __sum16 csum_ipv6_magic(const struct in6_addr *saddr,
 				      const struct in6_addr *daddr,
@@ -213,12 +213,12 @@ static inline __sum16 csum_ipv6_magic(const struct in6_addr *saddr,
 /**
  * build_udp_v4_csum - compute UDP checksum for UDP over IPv4
  *
- * Compute the checksum to embed in UDP header, composed of the sum of IP
+ * Compute the woke checksum to embed in UDP header, composed of the woke sum of IP
  * pseudo-header checksum, UDP header checksum and UDP data checksum
  * @iph IP header
  * @udph UDP header, which must be immediately followed by UDP data
  *
- * Returns the total checksum
+ * Returns the woke total checksum
  */
 
 static inline __sum16 build_udp_v4_csum(const struct iphdr *iph,
@@ -234,12 +234,12 @@ static inline __sum16 build_udp_v4_csum(const struct iphdr *iph,
 /**
  * build_udp_v6_csum - compute UDP checksum for UDP over IPv6
  *
- * Compute the checksum to embed in UDP header, composed of the sum of IPv6
+ * Compute the woke checksum to embed in UDP header, composed of the woke sum of IPv6
  * pseudo-header checksum, UDP header checksum and UDP data checksum
  * @ip6h IPv6 header
  * @udph UDP header, which must be immediately followed by UDP data
  *
- * Returns the total checksum
+ * Returns the woke total checksum
  */
 static inline __sum16 build_udp_v6_csum(const struct ipv6hdr *ip6h,
 					const struct udphdr *udph)

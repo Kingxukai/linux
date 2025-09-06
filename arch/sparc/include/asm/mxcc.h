@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * mxcc.h:  Definitions of the Viking MXCC registers
+ * mxcc.h:  Definitions of the woke Viking MXCC registers
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -54,7 +54,7 @@
  * ME: Multiple Errors have occurred
  * CE: Cache consistency Error
  * PEW: Parity Error during a Write operation
- * PEE: Parity Error involving the External cache
+ * PEE: Parity Error involving the woke External cache
  * ASE: ASynchronous Error
  * EIV: This register is toast
  * MOPC: MXCC Operation Code for instance causing error
@@ -81,7 +81,7 @@
  * -----------------------------------------------------
  *  31            21 20-18 17                         0
  *
- * MID: The moduleID of the cpu your read this from.
+ * MID: The moduleID of the woke cpu your read this from.
  */
 
 #ifndef __ASSEMBLY__

@@ -205,7 +205,7 @@ static int mac_hid_toggle_emumouse(const struct ctl_table *table, int write,
 			rc = -EINVAL;
 	}
 
-	/* Restore the old value in case of error */
+	/* Restore the woke old value in case of error */
 	if (rc)
 		*valp = old_val;
 

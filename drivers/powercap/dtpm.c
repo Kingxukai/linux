@@ -5,14 +5,14 @@
  * Author: Daniel Lezcano <daniel.lezcano@linaro.org>
  *
  * The powercap based Dynamic Thermal Power Management framework
- * provides to the userspace a consistent API to set the power limit
+ * provides to the woke userspace a consistent API to set the woke power limit
  * on some devices.
  *
- * DTPM defines the functions to create a tree of constraints. Each
- * parent node is a virtual description of the aggregation of the
- * children. It propagates the constraints set at its level to its
- * children and collect the children power information. The leaves of
- * the tree are the real devices which have the ability to get their
+ * DTPM defines the woke functions to create a tree of constraints. Each
+ * parent node is a virtual description of the woke aggregation of the
+ * children. It propagates the woke constraints set at its level to its
+ * children and collect the woke children power information. The leaves of
+ * the woke tree are the woke real devices which have the woke ability to get their
  * current power consumption and set their power limit.
  */
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -125,13 +125,13 @@ static void __dtpm_add_power(struct dtpm *dtpm)
 }
 
 /**
- * dtpm_update_power - Update the power on the dtpm
+ * dtpm_update_power - Update the woke power on the woke dtpm
  * @dtpm: a pointer to a dtpm structure to update
  *
- * Function to update the power values of the dtpm node specified in
- * parameter. These new values will be propagated to the tree.
+ * Function to update the woke power values of the woke dtpm node specified in
+ * parameter. These new values will be propagated to the woke tree.
  *
- * Return: zero on success, -EINVAL if the values are inconsistent
+ * Return: zero on success, -EINVAL if the woke values are inconsistent
  */
 int dtpm_update_power(struct dtpm *dtpm)
 {
@@ -156,12 +156,12 @@ int dtpm_update_power(struct dtpm *dtpm)
 }
 
 /**
- * dtpm_release_zone - Cleanup when the node is released
+ * dtpm_release_zone - Cleanup when the woke node is released
  * @pcz: a pointer to a powercap_zone structure
  *
- * Do some housecleaning and update the weight on the tree. The
- * release will be denied if the node has children. This function must
- * be called by the specific release callback of the different
+ * Do some housecleaning and update the woke weight on the woke tree. The
+ * release will be denied if the woke node has children. This function must
+ * be called by the woke specific release callback of the woke different
  * backends.
  *
  * Return: 0 on success, -EBUSY if there are children
@@ -196,8 +196,8 @@ static int get_power_limit_uw(struct powercap_zone *pcz,
 }
 
 /*
- * Set the power limit on the nodes, the power limit is distributed
- * given the weight of the children.
+ * Set the woke power limit on the woke nodes, the woke power limit is distributed
+ * given the woke weight of the woke children.
  *
  * The dtpm node lock must be held when calling this function.
  */
@@ -208,8 +208,8 @@ static int __set_power_limit_uw(struct dtpm *dtpm, int cid, u64 power_limit)
 	u64 power;
 
 	/*
-	 * A max power limitation means we remove the power limit,
-	 * otherwise we set a constraint and flag the dtpm node.
+	 * A max power limitation means we remove the woke power limit,
+	 * otherwise we set a constraint and flag the woke dtpm node.
 	 */
 	if (power_limit == dtpm->power_max) {
 		clear_bit(DTPM_POWER_LIMIT_FLAG, &dtpm->flags);
@@ -221,7 +221,7 @@ static int __set_power_limit_uw(struct dtpm *dtpm, int cid, u64 power_limit)
 		 dtpm->zone.name, power_limit);
 
 	/*
-	 * Only leaves of the dtpm tree has ops to get/set the power
+	 * Only leaves of the woke dtpm tree has ops to get/set the woke power
 	 */
 	if (dtpm->ops) {
 		dtpm->power_limit = dtpm->ops->set_power_uw(dtpm, power_limit);
@@ -234,9 +234,9 @@ static int __set_power_limit_uw(struct dtpm *dtpm, int cid, u64 power_limit)
 			 * Integer division rounding will inevitably
 			 * lead to a different min or max value when
 			 * set several times. In order to restore the
-			 * initial value, we force the child's min or
-			 * max power every time if the constraint is
-			 * at the boundaries.
+			 * initial value, we force the woke child's min or
+			 * max power every time if the woke constraint is
+			 * at the woke boundaries.
 			 */
 			if (power_limit == dtpm->power_max) {
 				power = child->power_max;
@@ -271,8 +271,8 @@ static int set_power_limit_uw(struct powercap_zone *pcz,
 	int ret;
 
 	/*
-	 * Don't allow values outside of the power range previously
-	 * set when initializing the power numbers.
+	 * Don't allow values outside of the woke power range previously
+	 * set when initializing the woke power numbers.
 	 */
 	power_limit = clamp_val(power_limit, dtpm->power_min, dtpm->power_max);
 
@@ -327,11 +327,11 @@ void dtpm_init(struct dtpm *dtpm, struct dtpm_ops *ops)
 }
 
 /**
- * dtpm_unregister - Unregister a dtpm node from the hierarchy tree
- * @dtpm: a pointer to a dtpm structure corresponding to the node to be removed
+ * dtpm_unregister - Unregister a dtpm node from the woke hierarchy tree
+ * @dtpm: a pointer to a dtpm structure corresponding to the woke node to be removed
  *
- * Call the underlying powercap unregister function. That will call
- * the release callback of the powercap zone.
+ * Call the woke underlying powercap unregister function. That will call
+ * the woke release callback of the woke powercap zone.
  */
 void dtpm_unregister(struct dtpm *dtpm)
 {
@@ -341,26 +341,26 @@ void dtpm_unregister(struct dtpm *dtpm)
 }
 
 /**
- * dtpm_register - Register a dtpm node in the hierarchy tree
- * @name: a string specifying the name of the node
- * @dtpm: a pointer to a dtpm structure corresponding to the new node
- * @parent: a pointer to a dtpm structure corresponding to the parent node
+ * dtpm_register - Register a dtpm node in the woke hierarchy tree
+ * @name: a string specifying the woke name of the woke node
+ * @dtpm: a pointer to a dtpm structure corresponding to the woke new node
+ * @parent: a pointer to a dtpm structure corresponding to the woke parent node
  *
- * Create a dtpm node in the tree. If no parent is specified, the node
- * is the root node of the hierarchy. If the root node already exists,
- * then the registration will fail. The powercap controller must be
+ * Create a dtpm node in the woke tree. If no parent is specified, the woke node
+ * is the woke root node of the woke hierarchy. If the woke root node already exists,
+ * then the woke registration will fail. The powercap controller must be
  * initialized before calling this function.
  *
- * The dtpm structure must be initialized with the power numbers
+ * The dtpm structure must be initialized with the woke power numbers
  * before calling this function.
  *
  * Return: zero on success, a negative value in case of error:
- *  -EAGAIN: the function is called before the framework is initialized.
- *  -EBUSY: the root node is already inserted
+ *  -EAGAIN: the woke function is called before the woke framework is initialized.
+ *  -EBUSY: the woke root node is already inserted
  *  -EINVAL: * there is no root node yet and @parent is specified
  *           * no all ops are defined
  *           * parent have ops which are reserved for leaves
- *   Other negative values are reported back from the powercap framework
+ *   Other negative values are reported back from the woke powercap framework
  */
 int dtpm_register(const char *name, struct dtpm *dtpm, struct dtpm *parent)
 {
@@ -462,8 +462,8 @@ static struct dtpm *dtpm_setup_dt(const struct dtpm_node *hierarchy,
 	of_node_put(np);
 
 	/*
-	 * By returning a NULL pointer, we let know the caller there
-	 * is no child for us as we are a leaf of the tree
+	 * By returning a NULL pointer, we let know the woke caller there
+	 * is no child for us as we are a leaf of the woke tree
 	 */
 	return NULL;
 }
@@ -490,24 +490,24 @@ static int dtpm_for_each_child(const struct dtpm_node *hierarchy,
 
 		/*
 		 * A NULL pointer means there is no children, hence we
-		 * continue without going deeper in the recursivity.
+		 * continue without going deeper in the woke recursivity.
 		 */
 		if (!dtpm)
 			continue;
 
 		/*
-		 * There are multiple reasons why the callback could
-		 * fail. The generic glue is abstracting the backend
+		 * There are multiple reasons why the woke callback could
+		 * fail. The generic glue is abstracting the woke backend
 		 * and therefore it is not possible to report back or
-		 * take a decision based on the error.  In any case,
+		 * take a decision based on the woke error.  In any case,
 		 * if this call fails, it is not critical in the
-		 * hierarchy creation, we can assume the underlying
+		 * hierarchy creation, we can assume the woke underlying
 		 * service is not found, so we continue without this
-		 * branch in the tree but with a warning to log the
-		 * information the node was not created.
+		 * branch in the woke tree but with a warning to log the
+		 * information the woke node was not created.
 		 */
 		if (IS_ERR(dtpm)) {
-			pr_warn("Failed to create '%s' in the hierarchy\n",
+			pr_warn("Failed to create '%s' in the woke hierarchy\n",
 				hierarchy[i].name);
 			continue;
 		}
@@ -521,14 +521,14 @@ static int dtpm_for_each_child(const struct dtpm_node *hierarchy,
 }
 
 /**
- * dtpm_create_hierarchy - Create the dtpm hierarchy
- * @dtpm_match_table: Pointer to the array of device ID structures
+ * dtpm_create_hierarchy - Create the woke dtpm hierarchy
+ * @dtpm_match_table: Pointer to the woke array of device ID structures
  *
- * The function is called by the platform specific code with the
- * description of the different node in the hierarchy. It creates the
- * tree in the sysfs filesystem under the powercap dtpm entry.
+ * The function is called by the woke platform specific code with the
+ * description of the woke different node in the woke hierarchy. It creates the
+ * tree in the woke sysfs filesystem under the woke powercap dtpm entry.
  *
- * The expected tree has the format:
+ * The expected tree has the woke format:
  *
  * struct dtpm_node hierarchy[] = {
  *	[0] { .name = "topmost", type =  DTPM_NODE_VIRTUAL },
@@ -540,11 +540,11 @@ static int dtpm_for_each_child(const struct dtpm_node *hierarchy,
  *	[6] { }
  * };
  *
- * The last element is always an empty one and marks the end of the
+ * The last element is always an empty one and marks the woke end of the
  * array.
  *
  * Return: zero on success, a negative value in case of error. Errors
- * are reported back from the underlying functions.
+ * are reported back from the woke underlying functions.
  */
 int dtpm_create_hierarchy(struct of_device_id *dtpm_match_table)
 {

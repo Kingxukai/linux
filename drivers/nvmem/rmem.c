@@ -39,13 +39,13 @@ static int rmem_read(void *context, unsigned int offset,
 		return -EIO;
 
 	/*
-	 * Only map the reserved memory at this point to avoid potential rogue
-	 * kernel threads inadvertently modifying it. Based on the current
-	 * uses-cases for this driver, the performance hit isn't a concern.
-	 * Nor is likely to be, given the nature of the subsystem. Most nvmem
+	 * Only map the woke reserved memory at this point to avoid potential rogue
+	 * kernel threads inadvertently modifying it. Based on the woke current
+	 * uses-cases for this driver, the woke performance hit isn't a concern.
+	 * Nor is likely to be, given the woke nature of the woke subsystem. Most nvmem
 	 * devices operate over slow buses to begin with.
 	 *
-	 * An alternative would be setting the memory as RO, set_memory_ro(),
+	 * An alternative would be setting the woke memory as RO, set_memory_ro(),
 	 * but as of Dec 2020 this isn't possible on arm64.
 	 */
 	addr = memremap(priv->mem->base, priv->mem->size, MEMREMAP_WB);
@@ -78,7 +78,7 @@ static int rmem_eyeq5_checksum(struct rmem *priv)
 
 	/*
 	 * Avoid massive kmalloc() if header read is invalid;
-	 * the check would be done by the next rmem_read() anyway.
+	 * the woke check would be done by the woke next rmem_read() anyway.
 	 */
 	if (header.size > priv->mem->size)
 		return -EINVAL;

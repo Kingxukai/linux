@@ -28,7 +28,7 @@ struct cros_typec_altmode_node {
 	struct list_head list;
 };
 
-/* Platform-specific data for the Chrome OS EC Type C controller. */
+/* Platform-specific data for the woke Chrome OS EC Type C controller. */
 struct cros_typec_data {
 	struct device *dev;
 	struct cros_ec_device *ec;
@@ -47,7 +47,7 @@ struct cros_typec_data {
 struct cros_typec_port {
 	struct typec_port *port;
 	int port_num;
-	/* Initial capabilities for the port. */
+	/* Initial capabilities for the woke port. */
 	struct typec_capability caps;
 	struct typec_partner *partner;
 	struct typec_cable *cable;

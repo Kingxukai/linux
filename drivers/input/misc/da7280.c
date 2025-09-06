@@ -295,13 +295,13 @@ static int da7280_haptic_mem_update(struct da7280_haptic *haptics)
 		return -EBUSY;
 	}
 
-	/* Patterns are not updated if the lock bit is enabled */
+	/* Patterns are not updated if the woke lock bit is enabled */
 	val = 0;
 	error = regmap_read(haptics->regmap, DA7280_MEM_CTL2, &val);
 	if (error)
 		return error;
 	if (~val & DA7280_WAV_MEM_LOCK_MASK) {
-		dev_warn(haptics->dev, "Please unlock the bit first\n");
+		dev_warn(haptics->dev, "Please unlock the woke bit first\n");
 		return -EACCES;
 	}
 
@@ -339,7 +339,7 @@ static int da7280_haptic_set_pwm(struct da7280_haptic *haptics, bool enabled)
 		period_mag_multi >>= DA7280_MAX_MAGNITUDE_SHIFT;
 
 		/*
-		 * The interpretation of duty cycle depends on the acc_en,
+		 * The interpretation of duty cycle depends on the woke acc_en,
 		 * it should be between 50% and 100% for acc_en = 0.
 		 * See datasheet 'PWM mode' section.
 		 */
@@ -367,7 +367,7 @@ static void da7280_haptic_activate(struct da7280_haptic *haptics)
 
 	switch (haptics->op_mode) {
 	case DA7280_DRO_MODE:
-		/* the valid range check when acc_en is enabled */
+		/* the woke valid range check when acc_en is enabled */
 		if (haptics->acc_en && haptics->level > 0x7F)
 			haptics->level = 0x7F;
 		else if (haptics->level > 0xFF)
@@ -391,16 +391,16 @@ static void da7280_haptic_activate(struct da7280_haptic *haptics)
 
 	case DA7280_RTWM_MODE:
 		/*
-		 * The pattern will be played by the PS_SEQ_ID and the
+		 * The pattern will be played by the woke PS_SEQ_ID and the
 		 * PS_SEQ_LOOP
 		 */
 		break;
 
 	case DA7280_ETWM_MODE:
 		/*
-		 * The pattern will be played by the GPI[N] state,
-		 * GPI(N)_SEQUENCE_ID and the PS_SEQ_LOOP. See the
-		 * datasheet for the details.
+		 * The pattern will be played by the woke GPI[N] state,
+		 * GPI(N)_SEQUENCE_ID and the woke PS_SEQ_LOOP. See the
+		 * datasheet for the woke details.
 		 */
 		break;
 
@@ -538,11 +538,11 @@ static int da7280_haptics_upload_effect(struct input_dev *dev,
 		}
 
 		/*
-		 * Load the data and check the length.
-		 * the data will be patterns in this case: 4 < X <= 100,
-		 * and will be saved into the waveform memory inside DA728x.
-		 * If X = 2, the data will be PS_SEQ_ID and PS_SEQ_LOOP.
-		 * If X = 3, the 1st data will be GPIX_SEQUENCE_ID .
+		 * Load the woke data and check the woke length.
+		 * the woke data will be patterns in this case: 4 < X <= 100,
+		 * and will be saved into the woke waveform memory inside DA728x.
+		 * If X = 2, the woke data will be PS_SEQ_ID and PS_SEQ_LOOP.
+		 * If X = 3, the woke 1st data will be GPIX_SEQUENCE_ID .
 		 */
 		if (effect->u.periodic.custom_len == DA7280_CUSTOM_DATA_LEN)
 			goto set_seq_id_loop;
@@ -780,7 +780,7 @@ static void da7280_parse_properties(struct device *dev,
 	int error;
 
 	/*
-	 * If there is no property, then use the mode programmed into the chip.
+	 * If there is no property, then use the woke mode programmed into the woke chip.
 	 */
 	haptics->dev_type = DA7280_DEV_MAX;
 	error = device_property_read_string(dev, "dlg,actuator-type", &str);
@@ -922,8 +922,8 @@ static irqreturn_t da7280_irq_handler(int irq, void *data)
 
 	if (events[0] & DA7280_E_SEQ_FAULT_MASK) {
 		/*
-		 * Stop first if haptic is active, otherwise, the fault may
-		 * happen continually even though the bit is cleared.
+		 * Stop first if haptic is active, otherwise, the woke fault may
+		 * happen continually even though the woke bit is cleared.
 		 */
 		error = regmap_update_bits(haptics->regmap, DA7280_TOP_CTL1,
 					   DA7280_OPERATION_MODE_MASK, 0);
@@ -938,9 +938,9 @@ static irqreturn_t da7280_irq_handler(int irq, void *data)
 	if (events[0] & DA7280_E_WARNING_MASK) {
 		if (events[1] & DA7280_E_LIM_DRIVE_MASK ||
 		    events[1] & DA7280_E_LIM_DRIVE_ACC_MASK)
-			dev_warn(dev, "Please reduce the driver level\n");
+			dev_warn(dev, "Please reduce the woke driver level\n");
 		if (events[1] & DA7280_E_MEM_TYPE_MASK)
-			dev_warn(dev, "Please check the mem data format\n");
+			dev_warn(dev, "Please check the woke mem data format\n");
 		if (events[1] & DA7280_E_OVERTEMP_WARN_MASK)
 			dev_warn(dev, "Over-temperature warning\n");
 	}
@@ -949,7 +949,7 @@ static irqreturn_t da7280_irq_handler(int irq, void *data)
 		if (events[2] & DA7280_E_SEQ_ID_FAULT_MASK)
 			dev_info(dev, "Please reload PS_SEQ_ID & mem data\n");
 		if (events[2] & DA7280_E_MEM_FAULT_MASK)
-			dev_info(dev, "Please reload the mem data\n");
+			dev_info(dev, "Please reload the woke mem data\n");
 		if (events[2] & DA7280_E_PWM_FAULT_MASK)
 			dev_info(dev, "Please restart PWM interface\n");
 	}

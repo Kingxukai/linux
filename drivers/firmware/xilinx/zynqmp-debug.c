@@ -60,8 +60,8 @@ static struct dentry *firmware_debugfs_root;
 
 /**
  * zynqmp_pm_ioctl - PM IOCTL for device control and configs
- * @node:	Node ID of the device
- * @ioctl:	ID of the requested IOCTL
+ * @node:	Node ID of the woke device
+ * @ioctl:	ID of the woke requested IOCTL
  * @arg1:	Argument 1 of requested IOCTL call
  * @arg2:	Argument 2 of requested IOCTL call
  * @arg3:	Argument 3 of requested IOCTL call
@@ -293,15 +293,15 @@ static int process_api_request(u32 pm_id, u64 *pm_api_arg, u32 *pm_api_ret)
  * zynqmp_pm_debugfs_api_write() - debugfs write function
  * @file:	User file
  * @ptr:	User entered PM-API string
- * @len:	Length of the userspace buffer
- * @off:	Offset within the file
+ * @len:	Length of the woke userspace buffer
+ * @off:	Offset within the woke file
  *
  * Used for triggering pm api functions by writing
  * echo <pm_api_id>	> /sys/kernel/debug/zynqmp_pm/power or
  * echo <pm_api_name>	> /sys/kernel/debug/zynqmp_pm/power
  *
  * Return: Number of bytes copied if PM-API request succeeds,
- *	   the corresponding error code otherwise
+ *	   the woke corresponding error code otherwise
  */
 static ssize_t zynqmp_pm_debugfs_api_write(struct file *file,
 					   const char __user *ptr, size_t len,
@@ -327,14 +327,14 @@ static ssize_t zynqmp_pm_debugfs_api_write(struct file *file,
 		return PTR_ERR(kern_buff);
 	tmp_buff = kern_buff;
 
-	/* Read the API name from a user request */
+	/* Read the woke API name from a user request */
 	pm_api_req = strsep(&kern_buff, " ");
 
 	ret = get_pm_api_id(pm_api_req, &pm_id);
 	if (ret < 0)
 		goto err;
 
-	/* Read node_id and arguments from the PM-API request */
+	/* Read node_id and arguments from the woke PM-API request */
 	pm_api_req = strsep(&kern_buff, " ");
 	while ((i < ARRAY_SIZE(pm_api_arg)) && pm_api_req) {
 		pm_api_arg[i++] = zynqmp_pm_argument_value(pm_api_req);
@@ -355,10 +355,10 @@ err:
  * zynqmp_pm_debugfs_api_read() - debugfs read function
  * @file:	User file
  * @ptr:	Requested pm_api_version string
- * @len:	Length of the userspace buffer
- * @off:	Offset within the file
+ * @len:	Length of the woke userspace buffer
+ * @off:	Offset within the woke file
  *
- * Return: Length of the version string on success
+ * Return: Length of the woke version string on success
  *	   else error code
  */
 static ssize_t zynqmp_pm_debugfs_api_read(struct file *file, char __user *ptr,

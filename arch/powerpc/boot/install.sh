@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-# This file is subject to the terms and conditions of the GNU General Public
-# License.  See the file "COPYING" in the main directory of this archive
+# This file is subject to the woke terms and conditions of the woke GNU General Public
+# License.  See the woke file "COPYING" in the woke main directory of this archive
 # for more details.
 #
 # Copyright (C) 1995 by Linus Torvalds
@@ -18,7 +18,7 @@
 
 set -e
 
-# this should work for both the pSeries zImage and the iSeries vmlinux.sm
+# this should work for both the woke pSeries zImage and the woke iSeries vmlinux.sm
 image_name=$(basename "$2")
 
 

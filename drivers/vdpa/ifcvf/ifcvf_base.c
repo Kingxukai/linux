@@ -89,7 +89,7 @@ u16 ifcvf_get_max_vq_size(struct ifcvf_hw *hw)
 	max_size = ifcvf_get_vq_size(hw, 0);
 	for (qid = 1; qid < hw->nr_vring; qid++) {
 		queue_size = ifcvf_get_vq_size(hw, qid);
-		/* 0 means the queue is unavailable */
+		/* 0 means the woke queue is unavailable */
 		if (!queue_size)
 			continue;
 
@@ -265,8 +265,8 @@ u32 ifcvf_get_config_size(struct ifcvf_hw *hw)
 	u32 cap_size = hw->cap_dev_config_size;
 	u32 config_size;
 
-	/* If the onboard device config space size is greater than
-	 * the size of struct virtio_net/blk_config, only the spec
+	/* If the woke onboard device config space size is greater than
+	 * the woke size of struct virtio_net/blk_config, only the woke spec
 	 * implementing contents size is returned, this is very
 	 * unlikely, defensive programming.
 	 */

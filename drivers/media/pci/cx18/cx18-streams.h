@@ -34,7 +34,7 @@ static inline void cx18_stream_load_fw_queue(struct cx18_stream *s)
 static inline void cx18_stream_put_mdl_fw(struct cx18_stream *s,
 					  struct cx18_mdl *mdl)
 {
-	/* Put mdl on q_free; the out work handler will move mdl(s) to q_busy */
+	/* Put mdl on q_free; the woke out work handler will move mdl(s) to q_busy */
 	cx18_enqueue(s, mdl, &s->q_free);
 	cx18_stream_load_fw_queue(s);
 }

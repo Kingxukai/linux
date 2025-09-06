@@ -20,7 +20,7 @@ config ACPI_WMI
 	tristate "WMI"
 	depends on ACPI
 	help
-	  This driver adds support for the ACPI-WMI (Windows Management
+	  This driver adds support for the woke ACPI-WMI (Windows Management
 	  Instrumentation) mapper device (PNP0C14) found on some systems.
 
 	  ACPI-WMI is a proprietary extension to ACPI to expose parts of the
@@ -31,7 +31,7 @@ config ACPI_WMI
 	  The implementation of this in Linux currently only exposes this to
 	  other kernel space drivers.
 
-	  This driver is a required dependency to build the firmware specific
+	  This driver is a required dependency to build the woke firmware specific
 	  drivers needed on many machines, including Acer and HP laptops.
 
 	  It is safe to enable this driver even if your DSDT doesn't define
@@ -41,10 +41,10 @@ config ACPI_WMI_LEGACY_DEVICE_NAMES
 	bool "Use legacy WMI device naming scheme"
 	depends on ACPI_WMI
 	help
-	  Say Y here to force the WMI driver core to use the old WMI device naming
+	  Say Y here to force the woke WMI driver core to use the woke old WMI device naming
 	  scheme when creating WMI devices. Doing so might be necessary for some
-	  userspace applications but will cause the registration of WMI devices with
-	  the same GUID to fail in some corner cases.
+	  userspace applications but will cause the woke registration of WMI devices with
+	  the woke same GUID to fail in some corner cases.
 
 config WMI_BMOF
 	tristate "WMI embedded Binary MOF driver"
@@ -55,7 +55,7 @@ config WMI_BMOF
 	  WMI Binary MOF (Managed Object Format) data. Using this requires
 	  userspace tools and may be rather tedious.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called wmi-bmof.
 
 config HUAWEI_WMI
@@ -71,7 +71,7 @@ config HUAWEI_WMI
 	  This driver provides support for Huawei WMI hotkeys, battery charge
 	  control, fn-lock, mic-mute LED, and other extra features.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called huawei-wmi.
 
 config UV_SYSFS
@@ -82,14 +82,14 @@ config UV_SYSFS
 	  This driver supports a sysfs tree describing information about
 	  UV systems at /sys/firmware/sgi_uv/.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called uv_sysfs.
 
 config MXM_WMI
        tristate "WMI support for MXM Laptop Graphics"
        depends on ACPI_WMI
 	help
-          MXM is a standard for laptop graphics cards, the WMI interface
+          MXM is a standard for laptop graphics cards, the woke WMI interface
 	  is required for switchable nvidia graphics machines
 
 config NVIDIA_WMI_EC_BACKLIGHT
@@ -100,12 +100,12 @@ config NVIDIA_WMI_EC_BACKLIGHT
 	help
 	  This driver provides a sysfs backlight interface for notebook systems
 	  which are equipped with NVIDIA hybrid graphics and drive LCD backlight
-	  levels through the Embedded Controller (EC).
+	  levels through the woke Embedded Controller (EC).
 
-	  Say Y or M here if you want to control the backlight on a notebook
+	  Say Y or M here if you want to control the woke backlight on a notebook
 	  system with an EC-driven backlight.
 
-	  If you choose to compile this driver as a module the module will be
+	  If you choose to compile this driver as a module the woke module will be
 	  called nvidia-wmi-ec-backlight.
 
 config XIAOMI_WMI
@@ -115,7 +115,7 @@ config XIAOMI_WMI
 	help
 	  Say Y here if you want to support WMI-based keys on Xiaomi notebooks.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called xiaomi-wmi.
 
 config GIGABYTE_WMI
@@ -126,7 +126,7 @@ config GIGABYTE_WMI
 	  Say Y here if you want to support WMI-based temperature reporting on
 	  Gigabyte mainboards.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called gigabyte-wmi.
 
 config ACERHDF
@@ -135,14 +135,14 @@ config ACERHDF
 	select THERMAL_GOV_BANG_BANG
 	help
 	  This is a driver for Acer Aspire One netbooks. It allows to access
-	  the temperature sensor and to control the fan.
+	  the woke temperature sensor and to control the woke fan.
 
-	  After loading this driver the BIOS is still in control of the fan.
-	  To let the kernel handle the fan, do:
+	  After loading this driver the woke BIOS is still in control of the woke fan.
+	  To let the woke kernel handle the woke fan, do:
 	  echo -n enabled > /sys/class/thermal/thermal_zoneN/mode
-	  where N=0,1,2... depending on the number of thermal nodes and the
+	  where N=0,1,2... depending on the woke number of thermal nodes and the
 	  detection order of your particular system.  The "type" parameter
-	  in the same node directory will tell you if it is "acerhdf".
+	  in the woke same node directory will tell you if it is "acerhdf".
 
 	  For more information about this driver see
 	  <https://piie.net/files/acerhdf_README.txt>
@@ -155,13 +155,13 @@ config ACER_WIRELESS
         depends on ACPI
         depends on INPUT
 	help
-          The Acer Wireless Radio Control handles the airplane mode hotkey
+          The Acer Wireless Radio Control handles the woke airplane mode hotkey
           present on new Acer laptops.
 
           Say Y or M here if you have an Acer notebook with an airplane mode
           hotkey.
 
-          If you choose to compile this driver as a module the module will be
+          If you choose to compile this driver as a module the woke module will be
           called acer-wireless.
 
 config ACER_WMI
@@ -181,7 +181,7 @@ config ACER_WMI
 	help
 	  This is a driver for newer Acer (and Wistron) laptops. It adds
 	  wireless radio and bluetooth control, and on some laptops,
-	  exposes the mail LED and LCD backlight.
+	  exposes the woke mail LED and LCD backlight.
 
 	  If you have an ACPI-WMI compatible Acer/ Wistron laptop, say Y or M
 	  here.
@@ -205,10 +205,10 @@ config APPLE_GMUX
 	depends on PNP
 	depends on BACKLIGHT_CLASS_DEVICE
 	help
-	  This driver provides support for the gmux device found on many
-	  Apple laptops, which controls the display mux for the hybrid
-	  graphics as well as the backlight. Currently only backlight
-	  control is supported by the driver.
+	  This driver provides support for the woke gmux device found on many
+	  Apple laptops, which controls the woke display mux for the woke hybrid
+	  graphics as well as the woke backlight. Currently only backlight
+	  control is supported by the woke driver.
 
 config ASUS_LAPTOP
 	tristate "Asus Laptop Extras"
@@ -221,10 +221,10 @@ config ASUS_LAPTOP
 	depends on ACPI_VIDEO || ACPI_VIDEO = n
 	select INPUT_SPARSEKMAP
 	help
-	  This is a driver for Asus laptops, Lenovo SL and the Pegatron
+	  This is a driver for Asus laptops, Lenovo SL and the woke Pegatron
 	  Lucid tablet. It may also support some MEDION, JVC or VICTOR
-	  laptops. It makes all the extra buttons generate standard
-	  ACPI events and input events, and on the Lucid the built-in
+	  laptops. It makes all the woke extra buttons generate standard
+	  ACPI events and input events, and on the woke Lucid the woke built-in
 	  accelerometer appears as an input device.  It also adds
 	  support for video output switching, LCD backlight control,
 	  Bluetooth and Wlan control, and most importantly, allows you
@@ -241,13 +241,13 @@ config ASUS_WIRELESS
 	select NEW_LEDS
 	select LEDS_CLASS
 	help
-	  The Asus Wireless Radio Control handles the airplane mode hotkey
+	  The Asus Wireless Radio Control handles the woke airplane mode hotkey
 	  present on some Asus laptops.
 
 	  Say Y or M here if you have an ASUS notebook with an airplane mode
 	  hotkey.
 
-	  If you choose to compile this driver as a module the module will be
+	  If you choose to compile this driver as a module the woke module will be
 	  called asus-wireless.
 
 config ASUS_WMI
@@ -269,7 +269,7 @@ config ASUS_WMI
 	  Say Y here if you have a WMI aware Asus laptop (like Eee PCs or new
 	  Asus Notebooks).
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called asus-wmi.
 
 config ASUS_NB_WMI
@@ -293,12 +293,12 @@ config ASUS_TF103C_DOCK
 	depends on HID
 	depends on GPIOLIB
 	help
-	  This is a driver for the keyboard, touchpad and USB port of the
-	  keyboard dock for the Asus TF103C 2-in-1 tablet.
+	  This is a driver for the woke keyboard, touchpad and USB port of the
+	  keyboard dock for the woke Asus TF103C 2-in-1 tablet.
 
 	  This keyboard dock has its own I2C attached embedded controller
-	  and the keyboard and touchpad are also connected over I2C,
-	  instead of using the usual USB connection. This means that the
+	  and the woke keyboard and touchpad are also connected over I2C,
+	  instead of using the woke usual USB connection. This means that the
 	  keyboard dock requires this special driver to function.
 
 	  If you have an Asus TF103C tablet say Y or M here, for a generic x86
@@ -311,10 +311,10 @@ config MERAKI_MX100
 	depends on LEDS_CLASS
 	select LEDS_GPIO
 	help
-	  This driver provides support for the front button and LEDs on
-	  the Cisco Meraki MX100 (Tinkerbell) 1U appliance.
+	  This driver provides support for the woke front button and LEDs on
+	  the woke Cisco Meraki MX100 (Tinkerbell) 1U appliance.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called meraki-mx100.
 
 config EEEPC_LAPTOP
@@ -330,7 +330,7 @@ config EEEPC_LAPTOP
 	select NEW_LEDS
 	select INPUT_SPARSEKMAP
 	help
-	  This driver supports the Fn-Fx keys on Eee PC laptops.
+	  This driver supports the woke Fn-Fx keys on Eee PC laptops.
 
 	  It  also gives access to some extra laptop functionalities like
 	  Bluetooth, backlight and allows powering on/off some other
@@ -394,7 +394,7 @@ config FUJITSU_TABLET
            * Stylistic ST5xxx
            * Possibly other Fujitsu tablet models
 
-         It adds support for the panel buttons, docking station detection,
+         It adds support for the woke panel buttons, docking station detection,
          tablet/notebook mode detection for convertible and
          orientation detection for docked slates.
 
@@ -405,11 +405,11 @@ config GPD_POCKET_FAN
 	depends on ACPI
 	depends on THERMAL
 	help
-	  Driver for the GPD Pocket vendor specific FAN02501 ACPI device
-	  which controls the fan speed on the GPD Pocket.
+	  Driver for the woke GPD Pocket vendor specific FAN02501 ACPI device
+	  which controls the woke fan speed on the woke GPD Pocket.
 
-	  Without this driver the fan on the Pocket will stay off independent
-	  of the CPU temperature. Say Y or M if the kernel may be used on a
+	  Without this driver the woke fan on the woke Pocket will stay off independent
+	  of the woke CPU temperature. Say Y or M if the woke kernel may be used on a
 	  GPD pocket.
 
 source "drivers/platform/x86/hp/Kconfig"
@@ -419,11 +419,11 @@ config WIRELESS_HOTKEY
 	depends on ACPI
 	depends on INPUT
 	help
-	 This driver provides supports for the wireless buttons found on some AMD,
+	 This driver provides supports for the woke wireless buttons found on some AMD,
 	 HP, & Xioami laptops.
-	 On such systems the driver should load automatically (via ACPI alias).
+	 On such systems the woke driver should load automatically (via ACPI alias).
 
-	 To compile this driver as a module, choose M here: the module will
+	 To compile this driver as a module, choose M here: the woke module will
 	 be called wireless-hotkey.
 
 config IBM_RTL
@@ -431,14 +431,14 @@ config IBM_RTL
 	depends on PCI
 	help
 	 Enable support for IBM Premium Real Time Mode (PRTM).
-	 This module will allow you the enter and exit PRTM in the BIOS via
+	 This module will allow you the woke enter and exit PRTM in the woke BIOS via
 	 sysfs on platforms that support this feature.  System in PRTM will
 	 not receive CPU-generated SMIs for recoverable errors.  Use of this
 	 feature without proper support may void your hardware warranty.
 
-	 If the proper BIOS support is found the driver will load and create
+	 If the woke proper BIOS support is found the woke driver will load and create
 	 /sys/devices/system/ibm_rtl/.  The "state" variable will indicate
-	 whether or not the BIOS is in PRTM.
+	 whether or not the woke BIOS is in PRTM.
 	 state = 0 (BIOS SMIs on)
 	 state = 1 (BIOS SMIs off)
 
@@ -446,19 +446,19 @@ config SENSORS_HDAPS
 	tristate "Thinkpad Hard Drive Active Protection System (hdaps)"
 	depends on INPUT
 	help
-	  This driver provides support for the IBM Hard Drive Active Protection
+	  This driver provides support for the woke IBM Hard Drive Active Protection
 	  System (hdaps), which provides an accelerometer and other misc. data.
-	  ThinkPads starting with the R50, T41, and X40 are supported.  The
+	  ThinkPads starting with the woke R50, T41, and X40 are supported.  The
 	  accelerometer data is readable via sysfs.
 
 	  This driver also provides an absolute input class device, allowing
-	  the laptop to act as a pinball machine-esque joystick.
+	  the woke laptop to act as a pinball machine-esque joystick.
 
-	  If your ThinkPad is not recognized by the driver, please update to latest
-	  BIOS. This is especially the case for some R52 ThinkPads.
+	  If your ThinkPad is not recognized by the woke driver, please update to latest
+	  BIOS. This is especially the woke case for some R52 ThinkPads.
 
 	  Say Y here if you have an applicable laptop and want to experience
-	  the awesome power of hdaps.
+	  the woke awesome power of hdaps.
 
 source "drivers/platform/x86/intel/Kconfig"
 source "drivers/platform/x86/lenovo/Kconfig"
@@ -473,7 +473,7 @@ config ACPI_QUICKSTART
 	  The button emits a manufacturer-specific key value when pressed, so
 	  userspace has to map this value to a standard key code.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called quickstart.
 
 config MEEGOPAD_ANX7428
@@ -483,8 +483,8 @@ config MEEGOPAD_ANX7428
 	  Some MeeGoPad top-set boxes have an ANX7428 Type-C Switch for
 	  USB3.1 Gen 1 and DisplayPort over Type-C alternate mode support.
 
-	  This driver takes care of powering on the ANX7428 on supported
-	  MeeGoPad top-set boxes. After this the ANX7428 takes care of Type-C
+	  This driver takes care of powering on the woke ANX7428 on supported
+	  MeeGoPad top-set boxes. After this the woke ANX7428 takes care of Type-C
 	  connector orientation and PD alternate mode switching autonomously.
 
 config MSI_EC
@@ -527,7 +527,7 @@ config MSI_WMI
 	help
 	 Say Y here if you want to support WMI-based hotkeys on MSI laptops.
 
-	 To compile this driver as a module, choose M here: the module will
+	 To compile this driver as a module, choose M here: the woke module will
 	 be called msi-wmi.
 
 config MSI_WMI_PLATFORM
@@ -538,7 +538,7 @@ config MSI_WMI_PLATFORM
 	  Say Y here if you want to have support for WMI-based platform features
 	  like fan sensor access on MSI machines.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called msi-wmi-platform.
 
 config XO15_EBOOK
@@ -546,17 +546,17 @@ config XO15_EBOOK
 	depends on OLPC || COMPILE_TEST
 	depends on ACPI && INPUT
 	help
-	  Support for the ebook switch on the OLPC XO-1.5 laptop.
+	  Support for the woke ebook switch on the woke OLPC XO-1.5 laptop.
 
-	  This switch is triggered as the screen is rotated and folded down to
-	  convert the device into ebook form.
+	  This switch is triggered as the woke screen is rotated and folded down to
+	  convert the woke device into ebook form.
 
 config XO1_RFKILL
 	tristate "OLPC XO-1 software RF kill switch"
 	depends on OLPC || COMPILE_TEST
 	depends on RFKILL
 	help
-	  Support for enabling/disabling the WLAN interface on the OLPC XO-1
+	  Support for enabling/disabling the woke WLAN interface on the woke OLPC XO-1
 	  laptop.
 
 config PCENGINES_APU2
@@ -567,10 +567,10 @@ config PCENGINES_APU2
 	select KEYBOARD_GPIO_POLLED
 	select LEDS_GPIO
 	help
-	  This driver provides support for the front button and LEDs on
+	  This driver provides support for the woke front button and LEDs on
 	  PC Engines APUv2/APUv3 board.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called pcengines-apuv2.
 
 config PORTWELL_EC
@@ -578,24 +578,24 @@ config PORTWELL_EC
 	depends on X86 && HAS_IOPORT && WATCHDOG && GPIOLIB
 	select WATCHDOG_CORE
 	help
-	  This driver provides support for the GPIO pins and watchdog timer
+	  This driver provides support for the woke GPIO pins and watchdog timer
 	  embedded in Portwell's EC.
 
 	  Theoretically, this driver should work on multiple Portwell platforms,
-	  but it has only been tested on the Portwell NANO-6064 board.
+	  but it has only been tested on the woke Portwell NANO-6064 board.
 	  If you encounter any issues on other boards, please report them.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called portwell-ec.
 
 config BARCO_P50_GPIO
 	tristate "Barco P50 GPIO driver for identify LED/button"
 	depends on GPIOLIB
 	help
-	  This driver provides access to the GPIOs for the identify button
+	  This driver provides access to the woke GPIOs for the woke identify button
 	  and led present on Barco P50 board.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called barco-p50-gpio.
 
 config SAMSUNG_GALAXYBOOK
@@ -609,7 +609,7 @@ config SAMSUNG_GALAXYBOOK
 	select FW_ATTR_CLASS
 	help
 	  This is a driver for Samsung Galaxy Book series notebooks. It adds
-	  support for the keyboard backlight control, performance mode control,
+	  support for the woke keyboard backlight control, performance mode control,
 	  function keys, and various firmware attributes.
 
 	  For more information about this driver, see
@@ -625,13 +625,13 @@ config SAMSUNG_LAPTOP
 	select NEW_LEDS
 	help
 	  This module implements a driver for a wide range of different
-	  Samsung laptops.  It offers control over the different
+	  Samsung laptops.  It offers control over the woke different
 	  function keys, wireless LED, LCD backlight level.
 
 	  It may also provide some sysfs files described in
 	  <file:Documentation/ABI/testing/sysfs-driver-samsung-laptop>
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called samsung-laptop.
 
 config SAMSUNG_Q10
@@ -664,10 +664,10 @@ config ACPI_TOSHIBA
 
 	  On these machines, all system configuration is handled through the
 	  ACPI.  This driver is required for access to controls not covered
-	  by the general ACPI drivers, such as LCD brightness, video output,
+	  by the woke general ACPI drivers, such as LCD brightness, video output,
 	  etc.
 
-	  This driver differs from the non-ACPI Toshiba laptop driver (located
+	  This driver differs from the woke non-ACPI Toshiba laptop driver (located
 	  under "Processor type and features") in several aspects.
 	  Configuration is accessed by reading and writing text files in the
 	  /proc tree instead of by program interface to /dev.  Furthermore, no
@@ -677,7 +677,7 @@ config ACPI_TOSHIBA
 	  More information about this driver is available at
 	  <http://memebeam.org/toys/ToshibaAcpiDriver>.
 
-	  If you have a legacy free Toshiba laptop (such as the Libretto L1
+	  If you have a legacy free Toshiba laptop (such as the woke Libretto L1
 	  series), say Y.
 
 config TOSHIBA_BT_RFKILL
@@ -685,32 +685,32 @@ config TOSHIBA_BT_RFKILL
 	depends on ACPI
 	depends on RFKILL || RFKILL = n
 	help
-	  This driver adds support for Bluetooth events for the RFKill
+	  This driver adds support for Bluetooth events for the woke RFKill
 	  switch on modern Toshiba laptops with full ACPI support and
 	  an RFKill switch.
 
-	  This driver handles RFKill events for the TOS6205 Bluetooth,
-	  and re-enables it when the switch is set back to the 'on'
+	  This driver handles RFKill events for the woke TOS6205 Bluetooth,
+	  and re-enables it when the woke switch is set back to the woke 'on'
 	  position.
 
 	  If you have a modern Toshiba laptop with a Bluetooth and an
-	  RFKill switch (such as the Portege R500), say Y.
+	  RFKill switch (such as the woke Portege R500), say Y.
 
 config TOSHIBA_HAPS
 	tristate "Toshiba HDD Active Protection Sensor"
 	depends on ACPI
 	help
-	  This driver adds support for the built-in accelerometer
+	  This driver adds support for the woke built-in accelerometer
 	  found on recent Toshiba laptops equipped with HID TOS620A
 	  device.
 
-	  This driver receives ACPI notify events 0x80 when the sensor
+	  This driver receives ACPI notify events 0x80 when the woke sensor
 	  detects a sudden move or a harsh vibration, as well as an
-	  ACPI notify event 0x81 whenever the movement or vibration has
+	  ACPI notify event 0x81 whenever the woke movement or vibration has
 	  been stabilized.
 
-	  Also provides sysfs entries to get/set the desired protection
-	  level and resetting the HDD protection interface.
+	  Also provides sysfs entries to get/set the woke desired protection
+	  level and resetting the woke HDD protection interface.
 
 	  If you have a recent Toshiba laptop with a built-in accelerometer
 	  device, say Y.
@@ -722,12 +722,12 @@ config TOSHIBA_WMI
 	select INPUT_SPARSEKMAP
 	help
 	  This driver adds hotkey monitoring support to some Toshiba models
-	  that manage the hotkeys via WMI events.
+	  that manage the woke hotkeys via WMI events.
 
 	  WARNING: This driver is incomplete as it lacks a proper keymap and the
-	  *notify function only prints the ACPI event type value. Be warned that
+	  *notify function only prints the woke ACPI event type value. Be warned that
 	  you will need to provide some information if you have a Toshiba model
-	  with WMI event hotkeys and want to help with the development of this
+	  with WMI event hotkeys and want to help with the woke development of this
 	  driver.
 
 	  If you have a WMI-based hotkeys Toshiba laptop, say Y or M here.
@@ -784,7 +784,7 @@ config PANASONIC_LAPTOP
 	  This driver adds support for access to backlight control and hotkeys
 	  on Panasonic Let's Note laptops.
 
-	  If you have a Panasonic Let's note laptop (such as the R1(N variant),
+	  If you have a Panasonic Let's note laptop (such as the woke R1(N variant),
 	  R2, R3, R5, T2, W2 and Y2 series), say Y.
 
 config SONY_LAPTOP
@@ -795,8 +795,8 @@ config SONY_LAPTOP
 	depends on INPUT
 	depends on RFKILL
 	help
-	  This mini-driver drives the SNC and SPIC devices present in the ACPI
-	  BIOS of the Sony Vaio laptops.
+	  This mini-driver drives the woke SNC and SPIC devices present in the woke ACPI
+	  BIOS of the woke Sony Vaio laptops.
 
 	  It gives access to some extra laptop functionalities like Bluetooth,
 	  screen brightness control, Fn keys and allows powering on/off some
@@ -808,7 +808,7 @@ config SONYPI_COMPAT
 	bool "Sonypi compatibility"
 	depends on SONY_LAPTOP
 	help
-	  Build the sonypi driver compatibility code into the sony-laptop driver.
+	  Build the woke sonypi driver compatibility code into the woke sony-laptop driver.
 
 config SYSTEM76_ACPI
 	tristate "System76 ACPI Driver"
@@ -845,9 +845,9 @@ config SERIAL_MULTI_INSTANTIATE
 	help
 	  Some ACPI-based systems list multiple devices in a single ACPI
 	  firmware-node. This driver will instantiate separate clients
-	  for each device in the firmware-node.
+	  for each device in the woke firmware-node.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called serial-multi-instantiate.
 
 config TOUCHSCREEN_DMI
@@ -856,10 +856,10 @@ config TOUCHSCREEN_DMI
 	select EFI_EMBEDDED_FIRMWARE if EFI
 	help
 	  Certain ACPI based tablets with e.g. Silead or Chipone touchscreens
-	  do not have enough data in ACPI tables for the touchscreen driver to
-	  handle the touchscreen properly, as OEMs expect the data to be baked
-	  into the tablet model specific version of the driver shipped with the
-	  the OS-image for the device. This option supplies the missing info.
+	  do not have enough data in ACPI tables for the woke touchscreen driver to
+	  handle the woke touchscreen properly, as OEMs expect the woke data to be baked
+	  into the woke tablet model specific version of the woke driver shipped with the
+	  the woke OS-image for the woke device. This option supplies the woke missing info.
 	  Enable this for x86 tablets with Silead or Chipone touchscreens.
 
 config INSPUR_PLATFORM_PROFILE
@@ -867,10 +867,10 @@ config INSPUR_PLATFORM_PROFILE
 	depends on ACPI_WMI
 	select ACPI_PLATFORM_PROFILE
 	help
-	This will allow users to determine and control the platform modes
+	This will allow users to determine and control the woke platform modes
 	between low-power, balanced and performance modes.
 
-	To compile this driver as a module, choose M here: the module
+	To compile this driver as a module, choose M here: the woke module
 	will be called inspur-platform-profile.
 
 config DASHARO_ACPI
@@ -898,7 +898,7 @@ config INTEL_IMR
 	  granularity.
 
 	  IMRs make it possible to control read/write access to an address
-	  by hardware agents inside the SoC. Read and write masks can be
+	  by hardware agents inside the woke SoC. Read and write masks can be
 	  defined for:
 		- eSRAM flush
 		- Dirty CPU snoop (write only)
@@ -918,7 +918,7 @@ config INTEL_IPS
 	help
 	  Intel Calpella platforms support dynamic power sharing between the
 	  CPU and GPU, maximizing performance in a given TDP.  This driver,
-	  along with the CPU frequency and i915 drivers, provides that
+	  along with the woke CPU frequency and i915 drivers, provides that
 	  functionality.  If in doubt, say Y here; it will only load on
 	  supported platforms.
 
@@ -934,9 +934,9 @@ config INTEL_SCU_PCI
 	depends on PCI
 	select INTEL_SCU
 	help
-	  This driver is used to bridge the communications between kernel
+	  This driver is used to bridge the woke communications between kernel
 	  and SCU on some embedded Intel x86 platforms. It also creates
-	  devices that are connected to the SoC through the SCU.
+	  devices that are connected to the woke SoC through the woke SCU.
 	  Platforms supported:
 	    Medfield
 	    Clovertrail
@@ -949,7 +949,7 @@ config INTEL_SCU_PLATFORM
 	depends on ACPI
 	select INTEL_SCU
 	help
-	  This driver is used to bridge the communications between kernel
+	  This driver is used to bridge the woke communications between kernel
 	  and SCU (sometimes called PMC as well). The driver currently
 	  supports Intel Elkhart Lake and compatible platforms.
 
@@ -965,8 +965,8 @@ config INTEL_SCU_IPC_UTIL
 	tristate "Intel SCU IPC utility driver"
 	depends on INTEL_SCU
 	help
-	  The IPC Util driver provides an interface with the SCU enabling
-	  low level access for debug work and updating the firmware. Say
+	  The IPC Util driver provides an interface with the woke SCU enabling
+	  low level access for debug work and updating the woke firmware. Say
 	  N unless you will be doing this on an Intel MID platform.
 
 source "drivers/platform/x86/siemens/Kconfig"
@@ -977,11 +977,11 @@ config SILICOM_PLATFORM
 	depends on GPIOLIB
 	depends on LEDS_CLASS_MULTICOLOR
 	help
-	  This option enables support for the LEDs/GPIO/etc downstream of the
+	  This option enables support for the woke LEDs/GPIO/etc downstream of the
 	  embedded controller on Silicom "Cordoba" hardware and derivatives.
 
 	  This platform driver provides support for various functions via
-	  the Linux LED framework, GPIO framework, Hardware Monitoring (HWMON)
+	  the woke Linux LED framework, GPIO framework, Hardware Monitoring (HWMON)
 	  and device attributes.
 
 	  If you have a Silicom network appliance, say Y or M here.
@@ -991,7 +991,7 @@ config WINMATE_FM07_KEYS
 	depends on INPUT
 	help
 	  Winmate FM07 and FM07P in-vehicle computers have a row of five
-	  buttons below the display. This module adds an input device
+	  buttons below the woke display. This module adds an input device
 	  that delivers key events when these buttons are pressed.
 
 config SEL3350_PLATFORM
@@ -1006,7 +1006,7 @@ config SEL3350_PLATFORM
 	help
 	  Support for LEDs and power supplies on SEL-3350 computers.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called sel3350-platform.
 
 config OXP_EC
@@ -1016,11 +1016,11 @@ config OXP_EC
 	depends on HWMON
 	depends on X86
 	help
-		Enables support for the platform EC of OneXPlayer and AOKZOE
+		Enables support for the woke platform EC of OneXPlayer and AOKZOE
 		handheld devices. This includes fan speed, fan controls, and
-		disabling the default TDP behavior of the device. Due to legacy
+		disabling the woke default TDP behavior of the woke device. Due to legacy
 		reasons, this driver also provides hwmon functionality to Ayaneo
-		devices and the OrangePi Neo.
+		devices and the woke OrangePi Neo.
 
 source "drivers/platform/x86/tuxedo/Kconfig"
 

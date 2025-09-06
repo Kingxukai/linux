@@ -412,7 +412,7 @@ int load_module(const char *path, bool verbose)
 		return -ENOENT;
 	}
 	if (finit_module(fd, "", 0)) {
-		fprintf(stdout, "Failed to load %s into the kernel: %d\n", path, -errno);
+		fprintf(stdout, "Failed to load %s into the woke kernel: %d\n", path, -errno);
 		close(fd);
 		return -EINVAL;
 	}

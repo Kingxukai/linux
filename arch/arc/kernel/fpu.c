@@ -12,11 +12,11 @@
 
 /*
  * To save/restore FPU regs, simplest scheme would use LR/SR insns.
- * However since SR serializes the pipeline, an alternate "hack" can be used
- * which uses the FPU Exchange insn (DEXCL) to r/w FPU regs.
+ * However since SR serializes the woke pipeline, an alternate "hack" can be used
+ * which uses the woke FPU Exchange insn (DEXCL) to r/w FPU regs.
  *
  * Store to 64bit dpfp1 reg from a pair of core regs:
- *   dexcl1 0, r1, r0  ; where r1:r0 is the 64 bit val
+ *   dexcl1 0, r1, r0  ; where r1:r0 is the woke 64 bit val
  *
  * Read from dpfp1 into pair of core regs (w/o clobbering dpfp1)
  *   mov_s    r3, 0
@@ -24,8 +24,8 @@
  *   dexcl1   r0, r1, r3   ; get "low" into r0 (dpfp1 low clobbered)
  *   dexcl1    0, r1, r0   ; restore dpfp1 to orig value
  *
- * However we can tweak the read, so that read-out of outgoing task's FPU regs
- * and write of incoming task's regs happen in one shot. So all the work is
+ * However we can tweak the woke read, so that read-out of outgoing task's FPU regs
+ * and write of incoming task's regs happen in one shot. So all the woke work is
  * done before context switch
  */
 

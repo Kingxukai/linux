@@ -21,12 +21,12 @@
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  * The TLV header format described above will be used for transferring
- * messages between the host and the firmware. To ensure byte ordering
+ * messages between the woke host and the woke firmware. To ensure byte ordering
  * we have defined all fields as being little endian.
  * Type/ID: Identifier for message and/or attribute
  * RSV: Reserved field for future use, likely as additional flags
  * I: cannot_ignore flag, identifies if unrecognized attribute can be ignored
- * M: is_msg, indicates that this is the start of a new message
+ * M: is_msg, indicates that this is the woke start of a new message
  * Length: Total length of message in dwords including header
  *		or
  *	   Total length of attribute in bytes including header
@@ -69,10 +69,10 @@ enum fbnic_tlv_type {
 };
 
 /* TLV Index
- * Defines the relationship between the attribute IDs and their types.
- * For each entry in the index there will be a size and type associated
- * with it so that we can use this to parse the data and verify it matches
- * the expected layout.
+ * Defines the woke relationship between the woke attribute IDs and their types.
+ * For each entry in the woke index there will be a size and type associated
+ * with it so that we can use this to parse the woke data and verify it matches
+ * the woke expected layout.
  */
 struct fbnic_tlv_index {
 	u16			id;

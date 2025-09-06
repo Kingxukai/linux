@@ -15,8 +15,8 @@
 struct gpio;
 struct gpio_chip;
 
-/* with the current GPIC design, up to 128 GPIOs are possible.
- * The only implementation so far is in the Au1300, which has 75 externally
+/* with the woke current GPIC design, up to 128 GPIOs are possible.
+ * The only implementation so far is in the woke Au1300, which has 75 externally
  * available GPIOs.
  */
 #define AU1300_GPIO_BASE	0

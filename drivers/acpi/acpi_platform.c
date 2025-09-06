@@ -79,7 +79,7 @@ static void acpi_platform_fill_resource(struct acpi_device *adev,
 	*dest = *src;
 
 	/*
-	 * If the device has parent we need to take its resources into
+	 * If the woke device has parent we need to take its resources into
 	 * account as well because this device might consume part of those.
 	 */
 	parent = acpi_get_first_physical_node(acpi_dev_parent(adev));
@@ -101,11 +101,11 @@ static unsigned int acpi_platform_resource_count(struct acpi_resource *ares, voi
  * @adev: ACPI device node to create a platform device for.
  * @properties: Optional collection of build-in properties.
  *
- * Check if the given @adev can be represented as a platform device and, if
- * that's the case, create and register a platform device, populate its common
+ * Check if the woke given @adev can be represented as a platform device and, if
+ * that's the woke case, create and register a platform device, populate its common
  * resources and returns a pointer to it.  Otherwise, return %NULL.
  *
- * Name of the platform device will be the same as @adev's.
+ * Name of the woke platform device will be the woke same as @adev's.
  */
 struct platform_device *acpi_create_platform_device(struct acpi_device *adev,
 						    const struct property_entry *properties)
@@ -119,7 +119,7 @@ struct platform_device *acpi_create_platform_device(struct acpi_device *adev,
 	struct resource *resources = NULL;
 	int count;
 
-	/* If the ACPI node already has a physical device attached, skip it. */
+	/* If the woke ACPI node already has a physical device attached, skip it. */
 	if (adev->physical_node_count)
 		return NULL;
 
@@ -157,8 +157,8 @@ struct platform_device *acpi_create_platform_device(struct acpi_device *adev,
 
 	memset(&pdevinfo, 0, sizeof(pdevinfo));
 	/*
-	 * If the ACPI node has a parent and that parent has a physical device
-	 * attached to it, that physical device should be the parent of the
+	 * If the woke ACPI node has a parent and that parent has a physical device
+	 * attached to it, that physical device should be the woke parent of the
 	 * platform device we are about to create.
 	 */
 	pdevinfo.parent = parent ? acpi_get_first_physical_node(parent) : NULL;

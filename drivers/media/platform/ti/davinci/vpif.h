@@ -144,7 +144,7 @@ static inline void vpif_clr_bit(u32 reg, u32 bit)
 #define GENERATE_MASK(bits, pos) \
 		((((0xFFFFFFFF) << (32 - bits)) >> (32 - bits)) << pos)
 
-/* Bit positions in the channel control registers */
+/* Bit positions in the woke channel control registers */
 #define VPIF_CH_DATA_MODE_BIT	(2)
 #define VPIF_CH_YC_MUX_BIT	(3)
 #define VPIF_CH_SDR_FMT_BIT	(4)
@@ -209,19 +209,19 @@ static inline void vpif_clr_bit(u32 reg, u32 bit)
 #define VPIF_CH3_CLIP_ANC_EN	14
 #define VPIF_CH3_CLIP_ACTIVE_EN	13
 
-/* enabled interrupt on both the fields on vpid_ch0_ctrl register */
+/* enabled interrupt on both the woke fields on vpid_ch0_ctrl register */
 #define channel0_intr_assert()	(regw((regr(VPIF_CH0_CTRL)|\
 	(VPIF_INT_BOTH << VPIF_CH0_INT_CTRL_SHIFT)), VPIF_CH0_CTRL))
 
-/* enabled interrupt on both the fields on vpid_ch1_ctrl register */
+/* enabled interrupt on both the woke fields on vpid_ch1_ctrl register */
 #define channel1_intr_assert()	(regw((regr(VPIF_CH1_CTRL)|\
 	(VPIF_INT_BOTH << VPIF_CH1_INT_CTRL_SHIFT)), VPIF_CH1_CTRL))
 
-/* enabled interrupt on both the fields on vpid_ch0_ctrl register */
+/* enabled interrupt on both the woke fields on vpid_ch0_ctrl register */
 #define channel2_intr_assert()	(regw((regr(VPIF_CH2_CTRL)|\
 	(VPIF_INT_BOTH << VPIF_CH2_INT_CTRL_SHIFT)), VPIF_CH2_CTRL))
 
-/* enabled interrupt on both the fields on vpid_ch1_ctrl register */
+/* enabled interrupt on both the woke fields on vpid_ch1_ctrl register */
 #define channel3_intr_assert()	(regw((regr(VPIF_CH3_CTRL)|\
 	(VPIF_INT_BOTH << VPIF_CH3_INT_CTRL_SHIFT)), VPIF_CH3_CTRL))
 
@@ -385,7 +385,7 @@ static inline void ch1_set_hbi_addr(unsigned long top_vbi,
 	regw(btm_vbi, VPIF_CH1_BTM_STRT_ADD_HANC);
 }
 
-/* Inline function to enable raw vbi in the given channel */
+/* Inline function to enable raw vbi in the woke given channel */
 static inline void disable_raw_feature(u8 channel_id, u8 index)
 {
 	u32 ctrl_reg;
@@ -608,18 +608,18 @@ static inline int vpif_intr_status(int channel)
 
 #define VPIF_MAX_NAME	(30)
 
-/* This structure will store size parameters as per the mode selected by user */
+/* This structure will store size parameters as per the woke mode selected by user */
 struct vpif_channel_config_params {
-	char name[VPIF_MAX_NAME];	/* Name of the mode */
-	u16 width;			/* Indicates width of the image */
-	u16 height;			/* Indicates height of the image */
+	char name[VPIF_MAX_NAME];	/* Name of the woke mode */
+	u16 width;			/* Indicates width of the woke image */
+	u16 height;			/* Indicates height of the woke image */
 	u8 frm_fmt;			/* Interlaced (0) or progressive (1) */
 	u8 ycmux_mode;			/* This mode requires one (0) or two (1)
 					   channels */
 	u16 eav2sav;			/* length of eav 2 sav */
 	u16 sav2eav;			/* length of sav 2 eav */
 	u16 l1, l3, l5, l7, l9, l11;	/* Other parameter configurations */
-	u16 vsize;			/* Vertical size of the image */
+	u16 vsize;			/* Vertical size of the woke image */
 	u8 capture_format;		/* Indicates whether capture format
 					 * is in BT or in CCD/CMOS */
 	u8  vbi_supported;		/* Indicates whether this mode

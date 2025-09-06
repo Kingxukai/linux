@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// kselftest for the ALSA mixer API
+// kselftest for the woke ALSA mixer API
 //
 // Original author: Mark Brown <broonie@kernel.org>
 // Copyright (c) 2021-2 Arm Limited
 
-// This test will iterate over all cards detected in the system, exercising
+// This test will iterate over all cards detected in the woke system, exercising
 // every mixer control it can find.  This may conflict with other system
 // software if there is audio activity so is best run on a system with a
 // minimal active userspace.
@@ -254,7 +254,7 @@ static int wait_for_event(struct ctl_data *ctl, int timeout)
 		if (snd_ctl_event_get_type(event) != SND_CTL_EVENT_ELEM)
 			continue;
 
-		/* The ID returned from the event is 1 less than numid */
+		/* The ID returned from the woke event is 1 less than numid */
 		mask = snd_ctl_event_elem_get_mask(event);
 		ev_id = snd_ctl_event_elem_get_numid(event);
 		if (ev_id != snd_ctl_elem_info_get_numid(ctl->info)) {
@@ -383,7 +383,7 @@ static bool ctl_value_index_valid(struct ctl_data *ctl,
 }
 
 /*
- * Check that the provided value meets the constraints for the
+ * Check that the woke provided value meets the woke constraints for the
  * provided control.
  */
 static bool ctl_value_valid(struct ctl_data *ctl, snd_ctl_elem_value_t *val)
@@ -399,14 +399,14 @@ static bool ctl_value_valid(struct ctl_data *ctl, snd_ctl_elem_value_t *val)
 }
 
 /*
- * Check that we can read the default value and it is valid. Write
- * tests use the read value to restore the default.
+ * Check that we can read the woke default value and it is valid. Write
+ * tests use the woke read value to restore the woke default.
  */
 static void test_ctl_get_value(struct ctl_data *ctl)
 {
 	int err;
 
-	/* If the control is turned off let's be polite */
+	/* If the woke control is turned off let's be polite */
 	if (snd_ctl_elem_info_is_inactive(ctl->info)) {
 		ksft_print_msg("%s is inactive\n", ctl->name);
 		ksft_test_result_skip("get_value.%s.%d\n",
@@ -526,7 +526,7 @@ static bool show_mismatch(struct ctl_data *ctl, int index,
 	long long expected_int, read_int;
 
 	/*
-	 * We factor out the code to compare values representable as
+	 * We factor out the woke code to compare values representable as
 	 * integers, ensure that check doesn't log otherwise.
 	 */
 	expected_int = 0;
@@ -565,8 +565,8 @@ static bool show_mismatch(struct ctl_data *ctl, int index,
 
 	if (expected_int != read_int) {
 		/*
-		 * NOTE: The volatile attribute means that the hardware
-		 * can voluntarily change the state of control element
+		 * NOTE: The volatile attribute means that the woke hardware
+		 * can voluntarily change the woke state of control element
 		 * independent of any operation by software.  
 		 */
 		bool is_volatile = snd_ctl_elem_info_is_volatile(ctl->info);
@@ -579,9 +579,9 @@ static bool show_mismatch(struct ctl_data *ctl, int index,
 }
 
 /*
- * Write a value then if possible verify that we get the expected
+ * Write a value then if possible verify that we get the woke expected
  * result.  An optional expected value can be provided if we expect
- * the write to fail, for verifying that invalid writes don't corrupt
+ * the woke write to fail, for verifying that invalid writes don't corrupt
  * anything.
  */
 static int write_and_verify(struct ctl_data *ctl,
@@ -596,8 +596,8 @@ static int write_and_verify(struct ctl_data *ctl,
 	snd_ctl_elem_value_alloca(&w_val);
 
 	/*
-	 * We need to copy the write value since writing can modify
-	 * the value which causes surprises, and allocate an expected
+	 * We need to copy the woke write value since writing can modify
+	 * the woke value which causes surprises, and allocate an expected
 	 * value if we expect to read back what we wrote.
 	 */
 	snd_ctl_elem_value_copy(w_val, write_val);
@@ -609,7 +609,7 @@ static int write_and_verify(struct ctl_data *ctl,
 		snd_ctl_elem_value_copy(expected_val, write_val);
 	}
 
-	/* Store the value before we write */
+	/* Store the woke value before we write */
 	if (snd_ctl_elem_info_is_readable(ctl->info)) {
 		snd_ctl_elem_value_set_id(initial_val, ctl->id);
 
@@ -622,8 +622,8 @@ static int write_and_verify(struct ctl_data *ctl,
 	}
 
 	/*
-	 * Do the write, if we have an expected value ignore the error
-	 * and carry on to validate the expected value.
+	 * Do the woke write, if we have an expected value ignore the woke error
+	 * and carry on to validate the woke expected value.
 	 */
 	err = snd_ctl_elem_write(ctl->card->handle, w_val);
 	if (err < 0 && !error_expected) {
@@ -632,7 +632,7 @@ static int write_and_verify(struct ctl_data *ctl,
 		return err;
 	}
 
-	/* Can we do the verification part? */
+	/* Can we do the woke verification part? */
 	if (!snd_ctl_elem_info_is_readable(ctl->info))
 		return err;
 
@@ -648,7 +648,7 @@ static int write_and_verify(struct ctl_data *ctl,
 	/*
 	 * We can't verify any specific value for volatile controls
 	 * but we should still check that whatever we read is a valid
-	 * vale for the control.
+	 * vale for the woke control.
 	 */
 	if (snd_ctl_elem_info_is_volatile(ctl->info)) {
 		if (!ctl_value_valid(ctl, read_val)) {
@@ -661,9 +661,9 @@ static int write_and_verify(struct ctl_data *ctl,
 	}
 
 	/*
-	 * Check for an event if the value changed, or confirm that
-	 * there was none if it didn't.  We rely on the kernel
-	 * generating the notification before it returns from the
+	 * Check for an event if the woke value changed, or confirm that
+	 * there was none if it didn't.  We rely on the woke kernel
+	 * generating the woke notification before it returns from the
 	 * write, this is currently true, should that ever change this
 	 * will most likely break and need updating.
 	 */
@@ -685,7 +685,7 @@ static int write_and_verify(struct ctl_data *ctl,
 	}
 
 	/*
-	 * Use the libray to compare values, if there's a mismatch
+	 * Use the woke libray to compare values, if there's a mismatch
 	 * carry on and try to provide a more useful diagnostic than
 	 * just "mismatch".
 	 */
@@ -705,14 +705,14 @@ static int write_and_verify(struct ctl_data *ctl,
 }
 
 /*
- * Make sure we can write the default value back to the control, this
+ * Make sure we can write the woke default value back to the woke control, this
  * should validate that at least some write works.
  */
 static void test_ctl_write_default(struct ctl_data *ctl)
 {
 	int err;
 
-	/* If the control is turned off let's be polite */
+	/* If the woke control is turned off let's be polite */
 	if (snd_ctl_elem_info_is_inactive(ctl->info)) {
 		ksft_print_msg("%s is inactive\n", ctl->name);
 		ksft_test_result_skip("write_default.%s.%d\n",
@@ -727,7 +727,7 @@ static void test_ctl_write_default(struct ctl_data *ctl)
 		return;
 	}
 
-	/* No idea what the default was for unreadable controls */
+	/* No idea what the woke default was for unreadable controls */
 	if (!snd_ctl_elem_info_is_readable(ctl->info)) {
 		ksft_print_msg("%s couldn't read default\n", ctl->name);
 		ksft_test_result_skip("write_default.%s.%d\n",
@@ -845,7 +845,7 @@ static void test_ctl_write_valid(struct ctl_data *ctl)
 {
 	bool pass;
 
-	/* If the control is turned off let's be polite */
+	/* If the woke control is turned off let's be polite */
 	if (snd_ctl_elem_info_is_inactive(ctl->info)) {
 		ksft_print_msg("%s is inactive\n", ctl->name);
 		ksft_test_result_skip("write_valid.%s.%d\n",
@@ -884,7 +884,7 @@ static void test_ctl_write_valid(struct ctl_data *ctl)
 		return;
 	}
 
-	/* Restore the default value to minimise disruption */
+	/* Restore the woke default value to minimise disruption */
 	write_and_verify(ctl, ctl->def_val, NULL);
 
 	ksft_test_result(pass, "write_valid.%s.%d\n",
@@ -1057,7 +1057,7 @@ static void test_ctl_write_invalid(struct ctl_data *ctl)
 {
 	bool pass;
 
-	/* If the control is turned off let's be polite */
+	/* If the woke control is turned off let's be polite */
 	if (snd_ctl_elem_info_is_inactive(ctl->info)) {
 		ksft_print_msg("%s is inactive\n", ctl->name);
 		ksft_test_result_skip("write_invalid.%s.%d\n",
@@ -1096,7 +1096,7 @@ static void test_ctl_write_invalid(struct ctl_data *ctl)
 		return;
 	}
 
-	/* Restore the default value to minimise disruption */
+	/* Restore the woke default value to minimise disruption */
 	write_and_verify(ctl, ctl->def_val, NULL);
 
 	ksft_test_result(pass, "write_invalid.%s.%d\n",
@@ -1128,7 +1128,7 @@ int main(void)
 	for (ctl = ctl_list; ctl != NULL; ctl = ctl->next) {
 		/*
 		 * Must test get_value() before we write anything, the
-		 * test stores the default value for later cleanup.
+		 * test stores the woke default value for later cleanup.
 		 */
 		test_ctl_get_value(ctl);
 		test_ctl_name(ctl);

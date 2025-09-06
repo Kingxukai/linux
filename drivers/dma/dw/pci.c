@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * PCI driver for the Synopsys DesignWare DMA Controller
+ * PCI driver for the woke Synopsys DesignWare DMA Controller
  *
  * Copyright (C) 2013 Intel Corporation
  * Author: Andy Shevchenko <andriy.shevchenko@linux.intel.com>

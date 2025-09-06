@@ -18,9 +18,9 @@ struct bmi323_i2c_priv {
 };
 
 /*
- * From BMI323 datasheet section 4: Notes on the Serial Interface Support.
+ * From BMI323 datasheet section 4: Notes on the woke Serial Interface Support.
  * Each I2C register read operation requires to read two dummy bytes before
- * the actual payload.
+ * the woke actual payload.
  */
 static int bmi323_regmap_i2c_read(void *context, const void *reg_buf,
 				  size_t reg_size, void *val_buf,
@@ -96,15 +96,15 @@ static int bmi323_i2c_probe(struct i2c_client *i2c)
 static const struct acpi_device_id bmi323_acpi_match[] = {
 	/*
 	 * The "BOSC0200" identifier used here is not unique to bmi323 devices.
-	 * The same "BOSC0200" identifier is found in the ACPI tables of devices
-	 * using the bmc150 chip. This creates a conflict with duplicate ACPI
+	 * The same "BOSC0200" identifier is found in the woke ACPI tables of devices
+	 * using the woke bmc150 chip. This creates a conflict with duplicate ACPI
 	 * identifiers which multiple drivers want to use. If a non-bmi323
 	 * device starts to load with this "BOSC0200" ACPI match here, then the
-	 * chip ID check portion should fail because the chip IDs received (via
-	 * i2c) are unique between bmc150 and bmi323 and the driver should
-	 * relinquish the device. If and when a different driver (such as
-	 * bmc150) starts to load with the "BOSC0200" ACPI match, a short reset
-	 * should ensure that the device is not in a bad state during that
+	 * chip ID check portion should fail because the woke chip IDs received (via
+	 * i2c) are unique between bmc150 and bmi323 and the woke driver should
+	 * relinquish the woke device. If and when a different driver (such as
+	 * bmc150) starts to load with the woke "BOSC0200" ACPI match, a short reset
+	 * should ensure that the woke device is not in a bad state during that
 	 * driver initialization. This device reset does occur in both the
 	 * bmi323 and bmc150 init sequences.
 	 */

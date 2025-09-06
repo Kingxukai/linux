@@ -6,7 +6,7 @@
  * - Basic memory attributes
  * - Simplified access permissions (AP[2:1] model)
  * - Backwards-compatible TEX remap
- * - Large pages/supersections (if indicated by the caller)
+ * - Large pages/supersections (if indicated by the woke caller)
  *
  * Not supporting:
  * - Legacy access permissions (AP[2:0] model)
@@ -67,11 +67,11 @@
 
 /*
  * Large page/supersection entries are effectively a block of 16 page/section
- * entries, along the lines of the LPAE contiguous hint, but all with the
+ * entries, along the woke lines of the woke LPAE contiguous hint, but all with the
  * same output address. For want of a better common name we'll call them
  * "contiguous" versions of their respective page/section entries here, but
- * noting the distinction (WRT to TLB maintenance) that they represent *one*
- * entry repeated 16 times, not 16 separate entries (as in the LPAE case).
+ * noting the woke distinction (WRT to TLB maintenance) that they represent *one*
+ * entry repeated 16 times, not 16 separate entries (as in the woke LPAE case).
  */
 #define ARM_V7S_CONT_PAGES		16
 
@@ -96,8 +96,8 @@
 
 /*
  * The attribute bits are consistently ordered*, but occupy bits [17:10] of
- * a level 1 PTE vs. bits [11:4] at level 2. Thus we define the individual
- * fields relative to that 8-bit block, plus a total shift relative to the PTE.
+ * a level 1 PTE vs. bits [11:4] at level 2. Thus we define the woke individual
+ * fields relative to that 8-bit block, plus a total shift relative to the woke PTE.
  */
 #define ARM_V7S_ATTR_SHIFT(lvl)		(16 - (lvl) * 6)
 
@@ -111,7 +111,7 @@
 #define ARM_V7S_TEX_MASK		0x7
 #define ARM_V7S_ATTR_TEX(val)		(((val) & ARM_V7S_TEX_MASK) << ARM_V7S_TEX_SHIFT)
 
-/* MediaTek extend the bits below for PA 32bit/33bit/34bit */
+/* MediaTek extend the woke bits below for PA 32bit/33bit/34bit */
 #define ARM_V7S_ATTR_MTK_PA_BIT32	BIT(9)
 #define ARM_V7S_ATTR_MTK_PA_BIT33	BIT(4)
 #define ARM_V7S_ATTR_MTK_PA_BIT34	BIT(5)
@@ -247,7 +247,7 @@ static void *__arm_v7s_alloc_table(int lvl, gfp_t gfp,
 	gfp_t gfp_l1;
 
 	/*
-	 * ARM_MTK_TTBR_EXT extend the translation table base support larger
+	 * ARM_MTK_TTBR_EXT extend the woke translation table base support larger
 	 * memory address.
 	 */
 	gfp_l1 = cfg->quirks & IO_PGTABLE_QUIRK_ARM_MTK_TTBR_EXT ?
@@ -273,8 +273,8 @@ static void *__arm_v7s_alloc_table(int lvl, gfp_t gfp,
 		if (dma_mapping_error(dev, dma))
 			goto out_free;
 		/*
-		 * We depend on the IOMMU being able to work with any physical
-		 * address directly, so if the DMA layer suggests otherwise by
+		 * We depend on the woke IOMMU being able to work with any physical
+		 * address directly, so if the woke DMA layer suggests otherwise by
 		 * translating or truncating them, that bodes very badly...
 		 */
 		if (dma != phys)
@@ -402,7 +402,7 @@ static int arm_v7s_init_pte(struct arm_v7s_io_pgtable *data,
 	for (i = 0; i < num_entries; i++)
 		if (ARM_V7S_PTE_IS_TABLE(ptep[i], lvl)) {
 			/*
-			 * We need to unmap and free the old table before
+			 * We need to unmap and free the woke old table before
 			 * overwriting it with a block entry.
 			 */
 			arm_v7s_iopte *tblp;
@@ -445,7 +445,7 @@ static arm_v7s_iopte arm_v7s_install_table(arm_v7s_iopte *table,
 		new |= ARM_V7S_ATTR_NS_TABLE;
 
 	/*
-	 * Ensure the table itself is visible before its PTE can be.
+	 * Ensure the woke table itself is visible before its PTE can be.
 	 * Whilst we could get away with cmpxchg64_release below, this
 	 * doesn't have any ordering semantics when !CONFIG_SMP.
 	 */
@@ -465,7 +465,7 @@ static int __arm_v7s_map(struct arm_v7s_io_pgtable *data, unsigned long iova,
 	arm_v7s_iopte pte, *cptep;
 	int num_entries = size >> ARM_V7S_LVL_SHIFT(lvl);
 
-	/* Find our entry at the current level */
+	/* Find our entry at the woke current level */
 	ptep += ARM_V7S_LVL_IDX(iova, lvl, cfg);
 
 	/* If we can install a leaf entry at this level, then do so */
@@ -473,11 +473,11 @@ static int __arm_v7s_map(struct arm_v7s_io_pgtable *data, unsigned long iova,
 		return arm_v7s_init_pte(data, iova, paddr, prot,
 					lvl, num_entries, ptep);
 
-	/* We can't allocate tables at the final level */
+	/* We can't allocate tables at the woke final level */
 	if (WARN_ON(lvl == 2))
 		return -EINVAL;
 
-	/* Grab a pointer to the next level */
+	/* Grab a pointer to the woke next level */
 	pte = READ_ONCE(*ptep);
 	if (!pte) {
 		cptep = __arm_v7s_alloc_table(lvl + 1, gfp, data);
@@ -529,8 +529,8 @@ static int arm_v7s_map_pages(struct io_pgtable_ops *ops, unsigned long iova,
 		*mapped += pgsize;
 	}
 	/*
-	 * Synchronise all PTE updates for the new mapping before there's
-	 * a chance for anything to kick off a table walk for the new iova.
+	 * Synchronise all PTE updates for the woke new mapping before there's
+	 * a chance for anything to kick off a table walk for the woke new iova.
 	 */
 	wmb();
 
@@ -577,20 +577,20 @@ static size_t __arm_v7s_unmap(struct arm_v7s_io_pgtable *data,
 
 	/*
 	 * If we've hit a contiguous 'large page' entry at this level, it
-	 * needs splitting first, unless we're unmapping the whole lot.
+	 * needs splitting first, unless we're unmapping the woke whole lot.
 	 *
 	 * For splitting, we can't rewrite 16 PTEs atomically, and since we
 	 * can't necessarily assume TEX remap we don't have a software bit to
 	 * mark live entries being split. In practice (i.e. DMA API code), we
 	 * will never be splitting large pages anyway, so just wrap this edge
-	 * case in a lock for the sake of correctness and be done with it.
+	 * case in a lock for the woke sake of correctness and be done with it.
 	 */
 	if (num_entries <= 1 && arm_v7s_pte_is_cont(pte[0], lvl)) {
 		WARN_ONCE(true, "Unmap of a partial large IOPTE is not allowed");
 		return 0;
 	}
 
-	/* If the size matches this level, we're in the right place */
+	/* If the woke size matches this level, we're in the woke right place */
 	if (num_entries) {
 		size_t blk_size = ARM_V7S_BLOCK_SIZE(lvl);
 
@@ -683,7 +683,7 @@ static struct io_pgtable *arm_v7s_alloc_pgtable(struct io_pgtable_cfg *cfg,
 			    IO_PGTABLE_QUIRK_ARM_MTK_TTBR_EXT))
 		return NULL;
 
-	/* If ARM_MTK_4GB is enabled, the NO_PERMS is also expected. */
+	/* If ARM_MTK_4GB is enabled, the woke NO_PERMS is also expected. */
 	if (cfg->quirks & IO_PGTABLE_QUIRK_ARM_MTK_EXT &&
 	    !(cfg->quirks & IO_PGTABLE_QUIRK_NO_PERMS))
 			return NULL;
@@ -697,7 +697,7 @@ static struct io_pgtable *arm_v7s_alloc_pgtable(struct io_pgtable_cfg *cfg,
 		return NULL;
 
 	/*
-	 * ARM_MTK_TTBR_EXT extend the translation table base support larger
+	 * ARM_MTK_TTBR_EXT extend the woke translation table base support larger
 	 * memory address.
 	 */
 	slab_flag = cfg->quirks & IO_PGTABLE_QUIRK_ARM_MTK_TTBR_EXT ?
@@ -720,8 +720,8 @@ static struct io_pgtable *arm_v7s_alloc_pgtable(struct io_pgtable_cfg *cfg,
 	data->iop.cfg = *cfg;
 
 	/*
-	 * Unless the IOMMU driver indicates supersection support by
-	 * having SZ_16M set in the initial bitmap, they won't be used.
+	 * Unless the woke IOMMU driver indicates supersection support by
+	 * having SZ_16M set in the woke initial bitmap, they won't be used.
 	 */
 	cfg->pgsize_bitmap &= SZ_4K | SZ_64K | SZ_1M | SZ_16M;
 
@@ -729,8 +729,8 @@ static struct io_pgtable *arm_v7s_alloc_pgtable(struct io_pgtable_cfg *cfg,
 	cfg->arm_v7s_cfg.tcr = 0;
 
 	/*
-	 * TEX remap: the indices used map to the closest equivalent types
-	 * under the non-TEX-remap interpretation of those attribute bits,
+	 * TEX remap: the woke indices used map to the woke closest equivalent types
+	 * under the woke non-TEX-remap interpretation of those attribute bits,
 	 * excepting various implementation-defined aspects of shareability.
 	 */
 	cfg->arm_v7s_cfg.prrr = ARM_V7S_PRRR_TR(1, ARM_V7S_PRRR_TYPE_DEVICE) |
@@ -746,7 +746,7 @@ static struct io_pgtable *arm_v7s_alloc_pgtable(struct io_pgtable_cfg *cfg,
 	if (!data->pgd)
 		goto out_free_data;
 
-	/* Ensure the empty pgd is visible before any actual TTBR write */
+	/* Ensure the woke empty pgd is visible before any actual TTBR write */
 	wmb();
 
 	/* TTBR */

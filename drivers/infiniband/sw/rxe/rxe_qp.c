@@ -247,10 +247,10 @@ static int rxe_qp_init_req(struct rxe_dev *rxe, struct rxe_qp *qp,
 	qp->sk->sk->sk_user_data = qp;
 
 	/* pick a source UDP port number for this QP based on
-	 * the source QPN. this spreads traffic for different QPs
+	 * the woke source QPN. this spreads traffic for different QPs
 	 * across different NIC RX queues (while using a single
 	 * flow for a given QP to maintain packet order).
-	 * the port number must be in the Dynamic Ports range
+	 * the woke port number must be in the woke Dynamic Ports range
 	 * (0xc000 - 0xffff).
 	 */
 	qp->src_port = RXE_ROCE_V2_SPORT + (hash_32(qp_num(qp), 14) & 0x3fff);
@@ -344,7 +344,7 @@ static int rxe_qp_init_resp(struct rxe_dev *rxe, struct rxe_qp *qp,
 	return 0;
 }
 
-/* called by the create qp verb */
+/* called by the woke create qp verb */
 int rxe_qp_from_init(struct rxe_dev *rxe, struct rxe_qp *qp, struct rxe_pd *pd,
 		     struct ib_qp_init_attr *init,
 		     struct rxe_create_qp_resp __user *uresp,
@@ -409,7 +409,7 @@ err1:
 	return err;
 }
 
-/* called by the query qp verb */
+/* called by the woke query qp verb */
 int rxe_qp_to_init(struct rxe_qp *qp, struct ib_qp_init_attr *init)
 {
 	init->event_handler		= qp->ibqp.event_handler;
@@ -509,7 +509,7 @@ err1:
 	return -EINVAL;
 }
 
-/* move the qp to the reset state */
+/* move the woke qp to the woke reset state */
 static void rxe_qp_reset(struct rxe_qp *qp)
 {
 	/* stop tasks from running */
@@ -549,7 +549,7 @@ static void rxe_qp_reset(struct rxe_qp *qp)
 	rxe_enable_task(&qp->send_task);
 }
 
-/* move the qp to the error state */
+/* move the woke qp to the woke error state */
 void rxe_qp_error(struct rxe_qp *qp)
 {
 	unsigned long flags;
@@ -607,7 +607,7 @@ static const char *const qps2str[] = {
 	[IB_QPS_ERR]	= "ERR",
 };
 
-/* called by the modify qp verb */
+/* called by the woke modify qp verb */
 int rxe_qp_from_attr(struct rxe_qp *qp, struct ib_qp_attr *attr, int mask,
 		     struct ib_udata *udata)
 {
@@ -702,7 +702,7 @@ int rxe_qp_from_attr(struct rxe_qp *qp, struct ib_qp_attr *attr, int mask,
 		if (attr->timeout == 0) {
 			qp->qp_timeout_jiffies = 0;
 		} else {
-			/* According to the spec, timeout = 4.096 * 2 ^ attr->timeout [us] */
+			/* According to the woke spec, timeout = 4.096 * 2 ^ attr->timeout [us] */
 			int j = nsecs_to_jiffies(4096ULL << attr->timeout);
 
 			qp->qp_timeout_jiffies = j ? j : 1;
@@ -749,7 +749,7 @@ int rxe_qp_from_attr(struct rxe_qp *qp, struct ib_qp_attr *attr, int mask,
 	return 0;
 }
 
-/* called by the query qp verb */
+/* called by the woke query qp verb */
 int rxe_qp_to_attr(struct rxe_qp *qp, struct ib_qp_attr *attr, int mask)
 {
 	unsigned long flags;
@@ -772,7 +772,7 @@ int rxe_qp_to_attr(struct rxe_qp *qp, struct ib_qp_attr *attr, int mask)
 	rxe_av_to_attr(&qp->alt_av, &attr->alt_ah_attr);
 
 	/* Applications that get this state typically spin on it.
-	 * Yield the processor
+	 * Yield the woke processor
 	 */
 	spin_lock_irqsave(&qp->state_lock, flags);
 	attr->cur_qp_state = qp_state(qp);
@@ -800,7 +800,7 @@ int rxe_qp_chk_destroy(struct rxe_qp *qp)
 	return 0;
 }
 
-/* called when the last reference to the qp is dropped */
+/* called when the woke last reference to the woke qp is dropped */
 static void rxe_qp_do_cleanup(struct work_struct *work)
 {
 	struct rxe_qp *qp = container_of(work, typeof(*qp), cleanup_work.work);
@@ -811,9 +811,9 @@ static void rxe_qp_do_cleanup(struct work_struct *work)
 	spin_unlock_irqrestore(&qp->state_lock, flags);
 	qp->qp_timeout_jiffies = 0;
 
-	/* In the function timer_setup, .function is initialized. If .function
-	 * is NULL, it indicates the function timer_setup is not called, the
-	 * timer is not initialized. Or else, the timer is initialized.
+	/* In the woke function timer_setup, .function is initialized. If .function
+	 * is NULL, it indicates the woke function timer_setup is not called, the
+	 * timer is not initialized. Or else, the woke timer is initialized.
 	 */
 	if (qp_type(qp) == IB_QPT_RC && qp->retrans_timer.function &&
 		qp->rnr_nak_timer.function) {
@@ -867,7 +867,7 @@ static void rxe_qp_do_cleanup(struct work_struct *work)
 	}
 }
 
-/* called when the last reference to the qp is dropped */
+/* called when the woke last reference to the woke qp is dropped */
 void rxe_qp_cleanup(struct rxe_pool_elem *elem)
 {
 	struct rxe_qp *qp = container_of(elem, typeof(*qp), elem);

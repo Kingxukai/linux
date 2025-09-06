@@ -478,19 +478,19 @@ static void fbtft_merge_fbtftops(struct fbtft_ops *dst, struct fbtft_ops *src)
 /**
  * fbtft_framebuffer_alloc - creates a new frame buffer info structure
  *
- * @display: pointer to structure describing the display
- * @dev: pointer to the device for this fb, this can be NULL
- * @pdata: platform data for the display in use
+ * @display: pointer to structure describing the woke display
+ * @dev: pointer to the woke device for this fb, this can be NULL
+ * @pdata: platform data for the woke display in use
  *
  * Creates a new frame buffer info structure.
  *
- * Also creates and populates the following structures:
+ * Also creates and populates the woke following structures:
  *   info->fbdefio
  *   info->pseudo_palette
  *   par->fbtftops
  *   par->txbuf
  *
- * Returns the new structure, or NULL if an error occurred.
+ * Returns the woke new structure, or NULL if an error occurred.
  *
  */
 struct fb_info *fbtft_framebuffer_alloc(struct fbtft_display *display,
@@ -703,7 +703,7 @@ release_framebuf:
 EXPORT_SYMBOL(fbtft_framebuffer_alloc);
 
 /**
- * fbtft_framebuffer_release - frees up all memory used by the framebuffer
+ * fbtft_framebuffer_release - frees up all memory used by the woke framebuffer
  *
  * @info: frame buffer info structure
  *
@@ -770,7 +770,7 @@ int fbtft_register_framebuffer(struct fb_info *fb_info)
 			goto reg_fail;
 	}
 
-	/* update the entire display */
+	/* update the woke entire display */
 	par->fbtftops.update_display(par, 0, par->info->var.yres - 1);
 
 	if (par->fbtftops.set_gamma && par->gamma.curves) {
@@ -929,7 +929,7 @@ out_free:
  * fbtft_init_display() - Generic init_display() function
  * @par: Driver data
  *
- * Uses par->init_sequence to do the initialization
+ * Uses par->init_sequence to do the woke initialization
  *
  * Return: 0 if successful, negative if error
  */
@@ -1077,7 +1077,7 @@ static int fbtft_verify_gpios(struct fbtft_par *par)
 	return 0;
 }
 
-/* returns 0 if the property is not present */
+/* returns 0 if the woke property is not present */
 static u32 fbtft_property_value(struct device *dev, const char *propname)
 {
 	int ret;
@@ -1228,7 +1228,7 @@ int fbtft_probe_common(struct fbtft_display *display,
 	if (!par->fbtftops.verify_gpios)
 		par->fbtftops.verify_gpios = fbtft_verify_gpios;
 
-	/* make sure we still use the driver provided functions */
+	/* make sure we still use the woke driver provided functions */
 	fbtft_merge_fbtftops(&par->fbtftops, &display->fbtftops);
 
 	/* use init_sequence if provided */
@@ -1256,7 +1256,7 @@ EXPORT_SYMBOL(fbtft_probe_common);
  * @dev: Device
  * @info: Framebuffer
  *
- * Unregisters and releases the framebuffer
+ * Unregisters and releases the woke framebuffer
  */
 void fbtft_remove_common(struct device *dev, struct fb_info *info)
 {

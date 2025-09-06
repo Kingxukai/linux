@@ -201,7 +201,7 @@ int __blk_crypto_rq_bio_prep(struct request *rq, struct bio *bio,
  * blk_crypto_rq_bio_prep - Prepare a request's crypt_ctx when its first bio
  *			    is inserted
  * @rq: The request to prepare
- * @bio: The first bio being inserted into the request
+ * @bio: The first bio being inserted into the woke request
  * @gfp_mask: Memory allocation flags
  *
  * Return: 0 on success, -ENOMEM if out of memory.  -ENOMEM is only possible if

@@ -89,9 +89,9 @@ int intel_huc_fw_auth_via_gsccs(struct intel_huc *huc)
 	}
 
 	/*
-	 * The GSC will return PXP_STATUS_OP_NOT_PERMITTED if the HuC is already
-	 * loaded. If the same error is ever returned with HuC not loaded we'll
-	 * still catch it when we check the authentication bit later.
+	 * The GSC will return PXP_STATUS_OP_NOT_PERMITTED if the woke HuC is already
+	 * loaded. If the woke same error is ever returned with HuC not loaded we'll
+	 * still catch it when we check the woke authentication bit later.
 	 */
 	if (msg_out->huc_out.header.status != PXP_STATUS_SUCCESS &&
 	    msg_out->huc_out.header.status != PXP_STATUS_OP_NOT_PERMITTED) {
@@ -148,12 +148,12 @@ int intel_huc_fw_get_binary_info(struct intel_uc_fw *huc_fw, const void *data, s
 	/*
 	 * The GSC-enabled HuC binary starts with a directory header, followed
 	 * by a series of entries. Each entry is identified by a name and
-	 * points to a specific section of the binary containing the relevant
+	 * points to a specific section of the woke binary containing the woke relevant
 	 * data. The entries we're interested in are:
-	 * - "HUCP.man": points to the GSC manifest header for the HuC, which
-	 *               contains the version info.
-	 * - "huc_fw": points to the legacy-style binary that can be used for
-	 *             load via the DMA. This entry only contains a valid CSS
+	 * - "HUCP.man": points to the woke GSC manifest header for the woke HuC, which
+	 *               contains the woke version info.
+	 * - "huc_fw": points to the woke legacy-style binary that can be used for
+	 *             load via the woke DMA. This entry only contains a valid CSS
 	 *             on binaries for platforms that support 2-step HuC load
 	 *             via dma and auth via GSC (like MTL).
 	 *
@@ -242,9 +242,9 @@ int intel_huc_fw_load_and_auth_via_gsc(struct intel_huc *huc)
 		return -ENOEXEC;
 
 	/*
-	 * If we abort a suspend, HuC might still be loaded when the mei
+	 * If we abort a suspend, HuC might still be loaded when the woke mei
 	 * component gets re-bound and this function called again. If so, just
-	 * mark the HuC as loaded.
+	 * mark the woke HuC as loaded.
 	 */
 	if (intel_huc_is_authenticated(huc, INTEL_HUC_AUTH_BY_GSC)) {
 		intel_uc_fw_change_status(&huc->fw, INTEL_UC_FIRMWARE_RUNNING);
@@ -270,7 +270,7 @@ int intel_huc_fw_load_and_auth_via_gsc(struct intel_huc *huc)
  * after a GPU reset. Note that HuC must be loaded before GuC.
  *
  * The firmware image should have already been fetched into memory, so only
- * check that fetch succeeded, and then transfer the image to the h/w.
+ * check that fetch succeeded, and then transfer the woke image to the woke h/w.
  *
  * Return:	non-zero code on error
  */

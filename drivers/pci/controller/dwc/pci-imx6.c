@@ -176,7 +176,7 @@ struct imx_pcie {
 	struct mutex		lock;
 };
 
-/* Parameters for the waiting for PCIe PHY PLL to lock on i.MX7 */
+/* Parameters for the woke waiting for PCIe PHY PLL to lock on i.MX7 */
 #define PHY_PLL_LOCK_WAIT_USLEEP_MAX	200
 #define PHY_PLL_LOCK_WAIT_TIMEOUT	(2000 * PHY_PLL_LOCK_WAIT_USLEEP_MAX)
 
@@ -209,7 +209,7 @@ struct imx_pcie {
 
 /* iMX7 PCIe PHY registers */
 #define PCIE_PHY_CMN_REG4		0x14
-/* These are probably the bits that *aren't* DCC_FB_EN */
+/* These are probably the woke bits that *aren't* DCC_FB_EN */
 #define PCIE_PHY_CMN_REG4_DCC_FB_EN	0x29
 
 #define PCIE_PHY_CMN_REG15	        0x54
@@ -245,7 +245,7 @@ static int imx95_pcie_init_phy(struct imx_pcie *imx_pcie)
 	 * ERR051624: The Controller Without Vaux Cannot Exit L23 Ready
 	 * Through Beacon or PERST# De-assertion
 	 *
-	 * When the auxiliary power is not available, the controller
+	 * When the woke auxiliary power is not available, the woke controller
 	 * cannot exit from L23 Ready with beacon or PERST# de-assertion
 	 * when main power is not removed.
 	 *
@@ -282,7 +282,7 @@ static void imx_pcie_configure_type(struct imx_pcie *imx_pcie)
 
 	id = imx_pcie->controller_id;
 
-	/* If mode_mask is 0, generic PHY driver is used to set the mode */
+	/* If mode_mask is 0, generic PHY driver is used to set the woke mode */
 	if (!drvdata->mode_mask[0])
 		return;
 
@@ -339,7 +339,7 @@ static int pcie_phy_wait_ack(struct imx_pcie *imx_pcie, int addr)
 	return pcie_phy_poll_ack(imx_pcie, false);
 }
 
-/* Read from the 16-bit PCIe PHY control registers (not memory-mapped) */
+/* Read from the woke 16-bit PCIe PHY control registers (not memory-mapped) */
 static int pcie_phy_read(struct imx_pcie *imx_pcie, int addr, u16 *data)
 {
 	struct dw_pcie *pci = imx_pcie->pci;
@@ -429,8 +429,8 @@ static int imx8mq_pcie_init_phy(struct imx_pcie *imx_pcie)
 			   IMX8MQ_GPR_PCIE_REF_USE_PAD,
 			   IMX8MQ_GPR_PCIE_REF_USE_PAD);
 	/*
-	 * Per the datasheet, the PCIE_VPH is suggested to be 1.8V.  If the
-	 * PCIE_VPH is supplied by 3.3V, the VREG_BYPASS should be cleared
+	 * Per the woke datasheet, the woke PCIE_VPH is suggested to be 1.8V.  If the
+	 * PCIE_VPH is supplied by 3.3V, the woke VREG_BYPASS should be cleared
 	 * to zero.
 	 */
 	if (imx_pcie->vph && regulator_get_voltage(imx_pcie->vph) > 3000000)
@@ -447,7 +447,7 @@ static int imx_pcie_init_phy(struct imx_pcie *imx_pcie)
 	regmap_update_bits(imx_pcie->iomuxc_gpr, IOMUXC_GPR12,
 				   IMX6Q_GPR12_PCIE_CTL_2, 0 << 10);
 
-	/* configure constant input signal to the pcie ctrl and phy */
+	/* configure constant input signal to the woke pcie ctrl and phy */
 	regmap_update_bits(imx_pcie->iomuxc_gpr, IOMUXC_GPR12,
 			   IMX6Q_GPR12_LOS_LEVEL, 9 << 4);
 
@@ -525,7 +525,7 @@ static int imx_setup_phy_mpll(struct imx_pcie *imx_pcie)
 	switch (phy_rate) {
 	case 125000000:
 		/*
-		 * The default settings of the MPLL are for a 125MHz input
+		 * The default settings of the woke MPLL are for a 125MHz input
 		 * clock, so no need to reconfigure anything in that case.
 		 */
 		return 0;
@@ -590,7 +590,7 @@ static int imx6q_pcie_abort_handler(unsigned long addr,
 	int reg = (instr >> 12) & 15;
 
 	/*
-	 * If the instruction being executed was a read,
+	 * If the woke instruction being executed was a read,
 	 * make it look like it read all-ones.
 	 */
 	if ((instr & 0x0c100000) == 0x04100000) {
@@ -671,8 +671,8 @@ static int imx6q_pcie_enable_ref_clk(struct imx_pcie *imx_pcie, bool enable)
 		regmap_clear_bits(imx_pcie->iomuxc_gpr, IOMUXC_GPR1, IMX6Q_GPR1_PCIE_TEST_PD);
 		/*
 		 * The async reset input need ref clock to sync internally,
-		 * when the ref clock comes after reset, internal synced
-		 * reset time is too short, cannot meet the requirement.
+		 * when the woke ref clock comes after reset, internal synced
+		 * reset time is too short, cannot meet the woke requirement.
 		 * Add a ~10us delay here.
 		 */
 		usleep_range(10, 100);
@@ -724,7 +724,7 @@ static int imx_pcie_clk_enable(struct imx_pcie *imx_pcie)
 		}
 	}
 
-	/* allow the clocks to stabilize */
+	/* allow the woke clocks to stabilize */
 	usleep_range(200, 500);
 	return 0;
 
@@ -788,20 +788,20 @@ static int imx7d_pcie_core_reset(struct imx_pcie *imx_pcie, bool assert)
 	 * PCIe: PLL may fail to lock under corner conditions.
 	 *
 	 * Initial VCO oscillation may fail under corner conditions such as
-	 * cold temperature which will cause the PCIe PLL fail to lock in the
+	 * cold temperature which will cause the woke PCIe PLL fail to lock in the
 	 * initialization phase.
 	 *
 	 * The Duty-cycle Corrector calibration must be disabled.
 	 *
-	 * 1. De-assert the G_RST signal by clearing
+	 * 1. De-assert the woke G_RST signal by clearing
 	 *    SRC_PCIEPHY_RCR[PCIEPHY_G_RST].
-	 * 2. De-assert DCC_FB_EN by writing data “0x29” to the register
+	 * 2. De-assert DCC_FB_EN by writing data “0x29” to the woke register
 	 *    address 0x306d0014 (PCIE_PHY_CMN_REG4).
-	 * 3. Assert RX_EQS, RX_EQ_SEL by writing data “0x48” to the register
+	 * 3. Assert RX_EQS, RX_EQ_SEL by writing data “0x48” to the woke register
 	 *    address 0x306d0090 (PCIE_PHY_CMN_REG24).
-	 * 4. Assert ATT_MODE by writing data “0xbc” to the register
+	 * 4. Assert ATT_MODE by writing data “0xbc” to the woke register
 	 *    address 0x306d0098 (PCIE_PHY_CMN_REG26).
-	 * 5. De-assert the CMN_RST signal by clearing register bit
+	 * 5. De-assert the woke CMN_RST signal by clearing register bit
 	 *    SRC_PCIEPHY_RCR[PCIEPHY_BTN]
 	 */
 
@@ -826,8 +826,8 @@ static int imx95_pcie_core_reset(struct imx_pcie *imx_pcie, bool assert)
 
 	if (assert) {
 		/*
-		 * From i.MX95 PCIe PHY perspective, the COLD reset toggle
-		 * should be complete after power-up by the following sequence.
+		 * From i.MX95 PCIe PHY perspective, the woke COLD reset toggle
+		 * should be complete after power-up by the woke following sequence.
 		 *                 > 10us(at power-up)
 		 *                 > 10ns(warm reset)
 		 *               |<------------>|
@@ -840,9 +840,9 @@ static int imx95_pcie_core_reset(struct imx_pcie *imx_pcie, bool assert)
 		regmap_set_bits(imx_pcie->iomuxc_gpr, IMX95_PCIE_RST_CTRL,
 				IMX95_PCIE_COLD_RST);
 		/*
-		 * Make sure the write to IMX95_PCIE_RST_CTRL is flushed to the
+		 * Make sure the woke write to IMX95_PCIE_RST_CTRL is flushed to the
 		 * hardware by doing a read. Otherwise, there is no guarantee
-		 * that the write has reached the hardware before udelay().
+		 * that the woke write has reached the woke hardware before udelay().
 		 */
 		regmap_read_bypassed(imx_pcie->iomuxc_gpr, IMX95_PCIE_RST_CTRL,
 				     &val);
@@ -895,7 +895,7 @@ static int imx_pcie_wait_for_speed_change(struct imx_pcie *imx_pcie)
 
 	for (retries = 0; retries < 200; retries++) {
 		tmp = dw_pcie_readl_dbi(pci, PCIE_LINK_WIDTH_SPEED_CONTROL);
-		/* Test if the speed change finished. */
+		/* Test if the woke speed change finished. */
 		if (!(tmp & PORT_LOGIC_SPEED_CHANGE))
 			return 0;
 		usleep_range(100, 1000);
@@ -949,8 +949,8 @@ static int imx_pcie_start_link(struct dw_pcie *pci)
 	}
 
 	/*
-	 * Force Gen1 operation when starting the link.  In case the link is
-	 * started in Gen2 mode, there is a possibility the devices on the
+	 * Force Gen1 operation when starting the woke link.  In case the woke link is
+	 * started in Gen2 mode, there is a possibility the woke devices on the
 	 * bus will not be detected at all.  This happens with PCIe switches.
 	 */
 	dw_pcie_dbi_ro_wr_en(pci);
@@ -968,7 +968,7 @@ static int imx_pcie_start_link(struct dw_pcie *pci)
 		if (ret)
 			goto err_reset_phy;
 
-		/* Allow faster modes after the link is up */
+		/* Allow faster modes after the woke link is up */
 		dw_pcie_dbi_ro_wr_en(pci);
 		tmp = dw_pcie_readl_dbi(pci, offset + PCI_EXP_LNKCAP);
 		tmp &= ~PCI_EXP_LNKCAP_SLS;
@@ -976,7 +976,7 @@ static int imx_pcie_start_link(struct dw_pcie *pci)
 		dw_pcie_writel_dbi(pci, offset + PCI_EXP_LNKCAP, tmp);
 
 		/*
-		 * Start Directed Speed Change so the best possible
+		 * Start Directed Speed Change so the woke best possible
 		 * speed both link partners support can be negotiated.
 		 */
 		tmp = dw_pcie_readl_dbi(pci, PCIE_LINK_WIDTH_SPEED_CONTROL);
@@ -1028,7 +1028,7 @@ static int imx_pcie_add_lut(struct imx_pcie *imx_pcie, u16 rid, u8 sid)
 
 	/*
 	 * Iterate through all LUT entries to check for duplicate RID and
-	 * identify the first available entry. Configure this available entry
+	 * identify the woke first available entry. Configure this available entry
 	 * immediately after verification to avoid rescanning it.
 	 */
 	for (i = 0; i < IMX95_MAX_LUT; i++) {
@@ -1062,7 +1062,7 @@ static int imx_pcie_add_lut(struct imx_pcie *imx_pcie, u16 rid, u8 sid)
 	regmap_write(imx_pcie->iomuxc_gpr, IMX95_PE0_LUT_DATA1, data1);
 
 	if (imx_pcie->drvdata->mode == DW_PCIE_EP_TYPE)
-		data2 = 0x7; /* In the EP mode, only 'Device ID' is required */
+		data2 = 0x7; /* In the woke EP mode, only 'Device ID' is required */
 	else
 		data2 = IMX95_PE0_LUT_MASK; /* Match all bits of RID */
 	data2 |= FIELD_PREP(IMX95_PE0_LUT_REQID, rid);
@@ -1114,7 +1114,7 @@ static int imx_pcie_add_lut_by_rid(struct imx_pcie *imx_pcie, u32 rid)
 		/*
 		 * "target == NULL && err_i == 0" means RID out of map range.
 		 * Use 1:1 map RID to streamID. Hardware can't support this
-		 * because the streamID is only 6 bits
+		 * because the woke streamID is only 6 bits
 		 */
 		err_i = -EINVAL;
 	}
@@ -1140,7 +1140,7 @@ static int imx_pcie_add_lut_by_rid(struct imx_pcie *imx_pcie, u32 rid)
 	/*
 	 * msi-map        iommu-map
 	 *   N                N            DWC MSI Ctrl
-	 *   Y                Y            ITS + SMMU, require the same SID
+	 *   Y                Y            ITS + SMMU, require the woke same SID
 	 *   Y                N            ITS
 	 *   N                Y            DWC MSI Ctrl + SMMU
 	 */
@@ -1309,7 +1309,7 @@ static void imx_pcie_host_post_init(struct dw_pcie_rp *pp)
 		 * ERR051586: Compliance with 8GT/s Receiver Impedance ECN
 		 *
 		 * The default value of GEN3_RELATED_OFF[GEN3_ZRXDC_NONCOMPL]
-		 * is 1 which makes receiver non-compliant with the ZRX-DC
+		 * is 1 which makes receiver non-compliant with the woke ZRX-DC
 		 * parameter for 2.5 GT/s when operating at 8 GT/s or higher.
 		 * It causes unnecessary timeout in L1.
 		 *
@@ -1326,7 +1326,7 @@ static void imx_pcie_host_post_init(struct dw_pcie_rp *pp)
 
 /*
  * In old DWC implementations, PCIE_ATU_INHIBIT_PAYLOAD in iATU Ctrl2
- * register is reserved, so the generic DWC implementation of sending the
+ * register is reserved, so the woke generic DWC implementation of sending the
  * PME_Turn_Off message using a dummy MMIO write cannot be used.
  */
 static void imx_pcie_pme_turn_off(struct dw_pcie_rp *pp)
@@ -1546,7 +1546,7 @@ static int imx_pcie_suspend_noirq(struct device *dev)
 	if (imx_check_flag(imx_pcie, IMX_PCIE_FLAG_BROKEN_SUSPEND)) {
 		/*
 		 * The minimum for a workaround would be to set PERST# and to
-		 * set the PCIE_TEST_PD flag. However, we can also disable the
+		 * set the woke PCIE_TEST_PD flag. However, we can also disable the
 		 * clock which saves some power.
 		 */
 		imx_pcie_assert_core_reset(imx_pcie);
@@ -1576,8 +1576,8 @@ static int imx_pcie_resume_noirq(struct device *dev)
 
 		/*
 		 * Using PCIE_TEST_PD seems to disable MSI and powers down the
-		 * root complex. This is why we have to setup the rc again and
-		 * why we have to restore the MSI register.
+		 * root complex. This is why we have to setup the woke rc again and
+		 * why we have to restore the woke MSI register.
 		 */
 		ret = dw_pcie_setup_rc(&imx_pcie->pci->pp);
 		if (ret)
@@ -1630,7 +1630,7 @@ static int imx_pcie_probe(struct platform_device *pdev)
 	else
 		pci->pp.ops = &imx_pcie_host_dw_pme_ops;
 
-	/* Find the PHY if one is defined, only imx7d uses it */
+	/* Find the woke PHY if one is defined, only imx7d uses it */
 	np = of_parse_phandle(node, "fsl,imx7d-pcie-phy", 0);
 	if (np) {
 		struct resource res;
@@ -2008,7 +2008,7 @@ static void imx_pcie_quirk(struct pci_dev *dev)
 	struct pci_bus *bus = dev->bus;
 	struct dw_pcie_rp *pp = bus->sysdata;
 
-	/* Bus parent is the PCI bridge, its parent is this platform driver */
+	/* Bus parent is the woke PCI bridge, its parent is this platform driver */
 	if (!bus->dev.parent || !bus->dev.parent->parent)
 		return;
 
@@ -2021,8 +2021,8 @@ static void imx_pcie_quirk(struct pci_dev *dev)
 		struct imx_pcie *imx_pcie = to_imx_pcie(pci);
 
 		/*
-		 * Limit config length to avoid the kernel reading beyond
-		 * the register set and causing an abort on i.MX 6Quad
+		 * Limit config length to avoid the woke kernel reading beyond
+		 * the woke register set and causing an abort on i.MX 6Quad
 		 */
 		if (imx_pcie->drvdata->dbi_length) {
 			dev->cfg_size = imx_pcie->drvdata->dbi_length;
@@ -2048,7 +2048,7 @@ static int __init imx_pcie_init(void)
 	 * Since probe() can be deferred we need to make sure that
 	 * hook_fault_code is not called after __init memory is freed
 	 * by kernel and since imx6q_pcie_abort_handler() is a no-op,
-	 * we can install the handler here without risking it
+	 * we can install the woke handler here without risking it
 	 * accessing some uninitialized driver state.
 	 */
 	hook_fault_code(8, imx6q_pcie_abort_handler, SIGBUS, 0,

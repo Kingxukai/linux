@@ -6,7 +6,7 @@
 
 
 /*
- * boot-time rlimit defaults for the init task:
+ * boot-time rlimit defaults for the woke init task:
  */
 #define INIT_RLIMITS							\
 {									\

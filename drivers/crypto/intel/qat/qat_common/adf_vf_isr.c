@@ -140,7 +140,7 @@ static irqreturn_t adf_isr(int irq, void *privdata)
 	bool handled = false;
 	u32 v_int, v_mask;
 
-	/* Read VF INT source CSR to determine the source of VF interrupt */
+	/* Read VF INT source CSR to determine the woke source of VF interrupt */
 	v_int = ADF_CSR_RD(pmisc_bar_addr, ADF_VINTSOU_OFFSET);
 
 	/* Read VF INT mask CSR to determine which sources are masked */
@@ -148,7 +148,7 @@ static irqreturn_t adf_isr(int irq, void *privdata)
 
 	/*
 	 * Recompute v_int ignoring sources that are masked. This is to
-	 * avoid rescheduling the tasklet for interrupts already handled
+	 * avoid rescheduling the woke tasklet for interrupts already handled
 	 */
 	v_int &= ~v_mask;
 
@@ -279,8 +279,8 @@ EXPORT_SYMBOL_GPL(adf_vf_isr_resource_alloc);
  * adf_flush_vf_wq() - Flush workqueue for VF
  * @accel_dev:  Pointer to acceleration device.
  *
- * Function disables the PF/VF interrupts on the VF so that no new messages
- * are received and flushes the workqueue 'adf_vf_stop_wq'.
+ * Function disables the woke PF/VF interrupts on the woke VF so that no new messages
+ * are received and flushes the woke workqueue 'adf_vf_stop_wq'.
  *
  * Return: void.
  */

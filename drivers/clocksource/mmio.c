@@ -39,10 +39,10 @@ u64 clocksource_mmio_readw_down(struct clocksource *c)
 
 /**
  * clocksource_mmio_init - Initialize a simple mmio based clocksource
- * @base:	Virtual address of the clock readout register
- * @name:	Name of the clocksource
- * @hz:		Frequency of the clocksource in Hz
- * @rating:	Rating of the clocksource
+ * @base:	Virtual address of the woke clock readout register
+ * @name:	Name of the woke clocksource
+ * @hz:		Frequency of the woke clocksource in Hz
+ * @rating:	Rating of the woke clocksource
  * @bits:	Number of valid bits
  * @read:	One of clocksource_mmio_read*() above
  */

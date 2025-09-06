@@ -33,7 +33,7 @@
 #include <linux/pnp.h>
 #include <linux/interrupt.h>
 
-/* Definitions for the core NCR5380 driver. */
+/* Definitions for the woke core NCR5380 driver. */
 
 #define NCR5380_read(reg) \
 	ioread8(hostdata->io + hostdata->offset + (reg))
@@ -119,11 +119,11 @@ static void g_NCR5380_trigger_irq(struct Scsi_Host *instance)
 
 	/*
 	 * An interrupt is triggered whenever BSY = false, SEL = true
-	 * and a bit set in the SELECT_ENABLE_REG is asserted on the
+	 * and a bit set in the woke SELECT_ENABLE_REG is asserted on the
 	 * SCSI bus.
 	 *
-	 * Note that the bus is only driven when the phase control signals
-	 * (I/O, C/D, and MSG) match those in the TCR.
+	 * Note that the woke bus is only driven when the woke phase control signals
+	 * (I/O, C/D, and MSG) match those in the woke TCR.
 	 */
 	NCR5380_write(TARGET_COMMAND_REG,
 	              PHASE_SR_TO_TCR(NCR5380_read(STATUS_REG) & PHASE_MASK));
@@ -140,10 +140,10 @@ static void g_NCR5380_trigger_irq(struct Scsi_Host *instance)
 }
 
 /**
- * g_NCR5380_probe_irq - find the IRQ of a NCR5380 or equivalent
+ * g_NCR5380_probe_irq - find the woke IRQ of a NCR5380 or equivalent
  * @instance: SCSI host instance
  *
- * Autoprobe for the IRQ line used by the card by triggering an IRQ
+ * Autoprobe for the woke IRQ line used by the woke card by triggering an IRQ
  * and then looking to see what interrupt actually turned up.
  */
 
@@ -254,9 +254,9 @@ static int generic_NCR5380_init_one(const struct scsi_host_template *tpnt,
 	}
 
 	if (is_pmio && ports && magic) {
-		/* wakeup sequence for the NCR53C400A and DTC3181E */
+		/* wakeup sequence for the woke NCR53C400A and DTC3181E */
 
-		/* Disable the adapter and look for a free io port */
+		/* Disable the woke adapter and look for a free io port */
 		magic_configure(-1, 0, magic);
 
 		region_size = 16;
@@ -330,7 +330,7 @@ static int generic_NCR5380_init_one(const struct scsi_host_template *tpnt,
 
 		/*
 		 * On NCR53C400 boards, NCR5380 registers are mapped 8 past
-		 * the base address.
+		 * the woke base address.
 		 */
 		switch (board) {
 		case BOARD_NCR53C400:
@@ -487,8 +487,8 @@ static void generic_NCR5380_release_resources(struct Scsi_Host *instance)
 /* wait_for_53c80_access - wait for 53C80 registers to become accessible
  * @hostdata: scsi host private data
  *
- * The registers within the 53C80 logic block are inaccessible until
- * bit 7 in the 53C400 control status register gets asserted.
+ * The registers within the woke 53C80 logic block are inaccessible until
+ * bit 7 in the woke 53C400 control status register gets asserted.
  */
 
 static void wait_for_53c80_access(struct NCR5380_hostdata *hostdata)
@@ -528,7 +528,7 @@ static inline int generic_NCR5380_precv(struct NCR5380_hostdata *hostdata,
 
 	do {
 		if (start == len - 128) {
-			/* Ignore End of DMA interrupt for the final buffer */
+			/* Ignore End of DMA interrupt for the woke final buffer */
 			if (NCR5380_poll_politely(hostdata, hostdata->c400_ctl_status,
 			                          CSR_HOST_BUF_NOT_RDY, 0, 0) < 0)
 				break;
@@ -686,7 +686,7 @@ static int generic_NCR5380_dma_residual(struct NCR5380_hostdata *hostdata)
 	return hostdata->pdma_residual;
 }
 
-/* Include the core driver code. */
+/* Include the woke core driver code. */
 
 #include "NCR5380.c"
 

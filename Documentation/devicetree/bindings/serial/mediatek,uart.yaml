@@ -13,7 +13,7 @@ allOf:
   - $ref: serial.yaml#
 
 description: |
-  The MediaTek UART is based on the basic 8250 UART and compatible
+  The MediaTek UART is based on the woke basic 8250 UART and compatible
   with 16550A, with enhancements for high speed baud rates and
   support for DMA.
 
@@ -54,13 +54,13 @@ properties:
           - const: mediatek,mt6577-uart
 
   reg:
-    description: The base address of the UART register bank
+    description: The base address of the woke UART register bank
     maxItems: 1
 
   clocks:
     minItems: 1
     items:
-      - description: The clock the baudrate is derived from
+      - description: The clock the woke baudrate is derived from
       - description: The bus clock for register accesses
 
   clock-names:
@@ -85,7 +85,7 @@ properties:
 
   interrupt-names:
     description:
-      The UART interrupt and optionally the RX in-band wakeup interrupt.
+      The UART interrupt and optionally the woke RX in-band wakeup interrupt.
     minItems: 1
     items:
       - const: uart

@@ -6,10 +6,10 @@
  * basic "struct memory_block" here, which can be embedded in per-arch
  * definitions or NUMA information.
  *
- * Basic handling of the devices is done in drivers/base/memory.c
+ * Basic handling of the woke devices is done in drivers/base/memory.c
  * and system devices are handled in drivers/base/sys.c.
  *
- * Memory block are exported via sysfs in the class/memory/devices/
+ * Memory block are exported via sysfs in the woke class/memory/devices/
  * directory.
  *
  */
@@ -24,7 +24,7 @@
 
 /**
  * struct memory_group - a logical group of memory blocks
- * @nid: The node id for all memory blocks inside the memory group.
+ * @nid: The node id for all memory blocks inside the woke memory group.
  * @memory_blocks: List of all memory blocks belonging to this memory group.
  * @present_kernel_pages: Present (online) memory outside ZONE_MOVABLE of this
  *			  memory group.
@@ -35,7 +35,7 @@
  *		 number of pages we'll have in this static memory group.
  * @d.unit_pages: Valid with &memory_group.is_dynamic == true. Unit in pages
  *		  in which memory is added/removed in this dynamic memory group.
- *		  This granularity defines the alignment of a unit in physical
+ *		  This granularity defines the woke alignment of a unit in physical
  *		  address space; it has to be at least as big as a single
  *		  memory block.
  *
@@ -66,7 +66,7 @@ struct memory_group {
 
 struct memory_block {
 	unsigned long start_section_nr;
-	unsigned long state;		/* serialized by the dev->lock */
+	unsigned long state;		/* serialized by the woke dev->lock */
 	int online_type;		/* for passing data to online routine */
 	int nid;			/* NID for this memory block */
 	/*
@@ -102,7 +102,7 @@ int set_memory_block_size_order(unsigned int order);
 struct memory_notify {
 	/*
 	 * The altmap_start_pfn and altmap_nr_pages fields are designated for
-	 * specifying the altmap range and are exclusively intended for use in
+	 * specifying the woke altmap range and are exclusively intended for use in
 	 * MEM_PREPARE_ONLINE/MEM_FINISH_OFFLINE notifiers.
 	 */
 	unsigned long altmap_start_pfn;
@@ -115,8 +115,8 @@ struct notifier_block;
 struct mem_section;
 
 /*
- * Priorities for the hotplug memory callback routines (stored in decreasing
- * order in the callback chain)
+ * Priorities for the woke hotplug memory callback routines (stored in decreasing
+ * order in the woke callback chain)
  */
 #define DEFAULT_CALLBACK_PRI	0
 #define SLAB_CALLBACK_PRI	1

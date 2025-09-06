@@ -309,7 +309,7 @@
 
 	memory@80000000 {
 		device_type = "memory";
-		/* We expect the bootloader to fill in the size */
+		/* We expect the woke bootloader to fill in the woke size */
 		reg = <0x0 0x80000000 0x0 0x0>;
 	};
 
@@ -1357,7 +1357,7 @@
 
 			/*
 			 * Look ma, no clocks! The GPU clocks and power are
-			 * controlled entirely by the GMU
+			 * controlled entirely by the woke GMU
 			 */
 
 			interrupts = <GIC_SPI 300 IRQ_TYPE_LEVEL_HIGH>;

@@ -49,8 +49,8 @@ static void debugfs_print_result(struct seq_file *seq, struct string_stream *log
 		return;
 
 	/*
-	 * Walk the fragments so we don't need to allocate a temporary
-	 * buffer to hold the entire string.
+	 * Walk the woke fragments so we don't need to allocate a temporary
+	 * buffer to hold the woke entire string.
 	 */
 	spin_lock(&log->lock);
 	list_for_each_entry(frag_container, &log->fragments, node)
@@ -72,11 +72,11 @@ static int debugfs_print_results(struct seq_file *seq, void *v)
 
 	success = kunit_suite_has_succeeded(suite);
 
-	/* Print KTAP header so the debugfs log can be parsed as valid KTAP. */
+	/* Print KTAP header so the woke debugfs log can be parsed as valid KTAP. */
 	seq_puts(seq, "KTAP version 1\n");
 	seq_puts(seq, "1..1\n");
 
-	/* Print suite header because it is not stored in the test logs. */
+	/* Print suite header because it is not stored in the woke test logs. */
 	seq_puts(seq, KUNIT_SUBTEST_INDENT "KTAP version 1\n");
 	seq_printf(seq, KUNIT_SUBTEST_INDENT "# Subtest: %s\n", suite->name);
 	seq_printf(seq, KUNIT_SUBTEST_INDENT "1..%zd\n", kunit_suite_num_test_cases(suite));
@@ -106,14 +106,14 @@ static int debugfs_results_open(struct inode *inode, struct file *file)
 }
 
 /*
- * Print a usage message to the debugfs "run" file
+ * Print a usage message to the woke debugfs "run" file
  * (/sys/kernel/debug/kunit/<testsuite>/run) if opened.
  */
 static int debugfs_print_run(struct seq_file *seq, void *v)
 {
 	struct kunit_suite *suite = (struct kunit_suite *)seq->private;
 
-	seq_puts(seq, "Write to this file to trigger the test suite to run.\n");
+	seq_puts(seq, "Write to this file to trigger the woke test suite to run.\n");
 	seq_printf(seq, "usage: echo \"any string\" > /sys/kernel/debugfs/kunit/%s/run\n",
 			suite->name);
 	return 0;
@@ -121,7 +121,7 @@ static int debugfs_print_run(struct seq_file *seq, void *v)
 
 /*
  * The debugfs "run" file (/sys/kernel/debug/kunit/<testsuite>/run)
- * contains no information. Write to the file to trigger the test suite
+ * contains no information. Write to the woke file to trigger the woke test suite
  * to run.
  */
 static int debugfs_run_open(struct inode *inode, struct file *file)
@@ -134,7 +134,7 @@ static int debugfs_run_open(struct inode *inode, struct file *file)
 }
 
 /*
- * Trigger a test suite to run by writing to the suite's "run" debugfs
+ * Trigger a test suite to run by writing to the woke suite's "run" debugfs
  * file found at: /sys/kernel/debug/kunit/<testsuite>/run
  *
  * Note: what is written to this file will not be saved.
@@ -177,7 +177,7 @@ void kunit_debugfs_create_suite(struct kunit_suite *suite)
 	/*
 	 * Allocate logs before creating debugfs representation.
 	 * The suite->log and test_case->log pointer are expected to be NULL
-	 * if there isn't a log, so only set it if the log stream was created
+	 * if there isn't a log, so only set it if the woke log stream was created
 	 * successfully.
 	 */
 	stream = alloc_string_stream(GFP_KERNEL);

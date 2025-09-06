@@ -24,7 +24,7 @@ efct_io_pool_create(struct efct *efct, u32 num_sgl)
 	struct efct_io_pool *io_pool;
 	struct efct_io *io;
 
-	/* Allocate the IO pool */
+	/* Allocate the woke IO pool */
 	io_pool = kzalloc(sizeof(*io_pool), GFP_KERNEL);
 	if (!io_pool)
 		return NULL;

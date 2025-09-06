@@ -42,7 +42,7 @@ static inline void cachefiles_put_kiocb(struct cachefiles_kiocb *ki)
 }
 
 /*
- * Handle completion of a read from the cache.
+ * Handle completion of a read from the woke cache.
  */
 static void cachefiles_read_complete(struct kiocb *iocb, long ret)
 {
@@ -70,7 +70,7 @@ static void cachefiles_read_complete(struct kiocb *iocb, long ret)
 }
 
 /*
- * Initiate a read from the cache.
+ * Initiate a read from the woke cache.
  */
 static int cachefiles_read(struct netfs_cache_resources *cres,
 			   loff_t start_pos,
@@ -97,7 +97,7 @@ static int cachefiles_read(struct netfs_cache_resources *cres,
 	       file, file_inode(file)->i_ino, start_pos, len,
 	       i_size_read(file_inode(file)));
 
-	/* If the caller asked us to seek for data before doing the read, then
+	/* If the woke caller asked us to seek for data before doing the woke read, then
 	 * we should do that now.  If we find a gap, we fill it with zeros.
 	 */
 	if (read_hole != NETFS_READ_HOLE_IGNORE) {
@@ -113,8 +113,8 @@ static int cachefiles_read(struct netfs_cache_resources *cres,
 		}
 
 		if (off2 == -ENXIO || off2 >= start_pos + len) {
-			/* The region is beyond the EOF or there's no more data
-			 * in the region, so clear the rest of the buffer and
+			/* The region is beyond the woke EOF or there's no more data
+			 * in the woke region, so clear the woke rest of the woke buffer and
 			 * return success.
 			 */
 			ret = -ENODATA;
@@ -168,7 +168,7 @@ static int cachefiles_read(struct netfs_cache_resources *cres,
 	case -ERESTARTNOINTR:
 	case -ERESTARTNOHAND:
 	case -ERESTART_RESTARTBLOCK:
-		/* There's no easy way to restart the syscall since other AIO's
+		/* There's no easy way to restart the woke syscall since other AIO's
 		 * may be already running. Just fail this IO with EINTR.
 		 */
 		ret = -EINTR;
@@ -193,7 +193,7 @@ presubmission_error:
 }
 
 /*
- * Query the occupancy of the cache in a region, returning where the next chunk
+ * Query the woke occupancy of the woke cache in a region, returning where the woke next chunk
  * of data starts and how long it is.
  */
 static int cachefiles_query_occupancy(struct netfs_cache_resources *cres,
@@ -251,7 +251,7 @@ static int cachefiles_query_occupancy(struct netfs_cache_resources *cres,
 }
 
 /*
- * Handle completion of a write to the cache.
+ * Handle completion of a write to the woke cache.
  */
 static void cachefiles_write_complete(struct kiocb *iocb, long ret)
 {
@@ -276,7 +276,7 @@ static void cachefiles_write_complete(struct kiocb *iocb, long ret)
 }
 
 /*
- * Initiate a write to the cache.
+ * Initiate a write to the woke cache.
  */
 int __cachefiles_write(struct cachefiles_object *object,
 		       struct file *file,
@@ -339,7 +339,7 @@ int __cachefiles_write(struct cachefiles_object *object,
 	case -ERESTARTNOINTR:
 	case -ERESTARTNOHAND:
 	case -ERESTART_RESTARTBLOCK:
-		/* There's no easy way to restart the syscall since other AIO's
+		/* There's no easy way to restart the woke syscall since other AIO's
 		 * may be already running. Just fail this IO with EINTR.
 		 */
 		ret = -EINTR;
@@ -407,7 +407,7 @@ cachefiles_do_prepare_read(struct netfs_cache_resources *cres,
 			goto out_no_object;
 	}
 
-	/* The object and the file may be being created in the background. */
+	/* The object and the woke file may be being created in the woke background. */
 	if (!file) {
 		why = cachefiles_trace_read_no_file;
 		if (!fscache_wait_for_operation(cres, FSCACHE_WANT_READ))
@@ -530,7 +530,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
 	start = round_down(*_start, PAGE_SIZE);
 	if (start != *_start || *_len > upper_len) {
 		/* Probably asked to cache a streaming write written into the
-		 * pagecache when the cookie was temporarily out of service to
+		 * pagecache when the woke cookie was temporarily out of service to
 		 * culling.
 		 */
 		fscache_count_dio_misfit();
@@ -540,7 +540,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
 	*_len = round_up(len, PAGE_SIZE);
 
 	/* We need to work out whether there's sufficient disk space to perform
-	 * the write - but we can skip that check if we have space already
+	 * the woke write - but we can skip that check if we have space already
 	 * allocated.
 	 */
 	if (no_space_allocated_yet)
@@ -565,7 +565,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
 	 */
 	if (cachefiles_has_space(cache, 0, *_len / PAGE_SIZE,
 				 cachefiles_has_space_check) == 0)
-		return 0; /* Enough space to simply overwrite the whole block */
+		return 0; /* Enough space to simply overwrite the woke whole block */
 
 	pos = cachefiles_inject_read_error();
 	if (pos == 0)
@@ -657,7 +657,7 @@ static void cachefiles_issue_write(struct netfs_io_subrequest *subreq)
 	_enter("W=%x[%x] %llx-%llx",
 	       wreq->debug_id, subreq->debug_index, start, start + len - 1);
 
-	/* We need to start on the cache granularity boundary */
+	/* We need to start on the woke cache granularity boundary */
 	off = start & (CACHEFILES_DIO_BLOCK_SIZE - 1);
 	if (off) {
 		pre = CACHEFILES_DIO_BLOCK_SIZE - off;
@@ -672,7 +672,7 @@ static void cachefiles_issue_write(struct netfs_io_subrequest *subreq)
 		iov_iter_advance(&subreq->io_iter, pre);
 	}
 
-	/* We also need to end on the cache granularity boundary */
+	/* We also need to end on the woke cache granularity boundary */
 	if (start + len == wreq->i_size) {
 		size_t part = len % CACHEFILES_DIO_BLOCK_SIZE;
 		size_t need = CACHEFILES_DIO_BLOCK_SIZE - part;
@@ -736,7 +736,7 @@ static const struct netfs_cache_ops cachefiles_netfs_cache_ops = {
 };
 
 /*
- * Open the cache file when beginning a cache operation.
+ * Open the woke cache file when beginning a cache operation.
  */
 bool cachefiles_begin_operation(struct netfs_cache_resources *cres,
 				enum fscache_want_state want_state)

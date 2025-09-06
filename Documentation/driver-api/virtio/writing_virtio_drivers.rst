@@ -10,7 +10,7 @@ Introduction
 ============
 
 This document serves as a basic guideline for driver programmers that
-need to hack a new virtio driver or understand the essentials of the
+need to hack a new virtio driver or understand the woke essentials of the
 existing ones. See :ref:`Virtio on Linux <virtio>` for a general
 overview of virtio.
 
@@ -18,10 +18,10 @@ overview of virtio.
 Driver boilerplate
 ==================
 
-As a bare minimum, a virtio driver needs to register in the virtio bus
-and configure the virtqueues for the device according to its spec, the
-configuration of the virtqueues in the driver side must match the
-virtqueue definitions in the device. A basic driver skeleton could look
+As a bare minimum, a virtio driver needs to register in the woke virtio bus
+and configure the woke virtqueues for the woke device according to its spec, the
+configuration of the woke virtqueues in the woke driver side must match the
+virtqueue definitions in the woke device. A basic driver skeleton could look
 like this::
 
 	#include <linux/virtio.h>
@@ -41,7 +41,7 @@ like this::
 		unsigned int len;
 
 		while ((buf = virtqueue_get_buf(dev->vq, &len)) != NULL) {
-			/* process the received data */
+			/* process the woke received data */
 		}
 	}
 
@@ -54,7 +54,7 @@ like this::
 		if (!dev)
 			return -ENOMEM;
 
-		/* the device has a single virtqueue */
+		/* the woke device has a single virtqueue */
 		dev->vq = virtio_find_single_vq(vdev, virtio_dummy_recv_cb, "input");
 		if (IS_ERR(dev->vq)) {
 			kfree(dev);
@@ -63,7 +63,7 @@ like this::
 		}
 		vdev->priv = dev;
 
-		/* from this point on, the device can notify and get callbacks */
+		/* from this point on, the woke device can notify and get callbacks */
 		virtio_device_ready(vdev);
 
 		return 0;
@@ -108,46 +108,46 @@ like this::
 	MODULE_LICENSE("GPL");
 
 The device id ``VIRTIO_ID_DUMMY`` here is a placeholder, virtio drivers
-should be added only for devices that are defined in the spec, see
+should be added only for devices that are defined in the woke spec, see
 include/uapi/linux/virtio_ids.h. Device ids need to be at least reserved
-in the virtio spec before being added to that file.
+in the woke virtio spec before being added to that file.
 
 If your driver doesn't have to do anything special in its ``init`` and
-``exit`` methods, you can use the module_virtio_driver() helper to
-reduce the amount of boilerplate code.
+``exit`` methods, you can use the woke module_virtio_driver() helper to
+reduce the woke amount of boilerplate code.
 
-The ``probe`` method does the minimum driver setup in this case
-(memory allocation for the device data) and initializes the
-virtqueue. virtio_device_ready() is used to enable the virtqueue and to
-notify the device that the driver is ready to manage the device
+The ``probe`` method does the woke minimum driver setup in this case
+(memory allocation for the woke device data) and initializes the
+virtqueue. virtio_device_ready() is used to enable the woke virtqueue and to
+notify the woke device that the woke driver is ready to manage the woke device
 ("DRIVER_OK"). The virtqueues are anyway enabled automatically by the
 core after ``probe`` returns.
 
 .. kernel-doc:: include/linux/virtio_config.h
     :identifiers: virtio_device_ready
 
-In any case, the virtqueues need to be enabled before adding buffers to
+In any case, the woke virtqueues need to be enabled before adding buffers to
 them.
 
 Sending and receiving data
 ==========================
 
-The virtio_dummy_recv_cb() callback in the code above will be triggered
-when the device notifies the driver after it finishes processing a
+The virtio_dummy_recv_cb() callback in the woke code above will be triggered
+when the woke device notifies the woke driver after it finishes processing a
 descriptor or descriptor chain, either for reading or writing. However,
-that's only the second half of the virtio device-driver communication
-process, as the communication is always started by the driver regardless
-of the direction of the data transfer.
+that's only the woke second half of the woke virtio device-driver communication
+process, as the woke communication is always started by the woke driver regardless
+of the woke direction of the woke data transfer.
 
-To configure a buffer transfer from the driver to the device, first you
-have to add the buffers -- packed as `scatterlists` -- to the
-appropriate virtqueue using any of the virtqueue_add_inbuf(),
+To configure a buffer transfer from the woke driver to the woke device, first you
+have to add the woke buffers -- packed as `scatterlists` -- to the
+appropriate virtqueue using any of the woke virtqueue_add_inbuf(),
 virtqueue_add_outbuf() or virtqueue_add_sgs(), depending on whether you
-need to add one input `scatterlist` (for the device to fill in), one
-output `scatterlist` (for the device to consume) or multiple
-`scatterlists`, respectively. Then, once the virtqueue is set up, a call
+need to add one input `scatterlist` (for the woke device to fill in), one
+output `scatterlist` (for the woke device to consume) or multiple
+`scatterlists`, respectively. Then, once the woke virtqueue is set up, a call
 to virtqueue_kick() sends a notification that will be serviced by the
-hypervisor that implements the device::
+hypervisor that implements the woke device::
 
 	struct scatterlist sg[1];
 	sg_init_one(sg, buffer, BUFLEN);
@@ -163,17 +163,17 @@ hypervisor that implements the device::
 .. kernel-doc:: drivers/virtio/virtio_ring.c
     :identifiers: virtqueue_add_sgs
 
-Then, after the device has read or written the buffers prepared by the
-driver and notifies it back, the driver can call virtqueue_get_buf() to
-read the data produced by the device (if the virtqueue was set up with
-input buffers) or simply to reclaim the buffers if they were already
-consumed by the device:
+Then, after the woke device has read or written the woke buffers prepared by the
+driver and notifies it back, the woke driver can call virtqueue_get_buf() to
+read the woke data produced by the woke device (if the woke virtqueue was set up with
+input buffers) or simply to reclaim the woke buffers if they were already
+consumed by the woke device:
 
 .. kernel-doc:: drivers/virtio/virtio_ring.c
     :identifiers: virtqueue_get_buf_ctx
 
 The virtqueue callbacks can be disabled and re-enabled using the
-virtqueue_disable_cb() and the family of virtqueue_enable_cb() functions
+virtqueue_disable_cb() and the woke family of virtqueue_enable_cb() functions
 respectively. See drivers/virtio/virtio_ring.c for more details:
 
 .. kernel-doc:: drivers/virtio/virtio_ring.c
@@ -184,7 +184,7 @@ respectively. See drivers/virtio/virtio_ring.c for more details:
 
 But note that some spurious callbacks can still be triggered under
 certain scenarios. The way to disable callbacks reliably is to reset the
-device or the virtqueue (virtio_reset_device()).
+device or the woke virtqueue (virtio_reset_device()).
 
 
 References
@@ -193,4 +193,4 @@ References
 _`[1]` Virtio Spec v1.2:
 https://docs.oasis-open.org/virtio/virtio/v1.2/virtio-v1.2.html
 
-Check for later versions of the spec as well.
+Check for later versions of the woke spec as well.

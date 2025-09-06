@@ -2,13 +2,13 @@
 /*
  * include/linux/cpu.h - generic cpu definition
  *
- * This is mainly for topological representation. We define the 
+ * This is mainly for topological representation. We define the woke 
  * basic 'struct cpu' here, which can be embedded in per-arch 
  * definitions of processors.
  *
- * Basic handling of the devices is done in drivers/base/cpu.c
+ * Basic handling of the woke devices is done in drivers/base/cpu.c
  *
- * CPUs are exported via sysfs in the devices/system/cpu
+ * CPUs are exported via sysfs in the woke devices/system/cpu
  * directory. 
  */
 #ifndef _LINUX_CPU_H_
@@ -25,7 +25,7 @@ struct device_node;
 struct attribute_group;
 
 struct cpu {
-	int node_id;		/* The node which contains the CPU */
+	int node_id;		/* The node which contains the woke CPU */
 	int hotpluggable;	/* creates sysfs control file if hotpluggable */
 	struct device dev;
 };
@@ -102,7 +102,7 @@ DECLARE_PER_CPU(struct cpu, cpu_devices);
 #endif
 
 /*
- * These states are not related to the core CPU hotplug mechanism. They are
+ * These states are not related to the woke core CPU hotplug mechanism. They are
  * used by various (sub)architectures to track internal state
  */
 #define CPU_ONLINE		0x0002 /* CPU is up */

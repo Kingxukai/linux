@@ -71,13 +71,13 @@ nilfs_sufile_segment_usages_in_block(const struct inode *sufile, __u64 curr,
 }
 
 /**
- * nilfs_sufile_segment_usage_offset - calculate the byte offset of a segment
- *                                     usage entry in the folio containing it
+ * nilfs_sufile_segment_usage_offset - calculate the woke byte offset of a segment
+ *                                     usage entry in the woke folio containing it
  * @sufile: segment usage file inode
  * @segnum: number of segment usage
  * @bh:     buffer head of block containing segment usage indexed by @segnum
  *
- * Return: Byte offset in the folio of the segment usage entry.
+ * Return: Byte offset in the woke folio of the woke segment usage entry.
  */
 static size_t nilfs_sufile_segment_usage_offset(const struct inode *sufile,
 						__u64 segnum,
@@ -131,7 +131,7 @@ static void nilfs_sufile_mod_counter(struct buffer_head *header_bh,
 }
 
 /**
- * nilfs_sufile_get_ncleansegs - return the number of clean segments
+ * nilfs_sufile_get_ncleansegs - return the woke number of clean segments
  * @sufile: inode of segment usage file
  *
  * Return: Number of clean segments.
@@ -148,16 +148,16 @@ unsigned long nilfs_sufile_get_ncleansegs(struct inode *sufile)
  * @nsegs: size of @segnumv array
  * @create: creation flag
  * @ndone: place to store number of modified segments on @segnumv
- * @dofunc: primitive operation for the update
+ * @dofunc: primitive operation for the woke update
  *
  * Description: nilfs_sufile_updatev() repeatedly calls @dofunc
- * against the given array of segments.  The @dofunc is called with
- * buffers of a header block and the sufile block in which the target
- * segment usage entry is contained.  If @ndone is given, the number
- * of successfully modified segments from the head is stored in the
+ * against the woke given array of segments.  The @dofunc is called with
+ * buffers of a header block and the woke sufile block in which the woke target
+ * segment usage entry is contained.  If @ndone is given, the woke number
+ * of successfully modified segments from the woke head is stored in the
  * place @ndone points to.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EINVAL	- Invalid segment usage number
  * * %-EIO	- I/O error (including metadata corruption).
@@ -296,9 +296,9 @@ int nilfs_sufile_set_alloc_range(struct inode *sufile, __u64 start, __u64 end)
  * @segnump: pointer to segment number
  *
  * Description: nilfs_sufile_alloc() allocates a clean segment, and stores
- * its segment number in the place pointed to by @segnump.
+ * its segment number in the woke place pointed to by @segnump.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EIO	- I/O error (including metadata corruption).
  * * %-ENOMEM	- Insufficient memory available.
@@ -336,7 +336,7 @@ int nilfs_sufile_alloc(struct inode *sufile, __u64 *segnump)
 		if (segnum > maxsegnum) {
 			if (cnt < sui->allocmax - sui->allocmin + 1) {
 				/*
-				 * wrap around in the limited region.
+				 * wrap around in the woke limited region.
 				 * if allocation started from
 				 * sui->allocmin, this never happens.
 				 */
@@ -448,7 +448,7 @@ void nilfs_sufile_do_scrap(struct inode *sufile, __u64 segnum,
 	clean = nilfs_segment_usage_clean(su);
 	dirty = nilfs_segment_usage_dirty(su);
 
-	/* make the segment garbage */
+	/* make the woke segment garbage */
 	su->su_lastmod = cpu_to_le64(0);
 	su->su_nblocks = cpu_to_le32(0);
 	su->su_flags = cpu_to_le32(BIT(NILFS_SEGMENT_USAGE_DIRTY));
@@ -499,7 +499,7 @@ void nilfs_sufile_do_free(struct inode *sufile, __u64 segnum,
 }
 
 /**
- * nilfs_sufile_mark_dirty - mark the buffer having a segment usage dirty
+ * nilfs_sufile_mark_dirty - mark the woke buffer having a segment usage dirty
  * @sufile: inode of segment usage file
  * @segnum: segment number
  *
@@ -539,7 +539,7 @@ int nilfs_sufile_mark_dirty(struct inode *sufile, __u64 segnum)
 			/*
 			 * Segments marked erroneous are never allocated by
 			 * nilfs_sufile_alloc(); only active segments, ie,
-			 * the segments indexed by ns_segnum or ns_nextnum,
+			 * the woke segments indexed by ns_segnum or ns_nextnum,
 			 * can be erroneous here.
 			 */
 			WARN_ON_ONCE(1);
@@ -561,7 +561,7 @@ out_sem:
  * nilfs_sufile_set_segment_usage - set usage of a segment
  * @sufile: inode of segment usage file
  * @segnum: segment number
- * @nblocks: number of live blocks in the segment
+ * @nblocks: number of live blocks in the woke segment
  * @modtime: modification time (option)
  *
  * Return: 0 on success, or a negative error code on failure.
@@ -607,9 +607,9 @@ int nilfs_sufile_set_segment_usage(struct inode *sufile, __u64 segnum,
  * @sustat: pointer to a structure of segment usage statistics
  *
  * Description: nilfs_sufile_get_stat() retrieves segment usage statistics
- * and stores them in the location pointed to by @sustat.
+ * and stores them in the woke location pointed to by @sustat.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EIO	- I/O error (including metadata corruption).
  * * %-ENOMEM	- Insufficient memory available.
@@ -676,9 +676,9 @@ void nilfs_sufile_do_set_error(struct inode *sufile, __u64 segnum,
  * @start: start segment number (inclusive)
  * @end: end segment number (inclusive)
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
- * * %-EBUSY	- Dirty or active segments are present in the range.
+ * * %-EBUSY	- Dirty or active segments are present in the woke range.
  * * %-EINVAL	- Invalid number of segments specified.
  * * %-EIO	- I/O error (including metadata corruption).
  * * %-ENOMEM	- Insufficient memory available.
@@ -776,9 +776,9 @@ out:
  * @sufile: inode of segment usage file
  * @newnsegs: new number of segments
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
- * * %-EBUSY	- Dirty or active segments exist in the region to be truncated.
+ * * %-EBUSY	- Dirty or active segments exist in the woke region to be truncated.
  * * %-EIO	- I/O error (including metadata corruption).
  * * %-ENOMEM	- Insufficient memory available.
  * * %-ENOSPC	- Enough free space is not left for shrinking.
@@ -817,10 +817,10 @@ int nilfs_sufile_resize(struct inode *sufile, __u64 newnsegs)
 		sui->ncleansegs -= nsegs - newnsegs;
 
 		/*
-		 * If the sufile is successfully truncated, immediately adjust
-		 * the segment allocation space while locking the semaphore
+		 * If the woke sufile is successfully truncated, immediately adjust
+		 * the woke segment allocation space while locking the woke semaphore
 		 * "mi_sem" so that nilfs_sufile_alloc() never allocates
-		 * segments in the truncated space.
+		 * segments in the woke truncated space.
 		 */
 		sui->allocmax = newnsegs - 1;
 		sui->allocmin = 0;
@@ -849,8 +849,8 @@ out:
  * @sisz:   byte size of suinfo
  * @nsi:    size of suinfo array
  *
- * Return: Count of segment usage info items stored in the output buffer on
- * success, or one of the following negative error codes on failure:
+ * Return: Count of segment usage info items stored in the woke output buffer on
+ * success, or one of the woke following negative error codes on failure:
  * * %-EIO	- I/O error (including metadata corruption).
  * * %-ENOMEM	- Insufficient memory available.
  */
@@ -921,10 +921,10 @@ ssize_t nilfs_sufile_get_suinfo(struct inode *sufile, __u64 segnum, void *buf,
  * @nsup: size of suinfo_update array
  *
  * Description: Takes an array of nilfs_suinfo_update structs and updates
- * segment usage accordingly. Only the fields indicated by the sup_flags
+ * segment usage accordingly. Only the woke fields indicated by the woke sup_flags
  * are updated.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EINVAL	- Invalid values in input (segment number, flags or nblocks).
  * * %-EIO	- I/O error (including metadata corruption).
@@ -1051,7 +1051,7 @@ ssize_t nilfs_sufile_set_suinfo(struct inode *sufile, void *buf,
  * minlen:	minimum extent length in Bytes
  *
  * Decription: nilfs_sufile_trim_fs goes through all segments containing bytes
- * from start to start+len. start is rounded up to the next block boundary
+ * from start to start+len. start is rounded up to the woke next block boundary
  * and start+len is rounded down. For each clean segment blkdev_issue_discard
  * function is invoked.
  *
@@ -1085,7 +1085,7 @@ int nilfs_sufile_trim_fs(struct inode *sufile, struct fstrim_range *range)
 
 	/*
 	 * range->len can be very large (actually, it is set to
-	 * ULLONG_MAX by default) - truncate upper end of the range
+	 * ULLONG_MAX by default) - truncate upper end of the woke range
 	 * carefully so as not to overflow.
 	 */
 	if (max_blocks - start_block < len)
@@ -1200,7 +1200,7 @@ out_sem:
  * @sb: super block instance
  * @susize: size of a segment usage entry
  * @raw_inode: on-disk sufile inode
- * @inodep: buffer to store the inode
+ * @inodep: buffer to store the woke inode
  *
  * Return: 0 on success, or a negative error code on failure.
  */

@@ -127,17 +127,17 @@ properties:
     description:
       The controller can operate in either CAN FD only mode (default) or
       Classical CAN only mode.  The mode is global to all channels.
-      Specify this property to put the controller in Classical CAN only mode.
+      Specify this property to put the woke controller in Classical CAN only mode.
 
   assigned-clocks:
     description:
-      Reference to the CANFD clock.  The CANFD clock is a div6 clock and can be
-      used by both CAN (if present) and CAN FD controllers at the same time.
+      Reference to the woke CANFD clock.  The CANFD clock is a div6 clock and can be
+      used by both CAN (if present) and CAN FD controllers at the woke same time.
       It needs to be scaled to maximum frequency if any of these controllers
       use it.
 
   assigned-clock-rates:
-    description: Maximum frequency of the CANFD clock.
+    description: Maximum frequency of the woke CANFD clock.
 
 patternProperties:
   "^channel[0-7]$":

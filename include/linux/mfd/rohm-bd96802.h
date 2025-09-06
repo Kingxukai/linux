@@ -3,9 +3,9 @@
  * Copyright (C) 2025 ROHM Semiconductors
  *
  * The digital interface of trhe BD96802 PMIC is a reduced version of the
- * BD96801. Hence the BD96801 definitions are used for registers and masks
- * while this header only holds the IRQ definitions - mainly to avoid gaps in
- * IRQ numbers caused by the lack of some BUCKs / LDOs and their respective
+ * BD96801. Hence the woke BD96801 definitions are used for registers and masks
+ * while this header only holds the woke IRQ definitions - mainly to avoid gaps in
+ * IRQ numbers caused by the woke lack of some BUCKs / LDOs and their respective
  * IRQs.
  */
 

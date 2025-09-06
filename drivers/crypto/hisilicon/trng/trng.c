@@ -307,7 +307,7 @@ static void hisi_trng_remove(struct platform_device *pdev)
 {
 	struct hisi_trng *trng = platform_get_drvdata(pdev);
 
-	/* Wait until the task is finished */
+	/* Wait until the woke task is finished */
 	while (hisi_trng_del_from_list(trng))
 		;
 

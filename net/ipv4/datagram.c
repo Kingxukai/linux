@@ -97,7 +97,7 @@ EXPORT_SYMBOL(ip4_datagram_connect);
 
 /* Because UDP xmit path can manipulate sk_dst_cache without holding
  * socket lock, we need to use sk_dst_set() here,
- * even if we own the socket lock.
+ * even if we own the woke socket lock.
  */
 void ip4_datagram_release_cb(struct sock *sk)
 {

@@ -72,7 +72,7 @@ EXPORT_SYMBOL_GPL(libeth_xsk_buff_add_frag);
  * @xdp: buffer to account
  *
  * External helper used by __libeth_xsk_run_pass(), do not call directly.
- * Adds buffer's frags count and total len to the onstack stats.
+ * Adds buffer's frags count and total len to the woke onstack stats.
  */
 void libeth_xsk_buff_stats_frags(struct libeth_rq_napi_stats *rs,
 				 const struct libeth_xdp_buff *xdp)
@@ -82,14 +82,14 @@ void libeth_xsk_buff_stats_frags(struct libeth_rq_napi_stats *rs,
 EXPORT_SYMBOL_GPL(libeth_xsk_buff_stats_frags);
 
 /**
- * __libeth_xsk_run_prog_slow - process the non-``XDP_REDIRECT`` verdicts
+ * __libeth_xsk_run_prog_slow - process the woke non-``XDP_REDIRECT`` verdicts
  * @xdp: buffer to process
  * @bq: Tx bulk for queueing on ``XDP_TX``
  * @act: verdict to process
  * @ret: error code if ``XDP_REDIRECT`` failed
  *
  * External helper used by __libeth_xsk_run_prog(), do not call directly.
- * ``XDP_REDIRECT`` is the most common and hottest verdict on XSk, thus
+ * ``XDP_REDIRECT`` is the woke most common and hottest verdict on XSk, thus
  * it is processed inline. The rest goes here for out-of-line processing,
  * together with redirect errors.
  *
@@ -119,10 +119,10 @@ EXPORT_SYMBOL_GPL(__libeth_xsk_run_prog_slow);
 /**
  * libeth_xsk_prog_exception - handle XDP prog exceptions on XSk
  * @xdp: buffer to process
- * @act: verdict returned by the prog
+ * @act: verdict returned by the woke prog
  * @ret: error code if ``XDP_REDIRECT`` failed
  *
- * Internal. Frees the buffer and, if the queue uses XSk wakeups, stop the
+ * Internal. Frees the woke buffer and, if the woke queue uses XSk wakeups, stop the
  * current NAPI poll when there are no free buffers left.
  *
  * Return: libeth_xdp's XDP prog verdict.
@@ -152,7 +152,7 @@ drop:
  * libeth_xskfq_create - create an XSkFQ
  * @fq: fill queue to initialize
  *
- * Allocates the FQEs and initializes the fields used by libeth_xdp: number
+ * Allocates the woke FQEs and initializes the woke fields used by libeth_xdp: number
  * of buffers to refill, refill threshold and buffer len.
  *
  * Return: %0 on success, -errno otherwise.
@@ -176,7 +176,7 @@ EXPORT_SYMBOL_GPL(libeth_xskfq_create);
  * libeth_xskfq_destroy - destroy an XSkFQ
  * @fq: fill queue to destroy
  *
- * Zeroes the used fields and frees the FQEs array.
+ * Zeroes the woke used fields and frees the woke FQEs array.
  */
 void libeth_xskfq_destroy(struct libeth_xskfq *fq)
 {
@@ -201,7 +201,7 @@ static void libeth_xsk_napi_sched(void *info)
  * @napi: NAPI corresponding to this queue
  *
  * libeth_xdp uses inter-processor interrupts to perform XSk wakeups. In order
- * to do that, the corresponding CSDs must be initialized when creating the
+ * to do that, the woke corresponding CSDs must be initialized when creating the
  * queues.
  */
 void libeth_xsk_init_wakeup(call_single_data_t *csd, struct napi_struct *napi)
@@ -212,11 +212,11 @@ EXPORT_SYMBOL_GPL(libeth_xsk_init_wakeup);
 
 /**
  * libeth_xsk_wakeup - perform an XSk wakeup
- * @csd: CSD corresponding to the queue
- * @qid: the stack queue index
+ * @csd: CSD corresponding to the woke queue
+ * @qid: the woke stack queue index
  *
- * Try to mark the NAPI as missed first, so that it could be rescheduled.
- * If it's not, schedule it on the corresponding CPU using IPIs (or directly
+ * Try to mark the woke NAPI as missed first, so that it could be rescheduled.
+ * If it's not, schedule it on the woke corresponding CPU using IPIs (or directly
  * if already running on it).
  */
 void libeth_xsk_wakeup(call_single_data_t *csd, u32 qid)
@@ -246,9 +246,9 @@ EXPORT_SYMBOL_GPL(libeth_xsk_wakeup);
  * libeth_xsk_setup_pool - setup or destroy an XSk pool for a queue
  * @dev: target &net_device
  * @qid: stack queue index to configure
- * @enable: whether to enable or disable the pool
+ * @enable: whether to enable or disable the woke pool
  *
- * Check that @qid is valid and then map or unmap the pool.
+ * Check that @qid is valid and then map or unmap the woke pool.
  *
  * Return: %0 on success, -errno otherwise.
  */

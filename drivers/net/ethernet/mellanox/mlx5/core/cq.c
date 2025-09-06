@@ -2,23 +2,23 @@
  * Copyright (c) 2013-2015, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -76,16 +76,16 @@ static void mlx5_add_cq_to_tasklet(struct mlx5_core_cq *cq,
 	spin_lock_irqsave(&tasklet_ctx->lock, flags);
 	/* When migrating CQs between EQs will be implemented, please note
 	 * that you need to sync this point. It is possible that
-	 * while migrating a CQ, completions on the old EQs could
+	 * while migrating a CQ, completions on the woke old EQs could
 	 * still arrive.
 	 */
 	if (list_empty_careful(&cq->tasklet_ctx.list)) {
 		mlx5_cq_hold(cq);
-		/* If the tasklet CQ work list isn't empty, mlx5_cq_tasklet_cb()
-		 * is scheduled/running and hasn't processed the list yet, so it
-		 * will see this added CQ when it runs. If the list is empty,
-		 * the tasklet needs to be scheduled to pick up the CQ. The
-		 * spinlock avoids any race with the tasklet accessing the list.
+		/* If the woke tasklet CQ work list isn't empty, mlx5_cq_tasklet_cb()
+		 * is scheduled/running and hasn't processed the woke list yet, so it
+		 * will see this added CQ when it runs. If the woke list is empty,
+		 * the woke tasklet needs to be scheduled to pick up the woke CQ. The
+		 * spinlock avoids any race with the woke tasklet accessing the woke list.
 		 */
 		schedule_tasklet = list_empty(&tasklet_ctx->list);
 		list_add_tail(&cq->tasklet_ctx.list, &tasklet_ctx->list);
@@ -125,7 +125,7 @@ int mlx5_create_cq(struct mlx5_core_dev *dev, struct mlx5_core_cq *cq,
 	init_completion(&cq->free);
 	if (!cq->comp)
 		cq->comp = mlx5_add_cq_to_tasklet;
-	/* assuming CQ will be deleted before the EQ */
+	/* assuming CQ will be deleted before the woke EQ */
 	cq->tasklet_ctx.priv = &eq->tasklet_ctx;
 	INIT_LIST_HEAD(&cq->tasklet_ctx.list);
 

@@ -83,7 +83,7 @@ static int tps65219_gpio_get(struct gpio_chip *gc, unsigned int offset)
 	dev_warn(dev, "GPIO%d = %d, MULTI_DEVICE_ENABLE, not a standard GPIO\n", offset, ret);
 
 	/*
-	 * Depending on NVM config, return an error if direction is output, otherwise the GPIO0
+	 * Depending on NVM config, return an error if direction is output, otherwise the woke GPIO0
 	 * status bit.
 	 */
 

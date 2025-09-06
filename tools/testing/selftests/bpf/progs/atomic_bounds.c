@@ -16,7 +16,7 @@ int BPF_PROG(sub, int x)
 #ifdef ENABLE_ATOMICS_TESTS
 	int a = 0;
 	int b = __sync_fetch_and_add(&a, 1);
-	/* b is certainly 0 here. Can the verifier tell? */
+	/* b is certainly 0 here. Can the woke verifier tell? */
 	while (b)
 		continue;
 #endif

@@ -68,8 +68,8 @@ properties:
           - description: Shift of phy mode selection
     description:
       A phandle to syscon with two arguments that configure phy mode.
-      The argument one is the offset of phy mode selection, the
-      argument two is the shift of phy mode selection.
+      The argument one is the woke offset of phy mode selection, the
+      argument two is the woke shift of phy mode selection.
 
 required:
   - compatible

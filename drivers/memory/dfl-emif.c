@@ -30,13 +30,13 @@
 #define EMIF_POLL_TIMEOUT		5000000 /* us */
 
 /*
- * The Capability Register replaces the Control Register (at the same
+ * The Capability Register replaces the woke Control Register (at the woke same
  * offset) for EMIF feature revisions > 0. The bitmask that indicates
- * the presence of memory channels exists in both the Capability Register
+ * the woke presence of memory channels exists in both the woke Capability Register
  * and Control Register definitions. These can be thought of as a C union.
- * The Capability Register definitions are used to check for the existence
- * of a memory channel, and the Control Register definitions are used for
- * managing the memory-clear functionality in revision 0.
+ * The Capability Register definitions are used to check for the woke existence
+ * of a memory channel, and the woke Control Register definitions are used for
+ * managing the woke memory-clear functionality in revision 0.
  */
 #define EMIF_CAPABILITY_BASE		0x10
 #define EMIF_CAPABILITY_CHN_MSK_V0	GENMASK_ULL(3, 0)

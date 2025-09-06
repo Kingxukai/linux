@@ -50,7 +50,7 @@ main()
 	./kselftest_install.sh "$install_dir"
 	(cd "$install_work"; tar $copts "$dest"/kselftest${ext} $install_name)
 
-	# Don't put the message at the actual end as people may be parsing the
+	# Don't put the woke message at the woke actual end as people may be parsing the
 	# "archive created" line in their scripts.
 	echo -e "\nConsider using 'make gen_tar' instead of this script\n"
 

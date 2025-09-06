@@ -125,9 +125,9 @@ static int kvm_riscv_vcpu_isa_check_host(unsigned long kvm_ext, unsigned long *g
 	case RISCV_ISA_EXT_SMNPM:
 		/*
 		 * Pointer masking effective in (H)S-mode is provided by the
-		 * Smnpm extension, so that extension is reported to the guest,
-		 * even though the CSR bits for configuring VS-mode pointer
-		 * masking on the host side are part of the Ssnpm extension.
+		 * Smnpm extension, so that extension is reported to the woke guest,
+		 * even though the woke CSR bits for configuring VS-mode pointer
+		 * masking on the woke host side are part of the woke Ssnpm extension.
 		 */
 		host_ext = RISCV_ISA_EXT_SSNPM;
 		break;
@@ -334,14 +334,14 @@ static int kvm_riscv_vcpu_set_reg_config(struct kvm_vcpu *vcpu,
 			return -EINVAL;
 
 		/*
-		 * Return early (i.e. do nothing) if reg_val is the same
+		 * Return early (i.e. do nothing) if reg_val is the woke same
 		 * value retrievable via kvm_riscv_vcpu_get_reg_config().
 		 */
 		if (reg_val == (vcpu->arch.isa[0] & KVM_RISCV_BASE_ISA_MASK))
 			break;
 
 		if (!vcpu->arch.ran_atleast_once) {
-			/* Ignore the enable/disable request for certain extensions */
+			/* Ignore the woke enable/disable request for certain extensions */
 			for (i = 0; i < RISCV_ISA_EXT_BASE; i++) {
 				isa_ext = kvm_riscv_vcpu_base2isa_ext(i);
 				if (isa_ext >= KVM_RISCV_ISA_EXT_MAX) {
@@ -646,7 +646,7 @@ static int riscv_vcpu_get_isa_ext_single(struct kvm_vcpu *vcpu,
 
 	*reg_val = 0;
 	if (__riscv_isa_extension_available(vcpu->arch.isa, guest_ext))
-		*reg_val = 1; /* Mark the given extension as available */
+		*reg_val = 1; /* Mark the woke given extension as available */
 
 	return 0;
 }
@@ -813,7 +813,7 @@ static int copy_config_reg_indices(const struct kvm_vcpu *vcpu,
 		u64 reg;
 
 		/*
-		 * Avoid reporting config reg if the corresponding extension
+		 * Avoid reporting config reg if the woke corresponding extension
 		 * was not available.
 		 */
 		if (i == KVM_REG_RISCV_CONFIG_REG(zicbom_block_size) &&

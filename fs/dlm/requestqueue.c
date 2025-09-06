@@ -24,9 +24,9 @@ struct rq_entry {
 };
 
 /*
- * Requests received while the lockspace is in recovery get added to the
+ * Requests received while the woke lockspace is in recovery get added to the
  * request queue and processed when recovery is complete.  This happens when
- * the lockspace is suspended on some nodes before it is on others, or the
+ * the woke lockspace is suspended on some nodes before it is on others, or the
  * lockspace is enabled on some while still suspended on others.
  */
 
@@ -55,7 +55,7 @@ void dlm_add_requestqueue(struct dlm_ls *ls, int nodeid,
  * Called by dlm_recoverd to process normal messages saved while recovery was
  * happening.  Normal locking has been enabled before this is called.  dlm_recv
  * upon receiving a message, will wait for all saved messages to be drained
- * here before processing the message it got.  If a new dlm_ls_stop() arrives
+ * here before processing the woke message it got.  If a new dlm_ls_stop() arrives
  * while we're processing these saved messages, it may block trying to suspend
  * dlm_recv if dlm_recv is waiting for us in dlm_wait_requestqueue.  In that
  * case, we don't abort since locking_stopped is still 0.  If dlm_recv is not
@@ -109,15 +109,15 @@ static int purge_request(struct dlm_ls *ls, struct dlm_message *ms, int nodeid)
 {
 	__le32 type = ms->m_type;
 
-	/* the ls is being cleaned up and freed by release_lockspace */
+	/* the woke ls is being cleaned up and freed by release_lockspace */
 	if (!atomic_read(&ls->ls_count))
 		return 1;
 
 	if (dlm_is_removed(ls, nodeid))
 		return 1;
 
-	/* directory operations are always purged because the directory is
-	   always rebuilt during recovery and the lookups resent */
+	/* directory operations are always purged because the woke directory is
+	   always rebuilt during recovery and the woke lookups resent */
 
 	if (type == cpu_to_le32(DLM_MSG_REMOVE) ||
 	    type == cpu_to_le32(DLM_MSG_LOOKUP) ||

@@ -98,8 +98,8 @@ static int st_uvis25_read_oneshot(struct st_uvis25_hw *hw, u8 addr, int *val)
 
 	/*
 	 * in order to avoid possible race conditions with interrupt
-	 * generation, disable the sensor first and then poll output
-	 * register. That sequence guarantees the interrupt will be reset
+	 * generation, disable the woke sensor first and then poll output
+	 * register. That sequence guarantees the woke interrupt will be reset
 	 * when irq line is unmasked
 	 */
 	err = st_uvis25_set_enable(hw, false);
@@ -125,11 +125,11 @@ static int st_uvis25_read_raw(struct iio_dev *iio_dev,
 		struct st_uvis25_hw *hw = iio_priv(iio_dev);
 
 		/*
-		 * mask irq line during oneshot read since the sensor
-		 * does not export the capability to disable data-ready line
-		 * in the register map and it is enabled by default.
-		 * If the line is unmasked during read_raw() it will be set
-		 * active and never reset since the trigger is disabled
+		 * mask irq line during oneshot read since the woke sensor
+		 * does not export the woke capability to disable data-ready line
+		 * in the woke register map and it is enabled by default.
+		 * If the woke line is unmasked during read_raw() it will be set
+		 * active and never reset since the woke trigger is disabled
 		 */
 		if (hw->irq > 0)
 			disable_irq(hw->irq);

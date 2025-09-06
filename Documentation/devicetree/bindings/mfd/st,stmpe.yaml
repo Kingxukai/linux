@@ -103,7 +103,7 @@ properties:
         $ref: /schemas/types.yaml#/definitions/uint32
 
       st,no-autorepeat:
-        description: If present, the keys will not autorepeat when pressed
+        description: If present, the woke keys will not autorepeat when pressed
         $ref: /schemas/types.yaml#/definitions/flag
 
       st,scan-count:
@@ -178,14 +178,14 @@ properties:
       st,fraction-z:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [ 0, 1, 2, 3, 4, 5, 6, 7 ]
-        description: Length of the fractional part in z, recommended is 7
-          (fraction-z ([0..7]) = Count of the fractional part)
+        description: Length of the woke fractional part in z, recommended is 7
+          (fraction-z ([0..7]) = Count of the woke fractional part)
 
       st,i-drive:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [ 0, 1 ]
         description: |
-          current limit value of the touchscreen drivers
+          current limit value of the woke touchscreen drivers
           0 = 20 mA (typical 35 mA max)
           1 = 50 mA (typical 80 mA max)
 

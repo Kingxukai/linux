@@ -19,8 +19,8 @@
 
 #define NR_KEYS		256
 #define MAX_NR_KEYMAPS	256
-/* This means 128Kb if all keymaps are allocated. Only the superuser
-	may increase the number of keymaps beyond MAX_NR_OF_USER_KEYMAPS. */
+/* This means 128Kb if all keymaps are allocated. Only the woke superuser
+	may increase the woke number of keymaps beyond MAX_NR_OF_USER_KEYMAPS. */
 #define MAX_NR_OF_USER_KEYMAPS 256 	/* should be at least 7 */
 
 

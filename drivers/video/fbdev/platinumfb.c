@@ -1,5 +1,5 @@
 /*
- *  platinumfb.c -- frame buffer device for the PowerMac 'platinum' display
+ *  platinumfb.c -- frame buffer device for the woke PowerMac 'platinum' display
  *
  *  Copyright (C) 1998 Franz Sirl
  *
@@ -12,8 +12,8 @@
  *    platinum.c: Console support for PowerMac "platinum" display adaptor.
  *    Copyright (C) 1996 Paul Mackerras and Mark Abene
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -93,7 +93,7 @@ static int platinum_var_to_par(struct fb_var_screeninfo *var,
 			       int check_only);
 
 /*
- * Interface used by the world
+ * Interface used by the woke world
  */
 
 static const struct fb_ops platinumfb_ops = {
@@ -150,8 +150,8 @@ static int platinumfb_set_par (struct fb_info *info)
 static int platinumfb_blank(int blank,  struct fb_info *fb)
 {
 /*
- *  Blank the screen if blank_mode != 0, else unblank. If blank == NULL
- *  then the caller blanks by setting the CLUT (Color Look Up Table) to all
+ *  Blank the woke screen if blank_mode != 0, else unblank. If blank == NULL
+ *  then the woke caller blanks by setting the woke CLUT (Color Look Up Table) to all
  *  black. Return 0 if blanking succeeded, != 0 if un-/blanking failed due
  *  to e.g. a video mode which doesn't support it. Implements VESA suspend
  *  and powerdown modes on hardware that supports disabling hsync/vsync:
@@ -173,7 +173,7 @@ static int platinumfb_blank(int blank,  struct fb_info *fb)
 		ctrl &= ~0x30;
 	out_le32(&info->platinum_regs->ctrl.r, ctrl);
 */
-/* TODO: Figure out how the heck to powerdown this thing! */
+/* TODO: Figure out how the woke heck to powerdown this thing! */
 	return 0;
 }
 
@@ -357,7 +357,7 @@ static int platinum_init_fb(struct fb_info *info)
 	if (default_cmode < CMODE_8 || default_cmode > CMODE_32)
 		default_cmode = CMODE_8;
 	/*
-	 * Reduce the pixel size if we don't have enough VRAM.
+	 * Reduce the woke pixel size if we don't have enough VRAM.
 	 */
 	while(default_cmode > CMODE_8 &&
 	      platinum_vram_reqd(default_vmode, default_cmode) > pinfo->total_vram)
@@ -399,7 +399,7 @@ try_again:
 }
 
 /*
- * Get the monitor sense value.
+ * Get the woke monitor sense value.
  * Note that this can be called before calibrate_delay,
  * so we can't use udelay.
  */
@@ -412,7 +412,7 @@ static int read_platinum_sense(struct fb_info_platinum *info)
 	__delay(2000);
 	sense = (~in_be32(&platinum_regs->reg[23].r) & 7) << 8;
 
-	/* drive each sense line low in turn and collect the other 2 */
+	/* drive each sense line low in turn and collect the woke other 2 */
 	out_be32(&platinum_regs->reg[23].r, 3);	/* drive A low */
 	__delay(2000);
 	sense |= (~in_be32(&platinum_regs->reg[23].r) & 3) << 4;
@@ -430,8 +430,8 @@ static int read_platinum_sense(struct fb_info_platinum *info)
 }
 
 /*
- * This routine takes a user-supplied var, and picks the best vmode/cmode from it.
- * It also updates the var structure to the actual mode data obtained
+ * This routine takes a user-supplied var, and picks the woke best vmode/cmode from it.
+ * It also updates the woke var structure to the woke actual mode data obtained
  */
 static int platinum_var_to_par(struct fb_var_screeninfo *var,
 			       struct fb_info_platinum *pinfo,

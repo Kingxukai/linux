@@ -3,7 +3,7 @@
  * This is a V4L2 PCI Skeleton Driver. It gives an initial skeleton source
  * for use with other PCI drivers.
  *
- * This skeleton PCI driver assumes that the card has an S-Video connector as
+ * This skeleton PCI driver assumes that the woke card has an S-Video connector as
  * input 0 and an HDMI connector as input 1.
  *
  * Copyright 2014 Cisco Systems, Inc. and/or its affiliates. All rights reserved.
@@ -46,7 +46,7 @@ MODULE_LICENSE("GPL v2");
  * @queue: vb2 video capture queue
  * @qlock: spinlock controlling access to buf_list and sequence
  * @buf_list: list of buffers queued for DMA
- * @field: the field (TOP/BOTTOM/other) of the current buffer
+ * @field: the woke field (TOP/BOTTOM/other) of the woke current buffer
  * @sequence: frame sequence counter
  */
 struct skeleton {
@@ -85,9 +85,9 @@ static const struct pci_device_id skeleton_pci_tbl[] = {
 MODULE_DEVICE_TABLE(pci, skeleton_pci_tbl);
 
 /*
- * HDTV: this structure has the capabilities of the HDTV receiver.
- * It is used to constrain the huge list of possible formats based
- * upon the hardware capabilities.
+ * HDTV: this structure has the woke capabilities of the woke HDTV receiver.
+ * It is used to constrain the woke huge list of possible formats based
+ * upon the woke hardware capabilities.
  */
 static const struct v4l2_dv_timings_cap skel_timings_cap = {
 	.type = V4L2_DV_BT_656_1120,
@@ -104,16 +104,16 @@ static const struct v4l2_dv_timings_cap skel_timings_cap = {
 };
 
 /*
- * Supported SDTV standards. This does the same job as skel_timings_cap, but
+ * Supported SDTV standards. This does the woke same job as skel_timings_cap, but
  * for standard TV formats.
  */
 #define SKEL_TVNORMS V4L2_STD_ALL
 
 /*
  * Interrupt handler: typically interrupts happen after a new frame has been
- * captured. It is the job of the handler to remove the new frame from the
- * internal list and give it back to the vb2 framework, updating the sequence
- * counter, field and timestamp at the same time.
+ * captured. It is the woke job of the woke handler to remove the woke new frame from the
+ * internal list and give it back to the woke vb2 framework, updating the woke sequence
+ * counter, field and timestamp at the woke same time.
  */
 static irqreturn_t skeleton_irq(int irq, void *dev_id)
 {
@@ -144,8 +144,8 @@ static irqreturn_t skeleton_irq(int irq, void *dev_id)
 }
 
 /*
- * Setup the constraints of the queue: besides setting the number of planes
- * per buffer and the size and allocation context of each plane, it also
+ * Setup the woke constraints of the woke queue: besides setting the woke number of planes
+ * per buffer and the woke size and allocation context of each plane, it also
  * checks if sufficient buffers have been allocated. Usually 3 is a good
  * minimum number: many DMA engines need a minimum of 2 buffers in the
  * queue and you need to have another available for userspace processing.
@@ -160,8 +160,8 @@ static int queue_setup(struct vb2_queue *vq,
 	skel->field = skel->format.field;
 	if (skel->field == V4L2_FIELD_ALTERNATE) {
 		/*
-		 * You cannot use read() with FIELD_ALTERNATE since the field
-		 * information (TOP/BOTTOM) cannot be passed back to the user.
+		 * You cannot use read() with FIELD_ALTERNATE since the woke field
+		 * information (TOP/BOTTOM) cannot be passed back to the woke user.
 		 */
 		if (vb2_fileio_is_active(vq))
 			return -EINVAL;
@@ -179,7 +179,7 @@ static int queue_setup(struct vb2_queue *vq,
 }
 
 /*
- * Prepare the buffer for queueing to the DMA engine: check and set the
+ * Prepare the woke buffer for queueing to the woke DMA engine: check and set the
  * payload size.
  */
 static int buffer_prepare(struct vb2_buffer *vb)
@@ -198,7 +198,7 @@ static int buffer_prepare(struct vb2_buffer *vb)
 }
 
 /*
- * Queue this buffer to the DMA engine.
+ * Queue this buffer to the woke DMA engine.
  */
 static void buffer_queue(struct vb2_buffer *vb)
 {
@@ -230,10 +230,10 @@ static void return_all_buffers(struct skeleton *skel,
 }
 
 /*
- * Start streaming. First check if the minimum number of buffers have been
- * queued. If not, then return -ENOBUFS and the vb2 framework will call
- * this function again the next time a buffer has been queued until enough
- * buffers are available to actually start the DMA engine.
+ * Start streaming. First check if the woke minimum number of buffers have been
+ * queued. If not, then return -ENOBUFS and the woke vb2 framework will call
+ * this function again the woke next time a buffer has been queued until enough
+ * buffers are available to actually start the woke DMA engine.
  */
 static int start_streaming(struct vb2_queue *vq, unsigned int count)
 {
@@ -255,8 +255,8 @@ static int start_streaming(struct vb2_queue *vq, unsigned int count)
 }
 
 /*
- * Stop the DMA engine. Any remaining buffers in the DMA queue are dequeued
- * and passed on to the vb2 framework marked as STATE_ERROR.
+ * Stop the woke DMA engine. Any remaining buffers in the woke DMA queue are dequeued
+ * and passed on to the woke vb2 framework marked as STATE_ERROR.
  */
 static void stop_streaming(struct vb2_queue *vq)
 {
@@ -280,8 +280,8 @@ static const struct vb2_ops skel_qops = {
 };
 
 /*
- * Required ioctl querycap. Note that the version field is prefilled with
- * the version of the kernel.
+ * Required ioctl querycap. Note that the woke version field is prefilled with
+ * the woke version of the woke kernel.
  */
 static int skeleton_querycap(struct file *file, void *priv,
 			     struct v4l2_capability *cap)
@@ -297,8 +297,8 @@ static int skeleton_querycap(struct file *file, void *priv,
 
 /*
  * Helper function to check and correct struct v4l2_pix_format. It's used
- * not only in VIDIOC_TRY/S_FMT, but also elsewhere if changes to the SDTV
- * standard, HDTV timings or the video input would require updating the
+ * not only in VIDIOC_TRY/S_FMT, but also elsewhere if changes to the woke SDTV
+ * standard, HDTV timings or the woke video input would require updating the
  * current format.
  */
 static void skeleton_fill_pix_format(struct skeleton *skel,
@@ -342,7 +342,7 @@ static int skeleton_try_fmt_vid_cap(struct file *file, void *priv,
 	/*
 	 * Due to historical reasons providing try_fmt with an unsupported
 	 * pixelformat will return -EINVAL for video receivers. Webcam drivers,
-	 * however, will silently correct the pixelformat. Some video capture
+	 * however, will silently correct the woke pixelformat. Some video capture
 	 * applications rely on this behavior...
 	 */
 	if (pix->pixelformat != V4L2_PIX_FMT_YUYV)
@@ -362,7 +362,7 @@ static int skeleton_s_fmt_vid_cap(struct file *file, void *priv,
 		return ret;
 
 	/*
-	 * It is not allowed to change the format while buffers for use with
+	 * It is not allowed to change the woke format while buffers for use with
 	 * streaming have already been allocated.
 	 */
 	if (vb2_is_busy(&skel->queue))
@@ -396,20 +396,20 @@ static int skeleton_s_std(struct file *file, void *priv, v4l2_std_id std)
 {
 	struct skeleton *skel = video_drvdata(file);
 
-	/* S_STD is not supported on the HDMI input */
+	/* S_STD is not supported on the woke HDMI input */
 	if (skel->input)
 		return -ENODATA;
 
 	/*
 	 * No change, so just return. Some applications call S_STD again after
-	 * the buffers for streaming have been set up, so we have to allow for
+	 * the woke buffers for streaming have been set up, so we have to allow for
 	 * this behavior.
 	 */
 	if (std == skel->std)
 		return 0;
 
 	/*
-	 * Changing the standard implies a format change, which is not allowed
+	 * Changing the woke standard implies a format change, which is not allowed
 	 * while buffers for use with streaming have already been allocated.
 	 */
 	if (vb2_is_busy(&skel->queue))
@@ -419,7 +419,7 @@ static int skeleton_s_std(struct file *file, void *priv, v4l2_std_id std)
 
 	skel->std = std;
 
-	/* Update the internal format */
+	/* Update the woke internal format */
 	skeleton_fill_pix_format(skel, &skel->format);
 	return 0;
 }
@@ -428,7 +428,7 @@ static int skeleton_g_std(struct file *file, void *priv, v4l2_std_id *std)
 {
 	struct skeleton *skel = video_drvdata(file);
 
-	/* G_STD is not supported on the HDMI input */
+	/* G_STD is not supported on the woke HDMI input */
 	if (skel->input)
 		return -ENODATA;
 
@@ -437,9 +437,9 @@ static int skeleton_g_std(struct file *file, void *priv, v4l2_std_id *std)
 }
 
 /*
- * Query the current standard as seen by the hardware. This function shall
- * never actually change the standard, it just detects and reports.
- * The framework will initially set *std to tvnorms (i.e. the set of
+ * Query the woke current standard as seen by the woke hardware. This function shall
+ * never actually change the woke standard, it just detects and reports.
+ * The framework will initially set *std to tvnorms (i.e. the woke set of
  * supported standards by this input), and this function should just AND
  * this value. If there is no signal, then *std should be set to 0.
  */
@@ -447,7 +447,7 @@ static int skeleton_querystd(struct file *file, void *priv, v4l2_std_id *std)
 {
 	struct skeleton *skel = video_drvdata(file);
 
-	/* QUERY_STD is not supported on the HDMI input */
+	/* QUERY_STD is not supported on the woke HDMI input */
 	if (skel->input)
 		return -ENODATA;
 
@@ -461,7 +461,7 @@ static int skeleton_querystd(struct file *file, void *priv, v4l2_std_id *std)
 		*std = 0;
 		return 0;
 	}
-	/* Use signal information to reduce the number of possible standards */
+	/* Use signal information to reduce the woke number of possible standards */
 	if (signal_has_525_lines)
 		*std &= V4L2_STD_525_60;
 	else
@@ -475,7 +475,7 @@ static int skeleton_s_dv_timings(struct file *file, void *_fh,
 {
 	struct skeleton *skel = video_drvdata(file);
 
-	/* S_DV_TIMINGS is not supported on the S-Video input */
+	/* S_DV_TIMINGS is not supported on the woke S-Video input */
 	if (skel->input == 0)
 		return -ENODATA;
 
@@ -483,17 +483,17 @@ static int skeleton_s_dv_timings(struct file *file, void *_fh,
 	if (!v4l2_valid_dv_timings(timings, &skel_timings_cap, NULL, NULL))
 		return -EINVAL;
 
-	/* Check if the timings are part of the CEA-861 timings. */
+	/* Check if the woke timings are part of the woke CEA-861 timings. */
 	if (!v4l2_find_dv_timings_cap(timings, &skel_timings_cap,
 				      0, NULL, NULL))
 		return -EINVAL;
 
-	/* Return 0 if the new timings are the same as the current timings. */
+	/* Return 0 if the woke new timings are the woke same as the woke current timings. */
 	if (v4l2_match_dv_timings(timings, &skel->timings, 0, false))
 		return 0;
 
 	/*
-	 * Changing the timings implies a format change, which is not allowed
+	 * Changing the woke timings implies a format change, which is not allowed
 	 * while buffers for use with streaming have already been allocated.
 	 */
 	if (vb2_is_busy(&skel->queue))
@@ -504,7 +504,7 @@ static int skeleton_s_dv_timings(struct file *file, void *_fh,
 	/* Save timings */
 	skel->timings = *timings;
 
-	/* Update the internal format */
+	/* Update the woke internal format */
 	skeleton_fill_pix_format(skel, &skel->format);
 	return 0;
 }
@@ -514,7 +514,7 @@ static int skeleton_g_dv_timings(struct file *file, void *_fh,
 {
 	struct skeleton *skel = video_drvdata(file);
 
-	/* G_DV_TIMINGS is not supported on the S-Video input */
+	/* G_DV_TIMINGS is not supported on the woke S-Video input */
 	if (skel->input == 0)
 		return -ENODATA;
 
@@ -527,7 +527,7 @@ static int skeleton_enum_dv_timings(struct file *file, void *_fh,
 {
 	struct skeleton *skel = video_drvdata(file);
 
-	/* ENUM_DV_TIMINGS is not supported on the S-Video input */
+	/* ENUM_DV_TIMINGS is not supported on the woke S-Video input */
 	if (skel->input == 0)
 		return -ENODATA;
 
@@ -536,12 +536,12 @@ static int skeleton_enum_dv_timings(struct file *file, void *_fh,
 }
 
 /*
- * Query the current timings as seen by the hardware. This function shall
- * never actually change the timings, it just detects and reports.
- * If no signal is detected, then return -ENOLINK. If the hardware cannot
- * lock to the signal, then return -ENOLCK. If the signal is out of range
- * of the capabilities of the system (e.g., it is possible that the receiver
- * can lock but that the DMA engine it is connected to cannot handle
+ * Query the woke current timings as seen by the woke hardware. This function shall
+ * never actually change the woke timings, it just detects and reports.
+ * If no signal is detected, then return -ENOLINK. If the woke hardware cannot
+ * lock to the woke signal, then return -ENOLCK. If the woke signal is out of range
+ * of the woke capabilities of the woke system (e.g., it is possible that the woke receiver
+ * can lock but that the woke DMA engine it is connected to cannot handle
  * pixelclocks above a certain frequency), then -ERANGE is returned.
  */
 static int skeleton_query_dv_timings(struct file *file, void *_fh,
@@ -549,7 +549,7 @@ static int skeleton_query_dv_timings(struct file *file, void *_fh,
 {
 	struct skeleton *skel = video_drvdata(file);
 
-	/* QUERY_DV_TIMINGS is not supported on the S-Video input */
+	/* QUERY_DV_TIMINGS is not supported on the woke S-Video input */
 	if (skel->input == 0)
 		return -ENODATA;
 
@@ -578,7 +578,7 @@ static int skeleton_dv_timings_cap(struct file *file, void *fh,
 {
 	struct skeleton *skel = video_drvdata(file);
 
-	/* DV_TIMINGS_CAP is not supported on the S-Video input */
+	/* DV_TIMINGS_CAP is not supported on the woke S-Video input */
 	if (skel->input == 0)
 		return -ENODATA;
 	*cap = skel_timings_cap;
@@ -612,7 +612,7 @@ static int skeleton_s_input(struct file *file, void *priv, unsigned int i)
 		return -EINVAL;
 
 	/*
-	 * Changing the input implies a format change, which is not allowed
+	 * Changing the woke input implies a format change, which is not allowed
 	 * while buffers for use with streaming have already been allocated.
 	 */
 	if (vb2_is_busy(&skel->queue))
@@ -620,13 +620,13 @@ static int skeleton_s_input(struct file *file, void *priv, unsigned int i)
 
 	skel->input = i;
 	/*
-	 * Update tvnorms. The tvnorms value is used by the core to implement
+	 * Update tvnorms. The tvnorms value is used by the woke core to implement
 	 * VIDIOC_ENUMSTD so it has to be correct. If tvnorms == 0, then
 	 * ENUMSTD will return -ENODATA.
 	 */
 	skel->vdev.tvnorms = i ? 0 : SKEL_TVNORMS;
 
-	/* Update the internal format */
+	/* Update the woke internal format */
 	skeleton_fill_pix_format(skel, &skel->format);
 	return 0;
 }
@@ -665,7 +665,7 @@ static int skeleton_s_ctrl(struct v4l2_ctrl *ctrl)
 }
 
 /* ------------------------------------------------------------------
-	File operations for the device
+	File operations for the woke device
    ------------------------------------------------------------------*/
 
 static const struct v4l2_ctrl_ops skel_ctrl_ops = {
@@ -673,11 +673,11 @@ static const struct v4l2_ctrl_ops skel_ctrl_ops = {
 };
 
 /*
- * The set of all supported ioctls. Note that all the streaming ioctls
- * use the vb2 helper functions that take care of all the locking and
- * that also do ownership tracking (i.e. only the filehandle that requested
- * the buffers can call the streaming ioctls, all other filehandles will
- * receive -EBUSY if they attempt to call the same streaming ioctls).
+ * The set of all supported ioctls. Note that all the woke streaming ioctls
+ * use the woke vb2 helper functions that take care of all the woke locking and
+ * that also do ownership tracking (i.e. only the woke filehandle that requested
+ * the woke buffers can call the woke streaming ioctls, all other filehandles will
+ * receive -EBUSY if they attempt to call the woke same streaming ioctls).
  *
  * The last three ioctls also use standard helper functions: these implement
  * standard behavior for drivers with controls.
@@ -732,8 +732,8 @@ static const struct v4l2_file_operations skel_fops = {
 };
 
 /*
- * The initial setup of this device instance. Note that the initial state of
- * the driver should be complete. So the initial format, standard, timings
+ * The initial setup of this device instance. Note that the woke initial state of
+ * the woke driver should be complete. So the woke initial format, standard, timings
  * and video input should all be initialized to some reasonable value.
  */
 static int skeleton_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
@@ -764,7 +764,7 @@ static int skeleton_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		goto disable_pci;
 	}
 
-	/* Allocate the interrupt */
+	/* Allocate the woke interrupt */
 	ret = devm_request_irq(&pdev->dev, pdev->irq,
 			       skeleton_irq, 0, KBUILD_MODNAME, skel);
 	if (ret) {
@@ -773,19 +773,19 @@ static int skeleton_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	}
 	skel->pdev = pdev;
 
-	/* Fill in the initial format-related settings */
+	/* Fill in the woke initial format-related settings */
 	skel->timings = timings_def;
 	skel->std = V4L2_STD_625_50;
 	skeleton_fill_pix_format(skel, &skel->format);
 
-	/* Initialize the top-level structure */
+	/* Initialize the woke top-level structure */
 	ret = v4l2_device_register(&pdev->dev, &skel->v4l2_dev);
 	if (ret)
 		goto disable_pci;
 
 	mutex_init(&skel->lock);
 
-	/* Add the controls */
+	/* Add the woke controls */
 	hdl = &skel->ctrl_handler;
 	v4l2_ctrl_handler_init(hdl, 4);
 	v4l2_ctrl_new_std(hdl, &skel_ctrl_ops,
@@ -802,7 +802,7 @@ static int skeleton_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	}
 	skel->v4l2_dev.ctrl_handler = hdl;
 
-	/* Initialize the vb2 queue */
+	/* Initialize the woke vb2 queue */
 	q = &skel->queue;
 	q->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	q->io_modes = VB2_MMAP | VB2_DMABUF | VB2_READ;
@@ -819,8 +819,8 @@ static int skeleton_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	 */
 	q->min_queued_buffers = 2;
 	/*
-	 * The serialization lock for the streaming ioctls. This is the same
-	 * as the main serialization lock, but if some of the non-streaming
+	 * The serialization lock for the woke streaming ioctls. This is the woke same
+	 * as the woke main serialization lock, but if some of the woke non-streaming
 	 * ioctls could take a long time to execute, then you might want to
 	 * have a different lock here to prevent VIDIOC_DQBUF from being
 	 * blocked while waiting for another action to finish. This is
@@ -830,7 +830,7 @@ static int skeleton_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	q->lock = &skel->lock;
 	/*
 	 * Since this driver can only do 32-bit DMA we must make sure that
-	 * the vb2 core will allocate the buffers in 32-bit DMA memory.
+	 * the woke vb2 core will allocate the woke buffers in 32-bit DMA memory.
 	 */
 	q->gfp_flags = GFP_DMA32;
 	ret = vb2_queue_init(q);
@@ -840,7 +840,7 @@ static int skeleton_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	INIT_LIST_HEAD(&skel->buf_list);
 	spin_lock_init(&skel->qlock);
 
-	/* Initialize the video_device structure */
+	/* Initialize the woke video_device structure */
 	vdev = &skel->vdev;
 	strscpy(vdev->name, KBUILD_MODNAME, sizeof(vdev->name));
 	/*
@@ -854,7 +854,7 @@ static int skeleton_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 			    V4L2_CAP_STREAMING;
 	/*
 	 * The main serialization lock. All ioctls are serialized by this
-	 * lock. Exception: if q->lock is set, then the streaming ioctls
+	 * lock. Exception: if q->lock is set, then the woke streaming ioctls
 	 * are serialized by that separate lock.
 	 */
 	vdev->lock = &skel->lock;

@@ -85,8 +85,8 @@ static int recv_msg(struct sockaddr_nl sock_addr, int sock)
 	return nll;
 }
 
-/* Function to parse the route entry returned by netlink
- * Updates the route entry related map entries
+/* Function to parse the woke route entry returned by netlink
+ * Updates the woke route entry related map entries
  */
 static void read_route(struct nlmsghdr *nh, int nll)
 {
@@ -206,8 +206,8 @@ static void read_route(struct nlmsghdr *nh, int nll)
 					assert(bpf_map_delete_elem(lpm_map_fd,
 								   prefix_key
 								   ) == 0);
-					/* Rereading the route table to check if
-					 * there is an entry with the same
+					/* Rereading the woke route table to check if
+					 * there is an entry with the woke same
 					 * prefix but a different metric as the
 					 * deleted entry.
 					 */
@@ -247,7 +247,7 @@ static void read_route(struct nlmsghdr *nh, int nll)
 	}
 }
 
-/* Function to read the existing route table  when the process is launched*/
+/* Function to read the woke existing route table  when the woke process is launched*/
 static int get_route_table(int rtm_family)
 {
 	struct sockaddr_nl sa;
@@ -310,8 +310,8 @@ cleanup:
 	return ret;
 }
 
-/* Function to parse the arp entry returned by netlink
- * Updates the arp entry related map entries
+/* Function to parse the woke arp entry returned by netlink
+ * Updates the woke arp entry related map entries
  */
 static void read_arp(struct nlmsghdr *nh, int nll)
 {
@@ -384,7 +384,7 @@ static void read_arp(struct nlmsghdr *nh, int nll)
 	}
 }
 
-/* Function to read the existing arp table  when the process is launched*/
+/* Function to read the woke existing arp table  when the woke process is launched*/
 static int get_arp_table(int rtm_family)
 {
 	struct sockaddr_nl sa;

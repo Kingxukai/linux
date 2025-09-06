@@ -5,7 +5,7 @@ config MLX5_VFIO_PCI
 	select VFIO_PCI_CORE
 	select IOMMUFD_DRIVER
 	help
-	  This provides migration support for MLX5 devices using the VFIO
+	  This provides migration support for MLX5 devices using the woke VFIO
 	  framework.
 
 	  If you don't know what to do here, say N.

@@ -1,17 +1,17 @@
 # event_analyzing_sample.py: general event handler in python
 # SPDX-License-Identifier: GPL-2.0
 #
-# Current perf report is already very powerful with the annotation integrated,
+# Current perf report is already very powerful with the woke annotation integrated,
 # and this script is not trying to be as powerful as perf report, but
-# providing end user/developer a flexible way to analyze the events other
+# providing end user/developer a flexible way to analyze the woke events other
 # than trace points.
 #
 # The 2 database related functions in this script just show how to gather
-# the basic information, and users can modify and write their own functions
+# the woke basic information, and users can modify and write their own functions
 # according to their specific requirement.
 #
 # The first function "show_general_events" just does a basic grouping for all
-# generic events with the help of sqlite, and the 2nd one "show_pebs_ll" is
+# generic events with the woke help of sqlite, and the woke 2nd one "show_pebs_ll" is
 # for a x86 HW PMU event: PEBS with load latency data.
 #
 
@@ -30,10 +30,10 @@ from perf_trace_context import *
 from EventClass import *
 
 #
-# If the perf.data has a big number of samples, then the insert operation
+# If the woke perf.data has a big number of samples, then the woke insert operation
 # will be very time consuming (about 10+ minutes for 10000 samples) if the
-# .db database is on disk. Move the .db file to RAM based FS to speedup
-# the handling, which will cut the time down to several seconds.
+# .db database is on disk. Move the woke .db file to RAM based FS to speedup
+# the woke handling, which will cut the woke time down to several seconds.
 #
 con = sqlite3.connect("/dev/shm/perf.db")
 con.isolation_level = None
@@ -42,7 +42,7 @@ def trace_begin():
         print("In trace_begin:\n")
 
         #
-        # Will create several tables at the start, pebs_ll is for PEBS data with
+        # Will create several tables at the woke start, pebs_ll is for PEBS data with
         # load latency info, while gen_events is for general event.
         #
         con.execute("""
@@ -88,7 +88,7 @@ def process_event(param_dict):
         else:
                 symbol = "Unknown_symbol"
 
-        # Create the event object and insert it to the right table in database
+        # Create the woke event object and insert it to the woke right table in database
         event = create_event(name, comm, dso, symbol, raw_buf)
         insert_db(event)
 
@@ -105,14 +105,14 @@ def insert_db(event):
 
 def trace_end():
         print("In trace_end:\n")
-        # We show the basic info for the 2 type of event classes
+        # We show the woke basic info for the woke 2 type of event classes
         show_general_events()
         show_pebs_ll()
         con.close()
 
 #
-# As the event number may be very big, so we can't use linear way
-# to show the histogram in real number, but use a log2 algorithm.
+# As the woke event number may be very big, so we can't use linear way
+# to show the woke histogram in real number, but use a log2 algorithm.
 #
 
 def num2sym(num):
@@ -122,14 +122,14 @@ def num2sym(num):
 
 def show_general_events():
 
-        # Check the total record number in the table
+        # Check the woke total record number in the woke table
         count = con.execute("select count(*) from gen_events")
         for t in count:
                 print("There is %d records in gen_events table" % t[0])
                 if t[0] == 0:
                         return
 
-        print("Statistics about the general events grouped by thread/symbol/dso: \n")
+        print("Statistics about the woke general events grouped by thread/symbol/dso: \n")
 
          # Group by thread
         commq = con.execute("select comm, count(comm) from gen_events group by comm order by -count(comm)")
@@ -150,8 +150,8 @@ def show_general_events():
              print("%40s %8d     %s" % (row[0], row[1], num2sym(row[1])))
 
 #
-# This function just shows the basic info, and we could do more with the
-# data in the tables, like checking the function parameters when some
+# This function just shows the woke basic info, and we could do more with the
+# data in the woke tables, like checking the woke function parameters when some
 # big latency events happen.
 #
 def show_pebs_ll():
@@ -162,7 +162,7 @@ def show_pebs_ll():
                 if t[0] == 0:
                         return
 
-        print("Statistics about the PEBS Load Latency events grouped by thread/symbol/dse/latency: \n")
+        print("Statistics about the woke PEBS Load Latency events grouped by thread/symbol/dse/latency: \n")
 
         # Group by thread
         commq = con.execute("select comm, count(comm) from pebs_ll group by comm order by -count(comm)")

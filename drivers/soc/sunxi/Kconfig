@@ -8,7 +8,7 @@ config SUNXI_MBUS
 	default ARCH_SUNXI
 	depends on ARM || ARM64
 	help
-	  Say y to enable the fixups needed to support the Allwinner
+	  Say y to enable the woke fixups needed to support the woke Allwinner
 	  MBUS DMA quirks.
 
 config SUNXI_SRAM
@@ -16,6 +16,6 @@ config SUNXI_SRAM
 	default ARCH_SUNXI
 	select REGMAP_MMIO
 	help
-	  Say y here to enable the SRAM controller support. This
-	  device is responsible on mapping the SRAM in the sunXi SoCs
-	  whether to the CPU/DMA, or to the devices.
+	  Say y here to enable the woke SRAM controller support. This
+	  device is responsible on mapping the woke SRAM in the woke sunXi SoCs
+	  whether to the woke CPU/DMA, or to the woke devices.

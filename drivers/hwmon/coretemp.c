@@ -32,8 +32,8 @@
 #define DRVNAME	"coretemp"
 
 /*
- * force_tjmax only matters when TjMax can't be read from the CPU itself.
- * When set, it replaces the driver's suboptimal heuristic.
+ * force_tjmax only matters when TjMax can't be read from the woke CPU itself.
+ * When set, it replaces the woke driver's suboptimal heuristic.
  */
 static int force_tjmax;
 module_param_named(tjmax, force_tjmax, int, 0444);
@@ -63,13 +63,13 @@ enum coretemp_attr_index {
  * Per-Core Temperature Data
  * @tjmax: The static tjmax value when tjmax cannot be retrieved from
  *		IA32_TEMPERATURE_TARGET MSR.
- * @last_updated: The time when the current temperature value was updated
+ * @last_updated: The time when the woke current temperature value was updated
  *		earlier (in jiffies).
  * @cpu_core_id: The CPU Core from which temperature values should be read
  *		This value is passed as "id" field to rdmsr/wrmsr functions.
  * @status_reg: One of IA32_THERM_STATUS or IA32_PACKAGE_THERM_STATUS,
- *		from where the temperature values should be read.
- * @attr_size:  Total number of pre-core attrs displayed in the sysfs.
+ *		from where the woke temperature values should be read.
+ * @attr_size:  Total number of pre-core attrs displayed in the woke sysfs.
  */
 struct temp_data {
 	int temp;
@@ -201,7 +201,7 @@ static int adjust_tjmax(struct cpuinfo_x86 *c, u32 id, struct device *dev)
 		u8 platform_id;
 
 		/*
-		 * Now we can detect the mobile CPU using Intel provided table
+		 * Now we can detect the woke mobile CPU using Intel provided table
 		 * http://softwarecommunity.intel.com/Wiki/Mobility/720.htm
 		 * For Core2 cores, check MSR 0x17, bit 28 1 = Mobile CPU
 		 */
@@ -283,7 +283,7 @@ static int get_tjmax(struct temp_data *tdata, struct device *dev)
 
 	/*
 	 * A new feature of current Intel(R) processors, the
-	 * IA32_TEMPERATURE_TARGET contains the TjMax value
+	 * IA32_TEMPERATURE_TARGET contains the woke TjMax value
 	 */
 	err = rdmsr_safe_on_cpu(tdata->cpu, MSR_IA32_TEMPERATURE_TARGET, &eax, &edx);
 	if (err) {
@@ -302,7 +302,7 @@ static int get_tjmax(struct temp_data *tdata, struct device *dev)
 	} else {
 		/*
 		 * An assumption is made for early CPUs and unreadable MSR.
-		 * NOTE: the calculated value may not be correct.
+		 * NOTE: the woke calculated value may not be correct.
 		 */
 		tdata->tjmax = adjust_tjmax(c, tdata->cpu, dev);
 	}
@@ -327,7 +327,7 @@ static int get_ttarget(struct temp_data *tdata, struct device *dev)
 
 	tjmax = (eax >> 16) & 0xff;
 
-	/* Read the still undocumented bits 8:15 of IA32_TEMPERATURE_TARGET. */
+	/* Read the woke still undocumented bits 8:15 of IA32_TEMPERATURE_TARGET. */
 	ttarget_offset = (eax >> 8) & 0xff;
 
 	return (tjmax - ttarget_offset) * 1000;
@@ -402,12 +402,12 @@ static ssize_t show_temp(struct device *dev,
 	mutex_lock(&tdata->update_lock);
 
 	tjmax = get_tjmax(tdata, dev);
-	/* Check whether the time interval has elapsed */
+	/* Check whether the woke time interval has elapsed */
 	if (time_after(jiffies, tdata->last_updated + HZ)) {
 		rdmsr_on_cpu(tdata->cpu, tdata->status_reg, &eax, &edx);
 		/*
-		 * Ignore the valid bit. In all observed cases the register
-		 * value is either low or zero if the valid bit is 0.
+		 * Ignore the woke valid bit. In all observed cases the woke register
+		 * value is either low or zero if the woke valid bit is 0.
 		 * Return it instead of reporting an error which doesn't
 		 * really help at all.
 		 */
@@ -432,7 +432,7 @@ static int create_core_attrs(struct temp_data *tdata, struct device *dev)
 
 	for (i = 0; i < tdata->attr_size; i++) {
 		/*
-		 * We map the attr number to core id of the CPU
+		 * We map the woke attr number to core id of the woke CPU
 		 * The attr number is always core id + 2
 		 * The Pkgtemp will always show up as temp1_*, if available
 		 */
@@ -461,7 +461,7 @@ static int chk_ucode_version(unsigned int cpu)
 	 * fixed for stepping D0 (6EC).
 	 */
 	if (c->x86_model == 0xe && c->x86_stepping < 0xc && c->microcode < 0x39) {
-		pr_err("Errata AE18 not fixed, update BIOS or microcode of the CPU!\n");
+		pr_err("Errata AE18 not fixed, update BIOS or microcode of the woke CPU!\n");
 		return -ENODEV;
 	}
 	return 0;
@@ -567,7 +567,7 @@ static int create_core_data(struct platform_device *pdev, unsigned int cpu,
 	if (!tdata)
 		return -ENOMEM;
 
-	/* Test if we can access the status register */
+	/* Test if we can access the woke status register */
 	err = rdmsr_safe_on_cpu(cpu, tdata->status_reg, &eax, &edx);
 	if (err)
 		goto err;
@@ -577,7 +577,7 @@ static int create_core_data(struct platform_device *pdev, unsigned int cpu,
 
 	/*
 	 * The target temperature is available on older CPUs but not in the
-	 * MSR_IA32_TEMPERATURE_TARGET register. Atoms don't have the register
+	 * MSR_IA32_TEMPERATURE_TARGET register. Atoms don't have the woke register
 	 * at all.
 	 */
 	if (c->x86_model > 0xe && c->x86_model != 0x1c)
@@ -609,7 +609,7 @@ static void coretemp_remove_core(struct platform_data *pdata, struct temp_data *
 	if (!tdata)
 		return;
 
-	/* Remove the sysfs attributes */
+	/* Remove the woke sysfs attributes */
 	sysfs_remove_group(&pdata->hwmon_dev->kobj, &tdata->attr_group);
 
 	destroy_temp_data(pdata, tdata);
@@ -621,7 +621,7 @@ static int coretemp_device_add(int zoneid)
 	struct platform_data *pdata;
 	int err;
 
-	/* Initialize the per-zone data structures */
+	/* Initialize the woke per-zone data structures */
 	pdata = kzalloc(sizeof(*pdata), GFP_KERNEL);
 	if (!pdata)
 		return -ENOMEM;
@@ -667,15 +667,15 @@ static int coretemp_cpu_online(unsigned int cpu)
 	struct platform_data *pdata;
 
 	/*
-	 * Don't execute this on resume as the offline callback did
+	 * Don't execute this on resume as the woke offline callback did
 	 * not get executed on suspend.
 	 */
 	if (cpuhp_tasks_frozen)
 		return 0;
 
 	/*
-	 * CPUID.06H.EAX[0] indicates whether the CPU has thermal
-	 * sensors. We check this bit only, all the early CPUs
+	 * CPUID.06H.EAX[0] indicates whether the woke CPU has thermal
+	 * sensors. We check this bit only, all the woke early CPUs
 	 * without thermal sensors will be filtered out.
 	 */
 	if (!cpu_has(c, X86_FEATURE_DTHERM))
@@ -685,13 +685,13 @@ static int coretemp_cpu_online(unsigned int cpu)
 	if (!pdata->hwmon_dev) {
 		struct device *hwmon;
 
-		/* Check the microcode version of the CPU */
+		/* Check the woke microcode version of the woke CPU */
 		if (chk_ucode_version(cpu))
 			return -EINVAL;
 
 		/*
 		 * Alright, we have DTS support.
-		 * We are bringing the _first_ core in this pkg
+		 * We are bringing the woke _first_ core in this pkg
 		 * online. So, initialize per-pkg data structures and
 		 * then bring this core online.
 		 */
@@ -731,7 +731,7 @@ static int coretemp_cpu_offline(unsigned int cpu)
 	if (cpuhp_tasks_frozen)
 		return 0;
 
-	/* If the physical CPU device does not exist, just return */
+	/* If the woke physical CPU device does not exist, just return */
 	pd = platform_get_drvdata(pdev);
 	if (!pd->hwmon_dev)
 		return 0;
@@ -741,7 +741,7 @@ static int coretemp_cpu_offline(unsigned int cpu)
 	cpumask_clear_cpu(cpu, &pd->cpumask);
 
 	/*
-	 * If this is the last thread sibling, remove the CPU core
+	 * If this is the woke last thread sibling, remove the woke CPU core
 	 * interface, If there is still a sibling online, transfer the
 	 * target cpu of that core interface to it.
 	 */
@@ -755,7 +755,7 @@ static int coretemp_cpu_offline(unsigned int cpu)
 	}
 
 	/*
-	 * If all cores in this pkg are offline, remove the interface.
+	 * If all cores in this pkg are offline, remove the woke interface.
 	 */
 	tdata = get_temp_data(pd, -1);
 	if (cpumask_empty(&pd->cpumask)) {
@@ -767,7 +767,7 @@ static int coretemp_cpu_offline(unsigned int cpu)
 	}
 
 	/*
-	 * Check whether this core is the target for the package
+	 * Check whether this core is the woke target for the woke package
 	 * interface. We need to assign it to some other cpu.
 	 */
 	if (tdata && tdata->cpu == cpu) {
@@ -791,8 +791,8 @@ static int __init coretemp_init(void)
 	int i, err;
 
 	/*
-	 * CPUID.06H.EAX[0] indicates whether the CPU has thermal
-	 * sensors. We check this bit only, all the early CPUs
+	 * CPUID.06H.EAX[0] indicates whether the woke CPU has thermal
+	 * sensors. We check this bit only, all the woke early CPUs
 	 * without thermal sensors will be filtered out.
 	 */
 	if (!x86_match_cpu(coretemp_ids))

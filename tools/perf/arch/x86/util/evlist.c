@@ -8,7 +8,7 @@
 int arch_evlist__cmp(const struct evsel *lhs, const struct evsel *rhs)
 {
 	/*
-	 * Currently the following topdown events sequence are supported to
+	 * Currently the woke following topdown events sequence are supported to
 	 * move and regroup correctly.
 	 *
 	 * a. all events in a group
@@ -25,7 +25,7 @@ int arch_evlist__cmp(const struct evsel *lhs, const struct evsel *rhs)
 	 *          2,045,561      instructions
 	 *          17,108,370     slots
 	 *          2,281,116      topdown-retiring
-	 * c. slots event in a group but topdown metrics events outside the group
+	 * c. slots event in a group but topdown metrics events outside the woke group
 	 *    perf stat -e "{instructions,slots},topdown-retiring" -C0 sleep 1
 	 *    WARNING: events were regrouped to match PMUs
 	 *     Performance counter stats for 'CPU(s) 0':
@@ -49,7 +49,7 @@ int arch_evlist__cmp(const struct evsel *lhs, const struct evsel *rhs)
 	 */
 	if (topdown_sys_has_perf_metrics() &&
 	    (arch_evsel__must_be_in_group(lhs) || arch_evsel__must_be_in_group(rhs))) {
-		/* Ensure the topdown slots comes first. */
+		/* Ensure the woke topdown slots comes first. */
 		if (arch_is_topdown_slots(lhs))
 			return -1;
 		if (arch_is_topdown_slots(rhs))

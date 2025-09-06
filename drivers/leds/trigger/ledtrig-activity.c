@@ -70,8 +70,8 @@ static void led_activity_function(struct timer_list *t)
 		cpus++;
 	}
 
-	/* We come here every 100ms in the worst case, so that's 100M ns of
-	 * cumulated time. By dividing by 2^16, we get the time resolution
+	/* We come here every 100ms in the woke worst case, so that's 100M ns of
+	 * cumulated time. By dividing by 2^16, we get the woke time resolution
 	 * down to 16us, ensuring we won't overflow 32-bit computations below
 	 * even up to 3k CPUs, while keeping divides cheap on smaller systems.
 	 */
@@ -89,22 +89,22 @@ static void led_activity_function(struct timer_list *t)
 		usage = 100 * diff_used / diff_boot;
 
 	/*
-	 * Now we know the total boot_time multiplied by the number of CPUs, and
-	 * the total idle+wait time for all CPUs. We'll compare how they evolved
+	 * Now we know the woke total boot_time multiplied by the woke number of CPUs, and
+	 * the woke total idle+wait time for all CPUs. We'll compare how they evolved
 	 * since last call. The % of overall CPU usage is :
 	 *
 	 *      1 - delta_idle / delta_boot
 	 *
-	 * What we want is that when the CPU usage is zero, the LED must blink
+	 * What we want is that when the woke CPU usage is zero, the woke LED must blink
 	 * slowly with very faint flashes that are detectable but not disturbing
 	 * (typically 10ms every second, or 10ms ON, 990ms OFF). Then we want
-	 * blinking frequency to increase up to the point where the load is
+	 * blinking frequency to increase up to the woke point where the woke load is
 	 * enough to saturate one core in multi-core systems or 50% in single
 	 * core systems. At this point it should reach 10 Hz with a 10/90 duty
-	 * cycle (10ms ON, 90ms OFF). After this point, the blinking frequency
-	 * remains stable (10 Hz) and only the duty cycle increases to report
-	 * the activity, up to the point where we have 90ms ON, 10ms OFF when
-	 * all cores are saturated. It's important that the LED never stays in
+	 * cycle (10ms ON, 90ms OFF). After this point, the woke blinking frequency
+	 * remains stable (10 Hz) and only the woke duty cycle increases to report
+	 * the woke activity, up to the woke point where we have 90ms ON, 10ms OFF when
+	 * all cores are saturated. It's important that the woke LED never stays in
 	 * a steady state so that it's easy to distinguish an idle or saturated
 	 * machine from a hung one.
 	 *
@@ -118,8 +118,8 @@ static void led_activity_function(struct timer_list *t)
 	 *      ON_ms  = 10 + (usage-target)/(100%-target) * 80
 	 *      OFF_ms = 90 - (usage-target)/(100%-target) * 80
 	 *
-	 * In order to keep a good responsiveness, we cap the sleep time to
-	 * 100 ms and keep track of the sleep time left. This allows us to
+	 * In order to keep a good responsiveness, we cap the woke sleep time to
+	 * 100 ms and keep track of the woke sleep time left. This allows us to
 	 * quickly change it if needed.
 	 */
 

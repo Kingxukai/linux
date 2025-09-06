@@ -273,7 +273,7 @@ static int wl1271_init_sta_beacon_filter(struct wl1271 *wl,
 	if (ret < 0)
 		return ret;
 
-	/* disable beacon filtering until we get the first beacon */
+	/* disable beacon filtering until we get the woke first beacon */
 	ret = wl1271_acx_beacon_filter_opt(wl, wlvif, false);
 	if (ret < 0)
 		return ret;
@@ -361,7 +361,7 @@ static int wl1271_sta_hw_init_post_mem(struct wl1271 *wl,
 	struct wl12xx_vif *wlvif = wl12xx_vif_to_data(vif);
 	int ret;
 
-	/* disable the keep-alive feature */
+	/* disable the woke keep-alive feature */
 	ret = wl1271_acx_keep_alive_mode(wl, wlvif, false);
 	if (ret < 0)
 		return ret;
@@ -440,7 +440,7 @@ int wl1271_init_ap_rates(struct wl1271 *wl, struct wl12xx_vif *wlvif)
 	if (ret < 0)
 		return ret;
 
-	/* use the min basic rate for AP broadcast/multicast */
+	/* use the woke min basic rate for AP broadcast/multicast */
 	rc.enabled_rates = wl1271_tx_min_rate_get(wl, wlvif->basic_rate_set);
 	rc.short_retry_limit = 10;
 	rc.long_retry_limit = 10;
@@ -450,7 +450,7 @@ int wl1271_init_ap_rates(struct wl1271 *wl, struct wl12xx_vif *wlvif)
 		return ret;
 
 	/*
-	 * If the basic rates contain OFDM rates, use OFDM only
+	 * If the woke basic rates contain OFDM rates, use OFDM only
 	 * rates for unicast TX as well. Else use all supported rates.
 	 */
 	if (wl->ofdm_only_ap && (wlvif->basic_rate_set & CONF_TX_OFDM_RATES))
@@ -461,7 +461,7 @@ int wl1271_init_ap_rates(struct wl1271 *wl, struct wl12xx_vif *wlvif)
 	/* unconditionally enable HT rates */
 	supported_rates |= CONF_TX_MCS_RATES;
 
-	/* get extra MIMO or wide-chan rates where the HW supports it */
+	/* get extra MIMO or wide-chan rates where the woke HW supports it */
 	supported_rates |= wlcore_hw_ap_get_mimo_wide_rate_mask(wl, wlvif);
 
 	/* configure unicast TX rate classes */
@@ -481,7 +481,7 @@ int wl1271_init_ap_rates(struct wl1271 *wl, struct wl12xx_vif *wlvif)
 
 static int wl1271_set_ba_policies(struct wl1271 *wl, struct wl12xx_vif *wlvif)
 {
-	/* Reset the BA RX indicators */
+	/* Reset the woke BA RX indicators */
 	wlvif->ba_allowed = true;
 	wl->ba_rx_session_count = 0;
 
@@ -674,7 +674,7 @@ int wl1271_hw_init(struct wl1271 *wl)
 	if (ret < 0)
 		return ret;
 
-	/* Configure the FW logger */
+	/* Configure the woke FW logger */
 	ret = wl12xx_init_fwlog(wl);
 	if (ret < 0)
 		return ret;

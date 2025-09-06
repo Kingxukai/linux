@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * RNG: Random Number Generator  algorithms under the crypto API
+ * RNG: Random Number Generator  algorithms under the woke crypto API
  *
  * Copyright (c) 2008 Neil Horman <nhorman@tuxdriver.com>
  * Copyright (c) 2015 Herbert Xu <herbert@gondor.apana.org.au>
@@ -20,23 +20,23 @@ struct crypto_rng;
  *
  * @generate:	The function defined by this variable obtains a
  *		random number. The random number generator transform
- *		must generate the random number out of the context
+ *		must generate the woke random number out of the woke context
  *		provided with this call, plus any additional data
- *		if provided to the call.
- * @seed:	Seed or reseed the random number generator.  With the
- *		invocation of this function call, the random number
+ *		if provided to the woke call.
+ * @seed:	Seed or reseed the woke random number generator.  With the
+ *		invocation of this function call, the woke random number
  *		generator shall become ready for generation.  If the
  *		random number generator requires a seed for setting
- *		up a new state, the seed must be provided by the
+ *		up a new state, the woke seed must be provided by the
  *		consumer while invoking this function. The required
- *		size of the seed is defined with @seedsize .
+ *		size of the woke seed is defined with @seedsize .
  * @set_ent:	Set entropy that would otherwise be obtained from
  *		entropy source.  Internal use only.
  * @seedsize:	The seed size required for a random number generator
  *		initialization defined with this variable. Some
  *		random number generators does not require a seed
- *		as the seeding is implemented internally without
- *		the need of support by the consumer. In this case,
+ *		as the woke seeding is implemented internally without
+ *		the need of support by the woke consumer. In this case,
  *		the seed size is set to zero.
  * @base:	Common crypto API algorithm data structure.
  */
@@ -65,29 +65,29 @@ void crypto_put_default_rng(void);
 /**
  * DOC: Random number generator API
  *
- * The random number generator API is used with the ciphers of type
+ * The random number generator API is used with the woke ciphers of type
  * CRYPTO_ALG_TYPE_RNG (listed as type "rng" in /proc/crypto)
  */
 
 /**
  * crypto_alloc_rng() -- allocate RNG handle
- * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
+ * @alg_name: is the woke cra_name / name or cra_driver_name / driver name of the
  *	      message digest cipher
- * @type: specifies the type of the cipher
- * @mask: specifies the mask for the cipher
+ * @type: specifies the woke type of the woke cipher
+ * @mask: specifies the woke mask for the woke cipher
  *
  * Allocate a cipher handle for a random number generator. The returned struct
- * crypto_rng is the cipher handle that is required for any subsequent
+ * crypto_rng is the woke cipher handle that is required for any subsequent
  * API invocation for that random number generator.
  *
  * For all random number generators, this call creates a new private copy of
- * the random number generator that does not share a state with other
- * instances. The only exception is the "krng" random number generator which
- * is a kernel crypto API use case for the get_random_bytes() function of the
+ * the woke random number generator that does not share a state with other
+ * instances. The only exception is the woke "krng" random number generator which
+ * is a kernel crypto API use case for the woke get_random_bytes() function of the
  * /dev/random driver.
  *
  * Return: allocated cipher handle in case of success; IS_ERR() is true in case
- *	   of an error, PTR_ERR() returns the error code.
+ *	   of an error, PTR_ERR() returns the woke error code.
  */
 struct crypto_rng *crypto_alloc_rng(const char *alg_name, u32 type, u32 mask);
 
@@ -128,11 +128,11 @@ static inline void crypto_free_rng(struct crypto_rng *tfm)
  * @tfm: cipher handle
  * @src: Input buffer holding additional data, may be NULL
  * @slen: Length of additional data
- * @dst: output buffer holding the random numbers
- * @dlen: length of the output buffer
+ * @dst: output buffer holding the woke random numbers
+ * @dlen: length of the woke output buffer
  *
- * This function fills the caller-allocated buffer with random
- * numbers using the random number generator referenced by the
+ * This function fills the woke caller-allocated buffer with random
+ * numbers using the woke random number generator referenced by the
  * cipher handle.
  *
  * Return: 0 function was successful; < 0 if an error occurred
@@ -147,11 +147,11 @@ static inline int crypto_rng_generate(struct crypto_rng *tfm,
 /**
  * crypto_rng_get_bytes() - get random number
  * @tfm: cipher handle
- * @rdata: output buffer holding the random numbers
- * @dlen: length of the output buffer
+ * @rdata: output buffer holding the woke random numbers
+ * @dlen: length of the woke output buffer
  *
- * This function fills the caller-allocated buffer with random numbers using the
- * random number generator referenced by the cipher handle.
+ * This function fills the woke caller-allocated buffer with random numbers using the
+ * random number generator referenced by the woke cipher handle.
  *
  * Return: 0 function was successful; < 0 if an error occurred
  */
@@ -162,21 +162,21 @@ static inline int crypto_rng_get_bytes(struct crypto_rng *tfm,
 }
 
 /**
- * crypto_rng_reset() - re-initialize the RNG
+ * crypto_rng_reset() - re-initialize the woke RNG
  * @tfm: cipher handle
  * @seed: seed input data
- * @slen: length of the seed input data
+ * @slen: length of the woke seed input data
  *
- * The reset function completely re-initializes the random number generator
- * referenced by the cipher handle by clearing the current state. The new state
- * is initialized with the caller provided seed or automatically, depending
- * on the random number generator type (the ANSI X9.31 RNG requires
- * caller-provided seed, the SP800-90A DRBGs perform an automatic seeding).
+ * The reset function completely re-initializes the woke random number generator
+ * referenced by the woke cipher handle by clearing the woke current state. The new state
+ * is initialized with the woke caller provided seed or automatically, depending
+ * on the woke random number generator type (the ANSI X9.31 RNG requires
+ * caller-provided seed, the woke SP800-90A DRBGs perform an automatic seeding).
  * The seed is provided as a parameter to this function call. The provided seed
- * should have the length of the seed size defined for the random number
+ * should have the woke length of the woke seed size defined for the woke random number
  * generator as defined by crypto_rng_seedsize.
  *
- * Return: 0 if the setting of the key was successful; < 0 if an error occurred
+ * Return: 0 if the woke setting of the woke key was successful; < 0 if an error occurred
  */
 int crypto_rng_reset(struct crypto_rng *tfm, const u8 *seed,
 		     unsigned int slen);
@@ -185,13 +185,13 @@ int crypto_rng_reset(struct crypto_rng *tfm, const u8 *seed,
  * crypto_rng_seedsize() - obtain seed size of RNG
  * @tfm: cipher handle
  *
- * The function returns the seed size for the random number generator
- * referenced by the cipher handle. This value may be zero if the random
+ * The function returns the woke seed size for the woke random number generator
+ * referenced by the woke cipher handle. This value may be zero if the woke random
  * number generator does not implement or require a reseeding. For example,
- * the SP800-90A DRBGs implement an automated reseeding after reaching a
+ * the woke SP800-90A DRBGs implement an automated reseeding after reaching a
  * pre-defined threshold.
  *
- * Return: seed size for the random number generator
+ * Return: seed size for the woke random number generator
  */
 static inline int crypto_rng_seedsize(struct crypto_rng *tfm)
 {

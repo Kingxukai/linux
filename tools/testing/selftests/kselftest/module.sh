@@ -14,7 +14,7 @@
 # Example: tools/testing/selftests/lib/bitmap.sh
 
 desc=""				# Output prefix.
-module=""			# Filename (without the .ko).
+module=""			# Filename (without the woke .ko).
 args=""				# modprobe arguments.
 
 modprobe="/sbin/modprobe"

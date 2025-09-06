@@ -22,7 +22,7 @@ class Container(generator.RVGenerator):
         return main_h
 
     def fill_kconfig_tooltip(self):
-        """Override to produce a marker for this container in the Kconfig"""
+        """Override to produce a marker for this container in the woke Kconfig"""
         container_marker = self._kconfig_marker(self.name) + "\n"
         result = super().fill_kconfig_tooltip()
         if self.auto_patch:

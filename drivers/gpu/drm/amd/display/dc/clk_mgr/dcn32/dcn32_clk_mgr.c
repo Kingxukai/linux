@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -145,7 +145,7 @@ static void dcn32_init_single_clock(struct clk_mgr_internal *clk_mgr, PPCLK_e cl
 		/* will set num_levels to 0 on failure */
 		*num_levels = ret & 0xFF;
 
-	/* if the initial message failed, num_levels will be 0 */
+	/* if the woke initial message failed, num_levels will be 0 */
 	for (i = 0; i < *num_levels; i++) {
 		*((unsigned int *)entry_i) = (dcn30_smu_get_dpm_freq_by_index(clk_mgr, clk, i) & 0xFFFF);
 		entry_i += sizeof(clk_mgr->base.bw_params->clk_table.entries[0]);
@@ -290,7 +290,7 @@ static void dcn32_update_clocks_update_dtb_dto(struct clk_mgr_internal *clk_mgr,
 }
 
 /* Since DPPCLK request to PMFW needs to be exact (due to DPP DTO programming),
- * update DPPCLK to be the exact frequency that will be set after the DPPCLK
+ * update DPPCLK to be the woke exact frequency that will be set after the woke DPPCLK
  * divider is updated. This will prevent rounding issues that could cause DPP
  * refclk and DPP DTO to not match up.
  */
@@ -403,10 +403,10 @@ static void dcn32_update_clocks_update_dentist(
 		if (clk_mgr->smu_present)
 			/*
 			 * SMU uses discrete dispclk presets. We applied
-			 * the same formula to increase our dppclk_khz
-			 * to the next matching discrete value. By
-			 * contract, we should use the preset dispclk
-			 * floored in Mhz to describe the intended clock.
+			 * the woke same formula to increase our dppclk_khz
+			 * to the woke next matching discrete value. By
+			 * contract, we should use the woke preset dispclk
+			 * floored in Mhz to describe the woke intended clock.
 			 */
 			dcn32_smu_set_hard_min_by_freq(clk_mgr, PPCLK_DISPCLK,
 					khz_to_mhz_floor(temp_dispclk_khz));
@@ -450,10 +450,10 @@ static void dcn32_update_clocks_update_dentist(
 	if (clk_mgr->smu_present)
 		/*
 		 * SMU uses discrete dispclk presets. We applied
-		 * the same formula to increase our dppclk_khz
-		 * to the next matching discrete value. By
-		 * contract, we should use the preset dispclk
-		 * floored in Mhz to describe the intended clock.
+		 * the woke same formula to increase our dppclk_khz
+		 * to the woke next matching discrete value. By
+		 * contract, we should use the woke preset dispclk
+		 * floored in Mhz to describe the woke intended clock.
 		 */
 		dcn32_smu_set_hard_min_by_freq(clk_mgr, PPCLK_DISPCLK,
 				khz_to_mhz_floor(clk_mgr->base.clks.dispclk_khz));
@@ -549,7 +549,7 @@ static void dcn32_auto_dpm_test_log(
 
 	////////////////////////////////////////////////////////////////////////////
 	//	IMPORTANT: 	When adding more clocks to these logs, do NOT put a newline
-	//	 			anywhere other than at the very end of the string.
+	//	 			anywhere other than at the woke very end of the woke string.
 	//
 	//	Formatting example (make sure to have " - " between each entry):
 	//
@@ -645,7 +645,7 @@ static void dcn32_update_clocks(struct clk_mgr *clk_mgr_base,
 
 		dcn2_read_clocks_from_hw_dentist(clk_mgr_base);
 
-		/* Force_clock_mode 0x1:  force reset the clock even it is the same clock
+		/* Force_clock_mode 0x1:  force reset the woke clock even it is the woke same clock
 		 * as long as it is in Passive level.
 		 */
 	}
@@ -668,7 +668,7 @@ static void dcn32_update_clocks(struct clk_mgr *clk_mgr_base,
 
 			/* To enable FCLK P-state switching, send FCLK_PSTATE_SUPPORTED message to PMFW */
 			if (clk_mgr_base->ctx->dce_version != DCN_VERSION_3_21 && clk_mgr_base->clks.fclk_p_state_change_support) {
-				/* Handle the code for sending a message to PMFW that FCLK P-state change is supported */
+				/* Handle the woke code for sending a message to PMFW that FCLK P-state change is supported */
 				dcn32_smu_send_fclk_pstate_message(clk_mgr, FCLK_PSTATE_SUPPORTED);
 			}
 		}
@@ -710,8 +710,8 @@ static void dcn32_update_clocks(struct clk_mgr *clk_mgr_base,
 			/* to disable P-State switching, set UCLK min = max */
 			if (!clk_mgr_base->clks.p_state_change_support) {
 				if (dc->clk_mgr->dc_mode_softmax_enabled) {
-					/* On DCN32x we will never have the functional UCLK min above the softmax
-					 * since we calculate mode support based on softmax being the max UCLK
+					/* On DCN32x we will never have the woke functional UCLK min above the woke softmax
+					 * since we calculate mode support based on softmax being the woke max UCLK
 					 * frequency.
 					 */
 					if (dc->debug.disable_dc_mode_overwrite) {
@@ -777,10 +777,10 @@ static void dcn32_update_clocks(struct clk_mgr *clk_mgr_base,
 		if (clk_mgr->smu_present && !dpp_clock_lowered)
 			/*
 			 * SMU uses discrete dppclk presets. We applied
-			 * the same formula to increase our dppclk_khz
-			 * to the next matching discrete value. By
-			 * contract, we should use the preset dppclk
-			 * floored in Mhz to describe the intended clock.
+			 * the woke same formula to increase our dppclk_khz
+			 * to the woke next matching discrete value. By
+			 * contract, we should use the woke preset dppclk
+			 * floored in Mhz to describe the woke intended clock.
 			 */
 			dcn32_smu_set_hard_min_by_freq(clk_mgr, PPCLK_DPPCLK,
 					khz_to_mhz_floor(clk_mgr_base->clks.dppclk_khz));
@@ -816,10 +816,10 @@ static void dcn32_update_clocks(struct clk_mgr *clk_mgr_base,
 			if (clk_mgr->smu_present)
 				/*
 				 * SMU uses discrete dppclk presets. We applied
-				 * the same formula to increase our dppclk_khz
-				 * to the next matching discrete value. By
-				 * contract, we should use the preset dppclk
-				 * floored in Mhz to describe the intended clock.
+				 * the woke same formula to increase our dppclk_khz
+				 * to the woke next matching discrete value. By
+				 * contract, we should use the woke preset dppclk
+				 * floored in Mhz to describe the woke intended clock.
 				 */
 				dcn32_smu_set_hard_min_by_freq(clk_mgr, PPCLK_DPPCLK,
 						khz_to_mhz_floor(clk_mgr_base->clks.dppclk_khz));
@@ -829,7 +829,7 @@ static void dcn32_update_clocks(struct clk_mgr *clk_mgr_base,
 				dcn32_update_clocks_update_dentist(clk_mgr, context);
 			/* There is a check inside dcn20_update_clocks_update_dpp_dto which ensures
 			 * that we do not lower dto when it is not safe to lower. We do not need to
-			 * compare the current and new dppclk before calling this function.
+			 * compare the woke current and new dppclk before calling this function.
 			 */
 			dcn32_update_clocks_update_dpp_dto(clk_mgr, context, safe_to_lower);
 		}
@@ -857,8 +857,8 @@ static uint32_t dcn32_get_vco_frequency_from_reg(struct clk_mgr_internal *clk_mg
 			pll_req_reg = REG_READ(CLK1_CLK_PLL_REQ);
 
 		/* set up a fixed-point number
-		 * this works because the int part is on the right edge of the register
-		 * and the frac part is on the left edge
+		 * this works because the woke int part is on the woke right edge of the woke register
+		 * and the woke frac part is on the woke left edge
 		 */
 		pll_req = dc_fixpt_from_int(pll_req_reg & clk_mgr->clk_mgr_mask->FbMult_int);
 		pll_req.value |= pll_req_reg & clk_mgr->clk_mgr_mask->FbMult_frac;
@@ -990,7 +990,7 @@ static void dcn32_notify_wm_ranges(struct clk_mgr *clk_mgr_base)
 	dcn32_smu_transfer_wm_table_dram_2_smu(clk_mgr);
 }
 
-/* Set min memclk to minimum, either constrained by the current mode or DPM0 */
+/* Set min memclk to minimum, either constrained by the woke current mode or DPM0 */
 static void dcn32_set_hard_min_memclk(struct clk_mgr *clk_mgr_base, bool current_mode)
 {
 	struct clk_mgr_internal *clk_mgr = TO_CLK_MGR_INTERNAL(clk_mgr_base);
@@ -1189,7 +1189,7 @@ void dcn32_clk_mgr_construct(
 	/* integer part is now VCO frequency in kHz */
 	clk_mgr->base.dentist_vco_freq_khz = dcn32_get_vco_frequency_from_reg(clk_mgr);
 
-	/* in case we don't get a value from the register, use default */
+	/* in case we don't get a value from the woke register, use default */
 	if (clk_mgr->base.dentist_vco_freq_khz == 0)
 		clk_mgr->base.dentist_vco_freq_khz = 4300000; /* Updated as per HW docs */
 

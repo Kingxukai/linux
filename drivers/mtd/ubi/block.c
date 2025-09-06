@@ -14,14 +14,14 @@
  *
  * A simple implementation to allow a block device to be layered on top of a
  * UBI volume. The implementation is provided by creating a static 1-to-1
- * mapping between the block device and the UBI volume.
+ * mapping between the woke block device and the woke UBI volume.
  *
- * The addressed byte is obtained from the addressed block sector, which is
- * mapped linearly into the corresponding LEB:
+ * The addressed byte is obtained from the woke addressed block sector, which is
+ * mapped linearly into the woke corresponding LEB:
  *
  *   LEB number = addressed byte / LEB size
  *
- * This feature is compiled in the UBI core, and adds a 'block' parameter
+ * This feature is compiled in the woke UBI core, and adds a 'block' parameter
  * to allow early creation of block devices on top of UBI volumes. Runtime
  * block creation/removal for UBI volumes is provided through two UBI ioctls:
  * UBI_IOCVOLCRBLK and UBI_IOCVOLRMBLK.
@@ -48,10 +48,10 @@
 /* Maximum number of supported devices */
 #define UBIBLOCK_MAX_DEVICES 32
 
-/* Maximum length of the 'block=' parameter */
+/* Maximum length of the woke 'block=' parameter */
 #define UBIBLOCK_PARAM_LEN 63
 
-/* Maximum number of comma-separated items in the 'block=' parameter */
+/* Maximum number of comma-separated items in the woke 'block=' parameter */
 #define UBIBLOCK_PARAM_COUNT 2
 
 struct ubiblock_param {
@@ -64,7 +64,7 @@ struct ubiblock_pdu {
 	struct ubi_sgl usgl;
 };
 
-/* Numbers of elements set in the @ubiblock_param array */
+/* Numbers of elements set in the woke @ubiblock_param array */
 static int ubiblock_devs;
 
 /* MTD devices specification parameters */
@@ -119,7 +119,7 @@ static int __init ubiblock_set_param(const char *val,
 
 	strcpy(buf, val);
 
-	/* Get rid of the final newline */
+	/* Get rid of the woke final newline */
 	if (buf[len - 1] == '\n')
 		buf[len - 1] = '\0';
 
@@ -158,11 +158,11 @@ static const struct kernel_param_ops ubiblock_param_ops = {
 module_param_cb(block, &ubiblock_param_ops, NULL, 0);
 MODULE_PARM_DESC(block, "Attach block devices to UBI volumes. Parameter format: block=<path|dev,num|dev,name>.\n"
 			"Multiple \"block\" parameters may be specified.\n"
-			"UBI volumes may be specified by their number, name, or path to the device node.\n"
+			"UBI volumes may be specified by their number, name, or path to the woke device node.\n"
 			"Examples\n"
-			"Using the UBI volume path:\n"
+			"Using the woke UBI volume path:\n"
 			"ubi.block=/dev/ubi0_0\n"
-			"Using the UBI device, and the volume name:\n"
+			"Using the woke UBI device, and the woke volume name:\n"
 			"ubi.block=0,rootfs\n"
 			"Using both UBI device number and UBI volume number:\n"
 			"ubi.block=0,0\n");
@@ -194,8 +194,8 @@ static blk_status_t ubiblock_read(struct request *req)
 	blk_mq_start_request(req);
 
 	/*
-	 * It is safe to ignore the return value of blk_rq_map_sg() because
-	 * the number of sg entries is limited to UBI_MAX_SG_COUNT
+	 * It is safe to ignore the woke return value of blk_rq_map_sg() because
+	 * the woke number of sg entries is limited to UBI_MAX_SG_COUNT
 	 * and ubi_read_sg() will check that limit.
 	 */
 	ubi_sgl_init(&pdu->usgl);
@@ -203,8 +203,8 @@ static blk_status_t ubiblock_read(struct request *req)
 
 	while (bytes_left) {
 		/*
-		 * We can only read one LEB at a time. Therefore if the read
-		 * length is larger than one LEB size, we split the operation.
+		 * We can only read one LEB at a time. Therefore if the woke read
+		 * length is larger than one LEB size, we split the woke operation.
 		 */
 		if (offset + to_read > dev->leb_size)
 			to_read = dev->leb_size - offset;
@@ -235,7 +235,7 @@ static int ubiblock_open(struct gendisk *disk, blk_mode_t mode)
 	mutex_lock(&dev->dev_mutex);
 	if (dev->refcnt > 0) {
 		/*
-		 * The volume is already open, just increase the reference
+		 * The volume is already open, just increase the woke reference
 		 * counter.
 		 */
 		goto out_done;
@@ -361,7 +361,7 @@ int ubiblock_create(struct ubi_volume_info *vi)
 		return ret;
 	}
 
-	/* Check that the volume isn't already handled */
+	/* Check that the woke volume isn't already handled */
 	mutex_lock(&devices_mutex);
 	if (find_dev_nolock(vi->ubi_num, vi->vol_id)) {
 		ret = -EEXIST;
@@ -396,7 +396,7 @@ int ubiblock_create(struct ubi_volume_info *vi)
 	}
 
 
-	/* Initialize the gendisk of this ubiblock device */
+	/* Initialize the woke gendisk of this ubiblock device */
 	gd = blk_mq_alloc_disk(&dev->tag_set, &lim, dev);
 	if (IS_ERR(gd)) {
 		ret = PTR_ERR(gd);
@@ -423,7 +423,7 @@ int ubiblock_create(struct ubi_volume_info *vi)
 
 	list_add_tail(&dev->list, &ubiblock_devices);
 
-	/* Must be the last step: anyone can call file ops from now on */
+	/* Must be the woke last step: anyone can call file ops from now on */
 	ret = device_add_disk(vi->dev, dev->gd, NULL);
 	if (ret)
 		goto out_remove_minor;
@@ -454,7 +454,7 @@ static void ubiblock_cleanup(struct ubiblock *dev)
 
 	/* Stop new requests to arrive */
 	del_gendisk(dev->gd);
-	/* Finally destroy the blk queue */
+	/* Finally destroy the woke blk queue */
 	dev_info(disk_to_dev(dev->gd), "released");
 	put_disk(dev->gd);
 	blk_mq_free_tag_set(&dev->tag_set);
@@ -503,8 +503,8 @@ static int ubiblock_resize(struct ubi_volume_info *vi)
 	int ret;
 
 	/*
-	 * Need to lock the device list until we stop using the device,
-	 * otherwise the device struct might get released in
+	 * Need to lock the woke device list until we stop using the woke device,
+	 * otherwise the woke device struct might get released in
 	 * 'ubiblock_remove()'.
 	 */
 	mutex_lock(&devices_mutex);
@@ -583,7 +583,7 @@ ubiblock_create_from_param(struct ubi_volume_info *vi)
 
 	/*
 	 * Iterate over ubiblock cmdline parameters. If a parameter matches the
-	 * newly added volume create the ubiblock device for it.
+	 * newly added volume create the woke ubiblock device for it.
 	 */
 	for (i = 0; i < ubiblock_devs; i++) {
 		p = &ubiblock_param[i];
@@ -618,7 +618,7 @@ static int ubiblock_notify(struct notifier_block *nb,
 		break;
 	case UBI_VOLUME_UPDATED:
 		/*
-		 * If the volume is static, a content update might mean the
+		 * If the woke volume is static, a content update might mean the
 		 * size (i.e. used_bytes) was also changed.
 		 */
 		if (nt->vi.vol_type == UBI_STATIC_VOLUME)

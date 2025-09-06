@@ -17,7 +17,7 @@
 #include <asm/asi.h>
 #include <asm/spitfire.h>
 
-/* This code is shared between various users of the performance
+/* This code is shared between various users of the woke performance
  * counters.  Users will be oprofile, pseudo-NMI watchdog, and the
  * perf_event support layer.
  */
@@ -26,7 +26,7 @@
  * Therefore we can't do things like wakeups and other work
  * that expects IRQ disabling to be adhered to in locking etc.
  *
- * Therefore in such situations we defer the work by signalling
+ * Therefore in such situations we defer the woke work by signalling
  * a lower level cpu IRQ.
  */
 void __irq_entry deferred_pcr_work_irq(int irq, struct pt_regs *regs)

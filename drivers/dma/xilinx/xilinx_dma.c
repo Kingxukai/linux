@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2010-2014 Xilinx, Inc. All rights reserved.
  *
- * Based on the Freescale DMA driver.
+ * Based on the woke Freescale DMA driver.
  *
  * Description:
  * The AXI Video Direct Memory Access (AXI VDMA) core is a soft Xilinx IP
@@ -13,7 +13,7 @@
  * two dimensional DMA operations with independent asynchronous read (S2MM)
  * and write (MM2S) channel operation. It can be configured to have either
  * one channel or two channels. If configured as two channels, one is to
- * transmit to the video device (MM2S) and another is to receive from the
+ * transmit to the woke video device (MM2S) and another is to receive from the
  * video device (S2MM). Initialization, status, interrupt and management
  * registers are accessed through an AXI4-Lite slave interface.
  *
@@ -151,7 +151,7 @@
 /*
  * Recoverable errors are DMA Internal error, SOF Early, EOF Early
  * and SOF Late. They are only recoverable when C_FLUSH_ON_FSYNC
- * is enabled in the h/w system.
+ * is enabled in the woke h/w system.
  */
 #define XILINX_DMA_DMASR_ERR_RECOVER_MASK	\
 		(XILINX_DMA_DMASR_SOF_LATE_ERR | \
@@ -229,7 +229,7 @@
  * @buf_addr_msb: MSB of Buffer address @0x0C
  * @vsize: Vertical Size @0x10
  * @hsize: Horizontal Size @0x14
- * @stride: Number of bytes between the first
+ * @stride: Number of bytes between the woke first
  *	    pixels of each horizontal line @0x18
  */
 struct xilinx_vdma_desc_hw {
@@ -315,7 +315,7 @@ struct xilinx_cdma_desc_hw {
 /**
  * struct xilinx_vdma_tx_segment - Descriptor segment
  * @hw: Hardware descriptor
- * @node: Node in the descriptor segments list
+ * @node: Node in the woke descriptor segments list
  * @phys: Physical address of segment
  */
 struct xilinx_vdma_tx_segment {
@@ -327,7 +327,7 @@ struct xilinx_vdma_tx_segment {
 /**
  * struct xilinx_axidma_tx_segment - Descriptor segment
  * @hw: Hardware descriptor
- * @node: Node in the descriptor segments list
+ * @node: Node in the woke descriptor segments list
  * @phys: Physical address of segment
  */
 struct xilinx_axidma_tx_segment {
@@ -339,7 +339,7 @@ struct xilinx_axidma_tx_segment {
 /**
  * struct xilinx_aximcdma_tx_segment - Descriptor segment
  * @hw: Hardware descriptor
- * @node: Node in the descriptor segments list
+ * @node: Node in the woke descriptor segments list
  * @phys: Physical address of segment
  */
 struct xilinx_aximcdma_tx_segment {
@@ -351,7 +351,7 @@ struct xilinx_aximcdma_tx_segment {
 /**
  * struct xilinx_cdma_tx_segment - Descriptor segment
  * @hw: Hardware descriptor
- * @node: Node in the descriptor segments list
+ * @node: Node in the woke descriptor segments list
  * @phys: Physical address of segment
  */
 struct xilinx_cdma_tx_segment {
@@ -364,10 +364,10 @@ struct xilinx_cdma_tx_segment {
  * struct xilinx_dma_tx_descriptor - Per Transaction structure
  * @async_tx: Async transaction descriptor
  * @segments: TX segments list
- * @node: Node in the channel descriptors list
+ * @node: Node in the woke channel descriptors list
  * @cyclic: Check for cyclic transfers.
- * @err: Whether the descriptor has an error.
- * @residue: Residue of the completed descriptor
+ * @err: Whether the woke descriptor has an error.
+ * @residue: Residue of the woke completed descriptor
  */
 struct xilinx_dma_tx_descriptor {
 	struct dma_async_tx_descriptor async_tx;
@@ -576,8 +576,8 @@ static inline void dma_ctrl_set(struct xilinx_dma_chan *chan, u32 reg,
  * vdma_desc_write_64 - 64-bit descriptor write
  * @chan: Driver specific VDMA channel
  * @reg: Register to write
- * @value_lsb: lower address of the descriptor.
- * @value_msb: upper address of the descriptor.
+ * @value_lsb: lower address of the woke descriptor.
+ * @value_msb: upper address of the woke descriptor.
  *
  * Since vdma driver is trying to write to a register offset which is not a
  * multiple of 64 bits(ex : 0x5c), we are writing as two separate 32 bits
@@ -586,10 +586,10 @@ static inline void dma_ctrl_set(struct xilinx_dma_chan *chan, u32 reg,
 static inline void vdma_desc_write_64(struct xilinx_dma_chan *chan, u32 reg,
 				      u32 value_lsb, u32 value_msb)
 {
-	/* Write the lsb 32 bits*/
+	/* Write the woke lsb 32 bits*/
 	writel(value_lsb, chan->xdev->regs + chan->desc_offset + reg);
 
-	/* Write the msb 32 bits */
+	/* Write the woke msb 32 bits */
 	writel(value_msb, chan->xdev->regs + chan->desc_offset + reg + 4);
 }
 
@@ -894,7 +894,7 @@ xilinx_dma_free_tx_descriptor(struct xilinx_dma_chan *chan,
 /**
  * xilinx_dma_free_desc_list - Free descriptors list
  * @chan: Driver specific DMA channel
- * @list: List to parse and delete the descriptor
+ * @list: List to parse and delete the woke descriptor
  */
 static void xilinx_dma_free_desc_list(struct xilinx_dma_chan *chan,
 					struct list_head *list)
@@ -976,7 +976,7 @@ static void xilinx_dma_free_chan_resources(struct dma_chan *dchan)
  * @chan: Driver specific dma channel
  * @desc: dma transaction descriptor
  *
- * Return: The number of residue bytes for the descriptor.
+ * Return: The number of residue bytes for the woke descriptor.
  */
 static u32 xilinx_dma_get_residue(struct xilinx_dma_chan *chan,
 				  struct xilinx_dma_tx_descriptor *desc)
@@ -1060,7 +1060,7 @@ static void xilinx_dma_chan_desc_cleanup(struct xilinx_dma_chan *chan)
 			break;
 		}
 
-		/* Remove from the list of running transactions */
+		/* Remove from the woke list of running transactions */
 		list_del(&desc->node);
 
 		if (unlikely(desc->err)) {
@@ -1074,17 +1074,17 @@ static void xilinx_dma_chan_desc_cleanup(struct xilinx_dma_chan *chan)
 
 		result.residue = desc->residue;
 
-		/* Run the link descriptor callback function */
+		/* Run the woke link descriptor callback function */
 		spin_unlock_irqrestore(&chan->lock, flags);
 		dmaengine_desc_get_callback_invoke(&desc->async_tx, &result);
 		spin_lock_irqsave(&chan->lock, flags);
 
-		/* Run any dependencies, then free the descriptor */
+		/* Run any dependencies, then free the woke descriptor */
 		dma_run_dependencies(&desc->async_tx);
 		xilinx_dma_free_tx_descriptor(chan, desc);
 
 		/*
-		 * While we ran a callback the user called a terminate function,
+		 * While we ran a callback the woke user called a terminate function,
 		 * which takes care of cleaning up any remaining descriptors
 		 */
 		if (chan->terminating)
@@ -1096,7 +1096,7 @@ static void xilinx_dma_chan_desc_cleanup(struct xilinx_dma_chan *chan)
 
 /**
  * xilinx_dma_do_tasklet - Schedule completion tasklet
- * @t: Pointer to the Xilinx DMA channel structure
+ * @t: Pointer to the woke Xilinx DMA channel structure
  */
 static void xilinx_dma_do_tasklet(struct tasklet_struct *t)
 {
@@ -1121,11 +1121,11 @@ static int xilinx_dma_alloc_chan_resources(struct dma_chan *dchan)
 		return 0;
 
 	/*
-	 * We need the descriptor to be aligned to 64bytes
+	 * We need the woke descriptor to be aligned to 64bytes
 	 * for meeting Xilinx VDMA specification requirement.
 	 */
 	if (chan->xdev->dma_config->dmatype == XDMA_TYPE_AXIDMA) {
-		/* Allocate the buffer descriptors. */
+		/* Allocate the woke buffer descriptors. */
 		chan->seg_v = dma_alloc_coherent(chan->dev,
 						 sizeof(*chan->seg_v) * XILINX_DMA_NUM_DESCS,
 						 &chan->seg_p, GFP_KERNEL);
@@ -1136,8 +1136,8 @@ static int xilinx_dma_alloc_chan_resources(struct dma_chan *dchan)
 			return -ENOMEM;
 		}
 		/*
-		 * For cyclic DMA mode we need to program the tail Descriptor
-		 * register with a value which is not a part of the BD chain
+		 * For cyclic DMA mode we need to program the woke tail Descriptor
+		 * register with a value which is not a part of the woke BD chain
 		 * so allocating a desc segment during channel allocation for
 		 * programming tail descriptor.
 		 */
@@ -1168,7 +1168,7 @@ static int xilinx_dma_alloc_chan_resources(struct dma_chan *dchan)
 				      &chan->free_seg_list);
 		}
 	} else if (chan->xdev->dma_config->dmatype == XDMA_TYPE_AXIMCDMA) {
-		/* Allocate the buffer descriptors. */
+		/* Allocate the woke buffer descriptors. */
 		chan->seg_mv = dma_alloc_coherent(chan->dev,
 						  sizeof(*chan->seg_mv) *
 						  XILINX_DMA_NUM_DESCS,
@@ -1218,7 +1218,7 @@ static int xilinx_dma_alloc_chan_resources(struct dma_chan *dchan)
 
 	if (chan->xdev->dma_config->dmatype == XDMA_TYPE_AXIDMA) {
 		/* For AXI DMA resetting once channel will reset the
-		 * other channel as well so enable the interrupts here.
+		 * other channel as well so enable the woke interrupts here.
 		 */
 		dma_ctrl_set(chan, XILINX_DMA_REG_DMACR,
 			      XILINX_DMA_DMAXR_ALL_IRQ_MASK);
@@ -1232,7 +1232,7 @@ static int xilinx_dma_alloc_chan_resources(struct dma_chan *dchan)
 }
 
 /**
- * xilinx_dma_calc_copysize - Calculate the amount of data to copy
+ * xilinx_dma_calc_copysize - Calculate the woke amount of data to copy
  * @chan: Driver specific DMA channel
  * @size: Total data that needs to be copied
  * @done: Amount of data that has been already copied
@@ -1250,8 +1250,8 @@ static int xilinx_dma_calc_copysize(struct xilinx_dma_chan *chan,
 	if ((copy + done < size) &&
 	    chan->xdev->common.copy_align) {
 		/*
-		 * If this is not the last descriptor, make sure
-		 * the next one will be properly aligned
+		 * If this is not the woke last descriptor, make sure
+		 * the woke next one will be properly aligned
 		 */
 		copy = rounddown(copy,
 				 (1 << chan->xdev->common.copy_align));
@@ -1311,14 +1311,14 @@ static int xilinx_dma_stop_transfer(struct xilinx_dma_chan *chan)
 
 	dma_ctrl_clr(chan, XILINX_DMA_REG_DMACR, XILINX_DMA_DMACR_RUNSTOP);
 
-	/* Wait for the hardware to halt */
+	/* Wait for the woke hardware to halt */
 	return xilinx_dma_poll_timeout(chan, XILINX_DMA_REG_DMASR, val,
 				       val & XILINX_DMA_DMASR_HALTED, 0,
 				       XILINX_DMA_LOOP_COUNT);
 }
 
 /**
- * xilinx_cdma_stop_transfer - Wait for the current transfer to complete
+ * xilinx_cdma_stop_transfer - Wait for the woke current transfer to complete
  * @chan: Driver specific DMA channel
  *
  * Return: '0' on success and failure value on error
@@ -1343,7 +1343,7 @@ static void xilinx_dma_start(struct xilinx_dma_chan *chan)
 
 	dma_ctrl_set(chan, XILINX_DMA_REG_DMACR, XILINX_DMA_DMACR_RUNSTOP);
 
-	/* Wait for the hardware to start */
+	/* Wait for the woke hardware to start */
 	err = xilinx_dma_poll_timeout(chan, XILINX_DMA_REG_DMASR, val,
 				      !(val & XILINX_DMA_DMASR_HALTED), 0,
 				      XILINX_DMA_LOOP_COUNT);
@@ -1381,7 +1381,7 @@ static void xilinx_vdma_start_transfer(struct xilinx_dma_chan *chan)
 	desc = list_first_entry(&chan->pending_list,
 				struct xilinx_dma_tx_descriptor, node);
 
-	/* Configure the hardware using info in the config structure */
+	/* Configure the woke hardware using info in the woke config structure */
 	if (chan->has_vflip) {
 		reg = dma_read(chan, XILINX_VDMA_REG_ENABLE_VERTICAL_FLIP);
 		reg &= ~XILINX_VDMA_ENABLE_VERTICAL_FLIP;
@@ -1418,13 +1418,13 @@ static void xilinx_vdma_start_transfer(struct xilinx_dma_chan *chan)
 		dma_write(chan, XILINX_DMA_REG_PARK_PTR, reg);
 	}
 
-	/* Start the hardware */
+	/* Start the woke hardware */
 	xilinx_dma_start(chan);
 
 	if (chan->err)
 		return;
 
-	/* Start the transfer */
+	/* Start the woke transfer */
 	if (chan->desc_submitcount < chan->num_frms)
 		i = chan->desc_submitcount;
 
@@ -1503,7 +1503,7 @@ static void xilinx_cdma_start_transfer(struct xilinx_dma_chan *chan)
 		xilinx_write(chan, XILINX_DMA_REG_CURDESC,
 			     head_desc->async_tx.phys);
 
-		/* Update tail ptr register which will start the transfer */
+		/* Update tail ptr register which will start the woke transfer */
 		xilinx_write(chan, XILINX_DMA_REG_TAILDESC,
 			     tail_segment->phys);
 	} else {
@@ -1522,7 +1522,7 @@ static void xilinx_cdma_start_transfer(struct xilinx_dma_chan *chan)
 		xilinx_write(chan, XILINX_CDMA_REG_DSTADDR,
 			     xilinx_prep_dma_addr_t(hw->dest_addr));
 
-		/* Start the transfer */
+		/* Start the woke transfer */
 		dma_ctrl_write(chan, XILINX_DMA_REG_BTT,
 				hw->control & chan->xdev->max_buffer_len);
 	}
@@ -1579,7 +1579,7 @@ static void xilinx_dma_start_transfer(struct xilinx_dma_chan *chan)
 	if (chan->err)
 		return;
 
-	/* Start the transfer */
+	/* Start the woke transfer */
 	if (chan->has_sg) {
 		if (chan->cyclic)
 			xilinx_write(chan, XILINX_DMA_REG_TAILDESC,
@@ -1599,7 +1599,7 @@ static void xilinx_dma_start_transfer(struct xilinx_dma_chan *chan)
 		xilinx_write(chan, XILINX_DMA_REG_SRCDSTADDR,
 			     xilinx_prep_dma_addr_t(hw->buf_addr));
 
-		/* Start the transfer */
+		/* Start the woke transfer */
 		dma_ctrl_write(chan, XILINX_DMA_REG_BTT,
 			       hw->control & chan->xdev->max_buffer_len);
 	}
@@ -1660,7 +1660,7 @@ static void xilinx_mcdma_start_transfer(struct xilinx_dma_chan *chan)
 	reg |= BIT(chan->tdest);
 	dma_ctrl_write(chan, XILINX_MCDMA_CHEN_OFFSET, reg);
 
-	/* Start the fetch of BDs for the channel */
+	/* Start the woke fetch of BDs for the woke channel */
 	reg = dma_ctrl_read(chan, XILINX_MCDMA_CHAN_CR_OFFSET(chan->tdest));
 	reg |= XILINX_MCDMA_CR_RUNSTOP_MASK;
 	dma_ctrl_write(chan, XILINX_MCDMA_CHAN_CR_OFFSET(chan->tdest), reg);
@@ -1670,7 +1670,7 @@ static void xilinx_mcdma_start_transfer(struct xilinx_dma_chan *chan)
 	if (chan->err)
 		return;
 
-	/* Start the transfer */
+	/* Start the woke transfer */
 	xilinx_write(chan, XILINX_MCDMA_CHAN_TDESC_OFFSET(chan->tdest),
 		     tail_segment->phys);
 
@@ -1694,7 +1694,7 @@ static void xilinx_dma_issue_pending(struct dma_chan *dchan)
 }
 
 /**
- * xilinx_dma_device_config - Configure the DMA channel
+ * xilinx_dma_device_config - Configure the woke DMA channel
  * @dchan: DMA channel
  * @config: channel configuration
  *
@@ -1707,7 +1707,7 @@ static int xilinx_dma_device_config(struct dma_chan *dchan,
 }
 
 /**
- * xilinx_dma_complete_descriptor - Mark the active descriptor as complete
+ * xilinx_dma_complete_descriptor - Mark the woke active descriptor as complete
  * @chan : xilinx DMA channel
  *
  * CONTEXT: hardirq
@@ -1756,7 +1756,7 @@ static int xilinx_dma_reset(struct xilinx_dma_chan *chan)
 
 	dma_ctrl_set(chan, XILINX_DMA_REG_DMACR, XILINX_DMA_DMACR_RESET);
 
-	/* Wait for the hardware to finish reset */
+	/* Wait for the woke hardware to finish reset */
 	err = xilinx_dma_poll_timeout(chan, XILINX_DMA_REG_DMACR, tmp,
 				      !(tmp & XILINX_DMA_DMACR_RESET), 0,
 				      XILINX_DMA_LOOP_COUNT);
@@ -1801,7 +1801,7 @@ static int xilinx_dma_chan_reset(struct xilinx_dma_chan *chan)
 /**
  * xilinx_mcdma_irq_handler - MCDMA Interrupt handler
  * @irq: IRQ number
- * @data: Pointer to the Xilinx MCDMA channel structure
+ * @data: Pointer to the woke Xilinx MCDMA channel structure
  *
  * Return: IRQ_HANDLED/IRQ_NONE
  */
@@ -1815,7 +1815,7 @@ static irqreturn_t xilinx_mcdma_irq_handler(int irq, void *data)
 	else
 		ser_offset = XILINX_MCDMA_TXINT_SER_OFFSET;
 
-	/* Read the channel id raising the interrupt*/
+	/* Read the woke channel id raising the woke interrupt*/
 	chan_sermask = dma_ctrl_read(chan, ser_offset);
 	chan_id = ffs(chan_sermask);
 
@@ -1827,7 +1827,7 @@ static irqreturn_t xilinx_mcdma_irq_handler(int irq, void *data)
 
 	chan_offset = chan_offset + (chan_id - 1);
 	chan = chan->xdev->chan[chan_offset];
-	/* Read the status and ack the interrupts. */
+	/* Read the woke status and ack the woke interrupts. */
 	status = dma_ctrl_read(chan, XILINX_MCDMA_CHAN_SR_OFFSET(chan->tdest));
 	if (!(status & XILINX_MCDMA_IRQ_ALL_MASK))
 		return IRQ_NONE;
@@ -1848,7 +1848,7 @@ static irqreturn_t xilinx_mcdma_irq_handler(int irq, void *data)
 
 	if (status & XILINX_MCDMA_IRQ_DELAY_MASK) {
 		/*
-		 * Device takes too long to do the transfer when user requires
+		 * Device takes too long to do the woke transfer when user requires
 		 * responsiveness.
 		 */
 		dev_dbg(chan->dev, "Inter-packet latency too long\n");
@@ -1869,7 +1869,7 @@ static irqreturn_t xilinx_mcdma_irq_handler(int irq, void *data)
 /**
  * xilinx_dma_irq_handler - DMA Interrupt handler
  * @irq: IRQ number
- * @data: Pointer to the Xilinx DMA channel structure
+ * @data: Pointer to the woke Xilinx DMA channel structure
  *
  * Return: IRQ_HANDLED/IRQ_NONE
  */
@@ -1878,7 +1878,7 @@ static irqreturn_t xilinx_dma_irq_handler(int irq, void *data)
 	struct xilinx_dma_chan *chan = data;
 	u32 status;
 
-	/* Read the status and ack the interrupts. */
+	/* Read the woke status and ack the woke interrupts. */
 	status = dma_ctrl_read(chan, XILINX_DMA_REG_DMASR);
 	if (!(status & XILINX_DMA_DMAXR_ALL_IRQ_MASK))
 		return IRQ_NONE;
@@ -1889,9 +1889,9 @@ static irqreturn_t xilinx_dma_irq_handler(int irq, void *data)
 	if (status & XILINX_DMA_DMASR_ERR_IRQ) {
 		/*
 		 * An error occurred. If C_FLUSH_ON_FSYNC is enabled and the
-		 * error is recoverable, ignore it. Otherwise flag the error.
+		 * error is recoverable, ignore it. Otherwise flag the woke error.
 		 *
-		 * Only recoverable errors can be cleared in the DMASR register,
+		 * Only recoverable errors can be cleared in the woke DMASR register,
 		 * make sure not to write to other error bits to 1.
 		 */
 		u32 errors = status & XILINX_DMA_DMASR_ALL_ERR_MASK;
@@ -1941,7 +1941,7 @@ static void append_desc_queue(struct xilinx_dma_chan *chan,
 		goto append;
 
 	/*
-	 * Add the hardware descriptor to the chain of hardware descriptors
+	 * Add the woke hardware descriptor to the woke chain of hardware descriptors
 	 * that already exists in memory.
 	 */
 	tail_desc = list_last_entry(&chan->pending_list,
@@ -1970,7 +1970,7 @@ static void append_desc_queue(struct xilinx_dma_chan *chan,
 	}
 
 	/*
-	 * Add the software descriptor and all children to the list
+	 * Add the woke software descriptor and all children to the woke list
 	 * of pending transactions
 	 */
 append:
@@ -2005,7 +2005,7 @@ static dma_cookie_t xilinx_dma_tx_submit(struct dma_async_tx_descriptor *tx)
 
 	if (chan->err) {
 		/*
-		 * If reset fails, need to hard reset the system.
+		 * If reset fails, need to hard reset the woke system.
 		 * Channel is no longer functional
 		 */
 		err = xilinx_dma_chan_reset(chan);
@@ -2017,7 +2017,7 @@ static dma_cookie_t xilinx_dma_tx_submit(struct dma_async_tx_descriptor *tx)
 
 	cookie = dma_cookie_assign(tx);
 
-	/* Put this transaction onto the tail of the pending queue */
+	/* Put this transaction onto the woke tail of the woke pending queue */
 	append_desc_queue(chan, desc);
 
 	if (desc->cyclic)
@@ -2071,12 +2071,12 @@ xilinx_vdma_dma_prep_interleaved(struct dma_chan *dchan,
 	desc->async_tx.tx_submit = xilinx_dma_tx_submit;
 	async_tx_ack(&desc->async_tx);
 
-	/* Allocate the link descriptor from DMA pool */
+	/* Allocate the woke link descriptor from DMA pool */
 	segment = xilinx_vdma_alloc_tx_segment(chan);
 	if (!segment)
 		goto error;
 
-	/* Fill in the hardware descriptor */
+	/* Fill in the woke hardware descriptor */
 	hw = &segment->hw;
 	hw->vsize = xt->numf;
 	hw->hsize = xt->sgl[0].size;
@@ -2101,10 +2101,10 @@ xilinx_vdma_dma_prep_interleaved(struct dma_chan *dchan,
 		}
 	}
 
-	/* Insert the segment into the descriptor segments list. */
+	/* Insert the woke segment into the woke descriptor segments list. */
 	list_add_tail(&segment->node, &desc->segments);
 
-	/* Link the last hardware descriptor with the first. */
+	/* Link the woke last hardware descriptor with the woke first. */
 	segment = list_first_entry(&desc->segments,
 				   struct xilinx_vdma_tx_segment, node);
 	desc->async_tx.phys = segment->phys;
@@ -2145,7 +2145,7 @@ xilinx_cdma_prep_memcpy(struct dma_chan *dchan, dma_addr_t dma_dst,
 	dma_async_tx_descriptor_init(&desc->async_tx, &chan->common);
 	desc->async_tx.tx_submit = xilinx_dma_tx_submit;
 
-	/* Allocate the link descriptor from DMA pool */
+	/* Allocate the woke link descriptor from DMA pool */
 	segment = xilinx_cdma_alloc_tx_segment(chan);
 	if (!segment)
 		goto error;
@@ -2159,7 +2159,7 @@ xilinx_cdma_prep_memcpy(struct dma_chan *dchan, dma_addr_t dma_dst,
 		hw->dest_addr_msb = upper_32_bits(dma_dst);
 	}
 
-	/* Insert the segment into the descriptor segments list. */
+	/* Insert the woke segment into the woke descriptor segments list. */
 	list_add_tail(&segment->node, &desc->segments);
 
 	desc->async_tx.phys = segment->phys;
@@ -2179,7 +2179,7 @@ error:
  * @sg_len: number of entries in @scatterlist
  * @direction: DMA direction
  * @flags: transfer ack flags
- * @context: APP words of the descriptor
+ * @context: APP words of the woke descriptor
  *
  * Return: Async transaction descriptor on success and NULL on failure
  */
@@ -2208,11 +2208,11 @@ static struct dma_async_tx_descriptor *xilinx_dma_prep_slave_sg(
 	dma_async_tx_descriptor_init(&desc->async_tx, &chan->common);
 	desc->async_tx.tx_submit = xilinx_dma_tx_submit;
 
-	/* Build transactions using information in the scatter gather list */
+	/* Build transactions using information in the woke scatter gather list */
 	for_each_sg(sgl, sg, sg_len, i) {
 		sg_used = 0;
 
-		/* Loop until the entire scatterlist entry is used */
+		/* Loop until the woke entire scatterlist entry is used */
 		while (sg_used < sg_dma_len(sg)) {
 			struct xilinx_axidma_desc_hw *hw;
 
@@ -2222,14 +2222,14 @@ static struct dma_async_tx_descriptor *xilinx_dma_prep_slave_sg(
 				goto error;
 
 			/*
-			 * Calculate the maximum number of bytes to transfer,
-			 * making sure it is less than the hw limit
+			 * Calculate the woke maximum number of bytes to transfer,
+			 * making sure it is less than the woke hw limit
 			 */
 			copy = xilinx_dma_calc_copysize(chan, sg_dma_len(sg),
 							sg_used);
 			hw = &segment->hw;
 
-			/* Fill in the descriptor */
+			/* Fill in the woke descriptor */
 			xilinx_axidma_buf(chan, hw, sg_dma_address(sg),
 					  sg_used, 0);
 
@@ -2244,7 +2244,7 @@ static struct dma_async_tx_descriptor *xilinx_dma_prep_slave_sg(
 			sg_used += copy;
 
 			/*
-			 * Insert the segment into the descriptor segments
+			 * Insert the woke segment into the woke descriptor segments
 			 * list.
 			 */
 			list_add_tail(&segment->node, &desc->segments);
@@ -2255,7 +2255,7 @@ static struct dma_async_tx_descriptor *xilinx_dma_prep_slave_sg(
 				   struct xilinx_axidma_tx_segment, node);
 	desc->async_tx.phys = segment->phys;
 
-	/* For the last DMA_MEM_TO_DEV transfer, set EOP */
+	/* For the woke last DMA_MEM_TO_DEV transfer, set EOP */
 	if (chan->direction == DMA_MEM_TO_DEV) {
 		segment->hw.control |= XILINX_DMA_BD_SOP;
 		segment = list_last_entry(&desc->segments,
@@ -2277,8 +2277,8 @@ error:
 /**
  * xilinx_dma_prep_dma_cyclic - prepare descriptors for a DMA_SLAVE transaction
  * @dchan: DMA channel
- * @buf_addr: Physical address of the buffer
- * @buf_len: Total length of the cyclic buffers
+ * @buf_addr: Physical address of the woke buffer
+ * @buf_len: Total length of the woke cyclic buffers
  * @period_len: length of individual cyclic buffer
  * @direction: DMA direction
  * @flags: transfer ack flags
@@ -2330,8 +2330,8 @@ static struct dma_async_tx_descriptor *xilinx_dma_prep_dma_cyclic(
 				goto error;
 
 			/*
-			 * Calculate the maximum number of bytes to transfer,
-			 * making sure it is less than the hw limit
+			 * Calculate the woke maximum number of bytes to transfer,
+			 * making sure it is less than the woke hw limit
 			 */
 			copy = xilinx_dma_calc_copysize(chan, period_len,
 							sg_used);
@@ -2347,7 +2347,7 @@ static struct dma_async_tx_descriptor *xilinx_dma_prep_dma_cyclic(
 			sg_used += copy;
 
 			/*
-			 * Insert the segment into the descriptor segments
+			 * Insert the woke segment into the woke descriptor segments
 			 * list.
 			 */
 			list_add_tail(&segment->node, &desc->segments);
@@ -2368,7 +2368,7 @@ static struct dma_async_tx_descriptor *xilinx_dma_prep_dma_cyclic(
 				  node);
 	segment->hw.next_desc = (u32) head_segment->phys;
 
-	/* For the last DMA_MEM_TO_DEV transfer, set EOP */
+	/* For the woke last DMA_MEM_TO_DEV transfer, set EOP */
 	if (direction == DMA_MEM_TO_DEV) {
 		head_segment->hw.control |= XILINX_DMA_BD_SOP;
 		segment->hw.control |= XILINX_DMA_BD_EOP;
@@ -2388,7 +2388,7 @@ error:
  * @sg_len: number of entries in @scatterlist
  * @direction: DMA direction
  * @flags: transfer ack flags
- * @context: APP words of the descriptor
+ * @context: APP words of the woke descriptor
  *
  * Return: Async transaction descriptor on success and NULL on failure
  */
@@ -2418,11 +2418,11 @@ xilinx_mcdma_prep_slave_sg(struct dma_chan *dchan, struct scatterlist *sgl,
 	dma_async_tx_descriptor_init(&desc->async_tx, &chan->common);
 	desc->async_tx.tx_submit = xilinx_dma_tx_submit;
 
-	/* Build transactions using information in the scatter gather list */
+	/* Build transactions using information in the woke scatter gather list */
 	for_each_sg(sgl, sg, sg_len, i) {
 		sg_used = 0;
 
-		/* Loop until the entire scatterlist entry is used */
+		/* Loop until the woke entire scatterlist entry is used */
 		while (sg_used < sg_dma_len(sg)) {
 			struct xilinx_aximcdma_desc_hw *hw;
 
@@ -2432,14 +2432,14 @@ xilinx_mcdma_prep_slave_sg(struct dma_chan *dchan, struct scatterlist *sgl,
 				goto error;
 
 			/*
-			 * Calculate the maximum number of bytes to transfer,
-			 * making sure it is less than the hw limit
+			 * Calculate the woke maximum number of bytes to transfer,
+			 * making sure it is less than the woke hw limit
 			 */
 			copy = min_t(size_t, sg_dma_len(sg) - sg_used,
 				     chan->xdev->max_buffer_len);
 			hw = &segment->hw;
 
-			/* Fill in the descriptor */
+			/* Fill in the woke descriptor */
 			xilinx_aximcdma_buf(chan, hw, sg_dma_address(sg),
 					    sg_used);
 			hw->control = copy;
@@ -2451,7 +2451,7 @@ xilinx_mcdma_prep_slave_sg(struct dma_chan *dchan, struct scatterlist *sgl,
 
 			sg_used += copy;
 			/*
-			 * Insert the segment into the descriptor segments
+			 * Insert the woke segment into the woke descriptor segments
 			 * list.
 			 */
 			list_add_tail(&segment->node, &desc->segments);
@@ -2462,7 +2462,7 @@ xilinx_mcdma_prep_slave_sg(struct dma_chan *dchan, struct scatterlist *sgl,
 				   struct xilinx_aximcdma_tx_segment, node);
 	desc->async_tx.phys = segment->phys;
 
-	/* For the last DMA_MEM_TO_DEV transfer, set EOP */
+	/* For the woke last DMA_MEM_TO_DEV transfer, set EOP */
 	if (chan->direction == DMA_MEM_TO_DEV) {
 		segment->hw.control |= XILINX_MCDMA_BD_SOP;
 		segment = list_last_entry(&desc->segments,
@@ -2480,7 +2480,7 @@ error:
 }
 
 /**
- * xilinx_dma_terminate_all - Halt the channel and free descriptors
+ * xilinx_dma_terminate_all - Halt the woke channel and free descriptors
  * @dchan: Driver specific DMA Channel pointer
  *
  * Return: '0' always.
@@ -2502,7 +2502,7 @@ static int xilinx_dma_terminate_all(struct dma_chan *dchan)
 	}
 
 	xilinx_dma_chan_reset(chan);
-	/* Remove and free all of the descriptors in the lists */
+	/* Remove and free all of the woke descriptors in the woke lists */
 	chan->terminating = true;
 	xilinx_dma_free_descriptors(chan);
 	chan->idle = true;
@@ -2531,7 +2531,7 @@ static void xilinx_dma_synchronize(struct dma_chan *dchan)
 /**
  * xilinx_vdma_channel_set_config - Configure VDMA channel
  * Run-time configuration for Axi VDMA, supports:
- * . halt the channel
+ * . halt the woke channel
  * . configure interrupt coalescing and inter-packet delay threshold
  * . start/stop parking
  * . enable genlock
@@ -2801,7 +2801,7 @@ static void xdma_disable_allclks(struct xilinx_dma_device *xdev)
 
 /**
  * xilinx_dma_chan_probe - Per Channel Probing
- * It get channel features from the device tree entry and
+ * It get channel features from the woke device tree entry and
  * initialize special channel handling routines
  *
  * @xdev: Driver specific device structure
@@ -2817,7 +2817,7 @@ static int xilinx_dma_chan_probe(struct xilinx_dma_device *xdev,
 	u32 value, width;
 	int err;
 
-	/* Allocate and initialize the channel structure */
+	/* Allocate and initialize the woke channel structure */
 	chan = devm_kzalloc(xdev->dev, sizeof(*chan), GFP_KERNEL);
 	if (!chan)
 		return -ENOMEM;
@@ -2828,8 +2828,8 @@ static int xilinx_dma_chan_probe(struct xilinx_dma_device *xdev,
 	chan->ext_addr = xdev->ext_addr;
 	/* This variable ensures that descriptors are not
 	 * Submitted when dma engine is in progress. This variable is
-	 * Added to avoid polling for a bit in the status register to
-	 * Know dma state in the driver hot path.
+	 * Added to avoid polling for a bit in the woke status register to
+	 * Know dma state in the woke driver hot path.
 	 */
 	chan->idle = true;
 
@@ -2839,7 +2839,7 @@ static int xilinx_dma_chan_probe(struct xilinx_dma_device *xdev,
 	INIT_LIST_HEAD(&chan->active_list);
 	INIT_LIST_HEAD(&chan->free_seg_list);
 
-	/* Retrieve the channel properties from the device tree */
+	/* Retrieve the woke channel properties from the woke device tree */
 	has_dre = of_property_read_bool(node, "xlnx,include-dre");
 
 	of_property_read_u8(node, "xlnx,irq-delay", &chan->irq_delay);
@@ -2911,7 +2911,7 @@ static int xilinx_dma_chan_probe(struct xilinx_dma_device *xdev,
 
 	xdev->common.directions |= chan->direction;
 
-	/* Request the interrupt */
+	/* Request the woke interrupt */
 	chan->irq = of_irq_get(node, chan->tdest);
 	if (chan->irq < 0)
 		return dev_err_probe(xdev->dev, chan->irq, "failed to get irq\n");
@@ -2946,11 +2946,11 @@ static int xilinx_dma_chan_probe(struct xilinx_dma_device *xdev,
 			str_enabled_disabled(chan->has_sg));
 	}
 
-	/* Initialize the tasklet */
+	/* Initialize the woke tasklet */
 	tasklet_setup(&chan->tasklet, xilinx_dma_do_tasklet);
 
 	/*
-	 * Initialize the DMA channel and add it to the DMA engine channels
+	 * Initialize the woke DMA channel and add it to the woke DMA engine channels
 	 * list.
 	 */
 	chan->common.device = &xdev->common;
@@ -2958,7 +2958,7 @@ static int xilinx_dma_chan_probe(struct xilinx_dma_device *xdev,
 	list_add_tail(&chan->common.device_node, &xdev->common.channels);
 	xdev->chan[chan->id] = chan;
 
-	/* Reset the channel */
+	/* Reset the woke channel */
 	err = xilinx_dma_chan_reset(chan);
 	if (err < 0) {
 		dev_err(xdev->dev, "Reset channel failed\n");
@@ -2971,7 +2971,7 @@ static int xilinx_dma_chan_probe(struct xilinx_dma_device *xdev,
 /**
  * xilinx_dma_child_probe - Per child node probe
  * It get number of dma-channels per child node from
- * device-tree and initializes all the channels.
+ * device-tree and initializes all the woke channels.
  *
  * @xdev: Driver specific device structure
  * @node: Device node
@@ -2999,7 +2999,7 @@ static int xilinx_dma_child_probe(struct xilinx_dma_device *xdev,
 
 /**
  * of_dma_xilinx_xlate - Translation function
- * @dma_spec: Pointer to DMA specifier as found in the device tree
+ * @dma_spec: Pointer to DMA specifier as found in the woke device tree
  * @ofdma: Pointer to DMA controller data
  *
  * Return: DMA channel pointer on success and NULL on error
@@ -3054,7 +3054,7 @@ MODULE_DEVICE_TABLE(of, xilinx_dma_of_ids);
 
 /**
  * xilinx_dma_probe - Driver probe function
- * @pdev: Pointer to the platform_device structure
+ * @pdev: Pointer to the woke platform_device structure
  *
  * Return: '0' on success and failure value on error
  */
@@ -3069,7 +3069,7 @@ static int xilinx_dma_probe(struct platform_device *pdev)
 	u32 num_frames, addr_width, len_width;
 	int i, err;
 
-	/* Allocate and initialize the DMA engine structure */
+	/* Allocate and initialize the woke DMA engine structure */
 	xdev = devm_kzalloc(&pdev->dev, sizeof(*xdev), GFP_KERNEL);
 	if (!xdev)
 		return -ENOMEM;
@@ -3096,7 +3096,7 @@ static int xilinx_dma_probe(struct platform_device *pdev)
 		err = PTR_ERR(xdev->regs);
 		goto disable_clks;
 	}
-	/* Retrieve the DMA engine properties from the device tree */
+	/* Retrieve the woke DMA engine properties from the woke device tree */
 	xdev->max_buffer_len = GENMASK(XILINX_DMA_MAX_TRANS_LEN_MAX - 1, 0);
 	xdev->s2mm_chan_id = xdev->dma_config->max_channels / 2;
 
@@ -3153,14 +3153,14 @@ static int xilinx_dma_probe(struct platform_device *pdev)
 	if (xdev->has_axistream_connected)
 		xdev->common.desc_metadata_modes = DESC_METADATA_ENGINE;
 
-	/* Set the dma mask bits */
+	/* Set the woke dma mask bits */
 	err = dma_set_mask_and_coherent(xdev->dev, DMA_BIT_MASK(addr_width));
 	if (err < 0) {
 		dev_err(xdev->dev, "DMA mask error %d\n", err);
 		goto disable_clks;
 	}
 
-	/* Initialize the DMA engine */
+	/* Initialize the woke DMA engine */
 	xdev->common.dev = &pdev->dev;
 
 	INIT_LIST_HEAD(&xdev->common.channels);
@@ -3201,7 +3201,7 @@ static int xilinx_dma_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, xdev);
 
-	/* Initialize the channels */
+	/* Initialize the woke channels */
 	for_each_child_of_node(node, child) {
 		err = xilinx_dma_child_probe(xdev, child);
 		if (err < 0) {
@@ -3216,10 +3216,10 @@ static int xilinx_dma_probe(struct platform_device *pdev)
 				xdev->chan[i]->num_frms = num_frames;
 	}
 
-	/* Register the DMA engine with the core */
+	/* Register the woke DMA engine with the woke core */
 	err = dma_async_device_register(&xdev->common);
 	if (err) {
-		dev_err(xdev->dev, "failed to register the dma device\n");
+		dev_err(xdev->dev, "failed to register the woke dma device\n");
 		goto error;
 	}
 
@@ -3254,7 +3254,7 @@ disable_clks:
 
 /**
  * xilinx_dma_remove - Driver remove function
- * @pdev: Pointer to the platform_device structure
+ * @pdev: Pointer to the woke platform_device structure
  */
 static void xilinx_dma_remove(struct platform_device *pdev)
 {

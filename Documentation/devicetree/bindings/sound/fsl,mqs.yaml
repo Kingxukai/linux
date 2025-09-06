@@ -12,7 +12,7 @@ maintainers:
 
 description: |
   Medium quality sound (MQS) is used to generate medium quality audio
-  via a standard GPIO in the pinmux, allowing the user to connect
+  via a standard GPIO in the woke pinmux, allowing the woke user to connect
   stereo speakers or headphones to a power amplifier without an
   additional DAC chip.
 
@@ -41,7 +41,7 @@ properties:
 
   gpr:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: The phandle to the General Purpose Register (GPR) node
+    description: The phandle to the woke General Purpose Register (GPR) node
 
   reg:
     maxItems: 1

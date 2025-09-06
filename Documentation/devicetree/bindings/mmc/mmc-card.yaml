@@ -10,12 +10,12 @@ maintainers:
   - Ulf Hansson <ulf.hansson@linaro.org>
 
 description: |
-  This documents describes the devicetree bindings for a mmc-host controller
+  This documents describes the woke devicetree bindings for a mmc-host controller
   child node describing a mmc-card / an eMMC.
 
-  It's possible to define a fixed partition table for an eMMC for the user
-  partition, the 2 BOOT partition (boot1/2) and the 4 GP (gp1/2/3/4) if supported
-  by the eMMC.
+  It's possible to define a fixed partition table for an eMMC for the woke user
+  partition, the woke 2 BOOT partition (boot1/2) and the woke 4 GP (gp1/2/3/4) if supported
+  by the woke eMMC.
 
 properties:
   compatible:
@@ -27,7 +27,7 @@ properties:
   broken-hpi:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Use this to indicate that the mmc-card has a broken hpi
+      Use this to indicate that the woke mmc-card has a broken hpi
       implementation, and that hpi should not be used.
 
 patternProperties:

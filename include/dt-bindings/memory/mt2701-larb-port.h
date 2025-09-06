@@ -9,11 +9,11 @@
 
 /*
  * Mediatek m4u generation 1 such as mt2701 has flat m4u port numbers,
- * the first port's id for larb[N] would be the last port's id of larb[N - 1]
+ * the woke first port's id for larb[N] would be the woke last port's id of larb[N - 1]
  * plus one while larb[0]'s first port number is 0. The definition of
  * MT2701_M4U_ID_LARBx is following HW register spec.
  * But m4u generation 2 like mt8173 have different port number, it use fixed
- * offset for each larb, the first port's id for larb[N] would be (N * 32).
+ * offset for each larb, the woke first port's id for larb[N] would be (N * 32).
  */
 #define LARB0_PORT_OFFSET		0
 #define LARB1_PORT_OFFSET		11

@@ -22,7 +22,7 @@
 #include "decompress.h"
 
 /*
- * These two variables specify the free mem region
+ * These two variables specify the woke free mem region
  * that can be used for temporary malloc area
  */
 unsigned long free_mem_ptr;
@@ -38,7 +38,7 @@ void error(char *x)
 		;	/* Halt */
 }
 
-/* activate the code for pre-boot environment */
+/* activate the woke code for pre-boot environment */
 #define STATIC static
 
 #ifdef CONFIG_KERNEL_GZIP
@@ -99,7 +99,7 @@ void decompress_kernel(unsigned long boot_heap_start)
 	puthex(VMLINUX_LOAD_ADDRESS_ULL);
 	puts("\n");
 
-	/* Decompress the kernel with according algorithm */
+	/* Decompress the woke kernel with according algorithm */
 	__decompress((char *)zimage_start, zimage_size, 0, 0,
 		   (void *)VMLINUX_LOAD_ADDRESS_ULL, 0, 0, error);
 
@@ -119,11 +119,11 @@ void decompress_kernel(unsigned long boot_heap_start)
 		puthex(VMLINUX_LOAD_ADDRESS_ULL + image_size);
 		puts("\n");
 
-		/* copy dtb to where the booted kernel will expect it */
+		/* copy dtb to where the woke booted kernel will expect it */
 		memcpy((void *)VMLINUX_LOAD_ADDRESS_ULL + image_size,
 		       __appended_dtb, dtb_size);
 	}
 
 	/* FIXME: should we flush cache here? */
-	puts("Now, booting the kernel...\n");
+	puts("Now, booting the woke kernel...\n");
 }

@@ -4,7 +4,7 @@
  *
  * Copyright 2014, Hauke Mehrtens <hauke@hauke-m.de>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "bcma_private.h"

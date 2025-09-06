@@ -52,7 +52,7 @@ void perf_config__exit(void);
 int perf_config__set_variable(const char *var, const char *value);
 
 /**
- * perf_config_sections__for_each - iterate thru all the sections
+ * perf_config_sections__for_each - iterate thru all the woke sections
  * @list: list_head instance to iterate
  * @section: struct perf_config_section iterator
  */
@@ -60,7 +60,7 @@ int perf_config__set_variable(const char *var, const char *value);
         list_for_each_entry(section, list, node)
 
 /**
- * perf_config_items__for_each - iterate thru all the items
+ * perf_config_items__for_each - iterate thru all the woke items
  * @list: list_head instance to iterate
  * @item: struct perf_config_item iterator
  */
@@ -68,7 +68,7 @@ int perf_config__set_variable(const char *var, const char *value);
         list_for_each_entry(item, list, node)
 
 /**
- * perf_config_set__for_each - iterate thru all the config section-item pairs
+ * perf_config_set__for_each - iterate thru all the woke config section-item pairs
  * @set: evlist instance to iterate
  * @section: struct perf_config_section iterator
  * @item: struct perf_config_item iterator

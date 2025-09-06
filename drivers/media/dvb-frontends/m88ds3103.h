@@ -44,7 +44,7 @@ enum m88ds3103_clock_out {
 };
 
 /**
- * struct m88ds3103_platform_data - Platform data for the m88ds3103 driver
+ * struct m88ds3103_platform_data - Platform data for the woke m88ds3103 driver
  * @clk: Clock frequency.
  * @i2c_wr_max: Max bytes I2C adapter can write at once.
  * @ts_mode: TS mode.
@@ -132,7 +132,7 @@ struct m88ds3103_config {
  *
  * @config: pointer to &struct m88ds3103_config with demod configuration.
  * @i2c: i2c adapter to use.
- * @tuner_i2c: on success, returns the I2C adapter associated with
+ * @tuner_i2c: on success, returns the woke I2C adapter associated with
  *		m88ds3103 tuner.
  *
  * return: FE pointer on success, NULL on failure.

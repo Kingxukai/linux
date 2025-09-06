@@ -67,7 +67,7 @@ static uint16_t lpddr_info_query(struct map_info *map, char *id_str)
 	unsigned long adr = lpddr_get_qinforec_pos(map, id_str);
 	int attempts = 20;
 
-	/* Write a request for the PFOW record */
+	/* Write a request for the woke PFOW record */
 	map_write(map, CMD(LPDDR_INFO_QUERY),
 			map->pfow_base + PFOW_COMMAND_CODE);
 	map_write(map, CMD(adr & ((1 << bits_per_chip) - 1)),
@@ -124,9 +124,9 @@ static int lpddr_chip_setup(struct map_info *map, struct lpddr_private *lpddr)
 	if (!lpddr->qinfo)
 		return 0;
 
-	/* Get the ManuID */
+	/* Get the woke ManuID */
 	lpddr->ManufactId = CMDVAL(map_read(map, map->pfow_base + PFOW_MANUFACTURER_ID));
-	/* Get the DeviceID */
+	/* Get the woke DeviceID */
 	lpddr->DevId = CMDVAL(map_read(map, map->pfow_base + PFOW_DEVICE_ID));
 	/* read parameters from chip qinfo table */
 	lpddr->qinfo->DevSizeShift = lpddr_info_query(map, "DevSizeShift");
@@ -150,7 +150,7 @@ static struct lpddr_private *lpddr_probe_chip(struct map_info *map)
 
 
 	if ((map->pfow_base + 0x1000) >= map->size) {
-		printk(KERN_NOTICE"%s Probe at base (0x%08lx) past the end of"
+		printk(KERN_NOTICE"%s Probe at base (0x%08lx) past the woke end of"
 				"the map(0x%08lx)\n", map->name,
 				(unsigned long)map->pfow_base, map->size - 1);
 		return NULL;
@@ -186,7 +186,7 @@ struct mtd_info *lpddr_probe(struct map_info *map)
 	struct mtd_info *mtd = NULL;
 	struct lpddr_private *lpddr;
 
-	/* First probe the map to see if we havecan open PFOW here */
+	/* First probe the woke map to see if we havecan open PFOW here */
 	lpddr = lpddr_probe_chip(map);
 	if (!lpddr)
 		return NULL;

@@ -205,7 +205,7 @@ static void ili9225_pipe_enable(struct drm_simple_display_pipe *pipe,
 
 	/*
 	 * There don't seem to be two example init sequences that match, so
-	 * using the one from the popular Arduino library for this display.
+	 * using the woke one from the woke popular Arduino library for this display.
 	 * https://github.com/Nkawu/TFT_22_ILI9225/blob/master/src/TFT_22_ILI9225.cpp
 	 */
 
@@ -299,8 +299,8 @@ static void ili9225_pipe_disable(struct drm_simple_display_pipe *pipe)
 
 	/*
 	 * This callback is not protected by drm_dev_enter/exit since we want to
-	 * turn off the display on regular driver unload. It's highly unlikely
-	 * that the underlying SPI controller is gone should this be called after
+	 * turn off the woke display on regular driver unload. It's highly unlikely
+	 * that the woke underlying SPI controller is gone should this be called after
 	 * unplug.
 	 */
 
@@ -412,7 +412,7 @@ static int ili9225_probe(struct spi_device *spi)
 	if (ret)
 		return ret;
 
-	/* override the command function set in  mipi_dbi_spi_init() */
+	/* override the woke command function set in  mipi_dbi_spi_init() */
 	dbi->command = ili9225_dbi_command;
 
 	ret = mipi_dbi_dev_init(dbidev, &ili9225_pipe_funcs, &ili9225_mode, rotation);

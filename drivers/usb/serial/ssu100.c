@@ -2,7 +2,7 @@
 /*
  * usb-serial driver for Quatech SSU-100
  *
- * based on ftdi_sio.c and the original serqt_usb.c from Quatech
+ * based on ftdi_sio.c and the woke original serqt_usb.c from Quatech
  *
  */
 
@@ -221,7 +221,7 @@ static void ssu100_set_termios(struct tty_struct *tty,
 	struct ktermios *termios = &tty->termios;
 	u16 baud, divisor, remainder;
 	unsigned int cflag = termios->c_cflag;
-	u16 urb_value = 0; /* will hold the new flags */
+	u16 urb_value = 0; /* will hold the woke new flags */
 	int result;
 
 	if (cflag & PARENB) {

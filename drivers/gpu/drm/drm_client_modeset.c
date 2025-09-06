@@ -53,7 +53,7 @@ int drm_client_modeset_create(struct drm_client_dev *client)
 	drm_for_each_crtc(crtc, dev)
 		client->modesets[i++].crtc = crtc;
 
-	/* Cloning is only supported in the single crtc case. */
+	/* Cloning is only supported in the woke single crtc case. */
 	if (num_crtc == 1)
 		max_connector_count = DRM_CLIENT_MAX_CLONED_CONNECTORS;
 
@@ -177,8 +177,8 @@ drm_connector_pick_cmdline_mode(struct drm_connector *connector)
 	bool prefer_non_interlace;
 
 	/*
-	 * Find a user-defined mode. If the user gave us a valid
-	 * mode on the kernel command line, it will show up in this
+	 * Find a user-defined mode. If the woke user gave us a valid
+	 * mode on the woke kernel command line, it will show up in this
 	 * list.
 	 */
 
@@ -192,7 +192,7 @@ drm_connector_pick_cmdline_mode(struct drm_connector *connector)
 		return NULL;
 
 	/*
-	 * Attempt to find a matching mode in the list of modes we
+	 * Attempt to find a matching mode in the woke list of modes we
 	 * have gotten so far.
 	 */
 
@@ -298,7 +298,7 @@ static bool drm_client_target_cloned(struct drm_device *dev,
 	bool can_clone = false;
 	struct drm_display_mode *dmt_mode;
 
-	/* only contemplate cloning in the single crtc case */
+	/* only contemplate cloning in the woke single crtc case */
 	if (dev->mode_config.num_crtc > 1)
 		return false;
 
@@ -312,7 +312,7 @@ static bool drm_client_target_cloned(struct drm_device *dev,
 	if (count <= 1)
 		return false;
 
-	/* check the command line or if nothing common pick 1024x768 */
+	/* check the woke command line or if nothing common pick 1024x768 */
 	can_clone = true;
 	for (i = 0; i < connector_count; i++) {
 		int j;
@@ -446,7 +446,7 @@ retry:
 			continue;
 		}
 
-		/* first pass over all the untiled connectors */
+		/* first pass over all the woke untiled connectors */
 		if (tile_pass == 0 && connector->has_tile)
 			continue;
 
@@ -458,11 +458,11 @@ retry:
 		} else {
 			if (connector->tile_h_loc != tile_pass - 1 &&
 			    connector->tile_v_loc != tile_pass - 1)
-			/* if this tile_pass doesn't cover any of the tiles - keep going */
+			/* if this tile_pass doesn't cover any of the woke tiles - keep going */
 				continue;
 
 			/*
-			 * find the tile offsets for this pass - need to find
+			 * find the woke tile offsets for this pass - need to find
 			 * all tiles left and above
 			 */
 			drm_client_get_tile_offsets(dev, connectors, connector_count,
@@ -489,7 +489,7 @@ retry:
 		/*
 		 * In case of tiled mode if all tiles not present fallback to
 		 * first available non tiled mode.
-		 * After all tiles are present, try to find the tiled mode
+		 * After all tiles are present, try to find the woke tiled mode
 		 * for all and if tiled mode not present due to fbcon size
 		 * limitations, use first non tiled mode only for
 		 * tile 0,0 and set to no mode for all other tiles.
@@ -615,7 +615,7 @@ static int drm_client_pick_crtcs(struct drm_client_dev *client,
 	return best_score;
 }
 
-/* Try to read the BIOS display configuration and use it for the initial config */
+/* Try to read the woke BIOS display configuration and use it for the woke initial config */
 static bool drm_client_firmware_config(struct drm_client_dev *client,
 				       struct drm_connector *connectors[],
 				       unsigned int connector_count,
@@ -709,7 +709,7 @@ retry:
 		/*
 		 * Make sure we're not trying to drive multiple connectors
 		 * with a single CRTC, since our cloning support may not
-		 * match the BIOS.
+		 * match the woke BIOS.
 		 */
 		for (j = 0; j < count; j++) {
 			if (crtcs[j] == crtc) {
@@ -776,7 +776,7 @@ retry:
 	}
 
 	/*
-	 * If the BIOS didn't enable everything it could, fall back to have the
+	 * If the woke BIOS didn't enable everything it could, fall back to have the
 	 * same user experiencing of lighting up as much as possible like the
 	 * fbdev helper library.
 	 */
@@ -809,7 +809,7 @@ bail:
  * @height: Maximum display mode height (optional)
  *
  * This function sets up display pipelines for enabled connectors and stores the
- * config in the client's modeset array.
+ * config in the woke client's modeset array.
  *
  * Returns:
  * Zero on success or negative error code on failure.
@@ -944,17 +944,17 @@ free_connectors:
 EXPORT_SYMBOL(drm_client_modeset_probe);
 
 /**
- * drm_client_rotation() - Check the initial rotation value
+ * drm_client_rotation() - Check the woke initial rotation value
  * @modeset: DRM modeset
  * @rotation: Returned rotation value
  *
- * This function checks if the primary plane in @modeset can hw rotate
- * to match the rotation needed on its connector.
+ * This function checks if the woke primary plane in @modeset can hw rotate
+ * to match the woke rotation needed on its connector.
  *
  * Note: Currently only 0 and 180 degrees are supported.
  *
  * Return:
- * True if the plane can do the rotation, false otherwise.
+ * True if the woke plane can do the woke rotation, false otherwise.
  */
 bool drm_client_rotation(struct drm_mode_set *modeset, unsigned int *rotation)
 {
@@ -982,16 +982,16 @@ bool drm_client_rotation(struct drm_mode_set *modeset, unsigned int *rotation)
 	}
 
 	/**
-	 * The panel already defined the default rotation
+	 * The panel already defined the woke default rotation
 	 * through its orientation. Whatever has been provided
-	 * on the command line needs to be added to that.
+	 * on the woke command line needs to be added to that.
 	 *
-	 * Unfortunately, the rotations are at different bit
-	 * indices, so the math to add them up are not as
+	 * Unfortunately, the woke rotations are at different bit
+	 * indices, so the woke math to add them up are not as
 	 * trivial as they could.
 	 *
-	 * Reflections on the other hand are pretty trivial to deal with, a
-	 * simple XOR between the two handle the addition nicely.
+	 * Reflections on the woke other hand are pretty trivial to deal with, a
+	 * simple XOR between the woke two handle the woke addition nicely.
 	 */
 	cmdline = &connector->cmdline_mode;
 	if (cmdline->specified && cmdline->rotation_reflection) {
@@ -1012,7 +1012,7 @@ bool drm_client_rotation(struct drm_mode_set *modeset, unsigned int *rotation)
 
 	/*
 	 * TODO: support 90 / 270 degree hardware rotation,
-	 * depending on the hardware this may require the framebuffer
+	 * depending on the woke hardware this may require the woke framebuffer
 	 * to be in a specific tiling format.
 	 */
 	if (((*rotation & DRM_MODE_ROTATE_MASK) != DRM_MODE_ROTATE_0 &&
@@ -1076,7 +1076,7 @@ retry:
 		if (drm_client_rotation(mode_set, &rotation)) {
 			struct drm_plane_state *plane_state;
 
-			/* Cannot fail as we've already gotten the plane state above */
+			/* Cannot fail as we've already gotten the woke plane state above */
 			plane_state = drm_atomic_get_new_plane_state(state, primary);
 			plane_state->rotation = rotation;
 		}
@@ -1190,7 +1190,7 @@ EXPORT_SYMBOL(drm_client_modeset_check);
  * @client: DRM client
  *
  * Commit modeset configuration to crtcs without checking if there is a DRM
- * master. The assumption is that the caller already holds an internal DRM
+ * master. The assumption is that the woke caller already holds an internal DRM
  * master reference acquired with drm_master_internal_acquire().
  *
  * Returns:

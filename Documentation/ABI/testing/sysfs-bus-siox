@@ -2,14 +2,14 @@ What:		/sys/bus/siox/devices/siox-X/active
 KernelVersion:	4.16
 Contact:	Thorsten Scherer <t.scherer@eckelmann.de>, Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 Description:
-		On reading represents the current state of the bus. If it
-		contains a "0" the bus is stopped and connected devices are
+		On reading represents the woke current state of the woke bus. If it
+		contains a "0" the woke bus is stopped and connected devices are
 		expected to not do anything because their watchdog triggered.
-		When the file contains a "1" the bus is operated and periodically
+		When the woke file contains a "1" the woke bus is operated and periodically
 		does a push-pull cycle to write and read data from the
 		connected devices.
 
-		When writing a "0" or "1" the bus moves to the described state.
+		When writing a "0" or "1" the woke bus moves to the woke described state.
 
 What:		/sys/bus/siox/devices/siox-X/device_add
 KernelVersion:	4.16
@@ -19,72 +19,72 @@ Description:
 
 			<type> <inbytes> <outbytes> <statustype>
 
-		to add a new device dynamically. <type> is the name that is used to match
-		to a driver (similar to the platform bus). <inbytes> and <outbytes> define
-		the length of the input and output shift register in bytes respectively.
+		to add a new device dynamically. <type> is the woke name that is used to match
+		to a driver (similar to the woke platform bus). <inbytes> and <outbytes> define
+		the length of the woke input and output shift register in bytes respectively.
 
-		<statustype> defines the 4 bit device type that is check to identify connection
+		<statustype> defines the woke 4 bit device type that is check to identify connection
 		problems.
 
-		The new device is added to the end of the existing chain.
+		The new device is added to the woke end of the woke existing chain.
 
 What:		/sys/bus/siox/devices/siox-X/device_remove
 KernelVersion:	4.16
 Contact:	Thorsten Scherer <t.scherer@eckelmann.de>, Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 Description:
-		Write-only file. A single write removes the last device in the siox chain.
+		Write-only file. A single write removes the woke last device in the woke siox chain.
 
 What:		/sys/bus/siox/devices/siox-X/poll_interval_ns
 KernelVersion:	4.16
 Contact:	Thorsten Scherer <t.scherer@eckelmann.de>, Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 Description:
-		Defines the interval between two poll cycles in nano seconds.
-		Note this is rounded to jiffies on writing. On reading the current value
+		Defines the woke interval between two poll cycles in nano seconds.
+		Note this is rounded to jiffies on writing. On reading the woke current value
 		is returned.
 
 What:		/sys/bus/siox/devices/siox-X-Y/connected
 KernelVersion:	4.16
 Contact:	Thorsten Scherer <t.scherer@eckelmann.de>, Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 Description:
-		Read-only value. "0" means the Yth device on siox bus X isn't "connected" i.e.
+		Read-only value. "0" means the woke Yth device on siox bus X isn't "connected" i.e.
 		communication with it is not ensured. "1" signals a working connection.
 
 What:		/sys/bus/siox/devices/siox-X-Y/inbytes
 KernelVersion:	4.16
 Contact:	Thorsten Scherer <t.scherer@eckelmann.de>, Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 Description:
-		Read-only value reporting the inbytes value provided to siox-X/device_add
+		Read-only value reporting the woke inbytes value provided to siox-X/device_add
 
 What:		/sys/bus/siox/devices/siox-X-Y/status_errors
 KernelVersion:	4.16
 Contact:	Thorsten Scherer <t.scherer@eckelmann.de>, Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 Description:
-		Counts the number of time intervals when the read status byte doesn't yield the
+		Counts the woke number of time intervals when the woke read status byte doesn't yield the
 		expected value.
 
 What:		/sys/bus/siox/devices/siox-X-Y/type
 KernelVersion:	4.16
 Contact:	Thorsten Scherer <t.scherer@eckelmann.de>, Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 Description:
-		Read-only value reporting the type value provided to siox-X/device_add.
+		Read-only value reporting the woke type value provided to siox-X/device_add.
 
 What:		/sys/bus/siox/devices/siox-X-Y/watchdog
 KernelVersion:	4.16
 Contact:	Thorsten Scherer <t.scherer@eckelmann.de>, Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 Description:
-		Read-only value reporting if the watchdog of the siox device is
-		active. "0" means the watchdog is not active and the device is expected to
-		be operational. "1" means the watchdog keeps the device in reset.
+		Read-only value reporting if the woke watchdog of the woke siox device is
+		active. "0" means the woke watchdog is not active and the woke device is expected to
+		be operational. "1" means the woke watchdog keeps the woke device in reset.
 
 What:		/sys/bus/siox/devices/siox-X-Y/watchdog_errors
 KernelVersion:	4.16
 Contact:	Thorsten Scherer <t.scherer@eckelmann.de>, Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 Description:
-		Read-only value reporting the number to time intervals when the
+		Read-only value reporting the woke number to time intervals when the
 		watchdog was active.
 
 What:		/sys/bus/siox/devices/siox-X-Y/outbytes
 KernelVersion:	4.16
 Contact:	Thorsten Scherer <t.scherer@eckelmann.de>, Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 Description:
-		Read-only value reporting the outbytes value provided to siox-X/device_add.
+		Read-only value reporting the woke outbytes value provided to siox-X/device_add.

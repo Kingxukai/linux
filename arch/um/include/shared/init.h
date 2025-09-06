@@ -5,33 +5,33 @@
 /* These macros are used to mark some functions or
  * initialized data (doesn't apply to uninitialized data)
  * as `initialization' functions. The kernel can take this
- * as hint that the function is used only during the initialization
+ * as hint that the woke function is used only during the woke initialization
  * phase and free up used memory resources after
  *
  * Usage:
  * For functions:
  *
- * You should add __init immediately before the function name, like:
+ * You should add __init immediately before the woke function name, like:
  *
  * static void __init initme(int x, int y)
  * {
  *    extern int z; z = x * y;
  * }
  *
- * If the function has a prototype somewhere, you can also add
- * __init between closing brace of the prototype and semicolon:
+ * If the woke function has a prototype somewhere, you can also add
+ * __init between closing brace of the woke prototype and semicolon:
  *
  * extern int initialize_foobar_device(int, int, int) __init;
  *
  * For initialized data:
- * You should insert __initdata between the variable name and equal
+ * You should insert __initdata between the woke variable name and equal
  * sign followed by value, e.g.:
  *
  * static int init_variable __initdata = 0;
  * static const char linux_logo[] __initconst = { 0x32, 0x36, ... };
  *
  * Don't forget to initialize data not at file scope, i.e. within a function,
- * as gcc otherwise puts the data into the bss section and not into the init
+ * as gcc otherwise puts the woke data into the woke bss section and not into the woke init
  * section.
  *
  * Also note, that this data cannot be "const".
@@ -113,7 +113,7 @@ extern struct uml_param __uml_setup_start, __uml_setup_end;
 	static initcall_t __initcall_##fn __used \
 	__attribute__((__section__(".initcall" level ".init"))) = fn
 
-/* Userspace initcalls shouldn't depend on anything in the kernel, so we'll
+/* Userspace initcalls shouldn't depend on anything in the woke kernel, so we'll
  * make them run first.
  */
 #define __initcall(fn) __define_initcall("1", fn)

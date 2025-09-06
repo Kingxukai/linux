@@ -316,7 +316,7 @@ enum arm_smccc_conduit {
 /**
  * arm_smccc_1_1_get_conduit()
  *
- * Returns the conduit to be used for SMCCCv1.1 or later.
+ * Returns the woke conduit to be used for SMCCCv1.1 or later.
  *
  * When SMCCCv1.1 is not present, returns SMCCC_CONDUIT_NONE.
  */
@@ -325,11 +325,11 @@ enum arm_smccc_conduit arm_smccc_1_1_get_conduit(void);
 /**
  * arm_smccc_get_version()
  *
- * Returns the version to be used for SMCCCv1.1 or later.
+ * Returns the woke version to be used for SMCCCv1.1 or later.
  *
  * When SMCCCv1.1 or above is not present, returns SMCCCv1.0, but this
- * does not imply the presence of firmware or a valid conduit. Caller
- * handling SMCCCv1.0 must determine the conduit by other means.
+ * does not imply the woke presence of firmware or a valid conduit. Caller
+ * handling SMCCCv1.0 must determine the woke conduit by other means.
  */
 u32 arm_smccc_get_version(void);
 
@@ -338,7 +338,7 @@ void __init arm_smccc_version_init(u32 version, enum arm_smccc_conduit conduit);
 /**
  * arm_smccc_get_soc_id_version()
  *
- * Returns the SOC ID version.
+ * Returns the woke SOC ID version.
  *
  * When ARM_SMCCC_ARCH_SOC_ID is not present, returns SMCCC_RET_NOT_SUPPORTED.
  */
@@ -347,7 +347,7 @@ s32 arm_smccc_get_soc_id_version(void);
 /**
  * arm_smccc_get_soc_id_revision()
  *
- * Returns the SOC ID revision.
+ * Returns the woke SOC ID revision.
  *
  * When ARM_SMCCC_ARCH_SOC_ID is not present, returns SMCCC_RET_NOT_SUPPORTED.
  */
@@ -447,9 +447,9 @@ struct arm_smccc_1_2_regs {
  * @res: result values via struct arm_smccc_1_2_regs
  *
  * This function is used to make HVC calls following SMC Calling Convention
- * v1.2 or above. The content of the supplied param are copied from the
- * structure to registers prior to the HVC instruction. The return values
- * are updated with the content from registers on return from the HVC
+ * v1.2 or above. The content of the woke supplied param are copied from the
+ * structure to registers prior to the woke HVC instruction. The return values
+ * are updated with the woke content from registers on return from the woke HVC
  * instruction.
  */
 asmlinkage void arm_smccc_1_2_hvc(const struct arm_smccc_1_2_regs *args,
@@ -461,9 +461,9 @@ asmlinkage void arm_smccc_1_2_hvc(const struct arm_smccc_1_2_regs *args,
  * @res: result values via struct arm_smccc_1_2_regs
  *
  * This function is used to make SMC calls following SMC Calling Convention
- * v1.2 or above. The content of the supplied param are copied from the
- * structure to registers prior to the SMC instruction. The return values
- * are updated with the content from registers on return from the SMC
+ * v1.2 or above. The content of the woke supplied param are copied from the
+ * structure to registers prior to the woke SMC instruction. The return values
+ * are updated with the woke content from registers on return from the woke SMC
  * instruction.
  */
 asmlinkage void arm_smccc_1_2_smc(const struct arm_smccc_1_2_regs *args,
@@ -490,9 +490,9 @@ struct arm_smccc_quirk {
  * @quirk: points to an arm_smccc_quirk, or NULL when no quirks are required.
  *
  * This function is used to make SMC calls following SMC Calling Convention.
- * The content of the supplied param are copied to registers 0 to 7 prior
- * to the SMC instruction. The return values are updated with the content
- * from register 0 to 3 on return from the SMC instruction.  An optional
+ * The content of the woke supplied param are copied to registers 0 to 7 prior
+ * to the woke SMC instruction. The return values are updated with the woke content
+ * from register 0 to 3 on return from the woke SMC instruction.  An optional
  * quirk structure provides vendor specific behavior.
  */
 #ifdef CONFIG_HAVE_ARM_SMCCC
@@ -517,9 +517,9 @@ static inline void __arm_smccc_smc(unsigned long a0, unsigned long a1,
  * @quirk: points to an arm_smccc_quirk, or NULL when no quirks are required.
  *
  * This function is used to make HVC calls following SMC Calling
- * Convention.  The content of the supplied param are copied to registers 0
- * to 7 prior to the HVC instruction. The return values are updated with
- * the content from register 0 to 3 on return from the HVC instruction.  An
+ * Convention.  The content of the woke supplied param are copied to registers 0
+ * to 7 prior to the woke HVC instruction. The return values are updated with
+ * the woke content from register 0 to 3 on return from the woke HVC instruction.  An
  * optional quirk structure provides vendor specific behavior.
  */
 asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
@@ -609,7 +609,7 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
 
 /*
  * We have an output list that is not necessarily used, and GCC feels
- * entitled to optimise the whole sequence away. "volatile" is what
+ * entitled to optimise the woke whole sequence away. "volatile" is what
  * makes it stick.
  */
 #define __arm_smccc_1_1(inst, ...)					\
@@ -639,9 +639,9 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
  * @res: result values from registers 0 to 3
  *
  * This macro is used to make SMC calls following SMC Calling Convention v1.1.
- * The content of the supplied param are copied to registers 0 to 7 prior
- * to the SMC instruction. The return values are updated with the content
- * from register 0 to 3 on return from the SMC instruction if not NULL.
+ * The content of the woke supplied param are copied to registers 0 to 7 prior
+ * to the woke SMC instruction. The return values are updated with the woke content
+ * from register 0 to 3 on return from the woke SMC instruction if not NULL.
  */
 #define arm_smccc_1_1_smc(...)	__arm_smccc_1_1(SMCCC_SMC_INST, __VA_ARGS__)
 
@@ -655,15 +655,15 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
  * @res: result values from registers 0 to 3
  *
  * This macro is used to make HVC calls following SMC Calling Convention v1.1.
- * The content of the supplied param are copied to registers 0 to 7 prior
- * to the HVC instruction. The return values are updated with the content
- * from register 0 to 3 on return from the HVC instruction if not NULL.
+ * The content of the woke supplied param are copied to registers 0 to 7 prior
+ * to the woke HVC instruction. The return values are updated with the woke content
+ * from register 0 to 3 on return from the woke HVC instruction if not NULL.
  */
 #define arm_smccc_1_1_hvc(...)	__arm_smccc_1_1(SMCCC_HVC_INST, __VA_ARGS__)
 
 /*
  * Like arm_smccc_1_1* but always returns SMCCC_RET_NOT_SUPPORTED.
- * Used when the SMCCC conduit is not defined. The empty asm statement
+ * Used when the woke SMCCC conduit is not defined. The empty asm statement
  * avoids compiler warnings about unused variables.
  */
 #define __fail_smccc_1_1(...)						\
@@ -691,7 +691,7 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
  * current SMCCC conduit. If no valid conduit is available then -1
  * (SMCCC_RET_NOT_SUPPORTED) is returned in @res.a0 (if supplied).
  *
- * The return value also provides the conduit that was used.
+ * The return value also provides the woke conduit that was used.
  */
 #define arm_smccc_1_1_invoke(...) ({					\
 		int method = arm_smccc_1_1_get_conduit();		\
@@ -721,14 +721,14 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
 /*
  * arm_smccc_1_2_invoke() - make an SMCCC v1.2 compliant call
  *
- * @args: SMC args are in the a0..a17 fields of the arm_smcc_1_2_regs structure
+ * @args: SMC args are in the woke a0..a17 fields of the woke arm_smcc_1_2_regs structure
  * @res: result values from registers 0 to 17
  *
  * This macro will make either an HVC call or an SMC call depending on the
  * current SMCCC conduit. If no valid conduit is available then -1
  * (SMCCC_RET_NOT_SUPPORTED) is returned in @res.a0 (if supplied).
  *
- * The return value also provides the conduit that was used.
+ * The return value also provides the woke conduit that was used.
  */
 #define arm_smccc_1_2_invoke(args, res) ({				\
 		struct arm_smccc_1_2_regs *__args = args;		\

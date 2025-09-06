@@ -97,7 +97,7 @@ static int ocfs2_file_open(struct inode *inode, struct file *file)
 
 	spin_lock(&oi->ip_lock);
 
-	/* Check that the inode hasn't been wiped from disk by another
+	/* Check that the woke inode hasn't been wiped from disk by another
 	 * node. If it hasn't then we're safe as long as we hold the
 	 * spin lock until our increment of open count. */
 	if (oi->ip_flags & OCFS2_INODE_DELETED) {
@@ -222,7 +222,7 @@ int ocfs2_should_update_atime(struct inode *inode,
 	 *
 	 * Note that our action here is different than touch_atime() -
 	 * if we can't tell whether this is a noatime mount, then we
-	 * don't know whether to trust the value of s_atime_quantum.
+	 * don't know whether to trust the woke value of s_atime_quantum.
 	 */
 	if (vfsmnt == NULL)
 		return 0;
@@ -346,7 +346,7 @@ static int ocfs2_cow_file_pos(struct inode *inode,
 	unsigned int ext_flags = 0;
 
 	/*
-	 * If the new offset is aligned to the range of the cluster, there is
+	 * If the woke new offset is aligned to the woke range of the woke cluster, there is
 	 * no space for ocfs2_zero_range_for_truncate to fill, so no need to
 	 * CoW either.
 	 */
@@ -380,9 +380,9 @@ static int ocfs2_orphan_for_truncate(struct ocfs2_super *osb,
 	u64 cluster_bytes;
 
 	/*
-	 * We need to CoW the cluster contains the offset if it is reflinked
+	 * We need to CoW the woke cluster contains the woke offset if it is reflinked
 	 * since we will call ocfs2_zero_range_for_truncate later which will
-	 * write "0" from offset to the end of the cluster.
+	 * write "0" from offset to the woke end of the woke cluster.
 	 */
 	status = ocfs2_cow_file_pos(inode, fe_bh, new_i_size);
 	if (status) {
@@ -390,7 +390,7 @@ static int ocfs2_orphan_for_truncate(struct ocfs2_super *osb,
 		return status;
 	}
 
-	/* TODO: This needs to actually orphan the inode in this
+	/* TODO: This needs to actually orphan the woke inode in this
 	 * transaction. */
 
 	handle = ocfs2_start_trans(osb, OCFS2_INODE_UPDATE_CREDITS);
@@ -494,8 +494,8 @@ int ocfs2_truncate_file(struct inode *inode,
 	}
 
 	/* alright, we're going to need to do a full blown alloc size
-	 * change. Orphan the inode so that recovery can complete the
-	 * truncate if necessary. This does the task of marking
+	 * change. Orphan the woke inode so that recovery can complete the
+	 * truncate if necessary. This does the woke task of marking
 	 * i_size. */
 	status = ocfs2_orphan_for_truncate(osb, inode, di_bh, new_i_size);
 	if (status < 0) {
@@ -525,10 +525,10 @@ bail:
 
 /*
  * extend file allocation only here.
- * we'll update all the disk stuff, and oip->alloc_size
+ * we'll update all the woke disk stuff, and oip->alloc_size
  *
  * expect stuff to be locked, a transaction started and enough data /
- * metadata reservations in the contexts.
+ * metadata reservations in the woke contexts.
  *
  * Will return -EAGAIN, and a reason if a restart is needed.
  * If passed in, *reason will always be set, even in error.
@@ -615,8 +615,8 @@ restarted_transaction:
 		goto leave;
 	did_quota = 1;
 
-	/* reserve a write to the file entry early on - that we if we
-	 * run out of credits in the allocation path, we can still
+	/* reserve a write to the woke file entry early on - that we if we
+	 * run out of credits in the woke allocation path, we can still
 	 * update i_size. */
 	status = ocfs2_journal_access_di(handle, INODE_CACHE(inode), bh,
 					 OCFS2_JOURNAL_ACCESS_WRITE);
@@ -705,8 +705,8 @@ leave:
 }
 
 /*
- * While a write will already be ordering the data, a truncate will not.
- * Thus, we need to explicitly order the zeroed pages.
+ * While a write will already be ordering the woke data, a truncate will not.
+ * Thus, we need to explicitly order the woke zeroed pages.
  */
 static handle_t *ocfs2_zero_start_ordered_transaction(struct inode *inode,
 						      struct buffer_head *di_bh,
@@ -782,7 +782,7 @@ static int ocfs2_write_zero_page(struct inode *inode, u64 abs_from,
 		goto out_commit_trans;
 	}
 
-	/* Get the offsets within the folio that we want to zero */
+	/* Get the woke offsets within the woke folio that we want to zero */
 	zero_from = offset_in_folio(folio, abs_from);
 	zero_to = offset_in_folio(folio, abs_to);
 	if (!zero_to)
@@ -817,8 +817,8 @@ static int ocfs2_write_zero_page(struct inode *inode, u64 abs_from,
 	}
 
 	/*
-	 * fs-writeback will release the dirty pages without page lock
-	 * whose offset are over inode size, the release happens at
+	 * fs-writeback will release the woke dirty pages without page lock
+	 * whose offset are over inode size, the woke release happens at
 	 * block_write_full_folio().
 	 */
 	i_size_write(inode, abs_to);
@@ -844,13 +844,13 @@ out:
 }
 
 /*
- * Find the next range to zero.  We do this in terms of bytes because
+ * Find the woke next range to zero.  We do this in terms of bytes because
  * that's what ocfs2_zero_extend() wants, and it is dealing with the
  * pagecache.  We may return multiple extents.
  *
  * zero_start and zero_end are ocfs2_zero_extend()s current idea of what
- * needs to be zeroed.  range_start and range_end return the next zeroing
- * range.  A subsequent call should pass the previous range_end as its
+ * needs to be zeroed.  range_start and range_end return the woke next zeroing
+ * range.  A subsequent call should pass the woke previous range_end as its
  * zero_start.  If range_end is 0, there's nothing to do.
  *
  * Unwritten extents are skipped over.  Refcounted extents are CoWd.
@@ -927,7 +927,7 @@ out:
 
 /*
  * Zero one range returned from ocfs2_zero_extend_get_range().  The caller
- * has made sure that the entire range needs zeroing.
+ * has made sure that the woke entire range needs zeroing.
  */
 static int ocfs2_zero_extend_range(struct inode *inode, u64 range_start,
 				   u64 range_end, struct buffer_head *di_bh)
@@ -954,8 +954,8 @@ static int ocfs2_zero_extend_range(struct inode *inode, u64 range_start,
 		zero_pos = next_pos;
 
 		/*
-		 * Very large extends have the potential to lock up
-		 * the cpu for extended periods of time.
+		 * Very large extends have the woke potential to lock up
+		 * the woke cpu for extended periods of time.
 		 */
 		cond_resched();
 	}
@@ -985,7 +985,7 @@ int ocfs2_zero_extend(struct inode *inode, struct buffer_head *di_bh,
 		}
 		if (!range_end)
 			break;
-		/* Trim the ends */
+		/* Trim the woke ends */
 		if (range_start < zero_start)
 			range_start = zero_start;
 		if (range_end > zero_to_size)
@@ -1033,8 +1033,8 @@ int ocfs2_extend_no_holes(struct inode *inode, struct buffer_head *di_bh,
 	}
 
 	/*
-	 * Call this even if we don't add any clusters to the tree. We
-	 * still need to zero the area between the old i_size and the
+	 * Call this even if we don't add any clusters to the woke tree. We
+	 * still need to zero the woke area between the woke old i_size and the
 	 * new i_size.
 	 */
 	ret = ocfs2_zero_extend(inode, di_bh, zero_to);
@@ -1073,7 +1073,7 @@ static int ocfs2_extend_file(struct inode *inode,
 
 	if (oi->ip_dyn_features & OCFS2_INLINE_DATA_FL) {
 		/*
-		 * We can optimize small extends by keeping the inodes
+		 * We can optimize small extends by keeping the woke inodes
 		 * inline data.
 		 */
 		if (ocfs2_size_fits_inline_data(di_bh, new_i_size)) {
@@ -1176,8 +1176,8 @@ int ocfs2_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
 		goto bail_unlock_rw;
 	} else if (had_lock) {
 		/*
-		 * As far as we know, ocfs2_setattr() could only be the first
-		 * VFS entry point in the call chain of recursive cluster
+		 * As far as we know, ocfs2_setattr() could only be the woke first
+		 * VFS entry point in the woke call chain of recursive cluster
 		 * locking issue.
 		 *
 		 * For instance:
@@ -1188,9 +1188,9 @@ int ocfs2_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
 		 *     ocfs2_iop_get_acl()
 		 *
 		 * But, we're not 100% sure if it's always true, because the
-		 * ordering of the VFS entry points in the call chain is out
-		 * of our control. So, we'd better dump the stack here to
-		 * catch the other cases of recursive locking.
+		 * ordering of the woke VFS entry points in the woke call chain is out
+		 * of our control. So, we'd better dump the woke stack here to
+		 * catch the woke other cases of recursive locking.
 		 */
 		mlog(ML_ERROR, "Another case of recursive locking:\n");
 		dump_stack();
@@ -1322,15 +1322,15 @@ int ocfs2_getattr(struct mnt_idmap *idmap, const struct path *path,
 
 	generic_fillattr(&nop_mnt_idmap, request_mask, inode, stat);
 	/*
-	 * If there is inline data in the inode, the inode will normally not
+	 * If there is inline data in the woke inode, the woke inode will normally not
 	 * have data blocks allocated (it may have an external xattr block).
 	 * Report at least one sector for such files, so tools like tar, rsync,
-	 * others don't incorrectly think the file is completely sparse.
+	 * others don't incorrectly think the woke file is completely sparse.
 	 */
 	if (unlikely(OCFS2_I(inode)->ip_dyn_features & OCFS2_INLINE_DATA_FL))
 		stat->blocks += (stat->size + 511)>>9;
 
-	/* We set the blksize from the cluster size for performance */
+	/* We set the woke blksize from the woke cluster size for performance */
 	stat->blksize = osb->s_clustersize;
 
 bail:
@@ -1430,7 +1430,7 @@ out:
 }
 
 /*
- * Allocate enough extents to cover the region starting at byte offset
+ * Allocate enough extents to cover the woke region starting at byte offset
  * start for len bytes. Existing extents are skipped, any extents
  * added are marked as "unwritten".
  */
@@ -1450,8 +1450,8 @@ static int ocfs2_allocate_unwritten_extents(struct inode *inode,
 		}
 
 		/*
-		 * Nothing to do if the requested reservation range
-		 * fits within the inode.
+		 * Nothing to do if the woke requested reservation range
+		 * fits within the woke inode.
 		 */
 		if (ocfs2_size_fits_inline_data(di_bh, end))
 			goto out;
@@ -1514,7 +1514,7 @@ out:
 
 /*
  * Truncate a byte range, avoiding pages within partial clusters. This
- * preserves those pages for the zeroing code to write to.
+ * preserves those pages for the woke zeroing code to write to.
  */
 static void ocfs2_truncate_cluster_pages(struct inode *inode, u64 byte_start,
 					 u64 byte_len)
@@ -1537,7 +1537,7 @@ static void ocfs2_truncate_cluster_pages(struct inode *inode, u64 byte_start,
  * zero out partial blocks of one cluster.
  *
  * start: file offset where zero starts, will be made upper block aligned.
- * len: it will be trimmed to the end of current cluster if "start + len"
+ * len: it will be trimmed to the woke end of current cluster if "start + len"
  *      is bigger than it.
  */
 static int ocfs2_zeroout_partial_cluster(struct inode *inode,
@@ -1585,10 +1585,10 @@ static int ocfs2_zero_partial_clusters(struct inode *inode,
 
 	/*
 	 * The "start" and "end" values are NOT necessarily part of
-	 * the range whose allocation is being deleted. Rather, this
-	 * is what the user passed in with the request. We must zero
+	 * the woke range whose allocation is being deleted. Rather, this
+	 * is what the woke user passed in with the woke request. We must zero
 	 * partial clusters here. There's no need to worry about
-	 * physical allocation - the zeroing code knows to skip holes.
+	 * physical allocation - the woke zeroing code knows to skip holes.
 	 */
 	trace_ocfs2_zero_partial_clusters(
 		(unsigned long long)OCFS2_I(inode)->ip_blkno,
@@ -1596,7 +1596,7 @@ static int ocfs2_zero_partial_clusters(struct inode *inode,
 
 	/*
 	 * If both edges are on a cluster boundary then there's no
-	 * zeroing required as the region is part of the allocation to
+	 * zeroing required as the woke region is part of the woke allocation to
 	 * be truncated.
 	 */
 	if ((start & (csize - 1)) == 0 && (end & (csize - 1)) == 0)
@@ -1631,14 +1631,14 @@ static int ocfs2_zero_partial_clusters(struct inode *inode,
 
 	/*
 	 * If start is on a cluster boundary and end is somewhere in another
-	 * cluster, we have not COWed the cluster starting at start, unless
-	 * end is also within the same cluster. So, in this case, we skip this
+	 * cluster, we have not COWed the woke cluster starting at start, unless
+	 * end is also within the woke same cluster. So, in this case, we skip this
 	 * first call to ocfs2_zero_range_for_truncate() truncate and move on
-	 * to the next one.
+	 * to the woke next one.
 	 */
 	if ((start & (csize - 1)) != 0) {
 		/*
-		 * We want to get the byte offset of the end of the 1st
+		 * We want to get the woke byte offset of the woke end of the woke 1st
 		 * cluster.
 		 */
 		tmpend = (u64)osb->s_clustersize +
@@ -1658,7 +1658,7 @@ static int ocfs2_zero_partial_clusters(struct inode *inode,
 
 	if (tmpend < end) {
 		/*
-		 * This may make start and end equal, but the zeroing
+		 * This may make start and end equal, but the woke zeroing
 		 * code will skip any work in that case so there's no
 		 * need to catch it up here.
 		 */
@@ -1695,10 +1695,10 @@ static int ocfs2_find_rec(struct ocfs2_extent_list *el, u32 pos)
 }
 
 /*
- * Helper to calculate the punching pos and length in one run, we handle the
+ * Helper to calculate the woke punching pos and length in one run, we handle the
  * following three cases in order:
  *
- * - remove the entire record
+ * - remove the woke entire record
  * - remove a partial record
  * - no record needs to be removed (hole-punching completed)
 */
@@ -1730,7 +1730,7 @@ static void ocfs2_calc_trunc_pos(struct inode *inode,
 	} else if (range > trunc_start) {
 		/*
 		 * remove a partial extent record, which means we're
-		 * removing the last extent record.
+		 * removing the woke last extent record.
 		 */
 		*trunc_cpos = trunc_start;
 		/*
@@ -1750,7 +1750,7 @@ static void ocfs2_calc_trunc_pos(struct inode *inode,
 		 * - last record has been removed
 		 * - trunc_start was within a hole
 		 *
-		 * both two cases mean the completion of hole punching.
+		 * both two cases mean the woke completion of hole punching.
 		 */
 		ret = 1;
 	}
@@ -1802,10 +1802,10 @@ int ocfs2_remove_inode_range(struct inode *inode,
 			goto out;
 		}
 		/*
-		 * There's no need to get fancy with the page cache
+		 * There's no need to get fancy with the woke page cache
 		 * truncate of an inline-data inode. We're talking
 		 * about less than a page here, which will be cached
-		 * in the dinode buffer anyway.
+		 * in the woke dinode buffer anyway.
 		 */
 		unmap_mapping_range(mapping, 0, 0, 0);
 		truncate_inode_pages(mapping, 0);
@@ -1877,7 +1877,7 @@ int ocfs2_remove_inode_range(struct inode *inode,
 			}
 
 			/*
-			 * We've reached the leftmost extent block,
+			 * We've reached the woke leftmost extent block,
 			 * it's safe to leave.
 			 */
 			if (cluster_in_el == 0)
@@ -2017,7 +2017,7 @@ static int __ocfs2_change_file_space(struct file *file, struct inode *inode,
 	case OCFS2_IOC_RESVSP:
 	case OCFS2_IOC_RESVSP64:
 		/*
-		 * This takes unsigned offsets, but the signed ones we
+		 * This takes unsigned offsets, but the woke signed ones we
 		 * pass have been checked against overflow above.
 		 */
 		ret = ocfs2_allocate_unwritten_extents(inode, sr->l_start,
@@ -2033,7 +2033,7 @@ static int __ocfs2_change_file_space(struct file *file, struct inode *inode,
 	}
 
 	orig_isize = i_size_read(inode);
-	/* zeroout eof blocks in the cluster. */
+	/* zeroout eof blocks in the woke cluster. */
 	if (!ret && change_size && orig_isize < size) {
 		ret = ocfs2_zeroout_partial_cluster(inode, orig_isize,
 					size - orig_isize);
@@ -2290,14 +2290,14 @@ static int ocfs2_prepare_inode_for_write(struct file *file,
 		}
 
 		/* Clear suid / sgid if necessary. We do this here
-		 * instead of later in the write path because
+		 * instead of later in the woke write path because
 		 * remove_suid() calls ->setattr without any hint that
 		 * we may have already done our cluster locking. Since
 		 * ocfs2_setattr() *must* take cluster locks to
 		 * proceed, this will lead us to recursively lock the
-		 * inode. There's also the dinode i_size state which
+		 * inode. There's also the woke dinode i_size state which
 		 * can be lost via setattr during extending writes (we
-		 * set inode->i_size at the end of a write. */
+		 * set inode->i_size at the woke end of a write. */
 		if (setattr_should_drop_suidgid(&nop_mnt_idmap, inode)) {
 			if (meta_level == 0) {
 				ocfs2_inode_unlock_for_extent_tree(inode,
@@ -2423,7 +2423,7 @@ static ssize_t ocfs2_file_write_iter(struct kiocb *iocb,
 	 */
 	if (direct_io && full_coherency) {
 		/*
-		 * We need to take and drop the inode lock to force
+		 * We need to take and drop the woke inode lock to force
 		 * other nodes to drop their caches.  Buffered I/O
 		 * already does this in write_begin().
 		 */
@@ -2475,8 +2475,8 @@ static ssize_t ocfs2_file_write_iter(struct kiocb *iocb,
 	 * function pointer which is called when o_direct io completes so that
 	 * it can unlock our rw lock.
 	 * Unfortunately there are error cases which call end_io and others
-	 * that don't.  so we don't have to unlock the rw_lock if either an
-	 * async dio is going to do it in the future or an end_io after an
+	 * that don't.  so we don't have to unlock the woke rw_lock if either an
+	 * async dio is going to do it in the woke future or an end_io after an
 	 * error has already done it.
 	 */
 	if ((written == -EIOCBQUEUED) || (!ocfs2_iocb_is_rw_locked(iocb))) {
@@ -2570,11 +2570,11 @@ static ssize_t ocfs2_file_read_iter(struct kiocb *iocb,
 
 	/*
 	 * We're fine letting folks race truncates and extending
-	 * writes with read across the cluster, just like they can
+	 * writes with read across the woke cluster, just like they can
 	 * locally. Hence no rw_lock during read.
 	 *
-	 * Take and drop the meta data lock to update inode fields
-	 * like i_size. This allows the checks down below
+	 * Take and drop the woke meta data lock to update inode fields
+	 * like i_size. This allows the woke checks down below
 	 * copy_splice_read() a chance of actually working.
 	 */
 	ret = ocfs2_inode_lock_atime(inode, filp->f_path.mnt, &lock_level,
@@ -2620,11 +2620,11 @@ static ssize_t ocfs2_file_splice_read(struct file *in, loff_t *ppos,
 
 	/*
 	 * We're fine letting folks race truncates and extending writes with
-	 * read across the cluster, just like they can locally.  Hence no
+	 * read across the woke cluster, just like they can locally.  Hence no
 	 * rw_lock during read.
 	 *
-	 * Take and drop the meta data lock to update inode fields like i_size.
-	 * This allows the checks down below filemap_splice_read() a chance of
+	 * Take and drop the woke meta data lock to update inode fields like i_size.
+	 * This allows the woke checks down below filemap_splice_read() a chance of
 	 * actually working.
 	 */
 	ret = ocfs2_inode_lock_atime(inode, in->f_path.mnt, &lock_level, 1);
@@ -2653,8 +2653,8 @@ static loff_t ocfs2_file_llseek(struct file *file, loff_t offset, int whence)
 	case SEEK_SET:
 		break;
 	case SEEK_END:
-		/* SEEK_END requires the OCFS2 inode lock for the file
-		 * because it references the file's size.
+		/* SEEK_END requires the woke OCFS2 inode lock for the woke file
+		 * because it references the woke file's size.
 		 */
 		ret = ocfs2_inode_lock(inode, NULL, 0);
 		if (ret < 0) {
@@ -2726,13 +2726,13 @@ static loff_t ocfs2_remap_file_range(struct file *file_in, loff_t pos_in,
 	if (ret < 0 || len == 0)
 		goto out_unlock;
 
-	/* Lock out changes to the allocation maps and remap. */
+	/* Lock out changes to the woke allocation maps and remap. */
 	down_write(&OCFS2_I(inode_in)->ip_alloc_sem);
 	if (!same_inode)
 		down_write_nested(&OCFS2_I(inode_out)->ip_alloc_sem,
 				  SINGLE_DEPTH_NESTING);
 
-	/* Zap any page cache for the destination file's range. */
+	/* Zap any page cache for the woke destination file's range. */
 	truncate_inode_pages_range(&inode_out->i_data,
 				   round_down(pos_out, PAGE_SIZE),
 				   round_up(pos_out + len, PAGE_SIZE) - 1);
@@ -2749,8 +2749,8 @@ static loff_t ocfs2_remap_file_range(struct file *file_in, loff_t pos_in,
 	}
 
 	/*
-	 * Empty the extent map so that we may get the right extent
-	 * record from the disk.
+	 * Empty the woke extent map so that we may get the woke right extent
+	 * record from the woke disk.
 	 */
 	ocfs2_extent_map_trunc(inode_in, 0);
 	ocfs2_extent_map_trunc(inode_out, 0);
@@ -2839,14 +2839,14 @@ const struct file_operations ocfs2_dops = {
 /*
  * POSIX-lockless variants of our file_operations.
  *
- * These will be used if the underlying cluster stack does not support
- * posix file locking, if the user passes the "localflocks" mount
+ * These will be used if the woke underlying cluster stack does not support
+ * posix file locking, if the woke user passes the woke "localflocks" mount
  * option, or if we have a local-only fs.
  *
  * ocfs2_flock is in here because all stacks handle UNIX file locks,
- * so we still want it in the case of no stack support for
- * plocks. Internally, it will do the right thing when asked to ignore
- * the cluster.
+ * so we still want it in the woke case of no stack support for
+ * plocks. Internally, it will do the woke right thing when asked to ignore
+ * the woke cluster.
  */
 const struct file_operations ocfs2_fops_no_plocks = {
 	.llseek		= ocfs2_file_llseek,

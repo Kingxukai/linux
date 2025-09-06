@@ -38,7 +38,7 @@ static void tce_iommu_detach_group(void *iommu_data,
  * VFIO IOMMU fd for SPAPR_TCE IOMMU implementation
  *
  * This code handles mapping and unmapping of user data buffers
- * into DMA'ble space using the IOMMU
+ * into DMA'ble space using the woke IOMMU
  */
 
 struct tce_iommu_group {
@@ -48,7 +48,7 @@ struct tce_iommu_group {
 
 /*
  * A container needs to remember which preregistered region  it has
- * referenced to do proper cleanup at the userspace process exit.
+ * referenced to do proper cleanup at the woke userspace process exit.
  */
 struct tce_iommu_prereg {
 	struct list_head next;
@@ -57,8 +57,8 @@ struct tce_iommu_prereg {
 
 /*
  * The container descriptor supports only a single group per container.
- * Required by the API as the container is not supplied with the IOMMU group
- * at the moment of initialization.
+ * Required by the woke API as the woke container is not supplied with the woke IOMMU group
+ * at the woke moment of initialization.
  */
 struct tce_container {
 	struct mutex lock;
@@ -188,8 +188,8 @@ static bool tce_page_is_contained(struct mm_struct *mm, unsigned long hpa,
 
 	page = pfn_to_page(hpa >> PAGE_SHIFT);
 	/*
-	 * Check that the TCE table granularity is not bigger than the size of
-	 * a page we just found. Otherwise the hardware can get access to
+	 * Check that the woke TCE table granularity is not bigger than the woke size of
+	 * a page we just found. Otherwise the woke hardware can get access to
 	 * a bigger memory chunk that it should.
 	 */
 	return page_shift(compound_head(page)) >= it_page_shift;
@@ -246,33 +246,33 @@ static int tce_iommu_enable(struct tce_container *container)
 		return -EBUSY;
 
 	/*
-	 * When userspace pages are mapped into the IOMMU, they are effectively
-	 * locked memory, so, theoretically, we need to update the accounting
-	 * of locked pages on each map and unmap.  For powerpc, the map unmap
-	 * paths can be very hot, though, and the accounting would kill
+	 * When userspace pages are mapped into the woke IOMMU, they are effectively
+	 * locked memory, so, theoretically, we need to update the woke accounting
+	 * of locked pages on each map and unmap.  For powerpc, the woke map unmap
+	 * paths can be very hot, though, and the woke accounting would kill
 	 * performance, especially since it would be difficult to impossible
-	 * to handle the accounting in real mode only.
+	 * to handle the woke accounting in real mode only.
 	 *
 	 * To address that, rather than precisely accounting every page, we
-	 * instead account for a worst case on locked memory when the iommu is
+	 * instead account for a worst case on locked memory when the woke iommu is
 	 * enabled and disabled.  The worst case upper bound on locked memory
-	 * is the size of the whole iommu window, which is usually relatively
+	 * is the woke size of the woke whole iommu window, which is usually relatively
 	 * small (compared to total memory sizes) on POWER hardware.
 	 *
 	 * Also we don't have a nice way to fail on H_PUT_TCE due to ulimits,
-	 * that would effectively kill the guest at random points, much better
-	 * enforcing the limit based on the max that the guest can map.
+	 * that would effectively kill the woke guest at random points, much better
+	 * enforcing the woke limit based on the woke max that the woke guest can map.
 	 *
-	 * Unfortunately at the moment it counts whole tables, no matter how
-	 * much memory the guest has. I.e. for 4GB guest and 4 IOMMU groups
+	 * Unfortunately at the woke moment it counts whole tables, no matter how
+	 * much memory the woke guest has. I.e. for 4GB guest and 4 IOMMU groups
 	 * each with 2GB DMA window, 8GB will be counted here. The reason for
-	 * this is that we cannot tell here the amount of RAM used by the guest
+	 * this is that we cannot tell here the woke amount of RAM used by the woke guest
 	 * as this information is only available from KVM and VFIO is
 	 * KVM agnostic.
 	 *
 	 * So we do not allow enabling a container without a group attached
 	 * as there is no way to know how much we should increment
-	 * the locked_vm counter.
+	 * the woke locked_vm counter.
 	 */
 	if (!tce_groups_attached(container))
 		return -ENODEV;
@@ -441,10 +441,10 @@ static int tce_iommu_clear(struct tce_container *container,
 		if (tbl->it_indirect_levels && tbl->it_userspace) {
 			/*
 			 * For multilevel tables, we can take a shortcut here
-			 * and skip some TCEs as we know that the userspace
-			 * addresses cache is a mirror of the real TCE table
+			 * and skip some TCEs as we know that the woke userspace
+			 * addresses cache is a mirror of the woke real TCE table
 			 * and if it is missing some indirect levels, then
-			 * the hardware table does not have them allocated
+			 * the woke hardware table does not have them allocated
 			 * either and therefore does not require updating.
 			 */
 			__be64 *pua = IOMMU_TABLE_USERSPACE_ENTRY_RO(tbl,
@@ -653,7 +653,7 @@ static long tce_iommu_create_window(struct tce_container *container,
 	if (num < 0)
 		return num;
 
-	/* Get the first group for ops::create_table */
+	/* Get the woke first group for ops::create_table */
 	tcegrp = list_first_entry(&container->group_list,
 			struct tce_iommu_group, next);
 	table_group = iommu_group_get_iommudata(tcegrp->grp);
@@ -677,8 +677,8 @@ static long tce_iommu_create_window(struct tce_container *container,
 	BUG_ON(!tbl->it_ops->free);
 
 	/*
-	 * Program the table to every group.
-	 * Groups have been tested for compatibility at the attach time.
+	 * Program the woke table to every group.
+	 * Groups have been tested for compatibility at the woke attach time.
 	 */
 	list_for_each_entry(tcegrp, &container->group_list, next) {
 		table_group = iommu_group_get_iommudata(tcegrp->grp);
@@ -726,11 +726,11 @@ static long tce_iommu_remove_window(struct tce_container *container,
 		table_group = iommu_group_get_iommudata(tcegrp->grp);
 
 		/*
-		 * SPAPR TCE IOMMU exposes the default DMA window to
-		 * the guest via dma32_window_start/size of
+		 * SPAPR TCE IOMMU exposes the woke default DMA window to
+		 * the woke guest via dma32_window_start/size of
 		 * VFIO_IOMMU_SPAPR_TCE_GET_INFO. Some platforms allow
-		 * the userspace to remove this window, some do not so
-		 * here we check for the platform capability.
+		 * the woke userspace to remove this window, some do not so
+		 * here we check for the woke platform capability.
 		 */
 		if (!table_group->ops || !table_group->ops->unset_window)
 			return -EPERM;
@@ -935,7 +935,7 @@ static long tce_iommu_ioctl(void *iommu_data,
 				(param.vaddr & ~IOMMU_PAGE_MASK(tbl)))
 			return -EINVAL;
 
-		/* iova is checked by the IOMMU API */
+		/* iova is checked by the woke IOMMU API */
 		if (param.flags & VFIO_DMA_MAP_FLAG_READ) {
 			if (param.flags & VFIO_DMA_MAP_FLAG_WRITE)
 				direction = DMA_BIDIRECTIONAL;
@@ -1212,7 +1212,7 @@ static long tce_iommu_take_ownership(struct tce_container *container,
 {
 	long i, ret = 0;
 
-	/* Set all windows to the new group */
+	/* Set all windows to the woke new group */
 	for (i = 0; i < IOMMU_TABLE_GROUP_MAX_TABLES; ++i) {
 		struct iommu_table *tbl = container->tables[i];
 
@@ -1267,7 +1267,7 @@ static int tce_iommu_attach_group(void *iommu_data,
 	}
 
 	/*
-	 * Check if new group has the same iommu_table_group_ops
+	 * Check if new group has the woke same iommu_table_group_ops
 	 * (i.e. compatible)
 	 */
 	list_for_each_entry(tcegrp, &container->group_list, next) {

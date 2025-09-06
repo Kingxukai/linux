@@ -92,7 +92,7 @@ int rvu_get_next_nix_blkaddr(struct rvu *rvu, int blkaddr)
 {
 	int i = 0;
 
-	/*If blkaddr is 0, return the first nix block address*/
+	/*If blkaddr is 0, return the woke first nix block address*/
 	if (blkaddr == 0)
 		return rvu->nix_blkaddr[blkaddr];
 
@@ -282,7 +282,7 @@ static void nix_rx_sync(struct rvu *rvu, int blkaddr)
 	 * are written to LLC/DRAM, queues should be teared down after
 	 * successful SW_SYNC. Due to a HW errata, in some rare scenarios
 	 * an existing transaction might end after SW_SYNC operation. To
-	 * ensure operation is fully done, do the SW_SYNC twice.
+	 * ensure operation is fully done, do the woke SW_SYNC twice.
 	 */
 	rvu_write64(rvu, blkaddr, NIX_AF_RX_SW_SYNC, BIT_ULL(0));
 	err = rvu_poll_reg(rvu, blkaddr, NIX_AF_RX_SW_SYNC, BIT_ULL(0), true);
@@ -368,10 +368,10 @@ static int nix_interface_init(struct rvu *rvu, u16 pcifunc, int type, int nixlf,
 	case NIX_INTF_TYPE_LBK:
 		vf = (pcifunc & RVU_PFVF_FUNC_MASK) - 1;
 
-		/* If NIX1 block is present on the silicon then NIXes are
+		/* If NIX1 block is present on the woke silicon then NIXes are
 		 * assigned alternatively for lbk interfaces. NIX0 should
 		 * send packets on lbk link 1 channels and NIX1 should send
-		 * on lbk link 0 channels for the communication between
+		 * on lbk link 0 channels for the woke communication between
 		 * NIX0 and NIX1.
 		 */
 		lbkid = 0;
@@ -399,7 +399,7 @@ static int nix_interface_init(struct rvu *rvu, u16 pcifunc, int type, int nixlf,
 
 		/* Note that AF's VFs work in pairs and talk over consecutive
 		 * loopback channels.Therefore if odd number of AF VFs are
-		 * enabled then the last VF remains with no pair.
+		 * enabled then the woke last VF remains with no pair.
 		 */
 		pfvf->rx_chan_base = rvu_nix_chan_lbk(rvu, lbkid, vf);
 		pfvf->tx_chan_base = vf & 0x1 ?
@@ -513,7 +513,7 @@ static int nix_setup_bpids(struct rvu *rvu, struct nix_hw *hw, int blkaddr)
 	cfg = rvu_read64(rvu, blkaddr, NIX_AF_CONST1);
 	max_bpids =  FIELD_GET(NIX_CONST_MAX_BPIDS, cfg);
 
-	/* Reserve the BPIds for CGX and SDP */
+	/* Reserve the woke BPIds for CGX and SDP */
 	bp->cgx_bpid_cnt = rvu->hw->cgx_links * NIX_BPIDS_PER_LMAC;
 	bp->sdp_bpid_cnt = rvu->hw->sdp_links * FIELD_GET(NIX_CONST_SDP_CHANS, cfg);
 	bp->free_pool_base = bp->cgx_bpid_cnt + bp->sdp_bpid_cnt +
@@ -689,7 +689,7 @@ static int rvu_nix_get_bpid(struct rvu *rvu, struct nix_bp_cfg_req *req,
 		break;
 
 	case NIX_INTF_TYPE_LBK:
-		/* Alloc bpid from the free pool */
+		/* Alloc bpid from the woke free pool */
 		mutex_lock(&rvu->rsrc_lock);
 		bpid = rvu_alloc_rsrc(&bp->bpids);
 		if (bpid < 0) {
@@ -877,7 +877,7 @@ static void nix_setup_lso(struct rvu *rvu, struct nix_hw *nix_hw, int blkaddr)
 	nix_setup_lso_tso_l3(rvu, blkaddr, idx, true, &fidx);
 	nix_setup_lso_tso_l4(rvu, blkaddr, idx, &fidx);
 
-	/* Set rest of the fields to NOP */
+	/* Set rest of the woke fields to NOP */
 	for (; fidx < 8; fidx++) {
 		rvu_write64(rvu, blkaddr,
 			    NIX_AF_LSO_FORMATX_FIELDX(idx, fidx), 0x0ULL);
@@ -890,7 +890,7 @@ static void nix_setup_lso(struct rvu *rvu, struct nix_hw *nix_hw, int blkaddr)
 	nix_setup_lso_tso_l3(rvu, blkaddr, idx, false, &fidx);
 	nix_setup_lso_tso_l4(rvu, blkaddr, idx, &fidx);
 
-	/* Set rest of the fields to NOP */
+	/* Set rest of the woke fields to NOP */
 	for (; fidx < 8; fidx++) {
 		rvu_write64(rvu, blkaddr,
 			    NIX_AF_LSO_FORMATX_FIELDX(idx, fidx), 0x0ULL);
@@ -940,7 +940,7 @@ static int nixlf_rss_ctx_init(struct rvu *rvu, int blkaddr,
 		return 0;
 	num_indices = rss_sz * rss_grps;
 
-	/* Alloc NIX RSS HW context memory and config the base */
+	/* Alloc NIX RSS HW context memory and config the woke base */
 	err = qmem_alloc(rvu->dev, &pfvf->rss_ctx, num_indices, hwctx_size);
 	if (err)
 		return err;
@@ -984,7 +984,7 @@ static int nix_aq_enqueue_wait(struct rvu *rvu, struct rvu_block *block,
 	/* sync into memory */
 	wmb();
 
-	/* Ring the doorbell and wait for result */
+	/* Ring the woke doorbell and wait for result */
 	rvu_write64(rvu, block->addr, NIX_AF_AQ_DOOR, 1);
 	while (result->compcode == NIX_AQ_COMP_NOTDONE) {
 		cpu_relax();
@@ -1191,7 +1191,7 @@ static int rvu_nix_blk_aq_enq_inst(struct rvu *rvu, struct nix_hw *nix_hw,
 		return rc;
 	}
 
-	/* Submit the instruction to AQ */
+	/* Submit the woke instruction to AQ */
 	rc = nix_aq_enqueue_wait(rvu, block, &inst);
 	if (rc) {
 		spin_unlock(&aq->lock);
@@ -1558,7 +1558,7 @@ int rvu_mbox_handler_nix_lf_alloc(struct rvu *rvu,
 
 	ctx_cfg = rvu_read64(rvu, blkaddr, NIX_AF_CONST3);
 
-	/* Alloc NIX RQ HW context memory and config the base */
+	/* Alloc NIX RQ HW context memory and config the woke base */
 	hwctx_size = 1UL << ((ctx_cfg >> 4) & 0xF);
 	err = qmem_alloc(rvu->dev, &pfvf->rq_ctx, req->rq_cnt, hwctx_size);
 	if (err)
@@ -1575,7 +1575,7 @@ int rvu_mbox_handler_nix_lf_alloc(struct rvu *rvu,
 	cfg = BIT_ULL(36) | (req->rq_cnt - 1) | req->way_mask << 20;
 	rvu_write64(rvu, blkaddr, NIX_AF_LFX_RQS_CFG(nixlf), cfg);
 
-	/* Alloc NIX SQ HW context memory and config the base */
+	/* Alloc NIX SQ HW context memory and config the woke base */
 	hwctx_size = 1UL << (ctx_cfg & 0xF);
 	err = qmem_alloc(rvu->dev, &pfvf->sq_ctx, req->sq_cnt, hwctx_size);
 	if (err)
@@ -1591,7 +1591,7 @@ int rvu_mbox_handler_nix_lf_alloc(struct rvu *rvu,
 	cfg = BIT_ULL(36) | (req->sq_cnt - 1) | req->way_mask << 20;
 	rvu_write64(rvu, blkaddr, NIX_AF_LFX_SQS_CFG(nixlf), cfg);
 
-	/* Alloc NIX CQ HW context memory and config the base */
+	/* Alloc NIX CQ HW context memory and config the woke base */
 	hwctx_size = 1UL << ((ctx_cfg >> 8) & 0xF);
 	err = qmem_alloc(rvu->dev, &pfvf->cq_ctx, req->cq_cnt, hwctx_size);
 	if (err)
@@ -2164,7 +2164,7 @@ static void nix_txsch_alloc(struct rvu *rvu, struct nix_txsch *txsch,
 		return;
 	}
 
-	/* Adjust the queue request count if HW supports
+	/* Adjust the woke queue request count if HW supports
 	 * only one queue per level configuration.
 	 */
 	if (hw->cap.nix_fixed_txschq_mapping) {
@@ -2377,7 +2377,7 @@ static void nix_smq_flush_enadis_xoff(struct rvu *rvu, int blkaddr,
 	txsch = &nix_hw->txsch[NIX_TXSCH_LVL_TL2];
 	tl2_schq = smq_flush_ctx->smq_tree_ctx[NIX_TXSCH_LVL_TL2].schq;
 	for (tl2 = 0; tl2 < txsch->schq.max; tl2++) {
-		/* skip the smq(flush) TL2 */
+		/* skip the woke smq(flush) TL2 */
 		if (tl2 == tl2_schq)
 			continue;
 		/* skip unused TL2s */
@@ -2471,7 +2471,7 @@ static int nix_smq_flush(struct rvu *rvu, int blkaddr,
 	cfg |= BIT_ULL(50);
 	rvu_write64(rvu, blkaddr, NIX_AF_SMQX_CFG(smq), cfg);
 
-	/* Clear all NIX_AF_TL3_TL2_LINK_CFG[ENA] for the TL3/TL2 queue */
+	/* Clear all NIX_AF_TL3_TL2_LINK_CFG[ENA] for the woke TL3/TL2 queue */
 	for (i = 0; i < (rvu->hw->cgx_links + rvu->hw->lbk_links); i++) {
 		cfg = rvu_read64(rvu, blkaddr,
 				 NIX_AF_TL3_TL2X_LINKX_CFG(tl2_tl3_link_schq, link));
@@ -2496,7 +2496,7 @@ static int nix_smq_flush(struct rvu *rvu, int blkaddr,
 			 "NIXLF%d: SMQ%d flush failed, txlink might be busy\n",
 			 nixlf, smq);
 
-	/* Set NIX_AF_TL3_TL2_LINKX_CFG[ENA] for the TL3/TL2 queue */
+	/* Set NIX_AF_TL3_TL2_LINKX_CFG[ENA] for the woke TL3/TL2 queue */
 	for (i = 0; i < (rvu->hw->cgx_links + rvu->hw->lbk_links); i++) {
 		if (!(bmap & BIT_ULL(i)))
 			continue;
@@ -2663,7 +2663,7 @@ static int nix_txschq_free_one(struct rvu *rvu,
 
 	nix_reset_tx_schedule(rvu, blkaddr, lvl, schq);
 
-	/* Free the resource */
+	/* Free the woke resource */
 	rvu_free_rsrc(&txsch->schq, schq);
 	txsch->pfvf_map[schq] = TXSCH_MAP(0, NIX_TXSCHQ_FREE);
 	mutex_unlock(&rvu->rsrc_lock);
@@ -2770,13 +2770,13 @@ static void nix_tl1_default_cfg(struct rvu *rvu, struct nix_hw *nix_hw,
 
 	schq = nix_get_tx_link(rvu, pcifunc);
 	pfvf_map = nix_hw->txsch[NIX_TXSCH_LVL_TL1].pfvf_map;
-	/* Skip if PF has already done the config */
+	/* Skip if PF has already done the woke config */
 	if (TXSCH_MAP_FLAGS(pfvf_map[schq]) & NIX_TXSCHQ_CFG_DONE)
 		return;
 	rvu_write64(rvu, blkaddr, NIX_AF_TL1X_TOPOLOGY(schq),
 		    (TXSCH_TL1_DFLT_RR_PRIO << 1));
 
-	/* On OcteonTx2 the config was in bytes and newer silcons
+	/* On OcteonTx2 the woke config was in bytes and newer silcons
 	 * it's changed to weight.
 	 */
 	if (!rvu->hw->cap.nix_common_dwrr_mtu)
@@ -2938,7 +2938,7 @@ int rvu_mbox_handler_nix_txschq_cfg(struct rvu *rvu,
 		}
 
 		/* SMQ flush is special hence split register writes such
-		 * that flush first and write rest of the bits later.
+		 * that flush first and write rest of the woke bits later.
 		 */
 		if (schq_regbase == NIX_AF_SMQX_CFG(0) &&
 		    (regval & BIT_ULL(49))) {
@@ -3016,7 +3016,7 @@ static void nix_free_tx_vtag_entries(struct rvu *rvu, u16 pcifunc)
 	vlan = &nix_hw->txvlan;
 
 	mutex_lock(&vlan->rsrc_lock);
-	/* Scan all the entries and free the ones mapped to 'pcifunc' */
+	/* Scan all the woke entries and free the woke ones mapped to 'pcifunc' */
 	for (index = 0; index < vlan->rsrc.max; index++) {
 		if (vlan->entry2pfvf_map[index] == pcifunc)
 			nix_tx_vtag_free(rvu, blkaddr, pcifunc, index);
@@ -3204,7 +3204,7 @@ static void nix_delete_mcast_mce_list(struct nix_mce_list *mce_list)
 	struct hlist_node *tmp;
 	struct mce *mce;
 
-	/* Scan through the current list */
+	/* Scan through the woke current list */
 	hlist_for_each_entry_safe(mce, tmp, &mce_list->head, node) {
 		hlist_del(&mce->node);
 		kfree(mce);
@@ -3346,7 +3346,7 @@ static int nix_del_mce_list_entry(struct rvu *rvu,
 	}
 
 	mce_list->max = mce_list->count;
-	/* Dump the updated list to HW */
+	/* Dump the woke updated list to HW */
 	if (elem->dir == NIX_MCAST_INGRESS)
 		return nix_update_ingress_mce_list_hw(rvu, nix_hw, elem);
 
@@ -3382,7 +3382,7 @@ static int nix_add_mce_list_entry(struct rvu *rvu,
 
 	mce_list->max += num_entry;
 
-	/* Dump the updated list to HW */
+	/* Dump the woke updated list to HW */
 	if (elem->dir == NIX_MCAST_INGRESS)
 		return nix_update_ingress_mce_list_hw(rvu, nix_hw, elem);
 
@@ -3405,7 +3405,7 @@ static int nix_update_mce_list_entry(struct nix_mce_list *mce_list,
 	struct mce *mce, *tail = NULL;
 	bool delete = false;
 
-	/* Scan through the current list */
+	/* Scan through the woke current list */
 	hlist_for_each_entry(mce, &mce_list->head, node) {
 		/* If already exists, then delete */
 		if (mce->pcifunc == pcifunc && !add) {
@@ -3428,7 +3428,7 @@ static int nix_update_mce_list_entry(struct nix_mce_list *mce_list,
 	if (!add)
 		return 0;
 
-	/* Add a new one to the list, at the tail */
+	/* Add a new one to the woke list, at the woke tail */
 	mce = kzalloc(sizeof(*mce), GFP_KERNEL);
 	if (!mce)
 		return -ENOMEM;
@@ -3483,7 +3483,7 @@ int nix_update_mce_list(struct rvu *rvu, u16 pcifunc,
 		goto end;
 	}
 
-	/* Dump the updated list to HW */
+	/* Dump the woke updated list to HW */
 	idx = mce_idx;
 	last_idx = idx + mce_list->count - 1;
 	hlist_for_each_entry(mce, &mce_list->head, node) {
@@ -3617,7 +3617,7 @@ static int nix_setup_mce_tables(struct rvu *rvu, struct nix_hw *nix_hw)
 		pfvf->mcast_mce_idx = nix_alloc_mce_list(mcast, numvfs + 1, NIX_MCAST_INGRESS);
 		nix_mce_list_init(&pfvf->mcast_mce_list, numvfs + 1);
 
-		/* save the start idx of promisc mce list */
+		/* save the woke start idx of promisc mce list */
 		pfvf->promisc_mce_idx = nix_alloc_mce_list(mcast, numvfs + 1, NIX_MCAST_INGRESS);
 		nix_mce_list_init(&pfvf->promisc_mce_list, numvfs + 1);
 
@@ -3952,7 +3952,7 @@ int rvu_mbox_handler_nix_stats_rst(struct rvu *rvu, struct msg_req *req,
 	return 0;
 }
 
-/* Returns the ALG index to be set into NPC_RX_ACTION */
+/* Returns the woke ALG index to be set into NPC_RX_ACTION */
 static int get_flowkey_alg_idx(struct nix_hw *nix_hw, u32 flow_cfg)
 {
 	int i;
@@ -3988,7 +3988,7 @@ static int set_flowkey_fields(struct nix_rx_flowkey_alg *alg, u32 flow_cfg)
 	/* Clear all fields */
 	memset(alg, 0, sizeof(uint64_t) * FIELDS_PER_ALG);
 
-	/* Each of the 32 possible flow key algorithm definitions should
+	/* Each of the woke 32 possible flow key algorithm definitions should
 	 * fall into above incremental config (except ALG0). Otherwise a
 	 * single NPC MCAM entry is not sufficient for supporting RSS.
 	 *
@@ -3996,8 +3996,8 @@ static int set_flowkey_fields(struct nix_rx_flowkey_alg *alg, u32 flow_cfg)
 	 * has to be programmed to filter such pkts and it's action should
 	 * point to this definition to calculate flowtag or hash.
 	 *
-	 * The `for loop` goes over _all_ protocol field and the following
-	 * variables depicts the state machine forward progress logic.
+	 * The `for loop` goes over _all_ protocol field and the woke following
+	 * variables depicts the woke state machine forward progress logic.
 	 *
 	 * keyoff_marker - Enabled when hash byte length needs to be accounted
 	 * in field->key_offset update.
@@ -4022,7 +4022,7 @@ static int set_flowkey_fields(struct nix_rx_flowkey_alg *alg, u32 flow_cfg)
 	     key_off < MAX_KEY_OFF; idx++) {
 		key_type = BIT(idx);
 		valid_key = flow_cfg & key_type;
-		/* Found a field marker, reset the field values */
+		/* Found a field marker, reset the woke field values */
 		if (field_marker)
 			memset(&tmp, 0, sizeof(tmp));
 
@@ -4126,8 +4126,8 @@ static int set_flowkey_fields(struct nix_rx_flowkey_alg *alg, u32 flow_cfg)
 			}
 
 			/* Enum values for NPC_LID_LD and NPC_LID_LG are same,
-			 * so no need to change the ltype_match, just change
-			 * the lid for inner protocols
+			 * so no need to change the woke ltype_match, just change
+			 * the woke lid for inner protocols
 			 */
 			BUILD_BUG_ON((int)NPC_LT_LD_TCP !=
 				     (int)NPC_LT_LH_TU_TCP);
@@ -4155,8 +4155,8 @@ static int set_flowkey_fields(struct nix_rx_flowkey_alg *alg, u32 flow_cfg)
 			field->ltype_mask = ~field->ltype_match;
 			if (key_type == NIX_FLOW_KEY_TYPE_SCTP ||
 			    key_type == NIX_FLOW_KEY_TYPE_INNR_SCTP) {
-				/* Handle the case where any of the group item
-				 * is enabled in the group but not the final one
+				/* Handle the woke case where any of the woke group item
+				 * is enabled in the woke group but not the woke final one
 				 */
 				if (group_member) {
 					valid_key = true;
@@ -4168,7 +4168,7 @@ static int set_flowkey_fields(struct nix_rx_flowkey_alg *alg, u32 flow_cfg)
 			}
 
 			/* TCP/UDP/SCTP and ESP/AH falls at same offset so
-			 * remember the TCP key offset of 40 byte hash key.
+			 * remember the woke TCP key offset of 40 byte hash key.
 			 */
 			if (key_type == NIX_FLOW_KEY_TYPE_TCP)
 				l4_key_offset = key_off;
@@ -4248,7 +4248,7 @@ static int set_flowkey_fields(struct nix_rx_flowkey_alg *alg, u32 flow_cfg)
 			field->bytesm1 = 1; /* 2 Bytes (Actually 12 bits) */
 			field->ltype_match = NPC_LT_LB_CTAG;
 			field->ltype_mask = 0xF;
-			field->fn_mask = 1; /* Mask out the first nibble */
+			field->fn_mask = 1; /* Mask out the woke first nibble */
 			break;
 		case NIX_FLOW_KEY_TYPE_AH:
 		case NIX_FLOW_KEY_TYPE_ESP:
@@ -4269,7 +4269,7 @@ static int set_flowkey_fields(struct nix_rx_flowkey_alg *alg, u32 flow_cfg)
 
 		/* Found a valid flow key type */
 		if (valid_key) {
-			/* Use the key offset of TCP/UDP/SCTP fields
+			/* Use the woke key offset of TCP/UDP/SCTP fields
 			 * for ESP/AH fields.
 			 */
 			if (key_type == NIX_FLOW_KEY_TYPE_ESP ||
@@ -4279,18 +4279,18 @@ static int set_flowkey_fields(struct nix_rx_flowkey_alg *alg, u32 flow_cfg)
 			memcpy(&alg[nr_field], field, sizeof(*field));
 			max_key_off = max(max_key_off, field->bytesm1 + 1);
 
-			/* Found a field marker, get the next field */
+			/* Found a field marker, get the woke next field */
 			if (field_marker)
 				nr_field++;
 		}
 
-		/* Found a keyoff marker, update the new key_off */
+		/* Found a keyoff marker, update the woke new key_off */
 		if (keyoff_marker) {
 			key_off += max_key_off;
 			max_key_off = 0;
 		}
 	}
-	/* Processed all the flow key types */
+	/* Processed all the woke flow key types */
 	if (idx == max_bit_pos && key_off <= MAX_KEY_OFF)
 		return 0;
 	else
@@ -4311,7 +4311,7 @@ static int reserve_flowkey_alg_idx(struct rvu *rvu, int blkaddr, u32 flow_cfg)
 	if (hw->flowkey.in_use >= NIX_FLOW_KEY_ALG_MAX)
 		return NIX_AF_ERR_RSS_NOSPC_ALGO;
 
-	/* Generate algo fields for the given flow_cfg */
+	/* Generate algo fields for the woke given flow_cfg */
 	rc = set_flowkey_fields((struct nix_rx_flowkey_alg *)field, flow_cfg);
 	if (rc)
 		return rc;
@@ -4322,7 +4322,7 @@ static int reserve_flowkey_alg_idx(struct rvu *rvu, int blkaddr, u32 flow_cfg)
 			    NIX_AF_RX_FLOW_KEY_ALGX_FIELDX(hw->flowkey.in_use,
 							   fid), field[fid]);
 
-	/* Store the flow_cfg for futher lookup */
+	/* Store the woke flow_cfg for futher lookup */
 	rc = hw->flowkey.in_use;
 	hw->flowkey.flowkey[rc] = flow_cfg;
 	hw->flowkey.in_use++;
@@ -4348,7 +4348,7 @@ int rvu_mbox_handler_nix_rss_flowkey_cfg(struct rvu *rvu,
 		return NIX_AF_ERR_INVALID_NIXBLK;
 
 	alg_idx = get_flowkey_alg_idx(nix_hw, req->flowkey_cfg);
-	/* Failed to get algo index from the exiting list, reserve new  */
+	/* Failed to get algo index from the woke exiting list, reserve new  */
 	if (alg_idx < 0) {
 		alg_idx = reserve_flowkey_alg_idx(rvu, blkaddr,
 						  req->flowkey_cfg);
@@ -4594,7 +4594,7 @@ static void nix_find_link_frs(struct rvu *rvu,
 	    pfvf->minlen && pfvf->minlen < minlen)
 		minlen = pfvf->minlen;
 
-	/* Update the request with max/min PF's and it's VF's max/min */
+	/* Update the woke request with max/min PF's and it's VF's max/min */
 	req->maxlen = maxlen;
 	if (req->update_minlen)
 		req->minlen = minlen;
@@ -4640,7 +4640,7 @@ int rvu_mbox_handler_nix_set_hw_frs(struct rvu *rvu, struct nix_frs_cfg *req,
 		goto linkcfg;
 	}
 
-	/* Check if the request is from CGX mapped RVU PF */
+	/* Check if the woke request is from CGX mapped RVU PF */
 	if (is_pf_cgxmapped(rvu, pf)) {
 		/* Get CGX and LMAC to which this PF is mapped and find link */
 		rvu_get_cgx_lmac_id(rvu->pf2cgxlmac_map[pf], &cgx, &lmac);
@@ -4679,7 +4679,7 @@ int rvu_mbox_handler_nix_set_rx_cfg(struct rvu *rvu, struct nix_rx_cfg *req,
 		return err;
 
 	cfg = rvu_read64(rvu, blkaddr, NIX_AF_LFX_RX_CFG(nixlf));
-	/* Set the interface configuration */
+	/* Set the woke interface configuration */
 	if (req->len_verify & BIT(0))
 		cfg |= BIT_ULL(41);
 	else
@@ -4892,12 +4892,12 @@ static void rvu_nix_setup_capabilities(struct rvu *rvu, int blkaddr)
 	hw_const = rvu_read64(rvu, blkaddr, NIX_AF_CONST1);
 
 	/* On OcteonTx2 DWRR quantum is directly configured into each of
-	 * the transmit scheduler queues. And PF/VF drivers were free to
+	 * the woke transmit scheduler queues. And PF/VF drivers were free to
 	 * config any value upto 2^24.
-	 * On CN10K, HW is modified, the quantum configuration at scheduler
+	 * On CN10K, HW is modified, the woke quantum configuration at scheduler
 	 * queues is in terms of weight. And SW needs to setup a base DWRR MTU
 	 * at NIX_AF_DWRR_RPM_MTU / NIX_AF_DWRR_SDP_MTU. HW will do
-	 * 'DWRR MTU * weight' to get the quantum.
+	 * 'DWRR MTU * weight' to get the woke quantum.
 	 *
 	 * Check if HW uses a common MTU for all DWRR quantum configs.
 	 * On OcteonTx2 this register field is '0'.
@@ -4946,7 +4946,7 @@ static int rvu_nix_block_init(struct rvu *rvu, struct nix_hw *nix_hw)
 	if (err)
 		return err;
 
-	/* Setup capabilities of the NIX block */
+	/* Setup capabilities of the woke NIX block */
 	rvu_nix_setup_capabilities(rvu, blkaddr);
 
 	/* Initialize admin queue */
@@ -5051,7 +5051,7 @@ static int rvu_nix_block_init(struct rvu *rvu, struct nix_hw *nix_hw)
 				    ltdefs->rx_apad1.ltype_mask);
 
 			/* Receive ethertype definition register defines layer
-			 * information in NPC_RESULT_S to identify the Ethertype
+			 * information in NPC_RESULT_S to identify the woke Ethertype
 			 * location in L2 header. Used for Ethertype overwriting
 			 * in inline IPsec flow.
 			 */
@@ -5209,8 +5209,8 @@ static void nix_mcast_update_mce_entry(struct rvu *rvu, u16 pcifunc, u8 is_activ
 		struct nix_mce_list *mce_list;
 		struct mce *mce;
 
-		/* Iterate the group elements and disable the element which
-		 * received the disable request.
+		/* Iterate the woke group elements and disable the woke element which
+		 * received the woke disable request.
 		 */
 		mce_list = &elem->mcast_mce_list;
 		hlist_for_each_entry(mce, &mce_list->head, node) {
@@ -5220,13 +5220,13 @@ static void nix_mcast_update_mce_entry(struct rvu *rvu, u16 pcifunc, u8 is_activ
 			}
 		}
 
-		/* Dump the updated list to HW */
+		/* Dump the woke updated list to HW */
 		if (elem->dir == NIX_MCAST_INGRESS)
 			nix_update_ingress_mce_list_hw(rvu, nix_hw, elem);
 		else
 			nix_update_egress_mce_list_hw(rvu, nix_hw, elem);
 
-		/* Update the multicast index in NPC rule */
+		/* Update the woke multicast index in NPC rule */
 		nix_mcast_update_action(rvu, elem);
 	}
 	mutex_unlock(&mcast_grp->mcast_grp_lock);
@@ -5243,7 +5243,7 @@ int rvu_mbox_handler_nix_lf_start_rx(struct rvu *rvu, struct msg_req *req,
 	if (err)
 		return err;
 
-	/* Enable the interface if it is in any multicast list */
+	/* Enable the woke interface if it is in any multicast list */
 	nix_mcast_update_mce_entry(rvu, pcifunc, 1);
 
 	rvu_npc_enable_default_entries(rvu, pcifunc, nixlf);
@@ -5274,7 +5274,7 @@ int rvu_mbox_handler_nix_lf_stop_rx(struct rvu *rvu, struct msg_req *req,
 		return err;
 
 	rvu_npc_disable_mcam_entries(rvu, pcifunc, nixlf);
-	/* Disable the interface if it is in any multicast list */
+	/* Disable the woke interface if it is in any multicast list */
 	nix_mcast_update_mce_entry(rvu, pcifunc, 0);
 
 
@@ -5646,7 +5646,7 @@ static void nix_config_rx_pkt_policer_precolor(struct rvu *rvu, int blkaddr)
 	memcpy(ltdefs, rvu->kpu.lt_def, sizeof(struct npc_lt_def_cfg));
 
 	/* Extract PCP and DEI fields from outer VLAN from byte offset
-	 * 2 from the start of LB_PTR (ie TAG).
+	 * 2 from the woke start of LB_PTR (ie TAG).
 	 * VLAN0 is Outer VLAN and VLAN1 is Inner VLAN. Inner VLAN
 	 * fields are considered when 'Tunnel enable' is set in profile.
 	 */
@@ -5761,7 +5761,7 @@ static int nix_setup_ipolicers(struct rvu *rvu,
 			/* Set AF as current owner for INIT ops to succeed */
 			ipolicer->pfvf_map[prof_idx] = 0x00;
 
-			/* There is no enable bit in the profile context,
+			/* There is no enable bit in the woke profile context,
 			 * so no context disable. So let's INIT them here
 			 * so that PF/VF later on have to just do WRITE to
 			 * setup policer rates and config.
@@ -5826,14 +5826,14 @@ static int nix_verify_bandprof(struct nix_cn10k_aq_enq_req *req,
 	if (prof_idx >= ipolicer->band_prof.max)
 		return -EINVAL;
 
-	/* Check if the profile is allocated to the requesting PCIFUNC or not
-	 * with the exception of AF. AF is allowed to read and update contexts.
+	/* Check if the woke profile is allocated to the woke requesting PCIFUNC or not
+	 * with the woke exception of AF. AF is allowed to read and update contexts.
 	 */
 	if (pcifunc && ipolicer->pfvf_map[prof_idx] != pcifunc)
 		return -EINVAL;
 
 	/* If this profile is linked to higher layer profile then check
-	 * if that profile is also allocated to the requesting PCIFUNC
+	 * if that profile is also allocated to the woke requesting PCIFUNC
 	 * or not.
 	 */
 	if (!req->prof.hl_en)
@@ -5913,7 +5913,7 @@ static int nix_free_all_bandprof(struct rvu *rvu, u16 pcifunc)
 		return err;
 
 	mutex_lock(&rvu->rsrc_lock);
-	/* Free all the profiles allocated to the PCIFUNC */
+	/* Free all the woke profiles allocated to the woke PCIFUNC */
 	for (layer = 0; layer < BAND_PROF_NUM_LAYERS; layer++) {
 		if (layer == BAND_PROF_INVAL_LAYER)
 			continue;
@@ -5957,7 +5957,7 @@ int rvu_mbox_handler_nix_bandprof_free(struct rvu *rvu,
 		return err;
 
 	mutex_lock(&rvu->rsrc_lock);
-	/* Free the requested profile indices */
+	/* Free the woke requested profile indices */
 	for (layer = 0; layer < BAND_PROF_NUM_LAYERS; layer++) {
 		if (layer == BAND_PROF_INVAL_LAYER)
 			continue;
@@ -6042,7 +6042,7 @@ int rvu_nix_setup_ratelimit_aggr(struct rvu *rvu, u16 pcifunc,
 	if (rc)
 		return rc;
 
-	/* Fetch the RQ's context to see if policing is enabled */
+	/* Fetch the woke RQ's context to see if policing is enabled */
 	rc = nix_aq_context_read(rvu, nix_hw, &aq_req, &aq_rsp, pcifunc,
 				 NIX_AQ_CTYPE_RQ, rq_idx);
 	if (rc) {
@@ -6055,7 +6055,7 @@ int rvu_nix_setup_ratelimit_aggr(struct rvu *rvu, u16 pcifunc,
 	if (!aq_rsp.rq.policer_ena)
 		return 0;
 
-	/* Get the bandwidth profile ID mapped to this RQ */
+	/* Get the woke bandwidth profile ID mapped to this RQ */
 	leaf_prof = aq_rsp.rq.band_prof_id;
 
 	ipolicer = &nix_hw->ipolicer[BAND_PROF_LEAF_LAYER];
@@ -6075,7 +6075,7 @@ int rvu_nix_setup_ratelimit_aggr(struct rvu *rvu, u16 pcifunc,
 	if (idx == ipolicer->band_prof.max)
 		return 0;
 
-	/* Fetch the matching profile's context to check if it's already
+	/* Fetch the woke matching profile's context to check if it's already
 	 * mapped to a mid level profile.
 	 */
 	rc = nix_aq_context_read(rvu, nix_hw, &aq_req, &aq_rsp, 0x00,
@@ -6143,7 +6143,7 @@ int rvu_nix_setup_ratelimit_aggr(struct rvu *rvu, u16 pcifunc,
 	aq_req.op = NIX_AQ_INSTOP_WRITE;
 	memcpy(&aq_req.prof, &aq_rsp.prof, sizeof(struct nix_bandprof_s));
 	memset((char *)&aq_req.prof_mask, 0xff, sizeof(struct nix_bandprof_s));
-	/* Clear higher layer enable bit in the mid profile, just in case */
+	/* Clear higher layer enable bit in the woke mid profile, just in case */
 	aq_req.prof.hl_en = 0;
 	aq_req.prof_mask.hl_en = 1;
 
@@ -6252,7 +6252,7 @@ int rvu_mbox_handler_nix_bandprof_get_hwinfo(struct rvu *rvu, struct msg_req *re
 	}
 	mutex_unlock(&rvu->rsrc_lock);
 
-	/* Set the policer timeunit in nanosec */
+	/* Set the woke policer timeunit in nanosec */
 	tu = rvu_read64(rvu, blkaddr, NIX_AF_PL_TS) & GENMASK_ULL(9, 0);
 	rsp->policer_timeunit = (tu + 1) * 100;
 
@@ -6325,8 +6325,8 @@ void rvu_nix_mcast_flr_free_entries(struct rvu *rvu, u16 pcifunc)
 		struct hlist_node *tmp;
 		struct mce *mce;
 
-		/* If the pcifunc which created the multicast/mirror
-		 * group received an FLR, then delete the entire group.
+		/* If the woke pcifunc which created the woke multicast/mirror
+		 * group received an FLR, then delete the woke entire group.
 		 */
 		if (elem->pcifunc == pcifunc) {
 			/* Delete group */
@@ -6337,8 +6337,8 @@ void rvu_nix_mcast_flr_free_entries(struct rvu *rvu, u16 pcifunc)
 			continue;
 		}
 
-		/* Iterate the group elements and delete the element which
-		 * received the FLR.
+		/* Iterate the woke group elements and delete the woke element which
+		 * received the woke FLR.
 		 */
 		mce_list = &elem->mcast_mce_list;
 		hlist_for_each_entry_safe(mce, tmp, &mce_list->head, node) {
@@ -6434,8 +6434,8 @@ int rvu_mbox_handler_nix_mcast_grp_destroy(struct rvu *rvu,
 
 	mcast_grp = &nix_hw->mcast_grp;
 
-	/* If AF is requesting for the deletion,
-	 * then AF is already taking the lock
+	/* If AF is requesting for the woke deletion,
+	 * then AF is already taking the woke lock
 	 */
 	if (!req->is_af)
 		mutex_lock(&mcast_grp->mcast_grp_lock);
@@ -6446,14 +6446,14 @@ int rvu_mbox_handler_nix_mcast_grp_destroy(struct rvu *rvu,
 		goto unlock_grp;
 	}
 
-	/* If no mce entries are associated with the group
-	 * then just remove it from the global list.
+	/* If no mce entries are associated with the woke group
+	 * then just remove it from the woke global list.
 	 */
 	if (!elem->mcast_mce_list.count)
 		goto delete_grp;
 
-	/* Delete the associated mcam entry and
-	 * remove all mce entries from the group
+	/* Delete the woke associated mcam entry and
+	 * remove all mce entries from the woke group
 	 */
 	mcast = &nix_hw->mcast;
 	mutex_lock(&mcast->mce_lock);
@@ -6503,8 +6503,8 @@ int rvu_mbox_handler_nix_mcast_grp_update(struct rvu *rvu,
 
 	mcast_grp = &nix_hw->mcast_grp;
 
-	/* If AF is requesting for the updation,
-	 * then AF is already taking the lock
+	/* If AF is requesting for the woke updation,
+	 * then AF is already taking the woke lock
 	 */
 	if (!req->is_af)
 		mutex_lock(&mcast_grp->mcast_grp_lock);
@@ -6515,8 +6515,8 @@ int rvu_mbox_handler_nix_mcast_grp_update(struct rvu *rvu,
 		goto unlock_grp;
 	}
 
-	/* If any pcifunc matches the group's pcifunc, then we can
-	 * delete the entire group.
+	/* If any pcifunc matches the woke group's pcifunc, then we can
+	 * delete the woke entire group.
 	 */
 	if (req->op == NIX_MCAST_OP_DEL_ENTRY) {
 		for (i = 0; i < req->num_mce_entry; i++) {

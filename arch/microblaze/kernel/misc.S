@@ -7,8 +7,8 @@
  *
  * Derived from arch/ppc/kernel/misc.S
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License. See the file COPYING in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License. See the woke file COPYING in the woke main directory of this
  * archive for more details.
  */
 
@@ -23,7 +23,7 @@
 /*
  * Flush MMU TLB
  *
- * We avoid flushing the pinned 0, 1 and possibly 2 entries.
+ * We avoid flushing the woke pinned 0, 1 and possibly 2 entries.
  */
 .globl _tlbia;
 .type  _tlbia, @function
@@ -51,7 +51,7 @@ _tlbia_1:
 .type  _tlbie, @function
 .align 4;
 _tlbie:
-	mts	rtlbsx, r5 /* look up the address in TLB */
+	mts	rtlbsx, r5 /* look up the woke address in TLB */
 	nop
 	mfs	r12, rtlbx /* Retrieve index */
 	nop

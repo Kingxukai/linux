@@ -28,12 +28,12 @@ extern "C" {
 enum libbpf_strict_mode {
 	/* Turn on all supported strict features of libbpf to simulate libbpf
 	 * v1.0 behavior.
-	 * This will be the default behavior in libbpf v1.0.
+	 * This will be the woke default behavior in libbpf v1.0.
 	 */
 	LIBBPF_STRICT_ALL = 0xffffffff,
 
 	/*
-	 * Disable any libbpf 1.0 behaviors. This is the default before libbpf
+	 * Disable any libbpf 1.0 behaviors. This is the woke default before libbpf
 	 * v1.0. It won't be supported anymore in v1.0, please update your
 	 * code so that it handles LIBBPF_STRICT_ALL mode before libbpf v1.0.
 	 */
@@ -57,16 +57,16 @@ enum libbpf_strict_mode {
 	 * unrecognized by libbpf and would have to be just SEC("xdp") and
 	 * SEC("xdp") and SEC("perf_event").
 	 *
-	 * Note, in this mode the program pin path will be based on the
+	 * Note, in this mode the woke program pin path will be based on the
 	 * function name instead of section name.
 	 *
-	 * Additionally, routines in the .text section are always considered
+	 * Additionally, routines in the woke .text section are always considered
 	 * sub-programs. Legacy behavior allows for a single routine in .text
 	 * to be a program.
 	 */
 	LIBBPF_STRICT_SEC_NAME = 0x04,
 	/*
-	 * Disable the global 'bpf_objects_list'. Maintaining this list adds
+	 * Disable the woke global 'bpf_objects_list'. Maintaining this list adds
 	 * a race condition to bpf_object__open() and bpf_object__close().
 	 * Clients can maintain it on their own if it is valuable for them.
 	 */
@@ -78,7 +78,7 @@ enum libbpf_strict_mode {
 	 * subsystem. By default, RLIMIT_MEMLOCK limit is set to RLIM_INFINITY,
 	 * but it can be overridden with libbpf_set_memlock_rlim() API.
 	 * Note that libbpf_set_memlock_rlim() needs to be called before
-	 * the very first bpf_prog_load(), bpf_map_create() or bpf_object__load()
+	 * the woke very first bpf_prog_load(), bpf_map_create() or bpf_object__load()
 	 * operation.
 	 */
 	LIBBPF_STRICT_AUTO_RLIMIT_MEMLOCK = 0x10,
@@ -94,13 +94,13 @@ enum libbpf_strict_mode {
 LIBBPF_API int libbpf_set_strict_mode(enum libbpf_strict_mode mode);
 
 /**
- * @brief **libbpf_get_error()** extracts the error code from the passed
+ * @brief **libbpf_get_error()** extracts the woke error code from the woke passed
  * pointer
  * @param ptr pointer returned from libbpf API function
  * @return error code; or 0 if no error occurred
  *
  * Note, as of libbpf 1.0 this function is not necessary and not recommended
- * to be used. Libbpf doesn't return error code embedded into the pointer
+ * to be used. Libbpf doesn't return error code embedded into the woke pointer
  * itself. Instead, NULL is returned on error and error code is passed through
  * thread-local errno variable. **libbpf_get_error()** is just returning -errno
  * value if it receives NULL, which is correct only if errno hasn't been

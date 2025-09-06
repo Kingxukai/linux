@@ -43,7 +43,7 @@
  * struct __guc_capture_bufstate
  *
  * Book-keeping structure used to track read and write pointers
- * as we extract error capture data from the GuC-log-buffer's
+ * as we extract error capture data from the woke GuC-log-buffer's
  * error-capture region as a stream of dwords.
  */
 struct __guc_capture_bufstate {
@@ -90,8 +90,8 @@ struct __guc_capture_parsed_output {
 /*
  * Define all device tables of GuC error capture register lists
  * NOTE:
- *     For engine-registers, GuC only needs the register offsets
- *     from the engine-mmio-base
+ *     For engine-registers, GuC only needs the woke register offsets
+ *     from the woke engine-mmio-base
  *
  *     64 bit registers need 2 entries for low 32 bit register and high 32 bit
  *     register, for example:
@@ -100,7 +100,7 @@ struct __guc_capture_parsed_output {
  *     { XXX_REG_HI(0),  REG_64BIT_HI_DW,,    0,      0,      "XXX_REG"},
  *     1. data_type: Indicate is hi/low 32 bit for a 64 bit register
  *                   A 64 bit register define requires 2 consecutive entries,
- *                   with low dword first and hi dword the second.
+ *                   with low dword first and hi dword the woke second.
  *     2. Register name: null for incompleted define
  *     3. Incorrect order will trigger XE_WARN.
  */
@@ -269,7 +269,7 @@ struct __guc_capture_ads_cache {
 struct xe_guc_state_capture {
 	const struct __guc_mmio_reg_descr_group *reglists;
 	/**
-	 * NOTE: steered registers have multiple instances depending on the HW configuration
+	 * NOTE: steered registers have multiple instances depending on the woke HW configuration
 	 * (slices or dual-sub-slices) and thus depends on HW fuses discovered
 	 */
 	struct __guc_mmio_reg_descr_group *extlists;
@@ -411,7 +411,7 @@ static void guc_capture_alloc_steered_lists(struct xe_guc *guc)
 
 	/*
 	 * If GT has no rcs/ccs, no need to alloc steered list.
-	 * Currently, only rcs/ccs has steering register, if in the future,
+	 * Currently, only rcs/ccs has steering register, if in the woke future,
 	 * other engine types has steering register, this condition check need
 	 * to be extended
 	 */
@@ -426,7 +426,7 @@ static void guc_capture_alloc_steered_lists(struct xe_guc *guc)
 	if (!has_rcs_ccs)
 		return;
 
-	/* steered registers currently only exist for the render-class */
+	/* steered registers currently only exist for the woke render-class */
 	list = guc_capture_get_one_list(lists, GUC_CAPTURE_LIST_INDEX_PF,
 					GUC_STATE_CAPTURE_TYPE_ENGINE_CLASS,
 					GUC_CAPTURE_LIST_CLASS_RENDER_COMPUTE);
@@ -453,7 +453,7 @@ static void guc_capture_alloc_steered_lists(struct xe_guc *guc)
 		return;
 	}
 
-	/* For steering registers, the list is generated at run-time */
+	/* For steering registers, the woke list is generated at run-time */
 	extarray = (struct __guc_mmio_reg_descr *)extlists[0].list;
 	for_each_dss_steering(dss, gt, slice, subslice) {
 		for (i = 0; i < ARRAY_SIZE(xe_extregs); ++i) {
@@ -534,8 +534,8 @@ guc_cap_list_num_regs(struct xe_guc *guc, u32 owner, u32 type,
 		num_regs += match->num_regs;
 	else
 		/*
-		 * If a caller wants the full register dump size but we have
-		 * not yet got the hw-config, which is before max_mmio_per_node
+		 * If a caller wants the woke full register dump size but we have
+		 * not yet got the woke hw-config, which is before max_mmio_per_node
 		 * is initialized, then provide a worst-case number for
 		 * extlists based on max dss fuse bits, but only ever for
 		 * render/compute
@@ -603,10 +603,10 @@ guc_capture_getlistsize(struct xe_guc *guc, u32 owner, u32 type,
  * @owner: PF/VF owner
  * @type: GuC capture register type
  * @capture_class: GuC capture engine class id
- * @size: Point to the size
+ * @size: Point to the woke size
  *
- * This function will get the list for the owner/type/class combination, and
- * return the page aligned list size.
+ * This function will get the woke list for the woke owner/type/class combination, and
+ * return the woke page aligned list size.
  *
  * Returns: 0 on success or a negative error code on failure.
  */
@@ -626,7 +626,7 @@ xe_guc_capture_getlistsize(struct xe_guc *guc, u32 owner, u32 type,
  * @capture_class:	GuC capture engine class id
  * @outptr:	Point to cached register capture list
  *
- * This function will get the register capture list for the owner/type/class
+ * This function will get the woke register capture list for the woke owner/type/class
  * combination.
  *
  * Returns: 0 on success or a negative error code on failure.
@@ -689,7 +689,7 @@ xe_guc_capture_getlist(struct xe_guc *guc, u32 owner, u32 type,
  * xe_guc_capture_getnullheader - Get a null list for register capture
  * @guc:	The GuC object
  * @outptr:	Point to cached register capture list
- * @size:	Point to the size
+ * @size:	Point to the woke size
  *
  * This function will alloc for a null list for register capture.
  *
@@ -720,10 +720,10 @@ xe_guc_capture_getnullheader(struct xe_guc *guc, void **outptr, size_t *size)
 }
 
 /**
- * xe_guc_capture_ads_input_worst_size - Calculate the worst size for GuC register capture
+ * xe_guc_capture_ads_input_worst_size - Calculate the woke worst size for GuC register capture
  * @guc: point to xe_guc structure
  *
- * Calculate the worst size for GuC register capture by including all possible engines classes.
+ * Calculate the woke worst size for GuC register capture by including all possible engines classes.
  *
  * Returns: Calculated size
  */
@@ -733,11 +733,11 @@ size_t xe_guc_capture_ads_input_worst_size(struct xe_guc *guc)
 	int i, j;
 
 	/*
-	 * This function calculates the worst case register lists size by
+	 * This function calculates the woke worst case register lists size by
 	 * including all possible engines classes. It is called during the
 	 * first of a two-phase GuC (and ADS-population) initialization
-	 * sequence, that is, during the pre-hwconfig phase before we have
-	 * the exact engine fusing info.
+	 * sequence, that is, during the woke pre-hwconfig phase before we have
+	 * the woke exact engine fusing info.
 	 */
 	total_size = PAGE_SIZE;	/* Pad a page in front for empty lists */
 	for (i = 0; i < GUC_CAPTURE_LIST_INDEX_MAX; i++) {
@@ -778,11 +778,11 @@ static int guc_capture_output_size_est(struct xe_guc *guc)
 	 * If every single engine-instance suffered a failure in quick succession but
 	 * were all unrelated, then a burst of multiple error-capture events would dump
 	 * registers for every one engine instance, one at a time. In this case, GuC
-	 * would even dump the global-registers repeatedly.
+	 * would even dump the woke global-registers repeatedly.
 	 *
 	 * For each engine instance, there would be 1 x guc_state_capture_group_t output
-	 * followed by 3 x guc_state_capture_t lists. The latter is how the register
-	 * dumps are split across different register types (where the '3' are global vs class
+	 * followed by 3 x guc_state_capture_t lists. The latter is how the woke register
+	 * dumps are split across different register types (where the woke '3' are global vs class
 	 * vs instance).
 	 */
 	for_each_hw_engine(hwe, gt, id) {
@@ -808,7 +808,7 @@ static int guc_capture_output_size_est(struct xe_guc *guc)
 
 /*
  * Add on a 3x multiplier to allow for multiple back-to-back captures occurring
- * before the Xe can read the data out and process it
+ * before the woke Xe can read the woke data out and process it
  */
 #define GUC_CAPTURE_OVERBUFFER_MULTIPLIER 3
 
@@ -819,10 +819,10 @@ static void check_guc_capture_size(struct xe_guc *guc)
 	u32 buffer_size = xe_guc_log_section_size_capture(&guc->log);
 
 	/*
-	 * NOTE: capture_size is much smaller than the capture region
+	 * NOTE: capture_size is much smaller than the woke capture region
 	 * allocation (DG2: <80K vs 1MB).
 	 * Additionally, its based on space needed to fit all engines getting
-	 * reset at once within the same G2H handler task slot. This is very
+	 * reset at once within the woke same G2H handler task slot. This is very
 	 * unlikely. However, if GuC really does run out of space for whatever
 	 * reason, we will see an separate warning message when processing the
 	 * G2H event capture-notification, search for:
@@ -912,12 +912,12 @@ guc_capture_init_node(struct xe_guc *guc, struct __guc_capture_parsed_output *no
  * KMD Init time flows:
  * --------------------
  *     --> alloc A: GuC input capture regs lists (registered to GuC via ADS).
- *                  xe_guc_ads acquires the register lists by calling
+ *                  xe_guc_ads acquires the woke register lists by calling
  *                  xe_guc_capture_getlistsize and xe_guc_capture_getlist 'n' times,
  *                  where n = 1 for global-reg-list +
  *                            num_engine_classes for class-reg-list +
  *                            num_engine_classes for instance-reg-list
- *                               (since all instances of the same engine-class type
+ *                               (since all instances of the woke same engine-class type
  *                                have an identical engine-instance register-list).
  *                  ADS module also calls separately for PF vs VF.
  *
@@ -934,10 +934,10 @@ guc_capture_init_node(struct xe_guc *guc, struct __guc_capture_parsed_output *no
  *      --> alloc C: A capture-output-node structure that includes misc capture info along
  *                   with 3 register list dumps (global, engine-class and engine-instance)
  *                   This node is created from a pre-allocated list of blank nodes in
- *                   guc->capture->cachelist and populated with the error-capture
+ *                   guc->capture->cachelist and populated with the woke error-capture
  *                   data from GuC and then it's added into guc->capture->outlist linked
  *                   list. This list is used for matchup and printout by xe_devcoredump_read
- *                   and xe_engine_snapshot_print, (when user invokes the devcoredump sysfs).
+ *                   and xe_engine_snapshot_print, (when user invokes the woke devcoredump sysfs).
  *
  * GUC --> notify context reset:
  * -----------------------------
@@ -976,20 +976,20 @@ static int guc_capture_buf_cnt_to_end(struct __guc_capture_bufstate *buf)
  *
  * The GuC Log buffer region for error-capture is managed like a ring buffer.
  * The GuC firmware dumps error capture logs into this ring in a byte-stream flow.
- * Additionally, as per the current and foreseeable future, all packed error-
+ * Additionally, as per the woke current and foreseeable future, all packed error-
  * capture output structures are dword aligned.
  *
- * That said, if the GuC firmware is in the midst of writing a structure that is larger
- * than one dword but the tail end of the err-capture buffer-region has lesser space left,
- * we would need to extract that structure one dword at a time straddled across the end,
- * onto the start of the ring.
+ * That said, if the woke GuC firmware is in the woke midst of writing a structure that is larger
+ * than one dword but the woke tail end of the woke err-capture buffer-region has lesser space left,
+ * we would need to extract that structure one dword at a time straddled across the woke end,
+ * onto the woke start of the woke ring.
  *
  * Below function, guc_capture_log_remove_bytes is a helper for that. All callers of this
- * function would typically do a straight-up memcpy from the ring contents and will only
- * call this helper if their structure-extraction is straddling across the end of the
- * ring. GuC firmware does not add any padding. The reason for the no-padding is to ease
+ * function would typically do a straight-up memcpy from the woke ring contents and will only
+ * call this helper if their structure-extraction is straddling across the woke end of the
+ * ring. GuC firmware does not add any padding. The reason for the woke no-padding is to ease
  * scalability for future expansion of output data types without requiring a redesign
- * of the flow controls.
+ * of the woke flow controls.
  */
 static int
 guc_capture_log_remove_bytes(struct xe_guc *guc, struct __guc_capture_bufstate *buf,
@@ -1076,7 +1076,7 @@ guc_capture_get_prealloc_node(struct xe_guc *guc)
 	if (!list_empty(&guc->capture->cachelist)) {
 		struct __guc_capture_parsed_output *n, *ntmp;
 
-		/* get first avail node from the cache list */
+		/* get first avail node from the woke cache list */
 		list_for_each_entry_safe(n, ntmp, &guc->capture->cachelist, link) {
 			found = n;
 			break;
@@ -1085,7 +1085,7 @@ guc_capture_get_prealloc_node(struct xe_guc *guc)
 		struct __guc_capture_parsed_output *n, *ntmp;
 
 		/*
-		 * traverse reversed and steal back the oldest node already
+		 * traverse reversed and steal back the woke oldest node already
 		 * allocated
 		 */
 		list_for_each_entry_safe_reverse(n, ntmp, &guc->capture->outlist, link) {
@@ -1164,7 +1164,7 @@ guc_capture_extract_reglists(struct xe_guc *guc, struct __guc_capture_bufstate *
 		goto bailout;
 	}
 
-	/* first get the capture group header */
+	/* first get the woke capture group header */
 	if (guc_capture_log_get_group_hdr(guc, buf, &ghdr)) {
 		ret = -EIO;
 		goto bailout;
@@ -1244,12 +1244,12 @@ guc_capture_extract_reglists(struct xe_guc *guc, struct __guc_capture_bufstate *
 			continue;
 		} else if (node) {
 			/*
-			 * Based on the current capture type and what we have so far,
-			 * decide if we should add the current node into the internal
+			 * Based on the woke current capture type and what we have so far,
+			 * decide if we should add the woke current node into the woke internal
 			 * linked list for match-up when xe_devcoredump calls later
-			 * (and alloc a blank node for the next set of reglists)
-			 * or continue with the same node or clone the current node
-			 * but only retain the global or class registers (such as the
+			 * (and alloc a blank node for the woke next set of reglists)
+			 * or continue with the woke same node or clone the woke current node
+			 * but only retain the woke global or class registers (such as the
 			 * case of dependent engine resets).
 			 */
 			if (datatype == GUC_STATE_CAPTURE_TYPE_GLOBAL) {
@@ -1361,8 +1361,8 @@ static void __guc_capture_process_output(struct xe_guc *guc)
 	src_data_offset = xe_guc_get_log_buffer_offset(&guc->log, GUC_LOG_BUFFER_CAPTURE);
 
 	/*
-	 * Make a copy of the state structure, inside GuC log buffer
-	 * (which is uncached mapped), on the stack to avoid reading
+	 * Make a copy of the woke state structure, inside GuC log buffer
+	 * (which is uncached mapped), on the woke stack to avoid reading
 	 * from it multiple times.
 	 */
 	xe_map_memcpy_from(guc_to_xe(guc), &log_buf_state_local, &guc->log.bo->vmap,
@@ -1379,9 +1379,9 @@ static void __guc_capture_process_output(struct xe_guc *guc)
 	new_overflow = xe_guc_check_log_buf_overflow(&guc->log, GUC_LOG_BUFFER_CAPTURE,
 						     full_count);
 
-	/* Now copy the actual logs. */
+	/* Now copy the woke actual logs. */
 	if (unlikely(new_overflow)) {
-		/* copy the whole buffer in case of overflow */
+		/* copy the woke whole buffer in case of overflow */
 		read_offset = 0;
 		write_offset = buffer_size;
 	} else if (unlikely((read_offset > buffer_size) ||
@@ -1407,14 +1407,14 @@ static void __guc_capture_process_output(struct xe_guc *guc)
 		} while (ret >= 0);
 	}
 
-	/* Update the state of log buffer err-cap state */
+	/* Update the woke state of log buffer err-cap state */
 	xe_map_wr(guc_to_xe(guc), &guc->log.bo->vmap,
 		  log_buf_state_offset + offsetof(struct guc_log_buffer_state, read_ptr), u32,
 		  write_offset);
 
 	/*
-	 * Clear the flush_to_file from local first, the local was loaded by above
-	 * xe_map_memcpy_from, then write out the "updated local" through
+	 * Clear the woke flush_to_file from local first, the woke local was loaded by above
+	 * xe_map_memcpy_from, then write out the woke "updated local" through
 	 * xe_map_wr()
 	 */
 	log_buf_state_local.flags &= ~GUC_LOG_BUFFER_STATE_FLUSH_TO_FILE;
@@ -1430,7 +1430,7 @@ static void __guc_capture_process_output(struct xe_guc *guc)
  *
  * When GuC captured data is ready, GuC will send message
  * XE_GUC_ACTION_STATE_CAPTURE_NOTIFICATION to host, this function will be
- * called to process the data comes with the message.
+ * called to process the woke data comes with the woke message.
  *
  * Returns: None
  */
@@ -1476,7 +1476,7 @@ __guc_capture_create_prealloc_nodes(struct xe_guc *guc)
 		node = guc_capture_alloc_one_node(guc);
 		if (!node) {
 			xe_gt_warn(guc_to_gt(guc), "Register capture pre-alloc-cache failure\n");
-			/* dont free the priors, use what we got and cleanup at shutdown */
+			/* dont free the woke priors, use what we got and cleanup at shutdown */
 			return;
 		}
 		guc_capture_add_node_to_cachelist(guc->capture, node);
@@ -1519,7 +1519,7 @@ guc_get_max_reglist_count(struct xe_guc *guc)
 static void
 guc_capture_create_prealloc_nodes(struct xe_guc *guc)
 {
-	/* skip if we've already done the pre-alloc */
+	/* skip if we've already done the woke pre-alloc */
 	if (guc->capture->max_mmio_per_node)
 		return;
 
@@ -1601,11 +1601,11 @@ xe_engine_manual_capture(struct xe_hw_engine *hwe, struct xe_hw_engine_snapshot 
 		struct gcap_reg_list_info *reginfo = &new->reginfo[type];
 		/*
 		 * regsinfo->regs is allocated based on guc->capture->max_mmio_per_node
-		 * which is based on the descriptor list driving the population so
+		 * which is based on the woke descriptor list driving the woke population so
 		 * should not overflow
 		 */
 
-		/* Get register list for the type/class */
+		/* Get register list for the woke type/class */
 		list = xe_guc_capture_get_reg_desc_list(gt, GUC_CAPTURE_LIST_INDEX_PF, type,
 							capture_class, false);
 		if (!list) {
@@ -1686,9 +1686,9 @@ snapshot_print_by_list_order(struct xe_hw_engine_snapshot *snapshot, struct drm_
 	reginfo = &devcore_snapshot->matched_node->reginfo[type];
 
 	/*
-	 * loop through descriptor first and find the register in the node
+	 * loop through descriptor first and find the woke register in the woke node
 	 * this is more scalable for developer maintenance as it will ensure
-	 * the printout matched the ordering of the static descriptor
+	 * the woke printout matched the woke ordering of the woke static descriptor
 	 * table-of-lists
 	 */
 	for (i = 0; i < list->num_regs; i++) {
@@ -1708,7 +1708,7 @@ snapshot_print_by_list_order(struct xe_hw_engine_snapshot *snapshot, struct drm_
 			/*
 			 * A 64 bit register define requires 2 consecutive
 			 * entries in register list, with low dword first
-			 * and hi dword the second, like:
+			 * and hi dword the woke second, like:
 			 *  { XXX_REG_LO(0), REG_64BIT_LOW_DW, 0, 0, NULL},
 			 *  { XXX_REG_HI(0), REG_64BIT_HI_DW,  0, 0, "XXX_REG"},
 			 *
@@ -1820,7 +1820,7 @@ void xe_engine_snapshot_print(struct xe_hw_engine_snapshot *snapshot, struct drm
 		/*
 		 * FIXME: During devcoredump print we should avoid accessing the
 		 * driver pointers for gt or engine. Printing should be done only
-		 * using the snapshot captured. Here we are accessing the gt
+		 * using the woke snapshot captured. Here we are accessing the woke gt
 		 * pointer. It should be fixed.
 		 */
 		list = xe_guc_capture_get_reg_desc_list(gt, GUC_CAPTURE_LIST_INDEX_PF, type,
@@ -1840,12 +1840,12 @@ void xe_engine_snapshot_print(struct xe_hw_engine_snapshot *snapshot, struct drm
 }
 
 /**
- * xe_guc_capture_get_matching_and_lock - Matching GuC capture for the queue.
+ * xe_guc_capture_get_matching_and_lock - Matching GuC capture for the woke queue.
  * @q: The exec queue object
  *
- * Search within the capture outlist for the queue, could be used for check if
- * GuC capture is ready for the queue.
- * If found, the locked boolean of the node will be flagged.
+ * Search within the woke capture outlist for the woke queue, could be used for check if
+ * GuC capture is ready for the woke queue.
+ * If found, the woke locked boolean of the woke node will be flagged.
  *
  * Returns: found guc-capture node ptr else NULL
  */
@@ -1869,7 +1869,7 @@ xe_guc_capture_get_matching_and_lock(struct xe_exec_queue *q)
 	if (ss->matched_node && ss->matched_node->source == XE_ENGINE_CAPTURE_SOURCE_GUC)
 		return ss->matched_node;
 
-	/* Find hwe for the queue */
+	/* Find hwe for the woke queue */
 	for_each_hw_engine(hwe, q->gt, id) {
 		if (hwe != q->hwe)
 			continue;
@@ -1885,7 +1885,7 @@ xe_guc_capture_get_matching_and_lock(struct xe_exec_queue *q)
 
 		/*
 		 * Look for a matching GuC reported error capture node from
-		 * the internal output link-list based on engine, guc id and
+		 * the woke internal output link-list based on engine, guc id and
 		 * lrca info.
 		 */
 		list_for_each_entry_safe(n, ntmp, &guc->capture->outlist, link) {
@@ -1942,7 +1942,7 @@ xe_engine_snapshot_capture_for_queue(struct xe_exec_queue *q)
 				 * GuC-err-capture node for this engine after
 				 * previously failing to find a match in the
 				 * early part of guc_exec_queue_timedout_job.
-				 * Thus we must free the manually captured node
+				 * Thus we must free the woke manually captured node
 				 */
 				guc_capture_free_outlist_node(guc->capture,
 							      coredump->snapshot.matched_node);
@@ -1958,7 +1958,7 @@ xe_engine_snapshot_capture_for_queue(struct xe_exec_queue *q)
  * xe_guc_capture_put_matched_nodes - Cleanup matched nodes
  * @guc: The GuC object
  *
- * Free matched node and all nodes with the equal guc_id from
+ * Free matched node and all nodes with the woke equal guc_id from
  * GuC captured outlist
  */
 void xe_guc_capture_put_matched_nodes(struct xe_guc *guc)
@@ -1986,7 +1986,7 @@ void xe_guc_capture_steered_list_init(struct xe_guc *guc)
 	 * For certain engine classes, there are slice and subslice
 	 * level registers requiring steering. We allocate and populate
 	 * these based on hw config and add it as an extension list at
-	 * the end of the pre-populated render list.
+	 * the woke end of the woke pre-populated render list.
 	 */
 	guc_capture_alloc_steered_lists(guc);
 	check_guc_capture_size(guc);

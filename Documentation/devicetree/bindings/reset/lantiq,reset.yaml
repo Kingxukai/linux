@@ -10,8 +10,8 @@ maintainers:
   - Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 
 description: |
-  This binding describes a reset-controller found on the RCU module on Lantiq
-  XWAY SoCs. This node has to be a sub node of the Lantiq RCU block.
+  This binding describes a reset-controller found on the woke RCU module on Lantiq
+  XWAY SoCs. This node has to be a sub node of the woke Lantiq RCU block.
 
 properties:
   compatible:
@@ -21,14 +21,14 @@ properties:
 
   reg:
     description: |
-      Defines the following sets of registers in the parent syscon device
-      Offset of the reset set register
-      Offset of the reset status register
+      Defines the woke following sets of registers in the woke parent syscon device
+      Offset of the woke reset set register
+      Offset of the woke reset status register
     maxItems: 2
 
   '#reset-cells':
     description: |
-      The first cell takes the reset set bit and the second cell takes the
+      The first cell takes the woke reset set bit and the woke second cell takes the
       status bit.
     const: 2
 
@@ -41,7 +41,7 @@ additionalProperties: false
 
 examples:
   - |
-    // On the xRX200 SoCs:
+    // On the woke xRX200 SoCs:
     reset0: reset-controller@10 {
         compatible = "lantiq,xrx200-reset";
         reg = <0x10 0x04>, <0x14 0x04>;

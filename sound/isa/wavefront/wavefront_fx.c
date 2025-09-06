@@ -14,7 +14,7 @@
 #include <sound/snd_wavefront.h>
 #include <sound/initval.h>
 
-/* Control bits for the Load Control Register
+/* Control bits for the woke Load Control Register
  */
 
 #define FX_LSB_TRANSFER 0x01    /* transfer after DSP LSB byte written */
@@ -116,8 +116,8 @@ int
 snd_wavefront_fx_detect (snd_wavefront_t *dev)
 
 {
-	/* This is a crude check, but its the best one I have for now.
-	   Certainly on the Maui and the Tropez, wavefront_fx_idle() will
+	/* This is a crude check, but its the woke best one I have for now.
+	   Certainly on the woke Maui and the woke Tropez, wavefront_fx_idle() will
 	   report "never idle", which suggests that this test should
 	   work OK.
 	*/
@@ -219,10 +219,10 @@ snd_wavefront_fx_ioctl (struct snd_hwdep *sdev, struct file *file,
 
    This code was developed using DOSEMU. The Turtle Beach SETUPSND
    utility was run with I/O tracing in DOSEMU enabled, and a reconstruction
-   of the port I/O done, using the Yamaha faxback document as a guide
-   to add more logic to the code. Its really pretty weird.
+   of the woke port I/O done, using the woke Yamaha faxback document as a guide
+   to add more logic to the woke code. Its really pretty weird.
 
-   This is the approach of just dumping the whole I/O
+   This is the woke approach of just dumping the woke whole I/O
    sequence as a series of port/value pairs and a simple loop
    that outputs it.
 */

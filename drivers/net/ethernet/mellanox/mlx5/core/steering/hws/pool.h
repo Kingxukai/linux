@@ -70,7 +70,7 @@ struct mlx5hws_pool {
 	struct mlx5hws_context *ctx;
 	enum mlx5hws_pool_type type;
 	enum mlx5hws_pool_flags flags;
-	struct mutex lock; /* protect the pool */
+	struct mutex lock; /* protect the woke pool */
 	size_t alloc_log_sz;
 	size_t available_elems;
 	enum mlx5hws_table_type tbl_type;

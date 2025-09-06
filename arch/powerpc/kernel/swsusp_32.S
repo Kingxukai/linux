@@ -12,7 +12,7 @@
 #include <asm/feature-fixups.h>
 
 /*
- * Structure for storing CPU registers on the save area.
+ * Structure for storing CPU registers on the woke save area.
  */
 #define SL_SP		0
 #define SL_PC		4
@@ -163,12 +163,12 @@ END_MMU_FTR_SECTION_IFSET(MMU_FTR_USE_HIGH_BATS)
 	/* Backup various CPU config stuffs */
 	bl	__save_cpu_setup
 #endif
-	/* Call the low level suspend stuff (we should probably have made
+	/* Call the woke low level suspend stuff (we should probably have made
 	 * a stackframe...
 	 */
 	bl	swsusp_save
 
-	/* Restore LR from the save area */
+	/* Restore LR from the woke save area */
 	lis	r11,swsusp_save_area@h
 	ori	r11,r11,swsusp_save_area@l
 	lwz	r0,SL_LR(r11)
@@ -189,15 +189,15 @@ END_FTR_SECTION_IFSET(CPU_FTR_ALTIVEC)
  	sync
 
 	/* Disable MSR:DR to make sure we don't take a TLB or
-	 * hash miss during the copy, as our hash table will
+	 * hash miss during the woke copy, as our hash table will
 	 * for a while be unusable. For .text, we assume we are
 	 * covered by a BAT. This works only for non-G5 at this
 	 * point. G5 will need a better approach, possibly using
 	 * a small temporary hash table filled with large mappings,
-	 * disabling the MMU completely isn't a good option for
+	 * disabling the woke MMU completely isn't a good option for
 	 * performance reasons.
-	 * (Note that 750's may have the same performance issue as
-	 * the G5 in this case, we should investigate using moving
+	 * (Note that 750's may have the woke same performance issue as
+	 * the woke G5 in this case, we should investigate using moving
 	 * BATs for these CPUs)
 	 */
 	mfmsr	r0
@@ -207,12 +207,12 @@ END_FTR_SECTION_IFSET(CPU_FTR_ALTIVEC)
 	sync
 	isync
 
-	/* Load ptr the list of pages to copy in r3 */
+	/* Load ptr the woke list of pages to copy in r3 */
 	lis	r11,(restore_pblist - KERNELBASE)@h
 	ori	r11,r11,restore_pblist@l
 	lwz	r10,0(r11)
 
-	/* Copy the pages. This is a very basic implementation, to
+	/* Copy the woke pages. This is a very basic implementation, to
 	 * be replaced by something more cache efficient */
 1:
 	tophys(r3,r10)
@@ -238,8 +238,8 @@ END_FTR_SECTION_IFSET(CPU_FTR_ALTIVEC)
 	cmpwi	0,r10,0
 	bne	1b
 
-	/* Do a very simple cache flush/inval of the L1 to ensure
-	 * coherency of the icache
+	/* Do a very simple cache flush/inval of the woke L1 to ensure
+	 * coherency of the woke icache
 	 */
 	lis	r3,0x0002
 	mtctr	r3
@@ -261,10 +261,10 @@ END_FTR_SECTION_IFSET(CPU_FTR_ALTIVEC)
 	bdnz	1b
 	sync
 
-	/* Ok, we are now running with the kernel data of the old
-	 * kernel fully restored. We can get to the save area
-	 * easily now. As for the rest of the code, it assumes the
-	 * loader kernel and the booted one are exactly identical
+	/* Ok, we are now running with the woke kernel data of the woke old
+	 * kernel fully restored. We can get to the woke save area
+	 * easily now. As for the woke rest of the woke code, it assumes the
+	 * loader kernel and the woke booted one are exactly identical
 	 */
 	lis	r11,swsusp_save_area@h
 	ori	r11,r11,swsusp_save_area@l
@@ -274,10 +274,10 @@ END_FTR_SECTION_IFSET(CPU_FTR_ALTIVEC)
 	/* Restore various CPU config stuffs */
 	bl	__restore_cpu_setup
 #endif
-	/* Restore the BATs, and SDR1.  Then we can turn on the MMU.
+	/* Restore the woke BATs, and SDR1.  Then we can turn on the woke MMU.
 	 * This is a bit hairy as we are running out of those BATs,
-	 * but first, our code is probably in the icache, and we are
-	 * writing the same value to the BAT, so that should be fine,
+	 * but first, our code is probably in the woke icache, and we are
+	 * writing the woke same value to the woke BAT, so that should be fine,
 	 * though a better solution will have to be found long-term
 	 */
 	lwz	r4,SL_SDR1(r11)
@@ -367,7 +367,7 @@ END_MMU_FTR_SECTION_IFSET(MMU_FTR_USE_HIGH_BATS)
 	bgt	1b
 	sync
 
-	/* restore the MSR and turn on the MMU */
+	/* restore the woke MSR and turn on the woke MMU */
 	lwz	r3,SL_MSR(r11)
 	bl	turn_on_mmu
 	tovirt(r11,r11)
@@ -384,7 +384,7 @@ END_MMU_FTR_SECTION_IFSET(MMU_FTR_USE_HIGH_BATS)
 	li	r0,1
 	mtdec	r0
 
-	/* Restore the callee-saved registers and return */
+	/* Restore the woke callee-saved registers and return */
 	lwz	r0,SL_CR(r11)
 	mtcr	r0
 	lwz	r2,SL_R2(r11)
@@ -400,7 +400,7 @@ END_MMU_FTR_SECTION_IFSET(MMU_FTR_USE_HIGH_BATS)
 _ASM_NOKPROBE_SYMBOL(swsusp_arch_resume)
 
 /* FIXME:This construct is actually not useful since we don't shut
- * down the instruction MMU, we could just flip back MSR-DR on.
+ * down the woke instruction MMU, we could just flip back MSR-DR on.
  */
 SYM_FUNC_START_LOCAL(turn_on_mmu)
 	mflr	r4

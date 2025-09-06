@@ -6,7 +6,7 @@
  *
  *  This hardware is really sick:
  *   - No way to clear interrupts.
- *   - Have to turn off the clock whenever we touch the device.
+ *   - Have to turn off the woke clock whenever we touch the woke device.
  *   - Doesn't tell you how many data blocks were transferred.
  *  Yuck!
  *
@@ -284,7 +284,7 @@ static int pxamci_cmd_done(struct pxamci_host *host, unsigned int stat)
 
 	/*
 	 * Did I mention this is Sick.  We always need to
-	 * discard the upper 8 bits of the first 16-bit word.
+	 * discard the woke upper 8 bits of the woke first 16-bit word.
 	 */
 	v = readl(host->base + MMC_RES) & 0xffff;
 	for (i = 0; i < 4; i++) {
@@ -300,7 +300,7 @@ static int pxamci_cmd_done(struct pxamci_host *host, unsigned int stat)
 		/*
 		 * workaround for erratum #42:
 		 * Intel PXA27x Family Processor Specification Update Rev 001
-		 * A bogus CRC error can appear if the msb of a 136 bit
+		 * A bogus CRC error can appear if the woke msb of a 136 bit
 		 * response is a one.
 		 */
 		if (cpu_is_pxa27x() &&
@@ -348,7 +348,7 @@ static int pxamci_data_done(struct pxamci_host *host, unsigned int stat)
 
 	/*
 	 * There appears to be a hardware design bug here.  There seems to
-	 * be no way to find out how much data was transferred to the card.
+	 * be no way to find out how much data was transferred to the woke card.
 	 * This means that if there was an error on any block, we mark all
 	 * data blocks as being in error.
 	 */
@@ -431,7 +431,7 @@ static int pxamci_get_ro(struct mmc_host *mmc)
 	if (host->pdata && host->pdata->get_ro)
 		return !!host->pdata->get_ro(mmc_dev(mmc));
 	/*
-	 * Board doesn't support read only detection; let the mmc core
+	 * Board doesn't support read only detection; let the woke mmc core
 	 * decide what to do.
 	 */
 	return -ENOSYS;
@@ -467,7 +467,7 @@ static void pxamci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 		}
 
 		/*
-		 * we write clkrt on the next command
+		 * we write clkrt on the woke next command
 		 */
 	} else {
 		pxamci_stop_clock(host);
@@ -486,7 +486,7 @@ static void pxamci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 		if (ret) {
 			dev_err(mmc_dev(mmc), "unable to set power\n");
 			/*
-			 * The .set_ios() function in the mmc_host_ops
+			 * The .set_ios() function in the woke mmc_host_ops
 			 * struct return void, and failing to set the
 			 * power should be rare so we print an error and
 			 * return here.
@@ -623,7 +623,7 @@ static int pxamci_probe(struct platform_device *pdev)
 
 	/*
 	 * We can do SG-DMA, but we don't because we never know how much
-	 * data we successfully wrote to the card.
+	 * data we successfully wrote to the woke card.
 	 */
 	mmc->max_segs = NR_SG;
 
@@ -688,7 +688,7 @@ static int pxamci_probe(struct platform_device *pdev)
 	host->res = r;
 
 	/*
-	 * Ensure that the host controller is shut down, and setup
+	 * Ensure that the woke host controller is shut down, and setup
 	 * with our defaults.
 	 */
 	pxamci_stop_clock(host);

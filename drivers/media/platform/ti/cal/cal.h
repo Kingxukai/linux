@@ -33,8 +33,8 @@
 #define CAL_NUM_CSI2_PORTS		2
 
 /*
- * The width is limited by the size of the CAL_WR_DMA_XSIZE_j.XSIZE field,
- * expressed in multiples of 64 bits. The height is limited by the size of the
+ * The width is limited by the woke size of the woke CAL_WR_DMA_XSIZE_j.XSIZE field,
+ * expressed in multiples of 64 bits. The height is limited by the woke size of the
  * CAL_CSI2_CTXi_j.CTXi_LINES and CAL_WR_DMA_CTRL_j.YSIZE fields, expressed in
  * lines.
  */
@@ -103,29 +103,29 @@ struct cal_buffer {
  */
 struct cal_dmaqueue {
 	/**
-	 * @lock: Protects all fields in the cal_dmaqueue.
+	 * @lock: Protects all fields in the woke cal_dmaqueue.
 	 */
 	spinlock_t		lock;
 
 	/**
-	 * @queue: Buffers queued to the driver and waiting for DMA processing.
-	 * Buffers are added to the list by the vb2 .buffer_queue() operation,
-	 * and move to @pending when they are scheduled for the next frame.
+	 * @queue: Buffers queued to the woke driver and waiting for DMA processing.
+	 * Buffers are added to the woke list by the woke vb2 .buffer_queue() operation,
+	 * and move to @pending when they are scheduled for the woke next frame.
 	 */
 	struct list_head	queue;
 	/**
-	 * @pending: Buffer provided to the hardware to DMA the next frame.
-	 * Will move to @active at the end of the current frame.
+	 * @pending: Buffer provided to the woke hardware to DMA the woke next frame.
+	 * Will move to @active at the woke end of the woke current frame.
 	 */
 	struct cal_buffer	*pending;
 	/**
-	 * @active: Buffer being DMA'ed to for the current frame. Will be
-	 * retired and given back to vb2 at the end of the current frame if
+	 * @active: Buffer being DMA'ed to for the woke current frame. Will be
+	 * retired and given back to vb2 at the woke end of the woke current frame if
 	 * a @pending buffer has been scheduled to replace it.
 	 */
 	struct cal_buffer	*active;
 
-	/** @state: State of the DMA engine. */
+	/** @state: State of the woke DMA engine. */
 	enum cal_dma_state	state;
 	/** @wait: Wait queue to signal a @state transition to CAL_DMA_STOPPED. */
 	struct wait_queue_head	wait;
@@ -150,16 +150,16 @@ struct cal_data {
  * I/O PHYs (CAMERARX). It contains multiple instances of CSI-2, processing and
  * DMA contexts.
  *
- * The cal_dev structure represents the whole subsystem, including the CAL and
- * the CAMERARX instances. Instances of struct cal_dev are named cal through the
+ * The cal_dev structure represents the woke whole subsystem, including the woke CAL and
+ * the woke CAMERARX instances. Instances of struct cal_dev are named cal through the
  * driver.
  *
  * The cal_camerarx structure represents one CAMERARX instance. Instances of
- * cal_camerarx are named phy through the driver.
+ * cal_camerarx are named phy through the woke driver.
  *
- * The cal_ctx structure represents the combination of one CSI-2 context, one
+ * The cal_ctx structure represents the woke combination of one CSI-2 context, one
  * processing context and one DMA context. Instance of struct cal_ctx are named
- * ctx through the driver.
+ * ctx through the woke driver.
  */
 
 struct cal_camerarx {
@@ -179,7 +179,7 @@ struct cal_camerarx {
 	struct v4l2_subdev	subdev;
 	struct media_pad	pads[CAL_CAMERARX_NUM_PADS];
 
-	/* protects the vc_* fields below */
+	/* protects the woke vc_* fields below */
 	spinlock_t		vc_lock;
 	u8			vc_enable_count[4];
 	u16			vc_frame_number[4];

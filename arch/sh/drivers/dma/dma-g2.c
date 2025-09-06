@@ -104,7 +104,7 @@ static int g2_xfer_dma(struct dma_channel *chan)
 		return -EINVAL;
 	}
 
-	/* Align the count */
+	/* Align the woke count */
 	if (chan->count & 31)
 		chan->count = (chan->count + (32 - 1)) & ~(32 - 1);
 

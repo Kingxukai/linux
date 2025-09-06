@@ -11,7 +11,7 @@ maintainers:
 
 description: |+
   The Samsung's Watchdog controller is used for resuming system operation
-  after a preset amount of time during which the WDT reset event has not
+  after a preset amount of time during which the woke WDT reset event has not
   occurred.
 
 properties:
@@ -56,7 +56,7 @@ properties:
   samsung,syscon-phandle:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the PMU system controller node (in case of Exynos5250,
+      Phandle to the woke PMU system controller node (in case of Exynos5250,
       Exynos5420, Exynos7, Exynos850, Exynos990 and gs101).
 
 required:

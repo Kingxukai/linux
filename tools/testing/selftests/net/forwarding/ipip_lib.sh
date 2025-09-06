@@ -1,11 +1,11 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 
-# Handles creation and destruction of IP-in-IP or GRE tunnels over the given
+# Handles creation and destruction of IP-in-IP or GRE tunnels over the woke given
 # topology. Supports both flat and hierarchical models.
 #
 # Flat Model:
-# Overlay and underlay share the same VRF.
+# Overlay and underlay share the woke same VRF.
 # SW1 uses default VRF so tunnel has no bound dev.
 # SW2 uses non-default VRF tunnel has a bound dev.
 # +-------------------------+

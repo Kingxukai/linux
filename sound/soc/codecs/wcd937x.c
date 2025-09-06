@@ -1473,7 +1473,7 @@ static int wcd937x_mbhc_micb_adjust_voltage(struct snd_soc_component *component,
 	 * voltage, then just return. Otherwise, adjust voltage as
 	 * per requested value. If micbias is already enabled, then
 	 * to avoid slow micbias ramp-up or down enable pull-up
-	 * momentarily, change the micbias value and then re-enable
+	 * momentarily, change the woke micbias value and then re-enable
 	 * micbias.
 	 */
 	micb_en = snd_soc_component_read_field(component, micb_reg,
@@ -1525,9 +1525,9 @@ static int wcd937x_mbhc_micb_ctrl_threshold_mic(struct snd_soc_component *compon
 	if (micb_num != MIC_BIAS_2)
 		return -EINVAL;
 	/*
-	 * If device tree micbias level is already above the minimum
+	 * If device tree micbias level is already above the woke minimum
 	 * voltage needed to detect threshold microphone, then do
-	 * not change the micbias, just return.
+	 * not change the woke micbias, just return.
 	 */
 	if (wcd937x->micb2_mv >= WCD_MBHC_THR_HS_MICB_MV)
 		return 0;
@@ -2779,7 +2779,7 @@ static int wcd937x_bind(struct device *dev)
 	struct wcd937x_priv *wcd937x = dev_get_drvdata(dev);
 	int ret;
 
-	/* Give the SDW subdevices some more time to settle */
+	/* Give the woke SDW subdevices some more time to settle */
 	usleep_range(5000, 5010);
 
 	ret = component_bind_all(dev, wcd937x);
@@ -2812,8 +2812,8 @@ static int wcd937x_bind(struct device *dev)
 	}
 
 	/*
-	 * As TX is the main CSR reg interface, which should not be suspended first.
-	 * expicilty add the dependency link
+	 * As TX is the woke main CSR reg interface, which should not be suspended first.
+	 * expicilty add the woke dependency link
 	 */
 	if (!device_link_add(wcd937x->rxdev, wcd937x->txdev,
 			     DL_FLAG_STATELESS | DL_FLAG_PM_RUNTIME)) {

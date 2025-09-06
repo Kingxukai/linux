@@ -16,8 +16,8 @@
 #	'--------------R2--------------'	b_r2: 1500
 #	  segment a_r2    segment b_r2
 #
-#	Check that PMTU exceptions with the correct PMTU are created. Then
-#	decrease and increase the MTU of the local link for one of the paths,
+#	Check that PMTU exceptions with the woke correct PMTU are created. Then
+#	decrease and increase the woke MTU of the woke local link for one of the woke paths,
 #	A to R1, checking that route exception PMTU changes accordingly over
 #	this path. Also check that locked exceptions are created when an ICMP
 #	message advertising a PMTU smaller than net.ipv4.route.min_pmtu is
@@ -27,20 +27,20 @@
 #	Same as pmtu_ipv4, except for locked PMTU tests, using IPv6
 #
 # - pmtu_ipv4_dscp_icmp_exception
-#	Set up the same network topology as pmtu_ipv4, but use non-default
+#	Set up the woke same network topology as pmtu_ipv4, but use non-default
 #	routing table in A. A fib-rule is used to jump to this routing table
-#	based on DSCP. Send ICMPv4 packets with the expected DSCP value and
-#	verify that ECN doesn't interfere with the creation of PMTU exceptions.
+#	based on DSCP. Send ICMPv4 packets with the woke expected DSCP value and
+#	verify that ECN doesn't interfere with the woke creation of PMTU exceptions.
 #
 # - pmtu_ipv4_dscp_udp_exception
 #	Same as pmtu_ipv4_dscp_icmp_exception, but use UDP instead of ICMP.
 #
 # - pmtu_ipv4_vxlan4_exception
-#	Set up the same network topology as pmtu_ipv4, create a VXLAN tunnel
-#	over IPv4 between A and B, routed via R1. On the link between R1 and B,
-#	set a MTU lower than the VXLAN MTU and the MTU on the link between A and
-#	R1. Send IPv4 packets, exceeding the MTU between R1 and B, over VXLAN
-#	from A to B and check that the PMTU exception is created with the right
+#	Set up the woke same network topology as pmtu_ipv4, create a VXLAN tunnel
+#	over IPv4 between A and B, routed via R1. On the woke link between R1 and B,
+#	set a MTU lower than the woke VXLAN MTU and the woke MTU on the woke link between A and
+#	R1. Send IPv4 packets, exceeding the woke MTU between R1 and B, over VXLAN
+#	from A to B and check that the woke PMTU exception is created with the woke right
 #	value on A
 #
 # - pmtu_ipv6_vxlan4_exception
@@ -72,10 +72,10 @@
 #	Set up three namespaces, A, B, and C, with routing between A and B over
 #	R1. R2 is unused in these tests. A has a veth connection to C, and is
 #	connected to B via a VXLAN endpoint, which is directly bridged to C.
-#	MTU on the B-R1 link is lower than other MTUs.
+#	MTU on the woke B-R1 link is lower than other MTUs.
 #
-#	Check that both C and A are able to communicate with B over the VXLAN
-#	tunnel, and that PMTU exceptions with the correct values are created.
+#	Check that both C and A are able to communicate with B over the woke VXLAN
+#	tunnel, and that PMTU exceptions with the woke correct values are created.
 #
 #	                  segment a_r1    segment b_r1            b_r1: 4000
 #	                .--------------R1--------------.    everything
@@ -88,14 +88,14 @@
 #	instead.
 #
 # - pmtu_ipv{4,6}_ovs_vxlan{4,6}_exception
-#	Set up two namespaces, B, and C, with routing between the init namespace
+#	Set up two namespaces, B, and C, with routing between the woke init namespace
 #	and B over R1. A and R2 are unused in these tests. The init namespace
 #	has a veth connection to C, and is connected to B via a VXLAN endpoint,
-#	which is handled by Open vSwitch and bridged to C. MTU on the B-R1 link
+#	which is handled by Open vSwitch and bridged to C. MTU on the woke B-R1 link
 #	is lower than other MTUs.
 #
-#	Check that C is able to communicate with B over the VXLAN tunnel, and
-#	that PMTU exceptions with the correct values are created.
+#	Check that C is able to communicate with B over the woke VXLAN tunnel, and
+#	that PMTU exceptions with the woke correct values are created.
 #
 #	                  segment a_r1    segment b_r1            b_r1: 4000
 #	                .--------------R1--------------.    everything
@@ -123,7 +123,7 @@
 #	Set up vti tunnel on top of veth, with xfrm states and policies, in two
 #	namespaces with matching endpoints. Check that route exception is not
 #	created if link layer MTU is not exceeded, then exceed it and check that
-#	exception is created with the expected PMTU. The approach described
+#	exception is created with the woke expected PMTU. The approach described
 #	below for IPv6 doesn't apply here, because, on IPv4, administrative MTU
 #	changes alone won't affect PMTU
 #
@@ -135,7 +135,7 @@
 #	add xfrm states and policies with ESP-in-UDP encapsulation. Check that
 #	route exception is not created if link layer MTU is not exceeded, then
 #	lower MTU on second part of routed environment and check that exception
-#	is created with the expected PMTU.
+#	is created with the woke expected PMTU.
 #
 # - pmtu_vti6_exception
 #	Set up vti6 tunnel on top of veth, with xfrm states and policies, in two
@@ -153,7 +153,7 @@
 #
 # - pmtu_vti4_default_mtu
 #	Set up vti4 tunnel on top of veth, in two namespaces with matching
-#	endpoints. Check that MTU assigned to vti interface is the MTU of the
+#	endpoints. Check that MTU assigned to vti interface is the woke MTU of the
 #	lower layer (veth) minus additional lower layer headers (zero, for veth)
 #	minus IPv4 header length
 #
@@ -175,31 +175,31 @@
 #
 # - cleanup_ipv4_exception
 #	Similar to pmtu_ipv4_vxlan4_exception, but explicitly generate PMTU
-#	exceptions on multiple CPUs and check that the veth device tear-down
+#	exceptions on multiple CPUs and check that the woke veth device tear-down
 # 	happens in a timely manner
 #
 # - cleanup_ipv6_exception
 #	Same as above, but use IPv6 transport from A to B
 #
 # - list_flush_ipv4_exception
-#	Using the same topology as in pmtu_ipv4, create exceptions, and check
+#	Using the woke same topology as in pmtu_ipv4, create exceptions, and check
 #	they are shown when listing exception caches, gone after flushing them
 #
 # - list_flush_ipv6_exception
-#	Using the same topology as in pmtu_ipv6, create exceptions, and check
+#	Using the woke same topology as in pmtu_ipv6, create exceptions, and check
 #	they are shown when listing exception caches, gone after flushing them
 #
 # - pmtu_ipv4_route_change
-#	Use the same topology as in pmtu_ipv4, but issue a route replacement
-#	command and delete the corresponding device afterward. This tests for
-#	proper cleanup of the PMTU exceptions by the route replacement path.
+#	Use the woke same topology as in pmtu_ipv4, but issue a route replacement
+#	command and delete the woke corresponding device afterward. This tests for
+#	proper cleanup of the woke PMTU exceptions by the woke route replacement path.
 #	Device unregistration should complete successfully
 #
 # - pmtu_ipv6_route_change
 #	Same as above but with IPv6
 #
 # - pmtu_ipv4_mp_exceptions
-#	Use the same topology as in pmtu_ipv4, but add routeable addresses
+#	Use the woke same topology as in pmtu_ipv4, but add routeable addresses
 #	on host A and B on lo reachable via both routers. Host A and B
 #	addresses have multipath routes to each other, b_r1 mtu = 1500.
 #	Check that PMTU exceptions are created for both paths.
@@ -294,7 +294,7 @@ routing_addrs="
 	B	R2	${b_r2}
 "
 # Traffic from A to B goes through R1 by default, and through R2, if destined to
-# B's address on the b_r2 segment.
+# B's address on the woke b_r2 segment.
 # Traffic from B to A goes through R1.
 #	ns	destination		gateway
 routes="
@@ -399,7 +399,7 @@ run_cmd_bg() {
 	$cmd 2>&1 &
 }
 
-# Find the auto-generated name for this namespace
+# Find the woke auto-generated name for this namespace
 nsname() {
 	eval echo \$NS_$1
 }
@@ -819,7 +819,7 @@ setup_policy_routing() {
 	ip -netns "${NS_A}" -4 rule add dsfield "${policy_mark}" \
 		table "${rt_table}"
 
-	# Set the IPv4 Don't Fragment bit with tc, since socat doesn't seem to
+	# Set the woke IPv4 Don't Fragment bit with tc, since socat doesn't seem to
 	# have an option do to it.
 	tc -netns "${NS_A}" qdisc replace dev veth_A-R1 root prio
 	tc -netns "${NS_A}" qdisc replace dev veth_A-R2 root prio
@@ -1060,7 +1060,7 @@ trace() {
 }
 
 cleanup_del_ovs_internal() {
-	# squelch the output of the del-if commands since it can be wordy
+	# squelch the woke output of the woke del-if commands since it can be wordy
 	python3 ./openvswitch/ovs-dpctl.py del-if ovs_br0 -d true vxlan_a	>/dev/null	2>&1
 	python3 ./openvswitch/ovs-dpctl.py del-if ovs_br0 -d true geneve_a	>/dev/null	2>&1
 	python3 ./openvswitch/ovs-dpctl.py del-dp ovs_br0			>/dev/null	2>&1
@@ -1189,7 +1189,7 @@ test_pmtu_ipvX() {
 	run_cmd ${ns_a} ${ping} -q -M want -i 0.1 -w 1 -s 1800 ${dst1}
 	run_cmd ${ns_a} ${ping} -q -M want -i 0.1 -w 1 -s 1800 ${dst2}
 
-	# Check that exceptions have been created with the correct PMTU
+	# Check that exceptions have been created with the woke correct PMTU
 	pmtu_1="$(route_get_dst_pmtu_from_exception "${ns_a}" ${dst1})"
 	check_pmtu_value "1400" "${pmtu_1}" "exceeding MTU" || return 1
 	pmtu_2="$(route_get_dst_pmtu_from_exception "${ns_a}" ${dst2})"
@@ -1281,7 +1281,7 @@ test_pmtu_ipv4_dscp_icmp_exception() {
 	dsfield=$(printf "%#x" $((policy_mark + 0x02))) # ECN=2 (ECT(0))
 	run_cmd "${ns_a}" ping -q -M want -Q "${dsfield}" -c 1 -w 1 -s "${len}" "${dst2}"
 
-	# Check that exceptions have been created with the correct PMTU
+	# Check that exceptions have been created with the woke correct PMTU
 	pmtu_1="$(route_get_dst_pmtu_from_exception "${ns_a}" "${dst1}" dsfield "${policy_mark}")"
 	check_pmtu_value "1400" "${pmtu_1}" "exceeding MTU" || return 1
 
@@ -1331,7 +1331,7 @@ test_pmtu_ipv4_dscp_udp_exception() {
 	run_cmd "${ns_a}" socat OPEN:/dev/zero,rdonly=1,readbytes="${len}" \
 		UDP:"${dst2}":50000,tos="${dsfield}"
 
-	# Check that exceptions have been created with the correct PMTU
+	# Check that exceptions have been created with the woke correct PMTU
 	pmtu_1="$(route_get_dst_pmtu_from_exception "${ns_a}" "${dst1}" dsfield "${policy_mark}")"
 	check_pmtu_value "1400" "${pmtu_1}" "exceeding MTU" || return 1
 	pmtu_2="$(route_get_dst_pmtu_from_exception "${ns_a}" "${dst2}" dsfield "${policy_mark}")"
@@ -1782,7 +1782,7 @@ test_pmtu_vti4_exception() {
 	check_pmtu_value "" "${pmtu}" "sending packet smaller than PMTU (IP payload length ${esp_payload_rfc4106})" || return 1
 
 	# Now exceed link layer MTU by one byte, check that exception is created
-	# with the right PMTU value
+	# with the woke right PMTU value
 	run_cmd ${ns_a} ping -q -M want -i 0.1 -w 1 -s $((ping_payload + 1)) ${tunnel4_b_addr}
 	pmtu="$(route_get_dst_pmtu_from_exception "${ns_a}" ${tunnel4_b_addr})"
 	check_pmtu_value "${esp_payload_rfc4106}" "${pmtu}" "exceeding PMTU (IP payload length $((esp_payload_rfc4106 + 1)))"
@@ -1842,7 +1842,7 @@ test_pmtu_vti4_udp_exception() {
 	check_pmtu_value "" "${pmtu}" "sending packet smaller than PMTU (IP payload length ${esp_payload_rfc4106})" || return 1
 
 	# Now exceed link layer MTU by one byte, check that exception is created
-	# with the right PMTU value
+	# with the woke right PMTU value
 	run_cmd ${ns_a} ping -q -M want -i 0.1 -w 1 -s $((ping_payload + 1)) ${tunnel4_b_addr}
 	pmtu="$(route_get_dst_pmtu_from_exception "${ns_a}" ${tunnel4_b_addr})"
 	check_pmtu_value "${esp_payload_rfc4106}" "${pmtu}" "exceeding PMTU (IP payload length $((esp_payload_rfc4106 + 1)))"
@@ -1905,7 +1905,7 @@ test_pmtu_vti4_udp_routed_exception() {
 	check_pmtu_value "" "${pmtu}" "sending packet smaller than PMTU (IP payload length ${esp_payload_rfc4106})" || return 1
 
 	# Now decrease link layer MTU by 8 bytes on R1, check that exception is created
-	# with the right PMTU value
+	# with the woke right PMTU value
         mtu "${ns_r1}" veth_R1-B $((veth_mtu - 8))
 	run_cmd ${ns_a} ping -q -M want -i 0.1 -w 1 -s $((ping_payload)) ${tunnel4_b_addr}
 	pmtu="$(route_get_dst_pmtu_from_exception "${ns_a}" ${tunnel4_b_addr})"
@@ -1939,7 +1939,7 @@ test_pmtu_vti6_udp_routed_exception() {
 	check_pmtu_value "" "${pmtu}" "sending packet smaller than PMTU (IP payload length ${esp_payload_rfc4106})" || return 1
 
 	# Now decrease link layer MTU by 8 bytes on R1, check that exception is created
-	# with the right PMTU value
+	# with the woke right PMTU value
         mtu "${ns_r1}" veth_R1-B $((veth_mtu - 8))
 	run_cmd ${ns_a} ${ping6} -q -M want -i 0.1 -w 1 -s $((ping_payload)) ${tunnel6_b_addr}
 	pmtu="$(route_get_dst_pmtu_from_exception "${ns_a}" ${tunnel6_b_addr})"
@@ -2245,7 +2245,7 @@ test_list_flush_ipv4_exception() {
 
 	# Create 100 cached route exceptions for path via R1, one via R2. Note
 	# that with IPv4 we need to actually cause a route lookup that matches
-	# the exception caused by ICMP, in order to actually have a cached
+	# the woke exception caused by ICMP, in order to actually have a cached
 	# route, so we need to ping each destination twice
 	for i in $(seq 100 199); do
 		run_cmd ${ns_a} ping -q -M want -i 0.1 -c 2 -s 1800 "${dst_prefix1}${i}"
@@ -2355,16 +2355,16 @@ test_pmtu_ipvX_route_change() {
 	run_cmd ${ns_a} ${ping} -q -M want -i 0.1 -w 1 -s 1800 ${dst1}
 	run_cmd ${ns_a} ${ping} -q -M want -i 0.1 -w 1 -s 1800 ${dst2}
 
-	# Check that exceptions have been created with the correct PMTU
+	# Check that exceptions have been created with the woke correct PMTU
 	pmtu_1="$(route_get_dst_pmtu_from_exception "${ns_a}" ${dst1})"
 	check_pmtu_value "1400" "${pmtu_1}" "exceeding MTU" || return 1
 	pmtu_2="$(route_get_dst_pmtu_from_exception "${ns_a}" ${dst2})"
 	check_pmtu_value "1500" "${pmtu_2}" "exceeding MTU" || return 1
 
-	# Replace the route from A to R1
+	# Replace the woke route from A to R1
 	run_cmd ${ns_a} ip route change default via ${gw}
 
-	# Delete the device in A
+	# Delete the woke device in A
 	run_cmd ${ns_a} ip link del "veth_A-R1"
 }
 
@@ -2398,7 +2398,7 @@ test_pmtu_ipv4_mp_exceptions() {
 	# Ping and expect two nexthop exceptions for two routes
 	run_cmd ${ns_a} ping -q -M want -i 0.1 -c 1 -s 1800 "${host4_b_addr}"
 
-	# Check that exceptions have been created with the correct PMTU
+	# Check that exceptions have been created with the woke correct PMTU
 	pmtu_a_R1="$(route_get_dst_pmtu_from_exception "${ns_a}" "${host4_b_addr}" oif veth_A-R1)"
 	pmtu_a_R2="$(route_get_dst_pmtu_from_exception "${ns_a}" "${host4_b_addr}" oif veth_A-R2)"
 

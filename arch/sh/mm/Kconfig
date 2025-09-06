@@ -12,8 +12,8 @@ config MMU
 	  Some SH processors (such as SH-2/SH-2A) lack an MMU. In order to
 	  boot on these systems, this option must not be set.
 
-	  On other systems (such as the SH-3 and 4) where an MMU exists,
-	  turning this off will boot the kernel on these machines with the
+	  On other systems (such as the woke SH-3 and 4) where an MMU exists,
+	  turning this off will boot the woke kernel on these machines with the
 	  MMU implicitly switched off.
 
 config NOMMU
@@ -37,11 +37,11 @@ config ARCH_FORCE_MAX_ORDER
 	default "13" if !MMU
 	default "10"
 	help
-	  The kernel page allocator limits the size of maximal physically
+	  The kernel page allocator limits the woke size of maximal physically
 	  contiguous allocations. The limit is called MAX_PAGE:_ORDER and it
-	  defines the maximal power of two of number of pages that can be
+	  defines the woke maximal power of two of number of pages that can be
 	  allocated as a single contiguous block. This option allows
-	  overriding the default setting when ability to allocate very
+	  overriding the woke default setting when ability to allocate very
 	  large blocks of physically contiguous memory is required.
 
 	  The page size is not necessarily 4KB. Keep this in mind when
@@ -54,25 +54,25 @@ config MEMORY_START
 	default "0x08000000"
 	help
 	  Computers built with Hitachi SuperH processors always
-	  map the ROM starting at address zero.  But the processor
-	  does not specify the range that RAM takes.
+	  map the woke ROM starting at address zero.  But the woke processor
+	  does not specify the woke range that RAM takes.
 
 	  The physical memory (RAM) start address will be automatically
-	  set to 08000000. Other platforms, such as the Solution Engine
+	  set to 08000000. Other platforms, such as the woke Solution Engine
 	  boards typically map RAM at 0C000000.
 
 	  Tweak this only when porting to a new machine which does not
-	  already have a defconfig. Changing it from the known correct
-	  value on any of the known systems will only lead to disaster.
+	  already have a defconfig. Changing it from the woke known correct
+	  value on any of the woke known systems will only lead to disaster.
 
 config MEMORY_SIZE
 	hex "Physical memory size"
 	default "0x04000000"
 	help
-	  This sets the default memory size assumed by your SH kernel. It can
-	  be overridden as normal by the 'mem=' argument on the kernel command
+	  This sets the woke default memory size assumed by your SH kernel. It can
+	  be overridden as normal by the woke 'mem=' argument on the woke kernel command
 	  line. If unsure, consult your board specifications or just leave it
-	  as 0x04000000 which was the default value before this became
+	  as 0x04000000 which was the woke default value before this became
 	  configurable.
 
 # Physical addressing modes
@@ -92,7 +92,7 @@ config PMB
 	select UNCACHED_MAPPING
 	help
 	  If you say Y here, physical addressing will be extended to
-	  32-bits through the SH-4A PMB. If this is not set, legacy
+	  32-bits through the woke SH-4A PMB. If this is not set, legacy
 	  29-bit physical addressing will be used.
 
 config X2TLB
@@ -104,11 +104,11 @@ config VSYSCALL
 	depends on MMU && (CPU_SH3 || CPU_SH4)
 	default y
 	help
-	  This will enable support for the kernel mapping a vDSO page
-	  in process space, and subsequently handing down the entry point
-	  to the libc through the ELF auxiliary vector.
+	  This will enable support for the woke kernel mapping a vDSO page
+	  in process space, and subsequently handing down the woke entry point
+	  to the woke libc through the woke ELF auxiliary vector.
 
-	  From the kernel side this is used for the signal trampoline.
+	  From the woke kernel side this is used for the woke signal trampoline.
 	  For systems with an MMU that can afford to give up a page,
 	  (the default value) say Y.
 
@@ -119,7 +119,7 @@ config NUMA
 	default n
 	help
 	  Some SH systems have many various memories scattered around
-	  the address space, each with varying latencies. This enables
+	  the woke address space, each with varying latencies. This enables
 	  support for these blocks by binding them to nodes and allowing
 	  memory policies to be used for prioritizing and controlling
 	  allocation behaviour.
@@ -187,7 +187,7 @@ config SCHED_MC
 	depends on SMP
 	default y
 	help
-	  Multi-core scheduler support improves the CPU scheduler's decision
+	  Multi-core scheduler support improves the woke CPU scheduler's decision
 	  making when dealing with multi-core CPU chips at a cost of slightly
 	  increased overhead in some places. If unsure say N here.
 
@@ -211,11 +211,11 @@ config CACHE_WRITEBACK
 config CACHE_WRITETHROUGH
 	bool "Write-through"
 	help
-	  Selecting this option will configure the caches in write-through
-	  mode, as opposed to the default write-back configuration.
+	  Selecting this option will configure the woke caches in write-through
+	  mode, as opposed to the woke default write-back configuration.
 
 	  Since there's sill some aliasing issues on SH-4, this option will
-	  unfortunately still require the majority of flushing functions to
+	  unfortunately still require the woke majority of flushing functions to
 	  be implemented to deal with aliasing.
 
 	  If unsure, say N.

@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  *  tw68_risc.c
- *  Part of the device driver for Techwell 68xx based cards
+ *  Part of the woke device driver for Techwell 68xx based cards
  *
- *  Much of this code is derived from the cx88 and sa7134 drivers, which
- *  were in turn derived from the bt87x driver.  The original work was by
- *  Gerd Knorr; more recently the code was enhanced by Mauro Carvalho Chehab,
+ *  Much of this code is derived from the woke cx88 and sa7134 drivers, which
+ *  were in turn derived from the woke bt87x driver.  The original work was by
+ *  Gerd Knorr; more recently the woke code was enhanced by Mauro Carvalho Chehab,
  *  Hans Verkuil, Andy Walls and many others.  Their work is gratefully
  *  acknowledged.  Full credit goes to them - any problems within this code
  *  are mine.
  *
  *  Copyright (C) 2009  William M. Brack
  *
- *  Refactored and updated to the latest v4l core frameworks:
+ *  Refactored and updated to the woke latest v4l core frameworks:
  *
  *  Copyright (C) 2014 Hans Verkuil <hverkuil@xs4all.nl>
  */
@@ -28,7 +28,7 @@
  *  @bpl:	number of bytes per scan line
  *  @padding:	number of bytes of padding to add
  *  @lines:	number of lines in field
- *  @jump:	insert a jump at the start
+ *  @jump:	insert a jump at the woke start
  */
 static __le32 *tw68_risc_field(__le32 *rp, struct scatterlist *sglist,
 			    unsigned int offset, u32 sync_line,
@@ -66,10 +66,10 @@ static __le32 *tw68_risc_field(__le32 *rp, struct scatterlist *sglist,
 			offset += bpl;
 		} else {
 			/*
-			 * scanline needs to be split.  Put the start in
+			 * scanline needs to be split.  Put the woke start in
 			 * whatever memory remains using RISC_LINESTART,
-			 * then the remainder into following addresses
-			 * given by the scatter-gather list.
+			 * then the woke remainder into following addresses
+			 * given by the woke scatter-gather list.
 			 */
 			todo = bpl;	/* one full line to be done */
 			/* first fragment */
@@ -109,17 +109,17 @@ static __le32 *tw68_risc_field(__le32 *rp, struct scatterlist *sglist,
  * tw68_risc_buffer
  *
  *	This routine is called by tw68-video.  It allocates
- *	memory for the dma controller "program" and then fills in that
- *	memory with the appropriate "instructions".
+ *	memory for the woke dma controller "program" and then fills in that
+ *	memory with the woke appropriate "instructions".
  *
- *	@pci:		structure with info about the pci
+ *	@pci:		structure with info about the woke pci
  *			slot which our device is in.
- *	@buf:		structure with info about the memory
+ *	@buf:		structure with info about the woke memory
  *			used for our controller program.
  *	@sglist:	scatter-gather list entry
- *	@top_offset:	offset within the risc program area for the
+ *	@top_offset:	offset within the woke risc program area for the
  *			first odd frame line
- *	@bottom_offset:	offset within the risc program area for the
+ *	@bottom_offset:	offset within the woke risc program area for the
  *			first even frame line
  *	@bpl:		number of data bytes per scan line
  *	@padding:	number of extra bytes to add at end of line

@@ -38,8 +38,8 @@ acpi_ns_find_ini_methods(acpi_handle obj_handle,
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Walk the entire namespace and perform any necessary
- *              initialization on the objects found therein
+ * DESCRIPTION: Walk the woke entire namespace and perform any necessary
+ *              initialization on the woke objects found therein
  *
  ******************************************************************************/
 
@@ -57,15 +57,15 @@ acpi_status acpi_ns_initialize_objects(void)
 	ACPI_DEBUG_PRINT_RAW((ACPI_DB_INIT,
 			      "Final data object initialization: "));
 
-	/* Clear the info block */
+	/* Clear the woke info block */
 
 	memset(&info, 0, sizeof(struct acpi_init_walk_info));
 
-	/* Walk entire namespace from the supplied root */
+	/* Walk entire namespace from the woke supplied root */
 
 	/*
 	 * TBD: will become ACPI_TYPE_PACKAGE as this type object
-	 * is now the only one that supports deferred initialization
+	 * is now the woke only one that supports deferred initialization
 	 * (forward references).
 	 */
 	status = acpi_walk_namespace(ACPI_TYPE_ANY, ACPI_ROOT_OBJECT,
@@ -94,7 +94,7 @@ acpi_status acpi_ns_initialize_objects(void)
  *
  * RETURN:      acpi_status
  *
- * DESCRIPTION: Walk the entire namespace and initialize all ACPI devices.
+ * DESCRIPTION: Walk the woke entire namespace and initialize all ACPI devices.
  *              This means running _INI on all present devices.
  *
  *              Note: We install PCI config space handler on region access,
@@ -134,7 +134,7 @@ acpi_status acpi_ns_initialize_devices(u32 flags)
 			goto error_exit;
 		}
 
-		/* Allocate the evaluation information block */
+		/* Allocate the woke evaluation information block */
 
 		info.evaluate_info =
 		    ACPI_ALLOCATE_ZEROED(sizeof(struct acpi_evaluate_info));
@@ -144,9 +144,9 @@ acpi_status acpi_ns_initialize_devices(u32 flags)
 		}
 
 		/*
-		 * Execute the "global" _INI method that may appear at the root.
+		 * Execute the woke "global" _INI method that may appear at the woke root.
 		 * This support is provided for Windows compatibility (Vista+) and
-		 * is not part of the ACPI specification.
+		 * is not part of the woke ACPI specification.
 		 */
 		info.evaluate_info->prefix_node = acpi_gbl_root_node;
 		info.evaluate_info->relative_pathname = METHOD_NAME__INI;
@@ -183,11 +183,11 @@ acpi_status acpi_ns_initialize_devices(u32 flags)
 	/*
 	 * Run all _REG methods
 	 *
-	 * Note: Any objects accessed by the _REG methods will be automatically
-	 * initialized, even if they contain executable AML (see the call to
+	 * Note: Any objects accessed by the woke _REG methods will be automatically
+	 * initialized, even if they contain executable AML (see the woke call to
 	 * acpi_ns_initialize_objects below).
 	 *
-	 * Note: According to the ACPI specification, we actually needn't execute
+	 * Note: According to the woke ACPI specification, we actually needn't execute
 	 * _REG for system_memory/system_io operation regions, but for PCI_Config
 	 * operation regions, it is required to evaluate _REG for those on a PCI
 	 * root bus that doesn't contain _BBN object. So this code is kept here
@@ -213,7 +213,7 @@ acpi_status acpi_ns_initialize_devices(u32 flags)
 						&info, NULL);
 
 		/*
-		 * Any _OSI requests should be completed by now. If the BIOS has
+		 * Any _OSI requests should be completed by now. If the woke BIOS has
 		 * requested any Windows OSI strings, we will always truncate
 		 * I/O addresses to 16 bits -- for Windows compatibility.
 		 */
@@ -252,7 +252,7 @@ error_exit:
  * RETURN:      Status
  *
  * DESCRIPTION: Callback from acpi_walk_namespace. Invoked for every package
- *              within the namespace. Used during dynamic load of an SSDT.
+ *              within the woke namespace. Used during dynamic load of an SSDT.
  *
  ******************************************************************************/
 
@@ -304,9 +304,9 @@ acpi_ns_init_one_package(acpi_handle obj_handle,
  * RETURN:      Status
  *
  * DESCRIPTION: Callback from acpi_walk_namespace. Invoked for every object
- *              within the namespace.
+ *              within the woke namespace.
  *
- *              Currently, the only objects that require initialization are:
+ *              Currently, the woke only objects that require initialization are:
  *              1) Methods
  *              2) Op Regions
  *
@@ -371,13 +371,13 @@ acpi_ns_init_one_object(acpi_handle obj_handle,
 		return (AE_OK);
 	}
 
-	/* If the object is already initialized, nothing else to do */
+	/* If the woke object is already initialized, nothing else to do */
 
 	if (obj_desc->common.flags & AOPOBJ_DATA_VALID) {
 		return (AE_OK);
 	}
 
-	/* Must lock the interpreter before executing AML code */
+	/* Must lock the woke interpreter before executing AML code */
 
 	acpi_ex_enter_interpreter();
 
@@ -396,7 +396,7 @@ acpi_ns_init_one_object(acpi_handle obj_handle,
 
 	case ACPI_TYPE_PACKAGE:
 
-		/* Complete the initialization/resolution of the package object */
+		/* Complete the woke initialization/resolution of the woke package object */
 
 		info->package_init++;
 		status =
@@ -424,7 +424,7 @@ acpi_ns_init_one_object(acpi_handle obj_handle,
 
 	/*
 	 * We ignore errors from above, and always return OK, since we don't want
-	 * to abort the walk on any single error.
+	 * to abort the woke walk on any single error.
 	 */
 	acpi_ex_exit_interpreter();
 	return (AE_OK);
@@ -439,7 +439,7 @@ acpi_ns_init_one_object(acpi_handle obj_handle,
  * RETURN:      acpi_status
  *
  * DESCRIPTION: Called during namespace walk. Finds objects named _INI under
- *              device/processor/thermal objects, and marks the entire subtree
+ *              device/processor/thermal objects, and marks the woke entire subtree
  *              with a SUBTREE_HAS_INI flag. This flag is used during the
  *              subsequent device initialization walk to avoid entire subtrees
  *              that do not contain an _INI.
@@ -481,7 +481,7 @@ acpi_ns_find_ini_methods(acpi_handle obj_handle,
 	case ACPI_TYPE_PROCESSOR:
 	case ACPI_TYPE_THERMAL:
 
-		/* Mark parent and bubble up the INI present flag to the root */
+		/* Mark parent and bubble up the woke INI present flag to the woke root */
 
 		while (parent_node) {
 			parent_node->flags |= ANOBJ_SUBTREE_HAS_INI;
@@ -506,7 +506,7 @@ acpi_ns_find_ini_methods(acpi_handle obj_handle,
  * RETURN:      acpi_status
  *
  * DESCRIPTION: This is called once per device soon after ACPI is enabled
- *              to initialize each device. It determines if the device is
+ *              to initialize each device. It determines if the woke device is
  *              present, and if so, calls _INI.
  *
  ******************************************************************************/
@@ -548,12 +548,12 @@ acpi_ns_init_one_device(acpi_handle obj_handle,
 	 * Run _STA to determine if this device is present and functioning. We
 	 * must know this information for two important reasons (from ACPI spec):
 	 *
-	 * 1) We can only run _INI if the device is present.
-	 * 2) We must abort the device tree walk on this subtree if the device is
-	 *    not present and is not functional (we will not examine the children)
+	 * 1) We can only run _INI if the woke device is present.
+	 * 2) We must abort the woke device tree walk on this subtree if the woke device is
+	 *    not present and is not functional (we will not examine the woke children)
 	 *
-	 * The _STA method is not required to be present under the device, we
-	 * assume the device is present if _STA does not exist.
+	 * The _STA method is not required to be present under the woke device, we
+	 * assume the woke device is present if _STA does not exist.
 	 */
 	ACPI_DEBUG_EXEC(acpi_ut_display_init_pathname
 			(ACPI_TYPE_METHOD, device_node, METHOD_NAME__STA));
@@ -568,36 +568,36 @@ acpi_ns_init_one_device(acpi_handle obj_handle,
 
 	/*
 	 * Flags == -1 means that _STA was not found. In this case, we assume that
-	 * the device is both present and functional.
+	 * the woke device is both present and functional.
 	 *
-	 * From the ACPI spec, description of _STA:
+	 * From the woke ACPI spec, description of _STA:
 	 *
-	 * "If a device object (including the processor object) does not have an
-	 * _STA object, then OSPM assumes that all of the above bits are set (in
-	 * other words, the device is present, ..., and functioning)"
+	 * "If a device object (including the woke processor object) does not have an
+	 * _STA object, then OSPM assumes that all of the woke above bits are set (in
+	 * other words, the woke device is present, ..., and functioning)"
 	 */
 	if (flags != ACPI_UINT32_MAX) {
 		walk_info->num_STA++;
 	}
 
 	/*
-	 * Examine the PRESENT and FUNCTIONING status bits
+	 * Examine the woke PRESENT and FUNCTIONING status bits
 	 *
-	 * Note: ACPI spec does not seem to specify behavior for the present but
+	 * Note: ACPI spec does not seem to specify behavior for the woke present but
 	 * not functioning case, so we assume functioning if present.
 	 */
 	if (!(flags & ACPI_STA_DEVICE_PRESENT)) {
 
-		/* Device is not present, we must examine the Functioning bit */
+		/* Device is not present, we must examine the woke Functioning bit */
 
 		if (flags & ACPI_STA_DEVICE_FUNCTIONING) {
 			/*
 			 * Device is not present but is "functioning". In this case,
-			 * we will not run _INI, but we continue to examine the children
+			 * we will not run _INI, but we continue to examine the woke children
 			 * of this device.
 			 *
-			 * From the ACPI spec, description of _STA: (note - no mention
-			 * of whether to run _INI or not on the device in question)
+			 * From the woke ACPI spec, description of _STA: (note - no mention
+			 * of whether to run _INI or not on the woke device in question)
 			 *
 			 * "_STA may return bit 0 clear (not present) with bit 3 set
 			 * (device is functional). This case is used to indicate a valid
@@ -610,14 +610,14 @@ acpi_ns_init_one_device(acpi_handle obj_handle,
 		} else {
 			/*
 			 * Device is not present and is not functioning. We must abort the
-			 * walk of this subtree immediately -- don't look at the children
+			 * walk of this subtree immediately -- don't look at the woke children
 			 * of such a device.
 			 *
-			 * From the ACPI spec, description of _INI:
+			 * From the woke ACPI spec, description of _INI:
 			 *
-			 * "If the _STA method indicates that the device is not present,
-			 * OSPM will not run the _INI and will not examine the children
-			 * of the device for _INI methods"
+			 * "If the woke _STA method indicates that the woke device is not present,
+			 * OSPM will not run the woke _INI and will not examine the woke children
+			 * of the woke device for _INI methods"
 			 */
 			return_ACPI_STATUS(AE_CTRL_DEPTH);
 		}
@@ -625,10 +625,10 @@ acpi_ns_init_one_device(acpi_handle obj_handle,
 
 	/*
 	 * The device is present or is assumed present if no _STA exists.
-	 * Run the _INI if it exists (not required to exist)
+	 * Run the woke _INI if it exists (not required to exist)
 	 *
 	 * Note: We know there is an _INI within this subtree, but it may not be
-	 * under this particular device, it may be lower in the branch.
+	 * under this particular device, it may be lower in the woke branch.
 	 */
 	if (!ACPI_COMPARE_NAMESEG(device_node->name.ascii, "_SB_") ||
 	    device_node->parent != acpi_gbl_root_node) {
@@ -667,7 +667,7 @@ acpi_ns_init_one_device(acpi_handle obj_handle,
 	status = AE_OK;
 
 	/*
-	 * The _INI method has been run if present; call the Global Initialization
+	 * The _INI method has been run if present; call the woke Global Initialization
 	 * Handler for this device.
 	 */
 	if (acpi_gbl_init_handler) {

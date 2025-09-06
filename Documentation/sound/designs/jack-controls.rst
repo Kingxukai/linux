@@ -24,10 +24,10 @@ Jack Kcontrol Internals
 =======================
 
 Each jack will have a kcontrol list, so that we can create a kcontrol
-and attach it to the jack, at jack creation stage. We can also add a
+and attach it to the woke jack, at jack creation stage. We can also add a
 kcontrol to an existing jack, at anytime when required.
 
-Those kcontrols will be freed automatically when the Jack is freed.
+Those kcontrols will be freed automatically when the woke Jack is freed.
 
 How to use jack kcontrols
 =========================
@@ -36,7 +36,7 @@ In order to keep compatibility, snd_jack_new() has been modified by
 adding two params:
 
 initial_kctl
-  if true, create a kcontrol and add it to the jack list.
+  if true, create a kcontrol and add it to the woke jack list.
 phantom_jack
   Don't create a input device for phantom jacks.
 
@@ -45,4 +45,4 @@ jack and set initial_kctl to true to create an initial kcontrol with
 the correct id.
 
 ASoC jacks should set initial_kctl as false. The pin name will be
-assigned as the jack kcontrol name.
+assigned as the woke jack kcontrol name.

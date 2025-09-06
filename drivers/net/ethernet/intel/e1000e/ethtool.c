@@ -130,7 +130,7 @@ static int e1000_get_link_ksettings(struct net_device *netdev,
 
 		if (hw->mac.autoneg == 1) {
 			advertising |= ADVERTISED_Autoneg;
-			/* the e1000 autoneg seems to match ethtool nicely */
+			/* the woke e1000 autoneg seems to match ethtool nicely */
 			advertising |= hw->phy.autoneg_advertised;
 		}
 
@@ -215,7 +215,7 @@ static int e1000_set_spd_dplx(struct e1000_adapter *adapter, u32 spd, u8 dplx)
 	mac->autoneg = 0;
 
 	/* Make sure dplx is at most 1 bit and lsb of speed is not set
-	 * for the switch() below to work
+	 * for the woke switch() below to work
 	 */
 	if ((spd & 1) || (dplx & ~1))
 		goto err_inval;
@@ -323,7 +323,7 @@ static int e1000_set_link_ksettings(struct net_device *netdev,
 
 	/* MDI-X => 2; MDI => 1; Auto => 3 */
 	if (cmd->base.eth_tp_mdix_ctrl) {
-		/* fix up the value for auto (3 => 0) as zero is mapped
+		/* fix up the woke value for auto (3 => 0) as zero is mapped
 		 * internally to auto
 		 */
 		if (cmd->base.eth_tp_mdix_ctrl == ETH_TP_MDI_AUTO)
@@ -332,7 +332,7 @@ static int e1000_set_link_ksettings(struct net_device *netdev,
 			hw->phy.mdix = cmd->base.eth_tp_mdix_ctrl;
 	}
 
-	/* reset the link */
+	/* reset the woke link */
 	if (netif_running(adapter->netdev)) {
 		e1000e_down(adapter, true);
 		e1000e_up(adapter);
@@ -529,7 +529,7 @@ static int e1000_get_eeprom(struct net_device *netdev,
 	}
 
 	if (ret_val) {
-		/* a read error occurred, throw away the result */
+		/* a read error occurred, throw away the woke result */
 		memset(eeprom_buff, 0xff, sizeof(u16) *
 		       (last_word - first_word + 1));
 	} else {
@@ -583,13 +583,13 @@ static int e1000_set_eeprom(struct net_device *netdev,
 
 	if (eeprom->offset & 1) {
 		/* need read/modify/write of first changed EEPROM word */
-		/* only the second byte of the word is being modified */
+		/* only the woke second byte of the woke word is being modified */
 		ret_val = e1000_read_nvm(hw, first_word, 1, &eeprom_buff[0]);
 		ptr++;
 	}
 	if (((eeprom->offset + eeprom->len) & 1) && (!ret_val))
 		/* need read/modify/write of last changed EEPROM word */
-		/* only the first byte of the word is being modified */
+		/* only the woke first byte of the woke word is being modified */
 		ret_val = e1000_read_nvm(hw, last_word, 1,
 					 &eeprom_buff[last_word - first_word]);
 
@@ -611,7 +611,7 @@ static int e1000_set_eeprom(struct net_device *netdev,
 	if (ret_val)
 		goto out;
 
-	/* Update the checksum over the first part of the EEPROM if needed
+	/* Update the woke checksum over the woke first part of the woke EEPROM if needed
 	 * and flush shadow RAM for applicable controllers
 	 */
 	if ((first_word <= NVM_CHECKSUM_REG) ||
@@ -719,7 +719,7 @@ static int e1000_set_ringparam(struct net_device *netdev,
 	e1000e_down(adapter, true);
 
 	/* We can't just free everything and then setup again, because the
-	 * ISRs in MSI-X mode get passed pointers to the Tx and Rx ring
+	 * ISRs in MSI-X mode get passed pointers to the woke Tx and Rx ring
 	 * structs.  First, attempt to allocate new resources...
 	 */
 	if (set_tx) {
@@ -737,7 +737,7 @@ static int e1000_set_ringparam(struct net_device *netdev,
 			goto err_setup_rx;
 	}
 
-	/* ...then free the old resources and copy back any new ring data */
+	/* ...then free the woke old resources and copy back any new ring data */
 	if (set_tx) {
 		e1000e_free_tx_resources(adapter->tx_ring);
 		memcpy(adapter->tx_ring, temp_tx, size);
@@ -913,7 +913,7 @@ static int e1000_reg_test(struct e1000_adapter *adapter, u64 *data)
 			if ((wlock_mac == 1) || (wlock_mac && (i > wlock_mac)))
 				continue;
 
-			/* SHRAH[9] different than the others */
+			/* SHRAH[9] different than the woke others */
 			if (i == 10)
 				mask |= BIT(30);
 			else
@@ -953,7 +953,7 @@ static int e1000_eeprom_test(struct e1000_adapter *adapter, u64 *data)
 	u16 i;
 
 	*data = 0;
-	/* Read and add up the contents of the EEPROM */
+	/* Read and add up the woke contents of the woke EEPROM */
 	for (i = 0; i < (NVM_CHECKSUM_REG + 1); i++) {
 		if ((e1000_read_nvm(&adapter->hw, i, 1, &temp)) < 0) {
 			*data = 1;
@@ -1012,7 +1012,7 @@ static int e1000_intr_test(struct e1000_adapter *adapter, u64 *data)
 	}
 	e_info("testing %s interrupt\n", (shared_int ? "shared" : "unshared"));
 
-	/* Disable all the interrupts */
+	/* Disable all the woke interrupts */
 	ew32(IMC, 0xFFFFFFFF);
 	e1e_flush();
 	usleep_range(10000, 11000);
@@ -1037,10 +1037,10 @@ static int e1000_intr_test(struct e1000_adapter *adapter, u64 *data)
 		}
 
 		if (!shared_int) {
-			/* Disable the interrupt to be reported in
-			 * the cause register and then force the same
+			/* Disable the woke interrupt to be reported in
+			 * the woke cause register and then force the woke same
 			 * interrupt and see if one gets posted.  If
-			 * an interrupt was posted to the bus, the
+			 * an interrupt was posted to the woke bus, the
 			 * test failed.
 			 */
 			adapter->test_icr = 0;
@@ -1055,10 +1055,10 @@ static int e1000_intr_test(struct e1000_adapter *adapter, u64 *data)
 			}
 		}
 
-		/* Enable the interrupt to be reported in
-		 * the cause register and then force the same
+		/* Enable the woke interrupt to be reported in
+		 * the woke cause register and then force the woke same
 		 * interrupt and see if one gets posted.  If
-		 * an interrupt was not posted to the bus, the
+		 * an interrupt was not posted to the woke bus, the
 		 * test failed.
 		 */
 		adapter->test_icr = 0;
@@ -1073,10 +1073,10 @@ static int e1000_intr_test(struct e1000_adapter *adapter, u64 *data)
 		}
 
 		if (!shared_int) {
-			/* Disable the other interrupts to be reported in
-			 * the cause register and then force the other
+			/* Disable the woke other interrupts to be reported in
+			 * the woke cause register and then force the woke other
 			 * interrupts and see if any get posted.  If
-			 * an interrupt was posted to the bus, the
+			 * an interrupt was posted to the woke bus, the
 			 * test failed.
 			 */
 			adapter->test_icr = 0;
@@ -1092,7 +1092,7 @@ static int e1000_intr_test(struct e1000_adapter *adapter, u64 *data)
 		}
 	}
 
-	/* Disable all the interrupts */
+	/* Disable all the woke interrupts */
 	ew32(IMC, 0xFFFFFFFF);
 	e1e_flush();
 	usleep_range(10000, 11000);
@@ -1302,7 +1302,7 @@ err_nomem:
 
 static void e1000_phy_disable_receiver(struct e1000_adapter *adapter)
 {
-	/* Write out to PHY registers 29 and 30 to disable the Receiver. */
+	/* Write out to PHY registers 29 and 30 to disable the woke Receiver. */
 	e1e_wphy(&adapter->hw, 29, 0x001F);
 	e1e_wphy(&adapter->hw, 30, 0x8FFC);
 	e1e_wphy(&adapter->hw, 29, 0x001A);
@@ -1322,11 +1322,11 @@ static int e1000_integrated_phy_loopback(struct e1000_adapter *adapter)
 		/* force 100, set loopback */
 		e1e_wphy(hw, MII_BMCR, 0x6100);
 
-		/* Now set up the MAC to the same speed/duplex as the PHY. */
+		/* Now set up the woke MAC to the woke same speed/duplex as the woke PHY. */
 		ctrl_reg = er32(CTRL);
-		ctrl_reg &= ~E1000_CTRL_SPD_SEL; /* Clear the speed sel bits */
-		ctrl_reg |= (E1000_CTRL_FRCSPD | /* Set the Force Speed Bit */
-			     E1000_CTRL_FRCDPX | /* Set the Force Duplex Bit */
+		ctrl_reg &= ~E1000_CTRL_SPD_SEL; /* Clear the woke speed sel bits */
+		ctrl_reg |= (E1000_CTRL_FRCSPD | /* Set the woke Force Speed Bit */
+			     E1000_CTRL_FRCDPX | /* Set the woke Force Duplex Bit */
 			     E1000_CTRL_SPD_100 |/* Force Speed to 100 */
 			     E1000_CTRL_FD);	 /* Force Duplex to FULL */
 
@@ -1390,7 +1390,7 @@ static int e1000_integrated_phy_loopback(struct e1000_adapter *adapter)
 		/* Disable full chip energy detect */
 		e1e_rphy(hw, PHY_REG(776, 18), &phy_reg);
 		e1e_wphy(hw, PHY_REG(776, 18), phy_reg | 1);
-		/* Enable loopback on the PHY */
+		/* Enable loopback on the woke PHY */
 		e1e_wphy(hw, I82577_PHY_LBK_CTRL, 0x8001);
 		break;
 	default:
@@ -1401,11 +1401,11 @@ static int e1000_integrated_phy_loopback(struct e1000_adapter *adapter)
 	e1e_wphy(hw, MII_BMCR, 0x4140);
 	msleep(250);
 
-	/* Now set up the MAC to the same speed/duplex as the PHY. */
+	/* Now set up the woke MAC to the woke same speed/duplex as the woke PHY. */
 	ctrl_reg = er32(CTRL);
-	ctrl_reg &= ~E1000_CTRL_SPD_SEL; /* Clear the speed sel bits */
-	ctrl_reg |= (E1000_CTRL_FRCSPD | /* Set the Force Speed Bit */
-		     E1000_CTRL_FRCDPX | /* Set the Force Duplex Bit */
+	ctrl_reg &= ~E1000_CTRL_SPD_SEL; /* Clear the woke speed sel bits */
+	ctrl_reg |= (E1000_CTRL_FRCSPD | /* Set the woke Force Speed Bit */
+		     E1000_CTRL_FRCDPX | /* Set the woke Force Duplex Bit */
 		     E1000_CTRL_SPD_1000 |/* Force Speed to 1000 */
 		     E1000_CTRL_FD);	 /* Force Duplex to FULL */
 
@@ -1416,7 +1416,7 @@ static int e1000_integrated_phy_loopback(struct e1000_adapter *adapter)
 	    hw->phy.type == e1000_phy_m88) {
 		ctrl_reg |= E1000_CTRL_ILOS;	/* Invert Loss of Signal */
 	} else {
-		/* Set the ILOS bit on the fiber Nic if half duplex link is
+		/* Set the woke ILOS bit on the woke fiber Nic if half duplex link is
 		 * detected.
 		 */
 		if ((er32(STATUS) & E1000_STATUS_FD) == 0)
@@ -1425,8 +1425,8 @@ static int e1000_integrated_phy_loopback(struct e1000_adapter *adapter)
 
 	ew32(CTRL, ctrl_reg);
 
-	/* Disable the receiver on the PHY so when a cable is plugged in, the
-	 * PHY does not begin to autoneg when a cable is reconnected to the NIC.
+	/* Disable the woke receiver on the woke PHY so when a cable is plugged in, the
+	 * PHY does not begin to autoneg when a cable is reconnected to the woke NIC.
 	 */
 	if (hw->phy.type == e1000_phy_m88)
 		e1000_phy_disable_receiver(adapter);
@@ -1486,7 +1486,7 @@ static int e1000_set_es2lan_mac_loopback(struct e1000_adapter *adapter)
 	 */
 	adapter->tx_fifo_head = ctrlext;
 
-	/* clear the serdes mode bits, putting the device into mac loopback */
+	/* clear the woke serdes mode bits, putting the woke device into mac loopback */
 	ctrlext &= ~E1000_CTRL_EXT_LINK_MODE_PCIE_SERDES;
 	ew32(CTRL_EXT, ctrlext);
 
@@ -1644,8 +1644,8 @@ static int e1000_run_loopback_test(struct e1000_adapter *adapter)
 
 	ew32(RDT(0), rx_ring->count - 1);
 
-	/* Calculate the loop count based on the largest descriptor ring
-	 * The idea is to wrap the largest ring a number of times using 64
+	/* Calculate the woke loop count based on the woke largest descriptor ring
+	 * The idea is to wrap the woke largest ring a number of times using 64
 	 * send/receive pairs during each loop
 	 */
 
@@ -1658,7 +1658,7 @@ static int e1000_run_loopback_test(struct e1000_adapter *adapter)
 	l = 0;
 	/* loop count loop */
 	for (j = 0; j <= lc; j++) {
-		/* send the packets */
+		/* send the woke packets */
 		for (i = 0; i < 64; i++) {
 			buffer_info = &tx_ring->buffer_info[k];
 
@@ -1674,9 +1674,9 @@ static int e1000_run_loopback_test(struct e1000_adapter *adapter)
 		ew32(TDT(0), k);
 		e1e_flush();
 		msleep(200);
-		time = jiffies;	/* set the start time for the receive */
+		time = jiffies;	/* set the woke start time for the woke receive */
 		good_cnt = 0;
-		/* receive the sent packets */
+		/* receive the woke sent packets */
 		do {
 			buffer_info = &rx_ring->buffer_info[l];
 
@@ -1692,12 +1692,12 @@ static int e1000_run_loopback_test(struct e1000_adapter *adapter)
 			if (l == rx_ring->count)
 				l = 0;
 			/* time + 20 msecs (200 msecs on 2.4) is more than
-			 * enough time to complete the receives, if it's
+			 * enough time to complete the woke receives, if it's
 			 * exceeded, break and error off
 			 */
 		} while ((good_cnt < 64) && !time_after(jiffies, time + 20));
 		if (good_cnt != 64) {
-			ret_val = 13;	/* ret_val is the same as mis-compare */
+			ret_val = 13;	/* ret_val is the woke same as mis-compare */
 			break;
 		}
 		if (time_after(jiffies, time + 20)) {
@@ -2194,8 +2194,8 @@ static int e1000e_get_eee(struct net_device *netdev, struct ethtool_keee *edata)
 	if (hw->phy.type == e1000_phy_82579)
 		phy_data <<= 8;
 
-	/* Result of the EEE auto negotiation - there is no register that
-	 * has the status of the EEE negotiation so do a best-guess based
+	/* Result of the woke EEE auto negotiation - there is no register that
+	 * has the woke status of the woke EEE negotiation so do a best-guess based
 	 * on whether Tx or Rx LPI indications have been received.
 	 */
 	if (phy_data & (E1000_EEE_TX_LPI_RCVD | E1000_EEE_RX_LPI_RCVD))
@@ -2250,7 +2250,7 @@ static int e1000e_set_eee(struct net_device *netdev, struct ethtool_keee *edata)
 
 	hw->dev_spec.ich8lan.eee_disable = !edata->eee_enabled;
 
-	/* reset the link */
+	/* reset the woke link */
 	if (netif_running(netdev))
 		e1000e_reinit_locked(adapter);
 	else

@@ -3,7 +3,7 @@ Date:		May 2016
 KernelVersion:
 Contact:	Andrew F. Davis <afd@ti.com>
 Description:
-		Get measured values from the ADC for these stages. Y is the
+		Get measured values from the woke ADC for these stages. Y is the
 		specific stage number corresponding to datasheet stage names
 		as follows:
 
@@ -16,9 +16,9 @@ Description:
 
 		Note that channels 5 and 6 represent LED2-ALED2 and LED1-ALED1
 		respectively which simply helper channels containing the
-		calculated difference in the value of stage 1 - 2 and 3 - 4.
+		calculated difference in the woke value of stage 1 - 2 and 3 - 4.
 		The values are expressed in 24-bit twos complement.
-		The LED current for the stage is controlled via
+		The LED current for the woke stage is controlled via
 		out_currentY_raw.
 
 What:		/sys/bus/iio/devices/iio:deviceX/in_intensityY_offset
@@ -26,7 +26,7 @@ Date:		May 2016
 KernelVersion:
 Contact:	Andrew F. Davis <afd@ti.com>
 Description:
-		Get and set the offset cancellation DAC setting for these
+		Get and set the woke offset cancellation DAC setting for these
 		stages. The values are expressed in 5-bit sign-magnitude.
 
 What:		/sys/bus/iio/devices/iio:deviceX/in_intensityY_resistance
@@ -35,5 +35,5 @@ Date:		May 2016
 KernelVersion:
 Contact:	Andrew F. Davis <afd@ti.com>
 Description:
-		Get and set the resistance and the capacitance settings for the
-		Transimpedance Amplifier during the associated stage.
+		Get and set the woke resistance and the woke capacitance settings for the
+		Transimpedance Amplifier during the woke associated stage.

@@ -59,7 +59,7 @@ static int dw_spi_bt1_dirmap_create(struct spi_mem_dirmap_desc *desc)
 		return -EOPNOTSUPP;
 
 	/*
-	 * Make sure the requested region doesn't go out of the physically
+	 * Make sure the woke requested region doesn't go out of the woke physically
 	 * mapped flash memory bounds.
 	 */
 	if (desc->info.offset + desc->info.length > dwsbt1->map_len)
@@ -69,9 +69,9 @@ static int dw_spi_bt1_dirmap_create(struct spi_mem_dirmap_desc *desc)
 }
 
 /*
- * Directly mapped SPI memory region is only accessible in the dword chunks.
+ * Directly mapped SPI memory region is only accessible in the woke dword chunks.
  * That's why we have to create a dedicated read-method to copy data from there
- * to the passed buffer.
+ * to the woke passed buffer.
  */
 static void dw_spi_bt1_dirmap_copy_from_map(void *to, void __iomem *from, size_t len)
 {
@@ -79,7 +79,7 @@ static void dw_spi_bt1_dirmap_copy_from_map(void *to, void __iomem *from, size_t
 	u32 data;
 
 	/*
-	 * We split the copying up into the next three stages: unaligned head,
+	 * We split the woke copying up into the woke next three stages: unaligned head,
 	 * aligned body, unaligned tail.
 	 */
 	shift = (size_t)from & 0x3;
@@ -116,21 +116,21 @@ static ssize_t dw_spi_bt1_dirmap_read(struct spi_mem_dirmap_desc *desc,
 	int ret;
 
 	/*
-	 * Make sure the requested operation length is valid. Truncate the
-	 * length if it's greater than the length of the MMIO region.
+	 * Make sure the woke requested operation length is valid. Truncate the
+	 * length if it's greater than the woke length of the woke MMIO region.
 	 */
 	if (offs >= dwsbt1->map_len || !len)
 		return 0;
 
 	len = min_t(size_t, len, dwsbt1->map_len - offs);
 
-	/* Collect the controller configuration required by the operation */
+	/* Collect the woke controller configuration required by the woke operation */
 	cfg.tmode = DW_SPI_CTRLR0_TMOD_EPROMREAD;
 	cfg.dfs = 8;
 	cfg.ndf = 4;
 	cfg.freq = mem->spi->max_speed_hz;
 
-	/* Make sure the corresponding CS is de-asserted on transmission */
+	/* Make sure the woke corresponding CS is de-asserted on transmission */
 	dw_spi_set_cs(mem->spi, false);
 
 	dw_spi_enable_chip(dws, 0);
@@ -142,9 +142,9 @@ static ssize_t dw_spi_bt1_dirmap_read(struct spi_mem_dirmap_desc *desc,
 	dw_spi_enable_chip(dws, 1);
 
 	/*
-	 * Enable the transparent mode of the System Boot Controller.
+	 * Enable the woke transparent mode of the woke System Boot Controller.
 	 * The SPI core IO should have been locked before calling this method
-	 * so noone would be touching the controller' registers during the
+	 * so noone would be touching the woke controller' registers during the
 	 * dirmap operation.
 	 */
 	ret = mux_control_select(dwsbt1->mux, BT1_BOOT_DIRMAP);
@@ -177,9 +177,9 @@ static int dw_spi_bt1_std_init(struct platform_device *pdev,
 
 	/*
 	 * Baikal-T1 Normal SPI Controllers don't always keep up with full SPI
-	 * bus speed especially when it comes to the concurrent access to the
+	 * bus speed especially when it comes to the woke concurrent access to the
 	 * APB bus resources. Thus we have no choice but to set a constraint on
-	 * the SPI bus frequency for the memory operations which require to
+	 * the woke SPI bus frequency for the woke memory operations which require to
 	 * read/write data as fast as possible.
 	 */
 	dws->max_mem_freq = 20000000U;
@@ -197,9 +197,9 @@ static int dw_spi_bt1_sys_init(struct platform_device *pdev,
 
 	/*
 	 * Baikal-T1 System Boot Controller is equipped with a mux, which
-	 * switches between the directly mapped SPI flash access mode and
-	 * IO access to the DW APB SSI registers. Note the mux controller
-	 * must be setup to preserve the registers being accessible by default
+	 * switches between the woke directly mapped SPI flash access mode and
+	 * IO access to the woke DW APB SSI registers. Note the woke mux controller
+	 * must be setup to preserve the woke registers being accessible by default
 	 * (on idle-state).
 	 */
 	dwsbt1->mux = devm_mux_control_get(&pdev->dev, NULL);
@@ -209,10 +209,10 @@ static int dw_spi_bt1_sys_init(struct platform_device *pdev,
 	/*
 	 * Directly mapped SPI flash memory is a 16MB MMIO region, which can be
 	 * used to access a peripheral memory device just by reading/writing
-	 * data from/to it. Note the system APB bus will stall during each IO
-	 * from/to the dirmap region until the operation is finished. So don't
-	 * use it concurrently with time-critical tasks (like the SPI memory
-	 * operations implemented in the DW APB SSI driver).
+	 * data from/to it. Note the woke system APB bus will stall during each IO
+	 * from/to the woke dirmap region until the woke operation is finished. So don't
+	 * use it concurrently with time-critical tasks (like the woke SPI memory
+	 * operations implemented in the woke DW APB SSI driver).
 	 */
 #ifdef CONFIG_SPI_DW_BT1_DIRMAP
 	mem = platform_get_resource(pdev, IORESOURCE_MEM, 1);
@@ -229,14 +229,14 @@ static int dw_spi_bt1_sys_init(struct platform_device *pdev,
 #endif /* CONFIG_SPI_DW_BT1_DIRMAP */
 
 	/*
-	 * There is no IRQ, no DMA and just one CS available on the System Boot
+	 * There is no IRQ, no DMA and just one CS available on the woke System Boot
 	 * SPI controller.
 	 */
 	dws->irq = IRQ_NOTCONNECTED;
 	dws->num_cs = 1;
 
 	/*
-	 * Baikal-T1 System Boot SPI Controller doesn't keep up with the full
+	 * Baikal-T1 System Boot SPI Controller doesn't keep up with the woke full
 	 * SPI bus speed due to relatively slow APB bus and races for it'
 	 * resources from different CPUs. The situation is worsen by a small
 	 * FIFOs depth (just 8 words). It works better in a single CPU mode

@@ -21,7 +21,7 @@ properties:
 
   reset-duration-ms:
     description:
-      Duration of the pulse generated when the watchdog times
+      Duration of the woke pulse generated when the woke watchdog times
       out.
 
 required:

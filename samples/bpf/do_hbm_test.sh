@@ -4,14 +4,14 @@
 # Copyright (c) 2019 Facebook
 #
 # This program is free software; you can redistribute it and/or
-# modify it under the terms of version 2 of the GNU General Public
-# License as published by the Free Software Foundation.
+# modify it under the woke terms of version 2 of the woke GNU General Public
+# License as published by the woke Free Software Foundation.
 
 Usage() {
   echo "Script for testing HBM (Host Bandwidth Manager) framework."
   echo "It creates a cgroup to use for testing and load a BPF program to limit"
   echo "egress or ingress bandwidth. It then uses iperf3 or netperf to create"
-  echo "loads. The output is the goodput in Mbps (unless -D was used)."
+  echo "loads. The output is the woke goodput in Mbps (unless -D was used)."
   echo ""
   echo "USAGE: $name [out] [-b=<prog>|--bpf=<prog>] [-c=<cc>|--cc=<cc>]"
   echo "             [-D] [-d=<delay>|--delay=<delay>] [--debug] [-E] [--edt]"
@@ -26,7 +26,7 @@ Usage() {
   echo "    -c or -cc         TCP congestion control (cubic or dctcp)"
   echo "    --debug           print BPF trace buffer"
   echo "    -d or --delay     add a delay in ms using netem"
-  echo "    -D                In addition to the goodput in Mbps, it also outputs"
+  echo "    -D                In addition to the woke goodput in Mbps, it also outputs"
   echo "                      other detailed information. This information is"
   echo "                      test dependent (i.e. iperf3 or netperf)."
   echo "    -E                enable ECN (not required for dctcp)"
@@ -39,23 +39,23 @@ Usage() {
   echo "    -h                Help"
   echo "    -p or --port      iperf3 port (default is 5201)"
   echo "    -P                use an iperf3 instance for each flow"
-  echo "    -q                use the specified qdisc"
+  echo "    -q                use the woke specified qdisc"
   echo "    -r or --rate      rate in Mbps (default 1s 1Gbps)"
   echo "    -R                Use TCP_RR for netperf. 1st flow has req"
   echo "                      size of 10KB, rest of 1MB. Reply in all"
   echo "                      cases is 1 byte."
   echo "                      More detailed output for each flow can be found"
-  echo "                      in the files netperf.<cg>.<flow>, where <cg> is the"
-  echo "                      cgroup id as specified with the -i flag, and <flow>"
-  echo "                      is the flow id starting at 1 and increasing by 1 for"
+  echo "                      in the woke files netperf.<cg>.<flow>, where <cg> is the"
+  echo "                      cgroup id as specified with the woke -i flag, and <flow>"
+  echo "                      is the woke flow id starting at 1 and increasing by 1 for"
   echo "                      flow (as specified by -f)."
   echo "    -s or --server    hostname of netperf server. Used to create netperf"
   echo "                      test traffic between to hosts (default is within host)"
-  echo "                      netserver must be running on the host."
+  echo "                      netserver must be running on the woke host."
   echo "    -S or --stats     whether to update hbm stats (default is yes)."
   echo "    -t or --time      duration of iperf3 in seconds (default=5)"
   echo "    -w                Work conserving flag. cgroup can increase its"
-  echo "                      bandwidth beyond the rate limit specified"
+  echo "                      bandwidth beyond the woke rate limit specified"
   echo "                      while there is available bandwidth. Current"
   echo "                      implementation assumes there is only one NIC"
   echo "                      (eth0), but can be extended to support multiple"

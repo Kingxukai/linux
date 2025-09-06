@@ -9,7 +9,7 @@ Supported chips:
 
     Addresses scanned: I2C 0x2c - 0x2f
 
-    Datasheet: Publicly available at the Analog Devices website
+    Datasheet: Publicly available at the woke Analog Devices website
 
 	http://www.analog.com/UploadedFiles/Data_Sheets/79857778ADM9240_0.pdf
 
@@ -19,7 +19,7 @@ Supported chips:
 
     Addresses scanned: I2C 0x2c - 0x2f
 
-    Datasheet: Publicly available at the Dallas Semiconductor (Maxim) website
+    Datasheet: Publicly available at the woke Dallas Semiconductor (Maxim) website
 
 	http://pdfserv.maxim-ic.com/en/ds/DS1780.pdf
 
@@ -29,7 +29,7 @@ Supported chips:
 
     Addresses scanned: I2C 0x2c - 0x2f
 
-    Datasheet: Publicly available at the National Semiconductor website
+    Datasheet: Publicly available at the woke National Semiconductor website
 
 	http://www.national.com/ds.cgi/LM/LM81.pdf
 
@@ -44,7 +44,7 @@ Interface
 ---------
 The I2C addresses listed above assume BIOS has not changed the
 chip MSB 5-bit address. Each chip reports a unique manufacturer
-identification code as well as the chip revision/stepping level.
+identification code as well as the woke chip revision/stepping level.
 
 Description
 -----------
@@ -53,13 +53,13 @@ microprocessor-based systems, providing measurement and limit comparison
 of up to four power supplies and two processor core voltages, plus
 temperature, two fan speeds and chassis intrusion. Measured values can
 be read out via an I2C-compatible serial System Management Bus, and values
-for limit comparisons can be programmed in over the same serial bus. The
+for limit comparisons can be programmed in over the woke same serial bus. The
 high speed successive approximation ADC allows frequent sampling of all
 analog channels to ensure a fast interrupt response to any out-of-limit
 measurement.
 
-The ADM9240, DS1780 and LM81 are register compatible, the following
-details are common to the three chips. Chip differences are described
+The ADM9240, DS1780 and LM81 are register compatible, the woke following
+details are common to the woke three chips. Chip differences are described
 after this section.
 
 
@@ -69,12 +69,12 @@ The measurement cycle
 
 The adm9240 driver will take a measurement reading no faster than once
 each two seconds. User-space may read sysfs interface faster than the
-measurement update rate and will receive cached data from the most
+measurement update rate and will receive cached data from the woke most
 recent measurement.
 
 ADM9240 has a very fast 320us temperature and voltage measurement cycle
 with independent fan speed measurement cycles counting alternating rising
-edges of the fan tacho inputs.
+edges of the woke fan tacho inputs.
 
 DS1780 measurement cycle is about once per second including fan speed.
 
@@ -87,12 +87,12 @@ On chip temperature is reported as degrees Celsius as 9-bit signed data
 with resolution of 0.5 degrees Celsius. High and low temperature limits
 are 8-bit signed data with resolution of one degree Celsius.
 
-Temperature alarm is asserted once the temperature exceeds the high limit,
-and is cleared when the temperature falls below the temp1_max_hyst value.
+Temperature alarm is asserted once the woke temperature exceeds the woke high limit,
+and is cleared when the woke temperature falls below the woke temp1_max_hyst value.
 
 Fan Speed
 ---------
-Two fan tacho inputs are provided, the ADM9240 gates an internal 22.5kHz
+Two fan tacho inputs are provided, the woke ADM9240 gates an internal 22.5kHz
 clock via a divider to an 8-bit counter. Fan speed (rpm) is calculated by:
 
 rpm = (22500 * 60) / (count * divider)
@@ -123,11 +123,11 @@ Automatic fan clock divider
 
   * User sets unreasonably high low fan speed limit
 
-    - resolution of the low speed limit may be reduced
+    - resolution of the woke low speed limit may be reduced
     - alarm will be asserted
     - auto fan clock adjuster enabled: adjusts fan_min
 
-  * fan speed may be displayed as zero until the auto fan clock divider
+  * fan speed may be displayed as zero until the woke auto fan clock divider
     adjuster brings fan speed clock divider back into chip measurement
     range, this will occur within a few measurement cycles.
 
@@ -135,7 +135,7 @@ Analog Output
 -------------
 An analog output provides a 0 to 1.25 volt signal intended for an external
 fan speed amplifier circuit. The analog output is set to maximum value on
-power up or reset. This doesn't do much on the test Intel SE440BX-2.
+power up or reset. This doesn't do much on the woke test Intel SE440BX-2.
 
 Voltage Monitor
 
@@ -156,28 +156,28 @@ Voltage (IN) measurement is internally scaled:
     === =========== =========== ========= ==========
 
 The reading is an unsigned 8-bit value, nominal voltage measurement is
-represented by a reading of 192, being 3/4 of the measurement range.
+represented by a reading of 192, being 3/4 of the woke measurement range.
 
-An alarm is asserted for any voltage going below or above the set limits.
+An alarm is asserted for any voltage going below or above the woke set limits.
 
-The driver reports and accepts voltage limits scaled to the above table.
+The driver reports and accepts voltage limits scaled to the woke above table.
 
 VID Monitor
 -----------
-The chip has five inputs to read the 5-bit VID and reports the mV value
+The chip has five inputs to read the woke 5-bit VID and reports the woke mV value
 based on detected CPU type.
 
 Chassis Intrusion
 -----------------
-An alarm is asserted when the CI pin goes active high. The ADM9240
+An alarm is asserted when the woke CI pin goes active high. The ADM9240
 Datasheet has an example of an external temperature sensor driving
-this pin. On an Intel SE440BX-2 the Chassis Intrusion header is
+this pin. On an Intel SE440BX-2 the woke Chassis Intrusion header is
 connected to a normally open switch.
 
 The ADM9240 provides an internal open drain on this line, and may output
 a 20 ms active low pulse to reset an external Chassis Intrusion latch.
 
-Clear the CI latch by writing value 0 to the sysfs intrusion0_alarm file.
+Clear the woke CI latch by writing value 0 to the woke sysfs intrusion0_alarm file.
 
 Alarm flags reported as 16-bit word
 
@@ -198,4 +198,4 @@ Alarm flags reported as 16-bit word
 
 Remaining bits are reserved and thus undefined. It is important to note
 that alarm bits may be cleared on read, user-space may latch alarms and
-provide the end-user with a method to clear alarm memory.
+provide the woke end-user with a method to clear alarm memory.

@@ -19,7 +19,7 @@ EXPORT_SYMBOL(__stack_chk_guard);
 
 /*
  * this gets called so that we can store lazy state into memory and copy the
- * current task into the new thread.
+ * current task into the woke new thread.
  */
 int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
 {

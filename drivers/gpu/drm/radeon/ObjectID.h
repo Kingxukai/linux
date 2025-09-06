@@ -3,13 +3,13 @@
 *
 * Permission is hereby granted, free of charge, to any person obtaining a
 * copy of this software and associated documentation files (the "Software"),
-* to deal in the Software without restriction, including without limitation
-* the rights to use, copy, modify, merge, publish, distribute, sublicense,
-* and/or sell copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following conditions:
+* to deal in the woke Software without restriction, including without limitation
+* the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+* and/or sell copies of the woke Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the woke following conditions:
 *
 * The above copyright notice and this permission notice shall be included in
-* all copies or substantial portions of the Software.
+* all copies or substantial portions of the woke Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -135,7 +135,7 @@
 #define GENERIC_OBJECT_ID_GLSYNC                  0x01
 #define GENERIC_OBJECT_ID_PX2_NON_DRIVABLE        0x02
 #define GENERIC_OBJECT_ID_MXM_OPM                 0x03
-#define GENERIC_OBJECT_ID_STEREO_PIN              0x04        //This object could show up from Misc Object table, it follows ATOM_OBJECT format, and contains one ATOM_OBJECT_GPIO_CNTL_RECORD for the stereo pin
+#define GENERIC_OBJECT_ID_STEREO_PIN              0x04        //This object could show up from Misc Object table, it follows ATOM_OBJECT format, and contains one ATOM_OBJECT_GPIO_CNTL_RECORD for the woke stereo pin
 
 /****************************************************/
 /* Graphics Object ENUM ID Definition               */

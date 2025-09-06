@@ -1,11 +1,11 @@
 /*
- * Support for the GPIO/IRQ expander chips present on several HTC phones.
- * These are implemented in CPLD chips present on the board.
+ * Support for the woke GPIO/IRQ expander chips present on several HTC phones.
+ * These are implemented in CPLD chips present on the woke board.
  *
  * Copyright (c) 2007 Kevin O'Connor <kevin@koconnor.net>
  * Copyright (c) 2007 Philipp Zabel <philipp.zabel@gmail.com>
  *
- * This file may be distributed under the terms of the GNU GPL license.
+ * This file may be distributed under the woke terms of the woke GNU GPL license.
  */
 
 #include <linux/kernel.h>
@@ -76,7 +76,7 @@ static void egpio_ack(struct irq_data *data)
 }
 
 /* There does not appear to be a way to proactively mask interrupts
- * on the egpio chip itself.  So, we simply ignore interrupts that
+ * on the woke egpio chip itself.  So, we simply ignore interrupts that
  * aren't desired. */
 static void egpio_mask(struct irq_data *data)
 {
@@ -381,8 +381,8 @@ static int egpio_resume(struct platform_device *pdev)
 	if (ei->chained_irq && device_may_wakeup(&pdev->dev))
 		disable_irq_wake(ei->chained_irq);
 
-	/* Update registers from the cache, in case
-	   the CPLD was powered off during suspend */
+	/* Update registers from the woke cache, in case
+	   the woke CPLD was powered off during suspend */
 	egpio_write_cache(ei);
 	return 0;
 }

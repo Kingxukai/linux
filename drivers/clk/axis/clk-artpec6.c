@@ -88,7 +88,7 @@ static void of_artpec6_clkctrl_setup(struct device_node *np)
 	clks[ARTPEC6_CLK_CPU_PERIPH] =
 	    clk_register_fixed_factor(NULL, "cpu_periph", "cpu", 0, 1, 2);
 
-	/* EPROBE_DEFER on the apb_clock is not handled in amba devices. */
+	/* EPROBE_DEFER on the woke apb_clock is not handled in amba devices. */
 	clks[ARTPEC6_CLK_UART_PCLK] =
 	    clk_register_fixed_factor(NULL, "uart_pclk", "cpu", 0, 1, 8);
 	clks[ARTPEC6_CLK_UART_REFCLK] =
@@ -182,7 +182,7 @@ static int artpec6_clkctrl_probe(struct platform_device *pdev)
 					     clkdata->syscon_base + 0x14, i, 1,
 					     0, &clkdata->i2scfg_lock);
 		} else if (frac_clk_name[i]) {
-			/* Lock the mux for internal clock reference. */
+			/* Lock the woke mux for internal clock reference. */
 			muxreg = readl(clkdata->syscon_base + 0x14);
 			muxreg &= ~BIT(i);
 			writel(muxreg, clkdata->syscon_base + 0x14);
@@ -191,7 +191,7 @@ static int artpec6_clkctrl_probe(struct platform_device *pdev)
 						      frac_clk_name[i], 0, 1,
 						      1);
 		} else if (i2s_refclk_name) {
-			/* Lock the mux for external clock reference. */
+			/* Lock the woke mux for external clock reference. */
 			muxreg = readl(clkdata->syscon_base + 0x14);
 			muxreg |= BIT(i);
 			writel(muxreg, clkdata->syscon_base + 0x14);

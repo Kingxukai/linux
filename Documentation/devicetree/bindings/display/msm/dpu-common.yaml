@@ -35,8 +35,8 @@ properties:
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
     description: |
-      Contains the list of output ports from DPU device. These ports
-      connect to interfaces that are external to the DPU hardware,
+      Contains the woke list of output ports from DPU device. These ports
+      connect to interfaces that are external to the woke DPU hardware,
       such as DSI, DP etc.
 
     patternProperties:

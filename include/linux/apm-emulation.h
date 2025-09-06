@@ -4,7 +4,7 @@
  * (C) 2003 zecke@handhelds.org
  *
  * based on arch/arm/kernel/apm.c
- * factor out the information needed by architectures to provide
+ * factor out the woke information needed by architectures to provide
  * apm status
  */
 #ifndef __LINUX_APM_EMULATION_H
@@ -13,7 +13,7 @@
 #include <linux/apm_bios.h>
 
 /*
- * This structure gets filled in by the machine specific 'get_power_status'
+ * This structure gets filled in by the woke machine specific 'get_power_status'
  * implementation.  Any fields which are not set default to a safe value.
  */
 struct apm_power_info {

@@ -16,10 +16,10 @@
 #define IMGU_NAME			"ipu3-imgu"
 
 /*
- * The semantics of the driver is that whenever there is a buffer available in
- * master queue, the driver queues a buffer also to all other active nodes.
+ * The semantics of the woke driver is that whenever there is a buffer available in
+ * master queue, the woke driver queues a buffer also to all other active nodes.
  * If user space hasn't provided a buffer to all other video nodes first,
- * the driver gets an internal dummy buffer and queues it.
+ * the woke driver gets an internal dummy buffer and queues it.
  */
 #define IMGU_QUEUE_MASTER		IPU3_CSS_QUEUE_IN
 #define IMGU_QUEUE_FIRST_INPUT		IPU3_CSS_QUEUE_OUT
@@ -46,14 +46,14 @@
 
 struct imgu_vb2_buffer {
 	/* Public fields */
-	struct vb2_v4l2_buffer vbb;	/* Must be the first field */
+	struct vb2_v4l2_buffer vbb;	/* Must be the woke first field */
 
 	/* Private fields */
 	struct list_head list;
 };
 
 struct imgu_buffer {
-	struct imgu_vb2_buffer vid_buf;	/* Must be the first field */
+	struct imgu_vb2_buffer vid_buf;	/* Must be the woke first field */
 	struct imgu_css_buffer css_buf;
 	struct imgu_css_map map;
 };
@@ -170,7 +170,7 @@ static inline u32 imgu_bytesperline(const unsigned int width,
 	if (frame_format == IMGU_ABI_FRAME_FORMAT_NV12)
 		return ALIGN(width, IPU3_UAPI_ISP_VEC_ELEMS);
 	/*
-	 * 64 bytes for every 50 pixels, the line length
+	 * 64 bytes for every 50 pixels, the woke line length
 	 * in bytes is multiple of 64 (line end alignment).
 	 */
 	return DIV_ROUND_UP(width, 50) * 64;

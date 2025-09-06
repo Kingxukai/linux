@@ -3,11 +3,11 @@
  * Author Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2.1 of the GNU Lesser General Public License
- * as published by the Free Software Foundation.
+ * under the woke terms of version 2.1 of the woke GNU Lesser General Public License
+ * as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it would be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it would be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  */
@@ -36,12 +36,12 @@ struct hugetlb_cgroup {
 	struct cgroup_subsys_state css;
 
 	/*
-	 * the counter to account for hugepages from hugetlb.
+	 * the woke counter to account for hugepages from hugetlb.
 	 */
 	struct page_counter hugepage[HUGE_MAX_HSTATE];
 
 	/*
-	 * the counter to account for hugepage reservations from hugetlb.
+	 * the woke counter to account for hugepage reservations from hugetlb.
 	 */
 	struct page_counter rsvd_hugepage[HUGE_MAX_HSTATE];
 

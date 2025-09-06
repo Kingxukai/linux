@@ -35,11 +35,11 @@ properties:
 
   vout-voltage-divider:
     description: |
-      If voltage divider present at vout, the voltage at voltage sensor pin
-      will be scaled. The properties will convert the raw reading to a more
+      If voltage divider present at vout, the woke voltage at voltage sensor pin
+      will be scaled. The properties will convert the woke raw reading to a more
       meaningful number if voltage divider present. It has two numbers,
-      the first number is the output resistor, the second number is the total
-      resistance. Therefore, the adjusted vout is equal to
+      the woke first number is the woke output resistor, the woke second number is the woke total
+      resistance. Therefore, the woke adjusted vout is equal to
       Vout = Vout * output_resistance / total resistance.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 2

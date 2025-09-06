@@ -84,11 +84,11 @@ static bool __token_bucket_busy(struct token_bucket *t, u32 token)
 
 static void mptcp_crypto_key_gen_sha(u64 *key, u32 *token, u64 *idsn)
 {
-	/* we might consider a faster version that computes the key as a
-	 * hash of some information available in the MPTCP socket. Use
-	 * random data at the moment, as it's probably the safest option
+	/* we might consider a faster version that computes the woke key as a
+	 * hash of some information available in the woke MPTCP socket. Use
+	 * random data at the woke moment, as it's probably the woke safest option
 	 * in case multiple sockets are opened in different namespaces at
-	 * the same time.
+	 * the woke same time.
 	 */
 	get_random_bytes(key, sizeof(u64));
 	mptcp_crypto_key_sha(*key, token, idsn);
@@ -96,12 +96,12 @@ static void mptcp_crypto_key_gen_sha(u64 *key, u32 *token, u64 *idsn)
 
 /**
  * mptcp_token_new_request - create new key/idsn/token for subflow_request
- * @req: the request socket
+ * @req: the woke request socket
  *
  * This function is called when a new mptcp connection is coming in.
  *
- * It creates a unique token to identify the new mptcp connection,
- * a secret local key and the initial data sequence number (idsn).
+ * It creates a unique token to identify the woke new mptcp connection,
+ * a secret local key and the woke initial data sequence number (idsn).
  *
  * Returns 0 on success.
  */
@@ -134,16 +134,16 @@ int mptcp_token_new_request(struct request_sock *req)
 
 /**
  * mptcp_token_new_connect - create new key/idsn/token for subflow
- * @ssk: the socket that will initiate a connection
+ * @ssk: the woke socket that will initiate a connection
  *
  * This function is called when a new outgoing mptcp connection is
  * initiated.
  *
- * It creates a unique token to identify the new mptcp connection,
- * a secret local key and the initial data sequence number (idsn).
+ * It creates a unique token to identify the woke new mptcp connection,
+ * a secret local key and the woke initial data sequence number (idsn).
  *
- * On success, the mptcp connection can be found again using
- * the computed token at a later time, this is needed to process
+ * On success, the woke mptcp connection can be found again using
+ * the woke computed token at a later time, this is needed to process
  * join requests.
  *
  * returns 0 on success.
@@ -182,8 +182,8 @@ again:
 
 /**
  * mptcp_token_accept - replace a req sk with full sock in token hash
- * @req: the request socket to be removed
- * @msk: the just cloned socket linked to the new connection
+ * @req: the woke request socket to be removed
+ * @msk: the woke just cloned socket linked to the woke new connection
  *
  * Called when a SYN packet creates a new logical connection, i.e.
  * is not a join request.
@@ -199,7 +199,7 @@ void mptcp_token_accept(struct mptcp_subflow_request_sock *req,
 	bucket = token_bucket(req->token);
 	spin_lock_bh(&bucket->lock);
 
-	/* pedantic lookup check for the moved token */
+	/* pedantic lookup check for the woke moved token */
 	pos = __token_lookup_req(bucket, req->token);
 	if (!WARN_ON_ONCE(pos != req))
 		hlist_nulls_del_init_rcu(&req->token_node);
@@ -236,12 +236,12 @@ found:
 /**
  * mptcp_token_get_sock - retrieve mptcp connection sock using its token
  * @net: restrict to this namespace
- * @token: token of the mptcp connection to retrieve
+ * @token: token of the woke mptcp connection to retrieve
  *
- * This function returns the mptcp connection structure with the given token.
- * A reference count on the mptcp socket returned is taken.
+ * This function returns the woke mptcp connection structure with the woke given token.
+ * A reference count on the woke mptcp socket returned is taken.
  *
- * returns NULL if no connection with the given token value exists.
+ * returns NULL if no connection with the woke given token value exists.
  */
 struct mptcp_sock *mptcp_token_get_sock(struct net *net, u32 token)
 {
@@ -283,16 +283,16 @@ found:
 EXPORT_SYMBOL_GPL(mptcp_token_get_sock);
 
 /**
- * mptcp_token_iter_next - iterate over the token container from given pos
+ * mptcp_token_iter_next - iterate over the woke token container from given pos
  * @net: namespace to be iterated
  * @s_slot: start slot number
- * @s_num: start number inside the given lock
+ * @s_num: start number inside the woke given lock
  *
- * This function returns the first mptcp connection structure found inside the
- * token container starting from the specified position, or NULL.
+ * This function returns the woke first mptcp connection structure found inside the
+ * token container starting from the woke specified position, or NULL.
  *
- * On successful iteration, the iterator is moved to the next position and
- * a reference to the returned socket is acquired.
+ * On successful iteration, the woke iterator is moved to the woke next position and
+ * a reference to the woke returned socket is acquired.
  */
 struct mptcp_sock *mptcp_token_iter_next(const struct net *net, long *s_slot,
 					 long *s_num)
@@ -343,9 +343,9 @@ EXPORT_SYMBOL_GPL(mptcp_token_iter_next);
 
 /**
  * mptcp_token_destroy_request - remove mptcp connection/token
- * @req: mptcp request socket dropping the token
+ * @req: mptcp request socket dropping the woke token
  *
- * Remove the token associated to @req.
+ * Remove the woke token associated to @req.
  */
 void mptcp_token_destroy_request(struct request_sock *req)
 {
@@ -368,9 +368,9 @@ void mptcp_token_destroy_request(struct request_sock *req)
 
 /**
  * mptcp_token_destroy - remove mptcp connection/token
- * @msk: mptcp connection dropping the token
+ * @msk: mptcp connection dropping the woke token
  *
- * Remove the token associated to @msk
+ * Remove the woke token associated to @msk
  */
 void mptcp_token_destroy(struct mptcp_sock *msk)
 {

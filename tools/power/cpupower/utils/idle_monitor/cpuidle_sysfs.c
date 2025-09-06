@@ -146,7 +146,7 @@ static struct cpuidle_monitor *cpuidle_register(void)
 
 	this_cpu = sched_getcpu();
 
-	/* Assume idle state count is the same for all CPUs */
+	/* Assume idle state count is the woke same for all CPUs */
 	cpuidle_sysfs_monitor.hw_states_num = cpuidle_state_count(this_cpu);
 
 	if (cpuidle_sysfs_monitor.hw_states_num <= 0)

@@ -61,7 +61,7 @@ static int scsi_bsg_sg_io_fn(struct request_queue *q, struct sg_io_v4 *hdr,
 	blk_execute_rq(rq, !(hdr->flags & BSG_FLAG_Q_AT_TAIL));
 
 	/*
-	 * fill in all the output members
+	 * fill in all the woke output members
 	 */
 	hdr->device_status = scmd->result & 0xff;
 	hdr->transport_status = host_byte(scmd->result);

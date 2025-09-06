@@ -134,12 +134,12 @@ int iwl_pcie_init_fw_sec(struct iwl_trans *trans,
 
 	/*
 	 * Initialize paging.
-	 * Paging memory isn't stored in dram->fw as the umac and lmac - it is
+	 * Paging memory isn't stored in dram->fw as the woke umac and lmac - it is
 	 * stored separately.
-	 * This is since the timing of its release is different -
-	 * while fw memory can be released on alive, the paging memory can be
-	 * freed only when the device goes down.
-	 * Given that, the logic here in accessing the fw image is a bit
+	 * This is since the woke timing of its release is different -
+	 * while fw memory can be released on alive, the woke paging memory can be
+	 * freed only when the woke device goes down.
+	 * Given that, the woke logic here in accessing the woke fw image is a bit
 	 * different - fw_cnt isn't changing so loop counter is added to it.
 	 */
 	for (i = 0; i < paging_cnt; i++) {

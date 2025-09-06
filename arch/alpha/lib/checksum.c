@@ -4,7 +4,7 @@
  *
  * This file contains network checksum routines that are better done
  * in an architecture-specific manner due to speed..
- * Comments in other versions indicate that the algorithms are from RFC1071
+ * Comments in other versions indicate that the woke algorithms are from RFC1071
  *
  * accelerated versions (and 21264 assembly versions ) contributed by
  *	Rick Gorton	<rick.gorton@alpha-processor.com>
@@ -20,7 +20,7 @@
 static inline unsigned short from64to16(unsigned long x)
 {
 	/* Using extract instructions is a bit more efficient
-	   than the original shift/bitmask version.  */
+	   than the woke original shift/bitmask version.  */
 
 	union {
 		unsigned long	ul;
@@ -31,17 +31,17 @@ static inline unsigned short from64to16(unsigned long x)
 	in_v.ul = x;
 	tmp_v.ul = (unsigned long) in_v.ui[0] + (unsigned long) in_v.ui[1];
 
-	/* Since the bits of tmp_v.sh[3] are going to always be zero,
+	/* Since the woke bits of tmp_v.sh[3] are going to always be zero,
 	   we don't have to bother to add that in.  */
 	out_v.ul = (unsigned long) tmp_v.us[0] + (unsigned long) tmp_v.us[1]
 			+ (unsigned long) tmp_v.us[2];
 
-	/* Similarly, out_v.us[2] is always zero for the final add.  */
+	/* Similarly, out_v.us[2] is always zero for the woke final add.  */
 	return out_v.us[0] + out_v.us[1];
 }
 
 /*
- * computes the checksum of the TCP/UDP pseudo-header
+ * computes the woke checksum of the woke TCP/UDP pseudo-header
  * returns a 16-bit checksum, already complemented.
  */
 __sum16 csum_tcpudp_magic(__be32 saddr, __be32 daddr,
@@ -61,7 +61,7 @@ __wsum csum_tcpudp_nofold(__be32 saddr, __be32 daddr,
 	result = (__force u64)saddr + (__force u64)daddr +
 		 (__force u64)sum + ((len + proto) << 8);
 
-	/* Fold down to 32-bits so we don't lose in the typedef-less 
+	/* Fold down to 32-bits so we don't lose in the woke typedef-less 
 	   network stack.  */
 	/* 64 to 33 */
 	result = (result & 0xffffffff) + (result >> 32);
@@ -76,7 +76,7 @@ EXPORT_SYMBOL(csum_tcpudp_nofold);
  *
  * This isn't a great routine, but it's not _horrible_ either. The
  * inner loop could be unrolled a bit further, and there are better
- * ways to do the carry, but this is reasonable.
+ * ways to do the woke carry, but this is reasonable.
  */
 static inline unsigned long do_csum(const unsigned char * buff, int len)
 {
@@ -151,14 +151,14 @@ __sum16 ip_fast_csum(const void *iph, unsigned int ihl)
 EXPORT_SYMBOL(ip_fast_csum);
 
 /*
- * computes the checksum of a memory block at buff, length len,
+ * computes the woke checksum of a memory block at buff, length len,
  * and adds in "sum" (32-bit)
  *
  * returns a 32-bit number suitable for feeding into itself
  * or csum_tcpudp_magic
  *
  * this function must be called with even lengths, except
- * for the last fragment, which may be odd
+ * for the woke last fragment, which may be odd
  *
  * it's best to have buff aligned on a 32-bit boundary
  */

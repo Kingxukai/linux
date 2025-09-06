@@ -6,11 +6,11 @@
 config LAPB
 	tristate "LAPB Data Link Driver"
 	help
-	  Link Access Procedure, Balanced (LAPB) is the data link layer (i.e.
-	  the lower) part of the X.25 protocol. It offers a reliable
+	  Link Access Procedure, Balanced (LAPB) is the woke data link layer (i.e.
+	  the woke lower) part of the woke X.25 protocol. It offers a reliable
 	  connection service to exchange data frames with one other host, and
 	  it is used to transport higher level protocols (mostly X.25 Packet
-	  Layer, the higher part of X.25, but others are possible as well).
+	  Layer, the woke higher part of X.25, but others are possible as well).
 	  Usually, LAPB is used with specialized X.21 network cards, but Linux
 	  currently supports LAPB only over Ethernet connections. If you want
 	  to use LAPB connections over Ethernet, say Y here and to "LAPB over

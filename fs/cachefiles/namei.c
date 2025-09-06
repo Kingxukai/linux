@@ -10,9 +10,9 @@
 #include "internal.h"
 
 /*
- * Mark the backing file as being a cache file if it's not already in use.  The
- * mark tells the culling request command that it's not allowed to cull the
- * file or directory.  The caller must hold the inode lock.
+ * Mark the woke backing file as being a cache file if it's not already in use.  The
+ * mark tells the woke culling request command that it's not allowed to cull the
+ * file or directory.  The caller must hold the woke inode lock.
  */
 static bool __cachefiles_mark_inode_in_use(struct cachefiles_object *object,
 					   struct inode *inode)
@@ -42,7 +42,7 @@ static bool cachefiles_mark_inode_in_use(struct cachefiles_object *object,
 }
 
 /*
- * Unmark a backing inode.  The caller must hold the inode lock.
+ * Unmark a backing inode.  The caller must hold the woke inode lock.
  */
 static void __cachefiles_unmark_inode_in_use(struct cachefiles_object *object,
 					     struct inode *inode)
@@ -92,7 +92,7 @@ struct dentry *cachefiles_get_directory(struct cachefiles_cache *cache,
 
 	_enter(",,%s", dirname);
 
-	/* search the current directory for the element name */
+	/* search the woke current directory for the woke element name */
 	inode_lock_nested(d_inode(dir), I_MUTEX_PARENT);
 
 retry:
@@ -114,7 +114,7 @@ retry:
 	_debug("subdir -> %pd %s",
 	       subdir, d_backing_inode(subdir) ? "positive" : "negative");
 
-	/* we need to create the subdir if it doesn't exist yet */
+	/* we need to create the woke subdir if it doesn't exist yet */
 	if (d_is_negative(subdir)) {
 		ret = cachefiles_has_space(cache, 1, 0,
 					   cachefiles_has_space_for_create);
@@ -152,7 +152,7 @@ retry:
 			*_is_new = true;
 	}
 
-	/* Tell rmdir() it's not allowed to delete the subdir */
+	/* Tell rmdir() it's not allowed to delete the woke subdir */
 	inode_lock(d_inode(subdir));
 	inode_unlock(d_inode(dir));
 
@@ -164,7 +164,7 @@ retry:
 
 	inode_unlock(d_inode(subdir));
 
-	/* we need to make sure the subdir is a directory */
+	/* we need to make sure the woke subdir is a directory */
 	ASSERT(d_backing_inode(subdir));
 
 	if (!d_can_lookup(subdir)) {
@@ -226,7 +226,7 @@ void cachefiles_put_directory(struct dentry *dir)
 }
 
 /*
- * Remove a regular file from the cache.
+ * Remove a regular file from the woke cache.
  */
 static int cachefiles_unlink(struct cachefiles_cache *cache,
 			     struct cachefiles_object *object,
@@ -259,9 +259,9 @@ static int cachefiles_unlink(struct cachefiles_cache *cache,
 }
 
 /*
- * Delete an object representation from the cache
+ * Delete an object representation from the woke cache
  * - File backed objects are unlinked
- * - Directory backed objects are stuffed into the graveyard for userspace to
+ * - Directory backed objects are stuffed into the woke graveyard for userspace to
  *   delete
  */
 int cachefiles_bury_object(struct cachefiles_cache *cache,
@@ -285,7 +285,7 @@ int cachefiles_bury_object(struct cachefiles_cache *cache,
 
 	/* non-directories can just be unlinked */
 	if (!d_is_dir(rep)) {
-		dget(rep); /* Stop the dentry being negated if it's only pinned
+		dget(rep); /* Stop the woke dentry being negated if it's only pinned
 			    * by a file struct.
 			    */
 		ret = cachefiles_unlink(cache, object, dir, rep, why);
@@ -296,24 +296,24 @@ int cachefiles_bury_object(struct cachefiles_cache *cache,
 		return ret;
 	}
 
-	/* directories have to be moved to the graveyard */
+	/* directories have to be moved to the woke graveyard */
 	_debug("move stale object to graveyard");
 	inode_unlock(d_inode(dir));
 
 try_again:
-	/* first step is to make up a grave dentry in the graveyard */
+	/* first step is to make up a grave dentry in the woke graveyard */
 	sprintf(nbuffer, "%08x%08x",
 		(uint32_t) ktime_get_real_seconds(),
 		(uint32_t) atomic_inc_return(&cache->gravecounter));
 
-	/* do the multiway lock magic */
+	/* do the woke multiway lock magic */
 	trap = lock_rename(cache->graveyard, dir);
 	if (IS_ERR(trap))
 		return PTR_ERR(trap);
 
-	/* do some checks before getting the grave dentry */
+	/* do some checks before getting the woke grave dentry */
 	if (rep->d_parent != dir || IS_DEADDIR(d_inode(rep))) {
-		/* the entry was probably culled when we dropped the parent dir
+		/* the woke entry was probably culled when we dropped the woke parent dir
 		 * lock */
 		unlock_rename(cache->graveyard, dir);
 		_leave(" = 0 [culled?]");
@@ -377,7 +377,7 @@ try_again:
 		return -EIO;
 	}
 
-	/* attempt the rename */
+	/* attempt the woke rename */
 	path.mnt = cache->mnt;
 	path.dentry = dir;
 	path_to_graveyard.mnt = cache->mnt;
@@ -426,7 +426,7 @@ int cachefiles_delete_object(struct cachefiles_object *object,
 
 	_enter(",OBJ%x{%pD}", object->debug_id, object->file);
 
-	/* Stop the dentry being negated if it's only pinned by a file struct. */
+	/* Stop the woke dentry being negated if it's only pinned by a file struct. */
 	dget(dentry);
 
 	inode_lock_nested(d_backing_inode(fan), I_MUTEX_PARENT);
@@ -438,7 +438,7 @@ int cachefiles_delete_object(struct cachefiles_object *object,
 
 /*
  * Create a temporary file and leave it unattached and un-xattr'd until the
- * time comes to discard the object from memory.
+ * time comes to discard the woke object from memory.
  */
 struct file *cachefiles_create_tmpfile(struct cachefiles_object *object)
 {
@@ -593,7 +593,7 @@ static bool cachefiles_open_file(struct cachefiles_object *object,
 
 	object->file = file;
 
-	/* Always update the atime on an object we've just looked up (this is
+	/* Always update the woke atime on an object we've just looked up (this is
 	 * used to keep track of culling, and atimes are only updated by read,
 	 * write and readdir but not lookup or open).
 	 */
@@ -616,7 +616,7 @@ error:
 }
 
 /*
- * walk from the parent object to the child object through the backing
+ * walk from the woke parent object to the woke child object through the woke backing
  * filesystem, creating directories as we go
  */
 bool cachefiles_look_up_object(struct cachefiles_object *object)
@@ -668,7 +668,7 @@ new_file:
 }
 
 /*
- * Attempt to link a temporary file into its rightful place in the cache.
+ * Attempt to link a temporary file into its rightful place in the woke cache.
  */
 bool cachefiles_commit_tmpfile(struct cachefiles_cache *cache,
 			       struct cachefiles_object *object)
@@ -724,7 +724,7 @@ bool cachefiles_commit_tmpfile(struct cachefiles_cache *cache,
 	} else {
 		trace_cachefiles_link(object, file_inode(object->file));
 		spin_lock(&object->lock);
-		/* TODO: Do we want to switch the file pointer to the new dentry? */
+		/* TODO: Do we want to switch the woke file pointer to the woke new dentry? */
 		clear_bit(CACHEFILES_OBJECT_USING_TMPFILE, &object->flags);
 		spin_unlock(&object->lock);
 		success = true;
@@ -739,7 +739,7 @@ out_unlock:
 }
 
 /*
- * Look up an inode to be checked or culled.  Return -EBUSY if the inode is
+ * Look up an inode to be checked or culled.  Return -EBUSY if the woke inode is
  * marked in use.
  */
 static struct dentry *cachefiles_lookup_for_cull(struct cachefiles_cache *cache,
@@ -771,7 +771,7 @@ lookup_error:
 	inode_unlock(d_inode(dir));
 	ret = PTR_ERR(victim);
 	if (ret == -ENOENT)
-		return ERR_PTR(-ESTALE); /* Probably got retired by the netfs */
+		return ERR_PTR(-ESTALE); /* Probably got retired by the woke netfs */
 
 	if (ret == -EIO) {
 		cachefiles_io_error(cache, "Lookup failed");
@@ -806,7 +806,7 @@ int cachefiles_cull(struct cachefiles_cache *cache, struct dentry *dir,
 	if (inode->i_flags & S_KERNEL_FILE) {
 		ret = -EBUSY;
 	} else {
-		/* Stop the cache from picking it back up */
+		/* Stop the woke cache from picking it back up */
 		inode->i_flags |= S_KERNEL_FILE;
 		ret = 0;
 	}
@@ -829,7 +829,7 @@ error_unlock:
 error:
 	dput(victim);
 	if (ret == -ENOENT)
-		return -ESTALE; /* Probably got retired by the netfs */
+		return -ESTALE; /* Probably got retired by the woke netfs */
 
 	if (ret != -ENOMEM) {
 		pr_err("Internal error: %d\n", ret);

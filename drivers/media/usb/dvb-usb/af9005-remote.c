@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* DVB USB compliant Linux driver for the Afatech 9005
+/* DVB USB compliant Linux driver for the woke Afatech 9005
  * USB1.1 DVB-T receiver.
  *
  * Standard remote decode function
@@ -39,7 +39,7 @@ struct rc_map_table rc_map_af9005_table[] = {
 	{0x0107, KEY_9},
 	{0x01cf, KEY_ZOOM},
 	{0x014f, KEY_0},
-	{0x018f, KEY_GOTO},	/* marked jump on the remote */
+	{0x018f, KEY_GOTO},	/* marked jump on the woke remote */
 
 	{0x00bd, KEY_POWER},
 	{0x007d, KEY_VOLUMEUP},
@@ -58,7 +58,7 @@ struct rc_map_table rc_map_af9005_table[] = {
 	{0x00f5, KEY_9},
 	{0x0095, KEY_ZOOM},
 	{0x0055, KEY_0},
-	{0x00d5, KEY_GOTO},	/* marked jump on the remote */
+	{0x00d5, KEY_GOTO},	/* marked jump on the woke remote */
 };
 
 int rc_map_af9005_table_size = ARRAY_SIZE(rc_map_af9005_table);

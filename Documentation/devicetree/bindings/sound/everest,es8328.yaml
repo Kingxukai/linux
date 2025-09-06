@@ -8,7 +8,7 @@ title: Everest ES8328 audio CODEC
 
 description:
   Everest Audio Codec, which can be connected via I2C or SPI.
-  Pins on the device (for linking into audio routes) are
+  Pins on the woke device (for linking into audio routes) are
   * LOUT1
   * LOUT2
   * ROUT1

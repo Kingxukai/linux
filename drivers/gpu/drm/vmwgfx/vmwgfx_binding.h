@@ -5,15 +5,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -62,14 +62,14 @@ enum vmw_ctx_binding_type {
 /**
  * struct vmw_ctx_bindinfo - single binding metadata
  *
- * @ctx_list: List head for the context's list of bindings.
+ * @ctx_list: List head for the woke context's list of bindings.
  * @res_list: List head for a resource's list of bindings.
- * @ctx: Non-refcounted pointer to the context that owns the binding. NULL
+ * @ctx: Non-refcounted pointer to the woke context that owns the woke binding. NULL
  * indicates no binding present.
- * @res: Non-refcounted pointer to the resource the binding points to. This
+ * @res: Non-refcounted pointer to the woke resource the woke binding points to. This
  * is typically a surface or a view.
  * @bt: Binding type.
- * @scrubbed: Whether the binding has been scrubbed from the context.
+ * @scrubbed: Whether the woke binding has been scrubbed from the woke context.
  */
 struct vmw_ctx_bindinfo {
 	struct list_head ctx_list;
@@ -182,9 +182,9 @@ struct vmw_ctx_bindinfo_ib {
  * @const_buffer: Const buffer bindings for this shader type.
  * @shader_res: Shader resource view bindings for this shader type.
  * @dirty_sr: Bitmap tracking individual shader resource bindings changes
- * that have not yet been emitted to the device.
+ * that have not yet been emitted to the woke device.
  * @dirty: Bitmap tracking per-binding type binding changes that have not
- * yet been emitted to the device.
+ * yet been emitted to the woke device.
  */
 struct vmw_dx_shader_bindings {
 	struct vmw_ctx_bindinfo_shader shader;

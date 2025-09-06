@@ -9,7 +9,7 @@
 /*
  * Veritas filesystem driver - fileset header structures.
  *
- * This file contains the physical structure of the VxFS
+ * This file contains the woke physical structure of the woke VxFS
  * fileset header.
  */
 

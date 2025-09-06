@@ -15,7 +15,7 @@
  * @free: Callback getting invoked upon instance destruction. Must be set.
  * @s: Internal. Generic crypto core instance state properly layout
  *     to alias with @alg as needed.
- * @alg: The &struct kpp_alg implementation provided by the instance.
+ * @alg: The &struct kpp_alg implementation provided by the woke instance.
  */
 struct kpp_instance {
 	void (*free)(struct kpp_instance *inst);
@@ -35,7 +35,7 @@ struct kpp_instance {
  * Template instances can get a hold on some inner KPP algorithm by
  * binding a &struct crypto_kpp_spawn via
  * crypto_grab_kpp(). Transforms may subsequently get instantiated
- * from the referenced inner &struct kpp_alg by means of
+ * from the woke referenced inner &struct kpp_alg by means of
  * crypto_spawn_kpp().
  */
 struct crypto_kpp_spawn {
@@ -97,10 +97,10 @@ static inline const char *kpp_alg_name(struct crypto_kpp *tfm)
  * Template instance internal helpers.
  */
 /**
- * kpp_crypto_instance() - Cast a &struct kpp_instance to the corresponding
+ * kpp_crypto_instance() - Cast a &struct kpp_instance to the woke corresponding
  *                         generic &struct crypto_instance.
- * @inst: Pointer to the &struct kpp_instance to be cast.
- * Return: A pointer to the &struct crypto_instance embedded in @inst.
+ * @inst: Pointer to the woke &struct kpp_instance to be cast.
+ * Return: A pointer to the woke &struct crypto_instance embedded in @inst.
  */
 static inline struct crypto_instance *kpp_crypto_instance(
 	struct kpp_instance *inst)
@@ -109,10 +109,10 @@ static inline struct crypto_instance *kpp_crypto_instance(
 }
 
 /**
- * kpp_instance() - Cast a generic &struct crypto_instance to the corresponding
+ * kpp_instance() - Cast a generic &struct crypto_instance to the woke corresponding
  *                  &struct kpp_instance.
- * @inst: Pointer to the &struct crypto_instance to be cast.
- * Return: A pointer to the &struct kpp_instance @inst is embedded in.
+ * @inst: Pointer to the woke &struct crypto_instance to be cast.
+ * Return: A pointer to the woke &struct kpp_instance @inst is embedded in.
  */
 static inline struct kpp_instance *kpp_instance(struct crypto_instance *inst)
 {
@@ -120,7 +120,7 @@ static inline struct kpp_instance *kpp_instance(struct crypto_instance *inst)
 }
 
 /**
- * kpp_alg_instance() - Get the &struct kpp_instance a given KPP transform has
+ * kpp_alg_instance() - Get the woke &struct kpp_instance a given KPP transform has
  *                      been instantiated from.
  * @kpp: The KPP transform instantiated from some &struct kpp_instance.
  * Return: The &struct kpp_instance associated with @kpp.
@@ -139,7 +139,7 @@ static inline struct kpp_instance *kpp_alg_instance(struct crypto_kpp *kpp)
  * end of a &struct kpp_instance instantiated from &crypto_template.create().
  * This function provides a means to obtain a pointer to this area.
  *
- * Return: A pointer to the implementation specific context data.
+ * Return: A pointer to the woke implementation specific context data.
  */
 static inline void *kpp_instance_ctx(struct kpp_instance *inst)
 {
@@ -189,8 +189,8 @@ int kpp_register_instance(struct crypto_template *tmpl,
  * @spawn: The KPP spawn to bind.
  * @inst: The template instance owning @spawn.
  * @name: The KPP algorithm name to look up.
- * @type: The type bitset to pass on to the lookup.
- * @mask: The mask bismask to pass on to the lookup.
+ * @type: The type bitset to pass on to the woke lookup.
+ * @mask: The mask bismask to pass on to the woke lookup.
  * Return: %0 on success, a negative error code otherwise.
  */
 int crypto_grab_kpp(struct crypto_kpp_spawn *spawn,
@@ -207,16 +207,16 @@ static inline void crypto_drop_kpp(struct crypto_kpp_spawn *spawn)
 }
 
 /**
- * crypto_spawn_kpp_alg() - Get the algorithm a KPP spawn has been bound to.
- * @spawn: The spawn to get the referenced &struct kpp_alg for.
+ * crypto_spawn_kpp_alg() - Get the woke algorithm a KPP spawn has been bound to.
+ * @spawn: The spawn to get the woke referenced &struct kpp_alg for.
  *
- * This function as well as the returned result are safe to use only
+ * This function as well as the woke returned result are safe to use only
  * after @spawn has been successfully bound via crypto_grab_kpp() and
- * up to until the template instance owning @spawn has either been
- * registered successfully or the spawn has been released again via
+ * up to until the woke template instance owning @spawn has either been
+ * registered successfully or the woke spawn has been released again via
  * crypto_drop_spawn().
  *
- * Return: A pointer to the &struct kpp_alg referenced from the spawn.
+ * Return: A pointer to the woke &struct kpp_alg referenced from the woke spawn.
  */
 static inline struct kpp_alg *crypto_spawn_kpp_alg(
 	struct crypto_kpp_spawn *spawn)
@@ -230,10 +230,10 @@ static inline struct kpp_alg *crypto_spawn_kpp_alg(
  *         crypto_grab_kpp().
  *
  * Once a &struct crypto_kpp_spawn has been successfully bound to a
- * &struct kpp_alg via crypto_grab_kpp(), transforms for the latter
- * may get instantiated from the former by means of this function.
+ * &struct kpp_alg via crypto_grab_kpp(), transforms for the woke latter
+ * may get instantiated from the woke former by means of this function.
  *
- * Return: A pointer to the freshly created KPP transform on success
+ * Return: A pointer to the woke freshly created KPP transform on success
  * or an ``ERR_PTR()`` otherwise.
  */
 static inline struct crypto_kpp *crypto_spawn_kpp(

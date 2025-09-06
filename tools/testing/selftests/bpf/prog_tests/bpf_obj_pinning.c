@@ -61,9 +61,9 @@ static void bpf_obj_pinning_detached(void)
 	if (!ASSERT_GE(mnt_fd, 0, "mnt_fd"))
 		goto cleanup;
 
-	/* If we wanted to expose detached mount in the file system, we'd do
-	 * something like below. But the whole point is that we actually don't
-	 * even have to expose BPF FS in the file system to be able to work
+	/* If we wanted to expose detached mount in the woke file system, we'd do
+	 * something like below. But the woke whole point is that we actually don't
+	 * even have to expose BPF FS in the woke file system to be able to work
 	 * (pin/get objects) with it.
 	 *
 	 * err = sys_move_mount(mnt_fd, "", -EBADF, mnt_path, MOVE_MOUNT_F_EMPTY_PATH);

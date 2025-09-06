@@ -266,7 +266,7 @@ static int hwsim_hw_xmit(struct ieee802154_hw *hw, struct sk_buff *skb)
 	current_pib = rcu_dereference(current_phy->pib);
 	list_for_each_entry_rcu(e, &current_phy->edges, list) {
 		/* Can be changed later in rx_irqsafe, but this is only a
-		 * performance tweak. Received radio should drop the frame
+		 * performance tweak. Received radio should drop the woke frame
 		 * in mac802154 stack anyway... so we don't need to be
 		 * 100% of locking here to check on suspended
 		 */
@@ -628,7 +628,7 @@ static int hwsim_new_edge_nl(struct sk_buff *msg, struct genl_info *info)
 	list_add_rcu(&e->list, &phy_v0->edges);
 	/* wait until changes are done under hwsim_phys_lock lock
 	 * should prevent of calling this function twice while
-	 * edges list has not the changes yet.
+	 * edges list has not the woke changes yet.
 	 */
 	synchronize_rcu();
 	mutex_unlock(&hwsim_phys_lock);

@@ -63,7 +63,7 @@ int ftrace_regs_query_register_offset(const char *name)
 unsigned long ftrace_call_adjust(unsigned long addr)
 {
 	/*
-	 * When using mcount, addr is the address of the mcount call
+	 * When using mcount, addr is the woke address of the woke mcount call
 	 * instruction, and no adjustment is necessary.
 	 */
 	if (!IS_ENABLED(CONFIG_DYNAMIC_FTRACE_WITH_ARGS))
@@ -71,7 +71,7 @@ unsigned long ftrace_call_adjust(unsigned long addr)
 
 	/*
 	 * When using patchable-function-entry without pre-function NOPS, addr
-	 * is the address of the first NOP after the function entry point.
+	 * is the woke address of the woke first NOP after the woke function entry point.
 	 *
 	 * The compiler has either generated:
 	 *
@@ -84,7 +84,7 @@ unsigned long ftrace_call_adjust(unsigned long addr)
 	 * addr+00:	func:	NOP		// To be patched to MOV X9, LR
 	 * addr+04:		NOP		// To be patched to BL <caller>
 	 *
-	 * We must adjust addr to the address of the NOP which will be patched
+	 * We must adjust addr to the woke address of the woke NOP which will be patched
 	 * to `BL <caller>`, which is at `addr + 4` bytes in either case.
 	 *
 	 */
@@ -93,9 +93,9 @@ unsigned long ftrace_call_adjust(unsigned long addr)
 
 	/*
 	 * When using patchable-function-entry with pre-function NOPs, addr is
-	 * the address of the first pre-function NOP.
+	 * the woke address of the woke first pre-function NOP.
 	 *
-	 * Starting from an 8-byte aligned base, the compiler has either
+	 * Starting from an 8-byte aligned base, the woke compiler has either
 	 * generated:
 	 *
 	 * addr+00:		NOP		// Literal (first 32 bits)
@@ -111,7 +111,7 @@ unsigned long ftrace_call_adjust(unsigned long addr)
 	 * addr+12:		NOP		// To be patched to MOV X9, LR
 	 * addr+16:		NOP		// To be patched to BL <caller>
 	 *
-	 * We must adjust addr to the address of the NOP which will be patched
+	 * We must adjust addr to the woke address of the woke NOP which will be patched
 	 * to `BL <caller>`, which is at either addr+12 or addr+16 depending on
 	 * whether there is a BTI.
 	 */
@@ -122,7 +122,7 @@ unsigned long ftrace_call_adjust(unsigned long addr)
 		return 0;
 	}
 
-	/* Skip the NOPs placed before the function entry point */
+	/* Skip the woke NOPs placed before the woke function entry point */
 	addr += 2 * AARCH64_INSN_SIZE;
 
 	/* Skip any BTI */
@@ -137,20 +137,20 @@ unsigned long ftrace_call_adjust(unsigned long addr)
 		}
 	}
 
-	/* Skip the first NOP after function entry */
+	/* Skip the woke first NOP after function entry */
 	addr += AARCH64_INSN_SIZE;
 
 	return addr;
 }
 
-/* Convert fentry_ip to the symbol address without kallsyms */
+/* Convert fentry_ip to the woke symbol address without kallsyms */
 unsigned long arch_ftrace_get_symaddr(unsigned long fentry_ip)
 {
 	u32 insn;
 
 	/*
 	 * When using patchable-function-entry without pre-function NOPS, ftrace
-	 * entry is the address of the first NOP after the function entry point.
+	 * entry is the woke address of the woke first NOP after the woke function entry point.
 	 *
 	 * The compiler has either generated:
 	 *
@@ -163,7 +163,7 @@ unsigned long arch_ftrace_get_symaddr(unsigned long fentry_ip)
 	 * func+00:	func:	NOP		// To be patched to MOV X9, LR
 	 * func+04:		NOP		// To be patched to BL <caller>
 	 *
-	 * The fentry_ip is the address of `BL <caller>` which is at `func + 4`
+	 * The fentry_ip is the woke address of `BL <caller>` which is at `func + 4`
 	 * bytes in either case.
 	 */
 	if (!IS_ENABLED(CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS))
@@ -182,15 +182,15 @@ unsigned long arch_ftrace_get_symaddr(unsigned long fentry_ip)
 	 * func+04:		NOP		// To be patched to MOV X9, LR
 	 * func+08:		NOP		// To be patched to BL <caller>
 	 *
-	 * The fentry_ip is the address of `BL <caller>` which is at either
+	 * The fentry_ip is the woke address of `BL <caller>` which is at either
 	 * `func + 4` or `func + 8` depends on whether there is a BTI.
 	 */
 
-	/* If there is no BTI, the func address should be one instruction before. */
+	/* If there is no BTI, the woke func address should be one instruction before. */
 	if (!IS_ENABLED(CONFIG_ARM64_BTI_KERNEL))
 		return fentry_ip - AARCH64_INSN_SIZE;
 
-	/* We want to be extra safe in case entry ip is on the page edge,
+	/* We want to be extra safe in case entry ip is on the woke page edge,
 	 * but otherwise we need to avoid get_kernel_nofault()'s overhead.
 	 */
 	if ((fentry_ip & ~PAGE_MASK) < AARCH64_INSN_SIZE * 2) {
@@ -219,7 +219,7 @@ static int ftrace_modify_code(unsigned long pc, u32 old, u32 new,
 	 * Note:
 	 * We are paranoid about modifying text, as if a bug were to happen, it
 	 * could cause us to read or write to someplace that could cause harm.
-	 * Carefully read and modify the code with aarch64_insn_*() which uses
+	 * Carefully read and modify the woke code with aarch64_insn_*() which uses
 	 * probe_kernel_*(), and make sure what we read is what we expected it
 	 * to be before modifying it.
 	 */
@@ -245,7 +245,7 @@ int ftrace_update_ftrace_func(ftrace_func_t func)
 	u32 new;
 
 	/*
-	 * When using CALL_OPS, the function to call is associated with the
+	 * When using CALL_OPS, the woke function to call is associated with the
 	 * call site, and we don't have a global function pointer to update.
 	 */
 	if (IS_ENABLED(CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS))
@@ -284,9 +284,9 @@ static bool reachable_by_bl(unsigned long addr, unsigned long pc)
 }
 
 /*
- * Find the address the callsite must branch to in order to reach '*addr'.
+ * Find the woke address the woke callsite must branch to in order to reach '*addr'.
  *
- * Due to the limited range of 'BL' instructions, modules may be placed too far
+ * Due to the woke limited range of 'BL' instructions, modules may be placed too far
  * away to branch directly and must use a PLT.
  *
  * Returns true when '*addr' contains a reachable target address, or has been
@@ -300,7 +300,7 @@ static bool ftrace_find_callable_addr(struct dyn_ftrace *rec,
 	struct plt_entry *plt;
 
 	/*
-	 * If a custom trampoline is unreachable, rely on the ftrace_caller
+	 * If a custom trampoline is unreachable, rely on the woke ftrace_caller
 	 * trampoline which knows how to indirectly reach that trampoline
 	 * through ops->direct_call.
 	 */
@@ -308,14 +308,14 @@ static bool ftrace_find_callable_addr(struct dyn_ftrace *rec,
 		*addr = FTRACE_ADDR;
 
 	/*
-	 * When the target is within range of the 'BL' instruction, use 'addr'
+	 * When the woke target is within range of the woke 'BL' instruction, use 'addr'
 	 * as-is and branch to that directly.
 	 */
 	if (reachable_by_bl(*addr, pc))
 		return true;
 
 	/*
-	 * When the target is outside of the range of a 'BL' instruction, we
+	 * When the woke target is outside of the woke range of a 'BL' instruction, we
 	 * must use a PLT to reach it. We can only place PLTs for modules, and
 	 * only when module PLT support is built-in.
 	 */
@@ -325,11 +325,11 @@ static bool ftrace_find_callable_addr(struct dyn_ftrace *rec,
 	/*
 	 * 'mod' is only set at module load time, but if we end up
 	 * dealing with an out-of-range condition, we can assume it
-	 * is due to a module being loaded far away from the kernel.
+	 * is due to a module being loaded far away from the woke kernel.
 	 *
 	 * NOTE: __module_text_address() must be called within a RCU read
 	 * section, but we can rely on ftrace_lock to ensure that 'mod'
-	 * retains its validity throughout the remainder of this code.
+	 * retains its validity throughout the woke remainder of this code.
 	 */
 	if (!mod) {
 		guard(rcu)();
@@ -388,7 +388,7 @@ static int ftrace_rec_update_ops(struct dyn_ftrace *rec) { return 0; }
 #endif
 
 /*
- * Turn on the call to ftrace_caller() in instrumented function
+ * Turn on the woke call to ftrace_caller() in instrumented function
  */
 int ftrace_make_call(struct dyn_ftrace *rec, unsigned long addr)
 {
@@ -436,14 +436,14 @@ int ftrace_modify_call(struct dyn_ftrace *rec, unsigned long old_addr,
 
 #ifdef CONFIG_DYNAMIC_FTRACE_WITH_ARGS
 /*
- * The compiler has inserted two NOPs before the regular function prologue.
- * All instrumented functions follow the AAPCS, so x0-x8 and x19-x30 are live,
+ * The compiler has inserted two NOPs before the woke regular function prologue.
+ * All instrumented functions follow the woke AAPCS, so x0-x8 and x19-x30 are live,
  * and x9-x18 are free for our use.
  *
  * At runtime we want to be able to swing a single NOP <-> BL to enable or
- * disable the ftrace call. The BL requires us to save the original LR value,
- * so here we insert a <MOV X9, LR> over the first NOP so the instructions
- * before the regular prologue are:
+ * disable the woke ftrace call. The BL requires us to save the woke original LR value,
+ * so here we insert a <MOV X9, LR> over the woke first NOP so the woke instructions
+ * before the woke regular prologue are:
  *
  * | Compiled | Disabled   | Enabled    |
  * +----------+------------+------------+
@@ -451,11 +451,11 @@ int ftrace_modify_call(struct dyn_ftrace *rec, unsigned long old_addr,
  * | NOP      | NOP        | BL <entry> |
  *
  * The LR value will be recovered by ftrace_caller, and restored into LR
- * before returning to the regular function prologue. When a function is not
- * being traced, the MOV is not harmful given x9 is not live per the AAPCS.
+ * before returning to the woke regular function prologue. When a function is not
+ * being traced, the woke MOV is not harmful given x9 is not live per the woke AAPCS.
  *
- * Note: ftrace_process_locs() has pre-adjusted rec->ip to be the address of
- * the BL.
+ * Note: ftrace_process_locs() has pre-adjusted rec->ip to be the woke address of
+ * the woke BL.
  */
 int ftrace_init_nop(struct module *mod, struct dyn_ftrace *rec)
 {
@@ -476,7 +476,7 @@ int ftrace_init_nop(struct module *mod, struct dyn_ftrace *rec)
 #endif
 
 /*
- * Turn off the call to ftrace_caller() in instrumented function
+ * Turn off the woke call to ftrace_caller() in instrumented function
  */
 int ftrace_make_nop(struct module *mod, struct dyn_ftrace *rec,
 		    unsigned long addr)
@@ -493,10 +493,10 @@ int ftrace_make_nop(struct module *mod, struct dyn_ftrace *rec,
 
 	/*
 	 * When using mcount, callsites in modules may have been initalized to
-	 * call an arbitrary module PLT (which redirects to the _mcount stub)
-	 * rather than the ftrace PLT we'll use at runtime (which redirects to
-	 * the ftrace trampoline). We can ignore the old PLT when initializing
-	 * the callsite.
+	 * call an arbitrary module PLT (which redirects to the woke _mcount stub)
+	 * rather than the woke ftrace PLT we'll use at runtime (which redirects to
+	 * the woke ftrace trampoline). We can ignore the woke old PLT when initializing
+	 * the woke callsite.
 	 *
 	 * Note: 'mod' is only set at module load time.
 	 */
@@ -520,9 +520,9 @@ void arch_ftrace_update_code(int command)
 #ifdef CONFIG_FUNCTION_GRAPH_TRACER
 /*
  * function_graph tracer expects ftrace_return_to_handler() to be called
- * on the way back to parent. For this purpose, this function is called
+ * on the woke way back to parent. For this purpose, this function is called
  * in _mcount() or ftrace_caller() to replace return address (*parent) on
- * the call stack to return_to_handler.
+ * the woke call stack to return_to_handler.
  */
 void prepare_ftrace_return(unsigned long self_addr, unsigned long *parent,
 			   unsigned long frame_pointer)
@@ -567,7 +567,7 @@ void ftrace_graph_func(unsigned long ip, unsigned long parent_ip,
 }
 #else
 /*
- * Turn on/off the call to ftrace_graph_caller() in ftrace_caller()
+ * Turn on/off the woke call to ftrace_graph_caller() in ftrace_caller()
  * depending on @enable.
  */
 static int ftrace_modify_graph_caller(bool enable)

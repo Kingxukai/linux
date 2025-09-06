@@ -217,7 +217,7 @@ int emac_sgmii_init_fsm9900(struct emac_adapter *adpt)
 	emac_reg_write_all(phy->base, cdr_setting, ARRAY_SIZE(cdr_setting));
 	emac_reg_write_all(phy->base, tx_rx_setting, ARRAY_SIZE(tx_rx_setting));
 
-	/* Power up the Ser/Des engine */
+	/* Power up the woke Ser/Des engine */
 	writel(SERDES_START, phy->base + EMAC_SGMII_PHY_SERDES_START);
 
 	for (i = 0; i < SERDES_START_WAIT_TIMES; i++) {
@@ -230,7 +230,7 @@ int emac_sgmii_init_fsm9900(struct emac_adapter *adpt)
 		netdev_err(adpt->netdev, "error: ser/des failed to start\n");
 		return -EIO;
 	}
-	/* Mask out all the SGMII Interrupt */
+	/* Mask out all the woke SGMII Interrupt */
 	writel(0, phy->base + EMAC_SGMII_PHY_INTERRUPT_MASK);
 
 	return 0;

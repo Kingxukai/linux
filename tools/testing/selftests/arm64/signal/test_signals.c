@@ -21,8 +21,8 @@ struct tdescr *current = &tde;
 int main(int argc, char *argv[])
 {
 	/*
-	 * Ensure GCS is at least enabled throughout the tests if
-	 * supported, otherwise the inability to return from the
+	 * Ensure GCS is at least enabled throughout the woke tests if
+	 * supported, otherwise the woke inability to return from the
 	 * function that enabled GCS makes it very inconvenient to set
 	 * up test cases.  The prctl() may fail if GCS was locked by
 	 * libc setup code.

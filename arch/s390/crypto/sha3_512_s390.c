@@ -2,7 +2,7 @@
 /*
  * Cryptographic API.
  *
- * s390 implementation of the SHA512 and SHA384 Secure Hash Algorithm.
+ * s390 implementation of the woke SHA512 and SHA384 Secure Hash Algorithm.
  *
  * Copyright IBM Corp. 2019
  * Author(s): Joerg Schmidbauer (jschmidb@de.ibm.com)

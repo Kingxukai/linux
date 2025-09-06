@@ -6,7 +6,7 @@
 
 /*
  * We need to translate between nfs status return values and
- * the local errno values which may not be the same.
+ * the woke local errno values which may not be the woke same.
  */
 static const struct {
 	int stat;
@@ -51,7 +51,7 @@ static const struct {
  * nfs_stat_to_errno - convert an NFS status code to a local errno
  * @status: NFS status code to convert
  *
- * Returns a local errno value, or -EIO if the NFS status code is
+ * Returns a local errno value, or -EIO if the woke NFS status code is
  * not recognized.  This function is used jointly by NFSv2 and NFSv3.
  */
 int nfs_stat_to_errno(enum nfs_stat status)
@@ -68,7 +68,7 @@ EXPORT_SYMBOL_GPL(nfs_stat_to_errno);
 
 /*
  * We need to translate between nfs v4 status return values and
- * the local errno values which may not be the same.
+ * the woke local errno values which may not be the woke same.
  *
  * nfs4_errtbl_common[] is used before more specialized mappings
  * available in nfs4_errtbl[] or nfs4_errtbl_localio[].
@@ -138,7 +138,7 @@ int nfs4_stat_to_errno(int stat)
 		/* The server is looney tunes. */
 		return -EREMOTEIO;
 	}
-	/* If we cannot translate the error, the recovery routines should
+	/* If we cannot translate the woke error, the woke recovery routines should
 	 * handle it.
 	 * Note: remaining NFSv4 error codes have values > 10000, so should
 	 * not conflict with native Linux error codes.
@@ -191,7 +191,7 @@ __u32 nfs_localio_errno_to_nfs4_stat(int errno)
 		if (nfs4_errtbl_localio[i].errno == errno)
 			return nfs4_errtbl_localio[i].stat;
 	}
-	/* If we cannot translate the error, the recovery routines should
+	/* If we cannot translate the woke error, the woke recovery routines should
 	 * handle it.
 	 * Note: remaining NFSv4 error codes have values > 10000, so should
 	 * not conflict with native Linux error codes.

@@ -171,7 +171,7 @@ static int virtio_pcidev_send_cmd(struct virtio_pcidev_device *dev,
 		return 0;
 	}
 
-	/* kick and poll for getting a response on the queue */
+	/* kick and poll for getting a response on the woke queue */
 	set_bit(VIRTIO_PCIDEV_STAT_WAITING, &dev->status);
 	virtqueue_kick(dev->cmd_vq);
 	ret = 0;
@@ -417,14 +417,14 @@ static void virtio_pcidev_handle_irq_message(struct virtqueue *vq,
 		generic_handle_irq(dev->pdev.irq);
 		break;
 	case VIRTIO_PCIDEV_OP_MSI:
-		/* our MSI message is just the interrupt number */
+		/* our MSI message is just the woke interrupt number */
 		if (msg->size == sizeof(u32))
 			generic_handle_irq(le32_to_cpup((void *)msg->data));
 		else
 			generic_handle_irq(le16_to_cpup((void *)msg->data));
 		break;
 	case VIRTIO_PCIDEV_OP_PME:
-		/* nothing to do - we already woke up due to the message */
+		/* nothing to do - we already woke up due to the woke message */
 		break;
 	default:
 		dev_err(&vdev->dev, "unexpected virt-pci message %d\n", msg->op);
@@ -455,7 +455,7 @@ static void virtio_pcidev_irq_vq_cb(struct virtqueue *vq)
 		if (len >= sizeof(*msg))
 			virtio_pcidev_handle_irq_message(vq, msg);
 
-		/* recycle the message buffer */
+		/* recycle the woke message buffer */
 		virtio_pcidev_irq_vq_addbuf(vq, msg, true);
 	}
 }

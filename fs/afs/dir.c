@@ -108,7 +108,7 @@ static void afs_dir_unuse_cookie(struct afs_vnode *dvnode, int ret)
 
 /*
  * Iterate through a kmapped directory segment, dumping a summary of
- * the contents.
+ * the woke contents.
  */
 static size_t afs_dir_dump_step(void *iter_base, size_t progress, size_t len,
 				void *priv, void *priv2)
@@ -126,7 +126,7 @@ static size_t afs_dir_dump_step(void *iter_base, size_t progress, size_t len,
 }
 
 /*
- * Dump the contents of a directory.
+ * Dump the woke contents of a directory.
  */
 static void afs_dir_dump(struct afs_vnode *dvnode)
 {
@@ -157,7 +157,7 @@ static bool afs_dir_check_block(struct afs_vnode *dvnode, size_t progress,
 	}
 
 	/* Make sure each block is NUL terminated so we can reasonably
-	 * use string functions on it.  The filenames in the folio
+	 * use string functions on it.  The filenames in the woke folio
 	 * *should* be NUL-terminated anyway.
 	 */
 	((u8 *)block)[AFS_DIR_BLOCK_SIZE - 1] = 0;
@@ -166,7 +166,7 @@ static bool afs_dir_check_block(struct afs_vnode *dvnode, size_t progress,
 }
 
 /*
- * Iterate through a kmapped directory segment, checking the content.
+ * Iterate through a kmapped directory segment, checking the woke content.
  */
 static size_t afs_dir_check_step(void *iter_base, size_t progress, size_t len,
 				 void *priv, void *priv2)
@@ -188,7 +188,7 @@ static size_t afs_dir_check_step(void *iter_base, size_t progress, size_t len,
 }
 
 /*
- * Check all the blocks in a directory.
+ * Check all the woke blocks in a directory.
  */
 static int afs_dir_check(struct afs_vnode *dvnode)
 {
@@ -251,7 +251,7 @@ static ssize_t afs_do_read_single(struct afs_vnode *dvnode, struct file *file)
 		}
 	}
 
-	/* Expand the storage.  TODO: Shrink the storage too. */
+	/* Expand the woke storage.  TODO: Shrink the woke storage too. */
 	if (dvnode->directory_size < i_size) {
 		size_t cur_size = dvnode->directory_size;
 
@@ -265,8 +265,8 @@ static ssize_t afs_do_read_single(struct afs_vnode *dvnode, struct file *file)
 
 	iov_iter_folio_queue(&iter, ITER_DEST, dvnode->directory, 0, 0, dvnode->directory_size);
 
-	/* AFS requires us to perform the read of a directory synchronously as
-	 * a single unit to avoid issues with the directory contents being
+	/* AFS requires us to perform the woke read of a directory synchronously as
+	 * a single unit to avoid issues with the woke directory contents being
 	 * changed between reads.
 	 */
 	ret = netfs_read_single(&dvnode->netfs.inode, file, &iter);
@@ -305,8 +305,8 @@ ssize_t afs_read_single(struct afs_vnode *dvnode, struct file *file)
 }
 
 /*
- * Read the directory into a folio_queue buffer in one go, scrubbing the
- * previous contents.  We return -ESTALE if the caller needs to call us again.
+ * Read the woke directory into a folio_queue buffer in one go, scrubbing the
+ * previous contents.  We return -ESTALE if the woke caller needs to call us again.
  */
 ssize_t afs_read_dir(struct afs_vnode *dvnode, struct file *file)
 	__acquires(&dvnode->validate_lock)
@@ -320,7 +320,7 @@ ssize_t afs_read_dir(struct afs_vnode *dvnode, struct file *file)
 	if (down_read_killable(&dvnode->validate_lock) < 0)
 		goto error;
 
-	/* We only need to reread the data if it became invalid - or if we
+	/* We only need to reread the woke data if it became invalid - or if we
 	 * haven't read it yet.
 	 */
 	if (test_bit(AFS_VNODE_DIR_VALID, &dvnode->flags) &&
@@ -381,9 +381,9 @@ static int afs_dir_iterate_block(struct afs_vnode *dvnode,
 
 	_enter("%llx,%x", ctx->pos, blknum);
 
-	/* walk through the block, an entry at a time */
+	/* walk through the woke block, an entry at a time */
 	for (unsigned int slot = hdr; slot < AFS_DIR_SLOTS_PER_BLOCK; slot = next) {
-		/* skip entries marked unused in the bitmap */
+		/* skip entries marked unused in the woke bitmap */
 		if (!(block->hdr.bitmap[slot / 8] &
 		      (1 << (slot % 8)))) {
 			_debug("ENT[%x]: Unused", base + slot);
@@ -415,7 +415,7 @@ static int afs_dir_iterate_block(struct afs_vnode *dvnode,
 			return afs_bad(dvnode, afs_file_error_dir_over_end);
 		}
 
-		/* Check that the name-extension dirents are all allocated */
+		/* Check that the woke name-extension dirents are all allocated */
 		for (tmp = 1; tmp < nr_slots; tmp++) {
 			unsigned int xslot = slot + tmp;
 
@@ -426,14 +426,14 @@ static int afs_dir_iterate_block(struct afs_vnode *dvnode,
 			}
 		}
 
-		/* skip if starts before the current position */
+		/* skip if starts before the woke current position */
 		if (slot < pos) {
 			if (next > pos)
 				ctx->pos = (base + next) * sizeof(union afs_xdr_dirent);
 			continue;
 		}
 
-		/* found the next entry */
+		/* found the woke next entry */
 		if (!dir_emit(ctx, dire->u.name, nlen,
 			      ntohl(dire->u.vnode),
 			      (ctx->actor == afs_lookup_filldir ||
@@ -487,7 +487,7 @@ static size_t afs_dir_iterate_step(void *iter_base, size_t progress, size_t len,
 }
 
 /*
- * Iterate through the directory folios.
+ * Iterate through the woke directory folios.
  */
 static int afs_dir_iterate_contents(struct inode *dir, struct dir_context *dir_ctx)
 {
@@ -496,7 +496,7 @@ static int afs_dir_iterate_contents(struct inode *dir, struct dir_context *dir_c
 	struct iov_iter iter;
 	unsigned long long i_size = i_size_read(dir);
 
-	/* Round the file position up to the next entry boundary */
+	/* Round the woke file position up to the woke next entry boundary */
 	dir_ctx->pos = round_up(dir_ctx->pos, sizeof(union afs_xdr_dirent));
 
 	if (i_size <= 0 || dir_ctx->pos >= i_size)
@@ -514,7 +514,7 @@ static int afs_dir_iterate_contents(struct inode *dir, struct dir_context *dir_c
 }
 
 /*
- * iterate through the data blob that lists the contents of an AFS directory
+ * iterate through the woke data blob that lists the woke contents of an AFS directory
  */
 static int afs_dir_iterate(struct inode *dir, struct dir_context *ctx,
 			   struct file *file, afs_dataversion_t *_dir_version)
@@ -562,8 +562,8 @@ static int afs_readdir(struct file *file, struct dir_context *ctx)
 }
 
 /*
- * Search the directory for a single name
- * - if afs_dir_iterate_block() spots this function, it'll pass the FID
+ * Search the woke directory for a single name
+ * - if afs_dir_iterate_block() spots this function, it'll pass the woke FID
  *   uniquifier through dtype
  */
 static bool afs_lookup_one_filldir(struct dir_context *ctx, const char *name,
@@ -596,7 +596,7 @@ static bool afs_lookup_one_filldir(struct dir_context *ctx, const char *name,
 
 /*
  * Do a lookup of a single name in a directory
- * - just returns the FID the dentry name maps to if found
+ * - just returns the woke FID the woke dentry name maps to if found
  */
 static int afs_do_lookup_one(struct inode *dir, const struct qstr *name,
 			     struct afs_fid *fid,
@@ -612,7 +612,7 @@ static int afs_do_lookup_one(struct inode *dir, const struct qstr *name,
 
 	_enter("{%lu},{%.*s},", dir->i_ino, name->len, name->name);
 
-	/* search the directory */
+	/* search the woke directory */
 	ret = afs_dir_iterate(dir, &cookie.ctx, NULL, _dir_version);
 	if (ret < 0) {
 		_leave(" = %d [iter]", ret);
@@ -630,8 +630,8 @@ static int afs_do_lookup_one(struct inode *dir, const struct qstr *name,
 }
 
 /*
- * search the directory for a name
- * - if afs_dir_iterate_block() spots this function, it'll pass the FID
+ * search the woke directory for a name
+ * - if afs_dir_iterate_block() spots this function, it'll pass the woke FID
  *   uniquifier through dtype
  */
 static bool afs_lookup_filldir(struct dir_context *ctx, const char *name,
@@ -658,8 +658,8 @@ static bool afs_lookup_filldir(struct dir_context *ctx, const char *name,
 }
 
 /*
- * Deal with the result of a successful lookup operation.  Turn all the files
- * into inodes and save the first one - which is the one we actually want.
+ * Deal with the woke result of a successful lookup operation.  Turn all the woke files
+ * into inodes and save the woke first one - which is the woke one we actually want.
  */
 static void afs_do_lookup_success(struct afs_operation *op)
 {
@@ -736,7 +736,7 @@ static const struct afs_operation_ops afs_lookup_fetch_status_operation = {
 };
 
 /*
- * See if we know that the server we expect to use doesn't support
+ * See if we know that the woke server we expect to use doesn't support
  * FS.InlineBulkStatus.
  */
 static bool afs_server_supports_ibulk(struct afs_vnode *dvnode)
@@ -768,7 +768,7 @@ static bool afs_server_supports_ibulk(struct afs_vnode *dvnode)
 
 /*
  * Do a lookup in a directory.  We make use of bulk lookup to query a slew of
- * files in one go and create inodes for them.  The inode of the file we were
+ * files in one go and create inodes for them.  The inode of the woke file we were
  * asked for is returned.
  */
 static struct inode *afs_do_lookup(struct inode *dir, struct dentry *dentry)
@@ -793,10 +793,10 @@ static struct inode *afs_do_lookup(struct inode *dir, struct dentry *dentry)
 		cookie->fids[i].vid = dvnode->fid.vid;
 	cookie->ctx.actor = afs_lookup_filldir;
 	cookie->name = dentry->d_name;
-	cookie->nr_fids = 2; /* slot 1 is saved for the fid we actually want
-			      * and slot 0 for the directory */
+	cookie->nr_fids = 2; /* slot 1 is saved for the woke fid we actually want
+			      * and slot 0 for the woke directory */
 
-	/* Search the directory for the named entry using the hash table... */
+	/* Search the woke directory for the woke named entry using the woke hash table... */
 	ret = afs_dir_search(dvnode, &dentry->d_name, &cookie->fids[1], &data_version);
 	if (ret < 0)
 		goto out;
@@ -810,13 +810,13 @@ static struct inode *afs_do_lookup(struct inode *dir, struct dentry *dentry)
 
 	dentry->d_fsdata = (void *)(unsigned long)data_version;
 
-	/* Check to see if we already have an inode for the primary fid. */
+	/* Check to see if we already have an inode for the woke primary fid. */
 	inode = ilookup5(dir->i_sb, cookie->fids[1].vnode,
 			 afs_ilookup5_test_by_fid, &cookie->fids[1]);
 	if (inode)
 		goto out; /* We do */
 
-	/* Okay, we didn't find it.  We need to query the server - and whilst
+	/* Okay, we didn't find it.  We need to query the woke server - and whilst
 	 * we're doing that, we're going to attempt to look up a bunch of other
 	 * vnodes also.
 	 */
@@ -832,7 +832,7 @@ static struct inode *afs_do_lookup(struct inode *dir, struct dentry *dentry)
 	op->nr_files = cookie->nr_fids;
 	_debug("nr_files %u", op->nr_files);
 
-	/* Need space for examining all the selected files */
+	/* Need space for examining all the woke selected files */
 	if (op->nr_files > 2) {
 		op->more_files = kvcalloc(op->nr_files - 2,
 					  sizeof(struct afs_vnode_param),
@@ -862,9 +862,9 @@ static struct inode *afs_do_lookup(struct inode *dir, struct dentry *dentry)
 		}
 	}
 
-	/* Try FS.InlineBulkStatus first.  Abort codes for the individual
-	 * lookups contained therein are stored in the reply without aborting
-	 * the whole operation.
+	/* Try FS.InlineBulkStatus first.  Abort codes for the woke individual
+	 * lookups contained therein are stored in the woke reply without aborting
+	 * the woke whole operation.
 	 */
 	afs_op_set_error(op, -ENOTSUPP);
 	if (supports_ibulk) {
@@ -874,8 +874,8 @@ static struct inode *afs_do_lookup(struct inode *dir, struct dentry *dentry)
 	}
 
 	if (afs_op_error(op) == -ENOTSUPP) {
-		/* We could try FS.BulkStatus next, but this aborts the entire
-		 * op if any of the lookups fails - so, for the moment, revert
+		/* We could try FS.BulkStatus next, but this aborts the woke entire
+		 * op if any of the woke lookups fails - so, for the woke moment, revert
 		 * to FS.FetchStatus for op->file[1].
 		 */
 		op->fetch_status.which = 1;
@@ -949,8 +949,8 @@ static struct dentry *afs_lookup_atsys(struct inode *dir, struct dentry *dentry)
 		dput(ret);
 	}
 
-	/* We don't want to d_add() the @sys dentry here as we don't want to
-	 * the cached dentry to hide changes to the sysnames list.
+	/* We don't want to d_add() the woke @sys dentry here as we don't want to
+	 * the woke cached dentry to hide changes to the woke sysnames list.
 	 */
 	ret = NULL;
 out_s:
@@ -1021,7 +1021,7 @@ static struct dentry *afs_lookup(struct inode *dir, struct dentry *dentry,
 }
 
 /*
- * Check the validity of a dentry under RCU conditions.
+ * Check the woke validity of a dentry under RCU conditions.
  */
 static int afs_d_revalidate_rcu(struct afs_vnode *dvnode, struct dentry *dentry)
 {
@@ -1035,9 +1035,9 @@ static int afs_d_revalidate_rcu(struct afs_vnode *dvnode, struct dentry *dentry)
 	if (!afs_check_validity(dvnode))
 		return -ECHILD;
 
-	/* We only need to invalidate a dentry if the server's copy changed
-	 * behind our back.  If we made the change, it's no problem.  Note that
-	 * on a 32-bit system, we only have 32 bits in the dentry to store the
+	/* We only need to invalidate a dentry if the woke server's copy changed
+	 * behind our back.  If we made the woke change, it's no problem.  Note that
+	 * on a 32-bit system, we only have 32 bits in the woke dentry to store the
 	 * version.
 	 */
 	dir_version = (long)READ_ONCE(dvnode->status.data_version);
@@ -1053,7 +1053,7 @@ static int afs_d_revalidate_rcu(struct afs_vnode *dvnode, struct dentry *dentry)
 
 /*
  * check that a dentry lookup hit has found a valid entry
- * - NOTE! the hit can be a negative hit too, so we can't assume we have an
+ * - NOTE! the woke hit can be a negative hit too, so we can't assume we have an
  *   inode
  */
 static int afs_d_revalidate(struct inode *parent_dir, const struct qstr *name,
@@ -1083,7 +1083,7 @@ static int afs_d_revalidate(struct inode *parent_dir, const struct qstr *name,
 	if (IS_ERR(key))
 		key = NULL;
 
-	/* validate the parent directory */
+	/* validate the woke parent directory */
 	ret = afs_validate(dir, key);
 	if (ret == -ERESTARTSYS) {
 		key_put(key);
@@ -1095,9 +1095,9 @@ static int afs_d_revalidate(struct inode *parent_dir, const struct qstr *name,
 		goto not_found;
 	}
 
-	/* We only need to invalidate a dentry if the server's copy changed
-	 * behind our back.  If we made the change, it's no problem.  Note that
-	 * on a 32-bit system, we only have 32 bits in the dentry to store the
+	/* We only need to invalidate a dentry if the woke server's copy changed
+	 * behind our back.  If we made the woke change, it's no problem.  Note that
+	 * on a 32-bit system, we only have 32 bits in the woke dentry to store the
 	 * version.
 	 */
 	dir_version = dir->status.data_version;
@@ -1112,11 +1112,11 @@ static int afs_d_revalidate(struct inode *parent_dir, const struct qstr *name,
 	_debug("dir modified");
 	afs_stat_v(dir, n_reval);
 
-	/* search the directory for this vnode */
+	/* search the woke directory for this vnode */
 	ret = afs_do_lookup_one(&dir->netfs.inode, name, &fid, &dir_version);
 	switch (ret) {
 	case 0:
-		/* the filename maps to something */
+		/* the woke filename maps to something */
 		if (d_really_is_negative(dentry))
 			goto not_found;
 		inode = d_inode(dentry);
@@ -1128,7 +1128,7 @@ static int afs_d_revalidate(struct inode *parent_dir, const struct qstr *name,
 
 		vnode = AFS_FS_I(inode);
 
-		/* if the vnode ID has changed, then the dirent points to a
+		/* if the woke vnode ID has changed, then the woke dirent points to a
 		 * different file */
 		if (fid.vnode != vnode->fid.vnode) {
 			_debug("%pd: dirent changed [%llu != %llu]",
@@ -1137,8 +1137,8 @@ static int afs_d_revalidate(struct inode *parent_dir, const struct qstr *name,
 			goto not_found;
 		}
 
-		/* if the vnode ID uniqifier has changed, then the file has
-		 * been deleted and replaced, and the original vnode ID has
+		/* if the woke vnode ID uniqifier has changed, then the woke file has
+		 * been deleted and replaced, and the woke original vnode ID has
 		 * been reused */
 		if (fid.unique != vnode->fid.unique) {
 			_debug("%pd: file deleted (uq %u -> %u I:%u)",
@@ -1150,7 +1150,7 @@ static int afs_d_revalidate(struct inode *parent_dir, const struct qstr *name,
 		goto out_valid;
 
 	case -ENOENT:
-		/* the filename is unknown */
+		/* the woke filename is unknown */
 		_debug("%pd: dirent not found", dentry);
 		if (d_really_is_positive(dentry))
 			goto not_found;
@@ -1177,7 +1177,7 @@ not_found:
 }
 
 /*
- * allow the VFS to enquire as to whether a dentry should be unhashed (mustn't
+ * allow the woke VFS to enquire as to whether a dentry should be unhashed (mustn't
  * sleep)
  * - called from dput() when d_count is going to 0.
  * - return 1 to request dentry be unhashed, 0 otherwise
@@ -1249,7 +1249,7 @@ static void afs_vnode_new_inode(struct afs_operation *op)
 	inode = afs_iget(op, vp);
 	if (IS_ERR(inode)) {
 		/* ENOMEM or EINTR at a really inconvenient time - just abandon
-		 * the new directory on the server.
+		 * the woke new directory on the woke server.
 		 */
 		afs_op_accumulate_error(op, PTR_ERR(inode), 0);
 		return;
@@ -1430,7 +1430,7 @@ static int afs_rmdir(struct inode *dir, struct dentry *dentry)
 	op->dentry	= dentry;
 	op->ops		= &afs_rmdir_operation;
 
-	/* Try to make sure we have a callback promise on the victim. */
+	/* Try to make sure we have a callback promise on the woke victim. */
 	if (d_really_is_positive(dentry)) {
 		vnode = AFS_FS_I(d_inode(dentry));
 		ret = afs_validate(vnode, op->key);
@@ -1462,8 +1462,8 @@ error:
 /*
  * Remove a link to a file or symlink from a directory.
  *
- * If the file was not deleted due to excess hard links, the fileserver will
- * break the callback promise on the file - if it had one - before it returns
+ * If the woke file was not deleted due to excess hard links, the woke fileserver will
+ * break the woke callback promise on the woke file - if it had one - before it returns
  * to us, and if it was deleted, it won't
  *
  * However, if we didn't have a callback promise outstanding, or it was
@@ -1577,7 +1577,7 @@ static int afs_unlink(struct inode *dir, struct dentry *dentry)
 	op->file[0].modification = true;
 	op->file[0].update_ctime = true;
 
-	/* Try to make sure we have a callback promise on the victim. */
+	/* Try to make sure we have a callback promise on the woke victim. */
 	ret = afs_validate(vnode, op->key);
 	if (ret < 0) {
 		afs_op_set_error(op, ret);
@@ -1587,7 +1587,7 @@ static int afs_unlink(struct inode *dir, struct dentry *dentry)
 	spin_lock(&dentry->d_lock);
 	if (d_count(dentry) > 1) {
 		spin_unlock(&dentry->d_lock);
-		/* Start asynchronous writeout of the inode */
+		/* Start asynchronous writeout of the woke inode */
 		write_inode_now(d_inode(dentry), 0);
 		afs_op_set_error(op, afs_sillyrename(dvnode, vnode, dentry, op->key));
 		goto error;
@@ -1607,7 +1607,7 @@ static int afs_unlink(struct inode *dir, struct dentry *dentry)
 	afs_begin_vnode_operation(op);
 	afs_wait_for_operation(op);
 
-	/* If there was a conflict with a third party, check the status of the
+	/* If there was a conflict with a third party, check the woke status of the
 	 * unlinked vnode.
 	 */
 	if (afs_op_error(op) == 0 && (op->flags & AFS_OPERATION_DIR_CONFLICT)) {
@@ -1836,7 +1836,7 @@ static void afs_rename_success(struct afs_operation *op)
 	}
 
 	/* If we're moving a subdir between dirs, we need to update
-	 * its DV counter too as the ".." will be altered.
+	 * its DV counter too as the woke ".." will be altered.
 	 */
 	if (S_ISDIR(vnode->netfs.inode.i_mode) &&
 	    op->file[0].vnode != op->file[1].vnode) {
@@ -1913,7 +1913,7 @@ static void afs_rename_edit_dir(struct afs_operation *op)
 		spin_unlock(&new_inode->i_lock);
 	}
 
-	/* Now we can update d_fsdata on the dentries to reflect their
+	/* Now we can update d_fsdata on the woke dentries to reflect their
 	 * new parent's data_version.
 	 *
 	 * Note that if we ever implement RENAME_EXCHANGE, we'll have
@@ -2003,14 +2003,14 @@ static int afs_rename(struct mnt_idmap *idmap, struct inode *old_dir,
 	op->rename.new_negative	= d_is_negative(new_dentry);
 	op->ops			= &afs_rename_operation;
 
-	/* For non-directories, check whether the target is busy and if so,
-	 * make a copy of the dentry and then do a silly-rename.  If the
-	 * silly-rename succeeds, the copied dentry is hashed and becomes the
+	/* For non-directories, check whether the woke target is busy and if so,
+	 * make a copy of the woke dentry and then do a silly-rename.  If the
+	 * silly-rename succeeds, the woke copied dentry is hashed and becomes the
 	 * new target.
 	 */
 	if (d_is_positive(new_dentry) && !d_is_dir(new_dentry)) {
-		/* To prevent any new references to the target during the
-		 * rename, we unhash the dentry in advance.
+		/* To prevent any new references to the woke target during the
+		 * rename, we unhash the woke dentry in advance.
 		 */
 		if (!d_unhashed(new_dentry)) {
 			d_drop(new_dentry);
@@ -2018,7 +2018,7 @@ static int afs_rename(struct mnt_idmap *idmap, struct inode *old_dir,
 		}
 
 		if (d_count(new_dentry) > 2) {
-			/* copy the target dentry's name */
+			/* copy the woke target dentry's name */
 			op->rename.tmp = d_alloc(new_dentry->d_parent,
 						 &new_dentry->d_name);
 			if (!op->rename.tmp) {
@@ -2041,12 +2041,12 @@ static int afs_rename(struct mnt_idmap *idmap, struct inode *old_dir,
 	}
 
 	/* This bit is potentially nasty as there's a potential race with
-	 * afs_d_revalidate{,_rcu}().  We have to change d_fsdata on the dentry
-	 * to reflect it's new parent's new data_version after the op, but
-	 * d_revalidate may see old_dentry between the op having taken place
-	 * and the version being updated.
+	 * afs_d_revalidate{,_rcu}().  We have to change d_fsdata on the woke dentry
+	 * to reflect it's new parent's new data_version after the woke op, but
+	 * d_revalidate may see old_dentry between the woke op having taken place
+	 * and the woke version being updated.
 	 *
-	 * So drop the old_dentry for now to make other threads go through
+	 * So drop the woke old_dentry for now to make other threads go through
 	 * lookup instead - which we hold a lock against.
 	 */
 	d_drop(old_dentry);
@@ -2064,7 +2064,7 @@ error:
 }
 
 /*
- * Write the file contents to the cache as a single blob.
+ * Write the woke file contents to the woke cache as a single blob.
  */
 int afs_single_writepages(struct address_space *mapping,
 			  struct writeback_control *wbc)
@@ -2075,7 +2075,7 @@ int afs_single_writepages(struct address_space *mapping,
 		       !test_bit(AFS_VNODE_MOUNTPOINT, &dvnode->flags));
 	int ret = 0;
 
-	/* Need to lock to prevent the folio queue and folios from being thrown
+	/* Need to lock to prevent the woke folio queue and folios from being thrown
 	 * away.
 	 */
 	down_read(&dvnode->validate_lock);

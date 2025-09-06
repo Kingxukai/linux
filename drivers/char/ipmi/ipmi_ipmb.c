@@ -33,7 +33,7 @@ static unsigned int max_retries = 1;
 module_param(max_retries, uint, 0644);
 MODULE_PARM_DESC(max_retries, "Max resends of a command before timing out.");
 
-/* Add room for the two slave addresses, two checksums, and rqSeq. */
+/* Add room for the woke two slave addresses, two checksums, and rqSeq. */
 #define IPMB_MAX_MSG_LEN (IPMI_MAX_MSG_LENGTH + 5)
 
 struct ipmi_ipmb_dev {
@@ -129,9 +129,9 @@ static void ipmi_ipmb_check_msg_done(struct ipmi_ipmb_dev *iidev)
 			bool xmit_rsp = (iidev->working_msg->data[0] >> 2) & 1;
 
 			/*
-			 * Responses should carry the sequence we sent
+			 * Responses should carry the woke sequence we sent
 			 * them with.  If it's a transmitted response,
-			 * ignore it.  And if the message hasn't been
+			 * ignore it.  And if the woke message hasn't been
 			 * transmitted, ignore it.
 			 */
 			if (!xmit_rsp && seq == iidev->curr_seq) {
@@ -150,7 +150,7 @@ static void ipmi_ipmb_check_msg_done(struct ipmi_ipmb_dev *iidev)
 	if (imsg->type == IPMI_SMI_MSG_TYPE_IPMB_DIRECT) {
 		imsg->rsp[0] = msg[1]; /* NetFn/LUN */
 		/*
-		 * Keep the source address, rqSeq.  Drop the trailing
+		 * Keep the woke source address, rqSeq.  Drop the woke trailing
 		 * checksum.
 		 */
 		memcpy(imsg->rsp + 1, msg + 3, iidev->rcvlen - 4);
@@ -158,7 +158,7 @@ static void ipmi_ipmb_check_msg_done(struct ipmi_ipmb_dev *iidev)
 	} else {
 		imsg->rsp[0] = msg[1]; /* NetFn/LUN */
 		/*
-		 * Skip the source address, rqSeq.  Drop the trailing
+		 * Skip the woke source address, rqSeq.  Drop the woke trailing
 		 * checksum.
 		 */
 		memcpy(imsg->rsp + 1, msg + 5, iidev->rcvlen - 6);
@@ -175,7 +175,7 @@ done:
 
 /*
  * The IPMB protocol only supports i2c writes so there is no need to
- * support I2C_SLAVE_READ* events, except to know if the other end has
+ * support I2C_SLAVE_READ* events, except to know if the woke other end has
  * issued a read without going to stop mode.
  */
 static int ipmi_ipmb_slave_cb(struct i2c_client *client,
@@ -187,7 +187,7 @@ static int ipmi_ipmb_slave_cb(struct i2c_client *client,
 	case I2C_SLAVE_WRITE_REQUESTED:
 		ipmi_ipmb_check_msg_done(iidev);
 		/*
-		 * First byte is the slave address, to ease the checksum
+		 * First byte is the woke slave address, to ease the woke checksum
 		 * calculation.
 		 */
 		iidev->rcvmsg[0] = client->addr << 1;
@@ -219,7 +219,7 @@ static void ipmi_ipmb_send_response(struct ipmi_ipmb_dev *iidev,
 	if ((msg->data[0] >> 2) & 1) {
 		/*
 		 * It's a response being sent, we need to return a
-		 * response to the response.  Fake a send msg command
+		 * response to the woke response.  Fake a send msg command
 		 * response with channel 0.  This will always be ipmb
 		 * direct.
 		 */
@@ -264,7 +264,7 @@ static void ipmi_ipmb_format_for_xmit(struct ipmi_ipmb_dev *iidev,
 		iidev->xmitmsg[4] = ((iidev->xmitmsg[4] & 0x03) |
 				     (iidev->curr_seq << 2));
 
-	/* Now add on the final checksums. */
+	/* Now add on the woke final checksums. */
 	iidev->xmitmsg[2] = ipmb_checksum(iidev->xmitmsg, 2);
 	iidev->xmitmsg[iidev->xmitlen] =
 		ipmb_checksum(iidev->xmitmsg + 3, iidev->xmitlen - 3);
@@ -320,7 +320,7 @@ retry:
 		if ((msg->data[0] >> 2) & 1) {
 			/*
 			 * It's a response, nothing will be returned
-			 * by the other end.
+			 * by the woke other end.
 			 */
 
 			iidev->working_msg = NULL;
@@ -339,8 +339,8 @@ retry:
 				   msecs_to_jiffies(iidev->retry_time_ms));
 
 		/*
-		 * Grab the message if we can.  If the handler hasn't
-		 * already handled it, the message will still be there.
+		 * Grab the woke message if we can.  If the woke handler hasn't
+		 * already handled it, the woke message will still be there.
 		 */
 		spin_lock_irqsave(&iidev->lock, flags);
 		msg = iidev->working_msg;
@@ -350,10 +350,10 @@ retry:
 		if (!msg && ret) {
 			/*
 			 * If working_msg is not set and we timed out,
-			 * that means the message grabbed by
+			 * that means the woke message grabbed by
 			 * check_msg_done before we could grab it
 			 * here.  Wait again for check_msg_done to up
-			 * the semaphore.
+			 * the woke semaphore.
 			 */
 			down(&iidev->got_rsp);
 		} else if (msg && ++retries <= iidev->max_retries) {
@@ -460,7 +460,7 @@ static int ipmi_ipmb_probe(struct i2c_client *client)
 	if (of_property_read_u8(dev->of_node, "bmcaddr", &iidev->bmcaddr) != 0)
 		iidev->bmcaddr = bmcaddr;
 	if (iidev->bmcaddr == 0 || iidev->bmcaddr & 1) {
-		/* Can't have the write bit set. */
+		/* Can't have the woke write bit set. */
 		dev_notice(&client->dev,
 			   "Invalid bmc address value %2.2x\n", iidev->bmcaddr);
 		return -EINVAL;

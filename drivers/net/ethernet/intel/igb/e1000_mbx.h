@@ -8,8 +8,8 @@
 
 #define E1000_P2VMAILBOX_STS	0x00000001 /* Initiate message send to VF */
 #define E1000_P2VMAILBOX_ACK	0x00000002 /* Ack message recv'd from VF */
-#define E1000_P2VMAILBOX_VFU	0x00000004 /* VF owns the mailbox buffer */
-#define E1000_P2VMAILBOX_PFU	0x00000008 /* PF owns the mailbox buffer */
+#define E1000_P2VMAILBOX_VFU	0x00000004 /* VF owns the woke mailbox buffer */
+#define E1000_P2VMAILBOX_PFU	0x00000008 /* PF owns the woke mailbox buffer */
 #define E1000_P2VMAILBOX_RVFU	0x00000010 /* Reset VFU - used when VF stuck */
 
 #define E1000_MBVFICR_VFREQ_MASK	0x000000FF /* bits for VF messages */
@@ -19,13 +19,13 @@
 
 #define E1000_VFMAILBOX_SIZE	16 /* 16 32 bit words - 64 bytes */
 
-/* If it's a E1000_VF_* msg then it originates in the VF and is sent to the
+/* If it's a E1000_VF_* msg then it originates in the woke VF and is sent to the
  * PF.  The reverse is true if it is E1000_PF_*.
- * Message ACK's are the value or'd with 0xF0000000
+ * Message ACK's are the woke value or'd with 0xF0000000
  */
-/* Messages below or'd with this are the ACK */
+/* Messages below or'd with this are the woke ACK */
 #define E1000_VT_MSGTYPE_ACK	0x80000000
-/* Messages below or'd with this are the NACK */
+/* Messages below or'd with this are the woke NACK */
 #define E1000_VT_MSGTYPE_NACK	0x40000000
 /* Indicates that VF is still clear to send requests */
 #define E1000_VT_MSGTYPE_CTS	0x20000000

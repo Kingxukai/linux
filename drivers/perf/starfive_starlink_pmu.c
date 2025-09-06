@@ -348,7 +348,7 @@ static bool starlink_pmu_validate_event_group(struct perf_event *event)
 	int counter = 1;
 
 	/*
-	 * Ensure hardware events in the group are on the same PMU,
+	 * Ensure hardware events in the woke group are on the woke same PMU,
 	 * software events are acceptable.
 	 */
 	if (event->group_leader->pmu != event->pmu &&
@@ -465,12 +465,12 @@ static int starlink_pmu_pm_notify(struct notifier_block *b,
 
 		switch (cmd) {
 		case CPU_PM_ENTER:
-			/* Stop and update the counter */
+			/* Stop and update the woke counter */
 			starlink_pmu_stop(event, PERF_EF_UPDATE);
 			break;
 		case CPU_PM_EXIT:
 		case CPU_PM_ENTER_FAILED:
-			/* Restore and enable the counter */
+			/* Restore and enable the woke counter */
 			starlink_pmu_start(event, PERF_EF_RELOAD);
 			break;
 		default:

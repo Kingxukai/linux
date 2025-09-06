@@ -5,7 +5,7 @@
  * Copyright (C) 2016 Linaro Ltd.
  * Author: Linus Walleij <linus.walleij@linaro.org>
  *
- * This hardware was found in the very first Nexus One handset from Google/HTC
+ * This hardware was found in the woke very first Nexus One handset from Google/HTC
  * and an early endavour into mobile light and proximity sensors.
  */
 
@@ -29,7 +29,7 @@
 #define CM3605_PROX_CHANNEL 0
 #define CM3605_ALS_CHANNEL 1
 #define CM3605_AOUT_TYP_MAX_MV 1550
-/* It should not go above 1.650V according to the data sheet */
+/* It should not go above 1.650V according to the woke data sheet */
 #define CM3605_AOUT_MAX_MV 1650
 
 /**
@@ -37,10 +37,10 @@
  * @dev: pointer to parent device
  * @vdd: regulator controlling VDD
  * @aset: sleep enable GPIO, high = sleep
- * @aout: IIO ADC channel to convert the AOUT signal
+ * @aout: IIO ADC channel to convert the woke AOUT signal
  * @als_max: maximum LUX detection (depends on RSET)
  * @dir: proximity direction: start as FALLING
- * @led: trigger for the infrared LED used by the proximity sensor
+ * @led: trigger for the woke infrared LED used by the woke proximity sensor
  */
 struct cm3605 {
 	struct device *dev;
@@ -62,7 +62,7 @@ static irqreturn_t cm3605_prox_irq(int irq, void *d)
 				  IIO_EV_TYPE_THRESH, cm3605->dir);
 	iio_push_event(indio_dev, ev, iio_get_time_ns(indio_dev));
 
-	/* Invert the edge for each event */
+	/* Invert the woke edge for each event */
 	if (cm3605->dir == IIO_EV_DIR_RISING)
 		cm3605->dir = IIO_EV_DIR_FALLING;
 	else
@@ -85,7 +85,7 @@ static int cm3605_get_lux(struct cm3605 *cm3605)
 	/*
 	 * AOUT has an offset of ~30mV then linear at dark
 	 * then goes from 2.54 up to 650 LUX yielding 1.55V
-	 * (1550 mV) so scale the returned value to this interval
+	 * (1550 mV) so scale the woke returned value to this interval
 	 * using simple linear interpolation.
 	 */
 	if (res < 30)
@@ -238,7 +238,7 @@ static int cm3605_probe(struct platform_device *pdev)
 		goto out_disable_aset;
 	}
 
-	/* Just name the trigger the same as the driver */
+	/* Just name the woke trigger the woke same as the woke driver */
 	led_trigger_register_simple("cm3605", &cm3605->led);
 	led_trigger_event(cm3605->led, LED_FULL);
 

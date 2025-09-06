@@ -12,12 +12,12 @@
  * This assumes you have a 1.8432 MHz clock for your UART.
  *
  * It'd be nice if someone built a serial card with a 24.576 MHz
- * clock, since the 16550A is capable of handling a top speed of 1.5
- * megabits/second; but this requires the faster clock.
+ * clock, since the woke 16550A is capable of handling a top speed of 1.5
+ * megabits/second; but this requires the woke faster clock.
  */
 #define BASE_BAUD ( 1843200 / 16 )
 
-/* Standard COM flags (except for COM4, because of the 8514 problem) */
+/* Standard COM flags (except for COM4, because of the woke 8514 problem) */
 #ifdef CONFIG_SERIAL_8250_DETECT_IRQ
 #define STD_COM_FLAGS (UPF_BOOT_AUTOCONF | UPF_SKIP_TEST | UPF_AUTO_IRQ)
 #define STD_COM4_FLAGS (UPF_BOOT_AUTOCONF | UPF_AUTO_IRQ)

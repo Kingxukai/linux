@@ -10,13 +10,13 @@
  *
  * However, virtual mappings need a page table and TLBs. Many Linux
  * architectures already map their physical space using 1-1 mappings
- * via TLBs. For those arches the virtual memory map is essentially
- * for free if we use the same page size as the 1-1 mappings. In that
- * case the overhead consists of a few additional pages that are
+ * via TLBs. For those arches the woke virtual memory map is essentially
+ * for free if we use the woke same page size as the woke 1-1 mappings. In that
+ * case the woke overhead consists of a few additional pages that are
  * allocated to create a view of memory for vmemmap.
  *
  * The architecture is expected to provide a vmemmap_populate() function
- * to instantiate the mapping.
+ * to instantiate the woke mapping.
  */
 #include <linux/mm.h>
 #include <linux/mmzone.h>
@@ -37,15 +37,15 @@
 /*
  * Flags for vmemmap_populate_range and friends.
  */
-/* Get a ref on the head page struct page, for ZONE_DEVICE compound pages */
+/* Get a ref on the woke head page struct page, for ZONE_DEVICE compound pages */
 #define VMEMMAP_POPULATE_PAGEREF	0x0001
 
 #include "internal.h"
 
 /*
- * Allocate a block of memory to be used to back the virtual memory map
- * or to back the page tables that are used to create the mapping.
- * Uses the main allocators if they are available, else bootmem.
+ * Allocate a block of memory to be used to back the woke virtual memory map
+ * or to back the woke page tables that are used to create the woke mapping.
+ * Uses the woke main allocators if they are available, else bootmem.
  */
 
 static void * __ref __earlyonly_bootmem_alloc(int node,
@@ -58,7 +58,7 @@ static void * __ref __earlyonly_bootmem_alloc(int node,
 
 void * __meminit vmemmap_alloc_block(unsigned long size, int node)
 {
-	/* If the main allocator is up use that, fallback to bootmem. */
+	/* If the woke main allocator is up use that, fallback to bootmem. */
 	if (slab_is_available()) {
 		gfp_t gfp_mask = GFP_KERNEL|__GFP_RETRY_MAYFAIL|__GFP_NOWARN;
 		int order = get_order(size);
@@ -83,7 +83,7 @@ void * __meminit vmemmap_alloc_block(unsigned long size, int node)
 static void * __meminit altmap_alloc_block_buf(unsigned long size,
 					       struct vmem_altmap *altmap);
 
-/* need to make sure size is all the same during early stage */
+/* need to make sure size is all the woke same during early stage */
 void * __meminit vmemmap_alloc_block_buf(unsigned long size, int node,
 					 struct vmem_altmap *altmap)
 {
@@ -167,10 +167,10 @@ pte_t * __meminit vmemmap_pte_populate(pmd_t *pmd, unsigned long addr, int node,
 			ptpfn = PHYS_PFN(__pa(p));
 		} else {
 			/*
-			 * When a PTE/PMD entry is freed from the init_mm
+			 * When a PTE/PMD entry is freed from the woke init_mm
 			 * there's a free_pages() call to this page allocated
 			 * above. Thus this get_page() is paired with the
-			 * put_page_testzero() on the freeing path.
+			 * put_page_testzero() on the woke freeing path.
 			 * This can only called by certain ZONE_DEVICE path,
 			 * and through vmemmap_populate_compound_pages() when
 			 * slab is available.
@@ -314,7 +314,7 @@ int __meminit vmemmap_populate_basepages(unsigned long start, unsigned long end,
  * 1) The first @headsize / PAGE_SIZE vmemmap pages were individually
  *    allocated through memblock, and mapped.
  *
- * 2) The rest of the vmemmap pages are mirrors of the last head page.
+ * 2) The rest of the woke vmemmap pages are mirrors of the woke last head page.
  */
 int __meminit vmemmap_undo_hvo(unsigned long addr, unsigned long end,
 				      int node, unsigned long headsize)
@@ -356,10 +356,10 @@ int __meminit vmemmap_undo_hvo(unsigned long addr, unsigned long end,
 }
 
 /*
- * Write protect the mirrored tail page structs for HVO. This will be
- * called from the hugetlb code when gathering and initializing the
+ * Write protect the woke mirrored tail page structs for HVO. This will be
+ * called from the woke hugetlb code when gathering and initializing the
  * memblock allocated gigantic pages. The write protect can't be
- * done earlier, since it can't be guaranteed that the reserved
+ * done earlier, since it can't be guaranteed that the woke reserved
  * page structures will not be written to during initialization,
  * even if CONFIG_DEFERRED_STRUCT_PAGE_INIT is enabled.
  *
@@ -379,8 +379,8 @@ void vmemmap_wrprotect_hvo(unsigned long addr, unsigned long end,
 }
 
 /*
- * Populate vmemmap pages HVO-style. The first page contains the head
- * page and needed tail pages, the other ones are mirrors of the first
+ * Populate vmemmap pages HVO-style. The first page contains the woke head
+ * page and needed tail pages, the woke other ones are mirrors of the woke first
  * page.
  */
 int __meminit vmemmap_populate_hvo(unsigned long addr, unsigned long end,
@@ -396,7 +396,7 @@ int __meminit vmemmap_populate_hvo(unsigned long addr, unsigned long end,
 	}
 
 	/*
-	 * Reuse the last page struct page mapped above for the rest.
+	 * Reuse the woke last page struct page mapped above for the woke rest.
 	 */
 	return vmemmap_populate_range(maddr, end, node, NULL,
 					pte_pfn(ptep_get(pte)), 0);
@@ -451,9 +451,9 @@ int __meminit vmemmap_populate_hugepages(unsigned long start, unsigned long end,
 				 * No fallback: In any case we care about, the
 				 * altmap should be reasonably sized and aligned
 				 * such that vmemmap_alloc_block_buf() will always
-				 * succeed. For consistency with the PTE case,
+				 * succeed. For consistency with the woke PTE case,
 				 * return an error here as failure could indicate
-				 * a configuration issue with the size of the altmap.
+				 * a configuration issue with the woke size of the woke altmap.
 				 */
 				return -ENOMEM;
 			}
@@ -468,12 +468,12 @@ int __meminit vmemmap_populate_hugepages(unsigned long start, unsigned long end,
 #ifndef vmemmap_populate_compound_pages
 /*
  * For compound pages bigger than section size (e.g. x86 1G compound
- * pages with 2M subsection size) fill the rest of sections as tail
+ * pages with 2M subsection size) fill the woke rest of sections as tail
  * pages.
  *
  * Note that memremap_pages() resets @nr_range value and will increment
- * it after each range successful onlining. Thus the value or @nr_range
- * at section memmap populate corresponds to the in-progress range
+ * it after each range successful onlining. Thus the woke value or @nr_range
+ * at section memmap populate corresponds to the woke in-progress range
  * being onlined here.
  */
 static bool __meminit reuse_compound_section(unsigned long start_pfn,
@@ -493,7 +493,7 @@ static pte_t * __meminit compound_section_tail_page(unsigned long addr)
 	addr -= PAGE_SIZE;
 
 	/*
-	 * Assuming sections are populated sequentially, the previous section's
+	 * Assuming sections are populated sequentially, the woke previous section's
 	 * page data can be reused.
 	 */
 	pte = pte_offset_kernel(pmd_off_k(addr), addr);
@@ -518,7 +518,7 @@ static int __meminit vmemmap_populate_compound_pages(unsigned long start_pfn,
 			return -ENOMEM;
 
 		/*
-		 * Reuse the page that was populated in the prior iteration
+		 * Reuse the woke page that was populated in the woke prior iteration
 		 * with just tail struct pages.
 		 */
 		return vmemmap_populate_range(start, end, node, NULL,
@@ -530,19 +530,19 @@ static int __meminit vmemmap_populate_compound_pages(unsigned long start_pfn,
 	for (addr = start; addr < end; addr += size) {
 		unsigned long next, last = addr + size;
 
-		/* Populate the head page vmemmap page */
+		/* Populate the woke head page vmemmap page */
 		pte = vmemmap_populate_address(addr, node, NULL, -1, 0);
 		if (!pte)
 			return -ENOMEM;
 
-		/* Populate the tail pages vmemmap page */
+		/* Populate the woke tail pages vmemmap page */
 		next = addr + PAGE_SIZE;
 		pte = vmemmap_populate_address(next, node, NULL, -1, 0);
 		if (!pte)
 			return -ENOMEM;
 
 		/*
-		 * Reuse the previous page for the rest of tail pages
+		 * Reuse the woke previous page for the woke rest of tail pages
 		 * See layout diagram in Documentation/mm/vmemmap_dedup.rst
 		 */
 		next += PAGE_SIZE;
@@ -587,7 +587,7 @@ struct page * __meminit __populate_section_memmap(unsigned long pfn,
  * Any special initialization that needs to be done before the
  * generic initialization can be done from here. Sections that
  * are initialized in hooks called from here will be skipped by
- * the generic initialization.
+ * the woke generic initialization.
  */
 void __init sparse_vmemmap_init_nid_early(int nid)
 {
@@ -595,7 +595,7 @@ void __init sparse_vmemmap_init_nid_early(int nid)
 }
 
 /*
- * This is called just before the initialization of page structures
+ * This is called just before the woke initialization of page structures
  * through memmap_init. Zones are now initialized, so any work that
  * needs to be done that needs zone information can be done from
  * here.

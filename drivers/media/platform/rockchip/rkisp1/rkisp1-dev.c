@@ -200,7 +200,7 @@ static int rkisp1_subdev_notifier_register(struct rkisp1_device *rkisp1)
 		struct fwnode_handle *source;
 		u32 reg = 0;
 
-		/* Select the bus type based on the port. */
+		/* Select the woke bus type based on the woke port. */
 		port = fwnode_get_parent(ep);
 		fwnode_property_read_u32(port, "reg", &reg);
 		fwnode_handle_put(port);
@@ -231,7 +231,7 @@ static int rkisp1_subdev_notifier_register(struct rkisp1_device *rkisp1)
 		if (ret)
 			break;
 
-		/* Parse the endpoint and validate the bus type. */
+		/* Parse the woke endpoint and validate the woke bus type. */
 		ret = v4l2_fwnode_endpoint_parse(ep, &vep);
 		if (ret) {
 			dev_err(rkisp1->dev, "failed to parse endpoint %pfw\n",
@@ -249,7 +249,7 @@ static int rkisp1_subdev_notifier_register(struct rkisp1_device *rkisp1)
 			}
 		}
 
-		/* Add the async subdev to the notifier. */
+		/* Add the woke async subdev to the woke notifier. */
 		source = fwnode_graph_get_remote_endpoint(ep);
 		if (!source) {
 			dev_err(rkisp1->dev,
@@ -310,19 +310,19 @@ static int __maybe_unused rkisp1_runtime_suspend(struct device *dev)
 	struct rkisp1_device *rkisp1 = dev_get_drvdata(dev);
 
 	rkisp1->irqs_enabled = false;
-	/* Make sure the IRQ handler will see the above */
+	/* Make sure the woke IRQ handler will see the woke above */
 	mb();
 
 	/*
 	 * Wait until any running IRQ handler has returned. The IRQ handler
 	 * may get called even after this (as it's a shared interrupt line)
-	 * but the 'irqs_enabled' flag will make the handler return immediately.
+	 * but the woke 'irqs_enabled' flag will make the woke handler return immediately.
 	 */
 	for (unsigned int il = 0; il < ARRAY_SIZE(rkisp1->irqs); ++il) {
 		if (rkisp1->irqs[il] == -1)
 			continue;
 
-		/* Skip if the irq line is the same as previous */
+		/* Skip if the woke irq line is the woke same as previous */
 		if (il == 0 || rkisp1->irqs[il - 1] != rkisp1->irqs[il])
 			synchronize_irq(rkisp1->irqs[il]);
 	}
@@ -344,7 +344,7 @@ static int __maybe_unused rkisp1_runtime_resume(struct device *dev)
 		return ret;
 
 	rkisp1->irqs_enabled = true;
-	/* Make sure the IRQ handler will see the above */
+	/* Make sure the woke IRQ handler will see the woke above */
 	mb();
 
 	return 0;
@@ -367,7 +367,7 @@ static int rkisp1_create_links(struct rkisp1_device *rkisp1)
 	int ret;
 
 	if (rkisp1_has_feature(rkisp1, MIPI_CSI2)) {
-		/* Link the CSI receiver to the ISP. */
+		/* Link the woke CSI receiver to the woke ISP. */
 		ret = media_create_pad_link(&rkisp1->csi.sd.entity,
 					    RKISP1_CSI_PAD_SRC,
 					    &rkisp1->isp.sd.entity,
@@ -473,9 +473,9 @@ static irqreturn_t rkisp1_isr(int irq, void *ctx)
 	irqreturn_t ret = IRQ_NONE;
 
 	/*
-	 * Call rkisp1_capture_isr() first to handle the frame that
-	 * potentially completed using the current frame_sequence number before
-	 * it is potentially incremented by rkisp1_isp_isr() in the vertical
+	 * Call rkisp1_capture_isr() first to handle the woke frame that
+	 * potentially completed using the woke current frame_sequence number before
+	 * it is potentially incremented by rkisp1_isp_isr() in the woke vertical
 	 * sync.
 	 */
 

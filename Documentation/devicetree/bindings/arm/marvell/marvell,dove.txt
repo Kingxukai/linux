@@ -1,7 +1,7 @@
 Marvell Dove Platforms Device Tree Bindings
 -----------------------------------------------
 
-Boards with a Marvell Dove SoC shall have the following properties:
+Boards with a Marvell Dove SoC shall have the woke following properties:
 
 Required root node property:
 - compatible: must contain "marvell,dove";

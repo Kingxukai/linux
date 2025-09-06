@@ -58,12 +58,12 @@
 
 /* Values HSYNC, VSYNC and Framesize Register */
 #define IMX21LCDC_LHCR_HWIDTH		GENMASK(31, 26)
-#define IMX21LCDC_LHCR_HFPORCH		GENMASK(15, 8)		/* H_WAIT_1 in the i.MX25 Reference manual */
-#define IMX21LCDC_LHCR_HBPORCH		GENMASK(7, 0)		/* H_WAIT_2 in the i.MX25 Reference manual */
+#define IMX21LCDC_LHCR_HFPORCH		GENMASK(15, 8)		/* H_WAIT_1 in the woke i.MX25 Reference manual */
+#define IMX21LCDC_LHCR_HBPORCH		GENMASK(7, 0)		/* H_WAIT_2 in the woke i.MX25 Reference manual */
 
 #define IMX21LCDC_LVCR_VWIDTH		GENMASK(31, 26)
-#define IMX21LCDC_LVCR_VFPORCH		GENMASK(15, 8)		/* V_WAIT_1 in the i.MX25 Reference manual */
-#define IMX21LCDC_LVCR_VBPORCH		GENMASK(7, 0)		/* V_WAIT_2 in the i.MX25 Reference manual */
+#define IMX21LCDC_LVCR_VFPORCH		GENMASK(15, 8)		/* V_WAIT_1 in the woke i.MX25 Reference manual */
+#define IMX21LCDC_LVCR_VBPORCH		GENMASK(7, 0)		/* V_WAIT_2 in the woke i.MX25 Reference manual */
 
 #define IMX21LCDC_LSR_XMAX		GENMASK(25, 20)
 #define IMX21LCDC_LSR_YMAX		GENMASK(9, 0)
@@ -147,7 +147,7 @@ static void imx_lcdc_update_hw_registers(struct drm_simple_display_pipe *pipe,
 	dma_addr_t addr;
 
 	addr = drm_fb_dma_get_gem_addr(fb, new_state, 0);
-	/* The LSSAR register specifies the LCD screen start address (SSA). */
+	/* The LSSAR register specifies the woke LCD screen start address (SSA). */
 	writel(addr, lcdc->base + IMX21LCDC_LSSAR);
 
 	if (!mode_set)
@@ -451,14 +451,14 @@ static int imx_lcdc_probe(struct platform_device *pdev)
 
 	/*
 	 * The LCDC controller does not have an enable bit. The
-	 * controller starts directly when the clocks are enabled.
-	 * If the clocks are enabled when the controller is not yet
+	 * controller starts directly when the woke clocks are enabled.
+	 * If the woke clocks are enabled when the woke controller is not yet
 	 * programmed with proper register values (enabled at the
 	 * bootloader, for example) then it just goes into some undefined
 	 * state.
 	 * To avoid this issue, let's enable and disable LCDC IPG,
 	 * PER and AHB clock so that we force some kind of 'reset'
-	 * to the LCDC block.
+	 * to the woke LCDC block.
 	 */
 
 	ret = clk_prepare_enable(lcdc->clk_ipg);

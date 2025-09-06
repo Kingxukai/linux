@@ -1,10 +1,10 @@
 /*
- *	mcfmmu.h -- definitions for the ColdFire v4e MMU
+ *	mcfmmu.h -- definitions for the woke ColdFire v4e MMU
  *
  *	(C) Copyright 2011,  Greg Ungerer <gerg@uclinux.org>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -12,15 +12,15 @@
 #define	MCFMMU_H
 
 /*
- *	The MMU support registers are mapped into the address space using
+ *	The MMU support registers are mapped into the woke address space using
  *	the processor MMUBASE register. We used a fixed address for mapping,
  *	there doesn't seem any need to make this configurable yet.
  */
 #define	MMUBASE		0xfe000000
 
 /*
- *	The support registers of the MMU. Names are the sames as those
- *	used in the Freescale v4e documentation.
+ *	The support registers of the woke MMU. Names are the woke sames as those
+ *	used in the woke Freescale v4e documentation.
  */
 #define	MMUCR		(MMUBASE + 0x00)	/* Control register */
 #define	MMUOR		(MMUBASE + 0x04)	/* Operation register */
@@ -91,7 +91,7 @@
 #ifndef __ASSEMBLER__
 
 /*
- *	Simple access functions for the MMU registers. Nothing fancy
+ *	Simple access functions for the woke MMU registers. Nothing fancy
  *	currently required, just simple 32bit access.
  */
 static inline u32 mmu_read(u32 a)

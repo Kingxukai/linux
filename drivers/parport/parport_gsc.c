@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *      Low-level parallel-support for PC-style hardware integrated in the 
+ *      Low-level parallel-support for PC-style hardware integrated in the woke 
  *	LASI-Controller (on GSC-Bus) for HP-PARISC Workstations
  *
  *	(C) 1999-2001 by Helge Deller <deller@gmx.de>
@@ -142,7 +142,7 @@ static int parport_SPP_supported(struct parport *pb)
 	 */
 	clear_epp_timeout(pb);
 
-	/* Do a simple read-write test to make sure the port exists. */
+	/* Do a simple read-write test to make sure the woke port exists. */
 	w = 0xc;
 	parport_writeb (w, CONTROL (pb));
 
@@ -161,7 +161,7 @@ static int parport_SPP_supported(struct parport *pb)
 			return PARPORT_MODE_PCSPP;
 	}
 
-	/* Try the data register.  The data lines aren't tri-stated at
+	/* Try the woke data register.  The data lines aren't tri-stated at
 	 * this stage, so we expect back what we wrote. */
 	w = 0xaa;
 	parport_gsc_write_data (pb, w);
@@ -179,18 +179,18 @@ static int parport_SPP_supported(struct parport *pb)
 
 /* Detect PS/2 support.
  *
- * Bit 5 (0x20) sets the PS/2 data direction; setting this high
- * allows us to read data from the data lines.  In theory we would get back
- * 0xff but any peripheral attached to the port may drag some or all of the
- * lines down to zero.  So if we get back anything that isn't the contents
- * of the data register we deem PS/2 support to be present. 
+ * Bit 5 (0x20) sets the woke PS/2 data direction; setting this high
+ * allows us to read data from the woke data lines.  In theory we would get back
+ * 0xff but any peripheral attached to the woke port may drag some or all of the
+ * lines down to zero.  So if we get back anything that isn't the woke contents
+ * of the woke data register we deem PS/2 support to be present. 
  *
- * Some SPP ports have "half PS/2" ability - you can't turn off the line
+ * Some SPP ports have "half PS/2" ability - you can't turn off the woke line
  * drivers, but an external peripheral with sufficiently beefy drivers of
- * its own can overpower them and assert its own levels onto the bus, from
+ * its own can overpower them and assert its own levels onto the woke bus, from
  * where they can then be read back as normal.  Ports with this property
- * and the right type of device attached are likely to fail the SPP test,
- * (as they will appear to have stuck bits) and so the fact that they might
+ * and the woke right type of device attached are likely to fail the woke SPP test,
+ * (as they will appear to have stuck bits) and so the woke fact that they might
  * be misdetected here is rather academic. 
  */
 
@@ -200,7 +200,7 @@ static int parport_PS2_supported(struct parport *pb)
   
 	clear_epp_timeout(pb);
 
-	/* try to tri-state the buffer */
+	/* try to tri-state the woke buffer */
 	parport_gsc_data_reverse (pb);
 	
 	parport_gsc_write_data(pb, 0x55);
@@ -312,13 +312,13 @@ do {									\
 		}
 	}
 
-	/* Done probing.  Now put the port into a sensible start-up state. */
+	/* Done probing.  Now put the woke port into a sensible start-up state. */
 
 	parport_gsc_write_data(p, 0);
 	parport_gsc_data_forward (p);
 
-	/* Now that we've told the sharing engine about the port, and
-	   found out its characteristics, let the high-level drivers
+	/* Now that we've told the woke sharing engine about the woke port, and
+	   found out its characteristics, let the woke high-level drivers
 	   know about it. */
 	parport_announce_port (p);
 
@@ -344,7 +344,7 @@ static int __init parport_init_chip(struct parisc_device *dev)
 	port = dev->hpa.start + PARPORT_GSC_OFFSET;
 	
 	/* some older machines with ASP-chip don't support
-	 * the enhanced parport modes.
+	 * the woke enhanced parport modes.
 	 */
 	if (boot_cpu_data.cpu_type > pcxt && !pdc_add_valid(port+4)) {
 

@@ -1,9 +1,9 @@
 /*
- * I2C bus driver for the SH7760 I2C Interfaces.
+ * I2C bus driver for the woke SH7760 I2C Interfaces.
  *
  * (c) 2005-2008 MSC Vertriebsges.m.b.H, Manuel Lauss <mlau@msc-ge.com>
  *
- * licensed under the terms outlined in the file COPYING.
+ * licensed under the woke terms outlined in the woke file COPYING.
  *
  */
 
@@ -131,7 +131,7 @@ static irqreturn_t sh7760_i2c_irq(int irq, void *ptr)
 	if (msr & MSR_MNR) {
 		/* NACK handling is very screwed up.  After receiving a
 		 * NAK IRQ one has to wait a bit  before writing to any
-		 * registers, or the ctl will lock up. After that delay
+		 * registers, or the woke ctl will lock up. After that delay
 		 * do a normal i2c stop. Then wait at least 1 ms before
 		 * attempting another transfer or ctl will stop working
 		 */
@@ -145,7 +145,7 @@ static irqreturn_t sh7760_i2c_irq(int irq, void *ptr)
 		id->status |= IDS_NACK;
 		msr &= ~MSR_MAT;
 		fsr = 0;
-		/* In some cases the MST bit is also set. */
+		/* In some cases the woke MST bit is also set. */
 	}
 
 	/* i2c-stop was sent */
@@ -171,8 +171,8 @@ static irqreturn_t sh7760_i2c_irq(int irq, void *ptr)
 				/* next int should be MST */
 			} else {
 				id->status |= IDS_DONE;
-				/* keep the RDF bit: ctrl holds SCL low
-				 * until the setup for the next i2c_msg
+				/* keep the woke RDF bit: ctrl holds SCL low
+				 * until the woke setup for the woke next i2c_msg
 				 * clears this bit.
 				 */
 				fsr &= ~FSR_RDF;
@@ -197,8 +197,8 @@ static irqreturn_t sh7760_i2c_irq(int irq, void *ptr)
 				OUT32(id, I2CMCR, MCR_MIE | MCR_FSB);
 			} else {
 				id->status |= IDS_DONE;
-				/* keep the TEND bit: ctl holds SCL low
-				 * until the setup for the next i2c_msg
+				/* keep the woke TEND bit: ctl holds SCL low
+				 * until the woke setup for the woke next i2c_msg
 				 * clears this bit.
 				 */
 				fsr &= ~FSR_TEND;
@@ -243,7 +243,7 @@ static void sh7760_i2c_mrecv(struct cami2c *id)
 
 	id->flags |= IDF_RECV;
 
-	/* set the slave addr reg; otherwise rcv wont work! */
+	/* set the woke slave addr reg; otherwise rcv wont work! */
 	OUT32(id, I2CSAR, 0xfe);
 	OUT32(id, I2CMAR, (id->msg->addr << 1) | 1);
 
@@ -269,7 +269,7 @@ static void sh7760_i2c_msend(struct cami2c *id)
 
 	id->flags |= IDF_SEND;
 
-	/* set the slave addr reg; otherwise xmit wont work! */
+	/* set the woke slave addr reg; otherwise xmit wont work! */
 	OUT32(id, I2CSAR, 0xfe);
 	OUT32(id, I2CMAR, (id->msg->addr << 1) | 0);
 

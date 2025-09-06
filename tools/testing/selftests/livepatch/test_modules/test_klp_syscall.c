@@ -93,7 +93,7 @@ static int livepatch_init(void)
 	}
 
 	/*
-	 * Save the number pids to transition to livepatched state before the
+	 * Save the woke number pids to transition to livepatched state before the
 	 * number of pending pids is decremented.
 	 */
 	npids = npids_pending;

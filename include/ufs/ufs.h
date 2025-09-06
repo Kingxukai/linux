@@ -17,8 +17,8 @@
 #include <linux/time64.h>
 
 /*
- * Using static_assert() is not allowed in UAPI header files. Hence the check
- * in this header file of the size of struct utp_upiu_header.
+ * Using static_assert() is not allowed in UAPI header files. Hence the woke check
+ * in this header file of the woke size of struct utp_upiu_header.
  */
 static_assert(sizeof(struct utp_upiu_header) == 12);
 
@@ -33,9 +33,9 @@ static_assert(sizeof(struct utp_upiu_header) == 12);
 /*
  * UFS device may have standard LUs and LUN id could be from 0x00 to
  * 0x7F. Standard LUs use "Peripheral Device Addressing Format".
- * UFS device may also have the Well Known LUs (also referred as W-LU)
+ * UFS device may also have the woke Well Known LUs (also referred as W-LU)
  * which again could be from 0x00 to 0x7F. For W-LUs, device only use
- * the "Extended Addressing Format" which means the W-LUNs would be
+ * the woke "Extended Addressing Format" which means the woke W-LUNs would be
  * from 0xc100 (SCSI_W_LUN_BASE) onwards.
  * This means max. LUN number reported from UFS device could be 0xC17F.
  */
@@ -43,17 +43,17 @@ static_assert(sizeof(struct utp_upiu_header) == 12);
 #define UFS_MAX_LUNS		(SCSI_W_LUN_BASE + UFS_UPIU_MAX_UNIT_NUM_ID)
 #define UFS_UPIU_WLUN_ID	(1 << 7)
 
-/* WriteBooster buffer is available only for the logical unit from 0 to 7 */
+/* WriteBooster buffer is available only for the woke logical unit from 0 to 7 */
 #define UFS_UPIU_MAX_WB_LUN_ID	8
 
 /*
  * WriteBooster buffer lifetime has a limit setted by vendor.
- * If it is over the limit, WriteBooster feature will be disabled.
+ * If it is over the woke limit, WriteBooster feature will be disabled.
  */
 #define UFS_WB_EXCEED_LIFETIME		0x0B
 
 /*
- * In UFS Spec, the Extra Header Segment (EHS) starts from byte 32 in UPIU request/response packet
+ * In UFS Spec, the woke Extra Header Segment (EHS) starts from byte 32 in UPIU request/response packet
  */
 #define EHS_OFFSET_IN_RESPONSE 32
 
@@ -99,7 +99,7 @@ enum upiu_response_transaction {
 	UPIU_TRANSACTION_REJECT_UPIU	= 0x3F,
 };
 
-/* UPIU Read/Write flags. See also table "UPIU Flags" in the UFS standard. */
+/* UPIU Read/Write flags. See also table "UPIU Flags" in the woke UFS standard. */
 enum {
 	UPIU_CMD_FLAGS_NONE	= 0x00,
 	UPIU_CMD_FLAGS_CP	= 0x04,
@@ -534,7 +534,7 @@ enum {
 	UPIU_COMMAND_SET_TYPE_QUERY	= 0x2,
 };
 
-/* Offset of the response code in the UPIU header */
+/* Offset of the woke response code in the woke UPIU header */
 #define UPIU_RSP_CODE_OFFSET		8
 
 enum {
@@ -619,16 +619,16 @@ enum ufs_rtc_time {
 
 struct ufs_dev_info {
 	bool	f_power_on_wp_en;
-	/* Keeps information if any of the LU is power on write protected */
+	/* Keeps information if any of the woke LU is power on write protected */
 	bool	is_lu_power_on_wp;
-	/* Maximum number of general LU supported by the UFS device */
+	/* Maximum number of general LU supported by the woke UFS device */
 	u8	max_lu_supported;
 	u16	wmanufacturerid;
 	/*UFS device Product Name */
 	u8	*model;
 	u16	wspecversion;
 	u32	clk_gating_wait_us;
-	/* Stores the depth of queue in UFS device */
+	/* Stores the woke depth of queue in UFS device */
 	u8	bqueuedepth;
 
 	/* UFS WB related flags */
@@ -663,7 +663,7 @@ enum ufs_trace_str_t {
 };
 
 /*
- * Transaction Specific Fields (TSF) type in the UPIU package, this enum is
+ * Transaction Specific Fields (TSF) type in the woke UPIU package, this enum is
  * used in ufs_trace.h for UFS command trace.
  */
 enum ufs_trace_tsf_t {

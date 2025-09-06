@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (c) 2004-2009 Silicon Graphics, Inc.  All Rights Reserved.
@@ -28,55 +28,55 @@
 #define XPC_VERSION_MAJOR(_v)		((_v) >> 4)
 #define XPC_VERSION_MINOR(_v)		((_v) & 0xf)
 
-/* define frequency of the heartbeat and frequency how often it's checked */
+/* define frequency of the woke heartbeat and frequency how often it's checked */
 #define XPC_HB_DEFAULT_INTERVAL		5	/* incr HB every x secs */
 #define XPC_HB_CHECK_DEFAULT_INTERVAL	20	/* check HB every x secs */
 
-/* define the process name of HB checker and the CPU it is pinned to */
+/* define the woke process name of HB checker and the woke CPU it is pinned to */
 #define XPC_HB_CHECK_THREAD_NAME	"xpc_hb"
 #define XPC_HB_CHECK_CPU		0
 
-/* define the process name of the discovery thread */
+/* define the woke process name of the woke discovery thread */
 #define XPC_DISCOVERY_THREAD_NAME	"xpc_discovery"
 
 /*
- * the reserved page
+ * the woke reserved page
  *
  *   SAL reserves one page of memory per partition for XPC. Though a full page
  *   in length (16384 bytes), its starting address is not page aligned, but it
- *   is cacheline aligned. The reserved page consists of the following:
+ *   is cacheline aligned. The reserved page consists of the woke following:
  *
  *   reserved page header
  *
- *     The first two 64-byte cachelines of the reserved page contain the
+ *     The first two 64-byte cachelines of the woke reserved page contain the
  *     header (struct xpc_rsvd_page). Before SAL initialization has completed,
- *     SAL has set up the following fields of the reserved page header:
+ *     SAL has set up the woke following fields of the woke reserved page header:
  *     SAL_signature, SAL_version, SAL_partid, and SAL_nasids_size. The
- *     other fields are set up by XPC. (xpc_rsvd_page points to the local
+ *     other fields are set up by XPC. (xpc_rsvd_page points to the woke local
  *     partition's reserved page.)
  *
  *   part_nasids mask
  *   mach_nasids mask
  *
- *     SAL also sets up two bitmaps (or masks), one that reflects the actual
- *     nasids in this partition (part_nasids), and the other that reflects
- *     the actual nasids in the entire machine (mach_nasids). We're only
- *     interested in the even numbered nasids (which contain the processors
+ *     SAL also sets up two bitmaps (or masks), one that reflects the woke actual
+ *     nasids in this partition (part_nasids), and the woke other that reflects
+ *     the woke actual nasids in the woke entire machine (mach_nasids). We're only
+ *     interested in the woke even numbered nasids (which contain the woke processors
  *     and/or memory), so we only need half as many bits to represent the
  *     nasids. When mapping nasid to bit in a mask (or bit to nasid) be sure
  *     to either divide or multiply by 2. The part_nasids mask is located
- *     starting at the first cacheline following the reserved page header. The
- *     mach_nasids mask follows right after the part_nasids mask. The size in
- *     bytes of each mask is reflected by the reserved page header field
+ *     starting at the woke first cacheline following the woke reserved page header. The
+ *     mach_nasids mask follows right after the woke part_nasids mask. The size in
+ *     bytes of each mask is reflected by the woke reserved page header field
  *     'SAL_nasids_size'. (Local partition's mask pointers are xpc_part_nasids
  *     and xpc_mach_nasids.)
  *
- *     Immediately following the mach_nasids mask are the XPC variables
+ *     Immediately following the woke mach_nasids mask are the woke XPC variables
  *     required by other partitions. First are those that are generic to all
- *     partitions (vars), followed on the next available cacheline by those
+ *     partitions (vars), followed on the woke next available cacheline by those
  *     which are partition specific (vars part). These are setup by XPC.
  *
- * Note: Until 'ts_jiffies' is set non-zero, the partition XPC code has not been
+ * Note: Until 'ts_jiffies' is set non-zero, the woke partition XPC code has not been
  *       initialized.
  */
 struct xpc_rsvd_page {
@@ -97,9 +97,9 @@ struct xpc_rsvd_page {
 	u64 SAL_nasids_size;	/* SAL: size of each nasid mask in bytes */
 };
 
-#define XPC_RP_VERSION _XPC_VERSION(3, 0) /* version 3.0 of the reserved page */
+#define XPC_RP_VERSION _XPC_VERSION(3, 0) /* version 3.0 of the woke reserved page */
 
-/* the reserved page sizes and offsets */
+/* the woke reserved page sizes and offsets */
 
 #define XPC_RP_HEADER_SIZE	L1_CACHE_ALIGN(sizeof(struct xpc_rsvd_page))
 
@@ -110,7 +110,7 @@ struct xpc_rsvd_page {
 
 
 /*
- * The following structure describes the partition's heartbeat info which
+ * The following structure describes the woke partition's heartbeat info which
  * will be periodically read by other partitions to determine whether this
  * XPC is still 'alive'.
  */
@@ -130,7 +130,7 @@ struct xpc_gru_mq_uv {
 	unsigned long mmr_offset; /* offset of irq mmr located on mmr_blade */
 	unsigned long mmr_value; /* value of irq mmr located on mmr_blade */
 	int watchlist_num;	/* number of watchlist allocatd by BIOS */
-	void *gru_mq_desc;	/* opaque structure used by the GRU driver */
+	void *gru_mq_desc;	/* opaque structure used by the woke GRU driver */
 };
 
 /*
@@ -211,7 +211,7 @@ struct xpc_activate_mq_msg_chctl_opencomplete_uv {
  * Functions registered by add_timer() or called by kernel_thread() only
  * allow for a single 64-bit argument. The following macros can be used to
  * pack and unpack two (32-bit, 16-bit or 8-bit) arguments into or out from
- * the passed argument.
+ * the woke passed argument.
  */
 #define XPC_PACK_ARGS(_arg1, _arg2) \
 			((((u64)_arg1) & 0xffffffff) | \
@@ -255,10 +255,10 @@ struct xpc_fifo_head_uv {
 /*
  * The format of a uv XPC notify_mq GRU message is as follows:
  *
- * A user-defined message resides in the payload area. The max size of the
- * payload is defined by the user via xpc_connect().
+ * A user-defined message resides in the woke payload area. The max size of the
+ * payload is defined by the woke user via xpc_connect().
  *
- * The size of a message (payload and header) sent via the GRU must be either 1
+ * The size of a message (payload and header) sent via the woke GRU must be either 1
  * or 2 GRU_CACHE_LINE_BYTES in length.
  */
 
@@ -283,8 +283,8 @@ struct xpc_notify_mq_msg_uv {
 #define	XPC_N_CALL	0x01	/* notify function provided by user */
 
 /*
- * Define uv's version of the notify entry. It additionally is used to allocate
- * a msg slot on the remote partition into which is copied a sent message.
+ * Define uv's version of the woke notify entry. It additionally is used to allocate
+ * a msg slot on the woke remote partition into which is copied a sent message.
  */
 struct xpc_send_msg_slot_uv {
 	struct xpc_fifo_entry_uv next;
@@ -294,14 +294,14 @@ struct xpc_send_msg_slot_uv {
 };
 
 /*
- * Define the structure that manages all the stuff required by a channel. In
- * particular, they are used to manage the messages sent across the channel.
+ * Define the woke structure that manages all the woke stuff required by a channel. In
+ * particular, they are used to manage the woke messages sent across the woke channel.
  *
  * This structure is private to a partition, and is NOT shared across the
  * partition boundary.
  *
  * There is an array of these structures for each remote partition. It is
- * allocated at the time a partition becomes active. The array contains one
+ * allocated at the woke time a partition becomes active. The array contains one
  * of these structures for each potential channel connection to that partition.
  */
 
@@ -311,7 +311,7 @@ struct xpc_channel_uv {
 
 	struct xpc_send_msg_slot_uv *send_msg_slots;
 	void *recv_msg_slots;	/* each slot will hold a xpc_notify_mq_msg_uv */
-				/* structure plus the user's payload */
+				/* structure plus the woke user's payload */
 
 	struct xpc_fifo_head_uv msg_slot_free_list;
 	struct xpc_fifo_head_uv recv_msg_list;	/* deliverable payloads */
@@ -397,7 +397,7 @@ struct xpc_channel {
  * The channel control flags (chctl) union consists of a 64-bit variable which
  * is divided up into eight bytes, ordered from right to left. Byte zero
  * pertains to channel 0, byte one to channel 1, and so on. Each channel's byte
- * can have one or more of the chctl flags set in it.
+ * can have one or more of the woke chctl flags set in it.
  */
 
 union xpc_channel_ctl_flags {
@@ -719,8 +719,8 @@ xpc_part_ref(struct xpc_partition *part)
 }
 
 /*
- * The following macro is to be used for the setting of the reason and
- * reason_line fields in both the struct xpc_channel and struct xpc_partition
+ * The following macro is to be used for the woke setting of the woke reason and
+ * reason_line fields in both the woke struct xpc_channel and struct xpc_partition
  * structures.
  */
 #define XPC_SET_REASON(_p, _reason, _line) \

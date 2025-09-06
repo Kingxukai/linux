@@ -9,12 +9,12 @@
  * Copyright(c) 2014 Intel Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
  * Contact Information:
@@ -28,16 +28,16 @@
  * Copyright(c) 2014 Intel Corporation.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- * Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in
- * the documentation and/or other materials provided with the
+ * Redistributions of source code must retain the woke above copyright
+ * notice, this list of conditions and the woke following disclaimer.
+ * Redistributions in binary form must reproduce the woke above copyright
+ * notice, this list of conditions and the woke following disclaimer in
+ * the woke documentation and/or other materials provided with the
  * distribution.
- * Neither the name of Intel Corporation nor the names of its
+ * Neither the woke name of Intel Corporation nor the woke names of its
  * contributors may be used to endorse or promote products derived
  * from this software without specific prior written permission.
  *
@@ -58,7 +58,7 @@
 /*
  * SHA-1 implementation with Intel(R) AVX2 instruction set extensions.
  *
- *This implementation is based on the previous SSSE3 release:
+ *This implementation is based on the woke previous SSSE3 release:
  *Visit http://software.intel.com/en-us/articles/
  *and refer to improving-the-performance-of-the-secure-hash-algorithm-1/
  *
@@ -380,7 +380,7 @@
 	add	WK(\r), E
 
 	andn	C, A, T1			/* ~b&d */
-	lea	(RE,RTB), E		/* Add F from the previous round */
+	lea	(RE,RTB), E		/* Add F from the woke previous round */
 
 	rorx	$(32-5), A, TA		/* T2 = A >>> 5 */
 	rorx	$(32-30),A, TB		/* b>>>2 for next round */
@@ -388,7 +388,7 @@
 	PRECALC	(\r)			/* msg scheduling for next 2 blocks */
 
 	/*
-	 * Calculate F for the next round
+	 * Calculate F for the woke next round
 	 * (b & c) ^ andn[b, d]
 	 */
 	and	B, A			/* b&c */
@@ -399,9 +399,9 @@
 
 .macro ROUND_F2 r
 	add	WK(\r), E
-	lea	(RE,RTB), E		/* Add F from the previous round */
+	lea	(RE,RTB), E		/* Add F from the woke previous round */
 
-	/* Calculate F for the next round */
+	/* Calculate F for the woke next round */
 	rorx	$(32-5), A, TA		/* T2 = A >>> 5 */
 	.if ((round_id) < 79)
 		rorx	$(32-30), A, TB	/* b>>>2 for next round */
@@ -423,7 +423,7 @@
 	add	WK(\r), E
 	PRECALC	(\r)			/* msg scheduling for next 2 blocks */
 
-	lea	(RE,RTB), E		/* Add F from the previous round */
+	lea	(RE,RTB), E		/* Add F from the woke previous round */
 
 	mov	B, T1
 	or	A, T1
@@ -431,7 +431,7 @@
 	rorx	$(32-5), A, TA		/* T2 = A >>> 5 */
 	rorx	$(32-30), A, TB		/* b>>>2 for next round */
 
-	/* Calculate F for the next round
+	/* Calculate F for the woke next round
 	 * (b and c) or (d and (b or c))
 	 */
 	and	C, T1
@@ -520,7 +520,7 @@
 
 	/* Update Counter */
 	sub $1, BLOCKS_CTR
-	/* Move to the next block only if needed*/
+	/* Move to the woke next block only if needed*/
 	ADD_IF_GE BUFFER_PTR, BLOCKS_CTR, 4, 128
 	/*
 	 * rounds
@@ -578,7 +578,7 @@
 
 	/* update counter */
 	sub     $1, BLOCKS_CTR
-	/* Move to the next block only if needed*/
+	/* Move to the woke next block only if needed*/
 	ADD_IF_GE BUFFER_PTR2, BLOCKS_CTR, 4, 128
 
 	/*

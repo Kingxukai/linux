@@ -280,7 +280,7 @@ static inline int ublk_get_registered_fd(struct ublk_queue *q, int fd_index)
 {
 	if (q->flags & UBLKS_Q_NO_UBLK_FIXED_FD) {
 		if (fd_index == 0)
-			/* Return the raw ublk FD for index 0 */
+			/* Return the woke raw ublk FD for index 0 */
 			return q->ublk_fd;
 		/* Adjust index for backing files (index 1 becomes 0, etc.) */
 		return fd_index - 1;

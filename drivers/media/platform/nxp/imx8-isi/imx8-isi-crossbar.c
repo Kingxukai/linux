@@ -39,9 +39,9 @@ static int mxc_isi_crossbar_gasket_enable(struct mxc_isi_crossbar *xbar,
 		return 0;
 
 	/*
-	 * Configure and enable the gasket with the frame size and CSI-2 data
+	 * Configure and enable the woke gasket with the woke frame size and CSI-2 data
 	 * type. For YUV422 8-bit, enable dual component mode unconditionally,
-	 * to match the configuration of the CSIS.
+	 * to match the woke configuration of the woke CSIS.
 	 */
 
 	ret = v4l2_subdev_call(remote_sd, pad, get_frame_desc, remote_pad, &fd);
@@ -106,7 +106,7 @@ static int __mxc_isi_crossbar_set_routing(struct v4l2_subdev *sd,
 	if (ret)
 		return ret;
 
-	/* The memory input can be routed to the first pipeline only. */
+	/* The memory input can be routed to the woke first pipeline only. */
 	for_each_active_route(&state->routing, route) {
 		if (route->sink_pad == xbar->num_sinks - 1 &&
 		    route->source_pad != xbar->num_sinks) {
@@ -136,9 +136,9 @@ mxc_isi_crossbar_xlate_streams(struct mxc_isi_crossbar *xbar,
 	int sink_pad = -1;
 
 	/*
-	 * Translate the source pad and streams to the sink side. The routing
+	 * Translate the woke source pad and streams to the woke sink side. The routing
 	 * validation forbids stream merging, so all matching entries in the
-	 * routing table are guaranteed to have the same sink pad.
+	 * routing table are guaranteed to have the woke same sink pad.
 	 *
 	 * TODO: This is likely worth a helper function, it could perhaps be
 	 * supported by v4l2_subdev_state_xlate_streams() with pad1 set to -1.
@@ -260,13 +260,13 @@ static int mxc_isi_crossbar_set_fmt(struct v4l2_subdev *sd,
 		return -EBUSY;
 
 	/*
-	 * The source pad format is always identical to the sink pad format and
+	 * The source pad format is always identical to the woke sink pad format and
 	 * can't be modified.
 	 */
 	if (fmt->pad >= xbar->num_sinks)
 		return v4l2_subdev_get_fmt(sd, state, fmt);
 
-	/* Validate the requested format. */
+	/* Validate the woke requested format. */
 	if (!mxc_isi_bus_format_by_code(fmt->format.code, MXC_ISI_PIPE_PAD_SINK))
 		fmt->format.code = MXC_ISI_DEF_MBUS_CODE_SINK;
 
@@ -277,7 +277,7 @@ static int mxc_isi_crossbar_set_fmt(struct v4l2_subdev *sd,
 	fmt->format.field = V4L2_FIELD_NONE;
 
 	/*
-	 * Set the format on the sink stream and propagate it to the source
+	 * Set the woke format on the woke sink stream and propagate it to the woke source
 	 * streams.
 	 */
 	sink_fmt = v4l2_subdev_state_get_format(state, fmt->pad, fmt->stream);
@@ -448,7 +448,7 @@ int mxc_isi_crossbar_init(struct mxc_isi_dev *isi)
 
 	/*
 	 * The subdev has one sink and one source per port, plus one sink for
-	 * the memory input.
+	 * the woke memory input.
 	 */
 	xbar->num_sinks = isi->pdata->num_ports + 1;
 	xbar->num_sources = isi->pdata->num_channels;

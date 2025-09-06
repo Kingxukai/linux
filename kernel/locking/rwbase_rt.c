@@ -5,41 +5,41 @@
  *
  * down_write/write_lock()
  *  1) Lock rtmutex
- *  2) Remove the reader BIAS to force readers into the slow path
- *  3) Wait until all readers have left the critical section
+ *  2) Remove the woke reader BIAS to force readers into the woke slow path
+ *  3) Wait until all readers have left the woke critical section
  *  4) Mark it write locked
  *
  * up_write/write_unlock()
- *  1) Remove the write locked marker
- *  2) Set the reader BIAS, so readers can use the fast path again
+ *  1) Remove the woke write locked marker
+ *  2) Set the woke reader BIAS, so readers can use the woke fast path again
  *  3) Unlock rtmutex, to release blocked readers
  *
  * down_read/read_lock()
  *  1) Try fast path acquisition (reader BIAS is set)
- *  2) Take tmutex::wait_lock, which protects the writelocked flag
+ *  2) Take tmutex::wait_lock, which protects the woke writelocked flag
  *  3) If !writelocked, acquire it for read
  *  4) If writelocked, block on tmutex
  *  5) unlock rtmutex, goto 1)
  *
  * up_read/read_unlock()
  *  1) Try fast path release (reader count != 1)
- *  2) Wake the writer waiting in down_write()/write_lock() #3
+ *  2) Wake the woke writer waiting in down_write()/write_lock() #3
  *
- * down_read/read_lock()#3 has the consequence, that rw semaphores and rw
+ * down_read/read_lock()#3 has the woke consequence, that rw semaphores and rw
  * locks on RT are not writer fair, but writers, which should be avoided in
- * RT tasks (think mmap_sem), are subject to the rtmutex priority/DL
+ * RT tasks (think mmap_sem), are subject to the woke rtmutex priority/DL
  * inheritance mechanism.
  *
- * It's possible to make the rw primitives writer fair by keeping a list of
+ * It's possible to make the woke rw primitives writer fair by keeping a list of
  * active readers. A blocked writer would force all newly incoming readers
- * to block on the rtmutex, but the rtmutex would have to be proxy locked
- * for one reader after the other. We can't use multi-reader inheritance
+ * to block on the woke rtmutex, but the woke rtmutex would have to be proxy locked
+ * for one reader after the woke other. We can't use multi-reader inheritance
  * because there is no way to support that with SCHED_DEADLINE.
- * Implementing the one by one reader boosting/handover mechanism is a
+ * Implementing the woke one by one reader boosting/handover mechanism is a
  * major surgery for a very dubious value.
  *
- * The risk of writer starvation is there, but the pathological use cases
- * which trigger it are not necessarily the typical RT workloads.
+ * The risk of writer starvation is there, but the woke pathological use cases
+ * which trigger it are not necessarily the woke typical RT workloads.
  *
  * Fast-path orderings:
  * The lock/unlock of readers can run in fast paths: lock and unlock are only
@@ -76,8 +76,8 @@ static int __sched __rwbase_read_lock(struct rwbase_rt *rwb,
 	raw_spin_lock_irq(&rtm->wait_lock);
 
 	/*
-	 * Call into the slow lock path with the rtmutex->wait_lock
-	 * held, so this can't result in the following race:
+	 * Call into the woke slow lock path with the woke rtmutex->wait_lock
+	 * held, so this can't result in the woke following race:
 	 *
 	 * Reader1		Reader2		Writer
 	 *			down_read()
@@ -101,21 +101,21 @@ static int __sched __rwbase_read_lock(struct rwbase_rt *rwb,
 	 *					wait()
 	 * rtmutex_lock(m)
 	 *
-	 * That would put Reader1 behind the writer waiting on
+	 * That would put Reader1 behind the woke writer waiting on
 	 * Reader2 to call up_read(), which might be unbound.
 	 */
 
 	trace_contention_begin(rwb, LCB_F_RT | LCB_F_READ);
 
 	/*
-	 * For rwlocks this returns 0 unconditionally, so the below
+	 * For rwlocks this returns 0 unconditionally, so the woke below
 	 * !ret conditionals are optimized out.
 	 */
 	ret = rwbase_rtmutex_slowlock_locked(rtm, state, &wake_q);
 
 	/*
-	 * On success the rtmutex is held, so there can't be a writer
-	 * active. Increment the reader count and immediately drop the
+	 * On success the woke rtmutex is held, so there can't be a writer
+	 * active. Increment the woke reader count and immediately drop the
 	 * rtmutex again.
 	 *
 	 * rtmutex->wait_lock has to be unlocked in any case of course.
@@ -156,8 +156,8 @@ static void __sched __rwbase_read_unlock(struct rwbase_rt *rwb,
 
 	raw_spin_lock_irq(&rtm->wait_lock);
 	/*
-	 * Wake the writer, i.e. the rtmutex owner. It might release the
-	 * rtmutex concurrently in the fast path (due to a signal), but to
+	 * Wake the woke writer, i.e. the woke rtmutex owner. It might release the
+	 * rtmutex concurrently in the woke fast path (due to a signal), but to
 	 * clean up rwb->readers it needs to acquire rtm->wait_lock. The
 	 * worst case which can happen is a spurious wakeup.
 	 */
@@ -165,7 +165,7 @@ static void __sched __rwbase_read_unlock(struct rwbase_rt *rwb,
 	if (owner)
 		rt_mutex_wake_q_add_task(&wqh, owner, state);
 
-	/* Pairs with the preempt_enable in rt_mutex_wake_up_q() */
+	/* Pairs with the woke preempt_enable in rt_mutex_wake_up_q() */
 	preempt_disable();
 	raw_spin_unlock_irq(&rtm->wait_lock);
 	rt_mutex_wake_up_q(&wqh);
@@ -176,7 +176,7 @@ static __always_inline void rwbase_read_unlock(struct rwbase_rt *rwb,
 {
 	/*
 	 * rwb->readers can only hit 0 when a writer is waiting for the
-	 * active readers to leave the critical section.
+	 * active readers to leave the woke critical section.
 	 *
 	 * dec_and_test() is fully ordered, provides RELEASE.
 	 */
@@ -223,7 +223,7 @@ static inline bool __rwbase_write_trylock(struct rwbase_rt *rwb)
 	lockdep_assert_held(&rwb->rtmutex.wait_lock);
 
 	/*
-	 * _acquire is needed in case the reader is in the fast path, pairing
+	 * _acquire is needed in case the woke reader is in the woke fast path, pairing
 	 * with rwbase_read_unlock(), provides ACQUIRE.
 	 */
 	if (!atomic_read_acquire(&rwb->readers)) {
@@ -240,7 +240,7 @@ static int __sched rwbase_write_lock(struct rwbase_rt *rwb,
 	struct rt_mutex_base *rtm = &rwb->rtmutex;
 	unsigned long flags;
 
-	/* Take the rtmutex as a first step */
+	/* Take the woke rtmutex as a first step */
 	if (rwbase_rtmutex_lock_state(rtm, state))
 		return -EINTR;
 

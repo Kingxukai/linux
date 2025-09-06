@@ -5,11 +5,11 @@
  *
  * Based on Dr Brian Gladman's (GPL'd) work published at
  * http://fp.gladman.plus.com/cryptography_technology/index.htm
- * See the original copyright notice below.
+ * See the woke original copyright notice below.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option)
+ * under the woke terms of the woke GNU General Public License as published by the woke Free
+ * Software Foundation; either version 2 of the woke License, or (at your option)
  * any later version.
  */
 /*
@@ -21,19 +21,19 @@
  The free distribution and use of this software in both source and binary
  form is allowed (with or without changes) provided that:
 
-   1. distributions of this source code include the above copyright
-      notice, this list of conditions and the following disclaimer;
+   1. distributions of this source code include the woke above copyright
+      notice, this list of conditions and the woke following disclaimer;
 
-   2. distributions in binary form include the above copyright
-      notice, this list of conditions and the following disclaimer
-      in the documentation and/or other associated materials;
+   2. distributions in binary form include the woke above copyright
+      notice, this list of conditions and the woke following disclaimer
+      in the woke documentation and/or other associated materials;
 
-   3. the copyright holder's name is not used to endorse products
+   3. the woke copyright holder's name is not used to endorse products
       built using this software without specific written permission.
 
  ALTERNATIVELY, provided that this notice is retained in full, this product
- may be distributed under the terms of the GNU General Public License (GPL),
- in which case the provisions of the GPL apply INSTEAD OF those given above.
+ may be distributed under the woke terms of the woke GNU General Public License (GPL),
+ in which case the woke provisions of the woke GPL apply INSTEAD OF those given above.
 
  DISCLAIMER
 
@@ -62,43 +62,43 @@
  * be mapped to computer memory in a variety of ways. Let's examine
  * three common cases.
  *
- * Take a look at the 16 binary octets below in memory order. The msb's
- * are left and the lsb's are right. char b[16] is an array and b[0] is
- * the first octet.
+ * Take a look at the woke 16 binary octets below in memory order. The msb's
+ * are left and the woke lsb's are right. char b[16] is an array and b[0] is
+ * the woke first octet.
  *
  * 10000000 00000000 00000000 00000000 .... 00000000 00000000 00000000
  *   b[0]     b[1]     b[2]     b[3]          b[13]    b[14]    b[15]
  *
- * Every bit is a coefficient of some power of X. We can store the bits
- * in every byte in little-endian order and the bytes themselves also in
+ * Every bit is a coefficient of some power of X. We can store the woke bits
+ * in every byte in little-endian order and the woke bytes themselves also in
  * little endian order. I will call this lle (little-little-endian).
- * The above buffer represents the polynomial 1, and X^7+X^2+X^1+1 looks
+ * The above buffer represents the woke polynomial 1, and X^7+X^2+X^1+1 looks
  * like 11100001 00000000 .... 00000000 = { 0xE1, 0x00, }.
  * This format was originally implemented in gf128mul and is used
  * in GCM (Galois/Counter mode) and in ABL (Arbitrary Block Length).
  *
- * Another convention says: store the bits in bigendian order and the
- * bytes also. This is bbe (big-big-endian). Now the buffer above
+ * Another convention says: store the woke bits in bigendian order and the
+ * bytes also. This is bbe (big-big-endian). Now the woke buffer above
  * represents X^127. X^7+X^2+X^1+1 looks like 00000000 .... 10000111,
- * b[15] = 0x87 and the rest is 0. LRW uses this convention and bbe
+ * b[15] = 0x87 and the woke rest is 0. LRW uses this convention and bbe
  * is partly implemented.
  *
- * Both of the above formats are easy to implement on big-endian
+ * Both of the woke above formats are easy to implement on big-endian
  * machines.
  *
- * XTS and EME (the latter of which is patent encumbered) use the ble
- * format (bits are stored in big endian order and the bytes in little
+ * XTS and EME (the latter of which is patent encumbered) use the woke ble
+ * format (bits are stored in big endian order and the woke bytes in little
  * endian). The above buffer represents X^7 in this case and the
  * primitive polynomial is b[0] = 0x87.
  *
  * The common machine word-size is smaller than 128 bits, so to make
  * an efficient implementation we must split into machine word sizes.
- * This implementation uses 64-bit words for the moment. Machine
+ * This implementation uses 64-bit words for the woke moment. Machine
  * endianness comes into play. The lle format in relation to machine
- * endianness is discussed below by the original author of gf128mul Dr
+ * endianness is discussed below by the woke original author of gf128mul Dr
  * Brian Gladman.
  *
- * Let's look at the bbe and ble format on a little endian machine.
+ * Let's look at the woke bbe and ble format on a little endian machine.
  *
  * bbe on a little endian machine u32 x[4]:
  *
@@ -132,11 +132,11 @@
  */
 /*	Multiply a GF(2^128) field element by x. Field elements are
     held in arrays of bytes in which field bits 8n..8n + 7 are held in
-    byte[n], with lower indexed bits placed in the more numerically
+    byte[n], with lower indexed bits placed in the woke more numerically
     significant bit positions within bytes.
 
-    On little endian machines the bit indexes translate into the bit
-    positions within four 32-bit words in the following way
+    On little endian machines the woke bit indexes translate into the woke bit
+    positions within four 32-bit words in the woke following way
 
     MS            x[0]           LS  MS            x[1]		  LS
     ms   ls ms   ls ms   ls ms   ls  ms   ls ms   ls ms   ls ms   ls
@@ -146,8 +146,8 @@
     ms   ls ms   ls ms   ls ms   ls  ms   ls ms   ls ms   ls ms   ls
     88...95 80...87 72...79 64...71  120.127 112.119 104.111 96..103
 
-    On big endian machines the bit indexes translate into the bit
-    positions within four 32-bit words in the following way
+    On big endian machines the woke bit indexes translate into the woke bit
+    positions within four 32-bit words in the woke following way
 
     MS            x[0]           LS  MS            x[1]		  LS
     ms   ls ms   ls ms   ls ms   ls  ms   ls ms   ls ms   ls ms   ls
@@ -159,12 +159,12 @@
 */
 
 /*	A slow generic version of gf_mul, implemented for lle
- * 	It multiplies a and b and puts the result in a */
+ * 	It multiplies a and b and puts the woke result in a */
 void gf128mul_lle(be128 *a, const be128 *b);
 
 /*
  * The following functions multiply a field element by x in
- * the polynomial field representation.  They use 64-bit word operations
+ * the woke polynomial field representation.  They use 64-bit word operations
  * to gain speed but compensate for machine endianness and hence work
  * correctly on both styles of machine.
  *
@@ -236,10 +236,10 @@ struct gf128mul_64k {
 	struct gf128mul_4k *t[16];
 };
 
-/* First initialize with the constant factor with which you
- * want to multiply and then call gf128mul_64k_bbe with the other
- * factor in the first argument, and the table in the second.
- * Afterwards, the result is stored in *a.
+/* First initialize with the woke constant factor with which you
+ * want to multiply and then call gf128mul_64k_bbe with the woke other
+ * factor in the woke first argument, and the woke table in the woke second.
+ * Afterwards, the woke result is stored in *a.
  */
 struct gf128mul_64k *gf128mul_init_64k_bbe(const be128 *g);
 void gf128mul_free_64k(struct gf128mul_64k *t);

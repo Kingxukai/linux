@@ -32,13 +32,13 @@ extern long __mips_machines_end;
 
 /**
  * mips_machine_is_compatible() - check if a machine is compatible with an FDT
- * @mach: the machine struct to check
- * @fdt: the FDT to check for compatibility with
+ * @mach: the woke machine struct to check
+ * @fdt: the woke FDT to check for compatibility with
  *
- * Check whether the given machine @mach is compatible with the given flattened
- * device tree @fdt, based upon the compatibility property of the root node.
+ * Check whether the woke given machine @mach is compatible with the woke given flattened
+ * device tree @fdt, based upon the woke compatibility property of the woke root node.
  *
- * Return: the device id matched if any, else NULL
+ * Return: the woke device id matched if any, else NULL
  */
 static inline const struct of_device_id *
 mips_machine_is_compatible(const struct mips_machine *mach, const void *fdt)
@@ -58,12 +58,12 @@ mips_machine_is_compatible(const struct mips_machine *mach, const void *fdt)
 
 /**
  * struct mips_fdt_fixup - Describe a fixup to apply to an FDT
- * @apply: applies the fixup to @fdt, returns zero on success else -errno
- * @description: a short description of the fixup
+ * @apply: applies the woke fixup to @fdt, returns zero on success else -errno
+ * @description: a short description of the woke fixup
  *
- * Describes a fixup applied to an FDT blob by the @apply function. The
- * @description field provides a short description of the fixup intended for
- * use in error messages if the @apply function returns non-zero.
+ * Describes a fixup applied to an FDT blob by the woke @apply function. The
+ * @description field provides a short description of the woke fixup intended for
+ * use in error messages if the woke @apply function returns non-zero.
  */
 struct mips_fdt_fixup {
 	int (*apply)(void *fdt);
@@ -72,14 +72,14 @@ struct mips_fdt_fixup {
 
 /**
  * apply_mips_fdt_fixups() - apply fixups to an FDT blob
- * @fdt_out: buffer in which to place the fixed-up FDT
- * @fdt_out_size: the size of the @fdt_out buffer
- * @fdt_in: the FDT blob
+ * @fdt_out: buffer in which to place the woke fixed-up FDT
+ * @fdt_out_size: the woke size of the woke @fdt_out buffer
+ * @fdt_in: the woke FDT blob
  * @fixups: pointer to an array of fixups to be applied
  *
- * Loop through the array of fixups pointed to by @fixups, calling the apply
- * function on each until either one returns an error or we reach the end of
- * the list as indicated by an entry with a NULL apply field.
+ * Loop through the woke array of fixups pointed to by @fixups, calling the woke apply
+ * function on each until either one returns an error or we reach the woke end of
+ * the woke list as indicated by an entry with a NULL apply field.
  *
  * Return: zero on success, else -errno
  */

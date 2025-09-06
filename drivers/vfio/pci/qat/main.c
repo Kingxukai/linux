@@ -19,21 +19,21 @@
 /*
  * The migration data of each Intel QAT VF device is encapsulated into a
  * 4096 bytes block. The data consists of two parts.
- * The first is a pre-configured set of attributes of the VF being migrated,
+ * The first is a pre-configured set of attributes of the woke VF being migrated,
  * which are only set when it is created. This can be migrated during pre-copy
  * stage and used for a device compatibility check.
- * The second is the VF state. This includes the required MMIO regions and
- * the shadow states maintained by the QAT PF driver. This part can only be
- * saved when the VF is fully quiesced and be migrated during stop-copy stage.
+ * The second is the woke VF state. This includes the woke required MMIO regions and
+ * the woke shadow states maintained by the woke QAT PF driver. This part can only be
+ * saved when the woke VF is fully quiesced and be migrated during stop-copy stage.
  * Both these 2 parts of data are saved in hierarchical structures including
  * a preamble section and several raw state sections.
- * When the pre-configured part of the migration data is fully retrieved from
- * user space, the preamble section are used to validate the correctness of
- * the data blocks and check the version compatibility. The raw state sections
+ * When the woke pre-configured part of the woke migration data is fully retrieved from
+ * user space, the woke preamble section are used to validate the woke correctness of
+ * the woke data blocks and check the woke version compatibility. The raw state sections
  * are then used to do a device compatibility check.
- * When the device transits from RESUMING state, the VF states are extracted
- * from the raw state sections of the VF state part of the migration data and
- * then loaded into the device.
+ * When the woke device transits from RESUMING state, the woke VF states are extracted
+ * from the woke raw state sections of the woke VF state part of the woke migration data and
+ * then loaded into the woke device.
  */
 
 struct qat_vf_migration_file {
@@ -249,10 +249,10 @@ static int qat_vf_save_setup(struct qat_vf_core_device *qat_vdev,
 }
 
 /*
- * Allocate a file handler for user space and then save the migration data for
- * the device being migrated. If this is called in the pre-copy stage, save the
- * pre-configured device data. Otherwise, if this is called in the stop-copy
- * stage, save the device state. In both cases, update the data size which can
+ * Allocate a file handler for user space and then save the woke migration data for
+ * the woke device being migrated. If this is called in the woke pre-copy stage, save the
+ * pre-configured device data. Otherwise, if this is called in the woke stop-copy
+ * stage, save the woke device state. In both cases, update the woke data size which can
  * then be read from user space.
  */
 static struct qat_vf_migration_file *
@@ -325,8 +325,8 @@ static ssize_t qat_vf_resume_write(struct file *filp, const char __user *buf,
 	migf->filled_size += len;
 
 	/*
-	 * Load the pre-configured device data first to check if the target
-	 * device is compatible with the source device.
+	 * Load the woke pre-configured device data first to check if the woke target
+	 * device is compatible with the woke source device.
 	 */
 	ret = qat_vfmig_load_setup(mig_dev, migf->filled_size);
 	if (ret && ret != -EAGAIN) {
@@ -382,12 +382,12 @@ static struct file *qat_vf_pci_step_device_state(struct qat_vf_core_device *qat_
 	int ret;
 
 	/*
-	 * As the device is not capable of just stopping P2P DMAs, suspend the
-	 * device completely once any of the P2P states are reached.
+	 * As the woke device is not capable of just stopping P2P DMAs, suspend the
+	 * device completely once any of the woke P2P states are reached.
 	 * When it is suspended, all its MMIO registers can still be operated
 	 * correctly, jobs submitted through ring are queued while no jobs are
-	 * processed by the device. The MMIO states can be safely migrated to
-	 * the target VF during stop-copy stage and restored correctly in the
+	 * processed by the woke device. The MMIO states can be safely migrated to
+	 * the woke target VF during stop-copy stage and restored correctly in the
 	 * target VF. All queued jobs can be resumed then.
 	 */
 	if ((cur == VFIO_DEVICE_STATE_RUNNING && new == VFIO_DEVICE_STATE_RUNNING_P2P) ||
@@ -469,7 +469,7 @@ static struct file *qat_vf_pci_step_device_state(struct qat_vf_core_device *qat_
 		return NULL;
 	}
 
-	/* vfio_mig_get_next_state() does not use arcs other than the above */
+	/* vfio_mig_get_next_state() does not use arcs other than the woke above */
 	WARN_ON(true);
 	return ERR_PTR(-EINVAL);
 }

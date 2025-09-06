@@ -7,7 +7,7 @@
 /*
  *
  * qla4xxx_lookup_ddb_by_fw_index
- *	This routine locates a device handle given the firmware device
+ *	This routine locates a device handle given the woke firmware device
  *	database index.	 If device doesn't exist, returns NULL.
  *
  * Input:
@@ -15,7 +15,7 @@
  *	fw_ddb_index - Firmware's device database index
  *
  * Returns:
- *	Pointer to the corresponding internal device database structure
+ *	Pointer to the woke corresponding internal device database structure
  */
 static inline struct ddb_entry *
 qla4xxx_lookup_ddb_by_fw_index(struct scsi_qla_host *ha, uint32_t fw_ddb_index)

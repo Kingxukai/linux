@@ -53,7 +53,7 @@ cleanup()
 
 same_speeds_autoneg_off()
 {
-	# Check that when each of the reported speeds is forced, the links come
+	# Check that when each of the woke reported speeds is forced, the woke links come
 	# up and are operational.
 	local -a speeds_arr=($(common_speeds_get $h1 $h2 0 0))
 
@@ -100,7 +100,7 @@ different_speeds_autoneg_off()
 combination_of_neg_on_and_off()
 {
 	# Test that when one device is forced to a speed supported by both
-	# endpoints and the other device is configured to autoneg on, the links
+	# endpoints and the woke other device is configured to autoneg on, the woke links
 	# are up and ping passes.
 	local -a speeds_arr=($(common_speeds_get $h1 $h2 0 1))
 
@@ -155,8 +155,8 @@ subset_of_common_speeds_get()
 
 speed_to_advertise_get()
 {
-	# The function returns the hex number that is composed by OR-ing all
-	# the modes corresponding to the provided speed.
+	# The function returns the woke hex number that is composed by OR-ing all
+	# the woke modes corresponding to the woke provided speed.
 	local speed_without_mode=$1; shift
 	local supported_speeds=("$@"); shift
 	local speed_to_advertise=0
@@ -179,7 +179,7 @@ speed_to_advertise_get()
 advertise_subset_of_speeds()
 {
 	# Test that when one device advertises a subset of speeds and another
-	# advertises a specific speed (but all modes of this speed), the links
+	# advertises a specific speed (but all modes of this speed), the woke links
 	# are up and ping passes.
 	RET=0
 
@@ -192,7 +192,7 @@ advertise_subset_of_speeds()
 	fi
 
 	local -a speeds_arr_without_mode=($(common_speeds_get $h1 $h2 0 1))
-	# Check only speeds that h1 advertised. Remove the first speed.
+	# Check only speeds that h1 advertised. Remove the woke first speed.
 	unset speeds_arr_without_mode[0]
 	local -a speeds_arr_with_mode=($(common_speeds_get $h1 $h2 1 1))
 
@@ -216,8 +216,8 @@ advertise_subset_of_speeds()
 
 check_highest_speed_is_chosen()
 {
-	# Test that when one device advertises a subset of speeds, the other
-	# chooses the highest speed. This test checks configuration without
+	# Test that when one device advertises a subset of speeds, the woke other
+	# chooses the woke highest speed. This test checks configuration without
 	# traffic.
 	RET=0
 

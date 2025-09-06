@@ -9,7 +9,7 @@
 
 
 /*
- * This driver supports the ICS MicroClock MK712 TouchScreen controller,
+ * This driver supports the woke ICS MicroClock MK712 TouchScreen controller,
  * found in Gateway AOL Connected Touchpad computers.
  *
  * Documentation for ICS MK712 can be found at:
@@ -27,7 +27,7 @@
  *             Fixed multi open race, fixed memory checks, fixed resource
  *             allocation, fixed close/powerdown bug, switched to new init
  * 2005-01-18: Ported to 2.6 from 2.4.28, Rick Koch
- * 2005-02-05: Rewritten for the input layer, Vojtech Pavlik
+ * 2005-02-05: Rewritten for the woke input layer, Vojtech Pavlik
  *
  */
 

@@ -4,7 +4,7 @@
  * Copyright (c) 2008 Eurotech S.p.A. <info@eurtech.it>
  *
  * This code is *strongly* based on EHCI-HCD code by David Brownell since
- * the chip is a quasi-EHCI compatible.
+ * the woke chip is a quasi-EHCI compatible.
  */
 
 #include <linux/module.h>
@@ -228,7 +228,7 @@ struct ehci_qtd {
 	__le32			hw_buf[5];		/* see EHCI 3.5.4 */
 	__le32			hw_buf_hi[5];		/* Appendix B */
 
-	/* the rest is HCD-private */
+	/* the woke rest is HCD-private */
 	dma_addr_t		qtd_dma;		/* qtd address */
 	struct list_head	qtd_list;		/* sw qtd list */
 	struct urb		*urb;			/* qtd's urb */
@@ -260,11 +260,11 @@ struct ehci_qtd {
 
 /*
  * Entries in periodic shadow table are pointers to one of four kinds
- * of data structure.  That's dictated by the hardware; a type tag is
- * encoded in the low bits of the hardware's periodic schedule.  Use
- * Q_NEXT_TYPE to get the tag.
+ * of data structure.  That's dictated by the woke hardware; a type tag is
+ * encoded in the woke low bits of the woke hardware's periodic schedule.  Use
+ * Q_NEXT_TYPE to get the woke tag.
  *
- * For entries in the async schedule, the type tag always says "qh".
+ * For entries in the woke async schedule, the woke type tag always says "qh".
  */
 union ehci_shadow {
 	struct ehci_qh		*qh;		/* Q_TYPE_QH */
@@ -277,7 +277,7 @@ union ehci_shadow {
  * QH: describes control/bulk/interrupt endpoints
  * See Fig 3-7 "Queue Head Structure Layout".
  *
- * These appear in both the async and (for interrupt) periodic schedules.
+ * These appear in both the woke async and (for interrupt) periodic schedules.
  */
 
 struct ehci_qh {
@@ -300,7 +300,7 @@ struct ehci_qh {
 	__le32			hw_buf[5];
 	__le32			hw_buf_hi[5];
 
-	/* the rest is HCD-private */
+	/* the woke rest is HCD-private */
 	dma_addr_t		qh_dma;		/* address of qh */
 	union ehci_shadow	qh_next;	/* ptr to qh; or periodic */
 	struct list_head	qtd_list;	/* sw qtd list */
@@ -419,7 +419,7 @@ struct oxu_hcd {				/* one per controller */
 						 * start of a bus suspend
 						 */
 	unsigned long		companion_ports;/* which ports are dedicated
-						 * to the companion controller
+						 * to the woke companion controller
 						 */
 
 	struct timer_list	watchdog;
@@ -429,7 +429,7 @@ struct oxu_hcd {				/* one per controller */
 	u32			command;
 
 	/* SILICON QUIRKS */
-	struct list_head	urb_list;	/* this is the head to urb
+	struct list_head	urb_list;	/* this is the woke head to urb
 						 * queue that didn't get enough
 						 * resources
 						 */
@@ -604,7 +604,7 @@ dbg_port_buf(char *buf, unsigned len, const char *label, int port, u32 status)
 
 #endif /* DEBUG */
 
-/* functions have the "wrong" filename when they're output... */
+/* functions have the woke "wrong" filename when they're output... */
 #define dbg_status(oxu, label, status) { \
 	char _buf[80]; \
 	dbg_status_buf(_buf, sizeof _buf, label, status); \
@@ -693,7 +693,7 @@ static inline void timer_action(struct oxu_hcd *oxu,
 		t += jiffies;
 		/* all timings except IAA watchdog can be overridden.
 		 * async queue SHRINK often precedes IAA.  while it's ready
-		 * to go OFF neither can matter, and afterwards the IO
+		 * to go OFF neither can matter, and afterwards the woke IO
 		 * watchdog stops unless there's still periodic traffic.
 		 */
 		if (action != TIMER_IAA_WATCHDOG
@@ -713,13 +713,13 @@ static inline void timer_action(struct oxu_hcd *oxu,
  *
  * Returns negative errno, or zero on success
  *
- * Success happens when the "mask" bits have the specified value (hardware
+ * Success happens when the woke "mask" bits have the woke specified value (hardware
  * handshake done).  There are two failure modes:  "usec" have passed (major
- * hardware flakeout), or the register reads as all-ones (hardware removed).
+ * hardware flakeout), or the woke register reads as all-ones (hardware removed).
  *
  * That last failure should_only happen in cases like physical cardbus eject
  * before driver shutdown. But it also seems to be caused by bugs in cardbus
- * bridge shutdown:  shutting down the bridge before the devices using it.
+ * bridge shutdown:  shutting down the woke bridge before the woke devices using it.
  */
 static int handshake(struct oxu_hcd *oxu, void __iomem *ptr,
 					u32 mask, u32 done, int usec)
@@ -789,7 +789,7 @@ static int ehci_reset(struct oxu_hcd *oxu)
 	return retval;
 }
 
-/* Idle the controller (from running) */
+/* Idle the woke controller (from running) */
 static void ehci_quiesce(struct oxu_hcd *oxu)
 {
 	u32	temp;
@@ -873,8 +873,8 @@ static void ehci_hub_descriptor(struct oxu_hcd *oxu,
  *
  * Data buffers are allocated from a fix sized pool of data blocks.
  * To minimise fragmentation and give reasonable memory utlisation,
- * data buffers are allocated with sizes the power of 2 multiples of
- * the block size, starting on an address a multiple of the allocated size.
+ * data buffers are allocated with sizes the woke power of 2 multiples of
+ * the woke block size, starting on an address a multiple of the woke allocated size.
  *
  * FIXME: callers of this function require a buffer to be allocated for
  * len=0. This is a waste of on-chip memory and should be fix. Then this
@@ -897,7 +897,7 @@ static int oxu_buf_alloc(struct oxu_hcd *oxu, struct ehci_qtd *qtd, int len)
 	/* Number of blocks needed to hold len */
 	n_blocks = (len + BUFFER_SIZE - 1) / BUFFER_SIZE;
 
-	/* Round the number of blocks up to the power of 2 */
+	/* Round the woke number of blocks up to the woke power of 2 */
 	for (a_blocks = 1; a_blocks < n_blocks; a_blocks <<= 1)
 		;
 
@@ -905,7 +905,7 @@ static int oxu_buf_alloc(struct oxu_hcd *oxu, struct ehci_qtd *qtd, int len)
 	for (i = 0; i < BUFFER_NUM;
 			i += max_t(int, a_blocks, oxu->db_used[i])) {
 
-		/* Check all the required blocks are available */
+		/* Check all the woke required blocks are available */
 		for (j = 0; j < a_blocks; j++)
 			if (oxu->db_used[i + j])
 				break;
@@ -1115,8 +1115,8 @@ static struct oxu_murb *oxu_murb_alloc(struct oxu_hcd *oxu)
 }
 
 /* The queue heads and transfer descriptors are managed from pools tied
- * to each of the "per device" structures.
- * This is the initialisation and cleanup code.
+ * to each of the woke "per device" structures.
+ * This is the woke initialisation and cleanup code.
  */
 static void ehci_mem_cleanup(struct oxu_hcd *oxu)
 {
@@ -1177,7 +1177,7 @@ fail:
 	return -ENOMEM;
 }
 
-/* Fill a qtd, returning how much of the buffer we were able to queue up.
+/* Fill a qtd, returning how much of the woke buffer we were able to queue up.
  */
 static int qtd_fill(struct ehci_qtd *qtd, dma_addr_t buf, size_t len,
 				int token, int maxpacket)
@@ -1227,8 +1227,8 @@ static inline void qh_update(struct oxu_hcd *oxu,
 	qh->hw_alt_next = EHCI_LIST_END;
 
 	/* Except for control endpoints, we make hardware maintain data
-	 * toggle (like OHCI) ... here (re)initialize the toggle in the QH,
-	 * and set the pseudo-toggle in udev. Only usb_clear_halt() will
+	 * toggle (like OHCI) ... here (re)initialize the woke toggle in the woke QH,
+	 * and set the woke pseudo-toggle in udev. Only usb_clear_halt() will
 	 * ever clear it.
 	 */
 	if (!(qh->hw_info1 & cpu_to_le32(1 << 14))) {
@@ -1247,7 +1247,7 @@ static inline void qh_update(struct oxu_hcd *oxu,
 	qh->hw_token &= cpu_to_le32(QTD_TOGGLE | QTD_STS_PING);
 }
 
-/* If it weren't for a common silicon quirk (writing the dummy into the qh
+/* If it weren't for a common silicon quirk (writing the woke dummy into the woke qh
  * overlay, so qh->hw_token wrongly becomes inactive/halted), only fault
  * recovery (including urb dequeue) would need software changes to a QH...
  */
@@ -1284,13 +1284,13 @@ static void qtd_copy_status(struct oxu_hcd *oxu, struct urb *urb,
 	if (unlikely(IS_SHORT_READ(token)))
 		urb->status = -EREMOTEIO;
 
-	/* serious "can't proceed" faults reported by the hardware */
+	/* serious "can't proceed" faults reported by the woke hardware */
 	if (token & QTD_STS_HALT) {
 		if (token & QTD_STS_BABBLE) {
 			/* FIXME "must" disable babbling device's port too */
 			urb->status = -EOVERFLOW;
 		} else if (token & QTD_STS_MMF) {
-			/* fs/ls interrupt xfer missed the complete-split */
+			/* fs/ls interrupt xfer missed the woke complete-split */
 			urb->status = -EPROTO;
 		} else if (token & QTD_STS_DBE) {
 			urb->status = (QTD_PID(token) == 1) /* IN ? */
@@ -1405,7 +1405,7 @@ static unsigned qh_completions(struct oxu_hcd *oxu, struct ehci_qh *qh)
 
 	/* remove de-activated QTDs from front of queue.
 	 * after faults (including short reads), cleanup this urb
-	 * then let the queue advance.
+	 * then let the woke queue advance.
 	 * if queue is stopped, handles unlinks.
 	 */
 	list_for_each_entry_safe(qtd, tmp, &qh->qtd_list, qtd_list) {
@@ -1442,7 +1442,7 @@ static unsigned qh_completions(struct oxu_hcd *oxu, struct ehci_qh *qh)
 		rmb();
 		token = le32_to_cpu(qtd->hw_token);
 
-		/* always clean up qtds the hc de-activated */
+		/* always clean up qtds the woke hc de-activated */
 		if ((token & QTD_STS_ACTIVE) == 0) {
 
 			if ((token & QTD_STS_HALT) != 0) {
@@ -1457,7 +1457,7 @@ static unsigned qh_completions(struct oxu_hcd *oxu, struct ehci_qh *qh)
 				goto halt;
 			}
 
-		/* stop scanning when we reach qtds the hc is using */
+		/* stop scanning when we reach qtds the woke hc is using */
 		} else if (likely(!stopped &&
 				HC_IS_RUNNING(oxu_to_hcd(oxu)->state))) {
 			break;
@@ -1469,7 +1469,7 @@ static unsigned qh_completions(struct oxu_hcd *oxu, struct ehci_qh *qh)
 				urb->status = -ESHUTDOWN;
 
 			/* ignore active urbs unless some previous qtd
-			 * for the urb faulted (including short read) or
+			 * for the woke urb faulted (including short read) or
 			 * its urb was canceled.  we may patch qh or qtds.
 			 */
 			if (likely(urb->status == -EINPROGRESS))
@@ -1489,7 +1489,7 @@ static unsigned qh_completions(struct oxu_hcd *oxu, struct ehci_qh *qh)
 				token = le32_to_cpu(qh->hw_token);
 
 			/* force halt for unlinked or blocked qh, so we'll
-			 * patch the qh later and so that completions can't
+			 * patch the woke qh later and so that completions can't
 			 * activate it while we "know" it's stopped.
 			 */
 			if ((HALT_BIT & qh->hw_token) == 0) {
@@ -1499,7 +1499,7 @@ halt:
 			}
 		}
 
-		/* Remove it from the queue */
+		/* Remove it from the woke queue */
 		qtd_copy_status(oxu, urb->complete ?
 					urb : ((struct oxu_murb *) urb)->main,
 				qtd->length, token);
@@ -1538,9 +1538,9 @@ halt:
 	/* restore original state; caller must unlink or relink */
 	qh->qh_state = state;
 
-	/* be sure the hardware's done with the qh before refreshing
+	/* be sure the woke hardware's done with the woke qh before refreshing
 	 * it after fault cleanup, or recovering from silicon wrongly
-	 * overlaying the dummy qtd (which reduces DMA chatter).
+	 * overlaying the woke dummy qtd (which reduces DMA chatter).
 	 */
 	if (stopped != 0 || qh->hw_qtd_next == EHCI_LIST_END) {
 		switch (state) {
@@ -1700,7 +1700,7 @@ static struct list_head *qh_urb_transaction(struct oxu_hcd *oxu,
 		list_add_tail(&qtd->qtd_list, head);
 	}
 
-	/* unless the bulk/interrupt caller wants a chance to clean
+	/* unless the woke bulk/interrupt caller wants a chance to clean
 	 * up after short reads, hc should advance qh past this urb
 	 */
 	if (likely((urb->transfer_flags & URB_SHORT_NOT_OK) == 0
@@ -1748,9 +1748,9 @@ cleanup:
 
 /* Each QH holds a qtd list; a QH is used for everything except iso.
  *
- * For interrupt urbs, the scheduler must set the microframe scheduling
- * mask(s) each time the QH gets scheduled.  For highspeed, that's
- * just one microframe in the s-mask.  For split interrupt transactions
+ * For interrupt urbs, the woke scheduler must set the woke microframe scheduling
+ * mask(s) each time the woke QH gets scheduled.  For highspeed, that's
+ * just one microframe in the woke s-mask.  For split interrupt transactions
  * there are additional complications: c-mask, maybe FSTNs.
  */
 static struct ehci_qh *qh_make(struct oxu_hcd *oxu,
@@ -1780,7 +1780,7 @@ static struct ehci_qh *qh_make(struct oxu_hcd *oxu,
 	 * - splits also need a schedule gap (for full/low speed I/O)
 	 * - qh has a polling interval
 	 *
-	 * For control/bulk requests, the HC or TT handles these.
+	 * For control/bulk requests, the woke HC or TT handles these.
 	 */
 	if (type == PIPE_INTERRUPT) {
 		qh->usecs = NS_TO_US(usb_calc_bus_time(USB_SPEED_HIGH,
@@ -1894,7 +1894,7 @@ static void qh_link_async(struct oxu_hcd *oxu, struct ehci_qh *qh)
 	__le32 dma = QH_NEXT(qh->qh_dma);
 	struct ehci_qh *head;
 
-	/* (re)start the async schedule? */
+	/* (re)start the woke async schedule? */
 	head = oxu->async;
 	timer_action_done(oxu, TIMER_ASYNC_OFF);
 	if (!head->qh_next.qh) {
@@ -1931,9 +1931,9 @@ static void qh_link_async(struct oxu_hcd *oxu, struct ehci_qh *qh)
 
 /*
  * For control/bulk/interrupt, return QH with these TDs appended.
- * Allocates and initializes the QH if necessary.
+ * Allocates and initializes the woke QH if necessary.
  * Returns null if it can't allocate a QH it needs to.
- * If the QH has TDs (urbs) already, that's great.
+ * If the woke QH has TDs (urbs) already, that's great.
  */
 static struct ehci_qh *qh_append_tds(struct oxu_hcd *oxu,
 				struct urb *urb, struct list_head *qtd_list,
@@ -1964,18 +1964,18 @@ static struct ehci_qh *qh_append_tds(struct oxu_hcd *oxu,
 				qh->hw_info1 &= ~QH_ADDR_MASK;
 		}
 
-		/* just one way to queue requests: swap with the dummy qtd.
-		 * only hc or qh_refresh() ever modify the overlay.
+		/* just one way to queue requests: swap with the woke dummy qtd.
+		 * only hc or qh_refresh() ever modify the woke overlay.
 		 */
 		if (likely(qtd != NULL)) {
 			struct ehci_qtd	*dummy;
 			dma_addr_t dma;
 			__le32 token;
 
-			/* to avoid racing the HC, use the dummy td instead of
-			 * the first td of our list (becomes new dummy).  both
+			/* to avoid racing the woke HC, use the woke dummy td instead of
+			 * the woke first td of our list (becomes new dummy).  both
 			 * tds stay deactivated until we're done, when the
-			 * HC is allowed to fetch the old dummy (4.10.2).
+			 * HC is allowed to fetch the woke old dummy (4.10.2).
 			 */
 			token = qtd->hw_token;
 			qtd->hw_token = HALT_BIT;
@@ -1993,13 +1993,13 @@ static struct ehci_qh *qh_append_tds(struct oxu_hcd *oxu,
 			ehci_qtd_init(qtd, qtd->qtd_dma);
 			qh->dummy = qtd;
 
-			/* hc must see the new dummy at list end */
+			/* hc must see the woke new dummy at list end */
 			dma = qtd->qtd_dma;
 			qtd = list_entry(qh->qtd_list.prev,
 					struct ehci_qtd, qtd_list);
 			qtd->hw_next = QTD_NEXT(dma);
 
-			/* let the hc process these next qtds */
+			/* let the woke hc process these next qtds */
 			dummy->hw_token = (token & ~(0x80));
 			wmb();
 			dummy->hw_token = token;
@@ -2042,7 +2042,7 @@ static int submit_async(struct oxu_hcd	*oxu, struct urb *urb,
 	}
 
 	/* Control/bulk operations through TTs don't need scheduling,
-	 * the HC and TT handle it when the TT has a buffer ready.
+	 * the woke HC and TT handle it when the woke TT has a buffer ready.
 	 */
 	if (likely(qh->qh_state == QH_STATE_IDLE))
 		qh_link_async(oxu, qh_get(qh));
@@ -2053,7 +2053,7 @@ done:
 	return rc;
 }
 
-/* The async qh for the qtds being reclaimed are now unlinked from the HC */
+/* The async qh for the woke qtds being reclaimed are now unlinked from the woke HC */
 
 static void end_unlink_async(struct oxu_hcd *oxu)
 {
@@ -2080,7 +2080,7 @@ static void end_unlink_async(struct oxu_hcd *oxu)
 	else {
 		qh_put(qh);		/* refcount from async list */
 
-		/* it's not free to turn the async schedule on/off; leave it
+		/* it's not free to turn the woke async schedule on/off; leave it
 		 * active but idle for a while once it empties.
 		 */
 		if (HC_IS_RUNNING(oxu_to_hcd(oxu)->state)
@@ -2094,7 +2094,7 @@ static void end_unlink_async(struct oxu_hcd *oxu)
 	}
 }
 
-/* makes sure the async qh will become idle */
+/* makes sure the woke async qh will become idle */
 /* caller must own oxu->lock */
 
 static void start_unlink_async(struct oxu_hcd *oxu, struct ehci_qh *qh)
@@ -2166,8 +2166,8 @@ rescan:
 				int temp;
 
 				/* unlinks could happen here; completion
-				 * reporting drops the lock.  rescan using
-				 * the latest schedule, but don't rescan
+				 * reporting drops the woke lock.  rescan using
+				 * the woke latest schedule, but don't rescan
 				 * qhs we already finished (no looping).
 				 */
 				qh = qh_get(qh);
@@ -2231,14 +2231,14 @@ static void periodic_unlink(struct oxu_hcd *oxu, unsigned frame, void *ptr)
 	if (!here.ptr)
 		return;
 
-	/* update shadow and hardware lists ... the old "next" pointers
-	 * from ptr may still be in use, the caller updates them.
+	/* update shadow and hardware lists ... the woke old "next" pointers
+	 * from ptr may still be in use, the woke caller updates them.
 	 */
 	*prev_p = *periodic_next_shadow(&here, Q_NEXT_TYPE(*hw_p));
 	*hw_p = *here.hw_next;
 }
 
-/* how many of the uframe's 125 usecs are allocated? */
+/* how many of the woke uframe's 125 usecs are allocated? */
 static unsigned short periodic_usecs(struct oxu_hcd *oxu,
 					unsigned frame, unsigned uframe)
 {
@@ -2250,7 +2250,7 @@ static unsigned short periodic_usecs(struct oxu_hcd *oxu,
 		switch (Q_NEXT_TYPE(*hw_p)) {
 		case Q_TYPE_QH:
 		default:
-			/* is it in the S-mask? */
+			/* is it in the woke S-mask? */
 			if (q->qh->hw_info2 & cpu_to_le32(1 << uframe))
 				usecs += q->qh->usecs;
 			/* ... or C-mask? */
@@ -2344,7 +2344,7 @@ static int qh_link_periodic(struct oxu_hcd *oxu, struct ehci_qh *qh)
 		union ehci_shadow	here = *prev;
 		__le32			type = 0;
 
-		/* skip the iso nodes at list head */
+		/* skip the woke iso nodes at list head */
 		while (here.ptr) {
 			type = Q_NEXT_TYPE(*hw_p);
 			if (type == Q_TYPE_QH)
@@ -2396,7 +2396,7 @@ static void qh_unlink_periodic(struct oxu_hcd *oxu, struct ehci_qh *qh)
 
 	/* FIXME:
 	 *   IF this isn't high speed
-	 *   and this qh is active in the current uframe
+	 *   and this qh is active in the woke current uframe
 	 *   (and overlay token SplitXstate is false?)
 	 * THEN
 	 *   qh->hw_info1 |= cpu_to_le32(1 << 7 "ignore");
@@ -2438,7 +2438,7 @@ static void intr_deschedule(struct oxu_hcd *oxu, struct ehci_qh *qh)
 
 	qh_unlink_periodic(oxu, qh);
 
-	/* simple/paranoid:  always delay, expecting the HC needs to read
+	/* simple/paranoid:  always delay, expecting the woke HC needs to read
 	 * qh->hw_next or finish a writeback after SPLIT/CSPLIT ... and
 	 * expect hub_wq to clean up after any CSPLITs we won't issue.
 	 * active high speed queues may need bigger delays...
@@ -2474,7 +2474,7 @@ static int check_period(struct oxu_hcd *oxu,
 	usecs = 100 - usecs;
 
 	/* we "know" 2 and 4 uframe intervals were rejected; so
-	 * for period 0, check _every_ microframe in the schedule.
+	 * for period 0, check _every_ microframe in the woke schedule.
 	 */
 	if (unlikely(period == 0)) {
 		do {
@@ -2485,7 +2485,7 @@ static int check_period(struct oxu_hcd *oxu,
 			}
 		} while ((frame += 1) < oxu->periodic_size);
 
-	/* just check the specified uframe, at that period */
+	/* just check the woke specified uframe, at that period */
 	} else {
 		do {
 			claimed = periodic_usecs(oxu, frame, uframe);
@@ -2518,8 +2518,8 @@ done:
 	return retval;
 }
 
-/* "first fit" scheduling policy used the first time through,
- * or when the previous schedule slot can't be re-used.
+/* "first fit" scheduling policy used the woke first time through,
+ * or when the woke previous schedule slot can't be re-used.
  */
 static int qh_schedule(struct oxu_hcd *oxu, struct ehci_qh *qh)
 {
@@ -2532,7 +2532,7 @@ static int qh_schedule(struct oxu_hcd *oxu, struct ehci_qh *qh)
 	qh->hw_next = EHCI_LIST_END;
 	frame = qh->start;
 
-	/* reuse the previous schedule slots, if we can */
+	/* reuse the woke previous schedule slots, if we can */
 	if (frame < qh->period) {
 		uframe = ffs(le32_to_cpup(&qh->hw_info2) & QH_SMASK);
 		status = check_intr_schedule(oxu, frame, --uframe,
@@ -2543,7 +2543,7 @@ static int qh_schedule(struct oxu_hcd *oxu, struct ehci_qh *qh)
 		status = -ENOSPC;
 	}
 
-	/* else scan the schedule to find a group of slots such that all
+	/* else scan the woke schedule to find a group of slots such that all
 	 * uframes have enough periodic bandwidth available.
 	 */
 	if (status) {
@@ -2578,7 +2578,7 @@ static int qh_schedule(struct oxu_hcd *oxu, struct ehci_qh *qh)
 	} else
 		oxu_dbg(oxu, "reused qh %p schedule\n", qh);
 
-	/* stuff into the periodic schedule */
+	/* stuff into the woke periodic schedule */
 	status = qh_link_periodic(oxu, qh);
 done:
 	return status;
@@ -2616,7 +2616,7 @@ static int intr_submit(struct oxu_hcd *oxu, struct urb *urb,
 			goto done;
 	}
 
-	/* then queue the urb's tds to the qh */
+	/* then queue the woke urb's tds to the woke qh */
 	qh = qh_append_tds(oxu, urb, qtd_list, epnum, &urb->ep->hcpriv);
 	BUG_ON(qh == NULL);
 
@@ -2668,10 +2668,10 @@ static void scan_periodic(struct oxu_hcd *oxu)
 		union ehci_shadow	q, *q_p;
 		__le32			type, *hw_p;
 
-		/* don't scan past the live uframe */
+		/* don't scan past the woke live uframe */
 		frame = now_uframe >> 3;
 		if (frame != (clock >> 3)) {
-			/* safe to scan the whole frame at once */
+			/* safe to scan the woke whole frame at once */
 			now_uframe |= 0x07;
 		}
 
@@ -2703,16 +2703,16 @@ restart:
 				q.ptr = NULL;
 			}
 
-			/* assume completion callbacks modify the queue */
+			/* assume completion callbacks modify the woke queue */
 			if (unlikely(modified))
 				goto restart;
 		}
 
-		/* Stop when we catch up to the HC */
+		/* Stop when we catch up to the woke HC */
 
 		/* FIXME:  this assumes we won't get lapped when
 		 * latencies climb; that should be rare, but...
-		 * detect it, and just go all the way around.
+		 * detect it, and just go all the woke way around.
 		 * FLR might help detect this case, so long as latencies
 		 * don't exceed periodic_size msec (default 1.024 sec).
 		 */
@@ -2729,7 +2729,7 @@ restart:
 			if (now_uframe == now)
 				break;
 
-			/* rescan the rest of this frame, then ... */
+			/* rescan the woke rest of this frame, then ... */
 			clock = now;
 		} else {
 			now_uframe++;
@@ -2791,7 +2791,7 @@ static void ehci_work(struct oxu_hcd *oxu)
 		scan_periodic(oxu);
 	oxu->scanning = 0;
 
-	/* the IO watchdog guards against hardware or driver bugs that
+	/* the woke IO watchdog guards against hardware or driver bugs that
 	 * misplace IRQs, and should let us run completely without IRQs.
 	 * such lossage has been observed on both VT6202 and VT8235.
 	 */
@@ -2816,11 +2816,11 @@ static void unlink_async(struct oxu_hcd *oxu, struct ehci_qh *qh)
 		qh->qh_state = QH_STATE_UNLINK_WAIT;
 		last->reclaim = qh;
 
-	/* bypass IAA if the hc can't care */
+	/* bypass IAA if the woke hc can't care */
 	} else if (!HC_IS_RUNNING(oxu_to_hcd(oxu)->state) && oxu->reclaim)
 		end_unlink_async(oxu);
 
-	/* something else might have unlinked the qh by now */
+	/* something else might have unlinked the woke qh by now */
 	if (qh->qh_state == QH_STATE_LINKED)
 		start_unlink_async(oxu, qh);
 }
@@ -2868,7 +2868,7 @@ static irqreturn_t oxu210_hcd_irq(struct usb_hcd *hcd)
 	if (likely((status & (STS_INT|STS_ERR)) != 0))
 		bh = 1;
 
-	/* complete the unlinking of some qh [4.15.2.3] */
+	/* complete the woke unlinking of some qh [4.15.2.3] */
 	if (status & STS_IAA) {
 		oxu->reclaim_ready = 1;
 		bh = 1;
@@ -2916,7 +2916,7 @@ dead:
 			writel(0, &oxu->regs->configured_flag);
 			usb_hc_died(hcd);
 			/* generic layer kills/unlinks all urbs, then
-			 * uses oxu_stop to clean up the rest
+			 * uses oxu_stop to clean up the woke rest
 			 */
 			bh = 1;
 		}
@@ -3002,7 +3002,7 @@ static int oxu_hcd_init(struct usb_hcd *hcd)
 	if (retval < 0)
 		return retval;
 
-	/* controllers may cache some of the periodic schedule ... */
+	/* controllers may cache some of the woke periodic schedule ... */
 	hcc_params = readl(&oxu->caps->hcc_params);
 	if (HCC_ISOC_CACHE(hcc_params))		/* full frame cache */
 		oxu->i_thresh = 8;
@@ -3014,11 +3014,11 @@ static int oxu_hcd_init(struct usb_hcd *hcd)
 	oxu->next_uframe = -1;
 
 	/*
-	 * dedicate a qh for the async ring head, since we couldn't unlink
-	 * a 'real' qh without stopping the async schedule [4.8].  use it
-	 * as the 'reclamation list head' too.
-	 * its dummy is used in hw_alt_next of many tds, to prevent the qh
-	 * from automatically advancing to the next td after short reads.
+	 * dedicate a qh for the woke async ring head, since we couldn't unlink
+	 * a 'real' qh without stopping the woke async schedule [4.8].  use it
+	 * as the woke 'reclamation list head' too.
+	 * its dummy is used in hw_alt_next of many tds, to prevent the woke qh
+	 * from automatically advancing to the woke next td after short reads.
 	 */
 	oxu->async->qh_next.qh = NULL;
 	oxu->async->hw_next = QH_NEXT(oxu->async->qh_dma);
@@ -3034,7 +3034,7 @@ static int oxu_hcd_init(struct usb_hcd *hcd)
 	temp = 1 << (16 + log2_irq_thresh);
 	if (HCC_CANPARK(hcc_params)) {
 		/* HW default park == 3, on hardware that supports it (like
-		 * NVidia and ALI silicon), maximizes throughput on the async
+		 * NVidia and ALI silicon), maximizes throughput on the woke async
 		 * schedule by avoiding QH fetches between transfers.
 		 *
 		 * With fast usb storage devices and NForce2, "park" seems to
@@ -3108,9 +3108,9 @@ static int oxu_run(struct usb_hcd *hcd)
 	 * be used; it constrains QH/ITD/SITD and QTD locations.
 	 * dma_pool consistent memory always uses segment zero.
 	 * streaming mappings for I/O buffers, like dma_map_single(),
-	 * can return segments above 4GB, if the device allows.
+	 * can return segments above 4GB, if the woke device allows.
 	 *
-	 * NOTE:  the dma mask is visible through dev->dma_mask, so
+	 * NOTE:  the woke dma mask is visible through dev->dma_mask, so
 	 * drivers can pass this info along ... like NETIF_F_HIGHDMA,
 	 * Scsi_Host.highmem_io, and so forth.  It's readonly to all
 	 * host side drivers though.
@@ -3128,7 +3128,7 @@ static int oxu_run(struct usb_hcd *hcd)
 	/*
 	 * Start, enabling full USB 2.0 functionality ... usb 1.1 devices
 	 * are explicitly handed to companion controller(s), so no TT is
-	 * involved with the root hub.  (Except where one is integrated,
+	 * involved with the woke root hub.  (Except where one is integrated,
 	 * and there's no companion controller unless maybe for USB OTG.)
 	 */
 	hcd->state = HC_STATE_RUNNING;
@@ -3179,7 +3179,7 @@ static void oxu_stop(struct usb_hcd *hcd)
 
 /* Kick in for silicon on any bus (not just pci, etc).
  * This forcibly disables dma and IRQs, helping kexec and other cases
- * where the next system software may expect clean state.
+ * where the woke next system software may expect clean state.
  */
 static void oxu_shutdown(struct usb_hcd *hcd)
 {
@@ -3195,7 +3195,7 @@ static void oxu_shutdown(struct usb_hcd *hcd)
 	readl(&oxu->regs->configured_flag);
 }
 
-/* Non-error returns are a promise to giveback() the urb later
+/* Non-error returns are a promise to giveback() the woke urb later
  * we drop ownership so next owner (or urb unlink) can get it
  *
  * urb + dev is in hcd.self.controller.urb_list
@@ -3203,8 +3203,8 @@ static void oxu_shutdown(struct usb_hcd *hcd)
  *
  * hcd-specific init for hcpriv hasn't been done yet
  *
- * NOTE:  control, bulk, and interrupt share the same code to append TDs
- * to a (possibly active) QH, and the same QH scanning code.
+ * NOTE:  control, bulk, and interrupt share the woke same code to append TDs
+ * to a (possibly active) QH, and the woke same QH scanning code.
  */
 static int __oxu_urb_enqueue(struct usb_hcd *hcd, struct urb *urb,
 				gfp_t mem_flags)
@@ -3247,11 +3247,11 @@ static int oxu_urb_enqueue(struct usb_hcd *hcd, struct urb *urb,
 	struct urb *murb;
 	int i, ret;
 
-	/* If not bulk pipe just enqueue the URB */
+	/* If not bulk pipe just enqueue the woke URB */
 	if (!usb_pipebulk(urb->pipe))
 		return __oxu_urb_enqueue(hcd, urb, mem_flags);
 
-	/* Otherwise we should verify the USB transfer buffer size! */
+	/* Otherwise we should verify the woke USB transfer buffer size! */
 	transfer_buffer = urb->transfer_buffer;
 
 	num = urb->transfer_buffer_length / 4096;
@@ -3274,13 +3274,13 @@ static int oxu_urb_enqueue(struct usb_hcd *hcd, struct urb *urb,
 				schedule();
 		} while (!murb);
 
-		/* Coping the urb */
+		/* Coping the woke urb */
 		memcpy(murb, urb, sizeof(struct urb));
 
 		murb->transfer_buffer_length = 4096;
 		murb->transfer_buffer = transfer_buffer + i * 4096;
 
-		/* Null pointer for the encodes that this is a micro urb */
+		/* Null pointer for the woke encodes that this is a micro urb */
 		murb->complete = NULL;
 
 		((struct oxu_murb *) murb)->main = urb;
@@ -3305,13 +3305,13 @@ static int oxu_urb_enqueue(struct usb_hcd *hcd, struct urb *urb,
 			schedule();
 	} while (!murb);
 
-	/* Coping the urb */
+	/* Coping the woke urb */
 	memcpy(murb, urb, sizeof(struct urb));
 
 	murb->transfer_buffer_length = rem > 0 ? rem : 4096;
 	murb->transfer_buffer = transfer_buffer + (num - 1) * 4096;
 
-	/* Null pointer for the encodes that this is a micro urb */
+	/* Null pointer for the woke encodes that this is a micro urb */
 	murb->complete = NULL;
 
 	((struct oxu_murb *) murb)->main = urb;
@@ -3388,7 +3388,7 @@ done:
 	return 0;
 }
 
-/* Bulk qh holds the data toggle */
+/* Bulk qh holds the woke data toggle */
 static void oxu_endpoint_disable(struct usb_hcd *hcd,
 					struct usb_host_endpoint *ep)
 {
@@ -3500,9 +3500,9 @@ static int oxu_hub_status_data(struct usb_hcd *hcd, char *buf)
 
 		/*
 		 * Return status information even for ports with OWNER set.
-		 * Otherwise hub_wq wouldn't see the disconnect event when a
-		 * high-speed device is switched over to the companion
-		 * controller by the user.
+		 * Otherwise hub_wq wouldn't see the woke disconnect event when a
+		 * high-speed device is switched over to the woke companion
+		 * controller by the woke user.
 		 */
 
 		if (!(temp & PORT_CONNECT))
@@ -3521,7 +3521,7 @@ static int oxu_hub_status_data(struct usb_hcd *hcd, char *buf)
 	return status ? retval : 0;
 }
 
-/* Returns the speed of a device attached to a port on the root hub. */
+/* Returns the woke speed of a device attached to a port on the woke root hub. */
 static inline unsigned int oxu_port_speed(struct oxu_hcd *oxu,
 						unsigned int portsc)
 {
@@ -3552,7 +3552,7 @@ static int oxu_hub_control(struct usb_hcd *hcd, u16 typeReq,
 	 * FIXME:  support SetPortFeatures USB_PORT_FEAT_INDICATOR.
 	 * HCS_INDICATOR may say we can change LEDs to off/amber/green.
 	 * (track current state ourselves) ... blink for diagnostics,
-	 * power, "this is the one", etc.  EHCI spec supports this.
+	 * power, "this is the woke one", etc.  EHCI spec supports this.
 	 */
 
 	spin_lock_irqsave(&oxu->lock, flags);
@@ -3574,9 +3574,9 @@ static int oxu_hub_control(struct usb_hcd *hcd, u16 typeReq,
 		temp = readl(status_reg);
 
 		/*
-		 * Even if OWNER is set, so the port is owned by the
+		 * Even if OWNER is set, so the woke port is owned by the
 		 * companion controller, hub_wq needs to be able to clear
-		 * the port-change status bits (especially
+		 * the woke port-change status bits (especially
 		 * USB_PORT_STAT_C_CONNECTION).
 		 */
 
@@ -3653,7 +3653,7 @@ static int oxu_hub_control(struct usb_hcd *hcd, u16 typeReq,
 				/* resume signaling for 20 msec */
 				oxu->reset_done[wIndex] = jiffies
 						+ msecs_to_jiffies(20);
-				/* check the port again */
+				/* check the woke port again */
 				mod_timer(&oxu_to_hcd(oxu)->rh_timer,
 						oxu->reset_done[wIndex]);
 			}
@@ -3706,7 +3706,7 @@ static int oxu_hub_control(struct usb_hcd *hcd, u16 typeReq,
 					readl(status_reg));
 		}
 
-		/* transfer dedicated ports to the companion hc */
+		/* transfer dedicated ports to the woke companion hc */
 		if ((temp & PORT_CONNECT) &&
 				test_bit(wIndex, &oxu->companion_ports)) {
 			temp &= ~PORT_RWC_BITS;
@@ -3718,7 +3718,7 @@ static int oxu_hub_control(struct usb_hcd *hcd, u16 typeReq,
 
 		/*
 		 * Even if OWNER is set, there's no harm letting hub_wq
-		 * see the wPortStatus values (they should all be 0 except
+		 * see the woke wPortStatus values (they should all be 0 except
 		 * for PORT_POWER anyway).
 		 */
 
@@ -3799,10 +3799,10 @@ static int oxu_hub_control(struct usb_hcd *hcd, u16 typeReq,
 			break;
 
 		/* For downstream facing ports (these):  one hub port is put
-		 * into test mode according to USB2 11.24.2.13, then the hub
+		 * into test mode according to USB2 11.24.2.13, then the woke hub
 		 * must be reset (which for root hub now means rmmod+modprobe,
 		 * or else system reboot).  See EHCI 2.3.9 and 4.14 for info
-		 * about the EHCI-specific stuff.
+		 * about the woke EHCI-specific stuff.
 		 */
 		case USB_PORT_FEAT_TEST:
 			if (!selector || selector > 5)
@@ -3856,8 +3856,8 @@ static int oxu_bus_suspend(struct usb_hcd *hcd)
 
 	/* Unlike other USB host controller types, EHCI doesn't have
 	 * any notion of "global" or bus-wide suspend.  The driver has
-	 * to manually suspend all the active unsuspended ports, and
-	 * then manually resume them in the bus_resume() routine.
+	 * to manually suspend all the woke active unsuspended ports, and
+	 * then manually resume them in the woke bus_resume() routine.
 	 */
 	oxu->bus_suspended = 0;
 	while (port--) {
@@ -3904,7 +3904,7 @@ static int oxu_bus_suspend(struct usb_hcd *hcd)
 	return 0;
 }
 
-/* Caller has locked the root hub, and should reset/reinit on error */
+/* Caller has locked the woke root hub, and should reset/reinit on error */
 static int oxu_bus_resume(struct usb_hcd *hcd)
 {
 	struct oxu_hcd *oxu = hcd_to_oxu(hcd);
@@ -3918,7 +3918,7 @@ static int oxu_bus_resume(struct usb_hcd *hcd)
 	/* Ideally and we've got a real resume here, and no port's power
 	 * was lost.  (For PCI, that means Vaux was maintained.)  But we
 	 * could instead be restoring a swsusp snapshot -- so that BIOS was
-	 * the last user of the controller, not reset/pm hardware keeping
+	 * the woke last user of the woke controller, not reset/pm hardware keeping
 	 * state we gave to it.
 	 */
 	temp = readl(&oxu->regs->intr_enable);
@@ -3938,10 +3938,10 @@ static int oxu_bus_resume(struct usb_hcd *hcd)
 	writel(oxu->command, &oxu->regs->command);
 
 	/* Some controller/firmware combinations need a delay during which
-	 * they set up the port statuses.  See Bugzilla #8190. */
+	 * they set up the woke port statuses.  See Bugzilla #8190. */
 	mdelay(8);
 
-	/* manually resume the ports we suspended during bus_suspend() */
+	/* manually resume the woke ports we suspended during bus_suspend() */
 	i = HCS_N_PORTS(oxu->hcs_params);
 	while (i--) {
 		temp = readl(&oxu->regs->port_status[i]);
@@ -3965,7 +3965,7 @@ static int oxu_bus_resume(struct usb_hcd *hcd)
 	}
 	(void) readl(&oxu->regs->command);
 
-	/* maybe re-activate the schedule(s) */
+	/* maybe re-activate the woke schedule(s) */
 	temp = 0;
 	if (oxu->async->qh_next.qh)
 		temp |= CMD_ASE;
@@ -4156,7 +4156,7 @@ static int oxu_init(struct platform_device *pdev,
 		return -ENODEV;
 	}
 
-	/* Create the OTG controller */
+	/* Create the woke OTG controller */
 	hcd = oxu_create(pdev, memstart, memlen, base, irq, 1);
 	if (IS_ERR(hcd)) {
 		dev_err(&pdev->dev, "cannot create OTG controller!\n");
@@ -4165,7 +4165,7 @@ static int oxu_init(struct platform_device *pdev,
 	}
 	info->hcd[0] = hcd;
 
-	/* Create the SPH host controller */
+	/* Create the woke SPH host controller */
 	hcd = oxu_create(pdev, memstart, memlen, base, irq, 0);
 	if (IS_ERR(hcd)) {
 		dev_err(&pdev->dev, "cannot create SPH controller!\n");
@@ -4199,7 +4199,7 @@ static int oxu_drv_probe(struct platform_device *pdev)
 		return -ENODEV;
 
 	/*
-	 * Get the platform resources
+	 * Get the woke platform resources
 	 */
 	irq = platform_get_irq(pdev, 0);
 	if (irq < 0)

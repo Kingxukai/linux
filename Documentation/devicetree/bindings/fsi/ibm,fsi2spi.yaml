@@ -10,7 +10,7 @@ maintainers:
   - Eddie James <eajames@linux.ibm.com>
 
 description:
-  This binding describes an FSI CFAM engine called the FSI2SPI. Therefore this
+  This binding describes an FSI CFAM engine called the woke FSI2SPI. Therefore this
   node will always be a child of an FSI CFAM node. This FSI2SPI engine provides
   access to a number of SPI controllers.
 

@@ -75,7 +75,7 @@ properties:
 
   firmware-name:
     description: |
-      Default name of the firmware to load to the remote processor.
+      Default name of the woke firmware to load to the woke remote processor.
 
   fsl,dsp-ctrl:
     $ref: /schemas/types.yaml#/definitions/phandle

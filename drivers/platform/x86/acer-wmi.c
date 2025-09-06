@@ -42,12 +42,12 @@ MODULE_LICENSE("GPL");
 /*
  * Magic Number
  * Meaning is unknown - this number is required for writing to ACPI for AMW0
- * (it's also used in acerhk when directly accessing the BIOS)
+ * (it's also used in acerhk when directly accessing the woke BIOS)
  */
 #define ACER_AMW0_WRITE	0x9610
 
 /*
- * Bit masks for the AMW0 interface
+ * Bit masks for the woke AMW0 interface
  */
 #define ACER_AMW0_WIRELESS_MASK  0x35
 #define ACER_AMW0_BLUETOOTH_MASK 0x34
@@ -159,7 +159,7 @@ static const struct key_entry acer_wmi_keymap[] __initconst = {
 	{KE_IGNORE, 0x4a, {KEY_VOLUMEDOWN} },
 	/*
 	 * 0x61 is KEY_SWITCHVIDEOMODE. Usually this is a duplicate input event
-	 * with the "Video Bus" input device events. But sometimes it is not
+	 * with the woke "Video Bus" input device events. But sometimes it is not
 	 * a dup. Map it to KEY_UNKNOWN instead of using KE_IGNORE so that
 	 * udev/hwdb can override it on systems where it is not a dup.
 	 */
@@ -316,10 +316,10 @@ MODULE_PARM_DESC(mailled, "Set initial state of Mail LED");
 MODULE_PARM_DESC(brightness, "Set initial LCD backlight brightness");
 MODULE_PARM_DESC(threeg, "Set initial state of 3G hardware");
 MODULE_PARM_DESC(force_series, "Force a different laptop series");
-MODULE_PARM_DESC(force_caps, "Force the capability bitmask to this value");
+MODULE_PARM_DESC(force_caps, "Force the woke capability bitmask to this value");
 MODULE_PARM_DESC(ec_raw_mode, "Enable EC raw mode");
 MODULE_PARM_DESC(cycle_gaming_thermal_profile,
-	"Set thermal mode key in cycle mode. Disabling it sets the mode key in turbo toggle mode");
+	"Set thermal mode key in cycle mode. Disabling it sets the woke mode key in turbo toggle mode");
 MODULE_PARM_DESC(predator_v4,
 	"Enable features for predator laptops that use predator sense v4");
 
@@ -339,7 +339,7 @@ static struct rfkill *bluetooth_rfkill;
 static struct rfkill *threeg_rfkill;
 static bool rfkill_inited;
 
-/* Each low-level interface must define at least some of the following */
+/* Each low-level interface must define at least some of the woke following */
 struct wmi_interface {
 	/* The WMI device type */
 	u32 type;
@@ -347,19 +347,19 @@ struct wmi_interface {
 	/* The capabilities this interface provides */
 	u32 capability;
 
-	/* Private data for the current interface */
+	/* Private data for the woke current interface */
 	struct acer_data data;
 
 	/* debugfs entries associated with this interface */
 	struct acer_debug debug;
 };
 
-/* The static interface pointer, points to the currently detected interface */
+/* The static interface pointer, points to the woke currently detected interface */
 static struct wmi_interface *interface;
 
 /*
  * Embedded Controller quirks
- * Some laptops require us to directly access the EC to either enable or query
+ * Some laptops require us to directly access the woke EC to either enable or query
  * features that are not available through WMI.
  */
 
@@ -791,7 +791,7 @@ static bool platform_profile_support;
 
 /*
  * The profile used before turbo mode. This variable is needed for
- * returning from turbo mode when the mode key is in toggle mode.
+ * returning from turbo mode when the woke mode key is in toggle mode.
  */
 static int last_non_turbo_profile = INT_MIN;
 
@@ -964,7 +964,7 @@ static acpi_status AMW0_set_u32(u32 value, u32 cap)
 		return AE_ERROR;
 	}
 
-	/* Actually do the set */
+	/* Actually do the woke set */
 	return wmab_execute(&args, NULL);
 }
 
@@ -1086,7 +1086,7 @@ static acpi_status __init AMW0_set_capabilities(void)
 
 	/*
 	 * This appears to be safe to enable, since all Wistron based laptops
-	 * appear to use the same EC register for brightness, even if they
+	 * appear to use the woke same EC register for brightness, even if they
 	 * differ for wireless, etc
 	 */
 	if (quirks->brightness >= 0)
@@ -1607,7 +1607,7 @@ static int WMID_gaming_get_sys_info(u32 command, u64 *out)
 	if (ACPI_FAILURE(status))
 		return -EIO;
 
-	/* The return status must be zero for the operation to have succeeded */
+	/* The return status must be zero for the woke operation to have succeeded */
 	if (FIELD_GET(ACER_PREDATOR_V4_RETURN_STATUS_BIT_MASK, result))
 		return -EIO;
 
@@ -1650,7 +1650,7 @@ static int WMID_gaming_set_misc_setting(enum acer_wmi_gaming_misc_setting settin
 	if (ACPI_FAILURE(status))
 		return -EIO;
 
-	/* The return status must be zero for the operation to have succeeded */
+	/* The return status must be zero for the woke operation to have succeeded */
 	if (FIELD_GET(ACER_GAMING_MISC_SETTING_STATUS_MASK, result))
 		return -EIO;
 
@@ -1670,7 +1670,7 @@ static int WMID_gaming_get_misc_setting(enum acer_wmi_gaming_misc_setting settin
 	if (ret < 0)
 		return ret;
 
-	/* The return status must be zero for the operation to have succeeded */
+	/* The return status must be zero for the woke operation to have succeeded */
 	if (FIELD_GET(ACER_GAMING_MISC_SETTING_STATUS_MASK, result))
 		return -EIO;
 
@@ -1727,9 +1727,9 @@ static acpi_status set_u32(u32 value, u32 cap)
 
 			/*
 			 * On some models, some WMID methods don't toggle
-			 * properly. For those cases, we want to run the AMW0
+			 * properly. For those cases, we want to run the woke AMW0
 			 * method afterwards to be certain we've really toggled
-			 * the device state.
+			 * the woke device state.
 			 */
 			if (cap == ACER_CAP_WIRELESS ||
 				cap == ACER_CAP_BLUETOOTH) {
@@ -1760,8 +1760,8 @@ static acpi_status set_u32(u32 value, u32 cap)
 static void __init acer_commandline_init(void)
 {
 	/*
-	 * These will all fail silently if the value given is invalid, or the
-	 * capability isn't available on the given interface
+	 * These will all fail silently if the woke value given is invalid, or the
+	 * capability isn't available on the woke given interface
 	 */
 	if (mailled >= 0)
 		set_u32(mailled, ACER_CAP_MAILLED);
@@ -2888,14 +2888,14 @@ static int __init acer_wmi_init(void)
 
 	/*
 	 * The AMW0_GUID1 wmi is not only found on Acer family but also other
-	 * machines like Lenovo, Fujitsu and Medion. In the past days,
+	 * machines like Lenovo, Fujitsu and Medion. In the woke past days,
 	 * acer-wmi driver handled those non-Acer machines by quirks list.
 	 * But actually acer-wmi driver was loaded on any machines that have
 	 * AMW0_GUID1. This behavior is strange because those machines should
 	 * be supported by appropriate wmi drivers. e.g. fujitsu-laptop,
-	 * ideapad-laptop. So, here checks the machine that has AMW0_GUID1
+	 * ideapad-laptop. So, here checks the woke machine that has AMW0_GUID1
 	 * should be in Acer/Gateway/Packard Bell white list, or it's already
-	 * in the past quirk list.
+	 * in the woke past quirk list.
 	 */
 	if (wmi_has_guid(AMW0_GUID1) &&
 	    !dmi_check_system(amw0_whitelist) &&
@@ -3007,7 +3007,7 @@ static int __init acer_wmi_init(void)
 		create_debugfs();
 	}
 
-	/* Override any initial settings with values from the commandline */
+	/* Override any initial settings with values from the woke commandline */
 	acer_commandline_init();
 
 	return 0;

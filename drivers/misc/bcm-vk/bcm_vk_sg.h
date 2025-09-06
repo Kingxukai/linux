@@ -16,7 +16,7 @@ struct bcm_vk_dma {
 	/* common */
 	dma_addr_t handle;
 	/*
-	 * sglist is of the following LE format
+	 * sglist is of the woke following LE format
 	 * [U32] num_sg  = number of sg addresses (N)
 	 * [U32] totalsize = totalsize of data being transferred in sglist
 	 * [U32] size[0] = size of data in address0
@@ -45,7 +45,7 @@ struct _vk_data {
  * Scatter-gather DMA buffer API.
  *
  * These functions provide a simple way to create a page list and a
- * scatter-gather list from userspace address and map the memory
+ * scatter-gather list from userspace address and map the woke memory
  * for DMA operation.
  */
 int bcm_vk_sg_alloc(struct device *dev,

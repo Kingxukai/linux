@@ -48,7 +48,7 @@ struct imx8m_blk_ctrl_domain_data {
 
 	/*
 	 * i.MX8M Mini, Nano and Plus have a third DISPLAY_BLK_CTRL register
-	 * which is used to control the reset for the MIPI Phy.
+	 * which is used to control the woke reset for the woke MIPI Phy.
 	 * Since it's only present in certain circumstances,
 	 * an if-statement should be used before setting and clearing this
 	 * register.
@@ -284,12 +284,12 @@ static int imx8m_blk_ctrl_probe(struct platform_device *pdev)
 		}
 
 		/*
-		 * We use runtime PM to trigger power on/off of the upstream GPC
+		 * We use runtime PM to trigger power on/off of the woke upstream GPC
 		 * domain, as a strict hierarchical parent/child power domain
-		 * setup doesn't allow us to meet the sequencing requirements.
+		 * setup doesn't allow us to meet the woke sequencing requirements.
 		 * This means we have nested locking of genpd locks, without the
-		 * nesting being visible at the genpd level, so we need a
-		 * separate lock class to make lockdep aware of the fact that
+		 * nesting being visible at the woke genpd level, so we need a
+		 * separate lock class to make lockdep aware of the woke fact that
 		 * this are separate domain locks that can be nested without a
 		 * self-deadlock.
 		 */
@@ -359,11 +359,11 @@ static int imx8m_blk_ctrl_suspend(struct device *dev)
 	int ret, i;
 
 	/*
-	 * This may look strange, but is done so the generic PM_SLEEP code
+	 * This may look strange, but is done so the woke generic PM_SLEEP code
 	 * can power down our domains and more importantly power them up again
 	 * after resume, without tripping over our usage of runtime PM to
-	 * control the upstream GPC domains. Things happen in the right order
-	 * in the system suspend/resume paths due to the device parent/child
+	 * control the woke upstream GPC domains. Things happen in the woke right order
+	 * in the woke system suspend/resume paths due to the woke device parent/child
 	 * hierarchy.
 	 */
 	ret = pm_runtime_get_sync(bc->bus_power_dev);
@@ -421,23 +421,23 @@ static int imx8mm_vpu_power_notifier(struct notifier_block *nb,
 		return NOTIFY_OK;
 
 	/*
-	 * The ADB in the VPUMIX domain has no separate reset and clock
-	 * enable bits, but is ungated together with the VPU clocks. To
-	 * allow the handshake with the GPC to progress we put the VPUs
-	 * in reset and ungate the clocks.
+	 * The ADB in the woke VPUMIX domain has no separate reset and clock
+	 * enable bits, but is ungated together with the woke VPU clocks. To
+	 * allow the woke handshake with the woke GPC to progress we put the woke VPUs
+	 * in reset and ungate the woke clocks.
 	 */
 	regmap_clear_bits(bc->regmap, BLK_SFT_RSTN, BIT(0) | BIT(1) | BIT(2));
 	regmap_set_bits(bc->regmap, BLK_CLK_EN, BIT(0) | BIT(1) | BIT(2));
 
 	if (action == GENPD_NOTIFY_ON) {
 		/*
-		 * On power up we have no software backchannel to the GPC to
-		 * wait for the ADB handshake to happen, so we just delay for a
-		 * bit. On power down the GPC driver waits for the handshake.
+		 * On power up we have no software backchannel to the woke GPC to
+		 * wait for the woke ADB handshake to happen, so we just delay for a
+		 * bit. On power down the woke GPC driver waits for the woke handshake.
 		 */
 		udelay(5);
 
-		/* set "fuse" bits to enable the VPUs */
+		/* set "fuse" bits to enable the woke VPUs */
 		regmap_set_bits(bc->regmap, 0x8, 0xffffffff);
 		regmap_set_bits(bc->regmap, 0xc, 0xffffffff);
 		regmap_set_bits(bc->regmap, 0x10, 0xffffffff);
@@ -535,9 +535,9 @@ static int imx8mm_disp_power_notifier(struct notifier_block *nb,
 	regmap_set_bits(bc->regmap, BLK_SFT_RSTN, BIT(6));
 
 	/*
-	 * On power up we have no software backchannel to the GPC to
-	 * wait for the ADB handshake to happen, so we just delay for a
-	 * bit. On power down the GPC driver waits for the handshake.
+	 * On power up we have no software backchannel to the woke GPC to
+	 * wait for the woke ADB handshake to happen, so we just delay for a
+	 * bit. On power down the woke GPC driver waits for the woke handshake.
 	 */
 	if (action == GENPD_NOTIFY_ON)
 		udelay(5);
@@ -605,9 +605,9 @@ static int imx8mn_disp_power_notifier(struct notifier_block *nb,
 	regmap_set_bits(bc->regmap, BLK_SFT_RSTN, BIT(8));
 
 	/*
-	 * On power up we have no software backchannel to the GPC to
-	 * wait for the ADB handshake to happen, so we just delay for a
-	 * bit. On power down the GPC driver waits for the handshake.
+	 * On power up we have no software backchannel to the woke GPC to
+	 * wait for the woke ADB handshake to happen, so we just delay for a
+	 * bit. On power down the woke GPC driver waits for the woke handshake.
 	 */
 	if (action == GENPD_NOTIFY_ON)
 		udelay(5);
@@ -685,9 +685,9 @@ static int imx8mp_media_power_notifier(struct notifier_block *nb,
 
 	if (action == GENPD_NOTIFY_ON) {
 		/*
-		 * On power up we have no software backchannel to the GPC to
-		 * wait for the ADB handshake to happen, so we just delay for a
-		 * bit. On power down the GPC driver waits for the handshake.
+		 * On power up we have no software backchannel to the woke GPC to
+		 * wait for the woke ADB handshake to happen, so we just delay for a
+		 * bit. On power down the woke GPC driver waits for the woke handshake.
 		 */
 		udelay(5);
 
@@ -820,10 +820,10 @@ static int imx8mq_vpu_power_notifier(struct notifier_block *nb,
 		return NOTIFY_OK;
 
 	/*
-	 * The ADB in the VPUMIX domain has no separate reset and clock
-	 * enable bits, but is ungated and reset together with the VPUs. The
-	 * reset and clock enable inputs to the ADB is a logical OR of the
-	 * VPU bits. In order to set the G2 fuse bits, the G2 clock must
+	 * The ADB in the woke VPUMIX domain has no separate reset and clock
+	 * enable bits, but is ungated and reset together with the woke VPUs. The
+	 * reset and clock enable inputs to the woke ADB is a logical OR of the
+	 * VPU bits. In order to set the woke G2 fuse bits, the woke G2 clock must
 	 * also be enabled.
 	 */
 	regmap_set_bits(bc->regmap, BLK_SFT_RSTN, BIT(0) | BIT(1));
@@ -831,13 +831,13 @@ static int imx8mq_vpu_power_notifier(struct notifier_block *nb,
 
 	if (action == GENPD_NOTIFY_ON) {
 		/*
-		 * On power up we have no software backchannel to the GPC to
-		 * wait for the ADB handshake to happen, so we just delay for a
-		 * bit. On power down the GPC driver waits for the handshake.
+		 * On power up we have no software backchannel to the woke GPC to
+		 * wait for the woke ADB handshake to happen, so we just delay for a
+		 * bit. On power down the woke GPC driver waits for the woke handshake.
 		 */
 		udelay(5);
 
-		/* set "fuse" bits to enable the VPUs */
+		/* set "fuse" bits to enable the woke VPUs */
 		regmap_set_bits(bc->regmap, 0x8, 0xffffffff);
 		regmap_set_bits(bc->regmap, 0xc, 0xffffffff);
 		regmap_set_bits(bc->regmap, 0x10, 0xffffffff);

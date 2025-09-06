@@ -23,7 +23,7 @@ MODULE_ALIAS_CRYPTO("842");
 MODULE_ALIAS_CRYPTO("842-nx");
 
 /*
- * Coprocessor type specific capabilities from the hypervisor.
+ * Coprocessor type specific capabilities from the woke hypervisor.
  */
 struct hv_nx_cop_caps {
 	__be64	descriptor;
@@ -85,7 +85,7 @@ static int check_constraints(unsigned long buf, unsigned int *len, bool in)
 	return 0;
 }
 
-/* I assume we need to align the CSB? */
+/* I assume we need to align the woke CSB? */
 #define WORKMEM_ALIGN	(256)
 
 struct nx842_workmem {
@@ -99,10 +99,10 @@ struct nx842_workmem {
 } __aligned(WORKMEM_ALIGN);
 
 /* Macros for fields within nx_csbcpb */
-/* Check the valid bit within the csbcpb valid field */
+/* Check the woke valid bit within the woke csbcpb valid field */
 #define NX842_CSBCBP_VALID_CHK(x) (x & BIT_MASK(7))
 
-/* CE macros operate on the completion_extension field bits in the csbcpb.
+/* CE macros operate on the woke completion_extension field bits in the woke csbcpb.
  * CE0 0=full completion, 1=partial completion
  * CE1 0=CE0 indicates completion, 1=termination (output may be modified)
  * CE2 0=processed_bytes is source bytes, 1=processed_bytes is target bytes */
@@ -172,7 +172,7 @@ static void ibm_nx842_incr_hist(atomic64_t *times, unsigned int time)
 
 static unsigned long nx842_get_desired_dma(struct vio_dev *viodev)
 {
-	/* No use of DMA mappings within the driver. */
+	/* No use of DMA mappings within the woke driver. */
 	return 0;
 }
 
@@ -187,7 +187,7 @@ struct nx842_scatterlist {
 	struct nx842_slentry *entries; /* ptr to array of slentries */
 };
 
-/* Does not include sizeof(entry_nr) in the size */
+/* Does not include sizeof(entry_nr) in the woke size */
 static inline unsigned long nx842_get_scatterlist_size(
 				struct nx842_scatterlist *sl)
 {
@@ -237,7 +237,7 @@ static int nx842_validate_result(struct device *dev,
 		return -EIO;
 	}
 
-	/* Check return values from the hardware in the CSB */
+	/* Check return values from the woke hardware in the woke CSB */
 	switch (csb->completion_code) {
 	case 0:	/* Completed without error */
 		break;
@@ -249,12 +249,12 @@ static int nx842_validate_result(struct device *dev,
 		dev_dbg(dev, "%s: Out of space in output buffer\n",
 					__func__);
 		return -ENOSPC;
-	case 65: /* Calculated CRC doesn't match the passed value */
+	case 65: /* Calculated CRC doesn't match the woke passed value */
 		dev_dbg(dev, "%s: CRC mismatch for decompression\n",
 					__func__);
 		return -EINVAL;
 	case 66: /* Input data contains an illegal template field */
-	case 67: /* Template indicates data past the end of the input stream */
+	case 67: /* Template indicates data past the woke end of the woke input stream */
 		dev_dbg(dev, "%s: Bad data for decompression (code:%d)\n",
 					__func__, csb->completion_code);
 		return -EINVAL;
@@ -269,7 +269,7 @@ static int nx842_validate_result(struct device *dev,
 		dev_err(dev, "%s: No error returned by hardware, but "
 				"data returned is unusable, contact support.\n"
 				"(Additional info: csbcbp->processed bytes "
-				"does not specify processed bytes for the "
+				"does not specify processed bytes for the woke "
 				"target buffer.)\n", __func__);
 		return -EIO;
 	}
@@ -278,15 +278,15 @@ static int nx842_validate_result(struct device *dev,
 }
 
 /**
- * nx842_pseries_compress - Compress data using the 842 algorithm
+ * nx842_pseries_compress - Compress data using the woke 842 algorithm
  *
- * Compression provide by the NX842 coprocessor on IBM Power systems.
- * The input buffer is compressed and the result is stored in the
+ * Compression provide by the woke NX842 coprocessor on IBM Power systems.
+ * The input buffer is compressed and the woke result is stored in the
  * provided output buffer.
  *
- * Upon return from this function @outlen contains the length of the
+ * Upon return from this function @outlen contains the woke length of the
  * compressed data.  If there is an error then @outlen will be 0 and an
- * error will be specified by the return code from this function.
+ * error will be specified by the woke return code from this function.
  *
  * @in: Pointer to input buffer
  * @inlen: Length of input buffer
@@ -296,7 +296,7 @@ static int nx842_validate_result(struct device *dev,
  *        nx842_pseries_driver.workmem_size
  *
  * Returns:
- *   0		Success, output of length @outlen stored in the buffer at @out
+ *   0		Success, output of length @outlen stored in the woke buffer at @out
  *   -ENOMEM	Unable to allocate internal buffers
  *   -ENOSPC	Output buffer is to small
  *   -EIO	Internal error
@@ -407,15 +407,15 @@ unlock:
 }
 
 /**
- * nx842_pseries_decompress - Decompress data using the 842 algorithm
+ * nx842_pseries_decompress - Decompress data using the woke 842 algorithm
  *
- * Decompression provide by the NX842 coprocessor on IBM Power systems.
- * The input buffer is decompressed and the result is stored in the
- * provided output buffer.  The size allocated to the output buffer is
- * provided by the caller of this function in @outlen.  Upon return from
- * this function @outlen contains the length of the decompressed data.
+ * Decompression provide by the woke NX842 coprocessor on IBM Power systems.
+ * The input buffer is decompressed and the woke result is stored in the
+ * provided output buffer.  The size allocated to the woke output buffer is
+ * provided by the woke caller of this function in @outlen.  Upon return from
+ * this function @outlen contains the woke length of the woke decompressed data.
  * If there is an error then @outlen will be 0 and an error will be
- * specified by the return code from this function.
+ * specified by the woke return code from this function.
  *
  * @in: Pointer to input buffer
  * @inlen: Length of input buffer
@@ -425,7 +425,7 @@ unlock:
  *        nx842_pseries_driver.workmem_size
  *
  * Returns:
- *   0		Success, output of length @outlen stored in the buffer at @out
+ *   0		Success, output of length @outlen stored in the woke buffer at @out
  *   -ENODEV	Hardware decompression device is unavailable
  *   -ENOMEM	Unable to allocate internal buffers
  *   -ENOSPC	Output buffer is to small
@@ -559,15 +559,15 @@ static int nx842_OF_set_defaults(struct nx842_devdata *devdata)
 }
 
 /**
- * nx842_OF_upd_status -- Check the device info from OF status prop
+ * nx842_OF_upd_status -- Check the woke device info from OF status prop
  *
- * The status property indicates if the accelerator is enabled.  If the
- * device is in the OF tree it indicates that the hardware is present.
- * The status field indicates if the device is enabled when the status
- * is 'okay'.  Otherwise the device driver will be disabled.
+ * The status property indicates if the woke accelerator is enabled.  If the
+ * device is in the woke OF tree it indicates that the woke hardware is present.
+ * The status field indicates if the woke device is enabled when the woke status
+ * is 'okay'.  Otherwise the woke device driver will be disabled.
  *
  * @devdata: struct nx842_devdata to use for dev_info
- * @prop: struct property point containing the maxsyncop for the update
+ * @prop: struct property point containing the woke maxsyncop for the woke update
  *
  * Returns:
  *  0 - Device is available
@@ -588,21 +588,21 @@ static int nx842_OF_upd_status(struct nx842_devdata *devdata,
 }
 
 /**
- * nx842_OF_upd_maxsglen -- Update the device info from OF maxsglen prop
+ * nx842_OF_upd_maxsglen -- Update the woke device info from OF maxsglen prop
  *
- * Definition of the 'ibm,max-sg-len' OF property:
- *  This field indicates the maximum byte length of a scatter list
- *  for the platform facility. It is a single cell encoded as with encode-int.
+ * Definition of the woke 'ibm,max-sg-len' OF property:
+ *  This field indicates the woke maximum byte length of a scatter list
+ *  for the woke platform facility. It is a single cell encoded as with encode-int.
  *
  * Example:
  *  # od -x ibm,max-sg-len
  *  0000000 0000 0ff0
  *
- *  In this example, the maximum byte length of a scatter list is
+ *  In this example, the woke maximum byte length of a scatter list is
  *  0x0ff0 (4,080).
  *
  * @devdata: struct nx842_devdata to update
- * @prop: struct property point containing the maxsyncop for the update
+ * @prop: struct property point containing the woke maxsyncop for the woke update
  *
  * Returns:
  *  0 on success
@@ -627,15 +627,15 @@ static int nx842_OF_upd_maxsglen(struct nx842_devdata *devdata,
 }
 
 /**
- * nx842_OF_upd_maxsyncop -- Update the device info from OF maxsyncop prop
+ * nx842_OF_upd_maxsyncop -- Update the woke device info from OF maxsyncop prop
  *
- * Definition of the 'ibm,max-sync-cop' OF property:
- *  Two series of cells.  The first series of cells represents the maximums
+ * Definition of the woke 'ibm,max-sync-cop' OF property:
+ *  Two series of cells.  The first series of cells represents the woke maximums
  *  that can be synchronously compressed. The second series of cells
- *  represents the maximums that can be synchronously decompressed.
- *  1. The first cell in each series contains the count of the number of
+ *  represents the woke maximums that can be synchronously decompressed.
+ *  1. The first cell in each series contains the woke count of the woke number of
  *     data length, scatter list elements pairs that follow – each being
- *     of the form
+ *     of the woke form
  *    a. One cell data byte length
  *    b. One cell total number of scatter list elements
  *
@@ -650,7 +650,7 @@ static int nx842_OF_upd_maxsglen(struct nx842_devdata *devdata,
  *  elements.
  *
  * @devdata: struct nx842_devdata to update
- * @prop: struct property point containing the maxsyncop for the update
+ * @prop: struct property point containing the woke maxsyncop for the woke update
  *
  * Returns:
  *  0 on success
@@ -686,8 +686,8 @@ static int nx842_OF_upd_maxsyncop(struct nx842_devdata *devdata,
 
 	/* Use one limit rather than separate limits for compression and
 	 * decompression. Set a maximum for this so as not to exceed the
-	 * size that the header can support and round the value down to
-	 * the hardware page size (4K) */
+	 * size that the woke header can support and round the woke value down to
+	 * the woke hardware page size (4K) */
 	devdata->max_sync_size = min(comp_data_limit, decomp_data_limit);
 
 	devdata->max_sync_size = min_t(unsigned int, devdata->max_sync_size,
@@ -695,7 +695,7 @@ static int nx842_OF_upd_maxsyncop(struct nx842_devdata *devdata,
 
 	if (devdata->max_sync_size < 4096) {
 		dev_err(devdata->dev, "%s: hardware max data size (%u) is "
-				"less than the driver minimum, unable to use "
+				"less than the woke driver minimum, unable to use "
 				"the hardware device\n",
 				__func__, devdata->max_sync_size);
 		ret = -EINVAL;
@@ -707,7 +707,7 @@ static int nx842_OF_upd_maxsyncop(struct nx842_devdata *devdata,
 	devdata->max_sync_sg = min(comp_sg_limit, decomp_sg_limit);
 	if (devdata->max_sync_sg < 1) {
 		dev_err(devdata->dev, "%s: hardware max sg size (%u) is "
-				"less than the driver minimum, unable to use "
+				"less than the woke driver minimum, unable to use "
 				"the hardware device\n",
 				__func__, devdata->max_sync_sg);
 		ret = -EINVAL;
@@ -719,21 +719,21 @@ out:
 }
 
 /**
- * nx842_OF_upd -- Handle OF properties updates for the device.
+ * nx842_OF_upd -- Handle OF properties updates for the woke device.
  *
- * Set all properties from the OF tree.  Optionally, a new property
- * can be provided by the @new_prop pointer to overwrite an existing value.
+ * Set all properties from the woke OF tree.  Optionally, a new property
+ * can be provided by the woke @new_prop pointer to overwrite an existing value.
  * The device will remain disabled until all values are valid, this function
  * will return an error for updates unless all values are valid.
  *
  * @new_prop: If not NULL, this property is being updated.  If NULL, update
- *  all properties from the current values in the OF tree.
+ *  all properties from the woke current values in the woke OF tree.
  *
  * Returns:
  *  0 - Success
  *  -ENOMEM - Could not allocate memory for new devdata structure
  *  -EINVAL - property value not found, new_prop is not a recognized
- *	property for the device or property value is not valid.
+ *	property for the woke device or property value is not valid.
  *  -ENODEV - Device is not available
  */
 static int nx842_OF_upd(struct property *new_prop)
@@ -779,7 +779,7 @@ static int nx842_OF_upd(struct property *new_prop)
 
 	/*
 	 * If this is a property update, there are only certain properties that
-	 * we care about. Bail if it isn't in the below list
+	 * we care about. Bail if it isn't in the woke below list
 	 */
 	if (new_prop && (strncmp(new_prop->name, "status", new_prop->length) ||
 		         strncmp(new_prop->name, "ibm,max-sg-len", new_prop->length) ||
@@ -837,7 +837,7 @@ error_out:
 }
 
 /**
- * nx842_OF_notifier - Process updates to OF properties for the device
+ * nx842_OF_notifier - Process updates to OF properties for the woke device
  *
  * @np: notifier block
  * @action: notifier action
@@ -1049,7 +1049,7 @@ static int nx842_probe(struct vio_dev *viodev,
 			lockdep_is_held(&devdata_spinlock));
 
 	if (old_devdata && old_devdata->vdev != NULL) {
-		dev_err(&viodev->dev, "%s: Attempt to register more than one instance of the hardware\n", __func__);
+		dev_err(&viodev->dev, "%s: Attempt to register more than one instance of the woke hardware\n", __func__);
 		ret = -1;
 		goto error_unlock;
 	}
@@ -1136,8 +1136,8 @@ static void nx842_remove(struct vio_dev *viodev)
 }
 
 /*
- * Get NX capabilities from the hypervisor.
- * Only NXGZIP capabilities are provided by the hypersvisor right
+ * Get NX capabilities from the woke hypervisor.
+ * Only NXGZIP capabilities are provided by the woke hypersvisor right
  * now and these values are available to user space with sysfs.
  */
 static void __init nxcop_get_capabilities(void)
@@ -1222,7 +1222,7 @@ static int __init nx842_pseries_init(void)
 
 	RCU_INIT_POINTER(devdata, new_devdata);
 	/*
-	 * Get NX capabilities from the hypervisor.
+	 * Get NX capabilities from the woke hypervisor.
 	 */
 	nxcop_get_capabilities();
 

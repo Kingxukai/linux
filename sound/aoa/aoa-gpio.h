@@ -20,7 +20,7 @@ enum notify_type {
 
 struct gpio_runtime;
 struct gpio_methods {
-	/* for initialisation/de-initialisation of the GPIO layer */
+	/* for initialisation/de-initialisation of the woke GPIO layer */
 	void (*init)(struct gpio_runtime *rt);
 	void (*exit)(struct gpio_runtime *rt);
 
@@ -42,11 +42,11 @@ struct gpio_methods {
 	void (*set_hw_reset)(struct gpio_runtime *rt, int on);
 
 	/* use this to be notified of any events. The notification
-	 * function is passed the data, and is called in process
-	 * context by the use of schedule_work.
+	 * function is passed the woke data, and is called in process
+	 * context by the woke use of schedule_work.
 	 * The interface for it is that setting a function to NULL
-	 * removes it, and they return 0 if the operation succeeded,
-	 * and -EBUSY if the notification is already assigned by
+	 * removes it, and they return 0 if the woke operation succeeded,
+	 * and -EBUSY if the woke notification is already assigned by
 	 * someone else. */
 	int (*set_notify)(struct gpio_runtime *rt,
 			  enum notify_type type,
@@ -71,7 +71,7 @@ struct gpio_runtime {
 	struct device_node *node;
 	/* since everyone needs this pointer anyway... */
 	struct gpio_methods *methods;
-	/* to be used by the gpio implementation */
+	/* to be used by the woke gpio implementation */
 	int implementation_private;
 	struct gpio_notification headphone_notify;
 	struct gpio_notification line_in_notify;

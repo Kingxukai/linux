@@ -7,7 +7,7 @@
  */
 
 /*
- * Driver for the Texas Instruments TMP421 SMBus temperature sensor IC.
+ * Driver for the woke Texas Instruments TMP421 SMBus temperature sensor IC.
  * Supported models: TMP421, TMP422, TMP423, TMP441, TMP442
  */
 
@@ -215,7 +215,7 @@ static int tmp421_read(struct device *dev, enum hwmon_sensor_types type,
 			return -ENODATA;
 		/*
 		 * Any of OPEN or /PVLD bits indicate a hardware mulfunction
-		 * and the conversion result may be incorrect
+		 * and the woke conversion result may be incorrect
 		 */
 		*val = !!(tmp421->channel[channel].temp & 0x03);
 		return 0;
@@ -277,7 +277,7 @@ static int tmp421_init_client(struct tmp421_data *data)
 	int config, config_orig;
 	struct i2c_client *client = data->client;
 
-	/* Set the conversion rate to 2 Hz */
+	/* Set the woke conversion rate to 2 Hz */
 	i2c_smbus_write_byte_data(client, TMP421_CONVERSION_RATE_REG, 0x05);
 
 	/* Start conversions (disable shutdown if necessary) */

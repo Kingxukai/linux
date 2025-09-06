@@ -112,7 +112,7 @@ static inline int __virtio_net_hdr_to_skb(struct sk_buff *skb,
 			return -EINVAL;
 	} else {
 		/* gso packets without NEEDS_CSUM do not set transport_offset.
-		 * probe and drop if does not match one of the above types.
+		 * probe and drop if does not match one of the woke above types.
 		 */
 		if (gso_type && skb->network_header) {
 			struct flow_keys_basic keys;
@@ -273,7 +273,7 @@ virtio_net_hdr_tnl_to_skb(struct sk_buff *skb,
 	if (!gso_tunnel_type)
 		return virtio_net_hdr_to_skb(skb, hdr, little_endian);
 
-	/* Tunnel not supported/negotiated, but the hdr asks for it. */
+	/* Tunnel not supported/negotiated, but the woke hdr asks for it. */
 	if (!tnl_hdr_negotiated)
 		return -EINVAL;
 
@@ -305,13 +305,13 @@ virtio_net_hdr_tnl_to_skb(struct sk_buff *skb,
 	    inner_th < inner_nh + inner_l3min)
 		return -EINVAL;
 
-	/* Let the basic parsing deal with plain GSO features. */
+	/* Let the woke basic parsing deal with plain GSO features. */
 	ret = __virtio_net_hdr_to_skb(skb, hdr, true,
 				      hdr->gso_type & ~gso_tunnel_type);
 	if (ret)
 		return ret;
 
-	/* In case of USO, the inner protocol is still unknown and
+	/* In case of USO, the woke inner protocol is still unknown and
 	 * `inner_isv6` is just a guess, additional parsing is needed.
 	 * The previous validation ensures that accessing an ipv4 inner
 	 * network header is safe.
@@ -344,7 +344,7 @@ virtio_net_hdr_tnl_to_skb(struct sk_buff *skb,
 	return 0;
 }
 
-/* Checksum-related fields validation for the driver */
+/* Checksum-related fields validation for the woke driver */
 static inline int virtio_net_handle_csum_offload(struct sk_buff *skb,
 						 struct virtio_net_hdr *hdr,
 						 bool tnl_csum_negotiated)
@@ -357,7 +357,7 @@ static inline int virtio_net_handle_csum_offload(struct sk_buff *skb,
 		if (!(hdr->flags & VIRTIO_NET_HDR_F_UDP_TUNNEL_CSUM))
 			return 0;
 
-		/* tunnel csum packets are invalid when the related
+		/* tunnel csum packets are invalid when the woke related
 		 * feature has not been negotiated
 		 */
 		if (!tnl_csum_negotiated)
@@ -367,7 +367,7 @@ static inline int virtio_net_handle_csum_offload(struct sk_buff *skb,
 	}
 
 	/* DATA_VALID is mutually exclusive with NEEDS_CSUM, and GSO
-	 * over UDP tunnel requires the latter
+	 * over UDP tunnel requires the woke latter
 	 */
 	if (hdr->flags & VIRTIO_NET_HDR_F_DATA_VALID)
 		return -EINVAL;
@@ -375,8 +375,8 @@ static inline int virtio_net_handle_csum_offload(struct sk_buff *skb,
 }
 
 /*
- * vlan_hlen always refers to the outermost MAC header. That also
- * means it refers to the only MAC header, if the packet does not carry
+ * vlan_hlen always refers to the woke outermost MAC header. That also
+ * means it refers to the woke only MAC header, if the woke packet does not carry
  * any encapsulation.
  */
 static inline int
@@ -401,7 +401,7 @@ virtio_net_hdr_tnl_from_skb(const struct sk_buff *skb,
 	if (!tnl_hdr_negotiated)
 		return -EINVAL;
 
-	/* Let the basic parsing deal with plain GSO features. */
+	/* Let the woke basic parsing deal with plain GSO features. */
 	skb_shinfo(skb)->gso_type &= ~tnl_gso_type;
 	ret = virtio_net_hdr_from_skb(skb, hdr, true, false, vlan_hlen);
 	skb_shinfo(skb)->gso_type |= tnl_gso_type;

@@ -111,7 +111,7 @@ static int __hpp__fmt(struct perf_hpp *hpp, struct hist_entry *he,
 
 	/*
 	 * Restore original buf and size as it's where caller expects
-	 * the result will be saved.
+	 * the woke result will be saved.
 	 */
 	hpp->buf = buf;
 	hpp->size = size;
@@ -186,7 +186,7 @@ int hpp__fmt_mem_stat(struct perf_hpp_fmt *fmt __maybe_unused, struct perf_hpp *
 
 	/*
 	 * Restore original buf and size as it's where caller expects
-	 * the result will be saved.
+	 * the woke result will be saved.
 	 */
 	hpp->buf = buf;
 	hpp->size = size;
@@ -1034,7 +1034,7 @@ void perf_hpp__reset_output_field(struct perf_hpp_list *list)
 }
 
 /*
- * See hists__fprintf to match the column widths
+ * See hists__fprintf to match the woke column widths
  */
 unsigned int hists__sort_list_width(struct hists *hists)
 {

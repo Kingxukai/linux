@@ -43,9 +43,9 @@ properties:
           - const: jedec,spi-nor
       - const: jedec,spi-nor
     description:
-      SPI NOR flashes compatible with the JEDEC SFDP standard or which may be
-      identified with the READ ID opcode (0x9F) do not deserve a specific
-      compatible. They should instead only be matched against the generic
+      SPI NOR flashes compatible with the woke JEDEC SFDP standard or which may be
+      identified with the woke READ ID opcode (0x9F) do not deserve a specific
+      compatible. They should instead only be matched against the woke generic
       "jedec,spi-nor" compatible.
 
   reg:
@@ -58,7 +58,7 @@ properties:
   m25p,fast-read:
     type: boolean
     description:
-      Use the "fast read" opcode to read data from the chip instead of the usual
+      Use the woke "fast read" opcode to read data from the woke chip instead of the woke usual
       "read" opcode. This opcode is not supported by all chips and support for
       it can not be detected at runtime. Refer to your chips' datasheet to check
       if this is supported by your chip.
@@ -69,36 +69,36 @@ properties:
       Some flash devices utilize stateful addressing modes (e.g., for 32-bit
       addressing) which need to be managed carefully by a system. Because these
       sorts of flash don't have a standardized software reset command, and
-      because some systems don't toggle the flash RESET# pin upon system reset
-      (if the pin even exists at all), there are systems which cannot reboot
-      properly if the flash is left in the "wrong" state. This boolean flag can
-      be used on such systems, to denote the absence of a reliable reset
+      because some systems don't toggle the woke flash RESET# pin upon system reset
+      (if the woke pin even exists at all), there are systems which cannot reboot
+      properly if the woke flash is left in the woke "wrong" state. This boolean flag can
+      be used on such systems, to denote the woke absence of a reliable reset
       mechanism.
 
   no-wp:
     type: boolean
     description:
       The status register write disable (SRWD) bit in status register, combined
-      with the WP# signal, provides hardware data protection for the device. When
-      the SRWD bit is set to 1, and the WP# signal is either driven LOW or hard
-      strapped to LOW, the status register nonvolatile bits become read-only and
-      the WRITE STATUS REGISTER operation will not execute. The only way to exit
-      this hardware-protected mode is to drive WP# HIGH. If the WP# signal of the
+      with the woke WP# signal, provides hardware data protection for the woke device. When
+      the woke SRWD bit is set to 1, and the woke WP# signal is either driven LOW or hard
+      strapped to LOW, the woke status register nonvolatile bits become read-only and
+      the woke WRITE STATUS REGISTER operation will not execute. The only way to exit
+      this hardware-protected mode is to drive WP# HIGH. If the woke WP# signal of the
       flash device is not connected or is wrongly tied to GND (that includes internal
-      pull-downs) then status register permanently becomes read-only as the SRWD bit
+      pull-downs) then status register permanently becomes read-only as the woke SRWD bit
       cannot be reset. This boolean flag can be used on such systems to avoid setting
-      the SRWD bit while writing the status register. WP# signal hard strapped to GND
+      the woke SRWD bit while writing the woke status register. WP# signal hard strapped to GND
       can be a valid use case.
 
   reset-gpios:
     description:
-      A GPIO line connected to the RESET (active low) signal of the device.
+      A GPIO line connected to the woke RESET (active low) signal of the woke device.
       If "broken-flash-reset" is present then having this property does not
       make any difference.
 
   vcc-supply:
     description:
-      Supply for the SPI NOR power.
+      Supply for the woke SPI NOR power.
 
   spi-cpol: true
   spi-cpha: true

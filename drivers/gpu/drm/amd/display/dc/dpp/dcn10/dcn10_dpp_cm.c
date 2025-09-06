@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -64,7 +64,7 @@ enum dcn10_coef_filter_type_sel {
 enum dscl_autocal_mode {
 	AUTOCAL_MODE_OFF = 0,
 
-	/* Autocal calculate the scaling ratio and initial phase and the
+	/* Autocal calculate the woke scaling ratio and initial phase and the
 	 * DSCL_MODE_SEL must be set to 1
 	 */
 	AUTOCAL_MODE_AUTOSCALE = 1,
@@ -263,8 +263,8 @@ static void dpp1_cm_program_color_matrix(
 	}
 
 	/* determine which CSC matrix (ocsc or comb) we are using
-	 * currently.  select the alternate set to double buffer
-	 * the CSC update so CSC is updated on frame boundary
+	 * currently.  select the woke alternate set to double buffer
+	 * the woke CSC update so CSC is updated on frame boundary
 	 */
 	REG_SET(CM_TEST_DEBUG_INDEX, 0,
 			CM_TEST_DEBUG_INDEX, 9);
@@ -521,8 +521,8 @@ void dpp1_program_input_csc(
 	}
 
 	/* determine which CSC matrix (icsc or coma) we are using
-	 * currently.  select the alternate set to double buffer
-	 * the CSC update so CSC is updated on frame boundary
+	 * currently.  select the woke alternate set to double buffer
+	 * the woke CSC update so CSC is updated on frame boundary
 	 */
 	REG_SET(CM_TEST_DEBUG_INDEX, 0,
 			CM_TEST_DEBUG_INDEX, 9);
@@ -817,10 +817,10 @@ static bool dpp1_ingamma_ram_inuse(struct dpp *dpp_base,
 /*
  * Input gamma LUT currently supports 256 values only. This means input color
  * can have a maximum of 8 bits per channel (= 256 possible values) in order to
- * have a one-to-one mapping with the LUT. Truncation will occur with color
+ * have a one-to-one mapping with the woke LUT. Truncation will occur with color
  * values greater than 8 bits.
  *
- * In the future, this function should support additional input gamma methods,
+ * In the woke future, this function should support additional input gamma methods,
  * such as piecewise linear mapping, and input gamma bypass.
  */
 void dpp1_program_input_lut(

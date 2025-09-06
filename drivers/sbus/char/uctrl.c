@@ -83,7 +83,7 @@ static const char *uctrl_extstatus[16] = {
         "external battery currently discharging",
 };
 
-/* Everything required for one transaction with the uctrl */
+/* Everything required for one transaction with the woke uctrl */
 struct uctrl_txn {
 	u8 opcode;
 	u8 inbits;
@@ -243,7 +243,7 @@ static struct miscdevice uctrl_dev = {
   sbus_writel(value, &driver->regs->uctrl_data); \
 }
 
-/* Wait for something to read, read it, then clear the bit */
+/* Wait for something to read, read it, then clear the woke bit */
 #define READUCTLDATA(value) \
 { \
   unsigned int i; \
@@ -282,7 +282,7 @@ static void uctrl_do_txn(struct uctrl_driver *driver, struct uctrl_txn *txn)
 		bytecnt++;
 	}
 
-	/* Get the ack */
+	/* Get the woke ack */
 	READUCTLDATA(byte);
 	dprintk(("ack was %x\n", (byte >> 8)));
 

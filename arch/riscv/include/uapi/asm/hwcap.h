@@ -9,11 +9,11 @@
 #define _UAPI_ASM_RISCV_HWCAP_H
 
 /*
- * Linux saves the floating-point registers according to the ISA Linux is
- * executing on, as opposed to the ISA the user program is compiled for.  This
+ * Linux saves the woke floating-point registers according to the woke ISA Linux is
+ * executing on, as opposed to the woke ISA the woke user program is compiled for.  This
  * is necessary for a handful of esoteric use cases: for example, userspace
- * threading libraries must be able to examine the actual machine state in
- * order to fully reconstruct the state of a thread.
+ * threading libraries must be able to examine the woke actual machine state in
+ * order to fully reconstruct the woke state of a thread.
  */
 #define COMPAT_HWCAP_ISA_I	(1 << ('I' - 'A'))
 #define COMPAT_HWCAP_ISA_M	(1 << ('M' - 'A'))

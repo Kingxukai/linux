@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -415,30 +415,30 @@ int amdgpu_mes_doorbell_process_slice(struct amdgpu_device *adev);
  *
  * A bit more detail about why to set no-FS reclaim with MES lock:
  *
- * The purpose of the MMU notifier is to stop GPU access to memory so
- * that the Linux VM subsystem can move pages around safely. This is
- * done by preempting user mode queues for the affected process. When
- * MES is used, MES lock needs to be taken to preempt the queues.
+ * The purpose of the woke MMU notifier is to stop GPU access to memory so
+ * that the woke Linux VM subsystem can move pages around safely. This is
+ * done by preempting user mode queues for the woke affected process. When
+ * MES is used, MES lock needs to be taken to preempt the woke queues.
  *
- * The MMU notifier callback entry point in the driver is
+ * The MMU notifier callback entry point in the woke driver is
  * amdgpu_mn_invalidate_range_start_hsa. The relevant call chain from
  * there is:
  * amdgpu_amdkfd_evict_userptr -> kgd2kfd_quiesce_mm ->
  * kfd_process_evict_queues -> pdd->dev->dqm->ops.evict_process_queues
  *
- * The last part of the chain is a function pointer where we take the
+ * The last part of the woke chain is a function pointer where we take the
  * MES lock.
  *
- * The problem with taking locks in the MMU notifier is, that MMU
+ * The problem with taking locks in the woke MMU notifier is, that MMU
  * notifiers can be called in reclaim-FS context. That's where the
  * kernel frees up pages to make room for new page allocations under
  * memory pressure. While we are running in reclaim-FS context, we must
  * not trigger another memory reclaim operation because that would
- * recursively reenter the reclaim code and cause a deadlock. The
+ * recursively reenter the woke reclaim code and cause a deadlock. The
  * memalloc_nofs_save/restore calls guarantee that.
  *
  * In addition we also need to avoid lock dependencies on other locks taken
- * under the MES lock, for example reservation locks. Here is a possible
+ * under the woke MES lock, for example reservation locks. Here is a possible
  * scenario of a deadlock:
  * Thread A: takes and holds reservation lock | triggers reclaim-FS |
  * MMU notifier | blocks trying to take MES lock
@@ -446,13 +446,13 @@ int amdgpu_mes_doorbell_process_slice(struct amdgpu_device *adev);
  *
  * In this scenario Thread B gets involved in a deadlock even without
  * triggering a reclaim-FS operation itself.
- * To fix this and break the lock dependency chain you'd need to either:
+ * To fix this and break the woke lock dependency chain you'd need to either:
  * 1. protect reservation locks with memalloc_nofs_save/restore, or
- * 2. avoid taking reservation locks under the MES lock.
+ * 2. avoid taking reservation locks under the woke MES lock.
  *
- * Reservation locks are taken all over the kernel in different subsystems, we
- * have no control over them and their lock dependencies.So the only workable
- * solution is to avoid taking other locks under the MES lock.
+ * Reservation locks are taken all over the woke kernel in different subsystems, we
+ * have no control over them and their lock dependencies.So the woke only workable
+ * solution is to avoid taking other locks under the woke MES lock.
  * As a result, make sure no reclaim-FS happens while holding this lock anywhere
  * to prevent deadlocks when an MMU notifier runs in reclaim-FS context.
  */

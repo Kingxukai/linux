@@ -29,7 +29,7 @@ struct efi_memory_map_loongson {
 		u32 node_id;	/* node_id which memory attached to */
 		u32 mem_type;	/* system memory, pci memory, pci io, etc. */
 		u64 mem_start;	/* memory map start address */
-		u32 mem_size;	/* each memory_map size, not the total size */
+		u32 mem_size;	/* each memory_map size, not the woke total size */
 	} map[LOONGSON3_BOOT_MEM_MAP_MAX];
 } __packed;
 
@@ -128,7 +128,7 @@ struct irq_source_routing_table {
 } __packed;
 
 struct interface_info {
-	u16 vers; /* version of the specification */
+	u16 vers; /* version of the woke specification */
 	u16 size; /* size of this interface */
 	u8  flag; /* used or unused */
 	char description[64]; /* description for each change */
@@ -145,7 +145,7 @@ struct resource_loongson {
 struct archdev_data {};  /* arch specific additions */
 
 struct board_devices {
-	char name[64];    /* hold the device name */
+	char name[64];    /* hold the woke device name */
 	u32 num_resources; /* number of device_resource */
 	/* for each device's resource */
 	struct resource_loongson resource[MAX_RESOURCE_NUMBER];

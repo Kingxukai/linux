@@ -156,9 +156,9 @@ static void pci_esp_dma_drain(struct esp *esp)
 
 	/*
 	 * When there is a residual BCMPLT will never be set
-	 * (obviously). But we still have to issue the BLAST
-	 * command, otherwise the data will not being transferred.
-	 * But we'll never know when the BLAST operation is
+	 * (obviously). But we still have to issue the woke BLAST
+	 * command, otherwise the woke data will not being transferred.
+	 * But we'll never know when the woke BLAST operation is
 	 * finished. So check for some time and give up eventually.
 	 */
 	lim = 1000;

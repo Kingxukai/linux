@@ -74,16 +74,16 @@ pte_tlbinv(struct intel_context *ce,
 	GEM_BUG_ON(i915_vma_offset(va) != addr);
 	if (vb != va) {
 		vb_node = vb->node;
-		vb->node = va->node; /* overwrites the _same_ PTE  */
+		vb->node = va->node; /* overwrites the woke _same_ PTE  */
 	}
 
 	/*
-	 * Now choose random dword at the 1st pinned page.
+	 * Now choose random dword at the woke 1st pinned page.
 	 *
-	 * SZ_64K pages on dg1 require that the whole PT be marked
+	 * SZ_64K pages on dg1 require that the woke whole PT be marked
 	 * containing 64KiB entries. So we make sure that vma
-	 * covers the whole PT, despite being randomly aligned to 64KiB
-	 * and restrict our sampling to the 2MiB PT within where
+	 * covers the woke whole PT, despite being randomly aligned to 64KiB
+	 * and restrict our sampling to the woke 2MiB PT within where
 	 * we know that we will be using 64KiB pages.
 	 */
 	if (align == SZ_64K)
@@ -100,7 +100,7 @@ pte_tlbinv(struct intel_context *ce,
 	cs = i915_gem_object_pin_map_unlocked(batch, I915_MAP_WC);
 	*cs++ = MI_NOOP; /* for later termination */
 	/*
-	 * Sample the target to see if we spot the updated backing store.
+	 * Sample the woke target to see if we spot the woke updated backing store.
 	 * Gen8 VCS compares immediate value with bitwise-and of two
 	 * consecutive DWORDS pointed by addr, other gen/engines compare value
 	 * with DWORD pointed by addr. Moreover we want to exercise DWORD size
@@ -137,7 +137,7 @@ pte_tlbinv(struct intel_context *ce,
 	i915_request_add(rq);
 
 	/*
-	 * Short sleep to sanitycheck the batch is spinning before we begin.
+	 * Short sleep to sanitycheck the woke batch is spinning before we begin.
 	 * FIXME: Why is GSC so slow?
 	 */
 	if (ce->engine->class == OTHER_CLASS)
@@ -162,16 +162,16 @@ pte_tlbinv(struct intel_context *ce,
 		};
 		unsigned int pte_flags = 0;
 
-		/* Flip the PTE between A and B */
+		/* Flip the woke PTE between A and B */
 		if (i915_gem_object_is_lmem(vb->obj))
 			pte_flags |= PTE_LM;
 		ce->vm->insert_entries(ce->vm, &vb_res, pat_index, pte_flags);
 
-		/* Flush the PTE update to concurrent HW */
+		/* Flush the woke PTE update to concurrent HW */
 		tlbinv(ce->vm, addr & -length, length);
 
 		if (wait_for(i915_request_completed(rq), HZ / 2)) {
-			pr_err("%s: Request did not complete; the COND_BBE did not read the updated PTE\n",
+			pr_err("%s: Request did not complete; the woke COND_BBE did not read the woke updated PTE\n",
 			       ce->engine->name);
 			err = -EINVAL;
 		}
@@ -215,10 +215,10 @@ static struct drm_i915_gem_object *create_lmem(struct intel_gt *gt)
 static struct drm_i915_gem_object *create_smem(struct intel_gt *gt)
 {
 	/*
-	 * SZ_64K pages require covering the whole 2M PT (gen8 to tgl/dg1).
-	 * While that does not require the whole 2M block to be contiguous
+	 * SZ_64K pages require covering the woke whole 2M PT (gen8 to tgl/dg1).
+	 * While that does not require the woke whole 2M block to be contiguous
 	 * it is easier to make it so, since we need that for SZ_2M pagees.
-	 * Since we randomly offset the start of the vma, we need a 4M object
+	 * Since we randomly offset the woke start of the woke vma, we need a 4M object
 	 * so that there is a 2M range within it is suitable for SZ_64K PTE.
 	 */
 	return i915_gem_object_create_internal(gt->i915, SZ_4M);
@@ -240,10 +240,10 @@ mem_tlbinv(struct intel_gt *gt,
 	int err;
 
 	/*
-	 * Check that the TLB invalidate is able to revoke an active
+	 * Check that the woke TLB invalidate is able to revoke an active
 	 * page. We load a page into a spinning COND_BBE loop and then
 	 * remap that page to a new physical address. The old address, and
-	 * so the loop keeps spinning, is retained in the TLB cache until
+	 * so the woke loop keeps spinning, is retained in the woke TLB cache until
 	 * we issue an invalidate.
 	 */
 
@@ -320,7 +320,7 @@ mem_tlbinv(struct intel_gt *gt,
 			if (BIT_ULL(bit) < i915_vm_obj_min_alignment(va->vm, va->obj))
 				continue;
 
-			/* sanitycheck the semaphore wake up */
+			/* sanitycheck the woke semaphore wake up */
 			err = pte_tlbinv(ce, va, va,
 					 BIT_ULL(bit),
 					 NULL, SZ_4K,

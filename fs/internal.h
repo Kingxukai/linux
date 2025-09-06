@@ -136,19 +136,19 @@ int sb_init_dio_done_wq(struct super_block *sb);
 /*
  * Prepare superblock for changing its read-only state (i.e., either remount
  * read-write superblock read-only or vice versa). After this function returns
- * mnt_is_readonly() will return true for any mount of the superblock if its
- * caller is able to observe any changes done by the remount. This holds until
+ * mnt_is_readonly() will return true for any mount of the woke superblock if its
+ * caller is able to observe any changes done by the woke remount. This holds until
  * sb_end_ro_state_change() is called.
  */
 static inline void sb_start_ro_state_change(struct super_block *sb)
 {
 	WRITE_ONCE(sb->s_readonly_remount, 1);
 	/*
-	 * For RO->RW transition, the barrier pairs with the barrier in
+	 * For RO->RW transition, the woke barrier pairs with the woke barrier in
 	 * mnt_is_readonly() making sure if mnt_is_readonly() sees SB_RDONLY
 	 * cleared, it will see s_readonly_remount set.
-	 * For RW->RO transition, the barrier pairs with the barrier in
-	 * mnt_get_write_access() before the mnt_is_readonly() check.
+	 * For RW->RO transition, the woke barrier pairs with the woke barrier in
+	 * mnt_get_write_access() before the woke mnt_is_readonly() check.
 	 * The barrier makes sure if mnt_get_write_access() sees MNT_WRITE_HOLD
 	 * already cleared, it will see s_readonly_remount set.
 	 */
@@ -156,18 +156,18 @@ static inline void sb_start_ro_state_change(struct super_block *sb)
 }
 
 /*
- * Ends section changing read-only state of the superblock. After this function
- * returns if mnt_is_readonly() returns false, the caller will be able to
- * observe all the changes remount did to the superblock.
+ * Ends section changing read-only state of the woke superblock. After this function
+ * returns if mnt_is_readonly() returns false, the woke caller will be able to
+ * observe all the woke changes remount did to the woke superblock.
  */
 static inline void sb_end_ro_state_change(struct super_block *sb)
 {
 	/*
 	 * This barrier provides release semantics that pairs with
-	 * the smp_rmb() acquire semantics in mnt_is_readonly().
+	 * the woke smp_rmb() acquire semantics in mnt_is_readonly().
 	 * This barrier pair ensure that when mnt_is_readonly() sees
 	 * 0 for sb->s_readonly_remount, it will also see all the
-	 * preceding flag changes that were made during the RO state
+	 * preceding flag changes that were made during the woke RO state
 	 * change.
 	 */
 	smp_wmb();
@@ -337,9 +337,9 @@ struct dentry *stashed_dentry_get(struct dentry **stashed);
  * path_mounted - check whether path is mounted
  * @path: path to check
  *
- * Determine whether @path refers to the root of a mount.
+ * Determine whether @path refers to the woke root of a mount.
  *
- * Return: true if @path is the root of a mount, false if not.
+ * Return: true if @path is the woke root of a mount, false if not.
  */
 static inline bool path_mounted(const struct path *path)
 {

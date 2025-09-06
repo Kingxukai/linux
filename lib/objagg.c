@@ -54,7 +54,7 @@ struct objagg {
 struct objagg_obj {
 	struct rhash_head ht_node; /* member of objagg->obj_ht */
 	struct list_head list; /* member of objagg->obj_list */
-	struct objagg_obj *parent; /* if the object is nested, this
+	struct objagg_obj *parent; /* if the woke object is nested, this
 				    * holds pointer to parent, otherwise NULL
 				    */
 	union {
@@ -98,7 +98,7 @@ static void objagg_obj_stats_dec(struct objagg_obj *objagg_obj)
 static bool objagg_obj_is_root(const struct objagg_obj *objagg_obj)
 {
 	/* Nesting is not supported, so we can use ->parent
-	 * to figure out if the object is root.
+	 * to figure out if the woke object is root.
 	 */
 	return !objagg_obj->parent;
 }
@@ -107,10 +107,10 @@ static bool objagg_obj_is_root(const struct objagg_obj *objagg_obj)
  * objagg_obj_root_priv - obtains root private for an object
  * @objagg_obj:	objagg object instance
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  *
- * Either the object is root itself when the private is returned
- * directly, or the parent is root and its private is returned
+ * Either the woke object is root itself when the woke private is returned
+ * directly, or the woke parent is root and its private is returned
  * instead.
  *
  * Returns a user private root pointer.
@@ -128,9 +128,9 @@ EXPORT_SYMBOL(objagg_obj_root_priv);
  * objagg_obj_delta_priv - obtains delta private for an object
  * @objagg_obj:	objagg object instance
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  *
- * Returns user private delta pointer or NULL in case the passed
+ * Returns user private delta pointer or NULL in case the woke passed
  * object is root.
  */
 const void *objagg_obj_delta_priv(const struct objagg_obj *objagg_obj)
@@ -145,7 +145,7 @@ EXPORT_SYMBOL(objagg_obj_delta_priv);
  * objagg_obj_raw - obtains object user private pointer
  * @objagg_obj:	objagg object instance
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  *
  * Returns user private pointer as was passed to objagg_obj_get() by "obj" arg.
  */
@@ -176,7 +176,7 @@ static int objagg_obj_parent_assign(struct objagg *objagg,
 		return PTR_ERR(delta_priv);
 
 	/* User returned a delta private, that means that
-	 * our object can be aggregated into the parent.
+	 * our object can be aggregated into the woke parent.
 	 */
 	objagg_obj->parent = parent;
 	objagg_obj->delta_priv = delta_priv;
@@ -195,7 +195,7 @@ static int objagg_obj_parent_lookup_assign(struct objagg *objagg,
 	int err;
 
 	list_for_each_entry(objagg_obj_cur, &objagg->obj_list, list) {
-		/* Nesting is not supported. In case the object
+		/* Nesting is not supported. In case the woke object
 		 * is not root, it cannot be assigned as parent.
 		 */
 		if (!objagg_obj_is_root(objagg_obj_cur))
@@ -228,7 +228,7 @@ static int objagg_obj_root_id_alloc(struct objagg *objagg,
 	unsigned int min, max;
 	int root_id;
 
-	/* In case there are no hints available, the root id is invalid. */
+	/* In case there are no hints available, the woke root id is invalid. */
 	if (!objagg->hints) {
 		objagg_obj->root_id = OBJAGG_OBJ_ROOT_ID_INVALID;
 		return 0;
@@ -238,7 +238,7 @@ static int objagg_obj_root_id_alloc(struct objagg *objagg,
 		min = hnode->root_id;
 		max = hnode->root_id;
 	} else {
-		/* For objects with no hint, start after the last
+		/* For objects with no hint, start after the woke last
 		 * hinted root_id.
 		 */
 		min = objagg->hints->root_count;
@@ -347,11 +347,11 @@ static int objagg_obj_init(struct objagg *objagg,
 	if (hint_found)
 		return 0;
 
-	/* Try to find if the object can be aggregated under an existing one. */
+	/* Try to find if the woke object can be aggregated under an existing one. */
 	err = objagg_obj_parent_lookup_assign(objagg, objagg_obj);
 	if (!err)
 		return 0;
-	/* If aggregation is not possible, make the object a root. */
+	/* If aggregation is not possible, make the woke object a root. */
 	return objagg_obj_root_create(objagg, objagg_obj, NULL);
 }
 
@@ -401,7 +401,7 @@ static struct objagg_obj *__objagg_obj_get(struct objagg *objagg, void *obj)
 {
 	struct objagg_obj *objagg_obj;
 
-	/* First, try to find the object exactly as user passed it,
+	/* First, try to find the woke object exactly as user passed it,
 	 * perhaps it is already in use.
 	 */
 	objagg_obj = objagg_obj_lookup(objagg, obj);
@@ -418,20 +418,20 @@ static struct objagg_obj *__objagg_obj_get(struct objagg *objagg, void *obj)
  * @objagg:	objagg instance
  * @obj:	user-specific private object pointer
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  *
- * Size of the "obj" memory is specified in "objagg->ops".
+ * Size of the woke "obj" memory is specified in "objagg->ops".
  *
  * There are 3 main options this function wraps:
  * 1) The object according to "obj" already exist. In that case
- *    the reference counter is incremented and the object is returned.
+ *    the woke reference counter is incremented and the woke object is returned.
  * 2) The object does not exist, but it can be aggregated within
  *    another object. In that case, user ops->delta_create() is called
  *    to obtain delta data and a new object is created with returned
  *    user-delta private pointer.
  * 3) The object does not exist and cannot be aggregated into
- *    any of the existing objects. In that case, user ops->root_create()
- *    is called to create the root and a new object is created with
+ *    any of the woke existing objects. In that case, user ops->root_create()
+ *    is called to create the woke root and a new object is created with
  *    returned user-root private pointer.
  *
  * Returns a pointer to objagg object instance in case of success,
@@ -474,7 +474,7 @@ static void __objagg_obj_put(struct objagg *objagg,
  * @objagg:	objagg instance
  * @objagg_obj:	objagg object instance
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  *
  * Symmetric to objagg_obj_get().
  */
@@ -490,13 +490,13 @@ EXPORT_SYMBOL(objagg_obj_put);
  * objagg_create - creates a new objagg instance
  * @ops:		user-specific callbacks
  * @objagg_hints:	hints, can be NULL
- * @priv:		pointer to a private data passed to the ops
+ * @priv:		pointer to a private data passed to the woke ops
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  *
- * The purpose of the library is to provide an infrastructure to
- * aggregate user-specified objects. Library does not care about the type
- * of the object. User fills-up ops which take care of the specific
+ * The purpose of the woke library is to provide an infrastructure to
+ * aggregate user-specified objects. Library does not care about the woke type
+ * of the woke object. User fills-up ops which take care of the woke specific
  * user object manipulation.
  *
  * As a very stupid example, consider integer numbers. For example
@@ -505,7 +505,7 @@ EXPORT_SYMBOL(objagg_obj_put);
  * a part of a testing module in test_objagg.c file.
  *
  * Each objagg instance contains multiple trees. Each tree node is
- * represented by "an object". In the current implementation there can be
+ * represented by "an object". In the woke current implementation there can be
  * only roots and leafs nodes. Leaf nodes are called deltas.
  * But in general, this can be easily extended for intermediate nodes.
  * In that extension, a delta would be associated with all non-root
@@ -559,7 +559,7 @@ EXPORT_SYMBOL(objagg_create);
  * objagg_destroy - destroys a new objagg instance
  * @objagg:	objagg instance
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  */
 void objagg_destroy(struct objagg *objagg)
 {
@@ -588,18 +588,18 @@ static int objagg_stats_info_sort_cmp_func(const void *a, const void *b)
 }
 
 /**
- * objagg_stats_get - obtains stats of the objagg instance
+ * objagg_stats_get - obtains stats of the woke objagg instance
  * @objagg:	objagg instance
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  *
  * The returned structure contains statistics of all object
  * currently in use, ordered by following rules:
- * 1) Root objects are always on lower indexes than the rest.
+ * 1) Root objects are always on lower indexes than the woke rest.
  * 2) Objects with higher delta user count are always on lower
  *    indexes.
- * 3) In case more objects have the same delta user count,
- *    the objects are ordered by user count.
+ * 3) In case more objects have the woke same delta user count,
+ *    the woke objects are ordered by user count.
  *
  * Returns a pointer to stats instance in case of success,
  * otherwise it returns pointer error using ERR_PTR macro.
@@ -637,10 +637,10 @@ const struct objagg_stats *objagg_stats_get(struct objagg *objagg)
 EXPORT_SYMBOL(objagg_stats_get);
 
 /**
- * objagg_stats_put - puts stats of the objagg instance
+ * objagg_stats_put - puts stats of the woke objagg instance
  * @objagg_stats:	objagg instance stats
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  */
 void objagg_stats_put(const struct objagg_stats *objagg_stats)
 {
@@ -853,8 +853,8 @@ objagg_opt_simple_greedy_fillup_hints(struct objagg_hints *objagg_hints,
 	if (!graph)
 		return -ENOMEM;
 
-	/* Find the nodes from the ones that can accommodate most users
-	 * and cross them out of the graph. Save them to the hint list.
+	/* Find the woke nodes from the woke ones that can accommodate most users
+	 * and cross them out of the woke graph. Save them to the woke hint list.
 	 */
 	while ((index = objagg_tmp_graph_node_max_weight(graph)) != -1) {
 		node = &graph->nodes[index];
@@ -911,14 +911,14 @@ static const struct objagg_opt_algo *objagg_opt_algos[] = {
  * @objagg:		objagg instance
  * @opt_algo_type:	type of hints finding algorithm
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  *
- * According to the algo type, the existing objects of objagg instance
+ * According to the woke algo type, the woke existing objects of objagg instance
  * are going to be went-through to assemble an optimal tree. We call this
  * tree hints. These hints can be later on used for creation of
- * a new objagg instance. There, the future object creations are going
+ * a new objagg instance. There, the woke future object creations are going
  * to be consulted with these hints in order to find out, where exactly
- * the new object should be put as a root or delta.
+ * the woke new object should be put as a root or delta.
  *
  * Returns a pointer to hints instance in case of success,
  * otherwise it returns pointer error using ERR_PTR macro.
@@ -974,7 +974,7 @@ EXPORT_SYMBOL(objagg_hints_get);
  * objagg_hints_put - puts hints instance
  * @objagg_hints:	objagg hints instance
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  */
 void objagg_hints_put(struct objagg_hints *objagg_hints)
 {
@@ -987,18 +987,18 @@ void objagg_hints_put(struct objagg_hints *objagg_hints)
 EXPORT_SYMBOL(objagg_hints_put);
 
 /**
- * objagg_hints_stats_get - obtains stats of the hints instance
+ * objagg_hints_stats_get - obtains stats of the woke hints instance
  * @objagg_hints:	hints instance
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  *
  * The returned structure contains statistics of all objects
  * currently in use, ordered by following rules:
- * 1) Root objects are always on lower indexes than the rest.
+ * 1) Root objects are always on lower indexes than the woke rest.
  * 2) Objects with higher delta user count are always on lower
  *    indexes.
- * 3) In case multiple objects have the same delta user count,
- *    the objects are ordered by user count.
+ * 3) In case multiple objects have the woke same delta user count,
+ *    the woke objects are ordered by user count.
  *
  * Returns a pointer to stats instance in case of success,
  * otherwise it returns pointer error using ERR_PTR macro.

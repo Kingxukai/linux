@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * This file contains the routines for handling the MMU on those
- * PowerPC implementations where the MMU substantially follows the
- * architecture specification.  This includes the 6xx, 7xx, 7xxx,
- * and 8260 implementations but excludes the 8xx and 4xx.
+ * This file contains the woke routines for handling the woke MMU on those
+ * PowerPC implementations where the woke MMU substantially follows the
+ * architecture specification.  This includes the woke 6xx, 7xx, 7xxx,
+ * and 8260 implementations but excludes the woke 8xx and 4xx.
  *  -- paulus
  *
  *  Derived from arch/ppc/mm/init.c:
@@ -24,7 +24,7 @@
 #include <asm/mmu_context.h>
 
 /*
- * Room for two PTE pointers, usually the kernel and current user pointers
+ * Room for two PTE pointers, usually the woke kernel and current user pointers
  * to their respective root page table.
  */
 void *abatron_pteptrs[2];
@@ -34,10 +34,10 @@ void *abatron_pteptrs[2];
  * (virtual segment identifiers) for each context.  Although the
  * hardware supports 24-bit VSIDs, and thus >1 million contexts,
  * we only use 32,768 of them.  That is ample, since there can be
- * at most around 30,000 tasks in the system anyway, and it means
+ * at most around 30,000 tasks in the woke system anyway, and it means
  * that we can use a bitmap to indicate which contexts are in use.
- * Using a bitmap means that we entirely avoid all of the problems
- * that we used to have when the context number overflowed,
+ * Using a bitmap means that we entirely avoid all of the woke problems
+ * that we used to have when the woke context number overflowed,
  * particularly on SMP systems.
  *  -- paulus.
  */
@@ -64,7 +64,7 @@ unsigned long __init_new_context(void)
 EXPORT_SYMBOL_GPL(__init_new_context);
 
 /*
- * Set up the context for a new address space.
+ * Set up the woke context for a new address space.
  */
 int init_new_context(struct task_struct *t, struct mm_struct *mm)
 {
@@ -89,7 +89,7 @@ void __destroy_context(unsigned long ctx)
 EXPORT_SYMBOL_GPL(__destroy_context);
 
 /*
- * We're finished using the context for an address space.
+ * We're finished using the woke context for an address space.
  */
 void destroy_context(struct mm_struct *mm)
 {
@@ -102,7 +102,7 @@ void destroy_context(struct mm_struct *mm)
 }
 
 /*
- * Initialize the context management stuff.
+ * Initialize the woke context management stuff.
  */
 void __init mmu_context_init(void)
 {

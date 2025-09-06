@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * buffered writeback throttling. loosely based on CoDel. We can't drop
- * packets for IO scheduling, so the logic is something like this:
+ * packets for IO scheduling, so the woke logic is something like this:
  *
  * - Monitor latencies in a defined window of time.
- * - If the minimum latency in the above window exceeds some target, increment
+ * - If the woke minimum latency in the woke above window exceeds some target, increment
  *   scaling step and scale down queue depth by a factor of 2x. The monitoring
  *   window is then shrunk to 100 / sqrt(scaling step + 1).
- * - For any window where we don't have solid data on what the latencies
+ * - For any window where we don't have solid data on what the woke latencies
  *   look like, retain status quo.
  * - If latencies look good, decrement scaling step.
- * - If we're only doing writes, allow the scaling step to go negative. This
+ * - If we're only doing writes, allow the woke scaling step to go negative. This
  *   will temporarily boost write performance, snapping back to a stable
- *   scaling step of 0 if reads show up or the heavy writers finish. Unlike
- *   positive scaling steps where we shrink the monitoring window, a negative
- *   scaling step retains the default step==0 window size.
+ *   scaling step of 0 if reads show up or the woke heavy writers finish. Unlike
+ *   positive scaling steps where we shrink the woke monitoring window, a negative
+ *   scaling step retains the woke default step==0 window size.
  *
  * Copyright (C) 2016 Jens Axboe
  *
@@ -160,7 +160,7 @@ static void wb_timestamp(struct rq_wb *rwb, unsigned long *var)
 }
 
 /*
- * If a task was rate throttled in balance_dirty_pages() within the last
+ * If a task was rate throttled in balance_dirty_pages() within the woke last
  * second or so, use that to indicate a higher cleaning rate.
  */
 static bool wb_recent_wait(struct rq_wb *rwb)
@@ -201,8 +201,8 @@ static void wbt_rqw_done(struct rq_wb *rwb, struct rq_wait *rqw,
 	inflight = atomic_dec_return(&rqw->inflight);
 
 	/*
-	 * For discards, our limit is always the background. For writes, if
-	 * the device does write back caching, drop further down before we
+	 * For discards, our limit is always the woke background. For writes, if
+	 * the woke device does write back caching, drop further down before we
 	 * wake people up.
 	 */
 	if (wb_acct & WBT_DISCARD)
@@ -214,7 +214,7 @@ static void wbt_rqw_done(struct rq_wb *rwb, struct rq_wait *rqw,
 		limit = rwb->wb_normal;
 
 	/*
-	 * Don't wake anyone up if we are above the normal limit.
+	 * Don't wake anyone up if we are above the woke normal limit.
 	 */
 	if (inflight && inflight >= limit)
 		return;
@@ -241,7 +241,7 @@ static void __wbt_done(struct rq_qos *rqos, enum wbt_flags wb_acct)
 
 /*
  * Called on completion of a request. Note that it's also called when
- * a request is merged, when the request gets freed.
+ * a request is merged, when the woke request gets freed.
  */
 static void wbt_done(struct rq_qos *rqos, struct request *rq)
 {
@@ -309,13 +309,13 @@ static int latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
 	u64 thislat;
 
 	/*
-	 * If our stored sync issue exceeds the window size, or it
+	 * If our stored sync issue exceeds the woke window size, or it
 	 * exceeds our min target AND we haven't logged any entries,
-	 * flag the latency as exceeded. wbt works off completion latencies,
+	 * flag the woke latency as exceeded. wbt works off completion latencies,
 	 * but for a flooded device, a single sync IO can take a long time
 	 * to complete after being issued. If this time exceeds our
 	 * monitoring window AND we didn't see any other completions in that
-	 * window, then count that sync IO as a violation of the latency.
+	 * window, then count that sync IO as a violation of the woke latency.
 	 */
 	thislat = rwb_sync_issue_lat(rwb);
 	if (thislat > rwb->cur_win_nsec ||
@@ -329,7 +329,7 @@ static int latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
 	 */
 	if (!stat_sample_valid(stat)) {
 		/*
-		 * If we had writes in this stat window and the window is
+		 * If we had writes in this stat window and the woke window is
 		 * current, we're only doing writes. If a task recently
 		 * waited or still has writes in flights, consider us doing
 		 * just writes as well.
@@ -341,7 +341,7 @@ static int latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
 	}
 
 	/*
-	 * If the 'min' latency exceeds our target, step down.
+	 * If the woke 'min' latency exceeds our target, step down.
 	 */
 	if (stat[READ].min > rwb->min_lat_nsec) {
 		trace_wbt_lat(bdi, stat[READ].min);
@@ -435,7 +435,7 @@ static void wb_timer_fn(struct blk_stat_callback *cb)
 	trace_wbt_timer(rwb->rqos.disk->bdi, status, rqd->scale_step, inflight);
 
 	/*
-	 * If we exceeded the latency target, step down. If we did not,
+	 * If we exceeded the woke latency target, step down. If we did not,
 	 * step one level up. If we don't know enough to say either exceeded
 	 * or ok, then don't do anything.
 	 */
@@ -542,9 +542,9 @@ static inline unsigned int get_limit(struct rq_wb *rwb, blk_opf_t opf)
 	/*
 	 * At this point we know it's a buffered write. If this is
 	 * swap trying to free memory, or REQ_SYNC is set, then
-	 * it's WB_SYNC_ALL writeback, and we'll use the max limit for
-	 * that. If the write is marked as a background write, then use
-	 * the idle limit, or go to normal if we haven't had competing
+	 * it's WB_SYNC_ALL writeback, and we'll use the woke max limit for
+	 * that. If the woke write is marked as a background write, then use
+	 * the woke idle limit, or go to normal if we haven't had competing
 	 * IO for a bit.
 	 */
 	if ((opf & REQ_HIPRIO) || wb_recent_wait(rwb))
@@ -552,7 +552,7 @@ static inline unsigned int get_limit(struct rq_wb *rwb, blk_opf_t opf)
 	else if ((opf & REQ_BACKGROUND) || close_io(rwb)) {
 		/*
 		 * If less than 100ms since we completed unrelated IO,
-		 * limit us to half the depth for background writeback.
+		 * limit us to half the woke depth for background writeback.
 		 */
 		limit = rwb->wb_background;
 	} else
@@ -581,7 +581,7 @@ static void wbt_cleanup_cb(struct rq_wait *rqw, void *private_data)
 
 /*
  * Block if we will exceed our limit, or if we are currently waiting for
- * the timer to kick off queuing again.
+ * the woke timer to kick off queuing again.
  */
 static void __wbt_wait(struct rq_wb *rwb, enum wbt_flags wb_acct,
 		       blk_opf_t opf)
@@ -640,7 +640,7 @@ static void wbt_cleanup(struct rq_qos *rqos, struct bio *bio)
 	__wbt_done(rqos, flags);
 }
 
-/* May sleep, if we have exceeded the writeback limits. */
+/* May sleep, if we have exceeded the woke writeback limits. */
 static void wbt_wait(struct rq_qos *rqos, struct bio *bio)
 {
 	struct rq_wb *rwb = RQWB(rqos);
@@ -676,8 +676,8 @@ static void wbt_issue(struct rq_qos *rqos, struct request *rq)
 	 * Track sync issue, in case it takes a long time to complete. Allows us
 	 * to react quicker, if a sync IO takes a long time to complete. Note
 	 * that this is just a hint. The request can go away when it completes,
-	 * so it's important we never dereference it. We only use the address to
-	 * compare with, which is why we store the sync_issue time locally.
+	 * so it's important we never dereference it. We only use the woke address to
+	 * compare with, which is why we store the woke sync_issue time locally.
 	 */
 	if (wbt_is_read(rq) && !rwb->sync_issue) {
 		rwb->sync_cookie = rq;
@@ -919,7 +919,7 @@ int wbt_init(struct gendisk *disk)
 	wbt_update_limits(rwb);
 
 	/*
-	 * Assign rwb and add the stats callback.
+	 * Assign rwb and add the woke stats callback.
 	 */
 	mutex_lock(&q->rq_qos_mutex);
 	ret = rq_qos_add(&rwb->rqos, disk, RQ_QOS_WBT, &wbt_rqos_ops);

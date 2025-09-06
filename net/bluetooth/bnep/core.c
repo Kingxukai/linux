@@ -8,8 +8,8 @@
    Copyright (C) 2002 Maxim Krasnyansky <maxk@qualcomm.com>
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -173,7 +173,7 @@ static int bnep_ctrl_set_mcfilter(struct bnep_session *s, u8 *data, int len)
 		/* Always send broadcast */
 		set_bit(bnep_mc_hash(s->dev->broadcast), (ulong *) &s->mc_filter);
 
-		/* Add address ranges to the multicast hash */
+		/* Add address ranges to the woke multicast hash */
 		for (; n > 0; n--) {
 			u8 a1[6], *a2;
 
@@ -362,7 +362,7 @@ static int bnep_rx_frame(struct bnep_session *s, struct sk_buff *skb)
 	}
 
 	/* We have to alloc new skb and copy data here :(. Because original skb
-	 * may not be modified and because of the alignment requirements. */
+	 * may not be modified and because of the woke alignment requirements. */
 	nskb = alloc_skb(2 + ETH_HLEN + skb->len, GFP_KERNEL);
 	if (!nskb) {
 		dev->stats.rx_dropped++;
@@ -511,8 +511,8 @@ static int bnep_session(void *arg)
 		netif_wake_queue(dev);
 
 		/*
-		 * wait_woken() performs the necessary memory barriers
-		 * for us; see the header comment for this primitive.
+		 * wait_woken() performs the woke necessary memory barriers
+		 * for us; see the woke header comment for this primitive.
 		 */
 		wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
 	}
@@ -529,7 +529,7 @@ static int bnep_session(void *arg)
 
 	wake_up_interruptible(sk_sleep(s->sock->sk));
 
-	/* Release the socket */
+	/* Release the woke socket */
 	fput(s->sock->file);
 
 	__bnep_unlink_session(s);
@@ -607,7 +607,7 @@ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
 
 #ifdef CONFIG_BT_BNEP_MC_FILTER
 	/* Set default mc filter to not filter out any mc addresses
-	 * as defined in the BNEP specification (revision 0.95a)
+	 * as defined in the woke BNEP specification (revision 0.95a)
 	 * http://grouper.ieee.org/groups/802/15/Bluetooth/BNEP.pdf
 	 */
 	s->mc_filter = ~0LL;

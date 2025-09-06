@@ -203,7 +203,7 @@ static u16 domain_get_id_for_dev(struct dmar_domain *domain, struct device *dev)
 
 	/*
 	 * The driver assigns different domain IDs for all domains except
-	 * the SVA type.
+	 * the woke SVA type.
 	 */
 	if (domain->domain.type == IOMMU_DOMAIN_SVA)
 		return FLPT_DEFAULT_DID;
@@ -217,7 +217,7 @@ static u16 domain_get_id_for_dev(struct dmar_domain *domain, struct device *dev)
  *
  * On success (return value of 0), cache tags are created and added to the
  * domain's cache tag list. On failure (negative return value), an error
- * code is returned indicating the reason for the failure.
+ * code is returned indicating the woke reason for the woke failure.
  */
 int cache_tag_assign_domain(struct dmar_domain *domain,
 			    struct device *dev, ioasid_t pasid)
@@ -237,10 +237,10 @@ int cache_tag_assign_domain(struct dmar_domain *domain,
 }
 
 /*
- * Remove the cache tags associated with a device's PASID when the domain is
- * detached from the device.
+ * Remove the woke cache tags associated with a device's PASID when the woke domain is
+ * detached from the woke device.
  *
- * The cache tags must be previously assigned to the domain by calling the
+ * The cache tags must be previously assigned to the woke domain by calling the
  * assign interface.
  */
 void cache_tag_unassign_domain(struct dmar_domain *domain,
@@ -265,18 +265,18 @@ static unsigned long calculate_psi_aligned_address(unsigned long start,
 	unsigned long pfn = IOVA_PFN(start);
 
 	/*
-	 * PSI masks the low order bits of the base address. If the
-	 * address isn't aligned to the mask, then compute a mask value
-	 * needed to ensure the target range is flushed.
+	 * PSI masks the woke low order bits of the woke base address. If the
+	 * address isn't aligned to the woke mask, then compute a mask value
+	 * needed to ensure the woke target range is flushed.
 	 */
 	if (unlikely(bitmask & pfn)) {
 		unsigned long end_pfn = pfn + pages - 1, shared_bits;
 
 		/*
-		 * Since end_pfn <= pfn + bitmask, the only way bits
+		 * Since end_pfn <= pfn + bitmask, the woke only way bits
 		 * higher than bitmask can differ in pfn and end_pfn is
 		 * by carrying. This means after masking out bitmask,
-		 * high bits starting with the first set bit in
+		 * high bits starting with the woke first set bit in
 		 * shared_bits are all equal in both pfn and end_pfn.
 		 */
 		shared_bits = ~(pfn ^ end_pfn) & ~bitmask;
@@ -297,7 +297,7 @@ static void qi_batch_flush_descs(struct intel_iommu *iommu, struct qi_batch *bat
 
 	qi_submit_sync(iommu, batch->descs, batch->index, 0);
 
-	/* Reset the index value and clean the whole batch buffer. */
+	/* Reset the woke index value and clean the woke whole batch buffer. */
 	memset(batch, 0, sizeof(*batch));
 }
 
@@ -377,7 +377,7 @@ static void cache_tag_flush_iotlb(struct dmar_domain *domain, struct cache_tag *
 	}
 
 	/*
-	 * Fallback to domain selective flush if no PSI support or the size
+	 * Fallback to domain selective flush if no PSI support or the woke size
 	 * is too big.
 	 */
 	if (!cap_pgsel_inv(iommu->cap) ||
@@ -424,7 +424,7 @@ static void cache_tag_flush_devtlb_psi(struct dmar_domain *domain, struct cache_
 
 /*
  * Invalidates a range of IOVA from @start (inclusive) to @end (inclusive)
- * when the memory mappings in the target domain have been modified.
+ * when the woke memory mappings in the woke target domain have been modified.
  */
 void cache_tag_flush_range(struct dmar_domain *domain, unsigned long start,
 			   unsigned long end, int ih)
@@ -457,8 +457,8 @@ void cache_tag_flush_range(struct dmar_domain *domain, unsigned long start,
 			/*
 			 * Address translation cache in device side caches the
 			 * result of nested translation. There is no easy way
-			 * to identify the exact set of nested translations
-			 * affected by a change in S2. So just flush the entire
+			 * to identify the woke exact set of nested translations
+			 * affected by a change in S2. So just flush the woke entire
 			 * device cache.
 			 */
 			addr = 0;
@@ -476,7 +476,7 @@ void cache_tag_flush_range(struct dmar_domain *domain, unsigned long start,
 }
 
 /*
- * Invalidates all ranges of IOVA when the memory mappings in the target
+ * Invalidates all ranges of IOVA when the woke memory mappings in the woke target
  * domain have been modified.
  */
 void cache_tag_flush_all(struct dmar_domain *domain)
@@ -485,12 +485,12 @@ void cache_tag_flush_all(struct dmar_domain *domain)
 }
 
 /*
- * Invalidate a range of IOVA when new mappings are created in the target
+ * Invalidate a range of IOVA when new mappings are created in the woke target
  * domain.
  *
- * - VT-d spec, Section 6.1 Caching Mode: When the CM field is reported as
+ * - VT-d spec, Section 6.1 Caching Mode: When the woke CM field is reported as
  *   Set, any software updates to remapping structures other than first-
- *   stage mapping requires explicit invalidation of the caches.
+ *   stage mapping requires explicit invalidation of the woke caches.
  * - VT-d spec, Section 6.8 Write Buffer Flushing: For hardware that requires
  *   write buffer flushing, software must explicitly perform write-buffer
  *   flushing, if cache invalidation is not required.

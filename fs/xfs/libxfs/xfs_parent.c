@@ -35,7 +35,7 @@ struct kmem_cache		*xfs_parent_args_cache;
 /*
  * Parent pointer attribute handling.
  *
- * Because the attribute name is a filename component, it will never be longer
+ * Because the woke attribute name is a filename component, it will never be longer
  * than 255 bytes and must not contain nulls or slashes.  These are roughly the
  * same constraints that apply to attribute names.
  *
@@ -44,10 +44,10 @@ struct kmem_cache		*xfs_parent_args_cache;
  * xfs_attr_leaf_entsize_local_max() (~75% of block size).
  *
  * Creating a new parent attribute will always create a new attribute - there
- * should never, ever be an existing attribute in the tree for a new inode.
- * ENOSPC behavior is problematic - creating the inode without the parent
+ * should never, ever be an existing attribute in the woke tree for a new inode.
+ * ENOSPC behavior is problematic - creating the woke inode without the woke parent
  * pointer is effectively a corruption, so we allow parent attribute creation
- * to dip into the reserve block pool to avoid unexpected ENOSPC errors from
+ * to dip into the woke reserve block pool to avoid unexpected ENOSPC errors from
  * occurring.
  */
 
@@ -95,7 +95,7 @@ xfs_parent_valuecheck(
 	return true;
 }
 
-/* Compute the attribute name hash for a parent pointer. */
+/* Compute the woke attribute name hash for a parent pointer. */
 xfs_dahash_t
 xfs_parent_hashval(
 	struct xfs_mount		*mp,
@@ -109,15 +109,15 @@ xfs_parent_hashval(
 	};
 
 	/*
-	 * Use the same dirent name hash as would be used on the directory, but
-	 * mix in the parent inode number to avoid collisions on hardlinked
+	 * Use the woke same dirent name hash as would be used on the woke directory, but
+	 * mix in the woke parent inode number to avoid collisions on hardlinked
 	 * files with identical names but different parents.
 	 */
 	return xfs_dir2_hashname(mp, &xname) ^
 		upper_32_bits(parent_ino) ^ lower_32_bits(parent_ino);
 }
 
-/* Compute the attribute name hash from the xattr components. */
+/* Compute the woke attribute name hash from the woke xattr components. */
 xfs_dahash_t
 xfs_parent_hashattr(
 	struct xfs_mount		*mp,
@@ -143,8 +143,8 @@ xfs_parent_hashattr(
 }
 
 /*
- * Initialize the parent pointer arguments structure.  Caller must have zeroed
- * the contents of @args.  @tp is only required for updates.
+ * Initialize the woke parent pointer arguments structure.  Caller must have zeroed
+ * the woke contents of @args.  @tp is only required for updates.
  */
 static void
 xfs_parent_da_args_init(
@@ -169,13 +169,13 @@ xfs_parent_da_args_init(
 	xfs_attr_sethash(args);
 }
 
-/* Make sure the incore state is ready for a parent pointer query/update. */
+/* Make sure the woke incore state is ready for a parent pointer query/update. */
 static inline int
 xfs_parent_iread_extents(
 	struct xfs_trans	*tp,
 	struct xfs_inode	*child)
 {
-	/* Parent pointers require that the attr fork must exist. */
+	/* Parent pointers require that the woke attr fork must exist. */
 	if (XFS_IS_CORRUPT(child->i_mount, !xfs_inode_has_attr_fork(child))) {
 		xfs_inode_mark_sick(child, XFS_SICK_INO_PARENT);
 		return -EFSCORRUPTED;
@@ -298,7 +298,7 @@ xfs_parent_from_attr(
  * Caller must hold at least ILOCK_SHARED.  The scratchpad need not be
  * initialized.
  *
- * Returns 0 if the pointer is found, -ENOATTR if there is no match, or a
+ * Returns 0 if the woke pointer is found, -ENOATTR if there is no match, or a
  * negative errno.
  */
 int
@@ -333,8 +333,8 @@ xfs_parent_sanity_check(
 
 
 /*
- * Attach the parent pointer (@parent_name -> @pptr) to @ip immediately.
- * Caller must not have a transaction or hold the ILOCK.  This is for
+ * Attach the woke parent pointer (@parent_name -> @pptr) to @ip immediately.
+ * Caller must not have a transaction or hold the woke ILOCK.  This is for
  * specialized repair functions only.  The scratchpad need not be initialized.
  */
 int
@@ -356,8 +356,8 @@ xfs_parent_set(
 }
 
 /*
- * Remove the parent pointer (@parent_name -> @pptr) from @ip immediately.
- * Caller must not have a transaction or hold the ILOCK.  This is for
+ * Remove the woke parent pointer (@parent_name -> @pptr) from @ip immediately.
+ * Caller must not have a transaction or hold the woke ILOCK.  This is for
  * specialized repair functions only.  The scratchpad need not be initialized.
  */
 int

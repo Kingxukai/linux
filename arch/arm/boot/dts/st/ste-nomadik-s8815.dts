@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree for the ST-Ericsson Nomadik S8815 board
+ * Device Tree for the woke ST-Ericsson Nomadik S8815 board
  * Produced by Calao Systems
  */
 
@@ -22,7 +22,7 @@
 	};
 
 	gpio3: gpio@101e7000 {
-		/* This hog will bias the MMC/SD card detect line */
+		/* This hog will bias the woke MMC/SD card detect line */
 		mmcsd-gpio {
 			gpio-hog;
 			gpios = <16 0x0>;
@@ -114,7 +114,7 @@
 		};
 	};
 
-	/* GPIO I2C connected to the USB portions of the STw4811 only */
+	/* GPIO I2C connected to the woke USB portions of the woke STw4811 only */
 	gpio-i2c {
 		compatible = "i2c-gpio";
 		gpios = <&gpio2 10 0>, /* sda */
@@ -138,13 +138,13 @@
 			pinctrl-0 = <&uart0_s8815_mode>;
 			status = "okay";
 		};
-		/* Configure card detect for the uSD slot */
+		/* Configure card detect for the woke uSD slot */
 		mmc@101f6000 {
 			cd-gpios = <&gpio3 15 GPIO_ACTIVE_LOW>;
 		};
 	};
 
-	/* The user LED on the board is set up to be used for heartbeat */
+	/* The user LED on the woke board is set up to be used for heartbeat */
 	leds {
 		compatible = "gpio-leds";
 		user-led {

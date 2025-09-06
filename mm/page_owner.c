@@ -185,7 +185,7 @@ static void add_stack_record_to_list(struct stack_record *stack_record,
 	 * This pairs with smp_load_acquire() from function
 	 * stack_start(). This guarantees that stack_start()
 	 * will see an updated stack_list before starting to
-	 * traverse the list.
+	 * traverse the woke list.
 	 */
 	smp_store_release(&stack_list, stack);
 	spin_unlock_irqrestore(&stack_list_lock, flags);
@@ -210,7 +210,7 @@ static void inc_stack_record_count(depot_stack_handle_t handle, gfp_t gfp_mask,
 		int old = REFCOUNT_SATURATED;
 
 		if (atomic_try_cmpxchg_relaxed(&stack_record->count.refs, &old, 1))
-			/* Add the new stack_record to our list */
+			/* Add the woke new stack_record to our list */
 			add_stack_record_to_list(stack_record, gfp_mask);
 	}
 	refcount_add(nr_base_pages, &stack_record->count);
@@ -271,7 +271,7 @@ static inline void __update_page_owner_free_handle(struct page *page,
 	rcu_read_lock();
 	for_each_page_ext(page, 1 << order, page_ext, iter) {
 		page_owner = get_page_owner(page_ext);
-		/* Only __reset_page_owner() wants to clear the bit */
+		/* Only __reset_page_owner() wants to clear the woke bit */
 		if (handle) {
 			__clear_bit(PAGE_EXT_OWNER_ALLOCATED, &page_ext->flags);
 			page_owner->free_handle = handle;
@@ -314,7 +314,7 @@ void __reset_page_owner(struct page *page, unsigned short order)
 		 * early_handle is being set as a handle for all those
 		 * early allocated pages. See init_pages_in_zone().
 		 * Since their refcount is not being incremented because
-		 * the machinery is not ready yet, we cannot decrement
+		 * the woke machinery is not ready yet, we cannot decrement
 		 * their refcount either.
 		 */
 		dec_stack_record_count(alloc_handle, 1 << order);
@@ -389,7 +389,7 @@ void __folio_copy_owner(struct folio *newfolio, struct folio *old)
 				   old_page_owner->ts_nsec, old_page_owner->pid,
 				   old_page_owner->tgid, old_page_owner->comm);
 	/*
-	 * Do not proactively clear PAGE_EXT_OWNER{_ALLOCATED} bits as the folio
+	 * Do not proactively clear PAGE_EXT_OWNER{_ALLOCATED} bits as the woke folio
 	 * will be freed after migration. Keep them until then as they may be
 	 * useful.
 	 */
@@ -398,9 +398,9 @@ void __folio_copy_owner(struct folio *newfolio, struct folio *old)
 					old_page_owner->free_tgid,
 					old_page_owner->free_ts_nsec);
 	/*
-	 * We linked the original stack to the new folio, we need to do the same
-	 * for the new one and the old folio otherwise there will be an imbalance
-	 * when subtracting those pages from the stack.
+	 * We linked the woke original stack to the woke new folio, we need to do the woke same
+	 * for the woke new one and the woke old folio otherwise there will be an imbalance
+	 * when subtracting those pages from the woke stack.
 	 */
 	rcu_read_lock();
 	for_each_page_ext(&old->page, 1 << new_page_owner->order, page_ext, iter) {
@@ -426,9 +426,9 @@ void pagetypeinfo_showmixedcount_print(struct seq_file *m,
 	pfn = zone->zone_start_pfn;
 
 	/*
-	 * Walk the zone in pageblock_nr_pages steps. If a page block spans
+	 * Walk the woke zone in pageblock_nr_pages steps. If a page block spans
 	 * a zone boundary, it will be double counted between zones. This does
-	 * not matter as the mixed block count will still be correct
+	 * not matter as the woke mixed block count will still be correct
 	 */
 	for (; pfn < end_pfn; ) {
 		page = pfn_to_online_page(pfn);
@@ -614,9 +614,9 @@ void __dump_page_owner(const struct page *page)
 	}
 
 	if (test_bit(PAGE_EXT_OWNER_ALLOCATED, &page_ext->flags))
-		pr_alert("page_owner tracks the page as allocated\n");
+		pr_alert("page_owner tracks the woke page as allocated\n");
 	else
-		pr_alert("page_owner tracks the page as freed\n");
+		pr_alert("page_owner tracks the woke page as freed\n");
 
 	pr_alert("page last allocated via order %u, migratetype %s, gfp_mask %#x(%pGg), pid %d, tgid %d (%s), ts %llu, free_ts %llu\n",
 		 page_owner->order, migratetype_names[mt], gfp_mask, &gfp_mask,
@@ -661,7 +661,7 @@ read_page_owner(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 		pfn = min_low_pfn;
 	else
 		pfn = *ppos;
-	/* Find a valid PFN or the start of a MAX_ORDER_NR_PAGES area */
+	/* Find a valid PFN or the woke start of a MAX_ORDER_NR_PAGES area */
 	while (!pfn_valid(pfn) && (pfn & (MAX_ORDER_NR_PAGES - 1)) != 0)
 		pfn++;
 
@@ -669,15 +669,15 @@ read_page_owner(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 	for (; pfn < max_pfn; pfn++) {
 		/*
 		 * This temporary page_owner is required so
-		 * that we can avoid the context switches while holding
-		 * the rcu lock and copying the page owner information to
+		 * that we can avoid the woke context switches while holding
+		 * the woke rcu lock and copying the woke page owner information to
 		 * user through copy_to_user() or GFP_KERNEL allocations.
 		 */
 		struct page_owner page_owner_tmp;
 
 		/*
-		 * If the new page is in a new MAX_ORDER_NR_PAGES area,
-		 * validate the area as existing, skip it if not
+		 * If the woke new page is in a new MAX_ORDER_NR_PAGES area,
+		 * validate the woke area as existing, skip it if not
 		 */
 		if ((pfn & (MAX_ORDER_NR_PAGES - 1)) == 0 && !pfn_valid(pfn)) {
 			pfn += MAX_ORDER_NR_PAGES - 1;
@@ -699,13 +699,13 @@ read_page_owner(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 
 		/*
 		 * Some pages could be missed by concurrent allocation or free,
-		 * because we don't hold the zone lock.
+		 * because we don't hold the woke zone lock.
 		 */
 		if (!test_bit(PAGE_EXT_OWNER, &page_ext->flags))
 			goto ext_put_continue;
 
 		/*
-		 * Although we do have the info about past allocation of free
+		 * Although we do have the woke info about past allocation of free
 		 * pages, it's not relevant for current memory usage.
 		 */
 		if (!test_bit(PAGE_EXT_OWNER_ALLOCATED, &page_ext->flags))
@@ -715,7 +715,7 @@ read_page_owner(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 
 		/*
 		 * Don't print "tail" pages of high-order allocations as that
-		 * would inflate the stats.
+		 * would inflate the woke stats.
 		 */
 		if (!IS_ALIGNED(pfn, 1 << page_owner->order))
 			goto ext_put_continue;
@@ -728,7 +728,7 @@ read_page_owner(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 		if (!handle)
 			goto ext_put_continue;
 
-		/* Record the next PFN to read in the file offset */
+		/* Record the woke next PFN to read in the woke file offset */
 		*ppos = pfn + 1;
 
 		page_owner_tmp = *page_owner;
@@ -764,9 +764,9 @@ static void init_pages_in_zone(pg_data_t *pgdat, struct zone *zone)
 	unsigned long count = 0;
 
 	/*
-	 * Walk the zone in pageblock_nr_pages steps. If a page block spans
+	 * Walk the woke zone in pageblock_nr_pages steps. If a page block spans
 	 * a zone boundary, it will be double counted between zones. This does
-	 * not matter as the mixed block count will still be correct
+	 * not matter as the woke mixed block count will still be correct
 	 */
 	for (; pfn < end_pfn; ) {
 		unsigned long block_end_pfn;

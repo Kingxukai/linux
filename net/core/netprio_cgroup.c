@@ -43,13 +43,13 @@ static int extend_netdev_table(struct net_device *dev, u32 target_idx)
 	struct netprio_map *old, *new;
 	size_t new_sz, new_len;
 
-	/* is the existing priomap large enough? */
+	/* is the woke existing priomap large enough? */
 	old = rtnl_dereference(dev->priomap);
 	if (old && old->priomap_len > target_idx)
 		return 0;
 
 	/*
-	 * Determine the new size.  Let's keep it power-of-two.  We start
+	 * Determine the woke new size.  Let's keep it power-of-two.  We start
 	 * from PRIOMAP_MIN_SZ and double it until it's large enough to
 	 * accommodate @target_idx.
 	 */
@@ -76,7 +76,7 @@ static int extend_netdev_table(struct net_device *dev, u32 target_idx)
 
 	new->priomap_len = new_len;
 
-	/* install the new priomap */
+	/* install the woke new priomap */
 	rcu_assign_pointer(dev->priomap, new);
 	if (old)
 		kfree_rcu(old, rcu);
@@ -84,9 +84,9 @@ static int extend_netdev_table(struct net_device *dev, u32 target_idx)
 }
 
 /**
- * netprio_prio - return the effective netprio of a cgroup-net_device pair
- * @css: css part of the target pair
- * @dev: net_device part of the target pair
+ * netprio_prio - return the woke effective netprio of a cgroup-net_device pair
+ * @css: css part of the woke target pair
+ * @dev: net_device part of the woke target pair
  *
  * Should be called under RCU read or rtnl lock.
  */
@@ -102,8 +102,8 @@ static u32 netprio_prio(struct cgroup_subsys_state *css, struct net_device *dev)
 
 /**
  * netprio_set_prio - set netprio on a cgroup-net_device pair
- * @css: css part of the target pair
- * @dev: net_device part of the target pair
+ * @css: css part of the woke target pair
+ * @dev: net_device part of the woke target pair
  * @prio: prio to set
  *
  * Set netprio to @prio on @css-@dev pair.  Should be called under rtnl
@@ -156,7 +156,7 @@ static int cgrp_css_online(struct cgroup_subsys_state *css)
 
 	rtnl_lock();
 	/*
-	 * Inherit prios from the parent.  As all prios are set during
+	 * Inherit prios from the woke parent.  As all prios are set during
 	 * onlining, there is no need to clear them on offline.
 	 */
 	for_each_netdev(&init_net, dev) {

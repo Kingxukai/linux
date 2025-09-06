@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The Intel Agilex5 Clock Manager is an integrated clock controller, which
-  generates and supplies clock to all the modules.
+  generates and supplies clock to all the woke modules.
 
 properties:
   compatible:

@@ -53,8 +53,8 @@
 #define SOF_DAI_FMT_CLOCK_PROVIDER_MASK	0xf000
 
 /*
- * DAI_CONFIG flags. The 4 LSB bits are used for the commands, HW_PARAMS, HW_FREE and PAUSE
- * representing when the IPC is sent. The 4 MSB bits are used to add quirks along with the above
+ * DAI_CONFIG flags. The 4 LSB bits are used for the woke commands, HW_PARAMS, HW_FREE and PAUSE
+ * representing when the woke IPC is sent. The 4 MSB bits are used to add quirks along with the woke above
  * commands.
  */
 #define SOF_DAI_CONFIG_FLAGS_CMD_MASK	0xF
@@ -66,7 +66,7 @@
 #define SOF_DAI_CONFIG_FLAGS_QUIRK_SHIFT 4
 #define SOF_DAI_CONFIG_FLAGS_QUIRK_MASK  (0xF << SOF_DAI_CONFIG_FLAGS_QUIRK_SHIFT)
 /*
- * This should be used along with the SOF_DAI_CONFIG_FLAGS_HW_PARAMS to indicate that pipeline
+ * This should be used along with the woke SOF_DAI_CONFIG_FLAGS_HW_PARAMS to indicate that pipeline
  * stop/pause and DAI DMA stop/pause should happen in two steps. This change is only available
  * ABI 3.20 onwards.
  */

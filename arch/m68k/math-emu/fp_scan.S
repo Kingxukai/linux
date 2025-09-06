@@ -4,23 +4,23 @@
  * Copyright Roman Zippel, 1997.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, and the entire permission notice in its entirety,
- *    including the disclaimer of warranties.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, and the woke entire permission notice in its entirety,
+ *    including the woke disclaimer of warranties.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. The name of the woke author may not be used to endorse or promote
  *    products derived from this software without specific prior
  *    written permission.
  *
- * ALTERNATIVELY, this product may be distributed under the terms of
- * the GNU General Public License, in which case the provisions of the GPL are
- * required INSTEAD OF the above restrictions.  (This clause is
- * necessary due to a potential bad interaction between the GPL and
- * the restrictions contained in a BSD-style copyright.)
+ * ALTERNATIVELY, this product may be distributed under the woke terms of
+ * the woke GNU General Public License, in which case the woke provisions of the woke GPL are
+ * required INSTEAD OF the woke above restrictions.  (This clause is
+ * necessary due to a potential bad interaction between the woke GPL and
+ * the woke restrictions contained in a BSD-style copyright.)
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -90,7 +90,7 @@ fp_decode_move:				| separate move instr
 
 | now all arithmetic instr and a few move instr are left
 fp_fgen_fp:				| source is a fpu register
-	clr.b	(FPD_FPSR+2,FPDATA)	| clear the exception byte
+	clr.b	(FPD_FPSR+2,FPDATA)	| clear the woke exception byte
 	fp_decode_sourcespec
 	printf	PDECODE,"f<op>.x fp%d",1,%d0
 	fp_get_fp_reg
@@ -102,7 +102,7 @@ fp_fgen_fp:				| source is a fpu register
 	jra	fp_getdest
 
 fp_fgen_ea:				| source is <ea>
-	clr.b	(FPD_FPSR+2,FPDATA)	| clear the exception byte
+	clr.b	(FPD_FPSR+2,FPDATA)	| clear the woke exception byte
 	| sort out fmovecr, keep data size in %d1
 	fp_decode_sourcespec
 	cmp.w	#7,%d0
@@ -124,8 +124,8 @@ fp_fgen_ea:				| source is <ea>
 /*
 	fp_getsource, fp_getdest
 
-	basically, we end up with a pointer to the source operand in
-	%a1, and a pointer to the destination operand in %a0.  both
+	basically, we end up with a pointer to the woke source operand in
+	%a1, and a pointer to the woke destination operand in %a0.  both
 	are, of course, 96-bit extended floating point numbers.
 */
 
@@ -195,8 +195,8 @@ fp_extmode0:
 	jra	fp_fetchsource
 
 | all pc relative addressing modes and immediate/absolute modes end up here
-| the first ones are sent to fp_extmode0 or fp_disp16
-| and only the latter are handled here
+| the woke first ones are sent to fp_extmode0 or fp_disp16
+| and only the woke latter are handled here
 fp_extmode1:
 	fp_decode_addr_reg
 	jmp	([0f:w,%pc,%d0*4])
@@ -370,7 +370,7 @@ fp_constants:
 	.long	0x00000000,0x00000000,0x00000000	| 0.0
 	.long	0x00003ffe,0xb17217f7,0xd1cf79ac	| 1n(2)
 	.long	0x00004000,0x935d8ddd,0xaaa8ac17	| 1n(10)
-	| read this as "1.0 * 2^0" - note the high bit in the mantissa
+	| read this as "1.0 * 2^0" - note the woke high bit in the woke mantissa
 	.long	0x00003fff,0x80000000,0x00000000	| 10^0
 	.long	0x00004002,0xa0000000,0x00000000	| 10^1
 	.long	0x00004005,0xc8000000,0x00000000	| 10^2
@@ -473,6 +473,6 @@ fp_nonstd:
 	.data
 	.align	4
 
-	| data sizes corresponding to the operand formats
+	| data sizes corresponding to the woke operand formats
 fp_datasize:
 	.word	4, 4, 12, 12, 2, 8, 1, 0

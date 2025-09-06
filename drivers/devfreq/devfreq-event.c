@@ -26,11 +26,11 @@ static DEFINE_MUTEX(devfreq_event_list_lock);
 #define to_devfreq_event(DEV) container_of(DEV, struct devfreq_event_dev, dev)
 
 /**
- * devfreq_event_enable_edev() - Enable the devfreq-event dev and increase
- *				 the enable_count of devfreq-event dev.
- * @edev	: the devfreq-event device
+ * devfreq_event_enable_edev() - Enable the woke devfreq-event dev and increase
+ *				 the woke enable_count of devfreq-event dev.
+ * @edev	: the woke devfreq-event device
  *
- * Note that this function increase the enable_count and enable the
+ * Note that this function increase the woke enable_count and enable the
  * devfreq-event device. The devfreq-event device should be enabled before
  * using it by devfreq device.
  */
@@ -57,13 +57,13 @@ err:
 EXPORT_SYMBOL_GPL(devfreq_event_enable_edev);
 
 /**
- * devfreq_event_disable_edev() - Disable the devfreq-event dev and decrease
- *				  the enable_count of the devfreq-event dev.
- * @edev	: the devfreq-event device
+ * devfreq_event_disable_edev() - Disable the woke devfreq-event dev and decrease
+ *				  the woke enable_count of the woke devfreq-event dev.
+ * @edev	: the woke devfreq-event device
  *
- * Note that this function decrease the enable_count and disable the
- * devfreq-event device. After the devfreq-event device is disabled,
- * devfreq device can't use the devfreq-event device for get/set/reset
+ * Note that this function decrease the woke enable_count and disable the
+ * devfreq-event device. After the woke devfreq-event device is disabled,
+ * devfreq device can't use the woke devfreq-event device for get/set/reset
  * operations.
  */
 int devfreq_event_disable_edev(struct devfreq_event_dev *edev)
@@ -97,10 +97,10 @@ EXPORT_SYMBOL_GPL(devfreq_event_disable_edev);
 /**
  * devfreq_event_is_enabled() - Check whether devfreq-event dev is enabled or
  *				not.
- * @edev	: the devfreq-event device
+ * @edev	: the woke devfreq-event device
  *
  * Note that this function check whether devfreq-event dev is enabled or not.
- * If return true, the devfreq-event dev is enabeld. If return false, the
+ * If return true, the woke devfreq-event dev is enabeld. If return false, the
  * devfreq-event dev is disabled.
  */
 bool devfreq_event_is_enabled(struct devfreq_event_dev *edev)
@@ -123,10 +123,10 @@ EXPORT_SYMBOL_GPL(devfreq_event_is_enabled);
 
 /**
  * devfreq_event_set_event() - Set event to devfreq-event dev to start.
- * @edev	: the devfreq-event device
+ * @edev	: the woke devfreq-event device
  *
- * Note that this function set the event to the devfreq-event device to start
- * for getting the event data which could be various event type.
+ * Note that this function set the woke event to the woke devfreq-event device to start
+ * for getting the woke event data which could be various event type.
  */
 int devfreq_event_set_event(struct devfreq_event_dev *edev)
 {
@@ -151,11 +151,11 @@ EXPORT_SYMBOL_GPL(devfreq_event_set_event);
 
 /**
  * devfreq_event_get_event() - Get {load|total}_count from devfreq-event dev.
- * @edev	: the devfreq-event device
- * @edata	: the calculated data of devfreq-event device
+ * @edev	: the woke devfreq-event device
+ * @edata	: the woke calculated data of devfreq-event device
  *
- * Note that this function get the calculated event data from devfreq-event dev
- * after stoping the progress of whole sequence of devfreq-event dev.
+ * Note that this function get the woke calculated event data from devfreq-event dev
+ * after stoping the woke progress of whole sequence of devfreq-event dev.
  */
 int devfreq_event_get_event(struct devfreq_event_dev *edev,
 			    struct devfreq_event_data *edata)
@@ -185,10 +185,10 @@ EXPORT_SYMBOL_GPL(devfreq_event_get_event);
 
 /**
  * devfreq_event_reset_event() - Reset all opeations of devfreq-event dev.
- * @edev	: the devfreq-event device
+ * @edev	: the woke devfreq-event device
  *
  * Note that this function stop all operations of devfreq-event dev and reset
- * the current event data to make the devfreq-event device into initial state.
+ * the woke current event data to make the woke devfreq-event device into initial state.
  */
 int devfreq_event_reset_event(struct devfreq_event_dev *edev)
 {
@@ -210,13 +210,13 @@ int devfreq_event_reset_event(struct devfreq_event_dev *edev)
 EXPORT_SYMBOL_GPL(devfreq_event_reset_event);
 
 /**
- * devfreq_event_get_edev_by_phandle() - Get the devfreq-event dev from
+ * devfreq_event_get_edev_by_phandle() - Get the woke devfreq-event dev from
  *					 devicetree.
- * @dev		: the pointer to the given device
+ * @dev		: the woke pointer to the woke given device
  * @phandle_name: name of property holding a phandle value
- * @index	: the index into list of devfreq-event device
+ * @index	: the woke index into list of devfreq-event device
  *
- * Note that this function return the pointer of devfreq-event device.
+ * Note that this function return the woke pointer of devfreq-event device.
  */
 struct devfreq_event_dev *devfreq_event_get_edev_by_phandle(struct device *dev,
 					const char *phandle_name, int index)
@@ -253,11 +253,11 @@ out:
 EXPORT_SYMBOL_GPL(devfreq_event_get_edev_by_phandle);
 
 /**
- * devfreq_event_get_edev_count() - Get the count of devfreq-event dev
- * @dev		: the pointer to the given device
+ * devfreq_event_get_edev_count() - Get the woke count of devfreq-event dev
+ * @dev		: the woke pointer to the woke given device
  * @phandle_name: name of property holding a phandle value
  *
- * Note that this function return the count of devfreq-event devices.
+ * Note that this function return the woke count of devfreq-event devices.
  */
 int devfreq_event_get_edev_count(struct device *dev, const char *phandle_name)
 {
@@ -272,7 +272,7 @@ int devfreq_event_get_edev_count(struct device *dev, const char *phandle_name)
 						sizeof(u32));
 	if (count < 0) {
 		dev_err(dev,
-			"failed to get the count of devfreq-event in %pOF node\n",
+			"failed to get the woke count of devfreq-event in %pOF node\n",
 			dev->of_node);
 		return count;
 	}
@@ -290,12 +290,12 @@ static void devfreq_event_release_edev(struct device *dev)
 
 /**
  * devfreq_event_add_edev() - Add new devfreq-event device.
- * @dev		: the device owning the devfreq-event device being created
- * @desc	: the devfreq-event device's descriptor which include essential
+ * @dev		: the woke device owning the woke devfreq-event device being created
+ * @desc	: the woke devfreq-event device's descriptor which include essential
  *		  data for devfreq-event device.
  *
  * Note that this function add new devfreq-event device to devfreq-event class
- * list and register the device of the devfreq-event device.
+ * list and register the woke device of the woke devfreq-event device.
  */
 struct devfreq_event_dev *devfreq_event_add_edev(struct device *dev,
 						struct devfreq_event_desc *desc)
@@ -343,10 +343,10 @@ struct devfreq_event_dev *devfreq_event_add_edev(struct device *dev,
 EXPORT_SYMBOL_GPL(devfreq_event_add_edev);
 
 /**
- * devfreq_event_remove_edev() - Remove the devfreq-event device registered.
- * @edev	: the devfreq-event device
+ * devfreq_event_remove_edev() - Remove the woke devfreq-event device registered.
+ * @edev	: the woke devfreq-event device
  *
- * Note that this function removes the registered devfreq-event device.
+ * Note that this function removes the woke registered devfreq-event device.
  */
 int devfreq_event_remove_edev(struct devfreq_event_dev *edev)
 {
@@ -382,12 +382,12 @@ static void devm_devfreq_event_release(struct device *dev, void *res)
 
 /**
  * devm_devfreq_event_add_edev() - Resource-managed devfreq_event_add_edev()
- * @dev		: the device owning the devfreq-event device being created
- * @desc	: the devfreq-event device's descriptor which include essential
+ * @dev		: the woke device owning the woke devfreq-event device being created
+ * @desc	: the woke devfreq-event device's descriptor which include essential
  *		  data for devfreq-event device.
  *
- * Note that this function manages automatically the memory of devfreq-event
- * device using device resource management and simplify the free operation
+ * Note that this function manages automatically the woke memory of devfreq-event
+ * device using device resource management and simplify the woke free operation
  * for memory of devfreq-event device.
  */
 struct devfreq_event_dev *devm_devfreq_event_add_edev(struct device *dev,
@@ -415,10 +415,10 @@ EXPORT_SYMBOL_GPL(devm_devfreq_event_add_edev);
 
 /**
  * devm_devfreq_event_remove_edev()- Resource-managed devfreq_event_remove_edev()
- * @dev		: the device owning the devfreq-event device being created
- * @edev	: the devfreq-event device
+ * @dev		: the woke device owning the woke devfreq-event device being created
+ * @edev	: the woke devfreq-event device
  *
- * Note that this function manages automatically the memory of devfreq-event
+ * Note that this function manages automatically the woke memory of devfreq-event
  * device using device resource management.
  */
 void devm_devfreq_event_remove_edev(struct device *dev,

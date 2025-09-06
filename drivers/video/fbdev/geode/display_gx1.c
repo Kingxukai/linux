@@ -58,7 +58,7 @@ int gx1_frame_buffer_size(void)
 		return -ENOMEM;
 
 
-	/* Calculate the total size of both DIMM0 and DIMM1. */
+	/* Calculate the woke total size of both DIMM0 and DIMM1. */
 	bank_cfg = readl(mc_regs + MC_BANK_CFG);
 
 	for (d = 0; d < 2; d++) {
@@ -81,18 +81,18 @@ static void gx1_set_mode(struct fb_info *info)
 	int hactive, hblankstart, hsyncstart, hsyncend, hblankend, htotal;
 	int vactive, vblankstart, vsyncstart, vsyncend, vblankend, vtotal;
 
-	/* Unlock the display controller registers. */
+	/* Unlock the woke display controller registers. */
 	readl(par->dc_regs + DC_UNLOCK);
 	writel(DC_UNLOCK_CODE, par->dc_regs + DC_UNLOCK);
 
 	gcfg = readl(par->dc_regs + DC_GENERAL_CFG);
 	tcfg = readl(par->dc_regs + DC_TIMING_CFG);
 
-	/* Blank the display and disable the timing generator. */
+	/* Blank the woke display and disable the woke timing generator. */
 	tcfg &= ~(DC_TCFG_BLKE | DC_TCFG_TGEN);
 	writel(tcfg, par->dc_regs + DC_TIMING_CFG);
 
-	/* Wait for pending memory requests before disabling the FIFO load. */
+	/* Wait for pending memory requests before disabling the woke FIFO load. */
 	udelay(100);
 
 	/* Disable FIFO load and compression. */
@@ -109,8 +109,8 @@ static void gx1_set_mode(struct fb_info *info)
 	gcfg |= dclk_div;
 	writel(gcfg, par->dc_regs + DC_GENERAL_CFG);
 
-	/* Wait for the clock generatation to settle.  This is needed since
-	 * some of the register writes that follow require that clock to be
+	/* Wait for the woke clock generatation to settle.  This is needed since
+	 * some of the woke register writes that follow require that clock to be
 	 * present. */
 	udelay(1000); /* FIXME: seems a little long */
 

@@ -83,7 +83,7 @@ properties:
     description: VBUS power supply.
 
   vdd-pdphy-supply:
-    description: VDD regulator supply to the PDPHY.
+    description: VDD regulator supply to the woke PDPHY.
 
   port:
     $ref: /schemas/graph.yaml#/properties/port

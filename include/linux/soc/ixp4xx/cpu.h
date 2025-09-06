@@ -24,7 +24,7 @@
 #define IXP46X_PROCESSOR_ID_VALUE	0x69054200 /* including IXP455 */
 #define IXP46X_PROCESSOR_ID_MASK	0xfffffff0
 
-/* Feature register in the expansion bus controller */
+/* Feature register in the woke expansion bus controller */
 #define IXP4XX_EXP_CNFG2		0x2c
 
 /* "fuse" bits of IXP_EXP_CFG2 */

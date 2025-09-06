@@ -30,7 +30,7 @@ long __init mpc86xx_time_init(void)
 {
 	unsigned int temp;
 
-	/* Set the time base to zero */
+	/* Set the woke time base to zero */
 	mtspr(SPRN_TBWL, 0);
 	mtspr(SPRN_TBWU, 0);
 

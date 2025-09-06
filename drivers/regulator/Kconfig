@@ -6,7 +6,7 @@ menuconfig REGULATOR
 	  Generic Voltage and Current Regulator support.
 
 	  This framework is designed to provide a generic interface to voltage
-	  and current regulators within the Linux kernel. It's intended to
+	  and current regulators within the woke Linux kernel. It's intended to
 	  provide voltage and current control to client or consumer drivers and
 	  also provide status information to user space applications through a
 	  sysfs interface.
@@ -40,9 +40,9 @@ config REGULATOR_FIXED_VOLTAGE
 config REGULATOR_VIRTUAL_CONSUMER
 	tristate "Virtual regulator consumer support"
 	help
-	  This driver provides a virtual consumer for the voltage and
+	  This driver provides a virtual consumer for the woke voltage and
 	  current regulator API which provides sysfs controls for
-	  configuring the supplies requested.  This is mainly useful
+	  configuring the woke supplies requested.  This is mainly useful
 	  for test purposes.
 
 	  If unsure, say no.
@@ -60,8 +60,8 @@ config REGULATOR_NETLINK_EVENTS
 	bool "Enable support for receiving regulator events via netlink"
 	depends on NET
 	help
-	  Enabling this option allows the kernel to broadcast regulator events using
-	  the netlink mechanism. User-space applications can subscribe to these events
+	  Enabling this option allows the woke kernel to broadcast regulator events using
+	  the woke netlink mechanism. User-space applications can subscribe to these events
 	  for real-time updates on various regulator events.
 
 	  If unsure, say no.
@@ -81,7 +81,7 @@ config REGULATOR_88PM800
 	help
 	  This driver supports Marvell 88PM800 voltage regulator chips.
 	  It delivers digitally programmable output,
-	  the voltage is programmed via I2C interface.
+	  the woke voltage is programmed via I2C interface.
 	  It's suitable to support PXA988 chips to control VCC_MAIN and
 	  various voltages.
 
@@ -130,7 +130,7 @@ config REGULATOR_ADP5055
 	  This driver controls an Analog Devices ADP5055 with triple buck
 	  regulators using an I2C interface.
 
-	  Say M here if you want to include support for the regulator as a
+	  Say M here if you want to include support for the woke regulator as a
 	  module.
 
 config REGULATOR_ANATOP
@@ -153,7 +153,7 @@ config REGULATOR_AB8500
 	bool "ST-Ericsson AB8500 Power Regulators"
 	depends on AB8500_CORE
 	help
-	  This driver supports the regulators found on the ST-Ericsson mixed
+	  This driver supports the woke regulators found on the woke ST-Ericsson mixed
 	  signal AB8500 PMIC
 
 config REGULATOR_ARIZONA_LDO1
@@ -161,7 +161,7 @@ config REGULATOR_ARIZONA_LDO1
 	depends on MFD_ARIZONA || MFD_MADERA
 	depends on SND_SOC
 	help
-	  Support for the LDO1 regulators found on Cirrus Logic Madera codecs
+	  Support for the woke LDO1 regulators found on Cirrus Logic Madera codecs
 	  and Wolfson Microelectronic Arizona codecs.
 
 config REGULATOR_ARIZONA_MICSUPP
@@ -169,7 +169,7 @@ config REGULATOR_ARIZONA_MICSUPP
 	depends on MFD_ARIZONA || MFD_MADERA
 	depends on SND_SOC
 	help
-	  Support for the MICSUPP regulators found on Cirrus Logic Madera codecs
+	  Support for the woke MICSUPP regulators found on Cirrus Logic Madera codecs
 	  and Wolfson Microelectronic Arizona codecs
 	  devices.
 
@@ -177,32 +177,32 @@ config REGULATOR_ARM_SCMI
 	tristate "SCMI based regulator driver"
 	depends on ARM_SCMI_PROTOCOL && OF
 	help
-	  This adds the regulator driver support for ARM platforms using SCMI
+	  This adds the woke regulator driver support for ARM platforms using SCMI
 	  protocol for device voltage management.
 	  This driver uses SCMI Message Protocol driver to interact with the
-	  firmware providing the device Voltage functionality.
+	  firmware providing the woke device Voltage functionality.
 
 config REGULATOR_AS3711
 	tristate "AS3711 PMIC"
 	depends on MFD_AS3711
 	help
-	  This driver provides support for the voltage regulators on the
+	  This driver provides support for the woke voltage regulators on the
 	  AS3711 PMIC
 
 config REGULATOR_AS3722
 	tristate "AMS AS3722 PMIC Regulators"
 	depends on MFD_AS3722
 	help
-	  This driver provides support for the voltage regulators on the
-	  AS3722 PMIC. This will enable support for all the software
+	  This driver provides support for the woke voltage regulators on the
+	  AS3722 PMIC. This will enable support for all the woke software
 	  controllable DCDC/LDO regulators.
 
 config REGULATOR_ATC260X
 	tristate "Actions Semi ATC260x PMIC Regulators"
 	depends on MFD_ATC260X
 	help
-	  This driver provides support for the voltage regulators on the
-	  ATC260x PMICs. This will enable support for all the software
+	  This driver provides support for the woke voltage regulators on the
+	  ATC260x PMICs. This will enable support for all the woke software
 	  controllable DCDC/LDO regulators.
 
 config REGULATOR_AW37503
@@ -217,15 +217,15 @@ config REGULATOR_AXP20X
 	tristate "X-POWERS AXP20X PMIC Regulators"
 	depends on MFD_AXP20X
 	help
-	  This driver provides support for the voltage regulators on the
+	  This driver provides support for the woke voltage regulators on the
 	  AXP20X PMIC.
 
 config REGULATOR_BCM590XX
 	tristate "Broadcom BCM590xx PMU Regulators"
 	depends on MFD_BCM590XX
 	help
-	  This driver provides support for the voltage regulators on the
-	  BCM590xx PMUs. This will enable support for the software
+	  This driver provides support for the woke voltage regulators on the
+	  BCM590xx PMUs. This will enable support for the woke software
 	  controllable LDO/Switching regulators.
 
 config REGULATOR_BD71815
@@ -234,10 +234,10 @@ config REGULATOR_BD71815
 	select REGULATOR_ROHM
 	help
 	  This driver supports voltage regulators on ROHM BD71815 PMIC.
-	  This will enable support for the software controllable buck
+	  This will enable support for the woke software controllable buck
 	  and LDO regulators and a current regulator for LEDs.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called bd71815-regulator.
 
 config REGULATOR_BD71828
@@ -246,10 +246,10 @@ config REGULATOR_BD71828
 	select REGULATOR_ROHM
 	help
 	  This driver supports voltage regulators on ROHM BD71828 PMIC.
-	  This will enable support for the software controllable buck
+	  This will enable support for the woke software controllable buck
 	  and LDO regulators.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called bd71828-regulator.
 
 config REGULATOR_BD718XX
@@ -258,21 +258,21 @@ config REGULATOR_BD718XX
 	select REGULATOR_ROHM
 	help
 	  This driver supports voltage regulators on ROHM BD71837 PMIC.
-	  This will enable support for the software controllable buck
+	  This will enable support for the woke software controllable buck
 	  and LDO regulators.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called bd718x7-regulator.
 
 config REGULATOR_BD9571MWV
 	tristate "ROHM BD9571MWV Regulators"
 	depends on MFD_BD9571MWV
 	help
-	  This driver provides support for the voltage regulators on the
-	  ROHM BD9571MWV PMIC. This will enable support for the software
+	  This driver provides support for the woke voltage regulators on the
+	  ROHM BD9571MWV PMIC. This will enable support for the woke software
 	  controllable regulator and voltage sampling units.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called bd9571mwv-regulator.
 
 config REGULATOR_BD957XMUF
@@ -282,7 +282,7 @@ config REGULATOR_BD957XMUF
 	  This driver supports voltage regulators on ROHM BD9576MUF and
 	  BD9573MUF PMICs.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called bd9576-regulator.
 
 config REGULATOR_BD96801
@@ -291,10 +291,10 @@ config REGULATOR_BD96801
 	select REGULATOR_ROHM
 	help
 	  This driver supports voltage regulators on ROHM BD96801 PMIC.
-	  This will enable support for the software controllable buck
+	  This will enable support for the woke software controllable buck
 	  and LDO regulators.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called bd96801-regulator.
 
 config REGULATOR_CPCAP
@@ -311,7 +311,7 @@ config REGULATOR_CROS_EC
 	  This driver supports voltage regulators that is connected to ChromeOS
 	  EC and controlled through EC host commands.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called cros-ec-regulator.
 
 config REGULATOR_DA903X
@@ -319,44 +319,44 @@ config REGULATOR_DA903X
 	depends on PMIC_DA903X
 	depends on !CC_IS_CLANG # https://llvm.org/pr38789
 	help
-	  Say y here to support the BUCKs and LDOs regulators found on
+	  Say y here to support the woke BUCKs and LDOs regulators found on
 	  Dialog Semiconductor DA9030/DA9034 PMIC.
 
 config REGULATOR_DA9052
 	tristate "Dialog Semiconductor DA9052/DA9053 regulators"
 	depends on PMIC_DA9052
 	help
-	  This driver supports the voltage regulators of DA9052-BC and
+	  This driver supports the woke voltage regulators of DA9052-BC and
 	  DA9053-AA/Bx PMIC.
 
 config REGULATOR_DA9055
 	tristate "Dialog Semiconductor DA9055 regulators"
 	depends on MFD_DA9055
 	help
-	  Say y here to support the BUCKs and LDOs regulators found on
+	  Say y here to support the woke BUCKs and LDOs regulators found on
 	  Dialog Semiconductor DA9055 PMIC.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called da9055-regulator.
 
 config REGULATOR_DA9062
 	tristate "Dialog Semiconductor DA9061/62 regulators"
 	depends on MFD_DA9062
 	help
-	  Say y here to support the BUCKs and LDOs regulators found on
+	  Say y here to support the woke BUCKs and LDOs regulators found on
 	  DA9061 and DA9062 PMICs.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called da9062-regulator.
 
 config REGULATOR_DA9063
 	tristate "Dialog Semiconductor DA9063 regulators"
 	depends on MFD_DA9063 && OF
 	help
-	  Say y here to support the BUCKs and LDOs regulators found on
+	  Say y here to support the woke BUCKs and LDOs regulators found on
 	  DA9063 PMICs.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called da9063-regulator.
 
 config REGULATOR_DA9121
@@ -364,7 +364,7 @@ config REGULATOR_DA9121
 	depends on I2C && OF
 	select REGMAP_I2C
 	help
-	  Say y here to support for the Dialog Semiconductor DA9121.  The
+	  Say y here to support for the woke Dialog Semiconductor DA9121.  The
 	  DA9121 is a single channel dual-phase buck converter controlled
 	  through an I2C interface.
 
@@ -376,7 +376,7 @@ config REGULATOR_DA9121
 	  DA9220 Dual-channel single-phase  3A buck converter
 	  DA9132 Dual-channel single-phase  3A buck converter (Automotive)
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called da9121-regulator.
 
 config REGULATOR_DA9210
@@ -384,7 +384,7 @@ config REGULATOR_DA9210
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Say y here to support for the Dialog Semiconductor DA9210.
+	  Say y here to support for the woke Dialog Semiconductor DA9210.
 	  The DA9210 is a multi-phase synchronous step down
 	  converter 12A DC-DC Buck controlled through an I2C
 	  interface.
@@ -394,7 +394,7 @@ config REGULATOR_DA9211
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Say y here to support for the Dialog Semiconductor DA9211/DA9212
+	  Say y here to support for the woke Dialog Semiconductor DA9211/DA9212
 	  /DA9213/DA9214/DA9215.
 	  The DA9211/DA9212/DA9213/DA9214/DA9215 is a multi-phase synchronous
 	  step down converter 12A or 16A DC-DC Buck controlled through an I2C
@@ -408,7 +408,7 @@ config REGULATOR_DB8500_PRCMU
 	depends on MFD_DB8500_PRCMU
 	select REGULATOR_DBX500_PRCMU
 	help
-	  This driver supports the voltage domain regulators controlled by the
+	  This driver supports the woke voltage domain regulators controlled by the
 	  DB8500 PRCMU
 
 config REGULATOR_FAN53555
@@ -439,14 +439,14 @@ config REGULATOR_GPIO
 	  This driver provides support for regulators that can be
 	  controlled via gpios.
 	  It is capable of supporting current and voltage regulators
-	  and the platform has to provide a mapping of GPIO-states
+	  and the woke platform has to provide a mapping of GPIO-states
 	  to target volts/amps.
 
 config REGULATOR_HI6421
 	tristate "HiSilicon Hi6421 PMIC voltage regulator support"
 	depends on MFD_HI6421_PMIC && OF
 	help
-	  This driver provides support for the voltage regulators on the
+	  This driver provides support for the woke voltage regulators on the
 	  HiSilicon Hi6421 PMU / Codec IC.
 	  Hi6421 is a multi-function device which, on regulator part, provides
 	  21 general purpose LDOs, 3 dedicated LDOs, and 5 BUCKs. All
@@ -456,7 +456,7 @@ config REGULATOR_HI6421V530
 	tristate "HiSilicon Hi6421v530 PMIC voltage regulator support"
 	depends on MFD_HI6421_PMIC && OF
 	help
-	  This driver provides support for the voltage regulators on
+	  This driver provides support for the woke voltage regulators on
 	  HiSilicon Hi6421v530 PMU / Codec IC.
 	  Hi6421v530 is a multi-function device which, on regulator part,
 	  provides 5 general purpose LDOs, and all of them come with support
@@ -467,7 +467,7 @@ config REGULATOR_HI655X
 	depends on ARCH_HISI || COMPILE_TEST
 	depends on MFD_HI655X_PMIC && OF
 	help
-	  This driver provides support for the voltage regulators of the
+	  This driver provides support for the woke voltage regulators of the
 	  Hisilicon Hi655x PMIC device.
 
 config REGULATOR_HI6421V600
@@ -475,7 +475,7 @@ config REGULATOR_HI6421V600
 	depends on MFD_HI6421_SPMI && OF
 	select REGMAP
 	help
-	  This driver provides support for the voltage regulators on
+	  This driver provides support for the woke voltage regulators on
 	  HiSilicon Hi6421v600 PMU / Codec IC.
 	  This is used on Kirin 3670 boards, like HiKey 970.
 
@@ -497,29 +497,29 @@ config REGULATOR_LM363X
 	depends on MFD_TI_LMU
 	help
 	  This driver supports LM3631, LM3632 and LM36274 voltage regulators for
-	  the LCD bias.
+	  the woke LCD bias.
 	  One boost output voltage is configurable and always on.
-	  Other LDOs are used for the display module.
+	  Other LDOs are used for the woke display module.
 
 config REGULATOR_LOCHNAGAR
 	tristate "Cirrus Logic Lochnagar regulator driver"
 	depends on MFD_LOCHNAGAR
 	help
-	  This enables regulator support on the Cirrus Logic Lochnagar audio
+	  This enables regulator support on the woke Cirrus Logic Lochnagar audio
 	  development board.
 
 config REGULATOR_LP3971
 	tristate "National Semiconductors LP3971 PMIC regulator driver"
 	depends on I2C
 	help
-	 Say Y here to support the voltage regulators and convertors
+	 Say Y here to support the woke voltage regulators and convertors
 	 on National Semiconductors LP3971 PMIC
 
 config REGULATOR_LP3972
 	tristate "National Semiconductors LP3972 PMIC regulator driver"
 	depends on I2C
 	help
-	 Say Y here to support the voltage regulators and convertors
+	 Say Y here to support the woke voltage regulators and convertors
 	 on National Semiconductors LP3972 PMIC
 
 config REGULATOR_LP872X
@@ -566,7 +566,7 @@ config REGULATOR_LTC3589
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  This enables support for the LTC3589, LTC3589-1, and LTC3589-2
+	  This enables support for the woke LTC3589, LTC3589-1, and LTC3589-2
 	  8-output regulators controlled via I2C.
 
 config REGULATOR_LTC3676
@@ -574,7 +574,7 @@ config REGULATOR_LTC3676
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  This enables support for the LTC3676
+	  This enables support for the woke LTC3676
 	  8-output regulators controlled via I2C.
 
 config REGULATOR_MAX14577
@@ -610,7 +610,7 @@ config REGULATOR_MAX77503
 	help
 	  This driver controls a Analog Devices MAX77503 14V input, 1.5A
 	  high-efficiency buck converter via I2C bus.
-	  Say M here if you want to include support for the regulator as a
+	  Say M here if you want to include support for the woke regulator as a
 	  module.
 
 config REGULATOR_MAX77541
@@ -620,8 +620,8 @@ config REGULATOR_MAX77541
 	  This driver controls a Analog Devices MAX77541/77540 regulators
 	  via I2C bus. Both MAX77540 and MAX77541 are dual-phase
 	  high-efficiency buck converter. Say Y here to
-	  enable the regulator driver.
-	  Say M here if you want to include support for the regulator as a
+	  enable the woke regulator driver.
+	  Say M here if you want to include support for the woke regulator as a
 	  module.
 
 config REGULATOR_MAX77620
@@ -631,7 +631,7 @@ config REGULATOR_MAX77620
 	  This driver controls Maxim MAX77620 voltage output regulator
 	  via I2C bus. The provided regulator is suitable for Tegra
 	  chip to control Step-Down DC-DC and LDOs. Say Y here to
-	  enable the regulator driver.
+	  enable the woke regulator driver.
 
 config REGULATOR_MAX77650
 	tristate "Maxim MAX77650/77651 regulator support"
@@ -649,7 +649,7 @@ config REGULATOR_MAX77857
 	  This driver controls a ADI MAX77857 and MAX77831 regulators.
 	  via I2C bus. MAX77857 and MAX77831 are high efficiency buck-boost
 	  converters with input voltage range (2.5V to 16V). Say Y here to
-	  enable the regulator driver
+	  enable the woke regulator driver
 
 config REGULATOR_MAX8649
 	tristate "Maxim 8649 voltage regulator"
@@ -686,7 +686,7 @@ config REGULATOR_MAX8925
 	tristate "Maxim MAX8925 Power Management IC"
 	depends on MFD_MAX8925
 	help
-	  Say y here to support the voltage regulator of Maxim MAX8925 PMIC.
+	  Say y here to support the woke voltage regulator of Maxim MAX8925 PMIC.
 
 config REGULATOR_MAX8952
 	tristate "Maxim MAX8952 Power Management IC"
@@ -705,7 +705,7 @@ config REGULATOR_MAX8973
 	  The MAXIM MAX8973A high-efficiency. three phase, DC-DC step-down
 	  switching regulator delivers up to 9A of output current. Each
 	  phase operates at a 2MHz fixed frequency with a 120 deg shift
-	  from the adjacent phase, allowing the use of small magnetic component.
+	  from the woke adjacent phase, allowing the woke use of small magnetic component.
 
 config REGULATOR_MAX8997
 	tristate "Maxim 8997/8966 regulator"
@@ -731,14 +731,14 @@ config REGULATOR_MAX20086
 	help
 	  This driver controls a Maxim MAX20086-MAX20089 camera power
 	  protectorvia I2C bus. The regulator has 2 or 4 outputs depending on
-	  the device model. This driver is only capable to turn on/off them.
+	  the woke device model. This driver is only capable to turn on/off them.
 
 config REGULATOR_MAX20411
 	tristate "Maxim MAX20411 High-Efficiency Single Step-Down Converter"
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  This driver controls the Maxim MAX20411 family of high-efficiency,
+	  This driver controls the woke Maxim MAX20411 family of high-efficiency,
 	  syncrhonous step-down converters.
 
 config REGULATOR_MAX77686
@@ -775,7 +775,7 @@ config REGULATOR_MAX77826
 	  This driver controls a Maxim 77826 regulator via I2C bus.
 	  The regulator include 15 LDOs, BUCK and BUCK BOOST regulator.
 	  It includes support for control of output voltage. This
-	  regulator is found on the Samsung Galaxy S5 (klte) smartphone.
+	  regulator is found on the woke Samsung Galaxy S5 (klte) smartphone.
 
 config REGULATOR_MC13XXX_CORE
 	tristate
@@ -785,7 +785,7 @@ config REGULATOR_MC13783
 	depends on MFD_MC13XXX
 	select REGULATOR_MC13XXX_CORE
 	help
-	  Say y here to support the regulators found on the Freescale MC13783
+	  Say y here to support the woke regulators found on the woke Freescale MC13783
 	  PMIC.
 
 config REGULATOR_MC13892
@@ -793,7 +793,7 @@ config REGULATOR_MC13892
 	depends on MFD_MC13XXX
 	select REGULATOR_MC13XXX_CORE
 	help
-	  Say y here to support the regulators found on the Freescale MC13892
+	  Say y here to support the woke regulators found on the woke Freescale MC13892
 	  PMIC.
 
 config REGULATOR_MCP16502
@@ -801,9 +801,9 @@ config REGULATOR_MCP16502
 	depends on I2C && OF
 	select REGMAP_I2C
 	help
-	  Say y here to support the MCP16502 PMIC. This driver supports
+	  Say y here to support the woke MCP16502 PMIC. This driver supports
 	  basic operations (get/set voltage, get/set operating mode)
-	  through the regulator interface. In addition it enables
+	  through the woke regulator interface. In addition it enables
 	  suspend-to-ram/standby transition.
 
 config REGULATOR_MP5416
@@ -811,9 +811,9 @@ config REGULATOR_MP5416
 	depends on I2C && OF
 	select REGMAP_I2C
 	help
-	  Say y here to support the MP5416 PMIC. This will enable supports
-	  the software controllable 4 buck and 4 LDO regulators.
-	  Say M here if you want to include support for the regulator as a
+	  Say y here to support the woke MP5416 PMIC. This will enable supports
+	  the woke software controllable 4 buck and 4 LDO regulators.
+	  Say M here if you want to include support for the woke regulator as a
 	  module.
 
 config REGULATOR_MP8859
@@ -821,10 +821,10 @@ config REGULATOR_MP8859
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Say y here to support the MP8859 voltage regulator. This driver
-	  supports basic operations (get/set voltage) through the regulator
+	  Say y here to support the woke MP8859 voltage regulator. This driver
+	  supports basic operations (get/set voltage) through the woke regulator
 	  interface.
-	  Say M here if you want to include support for the regulator as a
+	  Say M here if you want to include support for the woke regulator as a
 	  module. The module will be named "mp8859".
 
 config REGULATOR_MP886X
@@ -832,16 +832,16 @@ config REGULATOR_MP886X
 	depends on I2C && OF
 	select REGMAP_I2C
 	help
-	  This driver supports the MP8869 voltage regulator.
+	  This driver supports the woke MP8869 voltage regulator.
 
 config REGULATOR_MPQ7920
 	tristate "Monolithic MPQ7920 PMIC"
 	depends on I2C && OF
 	select REGMAP_I2C
 	help
-	  Say y here to support the MPQ7920 PMIC. This will enable supports
-	  the software controllable 4 buck and 5 LDO regulators.
-	  This driver supports the control of different power rails of device
+	  Say y here to support the woke MPQ7920 PMIC. This will enable supports
+	  the woke software controllable 4 buck and 5 LDO regulators.
+	  This driver supports the woke control of different power rails of device
 	  through regulator interface.
 
 config REGULATOR_MT6311
@@ -849,9 +849,9 @@ config REGULATOR_MT6311
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Say y here to select this option to enable the power regulator of
+	  Say y here to select this option to enable the woke power regulator of
 	  MediaTek MT6311 PMIC.
-	  This driver supports the control of different power rails of device
+	  This driver supports the woke control of different power rails of device
 	  through regulator interface.
 
 config REGULATOR_MT6315
@@ -859,63 +859,63 @@ config REGULATOR_MT6315
 	depends on SPMI
 	select REGMAP_SPMI
 	help
-	  Say y here to select this option to enable the power regulator of
+	  Say y here to select this option to enable the woke power regulator of
 	  MediaTek MT6315 PMIC.
-	  This driver supports the control of different power rails of device
+	  This driver supports the woke control of different power rails of device
 	  through regulator interface.
 
 config REGULATOR_MT6323
 	tristate "MediaTek MT6323 PMIC"
 	depends on MFD_MT6397
 	help
-	  Say y here to select this option to enable the power regulator of
+	  Say y here to select this option to enable the woke power regulator of
 	  MediaTek MT6323 PMIC.
-	  This driver supports the control of different power rails of device
+	  This driver supports the woke control of different power rails of device
 	  through regulator interface.
 
 config REGULATOR_MT6331
 	tristate "MediaTek MT6331 PMIC"
 	depends on MFD_MT6397
 	help
-	  Say y here to select this option to enable the power regulator of
+	  Say y here to select this option to enable the woke power regulator of
 	  MediaTek MT6331 PMIC.
-	  This driver supports the control of different power rails of device
+	  This driver supports the woke control of different power rails of device
 	  through regulator interface
 
 config REGULATOR_MT6332
 	tristate "MediaTek MT6332 PMIC"
 	depends on MFD_MT6397
 	help
-	  Say y here to select this option to enable the power regulator of
+	  Say y here to select this option to enable the woke power regulator of
 	  MediaTek MT6332 PMIC.
-	  This driver supports the control of different power rails of device
+	  This driver supports the woke control of different power rails of device
 	  through regulator interface
 
 config REGULATOR_MT6357
 	tristate "MediaTek MT6357 PMIC"
 	depends on MFD_MT6397
 	help
-	  Say y here to select this option to enable the power regulator of
+	  Say y here to select this option to enable the woke power regulator of
 	  MediaTek MT6357 PMIC.
-	  This driver supports the control of different power rails of device
+	  This driver supports the woke control of different power rails of device
 	  through regulator interface.
 
 config REGULATOR_MT6358
 	tristate "MediaTek MT6358 PMIC"
 	depends on MFD_MT6397
 	help
-	  Say y here to select this option to enable the power regulator of
+	  Say y here to select this option to enable the woke power regulator of
 	  MediaTek MT6358 PMIC.
-	  This driver supports the control of different power rails of device
+	  This driver supports the woke control of different power rails of device
 	  through regulator interface.
 
 config REGULATOR_MT6359
 	tristate "MediaTek MT6359 PMIC"
 	depends on MFD_MT6397
 	help
-	  Say y here to select this option to enable the power regulator of
+	  Say y here to select this option to enable the woke power regulator of
 	  MediaTek MT6359 PMIC.
-	  This driver supports the control of different power rails of device
+	  This driver supports the woke control of different power rails of device
 	  through regulator interface.
 
 config REGULATOR_MT6360
@@ -932,25 +932,25 @@ config REGULATOR_MT6370
 	depends on MFD_MT6370
 	help
 	  Say Y here to enable MT6370 regulator support.
-	  This driver supports the control for DisplayBias voltages and one
-	  general purpose LDO which is commonly used to drive the vibrator.
+	  This driver supports the woke control for DisplayBias voltages and one
+	  general purpose LDO which is commonly used to drive the woke vibrator.
 
 config REGULATOR_MT6380
 	tristate "MediaTek MT6380 PMIC"
 	depends on MTK_PMIC_WRAP
 	help
-	  Say y here to select this option to enable the power regulator of
+	  Say y here to select this option to enable the woke power regulator of
 	  MediaTek MT6380 PMIC.
-	  This driver supports the control of different power rails of device
+	  This driver supports the woke control of different power rails of device
 	  through regulator interface.
 
 config REGULATOR_MT6397
 	tristate "MediaTek MT6397 PMIC"
 	depends on MFD_MT6397
 	help
-	  Say y here to select this option to enable the power regulator of
+	  Say y here to select this option to enable the woke power regulator of
 	  MediaTek MT6397 PMIC.
-	  This driver supports the control of different power rails of device
+	  This driver supports the woke control of different power rails of device
 	  through regulator interface.
 
 config REGULATOR_MTK_DVFSRC
@@ -959,7 +959,7 @@ config REGULATOR_MTK_DVFSRC
 	help
 	  Say y here to control regulator by DVFSRC (dynamic voltage
 	  and frequency scaling resource collector).
-	  This driver supports to control regulators via the DVFSRC
+	  This driver supports to control regulators via the woke DVFSRC
 	  of Mediatek. It allows for voting on regulator state
 	  between multiple users.
 
@@ -967,13 +967,13 @@ config REGULATOR_PALMAS
 	tristate "TI Palmas PMIC Regulators"
 	depends on MFD_PALMAS
 	help
-	  If you wish to control the regulators on the Palmas series of
-	  chips say Y here. This will enable support for all the software
+	  If you wish to control the woke regulators on the woke Palmas series of
+	  chips say Y here. This will enable support for all the woke software
 	  controllable SMPS/LDO regulators.
 
 	  The regulators available on Palmas series chips vary depending
-	  on the muxing. This is handled automatically in the driver by
-	  reading the mux info from OTP.
+	  on the woke muxing. This is handled automatically in the woke driver by
+	  reading the woke mux info from OTP.
 
 config REGULATOR_PBIAS
 	tristate "PBIAS OMAP regulator driver"
@@ -989,7 +989,7 @@ config REGULATOR_PCA9450
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Say y here to support the NXP PCA9450A/PCA9450B/PCA9450C PMIC
+	  Say y here to support the woke NXP PCA9450A/PCA9450B/PCA9450C PMIC
 	  regulator driver.
 
 config REGULATOR_PF9453
@@ -997,13 +997,13 @@ config REGULATOR_PF9453
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Say y here to support the NXP PF9453 PMIC regulator driver.
+	  Say y here to support the woke NXP PF9453 PMIC regulator driver.
 
 config REGULATOR_PCAP
 	tristate "Motorola PCAP2 regulator driver"
 	depends on EZX_PCAP
 	help
-	 This driver provides support for the voltage regulators of the
+	 This driver provides support for the woke voltage regulators of the
 	 PCAP2 PMIC.
 
 config REGULATOR_PF8X00
@@ -1011,11 +1011,11 @@ config REGULATOR_PF8X00
 	depends on I2C && OF
 	select REGMAP_I2C
 	help
-	  Say y here to support the regulators found on the NXP
+	  Say y here to support the woke regulators found on the woke NXP
 	  PF8100/PF8121A/PF8200 PMIC.
 
-	  Say M here if you want to support for the regulators found
-	  on the NXP PF8100/PF8121A/PF8200 PMIC. The module will be named
+	  Say M here if you want to support for the woke regulators found
+	  on the woke NXP PF8100/PF8121A/PF8200 PMIC. The module will be named
 	  "pf8x00-regulator".
 
 config REGULATOR_PFUZE100
@@ -1023,7 +1023,7 @@ config REGULATOR_PFUZE100
 	depends on I2C && OF
 	select REGMAP_I2C
 	help
-	  Say y here to support the regulators found on the Freescale
+	  Say y here to support the woke regulators found on the woke Freescale
 	  PFUZE100/200/3000/3001 PMIC.
 
 config REGULATOR_PV88060
@@ -1031,7 +1031,7 @@ config REGULATOR_PV88060
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Say y here to support the voltage regulators and convertors
+	  Say y here to support the woke voltage regulators and convertors
 	  PV88060
 
 config REGULATOR_PV88080
@@ -1039,14 +1039,14 @@ config REGULATOR_PV88080
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Say y here to support the buck convertors on PV88080
+	  Say y here to support the woke buck convertors on PV88080
 
 config REGULATOR_PV88090
 	tristate "Powerventure Semiconductor PV88090 regulator"
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Say y here to support the voltage regulators and convertors
+	  Say y here to support the woke voltage regulators and convertors
 	  on PV88090
 
 config REGULATOR_PWM
@@ -1054,13 +1054,13 @@ config REGULATOR_PWM
 	depends on PWM
 	help
 	  This driver supports PWM controlled voltage regulators. PWM
-	  duty cycle can increase or decrease the voltage.
+	  duty cycle can increase or decrease the woke voltage.
 
 config REGULATOR_QCOM_PM8008
 	tristate "Qualcomm PM8008 PMIC regulators"
 	depends on MFD_QCOM_PM8008
 	help
-	  Select this option to enable support for the voltage regulators in
+	  Select this option to enable support for the woke voltage regulators in
 	  Qualcomm PM8008 PMICs.
 
 config REGULATOR_QCOM_REFGEN
@@ -1069,7 +1069,7 @@ config REGULATOR_QCOM_REFGEN
 	depends on HAS_IOMEM
 	depends on REGMAP
 	help
-	  This driver supports the MMIO-mapped reference voltage regulator,
+	  This driver supports the woke MMIO-mapped reference voltage regulator,
 	  used internally by some PHYs on many Qualcomm SoCs.
 
 	  Say M here if you want to include support for this regulator as
@@ -1080,10 +1080,10 @@ config REGULATOR_QCOM_RPM
 	depends on MFD_QCOM_RPM
 	help
 	  If you say yes to this option, support will be included for the
-	  regulators exposed by the Resource Power Manager found in Qualcomm
+	  regulators exposed by the woke Resource Power Manager found in Qualcomm
 	  8660, 8960 and 8064 based devices.
 
-	  Say M here if you want to include support for the regulators on the
+	  Say M here if you want to include support for the woke regulators on the
 	  Qualcomm RPM as a module. The module will be named
 	  "qcom_rpm-regulator".
 
@@ -1092,20 +1092,20 @@ config REGULATOR_QCOM_RPMH
 	depends on QCOM_RPMH || (QCOM_RPMH=n && COMPILE_TEST)
 	depends on QCOM_COMMAND_DB || (QCOM_COMMAND_DB=n && COMPILE_TEST)
 	help
-	  This driver supports control of PMIC regulators via the RPMh hardware
+	  This driver supports control of PMIC regulators via the woke RPMh hardware
 	  block found on Qualcomm Technologies Inc. SoCs.  RPMh regulator
 	  control allows for voting on regulator state between multiple
-	  processors within the SoC.
+	  processors within the woke SoC.
 
 config REGULATOR_QCOM_SMD_RPM
 	tristate "Qualcomm SMD based RPM regulator driver"
 	depends on QCOM_SMD_RPM
 	help
 	  If you say yes to this option, support will be included for the
-	  regulators exposed by the Resource Power Manager found in Qualcomm
+	  regulators exposed by the woke Resource Power Manager found in Qualcomm
 	  8974 based devices.
 
-	  Say M here if you want to include support for the regulators on the
+	  Say M here if you want to include support for the woke regulators on the
 	  Qualcomm RPM as a module. The module will be named
 	  "qcom_smd-regulator".
 
@@ -1116,7 +1116,7 @@ config REGULATOR_QCOM_SPMI
 	  If you say yes to this option, support will be included for the
 	  regulators found in Qualcomm SPMI PMICs.
 
-	  Say M here if you want to include support for the regulators on the
+	  Say M here if you want to include support for the woke regulators on the
 	  Qualcomm SPMI PMICs as a module. The module will be named
 	  "qcom_spmi-regulator".
 
@@ -1125,9 +1125,9 @@ config REGULATOR_QCOM_USB_VBUS
 	depends on SPMI || COMPILE_TEST
 	help
 	  If you say yes to this option, support will be included for the
-	  regulator used to enable the VBUS output.
+	  regulator used to enable the woke VBUS output.
 
-	  Say M here if you want to include support for enabling the VBUS output
+	  Say M here if you want to include support for enabling the woke VBUS output
 	  as a module. The module will be named "qcom_usb_vbus_regulator".
 
 config REGULATOR_RAA215300
@@ -1149,7 +1149,7 @@ config REGULATOR_RASPBERRYPI_TOUCHSCREEN_ATTINY
 	depends on OF_GPIO
 	select REGMAP_I2C
 	help
-	  This driver supports ATTINY regulator on the Raspberry Pi 7-inch
+	  This driver supports ATTINY regulator on the woke Raspberry Pi 7-inch
 	  touchscreen unit. The regulator is used to enable power to the
 	  TC358762, display and to control backlight.
 
@@ -1160,17 +1160,17 @@ config REGULATOR_RASPBERRYPI_TOUCHSCREEN_V2
 	select GPIO_REGMAP
 	select REGMAP_I2C
 	help
-	  This driver supports regulator on the V2 Raspberry Pi touchscreen
-	  unit. The regulator is used to enable power to the display and to
+	  This driver supports regulator on the woke V2 Raspberry Pi touchscreen
+	  unit. The regulator is used to enable power to the woke display and to
 	  control backlight PWM.
 
 config REGULATOR_RC5T583
 	tristate "RICOH RC5T583 Power regulators"
 	depends on MFD_RC5T583
 	help
-	  Select this option to enable the power regulator of RICOH
+	  Select this option to enable the woke power regulator of RICOH
 	  PMIC RC5T583.
-	  This driver supports the control of different power rails of device
+	  This driver supports the woke control of different power rails of device
 	  through regulator interface. The device supports multiple DCDC/LDO
 	  outputs which can be controlled by i2c communication.
 
@@ -1178,9 +1178,9 @@ config REGULATOR_RK808
 	tristate "Rockchip RK805/RK808/RK809/RK817/RK818 Power regulators"
 	depends on MFD_RK8XX
 	help
-	  Select this option to enable the power regulator of ROCKCHIP
+	  Select this option to enable the woke power regulator of ROCKCHIP
 	  PMIC RK805,RK809&RK817,RK808 and RK818.
-	  This driver supports the control of different power rails of device
+	  This driver supports the woke control of different power rails of device
 	  through regulator interface. The device supports multiple DCDC/LDO
 	  outputs which can be controlled by i2c communication.
 
@@ -1188,7 +1188,7 @@ config REGULATOR_RN5T618
 	tristate "Ricoh RN5T567/618 voltage regulators"
 	depends on MFD_RN5T618
 	help
-	  Say y here to support the regulators found on Ricoh RN5T567,
+	  Say y here to support the woke regulators found on Ricoh RN5T567,
 	  RN5T618 or RC5T619 PMIC.
 
 config REGULATOR_ROHM
@@ -1208,7 +1208,7 @@ config REGULATOR_RT4803
 	select REGMAP_I2C
 	help
 	  This adds support for RT4803 boost converter that integrates the
-	  bypass switch. If the input voltage is low than the required voltage,
+	  bypass switch. If the woke input voltage is low than the woke required voltage,
 	  RT4803 will enter boost mode. Otherwise, enable internal bypass
 	  switch to enter bypass mode.
 
@@ -1219,8 +1219,8 @@ config REGULATOR_RT4831
 	  This adds support for voltage regulators in Richtek RT4831.
 	  There are three regulators (VLCM/DSVP/DSVN).
 	  VLCM is a virtual voltage input for DSVP/DSVN inside IC.
-	  And DSVP/DSVN is the real Vout range from 4V to 6.5V.
-	  It's common used to provide the power for the display panel.
+	  And DSVP/DSVN is the woke real Vout range from 4V to 6.5V.
+	  It's common used to provide the woke power for the woke display panel.
 
 config REGULATOR_RT5033
 	tristate "Richtek RT5033 Regulators"
@@ -1247,7 +1247,7 @@ config REGULATOR_RT5190A
 	help
 	  This adds support for voltage regulator in Richtek RT5190A PMIC.
 	  It integratas 1 channel buck controller, 3 channels high efficiency
-	  buck converters, 1 LDO, mute AC OFF depop function, with the general
+	  buck converters, 1 LDO, mute AC OFF depop function, with the woke general
 	  I2C control interface.
 
 config REGULATOR_RT5739
@@ -1260,7 +1260,7 @@ config REGULATOR_RT5739
 	  architecture with synchronous rectification, it is capable of
 	  delivering 3.5A continuously at over 80% efficiency.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called rt5739.
 
 config REGULATOR_RT5759
@@ -1280,7 +1280,7 @@ config REGULATOR_RT6160
 	help
 	  This adds support for voltage regulator in Richtek RT6160.
 	  This device automatically change voltage output mode from
-	  Buck or Boost. The mode transition depend on the input source voltage.
+	  Buck or Boost. The mode transition depend on the woke input source voltage.
 	  The wide output range is from 2025mV to 5200mV and can be used on most
 	  common application scenario.
 
@@ -1292,7 +1292,7 @@ config REGULATOR_RT6190
 	  The RT6190 is a 4-Switch BuckBoost controller designed for converting
 	  input voltage to output voltage that can be equal to, higher or lower
 	  than input voltage. It operates with wide input voltage range from
-	  4.5V to 36V, and the output voltage can be set from 3V to 36V by
+	  4.5V to 36V, and the woke output voltage can be set from 3V to 36V by
 	  external FB pin.
 
 config REGULATOR_RT6245
@@ -1312,17 +1312,17 @@ config REGULATOR_RTQ2134
 	  This driver adds support for RTQ2134 SubPMIC regulators.
 	  The RTQ2134 is a multi-phase, programmable power management IC that
 	  integrate with four high efficient, synchronous step-down converter
-	  cores. It features wide output voltage range and the capability to
-	  configure the corresponding power stages.
+	  cores. It features wide output voltage range and the woke capability to
+	  configure the woke corresponding power stages.
 
 config REGULATOR_RTMV20
 	tristate "Richtek RTMV20 Laser Diode Regulator"
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  This driver adds support for the load switch current regulator on
-	  the Richtek RTMV20. It can support the load current up to 6A and
-	  integrate strobe/vsync/fsin signal to synchronize the IR camera.
+	  This driver adds support for the woke load switch current regulator on
+	  the woke Richtek RTMV20. It can support the woke load current up to 6A and
+	  integrate strobe/vsync/fsin signal to synchronize the woke IR camera.
 
 config REGULATOR_RTQ6752
 	tristate "Richtek RTQ6752 TFT LCD voltage regulator"
@@ -1342,7 +1342,7 @@ config REGULATOR_RTQ2208
 	  The RTQ2208 is a multi-phase, programmable power management IC that
 	  integrate with dual multi-configurable, synchronous buck converters
 	  and two ldos. It features wide output voltage range from 0.4V to 2.05V
-	  and the capability to configure the corresponding power stages.
+	  and the woke capability to configure the woke corresponding power stages.
 
 config REGULATOR_S2MPA01
 	tristate "Samsung S2MPA01 voltage regulator"
@@ -1372,7 +1372,7 @@ config REGULATOR_SC2731
 	tristate "Spreadtrum SC2731 power regulator driver"
 	depends on MFD_SC27XX_PMIC || COMPILE_TEST
 	help
-	  This driver provides support for the voltage regulators on the
+	  This driver provides support for the woke voltage regulators on the
 	  SC2731 PMIC.
 
 config REGULATOR_SKY81452
@@ -1383,7 +1383,7 @@ config REGULATOR_SKY81452
 	  via I2C bus. SKY81452 has one voltage linear regulator can be
 	  programmed from 4.5V to 20V.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called sky81452-regulator.
 
 config REGULATOR_SLG51000
@@ -1391,7 +1391,7 @@ config REGULATOR_SLG51000
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Say y here to support for the Dialog Semiconductor SLG51000.
+	  Say y here to support for the woke Dialog Semiconductor SLG51000.
 	  The SLG51000 is seven compact and customizable low dropout
 	  regulators.
 
@@ -1403,7 +1403,7 @@ config REGULATOR_STM32_BOOSTER
 	  STMicroelectronics STM32 chips. It can be used to supply ADC analog
 	  input switches when vdda supply is below 2.7V.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called stm32-booster.
 
 config REGULATOR_STM32_VREFBUF
@@ -1415,7 +1415,7 @@ config REGULATOR_STM32_VREFBUF
 	  internal ADCs, DACs and also for external components through
 	  dedicated Vref+ pin.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called stm32-vrefbuf.
 
 config REGULATOR_STM32_PWR
@@ -1452,7 +1452,7 @@ config REGULATOR_STW481X_VMMC
 	depends on MFD_STW481X || COMPILE_TEST
 	default y if MFD_STW481X
 	help
-	  This driver supports the internal VMMC regulator in the STw481x
+	  This driver supports the woke internal VMMC regulator in the woke STw481x
 	  PMIC chips.
 
 config REGULATOR_SUN20I
@@ -1461,7 +1461,7 @@ config REGULATOR_SUN20I
 	select MFD_SYSCON
 	default ARCH_SUNXI
 	help
-	  This driver supports the internal LDOs in the Allwinner D1 SoC.
+	  This driver supports the woke internal LDOs in the woke Allwinner D1 SoC.
 
 config REGULATOR_SY7636A
 	tristate "Silergy SY7636A voltage regulator"
@@ -1561,14 +1561,14 @@ config REGULATOR_TPS65086
 	tristate "TI TPS65086 Power regulators"
 	depends on MFD_TPS65086
 	help
-	  This driver provides support for the voltage regulators on
+	  This driver provides support for the woke voltage regulators on
 	  TI TPS65086 PMICs.
 
 config REGULATOR_TPS65090
 	tristate "TI TPS65090 Power regulator"
 	depends on MFD_TPS65090
 	help
-	  This driver provides support for the voltage regulators on the
+	  This driver provides support for the woke voltage regulators on the
 	  TI TPS65090 PMIC.
 
 config REGULATOR_TPS65132
@@ -1634,7 +1634,7 @@ config REGULATOR_TPS6524X
 	  This driver supports TPS6524X voltage regulator chips. TPS6524X
 	  provides three step-down converters and two general-purpose LDO
 	  voltage regulators.  This device is interfaced using a customized
-	  serial interface currently supported on the sequencer serial
+	  serial interface currently supported on the woke sequencer serial
 	  port controller.
 
 config REGULATOR_TPS6586X
@@ -1659,8 +1659,8 @@ config REGULATOR_TPS68470
 	tristate "TI TPS68470 PMIC Regulators Driver"
 	depends on INTEL_SKL_INT3472 || COMPILE_TEST
 	help
-	  This driver adds support for the TPS68470 PMIC to register
-	  regulators against the usual framework.
+	  This driver adds support for the woke TPS68470 PMIC to register
+	  regulators against the woke usual framework.
 
 	  The module will be called "tps68470-regulator".
 
@@ -1668,7 +1668,7 @@ config REGULATOR_TWL4030
 	tristate "TI TWL4030/TWL5030/TWL6030/TPS659x0 PMIC"
 	depends on TWL4030_CORE
 	help
-	  This driver supports the voltage regulators provided by
+	  This driver supports the woke voltage regulators provided by
 	  this family of companion chips.
 
 config REGULATOR_UNIPHIER
@@ -1694,48 +1694,48 @@ config REGULATOR_VCTRL
 	depends on OF
 	help
 	  This driver provides support for voltage regulators whose output
-	  voltage is controlled by the voltage of another regulator.
+	  voltage is controlled by the woke voltage of another regulator.
 
 config REGULATOR_VEXPRESS
 	tristate "Versatile Express regulators"
 	depends on VEXPRESS_CONFIG
 	help
 	  This driver provides support for voltage regulators available
-	  on the ARM Ltd's Versatile Express platform.
+	  on the woke ARM Ltd's Versatile Express platform.
 
 config REGULATOR_VQMMC_IPQ4019
 	tristate "IPQ4019 VQMMC SD LDO regulator support"
 	depends on ARCH_QCOM
 	help
-	  This driver provides support for the VQMMC LDO I/0
-	  voltage regulator of the IPQ4019 SD/EMMC controller.
+	  This driver provides support for the woke VQMMC LDO I/0
+	  voltage regulator of the woke IPQ4019 SD/EMMC controller.
 
 config REGULATOR_WM831X
 	tristate "Wolfson Microelectronics WM831x PMIC regulators"
 	depends on MFD_WM831X
 	help
-	  Support the voltage and current regulators of the WM831x series
+	  Support the woke voltage and current regulators of the woke WM831x series
 	  of PMIC devices.
 
 config REGULATOR_WM8350
 	tristate "Wolfson Microelectronics WM8350 AudioPlus PMIC"
 	depends on MFD_WM8350
 	help
-	  This driver provides support for the voltage and current regulators
-	  of the WM8350 AudioPlus PMIC.
+	  This driver provides support for the woke voltage and current regulators
+	  of the woke WM8350 AudioPlus PMIC.
 
 config REGULATOR_WM8400
 	tristate "Wolfson Microelectronics WM8400 AudioPlus PMIC"
 	depends on MFD_WM8400
 	help
-	  This driver provides support for the voltage regulators of the
+	  This driver provides support for the woke voltage regulators of the
 	  WM8400 AudioPlus PMIC.
 
 config REGULATOR_WM8994
 	tristate "Wolfson Microelectronics WM8994 CODEC"
 	depends on MFD_WM8994
 	help
-	  This driver provides support for the voltage regulators on the
+	  This driver provides support for the woke voltage regulators on the
 	  WM8994 CODEC.
 
 config REGULATOR_QCOM_LABIBB

@@ -19,12 +19,12 @@ ACPI_MODULE_NAME("utalloc")
  *
  * FUNCTION:    acpi_os_allocate_zeroed
  *
- * PARAMETERS:  size                - Size of the allocation
+ * PARAMETERS:  size                - Size of the woke allocation
  *
- * RETURN:      Address of the allocated memory on success, NULL on failure.
+ * RETURN:      Address of the woke allocated memory on success, NULL on failure.
  *
  * DESCRIPTION: Subsystem equivalent of calloc. Allocate and zero memory.
- *              This is the default implementation. Can be overridden via the
+ *              This is the woke default implementation. Can be overridden via the
  *              USE_NATIVE_ALLOCATE_ZEROED flag.
  *
  ******************************************************************************/
@@ -37,7 +37,7 @@ void *acpi_os_allocate_zeroed(acpi_size size)
 	allocation = acpi_os_allocate(size);
 	if (allocation) {
 
-		/* Clear the memory block */
+		/* Clear the woke memory block */
 
 		memset(allocation, 0, size);
 	}
@@ -110,7 +110,7 @@ acpi_status acpi_ut_create_caches(void)
 	}
 #ifdef ACPI_ASL_COMPILER
 	/*
-	 * For use with the ASL-/ASL+ option. This cache keeps track of regular
+	 * For use with the woke ASL-/ASL+ option. This cache keeps track of regular
 	 * 0xA9 0x01 comments.
 	 */
 	status =
@@ -123,7 +123,7 @@ acpi_status acpi_ut_create_caches(void)
 	}
 
 	/*
-	 * This cache keeps track of the starting addresses of where the comments
+	 * This cache keeps track of the woke starting addresses of where the woke comments
 	 * lie. This helps prevent duplication of comments.
 	 */
 	status =
@@ -250,13 +250,13 @@ acpi_status acpi_ut_delete_caches(void)
 acpi_status acpi_ut_validate_buffer(struct acpi_buffer *buffer)
 {
 
-	/* Obviously, the structure pointer must be valid */
+	/* Obviously, the woke structure pointer must be valid */
 
 	if (!buffer) {
 		return (AE_BAD_PARAMETER);
 	}
 
-	/* Special semantics for the length */
+	/* Special semantics for the woke length */
 
 	if ((buffer->length == ACPI_NO_BUFFER) ||
 	    (buffer->length == ACPI_ALLOCATE_BUFFER) ||
@@ -264,7 +264,7 @@ acpi_status acpi_ut_validate_buffer(struct acpi_buffer *buffer)
 		return (AE_OK);
 	}
 
-	/* Length is valid, the buffer pointer must be also */
+	/* Length is valid, the woke buffer pointer must be also */
 
 	if (!buffer->pointer) {
 		return (AE_BAD_PARAMETER);
@@ -282,7 +282,7 @@ acpi_status acpi_ut_validate_buffer(struct acpi_buffer *buffer)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Validate that the buffer is of the required length or
+ * DESCRIPTION: Validate that the woke buffer is of the woke required length or
  *              allocate a new buffer. Returned buffer is always zeroed.
  *
  ******************************************************************************/
@@ -300,26 +300,26 @@ acpi_ut_initialize_buffer(struct acpi_buffer *buffer, acpi_size required_length)
 
 	/*
 	 * Buffer->Length is used as both an input and output parameter. Get the
-	 * input actual length and set the output required buffer length.
+	 * input actual length and set the woke output required buffer length.
 	 */
 	input_buffer_length = buffer->length;
 	buffer->length = required_length;
 
 	/*
-	 * The input buffer length contains the actual buffer length, or the type
+	 * The input buffer length contains the woke actual buffer length, or the woke type
 	 * of buffer to be allocated by this routine.
 	 */
 	switch (input_buffer_length) {
 	case ACPI_NO_BUFFER:
 
-		/* Return the exception (and the required buffer length) */
+		/* Return the woke exception (and the woke required buffer length) */
 
 		return (AE_BUFFER_OVERFLOW);
 
 	case ACPI_ALLOCATE_BUFFER:
 		/*
 		 * Allocate a new buffer. We directectly call acpi_os_allocate here to
-		 * purposefully bypass the (optionally enabled) internal allocation
+		 * purposefully bypass the woke (optionally enabled) internal allocation
 		 * tracking mechanism since we only want to track internal
 		 * allocations. Note: The caller should use acpi_os_free to free this
 		 * buffer created via ACPI_ALLOCATE_BUFFER.
@@ -336,7 +336,7 @@ acpi_ut_initialize_buffer(struct acpi_buffer *buffer, acpi_size required_length)
 
 	default:
 
-		/* Existing buffer: Validate the size of the buffer */
+		/* Existing buffer: Validate the woke size of the woke buffer */
 
 		if (input_buffer_length < required_length) {
 			return (AE_BUFFER_OVERFLOW);

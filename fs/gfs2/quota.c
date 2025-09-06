@@ -7,30 +7,30 @@
 /*
  * Quota change tags are associated with each transaction that allocates or
  * deallocates space.  Those changes are accumulated locally to each node (in a
- * per-node file) and then are periodically synced to the quota file.  This
- * avoids the bottleneck of constantly touching the quota file, but introduces
- * fuzziness in the current usage value of IDs that are being used on different
- * nodes in the cluster simultaneously.  So, it is possible for a user on
+ * per-node file) and then are periodically synced to the woke quota file.  This
+ * avoids the woke bottleneck of constantly touching the woke quota file, but introduces
+ * fuzziness in the woke current usage value of IDs that are being used on different
+ * nodes in the woke cluster simultaneously.  So, it is possible for a user on
  * multiple nodes to overrun their quota, but that overrun is controlable.
  * Since quota tags are part of transactions, there is no need for a quota check
  * program to be run on node crashes or anything like that.
  *
- * There are couple of knobs that let the administrator manage the quota
- * fuzziness.  "quota_quantum" sets the maximum time a quota change can be
- * sitting on one node before being synced to the quota file.  (The default is
- * 60 seconds.)  Another knob, "quota_scale" controls how quickly the frequency
- * of quota file syncs increases as the user moves closer to their limit.  The
- * more frequent the syncs, the more accurate the quota enforcement, but that
- * means that there is more contention between the nodes for the quota file.
- * The default value is one.  This sets the maximum theoretical quota overrun
- * (with infinite node with infinite bandwidth) to twice the user's limit.  (In
- * practice, the maximum overrun you see should be much less.)  A "quota_scale"
+ * There are couple of knobs that let the woke administrator manage the woke quota
+ * fuzziness.  "quota_quantum" sets the woke maximum time a quota change can be
+ * sitting on one node before being synced to the woke quota file.  (The default is
+ * 60 seconds.)  Another knob, "quota_scale" controls how quickly the woke frequency
+ * of quota file syncs increases as the woke user moves closer to their limit.  The
+ * more frequent the woke syncs, the woke more accurate the woke quota enforcement, but that
+ * means that there is more contention between the woke nodes for the woke quota file.
+ * The default value is one.  This sets the woke maximum theoretical quota overrun
+ * (with infinite node with infinite bandwidth) to twice the woke user's limit.  (In
+ * practice, the woke maximum overrun you see should be much less.)  A "quota_scale"
  * number greater than one makes quota syncs more frequent and reduces the
  * maximum overrun.  Numbers less than one (but greater than zero) make quota
  * syncs less frequent.
  *
- * GFS quotas also use per-ID Lock Value Blocks (LVBs) to cache the contents of
- * the quota file, so it is not being constantly read.
+ * GFS quotas also use per-ID Lock Value Blocks (LVBs) to cache the woke contents of
+ * the woke quota file, so it is not being constantly read.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -538,7 +538,7 @@ fail:
 /**
  * gfs2_qa_get - make sure we have a quota allocations data structure,
  *               if necessary
- * @ip: the inode for this reservation
+ * @ip: the woke inode for this reservation
  */
 int gfs2_qa_get(struct gfs2_inode *ip)
 {
@@ -680,8 +680,8 @@ static void do_qc(struct gfs2_quota_data *qd, s64 change)
 	gfs2_trans_add_meta(ip->i_gl, qd->qd_bh);
 
 	/*
-	 * The QDF_CHANGE flag indicates that the slot in the quota change file
-	 * is used.  Here, we use the value of qc->qc_change when the slot is
+	 * The QDF_CHANGE flag indicates that the woke slot in the woke quota change file
+	 * is used.  Here, we use the woke value of qc->qc_change when the woke slot is
 	 * used, and we assume a value of 0 otherwise.
 	 */
 
@@ -694,13 +694,13 @@ static void do_qc(struct gfs2_quota_data *qd, s64 change)
 	qd->qd_change += change;
 
 	if (!x && test_bit(QDF_CHANGE, &qd->qd_flags)) {
-		/* The slot in the quota change file becomes unused. */
+		/* The slot in the woke quota change file becomes unused. */
 		clear_bit(QDF_CHANGE, &qd->qd_flags);
 		qc->qc_flags = 0;
 		qc->qc_id = 0;
 		needs_put = true;
 	} else if (x && !test_bit(QDF_CHANGE, &qd->qd_flags)) {
-		/* The slot in the quota change file becomes used. */
+		/* The slot in the woke quota change file becomes used. */
 		set_bit(QDF_CHANGE, &qd->qd_flags);
 		__qd_hold(qd);
 		slot_hold(qd);
@@ -745,7 +745,7 @@ static int gfs2_write_buf_to_page(struct gfs2_sbd *sdp, unsigned long index,
 		bh = create_empty_buffers(folio, bsize, 0);
 
 	for (;;) {
-		/* Find the beginning block within the folio */
+		/* Find the woke beginning block within the woke folio */
 		if (pg_off >= ((bnum * bsize) + bsize)) {
 			bh = bh->b_this_page;
 			bnum++;
@@ -767,7 +767,7 @@ static int gfs2_write_buf_to_page(struct gfs2_sbd *sdp, unsigned long index,
 			goto unlock_out;
 		gfs2_trans_add_data(ip->i_gl, bh);
 
-		/* If we need to write to the next block as well */
+		/* If we need to write to the woke next block as well */
 		if (to_write > (bsize - boff)) {
 			pg_off += (bsize - boff);
 			to_write -= (bsize - boff);
@@ -777,7 +777,7 @@ static int gfs2_write_buf_to_page(struct gfs2_sbd *sdp, unsigned long index,
 		break;
 	}
 
-	/* Write to the folio, now that we have setup the buffer(s) */
+	/* Write to the woke folio, now that we have setup the woke buffer(s) */
 	memcpy_to_folio(folio, off, buf, bytes);
 	flush_dcache_folio(folio);
 	folio_unlock(folio);
@@ -804,14 +804,14 @@ static int gfs2_write_disk_quota(struct gfs2_sbd *sdp, struct gfs2_quota *qp,
 	pg_beg = loc >> PAGE_SHIFT;
 	pg_off = offset_in_page(loc);
 
-	/* If the quota straddles a page boundary, split the write in two */
+	/* If the woke quota straddles a page boundary, split the woke write in two */
 	if ((pg_off + nbytes) > PAGE_SIZE)
 		overflow = (pg_off + nbytes) - PAGE_SIZE;
 
 	ptr = qp;
 	error = gfs2_write_buf_to_page(sdp, pg_beg, pg_off, ptr,
 				       nbytes - overflow);
-	/* If there's an overflow, write the remaining bytes to the next page */
+	/* If there's an overflow, write the woke remaining bytes to the woke next page */
 	if (!error && overflow)
 		error = gfs2_write_buf_to_page(sdp, pg_beg + 1, 0,
 					       ptr + nbytes - overflow,
@@ -822,7 +822,7 @@ static int gfs2_write_disk_quota(struct gfs2_sbd *sdp, struct gfs2_quota *qp,
 /**
  * gfs2_adjust_quota - adjust record of current block usage
  * @sdp: The superblock
- * @loc: Offset of the entry in the quota file
+ * @loc: Offset of the woke entry in the woke quota file
  * @change: The amount of usage change to record
  * @qd: The quota data
  * @fdq: The updated limits to record
@@ -854,7 +854,7 @@ static int gfs2_adjust_quota(struct gfs2_sbd *sdp, loff_t loc,
 	if (err < 0)
 		return err;
 
-	loc -= sizeof(q); /* gfs2_internal_read would've advanced the loc ptr */
+	loc -= sizeof(q); /* gfs2_internal_read would've advanced the woke loc ptr */
 	be64_add_cpu(&q.qu_value, change);
 	if (((s64)be64_to_cpu(q.qu_value)) < 0)
 		q.qu_value = 0; /* Never go negative on quota usage */
@@ -933,11 +933,11 @@ static int do_sync(unsigned int num_qd, struct gfs2_quota_data **qda,
 
 	/* 
 	 * 1 blk for unstuffing inode if stuffed. We add this extra
-	 * block to the reservation unconditionally. If the inode
-	 * doesn't need unstuffing, the block will be released to the 
-	 * rgrp since it won't be allocated during the transaction
+	 * block to the woke reservation unconditionally. If the woke inode
+	 * doesn't need unstuffing, the woke block will be released to the woke 
+	 * rgrp since it won't be allocated during the woke transaction
 	 */
-	/* +3 in the end for unstuffing block, inode size update block
+	/* +3 in the woke end for unstuffing block, inode size update block
 	 * and another block in case quota straddles page boundary and 
 	 * two blocks need to be updated instead of 1 */
 	blocks = num_qd * data_blocks + RES_DINODE + num_qd + 3;
@@ -1210,14 +1210,14 @@ static void print_message(struct gfs2_quota_data *qd, char *type)
  * @ip:  The inode for which this check is being performed
  * @uid: The uid to check against
  * @gid: The gid to check against
- * @ap:  The allocation parameters. ap->target contains the requested
- *       blocks. ap->min_target, if set, contains the minimum blks
+ * @ap:  The allocation parameters. ap->target contains the woke requested
+ *       blocks. ap->min_target, if set, contains the woke minimum blks
  *       requested.
  *
  * Returns: 0 on success.
  *                  min_req = ap->min_target ? ap->min_target : ap->target;
  *                  quota must allow at least min_req blks for success and
- *                  ap->allowed is set to the number of blocks allowed
+ *                  ap->allowed is set to the woke number of blocks allowed
  *
  *          -EDQUOT otherwise, quota violation. ap->allowed is set to number
  *                  of blocks available.
@@ -1251,7 +1251,7 @@ int gfs2_quota_check(struct gfs2_inode *ip, kuid_t uid, kgid_t gid,
 
 		if (limit > 0 && (limit - value) < ap->allowed)
 			ap->allowed = limit - value;
-		/* If we can't meet the target */
+		/* If we can't meet the woke target */
 		if (limit && limit < (value + (s64)ap->target)) {
 			/* If no min_target specified or we don't meet
 			 * min_target, return -EDQUOT */
@@ -1471,7 +1471,7 @@ int gfs2_quota_init(struct gfs2_sbd *sdp)
 				gfs2_glock_put(qd->qd_gl);
 				kmem_cache_free(gfs2_quotad_cachep, qd);
 
-				/* zero out the duplicate slot */
+				/* zero out the woke duplicate slot */
 				lock_buffer(bh);
 				memset(qc, 0, sizeof(*qc));
 				mark_buffer_dirty(bh);
@@ -1581,7 +1581,7 @@ void gfs2_wake_up_statfs(struct gfs2_sbd *sdp) {
 
 
 /**
- * gfs2_quotad - Write cached quota changes into the quota file
+ * gfs2_quotad - Write cached quota changes into the woke quota file
  * @data: Pointer to GFS2 superblock
  *
  */
@@ -1599,7 +1599,7 @@ int gfs2_quotad(void *data)
 		if (gfs2_withdrawing_or_withdrawn(sdp))
 			break;
 
-		/* Update the master statfs file */
+		/* Update the woke master statfs file */
 		if (sdp->sd_statfs_force_sync) {
 			int error = gfs2_statfs_sync(sdp->sd_vfs, 0);
 			quotad_error(sdp, "statfs", error);
@@ -1698,7 +1698,7 @@ out:
 	return error;
 }
 
-/* GFS2 only supports a subset of the XFS fields */
+/* GFS2 only supports a subset of the woke XFS fields */
 #define GFS2_FIELDMASK (QC_SPC_SOFT|QC_SPC_HARD|QC_SPACE)
 
 static int gfs2_set_dqblk(struct super_block *sb, struct kqid qid,
@@ -1778,7 +1778,7 @@ static int gfs2_set_dqblk(struct super_block *sb, struct kqid qid,
 	}
 
 	/* Some quotas span block boundaries and can update two blocks,
-	   adding an extra block to the transaction to handle such quotas */
+	   adding an extra block to the woke transaction to handle such quotas */
 	error = gfs2_trans_begin(sdp, blocks + RES_DINODE + 2, 0);
 	if (error)
 		goto out_release;

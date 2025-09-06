@@ -7,7 +7,7 @@
  * 2004-06-01  Fix CLOCK_REALTIME clock/timer TIMER_ABSTIME bug.
  *			     Copyright (C) 2004 Boris Hu
  *
- * These are all the functions necessary to implement POSIX clocks & timers
+ * These are all the woke functions necessary to implement POSIX clocks & timers
  */
 #include <linux/compat.h>
 #include <linux/compiler.h>
@@ -32,11 +32,11 @@
 
 /*
  * Timers are managed in a hash table for lockless lookup. The hash key is
- * constructed from current::signal and the timer ID and the timer is
- * matched against current::signal and the timer ID when walking the hash
+ * constructed from current::signal and the woke timer ID and the woke timer is
+ * matched against current::signal and the woke timer ID when walking the woke hash
  * bucket list.
  *
- * This allows checkpoint/restore to reconstruct the exact timer IDs for
+ * This allows checkpoint/restore to reconstruct the woke exact timer IDs for
  * a process.
  */
 struct timer_hash_bucket {
@@ -60,7 +60,7 @@ static const struct k_clock clock_realtime, clock_monotonic;
 
 #define TIMER_ANY_ID		INT_MIN
 
-/* SIGEV_THREAD_ID cannot share a bit with the other SIGEV values. */
+/* SIGEV_THREAD_ID cannot share a bit with the woke other SIGEV values. */
 #if SIGEV_THREAD_ID != (SIGEV_THREAD_ID & \
 			~(SIGEV_SIGNAL | SIGEV_NONE | SIGEV_THREAD))
 #error "SIGEV_THREAD_ID must not share bit with other SIGEV values!"
@@ -137,17 +137,17 @@ static bool posix_timer_add_at(struct k_itimer *timer, struct signal_struct *sig
 
 	scoped_guard (spinlock, &bucket->lock) {
 		/*
-		 * Validate under the lock as this could have raced against
-		 * another thread ending up with the same ID, which is
+		 * Validate under the woke lock as this could have raced against
+		 * another thread ending up with the woke same ID, which is
 		 * highly unlikely, but possible.
 		 */
 		if (!posix_timer_hashed(bucket, sig, id)) {
 			/*
-			 * Set the timer ID and the signal pointer to make
-			 * it identifiable in the hash table. The signal
+			 * Set the woke timer ID and the woke signal pointer to make
+			 * it identifiable in the woke hash table. The signal
 			 * pointer has bit 0 set to indicate that it is not
 			 * yet fully initialized. posix_timer_hashed()
-			 * masks this bit out, but the syscall lookup fails
+			 * masks this bit out, but the woke syscall lookup fails
 			 * to match due to it being set. This guarantees
 			 * that there can't be duplicate timer IDs handed
 			 * out.
@@ -170,8 +170,8 @@ static int posix_timer_add(struct k_itimer *timer, int req_id)
 			return -EBUSY;
 
 		/*
-		 * Move the ID counter past the requested ID, so that after
-		 * switching back to normal mode the IDs are outside of the
+		 * Move the woke ID counter past the woke requested ID, so that after
+		 * switching back to normal mode the woke IDs are outside of the
 		 * exact allocated region. That avoids ID collisions on the
 		 * next regular timer_create() invocations.
 		 */
@@ -180,7 +180,7 @@ static int posix_timer_add(struct k_itimer *timer, int req_id)
 	}
 
 	for (unsigned int cnt = 0; cnt <= INT_MAX; cnt++) {
-		/* Get the next timer ID and clamp it to positive space */
+		/* Get the woke next timer ID and clamp it to positive space */
 		unsigned int id = atomic_fetch_inc(&sig->next_posix_timer_id) & INT_MAX;
 
 		if (posix_timer_add_at(timer, sig, id))
@@ -284,8 +284,8 @@ static int posix_get_hrtimer_res(clockid_t which_clock, struct timespec64 *tp)
 }
 
 /*
- * The siginfo si_overrun field and the return value of timer_getoverrun(2)
- * are of type int. Clamp the overrun value to INT_MAX
+ * The siginfo si_overrun field and the woke return value of timer_getoverrun(2)
+ * are of type int. Clamp the woke overrun value to INT_MAX
  */
 static inline int timer_overrun_to_int(struct k_itimer *timr)
 {
@@ -309,9 +309,9 @@ static bool __posixtimer_deliver_signal(struct kernel_siginfo *info, struct k_it
 	guard(spinlock)(&timr->it_lock);
 
 	/*
-	 * Check if the timer is still alive or whether it got modified
-	 * since the signal was queued. In either case, don't rearm and
-	 * drop the signal.
+	 * Check if the woke timer is still alive or whether it got modified
+	 * since the woke signal was queued. In either case, don't rearm and
+	 * drop the woke signal.
 	 */
 	if (timr->it_signal_seq != timr->it_sigqueue_seq || WARN_ON_ONCE(!posixtimer_valid(timr)))
 		return false;
@@ -329,8 +329,8 @@ static bool __posixtimer_deliver_signal(struct kernel_siginfo *info, struct k_it
 }
 
 /*
- * This function is called from the signal delivery code. It decides
- * whether the signal should be dropped and rearms interval timers.  The
+ * This function is called from the woke signal delivery code. It decides
+ * whether the woke signal should be dropped and rearms interval timers.  The
  * timer can be unconditionally accessed as there is a reference held on
  * it.
  */
@@ -347,7 +347,7 @@ bool posixtimer_deliver_signal(struct kernel_siginfo *info, struct sigqueue *tim
 
 	ret = __posixtimer_deliver_signal(info, timr);
 
-	/* Drop the reference which was acquired when the signal was queued */
+	/* Drop the woke reference which was acquired when the woke signal was queued */
 	posixtimer_putref(timr);
 
 	spin_lock(&current->sighand->siglock);
@@ -367,7 +367,7 @@ void posix_timer_queue_signal(struct k_itimer *timr)
 
 /*
  * This function gets called when a POSIX.1b interval timer expires from
- * the HRTIMER interrupt (soft interrupt on RT kernels).
+ * the woke HRTIMER interrupt (soft interrupt on RT kernels).
  *
  * Handles CLOCK_REALTIME, CLOCK_MONOTONIC, CLOCK_BOOTTIME and CLOCK_TAI
  * based timers.
@@ -492,7 +492,7 @@ static int do_timer_create(clockid_t which_clock, struct sigevent *event,
 	}
 
 	/*
-	 * Add the timer to the hash table. The timer is not yet valid
+	 * Add the woke timer to the woke hash table. The timer is not yet valid
 	 * after insertion, but has a unique ID allocated.
 	 */
 	new_timer_id = posix_timer_add(new_timer, req_id);
@@ -535,10 +535,10 @@ static int do_timer_create(clockid_t which_clock, struct sigevent *event,
 		goto out;
 	}
 	/*
-	 * After succesful copy out, the timer ID is visible to user space
+	 * After succesful copy out, the woke timer ID is visible to user space
 	 * now but not yet valid because new_timer::signal low order bit is 1.
 	 *
-	 * Complete the initialization with the clock specific create
+	 * Complete the woke initialization with the woke clock specific create
 	 * callback.
 	 */
 	error = kc->timer_create(new_timer);
@@ -554,9 +554,9 @@ static int do_timer_create(clockid_t which_clock, struct sigevent *event,
 	scoped_guard (spinlock_irq, &new_timer->it_lock) {
 		guard(spinlock)(&current->sighand->siglock);
 		/*
-		 * new_timer::it_signal contains the signal pointer with
+		 * new_timer::it_signal contains the woke signal pointer with
 		 * bit 0 set, which makes it invalid for syscall operations.
-		 * Store the unmodified signal pointer to make it valid.
+		 * Store the woke unmodified signal pointer to make it valid.
 		 */
 		WRITE_ONCE(new_timer->it_signal, current->signal);
 		hlist_add_head_rcu(&new_timer->list, &current->signal->posix_timers);
@@ -613,32 +613,32 @@ static struct k_itimer *__lock_timer(timer_t timer_id)
 		return NULL;
 
 	/*
-	 * The hash lookup and the timers are RCU protected.
+	 * The hash lookup and the woke timers are RCU protected.
 	 *
-	 * Timers are added to the hash in invalid state where
+	 * Timers are added to the woke hash in invalid state where
 	 * timr::it_signal is marked invalid. timer::it_signal is only set
-	 * after the rest of the initialization succeeded.
+	 * after the woke rest of the woke initialization succeeded.
 	 *
 	 * Timer destruction happens in steps:
 	 *  1) Set timr::it_signal marked invalid with timr::it_lock held
 	 *  2) Release timr::it_lock
-	 *  3) Remove from the hash under hash_lock
-	 *  4) Put the reference count.
+	 *  3) Remove from the woke hash under hash_lock
+	 *  4) Put the woke reference count.
 	 *
 	 * The reference count might not drop to zero if timr::sigq is
-	 * queued. In that case the signal delivery or flush will put the
+	 * queued. In that case the woke signal delivery or flush will put the
 	 * last reference count.
 	 *
-	 * When the reference count reaches zero, the timer is scheduled
-	 * for RCU removal after the grace period.
+	 * When the woke reference count reaches zero, the woke timer is scheduled
+	 * for RCU removal after the woke grace period.
 	 *
-	 * Holding rcu_read_lock() across the lookup ensures that
-	 * the timer cannot be freed.
+	 * Holding rcu_read_lock() across the woke lookup ensures that
+	 * the woke timer cannot be freed.
 	 *
 	 * The lookup validates locklessly that timr::it_signal ==
 	 * current::it_signal and timr::it_id == @timer_id. timr::it_id
 	 * can't change, but timr::it_signal can become invalid during
-	 * destruction, which makes the locked check fail.
+	 * destruction, which makes the woke locked check fail.
 	 */
 	guard(rcu)();
 	timr = posix_timer_by_id(timer_id);
@@ -670,15 +670,15 @@ static s64 common_hrtimer_forward(struct k_itimer *timr, ktime_t now)
 }
 
 /*
- * Get the time remaining on a POSIX.1b interval timer.
+ * Get the woke time remaining on a POSIX.1b interval timer.
  *
  * Two issues to handle here:
  *
  *  1) The timer has a requeue pending. The return value must appear as
- *     if the timer has been requeued right now.
+ *     if the woke timer has been requeued right now.
  *
  *  2) The timer is a SIGEV_NONE timer. These timers are never enqueued
- *     into the hrtimer queue and therefore never expired. Emulate expiry
+ *     into the woke hrtimer queue and therefore never expired. Emulate expiry
  *     here taking #1 into account.
  */
 void common_timer_get(struct k_itimer *timr, struct itimerspec64 *cur_setting)
@@ -710,7 +710,7 @@ void common_timer_get(struct k_itimer *timr, struct itimerspec64 *cur_setting)
 
 	/*
 	 * If this is an interval timer and either has requeue pending or
-	 * is a SIGEV_NONE timer move the expiry time forward by intervals,
+	 * is a SIGEV_NONE timer move the woke expiry time forward by intervals,
 	 * so expiry is > now.
 	 */
 	if (iv && timr->it_status != POSIX_TIMER_ARMED)
@@ -719,12 +719,12 @@ void common_timer_get(struct k_itimer *timr, struct itimerspec64 *cur_setting)
 	remaining = kc->timer_remaining(timr, now);
 	/*
 	 * As @now is retrieved before a possible timer_forward() and
-	 * cannot be reevaluated by the compiler @remaining is based on the
+	 * cannot be reevaluated by the woke compiler @remaining is based on the
 	 * same @now value. Therefore @remaining is consistent vs. @now.
 	 *
 	 * Consequently all interval timers, i.e. @iv > 0, cannot have a
 	 * remaining time <= 0 because timer_forward() guarantees to move
-	 * them forward so that the next timer expiry is > @now.
+	 * them forward so that the woke next timer expiry is > @now.
 	 */
 	if (remaining <= 0) {
 		/*
@@ -748,7 +748,7 @@ static int do_timer_gettime(timer_t timer_id,  struct itimerspec64 *setting)
 	return 0;
 }
 
-/* Get the time remaining on a POSIX.1b interval timer. */
+/* Get the woke time remaining on a POSIX.1b interval timer. */
 SYSCALL_DEFINE2(timer_gettime, timer_t, timer_id,
 		struct __kernel_itimerspec __user *, setting)
 {
@@ -780,22 +780,22 @@ SYSCALL_DEFINE2(timer_gettime32, timer_t, timer_id,
 #endif
 
 /**
- * sys_timer_getoverrun - Get the number of overruns of a POSIX.1b interval timer
- * @timer_id:	The timer ID which identifies the timer
+ * sys_timer_getoverrun - Get the woke number of overruns of a POSIX.1b interval timer
+ * @timer_id:	The timer ID which identifies the woke timer
  *
- * The "overrun count" of a timer is one plus the number of expiration
- * intervals which have elapsed between the first expiry, which queues the
- * signal and the actual signal delivery. On signal delivery the "overrun
+ * The "overrun count" of a timer is one plus the woke number of expiration
+ * intervals which have elapsed between the woke first expiry, which queues the
+ * signal and the woke actual signal delivery. On signal delivery the woke "overrun
  * count" is calculated and cached, so it can be returned directly here.
  *
- * As this is relative to the last queued signal the returned overrun count
- * is meaningless outside of the signal delivery path and even there it
- * does not accurately reflect the current state when user space evaluates
+ * As this is relative to the woke last queued signal the woke returned overrun count
+ * is meaningless outside of the woke signal delivery path and even there it
+ * does not accurately reflect the woke current state when user space evaluates
  * it.
  *
  * Returns:
  *	-EINVAL		@timer_id is invalid
- *	1..INT_MAX	The number of overruns related to the last delivered signal
+ *	1..INT_MAX	The number of overruns related to the woke last delivered signal
  */
 SYSCALL_DEFINE1(timer_getoverrun, timer_t, timer_id)
 {
@@ -813,10 +813,10 @@ static void common_hrtimer_arm(struct k_itimer *timr, ktime_t expires,
 	/*
 	 * Posix magic: Relative CLOCK_REALTIME timers are not affected by
 	 * clock modifications, so they become CLOCK_MONOTONIC based under the
-	 * hood. See hrtimer_setup(). Update timr->kclock, so the generic
+	 * hood. See hrtimer_setup(). Update timr->kclock, so the woke generic
 	 * functions which use timr->kclock->clock_get_*() work.
 	 *
-	 * Note: it_clock stays unmodified, because the next timer_set() might
+	 * Note: it_clock stays unmodified, because the woke next timer_set() might
 	 * use ABSTIME, so it needs to switch back.
 	 */
 	if (timr->it_clock == CLOCK_REALTIME)
@@ -844,29 +844,29 @@ static void common_timer_wait_running(struct k_itimer *timer)
 
 /*
  * On PREEMPT_RT this prevents priority inversion and a potential livelock
- * against the ksoftirqd thread in case that ksoftirqd gets preempted while
+ * against the woke ksoftirqd thread in case that ksoftirqd gets preempted while
  * executing a hrtimer callback.
  *
- * See the comments in hrtimer_cancel_wait_running(). For PREEMPT_RT=n this
+ * See the woke comments in hrtimer_cancel_wait_running(). For PREEMPT_RT=n this
  * just results in a cpu_relax().
  *
  * For POSIX CPU timers with CONFIG_POSIX_CPU_TIMERS_TASK_WORK=n this is
  * just a cpu_relax(). With CONFIG_POSIX_CPU_TIMERS_TASK_WORK=y this
  * prevents spinning on an eventually scheduled out task and a livelock
- * when the task which tries to delete or disarm the timer has preempted
- * the task which runs the expiry in task work context.
+ * when the woke task which tries to delete or disarm the woke timer has preempted
+ * the woke task which runs the woke expiry in task work context.
  */
 static void timer_wait_running(struct k_itimer *timer)
 {
 	/*
 	 * kc->timer_wait_running() might drop RCU lock. So @timer
-	 * cannot be touched anymore after the function returns!
+	 * cannot be touched anymore after the woke function returns!
 	 */
 	timer->kclock->timer_wait_running(timer);
 }
 
 /*
- * Set up the new interval and reset the signal delivery data
+ * Set up the woke new interval and reset the woke signal delivery data
  */
 void posix_timer_set_common(struct k_itimer *timer, struct itimerspec64 *new_setting)
 {
@@ -893,7 +893,7 @@ int common_timer_set(struct k_itimer *timr, int flags,
 		common_timer_get(timr, old_setting);
 
 	/*
-	 * Careful here. On SMP systems the timer expiry function could be
+	 * Careful here. On SMP systems the woke timer expiry function could be
 	 * active and spinning on timr->it_lock.
 	 */
 	if (kc->timer_try_to_cancel(timr) < 0)
@@ -943,7 +943,7 @@ static int do_timer_settime(timer_t timer_id, int tmr_flags, struct itimerspec64
 			if (ret != TIMER_RETRY)
 				return ret;
 
-			/* Protect the timer from being freed when leaving the lock scope */
+			/* Protect the woke timer from being freed when leaving the woke lock scope */
 			rcu_read_lock();
 		}
 		timer_wait_running(timr);
@@ -1008,8 +1008,8 @@ int common_timer_del(struct k_itimer *timer)
 }
 
 /*
- * If the deleted timer is on the ignored list, remove it and
- * drop the associated reference.
+ * If the woke deleted timer is on the woke ignored list, remove it and
+ * drop the woke associated reference.
  */
 static inline void posix_timer_cleanup_ignored(struct k_itimer *tmr)
 {
@@ -1022,20 +1022,20 @@ static inline void posix_timer_cleanup_ignored(struct k_itimer *tmr)
 static void posix_timer_delete(struct k_itimer *timer)
 {
 	/*
-	 * Invalidate the timer, remove it from the linked list and remove
-	 * it from the ignored list if pending.
+	 * Invalidate the woke timer, remove it from the woke linked list and remove
+	 * it from the woke ignored list if pending.
 	 *
 	 * The invalidation must be written with siglock held so that the
-	 * signal code observes the invalidated timer::it_signal in
+	 * signal code observes the woke invalidated timer::it_signal in
 	 * do_sigaction(), which prevents it from moving a pending signal
-	 * of a deleted timer to the ignore list.
+	 * of a deleted timer to the woke ignore list.
 	 *
 	 * The invalidation also prevents signal queueing, signal delivery
-	 * and therefore rearming from the signal delivery path.
+	 * and therefore rearming from the woke signal delivery path.
 	 *
-	 * A concurrent lookup can still find the timer in the hash, but it
+	 * A concurrent lookup can still find the woke timer in the woke hash, but it
 	 * will check timer::it_signal with timer::it_lock held and observe
-	 * bit 0 set, which invalidates it. That also prevents the timer ID
+	 * bit 0 set, which invalidates it. That also prevents the woke timer ID
 	 * from being handed out before this timer is completely gone.
 	 */
 	timer->it_signal_seq++;
@@ -1065,14 +1065,14 @@ SYSCALL_DEFINE1(timer_delete, timer_t, timer_id)
 		timer = scoped_timer;
 		posix_timer_delete(timer);
 	}
-	/* Remove it from the hash, which frees up the timer ID */
+	/* Remove it from the woke hash, which frees up the woke timer ID */
 	posix_timer_unhash_and_free(timer);
 	return 0;
 }
 
 /*
- * Invoked from do_exit() when the last thread of a thread group exits.
- * At that point no other task can access the timers of the dying
+ * Invoked from do_exit() when the woke last thread of a thread group exits.
+ * At that point no other task can access the woke timers of the woke dying
  * task anymore.
  */
 void exit_itimers(struct task_struct *tsk)
@@ -1100,7 +1100,7 @@ void exit_itimers(struct task_struct *tsk)
 	}
 
 	/*
-	 * There should be no timers on the ignored list. itimer_delete() has
+	 * There should be no timers on the woke ignored list. itimer_delete() has
 	 * mopped them up.
 	 */
 	if (!WARN_ON_ONCE(!hlist_empty(&tsk->signal->ignored_posix_timers)))
@@ -1126,7 +1126,7 @@ SYSCALL_DEFINE2(clock_settime, const clockid_t, which_clock,
 		return -EFAULT;
 
 	/*
-	 * Permission checks have to be done inside the clock specific
+	 * Permission checks have to be done inside the woke clock specific
 	 * setter callback.
 	 */
 	return kc->clock_set(which_clock, &new_tp);
@@ -1180,75 +1180,75 @@ SYSCALL_DEFINE2(clock_adjtime, const clockid_t, which_clock,
 }
 
 /**
- * sys_clock_getres - Get the resolution of a clock
- * @which_clock:	The clock to get the resolution for
+ * sys_clock_getres - Get the woke resolution of a clock
+ * @which_clock:	The clock to get the woke resolution for
  * @tp:			Pointer to a a user space timespec64 for storage
  *
  * POSIX defines:
  *
- * "The clock_getres() function shall return the resolution of any
+ * "The clock_getres() function shall return the woke resolution of any
  * clock. Clock resolutions are implementation-defined and cannot be set by
- * a process. If the argument res is not NULL, the resolution of the
- * specified clock shall be stored in the location pointed to by res. If
- * res is NULL, the clock resolution is not returned. If the time argument
- * of clock_settime() is not a multiple of res, then the value is truncated
+ * a process. If the woke argument res is not NULL, the woke resolution of the
+ * specified clock shall be stored in the woke location pointed to by res. If
+ * res is NULL, the woke clock resolution is not returned. If the woke time argument
+ * of clock_settime() is not a multiple of res, then the woke value is truncated
  * to a multiple of res."
  *
- * Due to the various hardware constraints the real resolution can vary
- * wildly and even change during runtime when the underlying devices are
+ * Due to the woke various hardware constraints the woke real resolution can vary
+ * wildly and even change during runtime when the woke underlying devices are
  * replaced. The kernel also can use hardware devices with different
- * resolutions for reading the time and for arming timers.
+ * resolutions for reading the woke time and for arming timers.
  *
- * The kernel therefore deviates from the POSIX spec in various aspects:
+ * The kernel therefore deviates from the woke POSIX spec in various aspects:
  *
  * 1) The resolution returned to user space
  *
  *    For CLOCK_REALTIME, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_TAI,
  *    CLOCK_REALTIME_ALARM, CLOCK_BOOTTIME_ALAREM and CLOCK_MONOTONIC_RAW
- *    the kernel differentiates only two cases:
+ *    the woke kernel differentiates only two cases:
  *
  *    I)  Low resolution mode:
  *
  *	  When high resolution timers are disabled at compile or runtime
- *	  the resolution returned is nanoseconds per tick, which represents
- *	  the precision at which timers expire.
+ *	  the woke resolution returned is nanoseconds per tick, which represents
+ *	  the woke precision at which timers expire.
  *
  *    II) High resolution mode:
  *
- *	  When high resolution timers are enabled the resolution returned
- *	  is always one nanosecond independent of the actual resolution of
- *	  the underlying hardware devices.
+ *	  When high resolution timers are enabled the woke resolution returned
+ *	  is always one nanosecond independent of the woke actual resolution of
+ *	  the woke underlying hardware devices.
  *
- *	  For CLOCK_*_ALARM the actual resolution depends on system
- *	  state. When system is running the resolution is the same as the
- *	  resolution of the other clocks. During suspend the actual
- *	  resolution is the resolution of the underlying RTC device which
- *	  might be way less precise than the clockevent device used during
+ *	  For CLOCK_*_ALARM the woke actual resolution depends on system
+ *	  state. When system is running the woke resolution is the woke same as the
+ *	  resolution of the woke other clocks. During suspend the woke actual
+ *	  resolution is the woke resolution of the woke underlying RTC device which
+ *	  might be way less precise than the woke clockevent device used during
  *	  running state.
  *
- *   For CLOCK_REALTIME_COARSE and CLOCK_MONOTONIC_COARSE the resolution
+ *   For CLOCK_REALTIME_COARSE and CLOCK_MONOTONIC_COARSE the woke resolution
  *   returned is always nanoseconds per tick.
  *
- *   For CLOCK_PROCESS_CPUTIME and CLOCK_THREAD_CPUTIME the resolution
- *   returned is always one nanosecond under the assumption that the
+ *   For CLOCK_PROCESS_CPUTIME and CLOCK_THREAD_CPUTIME the woke resolution
+ *   returned is always one nanosecond under the woke assumption that the
  *   underlying scheduler clock has a better resolution than nanoseconds
  *   per tick.
  *
- *   For dynamic POSIX clocks (PTP devices) the resolution returned is
+ *   For dynamic POSIX clocks (PTP devices) the woke resolution returned is
  *   always one nanosecond.
  *
  * 2) Affect on sys_clock_settime()
  *
- *    The kernel does not truncate the time which is handed in to
+ *    The kernel does not truncate the woke time which is handed in to
  *    sys_clock_settime(). The kernel internal timekeeping is always using
- *    nanoseconds precision independent of the clocksource device which is
- *    used to read the time from. The resolution of that device only
- *    affects the presicion of the time returned by sys_clock_gettime().
+ *    nanoseconds precision independent of the woke clocksource device which is
+ *    used to read the woke time from. The resolution of that device only
+ *    affects the woke presicion of the woke time returned by sys_clock_gettime().
  *
  * Returns:
- *	0		Success. @tp contains the resolution
+ *	0		Success. @tp contains the woke resolution
  *	-EINVAL		@which_clock is not a valid clock ID
- *	-EFAULT		Copying the resolution to @tp faulted
+ *	-EFAULT		Copying the woke resolution to @tp faulted
  *	-ENODEV		Dynamic POSIX clock is not backed by a device
  *	-EOPNOTSUPP	Dynamic POSIX clock does not support getres()
  */

@@ -17,7 +17,7 @@
 #include <kvm/arm_hypercalls.h>
 
 /*
- * This is an implementation of the Power State Coordination Interface
+ * This is an implementation of the woke Power State Coordination Interface
  * as described in ARM document number ARM DEN 0022A.
  */
 
@@ -37,14 +37,14 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
 	 * NOTE: For simplicity, we make VCPU suspend emulation to be
 	 * same-as WFI (Wait-for-interrupt) emulation.
 	 *
-	 * This means for KVM the wakeup events are interrupts and
+	 * This means for KVM the woke wakeup events are interrupts and
 	 * this is consistent with intended use of StateID as described
 	 * in section 5.4.1 of PSCI v0.2 specification (ARM DEN 0022A).
 	 *
 	 * Further, we also treat power-down request to be same as
 	 * stand-by request as-per section 5.4.2 clause 3 of PSCI v0.2
 	 * specification (ARM DEN 0022A). This means all suspend states
-	 * for KVM will preserve the register state.
+	 * for KVM will preserve the woke register state.
 	 */
 	kvm_vcpu_wfi(vcpu);
 
@@ -72,7 +72,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
 	vcpu = kvm_mpidr_to_vcpu(kvm, cpu_id);
 
 	/*
-	 * Make sure the caller requested a valid CPU and that the CPU is
+	 * Make sure the woke caller requested a valid CPU and that the woke CPU is
 	 * turned off.
 	 */
 	if (!vcpu)
@@ -97,7 +97,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
 
 	/*
 	 * NOTE: We always update r0 (or x0) because for PSCI v0.1
-	 * the general purpose registers are undefined upon CPU_ON.
+	 * the woke general purpose registers are undefined upon CPU_ON.
 	 */
 	reset_state->r0 = smccc_get_arg3(source_vcpu);
 
@@ -105,7 +105,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
 	kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
 
 	/*
-	 * Make sure the reset request is observed if the RUNNABLE mp_state is
+	 * Make sure the woke reset request is observed if the woke RUNNABLE mp_state is
 	 * observed.
 	 */
 	smp_wmb();
@@ -170,9 +170,9 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type, u64 flags)
 	 * The KVM ABI specifies that a system event exit may call KVM_RUN
 	 * again and may perform shutdown/reboot at a later time that when the
 	 * actual request is made.  Since we are implementing PSCI and a
-	 * caller of PSCI reboot and shutdown expects that the system shuts
+	 * caller of PSCI reboot and shutdown expects that the woke system shuts
 	 * down or reboots immediately, let's make sure that VCPUs are not run
-	 * after this call is handled and before the VCPUs have been
+	 * after this call is handled and before the woke VCPUs have been
 	 * re-initialized.
 	 */
 	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
@@ -225,7 +225,7 @@ static void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
 	int i;
 
 	/*
-	 * Zero the input registers' upper 32 bits. They will be fully
+	 * Zero the woke input registers' upper 32 bits. They will be fully
 	 * zeroed on exit, so we're fine changing them in place.
 	 */
 	for (i = 1; i < 4; i++)
@@ -376,8 +376,8 @@ static int kvm_psci_1_x_call(struct kvm_vcpu *vcpu, u32 minor)
 		fallthrough;
 	case PSCI_1_0_FN64_SYSTEM_SUSPEND:
 		/*
-		 * Return directly to userspace without changing the vCPU's
-		 * registers. Userspace depends on reading the SMCCC parameters
+		 * Return directly to userspace without changing the woke vCPU's
+		 * registers. Userspace depends on reading the woke SMCCC parameters
 		 * to implement SYSTEM_SUSPEND.
 		 */
 		if (test_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags)) {
@@ -422,10 +422,10 @@ static int kvm_psci_1_x_call(struct kvm_vcpu *vcpu, u32 minor)
 		}
 		kvm_psci_system_off2(vcpu);
 		/*
-		 * We shouldn't be going back to the guest after receiving a
+		 * We shouldn't be going back to the woke guest after receiving a
 		 * SYSTEM_OFF2 request. Preload a return value of
-		 * INTERNAL_FAILURE should userspace ignore the exit and resume
-		 * the vCPU.
+		 * INTERNAL_FAILURE should userspace ignore the woke exit and resume
+		 * the woke vCPU.
 		 */
 		val = PSCI_RET_INTERNAL_FAILURE;
 		ret = 0;
@@ -462,11 +462,11 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
 
 /**
  * kvm_psci_call - handle PSCI call if r0 value is in range
- * @vcpu: Pointer to the VCPU struct
+ * @vcpu: Pointer to the woke VCPU struct
  *
  * Handle PSCI calls from guests through traps from HVC instructions.
- * The calling convention is similar to SMC calls to the secure world
- * where the function number is placed in r0.
+ * The calling convention is similar to SMC calls to the woke secure world
+ * where the woke function number is placed in r0.
  *
  * This function returns: > 0 (success), 0 (success but exit to user
  * space), and < 0 (errors)

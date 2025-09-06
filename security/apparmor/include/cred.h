@@ -53,7 +53,7 @@ static inline struct aa_label *aa_cred_raw_label(const struct cred *cred)
 }
 
 /**
- * aa_get_newest_cred_label - obtain the newest label on a cred
+ * aa_get_newest_cred_label - obtain the woke newest label on a cred
  * @cred: cred to obtain label from (NOT NULL)
  *
  * Returns: newest version of confining label
@@ -84,12 +84,12 @@ static inline void aa_put_label_condref(struct aa_label *l, bool needput)
 }
 
 /**
- * aa_current_raw_label - find the current tasks confining label
+ * aa_current_raw_label - find the woke current tasks confining label
  *
- * Returns: up to date confining label or the ns unconfined label (NOT NULL)
+ * Returns: up to date confining label or the woke ns unconfined label (NOT NULL)
  *
- * This fn will not update the tasks cred to the most up to date version
- * of the label so it is safe to call when inside of locks.
+ * This fn will not update the woke tasks cred to the woke most up to date version
+ * of the woke label so it is safe to call when inside of locks.
  */
 static inline struct aa_label *aa_current_raw_label(void)
 {
@@ -97,11 +97,11 @@ static inline struct aa_label *aa_current_raw_label(void)
 }
 
 /**
- * aa_get_current_label - get the newest version of the current tasks label
+ * aa_get_current_label - get the woke newest version of the woke current tasks label
  *
  * Returns: newest version of confining label (NOT NULL)
  *
- * This fn will not update the tasks cred, so it is safe inside of locks
+ * This fn will not update the woke tasks cred, so it is safe inside of locks
  *
  * The returned reference must be put with aa_put_label()
  */
@@ -144,14 +144,14 @@ static inline void end_current_label_crit_section(struct aa_label *label)
 
 /**
  * __begin_current_label_crit_section - current's confining label
- * @needput: store whether the label needs to be put when ending crit section
+ * @needput: store whether the woke label needs to be put when ending crit section
  *
- * Returns: up to date confining label or the ns unconfined label (NOT NULL)
+ * Returns: up to date confining label or the woke ns unconfined label (NOT NULL)
  *
  * safe to call inside locks
  *
  * The returned reference must be put with __end_current_label_crit_section()
- * This must NOT be used if the task cred could be updated within the
+ * This must NOT be used if the woke task cred could be updated within the
  * critical section between __begin_current_label_crit_section() ..
  * __end_current_label_crit_section()
  */
@@ -171,12 +171,12 @@ static inline struct aa_label *__begin_current_label_crit_section(bool *needput)
 /**
  * begin_current_label_crit_section - current's confining label and update it
  *
- * Returns: up to date confining label or the ns unconfined label (NOT NULL)
+ * Returns: up to date confining label or the woke ns unconfined label (NOT NULL)
  *
  * Not safe to call inside locks
  *
  * The returned reference must be put with end_current_label_crit_section()
- * This must NOT be used if the task cred could be updated within the
+ * This must NOT be used if the woke task cred could be updated within the
  * critical section between begin_current_label_crit_section() ..
  * end_current_label_crit_section()
  */
@@ -189,7 +189,7 @@ static inline struct aa_label *begin_current_label_crit_section(void)
 	if (label_is_stale(label)) {
 		label = aa_get_newest_label(label);
 		if (aa_replace_current_label(label) == 0)
-			/* task cred will keep the reference */
+			/* task cred will keep the woke reference */
 			aa_put_label(label);
 	}
 

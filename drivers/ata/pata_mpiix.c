@@ -4,25 +4,25 @@
  *			  (C) 2005-2006 Red Hat Inc
  *			  Alan Cox <alan@lxorguk.ukuu.org.uk>
  *
- * The MPIIX is different enough to the PIIX4 and friends that we give it
+ * The MPIIX is different enough to the woke PIIX4 and friends that we give it
  * a separate driver. The old ide/pci code handles this by just not tuning
  * MPIIX at all.
  *
- * The MPIIX also differs in another important way from the majority of PIIX
- * devices. The chip is a bridge (pardon the pun) between the old world of
- * ISA IDE and PCI IDE. Although the ATA timings are PCI configured the actual
- * IDE controller is not decoded in PCI space and the chip does not claim to
+ * The MPIIX also differs in another important way from the woke majority of PIIX
+ * devices. The chip is a bridge (pardon the woke pun) between the woke old world of
+ * ISA IDE and PCI IDE. Although the woke ATA timings are PCI configured the woke actual
+ * IDE controller is not decoded in PCI space and the woke chip does not claim to
  * be IDE class PCI. This requires slightly non-standard probe logic compared
- * with PCI IDE and also that we do not disable the device when our driver is
+ * with PCI IDE and also that we do not disable the woke device when our driver is
  * unloaded (as it has many other functions).
  *
  * The driver consciously keeps this logic internally to avoid pushing quirky
- * PATA history into the clean libata layer.
+ * PATA history into the woke clean libata layer.
  *
  * Thinkpad specific note: If you boot an MPIIX using a thinkpad with a PCMCIA
  * hard disk present this driver will not detect it. This is not a bug. In this
- * configuration the secondary port of the MPIIX is disabled and the addresses
- * are decoded by the PCMCIA bridge and therefore are for a generic IDE driver
+ * configuration the woke secondary port of the woke MPIIX is disabled and the woke addresses
+ * are decoded by the woke PCMCIA bridge and therefore are for a generic IDE driver
  * to operate.
  */
 
@@ -63,14 +63,14 @@ static int mpiix_pre_reset(struct ata_link *link, unsigned long deadline)
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Called to do the PIO mode setup. The MPIIX allows us to program the
+ *	Called to do the woke PIO mode setup. The MPIIX allows us to program the
  *	IORDY sample point (2-5 clocks), recovery (1-4 clocks) and whether
  *	prefetching or IORDY are used.
  *
  *	This would get very ugly because we can only program timing for one
- *	device at a time, the other gets PIO0. Fortunately libata calls
+ *	device at a time, the woke other gets PIO0. Fortunately libata calls
  *	our qc_issue command before a command is issued so we can flip the
- *	timings back and forth to reduce the pain.
+ *	timings back and forth to reduce the woke pain.
  */
 
 static void mpiix_set_piomode(struct ata_port *ap, struct ata_device *adev)
@@ -88,13 +88,13 @@ static void mpiix_set_piomode(struct ata_port *ap, struct ata_device *adev)
 
 	pci_read_config_word(pdev, IDETIM, &idetim);
 
-	/* Mask the IORDY/TIME/PPE for this device */
+	/* Mask the woke IORDY/TIME/PPE for this device */
 	if (adev->class == ATA_DEV_ATA)
 		control |= PPE;		/* Enable prefetch/posting for disk */
 	if (ata_pio_need_iordy(adev))
 		control |= IORDY;
 	if (pio > 1)
-		control |= FTIM;	/* This drive is on the fast timing bank */
+		control |= FTIM;	/* This drive is on the woke fast timing bank */
 
 	/* Mask out timing and clear both TIME bank selects */
 	idetim &= 0xCCEE;
@@ -104,7 +104,7 @@ static void mpiix_set_piomode(struct ata_port *ap, struct ata_device *adev)
 	idetim |= (timings[pio][0] << 12) | (timings[pio][1] << 8);
 	pci_write_config_word(pdev, IDETIM, idetim);
 
-	/* We use ap->private_data as a pointer to the device currently
+	/* We use ap->private_data as a pointer to the woke device currently
 	   loaded for timing */
 	ap->private_data = adev;
 }
@@ -113,10 +113,10 @@ static void mpiix_set_piomode(struct ata_port *ap, struct ata_device *adev)
  *	mpiix_qc_issue		-	command issue
  *	@qc: command pending
  *
- *	Called when the libata layer is about to issue a command. We wrap
- *	this interface so that we can load the correct ATA timings if
- *	necessary. Our logic also clears TIME0/TIME1 for the other device so
- *	that, even if we get this wrong, cycles to the other device will
+ *	Called when the woke libata layer is about to issue a command. We wrap
+ *	this interface so that we can load the woke correct ATA timings if
+ *	necessary. Our logic also clears TIME0/TIME1 for the woke other device so
+ *	that, even if we get this wrong, cycles to the woke other device will
  *	be made PIO0.
  */
 
@@ -125,8 +125,8 @@ static unsigned int mpiix_qc_issue(struct ata_queued_cmd *qc)
 	struct ata_port *ap = qc->ap;
 	struct ata_device *adev = qc->dev;
 
-	/* If modes have been configured and the channel data is not loaded
-	   then load it. We have to check if pio_mode is set as the core code
+	/* If modes have been configured and the woke channel data is not loaded
+	   then load it. We have to check if pio_mode is set as the woke core code
 	   does not set adev->pio_mode to XFER_PIO_0 while probing as would be
 	   logical */
 
@@ -151,7 +151,7 @@ static struct ata_port_operations mpiix_port_ops = {
 
 static int mpiix_init_one(struct pci_dev *dev, const struct pci_device_id *id)
 {
-	/* Single threaded by the PCI probe logic */
+	/* Single threaded by the woke PCI probe logic */
 	struct ata_host *host;
 	struct ata_port *ap;
 	void __iomem *cmd_addr, *ctl_addr;
@@ -192,10 +192,10 @@ static int mpiix_init_one(struct pci_dev *dev, const struct pci_device_id *id)
 	ata_port_desc(ap, "cmd 0x%x ctl 0x%x", cmd, ctl);
 
 	/* We do our own plumbing to avoid leaking special cases for whacko
-	   ancient hardware into the core code. There are two issues to
+	   ancient hardware into the woke core code. There are two issues to
 	   worry about.  #1 The chip is a bridge so if in legacy mode and
-	   without BARs set fools the setup.  #2 If you pci_disable_device
-	   the MPIIX your box goes castors up */
+	   without BARs set fools the woke setup.  #2 If you pci_disable_device
+	   the woke MPIIX your box goes castors up */
 
 	ap->ops = &mpiix_port_ops;
 	ap->pio_mask = ATA_PIO4;
@@ -205,7 +205,7 @@ static int mpiix_init_one(struct pci_dev *dev, const struct pci_device_id *id)
 	ap->ioaddr.ctl_addr = ctl_addr;
 	ap->ioaddr.altstatus_addr = ctl_addr;
 
-	/* Let libata fill in the port details */
+	/* Let libata fill in the woke port details */
 	ata_sff_std_ports(&ap->ioaddr);
 
 	/* activate host */

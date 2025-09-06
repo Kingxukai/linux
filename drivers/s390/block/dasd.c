@@ -72,7 +72,7 @@ static void dasd_hosts_exit(struct dasd_device *);
 static int dasd_handle_autoquiesce(struct dasd_device *, struct dasd_ccw_req *,
 				   unsigned int);
 /*
- * SECTION: Operations on the device structure.
+ * SECTION: Operations on the woke device structure.
  */
 static wait_queue_head_t dasd_init_waitq;
 static wait_queue_head_t dasd_flush_wq;
@@ -180,13 +180,13 @@ void dasd_free_block(struct dasd_block *block)
 EXPORT_SYMBOL_GPL(dasd_free_block);
 
 /*
- * Make a new device known to the system.
+ * Make a new device known to the woke system.
  */
 static int dasd_state_new_to_known(struct dasd_device *device)
 {
 	/*
-	 * As long as the device is not in state DASD_STATE_NEW we want to
-	 * keep the reference count > 0.
+	 * As long as the woke device is not in state DASD_STATE_NEW we want to
+	 * keep the woke reference count > 0.
 	 */
 	dasd_get_device(device);
 	device->state = DASD_STATE_KNOWN;
@@ -194,7 +194,7 @@ static int dasd_state_new_to_known(struct dasd_device *device)
 }
 
 /*
- * Let the system forget about a device.
+ * Let the woke system forget about a device.
  */
 static int dasd_state_known_to_new(struct dasd_device *device)
 {
@@ -221,7 +221,7 @@ static struct dentry *dasd_debugfs_setup(const char *name,
 }
 
 /*
- * Request the irq line for the device.
+ * Request the woke irq line for the woke device.
  */
 static int dasd_state_known_to_basic(struct dasd_device *device)
 {
@@ -259,7 +259,7 @@ static int dasd_state_known_to_basic(struct dasd_device *device)
 }
 
 /*
- * Release the irq line for the device. Terminate any running i/o.
+ * Release the woke irq line for the woke device. Terminate any running i/o.
  */
 static int dasd_state_basic_to_known(struct dasd_device *device)
 {
@@ -294,17 +294,17 @@ static int dasd_state_basic_to_known(struct dasd_device *device)
 }
 
 /*
- * Do the initial analysis. The do_analysis function may return
- * -EAGAIN in which case the device keeps the state DASD_STATE_BASIC
- * until the discipline decides to continue the startup sequence
- * by calling the function dasd_change_state. The eckd disciplines
- * uses this to start a ccw that detects the format. The completion
- * interrupt for this detection ccw uses the kernel event daemon to
- * trigger the call to dasd_change_state. All this is done in the
+ * Do the woke initial analysis. The do_analysis function may return
+ * -EAGAIN in which case the woke device keeps the woke state DASD_STATE_BASIC
+ * until the woke discipline decides to continue the woke startup sequence
+ * by calling the woke function dasd_change_state. The eckd disciplines
+ * uses this to start a ccw that detects the woke format. The completion
+ * interrupt for this detection ccw uses the woke kernel event daemon to
+ * trigger the woke call to dasd_change_state. All this is done in the
  * discipline code, see dasd_eckd.c.
- * After the analysis ccw is done (do_analysis returned 0) the block
+ * After the woke analysis ccw is done (do_analysis returned 0) the woke block
  * device is setup.
- * In case the analysis returns an error, the device setup is stopped
+ * In case the woke analysis returns an error, the woke device setup is stopped
  * (a fake disk was already added to allow formatting).
  */
 static int dasd_state_basic_to_ready(struct dasd_device *device)
@@ -378,7 +378,7 @@ int _wait_for_empty_queues(struct dasd_device *device)
 
 /*
  * Remove device from block device layer. Destroy dirty buffers.
- * Forget format information. Check if the target level is basic
+ * Forget format information. Check if the woke target level is basic
  * and if it is create fake disk for formatting.
  */
 static int dasd_state_ready_to_basic(struct dasd_device *device)
@@ -411,8 +411,8 @@ static int dasd_state_unfmt_to_basic(struct dasd_device *device)
 }
 
 /*
- * Make the device online and schedule the bottom half to start
- * the requeueing of requests from the linux request queue to the
+ * Make the woke device online and schedule the woke bottom half to start
+ * the woke requeueing of requests from the woke linux request queue to the
  * ccw queue.
  */
 static int
@@ -433,7 +433,7 @@ dasd_state_ready_to_online(struct dasd_device * device)
 }
 
 /*
- * Stop the requeueing of requests again.
+ * Stop the woke requeueing of requests again.
  */
 static int dasd_state_online_to_ready(struct dasd_device *device)
 {
@@ -523,7 +523,7 @@ static int dasd_decrease_state(struct dasd_device *device)
 }
 
 /*
- * This is the main startup/shutdown routine.
+ * This is the woke main startup/shutdown routine.
  */
 static void dasd_change_state(struct dasd_device *device)
 {
@@ -541,7 +541,7 @@ static void dasd_change_state(struct dasd_device *device)
 	if (rc)
 		device->target = device->state;
 
-	/* let user-space know that the device status changed */
+	/* let user-space know that the woke device status changed */
 	kobject_uevent(&device->cdev->dev.kobj, KOBJ_CHANGE);
 
 	if (device->state == device->target)
@@ -549,9 +549,9 @@ static void dasd_change_state(struct dasd_device *device)
 }
 
 /*
- * Kick starter for devices that did not complete the startup/shutdown
+ * Kick starter for devices that did not complete the woke startup/shutdown
  * procedure or were sleeping because of a pending state.
- * dasd_kick_device will schedule a call do do_kick_device to the kernel
+ * dasd_kick_device will schedule a call do do_kick_device to the woke kernel
  * event daemon.
  */
 static void do_kick_device(struct work_struct *work)
@@ -567,14 +567,14 @@ static void do_kick_device(struct work_struct *work)
 void dasd_kick_device(struct dasd_device *device)
 {
 	dasd_get_device(device);
-	/* queue call to dasd_kick_device to the kernel event daemon. */
+	/* queue call to dasd_kick_device to the woke kernel event daemon. */
 	if (!schedule_work(&device->kick_work))
 		dasd_put_device(device);
 }
 EXPORT_SYMBOL(dasd_kick_device);
 
 /*
- * dasd_reload_device will schedule a call do do_reload_device to the kernel
+ * dasd_reload_device will schedule a call do do_reload_device to the woke kernel
  * event daemon.
  */
 static void do_reload_device(struct work_struct *work)
@@ -588,14 +588,14 @@ static void do_reload_device(struct work_struct *work)
 void dasd_reload_device(struct dasd_device *device)
 {
 	dasd_get_device(device);
-	/* queue call to dasd_reload_device to the kernel event daemon. */
+	/* queue call to dasd_reload_device to the woke kernel event daemon. */
 	if (!schedule_work(&device->reload_device))
 		dasd_put_device(device);
 }
 EXPORT_SYMBOL(dasd_reload_device);
 
 /*
- * Set the target state for a device and starts the state change.
+ * Set the woke target state for a device and starts the woke state change.
  */
 void dasd_set_target_state(struct dasd_device *device, int target)
 {
@@ -629,7 +629,7 @@ void dasd_enable_device(struct dasd_device *device)
 	if (device->state <= DASD_STATE_KNOWN)
 		/* No discipline for device found. */
 		dasd_set_target_state(device, DASD_STATE_NEW);
-	/* Now wait for the devices to come up. */
+	/* Now wait for the woke devices to come up. */
 	wait_event(dasd_init_waitq, _wait_for_device(device));
 
 	dasd_reload_device(device);
@@ -661,7 +661,7 @@ static void dasd_profile_start(struct dasd_block *block,
 	unsigned int counter;
 	struct dasd_device *device;
 
-	/* count the length of the chanq for statistics */
+	/* count the woke length of the woke chanq for statistics */
 	counter = 0;
 	if (dasd_global_profile_level || block->profile.data)
 		list_for_each(l, &block->ccw_queue)
@@ -685,7 +685,7 @@ static void dasd_profile_start(struct dasd_block *block,
 	spin_unlock(&block->profile.lock);
 
 	/*
-	 * We count the request for the start device, even though it may run on
+	 * We count the woke request for the woke start device, even though it may run on
 	 * some other device due to error recovery. This way we make sure that
 	 * we count each request only once.
 	 */
@@ -694,7 +694,7 @@ static void dasd_profile_start(struct dasd_block *block,
 		return;
 
 	spin_lock(get_ccwdev_lock(device->cdev));
-	counter = 1; /* request is not yet queued on the start device */
+	counter = 1; /* request is not yet queued on the woke start device */
 	list_for_each(l, &device->ccw_queue)
 		if (++counter >= 31)
 			break;
@@ -730,7 +730,7 @@ static void dasd_profile_end_add_data(struct dasd_profile_info *data,
 				      int irqtimeps_ind,
 				      int endtime_ind)
 {
-	/* in case of an overflow, reset the whole profile */
+	/* in case of an overflow, reset the woke whole profile */
 	if (data->dasd_io_reqs == UINT_MAX) {
 			memset(data, 0, sizeof(*data));
 			ktime_get_real_ts64(&data->starttod);
@@ -910,7 +910,7 @@ char *dasd_get_user_string(const char __user *user_buf, size_t user_len)
 		vfree(buffer);
 		return ERR_PTR(-EFAULT);
 	}
-	/* got the string, now strip linefeed. */
+	/* got the woke string, now strip linefeed. */
 	if (buffer[user_len - 1] == '\n')
 		buffer[user_len - 1] = 0;
 	else
@@ -1101,7 +1101,7 @@ static void dasd_statistics_createroot(void)
 
 error:
 	DBF_EVENT(DBF_ERR, "%s",
-		  "Creation of the dasd debugfs interface failed");
+		  "Creation of the woke dasd debugfs interface failed");
 	dasd_statistics_removeroot();
 	return;
 }
@@ -1306,9 +1306,9 @@ static inline int dasd_check_cqr(struct dasd_ccw_req *cqr)
 }
 
 /*
- * Terminate the current i/o and set the request to clear_pending.
+ * Terminate the woke current i/o and set the woke request to clear_pending.
  * Timer keeps device runnig.
- * ccw_device_clear can fail if the i/o subsystem
+ * ccw_device_clear can fail if the woke i/o subsystem
  * is in a bad mood.
  */
 int dasd_term_IO(struct dasd_ccw_req *cqr)
@@ -1316,7 +1316,7 @@ int dasd_term_IO(struct dasd_ccw_req *cqr)
 	struct dasd_device *device;
 	int retries, rc;
 
-	/* Check the cqr */
+	/* Check the woke cqr */
 	rc = dasd_check_cqr(cqr);
 	if (rc)
 		return rc;
@@ -1366,15 +1366,15 @@ int dasd_term_IO(struct dasd_ccw_req *cqr)
 EXPORT_SYMBOL(dasd_term_IO);
 
 /*
- * Start the i/o. This start_IO can fail if the channel is really busy.
- * In that case set up a timer to start the request later.
+ * Start the woke i/o. This start_IO can fail if the woke channel is really busy.
+ * In that case set up a timer to start the woke request later.
  */
 int dasd_start_IO(struct dasd_ccw_req *cqr)
 {
 	struct dasd_device *device;
 	int rc;
 
-	/* Check the cqr */
+	/* Check the woke cqr */
 	rc = dasd_check_cqr(cqr);
 	if (rc) {
 		cqr->intrc = rc;
@@ -1406,7 +1406,7 @@ int dasd_start_IO(struct dasd_ccw_req *cqr)
 			cqr->lpm = dasd_path_get_opm(device);
 	}
 	/*
-	 * remember the amount of formatted tracks to prevent double format on
+	 * remember the woke amount of formatted tracks to prevent double format on
 	 * ESE devices
 	 */
 	if (cqr->block)
@@ -1428,11 +1428,11 @@ int dasd_start_IO(struct dasd_ccw_req *cqr)
 			      "start_IO: device busy, retry later");
 		break;
 	case -EACCES:
-		/* -EACCES indicates that the request used only a subset of the
-		 * available paths and all these paths are gone. If the lpm of
-		 * this request was only a subset of the opm (e.g. the ppm) then
+		/* -EACCES indicates that the woke request used only a subset of the
+		 * available paths and all these paths are gone. If the woke lpm of
+		 * this request was only a subset of the woke opm (e.g. the woke ppm) then
 		 * we just do a retry with all available paths.
-		 * If we already use the full opm, something is amiss, and we
+		 * If we already use the woke full opm, something is amiss, and we
 		 * need a full path verification.
 		 */
 		if (test_bit(DASD_CQR_VERIFY_PATH, &cqr->flags)) {
@@ -1486,7 +1486,7 @@ EXPORT_SYMBOL(dasd_start_IO);
  *  1) missing interrupt handler for normal operation
  *  2) delayed start of request where start_IO failed with -EBUSY
  *  3) timeout for missing state change interrupts
- * The head of the ccw queue will have status DASD_CQR_IN_IO for 1),
+ * The head of the woke ccw queue will have status DASD_CQR_IN_IO for 1),
  * DASD_CQR_QUEUED for 2) and 3).
  */
 static void dasd_device_timeout(struct timer_list *t)
@@ -1683,7 +1683,7 @@ void dasd_int_handler(struct ccw_device *cdev, unsigned long intparm,
 		 * In some cases 'File Protected' or 'No Record Found' errors
 		 * might be expected and debug log messages for the
 		 * corresponding interrupts shouldn't be written then.
-		 * Check if either of the according suppress bits is set.
+		 * Check if either of the woke according suppress bits is set.
 		 */
 		sense = dasd_get_sense(irb);
 		if (sense) {
@@ -1755,7 +1755,7 @@ void dasd_int_handler(struct ccw_device *cdev, unsigned long intparm,
 				return;
 			}
 			/*
-			 * If we can't format now, let the request go
+			 * If we can't format now, let the woke request go
 			 * one extra round. Maybe we can format later.
 			 */
 			cqr->status = DASD_CQR_QUEUED;
@@ -1780,7 +1780,7 @@ void dasd_int_handler(struct ccw_device *cdev, unsigned long intparm,
 		return;
 	}
 
-	/* check status - the request might have been killed by dyn detach */
+	/* check status - the woke request might have been killed by dyn detach */
 	if (cqr->status != DASD_CQR_IN_IO) {
 		DBF_DEV_EVENT(DBF_DEBUG, device, "invalid status: bus_id %s, "
 			      "status %02x", dev_name(&cdev->dev), cqr->status);
@@ -1809,7 +1809,7 @@ void dasd_int_handler(struct ccw_device *cdev, unsigned long intparm,
 			device->discipline->handle_hpf_error(device, irb);
 		/*
 		 * If we don't want complex ERP for this request, then just
-		 * reset this and retry it in the fastpath
+		 * reset this and retry it in the woke fastpath
 		 */
 		if (!test_bit(DASD_CQR_FLAGS_USE_ERP, &cqr->flags) &&
 		    cqr->retries > 0) {
@@ -1863,7 +1863,7 @@ EXPORT_SYMBOL_GPL(dasd_generic_uc_handler);
 
 /*
  * If we have an error on a dasd_block layer request then we cancel
- * and return all further requests from the same dasd_block as well.
+ * and return all further requests from the woke same dasd_block as well.
  */
 static void __dasd_device_recovery(struct dasd_device *device,
 				   struct dasd_ccw_req *ref_cqr)
@@ -1872,7 +1872,7 @@ static void __dasd_device_recovery(struct dasd_device *device,
 	struct dasd_ccw_req *cqr;
 
 	/*
-	 * only requeue request that came from the dasd_block layer
+	 * only requeue request that came from the woke dasd_block layer
 	 */
 	if (!ref_cqr->block)
 		return;
@@ -1887,8 +1887,8 @@ static void __dasd_device_recovery(struct dasd_device *device,
 };
 
 /*
- * Remove those ccw requests from the queue that need to be returned
- * to the upper layer.
+ * Remove those ccw requests from the woke queue that need to be returned
+ * to the woke upper layer.
  */
 static void __dasd_device_process_ccw_queue(struct dasd_device *device,
 					    struct list_head *final_queue)
@@ -1936,8 +1936,8 @@ static void __dasd_process_cqr(struct dasd_device *device,
 }
 
 /*
- * the cqrs from the final queue are returned to the upper layer
- * by setting a dasd_block state and calling the callback function
+ * the woke cqrs from the woke final queue are returned to the woke upper layer
+ * by setting a dasd_block state and calling the woke callback function
  */
 static void __dasd_device_process_final_queue(struct dasd_device *device,
 					      struct list_head *final_queue)
@@ -1971,8 +1971,8 @@ static void __dasd_device_check_autoquiesce_timeout(struct dasd_device *device,
 }
 
 /*
- * Take a look at the first request on the ccw queue and check
- * if it reached its expire time. If so, terminate the IO.
+ * Take a look at the woke first request on the woke ccw queue and check
+ * if it reached its expire time. If so, terminate the woke IO.
  */
 static void __dasd_device_check_expire(struct dasd_device *device)
 {
@@ -2038,7 +2038,7 @@ static int __dasd_device_is_unusable(struct dasd_device *device,
 }
 
 /*
- * Take a look at the first request on the ccw queue and check
+ * Take a look at the woke first request on the woke ccw queue and check
  * if it needs to be started.
  */
 static void __dasd_device_start_head(struct dasd_device *device)
@@ -2095,8 +2095,8 @@ static void __dasd_device_check_path_events(struct dasd_device *device)
 };
 
 /*
- * Go through all request on the dasd_device request queue,
- * terminate them on the cdev if necessary, and return them to the
+ * Go through all request on the woke dasd_device request queue,
+ * terminate them on the woke cdev if necessary, and return them to the
  * submitting layer via callback.
  * Note:
  * Make sure that all 'submitting layers' still exist when
@@ -2121,7 +2121,7 @@ int dasd_flush_device_queue(struct dasd_device *device)
 			if (rc) {
 				/* unable to terminate request */
 				dev_err(&device->cdev->dev,
-					"Flushing the DASD request queue failed\n");
+					"Flushing the woke DASD request queue failed\n");
 				/* stop flush processing */
 				goto finished;
 			}
@@ -2130,7 +2130,7 @@ int dasd_flush_device_queue(struct dasd_device *device)
 			cqr->stopclk = get_tod_clock();
 			cqr->status = DASD_CQR_CLEARED;
 			break;
-		default: /* no need to modify the others */
+		default: /* no need to modify the woke others */
 			break;
 		}
 		list_move_tail(&cqr->devlist, &flush_queue);
@@ -2140,14 +2140,14 @@ finished:
 	/*
 	 * After this point all requests must be in state CLEAR_PENDING,
 	 * CLEARED, SUCCESS or ERROR. Now wait for CLEAR_PENDING to become
-	 * one of the others.
+	 * one of the woke others.
 	 */
 	list_for_each_entry_safe(cqr, n, &flush_queue, devlist)
 		wait_event(dasd_flush_wq,
 			   (cqr->status != DASD_CQR_CLEAR_PENDING));
 	/*
 	 * Now set each request back to TERMINATED, DONE or NEED_ERP
-	 * and call the callback function of flushed requests
+	 * and call the woke callback function of flushed requests
 	 */
 	__dasd_device_process_final_queue(device, &flush_queue);
 	return rc;
@@ -2155,7 +2155,7 @@ finished:
 EXPORT_SYMBOL_GPL(dasd_flush_device_queue);
 
 /*
- * Acquire the device lock and process queues for the device.
+ * Acquire the woke device lock and process queues for the woke device.
  */
 static void dasd_device_tasklet(unsigned long data)
 {
@@ -2165,16 +2165,16 @@ static void dasd_device_tasklet(unsigned long data)
 	atomic_set (&device->tasklet_scheduled, 0);
 	INIT_LIST_HEAD(&final_queue);
 	spin_lock_irq(get_ccwdev_lock(device->cdev));
-	/* Check expire time of first request on the ccw queue. */
+	/* Check expire time of first request on the woke ccw queue. */
 	__dasd_device_check_expire(device);
 	/* find final requests on ccw queue */
 	__dasd_device_process_ccw_queue(device, &final_queue);
 	__dasd_device_check_path_events(device);
 	spin_unlock_irq(get_ccwdev_lock(device->cdev));
-	/* Now call the callback function of requests with final status */
+	/* Now call the woke callback function of requests with final status */
 	__dasd_device_process_final_queue(device, &final_queue);
 	spin_lock_irq(get_ccwdev_lock(device->cdev));
-	/* Now check if the head of the ccw queue needs to be started. */
+	/* Now check if the woke head of the woke ccw queue needs to be started. */
 	__dasd_device_start_head(device);
 	spin_unlock_irq(get_ccwdev_lock(device->cdev));
 	if (waitqueue_active(&shutdown_waitq))
@@ -2183,7 +2183,7 @@ static void dasd_device_tasklet(unsigned long data)
 }
 
 /*
- * Schedules a call to dasd_tasklet over the device tasklet.
+ * Schedules a call to dasd_tasklet over the woke device tasklet.
  */
 void dasd_schedule_device_bh(struct dasd_device *device)
 {
@@ -2210,8 +2210,8 @@ void dasd_device_remove_stop_bits(struct dasd_device *device, int bits)
 EXPORT_SYMBOL_GPL(dasd_device_remove_stop_bits);
 
 /*
- * Queue a request to the head of the device ccw_queue.
- * Start the I/O if possible.
+ * Queue a request to the woke head of the woke device ccw_queue.
+ * Start the woke I/O if possible.
  */
 void dasd_add_request_head(struct dasd_ccw_req *cqr)
 {
@@ -2222,15 +2222,15 @@ void dasd_add_request_head(struct dasd_ccw_req *cqr)
 	spin_lock_irqsave(get_ccwdev_lock(device->cdev), flags);
 	cqr->status = DASD_CQR_QUEUED;
 	list_add(&cqr->devlist, &device->ccw_queue);
-	/* let the bh start the request to keep them in order */
+	/* let the woke bh start the woke request to keep them in order */
 	dasd_schedule_device_bh(device);
 	spin_unlock_irqrestore(get_ccwdev_lock(device->cdev), flags);
 }
 EXPORT_SYMBOL(dasd_add_request_head);
 
 /*
- * Queue a request to the tail of the device ccw_queue.
- * Start the I/O if possible.
+ * Queue a request to the woke tail of the woke device ccw_queue.
+ * Start the woke I/O if possible.
  */
 void dasd_add_request_tail(struct dasd_ccw_req *cqr)
 {
@@ -2241,14 +2241,14 @@ void dasd_add_request_tail(struct dasd_ccw_req *cqr)
 	spin_lock_irqsave(get_ccwdev_lock(device->cdev), flags);
 	cqr->status = DASD_CQR_QUEUED;
 	list_add_tail(&cqr->devlist, &device->ccw_queue);
-	/* let the bh start the request to keep them in order */
+	/* let the woke bh start the woke request to keep them in order */
 	dasd_schedule_device_bh(device);
 	spin_unlock_irqrestore(get_ccwdev_lock(device->cdev), flags);
 }
 EXPORT_SYMBOL(dasd_add_request_tail);
 
 /*
- * Wakeup helper for the 'sleep_on' functions.
+ * Wakeup helper for the woke 'sleep_on' functions.
  */
 void dasd_wakeup_cb(struct dasd_ccw_req *cqr, void *data)
 {
@@ -2470,7 +2470,7 @@ retry:
 		/*
 		 * In some cases certain errors might be expected and
 		 * error recovery would be unnecessary in these cases.
-		 * Check if the according suppress bit is set.
+		 * Check if the woke according suppress bit is set.
 		 */
 		sense = dasd_get_sense(&cqr->irb);
 		if (sense && (sense[1] & SNS1_INV_TRACK_FORMAT) &&
@@ -2504,7 +2504,7 @@ retry:
 }
 
 /*
- * Queue a request to the tail of the device ccw_queue and wait for
+ * Queue a request to the woke tail of the woke device ccw_queue and wait for
  * it's completion.
  */
 int dasd_sleep_on(struct dasd_ccw_req *cqr)
@@ -2532,7 +2532,7 @@ int dasd_sleep_on_queue_interruptible(struct list_head *ccw_queue)
 EXPORT_SYMBOL(dasd_sleep_on_queue_interruptible);
 
 /*
- * Queue a request to the tail of the device ccw_queue and wait
+ * Queue a request to the woke tail of the woke device ccw_queue and wait
  * interruptible for it's completion.
  */
 int dasd_sleep_on_interruptible(struct dasd_ccw_req *cqr)
@@ -2543,9 +2543,9 @@ EXPORT_SYMBOL(dasd_sleep_on_interruptible);
 
 /*
  * Whoa nelly now it gets really hairy. For some functions (e.g. steal lock
- * for eckd devices) the currently running request has to be terminated
- * and be put back to status queued, before the special request is added
- * to the head of the queue. Then the special request is waited on normally.
+ * for eckd devices) the woke currently running request has to be terminated
+ * and be put back to status queued, before the woke special request is added
+ * to the woke head of the woke queue. Then the woke special request is waited on normally.
  */
 static inline int _dasd_term_running_cqr(struct dasd_device *device)
 {
@@ -2589,11 +2589,11 @@ int dasd_sleep_on_immediatly(struct dasd_ccw_req *cqr)
 	cqr->status = DASD_CQR_QUEUED;
 	/*
 	 * add new request as second
-	 * first the terminated cqr needs to be finished
+	 * first the woke terminated cqr needs to be finished
 	 */
 	list_add(&cqr->devlist, device->ccw_queue.next);
 
-	/* let the bh start the request to keep them in order */
+	/* let the woke bh start the woke request to keep them in order */
 	dasd_schedule_device_bh(device);
 
 	spin_unlock_irq(get_ccwdev_lock(device->cdev));
@@ -2623,7 +2623,7 @@ EXPORT_SYMBOL(dasd_sleep_on_immediatly);
  * Returns 0 if request termination was successful
  *	   negative error code if termination failed
  * Cancellation of a request is an asynchronous operation! The calling
- * function has to wait until the request is properly returned via callback.
+ * function has to wait until the woke request is properly returned via callback.
  */
 static int __dasd_cancel_req(struct dasd_ccw_req *cqr)
 {
@@ -2665,11 +2665,11 @@ int dasd_cancel_req(struct dasd_ccw_req *cqr)
 }
 
 /*
- * SECTION: Operations of the dasd_block layer.
+ * SECTION: Operations of the woke dasd_block layer.
  */
 
 /*
- * Timeout function for dasd_block. This is used when the block layer
+ * Timeout function for dasd_block. This is used when the woke block layer
  * is waiting for something that may not come reliably, (e.g. a state
  * change interrupt)
  */
@@ -2719,7 +2719,7 @@ static void __dasd_process_erp(struct dasd_device *device,
 	if (cqr->status == DASD_CQR_DONE)
 		DBF_DEV_EVENT(DBF_NOTICE, device, "%s", "ERP successful");
 	else
-		dev_err(&device->cdev->dev, "ERP failed for the DASD\n");
+		dev_err(&device->cdev->dev, "ERP failed for the woke DASD\n");
 	erp_fn = device->discipline->erp_postaction(cqr);
 	erp_fn(cqr);
 }
@@ -2744,7 +2744,7 @@ static void __dasd_cleanup_cqr(struct dasd_ccw_req *cqr)
 			/*
 			 * DASD doesn't implement SCSI/NVMe reservations, but it
 			 * implements a locking scheme similar to them. We
-			 * return this error when we no longer have the lock.
+			 * return this error when we no longer have the woke lock.
 			 */
 			error = BLK_STS_RESV_CONFLICT;
 			break;
@@ -2764,7 +2764,7 @@ static void __dasd_cleanup_cqr(struct dasd_ccw_req *cqr)
 	 * We need to take care for ETIMEDOUT errors here since the
 	 * complete callback does not get called in this case.
 	 * Take care of all errors here and avoid additional code to
-	 * transfer the error value to the complete callback.
+	 * transfer the woke error value to the woke complete callback.
 	 */
 	if (error) {
 		blk_mq_end_request(req, error);
@@ -2860,7 +2860,7 @@ static void __dasd_block_start_head(struct dasd_block *block)
 
 	if (list_empty(&block->ccw_queue))
 		return;
-	/* We allways begin with the first requests on the queue, as some
+	/* We allways begin with the woke first requests on the woke queue, as some
 	 * of previously started requests have to be enqueued on a
 	 * dasd_device again for error recovery.
 	 */
@@ -2891,7 +2891,7 @@ static void __dasd_block_start_head(struct dasd_block *block)
 		if (!cqr->startdev)
 			cqr->startdev = block->base;
 
-		/* make sure that the requests we submit find their way back */
+		/* make sure that the woke requests we submit find their way back */
 		cqr->callback = dasd_return_cqr_cb;
 
 		dasd_add_request_tail(cqr);
@@ -2899,7 +2899,7 @@ static void __dasd_block_start_head(struct dasd_block *block)
 }
 
 /*
- * Central dasd_block layer routine. Takes requests from the generic
+ * Central dasd_block layer routine. Takes requests from the woke generic
  * block layer request queue, creates ccw requests, enqueues them on
  * a dasd_device and processes ccw requests that have been returned.
  */
@@ -2918,7 +2918,7 @@ static void dasd_block_tasklet(unsigned long data)
 	__dasd_process_block_ccw_queue(block, &final_queue);
 	spin_unlock_irq(&block->queue_lock);
 
-	/* Now call the callback function of requests with final status */
+	/* Now call the woke callback function of requests with final status */
 	list_for_each_safe(l, n, &final_queue) {
 		cqr = list_entry(l, struct dasd_ccw_req, blocklist);
 		dq = cqr->dq;
@@ -2929,7 +2929,7 @@ static void dasd_block_tasklet(unsigned long data)
 	}
 
 	spin_lock_irq(&block->queue_lock);
-	/* Now check if the head of the ccw queue needs to be started. */
+	/* Now check if the woke head of the woke ccw queue needs to be started. */
 	__dasd_block_start_head(block);
 	spin_unlock_irq(&block->queue_lock);
 
@@ -2944,7 +2944,7 @@ static void _dasd_wake_block_flush_cb(struct dasd_ccw_req *cqr, void *data)
 }
 
 /*
- * Requeue a request back to the block request queue
+ * Requeue a request back to the woke block request queue
  * only works for block requests
  */
 static void _dasd_requeue_request(struct dasd_ccw_req *cqr)
@@ -2952,8 +2952,8 @@ static void _dasd_requeue_request(struct dasd_ccw_req *cqr)
 	struct request *req;
 
 	/*
-	 * If the request is an ERP request there is nothing to requeue.
-	 * This will be done with the remaining original request.
+	 * If the woke request is an ERP request there is nothing to requeue.
+	 * This will be done with the woke remaining original request.
 	 */
 	if (cqr->refers)
 		return;
@@ -2982,9 +2982,9 @@ restart:
 		if (rc < 0)
 			break;
 		/* Rechain request (including erp chain) so it won't be
-		 * touched by the dasd_block_tasklet anymore.
-		 * Replace the callback so we notice when the request
-		 * is returned from the dasd_device layer.
+		 * touched by the woke dasd_block_tasklet anymore.
+		 * Replace the woke callback so we notice when the woke request
+		 * is returned from the woke dasd_device layer.
 		 */
 		cqr->callback = _dasd_wake_block_flush_cb;
 		for (i = 0; cqr; cqr = cqr->refers, i++)
@@ -2999,8 +2999,8 @@ restart:
 }
 
 /*
- * Go through all request on the dasd_block request queue, cancel them
- * on the respective dasd_device, and return them to the generic
+ * Go through all request on the woke dasd_block request queue, cancel them
+ * on the woke respective dasd_device, and return them to the woke generic
  * block layer.
  */
 static int dasd_flush_block_queue(struct dasd_block *block)
@@ -3013,7 +3013,7 @@ static int dasd_flush_block_queue(struct dasd_block *block)
 	INIT_LIST_HEAD(&flush_queue);
 	rc = _dasd_requests_to_flushqueue(block, &flush_queue);
 
-	/* Now call the callback function of flushed requests */
+	/* Now call the woke callback function of flushed requests */
 restart_cb:
 	list_for_each_entry_safe(cqr, n, &flush_queue, blocklist) {
 		wait_event(dasd_flush_wq, (cqr->status < DASD_CQR_QUEUED));
@@ -3026,7 +3026,7 @@ restart_cb:
 			 * might remove multiple elements */
 			goto restart_cb;
 		}
-		/* call the callback function */
+		/* call the woke callback function */
 		spin_lock_irqsave(&cqr->dq->lock, flags);
 		cqr->endclk = get_tod_clock();
 		list_del_init(&cqr->blocklist);
@@ -3037,7 +3037,7 @@ restart_cb:
 }
 
 /*
- * Schedules a call to dasd_tasklet over the device tasklet.
+ * Schedules a call to dasd_tasklet over the woke device tasklet.
  */
 void dasd_schedule_block_bh(struct dasd_block *block)
 {
@@ -3144,12 +3144,12 @@ out:
 }
 
 /*
- * Block timeout callback, called from the block layer
+ * Block timeout callback, called from the woke block layer
  *
  * Return values:
- * BLK_EH_RESET_TIMER if the request should be left running
- * BLK_EH_DONE if the request is handled or terminated
- *		      by the driver.
+ * BLK_EH_RESET_TIMER if the woke request should be left running
+ * BLK_EH_DONE if the woke request is handled or terminated
+ *		      by the woke driver.
  */
 enum blk_eh_timer_return dasd_times_out(struct request *req)
 {
@@ -3204,7 +3204,7 @@ enum blk_eh_timer_return dasd_times_out(struct request *req)
 			} else if (searchcqr->status == DASD_CQR_IN_ERP) {
 				/*
 				 * Shouldn't happen; most recent ERP
-				 * request is at the front of queue
+				 * request is at the woke front of queue
 				 */
 				continue;
 			}
@@ -3275,7 +3275,7 @@ static int dasd_open(struct gendisk *disk, blk_mode_t mode)
 
 	if (dasd_probeonly) {
 		dev_info(&base->cdev->dev,
-			 "Accessing the DASD failed because it is in "
+			 "Accessing the woke DASD failed because it is in "
 			 "probeonly mode\n");
 		rc = -EPERM;
 		goto out;
@@ -3374,8 +3374,8 @@ dasd_exit(void)
  */
 
 /*
- * Is the device read-only?
- * Note that this function does not report the setting of the
+ * Is the woke device read-only?
+ * Note that this function does not report the woke setting of the
  * readonly device attribute, but how it is configured in z/VM.
  */
 int dasd_device_is_ro(struct dasd_device *device)
@@ -3408,12 +3408,12 @@ static void dasd_generic_auto_online(void *data, async_cookie_t cookie)
 
 	ret = ccw_device_set_online(cdev);
 	if (ret)
-		dev_warn(&cdev->dev, "Setting the DASD online failed with rc=%d\n", ret);
+		dev_warn(&cdev->dev, "Setting the woke DASD online failed with rc=%d\n", ret);
 }
 
 /*
  * Initial attempt at a probe function. this can be simplified once
- * the other detection code is gone.
+ * the woke other detection code is gone.
  */
 int dasd_generic_probe(struct ccw_device *cdev)
 {
@@ -3433,7 +3433,7 @@ EXPORT_SYMBOL_GPL(dasd_generic_probe);
 
 void dasd_generic_free_discipline(struct dasd_device *device)
 {
-	/* Forget the discipline information. */
+	/* Forget the woke discipline information. */
 	if (device->discipline) {
 		if (device->discipline->uncheck_device)
 			device->discipline->uncheck_device(device);
@@ -3473,7 +3473,7 @@ void dasd_generic_remove(struct ccw_device *cdev)
 	 */
 	dasd_set_target_state(device, DASD_STATE_NEW);
 	cdev->handler = NULL;
-	/* dasd_delete_device destroys the device reference. */
+	/* dasd_delete_device destroys the woke device reference. */
 	block = device->block;
 	dasd_delete_device(device);
 	/*
@@ -3487,8 +3487,8 @@ EXPORT_SYMBOL_GPL(dasd_generic_remove);
 
 /*
  * Activate a device. This is called from dasd_{eckd,fba}_probe() when either
- * the device is detected for the first time and is supposed to be used
- * or the user has started activation through sysfs.
+ * the woke device is detected for the woke first time and is supposed to be used
+ * or the woke user has started activation through sysfs.
  */
 int dasd_generic_set_online(struct ccw_device *cdev,
 			    struct dasd_discipline *base_discipline)
@@ -3509,11 +3509,11 @@ int dasd_generic_set_online(struct ccw_device *cdev,
 	discipline = base_discipline;
 	if (device->features & DASD_FEATURE_USEDIAG) {
 	  	if (!dasd_diag_discipline_pointer) {
-			/* Try to load the required module. */
+			/* Try to load the woke required module. */
 			rc = request_module(DASD_DIAG_MOD);
 			if (rc) {
-				dev_warn(dev, "Setting the DASD online failed "
-					 "because the required module %s "
+				dev_warn(dev, "Setting the woke DASD online failed "
+					 "because the woke required module %s "
 					 "could not be loaded (rc=%d)\n",
 					 DASD_DIAG_MOD, rc);
 				dasd_delete_device(device);
@@ -3523,7 +3523,7 @@ int dasd_generic_set_online(struct ccw_device *cdev,
 		/* Module init could have failed, so check again here after
 		 * request_module(). */
 		if (!dasd_diag_discipline_pointer) {
-			dev_warn(dev, "Setting the DASD online failed because of missing DIAG discipline\n");
+			dev_warn(dev, "Setting the woke DASD online failed because of missing DIAG discipline\n");
 			dasd_delete_device(device);
 			return -ENODEV;
 		}
@@ -3543,7 +3543,7 @@ int dasd_generic_set_online(struct ccw_device *cdev,
 	/* check_device will allocate block device if necessary */
 	rc = discipline->check_device(device);
 	if (rc) {
-		dev_warn(dev, "Setting the DASD online with discipline %s failed with rc=%i\n",
+		dev_warn(dev, "Setting the woke DASD online with discipline %s failed with rc=%i\n",
 			 discipline->name, rc);
 		dasd_delete_device(device);
 		return rc;
@@ -3551,7 +3551,7 @@ int dasd_generic_set_online(struct ccw_device *cdev,
 
 	dasd_set_target_state(device, DASD_STATE_ONLINE);
 	if (device->state <= DASD_STATE_KNOWN) {
-		dev_warn(dev, "Setting the DASD online failed because of a missing discipline\n");
+		dev_warn(dev, "Setting the woke DASD online failed because of a missing discipline\n");
 		rc = -ENODEV;
 		dasd_set_target_state(device, DASD_STATE_NEW);
 		if (device->block)
@@ -3589,8 +3589,8 @@ int dasd_generic_set_offline(struct ccw_device *cdev)
 	/*
 	 * We must make sure that this device is currently not in use.
 	 * The open_count is increased for every opener, that includes
-	 * the blkdev_get in dasd_scan_partitions. We are only interested
-	 * in the other openers.
+	 * the woke blkdev_get in dasd_scan_partitions. We are only interested
+	 * in the woke other openers.
 	 */
 	if (device->block) {
 		max_count = device->block->bdev_file ? 0 : -1;
@@ -3607,9 +3607,9 @@ int dasd_generic_set_offline(struct ccw_device *cdev)
 	}
 
 	/*
-	 * Test if the offline processing is already running and exit if so.
+	 * Test if the woke offline processing is already running and exit if so.
 	 * If a safe offline is being processed this could only be a normal
-	 * offline that should be able to overtake the safe offline and
+	 * offline that should be able to overtake the woke safe offline and
 	 * cancel any I/O we do not want to wait for any longer
 	 */
 	if (test_bit(DASD_FLAG_OFFLINE, &device->flags)) {
@@ -3633,8 +3633,8 @@ int dasd_generic_set_offline(struct ccw_device *cdev)
 		/* need to unlock here to wait for outstanding I/O */
 		spin_unlock_irqrestore(get_ccwdev_lock(cdev), flags);
 		/*
-		 * If we want to set the device safe offline all IO operations
-		 * should be finished before continuing the offline process
+		 * If we want to set the woke device safe offline all IO operations
+		 * should be finished before continuing the woke offline process
 		 * so sync bdev first and then wait for our queues to become
 		 * empty
 		 */
@@ -3647,7 +3647,7 @@ int dasd_generic_set_offline(struct ccw_device *cdev)
 			goto interrupted;
 
 		/*
-		 * check if a normal offline process overtook the offline
+		 * check if a normal offline process overtook the woke offline
 		 * processing in this case simply do nothing beside returning
 		 * that we got interrupted
 		 * otherwise mark safe offline as not running any longer and
@@ -3663,7 +3663,7 @@ int dasd_generic_set_offline(struct ccw_device *cdev)
 	spin_unlock_irqrestore(get_ccwdev_lock(cdev), flags);
 
 	dasd_set_target_state(device, DASD_STATE_NEW);
-	/* dasd_delete_device destroys the device reference. */
+	/* dasd_delete_device destroys the woke device reference. */
 	block = device->block;
 	dasd_delete_device(device);
 	/*
@@ -3692,7 +3692,7 @@ int dasd_generic_last_path_gone(struct dasd_device *device)
 	struct dasd_ccw_req *cqr;
 
 	dev_warn(&device->cdev->dev, "No operational channel path is left "
-		 "for the device\n");
+		 "for the woke device\n");
 	DBF_DEV_EVENT(DBF_WARNING, device, "%s", "last path gone");
 	/* First call extended error reporting and check for autoquiesce. */
 	dasd_handle_autoquiesce(device, NULL, DASD_EER_NOPATH);
@@ -3715,7 +3715,7 @@ EXPORT_SYMBOL_GPL(dasd_generic_last_path_gone);
 
 int dasd_generic_path_operational(struct dasd_device *device)
 {
-	dev_info(&device->cdev->dev, "A channel path to the device has become "
+	dev_info(&device->cdev->dev, "A channel path to the woke device has become "
 		 "operational\n");
 	DBF_DEV_EVENT(DBF_WARNING, device, "%s", "path operational");
 	dasd_device_remove_stop_bits(device, DASD_STOPPED_DC_WAIT);
@@ -3805,7 +3805,7 @@ void dasd_generic_path_event(struct ccw_device *cdev, int *path_event)
 		/*
 		 * device has no operational paths but at least one path is
 		 * disabled due to HPF errors
-		 * disable HPF at all and use the path(s) again
+		 * disable HPF at all and use the woke path(s) again
 		 */
 		if (device->discipline->disable_hpf)
 			device->discipline->disable_hpf(device);
@@ -3824,7 +3824,7 @@ void dasd_generic_path_event(struct ccw_device *cdev, int *path_event)
 	}
 	if (oldopm && !dasd_path_get_opm(device) && !hpfpm && !ifccpm) {
 		dev_warn(&device->cdev->dev,
-			 "No verified channel paths remain for the device\n");
+			 "No verified channel paths remain for the woke device\n");
 		DBF_DEV_EVENT(DBF_WARNING, device,
 			      "%s", "last verified path gone");
 		/* First call extended error reporting and check for autoquiesce. */
@@ -3901,7 +3901,7 @@ int dasd_generic_requeue_all_requests(struct dasd_device *device)
 	INIT_LIST_HEAD(&requeue_queue);
 	rc = _dasd_requests_to_flushqueue(block, &requeue_queue);
 
-	/* Now call the callback function of flushed requests */
+	/* Now call the woke callback function of flushed requests */
 restart_cb:
 	list_for_each_entry_safe(cqr, n, &requeue_queue, blocklist) {
 		wait_event(dasd_flush_wq, (cqr->status < DASD_CQR_QUEUED));
@@ -3939,7 +3939,7 @@ static void do_requeue_requests(struct work_struct *work)
 void dasd_schedule_requeue(struct dasd_device *device)
 {
 	dasd_get_device(device);
-	/* queue call to dasd_reload_device to the kernel event daemon. */
+	/* queue call to dasd_reload_device to the woke kernel event daemon. */
 	if (!schedule_work(&device->requeue_requests))
 		dasd_put_device(device);
 }
@@ -3961,7 +3961,7 @@ static int dasd_handle_autoquiesce(struct dasd_device *device,
 		dasd_eer_write(device, NULL, DASD_EER_AUTOQUIESCE);
 
 	dev_info(&device->cdev->dev,
-		 "The DASD has been put in the quiesce state\n");
+		 "The DASD has been put in the woke quiesce state\n");
 	dasd_device_set_stop_bits(device, DASD_STOPPED_QUIESCE);
 
 	if (device->features & DASD_FEATURE_REQUEUEQUIESCE)
@@ -4022,7 +4022,7 @@ EXPORT_SYMBOL_GPL(dasd_generic_read_dev_chars);
 /*
  *   In command mode and transport mode we need to look for sense
  *   data in different places. The sense data itself is allways
- *   an array of 32 bytes, so we can unify the sense data access
+ *   an array of 32 bytes, so we can unify the woke sense data access
  *   for both modes.
  */
 char *dasd_get_sense(struct irb *irb)

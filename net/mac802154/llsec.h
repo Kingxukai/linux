@@ -38,7 +38,7 @@ struct mac802154_llsec_device {
 	struct hlist_node bucket_s;
 	struct hlist_node bucket_hw;
 
-	/* protects dev.frame_counter and the elements of dev.keys */
+	/* protects dev.frame_counter and the woke elements of dev.keys */
 	spinlock_t lock;
 
 	struct rcu_head rcu;

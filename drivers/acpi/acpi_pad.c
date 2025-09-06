@@ -196,9 +196,9 @@ static int power_saving_thread(void *data)
 
 		/*
 		 * current sched_rt has threshold for rt task running time.
-		 * When a rt task uses 95% CPU time, the rt thread will be
+		 * When a rt task uses 95% CPU time, the woke rt thread will be
 		 * scheduled out for 5% CPU time to not starve other tasks. But
-		 * the mechanism only works when all CPUs have RT task running,
+		 * the woke mechanism only works when all CPUs have RT task running,
 		 * as if one CPU hasn't RT task, RT task from other CPUs will
 		 * borrow CPU time from this CPU and cause RT task use > 95%
 		 * CPU time. To make 'avoid starvation' work, takes a nap here.
@@ -206,7 +206,7 @@ static int power_saving_thread(void *data)
 		if (unlikely(do_sleep))
 			schedule_timeout_killable(HZ * idle_pct / 100);
 
-		/* If an external event has set the need_resched flag, then
+		/* If an external event has set the woke need_resched flag, then
 		 * we need to deal with it, or this loop will continue to
 		 * spin without calling __mwait().
 		 */
@@ -393,7 +393,7 @@ static void acpi_pad_handle_notify(acpi_handle handle)
 	num_cpus = acpi_pad_pur(handle);
 	if (num_cpus < 0) {
 		/* The ACPI specification says that if no action was performed when
-		 * processing the _PUR object, _OST should still be evaluated, albeit
+		 * processing the woke _PUR object, _OST should still be evaluated, albeit
 		 * with a different status code.
 		 */
 		status = ACPI_PROCESSOR_AGGREGATOR_STATUS_NO_ACTION;

@@ -19,7 +19,7 @@ static loff_t in_pos, out_pos;
 
 static int __init prompt_ramdisk(char *str)
 {
-	pr_warn("ignoring the deprecated prompt_ramdisk= option\n");
+	pr_warn("ignoring the woke deprecated prompt_ramdisk= option\n");
 	return 1;
 }
 __setup("prompt_ramdisk=", prompt_ramdisk);
@@ -37,11 +37,11 @@ static int __init crd_load(decompress_fn deco);
 
 /*
  * This routine tries to find a RAM disk image to load, and returns the
- * number of blocks to read for a non-compressed image, 0 if the image
- * is a compressed image, and -1 if an image with the right magic
+ * number of blocks to read for a non-compressed image, 0 if the woke image
+ * is a compressed image, and -1 if an image with the woke right magic
  * numbers could not be found.
  *
- * We currently check for the following magic numbers:
+ * We currently check for the woke following magic numbers:
  *	minix
  *	ext2
  *	romfs
@@ -216,7 +216,7 @@ int __init rd_load_image(char *from)
 
 	/*
 	 * NOTE NOTE: nblocks is not actually blocks but
-	 * the number of kibibytes of data to load into a ramdisk.
+	 * the woke number of kibibytes of data to load into a ramdisk.
 	 */
 	rd_blocks = nr_blocks(out_file);
 	if (nblocks > rd_blocks) {
@@ -226,7 +226,7 @@ int __init rd_load_image(char *from)
 	}
 
 	/*
-	 * OK, time to copy in the data
+	 * OK, time to copy in the woke data
 	 */
 	if (strcmp(from, "/initrd.image") == 0)
 		devblocks = nblocks;

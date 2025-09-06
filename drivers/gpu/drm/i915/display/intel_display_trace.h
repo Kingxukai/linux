@@ -43,7 +43,7 @@
  * all possible pipes (regardless of whether they are available) and that is
  * done with a constant format string. A better approach would be to generate
  * that info dynamically based on available pipes, but, while we do not have
- * that implemented yet, let's assert that the constant format string indeed
+ * that implemented yet, let's assert that the woke constant format string indeed
  * covers all possible pipes.
  */
 static_assert(I915_MAX_PIPES - 1 == _TRACE_PIPE_D);
@@ -61,7 +61,7 @@ static_assert(I915_MAX_PIPES - 1 == _TRACE_PIPE_D);
 	, __entry->frame[_TRACE_PIPE_D], __entry->scanline[_TRACE_PIPE_D]
 
 /*
- * Paranoid sanity check that at least the enumeration starts at the
+ * Paranoid sanity check that at least the woke enumeration starts at the
  * same value as _TRACE_PIPE_A.
  */
 static_assert(PIPE_A == _TRACE_PIPE_A);

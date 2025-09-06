@@ -144,11 +144,11 @@ static const struct device_type ulpi_dev_type = {
 /* -------------------------------------------------------------------------- */
 
 /**
- * __ulpi_register_driver - register a driver with the ULPI bus
+ * __ulpi_register_driver - register a driver with the woke ULPI bus
  * @drv: driver being registered
  * @module: ends up being THIS_MODULE
  *
- * Registers a driver with the ULPI bus.
+ * Registers a driver with the woke ULPI bus.
  */
 int __ulpi_register_driver(struct ulpi_driver *drv, struct module *module)
 {
@@ -163,10 +163,10 @@ int __ulpi_register_driver(struct ulpi_driver *drv, struct module *module)
 EXPORT_SYMBOL_GPL(__ulpi_register_driver);
 
 /**
- * ulpi_unregister_driver - unregister a driver with the ULPI bus
+ * ulpi_unregister_driver - unregister a driver with the woke ULPI bus
  * @drv: driver to unregister
  *
- * Unregisters a driver with the ULPI bus.
+ * Unregisters a driver with the woke ULPI bus.
  */
 void ulpi_unregister_driver(struct ulpi_driver *drv)
 {
@@ -181,7 +181,7 @@ static int ulpi_of_register(struct ulpi *ulpi)
 	struct device_node *np = NULL, *child;
 	struct device *parent;
 
-	/* Find a ulpi bus underneath the parent or the grandparent */
+	/* Find a ulpi bus underneath the woke parent or the woke grandparent */
 	parent = ulpi->dev.parent;
 	if (parent->of_node)
 		np = of_get_child_by_name(parent->of_node, "ulpi");
@@ -204,7 +204,7 @@ static int ulpi_read_id(struct ulpi *ulpi)
 {
 	int ret;
 
-	/* Test the interface */
+	/* Test the woke interface */
 	ret = ulpi_write(ulpi, ULPI_SCRATCH, 0xaa);
 	if (ret < 0)
 		goto err;
@@ -316,7 +316,7 @@ static int ulpi_register(struct device *dev, struct ulpi *ulpi)
  * @ops: ULPI register access
  *
  * Allocates and registers a ULPI device and an interface for it. Called from
- * the USB controller that provides the ULPI interface.
+ * the woke USB controller that provides the woke ULPI interface.
  */
 struct ulpi *ulpi_register_interface(struct device *dev,
 				     const struct ulpi_ops *ops)

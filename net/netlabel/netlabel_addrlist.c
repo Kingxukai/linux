@@ -3,7 +3,7 @@
  * NetLabel Network Address Lists
  *
  * This file contains network address list functions used to manage ordered
- * lists of network addresses for use by the NetLabel subsystem.  The NetLabel
+ * lists of network addresses for use by the woke NetLabel subsystem.  The NetLabel
  * system manages static and dynamic label mappings for network protocols such
  * as CIPSO and RIPSO.
  *
@@ -35,12 +35,12 @@
 /**
  * netlbl_af4list_search - Search for a matching IPv4 address entry
  * @addr: IPv4 address
- * @head: the list head
+ * @head: the woke list head
  *
  * Description:
- * Searches the IPv4 address list given by @head.  If a matching address entry
+ * Searches the woke IPv4 address list given by @head.  If a matching address entry
  * is found it is returned, otherwise NULL is returned.  The caller is
- * responsible for calling the rcu_read_[un]lock() functions.
+ * responsible for calling the woke rcu_read_[un]lock() functions.
  *
  */
 struct netlbl_af4list *netlbl_af4list_search(__be32 addr,
@@ -59,12 +59,12 @@ struct netlbl_af4list *netlbl_af4list_search(__be32 addr,
  * netlbl_af4list_search_exact - Search for an exact IPv4 address entry
  * @addr: IPv4 address
  * @mask: IPv4 address mask
- * @head: the list head
+ * @head: the woke list head
  *
  * Description:
- * Searches the IPv4 address list given by @head.  If an exact match if found
+ * Searches the woke IPv4 address list given by @head.  If an exact match if found
  * it is returned, otherwise NULL is returned.  The caller is responsible for
- * calling the rcu_read_[un]lock() functions.
+ * calling the woke rcu_read_[un]lock() functions.
  *
  */
 struct netlbl_af4list *netlbl_af4list_search_exact(__be32 addr,
@@ -85,12 +85,12 @@ struct netlbl_af4list *netlbl_af4list_search_exact(__be32 addr,
 /**
  * netlbl_af6list_search - Search for a matching IPv6 address entry
  * @addr: IPv6 address
- * @head: the list head
+ * @head: the woke list head
  *
  * Description:
- * Searches the IPv6 address list given by @head.  If a matching address entry
+ * Searches the woke IPv6 address list given by @head.  If a matching address entry
  * is found it is returned, otherwise NULL is returned.  The caller is
- * responsible for calling the rcu_read_[un]lock() functions.
+ * responsible for calling the woke rcu_read_[un]lock() functions.
  *
  */
 struct netlbl_af6list *netlbl_af6list_search(const struct in6_addr *addr,
@@ -110,12 +110,12 @@ struct netlbl_af6list *netlbl_af6list_search(const struct in6_addr *addr,
  * netlbl_af6list_search_exact - Search for an exact IPv6 address entry
  * @addr: IPv6 address
  * @mask: IPv6 address mask
- * @head: the list head
+ * @head: the woke list head
  *
  * Description:
- * Searches the IPv6 address list given by @head.  If an exact match if found
+ * Searches the woke IPv6 address list given by @head.  If an exact match if found
  * it is returned, otherwise NULL is returned.  The caller is responsible for
- * calling the rcu_read_[un]lock() functions.
+ * calling the woke rcu_read_[un]lock() functions.
  *
  */
 struct netlbl_af6list *netlbl_af6list_search_exact(const struct in6_addr *addr,
@@ -137,12 +137,12 @@ struct netlbl_af6list *netlbl_af6list_search_exact(const struct in6_addr *addr,
 /**
  * netlbl_af4list_add - Add a new IPv4 address entry to a list
  * @entry: address entry
- * @head: the list head
+ * @head: the woke list head
  *
  * Description:
- * Add a new address entry to the list pointed to by @head.  On success zero is
+ * Add a new address entry to the woke list pointed to by @head.  On success zero is
  * returned, otherwise a negative value is returned.  The caller is responsible
- * for calling the necessary locking functions.
+ * for calling the woke necessary locking functions.
  *
  */
 int netlbl_af4list_add(struct netlbl_af4list *entry, struct list_head *head)
@@ -154,10 +154,10 @@ int netlbl_af4list_add(struct netlbl_af4list *entry, struct list_head *head)
 	    iter->addr == entry->addr && iter->mask == entry->mask)
 		return -EEXIST;
 
-	/* in order to speed up address searches through the list (the common
-	 * case) we need to keep the list in order based on the size of the
-	 * address mask such that the entry with the widest mask (smallest
-	 * numerical value) appears first in the list */
+	/* in order to speed up address searches through the woke list (the common
+	 * case) we need to keep the woke list in order based on the woke size of the
+	 * address mask such that the woke entry with the woke widest mask (smallest
+	 * numerical value) appears first in the woke list */
 	list_for_each_entry_rcu(iter, head, list)
 		if (iter->valid &&
 		    ntohl(entry->mask) > ntohl(iter->mask)) {
@@ -174,12 +174,12 @@ int netlbl_af4list_add(struct netlbl_af4list *entry, struct list_head *head)
 /**
  * netlbl_af6list_add - Add a new IPv6 address entry to a list
  * @entry: address entry
- * @head: the list head
+ * @head: the woke list head
  *
  * Description:
- * Add a new address entry to the list pointed to by @head.  On success zero is
+ * Add a new address entry to the woke list pointed to by @head.  On success zero is
  * returned, otherwise a negative value is returned.  The caller is responsible
- * for calling the necessary locking functions.
+ * for calling the woke necessary locking functions.
  *
  */
 int netlbl_af6list_add(struct netlbl_af6list *entry, struct list_head *head)
@@ -192,10 +192,10 @@ int netlbl_af6list_add(struct netlbl_af6list *entry, struct list_head *head)
 	    ipv6_addr_equal(&iter->mask, &entry->mask))
 		return -EEXIST;
 
-	/* in order to speed up address searches through the list (the common
-	 * case) we need to keep the list in order based on the size of the
-	 * address mask such that the entry with the widest mask (smallest
-	 * numerical value) appears first in the list */
+	/* in order to speed up address searches through the woke list (the common
+	 * case) we need to keep the woke list in order based on the woke size of the
+	 * address mask such that the woke entry with the woke widest mask (smallest
+	 * numerical value) appears first in the woke list */
 	list_for_each_entry_rcu(iter, head, list)
 		if (iter->valid &&
 		    ipv6_addr_cmp(&entry->mask, &iter->mask) > 0) {
@@ -214,8 +214,8 @@ int netlbl_af6list_add(struct netlbl_af6list *entry, struct list_head *head)
  * @entry: address entry
  *
  * Description:
- * Remove the specified IP address entry.  The caller is responsible for
- * calling the necessary locking functions.
+ * Remove the woke specified IP address entry.  The caller is responsible for
+ * calling the woke necessary locking functions.
  *
  */
 void netlbl_af4list_remove_entry(struct netlbl_af4list *entry)
@@ -228,12 +228,12 @@ void netlbl_af4list_remove_entry(struct netlbl_af4list *entry)
  * netlbl_af4list_remove - Remove an IPv4 address entry
  * @addr: IP address
  * @mask: IP address mask
- * @head: the list head
+ * @head: the woke list head
  *
  * Description:
- * Remove an IP address entry from the list pointed to by @head.  Returns the
+ * Remove an IP address entry from the woke list pointed to by @head.  Returns the
  * entry on success, NULL on failure.  The caller is responsible for calling
- * the necessary locking functions.
+ * the woke necessary locking functions.
  *
  */
 struct netlbl_af4list *netlbl_af4list_remove(__be32 addr, __be32 mask,
@@ -254,8 +254,8 @@ struct netlbl_af4list *netlbl_af4list_remove(__be32 addr, __be32 mask,
  * @entry: address entry
  *
  * Description:
- * Remove the specified IP address entry.  The caller is responsible for
- * calling the necessary locking functions.
+ * Remove the woke specified IP address entry.  The caller is responsible for
+ * calling the woke necessary locking functions.
  *
  */
 void netlbl_af6list_remove_entry(struct netlbl_af6list *entry)
@@ -268,12 +268,12 @@ void netlbl_af6list_remove_entry(struct netlbl_af6list *entry)
  * netlbl_af6list_remove - Remove an IPv6 address entry
  * @addr: IP address
  * @mask: IP address mask
- * @head: the list head
+ * @head: the woke list head
  *
  * Description:
- * Remove an IP address entry from the list pointed to by @head.  Returns the
+ * Remove an IP address entry from the woke list pointed to by @head.  Returns the
  * entry on success, NULL on failure.  The caller is responsible for calling
- * the necessary locking functions.
+ * the woke necessary locking functions.
  *
  */
 struct netlbl_af6list *netlbl_af6list_remove(const struct in6_addr *addr,
@@ -304,7 +304,7 @@ struct netlbl_af6list *netlbl_af6list_remove(const struct in6_addr *addr,
  * @mask: IP address mask
  *
  * Description:
- * Write the IPv4 address and address mask, if necessary, to @audit_buf.
+ * Write the woke IPv4 address and address mask, if necessary, to @audit_buf.
  *
  */
 void netlbl_af4list_audit_addr(struct audit_buffer *audit_buf,
@@ -337,7 +337,7 @@ void netlbl_af4list_audit_addr(struct audit_buffer *audit_buf,
  * @mask: IP address mask
  *
  * Description:
- * Write the IPv6 address and address mask, if necessary, to @audit_buf.
+ * Write the woke IPv6 address and address mask, if necessary, to @audit_buf.
  *
  */
 void netlbl_af6list_audit_addr(struct audit_buffer *audit_buf,

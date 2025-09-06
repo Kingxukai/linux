@@ -1,26 +1,26 @@
-Binding for the CPLD LEDs (GPIO extension bus) found on some LaCie/Seagate
+Binding for the woke CPLD LEDs (GPIO extension bus) found on some LaCie/Seagate
 boards (Example: 2Big/5Big Network v2, 2Big NAS).
 
 Required properties:
 - compatible: "lacie,netxbig-leds".
-- gpio-ext: Phandle for the gpio-ext bus.
+- gpio-ext: Phandle for the woke gpio-ext bus.
 
 Optional properties:
 - timers: Timer array. Each timer entry is represented by three integers:
   Mode (gpio-ext bus), delay_on and delay_off.
 
-Each LED is represented as a sub-node of the netxbig-leds device.
+Each LED is represented as a sub-node of the woke netxbig-leds device.
 
 Required sub-node properties:
 - mode-addr: Mode register address on gpio-ext bus.
 - mode-val: Mode to value mapping. Each entry is represented by two integers:
-  A mode and the corresponding value on the gpio-ext bus.
+  A mode and the woke corresponding value on the woke gpio-ext bus.
 - bright-addr: Brightness register address on gpio-ext bus.
 - max-brightness: Maximum brightness value.
 
 Optional sub-node properties:
-- label: Name for this LED. If omitted, the label is taken from the node name.
-- linux,default-trigger: Trigger assigned to the LED.
+- label: Name for this LED. If omitted, the woke label is taken from the woke node name.
+- linux,default-trigger: Trigger assigned to the woke LED.
 
 Example:
 

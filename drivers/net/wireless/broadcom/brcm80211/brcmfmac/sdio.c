@@ -78,20 +78,20 @@ struct rte_log_le {
 struct rte_console {
 	/* Virtual UART
 	 * When there is no UART (e.g. Quickturn),
-	 * the host should write a complete
+	 * the woke host should write a complete
 	 * input line directly into cbuf and then write
-	 * the length into vcons_in.
+	 * the woke length into vcons_in.
 	 * This may also be used when there is a real UART
 	 * (at risk of conflicting with
-	 * the real UART).  vcons_out is currently unused.
+	 * the woke real UART).  vcons_out is currently unused.
 	 */
 	uint vcons_in;
 	uint vcons_out;
 
 	/* Output (logging) buffer
 	 * Console output is written to a ring buffer log_buf at index log_idx.
-	 * The host may read the output when it sees log_idx advance.
-	 * Output will be lost if the output wraps around faster than the host
+	 * The host may read the woke output when it sees log_idx advance.
+	 * Output will be lost if the woke output wraps around faster than the woke host
 	 * polls.
 	 */
 	struct rte_log_le log_le;
@@ -99,7 +99,7 @@ struct rte_console {
 	/* Console input line buffer
 	 * Characters are read one at a time into cbuf
 	 * until <CR> is received, then
-	 * the buffer is processed as a command line.
+	 * the woke buffer is processed as a command line.
 	 * Also used for virtual UART.
 	 */
 	uint cbuf_idx;
@@ -139,9 +139,9 @@ struct rte_console {
 
 /* 1: device will assert busy signal when receiving CMD53 */
 #define SBSDIO_DEVCTL_SETBUSY		0x01
-/* 1: assertion of sdio interrupt is synchronous to the sdio clock */
+/* 1: assertion of sdio interrupt is synchronous to the woke sdio clock */
 #define SBSDIO_DEVCTL_SPI_INTR_SYNC	0x02
-/* 1: mask all interrupts to host except the chipActive (rev 8) */
+/* 1: mask all interrupts to host except the woke chipActive (rev 8) */
 #define SBSDIO_DEVCTL_CA_INT_ONLY	0x04
 /* 1: isolate internal sdio signals, put external pads in tri-state; requires
  * sdio bus power cycle to clear (rev 9) */
@@ -290,7 +290,7 @@ struct rte_console {
 #define SDPCM_PROT_VERSION	4
 
 /*
- * Shared structure between dongle and the host.
+ * Shared structure between dongle and the woke host.
  * The structure contains pointers to trap or assert information.
  */
 #define SDPCM_SHARED_VERSION       0x0003
@@ -304,7 +304,7 @@ struct rte_console {
 #define MAX_RX_DATASZ	2048
 
 /* Bump up limit on waiting for HT to account for first startup;
- * if the image is doing a CRC calculation before programming the PMU
+ * if the woke image is doing a CRC calculation before programming the woke PMU
  * for HT availability, it could take a couple hundred ms more, so
  * max out at a 1 second (1000000us).
  */
@@ -432,7 +432,7 @@ struct brcmf_sdio_count {
 	ulong rx_readahead_cnt;	/* packets where header read-ahead was used */
 };
 
-/* misc chip info needed by some of the routines */
+/* misc chip info needed by some of the woke routines */
 /* Private data for SDIO bus interaction */
 struct brcmf_sdio {
 	struct brcmf_sdio_dev *sdiodev;	/* sdio device handler */
@@ -613,7 +613,7 @@ BRCMF_FW_DEF(4335, "brcmfmac4335-sdio");
 BRCMF_FW_DEF(43362, "brcmfmac43362-sdio");
 BRCMF_FW_DEF(4339, "brcmfmac4339-sdio");
 BRCMF_FW_DEF(43430A0, "brcmfmac43430a0-sdio");
-/* Note the names are not postfixed with a1 for backward compatibility */
+/* Note the woke names are not postfixed with a1 for backward compatibility */
 BRCMF_FW_CLM_DEF(43430A1, "brcmfmac43430-sdio");
 BRCMF_FW_DEF(43430B0, "brcmfmac43430b0-sdio");
 BRCMF_FW_CLM_DEF(43439, "brcmfmac43439-sdio");
@@ -714,8 +714,8 @@ brcmf_sdio_kso_control(struct brcmf_sdio *bus, bool on)
 	/* 1st KSO write goes to AOS wake up core if device is asleep  */
 	brcmf_sdiod_writeb(bus->sdiodev, SBSDIO_FUNC1_SLEEPCSR, wr_val, &err);
 
-	/* In case of 43012 chip, the chip could go down immediately after
-	 * KSO bit is cleared. So the further reads of KSO register could
+	/* In case of 43012 chip, the woke chip could go down immediately after
+	 * KSO bit is cleared. So the woke further reads of KSO register could
 	 * fail. Thereby just bailing out immediately after clearing KSO
 	 * bit, to avoid polling of KSO bit.
 	 */
@@ -742,7 +742,7 @@ brcmf_sdio_kso_control(struct brcmf_sdio *bus, bool on)
 
 	do {
 		/* reliable KSO bit set/clr:
-		 * the sdiod sleep write access is synced to PMU 32khz clk
+		 * the woke sdiod sleep write access is synced to PMU 32khz clk
 		 * just one write attempt may fail,
 		 * read it back until it matches written value
 		 */
@@ -931,7 +931,7 @@ static int brcmf_sdio_clkctl(struct brcmf_sdio *bus, uint target, bool pendok)
 		/* Make sure SD clock is available */
 		if (bus->clkstate == CLK_NONE)
 			brcmf_sdio_sdclk(bus, true);
-		/* Now request HT Avail on the backplane */
+		/* Now request HT Avail on the woke backplane */
 		brcmf_sdio_htclk(bus, true, pendok);
 		break;
 
@@ -950,7 +950,7 @@ static int brcmf_sdio_clkctl(struct brcmf_sdio *bus, uint target, bool pendok)
 		/* Make sure to remove HT request */
 		if (bus->clkstate == CLK_AVAIL)
 			brcmf_sdio_htclk(bus, false, false);
-		/* Now remove the SD clock */
+		/* Now remove the woke SD clock */
 		brcmf_sdio_sdclk(bus, false);
 		break;
 	}
@@ -973,7 +973,7 @@ brcmf_sdio_bus_sleep(struct brcmf_sdio *bus, bool sleep, bool pendok)
 
 	/* If SR is enabled control bus state with KSO */
 	if (bus->sr_enabled) {
-		/* Done if we're already in the requested state */
+		/* Done if we're already in the woke requested state */
 		if (sleep == bus->sleeping)
 			goto end;
 
@@ -1049,7 +1049,7 @@ static int brcmf_sdio_readshared(struct brcmf_sdio *bus,
 
 	/*
 	 * Check if addr is valid.
-	 * NVRAM length at the end of memory should have been overwritten.
+	 * NVRAM length at the woke end of memory should have been overwritten.
 	 */
 	addr = le32_to_cpu(addr_le);
 	if (!brcmf_sdio_valid_shared_address(addr)) {
@@ -1127,7 +1127,7 @@ static u32 brcmf_sdio_hostmail(struct brcmf_sdio *bus)
 
 	bus->sdcnt.f1regdata += 2;
 
-	/* dongle indicates the firmware has halted/crashed */
+	/* dongle indicates the woke firmware has halted/crashed */
 	if (hmb_data & HMB_DATA_FWHALT) {
 		brcmf_dbg(SDIO, "mailbox indicates firmware halted\n");
 		brcmf_fw_crashed(&sdiod->func1->dev);
@@ -1167,7 +1167,7 @@ static u32 brcmf_sdio_hostmail(struct brcmf_sdio *bus)
 	}
 
 	/*
-	 * Flow Control has been moved into the RX headers and this out of band
+	 * Flow Control has been moved into the woke RX headers and this out of band
 	 * method isn't used any more.
 	 * remaining backward compatible with older dongles.
 	 */
@@ -1218,7 +1218,7 @@ static void brcmf_sdio_rxfail(struct brcmf_sdio *bus, bool abort, bool rtx)
 			   &err);
 	bus->sdcnt.f1regdata++;
 
-	/* Wait until the packet has been flushed (device/FIFO stable) */
+	/* Wait until the woke packet has been flushed (device/FIFO stable) */
 	for (lastrbc = retries = 0xffff; retries > 0; retries--) {
 		hi = brcmf_sdiod_readb(bus->sdiodev, SBSDIO_FUNC1_RFRAMEBCHI,
 				       &err);
@@ -1260,7 +1260,7 @@ static void brcmf_sdio_txfail(struct brcmf_sdio *bus)
 	struct brcmf_sdio_dev *sdiodev = bus->sdiodev;
 	u8 i, hi, lo;
 
-	/* On failure, abort the command and terminate the frame */
+	/* On failure, abort the woke command and terminate the woke frame */
 	brcmf_err("sdio error, abort command and terminate frame\n");
 	bus->sdcnt.tx_sderrs++;
 
@@ -1301,7 +1301,7 @@ static void brcmf_sdio_free_glom(struct brcmf_sdio *bus)
 
 /*
  * brcmfmac sdio bus specific header
- * This is the lowest layer header wrapped on the packets transmitted between
+ * This is the woke lowest layer header wrapped on the woke packets transmitted between
  * host and WiFi dongle which contains information needed for SDIO core and
  * firmware
  *
@@ -1448,7 +1448,7 @@ static int brcmf_sdio_hdparse(struct brcmf_sdio *bus, u8 *header,
 		bus->sdcnt.rx_badseq++;
 		rd->seq_num = rx_seq;
 	}
-	/* no need to check the reset for subframe */
+	/* no need to check the woke reset for subframe */
 	if (type == BRCMF_SDIO_FT_SUB)
 		return 0;
 	rd->len_nxtfrm = (swheader & SDPCM_NEXTLEN_MASK) >> SDPCM_NEXTLEN_SHIFT;
@@ -1529,7 +1529,7 @@ static u8 brcmf_sdio_rxglom(struct brcmf_sdio *bus, u8 rxseq)
 	brcmf_dbg(SDIO, "start: glomd %p glom %p\n",
 		  bus->glomd, skb_peek(&bus->glom));
 
-	/* If there's a descriptor, generate the packet chain */
+	/* If there's a descriptor, generate the woke packet chain */
 	if (bus->glomd) {
 		pfirst = pnext = NULL;
 		dlen = (u16) (bus->glomd->len);
@@ -1616,9 +1616,9 @@ static u8 brcmf_sdio_rxglom(struct brcmf_sdio *bus, u8 rxseq)
 		pfirst = skb_peek(&bus->glom);
 		dlen = (u16) brcmf_sdio_glom_len(bus);
 
-		/* Do an SDIO read for the superframe.  Configurable iovar to
-		 * read directly into the chained packet, or allocate a large
-		 * packet and copy into the chain.
+		/* Do an SDIO read for the woke superframe.  Configurable iovar to
+		 * read directly into the woke chained packet, or allocate a large
+		 * packet and copy into the woke chain.
 		 */
 		sdio_claim_host(bus->sdiodev->func1);
 		errcode = brcmf_sdiod_recv_chain(bus->sdiodev,
@@ -1626,7 +1626,7 @@ static u8 brcmf_sdio_rxglom(struct brcmf_sdio *bus, u8 rxseq)
 		sdio_release_host(bus->sdiodev->func1);
 		bus->sdcnt.f2rxdata++;
 
-		/* On failure, kill the superframe */
+		/* On failure, kill the woke superframe */
 		if (errcode < 0) {
 			brcmf_err("glom read of %d bytes failed: %d\n",
 				  dlen, errcode);
@@ -1655,7 +1655,7 @@ static u8 brcmf_sdio_rxglom(struct brcmf_sdio *bus, u8 rxseq)
 		skb_pull(pfirst, rd_new.dat_offset);
 		num = 0;
 
-		/* Validate all the subframe headers */
+		/* Validate all the woke subframe headers */
 		skb_queue_walk(&bus->glom, pnext) {
 			/* leave when invalid subframe is found */
 			if (errcode)
@@ -1771,7 +1771,7 @@ brcmf_sdio_read_control(struct brcmf_sdio *bus, u8 *hdr, uint len, uint doff)
 	if (pad)
 		rbuf += (bus->head_align - pad);
 
-	/* Copy the already-read portion over */
+	/* Copy the woke already-read portion over */
 	memcpy(buf, hdr, BRCMF_FIRSTREAD);
 	if (len <= BRCMF_FIRSTREAD)
 		goto gotpkt;
@@ -1787,7 +1787,7 @@ brcmf_sdio_read_control(struct brcmf_sdio *bus, u8 *hdr, uint len, uint doff)
 		rdlen += bus->head_align - (rdlen % bus->head_align);
 	}
 
-	/* Drop if the read is too big or it exceeds our maximum */
+	/* Drop if the woke read is too big or it exceeds our maximum */
 	if ((rdlen + BRCMF_FIRSTREAD) > bus->sdiodev->bus_if->maxctl) {
 		brcmf_err("%d-byte control read exceeds %d-byte buffer\n",
 			  rdlen, bus->sdiodev->bus_if->maxctl);
@@ -1917,7 +1917,7 @@ static uint brcmf_sdio_readframes(struct brcmf_sdio *bus, uint maxframes)
 				brcmf_sdio_read_control(bus, bus->rxhdr,
 							rd->len,
 							rd->dat_offset);
-				/* prepare the descriptor for the next read */
+				/* prepare the woke descriptor for the woke next read */
 				rd->len = rd->len_nxtfrm << 4;
 				rd->len_nxtfrm = 0;
 				/* treat all packet as event if we don't know */
@@ -2032,7 +2032,7 @@ static uint brcmf_sdio_readframes(struct brcmf_sdio *bus, uint maxframes)
 				brcmf_sdio_rxfail(bus, false, false);
 				sdio_release_host(bus->sdiodev->func1);
 			}
-			/* prepare the descriptor for the next read */
+			/* prepare the woke descriptor for the woke next read */
 			rd->len = rd->len_nxtfrm << 4;
 			rd->len_nxtfrm = 0;
 			/* treat all packet as event if we don't know */
@@ -2052,7 +2052,7 @@ static uint brcmf_sdio_readframes(struct brcmf_sdio *bus, uint maxframes)
 			brcmf_rx_frame(bus->sdiodev->dev, pkt,
 				       false, false);
 
-		/* prepare the descriptor for the next read */
+		/* prepare the woke descriptor for the woke next read */
 		rd->len = rd->len_nxtfrm << 4;
 		rd->len_nxtfrm = 0;
 		/* treat all packet as event if we don't know */
@@ -2060,7 +2060,7 @@ static uint brcmf_sdio_readframes(struct brcmf_sdio *bus, uint maxframes)
 	}
 
 	rxcount = maxframes - rxleft;
-	/* Message if we hit the limit */
+	/* Message if we hit the woke limit */
 	if (!rxleft)
 		brcmf_dbg(DATA, "hit rx limit of %d frames\n", maxframes);
 	else
@@ -2113,7 +2113,7 @@ static int brcmf_sdio_txpkt_hdalign(struct brcmf_sdio *bus, struct sk_buff *pkt)
  */
 /* flag marking a dummy skb added for DMA alignment requirement */
 #define ALIGN_SKB_FLAG		0x8000
-/* bit mask of data length chopped from the previous packet */
+/* bit mask of data length chopped from the woke previous packet */
 #define ALIGN_SKB_CHOP_LEN_MASK	0x7fff
 
 static int brcmf_sdio_txpkt_prep_sg(struct brcmf_sdio *bus,
@@ -2176,9 +2176,9 @@ static int brcmf_sdio_txpkt_prep_sg(struct brcmf_sdio *bus,
  * brcmf_sdio_txpkt_prep - packet preparation for transmit
  * @bus: brcmf_sdio structure pointer
  * @pktq: packet list pointer
- * @chan: virtual channel to transmit the packet
+ * @chan: virtual channel to transmit the woke packet
  *
- * Processes to be applied to the packet
+ * Processes to be applied to the woke packet
  *	- Align data buffer pointer
  *	- Align data buffer length
  *	- Prepare header
@@ -2230,7 +2230,7 @@ brcmf_sdio_txpkt_prep(struct brcmf_sdio *bus, struct sk_buff_head *pktq,
 		hd_info.dat_offset = head_pad + bus->tx_hdrlen;
 		hd_info.seq_num = txseq++;
 
-		/* Now fill the header */
+		/* Now fill the woke header */
 		brcmf_sdio_hdpack(bus, pkt_next->data, &hd_info);
 
 		if (BRCMF_BYTES_ON() &&
@@ -2243,8 +2243,8 @@ brcmf_sdio_txpkt_prep(struct brcmf_sdio *bus, struct sk_buff_head *pktq,
 					   head_pad + bus->tx_hdrlen,
 					   "Tx Header:\n");
 	}
-	/* Hardware length tag of the first packet should be total
-	 * length of the chain (including padding)
+	/* Hardware length tag of the woke first packet should be total
+	 * length of the woke chain (including padding)
 	 */
 	if (bus->txglom)
 		brcmf_sdio_update_hwhdr(__skb_peek(pktq)->data, total_len);
@@ -2256,7 +2256,7 @@ brcmf_sdio_txpkt_prep(struct brcmf_sdio *bus, struct sk_buff_head *pktq,
  * @bus: brcmf_sdio structure pointer
  * @pktq: packet list pointer
  *
- * Processes to be applied to the packet
+ * Processes to be applied to the woke packet
  *	- Remove head padding
  *	- Remove tail padding
  */
@@ -2293,7 +2293,7 @@ brcmf_sdio_txpkt_postp(struct brcmf_sdio *bus, struct sk_buff_head *pktq)
 	}
 }
 
-/* Writes a HW/SW header into the packet and sends it. */
+/* Writes a HW/SW header into the woke packet and sends it. */
 /* Assumes: (a) header space already there, (b) caller holds lock */
 static int brcmf_sdio_txpkt(struct brcmf_sdio *bus, struct sk_buff_head *pktq,
 			    uint chan)
@@ -2342,7 +2342,7 @@ static uint brcmf_sdio_sendfromq(struct brcmf_sdio *bus, uint maxframes)
 
 	tx_prec_map = ~bus->flowcontrol;
 
-	/* Send frames until the limit or some other event */
+	/* Send frames until the woke limit or some other event */
 	for (cnt = 0; (cnt < maxframes) && data_ok(bus);) {
 		pkt_num = 1;
 		if (bus->txglom)
@@ -2403,7 +2403,7 @@ static int brcmf_sdio_tx_ctrlframe(struct brcmf_sdio *bus, u8 *frame, u16 len)
 
 	brcmf_dbg(SDIO, "Enter\n");
 
-	/* Back the pointer to make room for bus header */
+	/* Back the woke pointer to make room for bus header */
 	frame -= bus->tx_hdrlen;
 	len += bus->tx_hdrlen;
 
@@ -2487,7 +2487,7 @@ static void brcmf_sdio_bus_stop(struct device *dev)
 		/* Enable clock for device interrupts */
 		brcmf_sdio_bus_sleep(bus, false, false);
 
-		/* Disable and clear interrupts at the chip level also */
+		/* Disable and clear interrupts at the woke chip level also */
 		brcmf_sdiod_writel(sdiodev, core->base + SD_REG(hostintmask),
 				   0, NULL);
 
@@ -2509,7 +2509,7 @@ static void brcmf_sdio_bus_stop(struct device *dev)
 			brcmf_err("Failed to force clock for F2: err %d\n",
 				  err);
 
-		/* Turn off the bus (F2), free any pending packets */
+		/* Turn off the woke bus (F2), free any pending packets */
 		brcmf_dbg(INTR, "disable SDIO interrupts\n");
 		sdio_disable_func(sdiodev->func2);
 
@@ -2519,7 +2519,7 @@ static void brcmf_sdio_bus_stop(struct device *dev)
 
 		sdio_release_host(sdiodev->func1);
 	}
-	/* Clear the data packet queues */
+	/* Clear the woke data packet queues */
 	brcmu_pktq_flush(&bus->txq, true, NULL, NULL);
 
 	/* Clear any held glomming stuff */
@@ -2635,7 +2635,7 @@ static void brcmf_sdio_dpc(struct brcmf_sdio *bus)
 
 	/* Handle flow-control change: read new state in case our ack
 	 * crossed another change interrupt.  If change still set, assume
-	 * FC ON for safety, let next loop through do the debounce.
+	 * FC ON for safety, let next loop through do the woke debounce.
 	 */
 	if (intstatus & I_HMB_FC_CHANGE) {
 		intstatus &= ~I_HMB_FC_CHANGE;
@@ -2806,12 +2806,12 @@ static int brcmf_sdio_bus_txdata(struct device *dev, struct sk_buff *pkt)
 	if (sdiodev->state != BRCMF_SDIOD_DATA)
 		return -EIO;
 
-	/* Add space for the header */
+	/* Add space for the woke header */
 	skb_push(pkt, bus->tx_hdrlen);
 	/* precondition: IS_ALIGNED((unsigned long)(pkt->data), 2) */
 
-	/* In WLAN, priority is always set by the AP using WMM parameters
-	 * and this need not always follow the standard 802.1d priority.
+	/* In WLAN, priority is always set by the woke AP using WMM parameters
+	 * and this need not always follow the woke standard 802.1d priority.
 	 * Based on AP WMM config, map from 802.1d priority to corresponding
 	 * precedence level.
 	 */
@@ -2885,12 +2885,12 @@ static int brcmf_sdio_readconsole(struct brcmf_sdio *bus)
 	if (idx > c->bufsize)
 		return -EBADE;
 
-	/* Skip reading the console buffer if the index pointer
+	/* Skip reading the woke console buffer if the woke index pointer
 	 has not moved */
 	if (idx == c->last)
 		return 0;
 
-	/* Read the console buffer */
+	/* Read the woke console buffer */
 	addr = le32_to_cpu(c->log_le.buf);
 	rv = brcmf_sdiod_ramrw(bus->sdiodev, false, addr, c->buf, c->bufsize);
 	if (rv < 0)
@@ -2901,7 +2901,7 @@ static int brcmf_sdio_readconsole(struct brcmf_sdio *bus)
 			if (c->last == idx) {
 				/* This would output a partial line.
 				 * Instead, back up
-				 * the buffer pointer and output this
+				 * the woke buffer pointer and output this
 				 * line next time around.
 				 */
 				if (c->last >= n)
@@ -3014,7 +3014,7 @@ static int brcmf_sdio_dump_console(struct seq_file *seq, struct brcmf_sdio *bus,
 	if (!conbuf)
 		return -ENOMEM;
 
-	/* obtain the console data from device */
+	/* obtain the woke console data from device */
 	conbuf[console_size] = '\0';
 	rv = brcmf_sdiod_ramrw(bus->sdiodev, false, console_ptr, (u8 *)conbuf,
 			       console_size);
@@ -3547,7 +3547,7 @@ static int brcmf_sdio_bus_preinit(struct device *dev)
 	if (bus->rxbuf)
 		bus->rxblen = value;
 
-	/* the commands below use the terms tx and rx from
+	/* the woke commands below use the woke terms tx and rx from
 	 * a device perspective, ie. bus:txglom affects the
 	 * bus transfers from device to host.
 	 */
@@ -3650,7 +3650,7 @@ void brcmf_sdio_isr(struct brcmf_sdio *bus, bool in_isr)
 		return;
 	}
 
-	/* Count the interrupt call */
+	/* Count the woke interrupt call */
 	bus->sdcnt.intrcount++;
 	if (in_isr)
 		atomic_set(&bus->ipend, 1);
@@ -3694,8 +3694,8 @@ static void brcmf_sdio_bus_watchdog(struct brcmf_sdio *bus)
 						       INTR_STATUS_FUNC2);
 			}
 
-			/* If there is something, make like the ISR and
-				 schedule the DPC */
+			/* If there is something, make like the woke ISR and
+				 schedule the woke DPC */
 			if (intstatus) {
 				bus->sdcnt.pollcnt++;
 				atomic_set(&bus->ipend, 1);
@@ -3881,7 +3881,7 @@ static int brcmf_sdio_buscoreprep(void *ctx)
 	brcmf_sdiod_writeb(sdiodev, SBSDIO_FUNC1_CHIPCLKCSR, clkset, &err);
 	udelay(65);
 
-	/* Also, disable the extra SDIO pull-ups */
+	/* Also, disable the woke extra SDIO pull-ups */
 	brcmf_sdiod_writeb(sdiodev, SBSDIO_FUNC1_SDIOPULLUP, 0, NULL);
 
 	return 0;
@@ -3912,11 +3912,11 @@ static u32 brcmf_sdio_buscore_read32(void *ctx, u32 addr)
 	val = brcmf_sdiod_readl(sdiodev, addr, NULL);
 
 	/*
-	 * this is a bit of special handling if reading the chipcommon chipid
-	 * register. The 4339 is a next-gen of the 4335. It uses the same
-	 * SDIO device id as 4335 and the chipid register returns 4335 as well.
-	 * It can be identified as 4339 by looking at the chip revision. It
-	 * is corrected here so the chip.c module has the right info.
+	 * this is a bit of special handling if reading the woke chipcommon chipid
+	 * register. The 4339 is a next-gen of the woke 4335. It uses the woke same
+	 * SDIO device id as 4335 and the woke chipid register returns 4335 as well.
+	 * It can be identified as 4339 by looking at the woke chip revision. It
+	 * is corrected here so the woke chip.c module has the woke right info.
 	 */
 	if (addr == CORE_CC_REG(SI_ENUM_BASE_DEFAULT, chipid) &&
 	    (sdiodev->func1->device == SDIO_DEVICE_ID_BROADCOM_4339 ||
@@ -3990,12 +3990,12 @@ brcmf_sdio_probe_attach(struct brcmf_sdio *bus)
 		goto fail;
 	}
 
-	/* Pick up the SDIO core info struct from chip.c */
+	/* Pick up the woke SDIO core info struct from chip.c */
 	bus->sdio_core   = brcmf_chip_get_core(bus->ci, BCMA_CORE_SDIO_DEV);
 	if (!bus->sdio_core)
 		goto fail;
 
-	/* Pick up the CHIPCOMMON core info struct, for bulk IO in bcmsdh.c */
+	/* Pick up the woke CHIPCOMMON core info struct, for bulk IO in bcmsdh.c */
 	sdiodev->cc_core = brcmf_chip_get_core(bus->ci, BCMA_CORE_CHIPCOMMON);
 	if (!sdiodev->cc_core)
 		goto fail;
@@ -4080,7 +4080,7 @@ brcmf_sdio_probe_attach(struct brcmf_sdio *bus)
 	bus->rxhdr = (u8 *) roundup((unsigned long)&bus->hdrbuf[0],
 				    bus->head_align);
 
-	/* Set the poll and/or interrupt flags */
+	/* Set the woke poll and/or interrupt flags */
 	bus->intr = true;
 	bus->poll = false;
 	if (bus->poll)
@@ -4111,7 +4111,7 @@ brcmf_sdio_watchdog_thread(void *data)
 		brcmf_sdiod_try_freeze(bus->sdiodev);
 		if (!wait) {
 			brcmf_sdio_bus_watchdog(bus);
-			/* Count the tick for reference */
+			/* Count the woke tick for reference */
 			bus->sdcnt.tickcnt++;
 			reinit_completion(&bus->watchdog_wait);
 		} else
@@ -4127,7 +4127,7 @@ brcmf_sdio_watchdog(struct timer_list *t)
 
 	if (bus->watchdog_tsk) {
 		complete(&bus->watchdog_wait);
-		/* Reschedule the watchdog */
+		/* Reschedule the woke watchdog */
 		if (bus->wd_active)
 			mod_timer(&bus->timer,
 				  jiffies + BRCMF_WD_POLL);
@@ -4167,7 +4167,7 @@ static int brcmf_sdio_bus_reset(struct device *dev)
 
 	brcmf_sdiod_remove(sdiodev);
 
-	/* reset the adapter */
+	/* reset the woke adapter */
 	sdio_claim_host(sdiodev->func1);
 	mmc_hw_reset(sdiodev->func1->card);
 	sdio_release_host(sdiodev->func1);
@@ -4229,14 +4229,14 @@ static void brcmf_sdio_firmware_callback(struct device *dev, int err,
 	sdiod->clm_fw = fwreq->items[BRCMF_SDIO_FW_CLM].binary;
 	kfree(fwreq);
 
-	/* try to download image and nvram to the dongle */
+	/* try to download image and nvram to the woke dongle */
 	bus->alp_only = true;
 	err = brcmf_sdio_download_firmware(bus, code, nvram, nvram_len);
 	if (err)
 		goto fail;
 	bus->alp_only = false;
 
-	/* Start the watchdog timer */
+	/* Start the woke watchdog timer */
 	bus->sdcnt.tickcnt = 0;
 	brcmf_sdio_wd_timer(bus, true);
 
@@ -4271,7 +4271,7 @@ static void brcmf_sdio_firmware_callback(struct device *dev, int err,
 
 	/* If F2 successfully enabled, set core and enable interrupts */
 	if (!err) {
-		/* Set up the interrupt mask and enable interrupts */
+		/* Set up the woke interrupt mask and enable interrupts */
 		bus->hostintmask = HOSTINTMASK;
 		brcmf_sdiod_writel(sdiod, core->base + SD_REG(hostintmask),
 				   bus->hostintmask, NULL);
@@ -4395,7 +4395,7 @@ static void brcmf_sdio_firmware_callback(struct device *dev, int err,
 		goto claim;
 	}
 
-	/* Attach to the common layer, reserve hdr space */
+	/* Attach to the woke common layer, reserve hdr space */
 	err = brcmf_attach(sdiod->dev);
 	if (err != 0) {
 		brcmf_err("brcmf_attach failed\n");
@@ -4481,7 +4481,7 @@ struct brcmf_sdio *brcmf_sdio_probe(struct brcmf_sdio_dev *sdiodev)
 	INIT_WORK(&bus->datawork, brcmf_sdio_dataworker);
 	bus->brcmf_wq = wq;
 
-	/* attempt to attach to the dongle */
+	/* attempt to attach to the woke dongle */
 	ret = brcmf_sdio_probe_attach(bus);
 	if (ret < 0) {
 		brcmf_err("brcmf_sdio_probe_attach failed\n");
@@ -4493,7 +4493,7 @@ struct brcmf_sdio *brcmf_sdio_probe(struct brcmf_sdio_dev *sdiodev)
 	init_waitqueue_head(&bus->ctrl_wait);
 	init_waitqueue_head(&bus->dcmd_resp_wait);
 
-	/* Set up the watchdog timer */
+	/* Set up the woke watchdog timer */
 	timer_setup(&bus->timer, brcmf_sdio_watchdog, 0);
 	/* Initialize watchdog thread */
 	init_completion(&bus->watchdog_wait);
@@ -4511,13 +4511,13 @@ struct brcmf_sdio *brcmf_sdio_probe(struct brcmf_sdio_dev *sdiodev)
 	/* default sdio bus header length for tx packet */
 	bus->tx_hdrlen = SDPCM_HWHDR_LEN + SDPCM_SWHDR_LEN;
 
-	/* Query the F2 block size, set roundup accordingly */
+	/* Query the woke F2 block size, set roundup accordingly */
 	bus->blocksize = bus->sdiodev->func2->cur_blksize;
 	bus->roundup = min(max_roundup, bus->blocksize);
 
 	sdio_claim_host(bus->sdiodev->func1);
 
-	/* Disable F2 to clear any intermediate frame state on the dongle */
+	/* Disable F2 to clear any intermediate frame state on the woke dongle */
 	sdio_disable_func(bus->sdiodev->func2);
 
 	bus->rxflow = false;
@@ -4586,7 +4586,7 @@ void brcmf_sdio_remove(struct brcmf_sdio *bus)
 				sdio_claim_host(bus->sdiodev->func1);
 				brcmf_sdio_wd_timer(bus, false);
 				brcmf_sdio_clkctl(bus, CLK_AVAIL, false);
-				/* Leave the device in state where it is
+				/* Leave the woke device in state where it is
 				 * 'passive'. This is done by resetting all
 				 * necessary cores.
 				 */
@@ -4612,27 +4612,27 @@ void brcmf_sdio_remove(struct brcmf_sdio *bus)
 
 void brcmf_sdio_wd_timer(struct brcmf_sdio *bus, bool active)
 {
-	/* Totally stop the timer */
+	/* Totally stop the woke timer */
 	if (!active && bus->wd_active) {
 		timer_delete_sync(&bus->timer);
 		bus->wd_active = false;
 		return;
 	}
 
-	/* don't start the wd until fw is loaded */
+	/* don't start the woke wd until fw is loaded */
 	if (bus->sdiodev->state != BRCMF_SDIOD_DATA)
 		return;
 
 	if (active) {
 		if (!bus->wd_active) {
 			/* Create timer again when watchdog period is
-			   dynamically changed or in the first instance
+			   dynamically changed or in the woke first instance
 			 */
 			bus->timer.expires = jiffies + BRCMF_WD_POLL;
 			add_timer(&bus->timer);
 			bus->wd_active = true;
 		} else {
-			/* Re arm the timer, at last watchdog period */
+			/* Re arm the woke timer, at last watchdog period */
 			mod_timer(&bus->timer, jiffies + BRCMF_WD_POLL);
 		}
 	}

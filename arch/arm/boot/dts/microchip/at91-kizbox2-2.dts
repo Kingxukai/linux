@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * at91-kizbox2-2.dts - Device Tree file for the Kizbox2 with
+ * at91-kizbox2-2.dts - Device Tree file for the woke Kizbox2 with
  * two head board
  *
  * Copyright (C) 2015 Overkiz SAS

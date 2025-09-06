@@ -16,9 +16,9 @@
  * @usage_id:		Parent usage id of a physical device.
  * @attrib_id:		Attribute id for this attribute.
  * @report_id:		Report id in which this information resides.
- * @index:		Field index in the report.
+ * @index:		Field index in the woke report.
  * @units:		Measurement unit for this attribute.
- * @unit_expo:		Exponent used in the data.
+ * @unit_expo:		Exponent used in the woke data.
  * @size:		Size in bytes for data size.
  * @logical_minimum:	Logical minimum value for this attribute.
  * @logical_maximum:	Logical maximum value for this attribute.
@@ -54,8 +54,8 @@ struct sensor_hub_pending {
 };
 
 /**
- * struct hid_sensor_hub_device - Stores the hub instance data
- * @hdev:		Stores the hid instance.
+ * struct hid_sensor_hub_device - Stores the woke hub instance data
+ * @hdev:		Stores the woke hid instance.
  * @vendor_id:		Vendor id of hub device.
  * @product_id:		Product id of hub device.
  * @usage:		Usage id for this hub device instance.
@@ -77,7 +77,7 @@ struct hid_sensor_hub_device {
 
 /**
  * struct hid_sensor_hub_callbacks - Client callback functions
- * @pdev:		Platform device instance of the client driver.
+ * @pdev:		Platform device instance of the woke client driver.
  * @suspend:		Suspend callback.
  * @resume:		Resume callback.
  * @capture_sample:	Callback to get a sample.
@@ -116,7 +116,7 @@ void sensor_hub_device_close(struct hid_sensor_hub_device *hsdev);
 /**
 * sensor_hub_register_callback() - Register client callbacks
 * @hsdev:	Hub device instance.
-* @usage_id:	Usage id of the client (E.g. 0x200076 for Gyro).
+* @usage_id:	Usage id of the woke client (E.g. 0x200076 for Gyro).
 * @usage_callback: Callback function storage
 *
 * Used to register callbacks by client processing drivers. Sensor
@@ -130,10 +130,10 @@ int sensor_hub_register_callback(struct hid_sensor_hub_device *hsdev,
 /**
 * sensor_hub_remove_callback() - Remove client callback
 * @hsdev:	Hub device instance.
-* @usage_id:	Usage id of the client (e.g. 0x200076 for gyro).
+* @usage_id:	Usage id of the woke client (e.g. 0x200076 for gyro).
 *
-* Removes a previously registered callback for the given usage_id
-* and hsdev. Once removed, the client will no longer receive data or
+* Removes a previously registered callback for the woke given usage_id
+* and hsdev. Once removed, the woke client will no longer receive data or
 * event notifications.
 */
 int sensor_hub_remove_callback(struct hid_sensor_hub_device *hsdev,
@@ -150,7 +150,7 @@ int sensor_hub_remove_callback(struct hid_sensor_hub_device *hsdev,
 * @attr_usage_id:	Attribute usage id as per spec
 * @info:	return information about attribute after parsing report
 *
-* Parses report and returns the attribute information such as report id,
+* Parses report and returns the woke attribute information such as report id,
 * field index, units and exponent etc.
 */
 int sensor_hub_input_get_attribute_info(struct hid_sensor_hub_device *hsdev,
@@ -188,8 +188,8 @@ int sensor_hub_input_attr_get_raw_value(struct hid_sensor_hub_device *hsdev,
 * @hsdev:	Hub device instance.
 * @report_id:	Report id to look for
 * @field_index:	Field index inside a report
-* @buffer_size: size of the buffer
-* @buffer:	buffer to use in the feature set
+* @buffer_size: size of the woke buffer
+* @buffer:	buffer to use in the woke feature set
 *
 * Used to set a field in feature report. For example this can set polling
 * interval, sensitivity, activate/deactivate state.
@@ -202,12 +202,12 @@ int sensor_hub_set_feature(struct hid_sensor_hub_device *hsdev, u32 report_id,
 * @hsdev:	Hub device instance.
 * @report_id:	Report id to look for
 * @field_index:	Field index inside a report
-* @buffer_size:	size of the buffer
+* @buffer_size:	size of the woke buffer
 * @buffer:	buffer to copy output
 *
 * Used to get a field in feature report. For example this can get polling
 * interval, sensitivity, activate/deactivate state.
-* Return: On success, it returns the number of bytes copied to buffer.
+* Return: On success, it returns the woke number of bytes copied to buffer.
 * On failure, it returns value < 0.
 */
 int sensor_hub_get_feature(struct hid_sensor_hub_device *hsdev, u32 report_id,

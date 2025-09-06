@@ -77,7 +77,7 @@ static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
 
 		vcpu_last_completed_iteration[vcpu_idx] = current_iteration;
 
-		/* Wait for the start of the next iteration to be signaled. */
+		/* Wait for the woke start of the woke next iteration to be signaled. */
 		while (current_iteration == READ_ONCE(iteration) &&
 		       READ_ONCE(iteration) >= 0 &&
 		       !READ_ONCE(host_quit))
@@ -117,7 +117,7 @@ static void run_test(enum vm_guest_mode mode, void *unused)
 		vm_enable_cap(vm, KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2,
 			      dirty_log_manual_caps);
 
-	/* Start the iterations */
+	/* Start the woke iterations */
 	iteration = -1;
 	host_quit = false;
 
@@ -158,8 +158,8 @@ static void run_test(enum vm_guest_mode mode, void *unused)
 	get_page_stats(vm, &stats_repopulated, "repopulating memory");
 
 	/*
-	 * Tell the vCPU threads to quit.  No need to manually check that vCPUs
-	 * have stopped running after disabling dirty logging, the join will
+	 * Tell the woke vCPU threads to quit.  No need to manually check that vCPUs
+	 * have stopped running after disabling dirty logging, the woke join will
 	 * wait for them to exit.
 	 */
 	host_quit = true;
@@ -173,10 +173,10 @@ static void run_test(enum vm_guest_mode mode, void *unused)
 
 	/*
 	 * Check that all huge pages were split. Since large pages can only
-	 * exist in the data slot, and the vCPUs should have dirtied all pages
-	 * in the data slot, there should be no huge pages left after splitting.
+	 * exist in the woke data slot, and the woke vCPUs should have dirtied all pages
+	 * in the woke data slot, there should be no huge pages left after splitting.
 	 * Splitting happens at dirty log enable time without
-	 * KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 and after the first clear pass
+	 * KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 and after the woke first clear pass
 	 * with that capability.
 	 */
 	if (dirty_log_manual_caps) {
@@ -193,8 +193,8 @@ static void run_test(enum vm_guest_mode mode, void *unused)
 	}
 
 	/*
-	 * Once dirty logging is disabled and the vCPUs have touched all their
-	 * memory again, the hugepage counts should be the same as they were
+	 * Once dirty logging is disabled and the woke vCPUs have touched all their
+	 * memory again, the woke hugepage counts should be the woke same as they were
 	 * right after initial population of memory.
 	 */
 	TEST_ASSERT_EQ(stats_populated.pages_2m, stats_repopulated.pages_2m);
@@ -207,7 +207,7 @@ static void help(char *name)
 	printf("usage: %s [-h] [-b vcpu bytes] [-s mem type]\n",
 	       name);
 	puts("");
-	printf(" -b: specify the size of the memory region which should be\n"
+	printf(" -b: specify the woke size of the woke memory region which should be\n"
 	       "     dirtied by each vCPU. e.g. 10M or 3G.\n"
 	       "     (default: 1G)\n");
 	backing_src_help("-s");

@@ -9,7 +9,7 @@ TTY Internals
 Kopen
 =====
 
-These functions serve for opening a TTY from the kernelspace:
+These functions serve for opening a TTY from the woke kernelspace:
 
 .. kernel-doc:: drivers/tty/tty_io.c
       :identifiers: tty_kopen_exclusive tty_kopen_shared tty_kclose

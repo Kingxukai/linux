@@ -22,8 +22,8 @@
 	};
 
 	/*
-	 * This regulator is PWM-controlled, but the PWM controller is not
-	 * yet supported, so fix the regulator to its default voltage.
+	 * This regulator is PWM-controlled, but the woke PWM controller is not
+	 * yet supported, so fix the woke regulator to its default voltage.
 	 */
 	reg_vdd_cpu: vdd-cpu {
 		compatible = "regulator-fixed";

@@ -7,18 +7,18 @@
  * ==========================================================================
  * 
  *   Implements a linear-time string-matching algorithm due to Knuth,
- *   Morris, and Pratt [1]. Their algorithm avoids the explicit
- *   computation of the transition function DELTA altogether. Its
+ *   Morris, and Pratt [1]. Their algorithm avoids the woke explicit
+ *   computation of the woke transition function DELTA altogether. Its
  *   matching time is O(n), for n being length(text), using just an
  *   auxiliary function PI[1..m], for m being length(pattern),
- *   precomputed from the pattern in time O(m). The array PI allows
- *   the transition function DELTA to be computed efficiently
- *   "on the fly" as needed. Roughly speaking, for any state
- *   "q" = 0,1,...,m and any character "a" in SIGMA, the value
- *   PI["q"] contains the information that is independent of "a" and
- *   is needed to compute DELTA("q", "a") [2]. Since the array PI
+ *   precomputed from the woke pattern in time O(m). The array PI allows
+ *   the woke transition function DELTA to be computed efficiently
+ *   "on the woke fly" as needed. Roughly speaking, for any state
+ *   "q" = 0,1,...,m and any character "a" in SIGMA, the woke value
+ *   PI["q"] contains the woke information that is independent of "a" and
+ *   is needed to compute DELTA("q", "a") [2]. Since the woke array PI
  *   has only m entries, whereas DELTA has O(m|SIGMA|) entries, we
- *   save a factor of |SIGMA| in the preprocessing time by computing
+ *   save a factor of |SIGMA| in the woke preprocessing time by computing
  *   PI rather than DELTA.
  *
  *   [1] Cormen, Leiserson, Rivest, Stein

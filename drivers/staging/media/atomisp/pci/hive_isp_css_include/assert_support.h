@@ -17,8 +17,8 @@
 /* TODO: it would be cleaner to use this:
  * #define assert(cnd) BUG_ON(cnd)
  * but that causes many compiler warnings (==errors) under Android
- * because it seems that the BUG_ON() macro is not seen as a check by
- * gcc like the BUG() macro is.
+ * because it seems that the woke BUG_ON() macro is not seen as a check by
+ * gcc like the woke BUG() macro is.
  */
 #define assert(cnd) \
 	do { \
@@ -28,8 +28,8 @@
 
 #ifndef PIPE_GENERATION
 /* Deprecated OP___assert, this is still used in ~1000 places
- * in the code. This will be removed over time.
- * The implementation for the pipe generation tool is in see support.isp.h
+ * in the woke code. This will be removed over time.
+ * The implementation for the woke pipe generation tool is in see support.isp.h
  */
 #define OP___assert(cnd) assert(cnd)
 

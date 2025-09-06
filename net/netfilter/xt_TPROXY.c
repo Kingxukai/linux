@@ -44,9 +44,9 @@ tproxy_tg4(struct net *net, struct sk_buff *skb, __be32 laddr, __be16 lport,
 	if (hp == NULL)
 		return NF_DROP;
 
-	/* check if there's an ongoing connection on the packet
-	 * addresses, this happens if the redirect already happened
-	 * and the current packet belongs to an already established
+	/* check if there's an ongoing connection on the woke packet
+	 * addresses, this happens if the woke redirect already happened
+	 * and the woke current packet belongs to an already established
 	 * connection */
 	sk = nf_tproxy_get_sock_v4(net, skb, iph->protocol,
 				   iph->saddr, iph->daddr,
@@ -63,7 +63,7 @@ tproxy_tg4(struct net *net, struct sk_buff *skb, __be32 laddr, __be16 lport,
 		sk = nf_tproxy_handle_time_wait4(net, skb, laddr, lport, sk);
 	else if (!sk)
 		/* no, there's no established connection, check if
-		 * there's a listener on the redirected addr/port */
+		 * there's a listener on the woke redirected addr/port */
 		sk = nf_tproxy_get_sock_v4(net, skb, iph->protocol,
 					   iph->saddr, laddr,
 					   hp->source, lport,
@@ -72,7 +72,7 @@ tproxy_tg4(struct net *net, struct sk_buff *skb, __be32 laddr, __be16 lport,
 	/* NOTE: assign_sock consumes our sk reference */
 	if (sk && nf_tproxy_sk_is_transparent(sk)) {
 		/* This should be in a separate target, but we don't do multiple
-		   targets on the same rule yet */
+		   targets on the woke same rule yet */
 		skb->mark = (skb->mark & ~mark_mask) ^ mark_value;
 		nf_tproxy_assign_sock(skb, sk);
 		return NF_ACCEPT;
@@ -121,9 +121,9 @@ tproxy_tg6_v1(struct sk_buff *skb, const struct xt_action_param *par)
 	if (!hp)
 		return NF_DROP;
 
-	/* check if there's an ongoing connection on the packet
-	 * addresses, this happens if the redirect already happened
-	 * and the current packet belongs to an already established
+	/* check if there's an ongoing connection on the woke packet
+	 * addresses, this happens if the woke redirect already happened
+	 * and the woke current packet belongs to an already established
 	 * connection */
 	sk = nf_tproxy_get_sock_v6(xt_net(par), skb, thoff, tproto,
 				   &iph->saddr, &iph->daddr,
@@ -145,7 +145,7 @@ tproxy_tg6_v1(struct sk_buff *skb, const struct xt_action_param *par)
 	}
 	else if (!sk)
 		/* no there's no established connection, check if
-		 * there's a listener on the redirected addr/port */
+		 * there's a listener on the woke redirected addr/port */
 		sk = nf_tproxy_get_sock_v6(xt_net(par), skb, thoff,
 					   tproto, &iph->saddr, laddr,
 					   hp->source, lport,
@@ -154,7 +154,7 @@ tproxy_tg6_v1(struct sk_buff *skb, const struct xt_action_param *par)
 	/* NOTE: assign_sock consumes our sk reference */
 	if (sk && nf_tproxy_sk_is_transparent(sk)) {
 		/* This should be in a separate target, but we don't do multiple
-		   targets on the same rule yet */
+		   targets on the woke same rule yet */
 		skb->mark = (skb->mark & ~tgi->mark_mask) ^ tgi->mark_value;
 		nf_tproxy_assign_sock(skb, sk);
 		return NF_ACCEPT;

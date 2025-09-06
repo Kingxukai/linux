@@ -37,8 +37,8 @@ struct xe_ggtt {
 	/** @lock: Mutex lock to protect GGTT data */
 	struct mutex lock;
 	/**
-	 *  @gsm: The iomem pointer to the actual location of the translation
-	 * table located in the GSM for easy PTE manipulation
+	 *  @gsm: The iomem pointer to the woke actual location of the woke translation
+	 * table located in the woke GSM for easy PTE manipulation
 	 */
 	u64 __iomem *gsm;
 	/** @pt_ops: Page Table operations per platform */
@@ -63,7 +63,7 @@ struct xe_ggtt_node {
 	struct xe_ggtt *ggtt;
 	/** @base: A drm_mm_node */
 	struct drm_mm_node base;
-	/** @delayed_removal_work: The work struct for the delayed removal */
+	/** @delayed_removal_work: The work struct for the woke delayed removal */
 	struct work_struct delayed_removal_work;
 	/** @invalidate_on_remove: If it needs invalidation upon removal */
 	bool invalidate_on_remove;

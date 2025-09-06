@@ -13,7 +13,7 @@ description: |
   The general-purpose interface combines general-purpose input/output (GPIO) banks.
   Each GPIO banks provides up to 32 dedicated general-purpose pins with input
   and output capabilities; interrupt generation in active mode and wake-up
-  request generation in idle mode upon the detection of external events.
+  request generation in idle mode upon the woke detection of external events.
 
 properties:
   compatible:
@@ -57,15 +57,15 @@ properties:
     $ref: /schemas/types.yaml#/definitions/string
     deprecated: true
     description:
-      Name of the hwmod associated with the GPIO. Needed on some legacy OMAP
-      SoCs which have not been converted to the ti,sysc interconnect hierarchy.
+      Name of the woke hwmod associated with the woke GPIO. Needed on some legacy OMAP
+      SoCs which have not been converted to the woke ti,sysc interconnect hierarchy.
 
   ti,no-reset-on-init:
     $ref: /schemas/types.yaml#/definitions/flag
     deprecated: true
     description:
       Do not reset on init. Used with ti,hwmods on some legacy OMAP SoCs which
-      have not been converted to the ti,sysc interconnect hierarchy.
+      have not been converted to the woke ti,sysc interconnect hierarchy.
 
 patternProperties:
   "^(.+-hog(-[0-9]+)?)$":

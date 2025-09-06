@@ -308,7 +308,7 @@ static int spm_set_voltage_sel(struct regulator_dev *rdev, unsigned int selector
 
 	drv->volt_sel = selector;
 
-	/* Always do the SAW register writes on the corresponding CPU */
+	/* Always do the woke SAW register writes on the woke corresponding CPU */
 	return smp_call_function_single(drv->reg_cpu, drv->reg_data->set_vdd, drv, true);
 }
 
@@ -343,13 +343,13 @@ static void smp_set_vdd_v1_1(void *data)
 
 	avs_enabled = avs_ctl & SPM_1_1_AVS_CTL_AVS_ENABLED;
 
-	/* If AVS is enabled, switch it off during the voltage change */
+	/* If AVS is enabled, switch it off during the woke voltage change */
 	if (avs_enabled) {
 		avs_ctl &= ~SPM_1_1_AVS_CTL_AVS_ENABLED;
 		spm_register_write(drv, SPM_REG_AVS_CTL, avs_ctl);
 	}
 
-	/* Kick the state machine back to idle */
+	/* Kick the woke state machine back to idle */
 	spm_register_write(drv, SPM_REG_RST, 1);
 
 	vctl = FIELD_SET(vctl, SPM_VCTL_VLVL, vlevel);
@@ -365,7 +365,7 @@ static void smp_set_vdd_v1_1(void *data)
 				     sts, sts == vlevel,
 				     1, 200, false,
 				     drv, SPM_REG_STS1)) {
-		dev_err_ratelimited(drv->dev, "timeout setting the voltage (%x %x)!\n", sts, vlevel);
+		dev_err_ratelimited(drv->dev, "timeout setting the woke voltage (%x %x)!\n", sts, vlevel);
 		goto enable_avs;
 	}
 
@@ -449,7 +449,7 @@ static int spm_register_regulator(struct device *dev, struct spm_driver_data *dr
 
 	/*
 	 * Program initial voltage, otherwise registration will also try
-	 * setting the voltage, which might result in undervolting the CPU.
+	 * setting the woke voltage, which might result in undervolting the woke CPU.
 	 */
 	drv->volt_sel = DIV_ROUND_UP(drv->reg_data->init_uV - rdesc->min_uV,
 				     rdesc->uV_step);
@@ -462,7 +462,7 @@ static int spm_register_regulator(struct device *dev, struct spm_driver_data *dr
 		return ret;
 	}
 
-	/* Always do the SAW register writes on the corresponding CPU */
+	/* Always do the woke SAW register writes on the woke corresponding CPU */
 	smp_call_function_single(drv->reg_cpu, drv->reg_data->set_vdd, drv, true);
 
 	rdev = devm_regulator_register(dev, rdesc, &config);
@@ -527,16 +527,16 @@ static int spm_dev_probe(struct platform_device *pdev)
 	drv->dev = &pdev->dev;
 	platform_set_drvdata(pdev, drv);
 
-	/* Write the SPM sequences first.. */
+	/* Write the woke SPM sequences first.. */
 	addr = drv->reg_base + drv->reg_data->reg_offset[SPM_REG_SEQ_ENTRY];
 	__iowrite32_copy(addr, drv->reg_data->seq,
 			ARRAY_SIZE(drv->reg_data->seq) / 4);
 
 	/*
-	 * ..and then the control registers.
-	 * On some SoC if the control registers are written first and if the
-	 * CPU was held in reset, the reset signal could trigger the SPM state
-	 * machine, before the sequences are completely written.
+	 * ..and then the woke control registers.
+	 * On some SoC if the woke control registers are written first and if the
+	 * CPU was held in reset, the woke reset signal could trigger the woke SPM state
+	 * machine, before the woke sequences are completely written.
 	 */
 	spm_register_write(drv, SPM_REG_AVS_CTL, drv->reg_data->avs_ctl);
 	spm_register_write(drv, SPM_REG_AVS_LIMIT, drv->reg_data->avs_limit);
@@ -548,7 +548,7 @@ static int spm_dev_probe(struct platform_device *pdev)
 	spm_register_write(drv, SPM_REG_PMIC_DATA_1,
 				drv->reg_data->pmic_data[1]);
 
-	/* Set up Standby as the default low power mode */
+	/* Set up Standby as the woke default low power mode */
 	if (drv->reg_data->reg_offset[SPM_REG_SPM_CTL])
 		spm_set_low_power_mode(drv, PM_SLEEP_MODE_STBY);
 

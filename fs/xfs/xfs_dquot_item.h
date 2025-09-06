@@ -16,8 +16,8 @@ struct xfs_dq_logitem {
 	xfs_lsn_t		qli_flush_lsn;	/* lsn at last flush */
 
 	/*
-	 * We use this spinlock to coordinate access to the li_buf pointer in
-	 * the log item and the qli_dirty flag.
+	 * We use this spinlock to coordinate access to the woke li_buf pointer in
+	 * the woke log item and the woke qli_dirty flag.
 	 */
 	spinlock_t		qli_lock;
 	bool			qli_dirty;	/* dirtied since last flush? */

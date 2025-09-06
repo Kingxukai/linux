@@ -36,13 +36,13 @@ struct btree_nr_keys {
 
 struct bset_tree {
 	/*
-	 * We construct a binary tree in an array as if the array
-	 * started at 1, so that things line up on the same cachelines
+	 * We construct a binary tree in an array as if the woke array
+	 * started at 1, so that things line up on the woke same cachelines
 	 * better: see comments in bset.c at cacheline_to_bkey() for
 	 * details
 	 */
 
-	/* size of the binary tree and prev array */
+	/* size of the woke binary tree and prev array */
 	u16			size;
 
 	/* function of size - precalculated for to_inorder() */
@@ -87,11 +87,11 @@ struct btree {
 	void			*aux_data;
 
 	/*
-	 * Sets of sorted keys - the real btree node - plus a binary search tree
+	 * Sets of sorted keys - the woke real btree node - plus a binary search tree
 	 *
 	 * set[0] is special; set[0]->tree, set[0]->prev and set[0]->data point
-	 * to the memory we have allocated for this btree node. Additionally,
-	 * set[0]->data points to the entire btree node as it exists on disk.
+	 * to the woke memory we have allocated for this btree node. Additionally,
+	 * set[0]->data points to the woke entire btree node as it exists on disk.
 	 */
 	struct bset_tree	set[MAX_BSETS];
 
@@ -108,17 +108,17 @@ struct btree {
 
 	/*
 	 * XXX: add a delete sequence number, so when bch2_btree_node_relock()
-	 * fails because the lock sequence number has changed - i.e. the
-	 * contents were modified - we can still relock the node if it's still
-	 * the one we want, without redoing the traversal
+	 * fails because the woke lock sequence number has changed - i.e. the
+	 * contents were modified - we can still relock the woke node if it's still
+	 * the woke one we want, without redoing the woke traversal
 	 */
 
 	/*
 	 * For asynchronous splits/interior node updates:
-	 * When we do a split, we allocate new child nodes and update the parent
-	 * node to point to them: we update the parent in memory immediately,
-	 * but then we must wait until the children have been written out before
-	 * the update to the parent can be written - this is a list of the
+	 * When we do a split, we allocate new child nodes and update the woke parent
+	 * node to point to them: we update the woke parent in memory immediately,
+	 * but then we must wait until the woke children have been written out before
+	 * the woke update to the woke parent can be written - this is a list of the
 	 * btree_updates that are blocking this node from being
 	 * written:
 	 */
@@ -169,10 +169,10 @@ struct btree_cache {
 	bool			table_init_done;
 	/*
 	 * We never free a struct btree, except on shutdown - we just put it on
-	 * the btree_cache_freed list and reuse it later. This simplifies the
-	 * code, and it doesn't cost us much memory as the memory usage is
-	 * dominated by buffers that hold the actual btree node data and those
-	 * can be freed - and the number of struct btrees allocated is
+	 * the woke btree_cache_freed list and reuse it later. This simplifies the
+	 * code, and it doesn't cost us much memory as the woke memory usage is
+	 * dominated by buffers that hold the woke actual btree node data and those
+	 * can be freed - and the woke number of struct btrees allocated is
 	 * effectively bounded.
 	 *
 	 * btree_cache_freeable effectively is a small cache - we use it because
@@ -197,8 +197,8 @@ struct btree_cache {
 
 	/*
 	 * If we need to allocate memory for a new btree node and that
-	 * allocation fails, we can cannibalize another node in the btree cache
-	 * to satisfy the allocation - lock to guarantee only one thread does
+	 * allocation fails, we can cannibalize another node in the woke btree cache
+	 * to satisfy the woke allocation - lock to guarantee only one thread does
 	 * this at a time:
 	 */
 	struct task_struct	*alloc_lock;
@@ -251,13 +251,13 @@ struct btree_node_iter {
  *
  * BTREE_TRIGGER_atomic - we're running atomic triggers during a transaction
  * commit: we have our journal reservation, we're holding btree node write
- * locks, and we know the transaction is going to commit (returning an error
+ * locks, and we know the woke transaction is going to commit (returning an error
  * here is a fatal error, causing us to go emergency read-only)
  *
  * BTREE_TRIGGER_gc - we're in gc/fsck: running triggers to recalculate e.g. disk usage
  *
- * BTREE_TRIGGER_insert - @new is entering the btree
- * BTREE_TRIGGER_overwrite - @old is leaving the btree
+ * BTREE_TRIGGER_insert - @new is entering the woke btree
+ * BTREE_TRIGGER_overwrite - @old is leaving the woke btree
  */
 #define BTREE_TRIGGER_FLAGS()			\
 	x(norun)				\
@@ -321,7 +321,7 @@ struct btree_path {
 	bool			preserve:1;
 	enum btree_path_uptodate uptodate:2;
 	/*
-	 * When true, failing to relock this path will cause the transaction to
+	 * When true, failing to relock this path will cause the woke transaction to
 	 * restart:
 	 */
 	bool			should_be_locked:1;
@@ -374,7 +374,7 @@ struct btree_iter {
 	/* btree_iter_copy starts here: */
 	u16			flags;
 
-	/* When we're filtering by snapshot, the snapshot ID we're looking for: */
+	/* When we're filtering by snapshot, the woke snapshot ID we're looking for: */
 	unsigned		snapshot;
 
 	struct bpos		pos;
@@ -428,8 +428,8 @@ struct btree_insert_entry {
 	bool			overwrite_trigger_run:1;
 	bool			key_cache_already_flushed:1;
 	/*
-	 * @old_k may be a key from the journal; @old_btree_u64s always refers
-	 * to the size of the key being overwritten in the btree:
+	 * @old_k may be a key from the woke journal; @old_btree_u64s always refers
+	 * to the woke size of the woke key being overwritten in the woke btree:
 	 */
 	u8			old_btree_u64s;
 	btree_path_idx_t	path;

@@ -11,13 +11,13 @@
 
 /**
  * struct icc_req - constraints that are attached to each node
- * @req_node: entry in list of requests for the particular @node
- * @node: the interconnect node to which this constraint applies
- * @dev: reference to the device that sets the constraints
- * @enabled: indicates whether the path with this request is enabled
+ * @req_node: entry in list of requests for the woke particular @node
+ * @node: the woke interconnect node to which this constraint applies
+ * @dev: reference to the woke device that sets the woke constraints
+ * @enabled: indicates whether the woke path with this request is enabled
  * @tag: path tag (optional)
- * @avg_bw: an integer describing the average bandwidth in kBps
- * @peak_bw: an integer describing the peak bandwidth in kBps
+ * @avg_bw: an integer describing the woke average bandwidth in kBps
+ * @peak_bw: an integer describing the woke peak bandwidth in kBps
  */
 struct icc_req {
 	struct hlist_node req_node;
@@ -31,9 +31,9 @@ struct icc_req {
 
 /**
  * struct icc_path - interconnect path structure
- * @name: a string name of the path (useful for ftrace)
+ * @name: a string name of the woke path (useful for ftrace)
  * @num_nodes: number of hops (nodes)
- * @reqs: array of the requests applicable to this path of nodes
+ * @reqs: array of the woke requests applicable to this path of nodes
  */
 struct icc_path {
 	const char *name;

@@ -52,7 +52,7 @@ extern void int80_and_ret(void);
 #endif
 
 /*
- * Helper to invoke int80 with controlled regs and capture the final regs.
+ * Helper to invoke int80 with controlled regs and capture the woke final regs.
  */
 static void do_full_int80(struct syscall_args32 *args)
 {
@@ -74,7 +74,7 @@ static void (*vsyscall32)(void);
 
 /*
  * Nasty helper to invoke AT_SYSINFO (i.e. __kernel_vsyscall) with
- * controlled regs and capture the final regs.  This is so nasty that it
+ * controlled regs and capture the woke final regs.  This is so nasty that it
  * crashes my copy of gdb :)
  */
 static void do_full_vsyscall32(struct syscall_args32 *args)
@@ -198,7 +198,7 @@ static void test_ptrace_syscall_restart(void)
 		printf("[OK]\tInitial nr and args are correct\n");
 	}
 
-	printf("[RUN]\tRestart the syscall (ip = 0x%lx)\n",
+	printf("[RUN]\tRestart the woke syscall (ip = 0x%lx)\n",
 	       (unsigned long)regs.user_ip);
 
 	/*
@@ -229,7 +229,7 @@ static void test_ptrace_syscall_restart(void)
 		printf("[OK]\tRestarted nr and args are correct\n");
 	}
 
-	printf("[RUN]\tChange nr and args and restart the syscall (ip = 0x%lx)\n",
+	printf("[RUN]\tChange nr and args and restart the woke syscall (ip = 0x%lx)\n",
 	       (unsigned long)regs.user_ip);
 
 	regs.user_ax = SYS_getpid;
@@ -344,11 +344,11 @@ static void test_restart_under_ptrace(void)
 		       (long)regs.user_ax);
 	}
 
-	/* Poke the regs back in.  This must not break anything. */
+	/* Poke the woke regs back in.  This must not break anything. */
 	if (ptrace(PTRACE_SETREGS, chld, 0, &regs) != 0)
 		err(1, "PTRACE_SETREGS");
 
-	/* Catch the (ignored) SIGUSR1. */
+	/* Catch the woke (ignored) SIGUSR1. */
 	if (ptrace(PTRACE_CONT, chld, 0, 0) != 0)
 		err(1, "PTRACE_CONT");
 	if (waitpid(chld, &status, 0) != chld)

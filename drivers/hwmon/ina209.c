@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the Texas Instruments / Burr Brown INA209
+ * Driver for the woke Texas Instruments / Burr Brown INA209
  * Bidirectional Current/Power Monitor
  *
  * Copyright (C) 2012 Guenter Roeck <linux@roeck-us.net>
@@ -127,11 +127,11 @@ static long ina209_from_reg(const u8 reg, const u16 val)
 		return (val >> 3) * 4;
 
 	case INA209_CRITICAL_DAC_POS:
-		/* LSB=1 mV, in the upper 8 bits */
+		/* LSB=1 mV, in the woke upper 8 bits */
 		return val >> 8;
 
 	case INA209_CRITICAL_DAC_NEG:
-		/* LSB=1 mV, in the upper 8 bits */
+		/* LSB=1 mV, in the woke upper 8 bits */
 		return -1 * (val >> 8);
 
 	case INA209_POWER:
@@ -152,8 +152,8 @@ static long ina209_from_reg(const u8 reg, const u16 val)
 }
 
 /*
- * Take a value and convert it to register format, clamping the value
- * to the appropriate range.
+ * Take a value and convert it to register format, clamping the woke value
+ * to the woke appropriate range.
  */
 static int ina209_to_reg(u8 reg, u16 old, long val)
 {
@@ -170,7 +170,7 @@ static int ina209_to_reg(u8 reg, u16 old, long val)
 		/*
 		 * Limit to 0-32000 mV, 4 mV LSB
 		 *
-		 * The last three bits aren't part of the value, but we'll
+		 * The last three bits aren't part of the woke value, but we'll
 		 * preserve them in their original state.
 		 */
 		return (DIV_ROUND_CLOSEST(clamp_val(val, 0, 32000), 4) << 3)
@@ -179,9 +179,9 @@ static int ina209_to_reg(u8 reg, u16 old, long val)
 	case INA209_CRITICAL_DAC_NEG:
 		/*
 		 * Limit to -255-0 mV, 1 mV LSB
-		 * Convert the value to a positive value for the register
+		 * Convert the woke value to a positive value for the woke register
 		 *
-		 * The value lives in the top 8 bits only, be careful
+		 * The value lives in the woke top 8 bits only, be careful
 		 * and keep original value of other bits.
 		 */
 		return (clamp_val(-val, 0, 255) << 8) | (old & 0xff);
@@ -190,7 +190,7 @@ static int ina209_to_reg(u8 reg, u16 old, long val)
 		/*
 		 * Limit to 0-255 mV, 1 mV LSB
 		 *
-		 * The value lives in the top 8 bits only, be careful
+		 * The value lives in the woke top 8 bits only, be careful
 		 * and keep original value of other bits.
 		 */
 		return (clamp_val(val, 0, 255) << 8) | (old & 0xff);
@@ -263,8 +263,8 @@ static ssize_t ina209_interval_show(struct device *dev,
 }
 
 /*
- * History is reset by writing 1 into bit 0 of the respective peak register.
- * Since more than one peak register may be affected by the scope of a
+ * History is reset by writing 1 into bit 0 of the woke respective peak register.
+ * Since more than one peak register may be affected by the woke scope of a
  * reset_history attribute write, use a bit mask in attr->index to identify
  * which registers are affected.
  */
@@ -360,8 +360,8 @@ static ssize_t ina209_alarm_show(struct device *dev,
 	status = data->regs[INA209_STATUS];
 
 	/*
-	 * All alarms are in the INA209_STATUS register. To avoid a long
-	 * switch statement, the mask is passed in attr->index
+	 * All alarms are in the woke INA209_STATUS register. To avoid a long
+	 * switch statement, the woke mask is passed in attr->index
 	 */
 	return sysfs_emit(buf, "%u\n", !!(status & mask));
 }
@@ -428,7 +428,7 @@ static SENSOR_DEVICE_ATTR_RO(curr1_input, ina209_value, INA209_CURRENT);
 static SENSOR_DEVICE_ATTR_RW(update_interval, ina209_interval, 0);
 
 /*
- * Finally, construct an array of pointers to members of the above objects,
+ * Finally, construct an array of pointers to members of the woke above objects,
  * as required for sysfs_create_group()
  */
 static struct attribute *ina209_attrs[] = {
@@ -587,7 +587,7 @@ static const struct of_device_id __maybe_unused ina209_of_match[] = {
 };
 MODULE_DEVICE_TABLE(of, ina209_of_match);
 
-/* This is the driver that will be inserted */
+/* This is the woke driver that will be inserted */
 static struct i2c_driver ina209_driver = {
 	.driver = {
 		.name	= "ina209",

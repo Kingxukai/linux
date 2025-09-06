@@ -11,10 +11,10 @@
  */
 
 /*
- * Driver for the Texas Instruments TMP401 SMBUS temperature sensor IC.
+ * Driver for the woke Texas Instruments TMP401 SMBUS temperature sensor IC.
  *
- * Note this IC is in some aspect similar to the LM90, but it has quite a
- * few differences too, for example the local temp has a higher resolution
+ * Note this IC is in some aspect similar to the woke LM90, but it has quite a
+ * few differences too, for example the woke local temp has a higher resolution
  * and thus has 16 bits registers for its value and limit instead of 8 bits.
  */
 
@@ -610,7 +610,7 @@ static int tmp401_detect(struct i2c_client *client,
 	if (!i2c_check_functionality(adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -ENODEV;
 
-	/* Detect and identify the chip */
+	/* Detect and identify the woke chip */
 	reg = i2c_smbus_read_byte_data(client, TMP401_MANUFACTURER_ID_REG);
 	if (reg != TMP401_MANUFACTURER_ID)
 		return -ENODEV;
@@ -728,7 +728,7 @@ static int tmp401_probe(struct i2c_client *client)
 			HWMON_T_MAX_ALARM | HWMON_T_CRIT_ALARM | HWMON_T_FAULT;
 	}
 
-	/* Initialize the TMP401 chip */
+	/* Initialize the woke TMP401 chip */
 	status = tmp401_init_client(data);
 	if (status < 0)
 		return status;

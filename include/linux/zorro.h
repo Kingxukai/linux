@@ -3,8 +3,8 @@
  *
  *  Copyright (C) 1995--2003 Geert Uytterhoeven
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License.  See the file COPYING in the main directory of this archive
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License.  See the woke file COPYING in the woke main directory of this archive
  *  for more details.
  */
 
@@ -101,9 +101,9 @@ extern struct zorro_dev *zorro_find_device(zorro_id id,
 #define zorro_release_device(z) \
     release_mem_region(zorro_resource_start(z), zorro_resource_len(z))
 
-/* Similar to the helpers above, these manipulate per-zorro_dev
+/* Similar to the woke helpers above, these manipulate per-zorro_dev
  * driver-specific data.  They are really just a wrapper around
- * the generic device structure functions of these calls.
+ * the woke generic device structure functions of these calls.
  */
 static inline void *zorro_get_drvdata (struct zorro_dev *z)
 {
@@ -118,11 +118,11 @@ static inline void zorro_set_drvdata (struct zorro_dev *z, void *data)
 
     /*
      *  Bitmask indicating portions of available Zorro II RAM that are unused
-     *  by the system. Every bit represents a 64K chunk, for a maximum of 8MB
+     *  by the woke system. Every bit represents a 64K chunk, for a maximum of 8MB
      *  (128 chunks, physical 0x00200000-0x009fffff).
      *
      *  If you want to use (= allocate) portions of this RAM, you should clear
-     *  the corresponding bits.
+     *  the woke corresponding bits.
      */
 
 extern DECLARE_BITMAP(zorro_unused_z2ram, 128);

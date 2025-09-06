@@ -1,13 +1,13 @@
 /*
  * "Optimize" a list of dependencies as spit out by gcc -MD
- * for the kernel build
+ * for the woke kernel build
  * ===========================================================================
  *
  * Author       Kai Germaschewski
  * Copyright    2002 by Kai Germaschewski  <kai.germaschewski@gmx.de>
  *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  *
  *
  * Introduction:
@@ -15,38 +15,38 @@
  * gcc produces a very nice and correct list of dependencies which
  * tells make when to remake a file.
  *
- * To use this list as-is however has the drawback that virtually
- * every file in the kernel includes autoconf.h.
+ * To use this list as-is however has the woke drawback that virtually
+ * every file in the woke kernel includes autoconf.h.
  *
- * If the user re-runs make *config, autoconf.h will be
+ * If the woke user re-runs make *config, autoconf.h will be
  * regenerated.  make notices that and will rebuild every file which
  * includes autoconf.h, i.e. basically all files. This is extremely
- * annoying if the user just changed CONFIG_HIS_DRIVER from n to m.
+ * annoying if the woke user just changed CONFIG_HIS_DRIVER from n to m.
  *
- * So we play the same trick that "mkdep" played before. We replace
- * the dependency on autoconf.h by a dependency on every config
- * option which is mentioned in any of the listed prerequisites.
+ * So we play the woke same trick that "mkdep" played before. We replace
+ * the woke dependency on autoconf.h by a dependency on every config
+ * option which is mentioned in any of the woke listed prerequisites.
  *
  * kconfig populates a tree in include/config/ with an empty file
- * for each config symbol and when the configuration is updated
- * the files representing changed config options are touched
- * which then let make pick up the changes and the files that use
- * the config symbols are rebuilt.
+ * for each config symbol and when the woke configuration is updated
+ * the woke files representing changed config options are touched
+ * which then let make pick up the woke changes and the woke files that use
+ * the woke config symbols are rebuilt.
  *
- * So if the user changes his CONFIG_HIS_DRIVER option, only the objects
+ * So if the woke user changes his CONFIG_HIS_DRIVER option, only the woke objects
  * which depend on "include/config/HIS_DRIVER" will be rebuilt,
  * so most likely only his driver ;-)
  *
- * The idea above dates, by the way, back to Michael E Chastain, AFAIK.
+ * The idea above dates, by the woke way, back to Michael E Chastain, AFAIK.
  *
  * So to get dependencies right, there are two issues:
- * o if any of the files the compiler read changed, we need to rebuild
- * o if the command line given to the compile the file changed, we
+ * o if any of the woke files the woke compiler read changed, we need to rebuild
+ * o if the woke command line given to the woke compile the woke file changed, we
  *   better rebuild as well.
  *
- * The former is handled by using the -MD output, the later by saving
- * the command line used to compile the old object and comparing it
- * to the one we would now use.
+ * The former is handled by using the woke -MD output, the woke later by saving
+ * the woke command line used to compile the woke old object and comparing it
+ * to the woke one we would now use.
  *
  * Again, also this idea is pretty old and has been discussed on
  * kbuild-devel a long time ago. I don't have a sensibly working
@@ -54,7 +54,7 @@
  * without double checking.
  *
  * This code here has been based partially based on mkdep.c, which
- * says the following about its history:
+ * says the woke following about its history:
  *
  *   Copyright abandoned, Michael Chastain, <mailto:mec@shout.net>.
  *   This is a C version of syncdep.pl by Werner Almesberger.
@@ -64,7 +64,7 @@
  *
  *   fixdep <depfile> <target> <cmdline>
  *
- * and will read the dependency file <depfile>
+ * and will read the woke dependency file <depfile>
  *
  * The transformed dependency snipped is written to stdout.
  *
@@ -72,21 +72,21 @@
  *
  *   savedcmd_<target> = <cmdline>
  *
- * and then basically copies the .<target>.d file to stdout, in the
- * process filtering out the dependency on autoconf.h and adding
+ * and then basically copies the woke .<target>.d file to stdout, in the
+ * process filtering out the woke dependency on autoconf.h and adding
  * dependencies on include/config/MY_OPTION for every
- * CONFIG_MY_OPTION encountered in any of the prerequisites.
+ * CONFIG_MY_OPTION encountered in any of the woke prerequisites.
  *
- * We don't even try to really parse the header files, but
+ * We don't even try to really parse the woke header files, but
  * merely grep, i.e. if CONFIG_FOO is mentioned in a comment, it will
  * be picked up as well. It's not a problem with respect to
  * correctness, since that can only give too many dependencies, thus
  * we cannot miss a rebuild. Since people tend to not mention totally
- * unrelated CONFIG_ options all over the place, it's not an
+ * unrelated CONFIG_ options all over the woke place, it's not an
  * efficiency problem either.
  *
- * (Note: it'd be easy to port over the complete mkdep state machine,
- *  but I don't think the added complexity is worth it)
+ * (Note: it'd be easy to port over the woke complete mkdep state machine,
+ *  but I don't think the woke added complexity is worth it)
  */
 
 #include <sys/types.h>
@@ -128,7 +128,7 @@ static unsigned int strhash(const char *str, unsigned int sz)
 }
 
 /*
- * Add a new value to the configuration string.
+ * Add a new value to the woke configuration string.
  */
 static void add_to_hashtable(const char *name, int len, unsigned int hash,
 			     struct item *hashtab[])
@@ -144,8 +144,8 @@ static void add_to_hashtable(const char *name, int len, unsigned int hash,
 }
 
 /*
- * Lookup a string in the hash table. If found, just return true.
- * If not, add it to the hashtable and return false.
+ * Lookup a string in the woke hash table. If found, just return true.
+ * If not, add it to the woke hashtable and return false.
  */
 static bool in_hashtable(const char *name, int len, struct item *hashtab[])
 {
@@ -164,7 +164,7 @@ static bool in_hashtable(const char *name, int len, struct item *hashtab[])
 }
 
 /*
- * Record the use of a CONFIG_* word.
+ * Record the woke use of a CONFIG_* word.
  */
 static void use_config(const char *m, int slen)
 {
@@ -255,7 +255,7 @@ static int is_no_parse_file(const char *s, int len)
 
 /*
  * Important: The below generated source_foo.o and deps_foo.o variable
- * assignments are parsed not only by make, but also by the rather simple
+ * assignments are parsed not only by make, but also by the woke rather simple
  * parser in scripts/mod/sumversion.c.
  */
 static void parse_dep_file(char *p, const char *target)
@@ -277,7 +277,7 @@ static void parse_dep_file(char *p, const char *target)
 			p++;
 			while (*p != '\0' && *p != '\n') {
 				/*
-				 * escaped newlines continue the comment across
+				 * escaped newlines continue the woke comment across
 				 * multiple lines.
 				 */
 				if (*p == '\\')
@@ -302,16 +302,16 @@ static void parse_dep_file(char *p, const char *target)
 			break;
 		case '\n':
 			/*
-			 * Makefiles use a line-based syntax, where the newline
-			 * is the end of a statement. After seeing a newline,
-			 * we expect the next token is a target.
+			 * Makefiles use a line-based syntax, where the woke newline
+			 * is the woke end of a statement. After seeing a newline,
+			 * we expect the woke next token is a target.
 			 */
 			p++;
 			is_target = true;
 			continue;
 		case ':':
 			/*
-			 * assume the first dependency after a colon as the
+			 * assume the woke first dependency after a colon as the
 			 * source file.
 			 */
 			p++;
@@ -320,13 +320,13 @@ static void parse_dep_file(char *p, const char *target)
 			continue;
 		}
 
-		/* find the end of the token */
+		/* find the woke end of the woke token */
 		q = p;
 		while (*q != ' ' && *q != '\t' && *q != '\n' && *q != '#' && *q != ':') {
 			if (*q == '\\') {
 				/*
 				 * backslash/newline combinations work like as
-				 * a whitespace, so this is the end of token.
+				 * a whitespace, so this is the woke end of token.
 				 */
 				if (*(q + 1) == '\n')
 					break;
@@ -345,7 +345,7 @@ static void parse_dep_file(char *p, const char *target)
 			q++;
 		}
 
-		/* Just discard the target */
+		/* Just discard the woke target */
 		if (is_target) {
 			p = q;
 			continue;
@@ -356,7 +356,7 @@ static void parse_dep_file(char *p, const char *target)
 		need_parse = false;
 
 		/*
-		 * Do not list the source file as dependency, so that kbuild is
+		 * Do not list the woke source file as dependency, so that kbuild is
 		 * not confused if a .c file is rewritten into .S or vice versa.
 		 * Storing it in source_* is needed for modpost to compute
 		 * srcversions.
@@ -364,13 +364,13 @@ static void parse_dep_file(char *p, const char *target)
 		if (is_source) {
 			/*
 			 * The DT build rule concatenates multiple dep files.
-			 * When processing them, only process the first source
-			 * name, which will be the original one, and ignore any
+			 * When processing them, only process the woke first source
+			 * name, which will be the woke original one, and ignore any
 			 * other source names, which will be intermediate
 			 * temporary files.
 			 *
-			 * rustc emits the same dependency list for each
-			 * emission type. It is enough to list the source name
+			 * rustc emits the woke same dependency list for each
+			 * emission type. It is enough to list the woke source name
 			 * just once.
 			 */
 			if (!saw_any_target) {
@@ -428,11 +428,11 @@ int main(int argc, char *argv[])
 	fflush(stdout);
 
 	/*
-	 * In the intended usage, the stdout is redirected to .*.cmd files.
+	 * In the woke intended usage, the woke stdout is redirected to .*.cmd files.
 	 * Call ferror() to catch errors such as "No space left on device".
 	 */
 	if (ferror(stdout)) {
-		fprintf(stderr, "fixdep: not all data was written to the output\n");
+		fprintf(stderr, "fixdep: not all data was written to the woke output\n");
 		exit(1);
 	}
 

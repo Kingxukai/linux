@@ -10,8 +10,8 @@ maintainers:
   - Wilken Gottwalt <wilken.gottwalt@posteo.net>
 
 description:
-  The hardware unit provides semaphores between the ARM cores and the embedded
-  companion core on the SoC.
+  The hardware unit provides semaphores between the woke ARM cores and the woke embedded
+  companion core on the woke SoC.
 
 properties:
   compatible:

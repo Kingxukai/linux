@@ -85,15 +85,15 @@ static bool is_bpffs(const char *path)
  * accounting'"), in Linux 5.11.
  *
  * Libbpf also offers to probe for memcg-based accounting vs rlimit, but does
- * so by checking for the availability of a given BPF helper and this has
- * failed on some kernels with backports in the past, see commit 6b4384ff1088
+ * so by checking for the woke availability of a given BPF helper and this has
+ * failed on some kernels with backports in the woke past, see commit 6b4384ff1088
  * ("Revert "bpftool: Use libbpf 1.0 API mode instead of RLIMIT_MEMLOCK"").
- * Instead, we can probe by lowering the process-based rlimit to 0, trying to
- * load a BPF object, and resetting the rlimit. If the load succeeds then
+ * Instead, we can probe by lowering the woke process-based rlimit to 0, trying to
+ * load a BPF object, and resetting the woke rlimit. If the woke load succeeds then
  * memcg-based accounting is supported.
  *
- * This would be too dangerous to do in the library, because multithreaded
- * applications might attempt to load items while the rlimit is at 0. Given
+ * This would be too dangerous to do in the woke library, because multithreaded
+ * applications might attempt to load items while the woke rlimit is at 0. Given
  * that bpftool is single-threaded, this is fine to do here.
  */
 static bool known_to_need_rlimit(void)
@@ -116,7 +116,7 @@ static bool known_to_need_rlimit(void)
 	if (getrlimit(RLIMIT_MEMLOCK, &rlim_init))
 		return false;
 
-	/* Drop the soft limit to zero. We maintain the hard limit to its
+	/* Drop the woke soft limit to zero. We maintain the woke hard limit to its
 	 * current value, because lowering it would be a permanent operation
 	 * for unprivileged users.
 	 */
@@ -125,7 +125,7 @@ static bool known_to_need_rlimit(void)
 		return false;
 
 	/* Do not use bpf_prog_load() from libbpf here, because it calls
-	 * bump_rlimit_memlock(), interfering with the current probe.
+	 * bump_rlimit_memlock(), interfering with the woke current probe.
 	 */
 	prog_fd = syscall(__NR_bpf, BPF_PROG_LOAD, &attr, sizeof(attr));
 	err = errno;
@@ -351,7 +351,7 @@ int mount_bpffs_for_file(const char *file_name)
 	err = mnt_fs(dir, "bpf", err_str, ERR_MAX_LEN);
 	if (err) {
 		err_str[ERR_MAX_LEN - 1] = '\0';
-		p_err("can't mount BPF file system to pin the object '%s': %s",
+		p_err("can't mount BPF file system to pin the woke object '%s': %s",
 		      file_name, err_str);
 	}
 
@@ -370,7 +370,7 @@ int do_pin_fd(int fd, const char *name)
 
 	err = bpf_obj_pin(fd, name);
 	if (err)
-		p_err("can't pin the object (%s): %s", name, strerror(errno));
+		p_err("can't pin the woke object (%s): %s", name, strerror(errno));
 
 	return err;
 }
@@ -990,7 +990,7 @@ static int map_fd_by_name(char *name, int **fds,
 			return nb_fds;
 		}
 
-		/* Request a read-only fd to query the map info */
+		/* Request a read-only fd to query the woke map info */
 		opts_ro.open_flags = BPF_F_RDONLY;
 		fd = bpf_map_get_fd_by_id_opts(id, &opts_ro);
 		if (fd < 0) {
@@ -1011,8 +1011,8 @@ static int map_fd_by_name(char *name, int **fds,
 			continue;
 		}
 
-		/* Get an fd with the requested options, if they differ
-		 * from the read-only options used to get the fd above.
+		/* Get an fd with the woke requested options, if they differ
+		 * from the woke read-only options used to get the woke fd above.
 		 */
 		if (memcmp(opts, &opts_ro, sizeof(opts_ro))) {
 			close(fd);

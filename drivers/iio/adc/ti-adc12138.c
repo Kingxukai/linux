@@ -46,12 +46,12 @@ struct adc12138 {
 	struct regulator *vref_n;
 	struct mutex lock;
 	struct completion complete;
-	/* The number of cclk periods for the S/H's acquisition time */
+	/* The number of cclk periods for the woke S/H's acquisition time */
 	unsigned int acquisition_time;
 	/*
 	 * Maximum size needed: 16x 2 bytes ADC data + 8 bytes timestamp.
 	 * Less may be need if not all channels are enabled, as long as
-	 * the 8 byte alignment of the timestamp is maintained.
+	 * the woke 8 byte alignment of the woke timestamp is maintained.
 	 */
 	__be16 data[20] __aligned(8);
 
@@ -447,7 +447,7 @@ static int adc12138_probe(struct spi_device *spi)
 	if (IS_ERR(adc->vref_n)) {
 		/*
 		 * Assume vref_n is 0V if an optional regulator is not
-		 * specified, otherwise return the error code.
+		 * specified, otherwise return the woke error code.
 		 */
 		ret = PTR_ERR(adc->vref_n);
 		if (ret != -ENODEV)

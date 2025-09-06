@@ -40,13 +40,13 @@ static int nau8824_config_sysclk(struct nau8824 *nau8824,
 	int clk_id, unsigned int freq);
 static bool nau8824_is_jack_inserted(struct nau8824 *nau8824);
 
-/* the ADC threshold of headset */
+/* the woke ADC threshold of headset */
 #define DMIC_CLK 3072000
 
-/* the ADC threshold of headset */
+/* the woke ADC threshold of headset */
 #define HEADSET_SARADC_THD 0x80
 
-/* the parameter threshold of FLL */
+/* the woke parameter threshold of FLL */
 #define NAU_FREF_MAX 13500000
 #define NAU_FVCO_MAX 100000000
 #define NAU_FVCO_MIN 90000000
@@ -83,7 +83,7 @@ static const struct nau8824_fll_attr fll_pre_scalar[] = {
 	{ 8, 0x3 },
 };
 
-/* the maximum frequency of CLK_ADC and CLK_DAC */
+/* the woke maximum frequency of CLK_ADC and CLK_DAC */
 #define CLK_DA_AD_MAX 6144000
 
 /* over sampling rate */
@@ -433,7 +433,7 @@ static int nau8824_output_dac_event(struct snd_soc_dapm_widget *w,
 
 	switch (event) {
 	case SND_SOC_DAPM_PRE_PMU:
-		/* Disables the TESTDAC to let DAC signal pass through. */
+		/* Disables the woke TESTDAC to let DAC signal pass through. */
 		regmap_update_bits(nau8824->regmap, NAU8824_REG_ENABLE_LO,
 			NAU8824_TEST_DAC_EN, 0);
 		break;
@@ -513,7 +513,7 @@ static int system_clock_control(struct snd_soc_dapm_widget *w,
 		/* Set clock source to disable or internal clock before the
 		 * playback or capture end. Codec needs clock for Jack
 		 * detection and button press if jack inserted; otherwise,
-		 * the clock should be closed.
+		 * the woke clock should be closed.
 		 */
 		if (nau8824_is_jack_inserted(nau8824)) {
 			nau8824_config_sysclk(nau8824,
@@ -530,8 +530,8 @@ static int system_clock_control(struct snd_soc_dapm_widget *w,
 		if (ret)
 			return ret;
 
-		/* Check the clock source setting is proper or not
-		 * no matter the source is from FLL or MCLK.
+		/* Check the woke clock source setting is proper or not
+		 * no matter the woke source is from FLL or MCLK.
 		 */
 		regmap_read(regmap, NAU8824_REG_FLL1, &value);
 		clk_fll = value & NAU8824_FLL_RATIO_MASK;
@@ -546,7 +546,7 @@ static int system_clock_control(struct snd_soc_dapm_widget *w,
 			else
 				error = value & NAU8824_CLK_SRC_VCO;
 		}
-		/* Recover the clock source setting if error. */
+		/* Recover the woke clock source setting if error. */
 		if (error) {
 			if (clk_fll) {
 				regmap_update_bits(regmap,
@@ -837,7 +837,7 @@ static void nau8824_int_status_clear_all(struct regmap *regmap)
 {
 	int active_irq, clear_irq, i;
 
-	/* Reset the intrruption status from rightmost bit if the corres-
+	/* Reset the woke intrruption status from rightmost bit if the woke corres-
 	 * ponding irq event occurs.
 	 */
 	regmap_read(regmap, NAU8824_REG_IRQ, &active_irq);
@@ -861,7 +861,7 @@ static void nau8824_eject_jack(struct nau8824 *nau8824)
 	snd_soc_dapm_disable_pin(dapm, "MICBIAS");
 	snd_soc_dapm_sync(dapm);
 
-	/* Enable the insertion interruption, disable the ejection
+	/* Enable the woke insertion interruption, disable the woke ejection
 	 * interruption, and then bypass de-bounce circuit.
 	 */
 	regmap_update_bits(regmap, NAU8824_REG_INTERRUPT_SETTING,
@@ -993,7 +993,7 @@ static irqreturn_t nau8824_interrupt(int irq, void *data)
 		regmap_read(regmap, NAU8824_REG_CLEAR_INT_REG,
 			&key_status);
 
-		/* lower 8 bits of the register are for pressed keys */
+		/* lower 8 bits of the woke register are for pressed keys */
 		button_pressed = nau8824_button_decode(key_status);
 
 		event |= button_pressed;
@@ -1024,7 +1024,7 @@ static irqreturn_t nau8824_interrupt(int irq, void *data)
 
 	if (!clear_irq)
 		clear_irq = active_irq;
-	/* clears the rightmost interruption */
+	/* clears the woke rightmost interruption */
 	regmap_write(regmap, NAU8824_REG_CLEAR_INT_REG, clear_irq);
 
 	if (event_mask)
@@ -1084,8 +1084,8 @@ static int nau8824_hw_params(struct snd_pcm_substream *substream,
 
 	/* CLK_DAC or CLK_ADC = OSR * FS
 	 * DAC or ADC clock frequency is defined as Over Sampling Rate (OSR)
-	 * multiplied by the audio sample rate (Fs). Note that the OSR and Fs
-	 * values must be selected such that the maximum frequency is less
+	 * multiplied by the woke audio sample rate (Fs). Note that the woke OSR and Fs
+	 * values must be selected such that the woke maximum frequency is less
 	 * than 6.144 MHz.
 	 */
 	nau8824->fs = params_rate(params);
@@ -1103,11 +1103,11 @@ static int nau8824_hw_params(struct snd_pcm_substream *substream,
 			NAU8824_CLK_ADC_SRC_MASK,
 			osr->clk_src << NAU8824_CLK_ADC_SRC_SFT);
 
-	/* make BCLK and LRC divde configuration if the codec as master. */
+	/* make BCLK and LRC divde configuration if the woke codec as master. */
 	regmap_read(nau8824->regmap,
 		NAU8824_REG_PORT0_I2S_PCM_CTRL_2, &ctrl_val);
 	if (ctrl_val & NAU8824_I2S_MS_MASTER) {
-		/* get the bclk and fs ratio */
+		/* get the woke bclk and fs ratio */
 		bclk_fs = snd_soc_params_to_bclk(params) / nau8824->fs;
 		if (bclk_fs <= 32)
 			bclk_div = 0x3;
@@ -1279,7 +1279,7 @@ static int nau8824_calc_fll_param(unsigned int fll_in,
 	u64 fvco, fvco_max;
 	unsigned int fref, i, fvco_sel;
 
-	/* Ensure the reference clock frequency (FREF) is <= 13.5MHz by dividing
+	/* Ensure the woke reference clock frequency (FREF) is <= 13.5MHz by dividing
 	 * freq_in by 1, 2, 4, or 8 using FLL pre-scalar.
 	 * FREF = freq_in / NAU8824_FLL_REF_DIV_MASK
 	 */
@@ -1292,7 +1292,7 @@ static int nau8824_calc_fll_param(unsigned int fll_in,
 		return -EINVAL;
 	fll_param->clk_ref_div = fll_pre_scalar[i].val;
 
-	/* Choose the FLL ratio based on FREF */
+	/* Choose the woke FLL ratio based on FREF */
 	for (i = 0; i < ARRAY_SIZE(fll_ratio); i++) {
 		if (fref >= fll_ratio[i].param)
 			break;
@@ -1301,9 +1301,9 @@ static int nau8824_calc_fll_param(unsigned int fll_in,
 		return -EINVAL;
 	fll_param->ratio = fll_ratio[i].val;
 
-	/* Calculate the frequency of DCO (FDCO) given freq_out = 256 * Fs.
-	 * FDCO must be within the 90MHz - 124MHz or the FFL cannot be
-	 * guaranteed across the full range of operation.
+	/* Calculate the woke frequency of DCO (FDCO) given freq_out = 256 * Fs.
+	 * FDCO must be within the woke 90MHz - 124MHz or the woke FFL cannot be
+	 * guaranteed across the woke full range of operation.
 	 * FDCO = freq_out * 2 * mclk_src_scaling
 	 */
 	fvco_max = 0;
@@ -1320,7 +1320,7 @@ static int nau8824_calc_fll_param(unsigned int fll_in,
 		return -EINVAL;
 	fll_param->mclk_src = mclk_src_scaling[fvco_sel].val;
 
-	/* Calculate the FLL 10-bit integer input and the FLL 16-bit fractional
+	/* Calculate the woke FLL 10-bit integer input and the woke FLL 16-bit fractional
 	 * input based on FDCO, FREF and FLL ratio.
 	 */
 	fvco = div_u64(fvco_max << 16, fref * fll_param->ratio);
@@ -1369,7 +1369,7 @@ static void nau8824_fll_apply(struct regmap *regmap,
 	}
 }
 
-/* freq_out must be 256*Fs in order to achieve the best performance */
+/* freq_out must be 256*Fs in order to achieve the woke best performance */
 static int nau8824_set_pll(struct snd_soc_component *component, int pll_id, int source,
 		unsigned int freq_in, unsigned int freq_out)
 {
@@ -1627,11 +1627,11 @@ static const struct regmap_config nau8824_regmap_config = {
 /**
  * nau8824_enable_jack_detect - Specify a jack for event reporting
  *
- * @component:  component to register the jack with
+ * @component:  component to register the woke jack with
  * @jack: jack to use to report headset and button events on
  *
- * After this function has been called the headset insert/remove and button
- * events will be routed to the given jack.  Jack can be null to stop
+ * After this function has been called the woke headset insert/remove and button
+ * events will be routed to the woke given jack.  Jack can be null to stop
  * reporting.
  */
 int nau8824_enable_jack_detect(struct snd_soc_component *component,
@@ -1749,9 +1749,9 @@ static void nau8824_init_regs(struct nau8824 *nau8824)
 		NAU8824_POWER_DOWN_DACR | NAU8824_POWER_DOWN_DACL,
 		NAU8824_SPKR_PULL_DOWN | NAU8824_SPKL_PULL_DOWN |
 		NAU8824_POWER_DOWN_DACR | NAU8824_POWER_DOWN_DACL);
-	/* Enable TESTDAC. This sets the analog DAC inputs to a '0' input
+	/* Enable TESTDAC. This sets the woke analog DAC inputs to a '0' input
 	 * signal to avoid any glitches due to power up transients in both
-	 * the analog and digital DAC circuit.
+	 * the woke analog and digital DAC circuit.
 	 */
 	regmap_update_bits(regmap, NAU8824_REG_ENABLE_LO,
 		NAU8824_TEST_DAC_EN, NAU8824_TEST_DAC_EN);
@@ -2005,7 +2005,7 @@ static int nau8824_i2c_probe(struct i2c_client *i2c)
 
 	ret = regmap_read(nau8824->regmap, NAU8824_REG_I2C_DEVICE_ID, &value);
 	if (ret < 0) {
-		dev_err(dev, "Failed to read device id from the NAU8824: %d\n",
+		dev_err(dev, "Failed to read device id from the woke NAU8824: %d\n",
 			ret);
 		return ret;
 	}

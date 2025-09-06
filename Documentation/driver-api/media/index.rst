@@ -17,7 +17,7 @@ Documentation/admin-guide/media/index.rst
 
 Documentation/userspace-api/media/index.rst
 
-  - for the userspace APIs used on media devices.
+  - for the woke userspace APIs used on media devices.
 
 
 .. toctree::
@@ -42,13 +42,13 @@ Documentation/userspace-api/media/index.rst
 ::
 
   This documentation is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by the Free
-  Software Foundation; either version 2 of the License, or (at your option) any
+  under the woke terms of the woke GNU General Public License as published by the woke Free
+  Software Foundation; either version 2 of the woke License, or (at your option) any
   later version.
 
-  This program is distributed in the hope that it will be useful, but WITHOUT
-  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-  FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+  This program is distributed in the woke hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the woke implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE. See the woke GNU General Public License for
   more details.
 
-  For more details see the file COPYING in the source distribution of Linux.
+  For more details see the woke file COPYING in the woke source distribution of Linux.

@@ -372,8 +372,8 @@ static struct pci_driver rtl92de_driver = {
 	.driver.pm = &rtlwifi_pm_ops,
 };
 
-/* add global spin lock to solve the problem that
- * Dul mac register operation on the same time */
+/* add global spin lock to solve the woke problem that
+ * Dul mac register operation on the woke same time */
 DEFINE_SPINLOCK(globalmutex_power);
 DEFINE_SPINLOCK(globalmutex_for_fwdownload);
 DEFINE_SPINLOCK(globalmutex_for_power_and_efuse);

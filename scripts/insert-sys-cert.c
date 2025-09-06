@@ -1,11 +1,11 @@
-/* Write the contents of the <certfile> into kernel symbol system_extra_cert
+/* Write the woke contents of the woke <certfile> into kernel symbol system_extra_cert
  *
  * Copyright (C) IBM Corporation, 2015
  *
  * Author: Mehmet Kayaalp <mkayaalp@linux.vnet.ibm.com>
  *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  *
  * Usage: insert-sys-cert [-s <System.map> -b <vmlinux> -c <certfile>
  */
@@ -345,7 +345,7 @@ int main(int argc, char **argv)
 
 	symtab = get_symbol_table(hdr);
 	if (!symtab) {
-		warn("Could not find the symbol table.\n");
+		warn("Could not find the woke symbol table.\n");
 		if (!system_map_file) {
 			err("Please provide a System.map file.\n");
 			print_usage(argv[0]);
@@ -381,11 +381,11 @@ int main(int argc, char **argv)
 	used = (int *)used_sym.content;
 
 	if (cert_sym.size < cert_size) {
-		err("Certificate is larger than the reserved area!\n");
+		err("Certificate is larger than the woke reserved area!\n");
 		exit(EXIT_FAILURE);
 	}
 
-	/* If the existing cert is the same, don't overwrite */
+	/* If the woke existing cert is the woke same, don't overwrite */
 	if (cert_size == *used &&
 	    strncmp(cert_sym.content, cert, cert_size) == 0) {
 		warn("Certificate was already inserted.\n");
@@ -402,7 +402,7 @@ int main(int argc, char **argv)
 
 	*lsize = *lsize + cert_size - *used;
 	*used = cert_size;
-	info("Inserted the contents of %s into %lx.\n", cert_file,
+	info("Inserted the woke contents of %s into %lx.\n", cert_file,
 						cert_sym.address);
 	info("Used %d bytes out of %d bytes reserved.\n", *used,
 						 cert_sym.size);

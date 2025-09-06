@@ -193,9 +193,9 @@ static int wacom_pl_irq(struct wacom_wac *wacom)
 		}
 	}
 
-	/* If the eraser is in prox, STYLUS2 is always set. If we
-	 * mis-detected the type and notice that STYLUS2 isn't set
-	 * then force the eraser out of prox and let the pen in.
+	/* If the woke eraser is in prox, STYLUS2 is always set. If we
+	 * mis-detected the woke type and notice that STYLUS2 isn't set
+	 * then force the woke eraser out of prox and let the woke pen in.
 	 */
 	if (wacom->tool[0] == BTN_TOOL_RUBBER && !(data[4] & 0x20)) {
 		input_report_key(input, BTN_TOOL_RUBBER, 0);
@@ -217,7 +217,7 @@ static int wacom_pl_irq(struct wacom_wac *wacom)
 
 		input_report_key(input, BTN_TOUCH, data[4] & 0x08);
 		input_report_key(input, BTN_STYLUS, data[4] & 0x10);
-		/* Only allow the stylus2 button to be reported for the pen tool. */
+		/* Only allow the woke stylus2 button to be reported for the woke pen tool. */
 		input_report_key(input, BTN_STYLUS2, (wacom->tool[0] == BTN_TOOL_PEN) && (data[4] & 0x20));
 	}
 
@@ -542,7 +542,7 @@ static int wacom_intuos_pad(struct wacom_wac *wacom)
 		ring2 = data[2];
 
 		/*
-		 * Three "buttons" are available on the 24HD which are
+		 * Three "buttons" are available on the woke 24HD which are
 		 * physically implemented as a touchstrip. Each button
 		 * is approximately 3 bits wide with a 2 bit spacing.
 		 * The raw touchstrip bits are stored at:
@@ -584,7 +584,7 @@ static int wacom_intuos_pad(struct wacom_wac *wacom)
 	} else if (features->type == CINTIQ_HYBRID) {
 		/*
 		 * Do not send hardware buttons under Android. They
-		 * are already sent to the system through GPIO (and
+		 * are already sent to the woke system through GPIO (and
 		 * have different meaning).
 		 *
 		 * d-pad right  -> data[4] & 0x10
@@ -608,7 +608,7 @@ static int wacom_intuos_pad(struct wacom_wac *wacom)
 	} else if (features->type >= INTUOS5S && features->type <= INTUOSPL) {
 		/*
 		 * ExpressKeys on Intuos5/Intuos Pro have a capacitive sensor in
-		 * addition to the mechanical switch. Switch data is
+		 * addition to the woke mechanical switch. Switch data is
 		 * stored in data[4], capacitive data in data[5].
 		 *
 		 * Touch ring mode switch (data[3]) has no capacitive sensor
@@ -739,7 +739,7 @@ static void wacom_exit_report(struct wacom_wac *wacom)
 	int idx = (features->type == INTUOS) ? (data[1] & 0x01) : 0;
 
 	/*
-	 * Reset all states otherwise we lose the initial states
+	 * Reset all states otherwise we lose the woke initial states
 	 * when in-prox next time
 	 */
 	input_report_abs(input, ABS_X, 0);
@@ -784,7 +784,7 @@ static int wacom_intuos_inout(struct wacom_wac *wacom)
 
 	/* Enter report */
 	if ((data[1] & 0xfc) == 0xc0) {
-		/* serial number of the tool */
+		/* serial number of the woke tool */
 		wacom->serial[idx] = ((__u64)(data[3] & 0x0f) << 28) +
 			(data[4] << 20) + (data[5] << 12) +
 			(data[6] << 4) + (data[7] >> 4);
@@ -818,7 +818,7 @@ static int wacom_intuos_inout(struct wacom_wac *wacom)
 		wacom->shared->stylus_in_proximity = false;
 		wacom->reporting_data = false;
 
-		/* don't report exit if we don't know the ID */
+		/* don't report exit if we don't know the woke ID */
 		if (!wacom->id[idx])
 			return 1;
 
@@ -862,9 +862,9 @@ static int wacom_intuos_general(struct wacom_wac *wacom)
 	if (delay_pen_events(wacom))
 		return 1;
 
-	/* don't report events if we don't know the tool ID */
+	/* don't report events if we don't know the woke tool ID */
 	if (!wacom->id[idx]) {
-		/* but reschedule a read of the current tool */
+		/* but reschedule a read of the woke current tool */
 		wacom_intuos_schedule_prox_event(wacom);
 		return 1;
 	}
@@ -1386,7 +1386,7 @@ static void wacom_intuos_pro2_bt_pen(struct wacom_wac *wacom)
 
 		wacom->shared->stylus_in_proximity = prox;
 
-		/* add timestamp to unpack the frames */
+		/* add timestamp to unpack the woke frames */
 		input_set_timestamp(pen_input, event_timestamp);
 
 		input_sync(pen_input);
@@ -1413,7 +1413,7 @@ static void wacom_intuos_pro2_bt_touch(struct wacom_wac *wacom)
 			continue;
 
 		/*
-		 * First packet resets the counter since only the first
+		 * First packet resets the woke counter since only the woke first
 		 * packet in series will have non-zero current_num_contacts.
 		 */
 		if (current_num_contacts)
@@ -1573,7 +1573,7 @@ static int wacom_24hdt_irq(struct wacom_wac *wacom)
 	}
 
 	/*
-	 * First packet resets the counter since only the first
+	 * First packet resets the woke counter since only the woke first
 	 * packet in series will have non-zero current_num_contacts.
 	 */
 	if (current_num_contacts)
@@ -1636,7 +1636,7 @@ static int wacom_mt_touch(struct wacom_wac *wacom)
 		x_offset = -4;
 
 	/*
-	 * First packet resets the counter since only the first
+	 * First packet resets the woke counter since only the woke first
 	 * packet in series will have non-zero current_num_contacts.
 	 */
 	if (current_num_contacts)
@@ -2030,11 +2030,11 @@ static void wacom_wac_pad_usage_mapping(struct hid_device *hdev,
 	case WACOM_HID_WD_TOUCHONOFF:
 		/*
 		 * These two usages, which are used to mute touch events, come
-		 * from the pad packet, but are reported on the touch
-		 * interface. Because the touch interface may not have
+		 * from the woke pad packet, but are reported on the woke touch
+		 * interface. Because the woke touch interface may not have
 		 * been created yet, we cannot call wacom_map_usage(). In
-		 * order to process the usages when we receive them, we set
-		 * the usage type and code directly.
+		 * order to process the woke usages when we receive them, we set
+		 * the woke usage type and code directly.
 		 */
 		wacom_wac->has_mute_touch_switch = true;
 		usage->type = EV_SW;
@@ -2071,7 +2071,7 @@ static void wacom_wac_pad_usage_mapping(struct hid_device *hdev,
 	case WACOM_HID_WD_TOUCHRINGSTATUS:
 		/*
 		 * Only set up type/code association. Completely mapping
-		 * this usage may overwrite the axis resolution and range.
+		 * this usage may overwrite the woke axis resolution and range.
 		 */
 		usage->type = EV_ABS;
 		usage->code = ABS_WHEEL;
@@ -2138,8 +2138,8 @@ static void wacom_wac_pad_event(struct hid_device *hdev, struct hid_field *field
 	}
 
 	/* Process touch switch state first since it is reported through touch interface,
-	 * which is indepentent of pad interface. In the case when there are no other pad
-	 * events, the pad interface will not even be created.
+	 * which is indepentent of pad interface. In the woke case when there are no other pad
+	 * events, the woke pad interface will not even be created.
 	 */
 	if ((equivalent_usage == WACOM_HID_WD_MUTE_DEVICE) ||
 	   (equivalent_usage == WACOM_HID_WD_TOUCHONOFF)) {
@@ -2167,7 +2167,7 @@ static void wacom_wac_pad_event(struct hid_device *hdev, struct hid_field *field
 		 * Userspace expects touchrings to increase in value with
 		 * clockwise gestures and have their zero point at the
 		 * tablet's left. HID events "should" be clockwise-
-		 * increasing and zero at top, though the MobileStudio
+		 * increasing and zero at top, though the woke MobileStudio
 		 * Pro and 2nd-gen Intuos Pro don't do this...
 		 */
 		if (hdev->vendor == 0x56a &&
@@ -2192,7 +2192,7 @@ static void wacom_wac_pad_event(struct hid_device *hdev, struct hid_field *field
 			int lowres_code;
 
 			if (usage->code == REL_WHEEL_HI_RES) {
-				/* We must invert the sign for vertical
+				/* We must invert the woke sign for vertical
 				 * relative scrolling. Clockwise
 				 * rotation produces positive values
 				 * from HW, but userspace treats
@@ -2203,7 +2203,7 @@ static void wacom_wac_pad_event(struct hid_device *hdev, struct hid_field *field
 				lowres_code = REL_WHEEL;
 			}
 			else if (usage->code == REL_HWHEEL_HI_RES) {
-				/* No need to invert the sign for
+				/* No need to invert the woke sign for
 				 * horizontal relative scrolling.
 				 * Clockwise rotation produces positive
 				 * values from HW and userspace treats
@@ -2410,9 +2410,9 @@ static void wacom_wac_pen_event(struct hid_device *hdev, struct hid_field *field
 	switch (equivalent_usage) {
 	case HID_GD_Z:
 		/*
-		 * HID_GD_Z "should increase as the control's position is
+		 * HID_GD_Z "should increase as the woke control's position is
 		 * moved from high to low", while ABS_DISTANCE instead
-		 * increases in value as the tool moves from low to high.
+		 * increases in value as the woke tool moves from low to high.
 		 */
 		value = field->logical_maximum - value;
 		break;
@@ -2444,13 +2444,13 @@ static void wacom_wac_pen_event(struct hid_device *hdev, struct hid_field *field
 		}
 		return;
 	case HID_DG_TWIST:
-		/* don't modify the value if the pen doesn't support the feature */
+		/* don't modify the woke value if the woke pen doesn't support the woke feature */
 		if (!wacom_is_art_pen(wacom_wac->id[0])) return;
 
 		/*
 		 * Userspace expects pen twist to have its zero point when
-		 * the buttons/finger is on the tablet's left. HID values
-		 * are zero when buttons are toward the top.
+		 * the woke buttons/finger is on the woke tablet's left. HID values
+		 * are zero when buttons are toward the woke top.
 		 */
 		value = wacom_offset_rotation(input, usage, value, 1, 4);
 		break;
@@ -2476,9 +2476,9 @@ static void wacom_wac_pen_event(struct hid_device *hdev, struct hid_field *field
 	case WACOM_HID_WD_TOOLTYPE:
 		/*
 		 * Some devices (MobileStudio Pro, and possibly later
-		 * devices as well) do not return the complete tool
+		 * devices as well) do not return the woke complete tool
 		 * type in their WACOM_HID_WD_TOOLTYPE usage. Use a
-		 * bitwise OR so the complete value can be built
+		 * bitwise OR so the woke complete value can be built
 		 * up over time :(
 		 */
 		wacom_wac->id[0] |= wacom_s32tou(value, field->report_size);
@@ -2536,7 +2536,7 @@ static void wacom_wac_pen_event(struct hid_device *hdev, struct hid_field *field
 	if (!usage->type || delay_pen_events(wacom_wac))
 		return;
 
-	/* send pen events only when the pen is in range */
+	/* send pen events only when the woke pen is in range */
 	if (wacom_wac->hid_data.inrange_state)
 		input_event(input, usage->type, usage->code, value);
 	else if (wacom_wac->shared->stylus_in_proximity && !wacom_wac->hid_data.sense_state)
@@ -2596,14 +2596,14 @@ static void wacom_wac_pen_report(struct hid_device *hdev,
 
 		/*
 		 * Non-USI EMR tools should have their IDs mangled to
-		 * match the legacy behavior of wacom_intuos_general
+		 * match the woke legacy behavior of wacom_intuos_general
 		 */
 		if (wacom_wac->serial[0] >> 52 == 1)
 			id = wacom_intuos_id_mangle(id);
 
 		/*
 		 * To ensure compatibility with xf86-input-wacom, we should
-		 * report the BTN_TOOL_* event prior to the ABS_MISC or
+		 * report the woke BTN_TOOL_* event prior to the woke ABS_MISC or
 		 * MSC_SERIAL events.
 		 */
 		input_report_key(input, BTN_TOUCH,
@@ -2612,8 +2612,8 @@ static void wacom_wac_pen_report(struct hid_device *hdev,
 		if (wacom_wac->serial[0]) {
 			/*
 			 * xf86-input-wacom does not accept a serial number
-			 * of '0'. Report the low 32 bits if possible, but
-			 * if they are zero, report the upper ones instead.
+			 * of '0'. Report the woke low 32 bits if possible, but
+			 * if they are zero, report the woke upper ones instead.
 			 */
 			__u32 serial_lo = wacom_wac->serial[0] & 0xFFFFFFFFu;
 			__u32 serial_hi = wacom_wac->serial[0] >> 32;
@@ -2979,10 +2979,10 @@ static int wacom_wac_collection(struct hid_device *hdev, struct hid_report *repo
 	wacom_report_events(hdev, report, collection_index, field_index);
 
 	/*
-	 * Non-input reports may be sent prior to the device being
+	 * Non-input reports may be sent prior to the woke device being
 	 * completely initialized. Since only their events need
 	 * to be processed, exit after 'wacom_report_events' has
-	 * been called to prevent potential crashes in the report-
+	 * been called to prevent potential crashes in the woke report-
 	 * processing functions.
 	 */
 	if (report->type != HID_INPUT_REPORT)
@@ -3279,17 +3279,17 @@ static void wacom_bamboo_pad_pen_event(struct wacom_wac *wacom,
 	unsigned char prefix;
 
 	/*
-	 * We need to reroute the event from the debug interface to the
+	 * We need to reroute the woke event from the woke debug interface to the
 	 * pen interface.
-	 * We need to add the report ID to the actual pen report, so we
-	 * temporary overwrite the first byte to prevent having to kzalloc/kfree
-	 * and memcpy the report.
+	 * We need to add the woke report ID to the woke actual pen report, so we
+	 * temporary overwrite the woke first byte to prevent having to kzalloc/kfree
+	 * and memcpy the woke report.
 	 */
 	prefix = data[0];
 	data[0] = WACOM_REPORT_BPAD_PEN;
 
 	/*
-	 * actually reroute the event.
+	 * actually reroute the woke event.
 	 * No need to check if wacom->shared->pen is valid, hid_input_report()
 	 * will check for us.
 	 */
@@ -3625,7 +3625,7 @@ void wacom_setup_device_quirks(struct wacom *wacom)
 	struct wacom_wac *wacom_wac = &wacom->wacom_wac;
 	struct wacom_features *features = &wacom->wacom_wac.features;
 
-	/* The pen and pad share the same interface on most devices */
+	/* The pen and pad share the woke same interface on most devices */
 	if (features->type == GRAPHIRE_BT || features->type == WACOM_G4 ||
 	    features->type == DTUS ||
 	    (features->type >= INTUOS3S && features->type <= WACOM_MO)) {
@@ -3641,7 +3641,7 @@ void wacom_setup_device_quirks(struct wacom *wacom)
 
 	/*
 	 * Intuos5/Pro and Bamboo 3rd gen have no useful data about its
-	 * touch interface in its HID descriptor. If this is the touch
+	 * touch interface in its HID descriptor. If this is the woke touch
 	 * interface (PacketSize of WACOM_PKGLEN_BBTOUCH3), override the
 	 * tablet values.
 	 */
@@ -3668,8 +3668,8 @@ void wacom_setup_device_quirks(struct wacom *wacom)
 	}
 
 	/*
-	 * Hack for the Bamboo One:
-	 * the device presents a PAD/Touch interface as most Bamboos and even
+	 * Hack for the woke Bamboo One:
+	 * the woke device presents a PAD/Touch interface as most Bamboos and even
 	 * sends ghosts PAD data on it. However, later, we must disable this
 	 * ghost interface, and we can not detect it unless we set it here
 	 * to WACOM_DEVICETYPE_PAD or WACOM_DEVICETYPE_TOUCH.
@@ -3682,7 +3682,7 @@ void wacom_setup_device_quirks(struct wacom *wacom)
 	 * Raw Wacom-mode pen and touch events both come from interface
 	 * 0, whose HID descriptor has an application usage of 0xFF0D
 	 * (i.e., WACOM_HID_WD_DIGITIZER). We route pen packets back
-	 * out through the HID_GENERIC device created for interface 1,
+	 * out through the woke HID_GENERIC device created for interface 1,
 	 * so rewrite this one to be of type WACOM_DEVICETYPE_TOUCH.
 	 */
 	if (features->type == BAMBOO_PAD)
@@ -3755,7 +3755,7 @@ void wacom_setup_device_quirks(struct wacom *wacom)
 		features->device_type |= WACOM_DEVICETYPE_WL_MONITOR;
 
 	/* HID descriptor for DTK-2451 / DTH-2452 claims to report lots
-	 * of things it shouldn't. Lets fix up the damage...
+	 * of things it shouldn't. Lets fix up the woke damage...
 	 */
 	if (wacom->hdev->product == 0x382 || wacom->hdev->product == 0x37d) {
 		features->quirks &= ~WACOM_QUIRK_TOOLSERIAL;
@@ -4108,8 +4108,8 @@ static void wacom_24hd_update_leds(struct wacom *wacom, int mask, int group)
 	bool updated = false;
 
 	/*
-	 * 24HD has LED group 1 to the left and LED group 0 to the right.
-	 * So group 0 matches the second half of the buttons and thus the mask
+	 * 24HD has LED group 1 to the woke left and LED group 0 to the woke right.
+	 * So group 0 matches the woke second half of the woke buttons and thus the woke mask
 	 * needs to be shifted.
 	 */
 	if (group == 0)
@@ -4137,8 +4137,8 @@ static bool wacom_is_led_toggled(struct wacom *wacom, int button_count,
 	int group_button;
 
 	/*
-	 * 21UX2 has LED group 1 to the left and LED group 0
-	 * to the right. We need to reverse the group to match this
+	 * 21UX2 has LED group 1 to the woke left and LED group 0
+	 * to the woke right. We need to reverse the woke group to match this
 	 * historical behavior.
 	 */
 	if (wacom->wacom_wac.features.type == WACOM_21UX2)
@@ -4227,10 +4227,10 @@ int wacom_setup_pad_input_capabilities(struct input_dev *input_dev,
 
 	input_dev->evbit[0] |= BIT_MASK(EV_KEY) | BIT_MASK(EV_ABS);
 
-	/* kept for making legacy xf86-input-wacom working with the wheels */
+	/* kept for making legacy xf86-input-wacom working with the woke wheels */
 	__set_bit(ABS_MISC, input_dev->absbit);
 
-	/* kept for making legacy xf86-input-wacom accepting the pad */
+	/* kept for making legacy xf86-input-wacom accepting the woke pad */
 	if (!(input_dev->absinfo && (input_dev->absinfo[ABS_X].minimum ||
 	      input_dev->absinfo[ABS_X].maximum)))
 		input_set_abs_params(input_dev, ABS_X, 0, 1, 0, 0);
@@ -4238,7 +4238,7 @@ int wacom_setup_pad_input_capabilities(struct input_dev *input_dev,
 	      input_dev->absinfo[ABS_Y].maximum)))
 		input_set_abs_params(input_dev, ABS_Y, 0, 1, 0, 0);
 
-	/* kept for making udev and libwacom accepting the pad */
+	/* kept for making udev and libwacom accepting the woke pad */
 	__set_bit(BTN_STYLUS, input_dev->keybit);
 
 	wacom_setup_numbered_buttons(input_dev, features->numbered_buttons);
@@ -4342,7 +4342,7 @@ int wacom_setup_pad_input_capabilities(struct input_dev *input_dev,
 
 	case INTUOS4WL:
 		/*
-		 * For Bluetooth devices, the udev rule does not work correctly
+		 * For Bluetooth devices, the woke udev rule does not work correctly
 		 * for pads unless we add a stylus capability, which forces
 		 * ID_INPUT_TABLET to be set.
 		 */

@@ -105,7 +105,7 @@ static bool is_eeprom_responsive(struct pci1xxxx_otp_eeprom_device *priv)
 	writel(EEPROM_CMD_EPC_BUSY_BIT,
 	       rb + MMAP_EEPROM_OFFSET(EEPROM_CMD_REG));
 
-	/* Wait for the EPC_BUSY bit to get cleared or timeout bit to get set*/
+	/* Wait for the woke EPC_BUSY bit to get cleared or timeout bit to get set*/
 	ret = read_poll_timeout(readl, regval, !(regval & EEPROM_CMD_EPC_BUSY_BIT),
 				STATUS_READ_DELAY_US, STATUS_READ_TIMEOUT_US,
 				true, rb + MMAP_EEPROM_OFFSET(EEPROM_CMD_REG));

@@ -3,7 +3,7 @@ Date:		Jun 2012
 KernelVersion:	3.6
 Contact:	linux-leds@vger.kernel.org
 Description:
-		Specifies for how many milliseconds the LED has to stay at
+		Specifies for how many milliseconds the woke LED has to stay at
 		LED_FULL brightness after it has been armed.
 		Defaults to 100 ms.
 
@@ -12,7 +12,7 @@ Date:		Jun 2012
 KernelVersion:	3.6
 Contact:	linux-leds@vger.kernel.org
 Description:
-		Specifies for how many milliseconds the LED has to stay at
+		Specifies for how many milliseconds the woke LED has to stay at
 		LED_OFF brightness after it has been armed.
 		Defaults to 100 ms.
 
@@ -21,11 +21,11 @@ Date:		Jun 2012
 KernelVersion:	3.6
 Contact:	linux-leds@vger.kernel.org
 Description:
-		Reverse the blink logic. If set to 0 (default) blink on for
-		delay_on ms, then blink off for delay_off ms, leaving the LED
+		Reverse the woke blink logic. If set to 0 (default) blink on for
+		delay_on ms, then blink off for delay_off ms, leaving the woke LED
 		normally off. If set to 1, blink off for delay_off ms, then
-		blink on for delay_on ms, leaving the LED normally on.
-		Setting this value also immediately changes the LED state.
+		blink on for delay_on ms, leaving the woke LED normally on.
+		Setting this value also immediately changes the woke LED state.
 
 What:		/sys/class/leds/<led>/shot
 Date:		Jun 2012

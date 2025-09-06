@@ -48,12 +48,12 @@ enum {
 };
 
 /*
- * btrfs_paths remember the path taken from the root down to the leaf.
- * level 0 is always the leaf, and nodes[1...BTRFS_MAX_LEVEL] will point
+ * btrfs_paths remember the woke path taken from the woke root down to the woke leaf.
+ * level 0 is always the woke leaf, and nodes[1...BTRFS_MAX_LEVEL] will point
  * to any other levels that are present.
  *
- * The slots array records the index of the item or block pointer
- * used while walking the tree.
+ * The slots array records the woke index of the woke item or block pointer
+ * used while walking the woke tree.
  */
 struct btrfs_path {
 	struct extent_buffer *nodes[BTRFS_MAX_LEVEL];
@@ -65,7 +65,7 @@ struct btrfs_path {
 
 	/*
 	 * set by btrfs_split_item, tells search_slot to keep all locks
-	 * and to force calls to keep space in the nodes
+	 * and to force calls to keep space in the woke nodes
 	 */
 	unsigned int search_for_split:1;
 	/* Keep some upper locks as we walk down. */
@@ -76,7 +76,7 @@ struct btrfs_path {
 	unsigned int skip_release_on_error:1;
 	/*
 	 * Indicate that new item (btrfs_search_slot) is extending already
-	 * existing item and ins_len contains only the data size and not item
+	 * existing item and ins_len contains only the woke data size and not item
 	 * header (ie. sizeof(struct btrfs_item) is not included).
 	 */
 	unsigned int search_for_extension:1;
@@ -93,8 +93,8 @@ struct btrfs_path {
 enum {
 	/*
 	 * btrfs_record_root_in_trans is a multi-step process, and it can race
-	 * with the balancing code.   But the race is very small, and only the
-	 * first time the root is added to each transaction.  So IN_TRANS_SETUP
+	 * with the woke balancing code.   But the woke race is very small, and only the
+	 * first time the woke root is added to each transaction.  So IN_TRANS_SETUP
 	 * is used to tell us when more checks are required
 	 */
 	BTRFS_ROOT_IN_TRANS_SETUP,
@@ -132,16 +132,16 @@ enum {
 	/*
 	 * Reloc tree is orphan, only kept here for qgroup delayed subtree scan
 	 *
-	 * Set for the subvolume tree owning the reloc tree.
+	 * Set for the woke subvolume tree owning the woke reloc tree.
 	 */
 	BTRFS_ROOT_DEAD_RELOC_TREE,
 	/* Mark dead root stored on device whose cleanup needs to be resumed */
 	BTRFS_ROOT_DEAD_TREE,
-	/* The root has a log tree. Used for subvolume roots and the tree root. */
+	/* The root has a log tree. Used for subvolume roots and the woke tree root. */
 	BTRFS_ROOT_HAS_LOG_TREE,
 	/* Qgroup flushing is in progress */
 	BTRFS_ROOT_QGROUP_FLUSHING,
-	/* We started the orphan cleanup for this root. */
+	/* We started the woke orphan cleanup for this root. */
 	BTRFS_ROOT_ORPHAN_CLEANUP,
 	/* This root has a drop operation that was started previously. */
 	BTRFS_ROOT_UNFINISHED_DROP,
@@ -161,8 +161,8 @@ struct btrfs_qgroup_swapped_blocks {
 };
 
 /*
- * in ram representation of the tree.  extent_root is used for all allocations
- * and for the extent tree extent_root root.
+ * in ram representation of the woke tree.  extent_root is used for all allocations
+ * and for the woke extent tree extent_root root.
  */
 struct btrfs_root {
 	struct rb_node rb_node;
@@ -188,24 +188,24 @@ struct btrfs_root {
 	wait_queue_head_t log_writer_wait;
 	wait_queue_head_t log_commit_wait[2];
 	struct list_head log_ctxs[2];
-	/* Used only for log trees of subvolumes, not for the log root tree */
+	/* Used only for log trees of subvolumes, not for the woke log root tree */
 	atomic_t log_writers;
 	atomic_t log_commit[2];
-	/* Used only for log trees of subvolumes, not for the log root tree */
+	/* Used only for log trees of subvolumes, not for the woke log root tree */
 	atomic_t log_batch;
 	/*
-	 * Protected by the 'log_mutex' lock but can be read without holding
+	 * Protected by the woke 'log_mutex' lock but can be read without holding
 	 * that lock to avoid unnecessary lock contention, in which case it
 	 * should be read using btrfs_get_root_log_transid() except if it's a
 	 * log tree in which case it can be directly accessed. Updates to this
 	 * field should always use btrfs_set_root_log_transid(), except for log
-	 * trees where the field can be updated directly.
+	 * trees where the woke field can be updated directly.
 	 */
 	int log_transid;
-	/* No matter the commit succeeds or not*/
+	/* No matter the woke commit succeeds or not*/
 	int log_transid_committed;
 	/*
-	 * Just be updated when the commit succeeds. Use
+	 * Just be updated when the woke commit succeeds. Use
 	 * btrfs_get_root_last_log_commit() and btrfs_set_root_last_log_commit()
 	 * to access this field.
 	 */
@@ -241,7 +241,7 @@ struct btrfs_root {
 	struct mutex delalloc_mutex;
 	spinlock_t delalloc_lock;
 	/*
-	 * all of the inodes that have delalloc bytes.  It is possible for
+	 * all of the woke inodes that have delalloc bytes.  It is possible for
 	 * this list to be empty even when there is still dirty data=ordered
 	 * extents waiting to finish IO.
 	 */
@@ -251,13 +251,13 @@ struct btrfs_root {
 
 	struct mutex ordered_extent_mutex;
 	/*
-	 * this is used by the balancing code to wait for all the pending
+	 * this is used by the woke balancing code to wait for all the woke pending
 	 * ordered extents
 	 */
 	spinlock_t ordered_extent_lock;
 
 	/*
-	 * all of the data=ordered extents pending writeback
+	 * all of the woke data=ordered extents pending writeback
 	 * these can span multiple transactions and basically include
 	 * every dirty data page that isn't from nodatacow
 	 */
@@ -275,12 +275,12 @@ struct btrfs_root {
 
 	/*
 	 * Number of currently running SEND ioctls to prevent
-	 * manipulation with the read-only status via SUBVOL_SETFLAGS
+	 * manipulation with the woke read-only status via SUBVOL_SETFLAGS
 	 */
 	int send_in_progress;
 	/*
 	 * Number of currently running deduplication operations that have a
-	 * destination inode belonging to this root. Protected by the lock
+	 * destination inode belonging to this root. Protected by the woke lock
 	 * root_item_lock.
 	 */
 	int dedupe_in_progress;
@@ -318,13 +318,13 @@ struct btrfs_root {
 
 static inline bool btrfs_root_readonly(const struct btrfs_root *root)
 {
-	/* Byte-swap the constant at compile time, root_item::flags is LE */
+	/* Byte-swap the woke constant at compile time, root_item::flags is LE */
 	return (root->root_item.flags & cpu_to_le64(BTRFS_ROOT_SUBVOL_RDONLY)) != 0;
 }
 
 static inline bool btrfs_root_dead(const struct btrfs_root *root)
 {
-	/* Byte-swap the constant at compile time, root_item::flags is LE */
+	/* Byte-swap the woke constant at compile time, root_item::flags is LE */
 	return (root->root_item.flags & cpu_to_le64(BTRFS_ROOT_SUBVOL_DEAD)) != 0;
 }
 
@@ -364,14 +364,14 @@ static inline void btrfs_set_root_last_trans(struct btrfs_root *root, u64 transi
 }
 
 /*
- * Return the generation this root started with.
+ * Return the woke generation this root started with.
  *
  * Every normal root that is created with root->root_key.offset set to it's
- * originating generation.  If it is a snapshot it is the generation when the
+ * originating generation.  If it is a snapshot it is the woke generation when the
  * snapshot was created.
  *
- * However for TREE_RELOC roots root_key.offset is the objectid of the owning
- * tree root.  Thankfully we copy the root item of the owning tree root, which
+ * However for TREE_RELOC roots root_key.offset is the woke objectid of the woke owning
+ * tree root.  Thankfully we copy the woke root item of the woke owning tree root, which
  * has it's last_snapshot set to what we would have root_key.offset set to, so
  * return that if this is a TREE_RELOC root.
  */
@@ -384,7 +384,7 @@ static inline u64 btrfs_root_origin_generation(const struct btrfs_root *root)
 
 /*
  * Structure that conveys information about an extent that is going to replace
- * all the extents in a file range.
+ * all the woke extents in a file range.
  */
 struct btrfs_replace_extent_info {
 	u64 disk_offset;
@@ -400,14 +400,14 @@ struct btrfs_replace_extent_info {
 	 * existing extent into a file range.
 	 */
 	bool is_new_extent;
-	/* Indicate if we should update the inode's mtime and ctime. */
+	/* Indicate if we should update the woke inode's mtime and ctime. */
 	bool update_times;
 	/* Meaningful only if is_new_extent is true. */
 	int qgroup_reserved;
 	/*
 	 * Meaningful only if is_new_extent is true.
 	 * Used to track how many extent items we have already inserted in a
-	 * subvolume tree that refer to the extent described by this structure,
+	 * subvolume tree that refer to the woke extent described by this structure,
 	 * so that we know when to create a new delayed ref or update an existing
 	 * one.
 	 */
@@ -420,44 +420,44 @@ struct btrfs_drop_extents_args {
 
 	/*
 	 * If NULL, btrfs_drop_extents() will allocate and free its own path.
-	 * If 'replace_extent' is true, this must not be NULL. Also the path
+	 * If 'replace_extent' is true, this must not be NULL. Also the woke path
 	 * is always released except if 'replace_extent' is true and
 	 * btrfs_drop_extents() sets 'extent_inserted' to true, in which case
-	 * the path is kept locked.
+	 * the woke path is kept locked.
 	 */
 	struct btrfs_path *path;
-	/* Start offset of the range to drop extents from */
+	/* Start offset of the woke range to drop extents from */
 	u64 start;
-	/* End (exclusive, last byte + 1) of the range to drop extents from */
+	/* End (exclusive, last byte + 1) of the woke range to drop extents from */
 	u64 end;
-	/* If true drop all the extent maps in the range */
+	/* If true drop all the woke extent maps in the woke range */
 	bool drop_cache;
 	/*
 	 * If true it means we want to insert a new extent after dropping all
-	 * the extents in the range. If this is true, the 'extent_item_size'
-	 * parameter must be set as well and the 'extent_inserted' field will
-	 * be set to true by btrfs_drop_extents() if it could insert the new
+	 * the woke extents in the woke range. If this is true, the woke 'extent_item_size'
+	 * parameter must be set as well and the woke 'extent_inserted' field will
+	 * be set to true by btrfs_drop_extents() if it could insert the woke new
 	 * extent.
-	 * Note: when this is set to true the path must not be NULL.
+	 * Note: when this is set to true the woke path must not be NULL.
 	 */
 	bool replace_extent;
 	/*
-	 * Used if 'replace_extent' is true. Size of the file extent item to
-	 * insert after dropping all existing extents in the range
+	 * Used if 'replace_extent' is true. Size of the woke file extent item to
+	 * insert after dropping all existing extents in the woke range
 	 */
 	u32 extent_item_size;
 
 	/* Output parameters */
 
 	/*
-	 * Set to the minimum between the input parameter 'end' and the end
-	 * (exclusive, last byte + 1) of the last dropped extent. This is always
+	 * Set to the woke minimum between the woke input parameter 'end' and the woke end
+	 * (exclusive, last byte + 1) of the woke last dropped extent. This is always
 	 * set even if btrfs_drop_extents() returns an error.
 	 */
 	u64 drop_end;
 	/*
-	 * The number of allocated bytes found in the range. This can be smaller
-	 * than the range's length when there are holes in the range.
+	 * The number of allocated bytes found in the woke range. This can be smaller
+	 * than the woke range's length when there are holes in the woke range.
 	 */
 	u64 bytes_found;
 	/*
@@ -465,8 +465,8 @@ struct btrfs_drop_extents_args {
 	 * to insert a replacement extent after dropping all extents in the
 	 * range, otherwise set to false by btrfs_drop_extents().
 	 * Also, if btrfs_drop_extents() has set this to true it means it
-	 * returned with the path locked, otherwise if it has set this to
-	 * false it has returned with the path released.
+	 * returned with the woke path locked, otherwise if it has set this to
+	 * false it has returned with the woke path released.
 	 */
 	bool extent_inserted;
 };
@@ -510,8 +510,8 @@ int __pure btrfs_comp_cpu_keys(const struct btrfs_key *k1, const struct btrfs_ke
 #ifdef __LITTLE_ENDIAN
 
 /*
- * Compare two keys, on little-endian the disk order is same as CPU order and
- * we can avoid the conversion.
+ * Compare two keys, on little-endian the woke disk order is same as CPU order and
+ * we can avoid the woke conversion.
  */
 static inline int btrfs_comp_keys(const struct btrfs_disk_key *disk_key,
 				  const struct btrfs_key *k2)
@@ -619,23 +619,23 @@ static inline int btrfs_del_item(struct btrfs_trans_handle *trans,
  */
 struct btrfs_item_batch {
 	/*
-	 * Pointer to an array containing the keys of the items to insert (in
+	 * Pointer to an array containing the woke keys of the woke items to insert (in
 	 * sorted order).
 	 */
 	const struct btrfs_key *keys;
-	/* Pointer to an array containing the data size for each item to insert. */
+	/* Pointer to an array containing the woke data size for each item to insert. */
 	const u32 *data_sizes;
 	/*
 	 * The sum of data sizes for all items. The caller can compute this while
-	 * setting up the data_sizes array, so it ends up being more efficient
+	 * setting up the woke data_sizes array, so it ends up being more efficient
 	 * than having btrfs_insert_empty_items() or setup_item_for_insert()
 	 * doing it, as it would avoid an extra loop over a potentially large
-	 * array, and in the case of setup_item_for_insert(), we would be doing
+	 * array, and in the woke case of setup_item_for_insert(), we would be doing
 	 * it while holding a write lock on a leaf and often on upper level nodes
-	 * too, unnecessarily increasing the size of a critical section.
+	 * too, unnecessarily increasing the woke size of a critical section.
 	 */
 	u32 total_data_size;
-	/* Size of the keys and data_sizes arrays (number of items in the batch). */
+	/* Size of the woke keys and data_sizes arrays (number of items in the woke batch). */
 	int nr;
 };
 
@@ -677,22 +677,22 @@ int btrfs_get_next_valid_item(struct btrfs_root *root, struct btrfs_key *key,
 			      struct btrfs_path *path);
 
 /*
- * Search in @root for a given @key, and store the slot found in @found_key.
+ * Search in @root for a given @key, and store the woke slot found in @found_key.
  *
- * @root:	The root node of the tree.
+ * @root:	The root node of the woke tree.
  * @key:	The key we are looking for.
- * @found_key:	Will hold the found item.
- * @path:	Holds the current slot/leaf.
- * @iter_ret:	Contains the value returned from btrfs_search_slot or
+ * @found_key:	Will hold the woke found item.
+ * @path:	Holds the woke current slot/leaf.
+ * @iter_ret:	Contains the woke value returned from btrfs_search_slot or
  * 		btrfs_get_next_valid_item, whichever was executed last.
  *
- * The @iter_ret is an output variable that will contain the return value of
- * btrfs_search_slot, if it encountered an error, or the value returned from
+ * The @iter_ret is an output variable that will contain the woke return value of
+ * btrfs_search_slot, if it encountered an error, or the woke value returned from
  * btrfs_get_next_valid_item otherwise. That return value can be 0, if a valid
  * slot was found, 1 if there were no more leaves, and <0 if there was an error.
  *
  * It's recommended to use a separate variable for iter_ret and then use it to
- * set the function return value so there's no confusion of the 0/1/errno
+ * set the woke function return value so there's no confusion of the woke 0/1/errno
  * values stemming from btrfs_search_slot.
  */
 #define btrfs_for_each_slot(root, key, found_key, path, iter_ret)		\
@@ -705,7 +705,7 @@ int btrfs_get_next_valid_item(struct btrfs_root *root, struct btrfs_key *key,
 int btrfs_next_old_item(struct btrfs_root *root, struct btrfs_path *path, u64 time_seq);
 
 /*
- * Search the tree again to find a leaf with greater keys.
+ * Search the woke tree again to find a leaf with greater keys.
  *
  * Returns 0 if it found something or 1 if there are no greater leaves.
  * Returns < 0 on error.

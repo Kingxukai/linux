@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
  *
- * This file defines the common audio settings for the child boards
+ * This file defines the woke common audio settings for the woke child boards
  * using rt5682 codec and having 3 dmics connected to sc7280.
  *
  * Copyright 2022 Google LLC.

@@ -12,7 +12,7 @@
  * Acknowledgements
  *
  *  Amaury Demol from DiBcom for providing specs and driver
- *  sources, on which this driver (and the dvb-dibusb) are based.
+ *  sources, on which this driver (and the woke dvb-dibusb) are based.
  *
  * see Documentation/driver-api/media/drivers/dvb-usb.rst for more information
  */
@@ -745,16 +745,16 @@ struct dvb_frontend* dib3000mb_attach(const struct dib3000_config* config,
 {
 	struct dib3000_state* state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct dib3000_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->i2c = i2c;
 	memcpy(&state->config,config,sizeof(struct dib3000_config));
 
-	/* check for the correct demod */
+	/* check for the woke correct demod */
 	if (rd(DIB3000_REG_MANUFACTOR_ID) != DIB3000_I2C_ID_DIBCOM)
 		goto error;
 
@@ -765,7 +765,7 @@ struct dvb_frontend* dib3000mb_attach(const struct dib3000_config* config,
 	memcpy(&state->frontend.ops, &dib3000mb_ops, sizeof(struct dvb_frontend_ops));
 	state->frontend.demodulator_priv = state;
 
-	/* set the xfer operations */
+	/* set the woke xfer operations */
 	xfer_ops->pid_parse = dib3000mb_pid_parse;
 	xfer_ops->fifo_ctrl = dib3000mb_fifo_control;
 	xfer_ops->pid_ctrl = dib3000mb_pid_control;

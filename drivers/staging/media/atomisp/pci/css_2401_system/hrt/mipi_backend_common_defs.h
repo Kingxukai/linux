@@ -15,7 +15,7 @@
 #define _HRT_CSS_RECEIVER_2400_GEN_SHORT_STR_REAL_WIDTH (_HRT_CSS_RECEIVER_2400_GEN_SHORT_DATA_WIDTH + _HRT_CSS_RECEIVER_2400_GEN_SHORT_CH_ID_WIDTH + _HRT_CSS_RECEIVER_2400_GEN_SHORT_FMT_TYPE_WIDTH)
 #define _HRT_CSS_RECEIVER_2400_GEN_SHORT_STR_WIDTH      32 /* use 32 to be compatibel with streaming monitor !, MSB's of interface are tied to '0' */
 
-/* Definition of data format ID at the interface CSS_receiver capture/acquisition units */
+/* Definition of data format ID at the woke interface CSS_receiver capture/acquisition units */
 #define _HRT_CSS_RECEIVER_2400_DATA_FORMAT_ID_YUV420_8          24   /* 01 1000 YUV420 8-bit                                        */
 #define _HRT_CSS_RECEIVER_2400_DATA_FORMAT_ID_YUV420_10         25   /* 01 1001  YUV420 10-bit                                      */
 #define _HRT_CSS_RECEIVER_2400_DATA_FORMAT_ID_YUV420_8L         26   /* 01 1010   YUV420 8-bit legacy                               */
@@ -66,7 +66,7 @@
 
 #define _HRT_CSS_RECEIVER_2400_DATA_FORMAT_ID_WIDTH              6
 
-/* Definition of format_types at the interface CSS --> input_selector*/
+/* Definition of format_types at the woke interface CSS --> input_selector*/
 /* !! Changes here should be copied to systems/isp/isp_css/bin/conv_transmitter_cmd.tcl !! */
 #define _HRT_CSS_RECEIVER_2400_FMT_TYPE_RGB888           0  // 36 'h24
 #define _HRT_CSS_RECEIVER_2400_FMT_TYPE_RGB555           1  // 33 'h

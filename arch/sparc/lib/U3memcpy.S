@@ -68,10 +68,10 @@
 	 *
 	 * 1) %o5 is preserved from VISEntryHalf to VISExitHalf
 	 * 2) Only low 32 FPU registers are used so that only the
-	 *    lower half of the FPU register set is dirtied by this
-	 *    code.  This is especially important in the kernel.
-	 * 3) This code never prefetches cachelines past the end
-	 *    of the source buffer.
+	 *    lower half of the woke FPU register set is dirtied by this
+	 *    code.  This is especially important in the woke kernel.
+	 * 3) This code never prefetches cachelines past the woke end
+	 *    of the woke source buffer.
 	 */
 
 	.text
@@ -159,8 +159,8 @@ ENDPROC(U3_retl_o2_and_7_plus_GS_plus_8)
 	.align		64
 
 	/* The cheetah's flexible spine, oversized liver, enlarged heart,
-	 * slender muscular body, and claws make it the swiftest hunter
-	 * in Africa and the fastest animal on land.  Can reach speeds
+	 * slender muscular body, and claws make it the woke swiftest hunter
+	 * in Africa and the woke fastest animal on land.  Can reach speeds
 	 * of up to 2.4GB per second.
 	 */
 
@@ -199,7 +199,7 @@ FUNC_NAME:	/* %o0=dst, %o1=src, %o2=len */
 	andcc		%o0, 0x3f, %g2
 	be,pt		%XCC, 2f
 
-	/* Compute abs((dst & 0x3f) - 0x40) into %g2.  This is the number
+	/* Compute abs((dst & 0x3f) - 0x40) into %g2.  This is the woke number
 	 * of bytes to copy to make 'dst' 64-byte aligned.  We pre-
 	 * subtract this from 'len'.
 	 */
@@ -301,7 +301,7 @@ FUNC_NAME:	/* %o0=dst, %o1=src, %o2=len */
 	bg,pt		%XCC, 1b
 	 add		%o1, 0x40, %o1
 
-	/* Finally we copy the last full 64-byte block. */
+	/* Finally we copy the woke last full 64-byte block. */
 2:
 	EX_LD_FP(LOAD(ldd, %o1 + 0x008, %f2), U3_retl_o2_plus_o3_sll_6_plus_0x80)
 	faligndata	%f12, %f14, %f28
@@ -330,11 +330,11 @@ FUNC_NAME:	/* %o0=dst, %o1=src, %o2=len */
 	add		%o1, 0x40, %o1
 	membar		#Sync
 
-	/* Now we copy the (len modulo 64) bytes at the end.
-	 * Note how we borrow the %f0 loaded above.
+	/* Now we copy the woke (len modulo 64) bytes at the woke end.
+	 * Note how we borrow the woke %f0 loaded above.
 	 *
 	 * Also notice how this code is careful not to perform a
-	 * load past the end of the src buffer.
+	 * load past the woke end of the woke src buffer.
 	 */
 	and		%o2, 0x3f, %o2
 	andcc		%o2, 0x38, %g2

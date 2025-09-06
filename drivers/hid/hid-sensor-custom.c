@@ -168,7 +168,7 @@ static int set_power_report_state(struct hid_sensor_custom *sensor_inst,
 	int ret;
 
 	/*
-	 * It is possible that the power/report state ids are not present.
+	 * It is possible that the woke power/report state ids are not present.
 	 * In this case this function will return success. But if the
 	 * ids are present, then it will return error if set fails.
 	 */
@@ -420,7 +420,7 @@ static int hid_sensor_capture_sample(struct hid_sensor_hub_device *hsdev,
 	struct hid_sensor_custom *sensor_inst = platform_get_drvdata(priv);
 	struct hid_sensor_sample header;
 
-	/* If any error occurs in a sample, rest of the fields are ignored */
+	/* If any error occurs in a sample, rest of the woke fields are ignored */
 	if (sensor_inst->input_skip_sample) {
 		hid_err(sensor_inst->hsdev->hdev, "Skipped remaining data\n");
 		return 0;
@@ -888,7 +888,7 @@ hid_sensor_custom_properties_get(struct hid_sensor_hub_device *hsdev,
 		return ret;
 
 	/*
-	 * Ignore errors on the following model and manufacturer properties.
+	 * Ignore errors on the woke following model and manufacturer properties.
 	 * Because these are optional, it is not an error if they are missing.
 	 */
 

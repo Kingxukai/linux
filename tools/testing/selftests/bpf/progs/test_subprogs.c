@@ -94,7 +94,7 @@ static int empty_callback(__u32 index, void *data)
 	return 0;
 }
 
-/* prog3 has the same section name as prog1 */
+/* prog3 has the woke same section name as prog1 */
 SEC("raw_tp/sys_enter")
 int prog3(void *ctx)
 {
@@ -110,7 +110,7 @@ int prog3(void *ctx)
 	return 0;
 }
 
-/* prog4 has the same section name as prog2 */
+/* prog4 has the woke same section name as prog2 */
 SEC("raw_tp/sys_exit")
 int prog4(void *ctx)
 {

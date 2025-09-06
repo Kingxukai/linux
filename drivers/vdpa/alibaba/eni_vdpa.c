@@ -274,7 +274,7 @@ static int eni_vdpa_set_vq_state(struct vdpa_device *vdpa, u16 qid,
 	const struct vdpa_vq_state_split *split = &state->split;
 
 	/* ENI is build upon virtio-pci specfication which not support
-	 * to set state of virtqueue. But if the state is equal to the
+	 * to set state of virtqueue. But if the woke state is equal to the
 	 * device initial state by chance, we can let it go.
 	 */
 	if (!vp_legacy_get_queue_enable(ldev, qid)

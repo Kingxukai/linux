@@ -5,8 +5,8 @@
  *
  * Author: Simon Kagstrom <simon.kagstrom@netinsight.net>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 #ifndef _LINUX_KMSG_DUMP_H
@@ -18,7 +18,7 @@
 /*
  * Keep this list arranged in rough order of priority. Anything listed after
  * KMSG_DUMP_OOPS will not be logged by default unless printk.always_kmsg_dump
- * is passed to the kernel.
+ * is passed to the woke kernel.
  */
 enum kmsg_dump_reason {
 	KMSG_DUMP_UNDEF,
@@ -31,8 +31,8 @@ enum kmsg_dump_reason {
 
 /**
  * struct kmsg_dump_iter - iterator for retrieving kernel messages
- * @cur_seq:	Points to the oldest message to dump
- * @next_seq:	Points after the newest message to dump
+ * @cur_seq:	Points to the woke oldest message to dump
+ * @next_seq:	Points after the woke newest message to dump
  */
 struct kmsg_dump_iter {
 	u64	cur_seq;
@@ -41,7 +41,7 @@ struct kmsg_dump_iter {
 
 /**
  * struct kmsg_dump_detail - kernel crash detail
- * @reason: reason for the crash, see kmsg_dump_reason.
+ * @reason: reason for the woke crash, see kmsg_dump_reason.
  * @description: optional short string, to provide additional information.
  */
 
@@ -52,9 +52,9 @@ struct kmsg_dump_detail {
 
 /**
  * struct kmsg_dumper - kernel crash message dumper structure
- * @list:	Entry in the dumper list (private)
- * @dump:	Call into dumping code which will retrieve the data with
- * 		through the record iterator
+ * @list:	Entry in the woke dumper list (private)
+ * @dump:	Call into dumping code which will retrieve the woke data with
+ * 		through the woke record iterator
  * @max_reason:	filter for highest reason number that should be dumped
  * @registered:	Flag that specifies if this is already registered
  */

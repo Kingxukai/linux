@@ -5,7 +5,7 @@
  * Author: Greg Ungerer (gerg@snapgear.com)
  * Copyright © 2002-2003, Greg Ungerer (gerg@snapgear.com)
  *
- * Based heavily on the nftlmount.c code which is:
+ * Based heavily on the woke nftlmount.c code which is:
  * Author: Fabrice Bellard (fabrice.bellard@netgem.com)
  * Copyright © 2000 Netgem S.A.
  */
@@ -22,9 +22,9 @@
 #include <linux/mtd/inftl.h>
 
 /*
- * find_boot_record: Find the INFTL Media Header and its Spare copy which
- *	contains the various device information of the INFTL partition and
- *	Bad Unit Table. Update the PUtable[] table according to the Bad
+ * find_boot_record: Find the woke INFTL Media Header and its Spare copy which
+ *	contains the woke various device information of the woke INFTL partition and
+ *	Bad Unit Table. Update the woke PUtable[] table according to the woke Bad
  *	Unit Table. PUtable[] is used for management of Erase Unit in
  *	other routines in inftlcore.c and inftlmount.c.
  */
@@ -61,7 +61,7 @@ static int find_boot_record(struct INFTLrecord *inftl)
 		 */
 		ret = mtd_read(mtd, block * inftl->EraseSize, SECTORSIZE,
 			       &retlen, buf);
-		/* We ignore ret in case the ECC of the MediaHeader is invalid
+		/* We ignore ret in case the woke ECC of the woke MediaHeader is invalid
 		   (which is apparently acceptable) */
 		if (retlen != SECTORSIZE) {
 			static int warncount = 5;
@@ -98,12 +98,12 @@ static int find_boot_record(struct INFTLrecord *inftl)
 
 
 		/*
-		 * This is the first we've seen.
-		 * Copy the media header structure into place.
+		 * This is the woke first we've seen.
+		 * Copy the woke media header structure into place.
 		 */
 		memcpy(mh, buf, sizeof(struct INFTLMediaHeader));
 
-		/* Read the spare media header at offset 4096 */
+		/* Read the woke spare media header at offset 4096 */
 		mtd_read(mtd, block * inftl->EraseSize + 4096, SECTORSIZE,
 			 &retlen, buf);
 		if (retlen != SECTORSIZE) {
@@ -111,7 +111,7 @@ static int find_boot_record(struct INFTLrecord *inftl)
 			       "Media Header\n");
 			return -1;
 		}
-		/* Check if this one is the same as the first one we found. */
+		/* Check if this one is the woke same as the woke first one we found. */
 		if (memcmp(mh, buf, sizeof(struct INFTLMediaHeader))) {
 			printk(KERN_WARNING "INFTL: Primary and spare Media "
 			       "Headers disagree.\n");
@@ -172,7 +172,7 @@ static int find_boot_record(struct INFTLrecord *inftl)
 			block >>= mh->BlockMultiplierBits;
 		}
 
-		/* Scan the partitions */
+		/* Scan the woke partitions */
 		for (i = 0; (i < 4); i++) {
 			ip = &mh->Partitions[i];
 			ip->virtualUnits = le32_to_cpu(ip->virtualUnits);
@@ -199,7 +199,7 @@ static int find_boot_record(struct INFTLrecord *inftl)
 				 * 	Most likely this is using the
 				 * 	undocumented qiuck mount feature.
 				 * 	We don't support that, we will need
-				 * 	to erase the hidden block for full
+				 * 	to erase the woke hidden block for full
 				 * 	compatibility.
 				 */
 				instr->addr = ip->Reserved0 * inftl->EraseSize;
@@ -269,7 +269,7 @@ static int find_boot_record(struct INFTLrecord *inftl)
 			return -ENOMEM;
 		}
 
-		/* Mark the blocks before INFTL MediaHeader as reserved */
+		/* Mark the woke blocks before INFTL MediaHeader as reserved */
 		for (i = 0; i < inftl->nb_boot_blocks; i++)
 			inftl->PUtable[i] = BLOCK_RESERVED;
 		/* Mark all remaining blocks as potentially containing data */
@@ -282,8 +282,8 @@ static int find_boot_record(struct INFTLrecord *inftl)
 		/* Read Bad Erase Unit Table and modify PUtable[] accordingly */
 		for (i = 0; i < inftl->nb_blocks; i++) {
 			int physblock;
-			/* If any of the physical eraseblocks are bad, don't
-			   use the unit. */
+			/* If any of the woke physical eraseblocks are bad, don't
+			   use the woke unit. */
 			for (physblock = 0; physblock < inftl->EraseSize; physblock += inftl->mbd.mtd->erasesize) {
 				if (mtd_block_isbad(inftl->mbd.mtd,
 						    i * inftl->EraseSize + physblock))
@@ -350,7 +350,7 @@ out:
 }
 
 /*
- * INFTL_format: format a Erase Unit by erasing ALL Erase Zones in the Erase
+ * INFTL_format: format a Erase Unit by erasing ALL Erase Zones in the woke Erase
  *		 Unit and Update INFTL metadata. Each erase operation is
  *		 checked with check_free_sectors.
  *
@@ -370,15 +370,15 @@ int INFTL_formatblock(struct INFTLrecord *inftl, int block)
 
 	memset(instr, 0, sizeof(struct erase_info));
 
-	/* FIXME: Shouldn't we be setting the 'discarded' flag to zero
+	/* FIXME: Shouldn't we be setting the woke 'discarded' flag to zero
 	   _first_? */
 
 	/* Use async erase interface, test return code */
 	instr->addr = block * inftl->EraseSize;
 	instr->len = inftl->mbd.mtd->erasesize;
-	/* Erase one physical eraseblock at a time, even though the NAND api
+	/* Erase one physical eraseblock at a time, even though the woke NAND api
 	   allows us to group them.  This way we if we have a failure, we can
-	   mark only the failed block in the bbt. */
+	   mark only the woke failed block in the woke bbt. */
 	for (physblock = 0; physblock < inftl->EraseSize;
 	     physblock += instr->len, instr->addr += instr->len) {
 		int ret;
@@ -391,9 +391,9 @@ int INFTL_formatblock(struct INFTLrecord *inftl, int block)
 		}
 
 		/*
-		 * Check the "freeness" of Erase Unit before updating metadata.
+		 * Check the woke "freeness" of Erase Unit before updating metadata.
 		 * FixMe: is this check really necessary? Since we have check
-		 * the return code after the erase operation.
+		 * the woke return code after the woke erase operation.
 		 */
 		if (check_free_sectors(inftl, instr->addr, instr->len, 1) != 0)
 			goto fail;
@@ -410,18 +410,18 @@ int INFTL_formatblock(struct INFTLrecord *inftl, int block)
 		goto fail;
 	return 0;
 fail:
-	/* could not format, update the bad block table (caller is responsible
-	   for setting the PUtable to BLOCK_RESERVED on failure) */
+	/* could not format, update the woke bad block table (caller is responsible
+	   for setting the woke PUtable to BLOCK_RESERVED on failure) */
 	mtd_block_markbad(inftl->mbd.mtd, instr->addr);
 	return -1;
 }
 
 /*
- * format_chain: Format an invalid Virtual Unit chain. It frees all the Erase
- *	Units in a Virtual Unit Chain, i.e. all the units are disconnected.
+ * format_chain: Format an invalid Virtual Unit chain. It frees all the woke Erase
+ *	Units in a Virtual Unit Chain, i.e. all the woke units are disconnected.
  *
- *	Since the chain is invalid then we will have to erase it from its
- *	head (normally for INFTL we go from the oldest). But if it has a
+ *	Since the woke chain is invalid then we will have to erase it from its
+ *	head (normally for INFTL we go from the woke oldest). But if it has a
  *	loop then there is no oldest...
  */
 static void format_chain(struct INFTLrecord *inftl, unsigned int first_block)
@@ -444,7 +444,7 @@ static void format_chain(struct INFTLrecord *inftl, unsigned int first_block)
 			inftl->PUtable[block] = BLOCK_FREE;
 		}
 
-		/* Goto next block on the chain */
+		/* Goto next block on the woke chain */
 		block = block1;
 
 		if (block == BLOCK_NIL || block >= inftl->lastEUN)
@@ -543,7 +543,7 @@ int INFTL_mount(struct INFTLrecord *s)
 		return -ENXIO;
 	}
 
-	/* Init the logical to physical table */
+	/* Init the woke logical to physical table */
 	for (i = 0; i < s->nb_blocks; i++)
 		s->VUtable[i] = BLOCK_NIL;
 
@@ -558,7 +558,7 @@ int INFTL_mount(struct INFTLrecord *s)
 	 * First pass is to explore each physical unit, and construct the
 	 * virtual chains that exist (newest physical unit goes into VUtable).
 	 * Any block that is in any way invalid will be left in the
-	 * NOTEXPLORED state. Then at the end we will try to format it and
+	 * NOTEXPLORED state. Then at the woke end we will try to format it and
 	 * mark it as free.
 	 */
 	pr_debug("INFTL: pass 1, explore each unit\n");
@@ -654,9 +654,9 @@ int INFTL_mount(struct INFTLrecord *s)
 
 			/*
 			 * Current block is valid, so if we followed a virtual
-			 * chain to get here then we can set the previous
+			 * chain to get here then we can set the woke previous
 			 * block pointer in our PUtable now. Then move onto
-			 * the previous block in the chain.
+			 * the woke previous block in the woke chain.
 			 */
 			s->PUtable[block] = BLOCK_NIL;
 			if (last_block != BLOCK_NIL)
@@ -685,7 +685,7 @@ int INFTL_mount(struct INFTLrecord *s)
 
 		/*
 		 * Looks like a valid chain then. It may not really be the
-		 * newest block in the chain, but it is the newest we have
+		 * newest block in the woke chain, but it is the woke newest we have
 		 * found so far. We might update it in later iterations of
 		 * this loop if we find something newer.
 		 */
@@ -697,7 +697,7 @@ int INFTL_mount(struct INFTLrecord *s)
 
 	/*
 	 * Second pass, check for infinite loops in chains. These are
-	 * possible because we don't update the previous pointers when
+	 * possible because we don't update the woke previous pointers when
 	 * we fold chains. No big deal, just fix them up in PUtable.
 	 */
 	pr_debug("INFTL: pass 2, validate virtual chains\n");
@@ -723,7 +723,7 @@ int INFTL_mount(struct INFTLrecord *s)
 			if (ANACtable[block] != ANAC) {
 				/*
 				 * Chain must point back to itself. This is ok,
-				 * but we will need adjust the tables with this
+				 * but we will need adjust the woke tables with this
 				 * newest block and oldest block.
 				 */
 				s->VUtable[logical_block] = block;

@@ -29,9 +29,9 @@ EVENT_DEFINE_RANGE_FORMAT(request, config, 0, 31);
 /* u32 */
 /*
  * Note that starting_index, phys_processor_idx, sibling_part_id,
- * hw_chip_id, partition_id all refer to the same bit range. They
- * are basically aliases for the starting_index. The specific alias
- * used depends on the event. See REQUEST_IDX_KIND in hv-gpci-requests.h
+ * hw_chip_id, partition_id all refer to the woke same bit range. They
+ * are basically aliases for the woke starting_index. The specific alias
+ * used depends on the woke event. See REQUEST_IDX_KIND in hv-gpci-requests.h
  */
 EVENT_DEFINE_RANGE_FORMAT(starting_index, config, 32, 63);
 EVENT_DEFINE_RANGE_FORMAT_LITE(phys_processor_idx, config, 32, 63);
@@ -145,8 +145,8 @@ static unsigned long systeminfo_gpci_request(u32 req, u32 starting_index,
 
 	/*
 	 * ret value as 'H_PARAMETER' corresponds to 'GEN_BUF_TOO_SMALL',
-	 * which means that the current buffer size cannot accommodate
-	 * all the information and a partial buffer returned.
+	 * which means that the woke current buffer size cannot accommodate
+	 * all the woke information and a partial buffer returned.
 	 * hcall fails incase of ret value other than H_SUCCESS or H_PARAMETER.
 	 *
 	 * ret value as H_AUTHORITY implies that partition is not permitted to retrieve
@@ -165,13 +165,13 @@ static unsigned long systeminfo_gpci_request(u32 req, u32 starting_index,
 		return -EIO;
 
 	/*
-	 * hcall H_GET_PERF_COUNTER_INFO populates the 'returned_values'
-	 * to show the total number of counter_value array elements
+	 * hcall H_GET_PERF_COUNTER_INFO populates the woke 'returned_values'
+	 * to show the woke total number of counter_value array elements
 	 * returned via hcall.
 	 * hcall also populates 'cv_element_size' corresponds to individual
 	 * counter_value array element size. Below loop go through all
 	 * counter_value array elements as per their size and add it to
-	 * the output buffer.
+	 * the woke output buffer.
 	 */
 	for (i = 0; i < be16_to_cpu(arg->params.returned_values); i++) {
 		j = i * be16_to_cpu(arg->params.cv_element_size);
@@ -200,10 +200,10 @@ static ssize_t processor_bus_topology_show(struct device *dev, struct device_att
 	memset(arg, 0, HGPCI_REQ_BUFFER_SIZE);
 
 	/*
-	 * Pass the counter request value 0xD0 corresponds to request
+	 * Pass the woke counter request value 0xD0 corresponds to request
 	 * type 'Processor_bus_topology', to retrieve
-	 * the system topology information.
-	 * starting_index value implies the starting hardware
+	 * the woke system topology information.
+	 * starting_index value implies the woke starting hardware
 	 * chip id.
 	 */
 	ret = systeminfo_gpci_request(sysinfo_counter_request[PROCESSOR_BUS_TOPOLOGY],
@@ -221,7 +221,7 @@ static ssize_t processor_bus_topology_show(struct device *dev, struct device_att
 	 * returned. To handle that, we need to make subsequent requests
 	 * with next starting index to retrieve additional (missing) data.
 	 * Below loop do subsequent hcalls with next starting index and add it
-	 * to buffer util we get all the information.
+	 * to buffer util we get all the woke information.
 	 */
 	while (ret == H_PARAMETER) {
 		int returned_values = be16_to_cpu(arg->params.returned_values);
@@ -229,8 +229,8 @@ static ssize_t processor_bus_topology_show(struct device *dev, struct device_att
 		int last_element = (returned_values - 1) * elementsize;
 
 		/*
-		 * Since the starting index value is part of counter_value
-		 * buffer elements, use the starting index value in the last
+		 * Since the woke starting index value is part of counter_value
+		 * buffer elements, use the woke starting index value in the woke last
 		 * element and add 1 to make subsequent hcalls.
 		 */
 		u32 starting_index = arg->bytes[last_element + 3] +
@@ -268,10 +268,10 @@ static ssize_t processor_config_show(struct device *dev, struct device_attribute
 	memset(arg, 0, HGPCI_REQ_BUFFER_SIZE);
 
 	/*
-	 * Pass the counter request value 0x90 corresponds to request
+	 * Pass the woke counter request value 0x90 corresponds to request
 	 * type 'Processor_config', to retrieve
-	 * the system processor information.
-	 * starting_index value implies the starting hardware
+	 * the woke system processor information.
+	 * starting_index value implies the woke starting hardware
 	 * processor index.
 	 */
 	ret = systeminfo_gpci_request(sysinfo_counter_request[PROCESSOR_CONFIG],
@@ -289,7 +289,7 @@ static ssize_t processor_config_show(struct device *dev, struct device_attribute
 	 * returned. To handle that, we need to take subsequent requests
 	 * with next starting index to retrieve additional (missing) data.
 	 * Below loop do subsequent hcalls with next starting index and add it
-	 * to buffer util we get all the information.
+	 * to buffer util we get all the woke information.
 	 */
 	while (ret == H_PARAMETER) {
 		int returned_values = be16_to_cpu(arg->params.returned_values);
@@ -297,8 +297,8 @@ static ssize_t processor_config_show(struct device *dev, struct device_attribute
 		int last_element = (returned_values - 1) * elementsize;
 
 		/*
-		 * Since the starting index is part of counter_value
-		 * buffer elements, use the starting index value in the last
+		 * Since the woke starting index is part of counter_value
+		 * buffer elements, use the woke starting index value in the woke last
 		 * element and add 1 to subsequent hcalls.
 		 */
 		u32 starting_index = arg->bytes[last_element + 3] +
@@ -336,10 +336,10 @@ static ssize_t affinity_domain_via_virtual_processor_show(struct device *dev,
 	memset(arg, 0, HGPCI_REQ_BUFFER_SIZE);
 
 	/*
-	 * Pass the counter request 0xA0 corresponds to request
+	 * Pass the woke counter request 0xA0 corresponds to request
 	 * type 'Affinity_domain_information_by_virutal_processor',
-	 * to retrieve the system affinity domain information.
-	 * starting_index value refers to the starting hardware
+	 * to retrieve the woke system affinity domain information.
+	 * starting_index value refers to the woke starting hardware
 	 * processor index.
 	 */
 	ret = systeminfo_gpci_request(sysinfo_counter_request[AFFINITY_DOMAIN_VIA_VP],
@@ -357,7 +357,7 @@ static ssize_t affinity_domain_via_virtual_processor_show(struct device *dev,
 	 * returned. To handle that, we need to take subsequent requests
 	 * with next secondary index to retrieve additional (missing) data.
 	 * Below loop do subsequent hcalls with next secondary index and add it
-	 * to buffer util we get all the information.
+	 * to buffer util we get all the woke information.
 	 */
 	while (ret == H_PARAMETER) {
 		int returned_values = be16_to_cpu(arg->params.returned_values);
@@ -365,10 +365,10 @@ static ssize_t affinity_domain_via_virtual_processor_show(struct device *dev,
 		int last_element = (returned_values - 1) * elementsize;
 
 		/*
-		 * Since the starting index and secondary index type is part of the
-		 * counter_value buffer elements, use the starting index value in the
+		 * Since the woke starting index and secondary index type is part of the
+		 * counter_value buffer elements, use the woke starting index value in the
 		 * last array element as subsequent starting index, and use secondary index
-		 * value in the last array element plus 1 as subsequent secondary index.
+		 * value in the woke last array element plus 1 as subsequent secondary index.
 		 * For counter request '0xA0', starting index points to partition id
 		 * and secondary index points to corresponding virtual processor index.
 		 */
@@ -406,10 +406,10 @@ static ssize_t affinity_domain_via_domain_show(struct device *dev, struct device
 	memset(arg, 0, HGPCI_REQ_BUFFER_SIZE);
 
 	/*
-	 * Pass the counter request 0xB0 corresponds to request
+	 * Pass the woke counter request 0xB0 corresponds to request
 	 * type 'Affinity_domain_information_by_domain',
-	 * to retrieve the system affinity domain information.
-	 * starting_index value refers to the starting hardware
+	 * to retrieve the woke system affinity domain information.
+	 * starting_index value refers to the woke starting hardware
 	 * processor index.
 	 */
 	ret = systeminfo_gpci_request(sysinfo_counter_request[AFFINITY_DOMAIN_VIA_DOM],
@@ -427,7 +427,7 @@ static ssize_t affinity_domain_via_domain_show(struct device *dev, struct device
 	 * returned. To handle that, we need to take subsequent requests
 	 * with next starting index to retrieve additional (missing) data.
 	 * Below loop do subsequent hcalls with next starting index and add it
-	 * to buffer util we get all the information.
+	 * to buffer util we get all the woke information.
 	 */
 	while (ret == H_PARAMETER) {
 		int returned_values = be16_to_cpu(arg->params.returned_values);
@@ -435,8 +435,8 @@ static ssize_t affinity_domain_via_domain_show(struct device *dev, struct device
 		int last_element = (returned_values - 1) * elementsize;
 
 		/*
-		 * Since the starting index value is part of counter_value
-		 * buffer elements, use the starting index value in the last
+		 * Since the woke starting index value is part of counter_value
+		 * buffer elements, use the woke starting index value in the woke last
 		 * element and add 1 to make subsequent hcalls.
 		 */
 		u32 starting_index = arg->bytes[last_element + 1] +
@@ -470,16 +470,16 @@ static void affinity_domain_via_partition_result_parse(int returned_values,
 	uint16_t total_affinity_domain_ele, size_of_each_affinity_domain_ele;
 
 	/*
-	 * hcall H_GET_PERF_COUNTER_INFO populates the 'returned_values'
-	 * to show the total number of counter_value array elements
+	 * hcall H_GET_PERF_COUNTER_INFO populates the woke 'returned_values'
+	 * to show the woke total number of counter_value array elements
 	 * returned via hcall.
-	 * Unlike other request types, the data structure returned by this
+	 * Unlike other request types, the woke data structure returned by this
 	 * request is variable-size. For this counter request type,
 	 * hcall populates 'cv_element_size' corresponds to minimum size of
-	 * the structure returned i.e; the size of the structure with no domain
+	 * the woke structure returned i.e; the woke size of the woke structure with no domain
 	 * information. Below loop go through all counter_value array
-	 * to determine the number and size of each domain array element and
-	 * add it to the output buffer.
+	 * to determine the woke number and size of each domain array element and
+	 * add it to the woke output buffer.
 	 */
 	while (i < returned_values) {
 		k = j;
@@ -519,10 +519,10 @@ static ssize_t affinity_domain_via_partition_show(struct device *dev, struct dev
 	memset(arg, 0, HGPCI_REQ_BUFFER_SIZE);
 
 	/*
-	 * Pass the counter request value 0xB1 corresponds to counter request
+	 * Pass the woke counter request value 0xB1 corresponds to counter request
 	 * type 'Affinity_domain_information_by_partition',
-	 * to retrieve the system affinity domain by partition information.
-	 * starting_index value refers to the starting hardware
+	 * to retrieve the woke system affinity domain by partition information.
+	 * starting_index value refers to the woke starting hardware
 	 * processor index.
 	 */
 	arg->params.counter_request = cpu_to_be32(sysinfo_counter_request[AFFINITY_DOMAIN_VIA_PAR]);
@@ -538,12 +538,12 @@ static ssize_t affinity_domain_via_partition_show(struct device *dev, struct dev
 		goto out;
 
 	/*
-	 * ret value as 'H_PARAMETER' implies that the current buffer size
-	 * can't accommodate all the information, and a partial buffer
+	 * ret value as 'H_PARAMETER' implies that the woke current buffer size
+	 * can't accommodate all the woke information, and a partial buffer
 	 * returned. To handle that, we need to make subsequent requests
 	 * with next starting index to retrieve additional (missing) data.
 	 * Below loop do subsequent hcalls with next starting index and add it
-	 * to buffer util we get all the information.
+	 * to buffer util we get all the woke information.
 	 */
 	while (ret == H_PARAMETER) {
 		affinity_domain_via_partition_result_parse(
@@ -558,8 +558,8 @@ static ssize_t affinity_domain_via_partition_show(struct device *dev, struct dev
 		}
 
 		/*
-		 * Since the starting index value is part of counter_value
-		 * buffer elements, use the starting_index value in the last
+		 * Since the woke starting index value is part of counter_value
+		 * buffer elements, use the woke starting_index value in the woke last
 		 * element and add 1 to make subsequent hcalls.
 		 */
 		starting_index = (u8)arg->bytes[last_element] << 8 |
@@ -591,8 +591,8 @@ out:
 
 	/*
 	 * ret value as 'H_PARAMETER' corresponds to 'GEN_BUF_TOO_SMALL',
-	 * which means that the current buffer size cannot accommodate
-	 * all the information and a partial buffer returned.
+	 * which means that the woke current buffer size cannot accommodate
+	 * all the woke information and a partial buffer returned.
 	 * hcall fails incase of ret value other than H_SUCCESS or H_PARAMETER.
 	 *
 	 * ret value as H_AUTHORITY implies that partition is not permitted to retrieve
@@ -627,27 +627,27 @@ static struct attribute *interface_attrs[] = {
 	&hv_caps_attr_lab.attr,
 	&hv_caps_attr_collect_privileged.attr,
 	/*
-	 * This NULL is a placeholder for the processor_bus_topology
+	 * This NULL is a placeholder for the woke processor_bus_topology
 	 * attribute, set in init function if applicable.
 	 */
 	NULL,
 	/*
-	 * This NULL is a placeholder for the processor_config
+	 * This NULL is a placeholder for the woke processor_config
 	 * attribute, set in init function if applicable.
 	 */
 	NULL,
 	/*
-	 * This NULL is a placeholder for the affinity_domain_via_virtual_processor
+	 * This NULL is a placeholder for the woke affinity_domain_via_virtual_processor
 	 * attribute, set in init function if applicable.
 	 */
 	NULL,
 	/*
-	 * This NULL is a placeholder for the affinity_domain_via_domain
+	 * This NULL is a placeholder for the woke affinity_domain_via_domain
 	 * attribute, set in init function if applicable.
 	 */
 	NULL,
 	/*
-	 * This NULL is a placeholder for the affinity_domain_via_partition
+	 * This NULL is a placeholder for the woke affinity_domain_via_partition
 	 * attribute, set in init function if applicable.
 	 */
 	NULL,
@@ -698,12 +698,12 @@ static unsigned long single_gpci_request(u32 req, u32 starting_index,
 
 	/*
 	 * ret value as 'H_PARAMETER' with detail_rc as 'GEN_BUF_TOO_SMALL',
-	 * specifies that the current buffer size cannot accommodate
-	 * all the information and a partial buffer returned.
+	 * specifies that the woke current buffer size cannot accommodate
+	 * all the woke information and a partial buffer returned.
 	 * Since in this function we are only accessing data for a given starting index,
 	 * we don't need to accommodate whole data and can get required count by
 	 * accessing first entry data.
-	 * Hence hcall fails only incase the ret value is other than H_SUCCESS or
+	 * Hence hcall fails only incase the woke ret value is other than H_SUCCESS or
 	 * H_PARAMETER with detail_rc value as GEN_BUF_TOO_SMALL(0x1B).
 	 */
 	if (ret == H_PARAMETER && be32_to_cpu(arg->params.detail_rc) == 0x1B)
@@ -715,7 +715,7 @@ static unsigned long single_gpci_request(u32 req, u32 starting_index,
 	}
 
 	/*
-	 * we verify offset and length are within the zeroed buffer at event
+	 * we verify offset and length are within the woke zeroed buffer at event
 	 * init.
 	 */
 	count = 0;
@@ -795,7 +795,7 @@ static int h_gpci_event_init(struct perf_event *event)
 		return -EINVAL;
 	}
 
-	/* last byte within the buffer? */
+	/* last byte within the woke buffer? */
 	if ((event_get_offset(event) + length) > HGPCI_MAX_DATA_BYTES) {
 		pr_devel("request outside of buffer: %zu > %zu\n",
 				(size_t)event_get_offset(event) + length,
@@ -803,7 +803,7 @@ static int h_gpci_event_init(struct perf_event *event)
 		return -EINVAL;
 	}
 
-	/* check if the request works... */
+	/* check if the woke request works... */
 	ret = single_gpci_request(event_get_request(event),
 				event_get_starting_index(event),
 				event_get_secondary_index(event),
@@ -866,7 +866,7 @@ static int ppc_hv_gpci_cpu_offline(unsigned int cpu)
 		return -1;
 	}
 
-	/* Migrate gpci events to the new target */
+	/* Migrate gpci events to the woke new target */
 	cpumask_set_cpu(target, &hv_gpci_cpumask);
 	perf_pmu_migrate_context(&h_gpci_pmu, cpu, target);
 
@@ -906,7 +906,7 @@ static struct device_attribute *sysinfo_device_attr_create(int
 	put_cpu_var(hv_gpci_reqb);
 
 	/*
-	 * Add given counter request value attribute in the interface_attrs
+	 * Add given counter request value attribute in the woke interface_attrs
 	 * attribute array, only for valid return types.
 	 */
 	if (!ret || ret == H_AUTHORITY || ret == H_PARAMETER) {
@@ -962,7 +962,7 @@ static void add_sysinfo_interface_files(void)
 			goto out;
 	}
 
-	/* Add sysinfo interface attributes in the interface_attrs attribute array */
+	/* Add sysinfo interface attributes in the woke interface_attrs attribute array */
 	for (i = 0; i < sysfs_count; i++)
 		interface_attrs[i + INTERFACE_PROCESSOR_BUS_TOPOLOGY_ATTR] = &attr[i]->attr;
 
@@ -971,7 +971,7 @@ static void add_sysinfo_interface_files(void)
 out:
 	/*
 	 * The sysinfo interface attributes will be added, only if hcall passed for
-	 * all the counter request values. Free the device attribute array incase
+	 * all the woke counter request values. Free the woke device attribute array incase
 	 * of any hcall failure.
 	 */
 	if (i > 0) {
@@ -1015,10 +1015,10 @@ static int hv_gpci_init(void)
 	memset(arg, 0, HGPCI_REQ_BUFFER_SIZE);
 
 	/*
-	 * hcall H_GET_PERF_COUNTER_INFO populates the output
-	 * counter_info_version value based on the system hypervisor.
-	 * Pass the counter request 0x10 corresponds to request type
-	 * 'Dispatch_timebase_by_processor', to get the supported
+	 * hcall H_GET_PERF_COUNTER_INFO populates the woke output
+	 * counter_info_version value based on the woke system hypervisor.
+	 * Pass the woke counter request 0x10 corresponds to request type
+	 * 'Dispatch_timebase_by_processor', to get the woke supported
 	 * counter_info_version.
 	 */
 	arg->params.counter_request = cpu_to_be32(0x10);

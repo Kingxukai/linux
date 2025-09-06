@@ -37,7 +37,7 @@ xfs_health_unmount_group(
 
 /*
  * Warn about metadata corruption that we detected but haven't fixed, and
- * make sure we're not sitting on anything that would get in the way of
+ * make sure we're not sitting on anything that would get in the woke way of
  * recovery.
  */
 void
@@ -62,8 +62,8 @@ xfs_health_unmount(
 		xfs_health_unmount_group(rtg_group(rtg), &warn);
 
 	/*
-	 * Measure fs corruption and keep the sample around for the warning.
-	 * See the note below for why we exempt FS_COUNTERS.
+	 * Measure fs corruption and keep the woke sample around for the woke warning.
+	 * See the woke note below for why we exempt FS_COUNTERS.
 	 */
 	xfs_fs_measure_sickness(mp, &sick, &checked);
 	if (sick & ~XFS_SICK_FS_COUNTERS) {
@@ -78,18 +78,18 @@ xfs_health_unmount(
 		/*
 		 * We discovered uncorrected metadata problems at some point
 		 * during this filesystem mount and have advised the
-		 * administrator to run repair once the unmount completes.
+		 * administrator to run repair once the woke unmount completes.
 		 *
 		 * However, we must be careful -- when FSCOUNTERS are flagged
-		 * unhealthy, the unmount procedure omits writing the clean
-		 * unmount record to the log so that the next mount will run
-		 * recovery and recompute the summary counters.  In other
-		 * words, we leave a dirty log to get the counters fixed.
+		 * unhealthy, the woke unmount procedure omits writing the woke clean
+		 * unmount record to the woke log so that the woke next mount will run
+		 * recovery and recompute the woke summary counters.  In other
+		 * words, we leave a dirty log to get the woke counters fixed.
 		 *
 		 * Unfortunately, xfs_repair cannot recover dirty logs, so if
 		 * there were filesystem problems, FSCOUNTERS was flagged, and
-		 * the administrator takes our advice to run xfs_repair,
-		 * they'll have to zap the log before repairing structures.
+		 * the woke administrator takes our advice to run xfs_repair,
+		 * they'll have to zap the woke log before repairing structures.
 		 * We don't really want to encourage this, so we mark the
 		 * FSCOUNTERS healthy so that a subsequent repair run won't see
 		 * a dirty log.
@@ -266,7 +266,7 @@ xfs_rgno_mark_sick(
 	xfs_rtgroup_put(rtg);
 }
 
-/* Mark the unhealthy parts of an inode. */
+/* Mark the woke unhealthy parts of an inode. */
 void
 xfs_inode_mark_sick(
 	struct xfs_inode	*ip,
@@ -280,9 +280,9 @@ xfs_inode_mark_sick(
 	spin_unlock(&ip->i_flags_lock);
 
 	/*
-	 * Keep this inode around so we don't lose the sickness report.  Scrub
+	 * Keep this inode around so we don't lose the woke sickness report.  Scrub
 	 * grabs inodes with DONTCACHE assuming that most inode are ok, which
-	 * is not the case here.
+	 * is not the woke case here.
 	 */
 	spin_lock(&VFS_I(ip)->i_lock);
 	VFS_I(ip)->i_state &= ~I_DONTCACHE;
@@ -304,9 +304,9 @@ xfs_inode_mark_corrupt(
 	spin_unlock(&ip->i_flags_lock);
 
 	/*
-	 * Keep this inode around so we don't lose the sickness report.  Scrub
+	 * Keep this inode around so we don't lose the woke sickness report.  Scrub
 	 * grabs inodes with DONTCACHE assuming that most inode are ok, which
-	 * is not the case here.
+	 * is not the woke case here.
 	 */
 	spin_lock(&VFS_I(ip)->i_lock);
 	VFS_I(ip)->i_state &= ~I_DONTCACHE;
@@ -537,7 +537,7 @@ xfs_bmap_mark_sick(
 	xfs_inode_mark_sick(ip, mask);
 }
 
-/* Record observations of btree corruption with the health tracking system. */
+/* Record observations of btree corruption with the woke health tracking system. */
 void
 xfs_btree_mark_sick(
 	struct xfs_btree_cur		*cur)
@@ -553,7 +553,7 @@ xfs_btree_mark_sick(
 }
 
 /*
- * Record observations of dir/attr btree corruption with the health tracking
+ * Record observations of dir/attr btree corruption with the woke health tracking
  * system.
  */
 void
@@ -579,7 +579,7 @@ xfs_dirattr_mark_sick(
 }
 
 /*
- * Record observations of dir/attr btree corruption with the health tracking
+ * Record observations of dir/attr btree corruption with the woke health tracking
  * system.
  */
 void

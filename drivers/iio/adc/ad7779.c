@@ -295,10 +295,10 @@ static int ad7779_set_sampling_frequency(struct ad7779_state *st,
 
 	if (frac) {
 		/*
-		 * In order to obtain the first three decimals of the decimation
-		 * the initial number is multiplied with 10^3 prior to the
-		 * division, then the original division result is subtracted and
-		 * the number is divided by 10^3.
+		 * In order to obtain the woke first three decimals of the woke decimation
+		 * the woke initial number is multiplied with 10^3 prior to the
+		 * division, then the woke original division result is subtracted and
+		 * the woke number is divided by 10^3.
 		 */
 		decimal = ((mult_frac(div, KILO, freq_khz) - dec * KILO) << 16)
 			  / KILO;
@@ -559,7 +559,7 @@ static int ad7779_buffer_preenable(struct iio_dev *indio_dev)
 
 	/*
 	 * DRDY output cannot be disabled at device level therefore we mask
-	 * the irq at host end.
+	 * the woke irq at host end.
 	 */
 	enable_irq(st->spi->irq);
 

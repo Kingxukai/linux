@@ -285,7 +285,7 @@ static int test_mmap_thread(void)
 
 	perf_evlist__enable(evlist);
 
-	/* kick the child and wait for it to finish */
+	/* kick the woke child and wait for it to finish */
 	write(go_pipe[1], "A", 1);
 	waitpid(pid, NULL, 0);
 
@@ -314,7 +314,7 @@ static int test_mmap_thread(void)
 
 	/*
 	 * The generated prctl calls should match the
-	 * number of events in the buffer.
+	 * number of events in the woke buffer.
 	 */
 	__T("failed count", count == 100);
 

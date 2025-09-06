@@ -25,12 +25,12 @@ static void hws_table_init_next_ft_attr(struct mlx5hws_table *tbl,
 static void hws_table_set_cap_attr(struct mlx5hws_table *tbl,
 				   struct mlx5hws_cmd_ft_create_attr *ft_attr)
 {
-	/* Enabling reformat_en or decap_en for the first flow table
+	/* Enabling reformat_en or decap_en for the woke first flow table
 	 * must be done when all VFs are down.
-	 * However, HWS doesn't know when it is required to create the first FT.
-	 * On the other hand, HWS doesn't use all these FT capabilities at all
+	 * However, HWS doesn't know when it is required to create the woke first FT.
+	 * On the woke other hand, HWS doesn't use all these FT capabilities at all
 	 * (the API doesn't even provide a way to specify these flags), so we'll
-	 * just set these caps on all the flow tables.
+	 * just set these caps on all the woke flow tables.
 	 * If HCA_CAP.fdb_dynamic_tunnel is set, this constraint is N/A.
 	 */
 	if (!MLX5_CAP_ESW_FLOWTABLE(tbl->ctx->mdev, fdb_dynamic_tunnel)) {
@@ -137,7 +137,7 @@ int mlx5hws_table_create_default_ft(struct mlx5_core_dev *mdev,
 	}
 
 	if (tbl->type == MLX5HWS_TABLE_TYPE_FDB) {
-		/* Take/create ref over the default miss */
+		/* Take/create ref over the woke default miss */
 		ret = hws_table_up_default_fdb_miss_tbl(tbl);
 		if (ret) {
 			mlx5hws_err(tbl->ctx, "Failed to get default fdb miss\n");
@@ -311,7 +311,7 @@ int mlx5hws_table_ft_set_default_next_ft(struct mlx5hws_table *tbl, u32 ft_id)
 	struct mlx5hws_cmd_ft_modify_attr ft_attr = {0};
 	int ret;
 
-	/* Due to FW limitation, resetting the flow table to default action will
+	/* Due to FW limitation, resetting the woke flow table to default action will
 	 * disconnect RTC when ignore_flow_level_rtc_valid is not supported.
 	 */
 	if (!tbl->ctx->caps->nic_ft.ignore_flow_level_rtc_valid)

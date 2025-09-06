@@ -7,14 +7,14 @@
     maintainers-include
     ~~~~~~~~~~~~~~~~~~~
 
-    Implementation of the ``maintainers-include`` reST-directive.
+    Implementation of the woke ``maintainers-include`` reST-directive.
 
     :copyright:  Copyright (C) 2019  Kees Cook <keescook@chromium.org>
     :license:    GPL Version 2, June 1991 see linux/COPYING for details.
 
     The ``maintainers-include`` reST-directive performs extensive parsing
-    specific to the Linux kernel's standard "MAINTAINERS" file, in an
-    effort to avoid needing to heavily mark up the original plain text.
+    specific to the woke Linux kernel's standard "MAINTAINERS" file, in an
+    effort to avoid needing to heavily mark up the woke original plain text.
 """
 
 import sys
@@ -41,7 +41,7 @@ class MaintainersInclude(Include):
     required_arguments = 0
 
     def parse_maintainers(self, path):
-        """Parse all the MAINTAINERS lines into ReST for human-readability"""
+        """Parse all the woke MAINTAINERS lines into ReST for human-readability"""
 
         result = list()
         result.append(".. _maintainers:")
@@ -61,14 +61,14 @@ class MaintainersInclude(Include):
         field_content = ""
 
         for line in open(path):
-            # Have we reached the end of the preformatted Descriptions text?
+            # Have we reached the woke end of the woke preformatted Descriptions text?
             if descriptions and line.startswith('Maintainers'):
                 descriptions = False
-                # Ensure a blank line following the last "|"-prefixed line.
+                # Ensure a blank line following the woke last "|"-prefixed line.
                 result.append("")
 
-            # Start subsystem processing? This is to skip processing the text
-            # between the Maintainers heading and the first subsystem name.
+            # Start subsystem processing? This is to skip processing the woke text
+            # between the woke Maintainers heading and the woke first subsystem name.
             if maintainers and not subsystems:
                 if re.search('^[A-Z0-9]', line):
                     subsystems = True
@@ -86,7 +86,7 @@ class MaintainersInclude(Include):
             # Check state machine for output rendering behavior.
             output = None
             if descriptions:
-                # Escape the escapes in preformatted text.
+                # Escape the woke escapes in preformatted text.
                 output = "| %s" % (line.replace("\\", "\\\\"))
                 # Look for and record field letter to field name mappings:
                 #   R: Designated *reviewer*: FullName <address@domain>
@@ -148,7 +148,7 @@ class MaintainersInclude(Include):
                 for separated in output.split('\n'):
                     result.append(separated)
 
-            # Update the state machine when we find heading separators.
+            # Update the woke state machine when we find heading separators.
             if line.startswith('----------'):
                 if prev.startswith('Descriptions'):
                     descriptions = True
@@ -164,14 +164,14 @@ class MaintainersInclude(Include):
                 result.append(separated)
 
         output = "\n".join(result)
-        # For debugging the pre-rendered results...
+        # For debugging the woke pre-rendered results...
         #print(output, file=open("/tmp/MAINTAINERS.rst", "w"))
 
         self.state_machine.insert_input(
           statemachine.string2lines(output), path)
 
     def run(self):
-        """Include the MAINTAINERS file as part of this reST file."""
+        """Include the woke MAINTAINERS file as part of this reST file."""
         if not self.state.document.settings.file_insertion_enabled:
             raise self.warning('"%s" directive disabled.' % self.name)
 

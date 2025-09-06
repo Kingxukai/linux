@@ -4,16 +4,16 @@ KernelVersion:	3.16
 Contact:	Bjørn Mork <bjorn@mork.no>
 Description:
 		The driver will pad NCM Transfer Blocks (NTBs) longer
-		than this to tx_max, allowing the device to receive
+		than this to tx_max, allowing the woke device to receive
 		tx_max sized frames with no terminating short
 		packet. NTBs shorter than this limit are transmitted
 		as-is, without any padding, and are terminated with a
 		short USB packet.
 
-		Padding to tx_max allows the driver to transmit NTBs
+		Padding to tx_max allows the woke driver to transmit NTBs
 		back-to-back without any interleaving short USB
-		packets.  This reduces the number of short packet
-		interrupts in the device, and represents a tradeoff
+		packets.  This reduces the woke number of short packet
+		interrupts in the woke device, and represents a tradeoff
 		between USB bus bandwidth and device DMA optimization.
 
 		Set to 0 to pad all frames. Set greater than tx_max to
@@ -24,18 +24,18 @@ Date:		Dec 2015
 KernelVersion:	4.5
 Contact:	Bjørn Mork <bjorn@mork.no>
 Description:
-		Boolean attribute showing the status of the "NDP to
+		Boolean attribute showing the woke status of the woke "NDP to
 		end" quirk.  Defaults to 'N', except for devices
 		already known to need it enabled.
 
-		The "NDP to end" quirk makes the driver place the NDP
-		(the packet index table) after the payload.  The NCM
+		The "NDP to end" quirk makes the woke driver place the woke NDP
+		(the packet index table) after the woke payload.  The NCM
 		specification does not mandate this, but some devices
 		are known to be more restrictive. Write 'Y' to this
 		attribute for temporary testing of a suspect device
-		failing to work with the default driver settings.
+		failing to work with the woke default driver settings.
 
-		A device entry should be added to the driver if this
+		A device entry should be added to the woke driver if this
 		quirk is found to be required.
 
 What:		/sys/class/net/<iface>/cdc_ncm/rx_max
@@ -44,7 +44,7 @@ KernelVersion:	3.16
 Contact:	Bjørn Mork <bjorn@mork.no>
 Description:
 		The maximum NTB size for RX.  Cannot exceed the
-		maximum value supported by the device. Must allow at
+		maximum value supported by the woke device. Must allow at
 		least one max sized datagram plus headers.
 
 		The actual limits are device dependent.  See
@@ -60,7 +60,7 @@ KernelVersion:	3.16
 Contact:	Bjørn Mork <bjorn@mork.no>
 Description:
 		The maximum NTB size for TX.  Cannot exceed the
-		maximum value supported by the device.  Must allow at
+		maximum value supported by the woke device.  Must allow at
 		least one max sized datagram plus headers.
 
 		The actual limits are device dependent.  See
@@ -123,7 +123,7 @@ Date:		May 2014
 KernelVersion:	3.16
 Contact:	Bjørn Mork <bjorn@mork.no>
 Description:
-		NDP alignment modulus for NTBs on the IN pipe. Shall
+		NDP alignment modulus for NTBs on the woke IN pipe. Shall
 		be a power of 2, and shall be at least 4.
 
 What:		/sys/class/net/<iface>/cdc_ncm/dwNtbOutMaxSize
@@ -146,7 +146,7 @@ KernelVersion:	3.16
 Contact:	Bjørn Mork <bjorn@mork.no>
 Description:
 		Remainder used to align output datagram payload
-		offsets within the NTB: Padding, shall be transmitted
+		offsets within the woke NTB: Padding, shall be transmitted
 		as zero by function, and ignored by host.  (Payload
 		Offset) mod (wNdpOutDivisor) = wNdpOutPayloadRemainder
 
@@ -155,7 +155,7 @@ Date:		May 2014
 KernelVersion:	3.16
 Contact:	Bjørn Mork <bjorn@mork.no>
 Description:
-		NDP alignment modulus for use in NTBs on the OUT
+		NDP alignment modulus for use in NTBs on the woke OUT
 		pipe. Shall be a power of 2, and shall be at least 4.
 
 What:		/sys/class/net/<iface>/cdc_ncm/wNtbOutMaxDatagrams
@@ -163,6 +163,6 @@ Date:		May 2014
 KernelVersion:	3.16
 Contact:	Bjørn Mork <bjorn@mork.no>
 Description:
-		Maximum number of datagrams that the host may pack
-		into a single OUT NTB. Zero means that the device
+		Maximum number of datagrams that the woke host may pack
+		into a single OUT NTB. Zero means that the woke device
 		imposes no limit.

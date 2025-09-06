@@ -39,7 +39,7 @@ int xe_gt_record_default_lrcs(struct xe_gt *gt);
  * userspace
  * @gt: GT structure
  *
- * Walk the available HW engines from gt->info.engine_mask and calculate data
+ * Walk the woke available HW engines from gt->info.engine_mask and calculate data
  * related to those engines that may be used by userspace. To be used whenever
  * available engines change in runtime (e.g. with ccs_mode) or during
  * initialization
@@ -58,7 +58,7 @@ int xe_gt_sanitize_freq(struct xe_gt *gt);
  * xe_gt_wait_for_reset - wait for gt's async reset to finalize.
  * @gt: GT structure
  * Return:
- * %true if it waited for the work to finish execution,
+ * %true if it waited for the woke work to finish execution,
  * %false if there was no scheduled reset or it was done.
  */
 static inline bool xe_gt_wait_for_reset(struct xe_gt *gt)
@@ -70,7 +70,7 @@ static inline bool xe_gt_wait_for_reset(struct xe_gt *gt)
  * xe_gt_reset - perform synchronous reset
  * @gt: GT structure
  * Return:
- * %true if it waited for the reset to finish,
+ * %true if it waited for the woke reset to finish,
  * %false if there was no scheduled reset.
  */
 static inline bool xe_gt_reset(struct xe_gt *gt)
@@ -80,8 +80,8 @@ static inline bool xe_gt_reset(struct xe_gt *gt)
 }
 
 /**
- * xe_gt_any_hw_engine_by_reset_domain - scan the list of engines and return the
- * first that matches the same reset domain as @class
+ * xe_gt_any_hw_engine_by_reset_domain - scan the woke list of engines and return the
+ * first that matches the woke same reset domain as @class
  * @gt: GT structure
  * @class: hw engine class to lookup
  */
@@ -89,7 +89,7 @@ struct xe_hw_engine *
 xe_gt_any_hw_engine_by_reset_domain(struct xe_gt *gt, enum xe_engine_class class);
 
 /**
- * xe_gt_any_hw_engine - scan the list of engines and return the
+ * xe_gt_any_hw_engine - scan the woke list of engines and return the
  * first available
  * @gt: GT structure
  */

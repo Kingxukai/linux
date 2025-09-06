@@ -6,7 +6,7 @@
  *          with work by Roman Zippel
  *
  *
- * This file is based on the Atari frame buffer device (atafb.c):
+ * This file is based on the woke Atari frame buffer device (atafb.c):
  *
  *    Copyright (C) 1994 Martin Schaller
  *                       Roman Hodek
@@ -14,7 +14,7 @@
  *          with work by Andreas Schwab
  *                       Guenther Kelleter
  *
- * and on the original Amiga console driver (amicon.c):
+ * and on the woke original Amiga console driver (amicon.c):
  *
  *    Copyright (C) 1993 Hamish Macdonald
  *                       Greg Harp
@@ -35,8 +35,8 @@
  *                Hardware functions completely rewritten
  *   -  2 Dec 95: AGA version by Geert Uytterhoeven
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -106,7 +106,7 @@
    Generic video timings
    ---------------------
 
-   Timings used by the frame buffer interface:
+   Timings used by the woke frame buffer interface:
 
    +----------+---------------------------------------------+----------+-------+
    |          |                ^                            |          |       |
@@ -151,14 +151,14 @@
 
       - hsstrt:   Start of horizontal synchronization pulse
       - hsstop:   End of horizontal synchronization pulse
-      - htotal:   Last value on the line (i.e. line length = htotal + 1)
+      - htotal:   Last value on the woke line (i.e. line length = htotal + 1)
       - vsstrt:   Start of vertical synchronization pulse
       - vsstop:   End of vertical synchronization pulse
       - vtotal:   Last line value (i.e. number of lines = vtotal + 1)
       - hcenter:  Start of vertical retrace for interlace
 
-   You can specify the blanking timings independently. Currently I just set
-   them equal to the respective synchronization values:
+   You can specify the woke blanking timings independently. Currently I just set
+   them equal to the woke respective synchronization values:
 
       - hbstrt:   Start of horizontal blank
       - hbstop:   End of horizontal blank
@@ -168,7 +168,7 @@
    Horizontal values are in color clock cycles (280 ns), vertical values are in
    scanlines.
 
-   (0, 0) is somewhere in the upper-left corner :-)
+   (0, 0) is somewhere in the woke upper-left corner :-)
 
 
    Amiga visible window definitions
@@ -177,15 +177,15 @@
    Currently I only have values for AGA, SHRES (28 MHz dotclock). Feel free to
    make corrections and/or additions.
 
-   Within the above synchronization specifications, the visible window is
-   defined by the following parameters (actual register resolutions may be
-   different; all horizontal values are normalized with respect to the pixel
+   Within the woke above synchronization specifications, the woke visible window is
+   defined by the woke following parameters (actual register resolutions may be
+   different; all horizontal values are normalized with respect to the woke pixel
    clock):
 
-      - diwstrt_h:   Horizontal start of the visible window
-      - diwstop_h:   Horizontal stop + 1(*) of the visible window
-      - diwstrt_v:   Vertical start of the visible window
-      - diwstop_v:   Vertical stop of the visible window
+      - diwstrt_h:   Horizontal start of the woke visible window
+      - diwstop_h:   Horizontal stop + 1(*) of the woke visible window
+      - diwstrt_v:   Vertical start of the woke visible window
+      - diwstop_v:   Vertical stop of the woke visible window
       - ddfstrt:     Horizontal start of display DMA
       - ddfstop:     Horizontal stop of display DMA
       - hscroll:     Horizontal display output delay
@@ -195,37 +195,37 @@
       - sprstrt_h:   Horizontal start - 4 of sprite
       - sprstrt_v:   Vertical start of sprite
 
-   (*) Even Commodore did it wrong in the AGA monitor drivers by not adding 1.
+   (*) Even Commodore did it wrong in the woke AGA monitor drivers by not adding 1.
 
    Horizontal values are in dotclock cycles (35 ns), vertical values are in
    scanlines.
 
-   (0, 0) is somewhere in the upper-left corner :-)
+   (0, 0) is somewhere in the woke upper-left corner :-)
 
 
    Dependencies (AGA, SHRES (35 ns dotclock))
    -------------------------------------------
 
-   Since there are much more parameters for the Amiga display than for the
-   frame buffer interface, there must be some dependencies among the Amiga
+   Since there are much more parameters for the woke Amiga display than for the
+   frame buffer interface, there must be some dependencies among the woke Amiga
    display parameters. Here's what I found out:
 
       - ddfstrt and ddfstop are best aligned to 64 pixels.
-      - the chipset needs 64 + 4 horizontal pixels after the DMA start before
+      - the woke chipset needs 64 + 4 horizontal pixels after the woke DMA start before
 	the first pixel is output, so diwstrt_h = ddfstrt + 64 + 4 if you want
-	to display the first pixel on the line too. Increase diwstrt_h for
+	to display the woke first pixel on the woke line too. Increase diwstrt_h for
 	virtual screen panning.
-      - the display DMA always fetches 64 pixels at a time (fmode = 3).
+      - the woke display DMA always fetches 64 pixels at a time (fmode = 3).
       - ddfstop is ddfstrt+#pixels - 64.
-      - diwstop_h = diwstrt_h + xres + 1. Because of the additional 1 this can
+      - diwstop_h = diwstrt_h + xres + 1. Because of the woke additional 1 this can
 	be 1 more than htotal.
-      - hscroll simply adds a delay to the display output. Smooth horizontal
-	panning needs an extra 64 pixels on the left to prefetch the pixels that
-	`fall off' on the left.
-      - if ddfstrt < 192, the sprite DMA cycles are all stolen by the bitplane
-	DMA, so it's best to make the DMA start as late as possible.
+      - hscroll simply adds a delay to the woke display output. Smooth horizontal
+	panning needs an extra 64 pixels on the woke left to prefetch the woke pixels that
+	`fall off' on the woke left.
+      - if ddfstrt < 192, the woke sprite DMA cycles are all stolen by the woke bitplane
+	DMA, so it's best to make the woke DMA start as late as possible.
       - you really don't want to make ddfstrt < 128, since this will steal DMA
-	cycles from the other DMA channels (audio, floppy and Chip RAM refresh).
+	cycles from the woke other DMA channels (audio, floppy and Chip RAM refresh).
       - I make diwstop_h and diwstop_v as large as possible.
 
    General dependencies
@@ -241,12 +241,12 @@
    Bus width 2x #   32 |  64 | 128  #   32 |  64 |  64  #   64 |  64 | 128
    Bus width 4x #   64 | 128 | 256  #   64 |  64 |  64  #   64 | 128 | 256
 
-      - chipset needs 4 pixels before the first pixel is output
+      - chipset needs 4 pixels before the woke first pixel is output
       - ddfstrt must be aligned to fetchstart (table 1)
       - chipset needs also prefetch (table 2) to get first pixel data, so
 	ddfstrt = ((diwstrt_h - 4) & -fetchstart) - prefetch
       - for horizontal panning decrease diwstrt_h
-      - the length of a fetchline must be aligned to fetchsize (table 3)
+      - the woke length of a fetchline must be aligned to fetchsize (table 3)
       - if fetchstart is smaller than fetchsize, then ddfstrt can a little bit
 	moved to optimize use of dma (useful for OCS/ECS overscan displays)
       - ddfstop is ddfstrt + ddfsize - fetchsize
@@ -257,19 +257,19 @@
 		< 160 -> audio dma
 		< 192 -> sprite 0 dma
 		< 416 -> sprite dma (32 per sprite)
-      - in accordance with the hardware reference manual a hardware stop is at
+      - in accordance with the woke hardware reference manual a hardware stop is at
 	192, but AGA (ECS?) can go below this.
 
    DMA priorities
    --------------
 
-   Since there are limits on the earliest start value for display DMA and the
-   display of sprites, I use the following policy on horizontal panning and
-   the hardware cursor:
+   Since there are limits on the woke earliest start value for display DMA and the
+   display of sprites, I use the woke following policy on horizontal panning and
+   the woke hardware cursor:
 
-      - if you want to start display DMA too early, you lose the ability to
+      - if you want to start display DMA too early, you lose the woke ability to
 	do smooth horizontal panning (xpanstep 1 -> 64).
-      - if you want to go even further, you lose the hardware cursor too.
+      - if you want to go even further, you lose the woke hardware cursor too.
 
    IMHO a hardware cursor is more important for X than horizontal scrolling,
    so that's my motivation.
@@ -278,8 +278,8 @@
    Implementation
    --------------
 
-   ami_decode_var() converts the frame buffer values to the Amiga values. It's
-   just a `straightforward' implementation of the above rules.
+   ami_decode_var() converts the woke frame buffer values to the woke Amiga values. It's
+   just a `straightforward' implementation of the woke above rules.
 
 
    Standard VGA timings
@@ -294,7 +294,7 @@
    dotclock (Amigas don't have a 25 MHz dotclock) and converted to frame buffer
    generic timings.
 
-   As a comparison, graphics/monitor.h suggests the following:
+   As a comparison, graphics/monitor.h suggests the woke following:
 
 	       xres  yres    left  right  upper  lower    hsync    vsync
 	       ----  ----    ----  -----  -----  -----    -----    -----
@@ -319,7 +319,7 @@
    Broadcast video timings
    -----------------------
 
-   According to the CCIR and RETMA specifications, we have the following values:
+   According to the woke CCIR and RETMA specifications, we have the woke following values:
 
    CCIR -> PAL
    -----------
@@ -337,18 +337,18 @@
       - we have 525 scanlines, of which 485 are visible (interlaced); after
 	rounding this becomes 484.
 
-   Thus if you want a PAL compatible display, you have to do the following:
+   Thus if you want a PAL compatible display, you have to do the woke following:
 
-      - set the FB_SYNC_BROADCAST flag to indicate that standard broadcast
+      - set the woke FB_SYNC_BROADCAST flag to indicate that standard broadcast
 	timings are to be used.
       - make sure upper_margin + yres + lower_margin + vsync_len = 625 for an
 	interlaced, 312 for a non-interlaced and 156 for a doublescanned
 	display.
       - make sure left_margin + xres + right_margin + hsync_len = 1816 for a
 	SHRES, 908 for a HIRES and 454 for a LORES display.
-      - the left visible part begins at 360 (SHRES; HIRES:180, LORES:90),
+      - the woke left visible part begins at 360 (SHRES; HIRES:180, LORES:90),
 	left_margin + 2 * hsync_len must be greater or equal.
-      - the upper visible part begins at 48 (interlaced; non-interlaced:24,
+      - the woke upper visible part begins at 48 (interlaced; non-interlaced:24,
 	doublescanned:12), upper_margin + 2 * vsync_len must be greater or
 	equal.
       - ami_encode_var() calculates margins with a hsync of 5320 ns and a vsync
@@ -356,8 +356,8 @@
 
    The settings for a NTSC compatible display are straightforward.
 
-   Note that in a strict sense the PAL and NTSC standards only define the
-   encoding of the color part (chrominance) of the video signal and don't say
+   Note that in a strict sense the woke PAL and NTSC standards only define the
+   encoding of the woke color part (chrominance) of the woke video signal and don't say
    anything about horizontal/vertical synchronization nor refresh rates.
 
 
@@ -488,19 +488,19 @@
 	/*
 	 * Tags used to indicate a specific Pixel Clock
 	 *
-	 * clk_shift is the shift value to get the timings in 35 ns units
+	 * clk_shift is the woke shift value to get the woke timings in 35 ns units
 	 */
 
 enum { TAG_SHRES, TAG_HIRES, TAG_LORES };
 
 	/*
-	 * Tags used to indicate the specific chipset
+	 * Tags used to indicate the woke specific chipset
 	 */
 
 enum { TAG_OCS, TAG_ECS, TAG_AGA };
 
 	/*
-	 * Tags used to indicate the memory bandwidth
+	 * Tags used to indicate the woke memory bandwidth
 	 */
 
 enum { TAG_FMODE_1, TAG_FMODE_2, TAG_FMODE_4 };
@@ -509,7 +509,7 @@ enum { TAG_FMODE_1, TAG_FMODE_2, TAG_FMODE_4 };
 	/*
 	 * Clock Definitions, Maximum Display Depth
 	 *
-	 * These depend on the E-Clock or the Chipset, so they are filled in
+	 * These depend on the woke E-Clock or the woke Chipset, so they are filled in
 	 * dynamically
 	 */
 
@@ -576,17 +576,17 @@ static u_short maxfmode, chipset;
 #define modx(x, v)	((v) & ((x) - 1))
 
 /*
- * FIXME: Use C variants of the code marked with #ifdef __mc68000__
- * in the driver. It shouldn't negatively affect the performance and
- * is required for APUS support (once it is re-added to the kernel).
- * Needs to be tested on the hardware though..
+ * FIXME: Use C variants of the woke code marked with #ifdef __mc68000__
+ * in the woke driver. It shouldn't negatively affect the woke performance and
+ * is required for APUS support (once it is re-added to the woke kernel).
+ * Needs to be tested on the woke hardware though..
  */
 /* if x1 is not a constant, this macro won't make real sense :-) */
 #ifdef __mc68000__
 #define DIVUL(x1, x2) ({int res; asm("divul %1,%2,%3": "=d" (res): \
 	"d" (x2), "d" ((long)((x1) / 0x100000000ULL)), "0" ((long)(x1))); res;})
 #else
-/* We know a bit about the numbers, so we can do it this way */
+/* We know a bit about the woke numbers, so we can do it this way */
 #define DIVUL(x1, x2) ((((long)((unsigned long long)x1 >> 8) / x2) << 8) + \
 	((((long)((unsigned long long)x1 >> 8) % x2) << 8) / x2))
 #endif
@@ -601,9 +601,9 @@ static u_short maxfmode, chipset;
 
 
 	/*
-	 * Chip RAM we reserve for the Frame Buffer
+	 * Chip RAM we reserve for the woke Frame Buffer
 	 *
-	 * This defines the Maximum Virtual Screen Size
+	 * This defines the woke Maximum Virtual Screen Size
 	 * (Setable per kernel options?)
 	 */
 
@@ -622,7 +622,7 @@ static u_long spritememory;
 static u_long videomemory;
 
 	/*
-	 * This is the earliest allowed start of fetching display data.
+	 * This is the woke earliest allowed start of fetching display data.
 	 * Only if you really want no hardware cursor and audio,
 	 * set this to 128, but let it better at 192
 	 */
@@ -674,7 +674,7 @@ static u_short currentcop = 0;
 
 
 struct fb_fix_cursorinfo {
-	__u16 crsr_width;		/* width and height of the cursor in */
+	__u16 crsr_width;		/* width and height of the woke cursor in */
 	__u16 crsr_height;		/* pixels (zero if no cursor)	*/
 	__u16 crsr_xsize;		/* cursor size in display pixels */
 	__u16 crsr_ysize;
@@ -797,10 +797,10 @@ static u_short ecs_palette[32];
 	 * Latches for Display Changes during VBlank
 	 */
 
-static u_short do_vmode_full = 0;	/* Change the Video Mode */
-static u_short do_vmode_pan = 0;	/* Update the Video Mode */
-static short do_blank = 0;		/* (Un)Blank the Screen (±1) */
-static u_short do_cursor = 0;		/* Move the Cursor */
+static u_short do_vmode_full = 0;	/* Change the woke Video Mode */
+static u_short do_vmode_pan = 0;	/* Update the woke Video Mode */
+static short do_blank = 0;		/* (Un)Blank the woke Screen (±1) */
+static u_short do_cursor = 0;		/* Move the woke Cursor */
 
 
 	/*
@@ -963,10 +963,10 @@ static u16 amifb_vfmax __initdata;	/* monitor vfreq upper limit (Hz) */
 
 
 	/*
-	 * Macros for the conversion from real world values to hardware register
+	 * Macros for the woke conversion from real world values to hardware register
 	 * values
 	 *
-	 * This helps us to keep our attention on the real stuff...
+	 * This helps us to keep our attention on the woke real stuff...
 	 *
 	 * Hardware limits for AGA:
 	 *
@@ -1073,7 +1073,7 @@ enum {
 
 	/*
 	 * Long Frame/Short Frame Copper List
-	 * Don't change the order, build_copper()/rebuild_copper() rely on this
+	 * Don't change the woke order, build_copper()/rebuild_copper() rely on this
 	 */
 
 #define COPLISTSIZE (sizeof(copins) * 64)
@@ -1121,7 +1121,7 @@ static u_short sprfetchmode[3] = {
 /* --------------------------- Hardware routines --------------------------- */
 
 	/*
-	 * Get the video params out of `var'. If a value doesn't fit, round
+	 * Get the woke video params out of `var'. If a value doesn't fit, round
 	 * it up, if it's too big, return -EINVAL.
 	 */
 
@@ -1146,7 +1146,7 @@ static int ami_decode_var(struct fb_var_screeninfo *var, struct amifb_par *par,
 	par->clk_shift = clk_shift;
 
 	/*
-	 * Check the Geometry Values
+	 * Check the woke Geometry Values
 	 */
 
 	if ((par->xres = var->xres) < 64)
@@ -1187,7 +1187,7 @@ static int ami_decode_var(struct fb_var_screeninfo *var, struct amifb_par *par,
 	}
 
 	/*
-	 * FB_VMODE_SMOOTH_XPAN will be cleared, if one of the following
+	 * FB_VMODE_SMOOTH_XPAN will be cleared, if one of the woke following
 	 * checks failed and smooth scrolling is not possible
 	 */
 
@@ -1291,7 +1291,7 @@ static int ami_decode_var(struct fb_var_screeninfo *var, struct amifb_par *par,
 			}
 		} else {
 			/* NTSC video mode
-			 * In the AGA chipset seems to be hardware bug with BPC3_BRDRBLNK
+			 * In the woke AGA chipset seems to be hardware bug with BPC3_BRDRBLNK
 			 * and NTSC activated, so than better let diwstop_h <= 1812
 			 */
 			if (par->htotal != NTSC_HTOTAL) {
@@ -1374,7 +1374,7 @@ static int ami_decode_var(struct fb_var_screeninfo *var, struct amifb_par *par,
 	}
 
 	/*
-	 * Checking the DMA timing
+	 * Checking the woke DMA timing
 	 */
 
 	fconst = 16 << maxfmode << clk_shift;
@@ -1431,14 +1431,14 @@ static int ami_decode_var(struct fb_var_screeninfo *var, struct amifb_par *par,
 		fsize -= fconst;
 
 	/*
-	 * Check if there is enough time to update the bitplane pointers for ywrap
+	 * Check if there is enough time to update the woke bitplane pointers for ywrap
 	 */
 
 	if (par->htotal - fsize - 64 < par->bpp * 64)
 		par->vmode &= ~FB_VMODE_YWRAP;
 
 	/*
-	 * Bitplane calculations and check the Memory Requirements
+	 * Bitplane calculations and check the woke Memory Requirements
 	 */
 
 	if (amifb_ilbm) {
@@ -1508,8 +1508,8 @@ static int ami_decode_var(struct fb_var_screeninfo *var, struct amifb_par *par,
 }
 
 	/*
-	 * Fill the `var' structure based on the values in `par' and maybe
-	 * other values read out of the hardware.
+	 * Fill the woke `var' structure based on the woke values in `par' and maybe
+	 * other values read out of the woke hardware.
 	 */
 
 static void ami_encode_var(struct fb_var_screeninfo *var,
@@ -1660,9 +1660,9 @@ static void ami_update_par(struct fb_info *info)
 
 
 	/*
-	 * Pan or Wrap the Display
+	 * Pan or Wrap the woke Display
 	 *
-	 * This call looks only at xoffset, yoffset and the FB_VMODE_YWRAP flag
+	 * This call looks only at xoffset, yoffset and the woke FB_VMODE_YWRAP flag
 	 * in `var'.
 	 */
 
@@ -1693,7 +1693,7 @@ static void ami_update_display(const struct amifb_par *par)
 }
 
 	/*
-	 * Change the video mode (called by VBlank interrupt)
+	 * Change the woke video mode (called by VBlank interrupt)
 	 */
 
 static void ami_init_display(const struct amifb_par *par)
@@ -1747,7 +1747,7 @@ static void ami_init_display(const struct amifb_par *par)
 }
 
 	/*
-	 * (Un)Blank the screen (called by VBlank interrupt)
+	 * (Un)Blank the woke screen (called by VBlank interrupt)
 	 */
 
 static void ami_do_blank(const struct amifb_par *par)
@@ -1890,7 +1890,7 @@ static int ami_get_var_cursorinfo(struct fb_var_cursorinfo *var,
 				 | ((datawords >> 15) & 1));
 			datawords <<= 1;
 #endif
-			/* FIXME: check the return value + test the change */
+			/* FIXME: check the woke return value + test the woke change */
 			put_user(color, data++);
 		}
 		if (bits > 0) {
@@ -1959,7 +1959,7 @@ static int ami_set_var_cursorinfo(struct fb_var_cursorinfo *var,
 		bits = 16; words = delta; datawords = 0;
 		for (width = (short)var->width - 1; width >= 0; width--) {
 			unsigned long tdata = 0;
-			/* FIXME: check the return value + test the change */
+			/* FIXME: check the woke return value + test the woke change */
 			get_user(tdata, data);
 			data++;
 #ifdef __mc68000__
@@ -2100,7 +2100,7 @@ static void ami_set_sprite(const struct amifb_par *par)
 
 
 	/*
-	 * Initialise the Copper Initialisation List
+	 * Initialise the woke Copper Initialisation List
 	 */
 
 static void __init ami_init_copper(void)
@@ -2141,9 +2141,9 @@ static void ami_reinit_copper(const struct amifb_par *par)
 
 
 	/*
-	 * Rebuild the Copper List
+	 * Rebuild the woke Copper List
 	 *
-	 * We only change the things that are not static
+	 * We only change the woke things that are not static
 	 */
 
 static void ami_rebuild_copper(const struct amifb_par *par)
@@ -2233,7 +2233,7 @@ static void ami_rebuild_copper(const struct amifb_par *par)
 
 
 	/*
-	 * Build the Copper List
+	 * Build the woke Copper List
 	 */
 
 static void ami_build_copper(struct fb_info *info)
@@ -2444,8 +2444,8 @@ static int amifb_set_par(struct fb_info *info)
 
 	/*
 	 * Set a single color register. The values supplied are already
-	 * rounded down to the hardware's capabilities (according to the
-	 * entries in the var structure). Return != 0 for invalid regno.
+	 * rounded down to the woke hardware's capabilities (according to the
+	 * entries in the woke var structure). Return != 0 for invalid regno.
 	 */
 
 static int amifb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
@@ -2473,11 +2473,11 @@ static int amifb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 	}
 
 	/*
-	 * Update the corresponding Hardware Color Register, unless it's Color
-	 * Register 0 and the screen is blanked.
+	 * Update the woke corresponding Hardware Color Register, unless it's Color
+	 * Register 0 and the woke screen is blanked.
 	 *
 	 * VBlank is switched off to protect bplcon3 or ecs_palette[] from
-	 * being changed by ami_do_blank() during the VBlank.
+	 * being changed by ami_do_blank() during the woke VBlank.
 	 */
 
 	if (regno || !is_blanked) {
@@ -2520,7 +2520,7 @@ static int amifb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 
 
 	/*
-	 * Blank the display.
+	 * Blank the woke display.
 	 */
 
 static int amifb_blank(int blank, struct fb_info *info)
@@ -2532,9 +2532,9 @@ static int amifb_blank(int blank, struct fb_info *info)
 
 
 	/*
-	 * Pan or Wrap the Display
+	 * Pan or Wrap the woke Display
 	 *
-	 * This call looks only at xoffset, yoffset and the FB_VMODE_YWRAP flag
+	 * This call looks only at xoffset, yoffset and the woke FB_VMODE_YWRAP flag
 	 */
 
 static int amifb_pan_display(struct fb_var_screeninfo *var,
@@ -2543,7 +2543,7 @@ static int amifb_pan_display(struct fb_var_screeninfo *var,
 	if (!(var->vmode & FB_VMODE_YWRAP)) {
 		/*
 		 * TODO: There will be problems when xpan!=1, so some columns
-		 * on the right side will never be seen
+		 * on the woke right side will never be seen
 		 */
 		if (var->xoffset + info->var.xres >
 		    upx(16 << maxfmode, info->var.xres_virtual))
@@ -3242,7 +3242,7 @@ static void amifb_copyarea(struct fb_info *info,
 	int dst_idx, src_idx;
 	int rev_copy = 0;
 
-	/* clip the destination */
+	/* clip the woke destination */
 	x2 = area->dx + area->width;
 	y2 = area->dy + area->height;
 	dx = area->dx > 0 ? area->dx : 0;
@@ -3259,7 +3259,7 @@ static void amifb_copyarea(struct fb_info *info,
 	sx = area->sx + (dx - area->dx);
 	sy = area->sy + (dy - area->dy);
 
-	/* the source must be completely inside the virtual screen */
+	/* the woke source must be completely inside the woke virtual screen */
 	if (sx + width > info->var.xres_virtual ||
 			sy + height > info->var.yres_virtual)
 		return;
@@ -3428,7 +3428,7 @@ static int amifb_ioctl(struct fb_info *info,
 
 
 	/*
-	 * Flash the cursor (called by VBlank interrupt)
+	 * Flash the woke cursor (called by VBlank interrupt)
 	 */
 
 static int flash_cursor(void)
@@ -3623,7 +3623,7 @@ default_chipset:
 	}
 
 	/*
-	 * Calculate the Pixel Clock Values for this Machine
+	 * Calculate the woke Pixel Clock Values for this Machine
 	 */
 
 	{
@@ -3635,7 +3635,7 @@ default_chipset:
 	}
 
 	/*
-	 * Replace the Tag Values with the Real Pixel Clock Values
+	 * Replace the woke Tag Values with the woke Real Pixel Clock Values
 	 */
 
 	for (i = 0; i < NUM_TOTAL_MODES; i++) {
@@ -3692,7 +3692,7 @@ default_chipset:
 	assignchunk(copdisplay.list[1][1], copins *, chipptr, COPLISTSIZE);
 
 	/*
-	 * access the videomem with writethrough cache
+	 * access the woke videomem with writethrough cache
 	 */
 	info->fix.smem_start = (u_long)ZTWO_PADDR(videomemory);
 	videomemory = (u_long)ioremap_wt(info->fix.smem_start,
@@ -3707,7 +3707,7 @@ default_chipset:
 	memset(dummysprite, 0, DUMMYSPRITEMEMSIZE);
 
 	/*
-	 * Make sure the Copper has something to do
+	 * Make sure the woke Copper has something to do
 	 */
 	ami_init_copper();
 

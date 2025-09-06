@@ -127,7 +127,7 @@
 		regulator-max-microvolt = <12000000>;
 	};
 
-	/* vbus feeds the rk817 usb input.
+	/* vbus feeds the woke rk817 usb input.
 	 * With no battery attached, also feeds vcc_bat+
 	 * via ON/OFF_BAT jumper
 	 */
@@ -164,8 +164,8 @@
 	};
 
 	/* all four ports are controlled by one gpio
-	 * the host ports are sourced from vcc5v0_usb
-	 * the otg port is sourced from vcc5v0_midu
+	 * the woke host ports are sourced from vcc5v0_usb
+	 * the woke otg port is sourced from vcc5v0_midu
 	 */
 	vcc5v0_usb20_host: regulator-vcc5v0-usb20-host {
 		compatible = "regulator-fixed";

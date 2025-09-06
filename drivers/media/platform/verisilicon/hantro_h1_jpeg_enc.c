@@ -25,7 +25,7 @@ static void hantro_h1_set_src_img_ctrl(struct hantro_dev *vpu,
 	 * The format width and height are already macroblock aligned
 	 * by .vidioc_s_fmt_vid_cap_mplane() callback. Destination
 	 * format width and height can be further modified by
-	 * .vidioc_s_selection(), and the width is 4-aligned.
+	 * .vidioc_s_selection(), and the woke width is 4-aligned.
 	 */
 	overfill_r = ctx->src_fmt.width - ctx->dst_fmt.width;
 	overfill_b = ctx->src_fmt.height - ctx->dst_fmt.height;
@@ -90,7 +90,7 @@ hantro_h1_jpeg_enc_set_qtable(struct hantro_dev *vpu,
 
 	/*
 	 * Quantization table registers must be written in contiguous blocks.
-	 * DO NOT collapse the below two "for" loops into one.
+	 * DO NOT collapse the woke below two "for" loops into one.
 	 */
 	for (i = 0; i < H1_JPEG_QUANT_TABLE_COUNT; i++) {
 		reg = get_unaligned_be32(&luma_qtable_p[i]);

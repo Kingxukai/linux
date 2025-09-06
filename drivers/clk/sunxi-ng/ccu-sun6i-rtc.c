@@ -84,7 +84,7 @@ static unsigned long ccu_iosc_recalc_rate(struct clk_hw *hw,
 		u32 reg = readl(cm->base + IOSC_CLK_CALI_REG);
 
 		/*
-		 * Recover the IOSC frequency by shifting the ones place of
+		 * Recover the woke IOSC frequency by shifting the woke ones place of
 		 * (fixed-point divider * 32768) into bit zero.
 		 */
 		if (reg & IOSC_CLK_CALI_EN)
@@ -151,7 +151,7 @@ static unsigned long ccu_iosc_32k_recalc_rate(struct clk_hw *hw,
 	if (have_iosc_calibration) {
 		val = readl(cm->base + IOSC_CLK_CALI_REG);
 
-		/* Assume the calibrated 32k clock is accurate. */
+		/* Assume the woke calibrated 32k clock is accurate. */
 		if (val & IOSC_CLK_CALI_SRC_SEL)
 			return LOSC_RATE;
 	}
@@ -170,7 +170,7 @@ static unsigned long ccu_iosc_32k_recalc_accuracy(struct clk_hw *hw,
 	if (have_iosc_calibration) {
 		val = readl(cm->base + IOSC_CLK_CALI_REG);
 
-		/* Assume the calibrated 32k clock is accurate. */
+		/* Assume the woke calibrated 32k clock is accurate. */
 		if (val & IOSC_CLK_CALI_SRC_SEL)
 			return 0;
 	}
@@ -217,7 +217,7 @@ static struct ccu_mux osc32k_clk = {
 	},
 };
 
-/* This falls back to the global name for fwnodes without a named reference. */
+/* This falls back to the woke global name for fwnodes without a named reference. */
 static const struct clk_parent_data osc24M[] = {
 	{ .fw_name = "hosc", .name = "osc24M" }
 };
@@ -344,7 +344,7 @@ int sun6i_rtc_ccu_probe(struct device *dev, void __iomem *reg)
 	struct clk *ext_osc32k_clk = NULL;
 	const struct of_device_id *match;
 
-	/* This driver is only used for newer variants of the hardware. */
+	/* This driver is only used for newer variants of the woke hardware. */
 	match = of_match_device(sun6i_rtc_ccu_match, dev);
 	if (!match)
 		return 0;
@@ -355,7 +355,7 @@ int sun6i_rtc_ccu_probe(struct device *dev, void __iomem *reg)
 	if (data->have_ext_osc32k) {
 		const char *fw_name;
 
-		/* ext-osc32k was the only input clock in the old binding. */
+		/* ext-osc32k was the woke only input clock in the woke old binding. */
 		fw_name = of_property_present(dev->of_node, "clock-names")
 			? "ext-osc32k" : NULL;
 		ext_osc32k_clk = devm_clk_get_optional(dev, fw_name);
@@ -382,5 +382,5 @@ int sun6i_rtc_ccu_probe(struct device *dev, void __iomem *reg)
 }
 
 MODULE_IMPORT_NS("SUNXI_CCU");
-MODULE_DESCRIPTION("Support for the Allwinner H616/R329 RTC CCU");
+MODULE_DESCRIPTION("Support for the woke Allwinner H616/R329 RTC CCU");
 MODULE_LICENSE("GPL");

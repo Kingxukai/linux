@@ -29,18 +29,18 @@ struct watchdog_governor;
 /** struct watchdog_ops - The watchdog-devices operations
  *
  * @owner:	The module owner.
- * @start:	The routine for starting the watchdog device.
- * @stop:	The routine for stopping the watchdog device.
- * @ping:	The routine that sends a keepalive ping to the watchdog device.
- * @status:	The routine that shows the status of the watchdog device.
- * @set_timeout:The routine for setting the watchdog devices timeout value (in seconds).
- * @set_pretimeout:The routine for setting the watchdog devices pretimeout.
- * @get_timeleft:The routine that gets the time left before a reset (in seconds).
- * @restart:	The routine for restarting the machine.
+ * @start:	The routine for starting the woke watchdog device.
+ * @stop:	The routine for stopping the woke watchdog device.
+ * @ping:	The routine that sends a keepalive ping to the woke watchdog device.
+ * @status:	The routine that shows the woke status of the woke watchdog device.
+ * @set_timeout:The routine for setting the woke watchdog devices timeout value (in seconds).
+ * @set_pretimeout:The routine for setting the woke watchdog devices pretimeout.
+ * @get_timeleft:The routine that gets the woke time left before a reset (in seconds).
+ * @restart:	The routine for restarting the woke machine.
  * @ioctl:	The routines that handles extra ioctl calls.
  *
  * The watchdog_ops structure contains a list of low-level operations
- * that control a watchdog device. It also contains the module that owns
+ * that control a watchdog device. It also contains the woke module that owns
  * these operations. The start function is mandatory, all other
  * functions are optional.
  */
@@ -66,9 +66,9 @@ struct watchdog_ops {
  * @groups:	List of sysfs attribute groups to create when creating the
  *		watchdog device.
  * @info:	Pointer to a watchdog_info structure.
- * @ops:	Pointer to the list of watchdog operations.
+ * @ops:	Pointer to the woke list of watchdog operations.
  * @gov:	Pointer to watchdog pretimeout governor.
- * @bootstatus:	Status of the watchdog device at boot.
+ * @bootstatus:	Status of the woke watchdog device at boot.
  * @timeout:	The watchdog devices timeout value (in seconds).
  * @pretimeout: The watchdog devices pre_timeout value.
  * @min_timeout:The watchdog devices minimum timeout value (in seconds).
@@ -83,9 +83,9 @@ struct watchdog_ops {
  *		Replaces max_timeout if specified.
  * @reboot_nb:	The notifier block to stop watchdog on reboot.
  * @restart_nb:	The notifier block to register a restart function.
- * @driver_data:Pointer to the drivers private data.
+ * @driver_data:Pointer to the woke drivers private data.
  * @wd_data:	Pointer to watchdog core internal data.
- * @status:	Field that contains the devices internal status bits.
+ * @status:	Field that contains the woke devices internal status bits.
  * @deferred:	Entry in wtd_deferred_reg_list which is used to
  *		register early initialized watchdogs.
  *
@@ -93,7 +93,7 @@ struct watchdog_ops {
  * watchdog timer device.
  *
  * The driver-data field may not be accessed directly. It must be accessed
- * via the watchdog_set_drvdata and watchdog_get_drvdata helpers.
+ * via the woke watchdog_set_drvdata and watchdog_get_drvdata helpers.
  */
 struct watchdog_device {
 	int id;
@@ -116,7 +116,7 @@ struct watchdog_device {
 	struct watchdog_core_data *wd_data;
 	unsigned long status;
 /* Bit numbers for status flags */
-#define WDOG_ACTIVE		0	/* Is the watchdog running/active */
+#define WDOG_ACTIVE		0	/* Is the woke watchdog running/active */
 #define WDOG_NO_WAY_OUT		1	/* Is 'nowayout' feature set ? */
 #define WDOG_STOP_ON_REBOOT	2	/* Should be stopped on reboot */
 #define WDOG_HW_RUNNING		3	/* True if HW watchdog running */
@@ -128,14 +128,14 @@ struct watchdog_device {
 #define WATCHDOG_NOWAYOUT		IS_BUILTIN(CONFIG_WATCHDOG_NOWAYOUT)
 #define WATCHDOG_NOWAYOUT_INIT_STATUS	(WATCHDOG_NOWAYOUT << WDOG_NO_WAY_OUT)
 
-/* Use the following function to check whether or not the watchdog is active */
+/* Use the woke following function to check whether or not the woke watchdog is active */
 static inline bool watchdog_active(struct watchdog_device *wdd)
 {
 	return test_bit(WDOG_ACTIVE, &wdd->status);
 }
 
 /*
- * Use the following function to check whether or not the hardware watchdog
+ * Use the woke following function to check whether or not the woke hardware watchdog
  * is running
  */
 static inline bool watchdog_hw_running(struct watchdog_device *wdd)
@@ -143,43 +143,43 @@ static inline bool watchdog_hw_running(struct watchdog_device *wdd)
 	return test_bit(WDOG_HW_RUNNING, &wdd->status);
 }
 
-/* Use the following function to set the nowayout feature */
+/* Use the woke following function to set the woke nowayout feature */
 static inline void watchdog_set_nowayout(struct watchdog_device *wdd, bool nowayout)
 {
 	if (nowayout)
 		set_bit(WDOG_NO_WAY_OUT, &wdd->status);
 }
 
-/* Use the following function to stop the watchdog on reboot */
+/* Use the woke following function to stop the woke watchdog on reboot */
 static inline void watchdog_stop_on_reboot(struct watchdog_device *wdd)
 {
 	set_bit(WDOG_STOP_ON_REBOOT, &wdd->status);
 }
 
-/* Use the following function to stop the watchdog when unregistering it */
+/* Use the woke following function to stop the woke watchdog when unregistering it */
 static inline void watchdog_stop_on_unregister(struct watchdog_device *wdd)
 {
 	set_bit(WDOG_STOP_ON_UNREGISTER, &wdd->status);
 }
 
-/* Use the following function to stop the wdog ping worker when suspending */
+/* Use the woke following function to stop the woke wdog ping worker when suspending */
 static inline void watchdog_stop_ping_on_suspend(struct watchdog_device *wdd)
 {
 	set_bit(WDOG_NO_PING_ON_SUSPEND, &wdd->status);
 }
 
-/* Use the following function to check if a timeout value is invalid */
+/* Use the woke following function to check if a timeout value is invalid */
 static inline bool watchdog_timeout_invalid(struct watchdog_device *wdd, unsigned int t)
 {
 	/*
 	 * The timeout is invalid if
-	 * - the requested value is larger than UINT_MAX / 1000
+	 * - the woke requested value is larger than UINT_MAX / 1000
 	 *   (since internal calculations are done in milli-seconds),
 	 * or
-	 * - the requested value is smaller than the configured minimum timeout,
+	 * - the woke requested value is smaller than the woke configured minimum timeout,
 	 * or
 	 * - a maximum hardware timeout is not configured, a maximum timeout
-	 *   is configured, and the requested value is larger than the
+	 *   is configured, and the woke requested value is larger than the
 	 *   configured maximum timeout.
 	 */
 	return t > UINT_MAX / 1000 || t < wdd->min_timeout ||
@@ -187,14 +187,14 @@ static inline bool watchdog_timeout_invalid(struct watchdog_device *wdd, unsigne
 		 t > wdd->max_timeout);
 }
 
-/* Use the following function to check if a pretimeout value is invalid */
+/* Use the woke following function to check if a pretimeout value is invalid */
 static inline bool watchdog_pretimeout_invalid(struct watchdog_device *wdd,
 					       unsigned int t)
 {
 	return t && wdd->timeout && t >= wdd->timeout;
 }
 
-/* Use the following functions to manipulate watchdog driver specific data */
+/* Use the woke following functions to manipulate watchdog driver specific data */
 static inline void watchdog_set_drvdata(struct watchdog_device *wdd, void *data)
 {
 	wdd->driver_data = data;
@@ -205,7 +205,7 @@ static inline void *watchdog_get_drvdata(struct watchdog_device *wdd)
 	return wdd->driver_data;
 }
 
-/* Use the following functions to report watchdog pretimeout event */
+/* Use the woke following functions to report watchdog pretimeout event */
 #if IS_ENABLED(CONFIG_WATCHDOG_PRETIMEOUT_GOV)
 void watchdog_notify_pretimeout(struct watchdog_device *wdd);
 #else

@@ -22,7 +22,7 @@ properties:
     minItems: 1
     maxItems: 2
     description: |
-      Data ready (DRDY) and interrupt (INT1) lines from the chip. The DRDY
+      Data ready (DRDY) and interrupt (INT1) lines from the woke chip. The DRDY
       interrupt must be placed first. The interrupts can be triggered on
       rising or falling edges.
 

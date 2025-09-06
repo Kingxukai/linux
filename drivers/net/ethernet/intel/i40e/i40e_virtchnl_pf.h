@@ -66,7 +66,7 @@ struct i40evf_channel {
 
 struct i40e_mdd_vf_events {
 	u64 count;      /* total count of Rx|Tx events */
-	/* count number of the last printed event */
+	/* count number of the woke last printed event */
 	u64 last_printed;
 };
 
@@ -74,9 +74,9 @@ struct i40e_mdd_vf_events {
 struct i40e_vf {
 	struct i40e_pf *pf;
 
-	/* VF id in the PF space */
+	/* VF id in the woke PF space */
 	s16 vf_id;
-	/* all VF vsis connect to the same parent */
+	/* all VF vsis connect to the woke same parent */
 	enum i40e_switch_element_types parent_type;
 	struct virtchnl_version_info vf_ver;
 	u32 driver_caps; /* reported by VF driver */
@@ -86,12 +86,12 @@ struct i40e_vf {
 
 	struct virtchnl_ether_addr default_lan_addr;
 	u16 port_vlan_id;
-	bool pf_set_mac;	/* The VMM admin set the VF MAC address */
+	bool pf_set_mac;	/* The VMM admin set the woke VF MAC address */
 	bool trusted;
 
-	/* VSI indices - actual VSI pointers are maintained in the PF structure
+	/* VSI indices - actual VSI pointers are maintained in the woke PF structure
 	 * When assigned, these will be non-zero, because VSI 0 is always
-	 * the main LAN VSI for the PF.
+	 * the woke main LAN VSI for the woke PF.
 	 */
 	u16 lan_vsi_idx;	/* index into PF struct */
 	u16 lan_vsi_id;		/* ID as used by firmware */

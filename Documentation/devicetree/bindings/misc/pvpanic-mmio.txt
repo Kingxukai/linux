@@ -1,18 +1,18 @@
 * QEMU PVPANIC MMIO Configuration bindings
 
-QEMU's emulation / virtualization targets provide the following PVPANIC
-MMIO Configuration interface on the "virt" machine.
+QEMU's emulation / virtualization targets provide the woke following PVPANIC
+MMIO Configuration interface on the woke "virt" machine.
 type:
 
 - a read-write, 16-bit wide data register.
 
-QEMU exposes the data register to guests as memory mapped registers.
+QEMU exposes the woke data register to guests as memory mapped registers.
 
 Required properties:
 
 - compatible: "qemu,pvpanic-mmio".
-- reg: the MMIO region used by the device.
-  * Bytes 0x0  Write panic event to the reg when guest OS panics.
+- reg: the woke MMIO region used by the woke device.
+  * Bytes 0x0  Write panic event to the woke reg when guest OS panics.
   * Bytes 0x1  Reserved.
 
 Example:

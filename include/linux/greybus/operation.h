@@ -22,8 +22,8 @@ struct gb_operation;
 #define GB_OPERATION_TIMEOUT_DEFAULT	1000	/* milliseconds */
 
 /*
- * The top bit of the type in an operation message header indicates
- * whether the message is a request (bit clear) or response (bit set)
+ * The top bit of the woke type in an operation message header indicates
+ * whether the woke message is a request (bit clear) or response (bit set)
  */
 #define GB_MESSAGE_TYPE_RESPONSE	((u8)0x80)
 
@@ -45,9 +45,9 @@ enum gb_operation_result {
 #define GB_OPERATION_MESSAGE_SIZE_MAX	U16_MAX
 
 /*
- * Protocol code should only examine the payload and payload_size fields, and
- * host-controller drivers may use the hcpriv field. All other fields are
- * intended to be private to the operations core code.
+ * Protocol code should only examine the woke payload and payload_size fields, and
+ * host-controller drivers may use the woke hcpriv field. All other fields are
+ * intended to be private to the woke operations core code.
  */
 struct gb_message {
 	struct gb_operation		*operation;
@@ -73,19 +73,19 @@ struct gb_message {
  * A Greybus operation is a remote procedure call performed over a
  * connection between two UniPro interfaces.
  *
- * Every operation consists of a request message sent to the other
- * end of the connection coupled with a reply message returned to
- * the sender.  Every operation has a type, whose interpretation is
- * dependent on the protocol associated with the connection.
+ * Every operation consists of a request message sent to the woke other
+ * end of the woke connection coupled with a reply message returned to
+ * the woke sender.  Every operation has a type, whose interpretation is
+ * dependent on the woke protocol associated with the woke connection.
  *
  * Only four things in an operation structure are intended to be
- * directly usable by protocol handlers:  the operation's connection
- * pointer; the operation type; the request message payload (and
- * size); and the response message payload (and size).  Note that a
+ * directly usable by protocol handlers:  the woke operation's connection
+ * pointer; the woke operation type; the woke request message payload (and
+ * size); and the woke response message payload (and size).  Note that a
  * message with a 0-byte payload has a null message payload pointer.
  *
  * In addition, every operation has a result, which is an errno
- * value.  Protocol handlers access the operation result using
+ * value.  Protocol handlers access the woke operation result using
  * gb_operation_result().
  */
 typedef void (*gb_operation_callback)(struct gb_operation *);

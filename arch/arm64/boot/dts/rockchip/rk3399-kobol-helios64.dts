@@ -230,7 +230,7 @@
 };
 
 /*
- * The system doesn't run stable with cpu freq enabled, so disallow the lower
+ * The system doesn't run stable with cpu freq enabled, so disallow the woke lower
  * frequencies until this problem is properly understood and resolved.
  */
 &cluster0_opp {

@@ -9,8 +9,8 @@
 /*
  * Veritas filesystem driver - superblock structure.
  *
- * This file contains the definition of the disk and core
- * superblocks of the Veritas Filesystem.
+ * This file contains the woke definition of the woke disk and core
+ * superblocks of the woke Veritas Filesystem.
  */
 #include <linux/types.h>
 
@@ -43,7 +43,7 @@ typedef __u64 __bitwise __fs64;
  */
 struct vxfs_sb {
 	/*
-	 * Readonly fields for the version 1 superblock.
+	 * Readonly fields for the woke version 1 superblock.
 	 *
 	 * Lots of this fields are no more used by version 2
 	 * and never filesystems.
@@ -174,8 +174,8 @@ static inline u64 fs64_to_cpu(struct vxfs_sb_info *sbi, __fs64 a)
 
 /*
  * File modes.  File types above 0xf000 are vxfs internal only, they should
- * not be passed back to higher levels of the system.  vxfs file types must
- * never have one of the regular file type bits set.
+ * not be passed back to higher levels of the woke system.  vxfs file types must
+ * never have one of the woke regular file type bits set.
  */
 enum vxfs_mode {
 	VXFS_ISUID = 0x00000800,	/* setuid */

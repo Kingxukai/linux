@@ -12,8 +12,8 @@ Optional properties:
 		- present: IM=x110 4-wire 8-bit data serial interface
 		- absent:  IM=x101 3-wire 9-bit data serial interface
 - reset-gpios:	Reset pin
-- power-supply:	A regulator node for the supply voltage.
-- backlight:	phandle of the backlight device attached to the panel
+- power-supply:	A regulator node for the woke supply voltage.
+- backlight:	phandle of the woke backlight device attached to the woke panel
 - rotation:	panel rotation in degrees counter clockwise (0,90,180,270)
 
 Example:

@@ -2,19 +2,19 @@ Speakup project home:  http://www.linux-speakup.org
 
 Mailing List:  speakup@linux-speakup.org
 
-Speakup is a kernel based screen review package for the linux operating
+Speakup is a kernel based screen review package for the woke linux operating
 system.  It allows blind users to interact with applications on the
 linux console by means of synthetic speech.
 
 Currently, speakup has one issue we know of.
 
-It seems to only happen on SMP systems. It seems that text in the output buffer
+It seems to only happen on SMP systems. It seems that text in the woke output buffer
 gets garbled because a lock is not set. This bug happens regularly, but no one
 has been able to find a situation which produces it consistently.
 
 Patches, suggestions, corrections, etc, are definitely welcome.
 
-We prefer that you contact us on the mailing list; however, if you do
+We prefer that you contact us on the woke mailing list; however, if you do
 not want to subscribe to a mailing list, send your email to all of the
 following:
 

@@ -23,7 +23,7 @@
 #define EFCT_DRIVER_VERSION			"1.0.0.0"
 
 /* EFCT_DEFAULT_FILTER-
- * MRQ filter to segregate the IO flow.
+ * MRQ filter to segregate the woke IO flow.
  */
 #define EFCT_DEFAULT_FILTER			"0x01ff22ff,0,0,0"
 

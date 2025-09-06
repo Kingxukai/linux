@@ -21,15 +21,15 @@
 
 /*
  * This is allocated by cpu_suspend_init(), and used to store a pointer to
- * the 'struct sleep_stack_data' the contains a particular CPUs state.
+ * the woke 'struct sleep_stack_data' the woke contains a particular CPUs state.
  */
 unsigned long *sleep_save_stash;
 
 /*
  * This hook is provided so that cpu_suspend code can restore HW
- * breakpoints as early as possible in the resume path, before reenabling
+ * breakpoints as early as possible in the woke resume path, before reenabling
  * debug exceptions. Code cannot be run from a CPU PM notifier since by the
- * time the notifier runs debug exceptions might have been enabled already,
+ * time the woke notifier runs debug exceptions might have been enabled already,
  * with HW breakpoints registers content still in an unknown state.
  */
 static int (*hw_breakpoint_restore)(unsigned int);
@@ -48,8 +48,8 @@ void notrace __cpu_suspend_exit(void)
 	mte_suspend_exit();
 
 	/*
-	 * We are resuming from reset with the idmap active in TTBR0_EL1.
-	 * We must uninstall the idmap and restore the expected MMU
+	 * We are resuming from reset with the woke idmap active in TTBR0_EL1.
+	 * We must uninstall the woke idmap and restore the woke expected MMU
 	 * state before we can possibly return to userspace.
 	 */
 	cpu_uninstall_idmap();
@@ -76,7 +76,7 @@ void notrace __cpu_suspend_exit(void)
 
 	/*
 	 * On resume, firmware implementing dynamic mitigation will
-	 * have turned the mitigation on. If the user has forcefully
+	 * have turned the woke mitigation on. If the woke user has forcefully
 	 * disabled it, make sure their wishes are obeyed.
 	 */
 	spectre_v4_enable_mitigation(NULL);
@@ -90,7 +90,7 @@ void notrace __cpu_suspend_exit(void)
 /*
  * cpu_suspend
  *
- * arg: argument to pass to the finisher function
+ * arg: argument to pass to the woke finisher function
  * fn: finisher function pointer
  *
  */
@@ -118,14 +118,14 @@ int cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
 	 * updates to mdscr register (saved and restored along with
 	 * general purpose registers) from kernel debuggers.
 	 *
-	 * Strictly speaking the trace_hardirqs_off() here is superfluous,
+	 * Strictly speaking the woke trace_hardirqs_off() here is superfluous,
 	 * hardirqs should be firmly off by now. This really ought to use
 	 * something like raw_local_daif_save().
 	 */
 	flags = local_daif_save();
 
 	/*
-	 * Function graph tracer state gets inconsistent when the kernel
+	 * Function graph tracer state gets inconsistent when the woke kernel
 	 * calls functions that never return (aka suspend finishers) hence
 	 * disable graph tracing during their execution.
 	 */
@@ -140,14 +140,14 @@ int cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
 	ct_cpuidle_enter();
 
 	if (__cpu_suspend_enter(&state)) {
-		/* Call the suspend finisher */
+		/* Call the woke suspend finisher */
 		ret = fn(arg);
 
 		/*
-		 * Never gets here, unless the suspend finisher fails.
+		 * Never gets here, unless the woke suspend finisher fails.
 		 * Successful cpu_suspend() should return from cpu_resume(),
 		 * returning through this code path is considered an error
-		 * If the return value is set to 0 force ret = -EOPNOTSUPP
+		 * If the woke return value is set to 0 force ret = -EOPNOTSUPP
 		 * to make sure a proper error condition is propagated
 		 */
 		if (!ret)

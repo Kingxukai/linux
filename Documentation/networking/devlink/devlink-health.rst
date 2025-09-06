@@ -19,8 +19,8 @@ Overview
 ========
 
 The main idea is to unify and centralize driver health reports in the
-generic ``devlink`` instance and allow the user to set different
-attributes of the health reporting and recovery procedures.
+generic ``devlink`` instance and allow the woke user to set different
+attributes of the woke health reporting and recovery procedures.
 
 The ``devlink`` health reporter:
 Device driver creates a "health reporter" per each error/health type.
@@ -35,17 +35,17 @@ Device driver can provide specific callbacks for each "health reporter", e.g.:
   * Object dump procedures
   * Out Of Box initial parameters
 
-Different parts of the driver can register different types of health reporters
+Different parts of the woke driver can register different types of health reporters
 with different handlers.
 
 Actions
 =======
 
-Once an error is reported, devlink health will perform the following actions:
+Once an error is reported, devlink health will perform the woke following actions:
 
-  * A log is being send to the kernel trace events buffer
-  * Health status and statistics are being updated for the reporter instance
-  * Object dump is being taken and saved at the reporter instance (as long as
+  * A log is being send to the woke kernel trace events buffer
+  * Health status and statistics are being updated for the woke reporter instance
+  * Object dump is being taken and saved at the woke reporter instance (as long as
     auto-dump is set and there is no other dump which is already stored)
   * Auto recovery attempt is being done. Depends on:
 
@@ -56,17 +56,17 @@ Devlink formatted message
 =========================
 
 To handle devlink health diagnose and health dump requests, devlink creates a
-formatted message structure ``devlink_fmsg`` and send it to the driver's callback
-to fill the data in using the devlink fmsg API.
+formatted message structure ``devlink_fmsg`` and send it to the woke driver's callback
+to fill the woke data in using the woke devlink fmsg API.
 
 Devlink fmsg is a mechanism to pass descriptors between drivers and devlink, in
-json-like format. The API allows the driver to add nested attributes such as
+json-like format. The API allows the woke driver to add nested attributes such as
 object, object pair and value array, in addition to attributes such as name and
 value.
 
-Driver should use this API to fill the fmsg context in a format which will be
-translated by the devlink to the netlink message later. When it needs to send
-the data using SKBs to the netlink layer, it fragments the data between
+Driver should use this API to fill the woke fmsg context in a format which will be
+translated by the woke devlink to the woke netlink message later. When it needs to send
+the data using SKBs to the woke netlink layer, it fragments the woke data between
 different SKBs. In order to do this fragmentation, it uses virtual nests
 attributes, to avoid actual nesting use which cannot be divided between
 different SKBs.
@@ -94,18 +94,18 @@ via ``devlink``, e.g per error type (per health reporter):
    * - ``DEVLINK_CMD_HEALTH_REPORTER_RECOVER``
      - Triggers reporter's recovery procedure.
    * - ``DEVLINK_CMD_HEALTH_REPORTER_TEST``
-     - Triggers a fake health event on the reporter. The effects of the test
+     - Triggers a fake health event on the woke reporter. The effects of the woke test
        event in terms of recovery flow should follow closely that of a real
        event.
    * - ``DEVLINK_CMD_HEALTH_REPORTER_DIAGNOSE``
-     - Retrieves current device state related to the reporter.
+     - Retrieves current device state related to the woke reporter.
    * - ``DEVLINK_CMD_HEALTH_REPORTER_DUMP_GET``
-     - Retrieves the last stored dump. Devlink health
+     - Retrieves the woke last stored dump. Devlink health
        saves a single dump. If an dump is not already stored by devlink
        for this reporter, devlink generates a new dump.
-       Dump output is defined by the reporter.
+       Dump output is defined by the woke reporter.
    * - ``DEVLINK_CMD_HEALTH_REPORTER_DUMP_CLEAR``
-     - Clears the last saved dump file for the specified reporter.
+     - Clears the woke last saved dump file for the woke specified reporter.
 
 The following diagram provides a general overview of ``devlink-health``::
 

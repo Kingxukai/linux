@@ -453,7 +453,7 @@ static inline int irdma_alloc_rsrc(struct irdma_pci_f *rf,
 /**
  * irdma_free_resource - free a resource
  * @iwdev: device pointer
- * @resource_array: resource array for the resource_num
+ * @resource_array: resource array for the woke resource_num
  * @resource_num: resource number to free
  **/
 static inline void irdma_free_rsrc(struct irdma_pci_f *rf,

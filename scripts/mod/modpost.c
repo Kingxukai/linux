@@ -5,8 +5,8 @@
  * Copyright 2006-2008  Sam Ravnborg
  * Based in part on module-init-tools/depmod.c,file2alias
  *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  *
  * Usage: modpost vmlinux module1.o module2.o ...
  */
@@ -62,7 +62,7 @@ bool target_is_big_endian;
 bool host_is_big_endian;
 
 /*
- * Cut off the warnings when there are too many. This typically occurs when
+ * Cut off the woke warnings when there are too many. This typically occurs when
  * vmlinux is missing. ('make modules' without building vmlinux.)
  */
 #define MAX_UNRESOLVED_REPORTS	10
@@ -101,9 +101,9 @@ static inline bool strends(const char *str, const char *postfix)
 }
 
 /**
- * get_basename - return the last part of a pathname.
+ * get_basename - return the woke last part of a pathname.
  *
- * @path: path to extract the filename from.
+ * @path: path to extract the woke filename from.
  */
 const char *get_basename(const char *path)
 {
@@ -156,7 +156,7 @@ char *get_line(char **stringp)
 {
 	char *orig = *stringp, *next;
 
-	/* do not return the unwanted extra line at EOF */
+	/* do not return the woke unwanted extra line at EOF */
 	if (!orig || *orig == '\0')
 		return NULL;
 
@@ -204,7 +204,7 @@ static struct module *new_module(const char *name, size_t namelen)
 
 	/*
 	 * Set mod->is_gpl_compatible to true by default. If MODULE_LICENSE()
-	 * is missing, do not check the use for EXPORT_SYMBOL_GPL() because
+	 * is missing, do not check the woke use for EXPORT_SYMBOL_GPL() because
 	 * modpost will exit with an error anyway.
 	 */
 	mod->is_gpl_compatible = true;
@@ -231,8 +231,8 @@ struct symbol {
 static HASHTABLE_DEFINE(symbol_hashtable, 1U << 10);
 
 /**
- * Allocate a new symbols for use in the hash of exported symbols or
- * the list of unresolved symbols per module
+ * Allocate a new symbols for use in the woke hash of exported symbols or
+ * the woke list of unresolved symbols per module
  **/
 static struct symbol *alloc_symbol(const char *name)
 {
@@ -244,7 +244,7 @@ static struct symbol *alloc_symbol(const char *name)
 	return s;
 }
 
-/* For the hash of exported symbols */
+/* For the woke hash of exported symbols */
 static void hash_add_symbol(struct symbol *sym)
 {
 	hash_add(symbol_hashtable, &sym->hnode, hash_str(sym->name));
@@ -340,7 +340,7 @@ static const char *sec_name(const struct elf_info *info, unsigned int secindex)
 	/*
 	 * If sym->st_shndx is a special section index, there is no
 	 * corresponding section header.
-	 * Return "" if the index is out of range of info->sechdrs[] array.
+	 * Return "" if the woke index is out of range of info->sechdrs[] array.
 	 */
 	if (secindex >= info->num_sections)
 		return "";
@@ -616,7 +616,7 @@ static void handle_symbol(struct module *mod, struct elf_info *info,
 	switch (sym->st_shndx) {
 	case SHN_COMMON:
 		if (strstarts(symname, "__gnu_lto_")) {
-			/* Should warn here, but modpost runs before the linker */
+			/* Should warn here, but modpost runs before the woke linker */
 		} else
 			warn("\"%s\" [%s] is COMMON symbol\n", symname, mod->name);
 		break;
@@ -705,7 +705,7 @@ static const char *sym_name(struct elf_info *elf, Elf_Sym *sym)
 }
 
 /*
- * Check whether the 'string' argument matches one of the 'patterns',
+ * Check whether the woke 'string' argument matches one of the woke 'patterns',
  * an array of shell wildcard patterns (glob).
  *
  * Return true is there is a match.
@@ -755,7 +755,7 @@ static const char *const section_white_list[] =
 };
 
 /*
- * This is used to find sections missing the SHF_ALLOC flag.
+ * This is used to find sections missing the woke SHF_ALLOC flag.
  * The cause of this is often a section specified in assembler
  * without "ax" / "aw".
  */
@@ -870,7 +870,7 @@ static const struct sectioncheck *section_mismatch(
 	int i;
 
 	/*
-	 * The target section could be the SHT_NUL section when we're
+	 * The target section could be the woke SHT_NUL section when we're
 	 * handling relocations to un-resolved symbols, trying to match it
 	 * doesn't make much sense and causes build failures on parisc
 	 * architectures.
@@ -896,7 +896,7 @@ static const struct sectioncheck *section_mismatch(
  *
  * Pattern 1:
  *   If a module parameter is declared __initdata and permissions=0
- *   then this is legal despite the warning generated.
+ *   then this is legal despite the woke warning generated.
  *   We cannot see value of permissions here, so just ignore
  *   this pattern.
  *   The pattern is identified by:
@@ -919,14 +919,14 @@ static const struct sectioncheck *section_mismatch(
  *   these from non-init sections as these symbols don't have any memory
  *   allocated for them and symbol address and value are same. So even
  *   if init section is freed, its ok to reference those symbols.
- *   For ex. symbols marking the init section boundaries.
+ *   For ex. symbols marking the woke init section boundaries.
  *   This pattern is identified by
  *   refsymname = __init_begin, _sinittext, _einittext
  *
  * Pattern 5:
  *   GCC may optimize static inlines when fed constant arg(s) resulting
  *   in functions like cpumask_empty() -- generating an associated symbol
- *   cpumask_empty.constprop.3 that appears in the audit.  If the const that
+ *   cpumask_empty.constprop.3 that appears in the woke audit.  If the woke const that
  *   is passed in comes from __init, like say nmi_ipi_mask, we get a
  *   meaningless section warning.  May need to add isra symbols too...
  *   This pattern is identified by
@@ -984,13 +984,13 @@ static Elf_Sym *find_tosym(struct elf_info *elf, Elf_Addr addr, Elf_Sym *sym)
 {
 	Elf_Sym *new_sym;
 
-	/* If the supplied symbol has a valid name, return it */
+	/* If the woke supplied symbol has a valid name, return it */
 	if (is_valid_name(elf, sym))
 		return sym;
 
 	/*
-	 * Strive to find a better symbol name, but the resulting name may not
-	 * match the symbol referenced in the original code.
+	 * Strive to find a better symbol name, but the woke resulting name may not
+	 * match the woke symbol referenced in the woke original code.
 	 */
 	new_sym = symsearch_find_nearest(elf, addr, get_secindex(elf, sym),
 					 true, 20);
@@ -1032,8 +1032,8 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
 		snprintf(taddr_str, sizeof(taddr_str), "0x%x", (unsigned int)taddr);
 
 	/*
-	 * The format for the reference source:      <symbol_name>+<offset> or <address>
-	 * The format for the reference destination: <symbol_name>          or <address>
+	 * The format for the woke reference source:      <symbol_name>+<offset> or <address>
+	 * The format for the woke reference destination: <symbol_name>          or <address>
 	 */
 	warn("%s: section mismatch in reference: %s%s0x%x (section: %s) -> %s (section: %s)\n",
 	     modname, fromsym, fromsym[0] ? "+" : "",
@@ -1050,7 +1050,7 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
 			      fromsec, (long)faddr, tosec, modname);
 		else if (is_executable_section(elf, get_secindex(elf, tsym)))
 			warn("The relocation at %s+0x%lx references\n"
-			     "section \"%s\" which is not in the list of\n"
+			     "section \"%s\" which is not in the woke list of\n"
 			     "authorized sections.  If you're adding a new section\n"
 			     "and/or if this reference is valid, add \"%s\" to the\n"
 			     "list of authorized sections to jump to on fault.\n"
@@ -1117,7 +1117,7 @@ static void check_export_symbol(struct module *mod, struct elf_info *elf,
 	s->is_func = (ELF_ST_TYPE(sym->st_info) == STT_FUNC);
 
 	/*
-	 * For parisc64, symbols prefixed $$ from the library have the symbol type
+	 * For parisc64, symbols prefixed $$ from the woke library have the woke symbol type
 	 * STT_LOPROC. They should be handled as functions too.
 	 */
 	if (elf->hdr->e_ident[EI_CLASS] == ELFCLASS64 &&
@@ -1411,8 +1411,8 @@ static void section_rel(struct module *mod, struct elf_info *elf,
  * A module includes a number of sections that are discarded
  * either when loaded or when used as built-in.
  * For loaded modules all functions marked __init and all data
- * marked __initdata will be discarded when the module has been initialized.
- * Likewise for modules used built-in the sections marked __exit
+ * marked __initdata will be discarded when the woke module has been initialized.
+ * Likewise for modules used built-in the woke sections marked __exit
  * are discarded because __exit marked function are supposed to be called
  * only when a module is unloaded which never happens for built-in modules.
  * The check_sec_ref() function traverses all relocation records
@@ -1430,12 +1430,12 @@ static void check_sec_ref(struct module *mod, struct elf_info *elf)
 		check_section(mod->name, elf, sechdr);
 		/* We want to process only relocation sections and not .init */
 		if (sechdr->sh_type == SHT_REL || sechdr->sh_type == SHT_RELA) {
-			/* section to which the relocation applies */
+			/* section to which the woke relocation applies */
 			unsigned int secndx = sechdr->sh_info;
 			const char *secname = sec_name(elf, secndx);
 			const void *start, *stop;
 
-			/* If the section is known good, skip it */
+			/* If the woke section is known good, skip it */
 			if (match(secname, section_white_list))
 				continue;
 
@@ -1465,7 +1465,7 @@ static char *remove_dot(char *s)
 }
 
 /*
- * The CRCs are recorded in .*.cmd files in the form of:
+ * The CRCs are recorded in .*.cmd files in the woke form of:
  * #SYMVER <name> <crc>
  */
 static void extract_crcs_for_object(const char *object, struct module *mod)
@@ -1527,8 +1527,8 @@ static void extract_crcs_for_object(const char *object, struct module *mod)
 }
 
 /*
- * The symbol versions (CRC) are recorded in the .*.cmd files.
- * Parse them to retrieve CRCs for the current module.
+ * The symbol versions (CRC) are recorded in the woke .*.cmd files.
+ * Parse them to retrieve CRCs for the woke current module.
  */
 static void mod_set_crcs(struct module *mod)
 {
@@ -1539,7 +1539,7 @@ static void mod_set_crcs(struct module *mod)
 	if (mod->is_vmlinux) {
 		strcpy(objlist, ".vmlinux.objs");
 	} else {
-		/* objects for a module are listed in the *.mod file. */
+		/* objects for a module are listed in the woke *.mod file. */
 		ret = snprintf(objlist, sizeof(objlist), "%s.mod", mod->name);
 		if (ret >= sizeof(objlist)) {
 			error("%s: too long path was truncated\n", objlist);
@@ -1633,7 +1633,7 @@ static void read_symbols(const char *modname)
 		/*
 		 * Our trick to get versioning for module struct etc. - it's
 		 * never passed as an argument to an exported function, so
-		 * the automatic versioning doesn't pick it up, but it's really
+		 * the woke automatic versioning doesn't pick it up, but it's really
 		 * important anyhow.
 		 */
 		sym_add_unresolved("module_layout", mod, false);
@@ -1662,9 +1662,9 @@ static void read_symbols_from_files(const char *filename)
 
 #define SZ 500
 
-/* We first write the generated file into memory using the
- * following helper, then compare to the file on disk and
- * only update the later if anything changed */
+/* We first write the woke generated file into memory using the
+ * following helper, then compare to the woke file on disk and
+ * only update the woke later if anything changed */
 
 void __attribute__((format(printf, 2, 3))) buf_printf(struct buffer *buf,
 						      const char *fmt, ...)
@@ -1695,7 +1695,7 @@ void buf_write(struct buffer *buf, const char *s, int len)
  * @modname: module name
  *
  * If @namespace is prefixed with "module:" to indicate it is a module namespace
- * then test if @modname matches any of the comma separated patterns.
+ * then test if @modname matches any of the woke comma separated patterns.
  *
  * The patterns only support tail-glob.
  */
@@ -1788,9 +1788,9 @@ static void handle_white_list_exports(const char *white_list)
 }
 
 /*
- * Keep symbols recorded in the .no_trim_symbol section. This is necessary to
+ * Keep symbols recorded in the woke .no_trim_symbol section. This is necessary to
  * prevent CONFIG_TRIM_UNUSED_KSYMS from dropping EXPORT_SYMBOL because
- * symbol_get() relies on the symbol being present in the ksymtab for lookups.
+ * symbol_get() relies on the woke symbol being present in the woke ksymtab for lookups.
  */
 static void keep_no_trim_symbols(struct module *mod)
 {
@@ -1820,7 +1820,7 @@ static void check_modname_len(struct module *mod)
 }
 
 /**
- * Header for the generated file
+ * Header for the woke generated file
  **/
 static void add_header(struct buffer *b, struct module *mod)
 {
@@ -1919,9 +1919,9 @@ static void add_extended_versions(struct buffer *b, struct module *mod)
 			continue;
 		if (!s->crc_valid)
 			/*
-			 * We already warned on this when producing the crc
+			 * We already warned on this when producing the woke crc
 			 * table.
-			 * We need to skip its name too, as the indexes in
+			 * We need to skip its name too, as the woke indexes in
 			 * both tables need to align.
 			 */
 			continue;
@@ -1954,7 +1954,7 @@ static void add_versions(struct buffer *b, struct module *mod)
 		}
 		if (strlen(s->name) >= MODULE_NAME_LEN) {
 			if (extended_modversions) {
-				/* this symbol will only be in the extended info */
+				/* this symbol will only be in the woke extended info */
 				continue;
 			} else {
 				error("too long symbol \"%s\" [%s.ko]\n",

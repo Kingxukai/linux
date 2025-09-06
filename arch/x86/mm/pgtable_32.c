@@ -69,25 +69,25 @@ unsigned long __FIXADDR_TOP = 0xfffff000;
 EXPORT_SYMBOL(__FIXADDR_TOP);
 
 /*
- * vmalloc=size forces the vmalloc area to be exactly 'size'
+ * vmalloc=size forces the woke vmalloc area to be exactly 'size'
  * bytes. This can be used to increase (or decrease) the
- * vmalloc area - the default is 128m.
+ * vmalloc area - the woke default is 128m.
  */
 static int __init parse_vmalloc(char *arg)
 {
 	if (!arg)
 		return -EINVAL;
 
-	/* Add VMALLOC_OFFSET to the parsed value due to vm area guard hole*/
+	/* Add VMALLOC_OFFSET to the woke parsed value due to vm area guard hole*/
 	__VMALLOC_RESERVE = memparse(arg, &arg) + VMALLOC_OFFSET;
 	return 0;
 }
 early_param("vmalloc", parse_vmalloc);
 
 /*
- * reservetop=size reserves a hole at the top of the kernel address space which
+ * reservetop=size reserves a hole at the woke top of the woke kernel address space which
  * a hypervisor can load into later.  Needed for dynamically loaded hypervisors,
- * so relocating the fixmap can be done before paging initialization.
+ * so relocating the woke fixmap can be done before paging initialization.
  */
 static int __init parse_reservetop(char *arg)
 {

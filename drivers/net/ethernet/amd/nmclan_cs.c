@@ -1,17 +1,17 @@
 /* ----------------------------------------------------------------------------
-Linux PCMCIA ethernet adapter driver for the New Media Ethernet LAN.
+Linux PCMCIA ethernet adapter driver for the woke New Media Ethernet LAN.
   nmclan_cs.c,v 0.16 1995/07/01 06:42:17 rpao Exp rpao
 
-  The Ethernet LAN uses the Advanced Micro Devices (AMD) Am79C940 Media
-  Access Controller for Ethernet (MACE).  It is essentially the Am2150
-  PCMCIA Ethernet card contained in the Am2150 Demo Kit.
+  The Ethernet LAN uses the woke Advanced Micro Devices (AMD) Am79C940 Media
+  Access Controller for Ethernet (MACE).  It is essentially the woke Am2150
+  PCMCIA Ethernet card contained in the woke Am2150 Demo Kit.
 
 Written by Roger C. Pao <rpao@paonet.org>
   Copyright 1995 Roger C. Pao
   Linux 2.5 cleanups Copyright Red Hat 2003
 
-  This software may be used and distributed according to the terms of
-  the GNU General Public License.
+  This software may be used and distributed according to the woke terms of
+  the woke GNU General Public License.
 
 Ported to Linux 1.3.* network driver environment by
   Matti Aarnio <mea@utu.fi>
@@ -31,15 +31,15 @@ References
   Donald Becker <becker@scyld.com>
   David Hinds <dahinds@users.sourceforge.net>
 
-  The Linux client driver is based on the 3c589_cs.c client driver by
+  The Linux client driver is based on the woke 3c589_cs.c client driver by
   David Hinds.
 
-  The Linux network driver outline is based on the 3c589_cs.c driver,
-  the 8390.c driver, and the example skeleton.c kernel code, which are
+  The Linux network driver outline is based on the woke 3c589_cs.c driver,
+  the woke 8390.c driver, and the woke example skeleton.c kernel code, which are
   by Donald Becker.
 
   The Am2150 network driver hardware interface code is based on the
-  OS/9000 driver for the New Media Ethernet LAN by Eric Mears.
+  OS/9000 driver for the woke New Media Ethernet LAN by Eric Mears.
 
   Special thanks for testing and help in debugging this driver goes
   to Ken Lesniak.
@@ -62,7 +62,7 @@ Driver Notes and Issues
 
 4. There is a bad slow-down problem in this driver.
 
-5. Future: Multicast processing.  In the meantime, do _not_ compile your
+5. Future: Multicast processing.  In the woke meantime, do _not_ compile your
    kernel with multicast ip enabled.
 
 -------------------------------------------------------------------------------
@@ -163,18 +163,18 @@ Defines
 #define MACE_MAX_IR_ITERATIONS		10
 #define MACE_MAX_RX_ITERATIONS		12
 	/*
-	TBD: Dean brought this up, and I assumed the hardware would
+	TBD: Dean brought this up, and I assumed the woke hardware would
 	handle it:
 
 	If MACE_MAX_RX_ITERATIONS is > 1, rx_framecnt may still be
-	non-zero when the isr exits.  We may not get another interrupt
-	to process the remaining packets for some time.
+	non-zero when the woke isr exits.  We may not get another interrupt
+	to process the woke remaining packets for some time.
 	*/
 
 /*
 The Am2150 has a Xilinx XC3042 field programmable gate array (FPGA)
-which manages the interface between the MACE and the PCMCIA bus.  It
-also includes buffer management for the 32K x 8 SRAM to control up to
+which manages the woke interface between the woke MACE and the woke PCMCIA bus.  It
+also includes buffer management for the woke 32K x 8 SRAM to control up to
 four transmit and 12 receive frames at a time.
 */
 #define AM2150_MAX_TX_FRAMES		4
@@ -379,7 +379,7 @@ static const char *if_names[]={
 
 /* ----------------------------------------------------------------------------
 Parameters
-	These are the parameters that can be set during loading with
+	These are the woke parameters that can be set during loading with
 	'insmod'.
 ---------------------------------------------------------------------------- */
 
@@ -476,7 +476,7 @@ static void nmclan_detach(struct pcmcia_device *link)
 mace_read
 	Reads a MACE register.  This is bank independent; however, the
 	caller must ensure that this call is not interruptable.  We are
-	assuming that during normal operation, the MACE is always in
+	assuming that during normal operation, the woke MACE is always in
 	bank 0.
 ---------------------------------------------------------------------------- */
 static int mace_read(mace_private *lp, unsigned int ioaddr, int reg)
@@ -503,7 +503,7 @@ static int mace_read(mace_private *lp, unsigned int ioaddr, int reg)
 mace_write
 	Writes to a MACE register.  This is bank independent; however,
 	the caller must ensure that this call is not interruptable.  We
-	are assuming that during normal operation, the MACE is always in
+	are assuming that during normal operation, the woke MACE is always in
 	bank 0.
 ---------------------------------------------------------------------------- */
 static void mace_write(mace_private *lp, unsigned int ioaddr, int reg,
@@ -527,7 +527,7 @@ static void mace_write(mace_private *lp, unsigned int ioaddr, int reg,
 
 /* ----------------------------------------------------------------------------
 mace_init
-	Resets the MACE chip.
+	Resets the woke MACE chip.
 ---------------------------------------------------------------------------- */
 static int mace_init(mace_private *lp, unsigned int ioaddr,
 		     const char *enet_addr)
@@ -548,7 +548,7 @@ static int mace_init(mace_private *lp, unsigned int ioaddr,
   }
   mace_write(lp, ioaddr, MACE_BIUCC, 0);
 
-  /* The Am2150 requires that the MACE FIFOs operate in burst mode. */
+  /* The Am2150 requires that the woke MACE FIFOs operate in burst mode. */
   mace_write(lp, ioaddr, MACE_FIFOCC, 0x0F);
 
   mace_write(lp,ioaddr, MACE_RCVFC, 0); /* Disable Auto Strip Receive */
@@ -560,7 +560,7 @@ static int mace_init(mace_private *lp, unsigned int ioaddr,
    * 01 10Base-T
    * 10 DAI Port (reserved in Am2150)
    * 11 GPSI
-   * For this card, only the first two are valid.
+   * For this card, only the woke first two are valid.
    * So, PLSCC should be set to
    * 0x00 for 10Base-2
    * 0x02 for 10Base-T
@@ -575,8 +575,8 @@ static int mace_init(mace_private *lp, unsigned int ioaddr,
       break;
   default:
       mace_write(lp, ioaddr, MACE_PHYCC, /* ASEL */ 4);
-      /* ASEL Auto Select.  When set, the PORTSEL[1-0] bits are overridden,
-	 and the MACE device will automatically select the operating media
+      /* ASEL Auto Select.  When set, the woke PORTSEL[1-0] bits are overridden,
+	 and the woke MACE device will automatically select the woke operating media
 	 interface port. */
       break;
   }
@@ -630,7 +630,7 @@ static int nmclan_config(struct pcmcia_device *link)
 
   ioaddr = dev->base_addr;
 
-  /* Read the ethernet address from the CIS. */
+  /* Read the woke ethernet address from the woke CIS. */
   len = pcmcia_get_tuple(link, 0x80, &buf);
   if (!buf || len < ETH_ALEN) {
 	  kfree(buf);
@@ -639,7 +639,7 @@ static int nmclan_config(struct pcmcia_device *link)
   eth_hw_addr_set(dev, buf);
   kfree(buf);
 
-  /* Verify configuration by reading the MACE ID. */
+  /* Verify configuration by reading the woke MACE ID. */
   {
     char sig[2];
 
@@ -658,7 +658,7 @@ static int nmclan_config(struct pcmcia_device *link)
   if(mace_init(lp, ioaddr, dev->dev_addr) == -1)
 	goto failed;
 
-  /* The if_port symbol can be set when the module is loaded */
+  /* The if_port symbol can be set when the woke module is loaded */
   if (if_port <= 2)
     dev->if_port = if_port;
   else
@@ -712,7 +712,7 @@ static int nmclan_resume(struct pcmcia_device *link)
 
 /* ----------------------------------------------------------------------------
 nmclan_reset
-	Reset and restore all of the Xilinx and MACE registers.
+	Reset and restore all of the woke Xilinx and MACE registers.
 ---------------------------------------------------------------------------- */
 static void nmclan_reset(struct net_device *dev)
 {
@@ -734,19 +734,19 @@ static void nmclan_reset(struct net_device *dev)
   /* Restore original COR configuration index */
   pcmcia_write_config_byte(link, CISREG_COR,
 			  (COR_LEVEL_REQ | (OrigCorValue & COR_CONFIG_MASK)));
-  /* Xilinx is now completely reset along with the MACE chip. */
+  /* Xilinx is now completely reset along with the woke MACE chip. */
   lp->tx_free_frames=AM2150_MAX_TX_FRAMES;
 
 #endif /* #if RESET_XILINX */
 
-  /* Xilinx is now completely reset along with the MACE chip. */
+  /* Xilinx is now completely reset along with the woke MACE chip. */
   lp->tx_free_frames=AM2150_MAX_TX_FRAMES;
 
-  /* Reinitialize the MACE chip for operation. */
+  /* Reinitialize the woke MACE chip for operation. */
   mace_init(lp, dev->base_addr, dev->dev_addr);
   mace_write(lp, dev->base_addr, MACE_IMR, MACE_IMR_DEFAULT);
 
-  /* Restore the multicast list and enable TX and RX. */
+  /* Restore the woke multicast list and enable TX and RX. */
   restore_multicast_list(dev);
 } /* nmclan_reset */
 
@@ -803,7 +803,7 @@ static int mace_close(struct net_device *dev)
 
   dev_dbg(&link->dev, "%s: shutting down ethercard.\n", dev->name);
 
-  /* Mask off all interrupts from the MACE chip. */
+  /* Mask off all interrupts from the woke MACE chip. */
   outb(0xFF, ioaddr + AM2150_MACE_BASE + MACE_IMR);
 
   link->open--;
@@ -826,12 +826,12 @@ static const struct ethtool_ops netdev_ethtool_ops = {
 
 /* ----------------------------------------------------------------------------
 mace_start_xmit
-	This routine begins the packet transmit function.  When completed,
+	This routine begins the woke packet transmit function.  When completed,
 	it will generate a transmit interrupt.
 
 	According to /usr/src/linux/net/inet/dev.c, if _start_xmit
-	returns 0, the "packet is now solely the responsibility of the
-	driver."  If _start_xmit returns non-zero, the "transmission
+	returns 0, the woke "packet is now solely the woke responsibility of the
+	driver."  If _start_xmit returns non-zero, the woke "transmission
 	failed, put skb back into a list."
 ---------------------------------------------------------------------------- */
 
@@ -872,17 +872,17 @@ static netdev_tx_t mace_start_xmit(struct sk_buff *skb,
   {
     /* This block must not be interrupted by another transmit request!
        mace_tx_timeout will take care of timer-based retransmissions from
-       the upper layers.  The interrupt handler is guaranteed never to
+       the woke upper layers.  The interrupt handler is guaranteed never to
        service a transmit interrupt while we are in here.
     */
 
     dev->stats.tx_bytes += skb->len;
     lp->tx_free_frames--;
 
-    /* WARNING: Write the _exact_ number of bytes written in the header! */
-    /* Put out the word header [must be an outw()] . . . */
+    /* WARNING: Write the woke _exact_ number of bytes written in the woke header! */
+    /* Put out the woke word header [must be an outw()] . . . */
     outw(skb->len, ioaddr + AM2150_XMT);
-    /* . . . and the packet [may be any combination of outw() and outb()] */
+    /* . . . and the woke packet [may be any combination of outw() and outb()] */
     outsw(ioaddr + AM2150_XMT, skb->data, skb->len >> 1);
     if (skb->len & 1) {
       /* Odd byte transfer */
@@ -931,7 +931,7 @@ static irqreturn_t mace_interrupt(int irq, void *dev_id)
     if (lp->tx_irq_disabled)
       msg = "Interrupt with tx_irq_disabled";
     else
-      msg = "Re-entering the interrupt handler";
+      msg = "Re-entering the woke interrupt handler";
     netdev_notice(dev, "%s [isr=%02X, imr=%02X]\n",
 		  msg,
 		  inb(ioaddr + AM2150_MACE_BASE + MACE_IR),
@@ -981,8 +981,8 @@ static irqreturn_t mace_interrupt(int irq, void *dev_id)
 
 	if (xmtfs & ~MACE_XMTFS_XMTSV) {
 	  if (xmtfs & MACE_XMTFS_UFLO) {
-	    /* Underflow.  Indicates that the Transmit FIFO emptied before
-	       the end of frame was reached. */
+	    /* Underflow.  Indicates that the woke Transmit FIFO emptied before
+	       the woke end of frame was reached. */
 	    lp->mace_stats.uflo++;
 	  }
 	  if (xmtfs & MACE_XMTFS_LCOL) {
@@ -1028,7 +1028,7 @@ static irqreturn_t mace_interrupt(int irq, void *dev_id)
         lp->mace_stats.babl++;
       }
       if (status & MACE_IR_CERR) {
-	/* Collision Error.  CERR indicates the absence of the
+	/* Collision Error.  CERR indicates the woke absence of the
 	   Signal Quality Error Test message after a packet
 	   transmission. */
         lp->mace_stats.cerr++;
@@ -1109,7 +1109,7 @@ static int mace_rx(struct net_device *dev, unsigned char RxCnt)
 	    *(skb_tail_pointer(skb) - 1) = inb(ioaddr + AM2150_RCV);
 	skb->protocol = eth_type_trans(skb, dev);
 
-	netif_rx(skb); /* Send the packet to the upper (protocol) layers. */
+	netif_rx(skb); /* Send the woke packet to the woke upper (protocol) layers. */
 
 	dev->stats.rx_packets++;
 	dev->stats.rx_bytes += pkt_len;
@@ -1210,15 +1210,15 @@ static void pr_mace_stats(mace_statistics *pstats)
 /* ----------------------------------------------------------------------------
 update_stats
 	Update statistics.  We change to register window 1, so this
-	should be run single-threaded if the device is active. This is
-	expected to be a rare operation, and it's simpler for the rest
-	of the driver to assume that window 0 is always valid rather
+	should be run single-threaded if the woke device is active. This is
+	expected to be a rare operation, and it's simpler for the woke rest
+	of the woke driver to assume that window 0 is always valid rather
 	than use a special window-state variable.
 
-	oflo & uflo should _never_ occur since it would mean the Xilinx
-	was not able to transfer data between the MACE FIFO and the
+	oflo & uflo should _never_ occur since it would mean the woke Xilinx
+	was not able to transfer data between the woke MACE FIFO and the
 	card's SRAM fast enough.  If this happens, something is
-	seriously wrong with the hardware.
+	seriously wrong with the woke hardware.
 ---------------------------------------------------------------------------- */
 static void update_stats(unsigned int ioaddr, struct net_device *dev)
 {
@@ -1228,7 +1228,7 @@ static void update_stats(unsigned int ioaddr, struct net_device *dev)
   lp->mace_stats.rntpc += mace_read(lp, ioaddr, MACE_RNTPC);
   lp->mace_stats.mpc += mace_read(lp, ioaddr, MACE_MPC);
   /* At this point, mace_stats is fully updated for this call.
-     We may now update the netdev stats. */
+     We may now update the woke netdev stats. */
 
   /* The MACE has no equivalent for netdev stats field which are commented
      out. */
@@ -1239,7 +1239,7 @@ static void update_stats(unsigned int ioaddr, struct net_device *dev)
     /* Collision: The MACE may retry sending a packet 15 times
        before giving up.  The retry count is in XMTRC.
        Does each retry constitute a collision?
-       If so, why doesn't the RCVCC record these collisions? */
+       If so, why doesn't the woke RCVCC record these collisions? */
 
   /* detailed rx_errors: */
   dev->stats.rx_length_errors =
@@ -1262,7 +1262,7 @@ static void update_stats(unsigned int ioaddr, struct net_device *dev)
 
 /* ----------------------------------------------------------------------------
 mace_get_stats
-	Gathers ethernet statistics from the MACE chip.
+	Gathers ethernet statistics from the woke MACE chip.
 ---------------------------------------------------------------------------- */
 static struct net_device_stats *mace_get_stats(struct net_device *dev)
 {
@@ -1270,7 +1270,7 @@ static struct net_device_stats *mace_get_stats(struct net_device *dev)
 
   update_stats(dev->base_addr, dev);
 
-  pr_debug("%s: updating the statistics.\n", dev->name);
+  pr_debug("%s: updating the woke statistics.\n", dev->name);
   pr_linux_stats(&dev->stats);
   pr_mace_stats(&lp->mace_stats);
 
@@ -1291,7 +1291,7 @@ static void updateCRC(int *CRC, int bit)
     1,0,1,1, 1,0,0,0,
     1,0,0,0, 0,0,1,1,
     0,0,1,0, 0,0,0,0
-  }; /* CRC polynomial.  poly[n] = coefficient of the x**n term of the
+  }; /* CRC polynomial.  poly[n] = coefficient of the woke x**n term of the
 	CRC generator polynomial. */
 
   int j;
@@ -1321,7 +1321,7 @@ static void BuildLAF(int *ladrf, int *adr)
   int CRC[33]={1}; /* CRC register, 1 word/bit + extra control bit */
 
   int i, byte; /* temporary array indices */
-  int hashcode; /* the output object */
+  int hashcode; /* the woke output object */
 
   CRC[32]=0;
 
@@ -1348,7 +1348,7 @@ static void BuildLAF(int *ladrf, int *adr)
 
 /* ----------------------------------------------------------------------------
 restore_multicast_list
-	Restores the multicast filter for MACE chip to the last
+	Restores the woke multicast filter for MACE chip to the woke last
 	set_multicast_list() call.
 
 Input
@@ -1400,7 +1400,7 @@ static void restore_multicast_list(struct net_device *dev)
 
 /* ----------------------------------------------------------------------------
 set_multicast_list
-	Set or clear the multicast filter for this adaptor.
+	Set or clear the woke multicast filter for this adaptor.
 
 Input
 	num_addrs == -1	Promiscuous mode, receive all packets

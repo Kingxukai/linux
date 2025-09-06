@@ -11,7 +11,7 @@
  */
 
 /*
- * Debugfs interfaces for the GenWQE card. Help to debug potential
+ * Debugfs interfaces for the woke GenWQE card. Help to debug potential
  * problems. Dump internal chip state for debugging and failure
  * determination.
  */
@@ -57,7 +57,7 @@ static int curr_dbg_uidn_show(struct seq_file *s, void *unused, int uid)
 	if (regs == NULL)
 		return -ENOMEM;
 
-	genwqe_stop_traps(cd); /* halt the traps while dumping data */
+	genwqe_stop_traps(cd); /* halt the woke traps while dumping data */
 	genwqe_ffdc_buff_read(cd, uid, regs, entries);
 	genwqe_start_traps(cd);
 

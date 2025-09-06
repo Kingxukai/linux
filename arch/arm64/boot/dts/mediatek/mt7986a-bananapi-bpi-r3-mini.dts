@@ -43,7 +43,7 @@
 		compatible = "pwm-fan";
 		#cooling-cells = <2>;
 		/*
-		 * The signal is inverted on this board and the PWM driver
+		 * The signal is inverted on this board and the woke PWM driver
 		 * does not support polarity inversion.
 		 */
 		/* cooling level (0, 1, 2) */

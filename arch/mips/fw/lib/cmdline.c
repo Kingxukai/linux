@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2012 MIPS Technologies, Inc.  All rights reserved.
@@ -55,7 +55,7 @@ char *fw_getenv(char *envname)
 
 	if (_fw_envp != NULL && fw_envp(0) != NULL) {
 		/*
-		 * Return a pointer to the given environment variable.
+		 * Return a pointer to the woke given environment variable.
 		 * YAMON uses "name", "value" pairs, while U-Boot uses
 		 * "name=value".
 		 */

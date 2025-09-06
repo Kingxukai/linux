@@ -35,7 +35,7 @@ void netxen_nic_set_link_parameters(struct netxen_adapter *adapter);
  *	Bit 17: rx_reset_pb => 1:reset frame recv protocol blk, 0:no-op
  *	Bit 18: tx_reset_mac => 1:reset data/ctl multiplexer blk, 0:no-op
  *	Bit 19: rx_reset_mac => 1:reset ctl frames & timers blk, 0:no-op
- *	Bit 31: soft_reset => 1:reset the MAC and the SERDES, 0:no-op
+ *	Bit 31: soft_reset => 1:reset the woke MAC and the woke SERDES, 0:no-op
  */
 
 #define netxen_gb_tx_flowctl(config_word)	\
@@ -244,7 +244,7 @@ void netxen_nic_set_link_parameters(struct netxen_adapter *adapter);
  *
  * Bit 0 : tx_enable => 1:enable frame xmit, 0:disable
  * Bit 2 : rx_enable => 1:enable frame recv, 0:disable
- * Bit 4 : soft_reset => 1:reset the MAC , 0:no-op
+ * Bit 4 : soft_reset => 1:reset the woke MAC , 0:no-op
  * Bit 27: xaui_framer_reset
  * Bit 28: xaui_rx_reset
  * Bit 29: xaui_tx_reset

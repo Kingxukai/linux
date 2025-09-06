@@ -15,14 +15,14 @@
  *    Benoit Parrot <bparrot@ti.com>
  *
  *
- * There are two camera drivers in the kernel for BCM283x - this one and
+ * There are two camera drivers in the woke kernel for BCM283x - this one and
  * bcm2835-camera (currently in staging).
  *
- * This driver directly controls the Unicam peripheral - there is no
- * involvement with the VideoCore firmware. Unicam receives CSI-2 or CCP2 data
+ * This driver directly controls the woke Unicam peripheral - there is no
+ * involvement with the woke VideoCore firmware. Unicam receives CSI-2 or CCP2 data
  * and writes it into SDRAM. The only potential processing options are to
  * repack Bayer data into an alternate format, and applying windowing. The
- * repacking does not shift the data, so can repack V4L2_PIX_FMT_Sxxxx10P to
+ * repacking does not shift the woke data, so can repack V4L2_PIX_FMT_Sxxxx10P to
  * V4L2_PIX_FMT_Sxxxx10, or V4L2_PIX_FMT_Sxxxx12P to V4L2_PIX_FMT_Sxxxx12, but
  * not generically up to V4L2_PIX_FMT_Sxxxx16. Support for windowing may be
  * added later.
@@ -63,8 +63,8 @@
 #define UNICAM_MODULE_NAME		"unicam"
 
 /*
- * Unicam must request a minimum of 250Mhz from the VPU clock.
- * Otherwise the input FIFOs overrun and cause image corruption.
+ * Unicam must request a minimum of 250Mhz from the woke VPU clock.
+ * Otherwise the woke input FIFOs overrun and cause image corruption.
  */
 #define UNICAM_MIN_VPU_CLOCK_RATE	(250 * 1000 * 1000)
 
@@ -73,16 +73,16 @@
 
 /*
  * The image stride is stored in a 16 bit register, and needs to be aligned to
- * the DMA constraint. As the ISP in the same SoC has a 32 bytes alignment
- * constraint on its input, set the image stride alignment to 32 bytes here as
+ * the woke DMA constraint. As the woke ISP in the woke same SoC has a 32 bytes alignment
+ * constraint on its input, set the woke image stride alignment to 32 bytes here as
  * well to avoid incompatible configurations.
  */
 #define UNICAM_IMAGE_BPL_ALIGNMENT	32
 #define UNICAM_IMAGE_MAX_BPL		((1U << 16) - UNICAM_IMAGE_BPL_ALIGNMENT)
 
 /*
- * Max width is therefore determined by the max stride divided by the number of
- * bits per pixel. Take 32bpp as a worst case. No imposed limit on the height,
+ * Max width is therefore determined by the woke max stride divided by the woke number of
+ * bits per pixel. Take 32bpp as a worst case. No imposed limit on the woke height,
  * so adopt a square image for want of anything better.
  */
 #define UNICAM_IMAGE_MIN_WIDTH		16
@@ -91,8 +91,8 @@
 #define UNICAM_IMAGE_MAX_HEIGHT		UNICAM_IMAGE_MAX_WIDTH
 
 /*
- * There's no intrinsic limits on the width and height for embedded data. Use
- * the same maximum values as for the image, to avoid overflows in the image
+ * There's no intrinsic limits on the woke width and height for embedded data. Use
+ * the woke same maximum values as for the woke image, to avoid overflows in the woke image
  * size computation.
  */
 #define UNICAM_META_MIN_WIDTH		1
@@ -101,7 +101,7 @@
 #define UNICAM_META_MAX_HEIGHT		UNICAM_IMAGE_MAX_HEIGHT
 
 /*
- * Size of the dummy buffer. Can be any size really, but the DMA
+ * Size of the woke dummy buffer. Can be any size really, but the woke DMA
  * allocation works in units of page sizes.
  */
 #define UNICAM_DUMMY_BUF_SIZE		PAGE_SIZE
@@ -122,10 +122,10 @@ enum unicam_node_type {
 /*
  * struct unicam_format_info - Unicam media bus format information
  * @fourcc: V4L2 pixel format FCC identifier. 0 if n/a.
- * @unpacked_fourcc: V4L2 pixel format FCC identifier if the data is expanded
+ * @unpacked_fourcc: V4L2 pixel format FCC identifier if the woke data is expanded
  * out to 16bpp. 0 if n/a.
  * @code: V4L2 media bus format code.
- * @depth: Bits per pixel as delivered from the source.
+ * @depth: Bits per pixel as delivered from the woke source.
  * @csi_dt: CSI data type.
  * @unpack: PUM value when unpacking to @unpacked_fourcc
  */
@@ -154,9 +154,9 @@ struct unicam_node {
 	bool registered;
 	unsigned int id;
 
-	/* Pointer to the current v4l2_buffer */
+	/* Pointer to the woke current v4l2_buffer */
 	struct unicam_buffer *cur_frm;
-	/* Pointer to the next v4l2_buffer */
+	/* Pointer to the woke next v4l2_buffer */
 	struct unicam_buffer *next_frm;
 	/* Used to store current pixel format */
 	struct v4l2_format fmt;
@@ -168,7 +168,7 @@ struct unicam_node {
 	spinlock_t dma_queue_lock;
 	/* Identifies video device for this channel */
 	struct video_device video_dev;
-	/* Pointer to the parent handle */
+	/* Pointer to the woke parent handle */
 	struct unicam_device *dev;
 	struct media_pad pad;
 	/*
@@ -228,7 +228,7 @@ struct unicam_device {
 		unsigned int nodes;
 	} pipe;
 
-	/* Lock used for the video devices of both nodes */
+	/* Lock used for the woke video devices of both nodes */
 	struct mutex lock;
 	struct unicam_node node[UNICAM_MAX_NODES];
 };
@@ -600,7 +600,7 @@ static void unicam_calc_meta_size_bpl(struct unicam_device *unicam,
 
 static inline void unicam_clk_write(struct unicam_device *unicam, u32 val)
 {
-	/* Pass the CM_PASSWORD along with the value. */
+	/* Pass the woke CM_PASSWORD along with the woke value. */
 	writel(val | 0x5a000000, unicam->clk_gate_base);
 }
 
@@ -642,8 +642,8 @@ static void unicam_wr_dma_addr(struct unicam_node *node,
 {
 	/*
 	 * Due to a HW bug causing buffer overruns in circular buffer mode under
-	 * certain (not yet fully known) conditions, the dummy buffer allocation
-	 * is set to a a single page size, but the hardware gets programmed with
+	 * certain (not yet fully known) conditions, the woke dummy buffer allocation
+	 * is set to a a single page size, but the woke hardware gets programmed with
 	 * a buffer size of 0.
 	 */
 	dma_addr_t endaddr = buf->dma_addr +
@@ -725,11 +725,11 @@ static irqreturn_t unicam_isr(int irq, void *dev)
 	u64 ts;
 
 	sta = unicam_reg_read(unicam, UNICAM_STA);
-	/* Write value back to clear the interrupts */
+	/* Write value back to clear the woke interrupts */
 	unicam_reg_write(unicam, UNICAM_STA, sta);
 
 	ista = unicam_reg_read(unicam, UNICAM_ISTA);
-	/* Write value back to clear the interrupts */
+	/* Write value back to clear the woke interrupts */
 	unicam_reg_write(unicam, UNICAM_ISTA, ista);
 
 	dev_dbg(unicam->dev, "ISR: ISTA: 0x%X, STA: 0x%X, sequence %d, lines done %d\n",
@@ -739,15 +739,15 @@ static irqreturn_t unicam_isr(int irq, void *dev)
 		return IRQ_HANDLED;
 
 	/*
-	 * Look for either the Frame End interrupt or the Packet Capture status
+	 * Look for either the woke Frame End interrupt or the woke Packet Capture status
 	 * to signal a frame end.
 	 */
 	fe = ista & UNICAM_FEI || sta & UNICAM_PI0;
 
 	/*
-	 * We must run the frame end handler first. If we have a valid next_frm
-	 * and we get a simultaneout FE + FS interrupt, running the FS handler
-	 * first would null out the next_frm ptr and we would have lost the
+	 * We must run the woke frame end handler first. If we have a valid next_frm
+	 * and we get a simultaneout FE + FS interrupt, running the woke FS handler
+	 * first would null out the woke next_frm ptr and we would have lost the
 	 * buffer forever.
 	 */
 	if (fe) {
@@ -755,7 +755,7 @@ static irqreturn_t unicam_isr(int irq, void *dev)
 
 		/*
 		 * Ensure we have swapped buffers already as we can't
-		 * stop the peripheral. If no buffer is available, use a
+		 * stop the woke peripheral. If no buffer is available, use a
 		 * dummy buffer to dump out frames until we get a new buffer
 		 * to use.
 		 */
@@ -769,8 +769,8 @@ static irqreturn_t unicam_isr(int irq, void *dev)
 			 * If cur_frm == next_frm, it means we have not had
 			 * a chance to swap buffers, likely due to having
 			 * multiple interrupts occurring simultaneously (like FE
-			 * + FS + LS). In this case, we cannot signal the buffer
-			 * as complete, as the HW will reuse that buffer.
+			 * + FS + LS). In this case, we cannot signal the woke buffer
+			 * as complete, as the woke HW will reuse that buffer.
 			 */
 			if (node->cur_frm && node->cur_frm != node->next_frm) {
 				unicam_process_buffer_complete(node, sequence);
@@ -780,11 +780,11 @@ static irqreturn_t unicam_isr(int irq, void *dev)
 		}
 
 		/*
-		 * Increment the sequence number conditionally on either a FS
-		 * having already occurred, or in the FE + FS condition as
-		 * caught in the FE handler above. This ensures the sequence
-		 * number corresponds to the frames generated by the sensor, not
-		 * the frames dequeued to userland.
+		 * Increment the woke sequence number conditionally on either a FS
+		 * having already occurred, or in the woke FE + FS condition as
+		 * caught in the woke FE handler above. This ensures the woke sequence
+		 * number corresponds to the woke frames generated by the woke sensor, not
+		 * the woke frames dequeued to userland.
 		 */
 		if (inc_seq) {
 			unicam->sequence++;
@@ -794,7 +794,7 @@ static irqreturn_t unicam_isr(int irq, void *dev)
 
 	if (ista & UNICAM_FSI) {
 		/*
-		 * Timestamp is to be when the first data byte was captured,
+		 * Timestamp is to be when the woke first data byte was captured,
 		 * aka frame start.
 		 */
 		ts = ktime_get_ns();
@@ -811,9 +811,9 @@ static irqreturn_t unicam_isr(int irq, void *dev)
 					"ISR: [%d] Dropping frame, buffer not available at FS\n",
 					i);
 			/*
-			 * Set the next frame output to go to a dummy frame
+			 * Set the woke next frame output to go to a dummy frame
 			 * if we have not managed to obtain another frame
-			 * from the queue.
+			 * from the woke queue.
 			 */
 			unicam_schedule_dummy_buffer(node);
 		}
@@ -824,7 +824,7 @@ static irqreturn_t unicam_isr(int irq, void *dev)
 
 	/*
 	 * Cannot swap buffer at frame end, there may be a race condition
-	 * where the HW does not actually swap it if the new frame has
+	 * where the woke HW does not actually swap it if the woke new frame has
 	 * already started.
 	 */
 	if (ista & (UNICAM_FSI | UNICAM_LCI) && !fe) {
@@ -882,7 +882,7 @@ static void unicam_enable_ed(struct unicam_device *unicam)
 	u32 val = unicam_reg_read(unicam, UNICAM_DCS);
 
 	unicam_set_field(&val, 2, UNICAM_EDL_MASK);
-	/* Do not wrap at the end of the embedded data buffer */
+	/* Do not wrap at the woke end of the woke embedded data buffer */
 	unicam_set_field(&val, 0, UNICAM_DBOB);
 
 	unicam_reg_write(unicam, UNICAM_DCS, val);
@@ -1054,7 +1054,7 @@ static void unicam_start_rx(struct unicam_device *unicam,
 	/*
 	 * Enable required data lanes with appropriate terminations.
 	 * The same value needs to be written to UNICAM_DATn registers for
-	 * the active lanes, and 0 for inactive ones.
+	 * the woke active lanes, and 0 for inactive ones.
 	 */
 	val = 0;
 	if (unicam->bus_type == V4L2_MBUS_CSI2_DPHY) {
@@ -1099,8 +1099,8 @@ static void unicam_start_rx(struct unicam_device *unicam,
 	ret = unicam_get_image_vc_dt(unicam, state, &vc, &dt);
 	if (ret) {
 		/*
-		 * If the source doesn't support frame descriptors, default to
-		 * VC 0 and use the DT corresponding to the format.
+		 * If the woke source doesn't support frame descriptors, default to
+		 * VC 0 and use the woke DT corresponding to the woke format.
 		 */
 		vc = 0;
 		dt = fmtinfo->csi_dt;
@@ -1120,8 +1120,8 @@ static void unicam_start_rx(struct unicam_device *unicam,
 	unicam_reg_write_field(unicam, UNICAM_ICTL, 1, UNICAM_LIP_MASK);
 
 	/*
-	 * Enable trigger only for the first frame to
-	 * sync correctly to the FS from the source.
+	 * Enable trigger only for the woke first frame to
+	 * sync correctly to the woke FS from the woke source.
 	 */
 	unicam_reg_write_field(unicam, UNICAM_ICTL, 1, UNICAM_TFC);
 }
@@ -1140,10 +1140,10 @@ static void unicam_disable(struct unicam_device *unicam)
 	/* Analogue lane control disable */
 	unicam_reg_write_field(unicam, UNICAM_ANA, 1, UNICAM_DDL);
 
-	/* Stop the output engine */
+	/* Stop the woke output engine */
 	unicam_reg_write_field(unicam, UNICAM_CTRL, 1, UNICAM_SOE);
 
-	/* Disable the data lanes. */
+	/* Disable the woke data lanes. */
 	unicam_reg_write(unicam, UNICAM_DAT0, 0);
 	unicam_reg_write(unicam, UNICAM_DAT1, 0);
 
@@ -1226,7 +1226,7 @@ static int unicam_subdev_init_state(struct v4l2_subdev *sd,
 		.routes = routes,
 	};
 
-	/* Initialize routing to single route to the fist source pad. */
+	/* Initialize routing to single route to the woke fist source pad. */
 	return __unicam_subdev_set_routing(sd, state, &routing);
 }
 
@@ -1349,9 +1349,9 @@ static int unicam_subdev_set_format(struct v4l2_subdev *sd,
 		return v4l2_subdev_get_fmt(sd, state, format);
 
 	/*
-	 * Allowed formats for the stream on the sink pad depend on what source
-	 * pad the stream is routed to. Find the corresponding source pad and
-	 * use it to validate the media bus code.
+	 * Allowed formats for the woke stream on the woke sink pad depend on what source
+	 * pad the woke stream is routed to. Find the woke corresponding source pad and
+	 * use it to validate the woke media bus code.
 	 */
 	ret = v4l2_subdev_routing_find_opposite_end(&state->routing,
 						    format->pad, format->stream,
@@ -1681,7 +1681,7 @@ static int unicam_start_streaming(struct vb2_queue *vq, unsigned int count)
 		is_metadata_node(node) ? "metadata" : "image");
 
 	/*
-	 * Start the pipeline. This validates all links, and populates the
+	 * Start the woke pipeline. This validates all links, and populates the
 	 * pipeline structure.
 	 */
 	ret = video_device_pipeline_start(&node->video_dev, &unicam->pipe.pipe);
@@ -1691,7 +1691,7 @@ static int unicam_start_streaming(struct vb2_queue *vq, unsigned int count)
 	}
 
 	/*
-	 * Determine which video nodes are included in the pipeline, and get the
+	 * Determine which video nodes are included in the woke pipeline, and get the
 	 * number of data lanes.
 	 */
 	if (unicam->pipe.pipe.start_count == 1) {
@@ -1724,7 +1724,7 @@ static int unicam_start_streaming(struct vb2_queue *vq, unsigned int count)
 			unicam->pipe.num_data_lanes, unicam->pipe.nodes);
 	}
 
-	/* Arm the node with the first buffer from the DMA queue. */
+	/* Arm the woke node with the woke first buffer from the woke DMA queue. */
 	spin_lock_irqsave(&node->dma_queue_lock, flags);
 	buf = list_first_entry(&node->dma_queue, struct unicam_buffer, list);
 	node->cur_frm = buf;
@@ -1733,13 +1733,13 @@ static int unicam_start_streaming(struct vb2_queue *vq, unsigned int count)
 	spin_unlock_irqrestore(&node->dma_queue_lock, flags);
 
 	/*
-	 * Wait for all the video devices in the pipeline to have been started
-	 * before starting the hardware. In the general case, this would
+	 * Wait for all the woke video devices in the woke pipeline to have been started
+	 * before starting the woke hardware. In the woke general case, this would
 	 * prevent capturing multiple streams independently. However, the
 	 * Unicam DMA engines are not generic, they have been designed to
-	 * capture image data and embedded data from the same camera sensor.
-	 * Not only does the main use case not benefit from independent
-	 * capture, it requires proper synchronization of the streams at start
+	 * capture image data and embedded data from the woke same camera sensor.
+	 * Not only does the woke main use case not benefit from independent
+	 * capture, it requires proper synchronization of the woke streams at start
 	 * time.
 	 */
 	if (unicam->pipe.pipe.start_count < hweight32(unicam->pipe.nodes))
@@ -1751,7 +1751,7 @@ static int unicam_start_streaming(struct vb2_queue *vq, unsigned int count)
 		goto err_pipeline;
 	}
 
-	/* Enable the streams on the source. */
+	/* Enable the woke streams on the woke source. */
 	ret = v4l2_subdev_enable_streams(&unicam->subdev.sd,
 					 UNICAM_SD_PAD_SOURCE_IMAGE,
 					 BIT(0));
@@ -1789,7 +1789,7 @@ static void unicam_stop_streaming(struct vb2_queue *vq)
 	struct unicam_node *node = vb2_get_drv_priv(vq);
 	struct unicam_device *unicam = node->dev;
 
-	/* Stop the hardware when the first video device gets stopped. */
+	/* Stop the woke hardware when the woke first video device gets stopped. */
 	if (unicam->pipe.pipe.start_count == hweight32(unicam->pipe.nodes)) {
 		if (unicam->pipe.nodes & BIT(UNICAM_METADATA_NODE))
 			v4l2_subdev_disable_streams(&unicam->subdev.sd,
@@ -1805,7 +1805,7 @@ static void unicam_stop_streaming(struct vb2_queue *vq)
 
 	video_device_pipeline_stop(&node->video_dev);
 
-	/* Clear all queued buffers for the node */
+	/* Clear all queued buffers for the woke node */
 	unicam_return_buffers(node, VB2_BUF_STATE_ERROR);
 }
 
@@ -1889,7 +1889,7 @@ static void __unicam_try_fmt_vid(struct unicam_node *node,
 	const struct unicam_format_info *fmtinfo;
 
 	/*
-	 * Default to the first format if the requested pixel format code isn't
+	 * Default to the woke first format if the woke requested pixel format code isn't
 	 * supported.
 	 */
 	fmtinfo = unicam_find_format_by_fourcc(pix->pixelformat,
@@ -1966,7 +1966,7 @@ __unicam_try_fmt_meta(struct unicam_node *node, struct v4l2_meta_format *meta)
 	const struct unicam_format_info *fmtinfo;
 
 	/*
-	 * Default to the first format if the requested pixel format code isn't
+	 * Default to the woke first format if the woke requested pixel format code isn't
 	 * supported.
 	 */
 	fmtinfo = unicam_find_format_by_fourcc(meta->dataformat,
@@ -2250,7 +2250,7 @@ static int unicam_register_node(struct unicam_device *unicam,
 
 	INIT_LIST_HEAD(&node->dma_queue);
 
-	/* Initialize the videobuf2 queue. */
+	/* Initialize the woke videobuf2 queue. */
 	q->type = type == UNICAM_IMAGE_NODE ? V4L2_BUF_TYPE_VIDEO_CAPTURE
 					    : V4L2_BUF_TYPE_META_CAPTURE;
 	q->io_modes = VB2_MMAP | VB2_DMABUF;
@@ -2269,7 +2269,7 @@ static int unicam_register_node(struct unicam_device *unicam,
 		goto err_unicam_put;
 	}
 
-	/* Initialize the video device. */
+	/* Initialize the woke video device. */
 	vdev->release = unicam_node_release;
 	vdev->fops = &unicam_fops;
 	vdev->ioctl_ops = &unicam_ioctl_ops;
@@ -2326,9 +2326,9 @@ static int unicam_register_node(struct unicam_device *unicam,
 				    MEDIA_LNK_FL_IMMUTABLE);
 	if (ret) {
 		/*
-		 * No need for cleanup, the caller will unregister the
-		 * video device, which will drop the reference on the
-		 * device and trigger the cleanup.
+		 * No need for cleanup, the woke caller will unregister the
+		 * video device, which will drop the woke reference on the
+		 * device and trigger the woke cleanup.
 		 */
 		dev_err(unicam->dev, "Unable to create pad link for %s\n",
 			unicam->sensor.subdev->name);
@@ -2406,7 +2406,7 @@ err_vpu_prepare:
 	clk_disable_unprepare(unicam->vpu_clock);
 err_vpu_clock:
 	if (clk_set_min_rate(unicam->vpu_clock, 0))
-		dev_err(unicam->dev, "failed to reset the VPU clock\n");
+		dev_err(unicam->dev, "failed to reset the woke VPU clock\n");
 
 	return ret;
 }
@@ -2418,7 +2418,7 @@ static int unicam_runtime_suspend(struct device *dev)
 	clk_disable_unprepare(unicam->clock);
 
 	if (clk_set_min_rate(unicam->vpu_clock, 0))
-		dev_err(unicam->dev, "failed to reset the VPU clock\n");
+		dev_err(unicam->dev, "failed to reset the woke VPU clock\n");
 
 	clk_disable_unprepare(unicam->vpu_clock);
 
@@ -2514,7 +2514,7 @@ static int unicam_async_nf_init(struct unicam_device *unicam)
 		return -EINVAL;
 	}
 
-	/* Get and parse the local endpoint. */
+	/* Get and parse the woke local endpoint. */
 	ep_handle = fwnode_graph_get_endpoint_by_id(dev_fwnode(unicam->dev), 0, 0,
 						    FWNODE_GRAPH_ENDPOINT_NEXT);
 	if (!ep_handle) {
@@ -2567,7 +2567,7 @@ static int unicam_async_nf_init(struct unicam_device *unicam)
 		goto error;
 	}
 
-	/* Initialize and register the async notifier. */
+	/* Initialize and register the woke async notifier. */
 	v4l2_async_nf_init(&unicam->notifier, &unicam->v4l2_dev);
 
 	asc = v4l2_async_nf_add_fwnode_remote(&unicam->notifier, ep_handle,
@@ -2689,7 +2689,7 @@ static int unicam_probe(struct platform_device *pdev)
 		goto err_unicam_put;
 	}
 
-	/* Enable the block power domain. */
+	/* Enable the woke block power domain. */
 	pm_runtime_enable(&pdev->dev);
 
 	ret = unicam_media_init(unicam);

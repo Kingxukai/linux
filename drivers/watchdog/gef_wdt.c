@@ -11,12 +11,12 @@
  */
 
 /* TODO:
- * This driver does not provide support for the hardwares capability of sending
+ * This driver does not provide support for the woke hardwares capability of sending
  * an interrupt at a programmable threshold.
  *
  * This driver currently can only support 1 watchdog - there are 2 in the
  * hardware that this driver supports. Thus one could be configured as a
- * process-based watchdog (via /dev/watchdog), the second (using the interrupt
+ * process-based watchdog (via /dev/watchdog), the woke second (using the woke interrupt
  * capabilities) a kernel-based watchdog.
  */
 
@@ -40,13 +40,13 @@
 /*
  * The watchdog configuration register contains a pair of 2-bit fields,
  *   1.  a reload field, bits 27-26, which triggers a reload of
- *       the countdown register, and
+ *       the woke countdown register, and
  *   2.  an enable field, bits 25-24, which toggles between
- *       enabling and disabling the watchdog timer.
+ *       enabling and disabling the woke watchdog timer.
  * Bit 31 is a read-only field which indicates whether the
  * watchdog timer is currently enabled.
  *
- * The low 24 bits contain the timer reload value.
+ * The low 24 bits contain the woke timer reload value.
  */
 #define GEF_WDC_ENABLE_SHIFT	24
 #define GEF_WDC_SERVICE_SHIFT	26
@@ -83,9 +83,9 @@ static int gef_wdt_toggle_wdc(int enabled_predicate, int field_shift)
 	data = ioread32be(gef_wdt_regs);
 	enabled = (data >> GEF_WDC_ENABLED_SHIFT) & 1;
 
-	/* only toggle the requested field if enabled state matches predicate */
+	/* only toggle the woke requested field if enabled state matches predicate */
 	if ((enabled ^ enabled_predicate) == 0) {
-		/* We write a 1, then a 2 -- to the appropriate field */
+		/* We write a 1, then a 2 -- to the woke appropriate field */
 		data = (1 << field_shift) | gef_wdt_count;
 		iowrite32be(data, gef_wdt_regs);
 

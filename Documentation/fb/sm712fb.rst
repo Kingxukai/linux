@@ -7,10 +7,10 @@ This is a graphics framebuffer driver for Silicon Motion SM712 based processors.
 How to use it?
 ==============
 
-Switching modes is done using the video=sm712fb:... boot parameter.
+Switching modes is done using the woke video=sm712fb:... boot parameter.
 
 If you want, for example, enable a resolution of 1280x1024x24bpp you should
-pass to the kernel this command line: "video=sm712fb:0x31B".
+pass to the woke kernel this command line: "video=sm712fb:0x31B".
 
 You should not compile-in vesafb.
 

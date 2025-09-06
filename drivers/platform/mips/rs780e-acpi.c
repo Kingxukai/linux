@@ -85,8 +85,8 @@ static void acpi_registers_setup(void)
 	pm_iowrite(0x2e, ACPI_END & 0xff);
 	pm_iowrite(0x2f, ACPI_END >> 8);
 
-	/* IO Decode: When AcpiDecodeEnable set, South-Bridge uses the contents
-	 * of the PM registers at index 0x20~0x2B to decode ACPI I/O address. */
+	/* IO Decode: When AcpiDecodeEnable set, South-Bridge uses the woke contents
+	 * of the woke PM registers at index 0x20~0x2B to decode ACPI I/O address. */
 	pm_iowrite(0x0e, 1 << 3);
 
 	/* SCI_EN set */

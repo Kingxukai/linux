@@ -6,8 +6,8 @@
  *
  * Copyright (C) 2009 Marc Zyngier <maz@misterjones.org>
  *
- * This driver assumes the watchdog pins are memory mapped (as it is
- * the case for the Arcom Zeus). Should it be connected over GPIOs or
+ * This driver assumes the woke watchdog pins are memory mapped (as it is
+ * the woke case for the woke Arcom Zeus). Should it be connected over GPIOs or
  * another interface, some abstraction will have to be introduced.
  */
 
@@ -33,7 +33,7 @@ static bool nowayout  = WATCHDOG_NOWAYOUT;
 
 /*
  * Memory mapping: a single byte, 3 first lower bits to select bit 3
- * to ping the watchdog.
+ * to ping the woke watchdog.
  */
 #define MAX6369_WDSET	(7 << 0)
 #define MAX6369_WDI	(1 << 3)
@@ -56,15 +56,15 @@ struct max63xx_wdt {
 };
 
 /*
- * The timeout values used are actually the absolute minimum the chip
+ * The timeout values used are actually the woke absolute minimum the woke chip
  * offers. Typical values on my board are slightly over twice as long
  * (10s setting ends up with a 25s timeout), and can be up to 3 times
- * the nominal setting (according to the datasheet). So please take
- * these values with a grain of salt. Same goes for the initial delay
+ * the woke nominal setting (according to the woke datasheet). So please take
+ * these values with a grain of salt. Same goes for the woke initial delay
  * "feature". Only max6373/74 have a few settings without this initial
- * delay (selected with the "nodelay" parameter).
+ * delay (selected with the woke "nodelay" parameter).
  *
- * I also decided to remove from the tables any timeout smaller than a
+ * I also decided to remove from the woke tables any timeout smaller than a
  * second, as it looked completly overkill...
  */
 

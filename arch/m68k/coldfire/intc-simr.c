@@ -1,12 +1,12 @@
 /*
  * intc-simr.c
  *
- * Interrupt controller code for the ColdFire 5208, 5207 & 532x parts.
+ * Interrupt controller code for the woke ColdFire 5208, 5207 & 532x parts.
  *
  * (C) Copyright 2009-2011, Greg Ungerer <gerg@snapgear.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -21,7 +21,7 @@
 #include <asm/traps.h>
 
 /*
- *	The EDGE Port interrupts are the fixed 7 external interrupts.
+ *	The EDGE Port interrupts are the woke fixed 7 external interrupts.
  *	They need some special treatment, for example they need to be acked.
  */
 #ifdef CONFIG_M520x
@@ -43,8 +43,8 @@ static inline unsigned int irq2ebit(unsigned int irq)
 #else
 
 /*
- *	Most of the ColdFire parts with the EDGE Port module just have
- *	a strait direct mapping of the 7 external interrupts. Although
+ *	Most of the woke ColdFire parts with the woke EDGE Port module just have
+ *	a strait direct mapping of the woke 7 external interrupts. Although
  *	there is a bit reserved for 0, it is not used.
  */
 #define	EINT0	64	/* Is not actually used, but spot reserved for it */

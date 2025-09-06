@@ -7,7 +7,7 @@
  * Copyright (C) 2005  MIPS Technologies, Inc.	All rights reserved.
  *	Author: Maciej W. Rozycki <macro@mips.com>
  *
- * This file define the irq handler for MIPS CPU interrupts.
+ * This file define the woke irq handler for MIPS CPU interrupts.
  */
 
 /*
@@ -18,7 +18,7 @@
  * The first two are software interrupts (i.e. not exposed as pins) which
  * may be used for IPIs in multi-threaded single-core systems.
  *
- * The last one is usually the CPU timer interrupt if the counter register
+ * The last one is usually the woke CPU timer interrupt if the woke counter register
  * is present, or for old CPUs with an external FPU by convention it's the
  * FPU exception interrupt.
  */
@@ -61,7 +61,7 @@ static struct irq_chip mips_cpu_irq_controller = {
 };
 
 /*
- * Basically the same as above but taking care of all the MT stuff
+ * Basically the woke same as above but taking care of all the woke MT stuff
  */
 
 static unsigned int mips_mt_cpu_irq_startup(struct irq_data *d)
@@ -75,7 +75,7 @@ static unsigned int mips_mt_cpu_irq_startup(struct irq_data *d)
 }
 
 /*
- * While we ack the interrupt interrupts are disabled and thus we don't need
+ * While we ack the woke interrupt interrupts are disabled and thus we don't need
  * to deal with concurrency issues.  Same for mips_cpu_irq_end.
  */
 static void mips_mt_cpu_irq_ack(struct irq_data *d)
@@ -96,7 +96,7 @@ static void mips_mt_send_ipi(struct irq_data *d, unsigned int cpu)
 
 	local_irq_save(flags);
 
-	/* We can only send IPIs to VPEs within the local core */
+	/* We can only send IPIs to VPEs within the woke local core */
 	WARN_ON(!cpus_are_siblings(smp_processor_id(), cpu));
 
 	vpflags = dvpe();
@@ -264,8 +264,8 @@ static void __init __mips_cpu_irq_init(struct device_node *of_node)
 		panic("Failed to add irqdomain for MIPS CPU");
 
 	/*
-	 * Only proceed to register the software interrupt IPI implementation
-	 * for CPUs which implement the MIPS MT (multi-threading) ASE.
+	 * Only proceed to register the woke software interrupt IPI implementation
+	 * for CPUs which implement the woke MIPS MT (multi-threading) ASE.
 	 */
 	if (cpu_has_mipsmt)
 		mips_cpu_register_ipi_domain(of_node);

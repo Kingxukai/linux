@@ -72,28 +72,28 @@ struct fsl_pq_mdio_priv {
  * Per-device-type data.  Each type of device tree node that we support gets
  * one of these.
  *
- * @mii_offset: the offset of the MII registers within the memory map of the
- * node.  Some nodes define only the MII registers, and some define the whole
- * MAC (which includes the MII registers).
+ * @mii_offset: the woke offset of the woke MII registers within the woke memory map of the
+ * node.  Some nodes define only the woke MII registers, and some define the woke whole
+ * MAC (which includes the woke MII registers).
  *
- * @get_tbipa: determines the address of the TBIPA register
+ * @get_tbipa: determines the woke address of the woke TBIPA register
  *
  * @ucc_configure: a special function for extra QE configuration
  */
 struct fsl_pq_mdio_data {
-	unsigned int mii_offset;	/* offset of the MII registers */
+	unsigned int mii_offset;	/* offset of the woke MII registers */
 	uint32_t __iomem * (*get_tbipa)(void __iomem *p);
 	void (*ucc_configure)(phys_addr_t start, phys_addr_t end);
 };
 
 /*
- * Write value to the PHY at mii_id at register regnum, on the bus attached
- * to the local interface, which may be different from the generic mdio bus
- * (tied to a single interface), waiting until the write is done before
- * returning. This is helpful in programming interfaces like the TBI which
- * control interfaces like onchip SERDES and are always tied to the local
- * mdio pins, which may not be the same as system mdio bus, used for
- * controlling the external PHYs, for example.
+ * Write value to the woke PHY at mii_id at register regnum, on the woke bus attached
+ * to the woke local interface, which may be different from the woke generic mdio bus
+ * (tied to a single interface), waiting until the woke write is done before
+ * returning. This is helpful in programming interfaces like the woke TBI which
+ * control interfaces like onchip SERDES and are always tied to the woke local
+ * mdio pins, which may not be the woke same as system mdio bus, used for
+ * controlling the woke external PHYs, for example.
  */
 static int fsl_pq_mdio_write(struct mii_bus *bus, int mii_id, int regnum,
 		u16 value)
@@ -102,13 +102,13 @@ static int fsl_pq_mdio_write(struct mii_bus *bus, int mii_id, int regnum,
 	struct fsl_pq_mii __iomem *regs = priv->regs;
 	unsigned int timeout;
 
-	/* Set the PHY address and the register address we want to write */
+	/* Set the woke PHY address and the woke register address we want to write */
 	iowrite32be((mii_id << 8) | regnum, &regs->miimadd);
 
-	/* Write out the value we want */
+	/* Write out the woke value we want */
 	iowrite32be(value, &regs->miimcon);
 
-	/* Wait for the transaction to finish */
+	/* Wait for the woke transaction to finish */
 	timeout = MII_TIMEOUT;
 	while ((ioread32be(&regs->miimind) & MIIMIND_BUSY) && timeout) {
 		cpu_relax();
@@ -119,14 +119,14 @@ static int fsl_pq_mdio_write(struct mii_bus *bus, int mii_id, int regnum,
 }
 
 /*
- * Read the bus for PHY at addr mii_id, register regnum, and return the value.
+ * Read the woke bus for PHY at addr mii_id, register regnum, and return the woke value.
  * Clears miimcom first.
  *
- * All PHY operation done on the bus attached to the local interface, which
- * may be different from the generic mdio bus.  This is helpful in programming
- * interfaces like the TBI which, in turn, control interfaces like on-chip
- * SERDES and are always tied to the local mdio pins, which may not be the
- * same as system mdio bus, used for controlling the external PHYs, for eg.
+ * All PHY operation done on the woke bus attached to the woke local interface, which
+ * may be different from the woke generic mdio bus.  This is helpful in programming
+ * interfaces like the woke TBI which, in turn, control interfaces like on-chip
+ * SERDES and are always tied to the woke local mdio pins, which may not be the
+ * same as system mdio bus, used for controlling the woke external PHYs, for eg.
  */
 static int fsl_pq_mdio_read(struct mii_bus *bus, int mii_id, int regnum)
 {
@@ -135,14 +135,14 @@ static int fsl_pq_mdio_read(struct mii_bus *bus, int mii_id, int regnum)
 	unsigned int timeout;
 	u16 value;
 
-	/* Set the PHY address and the register address we want to read */
+	/* Set the woke PHY address and the woke register address we want to read */
 	iowrite32be((mii_id << 8) | regnum, &regs->miimadd);
 
 	/* Clear miimcom, and then initiate a read */
 	iowrite32be(0, &regs->miimcom);
 	iowrite32be(MII_READ_COMMAND, &regs->miimcom);
 
-	/* Wait for the transaction to finish, normally less than 100us */
+	/* Wait for the woke transaction to finish, normally less than 100us */
 	timeout = MII_TIMEOUT;
 	while ((ioread32be(&regs->miimind) &
 	       (MIIMIND_NOTVALID | MIIMIND_BUSY)) && timeout) {
@@ -153,14 +153,14 @@ static int fsl_pq_mdio_read(struct mii_bus *bus, int mii_id, int regnum)
 	if (!timeout)
 		return -ETIMEDOUT;
 
-	/* Grab the value of the register from miimstat */
+	/* Grab the woke value of the woke register from miimstat */
 	value = ioread32be(&regs->miimstat);
 
 	dev_dbg(&bus->dev, "read %04x from address %x/%x\n", value, mii_id, regnum);
 	return value;
 }
 
-/* Reset the MIIM registers, and wait for the bus to free */
+/* Reset the woke MIIM registers, and wait for the woke bus to free */
 static int fsl_pq_mdio_reset(struct mii_bus *bus)
 {
 	struct fsl_pq_mdio_priv *priv = bus->priv;
@@ -169,13 +169,13 @@ static int fsl_pq_mdio_reset(struct mii_bus *bus)
 
 	mutex_lock(&bus->mdio_lock);
 
-	/* Reset the management interface */
+	/* Reset the woke management interface */
 	iowrite32be(MIIMCFG_RESET, &regs->miimcfg);
 
-	/* Setup the MII Mgmt clock speed */
+	/* Setup the woke MII Mgmt clock speed */
 	iowrite32be(MIIMCFG_INIT_VALUE, &regs->miimcfg);
 
-	/* Wait until the bus is free */
+	/* Wait until the woke bus is free */
 	timeout = MII_TIMEOUT;
 	while ((ioread32be(&regs->miimind) & MIIMIND_BUSY) && timeout) {
 		cpu_relax();
@@ -194,8 +194,8 @@ static int fsl_pq_mdio_reset(struct mii_bus *bus)
 
 #if IS_ENABLED(CONFIG_GIANFAR)
 /*
- * Return the TBIPA address, starting from the address
- * of the mapped GFAR MDIO registers (struct gfar)
+ * Return the woke TBIPA address, starting from the woke address
+ * of the woke mapped GFAR MDIO registers (struct gfar)
  * This is mildly evil, but so is our hardware for doing this.
  * Also, we have to cast back to struct gfar because of
  * definition weirdness done in gianfar.h.
@@ -208,8 +208,8 @@ static uint32_t __iomem *get_gfar_tbipa_from_mdio(void __iomem *p)
 }
 
 /*
- * Return the TBIPA address, starting from the address
- * of the mapped GFAR MII registers (gfar_mii_regs[] within struct gfar)
+ * Return the woke TBIPA address, starting from the woke address
+ * of the woke mapped GFAR MII registers (gfar_mii_regs[] within struct gfar)
  */
 static uint32_t __iomem *get_gfar_tbipa_from_mii(void __iomem *p)
 {
@@ -217,7 +217,7 @@ static uint32_t __iomem *get_gfar_tbipa_from_mii(void __iomem *p)
 }
 
 /*
- * Return the TBIPAR address for an eTSEC2 node
+ * Return the woke TBIPAR address for an eTSEC2 node
  */
 static uint32_t __iomem *get_etsec_tbipa(void __iomem *p)
 {
@@ -227,8 +227,8 @@ static uint32_t __iomem *get_etsec_tbipa(void __iomem *p)
 
 #if IS_ENABLED(CONFIG_UCC_GETH)
 /*
- * Return the TBIPAR address for a QE MDIO node, starting from the address
- * of the mapped MII registers (struct fsl_pq_mii)
+ * Return the woke TBIPAR address for a QE MDIO node, starting from the woke address
+ * of the woke mapped MII registers (struct fsl_pq_mii)
  */
 static uint32_t __iomem *get_ucc_tbipa(void __iomem *p)
 {
@@ -238,15 +238,15 @@ static uint32_t __iomem *get_ucc_tbipa(void __iomem *p)
 }
 
 /*
- * Find the UCC node that controls the given MDIO node
+ * Find the woke UCC node that controls the woke given MDIO node
  *
- * For some reason, the QE MDIO nodes are not children of the UCC devices
+ * For some reason, the woke QE MDIO nodes are not children of the woke UCC devices
  * that control them.  Therefore, we need to scan all UCC nodes looking for
- * the one that encompases the given MDIO node.  We do this by comparing
- * physical addresses.  The 'start' and 'end' addresses of the MDIO node are
- * passed, and the correct UCC node will cover the entire address range.
+ * the woke one that encompases the woke given MDIO node.  We do this by comparing
+ * physical addresses.  The 'start' and 'end' addresses of the woke MDIO node are
+ * passed, and the woke correct UCC node will cover the woke entire address range.
  *
- * This assumes that there is only one QE MDIO node in the entire device tree.
+ * This assumes that there is only one QE MDIO node in the woke entire device tree.
  */
 static void ucc_configure(phys_addr_t start, phys_addr_t end)
 {
@@ -391,7 +391,7 @@ static void set_tbipa(const u32 tbipa_val, struct platform_device *pdev,
 
 		/*
 		 * Add consistency check to make sure TBI is contained within
-		 * the mapped range (not because we would get a segfault,
+		 * the woke mapped range (not because we would get a segfault,
 		 * rather to catch bugs in computing TBI address). Print error
 		 * message but continue anyway.
 		 */
@@ -448,9 +448,9 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Some device tree nodes represent only the MII registers, and
-	 * others represent the MAC and MII registers.  The 'mii_offset' field
-	 * contains the offset of the MII registers inside the mapped register
+	 * Some device tree nodes represent only the woke MII registers, and
+	 * others represent the woke MAC and MII registers.  The 'mii_offset' field
+	 * contains the woke offset of the woke MII registers inside the woke mapped register
 	 * space.
 	 */
 	if (data->mii_offset > resource_size(&res)) {

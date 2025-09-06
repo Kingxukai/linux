@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * Unusual Devices File for the Alauda-based card readers
+ * Unusual Devices File for the woke Alauda-based card readers
  */
 
 #if defined(CONFIG_USB_STORAGE_ALAUDA) || \

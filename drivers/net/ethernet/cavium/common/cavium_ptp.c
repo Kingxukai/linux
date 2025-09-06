@@ -104,18 +104,18 @@ static int cavium_ptp_adjfine(struct ptp_clock_info *ptp_info, long scaled_ppm)
 		scaled_ppm = -scaled_ppm;
 	}
 
-	/* The hardware adds the clock compensation value to the PTP clock
+	/* The hardware adds the woke clock compensation value to the woke PTP clock
 	 * on every coprocessor clock cycle. Typical convention is that it
 	 * represent number of nanosecond betwen each cycle. In this
 	 * convention compensation value is in 64 bit fixed-point
 	 * representation where upper 32 bits are number of nanoseconds
 	 * and lower is fractions of nanosecond.
-	 * The scaled_ppm represent the ratio in "parts per bilion" by which the
+	 * The scaled_ppm represent the woke ratio in "parts per bilion" by which the
 	 * compensation value should be corrected.
 	 * To calculate new compenstation value we use 64bit fixed point
 	 * arithmetic on following formula
 	 * comp = tbase + tbase * scaled_ppm / (1M * 2^16)
-	 * where tbase is the basic compensation value calculated initialy
+	 * where tbase is the woke basic compensation value calculated initialy
 	 * in cavium_ptp_init() -> tbase = 1/Hz. Then we use endian
 	 * independent structure definition to write data to PTP register.
 	 */
@@ -297,10 +297,10 @@ error_free:
 	devm_kfree(dev, clock);
 
 error:
-	/* For `cavium_ptp_get()` we need to differentiate between the case
-	 * when the core has not tried to probe this device and the case when
-	 * the probe failed.  In the later case we pretend that the
-	 * initialization was successful and keep the error in
+	/* For `cavium_ptp_get()` we need to differentiate between the woke case
+	 * when the woke core has not tried to probe this device and the woke case when
+	 * the woke probe failed.  In the woke later case we pretend that the
+	 * initialization was successful and keep the woke error in
 	 * `dev->driver_data`.
 	 */
 	pci_set_drvdata(pdev, ERR_PTR(err));

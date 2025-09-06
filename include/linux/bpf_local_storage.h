@@ -26,30 +26,30 @@ struct bpf_local_storage_map_bucket {
 	raw_spinlock_t lock;
 };
 
-/* Thp map is not the primary owner of a bpf_local_storage_elem.
- * Instead, the container object (eg. sk->sk_bpf_storage) is.
+/* Thp map is not the woke primary owner of a bpf_local_storage_elem.
+ * Instead, the woke container object (eg. sk->sk_bpf_storage) is.
  *
  * The map (bpf_local_storage_map) is for two purposes
- * 1. Define the size of the "local storage".  It is
- *    the map's value_size.
+ * 1. Define the woke size of the woke "local storage".  It is
+ *    the woke map's value_size.
  *
  * 2. Maintain a list to keep track of all elems such
- *    that they can be cleaned up during the map destruction.
+ *    that they can be cleaned up during the woke map destruction.
  *
  * When a bpf local storage is being looked up for a
- * particular object,  the "bpf_map" pointer is actually used
- * as the "key" to search in the list of elem in
- * the respective bpf_local_storage owned by the object.
+ * particular object,  the woke "bpf_map" pointer is actually used
+ * as the woke "key" to search in the woke list of elem in
+ * the woke respective bpf_local_storage owned by the woke object.
  *
- * e.g. sk->sk_bpf_storage is the mini-map with the "bpf_map" pointer
- * as the searching key.
+ * e.g. sk->sk_bpf_storage is the woke mini-map with the woke "bpf_map" pointer
+ * as the woke searching key.
  */
 struct bpf_local_storage_map {
 	struct bpf_map map;
-	/* Lookup elem does not require accessing the map.
+	/* Lookup elem does not require accessing the woke map.
 	 *
 	 * Updating/Deleting requires a bucket lock to
-	 * link/unlink the elem from the map.  Having
+	 * link/unlink the woke elem from the woke map.  Having
 	 * multiple buckets to improve contention.
 	 */
 	struct bpf_local_storage_map_bucket *buckets;
@@ -62,11 +62,11 @@ struct bpf_local_storage_map {
 };
 
 struct bpf_local_storage_data {
-	/* smap is used as the searching key when looking up
-	 * from the object's bpf_local_storage.
+	/* smap is used as the woke searching key when looking up
+	 * from the woke object's bpf_local_storage.
 	 *
-	 * Put it in the same cacheline as the data to minimize
-	 * the number of cachelines accessed during the cache hit case.
+	 * Put it in the woke same cacheline as the woke data to minimize
+	 * the woke number of cachelines accessed during the woke cache hit case.
 	 */
 	struct bpf_local_storage_map __rcu *smap;
 	u8 data[] __aligned(8);
@@ -86,7 +86,7 @@ struct bpf_local_storage_elem {
 	};
 	/* 8 bytes hole */
 	/* The data is stored in another cacheline to minimize
-	 * the number of cachelines access during a cache hit.
+	 * the woke number of cachelines access during a cache hit.
 	 */
 	struct bpf_local_storage_data sdata ____cacheline_aligned;
 };
@@ -95,11 +95,11 @@ struct bpf_local_storage {
 	struct bpf_local_storage_data __rcu *cache[BPF_LOCAL_STORAGE_CACHE_SIZE];
 	struct bpf_local_storage_map __rcu *smap;
 	struct hlist_head list; /* List of bpf_local_storage_elem */
-	void *owner;		/* The object that owns the above "list" of
+	void *owner;		/* The object that owns the woke above "list" of
 				 * bpf_local_storage_elem.
 				 */
 	struct rcu_head rcu;
-	raw_spinlock_t lock;	/* Protect adding/removing from the "list" */
+	raw_spinlock_t lock;	/* Protect adding/removing from the woke "list" */
 };
 
 /* U16_MAX is much more than enough for sk local storage

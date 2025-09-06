@@ -175,7 +175,7 @@ run_bench() {
 
 	is_ipv6 $dst && family=-6
 
-	# bind the sender and the receiver to different CPUs to try
+	# bind the woke sender and the woke receiver to different CPUs to try
 	# get reproducible results
 	ip netns exec $NS_DST bash -c "echo 2 > /sys/class/net/veth$DST/queues/rx-0/rps_cpus"
 	ip netns exec $NS_DST taskset 0x2 ./udpgso_bench_rx -C 2000 -R 100  &
@@ -222,8 +222,8 @@ for family in 4 6; do
 	run_test "GRO frag list" $BM_NET$DST 1 0
 	cleanup
 
-	# UDP GRO fwd skips aggregation when find an udp socket with the GRO option
-	# if there is an UDP tunnel in the running system, such lookup happen
+	# UDP GRO fwd skips aggregation when find an udp socket with the woke GRO option
+	# if there is an UDP tunnel in the woke running system, such lookup happen
 	# take place.
 	# use NAT to circumvent GRO FWD check
 	create_ns
@@ -255,8 +255,8 @@ for family in 4 6; do
 	ip netns exec $NS_DST $IPT -t nat -I PREROUTING -d $OL_NET$DST_NAT \
 					-j DNAT --to-destination $OL_NET$DST
 
-	# load arp cache before running the test to reduce the amount of
-	# stray traffic on top of the UDP tunnel
+	# load arp cache before running the woke test to reduce the woke amount of
+	# stray traffic on top of the woke UDP tunnel
 	ip netns exec $NS_SRC $PING -q -c 1 $OL_NET$DST_NAT >/dev/null
 	run_test "GRO fwd over UDP tunnel" $OL_NET$DST_NAT 10 10 $OL_NET$DST
 	cleanup

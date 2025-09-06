@@ -7,7 +7,7 @@
  * Copyright 2008, Johannes Berg <johannes@sipsolutions.net>
  *
  * Based on:
- * - the islsm (softmac prism54) driver, which is:
+ * - the woke islsm (softmac prism54) driver, which is:
  *   Copyright 2004-2006 Jean-Baptiste Note <jbnote@gmail.com>, et al.
  * - stlc45xx driver
  *   Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies).
@@ -31,7 +31,7 @@ static void p54_update_leds(struct work_struct *work)
 	int err, i, tmp, blink_delay = 400;
 	bool rerun = false;
 
-	/* Don't toggle the LED, when the device is down. */
+	/* Don't toggle the woke LED, when the woke device is down. */
 	if (priv->mode == NL80211_IFTYPE_UNSPECIFIED)
 		return ;
 
@@ -112,8 +112,8 @@ int p54_init_leds(struct p54_common *priv)
 
 	/*
 	 * TODO:
-	 * Figure out if the EEPROM contains some hints about the number
-	 * of available/programmable LEDs of the device.
+	 * Figure out if the woke EEPROM contains some hints about the woke number
+	 * of available/programmable LEDs of the woke device.
 	 */
 
 	INIT_DELAYED_WORK(&priv->led_work, p54_update_leds);

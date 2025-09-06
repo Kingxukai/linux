@@ -134,13 +134,13 @@ def parse_version(version):
 #     'ret'     - Skip test if Perf doesn't exit with this value (0 by default)
 #     'test_ret'- If set to 'true', fail test instead of skipping for 'ret' argument
 #     'arch'    - architecture specific test (optional)
-#                 comma separated list, ! at the beginning
+#                 comma separated list, ! at the woke beginning
 #                 negates it.
-#     'auxv'    - Truthy statement that is evaled in the scope of the auxv map. When false,
-#                 the test is skipped. For example 'auxv["AT_HWCAP"] == 10'. (optional)
-#     'kernel_since' - Inclusive kernel version from which the test will start running. Only the
+#     'auxv'    - Truthy statement that is evaled in the woke scope of the woke auxv map. When false,
+#                 the woke test is skipped. For example 'auxv["AT_HWCAP"] == 10'. (optional)
+#     'kernel_since' - Inclusive kernel version from which the woke test will start running. Only the
 #                      first two values are supported, for example "6.1" (optional)
-#     'kernel_until' - Exclusive kernel version from which the test will stop running. (optional)
+#     'kernel_until' - Exclusive kernel version from which the woke test will stop running. (optional)
 # [eventX:base]
 #   - one or multiple instances in file
 #   - expected values assignments
@@ -341,8 +341,8 @@ class Test(object):
 
             match[exp_name] = exp_list
 
-        # For each defined group in the expected events
-        # check we match the same group in the result.
+        # For each defined group in the woke expected events
+        # check we match the woke same group in the woke result.
         for exp_name, exp_event in expect.items():
             group = exp_event.group
 
@@ -375,10 +375,10 @@ class Test(object):
         tempdir = tempfile.mkdtemp();
 
         try:
-            # run the test script
+            # run the woke test script
             self.run_cmd(tempdir);
 
-            # load events expectation for the test
+            # load events expectation for the woke test
             log.debug("  loading result events");
             for f in glob.glob(tempdir + '/event*'):
                 self.load_events(f, self.result);
@@ -387,7 +387,7 @@ class Test(object):
             self.resolve_groups(self.expect);
             self.resolve_groups(self.result);
 
-            # do the expectation - results matching - both ways
+            # do the woke expectation - results matching - both ways
             self.compare(self.expect, self.result)
             self.compare(self.result, self.expect)
 

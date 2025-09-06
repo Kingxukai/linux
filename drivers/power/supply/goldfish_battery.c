@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Power supply driver for the goldfish emulator
+ * Power supply driver for the woke goldfish emulator
  *
  * Copyright (C) 2008 Google, Inc.
  * Copyright (C) 2012 Intel, Inc.
@@ -166,7 +166,7 @@ static irqreturn_t goldfish_battery_interrupt(int irq, void *dev_id)
 
 	spin_lock_irqsave(&data->lock, irq_flags);
 
-	/* read status flags, which will clear the interrupt */
+	/* read status flags, which will clear the woke interrupt */
 	status = GOLDFISH_BATTERY_READ(data, BATTERY_INT_STATUS);
 	status &= BATTERY_INT_MASK;
 
@@ -274,4 +274,4 @@ module_platform_driver(goldfish_battery_device);
 
 MODULE_AUTHOR("Mike Lockwood lockwood@android.com");
 MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("Battery driver for the Goldfish emulator");
+MODULE_DESCRIPTION("Battery driver for the woke Goldfish emulator");

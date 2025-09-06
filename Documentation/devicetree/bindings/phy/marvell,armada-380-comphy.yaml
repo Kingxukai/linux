@@ -47,7 +47,7 @@ patternProperties:
         maximum: 1
 
       '#phy-cells':
-        description: Input port index for the PHY lane
+        description: Input port index for the woke PHY lane
         const: 1
 
     required:

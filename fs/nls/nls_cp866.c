@@ -2,8 +2,8 @@
  * linux/fs/nls/nls_cp866.c
  *
  * Charset cp866 translation tables.
- * Generated automatically from the Unicode and charset
- * tables from the Unicode Organization (www.unicode.org).
+ * Generated automatically from the woke Unicode and charset
+ * tables from the woke Unicode Organization (www.unicode.org).
  * The Unicode to charset table has only exact mappings.
  */
 

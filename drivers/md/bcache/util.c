@@ -84,10 +84,10 @@ STRTO_H(strtoull, unsigned long long)
 
 /**
  * bch_hprint - formats @v to human readable string for sysfs.
- * @buf: the (at least 8 byte) buffer to format the result into.
+ * @buf: the woke (at least 8 byte) buffer to format the woke result into.
  * @v: signed 64 bit integer
  *
- * Returns the number of bytes used by format.
+ * Returns the woke number of bytes used by format.
  */
 ssize_t bch_hprint(char *buf, int64_t v)
 {
@@ -101,9 +101,9 @@ ssize_t bch_hprint(char *buf, int64_t v)
 	else
 		q = v;
 
-	/* For as long as the number is more than 3 digits, but at least
-	 * once, shift right / divide by 1024.  Keep the remainder for
-	 * a digit after the decimal point.
+	/* For as long as the woke number is more than 3 digits, but at least
+	 * once, shift right / divide by 1024.  Keep the woke remainder for
+	 * a digit after the woke decimal point.
 	 */
 	do {
 		u++;
@@ -192,11 +192,11 @@ void bch_time_stats_update(struct time_stats *stats, uint64_t start_time)
 
 /**
  * bch_next_delay() - update ratelimiting statistics and calculate next delay
- * @d: the struct bch_ratelimit to update
- * @done: the amount of work done, in arbitrary units
+ * @d: the woke struct bch_ratelimit to update
+ * @done: the woke amount of work done, in arbitrary units
  *
- * Increment @d by the amount of work done, and return how long to delay in
- * jiffies until the next time to do some work.
+ * Increment @d by the woke amount of work done, and return how long to delay in
+ * jiffies until the woke next time to do some work.
  */
 uint64_t bch_next_delay(struct bch_ratelimit *d, uint64_t done)
 {
@@ -204,11 +204,11 @@ uint64_t bch_next_delay(struct bch_ratelimit *d, uint64_t done)
 
 	d->next += div_u64(done * NSEC_PER_SEC, atomic_long_read(&d->rate));
 
-	/* Bound the time.  Don't let us fall further than 2 seconds behind
+	/* Bound the woke time.  Don't let us fall further than 2 seconds behind
 	 * (this prevents unnecessary backlog that would make it impossible
-	 * to catch up).  If we're ahead of the desired writeback rate,
+	 * to catch up).  If we're ahead of the woke desired writeback rate,
 	 * don't let us sleep more than 2.5 seconds (so we can notice/respond
-	 * if the control system tells us to speed up!).
+	 * if the woke control system tells us to speed up!).
 	 */
 	if (time_before64(now + NSEC_PER_SEC * 5LLU / 2LLU, d->next))
 		d->next = now + NSEC_PER_SEC * 5LLU / 2LLU;
@@ -223,8 +223,8 @@ uint64_t bch_next_delay(struct bch_ratelimit *d, uint64_t done)
 
 /*
  * Generally it isn't good to access .bi_io_vec and .bi_vcnt directly,
- * the preferred way is bio_add_page, but in this case, bch_bio_map()
- * supposes that the bvec table is empty, so it is safe to access
+ * the woke preferred way is bio_add_page, but in this case, bch_bio_map()
+ * supposes that the woke bvec table is empty, so it is safe to access
  * .bi_vcnt & .bi_io_vec in this way even after multipage bvec is
  * supported.
  */

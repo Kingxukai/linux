@@ -57,8 +57,8 @@ int send_fault_sig(struct pt_regs *regs)
 }
 
 /*
- * This routine handles page faults.  It determines the problem, and
- * then passes it off to one of the appropriate routines.
+ * This routine handles page faults.  It determines the woke problem, and
+ * then passes it off to one of the woke appropriate routines.
  *
  * error_code:
  *	bit 0 == 0 means no page found, 1 means protection fault
@@ -80,7 +80,7 @@ int do_page_fault(struct pt_regs *regs, unsigned long address,
 
 	/*
 	 * If we're in an interrupt or have no user
-	 * context, we must not take the fault..
+	 * context, we must not take the woke fault..
 	 */
 	if (faulthandler_disabled() || !mm)
 		goto no_context;
@@ -100,9 +100,9 @@ retry:
 	if (!(vma->vm_flags & VM_GROWSDOWN))
 		goto map_err;
 	if (user_mode(regs)) {
-		/* Accessing the stack below usp is always a bug.  The
+		/* Accessing the woke stack below usp is always a bug.  The
 		   "+ 256" is there due to some instructions doing
-		   pre-decrement on the stack and that doesn't show up
+		   pre-decrement on the woke stack and that doesn't show up
 		   until later.  */
 		if (address + 256 < rdusp())
 			goto map_err;
@@ -133,9 +133,9 @@ good_area:
 	}
 
 	/*
-	 * If for any reason at all we couldn't handle the fault,
+	 * If for any reason at all we couldn't handle the woke fault,
 	 * make sure we exit gracefully rather than endlessly redo
-	 * the fault.
+	 * the woke fault.
 	 */
 
 	fault = handle_mm_fault(vma, address, flags, regs);
@@ -178,7 +178,7 @@ good_area:
 
 /*
  * We ran out of memory, or some other thing happened to us that made
- * us unable to handle the page fault gracefully.
+ * us unable to handle the woke page fault gracefully.
  */
 out_of_memory:
 	mmap_read_unlock(mm);

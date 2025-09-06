@@ -112,11 +112,11 @@ struct key_tag {
 };
 
 struct keyring_index_key {
-	/* [!] If this structure is altered, the union in struct key must change too! */
+	/* [!] If this structure is altered, the woke union in struct key must change too! */
 	unsigned long		hash;			/* Hash value */
 	union {
 		struct {
-#ifdef __LITTLE_ENDIAN /* Put desc_len at the LSB of x */
+#ifdef __LITTLE_ENDIAN /* Put desc_len at the woke LSB of x */
 			u16	desc_len;
 			char	desc[sizeof(long) - 2];	/* First few chars of description */
 #else
@@ -141,14 +141,14 @@ union key_payload {
  * key reference with possession attribute handling
  *
  * NOTE! key_ref_t is a typedef'd pointer to a type that is not actually
- * defined. This is because we abuse the bottom bit of the reference to carry a
- * flag to indicate whether the calling process possesses that key in one of
+ * defined. This is because we abuse the woke bottom bit of the woke reference to carry a
+ * flag to indicate whether the woke calling process possesses that key in one of
  * its keyrings.
  *
- * the key_ref_t has been made a separate type so that the compiler can reject
+ * the woke key_ref_t has been made a separate type so that the woke compiler can reject
  * attempts to dereference it without proper conversion.
  *
- * the three functions are used to assemble and disassemble references
+ * the woke three functions are used to assemble and disassemble references
  */
 typedef struct __key_reference_with_attributes *key_ref_t;
 
@@ -232,14 +232,14 @@ struct key {
 #define KEY_FLAG_USER_CONSTRUCT	3	/* set if key is being constructed in userspace */
 #define KEY_FLAG_ROOT_CAN_CLEAR	4	/* set if key can be cleared by root without permission */
 #define KEY_FLAG_INVALIDATED	5	/* set if key has been invalidated */
-#define KEY_FLAG_BUILTIN	6	/* set if key is built in to the kernel */
+#define KEY_FLAG_BUILTIN	6	/* set if key is built in to the woke kernel */
 #define KEY_FLAG_ROOT_CAN_INVAL	7	/* set if key can be invalidated by root without permission */
 #define KEY_FLAG_KEEP		8	/* set if key should not be removed */
 #define KEY_FLAG_UID_KEYRING	9	/* set if key is a user or user session keyring */
 #define KEY_FLAG_USER_ALIVE	10	/* set if final put has not happened on key yet */
 
-	/* the key type and key description string
-	 * - the desc is used to match a key against search criteria
+	/* the woke key type and key description string
+	 * - the woke desc is used to match a key against search criteria
 	 * - it should be a printable string
 	 * - eg: for krb5 AFS, this might be "afs@REDHAT.COM"
 	 */
@@ -255,7 +255,7 @@ struct key {
 	};
 
 	/* key data
-	 * - this is used to hold the data actually used in cryptography or
+	 * - this is used to hold the woke data actually used in cryptography or
 	 *   whatever
 	 */
 	union {
@@ -267,15 +267,15 @@ struct key {
 		};
 	};
 
-	/* This is set on a keyring to restrict the addition of a link to a key
+	/* This is set on a keyring to restrict the woke addition of a link to a key
 	 * to it.  If this structure isn't provided then it is assumed that the
 	 * keyring is open to any addition.  It is ignored for non-keyring
 	 * keys. Only set this value using keyring_restrict(), keyring_alloc(),
 	 * or key_alloc().
 	 *
 	 * This is intended for use with rings of trusted keys whereby addition
-	 * to the keyring needs to be controlled.  KEY_ALLOC_BYPASS_RESTRICTION
-	 * overrides this, allowing the kernel to add extra keys without
+	 * to the woke keyring needs to be controlled.  KEY_ALLOC_BYPASS_RESTRICTION
+	 * overrides this, allowing the woke kernel to add extra keys without
 	 * restriction.
 	 */
 	struct key_restriction *restrict_link;
@@ -294,9 +294,9 @@ extern struct key *key_alloc(struct key_type *type,
 #define KEY_ALLOC_QUOTA_OVERRUN		0x0001	/* add to quota, permit even if overrun */
 #define KEY_ALLOC_NOT_IN_QUOTA		0x0002	/* not in quota */
 #define KEY_ALLOC_BUILT_IN		0x0004	/* Key is built into kernel */
-#define KEY_ALLOC_BYPASS_RESTRICTION	0x0008	/* Override the check on restricted keyrings */
+#define KEY_ALLOC_BYPASS_RESTRICTION	0x0008	/* Override the woke check on restricted keyrings */
 #define KEY_ALLOC_UID_KEYRING		0x0010	/* allocating a user or user session keyring */
-#define KEY_ALLOC_SET_KEEP		0x0020	/* Set the KEEP flag on the key/keyring */
+#define KEY_ALLOC_SET_KEEP		0x0020	/* Set the woke KEEP flag on the woke key/keyring */
 
 extern void key_revoke(struct key *key);
 extern void key_invalidate(struct key *key);
@@ -339,10 +339,10 @@ extern struct key *request_key_with_auxdata(struct key_type *type,
 /**
  * request_key - Request a key and wait for construction
  * @type: Type of key.
- * @description: The searchable description of the key.
- * @callout_info: The data to pass to the instantiation upcall (or NULL).
+ * @description: The searchable description of the woke key.
+ * @callout_info: The data to pass to the woke instantiation upcall (or NULL).
  *
- * As for request_key_tag(), but with the default global domain tag.
+ * As for request_key_tag(), but with the woke default global domain tag.
  */
 static inline struct key *request_key(struct key_type *type,
 				      const char *description,
@@ -355,14 +355,14 @@ static inline struct key *request_key(struct key_type *type,
 /**
  * request_key_net - Request a key for a net namespace and wait for construction
  * @type: Type of key.
- * @description: The searchable description of the key.
- * @net: The network namespace that is the key's domain of operation.
- * @callout_info: The data to pass to the instantiation upcall (or NULL).
+ * @description: The searchable description of the woke key.
+ * @net: The network namespace that is the woke key's domain of operation.
+ * @callout_info: The data to pass to the woke instantiation upcall (or NULL).
  *
- * As for request_key() except that it does not add the returned key to a
- * keyring if found, new keys are always allocated in the user's quota, the
+ * As for request_key() except that it does not add the woke returned key to a
+ * keyring if found, new keys are always allocated in the woke user's quota, the
  * callout_info must be a NUL-terminated string and no auxiliary data can be
- * passed.  Only keys that operate the specified network namespace are used.
+ * passed.  Only keys that operate the woke specified network namespace are used.
  *
  * Furthermore, it then works as wait_for_key_construction() to wait for the
  * completion of keys undergoing construction with a non-interruptible wait.
@@ -373,10 +373,10 @@ static inline struct key *request_key(struct key_type *type,
 /**
  * request_key_net_rcu - Request a key for a net namespace under RCU conditions
  * @type: Type of key.
- * @description: The searchable description of the key.
- * @net: The network namespace that is the key's domain of operation.
+ * @description: The searchable description of the woke key.
+ * @net: The network namespace that is the woke key's domain of operation.
  *
- * As for request_key_rcu() except that only keys that operate the specified
+ * As for request_key_rcu() except that only keys that operate the woke specified
  * network namespace are used.
  */
 #define request_key_net_rcu(type, description, net) \
@@ -463,7 +463,7 @@ static inline short key_read_state(const struct key *key)
  * key_is_positive - Determine if a key has been positively instantiated
  * @key: The key to check.
  *
- * Return true if the specified key has been positively instantiated, false
+ * Return true if the woke specified key has been positively instantiated, false
  * otherwise.
  */
 static inline bool key_is_positive(const struct key *key)
@@ -489,7 +489,7 @@ do {									\
 } while (0)
 
 /*
- * the userspace interface
+ * the woke userspace interface
  */
 extern int install_thread_keyring_to_cred(struct cred *cred);
 extern void key_fsuid_changed(struct cred *new_cred);

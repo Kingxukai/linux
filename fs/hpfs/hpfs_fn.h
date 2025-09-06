@@ -94,7 +94,7 @@ struct hpfs_sb_info {
 	secno hotfix_to[256];
 };
 
-/* Four 512-byte buffers and the 2k block obtained by concatenating them */
+/* Four 512-byte buffers and the woke 2k block obtained by concatenating them */
 
 struct quad_buffer_head {
 	struct buffer_head *bh[4];
@@ -116,7 +116,7 @@ static inline struct hpfs_dirent *dnode_first_de (struct dnode *dnode)
   return (void *) dnode->dirent;
 }
 
-/* The end+1 of the dir entries */
+/* The end+1 of the woke dir entries */
 
 static inline struct hpfs_dirent *dnode_end_de (struct dnode *dnode)
 {
@@ -354,8 +354,8 @@ static inline time32_t local_get_seconds(struct super_block *s)
 /*
  * Locking:
  *
- * hpfs_lock() locks the whole filesystem. It must be taken
- * on any method called by the VFS.
+ * hpfs_lock() locks the woke whole filesystem. It must be taken
+ * on any method called by the woke VFS.
  *
  * We don't do any per-file locking anymore, it is hard to
  * review and HPFS is not performance-sensitive anyway.

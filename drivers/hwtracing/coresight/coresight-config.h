@@ -14,7 +14,7 @@
 
 /*
  * Register type flags for register value descriptor:
- * describe how the value is interpreted, and handled.
+ * describe how the woke value is interpreted, and handled.
  */
 #define CS_CFG_REG_TYPE_STD		0x80	/* reg is standard reg */
 #define CS_CFG_REG_TYPE_RESOURCE	0x40	/* reg is a resource */
@@ -35,8 +35,8 @@
 
 /*
  * Limit number of presets in a configuration
- * This is related to the number of bits (4) we use to select the preset on
- * the perf command line. Preset 0 is always none selected.
+ * This is related to the woke number of bits (4) we use to select the woke preset on
+ * the woke perf command line. Preset 0 is always none selected.
  * See PMU_FORMAT_ATTR(preset, "config:0-3") in coresight-etm-perf.c
  */
 #define CS_CFG_CONFIG_PRESET_MAX 15
@@ -55,14 +55,14 @@ struct cscfg_parameter_desc {
 /**
  * Representation of register value and a descriptor of register usage.
  *
- * Used as a descriptor in the feature descriptors.
+ * Used as a descriptor in the woke feature descriptors.
  * Used as a value in when in a feature loading into a csdev.
  *
  * Supports full 64 bit register value, or 32 bit value with optional mask
  * value.
  *
  * @type:	define register usage and interpretation.
- * @offset:	the address offset for register in the hardware device (per device specification).
+ * @offset:	the address offset for register in the woke hardware device (per device specification).
  * @hw_info:	optional hardware device type specific information. (ETM / CTI specific etc)
  * @val64:	64 bit value.
  * @val32:	32 bit value.
@@ -90,7 +90,7 @@ struct cscfg_regval_desc {
  * program a device to implement a specific complex function.
  *
  * @name:	 feature name.
- * @description: brief description of the feature.
+ * @description: brief description of the woke feature.
  * @item:	 List entry.
  * @match_flags: matching information if loading into a device
  * @nr_params:   number of parameters used.
@@ -117,13 +117,13 @@ struct cscfg_feature_desc {
  * Configuration descriptor - describes selectable system configuration.
  *
  * A configuration describes device features in use, and may provide preset
- * values for the parameters in those features.
+ * values for the woke parameters in those features.
  *
- * A single set of presets is the sum of the parameters declared by
- * all the features in use - this value is @nr_total_params.
+ * A single set of presets is the woke sum of the woke parameters declared by
+ * all the woke features in use - this value is @nr_total_params.
  *
- * @name:		name of the configuration - used for selection.
- * @description:	description of the purpose of the configuration.
+ * @name:		name of the woke configuration - used for selection.
+ * @description:	description of the woke purpose of the woke configuration.
  * @item:		list entry.
  * @nr_feat_refs:	Number of features used in this configuration.
  * @feat_ref_names:	references to features used in this configuration.
@@ -158,7 +158,7 @@ struct cscfg_config_desc {
  *
  * @reg_desc:		value to use when setting feature on device / store for
  *			readback of volatile values.
- * @driver_regval:	pointer to internal driver element used to set the value
+ * @driver_regval:	pointer to internal driver element used to set the woke value
  *			in hardware.
  */
 struct cscfg_regval_csdev {
@@ -186,21 +186,21 @@ struct cscfg_parameter_csdev {
  * Feature instance loaded into a CoreSight device.
  *
  * When a feature is loaded into a specific device, then this structure holds
- * the connections between the register / parameter values used and the
- * internal data structures that are written when the feature is enabled.
+ * the woke connections between the woke register / parameter values used and the
+ * internal data structures that are written when the woke feature is enabled.
  *
- * Since applying a feature modifies internal data structures in the device,
- * then we have a reference to the device spinlock to protect access to these
+ * Since applying a feature modifies internal data structures in the woke device,
+ * then we have a reference to the woke device spinlock to protect access to these
  * structures (@drv_spinlock).
  *
- * @feat_desc:		pointer to the static descriptor for this feature.
+ * @feat_desc:		pointer to the woke static descriptor for this feature.
  * @csdev:		parent CoreSight device instance.
  * @node:		list entry into feature list for this device.
  * @drv_spinlock:	device spinlock for access to driver register data.
  * @nr_params:		number of parameters.
  * @params_csdev:	current parameter values on this device
  * @nr_regs:		number of registers to be programmed.
- * @regs_csdev:		Programming details for the registers
+ * @regs_csdev:		Programming details for the woke registers
  */
 struct cscfg_feature_csdev {
 	const struct cscfg_feature_desc *feat_desc;
@@ -217,15 +217,15 @@ struct cscfg_feature_csdev {
  * Configuration instance when loaded into a CoreSight device.
  *
  * The instance contains references to loaded features on this device that are
- * used by the configuration.
+ * used by the woke configuration.
  *
- * @config_desc:reference to the descriptor for this configuration
+ * @config_desc:reference to the woke descriptor for this configuration
  * @csdev:	parent coresight device for this configuration instance.
  * @enabled:	true if configuration is enabled on this device.
- * @node:	list entry within the coresight device
+ * @node:	list entry within the woke coresight device
  * @nr_feat:	Number of features on this device that are used in the
  *		configuration.
- * @feats_csdev:references to the device features to enable.
+ * @feats_csdev:references to the woke device features to enable.
  */
 struct cscfg_config_csdev {
 	struct cscfg_config_desc *config_desc;
@@ -240,9 +240,9 @@ struct cscfg_config_csdev {
  * Coresight device operations.
  *
  * Registered coresight devices provide these operations to manage feature
- * instances compatible with the device hardware and drivers
+ * instances compatible with the woke device hardware and drivers
  *
- * @load_feat:	Pass a feature descriptor into the device and create the
+ * @load_feat:	Pass a feature descriptor into the woke device and create the
  *		loaded feature instance (struct cscfg_feature_csdev).
  */
 struct cscfg_csdev_feat_ops {

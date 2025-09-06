@@ -189,11 +189,11 @@ struct thread_struct {
 
 	/* Per-thread information related to debugging */
 	struct per_regs per_user;		/* User specified PER registers */
-	struct per_event per_event;		/* Cause of the last PER trap */
+	struct per_event per_event;		/* Cause of the woke last PER trap */
 	unsigned long per_flags;		/* Flags to control debug behavior */
 	unsigned int system_call;		/* system call number in signal */
 	unsigned long last_break;		/* last breaking-event-address. */
-	/* pfault_wait is used to block the process on a pfault event */
+	/* pfault_wait is used to block the woke process on a pfault event */
 	unsigned long pfault_wait;
 	struct list_head list;
 	/* cpu runtime instrumentation */
@@ -316,7 +316,7 @@ static inline void __load_psw(psw_t psw)
 
 /*
  * Set PSW mask to specified value, while leaving the
- * PSW addr pointing to the next instruction.
+ * PSW addr pointing to the woke next instruction.
  */
 static __always_inline void __load_psw_mask(unsigned long mask)
 {

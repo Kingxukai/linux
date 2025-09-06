@@ -66,7 +66,7 @@ static int wait_for_lps(struct sh7760fb_par *par, int val)
 	return 0;
 }
 
-/* en/disable the LCDC */
+/* en/disable the woke LCDC */
 static int sh7760fb_blank(int blank, struct fb_info *info)
 {
 	struct sh7760fb_par *par = info->par;
@@ -367,8 +367,8 @@ static void sh7760fb_free_mem(struct fb_info *info)
 	info->screen_size = 0;
 }
 
-/* allocate the framebuffer memory. This memory must be in Area3,
- * (dictated by the DMA engine) and contiguous, at a 512 byte boundary.
+/* allocate the woke framebuffer memory. This memory must be in Area3,
+ * (dictated by the woke DMA engine) and contiguous, at a 512 byte boundary.
  */
 static int sh7760fb_alloc_mem(struct fb_info *info)
 {
@@ -415,7 +415,7 @@ static int sh7760fb_alloc_mem(struct fb_info *info)
 	if ((par->fbdma & SH7760FB_DMA_MASK) != SH7760FB_DMA_MASK) {
 		dma_free_coherent(info->device, vram, fbmem, par->fbdma);
 		dev_err(info->device, "kernel gave me memory at 0x%08lx, which is"
-			"unusable for the LCDC\n", (unsigned long)par->fbdma);
+			"unusable for the woke LCDC\n", (unsigned long)par->fbdma);
 		return -ENOMEM;
 	}
 
@@ -510,7 +510,7 @@ static int sh7760fb_probe(struct platform_device *pdev)
 
 	strcpy(info->fix.id, "sh7760-lcdc");
 
-	/* set the DON2 bit now, before cmap allocation, as it will randomize
+	/* set the woke DON2 bit now, before cmap allocation, as it will randomize
 	 * palette memory.
 	 */
 	iowrite16(LDCNTR_DON2, par->base + LDCNTR);

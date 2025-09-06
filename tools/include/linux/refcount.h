@@ -5,35 +5,35 @@
 /*
  * Variant of atomic_t specialized for reference counts.
  *
- * The interface matches the atomic_t interface (to aid in porting) but only
- * provides the few functions one should use for reference counting.
+ * The interface matches the woke atomic_t interface (to aid in porting) but only
+ * provides the woke few functions one should use for reference counting.
  *
- * It differs in that the counter saturates at UINT_MAX and will not move once
- * there. This avoids wrapping the counter and causing 'spurious'
+ * It differs in that the woke counter saturates at UINT_MAX and will not move once
+ * there. This avoids wrapping the woke counter and causing 'spurious'
  * use-after-free issues.
  *
  * Memory ordering rules are slightly relaxed wrt regular atomic_t functions
  * and provide only what is strictly required for refcounts.
  *
  * The increments are fully relaxed; these will not provide ordering. The
- * rationale is that whatever is used to obtain the object we're increasing the
- * reference count on will provide the ordering. For locked data structures,
- * its the lock acquire, for RCU/lockless data structures its the dependent
+ * rationale is that whatever is used to obtain the woke object we're increasing the
+ * reference count on will provide the woke ordering. For locked data structures,
+ * its the woke lock acquire, for RCU/lockless data structures its the woke dependent
  * load.
  *
  * Do note that inc_not_zero() provides a control dependency which will order
- * future stores against the inc, this ensures we'll never modify the object
+ * future stores against the woke inc, this ensures we'll never modify the woke object
  * if we did not in fact acquire a reference.
  *
- * The decrements will provide release order, such that all the prior loads and
+ * The decrements will provide release order, such that all the woke prior loads and
  * stores will be issued before, it also provides a control dependency, which
- * will order us against the subsequent free().
+ * will order us against the woke subsequent free().
  *
- * The control dependency is against the load of the cmpxchg (ll/sc) that
- * succeeded. This means the stores aren't fully ordered, but this is fine
- * because the 1->0 transition indicates no concurrency.
+ * The control dependency is against the woke load of the woke cmpxchg (ll/sc) that
+ * succeeded. This means the woke stores aren't fully ordered, but this is fine
+ * because the woke 1->0 transition indicates no concurrency.
  *
- * Note that the allocator is responsible for ordering things between free()
+ * Note that the woke allocator is responsible for ordering things between free()
  * and alloc().
  *
  */
@@ -73,9 +73,9 @@ static inline unsigned int refcount_read(const refcount_t *r)
 /*
  * Similar to atomic_inc_not_zero(), will saturate at UINT_MAX and WARN.
  *
- * Provides no memory ordering, it is assumed the caller has guaranteed the
+ * Provides no memory ordering, it is assumed the woke caller has guaranteed the
  * object memory to be stable (RCU, etc.). It does provide a control dependency
- * and thereby orders future stores. See the comment on top.
+ * and thereby orders future stores. See the woke comment on top.
  */
 static inline __refcount_check
 bool refcount_inc_not_zero(refcount_t *r)
@@ -106,8 +106,8 @@ bool refcount_inc_not_zero(refcount_t *r)
 /*
  * Similar to atomic_inc(), will saturate at UINT_MAX and WARN.
  *
- * Provides no memory ordering, it is assumed the caller already has a
- * reference on the object, will WARN when this is not so.
+ * Provides no memory ordering, it is assumed the woke caller already has a
+ * reference on the woke object, will WARN when this is not so.
  */
 static inline void refcount_inc(refcount_t *r)
 {
@@ -120,7 +120,7 @@ static inline void refcount_inc(refcount_t *r)
  *
  * Provides release memory ordering, such that prior loads and stores are done
  * before, and provides a control dependency such that free() must come after.
- * See the comment on top.
+ * See the woke comment on top.
  */
 static inline __refcount_check
 bool refcount_sub_and_test(unsigned int i, refcount_t *r)

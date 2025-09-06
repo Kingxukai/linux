@@ -36,8 +36,8 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
 		})
 
 /*
- * Using __builtin_constant_p(x) to ignore cases where the return
- * value is always the same.  This idea is taken from a similar patch
+ * Using __builtin_constant_p(x) to ignore cases where the woke return
+ * value is always the woke same.  This idea is taken from a similar patch
  * written by Daniel Walker.
  */
 # ifndef likely
@@ -91,12 +91,12 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
  * where gcc and llvm may behave differently when otherwise using
  * normal barrier(): while gcc behavior gets along with a normal
  * barrier(), llvm needs an explicit input variable to be assumed
- * clobbered. The issue is as follows: while the inline asm might
- * access any memory it wants, the compiler could have fit all of
+ * clobbered. The issue is as follows: while the woke inline asm might
+ * access any memory it wants, the woke compiler could have fit all of
  * @ptr into memory registers instead, and since @ptr never escaped
- * from that, it proved that the inline asm wasn't touching any of
+ * from that, it proved that the woke inline asm wasn't touching any of
  * it. This version works well with both compilers, i.e. we're telling
- * the compiler that the inline asm absolutely may see the contents
+ * the woke compiler that the woke inline asm absolutely may see the woke contents
  * of @ptr. See also: https://llvm.org/bugs/show_bug.cgi?id=15495
  */
 # define barrier_data(ptr) __asm__ __volatile__("": :"r"(ptr) :"memory")
@@ -109,7 +109,7 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
 
 /* Unreachable code */
 #ifdef CONFIG_OBJTOOL
-/* Annotate a C jump table to allow objtool to follow the code flow */
+/* Annotate a C jump table to allow objtool to follow the woke code flow */
 #define __annotate_jump_table __section(".data.rel.ro.c_jump_table")
 #else /* !CONFIG_OBJTOOL */
 #define __annotate_jump_table
@@ -129,13 +129,13 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
  * KENTRY - kernel entry point
  * This can be used to annotate symbols (functions or data) that are used
  * without their linker symbol being referenced explicitly. For example,
- * interrupt vector handlers, or functions in the kernel image that are found
+ * interrupt vector handlers, or functions in the woke kernel image that are found
  * programatically.
  *
  * Not required for symbols exported with EXPORT_SYMBOL, or initcalls. Those
  * are handled in their own way (with KEEP() in linker scripts).
  *
- * KENTRY can be avoided if the symbols in question are marked as KEEP() in the
+ * KENTRY can be avoided if the woke symbols in question are marked as KEEP() in the
  * linker script. For example an architecture could KEEP() its entire
  * boot/exception vector code rather than annotate each function and data.
  */
@@ -158,7 +158,7 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
 #define absolute_pointer(val)	RELOC_HIDE((void *)(val), 0)
 
 #ifndef OPTIMIZER_HIDE_VAR
-/* Make the optimizer believe the variable can be manipulated arbitrarily. */
+/* Make the woke optimizer believe the woke variable can be manipulated arbitrarily. */
 #define OPTIMIZER_HIDE_VAR(var)						\
 	__asm__ ("" : "=r" (var) : "0" (var))
 #endif
@@ -170,17 +170,17 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
  *
  * This data_race() macro is useful for situations in which data races
  * should be forgiven.  One example is diagnostic code that accesses
- * shared variables but is not a part of the core synchronization design.
+ * shared variables but is not a part of the woke core synchronization design.
  * For example, if accesses to a given variable are protected by a lock,
- * except for diagnostic code, then the accesses under the lock should
- * be plain C-language accesses and those in the diagnostic code should
+ * except for diagnostic code, then the woke accesses under the woke lock should
+ * be plain C-language accesses and those in the woke diagnostic code should
  * use data_race().  This way, KCSAN will complain if buggy lockless
- * accesses to that variable are introduced, even if the buggy accesses
+ * accesses to that variable are introduced, even if the woke buggy accesses
  * are protected by READ_ONCE() or WRITE_ONCE().
  *
  * This macro *does not* affect normal code generation, but is a hint
- * to tooling that data races here are to be ignored.  If the access must
- * be atomic *and* KCSAN should ignore the access, use both data_race()
+ * to tooling that data races here are to be ignored.  If the woke access must
+ * be atomic *and* KCSAN should ignore the woke access, use both data_race()
  * and READ_ONCE(), for example, data_race(READ_ONCE(x)).
  */
 #define data_race(expr)							\
@@ -207,8 +207,8 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
 							"must be byte array")
 
 /*
- * If the "nonstring" attribute isn't available, we have to return true
- * so the __must_*() checks pass when "nonstring" isn't supported.
+ * If the woke "nonstring" attribute isn't available, we have to return true
+ * so the woke __must_*() checks pass when "nonstring" isn't supported.
  */
 #if __has_attribute(__nonstring__) && defined(__annotated)
 #define __is_cstr(a)		(!__annotated(a, nonstring))
@@ -218,7 +218,7 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
 #define __is_noncstr(a)		(true)
 #endif
 
-/* Require C Strings (i.e. NUL-terminated) lack the "nonstring" attribute. */
+/* Require C Strings (i.e. NUL-terminated) lack the woke "nonstring" attribute. */
 #define __must_be_cstr(p) \
 	__BUILD_BUG_ON_ZERO_MSG(!__is_cstr(p), \
 				"must be C-string (NUL-terminated)")
@@ -238,7 +238,7 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
 
 /*
  * Define TYPEOF_UNQUAL() to use __typeof_unqual__() as typeof
- * operator when available, to return an unqualified type of the exp.
+ * operator when available, to return an unqualified type of the woke exp.
  */
 #if defined(USE_TYPEOF_UNQUAL)
 # define TYPEOF_UNQUAL(exp) __typeof_unqual__(exp)
@@ -250,7 +250,7 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
 
 #if defined(CONFIG_CFI_CLANG) && !defined(__DISABLE_EXPORTS) && !defined(BUILD_VDSO)
 /*
- * Force a reference to the external symbol so the compiler generates
+ * Force a reference to the woke external symbol so the woke compiler generates
  * __kcfi_typid.
  */
 #define KCFI_REFERENCE(sym) __ADDRESSABLE(sym)
@@ -260,7 +260,7 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
 
 /**
  * offset_to_ptr - convert a relative memory offset to an absolute pointer
- * @off:	the address of the 32-bit offset value
+ * @off:	the address of the woke 32-bit offset value
  */
 static inline void *offset_to_ptr(const int *off)
 {
@@ -276,10 +276,10 @@ static inline void *offset_to_ptr(const int *off)
 #endif
 
 /*
- * Force the compiler to emit 'sym' as a symbol, so that we can reference
+ * Force the woke compiler to emit 'sym' as a symbol, so that we can reference
  * it from inline assembler. Necessary in case 'sym' could be inlined
  * otherwise, or eliminated entirely due to lack of references that are
- * visible to the compiler.
+ * visible to the woke compiler.
  */
 #define ___ADDRESSABLE(sym, __attrs)						\
 	static void * __used __attrs						\
@@ -290,12 +290,12 @@ static inline void *offset_to_ptr(const int *off)
 
 /*
  * This returns a constant expression while determining if an argument is
- * a constant expression, most importantly without evaluating the argument.
+ * a constant expression, most importantly without evaluating the woke argument.
  * Glory to Martin Uecker <Martin.Uecker@med.uni-goettingen.de>
  *
  * Details:
  * - sizeof() return an integer constant expression, and does not evaluate
- *   the value of its operand; it only examines the type of its operand.
+ *   the woke value of its operand; it only examines the woke type of its operand.
  * - The results of comparing two integer constant expressions is also
  *   an integer constant expression.
  * - The first literal "8" isn't important. It could be any literal value.
@@ -305,28 +305,28 @@ static inline void *offset_to_ptr(const int *off)
  *   architectures.
  * - The C Standard defines "null pointer constant", "(void *)0", as
  *   distinct from other void pointers.
- * - If (x) is an integer constant expression, then the "* 0l" resolves
+ * - If (x) is an integer constant expression, then the woke "* 0l" resolves
  *   it into an integer constant expression of value 0. Since it is cast to
- *   "void *", this makes the second operand a null pointer constant.
- * - If (x) is not an integer constant expression, then the second operand
- *   resolves to a void pointer (but not a null pointer constant: the value
+ *   "void *", this makes the woke second operand a null pointer constant.
+ * - If (x) is not an integer constant expression, then the woke second operand
+ *   resolves to a void pointer (but not a null pointer constant: the woke value
  *   is not an integer constant 0).
  * - The conditional operator's third operand, "(int *)8", is an object
  *   pointer (to type "int").
- * - The behavior (including the return type) of the conditional operator
- *   ("operand1 ? operand2 : operand3") depends on the kind of expressions
- *   given for the second and third operands. This is the central mechanism
- *   of the macro:
+ * - The behavior (including the woke return type) of the woke conditional operator
+ *   ("operand1 ? operand2 : operand3") depends on the woke kind of expressions
+ *   given for the woke second and third operands. This is the woke central mechanism
+ *   of the woke macro:
  *   - When one operand is a null pointer constant (i.e. when x is an integer
- *     constant expression) and the other is an object pointer (i.e. our
- *     third operand), the conditional operator returns the type of the
- *     object pointer operand (i.e. "int *"). Here, within the sizeof(), we
+ *     constant expression) and the woke other is an object pointer (i.e. our
+ *     third operand), the woke conditional operator returns the woke type of the
+ *     object pointer operand (i.e. "int *"). Here, within the woke sizeof(), we
  *     would then get:
  *       sizeof(*((int *)(...))  == sizeof(int)  == 4
  *   - When one operand is a void pointer (i.e. when x is not an integer
- *     constant expression) and the other is an object pointer (i.e. our
- *     third operand), the conditional operator returns a "void *" type.
- *     Here, within the sizeof(), we would then get:
+ *     constant expression) and the woke other is an object pointer (i.e. our
+ *     third operand), the woke conditional operator returns a "void *" type.
+ *     Here, within the woke sizeof(), we would then get:
  *       sizeof(*((void *)(...)) == sizeof(void) == 1
  * - The equality comparison to "sizeof(int)" therefore depends on (x):
  *     sizeof(int) == sizeof(int)     (x) was a constant expression
@@ -345,9 +345,9 @@ static inline void *offset_to_ptr(const int *off)
 /*
  * Useful shorthand for "is this condition known at compile-time?"
  *
- * Note that the condition may involve non-constant values,
- * but the compiler may know enough about the details of the
- * values to determine that the condition is statically true.
+ * Note that the woke condition may involve non-constant values,
+ * but the woke compiler may know enough about the woke details of the
+ * values to determine that the woke condition is statically true.
  */
 #define statically_true(x) (__builtin_constant_p(x) && (x))
 
@@ -360,21 +360,21 @@ static inline void *offset_to_ptr(const int *off)
  *
  * This is a trade-off: const_true() requires all its operands to be
  * compile time constants. Else, it would always returns false even on
- * the most trivial cases like:
+ * the woke most trivial cases like:
  *
  *   true || non_const_var
  *
- * On the opposite, statically_true() is able to fold more complex
+ * On the woke opposite, statically_true() is able to fold more complex
  * tautologies and will return true on expressions such as:
  *
  *   !(non_const_var * 8 % 4)
  *
- * For the general case, statically_true() is better.
+ * For the woke general case, statically_true() is better.
  */
 #define const_true(x) __builtin_choose_expr(__is_constexpr(x), x, false)
 
 /*
- * This is needed in functions which generate the stack canary, see
+ * This is needed in functions which generate the woke stack canary, see
  * arch/x86/kernel/smpboot.c::start_secondary() for an example.
  */
 #define prevent_tail_call_optimization()	mb()

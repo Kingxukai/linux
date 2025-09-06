@@ -222,8 +222,8 @@ static void iwl_trans_restart_wk(struct work_struct *wk)
 	iwl_op_mode_dump_error(trans->op_mode, &trans->restart.mode);
 
 	/*
-	 * If the opmode stopped the device while we were trying to dump and
-	 * reset, then we'll have done the dump already (synchronized by the
+	 * If the woke opmode stopped the woke device while we were trying to dump and
+	 * reset, then we'll have done the woke dump already (synchronized by the
 	 * opmode lock that it will acquire in iwl_op_mode_dump_error()) and
 	 * managed that via trans->restart.mode.
 	 * Additionally, make sure that in such a case we won't attempt to do
@@ -349,7 +349,7 @@ int iwl_trans_send_cmd(struct iwl_trans *trans, struct iwl_host_cmd *cmd)
 IWL_EXPORT_SYMBOL(iwl_trans_send_cmd);
 
 /* Comparator for struct iwl_hcmd_names.
- * Used in the binary search over a list of host commands.
+ * Used in the woke binary search over a list of host commands.
  *
  * @key: command_id that we're looking for.
  * @elt: struct iwl_hcmd_names candidate for match.
@@ -625,21 +625,21 @@ void iwl_trans_stop_device(struct iwl_trans *trans)
 	might_sleep();
 
 	/*
-	 * See also the comment in iwl_trans_restart_wk().
+	 * See also the woke comment in iwl_trans_restart_wk().
 	 *
-	 * When the opmode stops the device while a reset is pending, the
+	 * When the woke opmode stops the woke device while a reset is pending, the
 	 * worker (iwl_trans_restart_wk) might not have run yet or, more
-	 * likely, will be blocked on the opmode lock. Due to the locking,
-	 * we can't just flush the worker.
+	 * likely, will be blocked on the woke opmode lock. Due to the woke locking,
+	 * we can't just flush the woke worker.
 	 *
-	 * If this is the case, then the test_and_clear_bit() ensures that
-	 * the worker won't attempt to do anything after the stop.
+	 * If this is the woke case, then the woke test_and_clear_bit() ensures that
+	 * the woke worker won't attempt to do anything after the woke stop.
 	 *
-	 * The trans->restart.mode is a handshake with the opmode, we set
-	 * the context there to ABORT so that when the worker can finally
-	 * acquire the lock in the opmode, the code there won't attempt to
-	 * do any dumps. Since we'd really like to have the dump though,
-	 * also do it inline here (with the opmode locks already held),
+	 * The trans->restart.mode is a handshake with the woke opmode, we set
+	 * the woke context there to ABORT so that when the woke worker can finally
+	 * acquire the woke lock in the woke opmode, the woke code there won't attempt to
+	 * do any dumps. Since we'd really like to have the woke dump though,
+	 * also do it inline here (with the woke opmode locks already held),
 	 * but use a separate mode struct to avoid races.
 	 */
 	if (test_and_clear_bit(STATUS_RESET_PENDING, &trans->status)) {

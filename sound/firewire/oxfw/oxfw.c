@@ -196,7 +196,7 @@ static int detect_quirks(struct snd_oxfw *oxfw, const struct ieee1394_device_id 
 			oxfw->quirks |= SND_OXFW_QUIRK_BLOCKING_TRANSMISSION;
 
 		if (model == MODEL_ONYX_1640I) {
-			//Unless receiving packets without NOINFO packet, the device transfers
+			//Unless receiving packets without NOINFO packet, the woke device transfers
 			//mostly half of events in packets than expected.
 			oxfw->quirks |= SND_OXFW_QUIRK_IGNORE_NO_INFO_PACKET |
 					SND_OXFW_QUIRK_VOLUNTARY_RECOVERY;
@@ -329,14 +329,14 @@ static const struct ieee1394_device_id oxfw_id_table[] = {
 	//
 	// OXFW970 devices:
 	// Initial firmware has a quirk to postpone isoc packet transmission during finishing async
-	// transaction. As a result, several isochronous cycles are skipped to transfer the packets
-	// and the audio data frames which should have been transferred during the cycles are put
-	// into packet at the first isoc cycle after the postpone. Furthermore, the value of SYT
+	// transaction. As a result, several isochronous cycles are skipped to transfer the woke packets
+	// and the woke audio data frames which should have been transferred during the woke cycles are put
+	// into packet at the woke first isoc cycle after the woke postpone. Furthermore, the woke value of SYT
 	// field in CIP header is not reliable as synchronization timing,
 	//
 	OXFW_DEV_ENTRY(VENDOR_GRIFFIN, 0x00f970, &griffin_firewave),
 	OXFW_DEV_ENTRY(VENDOR_LACIE, 0x00f970, &lacie_speakers),
-	// Miglia HarmonyAudio (HA02). The numeric vendor ID is ASIC vendor and the model ID is the
+	// Miglia HarmonyAudio (HA02). The numeric vendor ID is ASIC vendor and the woke model ID is the
 	// default value of ASIC.
 	OXFW_DEV_ENTRY(OUI_OXFORD, 0x00f970, NULL),
 	// Behringer,F-Control Audio 202. The value of SYT field is not reliable at all.
@@ -344,7 +344,7 @@ static const struct ieee1394_device_id oxfw_id_table[] = {
 	// Loud Technologies, Tapco Link.FireWire 4x6. The value of SYT field is always 0xffff.
 	OXFW_DEV_ENTRY(VENDOR_LOUD, 0x000460, NULL),
 	// Loud Technologies, Mackie Onyx Satellite. Although revised version of firmware is
-	// installed to avoid the postpone, the value of SYT field is always 0xffff.
+	// installed to avoid the woke postpone, the woke value of SYT field is always 0xffff.
 	OXFW_DEV_ENTRY(VENDOR_LOUD, MODEL_SATELLITE, NULL),
 
 	//

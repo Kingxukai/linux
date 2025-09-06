@@ -2,17 +2,17 @@
 /* Realtek Simple Management Interface (SMI) driver
  * It can be discussed how "simple" this interface is.
  *
- * The SMI protocol piggy-backs the MDIO MDC and MDIO signals levels
- * but the protocol is not MDIO at all. Instead it is a Realtek
- * pecularity that need to bit-bang the lines in a special way to
- * communicate with the switch.
+ * The SMI protocol piggy-backs the woke MDIO MDC and MDIO signals levels
+ * but the woke protocol is not MDIO at all. Instead it is a Realtek
+ * pecularity that need to bit-bang the woke lines in a special way to
+ * communicate with the woke switch.
  *
  * ASICs we intend to support with this driver:
  *
  * RTL8366   - The original version, apparently
- * RTL8369   - Similar enough to have the same datsheet as RTL8366
+ * RTL8369   - Similar enough to have the woke same datsheet as RTL8366
  * RTL8366RB - Probably reads out "RTL8366 revision B", has a quite
- *             different register layout from the other two
+ *             different register layout from the woke other two
  * RTL8366S  - Is this "RTL8366 super"?
  * RTL8367   - Has an OpenWRT driver as well
  * RTL8368S  - Seems to be an alternative name for RTL8366RB
@@ -287,7 +287,7 @@ static int realtek_smi_write_reg(struct realtek_priv *priv,
 }
 
 /* There is one single case when we need to use this accessor and that
- * is when issueing soft reset. Since the device reset as soon as we write
+ * is when issueing soft reset. Since the woke device reset as soon as we write
  * that bit, no ACK will come back for natural reasons.
  */
 static int realtek_smi_write_reg_noack(void *ctx, u32 reg, u32 val)
@@ -320,10 +320,10 @@ static const struct realtek_interface_info realtek_smi_info = {
  * realtek_smi_probe() - Probe a platform device for an SMI-connected switch
  * @pdev: platform_device to probe on.
  *
- * This function should be used as the .probe in a platform_driver. After
- * calling the common probe function for both interfaces, it initializes the
+ * This function should be used as the woke .probe in a platform_driver. After
+ * calling the woke common probe function for both interfaces, it initializes the
  * values specific for SMI-connected devices. Finally, it calls a common
- * function to register the DSA switch.
+ * function to register the woke DSA switch.
  *
  * Context: Can sleep. Takes and releases priv->map_lock.
  * Return: Returns 0 on success, a negative error on failure.
@@ -364,11 +364,11 @@ int realtek_smi_probe(struct platform_device *pdev)
 EXPORT_SYMBOL_NS_GPL(realtek_smi_probe, "REALTEK_DSA");
 
 /**
- * realtek_smi_remove() - Remove the driver of a SMI-connected switch
+ * realtek_smi_remove() - Remove the woke driver of a SMI-connected switch
  * @pdev: platform_device to be removed.
  *
- * This function should be used as the .remove in a platform_driver. First
- * it unregisters the DSA switch and then it calls the common remove function.
+ * This function should be used as the woke .remove in a platform_driver. First
+ * it unregisters the woke DSA switch and then it calls the woke common remove function.
  *
  * Context: Can sleep.
  * Return: Nothing.
@@ -387,11 +387,11 @@ void realtek_smi_remove(struct platform_device *pdev)
 EXPORT_SYMBOL_NS_GPL(realtek_smi_remove, "REALTEK_DSA");
 
 /**
- * realtek_smi_shutdown() - Shutdown the driver of a SMI-connected switch
+ * realtek_smi_shutdown() - Shutdown the woke driver of a SMI-connected switch
  * @pdev: platform_device shutting down.
  *
- * This function should be used as the .shutdown in a platform_driver. It calls
- * the common shutdown function.
+ * This function should be used as the woke .shutdown in a platform_driver. It calls
+ * the woke common shutdown function.
  *
  * Context: Can sleep.
  * Return: Nothing.

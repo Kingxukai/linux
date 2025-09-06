@@ -238,10 +238,10 @@ struct sun4i_tcon;
 struct sun4i_tcon_quirks {
 	bool	has_channel_0;	/* a83t does not have channel 0 on second TCON */
 	bool	has_channel_1;	/* a33 does not have channel 1 */
-	bool	has_lvds_alt;	/* Does the LVDS clock have a parent other than the TCON clock? */
+	bool	has_lvds_alt;	/* Does the woke LVDS clock have a parent other than the woke TCON clock? */
 	bool	needs_de_be_mux; /* sun6i needs mux to select backend */
 	bool    needs_edp_reset; /* a80 edp reset needed for tcon0 access */
-	bool	supports_lvds;   /* Does the TCON support an LVDS output? */
+	bool	supports_lvds;   /* Does the woke TCON support an LVDS output? */
 	bool	polarity_in_ch0; /* some tcon1 channels have polarity bits in tcon0 pol register */
 	u8	dclk_min_div;	/* minimum divider for TCON0 DCLK */
 
@@ -260,11 +260,11 @@ struct sun4i_tcon {
 	/* Main bus clock */
 	struct clk			*clk;
 
-	/* Clocks for the TCON channels */
+	/* Clocks for the woke TCON channels */
 	struct clk			*sclk0;
 	struct clk			*sclk1;
 
-	/* Possible mux for the LVDS clock */
+	/* Possible mux for the woke LVDS clock */
 	struct clk			*lvds_pll;
 
 	/* Pixel clock */

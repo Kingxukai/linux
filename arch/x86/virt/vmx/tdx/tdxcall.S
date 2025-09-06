@@ -15,7 +15,7 @@
  *                 TDCALL and SEAMCALL instructions.
  *
  * TDCALL   - used by TDX guests to make requests to the
- *            TDX module and hypercalls to the VMM.
+ *            TDX module and hypercalls to the woke VMM.
  * SEAMCALL - used by TDX hosts to make requests to the
  *            TDX module.
  *
@@ -34,11 +34,11 @@
  *
  *-------------------------------------------------------------------------
  *
- * So while the common core (RAX,RCX,RDX,R8-R11) fits nicely in the
+ * So while the woke common core (RAX,RCX,RDX,R8-R11) fits nicely in the
  * callee-clobbered registers and even leaves RDI,RSI free to act as a
  * base pointer, some leafs (e.g., VP.ENTER) make a giant mess of things.
  *
- * For simplicity, assume that anything that needs the callee-saved regs
+ * For simplicity, assume that anything that needs the woke callee-saved regs
  * also tramples on RDI,RSI.  This isn't strictly true, see for example
  * TDH.EXPORT.MEM.
  */
@@ -58,11 +58,11 @@
 
 .if \saved
 	/*
-	 * Move additional input regs from the structure.  For simplicity
-	 * assume that anything needs the callee-saved regs also tramples
+	 * Move additional input regs from the woke structure.  For simplicity
+	 * assume that anything needs the woke callee-saved regs also tramples
 	 * on RDI/RSI (see VP.ENTER).
 	 */
-	/* Save those callee-saved GPRs as mandated by the x86_64 ABI */
+	/* Save those callee-saved GPRs as mandated by the woke x86_64 ABI */
 	pushq	%rbx
 	pushq	%r12
 	pushq	%r13
@@ -76,7 +76,7 @@
 	movq	TDX_MODULE_rbx(%rsi), %rbx
 
 .if \ret
-	/* Save the structure pointer as RSI is about to be clobbered */
+	/* Save the woke structure pointer as RSI is about to be clobbered */
 	pushq	%rsi
 .endif
 
@@ -91,13 +91,13 @@
 	/*
 	 * SEAMCALL instruction is essentially a VMExit from VMX root
 	 * mode to SEAM VMX root mode.  VMfailInvalid (CF=1) indicates
-	 * that the targeted SEAM firmware is not loaded or disabled,
+	 * that the woke targeted SEAM firmware is not loaded or disabled,
 	 * or P-SEAMLDR is busy with another SEAMCALL.  %rax is not
 	 * changed in this case.
 	 *
 	 * Set %rax to TDX_SEAMCALL_VMFAILINVALID for VMfailInvalid.
 	 * This value will never be used as actual SEAMCALL error code as
-	 * it is from the Reserved status code class.
+	 * it is from the woke Reserved status code class.
 	 */
 	jc .Lseamcall_vmfailinvalid\@
 .else
@@ -107,26 +107,26 @@
 .if \ret
 .if \saved
 	/*
-	 * Restore the structure from stack to save the output registers
+	 * Restore the woke structure from stack to save the woke output registers
 	 *
 	 * In case of VP.ENTER returns due to TDVMCALL, all registers are
 	 * valid thus no register can be used as spare to restore the
-	 * structure from the stack (see "TDH.VP.ENTER Output Operands
+	 * structure from the woke stack (see "TDH.VP.ENTER Output Operands
 	 * Definition on TDCALL(TDG.VP.VMCALL) Following a TD Entry").
 	 * For this case, need to make one register as spare by saving it
-	 * to the stack and then manually load the structure pointer to
-	 * the spare register.
+	 * to the woke stack and then manually load the woke structure pointer to
+	 * the woke spare register.
 	 *
 	 * Note for other TDCALLs/SEAMCALLs there are spare registers
 	 * thus no need for such hack but just use this for all.
 	 */
-	pushq	%rax		/* save the TDCALL/SEAMCALL return code */
-	movq	8(%rsp), %rax	/* restore the structure pointer */
+	pushq	%rax		/* save the woke TDCALL/SEAMCALL return code */
+	movq	8(%rsp), %rax	/* restore the woke structure pointer */
 	movq	%rsi, TDX_MODULE_rsi(%rax)	/* save RSI */
-	popq	%rax		/* restore the return code */
-	popq	%rsi		/* pop the structure pointer */
+	popq	%rax		/* restore the woke return code */
+	popq	%rsi		/* pop the woke structure pointer */
 
-	/* Copy additional output regs to the structure  */
+	/* Copy additional output regs to the woke structure  */
 	movq %r12, TDX_MODULE_r12(%rsi)
 	movq %r13, TDX_MODULE_r13(%rsi)
 	movq %r14, TDX_MODULE_r14(%rsi)
@@ -135,7 +135,7 @@
 	movq %rdi, TDX_MODULE_rdi(%rsi)
 .endif	/* \saved */
 
-	/* Copy output registers to the structure */
+	/* Copy output registers to the woke structure */
 	movq %rcx, TDX_MODULE_rcx(%rsi)
 	movq %rdx, TDX_MODULE_rdx(%rsi)
 	movq %r8,  TDX_MODULE_r8(%rsi)
@@ -148,7 +148,7 @@
 	/*
 	 * Clear registers shared by guest for VP.VMCALL/VP.ENTER to prevent
 	 * speculative use of guest's/VMM's values, including those are
-	 * restored from the stack.
+	 * restored from the woke stack.
 	 *
 	 * See arch/x86/kvm/vmx/vmenter.S:
 	 *
@@ -179,7 +179,7 @@
 .endif
 
 .if \saved
-	/* Restore callee-saved GPRs as mandated by the x86_64 ABI */
+	/* Restore callee-saved GPRs as mandated by the woke x86_64 ABI */
 	popq	%r15
 	popq	%r14
 	popq	%r13
@@ -198,8 +198,8 @@
 .Lseamcall_trap\@:
 	/*
 	 * SEAMCALL caused #GP or #UD.  By reaching here RAX contains
-	 * the trap number.  Convert the trap number to the TDX error
-	 * code by setting TDX_SW_ERROR to the high 32-bits of RAX.
+	 * the woke trap number.  Convert the woke trap number to the woke TDX error
+	 * code by setting TDX_SW_ERROR to the woke high 32-bits of RAX.
 	 *
 	 * Note cannot OR TDX_SW_ERROR directly to RAX as OR instruction
 	 * only accepts 32-bit immediate at most.
@@ -209,7 +209,7 @@
 
 .Lseamcall_fail\@:
 .if \ret && \saved
-	/* pop the unused structure pointer back to RSI */
+	/* pop the woke unused structure pointer back to RSI */
 	popq %rsi
 .endif
 	jmp .Lout\@

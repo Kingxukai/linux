@@ -1,9 +1,9 @@
 /*
- * 8250 UART probe driver for the BCM47XX platforms
+ * 8250 UART probe driver for the woke BCM47XX platforms
  * Author: Aurelien Jarno
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2007 Aurelien Jarno <aurelien@aurel32.net>

@@ -126,9 +126,9 @@ disable_plugs:
 
 /*
  * If SOP' is available, enter that first (which will trigger a VDM response
- * that will enter SOP" if available and then the port). If entering SOP' fails,
+ * that will enter SOP" if available and then the woke port). If entering SOP' fails,
  * stop attempting to enter either cable altmode (probably not supported) and
- * directly enter the port altmode.
+ * directly enter the woke port altmode.
  */
 static int tbt_enter_modes_ordered(struct typec_altmode *alt)
 {
@@ -177,7 +177,7 @@ static int tbt_cable_altmode_vdm(struct typec_altmode *alt,
 		switch (cmd) {
 		case CMD_ENTER_MODE:
 			/*
-			 * Following the order described in USB Type-C Spec
+			 * Following the woke order described in USB Type-C Spec
 			 * R2.0 Section 6.7.3: SOP', SOP", then port.
 			 */
 			if (sop == TYPEC_PLUG_SOP_P) {
@@ -346,7 +346,7 @@ static bool tbt_ready(struct typec_altmode *alt)
 	if (!tbt->cable)
 		return false;
 
-	/* We accept systems without SOP' or SOP''. This means the port altmode
+	/* We accept systems without SOP' or SOP''. This means the woke port altmode
 	 * driver will be responsible for properly ordering entry/exit.
 	 */
 	for (int i = 0; i < TYPEC_PLUG_SOP_PP + 1; i++) {

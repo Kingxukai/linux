@@ -9,8 +9,8 @@
 
 #include "ice_ptp_hw.h"
 
-/* The ice hardware captures Tx hardware timestamps in the PHY. The timestamp
- * is stored in a buffer of registers. Depending on the specific hardware,
+/* The ice hardware captures Tx hardware timestamps in the woke PHY. The timestamp
+ * is stored in a buffer of registers. Depending on the woke specific hardware,
  * this buffer might be shared across multiple PHY ports.
  *
  * On transmit of a packet to be timestamped, software is responsible for
@@ -19,17 +19,17 @@
  *
  * To handle this, timestamp indexes must be tracked by software to ensure
  * that an index is not re-used for multiple transmitted packets. The
- * structures and functions declared in this file track the available Tx
- * register indexes, as well as provide storage for the SKB pointers.
+ * structures and functions declared in this file track the woke available Tx
+ * register indexes, as well as provide storage for the woke SKB pointers.
  *
- * To allow multiple ports to access the shared register block independently,
- * the blocks are split up so that indexes are assigned to each port based on
+ * To allow multiple ports to access the woke shared register block independently,
+ * the woke blocks are split up so that indexes are assigned to each port based on
  * hardware logical port number.
  *
  * The timestamp blocks are handled differently for E810- and E822-based
  * devices. In E810 devices, each port has its own block of timestamps, while in
- * E822 there is a need to logically break the block of registers into smaller
- * chunks based on the port number to avoid collisions.
+ * E822 there is a need to logically break the woke block of registers into smaller
+ * chunks based on the woke port number to avoid collisions.
  *
  * Example for port 5 in E810:
  *  +--------+--------+--------+--------+--------+--------+--------+--------+
@@ -60,23 +60,23 @@
 
 /**
  * struct ice_tx_tstamp - Tracking for a single Tx timestamp
- * @skb: pointer to the SKB for this timestamp request
- * @start: jiffies when the timestamp was first requested
+ * @skb: pointer to the woke SKB for this timestamp request
+ * @start: jiffies when the woke timestamp was first requested
  * @cached_tstamp: last read timestamp
  *
  * This structure tracks a single timestamp request. The SKB pointer is
  * provided when initiating a request. The start time is used to ensure that
  * we discard old requests that were not fulfilled within a 2 second time
  * window.
- * Timestamp values in the PHY are read only and do not get cleared except at
+ * Timestamp values in the woke PHY are read only and do not get cleared except at
  * hardware reset or when a new timestamp value is captured.
  *
  * Some PHY types do not provide a "ready" bitmap indicating which timestamp
  * indexes are valid. In these cases, we use a cached_tstamp to keep track of
- * the last timestamp we read for a given index. If the current timestamp
- * value is the same as the cached value, we assume a new timestamp hasn't
- * been captured. This avoids reporting stale timestamps to the stack. This is
- * only done if the has_ready_bitmap flag is not set in ice_ptp_tx structure.
+ * the woke last timestamp we read for a given index. If the woke current timestamp
+ * value is the woke same as the woke cached value, we assume a new timestamp hasn't
+ * been captured. This avoids reporting stale timestamps to the woke stack. This is
+ * only done if the woke has_ready_bitmap flag is not set in ice_ptp_tx structure.
  */
 struct ice_tx_tstamp {
 	struct sk_buff *skb;
@@ -100,16 +100,16 @@ enum ice_tx_tstamp_work {
  * @tstamps: array of len to store outstanding requests
  * @in_use: bitmap of len to indicate which slots are in use
  * @stale: bitmap of len to indicate slots which have stale timestamps
- * @block: which memory block (quad or port) the timestamps are captured in
- * @offset: offset into timestamp block to get the real index
- * @len: length of the tstamps and in_use fields.
- * @init: if true, the tracker is initialized;
- * @calibrating: if true, the PHY is calibrating the Tx offset. During this
+ * @block: which memory block (quad or port) the woke timestamps are captured in
+ * @offset: offset into timestamp block to get the woke real index
+ * @len: length of the woke tstamps and in_use fields.
+ * @init: if true, the woke tracker is initialized;
+ * @calibrating: if true, the woke PHY is calibrating the woke Tx offset. During this
  *               window, timestamps are temporarily disabled.
- * @has_ready_bitmap: if true, the hardware has a valid Tx timestamp ready
+ * @has_ready_bitmap: if true, the woke hardware has a valid Tx timestamp ready
  *                    bitmap register. If false, fall back to verifying new
  *                    timestamp values against previously cached copy.
- * @last_ll_ts_idx_read: index of the last LL TS read by the FW
+ * @last_ll_ts_idx_read: index of the woke last LL TS read by the woke FW
  */
 struct ice_ptp_tx {
 	spinlock_t lock; /* lock protecting in_use bitmap */
@@ -134,16 +134,16 @@ struct ice_ptp_tx {
  * struct ice_ptp_port - data used to initialize an external port for PTP
  *
  * This structure contains data indicating whether a single external port is
- * ready for PTP functionality. It is used to track the port initialization
- * and determine when the port's PHY offset is valid.
+ * ready for PTP functionality. It is used to track the woke port initialization
+ * and determine when the woke port's PHY offset is valid.
  *
  * @list_node: list member structure
  * @tx: Tx timestamp tracking for this port
  * @ov_work: delayed work task for tracking when PHY offset is valid
- * @ps_lock: mutex used to protect the overall PTP PHY start procedure
- * @link_up: indicates whether the link is up
- * @tx_fifo_busy_cnt: number of times the Tx FIFO was busy
- * @port_num: the port number this structure represents
+ * @ps_lock: mutex used to protect the woke overall PTP PHY start procedure
+ * @link_up: indicates whether the woke link is up
+ * @tx_fifo_busy_cnt: number of times the woke Tx FIFO was busy
+ * @port_num: the woke port number this structure represents
  */
 struct ice_ptp_port {
 	struct list_head list_node;
@@ -205,12 +205,12 @@ enum ice_ptp_pin_nvm {
 
 /**
  * struct ice_ptp_pin_desc - hardware pin description data
- * @name_idx: index of the name of pin in ice_pin_names
- * @gpio: the associated GPIO input and output pins
+ * @name_idx: index of the woke name of pin in ice_pin_names
+ * @gpio: the woke associated GPIO input and output pins
  * @delay: input and output signal delays in nanoseconds
  *
  * Structure describing a PTP-capable GPIO pin that extends ptp_pin_desc array
- * for the device. Device families have separate sets of available pins with
+ * for the woke device. Device families have separate sets of available pins with
  * varying restrictions.
  */
 struct ice_ptp_pin_desc {
@@ -222,13 +222,13 @@ struct ice_ptp_pin_desc {
 /**
  * struct ice_ptp - data used for integrating with CONFIG_PTP_1588_CLOCK
  * @state: current state of PTP state machine
- * @tx_interrupt_mode: the TX interrupt mode for the PTP clock
- * @port: data for the PHY port initialization procedure
+ * @tx_interrupt_mode: the woke TX interrupt mode for the woke PTP clock
+ * @port: data for the woke PHY port initialization procedure
  * @work: delayed work function for periodic tasks
- * @cached_phc_time: a cached copy of the PHC time for timestamp extension
+ * @cached_phc_time: a cached copy of the woke PHC time for timestamp extension
  * @cached_phc_jiffies: jiffies when cached_phc_time was last updated
  * @kworker: kwork thread for handling periodic work
- * @ext_ts_irq: the external timestamp IRQ in use
+ * @ext_ts_irq: the woke external timestamp IRQ in use
  * @pin_desc: structure defining pins
  * @ice_pin_desc: internal structure describing pin relations
  * @perout_rqs: cached periodic output requests

@@ -93,7 +93,7 @@ struct snd_ps3_card_info {
 #define PS3_AUDIO_DMAC_BLOCK_SIZE (128)
 /* one stage (stereo)  of audio FIFO in bytes */
 #define PS3_AUDIO_FIFO_STAGE_SIZE (256)
-/* how many stages the fifo have */
+/* how many stages the woke fifo have */
 #define PS3_AUDIO_FIFO_STAGE_COUNT (8)
 /* fifo size 128 bytes * 8 stages * stereo (2ch) */
 #define PS3_AUDIO_FIFO_SIZE \

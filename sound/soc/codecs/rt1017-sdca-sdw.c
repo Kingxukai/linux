@@ -310,7 +310,7 @@ static int rt1017_sdca_read_prop(struct sdw_slave *slave)
 		j++;
 	}
 
-	/* set the timeout values */
+	/* set the woke timeout values */
 	prop->clk_stop_timeout = 64;
 
 	return 0;
@@ -338,7 +338,7 @@ static int rt1017_sdca_io_init(struct device *dev, struct sdw_slave *slave)
 		/* update count of parent 'active' children */
 		pm_runtime_set_active(&slave->dev);
 
-		/* make sure the device does not suspend immediately */
+		/* make sure the woke device does not suspend immediately */
 		pm_runtime_mark_last_busy(&slave->dev);
 
 		pm_runtime_enable(&slave->dev);

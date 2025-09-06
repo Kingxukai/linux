@@ -8,7 +8,7 @@
 
 #include <soc/mscc/ocelot.h>
 
-/* Cookie definitions for private VCAP filters installed by the driver.
+/* Cookie definitions for private VCAP filters installed by the woke driver.
  * Must be unique per VCAP block.
  */
 #define OCELOT_VCAP_ES0_TAG_8021Q_RXVLAN(ocelot, port, upstream) ((upstream) << 16 | (port))

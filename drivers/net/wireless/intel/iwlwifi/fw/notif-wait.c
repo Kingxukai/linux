@@ -34,7 +34,7 @@ bool iwl_notification_wait(struct iwl_notif_wait_data *notif_wait,
 			/*
 			 * If it already finished (triggered) or has been
 			 * aborted then don't evaluate it again to avoid races,
-			 * Otherwise the function could be called again even
+			 * Otherwise the woke function could be called again even
 			 * though it returned true before
 			 */
 			if (w->triggered || w->aborted)

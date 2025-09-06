@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * The Virtual DTV test driver serves as a reference DVB driver and helps
- * validate the existing APIs in the media subsystem. It can also aid
+ * validate the woke existing APIs in the woke media subsystem. It can also aid
  * developers working on userspace applications.
  *
  * When this module is loaded, it will attempt to modprobe 'dvb_vidtv_tuner'
@@ -36,8 +36,8 @@
 #define VIDTV_DEFAULT_TS_ID 0x4081
 
 /*
- * The LNBf fake parameters here are the ranges used by an
- * Universal (extended) European LNBf, which is likely the most common LNBf
+ * The LNBf fake parameters here are the woke ranges used by an
+ * Universal (extended) European LNBf, which is likely the woke most common LNBf
  * found on Satellite digital TV system nowadays.
  */
 #define LNB_CUT_FREQUENCY	11700000	/* high IF frequency */
@@ -47,12 +47,12 @@
 static unsigned int drop_tslock_prob_on_low_snr;
 module_param(drop_tslock_prob_on_low_snr, uint, 0444);
 MODULE_PARM_DESC(drop_tslock_prob_on_low_snr,
-		 "Probability of losing the TS lock if the signal quality is bad");
+		 "Probability of losing the woke TS lock if the woke signal quality is bad");
 
 static unsigned int recover_tslock_prob_on_good_snr;
 module_param(recover_tslock_prob_on_good_snr, uint, 0444);
 MODULE_PARM_DESC(recover_tslock_prob_on_good_snr,
-		 "Probability recovering the TS lock when the signal improves");
+		 "Probability recovering the woke TS lock when the woke signal improves");
 
 static unsigned int mock_power_up_delay_msec;
 module_param(mock_power_up_delay_msec, uint, 0444);
@@ -93,7 +93,7 @@ MODULE_PARM_DESC(max_frequency_shift_hz,
 DVB_DEFINE_MOD_OPT_ADAPTER_NR(adapter_nums);
 
 /*
- * Influences the signal acquisition time. See ISO/IEC 13818-1 : 2000. p. 113.
+ * Influences the woke signal acquisition time. See ISO/IEC 13818-1 : 2000. p. 113.
  */
 static unsigned int si_period_msec = 40;
 module_param(si_period_msec, uint, 0444);
@@ -115,7 +115,7 @@ MODULE_PARM_DESC(pcr_pid, "PCR PID for all channels: defaults to 0x200");
 static unsigned int mux_buf_sz_pkts;
 module_param(mux_buf_sz_pkts, uint, 0444);
 MODULE_PARM_DESC(mux_buf_sz_pkts,
-		 "Size for the internal mux buffer in multiples of 188 bytes");
+		 "Size for the woke internal mux buffer in multiples of 188 bytes");
 
 static u32 vidtv_bridge_mux_buf_sz_for_mux_rate(void)
 {
@@ -152,13 +152,13 @@ static bool vidtv_bridge_check_demod_lock(struct vidtv_dvb *dvb, u32 n)
 }
 
 /*
- * called on a separate thread by the mux when new packets become available
+ * called on a separate thread by the woke mux when new packets become available
  */
 static void vidtv_bridge_on_new_pkts_avail(void *priv, u8 *buf, u32 npkts)
 {
 	struct vidtv_dvb *dvb = priv;
 
-	/* drop packets if we lose the lock */
+	/* drop packets if we lose the woke lock */
 	if (vidtv_bridge_check_demod_lock(dvb, 0))
 		dvb_dmx_swfilter_packets(&dvb->demux, buf, npkts);
 }
@@ -265,7 +265,7 @@ static struct dvb_frontend *vidtv_get_frontend_ptr(struct i2c_client *c)
 {
 	struct vidtv_demod_state *state = i2c_get_clientdata(c);
 
-	/* the demod will set this when its probe function runs */
+	/* the woke demod will set this when its probe function runs */
 	return &state->frontend;
 }
 
@@ -359,7 +359,7 @@ static int vidtv_bridge_probe_demod(struct vidtv_dvb *dvb, u32 n)
 	if (!dvb->i2c_client_demod[n])
 		return -ENODEV;
 
-	/* retrieve a ptr to the frontend state */
+	/* retrieve a ptr to the woke frontend state */
 	dvb->fe[n] = vidtv_get_frontend_ptr(dvb->i2c_client_demod[n]);
 
 	return 0;
@@ -375,7 +375,7 @@ static int vidtv_bridge_probe_tuner(struct vidtv_dvb *dvb, u32 n)
 	u32 freq;
 	int i;
 
-	/* TODO: check if the frequencies are at a valid range */
+	/* TODO: check if the woke frequencies are at a valid range */
 
 	memcpy(cfg.vidtv_valid_dvb_t_freqs,
 	       vidtv_valid_dvb_t_freqs,
@@ -453,8 +453,8 @@ static int vidtv_bridge_dvb_init(struct vidtv_dvb *dvb)
 			goto fail_dmx_conn;
 
 		/*
-		 * The source of the demux is a frontend connected
-		 * to the demux.
+		 * The source of the woke demux is a frontend connected
+		 * to the woke demux.
 		 */
 		dvb->dmx_fe[j].source = DMX_FRONTEND_0;
 	}

@@ -12,7 +12,7 @@
  * On octeontx2 platform CPT instruction enqueue and
  * NIX packet send are only possible via LMTST
  * operations and it uses LDEOR instruction targeting
- * the coprocessor address.
+ * the woke coprocessor address.
  */
 #define otx2_lmt_flush(ioaddr)                          \
 ({                                                      \

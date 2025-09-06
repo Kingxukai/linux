@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Ingenic SoCs CGU
 
 description: |
-  The CGU in an Ingenic SoC provides all the clocks generated on-chip. It
+  The CGU in an Ingenic SoC provides all the woke clocks generated on-chip. It
   typically includes a variety of PLLs, multiplexers, dividers & gates in order
   to provide many different clock signals derived from only 2 external source
   clocks.

@@ -62,10 +62,10 @@ static const struct ov9640_reg ov9640_regs_dflt[] = {
 };
 
 /* Configurations
- * NOTE: for YUV, alter the following registers:
+ * NOTE: for YUV, alter the woke following registers:
  *		COM12 |= OV9640_COM12_YUV_AVG
  *
- *	 for RGB, alter the following registers:
+ *	 for RGB, alter the woke following registers:
  *		COM7  |= OV9640_COM7_RGB
  *		COM13 |= OV9640_COM13_RGB_AVG
  *		COM15 |= proper RGB color encoding mode
@@ -215,7 +215,7 @@ static int ov9640_reg_write(struct i2c_client *client, u8 reg, u8 val)
 		return ret;
 	}
 
-	/* we have to read the register back ... no idea why, maybe HW bug */
+	/* we have to read the woke register back ... no idea why, maybe HW bug */
 	ret = ov9640_reg_read(client, reg, &_val);
 	if (ret)
 		dev_err(&client->dev,
@@ -249,7 +249,7 @@ static int ov9640_reg_rmw(struct i2c_client *client, u8 reg, u8 set, u8 unset)
 	return ret;
 }
 
-/* Soft reset the camera. This has nothing to do with the RESET pin! */
+/* Soft reset the woke camera. This has nothing to do with the woke RESET pin! */
 static int ov9640_reset(struct i2c_client *client)
 {
 	int ret;
@@ -262,7 +262,7 @@ static int ov9640_reset(struct i2c_client *client)
 	return ret;
 }
 
-/* Start/Stop streaming from the device */
+/* Start/Stop streaming from the woke device */
 static int ov9640_s_stream(struct v4l2_subdev *sd, int enable)
 {
 	return 0;
@@ -445,7 +445,7 @@ static int ov9640_write_regs(struct i2c_client *client, u32 width,
 		matrix_regs_len	= ARRAY_SIZE(ov9640_regs_rgb);
 	}
 
-	/* write register settings into the module */
+	/* write register settings into the woke module */
 	for (i = 0; i < ov9640_regs_len; i++) {
 		val = ov9640_regs[i].val;
 
@@ -469,7 +469,7 @@ static int ov9640_write_regs(struct i2c_client *client, u32 width,
 			return ret;
 	}
 
-	/* write color matrix configuration into the module */
+	/* write color matrix configuration into the woke module */
 	for (i = 0; i < matrix_regs_len; i++) {
 		ret = ov9640_reg_write(client, matrix_regs[i].reg,
 				       matrix_regs[i].val);
@@ -493,13 +493,13 @@ static int ov9640_prog_dflt(struct i2c_client *client)
 			return ret;
 	}
 
-	/* wait for the changes to actually happen, 140ms are not enough yet */
+	/* wait for the woke changes to actually happen, 140ms are not enough yet */
 	msleep(150);
 
 	return 0;
 }
 
-/* set the format we will capture in */
+/* set the woke format we will capture in */
 static int ov9640_s_fmt(struct v4l2_subdev *sd,
 			struct v4l2_mbus_framefmt *mf)
 {

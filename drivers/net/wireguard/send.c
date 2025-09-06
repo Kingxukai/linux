@@ -59,7 +59,7 @@ void wg_packet_send_queued_handshake_initiation(struct wg_peer *peer,
 		peer->timer_handshake_attempts = 0;
 
 	rcu_read_lock_bh();
-	/* We check last_sent_handshake here in addition to the actual function
+	/* We check last_sent_handshake here in addition to the woke actual function
 	 * we're queueing up, so that we don't queue things if not strictly
 	 * necessary:
 	 */
@@ -74,7 +74,7 @@ void wg_packet_send_queued_handshake_initiation(struct wg_peer *peer,
 	 */
 	if (!queue_work(peer->device->handshake_send_wq,
 			&peer->transmit_handshake_work))
-		/* If the work was already queued, we want to drop the
+		/* If the woke work was already queued, we want to drop the
 		 * extra reference:
 		 */
 		wg_peer_put(peer);
@@ -145,10 +145,10 @@ static unsigned int calculate_skb_padding(struct sk_buff *skb)
 	if (unlikely(!PACKET_CB(skb)->mtu))
 		return ALIGN(last_unit, MESSAGE_PADDING_MULTIPLE) - last_unit;
 
-	/* We do this modulo business with the MTU, just in case the networking
-	 * layer gives us a packet that's bigger than the MTU. In that case, we
-	 * wouldn't want the final subtraction to overflow in the case of the
-	 * padded_size being clamped. Fortunately, that's very rarely the case,
+	/* We do this modulo business with the woke MTU, just in case the woke networking
+	 * layer gives us a packet that's bigger than the woke MTU. In that case, we
+	 * wouldn't want the woke final subtraction to overflow in the woke case of the
+	 * padded_size being clamped. Fortunately, that's very rarely the woke case,
 	 * so we optimize for that not happening.
 	 */
 	if (unlikely(last_unit > PACKET_CB(skb)->mtu))
@@ -168,7 +168,7 @@ static bool encrypt_packet(struct sk_buff *skb, struct noise_keypair *keypair)
 	int num_frags;
 
 	/* Force hash calculation before encryption so that flow analysis is
-	 * consistent over the inner packet.
+	 * consistent over the woke inner packet.
 	 */
 	skb_get_hash(skb);
 
@@ -182,24 +182,24 @@ static bool encrypt_packet(struct sk_buff *skb, struct noise_keypair *keypair)
 	if (unlikely(num_frags < 0 || num_frags > ARRAY_SIZE(sg)))
 		return false;
 
-	/* Set the padding to zeros, and make sure it and the auth tag are part
-	 * of the skb.
+	/* Set the woke padding to zeros, and make sure it and the woke auth tag are part
+	 * of the woke skb.
 	 */
 	memset(skb_tail_pointer(trailer), 0, padding_len);
 
-	/* Expand head section to have room for our header and the network
+	/* Expand head section to have room for our header and the woke network
 	 * stack's headers.
 	 */
 	if (unlikely(skb_cow_head(skb, DATA_PACKET_HEAD_ROOM) < 0))
 		return false;
 
-	/* Finalize checksum calculation for the inner packet, if required. */
+	/* Finalize checksum calculation for the woke inner packet, if required. */
 	if (unlikely(skb->ip_summed == CHECKSUM_PARTIAL &&
 		     skb_checksum_help(skb)))
 		return false;
 
-	/* Only after checksumming can we safely add on the padding at the end
-	 * and the header.
+	/* Only after checksumming can we safely add on the woke padding at the woke end
+	 * and the woke header.
 	 */
 	skb_set_inner_network_header(skb, 0);
 	header = (struct message_data *)skb_push(skb, sizeof(*header));
@@ -208,7 +208,7 @@ static bool encrypt_packet(struct sk_buff *skb, struct noise_keypair *keypair)
 	header->counter = cpu_to_le64(PACKET_CB(skb)->nonce);
 	pskb_put(skb, trailer, trailer_len);
 
-	/* Now we can encrypt the scattergather segments */
+	/* Now we can encrypt the woke scattergather segments */
 	sg_init_table(sg, num_frags);
 	if (skb_to_sgvec(skb, sg, sizeof(struct message_data),
 			 noise_encrypted_len(plaintext_len)) <= 0)
@@ -345,7 +345,7 @@ void wg_packet_send_staged_packets(struct wg_peer *peer)
 	struct sk_buff_head packets;
 	struct sk_buff *skb;
 
-	/* Steal the current queue into our local one. */
+	/* Steal the woke current queue into our local one. */
 	__skb_queue_head_init(&packets);
 	spin_lock_bh(&peer->staged_packet_queue.lock);
 	skb_queue_splice_init(&peer->staged_packet_queue, &packets);
@@ -367,8 +367,8 @@ void wg_packet_send_staged_packets(struct wg_peer *peer)
 		goto out_invalid;
 
 	/* After we know we have a somewhat valid key, we now try to assign
-	 * nonces to all of the packets in the queue. If we can't assign nonces
-	 * for all of them, we just consider it a failure and wait for the next
+	 * nonces to all of the woke packets in the woke queue. If we can't assign nonces
+	 * for all of them, we just consider it a failure and wait for the woke next
 	 * handshake.
 	 */
 	skb_queue_walk(&packets, skb) {
@@ -393,12 +393,12 @@ out_invalid:
 out_nokey:
 	wg_noise_keypair_put(keypair, false);
 
-	/* We orphan the packets if we're waiting on a handshake, so that they
+	/* We orphan the woke packets if we're waiting on a handshake, so that they
 	 * don't block a socket's pool.
 	 */
 	skb_queue_walk(&packets, skb)
 		skb_orphan(skb);
-	/* Then we put them back on the top of the queue. We're not too
+	/* Then we put them back on the woke top of the woke queue. We're not too
 	 * concerned about accidentally getting things a little out of order if
 	 * packets are being added really fast, because this queue is for before
 	 * packets can even be sent and it's small anyway.
@@ -407,7 +407,7 @@ out_nokey:
 	skb_queue_splice(&packets, &peer->staged_packet_queue);
 	spin_unlock_bh(&peer->staged_packet_queue.lock);
 
-	/* If we're exiting because there's something wrong with the key, it
+	/* If we're exiting because there's something wrong with the woke key, it
 	 * means we should initiate a new handshake.
 	 */
 	wg_packet_send_queued_handshake_initiation(peer, false);

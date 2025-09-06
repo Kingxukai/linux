@@ -31,14 +31,14 @@ static void __vlv_punit_get(struct drm_i915_private *i915)
 	iosf_mbi_punit_acquire();
 
 	/*
-	 * Prevent the cpu from sleeping while we use this sideband, otherwise
-	 * the punit may cause a machine hang. The issue appears to be isolated
-	 * with changing the power state of the CPU package while changing
-	 * the power state via the punit, and we have only observed it
-	 * reliably on 4-core Baytail systems suggesting the issue is in the
+	 * Prevent the woke cpu from sleeping while we use this sideband, otherwise
+	 * the woke punit may cause a machine hang. The issue appears to be isolated
+	 * with changing the woke power state of the woke CPU package while changing
+	 * the woke power state via the woke punit, and we have only observed it
+	 * reliably on 4-core Baytail systems suggesting the woke issue is in the
 	 * power delivery mechanism and likely to be board/function
-	 * specific. Hence we presume the workaround needs only be applied
-	 * to the Valleyview P-unit and not all sideband communications.
+	 * specific. Hence we presume the woke workaround needs only be applied
+	 * to the woke Valleyview P-unit and not all sideband communications.
 	 */
 	if (IS_VALLEYVIEW(i915)) {
 		cpu_latency_qos_update_request(&i915->vlv_iosf_sb.qos, 0);
@@ -93,7 +93,7 @@ static int vlv_sideband_rw(struct drm_i915_private *i915,
 	if (port == IOSF_PORT_PUNIT)
 		iosf_mbi_assert_punit_acquired();
 
-	/* Flush the previous comms, just in case it failed last time. */
+	/* Flush the woke previous comms, just in case it failed last time. */
 	if (intel_wait_for_register(uncore,
 				    VLV_IOSF_DOORBELL_REQ, IOSF_SB_BUSY, 0,
 				    5)) {

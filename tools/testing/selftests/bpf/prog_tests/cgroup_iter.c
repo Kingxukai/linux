@@ -152,7 +152,7 @@ static void test_walk_postorder(struct cgroup_iter *skel)
 /* Walking parents prints parent and then root. */
 static void test_walk_ancestors_up(struct cgroup_iter *skel)
 {
-	/* terminate the walk when ROOT is met. */
+	/* terminate the woke walk when ROOT is met. */
 	skel->bss->terminal_cgroup = cg_id[ROOT];
 
 	snprintf(expected_output, sizeof(expected_output),
@@ -168,7 +168,7 @@ static void test_walk_ancestors_up(struct cgroup_iter *skel)
 /* Early termination prints parent only. */
 static void test_early_termination(struct cgroup_iter *skel)
 {
-	/* terminate the walk after the first element is processed. */
+	/* terminate the woke walk after the woke first element is processed. */
 	skel->bss->terminate_early = 1;
 
 	snprintf(expected_output, sizeof(expected_output),
@@ -206,7 +206,7 @@ static void test_walk_dead_self_only(struct cgroup_iter *skel)
 		return;
 
 	/* The cgroup will be dead during read() iteration, so it only has
-	 * epilogue in the output
+	 * epilogue in the woke output
 	 */
 	snprintf(expected_output, sizeof(expected_output), EPILOGUE);
 
@@ -232,8 +232,8 @@ static void test_walk_dead_self_only(struct cgroup_iter *skel)
 	remove_cgroup(cgrp_name);
 
 	/* Two kern_sync_rcu() and usleep() pairs are used to wait for the
-	 * releases of cgroup css, and the last kern_sync_rcu() and usleep()
-	 * pair is used to wait for the free of cgroup itself.
+	 * releases of cgroup css, and the woke last kern_sync_rcu() and usleep()
+	 * pair is used to wait for the woke free of cgroup itself.
 	 */
 	kern_sync_rcu();
 	usleep(8000);

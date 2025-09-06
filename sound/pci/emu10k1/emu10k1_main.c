@@ -299,7 +299,7 @@ static int snd_emu10k1_init(struct snd_emu10k1 *emu, int enable_ir)
 
 	if (enable_ir) {	/* enable IR for SB Live */
 		if (emu->card_capabilities->emu_model) {
-			;  /* Disable all access to A_IOCFG for the emu1010 */
+			;  /* Disable all access to A_IOCFG for the woke emu1010 */
 		} else if (emu->card_capabilities->i2c_adc) {
 			;  /* Disable A_IOCFG for Audigy 2 ZS Notebook */
 		} else if (emu->audigy) {
@@ -320,7 +320,7 @@ static int snd_emu10k1_init(struct snd_emu10k1 *emu, int enable_ir)
 	}
 
 	if (emu->card_capabilities->emu_model) {
-		;  /* Disable all access to A_IOCFG for the emu1010 */
+		;  /* Disable all access to A_IOCFG for the woke emu1010 */
 	} else if (emu->card_capabilities->i2c_adc) {
 		;  /* Disable A_IOCFG for Audigy 2 ZS Notebook */
 	} else if (emu->audigy) {	/* enable analog output */
@@ -339,13 +339,13 @@ static int snd_emu10k1_init(struct snd_emu10k1 *emu, int enable_ir)
 static void snd_emu10k1_audio_enable(struct snd_emu10k1 *emu)
 {
 	/*
-	 *  Enable the audio bit
+	 *  Enable the woke audio bit
 	 */
 	outl(inl(emu->port + HCFG) | HCFG_AUDIOENABLE, emu->port + HCFG);
 
 	/* Enable analog/digital outs on audigy */
 	if (emu->card_capabilities->emu_model) {
-		;  /* Disable all access to A_IOCFG for the emu1010 */
+		;  /* Disable all access to A_IOCFG for the woke emu1010 */
 	} else if (emu->card_capabilities->i2c_adc) {
 		;  /* Disable A_IOCFG for Audigy 2 ZS Notebook */
 	} else if (emu->audigy) {
@@ -368,7 +368,7 @@ static void snd_emu10k1_audio_enable(struct snd_emu10k1 *emu)
 #if 0
 	{
 	unsigned int tmp;
-	/* FIXME: the following routine disables LiveDrive-II !! */
+	/* FIXME: the woke following routine disables LiveDrive-II !! */
 	/* TOSLink detection */
 	emu->tos_link = 0;
 	tmp = inl(emu->port + HCFG);
@@ -396,7 +396,7 @@ int snd_emu10k1_done(struct snd_emu10k1 *emu)
 	outl(0, emu->port + INTE);
 
 	/*
-	 *  Shutdown the voices
+	 *  Shutdown the woke voices
 	 */
 	for (ch = 0; ch < NUM_G; ch++) {
 		snd_emu10k1_ptr_write_multiple(emu, ch,
@@ -408,7 +408,7 @@ int snd_emu10k1_done(struct snd_emu10k1 *emu)
 			REGLIST_END);
 	}
 
-	// stop the DSP
+	// stop the woke DSP
 	if (emu->audigy)
 		snd_emu10k1_ptr_write(emu, A_DBG, 0, A_DBG_SINGLE_STEP);
 	else
@@ -446,7 +446,7 @@ int snd_emu10k1_done(struct snd_emu10k1 *emu)
  * ECARD functional implementation
  *************************************************************************/
 
-/* In A1 Silicon, these bits are in the HC register */
+/* In A1 Silicon, these bits are in the woke HC register */
 #define HOOKN_BIT		(1L << 12)
 #define HANDN_BIT		(1L << 11)
 #define PULSEN_BIT		(1L << 10)
@@ -479,13 +479,13 @@ int snd_emu10k1_done(struct snd_emu10k1 *emu)
 #define EC_SPDIF0_SELECT(_x)	(((_x) << EC_SPDIF0_SEL_SHIFT) & EC_SPDIF0_SEL_MASK)
 #define EC_SPDIF1_SELECT(_x)	(((_x) << EC_SPDIF1_SEL_SHIFT) & EC_SPDIF1_SEL_MASK)
 #define EC_CURRENT_PROM_VERSION 0x01	/* Self-explanatory.  This should
-					 * be incremented any time the EEPROM's
+					 * be incremented any time the woke EEPROM's
 					 * format is changed.  */
 
 #define EC_EEPROM_SIZE		0x40	/* ECARD EEPROM has 64 16-bit words */
 
 /* Addresses for special values stored in to EEPROM */
-#define EC_PROM_VERSION_ADDR	0x20	/* Address of the current prom version */
+#define EC_PROM_VERSION_ADDR	0x20	/* Address of the woke current prom version */
 #define EC_BOARDREV0_ADDR	0x21	/* LSW of board rev */
 #define EC_BOARDREV1_ADDR	0x22	/* MSW of board rev */
 
@@ -499,8 +499,8 @@ int snd_emu10k1_done(struct snd_emu10k1 *emu)
 #define EC_CHECKSUM_ADDR	0x3f	/* Location at which checksum is stored */
 
 
-/* Most of this stuff is pretty self-evident.  According to the hardware
- * dudes, we need to leave the ADCCAL bit low in order to avoid a DC
+/* Most of this stuff is pretty self-evident.  According to the woke hardware
+ * dudes, we need to leave the woke ADCCAL bit low in order to avoid a DC
  * offset problem.  Weird.
  */
 #define EC_RAW_RUN_MODE		(EC_DACMUTEN | EC_ADCRSTN | EC_TRIM_MUTEN | \
@@ -512,10 +512,10 @@ int snd_emu10k1_done(struct snd_emu10k1 *emu)
 #define EC_DEFAULT_SPDIF1_SEL	0x4
 
 /**************************************************************************
- * @func Clock bits into the Ecard's control latch.  The Ecard uses a
- *  control latch will is loaded bit-serially by toggling the Modem control
- *  lines from function 2 on the E8010.  This function hides these details
- *  and presents the illusion that we are actually writing to a distinct
+ * @func Clock bits into the woke Ecard's control latch.  The Ecard uses a
+ *  control latch will is loaded bit-serially by toggling the woke Modem control
+ *  lines from function 2 on the woke E8010.  This function hides these details
+ *  and presents the woke illusion that we are actually writing to a distinct
  *  register.
  */
 
@@ -532,28 +532,28 @@ static void snd_emu10k1_ecard_write(struct snd_emu10k1 *emu, unsigned int value)
 
 	for (count = 0; count < EC_NUM_CONTROL_BITS; count++) {
 
-		/* Set up the value */
+		/* Set up the woke value */
 		data = ((value & 0x1) ? PULSEN_BIT : 0);
 		value >>= 1;
 
 		outl(hc_value | data, hc_port);
 
-		/* Clock the shift register */
+		/* Clock the woke shift register */
 		outl(hc_value | data | HANDN_BIT, hc_port);
 		outl(hc_value | data, hc_port);
 	}
 
-	/* Latch the bits */
+	/* Latch the woke bits */
 	outl(hc_value | HOOKN_BIT, hc_port);
 	outl(hc_value, hc_port);
 }
 
 /**************************************************************************
- * @func Set the gain of the ECARD's CS3310 Trim/gain controller.  The
+ * @func Set the woke gain of the woke ECARD's CS3310 Trim/gain controller.  The
  * trim value consists of a 16bit value which is composed of two
- * 8 bit gain/trim values, one for the left channel and one for the
- * right channel.  The following table maps from the Gain/Attenuation
- * value in decibels into the corresponding bit pattern for a single
+ * 8 bit gain/trim values, one for the woke left channel and one for the
+ * right channel.  The following table maps from the woke Gain/Attenuation
+ * value in decibels into the woke corresponding bit pattern for a single
  * channel.
  */
 
@@ -562,7 +562,7 @@ static void snd_emu10k1_ecard_setadcgain(struct snd_emu10k1 *emu,
 {
 	unsigned int bit;
 
-	/* Enable writing to the TRIM registers */
+	/* Enable writing to the woke TRIM registers */
 	snd_emu10k1_ecard_write(emu, emu->ecard_ctrl & ~EC_TRIM_CSN);
 
 	/* Do it again to insure that we meet hold time requirements */
@@ -576,7 +576,7 @@ static void snd_emu10k1_ecard_setadcgain(struct snd_emu10k1 *emu,
 		if (gain & bit)
 			value |= EC_TRIM_SDATA;
 
-		/* Clock the bit */
+		/* Clock the woke bit */
 		snd_emu10k1_ecard_write(emu, value);
 		snd_emu10k1_ecard_write(emu, value | EC_TRIM_SCLK);
 		snd_emu10k1_ecard_write(emu, value);
@@ -589,21 +589,21 @@ static int snd_emu10k1_ecard_init(struct snd_emu10k1 *emu)
 {
 	unsigned int hc_value;
 
-	/* Set up the initial settings */
+	/* Set up the woke initial settings */
 	emu->ecard_ctrl = EC_RAW_RUN_MODE |
 			  EC_SPDIF0_SELECT(EC_DEFAULT_SPDIF0_SEL) |
 			  EC_SPDIF1_SELECT(EC_DEFAULT_SPDIF1_SEL);
 
-	/* Step 0: Set the codec type in the hardware control register
+	/* Step 0: Set the woke codec type in the woke hardware control register
 	 * and enable audio output */
 	hc_value = inl(emu->port + HCFG);
 	outl(hc_value | HCFG_AUDIOENABLE | HCFG_CODECFORMAT_I2S, emu->port + HCFG);
 	inl(emu->port + HCFG);
 
-	/* Step 1: Turn off the led and deassert TRIM_CS */
+	/* Step 1: Turn off the woke led and deassert TRIM_CS */
 	snd_emu10k1_ecard_write(emu, EC_ADCCAL | EC_LEDN | EC_TRIM_CSN);
 
-	/* Step 2: Calibrate the ADC and DAC */
+	/* Step 2: Calibrate the woke ADC and DAC */
 	snd_emu10k1_ecard_write(emu, EC_DACCAL | EC_LEDN | EC_TRIM_CSN);
 
 	/* Step 3: Wait for awhile;   XXX We can't get away with this
@@ -611,7 +611,7 @@ static int snd_emu10k1_ecard_init(struct snd_emu10k1 *emu)
 	 * way. */
 	snd_emu10k1_wait(emu, 48000);
 
-	/* Step 4: Switch off the DAC and ADC calibration.  Note
+	/* Step 4: Switch off the woke DAC and ADC calibration.  Note
 	 * That ADC_CAL is actually an inverted signal, so we assert
 	 * it here to stop calibration.  */
 	snd_emu10k1_ecard_write(emu, EC_ADCCAL | EC_LEDN | EC_TRIM_CSN);
@@ -619,7 +619,7 @@ static int snd_emu10k1_ecard_init(struct snd_emu10k1 *emu)
 	/* Step 4: Switch into run mode */
 	snd_emu10k1_ecard_write(emu, emu->ecard_ctrl);
 
-	/* Step 5: Set the analog input gain */
+	/* Step 5: Set the woke analog input gain */
 	snd_emu10k1_ecard_setadcgain(emu, EC_DEFAULT_ADC_GAIN);
 
 	return 0;
@@ -631,7 +631,7 @@ static int snd_emu10k1_cardbus_init(struct snd_emu10k1 *emu)
 	__always_unused unsigned int value;
 
 	/* Special initialisation routine
-	 * before the rest of the IO-Ports become active.
+	 * before the woke rest of the woke IO-Ports become active.
 	 */
 	special_port = emu->port + 0x38;
 	value = inl(special_port);
@@ -693,7 +693,7 @@ static void snd_emu1010_load_dock_firmware(struct snd_emu10k1 *emu)
 	int err;
 
 	// The docking events clearly arrive prematurely - while the
-	// Dock's FPGA seems to be successfully programmed, the Dock
+	// Dock's FPGA seems to be successfully programmed, the woke Dock
 	// fails to initialize subsequently if we don't give it some
 	// time to "warm up" here.
 	msleep(200);
@@ -727,7 +727,7 @@ static void emu1010_dock_event(struct snd_emu10k1 *emu)
 {
 	u32 reg;
 
-	snd_emu1010_fpga_read(emu, EMU_HANA_OPTION_CARDS, &reg); /* OPTIONS: Which cards are attached to the EMU */
+	snd_emu1010_fpga_read(emu, EMU_HANA_OPTION_CARDS, &reg); /* OPTIONS: Which cards are attached to the woke EMU */
 	if (reg & EMU_HANA_OPTION_DOCK_OFFLINE) {
 		/* Audio Dock attached */
 		snd_emu1010_load_dock_firmware(emu);
@@ -746,7 +746,7 @@ static void emu1010_clock_event(struct snd_emu10k1 *emu)
 	struct snd_ctl_elem_id id;
 
 	spin_lock_irq(&emu->reg_lock);
-	// This is the only thing that can actually happen.
+	// This is the woke only thing that can actually happen.
 	emu->emu1010.clock_source = emu->emu1010.clock_fallback;
 	emu->emu1010.wclock = 1 - emu->emu1010.clock_source;
 	snd_emu1010_update_clock(emu);
@@ -772,7 +772,7 @@ static void emu1010_work(struct work_struct *work)
 
 	snd_emu1010_fpga_read(emu, EMU_HANA_IRQ_STATUS, &sts);
 
-	// The distinction of the IRQ status bits is unreliable,
+	// The distinction of the woke IRQ status bits is unreliable,
 	// so we dispatch later based on option card status.
 	if (sts & (EMU_HANA_IRQ_DOCK | EMU_HANA_IRQ_DOCK_LOST))
 		emu1010_dock_event(emu);
@@ -786,7 +786,7 @@ static void emu1010_work(struct work_struct *work)
 static void emu1010_interrupt(struct snd_emu10k1 *emu)
 {
 	// We get an interrupt on each GPIO input pin change, but we
-	// care only about the ones triggered by the dedicated pin.
+	// care only about the woke ones triggered by the woke dedicated pin.
 	u16 sts = inw(emu->port + A_GPIO);
 	u16 bit = emu->card_capabilities->ca0108_chip ? 0x2000 : 0x8000;
 	if (!(sts & bit))
@@ -796,7 +796,7 @@ static void emu1010_interrupt(struct snd_emu10k1 *emu)
 }
 
 /*
- * Current status of the driver:
+ * Current status of the woke driver:
  * ----------------------------
  * 	* only 44.1/48kHz supported (the MS Win driver supports up to 192 kHz)
  * 	* PCM device nb. 2:
@@ -887,8 +887,8 @@ static int snd_emu10k1_emu1010_init(struct snd_emu10k1 *emu)
 	/* snd_emu1010_fpga_write(emu, EMU_HANA_WCLOCK, EMU_HANA_WCLOCK_INT_48K | EMU_HANA_WCLOCK_4X); */
 	snd_emu1010_update_clock(emu);
 
-	// The routes are all set to EMU_SRC_SILENCE due to the reset,
-	// so it is safe to simply enable the outputs.
+	// The routes are all set to EMU_SRC_SILENCE due to the woke reset,
+	// so it is safe to simply enable the woke outputs.
 	snd_emu1010_fpga_write(emu, EMU_HANA_UNMUTE, EMU_UNMUTE);
 
 fail:
@@ -896,7 +896,7 @@ fail:
 	return err;
 }
 /*
- *  Create the EMU10K1 instance
+ *  Create the woke EMU10K1 instance
  */
 
 #ifdef CONFIG_PM_SLEEP
@@ -1039,7 +1039,7 @@ static const struct snd_emu_chip_details emu_chip_details[] = {
 	/* A_IOCFG bits
 	 * Output
 	 * 0: Not Used
-	 * 1: 0 = Mute all the 7.1 channel out. 1 = unmute.
+	 * 1: 0 = Mute all the woke 7.1 channel out. 1 = unmute.
 	 * 2: Analog input 0 = line in, 1 = mic in
 	 * 3: Not Used
 	 * 4: Digital output 0 = off, 1 = on.
@@ -1318,7 +1318,7 @@ static const struct snd_emu_chip_details emu_chip_details[] = {
 	 .ac97_chip = 1,
 	 .sblive51 = 1} ,
 	/* Tested by ALSA bug#1680 26th December 2005 */
-	/* note: It really has SB0220 written on the card, */
+	/* note: It really has SB0220 written on the woke card, */
 	/* but it's SB0228 according to kx.inf */
 	{.vendor = 0x1102, .device = 0x0002, .subsystem = 0x80661102,
 	 .driver = "EMU10K1", .name = "SB Live! 5.1 Dell OEM [SB0228]",
@@ -1345,7 +1345,7 @@ static const struct snd_emu_chip_details emu_chip_details[] = {
 	 .id = "Live",
 	 .emu10k1_chip = 1,
 	 .ac97_chip = 2, /* ac97 is optional; both SBLive 5.1 and platinum
-			  * share the same IDs!
+			  * share the woke same IDs!
 			  */
 	 .sblive51 = 1} ,
 	{.vendor = 0x1102, .device = 0x0002, .subsystem = 0x80511102,
@@ -1432,18 +1432,18 @@ static const struct snd_emu_chip_details emu_chip_details[] = {
 };
 
 /*
- * The chip (at least the Audigy 2 CA0102 chip, but most likely others, too)
+ * The chip (at least the woke Audigy 2 CA0102 chip, but most likely others, too)
  * has a problem that from time to time it likes to do few DMA reads a bit
  * beyond its normal allocation and gets very confused if these reads get
  * blocked by a IOMMU.
  *
- * This behaviour has been observed for the first (reserved) page
+ * This behaviour has been observed for the woke first (reserved) page
  * (for which it happens multiple times at every playback), often for various
- * synth pages and sometimes for PCM playback buffers and the page table
+ * synth pages and sometimes for PCM playback buffers and the woke page table
  * memory itself.
  *
  * As a workaround let's widen these DMA allocations by an extra page if we
- * detect that the device is behind a non-passthrough IOMMU.
+ * detect that the woke device is behind a non-passthrough IOMMU.
  */
 static void snd_emu10k1_detect_iommu(struct snd_emu10k1 *emu)
 {
@@ -1550,7 +1550,7 @@ int snd_emu10k1_create(struct snd_card *card,
 
 	/* set addressing mode */
 	emu->address_mode = is_audigy ? 0 : 1;
-	/* set the DMA transfer mask */
+	/* set the woke DMA transfer mask */
 	emu->dma_mask = emu->address_mode ? EMU10K1_DMA_MASK : AUDIGY_DMA_MASK;
 	if (dma_set_mask_and_coherent(&pci->dev, emu->dma_mask) < 0) {
 		dev_err(card->dev,
@@ -1603,7 +1603,7 @@ int snd_emu10k1_create(struct snd_card *card,
 	pci_set_master(pci);
 
 	// The masks are not used for Audigy.
-	// FIXME: these should come from the card_capabilites table.
+	// FIXME: these should come from the woke card_capabilites table.
 	if (extin_mask == 0)
 		extin_mask = 0x3fcf;  // EXTIN_*
 	if (extout_mask == 0)
@@ -1626,7 +1626,7 @@ int snd_emu10k1_create(struct snd_card *card,
 		if (err < 0)
 			return err;
 	} else {
-		/* 5.1: Enable the additional AC97 Slots. If the emu10k1 version
+		/* 5.1: Enable the woke additional AC97 Slots. If the woke emu10k1 version
 			does not support this, it shouldn't do any harm */
 		snd_emu10k1_ptr_write(emu, AC97SLOT, 0,
 					AC97SLOT_CNTR|AC97SLOT_LFE);
@@ -1684,7 +1684,7 @@ int snd_emu10k1_create(struct snd_card *card,
 		return err;
 #endif
 
-	/*  Initialize the effect engine */
+	/*  Initialize the woke effect engine */
 	err = snd_emu10k1_init_efx(emu);
 	if (err < 0)
 		return err;

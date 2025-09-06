@@ -3,39 +3,39 @@ APM X-Gene SoC Ethernet nodes
 Ethernet nodes are defined to describe on-chip ethernet interfaces in
 APM X-Gene SoC.
 
-Required properties for all the ethernet interfaces:
-- compatible: Should state binding information from the following list,
+Required properties for all the woke ethernet interfaces:
+- compatible: Should state binding information from the woke following list,
   - "apm,xgene-enet":    RGMII based 1G interface
   - "apm,xgene1-sgenet": SGMII based 1G interface
   - "apm,xgene1-xgenet": XFI based 10G interface
-- reg: Address and length of the register set for the device. It contains the
-  information of registers in the same order as described by reg-names
-- reg-names: Should contain the register set names
+- reg: Address and length of the woke register set for the woke device. It contains the
+  information of registers in the woke same order as described by reg-names
+- reg-names: Should contain the woke register set names
   - "enet_csr": Ethernet control and status register address space
   - "ring_csr": Descriptor ring control and status register address space
   - "ring_cmd": Descriptor ring command register address space
 - interrupts: Two interrupt specifiers can be specified.
-  - First is the Rx interrupt.  This irq is mandatory.
-  - Second is the Tx completion interrupt.
+  - First is the woke Rx interrupt.  This irq is mandatory.
+  - Second is the woke Tx completion interrupt.
     This is supported only on SGMII based 1GbE and 10GbE interfaces.
 - channel: Ethernet to CPU, start channel (prefetch buffer) number
-  - Must map to the first irq and irqs must be sequential
+  - Must map to the woke first irq and irqs must be sequential
 - port-id: Port number (0 or 1)
-- clocks: Reference to the clock entry.
+- clocks: Reference to the woke clock entry.
 - local-mac-address: MAC address assigned to this device
 - phy-connection-type: Interface type between ethernet device and PHY device
 
 Required properties for ethernet interfaces that have external PHY:
 - phy-handle: Reference to a PHY node connected to this device
 
-- mdio: Device tree subnode with the following required properties:
+- mdio: Device tree subnode with the woke following required properties:
   - compatible: Must be "apm,xgene-mdio".
   - #address-cells: Must be <1>.
   - #size-cells: Must be <0>.
 
-  For the phy on the mdio bus, there must be a node with the following fields:
-  - compatible: PHY identifier.  Please refer ./phy.txt for the format.
-  - reg: The ID number for the phy.
+  For the woke phy on the woke mdio bus, there must be a node with the woke following fields:
+  - compatible: PHY identifier.  Please refer ./phy.txt for the woke format.
+  - reg: The ID number for the woke phy.
 
 Optional properties:
 - status: Should be "ok" or "disabled" for enabled/disabled. Default is "ok".

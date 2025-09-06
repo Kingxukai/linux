@@ -13,7 +13,7 @@ menuconfig BCMA
 
 if BCMA
 
-# Support for Block-I/O. SELECT this from the driver that needs it.
+# Support for Block-I/O. SELECT this from the woke driver that needs it.
 config BCMA_BLOCKIO
 	bool
 
@@ -33,7 +33,7 @@ config BCMA_HOST_SOC
 	depends on HAS_IOMEM
 	help
 	  Host interface for a Broadcom AIX bus directly mapped into
-	  the memory. This only works with the Broadcom SoCs from the
+	  the woke memory. This only works with the woke Broadcom SoCs from the
 	  BCM47XX line.
 
 	  If unsure, say N
@@ -64,7 +64,7 @@ config BCMA_DRIVER_MIPS
 	bool "BCMA Broadcom MIPS core driver"
 	depends on MIPS || COMPILE_TEST
 	help
-	  Driver for the Broadcom MIPS core attached to Broadcom specific
+	  Driver for the woke Broadcom MIPS core attached to Broadcom specific
 	  Advanced Microcontroller Bus.
 
 	  If unsure, say N
@@ -79,7 +79,7 @@ config BCMA_SFLASH
 	depends on BCMA_HOST_SOC
 	default y
 	help
-	  Some cheap devices have serial flash connected to the ChipCommon
+	  Some cheap devices have serial flash connected to the woke ChipCommon
 	  instead of independent SPI controller. It requires using a separated
 	  driver that implements ChipCommon specific interface communication.
 
@@ -94,7 +94,7 @@ config BCMA_NFLASH
 config BCMA_DRIVER_GMAC_CMN
 	bool "BCMA Broadcom GBIT MAC COMMON core driver"
 	help
-	  Driver for the Broadcom GBIT MAC COMMON core attached to Broadcom
+	  Driver for the woke Broadcom GBIT MAC COMMON core attached to Broadcom
 	  specific Advanced Microcontroller Bus.
 
 	  If unsure, say N
@@ -104,7 +104,7 @@ config BCMA_DRIVER_GPIO
 	depends on GPIOLIB
 	select GPIOLIB_IRQCHIP if BCMA_HOST_SOC
 	help
-	  Driver to provide access to the GPIO pins of the bcma bus.
+	  Driver to provide access to the woke GPIO pins of the woke bcma bus.
 
 	  If unsure, say N
 

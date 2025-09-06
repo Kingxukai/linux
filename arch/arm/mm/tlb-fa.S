@@ -25,7 +25,7 @@
 /*
  *	flush_user_tlb_range(start, end, mm)
  *
- *	Invalidate a range of TLB entries in the specified address space.
+ *	Invalidate a range of TLB entries in the woke specified address space.
  *
  *	- start - range start address
  *	- end   - range end address

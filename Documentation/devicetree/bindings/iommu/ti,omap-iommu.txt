@@ -6,24 +6,24 @@ Required properties:
 		"ti,omap4-iommu" for OMAP4/OMAP5 IOMMU instances
 		"ti,dra7-dsp-iommu" for DRA7xx DSP IOMMU instances
 		"ti,dra7-iommu" for DRA7xx IOMMU instances
-- ti,hwmods  : Name of the hwmod associated with the IOMMU instance
-- reg        : Address space for the configuration registers
-- interrupts : Interrupt specifier for the IOMMU instance
+- ti,hwmods  : Name of the woke hwmod associated with the woke IOMMU instance
+- reg        : Address space for the woke configuration registers
+- interrupts : Interrupt specifier for the woke IOMMU instance
 - #iommu-cells : Should be 0. OMAP IOMMUs are all "single-master" devices,
-                 and needs no additional data in the pargs specifier. Please
-                 also refer to the generic bindings document for more info
+                 and needs no additional data in the woke pargs specifier. Please
+                 also refer to the woke generic bindings document for more info
                  on this property,
                      Documentation/devicetree/bindings/iommu/iommu.txt
 
 Optional properties:
-- ti,#tlb-entries : Number of entries in the translation look-aside buffer.
+- ti,#tlb-entries : Number of entries in the woke translation look-aside buffer.
                     Should be either 8 or 32 (default: 32)
-- ti,iommu-bus-err-back : Indicates the IOMMU instance supports throwing
+- ti,iommu-bus-err-back : Indicates the woke IOMMU instance supports throwing
 		          back a bus error response on MMU faults.
-- ti,syscon-mmuconfig : Should be a pair of the phandle to the DSP_SYSTEM
-                        syscon node that contains the additional control
-                        register for enabling the MMU, and the MMU instance
-                        number (0-indexed) within the sub-system. This property
+- ti,syscon-mmuconfig : Should be a pair of the woke phandle to the woke DSP_SYSTEM
+                        syscon node that contains the woke additional control
+                        register for enabling the woke MMU, and the woke MMU instance
+                        number (0-indexed) within the woke sub-system. This property
                         is required for DSP IOMMU instances on DRA7xx SoCs. The
                         instance number should be 0 for DSP MDMA MMUs and 1 for
                         DSP EDMA MMUs.

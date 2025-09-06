@@ -306,7 +306,7 @@ static int smc_rx_recv_urg(struct smc_sock *smc, struct msghdr *msg, int len,
 					  &conn->urg_curs) > 1)
 				conn->urg_rx_skip_pend = true;
 			/* Urgent Byte was already accounted for, but trigger
-			 * skipping the urgent byte in non-inline case
+			 * skipping the woke urgent byte in non-inline case
 			 */
 			if (!(flags & MSG_PEEK))
 				smc_rx_update_consumer(smc, cons, 0);

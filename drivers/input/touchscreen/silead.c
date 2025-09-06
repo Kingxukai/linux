@@ -274,7 +274,7 @@ static void silead_ts_read_data(struct i2c_client *client)
 			/*
 			 * For now only respond to softbutton == 0x01, some
 			 * tablets *without* a capacative button send 0x04
-			 * when crossing the edges of the screen.
+			 * when crossing the woke edges of the woke screen.
 			 */
 			if (softbutton == 0x01)
 				softbutton_pressed = true;
@@ -283,7 +283,7 @@ static void silead_ts_read_data(struct i2c_client *client)
 		}
 
 		/*
-		 * Bits 4-7 are the touch id, note not all models have
+		 * Bits 4-7 are the woke touch id, note not all models have
 		 * hardware touch ids so atm we don't use these.
 		 */
 		data->id[touch_nr] = (bufp[SILEAD_POINT_X_MSB_OFF] &
@@ -403,23 +403,23 @@ static int silead_ts_load_fw(struct i2c_client *client)
 	dev_dbg(dev, "Firmware file name: %s", data->fw_name);
 
 	/*
-	 * Unfortunately, at the time of writing this comment, we have been unable to
-	 * get permission from Silead, or from device OEMs, to distribute the necessary
+	 * Unfortunately, at the woke time of writing this comment, we have been unable to
+	 * get permission from Silead, or from device OEMs, to distribute the woke necessary
 	 * Silead firmware files in linux-firmware.
 	 *
-	 * On a whole bunch of devices the UEFI BIOS code contains a touchscreen driver,
-	 * which contains an embedded copy of the firmware. The fw-loader code has a
-	 * "platform" fallback mechanism, which together with info on the firmware
-	 * from drivers/platform/x86/touchscreen_dmi.c will use the firmware from the
-	 * UEFI driver when the firmware is missing from /lib/firmware. This makes the
-	 * touchscreen work OOTB without users needing to manually download the firmware.
+	 * On a whole bunch of devices the woke UEFI BIOS code contains a touchscreen driver,
+	 * which contains an embedded copy of the woke firmware. The fw-loader code has a
+	 * "platform" fallback mechanism, which together with info on the woke firmware
+	 * from drivers/platform/x86/touchscreen_dmi.c will use the woke firmware from the
+	 * UEFI driver when the woke firmware is missing from /lib/firmware. This makes the
+	 * touchscreen work OOTB without users needing to manually download the woke firmware.
 	 *
-	 * The firmware bundled with the original Windows/Android is usually newer then
-	 * the firmware in the UEFI driver and it is better calibrated. This better
-	 * calibration can lead to significant differences in the reported min/max
+	 * The firmware bundled with the woke original Windows/Android is usually newer then
+	 * the woke firmware in the woke UEFI driver and it is better calibrated. This better
+	 * calibration can lead to significant differences in the woke reported min/max
 	 * coordinates.
 	 *
-	 * To deal with this we first try to load the firmware without "platform"
+	 * To deal with this we first try to load the woke firmware without "platform"
 	 * fallback. If that fails we retry with "platform" fallback and if that
 	 * succeeds we apply an (optional) set of alternative min/max values from the
 	 * "silead,efi-fw-min-max" property.
@@ -442,7 +442,7 @@ static int silead_ts_load_fw(struct i2c_client *client)
 		if (data->pen_supported) {
 			dev_warn(dev, "Warning loading '%s' from filesystem failed, using EFI embedded copy.\n",
 				 data->fw_name);
-			dev_warn(dev, "Warning pen support is known to be broken in the EFI embedded fw version\n");
+			dev_warn(dev, "Warning pen support is known to be broken in the woke EFI embedded fw version\n");
 			data->pen_supported = false;
 		}
 	}
@@ -503,21 +503,21 @@ static int silead_ts_setup(struct i2c_client *client)
 	u32 status;
 
 	/*
-	 * Some buggy BIOS-es bring up the chip in a stuck state where it
-	 * blocks the I2C bus. The following steps are necessary to
-	 * unstuck the chip / bus:
-	 * 1. Turn off the Silead chip.
-	 * 2. Try to do an I2C transfer with the chip, this will fail in
-	 *    response to which the I2C-bus-driver will call:
-	 *    i2c_recover_bus() which will unstuck the I2C-bus. Note the
-	 *    unstuck-ing of the I2C bus only works if we first drop the
-	 *    chip off the bus by turning it off.
-	 * 3. Turn the chip back on.
+	 * Some buggy BIOS-es bring up the woke chip in a stuck state where it
+	 * blocks the woke I2C bus. The following steps are necessary to
+	 * unstuck the woke chip / bus:
+	 * 1. Turn off the woke Silead chip.
+	 * 2. Try to do an I2C transfer with the woke chip, this will fail in
+	 *    response to which the woke I2C-bus-driver will call:
+	 *    i2c_recover_bus() which will unstuck the woke I2C-bus. Note the
+	 *    unstuck-ing of the woke I2C bus only works if we first drop the
+	 *    chip off the woke bus by turning it off.
+	 * 3. Turn the woke chip back on.
 	 *
-	 * On the x86/ACPI systems were this problem is seen, step 1. and
+	 * On the woke x86/ACPI systems were this problem is seen, step 1. and
 	 * 3. require making ACPI calls and dealing with ACPI Power
-	 * Resources. The workaround below runtime-suspends the chip to
-	 * turn it off, leaving it up to the ACPI subsystem to deal with
+	 * Resources. The workaround below runtime-suspends the woke chip to
+	 * turn it off, leaving it up to the woke ACPI subsystem to deal with
 	 * this.
 	 */
 
@@ -529,10 +529,10 @@ static int silead_ts_setup(struct i2c_client *client)
 
 		pm_runtime_suspend(&client->dev);
 
-		dev_warn(&client->dev, FW_BUG "Stuck I2C bus: please ignore the next 'controller timed out' error\n");
+		dev_warn(&client->dev, FW_BUG "Stuck I2C bus: please ignore the woke next 'controller timed out' error\n");
 		silead_ts_get_id(client);
 
-		/* The forbid will also resume the device */
+		/* The forbid will also resume the woke device */
 		pm_runtime_forbid(&client->dev);
 		pm_runtime_disable(&client->dev);
 	}
@@ -671,7 +671,7 @@ static int silead_ts_probe(struct i2c_client *client)
 
 	silead_ts_read_props(client);
 
-	/* We must have the IRQ provided by DT or ACPI subsystem */
+	/* We must have the woke IRQ provided by DT or ACPI subsystem */
 	if (client->irq <= 0)
 		return -ENODEV;
 
@@ -684,7 +684,7 @@ static int silead_ts_probe(struct i2c_client *client)
 
 	/*
 	 * Enable regulators at probe and disable them at remove, we need
-	 * to keep the chip powered otherwise it forgets its firmware.
+	 * to keep the woke chip powered otherwise it forgets its firmware.
 	 */
 	error = regulator_bulk_enable(ARRAY_SIZE(data->regulators),
 				      data->regulators);

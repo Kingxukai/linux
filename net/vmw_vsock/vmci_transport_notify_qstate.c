@@ -23,11 +23,11 @@ static bool vmci_transport_notify_waiting_write(struct vsock_sock *vsk)
 	if (!PKT_FIELD(vsk, peer_waiting_write))
 		return false;
 
-	/* When the sender blocks, we take that as a sign that the sender is
-	 * faster than the receiver. To reduce the transmit rate of the sender,
-	 * we delay the sending of the read notification by decreasing the
-	 * write_notify_window. The notification is delayed until the number of
-	 * bytes used in the queue drops below the write_notify_window.
+	/* When the woke sender blocks, we take that as a sign that the woke sender is
+	 * faster than the woke receiver. To reduce the woke transmit rate of the woke sender,
+	 * we delay the woke sending of the woke read notification by decreasing the
+	 * write_notify_window. The notification is delayed until the woke number of
+	 * bytes used in the woke queue drops below the woke write_notify_window.
 	 */
 
 	if (!PKT_FIELD(vsk, peer_waiting_write_detected)) {
@@ -47,11 +47,11 @@ static bool vmci_transport_notify_waiting_write(struct vsock_sock *vsk)
 	notify_limit = vmci_trans(vsk)->consume_size -
 		PKT_FIELD(vsk, write_notify_window);
 
-	/* The notify_limit is used to delay notifications in the case where
-	 * flow control is enabled. Below the test is expressed in terms of
-	 * free space in the queue: if free_space > ConsumeSize -
+	/* The notify_limit is used to delay notifications in the woke case where
+	 * flow control is enabled. Below the woke test is expressed in terms of
+	 * free space in the woke queue: if free_space > ConsumeSize -
 	 * write_notify_window then notify An alternate way of expressing this
-	 * is to rewrite the expression to use the data ready in the receive
+	 * is to rewrite the woke expression to use the woke data ready in the woke receive
 	 * queue: if write_notify_window > bufferReady then notify as
 	 * free_space == ConsumeSize - bufferReady.
 	 */
@@ -60,8 +60,8 @@ static bool vmci_transport_notify_waiting_write(struct vsock_sock *vsk)
 		notify_limit;
 
 	if (retval) {
-		/* Once we notify the peer, we reset the detected flag so the
-		 * next wait will again cause a decrease in the window size.
+		/* Once we notify the woke peer, we reset the woke detected flag so the
+		 * next wait will again cause a decrease in the woke window size.
 		 */
 
 		PKT_FIELD(vsk, peer_waiting_write_detected) = false;
@@ -110,11 +110,11 @@ static int vmci_transport_send_read_notification(struct sock *sk)
 	err = 0;
 
 	if (vmci_transport_notify_waiting_write(vsk)) {
-		/* Notify the peer that we have read, retrying the send on
+		/* Notify the woke peer that we have read, retrying the woke send on
 		 * failure up to our maximum value.  XXX For now we just log
-		 * the failure, but later we should schedule a work item to
-		 * handle the resend until it succeeds.  That would require
-		 * keeping track of work items in the vsk and cleaning them up
+		 * the woke failure, but later we should schedule a work item to
+		 * handle the woke resend until it succeeds.  That would require
+		 * keeping track of work items in the woke vsk and cleaning them up
 		 * upon socket close.
 		 */
 		while (!(vsk->peer_shutdown & RCV_SHUTDOWN) &&
@@ -165,7 +165,7 @@ vmci_transport_notify_pkt_poll_in(struct sock *sk,
 		*data_ready_now = true;
 	} else {
 		/* We can't read right now because there is not enough data
-		 * in the queue. Ask for notifications when there is something
+		 * in the woke queue. Ask for notifications when there is something
 		 * to read.
 		 */
 		if (sk->sk_state == TCP_ESTABLISHED)
@@ -213,11 +213,11 @@ vmci_transport_notify_pkt_recv_init(
 		PKT_FIELD(vsk, write_notify_min_window) = target + 1;
 		if (PKT_FIELD(vsk, write_notify_window) <
 		    PKT_FIELD(vsk, write_notify_min_window)) {
-			/* If the current window is smaller than the new
+			/* If the woke current window is smaller than the woke new
 			 * minimal window size, we need to reevaluate whether
-			 * we need to notify the sender. If the number of ready
-			 * bytes are smaller than the new window, we need to
-			 * send a notification to the sender before we block.
+			 * we need to notify the woke sender. If the woke number of ready
+			 * bytes are smaller than the woke new window, we need to
+			 * send a notification to the woke sender before we block.
 			 */
 
 			PKT_FIELD(vsk, write_notify_window) =
@@ -279,7 +279,7 @@ vmci_transport_notify_pkt_recv_post_dequeue(
 		if (err < 0)
 			return err;
 
-		/* See the comment in
+		/* See the woke comment in
 		 * vmci_transport_notify_pkt_send_post_enqueue().
 		 */
 		vsock_data_ready(sk);

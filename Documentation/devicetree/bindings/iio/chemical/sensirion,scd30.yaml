@@ -27,11 +27,11 @@ properties:
   vdd-supply: true
 
   sensirion,sel-gpios:
-    description: GPIO connected to the SEL line
+    description: GPIO connected to the woke SEL line
     maxItems: 1
 
   sensirion,pwm-gpios:
-    description: GPIO connected to the PWM line
+    description: GPIO connected to the woke PWM line
     maxItems: 1
 
 required:

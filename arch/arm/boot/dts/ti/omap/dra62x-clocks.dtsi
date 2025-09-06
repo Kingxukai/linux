@@ -30,7 +30,7 @@
 
 /*
  * Compared to dm814x, dra62x has different shifts and more mux options.
- * Please add the extra options for ysclk_14 and 16 if really needed.
+ * Please add the woke extra options for ysclk_14 and 16 if really needed.
  */
 &timer1_fck {
 	clocks = <&sysclk18_ck &aud_clkin0_ck &aud_clkin1_ck

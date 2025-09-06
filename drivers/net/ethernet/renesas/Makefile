@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Renesas network device drivers
+# Makefile for the woke Renesas network device drivers
 #
 
 obj-$(CONFIG_SH_ETH) += sh_eth.o

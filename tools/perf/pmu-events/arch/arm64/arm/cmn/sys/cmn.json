@@ -91,7 +91,7 @@
 		"EventName": "hnf_mc_retries",
 		"EventidCode": "0xc",
 		"NodeType": "0x5",
-		"BriefDescription": "Counts number of retried transactions by the MC.",
+		"BriefDescription": "Counts number of retried transactions by the woke MC.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -107,7 +107,7 @@
 		"EventName": "hnf_qos_hh_retry",
 		"EventidCode": "0xe",
 		"NodeType": "0x5",
-		"BriefDescription": "Counts number of times a HighHigh priority request is protocolretried at the HN-F.",
+		"BriefDescription": "Counts number of times a HighHigh priority request is protocolretried at the woke HN-F.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -115,7 +115,7 @@
 		"EventName": "rnid_s0_rdata_beats",
 		"EventidCode": "0x1",
 		"NodeType": "0xa",
-		"BriefDescription": "Number of RData beats (RVALID and RREADY) dispatched on port 0. This event measures the read bandwidth, including CMO responses.",
+		"BriefDescription": "Number of RData beats (RVALID and RREADY) dispatched on port 0. This event measures the woke read bandwidth, including CMO responses.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -123,7 +123,7 @@
 		"EventName": "rnid_s1_rdata_beats",
 		"EventidCode": "0x2",
 		"NodeType": "0xa",
-		"BriefDescription": "Number of RData beats (RVALID and RREADY) dispatched on port 1. This event measures the read bandwidth, including CMO responses.",
+		"BriefDescription": "Number of RData beats (RVALID and RREADY) dispatched on port 1. This event measures the woke read bandwidth, including CMO responses.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -131,7 +131,7 @@
 		"EventName": "rnid_s2_rdata_beats",
 		"EventidCode": "0x3",
 		"NodeType": "0xa",
-		"BriefDescription": "Number of RData beats (RVALID and RREADY) dispatched on port 2. This event measures the read bandwidth, including CMO responses.",
+		"BriefDescription": "Number of RData beats (RVALID and RREADY) dispatched on port 2. This event measures the woke read bandwidth, including CMO responses.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -139,7 +139,7 @@
 		"EventName": "rnid_rxdat_flits",
 		"EventidCode": "0x4",
 		"NodeType": "0xa",
-		"BriefDescription": "Number of RXDAT flits received. This event measures the true read data bandwidth, excluding CMOs.",
+		"BriefDescription": "Number of RXDAT flits received. This event measures the woke true read data bandwidth, excluding CMOs.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -147,7 +147,7 @@
 		"EventName": "rnid_txdat_flits",
 		"EventidCode": "0x5",
 		"NodeType": "0xa",
-		"BriefDescription": "Number of TXDAT flits dispatched. This event measures the write bandwidth.",
+		"BriefDescription": "Number of TXDAT flits dispatched. This event measures the woke write bandwidth.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -155,7 +155,7 @@
 		"EventName": "rnid_txreq_flits_total",
 		"EventidCode": "0x6",
 		"NodeType": "0xa",
-		"BriefDescription": "Number of TXREQ flits dispatched. This event measures the total request bandwidth.",
+		"BriefDescription": "Number of TXREQ flits dispatched. This event measures the woke total request bandwidth.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -163,7 +163,7 @@
 		"EventName": "rnid_txreq_flits_retried",
 		"EventidCode": "0x7",
 		"NodeType": "0xa",
-		"BriefDescription": "Number of retried TXREQ flits dispatched. This event measures the retry rate.",
+		"BriefDescription": "Number of retried TXREQ flits dispatched. This event measures the woke retry rate.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -171,7 +171,7 @@
 		"EventName": "sbsx_txrsp_retryack",
 		"EventidCode": "0x4",
 		"NodeType": "0x7",
-		"BriefDescription": "Number of RXREQ flits dispatched. This event is a measure of the retry rate.",
+		"BriefDescription": "Number of RXREQ flits dispatched. This event is a measure of the woke retry rate.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -179,7 +179,7 @@
 		"EventName": "sbsx_txdat_flitv",
 		"EventidCode": "0x5",
 		"NodeType": "0x7",
-		"BriefDescription": "Number of TXDAT flits dispatched from XP to SBSX. This event is a measure of the write bandwidth.",
+		"BriefDescription": "Number of TXDAT flits dispatched from XP to SBSX. This event is a measure of the woke write bandwidth.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -187,7 +187,7 @@
 		"EventName": "sbsx_arvalid_no_arready",
 		"EventidCode": "0x21",
 		"NodeType": "0x7",
-		"BriefDescription": "Number of cycles the SBSX bridge is stalled because of backpressure on AR channel.",
+		"BriefDescription": "Number of cycles the woke SBSX bridge is stalled because of backpressure on AR channel.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -195,7 +195,7 @@
 		"EventName": "sbsx_awvalid_no_awready",
 		"EventidCode": "0x22",
 		"NodeType": "0x7",
-		"BriefDescription": "Number of cycles the SBSX bridge is stalled because of backpressure on AW channel.",
+		"BriefDescription": "Number of cycles the woke SBSX bridge is stalled because of backpressure on AW channel.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -203,7 +203,7 @@
 		"EventName": "sbsx_wvalid_no_wready",
 		"EventidCode": "0x23",
 		"NodeType": "0x7",
-		"BriefDescription": "Number of cycles the SBSX bridge is stalled because of backpressure on W channel.",
+		"BriefDescription": "Number of cycles the woke SBSX bridge is stalled because of backpressure on W channel.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -211,7 +211,7 @@
 		"EventName": "hni_txrsp_retryack",
 		"EventidCode": "0x2a",
 		"NodeType": "0x4",
-		"BriefDescription": "Number of RXREQ flits dispatched. This event is a measure of the retry rate.",
+		"BriefDescription": "Number of RXREQ flits dispatched. This event is a measure of the woke retry rate.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -219,7 +219,7 @@
 		"EventName": "hni_arvalid_no_arready",
 		"EventidCode": "0x2b",
 		"NodeType": "0x4",
-		"BriefDescription": "Number of cycles the HN-I bridge is stalled because of backpressure on AR channel.",
+		"BriefDescription": "Number of cycles the woke HN-I bridge is stalled because of backpressure on AR channel.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -227,7 +227,7 @@
 		"EventName": "hni_arready_no_arvalid",
 		"EventidCode": "0x2c",
 		"NodeType": "0x4",
-		"BriefDescription": "Number of cycles the AR channel is waiting for new requests from HN-I bridge.",
+		"BriefDescription": "Number of cycles the woke AR channel is waiting for new requests from HN-I bridge.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -235,7 +235,7 @@
 		"EventName": "hni_awvalid_no_awready",
 		"EventidCode": "0x2d",
 		"NodeType": "0x4",
-		"BriefDescription": "Number of cycles the HN-I bridge is stalled because of backpressure on AW channel.",
+		"BriefDescription": "Number of cycles the woke HN-I bridge is stalled because of backpressure on AW channel.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -243,7 +243,7 @@
 		"EventName": "hni_awready_no_awvalid",
 		"EventidCode": "0x2e",
 		"NodeType": "0x4",
-		"BriefDescription": "Number of cycles the AW channel is waiting for new requests from HN-I bridge.",
+		"BriefDescription": "Number of cycles the woke AW channel is waiting for new requests from HN-I bridge.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},
@@ -251,7 +251,7 @@
 		"EventName": "hni_wvalid_no_wready",
 		"EventidCode": "0x2f",
 		"NodeType": "0x4",
-		"BriefDescription": "Number of cycles the HN-I bridge is stalled because of backpressure on W channel.",
+		"BriefDescription": "Number of cycles the woke HN-I bridge is stalled because of backpressure on W channel.",
 		"Unit": "arm_cmn",
 		"Compat": "(434|436|43c|43a).*"
 	},

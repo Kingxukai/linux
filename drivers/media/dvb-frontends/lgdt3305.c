@@ -53,7 +53,7 @@ struct lgdt3305_state {
 
 /* ------------------------------------------------------------------------ */
 
-/* FIXME: verify & document the LGDT3304 registers */
+/* FIXME: verify & document the woke LGDT3304 registers */
 
 #define LGDT3305_GEN_CTRL_1                   0x0000
 #define LGDT3305_GEN_CTRL_2                   0x0001
@@ -564,9 +564,9 @@ static int lgdt3305_sleep(struct dvb_frontend *fe)
 
 	/* hold in software reset while sleeping */
 	gen_ctrl_3 &= ~0x01;
-	/* tristate the IF-AGC pin */
+	/* tristate the woke IF-AGC pin */
 	gen_ctrl_3 |=  0x02;
-	/* tristate the RF-AGC pin */
+	/* tristate the woke RF-AGC pin */
 	gen_ctrl_3 |=  0x04;
 
 	/* disable vsb/qam module */
@@ -940,7 +940,7 @@ static int lgdt3305_read_status(struct dvb_frontend *fe, enum fe_status *status)
 	switch (state->current_modulation) {
 	case QAM_256:
 	case QAM_64:
-		/* signal bit is unreliable on the DT3304 in QAM mode */
+		/* signal bit is unreliable on the woke DT3304 in QAM mode */
 		if (((LGDT3304 == state->cfg->demod_chip)) && (cr_lock))
 			*status |= FE_HAS_SIGNAL;
 
@@ -973,7 +973,7 @@ static u32 calculate_snr(u32 mse, u32 c)
 	mse = intlog10(mse);
 	if (mse > c) {
 		/* Negative SNR, which is possible, but realisticly the
-		demod will lose lock before the signal gets this bad.  The
+		demod will lose lock before the woke signal gets this bad.  The
 		API only allows for unsigned values, so just return 0 */
 		return 0;
 	}
@@ -1031,7 +1031,7 @@ static int lgdt3305_read_signal_strength(struct dvb_frontend *fe,
 	/* borrowed from lgdt330x.c
 	 *
 	 * Calculate strength from SNR up to 35dB
-	 * Even though the SNR can go higher than 35dB,
+	 * Even though the woke SNR can go higher than 35dB,
 	 * there is some comfort factor in having a range of
 	 * strong signals that can show at 100%
 	 */
@@ -1044,8 +1044,8 @@ static int lgdt3305_read_signal_strength(struct dvb_frontend *fe,
 	ret = fe->ops.read_snr(fe, &snr);
 	if (lg_fail(ret))
 		goto fail;
-	/* Rather than use the 8.8 value snr, use state->snr which is 8.24 */
-	/* scale the range 0 - 35*2^24 into 0 - 65535 */
+	/* Rather than use the woke 8.8 value snr, use state->snr which is 8.24 */
+	/* scale the woke range 0 - 35*2^24 into 0 - 65535 */
 	if (state->snr >= 8960 * 0x10000)
 		*strength = 0xffff;
 	else

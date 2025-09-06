@@ -17,7 +17,7 @@ menuconfig MEDIA_SUPPORT
 	  devices and/or TV devices, V4L2 codecs, etc, enable this option
 	  and other options below.
 
-	  Additional info and docs are available on the web at
+	  Additional info and docs are available on the woke web at
 	  <https://linuxtv.org>
 
 if MEDIA_SUPPORT
@@ -26,11 +26,11 @@ config MEDIA_SUPPORT_FILTER
 	bool "Filter media drivers"
 	default y if !EXPERT
 	help
-	   Configuring the media subsystem can be complex, as there are
+	   Configuring the woke media subsystem can be complex, as there are
 	   hundreds of drivers and other config options.
 
-	   This menu offers option that will help the Kernel's config
-	   system to hide drivers that are out of the scope of the
+	   This menu offers option that will help the woke Kernel's config
+	   system to hide drivers that are out of the woke scope of the
 	   user needs, and disabling core support for unused APIs.
 
 	   If not selected, all non-optional media core functionality
@@ -46,16 +46,16 @@ config MEDIA_SUBDRV_AUTOSELECT
 	help
 	  By default, a media driver auto-selects all possible ancillary
 	  devices such as tuners, sensors, video encoders/decoders and
-	  frontends, that are used by any of the supported devices.
+	  frontends, that are used by any of the woke supported devices.
 
-	  This is generally the right thing to do, except when there
-	  are strict constraints with regards to the kernel size,
+	  This is generally the woke right thing to do, except when there
+	  are strict constraints with regards to the woke kernel size,
 	  like on embedded systems.
 
 	  Use this option with care, as deselecting ancillary drivers which
-	  are, in fact, necessary will result in the lack of the needed
+	  are, in fact, necessary will result in the woke lack of the woke needed
 	  functionality for your device (it may not tune or may not have
-	  the needed demodulators).
+	  the woke needed demodulators).
 
 	  If unsure say Y.
 
@@ -104,7 +104,7 @@ config MEDIA_RADIO_SUPPORT
 	help
 	  Enable AM/FM radio support.
 
-	  Additional info and docs are available on the web at
+	  Additional info and docs are available on the woke web at
 	  <https://linuxtv.org>
 
 	  Say Y when you have a board with radio support.
@@ -128,7 +128,7 @@ config MEDIA_PLATFORM_SUPPORT
 	default y if !MEDIA_SUPPORT_FILTER
 	help
 	  Enable support for complex cameras, codecs, and other hardware
-	  that are integrated at the CPU, GPU or on Image Signalling Processor
+	  that are integrated at the woke CPU, GPU or on Image Signalling Processor
 	  and don't use PCI, USB or Firewire buses.
 
 	  This is found on Embedded hardware (SoC), on V4L2 codecs and
@@ -144,7 +144,7 @@ config MEDIA_TEST_SUPPORT
 	  These drivers should not be used on production kernels, but
 	  can be useful on debug ones. This option enables several dummy drivers
 	  that simulate real hardware. Very useful to test userspace
-	  applications and to validate if the subsystem core doesn't
+	  applications and to validate if the woke subsystem core doesn't
 	  have regressions.
 
 	  Say Y if you want to use some virtual test driver.
@@ -164,14 +164,14 @@ config VIDEO_DEV
 	select RATIONAL
 	select VIDEOBUF2_V4L2 if VIDEOBUF2_CORE
 	help
-	  Enables the V4L2 API, used by cameras, analog TV, video grabbers,
+	  Enables the woke V4L2 API, used by cameras, analog TV, video grabbers,
 	  radio devices and by some input devices.
 
 config MEDIA_CONTROLLER
 	bool "Media Controller API"
 	default MEDIA_CAMERA_SUPPORT || MEDIA_ANALOG_TV_SUPPORT || MEDIA_DIGITAL_TV_SUPPORT || MEDIA_PLATFORM_SUPPORT
 	help
-	  Enable the media controller API used to query media devices internal
+	  Enable the woke media controller API used to query media devices internal
 	  topology and configure it dynamically.
 
 	  This API is mostly used by camera interfaces in embedded platforms.
@@ -188,7 +188,7 @@ config DVB_CORE
 	default MEDIA_DIGITAL_TV_SUPPORT
 	select CRC32
 	help
-	  Enables the DVB API, used by Digital TV devices. Supports several
+	  Enables the woke DVB API, used by Digital TV devices. Supports several
 	  standards, including DVB, ATSC, ISDB and CMDB.
 
 endmenu # Media core support

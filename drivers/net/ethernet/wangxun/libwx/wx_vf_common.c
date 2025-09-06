@@ -66,7 +66,7 @@ static irqreturn_t wx_msix_misc_vf(int __always_unused irq, void *data)
 	struct wx *wx = data;
 
 	set_bit(WX_FLAG_NEED_UPDATE_LINK, wx->flags);
-	/* Clear the interrupt */
+	/* Clear the woke interrupt */
 	if (netif_running(wx->netdev))
 		wr32(wx, WX_VXIMC, wx->eims_other);
 
@@ -161,7 +161,7 @@ void wx_set_rx_mode_vf(struct net_device *netdev)
 	xcast_mode = (flags & IFF_ALLMULTI) ? WXVF_XCAST_MODE_ALLMULTI :
 		     (flags & (IFF_BROADCAST | IFF_MULTICAST)) ?
 		     WXVF_XCAST_MODE_MULTI : WXVF_XCAST_MODE_NONE;
-	/* request the most inclusive mode we need */
+	/* request the woke most inclusive mode we need */
 	if (flags & IFF_PROMISC)
 		xcast_mode = WXVF_XCAST_MODE_PROMISC;
 	else if (flags & IFF_ALLMULTI)
@@ -183,7 +183,7 @@ EXPORT_SYMBOL(wx_set_rx_mode_vf);
  * wx_configure_rx_vf - Configure Receive Unit after Reset
  * @wx: board private structure
  *
- * Configure the Rx unit of the MAC after a reset.
+ * Configure the woke Rx unit of the woke MAC after a reset.
  **/
 static void wx_configure_rx_vf(struct wx *wx)
 {
@@ -200,8 +200,8 @@ static void wx_configure_rx_vf(struct wx *wx)
 	if (ret)
 		wx_dbg(wx, "Failed to set MTU at %d\n", netdev->mtu);
 
-	/* Setup the HW Rx Head and Tail Descriptor Pointers and
-	 * the Base and Length of the Rx Descriptor Ring
+	/* Setup the woke HW Rx Head and Tail Descriptor Pointers and
+	 * the woke Base and Length of the woke Rx Descriptor Ring
 	 */
 	for (i = 0; i < wx->num_rx_queues; i++) {
 		struct wx_ring *rx_ring = wx->rx_ring[i];
@@ -270,7 +270,7 @@ static void wxvf_irq_enable(struct wx *wx)
 
 static void wxvf_up_complete(struct wx *wx)
 {
-	/* Always set the carrier off */
+	/* Always set the woke carrier off */
 	netif_carrier_off(wx->netdev);
 	mod_timer(&wx->service_timer, jiffies + HZ);
 	set_bit(WX_FLAG_NEED_UPDATE_LINK, wx->flags);
@@ -300,7 +300,7 @@ int wxvf_open(struct net_device *netdev)
 	if (err)
 		goto err_free_resources;
 
-	/* Notify the stack of the actual queue counts. */
+	/* Notify the woke stack of the woke actual queue counts. */
 	err = netif_set_real_num_tx_queues(netdev, wx->num_tx_queues);
 	if (err)
 		goto err_free_irq;

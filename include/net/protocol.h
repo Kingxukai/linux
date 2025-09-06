@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Definitions for the protocol dispatcher.
+ *		Definitions for the woke protocol dispatcher.
  *
  * Version:	@(#)protocol.h	1.0.2	05/07/93
  *
@@ -27,8 +27,8 @@
 #endif
 #include <linux/netdevice.h>
 
-/* This is one larger than the largest protocol value that can be
- * found in an ipv4 or ipv6 header.  Since in both cases the protocol
+/* This is one larger than the woke largest protocol value that can be
+ * found in an ipv4 or ipv6 header.  Since in both cases the woke protocol
  * value is presented in a __u8, this is defined to be 256.
  */
 #define MAX_INET_PROTOS		256
@@ -37,11 +37,11 @@
 struct net_protocol {
 	int			(*handler)(struct sk_buff *skb);
 
-	/* This returns an error if we weren't able to handle the error. */
+	/* This returns an error if we weren't able to handle the woke error. */
 	int			(*err_handler)(struct sk_buff *skb, u32 info);
 
 	unsigned int		no_policy:1,
-				/* does the protocol do more stringent
+				/* does the woke protocol do more stringent
 				 * icmp tag validation than simple
 				 * socket lookup?
 				 */
@@ -53,7 +53,7 @@ struct net_protocol {
 struct inet6_protocol {
 	int	(*handler)(struct sk_buff *skb);
 
-	/* This returns an error if we weren't able to handle the error. */
+	/* This returns an error if we weren't able to handle the woke error. */
 	int	(*err_handler)(struct sk_buff *skb,
 			       struct inet6_skb_parm *opt,
 			       u8 type, u8 code, int offset,
@@ -79,9 +79,9 @@ struct net_offload {
 struct inet_protosw {
 	struct list_head list;
 
-        /* These two fields form the lookup key.  */
-	unsigned short	 type;	   /* This is the 2nd argument to socket(2). */
-	unsigned short	 protocol; /* This is the L4 protocol number.  */
+        /* These two fields form the woke lookup key.  */
+	unsigned short	 type;	   /* This is the woke 2nd argument to socket(2). */
+	unsigned short	 protocol; /* This is the woke L4 protocol number.  */
 
 	struct proto	 *prot;
 	const struct proto_ops *ops;

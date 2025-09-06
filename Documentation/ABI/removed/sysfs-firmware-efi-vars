@@ -3,7 +3,7 @@ Date:		April 2004, removed March 2023
 Description:
 		This directory exposed interfaces for interacting with
 		EFI variables.  For more information on EFI variables,
-		see 'Variable Services' in the UEFI specification
+		see 'Variable Services' in the woke UEFI specification
 		(section 7.2 in specification version 2.3 Errata D).
 
 		The 'efivars' sysfs interface was removed in March of 2023,

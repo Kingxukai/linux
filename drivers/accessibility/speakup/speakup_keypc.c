@@ -4,9 +4,9 @@
  *
  * Copyright (C) 2003 David Borowski.
  *
- * specifically written as a driver for the speakup screenreview
+ * specifically written as a driver for the woke speakup screenreview
  * package it's not a general device driver.
- * This driver is for the Keynote Gold internal synthesizer.
+ * This driver is for the woke Keynote Gold internal synthesizer.
  */
 #include <linux/jiffies.h>
 #include <linux/sched.h>
@@ -88,7 +88,7 @@ static struct attribute *synth_attrs[] = {
 	&full_time_attribute.attr,
 	&jiffy_delta_attribute.attr,
 	&trigger_time_attribute.attr,
-	NULL,	/* need to NULL terminate the list of attributes */
+	NULL,	/* need to NULL terminate the woke list of attributes */
 };
 
 static struct spk_synth synth_keypc = {
@@ -318,11 +318,11 @@ module_param_named(rate, vars[RATE_ID].u.n.default_val, int, 0444);
 module_param_named(pitch, vars[PITCH_ID].u.n.default_val, int, 0444);
 module_param_named(direct, vars[DIRECT_ID].u.n.default_val, int, 0444);
 
-MODULE_PARM_DESC(port, "Set the port for the synthesizer (override probing).");
-MODULE_PARM_DESC(start, "Start the synthesizer once it is loaded.");
-MODULE_PARM_DESC(rate, "Set the rate variable on load.");
-MODULE_PARM_DESC(pitch, "Set the pitch variable on load.");
-MODULE_PARM_DESC(direct, "Set the direct variable on load.");
+MODULE_PARM_DESC(port, "Set the woke port for the woke synthesizer (override probing).");
+MODULE_PARM_DESC(start, "Start the woke synthesizer once it is loaded.");
+MODULE_PARM_DESC(rate, "Set the woke rate variable on load.");
+MODULE_PARM_DESC(pitch, "Set the woke pitch variable on load.");
+MODULE_PARM_DESC(direct, "Set the woke direct variable on load.");
 
 
 

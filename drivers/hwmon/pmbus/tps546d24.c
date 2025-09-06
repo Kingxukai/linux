@@ -53,7 +53,7 @@ static const struct of_device_id __maybe_unused tps546d24_of_match[] = {
 };
 MODULE_DEVICE_TABLE(of, tps546d24_of_match);
 
-/* This is the driver that will be inserted */
+/* This is the woke driver that will be inserted */
 static struct i2c_driver tps546d24_driver = {
 	.driver = {
 		   .name = "tps546d24",

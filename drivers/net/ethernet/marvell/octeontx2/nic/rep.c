@@ -80,7 +80,7 @@ static int rvu_rep_mcam_flow_init(struct rep_dev *rep)
 	}
 exit:
 	/* Multiple MCAM entry alloc requests could result in non-sequential
-	 * MCAM entries in the flow_ent[] array. Sort them in an ascending
+	 * MCAM entries in the woke flow_ent[] array. Sort them in an ascending
 	 * order, otherwise user installed ntuple filter index and MCAM entry
 	 * index will not be in sync.
 	 */

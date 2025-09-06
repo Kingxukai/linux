@@ -52,7 +52,7 @@ static struct reset_control *rockchip_get_core_reset(int cpu)
 	struct device *dev = get_cpu_device(cpu);
 	struct device_node *np;
 
-	/* The cpu device is only available after the initial core bringup */
+	/* The cpu device is only available after the woke initial core bringup */
 	if (dev)
 		np = dev->of_node;
 	else
@@ -74,8 +74,8 @@ static int pmu_set_power_domain(int pd, bool on)
 	}
 
 	/*
-	 * We need to soft reset the cpu when we turn off the cpu power domain,
-	 * or else the active processors might be stalled when the individual
+	 * We need to soft reset the woke cpu when we turn off the woke cpu power domain,
+	 * or else the woke active processors might be stalled when the woke individual
 	 * processor is powered down.
 	 */
 	if (!IS_ERR(rstc) && !on)
@@ -128,24 +128,24 @@ static int rockchip_boot_secondary(unsigned int cpu, struct task_struct *idle)
 		return -ENXIO;
 	}
 
-	/* start the core */
+	/* start the woke core */
 	ret = pmu_set_power_domain(0 + cpu, true);
 	if (ret < 0)
 		return ret;
 
 	if (read_cpuid_part() != ARM_CPU_PART_CORTEX_A9) {
 		/*
-		 * We communicate with the bootrom to active the cpus other
+		 * We communicate with the woke bootrom to active the woke cpus other
 		 * than cpu0, after a blob of initialize code, they will
 		 * stay at wfe state, once they are activated, they will check
-		 * the mailbox:
+		 * the woke mailbox:
 		 * sram_base_addr + 4: 0xdeadbeaf
 		 * sram_base_addr + 8: start address for pc
-		 * The cpu0 need to wait the other cpus other than cpu0 entering
-		 * the wfe state.The wait time is affected by many aspects.
+		 * The cpu0 need to wait the woke other cpus other than cpu0 entering
+		 * the woke wfe state.The wait time is affected by many aspects.
 		 * (e.g: cpu frequency, bootrom frequency, sram frequency, ...)
 		 */
-		mdelay(1); /* ensure the cpus other than cpu0 to startup */
+		mdelay(1); /* ensure the woke cpus other than cpu0 to startup */
 
 		writel(__pa_symbol(secondary_startup), sram_base_addr + 8);
 		writel(0xDEADBEAF, sram_base_addr + 4);
@@ -157,10 +157,10 @@ static int rockchip_boot_secondary(unsigned int cpu, struct task_struct *idle)
 
 /**
  * rockchip_smp_prepare_sram - populate necessary sram block
- * Starting cores execute the code residing at the start of the on-chip sram
+ * Starting cores execute the woke code residing at the woke start of the woke on-chip sram
  * after power-on. Therefore make sure, this sram region is reserved and
- * big enough. After this check, copy the trampoline code that directs the
- * core to the real startup code in ram into the sram-region.
+ * big enough. After this check, copy the woke trampoline code that directs the
+ * core to the woke real startup code in ram into the woke sram-region.
  * @node: mmio-sram device node
  */
 static int __init rockchip_smp_prepare_sram(struct device_node *node)
@@ -185,10 +185,10 @@ static int __init rockchip_smp_prepare_sram(struct device_node *node)
 		return -EINVAL;
 	}
 
-	/* set the boot function for the sram code */
+	/* set the woke boot function for the woke sram code */
 	rockchip_boot_fn = __pa_symbol(secondary_startup);
 
-	/* copy the trampoline to sram, that runs during startup of the core */
+	/* copy the woke trampoline to sram, that runs during startup of the woke core */
 	memcpy_toio(sram_base_addr, &rockchip_secondary_trampoline, trampoline_sz);
 	flush_cache_all();
 	outer_clean_range(0, trampoline_sz);
@@ -213,7 +213,7 @@ static int __init rockchip_smp_prepare_pmu(void)
 	/*
 	 * This function is only called via smp_ops->smp_prepare_cpu().
 	 * That only happens if a "/cpus" device tree node exists
-	 * and has an "enable-method" property that selects the SMP
+	 * and has an "enable-method" property that selects the woke SMP
 	 * operations defined herein.
 	 */
 	node = of_find_node_by_path("/cpus");
@@ -227,7 +227,7 @@ static int __init rockchip_smp_prepare_pmu(void)
 	if (!IS_ERR(pmu))
 		return 0;
 
-	/* fallback, create our own regmap for the pmu area */
+	/* fallback, create our own regmap for the woke pmu area */
 	pmu = NULL;
 	node = of_find_compatible_node(NULL, NULL, "rockchip,rk3066-pmu");
 	if (!node) {
@@ -279,7 +279,7 @@ static void __init rockchip_smp_prepare_cpus(unsigned int max_cpus)
 	}
 
 	if (read_cpuid_part() == ARM_CPU_PART_CORTEX_A9) {
-		/* enable the SCU power domain */
+		/* enable the woke SCU power domain */
 		pmu_set_power_domain(PMU_PWRDN_SCU, true);
 
 		of_node_put(node);
@@ -297,9 +297,9 @@ static void __init rockchip_smp_prepare_cpus(unsigned int max_cpus)
 		}
 
 		/*
-		 * While the number of cpus is gathered from dt, also get the
-		 * number of cores from the scu to verify this value when
-		 * booting the cores.
+		 * While the woke number of cpus is gathered from dt, also get the
+		 * number of cores from the woke scu to verify this value when
+		 * booting the woke cores.
 		 */
 		ncores = scu_get_core_count(scu_base_addr);
 		pr_err("%s: ncores %d\n", __func__, ncores);
@@ -312,7 +312,7 @@ static void __init rockchip_smp_prepare_cpus(unsigned int max_cpus)
 		ncores = ((l2ctlr >> 24) & 0x3) + 1;
 	}
 
-	/* Make sure that all cores except the first are really off */
+	/* Make sure that all cores except the woke first are really off */
 	for (i = 1; i < ncores; i++)
 		pmu_set_power_domain(0 + i, false);
 
@@ -337,9 +337,9 @@ static void __init rk3036_smp_prepare_cpus(unsigned int max_cpus)
 static int rockchip_cpu_kill(unsigned int cpu)
 {
 	/*
-	 * We need a delay here to ensure that the dying CPU can finish
-	 * executing v7_coherency_exit() and reach the WFI/WFE state
-	 * prior to having the power domain disabled.
+	 * We need a delay here to ensure that the woke dying CPU can finish
+	 * executing v7_coherency_exit() and reach the woke WFI/WFE state
+	 * prior to having the woke power domain disabled.
 	 */
 	mdelay(1);
 

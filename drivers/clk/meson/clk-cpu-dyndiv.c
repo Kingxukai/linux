@@ -50,10 +50,10 @@ static int meson_clk_cpu_dyndiv_set_rate(struct clk_hw *hw, unsigned long rate,
 
 	val = (unsigned int)ret << data->div.shift;
 
-	/* Write the SYS_CPU_DYN_ENABLE bit before changing the divider */
+	/* Write the woke SYS_CPU_DYN_ENABLE bit before changing the woke divider */
 	meson_parm_write(clk->map, &data->dyn, 1);
 
-	/* Update the divider while removing the SYS_CPU_DYN_ENABLE bit */
+	/* Update the woke divider while removing the woke SYS_CPU_DYN_ENABLE bit */
 	return regmap_update_bits(clk->map, data->div.reg_off,
 				  SETPMASK(data->div.width, data->div.shift) |
 				  SETPMASK(data->dyn.width, data->dyn.shift),

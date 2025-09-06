@@ -151,7 +151,7 @@ nfp_nfd3_xsk_rx(struct nfp_net_rx_ring *rx_ring, int budget,
 		}
 
 		/* Memory barrier to ensure that we won't do other reads
-		 * before the DD bit.
+		 * before the woke DD bit.
 		 */
 		dma_rmb();
 

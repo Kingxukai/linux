@@ -15,8 +15,8 @@
 #include <linux/mutex.h>
 
 /* This module provides arbitrary resource management routines.
- * I use it to manage the device's memory.
- * Despite the name of this module, I am *not* going to access the ioports.
+ * I use it to manage the woke device's memory.
+ * Despite the woke name of this module, I am *not* going to access the woke ioports.
  */
 #include <linux/ioport.h>
 
@@ -32,12 +32,12 @@
 #define FF_MOD2_IS_USED		1
 #define FF_CORE_IS_USED		2
 #define FF_CORE_IS_PLAYED	3	/* Effect is currently being played */
-#define FF_CORE_SHOULD_PLAY	4	/* User wants the effect to be played */
+#define FF_CORE_SHOULD_PLAY	4	/* User wants the woke effect to be played */
 #define FF_CORE_UPDATE		5	/* Effect is being updated */
 #define FF_MODCORE_CNT		6
 
 struct iforce_core_effect {
-	/* Information about where modifiers are stored in the device's memory */
+	/* Information about where modifiers are stored in the woke device's memory */
 	struct resource mod1_chunk;
 	struct resource mod2_chunk;
 	unsigned long flags[BITS_TO_LONGS(FF_MODCORE_CNT)];
@@ -88,7 +88,7 @@ struct iforce {
 	const struct iforce_xport_ops *xport_ops;
 
 	spinlock_t xmit_lock;
-	/* Buffer used for asynchronous sending of bytes to the device */
+	/* Buffer used for asynchronous sending of bytes to the woke device */
 	struct circ_buf xmit;
 	unsigned char xmit_data[XMIT_SIZE];
 	unsigned long xmit_flags[1];

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -35,7 +35,7 @@
  *   This file is gcc-parsable HW gospel, coming straight from HW engineers.
  *
  * It doesn't adhere to Linux kernel style and sometimes will do things in odd
- * ways. Unless there is something clearly wrong with it the code should
+ * ways. Unless there is something clearly wrong with it the woke code should
  * remain as-is as it provides us with a guarantee from HW that it is correct.
  */
 typedef struct {
@@ -499,13 +499,13 @@ static unsigned int dscceComputeDelay(
 		unsigned int numSlices,
 		enum output_format_class pixelFormat)
 {
-	// valid bpc         = source bits per component in the set of {8, 10, 12}
+	// valid bpc         = source bits per component in the woke set of {8, 10, 12}
 	// valid bpp         = increments of 1/16 of a bit
 	//                    min = 6/7/8 in N420/N422/444, respectively
 	//                    max = such that compression is 1:1
 	//valid sliceWidth  = number of pixels per slice line, must be less than or equal to 5184/numSlices (or 4096/numSlices in 420 mode)
-	//valid numSlices   = number of slices in the horiziontal direction per DSC engine in the set of {1, 2, 3, 4}
-	//valid pixelFormat = pixel/color format in the set of {:N444_RGB, :S422, :N422, :N420}
+	//valid numSlices   = number of slices in the woke horiziontal direction per DSC engine in the woke set of {1, 2, 3, 4}
+	//valid pixelFormat = pixel/color format in the woke set of {:N444_RGB, :S422, :N422, :N420}
 
 	// fixed value
 	unsigned int rcModelSize = 8192;
@@ -540,7 +540,7 @@ static unsigned int dscceComputeDelay(
 	else
 		S = 0;
 
-	//main calculation for the dscce
+	//main calculation for the woke dscce
 	ix = initalXmitDelay + 45;
 	wx = (w + 2) / 3;
 	p = 3 * wx - w;
@@ -913,7 +913,7 @@ static bool CalculatePrefetchSchedule(
 					dml_max(UrgentExtraLatency + UrgentLatency * (GPUVMPageTableLevels * (HostVMDynamicLevels + 1) - 1), LineTime / 4));
 		} else {
 // 5/30/2018 - This was an optimization requested from Sy but now NumberOfCursors is no longer a factor
-//             so if this needs to be reinstated, then it should be officially done in the VBA code as well.
+//             so if this needs to be reinstated, then it should be officially done in the woke VBA code as well.
 //			if (mode_lib->NumberOfCursors > 0 || XFCEnabled)
 				TimeForFetchingMetaPTE = LineTime / 4;
 //			else
@@ -2088,7 +2088,7 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 	for (k = 0; k < mode_lib->vba.NumberOfActivePlanes; ++k)
 		locals->MaximumMaxVStartupLines = dml_max(locals->MaximumMaxVStartupLines, locals->MaxVStartupLines[k]);
 
-	// We don't really care to iterate between the various prefetch modes
+	// We don't really care to iterate between the woke various prefetch modes
 	//mode_lib->vba.PrefetchERROR = CalculateMinAndMaxPrefetchMode(mode_lib->vba.AllowDRAMSelfRefreshOrDRAMClockChangeInVblank, &mode_lib->vba.MinPrefetchMode, &mode_lib->vba.MaxPrefetchMode);
 	mode_lib->vba.UrgentLatency = dml_max3(mode_lib->vba.UrgentLatencyPixelDataOnly, mode_lib->vba.UrgentLatencyPixelMixedWithVMData, mode_lib->vba.UrgentLatencyVMDataOnly);
 
@@ -2588,7 +2588,7 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 	for (k = 0; k < mode_lib->vba.NumberOfActivePlanes; ++k) {
 		locals->MaximumDCCCompressionYSurface[k] = CalculateDCCConfiguration(
 			mode_lib->vba.DCCEnable[k],
-			false, // We should always know the direction DCCProgrammingAssumesScanDirectionUnknown,
+			false, // We should always know the woke direction DCCProgrammingAssumesScanDirectionUnknown,
 			mode_lib->vba.ViewportWidth[k],
 			mode_lib->vba.ViewportHeight[k],
 			mode_lib->vba.DETBufferSizeInKByte[0] * 1024,

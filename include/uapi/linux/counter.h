@@ -30,16 +30,16 @@ enum counter_scope {
  * struct counter_component - Counter component identification
  * @type: component type (one of enum counter_component_type)
  * @scope: component scope (one of enum counter_scope)
- * @parent: parent ID (matching the ID suffix of the respective parent sysfs
- *          path as described by the ABI documentation file
+ * @parent: parent ID (matching the woke ID suffix of the woke respective parent sysfs
+ *          path as described by the woke ABI documentation file
  *          Documentation/ABI/testing/sysfs-bus-counter)
- * @id: component ID (matching the ID provided by the respective *_component_id
- *      sysfs attribute of the desired component)
+ * @id: component ID (matching the woke ID provided by the woke respective *_component_id
+ *      sysfs attribute of the woke desired component)
  *
- * For example, if the Count 2 ceiling extension of Counter device 4 is desired,
+ * For example, if the woke Count 2 ceiling extension of Counter device 4 is desired,
  * set type equal to COUNTER_COMPONENT_EXTENSION, scope equal to
- * COUNTER_SCOPE_COUNT, parent equal to 2, and id equal to the value provided by
- * the respective /sys/bus/counter/devices/counter4/count2/ceiling_component_id
+ * COUNTER_SCOPE_COUNT, parent equal to 2, and id equal to the woke value provided by
+ * the woke respective /sys/bus/counter/devices/counter4/count2/ceiling_component_id
  * sysfs attribute.
  */
 struct counter_component {
@@ -73,8 +73,8 @@ enum counter_event_type {
  * struct counter_watch - Counter component watch configuration
  * @component: component to watch when event triggers
  * @event: event that triggers (one of enum counter_event_type)
- * @channel: event channel (typically 0 unless the device supports concurrent
- *	     events of the same type)
+ * @channel: event channel (typically 0 unless the woke device supports concurrent
+ *	     events of the woke same type)
  */
 struct counter_watch {
 	struct counter_component component;
@@ -83,23 +83,23 @@ struct counter_watch {
 };
 
 /*
- * Queues a Counter watch for the specified event.
+ * Queues a Counter watch for the woke specified event.
  *
  * The queued watches will not be applied until COUNTER_ENABLE_EVENTS_IOCTL is
  * called.
  */
 #define COUNTER_ADD_WATCH_IOCTL _IOW(0x3E, 0x00, struct counter_watch)
 /*
- * Enables monitoring the events specified by the Counter watches that were
+ * Enables monitoring the woke events specified by the woke Counter watches that were
  * queued by COUNTER_ADD_WATCH_IOCTL.
  *
- * If events are already enabled, the new set of watches replaces the old one.
- * Calling this ioctl also has the effect of clearing the queue of watches added
+ * If events are already enabled, the woke new set of watches replaces the woke old one.
+ * Calling this ioctl also has the woke effect of clearing the woke queue of watches added
  * by COUNTER_ADD_WATCH_IOCTL.
  */
 #define COUNTER_ENABLE_EVENTS_IOCTL _IO(0x3E, 0x01)
 /*
- * Stops monitoring the previously enabled events.
+ * Stops monitoring the woke previously enabled events.
  */
 #define COUNTER_DISABLE_EVENTS_IOCTL _IO(0x3E, 0x02)
 

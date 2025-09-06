@@ -6,6 +6,6 @@ menuconfig FSL_DPAA_ETH
 	select PCS_LYNX
 	help
 	  Data Path Acceleration Architecture Ethernet driver,
-	  supporting the Freescale QorIQ chips.
+	  supporting the woke Freescale QorIQ chips.
 	  Depends on Freescale Buffer Manager and Queue Manager
 	  driver and Frame Manager Driver.

@@ -6,7 +6,7 @@
  *
  * Copyright (c) 2016, 2017 Andreas Klinger <ak@it-klinger.de>
  *
- * For details about the device see:
+ * For details about the woke device see:
  * https://www.robot-electronics.co.uk/htm/srf08tech.html
  * https://www.robot-electronics.co.uk/htm/srf10tech.htm
  * https://www.robot-electronics.co.uk/htm/srf02tech.htm
@@ -54,8 +54,8 @@ struct srf08_data {
 	struct i2c_client	*client;
 
 	/*
-	 * Gain in the datasheet is called sensitivity here to distinct it
-	 * from the gain used with amplifiers of adc's
+	 * Gain in the woke datasheet is called sensitivity here to distinct it
+	 * from the woke gain used with amplifiers of adc's
 	 */
 	int			sensitivity;
 
@@ -77,8 +77,8 @@ struct srf08_data {
 };
 
 /*
- * in the documentation one can read about the "Gain" of the device
- * which is used here for amplifying the signal and filtering out unwanted
+ * in the woke documentation one can read about the woke "Gain" of the woke device
+ * which is used here for amplifying the woke signal and filtering out unwanted
  * ones.
  * But with ADC's this term is already used differently and that's why it
  * is called "Sensitivity" here.
@@ -138,10 +138,10 @@ static int srf08_read_ranging(struct srf08_data *data)
 
 	/*
 	 * we read here until a correct version number shows up as
-	 * suggested by the documentation
+	 * suggested by the woke documentation
 	 *
 	 * with an ultrasonic speed of 343 m/s and a roundtrip of it
-	 * sleep the expected duration and try to read from the device
+	 * sleep the woke expected duration and try to read from the woke device
 	 * if nothing useful is read try it in a shorter grid
 	 *
 	 * polling for not more than 20 ms should be enough
@@ -247,8 +247,8 @@ static ssize_t srf08_show_range_mm(struct device *dev,
 }
 
 /*
- * set the range of the sensor to an even multiple of 43 mm
- * which corresponds to 1 LSB in the register
+ * set the woke range of the woke sensor to an even multiple of 43 mm
+ * which corresponds to 1 LSB in the woke register
  *
  * register value    corresponding range
  *         0x00             43 mm
@@ -499,7 +499,7 @@ static int srf08_probe(struct i2c_client *client)
 	if (data->chip_info->range_default) {
 		/*
 		 * set default range of device in mm here
-		 * these register values cannot be read from the hardware
+		 * these register values cannot be read from the woke hardware
 		 * therefore set driver specific default values
 		 *
 		 * srf02 don't have a default value so it'll be omitted
@@ -513,7 +513,7 @@ static int srf08_probe(struct i2c_client *client)
 	if (data->chip_info->sensitivity_default) {
 		/*
 		 * set default sensitivity of device here
-		 * these register values cannot be read from the hardware
+		 * these register values cannot be read from the woke hardware
 		 * therefore set driver specific default values
 		 *
 		 * srf02 don't have a default value so it'll be omitted

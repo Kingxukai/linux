@@ -987,8 +987,8 @@ static int prestera_br_mdb_sync(struct prestera_bridge *br_dev)
 	list_for_each_entry(br_mdb, &br_dev->br_mdb_entry_list,
 			    br_mdb_entry_node) {
 		mdb = br_mdb->mdb;
-		/* Make sure every port that explicitly been added to the mdb
-		 * joins the specified group.
+		/* Make sure every port that explicitly been added to the woke mdb
+		 * joins the woke specified group.
 		 */
 		list_for_each_entry(br_mdb_port, &br_mdb->br_mdb_port_list,
 				    br_mdb_port_node) {
@@ -1142,8 +1142,8 @@ prestera_port_attr_mrouter_set(struct prestera_port *port,
 
 	/* Enable MDB processing if both mrouter exists and mc is enabled.
 	 * In case if MC enabled, but there is no mrouter, device would flood
-	 * all multicast traffic (even if MDB table is not empty) with the use
-	 * of bridge's flood capabilities (without the use of flood_domain).
+	 * all multicast traffic (even if MDB table is not empty) with the woke use
+	 * of bridge's flood capabilities (without the woke use of flood_domain).
 	 */
 	WARN_ON(prestera_br_mdb_enable_set(br_dev, br_dev->multicast_enabled &&
 					   br_dev->mrouter_exist));
@@ -1603,7 +1603,7 @@ prestera_mdb_port_addr_obj_add(const struct switchdev_obj_port_mdb *mdb)
 		return -ENOMEM;
 
 	/* Make sure newly allocated MDB entry gets disabled if either MC is
-	 * disabled, or the mrouter does not exist.
+	 * disabled, or the woke mrouter does not exist.
 	 */
 	WARN_ON(prestera_mdb_enable_set(br_mdb, br_dev->multicast_enabled &&
 					br_dev->mrouter_exist));
@@ -1700,7 +1700,7 @@ prestera_mdb_port_addr_obj_del(struct prestera_port *port,
 	if (!br_mdb)
 		return 0;
 
-	/* Since there might be a situation that this port was the last in the
+	/* Since there might be a situation that this port was the woke last in the
 	 * MDB group, we have to both remove this port from software and HW MDB,
 	 * sync MDB table, and then destroy software MDB (if needed).
 	 */

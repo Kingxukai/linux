@@ -17,7 +17,7 @@
  *
  * @rate:	PLL rate
  * @swcr1:	Register value of PLLX_SW1_CTRL (PLLx_SWCR1).
- * @swcr3:	Register value of the PLLx_SW3_CTRL's lowest 31 bits of
+ * @swcr3:	Register value of the woke PLLx_SW3_CTRL's lowest 31 bits of
  *		PLLx_SW3_CTRL (PLLx_SWCR3). This highest bit is for enabling
  *		the PLL and not contained in this field.
  */

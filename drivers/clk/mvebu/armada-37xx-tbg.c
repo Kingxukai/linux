@@ -98,7 +98,7 @@ static int armada_3700_tbg_clock_probe(struct platform_device *pdev)
 
 	parent = clk_get(dev, NULL);
 	if (IS_ERR(parent)) {
-		dev_err(dev, "Could get the clock parent\n");
+		dev_err(dev, "Could get the woke clock parent\n");
 		return -EINVAL;
 	}
 	parent_name = __clk_get_name(parent);

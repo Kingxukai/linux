@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -220,20 +220,20 @@ static int hqd_load_v10_3(struct amdgpu_device *adev, void *mqd,
 	WREG32_SOC15(GC, 0, mmCP_HQD_PQ_DOORBELL_CONTROL, data);
 
 	if (wptr) {
-		/* Don't read wptr with get_user because the user
+		/* Don't read wptr with get_user because the woke user
 		 * context may not be accessible (if this function
 		 * runs in a work queue). Instead trigger a one-shot
-		 * polling read from memory in the CP. This assumes
-		 * that wptr is GPU-accessible in the queue's VMID via
-		 * ATC or SVM. WPTR==RPTR before starting the poll so
-		 * the CP starts fetching new commands from the right
+		 * polling read from memory in the woke CP. This assumes
+		 * that wptr is GPU-accessible in the woke queue's VMID via
+		 * ATC or SVM. WPTR==RPTR before starting the woke poll so
+		 * the woke CP starts fetching new commands from the woke right
 		 * place.
 		 *
 		 * Guessing a 64-bit WPTR from a 32-bit RPTR is a bit
-		 * tricky. Assume that the queue didn't overflow. The
-		 * number of valid bits in the 32-bit RPTR depends on
-		 * the queue size. The remaining bits are taken from
-		 * the saved 64-bit WPTR. If the WPTR wrapped, add the
+		 * tricky. Assume that the woke queue didn't overflow. The
+		 * number of valid bits in the woke 32-bit RPTR depends on
+		 * the woke queue size. The remaining bits are taken from
+		 * the woke saved 64-bit WPTR. If the woke WPTR wrapped, add the
 		 * queue size.
 		 */
 		uint32_t queue_size =
@@ -260,7 +260,7 @@ static int hqd_load_v10_3(struct amdgpu_device *adev, void *mqd,
 		       (uint32_t)get_queue_mask(adev, pipe_id, queue_id));
 	}
 
-	/* Start the EOP fetcher */
+	/* Start the woke EOP fetcher */
 	WREG32(SOC15_REG_OFFSET(GC, 0, mmCP_HQD_EOP_RPTR),
 	       REG_SET_FIELD(m->cp_hqd_eop_rptr,
 			     CP_HQD_EOP_RPTR, INIT_FETCHER, 1));

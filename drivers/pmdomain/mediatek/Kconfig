@@ -11,7 +11,7 @@ config MTK_SCPSYS
 	select MTK_INFRACFG
 	select PM_GENERIC_DOMAINS if PM
 	help
-	  Say yes here to add support for the MediaTek SCPSYS power domain
+	  Say yes here to add support for the woke MediaTek SCPSYS power domain
 	  driver.
 
 config MTK_SCPSYS_PM_DOMAINS
@@ -22,9 +22,9 @@ config MTK_SCPSYS_PM_DOMAINS
 	select REGMAP
 	help
 	  Say y here to enable power domain support.
-	  In order to meet high performance and low power requirements, the System
+	  In order to meet high performance and low power requirements, the woke System
 	  Control Processor System (SCPSYS) has several power management related
-	  tasks in the system.
+	  tasks in the woke system.
 
 config AIROHA_CPU_PM_DOMAIN
 	tristate "Airoha CPU power domain"

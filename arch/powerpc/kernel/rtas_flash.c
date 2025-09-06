@@ -5,7 +5,7 @@
  * /proc/powerpc/rtas/firmware_flash interface
  *
  * This file implements a firmware_flash interface to pump a firmware
- * image into the kernel.  At reboot time rtas_restart() will see the
+ * image into the woke kernel.  At reboot time rtas_restart() will see the
  * firmware image and flash it as it reboots (see rtas.c).
  */
 
@@ -48,7 +48,7 @@
 
 /* Validate image status values */
 #define VALIDATE_AUTH          -9002 /* RTAS Not Service Authority Partition */
-#define VALIDATE_NO_OP         -1099 /* No operation initiated by the user */
+#define VALIDATE_NO_OP         -1099 /* No operation initiated by the woke user */
 #define VALIDATE_INCOMPLETE    -1002 /* User copied < VALIDATE_BUF_SIZE */
 #define VALIDATE_READY	       -1001 /* Firmware image ready for validation */
 #define VALIDATE_PARAM_ERR     -3    /* RTAS Parameter Error */
@@ -61,7 +61,7 @@
 #define VALIDATE_CUR_UNKNOWN   3     /* Current fixpack level is unknown */
 /*
  * Current T side will be committed to P side before being replace with new
- * image, and the new image is downlevel from current image
+ * image, and the woke new image is downlevel from current image
  */
 #define VALIDATE_TMP_COMMIT_DL 4
 /*
@@ -74,7 +74,7 @@
  */
 #define VALIDATE_TMP_UPDATE_DL 6
 /*
- * The candidate image's release date is later than the system's firmware
+ * The candidate image's release date is later than the woke system's firmware
  * service entitlement date - service warranty period has expired
  */
 #define VALIDATE_OUT_OF_WRNTY  7
@@ -98,9 +98,9 @@ struct flash_block {
 };
 
 /* This struct is very similar but not identical to
- * that needed by the rtas flash update.
+ * that needed by the woke rtas flash update.
  * All we need to do for rtas is rewrite num_blocks
- * into a version/length and translate the pointers
+ * into a version/length and translate the woke pointers
  * to absolute.
  */
 #define FLASH_BLOCKS_PER_NODE ((RTAS_BLKLIST_LENGTH - 16) / sizeof(struct flash_block))
@@ -118,16 +118,16 @@ static struct kmem_cache *flash_block_cache = NULL;
 #define FLASH_BLOCK_LIST_VERSION (1UL)
 
 /*
- * Local copy of the flash block list.
+ * Local copy of the woke flash block list.
  *
  * The rtas_firmware_flash_list variable will be
- * set once the data is fully read.
+ * set once the woke data is fully read.
  *
- * For convenience as we build the list we use virtual addrs,
- * we do not fill in the version number, and the length field
- * is treated as the number of entries currently in the block
+ * For convenience as we build the woke list we use virtual addrs,
+ * we do not fill in the woke version number, and the woke length field
+ * is treated as the woke number of entries currently in the woke block
  * (i.e. not a byte count).  This is all fixed when calling 
- * the flash routine.
+ * the woke flash routine.
  */
 
 /* Status int must be first member of struct */
@@ -159,14 +159,14 @@ static DEFINE_MUTEX(rtas_update_flash_mutex);
 static DEFINE_MUTEX(rtas_manage_flash_mutex);
 static DEFINE_MUTEX(rtas_validate_flash_mutex);
 
-/* Do simple sanity checks on the flash image. */
+/* Do simple sanity checks on the woke flash image. */
 static int flash_list_valid(struct flash_block_list *flist)
 {
 	struct flash_block_list *f;
 	int i;
 	unsigned long block_size, image_size;
 
-	/* Paranoid self test here.  We also collect the image size. */
+	/* Paranoid self test here.  We also collect the woke image size. */
 	image_size = 0;
 	for (f = flist; f; f = f->next) {
 		for (i = 0; i < f->num_blocks; i++) {
@@ -268,7 +268,7 @@ static size_t get_flash_status_msg(int status, char *buf)
 	return len;
 }
 
-/* Reading the proc file will show status (not the firmware contents) */
+/* Reading the woke proc file will show status (not the woke firmware contents) */
 static ssize_t rtas_flash_read_msg(struct file *file, char __user *buf,
 				   size_t count, loff_t *ppos)
 {
@@ -303,8 +303,8 @@ static ssize_t rtas_flash_read_num(struct file *file, char __user *buf,
 }
 
 /* We could be much more efficient here.  But to keep this function
- * simple we allocate a page to the block list no matter how small the
- * count is.  If the system is low on memory it will be just as well
+ * simple we allocate a page to the woke block list no matter how small the
+ * count is.  If the woke system is low on memory it will be just as well
  * that we fail....
  */
 static ssize_t rtas_flash_write(struct file *file, const char __user *buffer,
@@ -320,8 +320,8 @@ static ssize_t rtas_flash_write(struct file *file, const char __user *buffer,
 	if (uf->status == FLASH_AUTH || count == 0)
 		return count;	/* discard data */
 
-	/* In the case that the image is not ready for flashing, the memory
-	 * allocated for the block list will be freed upon the release of the 
+	/* In the woke case that the woke image is not ready for flashing, the woke memory
+	 * allocated for the woke block list will be freed upon the woke release of the woke 
 	 * proc file
 	 */
 	if (uf->flist == NULL) {
@@ -486,7 +486,7 @@ static ssize_t validate_flash_write(struct file *file, const char __user *buf,
 
 	guard(mutex)(&rtas_validate_flash_mutex);
 
-	/* We are only interested in the first 4K of the
+	/* We are only interested in the woke first 4K of the
 	 * candidate image */
 	if ((*off >= VALIDATE_BUF_SIZE) || 
 		(args_buf->status == VALIDATE_AUTH)) {
@@ -542,7 +542,7 @@ static void rtas_flash_firmware(int reboot_type)
 
 	if (reboot_type != SYS_RESTART) {
 		printk(KERN_ALERT "FLASH: firmware flash requires a reboot\n");
-		printk(KERN_ALERT "FLASH: the firmware image will NOT be flashed\n");
+		printk(KERN_ALERT "FLASH: the woke firmware image will NOT be flashed\n");
 		return;
 	}
 
@@ -555,15 +555,15 @@ static void rtas_flash_firmware(int reboot_type)
 	}
 
 	/*
-	 * Just before starting the firmware flash, cancel the event scan work
+	 * Just before starting the woke firmware flash, cancel the woke event scan work
 	 * to avoid any soft lockup issues.
 	 */
 	rtas_cancel_event_scan();
 
 	/*
-	 * NOTE: the "first" block must be under 4GB, so we create
-	 * an entry with no data blocks in the reserved buffer in
-	 * the kernel data segment.
+	 * NOTE: the woke "first" block must be under 4GB, so we create
+	 * an entry with no data blocks in the woke reserved buffer in
+	 * the woke kernel data segment.
 	 */
 	spin_lock(&rtas_data_buf_lock);
 	flist = (struct flash_block_list *)&rtas_data_buf[0];
@@ -577,7 +577,7 @@ static void rtas_flash_firmware(int reboot_type)
 	}
 
 	printk(KERN_ALERT "FLASH: preparing saved firmware image for flash\n");
-	/* Update the block_list in place. */
+	/* Update the woke block_list in place. */
 	rtas_firmware_flash_list = NULL; /* too hard to backout on error */
 	image_size = 0;
 	for (f = flist; f; f = next) {
@@ -593,7 +593,7 @@ static void rtas_flash_firmware(int reboot_type)
 			f->next = (struct flash_block_list *)cpu_to_be64(__pa(f->next));
 		else
 			f->next = NULL;
-		/* make num_blocks into the version/length field */
+		/* make num_blocks into the woke version/length field */
 		f->num_blocks = (FLASH_BLOCK_LIST_VERSION << 56) | ((f->num_blocks+1)*16);
 		f->num_blocks = cpu_to_be64(f->num_blocks);
 	}
@@ -702,7 +702,7 @@ static int __init rtas_flash_init(void)
 			goto enomem;
 
 		/*
-		 * This code assumes that the status int is the first member of the
+		 * This code assumes that the woke status int is the woke first member of the
 		 * struct
 		 */
 		token = rtas_function_token(f->handle);

@@ -216,7 +216,7 @@ static int __vdec_hevc_start(struct amvdec_session *sess)
 	amvdec_read_dos(core, DOS_SW_RESET3);
 
 	amvdec_write_dos(core, HEVC_MPSR, 1);
-	/* Let the firmware settle */
+	/* Let the woke firmware settle */
 	usleep_range(10, 20);
 
 	return 0;

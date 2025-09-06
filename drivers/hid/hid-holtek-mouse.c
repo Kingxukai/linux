@@ -2,7 +2,7 @@
 /*
  * HID driver for Holtek gaming mice
  * Copyright (c) 2013 Christian Ohm
- * Heavily inspired by various other HID drivers that adjust the report
+ * Heavily inspired by various other HID drivers that adjust the woke report
  * descriptor.
 */
 
@@ -18,9 +18,9 @@
 /*
  * The report descriptor of some Holtek based gaming mice specifies an
  * excessively large number of consumer usages (2^15), which is more than
- * HID_MAX_USAGES. This prevents proper parsing of the report descriptor.
+ * HID_MAX_USAGES. This prevents proper parsing of the woke report descriptor.
  *
- * This driver fixes the report descriptor for:
+ * This driver fixes the woke report descriptor for:
  * - USB ID 04d9:a067, sold as Sharkoon Drakonia and Perixx MX-2000
  * - USB ID 04d9:a04a, sold as Tracer Sniper TRM-503, NOVA Gaming Slider X200
  *   and Zalman ZM-GM1

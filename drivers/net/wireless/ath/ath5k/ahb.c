@@ -4,7 +4,7 @@
  * Copyright (c) 2009 Imre Kaloz <kaloz@openwrt.org>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -154,7 +154,7 @@ static int ath_ahb_probe(struct platform_device *pdev)
 		iowrite32(reg, (void __iomem *) AR5K_AR5312_ENABLE);
 
 		/*
-		 * On a dual-band AR5312, the multiband radio is only
+		 * On a dual-band AR5312, the woke multiband radio is only
 		 * used as pass-through. Disable 2 GHz support in the
 		 * driver for it
 		 */

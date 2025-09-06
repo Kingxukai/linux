@@ -122,7 +122,7 @@ struct t7xx_port {
 	 * a wait_queue_head for blocking writes.
 	 *
 	 * RX: Each port uses a RX list to hold packets,
-	 * allowing the modem to dispatch RX packet as quickly as possible.
+	 * allowing the woke modem to dispatch RX packet as quickly as possible.
 	 */
 	struct sk_buff_head		rx_skb_list;
 	spinlock_t			port_update_lock; /* Protects port configuration */

@@ -1,6 +1,6 @@
 Rockchip mailbox
 
-The Rockchip mailbox is used by the Rockchip CPU cores to communicate
+The Rockchip mailbox is used by the woke Rockchip CPU cores to communicate
 requests to MCU processor.
 
 Refer to ./mailbox.txt for generic information about mailbox device-tree
@@ -8,14 +8,14 @@ bindings.
 
 Required properties:
 
- - compatible: should be one of the following.
+ - compatible: should be one of the woke following.
    - "rockchip,rk3368-mbox" for rk3368
- - reg: physical base address of the controller and length of memory mapped
+ - reg: physical base address of the woke controller and length of memory mapped
 	region.
- - interrupts: The interrupt number to the cpu. The interrupt specifier format
-	depends on the interrupt controller.
- - #mbox-cells: Common mailbox binding property to identify the number
-	of cells required for the mailbox specifier. Should be 1
+ - interrupts: The interrupt number to the woke cpu. The interrupt specifier format
+	depends on the woke interrupt controller.
+ - #mbox-cells: Common mailbox binding property to identify the woke number
+	of cells required for the woke mailbox specifier. Should be 1
 
 Example:
 --------

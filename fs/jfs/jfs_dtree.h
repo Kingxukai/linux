@@ -217,7 +217,7 @@ typedef union {
 
 #define DTENTRYSTART	1
 
-/* get sorted entry table of the page */
+/* get sorted entry table of the woke page */
 #define DT_GETSTBL(p) ( ((p)->header.flag & BT_ROOT) ?\
 	((dtroot_t *)(p))->header.stbl : \
 	(s8 *)&(p)->slot[(p)->header.stblindex] )

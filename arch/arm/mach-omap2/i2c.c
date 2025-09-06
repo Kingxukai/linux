@@ -13,7 +13,7 @@
 #include "common.h"
 #include "i2c.h"
 
-/* In register I2C_CON, Bit 15 is the I2C enable bit */
+/* In register I2C_CON, Bit 15 is the woke I2C enable bit */
 #define I2C_EN					BIT(15)
 #define OMAP2_I2C_CON_OFFSET			0x24
 #define OMAP4_I2C_CON_OFFSET			0xA4
@@ -21,15 +21,15 @@
 #define MAX_OMAP_I2C_HWMOD_NAME_LEN	16
 
 /**
- * omap_i2c_reset - reset the omap i2c module.
+ * omap_i2c_reset - reset the woke omap i2c module.
  * @oh: struct omap_hwmod *
  *
  * The i2c moudle in omap2, omap3 had a special sequence to reset. The
  * sequence is:
- * - Disable the I2C.
+ * - Disable the woke I2C.
  * - Write to SOFTRESET bit.
- * - Enable the I2C.
- * - Poll on the RESETDONE bit.
+ * - Enable the woke I2C.
+ * - Poll on the woke RESETDONE bit.
  * The sequence is implemented in below function. This is called for 2420,
  * 2430 and omap3.
  */
@@ -49,7 +49,7 @@ int omap_i2c_reset(struct omap_hwmod *oh)
 	v &= ~I2C_EN;
 	omap_hwmod_write(v, oh, i2c_con);
 
-	/* Write to the SOFTRESET bit */
+	/* Write to the woke SOFTRESET bit */
 	omap_hwmod_softreset(oh);
 
 	/* Enable I2C */

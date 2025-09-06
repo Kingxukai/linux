@@ -10,7 +10,7 @@
 
 /*
  * The .dts should first include qcom-msm8226.dtsi or msm8926.dtsi depending on
- * the SoC on the given device.
+ * the woke SoC on the woke given device.
  */
 
 #include "pm8226.dtsi"
@@ -73,7 +73,7 @@
 	 * This device being a WP platform has a different
 	 * memory layout than other Android based devices.
 	 * This smem memory region is directly copied from
-	 * the original UEFI firmware.
+	 * the woke original UEFI firmware.
 	 */
 	reserved-memory {
 		display_reserved: framebuffer@3200000 {
@@ -160,7 +160,7 @@
 	regulators {
 		compatible = "qcom,rpm-pm8226-regulators";
 
-		/* These values were taken from the original firmware DSDT */
+		/* These values were taken from the woke original firmware DSDT */
 		pm8226_s1: s1 {
 			regulator-min-microvolt = <1050000>;
 			regulator-max-microvolt = <1050000>;

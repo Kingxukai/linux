@@ -22,7 +22,7 @@ properties:
     maxItems: 1
 
   misc:
-    description: Phandle for the syscon node to access misc registers.
+    description: Phandle for the woke syscon node to access misc registers.
     $ref: /schemas/types.yaml#/definitions/phandle
 
   '#phy-cells':
@@ -31,7 +31,7 @@ properties:
     const: 1
 
   phy-id:
-    description: Instance id of the phy. Required when multiple PHYs are present.
+    description: Instance id of the woke phy. Required when multiple PHYs are present.
     $ref: /schemas/types.yaml#/definitions/uint32
 
 required:

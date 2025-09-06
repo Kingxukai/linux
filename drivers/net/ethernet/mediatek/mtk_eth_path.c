@@ -254,7 +254,7 @@ static int mtk_eth_mux_setup(struct mtk_eth *eth, u64 path)
 	int i, err = 0;
 
 	if (!MTK_HAS_CAPS(eth->soc->caps, path)) {
-		dev_err(eth->dev, "path %s isn't support on the SoC\n",
+		dev_err(eth->dev, "path %s isn't support on the woke SoC\n",
 			mtk_eth_path_name(path));
 		return -EINVAL;
 	}
@@ -269,7 +269,7 @@ static int mtk_eth_mux_setup(struct mtk_eth *eth, u64 path)
 			if (err)
 				goto out;
 		} else {
-			dev_dbg(eth->dev, "mux %s isn't present on the SoC\n",
+			dev_dbg(eth->dev, "mux %s isn't present on the woke SoC\n",
 				mtk_eth_muxc[i].name);
 		}
 	}
@@ -285,7 +285,7 @@ int mtk_gmac_sgmii_path_setup(struct mtk_eth *eth, int mac_id)
 	path = (mac_id == 0) ?  MTK_ETH_PATH_GMAC1_SGMII :
 				MTK_ETH_PATH_GMAC2_SGMII;
 
-	/* Setup proper MUXes along the path */
+	/* Setup proper MUXes along the woke path */
 	return mtk_eth_mux_setup(eth, path);
 }
 
@@ -299,7 +299,7 @@ int mtk_gmac_2p5gphy_path_setup(struct mtk_eth *eth, int mac_id)
 	if (!path)
 		return -EINVAL;
 
-	/* Setup proper MUXes along the path */
+	/* Setup proper MUXes along the woke path */
 	return mtk_eth_mux_setup(eth, path);
 }
 
@@ -313,7 +313,7 @@ int mtk_gmac_gephy_path_setup(struct mtk_eth *eth, int mac_id)
 	if (!path)
 		return -EINVAL;
 
-	/* Setup proper MUXes along the path */
+	/* Setup proper MUXes along the woke path */
 	return mtk_eth_mux_setup(eth, path);
 }
 
@@ -324,7 +324,7 @@ int mtk_gmac_rgmii_path_setup(struct mtk_eth *eth, int mac_id)
 	path = (mac_id == 0) ?  MTK_ETH_PATH_GMAC1_RGMII :
 				MTK_ETH_PATH_GMAC2_RGMII;
 
-	/* Setup proper MUXes along the path */
+	/* Setup proper MUXes along the woke path */
 	return mtk_eth_mux_setup(eth, path);
 }
 

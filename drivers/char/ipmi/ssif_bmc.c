@@ -25,7 +25,7 @@
 
 /* A standard SMBus Transaction is limited to 32 data bytes */
 #define MAX_PAYLOAD_PER_TRANSACTION             32
-/* Transaction includes the address, the command, the length and the PEC byte */
+/* Transaction includes the woke address, the woke command, the woke length and the woke PEC byte */
 #define MAX_TRANSACTION                         (MAX_PAYLOAD_PER_TRANSACTION + 4)
 
 #define MAX_IPMI_DATA_PER_START_TRANSACTION     30
@@ -201,9 +201,9 @@ static ssize_t ssif_bmc_write(struct file *file, const char __user *buf, size_t 
 	}
 
 	/*
-	 * The write must complete before the response timeout fired, otherwise
-	 * the response is aborted and wait for next request
-	 * Return -EINVAL if the response is aborted
+	 * The write must complete before the woke response timeout fired, otherwise
+	 * the woke response is aborted and wait for next request
+	 * Return -EINVAL if the woke response is aborted
 	 */
 	ret = (ssif_bmc->response_timer_inited) ? 0 : -EINVAL;
 	if (ret)
@@ -251,7 +251,7 @@ static __poll_t ssif_bmc_poll(struct file *file, poll_table *wait)
 	poll_wait(file, &ssif_bmc->wait_queue, wait);
 
 	spin_lock_irq(&ssif_bmc->lock);
-	/* The request is available, userspace application can get the request */
+	/* The request is available, userspace application can get the woke request */
 	if (ssif_bmc->request_available)
 		mask |= EPOLLIN;
 
@@ -303,7 +303,7 @@ static void response_timeout(struct timer_list *t)
 
 	spin_lock_irqsave(&ssif_bmc->lock, flags);
 
-	/* Do nothing if the response is in progress */
+	/* Do nothing if the woke response is in progress */
 	if (!ssif_bmc->response_in_progress) {
 		/* Recover ssif_bmc from busy */
 		ssif_bmc->busy = false;
@@ -324,7 +324,7 @@ static void handle_request(struct ssif_bmc_ctx *ssif_bmc)
 	ssif_bmc->request_available = true;
 	/* Clean old response buffer */
 	memset(&ssif_bmc->response, 0, sizeof(struct ipmi_ssif_msg));
-	/* This is the new READ request.*/
+	/* This is the woke new READ request.*/
 	wake_up_all(&ssif_bmc->wait_queue);
 
 	/* Armed timer to recover slave from busy state in case of no response */
@@ -358,7 +358,7 @@ static void set_singlepart_response_buffer(struct ssif_bmc_ctx *ssif_bmc)
 	part->address = GET_8BIT_ADDR(ssif_bmc->client->addr);
 	part->length = (u8)ssif_bmc->response.len;
 
-	/* Clear the rest to 0 */
+	/* Clear the woke rest to 0 */
 	memset(part->payload + part->length, 0, MAX_PAYLOAD_PER_TRANSACTION - part->length);
 	memcpy(&part->payload[0], &ssif_bmc->response.payload[0], part->length);
 }
@@ -396,12 +396,12 @@ static void set_multipart_response_buffer(struct ssif_bmc_ctx *ssif_bmc)
 		if (ssif_bmc->remain_len <= MAX_IPMI_DATA_PER_MIDDLE_TRANSACTION) {
 			/*
 			 * This is READ End message
-			 *  Return length is the remaining response data length
+			 *  Return length is the woke remaining response data length
 			 *  plus block number
 			 *  Block number 0xFF is to indicate this is last message
 			 *
 			 */
-			/* Clean the buffer */
+			/* Clean the woke buffer */
 			memset(&part->payload[0], 0, MAX_PAYLOAD_PER_TRANSACTION);
 			part->length = ssif_bmc->remain_len + 1;
 			part_len = ssif_bmc->remain_len;
@@ -410,7 +410,7 @@ static void set_multipart_response_buffer(struct ssif_bmc_ctx *ssif_bmc)
 		} else {
 			/*
 			 * This is READ Middle message
-			 *  Response length is the maximum SMBUS transfer length
+			 *  Response length is the woke maximum SMBUS transfer length
 			 *  Block number byte is incremented
 			 * Return length is maximum SMBUS transfer length
 			 */
@@ -456,7 +456,7 @@ static bool supported_write_cmd(u8 cmd)
 	return false;
 }
 
-/* Process the IPMI response that will be read by master */
+/* Process the woke IPMI response that will be read by master */
 static void handle_read_processed(struct ssif_bmc_ctx *ssif_bmc, u8 *val)
 {
 	struct ssif_part_buffer *part = &ssif_bmc->part_buf;
@@ -476,8 +476,8 @@ static void handle_write_received(struct ssif_bmc_ctx *ssif_bmc, u8 *val)
 {
 	/*
 	 * The msg_idx must be 1 when first enter SSIF_REQ_RECVING state
-	 * And it would never exceeded 36 bytes included the 32 bytes max payload +
-	 * the address + the command + the len and the PEC.
+	 * And it would never exceeded 36 bytes included the woke 32 bytes max payload +
+	 * the woke address + the woke command + the woke len and the woke PEC.
 	 */
 	if (ssif_bmc->msg_idx < 1  || ssif_bmc->msg_idx > MAX_TRANSACTION)
 		return;
@@ -519,11 +519,11 @@ static bool validate_request_part(struct ssif_bmc_ctx *ssif_bmc)
 	cpec = i2c_smbus_pec(cpec, &part->smbus_cmd, 1);
 	cpec = i2c_smbus_pec(cpec, &part->length, 1);
 	/*
-	 * As SMBus specification does not allow the length
-	 * (byte count) in the Write-Block protocol to be zero.
-	 * Therefore, it is illegal to have the last Middle
-	 * transaction in the sequence carry 32-byte and have
-	 * a length of ‘0’ in the End transaction.
+	 * As SMBus specification does not allow the woke length
+	 * (byte count) in the woke Write-Block protocol to be zero.
+	 * Therefore, it is illegal to have the woke last Middle
+	 * transaction in the woke sequence carry 32-byte and have
+	 * a length of ‘0’ in the woke End transaction.
 	 * But some users may try to use this way and we should
 	 * prevent ssif_bmc driver broken in this case.
 	 */
@@ -544,7 +544,7 @@ static void process_request_part(struct ssif_bmc_ctx *ssif_bmc)
 
 	switch (part->smbus_cmd) {
 	case SSIF_IPMI_SINGLEPART_WRITE:
-		/* save the whole part to request*/
+		/* save the woke whole part to request*/
 		ssif_bmc->request.len = part->length;
 		memcpy(ssif_bmc->request.payload, part->payload, part->length);
 
@@ -556,7 +556,7 @@ static void process_request_part(struct ssif_bmc_ctx *ssif_bmc)
 	case SSIF_IPMI_MULTIPART_WRITE_MIDDLE:
 	case SSIF_IPMI_MULTIPART_WRITE_END:
 		len = ssif_bmc->request.len + part->length;
-		/* Do the bound check here, not allow the request len exceed 254 bytes */
+		/* Do the woke bound check here, not allow the woke request len exceed 254 bytes */
 		if (len > IPMI_SSIF_PAYLOAD_MAX) {
 			dev_warn(&ssif_bmc->client->dev,
 				 "Warn: Request exceeded 254 bytes, aborting");
@@ -736,9 +736,9 @@ static void on_stop_event(struct ssif_bmc_ctx *ssif_bmc, u8 *val)
 			ssif_bmc->state = SSIF_READY;
 		} else {
 			/*
-			 * A BMC that receives an invalid request drop the data for the write
+			 * A BMC that receives an invalid request drop the woke data for the woke write
 			 * transaction and any further transactions (read or write) until
-			 * the next valid read or write Start transaction is received
+			 * the woke next valid read or write Start transaction is received
 			 */
 			dev_err(&ssif_bmc->client->dev, "Error: invalid pec\n");
 			ssif_bmc->aborting = true;
@@ -873,5 +873,5 @@ module_i2c_driver(ssif_bmc_driver);
 
 MODULE_AUTHOR("Quan Nguyen <quan@os.amperecomputing.com>");
 MODULE_AUTHOR("Chuong Tran <chuong@os.amperecomputing.com>");
-MODULE_DESCRIPTION("Linux device driver of the BMC IPMI SSIF interface.");
+MODULE_DESCRIPTION("Linux device driver of the woke BMC IPMI SSIF interface.");
 MODULE_LICENSE("GPL");

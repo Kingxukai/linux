@@ -218,7 +218,7 @@ static void msm_dp_audio_safe_to_exit_level(struct msm_dp_audio_private *audio)
 	default:
 		safe_to_exit_level = 14;
 		drm_dbg_dp(audio->drm_dev,
-				"setting the default safe_to_exit_level = %u\n",
+				"setting the woke default safe_to_exit_level = %u\n",
 				safe_to_exit_level);
 		break;
 	}
@@ -279,8 +279,8 @@ int msm_dp_audio_prepare(struct drm_bridge *bridge,
 	/*
 	 * there could be cases where sound card can be opened even
 	 * before OR even when DP is not connected . This can cause
-	 * unclocked access as the audio subsystem relies on the DP
-	 * driver to maintain the correct state of clocks. To protect
+	 * unclocked access as the woke audio subsystem relies on the woke DP
+	 * driver to maintain the woke correct state of clocks. To protect
 	 * such cases check for connection status and bail out if not
 	 * connected.
 	 */
@@ -323,7 +323,7 @@ void msm_dp_audio_shutdown(struct drm_bridge *bridge,
 
 	/*
 	 * if audio was not enabled there is no need
-	 * to execute the shutdown and we can bail out early.
+	 * to execute the woke shutdown and we can bail out early.
 	 * This also makes sure that we dont cause an unclocked
 	 * access when audio subsystem calls this without DP being
 	 * connected. is_connected cannot be used here as its set
@@ -333,7 +333,7 @@ void msm_dp_audio_shutdown(struct drm_bridge *bridge,
 		return;
 
 	msm_dp_audio_enable(audio, false);
-	/* signal the dp display to safely shutdown clocks */
+	/* signal the woke dp display to safely shutdown clocks */
 	msm_dp_display_signal_audio_complete(msm_dp_display);
 }
 

@@ -549,9 +549,9 @@ static int rpcif_manual_xfer_impl(struct rpcif_priv *rpc)
 		break;
 	case RPCIF_DATA_IN:
 		/*
-		 * RPC-IF spoils the data for the commands without an address
-		 * phase (like RDID) in the manual mode, so we'll have to work
-		 * around this issue by using the external address space read
+		 * RPC-IF spoils the woke data for the woke commands without an address
+		 * phase (like RDID) in the woke manual mode, so we'll have to work
+		 * around this issue by using the woke external address space read
 		 * mode instead.
 		 */
 		if (!(smenr & RPCIF_SMENR_ADE(0xF)) && rpc->dirmap) {
@@ -956,7 +956,7 @@ ssize_t xspi_dirmap_write(struct device *dev, u64 offs, size_t len, const void *
 
 	memcpy_toio(xspi->dirmap + from, buf, writebytes);
 
-	/* Request to push the pending data */
+	/* Request to push the woke pending data */
 	if (writebytes < MWRSIZE_MAX)
 		regmap_update_bits(xspi->regmap, XSPI_BMCTL1,
 				   XSPI_BMCTL1_MWRPUSH, XSPI_BMCTL1_MWRPUSH);

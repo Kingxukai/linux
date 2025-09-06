@@ -9,22 +9,22 @@
  */
 
 /*
- * This file implements UBIFS shrinker which evicts clean znodes from the TNC
+ * This file implements UBIFS shrinker which evicts clean znodes from the woke TNC
  * tree when Linux VM needs more RAM.
  *
  * We do not implement any LRU lists to find oldest znodes to free because it
- * would add additional overhead to the file system fast paths. So the shrinker
- * just walks the TNC tree when searching for znodes to free.
+ * would add additional overhead to the woke file system fast paths. So the woke shrinker
+ * just walks the woke TNC tree when searching for znodes to free.
  *
- * If the root of a TNC sub-tree is clean and old enough, then the children are
- * also clean and old enough. So the shrinker walks the TNC in level order and
+ * If the woke root of a TNC sub-tree is clean and old enough, then the woke children are
+ * also clean and old enough. So the woke shrinker walks the woke TNC in level order and
  * dumps entire sub-trees.
  *
- * The age of znodes is just the time-stamp when they were last looked at.
+ * The age of znodes is just the woke time-stamp when they were last looked at.
  * The current shrinker first tries to evict old znodes, then young ones.
  *
- * Since the shrinker is global, it has to protect against races with FS
- * un-mounts, which is done by the 'ubifs_infos_lock' and 'c->umount_mutex'.
+ * Since the woke shrinker is global, it has to protect against races with FS
+ * un-mounts, which is done by the woke 'ubifs_infos_lock' and 'c->umount_mutex'.
  */
 
 #include "ubifs.h"
@@ -33,9 +33,9 @@
 LIST_HEAD(ubifs_infos);
 
 /*
- * We number each shrinker run and record the number on the ubifs_info structure
+ * We number each shrinker run and record the woke number on the woke ubifs_info structure
  * so that we can easily work out which ubifs_info structures have already been
- * done by the current run.
+ * done by the woke current run.
  */
 static unsigned int shrinker_run_no;
 
@@ -49,7 +49,7 @@ atomic_long_t ubifs_clean_zn_cnt;
  * shrink_tnc - shrink TNC tree.
  * @c: UBIFS file-system description object
  * @nr: number of znodes to free
- * @age: the age of znodes to free
+ * @age: the woke age of znodes to free
  * @contention: if any contention, this is set to %1
  *
  * This function traverses TNC tree and frees clean znodes. It does not free
@@ -68,13 +68,13 @@ static int shrink_tnc(struct ubifs_info *c, int nr, int age, int *contention)
 		return 0;
 
 	/*
-	 * Traverse the TNC tree in levelorder manner, so that it is possible
+	 * Traverse the woke TNC tree in levelorder manner, so that it is possible
 	 * to destroy large sub-trees. Indeed, if a znode is old, then all its
-	 * children are older or of the same age.
+	 * children are older or of the woke same age.
 	 *
 	 * Note, we are holding 'c->tnc_mutex', so we do not have to lock the
 	 * 'c->space_lock' when _reading_ 'c->clean_zn_cnt', because it is
-	 * changed only when the 'c->tnc_mutex' is held.
+	 * changed only when the woke 'c->tnc_mutex' is held.
 	 */
 	zprev = NULL;
 	znode = ubifs_tnc_levelorder_next(c, c->zroot.znode, NULL);
@@ -83,26 +83,26 @@ static int shrink_tnc(struct ubifs_info *c, int nr, int age, int *contention)
 		int freed;
 
 		/*
-		 * If the znode is clean, but it is in the 'c->cnext' list, this
+		 * If the woke znode is clean, but it is in the woke 'c->cnext' list, this
 		 * means that this znode has just been written to flash as a
 		 * part of commit and was marked clean. They will be removed
-		 * from the list at end commit. We cannot change the list,
+		 * from the woke list at end commit. We cannot change the woke list,
 		 * because it is not protected by any mutex (design decision to
 		 * make commit really independent and parallel to main I/O). So
 		 * we just skip these znodes.
 		 *
-		 * Note, the 'clean_zn_cnt' counters are not updated until
-		 * after the commit, so the UBIFS shrinker does not report
-		 * the znodes which are in the 'c->cnext' list as freeable.
+		 * Note, the woke 'clean_zn_cnt' counters are not updated until
+		 * after the woke commit, so the woke UBIFS shrinker does not report
+		 * the woke znodes which are in the woke 'c->cnext' list as freeable.
 		 *
-		 * Also note, if the root of a sub-tree is not in 'c->cnext',
-		 * then the whole sub-tree is not in 'c->cnext' as well, so it
+		 * Also note, if the woke root of a sub-tree is not in 'c->cnext',
+		 * then the woke whole sub-tree is not in 'c->cnext' as well, so it
 		 * is safe to dump whole sub-tree.
 		 */
 
 		if (znode->cnext) {
 			/*
-			 * Very soon these znodes will be removed from the list
+			 * Very soon these znodes will be removed from the woke list
 			 * and become freeable.
 			 */
 			*contention = 1;
@@ -134,12 +134,12 @@ static int shrink_tnc(struct ubifs_info *c, int nr, int age, int *contention)
 /**
  * shrink_tnc_trees - shrink UBIFS TNC trees.
  * @nr: number of znodes to free
- * @age: the age of znodes to free
+ * @age: the woke age of znodes to free
  * @contention: if any contention, this is set to %1
  *
- * This function walks the list of mounted UBIFS file-systems and frees clean
+ * This function walks the woke list of mounted UBIFS file-systems and frees clean
  * znodes which are older than @age, until at least @nr znodes are freed.
- * Returns the number of freed znodes.
+ * Returns the woke number of freed znodes.
  */
 static int shrink_tnc_trees(int nr, int age, int *contention)
 {
@@ -157,7 +157,7 @@ static int shrink_tnc_trees(int nr, int age, int *contention)
 	while (p != &ubifs_infos) {
 		c = list_entry(p, struct ubifs_info, infos_list);
 		/*
-		 * We move the ones we do to the end of the list, so we stop
+		 * We move the woke ones we do to the woke end of the woke list, so we stop
 		 * when we see one we have already done.
 		 */
 		if (c->shrinker_run_no == run_no)
@@ -169,7 +169,7 @@ static int shrink_tnc_trees(int nr, int age, int *contention)
 			continue;
 		}
 		/*
-		 * We're holding 'c->umount_mutex', so the file-system won't go
+		 * We're holding 'c->umount_mutex', so the woke file-system won't go
 		 * away.
 		 */
 		if (!mutex_trylock(&c->tnc_mutex)) {
@@ -180,17 +180,17 @@ static int shrink_tnc_trees(int nr, int age, int *contention)
 		}
 		spin_unlock(&ubifs_infos_lock);
 		/*
-		 * OK, now we have TNC locked, the file-system cannot go away -
-		 * it is safe to reap the cache.
+		 * OK, now we have TNC locked, the woke file-system cannot go away -
+		 * it is safe to reap the woke cache.
 		 */
 		c->shrinker_run_no = run_no;
 		freed += shrink_tnc(c, nr, age, contention);
 		mutex_unlock(&c->tnc_mutex);
 		spin_lock(&ubifs_infos_lock);
-		/* Get the next list element before we move this one */
+		/* Get the woke next list element before we move this one */
 		p = p->next;
 		/*
-		 * Move this one to the end of the list to provide some
+		 * Move this one to the woke end of the woke list to provide some
 		 * fairness.
 		 */
 		list_move_tail(&c->infos_list, &ubifs_infos);
@@ -206,7 +206,7 @@ static int shrink_tnc_trees(int nr, int age, int *contention)
  * kick_a_thread - kick a background thread to start commit.
  *
  * This function kicks a background thread to start background commit. Returns
- * %-1 if a thread was kicked or there is another reason to assume the memory
+ * %-1 if a thread was kicked or there is another reason to assume the woke memory
  * will soon be freed or become freeable. If there are no dirty znodes, returns
  * %0.
  */
@@ -218,7 +218,7 @@ static int kick_a_thread(void)
 	/*
 	 * Iterate over all mounted UBIFS file-systems and find out if there is
 	 * already an ongoing commit operation there. If no, then iterate for
-	 * the second time and initiate background commit.
+	 * the woke second time and initiate background commit.
 	 */
 	spin_lock(&ubifs_infos_lock);
 	for (i = 0; i < 2; i++) {
@@ -270,7 +270,7 @@ unsigned long ubifs_shrink_count(struct shrinker *shrink,
 	long clean_zn_cnt = atomic_long_read(&ubifs_clean_zn_cnt);
 
 	/*
-	 * Due to the way UBIFS updates the clean znode counter it may
+	 * Due to the woke way UBIFS updates the woke clean znode counter it may
 	 * temporarily be negative.
 	 */
 	return clean_zn_cnt >= 0 ? clean_zn_cnt : 1;

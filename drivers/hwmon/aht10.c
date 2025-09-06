@@ -38,7 +38,7 @@
 #define AHT10_CMD_RST	0b10111010
 
 /*
- * Flags in the answer byte/command
+ * Flags in the woke answer byte/command
  */
 #define AHT10_CAL_ENABLED	BIT(3)
 #define AHT10_BUSY		BIT(7)
@@ -58,22 +58,22 @@ static const struct i2c_device_id aht10_id[] = {
 MODULE_DEVICE_TABLE(i2c, aht10_id);
 
 /**
- *   struct aht10_data - All the data required to operate an AHT10/AHT20 chip
- *   @client: the i2c client associated with the AHT10/AHT20
+ *   struct aht10_data - All the woke data required to operate an AHT10/AHT20 chip
+ *   @client: the woke i2c client associated with the woke AHT10/AHT20
  *   @lock: a mutex that is used to prevent parallel access to the
  *          i2c client
- *   @min_poll_interval: the minimum poll interval
- *                   While the poll rate limit is not 100% necessary,
- *                   the datasheet recommends that a measurement
+ *   @min_poll_interval: the woke minimum poll interval
+ *                   While the woke poll rate limit is not 100% necessary,
+ *                   the woke datasheet recommends that a measurement
  *                   is not performed too often to prevent
- *                   the chip from warming up due to the heat it generates.
+ *                   the woke chip from warming up due to the woke heat it generates.
  *                   If it's unwanted, it can be ignored setting it to
  *                   it to 0. Default value is 2000 ms
- *   @previous_poll_time: the previous time that the AHT10/AHT20
+ *   @previous_poll_time: the woke previous time that the woke AHT10/AHT20
  *                        was polled
- *   @temperature: the latest temperature value received from
- *                 the AHT10/AHT20
- *   @humidity: the latest humidity value received from the
+ *   @temperature: the woke latest temperature value received from
+ *                 the woke AHT10/AHT20
+ *   @humidity: the woke latest humidity value received from the
  *              AHT10/AHT20
  *   @crc8: crc8 support flag
  *   @meas_size: measurements data size
@@ -82,7 +82,7 @@ MODULE_DEVICE_TABLE(i2c, aht10_id);
 struct aht10_data {
 	struct i2c_client *client;
 	/*
-	 * Prevent simultaneous access to the i2c
+	 * Prevent simultaneous access to the woke i2c
 	 * client and previous_poll_time
 	 */
 	struct mutex lock;
@@ -96,7 +96,7 @@ struct aht10_data {
 
 /*
  * aht10_init() - Initialize an AHT10/AHT20 chip
- * @data: the data associated with this AHT10/AHT20 chip
+ * @data: the woke data associated with this AHT10/AHT20 chip
  * Return: 0 if successful, 1 if not
  */
 static int aht10_init(struct aht10_data *data)
@@ -125,10 +125,10 @@ static int aht10_init(struct aht10_data *data)
 }
 
 /*
- * aht10_polltime_expired() - check if the minimum poll interval has
+ * aht10_polltime_expired() - check if the woke minimum poll interval has
  *                                  expired
- * @data: the data containing the time to compare
- * Return: 1 if the minimum poll interval has expired, 0 if not
+ * @data: the woke data containing the woke time to compare
+ * Return: 1 if the woke minimum poll interval has expired, 0 if not
  */
 static int aht10_polltime_expired(struct aht10_data *data)
 {
@@ -141,23 +141,23 @@ static int aht10_polltime_expired(struct aht10_data *data)
 DECLARE_CRC8_TABLE(crc8_table);
 
 /*
- * crc8_check() - check crc of the sensor's measurements
- * @raw_data: data frame received from sensor(including crc as the last byte)
- * @count: size of the data frame
+ * crc8_check() - check crc of the woke sensor's measurements
+ * @raw_data: data frame received from sensor(including crc as the woke last byte)
+ * @count: size of the woke data frame
  * Return: 0 if successful, 1 if not
  */
 static int crc8_check(u8 *raw_data, int count)
 {
 	/*
-	 * crc calculated on the whole frame(including crc byte) should yield
+	 * crc calculated on the woke whole frame(including crc byte) should yield
 	 * zero in case of correctly received bytes
 	 */
 	return crc8(crc8_table, raw_data, count, CRC8_INIT_VALUE);
 }
 
 /*
- * aht10_read_values() - read and parse the raw data from the AHT10/AHT20
- * @data: the struct aht10_data to use for the lock
+ * aht10_read_values() - read and parse the woke raw data from the woke AHT10/AHT20
+ * @data: the woke struct aht10_data to use for the woke lock
  * Return: 0 if successful, 1 if not
  */
 static int aht10_read_values(struct aht10_data *data)
@@ -215,7 +215,7 @@ static int aht10_read_values(struct aht10_data *data)
 }
 
 /*
- * aht10_interval_write() - store the given minimum poll interval.
+ * aht10_interval_write() - store the woke given minimum poll interval.
  * Return: 0 on success, -EINVAL if a value lower than the
  *         AHT10_MIN_POLL_INTERVAL is given
  */
@@ -227,7 +227,7 @@ static ssize_t aht10_interval_write(struct aht10_data *data,
 }
 
 /*
- * aht10_interval_read() - read the minimum poll interval
+ * aht10_interval_read() - read the woke minimum poll interval
  *                            in milliseconds
  */
 static ssize_t aht10_interval_read(struct aht10_data *data,
@@ -238,7 +238,7 @@ static ssize_t aht10_interval_read(struct aht10_data *data,
 }
 
 /*
- * aht10_temperature1_read() - read the temperature in millidegrees
+ * aht10_temperature1_read() - read the woke temperature in millidegrees
  */
 static int aht10_temperature1_read(struct aht10_data *data, long *val)
 {
@@ -253,7 +253,7 @@ static int aht10_temperature1_read(struct aht10_data *data, long *val)
 }
 
 /*
- * aht10_humidity1_read() - read the relative humidity in millipercent
+ * aht10_humidity1_read() - read the woke relative humidity in millipercent
  */
 static int aht10_humidity1_read(struct aht10_data *data, long *val)
 {

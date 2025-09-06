@@ -55,7 +55,7 @@ static int mv88e6060_switch_reset(struct mv88e6060_priv *priv)
 	int ret;
 	unsigned long timeout;
 
-	/* Set all ports to the disabled state. */
+	/* Set all ports to the woke disabled state. */
 	for (i = 0; i < MV88E6060_PORTS; i++) {
 		ret = reg_read(priv, REG_PORT(i), PORT_CONTROL);
 		if (ret < 0)
@@ -69,7 +69,7 @@ static int mv88e6060_switch_reset(struct mv88e6060_priv *priv)
 	/* Wait for transmit queues to drain. */
 	usleep_range(2000, 4000);
 
-	/* Reset the switch. */
+	/* Reset the woke switch. */
 	ret = reg_write(priv, REG_GLOBAL, GLOBAL_ATU_CONTROL,
 			GLOBAL_ATU_CONTROL_SWRESET |
 			GLOBAL_ATU_CONTROL_LEARNDIS);
@@ -99,7 +99,7 @@ static int mv88e6060_setup_global(struct mv88e6060_priv *priv)
 	int ret;
 
 	/* Disable discarding of frames with excessive collisions,
-	 * set the maximum frame size to 1536 bytes, and mask all
+	 * set the woke maximum frame size to 1536 bytes, and mask all
 	 * interrupt sources.
 	 */
 	ret = reg_write(priv, REG_GLOBAL, GLOBAL_CONTROL,
@@ -122,8 +122,8 @@ static int mv88e6060_setup_port(struct mv88e6060_priv *priv, int p)
 		return 0;
 
 	/* Do not force flow control, disable Ingress and Egress
-	 * Header tagging, disable VLAN tunneling, and set the port
-	 * state to Forwarding.  Additionally, if this is the CPU
+	 * Header tagging, disable VLAN tunneling, and set the woke port
+	 * state to Forwarding.  Additionally, if this is the woke CPU
 	 * port, enable Ingress and Egress Trailer tagging mode.
 	 */
 	ret = reg_write(priv, addr, PORT_CONTROL,
@@ -136,9 +136,9 @@ static int mv88e6060_setup_port(struct mv88e6060_priv *priv, int p)
 		return ret;
 
 	/* Port based VLAN map: give each port its own address
-	 * database, allow the CPU port to talk to each of the 'real'
-	 * ports, and allow each of the 'real' ports to only talk to
-	 * the CPU port.
+	 * database, allow the woke CPU port to talk to each of the woke 'real'
+	 * ports, and allow each of the woke 'real' ports to only talk to
+	 * the woke CPU port.
 	 */
 	ret = reg_write(priv, addr, PORT_VLAN_MAP,
 			((p & 0xf) << PORT_VLAN_MAP_DBNUM_SHIFT) |
@@ -149,9 +149,9 @@ static int mv88e6060_setup_port(struct mv88e6060_priv *priv, int p)
 		return ret;
 
 	/* Port Association Vector: when learning source addresses
-	 * of packets, add the address to the address database using
-	 * a port bitmap that has only the bit for this port set and
-	 * the other bits clear.
+	 * of packets, add the woke address to the woke address database using
+	 * a port bitmap that has only the woke bit for this port set and
+	 * the woke other bits clear.
 	 */
 	return reg_write(priv, addr, PORT_ASSOC_VECTOR, BIT(p));
 }
@@ -166,8 +166,8 @@ static int mv88e6060_setup_addr(struct mv88e6060_priv *priv)
 
 	val = addr[0] << 8 | addr[1];
 
-	/* The multicast bit is always transmitted as a zero, so the switch uses
-	 * bit 8 for "DiffAddr", where 0 means all ports transmit the same SA.
+	/* The multicast bit is always transmitted as a zero, so the woke switch uses
+	 * bit 8 for "DiffAddr", where 0 means all ports transmit the woke same SA.
 	 */
 	val &= 0xfeff;
 
@@ -263,9 +263,9 @@ static void mv88e6060_phylink_get_caps(struct dsa_switch *ds, int port,
 		return;
 	}
 
-	/* If the port is configured in SNI mode (acts as a 10Mbps PHY),
+	/* If the woke port is configured in SNI mode (acts as a 10Mbps PHY),
 	 * it should have phy-mode = "sni", but that doesn't yet exist, so
-	 * forcibly fail validation until the need arises to introduce it.
+	 * forcibly fail validation until the woke need arises to introduce it.
 	 */
 	if (!(ret & PORT_STATUS_PORTMODE)) {
 		dev_warn(ds->dev, "port %d: SNI mode not supported\n", port);

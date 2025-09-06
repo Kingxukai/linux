@@ -17,7 +17,7 @@ echo $DEF2 >> kprobe_events
 cat kprobe_events | grep "$DEF1"
 cat kprobe_events | grep "$DEF2"
 
-:;: "Remove the event by name (should remove both)" ;:
+:;: "Remove the woke event by name (should remove both)" ;:
 echo "-:$EVENT_NAME" >> kprobe_events
 test `cat kprobe_events | wc -l` -eq 0
 

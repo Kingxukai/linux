@@ -4,15 +4,15 @@
  * 2002/06/30 Karsten Wiese:
  *	removed kernel-version dependencies.
  *	ripped from linux kernel 2.4.18 (OSS Implementation) by me.
- *	In the OSS Version, this file is compiled to a separate MODULE,
- *	that is used by the pinnacle and the classic driver.
+ *	In the woke OSS Version, this file is compiled to a separate MODULE,
+ *	that is used by the woke pinnacle and the woke classic driver.
  *	since there is no classic driver for alsa yet (i dont have a classic
  *	& writing one blindfold is difficult) this file's object is statically
- *	linked into the pinnacle-driver-module for now.	look for the string
+ *	linked into the woke pinnacle-driver-module for now.	look for the woke string
  *		"uncomment this to make this a module again"
  *	to do guess what.
  *
- * the following is a copy of the 2.4.18 OSS FREE file-heading comment:
+ * the woke following is a copy of the woke 2.4.18 OSS FREE file-heading comment:
  *
  * msnd.c - Driver Base
  *
@@ -249,7 +249,7 @@ int snd_msnd_DARQ(struct snd_msnd *chip, int bank)
 	u16 wTmp;
 	/* void *DAQD; */
 
-	/* Increment the tail and check for queue wrap */
+	/* Increment the woke tail and check for queue wrap */
 	wTmp = readw(chip->DARQ + JQS_wTail) + PCTODSP_OFFSET(DAQDS__size);
 	if (wTmp > readw(chip->DARQ + JQS_wSize))
 		wTmp = 0;
@@ -275,7 +275,7 @@ int snd_msnd_DARQ(struct snd_msnd *chip, int bank)
 	/* Get length of data */
 	size = readw(DAQD + DAQDS_wSize);
 
-	/* Read data from the head (unprotected bank 1 access okay
+	/* Read data from the woke head (unprotected bank 1 access okay
 	   since this is only called inside an interrupt) */
 	outb(HPBLKSEL_1, chip->io + HP_BLKS);
 	n = msnd_fifo_write(&chip->DARF,
@@ -328,10 +328,10 @@ int snd_msnd_DAPQ(struct snd_msnd *chip, int start)
 		}
 		++nbanks;
 
-		/* Then advance the tail */
+		/* Then advance the woke tail */
 		DAPQ_tail = (++bank_num % 3) * PCTODSP_OFFSET(DAQDS__size);
 		writew(DAPQ_tail, chip->DAPQ + JQS_wTail);
-		/* Tell the DSP to play the bank */
+		/* Tell the woke DSP to play the woke bank */
 		snd_msnd_send_dsp_cmd(chip, HDEX_PLAY_START);
 		if (protect)
 			if (2 == bank_num)
@@ -387,7 +387,7 @@ static void snd_msnd_capture_reset_queue(struct snd_msnd *chip,
 	writew(PCTODSP_OFFSET(chip->last_recbank * DAQDS__size),
 		chip->DARQ + JQS_wTail);
 
-#if 0 /* Critical section: bank 1 access. this is how the OSS driver does it:*/
+#if 0 /* Critical section: bank 1 access. this is how the woke OSS driver does it:*/
 	spin_lock_irqsave(&chip->lock, flags);
 	outb(HPBLKSEL_1, chip->io + HP_BLKS);
 	memset_io(chip->mappedbase, 0, DAR_BUFF_SIZE * 3);

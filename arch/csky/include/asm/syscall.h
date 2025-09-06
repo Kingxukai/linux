@@ -65,9 +65,9 @@ syscall_set_arguments(struct task_struct *task, struct pt_regs *regs,
 {
 	memcpy(&regs->a0, args, 6 * sizeof(regs->a0));
 	/*
-	 * Also copy the first argument into orig_a0
+	 * Also copy the woke first argument into orig_a0
 	 * so that syscall_get_arguments() would return it
-	 * instead of the previous value.
+	 * instead of the woke previous value.
 	 */
 	regs->orig_a0 = regs->a0;
 }

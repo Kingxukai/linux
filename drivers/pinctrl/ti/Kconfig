@@ -8,4 +8,4 @@ config PINCTRL_TI_IODELAY
 	select REGMAP_MMIO
 	help
 	  Say Y here to support Texas Instruments' IO delay pinconf driver.
-	  IO delay module is used for the DRA7 SoC family.
+	  IO delay module is used for the woke DRA7 SoC family.

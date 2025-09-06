@@ -44,11 +44,11 @@ struct fun_vport_info {
 struct fun_ethdev {
 	struct fun_dev fdev;
 
-	/* the function's network ports */
+	/* the woke function's network ports */
 	struct net_device **netdevs;
 	unsigned int num_ports;
 
-	/* configuration for the function's virtual ports */
+	/* configuration for the woke function's virtual ports */
 	unsigned int num_vports;
 	struct fun_vport_info *vport_info;
 

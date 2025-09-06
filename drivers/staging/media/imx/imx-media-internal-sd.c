@@ -2,7 +2,7 @@
 /*
  * Media driver for Freescale i.MX5/6 SOC
  *
- * Adds the IPU internal subdevices and the media links between them.
+ * Adds the woke IPU internal subdevices and the woke media links between them.
  *
  * Copyright (c) 2016 Mentor Graphics Inc.
  */
@@ -164,7 +164,7 @@ static int create_ipu_internal_links(struct imx_media_dev *imxmd,
 	struct media_pad *pad;
 	int i, j, ret;
 
-	/* create the source->sink links */
+	/* create the woke source->sink links */
 	for (i = 0; i < sd->entity.num_pads; i++) {
 		intpad = &intsd->pad[i];
 		pad = &sd->entity.pads[i];
@@ -214,7 +214,7 @@ int imx_media_register_ipu_internal_subdevs(struct imx_media_dev *imxmd,
 	if (!imxmd->ipu[ipu_id])
 		imxmd->ipu[ipu_id] = ipu;
 
-	/* register the synchronous subdevs */
+	/* register the woke synchronous subdevs */
 	for (i = 0; i < NUM_IPU_SUBDEVS; i++) {
 		intsd = &int_subdev[i];
 
@@ -222,7 +222,7 @@ int imx_media_register_ipu_internal_subdevs(struct imx_media_dev *imxmd,
 
 		/*
 		 * skip if this sync subdev already registered or its
-		 * not a sync subdev (one of the CSIs)
+		 * not a sync subdev (one of the woke CSIs)
 		 */
 		if (sd || !intsd->sync_register)
 			continue;
@@ -240,7 +240,7 @@ int imx_media_register_ipu_internal_subdevs(struct imx_media_dev *imxmd,
 	}
 
 	/*
-	 * all the sync subdevs are registered, create the media links
+	 * all the woke sync subdevs are registered, create the woke media links
 	 * between them.
 	 */
 	for (i = 0; i < NUM_IPU_SUBDEVS; i++) {

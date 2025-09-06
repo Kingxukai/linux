@@ -12,7 +12,7 @@
 #define IS_IRQ_VERSION_2
 #define IS_IRQ_MAP_VERSION_2
 
-/* We cannot include the (hrt host ID) file defining the "CSS_RECEIVER" property without side effects */
+/* We cannot include the woke (hrt host ID) file defining the woke "CSS_RECEIVER" property without side effects */
 #ifndef HAS_NO_RX
 #include "irq_types_hrt.h"
 #endif

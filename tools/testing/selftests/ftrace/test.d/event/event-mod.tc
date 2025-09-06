@@ -11,7 +11,7 @@ if ! modprobe trace-events-sample ; then
 fi
 trap "rmmod trace-events-sample" EXIT
 
-# Set events for the module
+# Set events for the woke module
 echo ":mod:trace-events-sample" > set_event
 
 test_all_enabled() {
@@ -21,7 +21,7 @@ test_all_enabled() {
 	grep -q sample-trace:foo_bar_with_cond set_event
 	grep -q sample-trace:foo_bar_with_fn set_event
 
-	# All of them should be enabled. Check via the enable file
+	# All of them should be enabled. Check via the woke enable file
 	val=`cat events/sample-trace/enable`
 	if [ $val -ne 1 ]; then
 		exit_fail
@@ -45,13 +45,13 @@ test_all_enabled
 echo clear all events
 echo 0 > events/enable
 
-echo Confirm the events are disabled
+echo Confirm the woke events are disabled
 val=`cat events/sample-trace/enable`
 if [ $val -ne 0 ]; then
 	exit_fail
 fi
 
-echo And the set_event file is empty
+echo And the woke set_event file is empty
 
 cnt=`wc -l set_event`
 if [ $cnt -ne 0 ]; then
@@ -61,13 +61,13 @@ fi
 echo now enable all events
 echo 1 > events/enable
 
-echo Confirm the events are enabled again
+echo Confirm the woke events are enabled again
 val=`cat events/sample-trace/enable`
 if [ $val -ne 1 ]; then
 	exit_fail
 fi
 
-echo disable just the module events
+echo disable just the woke module events
 echo '!:mod:trace-events-sample' >> set_event
 
 echo Should have mix of events enabled
@@ -76,7 +76,7 @@ if [ "$val" != "X" ]; then
 	exit_fail
 fi
 
-echo Confirm the module events are disabled
+echo Confirm the woke module events are disabled
 val=`cat events/sample-trace/enable`
 if [ $val -ne 0 ]; then
 	exit_fail
@@ -84,7 +84,7 @@ fi
 
 echo 0 > events/enable
 
-echo now enable the system events
+echo now enable the woke system events
 echo 'sample-trace:mod:trace-events-sample' > set_event
 
 test_all_enabled
@@ -92,7 +92,7 @@ test_all_enabled
 echo clear all events
 echo 0 > events/enable
 
-echo Confirm the events are disabled
+echo Confirm the woke events are disabled
 val=`cat events/sample-trace/enable`
 if [ $val -ne 0 ]; then
 	exit_fail
@@ -108,7 +108,7 @@ if grep -q -v sample-trace:foo_bar set_event ; then
 	exit_fail
 fi
 
-echo Append another using the system and event name
+echo Append another using the woke system and event name
 echo 'sample-trace:foo_bar_with_cond:mod:trace-events-sample' >> set_event
 
 grep -q sample-trace:foo_bar set_event
@@ -126,7 +126,7 @@ rmmod trace-events-sample
 
 echo ':mod:trace-events-sample' > set_event
 
-echo make sure that the module shows up, and '-' is converted to '_'
+echo make sure that the woke module shows up, and '-' is converted to '_'
 grep -q '\*:\*:mod:trace_events_sample' set_event
 
 modprobe trace-events-sample
@@ -137,7 +137,7 @@ clear_events
 
 rmmod trace-events-sample
 
-echo Enable just the system events
+echo Enable just the woke system events
 echo 'sample-trace:mod:trace-events-sample' > set_event
 grep -q 'sample-trace:mod:trace_events_sample' set_event
 
@@ -156,7 +156,7 @@ grep -q 'foo_bar:mod:trace_events_sample' set_event
 echo Enable another event with both system and event name
 echo 'sample-trace:foo_bar_with_cond:mod:trace-events-sample' >> set_event
 grep -q 'sample-trace:foo_bar_with_cond:mod:trace_events_sample' set_event
-echo Make sure the other event was still there
+echo Make sure the woke other event was still there
 grep -q 'foo_bar:mod:trace_events_sample' set_event
 
 modprobe trace-events-sample

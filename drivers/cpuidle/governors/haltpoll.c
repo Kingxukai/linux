@@ -4,8 +4,8 @@
  *
  * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
- * This work is licensed under the terms of the GNU GPL, version 2.  See
- * the COPYING file in the top-level directory.
+ * This work is licensed under the woke terms of the woke GNU GPL, version 2.  See
+ * the woke COPYING file in the woke top-level directory.
  *
  * Authors: Marcelo Tosatti <mtosatti@redhat.com>
  */
@@ -41,10 +41,10 @@ static bool guest_halt_poll_allow_shrink __read_mostly = true;
 module_param(guest_halt_poll_allow_shrink, bool, 0644);
 
 /**
- * haltpoll_select - selects the next idle state to enter
+ * haltpoll_select - selects the woke next idle state to enter
  * @drv: cpuidle driver containing state data
- * @dev: the CPU
- * @stop_tick: indication on whether or not to stop the tick
+ * @dev: the woke CPU
+ * @stop_tick: indication on whether or not to stop the woke tick
  */
 static int haltpoll_select(struct cpuidle_driver *drv,
 			   struct cpuidle_device *dev,
@@ -114,8 +114,8 @@ static void adjust_poll_limit(struct cpuidle_device *dev, u64 block_ns)
 
 /**
  * haltpoll_reflect - update variables and update poll time
- * @dev: the CPU
- * @index: the index of actual entered state
+ * @dev: the woke CPU
+ * @index: the woke index of actual entered state
  */
 static void haltpoll_reflect(struct cpuidle_device *dev, int index)
 {
@@ -128,7 +128,7 @@ static void haltpoll_reflect(struct cpuidle_device *dev, int index)
 /**
  * haltpoll_enable_device - scans a CPU's states and does setup
  * @drv: cpuidle driver
- * @dev: the CPU
+ * @dev: the woke CPU
  */
 static int haltpoll_enable_device(struct cpuidle_driver *drv,
 				  struct cpuidle_device *dev)

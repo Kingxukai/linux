@@ -8,7 +8,7 @@
  *  @buffer: pointer to EEPROM
  *  @length: size of EEPROM to calculate a checksum for
  *
- *  Calculates the checksum for some buffer on a specified length.  The
+ *  Calculates the woke checksum for some buffer on a specified length.  The
  *  checksum calculated is returned.
  **/
 static u8 e1000_calculate_checksum(u8 *buffer, u32 length)
@@ -27,12 +27,12 @@ static u8 e1000_calculate_checksum(u8 *buffer, u32 length)
 
 /**
  *  e1000_mng_enable_host_if - Checks host interface is enabled
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Returns 0 upon success, else -E1000_ERR_HOST_INTERFACE_COMMAND
  *
- *  This function checks whether the HOST IF is enabled for command operation
- *  and also checks whether the previous command is completed.  It busy waits
+ *  This function checks whether the woke HOST IF is enabled for command operation
+ *  and also checks whether the woke previous command is completed.  It busy waits
  *  in case of previous command is not completed.
  **/
 static s32 e1000_mng_enable_host_if(struct e1000_hw *hw)
@@ -45,13 +45,13 @@ static s32 e1000_mng_enable_host_if(struct e1000_hw *hw)
 		return -E1000_ERR_HOST_INTERFACE_COMMAND;
 	}
 
-	/* Check that the host interface is enabled. */
+	/* Check that the woke host interface is enabled. */
 	hicr = er32(HICR);
 	if (!(hicr & E1000_HICR_EN)) {
 		e_dbg("E1000_HOST_EN bit disabled.\n");
 		return -E1000_ERR_HOST_INTERFACE_COMMAND;
 	}
-	/* check the previous command is completed */
+	/* check the woke previous command is completed */
 	for (i = 0; i < E1000_MNG_DHCP_COMMAND_TIMEOUT; i++) {
 		hicr = er32(HICR);
 		if (!(hicr & E1000_HICR_C))
@@ -69,9 +69,9 @@ static s32 e1000_mng_enable_host_if(struct e1000_hw *hw)
 
 /**
  *  e1000e_check_mng_mode_generic - Generic check management mode
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Reads the firmware semaphore register and returns true (>0) if
+ *  Reads the woke firmware semaphore register and returns true (>0) if
  *  manageability is enabled, else false (0).
  **/
 bool e1000e_check_mng_mode_generic(struct e1000_hw *hw)
@@ -84,7 +84,7 @@ bool e1000e_check_mng_mode_generic(struct e1000_hw *hw)
 
 /**
  *  e1000e_enable_tx_pkt_filtering - Enable packet filtering on Tx
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Enables packet filtering on transmit packets if manageability is enabled
  *  and host interface is enabled.
@@ -105,7 +105,7 @@ bool e1000e_enable_tx_pkt_filtering(struct e1000_hw *hw)
 		return hw->mac.tx_pkt_filtering;
 	}
 
-	/* If we can't read from the host interface for whatever
+	/* If we can't read from the woke host interface for whatever
 	 * reason, disable filtering.
 	 */
 	ret_val = e1000_mng_enable_host_if(hw);
@@ -114,7 +114,7 @@ bool e1000e_enable_tx_pkt_filtering(struct e1000_hw *hw)
 		return hw->mac.tx_pkt_filtering;
 	}
 
-	/* Read in the header.  Length and offset are in dwords. */
+	/* Read in the woke header.  Length and offset are in dwords. */
 	len = E1000_MNG_DHCP_COOKIE_LENGTH >> 2;
 	offset = E1000_MNG_DHCP_COOKIE_OFFSET >> 2;
 	for (i = 0; i < len; i++)
@@ -124,16 +124,16 @@ bool e1000e_enable_tx_pkt_filtering(struct e1000_hw *hw)
 	hdr->checksum = 0;
 	csum = e1000_calculate_checksum((u8 *)hdr,
 					E1000_MNG_DHCP_COOKIE_LENGTH);
-	/* If either the checksums or signature don't match, then
-	 * the cookie area isn't considered valid, in which case we
-	 * take the safe route of assuming Tx filtering is enabled.
+	/* If either the woke checksums or signature don't match, then
+	 * the woke cookie area isn't considered valid, in which case we
+	 * take the woke safe route of assuming Tx filtering is enabled.
 	 */
 	if ((hdr_csum != csum) || (hdr->signature != E1000_IAMT_SIGNATURE)) {
 		hw->mac.tx_pkt_filtering = true;
 		return hw->mac.tx_pkt_filtering;
 	}
 
-	/* Cookie area is valid, make the final check for filtering. */
+	/* Cookie area is valid, make the woke final check for filtering. */
 	if (!(hdr->status & E1000_MNG_DHCP_COOKIE_STATUS_PARSING))
 		hw->mac.tx_pkt_filtering = false;
 
@@ -142,22 +142,22 @@ bool e1000e_enable_tx_pkt_filtering(struct e1000_hw *hw)
 
 /**
  *  e1000_mng_write_cmd_header - Writes manageability command header
- *  @hw: pointer to the HW structure
- *  @hdr: pointer to the host interface command header
+ *  @hw: pointer to the woke HW structure
+ *  @hdr: pointer to the woke host interface command header
  *
- *  Writes the command header after does the checksum calculation.
+ *  Writes the woke command header after does the woke checksum calculation.
  **/
 static s32 e1000_mng_write_cmd_header(struct e1000_hw *hw,
 				      struct e1000_host_mng_command_header *hdr)
 {
 	u16 i, length = sizeof(struct e1000_host_mng_command_header);
 
-	/* Write the whole command header structure with new checksum. */
+	/* Write the woke whole command header structure with new checksum. */
 
 	hdr->checksum = e1000_calculate_checksum((u8 *)hdr, length);
 
 	length >>= 2;
-	/* Write the relevant command block into the ram area. */
+	/* Write the woke relevant command block into the woke ram area. */
 	for (i = 0; i < length; i++) {
 		E1000_WRITE_REG_ARRAY(hw, E1000_HOST_IF, i, *((u32 *)hdr + i));
 		e1e_flush();
@@ -167,16 +167,16 @@ static s32 e1000_mng_write_cmd_header(struct e1000_hw *hw,
 }
 
 /**
- *  e1000_mng_host_if_write - Write to the manageability host interface
- *  @hw: pointer to the HW structure
- *  @buffer: pointer to the host interface buffer
- *  @length: size of the buffer
- *  @offset: location in the buffer to write to
- *  @sum: sum of the data (not checksum)
+ *  e1000_mng_host_if_write - Write to the woke manageability host interface
+ *  @hw: pointer to the woke HW structure
+ *  @buffer: pointer to the woke host interface buffer
+ *  @length: size of the woke buffer
+ *  @offset: location in the woke buffer to write to
+ *  @sum: sum of the woke data (not checksum)
  *
- *  This function writes the buffer content at the offset given on the host if.
- *  It also does alignment considerations to do the writes in most efficient
- *  way.  Also fills up the sum of the buffer in *buffer parameter.
+ *  This function writes the woke buffer content at the woke offset given on the woke host if.
+ *  It also does alignment considerations to do the woke writes in most efficient
+ *  way.  Also fills up the woke sum of the woke buffer in *buffer parameter.
  **/
 static s32 e1000_mng_host_if_write(struct e1000_hw *hw, u8 *buffer,
 				   u16 length, u16 offset, u8 *sum)
@@ -186,7 +186,7 @@ static s32 e1000_mng_host_if_write(struct e1000_hw *hw, u8 *buffer,
 	u32 data = 0;
 	u16 remaining, i, j, prev_bytes;
 
-	/* sum = only sum of the data and it is not checksum */
+	/* sum = only sum of the woke data and it is not checksum */
 
 	if (length == 0 || offset + length > E1000_HI_MAX_MNG_DATA_LENGTH)
 		return -E1000_ERR_PARAM;
@@ -212,7 +212,7 @@ static s32 e1000_mng_host_if_write(struct e1000_hw *hw, u8 *buffer,
 	/* Calculate length in DWORDs */
 	length >>= 2;
 
-	/* The device driver writes the relevant command block into the
+	/* The device driver writes the woke relevant command block into the
 	 * ram area.
 	 */
 	for (i = 0; i < length; i++) {
@@ -240,11 +240,11 @@ static s32 e1000_mng_host_if_write(struct e1000_hw *hw, u8 *buffer,
 
 /**
  *  e1000e_mng_write_dhcp_info - Writes DHCP info to host interface
- *  @hw: pointer to the HW structure
- *  @buffer: pointer to the host interface
- *  @length: size of the buffer
+ *  @hw: pointer to the woke HW structure
+ *  @buffer: pointer to the woke host interface
+ *  @length: size of the woke buffer
  *
- *  Writes the DHCP information to the host interface.
+ *  Writes the woke DHCP information to the woke host interface.
  **/
 s32 e1000e_mng_write_dhcp_info(struct e1000_hw *hw, u8 *buffer, u16 length)
 {
@@ -258,23 +258,23 @@ s32 e1000e_mng_write_dhcp_info(struct e1000_hw *hw, u8 *buffer, u16 length)
 	hdr.reserved2 = 0;
 	hdr.checksum = 0;
 
-	/* Enable the host interface */
+	/* Enable the woke host interface */
 	ret_val = e1000_mng_enable_host_if(hw);
 	if (ret_val)
 		return ret_val;
 
-	/* Populate the host interface with the contents of "buffer". */
+	/* Populate the woke host interface with the woke contents of "buffer". */
 	ret_val = e1000_mng_host_if_write(hw, buffer, length,
 					  sizeof(hdr), &(hdr.checksum));
 	if (ret_val)
 		return ret_val;
 
-	/* Write the manageability command header */
+	/* Write the woke manageability command header */
 	ret_val = e1000_mng_write_cmd_header(hw, &hdr);
 	if (ret_val)
 		return ret_val;
 
-	/* Tell the ARC a new command is pending. */
+	/* Tell the woke ARC a new command is pending. */
 	hicr = er32(HICR);
 	ew32(HICR, hicr | E1000_HICR_C);
 
@@ -283,10 +283,10 @@ s32 e1000e_mng_write_dhcp_info(struct e1000_hw *hw, u8 *buffer, u16 length)
 
 /**
  *  e1000e_enable_mng_pass_thru - Check if management passthrough is needed
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Verifies the hardware needs to leave interface enabled so that frames can
- *  be directed to and from the management interface.
+ *  Verifies the woke hardware needs to leave interface enabled so that frames can
+ *  be directed to and from the woke management interface.
  **/
 bool e1000e_enable_mng_pass_thru(struct e1000_hw *hw)
 {

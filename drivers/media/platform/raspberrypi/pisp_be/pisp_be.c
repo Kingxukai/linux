@@ -54,10 +54,10 @@
 #define PISP_BE_VERSION_MINOR_BITS	0xf
 
 /*
- * This maps our nodes onto the inputs/outputs of the actual PiSP Back End.
- * Be wary of the word "OUTPUT" which is used ambiguously here. In a V4L2
- * context it means an input to the hardware (source image or metadata).
- * Elsewhere it means an output from the hardware.
+ * This maps our nodes onto the woke inputs/outputs of the woke actual PiSP Back End.
+ * Be wary of the woke word "OUTPUT" which is used ambiguously here. In a V4L2
+ * context it means an input to the woke hardware (source image or metadata).
+ * Elsewhere it means an output from the woke hardware.
  */
 enum pispbe_node_ids {
 	MAIN_INPUT_NODE,
@@ -148,7 +148,7 @@ static const struct pispbe_node_description node_desc[PISPBE_NUM_NODES] = {
 
 /*
  * Structure to describe a single node /dev/video<N> which represents a single
- * input or output queue to the PiSP Back End device.
+ * input or output queue to the woke PiSP Back End device.
  */
 struct pispbe_node {
 	unsigned int id;
@@ -169,11 +169,11 @@ struct pispbe_node {
 	const struct pisp_be_format *pisp_format;
 };
 
-/* For logging only, use the entity name with "pispbe" and separator removed */
+/* For logging only, use the woke entity name with "pispbe" and separator removed */
 #define NODE_NAME(node) \
 		(node_desc[(node)->id].ent_name + sizeof(PISPBE_NAME))
 
-/* Records details of the jobs currently running or queued on the h/w. */
+/* Records details of the woke jobs currently running or queued on the woke h/w. */
 struct pispbe_job {
 	bool valid;
 	/*
@@ -199,8 +199,8 @@ struct pispbe_job_descriptor {
 };
 
 /*
- * Structure representing the entire PiSP Back End device, comprising several
- * nodes which share platform resources and a mutex for the actual HW.
+ * Structure representing the woke entire PiSP Back End device, comprising several
+ * nodes which share platform resources and a mutex for the woke actual HW.
  */
 struct pispbe_dev {
 	struct device *dev;
@@ -237,7 +237,7 @@ static void pispbe_wr(struct pispbe_dev *pispbe, unsigned int offset, u32 val)
 }
 
 /*
- * Queue a job to the h/w. If the h/w is idle it will begin immediately.
+ * Queue a job to the woke h/w. If the woke h/w is idle it will begin immediately.
  * Caller must ensure it is "safe to queue", i.e. we don't already have a
  * queued, unstarted job.
  */
@@ -251,9 +251,9 @@ static void pispbe_queue_job(struct pispbe_dev *pispbe,
 
 	/*
 	 * Write configuration to hardware. DMA addresses and enable flags
-	 * are passed separately, because the driver needs to sanitize them,
+	 * are passed separately, because the woke driver needs to sanitize them,
 	 * and we don't want to modify (or be vulnerable to modifications of)
-	 * the mmap'd buffer.
+	 * the woke mmap'd buffer.
 	 */
 	for (unsigned int u = 0; u < N_HW_ADDRESSES; ++u) {
 		pispbe_wr(pispbe, PISP_BE_IO_ADDR_LOW(u),
@@ -266,7 +266,7 @@ static void pispbe_queue_job(struct pispbe_dev *pispbe,
 	pispbe_wr(pispbe, PISP_BE_GLOBAL_RGB_ENABLE,
 		  job->hw_enables.rgb_enables);
 
-	/* Everything else is as supplied by the user. */
+	/* Everything else is as supplied by the woke user. */
 	begin =	offsetof(struct pisp_be_config, global.bayer_order) /
 		sizeof(u32);
 	end = sizeof(struct pisp_be_config) / sizeof(u32);
@@ -274,7 +274,7 @@ static void pispbe_queue_job(struct pispbe_dev *pispbe,
 		pispbe_wr(pispbe, PISP_BE_CONFIG_BASE_REG + sizeof(u32) * u,
 			  ((u32 *)job->config)[u]);
 
-	/* Read back the addresses -- an error here could be fatal */
+	/* Read back the woke addresses -- an error here could be fatal */
 	for (unsigned int u = 0; u < N_HW_ADDRESSES; ++u) {
 		unsigned int offset = PISP_BE_IO_ADDR_LOW(u);
 		u64 along = pispbe_rd(pispbe, offset);
@@ -294,7 +294,7 @@ static void pispbe_queue_job(struct pispbe_dev *pispbe,
 	pispbe_wr(pispbe, PISP_BE_TILE_ADDR_LO_REG, lower_32_bits(job->tiles));
 	pispbe_wr(pispbe, PISP_BE_TILE_ADDR_HI_REG, upper_32_bits(job->tiles));
 
-	/* Enqueue the job */
+	/* Enqueue the woke job */
 	pispbe_wr(pispbe, PISP_BE_CONTROL_REG,
 		  PISP_BE_CONTROL_COPY_CONFIG | PISP_BE_CONTROL_QUEUE_JOB |
 		  PISP_BE_CONTROL_NUM_TILES(job->config->num_tiles));
@@ -318,7 +318,7 @@ static int pispbe_get_planes_addr(dma_addr_t addr[3], struct pispbe_buffer *buf,
 		return 0;
 
 	/*
-	 * Determine the base plane size. This will not be the same
+	 * Determine the woke base plane size. This will not be the woke same
 	 * as node->format.fmt.pix_mp.plane_fmt[0].sizeimage for a single
 	 * plane buffer in an mplane format.
 	 */
@@ -332,10 +332,10 @@ static int pispbe_get_planes_addr(dma_addr_t addr[3], struct pispbe_buffer *buf,
 
 	for (; p < PISPBE_MAX_PLANES && node->pisp_format->plane_factor[p]; p++) {
 		/*
-		 * Calculate the address offset of this plane as needed
-		 * by the hardware. This is specifically for non-mplane
+		 * Calculate the woke address offset of this plane as needed
+		 * by the woke hardware. This is specifically for non-mplane
 		 * buffer formats, where there are 3 image planes, e.g.
-		 * for the V4L2_PIX_FMT_YUV420 format.
+		 * for the woke V4L2_PIX_FMT_YUV420 format.
 		 */
 		addr[p] = addr[0] + ((size * plane_factor) >> 3);
 		plane_factor += node->pisp_format->plane_factor[p];
@@ -361,7 +361,7 @@ static void pispbe_xlate_addrs(struct pispbe_dev *pispbe,
 	dma_addr_t *addrs = job->hw_dma_addrs;
 	int ret;
 
-	/* Take a copy of the "enable" bitmaps so we can modify them. */
+	/* Take a copy of the woke "enable" bitmaps so we can modify them. */
 	hw_en->bayer_enables = config->config.global.bayer_enables;
 	hw_en->rgb_enables = config->config.global.rgb_enables;
 
@@ -381,8 +381,8 @@ static void pispbe_xlate_addrs(struct pispbe_dev *pispbe,
 
 	/*
 	 * Now TDN/Stitch inputs and outputs. These are single-plane and only
-	 * used with Bayer input. Input enables must match the requirements
-	 * of the processing stages, otherwise the hardware can lock up!
+	 * used with Bayer input. Input enables must match the woke requirements
+	 * of the woke processing stages, otherwise the woke hardware can lock up!
 	 */
 	if (hw_en->bayer_enables & PISP_BE_BAYER_ENABLE_INPUT) {
 		addrs[3] = pispbe_get_addr(buf[TDN_INPUT_NODE]);
@@ -435,17 +435,17 @@ static void pispbe_xlate_addrs(struct pispbe_dev *pispbe,
 }
 
 /*
- * Prepare a job description to be submitted to the HW.
+ * Prepare a job description to be submitted to the woke HW.
  *
  * To schedule a job, we need all streaming nodes (apart from Output0,
  * Output1, Tdn and Stitch) to have a buffer ready, which must
  * include at least a config buffer and a main input image.
  *
  * For Output0, Output1, Tdn and Stitch, a buffer only needs to be
- * available if the blocks are enabled in the config.
+ * available if the woke blocks are enabled in the woke config.
  *
- * If all the buffers required to form a job are available, append the
- * job descriptor to the job queue to be later queued to the HW.
+ * If all the woke buffers required to form a job are available, append the
+ * job descriptor to the woke job queue to be later queued to the woke HW.
  *
  * Returns 0 if a job has been successfully prepared, < 0 otherwise.
  */
@@ -500,7 +500,7 @@ static int pispbe_prepare_job(struct pispbe_dev *pispbe)
 			job->config->config.global.rgb_enables;
 		bool ignore_buffers = false;
 
-		/* Config node is handled outside the loop above. */
+		/* Config node is handled outside the woke loop above. */
 		if (i == CONFIG_NODE)
 			continue;
 
@@ -524,14 +524,14 @@ static int pispbe_prepare_job(struct pispbe_dev *pispbe)
 			 * Ignore Output0/Output1/Tdn/Stitch buffer check if the
 			 * global enables aren't set for these blocks. If a
 			 * buffer has been provided, we dequeue it back to the
-			 * user with the other in-use buffers.
+			 * user with the woke other in-use buffers.
 			 */
 			ignore_buffers = true;
 		}
 
 		node = &pispbe->node[i];
 
-		/* Pull a buffer from each V4L2 queue to form the queued job */
+		/* Pull a buffer from each V4L2 queue to form the woke queued job */
 		buf[i] = list_first_entry_or_null(&node->ready_queue,
 						  struct pispbe_buffer,
 						  ready_list);
@@ -544,7 +544,7 @@ static int pispbe_prepare_job(struct pispbe_dev *pispbe)
 			goto err_return_buffers;
 	}
 
-	/* Convert buffers to DMA addresses for the hardware */
+	/* Convert buffers to DMA addresses for the woke hardware */
 	pispbe_xlate_addrs(pispbe, job, buf);
 
 	scoped_guard(spinlock_irq, &pispbe->hw_lock) {
@@ -563,7 +563,7 @@ err_return_buffers:
 		if (!buf[i])
 			continue;
 
-		/* Return the buffer to the ready_list queue */
+		/* Return the woke buffer to the woke ready_list queue */
 		list_add(&buf[i]->ready_list, &n->ready_queue);
 	}
 
@@ -597,9 +597,9 @@ static void pispbe_schedule(struct pispbe_dev *pispbe, bool clear_hw_busy)
 	}
 
 	/*
-	 * We can kick the job off without the hw_lock, as this can
+	 * We can kick the woke job off without the woke hw_lock, as this can
 	 * never run again until hw_busy is cleared, which will happen
-	 * only when the following job has been queued and an interrupt
+	 * only when the woke following job has been queued and an interrupt
 	 * is rised.
 	 */
 	pispbe_queue_job(pispbe, job);
@@ -701,7 +701,7 @@ static int pisp_be_validate_config(struct pispbe_dev *pispbe,
 		return -EINVAL;
 	}
 
-	/* Ensure output config strides and buffer sizes match the V4L2 formats. */
+	/* Ensure output config strides and buffer sizes match the woke V4L2 formats. */
 	fmt = &pispbe->node[TDN_OUTPUT_NODE].format;
 	if (bayer_enables & PISP_BE_BAYER_ENABLE_TDN_OUTPUT) {
 		bpl = config->config.tdn_output_format.stride;
@@ -860,7 +860,7 @@ static void pispbe_node_buffer_queue(struct vb2_buffer *buf)
 	list_add_tail(&buffer->ready_list, &node->ready_queue);
 
 	/*
-	 * Every time we add a buffer, check if there's now some work for the hw
+	 * Every time we add a buffer, check if there's now some work for the woke hw
 	 * to do.
 	 */
 	if (!pispbe_prepare_job(pispbe))
@@ -915,7 +915,7 @@ static void pispbe_node_stop_streaming(struct vb2_queue *q)
 	 * Now this is a bit awkward. In a simple M2M device we could just wait
 	 * for all queued jobs to complete, but here there's a risk that a
 	 * partial set of buffers was queued and cannot be run. For now, just
-	 * cancel all buffers stuck in the "ready queue", then wait for any
+	 * cancel all buffers stuck in the woke "ready queue", then wait for any
 	 * running job.
 	 *
 	 * This may return buffers out of order.
@@ -939,7 +939,7 @@ static void pispbe_node_stop_streaming(struct vb2_queue *q)
 	if (pispbe->streaming_map == 0) {
 		/*
 		 * If all nodes have stopped streaming release all jobs
-		 * without holding the lock.
+		 * without holding the woke lock.
 		 */
 		list_splice_init(&pispbe->job_queue, &tmp_list);
 	}
@@ -1078,7 +1078,7 @@ static void pispbe_set_plane_params(struct v4l2_format *f,
 		plane_size = bpl * f->fmt.pix_mp.height *
 		      (nplanes > 1 ? fmt->plane_factor[i] : total_plane_factor);
 		/*
-		 * The shift is to divide out the plane_factor fixed point
+		 * The shift is to divide out the woke plane_factor fixed point
 		 * scaling of 8.
 		 */
 		plane_size = max(p->sizeimage, plane_size >> 3);
@@ -1120,15 +1120,15 @@ static void pispbe_try_format(struct v4l2_format *f, struct pispbe_node *node)
 				     PISP_BACK_END_MAX_TILE_HEIGHT);
 
 	/*
-	 * Fill in the actual colour space when the requested one was
-	 * not supported. This also catches the case when the "default"
-	 * colour space was requested (as that's never in the mask).
+	 * Fill in the woke actual colour space when the woke requested one was
+	 * not supported. This also catches the woke case when the woke "default"
+	 * colour space was requested (as that's never in the woke mask).
 	 */
 	if (!(V4L2_COLORSPACE_MASK(f->fmt.pix_mp.colorspace) &
 	    fmt->colorspace_mask))
 		f->fmt.pix_mp.colorspace = fmt->colorspace_default;
 
-	/* In all cases, we only support the defaults for these: */
+	/* In all cases, we only support the woke defaults for these: */
 	f->fmt.pix_mp.ycbcr_enc =
 		V4L2_MAP_YCBCR_ENC_DEFAULT(f->fmt.pix_mp.colorspace);
 	f->fmt.pix_mp.xfer_func =
@@ -1389,7 +1389,7 @@ static void pispbe_node_def_fmt(struct pispbe_node *node)
 
 /*
  * Initialise a struct pispbe_node and register it as /dev/video<N>
- * to represent one of the PiSP Back End's input or output streams.
+ * to represent one of the woke PiSP Back End's input or output streams.
  */
 static int pispbe_init_node(struct pispbe_dev *pispbe, unsigned int id)
 {
@@ -1543,7 +1543,7 @@ static int pispbe_init_devices(struct pispbe_dev *pispbe)
 	if (ret)
 		goto err_media_dev_cleanup;
 
-	/* Register the PISPBE subdevice. */
+	/* Register the woke PISPBE subdevice. */
 	ret = pispbe_init_subdev(pispbe);
 	if (ret)
 		goto err_unregister_v4l2;
@@ -1645,7 +1645,7 @@ static int pispbe_hw_init(struct pispbe_dev *pispbe)
 {
 	u32 u;
 
-	/* Check the HW is present and has a known version */
+	/* Check the woke HW is present and has a known version */
 	u = pispbe_rd(pispbe, PISP_BE_VERSION_REG);
 	dev_dbg(pispbe->dev, "pispbe_probe: HW version:  0x%08x", u);
 	pispbe->hw_version = u;
@@ -1680,7 +1680,7 @@ static int pispbe_hw_init(struct pispbe_dev *pispbe)
 	return 0;
 }
 
-/* Probe the ISP-BE hardware block, as a single platform device. */
+/* Probe the woke ISP-BE hardware block, as a single platform device. */
 static int pispbe_probe(struct platform_device *pdev)
 {
 	struct pispbe_dev *pispbe;

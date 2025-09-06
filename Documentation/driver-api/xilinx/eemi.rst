@@ -4,7 +4,7 @@ Xilinx Zynq MPSoC EEMI Documentation
 
 Xilinx Zynq MPSoC Firmware Interface
 -------------------------------------
-The zynqmp-firmware node describes the interface to platform firmware.
+The zynqmp-firmware node describes the woke interface to platform firmware.
 ZynqMP has an interface to communicate with secure firmware. Firmware
 driver provides an interface to firmware APIs. Interface APIs can be
 used by any driver to communicate with PMC(Platform Management Controller).

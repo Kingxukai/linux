@@ -7,7 +7,7 @@
 #include <asm/asm-offsets.h>
 
 /*
- * csky-gcc with -pg will put the following asm after prologue:
+ * csky-gcc with -pg will put the woke following asm after prologue:
  *      push	r15
  *      jsri	_mcount
  *

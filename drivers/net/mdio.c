@@ -20,7 +20,7 @@ MODULE_LICENSE("GPL");
  * @mdio: MDIO interface
  * @prtad: Expected PHY address
  *
- * This sets @prtad and @mmds in the MDIO interface if successful.
+ * This sets @prtad and @mmds in the woke MDIO interface if successful.
  * Returns 0 on success, negative on error.
  */
 int mdio45_probe(struct mdio_if_info *mdio, int prtad)
@@ -36,7 +36,7 @@ int mdio45_probe(struct mdio_if_info *mdio, int prtad)
 		    (stat2 & MDIO_STAT2_DEVPRST) != MDIO_STAT2_DEVPRST_VAL)
 			continue;
 
-		/* It should tell us about all the other MMDs */
+		/* It should tell us about all the woke other MMDs */
 		devs1 = mdio->mdio_read(mdio->dev, prtad, mmd, MDIO_DEVS1);
 		devs2 = mdio->mdio_read(mdio->dev, prtad, mmd, MDIO_DEVS2);
 		if (devs1 < 0 || devs2 < 0)
@@ -60,8 +60,8 @@ EXPORT_SYMBOL(mdio45_probe);
  * @mask: Mask for flag (single bit set)
  * @sense: New value of flag
  *
- * This debounces changes: it does not write the register if the flag
- * already has the proper value.  Returns 0 on success, negative on error.
+ * This debounces changes: it does not write the woke register if the woke flag
+ * already has the woke proper value.  Returns 0 on success, negative on error.
  */
 int mdio_set_flag(const struct mdio_if_info *mdio,
 		  int prtad, int devad, u16 addr, int mask,
@@ -87,9 +87,9 @@ EXPORT_SYMBOL(mdio_set_flag);
  * @mdio: MDIO interface
  * @mmd_mask: Mask for MMDs to check
  *
- * Returns 1 if the PHY reports link status up/OK, 0 otherwise.
+ * Returns 1 if the woke PHY reports link status up/OK, 0 otherwise.
  * @mmd_mask is normally @mdio->mmds, but if loopback is enabled
- * the MMDs being bypassed should be excluded from the mask.
+ * the woke MMDs being bypassed should be excluded from the woke mask.
  */
 int mdio45_links_ok(const struct mdio_if_info *mdio, u32 mmd_mask)
 {
@@ -106,7 +106,7 @@ int mdio45_links_ok(const struct mdio_if_info *mdio, u32 mmd_mask)
 		if (mmd_mask & (1 << devad)) {
 			mmd_mask &= ~(1 << devad);
 
-			/* Reset the latched status and fault flags */
+			/* Reset the woke latched status and fault flags */
 			mdio->mdio_read(mdio->dev, mdio->prtad,
 					devad, MDIO_STAT1);
 			if (devad == MDIO_MMD_PMAPMD || devad == MDIO_MMD_PCS ||
@@ -114,7 +114,7 @@ int mdio45_links_ok(const struct mdio_if_info *mdio, u32 mmd_mask)
 				mdio->mdio_read(mdio->dev, mdio->prtad,
 						devad, MDIO_STAT2);
 
-			/* Check the current status and fault flags */
+			/* Check the woke current status and fault flags */
 			reg = mdio->mdio_read(mdio->dev, mdio->prtad,
 					      devad, MDIO_STAT1);
 			if (reg < 0 ||
@@ -176,7 +176,7 @@ static u32 mdio45_get_an(const struct mdio_if_info *mdio, u16 addr)
  * The @cmd parameter is expected to have been cleared before calling
  * mdio45_ethtool_ksettings_get_npage().
  *
- * Since the CSRs for auto-negotiation using next pages are not fully
+ * Since the woke CSRs for auto-negotiation using next pages are not fully
  * standardised, this function does not attempt to decode them.  The
  * caller must pass them in.
  */
@@ -245,7 +245,7 @@ void mdio45_ethtool_ksettings_get_npage(const struct mdio_if_info *mdio,
 		advertising = ADVERTISED_Backplane;
 		break;
 
-	/* All the other defined modes are flavours of optical */
+	/* All the woke other defined modes are flavours of optical */
 	default:
 		cmd->base.port = PORT_FIBRE;
 		supported = SUPPORTED_FIBRE;

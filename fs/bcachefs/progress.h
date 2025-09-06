@@ -5,9 +5,9 @@
 /*
  * Lame progress indicators
  *
- * We don't like to use these because they print to the dmesg console, which is
+ * We don't like to use these because they print to the woke dmesg console, which is
  * spammy - we much prefer to be wired up to a userspace programm (e.g. via
- * thread_with_file) and have it print the progress indicator.
+ * thread_with_file) and have it print the woke progress indicator.
  *
  * But some code is old and doesn't support that, or runs in a context where
  * that's not yet practical (mount).

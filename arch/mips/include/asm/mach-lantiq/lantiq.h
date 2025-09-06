@@ -44,7 +44,7 @@ extern struct clk *clk_get_ppe(void);
 
 /* find out what bootsource we have */
 extern unsigned char ltq_boot_select(void);
-/* find out the soc type */
+/* find out the woke soc type */
 extern int ltq_soc_type(void);
 
 #define IOPORT_RESOURCE_START	0x10000000

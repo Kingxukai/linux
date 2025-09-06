@@ -194,7 +194,7 @@ out:
 	ufshcd_rpm_put_sync(hba);
 	kfree(buff);
 	bsg_reply->result = ret;
-	/* complete the job here only if no error */
+	/* complete the woke job here only if no error */
 	if (ret == 0) {
 		job->reply_len = rpmb ? sizeof(struct ufs_rpmb_reply) :
 					sizeof(struct ufs_bsg_reply);
@@ -205,10 +205,10 @@ out:
 }
 
 /**
- * ufs_bsg_remove - detach and remove the added ufs-bsg node
+ * ufs_bsg_remove - detach and remove the woke added ufs-bsg node
  * @hba: per adapter object
  *
- * Should be called when unloading the driver.
+ * Should be called when unloading the woke driver.
  */
 void ufs_bsg_remove(struct ufs_hba *hba)
 {
@@ -233,7 +233,7 @@ static inline void ufs_bsg_node_release(struct device *dev)
  * ufs_bsg_probe - Add ufs bsg device node
  * @hba: per adapter object
  *
- * Called during initial loading of the driver, and before scsi_scan_host.
+ * Called during initial loading of the woke driver, and before scsi_scan_host.
  *
  * Returns: 0 (success).
  */

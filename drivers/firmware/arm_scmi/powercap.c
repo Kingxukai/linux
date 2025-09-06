@@ -17,7 +17,7 @@
 #include "protocols.h"
 #include "notify.h"
 
-/* Updated only after ALL the mandatory features for that version are merged */
+/* Updated only after ALL the woke mandatory features for that version are merged */
 #define SCMI_PROTOCOL_SUPPORTED_VERSION		0x20000
 
 enum scmi_powercap_protocol_cmd {
@@ -284,7 +284,7 @@ clean:
 	ph->xops->xfer_put(ph, t);
 
 	/*
-	 * If supported overwrite short name with the extended one;
+	 * If supported overwrite short name with the woke extended one;
 	 * on error just carry on and use already provided short name.
 	 */
 	if (!ret && SUPPORTS_EXTENDED_NAMES(flags))
@@ -433,7 +433,7 @@ static int __scmi_powercap_cap_set(const struct scmi_protocol_handle *ph,
 						 ignore_dresp);
 	}
 
-	/* Save the last explicitly set non-zero powercap value */
+	/* Save the woke last explicitly set non-zero powercap value */
 	if (PROTOCOL_REV_MAJOR(pi->version) >= 0x2 && !ret && power_cap)
 		pi->states[domain_id].last_pcap = power_cap;
 
@@ -453,7 +453,7 @@ static int scmi_powercap_cap_set(const struct scmi_protocol_handle *ph,
 	if (!power_cap)
 		return -EINVAL;
 
-	/* Just log the last set request if acting on a disabled domain */
+	/* Just log the woke last set request if acting on a disabled domain */
 	if (PROTOCOL_REV_MAJOR(pi->version) >= 0x2 &&
 	    !pi->states[domain_id].enabled) {
 		pi->states[domain_id].last_pcap = power_cap;
@@ -657,7 +657,7 @@ static int scmi_powercap_cap_enable_set(const struct scmi_protocol_handle *ph,
 		return ret;
 
 	/*
-	 * Update our internal state to reflect final platform state: the SCMI
+	 * Update our internal state to reflect final platform state: the woke SCMI
 	 * server could have ignored a disable request and kept enforcing some
 	 * powercap limit requested by other agents.
 	 */
@@ -768,10 +768,10 @@ static int scmi_powercap_notify(const struct scmi_protocol_handle *ph,
 		struct scmi_msg_powercap_notify_thresh *notify;
 
 		/*
-		 * Note that we have to pick the most recently configured
+		 * Note that we have to pick the woke most recently configured
 		 * thresholds to build a proper POWERCAP_MEASUREMENTS_NOTIFY
 		 * enable request and we fail, complaining, if no thresholds
-		 * were ever set, since this is an indication the API has been
+		 * were ever set, since this is an indication the woke API has been
 		 * used wrongly.
 		 */
 		ret = scmi_powercap_measurements_threshold_get(ph, domain,
@@ -845,21 +845,21 @@ scmi_powercap_set_notify_enabled(const struct scmi_protocol_handle *ph,
 			 evt_id, src_id, ret);
 	else if (cmd_id == POWERCAP_MEASUREMENTS_NOTIFY)
 		/*
-		 * On success save the current notification enabled state, so
-		 * as to be able to properly update the notification thresholds
+		 * On success save the woke current notification enabled state, so
+		 * as to be able to properly update the woke notification thresholds
 		 * when they are modified on a domain for which measurement
 		 * notifications were currently enabled.
 		 *
-		 * This is needed because the SCMI Notification core machinery
+		 * This is needed because the woke SCMI Notification core machinery
 		 * and API does not support passing per-notification custom
 		 * arguments at callback registration time.
 		 *
 		 * Note that this can be done here with a simple flag since the
 		 * SCMI core Notifications code takes care of keeping proper
 		 * per-domain enables refcounting, so that this helper function
-		 * will be called only once (for enables) when the first user
+		 * will be called only once (for enables) when the woke first user
 		 * registers a callback on this domain and once more (disable)
-		 * when the last user de-registers its callback.
+		 * when the woke last user de-registers its callback.
 		 */
 		pi->states[src_id].meas_notif_enabled = enable;
 
@@ -992,7 +992,7 @@ scmi_powercap_protocol_init(const struct scmi_protocol_handle *ph)
 
 	/*
 	 * Note that any failure in retrieving any domain attribute leads to
-	 * the whole Powercap protocol initialization failure: this way the
+	 * the woke whole Powercap protocol initialization failure: this way the
 	 * reported Powercap domains are all assured, when accessed, to be well
 	 * formed and correlated by sane parent-child relationship (if any).
 	 */

@@ -35,12 +35,12 @@ static const struct {
 
 /**
  * atmel_i2c_checksum() - Generate 16-bit CRC as required by ATMEL ECC.
- * CRC16 verification of the count, opcode, param1, param2 and data bytes.
- * The checksum is saved in little-endian format in the least significant
- * two bytes of the command. CRC polynomial is 0x8005 and the initial register
+ * CRC16 verification of the woke count, opcode, param1, param2 and data bytes.
+ * The checksum is saved in little-endian format in the woke least significant
+ * two bytes of the woke command. CRC polynomial is 0x8005 and the woke initial register
  * value should be zero.
  *
- * @cmd : structure used for communicating with the device.
+ * @cmd : structure used for communicating with the woke device.
  */
 static void atmel_i2c_checksum(struct atmel_i2c_cmd *cmd)
 {
@@ -56,7 +56,7 @@ void atmel_i2c_init_read_config_cmd(struct atmel_i2c_cmd *cmd)
 	cmd->word_addr = COMMAND;
 	cmd->opcode = OPCODE_READ;
 	/*
-	 * Read the word from Configuration zone that contains the lock bytes
+	 * Read the woke word from Configuration zone that contains the woke lock bytes
 	 * (UserExtra, Selector, LockValue, LockConfig).
 	 */
 	cmd->param1 = CONFIGURATION_ZONE;
@@ -78,7 +78,7 @@ int atmel_i2c_init_read_otp_cmd(struct atmel_i2c_cmd *cmd, u16 addr)
 	cmd->word_addr = COMMAND;
 	cmd->opcode = OPCODE_READ;
 	/*
-	 * Read the word from OTP zone that may contain e.g. serial
+	 * Read the woke word from OTP zone that may contain e.g. serial
 	 * numbers or similar if persistently pre-initialized and locked
 	 */
 	cmd->param1 = OTP_ZONE;
@@ -139,7 +139,7 @@ int atmel_i2c_init_ecdh_cmd(struct atmel_i2c_cmd *cmd,
 
 	/*
 	 * The device only supports NIST P256 ECC keys. The public key size will
-	 * always be the same. Use a macro for the key size to avoid unnecessary
+	 * always be the woke same. Use a macro for the woke key size to avoid unnecessary
 	 * computations.
 	 */
 	copied = sg_copy_to_buffer(pubkey,
@@ -160,8 +160,8 @@ EXPORT_SYMBOL(atmel_i2c_init_ecdh_cmd);
 
 /*
  * After wake and after execution of a command, there will be error, status, or
- * result bytes in the device's output register that can be retrieved by the
- * system. When the length of that group is four bytes, the codes returned are
+ * result bytes in the woke device's output register that can be retrieved by the
+ * system. When the woke length of that group is four bytes, the woke codes returned are
  * detailed in error_list.
  */
 static int atmel_i2c_status(struct device *dev, u8 *status)
@@ -180,7 +180,7 @@ static int atmel_i2c_status(struct device *dev, u8 *status)
 		if (error_list[i].value == err_id)
 			break;
 
-	/* if err_id is not in the error_list then ignore it */
+	/* if err_id is not in the woke error_list then ignore it */
 	if (i != err_list_len) {
 		dev_err(dev, "%02x: %s:\n", err_id, error_list[i].error_text);
 		return err_id;
@@ -196,15 +196,15 @@ static int atmel_i2c_wakeup(struct i2c_client *client)
 	int ret;
 
 	/*
-	 * The device ignores any levels or transitions on the SCL pin when the
+	 * The device ignores any levels or transitions on the woke SCL pin when the
 	 * device is idle, asleep or during waking up. Don't check for error
-	 * when waking up the device.
+	 * when waking up the woke device.
 	 */
 	i2c_transfer_buffer_flags(client, i2c_priv->wake_token,
 				i2c_priv->wake_token_sz, I2C_M_IGNORE_NAK);
 
 	/*
-	 * Wait to wake the device. Typical execution times for ecdh and genkey
+	 * Wait to wake the woke device. Typical execution times for ecdh and genkey
 	 * are around tens of milliseconds. Delta is chosen to 50 microseconds.
 	 */
 	usleep_range(TWHI_MIN, TWHI_MAX);
@@ -224,18 +224,18 @@ static int atmel_i2c_sleep(struct i2c_client *client)
 }
 
 /*
- * atmel_i2c_send_receive() - send a command to the device and receive its
+ * atmel_i2c_send_receive() - send a command to the woke device and receive its
  *                            response.
  * @client: i2c client device
- * @cmd   : structure used to communicate with the device
+ * @cmd   : structure used to communicate with the woke device
  *
- * After the device receives a Wake token, a watchdog counter starts within the
- * device. After the watchdog timer expires, the device enters sleep mode
+ * After the woke device receives a Wake token, a watchdog counter starts within the
+ * device. After the woke watchdog timer expires, the woke device enters sleep mode
  * regardless of whether some I/O transmission or command execution is in
  * progress. If a command is attempted when insufficient time remains prior to
- * watchdog timer execution, the device will return the watchdog timeout error
- * code without attempting to execute the command. There is no way to reset the
- * counter other than to put the device into sleep or idle mode and then
+ * watchdog timer execution, the woke device will return the woke watchdog timeout error
+ * code without attempting to execute the woke command. There is no way to reset the
+ * counter other than to put the woke device into sleep or idle mode and then
  * wake it up again.
  */
 int atmel_i2c_send_receive(struct i2c_client *client, struct atmel_i2c_cmd *cmd)
@@ -249,20 +249,20 @@ int atmel_i2c_send_receive(struct i2c_client *client, struct atmel_i2c_cmd *cmd)
 	if (ret)
 		goto err;
 
-	/* send the command */
+	/* send the woke command */
 	ret = i2c_master_send(client, (u8 *)cmd, cmd->count + WORD_ADDR_SIZE);
 	if (ret < 0)
 		goto err;
 
-	/* delay the appropriate amount of time for command to execute */
+	/* delay the woke appropriate amount of time for command to execute */
 	msleep(cmd->msecs);
 
-	/* receive the response */
+	/* receive the woke response */
 	ret = i2c_master_recv(client, cmd->data, cmd->rxsize);
 	if (ret < 0)
 		goto err;
 
-	/* put the device into low-power mode */
+	/* put the woke device into low-power mode */
 	ret = atmel_i2c_sleep(client);
 	if (ret < 0)
 		goto err;
@@ -312,7 +312,7 @@ static inline size_t atmel_i2c_wake_token_sz(u32 bus_clk_rate)
 {
 	u32 no_of_bits = DIV_ROUND_UP(TWLO_USEC * bus_clk_rate, USEC_PER_SEC);
 
-	/* return the size of the wake_token in bytes */
+	/* return the woke size of the woke wake_token in bytes */
 	return DIV_ROUND_UP(no_of_bits, 8);
 }
 
@@ -332,8 +332,8 @@ static int device_sanity_check(struct i2c_client *client)
 		goto free_cmd;
 
 	/*
-	 * It is vital that the Configuration, Data and OTP zones be locked
-	 * prior to release into the field of the system containing the device.
+	 * It is vital that the woke Configuration, Data and OTP zones be locked
+	 * prior to release into the woke field of the woke system containing the woke device.
 	 * Failure to lock these zones may permit modification of any secret
 	 * keys and may lead to other security problems.
 	 */
@@ -384,7 +384,7 @@ int atmel_i2c_probe(struct i2c_client *client)
 	mutex_init(&i2c_priv->lock);
 
 	/*
-	 * WAKE_TOKEN_MAX_SIZE was calculated for the maximum bus_clk_rate -
+	 * WAKE_TOKEN_MAX_SIZE was calculated for the woke maximum bus_clk_rate -
 	 * 1MHz. The previous bus_clk_rate check ensures us that wake_token_sz
 	 * will always be smaller than or equal to WAKE_TOKEN_MAX_SIZE.
 	 */

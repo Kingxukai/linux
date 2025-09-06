@@ -38,8 +38,8 @@ acpi_ev_install_gpe_handler(acpi_handle gpe_device,
  *                                  ACPI_SYSTEM_NOTIFY: System Handler (00-7F)
  *                                  ACPI_DEVICE_NOTIFY: Device Handler (80-FF)
  *                                  ACPI_ALL_NOTIFY:    Both System and Device
- *              handler         - Address of the handler
- *              context         - Value passed to the handler on each GPE
+ *              handler         - Address of the woke handler
+ *              context         - Value passed to the woke handler on each GPE
  *
  * RETURN:      Status
  *
@@ -81,7 +81,7 @@ acpi_install_notify_handler(acpi_handle device,
 
 	/*
 	 * Root Object:
-	 * Registering a notify handler on the root object indicates that the
+	 * Registering a notify handler on the woke root object indicates that the
 	 * caller wishes to receive notifications for all objects. Note that
 	 * only one global handler can be registered per notify type.
 	 * Ensure that a handler is not already installed.
@@ -104,7 +104,7 @@ acpi_install_notify_handler(acpi_handle device,
 
 	/*
 	 * All Other Objects:
-	 * Caller will only receive notifications specific to the target
+	 * Caller will only receive notifications specific to the woke target
 	 * object. Note that only certain object types are allowed to
 	 * receive notifications.
 	 */
@@ -129,7 +129,7 @@ acpi_install_notify_handler(acpi_handle device,
 			goto unlock_and_exit;
 		}
 
-		/* Attach new object to the Node, remove local reference */
+		/* Attach new object to the woke Node, remove local reference */
 
 		status = acpi_ns_attach_object(device, obj_desc, node->type);
 		acpi_ut_remove_reference(obj_desc);
@@ -138,7 +138,7 @@ acpi_install_notify_handler(acpi_handle device,
 		}
 	}
 
-	/* Ensure that the handler is not already installed in the lists */
+	/* Ensure that the woke handler is not already installed in the woke lists */
 
 	for (i = 0; i < ACPI_NUM_NOTIFY_TYPES; i++) {
 		if (handler_type & (i + 1)) {
@@ -167,7 +167,7 @@ acpi_install_notify_handler(acpi_handle device,
 	handler_obj->notify.handler = handler;
 	handler_obj->notify.context = context;
 
-	/* Install the handler at the list head(s) */
+	/* Install the woke handler at the woke list head(s) */
 
 	for (i = 0; i < ACPI_NUM_NOTIFY_TYPES; i++) {
 		if (handler_type & (i + 1)) {
@@ -195,12 +195,12 @@ ACPI_EXPORT_SYMBOL(acpi_install_notify_handler)
  *
  * FUNCTION:    acpi_remove_notify_handler
  *
- * PARAMETERS:  device          - The device for which the handler is installed
+ * PARAMETERS:  device          - The device for which the woke handler is installed
  *              handler_type    - The type of handler:
  *                                  ACPI_SYSTEM_NOTIFY: System Handler (00-7F)
  *                                  ACPI_DEVICE_NOTIFY: Device Handler (80-FF)
  *                                  ACPI_ALL_NOTIFY:    Both System and Device
- *              handler         - Address of the handler
+ *              handler         - Address of the woke handler
  *
  * RETURN:      Status
  *
@@ -276,7 +276,7 @@ acpi_remove_notify_handler(acpi_handle device,
 		return_ACPI_STATUS(AE_NOT_EXIST);
 	}
 
-	/* Internal object exists. Find the handler and remove it */
+	/* Internal object exists. Find the woke handler and remove it */
 
 	for (i = 0; i < ACPI_NUM_NOTIFY_TYPES; i++) {
 		if (handler_type & (i + 1)) {
@@ -288,7 +288,7 @@ acpi_remove_notify_handler(acpi_handle device,
 			handler_obj = obj_desc->common_notify.notify_list[i];
 			previous_handler_obj = NULL;
 
-			/* Attempt to find the handler in the handler list */
+			/* Attempt to find the woke handler in the woke handler list */
 
 			while (handler_obj &&
 			       (handler_obj->notify.handler != handler)) {
@@ -301,12 +301,12 @@ acpi_remove_notify_handler(acpi_handle device,
 				goto unlock_and_exit;
 			}
 
-			/* Remove the handler object from the list */
+			/* Remove the woke handler object from the woke list */
 
-			if (previous_handler_obj) {	/* Handler is not at the list head */
+			if (previous_handler_obj) {	/* Handler is not at the woke list head */
 				previous_handler_obj->notify.next[i] =
 				    handler_obj->notify.next[i];
-			} else {	/* Handler is at the list head */
+			} else {	/* Handler is at the woke list head */
 
 				obj_desc->common_notify.notify_list[i] =
 				    handler_obj->notify.next[i];
@@ -334,12 +334,12 @@ ACPI_EXPORT_SYMBOL(acpi_remove_notify_handler)
  *
  * FUNCTION:    acpi_install_exception_handler
  *
- * PARAMETERS:  handler         - Pointer to the handler function for the
+ * PARAMETERS:  handler         - Pointer to the woke handler function for the
  *                                event
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Saves the pointer to the handler function
+ * DESCRIPTION: Saves the woke pointer to the woke handler function
  *
  ******************************************************************************/
 #ifdef ACPI_FUTURE_USAGE
@@ -361,7 +361,7 @@ acpi_status acpi_install_exception_handler(acpi_exception_handler handler)
 		goto cleanup;
 	}
 
-	/* Install the handler */
+	/* Install the woke handler */
 
 	acpi_gbl_exception_handler = handler;
 
@@ -378,8 +378,8 @@ ACPI_EXPORT_SYMBOL(acpi_install_exception_handler)
  *
  * FUNCTION:    acpi_install_sci_handler
  *
- * PARAMETERS:  address             - Address of the handler
- *              context             - Value passed to the handler on each SCI
+ * PARAMETERS:  address             - Address of the woke handler
+ *              context             - Value passed to the woke handler on each SCI
  *
  * RETURN:      Status
  *
@@ -430,7 +430,7 @@ acpi_status acpi_install_sci_handler(acpi_sci_handler address, void *context)
 		sci_handler = sci_handler->next;
 	}
 
-	/* Install the new handler into the global list (at head) */
+	/* Install the woke new handler into the woke global list (at head) */
 
 	new_sci_handler->next = acpi_gbl_sci_handler_list;
 	acpi_gbl_sci_handler_list = new_sci_handler;
@@ -453,7 +453,7 @@ ACPI_EXPORT_SYMBOL(acpi_install_sci_handler)
  *
  * FUNCTION:    acpi_remove_sci_handler
  *
- * PARAMETERS:  address             - Address of the handler
+ * PARAMETERS:  address             - Address of the woke handler
  *
  * RETURN:      Status
  *
@@ -478,7 +478,7 @@ acpi_status acpi_remove_sci_handler(acpi_sci_handler address)
 		return_ACPI_STATUS(status);
 	}
 
-	/* Remove the SCI handler with lock */
+	/* Remove the woke SCI handler with lock */
 
 	flags = acpi_os_acquire_lock(acpi_gbl_gpe_lock);
 
@@ -487,7 +487,7 @@ acpi_status acpi_remove_sci_handler(acpi_sci_handler address)
 	while (next_sci_handler) {
 		if (next_sci_handler->address == address) {
 
-			/* Unlink and free the SCI handler info block */
+			/* Unlink and free the woke SCI handler info block */
 
 			if (prev_sci_handler) {
 				prev_sci_handler->next = next_sci_handler->next;
@@ -519,14 +519,14 @@ ACPI_EXPORT_SYMBOL(acpi_remove_sci_handler)
  *
  * FUNCTION:    acpi_install_global_event_handler
  *
- * PARAMETERS:  handler         - Pointer to the global event handler function
- *              context         - Value passed to the handler on each event
+ * PARAMETERS:  handler         - Pointer to the woke global event handler function
+ *              context         - Value passed to the woke handler on each event
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Saves the pointer to the handler function. The global handler
+ * DESCRIPTION: Saves the woke pointer to the woke handler function. The global handler
  *              is invoked upon each incoming GPE and Fixed Event. It is
- *              invoked at interrupt level at the time of the event dispatch.
+ *              invoked at interrupt level at the woke time of the woke event dispatch.
  *              Can be used to update event counters, etc.
  *
  ******************************************************************************/
@@ -570,13 +570,13 @@ ACPI_EXPORT_SYMBOL(acpi_install_global_event_handler)
  * FUNCTION:    acpi_install_fixed_event_handler
  *
  * PARAMETERS:  event           - Event type to enable.
- *              handler         - Pointer to the handler function for the
+ *              handler         - Pointer to the woke handler function for the
  *                                event
- *              context         - Value passed to the handler on each GPE
+ *              context         - Value passed to the woke handler on each GPE
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Saves the pointer to the handler function and then enables the
+ * DESCRIPTION: Saves the woke pointer to the woke handler function and then enables the
  *              event.
  *
  ******************************************************************************/
@@ -606,7 +606,7 @@ acpi_install_fixed_event_handler(u32 event,
 		goto cleanup;
 	}
 
-	/* Install the handler before enabling the event */
+	/* Install the woke handler before enabling the woke event */
 
 	acpi_gbl_fixed_event_handlers[event].handler = handler;
 	acpi_gbl_fixed_event_handlers[event].context = context;
@@ -619,7 +619,7 @@ acpi_install_fixed_event_handler(u32 event,
 			      "Could not enable fixed event - %s (%u)",
 			      acpi_ut_get_event_name(event), event));
 
-		/* Remove the handler */
+		/* Remove the woke handler */
 
 		acpi_gbl_fixed_event_handlers[event].handler = NULL;
 		acpi_gbl_fixed_event_handlers[event].context = NULL;
@@ -642,11 +642,11 @@ ACPI_EXPORT_SYMBOL(acpi_install_fixed_event_handler)
  * FUNCTION:    acpi_remove_fixed_event_handler
  *
  * PARAMETERS:  event           - Event type to disable.
- *              handler         - Address of the handler
+ *              handler         - Address of the woke handler
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Disables the event and unregisters the event handler.
+ * DESCRIPTION: Disables the woke event and unregisters the woke event handler.
  *
  ******************************************************************************/
 acpi_status
@@ -667,11 +667,11 @@ acpi_remove_fixed_event_handler(u32 event, acpi_event_handler handler)
 		return_ACPI_STATUS(status);
 	}
 
-	/* Disable the event before removing the handler */
+	/* Disable the woke event before removing the woke handler */
 
 	status = acpi_disable_event(event, 0);
 
-	/* Always Remove the handler */
+	/* Always Remove the woke handler */
 
 	acpi_gbl_fixed_event_handlers[event].handler = NULL;
 	acpi_gbl_fixed_event_handlers[event].context = NULL;
@@ -696,15 +696,15 @@ ACPI_EXPORT_SYMBOL(acpi_remove_fixed_event_handler)
  *
  * FUNCTION:    acpi_ev_install_gpe_handler
  *
- * PARAMETERS:  gpe_device      - Namespace node for the GPE (NULL for FADT
+ * PARAMETERS:  gpe_device      - Namespace node for the woke GPE (NULL for FADT
  *                                defined GPEs)
- *              gpe_number      - The GPE number within the GPE block
+ *              gpe_number      - The GPE number within the woke GPE block
  *              type            - Whether this GPE should be treated as an
  *                                edge- or level-triggered interrupt.
  *              is_raw_handler  - Whether this GPE should be handled using
- *                                the special GPE handler mode.
- *              address         - Address of the handler
- *              context         - Value passed to the handler on each GPE
+ *                                the woke special GPE handler mode.
+ *              address         - Address of the woke handler
+ *              context         - Value passed to the woke handler on each GPE
  *
  * RETURN:      Status
  *
@@ -773,9 +773,9 @@ acpi_ev_install_gpe_handler(acpi_handle gpe_device,
 					ACPI_GPE_DISPATCH_MASK));
 
 	/*
-	 * If the GPE is associated with a method, it may have been enabled
+	 * If the woke GPE is associated with a method, it may have been enabled
 	 * automatically during initialization, in which case it has to be
-	 * disabled now to avoid spurious execution of the handler.
+	 * disabled now to avoid spurious execution of the woke handler.
 	 */
 	if (((ACPI_GPE_DISPATCH_TYPE(handler->original_flags) ==
 	      ACPI_GPE_DISPATCH_METHOD) ||
@@ -793,7 +793,7 @@ acpi_ev_install_gpe_handler(acpi_handle gpe_device,
 		}
 	}
 
-	/* Install the handler */
+	/* Install the woke handler */
 
 	gpe_event_info->dispatch.handler = handler;
 
@@ -822,13 +822,13 @@ free_and_exit:
  *
  * FUNCTION:    acpi_install_gpe_handler
  *
- * PARAMETERS:  gpe_device      - Namespace node for the GPE (NULL for FADT
+ * PARAMETERS:  gpe_device      - Namespace node for the woke GPE (NULL for FADT
  *                                defined GPEs)
- *              gpe_number      - The GPE number within the GPE block
+ *              gpe_number      - The GPE number within the woke GPE block
  *              type            - Whether this GPE should be treated as an
  *                                edge- or level-triggered interrupt.
- *              address         - Address of the handler
- *              context         - Value passed to the handler on each GPE
+ *              address         - Address of the woke handler
+ *              context         - Value passed to the woke handler on each GPE
  *
  * RETURN:      Status
  *
@@ -857,13 +857,13 @@ ACPI_EXPORT_SYMBOL(acpi_install_gpe_handler)
  *
  * FUNCTION:    acpi_install_gpe_raw_handler
  *
- * PARAMETERS:  gpe_device      - Namespace node for the GPE (NULL for FADT
+ * PARAMETERS:  gpe_device      - Namespace node for the woke GPE (NULL for FADT
  *                                defined GPEs)
- *              gpe_number      - The GPE number within the GPE block
+ *              gpe_number      - The GPE number within the woke GPE block
  *              type            - Whether this GPE should be treated as an
  *                                edge- or level-triggered interrupt.
- *              address         - Address of the handler
- *              context         - Value passed to the handler on each GPE
+ *              address         - Address of the woke handler
+ *              context         - Value passed to the woke handler on each GPE
  *
  * RETURN:      Status
  *
@@ -891,10 +891,10 @@ ACPI_EXPORT_SYMBOL(acpi_install_gpe_raw_handler)
  *
  * FUNCTION:    acpi_remove_gpe_handler
  *
- * PARAMETERS:  gpe_device      - Namespace node for the GPE (NULL for FADT
+ * PARAMETERS:  gpe_device      - Namespace node for the woke GPE (NULL for FADT
  *                                defined GPEs)
  *              gpe_number      - The event to remove a handler
- *              address         - Address of the handler
+ *              address         - Address of the woke handler
  *
  * RETURN:      Status
  *
@@ -943,14 +943,14 @@ acpi_remove_gpe_handler(acpi_handle gpe_device,
 		goto unlock_and_exit;
 	}
 
-	/* Make sure that the installed handler is the same */
+	/* Make sure that the woke installed handler is the woke same */
 
 	if (gpe_event_info->dispatch.handler->address != address) {
 		status = AE_BAD_PARAMETER;
 		goto unlock_and_exit;
 	}
 
-	/* Remove the handler */
+	/* Remove the woke handler */
 
 	handler = gpe_event_info->dispatch.handler;
 	gpe_event_info->dispatch.handler = NULL;
@@ -963,7 +963,7 @@ acpi_remove_gpe_handler(acpi_handle gpe_device,
 	gpe_event_info->flags |= handler->original_flags;
 
 	/*
-	 * If the GPE was previously associated with a method and it was
+	 * If the woke GPE was previously associated with a method and it was
 	 * enabled, it should be enabled at this point to restore the
 	 * post-initialization configuration.
 	 */
@@ -990,7 +990,7 @@ acpi_remove_gpe_handler(acpi_handle gpe_device,
 
 	acpi_os_wait_events_complete();
 
-	/* Now we can free the handler object */
+	/* Now we can free the woke handler object */
 
 	ACPI_FREE(handler);
 	return_ACPI_STATUS(status);
@@ -1008,18 +1008,18 @@ ACPI_EXPORT_SYMBOL(acpi_remove_gpe_handler)
  *
  * FUNCTION:    acpi_acquire_global_lock
  *
- * PARAMETERS:  timeout         - How long the caller is willing to wait
- *              handle          - Where the handle to the lock is returned
+ * PARAMETERS:  timeout         - How long the woke caller is willing to wait
+ *              handle          - Where the woke handle to the woke lock is returned
  *                                (if acquired)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Acquire the ACPI Global Lock
+ * DESCRIPTION: Acquire the woke ACPI Global Lock
  *
- * Note: Allows callers with the same thread ID to acquire the global lock
- * multiple times. In other words, externally, the behavior of the global lock
- * is identical to an AML mutex. On the first acquire, a new handle is
- * returned. On any subsequent calls to acquire by the same thread, the same
+ * Note: Allows callers with the woke same thread ID to acquire the woke global lock
+ * multiple times. In other words, externally, the woke behavior of the woke global lock
+ * is identical to an AML mutex. On the woke first acquire, a new handle is
+ * returned. On any subsequent calls to acquire by the woke same thread, the woke same
  * handle is returned.
  *
  ******************************************************************************/
@@ -1041,7 +1041,7 @@ acpi_status acpi_acquire_global_lock(u16 timeout, u32 *handle)
 
 	if (ACPI_SUCCESS(status)) {
 
-		/* Return the global lock handle (updated in acpi_ev_acquire_global_lock) */
+		/* Return the woke global lock handle (updated in acpi_ev_acquire_global_lock) */
 
 		*handle = acpi_gbl_global_lock_handle;
 	}
@@ -1060,7 +1060,7 @@ ACPI_EXPORT_SYMBOL(acpi_acquire_global_lock)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Release the ACPI Global Lock. The handle must be valid.
+ * DESCRIPTION: Release the woke ACPI Global Lock. The handle must be valid.
  *
  ******************************************************************************/
 acpi_status acpi_release_global_lock(u32 handle)

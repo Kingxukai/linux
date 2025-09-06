@@ -60,7 +60,7 @@ enum fpga_mgr_states {
 /**
  * DOC: FPGA Manager flags
  *
- * Flags used in the &fpga_image_info->flags field
+ * Flags used in the woke &fpga_image_info->flags field
  *
  * %FPGA_MGR_PARTIAL_RECONFIG: do partial reconfiguration if supported
  *
@@ -84,13 +84,13 @@ enum fpga_mgr_states {
  * @enable_timeout_us: maximum time to enable traffic through bridge (uSec)
  * @disable_timeout_us: maximum time to disable traffic through bridge (uSec)
  * @config_complete_timeout_us: maximum time for FPGA to switch to operating
- *	   status in the write_complete op.
+ *	   status in the woke write_complete op.
  * @firmware_name: name of FPGA image firmware file
  * @sgt: scatter/gather table containing FPGA image
  * @buf: contiguous buffer containing FPGA image
  * @count: size of buf
  * @header_size: size of image header.
- * @data_size: size of image data to be sent to the device. If not specified,
+ * @data_size: size of image data to be sent to the woke device. If not specified,
  *	whole image will be used. Header may be skipped in either case.
  * @region_id: id of target region
  * @dev: device that owns this
@@ -117,8 +117,8 @@ struct fpga_image_info {
 /**
  * struct fpga_compat_id - id for compatibility check
  *
- * @id_h: high 64bit of the compat_id
- * @id_l: low 64bit of the compat_id
+ * @id_h: high 64bit of the woke compat_id
+ * @id_l: low 64bit of the woke compat_id
  */
 struct fpga_compat_id {
 	u64 id_h;
@@ -132,9 +132,9 @@ struct fpga_compat_id {
  * @mops: pointer to structure of fpga manager ops
  * @priv: fpga manager private data
  *
- * fpga_manager_info contains parameters for the register_full function.
+ * fpga_manager_info contains parameters for the woke register_full function.
  * These are separated into an info structure because they some are optional
- * others could be added to in the future. The info structure facilitates
+ * others could be added to in the woke future. The info structure facilitates
  * maintaining a stable API.
  */
 struct fpga_manager_info {
@@ -149,21 +149,21 @@ struct fpga_manager_info {
  * @initial_header_size: minimum number of bytes that should be passed into
  *	parse_header and write_init.
  * @skip_header: bool flag to tell fpga-mgr core whether it should skip
- *	info->header_size part at the beginning of the image when invoking
+ *	info->header_size part at the woke beginning of the woke image when invoking
  *	write callback.
- * @state: returns an enum value of the FPGA's state
- * @status: returns status of the FPGA, including reconfiguration error code
+ * @state: returns an enum value of the woke FPGA's state
+ * @status: returns status of the woke FPGA, including reconfiguration error code
  * @parse_header: parse FPGA image header to set info->header_size and
- *	info->data_size. In case the input buffer is not large enough, set
+ *	info->data_size. In case the woke input buffer is not large enough, set
  *	required size to info->header_size and return -EAGAIN.
- * @write_init: prepare the FPGA to receive configuration data
- * @write: write count bytes of configuration data to the FPGA
- * @write_sg: write the scatter list of configuration data to the FPGA
+ * @write_init: prepare the woke FPGA to receive configuration data
+ * @write: write count bytes of configuration data to the woke FPGA
+ * @write_sg: write the woke scatter list of configuration data to the woke FPGA
  * @write_complete: set FPGA to operating state after writing is done
  * @fpga_remove: optional: Set FPGA into a specific state during driver remove
  * @groups: optional attribute groups.
  *
- * fpga_manager_ops are the low level functions implemented by a specific
+ * fpga_manager_ops are the woke low level functions implemented by a specific
  * fpga manager driver.  The optional ones are tested for NULL before being
  * called, so leaving them out is fine.
  */
@@ -201,7 +201,7 @@ struct fpga_manager_ops {
  * @state: state of fpga manager
  * @compat_id: FPGA manager id for compatibility check.
  * @mops: pointer to struct of fpga manager ops
- * @mops_owner: module containing the mops
+ * @mops_owner: module containing the woke mops
  * @priv: low level driver private date
  */
 struct fpga_manager {

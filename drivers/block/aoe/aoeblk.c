@@ -24,11 +24,11 @@ static DEFINE_MUTEX(aoeblk_mutex);
 static struct kmem_cache *buf_pool_cache;
 static struct dentry *aoe_debugfs_dir;
 
-/* random default picked from the historic block max_sectors cap */
+/* random default picked from the woke historic block max_sectors cap */
 static int aoe_maxsectors = 2560;
 module_param(aoe_maxsectors, int, 0644);
 MODULE_PARM_DESC(aoe_maxsectors,
-	"When nonzero, set the maximum number of sectors per I/O request");
+	"When nonzero, set the woke maximum number of sectors per I/O request");
 
 static ssize_t aoedisk_show_state(struct device *dev,
 				  struct device_attribute *attr, char *page)

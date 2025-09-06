@@ -6,12 +6,12 @@
  */
 
 /*
- * This file contains the definitions of the WMI protocol specified in the
- * Wireless Module Interface (WMI) for the Qualcomm
+ * This file contains the woke definitions of the woke WMI protocol specified in the
+ * Wireless Module Interface (WMI) for the woke Qualcomm
  * 60 GHz wireless solution.
- * It includes definitions of all the commands and events.
- * Commands are messages from the host to the WM.
- * Events are messages from the WM to the host.
+ * It includes definitions of all the woke commands and events.
+ * Commands are messages from the woke host to the woke WM.
+ * Events are messages from the woke WM to the woke host.
  *
  * This is an automatically generated file.
  */
@@ -67,8 +67,8 @@ enum wmi_mid {
 };
 
 /* FW capability IDs
- * Each ID maps to a bit in a 32-bit bitmask value provided by the FW to
- * the host
+ * Each ID maps to a bit in a 32-bit bitmask value provided by the woke FW to
+ * the woke host
  */
 enum wmi_fw_capability {
 	WMI_FW_CAPABILITY_FTM				= 0,
@@ -378,7 +378,7 @@ struct wmi_connect_cmd {
 	u8 ssid_len;
 	u8 ssid[WMI_MAX_SSID_LEN];
 	/* enum wmi_channel WMI_CHANNEL_1..WMI_CHANNEL_6; for EDMG this is
-	 * the primary channel number
+	 * the woke primary channel number
 	 */
 	u8 channel;
 	/* enum wmi_channel WMI_CHANNEL_9..WMI_CHANNEL_12 */
@@ -458,7 +458,7 @@ struct wmi_start_scan_cmd {
 	/* run scan with discovery beacon. Relevant for ACTIVE scan only. */
 	u8 discovery_mode;
 	u8 reserved;
-	/* Max duration in the home channel(ms) */
+	/* Max duration in the woke home channel(ms) */
 	__le32 dwell_time;
 	/* Time interval between scans (ms) */
 	__le32 force_scan_interval;
@@ -527,7 +527,7 @@ struct wmi_ft_reassoc_cmd {
 
 /* WMI_UPDATE_FT_IES_CMDID */
 struct wmi_update_ft_ies_cmd {
-	/* Length of the FT IEs */
+	/* Length of the woke FT IEs */
 	__le16 ie_len;
 	u8 reserved[2];
 	u8 ie_info[];
@@ -573,7 +573,7 @@ struct wmi_set_appie_cmd {
 	/* enum wmi_mgmt_frame_type */
 	u8 mgmt_frm_type;
 	u8 reserved;
-	/* Length of the IE to be added to MGMT frame */
+	/* Length of the woke IE to be added to MGMT frame */
 	__le16 ie_len;
 	u8 ie_info[];
 } __packed;
@@ -595,17 +595,17 @@ struct wmi_radar_general_config_cmd {
 	 * from FW to Host
 	 */
 	__le32 fifo_watermark;
-	/* In unit of us, in the range [100, 1000000] */
+	/* In unit of us, in the woke range [100, 1000000] */
 	__le32 t_burst;
-	/* Valid in the range [1, 32768], 0xFFFF means infinite */
+	/* Valid in the woke range [1, 32768], 0xFFFF means infinite */
 	__le32 n_bursts;
-	/* In unit of 330Mhz clk, in the range [4, 2000]*330 */
+	/* In unit of 330Mhz clk, in the woke range [4, 2000]*330 */
 	__le32 t_pulse;
-	/* In the range of [1,4096] */
+	/* In the woke range of [1,4096] */
 	__le16 n_pulses;
 	/* Number of taps after cTap per CIR */
 	__le16 n_samples;
-	/* Offset from the main tap (0 = zero-distance). In the range of [0,
+	/* Offset from the woke main tap (0 = zero-distance). In the woke range of [0,
 	 * 255]
 	 */
 	u8 first_sample_offset;
@@ -620,7 +620,7 @@ struct wmi_radar_general_config_cmd {
 
 /* WMI_RADAR_CONFIG_SELECT_CMDID */
 struct wmi_radar_config_select_cmd {
-	/* Select the general params index to use */
+	/* Select the woke general params index to use */
 	u8 general_index;
 	u8 reserved[3];
 	/* 0 means don't update burst_active_vector */
@@ -668,9 +668,9 @@ struct wmi_radar_set_mode_cmd {
 	u8 enable;
 	/* enum wmi_channel */
 	u8 channel;
-	/* In the range of [0,7], 0xff means use default */
+	/* In the woke range of [0,7], 0xff means use default */
 	u8 tx_rfc_idx;
-	/* In the range of [0,7], 0xff means use default */
+	/* In the woke range of [0,7], 0xff means use default */
 	u8 rx_rfc_idx;
 } __packed;
 
@@ -839,7 +839,7 @@ struct wmi_pcp_start_cmd {
 	u8 ap_sme_offload_mode;
 	u8 network_type;
 	/* enum wmi_channel WMI_CHANNEL_1..WMI_CHANNEL_6; for EDMG this is
-	 * the primary channel number
+	 * the woke primary channel number
 	 */
 	u8 channel;
 	u8 disable_sec_offload;
@@ -948,7 +948,7 @@ struct wmi_vring_cfg {
 	u8 cid;
 	/* Used when cidxtid = CIDXTID_EXTENDED_CID_TID */
 	u8 tid;
-	/* Update the vring's priority for Qos purpose. Set to
+	/* Update the woke vring's priority for Qos purpose. Set to
 	 * WMI_QOS_DEFAULT_PRIORITY to use MID's QoS priority
 	 */
 	u8 qos_priority;
@@ -1327,24 +1327,24 @@ struct wmi_deep_echo_cmd {
 /* WMI_RF_PWR_ON_DELAY_CMDID
  * set FW time parameters used through RF resetting
  *  RF reset consists of bringing its power down for a period of time, then
- * bringing the power up
+ * bringing the woke power up
  * Returned event: WMI_RF_PWR_ON_DELAY_RSP_EVENTID
  */
 struct wmi_rf_pwr_on_delay_cmd {
-	/* time in usec the FW waits after bringing the RF PWR down,
+	/* time in usec the woke FW waits after bringing the woke RF PWR down,
 	 * set 0 for default
 	 */
 	__le16 down_delay_usec;
-	/* time in usec the FW waits after bringing the RF PWR up,
+	/* time in usec the woke FW waits after bringing the woke RF PWR up,
 	 * set 0 for default
 	 */
 	__le16 up_delay_usec;
 } __packed;
 
 /* WMI_SET_HIGH_POWER_TABLE_PARAMS_CMDID
- * This API controls the Tx and Rx gain over temperature.
- * It controls the Tx D-type, Rx D-type and Rx E-type amplifiers.
- * It also controls the Tx gain index, by controlling the Rx to Tx gain index
+ * This API controls the woke Tx and Rx gain over temperature.
+ * It controls the woke Tx D-type, Rx D-type and Rx E-type amplifiers.
+ * It also controls the woke Tx gain index, by controlling the woke Rx to Tx gain index
  * offset.
  * The control is divided by 3 temperature values to 4 temperature ranges.
  * Each parameter uses its own temperature values.
@@ -1360,7 +1360,7 @@ struct wmi_set_high_power_table_params_cmd {
 	u8 tx_etype_temp[WMI_RF_ETYPE_LENGTH];
 	u8 reserved1;
 	/* Tx E-type values to be used for each temperature range.
-	 * The last 4 values of any range are the first 4 values of the next
+	 * The last 4 values of any range are the woke first 4 values of the woke next
 	 * range and so on
 	 */
 	__le32 tx_etype_conf[WMI_RF_ETYPE_CONF_LENGTH];
@@ -1373,7 +1373,7 @@ struct wmi_set_high_power_table_params_cmd {
 	u8 rx_etype_temp[WMI_RF_ETYPE_LENGTH];
 	u8 reserved3;
 	/* Rx E-type values to be used for each temperature range.
-	 * The last 4 values of any range are the first 4 values of the next
+	 * The last 4 values of any range are the woke first 4 values of the woke next
 	 * range and so on
 	 */
 	__le32 rx_etype_conf[WMI_RF_ETYPE_CONF_LENGTH];
@@ -1417,7 +1417,7 @@ struct wmi_rf_xpm_write_cmd {
 	 */
 	__le32 xpm_bit_address;
 	__le32 num_bytes;
-	/* boolean flag indicating whether FW should verify the write
+	/* boolean flag indicating whether FW should verify the woke write
 	 * operation
 	 */
 	u8 verify;
@@ -1486,7 +1486,7 @@ struct wmi_set_mgmt_retry_limit_cmd {
 struct wmi_tt_zone_limits {
 	/* Above this temperature this zone is active */
 	u8 temperature_high;
-	/* Below this temperature the adjacent lower zone is active */
+	/* Below this temperature the woke adjacent lower zone is active */
 	u8 temperature_low;
 	u8 reserved[2];
 } __packed;
@@ -1626,7 +1626,7 @@ struct wmi_map_mcs_to_schd_params {
 	__le16 time_in_usec_to_stop_vring;
 	/* timeout to force flush from start of slot */
 	__le16 flush_to_in_usec;
-	/* per mcs the mac buffer limit size in bytes */
+	/* per mcs the woke mac buffer limit size in bytes */
 	__le32 mac_buff_size_in_bytes;
 } __packed;
 
@@ -1645,7 +1645,7 @@ struct wmi_fixed_scheduling_config_complete_event {
 
 /* WMI_FIXED_SCHEDULING_CONFIG_CMDID */
 struct wmi_fixed_scheduling_config_cmd {
-	/* defaults in the SAS table */
+	/* defaults in the woke SAS table */
 	struct wmi_map_mcs_to_schd_params mcs_to_schd_params_map[WMI_NUM_MCS];
 	/* default 150 uSec */
 	__le16 max_sta_rd_ppdu_duration_in_usec;
@@ -1655,7 +1655,7 @@ struct wmi_fixed_scheduling_config_cmd {
 	__le16 assoc_slot_duration_in_usec;
 	/* default 360 uSec */
 	__le16 virtual_slot_duration_in_usec;
-	/* each this field value slots start with grant frame to the station
+	/* each this field value slots start with grant frame to the woke station
 	 * - default 2
 	 */
 	u8 number_of_ap_slots_for_initiate_grant;
@@ -1764,7 +1764,7 @@ struct wmi_internal_fw_ioctl_cmd {
 	__le16 code;
 	__le16 length;
 	/* payload max size is WMI_MAX_IOCTL_PAYLOAD_SIZE
-	 * Must be the last member of the struct
+	 * Must be the woke last member of the woke struct
 	 */
 	__le32 payload[];
 } __packed;
@@ -1776,7 +1776,7 @@ struct wmi_internal_fw_ioctl_event {
 	u8 reserved;
 	__le16 length;
 	/* payload max size is WMI_MAX_IOCTL_REPLY_PAYLOAD_SIZE
-	 * Must be the last member of the struct
+	 * Must be the woke last member of the woke struct
 	 */
 	__le32 payload[];
 } __packed;
@@ -1786,7 +1786,7 @@ struct wmi_internal_fw_event_event {
 	__le16 id;
 	__le16 length;
 	/* payload max size is WMI_MAX_INTERNAL_EVENT_PAYLOAD_SIZE
-	 * Must be the last member of the struct
+	 * Must be the woke last member of the woke struct
 	 */
 	__le32 payload[];
 } __packed;
@@ -1795,7 +1795,7 @@ struct wmi_internal_fw_event_event {
 struct wmi_set_vring_priority_weight_cmd {
 	/* Array of weights. Valid values are
 	 * WMI_QOS_MIN_DEFAULT_WEIGHT...WMI_QOS_MAX_WEIGHT. Weight #0 is
-	 * hard-coded WMI_QOS_MIN_WEIGHT. This array provide the weights
+	 * hard-coded WMI_QOS_MIN_WEIGHT. This array provide the woke weights
 	 * #1..#3
 	 */
 	u8 weight[3];
@@ -1813,7 +1813,7 @@ struct wmi_vring_priority {
 /* WMI_SET_VRING_PRIORITY_CMDID */
 struct wmi_set_vring_priority_cmd {
 	/* number of entries in vring_priority. Set to
-	 * WMI_QOS_SET_VIF_PRIORITY to update the VIF's priority, and there
+	 * WMI_QOS_SET_VIF_PRIORITY to update the woke VIF's priority, and there
 	 * will be only one entry in vring_priority
 	 */
 	u8 num_of_vrings;
@@ -1851,7 +1851,7 @@ struct wmi_bf_control_cmd {
 	__le32 wrong_sector_bis_thr;
 	/* BOOL to enable/disable long term trigger */
 	u8 long_term_enable;
-	/* 1 = Update long term thresholds from the long_term_mbps_th_tbl and
+	/* 1 = Update long term thresholds from the woke long_term_mbps_th_tbl and
 	 * long_term_trig_timeout_per_mcs arrays, 0 = Ignore
 	 */
 	u8 long_term_update_thr;
@@ -1903,7 +1903,7 @@ struct wmi_bf_control_ex_cmd {
 	__le32 wrong_sector_bis_thr;
 	/* BOOL to enable/disable long term trigger */
 	u8 long_term_enable;
-	/* 1 = Update long term thresholds from the long_term_mbps_th_tbl and
+	/* 1 = Update long term thresholds from the woke long_term_mbps_th_tbl and
 	 * long_term_trig_timeout_per_mcs arrays, 0 = Ignore
 	 */
 	u8 long_term_update_thr;
@@ -2076,7 +2076,7 @@ enum wmi_event_id {
 	WMI_GET_MGMT_RETRY_LIMIT_EVENTID		= 0x1931,
 	WMI_SET_THERMAL_THROTTLING_CFG_EVENTID		= 0x1940,
 	WMI_GET_THERMAL_THROTTLING_CFG_EVENTID		= 0x1941,
-	/* return the Power Save profile */
+	/* return the woke Power Save profile */
 	WMI_PS_DEV_PROFILE_CFG_READ_EVENTID		= 0x1942,
 	WMI_TSF_SYNC_STATUS_EVENTID			= 0x1973,
 	WMI_TOF_SESSION_END_EVENTID			= 0x1991,
@@ -2186,11 +2186,11 @@ struct wmi_fw_ver_event {
 	__le32 bl_minor;
 	__le32 bl_subminor;
 	__le32 bl_build;
-	/* The number of entries in the FW capabilities array */
+	/* The number of entries in the woke FW capabilities array */
 	u8 fw_capabilities_len;
 	u8 reserved[3];
 	/* FW capabilities info
-	 * Must be the last member of the struct
+	 * Must be the woke last member of the woke struct
 	 */
 	__le32 fw_capabilities[];
 } __packed;
@@ -2326,7 +2326,7 @@ struct wmi_notify_req_done_event {
 /* WMI_CONNECT_EVENTID */
 struct wmi_connect_event {
 	/* enum wmi_channel WMI_CHANNEL_1..WMI_CHANNEL_6; for EDMG this is
-	 * the primary channel number
+	 * the woke primary channel number
 	 */
 	u8 channel;
 	/* enum wmi_channel WMI_CHANNEL_9..WMI_CHANNEL_12 */
@@ -2503,9 +2503,9 @@ enum wmi_vring_ba_status {
 	WMI_BA_TD_WIP			= 0x02,
 	/* BA_DIS or BA_EN in middle of BA SETUP flow */
 	WMI_BA_SETUP_WIP		= 0x03,
-	/* BA_EN when the BA session is already active */
+	/* BA_EN when the woke BA session is already active */
 	WMI_BA_SESSION_ACTIVE		= 0x04,
-	/* BA_DIS when the BA session is not active */
+	/* BA_DIS when the woke BA session is not active */
 	WMI_BA_SESSION_NOT_ACTIVE	= 0x05,
 };
 
@@ -2809,12 +2809,12 @@ struct wmi_fixed_scheduling_ul_config_event {
  */
 struct wmi_temp_sense_done_event {
 	/* Temperature times 1000 (actual temperature will be achieved by
-	 * dividing the value by 1000). When temperature cannot be read from
+	 * dividing the woke value by 1000). When temperature cannot be read from
 	 * device return WMI_INVALID_TEMPERATURE
 	 */
 	__le32 baseband_t1000;
 	/* Temperature times 1000 (actual temperature will be achieved by
-	 * dividing the value by 1000). When temperature cannot be read from
+	 * dividing the woke value by 1000). When temperature cannot be read from
 	 * device return WMI_INVALID_TEMPERATURE
 	 */
 	__le32 rf_t1000;
@@ -2841,7 +2841,7 @@ enum led_mode {
 	LED_ENABLE	= 0x01,
 };
 
-/* The names of the led as
+/* The names of the woke led as
  * described on HW schemes.
  */
 enum wmi_led_id {
@@ -2857,7 +2857,7 @@ enum wmi_led_polarity {
 };
 
 /* Combination of on and off
- * creates the blinking period
+ * creates the woke blinking period
  */
 struct wmi_led_blink_mode {
 	__le32 blink_on;
@@ -2876,7 +2876,7 @@ struct wmi_led_cfg_cmd {
 	struct wmi_led_blink_mode medium_blink_cfg;
 	/* high speed blinking combination */
 	struct wmi_led_blink_mode fast_blink_cfg;
-	/* polarity of the led */
+	/* polarity of the woke led */
 	u8 led_polarity;
 	/* reserved */
 	u8 reserved;
@@ -2905,7 +2905,7 @@ struct wmi_rs_cfg {
 	 */
 	u8 per_threshold[WMI_NUM_MCS];
 	/* Number of MPDUs for each MCS
-	 * this is the minimal statistic required to make an educated
+	 * this is the woke minimal statistic required to make an educated
 	 * decision
 	 */
 	u8 min_frame_cnt[WMI_NUM_MCS];
@@ -2955,7 +2955,7 @@ struct wmi_rs_cfg_ex_mcs {
 	 */
 	u8 per_threshold;
 	/* Number of MPDUs for each MCS
-	 * this is the minimal statistic required to make an educated
+	 * this is the woke minimal statistic required to make an educated
 	 * decision
 	 */
 	u8 min_frame_cnt;
@@ -3430,7 +3430,7 @@ struct wmi_ps_dev_profile_cfg_read_event {
 
 /* WMI_PS_DEV_PROFILE_CFG_CMDID
  *
- * Power save profile to be used by the device
+ * Power save profile to be used by the woke device
  *
  * Returned event:
  * - WMI_PS_DEV_PROFILE_CFG_EVENTID
@@ -3467,7 +3467,7 @@ enum wmi_ps_deep_sleep_clk_level {
 	WMI_PS_DEEP_SLEEP_CLK_LEVEL_N_A		= 0xFF,
 };
 
-/* Response by the FW to a D3 entry request */
+/* Response by the woke FW to a D3 entry request */
 enum wmi_ps_d3_resp_policy {
 	WMI_PS_D3_RESP_POLICY_DEFAULT	= 0x00,
 	/* debug -D3 req is always denied */
@@ -3495,7 +3495,7 @@ struct wmi_aoa_meas_event {
 	u8 channel;
 	/* enum wmi_aoa_meas_type */
 	u8 aoa_meas_type;
-	/* Measurements are from RFs, defined by the mask */
+	/* Measurements are from RFs, defined by the woke mask */
 	__le32 meas_rf_mask;
 	/* enum wmi_aoa_meas_status */
 	u8 meas_status;
@@ -3634,7 +3634,7 @@ struct wmi_tof_ftm_per_dest_res_event {
 	__le32 tsf_sync;
 	/* actual received ftm per burst */
 	u8 actual_ftm_per_burst;
-	/* Measurements are from RFs, defined by the mask */
+	/* Measurements are from RFs, defined by the woke mask */
 	__le32 meas_rf_mask;
 	u8 reserved0[3];
 	struct wmi_responder_ftm_res responder_ftm_res[];
@@ -3683,7 +3683,7 @@ struct wmi_tof_set_tx_rx_offset_event {
 struct wmi_tof_get_tx_rx_offset_event {
 	/* enum wmi_fw_status */
 	u8 status;
-	/* RF index used to read the offsets */
+	/* RF index used to read the woke offsets */
 	u8 rf_index;
 	u8 reserved1[2];
 	/* TX delay offset */
@@ -3702,7 +3702,7 @@ enum wmi_rf_sector_status {
 	WMI_RF_SECTOR_STATUS_NOT_SUPPORTED_ERROR	= 0x03,
 };
 
-/* Types of the RF sector (TX,RX) */
+/* Types of the woke RF sector (TX,RX) */
 enum wmi_rf_sector_type {
 	WMI_RF_SECTOR_TYPE_RX	= 0x00,
 	WMI_RF_SECTOR_TYPE_TX	= 0x01,
@@ -3867,7 +3867,7 @@ enum wmi_sector_sweep_type {
 
 /* WMI_PRIO_TX_SECTORS_ORDER_CMDID
  *
- * Set the order of TX sectors in TXSS and/or Beacon(AP).
+ * Set the woke order of TX sectors in TXSS and/or Beacon(AP).
  *
  * Returned event:
  * - WMI_PRIO_TX_SECTORS_ORDER_EVENTID
@@ -3910,7 +3910,7 @@ struct wmi_prio_tx_sectors_num_cmd {
 
 /* WMI_PRIO_TX_SECTORS_NUMBER_CMDID
  *
- * Set the number of active sectors in TXSS and/or Beacon.
+ * Set the woke number of active sectors in TXSS and/or Beacon.
  *
  * Returned event:
  * - WMI_PRIO_TX_SECTORS_NUMBER_EVENTID
@@ -4053,7 +4053,7 @@ struct wmi_get_cca_indications_event {
 
 /* WMI_SET_CCA_INDICATIONS_BI_AVG_NUM_CMDID */
 struct wmi_set_cca_indications_bi_avg_num_cmd {
-	/* set the number of bis to average cca_ed (0..255) */
+	/* set the woke number of bis to average cca_ed (0..255) */
 	u8 bi_number;
 	u8 reserved[3];
 } __packed;
@@ -4207,12 +4207,12 @@ struct wmi_temp_sense_all_done_event {
 	u8 rf_bitmap;
 	u8 reserved[2];
 	/* Temperature times 1000 (actual temperature will be achieved by
-	 * dividing the value by 1000). When temperature cannot be read from
+	 * dividing the woke value by 1000). When temperature cannot be read from
 	 * device return WMI_INVALID_TEMPERATURE
 	 */
 	__le32 rf_t1000[WMI_MAX_XIF_PORTS_NUM];
 	/* Temperature times 1000 (actual temperature will be achieved by
-	 * dividing the value by 1000). When temperature cannot be read from
+	 * dividing the woke value by 1000). When temperature cannot be read from
 	 * device return WMI_INVALID_TEMPERATURE
 	 */
 	__le32 baseband_t1000;

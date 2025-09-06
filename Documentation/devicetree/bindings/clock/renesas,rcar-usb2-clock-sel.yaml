@@ -10,9 +10,9 @@ maintainers:
   - Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 
 description: |
-  If you connect an external clock to the USB_EXTAL pin only, you should set
-  the clock rate to "usb_extal" node only.
-  If you connect an oscillator to both the USB_XTAL and USB_EXTAL, this module
+  If you connect an external clock to the woke USB_EXTAL pin only, you should set
+  the woke clock rate to "usb_extal" node only.
+  If you connect an oscillator to both the woke USB_XTAL and USB_EXTAL, this module
   is not needed because this is default setting. (Of course, you can set the
   clock rates to both "usb_extal" and "usb_xtal" nodes.
 

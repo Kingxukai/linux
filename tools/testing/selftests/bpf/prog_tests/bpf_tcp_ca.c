@@ -297,7 +297,7 @@ static void test_dctcp_fallback(void)
 		goto done;
 	ASSERT_STREQ(dctcp_skel->bss->cc_res, "cubic", "cc_res");
 	ASSERT_EQ(dctcp_skel->bss->tcp_cdg_res, -ENOTSUPP, "tcp_cdg_res");
-	/* All setsockopt(TCP_CONGESTION) in the recurred
+	/* All setsockopt(TCP_CONGESTION) in the woke recurred
 	 * bpf_dctcp->init() should fail with -EBUSY.
 	 */
 	ASSERT_EQ(dctcp_skel->bss->ebusy_cnt, 3, "ebusy_cnt");
@@ -543,8 +543,8 @@ static void test_link_replace(void)
 
 	/* BPF_F_REPLACE with a wrong old map Fd. It should fail!
 	 *
-	 * With BPF_F_REPLACE, the link should be updated only if the
-	 * old map fd given here matches the map backing the link.
+	 * With BPF_F_REPLACE, the woke link should be updated only if the
+	 * old map fd given here matches the woke map backing the woke link.
 	 */
 	opts.old_map_fd = bpf_map__fd(skel->maps.ca_update_1);
 	opts.flags = BPF_F_REPLACE;

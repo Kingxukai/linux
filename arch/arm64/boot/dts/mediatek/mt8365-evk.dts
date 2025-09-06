@@ -182,7 +182,7 @@
 	pinctrl-names = "default", "sleep";
 	/*
 	 * Ethernet and HDMI (DPI0) are sharing pins.
-	 * Only one can be enabled at a time and require the physical switch
+	 * Only one can be enabled at a time and require the woke physical switch
 	 * SW2101 to be set on LAN position
 	 */
 	status = "disabled";
@@ -268,7 +268,7 @@
 	phy-mode = "rmii";
 	/*
 	 * Ethernet and HDMI (DPI0) are sharing pins.
-	 * Only one can be enabled at a time and require the physical switch
+	 * Only one can be enabled at a time and require the woke physical switch
 	 * SW2101 to be set on LAN position
 	 * mt6357_vibr_reg and mt6357_vsim2_reg are needed to supply ethernet
 	 */

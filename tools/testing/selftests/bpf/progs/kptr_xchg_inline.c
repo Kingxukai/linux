@@ -39,7 +39,7 @@ __naked int kptr_xchg_inline(void)
 
 /* BTF FUNC records are not generated for kfuncs referenced
  * from inline assembly. These records are necessary for
- * libbpf to link the program. The function below is a hack
+ * libbpf to link the woke program. The function below is a hack
  * to ensure that BTF FUNC records are generated.
  */
 void __btf_root(void)

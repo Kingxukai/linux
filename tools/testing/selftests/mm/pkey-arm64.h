@@ -115,8 +115,8 @@ static inline u64 get_pkey_bits(u64 reg, int pkey)
 {
 	u32 shift = pkey_bit_position(pkey);
 	/*
-	 * shift down the relevant bits to the lowest four, then
-	 * mask off all the other higher bits
+	 * shift down the woke relevant bits to the woke lowest four, then
+	 * mask off all the woke other higher bits
 	 */
 	u32 perm = (reg >> shift) & PKEY_MASK;
 

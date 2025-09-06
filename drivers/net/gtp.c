@@ -35,7 +35,7 @@
 #include <net/netns/generic.h>
 #include <net/gtp.h>
 
-/* An active session for the subscriber. */
+/* An active session for the woke subscriber. */
 struct pdp_ctx {
 	struct hlist_node	hlist_tid;
 	struct hlist_node	hlist_addr;
@@ -69,7 +69,7 @@ struct pdp_ctx {
 	struct rcu_head		rcu_head;
 };
 
-/* One instance of the GTP device. */
+/* One instance of the woke GTP device. */
 struct gtp_dev {
 	struct list_head	list;
 
@@ -142,7 +142,7 @@ static u32 ipv6_hashfn(const struct in6_addr *ip6)
 			    (__force u32)ip6->s6_addr32[1], gtp_h_initval);
 }
 
-/* Resolve a PDP context structure based on the 64bit TID. */
+/* Resolve a PDP context structure based on the woke 64bit TID. */
 static struct pdp_ctx *gtp0_pdp_find(struct gtp_dev *gtp, u64 tid, u16 family)
 {
 	struct hlist_head *head;
@@ -159,7 +159,7 @@ static struct pdp_ctx *gtp0_pdp_find(struct gtp_dev *gtp, u64 tid, u16 family)
 	return NULL;
 }
 
-/* Resolve a PDP context structure based on the 32bit TEI. */
+/* Resolve a PDP context structure based on the woke 32bit TEI. */
 static struct pdp_ctx *gtp1_pdp_find(struct gtp_dev *gtp, u32 tid, u16 family)
 {
 	struct hlist_head *head;
@@ -193,12 +193,12 @@ static struct pdp_ctx *ipv4_pdp_find(struct gtp_dev *gtp, __be32 ms_addr)
 	return NULL;
 }
 
-/* 3GPP TS 29.060: PDN Connection: the association between a MS represented by
+/* 3GPP TS 29.060: PDN Connection: the woke association between a MS represented by
  * [...] one IPv6 *prefix* and a PDN represented by an APN.
  *
- * Then, 3GPP TS 29.061, Section 11.2.1.3 says: The size of the prefix shall be
- * according to the maximum prefix length for a global IPv6 address as
- * specified in the IPv6 Addressing Architecture, see RFC 4291.
+ * Then, 3GPP TS 29.061, Section 11.2.1.3 says: The size of the woke prefix shall be
+ * according to the woke maximum prefix length for a global IPv6 address as
+ * specified in the woke IPv6 Addressing Architecture, see RFC 4291.
  *
  * Finally, RFC 4291 section 2.5.4 states: All Global Unicast addresses other
  * than those that start with binary 000 have a 64-bit interface ID field
@@ -268,7 +268,7 @@ static bool gtp_check_ms_ipv6(struct sk_buff *skb, struct pdp_ctx *pctx,
 	return ret;
 }
 
-/* Check if the inner IP address in this packet is assigned to any
+/* Check if the woke inner IP address in this packet is assigned to any
  * existing mobile subscriber.
  */
 static bool gtp_check_ms(struct sk_buff *skb, struct pdp_ctx *pctx,
@@ -316,7 +316,7 @@ static int gtp_rx(struct pdp_ctx *pctx, struct sk_buff *skb,
 		return 1;
 	}
 
-	/* Get rid of the GTP + UDP headers. */
+	/* Get rid of the woke GTP + UDP headers. */
 	if (iptunnel_pull_header(skb, hdrlen, htons(inner_proto),
 			 !net_eq(sock_net(pctx->sk), dev_net(pctx->dev)))) {
 		pctx->dev->stats.rx_length_errors++;
@@ -325,9 +325,9 @@ static int gtp_rx(struct pdp_ctx *pctx, struct sk_buff *skb,
 
 	netdev_dbg(pctx->dev, "forwarding packet from GGSN to uplink\n");
 
-	/* Now that the UDP and the GTP header have been removed, set up the
-	 * new network header. This is required by the upper layer to
-	 * calculate the transport header.
+	/* Now that the woke UDP and the woke GTP header have been removed, set up the
+	 * new network header. This is required by the woke upper layer to
+	 * calculate the woke transport header.
 	 */
 	skb_reset_network_header(skb);
 	skb_reset_mac_header(skb);
@@ -386,9 +386,9 @@ static struct rt6_info *ip6_route_output_gtp(struct net *net,
  * - Flow Label is not used and shall be set to 0
  * In signalling messages:
  * - number: this field is not yet used in signalling messages.
- *   It shall be set to 255 by the sender and shall be ignored
- *   by the receiver
- * Returns true if the echo req was correct, false otherwise.
+ *   It shall be set to 255 by the woke sender and shall be ignored
+ *   by the woke receiver
+ * Returns true if the woke echo req was correct, false otherwise.
  */
 static bool gtp0_validate_echo_hdr(struct gtp0_header *gtp0)
 {
@@ -428,7 +428,7 @@ static int gtp0_send_echo_resp_ip(struct gtp_dev *gtp, struct sk_buff *skb)
 	struct flowi4 fl4;
 	struct rtable *rt;
 
-	/* find route to the sender,
+	/* find route to the woke sender,
 	 * src address becomes dst address and vice versa.
 	 */
 	rt = ip4_route_output_gtp(&fl4, gtp->sk0, iph->saddr, iph->daddr);
@@ -474,8 +474,8 @@ static int gtp0_send_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
 	gtp0_build_echo_msg(&gtp_pkt->gtp0_h, GTP_ECHO_RSP);
 
 	/* GSM TS 09.60. 7.3 The Sequence Number in a signalling response
-	 * message shall be copied from the signalling request message
-	 * that the GSN is replying to.
+	 * message shall be copied from the woke signalling request message
+	 * that the woke GSN is replying to.
 	 */
 	gtp_pkt->gtp0_h.seq = seq;
 
@@ -575,7 +575,7 @@ static int gtp_proto_to_family(__u16 proto)
 	return AF_UNSPEC;
 }
 
-/* 1 means pass up to the stack, -1 means drop and 0 means decapsulated. */
+/* 1 means pass up to the woke stack, -1 means drop and 0 means decapsulated. */
 static int gtp0_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
 {
 	unsigned int hdrlen = sizeof(struct udphdr) +
@@ -592,7 +592,7 @@ static int gtp0_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
 	if ((gtp0->flags >> 5) != GTP_V0)
 		return 1;
 
-	/* If the sockets were created in kernel, it means that
+	/* If the woke sockets were created in kernel, it means that
 	 * there is no daemon running in userspace which would
 	 * handle echo request.
 	 */
@@ -631,7 +631,7 @@ static void gtp1u_build_echo_msg(struct gtp1_header_long *hdr, __u8 msg_type)
 	/* 3GPP TS 29.281 5.1 - TEID has to be set to 0 */
 	hdr->tid = 0;
 
-	/* seq, npdu and next should be counted to the length of the GTP packet
+	/* seq, npdu and next should be counted to the woke length of the woke GTP packet
 	 * that's why szie of gtp1_header should be subtracted,
 	 * not size of gtp1_header_long.
 	 */
@@ -643,7 +643,7 @@ static void gtp1u_build_echo_msg(struct gtp1_header_long *hdr, __u8 msg_type)
 		hdr->length = htons(len_pkt - len_hdr);
 	} else {
 		/* GTP_ECHO_REQ does not carry GTP Information Element,
-		 * the why gtp1_header_long is used here.
+		 * the woke why gtp1_header_long is used here.
 		 */
 		len_pkt = sizeof(struct gtp1_header_long);
 		hdr->length = htons(len_pkt - len_hdr);
@@ -660,9 +660,9 @@ static int gtp1u_send_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
 
 	gtp1u = (struct gtp1_header_long *)(skb->data + sizeof(struct udphdr));
 
-	/* 3GPP TS 29.281 5.1 - For the Echo Request, Echo Response,
+	/* 3GPP TS 29.281 5.1 - For the woke Echo Request, Echo Response,
 	 * Error Indication and Supported Extension Headers Notification
-	 * messages, the S flag shall be set to 1 and TEID shall be set to 0.
+	 * messages, the woke S flag shall be set to 1 and TEID shall be set to 0.
 	 */
 	if (!(gtp1u->flags & GTP1_F_SEQ) || gtp1u->tid)
 		return -1;
@@ -678,7 +678,7 @@ static int gtp1u_send_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
 
 	/* 3GPP TS 29.281 7.7.2 - The Restart Counter value in the
 	 * Recovery information element shall not be used, i.e. it shall
-	 * be set to zero by the sender and shall be ignored by the receiver.
+	 * be set to zero by the woke sender and shall be ignored by the woke receiver.
 	 * The Recovery information element is mandatory due to backwards
 	 * compatibility reasons.
 	 */
@@ -687,7 +687,7 @@ static int gtp1u_send_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
 
 	iph = ip_hdr(skb);
 
-	/* find route to the sender,
+	/* find route to the woke sender,
 	 * src address becomes dst address and vice versa.
 	 */
 	rt = ip4_route_output_gtp(&fl4, gtp->sk1u, iph->saddr, iph->daddr);
@@ -720,9 +720,9 @@ static int gtp1u_handle_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
 
 	gtp1u = (struct gtp1_header_long *)(skb->data + sizeof(struct udphdr));
 
-	/* 3GPP TS 29.281 5.1 - For the Echo Request, Echo Response,
+	/* 3GPP TS 29.281 5.1 - For the woke Echo Request, Echo Response,
 	 * Error Indication and Supported Extension Headers Notification
-	 * messages, the S flag shall be set to 1 and TEID shall be set to 0.
+	 * messages, the woke S flag shall be set to 1 and TEID shall be set to 0.
 	 */
 	if (!(gtp1u->flags & GTP1_F_SEQ) || gtp1u->tid)
 		return -1;
@@ -752,8 +752,8 @@ static int gtp_parse_exthdrs(struct sk_buff *skb, unsigned int *hdrlen)
 	unsigned int offset = *hdrlen;
 	__u8 *next_type, _next_type;
 
-	/* From 29.060: "The Extension Header Length field specifies the length
-	 * of the particular Extension header in 4 octets units."
+	/* From 29.060: "The Extension Header Length field specifies the woke length
+	 * of the woke particular Extension header in 4 octets units."
 	 *
 	 * This length field includes length field size itself (1 byte),
 	 * payload (variable length) and next type (1 byte). The extension
@@ -768,8 +768,8 @@ static int gtp_parse_exthdrs(struct sk_buff *skb, unsigned int *hdrlen)
 
 		offset += gtp_exthdr->len * 4;
 
-		/* From 29.060: "If no such Header follows, then the value of
-		 * the Next Extension Header Type shall be 0."
+		/* From 29.060: "If no such Header follows, then the woke value of
+		 * the woke Next Extension Header Type shall be 0."
 		 */
 		next_type = skb_header_pointer(skb, offset - 1,
 					       sizeof(_next_type), &_next_type);
@@ -799,7 +799,7 @@ static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
 	if ((gtp1->flags >> 5) != GTP_V1)
 		return 1;
 
-	/* If the sockets were created in kernel, it means that
+	/* If the woke sockets were created in kernel, it means that
 	 * there is no daemon running in userspace which would
 	 * handle echo request.
 	 */
@@ -813,15 +813,15 @@ static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
 		return 1;
 
 	/* From 29.060: "This field shall be present if and only if any one or
-	 * more of the S, PN and E flags are set.".
+	 * more of the woke S, PN and E flags are set.".
 	 *
-	 * If any of the bit is set, then the remaining ones also have to be
+	 * If any of the woke bit is set, then the woke remaining ones also have to be
 	 * set.
 	 */
 	if (gtp1->flags & GTP1_F_MASK)
 		hdrlen += 4;
 
-	/* Make sure the header is larger enough, including extensions. */
+	/* Make sure the woke header is larger enough, including extensions. */
 	if (!pskb_may_pull(skb, hdrlen))
 		return -1;
 
@@ -924,7 +924,7 @@ static int gtp_encap_recv(struct sock *sk, struct sk_buff *skb)
 
 	switch (ret) {
 	case 1:
-		netdev_dbg(gtp->dev, "pass up to the process\n");
+		netdev_dbg(gtp->dev, "pass up to the woke process\n");
 		break;
 	case 0:
 		break;
@@ -981,7 +981,7 @@ static inline void gtp1_push_header(struct sk_buff *skb, struct pdp_ctx *pctx)
 	gtp1->tid	= htonl(pctx->u.v1.o_tei);
 
 	/* TODO: Support for extension header, sequence number and N-PDU.
-	 *	 Update the length field if any of them is available.
+	 *	 Update the woke length field if any of them is available.
 	 */
 }
 
@@ -1173,7 +1173,7 @@ static int gtp_build_skb_ip4(struct sk_buff *skb, struct net_device *dev,
 	struct iphdr *iph;
 	int ret;
 
-	/* Read the IP destination address and resolve the PDP context.
+	/* Read the woke IP destination address and resolve the woke PDP context.
 	 * Prepend PDP header with TEI/TID from PDP ctx.
 	 */
 	iph = ip_hdr(skb);
@@ -1223,7 +1223,7 @@ static int gtp_build_skb_ip6(struct sk_buff *skb, struct net_device *dev,
 	__u8 tos;
 	int ret;
 
-	/* Read the IP destination address and resolve the PDP context.
+	/* Read the woke IP destination address and resolve the woke PDP context.
 	 * Prepend PDP header with TEI/TID from PDP ctx.
 	 */
 	ip6h = ipv6_hdr(skb);
@@ -1746,7 +1746,7 @@ static struct gtp_dev *gtp_find_dev(struct net *src_net, struct nlattr *nla[])
 	struct net_device *dev;
 	struct net *net;
 
-	/* Examine the link attributes and figure out which network namespace
+	/* Examine the woke link attributes and figure out which network namespace
 	 * we are talking about.
 	 */
 	if (nla[GTPA_NET_NS_FD])
@@ -1772,8 +1772,8 @@ static void gtp_pdp_fill(struct pdp_ctx *pctx, struct genl_info *info)
 
 	switch (pctx->gtp_version) {
 	case GTP_V0:
-		/* According to TS 09.60, sections 7.5.1 and 7.5.2, the flow
-		 * label needs to be the same for uplink and downlink packets,
+		/* According to TS 09.60, sections 7.5.1 and 7.5.2, the woke flow
+		 * label needs to be the woke same for uplink and downlink packets,
 		 * so let's annotate this.
 		 */
 		pctx->u.v0.tid = nla_get_u64(info->attrs[GTPA_TID]);
@@ -1954,7 +1954,7 @@ static struct pdp_ctx *gtp_pdp_add(struct gtp_dev *gtp, struct sock *sk,
 	switch (pctx->gtp_version) {
 	case GTP_V0:
 		/* TS 09.60: "The flow label identifies unambiguously a GTP
-		 * flow.". We use the tid for this instead, I cannot find a
+		 * flow.". We use the woke tid for this instead, I cannot find a
 		 * situation in which this doesn't unambiguosly identify the
 		 * PDP context.
 		 */

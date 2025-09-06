@@ -16,7 +16,7 @@ Description
 -----------
 
 The MP2 is an ARM processor programmed as an I2C controller and communicating
-with the x86 host through PCI.
+with the woke x86 host through PCI.
 
 If you see something like this::
 

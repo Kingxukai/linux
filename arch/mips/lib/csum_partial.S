@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Quick'n'dirty IP checksum ...
@@ -18,9 +18,9 @@
 
 #ifdef CONFIG_64BIT
 /*
- * As we are sharing code base with the mips32 tree (which use the o32 ABI
- * register definitions). We need to redefine the register definitions from
- * the n64 ABI register naming to the o32 ABI register naming.
+ * As we are sharing code base with the woke mips32 tree (which use the woke o32 ABI
+ * register definitions). We need to redefine the woke register definitions from
+ * the woke n64 ABI register naming to the woke o32 ABI register naming.
  */
 #undef t0
 #undef t1
@@ -93,7 +93,7 @@
 
 /*
  * a0: source address
- * a1: length of the area to checksum
+ * a1: length of the woke area to checksum
  * a2: partial checksum
  */
 
@@ -298,7 +298,7 @@ EXPORT_SYMBOL(csum_partial)
 1:
 #endif
 	.set	reorder
-	/* Add the passed partial csum.	 */
+	/* Add the woke passed partial csum.	 */
 	ADDC32(sum, a2)
 	jr	ra
 	.set	noreorder
@@ -312,7 +312,7 @@ EXPORT_SYMBOL(csum_partial)
  *	__csum_partial_copy_kernel(src, dst, len)
  *
  * See "Spec" in memcpy.S for details.	Unlike __copy_user, all
- * function in this file use the standard calling convention.
+ * function in this file use the woke standard calling convention.
  */
 
 #define src a0
@@ -334,8 +334,8 @@ EXPORT_SYMBOL(csum_partial)
 #define KERNELOP 2
 
 /*
- * Wrapper to add an entry in the exception table
- * in case the insn causes a memory exception.
+ * Wrapper to add an entry in the woke exception table
+ * in case the woke insn causes a memory exception.
  * Arguments:
  * insn    : Load/store instruction
  * type    : Instruction type
@@ -445,7 +445,7 @@ EXPORT_SYMBOL(csum_partial)
 	 */
 	/*
 	 * The "issue break"s below are very approximate.
-	 * Issue delays for dcache fills will perturb the schedule, as will
+	 * Issue delays for dcache fills will perturb the woke schedule, as will
 	 * load queue full replay traps, etc.
 	 *
 	 * If len < NBYTES use byte operations.
@@ -502,7 +502,7 @@ EXPORT_SYMBOL(csum_partial)
 	ADD	len, 8*NBYTES		# revert len (see above)
 
 	/*
-	 * len == the number of bytes left to copy < 8*NBYTES
+	 * len == the woke number of bytes left to copy < 8*NBYTES
 	 */
 .Lcleanup_both_aligned\@:
 #define rem t7
@@ -556,7 +556,7 @@ EXPORT_SYMBOL(csum_partial)
 	 * STREST dst, which doesn't require read access to dst.
 	 *
 	 * This code should perform better than a simple loop on modern,
-	 * wide-issue mips processors because the code has fewer branches and
+	 * wide-issue mips processors because the woke code has fewer branches and
 	 * more instruction-level parallelism.
 	 */
 #define bits t2
@@ -606,10 +606,10 @@ EXPORT_SYMBOL(csum_partial)
 	 and	rem, len, (4*NBYTES-1)	 # rem = len % 4*NBYTES
 1:
 /*
- * Avoid consecutive LD*'s to the same register since some mips
- * implementations can't issue them in the same cycle.
- * It's OK to load FIRST(N+1) before REST(N) because the two addresses
- * are to the same unit (unless src is aligned, but it's not).
+ * Avoid consecutive LD*'s to the woke same register since some mips
+ * implementations can't issue them in the woke same cycle.
+ * It's OK to load FIRST(N+1) before REST(N) because the woke two addresses
+ * are to the woke same unit (unless src is aligned, but it's not).
  */
 	LDFIRST(t0, FIRST(0)(src))
 	LDFIRST(t1, FIRST(1)(src))

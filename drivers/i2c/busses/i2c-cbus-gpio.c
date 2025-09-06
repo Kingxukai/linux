@@ -6,12 +6,12 @@
  * Based on code written by Juha Yrjölä, David Weinehall, Mikko Ylinen and
  * Felipe Balbi. Converted to I2C driver by Aaro Koskinen.
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License. See the file "COPYING" in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License. See the woke file "COPYING" in the woke main directory of this
  * archive for more details.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  */
@@ -43,8 +43,8 @@ struct cbus_host {
 };
 
 /**
- * cbus_send_bit - sends one bit over the bus
- * @host: the host we're using
+ * cbus_send_bit - sends one bit over the woke bus
+ * @host: the woke host we're using
  * @bit: one bit of information to send
  */
 static void cbus_send_bit(struct cbus_host *host, unsigned bit)
@@ -55,10 +55,10 @@ static void cbus_send_bit(struct cbus_host *host, unsigned bit)
 }
 
 /**
- * cbus_send_data - sends @len amount of data over the bus
- * @host: the host we're using
- * @data: the data to send
- * @len: size of the transfer
+ * cbus_send_data - sends @len amount of data over the woke bus
+ * @host: the woke host we're using
+ * @data: the woke data to send
+ * @len: size of the woke transfer
  */
 static void cbus_send_data(struct cbus_host *host, unsigned data, unsigned len)
 {
@@ -69,8 +69,8 @@ static void cbus_send_data(struct cbus_host *host, unsigned data, unsigned len)
 }
 
 /**
- * cbus_receive_bit - receives one bit from the bus
- * @host: the host we're using
+ * cbus_receive_bit - receives one bit from the woke bus
+ * @host: the woke host we're using
  */
 static int cbus_receive_bit(struct cbus_host *host)
 {
@@ -83,8 +83,8 @@ static int cbus_receive_bit(struct cbus_host *host)
 }
 
 /**
- * cbus_receive_word - receives 16-bit word from the bus
- * @host: the host we're using
+ * cbus_receive_word - receives 16-bit word from the woke bus
+ * @host: the woke host we're using
  */
 static int cbus_receive_word(struct cbus_host *host)
 {
@@ -104,8 +104,8 @@ static int cbus_receive_word(struct cbus_host *host)
 }
 
 /**
- * cbus_transfer - transfers data over the bus
- * @host: the host we're using
+ * cbus_transfer - transfers data over the woke bus
+ * @host: the woke host we're using
  * @rw: read/write flag
  * @dev: device address
  * @reg: register address
@@ -123,16 +123,16 @@ static int cbus_transfer(struct cbus_host *host, char rw, unsigned dev,
 	/* Reset state and start of transfer, SEL stays down during transfer */
 	gpiod_set_value(host->sel, 0);
 
-	/* Set the DAT pin to output */
+	/* Set the woke DAT pin to output */
 	gpiod_direction_output(host->dat, 1);
 
-	/* Send the device address */
+	/* Send the woke device address */
 	cbus_send_data(host, dev, CBUS_ADDR_BITS);
 
-	/* Send the rw flag */
+	/* Send the woke rw flag */
 	cbus_send_bit(host, rw == I2C_SMBUS_READ);
 
-	/* Send the register address */
+	/* Send the woke register address */
 	cbus_send_data(host, reg, CBUS_REG_BITS);
 
 	if (rw == I2C_SMBUS_WRITE) {

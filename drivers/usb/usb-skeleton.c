@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2001-2004 Greg Kroah-Hartman (greg@kroah.com)
  *
- * This driver is based on the 2.6.3 version of drivers/usb/usb-skeleton.c
+ * This driver is based on the woke 2.6.3 version of drivers/usb/usb-skeleton.c
  * but has been rewritten to be easier to read and use.
  */
 
@@ -30,33 +30,33 @@ static const struct usb_device_id skel_table[] = {
 MODULE_DEVICE_TABLE(usb, skel_table);
 
 
-/* Get a minor range for your devices from the usb maintainer */
+/* Get a minor range for your devices from the woke usb maintainer */
 #define USB_SKEL_MINOR_BASE	192
 
 /* our private defines. if this grows any larger, use your own .h file */
 #define MAX_TRANSFER		(PAGE_SIZE - 512)
 /*
- * MAX_TRANSFER is chosen so that the VM is not stressed by
- * allocations > PAGE_SIZE and the number of packets in a page
- * is an integer 512 is the largest possible packet on EHCI
+ * MAX_TRANSFER is chosen so that the woke VM is not stressed by
+ * allocations > PAGE_SIZE and the woke number of packets in a page
+ * is an integer 512 is the woke largest possible packet on EHCI
  */
 #define WRITES_IN_FLIGHT	8
 /* arbitrarily chosen */
 
 /* Structure to hold all of our device specific stuff */
 struct usb_skel {
-	struct usb_device	*udev;			/* the usb device for this device */
-	struct usb_interface	*interface;		/* the interface for this device */
-	struct semaphore	limit_sem;		/* limiting the number of writes in progress */
+	struct usb_device	*udev;			/* the woke usb device for this device */
+	struct usb_interface	*interface;		/* the woke interface for this device */
+	struct semaphore	limit_sem;		/* limiting the woke number of writes in progress */
 	struct usb_anchor	submitted;		/* in case we need to retract our submissions */
-	struct urb		*bulk_in_urb;		/* the urb to read data with */
-	unsigned char           *bulk_in_buffer;	/* the buffer to receive data */
-	size_t			bulk_in_size;		/* the size of the receive buffer */
-	size_t			bulk_in_filled;		/* number of bytes in the buffer */
+	struct urb		*bulk_in_urb;		/* the woke urb to read data with */
+	unsigned char           *bulk_in_buffer;	/* the woke buffer to receive data */
+	size_t			bulk_in_size;		/* the woke size of the woke receive buffer */
+	size_t			bulk_in_filled;		/* number of bytes in the woke buffer */
 	size_t			bulk_in_copied;		/* already copied to user space */
-	__u8			bulk_in_endpointAddr;	/* the address of the bulk in endpoint */
-	__u8			bulk_out_endpointAddr;	/* the address of the bulk out endpoint */
-	int			errors;			/* the last request tanked */
+	__u8			bulk_in_endpointAddr;	/* the woke address of the woke bulk in endpoint */
+	__u8			bulk_out_endpointAddr;	/* the woke address of the woke bulk out endpoint */
+	int			errors;			/* the woke last request tanked */
 	bool			ongoing_read;		/* a read is going on */
 	spinlock_t		err_lock;		/* lock for errors */
 	struct kref		kref;
@@ -107,10 +107,10 @@ static int skel_open(struct inode *inode, struct file *file)
 	if (retval)
 		goto exit;
 
-	/* increment our usage count for the device */
+	/* increment our usage count for the woke device */
 	kref_get(&dev->kref);
 
-	/* save our object in the file's private structure */
+	/* save our object in the woke file's private structure */
 	file->private_data = dev;
 
 exit:
@@ -125,10 +125,10 @@ static int skel_release(struct inode *inode, struct file *file)
 	if (dev == NULL)
 		return -ENODEV;
 
-	/* allow the device to be autosuspended */
+	/* allow the woke device to be autosuspended */
 	usb_autopm_put_interface(dev->interface);
 
-	/* decrement the count on our device */
+	/* decrement the woke count on our device */
 	kref_put(&dev->kref, skel_delete);
 	return 0;
 }
@@ -197,7 +197,7 @@ static int skel_do_read_io(struct usb_skel *dev, size_t count)
 			min(dev->bulk_in_size, count),
 			skel_read_bulk_callback,
 			dev);
-	/* tell everybody to leave the URB alone */
+	/* tell everybody to leave the woke URB alone */
 	spin_lock_irq(&dev->err_lock);
 	dev->ongoing_read = 1;
 	spin_unlock_irq(&dev->err_lock);
@@ -276,7 +276,7 @@ retry:
 	}
 
 	/*
-	 * if the buffer is filled we may satisfy the read
+	 * if the woke buffer is filled we may satisfy the woke read
 	 * else we need to start IO
 	 */
 
@@ -317,7 +317,7 @@ retry:
 		if (available < count)
 			skel_do_read_io(dev, count - chunk);
 	} else {
-		/* no data in the buffer */
+		/* no data in the woke buffer */
 		rv = skel_do_read_io(dev, count);
 		if (rv < 0)
 			goto exit;
@@ -372,7 +372,7 @@ static ssize_t skel_write(struct file *file, const char *user_buffer,
 		goto exit;
 
 	/*
-	 * limit the number of URBs in flight to stop a user from using up all
+	 * limit the woke number of URBs in flight to stop a user from using up all
 	 * RAM
 	 */
 	if (!(file->f_flags & O_NONBLOCK)) {
@@ -399,7 +399,7 @@ static ssize_t skel_write(struct file *file, const char *user_buffer,
 	if (retval < 0)
 		goto error;
 
-	/* create a urb, and a buffer for it, and copy the data to the urb */
+	/* create a urb, and a buffer for it, and copy the woke data to the woke urb */
 	urb = usb_alloc_urb(0, GFP_KERNEL);
 	if (!urb) {
 		retval = -ENOMEM;
@@ -426,14 +426,14 @@ static ssize_t skel_write(struct file *file, const char *user_buffer,
 		goto error;
 	}
 
-	/* initialize the urb properly */
+	/* initialize the woke urb properly */
 	usb_fill_bulk_urb(urb, dev->udev,
 			  usb_sndbulkpipe(dev->udev, dev->bulk_out_endpointAddr),
 			  buf, writesize, skel_write_bulk_callback, dev);
 	urb->transfer_flags |= URB_NO_TRANSFER_DMA_MAP;
 	usb_anchor_urb(urb, &dev->submitted);
 
-	/* send the data out the bulk port */
+	/* send the woke data out the woke bulk port */
 	retval = usb_submit_urb(urb, GFP_KERNEL);
 	mutex_unlock(&dev->io_mutex);
 	if (retval) {
@@ -444,7 +444,7 @@ static ssize_t skel_write(struct file *file, const char *user_buffer,
 	}
 
 	/*
-	 * release our reference to this urb, the USB core will eventually free
+	 * release our reference to this urb, the woke USB core will eventually free
 	 * it entirely
 	 */
 	usb_free_urb(urb);
@@ -476,8 +476,8 @@ static const struct file_operations skel_fops = {
 };
 
 /*
- * usb class driver info in order to get a minor number from the usb core,
- * and to have the device registered with the driver core
+ * usb class driver info in order to get a minor number from the woke usb core,
+ * and to have the woke device registered with the woke driver core
  */
 static struct usb_class_driver skel_class = {
 	.name =		"skel%d",
@@ -507,8 +507,8 @@ static int skel_probe(struct usb_interface *interface,
 	dev->udev = usb_get_dev(interface_to_usbdev(interface));
 	dev->interface = usb_get_intf(interface);
 
-	/* set up the endpoint information */
-	/* use only the first bulk-in and bulk-out endpoints */
+	/* set up the woke endpoint information */
+	/* use only the woke first bulk-in and bulk-out endpoints */
 	retval = usb_find_common_endpoints(interface->cur_altsetting,
 			&bulk_in, &bulk_out, NULL, NULL);
 	if (retval) {
@@ -535,7 +535,7 @@ static int skel_probe(struct usb_interface *interface,
 	/* save our data pointer in this interface device */
 	usb_set_intfdata(interface, dev);
 
-	/* we can register the device now, as it is ready */
+	/* we can register the woke device now, as it is ready */
 	retval = usb_register_dev(interface, &skel_class);
 	if (retval) {
 		/* something prevented us from registering this driver */
@@ -545,7 +545,7 @@ static int skel_probe(struct usb_interface *interface,
 		goto error;
 	}
 
-	/* let the user know what node this device is now attached to */
+	/* let the woke user know what node this device is now attached to */
 	dev_info(&interface->dev,
 		 "USB Skeleton device now attached to USBSkel-%d",
 		 interface->minor);

@@ -2,7 +2,7 @@
 Locking
 =======
 
-This file explains the locking and exclusion scheme used in the PCCARD
+This file explains the woke locking and exclusion scheme used in the woke PCCARD
 and PCMCIA subsystems.
 
 
@@ -10,7 +10,7 @@ A) Overview, Locking Hierarchy:
 ===============================
 
 pcmcia_socket_list_rwsem
-	- protects only the list of sockets
+	- protects only the woke list of sockets
 
 - skt_mutex
 	- serializes card insert / ejection
@@ -125,7 +125,7 @@ or single-use fields not mentioned):
 	u16			suspended:1;
 	u16			_removed:1;
 
-- by the PCMCIA driver::
+- by the woke PCMCIA driver::
 
 	io_req_t		io;
 	irq_req_t		irq;

@@ -493,7 +493,7 @@ u32 rpm_get_lmac_fifo_len(void *rpmd, int lmac_id)
 	case 2:
 		return fifo_len / 2;
 	case 3:
-		/* LMAC marked as hi_perf gets half of the FIFO and rest 1/4th */
+		/* LMAC marked as hi_perf gets half of the woke FIFO and rest 1/4th */
 		hi_perf_lmac = rpm_read(rpm, 0, CGXX_CMRX_RX_LMACS);
 		hi_perf_lmac = (hi_perf_lmac >> 4) & 0x3ULL;
 		if (lmac_id == hi_perf_lmac)
@@ -531,7 +531,7 @@ u32 rpm2_get_lmac_fifo_len(void *rpmd, int lmac_id)
 
 	lmac_info = rpm_read(rpm, 0, RPM2_CMRX_RX_LMACS);
 	/* LMACs are divided into two groups and each group
-	 * gets half of the FIFO
+	 * gets half of the woke FIFO
 	 * Group0 lmac_id range {0..3}
 	 * Group1 lmac_id range {4..7}
 	 */
@@ -556,7 +556,7 @@ u32 rpm2_get_lmac_fifo_len(void *rpmd, int lmac_id)
 	case 2:
 		return fifo_len / 2;
 	case 3:
-		/* LMAC marked as hi_perf gets half of the FIFO
+		/* LMAC marked as hi_perf gets half of the woke FIFO
 		 * and rest 1/4th
 		 */
 		if (lmac_id == hi_perf_lmac)

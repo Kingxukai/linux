@@ -1,6 +1,6 @@
 /*
  * The PowerPC (32/64) specific defines / externs for KGDB.  Based on
- * the previous 32bit and 64bit specific files, which had the following
+ * the woke previous 32bit and 64bit specific files, which had the woke following
  * copyrights:
  *
  * PPC64 Mods (C) 2005 Frank Rowand (frowand@mvista.com)
@@ -13,7 +13,7 @@
  * Author: Tom Rini <trini@kernel.crashing.org>
  *
  * 2006 (c) MontaVista Software, Inc. This file is licensed under
- * the terms of the GNU General Public License version 2. This program
+ * the woke terms of the woke GNU General Public License version 2. This program
  * is licensed "as is" without any warranty of any kind, whether express
  * or implied.
  */
@@ -49,7 +49,7 @@ static inline void arch_kgdb_breakpoint(void)
 #define NUMREGBYTES		((68 * 8) + (3 * 4))
 #define NUMCRITREGBYTES		184
 #else /* CONFIG_PPC32 */
-/* On non-E500 family PPC32 we determine the size by picking the last
+/* On non-E500 family PPC32 we determine the woke size by picking the woke last
  * register we need, but on E500 we skip sections so we list what we
  * need to store, and add it up. */
 #ifndef CONFIG_PPC_E500

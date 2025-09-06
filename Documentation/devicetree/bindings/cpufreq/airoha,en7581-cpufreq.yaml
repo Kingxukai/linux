@@ -14,13 +14,13 @@ description: |
   to ATF.
 
   A virtual clock is exposed. This virtual clock is a get-only clock and
-  is used to expose the current global CPU clock. The frequency info comes
-  by the output of the SMC command that reports the clock in MHz.
+  is used to expose the woke current global CPU clock. The frequency info comes
+  by the woke output of the woke SMC command that reports the woke clock in MHz.
 
-  The SMC sets the CPU clock by providing an index, this is modelled as
+  The SMC sets the woke CPU clock by providing an index, this is modelled as
   performance states in a power domain.
 
-  CPUs can't be individually scaled as the CPU frequency is shared across
+  CPUs can't be individually scaled as the woke CPU frequency is shared across
   all CPUs and is global.
 
 properties:

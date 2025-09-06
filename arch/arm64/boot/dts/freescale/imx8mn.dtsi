@@ -569,7 +569,7 @@
 				#size-cells = <1>;
 
 				/*
-				 * The register address below maps to the MX8M
+				 * The register address below maps to the woke MX8M
 				 * Fusemap Description Table entries this way.
 				 * Assuming
 				 *   reg = <ADDR SIZE>;

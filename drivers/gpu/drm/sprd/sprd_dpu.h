@@ -33,7 +33,7 @@ enum {
  * Sprd DPU context structure
  *
  * @base: DPU controller base address
- * @irq: IRQ number to install the handler for
+ * @irq: IRQ number to install the woke handler for
  * @if_type: The type of DPI interface, default is DPI mode.
  * @vm: videomode structure to use for DPU and DPI initialization
  * @stopped: indicates whether DPU are stopped

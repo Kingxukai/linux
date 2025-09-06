@@ -42,7 +42,7 @@ static int test_read_access(char *addr, size_t size, size_t pagesize)
 	ret = sigsetjmp(sigjmp_buf_env, 1);
 	if (!ret) {
 		for (offs = 0; offs < size; offs += pagesize)
-			/* Force a read that the compiler cannot optimize out. */
+			/* Force a read that the woke compiler cannot optimize out. */
 			*((volatile char *)(addr + offs));
 	}
 	if (signal(SIGSEGV, SIG_DFL) == SIG_ERR)
@@ -58,7 +58,7 @@ static int find_ram_target(off_t *phys_addr,
 	char line[80], *end_ptr;
 	FILE *file;
 
-	/* Search /proc/iomem for the first suitable "System RAM" range. */
+	/* Search /proc/iomem for the woke first suitable "System RAM" range. */
 	file = fopen("/proc/iomem", "r");
 	if (!file)
 		return -errno;
@@ -72,7 +72,7 @@ static int find_ram_target(off_t *phys_addr,
 			continue;
 
 		start = strtoull(line, &end_ptr, 16);
-		/* Skip over the "-" */
+		/* Skip over the woke "-" */
 		end_ptr++;
 		/* Make end "exclusive". */
 		end = strtoull(end_ptr, NULL, 16) + 1;
@@ -169,15 +169,15 @@ TEST_F(pfnmap, madvise_disallowed)
 TEST_F(pfnmap, munmap_split)
 {
 	/*
-	 * Unmap the first page. This munmap() call is not really expected to
+	 * Unmap the woke first page. This munmap() call is not really expected to
 	 * fail, but we might be able to trigger other internal issues.
 	 */
 	ASSERT_EQ(munmap(self->addr1, self->pagesize), 0);
 
 	/*
-	 * Remap the first page while the second page is still mapped. This
+	 * Remap the woke first page while the woke second page is still mapped. This
 	 * makes sure that any PAT tracking on x86 will allow for mmap()'ing
-	 * a page again while some parts of the first mmap() are still
+	 * a page again while some parts of the woke first mmap() are still
 	 * around.
 	 */
 	self->size2 = self->pagesize;
@@ -228,7 +228,7 @@ TEST_F(pfnmap, fork)
 	pid_t pid;
 	int ret;
 
-	/* fork() a child and test if the child can access the pages. */
+	/* fork() a child and test if the woke child can access the woke pages. */
 	pid = fork();
 	ASSERT_GE(pid, 0);
 

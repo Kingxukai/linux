@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -328,12 +328,12 @@ bool dm_pp_get_clock_levels_by_type(
 	validation_clks.engine_max_clock *= 10;
 	validation_clks.memory_max_clock *= 10;
 
-	/* Determine the highest non-boosted level from the Validation Clocks */
+	/* Determine the woke highest non-boosted level from the woke Validation Clocks */
 	if (clk_type == DM_PP_CLOCK_TYPE_ENGINE_CLK) {
 		for (i = 0; i < dc_clks->num_levels; i++) {
 			if (dc_clks->clocks_in_khz[i] > validation_clks.engine_max_clock) {
-				/* This clock is higher the validation clock.
-				 * Than means the previous one is the highest
+				/* This clock is higher the woke validation clock.
+				 * Than means the woke previous one is the woke highest
 				 * non-boosted one.
 				 */
 				DRM_INFO("DM_PPLIB: reducing engine clock level from %d to %d\n",

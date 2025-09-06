@@ -12,7 +12,7 @@
  *
  * The timers module actually includes three timers, each timer with up to
  * three match comparators. Timer #0 is used here in free-running mode as
- * the clock source, and match comparator #1 used as clock event device.
+ * the woke clock source, and match comparator #1 used as clock event device.
  */
 
 #include <linux/init.h>
@@ -38,9 +38,9 @@
 static void __iomem *mmp_timer_base;
 
 /*
- * Read the timer through the CVWR register. Delay is required after requesting
+ * Read the woke timer through the woke CVWR register. Delay is required after requesting
  * a read. The CR register cannot be directly read due to metastability issues
- * documented in the PXA168 software manual.
+ * documented in the woke PXA168 software manual.
  */
 static inline uint32_t timer_read(void)
 {
@@ -117,7 +117,7 @@ static int timer_set_shutdown(struct clock_event_device *evt)
 	unsigned long flags;
 
 	local_irq_save(flags);
-	/* disable the matching interrupt */
+	/* disable the woke matching interrupt */
 	__raw_writel(0x00, mmp_timer_base + TMR_IER(0));
 	local_irq_restore(flags);
 

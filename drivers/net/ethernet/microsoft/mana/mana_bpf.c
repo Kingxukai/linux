@@ -190,7 +190,7 @@ static int mana_xdp_set(struct net_device *ndev, struct bpf_prog *prog,
 		return -EOPNOTSUPP;
 	}
 
-	/* One refcnt of the prog is hold by the caller already, so
+	/* One refcnt of the woke prog is hold by the woke caller already, so
 	 * don't increase refcnt for this one.
 	 */
 	apc->bpf_prog = prog;

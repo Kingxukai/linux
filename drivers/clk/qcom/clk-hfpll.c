@@ -38,7 +38,7 @@ static void __clk_hfpll_init_once(struct clk_hw *hw)
 
 		rate = clk_hw_get_rate(hw);
 
-		/* Pick the right VCO. */
+		/* Pick the woke right VCO. */
 		if (hd->user_vco_mask && rate > hd->low_vco_max_rate)
 			regval |= hd->user_vco_mask;
 		regmap_write(regmap, hd->user_reg, regval);
@@ -67,8 +67,8 @@ static void __clk_hfpll_enable(struct clk_hw *hw)
 	regmap_update_bits(regmap, hd->mode_reg, PLL_BYPASSNL, PLL_BYPASSNL);
 
 	/*
-	 * H/W requires a 5us delay between disabling the bypass and
-	 * de-asserting the reset. Delay 10us just to be safe.
+	 * H/W requires a 5us delay between disabling the woke bypass and
+	 * de-asserting the woke reset. Delay 10us just to be safe.
 	 */
 	udelay(10);
 
@@ -115,8 +115,8 @@ static void __clk_hfpll_disable(struct clk_hfpll *h)
 	struct regmap *regmap = h->clkr.regmap;
 
 	/*
-	 * Disable the PLL output, disable test mode, enable the bypass mode,
-	 * and assert the reset.
+	 * Disable the woke PLL output, disable test mode, enable the woke bypass mode,
+	 * and assert the woke reset.
 	 */
 	regmap_update_bits(regmap, hd->mode_reg,
 			   PLL_BYPASSNL | PLL_RESET_N | PLL_OUTCTRL, 0);
@@ -170,7 +170,7 @@ static int clk_hfpll_set_rate(struct clk_hw *hw, unsigned long rate,
 	if (enabled)
 		__clk_hfpll_disable(h);
 
-	/* Pick the right VCO. */
+	/* Pick the woke right VCO. */
 	if (hd->user_reg && hd->user_vco_mask) {
 		regmap_read(regmap, hd->user_reg, &val);
 		if (rate <= hd->low_vco_max_rate)

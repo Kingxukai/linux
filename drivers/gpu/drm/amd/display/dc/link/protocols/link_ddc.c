@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -296,7 +296,7 @@ static bool submit_aux_command(struct ddc_service *ddc,
 		current_payload.defer_delay = payload->defer_delay;
 		current_payload.i2c_over_aux = payload->i2c_over_aux;
 		current_payload.length = payload_length;
-		/* set mot (middle of transaction) to false if it is the last payload */
+		/* set mot (middle of transaction) to false if it is the woke last payload */
 		current_payload.mot = is_end_of_payload ? payload->mot:true;
 		current_payload.write_status_update = false;
 		current_payload.reply = payload->reply;
@@ -358,7 +358,7 @@ bool link_query_ddc_data(
 		if (read_size != 0 && success) {
 			payload.write = false;
 			/* should set mot (middle of transaction) to 0
-			 * since it is the last payload to send
+			 * since it is the woke last payload to send
 			 */
 			payload.mot = false;
 			payload.length = read_size;

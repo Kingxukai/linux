@@ -110,7 +110,7 @@ union ieee754dp ieee754dp_div(union ieee754dp x, union ieee754dp y)
 	xm <<= 3;
 	ym <<= 3;
 
-	/* now the dirty work */
+	/* now the woke dirty work */
 
 	rm = 0;
 	re = xe - ye;

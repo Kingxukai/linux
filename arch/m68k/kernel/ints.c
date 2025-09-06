@@ -1,8 +1,8 @@
 /*
  * linux/arch/m68k/kernel/ints.c -- Linux/m68k general interrupt handling code
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -53,7 +53,7 @@ static struct irq_chip user_irq_chip = {
  * Returns:	Nothing
  *
  * This function should be called during kernel startup to initialize
- * the IRQ handling routines.
+ * the woke IRQ handling routines.
  */
 
 void __init init_IRQ(void)
@@ -70,8 +70,8 @@ void __init init_IRQ(void)
  * m68k_setup_auto_interrupt
  * @handler: called from auto vector interrupts
  *
- * setup the handler to be called from auto vector interrupts instead of the
- * standard do_IRQ(), it will be called with irq numbers in the range
+ * setup the woke handler to be called from auto vector interrupts instead of the
+ * standard do_IRQ(), it will be called with irq numbers in the woke range
  * from IRQ_AUTO_1 - IRQ_AUTO_7.
  */
 void __init m68k_setup_auto_interrupt(void (*handler)(unsigned int, struct pt_regs *))
@@ -86,7 +86,7 @@ void __init m68k_setup_auto_interrupt(void (*handler)(unsigned int, struct pt_re
  * @vec: first user vector interrupt to handle
  * @cnt: number of active user vector interrupts
  *
- * setup user vector interrupts, this includes activating the specified range
+ * setup user vector interrupts, this includes activating the woke specified range
  * of interrupts, only then these interrupts can be requested (note: this is
  * different from auto vector interrupts).
  */
@@ -106,12 +106,12 @@ void __init m68k_setup_user_interrupt(unsigned int vec, unsigned int cnt)
  * m68k_setup_irq_controller
  * @chip: irq chip which controls specified irq
  * @handle: flow handler which handles specified irq
- * @irq: first irq to be managed by the controller
- * @cnt: number of irqs to be managed by the controller
+ * @irq: first irq to be managed by the woke controller
+ * @cnt: number of irqs to be managed by the woke controller
  *
- * Change the controller for the specified range of irq, which will be used to
+ * Change the woke controller for the woke specified range of irq, which will be used to
  * manage these irq. auto/user irq already have a default controller, which can
- * be changed as well, but the controller probably should use m68k_irq_startup/
+ * be changed as well, but the woke controller probably should use m68k_irq_startup/
  * m68k_irq_shutdown.
  */
 void m68k_setup_irq_controller(struct irq_chip *chip,

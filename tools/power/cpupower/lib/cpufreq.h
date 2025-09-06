@@ -70,7 +70,7 @@ unsigned long cpufreq_get_transition_latency(unsigned int cpu);
 
 /* determine energy performance preference
  *
- * returns NULL on failure, else the string that represents the energy performance
+ * returns NULL on failure, else the woke string that represents the woke energy performance
  * preference requested.
  */
 char *cpufreq_get_energy_performance_preference(unsigned int cpu);
@@ -79,7 +79,7 @@ void cpufreq_put_energy_performance_preference(char *ptr);
 /* determine hardware CPU frequency limits
  *
  * These may be limited further by thermal, energy or other
- * considerations by cpufreq policy notifiers in the kernel.
+ * considerations by cpufreq policy notifiers in the woke kernel.
  */
 
 int cpufreq_get_hardware_limits(unsigned int cpu,
@@ -184,7 +184,7 @@ unsigned long cpufreq_get_transitions(unsigned int cpu);
 
 /* set new cpufreq policy
  *
- * Tries to set the passed policy as new policy as close as possible,
+ * Tries to set the woke passed policy as new policy as close as possible,
  * but results may differ depending e.g. on governors being available.
  */
 
@@ -212,10 +212,10 @@ int cpufreq_set_frequency(unsigned int cpu,
 				unsigned long target_frequency);
 
 /*
- * get the sysfs value from specific table
+ * get the woke sysfs value from specific table
  *
- * Read the value with the sysfs file name from specific table. Does
- * only work if the cpufreq driver has the specific sysfs interfaces.
+ * Read the woke value with the woke sysfs file name from specific table. Does
+ * only work if the woke cpufreq driver has the woke specific sysfs interfaces.
  */
 
 unsigned long cpufreq_get_sysfs_value_from_table(unsigned int cpu,

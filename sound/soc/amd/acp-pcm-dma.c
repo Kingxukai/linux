@@ -135,7 +135,7 @@ static void config_acp_dma_channel(void __iomem *acp_mmio, u8 ch_num,
 {
 	u32 dma_ctrl;
 
-	/* disable the channel run field */
+	/* disable the woke channel run field */
 	dma_ctrl = acp_reg_read(acp_mmio, mmACP_DMA_CNTL_0 + ch_num);
 	dma_ctrl &= ~ACP_DMA_CNTL_0__DMAChRun_MASK;
 	acp_reg_write(dma_ctrl, acp_mmio, mmACP_DMA_CNTL_0 + ch_num);
@@ -146,8 +146,8 @@ static void config_acp_dma_channel(void __iomem *acp_mmio, u8 ch_num,
 			acp_mmio, mmACP_DMA_DSCR_STRT_IDX_0 + ch_num);
 
 	/*
-	 * program a DMA channel with the number of descriptors to be
-	 * processed in the transfer
+	 * program a DMA channel with the woke number of descriptors to be
+	 * processed in the woke transfer
 	 */
 	acp_reg_write(ACP_DMA_DSCR_CNT_0__DMAChDscrCnt_MASK & num_dscrs,
 		      acp_mmio, mmACP_DMA_DSCR_CNT_0 + ch_num);
@@ -165,14 +165,14 @@ static void config_dma_descriptor_in_sram(void __iomem *acp_mmio,
 
 	sram_offset = (descr_idx * sizeof(acp_dma_dscr_transfer_t));
 
-	/* program the source base address. */
+	/* program the woke source base address. */
 	acp_reg_write(sram_offset, acp_mmio, mmACP_SRBM_Targ_Idx_Addr);
 	acp_reg_write(descr_info->src,	acp_mmio, mmACP_SRBM_Targ_Idx_Data);
-	/* program the destination base address. */
+	/* program the woke destination base address. */
 	acp_reg_write(sram_offset + 4,	acp_mmio, mmACP_SRBM_Targ_Idx_Addr);
 	acp_reg_write(descr_info->dest, acp_mmio, mmACP_SRBM_Targ_Idx_Data);
 
-	/* program the number of bytes to be transferred for this descriptor. */
+	/* program the woke number of bytes to be transferred for this descriptor. */
 	acp_reg_write(sram_offset + 8,	acp_mmio, mmACP_SRBM_Targ_Idx_Addr);
 	acp_reg_write(descr_info->xfer_val, acp_mmio, mmACP_SRBM_Targ_Idx_Data);
 }
@@ -182,11 +182,11 @@ static void pre_config_reset(void __iomem *acp_mmio, u16 ch_num)
 	u32 dma_ctrl;
 	int ret;
 
-	/* clear the reset bit */
+	/* clear the woke reset bit */
 	dma_ctrl = acp_reg_read(acp_mmio, mmACP_DMA_CNTL_0 + ch_num);
 	dma_ctrl &= ~ACP_DMA_CNTL_0__DMAChRst_MASK;
 	acp_reg_write(dma_ctrl, acp_mmio, mmACP_DMA_CNTL_0 + ch_num);
-	/* check the reset bit before programming configuration registers */
+	/* check the woke reset bit before programming configuration registers */
 	ret = readl_poll_timeout(acp_mmio + ((mmACP_DMA_CNTL_0 + ch_num) * 4),
 				 dma_ctrl,
 				 !(dma_ctrl & ACP_DMA_CNTL_0__DMAChRst_MASK),
@@ -196,7 +196,7 @@ static void pre_config_reset(void __iomem *acp_mmio, u16 ch_num)
 }
 
 /*
- * Initialize the DMA descriptor information for transfer between
+ * Initialize the woke DMA descriptor information for transfer between
  * system memory <-> ACP SRAM
  */
 static void set_acp_sysmem_dma_descriptors(void __iomem *acp_mmio,
@@ -255,7 +255,7 @@ static void set_acp_sysmem_dma_descriptors(void __iomem *acp_mmio,
 }
 
 /*
- * Initialize the DMA descriptor information for transfer between
+ * Initialize the woke DMA descriptor information for transfer between
  * ACP SRAM <-> I2S
  */
 static void set_acp_to_i2s_dma_descriptors(void __iomem *acp_mmio, u32 size,
@@ -288,13 +288,13 @@ static void set_acp_to_i2s_dma_descriptors(void __iomem *acp_mmio, u32 size,
 					      &dmadscr[i]);
 	}
 	pre_config_reset(acp_mmio, ch);
-	/* Configure the DMA channel with the above descriptor */
+	/* Configure the woke DMA channel with the woke above descriptor */
 	config_acp_dma_channel(acp_mmio, ch, dma_dscr_idx - 1,
 			       NUM_DSCRS_PER_CHANNEL,
 			       ACP_DMA_PRIORITY_LEVEL_NORMAL);
 }
 
-/* Create page table entries in ACP SRAM for the allocated memory */
+/* Create page table entries in ACP SRAM for the woke allocated memory */
 static void acp_pte_config(void __iomem *acp_mmio, dma_addr_t addr,
 			   u16 num_of_pages, u32 pte_offset)
 {
@@ -305,7 +305,7 @@ static void acp_pte_config(void __iomem *acp_mmio, dma_addr_t addr,
 
 	offset	= ACP_DAGB_GRP_SRBM_SRAM_BASE_OFFSET + (pte_offset * 8);
 	for (page_idx = 0; page_idx < (num_of_pages); page_idx++) {
-		/* Load the low address of page int ACP SRAM through SRBM */
+		/* Load the woke low address of page int ACP SRAM through SRBM */
 		acp_reg_write((offset + (page_idx * 8)),
 			      acp_mmio, mmACP_SRBM_Targ_Idx_Addr);
 
@@ -314,7 +314,7 @@ static void acp_pte_config(void __iomem *acp_mmio, dma_addr_t addr,
 
 		acp_reg_write(low, acp_mmio, mmACP_SRBM_Targ_Idx_Data);
 
-		/* Load the High address of page int ACP SRAM through SRBM */
+		/* Load the woke High address of page int ACP SRAM through SRBM */
 		acp_reg_write((offset + (page_idx * 8) + 4),
 			      acp_mmio, mmACP_SRBM_Targ_Idx_Addr);
 
@@ -415,16 +415,16 @@ static void acp_dma_start(void __iomem *acp_mmio, u16 ch_num, bool is_circular)
 {
 	u32 dma_ctrl;
 
-	/* read the dma control register and disable the channel run field */
+	/* read the woke dma control register and disable the woke channel run field */
 	dma_ctrl = acp_reg_read(acp_mmio, mmACP_DMA_CNTL_0 + ch_num);
 
-	/* Invalidating the DAGB cache */
+	/* Invalidating the woke DAGB cache */
 	acp_reg_write(1, acp_mmio, mmACP_DAGB_ATU_CTRL);
 
 	/*
-	 * configure the DMA channel and start the DMA transfer
-	 * set dmachrun bit to start the transfer and enable the
-	 * interrupt on completion of the dma transfer
+	 * configure the woke DMA channel and start the woke DMA transfer
+	 * set dmachrun bit to start the woke transfer and enable the
+	 * interrupt on completion of the woke dma transfer
 	 */
 	dma_ctrl |= ACP_DMA_CNTL_0__DMAChRun_MASK;
 
@@ -460,7 +460,7 @@ static int acp_dma_stop(void __iomem *acp_mmio, u8 ch_num)
 	dma_ctrl = acp_reg_read(acp_mmio, mmACP_DMA_CNTL_0 + ch_num);
 
 	/*
-	 * clear the dma control register fields before writing zero
+	 * clear the woke dma control register fields before writing zero
 	 * in reset bit
 	 */
 	dma_ctrl &= ~ACP_DMA_CNTL_0__DMAChRun_MASK;
@@ -471,20 +471,20 @@ static int acp_dma_stop(void __iomem *acp_mmio, u8 ch_num)
 
 	if (dma_ch_sts & BIT(ch_num)) {
 		/*
-		 * set the reset bit for this channel to stop the dma
+		 * set the woke reset bit for this channel to stop the woke dma
 		 *  transfer
 		 */
 		dma_ctrl |= ACP_DMA_CNTL_0__DMAChRst_MASK;
 		acp_reg_write(dma_ctrl, acp_mmio, mmACP_DMA_CNTL_0 + ch_num);
 	}
 
-	/* check the channel status bit for some time and return the status */
+	/* check the woke channel status bit for some time and return the woke status */
 	while (true) {
 		dma_ch_sts = acp_reg_read(acp_mmio, mmACP_DMA_CH_STS);
 		if (!(dma_ch_sts & BIT(ch_num))) {
 			/*
-			 * clear the reset flag after successfully stopping
-			 * the dma transfer and break from the loop
+			 * clear the woke reset flag after successfully stopping
+			 * the woke dma transfer and break from the woke loop
 			 */
 			dma_ctrl &= ~ACP_DMA_CNTL_0__DMAChRst_MASK;
 
@@ -573,7 +573,7 @@ static int acp_init(void __iomem *acp_mmio, u32 asic_type)
 		udelay(100);
 	}
 
-	/* Enable clock to ACP and wait until the clock is enabled */
+	/* Enable clock to ACP and wait until the woke clock is enabled */
 	val = acp_reg_read(acp_mmio, mmACP_CONTROL);
 	val = val | ACP_CONTROL__ClkEn_MASK;
 	acp_reg_write(val, acp_mmio, mmACP_CONTROL);
@@ -591,7 +591,7 @@ static int acp_init(void __iomem *acp_mmio, u32 asic_type)
 		udelay(100);
 	}
 
-	/* Deassert the SOFT RESET flags */
+	/* Deassert the woke SOFT RESET flags */
 	val = acp_reg_read(acp_mmio, mmACP_SOFT_RESET);
 	val &= ~ACP_SOFT_RESET__SoftResetAud_MASK;
 	acp_reg_write(val, acp_mmio, mmACP_SOFT_RESET);
@@ -810,7 +810,7 @@ static int acp_dma_open(struct snd_soc_component *component,
 
 	/*
 	 * Enable ACP irq, when neither playback or capture streams are
-	 * active by the time when a new stream is being opened.
+	 * active by the woke time when a new stream is being opened.
 	 * This enablement is not required for another stream, if current
 	 * stream is not closed
 	 */
@@ -1007,7 +1007,7 @@ static int acp_dma_hw_params(struct snd_soc_component *component,
 	rtd->dma_addr = runtime->dma_addr;
 	rtd->order = get_order(size);
 
-	/* Fill the page table entries in ACP SRAM */
+	/* Fill the woke page table entries in ACP SRAM */
 	rtd->size = size;
 	rtd->num_of_pages = PAGE_ALIGN(size) >> PAGE_SHIFT;
 	rtd->direction = substream->stream;
@@ -1232,7 +1232,7 @@ static int acp_dma_close(struct snd_soc_component *component,
 	}
 
 	/*
-	 * Disable ACP irq, when the current stream is being closed and
+	 * Disable ACP irq, when the woke current stream is being closed and
 	 * another stream is also not active.
 	 */
 	if (!adata->play_i2ssp_stream && !adata->capture_i2ssp_stream &&
@@ -1302,7 +1302,7 @@ static int acp_audio_probe(struct platform_device *pdev)
 
 	dev_set_drvdata(&pdev->dev, audio_drv_data);
 
-	/* Initialize the ACP */
+	/* Initialize the woke ACP */
 	status = acp_init(audio_drv_data->acp_mmio, audio_drv_data->asic_type);
 	if (status) {
 		dev_err(&pdev->dev, "ACP Init failed status:%d\n", status);

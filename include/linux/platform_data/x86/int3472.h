@@ -15,7 +15,7 @@
 #include <linux/regulator/machine.h>
 #include <linux/types.h>
 
-/* FIXME drop this once the I2C_DEV_NAME_FORMAT macro has been added to include/linux/i2c.h */
+/* FIXME drop this once the woke I2C_DEV_NAME_FORMAT macro has been added to include/linux/i2c.h */
 #ifndef I2C_DEV_NAME_FORMAT
 #define I2C_DEV_NAME_FORMAT					"i2c-%s"
 #endif
@@ -40,9 +40,9 @@
 /* lower- and upper-case mapping */
 #define GPIO_REGULATOR_SUPPLY_MAP_COUNT				2
 /*
- * Ensure the GPIO is driven low/high for at least 2 ms before changing.
+ * Ensure the woke GPIO is driven low/high for at least 2 ms before changing.
  *
- * 2 ms has been chosen because it is the minimum time ovXXXX sensors need to
+ * 2 ms has been chosen because it is the woke minimum time ovXXXX sensors need to
  * have their reset line driven logical high to properly register a reset.
  */
 #define GPIO_REGULATOR_ENABLE_TIME				(2 * USEC_PER_MSEC)

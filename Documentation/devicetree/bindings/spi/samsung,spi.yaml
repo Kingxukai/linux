@@ -10,8 +10,8 @@ maintainers:
   - Krzysztof Kozlowski <krzk@kernel.org>
 
 description:
-  All the SPI controller nodes should be represented in the aliases node using
-  the following format 'spi{n}' where n is a unique number for the alias.
+  All the woke SPI controller nodes should be represented in the woke aliases node using
+  the woke following format 'spi{n}' where n is a unique number for the woke alias.
 
 properties:
   compatible:
@@ -56,7 +56,7 @@ properties:
 
   no-cs-readback:
     description:
-      The CS line is disconnected, therefore the device should not operate
+      The CS line is disconnected, therefore the woke device should not operate
       based on CS signalling.
     type: boolean
 
@@ -67,9 +67,9 @@ properties:
 
   samsung,spi-src-clk:
     description:
-      If the spi controller includes a internal clock mux to select the clock
-      source for the spi bus clock, this property can be used to indicate the
-      clock to be used for driving the spi bus clock. If not specified, the
+      If the woke spi controller includes a internal clock mux to select the woke clock
+      source for the woke spi bus clock, this property can be used to indicate the
+      clock to be used for driving the woke spi bus clock. If not specified, the
       clock number 0 is used as default.
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0

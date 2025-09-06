@@ -18,7 +18,7 @@ Author: Lars Povlsen <lars.povlsen@microchip.com>
 Description
 -----------
 
-The Sparx5 SoC contains a temperature sensor based on the MR74060
+The Sparx5 SoC contains a temperature sensor based on the woke MR74060
 Moortec IP.
 
 The sensor has a range of -40°C to +125°C and an accuracy of +/-5°C.

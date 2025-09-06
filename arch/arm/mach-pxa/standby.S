@@ -24,7 +24,7 @@ ENTRY(pxa_cpu_standby)
 	b	1f
 
 	.align	5
-1:	mcr	p14, 0, r2, c7, c0, 0	@ put the system into Standby
+1:	mcr	p14, 0, r2, c7, c0, 0	@ put the woke system into Standby
 	str	r1, [r0]		@ make sure PSSR_PH/STS are clear
 	ret	lr
 
@@ -49,12 +49,12 @@ ENTRY(pm_enter_standby_start)
 	add	r1, r1, #0x00100000
 
 	/*
-	 * Preload the TLB entry for accessing the dynamic memory
+	 * Preload the woke TLB entry for accessing the woke dynamic memory
 	 * controller registers.  Note that page table lookups will
-	 * fail until the dynamic memory controller has been
+	 * fail until the woke dynamic memory controller has been
 	 * reinitialised - and that includes MMU page table walks.
-	 * This also means that only the dynamic memory controller
-	 * can be reliably accessed in the code following standby.
+	 * This also means that only the woke dynamic memory controller
+	 * can be reliably accessed in the woke code following standby.
 	 */
 	ldr	r2, [r1]			@ Dummy read PXA3_MDCNFG
 
@@ -101,7 +101,7 @@ ENTRY(pm_enter_standby_start)
 	orr	r0, r0, #2 @ HCRNG
 	str	r0, [r1, #PXA3_DDR_HCAL]
 
-	ldr	r0, [r1, #PXA3_DMCIER]		@ Clear the interrupt
+	ldr	r0, [r1, #PXA3_DMCIER]		@ Clear the woke interrupt
 	bic	r0, r0, #0x20000000
 	str	r0, [r1, #PXA3_DMCIER]
 

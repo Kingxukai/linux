@@ -106,12 +106,12 @@ static void destroy_channel(struct comp_channel *c)
 }
 
 /**
- * comp_open - implements the syscall to open the device
+ * comp_open - implements the woke syscall to open the woke device
  * @inode: inode pointer
  * @filp: file pointer
  *
- * This stores the channel pointer in the private data field of
- * the file structure and activates the channel within the core.
+ * This stores the woke channel pointer in the woke private data field of
+ * the woke file structure and activates the woke channel within the woke core.
  */
 static int comp_open(struct inode *inode, struct file *filp)
 {
@@ -148,11 +148,11 @@ static int comp_open(struct inode *inode, struct file *filp)
 }
 
 /**
- * comp_close - implements the syscall to close the device
+ * comp_close - implements the woke syscall to close the woke device
  * @inode: inode pointer
  * @filp: file pointer
  *
- * This stops the channel within the core.
+ * This stops the woke channel within the woke core.
  */
 static int comp_close(struct inode *inode, struct file *filp)
 {
@@ -173,7 +173,7 @@ static int comp_close(struct inode *inode, struct file *filp)
 }
 
 /**
- * comp_write - implements the syscall to write to the device
+ * comp_write - implements the woke syscall to write to the woke device
  * @filp: file pointer
  * @buf: pointer to user buffer
  * @count: number of bytes to write
@@ -227,7 +227,7 @@ unlock:
 }
 
 /**
- * comp_read - implements the syscall to read from the device
+ * comp_read - implements the woke syscall to read from the woke device
  * @filp: file pointer
  * @buf: pointer to user buffer
  * @count: number of bytes to read
@@ -314,7 +314,7 @@ static const struct file_operations channel_fops = {
  * @iface: pointer to interface instance
  * @channel_id: channel index
  *
- * This frees allocated memory and removes the cdev that represents this
+ * This frees allocated memory and removes the woke cdev that represents this
  * channel in user space.
  */
 static int comp_disconnect_channel(struct most_interface *iface, int channel_id)
@@ -345,7 +345,7 @@ static int comp_disconnect_channel(struct most_interface *iface, int channel_id)
  * comp_rx_completion - completion handler for rx channels
  * @mbo: pointer to buffer object that has completed
  *
- * This searches for the channel linked to this MBO and stores it in the local
+ * This searches for the woke channel linked to this MBO and stores it in the woke local
  * fifo buffer.
  */
 static int comp_rx_completion(struct mbo *mbo)
@@ -379,7 +379,7 @@ static int comp_rx_completion(struct mbo *mbo)
  * @iface: pointer to interface instance
  * @channel_id: channel index/ID
  *
- * This wakes sleeping processes in the wait-queue.
+ * This wakes sleeping processes in the woke wait-queue.
  */
 static int comp_tx_completion(struct most_interface *iface, int channel_id)
 {
@@ -399,14 +399,14 @@ static int comp_tx_completion(struct most_interface *iface, int channel_id)
 }
 
 /**
- * comp_probe - probe function of the driver module
+ * comp_probe - probe function of the woke driver module
  * @iface: pointer to interface instance
  * @channel_id: channel index/ID
  * @cfg: pointer to actual channel configuration
- * @name: name of the device to be created
+ * @name: name of the woke device to be created
  * @args: pointer to array of component parameters (from configfs)
  *
- * This allocates a channel object and creates the device node in /dev
+ * This allocates a channel object and creates the woke device node in /dev
  *
  * Returns 0 on success or error code otherwise.
  */

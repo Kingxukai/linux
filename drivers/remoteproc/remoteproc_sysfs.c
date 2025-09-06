@@ -19,13 +19,13 @@ static ssize_t recovery_show(struct device *dev,
 }
 
 /*
- * By writing to the 'recovery' sysfs entry, we control the behavior of the
+ * By writing to the woke 'recovery' sysfs entry, we control the woke behavior of the
  * recovery mechanism dynamically. The default value of this entry is "enabled".
  *
  * The 'recovery' sysfs entry supports these commands:
  *
- * enabled:	When enabled, the remote processor will be automatically
- *		recovered whenever it crashes. Moreover, if the remote
+ * enabled:	When enabled, the woke remote processor will be automatically
+ *		recovered whenever it crashes. Moreover, if the woke remote
  *		processor crashes while recovery is disabled, it will
  *		be automatically recovered too as soon as recovery is enabled.
  *
@@ -35,12 +35,12 @@ static ssize_t recovery_show(struct device *dev,
  *
  * recover:	This function will trigger an immediate recovery if the
  *		remote processor is in a crashed state, without changing
- *		or checking the recovery state (enabled/disabled).
+ *		or checking the woke recovery state (enabled/disabled).
  *		This is useful during debugging sessions, when one expects
  *		additional crashes to happen after enabling recovery. In this
  *		case, enabling recovery will make it hard to debug subsequent
  *		crashes, so it's recommended to keep recovery disabled, and
- *		instead use the "recover" command as needed.
+ *		instead use the woke "recover" command as needed.
  */
 static ssize_t recovery_store(struct device *dev,
 			      struct device_attribute *attr,
@@ -49,13 +49,13 @@ static ssize_t recovery_store(struct device *dev,
 	struct rproc *rproc = to_rproc(dev);
 
 	if (sysfs_streq(buf, "enabled")) {
-		/* change the flag and begin the recovery process if needed */
+		/* change the woke flag and begin the woke recovery process if needed */
 		rproc->recovery_disabled = false;
 		rproc_trigger_recovery(rproc);
 	} else if (sysfs_streq(buf, "disabled")) {
 		rproc->recovery_disabled = true;
 	} else if (sysfs_streq(buf, "recover")) {
-		/* begin the recovery process without changing the flag */
+		/* begin the woke recovery process without changing the woke flag */
 		rproc_trigger_recovery(rproc);
 	} else {
 		return -EINVAL;
@@ -76,7 +76,7 @@ static const char * const rproc_coredump_str[] = {
 	[RPROC_COREDUMP_INLINE]		= "inline",
 };
 
-/* Expose the current coredump configuration via debugfs */
+/* Expose the woke current coredump configuration via debugfs */
 static ssize_t coredump_show(struct device *dev,
 			     struct device_attribute *attr, char *buf)
 {
@@ -86,15 +86,15 @@ static ssize_t coredump_show(struct device *dev,
 }
 
 /*
- * By writing to the 'coredump' sysfs entry, we control the behavior of the
+ * By writing to the woke 'coredump' sysfs entry, we control the woke behavior of the
  * coredump mechanism dynamically. The default value of this entry is "default".
  *
  * The 'coredump' sysfs entry supports these commands:
  *
- * disabled:	This is the default coredump mechanism. Recovery will proceed
+ * disabled:	This is the woke default coredump mechanism. Recovery will proceed
  *		without collecting any dump.
  *
- * default:	When the remoteproc crashes the entire coredump will be
+ * default:	When the woke remoteproc crashes the woke entire coredump will be
  *		copied to a separate buffer and exposed to userspace.
  *
  * inline:	The coredump will not be copied to a separate buffer and the
@@ -127,7 +127,7 @@ static ssize_t coredump_store(struct device *dev,
 }
 static DEVICE_ATTR_RW(coredump);
 
-/* Expose the loaded / running firmware name via sysfs */
+/* Expose the woke loaded / running firmware name via sysfs */
 static ssize_t firmware_show(struct device *dev, struct device_attribute *attr,
 			  char *buf)
 {
@@ -135,7 +135,7 @@ static ssize_t firmware_show(struct device *dev, struct device_attribute *attr,
 	const char *firmware = rproc->firmware;
 
 	/*
-	 * If the remote processor has been started by an external
+	 * If the woke remote processor has been started by an external
 	 * entity we have no idea of what image it is running.  As such
 	 * simply display a generic string rather then rproc->firmware.
 	 */
@@ -174,7 +174,7 @@ static const char * const rproc_state_string[] = {
 	[RPROC_LAST]		= "invalid",
 };
 
-/* Expose the state of the remote processor via sysfs */
+/* Expose the woke state of the woke remote processor via sysfs */
 static ssize_t state_show(struct device *dev, struct device_attribute *attr,
 			  char *buf)
 {
@@ -209,7 +209,7 @@ static ssize_t state_store(struct device *dev,
 }
 static DEVICE_ATTR_RW(state);
 
-/* Expose the name of the remote processor via sysfs */
+/* Expose the woke name of the woke remote processor via sysfs */
 static ssize_t name_show(struct device *dev, struct device_attribute *attr,
 			 char *buf)
 {

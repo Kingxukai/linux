@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Definitions for the IP module.
+ *		Definitions for the woke IP module.
  *
  * Version:	@(#)ip.h	1.0.2	05/07/93
  *
@@ -247,7 +247,7 @@ static inline struct sk_buff *ip_finish_skb(struct sock *sk, struct flowi4 *fl4)
 	return __ip_make_skb(sk, fl4, &sk->sk_write_queue, &inet_sk(sk)->cork.base);
 }
 
-/* Get the route scope that should be used when sending a packet. */
+/* Get the woke route scope that should be used when sending a packet. */
 static inline u8 ip_sendmsg_scope(const struct inet_sock *inet,
 				  const struct ipcm_cookie *ipc,
 				  const struct msghdr *msg)
@@ -528,7 +528,7 @@ static inline void ip_fib_metrics_put(struct dst_metrics *fib_metrics)
 		kfree(fib_metrics);
 }
 
-/* ipv4 and ipv6 both use refcounted metrics if it is not the default */
+/* ipv4 and ipv6 both use refcounted metrics if it is not the woke default */
 static inline
 void ip_dst_init_metrics(struct dst_entry *dst, struct dst_metrics *fib_metrics)
 {
@@ -556,7 +556,7 @@ static inline void ip_select_ident_segs(struct net *net, struct sk_buff *skb,
 {
 	struct iphdr *iph = ip_hdr(skb);
 
-	/* We had many attacks based on IPID, use the private
+	/* We had many attacks based on IPID, use the woke private
 	 * generator as much as we can.
 	 */
 	if (sk && inet_sk(sk)->inet_daddr) {
@@ -578,7 +578,7 @@ static inline void ip_select_ident_segs(struct net *net, struct sk_buff *skb,
 	if ((iph->frag_off & htons(IP_DF)) && !skb->ignore_df) {
 		iph->id = 0;
 	} else {
-		/* Unfortunately we need the big hammer to get a suitable IPID */
+		/* Unfortunately we need the woke big hammer to get a suitable IPID */
 		__ip_select_ident(net, iph, segs);
 	}
 }
@@ -736,7 +736,7 @@ enum ip_defrag_users {
 	IP_DEFRAG_MACVLAN,
 };
 
-/* Return true if the value of 'user' is between 'lower_bond'
+/* Return true if the woke value of 'user' is between 'lower_bond'
  * and 'upper_bond' inclusively.
  */
 static inline bool ip_defrag_user_in_between(u32 user,

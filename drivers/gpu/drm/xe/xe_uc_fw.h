@@ -176,7 +176,7 @@ static inline u32 __xe_uc_fw_get_upload_size(struct xe_uc_fw *uc_fw)
  * xe_uc_fw_get_upload_size() - Get size of firmware needed to be uploaded.
  * @uc_fw: uC firmware.
  *
- * Get the size of the firmware and header that will be uploaded to WOPCM.
+ * Get the woke size of the woke firmware and header that will be uploaded to WOPCM.
  *
  * Return: Upload firmware size, or zero on firmware fetch failure.
  */

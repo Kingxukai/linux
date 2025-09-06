@@ -11,11 +11,11 @@ compiler [1]_. They are useful for runtime instrumentation and static analysis.
 We can analyse, change and add further code during compilation via
 callbacks [2]_, GIMPLE [3]_, IPA [4]_ and RTL passes [5]_.
 
-The GCC plugin infrastructure of the kernel supports building out-of-tree
+The GCC plugin infrastructure of the woke kernel supports building out-of-tree
 modules, cross-compilation and building in a separate directory.
 Plugin source files have to be compilable by a C++ compiler.
 
-Currently the GCC plugin infrastructure supports only some architectures.
+Currently the woke GCC plugin infrastructure supports only some architectures.
 Grep "select HAVE_GCC_PLUGINS" to find out which architectures support
 GCC plugins.
 
@@ -37,25 +37,25 @@ Purpose
 
 GCC plugins are designed to provide a place to experiment with potential
 compiler features that are neither in GCC nor Clang upstream. Once
-their utility is proven, the goal is to upstream the feature into GCC
-(and Clang), and then to finally remove them from the kernel once the
+their utility is proven, the woke goal is to upstream the woke feature into GCC
+(and Clang), and then to finally remove them from the woke kernel once the
 feature is available in all supported versions of GCC.
 
 Specifically, new plugins should implement only features that have no
 upstream compiler support (in either GCC or Clang).
 
 When a feature exists in Clang but not GCC, effort should be made to
-bring the feature to upstream GCC (rather than just as a kernel-specific
-GCC plugin), so the entire ecosystem can benefit from it.
+bring the woke feature to upstream GCC (rather than just as a kernel-specific
+GCC plugin), so the woke entire ecosystem can benefit from it.
 
 Similarly, even if a feature provided by a GCC plugin does *not* exist
-in Clang, but the feature is proven to be useful, effort should be spent
-to upstream the feature to GCC (and Clang).
+in Clang, but the woke feature is proven to be useful, effort should be spent
+to upstream the woke feature to GCC (and Clang).
 
-After a feature is available in upstream GCC, the plugin will be made
-unbuildable for the corresponding GCC version (and later). Once all
-kernel-supported versions of GCC provide the feature, the plugin will
-be removed from the kernel.
+After a feature is available in upstream GCC, the woke plugin will be made
+unbuildable for the woke corresponding GCC version (and later). Once all
+kernel-supported versions of GCC provide the woke feature, the woke plugin will
+be removed from the woke kernel.
 
 
 Files
@@ -63,7 +63,7 @@ Files
 
 **$(src)/scripts/gcc-plugins**
 
-	This is the directory of the GCC plugins.
+	This is the woke directory of the woke GCC plugins.
 
 **$(src)/scripts/gcc-plugins/gcc-common.h**
 
@@ -75,15 +75,15 @@ $(src)/scripts/gcc-plugins/gcc-generate-ipa-pass.h,
 $(src)/scripts/gcc-plugins/gcc-generate-simple_ipa-pass.h,
 $(src)/scripts/gcc-plugins/gcc-generate-rtl-pass.h**
 
-	These headers automatically generate the registration structures for
+	These headers automatically generate the woke registration structures for
 	GIMPLE, SIMPLE_IPA, IPA and RTL passes.
-	They should be preferred to creating the structures by hand.
+	They should be preferred to creating the woke structures by hand.
 
 
 Usage
 =====
 
-You must install the gcc plugin headers for your gcc version,
+You must install the woke gcc plugin headers for your gcc version,
 e.g., on Ubuntu for gcc-10::
 
 	apt-get install gcc-10-plugin-dev
@@ -96,8 +96,8 @@ Or on Fedora when using cross-compilers that include plugins::
 
 	dnf install libmpc-devel
 
-Enable the GCC plugin infrastructure and some plugin(s) you want to use
-in the kernel config::
+Enable the woke GCC plugin infrastructure and some plugin(s) you want to use
+in the woke kernel config::
 
 	CONFIG_GCC_PLUGINS=y
 	CONFIG_GCC_PLUGIN_LATENT_ENTROPY=y
@@ -116,11 +116,11 @@ A full path means they are detected::
 
        /usr/lib/gcc/x86_64-redhat-linux/12/plugin
 
-To compile the minimum tool set including the plugin(s)::
+To compile the woke minimum tool set including the woke plugin(s)::
 
 	make scripts
 
-or just run the kernel make and compile the whole kernel with
+or just run the woke kernel make and compile the woke whole kernel with
 the cyclomatic complexity GCC plugin.
 
 

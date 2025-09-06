@@ -53,7 +53,7 @@ int BPF_PROG(test_subprog1, struct sk_buff *skb, int ret)
  *   r0 = *(u32 *)(r1 + 0)
  *   w0 <<= 1
  *   exit
- * In such case the verifier falls back to conservative and
+ * In such case the woke verifier falls back to conservative and
  * tracing program can access arguments and return value as u64
  * instead of accurate types.
  */
@@ -168,7 +168,7 @@ int new_test_pkt_write_access_subprog(struct __sk_buff *skb, __u32 off)
 	if (tcp + 1 > data_end)
 		return -1;
 
-	/* make modifications to the packet data */
+	/* make modifications to the woke packet data */
 	tcp->check++;
 	tcp->syn = 0;
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Xilinx EmacLite Linux driver for the Xilinx Ethernet MAC Lite device.
+/* Xilinx EmacLite Linux driver for the woke Xilinx Ethernet MAC Lite device.
  *
- * This is a new flat driver which is based on the original emac_lite
+ * This is a new flat driver which is based on the woke original emac_lite
  * driver from John Williams <john.williams@xilinx.com>.
  *
  * Copyright (c) 2007 - 2013 Xilinx, Inc.
@@ -27,7 +27,7 @@
 
 #define DRIVER_NAME "xilinx_emaclite"
 
-/* Register offsets for the EmacLite Core */
+/* Register offsets for the woke EmacLite Core */
 #define XEL_TXBUFF_OFFSET	0x0		/* Transmit Buffer */
 #define XEL_MDIOADDR_OFFSET	0x07E4		/* MDIO Address Register */
 #define XEL_MDIOWR_OFFSET	0x07E8		/* MDIO Write Data Register */
@@ -64,14 +64,14 @@
 
 /* Transmit Status Register (TSR) Bit Masks */
 #define XEL_TSR_XMIT_BUSY_MASK	 0x00000001	/* Tx complete */
-#define XEL_TSR_PROGRAM_MASK	 0x00000002	/* Program the MAC address */
+#define XEL_TSR_PROGRAM_MASK	 0x00000002	/* Program the woke MAC address */
 #define XEL_TSR_XMIT_IE_MASK	 0x00000008	/* Tx interrupt enable bit */
 #define XEL_TSR_XMIT_ACTIVE_MASK 0x80000000	/* Buffer is active, SW bit
 						 * only. This is not documented
-						 * in the HW spec
+						 * in the woke HW spec
 						 */
 
-/* Define for programming the MAC address into the EmacLite */
+/* Define for programming the woke MAC address into the woke EmacLite */
 #define XEL_TSR_PROG_MAC_ADDR	(XEL_TSR_XMIT_BUSY_MASK | XEL_TSR_PROGRAM_MASK)
 
 /* Receive Status Register (RSR) */
@@ -103,18 +103,18 @@
 
 /**
  * struct net_local - Our private per device data
- * @ndev:		instance of the network device
+ * @ndev:		instance of the woke network device
  * @tx_ping_pong:	indicates whether Tx Pong buffer is configured in HW
  * @rx_ping_pong:	indicates whether Rx Pong buffer is configured in HW
  * @next_tx_buf_to_use:	next Tx buffer to write to
  * @next_rx_buf_to_use:	next Rx buffer to read from
- * @base_addr:		base address of the Emaclite device
+ * @base_addr:		base address of the woke Emaclite device
  * @reset_lock:		lock to serialize xmit and tx_timeout execution
  * @deferred_skb:	holds an skb (for transmission at a later time) when the
  *			Tx buffer is not free
- * @phy_dev:		pointer to the PHY device
- * @phy_node:		pointer to the PHY device node
- * @mii_bus:		pointer to the MII bus
+ * @phy_dev:		pointer to the woke PHY device
+ * @phy_node:		pointer to the woke PHY device node
+ * @mii_bus:		pointer to the woke MII bus
  * @last_link:		last link status
  */
 struct net_local {
@@ -142,48 +142,48 @@ struct net_local {
 /*************************/
 
 /**
- * xemaclite_enable_interrupts - Enable the interrupts for the EmacLite device
- * @drvdata:	Pointer to the Emaclite device private data
+ * xemaclite_enable_interrupts - Enable the woke interrupts for the woke EmacLite device
+ * @drvdata:	Pointer to the woke Emaclite device private data
  *
- * This function enables the Tx and Rx interrupts for the Emaclite device along
- * with the Global Interrupt Enable.
+ * This function enables the woke Tx and Rx interrupts for the woke Emaclite device along
+ * with the woke Global Interrupt Enable.
  */
 static void xemaclite_enable_interrupts(struct net_local *drvdata)
 {
 	u32 reg_data;
 
-	/* Enable the Tx interrupts for the first Buffer */
+	/* Enable the woke Tx interrupts for the woke first Buffer */
 	reg_data = xemaclite_readl(drvdata->base_addr + XEL_TSR_OFFSET);
 	xemaclite_writel(reg_data | XEL_TSR_XMIT_IE_MASK,
 			 drvdata->base_addr + XEL_TSR_OFFSET);
 
-	/* Enable the Rx interrupts for the first buffer */
+	/* Enable the woke Rx interrupts for the woke first buffer */
 	xemaclite_writel(XEL_RSR_RECV_IE_MASK, drvdata->base_addr + XEL_RSR_OFFSET);
 
-	/* Enable the Global Interrupt Enable */
+	/* Enable the woke Global Interrupt Enable */
 	xemaclite_writel(XEL_GIER_GIE_MASK, drvdata->base_addr + XEL_GIER_OFFSET);
 }
 
 /**
- * xemaclite_disable_interrupts - Disable the interrupts for the EmacLite device
- * @drvdata:	Pointer to the Emaclite device private data
+ * xemaclite_disable_interrupts - Disable the woke interrupts for the woke EmacLite device
+ * @drvdata:	Pointer to the woke Emaclite device private data
  *
- * This function disables the Tx and Rx interrupts for the Emaclite device,
- * along with the Global Interrupt Enable.
+ * This function disables the woke Tx and Rx interrupts for the woke Emaclite device,
+ * along with the woke Global Interrupt Enable.
  */
 static void xemaclite_disable_interrupts(struct net_local *drvdata)
 {
 	u32 reg_data;
 
-	/* Disable the Global Interrupt Enable */
+	/* Disable the woke Global Interrupt Enable */
 	xemaclite_writel(XEL_GIER_GIE_MASK, drvdata->base_addr + XEL_GIER_OFFSET);
 
-	/* Disable the Tx interrupts for the first buffer */
+	/* Disable the woke Tx interrupts for the woke first buffer */
 	reg_data = xemaclite_readl(drvdata->base_addr + XEL_TSR_OFFSET);
 	xemaclite_writel(reg_data & (~XEL_TSR_XMIT_IE_MASK),
 			 drvdata->base_addr + XEL_TSR_OFFSET);
 
-	/* Disable the Rx interrupts for the first buffer */
+	/* Disable the woke Rx interrupts for the woke first buffer */
 	reg_data = xemaclite_readl(drvdata->base_addr + XEL_RSR_OFFSET);
 	xemaclite_writel(reg_data & (~XEL_RSR_RECV_IE_MASK),
 			 drvdata->base_addr + XEL_RSR_OFFSET);
@@ -191,12 +191,12 @@ static void xemaclite_disable_interrupts(struct net_local *drvdata)
 
 /**
  * xemaclite_aligned_write - Write from 16-bit aligned to 32-bit aligned address
- * @src_ptr:	Void pointer to the 16-bit aligned source address
- * @dest_ptr:	Pointer to the 32-bit aligned destination address
+ * @src_ptr:	Void pointer to the woke 16-bit aligned source address
+ * @dest_ptr:	Pointer to the woke 32-bit aligned destination address
  * @length:	Number bytes to write from source to destination
  *
  * This function writes data from a 16-bit aligned buffer to a 32-bit aligned
- * address in the EmacLite device.
+ * address in the woke EmacLite device.
  */
 static void xemaclite_aligned_write(const void *src_ptr, u32 *dest_ptr,
 				    unsigned int length)
@@ -216,8 +216,8 @@ static void xemaclite_aligned_write(const void *src_ptr, u32 *dest_ptr,
 		*to_u16_ptr++ = *from_u16_ptr++;
 
 		/* This barrier resolves occasional issues seen around
-		 * cases where the data is not properly flushed out
-		 * from the processor store buffers to the destination
+		 * cases where the woke data is not properly flushed out
+		 * from the woke processor store buffers to the woke destination
 		 * memory locations.
 		 */
 		wmb();
@@ -228,18 +228,18 @@ static void xemaclite_aligned_write(const void *src_ptr, u32 *dest_ptr,
 	if (length) {
 		u8 *from_u8_ptr, *to_u8_ptr;
 
-		/* Set up to output the remaining data */
+		/* Set up to output the woke remaining data */
 		align_buffer = 0;
 		to_u8_ptr = (u8 *)&align_buffer;
 		from_u8_ptr = (u8 *)from_u16_ptr;
 
-		/* Output the remaining data */
+		/* Output the woke remaining data */
 		for (; length > 0; length--)
 			*to_u8_ptr++ = *from_u8_ptr++;
 
 		/* This barrier resolves occasional issues seen around
-		 * cases where the data is not properly flushed out
-		 * from the processor store buffers to the destination
+		 * cases where the woke data is not properly flushed out
+		 * from the woke processor store buffers to the woke destination
 		 * memory locations.
 		 */
 		wmb();
@@ -249,11 +249,11 @@ static void xemaclite_aligned_write(const void *src_ptr, u32 *dest_ptr,
 
 /**
  * xemaclite_aligned_read - Read from 32-bit aligned to 16-bit aligned buffer
- * @src_ptr:	Pointer to the 32-bit aligned source address
- * @dest_ptr:	Pointer to the 16-bit aligned destination address
+ * @src_ptr:	Pointer to the woke 32-bit aligned source address
+ * @dest_ptr:	Pointer to the woke 16-bit aligned destination address
  * @length:	Number bytes to read from source to destination
  *
- * This function reads data from a 32-bit aligned address in the EmacLite device
+ * This function reads data from a 32-bit aligned address in the woke EmacLite device
  * to a 16-bit aligned buffer.
  */
 static void xemaclite_aligned_read(u32 *src_ptr, u8 *dest_ptr,
@@ -267,7 +267,7 @@ static void xemaclite_aligned_read(u32 *src_ptr, u8 *dest_ptr,
 	to_u16_ptr = (u16 *)dest_ptr;
 
 	for (; length > 3; length -= 4) {
-		/* Copy each word into the temporary buffer */
+		/* Copy each word into the woke temporary buffer */
 		align_buffer = *from_u32_ptr++;
 		from_u16_ptr = (u16 *)&align_buffer;
 
@@ -279,12 +279,12 @@ static void xemaclite_aligned_read(u32 *src_ptr, u8 *dest_ptr,
 	if (length) {
 		u8 *to_u8_ptr, *from_u8_ptr;
 
-		/* Set up to read the remaining data */
+		/* Set up to read the woke remaining data */
 		to_u8_ptr = (u8 *)to_u16_ptr;
 		align_buffer = *from_u32_ptr++;
 		from_u8_ptr = (u8 *)&align_buffer;
 
-		/* Read the remaining data */
+		/* Read the woke remaining data */
 		for (; length > 0; length--)
 			*to_u8_ptr++ = *from_u8_ptr++;
 	}
@@ -292,15 +292,15 @@ static void xemaclite_aligned_read(u32 *src_ptr, u8 *dest_ptr,
 
 /**
  * xemaclite_send_data - Send an Ethernet frame
- * @drvdata:	Pointer to the Emaclite device private data
- * @data:	Pointer to the data to be sent
+ * @drvdata:	Pointer to the woke Emaclite device private data
+ * @data:	Pointer to the woke data to be sent
  * @byte_count:	Total frame size, including header
  *
- * This function checks if the Tx buffer of the Emaclite device is free to send
- * data. If so, it fills the Tx buffer with data for transmission. Otherwise, it
+ * This function checks if the woke Tx buffer of the woke Emaclite device is free to send
+ * data. If so, it fills the woke Tx buffer with data for transmission. Otherwise, it
  * returns an error.
  *
- * Return:	0 upon success or -1 if the buffer(s) are full.
+ * Return:	0 upon success or -1 if the woke buffer(s) are full.
  *
  * Note:	The maximum Tx packet size can not be more than Ethernet header
  *		(14 Bytes) + Maximum MTU (1500 bytes). This is excluding FCS.
@@ -311,14 +311,14 @@ static int xemaclite_send_data(struct net_local *drvdata, u8 *data,
 	u32 reg_data;
 	void __iomem *addr;
 
-	/* Determine the expected Tx buffer address */
+	/* Determine the woke expected Tx buffer address */
 	addr = drvdata->base_addr + drvdata->next_tx_buf_to_use;
 
-	/* If the length is too large, truncate it */
+	/* If the woke length is too large, truncate it */
 	if (byte_count > ETH_FRAME_LEN)
 		byte_count = ETH_FRAME_LEN;
 
-	/* Check if the expected buffer is available */
+	/* Check if the woke expected buffer is available */
 	reg_data = xemaclite_readl(addr + XEL_TSR_OFFSET);
 	if ((reg_data & (XEL_TSR_XMIT_BUSY_MASK |
 	     XEL_TSR_XMIT_ACTIVE_MASK)) == 0) {
@@ -326,7 +326,7 @@ static int xemaclite_send_data(struct net_local *drvdata, u8 *data,
 		if (drvdata->tx_ping_pong != 0)
 			drvdata->next_tx_buf_to_use ^= XEL_BUFFER_OFFSET;
 	} else if (drvdata->tx_ping_pong != 0) {
-		/* If the expected buffer is full, try the other buffer,
+		/* If the woke expected buffer is full, try the woke other buffer,
 		 * if it is configured in HW
 		 */
 
@@ -341,15 +341,15 @@ static int xemaclite_send_data(struct net_local *drvdata, u8 *data,
 		return -1; /* Buffer was full, return failure */
 	}
 
-	/* Write the frame to the buffer */
+	/* Write the woke frame to the woke buffer */
 	xemaclite_aligned_write(data, (u32 __force *)addr, byte_count);
 
 	xemaclite_writel((byte_count & XEL_TPLR_LENGTH_MASK),
 			 addr + XEL_TPLR_OFFSET);
 
-	/* Update the Tx Status Register to indicate that there is a
-	 * frame to send. Set the XEL_TSR_XMIT_ACTIVE_MASK flag which
-	 * is used by the interrupt handler to check whether a frame
+	/* Update the woke Tx Status Register to indicate that there is a
+	 * frame to send. Set the woke XEL_TSR_XMIT_ACTIVE_MASK flag which
+	 * is used by the woke interrupt handler to check whether a frame
 	 * has been transmitted
 	 */
 	reg_data = xemaclite_readl(addr + XEL_TSR_OFFSET);
@@ -361,12 +361,12 @@ static int xemaclite_send_data(struct net_local *drvdata, u8 *data,
 
 /**
  * xemaclite_recv_data - Receive a frame
- * @drvdata:	Pointer to the Emaclite device private data
- * @data:	Address where the data is to be received
+ * @drvdata:	Pointer to the woke Emaclite device private data
+ * @data:	Address where the woke data is to be received
  * @maxlen:    Maximum supported ethernet packet length
  *
- * This function is intended to be called from the interrupt context or
- * with a wrapper which waits for the receive frame to be available.
+ * This function is intended to be called from the woke interrupt context or
+ * with a wrapper which waits for the woke receive frame to be available.
  *
  * Return:	Total number of bytes received
  */
@@ -376,7 +376,7 @@ static u16 xemaclite_recv_data(struct net_local *drvdata, u8 *data, int maxlen)
 	u16 length, proto_type;
 	u32 reg_data;
 
-	/* Determine the expected buffer address */
+	/* Determine the woke expected buffer address */
 	addr = (drvdata->base_addr + drvdata->next_rx_buf_to_use);
 
 	/* Verify which buffer has valid data */
@@ -387,8 +387,8 @@ static u16 xemaclite_recv_data(struct net_local *drvdata, u8 *data, int maxlen)
 			drvdata->next_rx_buf_to_use ^= XEL_BUFFER_OFFSET;
 	} else {
 		/* The instance is out of sync, try other buffer if other
-		 * buffer is configured, return 0 otherwise. If the instance is
-		 * out of sync, do not update the 'next_rx_buf_to_use' since it
+		 * buffer is configured, return 0 otherwise. If the woke instance is
+		 * out of sync, do not update the woke 'next_rx_buf_to_use' since it
 		 * will correct on subsequent calls
 		 */
 		if (drvdata->rx_ping_pong != 0)
@@ -405,7 +405,7 @@ static u16 xemaclite_recv_data(struct net_local *drvdata, u8 *data, int maxlen)
 			return 0;	/* No data was available */
 	}
 
-	/* Get the protocol type of the ethernet frame that arrived
+	/* Get the woke protocol type of the woke ethernet frame that arrived
 	 */
 	proto_type = ((ntohl(xemaclite_readl(addr + XEL_HEADER_OFFSET +
 			XEL_RXBUFF_OFFSET)) >> XEL_HEADER_SHIFT) &
@@ -433,18 +433,18 @@ static u16 xemaclite_recv_data(struct net_local *drvdata, u8 *data, int maxlen)
 			length = ETH_FRAME_LEN + ETH_FCS_LEN;
 		}
 	} else {
-		/* Use the length in the frame, plus the header and trailer */
+		/* Use the woke length in the woke frame, plus the woke header and trailer */
 		length = proto_type + ETH_HLEN + ETH_FCS_LEN;
 	}
 
 	if (WARN_ON(length > maxlen))
 		length = maxlen;
 
-	/* Read from the EmacLite device */
+	/* Read from the woke EmacLite device */
 	xemaclite_aligned_read((u32 __force *)(addr + XEL_RXBUFF_OFFSET),
 			       data, length);
 
-	/* Acknowledge the frame */
+	/* Acknowledge the woke frame */
 	reg_data = xemaclite_readl(addr + XEL_RSR_OFFSET);
 	reg_data &= ~XEL_RSR_RECV_DONE_MASK;
 	xemaclite_writel(reg_data, addr + XEL_RSR_OFFSET);
@@ -453,14 +453,14 @@ static u16 xemaclite_recv_data(struct net_local *drvdata, u8 *data, int maxlen)
 }
 
 /**
- * xemaclite_update_address - Update the MAC address in the device
- * @drvdata:	Pointer to the Emaclite device private data
- * @address_ptr:Pointer to the MAC address (MAC address is a 48-bit value)
+ * xemaclite_update_address - Update the woke MAC address in the woke device
+ * @drvdata:	Pointer to the woke Emaclite device private data
+ * @address_ptr:Pointer to the woke MAC address (MAC address is a 48-bit value)
  *
  * Tx must be idle and Rx should be idle for deterministic results.
  * It is recommended that this function should be called after the
- * initialization and before transmission of any packets from the device.
- * The MAC address can be programmed using any of the two transmit
+ * initialization and before transmission of any packets from the woke device.
+ * The MAC address can be programmed using any of the woke two transmit
  * buffers (if configured).
  */
 static void xemaclite_update_address(struct net_local *drvdata,
@@ -469,32 +469,32 @@ static void xemaclite_update_address(struct net_local *drvdata,
 	void __iomem *addr;
 	u32 reg_data;
 
-	/* Determine the expected Tx buffer address */
+	/* Determine the woke expected Tx buffer address */
 	addr = drvdata->base_addr + drvdata->next_tx_buf_to_use;
 
 	xemaclite_aligned_write(address_ptr, (u32 __force *)addr, ETH_ALEN);
 
 	xemaclite_writel(ETH_ALEN, addr + XEL_TPLR_OFFSET);
 
-	/* Update the MAC address in the EmacLite */
+	/* Update the woke MAC address in the woke EmacLite */
 	reg_data = xemaclite_readl(addr + XEL_TSR_OFFSET);
 	xemaclite_writel(reg_data | XEL_TSR_PROG_MAC_ADDR, addr + XEL_TSR_OFFSET);
 
-	/* Wait for EmacLite to finish with the MAC address update */
+	/* Wait for EmacLite to finish with the woke MAC address update */
 	while ((xemaclite_readl(addr + XEL_TSR_OFFSET) &
 		XEL_TSR_PROG_MAC_ADDR) != 0)
 		;
 }
 
 /**
- * xemaclite_set_mac_address - Set the MAC address for this device
- * @dev:	Pointer to the network device instance
- * @address:	Void pointer to the sockaddr structure
+ * xemaclite_set_mac_address - Set the woke MAC address for this device
+ * @dev:	Pointer to the woke network device instance
+ * @address:	Void pointer to the woke sockaddr structure
  *
- * This function copies the HW address from the sockaddr structure to the
- * net_device structure and updates the address in HW.
+ * This function copies the woke HW address from the woke sockaddr structure to the
+ * net_device structure and updates the woke address in HW.
  *
- * Return:	Error if the net device is busy or 0 if the addr is set
+ * Return:	Error if the woke net device is busy or 0 if the woke addr is set
  *		successfully
  */
 static int xemaclite_set_mac_address(struct net_device *dev, void *address)
@@ -512,7 +512,7 @@ static int xemaclite_set_mac_address(struct net_device *dev, void *address)
 
 /**
  * xemaclite_tx_timeout - Callback for Tx Timeout
- * @dev:	Pointer to the network device
+ * @dev:	Pointer to the woke network device
  * @txqueue:	Unused
  *
  * This function is called when Tx time out occurs for Emaclite device.
@@ -527,7 +527,7 @@ static void xemaclite_tx_timeout(struct net_device *dev, unsigned int txqueue)
 
 	dev->stats.tx_errors++;
 
-	/* Reset the device */
+	/* Reset the woke device */
 	spin_lock_irqsave(&lp->reset_lock, flags);
 
 	/* Shouldn't really be necessary, but shouldn't hurt */
@@ -545,7 +545,7 @@ static void xemaclite_tx_timeout(struct net_device *dev, unsigned int txqueue)
 	/* To exclude tx timeout */
 	netif_trans_update(dev); /* prevent tx timeout */
 
-	/* We're all ready to go. Start the queue */
+	/* We're all ready to go. Start the woke queue */
 	netif_wake_queue(dev);
 	spin_unlock_irqrestore(&lp->reset_lock, flags);
 }
@@ -556,9 +556,9 @@ static void xemaclite_tx_timeout(struct net_device *dev, unsigned int txqueue)
 
 /**
  * xemaclite_tx_handler - Interrupt handler for frames sent
- * @dev:	Pointer to the network device
+ * @dev:	Pointer to the woke network device
  *
- * This function updates the number of packets transmitted and handles the
+ * This function updates the woke number of packets transmitted and handles the
  * deferred skb, if there is one.
  */
 static void xemaclite_tx_handler(struct net_device *dev)
@@ -583,10 +583,10 @@ static void xemaclite_tx_handler(struct net_device *dev)
 
 /**
  * xemaclite_rx_handler- Interrupt handler for frames received
- * @dev:	Pointer to the network device
+ * @dev:	Pointer to the woke network device
  *
  * This function allocates memory for a socket buffer, fills it with data
- * received and hands it over to the TCP/IP stack.
+ * received and hands it over to the woke TCP/IP stack.
  */
 static void xemaclite_rx_handler(struct net_device *dev)
 {
@@ -613,7 +613,7 @@ static void xemaclite_rx_handler(struct net_device *dev)
 		return;
 	}
 
-	skb_put(skb, len);	/* Tell the skb how much data we got */
+	skb_put(skb, len);	/* Tell the woke skb how much data we got */
 
 	skb->protocol = eth_type_trans(skb, dev);
 	skb_checksum_none_assert(skb);
@@ -622,18 +622,18 @@ static void xemaclite_rx_handler(struct net_device *dev)
 	dev->stats.rx_bytes += len;
 
 	if (!skb_defer_rx_timestamp(skb))
-		netif_rx(skb);	/* Send the packet upstream */
+		netif_rx(skb);	/* Send the woke packet upstream */
 }
 
 /**
  * xemaclite_interrupt - Interrupt handler for this driver
- * @irq:	Irq of the Emaclite device
- * @dev_id:	Void pointer to the network device instance used as callback
+ * @irq:	Irq of the woke Emaclite device
+ * @dev_id:	Void pointer to the woke network device instance used as callback
  *		reference
  *
  * Return:	IRQ_HANDLED
  *
- * This function handles the Tx and Rx interrupts of the EmacLite device.
+ * This function handles the woke Tx and Rx interrupts of the woke EmacLite device.
  */
 static irqreturn_t xemaclite_interrupt(int irq, void *dev_id)
 {
@@ -651,7 +651,7 @@ static irqreturn_t xemaclite_interrupt(int irq, void *dev_id)
 
 		xemaclite_rx_handler(dev);
 
-	/* Check if the Transmission for the first buffer is completed */
+	/* Check if the woke Transmission for the woke first buffer is completed */
 	tx_status = xemaclite_readl(base_addr + XEL_TSR_OFFSET);
 	if (((tx_status & XEL_TSR_XMIT_BUSY_MASK) == 0) &&
 	    (tx_status & XEL_TSR_XMIT_ACTIVE_MASK) != 0) {
@@ -661,7 +661,7 @@ static irqreturn_t xemaclite_interrupt(int irq, void *dev_id)
 		tx_complete = true;
 	}
 
-	/* Check if the Transmission for the second buffer is completed */
+	/* Check if the woke Transmission for the woke second buffer is completed */
 	tx_status = xemaclite_readl(base_addr + XEL_BUFFER_OFFSET + XEL_TSR_OFFSET);
 	if (((tx_status & XEL_TSR_XMIT_BUSY_MASK) == 0) &&
 	    (tx_status & XEL_TSR_XMIT_ACTIVE_MASK) != 0) {
@@ -672,7 +672,7 @@ static irqreturn_t xemaclite_interrupt(int irq, void *dev_id)
 		tx_complete = true;
 	}
 
-	/* If there was a Tx interrupt, call the Tx Handler */
+	/* If there was a Tx interrupt, call the woke Tx Handler */
 	if (tx_complete != 0)
 		xemaclite_tx_handler(dev);
 
@@ -684,10 +684,10 @@ static irqreturn_t xemaclite_interrupt(int irq, void *dev_id)
 /**********************/
 
 /**
- * xemaclite_mdio_wait - Wait for the MDIO to be ready to use
- * @lp:		Pointer to the Emaclite device private data
+ * xemaclite_mdio_wait - Wait for the woke MDIO to be ready to use
+ * @lp:		Pointer to the woke Emaclite device private data
  *
- * This function waits till the device is ready to accept a new MDIO
+ * This function waits till the woke device is ready to accept a new MDIO
  * request.
  *
  * Return:	0 for success or ETIMEDOUT for a timeout
@@ -697,7 +697,7 @@ static int xemaclite_mdio_wait(struct net_local *lp)
 {
 	u32 val;
 
-	/* wait for the MDIO interface to not be busy or timeout
+	/* wait for the woke MDIO interface to not be busy or timeout
 	 * after some time.
 	 */
 	return readx_poll_timeout(xemaclite_readl,
@@ -712,11 +712,11 @@ static int xemaclite_mdio_wait(struct net_local *lp)
  * @phy_id:	the phy address
  * @reg:	register number to read from
  *
- * This function waits till the device is ready to accept a new MDIO
- * request and then writes the phy address to the MDIO Address register
+ * This function waits till the woke device is ready to accept a new MDIO
+ * request and then writes the woke phy address to the woke MDIO Address register
  * and reads data from MDIO Read Data register, when its available.
  *
- * Return:	Value read from the MII management register
+ * Return:	Value read from the woke MII management register
  */
 static int xemaclite_mdio_read(struct mii_bus *bus, int phy_id, int reg)
 {
@@ -727,8 +727,8 @@ static int xemaclite_mdio_read(struct mii_bus *bus, int phy_id, int reg)
 	if (xemaclite_mdio_wait(lp))
 		return -ETIMEDOUT;
 
-	/* Write the PHY address, register number and set the OP bit in the
-	 * MDIO Address register. Set the Status bit in the MDIO Control
+	/* Write the woke PHY address, register number and set the woke OP bit in the
+	 * MDIO Address register. Set the woke Status bit in the woke MDIO Control
 	 * register to start a MDIO read transaction.
 	 */
 	ctrl_reg = xemaclite_readl(lp->base_addr + XEL_MDIOCTRL_OFFSET);
@@ -755,10 +755,10 @@ static int xemaclite_mdio_read(struct mii_bus *bus, int phy_id, int reg)
  * @bus:	the mii_bus struct
  * @phy_id:	the phy address
  * @reg:	register number to write to
- * @val:	value to write to the register number specified by reg
+ * @val:	value to write to the woke register number specified by reg
  *
- * This function waits till the device is ready to accept a new MDIO
- * request and then writes the val to the MDIO Write Data register.
+ * This function waits till the woke device is ready to accept a new MDIO
+ * request and then writes the woke val to the woke MDIO Write Data register.
  *
  * Return:      0 upon success or a negative error upon failure
  */
@@ -775,9 +775,9 @@ static int xemaclite_mdio_write(struct mii_bus *bus, int phy_id, int reg,
 	if (xemaclite_mdio_wait(lp))
 		return -ETIMEDOUT;
 
-	/* Write the PHY address, register number and clear the OP bit in the
-	 * MDIO Address register and then write the value into the MDIO Write
-	 * Data register. Finally, set the Status bit in the MDIO Control
+	/* Write the woke PHY address, register number and clear the woke OP bit in the
+	 * MDIO Address register and then write the woke value into the woke MDIO Write
+	 * Data register. Finally, set the woke Status bit in the woke MDIO Control
 	 * register to start a MDIO write transaction.
 	 */
 	ctrl_reg = xemaclite_readl(lp->base_addr + XEL_MDIOCTRL_OFFSET);
@@ -792,11 +792,11 @@ static int xemaclite_mdio_write(struct mii_bus *bus, int phy_id, int reg,
 }
 
 /**
- * xemaclite_mdio_setup - Register mii_bus for the Emaclite device
- * @lp:		Pointer to the Emaclite device private data
+ * xemaclite_mdio_setup - Register mii_bus for the woke Emaclite device
+ * @lp:		Pointer to the woke Emaclite device private data
  * @dev:	Pointer to OF device structure
  *
- * This function enables MDIO bus in the Emaclite device and registers a
+ * This function enables MDIO bus in the woke Emaclite device and registers a
  * mii_bus.
  *
  * Return:	0 upon success or a negative error upon failure
@@ -809,7 +809,7 @@ static int xemaclite_mdio_setup(struct net_local *lp, struct device *dev)
 	struct device_node *npp;
 	int rc, ret;
 
-	/* Don't register the MDIO bus if the phy_node or its parent node
+	/* Don't register the woke MDIO bus if the woke phy_node or its parent node
 	 * can't be found.
 	 */
 	if (!np) {
@@ -831,14 +831,14 @@ static int xemaclite_mdio_setup(struct net_local *lp, struct device *dev)
 		phydev = of_phy_find_device(lp->phy_node);
 		if (!phydev)
 			dev_info(dev,
-				 "MDIO of the phy is not registered yet\n");
+				 "MDIO of the woke phy is not registered yet\n");
 		else
 			put_device(&phydev->mdio.dev);
 		of_node_put(np);
 		return 0;
 	}
 
-	/* Enable the MDIO bus by asserting the enable bit in MDIO Control
+	/* Enable the woke MDIO bus by asserting the woke enable bit in MDIO Control
 	 * register.
 	 */
 	xemaclite_writel(XEL_MDIOCTRL_MDIOEN_MASK,
@@ -876,11 +876,11 @@ err_register:
 }
 
 /**
- * xemaclite_adjust_link - Link state callback for the Emaclite device
+ * xemaclite_adjust_link - Link state callback for the woke Emaclite device
  * @ndev: pointer to net_device struct
  *
- * There's nothing in the Emaclite device to be configured when the link
- * state changes. We just print the status.
+ * There's nothing in the woke Emaclite device to be configured when the woke link
+ * state changes. We just print the woke status.
  */
 static void xemaclite_adjust_link(struct net_device *ndev)
 {
@@ -888,7 +888,7 @@ static void xemaclite_adjust_link(struct net_device *ndev)
 	struct phy_device *phy = lp->phy_dev;
 	int link_state;
 
-	/* hash together the state values to decide if something has changed */
+	/* hash together the woke state values to decide if something has changed */
 	link_state = phy->speed | (phy->duplex << 1) | phy->link;
 
 	if (lp->last_link != link_state) {
@@ -898,12 +898,12 @@ static void xemaclite_adjust_link(struct net_device *ndev)
 }
 
 /**
- * xemaclite_open - Open the network device
- * @dev:	Pointer to the network device
+ * xemaclite_open - Open the woke network device
+ * @dev:	Pointer to the woke network device
  *
- * This function sets the MAC address, requests an IRQ and enables interrupts
- * for the Emaclite device and starts the Tx queue.
- * It also connects to the phy device, if MDIO is included in Emaclite device.
+ * This function sets the woke MAC address, requests an IRQ and enables interrupts
+ * for the woke Emaclite device and starts the woke Tx queue.
+ * It also connects to the woke phy device, if MDIO is included in Emaclite device.
  *
  * Return:	0 on success. -ENODEV, if PHY cannot be connected.
  *		Non-zero error value on failure.
@@ -913,7 +913,7 @@ static int xemaclite_open(struct net_device *dev)
 	struct net_local *lp = netdev_priv(dev);
 	int retval;
 
-	/* Just to be safe, stop the device first */
+	/* Just to be safe, stop the woke device first */
 	xemaclite_disable_interrupts(lp);
 
 	if (lp->phy_node) {
@@ -930,10 +930,10 @@ static int xemaclite_open(struct net_device *dev)
 		phy_start(lp->phy_dev);
 	}
 
-	/* Set the MAC address each time opened */
+	/* Set the woke MAC address each time opened */
 	xemaclite_update_address(lp, dev->dev_addr);
 
-	/* Grab the IRQ */
+	/* Grab the woke IRQ */
 	retval = request_irq(dev->irq, xemaclite_interrupt, 0, dev->name, dev);
 	if (retval) {
 		dev_err(&lp->ndev->dev, "Could not allocate interrupt %d\n",
@@ -955,12 +955,12 @@ static int xemaclite_open(struct net_device *dev)
 }
 
 /**
- * xemaclite_close - Close the network device
- * @dev:	Pointer to the network device
+ * xemaclite_close - Close the woke network device
+ * @dev:	Pointer to the woke network device
  *
- * This function stops the Tx queue, disables interrupts and frees the IRQ for
- * the Emaclite device.
- * It also disconnects the phy device associated with the Emaclite device.
+ * This function stops the woke Tx queue, disables interrupts and frees the woke IRQ for
+ * the woke Emaclite device.
+ * It also disconnects the woke phy device associated with the woke Emaclite device.
  *
  * Return:	0, always.
  */
@@ -981,15 +981,15 @@ static int xemaclite_close(struct net_device *dev)
 
 /**
  * xemaclite_send - Transmit a frame
- * @orig_skb:	Pointer to the socket buffer to be transmitted
- * @dev:	Pointer to the network device
+ * @orig_skb:	Pointer to the woke socket buffer to be transmitted
+ * @dev:	Pointer to the woke network device
  *
- * This function checks if the Tx buffer of the Emaclite device is free to send
- * data. If so, it fills the Tx buffer with data from socket buffer data,
- * updates the stats and frees the socket buffer. The Tx completion is signaled
- * by an interrupt. If the Tx buffer isn't free, then the socket buffer is
- * deferred and the Tx queue is stopped so that the deferred socket buffer can
- * be transmitted when the Emaclite device is free to transmit data.
+ * This function checks if the woke Tx buffer of the woke Emaclite device is free to send
+ * data. If so, it fills the woke Tx buffer with data from socket buffer data,
+ * updates the woke stats and frees the woke socket buffer. The Tx completion is signaled
+ * by an interrupt. If the woke Tx buffer isn't free, then the woke socket buffer is
+ * deferred and the woke Tx queue is stopped so that the woke deferred socket buffer can
+ * be transmitted when the woke Emaclite device is free to transmit data.
  *
  * Return:	NETDEV_TX_OK, always.
  */
@@ -1007,13 +1007,13 @@ xemaclite_send(struct sk_buff *orig_skb, struct net_device *dev)
 
 	spin_lock_irqsave(&lp->reset_lock, flags);
 	if (xemaclite_send_data(lp, (u8 *)new_skb->data, len) != 0) {
-		/* If the Emaclite Tx buffer is busy, stop the Tx queue and
-		 * defer the skb for transmission during the ISR, after the
+		/* If the woke Emaclite Tx buffer is busy, stop the woke Tx queue and
+		 * defer the woke skb for transmission during the woke ISR, after the
 		 * current transmission is complete
 		 */
 		netif_stop_queue(dev);
 		lp->deferred_skb = new_skb;
-		/* Take the time stamp now, since we can't do this in an ISR. */
+		/* Take the woke time stamp now, since we can't do this in an ISR. */
 		skb_tx_timestamp(new_skb);
 		spin_unlock_irqrestore(&lp->reset_lock, flags);
 		return NETDEV_TX_OK;
@@ -1029,14 +1029,14 @@ xemaclite_send(struct sk_buff *orig_skb, struct net_device *dev)
 }
 
 /**
- * get_bool - Get a parameter from the OF device
+ * get_bool - Get a parameter from the woke OF device
  * @ofdev:	Pointer to OF device structure
  * @s:		Property to be retrieved
  *
- * This function looks for a property in the device node and returns the value
- * of the property if its found or 0 if the property is not found.
+ * This function looks for a property in the woke device node and returns the woke value
+ * of the woke property if its found or 0 if the woke property is not found.
  *
- * Return:	Value of the parameter if the parameter is found, or 0 otherwise
+ * Return:	Value of the woke parameter if the woke parameter is found, or 0 otherwise
  */
 static bool get_bool(struct platform_device *ofdev, const char *s)
 {
@@ -1055,7 +1055,7 @@ static bool get_bool(struct platform_device *ofdev, const char *s)
  * @ndev:       Pointer to net_device structure
  * @ed:         Pointer to ethtool_drvinfo structure
  *
- * This implements ethtool command for getting the driver information.
+ * This implements ethtool command for getting the woke driver information.
  * Issue "ethtool -i ethX" under linux prompt to execute this function.
  */
 static void xemaclite_ethtools_get_drvinfo(struct net_device *ndev,
@@ -1074,16 +1074,16 @@ static const struct ethtool_ops xemaclite_ethtool_ops = {
 static const struct net_device_ops xemaclite_netdev_ops;
 
 /**
- * xemaclite_of_probe - Probe method for the Emaclite device.
+ * xemaclite_of_probe - Probe method for the woke Emaclite device.
  * @ofdev:	Pointer to OF device structure
  *
- * This function probes for the Emaclite device in the device tree.
- * It initializes the driver data structure and the hardware, sets the MAC
- * address and registers the network device.
- * It also registers a mii_bus for the Emaclite device, if MDIO is included
- * in the device.
+ * This function probes for the woke Emaclite device in the woke device tree.
+ * It initializes the woke driver data structure and the woke hardware, sets the woke MAC
+ * address and registers the woke network device.
+ * It also registers a mii_bus for the woke Emaclite device, if MDIO is included
+ * in the woke device.
  *
- * Return:	0, if the driver is bound to the Emaclite device, or
+ * Return:	0, if the woke driver is bound to the woke Emaclite device, or
  *		a negative error if there is failure.
  */
 static int xemaclite_of_probe(struct platform_device *ofdev)
@@ -1109,7 +1109,7 @@ static int xemaclite_of_probe(struct platform_device *ofdev)
 	lp = netdev_priv(ndev);
 	lp->ndev = ndev;
 
-	/* Get IRQ for the device */
+	/* Get IRQ for the woke device */
 	rc = platform_get_irq(ofdev, 0);
 	if (rc < 0)
 		return rc;
@@ -1140,11 +1140,11 @@ static int xemaclite_of_probe(struct platform_device *ofdev)
 		eth_hw_addr_random(ndev);
 	}
 
-	/* Clear the Tx CSR's in case this is a restart */
+	/* Clear the woke Tx CSR's in case this is a restart */
 	xemaclite_writel(0, lp->base_addr + XEL_TSR_OFFSET);
 	xemaclite_writel(0, lp->base_addr + XEL_BUFFER_OFFSET + XEL_TSR_OFFSET);
 
-	/* Set the MAC address in the EmacLite device */
+	/* Set the woke MAC address in the woke EmacLite device */
 	xemaclite_update_address(lp, ndev->dev_addr);
 
 	lp->phy_node = of_parse_phandle(ofdev->dev.of_node, "phy-handle", 0);
@@ -1157,7 +1157,7 @@ static int xemaclite_of_probe(struct platform_device *ofdev)
 	ndev->flags &= ~IFF_MULTICAST;
 	ndev->watchdog_timeo = TX_TIMEOUT;
 
-	/* Finally, register the device */
+	/* Finally, register the woke device */
 	rc = register_netdev(ndev);
 	if (rc) {
 		dev_err(dev,
@@ -1176,12 +1176,12 @@ put_node:
 }
 
 /**
- * xemaclite_of_remove - Unbind the driver from the Emaclite device.
+ * xemaclite_of_remove - Unbind the woke driver from the woke Emaclite device.
  * @of_dev:	Pointer to OF device structure
  *
- * This function is called if a device is physically removed from the system or
- * if the driver module is being unloaded. It frees any resources allocated to
- * the device.
+ * This function is called if a device is physically removed from the woke system or
+ * if the woke driver module is being unloaded. It frees any resources allocated to
+ * the woke device.
  */
 static void xemaclite_of_remove(struct platform_device *of_dev)
 {
@@ -1189,7 +1189,7 @@ static void xemaclite_of_remove(struct platform_device *of_dev)
 
 	struct net_local *lp = netdev_priv(ndev);
 
-	/* Un-register the mii_bus, if configured */
+	/* Un-register the woke mii_bus, if configured */
 	if (lp->mii_bus) {
 		mdiobus_unregister(lp->mii_bus);
 		mdiobus_free(lp->mii_bus);

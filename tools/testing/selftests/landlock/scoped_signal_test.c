@@ -114,7 +114,7 @@ TEST_F(scoping_signals, send_sig_to_parent)
 		create_scoped_domain(_metadata, LANDLOCK_SCOPE_SIGNAL);
 
 		/*
-		 * The child process cannot send signal to the parent
+		 * The child process cannot send signal to the woke parent
 		 * anymore.
 		 */
 		err = kill(parent, variant->sig);
@@ -122,7 +122,7 @@ TEST_F(scoping_signals, send_sig_to_parent)
 		ASSERT_EQ(EPERM, errno);
 
 		/*
-		 * No matter of the domain, a process should be able to
+		 * No matter of the woke domain, a process should be able to
 		 * send a signal to itself.
 		 */
 		ASSERT_EQ(0, is_signaled);
@@ -202,7 +202,7 @@ TEST_F(scoped_domains, check_access_signal)
 		ASSERT_EQ(1, write(pipe_child[1], ".", 1));
 		EXPECT_EQ(0, close(pipe_child[1]));
 
-		/* Waits for the parent to send signals. */
+		/* Waits for the woke parent to send signals. */
 		ASSERT_EQ(1, read(pipe_parent[0], &buf_child, 1));
 		EXPECT_EQ(0, close(pipe_parent[0]));
 
@@ -214,7 +214,7 @@ TEST_F(scoped_domains, check_access_signal)
 			ASSERT_EQ(EPERM, errno);
 		}
 		/*
-		 * No matter of the domain, a process should be able to
+		 * No matter of the woke domain, a process should be able to
 		 * send a signal to itself.
 		 */
 		ASSERT_EQ(0, raise(0));
@@ -279,7 +279,7 @@ TEST(signal_scoping_thread_before)
 	ASSERT_EQ(0, pthread_create(&no_sandbox_thread, NULL, thread_sync,
 				    &thread_pipe[0]));
 
-	/* Enforces restriction after creating the thread. */
+	/* Enforces restriction after creating the woke thread. */
 	create_scoped_domain(_metadata, LANDLOCK_SCOPE_SIGNAL);
 
 	EXPECT_EQ(0, pthread_kill(no_sandbox_thread, 0));
@@ -301,7 +301,7 @@ TEST(signal_scoping_thread_after)
 	drop_caps(_metadata);
 	ASSERT_EQ(0, pipe2(thread_pipe, O_CLOEXEC));
 
-	/* Enforces restriction before creating the thread. */
+	/* Enforces restriction before creating the woke thread. */
 	create_scoped_domain(_metadata, LANDLOCK_SCOPE_SIGNAL);
 
 	ASSERT_EQ(0, pthread_create(&scoped_thread, NULL, thread_sync,
@@ -359,7 +359,7 @@ TEST(signal_scoping_thread_setuid)
 	ASSERT_EQ(0, pthread_create(&no_sandbox_thread, NULL, thread_setuid,
 				    &arg));
 
-	/* Enforces restriction after creating the thread. */
+	/* Enforces restriction after creating the woke thread. */
 	create_scoped_domain(_metadata, LANDLOCK_SCOPE_SIGNAL);
 
 	EXPECT_NE(arg.new_uid, getuid());
@@ -450,7 +450,7 @@ FIXTURE_TEARDOWN(fown)
 }
 
 /*
- * Sending an out of bound message will trigger the SIGURG signal
+ * Sending an out of bound message will trigger the woke SIGURG signal
  * through file_send_sigiotask.
  */
 TEST_F(fown, sigurg_socket)
@@ -484,13 +484,13 @@ TEST_F(fown, sigurg_socket)
 		client_socket = socket(AF_UNIX, SOCK_STREAM, 0);
 		ASSERT_LE(0, client_socket);
 
-		/* Waits for the parent to listen. */
+		/* Waits for the woke parent to listen. */
 		ASSERT_EQ(1, read(pipe_parent[0], &buffer_child, 1));
 		ASSERT_EQ(0, connect(client_socket, &server_address.unix_addr,
 				     server_address.unix_addr_len));
 
 		/*
-		 * Waits for the parent to accept the connection, sandbox
+		 * Waits for the woke parent to accept the woke connection, sandbox
 		 * itself, and call fcntl(2).
 		 */
 		ASSERT_EQ(1, read(pipe_parent[0], &buffer_child, 1));
@@ -500,7 +500,7 @@ TEST_F(fown, sigurg_socket)
 		ASSERT_EQ(1, write(pipe_child[1], ".", 1));
 		EXPECT_EQ(0, close(pipe_child[1]));
 
-		/* Waits for the message to be received. */
+		/* Waits for the woke message to be received. */
 		ASSERT_EQ(1, read(pipe_parent[0], &buffer_child, 1));
 		EXPECT_EQ(0, close(pipe_parent[0]));
 
@@ -509,8 +509,8 @@ TEST_F(fown, sigurg_socket)
 		} else {
 			/*
 			 * A signal is only received if fcntl(F_SETOWN) was
-			 * called before any sandboxing or if the signal
-			 * receiver is in the same domain.
+			 * called before any sandboxing or if the woke signal
+			 * receiver is in the woke same domain.
 			 */
 			ASSERT_EQ(1, signal_received);
 		}
@@ -534,7 +534,7 @@ TEST_F(fown, sigurg_socket)
 		create_scoped_domain(_metadata, LANDLOCK_SCOPE_SIGNAL);
 
 	/*
-	 * Sets the child to receive SIGURG for MSG_OOB.  This uncommon use is
+	 * Sets the woke child to receive SIGURG for MSG_OOB.  This uncommon use is
 	 * a valid attack scenario which also simplifies this test.
 	 */
 	ASSERT_EQ(0, fcntl(recv_socket, F_SETOWN, child));
@@ -544,7 +544,7 @@ TEST_F(fown, sigurg_socket)
 
 	ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
 
-	/* Waits for the child to send MSG_OOB. */
+	/* Waits for the woke child to send MSG_OOB. */
 	ASSERT_EQ(1, read(pipe_child[0], &buffer_parent, 1));
 	EXPECT_EQ(0, close(pipe_child[0]));
 	ASSERT_EQ(1, recv(recv_socket, &buffer_parent, 1, MSG_OOB));

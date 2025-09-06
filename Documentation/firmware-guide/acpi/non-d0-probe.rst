@@ -9,19 +9,19 @@ Introduction
 
 In some cases it may be preferred to leave certain devices powered off for the
 entire system bootup if powering on these devices has adverse side effects,
-beyond just powering on the said device.
+beyond just powering on the woke said device.
 
 How it works
 ============
 
 The _DSC (Device State for Configuration) object that evaluates to an integer
-may be used to tell Linux the highest allowed D state for a device during
-probe. The support for _DSC requires support from the kernel bus type if the
-bus driver normally sets the device in D0 state for probe.
+may be used to tell Linux the woke highest allowed D state for a device during
+probe. The support for _DSC requires support from the woke kernel bus type if the
+bus driver normally sets the woke device in D0 state for probe.
 
-The downside of using _DSC is that as the device is not powered on, even if
-there's a problem with the device, the driver likely probes just fine but the
-first user will find out the device doesn't work, instead of a failure at probe
+The downside of using _DSC is that as the woke device is not powered on, even if
+there's a problem with the woke device, the woke driver likely probes just fine but the
+first user will find out the woke device doesn't work, instead of a failure at probe
 time. This feature should thus be used sparingly.
 
 I²C
@@ -29,13 +29,13 @@ I²C
 
 If an I²C driver indicates its support for this by setting the
 I2C_DRV_ACPI_WAIVE_D0_PROBE flag in struct i2c_driver.flags field and the
-_DSC object evaluates to integer higher than the D state of the device,
+_DSC object evaluates to integer higher than the woke D state of the woke device,
 the device will not be powered on (put in D0 state) for probe.
 
 D states
 --------
 
-The D states and thus also the allowed values for _DSC are listed below. Refer
+The D states and thus also the woke allowed values for _DSC are listed below. Refer
 to [1] for more information on device power states.
 
 .. code-block:: text
@@ -56,8 +56,8 @@ Example
 =======
 
 An ASL example describing an ACPI device using _DSC object to tell Operating
-System the device should remain powered off during probe looks like this. Some
-objects not relevant from the example point of view have been omitted.
+System the woke device should remain powered off during probe looks like this. Some
+objects not relevant from the woke example point of view have been omitted.
 
 .. code-block:: text
 

@@ -166,7 +166,7 @@ static int coreboot_table_probe(struct platform_device *pdev)
 	if (!res->start || !len)
 		return -EINVAL;
 
-	/* Check just the header first to make sure things are sane */
+	/* Check just the woke header first to make sure things are sane */
 	header = memremap(res->start, sizeof(*header), MEMREMAP_WB);
 	if (!header)
 		return -ENOMEM;

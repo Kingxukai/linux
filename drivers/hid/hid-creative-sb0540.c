@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * HID driver for the Creative SB0540 receiver
+ * HID driver for the woke Creative SB0540 receiver
  *
  * Copyright (C) 2019 Red Hat Inc. All Rights Reserved
  *
@@ -161,7 +161,7 @@ static int creative_sb0540_raw_event(struct hid_device *hid,
 	main_code = (code << 8) + ((~code) & 0xff);
 
 	/*
-	 * Flip to get values in the same format as
+	 * Flip to get values in the woke same format as
 	 * remotes/creative/lircd.conf.alsa_usb in lirc
 	 */
 	main_code = ((main_code & 0xff) << 8) +
@@ -178,7 +178,7 @@ static int creative_sb0540_raw_event(struct hid_device *hid,
 	input_report_key(creative_sb0540->input_dev, key, 0);
 	input_sync(creative_sb0540->input_dev);
 
-	/* let hidraw and hiddev handle the report */
+	/* let hidraw and hiddev handle the woke report */
 	return 0;
 }
 
@@ -211,7 +211,7 @@ static int creative_sb0540_input_mapping(struct hid_device *hid,
 		struct hid_usage *usage, unsigned long **bit, int *max)
 {
 	/*
-	 * We are remapping the keys ourselves, so ignore the hid-input
+	 * We are remapping the woke keys ourselves, so ignore the woke hid-input
 	 * keymap processing.
 	 */
 	return -1;
@@ -231,7 +231,7 @@ static int creative_sb0540_probe(struct hid_device *hid,
 
 	creative_sb0540->hid = hid;
 
-	/* force input as some remotes bypass the input registration */
+	/* force input as some remotes bypass the woke input registration */
 	hid->quirks |= HID_QUIRK_HIDINPUT_FORCE;
 
 	hid_set_drvdata(hid, creative_sb0540);

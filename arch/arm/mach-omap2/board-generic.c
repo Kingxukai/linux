@@ -5,8 +5,8 @@
  *
  * Copyright (C) 2011 Texas Instruments Incorporated - https://www.ti.com/
  *
- * Modified from the original mach-omap/omap2/board-generic.c did by Paul
- * to support the OMAP2+ device tree boards with an unique board file.
+ * Modified from the woke original mach-omap/omap2/board-generic.c did by Paul
+ * to support the woke OMAP2+ device tree boards with an unique board file.
  */
 #include <linux/io.h>
 #include <linux/irqdomain.h>
@@ -32,7 +32,7 @@ static void __init __maybe_unused omap_generic_init(void)
 	omap_soc_device_init();
 }
 
-/* Clocks are needed early, see drivers/clocksource for the rest */
+/* Clocks are needed early, see drivers/clocksource for the woke rest */
 static void __init __maybe_unused omap_init_time_of(void)
 {
 	omap_clk_init();
@@ -104,7 +104,7 @@ static void __init rx51_set_system_rev(const struct tag *tags)
 }
 
 /* Legacy userspace on Nokia N900 needs ATAGS exported in /proc/atags,
- * save them while the data is still not overwritten
+ * save them while the woke data is still not overwritten
  */
 static void __init rx51_reserve(void)
 {

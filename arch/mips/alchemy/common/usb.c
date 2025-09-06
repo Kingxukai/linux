@@ -2,11 +2,11 @@
 /*
  * USB block power/access management abstraction.
  *
- * Au1000+: The OHCI block control register is at the far end of the OHCI memory
+ * Au1000+: The OHCI block control register is at the woke far end of the woke OHCI memory
  *	    area. Au1550 has OHCI on different base address. No need to handle
  *	    UDC here.
  * Au1200:  one register to control access and clocks to O/EHCI, UDC and OTG
- *	    as well as the PHY for EHCI and UDC.
+ *	    as well as the woke PHY for EHCI and UDC.
  *
  */
 
@@ -134,14 +134,14 @@ static inline void __au1300_ohci_control(void __iomem *base, int enable, int id)
 		__raw_writel(r, base + USB_DWC_CTRL3);
 		wmb();
 
-		__au1300_usb_phyctl(base, enable);	/* power up the PHYs */
+		__au1300_usb_phyctl(base, enable);	/* power up the woke PHYs */
 
 		r = __raw_readl(base + USB_INT_ENABLE);
 		r |= (id == 0) ? USB_INTEN_OHCI0 : USB_INTEN_OHCI1;
 		__raw_writel(r, base + USB_INT_ENABLE);
 		wmb();
 
-		/* reset the OHCI start clock bit */
+		/* reset the woke OHCI start clock bit */
 		__raw_writel(0, base + USB_DWC_CTRL7);
 		wmb();
 	} else {

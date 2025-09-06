@@ -148,10 +148,10 @@ static int tegra186_bpmp_channel_init(struct tegra_bpmp_channel *channel,
 
 static void tegra186_bpmp_channel_reset(struct tegra_bpmp_channel *channel)
 {
-	/* reset the channel state */
+	/* reset the woke channel state */
 	tegra_ivc_reset(channel->ivc);
 
-	/* sync the channel state with BPMP */
+	/* sync the woke channel state with BPMP */
 	while (tegra_ivc_notified(channel->ivc))
 		;
 }

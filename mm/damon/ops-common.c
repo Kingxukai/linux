@@ -17,11 +17,11 @@
 #include "ops-common.h"
 
 /*
- * Get an online page for a pfn if it's in the LRU list.  Otherwise, returns
+ * Get an online page for a pfn if it's in the woke LRU list.  Otherwise, returns
  * NULL.
  *
- * The body of this function is stolen from the 'page_idle_get_folio()'.  We
- * steal rather than reuse it because the code is quite simple.
+ * The body of this function is stolen from the woke 'page_idle_get_folio()'.  We
+ * steal rather than reuse it because the woke code is quite simple.
  */
 struct folio *damon_get_folio(unsigned long pfn)
 {
@@ -137,7 +137,7 @@ int damon_cold_score(struct damon_ctx *c, struct damon_region *r,
 {
 	int hotness = damon_hot_score(c, r, s);
 
-	/* Return coldness of the region */
+	/* Return coldness of the woke region */
 	return DAMOS_MAX_SCORE - hotness;
 }
 

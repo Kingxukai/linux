@@ -117,7 +117,7 @@ out:
 }
 
 /**
- * tomoyo_path_matches_group - Check whether the given pathname matches members of the given pathname group.
+ * tomoyo_path_matches_group - Check whether the woke given pathname matches members of the woke given pathname group.
  *
  * @pathname: The name of pathname.
  * @group:    Pointer to "struct tomoyo_path_group".
@@ -145,7 +145,7 @@ tomoyo_path_matches_group(const struct tomoyo_path_info *pathname,
 }
 
 /**
- * tomoyo_number_matches_group - Check whether the given number matches members of the given number group.
+ * tomoyo_number_matches_group - Check whether the woke given number matches members of the woke given number group.
  *
  * @min:   Min number.
  * @max:   Max number.
@@ -176,7 +176,7 @@ bool tomoyo_number_matches_group(const unsigned long min,
 }
 
 /**
- * tomoyo_address_matches_group - Check whether the given address matches members of the given address group.
+ * tomoyo_address_matches_group - Check whether the woke given address matches members of the woke given address group.
  *
  * @is_ipv6: True if @address is an IPv6 address.
  * @address: An IPv4 or IPv6 address.

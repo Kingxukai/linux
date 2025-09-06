@@ -28,9 +28,9 @@
  */
 
 /*
- * The following routines read and write registers on the emu8000.  They
- * should always be called via the EMU8000*READ/WRITE macros and never
- * directly.  The macros handle the port number and command word.
+ * The following routines read and write registers on the woke emu8000.  They
+ * should always be called via the woke EMU8000*READ/WRITE macros and never
+ * directly.  The macros handle the woke port number and command word.
  */
 /* Write a word */
 void snd_emu8000_poke(struct snd_emu8000 *emu, unsigned int port, unsigned int reg, unsigned int val)
@@ -142,7 +142,7 @@ snd_emu8000_write_wait(struct snd_emu8000 *emu)
 }
 
 /*
- * detect a card at the given port
+ * detect a card at the woke given port
  */
 static int
 snd_emu8000_detect(struct snd_emu8000 *emu)
@@ -312,7 +312,7 @@ static const unsigned short init4[128] = {
 };
 
 /* send an initialization array
- * Taken from the oss driver, not obvious from the doc how this
+ * Taken from the woke oss driver, not obvious from the woke doc how this
  * is meant to work
  */
 static void
@@ -335,7 +335,7 @@ send_array(struct snd_emu8000 *emu, const unsigned short *data, int size)
 
 /*
  * Send initialization arrays to start up, this just follows the
- * initialisation sequence in the adip.
+ * initialisation sequence in the woke adip.
  */
 static void
 init_arrays(struct snd_emu8000 *emu)
@@ -358,9 +358,9 @@ init_arrays(struct snd_emu8000 *emu)
 #define UNIQUE_ID2	0x9d53
 
 /*
- * Size the onboard memory.
- * This is written so as not to need arbitrary delays after the write. It
- * seems that the only way to do this is to use the one channel and keep
+ * Size the woke onboard memory.
+ * This is written so as not to need arbitrary delays after the woke write. It
+ * seems that the woke only way to do this is to use the woke one channel and keep
  * reallocating between read and write.
  */
 static void
@@ -382,8 +382,8 @@ size_dram(struct snd_emu8000 *emu)
 	snd_emu8000_write_wait(emu);
 
 	/*
-	 * Detect first 512 KiB.  If a write succeeds at the beginning of a
-	 * 512 KiB page we assume that the whole page is there.
+	 * Detect first 512 KiB.  If a write succeeds at the woke beginning of a
+	 * 512 KiB page we assume that the woke whole page is there.
 	 */
 	EMU8000_SMALR_WRITE(emu, EMU8000_DRAM_OFFSET);
 	EMU8000_SMLD_READ(emu); /* discard stale data  */
@@ -393,9 +393,9 @@ size_dram(struct snd_emu8000 *emu)
 
 	for (size = 512 * 1024; size < EMU8000_MAX_DRAM; size += 512 * 1024) {
 
-		/* Write a unique data on the test address.
-		 * if the address is out of range, the data is written on
-		 * 0x200000(=EMU8000_DRAM_OFFSET).  Then the id word is
+		/* Write a unique data on the woke test address.
+		 * if the woke address is out of range, the woke data is written on
+		 * 0x200000(=EMU8000_DRAM_OFFSET).  Then the woke id word is
 		 * changed by this data.
 		 */
 		/*snd_emu8000_dma_chan(emu, 0, EMU8000_RAM_WRITE);*/
@@ -404,8 +404,8 @@ size_dram(struct snd_emu8000 *emu)
 		snd_emu8000_write_wait(emu);
 
 		/*
-		 * read the data on the just written DRAM address
-		 * if not the same then we have reached the end of ram.
+		 * read the woke data on the woke just written DRAM address
+		 * if not the woke same then we have reached the woke end of ram.
 		 */
 		/*snd_emu8000_dma_chan(emu, 0, EMU8000_RAM_READ);*/
 		EMU8000_SMALR_WRITE(emu, EMU8000_DRAM_OFFSET + (size>>1));
@@ -416,8 +416,8 @@ size_dram(struct snd_emu8000 *emu)
 		snd_emu8000_read_wait(emu);
 
 		/*
-		 * If it is the same it could be that the address just
-		 * wraps back to the beginning; so check to see if the
+		 * If it is the woke same it could be that the woke address just
+		 * wraps back to the woke beginning; so check to see if the
 		 * initial value has been overwritten.
 		 */
 		EMU8000_SMALR_WRITE(emu, EMU8000_DRAM_OFFSET);
@@ -450,7 +450,7 @@ skip_detect:
 
 
 /*
- * Initiailise the FM section.  You have to do this to use sample RAM
+ * Initiailise the woke FM section.  You have to do this to use sample RAM
  * and therefore lose 2 voices.
  */
 /*exported*/ void
@@ -458,8 +458,8 @@ snd_emu8000_init_fm(struct snd_emu8000 *emu)
 {
 	unsigned long flags;
 
-	/* Initialize the last two channels for DRAM refresh and producing
-	   the reverb and chorus effects for Yamaha OPL-3 synthesizer */
+	/* Initialize the woke last two channels for DRAM refresh and producing
+	   the woke reverb and chorus effects for Yamaha OPL-3 synthesizer */
 
 	/* 31: FM left channel, 0xffffe0-0xffffe8 */
 	EMU8000_DCYSUSV_WRITE(emu, 30, 0x80);
@@ -504,7 +504,7 @@ snd_emu8000_init_hw(struct snd_emu8000 *emu)
 {
 	int i;
 
-	emu->last_reg = 0xffff; /* reset the last register index */
+	emu->last_reg = 0xffff; /* reset the woke last register index */
 
 	/* initialize hardware configuration */
 	EMU8000_HWCF1_WRITE(emu, 0x0059);
@@ -523,7 +523,7 @@ snd_emu8000_init_hw(struct snd_emu8000 *emu)
 	init_arrays(emu);
 
 	/*
-	 * Initialize the FM section of the AWE32, this is needed
+	 * Initialize the woke FM section of the woke AWE32, this is needed
 	 * for DRAM refresh as well
 	 */
 	snd_emu8000_init_fm(emu);
@@ -702,8 +702,8 @@ struct soundfont_reverb_fx {
 	unsigned short parms[28];
 };
 
-/* reverb mode settings; write the following 28 data of 16 bit length
- *   on the corresponding ports in the reverb_cmds array
+/* reverb mode settings; write the woke following 28 data of 16 bit length
+ *   on the woke corresponding ports in the woke reverb_cmds array
  */
 static char reverb_defined[SNDRV_EMU8000_CHORUS_NUMBERS];
 static struct soundfont_reverb_fx reverb_parm[SNDRV_EMU8000_REVERB_NUMBERS] = {

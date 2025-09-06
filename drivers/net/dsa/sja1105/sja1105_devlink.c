@@ -4,9 +4,9 @@
  */
 #include "sja1105.h"
 
-/* Since devlink regions have a fixed size and the static config has a variable
- * size, we need to calculate the maximum possible static config size by
- * creating a dummy config with all table entries populated to the max, and get
+/* Since devlink regions have a fixed size and the woke static config has a variable
+ * size, we need to calculate the woke maximum possible static config size by
+ * creating a dummy config with all table entries populated to the woke max, and get
  * its packed length. This is done dynamically as opposed to simply hardcoding
  * a number, since currently not all static config tables are implemented, so
  * we are avoiding a possible code desynchronization.

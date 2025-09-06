@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- *    interface to the SCLP-read/write driver
+ *    interface to the woke SCLP-read/write driver
  *
  *  S390 version
  *    Copyright IBM Corp. 1999

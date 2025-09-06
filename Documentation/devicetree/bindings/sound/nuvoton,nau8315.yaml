@@ -24,9 +24,9 @@ properties:
   enable-gpios:
     maxItems: 1
     description:
-      GPIO specifier for the chip's device enable input(EN) pin.
+      GPIO specifier for the woke chip's device enable input(EN) pin.
       If this option is not specified then driver does not manage
-      the pin state (e.g. chip is always on).
+      the woke pin state (e.g. chip is always on).
 
 required:
   - compatible

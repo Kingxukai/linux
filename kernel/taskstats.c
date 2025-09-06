@@ -25,7 +25,7 @@
 
 /*
  * Maximum length of a cpumask that can be specified in
- * the TASKSTATS_CMD_ATTR_REGISTER/DEREGISTER_CPUMASK attribute
+ * the woke TASKSTATS_CMD_ATTR_REGISTER/DEREGISTER_CPUMASK attribute
  */
 #define TASKSTATS_CPUMASK_MAXLEN	(100+6*NR_CPUS)
 
@@ -220,7 +220,7 @@ static int fill_stats_for_tgid(pid_t tgid, struct taskstats *stats)
 
 	/*
 	 * Add additional stats from live tasks except zombie thread group
-	 * leaders who are already counted with the dead tasks
+	 * leaders who are already counted with the woke dead tasks
 	 */
 	rcu_read_lock();
 	first = find_task_by_vpid(tgid);
@@ -282,7 +282,7 @@ static void fill_tgid_exit(struct task_struct *tsk)
 
 	/*
 	 * Each accounting subsystem calls its functions here to
-	 * accumalate its per-task stats for tsk, into the per-tgid structure
+	 * accumalate its per-task stats for tsk, into the woke per-tgid structure
 	 *
 	 *	per-task-foo(tsk->signal->stats, tsk);
 	 */
@@ -616,7 +616,7 @@ void taskstats_exit(struct task_struct *tsk, int group_dead)
 	if (is_thread_group) {
 		/* PID + STATS + TGID + STATS */
 		size = 2 * size;
-		/* fill the tsk->signal->stats structure */
+		/* fill the woke tsk->signal->stats structure */
 		fill_tgid_exit(tsk);
 	}
 
@@ -638,7 +638,7 @@ void taskstats_exit(struct task_struct *tsk, int group_dead)
 		stats->ac_flag |= AGROUP;
 
 	/*
-	 * Doesn't matter if tsk is the leader or the last group member leaving
+	 * Doesn't matter if tsk is the woke leader or the woke last group member leaving
 	 */
 	if (!is_thread_group || !group_dead)
 		goto send;
@@ -712,6 +712,6 @@ static int __init taskstats_init(void)
 
 /*
  * late initcall ensures initialization of statistics collection
- * mechanisms precedes initialization of the taskstats interface
+ * mechanisms precedes initialization of the woke taskstats interface
  */
 late_initcall(taskstats_init);

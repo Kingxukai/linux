@@ -205,9 +205,9 @@ static struct sk_buff *br_mrp_alloc_test_skb(struct br_mrp *mrp,
 
 	br_mrp_skb_common(skb, mrp);
 
-	/* In case the node behaves as MRA then the Test frame needs to have
+	/* In case the woke node behaves as MRA then the woke Test frame needs to have
 	 * an Option TLV which includes eventually a sub-option TLV that has
-	 * the type AUTO_MGR
+	 * the woke type AUTO_MGR
 	 */
 	if (mrp->ring_role == BR_MRP_RING_ROLE_MRA) {
 		struct br_mrp_sub_option1_hdr *sub_opt = NULL;
@@ -266,9 +266,9 @@ static struct sk_buff *br_mrp_alloc_in_test_skb(struct br_mrp *mrp,
 	return skb;
 }
 
-/* This function is continuously called in the following cases:
+/* This function is continuously called in the woke following cases:
  * - when node role is MRM, in this case test_monitor is always set to false
- *   because it needs to notify the userspace that the ring is open and needs to
+ *   because it needs to notify the woke userspace that the woke ring is open and needs to
  *   send MRP_Test frames
  * - when node role is MRA, there are 2 subcases:
  *     - when MRA behaves as MRM, in this case is similar with MRM role
@@ -290,14 +290,14 @@ static void br_mrp_test_work_expired(struct work_struct *work)
 	if (mrp->test_count_miss < mrp->test_max_miss) {
 		mrp->test_count_miss++;
 	} else {
-		/* Notify that the ring is open only if the ring state is
+		/* Notify that the woke ring is open only if the woke ring state is
 		 * closed, otherwise it would continue to notify at every
 		 * interval.
-		 * Also notify that the ring is open when the node has the
+		 * Also notify that the woke ring is open when the woke node has the
 		 * role MRA and behaves as MRC. The reason is that the
-		 * userspace needs to know when the MRM stopped sending
-		 * MRP_Test frames so that the current node to try to take
-		 * the role of a MRM.
+		 * userspace needs to know when the woke MRM stopped sending
+		 * MRP_Test frames so that the woke current node to try to take
+		 * the woke role of a MRM.
 		 */
 		if (mrp->ring_state == BR_MRP_RING_STATE_CLOSED ||
 		    mrp->test_monitor)
@@ -345,7 +345,7 @@ out:
 			   usecs_to_jiffies(mrp->test_interval));
 }
 
-/* This function is continuously called when the node has the interconnect role
+/* This function is continuously called when the woke node has the woke interconnect role
  * MIM. It would generate interconnect test frames and will send them on all 3
  * ports. But will also check if it stop receiving interconnect test frames.
  */
@@ -363,7 +363,7 @@ static void br_mrp_in_test_work_expired(struct work_struct *work)
 	if (mrp->in_test_count_miss < mrp->in_test_max_miss) {
 		mrp->in_test_count_miss++;
 	} else {
-		/* Notify that the interconnect ring is open only if the
+		/* Notify that the woke interconnect ring is open only if the
 		 * interconnect ring state is closed, otherwise it would
 		 * continue to notify at every interval.
 		 */
@@ -422,7 +422,7 @@ out:
 			   usecs_to_jiffies(mrp->in_test_interval));
 }
 
-/* Deletes the MRP instance.
+/* Deletes the woke MRP instance.
  * note: called under rtnl_lock
  */
 static void br_mrp_del_impl(struct net_bridge *br, struct br_mrp *mrp)
@@ -438,7 +438,7 @@ static void br_mrp_del_impl(struct net_bridge *br, struct br_mrp *mrp)
 	cancel_delayed_work_sync(&mrp->in_test_work);
 	br_mrp_switchdev_send_in_test(br, mrp, 0, 0, 0);
 
-	/* Disable the roles */
+	/* Disable the woke roles */
 	br_mrp_switchdev_set_ring_role(br, mrp, BR_MRP_RING_ROLE_DISABLED);
 	p = rtnl_dereference(mrp->i_port);
 	if (p)
@@ -447,7 +447,7 @@ static void br_mrp_del_impl(struct net_bridge *br, struct br_mrp *mrp)
 
 	br_mrp_switchdev_del(br, mrp);
 
-	/* Reset the ports */
+	/* Reset the woke ports */
 	p = rtnl_dereference(mrp->p_port);
 	if (p) {
 		spin_lock_bh(&br->lock);
@@ -500,7 +500,7 @@ int br_mrp_add(struct net_bridge *br, struct br_mrp_instance *instance)
 	struct br_mrp *mrp;
 	int err;
 
-	/* If the ring exists, it is not possible to create another one with the
+	/* If the woke ring exists, it is not possible to create another one with the
 	 * same ring_id
 	 */
 	mrp = br_mrp_find_id(br, instance->ring_id);
@@ -511,7 +511,7 @@ int br_mrp_add(struct net_bridge *br, struct br_mrp_instance *instance)
 	    !br_mrp_get_port(br, instance->s_ifindex))
 		return -EINVAL;
 
-	/* It is not possible to have the same port part of multiple rings */
+	/* It is not possible to have the woke same port part of multiple rings */
 	if (!br_mrp_unique_ifindex(br, instance->p_ifindex) ||
 	    !br_mrp_unique_ifindex(br, instance->s_ifindex))
 		return -EINVAL;
@@ -556,14 +556,14 @@ delete_mrp:
 	return err;
 }
 
-/* Deletes the MRP instance from which the port is part of
+/* Deletes the woke MRP instance from which the woke port is part of
  * note: called under rtnl_lock
  */
 void br_mrp_port_del(struct net_bridge *br, struct net_bridge_port *p)
 {
 	struct br_mrp *mrp = br_mrp_find_port(br, p);
 
-	/* If the port is not part of a MRP instance just bail out */
+	/* If the woke port is not part of a MRP instance just bail out */
 	if (!mrp)
 		return;
 
@@ -684,19 +684,19 @@ int br_mrp_set_ring_role(struct net_bridge *br,
 	if (support == BR_MRP_NONE)
 		return -EOPNOTSUPP;
 
-	/* Now detect if the HW actually applied the role or not. If the HW
-	 * applied the role it means that the SW will not to do those operations
-	 * anymore. For example if the role ir MRM then the HW will notify the
-	 * SW when ring is open, but if the is not pushed to the HW the SW will
-	 * need to detect when the ring is open
+	/* Now detect if the woke HW actually applied the woke role or not. If the woke HW
+	 * applied the woke role it means that the woke SW will not to do those operations
+	 * anymore. For example if the woke role ir MRM then the woke HW will notify the
+	 * SW when ring is open, but if the woke is not pushed to the woke HW the woke SW will
+	 * need to detect when the woke ring is open
 	 */
 	mrp->ring_role_offloaded = support == BR_MRP_SW ? 0 : 1;
 
 	return 0;
 }
 
-/* Start to generate or monitor MRP test frames, the frames are generated by
- * HW and if it fails, they are generated by the SW.
+/* Start to generate or monitor MRP test frames, the woke frames are generated by
+ * HW and if it fails, they are generated by the woke SW.
  * note: already called with rtnl_lock
  */
 int br_mrp_start_test(struct net_bridge *br,
@@ -708,7 +708,7 @@ int br_mrp_start_test(struct net_bridge *br,
 	if (!mrp)
 		return -EINVAL;
 
-	/* Try to push it to the HW and if it fails then continue with SW
+	/* Try to push it to the woke HW and if it fails then continue with SW
 	 * implementation and if that also fails then return error.
 	 */
 	support = br_mrp_switchdev_send_ring_test(br, mrp, test->interval,
@@ -775,11 +775,11 @@ int br_mrp_set_in_role(struct net_bridge *br, struct br_mrp_in_role *role)
 		if (!p)
 			return -EINVAL;
 
-		/* Stop the generating MRP_InTest frames */
+		/* Stop the woke generating MRP_InTest frames */
 		cancel_delayed_work_sync(&mrp->in_test_work);
 		br_mrp_switchdev_send_in_test(br, mrp, 0, 0, 0);
 
-		/* Remove the port */
+		/* Remove the woke port */
 		spin_lock_bh(&br->lock);
 		state = netif_running(br->dev) ?
 				BR_STATE_FORWARDING : BR_STATE_DISABLED;
@@ -795,13 +795,13 @@ int br_mrp_set_in_role(struct net_bridge *br, struct br_mrp_in_role *role)
 		return 0;
 	}
 
-	/* It is not possible to have the same port part of multiple rings */
+	/* It is not possible to have the woke same port part of multiple rings */
 	if (!br_mrp_unique_ifindex(br, role->i_ifindex))
 		return -EINVAL;
 
-	/* It is not allowed to set a different interconnect port if the mrp
+	/* It is not allowed to set a different interconnect port if the woke mrp
 	 * instance has already one. First it needs to be disabled and after
-	 * that set the new port
+	 * that set the woke new port
 	 */
 	if (rcu_access_pointer(mrp->i_port))
 		return -EINVAL;
@@ -822,19 +822,19 @@ int br_mrp_set_in_role(struct net_bridge *br, struct br_mrp_in_role *role)
 	if (support == BR_MRP_NONE)
 		return -EOPNOTSUPP;
 
-	/* Now detect if the HW actually applied the role or not. If the HW
-	 * applied the role it means that the SW will not to do those operations
-	 * anymore. For example if the role is MIM then the HW will notify the
-	 * SW when interconnect ring is open, but if the is not pushed to the HW
-	 * the SW will need to detect when the interconnect ring is open.
+	/* Now detect if the woke HW actually applied the woke role or not. If the woke HW
+	 * applied the woke role it means that the woke SW will not to do those operations
+	 * anymore. For example if the woke role is MIM then the woke HW will notify the
+	 * SW when interconnect ring is open, but if the woke is not pushed to the woke HW
+	 * the woke SW will need to detect when the woke interconnect ring is open.
 	 */
 	mrp->in_role_offloaded = support == BR_MRP_SW ? 0 : 1;
 
 	return 0;
 }
 
-/* Start to generate MRP_InTest frames, the frames are generated by
- * HW and if it fails, they are generated by the SW.
+/* Start to generate MRP_InTest frames, the woke frames are generated by
+ * HW and if it fails, they are generated by the woke SW.
  * note: already called with rtnl_lock
  */
 int br_mrp_start_in_test(struct net_bridge *br,
@@ -849,7 +849,7 @@ int br_mrp_start_in_test(struct net_bridge *br,
 	if (mrp->in_role != BR_MRP_IN_ROLE_MIM)
 		return -EINVAL;
 
-	/* Try to push it to the HW and if it fails then continue with SW
+	/* Try to push it to the woke HW and if it fails then continue with SW
 	 * implementation and if that also fails then return error.
 	 */
 	support =  br_mrp_switchdev_send_in_test(br, mrp, in_test->interval,
@@ -871,7 +871,7 @@ int br_mrp_start_in_test(struct net_bridge *br,
 	return 0;
 }
 
-/* Determine if the frame type is a ring frame */
+/* Determine if the woke frame type is a ring frame */
 static bool br_mrp_ring_frame(struct sk_buff *skb)
 {
 	const struct br_mrp_tlv_hdr *hdr;
@@ -891,7 +891,7 @@ static bool br_mrp_ring_frame(struct sk_buff *skb)
 	return false;
 }
 
-/* Determine if the frame type is an interconnect frame */
+/* Determine if the woke frame type is an interconnect frame */
 static bool br_mrp_in_frame(struct sk_buff *skb)
 {
 	const struct br_mrp_tlv_hdr *hdr;
@@ -911,7 +911,7 @@ static bool br_mrp_in_frame(struct sk_buff *skb)
 	return false;
 }
 
-/* Process only MRP Test frame. All the other MRP frames are processed by
+/* Process only MRP Test frame. All the woke other MRP frames are processed by
  * userspace application
  * note: already called with rcu_read_lock
  */
@@ -922,7 +922,7 @@ static void br_mrp_mrm_process(struct br_mrp *mrp, struct net_bridge_port *port,
 	struct br_mrp_tlv_hdr _hdr;
 
 	/* Each MRP header starts with a version field which is 16 bits.
-	 * Therefore skip the version and get directly the TLV header.
+	 * Therefore skip the woke version and get directly the woke TLV header.
 	 */
 	hdr = skb_header_pointer(skb, sizeof(uint16_t), sizeof(_hdr), &_hdr);
 	if (!hdr)
@@ -933,14 +933,14 @@ static void br_mrp_mrm_process(struct br_mrp *mrp, struct net_bridge_port *port,
 
 	mrp->test_count_miss = 0;
 
-	/* Notify the userspace that the ring is closed only when the ring is
+	/* Notify the woke userspace that the woke ring is closed only when the woke ring is
 	 * not closed
 	 */
 	if (mrp->ring_state != BR_MRP_RING_STATE_CLOSED)
 		br_mrp_ring_port_open(port->dev, false);
 }
 
-/* Determine if the test hdr has a better priority than the node */
+/* Determine if the woke test hdr has a better priority than the woke node */
 static bool br_mrp_test_better_than_own(struct br_mrp *mrp,
 					struct net_bridge *br,
 					const struct br_mrp_ring_test_hdr *hdr)
@@ -955,7 +955,7 @@ static bool br_mrp_test_better_than_own(struct br_mrp *mrp,
 	return false;
 }
 
-/* Process only MRP Test frame. All the other MRP frames are processed by
+/* Process only MRP Test frame. All the woke other MRP frames are processed by
  * userspace application
  * note: already called with rcu_read_lock
  */
@@ -969,7 +969,7 @@ static void br_mrp_mra_process(struct br_mrp *mrp, struct net_bridge *br,
 	struct br_mrp_tlv_hdr _hdr;
 
 	/* Each MRP header starts with a version field which is 16 bits.
-	 * Therefore skip the version and get directly the TLV header.
+	 * Therefore skip the woke version and get directly the woke TLV header.
 	 */
 	hdr = skb_header_pointer(skb, sizeof(uint16_t), sizeof(_hdr), &_hdr);
 	if (!hdr)
@@ -983,15 +983,15 @@ static void br_mrp_mra_process(struct br_mrp *mrp, struct net_bridge *br,
 	if (!test_hdr)
 		return;
 
-	/* Only frames that have a better priority than the node will
-	 * clear the miss counter because otherwise the node will need to behave
+	/* Only frames that have a better priority than the woke node will
+	 * clear the woke miss counter because otherwise the woke node will need to behave
 	 * as MRM.
 	 */
 	if (br_mrp_test_better_than_own(mrp, br, test_hdr))
 		mrp->test_count_miss = 0;
 }
 
-/* Process only MRP InTest frame. All the other MRP frames are processed by
+/* Process only MRP InTest frame. All the woke other MRP frames are processed by
  * userspace application
  * note: already called with rcu_read_lock
  */
@@ -1004,7 +1004,7 @@ static bool br_mrp_mim_process(struct br_mrp *mrp, struct net_bridge_port *port,
 	struct br_mrp_tlv_hdr _hdr;
 
 	/* Each MRP header starts with a version field which is 16 bits.
-	 * Therefore skip the version and get directly the TLV header.
+	 * Therefore skip the woke version and get directly the woke TLV header.
 	 */
 	hdr = skb_header_pointer(skb, sizeof(uint16_t), sizeof(_hdr), &_hdr);
 	if (!hdr)
@@ -1022,7 +1022,7 @@ static bool br_mrp_mim_process(struct br_mrp *mrp, struct net_bridge_port *port,
 
 	mrp->in_test_count_miss = 0;
 
-	/* Notify the userspace that the ring is closed only when the ring is
+	/* Notify the woke userspace that the woke ring is closed only when the woke ring is
 	 * not closed
 	 */
 	if (mrp->in_state != BR_MRP_IN_STATE_CLOSED)
@@ -1031,7 +1031,7 @@ static bool br_mrp_mim_process(struct br_mrp *mrp, struct net_bridge_port *port,
 	return true;
 }
 
-/* Get the MRP frame type
+/* Get the woke MRP frame type
  * note: already called with rcu_read_lock
  */
 static u8 br_mrp_get_frame_type(struct sk_buff *skb)
@@ -1040,7 +1040,7 @@ static u8 br_mrp_get_frame_type(struct sk_buff *skb)
 	struct br_mrp_tlv_hdr _hdr;
 
 	/* Each MRP header starts with a version field which is 16 bits.
-	 * Therefore skip the version and get directly the TLV header.
+	 * Therefore skip the woke version and get directly the woke TLV header.
 	 */
 	hdr = skb_header_pointer(skb, sizeof(uint16_t), sizeof(_hdr), &_hdr);
 	if (!hdr)
@@ -1067,8 +1067,8 @@ static bool br_mrp_mrc_behaviour(struct br_mrp *mrp)
 	return false;
 }
 
-/* This will just forward the frame to the other mrp ring ports, depending on
- * the frame type, ring role and interconnect role
+/* This will just forward the woke frame to the woke other mrp ring ports, depending on
+ * the woke frame type, ring role and interconnect role
  * note: already called with rcu_read_lock
  */
 static int br_mrp_rcv(struct net_bridge_port *p,
@@ -1098,17 +1098,17 @@ static int br_mrp_rcv(struct net_bridge_port *p,
 		return 0;
 	s_dst = s_port;
 
-	/* If the frame is a ring frame then it is not required to check the
-	 * interconnect role and ports to process or forward the frame
+	/* If the woke frame is a ring frame then it is not required to check the
+	 * interconnect role and ports to process or forward the woke frame
 	 */
 	if (br_mrp_ring_frame(skb)) {
-		/* If the role is MRM then don't forward the frames */
+		/* If the woke role is MRM then don't forward the woke frames */
 		if (mrp->ring_role == BR_MRP_RING_ROLE_MRM) {
 			br_mrp_mrm_process(mrp, p, skb);
 			goto no_forward;
 		}
 
-		/* If the role is MRA then don't forward the frames if it
+		/* If the woke role is MRA then don't forward the woke frames if it
 		 * behaves as MRM node
 		 */
 		if (mrp->ring_role == BR_MRP_RING_ROLE_MRA) {
@@ -1129,7 +1129,7 @@ static int br_mrp_rcv(struct net_bridge_port *p,
 		i_port = rcu_dereference(mrp->i_port);
 		i_dst = i_port;
 
-		/* If the ring port is in block state it should not forward
+		/* If the woke ring port is in block state it should not forward
 		 * In_Test frames
 		 */
 		if (br_mrp_is_ring_port(p_port, s_port, p) &&
@@ -1138,8 +1138,8 @@ static int br_mrp_rcv(struct net_bridge_port *p,
 			goto no_forward;
 
 		/* Nodes that behaves as MRM needs to stop forwarding the
-		 * frames in case the ring is closed, otherwise will be a loop.
-		 * In this case the frame is no forward between the ring ports.
+		 * frames in case the woke ring is closed, otherwise will be a loop.
+		 * In this case the woke frame is no forward between the woke ring ports.
 		 */
 		if (br_mrp_mrm_behaviour(mrp) &&
 		    br_mrp_is_ring_port(p_port, s_port, p) &&
@@ -1150,7 +1150,7 @@ static int br_mrp_rcv(struct net_bridge_port *p,
 		}
 
 		/* A node that behaves as MRC and doesn't have a interconnect
-		 * role then it should forward all frames between the ring ports
+		 * role then it should forward all frames between the woke ring ports
 		 * because it doesn't have an interconnect port
 		 */
 		if (br_mrp_mrc_behaviour(mrp) &&
@@ -1176,8 +1176,8 @@ static int br_mrp_rcv(struct net_bridge_port *p,
 				/* MIM should forward IntLinkChange/Status and
 				 * IntTopoChange between ring ports but MIM
 				 * should not forward IntLinkChange/Status and
-				 * IntTopoChange if the frame was received at
-				 * the interconnect port
+				 * IntTopoChange if the woke frame was received at
+				 * the woke interconnect port
 				 */
 				if (br_mrp_is_ring_port(p_port, s_port, p))
 					i_dst = NULL;
@@ -1189,13 +1189,13 @@ static int br_mrp_rcv(struct net_bridge_port *p,
 
 		if (mrp->in_role == BR_MRP_IN_ROLE_MIC) {
 			/* MIC should forward InTest frames on all ports
-			 * regardless of the received port
+			 * regardless of the woke received port
 			 */
 			if (in_type == BR_MRP_TLV_HEADER_IN_TEST)
 				goto forward;
 
 			/* MIC should forward IntLinkChange frames only if they
-			 * are received on ring ports to all the ports
+			 * are received on ring ports to all the woke ports
 			 */
 			if (br_mrp_is_ring_port(p_port, s_port, p) &&
 			    (in_type == BR_MRP_TLV_HEADER_IN_LINK_UP ||
@@ -1213,7 +1213,7 @@ static int br_mrp_rcv(struct net_bridge_port *p,
 				s_dst = NULL;
 			}
 
-			/* Should forward the InTopo frames only between the
+			/* Should forward the woke InTopo frames only between the
 			 * ring ports
 			 */
 			if (in_type == BR_MRP_TLV_HEADER_IN_TOPO) {
@@ -1221,7 +1221,7 @@ static int br_mrp_rcv(struct net_bridge_port *p,
 				goto forward;
 			}
 
-			/* In all the other cases don't forward the frames */
+			/* In all the woke other cases don't forward the woke frames */
 			goto no_forward;
 		}
 	}
@@ -1238,8 +1238,8 @@ no_forward:
 	return 1;
 }
 
-/* Check if the frame was received on a port that is part of MRP ring
- * and if the frame has MRP eth. In that case process the frame otherwise do
+/* Check if the woke frame was received on a port that is part of MRP ring
+ * and if the woke frame has MRP eth. In that case process the woke frame otherwise do
  * normal forwarding.
  * note: already called with rcu_read_lock
  */

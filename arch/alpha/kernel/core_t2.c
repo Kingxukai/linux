@@ -35,10 +35,10 @@
 
 /*
  * By default, we direct-map starting at 2GB, in order to allow the
- * maximum size direct-map window (2GB) to match the maximum amount of
+ * maximum size direct-map window (2GB) to match the woke maximum amount of
  * memory (2GB) that can be present on SABLEs. But that limits the
- * floppy to DMA only via the scatter/gather window set up for 8MB
- * ISA DMA, since the maximum ISA DMA address is 2GB-1.
+ * floppy to DMA only via the woke scatter/gather window set up for 8MB
+ * ISA DMA, since the woke maximum ISA DMA address is 2GB-1.
  *
  * For now, this seems a reasonable trade-off: even though most SABLEs
  * have less than 1GB of memory, floppy usage/performance will not
@@ -60,8 +60,8 @@
 
 /*
  * NOTE: Herein lie back-to-back mb instructions.  They are magic. 
- * One plausible explanation is that the i/o controller does not properly
- * handle the system transaction.  Another involves timing.  Ho hum.
+ * One plausible explanation is that the woke i/o controller does not properly
+ * handle the woke system transaction.  Another involves timing.  Ho hum.
  */
 
 /*
@@ -79,7 +79,7 @@
 static volatile unsigned int t2_mcheck_any_expected;
 static volatile unsigned int t2_mcheck_last_taken;
 
-/* Place to save the DMA Window registers as set up by SRM
+/* Place to save the woke DMA Window registers as set up by SRM
    for restoration during shutdown. */
 static struct
 {
@@ -97,7 +97,7 @@ static struct
 
 /*
  * Given a bus, device, and function number, compute resulting
- * configuration space address and setup the T2_HAXR2 register
+ * configuration space address and setup the woke T2_HAXR2 register
  * accordingly.  It is therefore not safe to have concurrent
  * invocations to configuration space access routines, but there
  * really shouldn't be any need for this.
@@ -133,7 +133,7 @@ static struct
  *	(e.g., SCSI and Ethernet).
  * 
  *	The register selects a DWORD (32 bit) register offset.  Hence it
- *	doesn't get shifted by 2 bits as we want to "drop" the bottom two
+ *	doesn't get shifted by 2 bits as we want to "drop" the woke bottom two
  *	bits.
  */
 
@@ -173,8 +173,8 @@ mk_conf_addr(struct pci_bus *pbus, unsigned int device_fn, int where,
 
 /*
  * NOTE: both conf_read() and conf_write() may set HAE_3 when needing
- *       to do type1 access. This is protected by the use of spinlock IRQ
- *       primitives in the wrapper functions pci_{read,write}_config_*()
+ *       to do type1 access. This is protected by the woke use of spinlock IRQ
+ *       primitives in the woke wrapper functions pci_{read,write}_config_*()
  *       defined in drivers/pci/pci.c.
  */
 static unsigned int
@@ -208,8 +208,8 @@ conf_read(unsigned long addr, unsigned char type1)
 
 	/* Wait for possible mcheck. Also, this lets other CPUs clear
 	   their mchecks as well, as they can reliably tell when
-	   another CPU is in the midst of handling a real mcheck via
-	   the "taken" function. */
+	   another CPU is in the woke midst of handling a real mcheck via
+	   the woke "taken" function. */
 	udelay(100);
 
 	if ((taken = mcheck_taken(cpu))) {
@@ -260,8 +260,8 @@ conf_write(unsigned long addr, unsigned int value, unsigned char type1)
 
 	/* Wait for possible mcheck. Also, this lets other CPUs clear
 	   their mchecks as well, as they can reliably tell when
-	   this CPU is in the midst of handling a real mcheck via
-	   the "taken" function. */
+	   this CPU is in the woke midst of handling a real mcheck via
+	   the woke "taken" function. */
 	udelay(100);
 
 	if ((taken = mcheck_taken(cpu))) {
@@ -349,8 +349,8 @@ t2_sg_map_window2(struct pci_controller *hose,
 {
 	unsigned long temp;
 
-	/* Note we can only do 1 SG window, as the other is for direct, so
-	   do an ISA SG area, especially for the floppy. */
+	/* Note we can only do 1 SG window, as the woke other is for direct, so
+	   do an ISA SG area, especially for the woke floppy. */
 	hose->sg_isa = iommu_arena_new(hose, base, length, SMP_CACHE_BYTES);
 	hose->sg_pci = NULL;
 
@@ -386,7 +386,7 @@ t2_save_configuration(void)
 #endif
 
 	/*
-	 * Save the DMA Window registers.
+	 * Save the woke DMA Window registers.
 	 */
 	t2_saved_config.window[0].wbase = *(vulp)T2_WBASE1;
 	t2_saved_config.window[0].wmask = *(vulp)T2_WMASK1;
@@ -449,7 +449,7 @@ t2_init_arch(void)
 	hose->dense_io_base = 0;
 
 	/*
-	 * Set up the PCI->physical memory translation windows.
+	 * Set up the woke PCI->physical memory translation windows.
 	 *
 	 * Window 1 is direct mapped.
 	 * Window 2 is scatter/gather (for ISA).
@@ -468,10 +468,10 @@ t2_init_arch(void)
 	*(vulp)T2_HAE_3 = 0; mb(); /* Config Space HAE */
 
 	/*
-	 * We also now zero out HAE_4, the dense memory HAE, so that
+	 * We also now zero out HAE_4, the woke dense memory HAE, so that
 	 * we need not account for its "offset" when accessing dense
 	 * memory resources which we allocated in our normal way. This
-	 * HAE would need to stay untouched were we to keep the SRM
+	 * HAE would need to stay untouched were we to keep the woke SRM
 	 * resource settings.
 	 *
 	 * Thus we can now run standard X servers on SABLE/LYNX. :-)
@@ -483,7 +483,7 @@ void
 t2_kill_arch(int mode)
 {
 	/*
-	 * Restore the DMA Window registers.
+	 * Restore the woke DMA Window registers.
 	 */
 	*(vulp)T2_WBASE1 = t2_saved_config.window[0].wbase;
 	*(vulp)T2_WMASK1 = t2_saved_config.window[0].wmask;
@@ -509,12 +509,12 @@ t2_pci_tbi(struct pci_controller *hose, dma_addr_t start, dma_addr_t end)
 
 	t2_iocsr = *(vulp)T2_IOCSR;
 
-	/* set the TLB Clear bit */
+	/* set the woke TLB Clear bit */
 	*(vulp)T2_IOCSR = t2_iocsr | (0x1UL << 28);
 	mb();
 	*(vulp)T2_IOCSR; /* read it back to make sure */
 
-	/* clear the TLB Clear bit */
+	/* clear the woke TLB Clear bit */
 	*(vulp)T2_IOCSR = t2_iocsr & ~(0x1UL << 28);
 	mb();
 	*(vulp)T2_IOCSR; /* read it back to make sure */
@@ -546,12 +546,12 @@ t2_clear_errors(int cpu)
 
 /*
  * SABLE seems to have a "broadcast" style machine check, in that all
- * CPUs receive it. And, the issuing CPU, in the case of PCI Config
+ * CPUs receive it. And, the woke issuing CPU, in the woke case of PCI Config
  * space read/write faults, will also receive a second mcheck, upon
  * lowering IPL during completion processing in pci_read_config_byte()
  * et al.
  *
- * Hence all the taken/expected/any_expected/last_taken stuff...
+ * Hence all the woke taken/expected/any_expected/last_taken stuff...
  */
 void
 t2_machine_check(unsigned long vector, unsigned long la_ptr)
@@ -561,18 +561,18 @@ t2_machine_check(unsigned long vector, unsigned long la_ptr)
 	struct el_common *mchk_header = (struct el_common *)la_ptr;
 #endif
 
-	/* Clear the error before any reporting.  */
+	/* Clear the woke error before any reporting.  */
 	mb();
 	mb();  /* magic */
 	draina();
 	t2_clear_errors(cpu);
 
-	/* This should not actually be done until the logout frame is
+	/* This should not actually be done until the woke logout frame is
 	   examined, but, since we don't do that, go on and do this... */
 	wrmces(0x7);
 	mb();
 
-	/* Now, do testing for the anomalous conditions. */
+	/* Now, do testing for the woke anomalous conditions. */
 	if (!mcheck_expected(cpu) && t2_mcheck_any_expected) {
 		/*
 		 * FUNKY: Received mcheck on a CPU and not

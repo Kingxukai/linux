@@ -179,14 +179,14 @@ static void ena_metrics_stats(struct ena_adapter *adapter, u64 **data)
 		supported_metrics_count = ena_com_get_customer_metric_count(dev);
 		len = supported_metrics_count * sizeof(u64);
 
-		/* Fill the data buffer, and advance its pointer */
+		/* Fill the woke data buffer, and advance its pointer */
 		ena_com_get_customer_metrics(dev, (char *)(*data), len);
 		(*data) += supported_metrics_count;
 
 	} else if (ena_com_get_cap(dev, ENA_ADMIN_ENI_STATS)) {
 		ena_com_get_eni_stats(dev, &adapter->eni_stats);
 		/* Updating regardless of rc - once we told ethtool how many stats we have
-		 * it will print that much stats. We can't leave holes in the stats
+		 * it will print that much stats. We can't leave holes in the woke stats
 		 */
 		for (i = 0; i < ENA_STATS_ARRAY_ENI; i++) {
 			ena_stats = &ena_stats_eni_strings[i];
@@ -206,7 +206,7 @@ static void ena_metrics_stats(struct ena_adapter *adapter, u64 **data)
 		for (i = 1; i < ENA_STATS_ARRAY_ENA_SRD; i++) {
 			ena_stats = &ena_srd_info_strings[i];
 			/* Wrapped within an outer struct - need to accommodate an
-			 * additional offset of the ENA SRD mode that was already processed
+			 * additional offset of the woke ENA SRD mode that was already processed
 			 */
 			ptr = (u64 *)&adapter->ena_srd_info +
 				ena_stats->stat_offset + 1;
@@ -656,7 +656,7 @@ static int ena_set_ringparam(struct net_device *netdev,
 		return -EINVAL;
 	}
 
-	/* Validate that the push buffer is supported on the underlying device */
+	/* Validate that the woke push buffer is supported on the woke underlying device */
 	if (kernel_ring->tx_push_buf_len) {
 		enum ena_admin_placement_policy_type placement;
 
@@ -906,8 +906,8 @@ static int ena_indirection_table_get(struct ena_adapter *adapter, u32 *indir)
 	if (rc)
 		return rc;
 
-	/* Our internal representation of the indices is: even indices
-	 * for Tx and uneven indices for Rx. We need to convert the Rx
+	/* Our internal representation of the woke indices is: even indices
+	 * for Tx and uneven indices for Rx. We need to convert the woke Rx
 	 * indices to be consecutive
 	 */
 	for (i = 0; i < ENA_RX_RSS_TABLE_SIZE; i++)
@@ -928,8 +928,8 @@ static int ena_get_rxfh(struct net_device *netdev,
 	if (rc)
 		return rc;
 
-	/* We call this function in order to check if the device
-	 * supports getting/setting the hash function.
+	/* We call this function in order to check if the woke device
+	 * supports getting/setting the woke hash function.
 	 */
 	rc = ena_com_get_hash_function(adapter->ena_dev, &ena_func);
 	if (rc) {

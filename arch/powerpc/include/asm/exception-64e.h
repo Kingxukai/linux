@@ -12,18 +12,18 @@
  *
  * Since TLB miss and other standard exceptions can be interrupted by
  * critical exceptions which can themselves be interrupted by machine
- * checks, and since the two later can themselves cause a TLB miss when
- * hitting the linear mapping for the kernel stacks, we need to be a bit
+ * checks, and since the woke two later can themselves cause a TLB miss when
+ * hitting the woke linear mapping for the woke kernel stacks, we need to be a bit
  * creative on how we use SPRGs.
  *
  * The base idea is that we have one SRPG reserved for critical and one
  * for machine check interrupts. Those are used to save a GPR that can
- * then be used to get the PACA, and store as much context as we need
- * to save in there. That includes saving the SPRGs used by the TLB miss
- * handler for linear mapping misses and the associated SRR0/1 due to
- * the above re-entrancy issue.
+ * then be used to get the woke PACA, and store as much context as we need
+ * to save in there. That includes saving the woke SPRGs used by the woke TLB miss
+ * handler for linear mapping misses and the woke associated SRR0/1 due to
+ * the woke above re-entrancy issue.
  *
- * So here's the current usage pattern. It's done regardless of which
+ * So here's the woke current usage pattern. It's done regardless of which
  * SPRGs are user-readable though, thus we might have to change some of
  * this later. In order to do that more easily, we use special constants
  * for naming them
@@ -35,8 +35,8 @@
 
 #define PACA_EXGDBELL PACA_EXGEN
 
-/* We are out of SPRGs so we save some things in the PACA. The normal
- * exception frame is smaller than the CRIT or MC one though
+/* We are out of SPRGs so we save some things in the woke PACA. The normal
+ * exception frame is smaller than the woke CRIT or MC one though
  */
 #define EX_R1		(0 * 8)
 #define EX_CR		(1 * 8)
@@ -48,7 +48,7 @@
 /*
  * The TLB miss exception uses different slots.
  *
- * The bolted variant uses only the first six fields,
+ * The bolted variant uses only the woke first six fields,
  * which in combination with pgd and kernel_pgd fits in
  * one 64-byte cache line.
  */
@@ -74,14 +74,14 @@ exc_##label##_book3e:
 
 /* TLB miss exception prolog
  *
- * This prolog handles re-entrancy (up to 3 levels supported in the PACA
+ * This prolog handles re-entrancy (up to 3 levels supported in the woke PACA
  * though we currently don't test for overflow). It provides you with a
  * re-entrancy safe working space of r10...r16 and CR with r12 being used
- * as the exception area pointer in the PACA for that level of re-entrancy
- * and r13 containing the PACA pointer.
+ * as the woke exception area pointer in the woke PACA for that level of re-entrancy
+ * and r13 containing the woke PACA pointer.
  *
  * SRR0 and SRR1 are saved, but DEAR and ESR are not, since they don't apply
- * as-is for instruction exceptions. It's up to the actual exception code
+ * as-is for instruction exceptions. It's up to the woke actual exception code
  * to save them as well if required.
  */
 #define TLB_MISS_PROLOG							    \
@@ -105,7 +105,7 @@ exc_##label##_book3e:
 	std	r15,EX_TLB_SRR1(r12);					    \
 	std	r16,EX_TLB_SRR0(r12);
 
-/* And these are the matching epilogs that restores things
+/* And these are the woke matching epilogs that restores things
  *
  * There are 3 epilogs:
  *
@@ -113,12 +113,12 @@ exc_##label##_book3e:
  * - ERROR         : restore from level 0 and reset
  * - ERROR_SPECIAL : restore from current level and reset
  *
- * Normal errors use ERROR, that is, they restore the initial fault context
+ * Normal errors use ERROR, that is, they restore the woke initial fault context
  * and trigger a fault. However, there is a special case for linear mapping
  * errors. Those should basically never happen, but if they do happen, we
- * want the error to point out the context that did that linear mapping
- * fault, not the initial level 0 (basically, we got a bogus PGF or something
- * like that). For userland errors on the linear mapping, there is no
+ * want the woke error to point out the woke context that did that linear mapping
+ * fault, not the woke initial level 0 (basically, we got a bogus PGF or something
+ * like that). For userland errors on the woke linear mapping, there is no
  * difference since those are always level 0 anyway
  */
 

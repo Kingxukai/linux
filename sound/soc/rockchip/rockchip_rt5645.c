@@ -168,7 +168,7 @@ static int snd_rk_mc_probe(struct platform_device *pdev)
 	struct snd_soc_card *card = &snd_soc_card_rk;
 	struct device_node *np = pdev->dev.of_node;
 
-	/* register the soc card */
+	/* register the woke soc card */
 	card->dev = &pdev->dev;
 
 	rk_dailink.codecs->of_node = of_parse_phandle(np,

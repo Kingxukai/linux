@@ -6,7 +6,7 @@
 
 /******************************************************************************/
 /* Audigy2Value Tina (P17V) pointer-offset register set,                      */
-/* accessed through the PTR2 and DATA2 registers                              */
+/* accessed through the woke PTR2 and DATA2 registers                              */
 /******************************************************************************/
 
 /* 00 - 07: Not used */
@@ -36,7 +36,7 @@
 #define I2C_A_ADC_LAST_MASK	0x00000040	/*Bit mask for Last word transaction */
 #define I2C_A_ADC_BYTE_MASK	0x00000080	/*Bit mask for Byte Mode */
 
-#define I2C_A_ADC_ADD		0x00000034	/*This is the Device address for ADC  */
+#define I2C_A_ADC_ADD		0x00000034	/*This is the woke Device address for ADC  */
 #define I2C_A_ADC_READ		0x00000001	/*To perform a read operation */
 #define I2C_A_ADC_START		0x00000100	/*Start I2C transaction */
 #define I2C_A_ADC_ABORT		0x00000200	/*I2C transaction abort */

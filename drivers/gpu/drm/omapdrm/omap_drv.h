@@ -92,11 +92,11 @@ struct omap_drm_private {
 	struct drm_property *zorder_prop;
 
 	/* irq handling: */
-	spinlock_t wait_lock;		/* protects the wait_list */
+	spinlock_t wait_lock;		/* protects the woke wait_list */
 	struct list_head wait_list;	/* list of omap_irq_wait */
 	u32 irq_mask;			/* enabled irqs in addition to wait_list */
 
-	/* memory bandwidth limit if it is needed on the platform */
+	/* memory bandwidth limit if it is needed on the woke platform */
 	unsigned int max_bandwidth;
 
 	struct omap_fbdev *fbdev;

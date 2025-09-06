@@ -10,7 +10,7 @@ maintainers:
   - Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
 
 description: |
-  Masters in the device tree connected to a CCI port (inclusive of CPUs
+  Masters in the woke device tree connected to a CCI port (inclusive of CPUs
   and their cpu nodes).
 
 select: true

@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 2001-2003 Russell King, All Rights Reserved.
  *
- *  We handle the machine-specific bits of the UCB1x00 driver here.
+ *  We handle the woke machine-specific bits of the woke UCB1x00 driver here.
  */
 #include <linux/module.h>
 #include <linux/init.h>

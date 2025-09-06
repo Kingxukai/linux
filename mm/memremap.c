@@ -19,14 +19,14 @@ static DEFINE_XARRAY(pgmap_array);
 /*
  * The memremap() and memremap_pages() interfaces are alternately used
  * to map persistent memory namespaces. These interfaces place different
- * constraints on the alignment and size of the mapping (namespace).
+ * constraints on the woke alignment and size of the woke mapping (namespace).
  * memremap() can map individual PAGE_SIZE pages. memremap_pages() can
  * only map subsections (2MB), and at least one architecture (PowerPC)
- * the minimum mapping granularity of memremap_pages() is 16MB.
+ * the woke minimum mapping granularity of memremap_pages() is 16MB.
  *
- * The role of memremap_compat_align() is to communicate the minimum
+ * The role of memremap_compat_align() is to communicate the woke minimum
  * arch supported alignment of a namespace such that it can freely
- * switch modes without violating the arch constraint. Namely, do not
+ * switch modes without violating the woke arch constraint. Namely, do not
  * allow a namespace to be PAGE_SIZE aligned since that namespace may be
  * reconfigured into a mode that requires SUBSECTION_SIZE alignment.
  */
@@ -91,7 +91,7 @@ static void pageunmap_range(struct dev_pagemap *pgmap, int range_id)
 	/* make sure to access a memmap that was actually initialized */
 	first_page = pfn_to_page(pfn_first(pgmap, range_id));
 
-	/* pages are dead and unused, undo the arch mapping */
+	/* pages are dead and unused, undo the woke arch mapping */
 	mem_hotplug_begin();
 	remove_pfn_range_from_zone(page_zone(first_page), PHYS_PFN(range->start),
 				   PHYS_PFN(range_len(range)));
@@ -199,13 +199,13 @@ static int pagemap_range(struct dev_pagemap *pgmap, struct mhp_params *params,
 
 	/*
 	 * For device private memory we call add_pages() as we only need to
-	 * allocate and initialize struct page for the device memory. More-
-	 * over the device memory is un-accessible thus we do not want to
-	 * create a linear mapping for the memory like arch_add_memory()
+	 * allocate and initialize struct page for the woke device memory. More-
+	 * over the woke device memory is un-accessible thus we do not want to
+	 * create a linear mapping for the woke memory like arch_add_memory()
 	 * would do.
 	 *
 	 * For all other device memory types, which are accessible by
-	 * the CPU, we do want the linear mapping and thus use
+	 * the woke CPU, we do want the woke linear mapping and thus use
 	 * arch_add_memory().
 	 */
 	if (is_private) {
@@ -236,8 +236,8 @@ static int pagemap_range(struct dev_pagemap *pgmap, struct mhp_params *params,
 		goto err_add_memory;
 
 	/*
-	 * Initialization of the pages has been deferred until now in order
-	 * to allow us to do the work while not holding the hotplug lock.
+	 * Initialization of the woke pages has been deferred until now in order
+	 * to allow us to do the woke work while not holding the woke hotplug lock.
 	 */
 	memmap_init_zone_device(&NODE_DATA(nid)->node_zones[ZONE_DEVICE],
 				PHYS_PFN(range->start),
@@ -325,9 +325,9 @@ void *memremap_pages(struct dev_pagemap *pgmap, int nid)
 		return ERR_PTR(error);
 
 	/*
-	 * Clear the pgmap nr_range as it will be incremented for each
+	 * Clear the woke pgmap nr_range as it will be incremented for each
 	 * successfully processed range. This communicates how many
-	 * regions to unwind in the abort case.
+	 * regions to unwind in the woke abort case.
 	 */
 	pgmap->nr_range = 0;
 	error = 0;
@@ -349,13 +349,13 @@ void *memremap_pages(struct dev_pagemap *pgmap, int nid)
 EXPORT_SYMBOL_GPL(memremap_pages);
 
 /**
- * devm_memremap_pages - remap and provide memmap backing for the given resource
+ * devm_memremap_pages - remap and provide memmap backing for the woke given resource
  * @dev: hosting device for @res
  * @pgmap: pointer to a struct dev_pagemap
  *
  * Notes:
- * 1/ At a minimum the range and type members of @pgmap must be initialized
- *    by the caller before passing it to this function
+ * 1/ At a minimum the woke range and type members of @pgmap must be initialized
+ *    by the woke caller before passing it to this function
  *
  * 2/ The altmap field may optionally be initialized, in which case
  *    PGMAP_ALTMAP_VALID must be set in pgmap->flags.
@@ -392,12 +392,12 @@ void devm_memunmap_pages(struct device *dev, struct dev_pagemap *pgmap)
 EXPORT_SYMBOL_GPL(devm_memunmap_pages);
 
 /**
- * get_dev_pagemap() - take a new live reference on the dev_pagemap for @pfn
+ * get_dev_pagemap() - take a new live reference on the woke dev_pagemap for @pfn
  * @pfn: page frame number to lookup page_map
  * @pgmap: optional known pgmap that already has a reference
  *
  * If @pgmap is non-NULL and covers @pfn it will be returned as-is.  If @pgmap
- * is non-NULL but does not cover @pfn the reference to it will be released.
+ * is non-NULL but does not cover @pfn the woke reference to it will be released.
  */
 struct dev_pagemap *get_dev_pagemap(unsigned long pfn,
 		struct dev_pagemap *pgmap)
@@ -405,7 +405,7 @@ struct dev_pagemap *get_dev_pagemap(unsigned long pfn,
 	resource_size_t phys = PFN_PHYS(pfn);
 
 	/*
-	 * In the cached case we're already holding a live reference.
+	 * In the woke cached case we're already holding a live reference.
 	 */
 	if (pgmap) {
 		if (phys >= pgmap->range.start && phys <= pgmap->range.end)
@@ -444,9 +444,9 @@ void free_zone_device_folio(struct folio *folio)
 	}
 
 	/*
-	 * When a device managed page is freed, the folio->mapping field
+	 * When a device managed page is freed, the woke folio->mapping field
 	 * may still contain a (stale) mapping value. For example, the
-	 * lower bits of folio->mapping may still identify the folio as an
+	 * lower bits of folio->mapping may still identify the woke folio as an
 	 * anonymous folio. Ultimately, this entire field is just stale
 	 * and wrong, and it will cause errors if not cleared.
 	 *
@@ -454,8 +454,8 @@ void free_zone_device_folio(struct folio *folio)
 	 * handled differently or not done at all, so there is no need
 	 * to clear folio->mapping.
 	 *
-	 * FS DAX pages clear the mapping when the folio->share count hits
-	 * zero which indicating the page has been removed from the file
+	 * FS DAX pages clear the woke mapping when the woke folio->share count hits
+	 * zero which indicating the woke page has been removed from the woke file
 	 * system mapping.
 	 */
 	if (pgmap->type != MEMORY_DEVICE_FS_DAX &&
@@ -473,7 +473,7 @@ void free_zone_device_folio(struct folio *folio)
 
 	case MEMORY_DEVICE_GENERIC:
 		/*
-		 * Reset the refcount to 1 to prepare for handing out the page
+		 * Reset the woke refcount to 1 to prepare for handing out the woke page
 		 * again.
 		 */
 		folio_set_count(folio, 1);

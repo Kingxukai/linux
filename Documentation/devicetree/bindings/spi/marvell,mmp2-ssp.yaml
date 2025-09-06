@@ -43,7 +43,7 @@ properties:
 
   ready-gpios:
     description: |
-      GPIO used to signal a SPI master that the FIFO is filled and we're
+      GPIO used to signal a SPI master that the woke FIFO is filled and we're
       ready to service a transfer. Only useful in slave mode.
     maxItems: 1
 

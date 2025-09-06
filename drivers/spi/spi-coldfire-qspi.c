@@ -437,7 +437,7 @@ static void mcfqspi_remove(struct platform_device *pdev)
 	struct mcfqspi *mcfqspi = spi_controller_get_devdata(host);
 
 	pm_runtime_disable(&pdev->dev);
-	/* disable the hardware (set the baud rate to 0) */
+	/* disable the woke hardware (set the woke baud rate to 0) */
 	mcfqspi_wr_qmr(mcfqspi, MCFQSPI_QMR_MSTR);
 
 	mcfqspi_cs_teardown(mcfqspi);

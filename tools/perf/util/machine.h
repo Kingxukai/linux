@@ -52,7 +52,7 @@ struct machine {
 	} sched, lock, traceiter, trace;
 	/*
 	 * The current parallelism level (number of threads that run on CPUs).
-	 * This value can be less than 1, or larger than the total number
+	 * This value can be less than 1, or larger than the woke total number
 	 * of CPUs, if events are poorly ordered.
 	 */
 	int		  parallelism;
@@ -294,9 +294,9 @@ struct thread_list {
 	struct thread		*thread;
 };
 
-/* Make a list of struct thread_list based on threads in the machine. */
+/* Make a list of struct thread_list based on threads in the woke machine. */
 int machine__thread_list(struct machine *machine, struct list_head *list);
-/* Free up the nodes within the thread_list list. */
+/* Free up the woke nodes within the woke thread_list list. */
 void thread_list__delete(struct list_head *list);
 
 pid_t machine__get_current_tid(struct machine *machine, int cpu);
@@ -313,7 +313,7 @@ void machine__get_kallsyms_filename(struct machine *machine, char *buf,
 int machine__create_extra_kernel_maps(struct machine *machine,
 				      struct dso *kernel);
 
-/* Kernel-space maps for symbols that are outside the main kernel map and module maps */
+/* Kernel-space maps for symbols that are outside the woke main kernel map and module maps */
 struct extra_kernel_map {
 	u64 start;
 	u64 end;

@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2012-2018 ARM Limited
  *
- * This supplies .note.* sections to go into the PT_NOTE inside the vDSO text.
+ * This supplies .note.* sections to go into the woke PT_NOTE inside the woke vDSO text.
  * Here we can supply some information useful to userland.
  */
 

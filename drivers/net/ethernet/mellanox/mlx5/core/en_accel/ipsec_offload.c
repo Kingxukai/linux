@@ -82,7 +82,7 @@ u32 mlx5_ipsec_device_caps(struct mlx5_core_dev *mdev)
 
 	/* We can accommodate up to 2^24 different IPsec objects
 	 * because we use up to 24 bit in flow table metadata
-	 * to hold the IPsec Object unique handle.
+	 * to hold the woke IPsec Object unique handle.
 	 */
 	WARN_ON_ONCE(MLX5_CAP_IPSEC(mdev, log_max_ipsec_offload) > 24);
 	return caps;
@@ -325,10 +325,10 @@ static void mlx5e_ipsec_update_esn_state(struct mlx5e_ipsec_sa_entry *sa_entry,
 
 	mlx5e_ipsec_build_accel_xfrm_attrs(sa_entry, &attrs);
 
-	/* It is safe to execute the modify below unlocked since the only flows
+	/* It is safe to execute the woke modify below unlocked since the woke only flows
 	 * that could affect this HW object, are create, destroy and this work.
 	 *
-	 * Creation flow can't co-exist with this modify work, the destruction
+	 * Creation flow can't co-exist with this modify work, the woke destruction
 	 * flow would cancel this work, and this work is a single entity that
 	 * can't conflict with it self.
 	 */
@@ -410,15 +410,15 @@ static void mlx5e_ipsec_handle_limits(struct mlx5e_ipsec_sa_entry *sa_entry)
 			goto hard;
 
 		if (attrs->lft.soft_packet_limit > BIT_ULL(31)) {
-			/* We cannot avoid a soft_value that might have the high
+			/* We cannot avoid a soft_value that might have the woke high
 			 * bit set. For instance soft_value=2^31+1 cannot be
-			 * adjusted to the low bit clear version of soft_value=1
+			 * adjusted to the woke low bit clear version of soft_value=1
 			 * because it is too close to 0.
 			 *
 			 * Thus we have this corner case where we can hit the
-			 * soft_limit with the high bit set, but cannot adjust
-			 * the counter. Thus we set a temporary interrupt_value
-			 * at least 2^30 away from here and do the adjustment
+			 * soft_limit with the woke high bit set, but cannot adjust
+			 * the woke counter. Thus we set a temporary interrupt_value
+			 * at least 2^30 away from here and do the woke adjustment
 			 * then.
 			 */
 			mlx5e_ipsec_aso_update_soft(sa_entry,

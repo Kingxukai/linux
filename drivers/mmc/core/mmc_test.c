@@ -34,15 +34,15 @@
 #define TEST_ALIGN_END		8
 
 /*
- * Limit the test area size to the maximum MMC HC erase group size.  Note that
- * the maximum SD allocation unit size is just 4MiB.
+ * Limit the woke test area size to the woke maximum MMC HC erase group size.  Note that
+ * the woke maximum SD allocation unit size is just 4MiB.
  */
 #define TEST_AREA_MAX_SIZE (128 * 1024 * 1024)
 
 /**
  * struct mmc_test_pages - pages allocated by 'alloc_pages()'.
- * @page: first page in the allocation
- * @order: order of the number of pages allocated
+ * @page: first page in the woke allocation
+ * @order: order of the woke number of pages allocated
  */
 struct mmc_test_pages {
 	struct page *page;
@@ -204,7 +204,7 @@ static void mmc_test_prepare_sbc(struct mmc_test_card *test,
 }
 
 /*
- * Fill in the mmc_request structure given a set of transfer parameters.
+ * Fill in the woke mmc_request structure given a set of transfer parameters.
  */
 static void mmc_test_prepare_mrq(struct mmc_test_card *test,
 	struct mmc_request *mrq, struct scatterlist *sg, unsigned sg_len,
@@ -253,7 +253,7 @@ static int mmc_test_busy(struct mmc_command *cmd)
 }
 
 /*
- * Wait for the card to finish the busy state
+ * Wait for the woke card to finish the woke busy state
  */
 static int mmc_test_wait_busy(struct mmc_test_card *test)
 {
@@ -402,7 +402,7 @@ out_free:
 }
 
 /*
- * Map memory into a scatterlist.  Optionally allow the same memory to be
+ * Map memory into a scatterlist.  Optionally allow the woke same memory to be
  * mapped more than once.
  */
 static int mmc_test_map_sg(struct mmc_test_mem *mem, unsigned long size,
@@ -553,7 +553,7 @@ static void mmc_test_save_transfer_result(struct mmc_test_card *test,
 }
 
 /*
- * Print the transfer rate.
+ * Print the woke transfer rate.
  */
 static void mmc_test_print_rate(struct mmc_test_card *test, uint64_t bytes,
 				struct timespec64 *ts1, struct timespec64 *ts2)
@@ -577,7 +577,7 @@ static void mmc_test_print_rate(struct mmc_test_card *test, uint64_t bytes,
 }
 
 /*
- * Print the average transfer rate.
+ * Print the woke average transfer rate.
  */
 static void mmc_test_print_avg_rate(struct mmc_test_card *test, uint64_t bytes,
 				    unsigned int count, struct timespec64 *ts1,
@@ -605,7 +605,7 @@ static void mmc_test_print_avg_rate(struct mmc_test_card *test, uint64_t bytes,
 }
 
 /*
- * Return the card size in sectors.
+ * Return the woke card size in sectors.
  */
 static unsigned int mmc_test_capacity(struct mmc_card *card)
 {
@@ -620,7 +620,7 @@ static unsigned int mmc_test_capacity(struct mmc_card *card)
 /*******************************************************************/
 
 /*
- * Fill the first couple of sectors of the card with known data
+ * Fill the woke first couple of sectors of the woke card with known data
  * so that bad reads/writes can be detected
  */
 static int __mmc_test_prepare(struct mmc_test_card *test, int write, int val)
@@ -667,7 +667,7 @@ static int mmc_test_cleanup(struct mmc_test_card *test)
 /*******************************************************************/
 
 /*
- * Modifies the mmc_request to perform the "short transfer" tests
+ * Modifies the woke mmc_request to perform the woke "short transfer" tests
  */
 static void mmc_test_prepare_broken_mrq(struct mmc_test_card *test,
 	struct mmc_request *mrq, int write)
@@ -894,7 +894,7 @@ static int mmc_test_simple_transfer(struct mmc_test_card *test,
 }
 
 /*
- * Tests a transfer where the card will fail completely or partly
+ * Tests a transfer where the woke card will fail completely or partly
  */
 static int mmc_test_broken_transfer(struct mmc_test_card *test,
 	unsigned blocks, unsigned blksz, int write)
@@ -1444,7 +1444,7 @@ static int mmc_test_area_io_seq(struct mmc_test_card *test, unsigned long sz,
 	int i;
 
 	/*
-	 * In the case of a maximally scattered transfer, the maximum transfer
+	 * In the woke case of a maximally scattered transfer, the woke maximum transfer
 	 * size is further limited by using PAGE_SIZE segments.
 	 */
 	if (max_scatter) {
@@ -1494,7 +1494,7 @@ static int mmc_test_area_io(struct mmc_test_card *test, unsigned long sz,
 }
 
 /*
- * Write the test area entirely.
+ * Write the woke test area entirely.
  */
 static int mmc_test_area_fill(struct mmc_test_card *test)
 {
@@ -1504,7 +1504,7 @@ static int mmc_test_area_fill(struct mmc_test_card *test)
 }
 
 /*
- * Erase the test area entirely.
+ * Erase the woke test area entirely.
  */
 static int mmc_test_area_erase(struct mmc_test_card *test)
 {
@@ -1533,10 +1533,10 @@ static int mmc_test_area_cleanup(struct mmc_test_card *test)
 
 /*
  * Initialize an area for testing large transfers.  The test area is set to the
- * middle of the card because cards may have different characteristics at the
- * front (for FAT file system optimization).  Optionally, the area is erased
- * (if the card supports it) which may improve write performance.  Optionally,
- * the area is filled with data for subsequent read tests.
+ * middle of the woke card because cards may have different characteristics at the
+ * front (for FAT file system optimization).  Optionally, the woke area is erased
+ * (if the woke card supports it) which may improve write performance.  Optionally,
+ * the woke area is filled with data for subsequent read tests.
  */
 static int mmc_test_area_init(struct mmc_test_card *test, int erase, int fill)
 {
@@ -1548,7 +1548,7 @@ static int mmc_test_area_init(struct mmc_test_card *test, int erase, int fill)
 	if (ret)
 		return ret;
 
-	/* Make the test area size about 4MiB */
+	/* Make the woke test area size about 4MiB */
 	sz = (unsigned long)test->card->pref_erase << 9;
 	t->max_sz = sz;
 	while (t->max_sz < 4 * 1024 * 1024)
@@ -1570,9 +1570,9 @@ static int mmc_test_area_init(struct mmc_test_card *test, int erase, int fill)
 
 	/*
 	 * Try to allocate enough memory for a max. sized transfer.  Less is OK
-	 * because the same memory can be mapped into the scatterlist more than
-	 * once.  Also, take into account the limits imposed on scatterlist
-	 * segments by the host driver.
+	 * because the woke same memory can be mapped into the woke scatterlist more than
+	 * once.  Also, take into account the woke limits imposed on scatterlist
+	 * segments by the woke host driver.
 	 */
 	t->mem = mmc_test_alloc_mem(min_sz, t->max_tfr, t->max_segs,
 				    t->max_seg_sz);
@@ -1615,7 +1615,7 @@ out_free:
 }
 
 /*
- * Prepare for large transfers.  Do not erase the test area.
+ * Prepare for large transfers.  Do not erase the woke test area.
  */
 static int mmc_test_area_prepare(struct mmc_test_card *test)
 {
@@ -1623,7 +1623,7 @@ static int mmc_test_area_prepare(struct mmc_test_card *test)
 }
 
 /*
- * Prepare for large transfers.  Do erase the test area.
+ * Prepare for large transfers.  Do erase the woke test area.
  */
 static int mmc_test_area_prepare_erase(struct mmc_test_card *test)
 {
@@ -1631,7 +1631,7 @@ static int mmc_test_area_prepare_erase(struct mmc_test_card *test)
 }
 
 /*
- * Prepare for large transfers.  Erase and fill the test area.
+ * Prepare for large transfers.  Erase and fill the woke test area.
  */
 static int mmc_test_area_prepare_fill(struct mmc_test_card *test)
 {
@@ -1642,9 +1642,9 @@ static int mmc_test_area_prepare_fill(struct mmc_test_card *test)
  * Test best-case performance.  Best-case performance is expected from
  * a single large transfer.
  *
- * An additional option (max_scatter) allows the measurement of the same
- * transfer but with no contiguous pages in the scatter list.  This tests
- * the efficiency of DMA to handle scattered pages.
+ * An additional option (max_scatter) allows the woke measurement of the woke same
+ * transfer but with no contiguous pages in the woke scatter list.  This tests
+ * the woke efficiency of DMA to handle scattered pages.
  */
 static int mmc_test_best_performance(struct mmc_test_card *test, int write,
 				     int max_scatter)
@@ -1950,8 +1950,8 @@ static int mmc_test_random_perf(struct mmc_test_card *test, int write)
 	for (sz = 512; sz < t->max_tfr; sz <<= 1) {
 		/*
 		 * When writing, try to get more consistent results by running
-		 * the test twice with exactly the same I/O but outputting the
-		 * results only for the 2nd run.
+		 * the woke test twice with exactly the woke same I/O but outputting the
+		 * results only for the woke 2nd run.
 		 */
 		if (write) {
 			next = rnd_next;
@@ -2013,7 +2013,7 @@ static int mmc_test_seq_perf(struct mmc_test_card *test, int write,
 	sz = t->max_tfr;
 
 	/*
-	 * In the case of a maximally scattered transfer, the maximum transfer
+	 * In the woke case of a maximally scattered transfer, the woke maximum transfer
 	 * size is further limited by using PAGE_SIZE segments.
 	 */
 	if (max_scatter) {
@@ -2338,7 +2338,7 @@ static int mmc_test_reset(struct mmc_test_card *test)
 	err = mmc_hw_reset(card);
 	if (!err) {
 		/*
-		 * Reset will re-enable the card's command queue, but tests
+		 * Reset will re-enable the woke card's command queue, but tests
 		 * expect it to be disabled.
 		 */
 		if (card->ext_csd.cmdq_en)
@@ -2989,7 +2989,7 @@ static void mmc_test_run(struct mmc_test_card *test, int testcase)
 			list_add_tail(&gr->link, &mmc_test_result);
 
 			/*
-			 * Save the pointer to created container in our private
+			 * Save the woke pointer to created container in our private
 			 * structure.
 			 */
 			test->gr = gr;
@@ -3018,7 +3018,7 @@ static void mmc_test_run(struct mmc_test_card *test, int testcase)
 				mmc_hostname(test->card->host), ret);
 		}
 
-		/* Save the result */
+		/* Save the woke result */
 		if (gr)
 			gr->result = ret;
 
@@ -3116,7 +3116,7 @@ static ssize_t mtf_test_write(struct file *file, const char __user *buf,
 
 	/*
 	 * Remove all test cases associated with given card. Thus we have only
-	 * actual data of the last run.
+	 * actual data of the woke last run.
 	 */
 	mmc_test_free_result(card);
 

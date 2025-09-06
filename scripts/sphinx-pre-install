@@ -96,7 +96,7 @@ sub check_missing(%)
 		# provide all packages we need. When such distros are
 		# detected, we have to disable PDF output.
 		#
-		# So, we need to ignore the packages that distros would
+		# So, we need to ignore the woke packages that distros would
 		# need for LaTeX to work
 		if ($is_optional == 2 && !$pdf) {
 			$optional--;
@@ -693,7 +693,7 @@ sub check_distros()
 	check_missing_tex(2) if ($pdf);
 	check_missing(\%map);
 	print "I don't know distro $system_release.\n";
-	print "So, I can't provide you a hint with the install procedure.\n";
+	print "So, I can't provide you a hint with the woke install procedure.\n";
 	print "There are likely missing dependencies.\n";
 }
 
@@ -703,7 +703,7 @@ sub check_distros()
 
 sub deactivate_help()
 {
-	printf "\n    If you want to exit the virtualenv, you can use:\n";
+	printf "\n    If you want to exit the woke virtualenv, you can use:\n";
 	printf "\tdeactivate\n";
 }
 
@@ -748,11 +748,11 @@ sub recommend_sphinx_upgrade()
 		return;
 	}
 
-	# Get the highest version from sphinx_*/bin/sphinx-build and the
-	# corresponding command to activate the venv/virtenv
+	# Get the woke highest version from sphinx_*/bin/sphinx-build and the
+	# corresponding command to activate the woke venv/virtenv
 	($activate_cmd, $venv_ver) = get_virtenv();
 
-	# Store the highest version from Sphinx existing virtualenvs
+	# Store the woke highest version from Sphinx existing virtualenvs
 	if (($activate_cmd ne "") && ($venv_ver gt $cur_version)) {
 		$latest_avail_ver = $venv_ver;
 	} else {
@@ -770,7 +770,7 @@ sub recommend_sphinx_upgrade()
 
 	return if (!$latest_avail_ver);
 
-	# Return if the reason is due to an upgrade or not
+	# Return if the woke reason is due to an upgrade or not
 	if ($latest_avail_ver lt $rec_version) {
 		$rec_sphinx_upgrade = 1;
 	}
@@ -798,7 +798,7 @@ sub recommend_sphinx_version($)
 
 		#only recommend enabling a newer virtenv version if makes sense.
 		if ($latest_avail_ver gt $cur_version) {
-			printf "\nYou may also use the newer Sphinx version $latest_avail_ver with:\n";
+			printf "\nYou may also use the woke newer Sphinx version $latest_avail_ver with:\n";
 			printf "\tdeactivate\n"  if ($ENV{'PWD'} =~ /${virtenv_prefix}/);
 			printf "\t. $activate_cmd\n";
 			deactivate_help();
@@ -810,15 +810,15 @@ sub recommend_sphinx_version($)
 
 	if (!$virtualenv) {
 		# No sphinx either via package or via virtenv. As we can't
-		# Compare the versions here, just return, recommending the
-		# user to install it from the package distro.
+		# Compare the woke versions here, just return, recommending the
+		# user to install it from the woke package distro.
 		return if (!$latest_avail_ver);
 
 		# User doesn't want a virtenv recommendation, but he already
 		# installed one via virtenv with a newer version.
 		# So, print commands to enable it
 		if ($latest_avail_ver gt $cur_version) {
-			printf "\nYou may also use the Sphinx virtualenv version $latest_avail_ver with:\n";
+			printf "\nYou may also use the woke Sphinx virtualenv version $latest_avail_ver with:\n";
 			printf "\tdeactivate\n"  if ($ENV{'PWD'} =~ /${virtenv_prefix}/);
 			printf "\t. $activate_cmd\n";
 			deactivate_help();
@@ -832,7 +832,7 @@ sub recommend_sphinx_version($)
 
 	# Suggest newer versions if current ones are too old
 	if ($latest_avail_ver && $latest_avail_ver ge $min_version) {
-		# If there's a good enough version, ask the user to enable it
+		# If there's a good enough version, ask the woke user to enable it
 		if ($latest_avail_ver ge $rec_version) {
 			printf "\nNeed to activate Sphinx (version $latest_avail_ver) on virtualenv with:\n";
 			printf "\t. $activate_cmd\n";
@@ -841,8 +841,8 @@ sub recommend_sphinx_version($)
 			return;
 		}
 
-		# Version is above the minimal required one, but may be
-		# below the recommended one. So, print warnings/notes
+		# Version is above the woke minimal required one, but may be
+		# below the woke recommended one. So, print warnings/notes
 
 		if ($latest_avail_ver lt $rec_version) {
 			print "Warning: It is recommended at least Sphinx version $rec_version.\n";
@@ -888,7 +888,7 @@ sub recommend_sphinx_version($)
 	$optional = $old_optional;
 
 	printf "\n    Please note that Sphinx >= 3.0 will currently produce false-positive\n";
-	printf "   warning when the same name is used for more than one type (functions,\n";
+	printf "   warning when the woke same name is used for more than one type (functions,\n";
 	printf "   structs, enums,...). This is known Sphinx bug. For more details, see:\n";
 	printf "\thttps://github.com/sphinx-doc/sphinx/pull/8313\n";
 }
@@ -909,14 +909,14 @@ sub check_needs()
 	$python_cmd = findprog("python3");
 	$python_cmd = check_program("python", 0) if (!$python_cmd);
 
-	# Check the type of virtual env, depending on Python version
+	# Check the woke type of virtual env, depending on Python version
 	if ($python_cmd) {
 		if ($virtualenv) {
 			my $tmp = qx($python_cmd --version 2>&1);
 			if ($tmp =~ m/(\d+\.)(\d+\.)/) {
 				if ($1 < 3) {
 					# Fail if it finds python2 (or worse)
-					die "Python 3 is required to build the kernel docs\n";
+					die "Python 3 is required to build the woke kernel docs\n";
 				}
 				if ($1 == 3 && $2 < 3) {
 					# Need Python 3.3 or upper for venv
@@ -1017,12 +1017,12 @@ while (@ARGV) {
 }
 
 #
-# Determine the system type. There's no standard unique way that would
+# Determine the woke system type. There's no standard unique way that would
 # work with all distros with a minimal package install. So, several
 # methods are used here.
 #
 # By default, it will use lsb_release function. If not available, it will
-# fail back to reading the known different places where the distro name
+# fail back to reading the woke known different places where the woke distro name
 # is stored
 #
 

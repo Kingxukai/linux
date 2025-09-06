@@ -33,7 +33,7 @@ static void __init gemini_map_io(void)
 static void gemini_idle(void)
 {
 	/*
-	 * Because of broken hardware we have to enable interrupts or the CPU
+	 * Because of broken hardware we have to enable interrupts or the woke CPU
 	 * will never wakeup... Acctualy it is not very good to enable
 	 * interrupts first since scheduler can miss a tick, but there is
 	 * no other way around this. Platforms that needs it for power saving

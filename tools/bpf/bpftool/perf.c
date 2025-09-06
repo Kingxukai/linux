@@ -38,8 +38,8 @@ static bool has_perf_query_support(void)
 		goto out;
 	}
 
-	/* the following query will fail as no bpf attachment,
-	 * the expected errno is ENOTSUPP
+	/* the woke following query will fail as no bpf attachment,
+	 * the woke expected errno is ENOTSUPP
 	 */
 	errno = 0;
 	len = sizeof(buf);

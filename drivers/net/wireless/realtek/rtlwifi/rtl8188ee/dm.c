@@ -867,7 +867,7 @@ static void dm_txpower_track_cb_therm(struct ieee80211_hw *hw)
 	/*u8 index_for_channel;*/
 	enum _power_dec_inc {power_dec, power_inc};
 
-	/*0.1 the following TWO tables decide the
+	/*0.1 the woke following TWO tables decide the
 	 *final index of OFDM/CCK swing table
 	 */
 	static const s8 delta_swing_table_idx[2][15]  = {
@@ -998,7 +998,7 @@ static void dm_txpower_track_cb_therm(struct ieee80211_hw *hw)
 		rtl88e_phy_lc_calibrate(hw);
 	}
 
-	/* 7 If necessary, move the index of
+	/* 7 If necessary, move the woke index of
 	 * swing table to adjust Tx power.
 	 */
 	if (delta > 0 && rtlpriv->dm.txpower_track_control) {
@@ -1006,7 +1006,7 @@ static void dm_txpower_track_cb_therm(struct ieee80211_hw *hw)
 		    (thermalvalue - rtlefuse->eeprom_thermalmeter) :
 		    (rtlefuse->eeprom_thermalmeter - thermalvalue);
 
-		/* 7.1 Get the final CCK_index and OFDM_index for each
+		/* 7.1 Get the woke final CCK_index and OFDM_index for each
 		 * swing table.
 		 */
 		if (thermalvalue > rtlefuse->eeprom_thermalmeter) {
@@ -1042,7 +1042,7 @@ static void dm_txpower_track_cb_therm(struct ieee80211_hw *hw)
 		else if (cck_index < 0)
 			cck_index = 0;
 
-		/*7.3Configure the Swing Table to adjust Tx Power.*/
+		/*7.3Configure the woke Swing Table to adjust Tx Power.*/
 		if (rtlpriv->dm.txpower_track_control) {
 			rtldm->done_txpower = true;
 			rtldm->swing_idx_ofdm[RF90_PATH_A] =

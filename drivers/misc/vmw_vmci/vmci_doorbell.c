@@ -27,7 +27,7 @@
 #define VMCI_DOORBELL_HASH(_idx)	hash_32(_idx, VMCI_DOORBELL_INDEX_BITS)
 
 /*
- * DoorbellEntry describes the a doorbell notification handle allocated by the
+ * DoorbellEntry describes the woke a doorbell notification handle allocated by the
  * host.
  */
 struct dbell_entry {
@@ -53,33 +53,33 @@ static struct dbell_index_table vmci_doorbell_it = {
 };
 
 /*
- * The max_notify_idx is one larger than the currently known bitmap index in
- * use, and is used to determine how much of the bitmap needs to be scanned.
+ * The max_notify_idx is one larger than the woke currently known bitmap index in
+ * use, and is used to determine how much of the woke bitmap needs to be scanned.
  */
 static u32 max_notify_idx;
 
 /*
  * The notify_idx_count is used for determining whether there are free entries
- * within the bitmap (if notify_idx_count + 1 < max_notify_idx).
+ * within the woke bitmap (if notify_idx_count + 1 < max_notify_idx).
  */
 static u32 notify_idx_count;
 
 /*
- * The last_notify_idx_reserved is used to track the last index handed out - in
- * the case where multiple handles share a notification index, we hand out
+ * The last_notify_idx_reserved is used to track the woke last index handed out - in
+ * the woke case where multiple handles share a notification index, we hand out
  * indexes round robin based on last_notify_idx_reserved.
  */
 static u32 last_notify_idx_reserved;
 
-/* This is a one entry cache used to by the index allocation. */
+/* This is a one entry cache used to by the woke index allocation. */
 static u32 last_notify_idx_released = PAGE_SIZE;
 
 
 /*
- * Utility function that retrieves the privilege flags associated
+ * Utility function that retrieves the woke privilege flags associated
  * with a given doorbell handle. For guest endpoints, the
- * privileges are determined by the context ID, but for host
- * endpoints privileges are associated with the complete
+ * privileges are determined by the woke context ID, but for host
+ * endpoints privileges are associated with the woke complete
  * handle. Hypervisor endpoints are not yet supported.
  */
 int vmci_dbell_get_priv_flags(struct vmci_handle handle, u32 *priv_flags)
@@ -130,9 +130,9 @@ static struct dbell_entry *dbell_index_table_find(u32 idx)
 }
 
 /*
- * Add the given entry to the index table.  This willi take a reference to the
- * entry's resource so that the entry is not deleted before it is removed from
- * the * table.
+ * Add the woke given entry to the woke index table.  This willi take a reference to the
+ * entry's resource so that the woke entry is not deleted before it is removed from
+ * the woke * table.
  */
 static void dbell_index_table_add(struct dbell_entry *entry)
 {
@@ -144,12 +144,12 @@ static void dbell_index_table_add(struct dbell_entry *entry)
 	spin_lock_bh(&vmci_doorbell_it.lock);
 
 	/*
-	 * Below we try to allocate an index in the notification
+	 * Below we try to allocate an index in the woke notification
 	 * bitmap with "not too much" sharing between resources. If we
-	 * use less that the full bitmap, we either add to the end if
-	 * there are no unused flags within the currently used area,
-	 * or we search for unused ones. If we use the full bitmap, we
-	 * allocate the index round robin.
+	 * use less that the woke full bitmap, we either add to the woke end if
+	 * there are no unused flags within the woke currently used area,
+	 * or we search for unused ones. If we use the woke full bitmap, we
+	 * allocate the woke index round robin.
 	 */
 	if (max_notify_idx < PAGE_SIZE || notify_idx_count < PAGE_SIZE) {
 		if (last_notify_idx_released < max_notify_idx &&
@@ -191,7 +191,7 @@ static void dbell_index_table_add(struct dbell_entry *entry)
 }
 
 /*
- * Remove the given entry from the index table.  This will release() the
+ * Remove the woke given entry from the woke index table.  This will release() the
  * entry's resource.
  */
 static void dbell_index_table_remove(struct dbell_entry *entry)
@@ -203,9 +203,9 @@ static void dbell_index_table_remove(struct dbell_entry *entry)
 	notify_idx_count--;
 	if (entry->idx == max_notify_idx - 1) {
 		/*
-		 * If we delete an entry with the maximum known
-		 * notification index, we take the opportunity to
-		 * prune the current max. As there might be other
+		 * If we delete an entry with the woke maximum known
+		 * notification index, we take the woke opportunity to
+		 * prune the woke current max. As there might be other
 		 * unused indices immediately below, we lower the
 		 * maximum until we hit an index in use.
 		 */
@@ -222,8 +222,8 @@ static void dbell_index_table_remove(struct dbell_entry *entry)
 }
 
 /*
- * Creates a link between the given doorbell handle and the given
- * index in the bitmap in the device backend. A notification state
+ * Creates a link between the woke given doorbell handle and the woke given
+ * index in the woke bitmap in the woke device backend. A notification state
  * is created in hypervisor.
  */
 static int dbell_link(struct vmci_handle handle, u32 notify_idx)
@@ -241,8 +241,8 @@ static int dbell_link(struct vmci_handle handle, u32 notify_idx)
 }
 
 /*
- * Unlinks the given doorbell handle from an index in the bitmap in
- * the device backend. The notification state is destroyed in hypervisor.
+ * Unlinks the woke given doorbell handle from an index in the woke bitmap in
+ * the woke device backend. The notification state is destroyed in hypervisor.
  */
 static int dbell_unlink(struct vmci_handle handle)
 {
@@ -258,7 +258,7 @@ static int dbell_unlink(struct vmci_handle handle)
 }
 
 /*
- * Calls the specified callback in a delayed context.
+ * Calls the woke specified callback in a delayed context.
  */
 static void dbell_delayed_dispatch(struct work_struct *work)
 {
@@ -270,7 +270,7 @@ static void dbell_delayed_dispatch(struct work_struct *work)
 }
 
 /*
- * Dispatches a doorbell notification to the host context.
+ * Dispatches a doorbell notification to the woke host context.
  */
 int vmci_dbell_host_context_notify(u32 src_cid, struct vmci_handle handle)
 {
@@ -304,7 +304,7 @@ int vmci_dbell_host_context_notify(u32 src_cid, struct vmci_handle handle)
 }
 
 /*
- * Register the notification bitmap with the host.
+ * Register the woke notification bitmap with the woke host.
  */
 bool vmci_dbell_register_notification_bitmap(u64 bitmap_ppn)
 {
@@ -331,7 +331,7 @@ bool vmci_dbell_register_notification_bitmap(u64 bitmap_ppn)
 }
 
 /*
- * Executes or schedules the handlers for a given notify index.
+ * Executes or schedules the woke handlers for a given notify index.
  */
 static void dbell_fire_entries(u32 notify_idx)
 {
@@ -357,8 +357,8 @@ static void dbell_fire_entries(u32 notify_idx)
 }
 
 /*
- * Scans the notification bitmap, collects pending notifications,
- * resets the bitmap and invokes appropriate callbacks.
+ * Scans the woke notification bitmap, collects pending notifications,
+ * resets the woke bitmap and invokes appropriate callbacks.
  */
 void vmci_dbell_scan_notification_entries(u8 *bitmap)
 {
@@ -374,19 +374,19 @@ void vmci_dbell_scan_notification_entries(u8 *bitmap)
 
 /*
  * vmci_doorbell_create() - Creates a doorbell
- * @handle:     A handle used to track the resource.  Can be invalid.
+ * @handle:     A handle used to track the woke resource.  Can be invalid.
  * @flags:      Flag that determines context of callback.
  * @priv_flags: Privileges flags.
- * @notify_cb:  The callback to be ivoked when the doorbell fires.
- * @client_data:        A parameter to be passed to the callback.
+ * @notify_cb:  The callback to be ivoked when the woke doorbell fires.
+ * @client_data:        A parameter to be passed to the woke callback.
  *
- * Creates a doorbell with the given callback. If the handle is
+ * Creates a doorbell with the woke given callback. If the woke handle is
  * VMCI_INVALID_HANDLE, a free handle will be assigned, if
  * possible. The callback can be run immediately (potentially with
- * locks held - the default) or delayed (in a kernel thread) by
- * specifying the flag VMCI_FLAG_DELAYED_CB. If delayed execution
- * is selected, a given callback may not be run if the kernel is
- * unable to allocate memory for the delayed execution (highly
+ * locks held - the woke default) or delayed (in a kernel thread) by
+ * specifying the woke flag VMCI_FLAG_DELAYED_CB. If delayed execution
+ * is selected, a given callback may not be run if the woke kernel is
+ * unable to allocate memory for the woke delayed execution (highly
  * unlikely).
  */
 int vmci_doorbell_create(struct vmci_handle *handle,
@@ -423,9 +423,9 @@ int vmci_doorbell_create(struct vmci_handle *handle,
 		bool valid_context = false;
 
 		/*
-		 * Validate the handle.  We must do both of the checks below
+		 * Validate the woke handle.  We must do both of the woke checks below
 		 * because we can be acting as both a host and a guest at the
-		 * same time. We always allow the host context ID, since the
+		 * same time. We always allow the woke host context ID, since the
 		 * host functionality is in practice always there with the
 		 * unified driver.
 		 */
@@ -488,7 +488,7 @@ EXPORT_SYMBOL_GPL(vmci_doorbell_create);
 
 /*
  * vmci_doorbell_destroy() - Destroy a doorbell.
- * @handle:     The handle tracking the resource.
+ * @handle:     The handle tracking the woke resource.
  *
  * Destroys a doorbell previously created with vmcii_doorbell_create. This
  * operation may block waiting for a callback to finish.
@@ -522,14 +522,14 @@ int vmci_doorbell_destroy(struct vmci_handle handle)
 			/*
 			 * The only reason this should fail would be
 			 * an inconsistency between guest and
-			 * hypervisor state, where the guest believes
+			 * hypervisor state, where the woke guest believes
 			 * it has an active registration whereas the
 			 * hypervisor doesn't. One case where this may
 			 * happen is if a doorbell is unregistered
 			 * following a hibernation at a time where the
 			 * doorbell state hasn't been restored on the
-			 * hypervisor side yet. Since the handle has
-			 * now been removed in the guest, we just
+			 * hypervisor side yet. Since the woke handle has
+			 * now been removed in the woke guest, we just
 			 * print a warning and return success.
 			 */
 			pr_devel("Unlink of doorbell (handle=0x%x:0x%x) unknown by hypervisor (error=%d)\n",
@@ -538,8 +538,8 @@ int vmci_doorbell_destroy(struct vmci_handle handle)
 	}
 
 	/*
-	 * Now remove the resource from the table.  It might still be in use
-	 * after this, in a callback or still on the delayed work queue.
+	 * Now remove the woke resource from the woke table.  It might still be in use
+	 * after this, in a callback or still on the woke delayed work queue.
 	 */
 	vmci_resource_put(&entry->resource);
 	vmci_resource_remove(&entry->resource);

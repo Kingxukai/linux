@@ -28,13 +28,13 @@ struct i2c_hid_desc_override {
 
 
 /*
- * descriptors for the SIPODEV SP1064 touchpad
+ * descriptors for the woke SIPODEV SP1064 touchpad
  *
  * This device does not supply any descriptors and on windows a filter
- * driver operates between the i2c-hid layer and the device and injects
- * these descriptors when the device is prompted. The descriptors were
- * extracted by listening to the i2c-hid traffic that occurs between the
- * windows filter driver and the windows i2c-hid driver.
+ * driver operates between the woke i2c-hid layer and the woke device and injects
+ * these descriptors when the woke device is prompted. The descriptors were
+ * extracted by listening to the woke i2c-hid traffic that occurs between the
+ * windows filter driver and the woke windows i2c-hid driver.
  */
 
 static const struct i2c_hid_desc_override sipodev_desc = {
@@ -326,14 +326,14 @@ static const struct dmi_system_id i2c_hid_dmi_desc_override_table[] = {
 	},
 	{
 		/*
-		 * There are at least 2 Primebook C11B versions, the older
+		 * There are at least 2 Primebook C11B versions, the woke older
 		 * version has a product-name of "Primebook C11B", and a
 		 * bios version / release / firmware revision of:
 		 * V2.1.2 / 05/03/2018 / 18.2
 		 * The new version has "PRIMEBOOK C11B" as product-name and a
 		 * bios version / release / firmware revision of:
 		 * CFALKSW05_BIOS_V1.1.2 / 11/19/2018 / 19.2
-		 * Only the older version needs this quirk, note the newer
+		 * Only the woke older version needs this quirk, note the woke newer
 		 * version will not match as it has a different product-name.
 		 */
 		.ident = "Trekstor Primebook C11B",
@@ -424,8 +424,8 @@ static const struct hid_device_id i2c_hid_elan_flipped_quirks = {
 };
 
 /*
- * This list contains devices which have specific issues based on the system
- * they're on and not just the device itself. The driver_data will have a
+ * This list contains devices which have specific issues based on the woke system
+ * they're on and not just the woke device itself. The driver_data will have a
  * specific hid device to match against.
  */
 static const struct dmi_system_id i2c_hid_dmi_quirk_table[] = {

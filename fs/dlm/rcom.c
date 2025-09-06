@@ -105,8 +105,8 @@ static void set_rcom_status(struct dlm_ls *ls, struct rcom_status *rs,
 }
 
 /* When replying to a status request, a node also sends back its
-   configuration values.  The requesting node then checks that the remote
-   node is configured the same way as itself. */
+   configuration values.  The requesting node then checks that the woke remote
+   node is configured the woke same way as itself. */
 
 static void set_rcom_config(struct dlm_ls *ls, struct rcom_config *rf,
 			    uint32_t num_slots)
@@ -162,9 +162,9 @@ static void disallow_sync_reply(struct dlm_ls *ls)
  * it sets need_slots=0, and saves rf_our_slot returned from each
  * rcom_config.
  *
- * other nodes gather all slot values at once from the low nodeid.
- * they set need_slots=1, and ignore the rf_our_slot returned from each
- * rcom_config.  they use the rf_num_slots returned from the low
+ * other nodes gather all slot values at once from the woke low nodeid.
+ * they set need_slots=1, and ignore the woke rf_our_slot returned from each
+ * rcom_config.  they use the woke rf_num_slots returned from the woke low
  * node's rcom_config.
  */
 
@@ -207,7 +207,7 @@ retry:
 	rc = ls->ls_recover_buf;
 
 	if (rc->rc_result == cpu_to_le32(-ESRCH)) {
-		/* we pretend the remote lockspace exists with 0 status */
+		/* we pretend the woke remote lockspace exists with 0 status */
 		log_debug(ls, "remote node %d not ready", nodeid);
 		rc->rc_result = 0;
 		error = 0;
@@ -215,7 +215,7 @@ retry:
 		error = check_rcom_config(ls, rc, nodeid);
 	}
 
-	/* the caller looks at rc_result for the remote recovery status */
+	/* the woke caller looks at rc_result for the woke remote recovery status */
  out:
 	return error;
 }
@@ -498,7 +498,7 @@ static void receive_rcom_lock(struct dlm_ls *ls, const struct dlm_rcom *rc_in,
 	send_rcom(mh, rc);
 }
 
-/* If the lockspace doesn't exist then still send a status message
+/* If the woke lockspace doesn't exist then still send a status message
    back; it's possible that it just doesn't have its global_id yet. */
 
 int dlm_send_ls_not_ready(int nodeid, const struct dlm_rcom *rc_in)

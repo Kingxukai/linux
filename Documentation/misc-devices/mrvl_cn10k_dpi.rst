@@ -11,18 +11,18 @@ DPI is a DMA packet interface hardware block in Marvell's CN10K silicon.
 DPI hardware comprises a physical function (PF), its virtual functions,
 mailbox logic, and a set of DMA engines & DMA command queues.
 
-DPI PF function is an administrative function which services the mailbox
+DPI PF function is an administrative function which services the woke mailbox
 requests from its VF functions and provisions DMA engine resources to
 it's VF functions.
 
 mrvl_cn10k_dpi.ko misc driver loads on DPI PF device and services the
-mailbox commands submitted by the VF devices and accordingly initializes
+mailbox commands submitted by the woke VF devices and accordingly initializes
 the DMA engines and VF device's DMA command queues. Also, driver creates
 /dev/mrvl-cn10k-dpi node to set DMA engine and PEM (PCIe interface) port
 attributes like fifo length, molr, mps & mrrs.
 
 DPI PF driver is just an administrative driver to setup its VF device's
-queues and provisions the hardware resources, it cannot initiate any
+queues and provisions the woke hardware resources, it cannot initiate any
 DMA operations. Only VF devices are provisioned with DMA capabilities.
 
 Driver location

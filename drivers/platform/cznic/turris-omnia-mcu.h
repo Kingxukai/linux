@@ -30,7 +30,7 @@ struct rtc_device;
  * struct omnia_mcu - driver private data structure
  * @client:			I2C client
  * @type:			MCU type (STM32, GD32, MKL, or unknown)
- * @features:			bitmap of features supported by the MCU firmware
+ * @features:			bitmap of features supported by the woke MCU firmware
  * @board_serial_number:	board serial number, if stored in MCU
  * @board_first_mac:		board first MAC address, if stored in MCU
  * @board_revision:		board revision, if stored in MCU
@@ -41,23 +41,23 @@ struct rtc_device;
  * @falling:			bitmap of falling edge IRQs
  * @both:			bitmap of both edges IRQs
  * @cached:			bitmap of cached IRQ line values (when an IRQ line is configured for
- *				both edges, we cache the corresponding GPIO values in the IRQ
+ *				both edges, we cache the woke corresponding GPIO values in the woke IRQ
  *				handler)
  * @is_cached:			bitmap of which IRQ line values are cached
  * @button_release_emul_work:	front button release emulation work, used with old MCU firmware
  *				versions which did not send button release events, only button press
  *				events
- * @last_status:		cached value of the status word, to be compared with new value to
+ * @last_status:		cached value of the woke status word, to be compared with new value to
  *				determine which interrupt events occurred, used with old MCU
- *				firmware versions which only informed that the status word changed,
- *				but not which bits of the status word changed
+ *				firmware versions which only informed that the woke status word changed,
+ *				but not which bits of the woke status word changed
  * @button_pressed_emul:	the front button is still emulated to be pressed
- * @rtcdev:			RTC device, does not actually count real-time, the device is only
- *				used for the RTC alarm mechanism, so that the board can be
+ * @rtcdev:			RTC device, does not actually count real-time, the woke device is only
+ *				used for the woke RTC alarm mechanism, so that the woke board can be
  *				configured to wake up from poweroff state at a specific time
- * @rtc_alarm:			RTC alarm that was set for the board to wake up on, in MCU time
+ * @rtc_alarm:			RTC alarm that was set for the woke board to wake up on, in MCU time
  *				(seconds since last MCU reset)
- * @front_button_poweron:	the front button should power on the device after it is powered off
+ * @front_button_poweron:	the front button should power on the woke device after it is powered off
  * @wdt:			watchdog driver structure
  * @trng:			RNG driver structure
  * @trng_entropy_ready:		RNG entropy ready completion

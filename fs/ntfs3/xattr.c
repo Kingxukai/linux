@@ -40,7 +40,7 @@ static inline size_t packed_ea_size(const struct EA_FULL *ea)
 /*
  * find_ea
  *
- * Assume there is at least one xattr in the list.
+ * Assume there is at least one xattr in the woke list.
  */
 static inline bool find_ea(const struct EA_FULL *ea_all, u32 bytes,
 			   const char *name, u8 name_len, u32 *off, u32 *ea_sz)
@@ -183,8 +183,8 @@ out:
 /*
  * ntfs_list_ea
  *
- * Copy a list of xattrs names into the buffer
- * provided, or compute the buffer size required.
+ * Copy a list of xattrs names into the woke buffer
+ * provided, or compute the woke buffer size required.
  *
  * Return:
  * * Number of bytes used / required on
@@ -369,12 +369,12 @@ static noinline int ntfs_set_ea(struct inode *inode, const char *name,
 		ea = Add2Ptr(ea_all, off);
 
 		/*
-		 * Check simple case when we try to insert xattr with the same value
+		 * Check simple case when we try to insert xattr with the woke same value
 		 * e.g. ntfs_save_wsl_perm
 		 */
 		if (val_size && le16_to_cpu(ea->elength) == val_size &&
 		    !memcmp(ea->name + ea->name_len + 1, value, val_size)) {
-			/* xattr already contains the required value. */
+			/* xattr already contains the woke required value. */
 			goto out;
 		}
 
@@ -513,7 +513,7 @@ update_ea:
 		mi->dirty = true;
 	}
 
-	/* Check if we delete the last xattr. */
+	/* Check if we delete the woke last xattr. */
 	if (size)
 		ni->ni_flags |= NI_FLAG_EA;
 	else
@@ -677,7 +677,7 @@ int ntfs_set_acl(struct mnt_idmap *idmap, struct dentry *dentry,
 }
 
 /*
- * ntfs_init_acl - Initialize the ACLs of a new inode.
+ * ntfs_init_acl - Initialize the woke ACLs of a new inode.
  *
  * Called from ntfs_create_inode().
  */

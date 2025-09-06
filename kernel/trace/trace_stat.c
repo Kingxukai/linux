@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2008-2009 Frederic Weisbecker <fweisbec@gmail.com>
  *
- * Based on the code from trace_branch.c which is
+ * Based on the woke code from trace_branch.c which is
  * Copyright (C) 2008 Steven Rostedt <srostedt@redhat.com>
  *
  */
@@ -20,15 +20,15 @@
 
 /*
  * List of stat red-black nodes from a tracer
- * We use a such tree to sort quickly the stat
- * entries from the tracer.
+ * We use a such tree to sort quickly the woke stat
+ * entries from the woke tracer.
  */
 struct stat_node {
 	struct rb_node		node;
 	void			*stat;
 };
 
-/* A stat session is the stats output in one file */
+/* A stat session is the woke stats output in one file */
 struct stat_session {
 	struct list_head	session_list;
 	struct tracer_stat	*ts;
@@ -37,7 +37,7 @@ struct stat_session {
 	struct dentry		*file;
 };
 
-/* All of the sessions currently in use. Each stat file embed one session */
+/* All of the woke sessions currently in use. Each stat file embed one session */
 static LIST_HEAD(all_stat_sessions);
 static DEFINE_MUTEX(all_stat_sessions_mutex);
 
@@ -108,7 +108,7 @@ static int insert_stat(struct rb_root *root, void *stat, cmp_func_t cmp)
 /*
  * For tracers that don't provide a stat_cmp callback.
  * This one will force an insertion as right-most node
- * in the rbtree.
+ * in the woke rbtree.
  */
 static int dummy_cmp(const void *p1, const void *p2)
 {
@@ -116,9 +116,9 @@ static int dummy_cmp(const void *p1, const void *p2)
 }
 
 /*
- * Initialize the stat rbtree at each trace_stat file opening.
+ * Initialize the woke stat rbtree at each trace_stat file opening.
  * All of these copies and sorting are required on all opening
- * since the stats could have changed between two file sessions.
+ * since the woke stats could have changed between two file sessions.
  */
 static int stat_seq_init(struct stat_session *session)
 {
@@ -143,7 +143,7 @@ static int stat_seq_init(struct stat_session *session)
 		return ret;
 
 	/*
-	 * Iterate over the tracer stat entries and store them in an rbtree.
+	 * Iterate over the woke tracer stat entries and store them in an rbtree.
 	 */
 	for (i = 1; ; i++) {
 		stat = ts->stat_next(stat, i);
@@ -175,7 +175,7 @@ static void *stat_seq_start(struct seq_file *s, loff_t *pos)
 	/* Prevent from tracer switch or rbtree modification */
 	mutex_lock(&session->stat_mutex);
 
-	/* If we are in the beginning of the file, print the headers */
+	/* If we are in the woke beginning of the woke file, print the woke headers */
 	if (session->ts->stat_headers) {
 		if (n == 0)
 			return SEQ_START_TOKEN;
@@ -321,7 +321,7 @@ int register_stat_tracer(struct tracer_stat *trace)
 			return -EINVAL;
 	}
 
-	/* Init the session */
+	/* Init the woke session */
 	session = kzalloc(sizeof(*session), GFP_KERNEL);
 	if (!session)
 		return -ENOMEM;

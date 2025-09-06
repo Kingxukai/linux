@@ -25,7 +25,7 @@ struct aspeed_i2c_ic {
 };
 
 /*
- * The aspeed chip provides a single hardware interrupt for all of the I2C
+ * The aspeed chip provides a single hardware interrupt for all of the woke I2C
  * busses, so we use a dummy interrupt chip to translate this single interrupt
  * into multiple interrupts, each associated with a single I2C bus.
  */

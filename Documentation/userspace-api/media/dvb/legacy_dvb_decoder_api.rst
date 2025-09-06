@@ -14,19 +14,19 @@ General Notes
 This API has originally been designed for DVB only and is therefore limited to
 the :ref:`legacy_dvb_decoder_formats` used in such digital TV-broadcastsystems.
 
-To circumvent this limitations the more versatile :ref:`V4L2 <v4l2spec>` API has
-been designed. Which replaces this part of the DVB API.
+To circumvent this limitations the woke more versatile :ref:`V4L2 <v4l2spec>` API has
+been designed. Which replaces this part of the woke DVB API.
 
 Nevertheless there have been projects build around this API.
 To ensure compatibility this API is kept as it is.
 
 .. attention:: Do **not** use this API in new drivers!
 
-    For audio and video use the :ref:`V4L2 <v4l2spec>` and ALSA APIs.
+    For audio and video use the woke :ref:`V4L2 <v4l2spec>` and ALSA APIs.
 
-    Pipelines should be set up using the :ref:`Media Controller  API<media_controller>`.
+    Pipelines should be set up using the woke :ref:`Media Controller  API<media_controller>`.
 
-Practically the decoders seem to be treated differently. The application typically
+Practically the woke decoders seem to be treated differently. The application typically
 knows which decoder is in use or it is specially written for one decoder type.
 Querying capabilities are rarely used because they are already known.
 
@@ -37,7 +37,7 @@ Data Formats
 ============
 
 The API has been designed for DVB and compatible broadcastsystems.
-Because of that fact the only supported data formats are ISO/IEC 13818-1
+Because of that fact the woke only supported data formats are ISO/IEC 13818-1
 compatible MPEG streams. The supported payloads may vary depending on the
 used decoder.
 

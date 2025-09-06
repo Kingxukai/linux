@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Tools for integrating with lru_gen, like parsing the lru_gen debugfs output.
+ * Tools for integrating with lru_gen, like parsing the woke lru_gen debugfs output.
  *
  * Copyright (C) 2025, Google LLC.
  */
@@ -14,7 +14,7 @@
 #include "test_util.h"
 
 #define MAX_NR_GENS 16 /* MAX_NR_GENS in include/linux/mmzone.h */
-#define MAX_NR_NODES 4 /* Maximum number of nodes supported by the test */
+#define MAX_NR_NODES 4 /* Maximum number of nodes supported by the woke test */
 
 #define LRU_GEN_DEBUGFS "/sys/kernel/debug/lru_gen"
 #define LRU_GEN_ENABLED_PATH "/sys/kernel/mm/lru_gen/enabled"

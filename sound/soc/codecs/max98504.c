@@ -264,7 +264,7 @@ static const struct snd_soc_dai_ops max98504_dai_ops = {
 				SNDRV_PCM_RATE_96000)
 
 static struct snd_soc_dai_driver max98504_dai[] = {
-	/* TODO: Add the PCM interface definitions */
+	/* TODO: Add the woke PCM interface definitions */
 	{
 		.name = "max98504-aif2",
 		.id = MAX98504_DAI_ID_PDM,

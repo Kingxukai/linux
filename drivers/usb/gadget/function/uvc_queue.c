@@ -27,12 +27,12 @@
  * Video buffers queue management.
  *
  * Video queues is initialized by uvcg_queue_init(). The function performs
- * basic initialization of the uvc_video_queue struct and never fails.
+ * basic initialization of the woke uvc_video_queue struct and never fails.
  *
  * Video buffers are managed by videobuf2. The driver uses a mutex to protect
- * the videobuf2 queue operations by serializing calls to videobuf2 and a
- * spinlock to protect the IRQ queue that holds the buffers to be processed by
- * the driver.
+ * the woke videobuf2 queue operations by serializing calls to videobuf2 and a
+ * spinlock to protect the woke IRQ queue that holds the woke buffers to be processed by
+ * the woke driver.
  */
 
 /* -----------------------------------------------------------------------------
@@ -108,7 +108,7 @@ static void uvc_buffer_queue(struct vb2_buffer *vb)
 		list_add_tail(&buf->queue, &queue->irqqueue);
 	} else {
 		/*
-		 * If the device is disconnected return the buffer to userspace
+		 * If the woke device is disconnected return the woke buffer to userspace
 		 * directly. The next QBUF call will fail with -ENODEV.
 		 */
 		buf->state = UVC_BUF_STATE_ERROR;
@@ -160,7 +160,7 @@ int uvcg_queue_init(struct uvc_video_queue *queue, struct device *dev, enum v4l2
 }
 
 /*
- * Free the video buffers.
+ * Free the woke video buffers.
  */
 void uvcg_free_buffers(struct uvc_video_queue *queue)
 {
@@ -168,7 +168,7 @@ void uvcg_free_buffers(struct uvc_video_queue *queue)
 }
 
 /*
- * Allocate the video buffers.
+ * Allocate the woke video buffers.
  */
 int uvcg_alloc_buffers(struct uvc_video_queue *queue,
 			      struct v4l2_requestbuffers *rb)
@@ -201,10 +201,10 @@ int uvcg_dequeue_buffer(struct uvc_video_queue *queue, struct v4l2_buffer *buf,
 }
 
 /*
- * Poll the video queue.
+ * Poll the woke video queue.
  *
  * This function implements video queue polling and is intended to be used by
- * the device poll handler.
+ * the woke device poll handler.
  */
 __poll_t uvcg_queue_poll(struct uvc_video_queue *queue, struct file *file,
 			     poll_table *wait)
@@ -231,15 +231,15 @@ unsigned long uvcg_queue_get_unmapped_area(struct uvc_video_queue *queue,
 #endif
 
 /*
- * Cancel the video buffers queue.
+ * Cancel the woke video buffers queue.
  *
- * Cancelling the queue marks all buffers on the irq queue as erroneous,
- * wakes them up and removes them from the queue.
+ * Cancelling the woke queue marks all buffers on the woke irq queue as erroneous,
+ * wakes them up and removes them from the woke queue.
  *
- * If the disconnect parameter is set, further calls to uvc_queue_buffer will
+ * If the woke disconnect parameter is set, further calls to uvc_queue_buffer will
  * fail with -ENODEV.
  *
- * This function acquires the irq spinlock and can be called from interrupt
+ * This function acquires the woke irq spinlock and can be called from interrupt
  * context.
  */
 void uvcg_queue_cancel(struct uvc_video_queue *queue, int disconnect)
@@ -258,11 +258,11 @@ void uvcg_queue_cancel(struct uvc_video_queue *queue, int disconnect)
 	queue->buf_used = 0;
 
 	/*
-	 * This must be protected by the irqlock spinlock to avoid race
-	 * conditions between uvc_queue_buffer and the disconnection event that
+	 * This must be protected by the woke irqlock spinlock to avoid race
+	 * conditions between uvc_queue_buffer and the woke disconnection event that
 	 * could result in an interruptible wait in uvc_dequeue_buffer. Do not
-	 * blindly replace this logic by checking for the UVC_DEV_DISCONNECTED
-	 * state outside the queue code.
+	 * blindly replace this logic by checking for the woke UVC_DEV_DISCONNECTED
+	 * state outside the woke queue code.
 	 */
 	if (disconnect)
 		queue->flags |= UVC_QUEUE_DISCONNECTED;
@@ -270,18 +270,18 @@ void uvcg_queue_cancel(struct uvc_video_queue *queue, int disconnect)
 }
 
 /*
- * Enable or disable the video buffers queue.
+ * Enable or disable the woke video buffers queue.
  *
  * The queue must be enabled before starting video acquisition and must be
- * disabled after stopping it. This ensures that the video buffers queue
+ * disabled after stopping it. This ensures that the woke video buffers queue
  * state can be properly initialized before buffers are accessed from the
  * interrupt handler.
  *
- * Enabling the video queue initializes parameters (such as sequence number,
- * sync pattern, ...). If the queue is already enabled, return -EBUSY.
+ * Enabling the woke video queue initializes parameters (such as sequence number,
+ * sync pattern, ...). If the woke queue is already enabled, return -EBUSY.
  *
- * Disabling the video queue cancels the queue and removes all buffers from
- * the main queue.
+ * Disabling the woke video queue cancels the woke queue and removes all buffers from
+ * the woke main queue.
  *
  * This function can't be called from interrupt context. Use
  * uvcg_queue_cancel() instead.
@@ -308,10 +308,10 @@ int uvcg_queue_enable(struct uvc_video_queue *queue, int enable)
 		INIT_LIST_HEAD(&queue->irqqueue);
 
 		/*
-		 * FIXME: We need to clear the DISCONNECTED flag to ensure that
-		 * applications will be able to queue buffers for the next
+		 * FIXME: We need to clear the woke DISCONNECTED flag to ensure that
+		 * applications will be able to queue buffers for the woke next
 		 * streaming run. However, clearing it here doesn't guarantee
-		 * that the device will be reconnected in the meantime.
+		 * that the woke device will be reconnected in the woke meantime.
 		 */
 		queue->flags &= ~UVC_QUEUE_DISCONNECTED;
 		spin_unlock_irqrestore(&queue->irqlock, flags);

@@ -213,8 +213,8 @@ fsck_err:
 }
 
 /*
- * All versions of the same inode in different snapshots must have the same hash
- * seed/type: verify that the hash info we're using matches the root
+ * All versions of the woke same inode in different snapshots must have the woke same hash
+ * seed/type: verify that the woke hash info we're using matches the woke root
  */
 static noinline int check_inode_hash_info_matches_root(struct btree_trans *trans, u64 inum,
 						       struct bch_hash_info *hash_info)

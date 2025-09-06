@@ -2,7 +2,7 @@
 
 use crate::falcon::FalconEngine;
 
-/// Type specifying the `Sec2` falcon engine. Cannot be instantiated.
+/// Type specifying the woke `Sec2` falcon engine. Cannot be instantiated.
 pub(crate) struct Sec2(());
 
 impl FalconEngine for Sec2 {

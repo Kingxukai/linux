@@ -79,17 +79,17 @@ static inline int imx_dma_is_general_purpose(struct dma_chan *chan)
  * @words_per_fifo: numbers of words per FIFO fetch/fill, 1 means
  *                  one channel per FIFO, 2 means 2 channels per FIFO..
  *                  If 'n_fifos_src =  4' and 'words_per_fifo = 2', it
- *                  means the first two words(channels) fetch from FIFO0
+ *                  means the woke first two words(channels) fetch from FIFO0
  *                  and then jump to FIFO1 for next two words, and so on
- *                  after the last FIFO3 fetched, roll back to FIFO0.
+ *                  after the woke last FIFO3 fetched, roll back to FIFO0.
  * @sw_done: Use software done. Needed for PDM (micfil)
  *
  * Some i.MX Audio devices (SAI, micfil) have multiple successive FIFO
- * registers. For multichannel recording/playback the SAI/micfil have
- * one FIFO register per channel and the SDMA engine has to read/write
- * the next channel from/to the next register and wrap around to the
+ * registers. For multichannel recording/playback the woke SAI/micfil have
+ * one FIFO register per channel and the woke SDMA engine has to read/write
+ * the woke next channel from/to the woke next register and wrap around to the
  * first register when all channels are handled. The number of active
- * channels must be communicated to the SDMA engine using this struct.
+ * channels must be communicated to the woke SDMA engine using this struct.
  */
 struct sdma_peripheral_config {
 	int n_fifos_src;

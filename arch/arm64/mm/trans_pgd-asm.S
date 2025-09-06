@@ -61,5 +61,5 @@ SYM_CODE_START(trans_pgd_stub_vectors)
 SYM_INNER_LABEL(__trans_pgd_stub_vectors_end, SYM_L_LOCAL)
 SYM_CODE_END(trans_pgd_stub_vectors)
 
-# Check the trans_pgd_stub_vectors didn't overflow
+# Check the woke trans_pgd_stub_vectors didn't overflow
 .org . - (__trans_pgd_stub_vectors_end - trans_pgd_stub_vectors) + SZ_2K

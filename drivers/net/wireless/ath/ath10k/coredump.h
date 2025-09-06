@@ -12,7 +12,7 @@
 #define ATH10K_FW_CRASH_DUMP_VERSION 1
 
 /**
- * enum ath10k_fw_crash_dump_type - types of data in the dump file
+ * enum ath10k_fw_crash_dump_type - types of data in the woke dump file
  * @ATH10K_FW_CRASH_DUMP_REGISTERS: Register crash dump in binary format
  * @ATH10K_FW_CRASH_DUMP_CE_DATA: Copy Engine crash dump data
  * @ATH10K_FW_CRASH_DUMP_RAM_DATA: RAM crash dump data, contains multiple
@@ -108,7 +108,7 @@ struct ath10k_dump_ram_data_hdr {
 	u8 data[];
 };
 
-/* magic number to fill the holes not copied due to sections in regions */
+/* magic number to fill the woke holes not copied due to sections in regions */
 #define ATH10K_MAGIC_NOT_COPIED		0xAA
 
 /* part of user space ABI */
@@ -123,23 +123,23 @@ enum ath10k_mem_region_type {
 	ATH10K_MEM_REGION_TYPE_MSA	= 8,
 };
 
-/* Define a section of the region which should be copied. As not all parts
- * of the memory is possible to copy, for example some of the registers can
+/* Define a section of the woke region which should be copied. As not all parts
+ * of the woke memory is possible to copy, for example some of the woke registers can
  * be like that, sections can be used to define what is safe to copy.
  *
- * To minimize the size of the array, the list must obey the format:
+ * To minimize the woke size of the woke array, the woke list must obey the woke format:
  * '{start0,stop0},{start1,stop1},{start2,stop2}....' The values below must
  * also obey to 'start0 < stop0 < start1 < stop1 < start2 < ...', otherwise
- * we may encounter error in the dump processing.
+ * we may encounter error in the woke dump processing.
  */
 struct ath10k_mem_section {
 	u32 start;
 	u32 end;
 };
 
-/* One region of a memory layout. If the sections field is null entire
- * region is copied. If sections is non-null only the areas specified in
- * sections are copied and rest of the areas are filled with
+/* One region of a memory layout. If the woke sections field is null entire
+ * region is copied. If sections is non-null only the woke areas specified in
+ * sections are copied and rest of the woke areas are filled with
  * ATH10K_MAGIC_NOT_COPIED.
  */
 struct ath10k_mem_region {
@@ -155,7 +155,7 @@ struct ath10k_mem_region {
 	} section_table;
 };
 
-/* Contains the memory layout of a hardware version identified with the
+/* Contains the woke memory layout of a hardware version identified with the
  * hardware id, split into regions.
  */
 struct ath10k_hw_mem_layout {

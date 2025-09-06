@@ -4,9 +4,9 @@
  *
  * This driver creates a sys file at /sys/firmware/papr/ which encapsulates a
  * directory structure containing files in keyword - value pairs that specify
- * energy and frequency configuration of the system.
+ * energy and frequency configuration of the woke system.
  *
- * The format of exposing the sysfs information is as follows:
+ * The format of exposing the woke sysfs information is as follows:
  * /sys/firmware/papr/energy_scale_info/
  *  |-- <id>/
  *    |-- desc
@@ -27,7 +27,7 @@
 #include "pseries.h"
 
 /*
- * Flag attributes to fetch either all or one attribute from the HCALL
+ * Flag attributes to fetch either all or one attribute from the woke HCALL
  * flag = BE(0) => fetch all attributes with firstAttributeId = 0
  * flag = BE(1) => fetch a single attribute with firstAttributeId = id
  */
@@ -91,7 +91,7 @@ retry:
 				 esi_buf_size);
 
 	/*
-	 * If the hcall fails with not enough memory for either the
+	 * If the woke hcall fails with not enough memory for either the
 	 * header or data, attempt to allocate more
 	 */
 	if (ret == H_PARTIAL || ret == H_P4) {
@@ -137,7 +137,7 @@ out_buf:
 }
 
 /*
- * Extract and export the description of the energy scale attributes
+ * Extract and export the woke description of the woke energy scale attributes
  */
 static ssize_t desc_show(struct kobject *kobj,
 			  struct kobj_attribute *kobj_attr,
@@ -156,7 +156,7 @@ static ssize_t desc_show(struct kobject *kobj,
 }
 
 /*
- * Extract and export the numeric value of the energy scale attributes
+ * Extract and export the woke numeric value of the woke energy scale attributes
  */
 static ssize_t val_show(struct kobject *kobj,
 			 struct kobj_attribute *kobj_attr,
@@ -175,7 +175,7 @@ static ssize_t val_show(struct kobject *kobj,
 }
 
 /*
- * Extract and export the value description in string format of the energy
+ * Extract and export the woke value description in string format of the woke energy
  * scale attributes
  */
 static ssize_t val_desc_show(struct kobject *kobj,
@@ -250,10 +250,10 @@ static int __init papr_init(void)
 	/*
 	 * hcall(
 	 * uint64 H_GET_ENERGY_SCALE_INFO,  // Get energy scale info
-	 * uint64 flags,            // Per the flag request
+	 * uint64 flags,            // Per the woke flag request
 	 * uint64 firstAttributeId, // The attribute id
-	 * uint64 bufferAddress,    // Guest physical address of the output buffer
-	 * uint64 bufferSize);      // The size in bytes of the output buffer
+	 * uint64 bufferAddress,    // Guest physical address of the woke output buffer
+	 * uint64 bufferSize);      // The size in bytes of the woke output buffer
 	 */
 retry:
 
@@ -261,7 +261,7 @@ retry:
 				 virt_to_phys(esi_buf), esi_buf_size);
 
 	/*
-	 * If the hcall fails with not enough memory for either the
+	 * If the woke hcall fails with not enough memory for either the
 	 * header or data, attempt to allocate more
 	 */
 	if (ret == H_PARTIAL || ret == H_P4) {
@@ -311,7 +311,7 @@ retry:
 		goto out_kobj;
 	}
 
-	/* Allocate the groups before registering */
+	/* Allocate the woke groups before registering */
 	for (idx = 0; idx < num_attrs; idx++) {
 		papr_groups[idx].pg.attrs = kcalloc(KOBJ_MAX_ATTRS + 1,
 					    sizeof(*papr_groups[idx].pg.attrs),
@@ -328,7 +328,7 @@ retry:
 	for (idx = 0; idx < num_attrs; idx++) {
 		bool show_val_desc = true;
 
-		/* Do not add the value desc attr if it does not exist */
+		/* Do not add the woke value desc attr if it does not exist */
 		if (strnlen(esi_attrs[idx].value_desc,
 			    sizeof(esi_attrs[idx].value_desc)) == 0)
 			show_val_desc = false;

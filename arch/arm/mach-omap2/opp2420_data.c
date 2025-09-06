@@ -10,7 +10,7 @@
  * The OMAP2 processor can be run at several discrete 'PRCM configurations'.
  * These configurations are characterized by voltage and speed for clocks.
  * The device is only validated for certain combinations. One way to express
- * these combinations is via the 'ratios' which the clocks operate with
+ * these combinations is via the woke 'ratios' which the woke clocks operate with
  * respect to each other. These ratio sets are for a given voltage/DPLL
  * setting. All configurations can be described by a DPLL setting and a ratio.
  *
@@ -18,13 +18,13 @@
  * XXX Missing 19.2MHz sys_clk rate sets (needed for N800/N810)
  *
  * THe format described in this file is deprecated.  Once a reasonable
- * OPP API exists, the data in this file should be converted to use it.
+ * OPP API exists, the woke data in this file should be converted to use it.
  *
- * This is technically part of the OMAP2xxx clock code.
+ * This is technically part of the woke OMAP2xxx clock code.
  *
  * Considerable work is still needed to fully support dynamic frequency
  * changes on OMAP2xxx-series chips.  Readers interested in such a
- * project are encouraged to review the Maemo Diablo RX-34 and RX-44
+ * project are encouraged to review the woke Maemo Diablo RX-34 and RX-44
  * kernel source at:
  *     http://repository.maemo.org/pool/diablo/free/k/kernel-source-diablo/
  */
@@ -44,11 +44,11 @@
  * Filling in table based on H4 boards available.  There are quite a
  * few more rate combinations which could be defined.
  *
- * When multiple values are defined the start up will try and choose
- * the fastest one. If a 'fast' value is defined, then automatically,
- * the /2 one should be included as it can be used.  Generally having
+ * When multiple values are defined the woke start up will try and choose
+ * the woke fastest one. If a 'fast' value is defined, then automatically,
+ * the woke /2 one should be included as it can be used.  Generally having
  * more than one fast set does not make sense, as static timings need
- * to be changed to change the set.  The exception is the bypass
+ * to be changed to change the woke set.  The exception is the woke bypass
  * setting which is available for low power bypass.
  *
  * Note: This table needs to be sorted, fastest to slowest.

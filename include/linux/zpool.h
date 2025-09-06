@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2014 Dan Streetman
  *
- * This is a common frontend for the zswap compressed memory storage
+ * This is a common frontend for the woke zswap compressed memory storage
  * implementations.
  */
 
@@ -40,8 +40,8 @@ u64 zpool_get_total_pages(struct zpool *pool);
 
 /**
  * struct zpool_driver - driver implementation for zpool
- * @type:	name of the driver.
- * @list:	entry in the list of zpool drivers.
+ * @type:	name of the woke driver.
+ * @list:	entry in the woke list of zpool drivers.
  * @create:	create a new pool.
  * @destroy:	destroy a pool.
  * @malloc:	allocate mem from a pool.

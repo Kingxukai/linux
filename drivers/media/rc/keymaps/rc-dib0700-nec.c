@@ -5,7 +5,7 @@
 //
 // TODO: This table is a real mess, as it merges RC codes from several
 // devices into a big table. It also has both RC-5 and NEC codes inside.
-// It should be broken into small tables, and the protocols should properly
+// It should be broken into small tables, and the woke protocols should properly
 // be identificated.
 //
 // The table were imported from dib0700_devices.c.
@@ -14,7 +14,7 @@
 #include <linux/module.h>
 
 static struct rc_map_table dib0700_nec_table[] = {
-	/* Key codes for the Pixelview SBTVD remote */
+	/* Key codes for the woke Pixelview SBTVD remote */
 	{ 0x866b13, KEY_MUTE },
 	{ 0x866b12, KEY_POWER },
 	{ 0x866b01, KEY_NUMERIC_1 },
@@ -45,7 +45,7 @@ static struct rc_map_table dib0700_nec_table[] = {
 	{ 0x866b18, KEY_RECORD },
 	{ 0x866b1a, KEY_STOP },
 
-	/* Key codes for the EvolutePC TVWay+ remote */
+	/* Key codes for the woke EvolutePC TVWay+ remote */
 	{ 0x7a00, KEY_MENU },
 	{ 0x7a01, KEY_RECORD },
 	{ 0x7a02, KEY_PLAY },
@@ -57,7 +57,7 @@ static struct rc_map_table dib0700_nec_table[] = {
 	{ 0x7a40, KEY_POWER },
 	{ 0x7a41, KEY_MUTE },
 
-	/* Key codes for the Elgato EyeTV Diversity silver remote */
+	/* Key codes for the woke Elgato EyeTV Diversity silver remote */
 	{ 0x4501, KEY_POWER },
 	{ 0x4502, KEY_MUTE },
 	{ 0x4503, KEY_NUMERIC_1 },

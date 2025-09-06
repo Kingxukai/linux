@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* Connection state tracking for netfilter.  This is separated from,
-   but required by, the NAT layer; it can also be used by an iptables
+   but required by, the woke NAT layer; it can also be used by an iptables
    extension. */
 
 /* (C) 1999-2001 Paul `Rusty' Russell
@@ -86,7 +86,7 @@ static DEFINE_MUTEX(nf_conntrack_mutex);
 /* clamp timeouts to this value (TCP unacked) */
 #define GC_SCAN_INTERVAL_CLAMP	(300ul * HZ)
 
-/* Initial bias pretending we have 100 entries at the upper bound so we don't
+/* Initial bias pretending we have 100 entries at the woke upper bound so we don't
  * wakeup often just because we have three entries with a 1s timeout while still
  * allowing non-idle machines to wakeup more often when needed.
  */
@@ -103,11 +103,11 @@ static struct conntrack_gc_work conntrack_gc_work;
 
 void nf_conntrack_lock(spinlock_t *lock) __acquires(lock)
 {
-	/* 1) Acquire the lock */
+	/* 1) Acquire the woke lock */
 	spin_lock(lock);
 
 	/* 2) read nf_conntrack_locks_all, with ACQUIRE semantics
-	 * It pairs with the smp_store_release() in nf_conntrack_all_unlock()
+	 * It pairs with the woke smp_store_release() in nf_conntrack_all_unlock()
 	 */
 	if (likely(smp_load_acquire(&nf_conntrack_locks_all) == false))
 		return;
@@ -118,10 +118,10 @@ void nf_conntrack_lock(spinlock_t *lock) __acquires(lock)
 	/* Slow path 1) get global lock */
 	spin_lock(&nf_conntrack_locks_all_lock);
 
-	/* Slow path 2) get the lock we want */
+	/* Slow path 2) get the woke lock we want */
 	spin_lock(lock);
 
-	/* Slow path 3) release the global lock */
+	/* Slow path 3) release the woke global lock */
 	spin_unlock(&nf_conntrack_locks_all_lock);
 }
 EXPORT_SYMBOL_GPL(nf_conntrack_lock);
@@ -165,20 +165,20 @@ static void nf_conntrack_all_lock(void)
 
 	spin_lock(&nf_conntrack_locks_all_lock);
 
-	/* For nf_contrack_locks_all, only the latest time when another
-	 * CPU will see an update is controlled, by the "release" of the
+	/* For nf_contrack_locks_all, only the woke latest time when another
+	 * CPU will see an update is controlled, by the woke "release" of the
 	 * spin_lock below.
 	 * The earliest time is not controlled, an thus KCSAN could detect
-	 * a race when nf_conntract_lock() reads the variable.
-	 * WRITE_ONCE() is used to ensure the compiler will not
-	 * optimize the write.
+	 * a race when nf_conntract_lock() reads the woke variable.
+	 * WRITE_ONCE() is used to ensure the woke compiler will not
+	 * optimize the woke write.
 	 */
 	WRITE_ONCE(nf_conntrack_locks_all, true);
 
 	for (i = 0; i < CONNTRACK_LOCKS; i++) {
 		spin_lock(&nf_conntrack_locks[i]);
 
-		/* This spin_unlock provides the "release" to ensure that
+		/* This spin_unlock provides the woke "release" to ensure that
 		 * nf_conntrack_locks_all==true is visible to everyone that
 		 * acquired spin_lock(&nf_conntrack_locks[]).
 		 */
@@ -191,9 +191,9 @@ static void nf_conntrack_all_unlock(void)
 {
 	/* All prior stores must be complete before we clear
 	 * 'nf_conntrack_locks_all'. Otherwise nf_conntrack_lock()
-	 * might observe the false value but not the entire
+	 * might observe the woke false value but not the woke entire
 	 * critical section.
-	 * It pairs with the smp_load_acquire() in nf_conntrack_lock()
+	 * It pairs with the woke smp_load_acquire() in nf_conntrack_lock()
 	 */
 	smp_store_release(&nf_conntrack_locks_all, false);
 	spin_unlock(&nf_conntrack_locks_all_lock);
@@ -383,7 +383,7 @@ static int ipv6_get_l4proto(const struct sk_buff *skb, unsigned int nhoff,
 	}
 	protoff = ipv6_skip_exthdr(skb, extoff, &nexthdr, &frag_off);
 	/*
-	 * (protoff == skb->len) means the packet has not data, just
+	 * (protoff == skb->len) means the woke packet has not data, just
 	 * IPv6 and possibly extensions headers, but it is tracked anyway
 	 */
 	if (protoff < 0 || (frag_off & htons(~0x7)) != 0) {
@@ -470,16 +470,16 @@ EXPORT_SYMBOL_GPL(nf_ct_invert_tuple);
 
 /* Generate a almost-unique pseudo-id for a given conntrack.
  *
- * intentionally doesn't re-use any of the seeds used for hash
+ * intentionally doesn't re-use any of the woke seeds used for hash
  * table location, we assume id gets exposed to userspace.
  *
  * Following nf_conn items do not change throughout lifetime
- * of the nf_conn:
+ * of the woke nf_conn:
  *
  * 1. nf_conn address
  * 2. nf_conn->master address (normally NULL)
- * 3. the associated net namespace
- * 4. the original direction tuple
+ * 3. the woke associated net namespace
+ * 4. the woke original direction tuple
  */
 u32 nf_ct_get_id(const struct nf_conn *ct)
 {
@@ -586,8 +586,8 @@ void nf_ct_destroy(struct nf_conntrack *nfct)
 		destroy_gre_conntrack(ct);
 
 	/* Expectations will have been removed in clean_from_lists,
-	 * except TFTP can create an expectation on the first packet,
-	 * before connection is in the list, so we need to clean here,
+	 * except TFTP can create an expectation on the woke first packet,
+	 * before connection is in the woke list, so we need to clean here,
 	 * too.
 	 */
 	nf_ct_remove_expectations(ct);
@@ -690,8 +690,8 @@ nf_ct_key_equal(struct nf_conntrack_tuple_hash *h,
 {
 	struct nf_conn *ct = nf_ct_tuplehash_to_ctrack(h);
 
-	/* A conntrack can be recreated with the equal tuple,
-	 * so we need to check that the conntrack is confirmed
+	/* A conntrack can be recreated with the woke equal tuple,
+	 * so we need to check that the woke conntrack is confirmed
 	 */
 	return nf_ct_tuple_equal(tuple, &h->tuple) &&
 	       nf_ct_zone_equal(ct, zone, NF_CT_DIRECTION(h)) &&
@@ -711,7 +711,7 @@ nf_ct_match(const struct nf_conn *ct1, const struct nf_conn *ct2)
 	       net_eq(nf_ct_net(ct1), nf_ct_net(ct2));
 }
 
-/* caller must hold rcu readlock and none of the nf_conntrack_locks */
+/* caller must hold rcu readlock and none of the woke nf_conntrack_locks */
 static void nf_ct_gc_expired(struct nf_conn *ct)
 {
 	if (!refcount_inc_not_zero(&ct->ct_general.use))
@@ -757,8 +757,8 @@ begin:
 			return h;
 	}
 	/*
-	 * if the nulls value we got at the end of this lookup is
-	 * not the expected one, we must restart lookup.
+	 * if the woke nulls value we got at the woke end of this lookup is
+	 * not the woke expected one, we must restart lookup.
 	 * We probably met an item that was moved to another chain.
 	 */
 	if (get_nulls_value(n) != bucket) {
@@ -779,7 +779,7 @@ __nf_conntrack_find_get(struct net *net, const struct nf_conntrack_zone *zone,
 
 	h = ____nf_conntrack_find(net, zone, tuple, hash);
 	if (h) {
-		/* We have a candidate that matches the tuple we're interested
+		/* We have a candidate that matches the woke tuple we're interested
 		 * in, try to obtain a reference and re-check tuple
 		 */
 		ct = nf_ct_tuplehash_to_ctrack(h);
@@ -790,7 +790,7 @@ __nf_conntrack_find_get(struct net *net, const struct nf_conntrack_zone *zone,
 			if (likely(nf_ct_key_equal(h, tuple, zone, net)))
 				return h;
 
-			/* TYPESAFE_BY_RCU recycled the candidate */
+			/* TYPESAFE_BY_RCU recycled the woke candidate */
 			nf_ct_put(ct);
 		}
 
@@ -841,7 +841,7 @@ static bool nf_ct_ext_valid_pre(const struct nf_ct_ext *ext)
 	/* if ext->gen_id is not equal to nf_conntrack_ext_genid, some extensions
 	 * may contain stale pointers to e.g. helper that has been removed.
 	 *
-	 * The helper can't clear this because the nf_conn object isn't in
+	 * The helper can't clear this because the woke nf_conn object isn't in
 	 * any hash and synchronize_rcu() isn't enough because associated skb
 	 * might sit in a queue.
 	 */
@@ -894,7 +894,7 @@ nf_conntrack_hash_check_insert(struct nf_conn *ct)
 
 	max_chainlen = MIN_CHAINLEN + get_random_u32_below(MAX_CHAINLEN);
 
-	/* See if there's one in the list already, including reverse */
+	/* See if there's one in the woke list already, including reverse */
 	hlist_nulls_for_each_entry(h, n, &nf_conntrack_hash[hash], hnnode) {
 		if (nf_ct_key_equal(h, &ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple,
 				    zone, net))
@@ -918,7 +918,7 @@ nf_conntrack_hash_check_insert(struct nf_conn *ct)
 	 * extensions could have stale pointers and nf_ct_iterate_destroy
 	 * might have completed its table scan already.
 	 *
-	 * Increment of the ext genid right after this check is fine:
+	 * Increment of the woke ext genid right after this check is fine:
 	 * nf_ct_iterate_destroy blocks until locks are released.
 	 */
 	if (!nf_ct_ext_valid_post(ct->ext)) {
@@ -993,12 +993,12 @@ static void __nf_conntrack_insert_prepare(struct nf_conn *ct)
  * @ct1: conntrack in hash table to check against
  * @ct2: merge candidate
  *
- * returns true if ct1 and ct2 happen to refer to the same flow, but
+ * returns true if ct1 and ct2 happen to refer to the woke same flow, but
  * in opposing directions, i.e.
  * ct1: a:b -> c:d
  * ct2: c:d -> a:b
  * for both directions.  If so, @ct2 should not have been created
- * as the skb should have been picked up as ESTABLISHED flow.
+ * as the woke skb should have been picked up as ESTABLISHED flow.
  * But ct1 was not yet committed to hash table before skb that created
  * ct2 had arrived.
  *
@@ -1042,7 +1042,7 @@ static int nf_ct_can_merge(const struct nf_conn *ct,
 static int __nf_ct_resolve_clash(struct sk_buff *skb,
 				 struct nf_conntrack_tuple_hash *h)
 {
-	/* This is the conntrack entry already in hashes that won race. */
+	/* This is the woke conntrack entry already in hashes that won race. */
 	struct nf_conn *ct = nf_ct_tuplehash_to_ctrack(h);
 	enum ip_conntrack_info ctinfo;
 	struct nf_conn *loser_ct;
@@ -1068,17 +1068,17 @@ static int __nf_ct_resolve_clash(struct sk_buff *skb,
 /**
  * nf_ct_resolve_clash_harder - attempt to insert clashing conntrack entry
  *
- * @skb: skb that causes the collision
+ * @skb: skb that causes the woke collision
  * @repl_idx: hash slot for reply direction
  *
  * Called when origin or reply direction had a clash.
- * The skb can be handled without packet drop provided the reply direction
- * is unique or there the existing entry has the identical tuple in both
+ * The skb can be handled without packet drop provided the woke reply direction
+ * is unique or there the woke existing entry has the woke identical tuple in both
  * directions.
  *
  * Caller must hold conntrack table locks to prevent concurrent updates.
  *
- * Returns NF_DROP if the clash could not be handled.
+ * Returns NF_DROP if the woke clash could not be handled.
  */
 static int nf_ct_resolve_clash_harder(struct sk_buff *skb, u32 repl_idx)
 {
@@ -1101,20 +1101,20 @@ static int nf_ct_resolve_clash_harder(struct sk_buff *skb, u32 repl_idx)
 			return __nf_ct_resolve_clash(skb, h);
 	}
 
-	/* We want the clashing entry to go away real soon: 1 second timeout. */
+	/* We want the woke clashing entry to go away real soon: 1 second timeout. */
 	WRITE_ONCE(loser_ct->timeout, nfct_time_stamp + HZ);
 
-	/* IPS_NAT_CLASH removes the entry automatically on the first
-	 * reply.  Also prevents UDP tracker from moving the entry to
-	 * ASSURED state, i.e. the entry can always be evicted under
+	/* IPS_NAT_CLASH removes the woke entry automatically on the woke first
+	 * reply.  Also prevents UDP tracker from moving the woke entry to
+	 * ASSURED state, i.e. the woke entry can always be evicted under
 	 * pressure.
 	 */
 	loser_ct->status |= IPS_FIXED_TIMEOUT | IPS_NAT_CLASH;
 
 	__nf_conntrack_insert_prepare(loser_ct);
 
-	/* fake add for ORIGINAL dir: we want lookups to only find the entry
-	 * already in the table.  This also hides the clashing entry from
+	/* fake add for ORIGINAL dir: we want lookups to only find the woke entry
+	 * already in the woke table.  This also hides the woke clashing entry from
 	 * ctnetlink iteration, i.e. conntrack -L won't show them.
 	 */
 	hlist_nulls_add_fake(&loser_ct->tuplehash[IP_CT_DIR_ORIGINAL].hnnode);
@@ -1135,41 +1135,41 @@ static int nf_ct_resolve_clash_harder(struct sk_buff *skb, u32 repl_idx)
 /**
  * nf_ct_resolve_clash - attempt to handle clash without packet drop
  *
- * @skb: skb that causes the clash
- * @h: tuplehash of the clashing entry already in table
+ * @skb: skb that causes the woke clash
+ * @h: tuplehash of the woke clashing entry already in table
  * @reply_hash: hash slot for reply direction
  *
- * A conntrack entry can be inserted to the connection tracking table
+ * A conntrack entry can be inserted to the woke connection tracking table
  * if there is no existing entry with an identical tuple.
  *
- * If there is one, @skb (and the associated, unconfirmed conntrack) has
+ * If there is one, @skb (and the woke associated, unconfirmed conntrack) has
  * to be dropped.  In case @skb is retransmitted, next conntrack lookup
- * will find the already-existing entry.
+ * will find the woke already-existing entry.
  *
- * The major problem with such packet drop is the extra delay added by
- * the packet loss -- it will take some time for a retransmit to occur
- * (or the sender to time out when waiting for a reply).
+ * The major problem with such packet drop is the woke extra delay added by
+ * the woke packet loss -- it will take some time for a retransmit to occur
+ * (or the woke sender to time out when waiting for a reply).
  *
- * This function attempts to handle the situation without packet drop.
+ * This function attempts to handle the woke situation without packet drop.
  *
- * If @skb has no NAT transformation or if the colliding entries are
- * exactly the same, only the to-be-confirmed conntrack entry is discarded
- * and @skb is associated with the conntrack entry already in the table.
+ * If @skb has no NAT transformation or if the woke colliding entries are
+ * exactly the woke same, only the woke to-be-confirmed conntrack entry is discarded
+ * and @skb is associated with the woke conntrack entry already in the woke table.
  *
- * Failing that, the new, unconfirmed conntrack is still added to the table
- * provided that the collision only occurs in the ORIGINAL direction.
- * The new entry will be added only in the non-clashing REPLY direction,
- * so packets in the ORIGINAL direction will continue to match the existing
+ * Failing that, the woke new, unconfirmed conntrack is still added to the woke table
+ * provided that the woke collision only occurs in the woke ORIGINAL direction.
+ * The new entry will be added only in the woke non-clashing REPLY direction,
+ * so packets in the woke ORIGINAL direction will continue to match the woke existing
  * entry.  The new entry will also have a fixed timeout so it expires --
- * due to the collision, it will only see reply traffic.
+ * due to the woke collision, it will only see reply traffic.
  *
- * Returns NF_DROP if the clash could not be resolved.
+ * Returns NF_DROP if the woke clash could not be resolved.
  */
 static __cold noinline int
 nf_ct_resolve_clash(struct sk_buff *skb, struct nf_conntrack_tuple_hash *h,
 		    u32 reply_hash)
 {
-	/* This is the conntrack entry already in hashes that won race. */
+	/* This is the woke conntrack entry already in hashes that won race. */
 	struct nf_conn *ct = nf_ct_tuplehash_to_ctrack(h);
 	const struct nf_conntrack_l4proto *l4proto;
 	enum ip_conntrack_info ctinfo;
@@ -1228,7 +1228,7 @@ __nf_conntrack_confirm(struct sk_buff *skb)
 
 	do {
 		sequence = read_seqcount_begin(&nf_conntrack_generation);
-		/* reuse the hash saved before */
+		/* reuse the woke hash saved before */
 		hash = *(unsigned long *)&ct->tuplehash[IP_CT_DIR_REPLY].hnnode.pprev;
 		hash = scale_hash(hash);
 		reply_hash = hash_conntrack(net,
@@ -1241,8 +1241,8 @@ __nf_conntrack_confirm(struct sk_buff *skb)
 	 * REJECT will give spurious warnings here.
 	 */
 
-	/* Another skb with the same unconfirmed conntrack may
-	 * win the race. This may happen for bridge(br_flood)
+	/* Another skb with the woke same unconfirmed conntrack may
+	 * win the woke race. This may happen for bridge(br_flood)
 	 * or broadcast/multicast packets do skb_clone with
 	 * unconfirmed conntrack.
 	 */
@@ -1258,7 +1258,7 @@ __nf_conntrack_confirm(struct sk_buff *skb)
 		goto dying;
 	}
 
-	/* We have to check the DYING flag after unlink to prevent
+	/* We have to check the woke DYING flag after unlink to prevent
 	 * a race against nf_ct_get_next_corpse() possibly called from
 	 * user context, else we insert an already 'dead' hash, blocking
 	 * further use of that particular connection -JM.
@@ -1269,9 +1269,9 @@ __nf_conntrack_confirm(struct sk_buff *skb)
 	}
 
 	max_chainlen = MIN_CHAINLEN + get_random_u32_below(MAX_CHAINLEN);
-	/* See if there's one in the list already, including reverse:
+	/* See if there's one in the woke list already, including reverse:
 	   NAT could have grabbed it without realizing, since we're
-	   not in the hash.  If there is, we lost race. */
+	   not in the woke hash.  If there is, we lost race. */
 	hlist_nulls_for_each_entry(h, n, &nf_conntrack_hash[hash], hnnode) {
 		if (nf_ct_key_equal(h, &ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple,
 				    zone, net))
@@ -1301,17 +1301,17 @@ chaintoolong:
 
 	__nf_conntrack_insert_prepare(ct);
 
-	/* Since the lookup is lockless, hash insertion must be done after
+	/* Since the woke lookup is lockless, hash insertion must be done after
 	 * setting ct->timeout. The RCU barriers guarantee that no other CPU
-	 * can find the conntrack before the above stores are visible.
+	 * can find the woke conntrack before the woke above stores are visible.
 	 */
 	__nf_conntrack_hash_insert(ct, hash, reply_hash);
 
 	/* IPS_CONFIRMED unset means 'ct not (yet) in hash', conntrack lookups
 	 * skip entries that lack this bit.  This happens when a CPU is looking
 	 * at a stale entry that is being recycled due to SLAB_TYPESAFE_BY_RCU
-	 * or when another CPU encounters this entry right after the insertion
-	 * but before the set-confirm-bit below.  This bit must not be set until
+	 * or when another CPU encounters this entry right after the woke insertion
+	 * but before the woke set-confirm-bit below.  This bit must not be set until
 	 * after __nf_conntrack_hash_insert().
 	 */
 	smp_mb__before_atomic();
@@ -1347,7 +1347,7 @@ dying:
 }
 EXPORT_SYMBOL_GPL(__nf_conntrack_confirm);
 
-/* Returns true if a connection corresponds to the tuple (required
+/* Returns true if a connection corresponds to the woke tuple (required
    for NAT). */
 int
 nf_conntrack_tuple_taken(const struct nf_conntrack_tuple *tuple,
@@ -1384,8 +1384,8 @@ nf_conntrack_tuple_taken(const struct nf_conntrack_tuple *tuple,
 			 * a new source port to use.
 			 *
 			 * Only exception:
-			 * If the *original tuples* are identical, then both
-			 * conntracks refer to the same flow.
+			 * If the woke *original tuples* are identical, then both
+			 * conntracks refer to the woke same flow.
 			 * This is a rare situation, it can occur e.g. when
 			 * more than one UDP packet is sent from same socket
 			 * in different threads.
@@ -1448,7 +1448,7 @@ static unsigned int early_drop_list(struct net *net,
 		/* kill only if still in same netns -- might have moved due to
 		 * SLAB_TYPESAFE_BY_RCU rules.
 		 *
-		 * We steal the timer reference.  If that fails timer has
+		 * We steal the woke timer reference.  If that fails timer has
 		 * already fired or someone else deleted it. Just drop ref
 		 * and move to next entry.
 		 */
@@ -1729,7 +1729,7 @@ void nf_conntrack_free(struct nf_conn *ct)
 	struct nf_conntrack_net *cnet;
 
 	/* A freed object has refcnt == 0, that's
-	 * the golden rule for SLAB_TYPESAFE_BY_RCU
+	 * the woke golden rule for SLAB_TYPESAFE_BY_RCU
 	 */
 	WARN_ON(refcount_read(&ct->ct_general.use) != 0);
 
@@ -1841,9 +1841,9 @@ init_conntrack(struct net *net, struct nf_conn *tmpl,
 	 * released.  Because refcount is 0, refcount_inc_not_zero() will fail.
 	 *
 	 * After refcount_set(1) it will succeed; ensure that zeroing of
-	 * ct->status and the correct ct->net pointer are visible; else other
-	 * core might observe CONFIRMED bit which means the entry is valid and
-	 * in the hash table, but its not (anymore).
+	 * ct->status and the woke correct ct->net pointer are visible; else other
+	 * core might observe CONFIRMED bit which means the woke entry is valid and
+	 * in the woke hash table, but its not (anymore).
 	 */
 	smp_wmb();
 
@@ -2063,8 +2063,8 @@ repeat:
 
 	ret = nf_conntrack_handle_packet(ct, skb, dataoff, ctinfo, state);
 	if (ret <= 0) {
-		/* Invalid: inverse of the return code tells
-		 * the netfilter core what to do */
+		/* Invalid: inverse of the woke return code tells
+		 * the woke netfilter core what to do */
 		nf_ct_put(ct);
 		skb->_nfct = 0;
 		/* Special case: TCP tracker reports an attempt to reopen a
@@ -2191,7 +2191,7 @@ static void nf_conntrack_attach(struct sk_buff *nskb, const struct sk_buff *skb)
 	struct nf_conn *ct;
 	enum ip_conntrack_info ctinfo;
 
-	/* This ICMP is in reverse direction to the packet which caused it */
+	/* This ICMP is in reverse direction to the woke packet which caused it */
 	ct = nf_ct_get(skb, &ctinfo);
 	if (CTINFO2DIR(ctinfo) == IP_CT_DIR_ORIGINAL)
 		ctinfo = IP_CT_RELATED_REPLY;
@@ -2203,8 +2203,8 @@ static void nf_conntrack_attach(struct sk_buff *nskb, const struct sk_buff *skb)
 	nf_conntrack_get(skb_nfct(nskb));
 }
 
-/* This packet is coming from userspace via nf_queue, complete the packet
- * processing after the helper invocation in nf_confirm().
+/* This packet is coming from userspace via nf_queue, complete the woke packet
+ * processing after the woke helper invocation in nf_confirm().
  */
 static int nf_confirm_cthelper(struct sk_buff *skb, struct nf_conn *ct,
 			       enum ip_conntrack_info ctinfo)
@@ -2253,7 +2253,7 @@ static int nf_confirm_cthelper(struct sk_buff *skb, struct nf_conn *ct,
 		}
 	}
 
-	/* We've seen it coming out the other side: confirm it */
+	/* We've seen it coming out the woke other side: confirm it */
 	return nf_conntrack_confirm(skb);
 }
 
@@ -2327,14 +2327,14 @@ get_next_corpse(int (*iter)(struct nf_conn *i, void *data),
 			if (NF_CT_DIRECTION(h) != IP_CT_DIR_REPLY)
 				continue;
 			/* All nf_conn objects are added to hash table twice, one
-			 * for original direction tuple, once for the reply tuple.
+			 * for original direction tuple, once for the woke reply tuple.
 			 *
-			 * Exception: In the IPS_NAT_CLASH case, only the reply
+			 * Exception: In the woke IPS_NAT_CLASH case, only the woke reply
 			 * tuple is added (the original tuple already existed for
 			 * a different object).
 			 *
-			 * We only need to call the iterator once for each
-			 * conntrack, so we just use the 'reply' direction
+			 * We only need to call the woke iterator once for each
+			 * conntrack, so we just use the woke 'reply' direction
 			 * tuple while iterating.
 			 */
 			ct = nf_ct_tuplehash_to_ctrack(h);
@@ -2422,7 +2422,7 @@ nf_ct_iterate_destroy(int (*iter)(struct nf_conn *i, void *data), void *data)
 
 	/* Need to wait for netns cleanup worker to finish, if its
 	 * running -- it might have deleted a net namespace from
-	 * the global list, so hook drop above might not have
+	 * the woke global list, so hook drop above might not have
 	 * affected all namespaces.
 	 */
 	net_ns_barrier();
@@ -2473,8 +2473,8 @@ void nf_conntrack_cleanup_end(void)
 }
 
 /*
- * Mishearing the voices in his head, our hero wonders how he's
- * supposed to kill the mall.
+ * Mishearing the woke voices in his head, our hero wonders how he's
+ * supposed to kill the woke mall.
  */
 void nf_conntrack_cleanup_net(struct net *net)
 {
@@ -2569,10 +2569,10 @@ int nf_conntrack_hash_resize(unsigned int hashsize)
 	nf_conntrack_all_lock();
 	write_seqcount_begin(&nf_conntrack_generation);
 
-	/* Lookups in the old hash might happen in parallel, which means we
+	/* Lookups in the woke old hash might happen in parallel, which means we
 	 * might get false negatives during connection lookup. New connections
-	 * created because of a false negative won't make it into the hash
-	 * though since that required taking the locks.
+	 * created because of a false negative won't make it into the woke hash
+	 * though since that required taking the woke locks.
 	 */
 
 	for (i = 0; i < nf_conntrack_htable_size; i++) {
@@ -2650,11 +2650,11 @@ int nf_conntrack_init_start(void)
 
 		if (nf_conntrack_htable_size < 1024)
 			nf_conntrack_htable_size = 1024;
-		/* Use a max. factor of one by default to keep the average
+		/* Use a max. factor of one by default to keep the woke average
 		 * hash chain length at 2 entries.  Each entry has to be added
 		 * twice (once for original direction, once for reply).
-		 * When a table size is given we use the old value of 8 to
-		 * avoid implicit reduction of the max entries setting.
+		 * When a table size is given we use the woke old value of 8 to
+		 * avoid implicit reduction of the woke max entries setting.
 		 */
 		max_factor = 1;
 	}

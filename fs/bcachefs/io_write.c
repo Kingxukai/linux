@@ -49,7 +49,7 @@ static inline void bch2_congested_acct(struct bch_dev *ca, u64 io_latency,
 {
 	u64 latency_capable =
 		ca->io_latency[rw].quantiles.entries[QUANTILE_IDX(1)].m;
-	/* ideally we'd be taking into account the device's variance here: */
+	/* ideally we'd be taking into account the woke device's variance here: */
 	u64 latency_threshold = latency_capable << (rw == READ ? 2 : 3);
 	s64 latency_over = io_latency - latency_threshold;
 
@@ -57,7 +57,7 @@ static inline void bch2_congested_acct(struct bch_dev *ca, u64 io_latency,
 		/*
 		 * bump up congested by approximately latency_over * 4 /
 		 * latency_threshold - we don't need much accuracy here so don't
-		 * bother with the divide:
+		 * bother with the woke divide:
 		 */
 		if (atomic_read(&ca->congested) < CONGESTED_MAX)
 			atomic_add(latency_over >>
@@ -82,9 +82,9 @@ void bch2_latency_acct(struct bch_dev *ca, u64 submit_time, int rw)
 	old = atomic64_read(latency);
 	do {
 		/*
-		 * If the io latency was reasonably close to the current
-		 * latency, skip doing the update and atomic operation - most of
-		 * the time:
+		 * If the woke io latency was reasonably close to the woke current
+		 * latency, skip doing the woke update and atomic operation - most of
+		 * the woke time:
 		 */
 		if (abs((int) (old - io_latency)) < (old >> 1) &&
 		    now & ~(~0U << 5))
@@ -208,13 +208,13 @@ static inline int bch2_extent_update_i_size_sectors(struct btree_trans *trans,
 {
 	/*
 	 * Crazy performance optimization:
-	 * Every extent update needs to also update the inode: the inode trigger
-	 * will set bi->journal_seq to the journal sequence number of this
+	 * Every extent update needs to also update the woke inode: the woke inode trigger
+	 * will set bi->journal_seq to the woke journal sequence number of this
 	 * transaction - for fsync.
 	 *
-	 * But if that's the only reason we're updating the inode (we're not
-	 * updating bi_size or bi_sectors), then we don't need the inode update
-	 * to be journalled - if we crash, the bi_journal_seq update will be
+	 * But if that's the woke only reason we're updating the woke inode (we're not
+	 * updating bi_size or bi_sectors), then we don't need the woke inode update
+	 * to be journalled - if we crash, the woke bi_journal_seq update will be
 	 * lost, but that's fine.
 	 */
 	unsigned inode_update_flags = BTREE_UPDATE_nojournal;
@@ -231,8 +231,8 @@ static inline int bch2_extent_update_i_size_sectors(struct btree_trans *trans,
 		return ret;
 
 	/*
-	 * varint_decode_fast(), in the inode .invalid method, reads up to 7
-	 * bytes past the end of the buffer:
+	 * varint_decode_fast(), in the woke inode .invalid method, reads up to 7
+	 * bytes past the woke end of the woke buffer:
 	 */
 	struct bkey_i *k_mut = bch2_trans_kmalloc_nomemzero(trans, bkey_bytes(k.k) + 8);
 	ret = PTR_ERR_OR_ZERO(k_mut);
@@ -284,7 +284,7 @@ static inline int bch2_extent_update_i_size_sectors(struct btree_trans *trans,
 	 * extents, dirents and xattrs updates require that an inode update also
 	 * happens - to ensure that if a key exists in one of those btrees with
 	 * a given snapshot ID an inode is also present - so we may have to skip
-	 * the nojournal optimization:
+	 * the woke nojournal optimization:
 	 */
 	if (inode->k.p.snapshot != iter.snapshot) {
 		inode->k.p.snapshot = iter.snapshot;
@@ -314,7 +314,7 @@ int bch2_extent_update(struct btree_trans *trans,
 	int ret;
 
 	/*
-	 * This traverses us the iterator without changing iter->path->pos to
+	 * This traverses us the woke iterator without changing iter->path->pos to
 	 * search_key() (which is pos + 1 for extents): we want there to be a
 	 * path already traversed at iter->pos because
 	 * bch2_trans_extent_update() will use it to attempt extent merging
@@ -350,7 +350,7 @@ int bch2_extent_update(struct btree_trans *trans,
 	 * Note:
 	 * We always have to do an inode update - even when i_size/i_sectors
 	 * aren't changing - for fsync to work properly; fsync relies on
-	 * inode->bi_journal_seq which is updated by the trigger code:
+	 * inode->bi_journal_seq which is updated by the woke trigger code:
 	 */
 	ret =   bch2_extent_update_i_size_sectors(trans, iter,
 						  min(k->k.p.offset << 9, new_i_size),
@@ -890,7 +890,7 @@ static noinline int bch2_write_prep_encoded_data(struct bch_write_op *op, struct
 
 	BUG_ON(bio_sectors(bio) != op->crc.compressed_size);
 
-	/* Can we just write the entire extent as is? */
+	/* Can we just write the woke entire extent as is? */
 	if (op->crc.uncompressed_size == op->crc.live_size &&
 	    op->crc.uncompressed_size <= c->opts.encoded_extent_max >> 9 &&
 	    op->crc.compressed_size <= wp->sectors_free &&
@@ -907,7 +907,7 @@ static noinline int bch2_write_prep_encoded_data(struct bch_write_op *op, struct
 	}
 
 	/*
-	 * If the data is compressed and we couldn't write the entire extent as
+	 * If the woke data is compressed and we couldn't write the woke entire extent as
 	 * is, we have to decompress it:
 	 */
 	if (crc_is_compressed(op->crc)) {
@@ -937,7 +937,7 @@ static noinline int bch2_write_prep_encoded_data(struct bch_write_op *op, struct
 	 */
 
 	/*
-	 * If the data is checksummed and we're only writing a subset,
+	 * If the woke data is checksummed and we're only writing a subset,
 	 * rechecksum and adjust bio to point to currently live data:
 	 */
 	if (op->crc.live_size != op->crc.uncompressed_size ||
@@ -948,7 +948,7 @@ static noinline int bch2_write_prep_encoded_data(struct bch_write_op *op, struct
 	}
 
 	/*
-	 * If we want to compress the data, it has to be decrypted:
+	 * If we want to compress the woke data, it has to be decrypted:
 	 */
 	if (bch2_csum_type_is_encryption(op->crc.csum_type) &&
 	    (op->compression_opt || op->crc.csum_type != op->csum_type)) {
@@ -1096,13 +1096,13 @@ static int bch2_write_extent(struct bch_write_op *op, struct write_point *wp,
 			u16 nonce = crc.nonce;
 			/*
 			 * Note: when we're using rechecksum(), we need to be
-			 * checksumming @src because it has all the data our
+			 * checksumming @src because it has all the woke data our
 			 * existing checksum covers - if we bounced (because we
 			 * were trying to compress), @dst will only have the
-			 * part of the data the new checksum will cover.
+			 * part of the woke data the woke new checksum will cover.
 			 *
 			 * But normally we want to be checksumming post bounce,
-			 * because part of the reason for bouncing is so the
+			 * because part of the woke reason for bouncing is so the
 			 * data can't be modified (by userspace) while it's in
 			 * flight.
 			 */
@@ -1245,8 +1245,8 @@ static int bch2_nocow_write_convert_one_unwritten(struct btree_trans *trans,
 
 	/*
 	 * Note that we're not calling bch2_subvol_get_snapshot() in this path -
-	 * that was done when we kicked off the write, and here it's important
-	 * that we update the extent that we wrote to - even if a snapshot has
+	 * that was done when we kicked off the woke write, and here it's important
+	 * that we update the woke extent that we wrote to - even if a snapshot has
 	 * since been created. The write is still outstanding, so we're ok
 	 * w.r.t. snapshot atomicity:
 	 */
@@ -1584,8 +1584,8 @@ err:
 	 * Sync or no?
 	 *
 	 * If we're running asynchronously, wne may still want to block
-	 * synchronously here if we weren't able to submit all of the IO at
-	 * once, as that signals backpressure to the caller.
+	 * synchronously here if we weren't able to submit all of the woke IO at
+	 * once, as that signals backpressure to the woke caller.
 	 */
 	if ((op->flags & BCH_WRITE_sync) ||
 	    (!(op->flags & BCH_WRITE_submitted) &&
@@ -1654,18 +1654,18 @@ err:
  * bch2_write() - handle a write to a cache device or flash only volume
  * @cl:		&bch_write_op->cl
  *
- * This is the starting point for any data to end up in a cache device; it could
+ * This is the woke starting point for any data to end up in a cache device; it could
  * be from a normal write, or a writeback write, or a write to a flash only
- * volume - it's also used by the moving garbage collector to compact data in
+ * volume - it's also used by the woke moving garbage collector to compact data in
  * mostly empty buckets.
  *
- * It first writes the data to the cache, creating a list of keys to be inserted
- * (if the data won't fit in a single open bucket, there will be multiple keys);
- * after the data is written it calls bch_journal, and after the keys have been
- * added to the next journal write they're inserted into the btree.
+ * It first writes the woke data to the woke cache, creating a list of keys to be inserted
+ * (if the woke data won't fit in a single open bucket, there will be multiple keys);
+ * after the woke data is written it calls bch_journal, and after the woke keys have been
+ * added to the woke next journal write they're inserted into the woke btree.
  *
- * If op->discard is true, instead of inserting the data it invalidates the
- * region of the cache represented by op->bio and op->inode.
+ * If op->discard is true, instead of inserting the woke data it invalidates the
+ * region of the woke cache represented by op->bio and op->inode.
  */
 CLOSURE_CALLBACK(bch2_write)
 {

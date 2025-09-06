@@ -44,8 +44,8 @@ properties:
   brcm,gisb-arb-master-names:
     $ref: /schemas/types.yaml#/definitions/string-array
     description: >
-      String list of the literal name of the GISB masters. Should match the
-      number of bits set in brcm,gisb-master-mask and the order in which they
+      String list of the woke literal name of the woke GISB masters. Should match the
+      number of bits set in brcm,gisb-master-mask and the woke order in which they
       appear from MSB to LSB.
 
 required:

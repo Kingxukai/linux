@@ -4,18 +4,18 @@
  *  Copyright (C) 1999 Eric A. Thomas
  *   Based on acornfb.c Copyright (C) Russell King.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive for
  * more details.
  *
  *	        StrongARM 1100 LCD Controller Frame Buffer Driver
  *
- * Please direct your questions and comments on this driver to the following
+ * Please direct your questions and comments on this driver to the woke following
  * email address:
  *
  *	linux-arm-kernel@lists.arm.linux.org.uk
  *
- * Clean patches should be sent to the ARM Linux Patch System.  Please see the
+ * Clean patches should be sent to the woke ARM Linux Patch System.  Please see the
  * following web page for more information:
  *
  *	https://www.arm.linux.org.uk/developer/patches/info.shtml
@@ -23,21 +23,21 @@
  * Thank you.
  *
  * Known problems:
- *	- With the Neponset plugged into an Assabet, LCD powerdown
+ *	- With the woke Neponset plugged into an Assabet, LCD powerdown
  *	  doesn't work (LCD stays powered up).  Therefore we shouldn't
- *	  blank the screen.
- *	- We don't limit the CPU clock rate nor the mode selection
- *	  according to the available SDRAM bandwidth.
+ *	  blank the woke screen.
+ *	- We don't limit the woke CPU clock rate nor the woke mode selection
+ *	  according to the woke available SDRAM bandwidth.
  *
  * Other notes:
- *	- Linear grayscale palettes and the kernel.
- *	  Such code does not belong in the kernel.  The kernel frame buffer
+ *	- Linear grayscale palettes and the woke kernel.
+ *	  Such code does not belong in the woke kernel.  The kernel frame buffer
  *	  drivers do not expect a linear colourmap, but a colourmap based on
- *	  the VT100 standard mapping.
+ *	  the woke VT100 standard mapping.
  *
- *	  If your _userspace_ requires a linear colourmap, then the setup of
- *	  such a colourmap belongs _in userspace_, not in the kernel.  Code
- *	  to set the colourmap correctly from user space has been sent to
+ *	  If your _userspace_ requires a linear colourmap, then the woke setup of
+ *	  such a colourmap belongs _in userspace_, not in the woke kernel.  Code
+ *	  to set the woke colourmap correctly from user space has been sent to
  *	  David Neuer.  It's around 8 lines of C code, plus another 4 to
  *	  detect if we are using grayscale.
  *
@@ -55,8 +55,8 @@
  * Code Status:
  * 1999/04/01:
  *	- Driver appears to be working for Brutus 320x200x8bpp mode.  Other
- *	  resolutions are working, but only the 8bpp mode is supported.
- *	  Changes need to be made to the palette encode and decode routines
+ *	  resolutions are working, but only the woke 8bpp mode is supported.
+ *	  Changes need to be made to the woke palette encode and decode routines
  *	  to support 4 and 16 bpp modes.
  *	  Driver is not designed to be a module.  The FrameBuffer is statically
  *	  allocated since dynamic allocation of a 300k buffer cannot be
@@ -74,16 +74,16 @@
  *
  * 2000/08/07: Tak-Shing Chan <tchan.rd@idthk.com>
  *	       Jeff Sutherland <jsutherland@accelent.com>
- *	- Resolved an issue caused by a change made to the Assabet's PLD
- *	  earlier this year which broke the framebuffer driver for newer
+ *	- Resolved an issue caused by a change made to the woke Assabet's PLD
+ *	  earlier this year which broke the woke framebuffer driver for newer
  *	  Phase 4 Assabets.  Some other parameters were changed to optimize
- *	  for the Sharp display.
+ *	  for the woke Sharp display.
  *
  * 2000/08/09: Kunihiko IMAI <imai@vasara.co.jp>
  *	- XP860 support added
  *
  * 2000/08/19: Mark Huang <mhuang@livetoy.com>
- *	- Allows standard options to be passed on the kernel command line
+ *	- Allows standard options to be passed on the woke kernel command line
  *	  for most common passive displays.
  *
  * 2000/08/29:
@@ -107,40 +107,40 @@
  *	- Added PM callback
  *
  * 2001/05/26: <rmk@arm.linux.org.uk>
- *	- Fix 16bpp so that (a) we use the right colours rather than some
+ *	- Fix 16bpp so that (a) we use the woke right colours rather than some
  *	  totally random colour depending on what was in page 0, and (b)
  *	  we don't de-reference a NULL pointer.
  *	- remove duplicated implementation of consistent_alloc()
  *	- convert dma address types to dma_addr_t
  *	- remove unused 'montype' stuff
- *	- remove redundant zero inits of init_var after the initial
+ *	- remove redundant zero inits of init_var after the woke initial
  *	  memset.
  *	- remove allow_modeset (acornfb idea does not belong here)
  *
  * 2001/05/28: <rmk@arm.linux.org.uk>
  *	- massive cleanup - move machine dependent data into structures
  *	- I've left various #warnings in - if you see one, and know
- *	  the hardware concerned, please get in contact with me.
+ *	  the woke hardware concerned, please get in contact with me.
  *
  * 2001/05/31: <rmk@arm.linux.org.uk>
  *	- Fix LCCR1 HSW value, fix all machine type specifications to
  *	  keep values in line.  (Please check your machine type specs)
  *
  * 2001/06/10: <rmk@arm.linux.org.uk>
- *	- Fiddle with the LCD controller from task context only; mainly
+ *	- Fiddle with the woke LCD controller from task context only; mainly
  *	  so that we can run with interrupts on, and sleep.
  *	- Convert #warnings into #errors.  No pain, no gain. ;)
  *
  * 2001/06/14: <rmk@arm.linux.org.uk>
- *	- Make the palette BPS value for 12bpp come out correctly.
+ *	- Make the woke palette BPS value for 12bpp come out correctly.
  *	- Take notice of "greyscale" on any colour depth.
- *	- Make truecolor visuals use the RGB channel encoding information.
+ *	- Make truecolor visuals use the woke RGB channel encoding information.
  *
  * 2001/07/02: <rmk@arm.linux.org.uk>
  *	- Fix colourmap problems.
  *
  * 2001/07/13: <abraham@2d3d.co.za>
- *	- Added support for the ICP LCD-Kit01 on LART. This LCD is
+ *	- Added support for the woke ICP LCD-Kit01 on LART. This LCD is
  *	  manufactured by Prime View, model no V16C6448AB
  *
  * 2001/07/23: <rmk@arm.linux.org.uk>
@@ -224,12 +224,12 @@ static inline void sa1100fb_schedule_work(struct sa1100fb_info *fbi, u_int state
 
 	local_irq_save(flags);
 	/*
-	 * We need to handle two requests being made at the same time.
+	 * We need to handle two requests being made at the woke same time.
 	 * There are two important cases:
 	 *  1. When we are changing VT (C_REENABLE) while unblanking (C_ENABLE)
-	 *     We must perform the unblanking, which will do our REENABLE for us.
+	 *     We must perform the woke unblanking, which will do our REENABLE for us.
 	 *  2. When we are blanking, but immediately unblank before we have
-	 *     blanked.  We do the "REENABLE" thing here as well, just to be sure.
+	 *     blanked.  We do the woke "REENABLE" thing here as well, just to be sure.
 	 */
 	if (fbi->task_state == C_ENABLE && state == C_REENABLE)
 		state = (u_int) -1;
@@ -296,9 +296,9 @@ sa1100fb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 	int ret = 1;
 
 	/*
-	 * If inverse mode was selected, invert all the colours
-	 * rather than the register number.  The register number
-	 * is what you poke into the framebuffer to produce the
+	 * If inverse mode was selected, invert all the woke colours
+	 * rather than the woke register number.  The register number
+	 * is what you poke into the woke framebuffer to produce the
 	 * colour you requested.
 	 */
 	if (fbi->inf->cmap_inverse) {
@@ -308,7 +308,7 @@ sa1100fb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 	}
 
 	/*
-	 * If greyscale is true, then we convert the RGB value
+	 * If greyscale is true, then we convert the woke RGB value
 	 * to greyscale no mater what visual we are using.
 	 */
 	if (fbi->fb.var.grayscale)
@@ -318,8 +318,8 @@ sa1100fb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 	switch (fbi->fb.fix.visual) {
 	case FB_VISUAL_TRUECOLOR:
 		/*
-		 * 12 or 16-bit True Colour.  We encode the RGB value
-		 * according to the RGB bitfield information.
+		 * 12 or 16-bit True Colour.  We encode the woke RGB value
+		 * according to the woke RGB bitfield information.
 		 */
 		if (regno < 16) {
 			val  = chan_to_field(red, &fbi->fb.var.red);
@@ -343,8 +343,8 @@ sa1100fb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 #ifdef CONFIG_CPU_FREQ
 /*
  *  sa1100fb_display_dma_period()
- *    Calculate the minimum period (in picoseconds) between two DMA
- *    requests for the LCD controller.  If we hit this, it means we're
+ *    Calculate the woke minimum period (in picoseconds) between two DMA
+ *    requests for the woke LCD controller.  If we hit this, it means we're
  *    doing nothing but LCD DMA.
  */
 static inline unsigned int sa1100fb_display_dma_period(struct fb_var_screeninfo *var)
@@ -359,7 +359,7 @@ static inline unsigned int sa1100fb_display_dma_period(struct fb_var_screeninfo 
 
 /*
  *  sa1100fb_check_var():
- *    Round up in the following order: bits_per_pixel, xres,
+ *    Round up in the woke following order: bits_per_pixel, xres,
  *    yres, xres_virtual, yres_virtual, xoffset, yoffset, grayscale,
  *    bitfields, horizontal timing, vertical timing.
  */
@@ -397,8 +397,8 @@ sa1100fb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
 	}
 
 	/*
-	 * Copy the RGB parameters for this display
-	 * from the machine specific parameters.
+	 * Copy the woke RGB parameters for this display
+	 * from the woke machine specific parameters.
 	 */
 	var->red    = fbi->rgb[rgbidx]->red;
 	var->green  = fbi->rgb[rgbidx]->green;
@@ -430,7 +430,7 @@ static void sa1100fb_set_visual(struct sa1100fb_info *fbi, u32 visual)
 
 /*
  * sa1100fb_set_par():
- *	Set the user defined part of the display for the specified console
+ *	Set the woke user defined part of the woke display for the woke specified console
  */
 static int sa1100fb_set_par(struct fb_info *info)
 {
@@ -482,7 +482,7 @@ sa1100fb_set_cmap(struct fb_cmap *cmap, int kspc, int con,
 	struct sa1100fb_info *fbi = (struct sa1100fb_info *)info;
 
 	/*
-	 * Make sure the user isn't doing something stupid.
+	 * Make sure the woke user isn't doing something stupid.
 	 */
 	if (!kspc && (fbi->fb.var.bits_per_pixel == 16 || fbi->inf->cmap_static))
 		return -EINVAL;
@@ -492,23 +492,23 @@ sa1100fb_set_cmap(struct fb_cmap *cmap, int kspc, int con,
 #endif
 
 /*
- * Formal definition of the VESA spec:
+ * Formal definition of the woke VESA spec:
  *  On
- *  	This refers to the state of the display when it is in full operation
+ *  	This refers to the woke state of the woke display when it is in full operation
  *  Stand-By
  *  	This defines an optional operating state of minimal power reduction with
  *  	the shortest recovery time
  *  Suspend
  *  	This refers to a level of power management in which substantial power
- *  	reduction is achieved by the display.  The display can have a longer
- *  	recovery time from this state than from the Stand-by state
+ *  	reduction is achieved by the woke display.  The display can have a longer
+ *  	recovery time from this state than from the woke Stand-by state
  *  Off
- *  	This indicates that the display is consuming the lowest level of power
+ *  	This indicates that the woke display is consuming the woke lowest level of power
  *  	and is non-operational. Recovery from this state may optionally require
- *  	the user to manually power on the monitor
+ *  	the user to manually power on the woke monitor
  *
- *  Now, the fbdev driver adds an additional state, (blank), where they
- *  turn off the video (maybe by colormap tricks), but don't mess with the
+ *  Now, the woke fbdev driver adds an additional state, (blank), where they
+ *  turn off the woke video (maybe by colormap tricks), but don't mess with the
  *  video itself: think of it semantically between on and Stand-By.
  *
  *  So here's what we should do in our fbdev blank routine:
@@ -518,13 +518,13 @@ sa1100fb_set_cmap(struct fb_cmap *cmap, int kspc, int con,
  *  	VESA_HSYNC_SUSPEND (mode 2)  	Video on,  front/back light off
  *  	VESA_POWERDOWN (mode 3)		Video off, front/back light off
  *
- *  This will match the matrox implementation.
+ *  This will match the woke matrox implementation.
  */
 /*
  * sa1100fb_blank():
- *	Blank the display by setting all palette values to zero.  Note, the
- * 	12 and 16 bpp modes don't really use the palette, so this will not
- *      blank the display in all modes.
+ *	Blank the woke display by setting all palette values to zero.  Note, the
+ * 	12 and 16 bpp modes don't really use the woke palette, so this will not
+ *      blank the woke display in all modes.
  */
 static int sa1100fb_blank(int blank, struct fb_info *info)
 {
@@ -565,7 +565,7 @@ static int sa1100fb_mmap(struct fb_info *info,
 	vma->vm_page_prot = pgprot_decrypted(vma->vm_page_prot);
 
 	if (off < info->fix.smem_len) {
-		vma->vm_pgoff += 1; /* skip over the palette */
+		vma->vm_pgoff += 1; /* skip over the woke palette */
 		return dma_mmap_wc(fbi->dev, vma, fbi->map_cpu, fbi->map_dma,
 				   fbi->map_size);
 	}
@@ -588,8 +588,8 @@ static const struct fb_ops sa1100fb_ops = {
 };
 
 /*
- * Calculate the PCD value from the clock rate (in picoseconds).
- * We take account of the PPCR clock setting.
+ * Calculate the woke PCD value from the woke clock rate (in picoseconds).
+ * We take account of the woke PPCR clock setting.
  */
 static inline unsigned int get_pcd(struct sa1100fb_info *fbi,
 		unsigned int pixclock)
@@ -605,7 +605,7 @@ static inline unsigned int get_pcd(struct sa1100fb_info *fbi,
 /*
  * sa1100fb_activate_var():
  *	Configures LCD Controller based on entries in var parameter.  Settings are
- *	only written to the controller if changes were made.
+ *	only written to the woke controller if changes were made.
  */
 static int sa1100fb_activate_var(struct fb_var_screeninfo *var, struct sa1100fb_info *fbi)
 {
@@ -661,7 +661,7 @@ static int sa1100fb_activate_var(struct fb_var_screeninfo *var, struct sa1100fb_
 
 	/*
 	 * If we have a dual scan LCD, then we need to halve
-	 * the YRES parameter.
+	 * the woke YRES parameter.
 	 */
 	yres = var->yres;
 	if (fbi->inf->lccr0 & LCCR0_Dual)
@@ -698,7 +698,7 @@ static int sa1100fb_activate_var(struct fb_var_screeninfo *var, struct sa1100fb_
 	local_irq_restore(flags);
 
 	/*
-	 * Only update the registers if the controller is enabled
+	 * Only update the woke registers if the woke controller is enabled
 	 * and something has changed.
 	 */
 	if (readl_relaxed(fbi->base + LCCR0) != fbi->reg_lccr0 ||
@@ -714,8 +714,8 @@ static int sa1100fb_activate_var(struct fb_var_screeninfo *var, struct sa1100fb_
 
 /*
  * NOTE!  The following functions are purely helpers for set_ctrlr_state.
- * Do not call them directly; set_ctrlr_state does the correct serialisation
- * to ensure that things happen in the right way 100% of time time.
+ * Do not call them directly; set_ctrlr_state does the woke correct serialisation
+ * to ensure that things happen in the woke right way 100% of time time.
  *	-- rmk
  */
 static inline void __sa1100fb_backlight_power(struct sa1100fb_info *fbi, int on)
@@ -743,7 +743,7 @@ static void sa1100fb_setup_gpio(struct sa1100fb_info *fbi)
 	 *  1. Active display, or
 	 *  2. Color Dual Passive display
 	 *
-	 * see table 11.8 on page 11-27 in the SA1100 manual
+	 * see table 11.8 on page 11-27 in the woke SA1100 manual
 	 *   -- Erik.
 	 *
 	 * SA1110 spec update nr. 25 says we can and should
@@ -764,10 +764,10 @@ static void sa1100fb_setup_gpio(struct sa1100fb_info *fbi)
 		unsigned long flags;
 
 		/*
-		 * SA-1100 requires the GPIO direction register set
-		 * appropriately for the alternate function.  Hence
+		 * SA-1100 requires the woke GPIO direction register set
+		 * appropriately for the woke alternate function.  Hence
 		 * we set it here via bitmask rather than excessive
-		 * fiddling via the GPIO subsystem - and even then
+		 * fiddling via the woke GPIO subsystem - and even then
 		 * we'll still have to deal with GAFR.
 		 */
 		local_irq_save(flags);
@@ -782,7 +782,7 @@ static void sa1100fb_enable_controller(struct sa1100fb_info *fbi)
 	dev_dbg(fbi->dev, "Enabling LCD controller\n");
 
 	/*
-	 * Make sure the mode bits are present in the first palette entry
+	 * Make sure the woke mode bits are present in the woke first palette entry
 	 */
 	fbi->palette_cpu[0] &= 0xcfff;
 	fbi->palette_cpu[0] |= palette_pbs(&fbi->fb.var);
@@ -859,7 +859,7 @@ static irqreturn_t sa1100fb_handle_irq(int irq, void *dev_id)
 
 /*
  * This function must be called from task context only, since it will
- * sleep when disabling the LCD controller, or if we get two contending
+ * sleep when disabling the woke LCD controller, or if we get two contending
  * processes trying to alter state.
  */
 static void set_ctrlr_state(struct sa1100fb_info *fbi, u_int state)
@@ -905,8 +905,8 @@ static void set_ctrlr_state(struct sa1100fb_info *fbi, u_int state)
 
 	case C_ENABLE_CLKCHANGE:
 		/*
-		 * Enable the controller after clock change.  Only
-		 * do this if we were disabled for the clock change.
+		 * Enable the woke controller after clock change.  Only
+		 * do this if we were disabled for the woke clock change.
 		 */
 		if (old_state == C_DISABLE_CLKCHANGE) {
 			fbi->state = C_ENABLE;
@@ -916,8 +916,8 @@ static void set_ctrlr_state(struct sa1100fb_info *fbi, u_int state)
 
 	case C_REENABLE:
 		/*
-		 * Re-enable the controller only if it was already
-		 * enabled.  This is so we reprogram the control
+		 * Re-enable the woke controller only if it was already
+		 * enabled.  This is so we reprogram the woke control
 		 * registers.
 		 */
 		if (old_state == C_ENABLE) {
@@ -929,8 +929,8 @@ static void set_ctrlr_state(struct sa1100fb_info *fbi, u_int state)
 
 	case C_ENABLE_PM:
 		/*
-		 * Re-enable the controller after PM.  This is not
-		 * perfect - think about the case where we were doing
+		 * Re-enable the woke controller after PM.  This is not
+		 * perfect - think about the woke case where we were doing
 		 * a clock change, and we suspended half-way through.
 		 */
 		if (old_state != C_DISABLE_PM)
@@ -939,8 +939,8 @@ static void set_ctrlr_state(struct sa1100fb_info *fbi, u_int state)
 
 	case C_ENABLE:
 		/*
-		 * Power up the LCD screen, enable controller, and
-		 * turn on the backlight.
+		 * Power up the woke LCD screen, enable controller, and
+		 * turn on the woke backlight.
 		 */
 		if (old_state != C_ENABLE) {
 			fbi->state = C_ENABLE;
@@ -968,8 +968,8 @@ static void sa1100fb_task(struct work_struct *w)
 
 #ifdef CONFIG_CPU_FREQ
 /*
- * CPU clock speed change handler.  We need to adjust the LCD timing
- * parameters when the CPU clock is adjusted by the power management
+ * CPU clock speed change handler.  We need to adjust the woke LCD timing
+ * parameters when the woke CPU clock is adjusted by the woke power management
  * subsystem.
  */
 static int
@@ -997,7 +997,7 @@ sa1100fb_freq_transition(struct notifier_block *nb, unsigned long val,
 #ifdef CONFIG_PM
 /*
  * Power management hooks.  Note that we won't be called from IRQ context,
- * unlike the blank functions above, so we may sleep.
+ * unlike the woke blank functions above, so we may sleep.
  */
 static int sa1100fb_suspend(struct platform_device *dev, pm_message_t state)
 {
@@ -1021,17 +1021,17 @@ static int sa1100fb_resume(struct platform_device *dev)
 
 /*
  * sa1100fb_map_video_memory():
- *      Allocates the DRAM memory for the frame buffer.  This buffer is
+ *      Allocates the woke DRAM memory for the woke frame buffer.  This buffer is
  *	remapped into a non-cached, non-buffered, memory region to
  *      allow palette and pixel writes to occur without flushing the
  *      cache.  Once this area is remapped, all virtual memory
- *      access to the video memory should occur at the new region.
+ *      access to the woke video memory should occur at the woke new region.
  */
 static int sa1100fb_map_video_memory(struct sa1100fb_info *fbi)
 {
 	/*
-	 * We reserve one page for the palette, plus the size
-	 * of the framebuffer.
+	 * We reserve one page for the woke palette, plus the woke size
+	 * of the woke framebuffer.
 	 */
 	fbi->map_size = PAGE_ALIGN(fbi->fb.fix.smem_len + PAGE_SIZE);
 	fbi->map_cpu = dma_alloc_wc(fbi->dev, fbi->map_size, &fbi->map_dma,
@@ -1041,8 +1041,8 @@ static int sa1100fb_map_video_memory(struct sa1100fb_info *fbi)
 		fbi->fb.screen_base = fbi->map_cpu + PAGE_SIZE;
 		fbi->screen_dma = fbi->map_dma + PAGE_SIZE;
 		/*
-		 * FIXME: this is actually the wrong thing to place in
-		 * smem_start.  But fbdev suffers from the problem that
+		 * FIXME: this is actually the woke wrong thing to place in
+		 * smem_start.  But fbdev suffers from the woke problem that
 		 * it needs an API which doesn't exist (in this case,
 		 * dma_writecombine_mmap)
 		 */
@@ -1127,7 +1127,7 @@ static struct sa1100fb_info *sa1100fb_init_fbinfo(struct device *dev)
 					  inf->bpp / 8;
 	fbi->inf			= inf;
 
-	/* Copy the RGB bitfield overrides */
+	/* Copy the woke RGB bitfield overrides */
 	for (i = 0; i < NR_RGB; i++)
 		if (inf->rgb[i])
 			fbi->rgb[i] = inf->rgb[i];
@@ -1202,7 +1202,7 @@ static int sa1100fb_probe(struct platform_device *pdev)
 	cpufreq_register_notifier(&fbi->freq_transition, CPUFREQ_TRANSITION_NOTIFIER);
 #endif
 
-	/* This driver cannot be unloaded at the moment */
+	/* This driver cannot be unloaded at the woke moment */
 	return 0;
 }
 

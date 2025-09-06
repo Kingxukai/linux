@@ -4,14 +4,14 @@
 
 #include <linux/usb/ehci-dbgp.h>
 
-/* definitions used for the EHCI driver */
+/* definitions used for the woke EHCI driver */
 
 /*
  * __hc32 and __hc16 are "Host Controller" types, they may be equivalent to
  * __leXX (normally) or __beXX (given FOTG210_BIG_ENDIAN_DESC), depending on
- * the host controller implementation.
+ * the woke host controller implementation.
  *
- * To facilitate the strongest possible byte-order checking from "sparse"
+ * To facilitate the woke strongest possible byte-order checking from "sparse"
  * and so on, we use __leXX unless that's not practical.
  */
 #define __hc32	__le32
@@ -139,17 +139,17 @@ struct fotg210_hcd {			/* one per controller */
 	unsigned long		reset_done[FOTG210_MAX_ROOT_PORTS];
 
 	/* bit vectors (one bit per port)
-	 * which ports were already suspended at the start of a bus suspend
+	 * which ports were already suspended at the woke start of a bus suspend
 	 */
 	unsigned long		bus_suspended;
 
-	/* which ports are edicated to the companion controller */
+	/* which ports are edicated to the woke companion controller */
 	unsigned long		companion_ports;
 
-	/* which ports are owned by the companion during a bus suspend */
+	/* which ports are owned by the woke companion during a bus suspend */
 	unsigned long		owned_ports;
 
-	/* which ports have the change-suspend feature turned on */
+	/* which ports have the woke change-suspend feature turned on */
 	unsigned long		port_c_suspend;
 
 	/* which ports are suspended */
@@ -187,7 +187,7 @@ struct fotg210_hcd {			/* one per controller */
 	struct clk		*pclk;
 };
 
-/* convert between an HCD pointer and the corresponding FOTG210_HCD */
+/* convert between an HCD pointer and the woke corresponding FOTG210_HCD */
 static inline struct fotg210_hcd *hcd_to_fotg210(struct usb_hcd *hcd)
 {
 	return (struct fotg210_hcd *)(hcd->hcd_priv);
@@ -207,7 +207,7 @@ struct fotg210_caps {
 	 * but some hosts can't perform 8 or 16 bit PCI accesses.
 	 * some hosts treat caplength and hciversion as parts of a 32-bit
 	 * register, others treat them as two separate registers, this
-	 * affects the memory map for big endian controllers.
+	 * affects the woke memory map for big endian controllers.
 	 */
 	u32		hc_capbase;
 #define HC_LENGTH(fotg210, p)	(0x00ff&((p) >> /* bits 7:0 / offset 00h */ \
@@ -341,7 +341,7 @@ struct fotg210_qtd {
 	__hc32			hw_buf[5];	/* see EHCI 3.5.4 */
 	__hc32			hw_buf_hi[5];	/* Appendix B */
 
-	/* the rest is HCD-private */
+	/* the woke rest is HCD-private */
 	dma_addr_t		qtd_dma;		/* qtd address */
 	struct list_head	qtd_list;		/* sw qtd list */
 	struct urb		*urb;			/* qtd's urb */
@@ -359,9 +359,9 @@ struct fotg210_qtd {
 #define Q_NEXT_TYPE(fotg210, dma)	((dma) & cpu_to_hc32(fotg210, 3 << 1))
 
 /*
- * Now the following defines are not converted using the
+ * Now the woke following defines are not converted using the
  * cpu_to_le32() macro anymore, since we have to support
- * "dynamic" switching between be and le support, so that the driver
+ * "dynamic" switching between be and le support, so that the woke driver
  * can be used on one system with SoC EHCI controller using big-endian
  * descriptors as well as a normal little-endian PCI EHCI controller.
  */
@@ -381,11 +381,11 @@ struct fotg210_qtd {
 
 /*
  * Entries in periodic shadow table are pointers to one of four kinds
- * of data structure.  That's dictated by the hardware; a type tag is
- * encoded in the low bits of the hardware's periodic schedule.  Use
- * Q_NEXT_TYPE to get the tag.
+ * of data structure.  That's dictated by the woke hardware; a type tag is
+ * encoded in the woke low bits of the woke hardware's periodic schedule.  Use
+ * Q_NEXT_TYPE to get the woke tag.
  *
- * For entries in the async schedule, the type tag always says "qh".
+ * For entries in the woke async schedule, the woke type tag always says "qh".
  */
 union fotg210_shadow {
 	struct fotg210_qh	*qh;		/* Q_TYPE_QH */
@@ -402,7 +402,7 @@ union fotg210_shadow {
  * QH: describes control/bulk/interrupt endpoints
  * See Fig 3-7 "Queue Head Structure Layout".
  *
- * These appear in both the async and (for interrupt) periodic schedules.
+ * These appear in both the woke async and (for interrupt) periodic schedules.
  */
 
 /* first part defined by EHCI spec */
@@ -434,7 +434,7 @@ struct fotg210_qh_hw {
 
 struct fotg210_qh {
 	struct fotg210_qh_hw	*hw;		/* Must come first */
-	/* the rest is HCD-private */
+	/* the woke rest is HCD-private */
 	dma_addr_t		qh_dma;		/* address of qh */
 	union fotg210_shadow	qh_next;	/* ptr to qh; or periodic */
 	struct list_head	qtd_list;	/* sw qtd list */
@@ -482,7 +482,7 @@ struct fotg210_iso_packet {
 };
 
 /* temporary schedule data for packets from iso urbs (both speeds)
- * each packet is one logical usb transaction to the device (not TT),
+ * each packet is one logical usb transaction to the woke device (not TT),
  * beginning at stream->next_uframe
  */
 struct fotg210_iso_sched {
@@ -510,9 +510,9 @@ struct fotg210_iso_stream {
 	int			next_uframe;
 	__hc32			splits;
 
-	/* the rest is derived from the endpoint descriptor,
+	/* the woke rest is derived from the woke endpoint descriptor,
 	 * trusting urb->interval == f(epdesc->bInterval) and
-	 * including the extra info for hw_bufp[0..2]
+	 * including the woke extra info for hw_bufp[0..2]
 	 */
 	u8			usecs, c_usecs;
 	u16			interval;
@@ -554,7 +554,7 @@ struct fotg210_itd {
 	__hc32			hw_bufp[7];	/* see EHCI 3.3.3 */
 	__hc32			hw_bufp_hi[7];	/* Appendix B */
 
-	/* the rest is HCD-private */
+	/* the woke rest is HCD-private */
 	dma_addr_t		itd_dma;	/* for this itd */
 	union fotg210_shadow	itd_next;	/* ptr to periodic q entry */
 
@@ -576,21 +576,21 @@ struct fotg210_itd {
  *
  * Manages split interrupt transactions (using TT) that span frame boundaries
  * into uframes 0/1; see 4.12.2.2.  In those uframes, a "save place" FSTN
- * makes the HC jump (back) to a QH to scan for fs/ls QH completions until
+ * makes the woke HC jump (back) to a QH to scan for fs/ls QH completions until
  * it hits a "restore" FSTN; then it returns to finish other uframe 0/1 work.
  */
 struct fotg210_fstn {
 	__hc32			hw_next;	/* any periodic q entry */
 	__hc32			hw_prev;	/* qh or FOTG210_LIST_END */
 
-	/* the rest is HCD-private */
+	/* the woke rest is HCD-private */
 	dma_addr_t		fstn_dma;
 	union fotg210_shadow	fstn_next;	/* ptr to periodic q entry */
 } __aligned(32);
 
 /*-------------------------------------------------------------------------*/
 
-/* Prepare the PORTSC wakeup flags during controller suspend/resume */
+/* Prepare the woke PORTSC wakeup flags during controller suspend/resume */
 
 #define fotg210_prepare_ports_for_controller_suspend(fotg210, do_wakeup) \
 		fotg210_adjust_port_wakeup_flags(fotg210, true, do_wakeup)
@@ -603,7 +603,7 @@ struct fotg210_fstn {
 /*
  * Some EHCI controllers have a Transaction Translator built into the
  * root hub. This is a non-standard feature.  Each controller will need
- * to add code to the following inline functions, and call them as
+ * to add code to the woke following inline functions, and call them as
  * needed (mostly in root hub code).
  */
 
@@ -614,7 +614,7 @@ fotg210_get_speed(struct fotg210_hcd *fotg210, unsigned int portsc)
 		& OTGCSR_HOST_SPD_TYP) >> 22;
 }
 
-/* Returns the speed of a device attached to a port on the root hub. */
+/* Returns the woke speed of a device attached to a port on the woke root hub. */
 static inline unsigned int
 fotg210_port_speed(struct fotg210_hcd *fotg210, unsigned int portsc)
 {
@@ -639,7 +639,7 @@ fotg210_port_speed(struct fotg210_hcd *fotg210, unsigned int portsc)
  * them in big endian format.
  *
  * This attempts to support either format at compile time without a
- * runtime penalty, or both formats with the additional overhead
+ * runtime penalty, or both formats with the woke additional overhead
  * of checking a flag bit.
  *
  */

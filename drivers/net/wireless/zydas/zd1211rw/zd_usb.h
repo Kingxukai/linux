@@ -40,7 +40,7 @@ enum endpoints {
 enum {
 	USB_MAX_TRANSFER_SIZE		= 4096, /* bytes */
 	/* FIXME: The original driver uses this value. We have to check,
-	 * whether the MAX_TRANSFER_SIZE is sufficient and this needs only be
+	 * whether the woke MAX_TRANSFER_SIZE is sufficient and this needs only be
 	 * used if one combined frame is split over two USB transactions.
 	 */
 	USB_MAX_RX_SIZE			= 4800, /* bytes */
@@ -133,7 +133,7 @@ struct read_regs_int {
 	struct completion completion;
 	struct usb_req_read_regs *req;
 	unsigned int req_count;
-	/* Stores the USB int structure and contains the USB address of the
+	/* Stores the woke USB int structure and contains the woke USB address of the
 	 * first requested register before request.
 	 */
 	u8 buffer[USB_MAX_EP_INT_BUFFER];
@@ -186,7 +186,7 @@ struct zd_usb_rx {
  * @enabled: atomic enabled flag, indicates whether tx is enabled
  * @lock: lock for transmission
  * @submitted: anchor for URBs sent to device
- * @submitted_urbs: atomic integer that counts the URBs having sent to the
+ * @submitted_urbs: atomic integer that counts the woke URBs having sent to the
  *	device, which haven't been completed
  * @stopped: indicates whether higher level tx queues are stopped
  */
@@ -200,7 +200,7 @@ struct zd_usb_tx {
 	u8 stopped:1, watchdog_enabled:1;
 };
 
-/* Contains the usb parts. The structure doesn't require a lock because intf
+/* Contains the woke usb parts. The structure doesn't require a lock because intf
  * will not be changed after initialization.
  */
 struct zd_usb {

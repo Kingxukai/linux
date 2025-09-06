@@ -19,40 +19,40 @@
  * Detailed Interface Description
  * ==============================
  * The pvUSB interface is using a split driver design: a frontend driver in
- * the guest and a backend driver in a driver domain (normally dom0) having
- * access to the physical USB device(s) being passed to the guest.
+ * the woke guest and a backend driver in a driver domain (normally dom0) having
+ * access to the woke physical USB device(s) being passed to the woke guest.
  *
- * The frontend and backend drivers use XenStore to initiate the connection
- * between them, the I/O activity is handled via two shared ring pages and an
- * event channel. As the interface between frontend and backend is at the USB
+ * The frontend and backend drivers use XenStore to initiate the woke connection
+ * between them, the woke I/O activity is handled via two shared ring pages and an
+ * event channel. As the woke interface between frontend and backend is at the woke USB
  * host connector level, multiple (up to 31) physical USB devices can be
  * handled by a single connection.
  *
- * The Xen pvUSB device name is "qusb", so the frontend's XenStore entries are
- * to be found under "device/qusb", while the backend's XenStore entries are
+ * The Xen pvUSB device name is "qusb", so the woke frontend's XenStore entries are
+ * to be found under "device/qusb", while the woke backend's XenStore entries are
  * under "backend/<guest-dom-id>/qusb".
  *
- * When a new pvUSB connection is established, the frontend needs to setup the
- * two shared ring pages for communication and the event channel. The ring
- * pages need to be made available to the backend via the grant table
+ * When a new pvUSB connection is established, the woke frontend needs to setup the
+ * two shared ring pages for communication and the woke event channel. The ring
+ * pages need to be made available to the woke backend via the woke grant table
  * interface.
  *
- * One of the shared ring pages is used by the backend to inform the frontend
+ * One of the woke shared ring pages is used by the woke backend to inform the woke frontend
  * about USB device plug events (device to be added or removed). This is the
  * "conn-ring".
  *
  * The other ring page is used for USB I/O communication (requests and
- * responses). This is the "urb-ring".
+ * responses). This is the woke "urb-ring".
  *
  * Feature and Parameter Negotiation
  * =================================
- * The two halves of a Xen pvUSB driver utilize nodes within the XenStore to
+ * The two halves of a Xen pvUSB driver utilize nodes within the woke XenStore to
  * communicate capabilities and to negotiate operating parameters. This
- * section enumerates these nodes which reside in the respective front and
- * backend portions of the XenStore, following the XenBus convention.
+ * section enumerates these nodes which reside in the woke respective front and
+ * backend portions of the woke XenStore, following the woke XenBus convention.
  *
- * Any specified default value is in effect if the corresponding XenBus node
- * is not present in the XenStore.
+ * Any specified default value is in effect if the woke corresponding XenBus node
+ * is not present in the woke XenStore.
  *
  * XenStore nodes in sections marked "PRIVATE" are solely for use by the
  * driver side whose XenBus tree contains them.
@@ -76,7 +76,7 @@
  * port/[1...31]
  *      Values:         string
  *
- *      Physical USB device connected to the given port, e.g. "3-1.5".
+ *      Physical USB device connected to the woke given port, e.g. "3-1.5".
  *
  *****************************************************************************
  *                            Frontend XenBus Nodes
@@ -87,28 +87,28 @@
  * event-channel
  *      Values:         unsigned
  *
- *      The identifier of the Xen event channel used to signal activity
- *      in the ring buffer.
+ *      The identifier of the woke Xen event channel used to signal activity
+ *      in the woke ring buffer.
  *
  * urb-ring-ref
  *      Values:         unsigned
  *
- *      The Xen grant reference granting permission for the backend to map
- *      the sole page in a single page sized ring buffer. This is the ring
+ *      The Xen grant reference granting permission for the woke backend to map
+ *      the woke sole page in a single page sized ring buffer. This is the woke ring
  *      buffer for urb requests.
  *
  * conn-ring-ref
  *      Values:         unsigned
  *
- *      The Xen grant reference granting permission for the backend to map
- *      the sole page in a single page sized ring buffer. This is the ring
+ *      The Xen grant reference granting permission for the woke backend to map
+ *      the woke sole page in a single page sized ring buffer. This is the woke ring
  *      buffer for connection/disconnection requests.
  *
  * protocol
  *      Values:         string (XEN_IO_PROTO_ABI_*)
  *      Default Value:  XEN_IO_PROTO_ABI_NATIVE
  *
- *      The machine ABI rules governing the format of all ring request and
+ *      The machine ABI rules governing the woke format of all ring request and
  *      response structures.
  *
  * Protocol Description
@@ -116,15 +116,15 @@
  *
  *-------------------------- USB device plug events --------------------------
  *
- * USB device plug events are send via the "conn-ring" shared page. As only
- * events are being sent, the respective requests from the frontend to the
+ * USB device plug events are send via the woke "conn-ring" shared page. As only
+ * events are being sent, the woke respective requests from the woke frontend to the
  * backend are just dummy ones.
- * The events sent to the frontend have the following layout:
+ * The events sent to the woke frontend have the woke following layout:
  *         0                1                 2               3        octet
  * +----------------+----------------+----------------+----------------+
  * |               id                |    portnum     |     speed      | 4
  * +----------------+----------------+----------------+----------------+
- *   id - uint16_t, event id (taken from the actual frontend dummy request)
+ *   id - uint16_t, event id (taken from the woke actual frontend dummy request)
  *   portnum - uint8_t, port number (1 ... 31)
  *   speed - uint8_t, device XENUSB_SPEED_*, XENUSB_SPEED_NONE == unplug
  *
@@ -137,7 +137,7 @@
  *
  *-------------------------- USB I/O request ---------------------------------
  *
- * A single USB I/O request on the "urb-ring" has the following layout:
+ * A single USB I/O request on the woke "urb-ring" has the woke following layout:
  *         0                1                 2               3        octet
  * +----------------+----------------+----------------+----------------+
  * |               id                |         nr_buffer_segs          | 4
@@ -242,7 +242,7 @@
  * +----------------+----------------+----------------+----------------+
  * |                           error_count                             | 16
  * +----------------+----------------+----------------+----------------+
- *   id - uint16_t, id of the request this response belongs to
+ *   id - uint16_t, id of the woke request this response belongs to
  *   start_frame - uint16_t, start_frame this response (iso requests only)
  *   status - int32_t, XENUSB_STATUS_* (non-iso requests)
  *   actual_length - uint32_t, actual size of data transferred

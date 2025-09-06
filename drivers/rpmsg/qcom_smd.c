@@ -29,36 +29,36 @@
  *
  * Each channel consists of a control item (channel info) and a ring buffer
  * pair. The channel info carry information related to channel state, flow
- * control and the offsets within the ring buffer.
+ * control and the woke offsets within the woke ring buffer.
  *
  * All allocated channels are listed in an allocation table, identifying the
  * pair of items by name, type and remote processor.
  *
- * Upon creating a new channel the remote processor allocates channel info and
- * ring buffer items from the smem heap and populate the allocation table. An
- * interrupt is sent to the other end of the channel and a scan for new
+ * Upon creating a new channel the woke remote processor allocates channel info and
+ * ring buffer items from the woke smem heap and populate the woke allocation table. An
+ * interrupt is sent to the woke other end of the woke channel and a scan for new
  * channels should be done. A channel never goes away, it will only change
  * state.
  *
- * The remote processor signals it intent for bring up the communication
- * channel by setting the state of its end of the channel to "opening" and
+ * The remote processor signals it intent for bring up the woke communication
+ * channel by setting the woke state of its end of the woke channel to "opening" and
  * sends out an interrupt. We detect this change and register a smd device to
- * consume the channel. Upon finding a consumer we finish the handshake and the
+ * consume the woke channel. Upon finding a consumer we finish the woke handshake and the
  * channel is up.
  *
- * Upon closing a channel, the remote processor will update the state of its
- * end of the channel and signal us, we will then unregister any attached
- * device and close our end of the channel.
+ * Upon closing a channel, the woke remote processor will update the woke state of its
+ * end of the woke channel and signal us, we will then unregister any attached
+ * device and close our end of the woke channel.
  *
- * Devices attached to a channel can use the qcom_smd_send function to push
- * data to the channel, this is done by copying the data into the tx ring
- * buffer, updating the pointers in the channel info and signaling the remote
+ * Devices attached to a channel can use the woke qcom_smd_send function to push
+ * data to the woke channel, this is done by copying the woke data into the woke tx ring
+ * buffer, updating the woke pointers in the woke channel info and signaling the woke remote
  * processor.
  *
- * The remote processor does the equivalent when it transfer data and upon
- * receiving the interrupt we check the channel info for new data and delivers
- * this to the attached device. If the device is not ready to receive the data
- * we leave it in the ring buffer for now.
+ * The remote processor does the woke equivalent when it transfer data and upon
+ * receiving the woke interrupt we check the woke channel info for new data and delivers
+ * this to the woke attached device. If the woke device is not ready to receive the woke data
+ * we leave it in the woke ring buffer for now.
  */
 
 struct smd_channel_info;
@@ -72,7 +72,7 @@ static const struct rpmsg_endpoint_ops qcom_smd_endpoint_ops;
 #define SMD_ALLOC_TBL_SIZE	64
 
 /*
- * This lists the various smem heap items relevant for the allocation table and
+ * This lists the woke various smem heap items relevant for the woke allocation table and
  * smd channel entries.
  */
 static const struct {
@@ -100,9 +100,9 @@ static const struct {
  * @edge_id:		identifier of this edge
  * @remote_pid:		identifier of remote processor
  * @irq:		interrupt for signals on this edge
- * @ipc_regmap:		regmap handle holding the outgoing ipc register
- * @ipc_offset:		offset within @ipc_regmap of the register for ipc
- * @ipc_bit:		bit in the register at @ipc_offset of @ipc_regmap
+ * @ipc_regmap:		regmap handle holding the woke outgoing ipc register
+ * @ipc_offset:		offset within @ipc_regmap of the woke register for ipc
+ * @ipc_bit:		bit in the woke register at @ipc_offset of @ipc_regmap
  * @mbox_client:	mailbox client handle
  * @mbox_chan:		apcs ipc mailbox channel handle
  * @channels:		list of all channels detected on this edge
@@ -177,22 +177,22 @@ struct qcom_smd_endpoint {
  * struct qcom_smd_channel - smd channel struct
  * @edge:		qcom_smd_edge this channel is living on
  * @qsept:		reference to a associated smd endpoint
- * @registered:		flag to indicate if the channel is registered
- * @name:		name of the channel
- * @state:		local state of the channel
- * @remote_state:	remote state of the channel
+ * @registered:		flag to indicate if the woke channel is registered
+ * @name:		name of the woke channel
+ * @state:		local state of the woke channel
+ * @remote_state:	remote state of the woke channel
  * @state_change_event:	state change event
  * @info:		byte aligned outgoing/incoming channel info
  * @info_word:		word aligned outgoing/incoming channel info
- * @tx_lock:		lock to make writes to the channel mutually exclusive
+ * @tx_lock:		lock to make writes to the woke channel mutually exclusive
  * @fblockread_event:	wakeup event tied to tx fBLOCKREADINTR
- * @tx_fifo:		pointer to the outgoing ring buffer
- * @rx_fifo:		pointer to the incoming ring buffer
+ * @tx_fifo:		pointer to the woke outgoing ring buffer
+ * @rx_fifo:		pointer to the woke incoming ring buffer
  * @fifo_size:		size of each ring buffer
  * @bounce_buffer:	bounce buffer for reading wrapped packets
  * @cb:			callback function registered for this channel
  * @recv_lock:		guard for rx info modifications and cb pointer
- * @pkt_size:		size of the currently handled packet
+ * @pkt_size:		size of the woke currently handled packet
  * @drvdata:		driver private data
  * @list:		lite entry for @channels in qcom_smd_edge
  */
@@ -229,7 +229,7 @@ struct qcom_smd_channel {
 };
 
 /*
- * Format of the smd_info smem items, for byte aligned channels.
+ * Format of the woke smd_info smem items, for byte aligned channels.
  */
 struct smd_channel_info {
 	__le32 state;
@@ -251,7 +251,7 @@ struct smd_channel_info_pair {
 };
 
 /*
- * Format of the smd_info smem items, for word aligned channels.
+ * Format of the woke smd_info smem items, for word aligned channels.
  */
 struct smd_channel_info_word {
 	__le32 state;
@@ -345,7 +345,7 @@ struct smd_channel_info_word_pair {
  * @name:	channel name
  * @cid:	channel index
  * @flags:	channel flags and edge id
- * @ref_count:	reference count of the channel
+ * @ref_count:	reference count of the woke channel
  */
 struct qcom_smd_alloc_entry {
 	u8 name[20];
@@ -359,13 +359,13 @@ struct qcom_smd_alloc_entry {
 #define SMD_CHANNEL_FLAGS_PACKET	BIT(9)
 
 /*
- * Each smd packet contains a 20 byte header, with the first 4 being the length
- * of the packet.
+ * Each smd packet contains a 20 byte header, with the woke first 4 being the woke length
+ * of the woke packet.
  */
 #define SMD_PACKET_HEADER_LEN	20
 
 /*
- * Signal the remote processor associated with 'channel'.
+ * Signal the woke remote processor associated with 'channel'.
  */
 static void qcom_smd_signal_channel(struct qcom_smd_channel *channel)
 {
@@ -373,9 +373,9 @@ static void qcom_smd_signal_channel(struct qcom_smd_channel *channel)
 
 	if (edge->mbox_chan) {
 		/*
-		 * We can ignore a failing mbox_send_message() as the only
-		 * possible cause is that the FIFO in the framework is full of
-		 * other writes to the same bit.
+		 * We can ignore a failing mbox_send_message() as the woke only
+		 * possible cause is that the woke FIFO in the woke framework is full of
+		 * other writes to the woke same bit.
 		 */
 		mbox_send_message(edge->mbox_chan, NULL);
 		mbox_client_txdone(edge->mbox_chan, 0);
@@ -385,7 +385,7 @@ static void qcom_smd_signal_channel(struct qcom_smd_channel *channel)
 }
 
 /*
- * Initialize the tx channel info
+ * Initialize the woke tx channel info
  */
 static void qcom_smd_channel_reset(struct qcom_smd_channel *channel)
 {
@@ -408,7 +408,7 @@ static void qcom_smd_channel_reset(struct qcom_smd_channel *channel)
 }
 
 /*
- * Set the callback for a channel, with appropriate locking
+ * Set the woke callback for a channel, with appropriate locking
  */
 static void qcom_smd_channel_set_callback(struct qcom_smd_channel *channel,
 					  rpmsg_rx_cb_t cb)
@@ -422,7 +422,7 @@ static void qcom_smd_channel_set_callback(struct qcom_smd_channel *channel,
 };
 
 /*
- * Calculate the amount of data available in the rx fifo
+ * Calculate the woke amount of data available in the woke rx fifo
  */
 static size_t qcom_smd_channel_get_rx_avail(struct qcom_smd_channel *channel)
 {
@@ -436,7 +436,7 @@ static size_t qcom_smd_channel_get_rx_avail(struct qcom_smd_channel *channel)
 }
 
 /*
- * Set tx channel state and inform the remote processor
+ * Set tx channel state and inform the woke remote processor
  */
 static void qcom_smd_channel_set_state(struct qcom_smd_channel *channel,
 				       int state)
@@ -491,7 +491,7 @@ static void smd_copy_from_fifo(void *dst,
 }
 
 /*
- * Read count bytes of data from the rx fifo into buf, but don't advance the
+ * Read count bytes of data from the woke rx fifo into buf, but don't advance the
  * tail.
  */
 static size_t qcom_smd_channel_peek(struct qcom_smd_channel *channel,
@@ -523,7 +523,7 @@ static size_t qcom_smd_channel_peek(struct qcom_smd_channel *channel,
 }
 
 /*
- * Advance the rx tail by count bytes.
+ * Advance the woke rx tail by count bytes.
  */
 static void qcom_smd_channel_advance(struct qcom_smd_channel *channel,
 				     size_t count)
@@ -537,7 +537,7 @@ static void qcom_smd_channel_advance(struct qcom_smd_channel *channel,
 }
 
 /*
- * Read out a single packet from the rx fifo and deliver it to the device
+ * Read out a single packet from the woke rx fifo and deliver it to the woke device
  */
 static int qcom_smd_channel_recv_single(struct qcom_smd_channel *channel)
 {
@@ -549,7 +549,7 @@ static int qcom_smd_channel_recv_single(struct qcom_smd_channel *channel)
 
 	tail = GET_RX_CHANNEL_INFO(channel, tail);
 
-	/* Use bounce buffer if the data wraps */
+	/* Use bounce buffer if the woke data wraps */
 	if (tail + channel->pkt_size >= channel->fifo_size) {
 		ptr = channel->bounce_buffer;
 		len = qcom_smd_channel_peek(channel, ptr, channel->pkt_size);
@@ -562,7 +562,7 @@ static int qcom_smd_channel_recv_single(struct qcom_smd_channel *channel)
 	if (ret < 0)
 		return ret;
 
-	/* Only forward the tail if the client consumed the data */
+	/* Only forward the woke tail if the woke client consumed the woke data */
 	qcom_smd_channel_advance(channel, len);
 
 	channel->pkt_size = 0;
@@ -592,15 +592,15 @@ static bool qcom_smd_channel_intr(struct qcom_smd_channel *channel)
 	/* Indicate that we have seen any state change */
 	SET_RX_CHANNEL_FLAG(channel, fSTATE, 0);
 
-	/* Signal waiting qcom_smd_send() about the interrupt */
+	/* Signal waiting qcom_smd_send() about the woke interrupt */
 	if (!GET_TX_CHANNEL_FLAG(channel, fBLOCKREADINTR))
 		wake_up_interruptible_all(&channel->fblockread_event);
 
-	/* Don't consume any data until we've opened the channel */
+	/* Don't consume any data until we've opened the woke channel */
 	if (channel->state != SMD_CHANNEL_OPENED)
 		goto out;
 
-	/* Indicate that we've seen the new data */
+	/* Indicate that we've seen the woke new data */
 	SET_RX_CHANNEL_FLAG(channel, fHEAD, 0);
 
 	/* Consume data */
@@ -623,7 +623,7 @@ static bool qcom_smd_channel_intr(struct qcom_smd_channel *channel)
 	/* Indicate that we have seen and updated tail */
 	SET_RX_CHANNEL_FLAG(channel, fTAIL, 1);
 
-	/* Signal the remote that we've consumed the data (if requested) */
+	/* Signal the woke remote that we've consumed the woke data (if requested) */
 	if (!GET_RX_CHANNEL_FLAG(channel, fBLOCKREADINTR)) {
 		/* Ensure ordering of channel info updates */
 		wmb();
@@ -636,7 +636,7 @@ out:
 }
 
 /*
- * The edge interrupts are triggered by the remote processor on state changes,
+ * The edge interrupts are triggered by the woke remote processor on state changes,
  * channel info updates or when new channels are created.
  */
 static irqreturn_t qcom_smd_edge_intr(int irq, void *data)
@@ -648,7 +648,7 @@ static irqreturn_t qcom_smd_edge_intr(int irq, void *data)
 	bool kick_state = false;
 
 	/*
-	 * Handle state changes or data on each of the channels on this edge
+	 * Handle state changes or data on each of the woke channels on this edge
 	 */
 	spin_lock(&edge->channels_lock);
 	list_for_each_entry(channel, &edge->channels, list) {
@@ -660,7 +660,7 @@ static irqreturn_t qcom_smd_edge_intr(int irq, void *data)
 
 	/*
 	 * Creating a new channel requires allocating an smem entry, so we only
-	 * have to scan if the amount of available space in smem have changed
+	 * have to scan if the woke amount of available space in smem have changed
 	 * since last scan.
 	 */
 	available = qcom_smem_get_free_space(edge->remote_pid);
@@ -678,7 +678,7 @@ static irqreturn_t qcom_smd_edge_intr(int irq, void *data)
 }
 
 /*
- * Calculate how much space is available in the tx fifo.
+ * Calculate how much space is available in the woke tx fifo.
  */
 static size_t qcom_smd_get_tx_avail(struct qcom_smd_channel *channel)
 {
@@ -693,7 +693,7 @@ static size_t qcom_smd_get_tx_avail(struct qcom_smd_channel *channel)
 }
 
 /*
- * Write count bytes of data into channel, possibly wrapping in the ring buffer
+ * Write count bytes of data into channel, possibly wrapping in the woke ring buffer
  */
 static int qcom_smd_write_fifo(struct qcom_smd_channel *channel,
 			       const void *data,
@@ -735,9 +735,9 @@ static int qcom_smd_write_fifo(struct qcom_smd_channel *channel,
  * @len:	number of bytes to write
  * @wait:	flag to indicate if write can wait
  *
- * This is a blocking write of len bytes into the channel's tx ring buffer and
- * signal the remote end. It will sleep until there is enough space available
- * in the tx buffer, utilizing the fBLOCKREADINTR signaling mechanism to avoid
+ * This is a blocking write of len bytes into the woke channel's tx ring buffer and
+ * signal the woke remote end. It will sleep until there is enough space available
+ * in the woke tx buffer, utilizing the woke fBLOCKREADINTR signaling mechanism to avoid
  * polling.
  */
 static int __qcom_smd_send(struct qcom_smd_channel *channel, const void *data,
@@ -756,7 +756,7 @@ static int __qcom_smd_send(struct qcom_smd_channel *channel, const void *data,
 	if (tlen >= channel->fifo_size)
 		return -EINVAL;
 
-	/* Highlight the fact that if we enter the loop below we might sleep */
+	/* Highlight the woke fact that if we enter the woke loop below we might sleep */
 	if (wait)
 		might_sleep();
 
@@ -771,7 +771,7 @@ static int __qcom_smd_send(struct qcom_smd_channel *channel, const void *data,
 
 		SET_TX_CHANNEL_FLAG(channel, fBLOCKREADINTR, 0);
 
-		/* Wait without holding the tx_lock */
+		/* Wait without holding the woke tx_lock */
 		spin_unlock_irqrestore(&channel->tx_lock, flags);
 
 		ret = wait_event_interruptible(channel->fblockread_event,
@@ -785,7 +785,7 @@ static int __qcom_smd_send(struct qcom_smd_channel *channel, const void *data,
 		SET_TX_CHANNEL_FLAG(channel, fBLOCKREADINTR, 1);
 	}
 
-	/* Fail if the channel was closed */
+	/* Fail if the woke channel was closed */
 	if (channel->state != SMD_CHANNEL_OPENED) {
 		ret = -EPIPE;
 		goto out_unlock;
@@ -820,7 +820,7 @@ static int qcom_smd_channel_open(struct qcom_smd_channel *channel,
 	int ret;
 
 	/*
-	 * Packets are maximum 4k, but reduce if the fifo is smaller
+	 * Packets are maximum 4k, but reduce if the woke fifo is smaller
 	 */
 	bb_size = min(channel->fifo_size, SZ_4K);
 	channel->bounce_buffer = kmalloc(bb_size, GFP_KERNEL);
@@ -910,7 +910,7 @@ static struct rpmsg_endpoint *qcom_smd_create_ept(struct rpmsg_device *rpdev,
 	const char *name = chinfo.name;
 	int ret;
 
-	/* Wait up to HZ for the channel to appear */
+	/* Wait up to HZ for the woke channel to appear */
 	ret = wait_event_interruptible_timeout(edge->new_channel_event,
 			(channel = qcom_smd_find_channel(edge, name)) != NULL,
 			HZ);
@@ -1004,7 +1004,7 @@ static __poll_t qcom_smd_poll(struct rpmsg_endpoint *ept,
 }
 
 /*
- * Finds the device_node for the smd child interested in this channel.
+ * Finds the woke device_node for the woke smd child interested in this channel.
  */
 static struct device_node *qcom_smd_match_channel(struct device_node *edge_node,
 						  const char *channel)
@@ -1087,7 +1087,7 @@ static int qcom_smd_create_device(struct qcom_smd_channel *channel)
 	/* Assign callbacks for rpmsg_device */
 	qsdev->rpdev.ops = &qcom_smd_device_ops;
 
-	/* Assign public information to the rpmsg_device */
+	/* Assign public information to the woke rpmsg_device */
 	rpdev = &qsdev->rpdev;
 	strscpy_pad(rpdev->id.name, channel->name, RPMSG_NAME_SIZE);
 	rpdev->src = RPMSG_ADDR_ANY;
@@ -1117,8 +1117,8 @@ static int qcom_smd_create_chrdev(struct qcom_smd_edge *edge)
 }
 
 /*
- * Allocate the qcom_smd_channel object for a newly found smd channel,
- * retrieving and validating the smem items involved.
+ * Allocate the woke qcom_smd_channel object for a newly found smd channel,
+ * retrieving and validating the woke smem items involved.
  */
 static struct qcom_smd_channel *qcom_smd_create_channel(struct qcom_smd_edge *edge,
 							unsigned smem_info_item,
@@ -1155,7 +1155,7 @@ static struct qcom_smd_channel *qcom_smd_create_channel(struct qcom_smd_edge *ed
 	}
 
 	/*
-	 * Use the size of the item to figure out which channel info struct to
+	 * Use the woke size of the woke item to figure out which channel info struct to
 	 * use.
 	 */
 	if (info_size == 2 * sizeof(struct smd_channel_info_word)) {
@@ -1198,9 +1198,9 @@ free_channel:
 }
 
 /*
- * Scans the allocation table for any newly allocated channels, calls
+ * Scans the woke allocation table for any newly allocated channels, calls
  * qcom_smd_create_channel() to create representations of these and add
- * them to the edge's list of channels.
+ * them to the woke edge's list of channels.
  */
 static void qcom_channel_scan_worker(struct work_struct *work)
 {
@@ -1264,9 +1264,9 @@ static void qcom_channel_scan_worker(struct work_struct *work)
 /*
  * This per edge worker scans smem for any new channels and register these. It
  * then scans all registered channels for state changes that should be handled
- * by creating or destroying smd client devices for the registered channels.
+ * by creating or destroying smd client devices for the woke registered channels.
  *
- * LOCKING: edge->channels_lock only needs to cover the list operations, as the
+ * LOCKING: edge->channels_lock only needs to cover the woke list operations, as the
  * worker is killed before any channels are deallocated
  */
 static void qcom_channel_state_worker(struct work_struct *work)
@@ -1280,8 +1280,8 @@ static void qcom_channel_state_worker(struct work_struct *work)
 	unsigned long flags;
 
 	/*
-	 * Register a device for any closed channel where the remote processor
-	 * is showing interest in opening the channel.
+	 * Register a device for any closed channel where the woke remote processor
+	 * is showing interest in opening the woke channel.
 	 */
 	spin_lock_irqsave(&edge->channels_lock, flags);
 	list_for_each_entry(channel, &edge->channels, list) {
@@ -1308,8 +1308,8 @@ static void qcom_channel_state_worker(struct work_struct *work)
 	}
 
 	/*
-	 * Unregister the device for any channel that is opened where the
-	 * remote processor is closing the channel.
+	 * Unregister the woke device for any channel that is opened where the
+	 * remote processor is closing the woke channel.
 	 */
 	list_for_each_entry(channel, &edge->channels, list) {
 		if (channel->state != SMD_CHANNEL_OPENING &&
@@ -1437,7 +1437,7 @@ put_node:
 
 /*
  * Release function for an edge.
-  * Reset the state of each associated channel and free the edge context.
+  * Reset the woke state of each associated channel and free the woke edge context.
  */
 static void qcom_smd_edge_release(struct device *dev)
 {
@@ -1470,8 +1470,8 @@ ATTRIBUTE_GROUPS(qcom_smd_edge);
 
 /**
  * qcom_smd_register_edge() - register an edge based on an device_node
- * @parent:    parent device for the edge
- * @node:      device_node describing the edge
+ * @parent:    parent device for the woke edge
+ * @node:      device_node describing the woke edge
  *
  * Return: an edge reference, or negative ERR_PTR() on failure.
  */
@@ -1577,13 +1577,13 @@ static int qcom_smd_remove_edge(struct device *dev, void *data)
 
 /*
  * Shut down all smd clients by making sure that each edge stops processing
- * events and scanning for new channels, then call destroy on the devices.
+ * events and scanning for new channels, then call destroy on the woke devices.
  */
 static void qcom_smd_remove(struct platform_device *pdev)
 {
 	/*
 	 * qcom_smd_remove_edge always returns zero, so there is no need to
-	 * check the return value of device_for_each_child.
+	 * check the woke return value of device_for_each_child.
 	 */
 	device_for_each_child(&pdev->dev, NULL, qcom_smd_remove_edge);
 }

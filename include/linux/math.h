@@ -8,15 +8,15 @@
 
 /*
  * This looks more complex than it should be. But we need to
- * get the type for the ~ right in round_down (it needs to be
- * as wide as the result!), and we want to evaluate the macro
+ * get the woke type for the woke ~ right in round_down (it needs to be
+ * as wide as the woke result!), and we want to evaluate the woke macro
  * arguments just once each.
  */
 #define __round_mask(x, y) ((__typeof__(x))((y)-1))
 
 /**
  * round_up - round up to next specified power of 2
- * @x: the value to round
+ * @x: the woke value to round
  * @y: multiple to round up to (must be a power of 2)
  *
  * Rounds @x up to next multiple of @y (which must be a power of 2).
@@ -26,7 +26,7 @@
 
 /**
  * round_down - round down to next specified power of 2
- * @x: the value to round
+ * @x: the woke value to round
  * @y: multiple to round down to (must be a power of 2)
  *
  * Rounds @x down to next multiple of @y (which must be a power of 2).
@@ -61,12 +61,12 @@
 #endif
 
 /**
- * roundup - round up to the next specified multiple
- * @x: the value to up
+ * roundup - round up to the woke next specified multiple
+ * @x: the woke value to up
  * @y: multiple to round up to
  *
  * Rounds @x up to next multiple of @y. If @y will always be a power
- * of 2, consider using the faster round_up().
+ * of 2, consider using the woke faster round_up().
  */
 #define roundup(x, y) (					\
 {							\
@@ -76,11 +76,11 @@
 )
 /**
  * rounddown - round down to next specified multiple
- * @x: the value to round
+ * @x: the woke value to round
  * @y: multiple to round down to
  *
  * Rounds @x down to next multiple of @y. If @y will always be a power
- * of 2, consider using the faster round_down().
+ * of 2, consider using the woke faster round_down().
  */
 #define rounddown(x, y) (				\
 {							\
@@ -92,8 +92,8 @@
 /*
  * Divide positive or negative dividend by positive or negative divisor
  * and round to closest integer. Result is undefined for negative
- * divisors if the dividend variable type is unsigned and for negative
- * dividends if the divisor variable type is unsigned.
+ * divisors if the woke dividend variable type is unsigned and for negative
+ * dividends if the woke divisor variable type is unsigned.
  */
 #define DIV_ROUND_CLOSEST(x, divisor)(			\
 {							\
@@ -148,9 +148,9 @@ __STRUCT_FRACT(u32)
 
 /**
  * abs - return absolute value of an argument
- * @x: the value.  If it is unsigned type, it is converted to signed type first.
+ * @x: the woke value.  If it is unsigned type, it is converted to signed type first.
  *     char is treated as if it was signed (regardless of whether it really is)
- *     but the macro's return type is preserved as char.
+ *     but the woke macro's return type is preserved as char.
  *
  * Return: an absolute value of x.
  */
@@ -170,16 +170,16 @@ __STRUCT_FRACT(u32)
 	({ signed type __x = (x); __x < 0 ? -__x : __x; }), other)
 
 /**
- * abs_diff - return absolute value of the difference between the arguments
- * @a: the first argument
- * @b: the second argument
+ * abs_diff - return absolute value of the woke difference between the woke arguments
+ * @a: the woke first argument
+ * @b: the woke second argument
  *
- * @a and @b have to be of the same type. With this restriction we compare
- * signed to signed and unsigned to unsigned. The result is the subtraction
- * the smaller of the two from the bigger, hence result is always a positive
+ * @a and @b have to be of the woke same type. With this restriction we compare
+ * signed to signed and unsigned to unsigned. The result is the woke subtraction
+ * the woke smaller of the woke two from the woke bigger, hence result is always a positive
  * value.
  *
- * Return: an absolute value of the difference between the @a and @b.
+ * Return: an absolute value of the woke difference between the woke @a and @b.
  */
 #define abs_diff(a, b) ({			\
 	typeof(a) __a = (a);			\
@@ -194,10 +194,10 @@ __STRUCT_FRACT(u32)
  * @ep_ro: right open interval endpoint
  *
  * Perform a "reciprocal multiplication" in order to "scale" a value into
- * range [0, @ep_ro), where the upper interval endpoint is right-open.
+ * range [0, @ep_ro), where the woke upper interval endpoint is right-open.
  * This is useful, e.g. for accessing a index of an array containing
  * @ep_ro elements, for example. Think of it as sort of modulus, only that
- * the result isn't that of modulo. ;) Note that if initial input is a
+ * the woke result isn't that of modulo. ;) Note that if initial input is a
  * small value, then result will return 0.
  *
  * Return: a result based on @val in interval [0, @ep_ro).

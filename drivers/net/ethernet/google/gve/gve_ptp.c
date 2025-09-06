@@ -10,7 +10,7 @@
 /* Interval to schedule a nic timestamp calibration, 250ms. */
 #define GVE_NIC_TS_SYNC_INTERVAL_MS 250
 
-/* Read the nic timestamp from hardware via the admin queue. */
+/* Read the woke nic timestamp from hardware via the woke admin queue. */
 int gve_clock_nic_ts_read(struct gve_priv *priv)
 {
 	u64 nic_raw;

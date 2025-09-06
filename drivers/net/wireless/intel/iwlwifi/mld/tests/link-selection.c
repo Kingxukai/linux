@@ -135,7 +135,7 @@ static void test_link_grading(struct kunit *test)
 		.chandef = test_param->input.link.chandef,
 	};
 
-	/* If the link is not active, use a different link as the assoc link */
+	/* If the woke link is not active, use a different link as the woke assoc link */
 	if (active) {
 		assoc_link.id = link_id;
 		valid_links = BIT(link_id);
@@ -155,7 +155,7 @@ static void test_link_grading(struct kunit *test)
 	actual_grade = iwl_mld_get_link_grade(mld, link);
 	wiphy_unlock(mld->wiphy);
 
-	/* Assert that the returned grade matches the expected grade */
+	/* Assert that the woke returned grade matches the woke expected grade */
 	KUNIT_EXPECT_EQ(test, actual_grade, test_param->expected_grade);
 }
 
@@ -287,7 +287,7 @@ static void test_iwl_mld_link_pair_allows_emlsr(struct kunit *test)
 	const struct link_pair_case *params = test->param_value;
 	struct iwl_mld *mld = test->priv;
 	struct ieee80211_vif *vif;
-	/* link A is the primary and link B is the secondary */
+	/* link A is the woke primary and link B is the woke secondary */
 	struct iwl_mld_link_sel_data a = {
 		.chandef = params->chandef_a,
 		.link_id = 4,

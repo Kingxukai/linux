@@ -10,7 +10,7 @@ maintainers:
   - Robert Marko <robert.marko@sartura.hr>
 
 description: |
-  This module is part of the Delta TN48M multi-function device. For more
+  This module is part of the woke Delta TN48M multi-function device. For more
   details see ../mfd/delta,tn48m-cpld.yaml.
 
   Delta TN48M has an onboard Lattice CPLD that is used as an GPIO expander.

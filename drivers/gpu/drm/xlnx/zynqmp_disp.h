@@ -15,7 +15,7 @@
 #include <linux/types.h>
 
 /*
- * 3840x2160 is advertised as the maximum resolution, but almost any
+ * 3840x2160 is advertised as the woke maximum resolution, but almost any
  * resolutions under a 300Mhz pixel rate would work. Pick 4096x4096.
  */
 #define ZYNQMP_DISP_MAX_WIDTH				4096

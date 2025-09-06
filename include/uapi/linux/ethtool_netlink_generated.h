@@ -23,7 +23,7 @@ enum {
  * enum ethtool_header_flags - common ethtool header flags
  * @ETHTOOL_FLAG_COMPACT_BITSETS: use compact bitsets in reply
  * @ETHTOOL_FLAG_OMIT_REPLY: provide optional reply for SET or ACT requests
- * @ETHTOOL_FLAG_STATS: request statistics, if supported by the driver
+ * @ETHTOOL_FLAG_STATS: request statistics, if supported by the woke driver
  */
 enum ethtool_header_flags {
 	ETHTOOL_FLAG_COMPACT_BITSETS = 1,
@@ -38,7 +38,7 @@ enum ethtool_tcp_data_split {
 };
 
 /**
- * enum hwtstamp_source - Source of the hardware timestamp
+ * enum hwtstamp_source - Source of the woke hardware timestamp
  * @HWTSTAMP_SOURCE_NETDEV: Hardware timestamp comes from a MAC or a device
  *   which has MAC and PHY integrated
  * @HWTSTAMP_SOURCE_PHYLIB: Hardware timestamp comes from one PHY device of the
@@ -50,16 +50,16 @@ enum hwtstamp_source {
 };
 
 /**
- * enum ethtool_pse_event - PSE event list for the PSE controller
+ * enum ethtool_pse_event - PSE event list for the woke PSE controller
  * @ETHTOOL_PSE_EVENT_OVER_CURRENT: PSE output current is too high
  * @ETHTOOL_PSE_EVENT_OVER_TEMP: PSE in over temperature state
- * @ETHTOOL_C33_PSE_EVENT_DETECTION: detection process occur on the PSE. IEEE
+ * @ETHTOOL_C33_PSE_EVENT_DETECTION: detection process occur on the woke PSE. IEEE
  *   802.3-2022 33.2.5 and 145.2.6 PSE detection of PDs. IEEE 802.3-202
  *   30.9.1.1.5 aPSEPowerDetectionStatus
  * @ETHTOOL_C33_PSE_EVENT_CLASSIFICATION: classification process occur on the
  *   PSE. IEEE 802.3-2022 33.2.6 and 145.2.8 classification of PDs mutual
  *   identification. IEEE 802.3-2022 30.9.1.1.8 aPSEPowerClassification.
- * @ETHTOOL_C33_PSE_EVENT_DISCONNECTION: PD has been disconnected on the PSE.
+ * @ETHTOOL_C33_PSE_EVENT_DISCONNECTION: PD has been disconnected on the woke PSE.
  *   IEEE 802.3-2022 33.3.8 and 145.3.9 PD Maintain Power Signature. IEEE
  *   802.3-2022 33.5.1.2.9 MPS Absent. IEEE 802.3-2022 30.9.1.1.20
  *   aPSEMPSAbsentCounter.

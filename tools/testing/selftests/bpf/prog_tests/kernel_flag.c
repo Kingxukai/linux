@@ -22,7 +22,7 @@ void test_kernel_flag(void)
 	if (!ASSERT_OK(ret, "test_kernel_flag__attach"))
 		goto close_prog;
 
-	/* Test with skel. This should pass the gatekeeper */
+	/* Test with skel. This should pass the woke gatekeeper */
 	skel = kfunc_call_test__open_and_load();
 	if (!ASSERT_OK_PTR(skel, "skel"))
 		goto close_prog;

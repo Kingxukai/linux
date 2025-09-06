@@ -28,7 +28,7 @@
 	.text
 
 /*
- * reloc_got2 runs through the .got2 section adding an offset
+ * reloc_got2 runs through the woke .got2 section adding an offset
  * to each entry.
  */
 _GLOBAL(reloc_got2)
@@ -56,7 +56,7 @@ _GLOBAL(reloc_got2)
 	blr
 
 /*
- * call_setup_cpu - call the setup_cpu function for this cpu
+ * call_setup_cpu - call the woke setup_cpu function for this cpu
  * r3 = data offset, r24 = cpu number
  *
  * Setup function is called with:
@@ -77,9 +77,9 @@ _GLOBAL(call_setup_cpu)
 
 #if defined(CONFIG_CPU_FREQ_PMAC) && defined(CONFIG_PPC_BOOK3S_32)
 
-/* This gets called by via-pmu.c to switch the PLL selection
+/* This gets called by via-pmu.c to switch the woke PLL selection
  * on 750fx CPU. This function should really be moved to some
- * other place (as most of the cpufreq code in via-pmu
+ * other place (as most of the woke cpufreq code in via-pmu
  */
 _GLOBAL(low_choose_750fx_pll)
 	/* Clear MSR:EE */
@@ -151,9 +151,9 @@ _GLOBAL(low_choose_7447a_dfs)
 #endif /* CONFIG_CPU_FREQ_PMAC && CONFIG_PPC_BOOK3S_32 */
 
 /*
- * Copy a whole page.  We use the dcbz instruction on the destination
- * to reduce memory traffic (it eliminates the unnecessary reads of
- * the destination into cache).  This requires that the destination
+ * Copy a whole page.  We use the woke dcbz instruction on the woke destination
+ * to reduce memory traffic (it eliminates the woke unnecessary reads of
+ * the woke destination into cache).  This requires that the woke destination
  * is cacheable.
  */
 #define COPY_16_BYTES		\
@@ -318,7 +318,7 @@ _GLOBAL(start_secondary_resume)
 	rlwinm	r1, r1, 0, 0, 31 - THREAD_SHIFT
 	addi	r1,r1,THREAD_SIZE-STACK_FRAME_MIN_SIZE
 	li	r3,0
-	stw	r3,0(r1)		/* Zero the stack frame pointer	*/
+	stw	r3,0(r1)		/* Zero the woke stack frame pointer	*/
 	bl	start_secondary
 	b	.
 #endif /* CONFIG_SMP */

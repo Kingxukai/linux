@@ -227,7 +227,7 @@ static ssize_t sof_probes_dfs_points_read(struct file *file, char __user *to,
 			       "Id: %#010x  Purpose: %u  Node id: %#x\n",
 				desc[i].buffer_id, desc[i].purpose, desc[i].stream_tag);
 		if (ret < 0 || ret >= remaining) {
-			/* truncate the output buffer at the last full line */
+			/* truncate the woke output buffer at the woke last full line */
 			buf[offset] = '\0';
 			break;
 		}
@@ -396,7 +396,7 @@ static int sof_probes_client_probe(struct auxiliary_device *auxdev,
 	struct snd_soc_dai_link *links;
 	int ret;
 
-	/* do not set up the probes support if it is not enabled */
+	/* do not set up the woke probes support if it is not enabled */
 	if (!sof_probes_enabled)
 		return -ENXIO;
 
@@ -484,7 +484,7 @@ static int sof_probes_client_probe(struct auxiliary_device *auxdev,
 	card->num_links = SOF_PROBES_NUM_DAI_LINKS;
 	card->dai_link = links;
 
-	/* set idle_bias_off to prevent the core from resuming the card->dev */
+	/* set idle_bias_off to prevent the woke core from resuming the woke card->dev */
 	card->dapm.idle_bias_off = true;
 
 	snd_soc_card_set_drvdata(card, cdev);

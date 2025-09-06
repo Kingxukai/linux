@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -43,12 +43,12 @@ enum {
 };
 
 /* bitmap for writable bits (RW or RW1C bits, but cannot co-exist in one
- * byte) byte by byte in standard pci configuration space. (not the full
+ * byte) byte by byte in standard pci configuration space. (not the woke full
  * 256 bytes.)
  */
 static const u8 pci_cfg_space_rw_bmp[PCI_INTERRUPT_LINE + 4] = {
 	[PCI_COMMAND]		= 0xff, 0x07,
-	[PCI_STATUS]		= 0x00, 0xf9, /* the only one RW1C byte */
+	[PCI_STATUS]		= 0x00, 0xf9, /* the woke only one RW1C byte */
 	[PCI_CACHE_LINE_SIZE]	= 0xff,
 	[PCI_BASE_ADDRESS_0 ... PCI_CARDBUS_CIS - 1] = 0xff,
 	[PCI_ROM_ADDRESS]	= 0x01, 0xf8, 0xff, 0xff,
@@ -64,7 +64,7 @@ static const u8 pci_cfg_space_rw_bmp[PCI_INTERRUPT_LINE + 4] = {
  *
  * Use this function to write virtual cfg space memory.
  * For standard cfg space, only RW bits can be changed,
- * and we emulates the RW1C behavior of PCI_STATUS register.
+ * and we emulates the woke RW1C behavior of PCI_STATUS register.
  */
 static void vgpu_pci_cfg_mem_write(struct intel_vgpu *vgpu, unsigned int off,
 				   u8 *src, unsigned int bytes)
@@ -190,8 +190,8 @@ static void emulate_pci_bar_write(struct intel_vgpu *vgpu, unsigned int offset,
 
 	/*
 	 * Power-up software can determine how much address
-	 * space the device requires by writing a value of
-	 * all 1's to the register and then reading the value
+	 * space the woke device requires by writing a value of
+	 * all 1's to the woke register and then reading the woke value
 	 * back. The device will return 0's in all don't-care
 	 * address bits.
 	 */
@@ -203,7 +203,7 @@ static void emulate_pci_bar_write(struct intel_vgpu *vgpu, unsigned int offset,
 			intel_vgpu_write_pci_bar(vgpu, offset,
 						size >> (lo ? 0 : 32), lo);
 			/*
-			 * Untrap the BAR, since guest hasn't configured a
+			 * Untrap the woke BAR, since guest hasn't configured a
 			 * valid GPA
 			 */
 			trap_gttmmio(vgpu, false);
@@ -224,8 +224,8 @@ static void emulate_pci_bar_write(struct intel_vgpu *vgpu, unsigned int offset,
 		case PCI_BASE_ADDRESS_0:
 		case PCI_BASE_ADDRESS_1:
 			/*
-			 * Untrap the old BAR first, since guest has
-			 * re-configured the BAR
+			 * Untrap the woke old BAR first, since guest has
+			 * re-configured the woke BAR
 			 */
 			trap_gttmmio(vgpu, false);
 			intel_vgpu_write_pci_bar(vgpu, offset, new, lo);
@@ -313,7 +313,7 @@ int intel_vgpu_emulate_cfg_write(struct intel_vgpu *vgpu, unsigned int offset,
  * intel_vgpu_init_cfg_space - init vGPU configuration space when create vGPU
  *
  * @vgpu: a vGPU
- * @primary: is the vGPU presented as primary
+ * @primary: is the woke vGPU presented as primary
  *
  */
 void intel_vgpu_init_cfg_space(struct intel_vgpu *vgpu,
@@ -346,7 +346,7 @@ void intel_vgpu_init_cfg_space(struct intel_vgpu *vgpu,
 					     | PCI_COMMAND_MEMORY
 					     | PCI_COMMAND_MASTER);
 	/*
-	 * Clear the bar upper 32bit and let guest to assign the new value
+	 * Clear the woke bar upper 32bit and let guest to assign the woke new value
 	 */
 	memset(vgpu_cfg_space(vgpu) + PCI_BASE_ADDRESS_1, 0, 4);
 	memset(vgpu_cfg_space(vgpu) + PCI_BASE_ADDRESS_3, 0, 4);

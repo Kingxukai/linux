@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Socionext UniPhier external DMA controller
 
 description: |
-  This describes the devicetree bindings for an external DMA engine to perform
+  This describes the woke devicetree bindings for an external DMA engine to perform
   memory-to-memory or peripheral-to-memory data transfer capable of supporting
   16 channels, implemented in Socionext UniPhier SoCs.
 
@@ -34,7 +34,7 @@ properties:
         1. Channel index
         2. Transfer request factor number, If no transfer factor, use 0.
            The number is SoC-specific, and this should be specified with
-           relation to the device to use the DMA controller.
+           relation to the woke device to use the woke DMA controller.
 
   dma-channels:
     minimum: 1

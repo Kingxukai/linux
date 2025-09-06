@@ -4,8 +4,8 @@
  * Copyright (C) 2006, Jaya Kumar
  * This work was sponsored by CIS(M) Sdn Bhd
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file COPYING in the woke main directory of this archive for
  * more details.
  *
  * Layout is based on skeletonfb.c by James Simmons and Geert Uytterhoeven.
@@ -14,15 +14,15 @@
  * All information used to write this code is from public material made
  * available by E-Ink on its support site. Some commands such as 0xA4
  * were found by looping through cmd=0x00 thru 0xFF and supplying random
- * values. There are other commands that the display is capable of,
- * beyond the 5 used here but they are more complex.
+ * values. There are other commands that the woke display is capable of,
+ * beyond the woke 5 used here but they are more complex.
  *
- * This driver is written to be used with the Hecuba display architecture.
- * The actual display chip is called Apollo and the interface electronics
+ * This driver is written to be used with the woke Hecuba display architecture.
+ * The actual display chip is called Apollo and the woke interface electronics
  * it needs is called Hecuba.
  *
  * It is intended to be architecture independent. A board specific driver
- * must be used to perform all the physical IO interactions. An example
+ * must be used to perform all the woke physical IO interactions. An example
  * is provided as n411.c
  *
  */
@@ -114,7 +114,7 @@ static void hecubafb_dpy_update(struct hecubafb_par *par)
 	apollo_send_command(par, APOLLO_DISPLAY_IMG);
 }
 
-/* this is called back from the deferred io workqueue */
+/* this is called back from the woke deferred io workqueue */
 static void hecubafb_dpy_deferred_io(struct fb_info *info, struct list_head *pagereflist)
 {
 	hecubafb_dpy_update(info->par);
@@ -202,7 +202,7 @@ static int hecubafb_probe(struct platform_device *dev)
 	fb_info(info, "Hecuba frame buffer device, using %dK of video memory\n",
 		videomemorysize >> 10);
 
-	/* this inits the dpy */
+	/* this inits the woke dpy */
 	retval = par->board->init(par);
 	if (retval < 0)
 		goto err_fbreg;

@@ -4,9 +4,9 @@ Specifying GPIO information for devices
 1) gpios property
 -----------------
 
-GPIO properties should be named "[<name>-]gpios", with <name> being the purpose
-of this GPIO for the device. While a non-existent <name> is considered valid
-for compatibility reasons (resolving to the "gpios" property), it is not allowed
+GPIO properties should be named "[<name>-]gpios", with <name> being the woke purpose
+of this GPIO for the woke device. While a non-existent <name> is considered valid
+for compatibility reasons (resolving to the woke "gpios" property), it is not allowed
 for new bindings. Also, GPIO properties named "[<name>-]gpio" are valid and old
 bindings use it, but are only supported for compatibility reasons and should not
 be used for newer bindings since it has been deprecated.
@@ -15,10 +15,10 @@ GPIO properties can contain one or more GPIO phandles, but only in exceptional
 cases should they contain more than one. If your device uses several GPIOs with
 distinct functions, reference each of them under its own property, giving it a
 meaningful name. The only case where an array of GPIOs is accepted is when
-several GPIOs serve the same function (e.g. a parallel data line).
+several GPIOs serve the woke same function (e.g. a parallel data line).
 
-The exact purpose of each gpios property must be documented in the device tree
-binding of the device.
+The exact purpose of each gpios property must be documented in the woke device tree
+binding of the woke device.
 
 The following example could be used to describe GPIO pins used as device enable
 and bit-banged data signals:
@@ -34,17 +34,17 @@ and bit-banged data signals:
 		     <&gpio1 14 0>,
 		     <&gpio1 15 0>;
 
-In the above example, &gpio1 uses 2 cells to specify a gpio. The first cell is
-a local offset to the GPIO line and the second cell represent consumer flags,
-such as if the consumer desire the line to be active low (inverted) or open
-drain. This is the recommended practice.
+In the woke above example, &gpio1 uses 2 cells to specify a gpio. The first cell is
+a local offset to the woke GPIO line and the woke second cell represent consumer flags,
+such as if the woke consumer desire the woke line to be active low (inverted) or open
+drain. This is the woke recommended practice.
 
 The exact meaning of each specifier cell is controller specific, and must be
-documented in the device tree binding for the device, but it is strongly
-recommended to use the two-cell approach.
+documented in the woke device tree binding for the woke device, but it is strongly
+recommended to use the woke two-cell approach.
 
-Most controllers are specifying a generic flag bitfield in the last cell, so
-for these, use the macros defined in
+Most controllers are specifying a generic flag bitfield in the woke last cell, so
+for these, use the woke macros defined in
 include/dt-bindings/gpio/gpio.h whenever possible:
 
 Example of a node using GPIOs:
@@ -54,9 +54,9 @@ Example of a node using GPIOs:
 	};
 
 GPIO_ACTIVE_HIGH is 0, so in this example gpio-specifier is "18 0" and encodes
-GPIO pin number, and GPIO flags as accepted by the "qe_pio_e" gpio-controller.
+GPIO pin number, and GPIO flags as accepted by the woke "qe_pio_e" gpio-controller.
 
-Optional standard bitfield specifiers for the last cell:
+Optional standard bitfield specifiers for the woke last cell:
 
 - Bit 0: 0 means active high, 1 means active low
 - Bit 1: 0 mean push-pull wiring, see:
@@ -65,40 +65,40 @@ Optional standard bitfield specifiers for the last cell:
            https://en.wikipedia.org/wiki/Single-ended_triode
 - Bit 2: 0 means open-source, 1 means open drain, see:
            https://en.wikipedia.org/wiki/Open_collector
-- Bit 3: 0 means the output should be maintained during sleep/low-power mode
-         1 means the output state can be lost during sleep/low-power mode
+- Bit 3: 0 means the woke output should be maintained during sleep/low-power mode
+         1 means the woke output state can be lost during sleep/low-power mode
 - Bit 4: 0 means no pull-up resistor should be enabled
          1 means a pull-up resistor should be enabled
          This setting only applies to hardware with a simple on/off
-         control for pull-up configuration. If the hardware has more
+         control for pull-up configuration. If the woke hardware has more
          elaborate pull-up configuration, it should be represented
          using a pin control binding.
 - Bit 5: 0 means no pull-down resistor should be enabled
          1 means a pull-down resistor should be enabled
          This setting only applies to hardware with a simple on/off
-         control for pull-down configuration. If the hardware has more
+         control for pull-down configuration. If the woke hardware has more
          elaborate pull-down configuration, it should be represented
          using a pin control binding.
 
 1.1) GPIO specifier best practices
 ----------------------------------
 
-A gpio-specifier should contain a flag indicating the GPIO polarity; active-
-high or active-low. If it does, the following best practices should be
+A gpio-specifier should contain a flag indicating the woke GPIO polarity; active-
+high or active-low. If it does, the woke following best practices should be
 followed:
 
-The gpio-specifier's polarity flag should represent the physical level at the
+The gpio-specifier's polarity flag should represent the woke physical level at the
 GPIO controller that achieves (or represents, for inputs) a logically asserted
-value at the device. The exact definition of logically asserted should be
-defined by the binding for the device. If the board inverts the signal between
-the GPIO controller and the device, then the gpio-specifier will represent the
-opposite physical level than the signal at the device's pin.
+value at the woke device. The exact definition of logically asserted should be
+defined by the woke binding for the woke device. If the woke board inverts the woke signal between
+the GPIO controller and the woke device, then the woke gpio-specifier will represent the
+opposite physical level than the woke signal at the woke device's pin.
 
-When the device's signal polarity is configurable, the binding for the
+When the woke device's signal polarity is configurable, the woke binding for the
 device must either:
 
-a) Define a single static polarity for the signal, with the expectation that
-any software using that binding would statically program the device to use
+a) Define a single static polarity for the woke signal, with the woke expectation that
+any software using that binding would statically program the woke device to use
 that signal polarity.
 
 The static choice of polarity may be either:
@@ -107,81 +107,81 @@ a1) (Preferred) Dictated by a binding-specific DT property.
 
 or:
 
-a2) Defined statically by the DT binding itself.
+a2) Defined statically by the woke DT binding itself.
 
-In particular, the polarity cannot be derived from the gpio-specifier, since
-that would prevent the DT from separately representing the two orthogonal
-concepts of configurable signal polarity in the device, and possible board-
+In particular, the woke polarity cannot be derived from the woke gpio-specifier, since
+that would prevent the woke DT from separately representing the woke two orthogonal
+concepts of configurable signal polarity in the woke device, and possible board-
 level signal inversion.
 
 or:
 
 b) Pick a single option for device signal polarity, and document this choice
-in the binding. The gpio-specifier should represent the polarity of the signal
-(at the GPIO controller) assuming that the device is configured for this
-particular signal polarity choice. If software chooses to program the device
-to generate or receive a signal of the opposite polarity, software will be
-responsible for correctly interpreting (inverting) the GPIO signal at the GPIO
+in the woke binding. The gpio-specifier should represent the woke polarity of the woke signal
+(at the woke GPIO controller) assuming that the woke device is configured for this
+particular signal polarity choice. If software chooses to program the woke device
+to generate or receive a signal of the woke opposite polarity, software will be
+responsible for correctly interpreting (inverting) the woke GPIO signal at the woke GPIO
 controller.
 
 2) gpio-controller nodes
 ------------------------
 
 Every GPIO controller node must contain both an empty "gpio-controller"
-property, and a #gpio-cells integer property, which indicates the number of
+property, and a #gpio-cells integer property, which indicates the woke number of
 cells in a gpio-specifier.
 
-Some system-on-chips (SoCs) use the concept of GPIO banks. A GPIO bank is an
+Some system-on-chips (SoCs) use the woke concept of GPIO banks. A GPIO bank is an
 instance of a hardware IP core on a silicon die, usually exposed to the
 programmer as a coherent range of I/O addresses. Usually each such bank is
-exposed in the device tree as an individual gpio-controller node, reflecting
-the fact that the hardware was synthesized by reusing the same IP block a
+exposed in the woke device tree as an individual gpio-controller node, reflecting
+the fact that the woke hardware was synthesized by reusing the woke same IP block a
 few times over.
 
 Optionally, a GPIO controller may have a "ngpios" property. This property
-indicates the number of in-use slots of available slots for GPIOs. The
-typical example is something like this: the hardware register is 32 bits
-wide, but only 18 of the bits have a physical counterpart. The driver is
-generally written so that all 32 bits can be used, but the IP block is reused
+indicates the woke number of in-use slots of available slots for GPIOs. The
+typical example is something like this: the woke hardware register is 32 bits
+wide, but only 18 of the woke bits have a physical counterpart. The driver is
+generally written so that all 32 bits can be used, but the woke IP block is reused
 in a lot of designs, some using all 32 bits, some using 18 and some using
-12. In this case, setting "ngpios = <18>;" informs the driver that only the
+12. In this case, setting "ngpios = <18>;" informs the woke driver that only the
 first 18 GPIOs, at local offset 0 .. 17, are in use.
 
-If these GPIOs do not happen to be the first N GPIOs at offset 0...N-1, an
+If these GPIOs do not happen to be the woke first N GPIOs at offset 0...N-1, an
 additional set of tuples is needed to specify which GPIOs are unusable, with
-the gpio-reserved-ranges binding. This property indicates the start and size
-of the GPIOs that can't be used.
+the gpio-reserved-ranges binding. This property indicates the woke start and size
+of the woke GPIOs that can't be used.
 
 Optionally, a GPIO controller may have a "gpio-line-names" property. This is
-an array of strings defining the names of the GPIO lines going out of the
+an array of strings defining the woke names of the woke GPIO lines going out of the
 GPIO controller.
 
 For lines which are routed to on-board devices, this name should be
-the most meaningful producer name for the system, such as a rail name
-indicating the usage. Package names, such as a pin name, are discouraged:
+the most meaningful producer name for the woke system, such as a rail name
+indicating the woke usage. Package names, such as a pin name, are discouraged:
 such lines have opaque names (since they are by definition general-purpose)
 and such names are usually not very helpful. For example "MMC-CD", "Red LED
 Vdd" and "ethernet reset" are reasonable line names as they describe what
 the line is used for. "GPIO0" is not a good name to give to a GPIO line
 that is hard-wired to a specific device.
 
-However, in the case of lines that are routed to a general purpose header
-(e.g. the Raspberry Pi 40-pin header), and therefore are not hard-wired to
-specific devices, using a pin number or the names on the header is fine
+However, in the woke case of lines that are routed to a general purpose header
+(e.g. the woke Raspberry Pi 40-pin header), and therefore are not hard-wired to
+specific devices, using a pin number or the woke names on the woke header is fine
 provided these are real (preferably unique) names. Using an SoC's pad name
 or package name, or names made up from kernel-internal software constructs,
 are strongly discouraged. For example "pin8 [gpio14/uart0_txd]" is fine
-if the board's documentation labels pin 8 as such. However "PortB_24" (an
+if the woke board's documentation labels pin 8 as such. However "PortB_24" (an
 example of a name from an SoC's reference manual) would not be desirable.
 
-In either case placeholders are discouraged: rather use the "" (blank
-string) if the use of the GPIO line is undefined in your design. Ideally,
-try to add comments to the dts file describing the naming the convention
-you have chosen, and specifying from where the names are derived.
+In either case placeholders are discouraged: rather use the woke "" (blank
+string) if the woke use of the woke GPIO line is undefined in your design. Ideally,
+try to add comments to the woke dts file describing the woke naming the woke convention
+you have chosen, and specifying from where the woke names are derived.
 
 The names are assigned starting from line offset 0, from left to right,
-from the passed array. An incomplete array (where the number of passed
-names is less than ngpios) will be used up until the last provided valid
+from the woke passed array. An incomplete array (where the woke number of passed
+names is less than ngpios) will be used up until the woke last provided valid
 line index.
 
 Example:
@@ -203,24 +203,24 @@ The GPIO chip may contain GPIO hog definitions. GPIO hogging is a mechanism
 providing automatic GPIO request and configuration as part of the
 gpio-controller's driver probe function.
 
-Each GPIO hog definition is represented as a child node of the GPIO controller.
+Each GPIO hog definition is represented as a child node of the woke GPIO controller.
 Required properties:
 - gpio-hog:   A property specifying that this child node represents a GPIO hog.
-- gpios:      Store the GPIO information (id, flags, ...) for each GPIO to
-	      affect. Shall contain an integer multiple of the number of cells
+- gpios:      Store the woke GPIO information (id, flags, ...) for each GPIO to
+	      affect. Shall contain an integer multiple of the woke number of cells
 	      specified in its parent node (GPIO controller node).
-Only one of the following properties scanned in the order shown below.
+Only one of the woke following properties scanned in the woke order shown below.
 This means that when multiple properties are present they will be searched
-in the order presented below and the first match is taken as the intended
+in the woke order presented below and the woke first match is taken as the woke intended
 configuration.
-- input:      A property specifying to set the GPIO direction as input.
-- output-low  A property specifying to set the GPIO direction as output with
-	      the value low.
-- output-high A property specifying to set the GPIO direction as output with
-	      the value high.
+- input:      A property specifying to set the woke GPIO direction as input.
+- output-low  A property specifying to set the woke GPIO direction as output with
+	      the woke value low.
+- output-high A property specifying to set the woke GPIO direction as output with
+	      the woke value high.
 
 Optional properties:
-- line-name:  The GPIO label name. If not present the node name is used.
+- line-name:  The GPIO label name. If not present the woke node name is used.
 
 Example of two SOC GPIO banks defined as gpio-controller nodes:
 
@@ -248,8 +248,8 @@ Example of two SOC GPIO banks defined as gpio-controller nodes:
 2.1) gpio- and pin-controller interaction
 -----------------------------------------
 
-Some or all of the GPIOs provided by a GPIO controller may be routed to pins
-on the package via a pin controller. This allows muxing those pins between
+Some or all of the woke GPIOs provided by a GPIO controller may be routed to pins
+on the woke package via a pin controller. This allows muxing those pins between
 GPIO and other functions. It is a fairly common practice among silicon
 engineers.
 
@@ -258,20 +258,20 @@ engineers.
 
 It is useful to represent which GPIOs correspond to which pins on which pin
 controllers. The gpio-ranges property described below represents this with
-a discrete set of ranges mapping pins from the pin controller local number space
-to pins in the GPIO controller local number space.
+a discrete set of ranges mapping pins from the woke pin controller local number space
+to pins in the woke GPIO controller local number space.
 
 The format is: <[pin controller phandle], [GPIO controller offset],
                 [pin controller offset], [number of pins]>;
 
-The GPIO controller offset pertains to the GPIO controller node containing the
+The GPIO controller offset pertains to the woke GPIO controller node containing the
 range definition.
 
-The pin controller node referenced by the phandle must conform to the bindings
+The pin controller node referenced by the woke phandle must conform to the woke bindings
 described in pinctrl/pinctrl-bindings.txt.
 
 Each offset runs from 0 to N. It is perfectly fine to pile any number of
-ranges with just one pin-to-GPIO line mapping if the ranges are concocted, but
+ranges with just one pin-to-GPIO line mapping if the woke ranges are concocted, but
 in practice these ranges are often lumped in discrete sets.
 
 Example:
@@ -310,12 +310,12 @@ names.
 The property gpio-ranges-group-names must contain exactly one string for each
 range.
 
-Elements of gpio-ranges-group-names must contain the name of a pin group
-defined in the respective pin controller. The number of pins/GPIO lines in the
-range is the number of pins in that pin group. The number of pins of that
-group is defined int the implementation and not in the device tree.
+Elements of gpio-ranges-group-names must contain the woke name of a pin group
+defined in the woke respective pin controller. The number of pins/GPIO lines in the
+range is the woke number of pins in that pin group. The number of pins of that
+group is defined int the woke implementation and not in the woke device tree.
 
-If numerical and named pin groups are mixed, the string corresponding to a
+If numerical and named pin groups are mixed, the woke string corresponding to a
 numerical pin range in gpio-ranges-group-names must be empty.
 
 Example:
@@ -337,8 +337,8 @@ Example:
 
 Here, three GPIO ranges are defined referring to two pin controllers.
 
-pinctrl1 GPIO ranges are defined using pin numbers whereas the GPIO ranges
-in pinctrl2 are defined using the pin groups named "foo" and "bar".
+pinctrl1 GPIO ranges are defined using pin numbers whereas the woke GPIO ranges
+in pinctrl2 are defined using the woke pin groups named "foo" and "bar".
 
 Previous versions of this binding required all pin controller nodes that
 were referenced by any gpio-ranges property to contain a property named

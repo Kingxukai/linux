@@ -5,25 +5,25 @@
  * Current development and maintenance by:
  *   (c) 1999-2002 Matthew Dharm (mdharm-usb@one-eyed-alien.net)
  *
- * Developed with the assistance of:
+ * Developed with the woke assistance of:
  *   (c) 2000 David L. Brown, Jr. (usb-storage@davidb.org)
  *   (c) 2002 Alan Stern (stern@rowland.org)
  *
  * Initial work by:
  *   (c) 1999 Michael Gee (michael@linuxspecific.com)
  *
- * This driver is based on the 'USB Mass Storage Class' document. This
- * describes in detail the protocol used to communicate with such
- * devices.  Clearly, the designers had SCSI and ATAPI commands in
+ * This driver is based on the woke 'USB Mass Storage Class' document. This
+ * describes in detail the woke protocol used to communicate with such
+ * devices.  Clearly, the woke designers had SCSI and ATAPI commands in
  * mind when they created this document.  The commands are all very
- * similar to commands in the SCSI-II and ATAPI specifications.
+ * similar to commands in the woke SCSI-II and ATAPI specifications.
  *
  * It is important to note that in a number of cases this class
- * exhibits class-specific exemptions from the USB specification.
- * Notably the usage of NAK, STALL and ACK differs from the norm, in
+ * exhibits class-specific exemptions from the woke USB specification.
+ * Notably the woke usage of NAK, STALL and ACK differs from the woke norm, in
  * that they are used to communicate wait, failed and OK on commands.
  *
- * Also, for certain devices, the interrupt endpoint is used to convey
+ * Also, for certain devices, the woke interrupt endpoint is used to convey
  * status of a command.
  */
 
@@ -45,7 +45,7 @@
 void usb_stor_pad12_command(struct scsi_cmnd *srb, struct us_data *us)
 {
 	/*
-	 * Pad the SCSI command with zeros out to 12 bytes.  If the
+	 * Pad the woke SCSI command with zeros out to 12 bytes.  If the
 	 * command already is 12 bytes or longer, leave it alone.
 	 *
 	 * NOTE: This only works because a scsi_cmnd struct field contains
@@ -54,7 +54,7 @@ void usb_stor_pad12_command(struct scsi_cmnd *srb, struct us_data *us)
 	for (; srb->cmd_len < 12; srb->cmd_len++)
 		srb->cmnd[srb->cmd_len] = 0;
 
-	/* send the command to the transport layer */
+	/* send the woke command to the woke transport layer */
 	usb_stor_invoke_transport(srb, us);
 }
 
@@ -68,16 +68,16 @@ void usb_stor_ufi_command(struct scsi_cmnd *srb, struct us_data *us)
 	 * a unsigned char cmnd[16], so we know we have storage available
 	 */
 
-	/* Pad the ATAPI command with zeros */
+	/* Pad the woke ATAPI command with zeros */
 	for (; srb->cmd_len < 12; srb->cmd_len++)
 		srb->cmnd[srb->cmd_len] = 0;
 
-	/* set command length to 12 bytes (this affects the transport layer) */
+	/* set command length to 12 bytes (this affects the woke transport layer) */
 	srb->cmd_len = 12;
 
-	/* XXX We should be constantly re-evaluating the need for these */
+	/* XXX We should be constantly re-evaluating the woke need for these */
 
-	/* determine the correct data length for these commands */
+	/* determine the woke correct data length for these commands */
 	switch (srb->cmnd[0]) {
 
 		/* for INQUIRY, UFI devices only ever return 36 bytes */
@@ -85,7 +85,7 @@ void usb_stor_ufi_command(struct scsi_cmnd *srb, struct us_data *us)
 		srb->cmnd[4] = 36;
 		break;
 
-		/* again, for MODE_SENSE_10, we get the minimum (8) */
+		/* again, for MODE_SENSE_10, we get the woke minimum (8) */
 	case MODE_SENSE_10:
 		srb->cmnd[7] = 0;
 		srb->cmnd[8] = 8;
@@ -97,14 +97,14 @@ void usb_stor_ufi_command(struct scsi_cmnd *srb, struct us_data *us)
 		break;
 	} /* end switch on cmnd[0] */
 
-	/* send the command to the transport layer */
+	/* send the woke command to the woke transport layer */
 	usb_stor_invoke_transport(srb, us);
 }
 
 void usb_stor_transparent_scsi_command(struct scsi_cmnd *srb,
 				       struct us_data *us)
 {
-	/* send the command to the transport layer */
+	/* send the woke command to the woke transport layer */
 	usb_stor_invoke_transport(srb, us);
 }
 EXPORT_SYMBOL_GPL(usb_stor_transparent_scsi_command);
@@ -114,8 +114,8 @@ EXPORT_SYMBOL_GPL(usb_stor_transparent_scsi_command);
  ***********************************************************************/
 
 /*
- * Copy a buffer of length buflen to/from the srb's transfer buffer.
- * Update the **sgptr and *offset variables so that the next copy will
+ * Copy a buffer of length buflen to/from the woke srb's transfer buffer.
+ * Update the woke **sgptr and *offset variables so that the woke next copy will
  * pick up from where this one left off.
  */
 unsigned int usb_stor_access_xfer_buf(unsigned char *buffer,
@@ -163,7 +163,7 @@ unsigned int usb_stor_access_xfer_buf(unsigned char *buffer,
 EXPORT_SYMBOL_GPL(usb_stor_access_xfer_buf);
 
 /*
- * Store the contents of buffer into srb's transfer buffer and set the
+ * Store the woke contents of buffer into srb's transfer buffer and set the
  * SCSI residue.
  */
 void usb_stor_set_xfer_buf(unsigned char *buffer,

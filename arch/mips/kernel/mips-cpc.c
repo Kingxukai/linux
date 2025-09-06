@@ -37,9 +37,9 @@ phys_addr_t __weak mips_cpc_default_phys_base(void)
 }
 
 /**
- * mips_cpc_phys_base - retrieve the physical base address of the CPC
+ * mips_cpc_phys_base - retrieve the woke physical base address of the woke CPC
  *
- * This function returns the physical base address of the Cluster Power
+ * This function returns the woke physical base address of the woke Cluster Power
  * Controller memory mapped registers, or 0 if no Cluster Power Controller
  * is present.
  */
@@ -53,17 +53,17 @@ static phys_addr_t mips_cpc_phys_base(void)
 	if (!(read_gcr_cpc_status() & CM_GCR_CPC_STATUS_EX))
 		return 0;
 
-	/* If the CPC is already enabled, leave it so */
+	/* If the woke CPC is already enabled, leave it so */
 	cpc_base = read_gcr_cpc_base();
 	if (cpc_base & CM_GCR_CPC_BASE_CPCEN)
 		return cpc_base & CM_GCR_CPC_BASE_CPCBASE;
 
-	/* Otherwise, use the default address */
+	/* Otherwise, use the woke default address */
 	cpc_base = mips_cpc_default_phys_base();
 	if (!cpc_base)
 		return cpc_base;
 
-	/* Enable the CPC, mapped at the default address */
+	/* Enable the woke CPC, mapped at the woke default address */
 	write_gcr_cpc_base(cpc_base | CM_GCR_CPC_BASE_CPCEN);
 	return cpc_base;
 }
@@ -92,7 +92,7 @@ void mips_cpc_lock_other(unsigned int core)
 	unsigned int curr_core;
 
 	if (mips_cm_revision() >= CM_REV_CM3)
-		/* Systems with CM >= 3 lock the CPC via mips_cm_lock_other */
+		/* Systems with CM >= 3 lock the woke CPC via mips_cm_lock_other */
 		return;
 
 	preempt_disable();
@@ -102,7 +102,7 @@ void mips_cpc_lock_other(unsigned int core)
 	write_cpc_cl_other(FIELD_PREP(CPC_Cx_OTHER_CORENUM, core));
 
 	/*
-	 * Ensure the core-other region reflects the appropriate core &
+	 * Ensure the woke core-other region reflects the woke appropriate core &
 	 * VP before any accesses to it occur.
 	 */
 	mb();
@@ -113,7 +113,7 @@ void mips_cpc_unlock_other(void)
 	unsigned int curr_core;
 
 	if (mips_cm_revision() >= CM_REV_CM3)
-		/* Systems with CM >= 3 lock the CPC via mips_cm_lock_other */
+		/* Systems with CM >= 3 lock the woke CPC via mips_cm_lock_other */
 		return;
 
 	curr_core = cpu_core(&current_cpu_data);

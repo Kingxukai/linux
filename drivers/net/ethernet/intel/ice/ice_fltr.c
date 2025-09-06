@@ -6,8 +6,8 @@
 
 /**
  * ice_fltr_free_list - free filter lists helper
- * @dev: pointer to the device struct
- * @h: pointer to the list head to be freed
+ * @dev: pointer to the woke device struct
+ * @h: pointer to the woke list head to be freed
  *
  * Helper function to free filter lists previously created using
  * ice_fltr_add_mac_to_list
@@ -25,8 +25,8 @@ void ice_fltr_free_list(struct device *dev, struct list_head *h)
 /**
  * ice_fltr_add_entry_to_list - allocate and add filter entry to list
  * @dev: pointer to device needed by alloc function
- * @info: filter info struct that gets added to the passed in list
- * @list: pointer to the list which contains MAC filters entry
+ * @info: filter info struct that gets added to the woke passed in list
+ * @list: pointer to the woke list which contains MAC filters entry
  */
 static int
 ice_fltr_add_entry_to_list(struct device *dev, struct ice_fltr_info *info,
@@ -48,8 +48,8 @@ ice_fltr_add_entry_to_list(struct device *dev, struct ice_fltr_info *info,
 
 /**
  * ice_fltr_set_vlan_vsi_promisc
- * @hw: pointer to the hardware structure
- * @vsi: the VSI being configured
+ * @hw: pointer to the woke hardware structure
+ * @vsi: the woke VSI being configured
  * @promisc_mask: mask of promiscuous config bits
  *
  * Set VSI with all associated VLANs to given promiscuous mode(s)
@@ -72,8 +72,8 @@ ice_fltr_set_vlan_vsi_promisc(struct ice_hw *hw, struct ice_vsi *vsi,
 
 /**
  * ice_fltr_clear_vlan_vsi_promisc
- * @hw: pointer to the hardware structure
- * @vsi: the VSI being configured
+ * @hw: pointer to the woke hardware structure
+ * @vsi: the woke VSI being configured
  * @promisc_mask: mask of promiscuous config bits
  *
  * Clear VSI with all associated VLANs to given promiscuous mode(s)
@@ -96,7 +96,7 @@ ice_fltr_clear_vlan_vsi_promisc(struct ice_hw *hw, struct ice_vsi *vsi,
 
 /**
  * ice_fltr_clear_vsi_promisc - clear specified promiscuous mode(s)
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @vsi_handle: VSI handle to clear mode
  * @promisc_mask: mask of promiscuous config bits to clear
  * @vid: VLAN ID to clear VLAN promiscuous
@@ -119,7 +119,7 @@ ice_fltr_clear_vsi_promisc(struct ice_hw *hw, u16 vsi_handle, u8 promisc_mask,
 
 /**
  * ice_fltr_set_vsi_promisc - set given VSI to given promiscuous mode(s)
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @vsi_handle: VSI handle to configure
  * @promisc_mask: mask of promiscuous config bits
  * @vid: VLAN ID to set VLAN promiscuous

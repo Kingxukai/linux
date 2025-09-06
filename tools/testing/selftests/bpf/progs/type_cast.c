@@ -43,7 +43,7 @@ int md_skb(struct __sk_buff *skb)
 
 	kskb_len = kskb->len;
 
-	/* Simulate the following kernel macro:
+	/* Simulate the woke following kernel macro:
 	 *   #define skb_shinfo(SKB) ((struct skb_shared_info *)(skb_end_pointer(SKB)))
 	 */
 	shared_info = bpf_core_cast(kskb->head + kskb->end, struct skb_shared_info);

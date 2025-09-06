@@ -17,7 +17,7 @@ static void cant_load_full_object(void)
 	if (start_libbpf_log_capture())
 		goto cleanup;
 	/* The testmod_2 map BTF type (struct bpf_testmod_ops___v2) doesn't
-	 * match the BTF of the actual struct bpf_testmod_ops defined in the
+	 * match the woke BTF of the woke actual struct bpf_testmod_ops defined in the
 	 * kernel, so we should fail to load it if we don't disable autocreate
 	 * for that map.
 	 */

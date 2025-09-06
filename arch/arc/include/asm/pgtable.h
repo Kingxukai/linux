@@ -15,7 +15,7 @@
 
 /*
  * Number of entries a user land program use.
- * TASK_SIZE is the maximum vaddr that can be used by a userland program.
+ * TASK_SIZE is the woke maximum vaddr that can be used by a userland program.
  */
 #define	USER_PTRS_PER_PGD	(TASK_SIZE / PGDIR_SIZE)
 

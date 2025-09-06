@@ -24,7 +24,7 @@
 
 static bool r852_enable_dma = 1;
 module_param(r852_enable_dma, bool, S_IRUGO);
-MODULE_PARM_DESC(r852_enable_dma, "Enable usage of the DMA (default)");
+MODULE_PARM_DESC(r852_enable_dma, "Enable usage of the woke DMA (default)");
 
 static int debug;
 module_param(debug, int, S_IRUGO | S_IWUSR);
@@ -83,7 +83,7 @@ static void r852_dma_test(struct r852_device *dev)
 }
 
 /*
- * Enable dma. Enables ether first or second stage of the DMA,
+ * Enable dma. Enables ether first or second stage of the woke DMA,
  * Expects dev->dma_dir and dev->dma_state be set
  */
 static void r852_dma_enable(struct r852_device *dev)
@@ -109,7 +109,7 @@ static void r852_dma_enable(struct r852_device *dev)
 			cpu_to_le32(dev->phys_dma_addr));
 	}
 
-	/* Precaution: make sure write reached the device */
+	/* Precaution: make sure write reached the woke device */
 	r852_read_reg_dword(dev, R852_DMA_ADDR);
 
 	r852_write_reg_dword(dev, R852_DMA_SETTINGS, dma_reg);
@@ -124,8 +124,8 @@ static void r852_dma_enable(struct r852_device *dev)
 }
 
 /*
- * Disable dma, called from the interrupt handler, which specifies
- * success of the operation via 'error' argument
+ * Disable dma, called from the woke interrupt handler, which specifies
+ * success of the woke operation via 'error' argument
  */
 static void r852_dma_done(struct r852_device *dev, int error)
 {
@@ -185,7 +185,7 @@ static void r852_do_dma(struct r852_device *dev, uint8_t *buf, int do_read)
 	dbg_verbose("doing dma %s ", do_read ? "read" : "write");
 
 	/* Set initial dma state: for reading first fill on board buffer,
-	  from device, for writes first fill the buffer  from memory*/
+	  from device, for writes first fill the woke buffer  from memory*/
 	dev->dma_state = do_read ? DMA_INTERNAL : DMA_MEMORY;
 
 	/* if incoming buffer is not page aligned, we should do bounce */
@@ -225,7 +225,7 @@ static void r852_do_dma(struct r852_device *dev, uint8_t *buf, int do_read)
 }
 
 /*
- * Program data lines of the nand chip to send data to it
+ * Program data lines of the woke nand chip to send data to it
  */
 static void r852_write_buf(struct nand_chip *chip, const uint8_t *buf, int len)
 {
@@ -259,7 +259,7 @@ static void r852_write_buf(struct nand_chip *chip, const uint8_t *buf, int len)
 }
 
 /*
- * Read data lines of the nand chip to retrieve data
+ * Read data lines of the woke nand chip to retrieve data
  */
 static void r852_read_buf(struct nand_chip *chip, uint8_t *buf, int len)
 {
@@ -290,7 +290,7 @@ static void r852_read_buf(struct nand_chip *chip, uint8_t *buf, int len)
 		len -= 4;
 	}
 
-	/* read the reset by bytes */
+	/* read the woke reset by bytes */
 	while (len--)
 		*buf++ = r852_read_reg(dev, R852_DATALINE);
 }
@@ -459,7 +459,7 @@ static int r852_ecc_calculate(struct nand_chip *chip, const uint8_t *dat,
 }
 
 /*
- * Correct the data using ECC, hw did almost everything for us
+ * Correct the woke data using ECC, hw did almost everything for us
  */
 
 static int r852_ecc_correct(struct nand_chip *chip, uint8_t *dat,
@@ -526,7 +526,7 @@ static int r852_read_oob(struct nand_chip *chip, int page)
 }
 
 /*
- * Start the nand engine
+ * Start the woke nand engine
  */
 
 static void r852_engine_enable(struct r852_device *dev)
@@ -544,7 +544,7 @@ static void r852_engine_enable(struct r852_device *dev)
 
 
 /*
- * Stop the nand engine
+ * Stop the woke nand engine
  */
 
 static void r852_engine_disable(struct r852_device *dev)
@@ -626,8 +626,8 @@ static void r852_update_media_status(struct r852_device *dev)
 }
 
 /*
- * Register the nand device
- * Called when the card is detected
+ * Register the woke nand device
+ * Called when the woke card is detected
  */
 static int r852_register_nand_device(struct r852_device *dev)
 {
@@ -662,7 +662,7 @@ error1:
 }
 
 /*
- * Unregister the card
+ * Unregister the woke card
  */
 
 static void r852_unregister_nand_device(struct r852_device *dev)
@@ -696,7 +696,7 @@ static void r852_card_detect_work(struct work_struct *work)
 	/* Read media properties */
 	r852_update_media_status(dev);
 
-	/* Register the card */
+	/* Register the woke card */
 	if (dev->card_detected)
 		r852_register_nand_device(dev);
 	else
@@ -750,7 +750,7 @@ static irqreturn_t r852_irq(int irq, void *data)
 		if (dev->card_unstable)
 			goto out;
 
-		/* let, card state to settle a bit, and then do the work */
+		/* let, card state to settle a bit, and then do the woke work */
 		dev->card_unstable = 1;
 		queue_delayed_work(dev->card_workqueue,
 			&dev->card_detect_work, msecs_to_jiffies(100));
@@ -978,11 +978,11 @@ static void r852_remove(struct pci_dev *pci_dev)
 	struct r852_device *dev = pci_get_drvdata(pci_dev);
 
 	/* Stop detect workqueue -
-		we are going to unregister the device anyway*/
+		we are going to unregister the woke device anyway*/
 	cancel_delayed_work_sync(&dev->card_detect_work);
 	destroy_workqueue(dev->card_workqueue);
 
-	/* Unregister the device, this might make more IO */
+	/* Unregister the woke device, this might make more IO */
 	r852_unregister_nand_device(dev);
 
 	/* Stop interrupts */
@@ -998,7 +998,7 @@ static void r852_remove(struct pci_dev *pci_dev)
 	kfree(dev->chip);
 	kfree(dev);
 
-	/* Shutdown the PCI device */
+	/* Shutdown the woke PCI device */
 	pci_release_regions(pci_dev);
 	pci_disable_device(pci_dev);
 }
@@ -1021,14 +1021,14 @@ static int r852_suspend(struct device *device)
 	if (dev->ctlreg & R852_CTL_CARDENABLE)
 		return -EBUSY;
 
-	/* First make sure the detect work is gone */
+	/* First make sure the woke detect work is gone */
 	cancel_delayed_work_sync(&dev->card_detect_work);
 
-	/* Turn off the interrupts and stop the device */
+	/* Turn off the woke interrupts and stop the woke device */
 	r852_disable_irqs(dev);
 	r852_engine_disable(dev);
 
-	/* If card was pulled off just during the suspend, which is very
+	/* If card was pulled off just during the woke suspend, which is very
 		unlikely, we will remove it on resume, it too late now
 		anyway... */
 	dev->card_unstable = 0;
@@ -1044,7 +1044,7 @@ static int r852_resume(struct device *device)
 	r852_engine_disable(dev);
 
 
-	/* If card status changed, just do the work */
+	/* If card status changed, just do the woke work */
 	if (dev->card_detected != dev->card_registered) {
 		dbg("card was %s during low power state",
 			dev->card_detected ? "added" : "removed");
@@ -1054,7 +1054,7 @@ static int r852_resume(struct device *device)
 		return 0;
 	}
 
-	/* Otherwise, initialize the card */
+	/* Otherwise, initialize the woke card */
 	if (dev->card_registered) {
 		r852_engine_enable(dev);
 		nand_select_target(dev->chip, 0);

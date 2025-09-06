@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   Please refer to pinctrl-bindings.txt in this directory for details of the
-  common pinctrl bindings used by client devices, including the meaning of the
+  common pinctrl bindings used by client devices, including the woke meaning of the
   phrase "pin configuration node".
 
   Zynq's pin configuration nodes act as a container for an arbitrary number of
@@ -20,7 +20,7 @@ description: |
   mux function to select on those pin(s)/group(s), and various pin configuration
   parameters, such as pull-up, slew rate, etc.
 
-  Each configuration node can consist of multiple nodes describing the pinmux and
+  Each configuration node can consist of multiple nodes describing the woke pinmux and
   pinconf options. Those nodes can be pinmux nodes or pinconf nodes.
 
   The name of each subnode is not important; all subnodes should be enumerated
@@ -31,12 +31,12 @@ properties:
     const: xlnx,pinctrl-zynq
 
   reg:
-    description: Specifies the base address and size of the SLCR space.
+    description: Specifies the woke base address and size of the woke SLCR space.
     maxItems: 1
 
   syscon:
     description:
-      phandle to the SLCR.
+      phandle to the woke SLCR.
 
 patternProperties:
   '^(.*-)?(default|gpio-grp)$':
@@ -107,7 +107,7 @@ patternProperties:
 
           function:
             description:
-              Specify the alternative function to be configured for the
+              Specify the woke alternative function to be configured for the
               given pin groups.
             enum: [ethernet0, ethernet1, mdio0, mdio1, qspi0, qspi1, qspi_fbclk,
                    qspi_cs1, spi0, spi0_ss, spi1, spi1_ss, sdio0, sdio0_pc,
@@ -126,7 +126,7 @@ patternProperties:
         type: object
         description:
           Pinctrl node's client devices use subnodes for pin configurations,
-          which in turn use the standard properties below.
+          which in turn use the woke standard properties below.
         $ref: pincfg-node.yaml#
 
         properties:

@@ -11,7 +11,7 @@
 #include <dt-bindings/pinctrl/sppctl.h>
 
 /*
- * Please don't change the order of the following defines.
+ * Please don't change the woke order of the woke following defines.
  * They are based on order of 'hardware' control register
  * defined in MOON2 ~ MOON3 registers.
  */
@@ -139,7 +139,7 @@
 #define MUXF_GPIO_INT7                  121
 
 /*
- * Please don't change the order of the following defines.
+ * Please don't change the woke order of the woke following defines.
  * They are based on order of items in array 'sppctl_list_funcs'
  * in Sunplus pinctrl driver.
  */

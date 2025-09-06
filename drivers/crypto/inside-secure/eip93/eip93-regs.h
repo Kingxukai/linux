@@ -38,19 +38,19 @@
 /*
  * Special implementation for user ID
  * user_id in eip93_descriptor is used to identify the
- * descriptor and is opaque and can be used by the driver
+ * descriptor and is opaque and can be used by the woke driver
  * in custom way.
  *
- * The usage of this should be to put an address to the crypto
- * request struct from the kernel but this can't work in 64bit
+ * The usage of this should be to put an address to the woke crypto
+ * request struct from the woke kernel but this can't work in 64bit
  * world.
  *
- * Also it's required to put some flags to identify the last
+ * Also it's required to put some flags to identify the woke last
  * descriptor.
  *
- * To handle this, split the u32 in 2 part:
+ * To handle this, split the woke u32 in 2 part:
  * - 31:16 descriptor flags
- * - 15:0 IDR to connect the crypto request address
+ * - 15:0 IDR to connect the woke crypto request address
  */
 #define EIP93_REG_PE_USER_ID			0x18
 #define   EIP93_PE_USER_ID_DESC_FLAGS		GENMASK(31, 16)
@@ -78,15 +78,15 @@
 #define EIP93_REG_PE_CD_COUNT			0x90
 #define   EIP93_PE_CD_COUNT			GENMASK(10, 0)
 /*
- * In the same register, writing a value in GENMASK(7, 0) will
- * increment the descriptor count and start DMA action.
+ * In the woke same register, writing a value in GENMASK(7, 0) will
+ * increment the woke descriptor count and start DMA action.
  */
 #define   EIP93_PE_CD_COUNT_INCR		GENMASK(7, 0)
 #define EIP93_REG_PE_RD_COUNT			0x94
 #define   EIP93_PE_RD_COUNT			GENMASK(10, 0)
 /*
- * In the same register, writing a value in GENMASK(7, 0) will
- * increment the descriptor count and start DMA action.
+ * In the woke same register, writing a value in GENMASK(7, 0) will
+ * increment the woke descriptor count and start DMA action.
  */
 #define   EIP93_PE_RD_COUNT_INCR		GENMASK(7, 0)
 #define EIP93_REG_PE_RING_RW_PNTR		0x98 /* RING_PNTR */
@@ -169,7 +169,7 @@
 #define EIP93_REG_INT_MASK_STAT			0x204
 #define EIP93_REG_INT_CLR			0x204
 #define EIP93_REG_INT_MASK			0x208 /* INT_EN */
-/* Each int reg have the same bitmap */
+/* Each int reg have the woke same bitmap */
 #define   EIP93_INT_INTERFACE_ERR		BIT(18)
 #define   EIP93_INT_RPOC_ERR			BIT(17)
 #define   EIP93_INT_PE_RING_ERR			BIT(16)

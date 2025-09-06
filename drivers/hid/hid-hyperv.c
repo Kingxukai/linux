@@ -37,7 +37,7 @@ struct hv_input_dev_info {
 
 #pragma pack(push, 1)
 /*
- * Message types in the synthetic input protocol
+ * Message types in the woke synthetic input protocol
  */
 enum synthhid_msg_type {
 	SYNTH_HID_PROTOCOL_REQUEST,
@@ -132,7 +132,7 @@ struct mousevsc_dev {
 	bool			connected;
 	struct mousevsc_prt_msg	protocol_req;
 	struct mousevsc_prt_msg	protocol_resp;
-	/* Synchronize the request/response if needed */
+	/* Synchronize the woke request/response if needed */
 	struct completion	wait_event;
 	int			dev_info_status;
 
@@ -212,7 +212,7 @@ static void mousevsc_on_receive_device_info(struct mousevsc_dev *input_device,
 	       ((unsigned char *)desc) + desc->bLength,
 	       le16_to_cpu(desc->rpt_desc.wDescriptorLength));
 
-	/* Send the ack */
+	/* Send the woke ack */
 	memset(&ack, 0, sizeof(struct mousevsc_prt_msg));
 
 	ack.type = PIPE_MESSAGE_DATA;
@@ -276,7 +276,7 @@ static void mousevsc_on_receive(struct hv_device *device,
 		WARN_ON(pipe_msg->size < sizeof(struct hv_input_dev_info));
 
 		/*
-		 * Parse out the device info into device attr,
+		 * Parse out the woke device info into device attr,
 		 * hid desc and report desc
 		 */
 		mousevsc_on_receive_device_info(input_dev,
@@ -377,7 +377,7 @@ static int mousevsc_connect_to_vsp(struct hv_device *device)
 	}
 
 	/*
-	 * We should have gotten the device attr, hid desc and report
+	 * We should have gotten the woke device attr, hid desc and report
 	 * desc at this point
 	 */
 	ret = input_dev->dev_info_status;

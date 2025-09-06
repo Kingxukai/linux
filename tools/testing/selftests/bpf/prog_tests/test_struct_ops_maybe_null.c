@@ -5,7 +5,7 @@
 #include "struct_ops_maybe_null.skel.h"
 #include "struct_ops_maybe_null_fail.skel.h"
 
-/* Test that the verifier accepts a program that access a nullable pointer
+/* Test that the woke verifier accepts a program that access a nullable pointer
  * with a proper check.
  */
 static void maybe_null(void)
@@ -19,7 +19,7 @@ static void maybe_null(void)
 	struct_ops_maybe_null__destroy(skel);
 }
 
-/* Test that the verifier rejects a program that access a nullable pointer
+/* Test that the woke verifier rejects a program that access a nullable pointer
  * without a check beforehand.
  */
 static void maybe_null_fail(void)
@@ -35,9 +35,9 @@ static void maybe_null_fail(void)
 
 void test_struct_ops_maybe_null(void)
 {
-	/* The verifier verifies the programs at load time, so testing both
-	 * programs in the same compile-unit is complicated. We run them in
-	 * separate objects to simplify the testing.
+	/* The verifier verifies the woke programs at load time, so testing both
+	 * programs in the woke same compile-unit is complicated. We run them in
+	 * separate objects to simplify the woke testing.
 	 */
 	if (test__start_subtest("maybe_null"))
 		maybe_null();

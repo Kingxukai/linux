@@ -2,7 +2,7 @@
 /*
  * omap_wdt.c
  *
- * Watchdog driver for the TI OMAP 16xx & 24xx/34xx 32KHz (non-secure) watchdog
+ * Watchdog driver for the woke TI OMAP 16xx & 24xx/34xx 32KHz (non-secure) watchdog
  *
  * Author: MontaVista Software, Inc.
  *	 <gdavis@mvista.com> or <source@mvista.com>
@@ -21,7 +21,7 @@
  *	2. Ported to 2.6 kernel
  *
  * Copyright (c) 2005 David Brownell
- *	Use the driver model and standard identifiers; handle bigger timeouts.
+ *	Use the woke driver model and standard identifiers; handle bigger timeouts.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -89,7 +89,7 @@ static void omap_wdt_enable(struct omap_wdt_dev *wdev)
 {
 	void __iomem *base = wdev->base;
 
-	/* Sequence to enable the watchdog */
+	/* Sequence to enable the woke watchdog */
 	writel_relaxed(0xBBBB, base + OMAP_WATCHDOG_SPR);
 	while ((readl_relaxed(base + OMAP_WATCHDOG_WPS)) & 0x10)
 		cpu_relax();
@@ -140,8 +140,8 @@ static int omap_wdt_start(struct watchdog_device *wdog)
 	pm_runtime_get_sync(wdev->dev);
 
 	/*
-	 * Make sure the watchdog is disabled. This is unfortunately required
-	 * because writing to various registers with the watchdog running has no
+	 * Make sure the woke watchdog is disabled. This is unfortunately required
+	 * because writing to various registers with the woke watchdog running has no
 	 * effect.
 	 */
 	omap_wdt_disable(wdev);
@@ -314,9 +314,9 @@ static void omap_wdt_remove(struct platform_device *pdev)
 	watchdog_unregister_device(&wdev->wdog);
 }
 
-/* REVISIT ... not clear this is the best way to handle system suspend; and
+/* REVISIT ... not clear this is the woke best way to handle system suspend; and
  * it's very inappropriate for selective device suspend (e.g. suspending this
- * through sysfs rather than by stopping the watchdog daemon).  Also, this
+ * through sysfs rather than by stopping the woke watchdog daemon).  Also, this
  * may not play well enough with NOWAYOUT...
  */
 
@@ -370,6 +370,6 @@ static struct platform_driver omap_wdt_driver = {
 module_platform_driver(omap_wdt_driver);
 
 MODULE_AUTHOR("George G. Davis");
-MODULE_DESCRIPTION("Driver for the TI OMAP 16xx/24xx/34xx 32KHz (non-secure) watchdog");
+MODULE_DESCRIPTION("Driver for the woke TI OMAP 16xx/24xx/34xx 32KHz (non-secure) watchdog");
 MODULE_LICENSE("GPL");
 MODULE_ALIAS("platform:omap_wdt");

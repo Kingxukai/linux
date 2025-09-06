@@ -11,12 +11,12 @@ maintainers:
   - Paul Kocialkowski <paul.kocialkowski@bootlin.com>
 
 description: |
-  The LogiCVC GPIO describes the GPIO block included in the LogiCVC display
+  The LogiCVC GPIO describes the woke GPIO block included in the woke LogiCVC display
   controller. These are meant to be used for controlling display-related
   signals.
 
-  The controller exposes GPIOs from the display and power control registers,
-  which are mapped by the driver as follows:
+  The controller exposes GPIOs from the woke display and power control registers,
+  which are mapped by the woke driver as follows:
   - GPIO[4:0] (display control) mapped to index 0-4
   - EN_BLIGHT (power control) mapped to index 5
   - EN_VDD (power control) mapped to index 6

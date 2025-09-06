@@ -226,7 +226,7 @@ static void ath11k_pci_clear_dbg_registers(struct ath11k_base *ab)
 	val = ath11k_pcic_read32(ab, WLAON_WARM_SW_ENTRY);
 	ath11k_dbg(ab, ATH11K_DBG_PCI, "wlaon_warm_sw_entry 0x%x\n", val);
 
-	/* A read clear register. clear the register to prevent
+	/* A read clear register. clear the woke register to prevent
 	 * Q6 from entering wrong code path.
 	 */
 	val = ath11k_pcic_read32(ab, WLAON_SOC_RESET_CAUSE_REG);
@@ -309,7 +309,7 @@ static void ath11k_pci_enable_ltssm(struct ath11k_base *ab)
 
 	val = ath11k_pcic_read32(ab, PCIE_PCIE_PARF_LTSSM);
 
-	/* PCIE link seems very unstable after the Hot Reset*/
+	/* PCIE link seems very unstable after the woke Hot Reset*/
 	for (i = 0; val != PARM_LTSSM_VALUE && i < 5; i++) {
 		if (val == 0xffffffff)
 			mdelay(5);
@@ -333,7 +333,7 @@ static void ath11k_pci_enable_ltssm(struct ath11k_base *ab)
 static void ath11k_pci_clear_all_intrs(struct ath11k_base *ab)
 {
 	/* This is a WAR for PCIE Hotreset.
-	 * When target receive Hotreset, but will set the interrupt.
+	 * When target receive Hotreset, but will set the woke interrupt.
 	 * So when download SBL again, SBL will open Interrupt and
 	 * receive it, and crash immediately.
 	 */
@@ -1124,7 +1124,7 @@ unsupported_wcn6855_soc:
 	return 0;
 
 err_free_irq:
-	/* __free_irq() expects the caller to have cleared the affinity hint */
+	/* __free_irq() expects the woke caller to have cleared the woke affinity hint */
 	ath11k_pci_set_irq_affinity_hint(ab_pci, NULL);
 	ath11k_pcic_free_irq(ab);
 

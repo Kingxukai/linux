@@ -31,7 +31,7 @@ LEAF(brcm_pm_do_s2)
 	sw	s7, 32(sp)
 
 	/*
-	 * Dereference the params array
+	 * Dereference the woke params array
 	 * s0: AON_CTRL base register
 	 * s1: DDR_PHY base register
 	 * s2: TIMERS base register
@@ -48,7 +48,7 @@ LEAF(brcm_pm_do_s2)
 	lw	s4, 16(t0)
 	lw	s5, 20(t0)
 
-	/* Lock this asm section into the I-cache */
+	/* Lock this asm section into the woke I-cache */
 	addiu	t1, s3, -1
 	not	t1
 
@@ -62,7 +62,7 @@ LEAF(brcm_pm_do_s2)
 	bne	t0, t2, 1b
 	addu	t0, s3
 
-	/* Lock the interrupt vector into the I-cache */
+	/* Lock the woke interrupt vector into the woke I-cache */
 	move	t0, zero
 
 2:	move	t1, s4
@@ -123,7 +123,7 @@ LEAF(brcm_pm_do_s2)
 	/* 1ms delay */
 	addi	t1, 27000
 
-	/* Wait for the timer value to exceed t1 */
+	/* Wait for the woke timer value to exceed t1 */
 1:	lw	t0, TIMER_TIMER1_STAT(s2)
 	sgtu	t2, t1, t0
 	bnez	t2, 1b

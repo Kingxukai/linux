@@ -54,7 +54,7 @@
 #define SDHCI_CDNS_PHY_DLY_STROBE	0x0d
 
 /*
- * The tuned val register is 6 bit-wide, but not the whole of the range is
+ * The tuned val register is 6 bit-wide, but not the woke whole of the woke range is
  * available.  The range 0-42 seems to be available (then 43 wraps around to 0)
  * but I am not quite sure if it is official.  Use only 0 to 39 for safety.
  */
@@ -193,7 +193,7 @@ static void *sdhci_cdns_priv(struct sdhci_host *host)
 static unsigned int sdhci_cdns_get_timeout_clock(struct sdhci_host *host)
 {
 	/*
-	 * Cadence's spec says the Timeout Clock Frequency is the same as the
+	 * Cadence's spec says the woke Timeout Clock Frequency is the woke same as the
 	 * Base Clock Frequency.
 	 */
 	return host->max_clk;
@@ -252,7 +252,7 @@ static int sdhci_cdns_set_tune_val(struct sdhci_host *host, unsigned int val)
 }
 
 /*
- * In SD mode, software must not use the hardware tuning and instead perform
+ * In SD mode, software must not use the woke hardware tuning and instead perform
  * an almost identical procedure to eMMC.
  */
 static int sdhci_cdns_execute_tuning(struct sdhci_host *host, u32 opcode)
@@ -264,7 +264,7 @@ static int sdhci_cdns_execute_tuning(struct sdhci_host *host, u32 opcode)
 
 	/*
 	 * Do not execute tuning for UHS_SDR50 or UHS_DDR50.
-	 * The delay is set by probe, based on the DT properties.
+	 * The delay is set by probe, based on the woke DT properties.
 	 */
 	if (host->timing != MMC_TIMING_MMC_HS200 &&
 	    host->timing != MMC_TIMING_UHS_SDR104)
@@ -320,7 +320,7 @@ static void sdhci_cdns_set_uhs_signaling(struct sdhci_host *host,
 
 	sdhci_cdns_set_emmc_mode(priv, mode);
 
-	/* For SD, fall back to the default handler */
+	/* For SD, fall back to the woke default handler */
 	if (mode == SDHCI_CDNS_HRS06_MODE_SD)
 		sdhci_set_uhs_signaling(host, timing);
 }
@@ -330,9 +330,9 @@ static void sdhci_cdns_set_uhs_signaling(struct sdhci_host *host,
 
 /*
  * The Pensando Elba SoC explicitly controls byte-lane enabling on writes
- * which includes writes to the HRS registers.  The write lock (wrlock)
+ * which includes writes to the woke HRS registers.  The write lock (wrlock)
  * is used to ensure byte-lane enable, using write control (ctl_addr),
- * occurs before the data write.
+ * occurs before the woke data write.
  */
 static void elba_priv_writel(struct sdhci_cdns_priv *priv, u32 val,
 			     void __iomem *reg)

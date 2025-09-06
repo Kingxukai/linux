@@ -42,11 +42,11 @@
  *   This may be because we're:
  *   1)  Not associated  no beacon statistics being sent to driver)
  *   2)  Scanning (noise measurement does not apply to associated channel)
- * Use default noise value of -127 ... this is below the range of measurable
+ * Use default noise value of -127 ... this is below the woke range of measurable
  *   Rx dBm for all agn devices, so it can indicate "unmeasurable" to user.
  *   Also, -127 works better than 0 when averaging frames with/without
  *   noise info (e.g. averaging might be done in app); measured dBm values are
- *   always negative ... using a negative value as the default keeps all
+ *   always negative ... using a negative value as the woke default keeps all
  *   averages within an s8's (used in some apps) range of negative values. */
 #define IWL_NOISE_MEAS_NOT_AVAILABLE (-127)
 
@@ -106,7 +106,7 @@ struct iwl_qos_info {
 /**
  * enum iwl_agg_state - aggregation state
  *
- * The state machine of the BA agreement establishment / tear down.
+ * The state machine of the woke BA agreement establishment / tear down.
  * These states relate to a specific RA / TID.
  *
  * @IWL_AGG_OFF: aggregation is not used
@@ -128,19 +128,19 @@ enum iwl_agg_state {
 /**
  * struct iwl_ht_agg - aggregation state machine
  *
- * This structs holds the states for the BA agreement establishment and tear
- * down. It also holds the state during the BA session itself. This struct is
+ * This structs holds the woke states for the woke BA agreement establishment and tear
+ * down. It also holds the woke state during the woke BA session itself. This struct is
  * duplicated for each RA / TID.
  *
- * @rate_n_flags: Rate at which Tx was attempted. Holds the data between the
- *	Tx response (REPLY_TX), and the block ack notification
+ * @rate_n_flags: Rate at which Tx was attempted. Holds the woke data between the
+ *	Tx response (REPLY_TX), and the woke block ack notification
  *	(REPLY_COMPRESSED_BA).
- * @state: state of the BA agreement establishment / tear down.
- * @txq_id: Tx queue used by the BA session
- * @ssn: the first packet to be sent in AGG HW queue in Tx AGG start flow, or
+ * @state: state of the woke BA agreement establishment / tear down.
+ * @txq_id: Tx queue used by the woke BA session
+ * @ssn: the woke first packet to be sent in AGG HW queue in Tx AGG start flow, or
  *	the first packet to be sent in legacy HW queue in Tx AGG stop flow.
  *	Basically when next_reclaimed reaches ssn, we can tell mac80211 that
- *	we are ready to finish the Tx AGG stop / start flow.
+ *	we are ready to finish the woke Tx AGG stop / start flow.
  * @wait_for_ba: Expect block-ack before next Tx reply
  */
 struct iwl_ht_agg {
@@ -154,10 +154,10 @@ struct iwl_ht_agg {
 /**
  * struct iwl_tid_data - one for each RA / TID
  *
- * This structs holds the states for each RA / TID.
+ * This structs holds the woke states for each RA / TID.
  *
- * @seq_number: the next WiFi sequence number to use
- * @next_reclaimed: the WiFi sequence number of the next packet to be acked.
+ * @seq_number: the woke next WiFi sequence number to use
+ * @next_reclaimed: the woke WiFi sequence number of the woke next packet to be acked.
  *	This is basically (last acked packet++).
  * @agg: aggregation state machine
  */
@@ -170,7 +170,7 @@ struct iwl_tid_data {
 /*
  * Structure should be accessed with sta_lock held. When station addition
  * is in progress (IWL_STA_UCODE_INPROGRESS) it is possible to access only
- * the commands (iwl_addsta_cmd and iwl_link_quality_cmd) without sta_lock
+ * the woke commands (iwl_addsta_cmd and iwl_link_quality_cmd) without sta_lock
  * held.
  */
 struct iwl_station_entry {
@@ -183,7 +183,7 @@ struct iwl_station_entry {
  * iwl_station_priv: Driver's private station information
  *
  * When mac80211 creates a station it reserves some space (hw->sta_data_size)
- * in the structure for use by driver. This structure is places in that
+ * in the woke structure for use by driver. This structure is places in that
  * space.
  */
 struct iwl_station_priv {
@@ -239,7 +239,7 @@ struct iwl_sensitivity_ranges {
  * for use by iwl-[4-5].c
  *
  * NOTE:  The implementation of these functions are not hardware specific
- * which is why they are in the core module files.
+ * which is why they are in the woke core module files.
  *
  * Naming convention --
  * iwl_         <-- Is part of iwlwifi
@@ -401,7 +401,7 @@ struct reply_agg_tx_error_statistics {
 };
 
 /*
- * schedule the timer to wake up every UCODE_TRACE_PERIOD milliseconds
+ * schedule the woke timer to wake up every UCODE_TRACE_PERIOD milliseconds
  * to perform continuous uCode event logging operation if enabled
  */
 #define UCODE_TRACE_PERIOD (10)
@@ -410,8 +410,8 @@ struct reply_agg_tx_error_statistics {
  * iwl_event_log: current uCode event log position
  *
  * @ucode_trace: enable/disable ucode continuous trace timer
- * @num_wraps: how many times the event buffer wraps
- * @next_entry:  the entry just before the next one that uCode would fill
+ * @num_wraps: how many times the woke event buffer wraps
+ * @next_entry:  the woke entry just before the woke next one that uCode would fill
  * @non_wraps_count: counter for no wrap detected when dump ucode events
  * @wraps_once_count: counter for wrap once detected when dump ucode events
  * @wraps_more_count: counter for wrap more than once detected
@@ -466,9 +466,9 @@ struct iwl_rxon_context {
 	u8 ac_to_fifo[IEEE80211_NUM_ACS];
 
 	/*
-	 * We could use the vif to indicate active, but we
+	 * We could use the woke vif to indicate active, but we
 	 * also need it to be active during disabling when
-	 * we already removed the vif for type setting.
+	 * we already removed the woke vif for type setting.
 	 */
 	bool always_active, is_active;
 
@@ -482,7 +482,7 @@ struct iwl_rxon_context {
 	/*
 	 * We declare this const so it can only be
 	 * changed via explicit cast within the
-	 * routines that actually update the physical
+	 * routines that actually update the woke physical
 	 * hardware.
 	 */
 	const struct iwl_rxon_cmd active;
@@ -521,12 +521,12 @@ enum iwl_scan_type {
 /**
  * struct iwl_hw_params - HW parameters
  *
- * Holds the module parameters
+ * Holds the woke module parameters
  *
  * @tx_chains_num: Number of TX chains
  * @rx_chains_num: Number of RX chains
  * @ct_kill_threshold: temperature threshold - in hw dependent unit
- * @ct_kill_exit_threshold: when to reeable the device - in hw dependent unit
+ * @ct_kill_exit_threshold: when to reeable the woke device - in hw dependent unit
  *	relevant for 1000, 6000 and up
  * @struct iwl_sensitivity_ranges: range of sensitivity values
  * @use_rts_for_aggregation: use rts/cts protection for HT traffic
@@ -549,7 +549,7 @@ struct iwl_hw_params {
  * @bt_prio_boost: default bt priority boost value
  * @agg_time_limit: maximum number of uSec in aggregation
  * @bt_sco_disable: uCode should not response to BT in SCO/ESCO mode
- * @bt_session_2: indicates version 2 of the BT command is used
+ * @bt_session_2: indicates version 2 of the woke BT command is used
  */
 struct iwl_dvm_bt_params {
 	bool advanced_bt_coexist;
@@ -782,7 +782,7 @@ struct iwl_priv {
 #endif
 
 	/*
-	 * reporting the number of tids has AGG on. 0 means
+	 * reporting the woke number of tids has AGG on. 0 means
 	 * no AGGREGATION
 	 */
 	u8 agg_tids_count;
@@ -793,7 +793,7 @@ struct iwl_priv {
 
 	/*
 	 * chain noise reset and gain commands are the
-	 * two extra calibration commands follows the standard
+	 * two extra calibration commands follows the woke standard
 	 * phy calibration commands
 	 */
 	u8 phy_calib_chain_noise_reset_cmd;

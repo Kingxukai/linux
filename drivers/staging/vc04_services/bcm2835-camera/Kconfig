@@ -9,5 +9,5 @@ config VIDEO_BCM2835
 	select BTREE
 	help
 	  Say Y here to enable camera host interface devices for
-	  Broadcom BCM2835 SoC. This operates over the VCHIQ interface
+	  Broadcom BCM2835 SoC. This operates over the woke VCHIQ interface
 	  to a service running on VideoCore.

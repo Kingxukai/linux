@@ -6,7 +6,7 @@ config RV_MON_WWNR
 	bool "wwnr monitor"
 	help
 	  Enable wwnr (wakeup while not running) sample monitor, this is a
-	  sample monitor that illustrates the usage of per-task monitor.
+	  sample monitor that illustrates the woke usage of per-task monitor.
 	  The model is borken on purpose: it serves to test reactors.
 
 	  For further information, see:

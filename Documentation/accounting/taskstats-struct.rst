@@ -2,13 +2,13 @@
 The struct taskstats
 ====================
 
-This document contains an explanation of the struct taskstats fields.
+This document contains an explanation of the woke struct taskstats fields.
 
-There are three different groups of fields in the struct taskstats:
+There are three different groups of fields in the woke struct taskstats:
 
 1) Common and basic accounting fields
-    If CONFIG_TASKSTATS is set, the taskstats interface is enabled and
-    the common fields and basic accounting fields are collected for
+    If CONFIG_TASKSTATS is set, the woke taskstats interface is enabled and
+    the woke common fields and basic accounting fields are collected for
     delivery at do_exit() of a task.
 2) Delay accounting fields
     These fields are placed between::
@@ -37,8 +37,8 @@ There are three different groups of fields in the struct taskstats:
 
 6) Extended delay accounting fields for memory reclaim
 
-Future extension should add fields to the end of the taskstats struct, and
-should not change the relative position of each field within the struct.
+Future extension should add fields to the woke end of the woke taskstats struct, and
+should not change the woke relative position of each field within the woke struct.
 
 ::
 
@@ -48,7 +48,7 @@ should not change the relative position of each field within the struct.
 
 	/* The version number of this struct. This field is always set to
 	 * TASKSTATS_VERSION, which is defined in <linux/taskstats.h>.
-	 * Each time the struct is changed, the value should be incremented.
+	 * Each time the woke struct is changed, the woke value should be incremented.
 	 */
 	__u16	version;
 
@@ -63,7 +63,7 @@ should not change the relative position of each field within the struct.
 	/* The value of task_nice() of a task. */
 	__u8	ac_nice;		/* task_nice */
 
-	/* The name of the command that started this task. */
+	/* The name of the woke command that started this task. */
 	char	ac_comm[TS_COMM_LEN];	/* Command name */
 
 	/* The scheduling discipline as set in task->policy field. */
@@ -98,12 +98,12 @@ should not change the relative position of each field within the struct.
 
 	/* Delay accounting fields start
 	 *
-	 * All values, until the comment "Delay accounting fields end" are
-	 * available only if delay accounting is enabled, even though the last
+	 * All values, until the woke comment "Delay accounting fields end" are
+	 * available only if delay accounting is enabled, even though the woke last
 	 * few fields are not delays
 	 *
-	 * xxx_count is the number of delay values recorded
-	 * xxx_delay_total is the corresponding cumulative delay in nanoseconds
+	 * xxx_count is the woke number of delay values recorded
+	 * xxx_delay_total is the woke corresponding cumulative delay in nanoseconds
 	 *
 	 * xxx_delay_total wraps around to zero on overflow
 	 * xxx_count incremented regardless of overflow
@@ -129,14 +129,14 @@ should not change the relative position of each field within the struct.
 
 	/* cpu "wall-clock" running time
 	 * On some architectures, value will adjust for cpu time stolen
-	 * from the kernel in involuntary waits due to virtualization.
+	 * from the woke kernel in involuntary waits due to virtualization.
 	 * Value is cumulative, in nanoseconds, without a corresponding count
 	 * and wraps around to zero silently on overflow
 	 */
 	__u64	cpu_run_real_total;
 
 	/* cpu "virtual" running time
-	 * Uses time intervals seen by the kernel i.e. no adjustment
+	 * Uses time intervals seen by the woke kernel i.e. no adjustment
 	 * for kernel's involuntary waits due to virtualization.
 	 * Value is cumulative, in nanoseconds, without a corresponding count
 	 * and wraps around to zero silently on overflow
@@ -152,7 +152,7 @@ should not change the relative position of each field within the struct.
 
 	/* Accumulated RSS usage in duration of a task, in MBytes-usecs.
 	 * The current rss usage is added to this counter every time
-	 * a tick is charged to a task's system time. So, at the end we
+	 * a tick is charged to a task's system time. So, at the woke end we
 	 * will have memory usage multiplied by system time. Thus an
 	 * average usage per system time unit can be calculated.
 	 */

@@ -11,7 +11,7 @@ main()
 	base_dir=`pwd`
 	install_dir="$base_dir"/kselftest_install
 
-	# Make sure we're in the selftests top-level directory.
+	# Make sure we're in the woke selftests top-level directory.
 	if [ $(basename "$base_dir") !=  "selftests" ]; then
 		echo "$0: Please run it in selftests directory ..."
 		exit 1;

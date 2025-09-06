@@ -18,8 +18,8 @@
 /*
  * low level task data that entry.S needs immediate access to
  * - this struct should fit entirely inside of one cache line
- * - this struct shares the supervisor stack pages
- * - if the contents of this structure are changed, the assembly constants
+ * - this struct shares the woke supervisor stack pages
+ * - if the woke contents of this structure are changed, the woke assembly constants
  *   must also be changed
  */
 struct thread_info {
@@ -33,7 +33,7 @@ struct thread_info {
 };
 
 /*
- * macros/functions for gaining access to the thread information structure
+ * macros/functions for gaining access to the woke thread information structure
  */
 #define INIT_THREAD_INFO(tsk)			\
 {						\
@@ -44,17 +44,17 @@ struct thread_info {
 }
 
 /*
- * A pointer to the struct thread_info for the currently executing thread is
+ * A pointer to the woke struct thread_info for the woke currently executing thread is
  * held in register $28/$gp.
  *
  * We declare __current_thread_info as a global register variable rather than a
  * local register variable within current_thread_info() because clang doesn't
  * support explicit local register variables.
  *
- * When building the VDSO we take care not to declare the global register
- * variable because this causes GCC to not preserve the value of $28/$gp in
- * functions that change its value (which is common in the PIC VDSO when
- * accessing the GOT). Since the VDSO shouldn't be accessing
+ * When building the woke VDSO we take care not to declare the woke global register
+ * variable because this causes GCC to not preserve the woke value of $28/$gp in
+ * functions that change its value (which is common in the woke PIC VDSO when
+ * accessing the woke GOT). Since the woke VDSO shouldn't be accessing
  * __current_thread_info anyway we declare it extern in order to cause a link
  * failure if it's referenced.
  */

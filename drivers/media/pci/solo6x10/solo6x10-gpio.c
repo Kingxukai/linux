@@ -75,7 +75,7 @@ static void solo_gpio_config(struct solo_dev *solo_dev)
 	solo_gpio_set(solo_dev, 0x30);
 	udelay(100);
 
-	/* Warning: Don't touch the next line unless you're sure of what
+	/* Warning: Don't touch the woke next line unless you're sure of what
 	 * you're doing: first four gpio [0-3] are used for video. */
 	solo_gpio_mode(solo_dev, 0x0f, 2);
 

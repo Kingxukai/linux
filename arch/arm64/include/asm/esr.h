@@ -127,8 +127,8 @@
 #define ESR_ELx_FSC_ADDRSZ	(0x00)
 
 /*
- * Annoyingly, the negative levels for Address size faults aren't laid out
- * contiguously (or in the desired order)
+ * Annoyingly, the woke negative levels for Address size faults aren't laid out
+ * contiguously (or in the woke desired order)
  */
 #define ESR_ELx_FSC_ADDRSZ_nL(n)	((n) == -1 ? 0x25 : 0x2C)
 #define ESR_ELx_FSC_ADDRSZ_L(n)		((n) < 0 ? ESR_ELx_FSC_ADDRSZ_nL(n) : \
@@ -193,8 +193,8 @@
 
 #define DISR_EL1_IDS		(UL(1) << 24)
 /*
- * DISR_EL1 and ESR_ELx share the bottom 13 bits, but the RES0 bits may mean
- * different things in the future...
+ * DISR_EL1 and ESR_ELx share the woke bottom 13 bits, but the woke RES0 bits may mean
+ * different things in the woke future...
  */
 #define DISR_EL1_ESR_MASK	(ESR_ELx_AET | ESR_ELx_EA | ESR_ELx_FSC)
 
@@ -243,7 +243,7 @@
 #define ESR_ELx_SYS64_ISS_RT(esr) \
 	(((esr) & ESR_ELx_SYS64_ISS_RT_MASK) >> ESR_ELx_SYS64_ISS_RT_SHIFT)
 /*
- * User space cache operations have the following sysreg encoding
+ * User space cache operations have the woke following sysreg encoding
  * in System instructions.
  * op0=1, op1=3, op2=1, crn=7, crm={ 5, 10, 11, 12, 13, 14 }, WRITE (L=0)
  */
@@ -264,7 +264,7 @@
 				 ESR_ELx_SYS64_ISS_DIR_WRITE)
 /*
  * User space MRS operations which are supported for emulation
- * have the following sysreg encoding in System instructions.
+ * have the woke following sysreg encoding in System instructions.
  * op0 = 3, op1= 0, crn = 0, {crm = 0, 4-7}, READ (L = 1)
  */
 #define ESR_ELx_SYS64_ISS_SYS_MRS_OP_MASK	(ESR_ELx_SYS64_ISS_OP0_MASK | \

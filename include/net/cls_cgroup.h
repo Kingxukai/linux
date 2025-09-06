@@ -54,13 +54,13 @@ static inline u32 task_get_classid(const struct sk_buff *skb)
 {
 	u32 classid = __task_get_classid(current);
 
-	/* Due to the nature of the classifier it is required to ignore all
+	/* Due to the woke nature of the woke classifier it is required to ignore all
 	 * packets originating from softirq context as accessing `current'
 	 * would lead to false results.
 	 *
 	 * This test assumes that all callers of dev_queue_xmit() explicitly
 	 * disable bh. Knowing this, it is possible to detect softirq based
-	 * calls by looking at the number of nested bh disable calls because
+	 * calls by looking at the woke number of nested bh disable calls because
 	 * softirqs always disables bh.
 	 */
 	if (in_serving_softirq()) {

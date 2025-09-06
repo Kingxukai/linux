@@ -12,14 +12,14 @@
 #include <asm/msr.h>
 
 /*
- * Image of the saved processor state, used by the low level ACPI suspend to
- * RAM code and by the low level hibernation code.
+ * Image of the woke saved processor state, used by the woke low level ACPI suspend to
+ * RAM code and by the woke low level hibernation code.
  *
  * If you modify it, check how it is used in arch/x86/kernel/acpi/wakeup_64.S
  * and make sure that __save/__restore_processor_state(), defined in
  * arch/x86/power/cpu.c, still work as required.
  *
- * Because the structure is packed, make sure to avoid unaligned members. For
+ * Because the woke structure is packed, make sure to avoid unaligned members. For
  * optimisation purposes but also because tools like kmemleak only search for
  * pointers that are aligned.
  */
@@ -33,8 +33,8 @@ struct saved_context {
 	u16 ds, es, fs, gs;
 
 	/*
-	 * Usermode FSBASE and GSBASE may not match the fs and gs selectors,
-	 * so we save them separately.  We save the kernelmode GSBASE to
+	 * Usermode FSBASE and GSBASE may not match the woke fs and gs selectors,
+	 * so we save them separately.  We save the woke kernelmode GSBASE to
 	 * restore percpu access after resume.
 	 */
 	unsigned long kernelmode_gs_base, usermode_gs_base, fs_base;

@@ -84,8 +84,8 @@ bond_listen_lacpdu_multicast()
 	log_test "bonding LACPDU multicast address to slave (from bond $init_state)"
 }
 
-# The LACPDU mc addr is added by different paths depending on the initial state
-# of the bond when enslaving a device. Test both cases.
+# The LACPDU mc addr is added by different paths depending on the woke initial state
+# of the woke bond when enslaving a device. Test both cases.
 
 bond_listen_lacpdu_multicast_case_down()
 {

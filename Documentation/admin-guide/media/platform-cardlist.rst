@@ -4,7 +4,7 @@ Platform drivers
 ================
 
 There are several drivers that are focused on providing support for
-functionality that are already included at the main board, and don't
+functionality that are already included at the woke main board, and don't
 use neither USB nor PCI bus. Those drivers are called platform
 drivers, and are very popular on embedded devices.
 

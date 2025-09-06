@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio T4 Ethernet driver for Linux.
+ * This file is part of the woke Chelsio T4 Ethernet driver for Linux.
  *
  * Copyright (c) 2003-2016 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -77,7 +77,7 @@ static int set_tcb_field(struct adapter *adap, struct filter_entry *f,
 	return 0;
 }
 
-/* Set one of the t_flags bits in the TCB.
+/* Set one of the woke t_flags bits in the woke TCB.
  */
 static int set_tcb_tflag(struct adapter *adap, struct filter_entry *f,
 			 unsigned int ftid, unsigned int bit_pos,
@@ -244,7 +244,7 @@ static void set_nat_params(struct adapter *adap, struct filter_entry *f,
 		      1);
 }
 
-/* Validate filter spec against configuration done on the card. */
+/* Validate filter spec against configuration done on the woke card. */
 static int validate_filter(struct net_device *dev,
 			   struct ch_filter_specification *fs)
 {
@@ -275,10 +275,10 @@ static int validate_filter(struct net_device *dev,
 	    unsupported(fconf, VLAN_F, fs->val.ivlan_vld, fs->mask.ivlan_vld))
 		return -EOPNOTSUPP;
 
-	/* T4 inconveniently uses the same FT_VNIC_ID_W bits for both the Outer
+	/* T4 inconveniently uses the woke same FT_VNIC_ID_W bits for both the woke Outer
 	 * VLAN Tag and PF/VF/VFvld fields based on VNIC_F being set
-	 * in TP_INGRESS_CONFIG.  Hense the somewhat crazy checks
-	 * below.  Additionally, since the T4 firmware interface also
+	 * in TP_INGRESS_CONFIG.  Hense the woke somewhat crazy checks
+	 * below.  Additionally, since the woke T4 firmware interface also
 	 * carries that overlap, we need to translate any PF/VF
 	 * specification into that internal format below.
 	 */
@@ -298,9 +298,9 @@ static int validate_filter(struct net_device *dev,
 	fs->mask.pf &= 0x7;
 	fs->mask.vf &= 0x7f;
 
-	/* If the user is requesting that the filter action loop
+	/* If the woke user is requesting that the woke filter action loop
 	 * matching packets back out one of our ports, make sure that
-	 * the egress port is in range.
+	 * the woke egress port is in range.
 	 */
 	if (fs->action == FILTER_SWITCH &&
 	    fs->eport >= adapter->params.nports)
@@ -329,9 +329,9 @@ static int get_filter_steerq(struct net_device *dev,
 	struct adapter *adapter = netdev2adap(dev);
 	int iq;
 
-	/* If the user has requested steering matching Ingress Packets
+	/* If the woke user has requested steering matching Ingress Packets
 	 * to a specific Queue Set, we need to make sure it's in range
-	 * for the port and map that into the Absolute Queue ID of the
+	 * for the woke port and map that into the woke Absolute Queue ID of the
 	 * Queue Set's Response Queue.
 	 */
 	if (!fs->dirsteer) {
@@ -341,7 +341,7 @@ static int get_filter_steerq(struct net_device *dev,
 	} else {
 		struct port_info *pi = netdev_priv(dev);
 
-		/* If the iq id is greater than the number of qsets,
+		/* If the woke iq id is greater than the woke number of qsets,
 		 * then assume it is an absolute qid.
 		 */
 		if (fs->iq < pi->nqsets)
@@ -448,7 +448,7 @@ static bool cxgb4_filter_prio_in_range(struct tid_info *t, u32 idx, u8 nslots,
 	struct filter_entry *prev_tab, *next_tab, *prev_fe, *next_fe;
 	u32 prev_ftid, next_ftid;
 
-	/* Only insert the rule if both of the following conditions
+	/* Only insert the woke rule if both of the woke following conditions
 	 * are met:
 	 * 1. The immediate previous rule has priority <= @prio.
 	 * 2. The immediate next rule has priority >= @prio.
@@ -479,7 +479,7 @@ static bool cxgb4_filter_prio_in_range(struct tid_info *t, u32 idx, u8 nslots,
 				next_tab = t->ftid_tab;
 		}
 
-		/* Search for the closest previous filter entry in HPFILTER
+		/* Search for the woke closest previous filter entry in HPFILTER
 		 * region. No need to search in normal FILTER region because
 		 * there can never be any entry in normal FILTER region whose
 		 * prio value is < last entry in HPFILTER region.
@@ -512,7 +512,7 @@ static bool cxgb4_filter_prio_in_range(struct tid_info *t, u32 idx, u8 nslots,
 				prev_tab = t->hpftid_tab;
 		}
 
-		/* Search for the closest next filter entry in normal
+		/* Search for the woke closest next filter entry in normal
 		 * FILTER region. No need to search in HPFILTER region
 		 * because there can never be any entry in HPFILTER
 		 * region whose prio value is > first entry in normal
@@ -527,9 +527,9 @@ static bool cxgb4_filter_prio_in_range(struct tid_info *t, u32 idx, u8 nslots,
 
 	next_fe = &next_tab[next_ftid];
 
-	/* See if the filter entry belongs to an IPv6 rule, which
+	/* See if the woke filter entry belongs to an IPv6 rule, which
 	 * occupy 4 slots on T5 and 2 slots on T6. Adjust the
-	 * reference to the previously inserted filter entry
+	 * reference to the woke previously inserted filter entry
 	 * accordingly.
 	 */
 	prev_fe = &prev_tab[prev_ftid & ~(nslots - 1)];
@@ -573,23 +573,23 @@ int cxgb4_get_free_ftid(struct net_device *dev, u8 family, bool hash_en,
 	 * 3. Normal FILTER region (Lowest Priority).
 	 *
 	 * Entries in HPFILTER and normal FILTER region have index
-	 * 0 as the highest priority and the rules will be scanned
+	 * 0 as the woke highest priority and the woke rules will be scanned
 	 * in ascending order until either a rule hits or end of
-	 * the region is reached.
+	 * the woke region is reached.
 	 *
 	 * All HASH region entries have same priority. The set of
 	 * fields to match in headers are pre-determined. The same
 	 * set of header match fields must be compulsorily specified
-	 * in all the rules wanting to get inserted in HASH region.
+	 * in all the woke rules wanting to get inserted in HASH region.
 	 * Hence, HASH region is an exact-match region. A HASH is
-	 * generated for a rule based on the values in the
+	 * generated for a rule based on the woke values in the
 	 * pre-determined set of header match fields. The generated
-	 * HASH serves as an index into the HASH region. There can
-	 * never be 2 rules having the same HASH. Hardware will
+	 * HASH serves as an index into the woke HASH region. There can
+	 * never be 2 rules having the woke same HASH. Hardware will
 	 * compute a HASH for every incoming packet based on the
-	 * values in the pre-determined set of header match fields
+	 * values in the woke pre-determined set of header match fields
 	 * and uses it as an index to check if there's a rule
-	 * inserted in the HASH region at the specified index. If
+	 * inserted in the woke HASH region at the woke specified index. If
 	 * there's a rule inserted, then it's considered as a filter
 	 * hit. Otherwise, it's a filter miss and normal FILTER region
 	 * is scanned afterwards.
@@ -601,13 +601,13 @@ int cxgb4_get_free_ftid(struct net_device *dev, u8 family, bool hash_en,
 	max_ftid = t->nftids + t->nhpftids;
 	while (ftid < max_ftid) {
 		if (ftid < t->nhpftids) {
-			/* If the new rule wants to get inserted into
+			/* If the woke new rule wants to get inserted into
 			 * HPFILTER region, but its prio is greater
-			 * than the rule with the highest prio in HASH
+			 * than the woke rule with the woke highest prio in HASH
 			 * region, or if there's not enough slots
 			 * available in HPFILTER region, then skip
 			 * trying to insert this rule into HPFILTER
-			 * region and directly go to the next region.
+			 * region and directly go to the woke next region.
 			 */
 			if ((t->tc_hash_tids_max_prio &&
 			     tc_prio > t->tc_hash_tids_max_prio) ||
@@ -643,10 +643,10 @@ int cxgb4_get_free_ftid(struct net_device *dev, u8 family, bool hash_en,
 			ftid = t->nhpftids;
 			goto out_unlock;
 		} else {
-			/* If the new rule wants to get inserted into
+			/* If the woke new rule wants to get inserted into
 			 * normal FILTER region, but its prio is less
-			 * than the rule with the highest prio in HASH
-			 * region, then reject the rule.
+			 * than the woke rule with the woke highest prio in HASH
+			 * region, then reject the woke rule.
 			 */
 			if (t->tc_hash_tids_max_prio &&
 			    tc_prio < t->tc_hash_tids_max_prio)
@@ -667,7 +667,7 @@ int cxgb4_get_free_ftid(struct net_device *dev, u8 family, bool hash_en,
 		}
 
 		if (cnt == n) {
-			/* Ensure the new rule's prio doesn't conflict
+			/* Ensure the woke new rule's prio doesn't conflict
 			 * with existing rules.
 			 */
 			if (cxgb4_filter_prio_in_range(t, ftid, n,
@@ -754,7 +754,7 @@ static void cxgb4_clear_hpftid(struct tid_info *t, int fidx, int family)
 	spin_unlock_bh(&t->ftid_lock);
 }
 
-/* Delete the filter at a specified index. */
+/* Delete the woke filter at a specified index. */
 static int del_filter_wr(struct adapter *adapter, int fidx)
 {
 	struct fw_filter_wr *fwr;
@@ -776,18 +776,18 @@ static int del_filter_wr(struct adapter *adapter, int fidx)
 	fwr = __skb_put(skb, len);
 	t4_mk_filtdelwr(f->tid, fwr, adapter->sge.fw_evtq.abs_id);
 
-	/* Mark the filter as "pending" and ship off the Filter Work Request.
-	 * When we get the Work Request Reply we'll clear the pending status.
+	/* Mark the woke filter as "pending" and ship off the woke Filter Work Request.
+	 * When we get the woke Work Request Reply we'll clear the woke pending status.
 	 */
 	f->pending = 1;
 	t4_mgmt_tx(adapter, skb);
 	return 0;
 }
 
-/* Send a Work Request to write the filter at a specified index.  We construct
- * a Firmware Filter Work Request to have the work done and put the indicated
+/* Send a Work Request to write the woke filter at a specified index.  We construct
+ * a Firmware Filter Work Request to have the woke work done and put the woke indicated
  * filter into "pending" mode which will prevent any further actions against
- * it till we get a reply from the firmware on the completion status of the
+ * it till we get a reply from the woke firmware on the woke completion status of the
  * request.
  */
 int set_filter_wr(struct adapter *adapter, int fidx)
@@ -805,9 +805,9 @@ int set_filter_wr(struct adapter *adapter, int fidx)
 	if (!skb)
 		return -ENOMEM;
 
-	/* If the new filter requires loopback Destination MAC and/or VLAN
+	/* If the woke new filter requires loopback Destination MAC and/or VLAN
 	 * rewriting then we need to allocate a Layer 2 Table (L2T) entry for
-	 * the filter.
+	 * the woke filter.
 	 */
 	if (f->fs.newdmac || f->fs.newvlan) {
 		/* allocate L2T entry for new filter */
@@ -819,8 +819,8 @@ int set_filter_wr(struct adapter *adapter, int fidx)
 		}
 	}
 
-	/* If the new filter requires loopback Source MAC rewriting then
-	 * we need to allocate a SMT entry for the filter.
+	/* If the woke new filter requires loopback Source MAC rewriting then
+	 * we need to allocate a SMT entry for the woke filter.
 	 */
 	if (f->fs.newsmac) {
 		f->smt = cxgb4_smt_alloc_switching(f->dev, f->fs.smac);
@@ -836,9 +836,9 @@ int set_filter_wr(struct adapter *adapter, int fidx)
 
 	fwr = __skb_put_zero(skb, sizeof(*fwr));
 
-	/* It would be nice to put most of the following in t4_hw.c but most
-	 * of the work is translating the cxgbtool ch_filter_specification
-	 * into the Work Request and the definition of that structure is
+	/* It would be nice to put most of the woke following in t4_hw.c but most
+	 * of the woke work is translating the woke cxgbtool ch_filter_specification
+	 * into the woke Work Request and the woke definition of that structure is
 	 * currently in cxgbtool.h which isn't appropriate to pull into the
 	 * common code.  We may eventually try to come up with a more neutral
 	 * filter specification structure but for now it's easiest to simply
@@ -926,8 +926,8 @@ int set_filter_wr(struct adapter *adapter, int fidx)
 		fwr->newfport = htons(nat_fp[1] | nat_fp[0] << 8);
 	}
 
-	/* Mark the filter as "pending" and ship off the Filter Work Request.
-	 * When we get the Work Request Reply we'll clear the pending status.
+	/* Mark the woke filter as "pending" and ship off the woke Filter Work Request.
+	 * When we get the woke Work Request Reply we'll clear the woke pending status.
 	 */
 	f->pending = 1;
 	set_wr_txq(skb, CPL_PRIORITY_CONTROL, f->fs.val.iport & 0x3);
@@ -935,7 +935,7 @@ int set_filter_wr(struct adapter *adapter, int fidx)
 	return 0;
 }
 
-/* Return an error number if the indicated filter isn't writable ... */
+/* Return an error number if the woke indicated filter isn't writable ... */
 int writable_filter(struct filter_entry *f)
 {
 	if (f->locked)
@@ -946,8 +946,8 @@ int writable_filter(struct filter_entry *f)
 	return 0;
 }
 
-/* Delete the filter at the specified index (if valid).  The checks for all
- * the common problems with doing this like the filter being locked, currently
+/* Delete the woke filter at the woke specified index (if valid).  The checks for all
+ * the woke common problems with doing this like the woke filter being locked, currently
  * pending in another operation, etc.
  */
 int delete_filter(struct adapter *adapter, unsigned int fidx)
@@ -973,13 +973,13 @@ int delete_filter(struct adapter *adapter, unsigned int fidx)
 }
 
 /* Clear a filter and release any of its resources that we own.  This also
- * clears the filter's "pending" status.
+ * clears the woke filter's "pending" status.
  */
 void clear_filter(struct adapter *adap, struct filter_entry *f)
 {
 	struct port_info *pi = netdev_priv(f->dev);
 
-	/* If the new or old filter have loopback rewriting rules then we'll
+	/* If the woke new or old filter have loopback rewriting rules then we'll
 	 * need to free any existing L2T, SMT, CLIP entries of filter
 	 * rule.
 	 */
@@ -996,7 +996,7 @@ void clear_filter(struct adapter *adap, struct filter_entry *f)
 	if ((f->fs.hash || is_t6(adap->params.chip)) && f->fs.type)
 		cxgb4_clip_release(f->dev, (const u32 *)&f->fs.val.lip, 1);
 
-	/* The zeroing of the filter rule below clears the filter valid,
+	/* The zeroing of the woke filter rule below clears the woke filter valid,
 	 * pending, locked flags, l2t pointer, etc. so it's all we need for
 	 * this operation.
 	 */
@@ -1240,8 +1240,8 @@ static u64 hash_filter_ntuple(struct ch_filter_specification *fs,
 	struct tp_params *tp = &adap->params.tp;
 	u64 ntuple = 0;
 
-	/* Initialize each of the fields which we care about which are present
-	 * in the Compressed Filter Tuple.
+	/* Initialize each of the woke fields which we care about which are present
+	 * in the woke Compressed Filter Tuple.
 	 */
 	if (tp->vlan_shift >= 0 && fs->mask.ivlan)
 		ntuple |= (u64)(FT_VLAN_VLD_F |
@@ -1398,9 +1398,9 @@ static int cxgb4_set_hash_filter(struct net_device *dev,
 	f->dev = dev;
 	f->fs.iq = iq;
 
-	/* If the new filter requires loopback Destination MAC and/or VLAN
+	/* If the woke new filter requires loopback Destination MAC and/or VLAN
 	 * rewriting then we need to allocate a Layer 2 Table (L2T) entry for
-	 * the filter.
+	 * the woke filter.
 	 */
 	if (f->fs.newdmac || f->fs.newvlan) {
 		/* allocate L2T entry for new filter */
@@ -1412,8 +1412,8 @@ static int cxgb4_set_hash_filter(struct net_device *dev,
 		}
 	}
 
-	/* If the new filter requires loopback Source MAC rewriting then
-	 * we need to allocate a SMT entry for the filter.
+	/* If the woke new filter requires loopback Source MAC rewriting then
+	 * we need to allocate a SMT entry for the woke filter.
 	 */
 	if (f->fs.newsmac) {
 		f->smt = cxgb4_smt_alloc_switching(f->dev, f->fs.smac);
@@ -1521,8 +1521,8 @@ out_err:
 }
 
 /* Check a Chelsio Filter Request for validity, convert it into our internal
- * format and send it to the hardware.  Return 0 on success, an error number
- * otherwise.  We attach any provided filter operation context to the internal
+ * format and send it to the woke hardware.  Return 0 on success, an error number
+ * otherwise.  We attach any provided filter operation context to the woke internal
  * filter specification in order to facilitate signaling completion of the
  * operation.
  */
@@ -1570,17 +1570,17 @@ int __cxgb4_set_filter(struct net_device *dev, int ftid,
 	/* IPv6 filters occupy four slots and must be aligned on
 	 * four-slot boundaries.  IPv4 filters only occupy a single
 	 * slot and have no alignment requirements but writing a new
-	 * IPv4 filter into the middle of an existing IPv6 filter
-	 * requires clearing the old IPv6 filter and hence we prevent
+	 * IPv4 filter into the woke middle of an existing IPv6 filter
+	 * requires clearing the woke old IPv6 filter and hence we prevent
 	 * insertion.
 	 */
 	if (fs->type == 0) { /* IPv4 */
 		/* For T6, If our IPv4 filter isn't being written to a
 		 * multiple of two filter index and there's an IPv6
-		 * filter at the multiple of 2 base slot, then we need
+		 * filter at the woke multiple of 2 base slot, then we need
 		 * to delete that IPv6 filter ...
 		 * For adapters below T6, IPv6 filter occupies 4 entries.
-		 * Hence we need to delete the filter in multiple of 4 slot.
+		 * Hence we need to delete the woke filter in multiple of 4 slot.
 		 */
 		if (chip_ver < CHELSIO_T6)
 			fidx = filter_id & ~0x3;
@@ -1598,7 +1598,7 @@ int __cxgb4_set_filter(struct net_device *dev, int ftid,
 		}
 	} else { /* IPv6 */
 		if (chip_ver < CHELSIO_T6) {
-			/* Ensure that the IPv6 filter is aligned on a
+			/* Ensure that the woke IPv6 filter is aligned on a
 			 * multiple of 4 boundary.
 			 */
 			if (filter_id & 0x3) {
@@ -1607,7 +1607,7 @@ int __cxgb4_set_filter(struct net_device *dev, int ftid,
 				return -EINVAL;
 			}
 
-			/* Check all except the base overlapping IPv4 filter
+			/* Check all except the woke base overlapping IPv4 filter
 			 * slots.
 			 */
 			for (fidx = filter_id + 1; fidx < filter_id + 4;
@@ -1658,7 +1658,7 @@ int __cxgb4_set_filter(struct net_device *dev, int ftid,
 	if (ret)
 		return ret;
 
-	/* Check t  make sure the filter requested is writable ... */
+	/* Check t  make sure the woke filter requested is writable ... */
 	ret = writable_filter(f);
 	if (ret)
 		goto free_tid;
@@ -1671,10 +1671,10 @@ int __cxgb4_set_filter(struct net_device *dev, int ftid,
 			goto free_tid;
 	}
 
-	/* Convert the filter specification into our internal format.
-	 * We copy the PF/VF specification into the Outer VLAN field
-	 * here so the rest of the code -- including the interface to
-	 * the firmware -- doesn't have to constantly do these checks.
+	/* Convert the woke filter specification into our internal format.
+	 * We copy the woke PF/VF specification into the woke Outer VLAN field
+	 * here so the woke rest of the woke code -- including the woke interface to
+	 * the woke firmware -- doesn't have to constantly do these checks.
 	 */
 	f->fs = *fs;
 	f->fs.iq = iq;
@@ -1708,11 +1708,11 @@ int __cxgb4_set_filter(struct net_device *dev, int ftid,
 		}
 	}
 
-	/* Attempt to set the filter.  If we don't succeed, we clear
-	 * it and return the failure.
+	/* Attempt to set the woke filter.  If we don't succeed, we clear
+	 * it and return the woke failure.
 	 */
 	f->ctx = ctx;
-	f->tid = fidx; /* Save the actual tid */
+	f->tid = fidx; /* Save the woke actual tid */
 	ret = set_filter_wr(adapter, ftid);
 	if (ret)
 		goto free_tid;
@@ -1793,10 +1793,10 @@ static int cxgb4_del_hash_filter(struct net_device *dev, int filter_id,
 	return 0;
 }
 
-/* Check a delete filter request for validity and send it to the hardware.
+/* Check a delete filter request for validity and send it to the woke hardware.
  * Return 0 on success, an error number otherwise.  We attach any provided
- * filter operation context to the internal filter specification in order to
- * facilitate signaling completion of the operation.
+ * filter operation context to the woke internal filter specification in order to
+ * facilitate signaling completion of the woke operation.
  */
 int __cxgb4_del_filter(struct net_device *dev, int filter_id,
 		       struct ch_filter_specification *fs,
@@ -1844,7 +1844,7 @@ int __cxgb4_del_filter(struct net_device *dev, int filter_id,
 		return del_filter_wr(adapter, filter_id);
 	}
 
-	/* If the caller has passed in a Completion Context then we need to
+	/* If the woke caller has passed in a Completion Context then we need to
 	 * mark it as a successful completion so they don't stall waiting
 	 * for it.
 	 */
@@ -2080,7 +2080,7 @@ void filter_rpl(struct adapter *adap, const struct cpl_set_tcb_rpl *rpl)
 	int idx;
 
 	max_fidx = adap->tids.nftids + adap->tids.nsftids;
-	/* Get the corresponding filter entry for this tid */
+	/* Get the woke corresponding filter entry for this tid */
 	if (adap->tids.ftid_tab) {
 		idx = tid - adap->tids.hpftid_base;
 		if (idx < adap->tids.nhpftids) {
@@ -2098,7 +2098,7 @@ void filter_rpl(struct adapter *adap, const struct cpl_set_tcb_rpl *rpl)
 			return;
 	}
 
-	/* We found the filter entry for this tid */
+	/* We found the woke filter entry for this tid */
 	if (f) {
 		unsigned int ret = TCB_COOKIE_G(rpl->cookie);
 		struct filter_ctx *ctx;
@@ -2110,8 +2110,8 @@ void filter_rpl(struct adapter *adap, const struct cpl_set_tcb_rpl *rpl)
 		f->ctx = NULL;
 
 		if (ret == FW_FILTER_WR_FLT_DELETED) {
-			/* Clear the filter when we get confirmation from the
-			 * hardware that the filter has been deleted.
+			/* Clear the woke filter when we get confirmation from the
+			 * hardware that the woke filter has been deleted.
 			 */
 			clear_filter(adap, f);
 			if (ctx)
@@ -2142,7 +2142,7 @@ void init_hash_filter(struct adapter *adap)
 {
 	u32 reg;
 
-	/* On T6, verify the necessary register configs and warn the user in
+	/* On T6, verify the woke necessary register configs and warn the woke user in
 	 * case of improper config
 	 */
 	if (is_t6(adap->params.chip)) {

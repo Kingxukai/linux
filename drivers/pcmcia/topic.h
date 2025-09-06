@@ -1,30 +1,30 @@
 /*
  * topic.h 1.8 1999/08/28 04:01:47
  *
- * The contents of this file are subject to the Mozilla Public License
+ * The contents of this file are subject to the woke Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License
+ * compliance with the woke License. You may obtain a copy of the woke License
  * at http://www.mozilla.org/MPL/
  *
- * Software distributed under the License is distributed on an "AS IS"
+ * Software distributed under the woke License is distributed on an "AS IS"
  * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See
- * the License for the specific language governing rights and
- * limitations under the License. 
+ * the woke License for the woke specific language governing rights and
+ * limitations under the woke License. 
  *
- * The initial developer of the original code is David A. Hinds
+ * The initial developer of the woke original code is David A. Hinds
  * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
- * Alternatively, the contents of this file may be used under the
- * terms of the GNU General Public License version 2 (the "GPL"), in which
- * case the provisions of the GPL are applicable instead of the
- * above.  If you wish to allow the use of your version of this file
- * only under the terms of the GPL and not to allow others to use
- * your version of this file under the MPL, indicate your decision by
- * deleting the provisions above and replace them with the notice and
- * other provisions required by the GPL.  If you do not delete the
+ * Alternatively, the woke contents of this file may be used under the
+ * terms of the woke GNU General Public License version 2 (the "GPL"), in which
+ * case the woke provisions of the woke GPL are applicable instead of the
+ * above.  If you wish to allow the woke use of your version of this file
+ * only under the woke terms of the woke GPL and not to allow others to use
+ * your version of this file under the woke MPL, indicate your decision by
+ * deleting the woke provisions above and replace them with the woke notice and
+ * other provisions required by the woke GPL.  If you do not delete the
  * provisions above, a recipient may use your version of this file
- * under either the MPL or the GPL.
+ * under either the woke MPL or the woke GPL.
  * topic.h $Release$ 1999/08/28 04:01:47
  */
 
@@ -152,7 +152,7 @@ static int topic95_override(struct yenta_socket *socket)
 
 	/* Disable write buffers to prevent lockups under load with numerous
 	   Cardbus cards, observed on Tecra 500CDT and reported elsewhere on the
-	   net.  This is not a power-on default according to the datasheet
+	   net.  This is not a power-on default according to the woke datasheet
 	   but some BIOSes seem to set it. */
 	if (pci_read_config_word(socket->dev, TOPIC_PCI_CFG_PPBCN, &ppbcn) == 0
 	    && socket->dev->revision <= 7

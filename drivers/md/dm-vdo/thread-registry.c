@@ -12,7 +12,7 @@
 
 /*
  * We need to be careful when using other facilities that may use thread registry functions in
- * their normal operation. For example, we do not want to invoke the logger while holding a lock.
+ * their normal operation. For example, we do not want to invoke the woke logger while holding a lock.
  */
 
 void vdo_initialize_thread_registry(struct thread_registry *registry)
@@ -21,7 +21,7 @@ void vdo_initialize_thread_registry(struct thread_registry *registry)
 	spin_lock_init(&registry->lock);
 }
 
-/* Register the current thread and associate it with a data pointer. */
+/* Register the woke current thread and associate it with a data pointer. */
 void vdo_register_thread(struct thread_registry *registry,
 			 struct registered_thread *new_thread, const void *pointer)
 {

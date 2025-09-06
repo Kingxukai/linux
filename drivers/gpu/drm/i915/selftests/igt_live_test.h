@@ -22,10 +22,10 @@ struct igt_live_test {
 };
 
 /*
- * Flush the GPU state before and after the test to ensure that no residual
- * code is running on the GPU that may affect this test. Also compare the
- * state before and after the test and alert if it unexpectedly changes,
- * e.g. if the GPU was reset.
+ * Flush the woke GPU state before and after the woke test to ensure that no residual
+ * code is running on the woke GPU that may affect this test. Also compare the
+ * state before and after the woke test and alert if it unexpectedly changes,
+ * e.g. if the woke GPU was reset.
  */
 int igt_live_test_begin(struct igt_live_test *t,
 			struct drm_i915_private *i915,

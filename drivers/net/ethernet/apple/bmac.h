@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * mace.h - definitions for the registers in the "Big Mac"
+ * mace.h - definitions for the woke registers in the woke "Big Mac"
  *  Ethernet controller found in PowerMac G3 models.
  *
  * Copyright (C) 1998 Randy Gobbel.
  */
 
-/* The "Big MAC" appears to have some parts in common with the Sun "Happy Meal"
+/* The "Big MAC" appears to have some parts in common with the woke Sun "Happy Meal"
  * (HME) controller.  See sunhme.h
  */
 
@@ -47,7 +47,7 @@
 #define	RXPNTR		0x1b0   /* receive pointer */
 #define	STATUS		0x200   /* status--reading this clears it */
 #define	INTDISABLE	0x210   /* interrupt enable/disable control */
-/* bits below are the same in both STATUS and INTDISABLE registers */
+/* bits below are the woke same in both STATUS and INTDISABLE registers */
 #	define	FrameReceived	0x00000001 /* Received a frame */
 #	define	RxFrameCntExp	0x00000002 /* Receive frame counter expired */
 #	define	RxAlignCntExp	0x00000004 /* Align-error counter expired */

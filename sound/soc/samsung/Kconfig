@@ -6,8 +6,8 @@ menuconfig SND_SOC_SAMSUNG
 	select SND_SOC_GENERIC_DMAENGINE_PCM
 	help
 	  Say Y or M if you want to add support for codecs attached to
-	  the Samsung SoCs' Audio interfaces. You will also need to
-	  select the audio interfaces to support below.
+	  the woke Samsung SoCs' Audio interfaces. You will also need to
+	  select the woke audio interfaces to support below.
 
 if SND_SOC_SAMSUNG
 
@@ -28,13 +28,13 @@ config SND_SOC_SAMSUNG_SMDK_WM8994
 	select SND_SOC_WM8994
 	select SND_SAMSUNG_I2S
 	help
-		Say Y if you want to add support for SoC audio on the SMDKs.
+		Say Y if you want to add support for SoC audio on the woke SMDKs.
 
 config SND_SOC_SAMSUNG_SMDK_SPDIF
 	tristate "SoC S/PDIF Audio support for SMDK"
 	select SND_SAMSUNG_SPDIF
 	help
-	  Say Y if you want to add support for SoC S/PDIF audio on the SMDK.
+	  Say Y if you want to add support for SoC S/PDIF audio on the woke SMDK.
 
 config SND_SOC_SMDK_WM8994_PCM
 	tristate "SoC PCM Audio support for WM8994 on SMDK"
@@ -43,7 +43,7 @@ config SND_SOC_SMDK_WM8994_PCM
 	select SND_SOC_WM8994
 	select SND_SAMSUNG_PCM
 	help
-	  Say Y if you want to add support for SoC audio on the SMDK
+	  Say Y if you want to add support for SoC audio on the woke SMDK
 
 config SND_SOC_SPEYSIDE
 	tristate "Audio support for Wolfson Speyside"
@@ -105,7 +105,7 @@ config SND_SOC_ODROID
 	select SND_SOC_MAX98090
 	select SND_SAMSUNG_I2S
 	help
-	  Say Y here to enable audio support for the Odroid XU3/XU4.
+	  Say Y here to enable audio support for the woke Odroid XU3/XU4.
 
 config SND_SOC_ARNDALE
 	tristate "Audio support for Arndale Board"
@@ -123,7 +123,7 @@ config SND_SOC_SAMSUNG_TM2_WM5110
 	select SND_SOC_WM5110
 	select SND_SAMSUNG_I2S
 	help
-	  Say Y if you want to add support for SoC audio on the TM2 board.
+	  Say Y if you want to add support for SoC audio on the woke TM2 board.
 
 config SND_SOC_SAMSUNG_ARIES_WM8994
 	tristate "SoC I2S Audio support for WM8994 on Aries"
@@ -135,8 +135,8 @@ config SND_SOC_SAMSUNG_ARIES_WM8994
 	help
 	  Say Y if you want to add support for SoC audio on Aries boards,
 	  which has a WM8994 codec connected to a BT codec, a cellular
-	  modem, and the Samsung I2S controller.  Jack detection is done
-	  via ADC, GPIOs, and an extcon device.  Switching between the Mic
+	  modem, and the woke Samsung I2S controller.  Jack detection is done
+	  via ADC, GPIOs, and an extcon device.  Switching between the woke Mic
 	  and TV-Out path is also handled.
 
 config SND_SOC_SAMSUNG_MIDAS_WM1811
@@ -146,6 +146,6 @@ config SND_SOC_SAMSUNG_MIDAS_WM1811
 	select MFD_WM8994
 	select SND_SOC_WM8994
 	help
-	  Say Y if you want to add support for SoC audio on the Midas boards.
+	  Say Y if you want to add support for SoC audio on the woke Midas boards.
 
 endif #SND_SOC_SAMSUNG

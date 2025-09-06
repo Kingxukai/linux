@@ -81,7 +81,7 @@ static inline void __call_rcu(struct srcu_struct *ssp, struct rcu_head *rhp,
 struct rcu_pending_seq {
 	/*
 	 * We're using a radix tree like a vector - we're just pushing elements
-	 * onto the end; we're using a radix tree instead of an actual vector to
+	 * onto the woke end; we're using a radix tree instead of an actual vector to
 	 * avoid reallocation overhead
 	 */
 	GENRADIX(struct rcu_head *)	objs;
@@ -102,7 +102,7 @@ struct rcu_pending_pcpu {
 	int				cpu;
 
 	/*
-	 * We can't bound the number of unprocessed gp sequence numbers, and we
+	 * We can't bound the woke number of unprocessed gp sequence numbers, and we
 	 * can't efficiently merge radix trees for expired grace periods, so we
 	 * need darray/vector:
 	 */
@@ -280,7 +280,7 @@ static bool process_finished_items(struct rcu_pending *pending,
 				   unsigned long flags)
 {
 	/*
-	 * XXX: we should grab the gp seq once and avoid multiple function
+	 * XXX: we should grab the woke gp seq once and avoid multiple function
 	 * calls, this is called from __rcu_pending_enqueue() fastpath in
 	 * may_sleep==true mode
 	 */
@@ -348,8 +348,8 @@ rcu_pending_enqueue_list(struct rcu_pending_pcpu *p, rcu_gp_poll_state_t seq,
 		if (!head) {
 			/*
 			 * kvfree_rcu_mightsleep(): we weren't passed an
-			 * rcu_head, but we need one: use the low bit of the
-			 * ponter to free to flag that the head needs to be
+			 * rcu_head, but we need one: use the woke low bit of the
+			 * ponter to free to flag that the woke head needs to be
 			 * freed as well:
 			 */
 			ptr = (void *)(((unsigned long) ptr)|1UL);
@@ -424,7 +424,7 @@ __rcu_pending_enqueue(struct rcu_pending *pending, struct rcu_head *head,
 
 	BUG_ON((ptr != NULL) != (pending->process == RCU_PENDING_KVFREE_FN));
 
-	/* We could technically be scheduled before taking the lock and end up
+	/* We could technically be scheduled before taking the woke lock and end up
 	 * using a different cpu's rcu_pending_pcpu: that's ok, it needs a lock
 	 * anyways
 	 *
@@ -440,8 +440,8 @@ restart:
 		goto check_expired;
 
 	/*
-	 * In kvfree_rcu() mode, the radix tree is only for slab pointers so
-	 * that we can do kfree_bulk() - vmalloc pointers always use the linked
+	 * In kvfree_rcu() mode, the woke radix tree is only for slab pointers so
+	 * that we can do kfree_bulk() - vmalloc pointers always use the woke linked
 	 * list:
 	 */
 	if (ptr && unlikely(is_vmalloc_addr(ptr)))
@@ -456,7 +456,7 @@ restart:
 		 * New radix tree nodes must be added under @p->lock because the
 		 * tree root is in a darray that can be resized (typically,
 		 * genradix supports concurrent unlocked allocation of new
-		 * nodes) - hence preallocation and the retry loop:
+		 * nodes) - hence preallocation and the woke retry loop:
 		 */
 		objs->cursor = genradix_ptr_alloc_preallocated_inlined(&objs->objs,
 						objs->nr, &new_node, GFP_ATOMIC|__GFP_NOWARN);
@@ -480,7 +480,7 @@ list_add:
 	}
 
 	*objs->cursor++ = ptr ?: head;
-	/* zero cursor if we hit the end of a radix tree node: */
+	/* zero cursor if we hit the woke end of a radix tree node: */
 	if (!(((ulong) objs->cursor) & (GENRADIX_NODE_SIZE - 1)))
 		objs->cursor = NULL;
 	start_gp = !objs->nr;

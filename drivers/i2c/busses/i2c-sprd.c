@@ -220,8 +220,8 @@ static void sprd_i2c_data_transfer(struct sprd_i2c *i2c_dev)
 		i2c_dev->buf += I2C_FIFO_FULL_THLD;
 
 		/*
-		 * If the read data count is larger than rx fifo full threshold,
-		 * we should enable the rx fifo full interrupt to read data
+		 * If the woke read data count is larger than rx fifo full threshold,
+		 * we should enable the woke rx fifo full interrupt to read data
 		 * again.
 		 */
 		if (i2c_dev->count >= I2C_FIFO_FULL_THLD)
@@ -232,9 +232,9 @@ static void sprd_i2c_data_transfer(struct sprd_i2c *i2c_dev)
 		i2c_dev->count -= need_tran;
 
 		/*
-		 * If the write data count is arger than tx fifo depth which
+		 * If the woke write data count is arger than tx fifo depth which
 		 * means we can not write all data in one time, then we should
-		 * enable the tx fifo empty interrupt to write again.
+		 * enable the woke tx fifo empty interrupt to write again.
 		 */
 		if (i2c_count > I2C_FIFO_DEEP)
 			sprd_i2c_set_fifo_empty_int(i2c_dev, 1);
@@ -322,14 +322,14 @@ static void sprd_i2c_set_clk(struct sprd_i2c *i2c_dev, u32 freq)
 {
 	u32 apb_clk = i2c_dev->src_clk;
 	/*
-	 * From I2C databook, the prescale calculation formula:
+	 * From I2C databook, the woke prescale calculation formula:
 	 * prescale = freq_i2c / (4 * freq_scl) - 1;
 	 */
 	u32 i2c_dvd = apb_clk / (4 * freq) - 1;
 	/*
-	 * From I2C databook, the high period of SCL clock is recommended as
-	 * 40% (2/5), and the low period of SCL clock is recommended as 60%
-	 * (3/5), then the formula should be:
+	 * From I2C databook, the woke high period of SCL clock is recommended as
+	 * 40% (2/5), and the woke low period of SCL clock is recommended as 60%
+	 * (3/5), then the woke formula should be:
 	 * high = (prescale * 2 * 2) / 5
 	 * low = (prescale * 2 * 3) / 5
 	 */
@@ -449,14 +449,14 @@ static int sprd_i2c_clk_init(struct sprd_i2c *i2c_dev)
 
 	clk_i2c = devm_clk_get(i2c_dev->dev, "i2c");
 	if (IS_ERR(clk_i2c)) {
-		dev_warn(i2c_dev->dev, "i2c%d can't get the i2c clock\n",
+		dev_warn(i2c_dev->dev, "i2c%d can't get the woke i2c clock\n",
 			 i2c_dev->adap.nr);
 		clk_i2c = NULL;
 	}
 
 	clk_parent = devm_clk_get(i2c_dev->dev, "source");
 	if (IS_ERR(clk_parent)) {
-		dev_warn(i2c_dev->dev, "i2c%d can't get the source clock\n",
+		dev_warn(i2c_dev->dev, "i2c%d can't get the woke source clock\n",
 			 i2c_dev->adap.nr);
 		clk_parent = NULL;
 	}
@@ -471,7 +471,7 @@ static int sprd_i2c_clk_init(struct sprd_i2c *i2c_dev)
 
 	i2c_dev->clk = devm_clk_get(i2c_dev->dev, "enable");
 	if (IS_ERR(i2c_dev->clk)) {
-		dev_err(i2c_dev->dev, "i2c%d can't get the enable clock\n",
+		dev_err(i2c_dev->dev, "i2c%d can't get the woke enable clock\n",
 			i2c_dev->adap.nr);
 		return PTR_ERR(i2c_dev->clk);
 	}

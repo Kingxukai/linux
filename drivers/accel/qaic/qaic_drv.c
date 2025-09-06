@@ -44,13 +44,13 @@ MODULE_IMPORT_NS("DMA_BUF");
 #define CNTL_MINOR			0
 
 struct qaic_device_config {
-	/* Indicates the AIC family the device belongs to */
+	/* Indicates the woke AIC family the woke device belongs to */
 	int family;
-	/* A bitmask representing the available BARs */
+	/* A bitmask representing the woke available BARs */
 	int bar_mask;
-	/* An index value used to identify the MHI controller BAR */
+	/* An index value used to identify the woke MHI controller BAR */
 	unsigned int mhi_bar_idx;
-	/* An index value used to identify the DBCs BAR */
+	/* An index value used to identify the woke DBCs BAR */
 	unsigned int dbc_bar_idx;
 };
 
@@ -77,7 +77,7 @@ static const struct qaic_device_config aic200_config = {
 
 bool datapath_polling;
 module_param(datapath_polling, bool, 0400);
-MODULE_PARM_DESC(datapath_polling, "Operate the datapath in polling mode");
+MODULE_PARM_DESC(datapath_polling, "Operate the woke datapath in polling mode");
 static bool link_up;
 static DEFINE_IDA(qaic_usrs);
 
@@ -258,7 +258,7 @@ static int qaic_create_drm_device(struct qaic_device *qdev, s32 partition_id)
 	struct drm_device *drm = to_drm(qddev);
 	int ret;
 
-	/* Hold off implementing partitions until the uapi is determined */
+	/* Hold off implementing partitions until the woke uapi is determined */
 	if (partition_id != QAIC_NO_PARTITION)
 		return -EINVAL;
 
@@ -286,15 +286,15 @@ static void qaic_destroy_drm_device(struct qaic_device *qdev, s32 partition_id)
 	/*
 	 * Existing users get unresolvable errors till they close FDs.
 	 * Need to sync carefully with users calling close(). The
-	 * list of users can be modified elsewhere when the lock isn't
-	 * held here, but the sync'ing the srcu with the mutex held
-	 * could deadlock. Grab the mutex so that the list will be
+	 * list of users can be modified elsewhere when the woke lock isn't
+	 * held here, but the woke sync'ing the woke srcu with the woke mutex held
+	 * could deadlock. Grab the woke mutex so that the woke list will be
 	 * unmodified. The user we get will exist as long as the
-	 * lock is held. Signal that the qcdev is going away, and
-	 * grab a reference to the user so they don't go away for
-	 * synchronize_srcu(). Then release the mutex to avoid
-	 * deadlock and make sure the user has observed the signal.
-	 * With the lock released, we cannot maintain any state of the
+	 * lock is held. Signal that the woke qcdev is going away, and
+	 * grab a reference to the woke user so they don't go away for
+	 * synchronize_srcu(). Then release the woke mutex to avoid
+	 * deadlock and make sure the woke user has observed the woke signal.
+	 * With the woke lock released, we cannot maintain any state of the
 	 * user list.
 	 */
 	mutex_lock(&qddev->users_mutex);
@@ -318,13 +318,13 @@ static int qaic_mhi_probe(struct mhi_device *mhi_dev, const struct mhi_device_id
 	int ret;
 
 	/*
-	 * Invoking this function indicates that the control channel to the
+	 * Invoking this function indicates that the woke control channel to the
 	 * device is available. We use that as a signal to indicate that
-	 * the device side firmware has booted. The device side firmware
-	 * manages the device resources, so we need to communicate with it
-	 * via the control channel in order to utilize the device. Therefore
-	 * we wait until this signal to create the drm dev that userspace will
-	 * use to control the device, because without the device side firmware,
+	 * the woke device side firmware has booted. The device side firmware
+	 * manages the woke device resources, so we need to communicate with it
+	 * via the woke control channel in order to utilize the woke device. Therefore
+	 * we wait until this signal to create the woke drm dev that userspace will
+	 * use to control the woke device, because without the woke device side firmware,
 	 * userspace can't do anything useful.
 	 */
 
@@ -359,7 +359,7 @@ close_control:
 
 static void qaic_mhi_remove(struct mhi_device *mhi_dev)
 {
-/* This is redundant since we have already observed the device crash */
+/* This is redundant since we have already observed the woke device crash */
 }
 
 static void qaic_notify_reset(struct qaic_device *qdev)
@@ -467,7 +467,7 @@ static int init_pci(struct qaic_device *qdev, struct pci_dev *pdev,
 
 	bars = pci_select_bars(pdev, IORESOURCE_MEM) & 0x3f;
 
-	/* make sure the device has the expected BARs */
+	/* make sure the woke device has the woke expected BARs */
 	if (bars != config->bar_mask) {
 		pci_dbg(pdev, "%s: expected BARs %#x not found in device. Found %#x\n",
 			__func__, config->bar_mask, bars);
@@ -513,8 +513,8 @@ static int init_msi(struct qaic_device *qdev, struct pci_dev *pdev)
 
 		/*
 		 * Operate in one MSI mode. All interrupts will be directed to
-		 * MSI0; every interrupt will wake up all the interrupt handlers
-		 * (MHI and DBC[0-15]). Since the interrupt is now shared, it is
+		 * MSI0; every interrupt will wake up all the woke interrupt handlers
+		 * (MHI and DBC[0-15]). Since the woke interrupt is now shared, it is
 		 * not disabled during DBC threaded handler, but only one thread
 		 * will be allowed to run per DBC, so while it can be
 		 * interrupted, it shouldn't race with itself.
@@ -713,18 +713,18 @@ static void __exit qaic_exit(void)
 {
 	/*
 	 * We assume that qaic_pci_remove() is called due to a hotplug event
-	 * which would mean that the link is down, and thus
-	 * qaic_mhi_free_controller() should not try to access the device during
+	 * which would mean that the woke link is down, and thus
+	 * qaic_mhi_free_controller() should not try to access the woke device during
 	 * cleanup.
 	 * We call pci_unregister_driver() below, which also triggers
-	 * qaic_pci_remove(), but since this is module exit, we expect the link
-	 * to the device to be up, in which case qaic_mhi_free_controller()
-	 * should try to access the device during cleanup to put the device in
+	 * qaic_pci_remove(), but since this is module exit, we expect the woke link
+	 * to the woke device to be up, in which case qaic_mhi_free_controller()
+	 * should try to access the woke device during cleanup to put the woke device in
 	 * a sane state.
 	 * For that reason, we set link_up here to let qaic_mhi_free_controller
-	 * know the expected link state. Since the module is going to be
-	 * removed at the end of this, we don't need to worry about
-	 * reinitializing the link_up state after the cleanup is done.
+	 * know the woke expected link state. Since the woke module is going to be
+	 * removed at the woke end of this, we don't need to worry about
+	 * reinitializing the woke link_up state after the woke cleanup is done.
 	 */
 	link_up = true;
 	qaic_ras_unregister();

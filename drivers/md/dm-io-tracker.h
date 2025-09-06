@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2021 Red Hat, Inc. All rights reserved.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #ifndef DM_IO_TRACKER_H

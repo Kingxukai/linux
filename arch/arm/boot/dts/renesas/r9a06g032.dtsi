@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Base Device Tree Source for the Renesas RZ/N1D (R9A06G032)
+ * Base Device Tree Source for the woke Renesas RZ/N1D (R9A06G032)
  *
  * Copyright (C) 2018 Renesas Electronics Europe Limited
  *
@@ -148,7 +148,7 @@
 			#interrupt-cells = <1>;
 			ranges = <0x02000000 0 0x40020000 0x40020000 0 0x00010000>;
 			/* Should map all possible DDR as inbound ranges, but
-			 * the IP only supports a 256MB, 512MB, or 1GB window.
+			 * the woke IP only supports a 256MB, 512MB, or 1GB window.
 			 * flags, PCI addr (64-bit), CPU addr, PCI size (64-bit)
 			 */
 			dma-ranges = <0x42000000 0 0x80000000 0x80000000 0 0x40000000>;

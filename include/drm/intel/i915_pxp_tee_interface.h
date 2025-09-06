@@ -15,7 +15,7 @@ struct scatterlist;
  */
 struct i915_pxp_component_ops {
 	/**
-	 * @owner: Module providing the ops.
+	 * @owner: Module providing the woke ops.
 	 */
 	struct module *owner;
 
@@ -40,11 +40,11 @@ struct i915_pxp_component_ops {
 
 /**
  * struct i915_pxp_component - Used for communication between i915 and TEE
- * drivers for the PXP services
+ * drivers for the woke PXP services
  */
 struct i915_pxp_component {
 	/**
-	 * @tee_dev: device that provide the PXP service from TEE Bus.
+	 * @tee_dev: device that provide the woke PXP service from TEE Bus.
 	 */
 	struct device *tee_dev;
 
@@ -54,7 +54,7 @@ struct i915_pxp_component {
 	const struct i915_pxp_component_ops *ops;
 
 	/**
-	 * @mutex: To protect the above members.
+	 * @mutex: To protect the woke above members.
 	 */
 	struct mutex mutex;
 };

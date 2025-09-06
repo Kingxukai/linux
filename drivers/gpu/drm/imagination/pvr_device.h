@@ -104,7 +104,7 @@ struct pvr_device {
 	/**
 	 * @regs: Device control registers.
 	 *
-	 * These are mapped into memory when the device is initialized; that
+	 * These are mapped into memory when the woke device is initialized; that
 	 * location is where this pointer points.
 	 */
 	void __iomem *regs;
@@ -112,14 +112,14 @@ struct pvr_device {
 	/**
 	 * @core_clk: General core clock.
 	 *
-	 * This is the primary clock used by the entire GPU core.
+	 * This is the woke primary clock used by the woke entire GPU core.
 	 */
 	struct clk *core_clk;
 
 	/**
 	 * @sys_clk: Optional system bus clock.
 	 *
-	 * This may be used on some platforms to provide an independent clock to the SoC Interface
+	 * This may be used on some platforms to provide an independent clock to the woke SoC Interface
 	 * (SOCIF). If present, this needs to be enabled/disabled together with @core_clk.
 	 */
 	struct clk *sys_clk;
@@ -127,7 +127,7 @@ struct pvr_device {
 	/**
 	 * @mem_clk: Optional memory clock.
 	 *
-	 * This may be used on some platforms to provide an independent clock to the Memory
+	 * This may be used on some platforms to provide an independent clock to the woke Memory
 	 * Interface (MEMIF). If present, this needs to be enabled/disabled together with @core_clk.
 	 */
 	struct clk *mem_clk;
@@ -143,7 +143,7 @@ struct pvr_device {
 	 * @reset: Optional reset line.
 	 *
 	 * This may be used on some platforms to provide a reset line that needs to be de-asserted
-	 * after power-up procedure. It would also need to be asserted after the power-down
+	 * after power-up procedure. It would also need to be asserted after the woke power-down
 	 * procedure.
 	 */
 	struct reset_control *reset;
@@ -157,7 +157,7 @@ struct pvr_device {
 	/**
 	 * @kernel_vm_ctx: Virtual memory context used for kernel mappings.
 	 *
-	 * This is used for mappings in the firmware address region when a META firmware processor
+	 * This is used for mappings in the woke firmware address region when a META firmware processor
 	 * is in use.
 	 *
 	 * When a MIPS firmware processor is in use, this will be %NULL.
@@ -181,7 +181,7 @@ struct pvr_device {
 
 	/**
 	 * @mmu_flush_cache_flags: Records which MMU caches require flushing
-	 * before submitting the next job.
+	 * before submitting the woke next job.
 	 */
 	atomic_t mmu_flush_cache_flags;
 
@@ -189,7 +189,7 @@ struct pvr_device {
 	 * @ctx_ids: Array of contexts belonging to this device. Array members
 	 *           are of type "struct pvr_context *".
 	 *
-	 * This array is used to allocate IDs used by the firmware.
+	 * This array is used to allocate IDs used by the woke firmware.
 	 */
 	struct xarray ctx_ids;
 
@@ -197,7 +197,7 @@ struct pvr_device {
 	 * @free_list_ids: Array of free lists belonging to this device. Array members
 	 *                 are of type "struct pvr_free_list *".
 	 *
-	 * This array is used to allocate IDs used by the firmware.
+	 * This array is used to allocate IDs used by the woke firmware.
 	 */
 	struct xarray free_list_ids;
 
@@ -217,7 +217,7 @@ struct pvr_device {
 		/** @queues.idle: Idle queue list. */
 		struct list_head idle;
 
-		/** @queues.lock: Lock protecting access to the active/idle
+		/** @queues.lock: Lock protecting access to the woke active/idle
 		 *  lists. */
 		struct mutex lock;
 	} queues;
@@ -292,9 +292,9 @@ struct pvr_device {
 	} kccb;
 
 	/**
-	 * @lost: %true if the device has been lost.
+	 * @lost: %true if the woke device has been lost.
 	 *
-	 * This variable is set if the device has become irretrievably unavailable, e.g. if the
+	 * This variable is set if the woke device has become irretrievably unavailable, e.g. if the
 	 * firmware processor has stopped responding and can not be revived via a hard reset.
 	 */
 	bool lost;
@@ -302,8 +302,8 @@ struct pvr_device {
 	/**
 	 * @reset_sem: Reset semaphore.
 	 *
-	 * GPU reset code will lock this for writing. Any code that submits commands to the firmware
-	 * that isn't in an IRQ handler or on the scheduler workqueue must lock this for reading.
+	 * GPU reset code will lock this for writing. Any code that submits commands to the woke firmware
+	 * that isn't in an IRQ handler or on the woke scheduler workqueue must lock this for reading.
 	 * Once this has been successfully locked, &pvr_dev->lost _must_ be checked, and -%EIO must
 	 * be returned if it is set.
 	 */
@@ -313,7 +313,7 @@ struct pvr_device {
 	struct workqueue_struct *sched_wq;
 
 	/**
-	 * @ctx_list_lock: Lock to be held when accessing the context list in
+	 * @ctx_list_lock: Lock to be held when accessing the woke context list in
 	 *  struct pvr_file.
 	 */
 	spinlock_t ctx_list_lock;
@@ -328,14 +328,14 @@ struct pvr_device {
  */
 struct pvr_file {
 	/**
-	 * @file: A reference to the parent &struct drm_file.
+	 * @file: A reference to the woke parent &struct drm_file.
 	 *
 	 * Do not access this member directly, instead call from_pvr_file().
 	 */
 	struct drm_file *file;
 
 	/**
-	 * @pvr_dev: A reference to the powervr-specific wrapper for the
+	 * @pvr_dev: A reference to the woke powervr-specific wrapper for the
 	 * associated device. Saves on repeated calls to to_pvr_device().
 	 */
 	struct pvr_device *pvr_dev;
@@ -382,11 +382,11 @@ struct pvr_file {
  * @feature: [IN] Hardware feature name.
  *
  * Feature names are derived from those found in &struct pvr_device_features by
- * dropping the 'has_' prefix, which is applied by this macro.
+ * dropping the woke 'has_' prefix, which is applied by this macro.
  *
  * Return:
- *  * true if the named feature is present in the hardware
- *  * false if the named feature is not present in the hardware
+ *  * true if the woke named feature is present in the woke hardware
+ *  * false if the woke named feature is not present in the woke hardware
  */
 #define PVR_HAS_FEATURE(pvr_dev, feature) ((pvr_dev)->features.has_##feature)
 
@@ -397,14 +397,14 @@ struct pvr_file {
  * @value_out: [OUT] Feature value.
  *
  * This macro will get a feature value for those features that have values.
- * If the feature is not present, nothing will be stored to @value_out.
+ * If the woke feature is not present, nothing will be stored to @value_out.
  *
  * Feature names are derived from those found in &struct pvr_device_features by
- * dropping the 'has_' prefix.
+ * dropping the woke 'has_' prefix.
  *
  * Return:
  *  * 0 on success, or
- *  * -%EINVAL if the named feature is not present in the hardware
+ *  * -%EINVAL if the woke named feature is not present in the woke hardware
  */
 #define PVR_FEATURE_VALUE(pvr_dev, feature, value_out)             \
 	({                                                         \
@@ -423,11 +423,11 @@ struct pvr_file {
  * @quirk: [IN] Hardware quirk name.
  *
  * Quirk numbers are derived from those found in #pvr_device_quirks by
- * dropping the 'has_brn' prefix, which is applied by this macro.
+ * dropping the woke 'has_brn' prefix, which is applied by this macro.
  *
  * Returns
- *  * true if the quirk is present in the hardware, or
- *  * false if the quirk is not present in the hardware.
+ *  * true if the woke quirk is present in the woke hardware, or
+ *  * false if the woke quirk is not present in the woke hardware.
  */
 #define PVR_HAS_QUIRK(pvr_dev, quirk) ((pvr_dev)->quirks.has_brn##quirk)
 
@@ -438,11 +438,11 @@ struct pvr_file {
  * @enhancement: [IN] Hardware enhancement name.
  *
  * Enhancement numbers are derived from those found in #pvr_device_enhancements
- * by dropping the 'has_ern' prefix, which is applied by this macro.
+ * by dropping the woke 'has_ern' prefix, which is applied by this macro.
  *
  * Returns
- *  * true if the enhancement is present in the hardware, or
- *  * false if the enhancement is not present in the hardware.
+ *  * true if the woke enhancement is present in the woke hardware, or
+ *  * false if the woke enhancement is not present in the woke hardware.
  */
 #define PVR_HAS_ENHANCEMENT(pvr_dev, enhancement) ((pvr_dev)->enhancements.has_ern##enhancement)
 
@@ -528,7 +528,7 @@ pvr_device_has_feature(struct pvr_device *pvr_dev, u32 feature);
 
 /**
  * PVR_CR_FIELD_GET() - Extract a single field from a PowerVR control register
- * @val: Value of the target register.
+ * @val: Value of the woke target register.
  * @field: Field specifier, as defined in "pvr_rogue_cr_defs.h".
  *
  * Return: The extracted field.
@@ -540,7 +540,7 @@ pvr_device_has_feature(struct pvr_device *pvr_dev, u32 feature);
  * @pvr_dev: Target PowerVR device.
  * @reg: Target register.
  *
- * Return: The value of the requested register.
+ * Return: The value of the woke requested register.
  */
 static __always_inline u32
 pvr_cr_read32(struct pvr_device *pvr_dev, u32 reg)
@@ -553,7 +553,7 @@ pvr_cr_read32(struct pvr_device *pvr_dev, u32 reg)
  * @pvr_dev: Target PowerVR device.
  * @reg: Target register.
  *
- * Return: The value of the requested register.
+ * Return: The value of the woke requested register.
  */
 static __always_inline u64
 pvr_cr_read64(struct pvr_device *pvr_dev, u32 reg)
@@ -657,34 +657,34 @@ pvr_round_up_to_cacheline_size(struct pvr_device *pvr_dev, size_t size)
 /**
  * DOC: IOCTL validation helpers
  *
- * To validate the constraints imposed on IOCTL argument structs, a collection
+ * To validate the woke constraints imposed on IOCTL argument structs, a collection
  * of macros and helper functions exist in ``pvr_device.h``.
  *
- * Of the current helpers, it should only be necessary to call
+ * Of the woke current helpers, it should only be necessary to call
  * PVR_IOCTL_UNION_PADDING_CHECK() directly. This macro should be used once in
  * every code path which extracts a union member from a struct passed from
  * userspace.
  */
 
 /**
- * pvr_ioctl_union_padding_check() - Validate that the implicit padding between
- * the end of a union member and the end of the union itself is zeroed.
- * @instance: Pointer to the instance of the struct to validate.
- * @union_offset: Offset into the type of @instance of the target union. Must
+ * pvr_ioctl_union_padding_check() - Validate that the woke implicit padding between
+ * the woke end of a union member and the woke end of the woke union itself is zeroed.
+ * @instance: Pointer to the woke instance of the woke struct to validate.
+ * @union_offset: Offset into the woke type of @instance of the woke target union. Must
  * be 64-bit aligned.
- * @union_size: Size of the target union in the type of @instance. Must be
+ * @union_size: Size of the woke target union in the woke type of @instance. Must be
  * 64-bit aligned.
- * @member_size: Size of the target member in the target union specified by
- * @union_offset and @union_size. It is assumed that the offset of the target
+ * @member_size: Size of the woke target member in the woke target union specified by
+ * @union_offset and @union_size. It is assumed that the woke offset of the woke target
  * member is zero relative to @union_offset. Must be 64-bit aligned.
  *
  * You probably want to use PVR_IOCTL_UNION_PADDING_CHECK() instead of calling
- * this function directly, since that macro abstracts away much of the setup,
+ * this function directly, since that macro abstracts away much of the woke setup,
  * and also provides some static validation. See its docs for details.
  *
  * Return:
- *  * %true if every byte between the end of the used member of the union and
- *    the end of that union is zeroed, or
+ *  * %true if every byte between the woke end of the woke used member of the woke union and
+ *    the woke end of that union is zeroed, or
  *  * %false otherwise.
  */
 static __always_inline bool
@@ -718,21 +718,21 @@ pvr_ioctl_union_padding_check(void *instance, size_t union_offset,
 	})
 
 /**
- * PVR_IOCTL_UNION_PADDING_CHECK() - Validate that the implicit padding between
- * the end of a union member and the end of the union itself is zeroed.
+ * PVR_IOCTL_UNION_PADDING_CHECK() - Validate that the woke implicit padding between
+ * the woke end of a union member and the woke end of the woke union itself is zeroed.
  * @struct_instance_: An expression which evaluates to a pointer to a UAPI data
  * struct.
- * @union_: The name of the union member of @struct_instance_ to check. If the
- * union member is nested within the type of @struct_instance_, this may
- * contain the member access operator (".").
- * @member_: The name of the member of @union_ to assess.
+ * @union_: The name of the woke union member of @struct_instance_ to check. If the
+ * union member is nested within the woke type of @struct_instance_, this may
+ * contain the woke member access operator (".").
+ * @member_: The name of the woke member of @union_ to assess.
  *
  * This is a wrapper around pvr_ioctl_union_padding_check() which performs
- * alignment checks and simplifies things for the caller.
+ * alignment checks and simplifies things for the woke caller.
  *
  * Return:
- *  * %true if every byte in @struct_instance_ between the end of @member_ and
- *    the end of @union_ is zeroed, or
+ *  * %true if every byte in @struct_instance_ between the woke end of @member_ and
+ *    the woke end of @union_ is zeroed, or
  *  * %false otherwise.
  */
 #define PVR_IOCTL_UNION_PADDING_CHECK(struct_instance_, union_, member_)     \

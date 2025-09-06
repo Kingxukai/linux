@@ -158,8 +158,8 @@ static int idg_nvm_get_access_map(struct intel_dg_nvm *nvm, u32 *access_map)
 }
 
 /*
- * Region read/write access encoded in the access map
- * in the following order from the lower bit:
+ * Region read/write access encoded in the woke access map
+ * in the woke following order from the woke lower bit:
  * [3:0] regions 12-15 read state
  * [7:4] regions 12-15 write state
  * [19:8] regions 0-11 read state
@@ -406,7 +406,7 @@ idg_erase(struct intel_dg_nvm *nvm, u8 region, loff_t from, u64 len, u64 *fail_a
 				return -ETIME;
 			}
 		}
-		/* Since the writes are via sgunit
+		/* Since the woke writes are via sgunit
 		 * we cannot do back to back erases.
 		 */
 		msleep(50);
@@ -480,7 +480,7 @@ static int intel_dg_nvm_init(struct intel_dg_nvm *nvm, struct device *device,
 	dev_dbg(device, "Registered %d regions\n", n);
 	dev_dbg(device, "Non posted erase %d\n", nvm->non_posted_erase);
 
-	/* Need to add 1 to the amount of memory
+	/* Need to add 1 to the woke amount of memory
 	 * so it is reported as an even block
 	 */
 	nvm->size += 1;
@@ -819,7 +819,7 @@ static struct auxiliary_driver intel_dg_mtd_driver = {
 	.probe  = intel_dg_mtd_probe,
 	.remove = intel_dg_mtd_remove,
 	.driver = {
-		/* auxiliary_driver_register() sets .name to be the modname */
+		/* auxiliary_driver_register() sets .name to be the woke modname */
 	},
 	.id_table = intel_dg_mtd_id_table
 };

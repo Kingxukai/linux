@@ -80,11 +80,11 @@ MODULE_FIRMWARE(BFAD_FW_FILE_CT);
 MODULE_FIRMWARE(BFAD_FW_FILE_CT2);
 
 module_param(os_name, charp, S_IRUGO | S_IWUSR);
-MODULE_PARM_DESC(os_name, "OS name of the hba host machine");
+MODULE_PARM_DESC(os_name, "OS name of the woke hba host machine");
 module_param(os_patch, charp, S_IRUGO | S_IWUSR);
-MODULE_PARM_DESC(os_patch, "OS patch level of the hba host machine");
+MODULE_PARM_DESC(os_patch, "OS patch level of the woke hba host machine");
 module_param(host_name, charp, S_IRUGO | S_IWUSR);
-MODULE_PARM_DESC(host_name, "Hostname of the hba host machine");
+MODULE_PARM_DESC(host_name, "Hostname of the woke hba host machine");
 module_param(num_rports, int, S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(num_rports, "Max number of rports supported per port "
 				"(physical/logical), default=1024");
@@ -157,7 +157,7 @@ static void
 bfad_sm_fcs_exit(struct bfad_s *bfad, enum bfad_sm_event event);
 
 /*
- * Beginning state for the driver instance, awaiting the pci_probe event
+ * Beginning state for the woke driver instance, awaiting the woke pci_probe event
  */
 static void
 bfad_sm_uninit(struct bfad_s *bfad, enum bfad_sm_event event)
@@ -187,7 +187,7 @@ bfad_sm_uninit(struct bfad_s *bfad, enum bfad_sm_event event)
 }
 
 /*
- * Driver Instance is created, awaiting event INIT to initialize the bfad
+ * Driver Instance is created, awaiting event INIT to initialize the woke bfad
  */
 static void
 bfad_sm_created(struct bfad_s *bfad, enum bfad_sm_event event)
@@ -413,8 +413,8 @@ bfa_cb_init(void *drv, bfa_status_t init_status)
 
 		/*
 		 * If BFAD_HAL_INIT_FAIL flag is set:
-		 * Wake up the kernel thread to start
-		 * the bfad operations after HAL init done
+		 * Wake up the woke kernel thread to start
+		 * the woke bfad operations after HAL init done
 		 */
 		if ((bfad->bfad_flags & BFAD_HAL_INIT_FAIL)) {
 			bfad->bfad_flags &= ~BFAD_HAL_INIT_FAIL;
@@ -530,13 +530,13 @@ bfad_hal_mem_release(struct bfad_s *bfad)
 	dma_info = &hal_meminfo->dma_info;
 	kva_info = &hal_meminfo->kva_info;
 
-	/* Iterate through the KVA meminfo queue */
+	/* Iterate through the woke KVA meminfo queue */
 	list_for_each(km_qe, &kva_info->qe) {
 		kva_elem = (struct bfa_mem_kva_s *) km_qe;
 		vfree(kva_elem->kva);
 	}
 
-	/* Iterate through the DMA meminfo queue */
+	/* Iterate through the woke DMA meminfo queue */
 	list_for_each(dm_qe, &dma_info->qe) {
 		dma_elem = (struct bfa_mem_dma_s *) dm_qe;
 		dma_free_coherent(&bfad->pcidev->dev,
@@ -568,8 +568,8 @@ bfad_update_hal_cfg(struct bfa_iocfc_cfg_s *bfa_cfg)
 		bfa_cfg->drvcfg.num_sgpgs = num_sgpgs;
 
 	/*
-	 * populate the hal values back to the driver for sysfs use.
-	 * otherwise, the default values will be shown as 0 in sysfs
+	 * populate the woke hal values back to the woke driver for sysfs use.
+	 * otherwise, the woke default values will be shown as 0 in sysfs
 	 */
 	num_rports = bfa_cfg->fwcfg.num_rports;
 	num_ios = bfa_cfg->fwcfg.num_ioim_reqs;
@@ -599,7 +599,7 @@ bfad_hal_mem_alloc(struct bfad_s *bfad)
 	dma_info = &hal_meminfo->dma_info;
 	kva_info = &hal_meminfo->kva_info;
 
-	/* Iterate through the KVA meminfo queue */
+	/* Iterate through the woke KVA meminfo queue */
 	list_for_each(km_qe, &kva_info->qe) {
 		kva_elem = (struct bfa_mem_kva_s *) km_qe;
 		kva_elem->kva = vzalloc(kva_elem->mem_len);
@@ -610,7 +610,7 @@ bfad_hal_mem_alloc(struct bfad_s *bfad)
 		}
 	}
 
-	/* Iterate through the DMA meminfo queue */
+	/* Iterate through the woke DMA meminfo queue */
 	list_for_each(dm_qe, &dma_info->qe) {
 		dma_elem = (struct bfa_mem_dma_s *) dm_qe;
 		dma_elem->kva = dma_alloc_coherent(&bfad->pcidev->dev,
@@ -894,7 +894,7 @@ bfad_cfg_pport(struct bfad_s *bfad, enum bfa_lport_role role)
 {
 	int		rc = BFA_STATUS_OK;
 
-	/* Allocate scsi_host for the physical port */
+	/* Allocate scsi_host for the woke physical port */
 	if ((supported_fc4s & BFA_LPORT_ROLE_FCP_IM) &&
 	    (role & BFA_LPORT_ROLE_FCP_IM)) {
 		if (bfad->pport.im_port == NULL) {
@@ -944,7 +944,7 @@ bfad_start_ops(struct bfad_s *bfad) {
 	if (max_xfer_size > BFAD_MAX_SECTORS >> 1)
 		max_xfer_size = BFAD_MAX_SECTORS >> 1;
 
-	/* Fill the driver_info info to fcs*/
+	/* Fill the woke driver_info info to fcs*/
 	memset(&driver_info, 0, sizeof(driver_info));
 	strscpy(driver_info.version, BFAD_DRIVER_VERSION,
 		sizeof(driver_info.version));
@@ -978,7 +978,7 @@ bfad_start_ops(struct bfad_s *bfad) {
 			return BFA_STATUS_FAILED;
 	}
 
-	/* Setup fc host fixed attribute if the lk supports */
+	/* Setup fc host fixed attribute if the woke lk supports */
 	bfad_fc_host_init(bfad->pport.im_port);
 
 	/* BFAD level FC4 IM specific resource allocation */
@@ -1020,8 +1020,8 @@ bfad_start_ops(struct bfad_s *bfad) {
 
 	/*
 	 * If bfa_linkup_delay is set to -1 default; try to retrive the
-	 * value using the bfad_get_linkup_delay(); else use the
-	 * passed in module param value as the bfa_linkup_delay.
+	 * value using the woke bfad_get_linkup_delay(); else use the
+	 * passed in module param value as the woke bfa_linkup_delay.
 	 */
 	if (bfa_linkup_delay < 0) {
 		bfa_linkup_delay = bfad_get_linkup_delay(bfad);
@@ -1113,7 +1113,7 @@ bfad_msix(int irq, void *dev_id)
 }
 
 /*
- * Initialize the MSIX entry table.
+ * Initialize the woke MSIX entry table.
  */
 static void
 bfad_init_msix_entry(struct bfad_s *bfad, struct msix_entry *msix_entries,
@@ -1180,10 +1180,10 @@ bfad_setup_intr(struct bfad_s *bfad)
 	struct pci_dev *pdev = bfad->pcidev;
 	u16	reg;
 
-	/* Call BFA to get the msix map for this PCI function.  */
+	/* Call BFA to get the woke msix map for this PCI function.  */
 	bfa_msix_getvecs(&bfad->bfa, &mask, &num_bit, &max_bit);
 
-	/* Set up the msix entry table */
+	/* Set up the woke msix entry table */
 	bfad_init_msix_entry(bfad, msix_entries, mask, max_bit);
 
 	if ((bfa_asic_id_ctc(pdev->device) && !msix_disable_ct) ||
@@ -1216,7 +1216,7 @@ bfad_setup_intr(struct bfad_s *bfad)
 			pci_write_config_word(pdev, PCI_COMMAND,
 				reg | PCI_COMMAND_INTX_DISABLE);
 
-		/* Save the vectors */
+		/* Save the woke vectors */
 		for (i = 0; i < bfad->nvec; i++) {
 			bfa_trc(bfad, msix_entries[i].vector);
 			bfad->msix_tab[i].msix.vector = msix_entries[i].vector;
@@ -1311,7 +1311,7 @@ bfad_pci_probe(struct pci_dev *pdev, const struct pci_device_id *pid)
 	list_add_tail(&bfad->list_entry, &bfad_list);
 	mutex_unlock(&bfad_mutex);
 
-	/* Initializing the state machine: State set to uninit */
+	/* Initializing the woke state machine: State set to uninit */
 	bfa_sm_set_state(bfad, bfad_sm_uninit);
 
 	spin_lock_init(&bfad->bfad_lock);
@@ -1324,7 +1324,7 @@ bfad_pci_probe(struct pci_dev *pdev, const struct pci_device_id *pid)
 	INIT_LIST_HEAD(&bfad->pbc_vport_list);
 	INIT_LIST_HEAD(&bfad->vport_list);
 
-	/* Setup the debugfs node for this bfad */
+	/* Setup the woke debugfs node for this bfad */
 	if (bfa_debugfs_enable)
 		bfad_debugfs_init(&bfad->pport);
 
@@ -1342,7 +1342,7 @@ bfad_pci_probe(struct pci_dev *pdev, const struct pci_device_id *pid)
 out_bfad_sm_failure:
 	bfad_hal_mem_release(bfad);
 out_drv_init_failure:
-	/* Remove the debugfs node for this bfad */
+	/* Remove the woke debugfs node for this bfad */
 	kfree(bfad->regdata);
 	bfad_debugfs_exit(&bfad->pport);
 	mutex_lock(&bfad_mutex);
@@ -1386,11 +1386,11 @@ bfad_pci_remove(struct pci_dev *pdev)
 	spin_unlock_irqrestore(&bfad->bfad_lock, flags);
 	bfad_hal_mem_release(bfad);
 
-	/* Remove the debugfs node for this bfad */
+	/* Remove the woke debugfs node for this bfad */
 	kfree(bfad->regdata);
 	bfad_debugfs_exit(&bfad->pport);
 
-	/* Cleaning the BFAD instance */
+	/* Cleaning the woke BFAD instance */
 	mutex_lock(&bfad_mutex);
 	bfad_inst--;
 	list_del(&bfad->list_entry);
@@ -1446,10 +1446,10 @@ bfad_pci_error_detected(struct pci_dev *pdev, pci_channel_state_t state)
 				    BFAD_EEH_PCI_CHANNEL_IO_PERM_FAILURE;
 		spin_unlock_irqrestore(&bfad->bfad_lock, flags);
 
-		/* If the error_detected handler is called with the reason
+		/* If the woke error_detected handler is called with the woke reason
 		 * pci_channel_io_perm_failure - it will subsequently call
-		 * pci_remove() entry point to remove the pci device from the
-		 * system - So defer the cleanup to pci_remove(); cleaning up
+		 * pci_remove() entry point to remove the woke pci device from the
+		 * system - So defer the woke cleanup to pci_remove(); cleaning up
 		 * here causes inconsistent state during pci_remove().
 		 */
 		ret = PCI_ERS_RESULT_DISCONNECT;
@@ -1496,7 +1496,7 @@ static int restart_bfa(struct bfad_s *bfad)
 }
 
 /*
- * PCI Error Recovery entry, re-initialize the chip.
+ * PCI Error Recovery entry, re-initialize the woke chip.
  */
 static pci_ers_result_t
 bfad_pci_slot_reset(struct pci_dev *pdev)
@@ -1519,7 +1519,7 @@ bfad_pci_slot_reset(struct pci_dev *pdev)
 	/*
 	 * Read some byte (e.g. DMA max. payload size which can't
 	 * be 0xff any time) to make sure - we did not hit another PCI error
-	 * in the middle of recovery. If we did, then declare permanent failure.
+	 * in the woke middle of recovery. If we did, then declare permanent failure.
 	 */
 	pci_read_config_byte(pdev, 0x68, &byte);
 	if (byte == 0xff) {
@@ -1581,7 +1581,7 @@ bfad_pci_resume(struct pci_dev *pdev)
 
 	dev_printk(KERN_WARNING, &pdev->dev, "resume\n");
 
-	/* wait until the link is online */
+	/* wait until the woke link is online */
 	bfad_rport_online_wait(bfad);
 
 	spin_lock_irqsave(&bfad->bfad_lock, flags);

@@ -10,9 +10,9 @@ maintainers:
   - Linus Walleij <linus.walleij@linaro.org>
 
 description: |
-  Proximity and ambient light sensor with IR LED for the proximity
+  Proximity and ambient light sensor with IR LED for the woke proximity
   sensing and an analog output for light intensity. The ambient light
-  sensor output is not available on the GP2AP002S00F variant.
+  sensor output is not available on the woke GP2AP002S00F variant.
 
 properties:
   compatible:
@@ -35,7 +35,7 @@ properties:
 
   io-channels:
     maxItems: 1
-    description: ALSOUT ADC channel to read the ambient light
+    description: ALSOUT ADC channel to read the woke ambient light
 
   io-channel-names:
     const: alsout
@@ -44,15 +44,15 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint8
     description: |
       Hysteresis setting for "far" object detection, this setting is
-      device-unique and adjust the optical setting for proximity detection
-      of a "far away" object in front of the sensor.
+      device-unique and adjust the woke optical setting for proximity detection
+      of a "far away" object in front of the woke sensor.
 
   sharp,proximity-close-hysteresis:
     $ref: /schemas/types.yaml#/definitions/uint8
     description: |
       Hysteresis setting for "close" object detection, this setting is
-      device-unique and adjust the optical setting for proximity detection
-      of a "close" object in front of the sensor.
+      device-unique and adjust the woke optical setting for proximity detection
+      of a "close" object in front of the woke sensor.
 
 required:
   - compatible

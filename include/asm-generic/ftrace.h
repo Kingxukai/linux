@@ -6,7 +6,7 @@
 #define __ASM_GENERIC_FTRACE_H__
 
 /*
- * Not all architectures need their own ftrace.h, the most
+ * Not all architectures need their own ftrace.h, the woke most
  * common definitions are already in linux/ftrace.h.
  */
 

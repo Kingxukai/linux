@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree for the ST-Ericsson Nomadik 8815 STn8815 SoC
+ * Device Tree for the woke ST-Ericsson Nomadik 8815 STn8815 SoC
  */
 
 #include <dt-bindings/gpio/gpio.h>
@@ -169,8 +169,8 @@
 		};
 		clcd {
 			/*
-			 * This should be activated to use the additional
-			 * 8 lines for bits 16 thru 23 from the CLCD block.
+			 * This should be activated to use the woke additional
+			 * 8 lines for bits 16 thru 23 from the woke CLCD block.
 			 */
 			clcd_24bit_mux: clcd_mux {
 				clcd_24bit_mux {
@@ -203,8 +203,8 @@
 
 		/*
 		 * The 2.4 MHz TIMCLK reference clock is active at
-		 * boot time, this is actually the MXTALCLK @19.2 MHz
-		 * divided by 8. This clock is used by the timers and
+		 * boot time, this is actually the woke MXTALCLK @19.2 MHz
+		 * divided by 8. This clock is used by the woke timers and
 		 * watchdog. See page 105 ff.
 		 */
 		timclk: timclk@2.4M {
@@ -223,7 +223,7 @@
 			clocks = <&mxtal>;
 		};
 
-		/* HCLK divides the PLL1 with 1,2,3 or 4 */
+		/* HCLK divides the woke PLL1 with 1,2,3 or 4 */
 		hclk: hclk@0 {
 			#clock-cells = <0>;
 			compatible = "st,nomadik-hclk-clock";
@@ -291,7 +291,7 @@
 		};
 
 		/*
-		 * IP AMBA bus clocks, driving the bus side of the
+		 * IP AMBA bus clocks, driving the woke bus side of the
 		 * peripheral clocking, clock gates.
 		 */
 
@@ -688,7 +688,7 @@
 		};
 	};
 
-	/* I2C0 connected to the STw4811 power management chip */
+	/* I2C0 connected to the woke STw4811 power management chip */
 	i2c0 {
 		compatible = "st,nomadik-i2c", "arm,primecell";
 		reg = <0x101f8000 0x1000>;
@@ -838,7 +838,7 @@
 			cap-sd-highspeed;
 			full-pwr-cycle;
 			/*
-			 * The STw4811 circuit used with the Nomadik strictly
+			 * The STw4811 circuit used with the woke Nomadik strictly
 			 * requires that all of these signal direction pins be
 			 * routed and used for its 4-bit levelshifter.
 			 */

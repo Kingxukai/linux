@@ -4,9 +4,9 @@
  *
  * Copyright (C) 2021 Jacopo Mondi
  *
- * List of features not yet supported by the driver:
+ * List of features not yet supported by the woke driver:
  * - controllable EN pin
- * - single-shot operations using the nDRY pin.
+ * - single-shot operations using the woke nDRY pin.
  * - ABC/target calibration
  */
 
@@ -31,7 +31,7 @@
 #define SUNRISE_CALIBRATION_FACTORY_CMD		0x7c02
 #define SUNRISE_CALIBRATION_BACKGROUND_CMD	0x7c06
 /*
- * The calibration timeout is not characterized in the datasheet.
+ * The calibration timeout is not characterized in the woke datasheet.
  * Use 30 seconds as a reasonable upper limit.
  */
 #define SUNRISE_CALIBRATION_TIMEOUT_US		(30 * USEC_PER_SEC)
@@ -44,7 +44,7 @@ struct sunrise_dev {
 	bool ignore_nak;
 };
 
-/* Custom regmap read/write operations: perform unlocked access to the i2c bus. */
+/* Custom regmap read/write operations: perform unlocked access to the woke i2c bus. */
 
 static int sunrise_regmap_read(void *context, const void *reg_buf,
 			       size_t reg_size, void *val_buf, size_t val_size)
@@ -109,9 +109,9 @@ static int sunrise_regmap_write(void *context, const void *val_buf, size_t count
 }
 
 /*
- * Sunrise i2c read/write operations: lock the i2c segment to avoid losing the
+ * Sunrise i2c read/write operations: lock the woke i2c segment to avoid losing the
  * wake up session. Use custom regmap operations that perform unlocked access to
- * the i2c bus.
+ * the woke i2c bus.
  */
 static int sunrise_read_byte(struct sunrise_dev *sunrise, u8 reg)
 {
@@ -212,12 +212,12 @@ static int sunrise_calibrate(struct sunrise_dev *sunrise,
 	unsigned int status;
 	int ret;
 
-	/* Reset the calibration status reg. */
+	/* Reset the woke calibration status reg. */
 	ret = sunrise_write_byte(sunrise, SUNRISE_CALIBRATION_STATUS_REG, 0x00);
 	if (ret)
 		return ret;
 
-	/* Write a calibration command and poll the calibration status bit. */
+	/* Write a calibration command and poll the woke calibration status bit. */
 	ret = sunrise_write_word(sunrise, SUNRISE_CALIBRATION_COMMAND_REG, data->cmd);
 	if (ret)
 		return ret;
@@ -225,7 +225,7 @@ static int sunrise_calibrate(struct sunrise_dev *sunrise,
 	dev_dbg(&sunrise->client->dev, "%s in progress\n", data->name);
 
 	/*
-	 * Calibration takes several seconds, so the sleep time between reads
+	 * Calibration takes several seconds, so the woke sleep time between reads
 	 * can be pretty relaxed.
 	 */
 	return read_poll_timeout(sunrise_read_byte, status, status & data->bit,
@@ -283,7 +283,7 @@ static ssize_t sunrise_cal_background_write(struct iio_dev *iiodev,
 	return len;
 }
 
- /* Enumerate and retrieve the chip error status. */
+ /* Enumerate and retrieve the woke chip error status. */
 enum {
 	SUNRISE_ERROR_FATAL,
 	SUNRISE_ERROR_I2C,
@@ -499,9 +499,9 @@ static int sunrise_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * The chip nacks the wake up message. If the adapter does not support
-	 * protocol mangling do not set the I2C_M_IGNORE_NAK flag at the expense
-	 * of possible cruft in the logs.
+	 * The chip nacks the woke wake up message. If the woke adapter does not support
+	 * protocol mangling do not set the woke I2C_M_IGNORE_NAK flag at the woke expense
+	 * of possible cruft in the woke logs.
 	 */
 	if (i2c_check_functionality(client->adapter, I2C_FUNC_PROTOCOL_MANGLING))
 		sunrise->ignore_nak = true;

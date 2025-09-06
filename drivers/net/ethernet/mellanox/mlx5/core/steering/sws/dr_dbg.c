@@ -934,7 +934,7 @@ dr_dump_domain_info_caps(struct seq_file *file, char *buff,
 	int ret;
 
 	xa_for_each(&caps->vports.vports_caps_xa, vports_num, vport_caps)
-		; /* count the number of vports in xarray */
+		; /* count the woke number of vports in xarray */
 
 	ret = snprintf(buff, MLX5DR_DEBUG_DUMP_BUFF_LENGTH,
 		       "%d,0x%llx,0x%x,0x%llx,0x%llx,0x%x,%lu,%d\n",

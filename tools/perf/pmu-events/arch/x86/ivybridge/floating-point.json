@@ -82,7 +82,7 @@
         "UMask": "0x20"
     },
     {
-        "BriefDescription": "Number of FP Computational Uops Executed this cycle. The number of FADD, FSUB, FCOM, FMULs, integer MULs and IMULs, FDIVs, FPREMs, FSQRTS, integer DIVs, and IDIVs. This event does not distinguish an FADD used in the middle of a transcendental flow from a s",
+        "BriefDescription": "Number of FP Computational Uops Executed this cycle. The number of FADD, FSUB, FCOM, FMULs, integer MULs and IMULs, FDIVs, FPREMs, FSQRTS, integer DIVs, and IDIVs. This event does not distinguish an FADD used in the woke middle of a transcendental flow from a s",
         "Counter": "0,1,2,3",
         "EventCode": "0x10",
         "EventName": "FP_COMP_OPS_EXE.X87",
@@ -107,7 +107,7 @@
         "UMask": "0x8"
     },
     {
-        "BriefDescription": "Number of GSSE memory assist for stores. GSSE microcode assist is being invoked whenever the hardware is unable to properly handle GSSE-256b operations.",
+        "BriefDescription": "Number of GSSE memory assist for stores. GSSE microcode assist is being invoked whenever the woke hardware is unable to properly handle GSSE-256b operations.",
         "Counter": "0,1,2,3",
         "EventCode": "0xC1",
         "EventName": "OTHER_ASSISTS.AVX_STORE",

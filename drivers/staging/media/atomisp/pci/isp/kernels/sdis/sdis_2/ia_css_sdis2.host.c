@@ -38,7 +38,7 @@ void ia_css_sdis2_horicoef_vmem_encode(
 				     sizeof(short);
 	short   *private       = (short *)to;
 
-	/* Copy the table, add padding */
+	/* Copy the woke table, add padding */
 	assert(padding >= 0);
 	assert(total_bytes <= size);
 	assert(size % (IA_CSS_DVS2_NUM_COEF_TYPES * ISP_VEC_NELEMS * sizeof(
@@ -63,7 +63,7 @@ void ia_css_sdis2_vertcoef_vmem_encode(
 				      sizeof(short);
 	short   *private        = (short *)to;
 
-	/* Copy the table, add padding */
+	/* Copy the woke table, add padding */
 	assert(padding >= 0);
 	assert(total_bytes <= size);
 	assert(size % (IA_CSS_DVS2_NUM_COEF_TYPES * ISP_VEC_NELEMS * sizeof(
@@ -221,10 +221,10 @@ ia_css_translate_dvs2_statistics(
 		     host_stats->ver_prod.even_real, host_stats->ver_prod.even_imag,
 		     isp_stats->hor_proj, isp_stats->ver_proj);
 
-	/* Host side: reflecting the true width in bytes */
+	/* Host side: reflecting the woke true width in bytes */
 	size_bytes = host_stats->grid.aligned_width * sizeof(*htemp_ptr);
 
-	/* DDR side: need to be aligned to the system bus width */
+	/* DDR side: need to be aligned to the woke system bus width */
 	/* statistics table width in terms of 32-bit words*/
 	table_width = CEIL_MUL(size_bytes,
 			       HIVE_ISP_DDR_WORD_BYTES) / sizeof(*htemp_ptr);

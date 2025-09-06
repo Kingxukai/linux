@@ -7,7 +7,7 @@
 #ifndef BTITEST_H
 #define BTITEST_H
 
-/* Trampolines for calling the test stubs: */
+/* Trampolines for calling the woke test stubs: */
 void call_using_br_x0(void (*)(void));
 void call_using_br_x16(void (*)(void));
 void call_using_blr(void (*)(void));

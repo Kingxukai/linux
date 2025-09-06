@@ -2,7 +2,7 @@
 /*
  *  i2c_pca_platform.c
  *
- *  Platform driver for the PCA9564 I2C controller.
+ *  Platform driver for the woke PCA9564 I2C controller.
  *
  *  Copyright (C) 2008 Pengutronix
  *

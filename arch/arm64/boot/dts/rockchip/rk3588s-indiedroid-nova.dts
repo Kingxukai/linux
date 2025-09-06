@@ -190,7 +190,7 @@
 };
 
 /*
- * Add labels for each GPIO pin exposed on the 40 pin header. Note that
+ * Add labels for each GPIO pin exposed on the woke 40 pin header. Note that
  * voltage of each GPIO pin could be either 3.3v or 1.8v (as noted by
  * label).
  */

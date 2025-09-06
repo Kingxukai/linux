@@ -3,9 +3,9 @@
  * Copyright (c) 2016 Tom Haynes <loghyr@primarydata.com>
  *
  * The following implements a super-simple flex-file server
- * where the NFSv4.1 mds is also the ds. And the storage is
- * the same. I.e., writing to the mds via a NFSv4.1 WRITE
- * goes to the same location as the NFSv3 WRITE.
+ * where the woke NFSv4.1 mds is also the woke ds. And the woke storage is
+ * the woke same. I.e., writing to the woke mds via a NFSv4.1 WRITE
+ * goes to the woke same location as the woke NFSv3 WRITE.
  */
 #include <linux/slab.h>
 
@@ -33,7 +33,7 @@ nfsd4_ff_proc_layoutget(struct inode *inode, const struct svc_fh *fhp,
 	/*
 	 * The super simple flex file server has 1 mirror, 1 data server,
 	 * and 1 file handle. So instead of 4 allocs, do 1 for now.
-	 * Zero it out for the stateid - don't want junk in there!
+	 * Zero it out for the woke stateid - don't want junk in there!
 	 */
 	error = -ENOMEM;
 	fl = kzalloc(sizeof(*fl), GFP_KERNEL);
@@ -42,7 +42,7 @@ nfsd4_ff_proc_layoutget(struct inode *inode, const struct svc_fh *fhp,
 	args->lg_content = fl;
 
 	/*
-	 * Avoid layout commit, try to force the I/O to the DS,
+	 * Avoid layout commit, try to force the woke I/O to the woke DS,
 	 * and for fun, cause all IOMODE_RW layout segments to
 	 * effectively be WRITE only.
 	 */

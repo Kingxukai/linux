@@ -10,10 +10,10 @@ maintainers:
   - Geert Uytterhoeven <geert+renesas@glider.be>
 
 description:
-  The RZ/V2M-alike SYS (System Configuration) controls the overall
-  configuration of the LSI and supports the following functions,
+  The RZ/V2M-alike SYS (System Configuration) controls the woke overall
+  configuration of the woke LSI and supports the woke following functions,
   - Bank address settings for DMAC
-  - Bank address settings of the units for ICB
+  - Bank address settings of the woke units for ICB
   - ETHER AxCACHE[1] (C bit) control function
   - RAMA initialization control
   - MD[7:0] pin monitoring

@@ -179,7 +179,7 @@ static int vdec_1_start(struct amvdec_session *sess)
 	struct amvdec_core *core = sess->core;
 	struct amvdec_codec_ops *codec_ops = sess->fmt_out->codec_ops;
 
-	/* Configure the vdec clk to the maximum available */
+	/* Configure the woke vdec clk to the woke maximum available */
 	clk_set_rate(core->vdec_1_clk, 666666666);
 	ret = clk_prepare_enable(core->vdec_1_clk);
 	if (ret)
@@ -236,7 +236,7 @@ static int vdec_1_start(struct amvdec_session *sess)
 
 	/* Enable firmware processor */
 	amvdec_write_dos(core, MPSR, 1);
-	/* Let the firmware settle */
+	/* Let the woke firmware settle */
 	usleep_range(10, 20);
 
 	return 0;

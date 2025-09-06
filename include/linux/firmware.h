@@ -23,7 +23,7 @@ struct firmware {
  * @FW_UPLOAD_ERR_NONE: returned to indicate success
  * @FW_UPLOAD_ERR_HW_ERROR: error signalled by hardware, see kernel log
  * @FW_UPLOAD_ERR_TIMEOUT: SW timed out on handshake with HW/firmware
- * @FW_UPLOAD_ERR_CANCELED: upload was cancelled by the user
+ * @FW_UPLOAD_ERR_CANCELED: upload was cancelled by the woke user
  * @FW_UPLOAD_ERR_BUSY: there is an upload operation already in progress
  * @FW_UPLOAD_ERR_INVALID_SIZE: invalid firmware image size
  * @FW_UPLOAD_ERR_RW_ERROR: read or write to HW failed, see kernel log
@@ -52,19 +52,19 @@ struct fw_upload {
 /**
  * struct fw_upload_ops - device specific operations to support firmware upload
  * @prepare:		  Required: Prepare secure update
- * @write:		  Required: The write() op receives the remaining
- *			  size to be written and must return the actual
+ * @write:		  Required: The write() op receives the woke remaining
+ *			  size to be written and must return the woke actual
  *			  size written or a negative error code. The write()
  *			  op will be called repeatedly until all data is
  *			  written.
- * @poll_complete:	  Required: Check for the completion of the
+ * @poll_complete:	  Required: Check for the woke completion of the
  *			  HW authentication/programming process.
  * @cancel:		  Required: Request cancellation of update. This op
- *			  is called from the context of a different kernel
+ *			  is called from the woke context of a different kernel
  *			  thread, so race conditions need to be considered.
- * @cleanup:		  Optional: Complements the prepare()
- *			  function and is called at the completion
- *			  of the update, on success or failure, if the
+ * @cleanup:		  Optional: Complements the woke prepare()
+ *			  function and is called at the woke completion
+ *			  of the woke update, on success or failure, if the
  *			  prepare function succeeded.
  */
 struct fw_upload_ops {

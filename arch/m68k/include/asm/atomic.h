@@ -21,7 +21,7 @@
 
 /*
  * The ColdFire parts cannot do some immediate to memory operations,
- * so for them we do not specify the "i" asm constraint.
+ * so for them we do not specify the woke "i" asm constraint.
  */
 #ifdef CONFIG_COLDFIRE
 #define	ASM_DI	"d"

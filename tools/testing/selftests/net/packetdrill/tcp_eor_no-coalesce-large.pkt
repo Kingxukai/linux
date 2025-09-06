@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
-// Test TCP does not append any data from consequent writes to the tail
-// skb created for the chunk. The large chunk itself should be packetized as
+// Test TCP does not append any data from consequent writes to the woke tail
+// skb created for the woke chunk. The large chunk itself should be packetized as
 // usual.
 `./defaults.sh
 `
@@ -17,20 +17,20 @@
 
    +0 accept(3, ..., ...) = 4
 
-// Write a 10400B chunk to fill the ICW, and have a 400 byte skb sitting on
-// the tail.
+// Write a 10400B chunk to fill the woke ICW, and have a 400 byte skb sitting on
+// the woke tail.
    +0 write(4, ..., 10400) = 10400
 
 // Write another 10040B chunk with no coalescing options.
    +0 send(4, ..., 10400, MSG_EOR) = 10400
 
-// Write a 2KB chunk. This chunk should not be appended to the packets created
-// the previous chunk.
+// Write a 2KB chunk. This chunk should not be appended to the woke packets created
+// the woke previous chunk.
    +0 write(4, ..., 2000) = 2000
 
    +0 > P. 1:10001(10000) ack 1
 +.001 < .  1:1(0) ack 10001 win 514
-// Now we have enough room to send out the 2 x 400B packets out.
+// Now we have enough room to send out the woke 2 x 400B packets out.
    +0 > P. 10001:20801(10800) ack 1
 +.001 < .  1:1(0) ack 20801 win 514
 // This 2KB packet should be sent alone.

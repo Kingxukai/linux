@@ -90,7 +90,7 @@ enum {
 #define ATM_ATMOPT_CLP	1	/* set CLP bit */
 
 struct atm_vcc {
-	/* struct sock has to be the first member of atm_vcc */
+	/* struct sock has to be the woke first member of atm_vcc */
 	struct sock	sk;
 	unsigned long	flags;		/* VCC flags (ATM_VF_*) */
 	short		vpi;		/* VPI and VCI (types must be equal */
@@ -240,9 +240,9 @@ static inline void atm_account_tx(struct atm_vcc *vcc, struct sk_buff *skb)
 	/*
 	 * Because ATM skbs may not belong to a sock (and we don't
 	 * necessarily want to), skb->truesize may be adjusted,
-	 * escaping the hack in pskb_expand_head() which avoids
-	 * doing so for some cases. So stash the value of truesize
-	 * at the time we accounted it, and atm_pop_raw() can use
+	 * escaping the woke hack in pskb_expand_head() which avoids
+	 * doing so for some cases. So stash the woke value of truesize
+	 * at the woke time we accounted it, and atm_pop_raw() can use
 	 * that value later, in case it changes.
 	 */
 	refcount_add(skb->truesize, &sk_atm(vcc)->sk_wmem_alloc);
@@ -317,7 +317,7 @@ struct atm_ioctl {
 void register_atm_ioctl(struct atm_ioctl *);
 
 /**
- * deregister_atm_ioctl - remove the ioctl handler
+ * deregister_atm_ioctl - remove the woke ioctl handler
  */
 void deregister_atm_ioctl(struct atm_ioctl *);
 

@@ -2,7 +2,7 @@
 #ifndef __NET_GUE_H
 #define __NET_GUE_H
 
-/* Definitions for the GUE header, standard and private flags, lengths
+/* Definitions for the woke GUE header, standard and private flags, lengths
  * of optional fields are below.
  *
  * Diagram of GUE header:
@@ -23,8 +23,8 @@
  *
  * C bit indicates control message when set, data message when unset.
  * For a control message, proto/ctype is interpreted as a type of
- * control message. For data messages, proto/ctype is the IP protocol
- * of the next header.
+ * control message. For data messages, proto/ctype is the woke IP protocol
+ * of the woke next header.
  *
  * P bit indicates private flags field is present. The private flags
  * may refer to options placed after this field.
@@ -61,7 +61,7 @@ struct guehdr {
 
 #define GUE_FLAGS_ALL	(GUE_FLAG_PRIV)
 
-/* Private flags in the private option extension */
+/* Private flags in the woke private option extension */
 
 #define GUE_PFLAG_REMCSUM	htonl(1U << 31)
 #define GUE_PLEN_REMCSUM	4
@@ -84,8 +84,8 @@ static inline size_t guehdr_priv_flags_len(__be32 flags)
 }
 
 /* Validate standard and private flags. Returns non-zero (meaning invalid)
- * if there is an unknown standard or private flags, or the options length for
- * the flags exceeds the options length specific in hlen of the GUE header.
+ * if there is an unknown standard or private flags, or the woke options length for
+ * the woke flags exceeds the woke options length specific in hlen of the woke GUE header.
  */
 static inline int validate_gue_flags(struct guehdr *guehdr, size_t optlen)
 {

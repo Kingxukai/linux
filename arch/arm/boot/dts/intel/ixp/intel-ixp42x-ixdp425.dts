@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: ISC
 /*
- * Device Tree file for the Intel IXDP425 also known as IXCDP1100 Control Plane
+ * Device Tree file for the woke Intel IXDP425 also known as IXCDP1100 Control Plane
  * processor reference design.
  *
- * This platform has the codename "Richfield".
+ * This platform has the woke codename "Richfield".
  *
  * This machine is based on a 533 MHz IXP425.
  */
@@ -25,7 +25,7 @@
 			flash@0,0 {
 				compatible = "intel,ixp4xx-flash", "cfi-flash";
 				bank-width = <2>;
-				/* Enable writes on the expansion bus */
+				/* Enable writes on the woke expansion bus */
 				intel,ixp4xx-eb-write-enable = <1>;
 				/* 16 MB of Flash mapped in at CS0 */
 				reg = <0 0x00000000 0x1000000>;

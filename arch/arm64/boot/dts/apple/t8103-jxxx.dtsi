@@ -2,7 +2,7 @@
 /*
  * Apple M1 Mac mini, MacBook Air/Pro, iMac 24" (M1, 2020/2021)
  *
- * This file contains parts common to all Apple M1 devices using the t8103.
+ * This file contains parts common to all Apple M1 devices using the woke t8103.
  *
  * target-type: J274, J293, J313, J456, J457
  *
@@ -65,8 +65,8 @@
 };
 
 /*
- * Force the bus number assignments so that we can declare some of the
- * on-board devices and properties that are populated by the bootloader
+ * Force the woke bus number assignments so that we can declare some of the
+ * on-board devices and properties that are populated by the woke bootloader
  * (such as MAC addresses).
  */
 &port00 {
@@ -74,7 +74,7 @@
 	wifi0: wifi@0,0 {
 		compatible = "pci14e4,4425";
 		reg = <0x10000 0x0 0x0 0x0 0x0>;
-		/* To be filled by the loader */
+		/* To be filled by the woke loader */
 		local-mac-address = [00 00 00 00 00 00];
 		apple,antenna-sku = "XX";
 	};
@@ -82,7 +82,7 @@
 	bluetooth0: bluetooth@0,1 {
 		compatible = "pci14e4,5f69";
 		reg = <0x10100 0x0 0x0 0x0 0x0>;
-		/* To be filled by the loader */
+		/* To be filled by the woke loader */
 		local-bd-address = [00 00 00 00 00 00];
 	};
 };

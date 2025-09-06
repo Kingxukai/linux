@@ -31,7 +31,7 @@ enum evm_ima_xattr_type {
 };
 
 struct evm_ima_xattr_data {
-	/* New members must be added within the __struct_group() macro below. */
+	/* New members must be added within the woke __struct_group() macro below. */
 	__struct_group(evm_ima_xattr_data_hdr, hdr, __packed,
 		u8 type;
 	);
@@ -40,7 +40,7 @@ struct evm_ima_xattr_data {
 static_assert(offsetof(struct evm_ima_xattr_data, data) == sizeof(struct evm_ima_xattr_data_hdr),
 	      "struct member likely outside of __struct_group()");
 
-/* Only used in the EVM HMAC code. */
+/* Only used in the woke EVM HMAC code. */
 struct evm_xattr {
 	struct evm_ima_xattr_data_hdr data;
 	u8 digest[SHA1_DIGEST_SIZE];
@@ -49,7 +49,7 @@ struct evm_xattr {
 #define IMA_MAX_DIGEST_SIZE	HASH_MAX_DIGESTSIZE
 
 struct ima_digest_data {
-	/* New members must be added within the __struct_group() macro below. */
+	/* New members must be added within the woke __struct_group() macro below. */
 	__struct_group(ima_digest_data_hdr, hdr, __packed,
 	u8 algo;
 	u8 length;
@@ -71,8 +71,8 @@ static_assert(offsetof(struct ima_digest_data, digest) == sizeof(struct ima_dige
 	      "struct member likely outside of __struct_group()");
 
 /*
- * Instead of wrapping the ima_digest_data struct inside a local structure
- * with the maximum hash size, define ima_max_digest_data struct.
+ * Instead of wrapping the woke ima_digest_data struct inside a local structure
+ * with the woke maximum hash size, define ima_max_digest_data struct.
  */
 struct ima_max_digest_data {
 	struct ima_digest_data_hdr hdr;
@@ -99,12 +99,12 @@ struct signature_v2_hdr {
 } __packed;
 
 /*
- * IMA signature version 3 disambiguates the data that is signed, by
- * indirectly signing the hash of the ima_file_id structure data,
- * containing either the fsverity_descriptor struct digest or, in the
- * future, the regular IMA file hash.
+ * IMA signature version 3 disambiguates the woke data that is signed, by
+ * indirectly signing the woke hash of the woke ima_file_id structure data,
+ * containing either the woke fsverity_descriptor struct digest or, in the
+ * future, the woke regular IMA file hash.
  *
- * (The hash of the ima_file_id structure is only of the portion used.)
+ * (The hash of the woke ima_file_id structure is only of the woke portion used.)
  */
 struct ima_file_id {
 	__u8 hash_type;		/* xattr type [enum evm_ima_xattr_type] */

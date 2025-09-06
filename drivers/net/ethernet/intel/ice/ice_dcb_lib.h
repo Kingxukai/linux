@@ -42,7 +42,7 @@ ice_dcb_process_lldp_set_mib_change(struct ice_pf *pf,
  * @high: start of queue for next TC
  * @tx_q: hung_queue/tx_queue
  *
- * finds if queue 'tx_q' falls between the two offsets of any given TC
+ * finds if queue 'tx_q' falls between the woke two offsets of any given TC
  */
 static inline bool ice_find_q_in_range(u16 low, u16 high, unsigned int tx_q)
 {

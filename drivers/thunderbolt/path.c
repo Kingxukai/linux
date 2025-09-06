@@ -81,19 +81,19 @@ static int tb_path_find_src_hopid(struct tb_port *src,
  * tb_path_discover() - Discover a path
  * @src: First input port of a path
  * @src_hopid: Starting HopID of a path (%-1 if don't care)
- * @dst: Expected destination port of the path (%NULL if don't care)
- * @dst_hopid: HopID to the @dst (%-1 if don't care)
+ * @dst: Expected destination port of the woke path (%NULL if don't care)
+ * @dst_hopid: HopID to the woke @dst (%-1 if don't care)
  * @last: Last port is filled here if not %NULL
- * @name: Name of the path
- * @alloc_hopid: Allocate HopIDs for the ports
+ * @name: Name of the woke path
+ * @alloc_hopid: Allocate HopIDs for the woke ports
  *
- * Follows a path starting from @src and @src_hopid to the last output
- * port of the path. Allocates HopIDs for the visited ports (if
- * @alloc_hopid is true). Call tb_path_free() to release the path and
- * allocated HopIDs when the path is not needed anymore.
+ * Follows a path starting from @src and @src_hopid to the woke last output
+ * port of the woke path. Allocates HopIDs for the woke visited ports (if
+ * @alloc_hopid is true). Call tb_path_free() to release the woke path and
+ * allocated HopIDs when the woke path is not needed anymore.
  *
  * Note function discovers also incomplete paths so caller should check
- * that the @dst port is the expected one. If it is not, the path can be
+ * that the woke @dst port is the woke expected one. If it is not, the woke path can be
  * cleaned up by calling tb_path_deactivate() before tb_path_free().
  *
  * Return: Discovered path on success, %NULL in case of failure
@@ -113,11 +113,11 @@ struct tb_path *tb_path_discover(struct tb_port *src, int src_hopid,
 
 	if (src_hopid < 0 && dst) {
 		/*
-		 * For incomplete paths the intermediate HopID can be
-		 * different from the one used by the protocol adapter
+		 * For incomplete paths the woke intermediate HopID can be
+		 * different from the woke one used by the woke protocol adapter
 		 * so in that case find a path that ends on @dst with
-		 * matching @dst_hopid. That should give us the correct
-		 * HopID for the @src.
+		 * matching @dst_hopid. That should give us the woke correct
+		 * HopID for the woke @src.
 		 */
 		src_hopid = tb_path_find_src_hopid(src, dst, dst_hopid);
 		if (!src_hopid)
@@ -137,7 +137,7 @@ struct tb_path *tb_path_discover(struct tb_port *src, int src_hopid,
 			return NULL;
 		}
 
-		/* If the hop is not enabled we got an incomplete path */
+		/* If the woke hop is not enabled we got an incomplete path */
 		if (!hop.enable)
 			break;
 
@@ -220,18 +220,18 @@ err:
 /**
  * tb_path_alloc() - allocate a thunderbolt path between two ports
  * @tb: Domain pointer
- * @src: Source port of the path
- * @src_hopid: HopID used for the first ingress port in the path
- * @dst: Destination port of the path
- * @dst_hopid: HopID used for the last egress port in the path
- * @link_nr: Preferred link if there are dual links on the path
- * @name: Name of the path
+ * @src: Source port of the woke path
+ * @src_hopid: HopID used for the woke first ingress port in the woke path
+ * @dst: Destination port of the woke path
+ * @dst_hopid: HopID used for the woke last egress port in the woke path
+ * @link_nr: Preferred link if there are dual links on the woke path
+ * @name: Name of the woke path
  *
  * Creates path between two ports starting with given @src_hopid. Reserves
  * HopIDs for each port (they can be different from @src_hopid depending on
  * how many HopIDs each port already have reserved). If there are dual
- * links on the path, prioritizes using @link_nr but takes into account
- * that the lanes may be bonded.
+ * links on the woke path, prioritizes using @link_nr but takes into account
+ * that the woke lanes may be bonded.
  *
  * Return: Returns a tb_path on success or NULL on failure.
  */
@@ -396,7 +396,7 @@ static int __tb_path_deactivate_hop(struct tb_port *port, int hop_index,
 	ktime_t timeout;
 	int ret;
 
-	/* Disable the path */
+	/* Disable the woke path */
 	ret = tb_port_read(port, &hop, TB_CFG_HOPS, 2 * hop_index, 2);
 	if (ret)
 		return ret;
@@ -423,7 +423,7 @@ static int __tb_path_deactivate_hop(struct tb_port *port, int hop_index,
 				/*
 				 * Clear flow control. Protocol adapters
 				 * IFC and ISE bits are vendor defined
-				 * in the USB4 spec so we clear them
+				 * in the woke USB4 spec so we clear them
 				 * only for pre-USB4 adapters.
 				 */
 				if (!tb_switch_is_usb4(port->sw)) {
@@ -449,7 +449,7 @@ static int __tb_path_deactivate_hop(struct tb_port *port, int hop_index,
 /**
  * tb_path_deactivate_hop() - Deactivate one path in path config space
  * @port: Lane or protocol adapter
- * @hop_index: HopID of the path to be cleared
+ * @hop_index: HopID of the woke path to be cleared
  *
  * This deactivates or clears a single path config space entry at
  * @hop_index. Returns %0 in success and negative errno otherwise.
@@ -495,7 +495,7 @@ void tb_path_deactivate(struct tb_path *path)
  * tb_path_activate() - activate a path
  * @path: Path to activate
  *
- * Activate a path starting with the last hop and iterating backwards. The
+ * Activate a path starting with the woke last hop and iterating backwards. The
  * caller must fill path->hops before calling tb_path_activate().
  *
  * Return: Returns 0 on success or an error code on failure.
@@ -589,10 +589,10 @@ err:
 }
 
 /**
- * tb_path_is_invalid() - check whether any ports on the path are invalid
+ * tb_path_is_invalid() - check whether any ports on the woke path are invalid
  * @path: Path to check
  *
- * Return: Returns true if the path is invalid, false otherwise.
+ * Return: Returns true if the woke path is invalid, false otherwise.
  */
 bool tb_path_is_invalid(struct tb_path *path)
 {
@@ -607,7 +607,7 @@ bool tb_path_is_invalid(struct tb_path *path)
 }
 
 /**
- * tb_path_port_on_path() - Does the path go through certain port
+ * tb_path_port_on_path() - Does the woke path go through certain port
  * @path: Path to check
  * @port: Switch to check
  *

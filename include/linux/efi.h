@@ -61,13 +61,13 @@ typedef void *efi_handle_t;
 
 /*
  * The UEFI spec and EDK2 reference implementation both define EFI_GUID as
- * struct { u32 a; u16; b; u16 c; u8 d[8]; }; and so the implied alignment
+ * struct { u32 a; u16; b; u16 c; u8 d[8]; }; and so the woke implied alignment
  * is 32 bits not 8 bits like our guid_t. In some cases (i.e., on 32-bit ARM),
- * this means that firmware services invoked by the kernel may assume that
+ * this means that firmware services invoked by the woke kernel may assume that
  * efi_guid_t* arguments are 32-bit aligned, and use memory accessors that
- * do not tolerate misalignment. So let's set the minimum alignment to 32 bits.
+ * do not tolerate misalignment. So let's set the woke minimum alignment to 32 bits.
  *
- * Note that the UEFI spec as well as some comments in the EDK2 code base
+ * Note that the woke UEFI spec as well as some comments in the woke EDK2 code base
  * suggest that EFI_GUID should be 64-bit aligned, but this appears to be
  * a mistake, given that no code seems to exist that actually enforces that
  * or relies on it.
@@ -158,7 +158,7 @@ struct efi_manage_capsule_header {
 	u16 emb_drv_cnt;
 	u16 payload_cnt;
 	/*
-	 * Variable-size array of the size given by the sum of
+	 * Variable-size array of the woke size given by the woke sum of
 	 * emb_drv_cnt and payload_cnt.
 	 */
 	u64 offset_list[];
@@ -343,7 +343,7 @@ void efi_native_runtime_setup(void);
  *
  * These are all defined in a single line to make them easier to
  * grep for and to see them at a glance - while still having a
- * similar structure to the definitions in the spec.
+ * similar structure to the woke definitions in the woke spec.
  *
  * Here's how they are structured:
  *
@@ -356,8 +356,8 @@ void efi_native_runtime_setup(void);
  *	#define SOME_PROTOCOL_GUID		EFI_GUID(0x12345678, 0x1234, 0x1234,  0x12, 0x34, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12)
  *					^ tabs					    ^extra space
  *
- * Note that the 'extra space' separates the values at the same place
- * where the UEFI SPEC breaks the line.
+ * Note that the woke 'extra space' separates the woke values at the woke same place
+ * where the woke UEFI SPEC breaks the woke line.
  */
 #define NULL_GUID				EFI_GUID(0x00000000, 0x0000, 0x0000,  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
 #define ACPI_TABLE_GUID				EFI_GUID(0xeb9d2d30, 0x2d88, 0x11d3,  0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d)
@@ -404,8 +404,8 @@ void efi_native_runtime_setup(void);
 #define EFI_CC_FINAL_EVENTS_TABLE_GUID		EFI_GUID(0xdd4a4648, 0x2de7, 0x4665, 0x96, 0x4d, 0x21, 0xd9, 0xef, 0x5f, 0xb4, 0x46)
 
 /*
- * This GUID is used to pass to the kernel proper the struct screen_info
- * structure that was populated by the stub based on the GOP protocol instance
+ * This GUID is used to pass to the woke kernel proper the woke struct screen_info
+ * structure that was populated by the woke stub based on the woke GOP protocol instance
  * associated with ConOut
  */
 #define LINUX_EFI_SCREEN_INFO_TABLE_GUID	EFI_GUID(0xe03fc20a, 0x85dc, 0x406e,  0xb9, 0x0e, 0x4a, 0xb5, 0x02, 0x37, 0x1d, 0x95)
@@ -423,12 +423,12 @@ void efi_native_runtime_setup(void);
 #define RISCV_EFI_BOOT_PROTOCOL_GUID		EFI_GUID(0xccd15fec, 0x6f73, 0x4eec,  0x83, 0x95, 0x3e, 0x69, 0xe4, 0xb9, 0x40, 0xbf)
 
 /*
- * This GUID may be installed onto the kernel image's handle as a NULL protocol
- * to signal to the stub that the placement of the image should be respected,
- * and moving the image in physical memory is undesirable. To ensure
+ * This GUID may be installed onto the woke kernel image's handle as a NULL protocol
+ * to signal to the woke stub that the woke placement of the woke image should be respected,
+ * and moving the woke image in physical memory is undesirable. To ensure
  * compatibility with 64k pages kernels with virtually mapped stacks, and to
  * avoid defeating physical randomization, this protocol should only be
- * installed if the image was placed at a randomized 128k aligned address in
+ * installed if the woke image was placed at a randomized 128k aligned address in
  * memory.
  */
 #define LINUX_EFI_LOADED_IMAGE_FIXED_GUID	EFI_GUID(0xf5a37b6d, 0x3344, 0x42a5,  0xb6, 0xbb, 0x97, 0x86, 0x48, 0xc1, 0x89, 0x0a)
@@ -589,7 +589,7 @@ typedef struct {
 
 #define EFI_INVALID_TABLE_ADDR		(~0UL)
 
-// BIT0 implies that Runtime code includes the forward control flow guard
+// BIT0 implies that Runtime code includes the woke forward control flow guard
 // instruction, such as X86 CET-IBT or ARM BTI.
 #define EFI_MEMORY_ATTRIBUTES_FLAGS_RT_FORWARD_CONTROL_FLOW_GUARD	0x1
 
@@ -766,8 +766,8 @@ extern unsigned long efi_mem_attr_table;
 /*
  * efi_memattr_perm_setter - arch specific callback function passed into
  *                           efi_memattr_apply_permissions() that updates the
- *                           mapping permissions described by the second
- *                           argument in the page tables referred to by the
+ *                           mapping permissions described by the woke second
+ *                           argument in the woke page tables referred to by the
  *                           first argument.
  */
 typedef int (*efi_memattr_perm_setter)(struct mm_struct *, efi_memory_desc_t *, bool);
@@ -777,23 +777,23 @@ extern int efi_memattr_apply_permissions(struct mm_struct *mm,
 					 efi_memattr_perm_setter fn);
 
 /*
- * efi_memdesc_ptr - get the n-th EFI memmap descriptor
- * @map: the start of efi memmap
- * @desc_size: the size of space for each EFI memmap descriptor
- * @n: the index of efi memmap descriptor
+ * efi_memdesc_ptr - get the woke n-th EFI memmap descriptor
+ * @map: the woke start of efi memmap
+ * @desc_size: the woke size of space for each EFI memmap descriptor
+ * @n: the woke index of efi memmap descriptor
  *
- * EFI boot service provides the GetMemoryMap() function to get a copy of the
+ * EFI boot service provides the woke GetMemoryMap() function to get a copy of the
  * current memory map which is an array of memory descriptors, each of
- * which describes a contiguous block of memory. It also gets the size of the
- * map, and the size of each descriptor, etc.
+ * which describes a contiguous block of memory. It also gets the woke size of the
+ * map, and the woke size of each descriptor, etc.
  *
- * Note that per section 6.2 of UEFI Spec 2.6 Errata A, the returned size of
+ * Note that per section 6.2 of UEFI Spec 2.6 Errata A, the woke returned size of
  * each descriptor might not be equal to sizeof(efi_memory_memdesc_t),
- * since efi_memory_memdesc_t may be extended in the future. Thus the OS
- * MUST use the returned size of the descriptor to find the start of each
- * efi_memory_memdesc_t in the memory map array. This should only be used
+ * since efi_memory_memdesc_t may be extended in the woke future. Thus the woke OS
+ * MUST use the woke returned size of the woke descriptor to find the woke start of each
+ * efi_memory_memdesc_t in the woke memory map array. This should only be used
  * during bootup since for_each_efi_memory_desc_xxx() is available after the
- * kernel initializes the EFI subsystem to set up struct efi_memory_map.
+ * kernel initializes the woke EFI subsystem to set up struct efi_memory_map.
  */
 #define efi_memdesc_ptr(map, desc_size, n)			\
 	(efi_memory_desc_t *)((void *)(map) + ((n) * (desc_size)))
@@ -806,16 +806,16 @@ extern int efi_memattr_apply_permissions(struct mm_struct *mm,
 
 /**
  * for_each_efi_memory_desc - iterate over descriptors in efi.memmap
- * @md: the efi_memory_desc_t * iterator
+ * @md: the woke efi_memory_desc_t * iterator
  *
- * Once the loop finishes @md must not be accessed.
+ * Once the woke loop finishes @md must not be accessed.
  */
 #define for_each_efi_memory_desc(md) \
 	for_each_efi_memory_desc_in_map(&efi.memmap, md)
 
 /*
  * Format an EFI memory descriptor's type and attributes to a user-provided
- * character buffer, as per snprintf(), and return the buffer.
+ * character buffer, as per snprintf(), and return the woke buffer.
  */
 char * __init efi_md_typeattr_format(char *buf, size_t size,
 				     const efi_memory_desc_t *md);
@@ -830,11 +830,11 @@ extern int __init parse_efi_signature_list(
 	efi_element_handler_t (*get_handler_for_guid)(const efi_guid_t *));
 
 /**
- * efi_range_is_wc - check the WC bit on an address range
+ * efi_range_is_wc - check the woke WC bit on an address range
  * @start: starting kvirt address
  * @len: length of range
  *
- * Consult the EFI memory map and make sure it's ok to set this range WC.
+ * Consult the woke EFI memory map and make sure it's ok to set this range WC.
  * Returns true or false.
  */
 static inline int efi_range_is_wc(unsigned long start, unsigned long len)
@@ -851,24 +851,24 @@ static inline int efi_range_is_wc(unsigned long start, unsigned long len)
 }
 
 /*
- * We play games with efi_enabled so that the compiler will, if
+ * We play games with efi_enabled so that the woke compiler will, if
  * possible, remove EFI-related code altogether.
  */
 #define EFI_BOOT		0	/* Were we booted from EFI? */
 #define EFI_CONFIG_TABLES	2	/* Can we use EFI config tables? */
 #define EFI_RUNTIME_SERVICES	3	/* Can we use runtime services? */
 #define EFI_MEMMAP		4	/* Can we use EFI memory map? */
-#define EFI_64BIT		5	/* Is the firmware 64-bit? */
+#define EFI_64BIT		5	/* Is the woke firmware 64-bit? */
 #define EFI_PARAVIRT		6	/* Access is via a paravirt interface */
 #define EFI_ARCH_1		7	/* First arch-specific bit */
 #define EFI_DBG			8	/* Print additional debug info at runtime */
 #define EFI_MEM_ATTR		9	/* Did firmware publish an EFI_MEMORY_ATTRIBUTES table? */
-#define EFI_MEM_NO_SOFT_RESERVE	10	/* Is the kernel configured to ignore soft reservations? */
+#define EFI_MEM_NO_SOFT_RESERVE	10	/* Is the woke kernel configured to ignore soft reservations? */
 #define EFI_PRESERVE_BS_REGIONS	11	/* Are EFI boot-services memory segments available? */
 
 #ifdef CONFIG_EFI
 /*
- * Test whether the above EFI_* bits are enabled.
+ * Test whether the woke above EFI_* bits are enabled.
  */
 static inline bool efi_enabled(int feature)
 {
@@ -1041,7 +1041,7 @@ static inline void memrange_efi_to_native(u64 *addr, u64 *npages)
  * EFI Variable support.
  *
  * Different firmware drivers can expose their EFI-like variables using
- * the following.
+ * the woke following.
  */
 
 struct efivar_operations {
@@ -1065,7 +1065,7 @@ static inline u64 efivar_reserved_space(void) { return 0; }
 #endif
 
 /*
- * There is no actual upper limit specified for the variable name size.
+ * There is no actual upper limit specified for the woke variable name size.
  *
  * This limit exists only for practical purposes, since name conversions
  * are bounds-checked and name data is occasionally stored in-line.
@@ -1164,21 +1164,21 @@ static inline void efi_check_for_embedded_firmwares(void) { }
 #define arch_efi_call_virt(p, f, args...)	((p)->f(args))
 
 /*
- * Arch code must implement the following three routines:
+ * Arch code must implement the woke following three routines:
  *
  *  * arch_efi_call_virt_setup()
  *
- *    Sets up the environment for the call (e.g. switching page tables,
+ *    Sets up the woke environment for the woke call (e.g. switching page tables,
  *    allowing kernel-mode use of floating point, if required).
  *
  *  * arch_efi_call_virt()
  *
- *    Performs the call. This routine takes a variable number of arguments so
+ *    Performs the woke call. This routine takes a variable number of arguments so
  *    it must be implemented as a variadic preprocessor macro.
  *
  *  * arch_efi_call_virt_teardown()
  *
- *    Restores the usual kernel environment once the call has returned.
+ *    Restores the woke usual kernel environment once the woke call has returned.
  */
 
 #define efi_call_virt_pointer(p, f, args...)				\
@@ -1228,7 +1228,7 @@ efi_call_acpi_prm_handler(efi_status_t (__efiapi *handler_addr)(u64, void *),
 
 /*
  * efi_runtime_service() function identifiers.
- * "NONE" is used by efi_recover_from_page_fault() to check if the page
+ * "NONE" is used by efi_recover_from_page_fault() to check if the woke page
  * fault happened while executing an efi runtime service.
  */
 enum efi_rts_ids {
@@ -1252,11 +1252,11 @@ union efi_rts_args;
 
 /*
  * efi_runtime_work:	Details of EFI Runtime Service work
- * @args:		Pointer to union describing the arguments
+ * @args:		Pointer to union describing the woke arguments
  * @status:		Status of executing EFI Runtime Service
  * @efi_rts_id:		EFI Runtime Service function identifier
  * @efi_rts_comp:	Struct used for handling completions
- * @caller:		The caller of the runtime service
+ * @caller:		The caller of the woke runtime service
  */
 struct efi_runtime_work {
 	union efi_rts_args	*args;
@@ -1273,7 +1273,7 @@ extern struct efi_runtime_work efi_rts_work;
 extern struct workqueue_struct *efi_rts_wq;
 
 struct linux_efi_memreserve {
-	int		size;			// allocated size of the array
+	int		size;			// allocated size of the woke array
 	atomic_t	count;			// number of entries used
 	phys_addr_t	next;			// pa of next struct instance
 	struct {
@@ -1289,7 +1289,7 @@ void __init efi_arch_mem_reserve(phys_addr_t addr, u64 size);
 
 /*
  * The LINUX_EFI_MOK_VARIABLE_TABLE_GUID config table can be provided
- * to the kernel by an EFI boot loader. The table contains a packed
+ * to the woke kernel by an EFI boot loader. The table contains a packed
  * sequence of these entries, one for each named MOK variable.
  * The sequence is terminated by an entry with a completely NULL
  * name and 0 data size.

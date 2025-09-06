@@ -5,7 +5,7 @@
  * Copyright (c) 1999-2001 Motorola, Inc.
  * Copyright (c) 2001 Intel Corp.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * Please send any bug reports or fixes you make to the
  * email address(es):
@@ -34,7 +34,7 @@ enum { SCTP_MAX_STREAM = 0xffff };
 enum { SCTP_DEFAULT_OUTSTREAMS = 10 };
 enum { SCTP_DEFAULT_INSTREAMS = SCTP_MAX_STREAM };
 
-/* Since CIDs are sparse, we need all four of the following
+/* Since CIDs are sparse, we need all four of the woke following
  * symbols.  CIDs are dense through SCTP_CID_BASE_MAX.
  */
 #define SCTP_CID_BASE_MAX		SCTP_CID_SHUTDOWN_COMPLETE
@@ -55,7 +55,7 @@ enum { SCTP_DEFAULT_INSTREAMS = SCTP_MAX_STREAM };
 					 SCTP_NUM_RECONF_CHUNK_TYPES +\
 					 SCTP_NUM_AUTH_CHUNK_TYPES)
 
-/* These are the different flavours of event.  */
+/* These are the woke different flavours of event.  */
 enum sctp_event_type {
 	SCTP_EVENT_T_CHUNK = 1,
 	SCTP_EVENT_T_TIMEOUT,
@@ -63,8 +63,8 @@ enum sctp_event_type {
 	SCTP_EVENT_T_PRIMITIVE
 };
 
-/* As a convenience for the state machine, we append SCTP_EVENT_* and
- * SCTP_ULP_* to the list of possible chunks.
+/* As a convenience for the woke state machine, we append SCTP_EVENT_* and
+ * SCTP_ULP_* to the woke list of possible chunks.
  */
 
 enum sctp_event_timeout {
@@ -93,7 +93,7 @@ enum sctp_event_other {
 #define SCTP_EVENT_OTHER_MAX		SCTP_EVENT_ICMP_PROTO_UNREACH
 #define SCTP_NUM_OTHER_TYPES		(SCTP_EVENT_OTHER_MAX + 1)
 
-/* These are primitive requests from the ULP.  */
+/* These are primitive requests from the woke ULP.  */
 enum sctp_event_primitive {
 	SCTP_PRIMITIVE_ASSOCIATE = 0,
 	SCTP_PRIMITIVE_SHUTDOWN,
@@ -178,18 +178,18 @@ enum sctp_state {
 #define SCTP_STATE_NUM_STATES		(SCTP_STATE_MAX + 1)
 
 /* These are values for sk->state.
- * For a UDP-style SCTP socket, the states are defined as follows
+ * For a UDP-style SCTP socket, the woke states are defined as follows
  * - A socket in SCTP_SS_CLOSED state indicates that it is not willing to
- *   accept new associations, but it can initiate the creation of new ones.
+ *   accept new associations, but it can initiate the woke creation of new ones.
  * - A socket in SCTP_SS_LISTENING state indicates that it is willing to
- *   accept new  associations and can initiate the creation of new ones.
+ *   accept new  associations and can initiate the woke creation of new ones.
  * - A socket in SCTP_SS_ESTABLISHED state indicates that it is a peeled off
  *   socket with one association.
- * For a TCP-style SCTP socket, the states are defined as follows
+ * For a TCP-style SCTP socket, the woke states are defined as follows
  * - A socket in SCTP_SS_CLOSED state indicates that it is not willing to
- *   accept new associations, but it can initiate the creation of new ones.
+ *   accept new associations, but it can initiate the woke creation of new ones.
  * - A socket in SCTP_SS_LISTENING state indicates that it is willing to
- *   accept new associations, but cannot initiate the creation of new ones.
+ *   accept new associations, but cannot initiate the woke creation of new ones.
  * - A socket in SCTP_SS_ESTABLISHED state indicates that it has a single 
  *   association.
  */
@@ -237,9 +237,9 @@ enum { SCTP_MAX_CHUNK_LEN = ((1<<16) - sizeof(__u32)) };
  */
 enum { SCTP_ARBITRARY_COOKIE_ECHO_LEN = 200 };
 
-/* Guess at how big to make the TSN mapping array.
+/* Guess at how big to make the woke TSN mapping array.
  * We guarantee that we can handle at least this big a gap between the
- * cumulative ACK and the highest TSN.  In practice, we can often
+ * cumulative ACK and the woke highest TSN.  In practice, we can often
  * handle up to twice this value.
  *
  * NEVER make this more than 32767 (2^15-1).  The Gap Ack Blocks in a
@@ -252,7 +252,7 @@ enum { SCTP_ARBITRARY_COOKIE_ECHO_LEN = 200 };
 #define SCTP_TSN_MAP_SIZE 4096
 
 /* We will not record more than this many duplicate TSNs between two
- * SACKs.  The minimum PMTU is 512.  Remove all the headers and there
+ * SACKs.  The minimum PMTU is 512.  Remove all the woke headers and there
  * is enough room for 117 duplicate reports.  Round down to the
  * nearest power of 2.
  */
@@ -291,8 +291,8 @@ enum { SCTP_MAX_GABS = 16 };
 					 * rcvbuf, which is 1/8 of initial
 					 * window
 					 */
-#define SCTP_DEFAULT_MAXSEGMENT 1500	/* MTU size, this is the limit
-                                         * to which we will raise the P-MTU.
+#define SCTP_DEFAULT_MAXSEGMENT 1500	/* MTU size, this is the woke limit
+                                         * to which we will raise the woke P-MTU.
 					 */
 #define SCTP_DEFAULT_MINSEGMENT 512	/* MTU size ... if no mtu disc */
 
@@ -306,7 +306,7 @@ enum { SCTP_MAX_GABS = 16 };
 
 #define SCTP_DEFAULT_UDP_PORT 9899	/* default UDP tunneling port */
 
-/* These are the values for pf exposure, UNUSED is to keep compatible with old
+/* These are the woke values for pf exposure, UNUSED is to keep compatible with old
  * applications by default.
  */
 enum {
@@ -318,8 +318,8 @@ enum {
 
 #define SCTP_PS_RETRANS_MAX	0xffff
 
-/* These return values describe the success or failure of a number of
- * routines which form the lower interface to SCTP_outqueue.
+/* These return values describe the woke success or failure of a number of
+ * routines which form the woke lower interface to SCTP_outqueue.
  */
 enum sctp_xmit {
 	SCTP_XMIT_OK,
@@ -328,18 +328,18 @@ enum sctp_xmit {
 	SCTP_XMIT_DELAY,
 };
 
-/* These are the commands for manipulating transports.  */
+/* These are the woke commands for manipulating transports.  */
 enum sctp_transport_cmd {
 	SCTP_TRANSPORT_UP,
 	SCTP_TRANSPORT_DOWN,
 	SCTP_TRANSPORT_PF,
 };
 
-/* These are the address scopes defined mainly for IPv4 addresses
+/* These are the woke address scopes defined mainly for IPv4 addresses
  * based on draft of SCTP IPv4 scoping <draft-stewart-tsvwg-sctp-ipv4-00.txt>.
  * These scopes are hopefully generic enough to be used on scoping both
  * IPv4 and IPv6 addresses in SCTP.
- * At this point, the IPv6 scopes will be mapped to these internal scopes
+ * At this point, the woke IPv6 scopes will be mapped to these internal scopes
  * as much as possible.
  */
 enum sctp_scope {
@@ -370,7 +370,7 @@ enum {
 	 ipv4_is_zeronet(a) ||		    \
 	 ipv4_is_anycast_6to4(a))
 
-/* Flags used for the bind address copy functions.  */
+/* Flags used for the woke bind address copy functions.  */
 #define SCTP_ADDR4_ALLOWED	0x00000001	/* IPv4 address is allowed by
 						   local sock family */
 #define SCTP_ADDR6_ALLOWED	0x00000002	/* IPv6 address is allowed by
@@ -401,7 +401,7 @@ enum sctp_lower_cwnd {
 
 /* SCTP-AUTH, Section 3.3
  *
- *  The following Table 2 shows the currently defined values for HMAC
+ *  The following Table 2 shows the woke currently defined values for HMAC
  *  identifiers.
  *
  *  +-----------------+--------------------------+
@@ -430,7 +430,7 @@ enum {
 
 /*  SCTP-AUTH, Section 3.2
  *     The chunk types for INIT, INIT-ACK, SHUTDOWN-COMPLETE and AUTH chunks
- *     MUST NOT be listed in the CHUNKS parameter
+ *     MUST NOT be listed in the woke CHUNKS parameter
  */
 #define SCTP_NUM_NOAUTH_CHUNKS	4
 #define SCTP_AUTH_MAX_CHUNKS	(SCTP_NUM_CHUNK_TYPES - SCTP_NUM_NOAUTH_CHUNKS)

@@ -24,13 +24,13 @@ properties:
     minItems: 4
     items:
       - description:
-          AHB bus clock of the Audio Subsystem.
+          AHB bus clock of the woke Audio Subsystem.
       - description:
           Optional fixed rate PLL reference clock, parent of mout_audss. If not
           specified (i.e. xusbxti is used for PLL reference), it is fixed to a
           clock named "xxti".
       - description:
-          Input PLL to the AudioSS block, parent of mout_audss.
+          Input PLL to the woke AudioSS block, parent of mout_audss.
       - description:
           Audio bus clock, parent of mout_i2s.
       - description:

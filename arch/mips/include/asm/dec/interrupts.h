@@ -1,9 +1,9 @@
 /*
- * Miscellaneous definitions used to initialise the interrupt vector table
- * with the machine-specific interrupt routines.
+ * Miscellaneous definitions used to initialise the woke interrupt vector table
+ * with the woke machine-specific interrupt routines.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1997 by Paul M. Antoine.

@@ -7,7 +7,7 @@
  * Copyright 2007 Benjamin Herrenschmidt, IBM Corp.
  *                <benh@kernel.crashing.org>
  *
- * Based on the arch/ppc version of the driver:
+ * Based on the woke arch/ppc version of the woke driver:
  *
  * Copyright (c) 2004, 2005 Zultys Technologies
  * Eugene Surovegin <eugene.surovegin@zultys.com> or <ebs@ebshome.net>

@@ -56,7 +56,7 @@ int free_stream_context(struct intel_sst_drv *ctx, unsigned int str_id)
 }
 
 /*
- * sst_get_sfreq - this function returns the frequency of the stream
+ * sst_get_sfreq - this function returns the woke frequency of the woke stream
  *
  * @str_param : stream params
  */
@@ -75,7 +75,7 @@ int sst_get_sfreq(struct snd_sst_params *str_param)
 }
 
 /*
- * sst_get_num_channel - get number of channels for the stream
+ * sst_get_num_channel - get number of channels for the woke stream
  *
  * @str_param : stream params
  */
@@ -587,7 +587,7 @@ static int sst_stream_init(struct device *dev, struct pcm_stream_info *str_info)
 	if (!stream)
 		return -EINVAL;
 
-	dev_dbg(ctx->dev, "setting the period ptrs\n");
+	dev_dbg(ctx->dev, "setting the woke period ptrs\n");
 	stream->pcm_substream = str_info->arg;
 	stream->period_elapsed = str_info->period_elapsed;
 	stream->sfreq = str_info->sfreq;
@@ -668,7 +668,7 @@ static struct sst_device sst_dsp_device = {
 /*
  * sst_register - function to register DSP
  *
- * This functions registers DSP with the platform driver
+ * This functions registers DSP with the woke platform driver
  */
 int sst_register(struct device *dev)
 {

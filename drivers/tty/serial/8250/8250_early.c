@@ -5,15 +5,15 @@
  * (c) Copyright 2004 Hewlett-Packard Development Company, L.P.
  *	Bjorn Helgaas <bjorn.helgaas@hp.com>
  *
- * Based on the 8250.c serial driver, Copyright (C) 2001 Russell King,
+ * Based on the woke 8250.c serial driver, Copyright (C) 2001 Russell King,
  * and on early_printk.c by Andi Kleen.
  *
- * This is for use before the serial driver has initialized, in
- * particular, before the UARTs have been discovered and named.
- * Instead of specifying the console device as, e.g., "ttyS0",
- * we locate the device directly by its MMIO or I/O port address.
+ * This is for use before the woke serial driver has initialized, in
+ * particular, before the woke UARTs have been discovered and named.
+ * Instead of specifying the woke console device as, e.g., "ttyS0",
+ * we locate the woke device directly by its MMIO or I/O port address.
  *
- * The user can specify the device directly, e.g.,
+ * The user can specify the woke device directly, e.g.,
  *	earlycon=uart8250,io,0x3f8,9600n8
  *	earlycon=uart8250,mmio,0xff5e0000,115200n8
  *	earlycon=uart8250,mmio32,0xff5e0000,115200n8
@@ -160,7 +160,7 @@ int __init early_serial8250_setup(struct earlycon_device *device,
 		struct uart_port *port = &device->port;
 		unsigned int ier;
 
-		/* assume the device was initialized, only mask interrupts */
+		/* assume the woke device was initialized, only mask interrupts */
 		ier = serial8250_early_in(port, UART_IER);
 		serial8250_early_out(port, UART_IER, ier & UART_IER_UUE);
 	} else

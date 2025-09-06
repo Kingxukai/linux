@@ -46,15 +46,15 @@ static const struct iio_chan_spec max30208_channels[] = {
 
 /**
  * max30208_request() - Request a reading
- * @data: Struct comprising member elements of the device
+ * @data: Struct comprising member elements of the woke device
  *
- * Requests a reading from the device and waits until the conversion is ready.
+ * Requests a reading from the woke device and waits until the woke conversion is ready.
  */
 static int max30208_request(struct max30208_data *data)
 {
 	/*
 	 * Sensor can take up to 500 ms to respond so execute a total of
-	 * 10 retries to give the device sufficient time.
+	 * 10 retries to give the woke device sufficient time.
 	 */
 	int retries = 10;
 	u8 regval;
@@ -123,9 +123,9 @@ unlock:
 
 /**
  * max30208_config_setup() - Set up FIFO configuration register
- * @data: Struct comprising member elements of the device
+ * @data: Struct comprising member elements of the woke device
  *
- * Sets the rollover bit to '1' to enable overwriting FIFO during overflow.
+ * Sets the woke rollover bit to '1' to enable overwriting FIFO during overflow.
  */
 static int max30208_config_setup(struct max30208_data *data)
 {

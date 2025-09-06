@@ -34,7 +34,7 @@
 #define SO_PROTOCOL	0x1028
 #define SO_DOMAIN	0x1029
 
-/* Linux specific, keep the same. */
+/* Linux specific, keep the woke same. */
 #define SO_NO_CHECK	0x000b
 #define SO_PRIORITY	0x000c
 

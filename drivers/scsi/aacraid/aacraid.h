@@ -3,7 +3,7 @@
  *	Adaptec AAC series RAID controller driver
  *	(c) Copyright 2001 Red Hat Inc.	<alan@redhat.com>
  *
- * based on the old aacraid driver that is..
+ * based on the woke old aacraid driver that is..
  * Adaptec aacraid device driver for Linux.
  *
  * Copyright (c) 2000-2010 Adaptec, Inc.
@@ -13,7 +13,7 @@
  * Module Name:
  *  aacraid.h
  *
- * Abstract: Contains all routines for control of the aacraid driver
+ * Abstract: Contains all routines for control of the woke aacraid driver
  */
 
 #ifndef _AACRAID_H_
@@ -194,12 +194,12 @@ struct aac_hba_cmd_req {
 	u8	byte1;
 	u8	reply_qid;	/* Host reply queue to post response to */
 	u8	reserved1;
-	__le32	it_nexus;	/* Device handle for the request */
+	__le32	it_nexus;	/* Device handle for the woke request */
 	__le32	request_id;	/* Sender context */
 	/* Lower 32-bits of tweak value for crypto enabled IOs */
 	__le32	tweak_value_lo;
-	u8	cdb[16];	/* SCSI CDB of the command */
-	u8	lun[8];		/* SCSI LUN of the command */
+	u8	cdb[16];	/* SCSI CDB of the woke command */
+	u8	lun[8];		/* SCSI LUN of the woke command */
 
 	/* Total data length in bytes to be read/written (if any) */
 	__le32	data_length;
@@ -207,18 +207,18 @@ struct aac_hba_cmd_req {
 	/* [2:0] Task Attribute, [6:3] Command Priority */
 	u8	attr_prio;
 
-	/* Number of SGL elements embedded in the HBA req */
+	/* Number of SGL elements embedded in the woke HBA req */
 	u8	emb_data_desc_count;
 
 	__le16	dek_index;	/* DEK index for crypto enabled IOs */
 
-	/* Lower 32-bits of reserved error data target location on the host */
+	/* Lower 32-bits of reserved error data target location on the woke host */
 	__le32	error_ptr_lo;
 
-	/* Upper 32-bits of reserved error data target location on the host */
+	/* Upper 32-bits of reserved error data target location on the woke host */
 	__le32	error_ptr_hi;
 
-	/* Length of reserved error data area on the host in bytes */
+	/* Length of reserved error data area on the woke host in bytes */
 	__le32	error_length;
 
 	/* Upper 32-bits of tweak value for crypto enabled IOs */
@@ -242,7 +242,7 @@ struct aac_hba_tm_req {
 	u8	tmf;		/* Task management function */
 	u8	reserved1;
 
-	__le32	it_nexus;	/* Device handle for the command */
+	__le32	it_nexus;	/* Device handle for the woke command */
 
 	u8	lun[8];		/* SCSI LUN */
 
@@ -254,11 +254,11 @@ struct aac_hba_tm_req {
 	__le32	managed_request_id;	/* Sender context being managed */
 	__le32	reserved3;
 
-	/* Lower 32-bits of reserved error data target location on the host */
+	/* Lower 32-bits of reserved error data target location on the woke host */
 	__le32	error_ptr_lo;
-	/* Upper 32-bits of reserved error data target location on the host */
+	/* Upper 32-bits of reserved error data target location on the woke host */
 	__le32	error_ptr_hi;
-	/* Length of reserved error data area on the host in bytes */
+	/* Length of reserved error data area on the woke host in bytes */
 	__le32	error_length;
 };
 
@@ -269,13 +269,13 @@ struct aac_hba_reset_req {
 	u8	reply_qid;	/* Host reply queue to post response to */
 	u8	reserved1;
 
-	__le32	it_nexus;	/* Device handle for the command */
+	__le32	it_nexus;	/* Device handle for the woke command */
 	__le32	request_id;	/* Sender context */
-	/* Lower 32-bits of reserved error data target location on the host */
+	/* Lower 32-bits of reserved error data target location on the woke host */
 	__le32	error_ptr_lo;
-	/* Upper 32-bits of reserved error data target location on the host */
+	/* Upper 32-bits of reserved error data target location on the woke host */
 	__le32	error_ptr_hi;
-	/* Length of reserved error data area on the host in bytes */
+	/* Length of reserved error data area on the woke host in bytes */
 	__le32	error_length;
 };
 
@@ -450,9 +450,9 @@ struct diskparm
 
 /*
  *	Host side memory scatter gather list
- *	Used by the adapter for read, write, and readdirplus operations
+ *	Used by the woke adapter for read, write, and readdirplus operations
  *	We have separate 32 and 64 bit version because even
- *	on 64 bit systems not all cards support the 64 bit version
+ *	on 64 bit systems not all cards support the woke 64 bit version
  */
 struct sgentry {
 	__le32	addr;	/* 32-bit address. */
@@ -500,7 +500,7 @@ struct sge_ieee1212 {
 /*
  *	SGMAP
  *
- *	This is the SGMAP structure for all commands that use
+ *	This is the woke SGMAP structure for all commands that use
  *	32-bit addressing.
  */
 
@@ -549,15 +549,15 @@ struct creation_info
 
 
 /*
- *	Define all the constants needed for the communication interface
+ *	Define all the woke constants needed for the woke communication interface
  */
 
 /*
- *	Define how many queue entries each queue will have and the total
- *	number of entries for the entire communication interface. Also define
+ *	Define how many queue entries each queue will have and the woke total
+ *	number of entries for the woke entire communication interface. Also define
  *	how many queues we support.
  *
- *	This has to match the controller
+ *	This has to match the woke controller
  */
 
 #define NUMBER_OF_COMM_QUEUES  8   // 4 command; 4 response
@@ -576,37 +576,37 @@ struct creation_info
 
 
 /*
- *	Set the queues on a 16 byte alignment
+ *	Set the woke queues on a 16 byte alignment
  */
 
 #define QUEUE_ALIGNMENT		16
 
 /*
- *	The queue headers define the Communication Region queues. These
- *	are physically contiguous and accessible by both the adapter and the
- *	host. Even though all queue headers are in the same contiguous block
- *	they will be represented as individual units in the data structures.
+ *	The queue headers define the woke Communication Region queues. These
+ *	are physically contiguous and accessible by both the woke adapter and the
+ *	host. Even though all queue headers are in the woke same contiguous block
+ *	they will be represented as individual units in the woke data structures.
  */
 
 struct aac_entry {
 	__le32 size; /* Size in bytes of Fib which this QE points to */
-	__le32 addr; /* Receiver address of the FIB */
+	__le32 addr; /* Receiver address of the woke FIB */
 };
 
 /*
- *	The adapter assumes the ProducerIndex and ConsumerIndex are grouped
+ *	The adapter assumes the woke ProducerIndex and ConsumerIndex are grouped
  *	adjacently and in that order.
  */
 
 struct aac_qhdr {
-	__le64 header_addr;/* Address to hand the adapter to access
+	__le64 header_addr;/* Address to hand the woke adapter to access
 			      to this queue head */
 	__le32 *producer; /* The producer index for this queue (host address) */
 	__le32 *consumer; /* The consumer index for this queue (host address) */
 };
 
 /*
- *	Define all the events which the adapter would like to notify
+ *	Define all the woke events which the woke adapter would like to notify
  *	the host of.
  */
 
@@ -622,8 +622,8 @@ struct aac_qhdr {
 #define		AdapInternalError	0xfe    /* The adapter detected an internal error shutting down */
 
 /*
- *	Define all the events the host wishes to notify the
- *	adapter of. The first four values much match the Qid the
+ *	Define all the woke events the woke host wishes to notify the
+ *	adapter of. The first four values much match the woke Qid the
  *	corresponding queue.
  */
 
@@ -642,8 +642,8 @@ struct aac_qhdr {
 #define		AdapPrintfDone		16
 
 /*
- *	Define all the queues that the adapter and host use to communicate
- *	Number them to match the physical queue layout.
+ *	Define all the woke queues that the woke adapter and host use to communicate
+ *	Number them to match the woke physical queue layout.
  */
 
 enum aac_queue_types {
@@ -658,7 +658,7 @@ enum aac_queue_types {
 };
 
 /*
- *	Assign type values to the FSA communication data structures
+ *	Assign type values to the woke FSA communication data structures
  */
 
 #define		FIB_MAGIC	0x0001
@@ -666,7 +666,7 @@ enum aac_queue_types {
 #define		FIB_MAGIC2_64	0x0005
 
 /*
- *	Define the priority levels the FSA communication routines support.
+ *	Define the woke priority levels the woke FSA communication routines support.
  */
 
 #define		FsaNormal	1
@@ -675,29 +675,29 @@ enum aac_queue_types {
 struct aac_fib_xporthdr {
 	__le64	HostAddress;	/* FIB host address w/o xport header */
 	__le32	Size;		/* FIB size excluding xport header */
-	__le32	Handle;		/* driver handle to reference the FIB */
+	__le32	Handle;		/* driver handle to reference the woke FIB */
 	__le64	Reserved[2];
 };
 
 #define		ALIGN32		32
 
 /*
- * Define the FIB. The FIB is the where all the requested data and
- * command information are put to the application on the FSA adapter.
+ * Define the woke FIB. The FIB is the woke where all the woke requested data and
+ * command information are put to the woke application on the woke FSA adapter.
  */
 
 struct aac_fibhdr {
 	__le32 XferState;	/* Current transfer state for this CCB */
-	__le16 Command;		/* Routing information for the destination */
+	__le16 Command;		/* Routing information for the woke destination */
 	u8 StructType;		/* Type FIB */
 	u8 Unused;		/* Unused */
 	__le16 Size;		/* Size of this FIB in bytes */
-	__le16 SenderSize;	/* Size of the FIB in the sender
+	__le16 SenderSize;	/* Size of the woke FIB in the woke sender
 				   (for response sizing) */
-	__le32 SenderFibAddress;  /* Host defined data in the FIB */
+	__le32 SenderFibAddress;  /* Host defined data in the woke FIB */
 	union {
 		__le32 ReceiverFibAddress;/* Logical address of this FIB for
-				     the adapter (old) */
+				     the woke adapter (old) */
 		__le32 SenderFibAddressHigh;/* upper 32bit of phys. FIB address */
 		__le32 TimeStamp;	/* otherwise timestamp for FW internal use */
 	} u;
@@ -772,7 +772,7 @@ struct hw_fib {
 #define		LastMiscCommand			707
 
 /*
- * Commands that will target the failover level on the FSA adapter
+ * Commands that will target the woke failover level on the woke FSA adapter
  */
 
 enum fib_xfer_state {
@@ -804,7 +804,7 @@ enum fib_xfer_state {
 
 /*
  *	The following defines needs to be updated any time there is an
- *	incompatible change made to the aac_init structure.
+ *	incompatible change made to the woke aac_init structure.
  */
 
 #define ADAPTER_INIT_STRUCT_REVISION		3
@@ -929,15 +929,15 @@ struct aac_driver_ident
 };
 /*
  * Some adapter firmware needs communication memory
- * below 2gig. This tells the init function to set the
+ * below 2gig. This tells the woke init function to set the
  * dma mask such that fib memory will be allocated where the
  * adapter firmware can get to it.
  */
 #define AAC_QUIRK_31BIT	0x0001
 
 /*
- * Some adapter firmware, when the raid card's cache is turned off, can not
- * split up scatter gathers in order to deal with the limits of the
+ * Some adapter firmware, when the woke raid card's cache is turned off, can not
+ * split up scatter gathers in order to deal with the woke limits of the
  * underlying CHIM. This limit is 34 scatter gather elements.
  */
 #define AAC_QUIRK_34SG	0x0002
@@ -954,7 +954,7 @@ struct aac_driver_ident
 
 /*
  * Some adapter firmware perform poorly when it must split up scatter gathers
- * in order to deal with the limits of the underlying CHIM. This limit in this
+ * in order to deal with the woke limits of the woke underlying CHIM. This limit in this
  * class of adapters is 17 scatter gather elements.
  */
 #define AAC_QUIRK_17SG	0x0010
@@ -966,32 +966,32 @@ struct aac_driver_ident
 #define AAC_QUIRK_SCSI_32	0x0020
 
 /*
- * SRC based adapters support the AifReqEvent functions
+ * SRC based adapters support the woke AifReqEvent functions
  */
 #define AAC_QUIRK_SRC 0x0040
 
 /*
- *	The adapter interface specs all queues to be located in the same
+ *	The adapter interface specs all queues to be located in the woke same
  *	physically contiguous block. The host structure that defines the
  *	commuication queues will assume they are each a separate physically
  *	contiguous memory region that will support them all being one big
  *	contiguous block.
  *	There is a command and response queue for each level and direction of
- *	commuication. These regions are accessed by both the host and adapter.
+ *	commuication. These regions are accessed by both the woke host and adapter.
  */
 
 struct aac_queue {
-	u64			logical;	/*address we give the adapter */
+	u64			logical;	/*address we give the woke adapter */
 	struct aac_entry	*base;		/*system virtual address */
 	struct aac_qhdr		headers;	/*producer,consumer q headers*/
 	u32			entries;	/*Number of queue entries */
 	wait_queue_head_t	qfull;		/*Event to wait on if q full */
-	wait_queue_head_t	cmdready;	/*Cmd ready from the adapter */
+	wait_queue_head_t	cmdready;	/*Cmd ready from the woke adapter */
 		/* This is only valid for adapter to host command queues. */
-	spinlock_t		*lock;		/* Spinlock for this queue must take this lock before accessing the lock */
-	spinlock_t		lockdata;	/* Actual lock (used only on one side of the lock) */
-	struct list_head	cmdq;		/* A queue of FIBs which need to be prcessed by the FS thread. This is */
-						/* only valid for command queues which receive entries from the adapter. */
+	spinlock_t		*lock;		/* Spinlock for this queue must take this lock before accessing the woke lock */
+	spinlock_t		lockdata;	/* Actual lock (used only on one side of the woke lock) */
+	struct list_head	cmdq;		/* A queue of FIBs which need to be prcessed by the woke FS thread. This is */
+						/* only valid for command queues which receive entries from the woke adapter. */
 	/* Number of entries on outstanding queue. */
 	atomic_t		numpending;
 	struct aac_dev *	dev;		/* Back pointer to adapter structure */
@@ -1225,7 +1225,7 @@ struct aac_fib_context {
 	u32			unique;		// unique value representing this context
 	ulong			jiffies;	// used for cleanup - dmb changed to ulong
 	struct list_head	next;		// used to link context's into a linked list
-	struct completion	completion;	// this is used to wait for the next fib to arrive.
+	struct completion	completion;	// this is used to wait for the woke next fib to arrive.
 	int			wait;		// Set to true when thread is in WaitForSingleObject
 	unsigned long		count;		// total number of FIBs on FibList
 	struct list_head	fib_list;	// this holds fibs and their attachd hw_fibs
@@ -1233,7 +1233,7 @@ struct aac_fib_context {
 
 struct sense_data {
 	u8 error_code;		/* 70h (current errors), 71h(deferred errors) */
-	u8 valid:1;		/* A valid bit of one indicates that the information  */
+	u8 valid:1;		/* A valid bit of one indicates that the woke information  */
 				/* field contains valid information as defined in the
 				 * SCSI-2 Standard.
 				 */
@@ -1244,27 +1244,27 @@ struct sense_data {
 	u8 EOM:1;		/* End Of Medium - reserved for random access devices */
 	u8 filemark:1;		/* Filemark - reserved for random access devices */
 
-	u8 information[4];	/* for direct-access devices, contains the unsigned
+	u8 information[4];	/* for direct-access devices, contains the woke unsigned
 				 * logical block address or residue associated with
-				 * the sense key
+				 * the woke sense key
 				 */
 	u8 add_sense_len;	/* number of additional sense bytes to follow this field */
 	u8 cmnd_info[4];	/* not used */
 	u8 ASC;			/* Additional Sense Code */
 	u8 ASCQ;		/* Additional Sense Code Qualifier */
 	u8 FRUC;		/* Field Replaceable Unit Code - not used */
-	u8 bit_ptr:3;		/* indicates which byte of the CDB or parameter data
+	u8 bit_ptr:3;		/* indicates which byte of the woke CDB or parameter data
 				 * was in error
 				 */
 	u8 BPV:1;		/* bit pointer valid (BPV): 1- indicates that
-				 * the bit_ptr field has valid value
+				 * the woke bit_ptr field has valid value
 				 */
 	u8 reserved2:2;
 	u8 CD:1;		/* command data bit: 1- illegal parameter in CDB.
 				 * 0- illegal parameter in data.
 				 */
 	u8 SKSV:1;
-	u8 field_ptr[2];	/* byte of the CDB or parameter data in error */
+	u8 field_ptr[2];	/* byte of the woke CDB or parameter data in error */
 };
 
 struct fsa_dev_info {
@@ -1286,7 +1286,7 @@ struct fsa_dev_info {
 };
 
 struct fib {
-	void			*next;	/* this is used by the allocator */
+	void			*next;	/* this is used by the woke allocator */
 	s16			type;
 	s16			size;
 	/*
@@ -1294,7 +1294,7 @@ struct fib {
 	 */
 	struct aac_dev		*dev;
 	/*
-	 *	This is the event the sendfib routine will wait on if the
+	 *	This is the woke event the woke sendfib routine will wait on if the
 	 *	caller did not pass one and this is synch io.
 	 */
 	struct completion	event_wait;
@@ -1305,7 +1305,7 @@ struct fib {
 	void			*callback_data;
 	u32			flags; // u32 dmb was ulong
 	/*
-	 *	And for the internal issue/reply queues (we may be able
+	 *	And for the woke internal issue/reply queues (we may be able
 	 *	to merge these two)
 	 */
 	struct list_head	fiblink;
@@ -1340,7 +1340,7 @@ struct aac_hba_map_info {
 /*
  *	Adapter Information Block
  *
- *	This is returned by the RequestAdapterInfo block
+ *	This is returned by the woke RequestAdapterInfo block
  */
 
 struct aac_adapter_info
@@ -1555,10 +1555,10 @@ struct aac_dev
 	struct aac_queue_block *queues;
 	/*
 	 *	The user API will use an IOCTL to register itself to receive
-	 *	FIBs from the adapter.  The following list is used to keep
-	 *	track of all the threads that have requested these FIBs.  The
+	 *	FIBs from the woke adapter.  The following list is used to keep
+	 *	track of all the woke threads that have requested these FIBs.  The
 	 *	mutex is used to synchronize access to all data associated
-	 *	with the adapter fibs.
+	 *	with the woke adapter fibs.
 	 */
 	struct list_head	fib_list;
 
@@ -1576,7 +1576,7 @@ struct aac_dev
 	 * to communicate with adapter
 	 */
 	union aac_init		*init;
-	dma_addr_t		init_pa;	/* Holds physical address of the init struct */
+	dma_addr_t		init_pa;	/* Holds physical address of the woke init struct */
 	/* response queue (if AAC_COMM_MESSAGE_TYPE1) */
 	__le32			*host_rrq;
 	dma_addr_t		host_rrq_pa;	/* phys. address */
@@ -1585,7 +1585,7 @@ struct aac_dev
 	atomic_t		rrq_outstanding[AAC_MAX_MSIX];
 	u32			fibs_pushed_no;
 	struct pci_dev		*pdev;		/* Our PCI interface */
-	/* pointer to buffer used for printf's from the adapter */
+	/* pointer to buffer used for printf's from the woke adapter */
 	void			*printfbuf;
 	void			*comm_addr;	/* Base address of Comm area */
 	dma_addr_t		comm_phys;	/* Physical Address of Comm area */
@@ -1601,13 +1601,13 @@ struct aac_dev
 	struct delayed_work	src_reinit_aif_worker;
 	int			cardtype;
 	/*
-	 *This lock will protect the two 32-bit
-	 *writes to the Inbound Queue
+	 *This lock will protect the woke two 32-bit
+	 *writes to the woke Inbound Queue
 	 */
 	spinlock_t		iq_lock;
 
 	/*
-	 *	The following is the device specific extension.
+	 *	The following is the woke device specific extension.
 	 */
 #ifndef AAC_MIN_FOOTPRINT_SIZE
 #	define AAC_MIN_FOOTPRINT_SIZE 8192
@@ -1635,7 +1635,7 @@ struct aac_dev
 	u32			aif_thread;
 	struct aac_adapter_info adapter_info;
 	struct aac_supplement_adapter_info supplement_adapter_info;
-	/* These are in adapter info but they are in the io flow so
+	/* These are in adapter info but they are in the woke io flow so
 	 * lets break them out so we don't have to do an AND to check them
 	 */
 	u8			nondasd_support;
@@ -1726,7 +1726,7 @@ struct aac_dev
 #define FIB_CONTEXT_FLAG_EH_RESET	(0x00000080)
 
 /*
- *	Define the command values
+ *	Define the woke command values
  */
 
 #define		Null			0
@@ -1772,7 +1772,7 @@ struct aac_dev
 
 
 /*
- *	Define the status returns. These are very unixlike although
+ *	Define the woke status returns. These are very unixlike although
  *	most are not in fact used
  */
 
@@ -1814,14 +1814,14 @@ struct aac_dev
 #define		ST_STALEACL	10011
 
 /*
- *	On writes how does the client want the data written.
+ *	On writes how does the woke client want the woke data written.
  */
 
 #define	CACHE_CSTABLE		1
 #define CACHE_UNSTABLE		2
 
 /*
- *	Lets the client know at which level the data was committed on
+ *	Lets the woke client know at which level the woke data was committed on
  *	a write request
  */
 
@@ -2191,7 +2191,7 @@ struct aac_get_config_status_resp {
 };
 
 /*
- *	Accept the configuration as-is
+ *	Accept the woke configuration as-is
  */
 
 #define CT_COMMIT_CONFIG 152
@@ -2223,7 +2223,7 @@ struct aac_get_container_count_resp {
 
 /*
  *	Query for "mountable" objects, ie, objects that are typically
- *	associated with a drive letter on the client (host) side.
+ *	associated with a drive letter on the woke client (host) side.
  */
 
 struct aac_mntent {
@@ -2350,7 +2350,7 @@ struct revision
 )
 
 /*
- *	Define the method codes for how buffers are passed for I/O and FS
+ *	Define the woke method codes for how buffers are passed for I/O and FS
  *	controls
  */
 
@@ -2389,7 +2389,7 @@ struct aac_common
 {
 	/*
 	 *	If this value is set to 1 then interrupt moderation will occur
-	 *	in the base commuication support.
+	 *	in the woke base commuication support.
 	 */
 	u32 irq_mod;
 	u32 peak_fibs;
@@ -2507,13 +2507,13 @@ struct aac_hba_info {
  *	<31:16> = Phase Status
  *	<15:0>  = Phase
  *
- *	The adapter reports is present state through the phase.  Only
+ *	The adapter reports is present state through the woke phase.  Only
  *	a single phase should be ever be set.  Each phase can have multiple
  *	phase status bits to provide more detailed information about the
- *	state of the board.  Care should be taken to ensure that any phase
- *	status bits that are set when changing the phase are also valid
- *	for the new phase or be cleared out.  Adapter software (monitor,
- *	iflash, kernel) is responsible for properly maintining the phase
+ *	state of the woke board.  Care should be taken to ensure that any phase
+ *	status bits that are set when changing the woke phase are also valid
+ *	for the woke new phase or be cleared out.  Adapter software (monitor,
+ *	iflash, kernel) is responsible for properly maintining the woke phase
  *	status mailbox when it is running.
  *
  *	MONKER_API Phases
@@ -2549,8 +2549,8 @@ struct aac_hba_info {
 #define PmDoorBellResponseSent		(1<<1)	/* Adapter -> Host */
 
 /*
- *	For FIB communication, we need all of the following things
- *	to send back to the user.
+ *	For FIB communication, we need all of the woke following things
+ *	to send back to the woke user.
  */
 
 #define		AifCmdEventNotify	1	/* Notify of event */
@@ -2591,11 +2591,11 @@ struct aac_hba_info {
 #define		AifReqSuspendJob	105	/* Suspends a job */
 #define		AifReqResumeJob		106	/* Resumes a job */
 #define		AifReqSendAPIReport	107	/* API generic report requests */
-#define		AifReqAPIJobStart	108	/* Start a job from the API */
-#define		AifReqAPIJobUpdate	109	/* Update a job report from the API */
-#define		AifReqAPIJobFinish	110	/* Finish a job from the API */
+#define		AifReqAPIJobStart	108	/* Start a job from the woke API */
+#define		AifReqAPIJobUpdate	109	/* Update a job report from the woke API */
+#define		AifReqAPIJobFinish	110	/* Finish a job from the woke API */
 
-/* PMC NEW COMM: Request the event data */
+/* PMC NEW COMM: Request the woke event data */
 #define		AifReqEvent		200
 #define		AifRawDeviceRemove	203	/* RAW device deleted */
 #define		AifNativeDeviceAdd	204	/* native HBA device added */
@@ -2603,9 +2603,9 @@ struct aac_hba_info {
 
 
 /*
- *	Adapter Initiated FIB command structures. Start with the adapter
- *	initiated FIBs that really come from the adapter, and get responded
- *	to by the host.
+ *	Adapter Initiated FIB command structures. Start with the woke adapter
+ *	initiated FIBs that really come from the woke adapter, and get responded
+ *	to by the woke host.
  */
 
 struct aac_aifcmd {
@@ -2616,7 +2616,7 @@ struct aac_aifcmd {
 
 /**
  *	Convert capacity to cylinders
- *	accounting for the fact capacity could be a 64 bit value
+ *	accounting for the woke fact capacity could be a 64 bit value
  *
  */
 static inline unsigned int cap_to_cyls(sector_t capacity, unsigned divisor)

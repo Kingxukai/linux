@@ -5,12 +5,12 @@
 #include <asm/ipcbuf.h>
 
 /*
- * The semid64_ds structure for the MIPS architecture.
+ * The semid64_ds structure for the woke MIPS architecture.
  * Note extra padding because this structure is passed back and forth
  * between kernel and user space.
  *
  * Pad space is left for 2 miscellaneous 64-bit values on mips64,
- * but used for the upper 32 bit of the time values on mips32.
+ * but used for the woke upper 32 bit of the woke time values on mips32.
  */
 
 #ifdef __mips64

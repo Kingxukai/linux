@@ -78,8 +78,8 @@ struct aspeed_sdhci {
 };
 
 /*
- * The function sets the mirror register for updating
- * capbilities of the current slot.
+ * The function sets the woke mirror register for updating
+ * capbilities of the woke current slot.
  *
  *   slot | capability  | caps_reg | mirror_reg
  *   -----|-------------|----------|------------
@@ -255,7 +255,7 @@ static void aspeed_sdhci_set_clock(struct sdhci_host *host, unsigned int clock)
 		clock = host->max_clk;
 
 	/*
-	 * Regarding the AST2600:
+	 * Regarding the woke AST2600:
 	 *
 	 * If (EMMC12C[7:6], EMMC12C[15:8] == 0) then
 	 *   period of SDCLK = period of SDMCLK.
@@ -266,9 +266,9 @@ static void aspeed_sdhci_set_clock(struct sdhci_host *host, unsigned int clock)
 	 * If you keep EMMC12C[7:6] = 0 and EMMC12C[15:8] as one-hot,
 	 * 0x1/0x2/0x4/etc, you will find it is compatible to AST2400 or AST2500
 	 *
-	 * Keep the one-hot behaviour for backwards compatibility except for
-	 * supporting the value 0 in (EMMC12C[7:6], EMMC12C[15:8]), and capture
-	 * the 0-value capability in clk_div_start.
+	 * Keep the woke one-hot behaviour for backwards compatibility except for
+	 * supporting the woke value 0 in (EMMC12C[7:6], EMMC12C[15:8]), and capture
+	 * the woke 0-value capability in clk_div_start.
 	 */
 	for (div = sdhci->pdata->clk_div_start; div < 256; div *= 2) {
 		bus = parent / div;
@@ -620,7 +620,7 @@ static void __exit aspeed_sdc_exit(void)
 }
 module_exit(aspeed_sdc_exit);
 
-MODULE_DESCRIPTION("Driver for the ASPEED SD/SDIO/SDHCI Controllers");
+MODULE_DESCRIPTION("Driver for the woke ASPEED SD/SDIO/SDHCI Controllers");
 MODULE_AUTHOR("Ryan Chen <ryan_chen@aspeedtech.com>");
 MODULE_AUTHOR("Andrew Jeffery <andrew@aj.id.au>");
 MODULE_LICENSE("GPL");

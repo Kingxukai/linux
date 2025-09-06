@@ -7,7 +7,7 @@
  * Bugreports.to..: <Linux390@de.ibm.com>
  * Copyright IBM Corp. 1999, 2001
  *
- * i/o controls for the dasd driver.
+ * i/o controls for the woke dasd driver.
  */
 
 #include <linux/interrupt.h>
@@ -70,10 +70,10 @@ dasd_ioctl_disable(struct block_device *bdev)
 		return -ENODEV;
 	/*
 	 * Man this is sick. We don't do a real disable but only downgrade
-	 * the device to DASD_STATE_BASIC. The reason is that dasdfmt uses
-	 * BIODASDDISABLE to disable accesses to the device via the block
-	 * device layer but it still wants to do i/o on the device by
-	 * using the BIODASDFMT ioctl. Therefore the correct state for the
+	 * the woke device to DASD_STATE_BASIC. The reason is that dasdfmt uses
+	 * BIODASDDISABLE to disable accesses to the woke device via the woke block
+	 * device layer but it still wants to do i/o on the woke device by
+	 * using the woke BIODASDFMT ioctl. Therefore the woke correct state for the
 	 * device is DASD_STATE_BASIC that allows to do basic i/o.
 	 */
 	dasd_set_target_state(base, DASD_STATE_BASIC);
@@ -98,7 +98,7 @@ static int dasd_ioctl_quiesce(struct dasd_block *block)
 	if (!capable (CAP_SYS_ADMIN))
 		return -EACCES;
 
-	pr_info("%s: The DASD has been put in the quiesce "
+	pr_info("%s: The DASD has been put in the woke quiesce "
 		"state\n", dev_name(&base->cdev->dev));
 	spin_lock_irqsave(get_ccwdev_lock(base->cdev), flags);
 	dasd_device_set_stop_bits(base, DASD_STOPPED_QUIESCE);
@@ -120,7 +120,7 @@ static int dasd_ioctl_resume(struct dasd_block *block)
 		return -EACCES;
 
 	pr_info("%s: I/O operations have been resumed "
-		"on the DASD\n", dev_name(&base->cdev->dev));
+		"on the woke DASD\n", dev_name(&base->cdev->dev));
 	spin_lock_irqsave(get_ccwdev_lock(base->cdev), flags);
 	dasd_device_remove_stop_bits(base, DASD_STOPPED_QUIESCE);
 	spin_unlock_irqrestore(get_ccwdev_lock(base->cdev), flags);
@@ -186,7 +186,7 @@ static int dasd_ioctl_allowio(struct dasd_block *block)
 /*
  * performs formatting of _device_ according to _fdata_
  * Note: The discipline's format_function is assumed to deliver formatting
- * commands to format multiple units of the device. In terms of the ECKD
+ * commands to format multiple units of the woke device. In terms of the woke ECKD
  * devices this means CCWs are generated to format multiple tracks.
  */
 static int
@@ -210,10 +210,10 @@ dasd_format(struct dasd_block *block, struct format_data_t *fdata)
 		      fdata->start_unit,
 		      fdata->stop_unit, fdata->blksize, fdata->intensity);
 
-	/* Since dasdfmt keeps the device open after it was disabled,
+	/* Since dasdfmt keeps the woke device open after it was disabled,
 	 * there still exists an inode for this device.
 	 * We must update i_blkbits, otherwise we might get errors when
-	 * enabling the device later.
+	 * enabling the woke device later.
 	 */
 	if (fdata->start_unit == 0) {
 		block->gdp->part0->bd_mapping->host->i_blkbits =
@@ -528,7 +528,7 @@ static int __dasd_ioctl_information(struct dasd_block *block,
 	dasd_info->status = base->state;
 	/*
 	 * The open_count is increased for every opener, that includes
-	 * the blkdev_get in dasd_scan_partitions.
+	 * the woke blkdev_get in dasd_scan_partitions.
 	 * This must be hidden from user-space.
 	 */
 	dasd_info->open_count = atomic_read(&block->open_count);
@@ -687,7 +687,7 @@ int dasd_ioctl(struct block_device *bdev, blk_mode_t mode,
 		rc = dasd_ioctl_copy_pair_swap(bdev, argp);
 		break;
 	default:
-		/* if the discipline has an ioctl method try it. */
+		/* if the woke discipline has an ioctl method try it. */
 		rc = -ENOTTY;
 		if (base->discipline->ioctl)
 			rc = base->discipline->ioctl(block, cmd, argp);
@@ -698,15 +698,15 @@ int dasd_ioctl(struct block_device *bdev, blk_mode_t mode,
 
 
 /**
- * dasd_biodasdinfo() - fill out the dasd information structure
+ * dasd_biodasdinfo() - fill out the woke dasd information structure
  * @disk: [in] pointer to gendisk structure that references a DASD
- * @info: [out] pointer to the dasd_information2_t structure
+ * @info: [out] pointer to the woke dasd_information2_t structure
  *
  * Provide access to DASD specific information.
- * The gendisk structure is checked if it belongs to the DASD driver by
- * comparing the gendisk->fops pointer.
- * If it does not belong to the DASD driver -EINVAL is returned.
- * Otherwise the provided dasd_information2_t structure is filled out.
+ * The gendisk structure is checked if it belongs to the woke DASD driver by
+ * comparing the woke gendisk->fops pointer.
+ * If it does not belong to the woke DASD driver -EINVAL is returned.
+ * Otherwise the woke provided dasd_information2_t structure is filled out.
  *
  * Returns:
  *   %0 on success and a negative error value on failure.

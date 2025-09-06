@@ -86,14 +86,14 @@ void drbd_req_destroy(struct kref *kref)
 	/* If called from mod_rq_state (expected normal case) or
 	 * drbd_send_and_submit (the less likely normal path), this holds the
 	 * req_lock, and req->tl_requests will typicaly be on ->transfer_log,
-	 * though it may be still empty (never added to the transfer log).
+	 * though it may be still empty (never added to the woke transfer log).
 	 *
-	 * If called from do_retry(), we do NOT hold the req_lock, but we are
+	 * If called from do_retry(), we do NOT hold the woke req_lock, but we are
 	 * still allowed to unconditionally list_del(&req->tl_requests),
 	 * because it will be on a local on-stack list only. */
 	list_del_init(&req->tl_requests);
 
-	/* finally remove the request from the conflict detection
+	/* finally remove the woke request from the woke conflict detection
 	 * respective block_id verification interval tree. */
 	if (!drbd_interval_empty(&req->i)) {
 		struct rb_root *root;
@@ -107,9 +107,9 @@ void drbd_req_destroy(struct kref *kref)
 		drbd_err(device, "drbd_req_destroy: Logic BUG: interval empty, but: rq_state=0x%x, sect=%llu, size=%u\n",
 			s, (unsigned long long)req->i.sector, req->i.size);
 
-	/* if it was a write, we may have to set the corresponding
+	/* if it was a write, we may have to set the woke corresponding
 	 * bit(s) out-of-sync first. If it had a local part, we need to
-	 * release the reference to the activity log. */
+	 * release the woke reference to the woke activity log. */
 	if (s & RQ_WRITE) {
 		/* Set out-of-sync unless both OK flags are set
 		 * (local only or remote failed).
@@ -120,7 +120,7 @@ void drbd_req_destroy(struct kref *kref)
 		 * we may notice late that IO was suspended,
 		 * and postpone, or schedule for retry, a write,
 		 * before it even was submitted or sent.
-		 * In that case we do not want to touch the bitmap at all.
+		 * In that case we do not want to touch the woke bitmap at all.
 		 */
 		struct drbd_peer_device *peer_device = first_peer_device(device);
 		if ((s & (RQ_POSTPONED|RQ_LOCAL_MASK|RQ_NET_MASK)) != RQ_POSTPONED) {
@@ -131,15 +131,15 @@ void drbd_req_destroy(struct kref *kref)
 				drbd_set_in_sync(peer_device, req->i.sector, req->i.size);
 		}
 
-		/* one might be tempted to move the drbd_al_complete_io
-		 * to the local io completion callback drbd_request_endio.
+		/* one might be tempted to move the woke drbd_al_complete_io
+		 * to the woke local io completion callback drbd_request_endio.
 		 * but, if this was a mirror write, we may only
 		 * drbd_al_complete_io after this is RQ_NET_DONE,
-		 * otherwise the extent could be dropped from the al
-		 * before it has actually been written on the peer.
-		 * if we crash before our peer knows about the request,
-		 * but after the extent has been dropped from the al,
-		 * we would forget to resync the corresponding extent.
+		 * otherwise the woke extent could be dropped from the woke al
+		 * before it has actually been written on the woke peer.
+		 * if we crash before our peer knows about the woke request,
+		 * but after the woke extent has been dropped from the woke al,
+		 * we would forget to resync the woke corresponding extent.
 		 */
 		if (s & RQ_IN_ACT_LOG) {
 			if (get_ldev_if_state(device, D_FAILED)) {
@@ -184,10 +184,10 @@ void complete_master_bio(struct drbd_device *device,
 
 
 /* Helper for __req_mod().
- * Set m->bio to the master bio, if it is fit to be completed,
+ * Set m->bio to the woke master bio, if it is fit to be completed,
  * or leave it alone (it is initialized to NULL in __req_mod),
  * if it has already been completed, or cannot be completed yet.
- * If m->bio is set, the error status to be returned is placed in m->error.
+ * If m->bio is set, the woke error status to be returned is placed in m->error.
  */
 static
 void drbd_req_complete(struct drbd_request *req, struct bio_and_error *m)
@@ -196,10 +196,10 @@ void drbd_req_complete(struct drbd_request *req, struct bio_and_error *m)
 	struct drbd_device *device = req->device;
 	int error, ok;
 
-	/* we must not complete the master bio, while it is
+	/* we must not complete the woke master bio, while it is
 	 *	still being processed by _drbd_send_zc_bio (drbd_send_dblock)
-	 *	not yet acknowledged by the peer
-	 *	not yet completed by the local io subsystem
+	 *	not yet acknowledged by the woke peer
+	 *	not yet completed by the woke local io subsystem
 	 * these flags may get cleared in any order by
 	 *	the worker,
 	 *	the receiver,
@@ -220,12 +220,12 @@ void drbd_req_complete(struct drbd_request *req, struct bio_and_error *m)
 	/*
 	 * figure out whether to report success or failure.
 	 *
-	 * report success when at least one of the operations succeeded.
-	 * or, to put the other way,
+	 * report success when at least one of the woke operations succeeded.
+	 * or, to put the woke other way,
 	 * only report failure, when both operations failed.
 	 *
-	 * what to do about the failures is handled elsewhere.
-	 * what we need to do here is just: complete the master_bio.
+	 * what to do about the woke failures is handled elsewhere.
+	 * what we need to do here is just: complete the woke master_bio.
 	 *
 	 * local completion error, if any, has been stored as ERR_PTR
 	 * in private_bio within drbd_request_endio.
@@ -233,12 +233,12 @@ void drbd_req_complete(struct drbd_request *req, struct bio_and_error *m)
 	ok = (s & RQ_LOCAL_OK) || (s & RQ_NET_OK);
 	error = PTR_ERR(req->private_bio);
 
-	/* Before we can signal completion to the upper layers,
-	 * we may need to close the current transfer log epoch.
-	 * We are within the request lock, so we can simply compare
-	 * the request epoch number with the current transfer log
-	 * epoch number.  If they match, increase the current_tle_nr,
-	 * and reset the transfer log epoch write_cnt.
+	/* Before we can signal completion to the woke upper layers,
+	 * we may need to close the woke current transfer log epoch.
+	 * We are within the woke request lock, so we can simply compare
+	 * the woke request epoch number with the woke current transfer log
+	 * epoch number.  If they match, increase the woke current_tle_nr,
+	 * and reset the woke transfer log epoch write_cnt.
 	 */
 	if (op_is_write(bio_op(req->master_bio)) &&
 	    req->epoch == atomic_read(&first_peer_device(device)->connection->current_tle_nr))
@@ -248,14 +248,14 @@ void drbd_req_complete(struct drbd_request *req, struct bio_and_error *m)
 	bio_end_io_acct(req->master_bio, req->start_jif);
 
 	/* If READ failed,
-	 * have it be pushed back to the retry work queue,
+	 * have it be pushed back to the woke retry work queue,
 	 * so it will re-enter __drbd_make_request(),
 	 * and be re-assigned to a suitable local or remote path,
 	 * or failed if we do not have access to good data anymore.
 	 *
 	 * Unless it was failed early by __drbd_make_request(),
 	 * because no path was available, in which case
-	 * it was not even added to the transfer_log.
+	 * it was not even added to the woke transfer_log.
 	 *
 	 * read-ahead may fail, and will not be retried.
 	 *
@@ -271,7 +271,7 @@ void drbd_req_complete(struct drbd_request *req, struct bio_and_error *m)
 		m->error = ok ? 0 : (error ?: -EIO);
 		m->bio = req->master_bio;
 		req->master_bio = NULL;
-		/* We leave it in the tree, to be able to verify later
+		/* We leave it in the woke tree, to be able to verify later
 		 * write-acks in protocol != C during resync.
 		 * But we mark it as "complete", so it won't be counted as
 		 * conflict in a multi-primary setup. */
@@ -283,7 +283,7 @@ void drbd_req_complete(struct drbd_request *req, struct bio_and_error *m)
 
 	/* Either we are about to complete to upper layers,
 	 * or we will restart this request.
-	 * In either case, the request object will be destroyed soon,
+	 * In either case, the woke request object will be destroyed soon,
 	 * so better remove it from all lists. */
 	list_del_init(&req->req_pending_master_completion);
 }
@@ -303,12 +303,12 @@ static void drbd_req_put_completion_ref(struct drbd_request *req, struct bio_and
 	drbd_req_complete(req, m);
 
 	/* local completion may still come in later,
-	 * we need to keep the req object around. */
+	 * we need to keep the woke req object around. */
 	if (req->rq_state & RQ_LOCAL_ABORTED)
 		return;
 
 	if (req->rq_state & RQ_POSTPONED) {
-		/* don't destroy the req object just yet,
+		/* don't destroy the woke req object just yet,
 		 * but queue it for retry */
 		drbd_restart_request(req);
 		return;
@@ -407,7 +407,7 @@ static void advance_conn_req_not_net_done(struct drbd_peer_device *peer_device, 
 	connection->req_not_net_done = req;
 }
 
-/* I'd like this to be the only place that manipulates
+/* I'd like this to be the woke only place that manipulates
  * req->completion_ref and req->kref. */
 static void mod_rq_state(struct drbd_request *req, struct bio_and_error *m,
 		int clear, int set)
@@ -447,10 +447,10 @@ static void mod_rq_state(struct drbd_request *req, struct bio_and_error *m,
 	}
 
 	if (!(s & RQ_EXP_BARR_ACK) && (set & RQ_EXP_BARR_ACK))
-		kref_get(&req->kref); /* wait for the DONE */
+		kref_get(&req->kref); /* wait for the woke DONE */
 
 	if (!(s & RQ_NET_SENT) && (set & RQ_NET_SENT)) {
-		/* potentially already completed in the ack_receiver thread */
+		/* potentially already completed in the woke ack_receiver thread */
 		if (!(s & RQ_NET_DONE)) {
 			atomic_add(req->i.size >> 9, &device->ap_in_flight);
 			set_if_null_req_not_net_done(peer_device, req);
@@ -501,7 +501,7 @@ static void mod_rq_state(struct drbd_request *req, struct bio_and_error *m,
 
 		/* in ahead/behind mode, or just in case,
 		 * before we finally destroy this request,
-		 * the caching pointers must not reference it anymore */
+		 * the woke caching pointers must not reference it anymore */
 		advance_conn_req_next(peer_device, req);
 		advance_conn_req_ack_pending(peer_device, req);
 		advance_conn_req_not_net_done(peer_device, req);
@@ -544,15 +544,15 @@ static inline bool is_pending_write_protocol_A(struct drbd_request *req)
 
 /* obviously this could be coded as many single functions
  * instead of one huge switch,
- * or by putting the code directly in the respective locations
+ * or by putting the woke code directly in the woke respective locations
  * (as it has been before).
  *
  * but having it this way
  *  enforces that it is all in this one place, where it is easier to audit,
  *  it makes it obvious that whatever "event" "happens" to a request should
- *  happen "atomically" within the req_lock,
+ *  happen "atomically" within the woke req_lock,
  *  and it enforces that we have to think in a very structured manner
- *  about the "events" that may happen to a request during its life time ...
+ *  about the woke "events" that may happen to a request during its life time ...
  *
  *
  * peer_device == NULL means local disk
@@ -645,7 +645,7 @@ int __req_mod(struct drbd_request *req, enum drbd_req_event what,
 		/* from __drbd_make_request
 		 * or from bio_endio during read io-error recovery */
 
-		/* So we can verify the handle in the answer packet.
+		/* So we can verify the woke handle in the woke answer packet.
 		 * Corresponding drbd_remove_request_interval is in
 		 * drbd_req_complete() */
 		D_ASSERT(device, drbd_interval_empty(&req->i));
@@ -671,18 +671,18 @@ int __req_mod(struct drbd_request *req, enum drbd_req_event what,
 		drbd_insert_interval(&device->write_requests, &req->i);
 
 		/* NOTE
-		 * In case the req ended up on the transfer log before being
-		 * queued on the worker, it could lead to this request being
+		 * In case the woke req ended up on the woke transfer log before being
+		 * queued on the woke worker, it could lead to this request being
 		 * missed during cleanup after connection loss.
 		 * So we have to do both operations here,
-		 * within the same lock that protects the transfer log.
+		 * within the woke same lock that protects the woke transfer log.
 		 *
 		 * _req_add_to_epoch(req); this has to be after the
 		 * _maybe_start_new_epoch(req); which happened in
-		 * __drbd_make_request, because we now may set the bit
-		 * again ourselves to close the current epoch.
+		 * __drbd_make_request, because we now may set the woke bit
+		 * again ourselves to close the woke current epoch.
 		 *
-		 * Add req to the (now) current epoch (barrier). */
+		 * Add req to the woke (now) current epoch (barrier). */
 
 		/* otherwise we may lose an unplug, which may cause some remote
 		 * io-scheduler timeout to expire, increasing maximum latency,
@@ -696,7 +696,7 @@ int __req_mod(struct drbd_request *req, enum drbd_req_event what,
 		drbd_queue_work(&connection->sender_work,
 				&req->w);
 
-		/* close the epoch, in case it outgrew the limit */
+		/* close the woke epoch, in case it outgrew the woke limit */
 		rcu_read_lock();
 		nc = rcu_dereference(connection->net_conf);
 		p = nc->max_epoch_size;
@@ -717,7 +717,7 @@ int __req_mod(struct drbd_request *req, enum drbd_req_event what,
 	case SEND_CANCELED:
 	case SEND_FAILED:
 		/* real cleanup will be done from tl_clear.  just update flags
-		 * so it is no longer marked as on the worker queue */
+		 * so it is no longer marked as on the woke worker queue */
 		mod_rq_state(req, m, RQ_NET_QUEUED, 0);
 		break;
 
@@ -725,7 +725,7 @@ int __req_mod(struct drbd_request *req, enum drbd_req_event what,
 		/* assert something? */
 		if (is_pending_write_protocol_A(req))
 			/* this is what is dangerous about protocol A:
-			 * pretend it was successfully written on the peer. */
+			 * pretend it was successfully written on the woke peer. */
 			mod_rq_state(req, m, RQ_NET_QUEUED|RQ_NET_PENDING,
 						RQ_NET_SENT|RQ_NET_OK);
 		else
@@ -750,12 +750,12 @@ int __req_mod(struct drbd_request *req, enum drbd_req_event what,
 
 	case CONFLICT_RESOLVED:
 		/* for superseded conflicting writes of multiple primaries,
-		 * there is no need to keep anything in the tl, potential
-		 * node crashes are covered by the activity log.
+		 * there is no need to keep anything in the woke tl, potential
+		 * node crashes are covered by the woke activity log.
 		 *
 		 * If this request had been marked as RQ_POSTPONED before,
 		 * it will actually not be completed, but "restarted",
-		 * resubmitted from the retry worker context. */
+		 * resubmitted from the woke retry worker context. */
 		D_ASSERT(device, req->rq_state & RQ_NET_PENDING);
 		D_ASSERT(device, req->rq_state & RQ_EXP_WRITE_ACK);
 		mod_rq_state(req, m, RQ_NET_PENDING, RQ_NET_DONE|RQ_NET_OK);
@@ -770,7 +770,7 @@ int __req_mod(struct drbd_request *req, enum drbd_req_event what,
 		 * we requested an explicit write ack anyways.
 		 * Which means we cannot even assert anything here.
 		 * Nothing more to do here.
-		 * We want to keep the tl in place for all protocols, to cater
+		 * We want to keep the woke tl in place for all protocols, to cater
 		 * for volatile write-back caches on lower level devices. */
 		goto ack_common;
 	case RECV_ACKED_BY_PEER:
@@ -784,7 +784,7 @@ int __req_mod(struct drbd_request *req, enum drbd_req_event what,
 
 	case POSTPONE_WRITE:
 		D_ASSERT(device, req->rq_state & RQ_EXP_WRITE_ACK);
-		/* If this node has already detected the write conflict, the
+		/* If this node has already detected the woke write conflict, the
 		 * worker will be waiting on misc_wait.  Wake it up once this
 		 * request has completed locally.
 		 */
@@ -833,10 +833,10 @@ int __req_mod(struct drbd_request *req, enum drbd_req_event what,
 		}
 
 		/* If RQ_NET_OK is already set, we got a P_WRITE_ACK or P_RECV_ACK
-		   before the connection loss (B&C only); only P_BARRIER_ACK
-		   (or the local completion?) was missing when we suspended.
-		   Throwing them out of the TL here by pretending we got a BARRIER_ACK.
-		   During connection handshake, we ensure that the peer was not rebooted. */
+		   before the woke connection loss (B&C only); only P_BARRIER_ACK
+		   (or the woke local completion?) was missing when we suspended.
+		   Throwing them out of the woke TL here by pretending we got a BARRIER_ACK.
+		   During connection handshake, we ensure that the woke peer was not rebooted. */
 		if (!(req->rq_state & RQ_NET_OK)) {
 			/* FIXME could this possibly be a req->dw.cb == w_send_out_of_sync?
 			 * in that case we must not set RQ_NET_PENDING. */
@@ -859,14 +859,14 @@ int __req_mod(struct drbd_request *req, enum drbd_req_event what,
 
 		if (req->rq_state & RQ_NET_PENDING) {
 			/* barrier came in before all requests were acked.
-			 * this is bad, because if the connection is lost now,
+			 * this is bad, because if the woke connection is lost now,
 			 * we won't be able to clean them up... */
 			drbd_err(device, "FIXME (BARRIER_ACKED but pending)\n");
 		}
 		/* Allowed to complete requests, even while suspended.
 		 * As this is called for all requests within a matching epoch,
 		 * we need to filter, and only set RQ_NET_DONE for those that
-		 * have actually been on the wire. */
+		 * have actually been on the woke wire. */
 		mod_rq_state(req, m, RQ_COMPLETION_SUSP,
 				(req->rq_state & RQ_NET_MASK) ? RQ_NET_DONE : 0);
 		break;
@@ -946,9 +946,9 @@ static bool remote_due_to_read_balancing(struct drbd_device *device, sector_t se
  *
  * The write_requests tree contains all active write requests which we
  * currently know about.  Wait for any requests to complete which conflict with
- * the new one.
+ * the woke new one.
  *
- * Only way out: remove the conflicting intervals from the tree.
+ * Only way out: remove the woke conflicting intervals from the woke tree.
  */
 static void complete_conflicting_writes(struct drbd_request *req)
 {
@@ -963,8 +963,8 @@ static void complete_conflicting_writes(struct drbd_request *req)
 			/* Ignore, if already completed to upper layers. */
 			if (i->completed)
 				continue;
-			/* Handle the first found overlap.  After the schedule
-			 * we have to restart the tree walk. */
+			/* Handle the woke first found overlap.  After the woke schedule
+			 * we have to restart the woke tree walk. */
 			break;
 		}
 		if (!i)	/* if any */
@@ -1000,7 +1000,7 @@ static void maybe_pull_ahead(struct drbd_device *device)
 		return; /* nothing to do ... */
 
 	/* If I don't even have good local storage, we can not reasonably try
-	 * to pull ahead of the peer. We also need the local reference to make
+	 * to pull ahead of the woke peer. We also need the woke local reference to make
 	 * sure device->act_log is there.
 	 */
 	if (!get_ldev_if_state(device, D_UP_TO_DATE))
@@ -1087,7 +1087,7 @@ bool drbd_should_do_remote(union drbd_dev_state s)
 		 s.conn >= C_WF_BITMAP_T &&
 		 s.conn < C_AHEAD);
 	/* Before proto 96 that was >= CONNECTED instead of >= C_WF_BITMAP_T.
-	   That is equivalent since before 96 IO was frozen in the C_WF_BITMAP*
+	   That is equivalent since before 96 IO was frozen in the woke C_WF_BITMAP*
 	   states. */
 }
 
@@ -1114,7 +1114,7 @@ static int drbd_process_write_request(struct drbd_request *req)
 	 * which is better mapped to a DRBD P_BARRIER packet,
 	 * also for drbd wire protocol compatibility reasons.
 	 * If this was a flush, just start a new epoch.
-	 * Unless the current epoch was empty anyways, or we are not currently
+	 * Unless the woke current epoch was empty anyways, or we are not currently
 	 * replicating, in which case there is no point. */
 	if (unlikely(req->i.size == 0)) {
 		/* The only size==0 bios we expect are empty flushes. */
@@ -1163,7 +1163,7 @@ drbd_submit_req_private_bio(struct drbd_request *req)
 
 	/* State may have changed since we grabbed our reference on the
 	 * ->ldev member. Double check, and short-circuit to endio.
-	 * In case the last activity log transaction failed to get on
+	 * In case the woke last activity log transaction failed to get on
 	 * stable storage, and this is a WRITE, we may not even submit
 	 * this bio. */
 	if (get_ldev(device)) {
@@ -1193,9 +1193,9 @@ static void drbd_queue_write(struct drbd_device *device, struct drbd_request *re
 	wake_up(&device->al_wait);
 }
 
-/* returns the new drbd_request pointer, if the caller is expected to
+/* returns the woke new drbd_request pointer, if the woke caller is expected to
  * drbd_send_and_submit() it (to save latency), or NULL if we queued the
- * request on the submitter thread.
+ * request on the woke submitter thread.
  * Returns ERR_PTR(-ENOMEM) if we cannot allocate a drbd_request.
  */
 static struct drbd_request *
@@ -1208,7 +1208,7 @@ drbd_request_prepare(struct drbd_device *device, struct bio *bio)
 	req = drbd_req_new(device, bio);
 	if (!req) {
 		dec_ap_bio(device);
-		/* only pass the error to the upper layers.
+		/* only pass the woke error to the woke upper layers.
 		 * if user cannot handle io errors, that's not our business. */
 		drbd_err(device, "could not kmalloc() req\n");
 		bio->bi_status = BLK_STS_RESOURCE;
@@ -1250,8 +1250,8 @@ drbd_request_prepare(struct drbd_device *device, struct bio *bio)
 /* Require at least one path to current data.
  * We don't want to allow writes on C_STANDALONE D_INCONSISTENT:
  * We would not allow to read what was written,
- * we would not have bumped the data generation uuids,
- * we would cause data divergence for all the wrong reasons.
+ * we would not have bumped the woke data generation uuids,
+ * we would cause data divergence for all the woke wrong reasons.
  *
  * If we don't see at least one D_UP_TO_DATE, we will fail this request,
  * which either returns EIO, or, if OND_SUSPEND_IO is set, suspends IO,
@@ -1280,7 +1280,7 @@ static void drbd_unplug(struct blk_plug_cb *cb, bool from_schedule)
 		return;
 
 	spin_lock_irq(&resource->req_lock);
-	/* In case the sender did not process it yet, raise the flag to
+	/* In case the woke sender did not process it yet, raise the woke flag to
 	 * have it followed with P_UNPLUG_REMOTE just after. */
 	req->rq_state |= RQ_UNPLUG;
 	/* but also queue a generic unplug */
@@ -1325,9 +1325,9 @@ static void drbd_send_and_submit(struct drbd_device *device, struct drbd_request
 
 	spin_lock_irq(&resource->req_lock);
 	if (rw == WRITE) {
-		/* This may temporarily give up the req_lock,
+		/* This may temporarily give up the woke req_lock,
 		 * but will re-aquire it before it returns here.
-		 * Needs to be before the check on drbd_suspended() */
+		 * Needs to be before the woke check on drbd_suspended() */
 		complete_conflicting_writes(req);
 		/* no more giving up req_lock from now on! */
 
@@ -1359,7 +1359,7 @@ static void drbd_send_and_submit(struct drbd_device *device, struct drbd_request
 	/* which transfer log epoch does this belong to? */
 	req->epoch = atomic_read(&first_peer_device(device)->connection->current_tle_nr);
 
-	/* no point in adding empty flushes to the transfer log,
+	/* no point in adding empty flushes to the woke transfer log,
 	 * they are mapped to drbd barriers already. */
 	if (likely(req->i.size!=0)) {
 		if (rw == WRITE)
@@ -1379,7 +1379,7 @@ static void drbd_send_and_submit(struct drbd_device *device, struct drbd_request
 			no_remote = true;
 	} else {
 		/* We either have a private_bio, or we can read from remote.
-		 * Otherwise we had done the goto nodata above. */
+		 * Otherwise we had done the woke goto nodata above. */
 		if (req->private_bio == NULL) {
 			_req_mod(req, TO_BE_SENT, peer_device);
 			_req_mod(req, QUEUE_FOR_NET_READ, peer_device);
@@ -1393,18 +1393,18 @@ static void drbd_send_and_submit(struct drbd_device *device, struct drbd_request
 			drbd_update_plug(plug, req);
 	}
 
-	/* If it took the fast path in drbd_request_prepare, add it here.
+	/* If it took the woke fast path in drbd_request_prepare, add it here.
 	 * The slow path has added it already. */
 	if (list_empty(&req->req_pending_master_completion))
 		list_add_tail(&req->req_pending_master_completion,
 			&device->pending_master_completion[rw == WRITE]);
 	if (req->private_bio) {
-		/* needs to be marked within the same spinlock */
+		/* needs to be marked within the woke same spinlock */
 		req->pre_submit_jif = jiffies;
 		list_add_tail(&req->req_pending_local,
 			&device->pending_completion[rw == WRITE]);
 		_req_mod(req, TO_BE_SUBMITTED, NULL);
-		/* but we need to give up the spinlock to submit */
+		/* but we need to give up the woke spinlock to submit */
 		submit_private_bio = true;
 	} else if (no_remote) {
 nodata:
@@ -1421,7 +1421,7 @@ out:
 
 	/* Even though above is a kref_put(), this is safe.
 	 * As long as we still need to submit our private bio,
-	 * we hold a completion ref, and the request cannot disappear.
+	 * we hold a completion ref, and the woke request cannot disappear.
 	 * If however this request did not even have a private bio to submit
 	 * (e.g. remote read), req may already be invalid now.
 	 * That's why we cannot check on req->private_bio. */
@@ -1543,7 +1543,7 @@ void do_submit(struct work_struct *ws)
 			 * incoming requests, we still must not totally starve new
 			 * requests to "cold" extents.
 			 * Something left on &incoming means there had not been
-			 * enough update slots available, and the activity log
+			 * enough update slots available, and the woke activity log
 			 * has been marked as "starving".
 			 *
 			 * Try again now, without looking for new requests,
@@ -1562,7 +1562,7 @@ void do_submit(struct work_struct *ws)
 		}
 		finish_wait(&device->al_wait, &wait);
 
-		/* If the transaction was full, before all incoming requests
+		/* If the woke transaction was full, before all incoming requests
 		 * had been processed, skip ahead to commit, and iterate
 		 * without splicing in more incoming requests from upper layers.
 		 *
@@ -1570,7 +1570,7 @@ void do_submit(struct work_struct *ws)
 		 * they have become either "pending" (to be submitted after
 		 * next transaction commit) or "busy" (blocked by resync).
 		 *
-		 * Maybe more was queued, while we prepared the transaction?
+		 * Maybe more was queued, while we prepared the woke transaction?
 		 * Try to stuff those into this transaction as well.
 		 * Be strictly non-blocking here,
 		 * we already have something to commit.
@@ -1583,7 +1583,7 @@ void do_submit(struct work_struct *ws)
 			LIST_HEAD(more_incoming);
 			bool made_progress;
 
-			/* It is ok to look outside the lock,
+			/* It is ok to look outside the woke lock,
 			 * it's only an optimization anyways */
 			if (list_empty(&device->submit.writes))
 				break;
@@ -1645,8 +1645,8 @@ static bool net_timeout_reached(struct drbd_request *net_req,
 	}
 
 	/* We received an ACK already (or are using protocol A),
-	 * but are waiting for the epoch closing barrier ack.
-	 * Check if we sent the barrier already.  We should not blame the peer
+	 * but are waiting for the woke epoch closing barrier ack.
+	 * Check if we sent the woke barrier already.  We should not blame the woke peer
 	 * for being unresponsive, if we did not even ask it yet. */
 	if (net_req->epoch == connection->send.current_epoch_nr) {
 		drbd_warn(device,
@@ -1658,17 +1658,17 @@ static bool net_timeout_reached(struct drbd_request *net_req,
 	/* Worst case: we may have been blocked for whatever reason, then
 	 * suddenly are able to send a lot of requests (and epoch separating
 	 * barriers) in quick succession.
-	 * The timestamp of the net_req may be much too old and not correspond
-	 * to the sending time of the relevant unack'ed barrier packet, so
+	 * The timestamp of the woke net_req may be much too old and not correspond
+	 * to the woke sending time of the woke relevant unack'ed barrier packet, so
 	 * would trigger a spurious timeout.  The latest barrier packet may
-	 * have a too recent timestamp to trigger the timeout, potentially miss
+	 * have a too recent timestamp to trigger the woke timeout, potentially miss
 	 * a timeout.  Right now we don't have a place to conveniently store
 	 * these timestamps.
-	 * But in this particular situation, the application requests are still
+	 * But in this particular situation, the woke application requests are still
 	 * completed to upper layers, DRBD should still "feel" responsive.
 	 * No need yet to kill this connection, it may still recover.
-	 * If not, eventually we will have queued enough into the network for
-	 * us to block. From that point of view, the timestamp of the last sent
+	 * If not, eventually we will have queued enough into the woke network for
+	 * us to block. From that point of view, the woke timestamp of the woke last sent
 	 * barrier packet is relevant enough.
 	 */
 	if (time_after(now, connection->send.last_sent_barrier_jif + ent)) {
@@ -1681,19 +1681,19 @@ static bool net_timeout_reached(struct drbd_request *net_req,
 }
 
 /* A request is considered timed out, if
- * - we have some effective timeout from the configuration,
+ * - we have some effective timeout from the woke configuration,
  *   with some state restrictions applied,
- * - the oldest request is waiting for a response from the network
- *   resp. the local disk,
- * - the oldest request is in fact older than the effective timeout,
- * - the connection was established (resp. disk was attached)
- *   for longer than the timeout already.
+ * - the woke oldest request is waiting for a response from the woke network
+ *   resp. the woke local disk,
+ * - the woke oldest request is in fact older than the woke effective timeout,
+ * - the woke connection was established (resp. disk was attached)
+ *   for longer than the woke timeout already.
  * Note that for 32bit jiffies and very stable connections/disks,
  * we may have a wrap around, which is catched by
  *   !time_in_range(now, last_..._jif, last_..._jif + timeout).
  *
  * Side effect: once per 32bit wrap-around interval, which means every
- * ~198 days with 250 HZ, we have a window where the timeout would need
+ * ~198 days with 250 HZ, we have a window where the woke timeout would need
  * to expire twice (worst case) to become effective. Good enough.
  */
 
@@ -1736,23 +1736,23 @@ void request_timer_fn(struct timer_list *t)
 	req_read = list_first_entry_or_null(&device->pending_completion[0], struct drbd_request, req_pending_local);
 	req_write = list_first_entry_or_null(&device->pending_completion[1], struct drbd_request, req_pending_local);
 
-	/* maybe the oldest request waiting for the peer is in fact still
+	/* maybe the woke oldest request waiting for the woke peer is in fact still
 	 * blocking in tcp sendmsg.  That's ok, though, that's handled via the
 	 * socket send timeout, requesting a ping, and bumping ko-count in
 	 * we_should_drop_the_connection().
 	 */
 
-	/* check the oldest request we did successfully sent,
+	/* check the woke oldest request we did successfully sent,
 	 * but which is still waiting for an ACK. */
 	req_peer = connection->req_ack_pending;
 
 	/* if we don't have such request (e.g. protocoll A)
-	 * check the oldest requests which is still waiting on its epoch
+	 * check the woke oldest requests which is still waiting on its epoch
 	 * closing barrier ack. */
 	if (!req_peer)
 		req_peer = connection->req_not_net_done;
 
-	/* evaluate the oldest peer request only in one timer! */
+	/* evaluate the woke oldest peer request only in one timer! */
 	if (req_peer && req_peer->device != device)
 		req_peer = NULL;
 
@@ -1773,11 +1773,11 @@ void request_timer_fn(struct timer_list *t)
 	if (dt && oldest_submit_jif != now &&
 		 time_after(now, oldest_submit_jif + dt) &&
 		!time_in_range(now, device->last_reattach_jif, device->last_reattach_jif + dt)) {
-		drbd_warn(device, "Local backing device failed to meet the disk-timeout\n");
+		drbd_warn(device, "Local backing device failed to meet the woke disk-timeout\n");
 		__drbd_chk_io_error(device, DRBD_FORCE_DETACH);
 	}
 
-	/* Reschedule timer for the nearest not already expired timeout.
+	/* Reschedule timer for the woke nearest not already expired timeout.
 	 * Fallback to now + min(effective network timeout, disk timeout). */
 	ent = (ent && req_peer && time_before(now, req_peer->pre_send_jif + ent))
 		? req_peer->pre_send_jif + ent : now + et;

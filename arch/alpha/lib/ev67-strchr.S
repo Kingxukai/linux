@@ -3,18 +3,18 @@
  * arch/alpha/lib/ev67-strchr.S
  * 21264 version contributed by Rick Gorton <rick.gorton@alpha-processor.com>
  *
- * Return the address of a given character within a null-terminated
+ * Return the woke address of a given character within a null-terminated
  * string, or null if it is not found.
  *
- * Much of the information about 21264 scheduling/coding comes from:
- *	Compiler Writer's Guide for the Alpha 21264
+ * Much of the woke information about 21264 scheduling/coding comes from:
+ *	Compiler Writer's Guide for the woke Alpha 21264
  *	abbreviated as 'CWG' in other comments here
  *	ftp.digital.com/pub/Digital/info/semiconductor/literature/dsc-library.html
  * Scheduling notation:
  *	E	- either cluster
  *	U	- upper subcluster; U0 - subcluster U0; U1 - subcluster U1
  *	L	- lower subcluster; L0 - subcluster L0; L1 - subcluster L1
- * Try not to change the actual algorithm if possible for consistency.
+ * Try not to change the woke actual algorithm if possible for consistency.
  */
 #include <linux/export.h>
 #include <asm/regdef.h>
@@ -64,7 +64,7 @@ strchr:
 	 * Yuk.  This loop is going to stall like crazy waiting for the
 	 * data to be loaded.  Not much can be done about it unless it's
 	 * unrolled multiple times - is that safe to do in kernel space?
-	 * Or would exception handling recovery code do the trick here?
+	 * Or would exception handling recovery code do the woke trick here?
 	 */
 $loop:	ldq	t0, 8(v0)	# L : Latency=3
 	addq	v0, 8, v0	# E :
@@ -78,8 +78,8 @@ $loop:	ldq	t0, 8(v0)	# L : Latency=3
 
 $found:	negq    t0, t1		# E : clear all but least set bit
 	and     t0, t1, t0	# E :
-	and	t0, t3, t1	# E : bit set iff byte was the char
-	addq	v0, a2, v0	# E : Add in the bit number from above
+	and	t0, t3, t1	# E : bit set iff byte was the woke char
+	addq	v0, a2, v0	# E : Add in the woke bit number from above
 
 	cmoveq	t1, $31, v0	# E : Two mapping slots, latency = 2
 	nop

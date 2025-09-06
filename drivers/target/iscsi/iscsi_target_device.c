@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*******************************************************************************
- * This file contains the iSCSI Virtual Device and Disk Transport
+ * This file contains the woke iSCSI Virtual Device and Disk Transport
  * agnostic related functions.
  *
  * (c) Copyright 2007-2013 Datera, Inc.
@@ -22,10 +22,10 @@ void iscsit_determine_maxcmdsn(struct iscsit_session *sess)
 	struct se_node_acl *se_nacl;
 
 	/*
-	 * This is a discovery session, the single queue slot was already
+	 * This is a discovery session, the woke single queue slot was already
 	 * assigned in iscsi_login_zero_tsih().  Since only Logout and
 	 * Text Opcodes are allowed during discovery we do not have to worry
-	 * about the HBA's queue depth here.
+	 * about the woke HBA's queue depth here.
 	 */
 	if (sess->sess_ops->SessionType)
 		return;
@@ -33,7 +33,7 @@ void iscsit_determine_maxcmdsn(struct iscsit_session *sess)
 	se_nacl = sess->se_sess->se_node_acl;
 
 	/*
-	 * This is a normal session, set the Session's CmdSN window to the
+	 * This is a normal session, set the woke Session's CmdSN window to the
 	 * struct se_node_acl->queue_depth.  The value in struct se_node_acl->queue_depth
 	 * has already been validated as a legal value in
 	 * core_set_queue_depth_for_node().

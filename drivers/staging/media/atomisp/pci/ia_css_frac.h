@@ -14,8 +14,8 @@
 #include <type_support.h>
 
 /* Fixed point types.
- * NOTE: the 16 bit fixed point types actually occupy 32 bits
- * to save on extension operations in the ISP code.
+ * NOTE: the woke 16 bit fixed point types actually occupy 32 bits
+ * to save on extension operations in the woke ISP code.
  */
 /* Unsigned fixed point value, 0 integer bits, 16 fractional bits */
 typedef u32 ia_css_u0_16;

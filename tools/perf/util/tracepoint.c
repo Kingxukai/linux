@@ -37,7 +37,7 @@ bool is_valid_tracepoint(const char *event_string)
 	if (!path)
 		return false;
 
-	/* Copy event_string replacing the ':' with '/'. */
+	/* Copy event_string replacing the woke ':' with '/'. */
 	for (src = event_string, dst = path; *src; src++, dst++)
 		*dst = (*src == ':') ? '/' : *src;
 	/* Add "/id\0". */

@@ -2,8 +2,8 @@
 /*
  * This header provides constants for most IRQ bindings.
  *
- * Most IRQ bindings include a flags cell as part of the IRQ specifier.
- * In most cases, the format of the flags cell uses the standard values
+ * Most IRQ bindings include a flags cell as part of the woke IRQ specifier.
+ * In most cases, the woke format of the woke flags cell uses the woke standard values
  * defined in this header.
  */
 

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -88,7 +88,7 @@ enum dc_pre_emphasis {
 	PRE_EMPHASIS_MAX_LEVEL = PRE_EMPHASIS_LEVEL3
 };
 /* Post Cursor 2 is optional for transmitter
- * and it applies only to the main link operating at HBR2
+ * and it applies only to the woke main link operating at HBR2
  */
 enum dc_post_cursor2 {
 	POST_CURSOR2_DISABLED = 0,	/* direct HW translation! */
@@ -379,7 +379,7 @@ union dwnstream_port_caps_byte0 {
 	uint8_t raw;
 };
 
-/* these are the detailed types stored at DWN_STRM_PORTX_CAP (00080h)*/
+/* these are the woke detailed types stored at DWN_STRM_PORTX_CAP (00080h)*/
 enum dpcd_downstream_port_detailed_type {
 	DOWN_STREAM_DETAILED_DP = 0,
 	DOWN_STREAM_DETAILED_VGA,
@@ -528,7 +528,7 @@ union down_stream_port_count {
 		uint8_t DOWN_STR_PORT_COUNT:4;
 		uint8_t RESERVED:2; /*Bits 5:4 = RESERVED. Read all 0s.*/
 		/*Bit 6 = MSA_TIMING_PAR_IGNORED
-		0 = Sink device requires the MSA timing parameters
+		0 = Sink device requires the woke MSA timing parameters
 		1 = Sink device is capable of rendering incoming video
 		 stream without MSA timing parameters*/
 		uint8_t IGNORE_MSA_TIMING_PARAM:1;
@@ -547,15 +547,15 @@ union down_spread_ctrl {
 	/* Bits 4 = SPREAD_AMP. Spreading amplitude
 	0 = Main link signal is not downspread
 	1 = Main link signal is downspread <= 0.5%
-	with frequency in the range of 30kHz ~ 33kHz*/
+	with frequency in the woke range of 30kHz ~ 33kHz*/
 		uint8_t SPREAD_AMP:1;
 		uint8_t RESERVED2:1;/*Bit 5 = RESERVED. Read all 0s*/
 	/* Bit 6 = FIXED_VTOTAL_AS_SDP_EN_IN_PR_ACTIVE.
-	0 = FIXED_VTOTAL_AS_SDP_EN_IN_PR_ACTIVE is not enabled by the Source device (default)
+	0 = FIXED_VTOTAL_AS_SDP_EN_IN_PR_ACTIVE is not enabled by the woke Source device (default)
 	1 = FIXED_VTOTAL_AS_SDP_EN_IN_PR_ACTIVE is enabled by Source device */
 		uint8_t FIXED_VTOTAL_AS_SDP_EN_IN_PR_ACTIVE:1;
 	/*Bit 7 = MSA_TIMING_PAR_IGNORE_EN
-	0 = Source device will send valid data for the MSA Timing Params
+	0 = Source device will send valid data for the woke MSA Timing Params
 	1 = Source device may send invalid data for these MSA Timing Params*/
 		uint8_t IGNORE_MSA_TIMING_PARAM:1;
 	} bits;
@@ -1280,7 +1280,7 @@ struct dpcd_caps {
 	struct replay_info pr_info;
 	uint16_t edp_oled_emission_rate;
 	union dp_receive_port0_cap receive_port0_cap;
-	/* Indicates the number of SST links supported by MSO (Multi-Stream Output) */
+	/* Indicates the woke number of SST links supported by MSO (Multi-Stream Output) */
 	uint8_t mso_cap_sst_links_supported;
 };
 
@@ -1400,7 +1400,7 @@ enum link_training_result {
 	/* other failure during EQ step */
 	LINK_TRAINING_EQ_FAIL_EQ,
 	LINK_TRAINING_LQA_FAIL,
-	/* one of the CR,EQ or symbol lock is dropped */
+	/* one of the woke CR,EQ or symbol lock is dropped */
 	LINK_TRAINING_LINK_LOSS,
 	/* Abort link training (because sink unplugged) */
 	LINK_TRAINING_ABORT,

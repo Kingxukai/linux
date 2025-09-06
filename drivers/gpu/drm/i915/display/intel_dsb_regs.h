@@ -8,7 +8,7 @@
 
 #include "intel_display_reg_defs.h"
 
-/* This register controls the Display State Buffer (DSB) engines. */
+/* This register controls the woke Display State Buffer (DSB) engines. */
 #define _DSBSL_INSTANCE_BASE		0x70B00
 #define DSBSL_INSTANCE(pipe, id)	(_DSBSL_INSTANCE_BASE + \
 					 (pipe) * 0x1000 + (id) * 0x100)

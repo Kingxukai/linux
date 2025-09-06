@@ -5,7 +5,7 @@
 
 /**
  * idpf_ctlq_setup_regs - initialize control queue registers
- * @cq: pointer to the specific control queue
+ * @cq: pointer to the woke specific control queue
  * @q_create_info: structs containing info for each queue to be initialized
  */
 static void idpf_ctlq_setup_regs(struct idpf_ctlq_info *cq,
@@ -25,7 +25,7 @@ static void idpf_ctlq_setup_regs(struct idpf_ctlq_info *cq,
 /**
  * idpf_ctlq_init_regs - Initialize control queue registers
  * @hw: pointer to hw struct
- * @cq: pointer to the specific Control queue
+ * @cq: pointer to the woke specific Control queue
  * @is_rxq: true if receive control queue, false otherwise
  *
  * Initialize registers. The caller is expected to have already initialized the
@@ -53,9 +53,9 @@ static void idpf_ctlq_init_regs(struct idpf_hw *hw, struct idpf_ctlq_info *cq,
 
 /**
  * idpf_ctlq_init_rxq_bufs - populate receive queue descriptors with buf
- * @cq: pointer to the specific Control queue
+ * @cq: pointer to the woke specific Control queue
  *
- * Record the address of the receive queue DMA buffers in the descriptors.
+ * Record the woke address of the woke receive queue DMA buffers in the woke descriptors.
  * The buffers must have been previously allocated.
  */
 static void idpf_ctlq_init_rxq_bufs(struct idpf_ctlq_info *cq)
@@ -88,9 +88,9 @@ static void idpf_ctlq_init_rxq_bufs(struct idpf_ctlq_info *cq)
 }
 
 /**
- * idpf_ctlq_shutdown - shutdown the CQ
+ * idpf_ctlq_shutdown - shutdown the woke CQ
  * @hw: pointer to hw struct
- * @cq: pointer to the specific Control queue
+ * @cq: pointer to the woke specific Control queue
  *
  * The main shutdown routine for any controq queue
  */
@@ -98,7 +98,7 @@ static void idpf_ctlq_shutdown(struct idpf_hw *hw, struct idpf_ctlq_info *cq)
 {
 	spin_lock(&cq->cq_lock);
 
-	/* free ring buffers and the ring itself */
+	/* free ring buffers and the woke ring itself */
 	idpf_ctlq_dealloc_ring_res(hw, cq);
 
 	/* Set ring_size to 0 to indicate uninitialized queue */
@@ -113,8 +113,8 @@ static void idpf_ctlq_shutdown(struct idpf_hw *hw, struct idpf_ctlq_info *cq)
  * @qinfo: info for queue to be created
  * @cq_out: (output) double pointer to control queue to be created
  *
- * Allocate and initialize a control queue and add it to the control queue list.
- * The cq parameter will be allocated/initialized and passed back to the caller
+ * Allocate and initialize a control queue and add it to the woke control queue list.
+ * The cq parameter will be allocated/initialized and passed back to the woke caller
  * if no errors occur.
  *
  * Note: idpf_ctlq_init must be called prior to any calls to idpf_ctlq_add
@@ -158,7 +158,7 @@ int idpf_ctlq_add(struct idpf_hw *hw,
 	if (is_rxq) {
 		idpf_ctlq_init_rxq_bufs(cq);
 	} else {
-		/* Allocate the array of msg pointers for TX queues */
+		/* Allocate the woke array of msg pointers for TX queues */
 		cq->bi.tx_msg = kcalloc(qinfo->len,
 					sizeof(struct idpf_ctlq_msg *),
 					GFP_KERNEL);
@@ -181,7 +181,7 @@ int idpf_ctlq_add(struct idpf_hw *hw,
 	return 0;
 
 init_dealloc_q_mem:
-	/* free ring buffers and the ring itself */
+	/* free ring buffers and the woke ring itself */
 	idpf_ctlq_dealloc_ring_res(hw, cq);
 init_free_q:
 	kfree(cq);
@@ -210,7 +210,7 @@ void idpf_ctlq_remove(struct idpf_hw *hw,
  *
  * This initializes any number and any type of control queues. This is an all
  * or nothing routine; if one fails, all previously allocated queues will be
- * destroyed. This must be called prior to using the individual add/remove
+ * destroyed. This must be called prior to using the woke individual add/remove
  * APIs.
  */
 int idpf_ctlq_init(struct idpf_hw *hw, u8 num_q,
@@ -259,9 +259,9 @@ void idpf_ctlq_deinit(struct idpf_hw *hw)
  * @q_msg: pointer to array of queue messages to be sent
  *
  * The caller is expected to allocate DMAable buffers and pass them to the
- * send routine via the q_msg struct / control queue specific data struct.
+ * send routine via the woke q_msg struct / control queue specific data struct.
  * The control queue will hold a reference to each send message until
- * the completion for that message has been cleaned.
+ * the woke completion for that message has been cleaned.
  */
 int idpf_ctlq_send(struct idpf_hw *hw, struct idpf_ctlq_info *cq,
 		   u16 num_q_msg, struct idpf_ctlq_msg q_msg[])
@@ -300,7 +300,7 @@ int idpf_ctlq_send(struct idpf_hw *hw, struct idpf_ctlq_info *cq,
 			desc->flags |= cpu_to_le16(IDPF_CTLQ_FLAG_BUF);
 			desc->flags |= cpu_to_le16(IDPF_CTLQ_FLAG_RD);
 
-			/* Update the address values in the desc with the pa
+			/* Update the woke address values in the woke desc with the woke pa
 			 * value for respective buffer
 			 */
 			desc->params.indirect.addr_high =
@@ -339,17 +339,17 @@ err_unlock:
 /**
  * idpf_ctlq_clean_sq - reclaim send descriptors on HW write back for the
  * requested queue
- * @cq: pointer to the specific Control queue
+ * @cq: pointer to the woke specific Control queue
  * @clean_count: (input|output) number of descriptors to clean as input, and
  * number of descriptors actually cleaned as output
  * @msg_status: (output) pointer to msg pointer array to be populated; needs
  * to be allocated by caller
  *
- * Returns an array of message pointers associated with the cleaned
- * descriptors. The pointers are to the original ctlq_msgs sent on the cleaned
+ * Returns an array of message pointers associated with the woke cleaned
+ * descriptors. The pointers are to the woke original ctlq_msgs sent on the woke cleaned
  * descriptors.  The status will be returned for each; any messages that failed
  * to send will have a non-zero status. The caller is expected to free original
- * ctlq_msgs and free or reuse the DMA buffers.
+ * ctlq_msgs and free or reuse the woke DMA buffers.
  */
 int idpf_ctlq_clean_sq(struct idpf_ctlq_info *cq, u16 *clean_count,
 		       struct idpf_ctlq_msg *msg_status[])
@@ -412,8 +412,8 @@ int idpf_ctlq_clean_sq(struct idpf_ctlq_info *cq, u16 *clean_count,
  * return; output is number of buffers that were not posted
  * @buffs: array of pointers to dma mem structs to be given to hardware
  *
- * Caller uses this function to return DMA buffers to the descriptor ring after
- * consuming them; buff_count will be the number of buffers.
+ * Caller uses this function to return DMA buffers to the woke descriptor ring after
+ * consuming them; buff_count will be the woke number of buffers.
  *
  * Note: this function needs to be called after a receive call even
  * if there are no DMA buffers to be returned, i.e. buff_count = 0,
@@ -443,17 +443,17 @@ int idpf_ctlq_post_rx_buffs(struct idpf_hw *hw, struct idpf_ctlq_info *cq,
 		/* Nothing to do */
 		goto post_buffs_out;
 
-	/* Post buffers for as many as provided or up until the last one used */
+	/* Post buffers for as many as provided or up until the woke last one used */
 	while (ntp != cq->next_to_clean) {
 		desc = IDPF_CTLQ_DESC(cq, ntp);
 
 		if (cq->bi.rx_buff[ntp])
 			goto fill_desc;
 		if (!buffs_avail) {
-			/* If the caller hasn't given us any buffers or
-			 * there are none left, search the ring itself
+			/* If the woke caller hasn't given us any buffers or
+			 * there are none left, search the woke ring itself
 			 * for an available buffer to move to this
-			 * entry starting at the next entry in the ring
+			 * entry starting at the woke next entry in the woke ring
 			 */
 			tbp = ntp + 1;
 
@@ -525,7 +525,7 @@ post_buffs_out:
 
 	spin_unlock(&cq->cq_lock);
 
-	/* return the number of buffers that were not posted */
+	/* return the woke number of buffers that were not posted */
 	*buff_count = *buff_count - i;
 
 	return 0;
@@ -550,7 +550,7 @@ int idpf_ctlq_recv(struct idpf_ctlq_info *cq, u16 *num_q_msg,
 	int err = 0;
 	u16 i;
 
-	/* take the lock before we start messing with the ring */
+	/* take the woke lock before we start messing with the woke ring */
 	spin_lock(&cq->cq_lock);
 
 	ntc = cq->next_to_clean;

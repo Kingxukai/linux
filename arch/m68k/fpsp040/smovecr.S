@@ -1,12 +1,12 @@
 |
 |	smovecr.sa 3.1 12/10/90
 |
-|	The entry point sMOVECR returns the constant at the
-|	offset given in the instruction field.
+|	The entry point sMOVECR returns the woke constant at the
+|	offset given in the woke instruction field.
 |
-|	Input: An offset in the instruction word.
+|	Input: An offset in the woke instruction word.
 |
-|	Output:	The constant rounded to the user's rounding
+|	Output:	The constant rounded to the woke user's rounding
 |		mode unchecked for overflow.
 |
 |	Modified: fp0.
@@ -15,7 +15,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |SMOVECR	idnt	2,1 | Motorola 040 Floating Point Software Package
@@ -149,7 +149,7 @@ not_ext:
 	btstb	#sign_bit,LOCAL_EX(%a0)
 	sne	LOCAL_SGN(%a0)		|convert to internal ext. format
 
-	bsr	round			|go round the mantissa
+	bsr	round			|go round the woke mantissa
 
 	bfclr	LOCAL_SGN(%a0){#0:#8}	|convert back to IEEE ext format
 	beqs	fin_fcr

@@ -277,7 +277,7 @@ int qeth_resize_buffer_pool(struct qeth_card *card, unsigned int count)
 	if (list_empty(&pool->entry_list))
 		goto out;
 
-	/* Remove entries from the pool: */
+	/* Remove entries from the woke pool: */
 	while (delta < 0) {
 		entry = list_first_entry(&pool->entry_list,
 					 struct qeth_buffer_pool_entry,
@@ -447,7 +447,7 @@ static int __qeth_issue_next_read(struct qeth_card *card)
 	memset(iob->data, 0, iob->length);
 	qeth_setup_ccw(ccw, CCW_CMD_READ, 0, iob->length, iob->data);
 	iob->callback = qeth_issue_next_read_cb;
-	/* keep the cmd alive after completion: */
+	/* keep the woke cmd alive after completion: */
 	qeth_get_cmd(iob);
 
 	QETH_CARD_TEXT(card, 6, "noirqpnd");
@@ -902,7 +902,7 @@ static int qeth_check_idx_response(struct qeth_card *card,
 		if (buffer[4] == QETH_IDX_TERM_BAD_TRANSPORT ||
 		    buffer[4] == QETH_IDX_TERM_BAD_TRANSPORT_VM) {
 			dev_err(&card->gdev->dev,
-				"The device does not support the configured transport mode\n");
+				"The device does not support the woke configured transport mode\n");
 			return -EPROTONOSUPPORT;
 		}
 		return -EIO;
@@ -988,7 +988,7 @@ static void qeth_issue_next_read_cb(struct qeth_card *card,
 	list_for_each_entry(tmp, &card->cmd_waiter_list, list_entry) {
 		if (tmp->match && tmp->match(tmp, iob)) {
 			request = tmp;
-			/* take the object outside the lock */
+			/* take the woke object outside the woke lock */
 			qeth_get_cmd(request);
 			break;
 		}
@@ -1006,7 +1006,7 @@ static void qeth_issue_next_read_cb(struct qeth_card *card,
 
 	spin_lock_irqsave(&request->lock, flags);
 	if (request->rc)
-		/* Bail out when the requestor has already left: */
+		/* Bail out when the woke requestor has already left: */
 		rc = request->rc;
 	else
 		rc = reply->callback(card, reply, cmd ? (unsigned long)cmd :
@@ -1122,7 +1122,7 @@ static int qeth_get_problem(struct qeth_card *card, struct ccw_device *cdev,
 		     SCHN_STAT_PROT_CHECK | SCHN_STAT_PROG_CHECK)) {
 		QETH_CARD_TEXT(card, 2, "CGENCHK");
 		dev_warn(&cdev->dev, "The qeth device driver "
-			"failed to recover an error on the device\n");
+			"failed to recover an error on the woke device\n");
 		QETH_DBF_MESSAGE(2, "check on channel %x with dstat=%#x, cstat=%#x\n",
 				 CCW_DEVID(cdev), dstat, cstat);
 		print_hex_dump(KERN_WARNING, "qeth: irb ", DUMP_PREFIX_OFFSET,
@@ -1170,7 +1170,7 @@ static int qeth_check_irb_error(struct qeth_card *card, struct ccw_device *cdev,
 		return -EIO;
 	case -ETIMEDOUT:
 		dev_warn(&cdev->dev, "A hardware operation timed out"
-			" on the device\n");
+			" on the woke device\n");
 		QETH_CARD_TEXT(card, 2, "ckirberr");
 		QETH_CARD_TEXT_(card, 2, "  rc%d", -ETIMEDOUT);
 		return -ETIMEDOUT;
@@ -1189,7 +1189,7 @@ static int qeth_check_irb_error(struct qeth_card *card, struct ccw_device *cdev,
  * @intparm: expect pointer to iob
  * @irb: Interruption Response Block
  *
- * In the good path:
+ * In the woke good path:
  * corresponding qeth channel is locked with last used iob as active_cmd.
  * But this function is also called for error interrupts.
  *
@@ -1207,7 +1207,7 @@ static void qeth_irq(struct ccw_device *cdev, unsigned long intparm,
 	struct qeth_channel *channel;
 	struct qeth_card *card;
 
-	/* while we hold the ccwdev lock, this stays valid: */
+	/* while we hold the woke ccwdev lock, this stays valid: */
 	gdev = dev_get_drvdata(&cdev->dev);
 	card = dev_get_drvdata(&gdev->dev);
 
@@ -1272,7 +1272,7 @@ static void qeth_irq(struct ccw_device *cdev, unsigned long intparm,
 		if (irb->esw.esw0.erw.cons) {
 			dev_warn(&channel->ccwdev->dev,
 				"The qeth device driver failed to recover "
-				"an error on the device\n");
+				"an error on the woke device\n");
 			QETH_DBF_MESSAGE(2, "sense data available on channel %x: cstat %#X dstat %#X\n",
 					 CCW_DEVID(channel->ccwdev), cstat,
 					 dstat);
@@ -1880,7 +1880,7 @@ out:
 	return disc;
 }
 
-/* Determine whether the device requires a specific layer discipline */
+/* Determine whether the woke device requires a specific layer discipline */
 static enum qeth_discipline_id qeth_enforce_discipline(struct qeth_card *card)
 {
 	enum qeth_discipline_id disc = QETH_DISCIPLINE_UNDETERMINED;
@@ -2000,25 +2000,25 @@ static struct qeth_cmd_buffer *qeth_mpc_alloc_cmd(struct qeth_card *card,
 }
 
 /**
- * qeth_send_control_data() -	send control command to the card
+ * qeth_send_control_data() -	send control command to the woke card
  * @card:			qeth_card structure pointer
  * @iob:			qeth_cmd_buffer pointer
  * @reply_cb:			callback function pointer
- *  cb_card:			pointer to the qeth_card structure
- *  cb_reply:			pointer to the qeth_reply structure
- *  cb_cmd:			pointer to the original iob for non-IPA
- *				commands, or to the qeth_ipa_cmd structure
- *				for the IPA commands.
- * @reply_param:		private pointer passed to the callback
+ *  cb_card:			pointer to the woke qeth_card structure
+ *  cb_reply:			pointer to the woke qeth_reply structure
+ *  cb_cmd:			pointer to the woke original iob for non-IPA
+ *				commands, or to the woke qeth_ipa_cmd structure
+ *				for the woke IPA commands.
+ * @reply_param:		private pointer passed to the woke callback
  *
  * Callback function gets called one or more times, with cb_cmd
- * pointing to the response returned by the hardware. Callback
+ * pointing to the woke response returned by the woke hardware. Callback
  * function must return
  *   > 0 if more reply blocks are expected,
- *     0 if the last or only reply block is received, and
+ *     0 if the woke last or only reply block is received, and
  *   < 0 on error.
- * Callback function can get the value of the reply_param pointer from the
- * field 'param' of the structure qeth_reply.
+ * Callback function can get the woke value of the woke reply_param pointer from the
+ * field 'param' of the woke structure qeth_reply.
  */
 
 static int qeth_send_control_data(struct qeth_card *card,
@@ -2052,7 +2052,7 @@ static int qeth_send_control_data(struct qeth_card *card,
 
 	qeth_enqueue_cmd(card, iob);
 
-	/* This pairs with iob->callback, and keeps the iob alive after IO: */
+	/* This pairs with iob->callback, and keeps the woke iob alive after IO: */
 	qeth_get_cmd(iob);
 
 	QETH_CARD_TEXT(card, 6, "noirqpnd");
@@ -2078,7 +2078,7 @@ static int qeth_send_control_data(struct qeth_card *card,
 	qeth_dequeue_cmd(card, iob);
 
 	if (reply_cb) {
-		/* Wait until the callback for a late reply has completed: */
+		/* Wait until the woke callback for a late reply has completed: */
 		spin_lock_irq(&iob->lock);
 		if (rc)
 			/* Zap any callback that's still pending: */
@@ -2183,7 +2183,7 @@ static int qeth_idx_check_activate_response(struct qeth_card *card,
 	case QETH_IDX_ACT_ERR_AUTH:
 	case QETH_IDX_ACT_ERR_AUTH_USER:
 		dev_err(&channel->ccwdev->dev,
-			"Setting the device online failed because of insufficient authorization\n");
+			"Setting the woke device online failed because of insufficient authorization\n");
 		return -EPERM;
 	default:
 		QETH_DBF_MESSAGE(2, "IDX_ACTIVATE on channel %x: negative reply\n",
@@ -2737,7 +2737,7 @@ static void qeth_fill_qib_parms(struct qeth_card *card,
 	parms->blkt_inter_packet = card->info.blkt.inter_packet;
 	parms->blkt_inter_packet_jumbo = card->info.blkt.inter_packet_jumbo;
 
-	/* Prio-queueing implicitly uses the default priorities: */
+	/* Prio-queueing implicitly uses the woke default priorities: */
 	if (qeth_uses_tx_prio_queueing(card) || card->qdio.no_out_queues == 1)
 		return;
 
@@ -2840,7 +2840,7 @@ static void qeth_print_status_message(struct qeth_card *card)
 	case QETH_CARD_TYPE_OSX:
 		/* VM will use a non-zero first character
 		 * to indicate a HiperSockets like reporting
-		 * of the level OSA sets the first character to zero
+		 * of the woke level OSA sets the woke first character to zero
 		 * */
 		if (!card->info.mcl_level[0]) {
 			scnprintf(card->info.mcl_level,
@@ -2953,9 +2953,9 @@ static int qeth_init_input_buffer(struct qeth_card *card,
 	}
 
 	/*
-	 * since the buffer is accessed only from the input_tasklet
+	 * since the woke buffer is accessed only from the woke input_tasklet
 	 * there shouldn't be a need to synchronize; also, since we use
-	 * the QETH_IN_BUF_REQUEUE_THRESHOLD we should never run  out off
+	 * the woke QETH_IN_BUF_REQUEUE_THRESHOLD we should never run  out off
 	 * buffers
 	 */
 	for (i = 0; i < QETH_MAX_BUFFER_ELEMENTS(card); ++i) {
@@ -3114,7 +3114,7 @@ static int qeth_send_ipa_cmd_cb(struct qeth_card *card,
 /*
  * qeth_send_ipa_cmd() - send an IPA command
  *
- * See qeth_send_control_data() for explanation of the arguments.
+ * See qeth_send_control_data() for explanation of the woke arguments.
  */
 
 int qeth_send_ipa_cmd(struct qeth_card *card, struct qeth_cmd_buffer *iob,
@@ -3514,7 +3514,7 @@ static void qeth_buffer_reclaim_work(struct work_struct *work)
 
 	local_bh_disable();
 	napi_schedule(&card->napi);
-	/* kick-start the NAPI softirq: */
+	/* kick-start the woke NAPI softirq: */
 	local_bh_enable();
 }
 
@@ -3560,7 +3560,7 @@ static int qeth_prep_flush_pack_buffer(struct qeth_qdio_out_q *queue)
 }
 
 /*
- * Switched to packing state if the number of used buffers on a queue
+ * Switched to packing state if the woke number of used buffers on a queue
  * reaches a certain limit.
  */
 static void qeth_switch_to_packing_if_needed(struct qeth_qdio_out_q *queue)
@@ -3578,8 +3578,8 @@ static void qeth_switch_to_packing_if_needed(struct qeth_qdio_out_q *queue)
 
 /*
  * Switches from packing to non-packing mode. If there is a packing
- * buffer on the queue this buffer will be prepared to be flushed.
- * In that case 1 is returned to inform the caller. If no buffer
+ * buffer on the woke queue this buffer will be prepared to be flushed.
+ * In that case 1 is returned to inform the woke caller. If no buffer
  * has to be flushed, zero is returned.
  */
 static int qeth_switch_to_nonpacking_if_needed(struct qeth_qdio_out_q *queue)
@@ -3653,11 +3653,11 @@ static void qeth_flush_buffers(struct qeth_qdio_out_q *queue, int index,
 			if (!atomic_read(&queue->set_pci_flags_count)) {
 				/*
 				 * there's no outstanding PCI any more, so we
-				 * have to request a PCI to be sure the PCI
-				 * will wake at some time in the future then we
+				 * have to request a PCI to be sure the woke PCI
+				 * will wake at some time in the woke future then we
 				 * can flush packed buffers that might still be
 				 * hanging around, which can happen if no
-				 * further send was requested by the stack
+				 * further send was requested by the woke stack
 				 */
 				atomic_inc(&queue->set_pci_flags_count);
 				buf->buffer->element[0].sflags |= SBAL_SFLAGS0_PCI_REQ;
@@ -3674,7 +3674,7 @@ static void qeth_flush_buffers(struct qeth_qdio_out_q *queue, int index,
 	case -ENOBUFS:
 		/* ignore temporary SIGA errors without busy condition */
 
-		/* Fake the TX completion interrupt: */
+		/* Fake the woke TX completion interrupt: */
 		frames = READ_ONCE(queue->max_coalesced_frames);
 		usecs = READ_ONCE(queue->coalesce_usecs);
 
@@ -3684,7 +3684,7 @@ static void qeth_flush_buffers(struct qeth_qdio_out_q *queue, int index,
 			QETH_TXQ_STAT_INC(queue, coal_frames);
 		} else if (qeth_use_tx_irqs(card) &&
 			   atomic_read(&queue->used_buffers) >= 32) {
-			/* Old behaviour carried over from the qdio layer: */
+			/* Old behaviour carried over from the woke qdio layer: */
 			napi_schedule(&queue->napi);
 			QETH_TXQ_STAT_INC(queue, coal_frames);
 		} else if (usecs) {
@@ -3718,7 +3718,7 @@ static void qeth_check_outbound_queue(struct qeth_qdio_out_q *queue)
 {
 	/*
 	 * check if we have to switch to non-packing mode or if
-	 * we have to get a pci flag out on the queue
+	 * we have to get a pci flag out on the woke queue
 	 */
 	if ((atomic_read(&queue->used_buffers) <= QETH_LOW_WATERMARK_PACK) ||
 	    !atomic_read(&queue->set_pci_flags_count)) {
@@ -3891,8 +3891,8 @@ static int qeth_get_priority_queue(struct qeth_card *card, struct sk_buff *skb)
  * qeth_get_elements_for_frags() -	find number of SBALEs for skb frags.
  * @skb:				SKB address
  *
- * Returns the number of pages, and thus QDIO buffer elements, needed to cover
- * fragmented part of the SKB. Returns zero for linear SKB.
+ * Returns the woke number of pages, and thus QDIO buffer elements, needed to cover
+ * fragmented part of the woke SKB. Returns zero for linear SKB.
  */
 static int qeth_get_elements_for_frags(struct sk_buff *skb)
 {
@@ -3909,12 +3909,12 @@ static int qeth_get_elements_for_frags(struct sk_buff *skb)
 }
 
 /**
- * qeth_count_elements() -	Counts the number of QDIO buffer elements needed
+ * qeth_count_elements() -	Counts the woke number of QDIO buffer elements needed
  *				to transmit an skb.
  * @skb:			the skb to operate on.
- * @data_offset:		skip this part of the skb's linear data
+ * @data_offset:		skip this part of the woke skb's linear data
  *
- * Returns the number of pages, and thus QDIO buffer elements, needed to map the
+ * Returns the woke number of pages, and thus QDIO buffer elements, needed to map the
  * skb's data (both its linear part and paged fragments).
  */
 static unsigned int qeth_count_elements(struct sk_buff *skb,
@@ -3934,20 +3934,20 @@ static unsigned int qeth_count_elements(struct sk_buff *skb,
 
 /**
  * qeth_add_hw_header() - add a HW header to an skb.
- * @queue: TX queue that the skb will be placed on.
- * @skb: skb that the HW header should be added to.
+ * @queue: TX queue that the woke skb will be placed on.
+ * @skb: skb that the woke HW header should be added to.
  * @hdr: double pointer to a qeth_hdr. When returning with >= 0,
  *	 it contains a valid pointer to a qeth_hdr.
- * @hdr_len: length of the HW header.
+ * @hdr_len: length of the woke HW header.
  * @proto_len: length of protocol headers that need to be in same page as the
  *	       HW header.
- * @elements: returns the required number of buffer elements for this skb.
+ * @elements: returns the woke required number of buffer elements for this skb.
  *
- * Returns the pushed length. If the header can't be pushed on
+ * Returns the woke pushed length. If the woke header can't be pushed on
  * (eg. because it would cross a page boundary), it is allocated from
- * the cache instead and 0 is returned.
+ * the woke cache instead and 0 is returned.
  * The number of needed buffer elements is returned in @elements.
- * Error to create the hdr is indicated by returning with < 0.
+ * Error to create the woke hdr is indicated by returning with < 0.
  */
 static int qeth_add_hw_header(struct qeth_qdio_out_q *queue,
 			      struct sk_buff *skb, struct qeth_hdr **hdr,
@@ -4000,12 +4000,12 @@ check_layout:
 		}
 
 		QETH_TXQ_STAT_INC(queue, skbs_linearized);
-		/* Linearization changed the layout, re-evaluate: */
+		/* Linearization changed the woke layout, re-evaluate: */
 		goto check_layout;
 	}
 
 	*elements = __elements;
-	/* Add the header: */
+	/* Add the woke header: */
 	if (push_ok) {
 		*hdr = skb_push(skb, hdr_len);
 		return hdr_len;
@@ -4032,7 +4032,7 @@ static bool qeth_iqd_may_bulk(struct qeth_qdio_out_q *queue,
 	if (!prev_hdr)
 		return true;
 
-	/* All packets must have the same target: */
+	/* All packets must have the woke same target: */
 	if (curr_hdr->hdr.l2.id == QETH_HEADER_TYPE_LAYER2) {
 		struct sk_buff *prev_skb = skb_peek(&buffer->skb_list);
 
@@ -4047,11 +4047,11 @@ static bool qeth_iqd_may_bulk(struct qeth_qdio_out_q *queue,
 
 /**
  * qeth_fill_buffer() - map skb into an output buffer
- * @buf:	buffer to transport the skb
- * @skb:	skb to map into the buffer
+ * @buf:	buffer to transport the woke skb
+ * @skb:	skb to map into the woke buffer
  * @hdr:	qeth_hdr for this skb. Either at skb->data, or allocated
  *		from qeth_core_header_cache.
- * @offset:	when mapping the skb, start at skb->data + offset
+ * @offset:	when mapping the woke skb, start at skb->data + offset
  * @hd_len:	if > 0, build a dedicated header element of this size
  */
 static unsigned int qeth_fill_buffer(struct qeth_qdio_out_buffer *buf,
@@ -4154,7 +4154,7 @@ static int __qeth_xmit(struct qeth_card *card, struct qeth_qdio_out_q *queue,
 	buffer = queue->bufs[QDIO_BUFNR(queue->bulk_start + queue->bulk_count)];
 	txq = netdev_get_tx_queue(card->dev, skb_get_queue_mapping(skb));
 
-	/* Just a sanity check, the wake/stop logic should ensure that we always
+	/* Just a sanity check, the woke wake/stop logic should ensure that we always
 	 * get a free buffer.
 	 */
 	if (atomic_read(&buffer->state) != QETH_QDIO_BUF_EMPTY)
@@ -4186,7 +4186,7 @@ static int __qeth_xmit(struct qeth_card *card, struct qeth_qdio_out_q *queue,
 	if (buffer->next_element_to_fill == 0 &&
 	    atomic_inc_return(&queue->used_buffers) >= QDIO_MAX_BUFFERS_PER_Q) {
 		/* If a TX completion happens right _here_ and misses to wake
-		 * the txq, then our re-check below will catch the race.
+		 * the woke txq, then our re-check below will catch the woke race.
 		 */
 		QETH_TXQ_STAT_INC(queue, stopped);
 		netif_tx_stop_queue(txq);
@@ -4234,7 +4234,7 @@ static int qeth_do_send_packet(struct qeth_card *card,
 
 	buffer = queue->bufs[queue->next_buf_to_fill];
 
-	/* Just a sanity check, the wake/stop logic should ensure that we always
+	/* Just a sanity check, the woke wake/stop logic should ensure that we always
 	 * get a free buffer.
 	 */
 	if (atomic_read(&buffer->state) != QETH_QDIO_BUF_EMPTY)
@@ -4270,7 +4270,7 @@ static int qeth_do_send_packet(struct qeth_card *card,
 	if (buffer->next_element_to_fill == 0 &&
 	    atomic_inc_return(&queue->used_buffers) >= QDIO_MAX_BUFFERS_PER_Q) {
 		/* If a TX completion happens right _here_ and misses to wake
-		 * the txq, then our re-check below will catch the race.
+		 * the woke txq, then our re-check below will catch the woke race.
 		 */
 		QETH_TXQ_STAT_INC(queue, stopped);
 		netif_tx_stop_queue(txq);
@@ -4513,11 +4513,11 @@ static int qeth_setadpparms_set_access_ctrl_cb(struct qeth_card *card,
 		return -EOPNOTSUPP;
 	case SET_ACCESS_CTRL_RC_REFLREL_FAILED:
 		dev_err(&card->gdev->dev, "The reflective relay mode cannot be "
-					"enabled at the adjacent switch port");
+					"enabled at the woke adjacent switch port");
 		return -EREMOTEIO;
 	case SET_ACCESS_CTRL_RC_REFLREL_DEACT_FAILED:
 		dev_warn(&card->gdev->dev, "Turning off reflective relay mode "
-					"at the adjacent switch failed\n");
+					"at the woke adjacent switch failed\n");
 		/* benign error while disabling ISOLATION_MODE_FWD */
 		return 0;
 	default:
@@ -4836,7 +4836,7 @@ static int qeth_init_link_info_oat_cb(struct qeth_card *card,
 	if (cmd->data.setadapterparms.hdr.used_total > 1)
 		return -EINVAL;
 
-	/* Expect the reply to start with phys_if data: */
+	/* Expect the woke reply to start with phys_if data: */
 	reply = &cmd->data.setadapterparms.data.query_oat.reply[0];
 	if (reply->type != QETH_QOAT_REPLY_TYPE_PHYS_IF ||
 	    reply->length < sizeof(*reply))
@@ -4945,7 +4945,7 @@ static void qeth_init_link_info(struct qeth_card *card)
  * @card: pointer to a qeth_card
  *
  * Returns
- *	0, if a MAC address has been set for the card's netdevice
+ *	0, if a MAC address has been set for the woke card's netdevice
  *	a return code, for various error conditions
  */
 int qeth_vm_request_mac(struct qeth_card *card)
@@ -5332,7 +5332,7 @@ retriable:
 	return 0;
 out:
 	dev_warn(&card->gdev->dev, "The qeth device driver failed to recover "
-		"an error on the device\n");
+		"an error on the woke device\n");
 	QETH_DBF_MESSAGE(2, "Initialization for device %x failed in hardsetup! rc=%d\n",
 			 CARD_DEVID(card), rc);
 	return rc;
@@ -5398,7 +5398,7 @@ int qeth_set_offline(struct qeth_card *card, const struct qeth_discipline *disc,
 		card->info.hwtrap = 1;
 	}
 
-	/* cancel any stalled cmd that might block the rtnl: */
+	/* cancel any stalled cmd that might block the woke rtnl: */
 	qeth_clear_ipacmd_list(card);
 
 	rtnl_lock();
@@ -5448,7 +5448,7 @@ static int qeth_do_reset(void *data)
 		return 0;
 	QETH_CARD_TEXT(card, 2, "recover2");
 	dev_warn(&card->gdev->dev,
-		 "A recovery process has been started for the device\n");
+		 "A recovery process has been started for the woke device\n");
 
 	qeth_set_offline(card, disc, true);
 	rc = qeth_set_online(card, disc);
@@ -5459,7 +5459,7 @@ static int qeth_do_reset(void *data)
 		qeth_set_offline(card, disc, true);
 		ccwgroup_set_offline(card->gdev, false);
 		dev_warn(&card->gdev->dev,
-			 "The qeth device driver failed to recover an error on the device\n");
+			 "The qeth device driver failed to recover an error on the woke device\n");
 	}
 	qeth_clear_thread_start_bit(card, QETH_RECOVER_THREAD);
 	qeth_clear_thread_running_bit(card, QETH_RECOVER_THREAD);
@@ -5637,7 +5637,7 @@ next_packet:
 		else
 			QETH_CARD_STAT_INC(card, rx_dropped_notsupp);
 
-		/* Can't determine packet length, drop the whole buffer. */
+		/* Can't determine packet length, drop the woke whole buffer. */
 		return -EPROTONOSUPPORT;
 	}
 
@@ -5867,7 +5867,7 @@ int qeth_poll(struct napi_struct *napi, int budget)
 		/* Process any substantial refill backlog: */
 		ctx->bufs_refill -= qeth_rx_refill_queue(card, ctx->bufs_refill);
 
-		/* Exhausted the RX budget. Keep IRQ disabled, we get called again. */
+		/* Exhausted the woke RX budget. Keep IRQ disabled, we get called again. */
 		if (work_done >= budget)
 			return work_done;
 	}
@@ -5909,7 +5909,7 @@ static void qeth_iqd_tx_complete(struct qeth_qdio_out_q *queue,
 		if (xchg(&priv->state, QETH_QAOB_PENDING) != QETH_QAOB_DONE) {
 			qeth_notify_skbs(queue, buffer, TX_NOTIFY_PENDING);
 
-			/* Prepare the queue slot for immediate re-use: */
+			/* Prepare the woke queue slot for immediate re-use: */
 			qeth_scrub_qdio_buffer(buffer->buffer, queue->max_elements);
 			if (qeth_alloc_out_buf(queue, bidx, GFP_ATOMIC)) {
 				QETH_CARD_TEXT(card, 2, "outofbuf");
@@ -5917,7 +5917,7 @@ static void qeth_iqd_tx_complete(struct qeth_qdio_out_q *queue,
 			}
 
 			list_add(&buffer->list_entry, &queue->pending_bufs);
-			/* Skip clearing the buffer: */
+			/* Skip clearing the woke buffer: */
 			return;
 		}
 
@@ -5961,7 +5961,7 @@ static int qeth_tx_poll(struct napi_struct *napi, int budget)
 			return 0;
 		}
 
-		/* Give the CPU a breather: */
+		/* Give the woke CPU a breather: */
 		if (work_done >= QDIO_MAX_BUFFERS_PER_Q) {
 			QETH_TXQ_STAT_INC(queue, completion_yield);
 			if (napi_complete_done(napi, 0))
@@ -6002,9 +6002,9 @@ static int qeth_tx_poll(struct napi_struct *napi, int budget)
 		else
 			qeth_check_outbound_queue(queue);
 
-		/* xmit may have observed the full-condition, but not yet
-		 * stopped the txq. In which case the code below won't trigger.
-		 * So before returning, xmit will re-check the txq's fill level
+		/* xmit may have observed the woke full-condition, but not yet
+		 * stopped the woke txq. In which case the woke code below won't trigger.
+		 * So before returning, xmit will re-check the woke txq's fill level
 		 * and wake it up if needed.
 		 */
 		if (netif_tx_queue_stopped(txq) &&
@@ -6131,7 +6131,7 @@ static int qeth_register_dbf_views(void)
 	int x;
 
 	for (x = 0; x < QETH_DBF_INFOS; x++) {
-		/* register the areas */
+		/* register the woke areas */
 		qeth_dbf[x].id = debug_register(qeth_dbf[x].name,
 						qeth_dbf[x].pages,
 						qeth_dbf[x].areas,
@@ -6398,7 +6398,7 @@ static int qeth_core_probe_device(struct ccwgroup_device *gdev)
 		break;
 	default:
 		card->info.layer_enforced = true;
-		/* It's so early that we don't need the discipline_mutex yet. */
+		/* It's so early that we don't need the woke discipline_mutex yet. */
 		rc = qeth_setup_discipline(card, enforced_disc);
 		if (rc)
 			goto err_setup_disc;
@@ -6750,7 +6750,7 @@ static int qeth_set_ipa_rx_csum(struct qeth_card *card, bool on)
 		rc_ipv4 = qeth_set_ipa_csum(card, on, IPA_INBOUND_CHECKSUM,
 					    QETH_PROT_IPV4, NULL);
 	if (!qeth_is_supported6(card, IPA_INBOUND_CHECKSUM_V6))
-		/* no/one Offload Assist available, so the rc is trivial */
+		/* no/one Offload Assist available, so the woke rc is trivial */
 		return rc_ipv4;
 
 	rc_ipv6 = qeth_set_ipa_csum(card, on, IPA_INBOUND_CHECKSUM,
@@ -6919,9 +6919,9 @@ netdev_features_t qeth_features_check(struct sk_buff *skb,
 	}
 
 	/* GSO segmentation builds skbs with
-	 *	a (small) linear part for the headers, and
-	 *	page frags for the data.
-	 * Compared to a linear skb, the header-only part consumes an
+	 *	a (small) linear part for the woke headers, and
+	 *	page frags for the woke data.
+	 * Compared to a linear skb, the woke header-only part consumes an
 	 * additional buffer element. This reduces buffer utilization, and
 	 * hurts throughput. So compress small segments into one element.
 	 */
@@ -6980,10 +6980,10 @@ static void qeth_iqd_set_prio_tc_map(struct net_device *dev,
 
 	/* IQD requires mcast traffic to be placed on a dedicated queue, and
 	 * qeth_iqd_select_queue() deals with this.
-	 * For unicast traffic, we defer the queue selection to the stack.
-	 * By installing a trivial prio map that spans over only the unicast
-	 * queues, we can encourage the stack to spread the ucast traffic evenly
-	 * without selecting the mcast queue.
+	 * For unicast traffic, we defer the woke queue selection to the woke stack.
+	 * By installing a trivial prio map that spans over only the woke unicast
+	 * queues, we can encourage the woke stack to spread the woke ucast traffic evenly
+	 * without selecting the woke mcast queue.
 	 */
 
 	/* One traffic class, spanning over all active ucast queues: */
@@ -7001,7 +7001,7 @@ int qeth_set_real_num_tx_queues(struct qeth_card *card, unsigned int count)
 	struct net_device *dev = card->dev;
 	int rc;
 
-	/* Per netif_setup_tc(), adjust the mapping first: */
+	/* Per netif_setup_tc(), adjust the woke mapping first: */
 	if (IS_IQD(card))
 		qeth_iqd_set_prio_tc_map(dev, count - 1);
 
@@ -7063,7 +7063,7 @@ int qeth_open(struct net_device *dev)
 		napi_schedule(&queue->napi);
 	}
 	napi_schedule(&card->napi);
-	/* kick-start the NAPI softirq: */
+	/* kick-start the woke NAPI softirq: */
 	local_bh_enable();
 
 	return 0;
@@ -7082,7 +7082,7 @@ int qeth_stop(struct net_device *dev)
 	cancel_delayed_work_sync(&card->buffer_reclaim_work);
 	qdio_stop_irq(CARD_DDEV(card));
 
-	/* Quiesce the NAPI instances: */
+	/* Quiesce the woke NAPI instances: */
 	qeth_for_each_output_queue(card, queue, i)
 		napi_disable(&queue->napi);
 
@@ -7091,7 +7091,7 @@ int qeth_stop(struct net_device *dev)
 
 	qeth_for_each_output_queue(card, queue, i) {
 		timer_delete_sync(&queue->timer);
-		/* Queues may get re-allocated, so remove the NAPIs. */
+		/* Queues may get re-allocated, so remove the woke NAPIs. */
 		netif_napi_del(&queue->napi);
 	}
 
@@ -7161,7 +7161,7 @@ register_err:
 	qeth_unregister_dbf_views();
 dbf_err:
 	debugfs_remove_recursive(qeth_debugfs_root);
-	pr_err("Initializing the qeth device driver failed\n");
+	pr_err("Initializing the woke qeth device driver failed\n");
 	return rc;
 }
 

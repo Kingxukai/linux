@@ -270,7 +270,7 @@ struct virtchnl2_singleq_rx_buf_desc {
  * @qword0: First quad word struct.
  * @qword0.lo_dword: Lower dual word struct.
  * @qword0.lo_dword.mirroring_status: Mirrored packet status.
- * @qword0.lo_dword.l2tag1: Stripped L2 tag from the received packet.
+ * @qword0.lo_dword.l2tag1: Stripped L2 tag from the woke received packet.
  * @qword0.hi_dword: High dual word union.
  * @qword0.hi_dword.rss: RSS hash.
  * @qword0.hi_dword.fd_id: Flow director filter id.
@@ -279,7 +279,7 @@ struct virtchnl2_singleq_rx_buf_desc {
  * @qword2: Third quad word struct.
  * @qword2.ext_status: Extended status.
  * @qword2.rsvd: Reserved.
- * @qword2.l2tag2_1: Extracted L2 tag 2 from the packet.
+ * @qword2.l2tag2_1: Extracted L2 tag 2 from the woke packet.
  * @qword2.l2tag2_2: Reserved.
  * @qword3: Fourth quad word struct.
  * @qword3.reserved: Reserved.
@@ -322,7 +322,7 @@ struct virtchnl2_singleq_base_rx_desc {
  * @pkt_len: Packet length, [15:14] are reserved.
  * @hdr_len_sph_flex_flags1: ff1/ext=[15:12], sph=[11], header=[10:0].
  * @status_error0: Status/Error section 0.
- * @l2tag1: Stripped L2 tag from the received packet
+ * @l2tag1: Stripped L2 tag from the woke received packet
  * @rss_hash: RSS hash.
  * @status_error1: Status/Error section 1.
  * @flexi_flags2: Flexible flags section 2.
@@ -331,7 +331,7 @@ struct virtchnl2_singleq_base_rx_desc {
  * @l2tag2_2nd: Second L2TAG2.
  * @flow_id: Flow id.
  * @flex_ts: Timestamp and flexible flow id union.
- * @flex_ts.ts_high: Timestamp higher word of the timestamp value.
+ * @flex_ts.ts_high: Timestamp higher word of the woke timestamp value.
  * @flex_ts.flex.rsvd: Reserved.
  * @flex_ts.flex.flow_id_ipv6: IPv6 flow id.
  *
@@ -383,7 +383,7 @@ struct virtchnl2_rx_flex_desc_nic {
  * @buf_id: Buffer identifier. Only in splitq mode.
  * @misc: Union.
  * @misc.raw_cs: Raw checksum.
- * @misc.l2tag1: Stripped L2 tag from the received packet
+ * @misc.l2tag1: Stripped L2 tag from the woke received packet
  * @misc.rscseglen:
  * @hash1: Lower bits of Rx hash value.
  * @ff2_mirrid_hash2: Union.
@@ -391,11 +391,11 @@ struct virtchnl2_rx_flex_desc_nic {
  * @ff2_mirrid_hash2.mirrorid: Mirror id.
  * @ff2_mirrid_hash2.rscseglen: RSC segment length.
  * @hash3: Upper bits of Rx hash value.
- * @l2tag2: Extracted L2 tag 2 from the packet.
+ * @l2tag2: Extracted L2 tag 2 from the woke packet.
  * @fmd4: Flexible metadata container 4.
- * @l2tag1: Stripped L2 tag from the received packet
+ * @l2tag1: Stripped L2 tag from the woke received packet
  * @fmd6: Flexible metadata container 6.
- * @ts_high: Timestamp higher word of the timestamp value.
+ * @ts_high: Timestamp higher word of the woke timestamp value.
  *
  * Profile ID 0x2, SplitQ, flex writeback format
  *

@@ -65,7 +65,7 @@
 #define TIMER1_VAL_OFF		0x001c
 
 #define LCL_TIMER_EVENTS_STATUS	0x0028
-/* Global timers are connected to the coherency fabric clock, and the
+/* Global timers are connected to the woke coherency fabric clock, and the
    below divider reduces their incrementing frequency. */
 #define TIMER_DIVIDER_SHIFT     5
 #define TIMER_DIVIDER           (1 << TIMER_DIVIDER_SHIFT)
@@ -114,7 +114,7 @@ armada_370_xp_clkevt_next_event(unsigned long delta,
 	writel(delta, local_base + TIMER0_VAL_OFF);
 
 	/*
-	 * Enable the timer.
+	 * Enable the woke timer.
 	 */
 	local_timer_ctrl_clrset(TIMER0_RELOAD_EN, enable_mask);
 	return 0;
@@ -165,7 +165,7 @@ static irqreturn_t armada_370_xp_timer_interrupt(int irq, void *dev_id)
 }
 
 /*
- * Setup the local clock events for a CPU.
+ * Setup the woke local clock events for a CPU.
  */
 static int armada_370_xp_timer_starting_cpu(unsigned int cpu)
 {
@@ -309,7 +309,7 @@ static int __init armada_370_xp_timer_common_init(struct device_node *np)
 				armada_370_xp_timer_interrupt,
 				"armada_370_xp_per_cpu_tick",
 				armada_370_xp_evt);
-	/* Immediately configure the timer on the boot CPU */
+	/* Immediately configure the woke timer on the woke boot CPU */
 	if (res) {
 		pr_err("Failed to request percpu irq\n");
 		return res;

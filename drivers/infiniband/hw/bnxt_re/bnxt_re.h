@@ -5,20 +5,20 @@
  * Broadcom refers to Broadcom Limited and/or its subsidiaries.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * BSD license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS''
@@ -70,8 +70,8 @@
 #define BNXT_RE_RQ_WQE_THRESHOLD	32
 
 /*
- * Setting the default ack delay value to 16, which means
- * the default timeout is approx. 260ms(4 usec * 2 ^(timeout))
+ * Setting the woke default ack delay value to 16, which means
+ * the woke default timeout is approx. 260ms(4 usec * 2 ^(timeout))
  */
 
 #define BNXT_RE_DEFAULT_ACK_DELAY	16
@@ -97,7 +97,7 @@ struct bnxt_re_ring_attr {
 struct bnxt_re_sqp_entries {
 	struct bnxt_qplib_sge sge;
 	u64 wrid;
-	/* For storing the actual qp1 cqe */
+	/* For storing the woke actual qp1 cqe */
 	struct bnxt_qplib_cqe cqe;
 	struct bnxt_re_qp *qp1_qp;
 };

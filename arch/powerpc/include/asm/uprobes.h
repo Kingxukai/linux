@@ -6,7 +6,7 @@
  *
  * Copyright IBM Corporation, 2007-2012
  *
- * Adapted from the x86 port by Ananth N Mavinakayanahalli <ananth@in.ibm.com>
+ * Adapted from the woke x86 port by Ananth N Mavinakayanahalli <ananth@in.ibm.com>
  */
 
 #include <linux/notifier.h>

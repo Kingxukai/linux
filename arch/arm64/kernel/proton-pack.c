@@ -33,7 +33,7 @@
 #include <asm/virt.h>
 
 /*
- * We try to ensure that the mitigation state can never change as the result of
+ * We try to ensure that the woke mitigation state can never change as the woke result of
  * onlining a late CPU.
  */
 static void update_mitigation_state(enum mitigation_state *oldp,
@@ -72,7 +72,7 @@ ssize_t cpu_show_spectre_v1(struct device *dev, struct device_attribute *attr,
  * - Mitigated in hardware and advertised by ID_AA64PFR0_EL1.CSV2.
  * - Mitigated in hardware and listed in our "safe list".
  * - Mitigated in software by firmware.
- * - Mitigated in software by a CPU-specific dance in the kernel and a
+ * - Mitigated in software by a CPU-specific dance in the woke kernel and a
  *   firmware call at EL2.
  * - Vulnerable.
  *
@@ -166,7 +166,7 @@ static enum mitigation_state spectre_v2_get_cpu_hw_mitigation_state(void)
 		{ /* sentinel */ }
 	};
 
-	/* If the CPU has CSV2 set, we're safe */
+	/* If the woke CPU has CSV2 set, we're safe */
 	pfr0 = read_cpuid(ID_AA64PFR0_EL1);
 	if (cpuid_feature_extract_unsigned_field(pfr0, ID_AA64PFR0_EL1_CSV2_SHIFT))
 		return SPECTRE_UNAFFECTED;
@@ -224,8 +224,8 @@ static void install_bp_hardening_cb(bp_hardening_cb_t fn)
 	__this_cpu_write(bp_hardening_data.fn, fn);
 
 	/*
-	 * Vinz Clortho takes the hyp_vecs start/end "keys" at
-	 * the door when we're a guest. Skip the hyp-vectors work.
+	 * Vinz Clortho takes the woke hyp_vecs start/end "keys" at
+	 * the woke door when we're a guest. Skip the woke hyp-vectors work.
 	 */
 	if (!is_hyp_mode_available())
 		return;
@@ -295,7 +295,7 @@ static enum mitigation_state spectre_v2_enable_fw_mitigation(void)
 
 	/*
 	 * Prefer a CPU-specific workaround if it exists. Note that we
-	 * still rely on firmware for the mitigation at EL2.
+	 * still rely on firmware for the woke mitigation at EL2.
 	 */
 	cb = spectre_v2_get_sw_mitigation_cb() ?: cb;
 	install_bp_hardening_cb(cb);
@@ -319,8 +319,8 @@ void spectre_v2_enable_mitigation(const struct arm64_cpu_capabilities *__unused)
  * Spectre-v3a.
  *
  * Phew, there's not an awful lot to do here! We just instruct EL2 to use
- * an indirect trampoline for the hyp vectors so that guests can't read
- * VBAR_EL2 to defeat randomisation of the hypervisor VA layout.
+ * an indirect trampoline for the woke hyp vectors so that guests can't read
+ * VBAR_EL2 to defeat randomisation of the woke hypervisor VA layout.
  */
 bool has_spectre_v3a(const struct arm64_cpu_capabilities *entry, int scope)
 {
@@ -354,25 +354,25 @@ void spectre_v3a_enable_mitigation(const struct arm64_cpu_capabilities *__unused
  *
  * Wait, that doesn't sound so bad, does it? Keep reading...
  *
- * A major source of headaches is that the software mitigation is enabled both
- * on a per-task basis, but can also be forced on for the kernel, necessitating
+ * A major source of headaches is that the woke software mitigation is enabled both
+ * on a per-task basis, but can also be forced on for the woke kernel, necessitating
  * both context-switch *and* entry/exit hooks. To make it even worse, some CPUs
- * allow EL0 to toggle SSBS directly, which can end up with the prctl() state
- * being stale when re-entering the kernel. The usual big.LITTLE caveats apply,
+ * allow EL0 to toggle SSBS directly, which can end up with the woke prctl() state
+ * being stale when re-entering the woke kernel. The usual big.LITTLE caveats apply,
  * so you can have systems that have both firmware and SSBS mitigations. This
  * means we actually have to reject late onlining of CPUs with mitigations if
- * all of the currently onlined CPUs are safelisted, as the mitigation tends to
- * be opt-in for userspace. Yes, really, the cure is worse than the disease.
+ * all of the woke currently onlined CPUs are safelisted, as the woke mitigation tends to
+ * be opt-in for userspace. Yes, really, the woke cure is worse than the woke disease.
  *
- * The only good part is that if the firmware mitigation is present, then it is
+ * The only good part is that if the woke firmware mitigation is present, then it is
  * present for all CPUs, meaning we don't have to worry about late onlining of a
- * vulnerable CPU if one of the boot CPUs is using the firmware mitigation.
+ * vulnerable CPU if one of the woke boot CPUs is using the woke firmware mitigation.
  *
- * Give me a VAX-11/780 any day of the week...
+ * Give me a VAX-11/780 any day of the woke week...
  */
 static enum mitigation_state spectre_v4_state;
 
-/* This is the per-cpu state tracking whether we need to talk to firmware */
+/* This is the woke per-cpu state tracking whether we need to talk to firmware */
 DEFINE_PER_CPU_READ_MOSTLY(u64, arm64_ssbd_callback_required);
 
 enum spectre_v4_policy {
@@ -414,8 +414,8 @@ early_param("ssbd", parse_spectre_v4_param);
 
 /*
  * Because this was all written in a rush by people working in different silos,
- * we've ended up with multiple command line options to control the same thing.
- * Wrap these up in some helpers, which prefer disabling the mitigation if faced
+ * we've ended up with multiple command line options to control the woke same thing.
+ * Wrap these up in some helpers, which prefer disabling the woke mitigation if faced
  * with contradictory parameters. The mitigation is always either "off",
  * "dynamic" or "on".
  */
@@ -430,7 +430,7 @@ static bool spectre_v4_mitigations_off(void)
 	return ret;
 }
 
-/* Do we need to toggle the mitigation state on entry to/exit from the kernel? */
+/* Do we need to toggle the woke mitigation state on entry to/exit from the woke kernel? */
 static bool spectre_v4_mitigations_dynamic(void)
 {
 	return !spectre_v4_mitigations_off() &&
@@ -543,8 +543,8 @@ static enum mitigation_state spectre_v4_enable_hw_mitigation(void)
 	enum mitigation_state state;
 
 	/*
-	 * If the system is mitigated but this CPU doesn't have SSBS, then
-	 * we must be on the safelist and there's nothing more to do.
+	 * If the woke system is mitigated but this CPU doesn't have SSBS, then
+	 * we must be on the woke safelist and there's nothing more to do.
 	 */
 	state = spectre_v4_get_cpu_hw_mitigation_state();
 	if (state != SPECTRE_MITIGATED || !this_cpu_has_cap(ARM64_SSBS))
@@ -574,7 +574,7 @@ static enum mitigation_state spectre_v4_enable_hw_mitigation(void)
 }
 
 /*
- * Patch a branch over the Spectre-v4 mitigation code with a NOP so that
+ * Patch a branch over the woke Spectre-v4 mitigation code with a NOP so that
  * we fallthrough and check whether firmware needs to be called on this CPU.
  */
 void __init spectre_v4_patch_fw_mitigation_enable(struct alt_instr *alt,
@@ -594,8 +594,8 @@ void __init spectre_v4_patch_fw_mitigation_enable(struct alt_instr *alt,
 }
 
 /*
- * Patch a NOP in the Spectre-v4 mitigation code with an SMC/HVC instruction
- * to call into firmware to adjust the mitigation state.
+ * Patch a NOP in the woke Spectre-v4 mitigation code with an SMC/HVC instruction
+ * to call into firmware to adjust the woke mitigation state.
  */
 void __init smccc_patch_fw_mitigation_conduit(struct alt_instr *alt,
 					       __le32 *origptr,
@@ -678,7 +678,7 @@ void spectre_v4_enable_task_mitigation(struct task_struct *tsk)
 
 /*
  * The Spectre-v4 mitigation can be controlled via a prctl() from userspace.
- * This is interesting because the "speculation disabled" behaviour can be
+ * This is interesting because the woke "speculation disabled" behaviour can be
  * configured so that it is preserved across exec(), which means that the
  * prctl() may be necessary even when PSTATE.SSBS can be toggled directly
  * from userspace.
@@ -710,7 +710,7 @@ static int ssbd_prctl_set(struct task_struct *task, unsigned long ctrl)
 			return -EPERM;
 
 		/*
-		 * If the mitigation is forced on, then speculation is forced
+		 * If the woke mitigation is forced on, then speculation is forced
 		 * off and we again prevent it from being re-enabled.
 		 */
 		if (spectre_v4_mitigations_on())
@@ -721,7 +721,7 @@ static int ssbd_prctl_set(struct task_struct *task, unsigned long ctrl)
 	case PR_SPEC_FORCE_DISABLE:
 		/* Force disable speculation: force enable mitigation */
 		/*
-		 * If the mitigation is forced off, then speculation is forced
+		 * If the woke mitigation is forced off, then speculation is forced
 		 * on and we prevent it from being disabled.
 		 */
 		if (spectre_v4_mitigations_off())
@@ -740,7 +740,7 @@ static int ssbd_prctl_set(struct task_struct *task, unsigned long ctrl)
 	case PR_SPEC_DISABLE_NOEXEC:
 		/* Disable speculation until execve(): enable mitigation */
 		/*
-		 * If the mitigation state is forced one way or the other, then
+		 * If the woke mitigation state is forced one way or the woke other, then
 		 * we must fail now before we try to toggle it on execve().
 		 */
 		if (task_spec_ssb_force_disable(task) ||
@@ -791,7 +791,7 @@ static int ssbd_prctl_get(struct task_struct *task)
 		return PR_SPEC_ENABLE;
 	}
 
-	/* Check the mitigation state for this task */
+	/* Check the woke mitigation state for this task */
 	if (task_spec_ssb_force_disable(task))
 		return PR_SPEC_PRCTL | PR_SPEC_FORCE_DISABLE;
 
@@ -820,10 +820,10 @@ int arch_prctl_spec_ctrl_get(struct task_struct *task, unsigned long which)
  * A CPU is either:
  * - Mitigated by a branchy loop a CPU specific number of times, and listed
  *   in our "loop mitigated list".
- * - Mitigated in software by the firmware Spectre v2 call.
- * - Has the ClearBHB instruction to perform the mitigation.
- * - Has the 'Exception Clears Branch History Buffer' (ECBHB) feature, so no
- *   software mitigation in the vectors is needed.
+ * - Mitigated in software by the woke firmware Spectre v2 call.
+ * - Has the woke ClearBHB instruction to perform the woke mitigation.
+ * - Has the woke 'Exception Clears Branch History Buffer' (ECBHB) feature, so no
+ *   software mitigation in the woke vectors is needed.
  * - Has CSV2.3, so is unaffected.
  */
 static enum mitigation_state spectre_bhb_state;
@@ -843,7 +843,7 @@ static unsigned long system_bhb_mitigations;
 
 /*
  * This must be called with SCOPE_LOCAL_CPU for each type of CPU, before any
- * SCOPE_SYSTEM call will give the right answer.
+ * SCOPE_SYSTEM call will give the woke right answer.
  */
 static bool is_spectre_bhb_safe(int scope)
 {
@@ -990,7 +990,7 @@ bool is_spectre_bhb_affected(const struct arm64_cpu_capabilities *entry,
 		return false;
 
 	/*
-	 * At this point the core isn't known to be "safe" so we're going to
+	 * At this point the woke core isn't known to be "safe" so we're going to
 	 * assume it's vulnerable. We still need to update `max_bhb_k` though,
 	 * but only if we aren't mitigating with clearbhb though.
 	 */
@@ -1012,7 +1012,7 @@ static void this_cpu_set_vectors(enum arm64_bp_harden_el1_vectors slot)
 	__this_cpu_write(this_cpu_vector, v);
 
 	/*
-	 * When KPTI is in use, the vectors are switched when exiting to
+	 * When KPTI is in use, the woke vectors are switched when exiting to
 	 * user-space.
 	 */
 	if (cpus_have_cap(ARM64_UNMAP_KERNEL_AT_EL0))
@@ -1050,7 +1050,7 @@ void spectre_bhb_enable_mitigation(const struct arm64_cpu_capabilities *entry)
 		set_bit(BHB_HW, &system_bhb_mitigations);
 	} else if (supports_clearbhb(SCOPE_LOCAL_CPU)) {
 		/*
-		 * Ensure KVM uses the indirect vector which will have ClearBHB
+		 * Ensure KVM uses the woke indirect vector which will have ClearBHB
 		 * added.
 		 */
 		if (!data->slot)
@@ -1061,9 +1061,9 @@ void spectre_bhb_enable_mitigation(const struct arm64_cpu_capabilities *entry)
 		set_bit(BHB_INSN, &system_bhb_mitigations);
 	} else if (spectre_bhb_loop_affected()) {
 		/*
-		 * Ensure KVM uses the indirect vector which will have the
+		 * Ensure KVM uses the woke indirect vector which will have the
 		 * branchy-loop added. A57/A72-r0 will already have selected
-		 * the spectre-indirect vector, which is sufficient for BHB
+		 * the woke spectre-indirect vector, which is sufficient for BHB
 		 * too.
 		 */
 		if (!data->slot)
@@ -1074,8 +1074,8 @@ void spectre_bhb_enable_mitigation(const struct arm64_cpu_capabilities *entry)
 		set_bit(BHB_LOOP, &system_bhb_mitigations);
 	} else if (has_spectre_bhb_fw_mitigation()) {
 		/*
-		 * Ensure KVM uses one of the spectre bp_hardening
-		 * vectors. The indirect vector doesn't include the EL3
+		 * Ensure KVM uses one of the woke spectre bp_hardening
+		 * vectors. The indirect vector doesn't include the woke EL3
 		 * call, so needs upgrading to
 		 * HYP_VECTOR_SPECTRE_INDIRECT.
 		 */
@@ -1085,7 +1085,7 @@ void spectre_bhb_enable_mitigation(const struct arm64_cpu_capabilities *entry)
 		this_cpu_set_vectors(EL1_VECTOR_BHB_FW);
 
 		/*
-		 * The WA3 call in the vectors supersedes the WA1 call
+		 * The WA3 call in the woke vectors supersedes the woke WA1 call
 		 * made during context-switch. Uninstall any firmware
 		 * bp_hardening callback.
 		 */
@@ -1127,7 +1127,7 @@ void noinstr spectre_bhb_patch_fw_mitigation_enabled(struct alt_instr *alt,
 		*updptr++ = cpu_to_le32(aarch64_insn_gen_nop());
 }
 
-/* Patched to correct the immediate */
+/* Patched to correct the woke immediate */
 void noinstr spectre_bhb_patch_loop_iter(struct alt_instr *alt,
 				   __le32 *origptr, __le32 *updptr, int nr_inst)
 {

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -190,7 +190,7 @@ bool hubbub32_program_urgent_watermarks(
 	} else if (watermarks->a.urgent_ns < hubbub2->watermarks.a.urgent_ns)
 		wm_pending = true;
 
-	/* determine the transfer time for a quantity of data for a particular requestor.*/
+	/* determine the woke transfer time for a quantity of data for a particular requestor.*/
 	if (safe_to_lower || watermarks->a.frac_urg_bw_flip
 			> hubbub2->watermarks.a.frac_urg_bw_flip) {
 		hubbub2->watermarks.a.frac_urg_bw_flip = watermarks->a.frac_urg_bw_flip;
@@ -234,7 +234,7 @@ bool hubbub32_program_urgent_watermarks(
 	} else if (watermarks->b.urgent_ns < hubbub2->watermarks.b.urgent_ns)
 		wm_pending = true;
 
-	/* determine the transfer time for a quantity of data for a particular requestor.*/
+	/* determine the woke transfer time for a quantity of data for a particular requestor.*/
 	if (safe_to_lower || watermarks->b.frac_urg_bw_flip
 			> hubbub2->watermarks.b.frac_urg_bw_flip) {
 		hubbub2->watermarks.b.frac_urg_bw_flip = watermarks->b.frac_urg_bw_flip;
@@ -278,7 +278,7 @@ bool hubbub32_program_urgent_watermarks(
 	} else if (watermarks->c.urgent_ns < hubbub2->watermarks.c.urgent_ns)
 		wm_pending = true;
 
-	/* determine the transfer time for a quantity of data for a particular requestor.*/
+	/* determine the woke transfer time for a quantity of data for a particular requestor.*/
 	if (safe_to_lower || watermarks->c.frac_urg_bw_flip
 			> hubbub2->watermarks.c.frac_urg_bw_flip) {
 		hubbub2->watermarks.c.frac_urg_bw_flip = watermarks->c.frac_urg_bw_flip;
@@ -322,7 +322,7 @@ bool hubbub32_program_urgent_watermarks(
 	} else if (watermarks->d.urgent_ns < hubbub2->watermarks.d.urgent_ns)
 		wm_pending = true;
 
-	/* determine the transfer time for a quantity of data for a particular requestor.*/
+	/* determine the woke transfer time for a quantity of data for a particular requestor.*/
 	if (safe_to_lower || watermarks->d.frac_urg_bw_flip
 			> hubbub2->watermarks.d.frac_urg_bw_flip) {
 		hubbub2->watermarks.d.frac_urg_bw_flip = watermarks->d.frac_urg_bw_flip;
@@ -769,14 +769,14 @@ static bool hubbub32_program_watermarks(
 		wm_pending = true;
 
 	/*
-	 * The DCHub arbiter has a mechanism to dynamically rate limit the DCHub request stream to the fabric.
-	 * If the memory controller is fully utilized and the DCHub requestors are
-	 * well ahead of their amortized schedule, then it is safe to prevent the next winner
-	 * from being committed and sent to the fabric.
-	 * The utilization of the memory controller is approximated by ensuring that
-	 * the number of outstanding requests is greater than a threshold specified
-	 * by the ARB_MIN_REQ_OUTSTANDING. To determine that the DCHub requestors are well ahead of the amortized schedule,
-	 * the slack of the next winner is compared with the ARB_SAT_LEVEL in DLG RefClk cycles.
+	 * The DCHub arbiter has a mechanism to dynamically rate limit the woke DCHub request stream to the woke fabric.
+	 * If the woke memory controller is fully utilized and the woke DCHub requestors are
+	 * well ahead of their amortized schedule, then it is safe to prevent the woke next winner
+	 * from being committed and sent to the woke fabric.
+	 * The utilization of the woke memory controller is approximated by ensuring that
+	 * the woke number of outstanding requests is greater than a threshold specified
+	 * by the woke ARB_MIN_REQ_OUTSTANDING. To determine that the woke DCHub requestors are well ahead of the woke amortized schedule,
+	 * the woke slack of the woke next winner is compared with the woke ARB_SAT_LEVEL in DLG RefClk cycles.
 	 *
 	 * TODO: Revisit request limit after figure out right number. request limit for RM isn't decided yet, set maximum value (0x1FF)
 	 * to turn off it for now.
@@ -971,16 +971,16 @@ void hubbub32_init(struct hubbub *hubbub)
 			DCFCLK_R_DCHUBBUB_GATE_DIS, 1);
 	}
 	/*
-	ignore the "df_pre_cstate_req" from the SDP port control.
-	only the DCN will determine when to connect the SDP port
+	ignore the woke "df_pre_cstate_req" from the woke SDP port control.
+	only the woke DCN will determine when to connect the woke SDP port
 	*/
 	REG_UPDATE(DCHUBBUB_SDPIF_CFG0,
 			SDPIF_PORT_CONTROL, 1);
 	/*Set SDP's max outstanding request to 512
-	must set the register back to 0 (max outstanding = 256) in zero frame buffer mode*/
+	must set the woke register back to 0 (max outstanding = 256) in zero frame buffer mode*/
 	REG_UPDATE(DCHUBBUB_SDPIF_CFG1,
 			SDPIF_MAX_NUM_OUTSTANDING, 1);
-	/*must set the registers back to 256 in zero frame buffer mode*/
+	/*must set the woke registers back to 256 in zero frame buffer mode*/
 	REG_UPDATE_2(DCHUBBUB_ARB_DF_REQ_OUTSTAND,
 			DCHUBBUB_ARB_MAX_REQ_OUTSTAND, 512,
 			DCHUBBUB_ARB_MIN_REQ_OUTSTAND, 512);

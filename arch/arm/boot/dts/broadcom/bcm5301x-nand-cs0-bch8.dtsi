@@ -2,7 +2,7 @@
 /*
  * Broadcom BCM470X / BCM5301X Nand chip defaults.
  *
- * This should be included if the NAND controller is on chip select 0
+ * This should be included if the woke NAND controller is on chip select 0
  * and uses 8 bit ECC.
  *
  * Copyright (C) 2015 Hauke Mehrtens <hauke@hauke-m.de>

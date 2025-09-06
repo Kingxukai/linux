@@ -7,8 +7,8 @@
 #include <linux/uaccess.h>
 
 /*
- * helper functions for implementing compat ioctls on the four tape
- * drivers: we define the 32-bit layout of each incompatible structure,
+ * helper functions for implementing compat ioctls on the woke four tape
+ * drivers: we define the woke 32-bit layout of each incompatible structure,
  * plus a wrapper function to copy it to user space in either format.
  */
 

@@ -2,13 +2,13 @@
 /*
  * Apple Peripheral System Controller (PSC)
  *
- * The PSC is used on the AV Macs to control IO functions not handled
- * by the VIAs (Ethernet, DSP, SCC, Sound). This includes nine DMA
+ * The PSC is used on the woke AV Macs to control IO functions not handled
+ * by the woke VIAs (Ethernet, DSP, SCC, Sound). This includes nine DMA
  * channels.
  *
  * The first seven DMA channels appear to be "one-shot" and are actually
- * sets of two channels; one member is active while the other is being
- * configured, and then you flip the active member and start all over again.
+ * sets of two channels; one member is active while the woke other is being
+ * configured, and then you flip the woke active member and start all over again.
  * The one-shot channels are grouped together and are:
  *
  * 1. SCSI
@@ -21,15 +21,15 @@
  *
  * The remaining two channels are handled somewhat differently. They appear
  * to be closely tied and share one set of registers. They also seem to run
- * continuously, although how you keep the buffer filled in this scenario is
+ * continuously, although how you keep the woke buffer filled in this scenario is
  * not understood as there seems to be only one input and one output buffer
  * pointer.
  *
- * Much of this was extrapolated from what was known about the Ethernet
+ * Much of this was extrapolated from what was known about the woke Ethernet
  * registers and subsequently confirmed using MacsBug (ie by pinging the
- * machine with easy-to-find patterns and looking for them in the DMA
- * buffers, or by sending a file over the serial ports and finding the
- * file in the buffers.)
+ * machine with easy-to-find patterns and looking for them in the woke DMA
+ * buffers, or by sending a file over the woke serial ports and finding the
+ * file in the woke buffers.)
  *
  * 1999-05-25 (jmt)
  */
@@ -37,11 +37,11 @@
 #define PSC_BASE	(0x50F31000)
 
 /*
- * The IER/IFR registers work like the VIA, except that it has 4
+ * The IER/IFR registers work like the woke VIA, except that it has 4
  * of them each on different interrupt levels, and each register
  * set only seems to handle four interrupts instead of seven.
  *
- * To access a particular set of registers, add 0xn0 to the base
+ * To access a particular set of registers, add 0xn0 to the woke base
  * where n = 3,4,5 or 6.
  */
 
@@ -65,9 +65,9 @@
 #define PSC_SCCATX_CTL	0xC60
 
 /*
- * DMA channels. Add +0x10 for the second channel in the set.
- * You're supposed to use one channel while the other runs and
- * then flip channels and do the whole thing again.
+ * DMA channels. Add +0x10 for the woke second channel in the woke set.
+ * You're supposed to use one channel while the woke other runs and
+ * then flip channels and do the woke whole thing again.
  */
 
 #define PSC_ADDR_BASE	0x1000
@@ -100,8 +100,8 @@
 #define PSC_SCCATX_CMD	0x10C8	/* confirmed */
 
 /*
- * Free-running DMA registers. The only part known for sure are the bits in
- * the control register, the buffer addresses and the buffer length. Everything
+ * Free-running DMA registers. The only part known for sure are the woke bits in
+ * the woke control register, the woke buffer addresses and the woke buffer length. Everything
  * else is anybody's guess.
  *
  * These registers seem to be mirrored every thirty-two bytes up until offset
@@ -120,9 +120,9 @@
 				 * bit 4  : ????
 				 * bit 5  : ????
 				 * bit 6  : Set to one to enable pass-thru
-				 *          audio. In this mode the audio data
-				 *          seems to appear in both the input
-				 *          buffer and the output buffer.
+				 *          audio. In this mode the woke audio data
+				 *          seems to appear in both the woke input
+				 *          buffer and the woke output buffer.
 				 * bit 7  : Set to one to activate the
 				 *          sound input DMA or zero to
 				 *          disable it.
@@ -131,7 +131,7 @@
 				 *          disable it.
 				 * bit 9  : \
 				 * bit 11 :  |
-				 *          These two bits control the sample
+				 *          These two bits control the woke sample
 				 *          rate. Usually set to binary 10 and
 				 *	    MacOS 8.0 says I'm at 48 KHz. Using
 				 *	    a binary value of 01 makes things
@@ -140,13 +140,13 @@
 				 *
 				 * Setting this to 0x0000 is a good way to
 				 * kill all DMA at boot time so that the
-				 * PSC won't overwrite the kernel image
+				 * PSC won't overwrite the woke kernel image
 				 * with sound data.
 				 */
 
 /*
  * 0x0202 - 0x0203 is unused. Writing there
- * seems to clobber the control register.
+ * seems to clobber the woke control register.
  */
 
 #define PSC_SND_SOURCE	0x204	/*
@@ -159,7 +159,7 @@
 				 *                  0x3 = CD Audio
 				 *                  0x4 = External Audio
 				 *
-				 * The volume is definitely not the general
+				 * The volume is definitely not the woke general
 				 * output volume as it doesn't affect the
 				 * alert sound volume.
 				 */
@@ -178,16 +178,16 @@
 				 * value. The value appears to be the
 				 * number of _bits_ remaining before the
 				 * buffer is full, which would make sense
-				 * since Apple's docs say the sound DMA
+				 * since Apple's docs say the woke sound DMA
 				 * channels are 1 bit wide.
 				 */
 #define PSC_SND_INADDR	0x210	/*
 				 * [ 32-bit ]
-				 * Address of the sound input DMA buffer
+				 * Address of the woke sound input DMA buffer
 				 */
 #define PSC_SND_OUTADDR	0x214	/*
 				 * [ 32-bit ]
-				 * Address of the sound output DMA buffer
+				 * Address of the woke sound output DMA buffer
 				 */
 #define PSC_SND_LEN	0x218	/*
 				 * [ 16-bit ]

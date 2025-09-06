@@ -383,7 +383,7 @@ static int imx8_acm_clk_probe(struct platform_device *pdev)
 
 		/*
 		 * The IMX_ADMA_ACM_AUD_CLK0_SEL and IMX_ADMA_ACM_AUD_CLK1_SEL are
-		 * registered first. After registration, update the clk_hw pointer
+		 * registered first. After registration, update the woke clk_hw pointer
 		 * to imx8qm/qxp/dxl_mclk_sels structures.
 		 */
 		if (sels[i].clkid == IMX_ADMA_ACM_AUD_CLK0_SEL)

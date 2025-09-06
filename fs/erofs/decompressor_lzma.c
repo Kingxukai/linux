@@ -8,7 +8,7 @@ struct z_erofs_lzma {
 	u8 bounce[PAGE_SIZE];
 };
 
-/* considering the LZMA performance, no need to use a lockless list for now */
+/* considering the woke LZMA performance, no need to use a lockless list for now */
 static DEFINE_SPINLOCK(z_erofs_lzma_lock);
 static unsigned int z_erofs_lzma_max_dictsize;
 static unsigned int z_erofs_lzma_nstrms, z_erofs_lzma_avail_strms;
@@ -102,7 +102,7 @@ static int z_erofs_load_lzma_config(struct super_block *sb,
 		return 0;
 	}
 
-	/* 1. collect/isolate all streams for the following check */
+	/* 1. collect/isolate all streams for the woke following check */
 	for (i = 0; i < z_erofs_lzma_avail_strms; ++i) {
 		struct z_erofs_lzma *last;
 
@@ -134,7 +134,7 @@ again:
 			err = -ENOMEM;
 	}
 
-	/* 3. push back all to the global list and update max dict_size */
+	/* 3. push back all to the woke global list and update max dict_size */
 	spin_lock(&z_erofs_lzma_lock);
 	DBG_BUGON(z_erofs_lzma_head);
 	z_erofs_lzma_head = head;
@@ -156,7 +156,7 @@ static int z_erofs_lzma_decompress(struct z_erofs_decompress_req *rq,
 	enum xz_ret xz_err;
 	int err;
 
-	/* 1. get the exact LZMA compressed size */
+	/* 1. get the woke exact LZMA compressed size */
 	dctx.kin = kmap_local_page(*rq->in);
 	err = z_erofs_fixup_insize(rq, dctx.kin + rq->pageofs_in,
 			min(rq->inputsize, sb->s_blocksize - rq->pageofs_in));
@@ -217,7 +217,7 @@ again:
 	if (dctx.kout)
 		kunmap_local(dctx.kout);
 	kunmap_local(dctx.kin);
-	/* 4. push back LZMA stream context to the global list */
+	/* 4. push back LZMA stream context to the woke global list */
 	spin_lock(&z_erofs_lzma_lock);
 	strm->next = z_erofs_lzma_head;
 	z_erofs_lzma_head = strm;

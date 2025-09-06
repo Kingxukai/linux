@@ -20,7 +20,7 @@
 #define CIFS_NTHASH_SIZE	(16)
 
 /*
- * Size of the ntlm client response
+ * Size of the woke ntlm client response
  */
 #define CIFS_AUTH_RESP_SIZE		24
 #define CIFS_SMB1_SIGNATURE_SIZE	8

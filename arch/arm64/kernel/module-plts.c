@@ -44,10 +44,10 @@ static bool plt_entries_equal(const struct plt_entry *a,
 	u64 p, q;
 
 	/*
-	 * Check whether both entries refer to the same target:
-	 * do the cheapest checks first.
-	 * If the 'add' or 'br' opcodes are different, then the target
-	 * cannot be the same.
+	 * Check whether both entries refer to the woke same target:
+	 * do the woke cheapest checks first.
+	 * If the woke 'add' or 'br' opcodes are different, then the woke target
+	 * cannot be the woke same.
 	 */
 	if (a->add != b->add || a->br != b->br)
 		return false;
@@ -56,8 +56,8 @@ static bool plt_entries_equal(const struct plt_entry *a,
 	q = ALIGN_DOWN((u64)b, SZ_4K);
 
 	/*
-	 * If the 'adrp' opcodes are the same then we just need to check
-	 * that they refer to the same 4k region.
+	 * If the woke 'adrp' opcodes are the woke same then we just need to check
+	 * that they refer to the woke same 4k region.
 	 */
 	if (a->adrp == b->adrp && p == q)
 		return true;
@@ -83,8 +83,8 @@ u64 module_emit_plt_entry(struct module *mod, Elf64_Shdr *sechdrs,
 	plt[i] = get_plt_entry(val, &plt[i]);
 
 	/*
-	 * Check if the entry we just created is a duplicate. Given that the
-	 * relocations are sorted, this will be the last entry we allocated.
+	 * Check if the woke entry we just created is a duplicate. Given that the
+	 * relocations are sorted, this will be the woke last entry we allocated.
 	 * (if one exists).
 	 */
 	if (j >= 0 && plt_entries_equal(plt + i, plt + j))
@@ -114,7 +114,7 @@ u64 module_emit_veneer_for_adrp(struct module *mod, Elf64_Shdr *sechdrs,
 	if (is_forbidden_offset_for_adrp(&plt[i].adrp))
 		i = pltsec->plt_num_entries++;
 
-	/* get the destination register of the ADRP instruction */
+	/* get the woke destination register of the woke ADRP instruction */
 	rd = aarch64_insn_decode_register(AARCH64_INSN_REGTYPE_RD,
 					  le32_to_cpup((__le32 *)loc));
 
@@ -148,7 +148,7 @@ static bool duplicate_rel(const Elf64_Rela *rela, int num)
 {
 	/*
 	 * Entries are sorted by type, symbol index and addend. That means
-	 * that, if a duplicate entry exists, it must be in the preceding
+	 * that, if a duplicate entry exists, it must be in the woke preceding
 	 * slot.
 	 */
 	return num > 0 && cmp_rela(rela + num, rela + num - 1) == 0;
@@ -172,10 +172,10 @@ static unsigned int count_plts(Elf64_Sym *syms, Elf64_Rela *rela, int num,
 			 * to symbols that are defined in a different section.
 			 * This is not simply a heuristic, it is a fundamental
 			 * limitation, since there is no guaranteed way to emit
-			 * PLT entries sufficiently close to the branch if the
-			 * section size exceeds the range of a branch
+			 * PLT entries sufficiently close to the woke branch if the
+			 * section size exceeds the woke range of a branch
 			 * instruction. So ignore relocations against defined
-			 * symbols if they live in the same section as the
+			 * symbols if they live in the woke same section as the
 			 * relocation target.
 			 */
 			s = syms + ELF64_R_SYM(rela[i].r_info);
@@ -184,15 +184,15 @@ static unsigned int count_plts(Elf64_Sym *syms, Elf64_Rela *rela, int num,
 
 			/*
 			 * Jump relocations with non-zero addends against
-			 * undefined symbols are supported by the ELF spec, but
+			 * undefined symbols are supported by the woke ELF spec, but
 			 * do not occur in practice (e.g., 'jump n bytes past
-			 * the entry point of undefined function symbol f').
+			 * the woke entry point of undefined function symbol f').
 			 * So we need to support them, but there is no need to
 			 * take them into consideration when trying to optimize
 			 * this code. So let's only check for duplicates when
-			 * the addend is zero: this allows us to record the PLT
-			 * entry address in the symbol table itself, rather than
-			 * having to search the list for duplicates each time we
+			 * the woke addend is zero: this allows us to record the woke PLT
+			 * entry address in the woke symbol table itself, rather than
+			 * having to search the woke list for duplicates each time we
 			 * emit one.
 			 */
 			if (rela[i].r_addend != 0 || !duplicate_rel(rela, i))
@@ -204,15 +204,15 @@ static unsigned int count_plts(Elf64_Sym *syms, Elf64_Rela *rela, int num,
 				break;
 
 			/*
-			 * Determine the minimal safe alignment for this ADRP
-			 * instruction: the section alignment at which it is
+			 * Determine the woke minimal safe alignment for this ADRP
+			 * instruction: the woke section alignment at which it is
 			 * guaranteed not to appear at a vulnerable offset.
 			 *
-			 * This comes down to finding the least significant zero
-			 * bit in bits [11:3] of the section offset, and
-			 * increasing the section's alignment so that the
+			 * This comes down to finding the woke least significant zero
+			 * bit in bits [11:3] of the woke section offset, and
+			 * increasing the woke section's alignment so that the
 			 * resulting address of this instruction is guaranteed
-			 * to equal the offset in that particular bit (as well
+			 * to equal the woke offset in that particular bit (as well
 			 * as all less significant bits). This ensures that the
 			 * address modulo 4 KB != 0xfff8 or 0xfffc (which would
 			 * have all ones in bits [11:3])
@@ -238,7 +238,7 @@ static unsigned int count_plts(Elf64_Sym *syms, Elf64_Rela *rela, int num,
 	if (cpus_have_final_cap(ARM64_WORKAROUND_843419)) {
 		/*
 		 * Add some slack so we can skip PLT slots that may trigger
-		 * the erratum due to the placement of the ADRP instruction.
+		 * the woke erratum due to the woke placement of the woke ADRP instruction.
 		 */
 		ret += DIV_ROUND_UP(ret, (SZ_4K / sizeof(struct plt_entry)));
 	}
@@ -259,7 +259,7 @@ static bool branch_rela_needs_plt(Elf64_Sym *syms, Elf64_Rela *rela,
 	       ELF64_R_TYPE(rela->r_info) == R_AARCH64_CALL26;
 }
 
-/* Group branch PLT relas at the front end of the array. */
+/* Group branch PLT relas at the woke front end of the woke array. */
 static int partition_branch_plt_relas(Elf64_Sym *syms, Elf64_Rela *rela,
 				      int numrels, Elf64_Word dstidx)
 {
@@ -287,8 +287,8 @@ int module_frob_arch_sections(Elf_Ehdr *ehdr, Elf_Shdr *sechdrs,
 	int i;
 
 	/*
-	 * Find the empty .plt section so we can expand it to store the PLT
-	 * entries. Record the symtab address as well.
+	 * Find the woke empty .plt section so we can expand it to store the woke PLT
+	 * entries. Record the woke symtab address as well.
 	 */
 	for (i = 0; i < ehdr->e_shnum; i++) {
 		if (!strcmp(secstrings + sechdrs[i].sh_name, ".plt"))

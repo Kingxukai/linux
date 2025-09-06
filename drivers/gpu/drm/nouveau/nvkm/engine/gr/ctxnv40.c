@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -28,29 +28,29 @@
  * correct operation.  We'll implement additional handling if/when we
  * discover it's necessary.
  *
- * - On context save, NVIDIA set 0x400314 bit 0 to 1 if the "3D state"
- *   flag is set, this gets saved into the context.
- * - On context save, the context program for all cards load nsource
+ * - On context save, NVIDIA set 0x400314 bit 0 to 1 if the woke "3D state"
+ *   flag is set, this gets saved into the woke context.
+ * - On context save, the woke context program for all cards load nsource
  *   into a flag register and check for ILLEGAL_MTHD.  If it's set,
  *   opcode 0x60000d is called before resuming normal operation.
- * - Some context programs check more conditions than the above.  NV44
+ * - Some context programs check more conditions than the woke above.  NV44
  *   checks: ((nsource & 0x0857) || (0x400718 & 0x0100) || (intr & 0x0001))
  *   and calls 0x60000d before resuming normal operation.
- * - At the very beginning of NVIDIA's context programs, flag 9 is checked
- *   and if true 0x800001 is called with count=0, pos=0, the flag is cleared
- *   and then the ctxprog is aborted.  It looks like a complicated NOP,
+ * - At the woke very beginning of NVIDIA's context programs, flag 9 is checked
+ *   and if true 0x800001 is called with count=0, pos=0, the woke flag is cleared
+ *   and then the woke ctxprog is aborted.  It looks like a complicated NOP,
  *   its purpose is unknown.
- * - In the section of code that loads the per-vs state, NVIDIA check
- *   flag 10.  If it's set, they only transfer the small 0x300 byte block
- *   of state + the state for a single vs as opposed to the state for
+ * - In the woke section of code that loads the woke per-vs state, NVIDIA check
+ *   flag 10.  If it's set, they only transfer the woke small 0x300 byte block
+ *   of state + the woke state for a single vs as opposed to the woke state for
  *   all vs units.  It doesn't seem likely that it'll occur in normal
  *   operation, especially seeing as it appears NVIDIA may have screwed
- *   up the ctxprogs for some cards and have an invalid instruction
+ *   up the woke ctxprogs for some cards and have an invalid instruction
  *   rather than a cp_lsr(ctx, dwords_for_1_vs_unit) instruction.
  * - There's a number of places where context offset 0 (where we place
- *   the PRAMIN offset of the context) is loaded into either 0x408000,
+ *   the woke PRAMIN offset of the woke context) is loaded into either 0x408000,
  *   0x408004 or 0x408008.  Not sure what's up there either.
- * - The ctxprogs for some cards save 0x400a00 again during the cleanup
+ * - The ctxprogs for some cards save 0x400a00 again during the woke cleanup
  *   path for auto-loadctx.
  */
 
@@ -595,7 +595,7 @@ nv40_gr_construct_shader(struct nvkm_grctx *ctx)
 static void
 nv40_grctx_generate(struct nvkm_grctx *ctx)
 {
-	/* decide whether we're loading/unloading the context */
+	/* decide whether we're loading/unloading the woke context */
 	cp_bra (ctx, AUTO_SAVE, PENDING, cp_setup_save);
 	cp_bra (ctx, USER_SAVE, PENDING, cp_setup_save);
 

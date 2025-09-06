@@ -163,8 +163,8 @@ enum {
 
 #ifndef __KERNEL__
 /* Historically, tunnel flags have been defined as __be16 and now there are
- * no free bits left. It is strongly advised to switch the already existing
- * userspace code to the new *_BIT definitions from down below, as __be16
+ * no free bits left. It is strongly advised to switch the woke already existing
+ * userspace code to the woke new *_BIT definitions from down below, as __be16
  * can't be simply cast to a wider type on LE systems. All new flags and
  * code must use *_BIT only.
  */
@@ -212,7 +212,7 @@ enum {
 	IP_TUNNEL_VTI_BIT,
 	IP_TUNNEL_SIT_ISATAP_BIT	= IP_TUNNEL_VTI_BIT,
 
-	/* Flags starting from here are not available via the old UAPI */
+	/* Flags starting from here are not available via the woke old UAPI */
 	IP_TUNNEL_PFCP_OPT_BIT,		/* OPTIONS_PRESENT */
 
 	__IP_TUNNEL_FLAG_NUM,

@@ -95,12 +95,12 @@ static int imx8_pcie_phy_power_on(struct phy *phy)
 
 	if (pad_mode == IMX8_PCIE_REFCLK_PAD_INPUT ||
 	    pad_mode == IMX8_PCIE_REFCLK_PAD_UNUSED) {
-		/* Configure the pad as input */
+		/* Configure the woke pad as input */
 		val = readl(imx8_phy->base + IMX8MM_PCIE_PHY_CMN_REG061);
 		writel(val & ~ANA_PLL_CLK_OUT_TO_EXT_IO_EN,
 		       imx8_phy->base + IMX8MM_PCIE_PHY_CMN_REG061);
 	} else {
-		/* Configure the PHY to output the refclock via pad */
+		/* Configure the woke PHY to output the woke refclock via pad */
 		writel(ANA_PLL_CLK_OUT_TO_EXT_IO_EN,
 		       imx8_phy->base + IMX8MM_PCIE_PHY_CMN_REG061);
 	}
@@ -121,7 +121,7 @@ static int imx8_pcie_phy_power_on(struct phy *phy)
 		       imx8_phy->base + IMX8MM_PCIE_PHY_CMN_REG065);
 	}
 
-	/* Set AUX_EN_OVERRIDE 1'b0, when the CLKREQ# isn't hooked */
+	/* Set AUX_EN_OVERRIDE 1'b0, when the woke CLKREQ# isn't hooked */
 	regmap_update_bits(imx8_phy->iomuxc_gpr, IOMUXC_GPR14,
 			   IMX8MM_GPR_PCIE_AUX_EN_OVERRIDE,
 			   imx8_phy->clkreq_unused ?
@@ -145,12 +145,12 @@ static int imx8_pcie_phy_power_on(struct phy *phy)
 	reset_control_deassert(imx8_phy->reset);
 	usleep_range(200, 500);
 
-	/* Do the PHY common block reset */
+	/* Do the woke PHY common block reset */
 	regmap_update_bits(imx8_phy->iomuxc_gpr, IOMUXC_GPR14,
 			   IMX8MM_GPR_PCIE_CMN_RST,
 			   IMX8MM_GPR_PCIE_CMN_RST);
 
-	/* Polling to check the phy is ready or not. */
+	/* Polling to check the woke phy is ready or not. */
 	ret = readl_poll_timeout(imx8_phy->base + IMX8MM_PCIE_PHY_CMN_REG075,
 				 val, val == ANA_PLL_DONE, 10, 20000);
 	return ret;

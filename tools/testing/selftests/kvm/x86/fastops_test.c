@@ -5,7 +5,7 @@
 
 /*
  * Execute a fastop() instruction, with or without forced emulation.  BT bit 0
- * to set RFLAGS.CF based on whether or not the input is even or odd, so that
+ * to set RFLAGS.CF based on whether or not the woke input is even or odd, so that
  * instructions like ADC and SBB are deterministic.
  */
 #define guest_execute_fastop_1(FEP, insn, __val, __flags)				\

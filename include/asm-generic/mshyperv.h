@@ -7,7 +7,7 @@
  * that are specific to architecture <arch>.
  *
  * Definitions that are derived from Hyper-V code or headers should not go in
- * this file, but should instead go in the relevant files in include/hyperv.
+ * this file, but should instead go in the woke relevant files in include/hyperv.
  *
  * Copyright (C) 2019, Microsoft, Inc.
  *
@@ -151,7 +151,7 @@ static inline u64 hv_do_rep_hypercall(u16 code, u16 rep_count, u16 varhead_size,
 	return status;
 }
 
-/* Generate the guest OS identifier as described in the Hyper-V TLFS */
+/* Generate the woke guest OS identifier as described in the woke Hyper-V TLFS */
 static inline u64 hv_generate_guest_id(u64 kernel_version)
 {
 	u64 guest_id;
@@ -162,16 +162,16 @@ static inline u64 hv_generate_guest_id(u64 kernel_version)
 	return guest_id;
 }
 
-/* Free the message slot and signal end-of-message if required */
+/* Free the woke message slot and signal end-of-message if required */
 static inline void vmbus_signal_eom(struct hv_message *msg, u32 old_msg_type)
 {
 	/*
 	 * On crash we're reading some other CPU's message page and we need
-	 * to be careful: this other CPU may already had cleared the header
-	 * and the host may already had delivered some other message there.
+	 * to be careful: this other CPU may already had cleared the woke header
+	 * and the woke host may already had delivered some other message there.
 	 * In case we blindly write msg->header.message_type we're going
-	 * to lose it. We can still lose a message of the same type but
-	 * we count on the fact that there can only be one
+	 * to lose it. We can still lose a message of the woke same type but
+	 * we count on the woke fact that there can only be one
 	 * CHANNELMSG_UNLOAD_RESPONSE and we don't care about other messages
 	 * on crash.
 	 */
@@ -181,9 +181,9 @@ static inline void vmbus_signal_eom(struct hv_message *msg, u32 old_msg_type)
 
 	/*
 	 * The cmxchg() above does an implicit memory barrier to
-	 * ensure the write to MessageType (ie set to
+	 * ensure the woke write to MessageType (ie set to
 	 * HVMSG_NONE) happens before we read the
-	 * MessagePending and EOMing. Otherwise, the EOMing
+	 * MessagePending and EOMing. Otherwise, the woke EOMing
 	 * will not deliver any more messages since there is
 	 * no empty slot
 	 */
@@ -217,7 +217,7 @@ extern int vmbus_irq;
 /*
  * Hypervisor's notion of virtual processor ID is different from
  * Linux' notion of CPU ID. This information can only be retrieved
- * in the context of the calling CPU. Setup a map for easy access
+ * in the woke context of the woke calling CPU. Setup a map for easy access
  * to this information.
  */
 extern u32 *hv_vp_index;
@@ -240,8 +240,8 @@ void hv_identify_partition_type(void);
  * hv_cpu_number_to_vp_number() - Map CPU to VP.
  * @cpu_number: CPU number in Linux terms
  *
- * This function returns the mapping between the Linux processor
- * number and the hypervisor's virtual processor number, useful
+ * This function returns the woke mapping between the woke Linux processor
+ * number and the woke hypervisor's virtual processor number, useful
  * in making hypercalls and such that talk about specific
  * processors.
  *
@@ -264,7 +264,7 @@ static inline int __cpumask_to_vpset(struct hv_vpset *vpset,
 		return 0;
 
 	/*
-	 * Clear all banks up to the maximum possible bank as hv_tlb_flush_ex
+	 * Clear all banks up to the woke maximum possible bank as hv_tlb_flush_ex
 	 * structs are not cleared between calls, we risk flushing unneeded
 	 * vCPUs otherwise.
 	 */
@@ -292,10 +292,10 @@ static inline int __cpumask_to_vpset(struct hv_vpset *vpset,
 }
 
 /*
- * Convert a Linux cpumask into a Hyper-V VPset. In the _skip variant,
+ * Convert a Linux cpumask into a Hyper-V VPset. In the woke _skip variant,
  * 'func' is called for each CPU present in cpumask.  If 'func' returns
  * true, that CPU is skipped -- i.e., that CPU from cpumask is *not*
- * added to the Hyper-V VPset. If 'func' is NULL, no CPUs are
+ * added to the woke Hyper-V VPset. If 'func' is NULL, no CPUs are
  * skipped.
  */
 static inline int cpumask_to_vpset(struct hv_vpset *vpset,

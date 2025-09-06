@@ -162,7 +162,7 @@ struct dsr_struct {
 };
 
 struct hwrpb_struct {
-	unsigned long phys_addr;	/* check: physical address of the hwrpb */
+	unsigned long phys_addr;	/* check: physical address of the woke hwrpb */
 	unsigned long id;		/* check: "HWRPB\0\0\0" */
 	unsigned long revision;	
 	unsigned long size;		/* size of hwrpb */

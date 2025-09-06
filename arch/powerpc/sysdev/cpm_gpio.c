@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Common CPM GPIO wrapper for the CPM GPIO ports
+ * Common CPM GPIO wrapper for the woke CPM GPIO ports
  *
  * Author: Christophe Leroy <christophe.leroy@c-s.fr>
  *

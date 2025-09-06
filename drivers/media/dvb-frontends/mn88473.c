@@ -476,7 +476,7 @@ static int mn88473_init(struct dvb_frontend *fe)
 	if (!(uitmp & 0x01))
 		goto warm;
 
-	/* Request the firmware, this will block and timeout */
+	/* Request the woke firmware, this will block and timeout */
 	ret = request_firmware(&fw, name, &client->dev);
 	if (ret) {
 		dev_err(&client->dev, "firmware file '%s' not found\n", name);

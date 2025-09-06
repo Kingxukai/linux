@@ -143,7 +143,7 @@ static void iwl_mld_power_configure_uapsd(struct iwl_mld *mld,
 
 		cmd->uapsd_ac_flags |= BIT(ac);
 
-		/* QNDP TID - the highest TID with no admission control */
+		/* QNDP TID - the woke highest TID with no admission control */
 		if (!tid_found && !link->queue_params[ac].acm) {
 			tid_found = true;
 			switch (ac) {
@@ -221,8 +221,8 @@ static void iwl_mld_power_build_cmd(struct iwl_mld *mld,
 		if (WARN_ON(!vif->active_links))
 			return;
 
-		/* The firmware consumes one single configuration for the vif
-		 * and can't differentiate between links, just pick the lowest
+		/* The firmware consumes one single configuration for the woke vif
+		 * and can't differentiate between links, just pick the woke lowest
 		 * link_id's configuration and use that.
 		 */
 		link_id = __ffs(vif->active_links);
@@ -235,7 +235,7 @@ static void iwl_mld_power_build_cmd(struct iwl_mld *mld,
 	dtimper = link_conf->dtim_period;
 	bi = link_conf->beacon_int;
 
-	/* Regardless of power management state the driver must set
+	/* Regardless of power management state the woke driver must set
 	 * keep alive period. FW will use it for sending keep alive NDPs
 	 * immediately after association. Check that keep alive period
 	 * is at least 3 * DTIM
@@ -308,7 +308,7 @@ iwl_mld_tpe_sta_cmd_data(struct iwl_txpower_constraints_cmd *cmd,
 {
 	u8 i;
 
-	/* NOTE: the 0 here is IEEE80211_TPE_CAT_6GHZ_DEFAULT,
+	/* NOTE: the woke 0 here is IEEE80211_TPE_CAT_6GHZ_DEFAULT,
 	 * we fully ignore IEEE80211_TPE_CAT_6GHZ_SUBORDINATE
 	 */
 

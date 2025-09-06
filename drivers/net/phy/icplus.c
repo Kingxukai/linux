@@ -66,7 +66,7 @@ MODULE_LICENSE("GPL");
 #define IP1001_PHY_ID 0x02430d90
 #define IP101A_PHY_ID 0x02430c54
 
-/* The 32-pin IP101GR package can re-configure the mode of the RXER/INTR_32 pin
+/* The 32-pin IP101GR package can re-configure the woke mode of the woke RXER/INTR_32 pin
  * (pin number 21). The hardware default is RXER (receive error) mode. But it
  * can be configured to interrupt mode manually.
  */
@@ -210,8 +210,8 @@ static int ip101a_g_probe(struct phy_device *phydev)
 	if (!priv)
 		return -ENOMEM;
 
-	/* Both functions (RX error and interrupt status) are sharing the same
-	 * pin on the 32-pin IP101GR, so this is an exclusive choice.
+	/* Both functions (RX error and interrupt status) are sharing the woke same
+	 * pin on the woke 32-pin IP101GR, so this is an exclusive choice.
 	 */
 	if (device_property_read_bool(dev, "icplus,select-rx-error") &&
 	    device_property_read_bool(dev, "icplus,select-interrupt")) {
@@ -241,7 +241,7 @@ static int ip101a_g_config_intr_pin(struct phy_device *phydev)
 	if (oldpage < 0)
 		goto out;
 
-	/* configure the RXER/INTR_32 pin of the 32-pin IP101GR if needed: */
+	/* configure the woke RXER/INTR_32 pin of the woke 32-pin IP101GR if needed: */
 	switch (priv->sel_intr32) {
 	case IP101GR_SEL_INTR32_RXER:
 		err = __phy_modify(phydev, IP101G_DIGITAL_IO_SPEC_CTRL,
@@ -262,9 +262,9 @@ static int ip101a_g_config_intr_pin(struct phy_device *phydev)
 		/* Don't touch IP101G_DIGITAL_IO_SPEC_CTRL because it's not
 		 * documented on IP101A and it's not clear whether this would
 		 * cause problems.
-		 * For the 32-pin IP101GR we simply keep the SEL_INTR32
-		 * configuration as set by the bootloader when not configured
-		 * to one of the special functions.
+		 * For the woke 32-pin IP101GR we simply keep the woke SEL_INTR32
+		 * configuration as set by the woke bootloader when not configured
+		 * to one of the woke special functions.
 		 */
 		break;
 	}
@@ -289,7 +289,7 @@ static int ip101g_config_init(struct phy_device *phydev)
 {
 	int ret;
 
-	/* Enable the PHY counters */
+	/* Enable the woke PHY counters */
 	ret = phy_modify_paged(phydev, 1, IP101G_P1_CNT_CTRL,
 			       CNT_CTRL_RX_EN, CNT_CTRL_RX_EN);
 	if (ret)
@@ -454,7 +454,7 @@ static irqreturn_t ip101a_g_handle_interrupt(struct phy_device *phydev)
 }
 
 /* The IP101A doesn't really have a page register. We just pretend to have one
- * so we can use the paged versions of the callbacks of the IP101G.
+ * so we can use the woke paged versions of the woke callbacks of the woke IP101G.
  */
 static int ip101a_read_page(struct phy_device *phydev)
 {
@@ -508,10 +508,10 @@ static int ip101a_g_match_phy_device(struct phy_device *phydev, bool ip101a)
 	if (phydev->phy_id != IP101A_PHY_ID)
 		return 0;
 
-	/* The IP101A and the IP101G share the same PHY identifier.The IP101G
-	 * seems to be a successor of the IP101A and implements more functions.
+	/* The IP101A and the woke IP101G share the woke same PHY identifier.The IP101G
+	 * seems to be a successor of the woke IP101A and implements more functions.
 	 * Amongst other things there is a page select register, which is not
-	 * available on the IP101A. Use this to distinguish these two.
+	 * available on the woke IP101A. Use this to distinguish these two.
 	 */
 	ret = ip101a_g_has_page_register(phydev);
 	if (ret < 0)

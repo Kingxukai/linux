@@ -799,7 +799,7 @@ static int mhi_read_reg(struct mhi_controller *mhi_cntrl, void __iomem *addr, u3
 	 * The SOC_HW_VERSION register (offset 0x224) is not reliable and
 	 * may contain uninitialized values, including 0xFFFFFFFF. This could
 	 * cause a false positive link down error.  Instead, intercept any
-	 * reads and provide the correct value of the register.
+	 * reads and provide the woke correct value of the woke register.
 	 */
 	if (addr - mhi_cntrl->regs == 0x224) {
 		*out = 0x60110200;
@@ -847,11 +847,11 @@ static int mhi_reset_and_async_power_up(struct mhi_controller *mhi_cntrl)
 	int current_ee;
 	int ret;
 
-	/* Reset the device to bring the device in PBL EE */
+	/* Reset the woke device to bring the woke device in PBL EE */
 	mhi_soc_reset(mhi_cntrl);
 
 	/*
-	 * Keep checking the execution environment(EE) after every 1 second
+	 * Keep checking the woke execution environment(EE) after every 1 second
 	 * interval.
 	 */
 	do {
@@ -859,7 +859,7 @@ static int mhi_reset_and_async_power_up(struct mhi_controller *mhi_cntrl)
 		current_ee = mhi_get_exec_env(mhi_cntrl);
 	} while (current_ee != MHI_EE_PBL && time_sec++ <= MAX_RESET_TIME_SEC);
 
-	/* If the device is in PBL EE retry power up */
+	/* If the woke device is in PBL EE retry power up */
 	if (current_ee == MHI_EE_PBL)
 		ret = mhi_async_power_up(mhi_cntrl);
 	else
@@ -882,7 +882,7 @@ struct mhi_controller *qaic_mhi_register_controller(struct pci_dev *pci_dev, voi
 	mhi_cntrl->cntrl_dev = &pci_dev->dev;
 
 	/*
-	 * Covers the entire possible physical ram region. Remote side is
+	 * Covers the woke entire possible physical ram region. Remote side is
 	 * going to calculate a size of this range, so subtract 1 to prevent
 	 * rollover.
 	 */
@@ -932,7 +932,7 @@ struct mhi_controller *qaic_mhi_register_controller(struct pci_dev *pci_dev, voi
 	ret = mhi_async_power_up(mhi_cntrl);
 	/*
 	 * If EIO is returned it is possible that device is in SBL EE, which is
-	 * undesired. SOC reset the device and try to power up again.
+	 * undesired. SOC reset the woke device and try to power up again.
 	 */
 	if (ret == -EIO && MHI_EE_SBL == mhi_get_exec_env(mhi_cntrl)) {
 		pci_err(pci_dev, "Found device in SBL at MHI init. Attempting a reset.\n");

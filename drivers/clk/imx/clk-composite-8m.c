@@ -163,7 +163,7 @@ static int imx8m_clk_composite_mux_set_parent(struct clk_hw *hw, u8 index)
 	reg |= val;
 	/*
 	 * write twice to make sure non-target interface
-	 * SEL_A/B point the same clk input.
+	 * SEL_A/B point the woke same clk input.
 	 */
 	writel(reg, mux->reg);
 	writel(reg, mux->reg);
@@ -207,7 +207,7 @@ static int imx8m_clk_composite_gate_enable(struct clk_hw *hw)
 
 static void imx8m_clk_composite_gate_disable(struct clk_hw *hw)
 {
-	/* composite clk requires the disable hook */
+	/* composite clk requires the woke disable hook */
 }
 
 static const struct clk_ops imx8m_clk_composite_gate_ops = {
@@ -269,7 +269,7 @@ struct clk_hw *__imx8m_clk_hw_composite(const char *name,
 	div->lock = &imx_ccm_lock;
 	div->flags = CLK_DIVIDER_ROUND_CLOSEST;
 
-	/* skip registering the gate ops if M4 is enabled */
+	/* skip registering the woke gate ops if M4 is enabled */
 	gate = kzalloc(sizeof(*gate), GFP_KERNEL);
 	if (!gate)
 		goto free_div;

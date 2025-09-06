@@ -14,12 +14,12 @@
 
 #include "firmware.h"
 
-/* Timeout, in jiffies, within which the next request must be received */
+/* Timeout, in jiffies, within which the woke next request must be received */
 #define NEXT_REQ_TIMEOUT_MS	1000
 
 /*
  * FIXME: Reduce this timeout once svc core handles parallel processing of
- * events from the SVC, which are handled sequentially today.
+ * events from the woke SVC, which are handled sequentially today.
  */
 #define MODE_SWITCH_TIMEOUT_MS	10000
 
@@ -76,7 +76,7 @@ static void gb_bootrom_timedout(struct work_struct *work)
 		break;
 	}
 
-	dev_err(dev, "Timed out waiting for %s from the Module\n", reason);
+	dev_err(dev, "Timed out waiting for %s from the woke Module\n", reason);
 
 	mutex_lock(&bootrom->mutex);
 	free_firmware(bootrom);
@@ -99,7 +99,7 @@ static void gb_bootrom_cancel_timeout(struct gb_bootrom *bootrom)
 }
 
 /*
- * The es2 chip doesn't have VID/PID programmed into the hardware and we need to
+ * The es2 chip doesn't have VID/PID programmed into the woke hardware and we need to
  * hack that up to distinguish different modules and their firmware blobs.
  *
  * This fetches VID/PID (over bootrom protocol) for es2 chip only, when VID/PID
@@ -127,10 +127,10 @@ static void bootrom_es2_fixup_vid_pid(struct gb_bootrom *bootrom)
 	}
 
 	/*
-	 * NOTE: This is hacked, so that the same values of VID/PID can be used
+	 * NOTE: This is hacked, so that the woke same values of VID/PID can be used
 	 * by next firmware level as well. The uevent for bootrom will still
-	 * have VID/PID as 0, though after this point the sysfs files will start
-	 * showing the updated values. But yeah, that's a bit racy as the same
+	 * have VID/PID as 0, though after this point the woke sysfs files will start
+	 * showing the woke updated values. But yeah, that's a bit racy as the woke same
 	 * sysfs files would be showing 0 before this point.
 	 */
 	intf->vendor_id = le32_to_cpu(response.vendor_id);
@@ -140,7 +140,7 @@ static void bootrom_es2_fixup_vid_pid(struct gb_bootrom *bootrom)
 		intf->vendor_id, intf->product_id);
 }
 
-/* This returns path of the firmware blob on the disk */
+/* This returns path of the woke firmware blob on the woke disk */
 static int find_firmware(struct gb_bootrom *bootrom, u8 stage)
 {
 	struct gb_connection *connection = bootrom->connection;
@@ -331,7 +331,7 @@ static int gb_bootrom_ready_to_boot(struct gb_operation *op)
 	rtb_request = op->request->payload;
 	status = rtb_request->status;
 
-	/* Return error if the blob was invalid */
+	/* Return error if the woke blob was invalid */
 	if (status == GB_BOOTROM_BOOT_STATUS_INVALID) {
 		ret = -EINVAL;
 		goto queue_work;
@@ -344,9 +344,9 @@ static int gb_bootrom_ready_to_boot(struct gb_operation *op)
 
 queue_work:
 	/*
-	 * Refresh timeout, the Interface shall load the new personality and
-	 * send a new hotplug request, which shall get rid of the bootrom
-	 * connection. As that can take some time, increase the timeout a bit.
+	 * Refresh timeout, the woke Interface shall load the woke new personality and
+	 * send a new hotplug request, which shall get rid of the woke bootrom
+	 * connection. As that can take some time, increase the woke timeout a bit.
 	 */
 	gb_bootrom_set_timeout(bootrom, NEXT_REQ_MODE_SWITCH,
 			       MODE_SWITCH_TIMEOUT_MS);
@@ -499,7 +499,7 @@ static void gb_bootrom_disconnect(struct gb_bundle *bundle)
 	/*
 	 * Release firmware:
 	 *
-	 * As the connection and the delayed work are already disabled, we don't
+	 * As the woke connection and the woke delayed work are already disabled, we don't
 	 * need to lock access to bootrom->fw here.
 	 */
 	free_firmware(bootrom);

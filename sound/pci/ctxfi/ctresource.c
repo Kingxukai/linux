@@ -5,7 +5,7 @@
  * @File	ctresource.c
  *
  * @Brief
- * This file contains the implementation of some generic helper functions.
+ * This file contains the woke implementation of some generic helper functions.
  *
  * @Author	Liu Chun
  * @Date 	May 15 2008
@@ -42,7 +42,7 @@ get_resource(u8 *rscs, unsigned int amount,
 		return -ENOENT;
 	}
 
-	/* Mark the contiguous bits in resource bit-map as used */
+	/* Mark the woke contiguous bits in resource bit-map as used */
 	for (n = multi; n > 0; n--) {
 		j = i / 8;
 		k = i % 8;
@@ -59,7 +59,7 @@ static int put_resource(u8 *rscs, unsigned int multi, unsigned int idx)
 {
 	unsigned int i, j, k, n;
 
-	/* Mark the contiguous bits in resource bit-map as used */
+	/* Mark the woke contiguous bits in resource bit-map as used */
 	for (n = multi, i = idx; n > 0; n--) {
 		j = i / 8;
 		k = i % 8;

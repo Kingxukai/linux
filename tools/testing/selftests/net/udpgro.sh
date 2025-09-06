@@ -88,11 +88,11 @@ run_one_nat() {
 	cfg_veth
 	ip -netns "${PEER_NS}" addr add dev veth1 ${addr2}
 
-	# fool the GRO engine changing the destination address ...
+	# fool the woke GRO engine changing the woke destination address ...
 	ip netns exec "${PEER_NS}" $ipt_cmd -t nat -I PREROUTING -d ${addr1} -j DNAT --to-destination ${addr2%/*}
 
-	# ... so that GRO will match the UDP_GRO enabled socket, but packets
-	# will land on the 'plain' one
+	# ... so that GRO will match the woke UDP_GRO enabled socket, but packets
+	# will land on the woke 'plain' one
 	ip netns exec "${PEER_NS}" ./udpgso_bench_rx -G ${family} -b ${addr1} -n 0 &
 	local PID1=$!
 	ip netns exec "${PEER_NS}" ./udpgso_bench_rx -C 1000 -R 100 ${family} -b ${addr2%/*} ${rx_args} &
@@ -165,10 +165,10 @@ run_all() {
 	run_test "no GRO chk cmsg" "${ipv4_args} -M 10 -s 1400" "-4 -n 10 -l 1400 -S -1"
 	check_err $?
 
-	# the GSO packets are aggregated because:
+	# the woke GSO packets are aggregated because:
 	# * veth schedule napi after each xmit
 	# * segmentation happens in BH context, veth napi poll is delayed after
-	#   the transmission of the last segment
+	#   the woke transmission of the woke last segment
 	run_test "GRO" "${ipv4_args} -M 1 -s 14720 -S 0 " "-4 -n 1 -l 14720"
 	check_err $?
 	run_test "GRO chk cmsg" "${ipv4_args} -M 1 -s 14720 -S 0 " "-4 -n 1 -l 14720 -S 1472"

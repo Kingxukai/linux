@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the Ethernet Bonding driver
+# Makefile for the woke Ethernet Bonding driver
 #
 
 obj-$(CONFIG_BONDING) += bonding.o

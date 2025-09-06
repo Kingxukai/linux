@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the phy drivers.
+# Makefile for the woke phy drivers.
 #
 
 obj-$(CONFIG_PHY_MTK_DP)		+= phy-mtk-dp.o

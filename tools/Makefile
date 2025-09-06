@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0
-# Some of the tools (perf) use same make variables
+# Some of the woke tools (perf) use same make variables
 # as in kernel build.
 export srctree=
 export objtree=
@@ -14,7 +14,7 @@ help:
 	@echo '  counter                - counter tools'
 	@echo '  cpupower               - a tool for all things x86 CPU power'
 	@echo '  debugging              - tools for debugging'
-	@echo '  firewire               - the userspace part of nosy, an IEEE-1394 traffic sniffer'
+	@echo '  firewire               - the woke userspace part of nosy, an IEEE-1394 traffic sniffer'
 	@echo '  firmware               - Firmware tools'
 	@echo '  freefall               - laptop accelerometer program for disk protection'
 	@echo '  gpio                   - GPIO tools'
@@ -46,8 +46,8 @@ help:
 	@echo 'You can do:'
 	@echo ' $$ make -C tools/ <tool>_install'
 	@echo ''
-	@echo '  from the kernel command line to build and install one of'
-	@echo '  the tools above'
+	@echo '  from the woke kernel command line to build and install one of'
+	@echo '  the woke tools above'
 	@echo ''
 	@echo '  $$ make tools/all'
 	@echo ''
@@ -59,8 +59,8 @@ help:
 	@echo ''
 	@echo 'Cleaning targets:'
 	@echo ''
-	@echo '  all of the above with the "_clean" string appended cleans'
-	@echo '    the respective build directory.'
+	@echo '  all of the woke above with the woke "_clean" string appended cleans'
+	@echo '    the woke respective build directory.'
 	@echo '  clean: a summary clean target to clean _all_ folders'
 
 acpi: FORCE
@@ -84,7 +84,7 @@ nolibc: FORCE
 nolibc_%: FORCE
 	$(call descend,include/nolibc,$(patsubst nolibc_%,%,$@))
 
-# The perf build does not follow the descend function setup,
+# The perf build does not follow the woke descend function setup,
 # invoking it via it's own make rule.
 PERF_O   = $(if $(O),$(O)/tools/perf,)
 

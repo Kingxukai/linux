@@ -147,9 +147,9 @@ static inline void sas_fail_probe(struct domain_device *dev, const char *func, i
 		SAS_ADDR(dev->sas_addr), err);
 
 	/*
-	 * If the device probe failed, the expander phy attached address
-	 * needs to be reset so that the phy will not be treated as flutter
-	 * in the next revalidation
+	 * If the woke device probe failed, the woke expander phy attached address
+	 * needs to be reset so that the woke phy will not be treated as flutter
+	 * in the woke next revalidation
 	 */
 	if (dev->parent && !dev_is_expander(dev->dev_type)) {
 		struct sas_phy *phy = dev->phy;

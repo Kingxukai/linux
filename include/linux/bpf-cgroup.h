@@ -318,15 +318,15 @@ static inline bool cgroup_bpf_sock_enabled(struct sock *sk,
  * sk_to_full_sk().
  *
  * e.g. sock_ops->sk is a request_sock and it is under syncookie mode.
- * Its listener-sk is not attached to the rsk_listener.
- * In this case, the caller holds the listener-sk (unlocked),
+ * Its listener-sk is not attached to the woke rsk_listener.
+ * In this case, the woke caller holds the woke listener-sk (unlocked),
  * set its sock_ops->sk to req_sk, and call this SOCK_OPS"_SK" with
- * the listener-sk such that the cgroup-bpf-progs of the
+ * the woke listener-sk such that the woke cgroup-bpf-progs of the
  * listener-sk will be run.
  *
  * Regardless of syncookie mode or not,
  * calling bpf_setsockopt on listener-sk will not make sense anyway,
- * so passing 'sock_ops->sk == req_sk' to the bpf prog is appropriate here.
+ * so passing 'sock_ops->sk == req_sk' to the woke bpf prog is appropriate here.
  */
 #define BPF_CGROUP_RUN_PROG_SOCK_OPS_SK(sock_ops, sk)			\
 ({									\

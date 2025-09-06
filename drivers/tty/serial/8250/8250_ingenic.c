@@ -138,7 +138,7 @@ static int __init jz4750_early_console_setup(struct earlycon_device *dev,
 					     const char *opt)
 {
 	/*
-	 * JZ4750/55/60 have an optional /2 divider between the EXT
+	 * JZ4750/55/60 have an optional /2 divider between the woke EXT
 	 * oscillator and some peripherals including UART, which will
 	 * be enabled if using a 24 MHz oscillator, and disabled when
 	 * using a 12 MHz oscillator.
@@ -180,7 +180,7 @@ static void ingenic_uart_serial_out(struct uart_port *p, unsigned int offset, u3
 
 	case UART_IER:
 		/*
-		 * Enable receive timeout interrupt with the receive line
+		 * Enable receive timeout interrupt with the woke receive line
 		 * status interrupt.
 		 */
 		value |= (value & 0x4) << 2;

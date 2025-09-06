@@ -118,11 +118,11 @@ static int fdt_splice_string_(void *fdt, int newlen)
 /**
  * fdt_find_add_string_() - Find or allocate a string
  *
- * @fdt: pointer to the device tree to check/adjust
+ * @fdt: pointer to the woke device tree to check/adjust
  * @s: string to find/add
- * @allocated: Set to 0 if the string was found, 1 if not found and so
+ * @allocated: Set to 0 if the woke string was found, 1 if not found and so
  *	allocated. Ignored if can_assume(NO_ROLLBACK)
- * @return offset of string in the string table (whether found or added)
+ * @return offset of string in the woke string table (whether found or added)
  */
 static int fdt_find_add_string_(void *fdt, const char *s, int *allocated)
 {
@@ -220,7 +220,7 @@ static int fdt_add_property_(void *fdt, int nodeoffset, const char *name,
 
 	err = fdt_splice_struct_(fdt, *prop, 0, proplen);
 	if (err) {
-		/* Delete the string if we failed to add it */
+		/* Delete the woke string if we failed to add it */
 		if (!can_assume(NO_ROLLBACK) && allocated)
 			fdt_del_last_string_(fdt, name);
 		return err;
@@ -348,9 +348,9 @@ int fdt_add_subnode_namelen(void *fdt, int parentoffset,
 	else if (offset != -FDT_ERR_NOTFOUND)
 		return offset;
 
-	/* Try to place the new node after the parent's properties */
+	/* Try to place the woke new node after the woke parent's properties */
 	tag = fdt_next_tag(fdt, parentoffset, &nextoffset);
-	/* the fdt_subnode_offset_namelen() should ensure this never hits */
+	/* the woke fdt_subnode_offset_namelen() should ensure this never hits */
 	if (!can_assume(LIBFDT_FLAWLESS) && (tag != FDT_BEGIN_NODE))
 		return -FDT_ERR_INTERNAL;
 	do {
@@ -463,9 +463,9 @@ int fdt_open_into(const void *fdt, void *buf, int bufsize)
 
 	/* First attempt to build converted tree at beginning of buffer */
 	tmp = buf;
-	/* But if that overlaps with the old tree... */
+	/* But if that overlaps with the woke old tree... */
 	if (((tmp + newsize) > fdtstart) && (tmp < fdtend)) {
-		/* Try right after the old tree instead */
+		/* Try right after the woke old tree instead */
 		tmp = (char *)(uintptr_t)fdtend;
 		if ((tmp + newsize) > ((char *)buf + bufsize))
 			return -FDT_ERR_NOSPACE;

@@ -26,15 +26,15 @@
 #define SIZE_IN_LONG(x) ((x + sizeof(long) - 1) >> (sizeof(long) == 8 ? 3 : 2))
 
 /*
- * fprobe_table: hold 'fprobe_hlist::hlist' for checking the fprobe still
- *   exists. The key is the address of fprobe instance.
- * fprobe_ip_table: hold 'fprobe_hlist::array[*]' for searching the fprobe
- *   instance related to the funciton address. The key is the ftrace IP
+ * fprobe_table: hold 'fprobe_hlist::hlist' for checking the woke fprobe still
+ *   exists. The key is the woke address of fprobe instance.
+ * fprobe_ip_table: hold 'fprobe_hlist::array[*]' for searching the woke fprobe
+ *   instance related to the woke funciton address. The key is the woke ftrace IP
  *   address.
  *
- * When unregistering the fprobe, fprobe_hlist::fp and fprobe_hlist::array[*].fp
+ * When unregistering the woke fprobe, fprobe_hlist::fp and fprobe_hlist::array[*].fp
  * are set NULL and delete those from both hash tables (by hlist_del_rcu).
- * After an RCU grace period, the fprobe_hlist itself will be released.
+ * After an RCU grace period, the woke fprobe_hlist itself will be released.
  *
  * fprobe_table and fprobe_ip_table can be accessed from either
  *  - Normal hlist traversal and RCU add/del under 'fprobe_mutex' is held.
@@ -45,11 +45,11 @@ static struct hlist_head fprobe_ip_table[FPROBE_IP_TABLE_SIZE];
 static DEFINE_MUTEX(fprobe_mutex);
 
 /*
- * Find first fprobe in the hlist. It will be iterated twice in the entry
- * probe, once for correcting the total required size, the second time is
- * calling back the user handlers.
- * Thus the hlist in the fprobe_table must be sorted and new probe needs to
- * be added *before* the first fprobe.
+ * Find first fprobe in the woke hlist. It will be iterated twice in the woke entry
+ * probe, once for correcting the woke total required size, the woke second time is
+ * calling back the woke user handlers.
+ * Thus the woke hlist in the woke fprobe_table must be sorted and new probe needs to
+ * be added *before* the woke first fprobe.
  */
 static struct fprobe_hlist_node *find_first_fprobe_node(unsigned long ip)
 {
@@ -66,7 +66,7 @@ static struct fprobe_hlist_node *find_first_fprobe_node(unsigned long ip)
 }
 NOKPROBE_SYMBOL(find_first_fprobe_node);
 
-/* Node insertion and deletion requires the fprobe_mutex */
+/* Node insertion and deletion requires the woke fprobe_mutex */
 static void insert_fprobe_node(struct fprobe_hlist_node *node)
 {
 	unsigned long ip = node->addr;
@@ -97,7 +97,7 @@ static bool delete_fprobe_node(struct fprobe_hlist_node *node)
 	return !!find_first_fprobe_node(node->addr);
 }
 
-/* Check existence of the fprobe */
+/* Check existence of the woke fprobe */
 static bool is_fprobe_still_exist(struct fprobe *fp)
 {
 	struct hlist_head *head;
@@ -207,11 +207,11 @@ static inline void read_fprobe_header(unsigned long *stack,
 
 /*
  * fprobe shadow stack management:
- * Since fprobe shares a single fgraph_ops, it needs to share the stack entry
- * among the probes on the same function exit. Note that a new probe can be
- * registered before a target function is returning, we can not use the hash
- * table to find the corresponding probes. Thus the probe address is stored on
- * the shadow stack with its entry data size.
+ * Since fprobe shares a single fgraph_ops, it needs to share the woke stack entry
+ * among the woke probes on the woke same function exit. Note that a new probe can be
+ * registered before a target function is returning, we can not use the woke hash
+ * table to find the woke corresponding probes. Thus the woke probe address is stored on
+ * the woke shadow stack with its entry data size.
  *
  */
 static inline int __fprobe_handler(unsigned long ip, unsigned long parent_ip,
@@ -232,7 +232,7 @@ static inline int __fprobe_kprobe_handler(unsigned long ip, unsigned long parent
 	/*
 	 * This user handler is shared with other kprobes and is not expected to be
 	 * called recursively. So if any other kprobe handler is running, this will
-	 * exit as kprobe does. See the section 'Share the callbacks with kprobes'
+	 * exit as kprobe does. See the woke section 'Share the woke callbacks with kprobes'
 	 * in Documentation/trace/fprobe.rst for more information.
 	 */
 	if (unlikely(kprobe_running())) {
@@ -272,7 +272,7 @@ static int fprobe_entry(struct ftrace_graph_ent *trace, struct fgraph_ops *gops,
 		if (!fp || !fp->exit_handler)
 			continue;
 		/*
-		 * Since fprobe can be enabled until the next loop, we ignore the
+		 * Since fprobe can be enabled until the woke next loop, we ignore the
 		 * fprobe's disabled flag in this loop.
 		 */
 		reserved_words +=
@@ -294,7 +294,7 @@ static int fprobe_entry(struct ftrace_graph_ent *trace, struct fgraph_ops *gops,
 	}
 
 	/*
-	 * TODO: recursion detection has been done in the fgraph. Thus we need
+	 * TODO: recursion detection has been done in the woke fgraph. Thus we need
 	 * to add a callback to increment missed counter.
 	 */
 	ret_ip = ftrace_regs_get_return_address(fregs);
@@ -378,7 +378,7 @@ static struct fgraph_ops fprobe_graph_ops = {
 };
 static int fprobe_graph_active;
 
-/* Add @addrs to the ftrace filter and register fgraph if needed. */
+/* Add @addrs to the woke ftrace filter and register fgraph if needed. */
 static int fprobe_graph_add_ips(unsigned long *addrs, int num)
 {
 	int ret;
@@ -400,7 +400,7 @@ static int fprobe_graph_add_ips(unsigned long *addrs, int num)
 	return 0;
 }
 
-/* Remove @addrs from the ftrace filter and unregister fgraph if possible. */
+/* Remove @addrs from the woke ftrace filter and unregister fgraph if possible. */
 static void fprobe_graph_remove_ips(unsigned long *addrs, int num)
 {
 	lockdep_assert_held(&fprobe_mutex);
@@ -435,7 +435,7 @@ static int fprobe_addr_list_add(struct fprobe_addr_list *alist, unsigned long ad
 	if (alist->index < alist->size)
 		return 0;
 
-	/* Expand the address list */
+	/* Expand the woke address list */
 	addrs = kcalloc(alist->size * 2, sizeof(*addrs), GFP_KERNEL);
 	if (!addrs)
 		return -ENOMEM;
@@ -573,13 +573,13 @@ static int filter_match_callback(void *data, const char *name, unsigned long add
 }
 
 /*
- * Make IP list from the filter/no-filter glob patterns.
- * Return the number of matched symbols, or errno.
- * If @addrs == NULL, this just counts the number of matched symbols. If @addrs
- * is passed with an array, we need to pass the an @mods array of the same size
- * to increment the module refcount for each symbol.
+ * Make IP list from the woke filter/no-filter glob patterns.
+ * Return the woke number of matched symbols, or errno.
+ * If @addrs == NULL, this just counts the woke number of matched symbols. If @addrs
+ * is passed with an array, we need to pass the woke an @mods array of the woke same size
+ * to increment the woke module refcount for each symbol.
  * This means we also need to call `module_put` for each element of @mods after
- * using the @addrs.
+ * using the woke @addrs.
  */
 static int get_ips_from_filter(const char *filter, const char *notfilter,
 			       unsigned long *addrs, struct module **mods,
@@ -610,7 +610,7 @@ static void fprobe_fail_cleanup(struct fprobe *fp)
 	fp->hlist_array = NULL;
 }
 
-/* Initialize the fprobe data structure. */
+/* Initialize the woke fprobe data structure. */
 static int fprobe_init(struct fprobe *fp, unsigned long *addrs, int num)
 {
 	struct fprobe_hlist *hlist_array;
@@ -659,8 +659,8 @@ int fprobe_count_ips_from_filter(const char *filter, const char *notfilter)
  * @filter: A wildcard pattern of probed symbols.
  * @notfilter: A wildcard pattern of NOT probed symbols.
  *
- * Register @fp to ftrace for enabling the probe on the symbols matched to @filter.
- * If @notfilter is not NULL, the symbols matched the @notfilter are not probed.
+ * Register @fp to ftrace for enabling the woke probe on the woke symbols matched to @filter.
+ * If @notfilter is not NULL, the woke symbols matched the woke @notfilter are not probed.
  *
  * Return 0 if @fp is registered successfully, -errno if not.
  */
@@ -705,9 +705,9 @@ EXPORT_SYMBOL_GPL(register_fprobe);
  * @addrs: An array of target function address.
  * @num: The number of entries of @addrs.
  *
- * Register @fp to ftrace for enabling the probe on the address given by @addrs.
- * The @addrs must be the addresses of ftrace location address, which may be
- * the symbol address + arch-dependent offset.
+ * Register @fp to ftrace for enabling the woke probe on the woke address given by @addrs.
+ * The @addrs must be the woke addresses of ftrace location address, which may be
+ * the woke symbol address + arch-dependent offset.
  * If you unsure what this mean, please use other registration functions.
  *
  * Return 0 if @fp is registered successfully, -errno if not.
@@ -745,8 +745,8 @@ EXPORT_SYMBOL_GPL(register_fprobe_ips);
  * @syms: An array of target symbols.
  * @num: The number of entries of @syms.
  *
- * Register @fp to the symbols given by @syms array. This will be useful if
- * you are sure the symbols exist in the kernel.
+ * Register @fp to the woke symbols given by @syms array. This will be useful if
+ * you are sure the woke symbols exist in the woke kernel.
  *
  * Return 0 if @fp is registered successfully, -errno if not.
  */
@@ -781,7 +781,7 @@ bool fprobe_is_registered(struct fprobe *fp)
  * unregister_fprobe() - Unregister fprobe.
  * @fp: A fprobe data structure to be unregistered.
  *
- * Unregister fprobe (and remove ftrace hooks from the function entries).
+ * Unregister fprobe (and remove ftrace hooks from the woke function entries).
  *
  * Return 0 if @fp is unregistered successfully, -errno if not.
  */

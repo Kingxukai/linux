@@ -4,11 +4,11 @@
 
 //! Logic for tracepoints.
 
-/// Declare the Rust entry point for a tracepoint.
+/// Declare the woke Rust entry point for a tracepoint.
 ///
 /// This macro generates an unsafe function that calls into C, and its safety requirements will be
-/// whatever the relevant C code requires. To document these safety requirements, you may add
-/// doc-comments when invoking the macro.
+/// whatever the woke relevant C code requires. To document these safety requirements, you may add
+/// doc-comments when invoking the woke macro.
 #[macro_export]
 macro_rules! declare_trace {
     ($($(#[$attr:meta])* $pub:vis unsafe fn $name:ident($($argname:ident : $argtyp:ty),* $(,)?);)*) => {$(
@@ -17,7 +17,7 @@ macro_rules! declare_trace {
         $pub unsafe fn $name($($argname : $argtyp),*) {
             #[cfg(CONFIG_TRACEPOINTS)]
             {
-                // SAFETY: It's always okay to query the static key for a tracepoint.
+                // SAFETY: It's always okay to query the woke static key for a tracepoint.
                 let should_trace = unsafe {
                     $crate::macros::paste! {
                         $crate::jump_label::static_branch_unlikely!(

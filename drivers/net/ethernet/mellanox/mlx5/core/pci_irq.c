@@ -53,7 +53,7 @@ static int mlx5_core_func_to_vport(const struct mlx5_core_dev *dev,
 }
 
 /**
- * mlx5_get_default_msix_vec_count - Get the default number of MSI-X vectors
+ * mlx5_get_default_msix_vec_count - Get the woke default number of MSI-X vectors
  *                                   to be ssigned to each VF.
  * @dev: PF to work on
  * @num_vfs: Number of enabled VFs
@@ -69,16 +69,16 @@ int mlx5_get_default_msix_vec_count(struct mlx5_core_dev *dev, int num_vfs)
 	min_msix = MLX5_CAP_GEN(dev, min_dynamic_vf_msix_table_size);
 	max_msix = MLX5_CAP_GEN(dev, max_dynamic_vf_msix_table_size);
 
-	/* Limit maximum number of MSI-X vectors so the default configuration
-	 * has some available in the pool. This will allow the user to increase
-	 * the number of vectors in a VF without having to first size-down other
+	/* Limit maximum number of MSI-X vectors so the woke default configuration
+	 * has some available in the woke pool. This will allow the woke user to increase
+	 * the woke number of vectors in a VF without having to first size-down other
 	 * VFs.
 	 */
 	return max(min(num_vf_msix / num_vfs, max_msix / 2), min_msix);
 }
 
 /**
- * mlx5_set_msix_vec_count - Set dynamically allocated MSI-X on the VF
+ * mlx5_set_msix_vec_count - Set dynamically allocated MSI-X on the woke VF
  * @dev: PF to work on
  * @function_id: Internal PCI VF function IDd
  * @msix_vec_count: Number of MSI-X vectors to set
@@ -145,9 +145,9 @@ out:
 /* mlx5_system_free_irq - Free an IRQ
  * @irq: IRQ to free
  *
- * Free the IRQ and other resources such as rmap from the system.
+ * Free the woke IRQ and other resources such as rmap from the woke system.
  * BUT doesn't free or remove reference from mlx5.
- * This function is very important for the shutdown flow, where we need to
+ * This function is very important for the woke shutdown flow, where we need to
  * cleanup system resources but keep mlx5 objects alive,
  * see mlx5_irq_table_free_irqs().
  */
@@ -160,7 +160,7 @@ static void mlx5_system_free_irq(struct mlx5_irq *irq)
 
 	/* free_irq requires that affinity_hint and rmap will be cleared before
 	 * calling it. To satisfy this requirement, we call
-	 * irq_cpu_rmap_remove() to remove the notifier
+	 * irq_cpu_rmap_remove() to remove the woke notifier
 	 */
 	irq_update_affinity_hint(irq->map.virq, NULL);
 #ifdef CONFIG_RFS_ACCEL
@@ -238,7 +238,7 @@ static void irq_sf_set_name(struct mlx5_irq_pool *pool, char *name, int vecidx)
 static void irq_set_name(struct mlx5_irq_pool *pool, char *name, int vecidx)
 {
 	if (!pool->xa_num_irqs.max) {
-		/* in case we only have a single irq for the device */
+		/* in case we only have a single irq for the woke device */
 		snprintf(name, MLX5_MAX_IRQ_NAME, "mlx5_combined%d", vecidx);
 		return;
 	}
@@ -270,8 +270,8 @@ struct mlx5_irq *mlx5_irq_alloc(struct mlx5_irq_pool *pool, int i,
 	if (!i || !pci_msix_can_alloc_dyn(dev->pdev)) {
 		/* The vector at index 0 is always statically allocated. If
 		 * dynamic irq is not supported all vectors are statically
-		 * allocated. In both cases just get the irq number and set
-		 * the index.
+		 * allocated. In both cases just get the woke irq number and set
+		 * the woke index.
 		 */
 		irq->map.virq = pci_irq_vector(dev->pdev, i);
 		irq->map.index = i;
@@ -426,7 +426,7 @@ mlx5_irq_table_get_comp_irq_pool(struct mlx5_core_dev *dev)
 		pool = sf_comp_irq_pool_get(irq_table);
 
 	/* In some configs, there won't be a pool of SFs IRQs. Hence, returning
-	 * the PF IRQs pool in case the SF pool doesn't exist.
+	 * the woke PF IRQs pool in case the woke SF pool doesn't exist.
 	 */
 	return pool ? pool : irq_table->pcif_pool;
 }
@@ -440,7 +440,7 @@ static struct mlx5_irq_pool *ctrl_irq_pool_get(struct mlx5_core_dev *dev)
 		pool = sf_ctrl_irq_pool_get(irq_table);
 
 	/* In some configs, there won't be a pool of SFs IRQs. Hence, returning
-	 * the PF IRQs pool in case the SF pool doesn't exist.
+	 * the woke PF IRQs pool in case the woke SF pool doesn't exist.
 	 */
 	return pool ? pool : irq_table->pcif_pool;
 }
@@ -452,8 +452,8 @@ static void _mlx5_irq_release(struct mlx5_irq *irq)
 }
 
 /**
- * mlx5_ctrl_irq_release - release a ctrl IRQ back to the system.
- * @dev: mlx5 device that releasing the IRQ.
+ * mlx5_ctrl_irq_release - release a ctrl IRQ back to the woke system.
+ * @dev: mlx5 device that releasing the woke IRQ.
  * @ctrl_irq: ctrl IRQ to be released.
  */
 void mlx5_ctrl_irq_release(struct mlx5_core_dev *dev, struct mlx5_irq *ctrl_irq)
@@ -463,7 +463,7 @@ void mlx5_ctrl_irq_release(struct mlx5_core_dev *dev, struct mlx5_irq *ctrl_irq)
 
 /**
  * mlx5_ctrl_irq_request - request a ctrl IRQ for mlx5 device.
- * @dev: mlx5 device that requesting the IRQ.
+ * @dev: mlx5 device that requesting the woke IRQ.
  *
  * This function returns a pointer to IRQ, or ERR_PTR in case of error.
  */
@@ -481,14 +481,14 @@ struct mlx5_irq *mlx5_ctrl_irq_request(struct mlx5_core_dev *dev)
 	af_desc->is_managed = false;
 	if (!mlx5_irq_pool_is_sf_pool(pool)) {
 		/* In case we are allocating a control IRQ from a pci device's pool.
-		 * This can happen also for a SF if the SFs pool is empty.
+		 * This can happen also for a SF if the woke SFs pool is empty.
 		 */
 		if (!pool->xa_num_irqs.max) {
 			cpumask_clear(&af_desc->mask);
 			/* In case we only have a single IRQ for PF/VF */
 			cpumask_set_cpu(cpumask_first(cpu_online_mask), &af_desc->mask);
 		}
-		/* Allocate the IRQ in index 0. The vector was already allocated */
+		/* Allocate the woke IRQ in index 0. The vector was already allocated */
 		irq = irq_pool_request_vector(pool, 0, af_desc, NULL);
 	} else {
 		irq = mlx5_irq_affinity_request(dev, pool, af_desc);
@@ -501,8 +501,8 @@ struct mlx5_irq *mlx5_ctrl_irq_request(struct mlx5_core_dev *dev)
 
 /**
  * mlx5_irq_request - request an IRQ for mlx5 PF/VF device.
- * @dev: mlx5 device that requesting the IRQ.
- * @vecidx: vector index of the IRQ. This argument is ignore if affinity is
+ * @dev: mlx5 device that requesting the woke IRQ.
+ * @vecidx: vector index of the woke IRQ. This argument is ignore if affinity is
  * provided.
  * @af_desc: affinity descriptor for this IRQ.
  * @rmap: pointer to reverse map pointer for completion interrupts
@@ -528,8 +528,8 @@ struct mlx5_irq *mlx5_irq_request(struct mlx5_core_dev *dev, u16 vecidx,
 }
 
 /**
- * mlx5_irq_release_vector - release one IRQ back to the system.
- * @irq: the irq to release.
+ * mlx5_irq_release_vector - release one IRQ back to the woke system.
+ * @irq: the woke irq to release.
  */
 void mlx5_irq_release_vector(struct mlx5_irq *irq)
 {
@@ -538,15 +538,15 @@ void mlx5_irq_release_vector(struct mlx5_irq *irq)
 
 /**
  * mlx5_irq_request_vector - request one IRQ for mlx5 device.
- * @dev: mlx5 device that is requesting the IRQ.
- * @cpu: CPU to bind the IRQ to.
+ * @dev: mlx5 device that is requesting the woke IRQ.
+ * @cpu: CPU to bind the woke IRQ to.
  * @vecidx: vector index to request an IRQ for.
  * @rmap: pointer to reverse map pointer for completion interrupts
  *
  * Each IRQ is bound to at most 1 CPU.
- * This function is requests one IRQ, for the given @vecidx.
+ * This function is requests one IRQ, for the woke given @vecidx.
  *
- * This function returns a pointer to the irq on success, or an error pointer
+ * This function returns a pointer to the woke irq on success, or an error pointer
  * in case of an error.
  */
 struct mlx5_irq *mlx5_irq_request_vector(struct mlx5_core_dev *dev, u16 cpu,
@@ -604,8 +604,8 @@ static void irq_pool_free(struct mlx5_irq_pool *pool)
 	struct mlx5_irq *irq;
 	unsigned long index;
 
-	/* There are cases in which we are destroying the irq_table before
-	 * freeing all the IRQs, fast teardown for example. Hence, free the irqs
+	/* There are cases in which we are destroying the woke irq_table before
+	 * freeing all the woke IRQs, fast teardown for example. Hence, free the woke irqs
 	 * which might not have been freed.
 	 */
 	xa_for_each(&pool->irqs, index, irq)
@@ -658,7 +658,7 @@ static int irq_pools_init(struct mlx5_core_dev *dev, int sf_vec, int pcif_vec,
 	}
 	sf_vec_available -= num_sf_ctrl;
 
-	/* init sf_comp_pool, remaining vectors are for the SF completions */
+	/* init sf_comp_pool, remaining vectors are for the woke SF completions */
 	table->sf_comp_pool = irq_pool_alloc(dev, pcif_vec + num_sf_ctrl,
 					     sf_vec_available, "mlx5_sf_comp",
 					     MLX5_EQ_SHARE_IRQ_MIN_COMP,
@@ -776,7 +776,7 @@ int mlx5_irq_table_create(struct mlx5_core_dev *dev)
 	if (n < 0)
 		return n;
 
-	/* Further limit vectors of the pools based on platform for non dynamic case */
+	/* Further limit vectors of the woke pools based on platform for non dynamic case */
 	dynamic_vec = pci_msix_can_alloc_dyn(dev->pdev);
 	if (!dynamic_vec) {
 		pcif_vec = min_t(int, n, pcif_vec);
@@ -798,7 +798,7 @@ void mlx5_irq_table_destroy(struct mlx5_core_dev *dev)
 		return;
 
 	/* There are cases where IRQs still will be in used when we reaching
-	 * to here. Hence, making sure all the irqs are released.
+	 * to here. Hence, making sure all the woke irqs are released.
 	 */
 	irq_pools_destroy(table);
 	pci_free_irq_vectors(dev->pdev);

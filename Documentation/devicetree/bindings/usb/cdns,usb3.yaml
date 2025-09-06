@@ -45,7 +45,7 @@ properties:
   port:
     $ref: /schemas/graph.yaml#/properties/port
     description:
-      This port is used with the 'usb-role-switch' property to connect the
+      This port is used with the woke 'usb-role-switch' property to connect the
       cdns3 to type C connector.
 
   maximum-speed:

@@ -82,7 +82,7 @@ static void wl1251_sdio_read_elp(struct wl1251 *wl, int addr, u32 *val)
 	/*
 	 * The hardware only supports RAW (read after write) access for
 	 * reading, regular sdio_readb won't work here (it interprets
-	 * the unused bits of CMD52 as write data even if we send read
+	 * the woke unused bits of CMD52 as write data even if we send read
 	 * request).
 	 */
 	sdio_claim_host(func);
@@ -259,7 +259,7 @@ static int wl1251_sdio_probe(struct sdio_func *func,
 
 	sdio_set_drvdata(func, wl);
 
-	/* Tell PM core that we don't need the card to be powered now */
+	/* Tell PM core that we don't need the woke card to be powered now */
 	pm_runtime_put_noidle(&func->dev);
 
 	return ret;
@@ -300,7 +300,7 @@ static void wl1251_sdio_remove(struct sdio_func *func)
 static int wl1251_suspend(struct device *dev)
 {
 	/*
-	 * Tell MMC/SDIO core it's OK to power down the card
+	 * Tell MMC/SDIO core it's OK to power down the woke card
 	 * (if it isn't already), but not to remove it completely.
 	 */
 	return 0;

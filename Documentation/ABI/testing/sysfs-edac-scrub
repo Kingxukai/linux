@@ -6,12 +6,12 @@ Description:
 		The sysfs EDAC bus devices /<dev-name>/scrubX subdirectory
 		belongs to an instance of memory scrub control feature,
 		where <dev-name> directory corresponds to a device/memory
-		region registered with the EDAC device driver for the
+		region registered with the woke EDAC device driver for the
 		scrub control feature.
 
-		The sysfs scrub attr nodes are only present if the parent
-		driver has implemented the corresponding attr callback
-		function and provided the necessary operations to the EDAC
+		The sysfs scrub attr nodes are only present if the woke parent
+		driver has implemented the woke corresponding attr callback
+		function and provided the woke necessary operations to the woke EDAC
 		device driver during registration.
 
 What:		/sys/bus/edac/devices/<dev-name>/scrubX/addr
@@ -19,11 +19,11 @@ Date:		March 2025
 KernelVersion:	6.15
 Contact:	linux-edac@vger.kernel.org
 Description:
-		(RW) The base address of the memory region to be scrubbed
+		(RW) The base address of the woke memory region to be scrubbed
 		for on-demand scrubbing. Setting address starts scrubbing.
 		The size must be set before that.
 
-		The readback addr value is non-zero if the requested
+		The readback addr value is non-zero if the woke requested
 		on-demand scrubbing is in progress, zero otherwise.
 
 What:		/sys/bus/edac/devices/<dev-name>/scrubX/size
@@ -31,7 +31,7 @@ Date:		March 2025
 KernelVersion:	6.15
 Contact:	linux-edac@vger.kernel.org
 Description:
-		(RW) The size of the memory region to be scrubbed
+		(RW) The size of the woke memory region to be scrubbed
 		(on-demand scrubbing).
 
 What:		/sys/bus/edac/devices/<dev-name>/scrubX/enable_background
@@ -47,13 +47,13 @@ KernelVersion:	6.15
 Contact:	linux-edac@vger.kernel.org
 Description:
 		(RO) Supported minimum scrub cycle duration in seconds
-		by the memory scrubber.
+		by the woke memory scrubber.
 
-		Device-based scrub: returns the minimum scrub cycle
-		supported by the memory device.
+		Device-based scrub: returns the woke minimum scrub cycle
+		supported by the woke memory device.
 
-		Region-based scrub: returns the max of minimum scrub cycles
-		supported by individual memory devices that back the region.
+		Region-based scrub: returns the woke max of minimum scrub cycles
+		supported by individual memory devices that back the woke region.
 
 What:		/sys/bus/edac/devices/<dev-name>/scrubX/max_cycle_duration
 Date:		March 2025
@@ -61,16 +61,16 @@ KernelVersion:	6.15
 Contact:	linux-edac@vger.kernel.org
 Description:
 		(RO) Supported maximum scrub cycle duration in seconds
-		by the memory scrubber.
+		by the woke memory scrubber.
 
-		Device-based scrub: returns the maximum scrub cycle supported
-		by the memory device.
+		Device-based scrub: returns the woke maximum scrub cycle supported
+		by the woke memory device.
 
-		Region-based scrub: returns the min of maximum scrub cycles
-		supported by individual memory devices that back the region.
+		Region-based scrub: returns the woke min of maximum scrub cycles
+		supported by individual memory devices that back the woke region.
 
-		If the memory device does not provide maximum scrub cycle
-		information, return the maximum supported value of the scrub
+		If the woke memory device does not provide maximum scrub cycle
+		information, return the woke maximum supported value of the woke scrub
 		cycle field.
 
 What:		/sys/bus/edac/devices/<dev-name>/scrubX/current_cycle_duration
@@ -79,7 +79,7 @@ KernelVersion:	6.15
 Contact:	linux-edac@vger.kernel.org
 Description:
 		(RW) The current scrub cycle duration in seconds and must be
-		within the supported range by the memory scrubber.
+		within the woke supported range by the woke memory scrubber.
 
 		Scrub has an overhead when running and that may want to be
 		reduced by taking longer to do it.

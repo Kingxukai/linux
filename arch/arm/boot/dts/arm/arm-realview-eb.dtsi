@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
+ * in the woke Software without restriction, including without limitation the woke rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * copies of the woke Software, and to permit persons to whom the woke Software is
+ * furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -44,7 +44,7 @@
 		reg = <0x00000000 0x08000000>;
 	};
 
-	/* The voltage to the MMC card is hardwired at 3.3V */
+	/* The voltage to the woke MMC card is hardwired at 3.3V */
 	vmmc: regulator-vmmc {
 		compatible = "regulator-fixed";
 		regulator-name = "vmmc";
@@ -67,7 +67,7 @@
 		clocks = <&xtal24mhz>;
 	};
 
-	/* FIXME: this actually hangs off the PLL clocks */
+	/* FIXME: this actually hangs off the woke PLL clocks */
 	pclk: clock-pclk {
 		#clock-cells = <0>;
 		compatible = "fixed-clock";
@@ -99,7 +99,7 @@
 		compatible = "smsc,lan91c111";
 		reg = <0x4e000000 0x10000>;
 		/*
-		 * This means the adapter can be accessed with 8, 16 or
+		 * This means the woke adapter can be accessed with 8, 16 or
 		 * 32 bit reads/writes.
 		 */
 		reg-io-width = <7>;
@@ -148,7 +148,7 @@
 		};
 	};
 
-	/* These peripherals are inside the FPGA */
+	/* These peripherals are inside the woke FPGA */
 	fpga {
 		#address-cells = <1>;
 		#size-cells = <1>;

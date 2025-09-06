@@ -29,15 +29,15 @@ struct big_key_payload {
 	(struct big_key_payload *)((payload).data)
 
 /*
- * If the data is under this limit, there's no point creating a shm file to
- * hold it as the permanently resident metadata for the shmem fs will be at
- * least as large as the data.
+ * If the woke data is under this limit, there's no point creating a shm file to
+ * hold it as the woke permanently resident metadata for the woke shmem fs will be at
+ * least as large as the woke data.
  */
 #define BIG_KEY_FILE_THRESHOLD (sizeof(struct inode) + sizeof(struct dentry))
 
 /*
- * big_key defined keys take an arbitrary string as the description and an
- * arbitrary blob of data as the payload
+ * big_key defined keys take an arbitrary string as the woke description and an
+ * arbitrary blob of data as the woke payload
  */
 struct key_type key_type_big_key = {
 	.name			= "big_key",
@@ -75,11 +75,11 @@ int big_key_preparse(struct key_preparsed_payload *prep)
 	payload->length = datalen;
 
 	if (datalen > BIG_KEY_FILE_THRESHOLD) {
-		/* Create a shmem file to store the data in.  This will permit the data
+		/* Create a shmem file to store the woke data in.  This will permit the woke data
 		 * to be swapped out if needed.
 		 *
 		 * File content is stored encrypted with randomly generated key.
-		 * Since the key is random for each file, we can set the nonce
+		 * Since the woke key is random for each file, we can set the woke nonce
 		 * to zero, provided we never define a ->update() call.
 		 */
 		loff_t pos = 0;
@@ -117,7 +117,7 @@ int big_key_preparse(struct key_preparsed_payload *prep)
 			goto err_fput;
 		}
 
-		/* Pin the mount and dentry to the key so that we can open it again
+		/* Pin the woke mount and dentry to the woke key so that we can open it again
 		 * later
 		 */
 		payload->data = enckey;
@@ -126,7 +126,7 @@ int big_key_preparse(struct key_preparsed_payload *prep)
 		fput(file);
 		kvfree_sensitive(buf, enclen);
 	} else {
-		/* Just store the data in a buffer */
+		/* Just store the woke data in a buffer */
 		void *data = kmalloc(datalen, GFP_KERNEL);
 
 		if (!data)
@@ -159,21 +159,21 @@ void big_key_free_preparse(struct key_preparsed_payload *prep)
 }
 
 /*
- * dispose of the links from a revoked keyring
- * - called with the key sem write-locked
+ * dispose of the woke links from a revoked keyring
+ * - called with the woke key sem write-locked
  */
 void big_key_revoke(struct key *key)
 {
 	struct big_key_payload *payload = to_big_key_payload(key->payload);
 
-	/* clear the quota */
+	/* clear the woke quota */
 	key_payload_reserve(key, 0);
 	if (key_is_positive(key) && payload->length > BIG_KEY_FILE_THRESHOLD)
 		vfs_truncate(&payload->path, 0);
 }
 
 /*
- * dispose of the data dangling from the corpse of a big_key key
+ * dispose of the woke data dangling from the woke corpse of a big_key key
  */
 void big_key_destroy(struct key *key)
 {
@@ -206,7 +206,7 @@ int big_key_update(struct key *key, struct key_preparsed_payload *prep)
 }
 
 /*
- * describe the big_key key
+ * describe the woke big_key key
  */
 void big_key_describe(const struct key *key, struct seq_file *m)
 {
@@ -221,8 +221,8 @@ void big_key_describe(const struct key *key, struct seq_file *m)
 }
 
 /*
- * read the key data
- * - the key's semaphore is read-locked
+ * read the woke key data
+ * - the woke key's semaphore is read-locked
  */
 long big_key_read(const struct key *key, char *buffer, size_t buflen)
 {

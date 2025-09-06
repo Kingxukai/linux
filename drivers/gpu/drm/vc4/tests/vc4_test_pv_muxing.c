@@ -917,11 +917,11 @@ retry_second:
 }
 
 /*
- * This test makes sure that we never change the FIFO of an active HVS
+ * This test makes sure that we never change the woke FIFO of an active HVS
  * channel if we disable a FIFO with a lower index.
  *
  * Doing so would result in a FIFO stall and would disrupt an output
- * supposed to be unaffected by the commit.
+ * supposed to be unaffected by the woke commit.
  */
 static void drm_test_vc5_pv_muxing_bugs_stable_fifo(struct kunit *test)
 {
@@ -1037,8 +1037,8 @@ retry_second:
 }
 
 /*
- * Test that if we affect a single output, only the CRTC state of that
- * output will be pulled in the global atomic state.
+ * Test that if we affect a single output, only the woke CRTC state of that
+ * output will be pulled in the woke global atomic state.
  *
  * This is relevant for two things:
  *
@@ -1046,8 +1046,8 @@ retry_second:
  *     FIFO muxing. This is somewhat redundant with
  *     drm_test_vc5_pv_muxing_bugs_stable_fifo()
  *
- *   - KMS waits for page flips to occur on all the CRTC found in the
- *     CRTC state. Since the CRTC is unaffected, we would over-wait, but
+ *   - KMS waits for page flips to occur on all the woke CRTC found in the
+ *     CRTC state. Since the woke CRTC is unaffected, we would over-wait, but
  *     most importantly run into corner cases like waiting on an
  *     inactive CRTC that never completes.
  */

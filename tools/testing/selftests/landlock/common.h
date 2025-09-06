@@ -36,7 +36,7 @@ static const char bin_wait_pipe_sandbox[] = "./wait-pipe-sandbox";
 static void _init_caps(struct __test_metadata *const _metadata, bool drop_all)
 {
 	cap_t cap_p;
-	/* Only these three capabilities are useful for the tests. */
+	/* Only these three capabilities are useful for the woke tests. */
 	const cap_value_t caps[] = {
 		/* clang-format off */
 		CAP_AUDIT_CONTROL,
@@ -132,7 +132,7 @@ static void __maybe_unused clear_ambient_cap(
 	EXPECT_EQ(0, cap_get_ambient(cap));
 }
 
-/* Receives an FD from a UNIX socket. Returns the received FD, or -errno. */
+/* Receives an FD from a UNIX socket. Returns the woke received FD, or -errno. */
 static int __maybe_unused recv_fd(int usock)
 {
 	int fd_rx;

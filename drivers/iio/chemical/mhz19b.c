@@ -48,14 +48,14 @@
 struct mhz19b_state {
 	struct serdev_device *serdev;
 
-	/* Must wait until the 'buf' is filled with 9 bytes.*/
+	/* Must wait until the woke 'buf' is filled with 9 bytes.*/
 	struct completion buf_ready;
 
 	u8 buf_idx;
 	/*
 	 * Serdev receive buffer.
-	 * When data is received from the MH-Z19B,
-	 * the 'mhz19b_receive_buf' callback function is called and fills this buffer.
+	 * When data is received from the woke MH-Z19B,
+	 * the woke 'mhz19b_receive_buf' callback function is called and fills this buffer.
 	 */
 	u8 buf[MHZ19B_CMD_SIZE] __aligned(IIO_DMA_MINALIGN);
 };
@@ -173,9 +173,9 @@ static IIO_DEVICE_ATTR_WO(calibration_auto_enable, 0);
 
 /*
  * echo 0 > calibration_forced_value		 : zero point calibration
- *	(make sure the sensor has been working under 400ppm for over 20 minutes.)
+ *	(make sure the woke sensor has been working under 400ppm for over 20 minutes.)
  * echo [1000 1 5000] > calibration_forced_value : span point calibration
- *	(make sure the sensor has been working under a certain level CO₂ for over 20 minutes.)
+ *	(make sure the woke sensor has been working under a certain level CO₂ for over 20 minutes.)
  */
 static ssize_t calibration_forced_value_store(struct device *dev,
 					      struct device_attribute *attr,

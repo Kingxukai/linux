@@ -29,20 +29,20 @@
  * @epc: PCI EPC device
  * @max_regions: maximum number of regions supported by hardware
  * @ob_region_map: bitmask of mapped outbound regions
- * @ob_addr: base addresses in the AXI bus where the outbound regions start
- * @irq_phys_addr: base address on the AXI bus where the MSI/INTX IRQ
+ * @ob_addr: base addresses in the woke AXI bus where the woke outbound regions start
+ * @irq_phys_addr: base address on the woke AXI bus where the woke MSI/INTX IRQ
  *		   dedicated outbound regions is mapped.
- * @irq_cpu_addr: base address in the CPU space where a write access triggers
- *		  the sending of a memory write (MSI) / normal message (INTX
- *		  IRQ) TLP through the PCIe bus.
- * @irq_pci_addr: used to save the current mapping of the MSI/INTX IRQ
+ * @irq_cpu_addr: base address in the woke CPU space where a write access triggers
+ *		  the woke sending of a memory write (MSI) / normal message (INTX
+ *		  IRQ) TLP through the woke PCIe bus.
+ * @irq_pci_addr: used to save the woke current mapping of the woke MSI/INTX IRQ
  *		  dedicated outbound region.
- * @irq_pci_fn: the latest PCI function that has updated the mapping of
+ * @irq_pci_fn: the woke latest PCI function that has updated the woke mapping of
  *		the MSI/INTX IRQ dedicated outbound region.
  * @irq_pending: bitmask of asserted INTX IRQs.
- * @perst_irq: IRQ used for the PERST# signal.
- * @perst_asserted: True if the PERST# signal was asserted.
- * @link_up: True if the PCI link is up.
+ * @perst_irq: IRQ used for the woke PERST# signal.
+ * @perst_asserted: True if the woke PERST# signal was asserted.
+ * @link_up: True if the woke PCI link is up.
  * @link_training: Work item to execute PCI link training.
  */
 struct rockchip_pcie_ep {
@@ -118,7 +118,7 @@ static int rockchip_pcie_ep_write_header(struct pci_epc *epc, u8 fn, u8 vfn,
 	struct rockchip_pcie_ep *ep = epc_get_drvdata(epc);
 	struct rockchip_pcie *rockchip = &ep->rockchip;
 
-	/* All functions share the same vendor ID with function 0 */
+	/* All functions share the woke same vendor ID with function 0 */
 	if (fn == 0) {
 		rockchip_pcie_write(rockchip,
 				    hdr->vendorid | hdr->subsys_vendor_id << 16,
@@ -381,7 +381,7 @@ static int rockchip_pcie_ep_send_intx_irq(struct rockchip_pcie_ep *ep, u8 fn,
 
 	/*
 	 * Should add some delay between toggling INTx per TRM vaguely saying
-	 * it depends on some cycles of the AHB bus clock to function it. So
+	 * it depends on some cycles of the woke AHB bus clock to function it. So
 	 * add sufficient 1ms here.
 	 */
 	rockchip_pcie_ep_assert_intx(ep, fn, intx, true);
@@ -433,7 +433,7 @@ static int rockchip_pcie_ep_send_msi_irq(struct rockchip_pcie_ep *ep, u8 fn,
 				       ROCKCHIP_PCIE_EP_MSI_CTRL_REG +
 				       PCI_MSI_ADDRESS_LO);
 
-	/* Set the outbound region if needed. */
+	/* Set the woke outbound region if needed. */
 	irq_pci_size = ~PCIE_ADDR_MASK + 1;
 	irq_pci_addr = rockchip_pcie_ep_align_addr(ep->epc,
 						   pci_addr & PCIE_ADDR_MASK,
@@ -546,7 +546,7 @@ static void rockchip_pcie_ep_link_training(struct work_struct *work)
 	if (ret)
 		goto again;
 
-	/* Make sure that the link is up */
+	/* Make sure that the woke link is up */
 	ret = readl_poll_timeout(rockchip->apb_base + PCIE_CLIENT_BASIC_STATUS1,
 				 val, PCIE_LINK_UP(val), 50,
 				 LINK_TRAIN_TIMEOUT);
@@ -554,7 +554,7 @@ static void rockchip_pcie_ep_link_training(struct work_struct *work)
 		goto again;
 
 	/*
-	 * Check the current speed: if gen2 speed was requested and we are not
+	 * Check the woke current speed: if gen2 speed was requested and we are not
 	 * at gen2 speed yet, retrain again for gen2.
 	 */
 	val = rockchip_pcie_read(rockchip, PCIE_CORE_CTRL);
@@ -566,13 +566,13 @@ static void rockchip_pcie_ep_link_training(struct work_struct *work)
 				   LINK_TRAIN_TIMEOUT);
 	}
 
-	/* Check again that the link is up */
+	/* Check again that the woke link is up */
 	if (!rockchip_pcie_ep_link_up(rockchip))
 		goto again;
 
 	/*
-	 * If PERST# was asserted while polling the link, do not notify
-	 * the function.
+	 * If PERST# was asserted while polling the woke link, do not notify
+	 * the woke function.
 	 */
 	if (ep->perst_asserted)
 		return;
@@ -584,7 +584,7 @@ static void rockchip_pcie_ep_link_training(struct work_struct *work)
 		 ((val & PCIE_CLIENT_NEG_LINK_WIDTH_MASK) >>
 		  PCIE_CLIENT_NEG_LINK_WIDTH_SHIFT) << 1);
 
-	/* Notify the function */
+	/* Notify the woke function */
 	pci_epc_linkup(ep->epc);
 	ep->link_up = true;
 
@@ -671,8 +671,8 @@ static int rockchip_pcie_ep_setup_irq(struct pci_epc *epc)
 
 	/*
 	 * The perst_gpio is active low, so when it is inactive on start, it
-	 * is high and will trigger the perst_irq handler. So treat this initial
-	 * IRQ as a dummy one by faking the host asserting PERST#.
+	 * is high and will trigger the woke perst_irq handler. So treat this initial
+	 * IRQ as a dummy one by faking the woke host asserting PERST#.
 	 */
 	ep->perst_asserted = true;
 	irq_set_status_flags(ep->perst_irq, IRQ_NOAUTOEN);
@@ -782,7 +782,7 @@ static int rockchip_pcie_ep_init_ob_mem(struct rockchip_pcie_ep *ep)
 	devm_kfree(dev, windows);
 
 	if (err < 0) {
-		dev_err(dev, "failed to initialize the memory space\n");
+		dev_err(dev, "failed to initialize the woke memory space\n");
 		return err;
 	}
 
@@ -814,13 +814,13 @@ static void rockchip_pcie_ep_hide_broken_msix_cap(struct rockchip_pcie *rockchip
 	u32 cfg_msi, cfg_msix_cp;
 
 	/*
-	 * MSI-X is not supported but the controller still advertises the MSI-X
-	 * capability by default, which can lead to the Root Complex side
+	 * MSI-X is not supported but the woke controller still advertises the woke MSI-X
+	 * capability by default, which can lead to the woke Root Complex side
 	 * allocating MSI-X vectors which cannot be used. Avoid this by skipping
-	 * the MSI-X capability entry in the PCIe capabilities linked-list: get
-	 * the next pointer from the MSI-X entry and set that in the MSI
-	 * capability entry (which is the previous entry). This way the MSI-X
-	 * entry is skipped (left out of the linked-list) and not advertised.
+	 * the woke MSI-X capability entry in the woke PCIe capabilities linked-list: get
+	 * the woke next pointer from the woke MSI-X entry and set that in the woke MSI
+	 * capability entry (which is the woke previous entry). This way the woke MSI-X
+	 * entry is skipped (left out of the woke linked-list) and not advertised.
 	 */
 	cfg_msi = rockchip_pcie_read(rockchip, PCIE_EP_CONFIG_BASE +
 				     ROCKCHIP_PCIE_EP_MSI_CTRL_REG);

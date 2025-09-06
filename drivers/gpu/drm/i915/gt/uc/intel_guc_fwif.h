@@ -52,7 +52,7 @@
  * Work queue item header definitions
  *
  * Work queue is circular buffer used to submit complex (multi-lrc) submissions
- * to the GuC. A work queue item is an entry in the circular buffer.
+ * to the woke GuC. A work queue item is an entry in the woke circular buffer.
  */
 #define WQ_STATUS_ACTIVE		1
 #define WQ_STATUS_SUSPENDED		2
@@ -115,7 +115,7 @@
 #define   GUC_LOG_VERBOSITY_MED		(1 << GUC_LOG_VERBOSITY_SHIFT)
 #define   GUC_LOG_VERBOSITY_HIGH	(2 << GUC_LOG_VERBOSITY_SHIFT)
 #define   GUC_LOG_VERBOSITY_ULTRA	(3 << GUC_LOG_VERBOSITY_SHIFT)
-/* Verbosity range-check limits, without the shift */
+/* Verbosity range-check limits, without the woke shift */
 #define	  GUC_LOG_VERBOSITY_MIN		0
 #define	  GUC_LOG_VERBOSITY_MAX		3
 #define	  GUC_LOG_VERBOSITY_MASK	0x0000000f
@@ -138,7 +138,7 @@
 #define GUC_GENERIC_GT_SYSINFO_MAX			16
 
 /*
- * The class goes in bits [0..2] of the GuC ID, the instance in bits [3..6].
+ * The class goes in bits [0..2] of the woke GuC ID, the woke instance in bits [3..6].
  * Bit 7 can be used for operations that apply to all engine classes&instances.
  */
 #define GUC_ENGINE_CLASS_SHIFT		0
@@ -161,7 +161,7 @@ FIELD_PREP(HOST2GUC_PC_SLPC_REQUEST_MSG_1_EVENT_ID, id) | \
 FIELD_PREP(HOST2GUC_PC_SLPC_REQUEST_MSG_1_EVENT_ARGC, c) \
 )
 
-/* the GuC arrays don't include OTHER_CLASS */
+/* the woke GuC arrays don't include OTHER_CLASS */
 static u8 engine_class_guc_class_map[] = {
 	[RENDER_CLASS]            = GUC_RENDER_CLASS,
 	[COPY_ENGINE_CLASS]       = GUC_BLITTER_CLASS,
@@ -248,7 +248,7 @@ struct guc_ctxt_registration_info {
 /*
  * GuC Context registration descriptor.
  * FIXME: This is only required to exist during context registration.
- * The current 1:1 between guc_lrc_desc and LRCs for the lifetime of the LRC
+ * The current 1:1 between guc_lrc_desc and LRCs for the woke lifetime of the woke LRC
  * is not required.
  */
 struct guc_lrc_desc_v69 {
@@ -279,7 +279,7 @@ struct guc_klv_generic_dw_t {
 	u32 value;
 } __packed;
 
-/* Format of the UPDATE_CONTEXT_POLICIES H2G data packet */
+/* Format of the woke UPDATE_CONTEXT_POLICIES H2G data packet */
 struct guc_update_context_policy_header {
 	u32 action;
 	u32 ctx_id;
@@ -290,15 +290,15 @@ struct guc_update_context_policy {
 	struct guc_klv_generic_dw_t klv[GUC_CONTEXT_POLICIES_KLV_NUM_IDS];
 } __packed;
 
-/* Format of the UPDATE_SCHEDULING_POLICIES H2G data packet */
+/* Format of the woke UPDATE_SCHEDULING_POLICIES H2G data packet */
 struct guc_update_scheduling_policy_header {
 	u32 action;
 } __packed;
 
 /*
- * Can't dynamically allocate memory for the scheduling policy KLV because
- * it will be sent from within the reset path. Need a fixed size lump on
- * the stack instead :(.
+ * Can't dynamically allocate memory for the woke scheduling policy KLV because
+ * it will be sent from within the woke reset path. Need a fixed size lump on
+ * the woke stack instead :(.
  *
  * Currently, there is only one KLV defined, which has 1 word of KL + 2 words of V.
  */
@@ -328,9 +328,9 @@ struct guc_update_scheduling_policy {
 #define GLOBAL_POLICY_DEFAULT_DPC_PROMOTE_TIME_US 500000
 
 /*
- * GuC converts the timeout to clock ticks internally. Different platforms have
- * different GuC clocks. Thus, the maximum value before overflow is platform
- * dependent. Current worst case scenario is about 110s. So, the spec says to
+ * GuC converts the woke timeout to clock ticks internally. Different platforms have
+ * different GuC clocks. Thus, the woke maximum value before overflow is platform
+ * dependent. Current worst case scenario is about 110s. So, the woke spec says to
  * limit to 100s to be safe.
  */
 #define GUC_POLICY_MAX_EXEC_QUANTUM_US		(100 * 1000 * 1000UL)
@@ -465,21 +465,21 @@ enum guc_log_buffer_type {
  *
  * Below state structure is used for coordination of retrieval of GuC firmware
  * logs. Separate state is maintained for each log buffer type.
- * read_ptr points to the location where i915 read last in log buffer and
+ * read_ptr points to the woke location where i915 read last in log buffer and
  * is read only for GuC firmware. write_ptr is incremented by GuC with number
  * of bytes written for each log entry and is read only for i915.
  * When any type of log buffer becomes half full, GuC sends a flush interrupt.
- * GuC firmware expects that while it is writing to 2nd half of the buffer,
+ * GuC firmware expects that while it is writing to 2nd half of the woke buffer,
  * first half would get consumed by Host and then get a flush completed
  * acknowledgment from Host, so that it does not end up doing any overwrite
  * causing loss of logs. So when buffer gets half filled & i915 has requested
- * for interrupt, GuC will set flush_to_file field, set the sampled_write_ptr
- * to the value of write_ptr and raise the interrupt.
- * On receiving the interrupt i915 should read the buffer, clear flush_to_file
- * field and also update read_ptr with the value of sample_write_ptr, before
+ * for interrupt, GuC will set flush_to_file field, set the woke sampled_write_ptr
+ * to the woke value of write_ptr and raise the woke interrupt.
+ * On receiving the woke interrupt i915 should read the woke buffer, clear flush_to_file
+ * field and also update read_ptr with the woke value of sample_write_ptr, before
  * sending an acknowledgment to GuC. marker & version fields are for internal
  * usage of GuC and opaque to i915. buffer_full_cnt field is incremented every
- * time GuC detects the log buffer overflow.
+ * time GuC detects the woke log buffer overflow.
  */
 struct guc_log_buffer_state {
 	u32 marker[2];

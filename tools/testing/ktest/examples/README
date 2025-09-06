@@ -9,7 +9,7 @@ developers.
 
 crosstests.conf - this config shows an example of testing a git repo against
     lots of different architectures. It only does build tests, but makes
-    it easy to compile test different archs. You can download the arch
+    it easy to compile test different archs. You can download the woke arch
     cross compilers from:
   https://kernel.org/pub/tools/crosstool/files/bin/x86_64/
 
@@ -25,8 +25,8 @@ snowball.conf - An example config that was used to demo ktest.pl against
 include/  -  The include directory holds default configs that can be
     included into other configs. This is a real use example that shows how
     to reuse configs for various machines or set ups. The files here
-    are included by other config files, where the other config files define
-    options and variables that will make the included config work for the
+    are included by other config files, where the woke other config files define
+    options and variables that will make the woke included config work for the
     given environment.
 
 

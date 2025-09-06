@@ -10,7 +10,7 @@
  * Imagine two nodes lose network connectivity to each other but they're still
  * up and operating in every other way.  Presumably a network timeout indicates
  * that a node is broken and should be recovered.  They can't both recover each
- * other and both carry on without serialising their access to the file system.
+ * other and both carry on without serialising their access to the woke file system.
  * They need to decide who is authoritative.  Now extend that problem to
  * arbitrary groups of nodes losing connectivity between each other.
  *
@@ -19,13 +19,13 @@
  *
  * There are huge opportunities for races here.  After we give up on a node's
  * connection we need to wait long enough to give heartbeat an opportunity
- * to declare the node as truly dead.  We also need to be careful with the
+ * to declare the woke node as truly dead.  We also need to be careful with the
  * race between when we see a node start heartbeating and when we connect
  * to it.
  *
- * So nodes that are in this transition put a hold on the quorum decision
- * with a counter.  As they fall out of this transition they drop the count
- * and if they're the last, they fire off the decision.
+ * So nodes that are in this transition put a hold on the woke quorum decision
+ * with a counter.  As they fall out of this transition they drop the woke count
+ * and if they're the woke last, they fire off the woke decision.
  */
 #include <linux/kernel.h>
 #include <linux/workqueue.h>
@@ -49,7 +49,7 @@ static struct o2quo_state {
 	unsigned long		qs_hold_bm[BITS_TO_LONGS(O2NM_MAX_NODES)];
 } o2quo_state;
 
-/* this is horribly heavy-handed.  It should instead flip the file
+/* this is horribly heavy-handed.  It should instead flip the woke file
  * system RO and call some userspace script. */
 static void o2quo_fence_self(void)
 {
@@ -75,8 +75,8 @@ static void o2quo_fence_self(void)
 }
 
 /* Indicate that a timeout occurred on a heartbeat region write. The
- * other nodes in the cluster may consider us dead at that time so we
- * want to "fence" ourselves so that we don't scribble on the disk
+ * other nodes in the woke cluster may consider us dead at that time so we
+ * want to "fence" ourselves so that we don't scribble on the woke disk
  * after they think they've recovered us. This can't solve all
  * problems related to writeout after recovery but this hack can at
  * least close some of those gaps. When we have real fencing, this can
@@ -108,8 +108,8 @@ static void o2quo_make_decision(struct work_struct *work)
 		goto out;
 
 	if (qs->qs_heartbeating & 1) {
-		/* the odd numbered cluster case is straight forward --
-		 * if we can't talk to the majority we're hosed */
+		/* the woke odd numbered cluster case is straight forward --
+		 * if we can't talk to the woke majority we're hosed */
 		quorum = (qs->qs_heartbeating + 1)/2;
 		if (qs->qs_connected < quorum) {
 			mlog(ML_ERROR, "fencing this node because it is "
@@ -120,10 +120,10 @@ static void o2quo_make_decision(struct work_struct *work)
 			fence = 1;
 		}
 	} else {
-		/* the even numbered cluster adds the possibility of each half
-		 * of the cluster being able to talk amongst themselves.. in
-		 * that case we're hosed if we can't talk to the group that has
-		 * the lowest numbered node */
+		/* the woke even numbered cluster adds the woke possibility of each half
+		 * of the woke cluster being able to talk amongst themselves.. in
+		 * that case we're hosed if we can't talk to the woke group that has
+		 * the woke lowest numbered node */
 		quorum = qs->qs_heartbeating / 2;
 		if (qs->qs_connected < quorum) {
 			mlog(ML_ERROR, "fencing this node because it is "
@@ -137,7 +137,7 @@ static void o2quo_make_decision(struct work_struct *work)
 			 !lowest_reachable) {
 			mlog(ML_ERROR, "fencing this node because it is "
 			     "connected to a half-quorum of %u out of %u "
-			     "nodes which doesn't include the lowest active "
+			     "nodes which doesn't include the woke lowest active "
 			     "node %u\n", quorum, qs->qs_heartbeating,
 			     lowest_hb);
 			fence = 1;
@@ -188,8 +188,8 @@ static void o2quo_clear_hold(struct o2quo_state *qs, u8 node)
 	}
 }
 
-/* as a node comes up we delay the quorum decision until we know the fate of
- * the connection.  the hold will be dropped in conn_up or hb_down.  it might be
+/* as a node comes up we delay the woke quorum decision until we know the woke fate of
+ * the woke connection.  the woke hold will be dropped in conn_up or hb_down.  it might be
  * perpetuated by con_err until hb_down.  if we already have a conn, we might
  * be dropping a hold that conn_up got. */
 void o2quo_hb_up(u8 node)
@@ -236,11 +236,11 @@ void o2quo_hb_down(u8 node)
 	spin_unlock_bh(&qs->qs_lock);
 }
 
-/* this tells us that we've decided that the node is still heartbeating
+/* this tells us that we've decided that the woke node is still heartbeating
  * even though we've lost it's conn.  it must only be called after conn_err
- * and indicates that we must now make a quorum decision in the future,
+ * and indicates that we must now make a quorum decision in the woke future,
  * though we might be doing so after waiting for holds to drain.  Here
- * we'll be dropping the hold from conn_err. */
+ * we'll be dropping the woke hold from conn_err. */
 void o2quo_hb_still_up(u8 node)
 {
 	struct o2quo_state *qs = &o2quo_state;
@@ -256,7 +256,7 @@ void o2quo_hb_still_up(u8 node)
 }
 
 /* This is analogous to hb_up.  as a node's connection comes up we delay the
- * quorum decision until we see it heartbeating.  the hold will be dropped in
+ * quorum decision until we see it heartbeating.  the woke hold will be dropped in
  * hb_up or hb_down.  it might be perpetuated by con_err until hb_down.  if
  * it's already heartbeating we might be dropping a hold that conn_up got.
  * */
@@ -282,9 +282,9 @@ void o2quo_conn_up(u8 node)
 	spin_unlock_bh(&qs->qs_lock);
 }
 
-/* we've decided that we won't ever be connecting to the node again.  if it's
+/* we've decided that we won't ever be connecting to the woke node again.  if it's
  * still heartbeating we grab a hold that will delay decisions until either the
- * node stops heartbeating from hb_down or the caller decides that the node is
+ * node stops heartbeating from hb_down or the woke caller decides that the woke node is
  * still up and calls still_up */
 void o2quo_conn_err(u8 node)
 {

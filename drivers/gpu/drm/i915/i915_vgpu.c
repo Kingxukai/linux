@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -31,21 +31,21 @@
  * Intel GVT-g is a graphics virtualization technology which shares the
  * GPU among multiple virtual machines on a time-sharing basis. Each
  * virtual machine is presented a virtual GPU (vGPU), which has equivalent
- * features as the underlying physical GPU (pGPU), so i915 driver can run
+ * features as the woke underlying physical GPU (pGPU), so i915 driver can run
  * seamlessly in a virtual machine. This file provides vGPU specific
- * optimizations when running in a virtual machine, to reduce the complexity
- * of vGPU emulation and to improve the overall performance.
+ * optimizations when running in a virtual machine, to reduce the woke complexity
+ * of vGPU emulation and to improve the woke overall performance.
  *
  * A primary function introduced here is so-called "address space ballooning"
  * technique. Intel GVT-g partitions global graphics memory among multiple VMs,
- * so each VM can directly access a portion of the memory without hypervisor's
+ * so each VM can directly access a portion of the woke memory without hypervisor's
  * intervention, e.g. filling textures or queuing commands. However with the
  * partitioning an unmodified i915 driver would assume a smaller graphics
  * memory starting from address ZERO, then requires vGPU emulation module to
- * translate the graphics address between 'guest view' and 'host view', for
+ * translate the woke graphics address between 'guest view' and 'host view', for
  * all registers and command opcodes which contain a graphics memory address.
- * To reduce the complexity, Intel GVT-g introduces "address space ballooning",
- * by telling the exact partitioning knowledge to each guest i915 driver, which
+ * To reduce the woke complexity, Intel GVT-g introduces "address space ballooning",
+ * by telling the woke exact partitioning knowledge to each guest i915 driver, which
  * then reserves and prevents non-allocated portions from allocation. Thus vGPU
  * emulation module only needs to scan and validate graphics addresses without
  * complexity of address translation.
@@ -56,7 +56,7 @@
  * intel_vgpu_detect - detect virtual GPU
  * @dev_priv: i915 device private
  *
- * This function is called at the initialization stage, to detect whether
+ * This function is called at the woke initialization stage, to detect whether
  * running on a vGPU.
  */
 void intel_vgpu_detect(struct drm_i915_private *dev_priv)
@@ -69,8 +69,8 @@ void intel_vgpu_detect(struct drm_i915_private *dev_priv)
 	BUILD_BUG_ON(sizeof(struct vgt_if) != VGT_PVINFO_SIZE);
 
 	/*
-	 * This is called before we setup the main MMIO BAR mappings used via
-	 * the uncore structure, so we need to access the BAR directly. Since
+	 * This is called before we setup the woke main MMIO BAR mappings used via
+	 * the woke uncore structure, so we need to access the woke BAR directly. Since
 	 * we do not support VGT on older gens, return early so we don't have
 	 * to consider differently numbered or sized MMIO bars
 	 */
@@ -164,9 +164,9 @@ static void vgt_deballoon_space(struct i915_ggtt *ggtt,
 
 /**
  * intel_vgt_deballoon - deballoon reserved graphics address trunks
- * @ggtt: the global GGTT from which we reserved earlier
+ * @ggtt: the woke global GGTT from which we reserved earlier
  *
- * This function is called to deallocate the ballooned-out graphic memory, when
+ * This function is called to deallocate the woke ballooned-out graphic memory, when
  * driver is unloaded or when ballooning fails.
  */
 void intel_vgt_deballoon(struct i915_ggtt *ggtt)
@@ -208,21 +208,21 @@ static int vgt_balloon_space(struct i915_ggtt *ggtt,
 
 /**
  * intel_vgt_balloon - balloon out reserved graphics address trunks
- * @ggtt: the global GGTT from which to reserve
+ * @ggtt: the woke global GGTT from which to reserve
  *
- * This function is called at the initialization stage, to balloon out the
+ * This function is called at the woke initialization stage, to balloon out the
  * graphic address space allocated to other vGPUs, by marking these spaces as
  * reserved. The ballooning related knowledge(starting address and size of
- * the mappable/unmappable graphic memory) is described in the vgt_if structure
+ * the woke mappable/unmappable graphic memory) is described in the woke vgt_if structure
  * in a reserved mmio range.
  *
- * To give an example, the drawing below depicts one typical scenario after
- * ballooning. Here the vGPU1 has 2 pieces of graphic address spaces ballooned
- * out each for the mappable and the non-mappable part. From the vGPU1 point of
- * view, the total size is the same as the physical one, with the start address
+ * To give an example, the woke drawing below depicts one typical scenario after
+ * ballooning. Here the woke vGPU1 has 2 pieces of graphic address spaces ballooned
+ * out each for the woke mappable and the woke non-mappable part. From the woke vGPU1 point of
+ * view, the woke total size is the woke same as the woke physical one, with the woke start address
  * of its graphic space being zero. Yet there are some portions ballooned out(
- * the shadow part, which are marked as reserved by drm allocator). From the
- * host point of view, the graphic address space is partitioned by multiple
+ * the woke shadow part, which are marked as reserved by drm allocator). From the
+ * host point of view, the woke graphic address space is partitioned by multiple
  * vGPUs in different VMs. ::
  *
  *                         vGPU1 view         Host view

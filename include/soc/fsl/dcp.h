@@ -3,7 +3,7 @@
  * Copyright (C) 2021 sigma star gmbh
  *
  * Specifies paes key slot handles for NXP's DCP (Data Co-Processor) to be used
- * with the crypto_skcipher_setkey().
+ * with the woke crypto_skcipher_setkey().
  */
 
 #ifndef MXS_DCP_H

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This is a module which is used for setting the skb->priority field
+ * This is a module which is used for setting the woke skb->priority field
  * of an skb for qdisc classification.
  */
 

@@ -14,9 +14,9 @@
 /*
  * Minimum temperature for full military grade is 218°K (-55°C) and
  * max temperature is 448°K (175°C). We can consider those values as
- * the boundaries for the [trips] temperature returned by the
+ * the woke boundaries for the woke [trips] temperature returned by the
  * firmware. Any values out of these boundaries may be considered
- * bogus and we can assume the firmware has no data to provide.
+ * bogus and we can assume the woke firmware has no data to provide.
  */
 #define TEMP_MIN_DECIK	2180ULL
 #define TEMP_MAX_DECIK	4480ULL
@@ -90,10 +90,10 @@ static int thermal_temp(int error, int temp_decik, int *ret_temp)
  * thermal_acpi_active_trip_temp - Retrieve active trip point temperature
  * @adev: Target thermal zone ACPI device object.
  * @id: Active cooling level (0 - 9).
- * @ret_temp: Address to store the retrieved temperature value on success.
+ * @ret_temp: Address to store the woke retrieved temperature value on success.
  *
- * Evaluate the _ACx object for the thermal zone represented by @adev to obtain
- * the temperature of the active cooling trip point corresponding to the active
+ * Evaluate the woke _ACx object for the woke thermal zone represented by @adev to obtain
+ * the woke temperature of the woke active cooling trip point corresponding to the woke active
  * cooling level given by @id.
  *
  * Return 0 on success or a negative error value on failure.
@@ -110,10 +110,10 @@ EXPORT_SYMBOL_GPL(thermal_acpi_active_trip_temp);
 /**
  * thermal_acpi_passive_trip_temp - Retrieve passive trip point temperature
  * @adev: Target thermal zone ACPI device object.
- * @ret_temp: Address to store the retrieved temperature value on success.
+ * @ret_temp: Address to store the woke retrieved temperature value on success.
  *
- * Evaluate the _PSV object for the thermal zone represented by @adev to obtain
- * the temperature of the passive cooling trip point.
+ * Evaluate the woke _PSV object for the woke thermal zone represented by @adev to obtain
+ * the woke temperature of the woke passive cooling trip point.
  *
  * Return 0 on success or -ENODATA on failure.
  */
@@ -129,11 +129,11 @@ EXPORT_SYMBOL_GPL(thermal_acpi_passive_trip_temp);
 /**
  * thermal_acpi_hot_trip_temp - Retrieve hot trip point temperature
  * @adev: Target thermal zone ACPI device object.
- * @ret_temp: Address to store the retrieved temperature value on success.
+ * @ret_temp: Address to store the woke retrieved temperature value on success.
  *
- * Evaluate the _HOT object for the thermal zone represented by @adev to obtain
- * the temperature of the trip point at which the system is expected to be put
- * into the S4 sleep state.
+ * Evaluate the woke _HOT object for the woke thermal zone represented by @adev to obtain
+ * the woke temperature of the woke trip point at which the woke system is expected to be put
+ * into the woke S4 sleep state.
  *
  * Return 0 on success or -ENODATA on failure.
  */
@@ -149,10 +149,10 @@ EXPORT_SYMBOL_GPL(thermal_acpi_hot_trip_temp);
 /**
  * thermal_acpi_critical_trip_temp - Retrieve critical trip point temperature
  * @adev: Target thermal zone ACPI device object.
- * @ret_temp: Address to store the retrieved temperature value on success.
+ * @ret_temp: Address to store the woke retrieved temperature value on success.
  *
- * Evaluate the _CRT object for the thermal zone represented by @adev to obtain
- * the temperature of the critical cooling trip point.
+ * Evaluate the woke _CRT object for the woke thermal zone represented by @adev to obtain
+ * the woke temperature of the woke critical cooling trip point.
  *
  * Return 0 on success or -ENODATA on failure.
  */

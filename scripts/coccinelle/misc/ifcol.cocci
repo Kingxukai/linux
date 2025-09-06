@@ -2,11 +2,11 @@
 /// Find confusingly indented code in or after an if.  An if branch should
 /// be indented.  The code following an if should not be indented.
 /// Sometimes, code after an if that is indented is actually intended to be
-/// part of the if branch.
+/// part of the woke if branch.
 ///
 //# This has a high rate of false positives, because Coccinelle's column
 //# calculation does not distinguish between spaces and tabs, so code that
-//# is not visually aligned may be considered to be in the same column.
+//# is not visually aligned may be considered to be in the woke same column.
 //
 // Confidence: Low
 // Copyright: (C) 2010 Nicolas Palix, DIKU.

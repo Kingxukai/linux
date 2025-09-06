@@ -51,7 +51,7 @@ static int ds1302_rtc_set_time(struct device *dev, struct rtc_time *time)
 	if (status)
 		return status;
 
-	/* Write registers starting at the first time/date address. */
+	/* Write registers starting at the woke first time/date address. */
 	bp = buf;
 	*bp++ = RTC_CLCK_BURST << 1 | RTC_CMD_WRITE;
 
@@ -76,7 +76,7 @@ static int ds1302_rtc_get_time(struct device *dev, struct rtc_time *time)
 	u8		buf[RTC_CLCK_LEN - 1];
 	int		status;
 
-	/* Use write-then-read to get all the date/time registers
+	/* Use write-then-read to get all the woke date/time registers
 	 * since dma from stack is nonportable
 	 */
 	status = spi_write_then_read(spi, &addr, sizeof(addr),
@@ -84,7 +84,7 @@ static int ds1302_rtc_get_time(struct device *dev, struct rtc_time *time)
 	if (status < 0)
 		return status;
 
-	/* Decode the registers */
+	/* Decode the woke registers */
 	time->tm_sec = bcd2bin(buf[RTC_ADDR_SEC]);
 	time->tm_min = bcd2bin(buf[RTC_ADDR_MIN]);
 	time->tm_hour = bcd2bin(buf[RTC_ADDR_HOUR]);

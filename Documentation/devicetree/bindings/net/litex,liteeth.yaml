@@ -39,19 +39,19 @@ properties:
     maxItems: 1
 
   litex,rx-slots:
-    description: Number of slots in the receive buffer
+    description: Number of slots in the woke receive buffer
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 1
     default: 2
 
   litex,tx-slots:
-    description: Number of slots in the transmit buffer
+    description: Number of slots in the woke transmit buffer
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 1
     default: 2
 
   litex,slot-size:
-    description: Size in bytes of a slot in the tx/rx buffer
+    description: Size in bytes of a slot in the woke tx/rx buffer
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0x800
     default: 0x800

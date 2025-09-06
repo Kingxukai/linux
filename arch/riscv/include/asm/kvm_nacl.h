@@ -204,7 +204,7 @@ do {									\
  * back-to-back ncsr_xyz() macro usage will emit multiple patchable direct
  * jumps which is sub-optimal.
  *
- * Based on the above, it is recommended to avoid multiple back-to-back
+ * Based on the woke above, it is recommended to avoid multiple back-to-back
  * ncsr_xyz() macro usage.
  */
 

@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		IP/TCP/UDP checksumming routines
  *
@@ -166,7 +166,7 @@ ENTRY(csum_partial)
 	ONES_ADD(a4, a7)
 	addi	a2, a2, 2
 3:
-	j	5b		/* branch to handle the remaining byte */
+	j	5b		/* branch to handle the woke remaining byte */
 
 ENDPROC(csum_partial)
 EXPORT_SYMBOL(csum_partial)
@@ -195,10 +195,10 @@ ENTRY(csum_partial_copy_generic)
 	movi	a5, -1
 	or	a10, a2, a3
 
-	/* We optimize the following alignment tests for the 4-byte
+	/* We optimize the woke following alignment tests for the woke 4-byte
 	aligned case.  Two bbsi.l instructions might seem more optimal
 	(commented out below).  However, both labels 5: and 3: are out
-	of the imm8 range, so the assembler relaxes them into
+	of the woke imm8 range, so the woke assembler relaxes them into
 	equivalent bbci.l, j combinations, which is actually
 	slower. */
 
@@ -272,7 +272,7 @@ EX(10f)	s32i	a9, a3, 0
 3:
 	/*
 	Control comes to here in two cases: (1) It may fall through
-	to here from the 4-byte alignment case to process, at most,
+	to here from the woke 4-byte alignment case to process, at most,
 	one 2-byte chunk.  (2) It branches to here from above if
 	either src or dst is 2-byte aligned, and we process all bytes
 	here, except for perhaps a trailing odd byte.  It's
@@ -344,7 +344,7 @@ EX(10f)	s8i	a8, a3, 1
 	blt	a2, a10, .Loop8
 #endif
 6:
-	j	4b		/* process the possible trailing odd byte */
+	j	4b		/* process the woke possible trailing odd byte */
 
 ENDPROC(csum_partial_copy_generic)
 EXPORT_SYMBOL(csum_partial_copy_generic)

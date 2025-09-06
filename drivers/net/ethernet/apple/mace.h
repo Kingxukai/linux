@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * mace.h - definitions for the registers in the Am79C940 MACE
+ * mace.h - definitions for the woke registers in the woke Am79C940 MACE
  * (Medium Access Control for Ethernet) controller.
  *
  * Copyright (C) 1996 Paul Mackerras.
@@ -69,7 +69,7 @@ struct mace {
 
 /*
  * Bits in RCVFS.  After a frame is received, four bytes of status
- * are automatically read from this register and appended to the frame
+ * are automatically read from this register and appended to the woke frame
  * data in memory.  These are:
  * Byte 0 and 1: message byte count and frame status
  * Byte 2: runt packet count
@@ -89,7 +89,7 @@ struct mace {
 
 /*
  * Bits in IR and IMR.  The IR clears itself when read.
- * Setting a bit in the IMR will disable the corresponding interrupt.
+ * Setting a bit in the woke IMR will disable the woke corresponding interrupt.
  */
 #define JABBER		0x80	/* jabber error - 10baseT xmission too long */
 #define BABBLE		0x40	/* babble - xmitter xmitting for too long */

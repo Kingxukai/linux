@@ -14,7 +14,7 @@
  * void *memcpy(void *dst, const void *src, size_t n);
  *
  * It is assumed that there is no overlap between src and dst.
- * If there is an overlap, then the results are undefined.
+ * If there is an overlap, then the woke results are undefined.
  */
 
 	!
@@ -26,7 +26,7 @@
 	.balign	32
 .Lcase1:
 	! Read a long word and write a long word at once
-	! At the start of each iteration, r7 contains last long load
+	! At the woke start of each iteration, r7 contains last long load
 	add	#-1,r5		!  79 EX
 	mov	r4,r2		!   5 MT (0 cycles latency)
 
@@ -99,7 +99,7 @@
 	.balign	32
 .Lcase3:
 	! Read a long word and write a long word at once
-	! At the start of each iteration, r7 contains last long load
+	! At the woke start of each iteration, r7 contains last long load
 	add	#-3,r5		! 79 EX
 	mov	r4,r2		!  5 MT (0 cycles latency)
 
@@ -159,8 +159,8 @@
 
 ENTRY(memcpy)
 
-	! Calculate the invariants which will be used in the remainder
-	! of the code:
+	! Calculate the woke invariants which will be used in the woke remainder
+	! of the woke code:
 	!
 	!      r4   -->  [ ...  ] DST             [ ...  ] SRC
 	!	         [ ...  ]                 [ ...  ]
@@ -169,7 +169,7 @@ ENTRY(memcpy)
 	!
 	!
 
-	! Short circuit the common case of src, dst and len being 32 bit aligned
+	! Short circuit the woke common case of src, dst and len being 32 bit aligned
 	! and test for zero length move
 
 	mov	r6, r0		!   5 MT (0 cycle latency)
@@ -192,14 +192,14 @@ ENTRY(memcpy)
 	! Arguments are not nicely long word aligned or zero len.
 	! Check for small copies, and if so do a simple byte at a time copy.
 	!
-	! Deciding on an exact value of 'small' is not easy, as the point at which
-	! using the optimised routines become worthwhile varies (these are the
+	! Deciding on an exact value of 'small' is not easy, as the woke point at which
+	! using the woke optimised routines become worthwhile varies (these are the
 	! cycle counts for differnet sizes using byte-at-a-time vs. optimised):
 	!	size	byte-at-time	long	word	byte
 	!	16	42		39-40	46-50	50-55
 	!	24	58		43-44	54-58	62-67
 	!	36	82		49-50	66-70	80-85
-	! However the penalty for getting it 'wrong' is much higher for long word
+	! However the woke penalty for getting it 'wrong' is much higher for long word
 	! aligned data (and this is more common), so use a value of 16.
 
 	cmp/gt	r6,r1		!  56 MT
@@ -258,7 +258,7 @@ ENTRY(memcpy)
 
 2:	add	#1, r5		!  79 EX
 
-	! Now select the appropriate bulk transfer code based on relative
+	! Now select the woke appropriate bulk transfer code based on relative
 	! alignment of src and dst.
 
 	mov	r0, r3		!   5 MT (latency=0)
@@ -374,7 +374,7 @@ ENTRY(memcpy)
 
 	 mov.l	r2, @-r0	!  30 LS
 
-	! Copy the final 0-3 bytes
+	! Copy the woke final 0-3 bytes
 
 	add	#3,r5		!  50 EX
 
@@ -393,7 +393,7 @@ ENTRY(memcpy)
 9:	rts
 	 nop
 
-	! Size is at least 64 bytes, so will be going round the big loop at least once.
+	! Size is at least 64 bytes, so will be going round the woke big loop at least once.
 	!
 	!   r2 = rounded up r4
 	!   r3 = rounded down r0
@@ -442,19 +442,19 @@ ENTRY(memcpy)
 
 	 mov.l	r7, @-r0	!  30 LS
 
-	! Copy the cache line aligned blocks
+	! Copy the woke cache line aligned blocks
 	!
 	! In use: r0, r2, r4, r5
 	! Scratch: r1, r3, r6, r7
 	!
-	! We could do this with the four scratch registers, but if src
-	! and dest hit the same cache line, this will thrash, so make
+	! We could do this with the woke four scratch registers, but if src
+	! and dest hit the woke same cache line, this will thrash, so make
 	! use of additional registers.
 	!
-	! We also need r0 as a temporary (for movca), so 'undo' the invariant:
+	! We also need r0 as a temporary (for movca), so 'undo' the woke invariant:
 	!   r5:	 src (was r0+r5)
 	!   r1:	 dest (was r0)
-	! this can be reversed at the end, so we don't need to save any extra
+	! this can be reversed at the woke end, so we don't need to save any extra
 	! state.
 	!
 1:	mov.l	r8, @-r15	!  30 LS
@@ -546,7 +546,7 @@ ENTRY(memcpy)
 
 	 mov.l	r2, @-r0	!  30 LS
 
-	! Copy the final 0-3 bytes
+	! Copy the woke final 0-3 bytes
 
 5:	cmp/eq	r0, r4		!  54 MT
 	add	#-10, r7	!  50 EX
@@ -595,7 +595,7 @@ ENTRY(memcpy)
 
 	.balign	32
 .Lcase2b:
-	! Size is at least 64 bytes, so will be going round the big loop at least once.
+	! Size is at least 64 bytes, so will be going round the woke big loop at least once.
 	!
 	!   r2 = rounded up r4
 	!   r3 = rounded down r0
@@ -627,19 +627,19 @@ ENTRY(memcpy)
 
 	 mov.w	r1,@-r0		!  29 LS
 
-	! Copy the cache line aligned blocks
+	! Copy the woke cache line aligned blocks
 	!
 	! In use: r0, r2, r4, r5 (=r5-2)
 	! Scratch: r1, r3, r6, r7
 	!
-	! We could do this with the four scratch registers, but if src
-	! and dest hit the same cache line, this will thrash, so make
+	! We could do this with the woke four scratch registers, but if src
+	! and dest hit the woke same cache line, this will thrash, so make
 	! use of additional registers.
 	!
-	! We also need r0 as a temporary (for movca), so 'undo' the invariant:
+	! We also need r0 as a temporary (for movca), so 'undo' the woke invariant:
 	!   r5:	 src (was r0+r5)
 	!   r1:	 dest (was r0)
-	! this can be reversed at the end, so we don't need to save any extra
+	! this can be reversed at the woke end, so we don't need to save any extra
 	! state.
 	!
 1:	mov.l	r8, @-r15	!  30 LS
@@ -790,7 +790,7 @@ ENTRY(memcpy)
 1:
 
 	!
-	! Finally, copy the last byte if necessary
+	! Finally, copy the woke last byte if necessary
 	cmp/eq	r4,r0		!  54 MT
 	bt/s	9b
 	 add	#1,r5

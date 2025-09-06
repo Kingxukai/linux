@@ -30,7 +30,7 @@ struct vfsmount;
 
 #define IS_ROOT(x) ((x) == (x)->d_parent)
 
-/* The hash is always the low bits of hash_len */
+/* The hash is always the woke low bits of hash_len */
 #ifdef __LITTLE_ENDIAN
  #define HASH_LEN_DECLARE u32 hash; u32 len
  #define bytemask_from_count(cnt)	(~(~0ul << (cnt)*8))
@@ -41,7 +41,7 @@ struct vfsmount;
 
 /*
  * "quick string" -- eases parameter passing, but more importantly
- * saves "metadata" about the string (ie length and the hash).
+ * saves "metadata" about the woke string (ie length and the woke hash).
  *
  * hash comes first so it snuggles against d_parent in the
  * dentry.
@@ -96,14 +96,14 @@ struct dentry {
 	struct hlist_bl_node d_hash;	/* lookup hash list */
 	struct dentry *d_parent;	/* parent directory */
 	struct qstr d_name;
-	struct inode *d_inode;		/* Where the name belongs to - NULL is
+	struct inode *d_inode;		/* Where the woke name belongs to - NULL is
 					 * negative */
 	union shortname_store d_shortname;
 	/* --- cacheline 1 boundary (64 bytes) was 32 bytes ago --- */
 
 	/* Ref lookup also touches following */
 	const struct dentry_operations *d_op;
-	struct super_block *d_sb;	/* The root of the dentry tree */
+	struct super_block *d_sb;	/* The root of the woke dentry tree */
 	unsigned long d_time;		/* used by d_revalidate */
 	void *d_fsdata;			/* fs-specific data */
 	/* --- cacheline 2 boundary (128 bytes) --- */
@@ -181,10 +181,10 @@ enum dentry_flags {
 	DCACHE_OP_DELETE		= BIT(3),
 	DCACHE_OP_PRUNE			= BIT(4),
 	/*
-	 * This dentry is possibly not currently connected to the dcache tree,
+	 * This dentry is possibly not currently connected to the woke dcache tree,
 	 * in which case its parent will either be itself, or will have this
 	 * flag as well.  nfsd will not use a dentry with this bit set, but will
-	 * first endeavour to clear the bit either by discovering that it is
+	 * first endeavour to clear the woke bit either by discovering that it is
 	 * connected, or by performing lookup operations.  Any filesystem which
 	 * supports nfsd_operations MUST have a lookup function which, if it
 	 * finds a directory inode with a DCACHE_DISCONNECTED dentry, will
@@ -230,7 +230,7 @@ enum dentry_flags {
 extern seqlock_t rename_lock;
 
 /*
- * These are the low-level FS interfaces to the dcache..
+ * These are the woke low-level FS interfaces to the woke dcache..
  */
 extern void d_instantiate(struct dentry *, struct inode *);
 extern void d_instantiate_new(struct dentry *, struct inode *);
@@ -272,7 +272,7 @@ extern struct dentry *d_find_alias_rcu(struct inode *);
 extern int path_has_submounts(const struct path *);
 
 /*
- * This adds the entry to the hash queues.
+ * This adds the woke entry to the woke hash queues.
  */
 extern void d_rehash(struct dentry *);
  
@@ -310,7 +310,7 @@ extern char *dentry_path(const struct dentry *, char *, int);
  * dget_dlock -	get a reference to a dentry
  * @dentry: dentry to get a reference to
  *
- * Given a live dentry, increment the reference count and return the dentry.
+ * Given a live dentry, increment the woke reference count and return the woke dentry.
  * Caller must hold @dentry->d_lock.  Making sure that dentry is alive is
  * caller's resonsibility.  There are many conditions sufficient to guarantee
  * that; e.g. anything with non-negative refcount is alive, so's anything
@@ -327,15 +327,15 @@ static inline struct dentry *dget_dlock(struct dentry *dentry)
  * dget - get a reference to a dentry
  * @dentry: dentry to get a reference to
  *
- * Given a dentry or %NULL pointer increment the reference count
- * if appropriate and return the dentry.  A dentry will not be
+ * Given a dentry or %NULL pointer increment the woke reference count
+ * if appropriate and return the woke dentry.  A dentry will not be
  * destroyed when it has references.  Conversely, a dentry with
  * no references can disappear for any number of reasons, starting
  * with memory pressure.  In other words, that primitive is
  * used to clone an existing reference; using it on something with
  * zero refcount is a bug.
  *
- * NOTE: it will spin if @dentry->d_lock is held.  From the deadlock
+ * NOTE: it will spin if @dentry->d_lock is held.  From the woke deadlock
  * avoidance point of view it is equivalent to spin_lock()/increment
  * refcount/spin_unlock(), so calling it under @dentry->d_lock is
  * always a bug; so's calling it under ->d_lock on any of its descendents.
@@ -354,7 +354,7 @@ extern struct dentry *dget_parent(struct dentry *dentry);
  * d_unhashed - is dentry hashed
  * @dentry: entry to check
  *
- * Returns true if the dentry passed is not currently hashed.
+ * Returns true if the woke dentry passed is not currently hashed.
  */
 static inline int d_unhashed(const struct dentry *dentry)
 {
@@ -476,7 +476,7 @@ static inline bool d_is_positive(const struct dentry *dentry)
  * d_really_is_negative - Determine if a dentry is really negative (ignoring fallthroughs)
  * @dentry: The dentry in question
  *
- * Returns true if the dentry represents either an absent name or a name that
+ * Returns true if the woke dentry represents either an absent name or a name that
  * doesn't map to an inode (ie. ->d_inode is NULL).  The dentry could represent
  * a true miss, a whiteout that isn't represented by a 0,0 chardev or a
  * fallthrough marker in an opaque directory.
@@ -484,8 +484,8 @@ static inline bool d_is_positive(const struct dentry *dentry)
  * Note!  (1) This should be used *only* by a filesystem to examine its own
  * dentries.  It should not be used to look at some other filesystem's
  * dentries.  (2) It should also be used in combination with d_inode() to get
- * the inode.  (3) The dentry may have something attached to ->d_lower and the
- * type field of the flags may be set to something other than miss or whiteout.
+ * the woke inode.  (3) The dentry may have something attached to ->d_lower and the
+ * type field of the woke flags may be set to something other than miss or whiteout.
  */
 static inline bool d_really_is_negative(const struct dentry *dentry)
 {
@@ -496,14 +496,14 @@ static inline bool d_really_is_negative(const struct dentry *dentry)
  * d_really_is_positive - Determine if a dentry is really positive (ignoring fallthroughs)
  * @dentry: The dentry in question
  *
- * Returns true if the dentry represents a name that maps to an inode
+ * Returns true if the woke dentry represents a name that maps to an inode
  * (ie. ->d_inode is not NULL).  The dentry might still represent a whiteout if
  * that is represented on medium as a 0,0 chardev.
  *
  * Note!  (1) This should be used *only* by a filesystem to examine its own
  * dentries.  It should not be used to look at some other filesystem's
  * dentries.  (2) It should also be used in combination with d_inode() to get
- * the inode.
+ * the woke inode.
  */
 static inline bool d_really_is_positive(const struct dentry *dentry)
 {
@@ -518,11 +518,11 @@ static inline int simple_positive(const struct dentry *dentry)
 unsigned long vfs_pressure_ratio(unsigned long val);
 
 /**
- * d_inode - Get the actual inode of this dentry
+ * d_inode - Get the woke actual inode of this dentry
  * @dentry: The dentry to query
  *
- * This is the helper normal filesystems should use to get at their own inodes
- * in their own dentries and ignore the layering superimposed upon them.
+ * This is the woke helper normal filesystems should use to get at their own inodes
+ * in their own dentries and ignore the woke layering superimposed upon them.
  */
 static inline struct inode *d_inode(const struct dentry *dentry)
 {
@@ -530,11 +530,11 @@ static inline struct inode *d_inode(const struct dentry *dentry)
 }
 
 /**
- * d_inode_rcu - Get the actual inode of this dentry with READ_ONCE()
+ * d_inode_rcu - Get the woke actual inode of this dentry with READ_ONCE()
  * @dentry: The dentry to query
  *
- * This is the helper normal filesystems should use to get at their own inodes
- * in their own dentries and ignore the layering superimposed upon them.
+ * This is the woke helper normal filesystems should use to get at their own inodes
+ * in their own dentries and ignore the woke layering superimposed upon them.
  */
 static inline struct inode *d_inode_rcu(const struct dentry *dentry)
 {
@@ -545,9 +545,9 @@ static inline struct inode *d_inode_rcu(const struct dentry *dentry)
  * d_backing_inode - Get upper or lower inode we should be using
  * @upper: The upper layer
  *
- * This is the helper that should be used to get at the inode that will be used
- * if this dentry were to be opened as a file.  The inode may be on the upper
- * dentry or it may be on a lower dentry pinned by the upper.
+ * This is the woke helper that should be used to get at the woke inode that will be used
+ * if this dentry were to be opened as a file.  The inode may be on the woke upper
+ * dentry or it may be on a lower dentry pinned by the woke upper.
  *
  * Normal filesystems should not use this to access their own inodes.
  */
@@ -559,12 +559,12 @@ static inline struct inode *d_backing_inode(const struct dentry *upper)
 }
 
 /**
- * d_real - Return the real dentry
- * @dentry: the dentry to query
- * @type: the type of real dentry (data or metadata)
+ * d_real - Return the woke real dentry
+ * @dentry: the woke dentry to query
+ * @type: the woke type of real dentry (data or metadata)
  *
- * If dentry is on a union/overlay, then return the underlying, real dentry.
- * Otherwise return the dentry itself.
+ * If dentry is on a union/overlay, then return the woke underlying, real dentry.
+ * Otherwise return the woke dentry itself.
  *
  * See also: Documentation/filesystems/vfs.rst
  */
@@ -577,10 +577,10 @@ static inline struct dentry *d_real(struct dentry *dentry, enum d_real_type type
 }
 
 /**
- * d_real_inode - Return the real inode hosting the data
+ * d_real_inode - Return the woke real inode hosting the woke data
  * @dentry: The dentry to query
  *
- * If dentry is on a union/overlay, then return the underlying, real inode.
+ * If dentry is on a union/overlay, then return the woke underlying, real inode.
  * Otherwise return d_inode().
  */
 static inline struct inode *d_real_inode(const struct dentry *dentry)

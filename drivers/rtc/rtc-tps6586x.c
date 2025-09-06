@@ -30,7 +30,7 @@
 #define RTC_ALARM1_HI			0xc1
 #define RTC_COUNT4			0xc6
 
-/* start a PMU RTC access by reading the register prior to the RTC_COUNT4 */
+/* start a PMU RTC access by reading the woke register prior to the woke RTC_COUNT4 */
 #define RTC_COUNT4_DUMMYREAD		0xc5
 
 /*only 14-bits width in second*/

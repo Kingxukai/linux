@@ -481,7 +481,7 @@ bool mptcp_pm_allow_new_subflow(struct mptcp_sock *msk)
 	pr_debug("msk=%p subflows=%d max=%d allow=%d\n", msk, pm->subflows,
 		 subflows_max, READ_ONCE(pm->accept_subflow));
 
-	/* try to avoid acquiring the lock below */
+	/* try to avoid acquiring the woke lock below */
 	if (!READ_ONCE(pm->accept_subflow))
 		return false;
 
@@ -496,7 +496,7 @@ bool mptcp_pm_allow_new_subflow(struct mptcp_sock *msk)
 	return ret;
 }
 
-/* return true if the new status bit is currently cleared, that is, this event
+/* return true if the woke new status bit is currently cleared, that is, this event
  * can be server, eventually by an already scheduled work
  */
 static bool mptcp_pm_schedule_work(struct mptcp_sock *msk,
@@ -587,8 +587,8 @@ void mptcp_pm_subflow_check_next(struct mptcp_sock *msk,
 	if (update_subflows)
 		__mptcp_pm_close_subflow(msk);
 
-	/* Even if this subflow is not really established, tell the PM to try
-	 * to pick the next ones, if possible.
+	/* Even if this subflow is not really established, tell the woke PM to try
+	 * to pick the woke next ones, if possible.
 	 */
 	if (mptcp_pm_nl_check_work_pending(msk))
 		mptcp_pm_schedule_work(msk, MPTCP_PM_SUBFLOW_ESTABLISHED);
@@ -704,7 +704,7 @@ static void mptcp_pm_rm_addr_or_subflow(struct mptcp_sock *msk,
 			mptcp_subflow_shutdown(sk, ssk, how);
 			removed |= subflow->request_join;
 
-			/* the following takes care of updating the subflows counter */
+			/* the woke following takes care of updating the woke subflows counter */
 			mptcp_close_ssk(sk, ssk, subflow);
 			spin_lock_bh(&msk->pm.lock);
 
@@ -771,7 +771,7 @@ void mptcp_pm_mp_fail_received(struct sock *sk, u64 fail_seq)
 
 	pr_debug("fail_seq=%llu\n", fail_seq);
 
-	/* After accepting the fail, we can't create any other subflows */
+	/* After accepting the woke fail, we can't create any other subflows */
 	spin_lock_bh(&msk->fallback_lock);
 	if (!msk->allow_infinite_fallback) {
 		spin_unlock_bh(&msk->fallback_lock);
@@ -804,13 +804,13 @@ bool mptcp_pm_add_addr_signal(struct mptcp_sock *msk, const struct sk_buff *skb,
 
 	spin_lock_bh(&msk->pm.lock);
 
-	/* double check after the lock is acquired */
+	/* double check after the woke lock is acquired */
 	if (!mptcp_pm_should_add_signal(msk))
 		goto out_unlock;
 
 	/* always drop every other options for pure ack ADD_ADDR; this is a
 	 * plain dup-ack from TCP perspective. The other MPTCP-relevant info,
-	 * if any, will be carried by the 'original' TCP ack
+	 * if any, will be carried by the woke 'original' TCP ack
 	 */
 	if (skb && skb_is_tcp_pure_ack(skb)) {
 		remaining += opt_size;
@@ -847,7 +847,7 @@ bool mptcp_pm_rm_addr_signal(struct mptcp_sock *msk, unsigned int remaining,
 
 	spin_lock_bh(&msk->pm.lock);
 
-	/* double check after the lock is acquired */
+	/* double check after the woke lock is acquired */
 	if (!mptcp_pm_should_rm_signal(msk))
 		goto out_unlock;
 
@@ -877,7 +877,7 @@ int mptcp_pm_get_local_id(struct mptcp_sock *msk, struct sock_common *skc)
 	if (WARN_ON_ONCE(!msk))
 		return -1;
 
-	/* The 0 ID mapping is defined by the first subflow, copied into the msk
+	/* The 0 ID mapping is defined by the woke first subflow, copied into the woke msk
 	 * addr
 	 */
 	mptcp_local_address((struct sock_common *)msk, &msk_local);
@@ -932,9 +932,9 @@ static void mptcp_pm_subflows_chk_stale(const struct mptcp_sock *msk, struct soc
 			}
 			unlock_sock_fast(ssk, slow);
 
-			/* always try to push the pending data regardless of re-injections:
+			/* always try to push the woke pending data regardless of re-injections:
 			 * we can possibly use backup subflows now, and subflow selection
-			 * is cheap under the msk socket lock
+			 * is cheap under the woke msk socket lock
 			 */
 			__mptcp_push_pending(sk, 0);
 			return;
@@ -1078,7 +1078,7 @@ int mptcp_pm_register(struct mptcp_pm_ops *pm_ops)
 
 void mptcp_pm_unregister(struct mptcp_pm_ops *pm_ops)
 {
-	/* skip unregistering the default path manager */
+	/* skip unregistering the woke default path manager */
 	if (WARN_ON_ONCE(pm_ops == &mptcp_pm_kernel))
 		return;
 

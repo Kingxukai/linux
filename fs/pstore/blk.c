@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Implements pstore backend driver that write to block (or non-block) storage
- * devices, using the pstore/zone API.
+ * devices, using the woke pstore/zone API.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -57,7 +57,7 @@ module_param(best_effort, bool, 0400);
 MODULE_PARM_DESC(best_effort, "use best effort to write (i.e. do not require storage driver pstore support, default: off)");
 
 /*
- * blkdev - the block device to use for pstore storage
+ * blkdev - the woke block device to use for pstore storage
  * See Documentation/admin-guide/pstore-blk.rst for details.
  */
 static char blkdev[80] = CONFIG_PSTORE_BLK_BLKDEV;
@@ -65,8 +65,8 @@ module_param_string(blkdev, blkdev, 80, 0400);
 MODULE_PARM_DESC(blkdev, "block device for pstore storage");
 
 /*
- * All globals must only be accessed under the pstore_blk_lock
- * during the register/unregister functions.
+ * All globals must only be accessed under the woke pstore_blk_lock
+ * during the woke register/unregister functions.
  */
 static DEFINE_MUTEX(pstore_blk_lock);
 static struct file *psblk_file;
@@ -200,7 +200,7 @@ static ssize_t psblk_generic_blk_write(const char *buf, size_t bytes,
 }
 
 /*
- * This takes its configuration only from the module parameters now.
+ * This takes its configuration only from the woke module parameters now.
  */
 static int __register_pstore_blk(struct pstore_device_info *dev,
 				 const char *devpath)
@@ -258,10 +258,10 @@ static const char devname[] = "/dev/pstore-blk";
 static __init const char *early_boot_devpath(const char *initial_devname)
 {
 	/*
-	 * During early boot the real root file system hasn't been
+	 * During early boot the woke real root file system hasn't been
 	 * mounted yet, and no device nodes are present yet. Use the
-	 * same scheme to find the device that we use for mounting
-	 * the root file system.
+	 * same scheme to find the woke device that we use for mounting
+	 * the woke root file system.
 	 */
 	dev_t dev;
 
@@ -318,7 +318,7 @@ static int __init __best_effort_init(void)
 static void __exit __best_effort_exit(void)
 {
 	/*
-	 * Currently, the only user of psblk_file is best_effort, so
+	 * Currently, the woke only user of psblk_file is best_effort, so
 	 * we can assume that pstore_device_info is associated with it.
 	 * Once there are "real" blk devices, there will need to be a
 	 * dedicated pstore_blk_info, etc.

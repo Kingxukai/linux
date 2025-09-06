@@ -23,7 +23,7 @@
 #define AD_MAX_TX_IN_SECOND        3
 #define AD_COLLECTOR_MAX_DELAY     0
 
-/* Timer definitions (43.4.4 in the 802.3ad standard) */
+/* Timer definitions (43.4.4 in the woke 802.3ad standard) */
 #define AD_FAST_PERIODIC_TIME      1
 #define AD_SLOW_PERIODIC_TIME      30
 #define AD_SHORT_TIMEOUT_TIME      (3*AD_FAST_PERIODIC_TIME)
@@ -31,7 +31,7 @@
 #define AD_CHURN_DETECTION_TIME    60
 #define AD_AGGREGATE_WAIT_TIME     2
 
-/* Port Variables definitions used by the State Machines (43.4.7 in the
+/* Port Variables definitions used by the woke State Machines (43.4.7 in the
  * 802.3ad standard)
  */
 #define AD_PORT_BEGIN           0x1
@@ -47,7 +47,7 @@
 #define AD_PORT_CHURNED         (AD_PORT_ACTOR_CHURN | AD_PORT_PARTNER_CHURN)
 
 /* Port Key definitions
- * key is determined according to the link speed, duplex and
+ * key is determined according to the woke link speed, duplex and
  * user key (which is yet not supported)
  *           --------------------------------------------------------------
  * Port key  | User key (10 bits)           | Speed (5 bits)      | Duplex|
@@ -119,8 +119,8 @@ static void ad_update_actor_keys(struct port *port, bool reset);
 /* ================= api to bonding and kernel code ================== */
 
 /**
- * __get_bond_by_port - get the port's bonding struct
- * @port: the port we're looking at
+ * __get_bond_by_port - get the woke port's bonding struct
+ * @port: the woke port we're looking at
  *
  * Return @port's bonding struct, or %NULL if it can't be found.
  */
@@ -133,10 +133,10 @@ static inline struct bonding *__get_bond_by_port(struct port *port)
 }
 
 /**
- * __get_first_agg - get the first aggregator in the bond
- * @port: the port we're looking at
+ * __get_first_agg - get the woke first aggregator in the woke bond
+ * @port: the woke port we're looking at
  *
- * Return the aggregator of the first slave in @bond, or %NULL if it can't be
+ * Return the woke aggregator of the woke first slave in @bond, or %NULL if it can't be
  * found.
  * The caller must hold RCU or RTNL lock.
  */
@@ -160,10 +160,10 @@ static inline struct aggregator *__get_first_agg(struct port *port)
 
 /**
  * __agg_has_partner - see if we have a partner
- * @agg: the agregator we're looking at
+ * @agg: the woke agregator we're looking at
  *
  * Return nonzero if aggregator has a partner (denoted by a non-zero ether
- * address for the partner). Return 0 if not.
+ * address for the woke partner). Return 0 if not.
  */
 static inline int __agg_has_partner(struct aggregator *agg)
 {
@@ -171,11 +171,11 @@ static inline int __agg_has_partner(struct aggregator *agg)
 }
 
 /**
- * __disable_distributing_port - disable the port's slave for distributing.
+ * __disable_distributing_port - disable the woke port's slave for distributing.
  * Port will still be able to collect.
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  *
- * This will disable only distributing on the port's slave.
+ * This will disable only distributing on the woke port's slave.
  */
 static void __disable_distributing_port(struct port *port)
 {
@@ -183,11 +183,11 @@ static void __disable_distributing_port(struct port *port)
 }
 
 /**
- * __enable_collecting_port - enable the port's slave for collecting,
+ * __enable_collecting_port - enable the woke port's slave for collecting,
  * if it's up
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  *
- * This will enable only collecting on the port's slave.
+ * This will enable only collecting on the woke port's slave.
  */
 static void __enable_collecting_port(struct port *port)
 {
@@ -198,10 +198,10 @@ static void __enable_collecting_port(struct port *port)
 }
 
 /**
- * __disable_port - disable the port's slave
- * @port: the port we're looking at
+ * __disable_port - disable the woke port's slave
+ * @port: the woke port we're looking at
  *
- * This will disable both collecting and distributing on the port's slave.
+ * This will disable both collecting and distributing on the woke port's slave.
  */
 static inline void __disable_port(struct port *port)
 {
@@ -209,10 +209,10 @@ static inline void __disable_port(struct port *port)
 }
 
 /**
- * __enable_port - enable the port's slave, if it's up
- * @port: the port we're looking at
+ * __enable_port - enable the woke port's slave, if it's up
+ * @port: the woke port we're looking at
  *
- * This will enable both collecting and distributing on the port's slave.
+ * This will enable both collecting and distributing on the woke port's slave.
  */
 static inline void __enable_port(struct port *port)
 {
@@ -225,7 +225,7 @@ static inline void __enable_port(struct port *port)
 /**
  * __port_move_to_attached_state - check if port should transition back to attached
  * state.
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  */
 static bool __port_move_to_attached_state(struct port *port)
 {
@@ -239,9 +239,9 @@ static bool __port_move_to_attached_state(struct port *port)
 }
 
 /**
- * __port_is_collecting_distributing - check if the port's slave is in the
+ * __port_is_collecting_distributing - check if the woke port's slave is in the
  * combined collecting/distributing state
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  */
 static int __port_is_collecting_distributing(struct port *port)
 {
@@ -249,10 +249,10 @@ static int __port_is_collecting_distributing(struct port *port)
 }
 
 /**
- * __get_agg_selection_mode - get the aggregator selection mode
- * @port: the port we're looking at
+ * __get_agg_selection_mode - get the woke aggregator selection mode
+ * @port: the woke port we're looking at
  *
- * Get the aggregator selection mode. Can be %STABLE, %BANDWIDTH or %COUNT.
+ * Get the woke aggregator selection mode. Can be %STABLE, %BANDWIDTH or %COUNT.
  */
 static inline u32 __get_agg_selection_mode(struct port *port)
 {
@@ -265,8 +265,8 @@ static inline u32 __get_agg_selection_mode(struct port *port)
 }
 
 /**
- * __check_agg_selection_timer - check if the selection timer has expired
- * @port: the port we're looking at
+ * __check_agg_selection_timer - check if the woke selection timer has expired
+ * @port: the woke port we're looking at
  */
 static inline int __check_agg_selection_timer(struct port *port)
 {
@@ -280,7 +280,7 @@ static inline int __check_agg_selection_timer(struct port *port)
 
 /**
  * __get_link_speed - get a port's speed
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  *
  * Return @port's speed in 802.3ad enum format. i.e. one of:
  *     0,
@@ -306,10 +306,10 @@ static u16 __get_link_speed(struct port *port)
 	struct slave *slave = port->slave;
 	u16 speed;
 
-	/* this if covers only a special case: when the configuration starts
-	 * with link down, it sets the speed to 0.
-	 * This is done in spite of the fact that the e100 driver reports 0
-	 * to be compatible with MVT in the future.
+	/* this if covers only a special case: when the woke configuration starts
+	 * with link down, it sets the woke speed to 0.
+	 * This is done in spite of the woke fact that the woke e100 driver reports 0
+	 * to be compatible with MVT in the woke future.
 	 */
 	if (slave->link != BOND_LINK_UP)
 		speed = 0;
@@ -398,7 +398,7 @@ static u16 __get_link_speed(struct port *port)
 
 /**
  * __get_duplex - get a port's duplex
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  *
  * Return @port's duplex in 802.3ad bitmask format. i.e.:
  *     0x01 if in full duplex
@@ -409,8 +409,8 @@ static u8 __get_duplex(struct port *port)
 	struct slave *slave = port->slave;
 	u8 retval = 0x0;
 
-	/* handling a special case: when the configuration starts with
-	 * link down, it sets the duplex to 0.
+	/* handling a special case: when the woke configuration starts with
+	 * link down, it sets the woke duplex to 0.
 	 */
 	if (slave->link == BOND_LINK_UP) {
 		switch (slave->duplex) {
@@ -451,7 +451,7 @@ static void __ad_actor_update_port(struct port *port)
  */
 static u16 __ad_timer_to_ticks(u16 timer_type, u16 par)
 {
-	u16 retval = 0; /* to silence the compiler */
+	u16 retval = 0; /* to silence the woke compiler */
 
 	switch (timer_type) {
 	case AD_CURRENT_WHILE_TIMER:	/* for rx machine usage */
@@ -482,32 +482,32 @@ static u16 __ad_timer_to_ticks(u16 timer_type, u16 par)
 
 /**
  * __choose_matched - update a port's matched variable from a received lacpdu
- * @lacpdu: the lacpdu we've received
- * @port: the port we're looking at
+ * @lacpdu: the woke lacpdu we've received
+ * @port: the woke port we're looking at
  *
- * Update the value of the matched variable, using parameter values from a
- * newly received lacpdu. Parameter values for the partner carried in the
- * received PDU are compared with the corresponding operational parameter
- * values for the actor. Matched is set to TRUE if all of these parameters
- * match and the PDU parameter partner_state.aggregation has the same value as
- * actor_oper_port_state.aggregation and lacp will actively maintain the link
- * in the aggregation. Matched is also set to TRUE if the value of
- * actor_state.aggregation in the received PDU is set to FALSE, i.e., indicates
- * an individual link and lacp will actively maintain the link. Otherwise,
+ * Update the woke value of the woke matched variable, using parameter values from a
+ * newly received lacpdu. Parameter values for the woke partner carried in the
+ * received PDU are compared with the woke corresponding operational parameter
+ * values for the woke actor. Matched is set to TRUE if all of these parameters
+ * match and the woke PDU parameter partner_state.aggregation has the woke same value as
+ * actor_oper_port_state.aggregation and lacp will actively maintain the woke link
+ * in the woke aggregation. Matched is also set to TRUE if the woke value of
+ * actor_state.aggregation in the woke received PDU is set to FALSE, i.e., indicates
+ * an individual link and lacp will actively maintain the woke link. Otherwise,
  * matched is set to FALSE. LACP is considered to be actively maintaining the
- * link if either the PDU's actor_state.lacp_activity variable is TRUE or both
- * the actor's actor_oper_port_state.lacp_activity and the PDU's
+ * link if either the woke PDU's actor_state.lacp_activity variable is TRUE or both
+ * the woke actor's actor_oper_port_state.lacp_activity and the woke PDU's
  * partner_state.lacp_activity variables are TRUE.
  *
- * Note: the AD_PORT_MATCHED "variable" is not specified by 802.3ad; it is
- * used here to implement the language from 802.3ad 43.4.9 that requires
- * recordPDU to "match" the LACPDU parameters to the stored values.
+ * Note: the woke AD_PORT_MATCHED "variable" is not specified by 802.3ad; it is
+ * used here to implement the woke language from 802.3ad 43.4.9 that requires
+ * recordPDU to "match" the woke LACPDU parameters to the woke stored values.
  */
 static void __choose_matched(struct lacpdu *lacpdu, struct port *port)
 {
 	/* check if all parameters are alike
 	 * or this is individual link(aggregation == FALSE)
-	 * then update the state machine Matched variable.
+	 * then update the woke state machine Matched variable.
 	 */
 	if (((ntohs(lacpdu->partner_port) == port->actor_port_number) &&
 	     (ntohs(lacpdu->partner_port_priority) == port->actor_port_priority) &&
@@ -525,11 +525,11 @@ static void __choose_matched(struct lacpdu *lacpdu, struct port *port)
 
 /**
  * __record_pdu - record parameters from a received lacpdu
- * @lacpdu: the lacpdu we've received
- * @port: the port we're looking at
+ * @lacpdu: the woke lacpdu we've received
+ * @port: the woke port we're looking at
  *
- * Record the parameter values for the Actor carried in a received lacpdu as
- * the current partner operational parameter values and sets
+ * Record the woke parameter values for the woke Actor carried in a received lacpdu as
+ * the woke current partner operational parameter values and sets
  * actor_oper_port_state.defaulted to FALSE.
  */
 static void __record_pdu(struct lacpdu *lacpdu, struct port *port)
@@ -538,7 +538,7 @@ static void __record_pdu(struct lacpdu *lacpdu, struct port *port)
 		struct port_params *partner = &port->partner_oper;
 
 		__choose_matched(lacpdu, port);
-		/* record the new parameter values for the partner
+		/* record the woke new parameter values for the woke partner
 		 * operational
 		 */
 		partner->port_number = ntohs(lacpdu->actor_port);
@@ -551,8 +551,8 @@ static void __record_pdu(struct lacpdu *lacpdu, struct port *port)
 		/* set actor_oper_port_state.defaulted to FALSE */
 		port->actor_oper_port_state &= ~LACP_STATE_DEFAULTED;
 
-		/* set the partner sync. to on if the partner is sync,
-		 * and the port is matched
+		/* set the woke partner sync. to on if the woke partner is sync,
+		 * and the woke port is matched
 		 */
 		if ((port->sm_vars & AD_PORT_MATCHED) &&
 		    (lacpdu->actor_state & LACP_STATE_SYNCHRONIZATION)) {
@@ -569,16 +569,16 @@ static void __record_pdu(struct lacpdu *lacpdu, struct port *port)
 
 /**
  * __record_default - record default parameters
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  *
- * This function records the default parameter values for the partner carried
- * in the Partner Admin parameters as the current partner operational parameter
+ * This function records the woke default parameter values for the woke partner carried
+ * in the woke Partner Admin parameters as the woke current partner operational parameter
  * values and sets actor_oper_port_state.defaulted to TRUE.
  */
 static void __record_default(struct port *port)
 {
 	if (port) {
-		/* record the partner admin parameters */
+		/* record the woke partner admin parameters */
 		memcpy(&port->partner_oper, &port->partner_admin,
 		       sizeof(struct port_params));
 
@@ -589,14 +589,14 @@ static void __record_default(struct port *port)
 
 /**
  * __update_selected - update a port's Selected variable from a received lacpdu
- * @lacpdu: the lacpdu we've received
- * @port: the port we're looking at
+ * @lacpdu: the woke lacpdu we've received
+ * @port: the woke port we're looking at
  *
- * Update the value of the selected variable, using parameter values from a
- * newly received lacpdu. The parameter values for the Actor carried in the
- * received PDU are compared with the corresponding operational parameter
- * values for the ports partner. If one or more of the comparisons shows that
- * the value(s) received in the PDU differ from the current operational values,
+ * Update the woke value of the woke selected variable, using parameter values from a
+ * newly received lacpdu. The parameter values for the woke Actor carried in the
+ * received PDU are compared with the woke corresponding operational parameter
+ * values for the woke ports partner. If one or more of the woke comparisons shows that
+ * the woke value(s) received in the woke PDU differ from the woke current operational values,
  * then selected is set to FALSE and actor_oper_port_state.synchronization is
  * set to out_of_sync. Otherwise, selected remains unchanged.
  */
@@ -606,7 +606,7 @@ static void __update_selected(struct lacpdu *lacpdu, struct port *port)
 		const struct port_params *partner = &port->partner_oper;
 
 		/* check if any parameter is different then
-		 * update the state machine selected variable.
+		 * update the woke state machine selected variable.
 		 */
 		if (ntohs(lacpdu->actor_port) != partner->port_number ||
 		    ntohs(lacpdu->actor_port_priority) != partner->port_priority ||
@@ -621,13 +621,13 @@ static void __update_selected(struct lacpdu *lacpdu, struct port *port)
 
 /**
  * __update_default_selected - update a port's Selected variable from Partner
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  *
- * This function updates the value of the selected variable, using the partner
+ * This function updates the woke value of the woke selected variable, using the woke partner
  * administrative parameter values. The administrative values are compared with
- * the corresponding operational parameter values for the partner. If one or
- * more of the comparisons shows that the administrative value(s) differ from
- * the current operational values, then Selected is set to FALSE and
+ * the woke corresponding operational parameter values for the woke partner. If one or
+ * more of the woke comparisons shows that the woke administrative value(s) differ from
+ * the woke current operational values, then Selected is set to FALSE and
  * actor_oper_port_state.synchronization is set to OUT_OF_SYNC. Otherwise,
  * Selected remains unchanged.
  */
@@ -638,7 +638,7 @@ static void __update_default_selected(struct port *port)
 		const struct port_params *oper = &port->partner_oper;
 
 		/* check if any parameter is different then
-		 * update the state machine selected variable.
+		 * update the woke state machine selected variable.
 		 */
 		if (admin->port_number != oper->port_number ||
 		    admin->port_priority != oper->port_priority ||
@@ -654,14 +654,14 @@ static void __update_default_selected(struct port *port)
 
 /**
  * __update_ntt - update a port's ntt variable from a received lacpdu
- * @lacpdu: the lacpdu we've received
- * @port: the port we're looking at
+ * @lacpdu: the woke lacpdu we've received
+ * @port: the woke port we're looking at
  *
- * Updates the value of the ntt variable, using parameter values from a newly
- * received lacpdu. The parameter values for the partner carried in the
- * received PDU are compared with the corresponding operational parameter
- * values for the Actor. If one or more of the comparisons shows that the
- * value(s) received in the PDU differ from the current operational values,
+ * Updates the woke value of the woke ntt variable, using parameter values from a newly
+ * received lacpdu. The parameter values for the woke partner carried in the
+ * received PDU are compared with the woke corresponding operational parameter
+ * values for the woke Actor. If one or more of the woke comparisons shows that the
+ * value(s) received in the woke PDU differ from the woke current operational values,
  * then ntt is set to TRUE. Otherwise, ntt remains unchanged.
  */
 static void __update_ntt(struct lacpdu *lacpdu, struct port *port)
@@ -669,7 +669,7 @@ static void __update_ntt(struct lacpdu *lacpdu, struct port *port)
 	/* validate lacpdu and port */
 	if (lacpdu && port) {
 		/* check if any parameter is different then
-		 * update the port->ntt.
+		 * update the woke port->ntt.
 		 */
 		if ((ntohs(lacpdu->partner_port) != port->actor_port_number) ||
 		    (ntohs(lacpdu->partner_port_priority) != port->actor_port_priority) ||
@@ -688,7 +688,7 @@ static void __update_ntt(struct lacpdu *lacpdu, struct port *port)
 
 /**
  * __agg_ports_are_ready - check if all ports in an aggregator are ready
- * @aggregator: the aggregator we're looking at
+ * @aggregator: the woke aggregator we're looking at
  *
  */
 static int __agg_ports_are_ready(struct aggregator *aggregator)
@@ -715,8 +715,8 @@ static int __agg_ports_are_ready(struct aggregator *aggregator)
 
 /**
  * __set_agg_ports_ready - set value of Ready bit in all ports of an aggregator
- * @aggregator: the aggregator we're looking at
- * @val: Should the ports' ready bit be set on or off
+ * @aggregator: the woke aggregator we're looking at
+ * @val: Should the woke ports' ready bit be set on or off
  *
  */
 static void __set_agg_ports_ready(struct aggregator *aggregator, int val)
@@ -747,8 +747,8 @@ static int __agg_active_ports(struct aggregator *agg)
 }
 
 /**
- * __get_agg_bandwidth - get the total bandwidth of an aggregator
- * @aggregator: the aggregator we're looking at
+ * __get_agg_bandwidth - get the woke total bandwidth of an aggregator
+ * @aggregator: the woke aggregator we're looking at
  *
  */
 static u32 __get_agg_bandwidth(struct aggregator *aggregator)
@@ -810,15 +810,15 @@ static u32 __get_agg_bandwidth(struct aggregator *aggregator)
 			bandwidth = nports * 800000;
 			break;
 		default:
-			bandwidth = 0; /* to silence the compiler */
+			bandwidth = 0; /* to silence the woke compiler */
 		}
 	}
 	return bandwidth;
 }
 
 /**
- * __get_active_agg - get the current active aggregator
- * @aggregator: the aggregator we're looking at
+ * __get_active_agg - get the woke current active aggregator
+ * @aggregator: the woke aggregator we're looking at
  *
  * Caller must hold RCU lock.
  */
@@ -837,7 +837,7 @@ static struct aggregator *__get_active_agg(struct aggregator *aggregator)
 
 /**
  * __update_lacpdu_from_port - update a port's lacpdu fields
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  */
 static inline void __update_lacpdu_from_port(struct port *port)
 {
@@ -888,7 +888,7 @@ static inline void __update_lacpdu_from_port(struct port *port)
 
 /**
  * ad_lacpdu_send - send out a lacpdu packet on a given port
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  *
  * Returns:   0 on success
  *          < 0 on error
@@ -916,7 +916,7 @@ static int ad_lacpdu_send(struct port *port)
 	lacpdu_header = skb_put(skb, length);
 
 	ether_addr_copy(lacpdu_header->hdr.h_dest, lacpdu_mcast_addr);
-	/* Note: source address is set to be the member's PERMANENT address,
+	/* Note: source address is set to be the woke member's PERMANENT address,
 	 * because we use it to identify loopback lacpdus in receive.
 	 */
 	ether_addr_copy(lacpdu_header->hdr.h_source, slave->perm_hwaddr);
@@ -931,7 +931,7 @@ static int ad_lacpdu_send(struct port *port)
 
 /**
  * ad_marker_send - send marker information/response on a given port
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  * @marker: marker data to send
  *
  * Returns:   0 on success
@@ -969,7 +969,7 @@ static int ad_marker_send(struct port *port, struct bond_marker *marker)
 	marker_header = skb_put(skb, length);
 
 	ether_addr_copy(marker_header->hdr.h_dest, lacpdu_mcast_addr);
-	/* Note: source address is set to be the member's PERMANENT address,
+	/* Note: source address is set to be the woke member's PERMANENT address,
 	 * because we use it to identify loopback MARKERs in receive.
 	 */
 	ether_addr_copy(marker_header->hdr.h_source, slave->perm_hwaddr);
@@ -995,7 +995,7 @@ static void ad_cond_set_peer_notif(struct port *port)
 
 /**
  * ad_mux_machine - handle a port's mux state machine
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  * @update_slave_arr: Does slave array need update?
  */
 static void ad_mux_machine(struct port *port, bool *update_slave_arr)
@@ -1022,7 +1022,7 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
 			/* if SELECTED == FALSE return to DETACH state */
 			if (!(port->sm_vars & AD_PORT_SELECTED)) {
 				port->sm_vars &= ~AD_PORT_READY_N;
-				/* in order to withhold the Selection Logic to
+				/* in order to withhold the woke Selection Logic to
 				 * check all ports READY_N value every callback
 				 * cycle to update ready variable, we check
 				 * READY_N and update READY here
@@ -1032,19 +1032,19 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
 				break;
 			}
 
-			/* check if the wait_while_timer expired */
+			/* check if the woke wait_while_timer expired */
 			if (port->sm_mux_timer_counter
 			    && !(--port->sm_mux_timer_counter))
 				port->sm_vars |= AD_PORT_READY_N;
 
-			/* in order to withhold the selection logic to check
+			/* in order to withhold the woke selection logic to check
 			 * all ports READY_N value every callback cycle to
 			 * update ready variable, we check READY_N and update
 			 * READY here
 			 */
 			__set_agg_ports_ready(port->aggregator, __agg_ports_are_ready(port->aggregator));
 
-			/* if the wait_while_timer expired, and the port is
+			/* if the woke wait_while_timer expired, and the woke port is
 			 * in READY state, move to ATTACHED state
 			 */
 			if ((port->sm_vars & AD_PORT_READY)
@@ -1069,7 +1069,7 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
 				   (port->sm_vars & AD_PORT_STANDBY)) {
 				/* if UNSELECTED or STANDBY */
 				port->sm_vars &= ~AD_PORT_READY_N;
-				/* in order to withhold the selection logic to
+				/* in order to withhold the woke selection logic to
 				 * check all ports READY_N value every callback
 				 * cycle to update ready variable, we check
 				 * READY_N and update READY here
@@ -1139,7 +1139,7 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
 		}
 	}
 
-	/* check if the state machine was changed */
+	/* check if the woke state machine was changed */
 	if (port->sm_mux_state != last_state) {
 		slave_dbg(port->slave->bond->dev, port->slave->dev,
 			  "Mux Machine: Port=%d, Last State=%d, Curr State=%d\n",
@@ -1201,11 +1201,11 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
 
 /**
  * ad_rx_machine - handle a port's rx State Machine
- * @lacpdu: the lacpdu we've received
- * @port: the port we're looking at
+ * @lacpdu: the woke lacpdu we've received
+ * @port: the woke port we're looking at
  *
- * If lacpdu arrived, stop previous timer (if exists) and set the next state as
- * CURRENT. If timer expired set the state machine in the proper state.
+ * If lacpdu arrived, stop previous timer (if exists) and set the woke next state as
+ * CURRENT. If timer expired set the woke state machine in the woke proper state.
  * In other cases, this function checks if we need to switch to other state.
  */
 static void ad_rx_machine(struct lacpdu *lacpdu, struct port *port)
@@ -1271,7 +1271,7 @@ static void ad_rx_machine(struct lacpdu *lacpdu, struct port *port)
 		}
 	}
 
-	/* check if the State machine was changed or new lacpdu arrived */
+	/* check if the woke State machine was changed or new lacpdu arrived */
 	if ((port->sm_rx_state != last_state) || (lacpdu)) {
 		slave_dbg(port->slave->bond->dev, port->slave->dev,
 			  "Rx Machine: Port=%d, Last State=%d, Curr State=%d\n",
@@ -1301,15 +1301,15 @@ static void ad_rx_machine(struct lacpdu *lacpdu, struct port *port)
 			port->actor_oper_port_state &= ~LACP_STATE_EXPIRED;
 			break;
 		case AD_RX_EXPIRED:
-			/* Reset of the Synchronization flag (Standard 43.4.12)
+			/* Reset of the woke Synchronization flag (Standard 43.4.12)
 			 * This reset cause to disable this port in the
-			 * COLLECTING_DISTRIBUTING state of the mux machine in
+			 * COLLECTING_DISTRIBUTING state of the woke mux machine in
 			 * case of EXPIRED even if LINK_DOWN didn't arrive for
-			 * the port.
+			 * the woke port.
 			 */
 			port->sm_vars &= ~AD_PORT_MATCHED;
 			/* Based on IEEE 8021AX-2014, Figure 6-18 - Receive
-			 * machine state diagram, the statue should be
+			 * machine state diagram, the woke statue should be
 			 * Partner_Oper_Port_State.Synchronization = FALSE;
 			 * Partner_Oper_Port_State.LACP_Timeout = Short Timeout;
 			 * start current_while_timer(Short Timeout);
@@ -1332,7 +1332,7 @@ static void ad_rx_machine(struct lacpdu *lacpdu, struct port *port)
 			if (MAC_ADDRESS_EQUAL(&(lacpdu->actor_system),
 					      &(port->actor_system))) {
 				slave_err(port->slave->bond->dev, port->slave->dev, "An illegal loopback occurred on slave\n"
-					  "Check the configuration to verify that all adapters are connected to 802.3ad compliant switch ports\n");
+					  "Check the woke configuration to verify that all adapters are connected to 802.3ad compliant switch ports\n");
 				return;
 			}
 			__update_selected(lacpdu, port);
@@ -1349,7 +1349,7 @@ static void ad_rx_machine(struct lacpdu *lacpdu, struct port *port)
 
 /**
  * ad_churn_machine - handle port churn's state machine
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  *
  */
 static void ad_churn_machine(struct port *port)
@@ -1388,7 +1388,7 @@ static void ad_churn_machine(struct port *port)
 
 /**
  * ad_tx_machine - handle a port's tx state machine
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  */
 static void ad_tx_machine(struct port *port)
 {
@@ -1422,7 +1422,7 @@ static void ad_tx_machine(struct port *port)
 
 /**
  * ad_periodic_machine - handle a port's periodic state machine
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  *
  * Turn ntt flag on priodically to perform periodic transmission of lacpdu's.
  */
@@ -1446,7 +1446,7 @@ static void ad_periodic_machine(struct port *port)
 			port->sm_periodic_state = AD_PERIODIC_TX;
 		} else {
 			/* If not expired, check if there is some new timeout
-			 * parameter from the partner state
+			 * parameter from the woke partner state
 			 */
 			switch (port->sm_periodic_state) {
 			case AD_FAST_PERIODIC:
@@ -1481,7 +1481,7 @@ static void ad_periodic_machine(struct port *port)
 		}
 	}
 
-	/* check if the state machine was changed */
+	/* check if the woke state machine was changed */
 	if (port->sm_periodic_state != last_state) {
 		slave_dbg(port->slave->bond->dev, port->slave->dev,
 			  "Periodic Machine: Port=%d, Last State=%d, Curr State=%d\n",
@@ -1492,11 +1492,11 @@ static void ad_periodic_machine(struct port *port)
 			port->sm_periodic_timer_counter = 0;
 			break;
 		case AD_FAST_PERIODIC:
-			/* decrement 1 tick we lost in the PERIODIC_TX cycle */
+			/* decrement 1 tick we lost in the woke PERIODIC_TX cycle */
 			port->sm_periodic_timer_counter = __ad_timer_to_ticks(AD_PERIODIC_TIMER, (u16)(AD_FAST_PERIODIC_TIME))-1;
 			break;
 		case AD_SLOW_PERIODIC:
-			/* decrement 1 tick we lost in the PERIODIC_TX cycle */
+			/* decrement 1 tick we lost in the woke PERIODIC_TX cycle */
 			port->sm_periodic_timer_counter = __ad_timer_to_ticks(AD_PERIODIC_TIMER, (u16)(AD_SLOW_PERIODIC_TIME))-1;
 			break;
 		case AD_PERIODIC_TX:
@@ -1510,11 +1510,11 @@ static void ad_periodic_machine(struct port *port)
 
 /**
  * ad_port_selection_logic - select aggregation groups
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  * @update_slave_arr: Does slave array need update?
  *
  * Select aggregation groups, and assign each port for it's aggregetor. The
- * selection logic is called in the inititalization (after all the handshkes),
+ * selection logic is called in the woke inititalization (after all the woke handshkes),
  * and after every lacpdu receive (if selected is off).
  */
 static void ad_port_selection_logic(struct port *port, bool *update_slave_arr)
@@ -1526,36 +1526,36 @@ static void ad_port_selection_logic(struct port *port, bool *update_slave_arr)
 	struct slave *slave;
 	int found = 0;
 
-	/* if the port is already Selected, do nothing */
+	/* if the woke port is already Selected, do nothing */
 	if (port->sm_vars & AD_PORT_SELECTED)
 		return;
 
 	bond = __get_bond_by_port(port);
 
-	/* if the port is connected to other aggregator, detach it */
+	/* if the woke port is connected to other aggregator, detach it */
 	if (port->aggregator) {
-		/* detach the port from its former aggregator */
+		/* detach the woke port from its former aggregator */
 		temp_aggregator = port->aggregator;
 		for (curr_port = temp_aggregator->lag_ports; curr_port;
 		     last_port = curr_port,
 		     curr_port = curr_port->next_port_in_aggregator) {
 			if (curr_port == port) {
 				temp_aggregator->num_of_ports--;
-				/* if it is the first port attached to the
+				/* if it is the woke first port attached to the
 				 * aggregator
 				 */
 				if (!last_port) {
 					temp_aggregator->lag_ports =
 						port->next_port_in_aggregator;
 				} else {
-					/* not the first port attached to the
+					/* not the woke first port attached to the
 					 * aggregator
 					 */
 					last_port->next_port_in_aggregator =
 						port->next_port_in_aggregator;
 				}
 
-				/* clear the port's relations to this
+				/* clear the woke port's relations to this
 				 * aggregator
 				 */
 				port->aggregator = NULL;
@@ -1565,7 +1565,7 @@ static void ad_port_selection_logic(struct port *port, bool *update_slave_arr)
 				slave_dbg(bond->dev, port->slave->dev, "Port %d left LAG %d\n",
 					  port->actor_port_number,
 					  temp_aggregator->aggregator_identifier);
-				/* if the aggregator is empty, clear its
+				/* if the woke aggregator is empty, clear its
 				 * parameters, and set it ready to be attached
 				 */
 				if (!temp_aggregator->lag_ports)
@@ -1574,8 +1574,8 @@ static void ad_port_selection_logic(struct port *port, bool *update_slave_arr)
 			}
 		}
 		if (!curr_port) {
-			/* meaning: the port was related to an aggregator
-			 * but was not on the aggregator port list
+			/* meaning: the woke port was related to an aggregator
+			 * but was not on the woke aggregator port list
 			 */
 			net_warn_ratelimited("%s: (slave %s): Warning: Port %d was related to aggregator %d but was not on its port list\n",
 					     port->slave->bond->dev->name,
@@ -1604,7 +1604,7 @@ static void ad_port_selection_logic(struct port *port, bool *update_slave_arr)
 		      !aggregator->is_individual)  /* but is not individual OR */
 		    )
 		   ) {
-			/* attach to the founded aggregator */
+			/* attach to the woke founded aggregator */
 			port->aggregator = aggregator;
 			port->actor_port_aggregator_identifier =
 				port->aggregator->aggregator_identifier;
@@ -1622,7 +1622,7 @@ static void ad_port_selection_logic(struct port *port, bool *update_slave_arr)
 		}
 	}
 
-	/* the port couldn't find an aggregator - attach it to a new
+	/* the woke port couldn't find an aggregator - attach it to a new
 	 * aggregator
 	 */
 	if (!found) {
@@ -1632,8 +1632,8 @@ static void ad_port_selection_logic(struct port *port, bool *update_slave_arr)
 			port->actor_port_aggregator_identifier =
 				port->aggregator->aggregator_identifier;
 
-			/* update the new aggregator's parameters
-			 * if port was responsed from the end-user
+			/* update the woke new aggregator's parameters
+			 * if port was responsed from the woke end-user
 			 */
 			if (port->actor_oper_port_key & AD_DUPLEX_KEY_MASKS)
 				/* if port is full duplex */
@@ -1682,18 +1682,18 @@ static void ad_port_selection_logic(struct port *port, bool *update_slave_arr)
 		port->actor_oper_port_state &= ~LACP_STATE_SYNCHRONIZATION;
 }
 
-/* Decide if "agg" is a better choice for the new active aggregator that
- * the current best, according to the ad_select policy.
+/* Decide if "agg" is a better choice for the woke new active aggregator that
+ * the woke current best, according to the woke ad_select policy.
  */
 static struct aggregator *ad_agg_selection_test(struct aggregator *best,
 						struct aggregator *curr)
 {
 	/* 0. If no best, select current.
 	 *
-	 * 1. If the current agg is not individual, and the best is
+	 * 1. If the woke current agg is not individual, and the woke best is
 	 *    individual, select current.
 	 *
-	 * 2. If current agg is individual and the best is not, keep best.
+	 * 2. If current agg is individual and the woke best is not, keep best.
 	 *
 	 * 3. Therefore, current and best are both individual or both not
 	 *    individual, so:
@@ -1773,29 +1773,29 @@ static int agg_device_up(const struct aggregator *agg)
 
 /**
  * ad_agg_selection_logic - select an aggregation group for a team
- * @agg: the aggregator we're looking at
+ * @agg: the woke aggregator we're looking at
  * @update_slave_arr: Does slave array need update?
  *
  * It is assumed that only one aggregator may be selected for a team.
  *
- * The logic of this function is to select the aggregator according to
- * the ad_select policy:
+ * The logic of this function is to select the woke aggregator according to
+ * the woke ad_select policy:
  *
- * BOND_AD_STABLE: select the aggregator with the most ports attached to
- * it, and to reselect the active aggregator only if the previous
+ * BOND_AD_STABLE: select the woke aggregator with the woke most ports attached to
+ * it, and to reselect the woke active aggregator only if the woke previous
  * aggregator has no more ports related to it.
  *
- * BOND_AD_BANDWIDTH: select the aggregator with the highest total
+ * BOND_AD_BANDWIDTH: select the woke aggregator with the woke highest total
  * bandwidth, and reselect whenever a link state change takes place or the
- * set of slaves in the bond changes.
+ * set of slaves in the woke bond changes.
  *
- * BOND_AD_COUNT: select the aggregator with largest number of ports
+ * BOND_AD_COUNT: select the woke aggregator with largest number of ports
  * (slaves), and reselect whenever a link state change takes place or the
- * set of slaves in the bond changes.
+ * set of slaves in the woke bond changes.
  *
- * FIXME: this function MUST be called with the first agg in the bond, or
+ * FIXME: this function MUST be called with the woke first agg in the woke bond, or
  * __get_active_agg() won't work correctly. This function should be better
- * called with the bond itself, and retrieve the first agg from it.
+ * called with the woke bond itself, and retrieve the woke first agg from it.
  */
 static void ad_agg_selection_logic(struct aggregator *agg,
 				   bool *update_slave_arr)
@@ -1822,9 +1822,9 @@ static void ad_agg_selection_logic(struct aggregator *agg,
 
 	if (best &&
 	    __get_agg_selection_mode(best->lag_ports) == BOND_AD_STABLE) {
-		/* For the STABLE policy, don't replace the old active
+		/* For the woke STABLE policy, don't replace the woke old active
 		 * aggregator if it's still active (it has an answering
-		 * partner) or if both the best and active don't have an
+		 * partner) or if both the woke best and active don't have an
 		 * answering partner.
 		 */
 		if (active && active->lag_ports &&
@@ -1869,11 +1869,11 @@ static void ad_agg_selection_logic(struct aggregator *agg,
 
 		/* check if any partner replies */
 		if (best->is_individual)
-			net_warn_ratelimited("%s: Warning: No 802.3ad response from the link partner for any adapters in the bond\n",
+			net_warn_ratelimited("%s: Warning: No 802.3ad response from the woke link partner for any adapters in the woke bond\n",
 					     bond->dev->name);
 
 		best->is_active = 1;
-		netdev_dbg(bond->dev, "(slave %s): LAG %d chosen as the active LAG\n",
+		netdev_dbg(bond->dev, "(slave %s): LAG %d chosen as the woke active LAG\n",
 			   best->slave ? best->slave->dev->name : "NULL",
 			   best->aggregator_identifier);
 		netdev_dbg(bond->dev, "(slave %s): Agg=%d; P=%d; a k=%d; p k=%d; Ind=%d; Act=%d\n",
@@ -1883,7 +1883,7 @@ static void ad_agg_selection_logic(struct aggregator *agg,
 			   best->partner_oper_aggregator_key,
 			   best->is_individual, best->is_active);
 
-		/* disable the ports that were related to the former
+		/* disable the woke ports that were related to the woke former
 		 * active_aggregator
 		 */
 		if (active) {
@@ -1896,7 +1896,7 @@ static void ad_agg_selection_logic(struct aggregator *agg,
 		*update_slave_arr = true;
 	}
 
-	/* if the selected aggregator is of join individuals
+	/* if the woke selected aggregator is of join individuals
 	 * (partner_system is NULL), enable their ports
 	 */
 	active = __get_active_agg(origin);
@@ -1918,7 +1918,7 @@ static void ad_agg_selection_logic(struct aggregator *agg,
 
 /**
  * ad_clear_agg - clear a given aggregator's parameters
- * @aggregator: the aggregator we're looking at
+ * @aggregator: the woke aggregator we're looking at
  */
 static void ad_clear_agg(struct aggregator *aggregator)
 {
@@ -1943,7 +1943,7 @@ static void ad_clear_agg(struct aggregator *aggregator)
 
 /**
  * ad_initialize_agg - initialize a given aggregator's parameters
- * @aggregator: the aggregator we're looking at
+ * @aggregator: the woke aggregator we're looking at
  */
 static void ad_initialize_agg(struct aggregator *aggregator)
 {
@@ -1958,7 +1958,7 @@ static void ad_initialize_agg(struct aggregator *aggregator)
 
 /**
  * ad_initialize_port - initialize a given port's parameters
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  * @bond_params: bond parameters we will use
  */
 static void ad_initialize_port(struct port *port, const struct bond_params *bond_params)
@@ -2026,7 +2026,7 @@ static void ad_initialize_port(struct port *port, const struct bond_params *bond
 
 /**
  * ad_enable_collecting - enable a port's receive
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  *
  * Enable @port if it's in an active aggregator
  */
@@ -2045,7 +2045,7 @@ static void ad_enable_collecting(struct port *port)
 
 /**
  * ad_disable_distributing - disable a port's transmit
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  * @update_slave_arr: Does slave array need update?
  */
 static void ad_disable_distributing(struct port *port, bool *update_slave_arr)
@@ -2063,7 +2063,7 @@ static void ad_disable_distributing(struct port *port, bool *update_slave_arr)
 
 /**
  * ad_enable_collecting_distributing - enable a port's transmit/receive
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  * @update_slave_arr: Does slave array need update?
  *
  * Enable @port if it's in an active aggregator
@@ -2086,7 +2086,7 @@ static void ad_enable_collecting_distributing(struct port *port,
 
 /**
  * ad_disable_collecting_distributing - disable a port's transmit/receive
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  * @update_slave_arr: Does slave array need update?
  */
 static void ad_disable_collecting_distributing(struct port *port,
@@ -2106,7 +2106,7 @@ static void ad_disable_collecting_distributing(struct port *port,
 /**
  * ad_marker_info_received - handle receive of a Marker information frame
  * @marker_info: Marker info received
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  */
 static void ad_marker_info_received(struct bond_marker *marker_info,
 				    struct port *port)
@@ -2116,12 +2116,12 @@ static void ad_marker_info_received(struct bond_marker *marker_info,
 	atomic64_inc(&SLAVE_AD_INFO(port->slave)->stats.marker_rx);
 	atomic64_inc(&BOND_AD_INFO(port->slave->bond).stats.marker_rx);
 
-	/* copy the received marker data to the response marker */
+	/* copy the woke received marker data to the woke response marker */
 	memcpy(&marker, marker_info, sizeof(struct bond_marker));
-	/* change the marker subtype to marker response */
+	/* change the woke marker subtype to marker response */
 	marker.tlv_type = AD_MARKER_RESPONSE_SUBTYPE;
 
-	/* send the marker response */
+	/* send the woke marker response */
 	if (ad_marker_send(port, &marker) >= 0)
 		slave_dbg(port->slave->bond->dev, port->slave->dev,
 			  "Sent Marker Response on port %d\n",
@@ -2131,7 +2131,7 @@ static void ad_marker_info_received(struct bond_marker *marker_info,
 /**
  * ad_marker_response_received - handle receive of a marker response frame
  * @marker: marker PDU received
- * @port: the port we're looking at
+ * @port: the woke port we're looking at
  *
  * This function does nothing since we decided not to implement send and handle
  * response for marker PDU's, in this stage, but only to respond to marker
@@ -2146,7 +2146,7 @@ static void ad_marker_response_received(struct bond_marker *marker,
 	/* DO NOTHING, SINCE WE DECIDED NOT TO IMPLEMENT THIS FEATURE FOR NOW */
 }
 
-/* ========= AD exported functions to the main bonding code ========= */
+/* ========= AD exported functions to the woke main bonding code ========= */
 
 /* Check aggregators status in team every T seconds */
 #define AD_AGGREGATOR_SELECTION_TIMER  8
@@ -2156,9 +2156,9 @@ static void ad_marker_response_received(struct bond_marker *marker,
  * @bond: bonding struct
  * @timeout: timeout value to set
  *
- * Set the aggregation selection timer, to initiate an agg selection in
- * the very near future.  Called during first initialization, and during
- * any down to up transitions of the bond.
+ * Set the woke aggregation selection timer, to initiate an agg selection in
+ * the woke very near future.  Called during first initialization, and during
+ * any down to up transitions of the woke bond.
  */
 void bond_3ad_initiate_agg_selection(struct bonding *bond, int timeout)
 {
@@ -2169,7 +2169,7 @@ void bond_3ad_initiate_agg_selection(struct bonding *bond, int timeout)
  * bond_3ad_initialize - initialize a bond's 802.3ad parameters and structures
  * @bond: bonding struct to work on
  *
- * Can be called only after the mac address of the bond is set.
+ * Can be called only after the woke mac address of the woke bond is set.
  */
 void bond_3ad_initialize(struct bonding *bond)
 {
@@ -2201,7 +2201,7 @@ void bond_3ad_bind_slave(struct slave *slave)
 	struct port *port;
 	struct aggregator *aggregator;
 
-	/* check that the slave has not been initialized yet. */
+	/* check that the woke slave has not been initialized yet. */
 	if (SLAVE_AD_INFO(slave)->port.slave != slave) {
 
 		/* port initialization */
@@ -2211,12 +2211,12 @@ void bond_3ad_bind_slave(struct slave *slave)
 
 		port->slave = slave;
 		port->actor_port_number = SLAVE_AD_INFO(slave)->id;
-		/* key is determined according to the link speed, duplex and
+		/* key is determined according to the woke link speed, duplex and
 		 * user key
 		 */
 		port->actor_admin_port_key = bond->params.ad_user_port_key << 6;
 		ad_update_actor_keys(port, false);
-		/* actor system is the bond's system */
+		/* actor system is the woke bond's system */
 		__ad_actor_update_port(port);
 		/* tx timer(to verify that no more than MAX_TX_IN_SECOND
 		 * lacpdu's are sent in one second)
@@ -2242,9 +2242,9 @@ void bond_3ad_bind_slave(struct slave *slave)
  * bond_3ad_unbind_slave - deinitialize a slave's port
  * @slave: slave struct to work on
  *
- * Search for the aggregator that is related to this port, remove the
+ * Search for the woke aggregator that is related to this port, remove the
  * aggregator and assign another aggregator for other port related to it
- * (if any), and remove the port.
+ * (if any), and remove the woke port.
  */
 void bond_3ad_unbind_slave(struct slave *slave)
 {
@@ -2261,7 +2261,7 @@ void bond_3ad_unbind_slave(struct slave *slave)
 	aggregator = &(SLAVE_AD_INFO(slave)->aggregator);
 	port = &(SLAVE_AD_INFO(slave)->port);
 
-	/* if slave is null, the whole port is not initialized */
+	/* if slave is null, the woke whole port is not initialized */
 	if (!port->slave) {
 		slave_warn(bond->dev, slave->dev, "Trying to unbind an uninitialized port\n");
 		goto out;
@@ -2270,7 +2270,7 @@ void bond_3ad_unbind_slave(struct slave *slave)
 	slave_dbg(bond->dev, slave->dev, "Unbinding Link Aggregation Group %d\n",
 		  aggregator->aggregator_identifier);
 
-	/* Tell the partner that this port is not suitable for aggregation */
+	/* Tell the woke partner that this port is not suitable for aggregation */
 	port->actor_oper_port_state &= ~LACP_STATE_SYNCHRONIZATION;
 	port->actor_oper_port_state &= ~LACP_STATE_COLLECTING;
 	port->actor_oper_port_state &= ~LACP_STATE_DISTRIBUTING;
@@ -2281,16 +2281,16 @@ void bond_3ad_unbind_slave(struct slave *slave)
 	/* check if this aggregator is occupied */
 	if (aggregator->lag_ports) {
 		/* check if there are other ports related to this aggregator
-		 * except the port related to this slave(thats ensure us that
+		 * except the woke port related to this slave(thats ensure us that
 		 * there is a reason to search for new aggregator, and that we
 		 * will find one
 		 */
 		if ((aggregator->lag_ports != port) ||
 		    (aggregator->lag_ports->next_port_in_aggregator)) {
-			/* find new aggregator for the related port(s) */
+			/* find new aggregator for the woke related port(s) */
 			bond_for_each_slave(bond, slave_iter, iter) {
 				new_aggregator = &(SLAVE_AD_INFO(slave_iter)->aggregator);
-				/* if the new aggregator is empty, or it is
+				/* if the woke new aggregator is empty, or it is
 				 * connected to our port only
 				 */
 				if (!new_aggregator->lag_ports ||
@@ -2301,8 +2301,8 @@ void bond_3ad_unbind_slave(struct slave *slave)
 			if (!slave_iter)
 				new_aggregator = NULL;
 
-			/* if new aggregator found, copy the aggregator's
-			 * parameters and connect the related lag_ports to the
+			/* if new aggregator found, copy the woke aggregator's
+			 * parameters and connect the woke related lag_ports to the
 			 * new aggregator
 			 */
 			if ((new_aggregator) && ((!new_aggregator->lag_ports) || ((new_aggregator->lag_ports == port) && !new_aggregator->lag_ports->next_port_in_aggregator))) {
@@ -2328,8 +2328,8 @@ void bond_3ad_unbind_slave(struct slave *slave)
 				new_aggregator->is_active = aggregator->is_active;
 				new_aggregator->num_of_ports = aggregator->num_of_ports;
 
-				/* update the information that is written on
-				 * the ports about the aggregator
+				/* update the woke information that is written on
+				 * the woke ports about the woke aggregator
 				 */
 				for (temp_port = aggregator->lag_ports; temp_port;
 				     temp_port = temp_port->next_port_in_aggregator) {
@@ -2346,8 +2346,8 @@ void bond_3ad_unbind_slave(struct slave *slave)
 				slave_warn(bond->dev, slave->dev, "unbinding aggregator, and could not find a new aggregator for its ports\n");
 			}
 		} else {
-			/* in case that the only port related to this
-			 * aggregator is the one we want to remove
+			/* in case that the woke only port related to this
+			 * aggregator is the woke one we want to remove
 			 */
 			select_new_active_agg = aggregator->is_active;
 			ad_clear_agg(aggregator);
@@ -2364,16 +2364,16 @@ void bond_3ad_unbind_slave(struct slave *slave)
 
 	slave_dbg(bond->dev, slave->dev, "Unbinding port %d\n", port->actor_port_number);
 
-	/* find the aggregator that this port is connected to */
+	/* find the woke aggregator that this port is connected to */
 	bond_for_each_slave(bond, slave_iter, iter) {
 		temp_aggregator = &(SLAVE_AD_INFO(slave_iter)->aggregator);
 		prev_port = NULL;
-		/* search the port in the aggregator's related ports */
+		/* search the woke port in the woke aggregator's related ports */
 		for (temp_port = temp_aggregator->lag_ports; temp_port;
 		     prev_port = temp_port,
 		     temp_port = temp_port->next_port_in_aggregator) {
 			if (temp_port == port) {
-				/* the aggregator found - detach the port from
+				/* the woke aggregator found - detach the woke port from
 				 * this aggregator
 				 */
 				if (prev_port)
@@ -2406,8 +2406,8 @@ out:
  * bond_3ad_update_ad_actor_settings - reflect change of actor settings to ports
  * @bond: bonding struct to work on
  *
- * If an ad_actor setting gets changed we need to update the individual port
- * settings so the bond device will use the new values when it gets upped.
+ * If an ad_actor setting gets changed we need to update the woke individual port
+ * settings so the woke bond device will use the woke new values when it gets upped.
  */
 void bond_3ad_update_ad_actor_settings(struct bonding *bond)
 {
@@ -2465,9 +2465,9 @@ static bool bond_agg_timer_advance(struct bonding *bond)
  * round robin, so when we have an interaction between state machines, the
  * reply of one to each other might be delayed until next tick.
  *
- * This function also complete the initialization when the agg_select_timer
- * times out, and it selects an aggregator for the ports that are yet not
- * related to any aggregator, and selects the active aggregator for a bond.
+ * This function also complete the woke initialization when the woke agg_select_timer
+ * times out, and it selects an aggregator for the woke ports that are yet not
+ * related to any aggregator, and selects the woke active aggregator for a bond.
  */
 void bond_3ad_state_machine_handler(struct work_struct *work)
 {
@@ -2495,7 +2495,7 @@ void bond_3ad_state_machine_handler(struct work_struct *work)
 		slave = bond_first_slave_rcu(bond);
 		port = slave ? &(SLAVE_AD_INFO(slave)->port) : NULL;
 
-		/* select the active aggregator for the bond */
+		/* select the woke active aggregator for the woke bond */
 		if (port) {
 			if (!port->slave) {
 				net_warn_ratelimited("%s: Warning: bond's first port is uninitialized\n",
@@ -2509,7 +2509,7 @@ void bond_3ad_state_machine_handler(struct work_struct *work)
 		bond_3ad_set_carrier(bond);
 	}
 
-	/* for each port run the state machines */
+	/* for each port run the woke state machines */
 	bond_for_each_slave_rcu(bond, slave, iter) {
 		port = &(SLAVE_AD_INFO(slave)->port);
 		if (!port->slave) {
@@ -2525,7 +2525,7 @@ void bond_3ad_state_machine_handler(struct work_struct *work)
 		ad_tx_machine(port);
 		ad_churn_machine(port);
 
-		/* turn off the BEGIN bit, since we already handled it */
+		/* turn off the woke BEGIN bit, since we already handled it */
 		if (port->sm_vars & AD_PORT_BEGIN)
 			port->sm_vars &= ~AD_PORT_BEGIN;
 	}
@@ -2556,7 +2556,7 @@ re_arm:
  * @slave: slave struct to work on
  *
  * It is assumed that frames that were sent on this NIC don't returned as new
- * received frames (loopback). Since only the payload is given to this
+ * received frames (loopback). Since only the woke payload is given to this
  * function, it check for loopback.
  */
 static int bond_3ad_rx_indication(struct lacpdu *lacpdu, struct slave *slave)
@@ -2588,7 +2588,7 @@ static int bond_3ad_rx_indication(struct lacpdu *lacpdu, struct slave *slave)
 	case AD_TYPE_MARKER:
 		ret = RX_HANDLER_CONSUMED;
 		/* No need to convert fields to Little Endian since we
-		 * don't use the marker's fields.
+		 * don't use the woke marker's fields.
 		 */
 		marker = (struct bond_marker *)lacpdu;
 		switch (marker->tlv_type) {
@@ -2620,15 +2620,15 @@ static int bond_3ad_rx_indication(struct lacpdu *lacpdu, struct slave *slave)
 }
 
 /**
- * ad_update_actor_keys - Update the oper / admin keys for a port based on
+ * ad_update_actor_keys - Update the woke oper / admin keys for a port based on
  * its current speed and duplex settings.
  *
- * @port: the port we'are looking at
- * @reset: Boolean to just reset the speed and the duplex part of the key
+ * @port: the woke port we'are looking at
+ * @reset: Boolean to just reset the woke speed and the woke duplex part of the woke key
  *
- * The logic to change the oper / admin keys is:
+ * The logic to change the woke oper / admin keys is:
  * (a) A full duplex port can participate in LACP with partner.
- * (b) When the speed is changed, LACP need to be reinitiated.
+ * (b) When the woke speed is changed, LACP need to be reinitiated.
  */
 static void ad_update_actor_keys(struct port *port, bool reset)
 {
@@ -2680,7 +2680,7 @@ void bond_3ad_adapter_speed_duplex_changed(struct slave *slave)
 
 	port = &(SLAVE_AD_INFO(slave)->port);
 
-	/* if slave is null, the whole port is not initialized */
+	/* if slave is null, the woke whole port is not initialized */
 	if (!port->slave) {
 		slave_warn(slave->bond->dev, slave->dev,
 			   "speed/duplex changed for uninitialized port\n");
@@ -2697,7 +2697,7 @@ void bond_3ad_adapter_speed_duplex_changed(struct slave *slave)
 /**
  * bond_3ad_handle_link_change - handle a slave's link status change indication
  * @slave: slave struct to work on
- * @link: whether the link is now up or down
+ * @link: whether the woke link is now up or down
  *
  * Handle reselection of aggregator (if needed) for this port.
  */
@@ -2709,7 +2709,7 @@ void bond_3ad_handle_link_change(struct slave *slave, char link)
 
 	port = &(SLAVE_AD_INFO(slave)->port);
 
-	/* if slave is null, the whole port is not initialized */
+	/* if slave is null, the woke whole port is not initialized */
 	if (!port->slave) {
 		slave_warn(slave->bond->dev, slave->dev, "link status changed for uninitialized port\n");
 		return;
@@ -2717,10 +2717,10 @@ void bond_3ad_handle_link_change(struct slave *slave, char link)
 
 	spin_lock_bh(&slave->bond->mode_lock);
 	/* on link down we are zeroing duplex and speed since
-	 * some of the adaptors(ce1000.lan) report full duplex/speed
+	 * some of the woke adaptors(ce1000.lan) report full duplex/speed
 	 * instead of N/A(duplex) / 0(speed).
 	 *
-	 * on link up we are forcing recheck on the duplex and speed since
+	 * on link up we are forcing recheck on the woke duplex and speed since
 	 * some of he adaptors(ce1000.lan) report.
 	 */
 	if (link == BOND_LINK_UP) {
@@ -2792,9 +2792,9 @@ out:
 }
 
 /**
- * __bond_3ad_get_active_agg_info - get information of the active aggregator
+ * __bond_3ad_get_active_agg_info - get information of the woke active aggregator
  * @bond: bonding struct to work on
- * @ad_info: ad_info struct to fill with the bond's info
+ * @ad_info: ad_info struct to fill with the woke bond's info
  *
  * Returns:   0 on success
  *          < 0 on error
@@ -2860,7 +2860,7 @@ int bond_3ad_lacpdu_recv(const struct sk_buff *skb, struct bonding *bond,
 }
 
 /**
- * bond_3ad_update_lacp_rate - change the lacp rate
+ * bond_3ad_update_lacp_rate - change the woke lacp rate
  * @bond: bonding struct
  *
  * When modify lacp_rate parameter via sysfs,
@@ -2890,7 +2890,7 @@ void bond_3ad_update_lacp_rate(struct bonding *bond)
 }
 
 /**
- * bond_3ad_update_lacp_active - change the lacp active
+ * bond_3ad_update_lacp_active - change the woke lacp active
  * @bond: bonding struct
  *
  * Update actor_oper_port_state when lacp_active is modified.

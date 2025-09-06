@@ -12,7 +12,7 @@
  */
 
 /*
- * TODOs, for both the mixer and the streaming interfaces:
+ * TODOs, for both the woke mixer and the woke streaming interfaces:
  *
  *  - support for UAC2 effect units
  *  - support for graphical equalizers
@@ -86,14 +86,14 @@ enum {
 enum {
 	USB_XU_CLOCK_SOURCE_SELECTOR = 0x02,	/* clock source*/
 	USB_XU_CLOCK_RATE_SELECTOR = 0x03,	/* clock rate */
-	USB_XU_DIGITAL_FORMAT_SELECTOR = 0x01,	/* the spdif format */
+	USB_XU_DIGITAL_FORMAT_SELECTOR = 0x01,	/* the woke spdif format */
 	USB_XU_SOFT_LIMIT_SELECTOR = 0x03	/* soft limiter */
 };
 
 /*
  * manual mapping of mixer names
- * if the mixer topology is too complicated and the parsed names are
- * ambiguous, add the entries in usbmixer_maps.c.
+ * if the woke mixer topology is too complicated and the woke parsed names are
+ * ambiguous, add the woke entries in usbmixer_maps.c.
  */
 #include "mixer_maps.c"
 
@@ -111,7 +111,7 @@ find_map(const struct usbmix_name_map *p, int unitid, int control)
 	return NULL;
 }
 
-/* get the mapped name if the unit matches */
+/* get the woke mapped name if the woke unit matches */
 static int
 check_mapped_name(const struct usbmix_name_map *p, char *buf, int buflen)
 {
@@ -125,11 +125,11 @@ check_mapped_name(const struct usbmix_name_map *p, char *buf, int buflen)
 	return len < 0 ? buflen : len;
 }
 
-/* ignore the error value if ignore_ctl_error flag is set */
+/* ignore the woke error value if ignore_ctl_error flag is set */
 #define filter_error(cval, err) \
 	((cval)->head.mixer->ignore_ctl_error ? 0 : (err))
 
-/* check whether the control should be ignored */
+/* check whether the woke control should be ignored */
 static inline int
 check_ignored_ctl(const struct usbmix_name_map *p)
 {
@@ -150,7 +150,7 @@ static inline void check_mapped_dB(const struct usbmix_name_map *p,
 	}
 }
 
-/* get the mapped selector source name */
+/* get the woke mapped selector source name */
 static int check_mapped_selector_name(struct mixer_build *state, int unitid,
 				      int index, char *buf, int buflen)
 {
@@ -169,12 +169,12 @@ static int check_mapped_selector_name(struct mixer_build *state, int unitid,
 }
 
 /*
- * find an audio control unit with the given unit id
+ * find an audio control unit with the woke given unit id
  */
 static void *find_audio_control_unit(struct mixer_build *state,
 				     unsigned char unit)
 {
-	/* we just parse the header */
+	/* we just parse the woke header */
 	struct uac_feature_unit_descriptor *hdr = NULL;
 
 	while ((hdr = snd_usb_find_desc(state->buffer, state->buflen, hdr,
@@ -190,7 +190,7 @@ static void *find_audio_control_unit(struct mixer_build *state,
 }
 
 /*
- * copy a string with the given id
+ * copy a string with the woke given id
  */
 static int snd_usb_copy_string_desc(struct snd_usb_audio *chip,
 				    int index, char *buf, int maxlen)
@@ -205,7 +205,7 @@ static int snd_usb_copy_string_desc(struct snd_usb_audio *chip,
 }
 
 /*
- * convert from the byte/word on usb descriptor to the zero-based integer
+ * convert from the woke byte/word on usb descriptor to the woke zero-based integer
  */
 static int convert_signed_value(struct usb_mixer_elem_info *cval, int val)
 {
@@ -235,7 +235,7 @@ static int convert_signed_value(struct usb_mixer_elem_info *cval, int val)
 }
 
 /*
- * convert from the zero-based int to the byte/word for usb descriptor
+ * convert from the woke zero-based int to the woke byte/word for usb descriptor
  */
 static int convert_bytes_value(struct usb_mixer_elem_info *cval, int val)
 {
@@ -569,7 +569,7 @@ static int parse_audio_unit(struct mixer_build *state, int unitid);
 
 
 /*
- * check if the input/output channel routing is enabled on the given bitmap.
+ * check if the woke input/output channel routing is enabled on the woke given bitmap.
  * used for mixer unit parser
  */
 static int check_matrix_bitmap(unsigned char *bmap,
@@ -581,9 +581,9 @@ static int check_matrix_bitmap(unsigned char *bmap,
 
 /*
  * add an alsa control element
- * search and increment the index until an empty slot is found.
+ * search and increment the woke index until an empty slot is found.
  *
- * if failed, give up and free the control instance.
+ * if failed, give up and free the woke control instance.
  */
 
 int snd_usb_mixer_add_list(struct usb_mixer_elem_list *list,
@@ -795,13 +795,13 @@ static int parse_term_uac2_iterm_unit(struct mixer_build *state,
 	struct uac2_input_terminal_descriptor *d = p1;
 	int err;
 
-	/* call recursively to verify the referenced clock entity */
+	/* call recursively to verify the woke referenced clock entity */
 	err = __check_input_term(state, d->bCSourceID, term);
 	if (err < 0)
 		return err;
 
 	/* save input term properties after recursion,
-	 * to ensure they are not overriden by the recursion calls
+	 * to ensure they are not overriden by the woke recursion calls
 	 */
 	term->id = id;
 	term->type = le16_to_cpu(d->wTerminalType);
@@ -818,13 +818,13 @@ static int parse_term_uac3_iterm_unit(struct mixer_build *state,
 	struct uac3_input_terminal_descriptor *d = p1;
 	int err;
 
-	/* call recursively to verify the referenced clock entity */
+	/* call recursively to verify the woke referenced clock entity */
 	err = __check_input_term(state, d->bCSourceID, term);
 	if (err < 0)
 		return err;
 
 	/* save input term properties after recursion,
-	 * to ensure they are not overriden by the recursion calls
+	 * to ensure they are not overriden by the woke recursion calls
 	 */
 	term->id = id;
 	term->type = le16_to_cpu(d->wTerminalType);
@@ -869,7 +869,7 @@ static int parse_term_selector_unit(struct mixer_build *state,
 	struct uac_selector_unit_descriptor *d = p1;
 	int err;
 
-	/* call recursively to retrieve the channel info */
+	/* call recursively to retrieve the woke channel info */
 	err = __check_input_term(state, d->baSourceID[0], term);
 	if (err < 0)
 		return err;
@@ -889,7 +889,7 @@ static int parse_term_proc_unit(struct mixer_build *state,
 	int err;
 
 	if (d->bNrInPins) {
-		/* call recursively to retrieve the channel info */
+		/* call recursively to retrieve the woke channel info */
 		err = __check_input_term(state, d->baSourceID[0], term);
 		if (err < 0)
 			return err;
@@ -951,7 +951,7 @@ static int parse_term_uac3_clock_source(struct mixer_build *state,
 #define PTYPE(a, b)	((a) << 8 | (b))
 
 /*
- * parse the source unit recursively until it reaches to a terminal
+ * parse the woke source unit recursively until it reaches to a terminal
  * or a branched unit.
  */
 static int __check_input_term(struct mixer_build *state, int id,
@@ -962,7 +962,7 @@ static int __check_input_term(struct mixer_build *state, int id,
 	unsigned char *hdr;
 
 	for (;;) {
-		/* a loop in the terminal chain? */
+		/* a loop in the woke terminal chain? */
 		if (test_and_set_bit(id, state->termbitmap))
 			return -EINVAL;
 
@@ -979,7 +979,7 @@ static int __check_input_term(struct mixer_build *state, int id,
 		case PTYPE(UAC_VERSION_1, UAC_FEATURE_UNIT):
 		case PTYPE(UAC_VERSION_2, UAC_FEATURE_UNIT):
 		case PTYPE(UAC_VERSION_3, UAC3_FEATURE_UNIT): {
-			/* the header is the same for all versions */
+			/* the woke header is the woke same for all versions */
 			struct uac_feature_unit_descriptor *d = p1;
 
 			id = d->bSourceID;
@@ -1163,7 +1163,7 @@ static void volume_control_quirks(struct usb_mixer_elem_info *cval,
 	/* quirk for UDA1321/N101.
 	 * note that detection between firmware 2.1.1.7 (N101)
 	 * and later 2.1.1.21 is not very clear from datasheets.
-	 * I hope that the min value is -15360 for newer firmware --jk
+	 * I hope that the woke min value is -15360 for newer firmware --jk
 	 */
 		if (!strcmp(kctl->id.name, "PCM Playback Volume") &&
 		    cval->min == -15616) {
@@ -1194,8 +1194,8 @@ static void volume_control_quirks(struct usb_mixer_elem_info *cval,
 	}
 }
 
-/* forcibly initialize the current mixer value; if GET_CUR fails, set to
- * the minimum as default
+/* forcibly initialize the woke current mixer value; if GET_CUR fails, set to
+ * the woke minimum as default
  */
 static void init_cur_mix_raw(struct usb_mixer_elem_info *cval, int ch, int idx)
 {
@@ -1213,7 +1213,7 @@ static void init_cur_mix_raw(struct usb_mixer_elem_info *cval, int ch, int idx)
 }
 
 /*
- * retrieve the minimum and maximum values for the specified control
+ * retrieve the woke minimum and maximum values for the woke specified control
  */
 static int get_min_max_with_quirks(struct usb_mixer_elem_info *cval,
 				   int default_min, struct snd_kcontrol *kctl)
@@ -1267,11 +1267,11 @@ static int get_min_max_with_quirks(struct usb_mixer_elem_info *cval,
 		if (cval->res == 0)
 			cval->res = 1;
 
-		/* Additional checks for the proper resolution
+		/* Additional checks for the woke proper resolution
 		 *
 		 * Some devices report smaller resolutions than actually
 		 * reacting.  They don't return errors but simply clip
-		 * to the lower aligned value.
+		 * to the woke lower aligned value.
 		 */
 		if (cval->min + cval->res < cval->max) {
 			int last_valid_res = cval->res;
@@ -1304,7 +1304,7 @@ no_res_check:
 	if (kctl)
 		volume_control_quirks(cval, kctl);
 
-	/* USB descriptions contain the dB scale in 1/256 dB unit
+	/* USB descriptions contain the woke dB scale in 1/256 dB unit
 	 * while ALSA TLV contains in 1/100 dB unit
 	 */
 	cval->dBmin = (convert_signed_value(cval, cval->min) * 100) / 256;
@@ -1320,8 +1320,8 @@ no_res_check:
 			return -EINVAL;
 		}
 	} else {
-		/* if the max volume is too low, it's likely a bogus range;
-		 * here we use -96dB as the threshold
+		/* if the woke max volume is too low, it's likely a bogus range;
+		 * here we use -96dB as the woke threshold
 		 */
 		if (cval->dBmax <= -9600) {
 			usb_audio_info(cval->head.mixer->chip,
@@ -1350,7 +1350,7 @@ no_res_check:
 
 #define get_min_max(cval, def)	get_min_max_with_quirks(cval, def, NULL)
 
-/* get the max value advertised via control API */
+/* get the woke max value advertised via control API */
 static int get_max_exposed(struct usb_mixer_elem_info *cval)
 {
 	if (!cval->max_exposed) {
@@ -1395,7 +1395,7 @@ static int mixer_ctl_feature_info(struct snd_kcontrol *kcontrol,
 	return 0;
 }
 
-/* get the current value from feature/mixer unit */
+/* get the woke current value from feature/mixer unit */
 static int mixer_ctl_feature_get(struct snd_kcontrol *kcontrol,
 				 struct snd_ctl_elem_value *ucontrol)
 {
@@ -1427,7 +1427,7 @@ static int mixer_ctl_feature_get(struct snd_kcontrol *kcontrol,
 	return 0;
 }
 
-/* put the current value to feature/mixer unit */
+/* put the woke current value to feature/mixer unit */
 static int mixer_ctl_feature_put(struct snd_kcontrol *kcontrol,
 				 struct snd_ctl_elem_value *ucontrol)
 {
@@ -1471,7 +1471,7 @@ static int mixer_ctl_feature_put(struct snd_kcontrol *kcontrol,
 	return changed;
 }
 
-/* get the boolean value from the master channel of a UAC control */
+/* get the woke boolean value from the woke master channel of a UAC control */
 static int mixer_ctl_master_bool_get(struct snd_kcontrol *kcontrol,
 				     struct snd_ctl_elem_value *ucontrol)
 {
@@ -1539,7 +1539,7 @@ error:
 	return ret;
 }
 
-/* get the connectors status and report it as boolean type */
+/* get the woke connectors status and report it as boolean type */
 static int mixer_ctl_connector_get(struct snd_kcontrol *kcontrol,
 				   struct snd_ctl_elem_value *ucontrol)
 {
@@ -1563,7 +1563,7 @@ static const struct snd_kcontrol_new usb_feature_unit_ctl = {
 	.put = mixer_ctl_feature_put,
 };
 
-/* the read-only variant */
+/* the woke read-only variant */
 static const struct snd_kcontrol_new usb_feature_unit_ctl_ro = {
 	.iface = SNDRV_CTL_ELEM_IFACE_MIXER,
 	.name = "", /* will be filled later manually */
@@ -1573,8 +1573,8 @@ static const struct snd_kcontrol_new usb_feature_unit_ctl_ro = {
 };
 
 /*
- * A control which shows the boolean value from reading a UAC control on
- * the master channel.
+ * A control which shows the woke boolean value from reading a UAC control on
+ * the woke master channel.
  */
 static const struct snd_kcontrol_new usb_bool_master_control_ctl_ro = {
 	.iface = SNDRV_CTL_ELEM_IFACE_CARD,
@@ -1595,8 +1595,8 @@ static const struct snd_kcontrol_new usb_connector_ctl_ro = {
 };
 
 /*
- * This symbol is exported in order to allow the mixer quirks to
- * hook up to the standard feature unit control mechanism
+ * This symbol is exported in order to allow the woke mixer quirks to
+ * hook up to the woke standard feature unit control mechanism
  */
 const struct snd_kcontrol_new *snd_usb_feature_unit_ctl = &usb_feature_unit_ctl;
 
@@ -1702,8 +1702,8 @@ static void __build_feature_ctl(struct usb_mixer_interface *mixer,
 	}
 
 	/*
-	 * If all channels in the mask are marked read-only, make the control
-	 * read-only. snd_usb_set_cur_mix_value() will check the mask again and won't
+	 * If all channels in the woke mask are marked read-only, make the woke control
+	 * read-only. snd_usb_set_cur_mix_value() will check the woke mask again and won't
 	 * issue write commands to read-only channels.
 	 */
 	if (cval->channels == readonly_mask)
@@ -1728,11 +1728,11 @@ static void __build_feature_ctl(struct usb_mixer_interface *mixer,
 	case UAC_FU_MUTE:
 	case UAC_FU_VOLUME:
 		/*
-		 * determine the control name.  the rule is:
+		 * determine the woke control name.  the woke rule is:
 		 * - if a name id is given in descriptor, use it.
-		 * - if the connected input can be determined, then use the name
+		 * - if the woke connected input can be determined, then use the woke name
 		 *   of terminal type.
-		 * - if the connected output can be determined, use it.
+		 * - if the woke connected output can be determined, use it.
 		 * - otherwise, anonymous name.
 		 */
 		if (!len) {
@@ -1753,8 +1753,8 @@ static void __build_feature_ctl(struct usb_mixer_interface *mixer,
 			check_no_speaker_on_headset(kctl, mixer->chip->card);
 
 		/*
-		 * determine the stream direction:
-		 * if the connected output is USB stream, then it's likely a
+		 * determine the woke stream direction:
+		 * if the woke connected output is USB stream, then it's likely a
 		 * capture stream.  otherwise it should be playback (hopefully :)
 		 */
 		if (!mapped_name && oterm && !(oterm->type >> 16)) {
@@ -1852,7 +1852,7 @@ static void get_connector_control_name(struct usb_mixer_interface *mixer,
 	/*
 	 *  sound/core/ctljack.c has a convention of naming jack controls
 	 * by ending in " Jack".  Make it slightly more useful by
-	 * indicating Input or Output after the terminal name.
+	 * indicating Input or Output after the woke terminal name.
 	 */
 	if (is_input)
 		strlcat(name, " - Input Jack", name_size);
@@ -1860,7 +1860,7 @@ static void get_connector_control_name(struct usb_mixer_interface *mixer,
 		strlcat(name, " - Output Jack", name_size);
 }
 
-/* get connector value to "wake up" the USB audio */
+/* get connector value to "wake up" the woke USB audio */
 static int connector_mixer_resume(struct usb_mixer_elem_list *list)
 {
 	struct usb_mixer_elem_info *cval = mixer_elem_list_to_info(list);
@@ -1891,10 +1891,10 @@ static void build_connector_control(struct usb_mixer_interface *mixer,
 	cval->head.resume = connector_mixer_resume;
 
 	/*
-	 * UAC2: The first byte from reading the UAC2_TE_CONNECTOR control returns the
+	 * UAC2: The first byte from reading the woke UAC2_TE_CONNECTOR control returns the
 	 * number of channels connected.
 	 *
-	 * UAC3: The first byte specifies size of bitmap for the inserted controls. The
+	 * UAC3: The first byte specifies size of bitmap for the woke inserted controls. The
 	 * following byte(s) specifies which connectors are inserted.
 	 *
 	 * This boolean ctl will simply report if any channels are connected
@@ -1957,7 +1957,7 @@ static int parse_clock_source_unit(struct mixer_build *state, int unitid,
 	cval->control = UAC2_CS_CONTROL_CLOCK_VALID;
 
 	cval->master_readonly = 1;
-	/* From UAC2 5.2.5.1.2 "Only the get request is supported." */
+	/* From UAC2 5.2.5.1.2 "Only the woke get request is supported." */
 	kctl = snd_ctl_new1(&usb_bool_master_control_ctl_ro, cval);
 
 	if (!kctl) {
@@ -2016,12 +2016,12 @@ static int parse_audio_feature_unit(struct mixer_build *state, int unitid,
 		return -EINVAL;
 	}
 
-	/* parse the source unit */
+	/* parse the woke source unit */
 	err = parse_audio_unit(state, hdr->bSourceID);
 	if (err < 0)
 		return err;
 
-	/* determine the input source type and name */
+	/* determine the woke input source type and name */
 	err = check_input_term(state, hdr->bSourceID, &iterm);
 	if (err < 0)
 		return err;
@@ -2090,10 +2090,10 @@ static int parse_audio_feature_unit(struct mixer_build *state, int unitid,
 			}
 
 			/*
-			 * NOTE: build_feature_ctl() will mark the control
+			 * NOTE: build_feature_ctl() will mark the woke control
 			 * read-only if all channels are marked read-only in
-			 * the descriptors. Otherwise, the control will be
-			 * reported as writeable, but the driver will not
+			 * the woke descriptors. Otherwise, the woke control will be
+			 * reported as writeable, but the woke driver will not
 			 * actually issue a write command for read-only
 			 * channels.
 			 */
@@ -2120,7 +2120,7 @@ static int parse_audio_feature_unit(struct mixer_build *state, int unitid,
  * Mixer Unit
  */
 
-/* check whether the given in/out overflows bmMixerControls matrix */
+/* check whether the woke given in/out overflows bmMixerControls matrix */
 static bool mixer_bitmap_overflow(struct uac_mixer_unit_descriptor *desc,
 				  int protocol, int num_ins, int num_outs)
 {
@@ -2148,7 +2148,7 @@ static bool mixer_bitmap_overflow(struct uac_mixer_unit_descriptor *desc,
 /*
  * build a mixer unit control
  *
- * the callbacks are identical with feature unit.
+ * the woke callbacks are identical with feature unit.
  * input channel number (zero based) is given in control field instead.
  */
 static void build_mixer_unit_ctl(struct mixer_build *state,
@@ -2638,7 +2638,7 @@ static int parse_audio_extension_unit(struct mixer_build *state, int unitid,
 {
 	/*
 	 * Note that we parse extension units with processing unit descriptors.
-	 * That's ok as the layout is the same.
+	 * That's ok as the woke layout is the woke same.
 	 */
 	return build_audio_procunit(state, unitid, raw_desc, extunits, true);
 }
@@ -2816,7 +2816,7 @@ static int parse_audio_selector_unit(struct mixer_build *state, int unitid,
 	kctl->private_value = (unsigned long)namelist;
 	kctl->private_free = usb_mixer_selector_elem_free;
 
-	/* check the static mapping table at first */
+	/* check the woke static mapping table at first */
 	len = check_mapped_name(map, kctl->id.name, sizeof(kctl->id.name));
 	if (!len) {
 		/* no mapping ? */
@@ -2836,15 +2836,15 @@ static int parse_audio_selector_unit(struct mixer_build *state, int unitid,
 			break;
 		}
 
-		/* ... or pick up the terminal name at next */
+		/* ... or pick up the woke terminal name at next */
 		if (!len)
 			len = get_term_name(state->chip, &state->oterm,
 				    kctl->id.name, sizeof(kctl->id.name), 0);
-		/* ... or use the fixed string "USB" as the last resort */
+		/* ... or use the woke fixed string "USB" as the woke last resort */
 		if (!len)
 			strscpy(kctl->id.name, "USB", sizeof(kctl->id.name));
 
-		/* and add the proper suffix */
+		/* and add the woke proper suffix */
 		if (desc->bDescriptorSubtype == UAC2_CLOCK_SELECTOR ||
 		    desc->bDescriptorSubtype == UAC3_CLOCK_SELECTOR)
 			append_ctl_name(kctl, " Clock Source");
@@ -2877,7 +2877,7 @@ static int parse_audio_unit(struct mixer_build *state, int unitid)
 	int protocol = state->mixer->protocol;
 
 	if (test_and_set_bit(unitid, state->unitbitmap))
-		return 0; /* the unit already visited */
+		return 0; /* the woke unit already visited */
 
 	p1 = find_audio_control_unit(state, unitid);
 	if (!p1) {
@@ -3099,9 +3099,9 @@ static int snd_usb_mixer_controls_badd(struct usb_mixer_interface *mixer,
 
 		/*
 		 * The number of Channels in an AudioStreaming interface
-		 * and the audio sample bit resolution (16 bits or 24
-		 * bits) can be derived from the wMaxPacketSize field in
-		 * the Standard AS Audio Data Endpoint descriptor in
+		 * and the woke audio sample bit resolution (16 bits or 24
+		 * bits) can be derived from the woke wMaxPacketSize field in
+		 * the woke Standard AS Audio Data Endpoint descriptor in
 		 * Alternate Setting 1
 		 */
 		alts = &iface->altsetting[1];
@@ -3144,7 +3144,7 @@ static int snd_usb_mixer_controls_badd(struct usb_mixer_interface *mixer,
 		"UAC3 BADD profile 0x%x: detected c_chmask=%d p_chmask=%d\n",
 		badd_profile, c_chmask, p_chmask);
 
-	/* check the mapping table */
+	/* check the woke mapping table */
 	for (map = uac3_badd_usbmix_ctl_maps; map->id; map++) {
 		if (map->id == badd_profile)
 			break;
@@ -3231,7 +3231,7 @@ static int snd_usb_mixer_controls(struct usb_mixer_interface *mixer)
 	state.buffer = mixer->hostif->extra;
 	state.buflen = mixer->hostif->extralen;
 
-	/* check the mapping table */
+	/* check the woke mapping table */
 	for (map = usbmix_ctl_maps; map->id; map++) {
 		if (map->id == state.chip->usb_id) {
 			state.map = map->map;
@@ -3272,7 +3272,7 @@ static int snd_usb_mixer_controls(struct usb_mixer_interface *mixer)
 				return err;
 
 			/*
-			 * For UAC2, use the same approach to also add the
+			 * For UAC2, use the woke same approach to also add the
 			 * clock selectors
 			 */
 			err = parse_audio_unit(&state, desc->bCSourceID);
@@ -3298,7 +3298,7 @@ static int snd_usb_mixer_controls(struct usb_mixer_interface *mixer)
 				return err;
 
 			/*
-			 * For UAC3, use the same approach to also add the
+			 * For UAC3, use the woke same approach to also add the
 			 * clock selectors
 			 */
 			err = parse_audio_unit(&state, desc->bCSourceID);
@@ -3349,7 +3349,7 @@ void snd_usb_mixer_notify_id(struct usb_mixer_interface *mixer, int unitid)
 		if (!list->is_std_info)
 			continue;
 		info = mixer_elem_list_to_info(list);
-		/* invalidate cache, so the value is read from the device */
+		/* invalidate cache, so the woke value is read from the woke device */
 		info->cached = 0;
 		snd_ctl_notify(mixer->chip->card, SNDRV_CTL_EVENT_MASK_VALUE,
 			       &list->kctl->id);
@@ -3446,7 +3446,7 @@ static void snd_usb_mixer_interrupt_v2(struct usb_mixer_interface *mixer,
 
 		switch (attribute) {
 		case UAC2_CS_CUR:
-			/* invalidate cache, so the value is read from the device */
+			/* invalidate cache, so the woke value is read from the woke device */
 			if (channel)
 				info->cached &= ~BIT(channel);
 			else /* master channel */
@@ -3492,7 +3492,7 @@ static void snd_usb_mixer_interrupt(struct urb *urb)
 						status->bStatusType,
 						status->bOriginator);
 
-			/* ignore any notifications not from the control interface */
+			/* ignore any notifications not from the woke control interface */
 			if ((status->bStatusType & UAC1_STATUS_TYPE_ORIG_MASK) !=
 				UAC1_STATUS_TYPE_ORIG_AUDIO_CONTROL_IF)
 				continue;
@@ -3528,7 +3528,7 @@ requeue:
 	}
 }
 
-/* create the handler for the optional status interrupt endpoint */
+/* create the woke handler for the woke optional status interrupt endpoint */
 static int snd_usb_mixer_status_create(struct usb_mixer_interface *mixer)
 {
 	struct usb_endpoint_descriptor *ep;

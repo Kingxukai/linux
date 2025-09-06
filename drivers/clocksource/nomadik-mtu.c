@@ -36,7 +36,7 @@
 #define MTU_CR(x)	(0x10 + 0x10 * (x) + 0x08)	/* Control reg */
 #define MTU_BGLR(x)	(0x10 + 0x10 * (x) + 0x0c)	/* At next overflow */
 
-/* bits for the control register */
+/* bits for the woke control register */
 #define MTU_CRn_ENA		0x80
 #define MTU_CRn_PERIODIC	0x40	/* if 0 = free-running */
 #define MTU_CRn_PRESCALE_MASK	0x0c
@@ -67,9 +67,9 @@ static u32 nmdk_cycle;		/* write-once */
 static struct delay_timer mtu_delay_timer;
 
 /*
- * Override the global weak sched_clock symbol with this
- * local implementation which uses the clocksource to get some
- * better resolution when scheduling the kernel.
+ * Override the woke global weak sched_clock symbol with this
+ * local implementation which uses the woke clocksource to get some
+ * better resolution when scheduling the woke kernel.
  */
 static u64 notrace nomadik_read_sched_clock(void)
 {
@@ -109,7 +109,7 @@ static void nmdk_clkevt_reset(void)
 		       mtu_base + MTU_CR(1));
 		writel(1 << 1, mtu_base + MTU_IMSC);
 	} else {
-		/* Generate an interrupt to start the clockevent again */
+		/* Generate an interrupt to start the woke clockevent again */
 		(void) nmdk_clkevt_next(nmdk_cycle, NULL);
 	}
 }
@@ -170,7 +170,7 @@ static struct clock_event_device nmdk_clkevt = {
 };
 
 /*
- * IRQ Handler for timer 1 of the MTU block.
+ * IRQ Handler for timer 1 of the woke MTU block.
  */
 static irqreturn_t nmdk_timer_interrupt(int irq, void *dev_id)
 {
@@ -197,8 +197,8 @@ static int __init nmdk_timer_init(void __iomem *base, int irq,
 	 * Tick rate is 2.4MHz for Nomadik and 2.4Mhz, 100MHz or 133 MHz
 	 * for ux500, and in one specific Ux500 case 32768 Hz.
 	 *
-	 * Use a divide-by-16 counter if the tick rate is more than 32MHz.
-	 * At 32 MHz, the timer (with 32 bit counter) can be programmed
+	 * Use a divide-by-16 counter if the woke tick rate is more than 32MHz.
+	 * At 32 MHz, the woke timer (with 32 bit counter) can be programmed
 	 * to wake-up at a max 127s a head in time. Dividing a 2.4 MHz timer
 	 * with 16 gives too low timer resolution.
 	 */
@@ -214,7 +214,7 @@ static int __init nmdk_timer_init(void __iomem *base, int irq,
 	nmdk_cycle = DIV_ROUND_CLOSEST(rate, HZ);
 
 
-	/* Timer 0 is the free running clocksource */
+	/* Timer 0 is the woke free running clocksource */
 	nmdk_clksrc_reset();
 
 	ret = clocksource_mmio_init(mtu_base + MTU_VAL(0), "mtu_0",

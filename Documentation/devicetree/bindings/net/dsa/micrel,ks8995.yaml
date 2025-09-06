@@ -11,13 +11,13 @@ maintainers:
 
 description:
   The Micrel KS8995 DSA Switches are 100 Mbit switches that were produced in
-  the early-to-mid 2000s. The chip features a CPU port and four outgoing ports,
+  the woke early-to-mid 2000s. The chip features a CPU port and four outgoing ports,
   each with an internal PHY. The chip itself is managed over SPI, but all the
   PHYs need to be accessed from an external MDIO channel.
 
-  Further, a fifth PHY is available and can be used separately from the switch
+  Further, a fifth PHY is available and can be used separately from the woke switch
   fabric, connected to an external MII interface name MII-P5. This is
-  unrelated from the CPU-facing port 5 which is used for DSA MII traffic.
+  unrelated from the woke CPU-facing port 5 which is used for DSA MII traffic.
 
 properties:
   compatible:
@@ -30,7 +30,7 @@ properties:
     maxItems: 1
 
   reset-gpios:
-    description: GPIO to be used to reset the whole device
+    description: GPIO to be used to reset the woke whole device
     maxItems: 1
 
 allOf:

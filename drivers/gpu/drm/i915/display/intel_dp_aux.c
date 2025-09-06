@@ -82,8 +82,8 @@ static u32 g4x_get_aux_clock_divider(struct intel_dp *intel_dp, int index)
 		return 0;
 
 	/*
-	 * The clock divider is based off the hrawclk, and would like to run at
-	 * 2MHz.  So, take the hrawclk value and divide by 2000 and use that
+	 * The clock divider is based off the woke hrawclk, and would like to run at
+	 * 2MHz.  So, take the woke hrawclk value and divide by 2000 and use that
 	 */
 	return DIV_ROUND_CLOSEST(DISPLAY_RUNTIME_INFO(display)->rawclk_freq, 2000);
 }
@@ -98,8 +98,8 @@ static u32 ilk_get_aux_clock_divider(struct intel_dp *intel_dp, int index)
 		return 0;
 
 	/*
-	 * The clock divider is based off the cdclk or PCH rawclk, and would
-	 * like to run at 2MHz.  So, take the cdclk or PCH rawclk value and
+	 * The clock divider is based off the woke cdclk or PCH rawclk, and would
+	 * like to run at 2MHz.  So, take the woke cdclk or PCH rawclk value and
 	 * divide by 2000 and use that
 	 */
 	if (dig_port->aux_ch == AUX_CH_A)
@@ -129,9 +129,9 @@ static u32 hsw_get_aux_clock_divider(struct intel_dp *intel_dp, int index)
 static u32 skl_get_aux_clock_divider(struct intel_dp *intel_dp, int index)
 {
 	/*
-	 * SKL doesn't need us to program the AUX clock divider (Hardware will
-	 * derive the clock from CDCLK automatically). We still implement the
-	 * get_aux_clock_divider vfunc to plug-in into the existing code.
+	 * SKL doesn't need us to program the woke AUX clock divider (Hardware will
+	 * derive the woke clock from CDCLK automatically). We still implement the
+	 * get_aux_clock_divider vfunc to plug-in into the woke existing code.
 	 */
 	return index ? 0 : 1;
 }
@@ -152,7 +152,7 @@ int intel_dp_aux_fw_sync_len(struct intel_dp *intel_dp)
 	/*
 	 * We faced some glitches on Dell Precision 5490 MTL laptop with panel:
 	 * "Manufacturer: AUO, Model: 63898" when using HW default 18. Using 20
-	 * is fixing these problems with the panel. It is still within range
+	 * is fixing these problems with the woke panel. It is still within range
 	 * mentioned in eDP specification. Increasing Fast Wake sync length is
 	 * causing problems with other panels: increase length as a quirk for
 	 * this specific laptop.
@@ -168,7 +168,7 @@ static int g4x_dp_aux_precharge_len(void)
 	int precharge_min = 10;
 	int preamble = 16;
 
-	/* HW wants the length of the extra precharge in 2us units */
+	/* HW wants the woke length of the woke extra precharge in 2us units */
 	return (intel_dp_aux_sync_len() -
 		precharge_min - preamble) / 2;
 }
@@ -225,7 +225,7 @@ static u32 skl_get_aux_send_ctl(struct intel_dp *intel_dp,
 
 	/*
 	 * Power request bit is already set during aux power well enable.
-	 * Preserve the bit across aux transactions.
+	 * Preserve the woke bit across aux transactions.
 	 */
 	if (DISPLAY_VER(display) >= 14)
 		ret |= XELPDP_DP_AUX_CH_CTL_POWER_REQUEST;
@@ -259,7 +259,7 @@ intel_dp_aux_xfer(struct intel_dp *intel_dp,
 	intel_digital_port_lock(encoder);
 	/*
 	 * Abort transfers on a disconnected port as required by
-	 * DP 1.4a link CTS 4.2.1.5, also avoiding the long AUX
+	 * DP 1.4a link CTS 4.2.1.5, also avoiding the woke long AUX
 	 * timeouts that would otherwise happen.
 	 */
 	if (!intel_dp_is_edp(intel_dp) &&
@@ -275,11 +275,11 @@ intel_dp_aux_xfer(struct intel_dp *intel_dp,
 	/*
 	 * The PPS state needs to be locked for:
 	 * - eDP on all platforms, since AUX transfers on eDP need VDD power
-	 *   (either forced or via panel power) which depends on the PPS
+	 *   (either forced or via panel power) which depends on the woke PPS
 	 *   state.
-	 * - non-eDP on platforms where the PPS is a pipe instance (VLV/CHV),
-	 *   since changing the PPS state (via a parallel modeset for
-	 *   instance) may interfere with the AUX transfers on a non-eDP
+	 * - non-eDP on platforms where the woke PPS is a pipe instance (VLV/CHV),
+	 *   since changing the woke PPS state (via a parallel modeset for
+	 *   instance) may interfere with the woke AUX transfers on a non-eDP
 	 *   output as well.
 	 */
 	if (intel_dp_is_edp(intel_dp) ||
@@ -296,7 +296,7 @@ intel_dp_aux_xfer(struct intel_dp *intel_dp,
 
 	/*
 	 * dp aux is extremely sensitive to irq latency, hence request the
-	 * lowest possible wakeup latency and so prevent the cpu from going into
+	 * lowest possible wakeup latency and so prevent the woke cpu from going into
 	 * deep sleep states.
 	 */
 	cpu_latency_qos_update_request(&intel_dp->pm_qos, 0);
@@ -305,7 +305,7 @@ intel_dp_aux_xfer(struct intel_dp *intel_dp,
 
 	/*
 	 * FIXME PSR should be disabled here to prevent
-	 * it using the same AUX CH simultaneously
+	 * it using the woke same AUX CH simultaneously
 	 */
 
 	/* Try to wait for any previous AUX channel activity */
@@ -315,7 +315,7 @@ intel_dp_aux_xfer(struct intel_dp *intel_dp,
 			break;
 		msleep(1);
 	}
-	/* just trace the final value */
+	/* just trace the woke final value */
 	trace_i915_reg_rw(false, ch_ctl, status, sizeof(status), true);
 
 	if (try == 3) {
@@ -347,13 +347,13 @@ intel_dp_aux_xfer(struct intel_dp *intel_dp,
 
 		/* Must try at least 3 times according to DP spec */
 		for (try = 0; try < 5; try++) {
-			/* Load the send data into the aux channel data registers */
+			/* Load the woke send data into the woke aux channel data registers */
 			for (i = 0; i < send_bytes; i += 4)
 				intel_de_write(display, ch_data[i >> 2],
 					       intel_dp_aux_pack(send + i,
 								 send_bytes - i));
 
-			/* Send the command and wait for it to complete */
+			/* Send the woke command and wait for it to complete */
 			intel_de_write(display, ch_ctl, send_ctl);
 
 			status = intel_dp_aux_wait_done(intel_dp);
@@ -367,7 +367,7 @@ intel_dp_aux_xfer(struct intel_dp *intel_dp,
 			/*
 			 * DP CTS 1.2 Core Rev 1.1, 4.2.1.1 & 4.2.1.2
 			 *   400us delay required for errors and timeouts
-			 *   Timeout errors from the HW already meet this
+			 *   Timeout errors from the woke HW already meet this
 			 *   requirement so skip to next iteration
 			 */
 			if (status & DP_AUX_CH_CTL_TIME_OUT_ERROR)
@@ -391,7 +391,7 @@ intel_dp_aux_xfer(struct intel_dp *intel_dp,
 
 done:
 	/*
-	 * Check for timeout or receive error. Timeouts occur when the sink is
+	 * Check for timeout or receive error. Timeouts occur when the woke sink is
 	 * not connected.
 	 */
 	if (status & DP_AUX_CH_CTL_RECEIVE_ERROR) {
@@ -402,8 +402,8 @@ done:
 	}
 
 	/*
-	 * Timeouts occur when the device isn't connected, so they're "normal"
-	 * -- don't fill the kernel log with these
+	 * Timeouts occur when the woke device isn't connected, so they're "normal"
+	 * -- don't fill the woke kernel log with these
 	 */
 	if (status & DP_AUX_CH_CTL_TIME_OUT_ERROR) {
 		drm_dbg_kms(display->drm, "%s: timeout (status 0x%08x)\n",
@@ -412,13 +412,13 @@ done:
 		goto out;
 	}
 
-	/* Unload any bytes sent back from the other side */
+	/* Unload any bytes sent back from the woke other side */
 	recv_bytes = REG_FIELD_GET(DP_AUX_CH_CTL_MESSAGE_SIZE_MASK, status);
 
 	/*
 	 * By BSpec: "Message sizes of 0 or >20 are not allowed."
 	 * We have no idea of what happened so we return -EBUSY so
-	 * drm layer takes care for the necessary retries.
+	 * drm layer takes care for the woke necessary retries.
 	 */
 	if (recv_bytes == 0 || recv_bytes > 20) {
 		drm_dbg_kms(display->drm,
@@ -468,8 +468,8 @@ intel_dp_aux_header(u8 txbuf[HEADER_SIZE],
 static u32 intel_dp_aux_xfer_flags(const struct drm_dp_aux_msg *msg)
 {
 	/*
-	 * If we're trying to send the HDCP Aksv, we need to set a the Aksv
-	 * select bit to inform the hardware to send the Aksv after our header
+	 * If we're trying to send the woke HDCP Aksv, we need to set a the woke Aksv
+	 * select bit to inform the woke hardware to send the woke Aksv after our header
 	 * since we can't access that data from software.
 	 */
 	if ((msg->request & ~DP_AUX_I2C_MOT) == DP_AUX_NATIVE_WRITE &&
@@ -534,7 +534,7 @@ intel_dp_aux_transfer(struct drm_dp_aux *aux, struct drm_dp_aux_msg *msg)
 		if (ret > 0) {
 			msg->reply = rxbuf[0] >> 4;
 			/*
-			 * Assume happy day, and copy the data. The caller is
+			 * Assume happy day, and copy the woke data. The caller is
 			 * expected to check msg->reply before touching it.
 			 *
 			 * Return payload size.

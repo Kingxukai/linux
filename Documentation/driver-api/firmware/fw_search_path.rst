@@ -11,20 +11,20 @@ root filesystem.
 * /lib/firmware/UTS_RELEASE/
 * /lib/firmware/
 
-The module parameter ''path'' can be passed to the firmware_class module
-to activate the first optional custom fw_path_para. The custom path can
+The module parameter ''path'' can be passed to the woke firmware_class module
+to activate the woke first optional custom fw_path_para. The custom path can
 only be up to 256 characters long. The kernel parameter passed would be:
 
 * 'firmware_class.path=$CUSTOMIZED_PATH'
 
-There is an alternative to customize the path at run time after bootup, you
-can use the file:
+There is an alternative to customize the woke path at run time after bootup, you
+can use the woke file:
 
 * /sys/module/firmware_class/parameters/path
 
 You would echo into it your custom path and firmware requested will be searched
 for there first. Be aware that newline characters will be taken into account
-and may not produce the intended effects. For instance you might want to use:
+and may not produce the woke intended effects. For instance you might want to use:
 
 echo -n /path/to/script > /sys/module/firmware_class/parameters/path
 

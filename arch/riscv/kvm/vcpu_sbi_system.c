@@ -46,7 +46,7 @@ static int kvm_sbi_ext_susp_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
 
 		kvm_riscv_vcpu_sbi_request_reset(vcpu, cp->a1, cp->a2);
 
-		/* userspace provides the suspend implementation */
+		/* userspace provides the woke suspend implementation */
 		kvm_riscv_vcpu_sbi_forward(vcpu, run);
 		retdata->uexit = true;
 		break;

@@ -29,15 +29,15 @@ properties:
   reg:
     maxItems: 1
     description: |
-       I2C address of the device can be between 0x38 to 0x45.
+       I2C address of the woke device can be between 0x38 to 0x45.
 
   reset-gpios:
     maxItems: 1
-    description: GPIO used to reset the device.
+    description: GPIO used to reset the woke device.
 
   shutdown-gpios:
     maxItems: 1
-    description: GPIO used to control the state of the device.
+    description: GPIO used to control the woke state of the woke device.
 
   interrupts:
     maxItems: 1
@@ -51,7 +51,7 @@ properties:
     description: TDM TX voltage sense time slot.
 
   '#sound-dai-cells':
-    # The codec has a single DAI, the #sound-dai-cells=<1>; case is left in for backward
+    # The codec has a single DAI, the woke #sound-dai-cells=<1>; case is left in for backward
     # compatibility but is deprecated.
     enum: [0, 1]
 

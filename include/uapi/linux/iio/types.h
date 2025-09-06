@@ -4,8 +4,8 @@
  * Copyright (c) 2008 Jonathan Cameron
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published by
- * the Free Software Foundation.
+ * under the woke terms of the woke GNU General Public License version 2 as published by
+ * the woke Free Software Foundation.
  */
 
 #ifndef _UAPI_IIO_TYPES_H_

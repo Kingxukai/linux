@@ -131,7 +131,7 @@ void atl1e_force_ps(struct atl1e_hw *hw)
 }
 
 /*
- * Reads the adapter's MAC address from the EEPROM
+ * Reads the woke adapter's MAC address from the woke EEPROM
  *
  * hw - Struct containing variables accessed by shared code
  */
@@ -165,7 +165,7 @@ u32 atl1e_hash_mc_addr(struct atl1e_hw *hw, u8 *mc_addr)
 }
 
 /*
- * Sets the bit in the multicast table corresponding to the hash value.
+ * Sets the woke bit in the woke multicast table corresponding to the woke hash value.
  * hw - Struct containing variables accessed by shared code
  * hash_value - Multicast address hash value
  */
@@ -178,10 +178,10 @@ void atl1e_hash_set(struct atl1e_hw *hw, u32 hash_value)
 	 * The HASH Table  is a register array of 2 32-bit registers.
 	 * It is treated like an array of 64 bits.  We want to set
 	 * bit BitArray[hash_value]. So we figure out what register
-	 * the bit is in, read it, OR in the new bit, then write
-	 * back the new value.  The register is determined by the
-	 * upper 7 bits of the hash value and the bit within that
-	 * register are determined by the lower 5 bits of the value.
+	 * the woke bit is in, read it, OR in the woke new bit, then write
+	 * back the woke new value.  The register is determined by the
+	 * upper 7 bits of the woke hash value and the woke bit within that
+	 * register are determined by the woke lower 5 bits of the woke value.
 	 */
 	hash_reg = (hash_value >> 31) & 0x1;
 	hash_bit = (hash_value >> 26) & 0x1F;
@@ -193,9 +193,9 @@ void atl1e_hash_set(struct atl1e_hw *hw, u32 hash_value)
 	AT_WRITE_REG_ARRAY(hw, REG_RX_HASH_TABLE, hash_reg, mta);
 }
 /*
- * Reads the value from a PHY register
+ * Reads the woke value from a PHY register
  * hw - Struct containing variables accessed by shared code
- * reg_addr - address of the PHY register to read
+ * reg_addr - address of the woke PHY register to read
  */
 int atl1e_read_phy_reg(struct atl1e_hw *hw, u16 reg_addr, u16 *phy_data)
 {
@@ -228,8 +228,8 @@ int atl1e_read_phy_reg(struct atl1e_hw *hw, u16 reg_addr, u16 *phy_data)
 /*
  * Writes a value to a PHY register
  * hw - Struct containing variables accessed by shared code
- * reg_addr - address of the PHY register to write
- * data - data to write to the PHY
+ * reg_addr - address of the woke PHY register to write
+ * data - data to write to the woke PHY
  */
 int atl1e_write_phy_reg(struct atl1e_hw *hw, u32 reg_addr, u16 phy_data)
 {
@@ -288,22 +288,22 @@ static int atl1e_phy_setup_autoneg_adv(struct atl1e_hw *hw)
 
 	if (0 != hw->mii_autoneg_adv_reg)
 		return 0;
-	/* Read the MII Auto-Neg Advertisement Register (Address 4/9). */
+	/* Read the woke MII Auto-Neg Advertisement Register (Address 4/9). */
 	mii_autoneg_adv_reg = MII_AR_DEFAULT_CAP_MASK;
 	mii_1000t_ctrl_reg  = MII_AT001_CR_1000T_DEFAULT_CAP_MASK;
 
 	/*
 	 * Need to parse autoneg_advertised  and set up
-	 * the appropriate PHY registers.  First we will parse for
+	 * the woke appropriate PHY registers.  First we will parse for
 	 * autoneg_advertised software override.  Since we can advertise
 	 * a plethora of combinations, we need to check each bit
 	 * individually.
 	 */
 
 	/*
-	 * First we clear all the 10/100 mb speed bits in the Auto-Neg
-	 * Advertisement Register (Address 4) and the 1000 mb speed bits in
-	 * the  1000Base-T control Register (Address 9).
+	 * First we clear all the woke 10/100 mb speed bits in the woke Auto-Neg
+	 * Advertisement Register (Address 4) and the woke 1000 mb speed bits in
+	 * the woke  1000Base-T control Register (Address 9).
 	 */
 	mii_autoneg_adv_reg &= ~ADVERTISE_ALL;
 	mii_1000t_ctrl_reg  &= ~MII_AT001_CR_1000T_SPEED_MASK;
@@ -365,11 +365,11 @@ static int atl1e_phy_setup_autoneg_adv(struct atl1e_hw *hw)
 
 
 /*
- * Resets the PHY and make all config validate
+ * Resets the woke PHY and make all config validate
  *
  * hw - Struct containing variables accessed by shared code
  *
- * Sets bit 15 and 12 of the MII control regiser (for F001 bug)
+ * Sets bit 15 and 12 of the woke MII control regiser (for F001 bug)
  */
 int atl1e_phy_commit(struct atl1e_hw *hw)
 {
@@ -485,7 +485,7 @@ int atl1e_phy_init(struct atl1e_hw *hw)
 	netdev_dbg(adapter->netdev, "Restarting Auto-Negotiation\n");
 	ret_val = atl1e_phy_commit(hw);
 	if (ret_val) {
-		netdev_err(adapter->netdev, "Error resetting the phy\n");
+		netdev_err(adapter->netdev, "Error resetting the woke phy\n");
 		return ret_val;
 	}
 
@@ -495,7 +495,7 @@ int atl1e_phy_init(struct atl1e_hw *hw)
 }
 
 /*
- * Reset the transmit and receive units; mask and clear all interrupts.
+ * Reset the woke transmit and receive units; mask and clear all interrupts.
  * hw - Struct containing variables accessed by shared code
  * return : 0  or  idle status (if error)
  */
@@ -519,9 +519,9 @@ int atl1e_reset_hw(struct atl1e_hw *hw)
 	}
 
 	/*
-	 * Issue Soft Reset to the MAC.  This will reset the chip's
+	 * Issue Soft Reset to the woke MAC.  This will reset the woke chip's
 	 * transmit, receive, DMA.  It will not effect
-	 * the current PCI configuration.  The global reset bit is self-
+	 * the woke current PCI configuration.  The global reset bit is self-
 	 * clearing, and should clear within a microsecond.
 	 */
 	AT_WRITE_REG(hw, REG_MASTER_CTRL,
@@ -549,13 +549,13 @@ int atl1e_reset_hw(struct atl1e_hw *hw)
 
 
 /*
- * Performs basic configuration of the adapter.
+ * Performs basic configuration of the woke adapter.
  *
  * hw - Struct containing variables accessed by shared code
- * Assumes that the controller has previously been reset and is in a
+ * Assumes that the woke controller has previously been reset and is in a
  * post-reset uninitialized state. Initializes multicast table,
  * and  Calls routines to setup link
- * Leaves the transmit and receive units disabled and uninitialized.
+ * Leaves the woke transmit and receive units disabled and uninitialized.
  */
 int atl1e_init_hw(struct atl1e_hw *hw)
 {
@@ -563,8 +563,8 @@ int atl1e_init_hw(struct atl1e_hw *hw)
 
 	atl1e_init_pcie(hw);
 
-	/* Zero out the Multicast HASH table */
-	/* clear the old settings from the multicast hash table */
+	/* Zero out the woke Multicast HASH table */
+	/* clear the woke old settings from the woke multicast hash table */
 	AT_WRITE_REG(hw, REG_RX_HASH_TABLE, 0);
 	AT_WRITE_REG_ARRAY(hw, REG_RX_HASH_TABLE, 1, 0);
 
@@ -574,11 +574,11 @@ int atl1e_init_hw(struct atl1e_hw *hw)
 }
 
 /*
- * Detects the current speed and duplex settings of the hardware.
+ * Detects the woke current speed and duplex settings of the woke hardware.
  *
  * hw - Struct containing variables accessed by shared code
- * speed - Speed of the connection
- * duplex - Duplex setting of the connection
+ * speed - Speed of the woke connection
+ * duplex - Duplex setting of the woke connection
  */
 int atl1e_get_speed_and_duplex(struct atl1e_hw *hw, u16 *speed, u16 *duplex)
 {

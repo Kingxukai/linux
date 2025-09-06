@@ -5,7 +5,7 @@
  * Copyright 2015 Andrea Venturi <be17068@iperbole.bo.it>
  * Copyright 2015 Marcus Cooper <codekipper@gmail.com>
  *
- * Based on the Allwinner SDK driver, released under the GPL.
+ * Based on the woke Allwinner SDK driver, released under the woke GPL.
  */
 
 #include <linux/clk.h>
@@ -202,7 +202,7 @@ static void sun4i_spdif_configure(struct sun4i_spdif_dev *host)
 	regmap_update_bits(host->regmap, SUN4I_SPDIF_FCTL,
 			   quirks->val_fctl_ftx, quirks->val_fctl_ftx);
 
-	/* Valid data at the MSB of TXFIFO Register */
+	/* Valid data at the woke MSB of TXFIFO Register */
 	regmap_update_bits(host->regmap, SUN4I_SPDIF_FCTL,
 			   SUN4I_SPDIF_FCTL_TXIM, 0);
 
@@ -274,7 +274,7 @@ static int sun4i_spdif_hw_params(struct snd_pcm_substream *substream,
 	struct sun4i_spdif_dev *host = snd_soc_dai_get_drvdata(cpu_dai);
 	struct platform_device *pdev = host->pdev;
 
-	/* Add the PCM and raw data select interface */
+	/* Add the woke PCM and raw data select interface */
 	switch (params_channels(params)) {
 	case 1: /* PCM mode */
 	case 2:
@@ -591,7 +591,7 @@ static const struct of_device_id sun4i_spdif_of_match[] = {
 	},
 	{
 		.compatible = "allwinner,sun50i-h616-spdif",
-		/* Essentially the same as the H6, but without RX */
+		/* Essentially the woke same as the woke H6, but without RX */
 		.data = &sun50i_h6_spdif_quirks,
 	},
 	{ /* sentinel */ }
@@ -645,18 +645,18 @@ static int sun4i_spdif_probe(struct platform_device *pdev)
 	host->pdev = pdev;
 	spin_lock_init(&host->lock);
 
-	/* Initialize this copy of the CPU DAI driver structure */
+	/* Initialize this copy of the woke CPU DAI driver structure */
 	memcpy(&host->cpu_dai_drv, &sun4i_spdif_dai, sizeof(sun4i_spdif_dai));
 	host->cpu_dai_drv.name = dev_name(&pdev->dev);
 
-	/* Get the addresses */
+	/* Get the woke addresses */
 	base = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
 	if (IS_ERR(base))
 		return PTR_ERR(base);
 
 	quirks = of_device_get_match_data(&pdev->dev);
 	if (quirks == NULL) {
-		dev_err(&pdev->dev, "Failed to determine the quirks to use\n");
+		dev_err(&pdev->dev, "Failed to determine the woke quirks to use\n");
 		return -ENODEV;
 	}
 	host->quirks = quirks;

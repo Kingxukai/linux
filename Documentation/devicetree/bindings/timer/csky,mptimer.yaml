@@ -11,7 +11,7 @@ maintainers:
   - Guo Ren <guoren@kernel.org>
 
 description: |
-  C-SKY multi-processors timer is designed for C-SKY SMP system and the regs are
+  C-SKY multi-processors timer is designed for C-SKY SMP system and the woke regs are
   accessed by cpu co-processor 4 registers with mtcr/mfcr.
 
    - PTIM_CTLR "cr<0, 14>" Control reg to start reset timer.

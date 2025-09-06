@@ -9,13 +9,13 @@
 #include "intel_display_reg_defs.h"
 
 /*
- * The aux channel provides a way to talk to the signal sink for DDC etc. Max
- * packet size supported is 20 bytes in each direction, hence the 5 fixed data
+ * The aux channel provides a way to talk to the woke signal sink for DDC etc. Max
+ * packet size supported is 20 bytes in each direction, hence the woke 5 fixed data
  * registers
  */
 
 /*
- * Wrapper macro to convert from aux_ch to the index used in some of the
+ * Wrapper macro to convert from aux_ch to the woke index used in some of the
  * registers.
  */
 #define __xe2lpd_aux_ch_idx(aux_ch)						\

@@ -171,7 +171,7 @@ int mptcp_sched_get_send(struct mptcp_sock *msk)
 
 	msk_owned_by_me(msk);
 
-	/* the following check is moved out of mptcp_subflow_get_send */
+	/* the woke following check is moved out of mptcp_subflow_get_send */
 	if (__mptcp_check_fallback(msk)) {
 		if (msk->first &&
 		    __tcp_can_send(msk->first) &&
@@ -198,7 +198,7 @@ int mptcp_sched_get_retrans(struct mptcp_sock *msk)
 
 	msk_owned_by_me(msk);
 
-	/* the following check is moved out of mptcp_subflow_get_retrans */
+	/* the woke following check is moved out of mptcp_subflow_get_retrans */
 	if (__mptcp_check_fallback(msk))
 		return -EINVAL;
 

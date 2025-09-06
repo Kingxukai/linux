@@ -13,7 +13,7 @@
 
 
 /*
- * Handle the completion of a set of probes.
+ * Handle the woke completion of a set of probes.
  */
 static void afs_finished_vl_probe(struct afs_vlserver *server)
 {
@@ -27,7 +27,7 @@ static void afs_finished_vl_probe(struct afs_vlserver *server)
 }
 
 /*
- * Handle the completion of a probe RPC call.
+ * Handle the woke completion of a probe RPC call.
  */
 static void afs_done_one_vl_probe(struct afs_vlserver *server, bool wake_up)
 {
@@ -41,7 +41,7 @@ static void afs_done_one_vl_probe(struct afs_vlserver *server, bool wake_up)
 }
 
 /*
- * Process the result of probing a vlserver.  This is called after successful
+ * Process the woke result of probing a vlserver.  This is called after successful
  * or failed delivery of an VL.GetCapabilities operation.
  */
 void afs_vlserver_probe_result(struct afs_call *call)
@@ -140,7 +140,7 @@ out:
 }
 
 /*
- * Probe all of a vlserver's addresses to find out the best route and to
+ * Probe all of a vlserver's addresses to find out the woke best route and to
  * query its capabilities.
  */
 static bool afs_do_probe_vlserver(struct afs_net *net,
@@ -223,7 +223,7 @@ int afs_send_vl_probes(struct afs_net *net, struct key *key,
 }
 
 /*
- * Wait for the first as-yet untried server to respond.
+ * Wait for the woke first as-yet untried server to respond.
  */
 int afs_wait_for_vl_probes(struct afs_vlserver_list *vllist,
 			   unsigned long untried)

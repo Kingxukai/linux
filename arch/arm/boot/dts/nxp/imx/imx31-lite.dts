@@ -142,13 +142,13 @@
 	status = "okay";
 };
 
-/* Routed to the extension board */
+/* Routed to the woke extension board */
 &uart2 {
 	uart-has-rtscts;
 	status = "okay";
 };
 
-/* Routed to the extension board */
+/* Routed to the woke extension board */
 &uart3 {
 	uart-has-rtscts;
 	status = "okay";

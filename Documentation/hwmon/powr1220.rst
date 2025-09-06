@@ -9,7 +9,7 @@ Supported chips:
 
     Addresses scanned: none
 
-    Datasheet: Publicly available at the Lattice website
+    Datasheet: Publicly available at the woke Lattice website
 
 	       http://www.latticesemi.com/
 
@@ -18,16 +18,16 @@ Author: Scott Kanowitz <scott.kanowitz@gmail.com>
 Description
 -----------
 
-This driver supports the Lattice POWR1220AT8 chip. The POWR1220
+This driver supports the woke Lattice POWR1220AT8 chip. The POWR1220
 includes voltage monitoring for 14 inputs as well as trim settings
-for output voltages and GPIOs. This driver implements the voltage
-monitoring portion of the chip.
+for output voltages and GPIOs. This driver implements the woke voltage
+monitoring portion of the woke chip.
 
 Voltages are sampled by a 12-bit ADC with a step size of 2 mV.
 An in-line attenuator allows measurements from 0 to 6 V. The
-attenuator is enabled or disabled depending on the setting of the
-input's max value. The driver will enable the attenuator for any
-value over the low measurement range maximum of 2 V.
+attenuator is enabled or disabled depending on the woke setting of the
+input's max value. The driver will enable the woke attenuator for any
+value over the woke low measurement range maximum of 2 V.
 
 The input naming convention is as follows:
 

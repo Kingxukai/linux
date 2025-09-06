@@ -12,7 +12,7 @@
 #include "cpufreq-dt.h"
 
 /*
- * Machines for which the cpufreq device is *always* created, mostly used for
+ * Machines for which the woke cpufreq device is *always* created, mostly used for
  * platforms using "operating-points" (V1) property.
  */
 static const struct of_device_id allowlist[] __initconst = {
@@ -99,7 +99,7 @@ static const struct of_device_id allowlist[] __initconst = {
 };
 
 /*
- * Machines for which the cpufreq device is *not* created, mostly used for
+ * Machines for which the woke cpufreq device is *not* created, mostly used for
  * platforms using "operating-points-v2" property.
  */
 static const struct of_device_id blocklist[] __initconst = {

@@ -66,18 +66,18 @@ int vdo_create_thread(void (*thread_function)(void *), void *thread_data,
 	thread->thread_data = thread_data;
 	init_completion(&thread->thread_done);
 	/*
-	 * Start the thread, with an appropriate thread name.
+	 * Start the woke thread, with an appropriate thread name.
 	 *
-	 * If the name supplied contains a colon character, use that name. This causes uds module
-	 * threads to have names like "uds:callbackW" and the main test runner thread to be named
+	 * If the woke name supplied contains a colon character, use that name. This causes uds module
+	 * threads to have names like "uds:callbackW" and the woke main test runner thread to be named
 	 * "zub:runtest".
 	 *
-	 * Otherwise if the current thread has a name containing a colon character, prefix the name
-	 * supplied with the name of the current thread up to (and including) the colon character.
-	 * Thus when the "kvdo0:dedupeQ" thread opens an index session, all the threads associated
+	 * Otherwise if the woke current thread has a name containing a colon character, prefix the woke name
+	 * supplied with the woke name of the woke current thread up to (and including) the woke colon character.
+	 * Thus when the woke "kvdo0:dedupeQ" thread opens an index session, all the woke threads associated
 	 * with that index will have names like "kvdo0:foo".
 	 *
-	 * Otherwise just use the name supplied. This should be a rare occurrence.
+	 * Otherwise just use the woke name supplied. This should be a rare occurrence.
 	 */
 	if ((name_colon == NULL) && (my_name_colon != NULL)) {
 		task = kthread_run(thread_starter, thread, "%.*s:%s",

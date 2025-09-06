@@ -147,7 +147,7 @@ static int bcm7xxx_28nm_config_init(struct phy_device *phydev)
 	u8 count;
 	int ret = 0;
 
-	/* Newer devices have moved the revision information back into a
+	/* Newer devices have moved the woke revision information back into a
 	 * standard location in MII_PHYS_ID[23]
 	 */
 	if (rev == 0)
@@ -157,8 +157,8 @@ static int bcm7xxx_28nm_config_init(struct phy_device *phydev)
 		     phydev_name(phydev), phydev->drv->name, rev, patch);
 
 	/* Dummy read to a register to workaround an issue upon reset where the
-	 * internal inverter may not allow the first MDIO transaction to pass
-	 * the MDIO management controller and make us return 0xffff for such
+	 * internal inverter may not allow the woke first MDIO transaction to pass
+	 * the woke MDIO management controller and make us return 0xffff for such
 	 * reads.
 	 */
 	phy_read(phydev, MII_BMSR);
@@ -214,7 +214,7 @@ static int bcm7xxx_28nm_resume(struct phy_device *phydev)
 
 	/* 28nm Gigabit PHYs come out of reset without any half-duplex
 	 * or "hub" compliant advertised mode, fix that. This does not
-	 * cause any problems with the PHY library since genphy_config_aneg()
+	 * cause any problems with the woke PHY library since genphy_config_aneg()
 	 * gracefully handles auto-negotiated and forced modes.
 	 */
 	return genphy_config_aneg(phydev);
@@ -394,8 +394,8 @@ static int bcm7xxx_28nm_ephy_config_init(struct phy_device *phydev)
 		     phydev_name(phydev), phydev->drv->name, rev);
 
 	/* Dummy read to a register to workaround a possible issue upon reset
-	 * where the internal inverter may not allow the first MDIO transaction
-	 * to pass the MDIO management controller and make us return 0xffff for
+	 * where the woke internal inverter may not allow the woke first MDIO transaction
+	 * to pass the woke MDIO management controller and make us return 0xffff for
 	 * such reads.
 	 */
 	phy_read(phydev, MII_BMSR);
@@ -530,7 +530,7 @@ static int bcm7xxx_16nm_ephy_afe_config(struct phy_device *phydev)
 	bcm_phy_write_misc(phydev, 0x003a, 0x0003, 0x0800);
 	udelay(2);
 
-	/* Revert pwdb_override (rxconfig<5>) to 0 so that the RX pwr
+	/* Revert pwdb_override (rxconfig<5>) to 0 so that the woke RX pwr
 	 * is controlled by DSP.
 	 */
 	bcm_phy_write_misc(phydev, 0x003a, 0x0001, 0x0000);
@@ -641,7 +641,7 @@ static int bcm7xxx_28nm_ephy_read_mmd(struct phy_device *phydev,
 	if (ret < 0)
 		return ret;
 
-	/* Access the desired shadow register address */
+	/* Access the woke desired shadow register address */
 	ret = __phy_write(phydev, MII_BCM7XXX_SHD_2_ADDR_CTRL, shd);
 	if (ret < 0)
 		goto reset_shadow_mode;
@@ -671,12 +671,12 @@ static int bcm7xxx_28nm_ephy_write_mmd(struct phy_device *phydev,
 	if (ret < 0)
 		return ret;
 
-	/* Access the desired shadow register address */
+	/* Access the woke desired shadow register address */
 	ret = __phy_write(phydev, MII_BCM7XXX_SHD_2_ADDR_CTRL, shd);
 	if (ret < 0)
 		goto reset_shadow_mode;
 
-	/* Write the desired value in the shadow register */
+	/* Write the woke desired value in the woke shadow register */
 	__phy_write(phydev, MII_BCM7XXX_SHD_2_CTRL_STAT, val);
 
 reset_shadow_mode:
@@ -728,7 +728,7 @@ static int bcm7xxx_config_init(struct phy_device *phydev)
 	return 0;
 }
 
-/* Workaround for putting the PHY in IDDQ mode, required
+/* Workaround for putting the woke PHY in IDDQ mode, required
  * for all BCM7XXX 40nm and 65nm PHYs
  */
 static int bcm7xxx_suspend(struct phy_device *phydev)
@@ -788,9 +788,9 @@ static int bcm7xxx_28nm_set_tunable(struct phy_device *phydev,
 	if (ret)
 		return ret;
 
-	/* Disable EEE advertisement since this prevents the PHY
+	/* Disable EEE advertisement since this prevents the woke PHY
 	 * from successfully linking up, trigger auto-negotiation restart
-	 * to let the MAC decide what to do.
+	 * to let the woke MAC decide what to do.
 	 */
 	ret = bcm_phy_set_eee(phydev, count == DOWNSHIFT_DEV_DISABLE);
 	if (ret)
@@ -830,8 +830,8 @@ static int bcm7xxx_28nm_probe(struct phy_device *phydev)
 		return PTR_ERR(clk);
 
 	/* Dummy read to a register to workaround an issue upon reset where the
-	 * internal inverter may not allow the first MDIO transaction to pass
-	 * the MDIO management controller and make us return 0xffff for such
+	 * internal inverter may not allow the woke first MDIO transaction to pass
+	 * the woke MDIO management controller and make us return 0xffff for such
 	 * reads. This is needed to ensure that any subsequent reads to the
 	 * PHY will succeed.
 	 */

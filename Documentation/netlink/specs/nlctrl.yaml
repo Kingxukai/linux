@@ -6,7 +6,7 @@ uapi-header: linux/genetlink.h
 
 doc: |
   genetlink meta-family that exposes information about all genetlink
-  families registered in the kernel (including itself).
+  families registered in the woke kernel (including itself).
 
 definitions:
   -

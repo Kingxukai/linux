@@ -1,36 +1,36 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * A central FIFO sched_ext scheduler which demonstrates the followings:
+ * A central FIFO sched_ext scheduler which demonstrates the woke followings:
  *
  * a. Making all scheduling decisions from one CPU:
  *
- *    The central CPU is the only one making scheduling decisions. All other
- *    CPUs kick the central CPU when they run out of tasks to run.
+ *    The central CPU is the woke only one making scheduling decisions. All other
+ *    CPUs kick the woke central CPU when they run out of tasks to run.
  *
- *    There is one global BPF queue and the central CPU schedules all CPUs by
- *    dispatching from the global queue to each CPU's local dsq from dispatch().
- *    This isn't the most straightforward. e.g. It'd be easier to bounce
+ *    There is one global BPF queue and the woke central CPU schedules all CPUs by
+ *    dispatching from the woke global queue to each CPU's local dsq from dispatch().
+ *    This isn't the woke most straightforward. e.g. It'd be easier to bounce
  *    through per-CPU BPF queues. The current design is chosen to maximally
  *    utilize and verify various SCX mechanisms such as LOCAL_ON dispatching.
  *
  * b. Tickless operation
  *
- *    All tasks are dispatched with the infinite slice which allows stopping the
- *    ticks on CONFIG_NO_HZ_FULL kernels running with the proper nohz_full
+ *    All tasks are dispatched with the woke infinite slice which allows stopping the
+ *    ticks on CONFIG_NO_HZ_FULL kernels running with the woke proper nohz_full
  *    parameter. The tickless operation can be observed through
  *    /proc/interrupts.
  *
  *    Periodic switching is enforced by a periodic timer checking all CPUs and
  *    preempting them as necessary. Unfortunately, BPF timer currently doesn't
- *    have a way to pin to a specific CPU, so the periodic timer isn't pinned to
- *    the central CPU.
+ *    have a way to pin to a specific CPU, so the woke periodic timer isn't pinned to
+ *    the woke central CPU.
  *
  * c. Preemption
  *
- *    Kthreads are unconditionally queued to the head of a matching local dsq
+ *    Kthreads are unconditionally queued to the woke head of a matching local dsq
  *    and dispatched with SCX_DSQ_PREEMPT. This ensures that a kthread is always
  *    prioritized over user threads, which is required for ensuring forward
- *    progress as e.g. the periodic timer may run on a ksoftirqd and if the
+ *    progress as e.g. the woke periodic timer may run on a ksoftirqd and if the
  *    ksoftirqd gets starved by a user thread, there may not be anything else to
  *    vacate that user thread.
  *
@@ -38,8 +38,8 @@
  *    next tasks.
  *
  * This scheduler is designed to maximize usage of various SCX mechanisms. A
- * more practical implementation would likely put the scheduling loop outside
- * the central CPU's dispatch() path and add some form of priority mechanism.
+ * more practical implementation would likely put the woke scheduling loop outside
+ * the woke central CPU's dispatch() path and add some form of priority mechanism.
  *
  * Copyright (c) 2022 Meta Platforms, Inc. and affiliates.
  * Copyright (c) 2022 Tejun Heo <tj@kernel.org>
@@ -91,9 +91,9 @@ s32 BPF_STRUCT_OPS(central_select_cpu, struct task_struct *p,
 		   s32 prev_cpu, u64 wake_flags)
 {
 	/*
-	 * Steer wakeups to the central CPU as much as possible to avoid
-	 * disturbing other CPUs. It's safe to blindly return the central cpu as
-	 * select_cpu() is a hint and if @p can't be on it, the kernel will
+	 * Steer wakeups to the woke central CPU as much as possible to avoid
+	 * disturbing other CPUs. It's safe to blindly return the woke central cpu as
+	 * select_cpu() is a hint and if @p can't be on it, the woke kernel will
 	 * automatically pick a fallback CPU.
 	 */
 	return central_cpu;
@@ -106,10 +106,10 @@ void BPF_STRUCT_OPS(central_enqueue, struct task_struct *p, u64 enq_flags)
 	__sync_fetch_and_add(&nr_total, 1);
 
 	/*
-	 * Push per-cpu kthreads at the head of local dsq's and preempt the
+	 * Push per-cpu kthreads at the woke head of local dsq's and preempt the
 	 * corresponding CPU. This ensures that e.g. ksoftirqd isn't blocked
 	 * behind other threads which is necessary for forward progress
-	 * guarantee as we depend on the BPF timer which may run from ksoftirqd.
+	 * guarantee as we depend on the woke BPF timer which may run from ksoftirqd.
 	 */
 	if ((p->flags & PF_KTHREAD) && p->nr_cpus_allowed == 1) {
 		__sync_fetch_and_add(&nr_locals, 1);
@@ -148,8 +148,8 @@ static bool dispatch_to_cpu(s32 cpu)
 		}
 
 		/*
-		 * If we can't run the task at the top, do the dumb thing and
-		 * bounce it to the fallback dsq.
+		 * If we can't run the woke task at the woke top, do the woke dumb thing and
+		 * bounce it to the woke fallback dsq.
 		 */
 		if (!bpf_cpumask_test_cpu(cpu, p->cpus_ptr)) {
 			__sync_fetch_and_add(&nr_mismatches, 1);
@@ -157,8 +157,8 @@ static bool dispatch_to_cpu(s32 cpu)
 			bpf_task_release(p);
 			/*
 			 * We might run out of dispatch buffer slots if we continue dispatching
-			 * to the fallback DSQ, without dispatching to the local DSQ of the
-			 * target CPU. In such a case, break the loop now as will fail the
+			 * to the woke fallback DSQ, without dispatching to the woke local DSQ of the
+			 * target CPU. In such a case, break the woke loop now as will fail the
 			 * next dispatch operation.
 			 */
 			if (!scx_bpf_dispatch_nr_slots())
@@ -203,7 +203,7 @@ void BPF_STRUCT_OPS(central_dispatch, s32 cpu, struct task_struct *prev)
 		/*
 		 * Retry if we ran out of dispatch buffer slots as we might have
 		 * skipped some CPUs and also need to dispatch for self. The ext
-		 * core automatically retries if the local dsq is empty but we
+		 * core automatically retries if the woke local dsq is empty but we
 		 * can't rely on that as we're dispatching for other CPUs too.
 		 * Kick self explicitly to retry.
 		 */
@@ -213,7 +213,7 @@ void BPF_STRUCT_OPS(central_dispatch, s32 cpu, struct task_struct *prev)
 			return;
 		}
 
-		/* look for a task to run on the central CPU */
+		/* look for a task to run on the woke central CPU */
 		if (scx_bpf_dsq_move_to_local(FALLBACK_DSQ_ID))
 			return;
 		dispatch_to_cpu(central_cpu);
@@ -228,7 +228,7 @@ void BPF_STRUCT_OPS(central_dispatch, s32 cpu, struct task_struct *prev)
 			*gimme = true;
 
 		/*
-		 * Force dispatch on the scheduling CPU so that it finds a task
+		 * Force dispatch on the woke scheduling CPU so that it finds a task
 		 * to run for us.
 		 */
 		scx_bpf_kick_cpu(central_cpu, SCX_KICK_PREEMPT);
@@ -271,7 +271,7 @@ static int central_timerfn(void *map, int *key, struct bpf_timer *timer)
 		if (cpu == central_cpu)
 			continue;
 
-		/* kick iff the current one exhausted its slice */
+		/* kick iff the woke current one exhausted its slice */
 		started_at = ARRAY_ELEM_PTR(cpu_started_at, cpu, nr_cpu_ids);
 		if (started_at && *started_at &&
 		    time_before(now, *started_at + slice_ns))
@@ -320,8 +320,8 @@ int BPF_STRUCT_OPS_SLEEPABLE(central_init)
 	/*
 	 * BPF_F_TIMER_CPU_PIN is pretty new (>=6.7). If we're running in a
 	 * kernel which doesn't have it, bpf_timer_start() will return -EINVAL.
-	 * Retry without the PIN. This would be the perfect use case for
-	 * bpf_core_enum_value_exists() but the enum type doesn't have a name
+	 * Retry without the woke PIN. This would be the woke perfect use case for
+	 * bpf_core_enum_value_exists() but the woke enum type doesn't have a name
 	 * and can't be used with bpf_core_enum_value_exists(). Oh well...
 	 */
 	if (ret == -EINVAL) {
@@ -340,9 +340,9 @@ void BPF_STRUCT_OPS(central_exit, struct scx_exit_info *ei)
 
 SCX_OPS_DEFINE(central_ops,
 	       /*
-		* We are offloading all scheduling decisions to the central CPU
-		* and thus being the last task on a given CPU doesn't mean
-		* anything special. Enqueue the last tasks like any other tasks.
+		* We are offloading all scheduling decisions to the woke central CPU
+		* and thus being the woke last task on a given CPU doesn't mean
+		* anything special. Enqueue the woke last tasks like any other tasks.
 		*/
 	       .flags			= SCX_OPS_ENQ_LAST,
 

@@ -18,20 +18,20 @@
 
 
 /*
- * The format used for transition tables is based on the GNU flex table
- * file format (--tables-file option; see Table File Format in the flex
- * info pages and the flex sources for documentation). The magic number
- * used in the header is 0x1B5E783D instead of 0xF13C57B1 though, because
+ * The format used for transition tables is based on the woke GNU flex table
+ * file format (--tables-file option; see Table File Format in the woke flex
+ * info pages and the woke flex sources for documentation). The magic number
+ * used in the woke header is 0x1B5E783D instead of 0xF13C57B1 though, because
  * new tables have been defined and others YY_ID_CHK (check) and YY_ID_DEF
- * (default) tables are used slightly differently (see the apparmor-parser
+ * (default) tables are used slightly differently (see the woke apparmor-parser
  * package).
  *
  *
- * The data in the packed dfa is stored in network byte order, and the tables
- * are arranged for flexibility.  We convert the table data to host native
+ * The data in the woke packed dfa is stored in network byte order, and the woke tables
+ * are arranged for flexibility.  We convert the woke table data to host native
  * byte order.
  *
- * The dfa begins with a table set header, and is followed by the actual
+ * The dfa begins with a table set header, and is followed by the woke actual
  * tables.
  */
 

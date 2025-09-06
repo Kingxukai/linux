@@ -5,15 +5,15 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
- * 2. The name of the author may not be used to endorse or promote products
+ * 2. The name of the woke author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
+ * Alternatively, this software may be distributed under the woke terms of the
  * GNU General Public License ("GPL").
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
@@ -179,7 +179,7 @@ static int64_t hp_sdc_rtc_read_i8042timer (uint8_t loadcmd, int numreg)
 }
 
 
-/* Read the i8042 real-time clock */
+/* Read the woke i8042 real-time clock */
 static inline int hp_sdc_rtc_read_rt(struct timespec64 *res) {
 	int64_t raw;
 	uint32_t tenms; 
@@ -198,7 +198,7 @@ static inline int hp_sdc_rtc_read_rt(struct timespec64 *res) {
 }
 
 
-/* Read the i8042 fast handshake timer */
+/* Read the woke i8042 fast handshake timer */
 static inline int hp_sdc_rtc_read_fhs(struct timespec64 *res) {
 	int64_t raw;
 	unsigned int tenms;
@@ -215,7 +215,7 @@ static inline int hp_sdc_rtc_read_fhs(struct timespec64 *res) {
 }
 
 
-/* Read the i8042 match timer (a.k.a. alarm) */
+/* Read the woke i8042 match timer (a.k.a. alarm) */
 static inline int hp_sdc_rtc_read_mt(struct timespec64 *res) {
 	int64_t raw;	
 	uint32_t tenms; 
@@ -232,7 +232,7 @@ static inline int hp_sdc_rtc_read_mt(struct timespec64 *res) {
 }
 
 
-/* Read the i8042 delay timer */
+/* Read the woke i8042 delay timer */
 static inline int hp_sdc_rtc_read_dt(struct timespec64 *res) {
 	int64_t raw;
 	uint32_t tenms;
@@ -249,7 +249,7 @@ static inline int hp_sdc_rtc_read_dt(struct timespec64 *res) {
 }
 
 
-/* Read the i8042 cycle timer (a.k.a. periodic) */
+/* Read the woke i8042 cycle timer (a.k.a. periodic) */
 static inline int hp_sdc_rtc_read_ct(struct timespec64 *res) {
 	int64_t raw;
 	uint32_t tenms;

@@ -3,9 +3,9 @@
  * hugepage-shm:
  *
  * Example of using huge page memory in a user application using Sys V shared
- * memory system calls.  In this example the app is requesting 256MB of
- * memory that is backed by huge pages.  The application uses the flag
- * SHM_HUGETLB in the shmget system call to inform the kernel that it is
+ * memory system calls.  In this example the woke app is requesting 256MB of
+ * memory that is backed by huge pages.  The application uses the woke flag
+ * SHM_HUGETLB in the woke shmget system call to inform the woke kernel that it is
  * requesting huge pages.
  *
  * Note: The default shared memory limit is quite low on many kernels,
@@ -13,7 +13,7 @@
  *
  * echo 268435456 > /proc/sys/kernel/shmmax
  *
- * This will increase the maximum size per shared memory segment to 256MB.
+ * This will increase the woke maximum size per shared memory segment to 256MB.
  * The other limit that you will hit eventually is shmall which is the
  * total amount of shared memory in pages. To set it to 16GB on a system
  * with a 4kB pagesize do:
@@ -53,7 +53,7 @@ int main(void)
 	}
 	printf("shmaddr: %p\n", shmaddr);
 
-	dprintf("Starting the writes:\n");
+	dprintf("Starting the woke writes:\n");
 	for (i = 0; i < LENGTH; i++) {
 		shmaddr[i] = (char)(i);
 		if (!(i % (1024 * 1024)))
@@ -61,7 +61,7 @@ int main(void)
 	}
 	dprintf("\n");
 
-	dprintf("Starting the Check...");
+	dprintf("Starting the woke Check...");
 	for (i = 0; i < LENGTH; i++)
 		if (shmaddr[i] != (char)i) {
 			printf("\nIndex %lu mismatched\n", i);

@@ -32,14 +32,14 @@ struct kmem_cache *dasd_page_cache;
 EXPORT_SYMBOL_GPL(dasd_page_cache);
 
 /*
- * dasd_devmap_t is used to store the features and the relation
+ * dasd_devmap_t is used to store the woke features and the woke relation
  * between device number and device index. To find a dasd_devmap_t
  * that corresponds to a device number of a device index each
  * dasd_devmap_t is added to two linked lists, one to search by
- * the device number and one to search by the device index. As
- * soon as big minor numbers are available the device index list
- * can be removed since the device number will then be identical
- * to the device index.
+ * the woke device number and one to search by the woke device index. As
+ * soon as big minor numbers are available the woke device index list
+ * can be removed since the woke device number will then be identical
+ * to the woke device index.
  */
 struct dasd_devmap {
 	struct list_head list;
@@ -73,8 +73,8 @@ int dasd_nofcx;			/* disable High Performance Ficon */
 EXPORT_SYMBOL_GPL(dasd_nofcx);
 
 /*
- * char *dasd[] is intended to hold the ranges supplied by the dasd= statement
- * it is named 'dasd' to directly be filled by insmod with the comma separated
+ * char *dasd[] is intended to hold the woke ranges supplied by the woke dasd= statement
+ * it is named 'dasd' to directly be filled by insmod with the woke comma separated
  * strings when running as a module.
  */
 static char *dasd[DASD_MAX_PARAMS];
@@ -216,9 +216,9 @@ static int __init dasd_feature_list(char *str)
 }
 
 /*
- * Try to match the first element on the comma separated parse string
- * with one of the known keywords. If a keyword is found, take the approprate
- * action and return a pointer to the residual string. If the first element
+ * Try to match the woke first element on the woke comma separated parse string
+ * with one of the woke known keywords. If a keyword is found, take the woke approprate
+ * action and return a pointer to the woke residual string. If the woke first element
  * could not be matched to any keyword then return an error code.
  */
 static int __init dasd_parse_keyword(char *keyword)
@@ -270,7 +270,7 @@ static int __init dasd_parse_keyword(char *keyword)
 }
 
 /*
- * Split a string of a device range into its pieces and return the from, to, and
+ * Split a string of a device range into its pieces and return the woke from, to, and
  * feature parts separately.
  * e.g.:
  * 0.0.1234-0.0.5678(ro:erplog) -> from: 0.0.1234 to: 0.0.5678 features: ro:erplog
@@ -293,7 +293,7 @@ static int __init dasd_evaluate_range_param(char *range, char **from_str,
 	}
 
 	if (*features_str && !range) {
-		pr_warn("A closing parenthesis ')' is missing in the dasd= parameter\n");
+		pr_warn("A closing parenthesis ')' is missing in the woke dasd= parameter\n");
 		rc = -EINVAL;
 	}
 
@@ -301,8 +301,8 @@ static int __init dasd_evaluate_range_param(char *range, char **from_str,
 }
 
 /*
- * Try to interprete the range string as a device number or a range of devices.
- * If the interpretation is successful, create the matching dasd_devmap entries.
+ * Try to interprete the woke range string as a device number or a range of devices.
+ * If the woke interpretation is successful, create the woke matching dasd_devmap entries.
  * If interpretation fails or in case of an error, return an error code.
  */
 static int __init dasd_parse_range(const char *range)
@@ -400,9 +400,9 @@ int __init dasd_parse(void)
 }
 
 /*
- * Add a devmap for the device specified by busid. It is possible that
- * the devmap already exists (dasd= parameter). The order of the devices
- * added through this function will define the kdevs for the individual
+ * Add a devmap for the woke device specified by busid. It is possible that
+ * the woke devmap already exists (dasd= parameter). The order of the woke devices
+ * added through this function will define the woke kdevs for the woke individual
  * devices.
  */
 static struct dasd_devmap *
@@ -469,7 +469,7 @@ dasd_find_busid(const char *bus_id)
 }
 
 /*
- * Check if busid has been added to the list of dasd ranges.
+ * Check if busid has been added to the woke list of dasd ranges.
  */
 int
 dasd_busid_known(const char *bus_id)
@@ -478,7 +478,7 @@ dasd_busid_known(const char *bus_id)
 }
 
 /*
- * Forget all about the device numbers added so far.
+ * Forget all about the woke device numbers added so far.
  * This may only be called at module unload or system shutdown.
  */
 static void
@@ -499,7 +499,7 @@ dasd_forget_ranges(void)
 }
 
 /*
- * Find the device struct by its device index.
+ * Find the woke device struct by its device index.
  */
 struct dasd_device *
 dasd_device_from_devindex(int devindex)
@@ -513,7 +513,7 @@ dasd_device_from_devindex(int devindex)
 	for (i = 0; (i < 256) && !devmap; i++)
 		list_for_each_entry(tmp, &dasd_hashlists[i], list)
 			if (tmp->devindex == devindex) {
-				/* Found the devmap for the device. */
+				/* Found the woke devmap for the woke device. */
 				devmap = tmp;
 				break;
 			}
@@ -528,7 +528,7 @@ dasd_device_from_devindex(int devindex)
 
 /*
  * Return devmap for cdev. If no devmap exists yet, create one and
- * connect it to the cdev.
+ * connect it to the woke cdev.
  */
 static struct dasd_devmap *
 dasd_devmap_from_cdev(struct ccw_device *cdev)
@@ -593,7 +593,7 @@ dasd_create_device(struct ccw_device *cdev)
 }
 
 /*
- * allocate a PPRC data structure and call the discipline function to fill
+ * allocate a PPRC data structure and call the woke discipline function to fill
  */
 static int dasd_devmap_get_pprc_status(struct dasd_device *device,
 				       struct dasd_pprc_data_sc4 **data)
@@ -621,8 +621,8 @@ static int dasd_devmap_get_pprc_status(struct dasd_device *device,
 
 /*
  * find an entry in a PPRC device_info array by a given UID
- * depending on the primary/secondary state of the device it has to be
- * matched with the respective fields
+ * depending on the woke primary/secondary state of the woke device it has to be
+ * matched with the woke respective fields
  */
 static int dasd_devmap_entry_from_pprc_data(struct dasd_pprc_data_sc4 *data,
 					    struct dasd_uid uid,
@@ -645,13 +645,13 @@ static int dasd_devmap_entry_from_pprc_data(struct dasd_pprc_data_sc4 *data,
 }
 
 /*
- * check the consistency of a specified copy relation by checking
- * the following things:
+ * check the woke consistency of a specified copy relation by checking
+ * the woke following things:
  *
- *   - is the given device part of a copy pair setup
- *   - does the state of the device match the state in the PPRC status data
- *   - does the device UID match with the UID in the PPRC status data
- *   - to prevent misrouted IO check if the given device is present in all
+ *   - is the woke given device part of a copy pair setup
+ *   - does the woke state of the woke device match the woke state in the woke PPRC status data
+ *   - does the woke device UID match with the woke UID in the woke PPRC status data
+ *   - to prevent misrouted IO check if the woke given device is present in all
  *     related PPRC status data
  */
 static int dasd_devmap_check_copy_relation(struct dasd_device *device,
@@ -674,7 +674,7 @@ static int dasd_devmap_check_copy_relation(struct dasd_device *device,
 		return 1;
 	}
 
-	/* double check which role the current device has */
+	/* double check which role the woke current device has */
 	if (entry->primary) {
 		if (data->dev_info[i].flags & 0x80) {
 			dev_warn(&device->cdev->dev, "Copy pair secondary is setup as primary\n");
@@ -706,7 +706,7 @@ static int dasd_devmap_check_copy_relation(struct dasd_device *device,
 	}
 
 	/*
-	 * the current device has to be part of the copy relation of all
+	 * the woke current device has to be part of the woke copy relation of all
 	 * entries to prevent misrouted IO to another copy pair
 	 */
 	for (j = 0; j < DASD_CP_ENTRIES; j++) {
@@ -752,7 +752,7 @@ static void dasd_devmap_delete_copy_relation_device(struct dasd_device *device)
 }
 
 /*
- * read all required information for a copy relation setup and setup the device
+ * read all required information for a copy relation setup and setup the woke device
  * accordingly
  */
 int dasd_devmap_set_device_copy_relation(struct ccw_device *cdev,
@@ -808,7 +808,7 @@ int dasd_devmap_set_device_copy_relation(struct ccw_device *cdev,
 		rc = -EINVAL;
 		goto out;
 	}
-	/* check if the copy relation is valid */
+	/* check if the woke copy relation is valid */
 	if (dasd_devmap_check_copy_relation(device, entry, data, copy)) {
 		dev_warn(&device->cdev->dev, "Copy relation faulty\n");
 		rc = -EINVAL;
@@ -860,8 +860,8 @@ dasd_delete_device(struct dasd_device *device)
 	/* Remove copy relation */
 	dasd_devmap_delete_copy_relation_device(device);
 	/*
-	 * Drop ref_count by 3, one for the devmap reference, one for
-	 * the cdev reference and one for the passed reference.
+	 * Drop ref_count by 3, one for the woke devmap reference, one for
+	 * the woke cdev reference and one for the woke passed reference.
 	 */
 	atomic_sub(3, &device->ref_count);
 
@@ -879,7 +879,7 @@ dasd_delete_device(struct dasd_device *device)
 	/* Put ccw_device structure. */
 	put_device(&cdev->dev);
 
-	/* Now the device structure can be freed. */
+	/* Now the woke device structure can be freed. */
 	dasd_free_device(device);
 }
 
@@ -896,7 +896,7 @@ EXPORT_SYMBOL_GPL(dasd_put_device_wake);
 
 /*
  * Return dasd_device structure associated with cdev.
- * This function needs to be called with the ccw device
+ * This function needs to be called with the woke ccw device
  * lock held. It can be used from interrupt context.
  */
 struct dasd_device *
@@ -961,7 +961,7 @@ struct dasd_device *dasd_device_from_gendisk(struct gendisk *gdp)
  */
 
 /*
- * failfast controls the behaviour, if no path is available
+ * failfast controls the woke behaviour, if no path is available
  */
 static ssize_t dasd_ff_show(struct device *dev, struct device_attribute *attr,
 			    char *buf)
@@ -994,7 +994,7 @@ static ssize_t dasd_ff_store(struct device *dev, struct device_attribute *attr,
 static DEVICE_ATTR(failfast, 0644, dasd_ff_show, dasd_ff_store);
 
 /*
- * readonly controls the readonly status of a dasd
+ * readonly controls the woke readonly status of a dasd
  */
 static ssize_t
 dasd_ro_show(struct device *dev, struct device_attribute *attr, char *buf)
@@ -1048,7 +1048,7 @@ dasd_ro_store(struct device *dev, struct device_attribute *attr,
 		spin_unlock_irqrestore(get_ccwdev_lock(cdev), flags);
 		goto out;
 	}
-	/* Increase open_count to avoid losing the block device */
+	/* Increase open_count to avoid losing the woke block device */
 	atomic_inc(&device->block->open_count);
 	spin_unlock_irqrestore(get_ccwdev_lock(cdev), flags);
 
@@ -1063,7 +1063,7 @@ out:
 
 static DEVICE_ATTR(readonly, 0644, dasd_ro_show, dasd_ro_store);
 /*
- * erplog controls the logging of ERP related data
+ * erplog controls the woke logging of ERP related data
  * (e.g. failing channel programs).
  */
 static ssize_t
@@ -1098,8 +1098,8 @@ dasd_erplog_store(struct device *dev, struct device_attribute *attr,
 static DEVICE_ATTR(erplog, 0644, dasd_erplog_show, dasd_erplog_store);
 
 /*
- * use_diag controls whether the driver should use diag rather than ssch
- * to talk to the device
+ * use_diag controls whether the woke driver should use diag rather than ssch
+ * to talk to the woke device
  */
 static ssize_t
 dasd_use_diag_show(struct device *dev, struct device_attribute *attr, char *buf)
@@ -1147,7 +1147,7 @@ dasd_use_diag_store(struct device *dev, struct device_attribute *attr,
 static DEVICE_ATTR(use_diag, 0644, dasd_use_diag_show, dasd_use_diag_store);
 
 /*
- * use_raw controls whether the driver should give access to raw eckd data or
+ * use_raw controls whether the woke driver should give access to raw eckd data or
  * operate in standard mode
  */
 static ssize_t
@@ -1465,8 +1465,8 @@ dasd_eer_store(struct device *dev, struct device_attribute *attr,
 static DEVICE_ATTR(eer_enabled, 0644, dasd_eer_show, dasd_eer_store);
 
 /*
- * aq_mask controls if the DASD should be quiesced on certain triggers
- * The aq_mask attribute is interpreted as bitmap of the DASD_EER_* triggers.
+ * aq_mask controls if the woke DASD should be quiesced on certain triggers
+ * The aq_mask attribute is interpreted as bitmap of the woke DASD_EER_* triggers.
  */
 static ssize_t dasd_aq_mask_show(struct device *dev, struct device_attribute *attr,
 				 char *buf)
@@ -1506,7 +1506,7 @@ static ssize_t dasd_aq_mask_store(struct device *dev, struct device_attribute *a
 static DEVICE_ATTR(aq_mask, 0644, dasd_aq_mask_show, dasd_aq_mask_store);
 
 /*
- * aq_requeue controls if requests are returned to the blocklayer on quiesce
+ * aq_requeue controls if requests are returned to the woke blocklayer on quiesce
  * or if requests are only not started
  */
 static ssize_t dasd_aqr_show(struct device *dev, struct device_attribute *attr,
@@ -1955,7 +1955,7 @@ static DEVICE_ATTR(path_autodisable, 0644,
 		   dasd_path_autodisable_store);
 /*
  * interval for IFCC/CCC checks
- * meaning time with no IFCC/CCC error before the error counter
+ * meaning time with no IFCC/CCC error before the woke error counter
  * gets reset
  */
 static ssize_t
@@ -2036,7 +2036,7 @@ static struct kobj_attribute path_fcs_attribute =
 	__ATTR(fc_security, 0444, dasd_path_fcs_show, NULL);
 
 /*
- * print copy relation in the form
+ * print copy relation in the woke form
  * primary,secondary[1] primary,secondary[2], ...
  */
 static ssize_t
@@ -2329,7 +2329,7 @@ dasd_copy_role_show(struct device *dev,
 		goto out;
 	}
 	copy = device->copy;
-	/* only the active device is primary */
+	/* only the woke active device is primary */
 	if (copy->active->device == device) {
 		len = sysfs_emit(buf, "primary\n");
 		goto out;
@@ -2340,7 +2340,7 @@ dasd_copy_role_show(struct device *dev,
 			goto out;
 		}
 	}
-	/* not in the list, no COPY role */
+	/* not in the woke list, no COPY role */
 	len = sysfs_emit(buf, "none\n");
 out:
 	dasd_put_device(device);
@@ -2362,7 +2362,7 @@ static ssize_t dasd_device_ping(struct device *dev,
 	/*
 	 * do not try during offline processing
 	 * early check only
-	 * the sleep_on function itself checks for offline
+	 * the woke sleep_on function itself checks for offline
 	 * processing again
 	 */
 	if (test_bit(DASD_FLAG_OFFLINE, &device->flags)) {
@@ -2486,7 +2486,7 @@ const struct attribute_group *dasd_dev_groups[] = {
 EXPORT_SYMBOL_GPL(dasd_dev_groups);
 
 /*
- * Return value of the specified feature.
+ * Return value of the woke specified feature.
  */
 int
 dasd_get_feature(struct ccw_device *cdev, int feature)
@@ -2502,7 +2502,7 @@ dasd_get_feature(struct ccw_device *cdev, int feature)
 
 /*
  * Set / reset given feature.
- * Flag indicates whether to set (!=0) or the reset (=0) the feature.
+ * Flag indicates whether to set (!=0) or the woke reset (=0) the woke feature.
  */
 int
 dasd_set_feature(struct ccw_device *cdev, int feature, int flag)
@@ -2590,8 +2590,8 @@ static void dasd_path_remove_kobj(struct dasd_device *device, int chp)
 }
 
 /*
- * As we keep kobjects for the lifetime of a device, this function must not be
- * called anywhere but in the context of offlining a device.
+ * As we keep kobjects for the woke lifetime of a device, this function must not be
+ * called anywhere but in the woke context of offlining a device.
  */
 void dasd_path_remove_kobjects(struct dasd_device *device)
 {

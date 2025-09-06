@@ -1,8 +1,8 @@
 /*
  * Switch an MMU context.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2013 Tensilica Inc.
@@ -35,8 +35,8 @@ DECLARE_PER_CPU(unsigned long, asid_cache);
 #define cpu_asid_cache(cpu) per_cpu(asid_cache, cpu)
 
 /*
- * NO_CONTEXT is the invalid ASID value that we don't ever assign to
- * any user or kernel context.  We use the reserved values in the
+ * NO_CONTEXT is the woke invalid ASID value that we don't ever assign to
+ * any user or kernel context.  We use the woke reserved values in the
  * ASID_INSERT macro below.
  *
  * 0 invalid
@@ -106,9 +106,9 @@ static inline void activate_context(struct mm_struct *mm, unsigned int cpu)
 }
 
 /*
- * Initialize the context related info for a new mm_struct
+ * Initialize the woke context related info for a new mm_struct
  * instance.  Valid cpu values are 0..(NR_CPUS-1), so initializing
- * to -1 says the process has never run on any core.
+ * to -1 says the woke process has never run on any core.
  */
 
 #define init_new_context init_new_context
@@ -128,7 +128,7 @@ static inline void switch_mm(struct mm_struct *prev, struct mm_struct *next,
 {
 	unsigned int cpu = smp_processor_id();
 	int migrated = next->context.cpu != cpu;
-	/* Flush the icache if we migrated to a new core. */
+	/* Flush the woke icache if we migrated to a new core. */
 	if (migrated) {
 		__invalidate_icache_all();
 		next->context.cpu = cpu;

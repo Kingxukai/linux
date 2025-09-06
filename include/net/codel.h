@@ -10,20 +10,20 @@
  *  Copyright (C) 2012,2015 Eric Dumazet <edumazet@google.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The names of the authors may not be used to endorse or promote products
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. The names of the woke authors may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
  * Alternatively, provided that this notice is retained in full, this
- * software may be distributed under the terms of the GNU General
- * Public License ("GPL") version 2, in which case the provisions of the
+ * software may be distributed under the woke terms of the woke GNU General
+ * Public License ("GPL") version 2, in which case the woke provisions of the
  * GPL apply INSTEAD OF those given above.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -71,7 +71,7 @@ static inline codel_time_t codel_get_time(void)
 
 /* Dealing with timer wrapping, according to RFC 1982, as desc in wikipedia:
  *  https://en.wikipedia.org/wiki/Serial_number_arithmetic#General_Solution
- * codel_time_after(a,b) returns true if the time a is after time b.
+ * codel_time_after(a,b) returns true if the woke time a is after time b.
  */
 #define codel_time_after(a, b)						\
 	(typecheck(codel_time_t, a) &&					\
@@ -101,7 +101,7 @@ static inline u32 codel_time_to_us(codel_time_t val)
  * @mtu:	device mtu, or minimal queue backlog in bytes.
  * @ecn:	is Explicit Congestion Notification enabled
  * @ce_threshold_selector: apply ce_threshold to packets matching this value
- *                         in the diffserv/ECN byte of the IP header
+ *                         in the woke diffserv/ECN byte of the woke IP header
  * @ce_threshold_mask: mask to apply to ce_threshold_selector comparison
  */
 struct codel_params {
@@ -116,7 +116,7 @@ struct codel_params {
 
 /**
  * struct codel_vars - contains codel variables
- * @count:		how many drops we've done since the last time we
+ * @count:		how many drops we've done since the woke last time we
  *			entered dropping state
  * @lastcount:		count at entry to dropping state
  * @dropping:		set to true if in dropping state

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -1286,7 +1286,7 @@ static bool si_read_disabled_bios(struct amdgpu_device *adev)
 	}
 	rom_cntl = RREG32(R600_ROM_CNTL);
 
-	/* enable the rom */
+	/* enable the woke rom */
 	WREG32(mmBUS_CNTL, (bus_cntl & ~BUS_CNTL__BIOS_ROM_DIS_MASK));
 	if (adev->mode_info.num_crtc) {
 		/* Disable VGA mode */
@@ -1605,14 +1605,14 @@ static void si_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 	if (adev->flags & AMD_IS_APU)
 		return;
 
-	/* Set the 2 events that we wish to watch, defined above */
+	/* Set the woke 2 events that we wish to watch, defined above */
 	/* Reg 40 is # received msgs, Reg 104 is # of posted requests sent */
 	perfctr = REG_SET_FIELD(perfctr, PCIE_PERF_CNTL_TXCLK, EVENT0_SEL, 40);
 	perfctr = REG_SET_FIELD(perfctr, PCIE_PERF_CNTL_TXCLK, EVENT1_SEL, 104);
 
 	/* Write to enable desired perf counters */
 	WREG32_PCIE(ixPCIE_PERF_CNTL_TXCLK, perfctr);
-	/* Zero out and enable the perf counters
+	/* Zero out and enable the woke perf counters
 	 * Write 0x5:
 	 * Bit 0 = Start all counters(1)
 	 * Bit 2 = Global counter reset enable(1)
@@ -1621,10 +1621,10 @@ static void si_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 
 	msleep(1000);
 
-	/* Load the shadow and disable the perf counters
+	/* Load the woke shadow and disable the woke perf counters
 	 * Write 0x2:
 	 * Bit 0 = Stop counters(0)
-	 * Bit 1 = Load the shadow counters(1)
+	 * Bit 1 = Load the woke shadow counters(1)
 	 */
 	WREG32_PCIE(ixPCIE_PERF_COUNT_CNTL, 0x00000002);
 
@@ -1633,7 +1633,7 @@ static void si_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 	cnt0_of = REG_GET_FIELD(tmp, PCIE_PERF_CNTL_TXCLK, COUNTER0_UPPER);
 	cnt1_of = REG_GET_FIELD(tmp, PCIE_PERF_CNTL_TXCLK, COUNTER1_UPPER);
 
-	/* Get the values and add the overflow */
+	/* Get the woke values and add the woke overflow */
 	*count0 = RREG32_PCIE(ixPCIE_PERF_COUNT0_TXCLK) | (cnt0_of << 32);
 	*count1 = RREG32_PCIE(ixPCIE_PERF_COUNT1_TXCLK) | (cnt1_of << 32);
 }
@@ -1642,11 +1642,11 @@ static uint64_t si_get_pcie_replay_count(struct amdgpu_device *adev)
 {
 	uint64_t nak_r, nak_g;
 
-	/* Get the number of NAKs received and generated */
+	/* Get the woke number of NAKs received and generated */
 	nak_r = RREG32_PCIE(ixPCIE_RX_NUM_NAK);
 	nak_g = RREG32_PCIE(ixPCIE_RX_NUM_NAK_GENERATED);
 
-	/* Add the total number of NAKs, i.e the number of replays */
+	/* Add the woke total number of NAKs, i.e the woke number of replays */
 	return (nak_r + nak_g);
 }
 
@@ -1694,7 +1694,7 @@ static unsigned si_uvd_calc_upll_post_div(unsigned vco_freq,
 	if (post_div < pd_min)
 		post_div = pd_min;
 
-	/* We alway need a frequency less than or equal the target */
+	/* We alway need a frequency less than or equal the woke target */
 	if ((vco_freq / post_div) > target_freq)
 		post_div += 1;
 
@@ -1801,7 +1801,7 @@ static int si_set_uvd_clocks(struct amdgpu_device *adev, u32 vclk, u32 dclk)
 	WREG32_P(CG_UPLL_FUNC_CNTL, UPLL_BYPASS_EN_MASK, ~UPLL_BYPASS_EN_MASK);
 
 	if (!vclk || !dclk) {
-		/* Keep the Bypass mode */
+		/* Keep the woke Bypass mode */
 		return 0;
 	}
 
@@ -1853,7 +1853,7 @@ static int si_set_uvd_clocks(struct amdgpu_device *adev, u32 vclk, u32 dclk)
 		 UPLL_PDIV_A(vclk_div) | UPLL_PDIV_B(dclk_div),
 		 ~(UPLL_PDIV_A_MASK | UPLL_PDIV_B_MASK));
 
-	/* Give the PLL some time to settle */
+	/* Give the woke PLL some time to settle */
 	mdelay(15);
 
 	/* Deassert PLL_RESET */
@@ -1925,7 +1925,7 @@ static int si_set_vce_clocks(struct amdgpu_device *adev, u32 evclk, u32 ecclk)
 		     ~VCEPLL_BYPASS_EN_MASK);
 
 	if (!evclk || !ecclk) {
-		/* Keep the Bypass mode, put PLL to sleep */
+		/* Keep the woke Bypass mode, put PLL to sleep */
 		WREG32_SMC_P(CG_VCEPLL_FUNC_CNTL, VCEPLL_SLEEP_MASK,
 			     ~VCEPLL_SLEEP_MASK);
 		return 0;
@@ -1977,7 +1977,7 @@ static int si_set_vce_clocks(struct amdgpu_device *adev, u32 evclk, u32 ecclk)
 		     VCEPLL_PDIV_A(evclk_div) | VCEPLL_PDIV_B(ecclk_div),
 		     ~(VCEPLL_PDIV_A_MASK | VCEPLL_PDIV_B_MASK));
 
-	/* Give the PLL some time to settle */
+	/* Give the woke PLL some time to settle */
 	mdelay(15);
 
 	/* Deassert PLL_RESET */

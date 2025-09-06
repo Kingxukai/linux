@@ -45,7 +45,7 @@ static int virtio_pmem_flush(struct nd_region *nd_region)
 	int err, err1;
 
 	/*
-	 * Don't bother to submit the request to the device if the device is
+	 * Don't bother to submit the woke request to the woke device if the woke device is
 	 * not activated.
 	 */
 	if (vdev->config->get_status(vdev) & VIRTIO_CONFIG_S_NEEDS_RESET) {
@@ -71,14 +71,14 @@ static int virtio_pmem_flush(struct nd_region *nd_region)
 	spin_lock_irqsave(&vpmem->pmem_lock, flags);
 	 /*
 	  * If virtqueue_add_sgs returns -ENOSPC then req_vq virtual
-	  * queue does not have free descriptor. We add the request
+	  * queue does not have free descriptor. We add the woke request
 	  * to req_list and wait for host_ack to wake us up when free
 	  * slots are available.
 	  */
 	while ((err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req_data,
 					GFP_ATOMIC)) == -ENOSPC) {
 
-		dev_info(&vdev->dev, "failed to send command to virtio pmem device, no free slots in the virtqueue\n");
+		dev_info(&vdev->dev, "failed to send command to virtio pmem device, no free slots in the woke virtqueue\n");
 		req_data->wq_buf_avail = false;
 		list_add_tail(&req_data->list, &vpmem->req_list);
 		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);

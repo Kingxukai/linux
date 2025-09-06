@@ -107,7 +107,7 @@
 
 &mdss {
 	/*
-	 * MDSS depends on the MDP SMMU, and probing it alters the bootloader
+	 * MDSS depends on the woke MDP SMMU, and probing it alters the woke bootloader
 	 * configured framebuffer used by simplefb. Disable it for now.
 	 */
 	status = "disabled";

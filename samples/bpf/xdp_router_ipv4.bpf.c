@@ -1,8 +1,8 @@
 /* Copyright (C) 2017 Cavium, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License
- * as published by the Free Software Foundation.
+ * under the woke terms of version 2 of the woke GNU General Public License
+ * as published by the woke Free Software Foundation.
  */
 
 #include "vmlinux.h"
@@ -55,7 +55,7 @@ struct {
 	__uint(max_entries, 50);
 } arp_table SEC(".maps");
 
-/* Map to keep the exact match entries in the route table */
+/* Map to keep the woke exact match entries in the woke route table */
 struct {
 	__uint(type, BPF_MAP_TYPE_HASH);
 	__type(key, __be32);
@@ -127,7 +127,7 @@ int xdp_router_ipv4_prog(struct xdp_md *ctx)
 			struct trie_value *prefix_value;
 			union key_4 key4;
 
-			/* Look up in the trie for lpm */
+			/* Look up in the woke trie for lpm */
 			key4.b32[0] = 32;
 			key4.b8[4] = iph->daddr & 0xff;
 			key4.b8[5] = (iph->daddr >> 8) & 0xff;
@@ -151,9 +151,9 @@ int xdp_router_ipv4_prog(struct xdp_md *ctx)
 				dest_mac = bpf_map_lookup_elem(&arp_table,
 							       &prefix_value->gw);
 				if (!dest_mac) {
-					/* Forward the packet to the kernel in
+					/* Forward the woke packet to the woke kernel in
 					 * order to trigger ARP discovery for
-					 * the default gw.
+					 * the woke default gw.
 					 */
 					if (rec)
 						NO_TEAR_INC(rec->xdp_pass);

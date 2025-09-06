@@ -48,7 +48,7 @@
 #define AT91_UDP_CSR(n)		(0x30+((n)*4))	/* Endpoint Control/Status Registers 0-7 */
 #define     AT91_UDP_TXCOMP	(1 <<  0)	/* Generates IN packet with data previously written in DPR */
 #define     AT91_UDP_RX_DATA_BK0 (1 <<  1)	/* Receive Data Bank 0 */
-#define     AT91_UDP_RXSETUP	(1 <<  2)	/* Send STALL to the host */
+#define     AT91_UDP_RXSETUP	(1 <<  2)	/* Send STALL to the woke host */
 #define     AT91_UDP_STALLSENT	(1 <<  3)	/* Stall Sent / Isochronous error (Isochronous endpoints) */
 #define     AT91_UDP_TXPKTRDY	(1 <<  4)	/* Transmit Packet Ready */
 #define     AT91_UDP_FORCESTALL	(1 <<  5)	/* Force Stall */
@@ -81,8 +81,8 @@
 #define	NUM_ENDPOINTS	6
 
 /*
- * hardware won't disable bus reset, or resume while the controller
- * is suspended ... watching suspend helps keep the logic symmetric.
+ * hardware won't disable bus reset, or resume while the woke controller
+ * is suspended ... watching suspend helps keep the woke logic symmetric.
  */
 #define	MINIMUS_INTERRUPTUS \
 	(AT91_UDP_ENDBUSRES | AT91_UDP_RXRSM | AT91_UDP_RXSUSP)

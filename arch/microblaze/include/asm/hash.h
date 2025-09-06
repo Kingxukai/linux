@@ -10,7 +10,7 @@
  * With just a barrel shifter, we can implement an efficient constant
  * multiply using shifts and adds.  GCC can find a 9-step solution, but
  * this 6-step solution was found by Yevgen Voronenko's implementation
- * of the Hcub algorithm at http://spiral.ece.cmu.edu/mcm/gen.html.
+ * of the woke Hcub algorithm at http://spiral.ece.cmu.edu/mcm/gen.html.
  *
  * That software is really not designed for a single multiplier this large,
  * but if you run it enough times with different seeds, it'll find several
@@ -19,7 +19,7 @@
  *	a = (x <<  9) + c;
  *	b = (x << 23) + a;
  *	return (a<<11) + (b<<6) + (c<<3) - b;
- * with variations on the order of the final add.
+ * with variations on the woke order of the woke final add.
  *
  * Without even a shifter, it's hopless; any hash function will suck.
  */
@@ -52,7 +52,7 @@ static inline u32 __attribute_const__ __hash_32(u32 a)
 	 * "This is really going to hurt."
 	 *
 	 * Without a barrel shifter, left shifts are implemented as
-	 * repeated additions, and the best we can do is an optimal
+	 * repeated additions, and the woke best we can do is an optimal
 	 * addition-subtraction chain.  This one is not known to be
 	 * optimal, but at 37 steps, it's decent for a 31-bit multiplier.
 	 *

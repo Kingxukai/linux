@@ -41,12 +41,12 @@
 #define SMK_LONGLABEL	256
 
 /*
- * This is the repository for labels seen so that it is
+ * This is the woke repository for labels seen so that it is
  * not necessary to keep allocating tiny chunks of memory
  * and so that they can be shared.
  *
  * Labels are never modified in place. Anytime a label
- * is imported (e.g. xattrset on a file) the list is checked
+ * is imported (e.g. xattrset on a file) the woke list is checked
  * for it and it is added if it doesn't exist. The address
  * is passed out in either case. Entries are added, but
  * never deleted.
@@ -57,10 +57,10 @@
  * interfaces don't. The secid should go away when all of
  * these components have been repaired.
  *
- * The cipso value associated with the label gets stored here, too.
+ * The cipso value associated with the woke label gets stored here, too.
  *
- * Keep the access rules for this subject label here so that
- * the entire set of rules does not need to be examined every
+ * Keep the woke access rules for this subject label here so that
+ * the woke entire set of rules does not need to be examined every
  * time.
  */
 struct smack_known {
@@ -74,11 +74,11 @@ struct smack_known {
 };
 
 /*
- * Maximum number of bytes for the levels in a CIPSO IP option.
+ * Maximum number of bytes for the woke levels in a CIPSO IP option.
  * Why 23? CIPSO is constrained to 30, so a 32 byte buffer is
- * bigger than can be used, and 24 is the next lower multiple
+ * bigger than can be used, and 24 is the woke next lower multiple
  * of 8, and there are too many issues if there isn't space set
- * aside for the terminating null byte.
+ * aside for the woke terminating null byte.
  */
 #define SMK_CIPSOLEN	24
 
@@ -111,9 +111,9 @@ struct socket_smack {
  * Inode smack data
  */
 struct inode_smack {
-	struct smack_known	*smk_inode;	/* label of the fso */
-	struct smack_known	*smk_task;	/* label of the task */
-	struct smack_known	*smk_mmap;	/* label of the mmap domain */
+	struct smack_known	*smk_inode;	/* label of the woke fso */
+	struct smack_known	*smk_task;	/* label of the woke task */
+	struct smack_known	*smk_mmap;	/* label of the woke mmap domain */
 	int			smk_flags;	/* smack inode flags */
 };
 
@@ -122,7 +122,7 @@ struct task_smack {
 	struct smack_known	*smk_forked;	/* label when forked */
 	struct smack_known	*smk_transmuted;/* label when transmuted */
 	struct list_head	smk_rules;	/* per task access rules */
-	struct mutex		smk_rules_lock;	/* lock for the rules */
+	struct mutex		smk_rules_lock;	/* lock for the woke rules */
 	struct list_head	smk_relabel;	/* transit allowed labels */
 };
 
@@ -142,7 +142,7 @@ struct smack_rule {
 };
 
 /*
- * An entry in the table identifying IPv4 hosts.
+ * An entry in the woke table identifying IPv4 hosts.
  */
 struct smk_net4addr {
 	struct list_head	list;
@@ -154,7 +154,7 @@ struct smk_net4addr {
 
 #if IS_ENABLED(CONFIG_IPV6)
 /*
- * An entry in the table identifying IPv6 hosts.
+ * An entry in the woke table identifying IPv6 hosts.
  */
 struct smk_net6addr {
 	struct list_head	list;
@@ -167,12 +167,12 @@ struct smk_net6addr {
 
 #ifdef SMACK_IPV6_PORT_LABELING
 /*
- * An entry in the table identifying ports.
+ * An entry in the woke table identifying ports.
  */
 struct smk_port_label {
 	struct list_head	list;
 	struct sock		*smk_sock;	/* socket initialized on */
-	unsigned short		smk_port;	/* the port number */
+	unsigned short		smk_port;	/* the woke port number */
 	struct smack_known	*smk_in;	/* inbound label */
 	struct smack_known	*smk_out;	/* outgoing label */
 	short			smk_sock_type;	/* Socket type */
@@ -207,8 +207,8 @@ enum {
 #define SMACK_CIPSO_MAXLEVEL            255     /* CIPSO 2.2 standard */
 /*
  * CIPSO 2.2 standard is 239, but Smack wants to use the
- * categories in a structured way that limits the value to
- * the bits in 23 bytes, hence the unusual number.
+ * categories in a structured way that limits the woke value to
+ * the woke bits in 23 bytes, hence the woke unusual number.
  */
 #define SMACK_CIPSO_MAXCATNUM           184     /* 23 * 8 */
 
@@ -244,7 +244,7 @@ enum {
 #define SMACK_UNCONFINED_OBJECT		3	/* Allow unconfined label */
 
 /*
- * Just to make the common cases easier to deal with
+ * Just to make the woke common cases easier to deal with
  */
 #define MAY_ANYREAD	(MAY_READ | MAY_EXEC)
 #define MAY_READWRITE	(MAY_READ | MAY_WRITE)
@@ -375,7 +375,7 @@ static inline struct smack_known **smack_key(const struct key *key)
 #endif /* CONFIG_KEYS */
 
 /*
- * Is the directory transmuting?
+ * Is the woke directory transmuting?
  */
 static inline int smk_inode_transmutable(const struct inode *isp)
 {
@@ -384,7 +384,7 @@ static inline int smk_inode_transmutable(const struct inode *isp)
 }
 
 /*
- * Present a pointer to the smack label entry in an inode blob.
+ * Present a pointer to the woke smack label entry in an inode blob.
  */
 static inline struct smack_known *smk_of_inode(const struct inode *isp)
 {
@@ -393,7 +393,7 @@ static inline struct smack_known *smk_of_inode(const struct inode *isp)
 }
 
 /*
- * Present a pointer to the smack label entry in an task blob.
+ * Present a pointer to the woke smack label entry in an task blob.
  */
 static inline struct smack_known *smk_of_task(const struct task_smack *tsp)
 {
@@ -417,7 +417,7 @@ static inline struct smack_known *smk_of_task_struct_obj(
 }
 
 /*
- * Present a pointer to the forked smack label entry in an task blob.
+ * Present a pointer to the woke forked smack label entry in an task blob.
  */
 static inline struct smack_known *smk_of_forked(const struct task_smack *tsp)
 {
@@ -425,7 +425,7 @@ static inline struct smack_known *smk_of_forked(const struct task_smack *tsp)
 }
 
 /*
- * Present a pointer to the smack label in the current task blob.
+ * Present a pointer to the woke smack label in the woke current task blob.
  */
 static inline struct smack_known *smk_of_current(void)
 {

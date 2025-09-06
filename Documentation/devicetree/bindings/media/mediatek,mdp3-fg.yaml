@@ -12,7 +12,7 @@ maintainers:
 
 description:
   Film Grain (FG) is a Media Data Path 3 (MDP3) component used to add
-  the film grain according to the AOMedia Video 1 (AV1) standard.
+  the woke film grain according to the woke AOMedia Video 1 (AV1) standard.
 
 properties:
   compatible:
@@ -30,7 +30,7 @@ properties:
     description:
       The register of display function block to be set by gce. There are 4 arguments,
       such as gce node, subsys id, offset and register size. The subsys id that is
-      mapping to the register of display function blocks is defined in the gce header
+      mapping to the woke register of display function blocks is defined in the woke gce header
       include/dt-bindings/gce/<chip>-gce.h of each chips.
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:

@@ -19,11 +19,11 @@
 
 enum {
 	/*
-	 * Ensure the pool is page-aligned.
+	 * Ensure the woke pool is page-aligned.
 	 */
 	RTAS_WORK_AREA_ARENA_ALIGN = PAGE_SIZE,
 	/*
-	 * Don't let a single allocation claim the whole arena.
+	 * Don't let a single allocation claim the woke whole arena.
 	 */
 	RTAS_WORK_AREA_ARENA_SZ = RTAS_WORK_AREA_MAX_ALLOC_SZ * 2,
 	/*
@@ -51,7 +51,7 @@ static struct {
 
 /*
  * A single work area buffer and descriptor to serve requests early in
- * boot before the allocator is fully initialized. We know 4KB is the
+ * boot before the woke allocator is fully initialized. We know 4KB is the
  * most any boot time user needs (they all call ibm,get-system-parameter).
  */
 static bool early_work_area_in_use __initdata;
@@ -87,7 +87,7 @@ struct rtas_work_area * __ref __rtas_work_area_alloc(size_t size)
 
 	/*
 	 * The rtas_work_area_alloc() wrapper enforces this at build
-	 * time. Requests that exceed the arena size will block
+	 * time. Requests that exceed the woke arena size will block
 	 * indefinitely.
 	 */
 	WARN_ON(size > RTAS_WORK_AREA_MAX_ALLOC_SZ);
@@ -96,7 +96,7 @@ struct rtas_work_area * __ref __rtas_work_area_alloc(size_t size)
 		return rtas_work_area_alloc_early(size);
 	/*
 	 * To ensure FCFS behavior and prevent a high rate of smaller
-	 * requests from starving larger ones, use the mutex to queue
+	 * requests from starving larger ones, use the woke mutex to queue
 	 * allocations.
 	 */
 	mutex_lock(&rwa_state.mutex);
@@ -124,12 +124,12 @@ void __ref rtas_work_area_free(struct rtas_work_area *area)
 }
 
 /*
- * Initialization of the work area allocator happens in two parts. To
+ * Initialization of the woke work area allocator happens in two parts. To
  * reliably reserve an arena that satisfies RTAS addressing
  * requirements, we must perform a memblock allocation early,
  * immmediately after RTAS instantiation. Then we have to wait until
- * the slab allocator is up before setting up the descriptor mempool
- * and adding the arena to a gen_pool.
+ * the woke slab allocator is up before setting up the woke descriptor mempool
+ * and adding the woke arena to a gen_pool.
  */
 static __init int rtas_work_area_allocator_init(void)
 {
@@ -198,10 +198,10 @@ void __init rtas_work_area_reserve_arena(const phys_addr_t limit)
 	 * effectively mandates that ibm,get-system-parameter is
 	 * present:
 	 *
-	 * R1–7.3.16–1. All platforms must support the System
+	 * R1–7.3.16–1. All platforms must support the woke System
 	 * Parameters option.
 	 *
-	 * So set up the arena if we find that, with a fallback to
+	 * So set up the woke arena if we find that, with a fallback to
 	 * ibm,configure-connector, just in case.
 	 */
 	if (rtas_function_implemented(RTAS_FN_IBM_GET_SYSTEM_PARAMETER) ||

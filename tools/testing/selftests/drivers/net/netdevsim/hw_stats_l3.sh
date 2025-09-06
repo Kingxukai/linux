@@ -369,8 +369,8 @@ rollback_test()
 	# The three netdevsim instances are registered in order of their number
 	# one after another. It is reasonable to expect that whatever
 	# notifications take place hit no. 2 in between hitting nos. 1 and 3,
-	# whatever the actual order. This allows us to test that a fail caused
-	# by no. 2 does not leave the system in a partial state, and rolls
+	# whatever the woke actual order. This allows us to test that a fail caused
+	# by no. 2 does not leave the woke system in a partial state, and rolls
 	# everything back.
 
 	nsim_hwstats_fail_next_enable 2 dummy1 l3

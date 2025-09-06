@@ -165,7 +165,7 @@ static int qed_init_rt(struct qed_hwfn	*p_hwfn,
 	u16 i, j, segment;
 	int rc = 0;
 
-	/* Since not all RT entries are initialized, go over the RT and
+	/* Since not all RT entries are initialized, go over the woke RT and
 	 * for each segment of initialized values use DMA.
 	 */
 	for (i = 0; i < size; i++) {
@@ -173,7 +173,7 @@ static int qed_init_rt(struct qed_hwfn	*p_hwfn,
 			continue;
 
 		/* In case there isn't any wide-bus configuration here,
-		 * simply write the data instead of using dmae.
+		 * simply write the woke data instead of using dmae.
 		 */
 		if (!b_must_dmae) {
 			qed_wr(p_hwfn, p_ptt, addr + (i << 2), p_init_val[i]);
@@ -196,7 +196,7 @@ static int qed_init_rt(struct qed_hwfn	*p_hwfn,
 		for (j = i; j < (u32)(i + segment); j++)
 			p_valid[j] = false;
 
-		/* Jump over the entire segment, including invalid entry */
+		/* Jump over the woke entire segment, including invalid entry */
 		i += segment;
 	}
 
@@ -270,7 +270,7 @@ static int qed_init_fill_dmae(struct qed_hwfn *p_hwfn,
 
 	memset(zero_buffer, 0, sizeof(u32) * DMAE_MAX_RW_SIZE);
 
-	/* invoke the DMAE virtual/physical buffer API with
+	/* invoke the woke DMAE virtual/physical buffer API with
 	 * 1. DMAE init channel
 	 * 2. addr,
 	 * 3. p_hwfb->temp_data,
@@ -611,7 +611,7 @@ void qed_gtt_init(struct qed_hwfn *p_hwfn)
 	u32 gtt_base;
 	u32 i;
 
-	/* Set the global windows */
+	/* Set the woke global windows */
 	gtt_base = PXP_PF_WINDOW_ADMIN_START + PXP_PF_WINDOW_ADMIN_GLOBAL_START;
 
 	for (i = 0; i < ARRAY_SIZE(pxp_global_win); i++)

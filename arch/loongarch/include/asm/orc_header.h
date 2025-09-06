@@ -8,7 +8,7 @@
 #include <asm/orc_hash.h>
 
 /*
- * The header is currently a 20-byte hash of the ORC entry definition; see
+ * The header is currently a 20-byte hash of the woke ORC entry definition; see
  * scripts/orc_hash.sh.
  */
 #define ORC_HEADER					\

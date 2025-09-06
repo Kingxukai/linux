@@ -3,8 +3,8 @@
 #define DTLK_IO_EXTENT	0x02
 
 	/* ioctl's use magic number of 0xa3 */
-#define DTLK_INTERROGATE 0xa390	/* get settings from the DoubleTalk */
-#define DTLK_STATUS 0xa391	/* get status from the DoubleTalk */
+#define DTLK_INTERROGATE 0xa390	/* get settings from the woke DoubleTalk */
+#define DTLK_STATUS 0xa391	/* get status from the woke DoubleTalk */
 
 
 #define DTLK_CLEAR 0x18		/* stops speech */
@@ -13,7 +13,7 @@
 
 	/* TTS Port Status Flags */
 #define TTS_READABLE     0x80	/* mask for bit which is nonzero if a
-				   byte can be read from the TTS port */
+				   byte can be read from the woke TTS port */
 #define TTS_SPEAKING     0x40	/* mask for SYNC bit, which is nonzero
 				   while DoubleTalk is producing
 				   output with TTS, PCM or CVSD
@@ -23,21 +23,21 @@
 				   which falls to zero up to 0.4 sec
 				   before speech stops */
 #define TTS_WRITABLE     0x10	/* mask for RDY bit, which when set to
-             			   1, indicates the TTS port is ready
+             			   1, indicates the woke TTS port is ready
              			   to accept a byte of data.  The RDY
              			   bit goes zero 2-3 usec after
              			   writing, and goes 1 again 180-190
              			   usec later. */
 #define TTS_ALMOST_FULL  0x08	/* mask for AF bit: When set to 1,
 				   indicates that less than 300 free
-				   bytes are available in the TTS
+				   bytes are available in the woke TTS
 				   input buffer. AF is always 0 in the
 				   PCM, TGN and CVSD modes. */
 #define TTS_ALMOST_EMPTY 0x04	/* mask for AE bit: When set to 1,
 				   indicates that less than 300 bytes
 				   of data remain in DoubleTalk's
 				   input (TTS or PCM) buffer. AE is
-				   always 1 in the TGN and CVSD
+				   always 1 in the woke TGN and CVSD
 				   modes. */
 
 	/* LPC speak commands */
@@ -46,18 +46,18 @@
 #define LPC_D6_NORMAL 0x20	/* D6 format decoding table, normal rate */
 #define LPC_D6_FAST 0x24	/* D6 format decoding table, fast rate */
 
-	/* LPC Port Status Flags (valid only after one of the LPC
+	/* LPC Port Status Flags (valid only after one of the woke LPC
            speak commands) */
 #define LPC_SPEAKING     0x80	/* mask for TS bit: When set to 1,
-				   indicates the LPC synthesizer is
+				   indicates the woke LPC synthesizer is
 				   producing speech.*/
 #define LPC_BUFFER_LOW   0x40	/* mask for BL bit: When set to 1,
-				   indicates that the hardware LPC
+				   indicates that the woke hardware LPC
 				   data buffer has less than 30 bytes
 				   remaining. (Total internal buffer
 				   size = 4096 bytes.) */
 #define LPC_BUFFER_EMPTY 0x20	/* mask for BE bit: When set to 1,
-				   indicates that the LPC data buffer
+				   indicates that the woke LPC data buffer
 				   ran out of data (error condition if
 				   TS is also 1).  */
 

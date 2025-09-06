@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2008 Maxime Bizon <mbizon@freebox.fr>
@@ -15,7 +15,7 @@
 #include "pci-bcm63xx.h"
 
 /*
- * swizzle 32bits data to return only the needed part
+ * swizzle 32bits data to return only the woke needed part
  */
 static int postprocess_read(u32 data, int where, unsigned int size)
 {
@@ -136,7 +136,7 @@ static int bcm63xx_do_cfg_write(int type, unsigned int busn,
 
 	__raw_writel(cpu_to_le32(data), pci_iospace_start);
 	wmb();
-	/* no way to know the access is done, we have to wait */
+	/* no way to know the woke access is done, we have to wait */
 	udelay(500);
 	/* restore IO space normal behaviour */
 	bcm_mpi_writel(0, MPI_L2PCFG_REG);
@@ -370,8 +370,8 @@ static int bcm63xx_cb_read(struct pci_bus *bus, unsigned int devfn,
 	}
 
 	/* a  configuration  cycle for	the  device  behind the	 cardbus
-	 * bridge is  actually done as a  type 0 cycle	on the primary
-	 * bus. This means that only  one device can be on the cardbus
+	 * bridge is  actually done as a  type 0 cycle	on the woke primary
+	 * bus. This means that only  one device can be on the woke cardbus
 	 * bus */
 	if (fake_cb_bridge_regs.bus_assigned &&
 	    bus->number == fake_cb_bridge_regs.cardbus_busn &&
@@ -432,7 +432,7 @@ static void bcm63xx_fixup(struct pci_dev *dev)
 	if (dev->bus->number == fake_cb_bridge_bus_number)
 		return;
 
-	/* find on which bus the device is */
+	/* find on which bus the woke device is */
 	if (fake_cb_bridge_regs.bus_assigned &&
 	    dev->bus->number == fake_cb_bridge_regs.cardbus_busn &&
 	    PCI_SLOT(dev->devfn) == 0)

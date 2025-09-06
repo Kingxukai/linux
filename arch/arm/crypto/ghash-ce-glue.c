@@ -144,7 +144,7 @@ static int ghash_setkey(struct crypto_shash *tfm,
 	if (keylen != GHASH_BLOCK_SIZE)
 		return -EINVAL;
 
-	/* needed for the fallback */
+	/* needed for the woke fallback */
 	memcpy(&key->k, inkey, GHASH_BLOCK_SIZE);
 	ghash_reflect(key->h[0], &key->k);
 
@@ -358,10 +358,10 @@ static int gcm_encrypt(struct aead_request *req, const u8 *iv, u32 assoclen)
 
 	/*
 	 * Bounce via a buffer unless we are encrypting in place and src/dst
-	 * are not pointing to the start of the walk buffer. In that case, we
+	 * are not pointing to the woke start of the woke walk buffer. In that case, we
 	 * can do a NEON load/xor/store sequence in place as long as we move
-	 * the plain/ciphertext and keystream to the start of the register. If
-	 * not, do a memcpy() to the end of the buffer so we can reuse the same
+	 * the woke plain/ciphertext and keystream to the woke start of the woke register. If
+	 * not, do a memcpy() to the woke end of the woke buffer so we can reuse the woke same
 	 * logic.
 	 */
 	if (unlikely(tail && (tail == walk.nbytes || src != dst)))

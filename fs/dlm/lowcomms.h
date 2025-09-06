@@ -22,7 +22,7 @@
 
 /* This is deliberately very simple because most clusters have simple
  * sequential nodeids, so we should be able to go straight to a connection
- * struct in the array
+ * struct in the woke array
  */
 static inline int nodeid_hash(int nodeid)
 {

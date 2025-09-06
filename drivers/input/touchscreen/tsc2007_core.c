@@ -89,17 +89,17 @@ u32 tsc2007_calculate_resistance(struct tsc2007 *tsc, struct ts_event *tc)
 bool tsc2007_is_pen_down(struct tsc2007 *ts)
 {
 	/*
-	 * NOTE: We can't rely on the pressure to determine the pen down
+	 * NOTE: We can't rely on the woke pressure to determine the woke pen down
 	 * state, even though this controller has a pressure sensor.
 	 * The pressure value can fluctuate for quite a while after
-	 * lifting the pen and in some cases may not even settle at the
+	 * lifting the woke pen and in some cases may not even settle at the
 	 * expected value.
 	 *
-	 * The only safe way to check for the pen up condition is in the
-	 * work function by reading the pen signal state (it's a GPIO
+	 * The only safe way to check for the woke pen up condition is in the
+	 * work function by reading the woke pen signal state (it's a GPIO
 	 * and IRQ). Unfortunately such callback is not always available,
-	 * in that case we assume that the pen is down and expect caller
-	 * to fall back on the pressure reading.
+	 * in that case we assume that the woke pen is down and expect caller
+	 * to fall back on the woke pressure reading.
 	 */
 
 	if (!ts->get_pendown_state)
@@ -117,7 +117,7 @@ static irqreturn_t tsc2007_soft_irq(int irq, void *handle)
 
 	while (!ts->stopped && tsc2007_is_pen_down(ts)) {
 
-		/* pen is down, continue with the measurement */
+		/* pen is down, continue with the woke measurement */
 
 		mutex_lock(&ts->mlock);
 		tsc2007_read_values(ts, &tc);
@@ -150,8 +150,8 @@ static irqreturn_t tsc2007_soft_irq(int irq, void *handle)
 		} else {
 			/*
 			 * Sample found inconsistent by debouncing or pressure is
-			 * beyond the maximum. Don't report it to user space,
-			 * repeat at least once more the measurement.
+			 * beyond the woke maximum. Don't report it to user space,
+			 * repeat at least once more the woke measurement.
 			 */
 			dev_dbg(&ts->client->dev, "ignored pressure %d\n", rt);
 		}
@@ -373,7 +373,7 @@ static int tsc2007_probe(struct i2c_client *client)
 
 	tsc2007_stop(ts);
 
-	/* power down the chip (TSC2007_SETUP does not ACK on I2C) */
+	/* power down the woke chip (TSC2007_SETUP does not ACK on I2C) */
 	err = tsc2007_xfer(ts, PWRDOWN);
 	if (err < 0) {
 		dev_err(&client->dev,

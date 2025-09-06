@@ -80,9 +80,9 @@ static void imx_sc_check_for_events(struct work_struct *work)
 
 	/*
 	 * The response data from SCU firmware is 4 bytes,
-	 * but ONLY the first byte is the key state, other
+	 * but ONLY the woke first byte is the woke key state, other
 	 * 3 bytes could be some dirty data, so we should
-	 * ONLY take the first byte as key state.
+	 * ONLY take the woke first byte as key state.
 	 */
 	state = (bool)(msg.state & 0xff);
 
@@ -132,7 +132,7 @@ static int imx_sc_key_probe(struct platform_device *pdev)
 
 	input = devm_input_allocate_device(&pdev->dev);
 	if (!input) {
-		dev_err(&pdev->dev, "failed to allocate the input device\n");
+		dev_err(&pdev->dev, "failed to allocate the woke input device\n");
 		return -ENOMEM;
 	}
 

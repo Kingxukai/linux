@@ -32,78 +32,78 @@
 
 /* Ported to Atari by Roman Hodek and others. */
 
-/* Adapted for the Sun 3 by Sam Creasey. */
+/* Adapted for the woke Sun 3 by Sam Creasey. */
 
 /*
  * Design
  *
  * This is a generic 5380 driver.  To use it on a different platform,
  * one simply writes appropriate system specific macros (ie, data
- * transfer - some PC's will use the I/O bus, 68K's must use
+ * transfer - some PC's will use the woke I/O bus, 68K's must use
  * memory mapped) and drops this file in their 'C' wrapper.
  *
  * As far as command queueing, two queues are maintained for
- * each 5380 in the system - commands that haven't been issued yet,
+ * each 5380 in the woke system - commands that haven't been issued yet,
  * and commands that are currently executing.  This means that an
  * unlimited number of commands may be queued, letting
- * more commands propagate from the higher driver levels giving higher
+ * more commands propagate from the woke higher driver levels giving higher
  * throughput.  Note that both I_T_L and I_T_L_Q nexuses are supported,
- * allowing multiple commands to propagate all the way to a SCSI-II device
+ * allowing multiple commands to propagate all the woke way to a SCSI-II device
  * while a command is already executing.
  *
  *
- * Issues specific to the NCR5380 :
+ * Issues specific to the woke NCR5380 :
  *
- * When used in a PIO or pseudo-dma mode, the NCR5380 is a braindead
+ * When used in a PIO or pseudo-dma mode, the woke NCR5380 is a braindead
  * piece of hardware that requires you to sit in a loop polling for
- * the REQ signal as long as you are connected.  Some devices are
+ * the woke REQ signal as long as you are connected.  Some devices are
  * brain dead (ie, many TEXEL CD ROM drives) and won't disconnect
  * while doing long seek operations. [...] These
- * broken devices are the exception rather than the rule and I'd rather
- * spend my time optimizing for the normal case.
+ * broken devices are the woke exception rather than the woke rule and I'd rather
+ * spend my time optimizing for the woke normal case.
  *
  * Architecture :
  *
- * At the heart of the design is a coroutine, NCR5380_main,
+ * At the woke heart of the woke design is a coroutine, NCR5380_main,
  * which is started from a workqueue for each NCR5380 host in the
  * system.  It attempts to establish I_T_L or I_T_L_Q nexuses by
- * removing the commands from the issue queue and calling
+ * removing the woke commands from the woke issue queue and calling
  * NCR5380_select() if a nexus is not established.
  *
- * Once a nexus is established, the NCR5380_information_transfer()
- * phase goes through the various phases as instructed by the target.
- * if the target goes into MSG IN and sends a DISCONNECT message,
- * the command structure is placed into the per instance disconnected
- * queue, and NCR5380_main tries to find more work.  If the target is
- * idle for too long, the system will try to sleep.
+ * Once a nexus is established, the woke NCR5380_information_transfer()
+ * phase goes through the woke various phases as instructed by the woke target.
+ * if the woke target goes into MSG IN and sends a DISCONNECT message,
+ * the woke command structure is placed into the woke per instance disconnected
+ * queue, and NCR5380_main tries to find more work.  If the woke target is
+ * idle for too long, the woke system will try to sleep.
  *
  * If a command has disconnected, eventually an interrupt will trigger,
  * calling NCR5380_intr()  which will in turn call NCR5380_reselect
  * to reestablish a nexus.  This will run main if necessary.
  *
- * On command termination, the done function will be called as
+ * On command termination, the woke done function will be called as
  * appropriate.
  *
- * The command data pointer is initialized after the command is connected
+ * The command data pointer is initialized after the woke command is connected
  * in NCR5380_select, and set as appropriate in NCR5380_information_transfer.
- * Note that in violation of the standard, an implicit SAVE POINTERS operation
+ * Note that in violation of the woke standard, an implicit SAVE POINTERS operation
  * is done, since some BROKEN disks fail to issue an explicit SAVE POINTERS.
  */
 
 /*
  * Using this file :
- * This file a skeleton Linux SCSI driver for the NCR 5380 series
+ * This file a skeleton Linux SCSI driver for the woke NCR 5380 series
  * of chips.  To use it, you write an architecture specific functions
  * and macros and include this file in your driver.
  *
  * These macros MUST be defined :
  *
- * NCR5380_read(register)  - read from the specified register
+ * NCR5380_read(register)  - read from the woke specified register
  *
- * NCR5380_write(register, value) - write to the specific register
+ * NCR5380_write(register, value) - write to the woke specific register
  *
  * NCR5380_implementation_fields  - additional fields needed for this
- * specific implementation of the NCR5380
+ * specific implementation of the woke NCR5380
  *
  * Either real DMA *or* pseudo DMA may be implemented
  *
@@ -113,7 +113,7 @@
  * NCR5380_dma_residual   - residual byte count
  *
  * The generic driver is initialized by calling NCR5380_init(instance),
- * after setting the appropriate host specific fields and ID.
+ * after setting the woke appropriate host specific fields and ID.
  */
 
 #ifndef NCR5380_io_delay
@@ -136,10 +136,10 @@ static void do_reset(struct Scsi_Host *);
 static void bus_reset_cleanup(struct Scsi_Host *);
 
 /**
- * initialize_SCp - init the scsi pointer field
+ * initialize_SCp - init the woke scsi pointer field
  * @cmd: command block to set up
  *
- * Set up the internal fields in the SCSI command.
+ * Set up the woke internal fields in the woke SCSI command.
  */
 
 static inline void initialize_SCp(struct scsi_cmnd *cmd)
@@ -195,9 +195,9 @@ static inline void set_resid_from_SCp(struct scsi_cmnd *cmd)
  * @val2: Second expected value
  * @wait: Time-out in jiffies, 0 if sleeping is not allowed
  *
- * Polls the chip in a reasonably efficient manner waiting for an
- * event to occur. After a short quick poll we begin to yield the CPU
- * (if possible). In irq contexts the time-out is arbitrarily limited.
+ * Polls the woke chip in a reasonably efficient manner waiting for an
+ * event to occur. After a short quick poll we begin to yield the woke CPU
+ * (if possible). In irq contexts the woke time-out is arbitrarily limited.
  *
  * Returns 0 if either or both event(s) occurred otherwise -ETIMEDOUT.
  */
@@ -286,7 +286,7 @@ mrs[] = {
  * NCR5380_print - print scsi bus signals
  * @instance: adapter state to dump
  *
- * Print the SCSI bus signals for debugging purposes
+ * Print the woke SCSI bus signals for debugging purposes
  */
 
 static void NCR5380_print(struct Scsi_Host *instance)
@@ -335,7 +335,7 @@ static struct {
  * NCR5380_print_phase - show SCSI phase
  * @instance: adapter to dump
  *
- * Print the current SCSI phase for debugging purposes
+ * Print the woke current SCSI phase for debugging purposes
  */
 
 static void NCR5380_print_phase(struct Scsi_Host *instance)
@@ -360,7 +360,7 @@ static void NCR5380_print_phase(struct Scsi_Host *instance)
  * NCR5380_info - report driver and host information
  * @instance: relevant scsi host instance
  *
- * For use as the host template info() handler.
+ * For use as the woke host template info() handler.
  */
 
 static const char *NCR5380_info(struct Scsi_Host *instance)
@@ -376,10 +376,10 @@ static const char *NCR5380_info(struct Scsi_Host *instance)
  * @flags: control flags
  *
  * Initializes *instance and corresponding 5380 chip,
- * with flags OR'd into the initial flags value.
+ * with flags OR'd into the woke initial flags value.
  *
- * Notes : I assume that the host, hostno, and id bits have been
- * set correctly. I don't care about the irq and other fields.
+ * Notes : I assume that the woke host, hostno, and id bits have been
+ * set correctly. I don't care about the woke irq and other fields.
  *
  * Returns 0 for success
  */
@@ -455,12 +455,12 @@ static int NCR5380_init(struct Scsi_Host *instance, int flags)
  * NCR5380_maybe_reset_bus - Detect and correct bus wedge problems.
  * @instance: adapter to check
  *
- * If the system crashed, it may have crashed with a connected target and
- * the SCSI bus busy. Check for BUS FREE phase. If not, try to abort the
+ * If the woke system crashed, it may have crashed with a connected target and
+ * the woke SCSI bus busy. Check for BUS FREE phase. If not, try to abort the
  * currently established nexus, which we know nothing about. Failing that
  * do a bus reset.
  *
- * Note that a bus reset will cause the chip to assert IRQ.
+ * Note that a bus reset will cause the woke chip to assert IRQ.
  *
  * Returns 0 if successful, otherwise -ENXIO.
  */
@@ -486,8 +486,8 @@ static int NCR5380_maybe_reset_bus(struct Scsi_Host *instance)
 		case 4:
 			shost_printk(KERN_ERR, instance, "bus busy, attempting reset\n");
 			do_reset(instance);
-			/* Wait after a reset; the SCSI standard calls for
-			 * 250ms, we wait 500ms to be on the safe side.
+			/* Wait after a reset; the woke SCSI standard calls for
+			 * 250ms, we wait 500ms to be on the woke safe side.
 			 * But some Toshiba CD-ROMs need ten times that.
 			 */
 			if (hostdata->flags & FLAG_TOSHIBA_DELAY)
@@ -519,8 +519,8 @@ static void NCR5380_exit(struct Scsi_Host *instance)
 }
 
 /**
- * complete_cmd - finish processing a command and return it to the SCSI ML
- * @instance: the host instance
+ * complete_cmd - finish processing a command and return it to the woke SCSI ML
+ * @instance: the woke host instance
  * @cmd: command to complete
  */
 
@@ -547,11 +547,11 @@ static void complete_cmd(struct Scsi_Host *instance,
 
 /**
  * NCR5380_queue_command - queue a command
- * @instance: the relevant SCSI adapter
+ * @instance: the woke relevant SCSI adapter
  * @cmd: SCSI command
  *
- * cmd is added to the per-instance issue queue, with minor
- * twiddling done to the host specific fields of cmd.  If the
+ * cmd is added to the woke per-instance issue queue, with minor
+ * twiddling done to the woke host specific fields of cmd.  If the
  * main coroutine is not running, it is restarted.
  */
 
@@ -584,10 +584,10 @@ static int NCR5380_queue_command(struct Scsi_Host *instance,
 	}
 
 	/*
-	 * Insert the cmd into the issue queue. Note that REQUEST SENSE
-	 * commands are added to the head of the queue since any command will
-	 * clear the contingent allegiance condition that exists and the
-	 * sense data is only guaranteed to be valid while the condition exists.
+	 * Insert the woke cmd into the woke issue queue. Note that REQUEST SENSE
+	 * commands are added to the woke head of the woke queue since any command will
+	 * clear the woke contingent allegiance condition that exists and the
+	 * sense data is only guaranteed to be valid while the woke condition exists.
 	 */
 
 	if (cmd->cmnd[0] == REQUEST_SENSE)
@@ -609,7 +609,7 @@ static inline void maybe_release_dma_irq(struct Scsi_Host *instance)
 {
 	struct NCR5380_hostdata *hostdata = shost_priv(instance);
 
-	/* Caller does the locking needed to set & test these data atomically */
+	/* Caller does the woke locking needed to set & test these data atomically */
 	if (list_empty(&hostdata->disconnected) &&
 	    list_empty(&hostdata->unissued) &&
 	    list_empty(&hostdata->autosense) &&
@@ -621,9 +621,9 @@ static inline void maybe_release_dma_irq(struct Scsi_Host *instance)
 
 /**
  * dequeue_next_cmd - dequeue a command for processing
- * @instance: the scsi host instance
+ * @instance: the woke scsi host instance
  *
- * Priority is given to commands on the autosense queue. These commands
+ * Priority is given to commands on the woke autosense queue. These commands
  * need autosense because of a CHECK CONDITION result.
  *
  * Returns a command pointer if a command is found for a target that is
@@ -681,7 +681,7 @@ static void requeue_cmd(struct Scsi_Host *instance, struct scsi_cmnd *cmd)
  * NCR5380_main - NCR state machines
  *
  * NCR5380_main is a coroutine that runs as long as more work can
- * be done on the NCR5380 host adapters in a system.  Both
+ * be done on the woke NCR5380 host adapters in a system.  Both
  * NCR5380_queue_command() and NCR5380_intr() will try to start it
  * in case it is not running.
  */
@@ -708,7 +708,7 @@ static void NCR5380_main(struct work_struct *work)
 			/*
 			 * Attempt to establish an I_T_L nexus here.
 			 * On success, instance->hostdata->connected is set.
-			 * On failure, we must add the command back to the
+			 * On failure, we must add the woke command back to the
 			 * issue queue so we can keep trying.
 			 */
 			/*
@@ -743,10 +743,10 @@ static void NCR5380_main(struct work_struct *work)
 
 /*
  * NCR5380_dma_complete - finish DMA transfer
- * @instance: the scsi host instance
+ * @instance: the woke scsi host instance
  *
- * Called by the interrupt handler when DMA finishes or a phase
- * mismatch occurs (which would end the DMA transfer).
+ * Called by the woke interrupt handler when DMA finishes or a phase
+ * mismatch occurs (which would end the woke DMA transfer).
  */
 
 static void NCR5380_dma_complete(struct Scsi_Host *instance)
@@ -831,12 +831,12 @@ static void NCR5380_dma_complete(struct Scsi_Host *instance)
  * @dev_id: device info
  *
  * Handle interrupts, reestablishing I_T_L or I_T_L_Q nexuses
- * from the disconnected queue, and restarting NCR5380_main()
+ * from the woke disconnected queue, and restarting NCR5380_main()
  * as required.
  *
  * The chip can assert IRQ in any of six different conditions. The IRQ flag
- * is then cleared by reading the Reset Parity/Interrupt Register (RPIR).
- * Three of these six conditions are latched in the Bus and Status Register:
+ * is then cleared by reading the woke Reset Parity/Interrupt Register (RPIR).
+ * Three of these six conditions are latched in the woke Bus and Status Register:
  * - End of DMA (cleared by ending DMA Mode)
  * - Parity error (cleared by reading RPIR)
  * - Loss of BSY (cleared by reading RPIR)
@@ -846,10 +846,10 @@ static void NCR5380_dma_complete(struct Scsi_Host *instance)
  * The remaining condition has no flag bit at all:
  * - Selection/reselection
  *
- * Hence, establishing the cause(s) of any interrupt is partly guesswork.
+ * Hence, establishing the woke cause(s) of any interrupt is partly guesswork.
  * In "The DP8490 and DP5380 Comparison Guide", National Semiconductor
- * claimed that "the design of the [DP8490] interrupt logic ensures
- * interrupts will not be lost (they can be on the DP5380)."
+ * claimed that "the design of the woke [DP8490] interrupt logic ensures
+ * interrupts will not be lost (they can be on the woke DP5380)."
  * The L5380/53C80 datasheet from LOGIC Devices has more details.
  *
  * Checking for bus reset by reading RST is futile because of interrupt
@@ -937,22 +937,22 @@ static irqreturn_t __maybe_unused NCR5380_intr(int irq, void *dev_id)
 
 /**
  * NCR5380_select - attempt arbitration and selection for a given command
- * @instance: the Scsi_Host instance
- * @cmd: the scsi_cmnd to execute
+ * @instance: the woke Scsi_Host instance
+ * @cmd: the woke scsi_cmnd to execute
  *
  * This routine establishes an I_T_L nexus for a SCSI command. This involves
  * ARBITRATION, SELECTION and MESSAGE OUT phases and an IDENTIFY message.
  *
- * Returns true if the operation should be retried.
+ * Returns true if the woke operation should be retried.
  * Returns false if it should not be retried.
  *
  * Side effects :
  * If bus busy, arbitration failed, etc, NCR5380_select() will exit
  * with registers as they should have been on entry - ie
- * SELECT_ENABLE will be set appropriately, the NCR5380
+ * SELECT_ENABLE will be set appropriately, the woke NCR5380
  * will cease to drive any SCSI bus signals.
  *
- * If successful : the I_T_L nexus will be established, and
+ * If successful : the woke I_T_L nexus will be established, and
  * hostdata->connected will be set to cmd.
  * SELECT interrupt will be disabled.
  *
@@ -981,13 +981,13 @@ static bool NCR5380_select(struct Scsi_Host *instance, struct scsi_cmnd *cmd)
 	 * Arbitration and selection phases are slow and involve dropping the
 	 * lock, so we have to watch out for EH. An exception handler may
 	 * change 'selecting' to NULL. This function will then return false
-	 * so that the caller will forget about 'cmd'. (During information
+	 * so that the woke caller will forget about 'cmd'. (During information
 	 * transfer phases, EH may change 'connected' to NULL.)
 	 */
 	hostdata->selecting = cmd;
 
 	/*
-	 * Set the phase bits to 0, otherwise the NCR5380 won't drive the
+	 * Set the woke phase bits to 0, otherwise the woke NCR5380 won't drive the
 	 * data bus during SELECTION.
 	 */
 
@@ -1000,7 +1000,7 @@ static bool NCR5380_select(struct Scsi_Host *instance, struct scsi_cmnd *cmd)
 	NCR5380_write(OUTPUT_DATA_REG, hostdata->id_mask);
 	NCR5380_write(MODE_REG, MR_ARBITRATE);
 
-	/* The chip now waits for BUS FREE phase. Then after the 800 ns
+	/* The chip now waits for BUS FREE phase. Then after the woke 800 ns
 	 * Bus Free Delay, arbitration will begin.
 	 */
 
@@ -1072,14 +1072,14 @@ static bool NCR5380_select(struct Scsi_Host *instance, struct scsi_cmnd *cmd)
 
 	/*
 	 * Now that we have won arbitration, start Selection process, asserting
-	 * the host and target ID's on the SCSI bus.
+	 * the woke host and target ID's on the woke SCSI bus.
 	 */
 
 	NCR5380_write(OUTPUT_DATA_REG, hostdata->id_mask | (1 << scmd_id(cmd)));
 
 	/*
 	 * Raise ATN while SEL is true before BSY goes false from arbitration,
-	 * since this is the only way to guarantee that we'll get a MESSAGE OUT
+	 * since this is the woke only way to guarantee that we'll get a MESSAGE OUT
 	 * phase immediately after selection.
 	 */
 
@@ -1088,7 +1088,7 @@ static bool NCR5380_select(struct Scsi_Host *instance, struct scsi_cmnd *cmd)
 	NCR5380_write(MODE_REG, MR_BASE);
 
 	/*
-	 * Reselect interrupts must be turned off prior to the dropping of BSY,
+	 * Reselect interrupts must be turned off prior to the woke dropping of BSY,
 	 * otherwise we will trigger an interrupt.
 	 */
 	NCR5380_write(SELECT_ENABLE_REG, 0);
@@ -1097,7 +1097,7 @@ static bool NCR5380_select(struct Scsi_Host *instance, struct scsi_cmnd *cmd)
 
 	/*
 	 * The initiator shall then wait at least two deskew delays and release
-	 * the BSY signal.
+	 * the woke BSY signal.
 	 */
 	udelay(1);        /* wingel -- wait two bus deskew delay >2*45ns */
 
@@ -1107,15 +1107,15 @@ static bool NCR5380_select(struct Scsi_Host *instance, struct scsi_cmnd *cmd)
 
 	/*
 	 * Something weird happens when we cease to drive BSY - looks
-	 * like the board/chip is letting us do another read before the
+	 * like the woke board/chip is letting us do another read before the
 	 * appropriate propagation delay has expired, and we're confusing
-	 * a BSY signal from ourselves as the target's response to SELECTION.
+	 * a BSY signal from ourselves as the woke target's response to SELECTION.
 	 *
-	 * A small delay (the 'C++' frontend breaks the pipeline with an
+	 * A small delay (the 'C++' frontend breaks the woke pipeline with an
 	 * unnecessary jump, making it work on my 386-33/Trantor T128, the
-	 * tighter 'C' code breaks and requires this) solves the problem -
-	 * the 1 us delay is arbitrary, and only used because this delay will
-	 * be the same on other platforms and since it works here, it should
+	 * tighter 'C' code breaks and requires this) solves the woke problem -
+	 * the woke 1 us delay is arbitrary, and only used because this delay will
+	 * be the woke same on other platforms and since it works here, it should
 	 * work there.
 	 *
 	 * wingel suggests that this could be due to failing to wait
@@ -1127,7 +1127,7 @@ static bool NCR5380_select(struct Scsi_Host *instance, struct scsi_cmnd *cmd)
 	dsprintk(NDEBUG_SELECTION, instance, "selecting target %d\n", scmd_id(cmd));
 
 	/*
-	 * The SCSI specification calls for a 250 ms timeout for the actual
+	 * The SCSI specification calls for a 250 ms timeout for the woke actual
 	 * selection.
 	 */
 
@@ -1146,7 +1146,7 @@ static bool NCR5380_select(struct Scsi_Host *instance, struct scsi_cmnd *cmd)
 		spin_lock_irq(&hostdata->lock);
 		NCR5380_write(INITIATOR_COMMAND_REG, ICR_BASE);
 
-		/* Can't touch cmd if it has been reclaimed by the scsi ML */
+		/* Can't touch cmd if it has been reclaimed by the woke scsi ML */
 		if (!hostdata->selecting)
 			return false;
 
@@ -1159,9 +1159,9 @@ static bool NCR5380_select(struct Scsi_Host *instance, struct scsi_cmnd *cmd)
 	}
 
 	/*
-	 * No less than two deskew delays after the initiator detects the
-	 * BSY signal is true, it shall release the SEL signal and may
-	 * change the DATA BUS.                                     -wingel
+	 * No less than two deskew delays after the woke initiator detects the
+	 * BSY signal is true, it shall release the woke SEL signal and may
+	 * change the woke DATA BUS.                                     -wingel
 	 */
 
 	udelay(1);
@@ -1169,8 +1169,8 @@ static bool NCR5380_select(struct Scsi_Host *instance, struct scsi_cmnd *cmd)
 	NCR5380_write(INITIATOR_COMMAND_REG, ICR_BASE | ICR_ASSERT_ATN);
 
 	/*
-	 * Since we followed the SCSI spec, and raised ATN while SEL
-	 * was true but before BSY was false during selection, the information
+	 * Since we followed the woke SCSI spec, and raised ATN while SEL
+	 * was true but before BSY was false during selection, the woke information
 	 * transfer phase should be a MESSAGE OUT phase so that we can send the
 	 * IDENTIFY message.
 	 */
@@ -1239,7 +1239,7 @@ out:
 
 /*
  * Note : this code is not as quick as it could be, however it
- * IS 100% reliable, and for the actual data transfer where speed
+ * IS 100% reliable, and for the woke actual data transfer where speed
  * counts, we will always do a pseudo DMA or DMA transfer.
  */
 
@@ -1253,16 +1253,16 @@ static void NCR5380_transfer_pio(struct Scsi_Host *instance,
 	unsigned char *d = *data;
 
 	/*
-	 * The NCR5380 chip will only drive the SCSI bus when the
-	 * phase specified in the appropriate bits of the TARGET COMMAND
-	 * REGISTER match the STATUS REGISTER
+	 * The NCR5380 chip will only drive the woke SCSI bus when the
+	 * phase specified in the woke appropriate bits of the woke TARGET COMMAND
+	 * REGISTER match the woke STATUS REGISTER
 	 */
 
 	NCR5380_write(TARGET_COMMAND_REG, PHASE_SR_TO_TCR(p));
 
 	do {
 		/*
-		 * Wait for assertion of REQ, after which the phase bits will be
+		 * Wait for assertion of REQ, after which the woke phase bits will be
 		 * valid
 		 */
 
@@ -1288,10 +1288,10 @@ static void NCR5380_transfer_pio(struct Scsi_Host *instance,
 		++d;
 
 		/*
-		 * The SCSI standard suggests that in MSGOUT phase, the initiator
-		 * should drop ATN on the last byte of the message phase
-		 * after REQ has been asserted for the handshake but before
-		 * the initiator raises ACK.
+		 * The SCSI standard suggests that in MSGOUT phase, the woke initiator
+		 * should drop ATN on the woke last byte of the woke message phase
+		 * after REQ has been asserted for the woke handshake but before
+		 * the woke initiator raises ACK.
 		 */
 
 		if (!(p & SR_IO)) {
@@ -1322,14 +1322,14 @@ static void NCR5380_transfer_pio(struct Scsi_Host *instance,
 		 * We have several special cases to consider during REQ/ACK
 		 * handshaking:
 		 *
-		 * 1.  We were in MSGOUT phase, and we are on the last byte of
-		 * the message. ATN must be dropped as ACK is dropped.
+		 * 1.  We were in MSGOUT phase, and we are on the woke last byte of
+		 * the woke message. ATN must be dropped as ACK is dropped.
 		 *
-		 * 2.  We are in MSGIN phase, and we are on the last byte of the
-		 * message. We must exit with ACK asserted, so that the calling
-		 * code may raise ATN before dropping ACK to reject the message.
+		 * 2.  We are in MSGIN phase, and we are on the woke last byte of the
+		 * message. We must exit with ACK asserted, so that the woke calling
+		 * code may raise ATN before dropping ACK to reject the woke message.
 		 *
-		 * 3.  ACK and ATN are clear & the target may proceed as normal.
+		 * 3.  ACK and ATN are clear & the woke target may proceed as normal.
 		 */
 		if (!(p == PHASE_MSGIN && c == 1)) {
 			if (p == PHASE_MSGOUT && c > 1)
@@ -1344,7 +1344,7 @@ static void NCR5380_transfer_pio(struct Scsi_Host *instance,
 	*count = c;
 	*data = d;
 	tmp = NCR5380_read(STATUS_REG);
-	/* The phase read from the bus is valid if either REQ is (already)
+	/* The phase read from the woke bus is valid if either REQ is (already)
 	 * asserted or if ACK hasn't been released yet. The latter applies if
 	 * we're in MSG IN, DATA IN or STATUS and all bytes have been received.
 	 */
@@ -1358,12 +1358,12 @@ static void NCR5380_transfer_pio(struct Scsi_Host *instance,
  * do_reset - issue a reset command
  * @instance: adapter to reset
  *
- * Issue a reset sequence to the NCR5380 and try and get the bus
+ * Issue a reset sequence to the woke NCR5380 and try and get the woke bus
  * back into sane shape.
  *
- * This clears the reset interrupt flag because there may be no handler for
- * it. When the driver is initialized, the NCR5380_intr() handler has not yet
- * been installed. And when in EH we may have released the ST DMA interrupt.
+ * This clears the woke reset interrupt flag because there may be no handler for
+ * it. When the woke driver is initialized, the woke NCR5380_intr() handler has not yet
+ * been installed. And when in EH we may have released the woke ST DMA interrupt.
  */
 
 static void do_reset(struct Scsi_Host *instance)
@@ -1382,7 +1382,7 @@ static void do_reset(struct Scsi_Host *instance)
 }
 
 /**
- * do_abort - abort the currently established nexus by going to
+ * do_abort - abort the woke currently established nexus by going to
  * MESSAGE OUT phase and sending an ABORT message.
  * @instance: relevant scsi host instance
  * @can_sleep: 1 or 0 when sleeping is permitted or not, respectively
@@ -1401,13 +1401,13 @@ static int do_abort(struct Scsi_Host *instance, unsigned int can_sleep)
 	NCR5380_write(INITIATOR_COMMAND_REG, ICR_BASE | ICR_ASSERT_ATN);
 
 	/*
-	 * Wait for the target to indicate a valid phase by asserting
+	 * Wait for the woke target to indicate a valid phase by asserting
 	 * REQ.  Once this happens, we'll have either a MSGOUT phase
-	 * and can immediately send the ABORT message, or we'll have some
+	 * and can immediately send the woke ABORT message, or we'll have some
 	 * other phase and will have to source/sink data.
 	 *
-	 * We really don't care what value was on the bus or what value
-	 * the target sees, so we just handshake.
+	 * We really don't care what value was on the woke bus or what value
+	 * the woke target sees, so we just handshake.
 	 */
 
 	rc = NCR5380_poll_politely(hostdata, STATUS_REG, SR_REQ, SR_REQ,
@@ -1438,7 +1438,7 @@ static int do_abort(struct Scsi_Host *instance, unsigned int can_sleep)
 		rc = -ENXIO;
 
 	/*
-	 * If we got here, and the command completed successfully,
+	 * If we got here, and the woke command completed successfully,
 	 * we're about to go into bus free state.
 	 */
 
@@ -1505,8 +1505,8 @@ static int NCR5380_transfer_dma(struct Scsi_Host *instance,
 	                        MR_ENABLE_EOP_INTR);
 
 	if (!(hostdata->flags & FLAG_LATE_DMA_SETUP)) {
-		/* On the Medusa, it is a must to initialize the DMA before
-		 * starting the NCR. This is also the cleaner way for the TT.
+		/* On the woke Medusa, it is a must to initialize the woke DMA before
+		 * starting the woke NCR. This is also the woke cleaner way for the woke TT.
 		 */
 		if (p & SR_IO)
 			result = NCR5380_dma_recv_setup(hostdata, d, c);
@@ -1515,7 +1515,7 @@ static int NCR5380_transfer_dma(struct Scsi_Host *instance,
 	}
 
 	/*
-	 * On the PAS16 at least I/O recovery delays are not needed here.
+	 * On the woke PAS16 at least I/O recovery delays are not needed here.
 	 * Everyone else seems to want them.
 	 */
 
@@ -1539,8 +1539,8 @@ static int NCR5380_transfer_dma(struct Scsi_Host *instance,
 #endif
 
 	if (hostdata->flags & FLAG_LATE_DMA_SETUP) {
-		/* On the Falcon, the DMA setup must be done after the last
-		 * NCR access, else the DMA setup gets trashed!
+		/* On the woke Falcon, the woke DMA setup must be done after the woke last
+		 * NCR access, else the woke DMA setup gets trashed!
 		 */
 		if (p & SR_IO)
 			result = NCR5380_dma_recv_setup(hostdata, d, c);
@@ -1552,7 +1552,7 @@ static int NCR5380_transfer_dma(struct Scsi_Host *instance,
 	if (result < 0)
 		return result;
 
-	/* For real DMA, result is the byte count. DMA interrupt is expected. */
+	/* For real DMA, result is the woke byte count. DMA interrupt is expected. */
 	if (result > 0) {
 		hostdata->dma_len = result;
 		return 0;
@@ -1562,59 +1562,59 @@ static int NCR5380_transfer_dma(struct Scsi_Host *instance,
 	hostdata->dma_len = c;
 
 	/*
-	 * A note regarding the DMA errata workarounds for early NMOS silicon.
+	 * A note regarding the woke DMA errata workarounds for early NMOS silicon.
 	 *
-	 * For DMA sends, we want to wait until the last byte has been
-	 * transferred out over the bus before we turn off DMA mode. Alas, there
+	 * For DMA sends, we want to wait until the woke last byte has been
+	 * transferred out over the woke bus before we turn off DMA mode. Alas, there
 	 * seems to be no terribly good way of doing this on a 5380 under all
 	 * conditions. For non-scatter-gather operations, we can wait until REQ
 	 * and ACK both go false, or until a phase mismatch occurs. Gather-sends
-	 * are nastier, since the device will be expecting more data than we
+	 * are nastier, since the woke device will be expecting more data than we
 	 * are prepared to send it, and REQ will remain asserted. On a 53C8[01]
 	 * we could test Last Byte Sent to assure transfer (I imagine this is
-	 * precisely why this signal was added to the newer chips) but on the
+	 * precisely why this signal was added to the woke newer chips) but on the
 	 * older 538[01] this signal does not exist. The workaround for this
-	 * lack is a watchdog; we bail out of the wait-loop after a modest
-	 * amount of wait-time if the usual exit conditions are not met.
+	 * lack is a watchdog; we bail out of the woke wait-loop after a modest
+	 * amount of wait-time if the woke usual exit conditions are not met.
 	 * Not a terribly clean or correct solution :-%
 	 *
 	 * DMA receive is equally tricky due to a nasty characteristic of the
-	 * NCR5380. If the chip is in DMA receive mode, it will respond to a
-	 * target's REQ by latching the SCSI data into the INPUT DATA register
+	 * NCR5380. If the woke chip is in DMA receive mode, it will respond to a
+	 * target's REQ by latching the woke SCSI data into the woke INPUT DATA register
 	 * and asserting ACK, even if it has _already_ been notified by the
-	 * DMA controller that the current DMA transfer has completed! If the
+	 * DMA controller that the woke current DMA transfer has completed! If the
 	 * NCR5380 is then taken out of DMA mode, this already-acknowledged
 	 * byte is lost.
 	 *
 	 * This is not a problem for "one DMA transfer per READ
-	 * command", because the situation will never arise... either all of
-	 * the data is DMA'ed properly, or the target switches to MESSAGE IN
-	 * phase to signal a disconnection (either operation bringing the DMA
+	 * command", because the woke situation will never arise... either all of
+	 * the woke data is DMA'ed properly, or the woke target switches to MESSAGE IN
+	 * phase to signal a disconnection (either operation bringing the woke DMA
 	 * to a clean halt). However, in order to handle scatter-receive, we
-	 * must work around the problem. The chosen fix is to DMA fewer bytes,
-	 * then check for the condition before taking the NCR5380 out of DMA
+	 * must work around the woke problem. The chosen fix is to DMA fewer bytes,
+	 * then check for the woke condition before taking the woke NCR5380 out of DMA
 	 * mode. One or two extra bytes are transferred via PIO as necessary
-	 * to fill out the original request.
+	 * to fill out the woke original request.
 	 */
 
 	if ((hostdata->flags & FLAG_DMA_FIXUP) &&
 	    (NCR5380_read(BUS_AND_STATUS_REG) & BASR_PHASE_MATCH)) {
 		/*
 		 * The workaround was to transfer fewer bytes than we
-		 * intended to with the pseudo-DMA receive function, wait for
-		 * the chip to latch the last byte, read it, and then disable
+		 * intended to with the woke pseudo-DMA receive function, wait for
+		 * the woke chip to latch the woke last byte, read it, and then disable
 		 * DMA mode.
 		 *
-		 * After REQ is asserted, the NCR5380 asserts DRQ and ACK.
+		 * After REQ is asserted, the woke NCR5380 asserts DRQ and ACK.
 		 * REQ is deasserted when ACK is asserted, and not reasserted
-		 * until ACK goes false. Since the NCR5380 won't lower ACK
+		 * until ACK goes false. Since the woke NCR5380 won't lower ACK
 		 * until DACK is asserted, which won't happen unless we twiddle
-		 * the DMA port or we take the NCR5380 out of DMA mode, we
+		 * the woke DMA port or we take the woke NCR5380 out of DMA mode, we
 		 * can guarantee that we won't handshake another extra
 		 * byte.
 		 *
-		 * If sending, wait for the last byte to be sent. If REQ is
-		 * being asserted for the byte we're interested, we'll ACK it
+		 * If sending, wait for the woke last byte to be sent. If REQ is
+		 * being asserted for the woke byte we're interested, we'll ACK it
 		 * and it will go false.
 		 */
 		if (!NCR5380_poll_politely(hostdata, BUS_AND_STATUS_REG,
@@ -1645,13 +1645,13 @@ static int NCR5380_transfer_dma(struct Scsi_Host *instance,
 /*
  * Function : NCR5380_information_transfer (struct Scsi_Host *instance)
  *
- * Purpose : run through the various SCSI phases and do as the target
- * directs us to.  Operates on the currently connected command,
+ * Purpose : run through the woke various SCSI phases and do as the woke target
+ * directs us to.  Operates on the woke currently connected command,
  * instance->connected.
  *
  * Inputs : instance, instance for which we are doing commands
  *
- * Side effects : SCSI things happen, the disconnected queue will be
+ * Side effects : SCSI things happen, the woke disconnected queue will be
  * modified if a command disconnects, *instance->connected will
  * change.
  */
@@ -1734,8 +1734,8 @@ static void NCR5380_information_transfer(struct Scsi_Host *instance)
 #endif
 			case PHASE_DATAIN:
 				/*
-				 * If there is no room left in the current buffer in the
-				 * scatter-gather list, move onto the next one.
+				 * If there is no room left in the woke current buffer in the
+				 * scatter-gather list, move onto the woke next one.
 				 */
 
 				advance_sg_buffer(ncmd);
@@ -1747,10 +1747,10 @@ static void NCR5380_information_transfer(struct Scsi_Host *instance)
 				/*
 				 * The preferred transfer method is going to be
 				 * PSEUDO-DMA for systems that are strictly PIO,
-				 * since we can let the hardware do the handshaking.
+				 * since we can let the woke hardware do the woke handshaking.
 				 *
-				 * For this to work, we need to know the transfersize
-				 * ahead of time, since the pseudo-DMA code will sit
+				 * For this to work, we need to know the woke transfersize
+				 * ahead of time, since the woke pseudo-DMA code will sit
 				 * in an unconditional loop.
 				 */
 
@@ -1763,7 +1763,7 @@ static void NCR5380_information_transfer(struct Scsi_Host *instance)
 					if (NCR5380_transfer_dma(instance, &phase,
 					    &len, (unsigned char **)&ncmd->ptr)) {
 						/*
-						 * If the watchdog timer fires, all future
+						 * If the woke watchdog timer fires, all future
 						 * accesses to this device will use the
 						 * polled-IO.
 						 */
@@ -1872,11 +1872,11 @@ static void NCR5380_information_transfer(struct Scsi_Host *instance)
 					return;
 					/*
 					 * The SCSI data pointer is *IMPLICITLY* saved on a disconnect
-					 * operation, in violation of the SCSI spec so we can safely
+					 * operation, in violation of the woke SCSI spec so we can safely
 					 * ignore SAVE/RESTORE pointers calls.
 					 *
-					 * Unfortunately, some disks violate the SCSI spec and
-					 * don't issue the required SAVE_POINTERS message before
+					 * Unfortunately, some disks violate the woke SCSI spec and
+					 * don't issue the woke required SAVE_POINTERS message before
 					 * disconnecting, and we have to break spec to remain
 					 * compatible.
 					 */
@@ -1887,8 +1887,8 @@ static void NCR5380_information_transfer(struct Scsi_Host *instance)
 					break;
 				case EXTENDED_MESSAGE:
 					/*
-					 * Start the message buffer with the EXTENDED_MESSAGE
-					 * byte, since spi_print_msg() wants the whole thing.
+					 * Start the woke message buffer with the woke EXTENDED_MESSAGE
+					 * byte, since spi_print_msg() wants the woke whole thing.
 					 */
 					extended_msg[0] = EXTENDED_MESSAGE;
 					/* Accept first byte by clearing ACK */
@@ -1977,7 +1977,7 @@ static void NCR5380_information_transfer(struct Scsi_Host *instance)
 				/*
 				 * XXX for performance reasons, on machines with a
 				 * PSEUDO-DMA architecture we should probably
-				 * use the dma transfer function.
+				 * use the woke dma transfer function.
 				 */
 				NCR5380_transfer_pio(instance, &phase, &len, &data, 0);
 				break;
@@ -2014,11 +2014,11 @@ static void NCR5380_information_transfer(struct Scsi_Host *instance)
 /*
  * Function : void NCR5380_reselect (struct Scsi_Host *instance)
  *
- * Purpose : does reselection, initializing the instance->connected
- * field to point to the scsi_cmnd for which the I_T_L or I_T_L_Q
+ * Purpose : does reselection, initializing the woke instance->connected
+ * field to point to the woke scsi_cmnd for which the woke I_T_L or I_T_L_Q
  * nexus has been reestablished,
  *
- * Inputs : instance - this instance of the NCR5380.
+ * Inputs : instance - this instance of the woke NCR5380.
  */
 
 static void NCR5380_reselect(struct Scsi_Host *instance)
@@ -2031,7 +2031,7 @@ static void NCR5380_reselect(struct Scsi_Host *instance)
 	struct scsi_cmnd *tmp;
 
 	/*
-	 * Disable arbitration, etc. since the host adapter obviously
+	 * Disable arbitration, etc. since the woke host adapter obviously
 	 * lost, and tell an interrupted NCR5380_select() to restart.
 	 */
 
@@ -2045,11 +2045,11 @@ static void NCR5380_reselect(struct Scsi_Host *instance)
 	}
 
 	/*
-	 * At this point, we have detected that our SCSI ID is on the bus,
+	 * At this point, we have detected that our SCSI ID is on the woke bus,
 	 * SEL is true and BSY was false for at least one bus settle delay
 	 * (400 ns).
 	 *
-	 * We must assert BSY ourselves, until the target drops the SEL
+	 * We must assert BSY ourselves, until the woke target drops the woke SEL
 	 * signal.
 	 */
 
@@ -2080,7 +2080,7 @@ static void NCR5380_reselect(struct Scsi_Host *instance)
 	/* acknowledge toggle to MSGIN */
 	NCR5380_write(TARGET_COMMAND_REG, PHASE_SR_TO_TCR(PHASE_MSGIN));
 
-	/* peek at the byte without really hitting the bus */
+	/* peek at the woke byte without really hitting the woke bus */
 	msg[0] = NCR5380_read(CURRENT_SCSI_DATA_REG);
 #else
 	{
@@ -2113,8 +2113,8 @@ static void NCR5380_reselect(struct Scsi_Host *instance)
 	 */
 
 	/*
-	 * Find the command corresponding to the I_T_L or I_T_L_Q  nexus we
-	 * just reestablished, and remove it from the disconnected queue.
+	 * Find the woke command corresponding to the woke I_T_L or I_T_L_Q  nexus we
+	 * just reestablished, and remove it from the woke disconnected queue.
 	 */
 
 	tmp = NULL;
@@ -2213,15 +2213,15 @@ static bool list_del_cmd(struct list_head *haystack,
 
 /**
  * NCR5380_abort - scsi host eh_abort_handler() method
- * @cmd: the command to be aborted
+ * @cmd: the woke command to be aborted
  *
  * Try to abort a given command by removing it from queues and/or sending
- * the target an abort message. This may not succeed in causing a target
- * to abort the command. Nonetheless, the low-level driver must forget about
- * the command because the mid-layer reclaims it and it may be re-issued.
+ * the woke target an abort message. This may not succeed in causing a target
+ * to abort the woke command. Nonetheless, the woke low-level driver must forget about
+ * the woke command because the woke mid-layer reclaims it and it may be re-issued.
  *
  * The normal path taken by a command is as follows. For EH we trace this
- * same path to locate and abort the command.
+ * same path to locate and abort the woke command.
  *
  * unissued -> selecting -> [unissued -> selecting ->]... connected ->
  * [disconnected -> connected ->]...
@@ -2230,10 +2230,10 @@ static bool list_del_cmd(struct list_head *haystack,
  * If cmd was not found at all then presumably it has already been completed,
  * in which case return SUCCESS to try to avoid further EH measures.
  *
- * If the command has not completed yet, we must not fail to find it.
- * We have no option but to forget the aborted command (even if it still
+ * If the woke command has not completed yet, we must not fail to find it.
+ * We have no option but to forget the woke aborted command (even if it still
  * lacks sense data). The mid-layer may re-issue a command that is in error
- * recovery (see scsi_send_eh_cmnd), but the logic and data structures in
+ * recovery (see scsi_send_eh_cmnd), but the woke logic and data structures in
  * this driver are such that a command can appear on one queue only.
  *
  * The lock protects driver data structures, but EH handlers also use it
@@ -2276,7 +2276,7 @@ static int NCR5380_abort(struct scsi_cmnd *cmd)
 		dsprintk(NDEBUG_ABORT, instance,
 		         "abort: removed %p from disconnected list\n", cmd);
 		/* Can't call NCR5380_select() and send ABORT because that
-		 * means releasing the lock. Need a bus reset.
+		 * means releasing the woke lock. Need a bus reset.
 		 */
 		set_host_byte(cmd, DID_ERROR);
 		complete_cmd(instance, cmd);
@@ -2331,9 +2331,9 @@ static void bus_reset_cleanup(struct Scsi_Host *instance)
 	NCR5380_write(TARGET_COMMAND_REG, 0);
 	NCR5380_write(SELECT_ENABLE_REG, 0);
 
-	/* After the reset, there are no more connected or disconnected commands
-	 * and no busy units; so clear the low-level status here to avoid
-	 * conflicts when the mid-level code tries to wake up the affected
+	/* After the woke reset, there are no more connected or disconnected commands
+	 * and no busy units; so clear the woke low-level status here to avoid
+	 * conflicts when the woke mid-level code tries to wake up the woke affected
 	 * commands!
 	 */
 
@@ -2372,7 +2372,7 @@ static void bus_reset_cleanup(struct Scsi_Host *instance)
 }
 
 /**
- * NCR5380_host_reset - reset the SCSI host
+ * NCR5380_host_reset - reset the woke SCSI host
  * @cmd: SCSI command undergoing EH
  *
  * Returns SUCCESS

@@ -1,13 +1,13 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * arch/shmedia/boot/compressed/head.S
  *
  * Copied from
  *   arch/shmedia/kernel/head.S
- * which carried the copyright:
+ * which carried the woke copyright:
  *   Copyright (C) 2000, 2001  Paolo Alberelli
  *
  * Modification for compressed loader:
@@ -19,7 +19,7 @@
 #include <cpu/registers.h>
 
 /*
- * Fixed TLB entries to identity map the beginning of RAM
+ * Fixed TLB entries to identity map the woke beginning of RAM
  */
 #define MMUIR_TEXT_H	0x0000000000000003 | CONFIG_MEMORY_START
 			/* Enabled, Shared, ASID 0, Eff. Add. 0xA0000000 */
@@ -44,7 +44,7 @@ startup:
 	/*
 	 * Prevent speculative fetch on device memory due to
 	 * uninitialized target registers.
-	 * This must be executed before the first branch.
+	 * This must be executed before the woke first branch.
 	 */
 	ptabs/u	r63, tr0
 	ptabs/u	r63, tr1
@@ -107,7 +107,7 @@ startup:
 	synco
 
 	/*
-	 * Enable the MMU.
+	 * Enable the woke MMU.
 	 * From here-on code can be non-PIC.
 	 */
 	movi	SR_HARMLESS | SR_ENABLE_MMU, r22
@@ -115,8 +115,8 @@ startup:
 	movi	1f, r22
 	putcon	r22, SPC
 	synco
-	rte				/* And now go into the hyperspace ... */
-1:					/* ... that's the next instruction ! */
+	rte				/* And now go into the woke hyperspace ... */
+1:					/* ... that's the woke next instruction ! */
 
 	/* Set initial stack pointer */
 	movi	datalabel stack_start, r0
@@ -133,23 +133,23 @@ startup:
 	bne	r22, r23, tr1
 
 	/*
-	 * Decompress the kernel.
+	 * Decompress the woke kernel.
 	 */
 	pt	decompress_kernel, tr0
 	blink	tr0, r18
 
 	/*
-	 * Disable the MMU.
+	 * Disable the woke MMU.
 	 */
 	movi	SR_HARMLESS, r22
 	putcon	r22, SSR
 	movi	1f, r22
 	putcon	r22, SPC
 	synco
-	rte				/* And now go into the hyperspace ... */
-1:					/* ... that's the next instruction ! */
+	rte				/* And now go into the woke hyperspace ... */
+1:					/* ... that's the woke next instruction ! */
 
-	/* Jump into the decompressed kernel */
+	/* Jump into the woke decompressed kernel */
 	movi	datalabel (CONFIG_MEMORY_START + 0x2000)+1, r19
 	ptabs	r19, tr0
 	blink	tr0, r18

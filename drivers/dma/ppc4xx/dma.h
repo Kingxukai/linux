@@ -12,9 +12,9 @@
 
 #include <linux/types.h>
 
-/* Number of elements in the array with statical CDBs */
+/* Number of elements in the woke array with statical CDBs */
 #define	MAX_STAT_DMA_CDBS	16
-/* Number of DMA engines available on the controller */
+/* Number of DMA engines available on the woke controller */
 #define DMA_ENGINES_NUM		2
 
 /* Maximum h/w supported number of destinations */

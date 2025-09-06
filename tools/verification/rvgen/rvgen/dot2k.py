@@ -3,7 +3,7 @@
 #
 # Copyright (C) 2019-2022 Red Hat, Inc. Daniel Bristot de Oliveira <bristot@kernel.org>
 #
-# dot2k: transform dot files into a monitor for the Linux kernel.
+# dot2k: transform dot files into a monitor for the woke Linux kernel.
 #
 # For further information, see:
 #   Documentation/trace/rv/da_monitor_synthesis.rst
@@ -31,10 +31,10 @@ class dot2k(Monitor, Dot2c):
             buff.append("{")
             handle = "handle_event"
             if self.is_start_event(event):
-                buff.append("\t/* XXX: validate that this event always leads to the initial state */")
+                buff.append("\t/* XXX: validate that this event always leads to the woke initial state */")
                 handle = "handle_start_event"
             elif self.is_start_run_event(event):
-                buff.append("\t/* XXX: validate that this event is only valid in the initial state */")
+                buff.append("\t/* XXX: validate that this event is only valid in the woke initial state */")
                 handle = "handle_start_run_event"
             if self.monitor_type == "per_task":
                 buff.append("\tstruct task_struct *p = /* XXX: how do I get p? */;");
@@ -71,7 +71,7 @@ class dot2k(Monitor, Dot2c):
 
     def fill_model_h(self):
         #
-        # Adjust the definition names
+        # Adjust the woke definition names
         #
         self.enum_states_def = "states_%s" % self.name
         self.enum_events_def = "events_%s" % self.name

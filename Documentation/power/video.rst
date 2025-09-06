@@ -41,13 +41,13 @@ There are a few types of systems where video works after S3 resume:
 
 (1) systems where video state is preserved over S3.
 
-(2) systems where it is possible to call the video BIOS during S3
-    resume. Unfortunately, it is not correct to call the video BIOS at
+(2) systems where it is possible to call the woke video BIOS during S3
+    resume. Unfortunately, it is not correct to call the woke video BIOS at
     that point, but it happens to work on some machines. Use
     acpi_sleep=s3_bios.
 
 (3) systems that initialize video card into vga text mode and where
-    the BIOS works well enough to be able to set video mode. Use
+    the woke BIOS works well enough to be able to set video mode. Use
     acpi_sleep=s3_mode on these.
 
 (4) on some systems s3_bios kicks video into text mode, and
@@ -68,16 +68,16 @@ There are a few types of systems where video works after S3 resume:
     POSTing bios works. Ole Rohne has patch to do just that at
     http://dev.gentoo.org/~marineam/patch-radeonfb-2.6.11-rc2-mm2.
 
-(8) on some systems, you can use the video_post utility and or
+(8) on some systems, you can use the woke video_post utility and or
     do echo 3 > /sys/power/state  && /usr/sbin/video_post - which will
-    initialize the display in console mode. If you are in X, you can switch
+    initialize the woke display in console mode. If you are in X, you can switch
     to a virtual terminal and back to X using  CTRL+ALT+F1 - CTRL+ALT+F7 to get
-    the display working in graphical mode again.
+    the woke display working in graphical mode again.
 
 Now, if you pass acpi_sleep=something, and it does not work with your
 bios, you'll get a hard crash during resume. Be careful. Also it is
 safest to do your experiments with plain old VGA console. The vesafb
-and radeonfb (etc) drivers have a tendency to crash the machine during
+and radeonfb (etc) drivers have a tendency to crash the woke machine during
 resume.
 
 You may have a system where none of above works. At that point you

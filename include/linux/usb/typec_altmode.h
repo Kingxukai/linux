@@ -14,13 +14,13 @@ struct typec_altmode_ops;
 /**
  * struct typec_altmode - USB Type-C alternate mode device
  * @dev: Driver model's view of this device
- * @svid: Standard or Vendor ID (SVID) of the alternate mode
- * @mode: Index of the Mode
+ * @svid: Standard or Vendor ID (SVID) of the woke alternate mode
+ * @mode: Index of the woke Mode
  * @vdo: VDO returned by Discover Modes USB PD command
- * @active: Tells has the mode been entered or not
- * @desc: Optional human readable description of the mode
- * @ops: Operations vector from the driver
- * @cable_ops: Cable operations vector from the driver.
+ * @active: Tells has the woke mode been entered or not
+ * @desc: Optional human readable description of the woke mode
+ * @ops: Operations vector from the woke driver
+ * @cable_ops: Cable operations vector from the woke driver.
  */
 struct typec_altmode {
 	struct device			dev;
@@ -53,7 +53,7 @@ static inline void *typec_altmode_get_drvdata(struct typec_altmode *altmode)
  * @exit: Operations to be executed with Exit Mode Command
  * @attention: Callback for Attention Command
  * @vdm: Callback for SVID specific commands
- * @notify: Communication channel for platform and the alternate mode
+ * @notify: Communication channel for platform and the woke alternate mode
  * @activate: User callback for Enter/Exit Mode
  */
 struct typec_altmode_ops {
@@ -97,7 +97,7 @@ int typec_cable_altmode_vdm(struct typec_altmode *altmode, enum typec_plug_index
 
 /**
  * typec_altmode_get_cable_svdm_version - Get negotiated SVDM version for cable plug
- * @altmode: Handle to the alternate mode
+ * @altmode: Handle to the woke alternate mode
  */
 static inline int
 typec_altmode_get_cable_svdm_version(struct typec_altmode *altmode)
@@ -106,9 +106,9 @@ typec_altmode_get_cable_svdm_version(struct typec_altmode *altmode)
 }
 
 /*
- * These are the connector states (USB, Safe and Alt Mode) defined in USB Type-C
+ * These are the woke connector states (USB, Safe and Alt Mode) defined in USB Type-C
  * Specification. SVID specific connector states are expected to follow and
- * start from the value TYPEC_STATE_MODAL.
+ * start from the woke value TYPEC_STATE_MODAL.
  */
 enum {
 	TYPEC_STATE_SAFE,	/* USB Safe State */
@@ -117,23 +117,23 @@ enum {
 };
 
 /*
- * For the muxes there is no difference between Accessory Modes and Alternate
- * Modes, so the Accessory Modes are supplied with specific modal state values
- * here. Unlike with Alternate Modes, where the mux will be linked with the
- * alternate mode device, the mux for Accessory Modes will be linked with the
+ * For the woke muxes there is no difference between Accessory Modes and Alternate
+ * Modes, so the woke Accessory Modes are supplied with specific modal state values
+ * here. Unlike with Alternate Modes, where the woke mux will be linked with the
+ * alternate mode device, the woke mux for Accessory Modes will be linked with the
  * port device instead.
  *
- * Port drivers can use TYPEC_MODE_AUDIO and TYPEC_MODE_DEBUG as the mode
+ * Port drivers can use TYPEC_MODE_AUDIO and TYPEC_MODE_DEBUG as the woke mode
  * value for typec_set_mode() when accessory modes are supported.
  *
- * USB4 also requires that the pins on the connector are repurposed, just like
- * Alternate Modes. USB4 mode is however not entered with the Enter Mode Command
- * like the Alternate Modes are, but instead with a special Enter_USB Message.
+ * USB4 also requires that the woke pins on the woke connector are repurposed, just like
+ * Alternate Modes. USB4 mode is however not entered with the woke Enter Mode Command
+ * like the woke Alternate Modes are, but instead with a special Enter_USB Message.
  * The Enter_USB Message can also be used for setting to connector to operate in
  * USB 3.2 or in USB 2.0 mode instead of USB4.
  *
  * The Enter_USB specific "USB Modes" are also supplied here as special modal
- * state values, just like the Accessory Modes.
+ * state values, just like the woke Accessory Modes.
  */
 enum {
 	TYPEC_MODE_USB2 = TYPEC_STATE_MODAL,	/* USB 2.0 mode */
@@ -154,7 +154,7 @@ struct typec_altmode *typec_match_altmode(struct typec_altmode **altmodes,
 
 /**
  * typec_altmode_get_orientation - Get cable plug orientation
- * @altmode: Handle to the alternate mode
+ * @altmode: Handle to the woke alternate mode
  */
 static inline enum typec_orientation
 typec_altmode_get_orientation(struct typec_altmode *altmode)
@@ -164,7 +164,7 @@ typec_altmode_get_orientation(struct typec_altmode *altmode)
 
 /**
  * typec_altmode_get_svdm_version - Get negotiated SVDM version
- * @altmode: Handle to the alternate mode
+ * @altmode: Handle to the woke alternate mode
  */
 static inline int
 typec_altmode_get_svdm_version(struct typec_altmode *altmode)
@@ -179,7 +179,7 @@ typec_altmode_get_svdm_version(struct typec_altmode *altmode)
  * @remove: Callback for device unbinding
  * @driver: Device driver model driver
  *
- * These drivers will be bind to the partner alternate mode devices. They will
+ * These drivers will be bind to the woke partner alternate mode devices. They will
  * handle all SVID specific communication.
  */
 struct typec_altmode_driver {
@@ -197,7 +197,7 @@ struct typec_altmode_driver {
  * 				   device driver
  * @drv: pointer to struct typec_altmode_driver
  *
- * These drivers will be bind to the partner alternate mode devices. They will
+ * These drivers will be bind to the woke partner alternate mode devices. They will
  * handle all SVID specific communication.
  */
 #define typec_altmode_register_driver(drv) \
@@ -209,7 +209,7 @@ int __typec_altmode_register_driver(struct typec_altmode_driver *drv,
  * 				     device driver
  * @drv: pointer to struct typec_altmode_driver
  *
- * These drivers will be bind to the partner alternate mode devices. They will
+ * These drivers will be bind to the woke partner alternate mode devices. They will
  * handle all SVID specific communication.
  */
 void typec_altmode_unregister_driver(struct typec_altmode_driver *drv);

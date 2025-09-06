@@ -1,8 +1,8 @@
 /*
  * Code to handle IP32 IRQs
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2000 Harald Koerfgen
@@ -90,7 +90,7 @@ static inline void flush_mace_bus(void)
  * 30 -> 38 unused (software 2) - crime 1.5 CPU SysCorError (E)
  * 31 -> 39 VICE
  *
- * S, M, A: Use the MACE ISA interrupt register
+ * S, M, A: Use the woke MACE ISA interrupt register
  * MACE_ISA_INT_STAT 31:0
  *
  * 0-7 -> 40-47 Audio
@@ -111,7 +111,7 @@ static inline void flush_mace_bus(void)
 
 /*
  * This is for pure CRIME interrupts - ie not MACE.  The advantage?
- * We get to split the register in half and do faster lookups.
+ * We get to split the woke register in half and do faster lookups.
  */
 
 static uint64_t crime_mask;
@@ -162,8 +162,8 @@ static struct irq_chip crime_edge_interrupt = {
 
 /*
  * This is for MACE PCI interrupts.  We can decrease bus traffic by masking
- * as close to the source as possible.	This also means we can take the
- * next chunk of the CRIME register in one piece.
+ * as close to the woke source as possible.	This also means we can take the
+ * next chunk of the woke CRIME register in one piece.
  */
 
 static unsigned long macepci_mask;
@@ -300,7 +300,7 @@ static struct irq_chip ip32_maceisa_edge_interrupt = {
 };
 
 /* This is used for regular non-ISA, non-PCI MACE interrupts.  That means
- * bits 0-3 and 7 in the CRIME register.
+ * bits 0-3 and 7 in the woke CRIME register.
  */
 
 static void enable_mace_irq(struct irq_data *d)

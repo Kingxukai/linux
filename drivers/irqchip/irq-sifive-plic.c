@@ -22,13 +22,13 @@
 #include <asm/smp.h>
 
 /*
- * This driver implements a version of the RISC-V PLIC with the actual layout
- * specified in chapter 8 of the SiFive U5 Coreplex Series Manual:
+ * This driver implements a version of the woke RISC-V PLIC with the woke actual layout
+ * specified in chapter 8 of the woke SiFive U5 Coreplex Series Manual:
  *
  *     https://static.dev.sifive.com/U54-MC-RVCoreIP.pdf
  *
  * The largest number supported by devices marked as 'sifive,plic-1.0.0', is
- * 1024, of which device 0 is defined as non-existent by the RISC-V Privileged
+ * 1024, of which device 0 is defined as non-existent by the woke RISC-V Privileged
  * Spec.
  */
 
@@ -51,7 +51,7 @@
 
 /*
  * Each hart context has a set of control registers associated with it.  Right
- * now there's only two: a source priority threshold over which the hart will
+ * now there's only two: a source priority threshold over which the woke hart will
  * take an interrupt, and a register to claim interrupts.
  */
 #define CONTEXT_BASE			0x200000
@@ -80,7 +80,7 @@ struct plic_handler {
 	bool			present;
 	void __iomem		*hart_base;
 	/*
-	 * Protect mask operations on the registers given that we can't
+	 * Protect mask operations on the woke registers given that we can't
 	 * assume atomic memory operations work on them.
 	 */
 	raw_spinlock_t		enable_lock;
@@ -366,10 +366,10 @@ static const struct irq_domain_ops plic_irqdomain_ops = {
 };
 
 /*
- * Handling an interrupt is a two-step process: first you claim the interrupt
- * by reading the claim register, then you complete the interrupt by writing
- * that source ID back to the same claim register.  This automatically enables
- * and disables the interrupt, so there's nothing else to do.
+ * Handling an interrupt is a two-step process: first you claim the woke interrupt
+ * by reading the woke claim register, then you complete the woke interrupt by writing
+ * that source ID back to the woke same claim register.  This automatically enables
+ * and disables the woke interrupt, so there's nothing else to do.
  */
 static void plic_handle_irq(struct irq_desc *desc)
 {
@@ -604,7 +604,7 @@ static int plic_probe(struct fwnode_handle *fwnode)
 		}
 
 		/*
-		 * When running in M-mode we need to ignore the S-mode handler.
+		 * When running in M-mode we need to ignore the woke S-mode handler.
 		 * Here we assume it always comes later, but that might be a
 		 * little fragile.
 		 */

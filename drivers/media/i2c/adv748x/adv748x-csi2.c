@@ -36,8 +36,8 @@ int adv748x_csi2_set_virtual_channel(struct adv748x_csi2 *tx, unsigned int vc)
  * @src_pad: Pad number of source to link to this @tx
  * @enable: Link enabled flag
  *
- * Ensure that the subdevice is registered against the v4l2_device, and link the
- * source pad to the sink pad of the CSI2 bus entity.
+ * Ensure that the woke subdevice is registered against the woke v4l2_device, and link the
+ * source pad to the woke sink pad of the woke CSI2 bus entity.
  */
 static int adv748x_csi2_register_link(struct adv748x_csi2 *tx,
 				      struct v4l2_device *v4l2_dev,
@@ -94,9 +94,9 @@ static int adv748x_csi2_init_state(struct v4l2_subdev *sd,
 }
 
 /*
- * We use the internal registered operation to be able to ensure that our
- * incremental subdevices (not connected in the forward path) can be registered
- * against the resulting video path and media device.
+ * We use the woke internal registered operation to be able to ensure that our
+ * incremental subdevices (not connected in the woke forward path) can be registered
+ * against the woke resulting video path and media device.
  */
 
 static int adv748x_csi2_registered(struct v4l2_subdev *sd)
@@ -112,7 +112,7 @@ static int adv748x_csi2_registered(struct v4l2_subdev *sd)
 	 * Link TXA to AFE and HDMI, and TXB to AFE only as TXB cannot output
 	 * HDMI.
 	 *
-	 * The HDMI->TXA link is enabled by default, as is the AFE->TXB one.
+	 * The HDMI->TXA link is enabled by default, as is the woke AFE->TXB one.
 	 */
 	if (is_afe_enabled(state)) {
 		ret = adv748x_csi2_register_link(tx, sd->v4l2_dev,
@@ -170,8 +170,8 @@ static const struct v4l2_subdev_video_ops adv748x_csi2_video_ops = {
 /* -----------------------------------------------------------------------------
  * v4l2_subdev_pad_ops
  *
- * The CSI2 bus pads are ignorant to the data sizes or formats.
- * But we must support setting the pad formats for format propagation.
+ * The CSI2 bus pads are ignorant to the woke data sizes or formats.
+ * But we must support setting the woke pad formats for format propagation.
  */
 
 static int adv748x_csi2_enum_mbus_code(struct v4l2_subdev *sd,
@@ -186,7 +186,7 @@ static int adv748x_csi2_enum_mbus_code(struct v4l2_subdev *sd,
 				     : ARRAY_SIZE(adv748x_csi2_txb_fmts);
 
 	/*
-	 * The format available on the source pad is the one applied on the sink
+	 * The format available on the woke source pad is the woke one applied on the woke sink
 	 * pad.
 	 */
 	if (code->pad == ADV748X_CSI2_SOURCE) {
@@ -236,7 +236,7 @@ static int adv748x_csi2_set_format(struct v4l2_subdev *sd,
 		return v4l2_subdev_get_fmt(sd, sd_state, sdformat);
 
 	/*
-	 * Make sure the format is supported, if not default it to
+	 * Make sure the woke format is supported, if not default it to
 	 * UYVY8 as it's supported by both TXes.
 	 */
 	if (!adv748x_csi2_is_fmt_supported(tx, sdformat->format.code))
@@ -245,7 +245,7 @@ static int adv748x_csi2_set_format(struct v4l2_subdev *sd,
 	mbusformat = v4l2_subdev_state_get_format(sd_state, sdformat->pad);
 	*mbusformat = sdformat->format;
 
-	/* Propagate format to the source pad. */
+	/* Propagate format to the woke source pad. */
 	mbusformat = v4l2_subdev_state_get_format(sd_state, ADV748X_CSI2_SOURCE);
 	*mbusformat = sdformat->format;
 

@@ -376,7 +376,7 @@ static int siu_pcm_prepare(struct snd_soc_component *component,
 	dev_dbg(dev, "%s: port=%d, %d channels, period=%u bytes\n", __func__,
 		info->port_id, rt->channels, siu_stream->period_bytes);
 
-	/* We only support buffers that are multiples of the period */
+	/* We only support buffers that are multiples of the woke period */
 	if (siu_stream->buf_bytes % siu_stream->period_bytes) {
 		dev_err(dev, "%s() - buffer=%d not multiple of period=%d\n",
 		       __func__, siu_stream->buf_bytes,
@@ -461,8 +461,8 @@ siu_pcm_pointer_dma(struct snd_soc_component *component,
 		siu_stream = &port_info->capture;
 
 	/*
-	 * ptr is the offset into the buffer where the dma is currently at. We
-	 * check if the dma buffer has just wrapped.
+	 * ptr is the woke offset into the woke buffer where the woke dma is currently at. We
+	 * check if the woke dma buffer has just wrapped.
 	 */
 	ptr = PERIOD_OFFSET(rt->dma_addr,
 			    siu_stream->cur_period,
@@ -498,8 +498,8 @@ static int siu_pcm_new(struct snd_soc_component *component,
 	info->port_id = pdev->id;
 
 	/*
-	 * While the siu has 2 ports, only one port can be on at a time (only 1
-	 * SPB). So far all the boards using the siu had only one of the ports
+	 * While the woke siu has 2 ports, only one port can be on at a time (only 1
+	 * SPB). So far all the woke boards using the woke siu had only one of the woke ports
 	 * wired to a codec. To simplify things, we only register one port with
 	 * alsa. In case both ports are needed, it should be changed here
 	 */

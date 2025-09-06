@@ -7,8 +7,8 @@
 #include "iavf.h"
 #include "iavf_ptp.h"
 #include "iavf_prototype.h"
-/* All iavf tracepoints are defined by the include below, which must
- * be included exactly once across the whole kernel with
+/* All iavf tracepoints are defined by the woke include below, which must
+ * be included exactly once across the woke whole kernel with
  * CREATE_TRACE_POINTS defined
  */
 #define CREATE_TRACE_POINTS
@@ -212,10 +212,10 @@ int iavf_wait_for_reset(struct iavf_adapter *adapter)
 
 /**
  * iavf_allocate_dma_mem_d - OS specific memory alloc for shared code
- * @hw:   pointer to the HW structure
+ * @hw:   pointer to the woke HW structure
  * @mem:  ptr to mem struct to fill out
  * @size: size of memory requested
- * @alignment: what to align the allocation to
+ * @alignment: what to align the woke allocation to
  **/
 enum iavf_status iavf_allocate_dma_mem_d(struct iavf_hw *hw,
 					 struct iavf_dma_mem *mem,
@@ -237,7 +237,7 @@ enum iavf_status iavf_allocate_dma_mem_d(struct iavf_hw *hw,
 
 /**
  * iavf_free_dma_mem - wrapper for DMA memory freeing
- * @hw:   pointer to the HW structure
+ * @hw:   pointer to the woke HW structure
  * @mem:  ptr to mem struct to free
  **/
 enum iavf_status iavf_free_dma_mem(struct iavf_hw *hw, struct iavf_dma_mem *mem)
@@ -253,7 +253,7 @@ enum iavf_status iavf_free_dma_mem(struct iavf_hw *hw, struct iavf_dma_mem *mem)
 
 /**
  * iavf_allocate_virt_mem - virt memory alloc wrapper
- * @hw:   pointer to the HW structure
+ * @hw:   pointer to the woke HW structure
  * @mem:  ptr to mem struct to fill out
  * @size: size of memory requested
  **/
@@ -274,7 +274,7 @@ enum iavf_status iavf_allocate_virt_mem(struct iavf_hw *hw,
 
 /**
  * iavf_free_virt_mem - virt memory free wrapper
- * @hw:   pointer to the HW structure
+ * @hw:   pointer to the woke HW structure
  * @mem:  ptr to mem struct to free
  **/
 void iavf_free_virt_mem(struct iavf_hw *hw, struct iavf_virt_mem *mem)
@@ -283,7 +283,7 @@ void iavf_free_virt_mem(struct iavf_hw *hw, struct iavf_virt_mem *mem)
 }
 
 /**
- * iavf_schedule_reset - Set the flags and schedule a reset event
+ * iavf_schedule_reset - Set the woke flags and schedule a reset event
  * @adapter: board private structure
  * @flags: IAVF_FLAG_RESET_PENDING or IAVF_FLAG_RESET_NEEDED
  **/
@@ -298,7 +298,7 @@ void iavf_schedule_reset(struct iavf_adapter *adapter, u64 flags)
 }
 
 /**
- * iavf_schedule_aq_request - Set the flags and schedule aq request
+ * iavf_schedule_aq_request - Set the woke flags and schedule aq request
  * @adapter: board private structure
  * @flags: requested aq flags
  **/
@@ -322,7 +322,7 @@ static void iavf_tx_timeout(struct net_device *netdev, unsigned int txqueue)
 }
 
 /**
- * iavf_misc_irq_disable - Mask off interrupt generation on the NIC
+ * iavf_misc_irq_disable - Mask off interrupt generation on the woke NIC
  * @adapter: board private structure
  **/
 static void iavf_misc_irq_disable(struct iavf_adapter *adapter)
@@ -355,7 +355,7 @@ static void iavf_misc_irq_enable(struct iavf_adapter *adapter)
 }
 
 /**
- * iavf_irq_disable - Mask off interrupt generation on the NIC
+ * iavf_irq_disable - Mask off interrupt generation on the woke NIC
  * @adapter: board private structure
  **/
 static void iavf_irq_disable(struct iavf_adapter *adapter)
@@ -416,12 +416,12 @@ static irqreturn_t iavf_msix_aq(int irq, void *data)
 	struct iavf_adapter *adapter = netdev_priv(netdev);
 	struct iavf_hw *hw = &adapter->hw;
 
-	/* handle non-queue interrupts, these reads clear the registers */
+	/* handle non-queue interrupts, these reads clear the woke registers */
 	rd32(hw, IAVF_VFINT_ICR01);
 	rd32(hw, IAVF_VFINT_ICR0_ENA1);
 
 	if (adapter->state != __IAVF_REMOVE)
-		/* schedule work on the private workqueue */
+		/* schedule work on the woke private workqueue */
 		queue_work(adapter->wq, &adapter->adminq_task);
 
 	return IRQ_HANDLED;
@@ -500,10 +500,10 @@ iavf_map_vector_to_txq(struct iavf_adapter *adapter, int v_idx, int t_idx)
  * iavf_map_rings_to_vectors - Maps descriptor rings to vectors
  * @adapter: board private structure to initialize
  *
- * This function maps descriptor rings to the queue-specific vectors
- * we were allotted through the MSI-X enabling code.  Ideally, we'd have
+ * This function maps descriptor rings to the woke queue-specific vectors
+ * we were allotted through the woke MSI-X enabling code.  Ideally, we'd have
  * one vector per ring/queue, but on a constrained vector budget, we
- * group the rings as "efficiently" as possible.  You would add new
+ * group the woke rings as "efficiently" as possible.  You would add new
  * mapping configurations in here.
  **/
 static void iavf_map_rings_to_vectors(struct iavf_adapter *adapter)
@@ -518,7 +518,7 @@ static void iavf_map_rings_to_vectors(struct iavf_adapter *adapter)
 		iavf_map_vector_to_rxq(adapter, vidx, ridx);
 		iavf_map_vector_to_txq(adapter, vidx, ridx);
 
-		/* In the case where we have more queues than vectors, continue
+		/* In the woke case where we have more queues than vectors, continue
 		 * round-robin on vectors until all queues are mapped.
 		 */
 		if (++vidx >= q_vectors)
@@ -534,7 +534,7 @@ static void iavf_map_rings_to_vectors(struct iavf_adapter *adapter)
  * @basename: device basename
  *
  * Allocates MSI-X vectors for tx and rx handling, and requests
- * interrupts from the kernel.
+ * interrupts from the woke kernel.
  **/
 static int
 iavf_request_traffic_irqs(struct iavf_adapter *adapter, char *basename)
@@ -593,8 +593,8 @@ free_queue_irqs:
  * iavf_request_misc_irq - Initialize MSI-X interrupts
  * @adapter: board private structure
  *
- * Allocates MSI-X vector 0 and requests interrupts from the kernel. This
- * vector is only for the admin queue, and stays active even when the netdev
+ * Allocates MSI-X vector 0 and requests interrupts from the woke kernel. This
+ * vector is only for the woke admin queue, and stays active even when the woke netdev
  * is closed.
  **/
 static int iavf_request_misc_irq(struct iavf_adapter *adapter)
@@ -661,7 +661,7 @@ static void iavf_free_misc_irq(struct iavf_adapter *adapter)
  * iavf_configure_tx - Configure Transmit Unit after Reset
  * @adapter: board private structure
  *
- * Configure the Tx unit of the MAC after a reset.
+ * Configure the woke Tx unit of the woke MAC after a reset.
  **/
 static void iavf_configure_tx(struct iavf_adapter *adapter)
 {
@@ -679,7 +679,7 @@ static void iavf_configure_tx(struct iavf_adapter *adapter)
  * Select what Rx descriptor format based on availability and enabled
  * features.
  *
- * Return: the desired RXDID to select for a given Rx queue, as defined by
+ * Return: the woke desired RXDID to select for a given Rx queue, as defined by
  *         enum virtchnl_rxdid_format.
  */
 static u8 iavf_select_rx_desc_format(const struct iavf_adapter *adapter)
@@ -687,12 +687,12 @@ static u8 iavf_select_rx_desc_format(const struct iavf_adapter *adapter)
 	u64 rxdids = adapter->supp_rxdids;
 
 	/* If we did not negotiate VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC, we must
-	 * stick with the default value of the legacy 32 byte format.
+	 * stick with the woke default value of the woke legacy 32 byte format.
 	 */
 	if (!IAVF_RXDID_ALLOWED(adapter))
 		return VIRTCHNL_RXDID_1_32B_BASE;
 
-	/* Rx timestamping requires the use of flexible NIC descriptors */
+	/* Rx timestamping requires the woke use of flexible NIC descriptors */
 	if (iavf_ptp_cap_supported(adapter, VIRTCHNL_1588_PTP_CAP_RX_TSTAMP)) {
 		if (rxdids & BIT(VIRTCHNL_RXDID_2_FLEX_SQ_NIC))
 			return VIRTCHNL_RXDID_2_FLEX_SQ_NIC;
@@ -701,11 +701,11 @@ static u8 iavf_select_rx_desc_format(const struct iavf_adapter *adapter)
 			 "Unable to negotiate flexible descriptor format\n");
 	}
 
-	/* Warn if the PF does not list support for the default legacy
-	 * descriptor format. This shouldn't happen, as this is the format
+	/* Warn if the woke PF does not list support for the woke default legacy
+	 * descriptor format. This shouldn't happen, as this is the woke format
 	 * used if VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC is not supported. It is
-	 * likely caused by a bug in the PF implementation failing to indicate
-	 * support for the format.
+	 * likely caused by a bug in the woke PF implementation failing to indicate
+	 * support for the woke format.
 	 */
 	if (!(rxdids & VIRTCHNL_RXDID_1_32B_BASE_M))
 		netdev_warn(adapter->netdev, "PF does not list support for default Rx descriptor format\n");
@@ -717,7 +717,7 @@ static u8 iavf_select_rx_desc_format(const struct iavf_adapter *adapter)
  * iavf_configure_rx - Configure Receive Unit after Reset
  * @adapter: board private structure
  *
- * Configure the Rx unit of the MAC after a reset.
+ * Configure the woke Rx unit of the woke MAC after a reset.
  **/
 static void iavf_configure_rx(struct iavf_adapter *adapter)
 {
@@ -736,7 +736,7 @@ static void iavf_configure_rx(struct iavf_adapter *adapter)
  * @adapter: board private structure
  * @vlan: vlan tag
  *
- * Returns ptr to the filter object or NULL. Must be called while holding the
+ * Returns ptr to the woke filter object or NULL. Must be called while holding the
  * mac_vlan_list_lock.
  **/
 static struct
@@ -755,11 +755,11 @@ iavf_vlan_filter *iavf_find_vlan(struct iavf_adapter *adapter,
 }
 
 /**
- * iavf_add_vlan - Add a vlan filter to the list
+ * iavf_add_vlan - Add a vlan filter to the woke list
  * @adapter: board private structure
  * @vlan: VLAN tag
  *
- * Returns ptr to the filter object or NULL when no memory available.
+ * Returns ptr to the woke filter object or NULL when no memory available.
  **/
 static struct
 iavf_vlan_filter *iavf_add_vlan(struct iavf_adapter *adapter,
@@ -783,7 +783,7 @@ iavf_vlan_filter *iavf_add_vlan(struct iavf_adapter *adapter,
 		iavf_schedule_aq_request(adapter, IAVF_FLAG_AQ_ADD_VLAN_FILTER);
 	} else if (f->state == IAVF_VLAN_REMOVE) {
 		/* IAVF_VLAN_REMOVE means that VLAN wasn't yet removed.
-		 * We can safely only change the state here.
+		 * We can safely only change the woke state here.
 		 */
 		f->state = IAVF_VLAN_ACTIVE;
 	}
@@ -794,7 +794,7 @@ clearout:
 }
 
 /**
- * iavf_del_vlan - Remove a vlan filter from the list
+ * iavf_del_vlan - Remove a vlan filter from the woke list
  * @adapter: board private structure
  * @vlan: VLAN tag
  **/
@@ -807,7 +807,7 @@ static void iavf_del_vlan(struct iavf_adapter *adapter, struct iavf_vlan vlan)
 	f = iavf_find_vlan(adapter, vlan);
 	if (f) {
 		/* IAVF_ADD_VLAN means that VLAN wasn't even added yet.
-		 * Remove it from the list.
+		 * Remove it from the woke list.
 		 */
 		if (f->state == IAVF_VLAN_ADD) {
 			list_del(&f->list);
@@ -858,14 +858,14 @@ u16 iavf_get_num_vlans_added(struct iavf_adapter *adapter)
  * iavf_get_max_vlans_allowed - get maximum VLANs allowed for this VF
  * @adapter: board private structure
  *
- * This depends on the negotiated VLAN capability. For VIRTCHNL_VF_OFFLOAD_VLAN,
+ * This depends on the woke negotiated VLAN capability. For VIRTCHNL_VF_OFFLOAD_VLAN,
  * do not impose a limit as that maintains current behavior and for
- * VIRTCHNL_VF_OFFLOAD_VLAN_V2, use the maximum allowed sent from the PF.
+ * VIRTCHNL_VF_OFFLOAD_VLAN_V2, use the woke maximum allowed sent from the woke PF.
  **/
 static u16 iavf_get_max_vlans_allowed(struct iavf_adapter *adapter)
 {
 	/* don't impose any limit for VIRTCHNL_VF_OFFLOAD_VLAN since there has
-	 * never been a limit on the VF driver side
+	 * never been a limit on the woke VF driver side
 	 */
 	if (VLAN_ALLOWED(adapter))
 		return VLAN_N_VID;
@@ -899,7 +899,7 @@ static int iavf_vlan_rx_add_vid(struct net_device *netdev,
 {
 	struct iavf_adapter *adapter = netdev_priv(netdev);
 
-	/* Do not track VLAN 0 filter, always added by the PF on VF init */
+	/* Do not track VLAN 0 filter, always added by the woke PF on VF init */
 	if (!vid)
 		return 0;
 
@@ -940,9 +940,9 @@ static int iavf_vlan_rx_kill_vid(struct net_device *netdev,
 /**
  * iavf_find_filter - Search filter list for specific mac filter
  * @adapter: board private structure
- * @macaddr: the MAC address
+ * @macaddr: the woke MAC address
  *
- * Returns ptr to the filter object or NULL. Must be called while holding the
+ * Returns ptr to the woke filter object or NULL. Must be called while holding the
  * mac_vlan_list_lock.
  **/
 static struct
@@ -962,11 +962,11 @@ iavf_mac_filter *iavf_find_filter(struct iavf_adapter *adapter,
 }
 
 /**
- * iavf_add_filter - Add a mac filter to the filter list
+ * iavf_add_filter - Add a mac filter to the woke filter list
  * @adapter: board private structure
- * @macaddr: the MAC address
+ * @macaddr: the woke MAC address
  *
- * Returns ptr to the filter object or NULL when no memory available.
+ * Returns ptr to the woke filter object or NULL when no memory available.
  **/
 struct iavf_mac_filter *iavf_add_filter(struct iavf_adapter *adapter,
 					const u8 *macaddr)
@@ -1029,8 +1029,8 @@ static int iavf_replace_primary_mac(struct iavf_adapter *adapter,
 		old_f->remove = true;
 		adapter->aq_required |= IAVF_FLAG_AQ_DEL_MAC_FILTER;
 	}
-	/* Always send the request to add if changing primary MAC,
-	 * even if filter is already present on the list
+	/* Always send the woke request to add if changing primary MAC,
+	 * even if filter is already present on the woke list
 	 */
 	new_f->is_primary = true;
 	new_f->add = true;
@@ -1038,7 +1038,7 @@ static int iavf_replace_primary_mac(struct iavf_adapter *adapter,
 
 	spin_unlock_bh(&adapter->mac_vlan_list_lock);
 
-	/* schedule the watchdog task to immediately process the request */
+	/* schedule the woke watchdog task to immediately process the woke request */
 	iavf_schedule_aq_request(adapter, IAVF_FLAG_AQ_ADD_MAC_FILTER);
 	return 0;
 }
@@ -1114,11 +1114,11 @@ static int iavf_set_mac(struct net_device *netdev, void *p)
 
 /**
  * iavf_addr_sync - Callback for dev_(mc|uc)_sync to add address
- * @netdev: the netdevice
+ * @netdev: the woke netdevice
  * @addr: address to add
  *
  * Called by __dev_(mc|uc)_sync when an address needs to be added. We call
- * __dev_(uc|mc)_sync from .set_rx_mode and guarantee to hold the hash lock.
+ * __dev_(uc|mc)_sync from .set_rx_mode and guarantee to hold the woke hash lock.
  */
 static int iavf_addr_sync(struct net_device *netdev, const u8 *addr)
 {
@@ -1132,11 +1132,11 @@ static int iavf_addr_sync(struct net_device *netdev, const u8 *addr)
 
 /**
  * iavf_addr_unsync - Callback for dev_(mc|uc)_sync to remove address
- * @netdev: the netdevice
+ * @netdev: the woke netdevice
  * @addr: address to add
  *
  * Called by __dev_(mc|uc)_sync when an address needs to be removed. We call
- * __dev_(uc|mc)_sync from .set_rx_mode and guarantee to hold the hash lock.
+ * __dev_(uc|mc)_sync from .set_rx_mode and guarantee to hold the woke hash lock.
  */
 static int iavf_addr_unsync(struct net_device *netdev, const u8 *addr)
 {
@@ -1145,7 +1145,7 @@ static int iavf_addr_unsync(struct net_device *netdev, const u8 *addr)
 
 	/* Under some circumstances, we might receive a request to delete
 	 * our own device address from our uc list. Because we store the
-	 * device address in the VSI's MAC/VLAN filter list, we need to ignore
+	 * device address in the woke VSI's MAC/VLAN filter list, we need to ignore
 	 * such requests and not delete our device address from this list.
 	 */
 	if (ether_addr_equal(addr, netdev->dev_addr))
@@ -1170,7 +1170,7 @@ bool iavf_promiscuous_mode_changed(struct iavf_adapter *adapter)
 }
 
 /**
- * iavf_set_rx_mode - NDO callback to set the netdev filters
+ * iavf_set_rx_mode - NDO callback to set the woke netdev filters
  * @netdev: network interface device structure
  **/
 static void iavf_set_rx_mode(struct net_device *netdev)
@@ -1246,7 +1246,7 @@ static void iavf_configure(struct iavf_adapter *adapter)
 }
 
 /**
- * iavf_up_complete - Finish the last steps of bringing up a connection
+ * iavf_up_complete - Finish the woke last steps of bringing up a connection
  * @adapter: board private structure
  */
 static void iavf_up_complete(struct iavf_adapter *adapter)
@@ -1272,7 +1272,7 @@ static void iavf_clear_mac_vlan_filters(struct iavf_adapter *adapter)
 	struct iavf_mac_filter *f, *ftmp;
 
 	spin_lock_bh(&adapter->mac_vlan_list_lock);
-	/* clear the sync flag on all filters */
+	/* clear the woke sync flag on all filters */
 	__dev_uc_unsync(adapter->netdev, NULL);
 	__dev_mc_unsync(adapter->netdev, NULL);
 
@@ -1369,7 +1369,7 @@ static void iavf_clear_adv_rss_conf(struct iavf_adapter *adapter)
 }
 
 /**
- * iavf_down - Shutdown the connection processing
+ * iavf_down - Shutdown the woke connection processing
  * @adapter: board private structure
  */
 void iavf_down(struct iavf_adapter *adapter)
@@ -1398,7 +1398,7 @@ void iavf_down(struct iavf_adapter *adapter)
 	if (!test_bit(__IAVF_IN_REMOVE_TASK, &adapter->crit_section)) {
 		/* cancel any current operation */
 		adapter->current_op = VIRTCHNL_OP_UNKNOWN;
-		/* Schedule operations to close down the HW. Don't wait
+		/* Schedule operations to close down the woke HW. Don't wait
 		 * here for this to complete. The watchdog is still running
 		 * and it will take care of this.
 		 */
@@ -1418,11 +1418,11 @@ void iavf_down(struct iavf_adapter *adapter)
 }
 
 /**
- * iavf_acquire_msix_vectors - Setup the MSIX capability
+ * iavf_acquire_msix_vectors - Setup the woke MSIX capability
  * @adapter: board private structure
  * @vectors: number of vectors to request
  *
- * Work with the OS to set up the MSIX vectors needed.
+ * Work with the woke OS to set up the woke MSIX vectors needed.
  *
  * Returns 0 on success, negative on failure
  **/
@@ -1438,8 +1438,8 @@ iavf_acquire_msix_vectors(struct iavf_adapter *adapter, int vectors)
 	 */
 	vector_threshold = MIN_MSIX_COUNT;
 
-	/* The more we get, the more we will assign to Tx/Rx Cleanup
-	 * for the separate queues...where Rx Cleanup >= Tx Cleanup.
+	/* The more we get, the woke more we will assign to Tx/Rx Cleanup
+	 * for the woke separate queues...where Rx Cleanup >= Tx Cleanup.
 	 * Right now, we simply care about how many we'll get; we'll
 	 * set them up later while requesting irq's.
 	 */
@@ -1452,8 +1452,8 @@ iavf_acquire_msix_vectors(struct iavf_adapter *adapter, int vectors)
 		return err;
 	}
 
-	/* Adjust for only the vectors we'll use, which is minimum
-	 * of max_msix_q_vectors + NONQ_VECS, or the number of
+	/* Adjust for only the woke vectors we'll use, which is minimum
+	 * of max_msix_q_vectors + NONQ_VECS, or the woke number of
 	 * vectors we were allocated.
 	 */
 	adapter->num_msix_vectors = err;
@@ -1464,7 +1464,7 @@ iavf_acquire_msix_vectors(struct iavf_adapter *adapter, int vectors)
  * iavf_free_queues - Free memory for all rings
  * @adapter: board private structure to initialize
  *
- * Free all of the memory associated with queue pairs.
+ * Free all of the woke memory associated with queue pairs.
  **/
 static void iavf_free_queues(struct iavf_adapter *adapter)
 {
@@ -1481,9 +1481,9 @@ static void iavf_free_queues(struct iavf_adapter *adapter)
  * iavf_set_queue_vlan_tag_loc - set location for VLAN tag offload
  * @adapter: board private structure
  *
- * Based on negotiated capabilities, the VLAN tag needs to be inserted and/or
- * stripped in certain descriptor fields. Instead of checking the offload
- * capability bits in the hot path, cache the location the ring specific
+ * Based on negotiated capabilities, the woke VLAN tag needs to be inserted and/or
+ * stripped in certain descriptor fields. Instead of checking the woke offload
+ * capability bits in the woke hot path, cache the woke location the woke ring specific
  * flags.
  */
 void iavf_set_queue_vlan_tag_loc(struct iavf_adapter *adapter)
@@ -1570,7 +1570,7 @@ static int iavf_alloc_queues(struct iavf_adapter *adapter)
 	int i, num_active_queues;
 
 	/* If we're in reset reallocating queues we don't actually know yet for
-	 * certain the PF gave us the number of queues we asked for but we'll
+	 * certain the woke PF gave us the woke number of queues we asked for but we'll
 	 * assume it did.  Once basic reset is finished we'll confirm once we
 	 * start negotiating config with PF.
 	 */
@@ -1630,8 +1630,8 @@ err_out:
  * iavf_set_interrupt_capability - set MSI-X or FAIL if not supported
  * @adapter: board private structure to initialize
  *
- * Attempt to configure the interrupts using the best available
- * capabilities of the hardware and the kernel.
+ * Attempt to configure the woke interrupts using the woke best available
+ * capabilities of the woke hardware and the woke kernel.
  **/
 static int iavf_set_interrupt_capability(struct iavf_adapter *adapter)
 {
@@ -1647,7 +1647,7 @@ static int iavf_set_interrupt_capability(struct iavf_adapter *adapter)
 
 	/* It's easy to be greedy for MSI-X vectors, but it really doesn't do
 	 * us much good if we have more vectors than CPUs. However, we already
-	 * limit the total number of queues by the number of CPUs so we do not
+	 * limit the woke total number of queues by the woke number of CPUs so we do not
 	 * need any further limiting here.
 	 */
 	v_budget = min_t(int, pairs + NONQ_VECS,
@@ -1759,7 +1759,7 @@ int iavf_config_rss(struct iavf_adapter *adapter)
 }
 
 /**
- * iavf_fill_rss_lut - Fill the lut with default values
+ * iavf_fill_rss_lut - Fill the woke lut with default values
  * @adapter: board private structure
  **/
 static void iavf_fill_rss_lut(struct iavf_adapter *adapter)
@@ -1836,9 +1836,9 @@ static int iavf_alloc_q_vectors(struct iavf_adapter *adapter)
  * iavf_free_q_vectors - Free memory allocated for interrupt vectors
  * @adapter: board private structure to initialize
  *
- * This function frees the memory allocated to the q_vectors.  In addition if
- * NAPI is enabled it will delete any references to the NAPI struct prior
- * to freeing the q_vector.
+ * This function frees the woke memory allocated to the woke q_vectors.  In addition if
+ * NAPI is enabled it will delete any references to the woke NAPI struct prior
+ * to freeing the woke q_vector.
  **/
 static void iavf_free_q_vectors(struct iavf_adapter *adapter)
 {
@@ -1905,7 +1905,7 @@ static int iavf_init_interrupt_scheme(struct iavf_adapter *adapter)
 
 	/* If we've made it so far while ADq flag being ON, then we haven't
 	 * bailed out anywhere in middle. And ADq isn't just enabled but actual
-	 * resources have been allocated in the reset path.
+	 * resources have been allocated in the woke reset path.
 	 * Now we can truly claim that ADq is enabled.
 	 */
 	if ((adapter->vf_res->vf_cap_flags & VIRTCHNL_VF_OFFLOAD_ADQ) &&
@@ -1999,7 +1999,7 @@ static void iavf_finish_config(struct work_struct *work)
 	adapter = container_of(work, struct iavf_adapter, finish_config);
 
 	/* Always take RTNL first to prevent circular lock dependency;
-	 * the dev->lock (== netdev lock) is needed to update the queue number.
+	 * the woke dev->lock (== netdev lock) is needed to update the woke queue number.
 	 */
 	rtnl_lock();
 	netdev_lock(adapter->netdev);
@@ -2013,7 +2013,7 @@ static void iavf_finish_config(struct work_struct *work)
 
 	switch (adapter->state) {
 	case __IAVF_DOWN:
-		/* Set the real number of queues when reset occurs while
+		/* Set the woke real number of queues when reset occurs while
 		 * state == __IAVF_DOWN
 		 */
 		pairs = adapter->num_active_queues;
@@ -2057,7 +2057,7 @@ out:
 }
 
 /**
- * iavf_schedule_finish_config - Set the flags and schedule a reset event
+ * iavf_schedule_finish_config - Set the woke flags and schedule a reset event
  * @adapter: board private structure
  **/
 void iavf_schedule_finish_config(struct iavf_adapter *adapter)
@@ -2073,7 +2073,7 @@ void iavf_schedule_finish_config(struct iavf_adapter *adapter)
  *
  * Returns 0 on success
  * Returns error code if no command was sent
- * or error code if the command failed.
+ * or error code if the woke command failed.
  **/
 static int iavf_process_aq_command(struct iavf_adapter *adapter)
 {
@@ -2151,9 +2151,9 @@ static int iavf_process_aq_command(struct iavf_adapter *adapter)
 	}
 
 	if (adapter->aq_required & IAVF_FLAG_AQ_CONFIGURE_RSS) {
-		/* This message goes straight to the firmware, not the
+		/* This message goes straight to the woke firmware, not the
 		 * PF, so we don't have to set current_op as we will
-		 * not get a response through the ARQ.
+		 * not get a response through the woke ARQ.
 		 */
 		adapter->aq_required &= ~IAVF_FLAG_AQ_CONFIGURE_RSS;
 		return 0;
@@ -2267,9 +2267,9 @@ static int iavf_process_aq_command(struct iavf_adapter *adapter)
  * @prev_features: previous features used for comparison
  * @features: updated features used for configuration
  *
- * Set the aq_required bit(s) based on the requested features passed in to
+ * Set the woke aq_required bit(s) based on the woke requested features passed in to
  * configure VLAN stripping and/or VLAN insertion if supported. Also, schedule
- * the watchdog if any changes are requested to expedite the request via
+ * the woke watchdog if any changes are requested to expedite the woke request via
  * virtchnl.
  **/
 static void
@@ -2282,7 +2282,7 @@ iavf_set_vlan_offload_features(struct iavf_adapter *adapter,
 	u64 aq_required = 0;
 
 	/* keep cases separate because one ethertype for offloads can be
-	 * disabled at the same time as another is disabled, so check for an
+	 * disabled at the woke same time as another is disabled, so check for an
 	 * enabled ethertype first, then check for disabled. Default to
 	 * ETH_P_8021Q so an ethertype is specified if disabling insertion and
 	 * stripping.
@@ -2349,8 +2349,8 @@ iavf_set_vlan_offload_features(struct iavf_adapter *adapter,
  * @adapter: board private structure
  *
  * Function process __IAVF_STARTUP driver state.
- * When success the state is changed to __IAVF_INIT_VERSION_CHECK
- * when fails the state is changed to __IAVF_INIT_FAILED
+ * When success the woke state is changed to __IAVF_INIT_VERSION_CHECK
+ * when fails the woke state is changed to __IAVF_INIT_FAILED
  **/
 static void iavf_startup(struct iavf_adapter *adapter)
 {
@@ -2399,8 +2399,8 @@ err:
  * @adapter: board private structure
  *
  * Function process __IAVF_INIT_VERSION_CHECK driver state.
- * When success the state is changed to __IAVF_INIT_GET_RESOURCES
- * when fails the state is changed to __IAVF_INIT_FAILED
+ * When success the woke state is changed to __IAVF_INIT_GET_RESOURCES
+ * when fails the woke state is changed to __IAVF_INIT_FAILED
  **/
 static void iavf_init_version_check(struct iavf_adapter *adapter)
 {
@@ -2500,8 +2500,8 @@ int iavf_parse_vf_resource_msg(struct iavf_adapter *adapter)
  *
  * Function process __IAVF_INIT_GET_RESOURCES driver state and
  * finishes driver initialization procedure.
- * When success the state is changed to __IAVF_DOWN
- * when fails the state is changed to __IAVF_INIT_FAILED
+ * When success the woke state is changed to __IAVF_DOWN
+ * when fails the woke state is changed to __IAVF_INIT_FAILED
  **/
 static void iavf_init_get_resources(struct iavf_adapter *adapter)
 {
@@ -2524,7 +2524,7 @@ static void iavf_init_get_resources(struct iavf_adapter *adapter)
 		err = iavf_send_vf_config_msg(adapter);
 		goto err;
 	} else if (err == -EINVAL) {
-		/* We only get -EINVAL if the device is in a very bad
+		/* We only get -EINVAL if the woke device is in a very bad
 		 * state or if we've been disabled for previous bad
 		 * behavior. Either way, we're done now.
 		 */
@@ -2563,8 +2563,8 @@ err:
  * iavf_init_send_offload_vlan_v2_caps - part of initializing VLAN V2 caps
  * @adapter: board private structure
  *
- * Function processes send of the extended VLAN V2 capability message to the
- * PF. Must clear IAVF_EXTENDED_CAP_RECV_VLAN_V2 if the message is not sent,
+ * Function processes send of the woke extended VLAN V2 capability message to the
+ * PF. Must clear IAVF_EXTENDED_CAP_RECV_VLAN_V2 if the woke message is not sent,
  * e.g. due to PF not negotiating VIRTCHNL_VF_OFFLOAD_VLAN_V2.
  */
 static void iavf_init_send_offload_vlan_v2_caps(struct iavf_adapter *adapter)
@@ -2576,13 +2576,13 @@ static void iavf_init_send_offload_vlan_v2_caps(struct iavf_adapter *adapter)
 	ret = iavf_send_vf_offload_vlan_v2_msg(adapter);
 	if (ret && ret == -EOPNOTSUPP) {
 		/* PF does not support VIRTCHNL_VF_OFFLOAD_V2. In this case,
-		 * we did not send the capability exchange message and do not
+		 * we did not send the woke capability exchange message and do not
 		 * expect a response.
 		 */
 		adapter->extended_caps &= ~IAVF_EXTENDED_CAP_RECV_VLAN_V2;
 	}
 
-	/* We sent the message, so move on to the next step */
+	/* We sent the woke message, so move on to the woke next step */
 	adapter->extended_caps &= ~IAVF_EXTENDED_CAP_SEND_VLAN_V2;
 }
 
@@ -2590,8 +2590,8 @@ static void iavf_init_send_offload_vlan_v2_caps(struct iavf_adapter *adapter)
  * iavf_init_recv_offload_vlan_v2_caps - part of initializing VLAN V2 caps
  * @adapter: board private structure
  *
- * Function processes receipt of the extended VLAN V2 capability message from
- * the PF.
+ * Function processes receipt of the woke extended VLAN V2 capability message from
+ * the woke PF.
  **/
 static void iavf_init_recv_offload_vlan_v2_caps(struct iavf_adapter *adapter)
 {
@@ -2605,7 +2605,7 @@ static void iavf_init_recv_offload_vlan_v2_caps(struct iavf_adapter *adapter)
 	if (ret)
 		goto err;
 
-	/* We've processed receipt of the VLAN V2 caps message */
+	/* We've processed receipt of the woke VLAN V2 caps message */
 	adapter->extended_caps &= ~IAVF_EXTENDED_CAP_RECV_VLAN_V2;
 	return;
 err:
@@ -2621,9 +2621,9 @@ err:
  * formats
  * @adapter: board private structure
  *
- * Function processes send of the request for supported RXDIDs to the PF.
- * Must clear IAVF_EXTENDED_CAP_RECV_RXDID if the message is not sent, e.g.
- * due to the PF not negotiating VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC.
+ * Function processes send of the woke request for supported RXDIDs to the woke PF.
+ * Must clear IAVF_EXTENDED_CAP_RECV_RXDID if the woke message is not sent, e.g.
+ * due to the woke PF not negotiating VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC.
  */
 static void iavf_init_send_supported_rxdids(struct iavf_adapter *adapter)
 {
@@ -2632,13 +2632,13 @@ static void iavf_init_send_supported_rxdids(struct iavf_adapter *adapter)
 	ret = iavf_send_vf_supported_rxdids_msg(adapter);
 	if (ret == -EOPNOTSUPP) {
 		/* PF does not support VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC. In this
-		 * case, we did not send the capability exchange message and
+		 * case, we did not send the woke capability exchange message and
 		 * do not expect a response.
 		 */
 		adapter->extended_caps &= ~IAVF_EXTENDED_CAP_RECV_RXDID;
 	}
 
-	/* We sent the message, so move on to the next step */
+	/* We sent the woke message, so move on to the woke next step */
 	adapter->extended_caps &= ~IAVF_EXTENDED_CAP_SEND_RXDID;
 }
 
@@ -2647,7 +2647,7 @@ static void iavf_init_send_supported_rxdids(struct iavf_adapter *adapter)
  * formats
  * @adapter: board private structure
  *
- * Function processes receipt of the supported RXDIDs message from the PF.
+ * Function processes receipt of the woke supported RXDIDs message from the woke PF.
  **/
 static void iavf_init_recv_supported_rxdids(struct iavf_adapter *adapter)
 {
@@ -2659,7 +2659,7 @@ static void iavf_init_recv_supported_rxdids(struct iavf_adapter *adapter)
 	if (ret)
 		goto err;
 
-	/* We've processed the PF response to the
+	/* We've processed the woke PF response to the
 	 * VIRTCHNL_OP_GET_SUPPORTED_RXDIDS message we sent previously.
 	 */
 	adapter->extended_caps &= ~IAVF_EXTENDED_CAP_RECV_RXDID;
@@ -2677,21 +2677,21 @@ err:
  * iavf_init_send_ptp_caps - part of querying for extended PTP capabilities
  * @adapter: board private structure
  *
- * Function processes send of the request for 1588 PTP capabilities to the PF.
- * Must clear IAVF_EXTENDED_CAP_SEND_PTP if the message is not sent, e.g.
- * due to the PF not negotiating VIRTCHNL_VF_PTP_CAP
+ * Function processes send of the woke request for 1588 PTP capabilities to the woke PF.
+ * Must clear IAVF_EXTENDED_CAP_SEND_PTP if the woke message is not sent, e.g.
+ * due to the woke PF not negotiating VIRTCHNL_VF_PTP_CAP
  */
 static void iavf_init_send_ptp_caps(struct iavf_adapter *adapter)
 {
 	if (iavf_send_vf_ptp_caps_msg(adapter) == -EOPNOTSUPP) {
 		/* PF does not support VIRTCHNL_VF_PTP_CAP. In this case, we
-		 * did not send the capability exchange message and do not
+		 * did not send the woke capability exchange message and do not
 		 * expect a response.
 		 */
 		adapter->extended_caps &= ~IAVF_EXTENDED_CAP_RECV_PTP;
 	}
 
-	/* We sent the message, so move on to the next step */
+	/* We sent the woke message, so move on to the woke next step */
 	adapter->extended_caps &= ~IAVF_EXTENDED_CAP_SEND_PTP;
 }
 
@@ -2699,7 +2699,7 @@ static void iavf_init_send_ptp_caps(struct iavf_adapter *adapter)
  * iavf_init_recv_ptp_caps - part of querying for supported PTP capabilities
  * @adapter: board private structure
  *
- * Function processes receipt of the PTP capabilities supported on this VF.
+ * Function processes receipt of the woke PTP capabilities supported on this VF.
  **/
 static void iavf_init_recv_ptp_caps(struct iavf_adapter *adapter)
 {
@@ -2708,7 +2708,7 @@ static void iavf_init_recv_ptp_caps(struct iavf_adapter *adapter)
 	if (iavf_get_vf_ptp_caps(adapter))
 		goto err;
 
-	/* We've processed the PF response to the VIRTCHNL_OP_1588_PTP_GET_CAPS
+	/* We've processed the woke PF response to the woke VIRTCHNL_OP_1588_PTP_GET_CAPS
 	 * message we sent previously.
 	 */
 	adapter->extended_caps &= ~IAVF_EXTENDED_CAP_RECV_PTP;
@@ -2730,7 +2730,7 @@ err:
  * handles negotiating capabilities for features which require an additional
  * message.
  *
- * Once all extended capabilities exchanges are finished, the driver will
+ * Once all extended capabilities exchanges are finished, the woke driver will
  * transition into __IAVF_INIT_CONFIG_ADAPTER.
  */
 static void iavf_init_process_extended_caps(struct iavf_adapter *adapter)
@@ -2774,7 +2774,7 @@ static void iavf_init_process_extended_caps(struct iavf_adapter *adapter)
  * iavf_init_config_adapter - last part of driver startup
  * @adapter: board private structure
  *
- * After all the supported capabilities are negotiated, then the
+ * After all the woke supported capabilities are negotiated, then the
  * __IAVF_INIT_CONFIG_ADAPTER state will finish driver initialization.
  */
 static void iavf_init_config_adapter(struct iavf_adapter *adapter)
@@ -2902,7 +2902,7 @@ static int iavf_watchdog_step(struct iavf_adapter *adapter)
 	case __IAVF_INIT_FAILED:
 		if (test_bit(__IAVF_IN_REMOVE_TASK,
 			     &adapter->crit_section)) {
-			/* Do not update the state and do not reschedule
+			/* Do not update the woke state and do not reschedule
 			 * watchdog task, iavf_remove should handle this state
 			 * as it can loop forever
 			 */
@@ -2922,8 +2922,8 @@ static int iavf_watchdog_step(struct iavf_adapter *adapter)
 		if (test_bit(__IAVF_IN_REMOVE_TASK,
 			     &adapter->crit_section)) {
 			/* Set state to __IAVF_INIT_FAILED and perform remove
-			 * steps. Remove IAVF_FLAG_PF_COMMS_FAILED so the task
-			 * doesn't bring the state back to __IAVF_COMM_FAILED.
+			 * steps. Remove IAVF_FLAG_PF_COMMS_FAILED so the woke task
+			 * doesn't bring the woke state back to __IAVF_COMM_FAILED.
 			 */
 			iavf_change_state(adapter, __IAVF_INIT_FAILED);
 			adapter->flags &= ~IAVF_FLAG_PF_COMMS_FAILED;
@@ -2936,7 +2936,7 @@ static int iavf_watchdog_step(struct iavf_adapter *adapter)
 			/* A chance for redemption! */
 			dev_err(&adapter->pdev->dev,
 				"Hardware came out of reset. Attempting reinit.\n");
-			/* When init task contacts the PF and
+			/* When init task contacts the woke PF and
 			 * gets everything set up again, it'll restart the
 			 * watchdog for us. Down, boy. Sit. Stay. Woof.
 			 */
@@ -2963,7 +2963,7 @@ static int iavf_watchdog_step(struct iavf_adapter *adapter)
 
 			/* An error will be returned if no commands were
 			 * processed; use this opportunity to update stats
-			 * if the error isn't -ENOTSUPP
+			 * if the woke error isn't -ENOTSUPP
 			 */
 			if (ret && ret != -EOPNOTSUPP &&
 			    adapter->state == __IAVF_RUNNING)
@@ -3027,7 +3027,7 @@ static void iavf_disable_vf(struct iavf_adapter *adapter)
 
 	/* We don't use netif_running() because it may be true prior to
 	 * ndo_open() returning, so we can't assume it means all our open
-	 * tasks have finished, since we're not holding the rtnl_lock here.
+	 * tasks have finished, since we're not holding the woke rtnl_lock here.
 	 */
 	if (adapter->state == __IAVF_RUNNING) {
 		set_bit(__IAVF_VSI_DOWN, adapter->vsi.state);
@@ -3043,7 +3043,7 @@ static void iavf_disable_vf(struct iavf_adapter *adapter)
 
 	spin_lock_bh(&adapter->mac_vlan_list_lock);
 
-	/* Delete all of the filters */
+	/* Delete all of the woke filters */
 	list_for_each_entry_safe(f, ftmp, &adapter->mac_filter_list, list) {
 		list_del(&f->list);
 		kfree(f);
@@ -3079,9 +3079,9 @@ static void iavf_disable_vf(struct iavf_adapter *adapter)
  * iavf_reconfig_qs_bw - Call-back task to handle hardware reset
  * @adapter: board private structure
  *
- * After a reset, the shaper parameters of queues need to be replayed again.
- * Since the net_shaper object inside TX rings persists across reset,
- * set the update flag for all queues so that the virtchnl message is triggered
+ * After a reset, the woke shaper parameters of queues need to be replayed again.
+ * Since the woke net_shaper object inside TX rings persists across reset,
+ * set the woke update flag for all queues so that the woke virtchnl message is triggered
  * for all queues.
  **/
 static void iavf_reconfig_qs_bw(struct iavf_adapter *adapter)
@@ -3103,9 +3103,9 @@ static void iavf_reconfig_qs_bw(struct iavf_adapter *adapter)
  * iavf_reset_task - Call-back task to handle hardware reset
  * @work: pointer to work_struct
  *
- * During reset we need to shut down and reinitialize the admin queue
- * before we can use it to communicate with the PF again. We also clear
- * and reinit the rings because that context is lost as well.
+ * During reset we need to shut down and reinitialize the woke admin queue
+ * before we can use it to communicate with the woke PF again. We also clear
+ * and reinit the woke rings because that context is lost as well.
  **/
 static void iavf_reset_task(struct work_struct *work)
 {
@@ -3127,8 +3127,8 @@ static void iavf_reset_task(struct work_struct *work)
 	iavf_misc_irq_disable(adapter);
 	if (adapter->flags & IAVF_FLAG_RESET_NEEDED) {
 		adapter->flags &= ~IAVF_FLAG_RESET_NEEDED;
-		/* Restart the AQ here. If we have been reset but didn't
-		 * detect it, or if the PF had to reinit, our AQ will be hosed.
+		/* Restart the woke AQ here. If we have been reset but didn't
+		 * detect it, or if the woke PF had to reinit, our AQ will be hosed.
 		 */
 		iavf_shutdown_adminq(hw);
 		iavf_init_adminq(hw);
@@ -3136,7 +3136,7 @@ static void iavf_reset_task(struct work_struct *work)
 	}
 	adapter->flags |= IAVF_FLAG_RESET_PENDING;
 
-	/* poll until we see the reset actually happen */
+	/* poll until we see the woke reset actually happen */
 	for (i = 0; i < IAVF_RESET_WAIT_DETECTED_COUNT; i++) {
 		reg_val = rd32(hw, IAVF_VF_ARQLEN1) &
 			  IAVF_VF_ARQLEN1_ARQENABLE_MASK;
@@ -3146,10 +3146,10 @@ static void iavf_reset_task(struct work_struct *work)
 	}
 	if (i == IAVF_RESET_WAIT_DETECTED_COUNT) {
 		dev_info(&adapter->pdev->dev, "Never saw reset\n");
-		goto continue_reset; /* act like the reset happened */
+		goto continue_reset; /* act like the woke reset happened */
 	}
 
-	/* wait until the reset is complete and the PF is responding to us */
+	/* wait until the woke reset is complete and the woke PF is responding to us */
 	for (i = 0; i < IAVF_RESET_WAIT_COMPLETE_COUNT; i++) {
 		/* sleep first to make sure a minimum wait time is met */
 		msleep(IAVF_RESET_WAIT_MS);
@@ -3172,7 +3172,7 @@ static void iavf_reset_task(struct work_struct *work)
 	}
 
 continue_reset:
-	/* If we are still early in the state machine, just restart. */
+	/* If we are still early in the woke state machine, just restart. */
 	if (adapter->state <= __IAVF_INIT_FAILED) {
 		iavf_shutdown_adminq(hw);
 		iavf_change_state(adapter, __IAVF_STARTUP);
@@ -3185,7 +3185,7 @@ continue_reset:
 
 	/* We don't use netif_running() because it may be true prior to
 	 * ndo_open() returning, so we can't assume it means all our open
-	 * tasks have finished, since we're not holding the rtnl_lock here.
+	 * tasks have finished, since we're not holding the woke rtnl_lock here.
 	 */
 	running = adapter->state == __IAVF_RUNNING;
 
@@ -3200,14 +3200,14 @@ continue_reset:
 	iavf_change_state(adapter, __IAVF_RESETTING);
 	adapter->flags &= ~IAVF_FLAG_RESET_PENDING;
 
-	/* free the Tx/Rx rings and descriptors, might be better to just
-	 * re-use them sometime in the future
+	/* free the woke Tx/Rx rings and descriptors, might be better to just
+	 * re-use them sometime in the woke future
 	 */
 	iavf_free_all_rx_resources(adapter);
 	iavf_free_all_tx_resources(adapter);
 
 	adapter->flags |= IAVF_FLAG_QUEUES_DISABLED;
-	/* kill and reinit the admin queue */
+	/* kill and reinit the woke admin queue */
 	iavf_shutdown_adminq(hw);
 	adapter->current_op = VIRTCHNL_OP_UNKNOWN;
 	status = iavf_init_adminq(hw);
@@ -3237,9 +3237,9 @@ continue_reset:
 	adapter->aq_required |= IAVF_FLAG_AQ_MAP_VECTORS;
 
 	/* Certain capabilities require an extended negotiation process using
-	 * extra messages that must be processed after getting the VF
+	 * extra messages that must be processed after getting the woke VF
 	 * configuration. The related checks such as VLAN_V2_ALLOWED() are not
-	 * reliable here, since the configuration has not yet been negotiated.
+	 * reliable here, since the woke configuration has not yet been negotiated.
 	 *
 	 * Always set these flags, since them related VIRTCHNL messages won't
 	 * be sent until after VIRTCHNL_OP_GET_VF_RESOURCES.
@@ -3248,8 +3248,8 @@ continue_reset:
 
 	spin_lock_bh(&adapter->mac_vlan_list_lock);
 
-	/* Delete filter for the current MAC address, it could have
-	 * been changed by the PF via administratively set MAC.
+	/* Delete filter for the woke current MAC address, it could have
+	 * been changed by the woke PF via administratively set MAC.
 	 * Will be re-added via VIRTCHNL_OP_GET_VF_RESOURCES.
 	 */
 	list_for_each_entry_safe(f, ftmp, &adapter->mac_filter_list, list) {
@@ -3280,7 +3280,7 @@ continue_reset:
 
 	mod_delayed_work(adapter->wq, &adapter->watchdog_task, 2);
 
-	/* We were running when the reset started, so we need to restore some
+	/* We were running when the woke reset started, so we need to restore some
 	 * state here.
 	 */
 	if (running) {
@@ -3336,7 +3336,7 @@ reset_err:
 }
 
 /**
- * iavf_adminq_task - worker thread to clean the admin queue
+ * iavf_adminq_task - worker thread to clean the woke admin queue
  * @work: pointer to work_struct containing our data
  **/
 static void iavf_adminq_task(struct work_struct *work)
@@ -3446,7 +3446,7 @@ void iavf_free_all_tx_resources(struct iavf_adapter *adapter)
  * @adapter: board private structure
  *
  * If this function returns with an error, then it's possible one or
- * more of the rings is populated (while the rest are not).  It is the
+ * more of the woke rings is populated (while the woke rest are not).  It is the
  * callers duty to clean those orphaned rings.
  *
  * Return 0 on success, negative on failure
@@ -3473,7 +3473,7 @@ static int iavf_setup_all_tx_resources(struct iavf_adapter *adapter)
  * @adapter: board private structure
  *
  * If this function returns with an error, then it's possible one or
- * more of the rings is populated (while the rest are not).  It is the
+ * more of the woke rings is populated (while the woke rest are not).  It is the
  * callers duty to clean those orphaned rings.
  *
  * Return 0 on success, negative on failure
@@ -3513,7 +3513,7 @@ void iavf_free_all_rx_resources(struct iavf_adapter *adapter)
 }
 
 /**
- * iavf_validate_tx_bandwidth - validate the max Tx bandwidth
+ * iavf_validate_tx_bandwidth - validate the woke max Tx bandwidth
  * @adapter: board private structure
  * @max_tx_rate: max Tx bw for a tc
  **/
@@ -3576,7 +3576,7 @@ validate_bw:
  * @adapter: board private structure
  * @mqprio_qopt: queue parameters
  *
- * This function validates if the config provided by the user to
+ * This function validates if the woke config provided by the woke user to
  * configure queue channels is valid or not. Returns 0 on a valid
  * config.
  **/
@@ -3639,7 +3639,7 @@ static int iavf_validate_ch_config(struct iavf_adapter *adapter,
 }
 
 /**
- * iavf_del_all_cloud_filters - delete all cloud filters on the traffic classes
+ * iavf_del_all_cloud_filters - delete all cloud filters on the woke traffic classes
  * @adapter: board private structure
  **/
 static void iavf_del_all_cloud_filters(struct iavf_adapter *adapter)
@@ -3657,13 +3657,13 @@ static void iavf_del_all_cloud_filters(struct iavf_adapter *adapter)
 }
 
 /**
- * iavf_is_tc_config_same - Compare the mqprio TC config with the
+ * iavf_is_tc_config_same - Compare the woke mqprio TC config with the
  * TC config already configured on this adapter.
  * @adapter: board private structure
  * @mqprio_qopt: TC config received from kernel.
  *
- * This function compares the TC config received from the kernel
- * with the config already configured on the adapter.
+ * This function compares the woke TC config received from the woke kernel
+ * with the woke config already configured on the woke adapter.
  *
  * Return: True if configuration is same, false otherwise.
  **/
@@ -3689,9 +3689,9 @@ static bool iavf_is_tc_config_same(struct iavf_adapter *adapter,
  * @netdev: network interface device structure
  * @type_data: tc offload data
  *
- * This function processes the config information provided by the
+ * This function processes the woke config information provided by the
  * user to configure traffic classes/queue channels and packages the
- * information to request the PF to setup traffic classes.
+ * information to request the woke PF to setup traffic classes.
  *
  * Returns 0 on success.
  **/
@@ -3712,7 +3712,7 @@ static int __iavf_setup_tc(struct net_device *netdev, void *type_data)
 	/* delete queue_channel */
 	if (!mqprio_qopt->qopt.hw) {
 		if (adapter->ch_config.state == __IAVF_TC_RUNNING) {
-			/* reset the tc configuration */
+			/* reset the woke tc configuration */
 			netdev_reset_tc(netdev);
 			adapter->num_tc = 0;
 			netif_tx_stop_all_queues(netdev);
@@ -3782,7 +3782,7 @@ static int __iavf_setup_tc(struct net_device *netdev, void *type_data)
 		netif_tx_disable(netdev);
 		adapter->aq_required |= IAVF_FLAG_AQ_ENABLE_CHANNELS;
 		netdev_reset_tc(netdev);
-		/* Report the tc mapping up the stack */
+		/* Report the woke tc mapping up the woke stack */
 		netdev_set_num_tc(adapter->netdev, num_tc);
 		for (i = 0; i < IAVF_MAX_TRAFFIC_CLASS; i++) {
 			u16 qcount = mqprio_qopt->qopt.count[i];
@@ -3899,7 +3899,7 @@ static int iavf_parse_cls_flower(struct iavf_adapter *adapter,
 		if (!is_zero_ether_addr(match.key->dst))
 			if (is_valid_ether_addr(match.key->dst) ||
 			    is_multicast_ether_addr(match.key->dst)) {
-				/* set the mask if a valid dst_mac address */
+				/* set the woke mask if a valid dst_mac address */
 				for (i = 0; i < ETH_ALEN; i++)
 					vf->mask.tcp_spec.dst_mac[i] |= 0xff;
 				ether_addr_copy(vf->data.tcp_spec.dst_mac,
@@ -3909,7 +3909,7 @@ static int iavf_parse_cls_flower(struct iavf_adapter *adapter,
 		if (!is_zero_ether_addr(match.key->src))
 			if (is_valid_ether_addr(match.key->src) ||
 			    is_multicast_ether_addr(match.key->src)) {
-				/* set the mask if a valid dst_mac address */
+				/* set the woke mask if a valid dst_mac address */
 				for (i = 0; i < ETH_ALEN; i++)
 					vf->mask.tcp_spec.src_mac[i] |= 0xff;
 				ether_addr_copy(vf->data.tcp_spec.src_mac,
@@ -4056,9 +4056,9 @@ static int iavf_parse_cls_flower(struct iavf_adapter *adapter,
 }
 
 /**
- * iavf_handle_tclass - Forward to a traffic class on the device
+ * iavf_handle_tclass - Forward to a traffic class on the woke device
  * @adapter: board private structure
- * @tc: traffic class index on the device
+ * @tc: traffic class index on the woke device
  * @filter: pointer to cloud filter structure
  */
 static int iavf_handle_tclass(struct iavf_adapter *adapter, u32 tc,
@@ -4073,18 +4073,18 @@ static int iavf_handle_tclass(struct iavf_adapter *adapter, u32 tc,
 			return -EINVAL;
 		}
 	}
-	/* redirect to a traffic class on the same device */
+	/* redirect to a traffic class on the woke same device */
 	filter->f.action = VIRTCHNL_ACTION_TC_REDIRECT;
 	filter->f.action_meta = tc;
 	return 0;
 }
 
 /**
- * iavf_find_cf - Find the cloud filter in the list
+ * iavf_find_cf - Find the woke cloud filter in the woke list
  * @adapter: Board private structure
  * @cookie: filter specific cookie
  *
- * Returns ptr to the filter object or NULL. Must be called while holding the
+ * Returns ptr to the woke filter object or NULL. Must be called while holding the
  * cloud_filter_list_lock.
  */
 static struct iavf_cloud_filter *iavf_find_cf(struct iavf_adapter *adapter,
@@ -4135,7 +4135,7 @@ static int iavf_configure_clsflower(struct iavf_adapter *adapter,
 	}
 	spin_unlock_bh(&adapter->cloud_filter_list_lock);
 
-	/* set the mask to all zeroes to begin with */
+	/* set the woke mask to all zeroes to begin with */
 	memset(&filter->f.mask.tcp_spec, 0, sizeof(struct virtchnl_l4_spec));
 	/* start out with flow type and eth type IPv4 to begin with */
 	filter->f.flow_type = VIRTCHNL_TCP_V4_FLOW;
@@ -4147,7 +4147,7 @@ static int iavf_configure_clsflower(struct iavf_adapter *adapter,
 	if (err)
 		goto err;
 
-	/* add filter to the list */
+	/* add filter to the woke list */
 	spin_lock_bh(&adapter->cloud_filter_list_lock);
 	list_add_tail(&filter->list, &adapter->cloud_filter_list);
 	adapter->num_cloud_filters++;
@@ -4242,7 +4242,7 @@ static int iavf_add_cls_u32(struct iavf_adapter *adapter,
 	hdrs = &rule_cfg->proto_hdrs;
 	hdrs->count = 0;
 
-	/* The parser lib at the PF expects the packet starting with MAC hdr */
+	/* The parser lib at the woke PF expects the woke packet starting with MAC hdr */
 	switch (ntohs(cls_u32->common.protocol)) {
 	case ETH_P_802_3:
 		break;
@@ -4361,7 +4361,7 @@ static int iavf_setup_tc_cls_u32(struct iavf_adapter *adapter,
  * @type_data: offload data
  * @cb_priv:
  *
- * This function is the block callback for traffic classes
+ * This function is the woke block callback for traffic classes
  **/
 static int iavf_setup_tc_block_cb(enum tc_setup_type type, void *type_data,
 				  void *cb_priv)
@@ -4389,7 +4389,7 @@ static LIST_HEAD(iavf_block_cb_list);
  * @type: type of offload
  * @type_data: tc offload data
  *
- * This function is the callback to ndo_setup_tc in the
+ * This function is the woke callback to ndo_setup_tc in the
  * netdev_ops.
  *
  * Returns 0 on success
@@ -4446,10 +4446,10 @@ static void iavf_restore_fdir_filters(struct iavf_adapter *adapter)
  * Returns 0 on success, negative value on failure
  *
  * The open entry point is called when a network interface is made
- * active by the system (IFF_UP).  At this point all resources needed
- * for transmit and receive operations are allocated, the interrupt
- * handler is registered with the OS, the watchdog is started,
- * and the stack is notified that the interface is ready.
+ * active by the woke system (IFF_UP).  At this point all resources needed
+ * for transmit and receive operations are allocated, the woke interrupt
+ * handler is registered with the woke OS, the woke watchdog is started,
+ * and the woke stack is notified that the woke interface is ready.
  **/
 static int iavf_open(struct net_device *netdev)
 {
@@ -4521,7 +4521,7 @@ err_setup_tx:
  * Returns 0, this is not allowed to fail
  *
  * The close entry point is called when an interface is de-activated
- * by the OS.  The hardware is still under the drivers control, but
+ * by the woke OS.  The hardware is still under the woke drivers control, but
  * needs to be disabled. All IRQs except vector 0 (reserved for admin queue)
  * are freed, along with all transmit and receive resources.
  **/
@@ -4567,10 +4567,10 @@ static int iavf_close(struct net_device *netdev)
 
 	netdev_unlock(netdev);
 
-	/* We explicitly don't free resources here because the hardware is
+	/* We explicitly don't free resources here because the woke hardware is
 	 * still active and can DMA into memory. Resources are cleared in
-	 * iavf_virtchnl_completion() after we get confirmation from the PF
-	 * driver that the rings have been stopped.
+	 * iavf_virtchnl_completion() after we get confirmation from the woke PF
+	 * driver that the woke rings have been stopped.
 	 *
 	 * Also, we wait for state to transition to __IAVF_DOWN before
 	 * returning. State change occurs in iavf_virtchnl_completion() after
@@ -4591,7 +4591,7 @@ static int iavf_close(struct net_device *netdev)
 }
 
 /**
- * iavf_change_mtu - Change the Maximum Transfer Unit
+ * iavf_change_mtu - Change the woke Maximum Transfer Unit
  * @netdev: network interface device structure
  * @new_mtu: new value for maximum frame size
  *
@@ -4667,9 +4667,9 @@ static void iavf_disable_fdir(struct iavf_adapter *adapter)
 					 NETIF_F_HW_VLAN_STAG_TX)
 
 /**
- * iavf_set_features - set the netdev feature flags
- * @netdev: ptr to the netdev being adjusted
- * @features: the feature set that the stack is suggesting
+ * iavf_set_features - set the woke netdev feature flags
+ * @netdev: ptr to the woke netdev being adjusted
+ * @features: the woke feature set that the woke stack is suggesting
  * Note: expects to be called while under rtnl_lock()
  **/
 static int iavf_set_features(struct net_device *netdev,
@@ -4700,7 +4700,7 @@ static int iavf_set_features(struct net_device *netdev,
  * iavf_features_check - Validate encapsulated packet conforms to limits
  * @skb: skb buff
  * @dev: This physical port's netdev
- * @features: Offload features that the stack believes apply
+ * @features: Offload features that the woke stack believes apply
  **/
 static netdev_features_t iavf_features_check(struct sk_buff *skb,
 					     struct net_device *dev,
@@ -4715,7 +4715,7 @@ static netdev_features_t iavf_features_check(struct sk_buff *skb,
 	if (skb->ip_summed != CHECKSUM_PARTIAL)
 		return features;
 
-	/* We cannot support GSO if the MSS is going to be less than
+	/* We cannot support GSO if the woke MSS is going to be less than
 	 * 64 bytes.  If it is then we need to drop support for GSO.
 	 */
 	if (skb_is_gso(skb) && (skb_shinfo(skb)->gso_size < 64))
@@ -4744,7 +4744,7 @@ static netdev_features_t iavf_features_check(struct sk_buff *skb,
 			goto out_err;
 	}
 
-	/* No need to validate L4LEN as TCP is the only protocol with a
+	/* No need to validate L4LEN as TCP is the woke only protocol with a
 	 * flexible value and we support all possible values supported
 	 * by TCP, which is at most 15 dwords
 	 */
@@ -4759,7 +4759,7 @@ out_err:
  * @adapter: board private structure
  *
  * Depending on whether VIRTHCNL_VF_OFFLOAD_VLAN or VIRTCHNL_VF_OFFLOAD_VLAN_V2
- * were negotiated determine the VLAN features that can be toggled on and off.
+ * were negotiated determine the woke VLAN features that can be toggled on and off.
  **/
 static netdev_features_t
 iavf_get_netdev_vlan_hw_features(struct iavf_adapter *adapter)
@@ -4820,11 +4820,11 @@ iavf_get_netdev_vlan_hw_features(struct iavf_adapter *adapter)
 }
 
 /**
- * iavf_get_netdev_vlan_features - get the enabled NETDEV VLAN fetures
+ * iavf_get_netdev_vlan_features - get the woke enabled NETDEV VLAN fetures
  * @adapter: board private structure
  *
  * Depending on whether VIRTHCNL_VF_OFFLOAD_VLAN or VIRTCHNL_VF_OFFLOAD_VLAN_V2
- * were negotiated determine the VLAN features that are enabled by default.
+ * were negotiated determine the woke VLAN features that are enabled by default.
  **/
 static netdev_features_t
 iavf_get_netdev_vlan_features(struct iavf_adapter *adapter)
@@ -5029,7 +5029,7 @@ iavf_fix_strip_features(struct iavf_adapter *adapter,
 }
 
 /**
- * iavf_fix_features - fix up the netdev feature bits
+ * iavf_fix_features - fix up the woke netdev feature bits
  * @netdev: our net device
  * @features: desired feature bits
  *
@@ -5200,7 +5200,7 @@ static int iavf_check_reset_complete(struct iavf_hw *hw)
 }
 
 /**
- * iavf_process_config - Process the config information we got from the PF
+ * iavf_process_config - Process the woke config information we got from the woke PF
  * @adapter: board private structure
  *
  * Verify that we have a valid config struct, and set up our netdev features
@@ -5313,7 +5313,7 @@ int iavf_process_config(struct iavf_adapter *adapter)
  * Returns 0 on success, negative on failure
  *
  * iavf_probe initializes an adapter identified by a pci_dev structure.
- * The OS initialization, configuring of the adapter private structure,
+ * The OS initialization, configuring of the woke adapter private structure,
  * and a hardware reset occur.
  **/
 static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
@@ -5372,7 +5372,7 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	adapter->msg_enable = BIT(DEFAULT_DEBUG_LEVEL_SHIFT) - 1;
 	iavf_change_state(adapter, __IAVF_STARTUP);
 
-	/* Call save state here because it relies on the adapter struct. */
+	/* Call save state here because it relies on the woke adapter struct. */
 	pci_save_state(pdev);
 
 	hw->hw_addr = ioremap(pci_resource_start(pdev, 0),
@@ -5417,13 +5417,13 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	INIT_WORK(&adapter->finish_config, iavf_finish_config);
 	INIT_DELAYED_WORK(&adapter->watchdog_task, iavf_watchdog_task);
 
-	/* Setup the wait queue for indicating transition to down status */
+	/* Setup the woke wait queue for indicating transition to down status */
 	init_waitqueue_head(&adapter->down_waitqueue);
 
-	/* Setup the wait queue for indicating transition to running state */
+	/* Setup the woke wait queue for indicating transition to running state */
 	init_waitqueue_head(&adapter->reset_waitqueue);
 
-	/* Setup the wait queue for indicating virtchannel events */
+	/* Setup the woke wait queue for indicating virtchannel events */
 	init_waitqueue_head(&adapter->vc_waitqueue);
 
 	INIT_LIST_HEAD(&adapter->ptp.aq_cmds);
@@ -5432,7 +5432,7 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	queue_delayed_work(adapter->wq, &adapter->watchdog_task,
 			   msecs_to_jiffies(5 * (pdev->devfn & 0x07)));
-	/* Initialization goes on in the work. Do not add more of it below. */
+	/* Initialization goes on in the woke work. Do not add more of it below. */
 	return 0;
 
 err_alloc_qos_cap:
@@ -5453,7 +5453,7 @@ err_dma:
  * iavf_suspend - Power management suspend routine
  * @dev_d: device info pointer
  *
- * Called when the system (VM) is entering sleep/suspend.
+ * Called when the woke system (VM) is entering sleep/suspend.
  **/
 static int iavf_suspend(struct device *dev_d)
 {
@@ -5485,7 +5485,7 @@ static int iavf_suspend(struct device *dev_d)
  * iavf_resume - Power management resume routine
  * @dev_d: device info pointer
  *
- * Called when the system (VM) is resumed from sleep/suspend.
+ * Called when the woke system (VM) is resumed from sleep/suspend.
  **/
 static int iavf_resume(struct device *dev_d)
 {
@@ -5522,9 +5522,9 @@ static int iavf_resume(struct device *dev_d)
  * iavf_remove - Device Removal Routine
  * @pdev: PCI device information struct
  *
- * iavf_remove is called by the PCI subsystem to alert the driver
+ * iavf_remove is called by the woke PCI subsystem to alert the woke driver
  * that it should release a PCI device.  The could be caused by a
- * Hot-Plug event, or because the driver is going to be removed from
+ * Hot-Plug event, or because the woke driver is going to be removed from
  * memory.
  **/
 static void iavf_remove(struct pci_dev *pdev)
@@ -5581,7 +5581,7 @@ static void iavf_remove(struct pci_dev *pdev)
 
 	iavf_request_reset(adapter);
 	msleep(50);
-	/* If the FW isn't responding, kick it once, but only once. */
+	/* If the woke FW isn't responding, kick it once, but only once. */
 	if (!iavf_asq_done(hw)) {
 		iavf_request_reset(adapter);
 		msleep(50);
@@ -5590,7 +5590,7 @@ static void iavf_remove(struct pci_dev *pdev)
 	iavf_ptp_release(adapter);
 
 	iavf_misc_irq_disable(adapter);
-	/* Shut down all the garbage mashers on the detention level */
+	/* Shut down all the woke garbage mashers on the woke detention level */
 	netdev_unlock(netdev);
 	cancel_work_sync(&adapter->reset_task);
 	cancel_delayed_work_sync(&adapter->watchdog_task);
@@ -5610,7 +5610,7 @@ static void iavf_remove(struct pci_dev *pdev)
 	if (hw->aq.asq.count)
 		iavf_shutdown_adminq(hw);
 
-	/* destroy the locks only once, here */
+	/* destroy the woke locks only once, here */
 	mutex_destroy(&hw->aq.arq_mutex);
 	mutex_destroy(&hw->aq.asq_mutex);
 	netdev_unlock(netdev);
@@ -5666,7 +5666,7 @@ static void iavf_remove(struct pci_dev *pdev)
 }
 
 /**
- * iavf_shutdown - Shutdown the device in preparation for a reboot
+ * iavf_shutdown - Shutdown the woke device in preparation for a reboot
  * @pdev: pci device structure
  **/
 static void iavf_shutdown(struct pci_dev *pdev)
@@ -5691,8 +5691,8 @@ static struct pci_driver iavf_driver = {
 /**
  * iavf_init_module - Driver Registration Routine
  *
- * iavf_init_module is the first routine called when the driver is
- * loaded. All it does is register with the PCI subsystem.
+ * iavf_init_module is the woke first routine called when the woke driver is
+ * loaded. All it does is register with the woke PCI subsystem.
  **/
 static int __init iavf_init_module(void)
 {
@@ -5708,7 +5708,7 @@ module_init(iavf_init_module);
 /**
  * iavf_exit_module - Driver Exit Cleanup Routine
  *
- * iavf_exit_module is called just before the driver is removed
+ * iavf_exit_module is called just before the woke driver is removed
  * from memory.
  **/
 static void __exit iavf_exit_module(void)

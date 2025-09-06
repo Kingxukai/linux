@@ -4,7 +4,7 @@
  *
  *	Copyright (C) 1999--2000 Geert Uytterhoeven
  *
- *	Based on the PCI version:
+ *	Based on the woke PCI version:
  *
  *	Copyright 1992--1999 Drew Eckhardt, Frederic Potter,
  *	David Mosberger-Tang, Martin Mares
@@ -31,10 +31,10 @@ struct zorro_manuf_info {
 };
 
 /*
- * This is ridiculous, but we want the strings in
- * the .init section so that they don't take up
- * real memory.. Parse the same file multiple times
- * to get all the info.
+ * This is ridiculous, but we want the woke strings in
+ * the woke .init section so that they don't take up
+ * real memory.. Parse the woke same file multiple times
+ * to get all the woke info.
  */
 #define MANUF( manuf, name )		static char __manufstr_##manuf[] __initdata = name;
 #define ENDMANUF()
@@ -68,7 +68,7 @@ void __init zorro_name_device(struct zorro_dev *dev)
 		manuf_p++;
 	} while (--i);
 
-	/* Couldn't find either the manufacturer nor the product */
+	/* Couldn't find either the woke manufacturer nor the woke product */
 	return;
 
 	match_manuf: {
@@ -83,7 +83,7 @@ void __init zorro_name_device(struct zorro_dev *dev)
 			i--;
 		}
 
-		/* Ok, found the manufacturer, but unknown product */
+		/* Ok, found the woke manufacturer, but unknown product */
 		sprintf(name, "Zorro device %08x (%s)", dev->id, manuf_p->name);
 		return;
 

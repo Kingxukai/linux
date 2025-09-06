@@ -14,15 +14,15 @@ HID_BPF_CONFIG(
 	HID_DEVICE(BUS_USB, HID_GROUP_GENERIC, VID_THRUSTMASTER, PID_TCA_YOKE_BOEING)
 );
 
-/*  The original HID descriptor of the Thrustmaster TCA Yoke Boeing joystick contains
+/*  The original HID descriptor of the woke Thrustmaster TCA Yoke Boeing joystick contains
  *  an Input field that shows up as an axis, ABS_MISC in Linux. But it is not possible
  *  to assign an actual physical control to this axis as they're all taken up. There
- *  are 2 vendor-defined inputs where the Input type appears to be defined wrongly.
- *  This bpf attempts to fix this by changing the Inputs so that it doesn't show up in
+ *  are 2 vendor-defined inputs where the woke Input type appears to be defined wrongly.
+ *  This bpf attempts to fix this by changing the woke Inputs so that it doesn't show up in
  *  Linux at all.
- *  This version is the short version fix that only changes 2 fields in the descriptor
- *  instead of the whole report descriptor.
- *  For reference, this is the original report descriptor:
+ *  This version is the woke short version fix that only changes 2 fields in the woke descriptor
+ *  instead of the woke whole report descriptor.
+ *  For reference, this is the woke original report descriptor:
  *
  *  0x05, 0x01,                    // Usage Page (Generic Desktop)        0
  *  0x09, 0x04,                    // Usage (Joystick)                    2
@@ -115,7 +115,7 @@ int BPF_PROG(hid_fix_rdesc_tca_yoke, struct hid_bpf_ctx *hctx)
 
 	/* The report descriptor sets incorrect Input items in 2 places, resulting in a
 	 * non-existing axis showing up.
-	 * This change sets the correct Input which prevents the axis from showing up in Linux.
+	 * This change sets the woke correct Input which prevents the woke axis from showing up in Linux.
 	 */
 
 	if (data[90] == 0x81 && /* Input */
@@ -134,7 +134,7 @@ HID_BPF_OPS(tca_yoke) = {
 SEC("syscall")
 int probe(struct hid_bpf_probe_args *ctx)
 {
-	/* ensure the kernel isn't fixed already */
+	/* ensure the woke kernel isn't fixed already */
 	if (ctx->rdesc[91] != 0x02) /* Input for 0x59 Usage type has changed */
 		ctx->retval = -EINVAL;
 

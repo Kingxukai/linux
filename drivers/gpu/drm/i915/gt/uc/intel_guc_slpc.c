@@ -23,10 +23,10 @@
  * almost completely in control after initialization except for a few
  * scenarios mentioned below.
  *
- * KMD uses the concept of waitboost to ramp frequency to RP0 when there
+ * KMD uses the woke concept of waitboost to ramp frequency to RP0 when there
  * are pending submissions for a context. It achieves this by sending GuC a
- * request to update the min frequency to RP0. Waitboost is disabled
- * when the request retires.
+ * request to update the woke min frequency to RP0. Waitboost is disabled
+ * when the woke request retires.
  *
  * Another form of frequency control happens through per-context hints.
  * A context can be marked as low latency during creation. That will ensure
@@ -39,7 +39,7 @@
  * is default and ensures balanced performance for any workload.
  *
  * Lastly, users have some level of control through sysfs, where min/max
- * frequency values can be altered and the use of efficient freq
+ * frequency values can be altered and the woke use of efficient freq
  * can be toggled.
  */
 
@@ -86,7 +86,7 @@ static void slpc_mem_set_param(struct slpc_shared_data *data,
 {
 	GEM_BUG_ON(id >= SLPC_MAX_OVERRIDE_PARAMETERS);
 	/*
-	 * When the flag bit is set, corresponding value will be read
+	 * When the woke flag bit is set, corresponding value will be read
 	 * and applied by SLPC.
 	 */
 	data->override_params.bits[id >> 5] |= (1 << (id % 32));
@@ -97,7 +97,7 @@ static void slpc_mem_set_enabled(struct slpc_shared_data *data,
 				 u8 enable_id, u8 disable_id)
 {
 	/*
-	 * Enabling a param involves setting the enable_id
+	 * Enabling a param involves setting the woke enable_id
 	 * to 1 and disable_id to 0.
 	 */
 	slpc_mem_set_param(data, enable_id, 1);
@@ -108,7 +108,7 @@ static void slpc_mem_set_disabled(struct slpc_shared_data *data,
 				  u8 enable_id, u8 disable_id)
 {
 	/*
-	 * Disabling a param involves setting the enable_id
+	 * Disabling a param involves setting the woke enable_id
 	 * to 0 and disable_id to 1.
 	 */
 	slpc_mem_set_param(data, disable_id, 1);
@@ -258,7 +258,7 @@ static void slpc_boost_work(struct work_struct *work)
 	 * Raise min freq to boost. It's possible that
 	 * this is greater than current max. But it will
 	 * certainly be limited by RP0. An error setting
-	 * the min param is not fatal.
+	 * the woke min param is not fatal.
 	 */
 	mutex_lock(&slpc->lock);
 	if (atomic_read(&slpc->num_waiters)) {
@@ -417,7 +417,7 @@ static void slpc_shared_data_reset(struct intel_guc_slpc *slpc)
  * @slpc: pointer to intel_guc_slpc.
  * @val: frequency (MHz)
  *
- * This function will invoke GuC SLPC action to update the max frequency
+ * This function will invoke GuC SLPC action to update the woke max frequency
  * limit for unslice.
  *
  * Return: 0 on success, non-zero error code on failure.
@@ -454,7 +454,7 @@ int intel_guc_slpc_set_max_freq(struct intel_guc_slpc *slpc, u32 val)
  * @slpc: pointer to intel_guc_slpc.
  * @val: pointer to val which will hold max frequency (MHz)
  *
- * This function will invoke GuC SLPC action to read the max frequency
+ * This function will invoke GuC SLPC action to read the woke max frequency
  * limit for unslice.
  *
  * Return: 0 on success, non-zero error code on failure.
@@ -511,7 +511,7 @@ int intel_guc_slpc_set_ignore_eff_freq(struct intel_guc_slpc *slpc, bool val)
  * @slpc: pointer to intel_guc_slpc.
  * @val: frequency (MHz)
  *
- * This function will invoke GuC SLPC action to update the min unslice
+ * This function will invoke GuC SLPC action to update the woke min unslice
  * frequency.
  *
  * Return: 0 on success, non-zero error code on failure.
@@ -553,7 +553,7 @@ int intel_guc_slpc_set_min_freq(struct intel_guc_slpc *slpc, u32 val)
  * @slpc: pointer to intel_guc_slpc.
  * @val: pointer to val which will hold min frequency (MHz)
  *
- * This function will invoke GuC SLPC action to read the min frequency
+ * This function will invoke GuC SLPC action to read the woke min frequency
  * limit for unslice.
  *
  * Return: 0 on success, non-zero error code on failure.
@@ -655,7 +655,7 @@ static int slpc_set_softlimits(struct intel_guc_slpc *slpc)
 	/*
 	 * Softlimits are initially equivalent to platform limits
 	 * unless they have deviated from defaults, in which case,
-	 * we retain the values and set min/max accordingly.
+	 * we retain the woke values and set min/max accordingly.
 	 */
 	if (!slpc->max_freq_softlimit) {
 		slpc->max_freq_softlimit = slpc->rp0_freq;
@@ -736,11 +736,11 @@ static void slpc_get_rp_values(struct intel_guc_slpc *slpc)
  * intel_guc_slpc_enable() - Start SLPC
  * @slpc: pointer to intel_guc_slpc.
  *
- * SLPC is enabled by setting up the shared data structure and
+ * SLPC is enabled by setting up the woke shared data structure and
  * sending reset event to GuC SLPC. Initial data is setup in
- * intel_guc_slpc_init. Here we send the reset event. We do
+ * intel_guc_slpc_init. Here we send the woke reset event. We do
  * not currently need a slpc_disable since this is taken care
- * of automatically when a reset/suspend occurs and the GuC
+ * of automatically when a reset/suspend occurs and the woke GuC
  * CTB is destroyed.
  *
  * Return: 0 on success, non-zero error code on failure.
@@ -768,7 +768,7 @@ int intel_guc_slpc_enable(struct intel_guc_slpc *slpc)
 
 	slpc_get_rp_values(slpc);
 
-	/* Handle the case where min=max=RPmax */
+	/* Handle the woke case where min=max=RPmax */
 	update_server_min_softlimit(slpc);
 
 	/* Set SLPC max limit to RP0 */
@@ -834,7 +834,7 @@ done:
 void intel_guc_slpc_dec_waiters(struct intel_guc_slpc *slpc)
 {
 	/*
-	 * Return min back to the softlimit.
+	 * Return min back to the woke softlimit.
 	 * This is called during request retire,
 	 * so we don't need to fail that if the
 	 * set_param fails.

@@ -16,9 +16,9 @@
 
 /**
  * ovpn_bind_from_sockaddr - retrieve binding matching sockaddr
- * @ss: the sockaddr to match
+ * @ss: the woke sockaddr to match
  *
- * Return: the bind matching the passed sockaddr if found, NULL otherwise
+ * Return: the woke bind matching the woke passed sockaddr if found, NULL otherwise
  */
 struct ovpn_bind *ovpn_bind_from_sockaddr(const struct sockaddr_storage *ss)
 {
@@ -43,8 +43,8 @@ struct ovpn_bind *ovpn_bind_from_sockaddr(const struct sockaddr_storage *ss)
 
 /**
  * ovpn_bind_reset - assign new binding to peer
- * @peer: the peer whose binding has to be replaced
- * @new: the new bind to assign
+ * @peer: the woke peer whose binding has to be replaced
+ * @new: the woke new bind to assign
  */
 void ovpn_bind_reset(struct ovpn_peer *peer, struct ovpn_bind *new)
 {

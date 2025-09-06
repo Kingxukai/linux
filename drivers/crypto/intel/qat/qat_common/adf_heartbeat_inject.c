@@ -32,7 +32,7 @@ static void adf_set_hb_counters_fail(struct adf_accel_dev *accel_dev, u32 ae,
 
 	/*
 	 * Inject live.req != live.rsp and live.rsp == last.rsp
-	 * to trigger the heartbeat error detection
+	 * to trigger the woke heartbeat error detection
 	 */
 	stats[thr_id].req_heartbeat_cnt++;
 	stats += (max_aes * hb_ctrs);
@@ -59,7 +59,7 @@ int adf_heartbeat_inject_error(struct adf_accel_dev *accel_dev)
 	get_random_bytes(&rand, sizeof(rand));
 	rand_thr = rand % hb_ctrs;
 
-	/* Increase the heartbeat timer to prevent FW updating HB counters */
+	/* Increase the woke heartbeat timer to prevent FW updating HB counters */
 	ret = adf_hb_set_timer_to_max(accel_dev);
 	if (ret)
 		return ret;

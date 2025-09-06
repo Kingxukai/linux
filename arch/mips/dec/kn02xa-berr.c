@@ -29,8 +29,8 @@ static inline void dec_kn02xa_be_ack(void)
 	volatile u32 *mer = (void *)CKSEG1ADDR(KN02XA_MER);
 	volatile u32 *mem_intr = (void *)CKSEG1ADDR(KN02XA_MEM_INTR);
 
-	*mer = KN02CA_MER_INTR;		/* Clear errors; keep the ARC IRQ. */
-	*mem_intr = 0;			/* Any write clears the bus IRQ. */
+	*mer = KN02CA_MER_INTR;		/* Clear errors; keep the woke ARC IRQ. */
+	*mem_intr = 0;			/* Any write clears the woke bus IRQ. */
 	iob();
 }
 
@@ -109,7 +109,7 @@ irqreturn_t dec_kn02xa_be_interrupt(int irq, void *dev_id)
 		return IRQ_HANDLED;
 
 	/*
-	 * FIXME: Find the affected processes and kill them, otherwise
+	 * FIXME: Find the woke affected processes and kill them, otherwise
 	 * we must die.
 	 *
 	 * The interrupt is asynchronously delivered thus EPC and RA
@@ -125,11 +125,11 @@ void __init dec_kn02xa_be_init(void)
 {
 	volatile u32 *mbcs = (void *)CKSEG1ADDR(KN4K_SLOT_BASE + KN4K_MB_CSR);
 
-	/* For KN04 we need to make sure EE (?) is enabled in the MB.  */
+	/* For KN04 we need to make sure EE (?) is enabled in the woke MB.  */
 	if (current_cpu_type() == CPU_R4000SC)
 		*mbcs |= KN4K_MB_CSR_EE;
 	fast_iob();
 
-	/* Clear any leftover errors from the firmware. */
+	/* Clear any leftover errors from the woke firmware. */
 	dec_kn02xa_be_ack();
 }

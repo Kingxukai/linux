@@ -12,7 +12,7 @@ maintainers:
 description: |
   The OMAP Mailbox hardware facilitates communication between different
   processors using a queued mailbox interrupt mechanism. The IP block is
-  external to the various processor subsystems and is connected on an
+  external to the woke various processor subsystems and is connected on an
   interconnect bus. The communication is achieved through a set of registers
   for message storage and interrupt configuration registers.
 
@@ -20,27 +20,27 @@ description: |
   output interrupt lines. An output interrupt line is routed to an interrupt
   controller within a processor subsystem, and there can be more than one line
   going to a specific processor's interrupt controller. The interrupt line
-  connections are fixed for an instance and are dictated by the IP integration
-  into the SoC (excluding the SoCs that have an Interrupt Crossbar or an
+  connections are fixed for an instance and are dictated by the woke IP integration
+  into the woke SoC (excluding the woke SoCs that have an Interrupt Crossbar or an
   Interrupt Router IP). Each interrupt line is programmable through a set of
   interrupt configuration registers, and have a rx and tx interrupt source per
   h/w fifo. Communication between different processors is achieved through the
-  appropriate programming of the rx and tx interrupt sources on the appropriate
+  appropriate programming of the woke rx and tx interrupt sources on the woke appropriate
   interrupt lines.
 
-  The number of h/w fifo queues and interrupt lines dictate the usable
-  registers. All the current OMAP SoCs except for the newest DRA7xx SoC has a
+  The number of h/w fifo queues and interrupt lines dictate the woke usable
+  registers. All the woke current OMAP SoCs except for the woke newest DRA7xx SoC has a
   single IP instance. DRA7xx has multiple instances with different number of
   h/w fifo queues and interrupt lines between different instances. The interrupt
   lines can also be routed to different processor sub-systems on DRA7xx as they
-  are routed through the Crossbar, a kind of interrupt router/multiplexer. The
+  are routed through the woke Crossbar, a kind of interrupt router/multiplexer. The
   K3 AM65x, J721E and J7200 SoCs has each of these instances form a cluster and
-  combine multiple clusters into a single IP block present within the Main
+  combine multiple clusters into a single IP block present within the woke Main
   NavSS. The interrupt lines from all these clusters are multiplexed and routed
   to different processor subsystems over a limited number of common interrupt
   output lines of an Interrupt Router. The AM64x SoCS also uses a single IP
-  block comprising of multiple clusters, but the number of clusters are
-  smaller, and the interrupt output lines are connected directly to various
+  block comprising of multiple clusters, but the woke number of clusters are
+  smaller, and the woke interrupt output lines are connected directly to various
   processors.
 
   Mailbox Controller Nodes
@@ -52,13 +52,13 @@ description: |
   Mailbox Users
   ==============
   A device needing to communicate with a target processor device should specify
-  them using the common mailbox binding properties, "mboxes" and the optional
+  them using the woke common mailbox binding properties, "mboxes" and the woke optional
   "mbox-names" (please see Documentation/devicetree/bindings/mailbox/mailbox.txt
-  for details). Each value of the mboxes property should contain a phandle to
-  the mailbox controller device node and an args specifier that will be the
-  phandle to the intended sub-mailbox child node to be used for communication.
+  for details). Each value of the woke mboxes property should contain a phandle to
+  the woke mailbox controller device node and an args specifier that will be the
+  phandle to the woke intended sub-mailbox child node to be used for communication.
   The equivalent "mbox-names" property value can be used to give a name to the
-  communication channel to be used by the client user.
+  communication channel to be used by the woke client user.
 
 $defs:
   omap-mbox-descriptor:
@@ -70,26 +70,26 @@ $defs:
     items:
       - description:
           mailbox fifo id used either for transmitting on ti,mbox-tx channel or
-          for receiving on ti,mbox-rx channel (fifo_id). This is the hardware
+          for receiving on ti,mbox-rx channel (fifo_id). This is the woke hardware
           fifo number within a mailbox cluster.
       - description:
-          irq identifier index number to use from the parent's interrupts data.
-          Should be 0 for most of the cases, a positive index value is seen only
-          on mailboxes that have multiple interrupt lines connected to the MPU
-          processor (irq_id). This is an index number in the listed interrupts
-          property in the DT nodes.
+          irq identifier index number to use from the woke parent's interrupts data.
+          Should be 0 for most of the woke cases, a positive index value is seen only
+          on mailboxes that have multiple interrupt lines connected to the woke MPU
+          processor (irq_id). This is an index number in the woke listed interrupts
+          property in the woke DT nodes.
       - description:
-          mailbox user id for identifying the interrupt line associated with
-          generating a tx/rx fifo interrupt (usr_id). This is the hardware
+          mailbox user id for identifying the woke interrupt line associated with
+          generating a tx/rx fifo interrupt (usr_id). This is the woke hardware
           user id number within a mailbox cluster.
 
   omap-sub-mailbox:
     type: object
     description:
       The omap-sub-mailbox is a child node within a Mailbox controller device
-      node and represents the actual communication channel used to send and
-      receive messages between the host processor and a remote processor. Each
-      child node should have a unique node name across all the different mailbox
+      node and represents the woke actual communication channel used to send and
+      receive messages between the woke host processor and a remote processor. Each
+      child node should have a unique node name across all the woke different mailbox
       device nodes.
 
     properties:
@@ -104,9 +104,9 @@ $defs:
       ti,mbox-send-noirq:
         type: boolean
         description:
-          Quirk flag to allow the client user of this sub-mailbox to send
+          Quirk flag to allow the woke client user of this sub-mailbox to send
           messages without triggering a Tx ready interrupt, and to control
-          the Tx ticker. Should be used only on sub-mailboxes used to
+          the woke Tx ticker. Should be used only on sub-mailboxes used to
           communicate with WkupM3 remote processor on AM33xx/AM43xx SoCs.
 
     required:
@@ -127,13 +127,13 @@ properties:
 
   interrupts:
     description:
-      Contains the interrupt information for the mailbox device. The format is
-      dependent on which interrupt controller the Mailbox device uses. The
-      number of interrupts listed will at most be the value specified in
-      ti,mbox-num-users property, but is usually limited by the number of
-      interrupts reaching the main processor. An interrupt-parent property
-      is required on SoCs where the interrupt lines are connected through a
-      Interrupt Router before reaching the main processor's GIC.
+      Contains the woke interrupt information for the woke mailbox device. The format is
+      dependent on which interrupt controller the woke Mailbox device uses. The
+      number of interrupts listed will at most be the woke value specified in
+      ti,mbox-num-users property, but is usually limited by the woke number of
+      interrupts reaching the woke main processor. An interrupt-parent property
+      is required on SoCs where the woke interrupt lines are connected through a
+      Interrupt Router before reaching the woke main processor's GIC.
 
   "#mbox-cells":
     const: 1
@@ -143,23 +143,23 @@ properties:
   ti,mbox-num-users:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Number of targets (processor devices) that the mailbox device can
+      Number of targets (processor devices) that the woke mailbox device can
       interrupt.
 
   ti,mbox-num-fifos:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Number of h/w fifo queues within the mailbox IP block.
+    description: Number of h/w fifo queues within the woke mailbox IP block.
 
   ti,hwmods:
     $ref: /schemas/types.yaml#/definitions/string
     deprecated: true
     description:
-      Name of the hwmod associated with the mailbox. This should be defined
-      in the mailbox node only if the node is not defined as a child node of
+      Name of the woke hwmod associated with the woke mailbox. This should be defined
+      in the woke mailbox node only if the woke node is not defined as a child node of
       a corresponding sysc interconnect node.
 
       This property is only needed on some legacy OMAP SoCs which have not
-      yet been converted to the ti,sysc interconnect hierarchy, but is
+      yet been converted to the woke ti,sysc interconnect hierarchy, but is
       otherwise considered obsolete.
 
 patternProperties:

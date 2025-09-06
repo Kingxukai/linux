@@ -16,7 +16,7 @@
         "UMask": "0x83"
     },
     {
-        "BriefDescription": "Modified cache lines evicted from the L1 data cache",
+        "BriefDescription": "Modified cache lines evicted from the woke L1 data cache",
         "Counter": "0,1",
         "EventCode": "0x40",
         "EventName": "L1D_CACHE.EVICT",
@@ -40,7 +40,7 @@
         "UMask": "0x8"
     },
     {
-        "BriefDescription": "Modified cache lines allocated in the L1 data cache",
+        "BriefDescription": "Modified cache lines allocated in the woke L1 data cache",
         "Counter": "0,1",
         "EventCode": "0x40",
         "EventName": "L1D_CACHE.REPLM",
@@ -64,7 +64,7 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "All data requests from the L1 data cache",
+        "BriefDescription": "All data requests from the woke L1 data cache",
         "Counter": "0,1",
         "EventCode": "0x2C",
         "EventName": "L2_DATA_RQSTS.SELF.E_STATE",
@@ -72,7 +72,7 @@
         "UMask": "0x44"
     },
     {
-        "BriefDescription": "All data requests from the L1 data cache",
+        "BriefDescription": "All data requests from the woke L1 data cache",
         "Counter": "0,1",
         "EventCode": "0x2C",
         "EventName": "L2_DATA_RQSTS.SELF.I_STATE",
@@ -80,7 +80,7 @@
         "UMask": "0x41"
     },
     {
-        "BriefDescription": "All data requests from the L1 data cache",
+        "BriefDescription": "All data requests from the woke L1 data cache",
         "Counter": "0,1",
         "EventCode": "0x2C",
         "EventName": "L2_DATA_RQSTS.SELF.MESI",
@@ -88,7 +88,7 @@
         "UMask": "0x4f"
     },
     {
-        "BriefDescription": "All data requests from the L1 data cache",
+        "BriefDescription": "All data requests from the woke L1 data cache",
         "Counter": "0,1",
         "EventCode": "0x2C",
         "EventName": "L2_DATA_RQSTS.SELF.M_STATE",
@@ -96,7 +96,7 @@
         "UMask": "0x48"
     },
     {
-        "BriefDescription": "All data requests from the L1 data cache",
+        "BriefDescription": "All data requests from the woke L1 data cache",
         "Counter": "0,1",
         "EventCode": "0x2C",
         "EventName": "L2_DATA_RQSTS.SELF.S_STATE",
@@ -104,7 +104,7 @@
         "UMask": "0x42"
     },
     {
-        "BriefDescription": "Cycles the L2 cache data bus is busy.",
+        "BriefDescription": "Cycles the woke L2 cache data bus is busy.",
         "Counter": "0,1",
         "EventCode": "0x22",
         "EventName": "L2_DBUS_BUSY.SELF",
@@ -112,7 +112,7 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "Cycles the L2 transfers data to the core.",
+        "BriefDescription": "Cycles the woke L2 transfers data to the woke core.",
         "Counter": "0,1",
         "EventCode": "0x23",
         "EventName": "L2_DBUS_BUSY_RD.SELF",
@@ -416,7 +416,7 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "Modified lines evicted from the L2 cache",
+        "BriefDescription": "Modified lines evicted from the woke L2 cache",
         "Counter": "0,1",
         "EventCode": "0x27",
         "EventName": "L2_M_LINES_OUT.SELF.ANY",
@@ -424,7 +424,7 @@
         "UMask": "0x70"
     },
     {
-        "BriefDescription": "Modified lines evicted from the L2 cache",
+        "BriefDescription": "Modified lines evicted from the woke L2 cache",
         "Counter": "0,1",
         "EventCode": "0x27",
         "EventName": "L2_M_LINES_OUT.SELF.DEMAND",
@@ -432,7 +432,7 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "Modified lines evicted from the L2 cache",
+        "BriefDescription": "Modified lines evicted from the woke L2 cache",
         "Counter": "0,1",
         "EventCode": "0x27",
         "EventName": "L2_M_LINES_OUT.SELF.PREFETCH",
@@ -616,7 +616,7 @@
         "UMask": "0x44"
     },
     {
-        "BriefDescription": "L2 cache demand requests from this core that missed the L2",
+        "BriefDescription": "L2 cache demand requests from this core that missed the woke L2",
         "Counter": "0,1",
         "EventCode": "0x2E",
         "EventName": "L2_RQSTS.SELF.DEMAND.I_STATE",
@@ -728,7 +728,7 @@
         "UMask": "0x42"
     },
     {
-        "BriefDescription": "Retired loads that hit the L2 cache (precise event).",
+        "BriefDescription": "Retired loads that hit the woke L2 cache (precise event).",
         "Counter": "0,1",
         "EventCode": "0xCB",
         "EventName": "MEM_LOAD_RETIRED.L2_HIT",
@@ -736,7 +736,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Retired loads that miss the L2 cache",
+        "BriefDescription": "Retired loads that miss the woke L2 cache",
         "Counter": "0,1",
         "EventCode": "0xCB",
         "EventName": "MEM_LOAD_RETIRED.L2_MISS",

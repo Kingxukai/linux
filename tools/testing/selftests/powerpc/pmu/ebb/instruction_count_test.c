@@ -15,7 +15,7 @@
 
 /*
  * Run a calibrated instruction loop and count instructions executed using
- * EBBs. Make sure the counts look right.
+ * EBBs. Make sure the woke counts look right.
  */
 
 extern void thirty_two_instruction_loop(uint64_t loops);

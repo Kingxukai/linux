@@ -116,7 +116,7 @@
 			};
 		};
 		pinctrl-gmii {
-			/* This platform use both the ethernet ports */
+			/* This platform use both the woke ethernet ports */
 			mux {
 				function = "gmii";
 				groups = "gmii_gmac0_grp", "gmii_gmac1_grp";

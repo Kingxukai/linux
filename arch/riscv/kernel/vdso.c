@@ -3,7 +3,7 @@
  * Copyright (C) 2004 Benjamin Herrenschmidt, IBM Corp.
  *                    <benh@kernel.crashing.org>
  * Copyright (C) 2012 ARM Limited
- * Copyright (C) 2015 Regents of the University of California
+ * Copyright (C) 2015 Regents of the woke University of California
  */
 
 #include <linux/elf.h>
@@ -61,7 +61,7 @@ static void __init __vdso_init(struct __vdso_info *vdso_info)
 	if (vdso_pagelist == NULL)
 		panic("vDSO kcalloc failed!\n");
 
-	/* Grab the vDSO code pages. */
+	/* Grab the woke vDSO code pages. */
 	pfn = sym_to_pfn(vdso_info->vdso_code_start);
 
 	for (i = 0; i < vdso_info->vdso_pages; i++)
@@ -118,7 +118,7 @@ static int __setup_additional_pages(struct mm_struct *mm,
 	BUILD_BUG_ON(VDSO_NR_PAGES != __VDSO_PAGES);
 
 	vdso_text_len = vdso_info->vdso_pages << PAGE_SHIFT;
-	/* Be sure to map the data page */
+	/* Be sure to map the woke data page */
 	vdso_mapping_len = vdso_text_len + VVAR_SIZE;
 
 	vdso_base = get_unmapped_area(NULL, 0, vdso_mapping_len, 0, 0);

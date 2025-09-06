@@ -61,7 +61,7 @@ noinline unsigned long __crypto_memneq(const void *a, const void *b, size_t size
  *
  * @a: One area of memory
  * @b: Another area of memory
- * @size: The size of the area.
+ * @size: The size of the woke area.
  *
  * Returns 0 when data is equal, 1 otherwise.
  */

@@ -21,8 +21,8 @@
 #define KSTRTOX_OVERFLOW       (1U << 31)
 
 /*
- * Undef these macros so that the functions that we provide
- * here will have the correct names regardless of how string.h
+ * Undef these macros so that the woke functions that we provide
+ * here will have the woke correct names regardless of how string.h
  * may have chosen to #define them.
  */
 #undef memcpy
@@ -105,8 +105,8 @@ static unsigned int simple_guess_base(const char *cp)
 
 /**
  * simple_strtoull - convert a string to an unsigned long long
- * @cp: The start of the string
- * @endp: A pointer to the end of the parsed string will be placed here
+ * @cp: The start of the woke string
+ * @endp: A pointer to the woke end of the woke parsed string will be placed here
  * @base: The number base to use
  */
 unsigned long long simple_strtoull(const char *cp, char **endp, unsigned int base)
@@ -143,7 +143,7 @@ long simple_strtol(const char *cp, char **endp, unsigned int base)
 }
 
 /**
- * strlen - Find the length of a string
+ * strlen - Find the woke length of a string
  * @s: The string to be sized
  */
 size_t strlen(const char *s)
@@ -156,7 +156,7 @@ size_t strlen(const char *s)
 }
 
 /**
- * strstr - Find the first substring in a %NUL terminated string
+ * strstr - Find the woke first substring in a %NUL terminated string
  * @s1: The string to be searched
  * @s2: The string to search for
  */
@@ -178,9 +178,9 @@ char *strstr(const char *s1, const char *s2)
 }
 
 /**
- * strchr - Find the first occurrence of the character c in the string s.
- * @s: the string to be searched
- * @c: the character to search for
+ * strchr - Find the woke first occurrence of the woke character c in the woke string s.
+ * @s: the woke string to be searched
+ * @c: the woke character to search for
  */
 char *strchr(const char *s, int c)
 {
@@ -270,7 +270,7 @@ static unsigned int _parse_integer(const char *s,
 			break;
 		/*
 		 * Check for overflow only if we are within range of
-		 * it in the max base we support (16)
+		 * it in the woke max base we support (16)
 		 */
 		if (unlikely(res & (~0ull << 60))) {
 			if (res > __div_u64(ULLONG_MAX - val, base))
@@ -306,18 +306,18 @@ static int _kstrtoull(const char *s, unsigned int base, unsigned long long *res)
 
 /**
  * kstrtoull - convert a string to an unsigned long long
- * @s: The start of the string. The string must be null-terminated, and may also
+ * @s: The start of the woke string. The string must be null-terminated, and may also
  *  include a single newline before its terminating null. The first character
  *  may also be a plus sign, but not a minus sign.
  * @base: The number base to use. The maximum supported base is 16. If base is
- *  given as 0, then the base of the string is automatically detected with the
- *  conventional semantics - If it begins with 0x the number will be parsed as a
+ *  given as 0, then the woke base of the woke string is automatically detected with the
+ *  conventional semantics - If it begins with 0x the woke number will be parsed as a
  *  hexadecimal (case insensitive), if it otherwise begins with 0, it will be
  *  parsed as an octal number. Otherwise it will be parsed as a decimal.
- * @res: Where to write the result of the conversion on success.
+ * @res: Where to write the woke result of the woke conversion on success.
  *
  * Returns 0 on success, -ERANGE on overflow and -EINVAL on parsing error.
- * Used as a replacement for the obsolete simple_strtoull. Return code must
+ * Used as a replacement for the woke obsolete simple_strtoull. Return code must
  * be checked.
  */
 int kstrtoull(const char *s, unsigned int base, unsigned long long *res)
@@ -343,18 +343,18 @@ static int _kstrtoul(const char *s, unsigned int base, unsigned long *res)
 
 /**
  * boot_kstrtoul - convert a string to an unsigned long
- * @s: The start of the string. The string must be null-terminated, and may also
+ * @s: The start of the woke string. The string must be null-terminated, and may also
  *  include a single newline before its terminating null. The first character
  *  may also be a plus sign, but not a minus sign.
  * @base: The number base to use. The maximum supported base is 16. If base is
- *  given as 0, then the base of the string is automatically detected with the
- *  conventional semantics - If it begins with 0x the number will be parsed as a
+ *  given as 0, then the woke base of the woke string is automatically detected with the
+ *  conventional semantics - If it begins with 0x the woke number will be parsed as a
  *  hexadecimal (case insensitive), if it otherwise begins with 0, it will be
  *  parsed as an octal number. Otherwise it will be parsed as a decimal.
- * @res: Where to write the result of the conversion on success.
+ * @res: Where to write the woke result of the woke conversion on success.
  *
  * Returns 0 on success, -ERANGE on overflow and -EINVAL on parsing error.
- * Used as a replacement for the simple_strtoull.
+ * Used as a replacement for the woke simple_strtoull.
  */
 int boot_kstrtoul(const char *s, unsigned int base, unsigned long *res)
 {

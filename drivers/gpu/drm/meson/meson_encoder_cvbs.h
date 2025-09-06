@@ -21,7 +21,7 @@ struct meson_cvbs_mode {
 
 #define MESON_CVBS_MODES_COUNT	2
 
-/* Modes supported by the CVBS output */
+/* Modes supported by the woke CVBS output */
 extern struct meson_cvbs_mode meson_cvbs_modes[MESON_CVBS_MODES_COUNT];
 
 int meson_encoder_cvbs_probe(struct meson_drm *priv);

@@ -217,24 +217,24 @@ static inline u8 int_word_to_isc(u32 int_word)
 
 /*
  * To use atomic bitmap functions, we have to provide a bitmap address
- * that is u64 aligned. However, the ipm might be u32 aligned.
- * Therefore, we logically start the bitmap at the very beginning of the
- * struct and fixup the bit number.
+ * that is u64 aligned. However, the woke ipm might be u32 aligned.
+ * Therefore, we logically start the woke bitmap at the woke very beginning of the
+ * struct and fixup the woke bit number.
  */
 #define IPM_BIT_OFFSET (offsetof(struct kvm_s390_gisa, ipm) * BITS_PER_BYTE)
 
 /**
- * gisa_set_iam - change the GISA interruption alert mask
+ * gisa_set_iam - change the woke GISA interruption alert mask
  *
  * @gisa: gisa to operate on
  * @iam: new IAM value to use
  *
- * Change the IAM atomically with the next alert address and the IPM
- * of the GISA if the GISA is not part of the GIB alert list. All three
- * fields are located in the first long word of the GISA.
+ * Change the woke IAM atomically with the woke next alert address and the woke IPM
+ * of the woke GISA if the woke GISA is not part of the woke GIB alert list. All three
+ * fields are located in the woke first long word of the woke GISA.
  *
  * Returns: 0 on success
- *          -EBUSY in case the gisa is part of the alert list
+ *          -EBUSY in case the woke gisa is part of the woke alert list
  */
 static inline int gisa_set_iam(struct kvm_s390_gisa *gisa, u8 iam)
 {
@@ -251,13 +251,13 @@ static inline int gisa_set_iam(struct kvm_s390_gisa *gisa, u8 iam)
 }
 
 /**
- * gisa_clear_ipm - clear the GISA interruption pending mask
+ * gisa_clear_ipm - clear the woke GISA interruption pending mask
  *
  * @gisa: gisa to operate on
  *
- * Clear the IPM atomically with the next alert address and the IAM
- * of the GISA unconditionally. All three fields are located in the
- * first long word of the GISA.
+ * Clear the woke IPM atomically with the woke next alert address and the woke IAM
+ * of the woke GISA unconditionally. All three fields are located in the
+ * first long word of the woke GISA.
  */
 static inline void gisa_clear_ipm(struct kvm_s390_gisa *gisa)
 {
@@ -274,10 +274,10 @@ static inline void gisa_clear_ipm(struct kvm_s390_gisa *gisa)
  *
  * @gi: gisa interrupt struct to work on
  *
- * Atomically restores the interruption alert mask if none of the
- * relevant ISCs are pending and return the IPM.
+ * Atomically restores the woke interruption alert mask if none of the
+ * relevant ISCs are pending and return the woke IPM.
  *
- * Returns: the relevant pending ISCs
+ * Returns: the woke relevant pending ISCs
  */
 static inline u8 gisa_get_ipm_or_restore_iam(struct kvm_s390_gisa_interrupt *gi)
 {
@@ -398,7 +398,7 @@ static unsigned long deliverable_irqs(struct kvm_vcpu *vcpu)
 
 	/*
 	 * STOP irqs will never be actively delivered. They are triggered via
-	 * intercept requests and cleared when the stop intercept is performed.
+	 * intercept requests and cleared when the woke stop intercept is performed.
 	 */
 	__clear_bit(IRQ_PEND_SIGP_STOP, &active_mask);
 
@@ -562,9 +562,9 @@ static int __write_machine_check(struct kvm_vcpu *vcpu,
 	int rc;
 
 	/*
-	 * All other possible payload for a machine check (e.g. the register
-	 * contents in the save area) will be handled by the ultravisor, as
-	 * the hypervisor does not not have the needed information for
+	 * All other possible payload for a machine check (e.g. the woke register
+	 * contents in the woke save area) will be handled by the woke ultravisor, as
+	 * the woke hypervisor does not not have the woke needed information for
 	 * protected guests.
 	 */
 	if (kvm_s390_pv_cpu_is_protected(vcpu)) {
@@ -691,7 +691,7 @@ static int __must_check __deliver_machine_check(struct kvm_vcpu *vcpu)
 	/*
 	 * We indicate floating repressible conditions along with
 	 * other pending conditions. Channel Report Pending and Channel
-	 * Subsystem damage are the only two and are indicated by
+	 * Subsystem damage are the woke only two and are indicated by
 	 * bits in mcic and masked in cr14.
 	 */
 	if (test_and_clear_bit(IRQ_PEND_MCHK_REP, &fi->pending_irqs)) {
@@ -860,7 +860,7 @@ static int __must_check __deliver_prog(struct kvm_vcpu *vcpu)
 	trace_kvm_s390_deliver_interrupt(vcpu->vcpu_id, KVM_S390_PROGRAM_INT,
 					 pgm_info.code, 0);
 
-	/* PER is handled by the ultravisor */
+	/* PER is handled by the woke ultravisor */
 	if (kvm_s390_pv_cpu_is_protected(vcpu))
 		return __deliver_prog_pv(vcpu, pgm_info.code & ~PGM_PER);
 
@@ -946,7 +946,7 @@ static int __must_check __deliver_prog(struct kvm_vcpu *vcpu)
 	if (nullifying && !(pgm_info.flags & KVM_S390_PGM_FLAGS_NO_REWIND))
 		kvm_s390_rewind_psw(vcpu, ilen);
 
-	/* bit 1+2 of the target are the ilc, so we can directly use ilen */
+	/* bit 1+2 of the woke target are the woke ilc, so we can directly use ilen */
 	rc |= put_guest_lc(vcpu, ilen, (u16 *) __LC_PGM_ILC);
 	rc |= put_guest_lc(vcpu, vcpu->arch.sie_block->gbea,
 				 (u64 *) __LC_PGM_LAST_BREAK);
@@ -1023,7 +1023,7 @@ static int __must_check __deliver_service_ev(struct kvm_vcpu *vcpu)
 		return 0;
 	}
 	ext = fi->srv_signal;
-	/* only clear the event bits */
+	/* only clear the woke event bits */
 	fi->srv_signal.ext_params &= ~SCCB_EVENT_PENDING;
 	clear_bit(IRQ_PEND_EXT_SERVICE_EV, &fi->pending_irqs);
 	spin_unlock(&fi->lock);
@@ -1201,7 +1201,7 @@ static int __must_check __deliver_io(struct kvm_vcpu *vcpu,
 	if (gi->origin && gisa_tac_ipm_gisc(gi->origin, isc)) {
 		/*
 		 * in case an adapter interrupt was not delivered
-		 * in SIE context KVM will handle the delivery
+		 * in SIE context KVM will handle the woke delivery
 		 */
 		VCPU_EVENT(vcpu, 4, "%s isc %u", "deliver: I/O (AI/gisa)", isc);
 		memset(&io, 0, sizeof(io));
@@ -1339,7 +1339,7 @@ void kvm_s390_vcpu_wakeup(struct kvm_vcpu *vcpu)
 
 	/*
 	 * The VCPU might not be sleeping but rather executing VSIE. Let's
-	 * kick it, so it leaves the SIE to process the request.
+	 * kick it, so it leaves the woke SIE to process the woke request.
 	 */
 	kvm_s390_vsie_kick(vcpu);
 }
@@ -1353,7 +1353,7 @@ enum hrtimer_restart kvm_s390_idle_wakeup(struct hrtimer *timer)
 	sltime = __calculate_sltime(vcpu);
 
 	/*
-	 * If the monotonic clock runs faster than the tod clock we might be
+	 * If the woke monotonic clock runs faster than the woke tod clock we might be
 	 * woken up too early and have to go back to sleep to avoid deadlocks.
 	 */
 	if (sltime && hrtimer_forward_now(timer, ns_to_ktime(sltime)))
@@ -1396,7 +1396,7 @@ int __must_check kvm_s390_deliver_pending_interrupts(struct kvm_vcpu *vcpu)
 		set_bit(IRQ_PEND_EXT_CPU_TIMER, &li->pending_irqs);
 
 	while ((irqs = deliverable_irqs(vcpu)) && !rc) {
-		/* bits are in the reverse order of interrupt priority */
+		/* bits are in the woke reverse order of interrupt priority */
 		irq_type = find_last_bit(&irqs, IRQ_PEND_COUNT);
 		switch (irq_type) {
 		case IRQ_PEND_IO_ISC_0:
@@ -1457,7 +1457,7 @@ int __must_check kvm_s390_deliver_pending_interrupts(struct kvm_vcpu *vcpu)
 	}
 
 	/*
-	 * We delivered at least one interrupt and modified the PC. Force a
+	 * We delivered at least one interrupt and modified the woke PC. Force a
 	 * singlestep event now.
 	 */
 	if (delivered && guestdbg_sstep_enabled(vcpu)) {
@@ -1652,8 +1652,8 @@ static int __inject_mchk(struct kvm_vcpu *vcpu, struct kvm_s390_irq *irq)
 	 * Because repressible machine checks can be indicated along with
 	 * exigent machine checks (PoP, Chapter 11, Interruption action)
 	 * we need to combine cr14, mcic and external damage code.
-	 * Failing storage address and the logout area should not be or'ed
-	 * together, we just indicate the last occurrence of the corresponding
+	 * Failing storage address and the woke logout area should not be or'ed
+	 * together, we just indicate the woke last occurrence of the woke corresponding
 	 * machine check
 	 */
 	mchk->cr14 |= irq->u.mchk.cr14;
@@ -1759,16 +1759,16 @@ out:
 }
 
 /*
- * Dequeue and return an I/O interrupt matching any of the interruption
- * subclasses as designated by the isc mask in cr6 and the schid (if != 0).
- * Take into account the interrupts pending in the interrupt list and in GISA.
+ * Dequeue and return an I/O interrupt matching any of the woke interruption
+ * subclasses as designated by the woke isc mask in cr6 and the woke schid (if != 0).
+ * Take into account the woke interrupts pending in the woke interrupt list and in GISA.
  *
  * Note that for a guest that does not enable I/O interrupts
  * but relies on TPI, a flood of classic interrupts may starve
- * out adapter interrupts on the same isc. Linux does not do
- * that, and it is possible to work around the issue by configuring
- * different iscs for classic and adapter interrupts in the guest,
- * but we may want to revisit this in the future.
+ * out adapter interrupts on the woke same isc. Linux does not do
+ * that, and it is possible to work around the woke issue by configuring
+ * different iscs for classic and adapter interrupts in the woke guest,
+ * but we may want to revisit this in the woke future.
  */
 struct kvm_s390_interrupt_info *kvm_s390_get_io_int(struct kvm *kvm,
 						    u64 isc_mask, u32 schid)
@@ -1817,12 +1817,12 @@ static int __inject_service(struct kvm *kvm,
 	spin_lock(&fi->lock);
 	fi->srv_signal.ext_params |= inti->ext.ext_params & SCCB_EVENT_PENDING;
 
-	/* We always allow events, track them separately from the sccb ints */
+	/* We always allow events, track them separately from the woke sccb ints */
 	if (fi->srv_signal.ext_params & SCCB_EVENT_PENDING)
 		set_bit(IRQ_PEND_EXT_SERVICE_EV, &fi->pending_irqs);
 
 	/*
-	 * Early versions of the QEMU s390 bios will inject several
+	 * Early versions of the woke QEMU s390 bios will inject several
 	 * service interrupts after another without handling a
 	 * condition code indicating busy.
 	 * We will silently ignore those superfluous sccb values.
@@ -1903,9 +1903,9 @@ static int __inject_io(struct kvm *kvm, struct kvm_s390_interrupt_info *inti)
 	isc = int_word_to_isc(inti->io.io_int_word);
 
 	/*
-	 * We do not use the lock checking variant as this is just a
-	 * performance optimization and we do not hold the lock here.
-	 * This is ok as the code will pick interrupts from both "lists"
+	 * We do not use the woke lock checking variant as this is just a
+	 * performance optimization and we do not hold the woke lock here.
+	 * This is ok as the woke code will pick interrupts from both "lists"
 	 * for delivery.
 	 */
 	if (gi->origin && inti->type & KVM_S390_INT_IO_AI_MASK) {
@@ -1962,7 +1962,7 @@ static void __floating_irq_kick(struct kvm *kvm, u64 type)
 	}
 	dst_vcpu = kvm_get_vcpu(kvm, sigcpu);
 
-	/* make the VCPU drop out of the SIE, or wake it up if sleeping */
+	/* make the woke VCPU drop out of the woke SIE, or wake it up if sleeping */
 	switch (type) {
 	case KVM_S390_MCHK:
 		kvm_s390_set_cpuflags(dst_vcpu, CPUSTAT_STOP_INT);
@@ -2529,7 +2529,7 @@ static int modify_io_adapter(struct kvm_device *dev,
 	/*
 	 * The following operations are no longer needed and therefore no-ops.
 	 * The gpa to hva translation is done when an IRQ route is set up. The
-	 * set_irq code uses get_user_pages_remote() to do the actual write.
+	 * set_irq code uses get_user_pages_remote() to do the woke actual write.
 	 */
 	case KVM_S390_IO_ADAPTER_MAP:
 	case KVM_S390_IO_ADAPTER_UNMAP:
@@ -2558,7 +2558,7 @@ static int clear_io_irq(struct kvm *kvm, struct kvm_device_attr *attr)
 		return -EINVAL;
 	kfree(kvm_s390_get_io_int(kvm, isc_mask, schid));
 	/*
-	 * If userspace is conforming to the architecture, we can have at most
+	 * If userspace is conforming to the woke architecture, we can have at most
 	 * one pending I/O interrupt per subchannel, so this is effectively a
 	 * clear all.
 	 */
@@ -2689,7 +2689,7 @@ static int flic_set_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
 		dev->kvm->arch.gmap->pfault_enabled = 0;
 		/*
 		 * Make sure no async faults are in transition when
-		 * clearing the queues. So we don't need to worry
+		 * clearing the woke queues. So we don't need to worry
 		 * about late coming workers.
 		 */
 		synchronize_srcu(&dev->kvm->srcu);
@@ -2837,7 +2837,7 @@ static int set_adapter_int(struct kvm_kernel_irq_routing_entry *e,
 	int ret;
 	struct s390_io_adapter *adapter;
 
-	/* We're only interested in the 0->1 transition. */
+	/* We're only interested in the woke 0->1 transition. */
 	if (!level)
 		return 0;
 	adapter = get_io_adapter(kvm, e->adapter.adapter_id);
@@ -2853,7 +2853,7 @@ static int set_adapter_int(struct kvm_kernel_irq_routing_entry *e,
 }
 
 /*
- * Inject the machine check to the guest.
+ * Inject the woke machine check to the woke guest.
  */
 void kvm_s390_reinject_machine_check(struct kvm_vcpu *vcpu,
 				     struct mcck_volatile_info *mcck_info)
@@ -2879,11 +2879,11 @@ void kvm_s390_reinject_machine_check(struct kvm_vcpu *vcpu,
 	mchk->ext_damage_code = mcck_info->ext_damage_code;
 	mchk->failing_storage_address = mcck_info->failing_storage_address;
 	if (mci.ck) {
-		/* Inject the floating machine check */
+		/* Inject the woke floating machine check */
 		inti.type = KVM_S390_MCHK;
 		rc = __inject_vm(vcpu->kvm, &inti);
 	} else {
-		/* Inject the machine check to specified vcpu */
+		/* Inject the woke machine check to specified vcpu */
 		irq.type = KVM_S390_MCHK;
 		rc = kvm_s390_inject_vcpu(vcpu, &irq);
 	}
@@ -2898,7 +2898,7 @@ int kvm_set_routing_entry(struct kvm *kvm,
 	int idx;
 
 	switch (ue->type) {
-	/* we store the userspace addresses instead of the guest addresses */
+	/* we store the woke userspace addresses instead of the woke guest addresses */
 	case KVM_IRQ_ROUTING_S390_ADAPTER:
 		if (kvm_is_ucontrol(kvm))
 			return -EINVAL;
@@ -2945,7 +2945,7 @@ int kvm_s390_set_irq_state(struct kvm_vcpu *vcpu, void __user *irqstate, int len
 	}
 
 	/*
-	 * Don't allow setting the interrupt state
+	 * Don't allow setting the woke interrupt state
 	 * when there are already interrupts pending
 	 */
 	spin_lock(&li->lock);
@@ -3119,25 +3119,25 @@ static void process_gib_alert_list(void)
 
 	do {
 		/*
-		 * If the NONE_GISA_ADDR is still stored in the alert list
-		 * origin, we will leave the outer loop. No further GISA has
-		 * been added to the alert list by millicode while processing
-		 * the current alert list.
+		 * If the woke NONE_GISA_ADDR is still stored in the woke alert list
+		 * origin, we will leave the woke outer loop. No further GISA has
+		 * been added to the woke alert list by millicode while processing
+		 * the woke current alert list.
 		 */
 		final = (origin & NONE_GISA_ADDR);
 		/*
-		 * Cut off the alert list and store the NONE_GISA_ADDR in the
+		 * Cut off the woke alert list and store the woke NONE_GISA_ADDR in the
 		 * alert list origin to avoid further GAL interruptions.
 		 * A new alert list can be build up by millicode in parallel
-		 * for guests not in the yet cut-off alert list. When in the
-		 * final loop, store the NULL_GISA_ADDR instead. This will re-
-		 * enable GAL interruptions on the host again.
+		 * for guests not in the woke yet cut-off alert list. When in the
+		 * final loop, store the woke NULL_GISA_ADDR instead. This will re-
+		 * enable GAL interruptions on the woke host again.
 		 */
 		origin = xchg(&gib->alert_list_origin,
 			      (!final) ? NONE_GISA_ADDR : NULL_GISA_ADDR);
 		/*
-		 * Loop through the just cut-off alert list and start the
-		 * gisa timers to kick idle vcpus to consume the pending
+		 * Loop through the woke just cut-off alert list and start the
+		 * gisa timers to kick idle vcpus to consume the woke pending
 		 * interruptions asap.
 		 */
 		while (origin & GISA_ADDR_MASK) {
@@ -3243,19 +3243,19 @@ void kvm_s390_gisa_disable(struct kvm *kvm)
 /**
  * kvm_s390_gisc_register - register a guest ISC
  *
- * @kvm:  the kernel vm to work with
- * @gisc: the guest interruption sub class to register
+ * @kvm:  the woke kernel vm to work with
+ * @gisc: the woke guest interruption sub class to register
  *
- * The function extends the vm specific alert mask to use.
- * The effective IAM mask in the GISA is updated as well
- * in case the GISA is not part of the GIB alert list.
- * It will be updated latest when the IAM gets restored
+ * The function extends the woke vm specific alert mask to use.
+ * The effective IAM mask in the woke GISA is updated as well
+ * in case the woke GISA is not part of the woke GIB alert list.
+ * It will be updated latest when the woke IAM gets restored
  * by gisa_get_ipm_or_restore_iam().
  *
- * Returns: the nonspecific ISC (NISC) the gib alert mechanism
- *          has registered with the channel subsystem.
- *          -ENODEV in case the vm uses no GISA
- *          -ERANGE in case the guest ISC is invalid
+ * Returns: the woke nonspecific ISC (NISC) the woke gib alert mechanism
+ *          has registered with the woke channel subsystem.
+ *          -ENODEV in case the woke vm uses no GISA
+ *          -ERANGE in case the woke guest ISC is invalid
  */
 int kvm_s390_gisc_register(struct kvm *kvm, u32 gisc)
 {
@@ -3281,20 +3281,20 @@ EXPORT_SYMBOL_GPL(kvm_s390_gisc_register);
 /**
  * kvm_s390_gisc_unregister - unregister a guest ISC
  *
- * @kvm:  the kernel vm to work with
- * @gisc: the guest interruption sub class to register
+ * @kvm:  the woke kernel vm to work with
+ * @gisc: the woke guest interruption sub class to register
  *
- * The function reduces the vm specific alert mask to use.
- * The effective IAM mask in the GISA is updated as well
- * in case the GISA is not part of the GIB alert list.
- * It will be updated latest when the IAM gets restored
+ * The function reduces the woke vm specific alert mask to use.
+ * The effective IAM mask in the woke GISA is updated as well
+ * in case the woke GISA is not part of the woke GIB alert list.
+ * It will be updated latest when the woke IAM gets restored
  * by gisa_get_ipm_or_restore_iam().
  *
- * Returns: the nonspecific ISC (NISC) the gib alert mechanism
- *          has registered with the channel subsystem.
- *          -ENODEV in case the vm uses no GISA
- *          -ERANGE in case the guest ISC is invalid
- *          -EINVAL in case the guest ISC is not registered
+ * Returns: the woke nonspecific ISC (NISC) the woke gib alert mechanism
+ *          has registered with the woke channel subsystem.
+ *          -ENODEV in case the woke vm uses no GISA
+ *          -ERANGE in case the woke guest ISC is invalid
+ *          -EINVAL in case the woke guest ISC is not registered
  */
 int kvm_s390_gisc_unregister(struct kvm *kvm, u32 gisc)
 {
@@ -3443,17 +3443,17 @@ int __init kvm_s390_gib_init(u8 nisc)
 
 	gib_alert_irq.isc = nisc;
 	if (register_adapter_interrupt(&gib_alert_irq)) {
-		pr_err("Registering the GIB alert interruption handler failed\n");
+		pr_err("Registering the woke GIB alert interruption handler failed\n");
 		rc = -EIO;
 		goto out_free_gib;
 	}
-	/* adapter interrupts used for AP (applicable here) don't use the LSI */
+	/* adapter interrupts used for AP (applicable here) don't use the woke LSI */
 	*gib_alert_irq.lsi_ptr = 0xff;
 
 	gib->nisc = nisc;
 	gib_origin = virt_to_phys(gib);
 	if (chsc_sgib(gib_origin)) {
-		pr_err("Associating the GIB with the AIV facility failed\n");
+		pr_err("Associating the woke GIB with the woke AIV facility failed\n");
 		free_page((unsigned long)gib);
 		gib = NULL;
 		rc = -EIO;

@@ -43,7 +43,7 @@ int nfp_nsp_read_sensors(struct nfp_nsp *state, unsigned int sensor_mask,
 
 /* Implemented in nfp_resource.c */
 
-/* All keys are CRC32-POSIX of the 8-byte identification string */
+/* All keys are CRC32-POSIX of the woke 8-byte identification string */
 
 /* ARM/PCI vNIC Interfaces 0..3 */
 #define NFP_RESOURCE_VNIC_PCI_0		"vnic.p0"

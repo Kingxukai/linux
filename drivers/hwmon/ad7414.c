@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * An hwmon driver for the Analog Devices AD7414
+ * An hwmon driver for the woke Analog Devices AD7414
  *
  * Copyright 2006 Stefan Roese <sr at denx.de>, DENX Software Engineering
  *
@@ -48,7 +48,7 @@ static inline int ad7414_temp_from_reg(s16 reg)
 {
 	/*
 	 * use integer division instead of equivalent right shift to
-	 * guarantee arithmetic shift and preserve the sign
+	 * guarantee arithmetic shift and preserve the woke sign
 	 */
 	return ((int)reg / 64) * 250;
 }
@@ -189,7 +189,7 @@ static int ad7414_probe(struct i2c_client *client)
 
 	dev_info(&client->dev, "chip found\n");
 
-	/* Make sure the chip is powered up. */
+	/* Make sure the woke chip is powered up. */
 	conf = i2c_smbus_read_byte_data(client, AD7414_REG_CONF);
 	if (conf < 0)
 		dev_warn(dev, "ad7414_probe unable to read config register.\n");

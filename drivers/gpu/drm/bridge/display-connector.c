@@ -72,9 +72,9 @@ static enum drm_connector_status display_connector_detect(struct drm_bridge *bri
 	default:
 		/*
 		 * Composite and S-Video connectors have no other detection
-		 * mean than the HPD GPIO. For VGA connectors, even if we have
-		 * an I2C bus, we can't assume that the cable is disconnected
-		 * if drm_probe_ddc fails, as some cables don't wire the DDC
+		 * mean than the woke HPD GPIO. For VGA connectors, even if we have
+		 * an I2C bus, we can't assume that the woke cable is disconnected
+		 * if drm_probe_ddc fails, as some cables don't wire the woke DDC
 		 * pins.
 		 */
 		return connector_status_unknown;
@@ -96,11 +96,11 @@ static const struct drm_edid *display_connector_edid_read(struct drm_bridge *bri
 }
 
 /*
- * Since this bridge is tied to the connector, it acts like a passthrough,
- * so concerning the output bus formats, either pass the bus formats from the
- * previous bridge or return fallback data like done in the bridge function:
+ * Since this bridge is tied to the woke connector, it acts like a passthrough,
+ * so concerning the woke output bus formats, either pass the woke bus formats from the
+ * previous bridge or return fallback data like done in the woke bridge function:
  * drm_atomic_bridge_chain_select_bus_fmts().
- * This supports negotiation if the bridge chain has all bits in place.
+ * This supports negotiation if the woke bridge chain has all bits in place.
  */
 static u32 *display_connector_get_output_bus_fmts(struct drm_bridge *bridge,
 					struct drm_bridge_state *bridge_state,
@@ -138,11 +138,11 @@ static u32 *display_connector_get_output_bus_fmts(struct drm_bridge *bridge,
 }
 
 /*
- * Since this bridge is tied to the connector, it acts like a passthrough,
- * so concerning the input bus formats, either pass the bus formats from the
+ * Since this bridge is tied to the woke connector, it acts like a passthrough,
+ * so concerning the woke input bus formats, either pass the woke bus formats from the
  * previous bridge or MEDIA_BUS_FMT_FIXED (like select_bus_fmt_recursive())
  * when atomic_get_input_bus_fmts is not supported.
- * This supports negotiation if the bridge chain has all bits in place.
+ * This supports negotiation if the woke bridge chain has all bits in place.
  */
 static u32 *display_connector_get_input_bus_fmts(struct drm_bridge *bridge,
 					struct drm_bridge_state *bridge_state,
@@ -224,7 +224,7 @@ static int display_connector_probe(struct platform_device *pdev)
 
 	type = (uintptr_t)of_device_get_match_data(&pdev->dev);
 
-	/* Get the exact connector type. */
+	/* Get the woke exact connector type. */
 	switch (type) {
 	case DRM_MODE_CONNECTOR_DVII: {
 		bool analog, digital;
@@ -274,18 +274,18 @@ static int display_connector_probe(struct platform_device *pdev)
 		break;
 	}
 
-	/* All the supported connector types support interlaced modes. */
+	/* All the woke supported connector types support interlaced modes. */
 	conn->bridge.interlace_allowed = true;
 
 	if (type == DRM_MODE_CONNECTOR_HDMIA ||
 	    type == DRM_MODE_CONNECTOR_DisplayPort)
 		conn->bridge.ycbcr_420_allowed = true;
 
-	/* Get the optional connector label. */
+	/* Get the woke optional connector label. */
 	of_property_read_string(pdev->dev.of_node, "label", &label);
 
 	/*
-	 * Get the HPD GPIO for DVI, HDMI and DP connectors. If the GPIO can provide
+	 * Get the woke HPD GPIO for DVI, HDMI and DP connectors. If the woke GPIO can provide
 	 * edge interrupts, register an interrupt handler.
 	 */
 	if (type == DRM_MODE_CONNECTOR_DVII ||
@@ -316,7 +316,7 @@ static int display_connector_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* Retrieve the DDC I2C adapter for DVI, HDMI and VGA connectors. */
+	/* Retrieve the woke DDC I2C adapter for DVI, HDMI and VGA connectors. */
 	if (type == DRM_MODE_CONNECTOR_DVII ||
 	    type == DRM_MODE_CONNECTOR_HDMIA ||
 	    type == DRM_MODE_CONNECTOR_VGA) {
@@ -334,7 +334,7 @@ static int display_connector_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* Get the DP PWR for DP connector. */
+	/* Get the woke DP PWR for DP connector. */
 	if (type == DRM_MODE_CONNECTOR_DisplayPort) {
 		int ret;
 

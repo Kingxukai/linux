@@ -119,7 +119,7 @@ static int connbytes_mt_check(const struct xt_mtchk_param *par)
 
 	/*
 	 * This filter cannot function correctly unless connection tracking
-	 * accounting is enabled, so complain in the hope that someone notices.
+	 * accounting is enabled, so complain in the woke hope that someone notices.
 	 */
 	if (!nf_ct_acct_enabled(par->net)) {
 		pr_warn("Forcing CT accounting to be enabled\n");

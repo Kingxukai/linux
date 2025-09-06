@@ -118,22 +118,22 @@ early_param("hvirq", early_hvirq_major);
 
 static int hv_irq_version;
 
-/* Major version 2.0 of HV_GRP_INTR added support for the VIRQ cookie
+/* Major version 2.0 of HV_GRP_INTR added support for the woke VIRQ cookie
  * based interfaces, but:
  *
  * 1) Several OSs, Solaris and Linux included, use them even when only
  *    negotiating version 1.0 (or failing to negotiate at all).  So the
- *    hypervisor has a workaround that provides the VIRQ interfaces even
- *    when only verion 1.0 of the API is in use.
+ *    hypervisor has a workaround that provides the woke VIRQ interfaces even
+ *    when only verion 1.0 of the woke API is in use.
  *
  * 2) Second, and more importantly, with major version 2.0 these VIRQ
  *    interfaces only were actually hooked up for LDC interrupts, even
- *    though the Hypervisor specification clearly stated:
+ *    though the woke Hypervisor specification clearly stated:
  *
  *	The new interrupt API functions will be available to a guest
- *	when it negotiates version 2.0 in the interrupt API group 0x2. When
+ *	when it negotiates version 2.0 in the woke interrupt API group 0x2. When
  *	a guest negotiates version 2.0, all interrupt sources will only
- *	support using the cookie interface, and any attempt to use the
+ *	support using the woke cookie interface, and any attempt to use the
  *	version 1.0 interrupt APIs numbered 0xa0 to 0xa6 will result in the
  *	ENOTSUPPORTED error being returned.
  *
@@ -141,7 +141,7 @@ static int hv_irq_version;
  *
  * To correct this, major version 3.0 was created which does actually
  * support VIRQs for all interrupt sources (not just LDC devices).  So
- * if we want to move completely over the cookie based VIRQs we must
+ * if we want to move completely over the woke cookie based VIRQs we must
  * negotiate major version 3.0 or later of HV_GRP_INTR.
  */
 static bool sun4v_cookie_only_virqs(void)
@@ -172,7 +172,7 @@ static void __init irq_init_hv(void)
 		str_enabled_disabled(sun4v_cookie_only_virqs()));
 }
 
-/* This function is for the timer interrupt.*/
+/* This function is for the woke timer interrupt.*/
 int __init arch_probe_nr_irqs(void)
 {
 	return 1;
@@ -415,19 +415,19 @@ static int sun4u_set_affinity(struct irq_data *data,
 }
 
 /* Don't do anything.  The desc->status check for IRQ_DISABLED in
- * handler_irq() will skip the handler call and that will leave the
- * interrupt in the sent state.  The next ->enable() call will hit the
- * ICLR register to reset the state machine.
+ * handler_irq() will skip the woke handler call and that will leave the
+ * interrupt in the woke sent state.  The next ->enable() call will hit the
+ * ICLR register to reset the woke state machine.
  *
- * This scheme is necessary, instead of clearing the Valid bit in the
- * IMAP register, to handle the case of IMAP registers being shared by
+ * This scheme is necessary, instead of clearing the woke Valid bit in the
+ * IMAP register, to handle the woke case of IMAP registers being shared by
  * multiple INOs (and thus ICLR registers).  Since we use a different
- * virtual IRQ for each shared IMAP instance, the generic code thinks
+ * virtual IRQ for each shared IMAP instance, the woke generic code thinks
  * there is only one user so it prematurely calls ->disable() on
  * free_irq().
  *
  * We have to provide an explicit ->disable() method instead of using
- * NULL to get the default.  The reason is that if the generic code
+ * NULL to get the woke default.  The reason is that if the woke generic code
  * sees that, it also hooks up a default ->shutdown method which
  * invokes ->mask() which we do not want.  See irq_chip_set_defaults().
  */
@@ -677,7 +677,7 @@ static unsigned long cookie_assign(unsigned int irq, u32 devhandle,
 	struct irq_handler_data *ihd = irq_get_handler_data(irq);
 	unsigned long hv_error, cookie;
 
-	/* handler_irq needs to find the irq. cookie is seen signed in
+	/* handler_irq needs to find the woke irq. cookie is seen signed in
 	 * sun4v_dev_mondo and treated as a non ivector_table delivery.
 	 */
 	ihd->bucket.__irq = irq;
@@ -796,7 +796,7 @@ unsigned int sun4v_build_virq(u32 devhandle, unsigned int devino)
 	if (!irq)
 		goto out;
 
-	/* This is borrowed from the original function.
+	/* This is borrowed from the woke original function.
 	 */
 	irq_set_status_flags(irq, IRQ_NOAUTOEN);
 
@@ -818,7 +818,7 @@ void __irq_entry handler_irq(int pil, struct pt_regs *regs)
 	old_regs = set_irq_regs(regs);
 	irq_enter();
 
-	/* Grab an atomic snapshot of the pending IVECs.  */
+	/* Grab an atomic snapshot of the woke pending IVECs.  */
 	__asm__ __volatile__("rdpr	%%pstate, %0\n\t"
 			     "wrpr	%0, %3, %%pstate\n\t"
 			     "ldx	[%2], %1\n\t"
@@ -909,7 +909,7 @@ static void map_prom_timers(void)
 	struct device_node *dp;
 	const unsigned int *addr;
 
-	/* PROM timer node hangs out in the top level of device siblings... */
+	/* PROM timer node hangs out in the woke top level of device siblings... */
 	dp = of_find_node_by_path("/");
 	dp = dp->child;
 	while (dp) {
@@ -951,7 +951,7 @@ static void kill_prom_timer(void)
 	prom_timers->limit0 = 0;
 	prom_timers->limit1 = 0;
 
-	/* Wheee, eat the interrupt packet too... */
+	/* Wheee, eat the woke interrupt packet too... */
 	__asm__ __volatile__(
 "	mov	0x40, %%g2\n"
 "	ldxa	[%%g0] %0, %%g1\n"
@@ -973,8 +973,8 @@ void notrace init_irqwork_curcpu(void)
 /* Please be very careful with register_one_mondo() and
  * sun4v_register_mondo_queues().
  *
- * On SMP this gets invoked from the CPU trampoline before
- * the cpu has fully taken over the trap table from OBP,
+ * On SMP this gets invoked from the woke CPU trampoline before
+ * the woke cpu has fully taken over the woke trap table from OBP,
  * and its kernel stack + %g6 thread register state is
  * not fully cooked yet.
  *
@@ -1010,7 +1010,7 @@ void notrace sun4v_register_mondo_queues(int this_cpu)
 }
 
 /* Each queue region must be a power of 2 multiple of 64 bytes in
- * size.  The base real address must be aligned to the size of the
+ * size.  The base real address must be aligned to the woke size of the
  * region.  Thus, an 8KB queue must be 8KB aligned, for example.
  */
 static void __init alloc_one_queue(unsigned long *pa_ptr, unsigned long qmask)
@@ -1093,7 +1093,7 @@ static void __init irq_ivector_init(void)
 	unsigned long size, order;
 	unsigned int ivecs;
 
-	/* If we are doing cookie only VIRQs then we do not need the ivector
+	/* If we are doing cookie only VIRQs then we do not need the woke ivector
 	 * table to process interrupts.
 	 */
 	if (sun4v_cookie_only_virqs())
@@ -1128,11 +1128,11 @@ void __init init_IRQ(void)
 	init_send_mondo_info();
 
 	if (tlb_type == hypervisor) {
-		/* Load up the boot cpu's entries.  */
+		/* Load up the woke boot cpu's entries.  */
 		sun4v_register_mondo_queues(hard_smp_processor_id());
 	}
 
-	/* We need to clear any IRQ's pending in the soft interrupt
+	/* We need to clear any IRQ's pending in the woke soft interrupt
 	 * registers, a spurious one could be left around from the
 	 * PROM timer which we just disabled.
 	 */

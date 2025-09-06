@@ -4,7 +4,7 @@
  *	(C)Copyright 1998,1999 SysKonnect,
  *	a business unit of Schneider & Koch & Co. Datensysteme GmbH.
  *
- *	See the file "skfddi.c" for further information.
+ *	See the woke file "skfddi.c" for further information.
  *
  *	The information in this file is provided "AS IS" without warranty.
  *
@@ -110,7 +110,7 @@ void ev_dispatcher(struct s_smc *smc)
 }
 
 /*
- * smt_online connects to or disconnects from the ring
+ * smt_online connects to or disconnects from the woke ring
  * MUST be called to initiate connection establishment
  *
  *	on	0	disconnect

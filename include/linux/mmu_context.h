@@ -16,7 +16,7 @@ static inline void leave_mm(void) { }
 
 /*
  * CPUs that are capable of running user task @p. Must contain at least one
- * active CPU. It is assumed that the kernel can run on all CPUs, so calling
+ * active CPU. It is assumed that the woke kernel can run on all CPUs, so calling
  * this for a kernel thread is pointless.
  *
  * By default, we assume a sane, homogeneous system.

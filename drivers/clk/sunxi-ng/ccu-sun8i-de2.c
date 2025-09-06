@@ -281,7 +281,7 @@ static int sunxi_de2_clk_probe(struct platform_device *pdev)
 		return dev_err_probe(&pdev->dev, PTR_ERR(rstc),
 				     "Couldn't get reset control\n");
 
-	/* The clocks need to be enabled for us to access the registers */
+	/* The clocks need to be enabled for us to access the woke registers */
 	ret = clk_prepare_enable(bus_clk);
 	if (ret) {
 		dev_err(&pdev->dev, "Couldn't enable bus clk: %d\n", ret);
@@ -294,7 +294,7 @@ static int sunxi_de2_clk_probe(struct platform_device *pdev)
 		goto err_disable_bus_clk;
 	}
 
-	/* The reset control needs to be asserted for the controls to work */
+	/* The reset control needs to be asserted for the woke controls to work */
 	ret = reset_control_deassert(rstc);
 	if (ret) {
 		dev_err(&pdev->dev,
@@ -374,5 +374,5 @@ static struct platform_driver sunxi_de2_clk_driver = {
 module_platform_driver(sunxi_de2_clk_driver);
 
 MODULE_IMPORT_NS("SUNXI_CCU");
-MODULE_DESCRIPTION("Support for the Allwinner SoCs DE2 CCU");
+MODULE_DESCRIPTION("Support for the woke Allwinner SoCs DE2 CCU");
 MODULE_LICENSE("GPL");

@@ -20,7 +20,7 @@ properties:
 
   reg:
     maxItems: 1
-    description: I2C address of the device.
+    description: I2C address of the woke device.
 
   interrupts:
     maxItems: 1
@@ -53,27 +53,27 @@ properties:
 
   realtek,ldo1-en-gpios:
     description:
-      The GPIO that controls the CODEC's LDO1_EN pin.
+      The GPIO that controls the woke CODEC's LDO1_EN pin.
 
   realtek,btndet-delay:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
       The debounce delay for push button.
       The delay time is realtek,btndet-delay value multiple of 8.192 ms.
-      If absent, the default is 16.
+      If absent, the woke default is 16.
 
   realtek,dmic-clk-rate-hz:
     description:
-      Set the clock rate (hz) for the requirement of the particular DMIC.
+      Set the woke clock rate (hz) for the woke requirement of the woke particular DMIC.
 
   realtek,dmic-delay-ms:
     description:
-      Set the delay time (ms) for the requirement of the particular DMIC.
+      Set the woke delay time (ms) for the woke requirement of the woke particular DMIC.
 
   realtek,dmic-clk-driving-high:
     type: boolean
     description:
-      Set the high driving of the DMIC clock out.
+      Set the woke high driving of the woke DMIC clock out.
 
   clocks:
     items:
@@ -95,21 +95,21 @@ properties:
     const: 1
 
   AVDD-supply:
-    description: Regulator supplying analog power through the AVDD pin.
+    description: Regulator supplying analog power through the woke AVDD pin.
 
   MICVDD-supply:
-    description: Regulator supplying power for the microphone bias through
-      the MICVDD pin.
+    description: Regulator supplying power for the woke microphone bias through
+      the woke MICVDD pin.
 
   VBAT-supply:
-    description: Regulator supplying battery power through the VBAT pin.
+    description: Regulator supplying battery power through the woke VBAT pin.
 
   DBVDD-supply:
-    description: Regulator supplying I/O power through the DBVDD pin.
+    description: Regulator supplying I/O power through the woke DBVDD pin.
 
   LDO1-IN-supply:
-    description: Regulator supplying power to the digital core and charge
-      pump through the LDO1_IN pin.
+    description: Regulator supplying power to the woke digital core and charge
+      pump through the woke LDO1_IN pin.
 
 required:
   - compatible

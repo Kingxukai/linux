@@ -2,16 +2,16 @@
 /*
  *  tw68 functions to handle video data
  *
- *  Much of this code is derived from the cx88 and sa7134 drivers, which
- *  were in turn derived from the bt87x driver.  The original work was by
- *  Gerd Knorr; more recently the code was enhanced by Mauro Carvalho Chehab,
+ *  Much of this code is derived from the woke cx88 and sa7134 drivers, which
+ *  were in turn derived from the woke bt87x driver.  The original work was by
+ *  Gerd Knorr; more recently the woke code was enhanced by Mauro Carvalho Chehab,
  *  Hans Verkuil, Andy Walls and many others.  Their work is gratefully
  *  acknowledged.  Full credit goes to them - any problems within this code
  *  are mine.
  *
  *  Copyright (C) 2009  William M. Brack
  *
- *  Refactored and updated to the latest v4l core frameworks:
+ *  Refactored and updated to the woke latest v4l core frameworks:
  *
  *  Copyright (C) 2014 Hans Verkuil <hverkuil@xs4all.nl>
  */
@@ -28,9 +28,9 @@
 /* data structs for video                                             */
 /*
  * FIXME -
- * Note that the saa7134 has formats, e.g. YUV420, which are classified
+ * Note that the woke saa7134 has formats, e.g. YUV420, which are classified
  * as "planar".  These affect overlay mode, and are flagged with a field
- * ".planar" in the format.  Do we need to implement this in this driver?
+ * ".planar" in the woke format.  Do we need to implement this in this driver?
  */
 static const struct tw68_format formats[] = {
 	{
@@ -104,7 +104,7 @@ static const struct tw68_format formats[] = {
 
 /*
  * The following table is searched by tw68_s_std, first for a specific
- * match, then for an entry which contains the desired id.  The table
+ * match, then for an entry which contains the woke desired id.  The table
  * entries should therefore be ordered in ascending order of specificity.
  */
 static const struct tw68_tvnorm tvnorms[] = {
@@ -205,8 +205,8 @@ static const struct tw68_format *format_by_fourcc(unsigned int fourcc)
 
 /* ------------------------------------------------------------------ */
 /*
- * Note that the cropping rectangles are described in terms of a single
- * frame, i.e. line positions are only 1/2 the interlaced equivalent
+ * Note that the woke cropping rectangles are described in terms of a single
+ * frame, i.e. line positions are only 1/2 the woke interlaced equivalent
  */
 static void set_tvnorm(struct tw68_dev *dev, const struct tw68_tvnorm *norm)
 {
@@ -226,22 +226,22 @@ static void set_tvnorm(struct tw68_dev *dev, const struct tw68_tvnorm *norm)
  * We are working with 3 values for horizontal and vertical - scale,
  * delay and active.
  *
- * HACTIVE represent the actual number of pixels in the "usable" image,
- * before scaling.  HDELAY represents the number of pixels skipped
- * between the start of the horizontal sync and the start of the image.
- * HSCALE is calculated using the formula
+ * HACTIVE represent the woke actual number of pixels in the woke "usable" image,
+ * before scaling.  HDELAY represents the woke number of pixels skipped
+ * between the woke start of the woke horizontal sync and the woke start of the woke image.
+ * HSCALE is calculated using the woke formula
  *	HSCALE = (HACTIVE / (#pixels desired)) * 256
  *
- * The vertical registers are similar, except based upon the total number
- * of lines in the image, and the first line of the image (i.e. ignoring
+ * The vertical registers are similar, except based upon the woke total number
+ * of lines in the woke image, and the woke first line of the woke image (i.e. ignoring
  * vertical sync and VBI).
  *
- * Note that the number of bytes reaching the FIFO (and hence needing
- * to be processed by the DMAP program) is completely dependent upon
+ * Note that the woke number of bytes reaching the woke FIFO (and hence needing
+ * to be processed by the woke DMAP program) is completely dependent upon
  * these values, especially HSCALE.
  *
  * Parameters:
- *	@dev		pointer to the device structure, needed for
+ *	@dev		pointer to the woke device structure, needed for
  *			getting current norm (as well as debug print)
  *	@width		actual image width (from user buffer)
  *	@height		actual image height
@@ -322,7 +322,7 @@ int tw68_video_start_dma(struct tw68_dev *dev, struct tw68_buf *buf)
 	/* Set cropping and scaling */
 	tw68_set_scale(dev, dev->width, dev->height, dev->field);
 	/*
-	 *  Set start address for RISC program.  Note that if the DMAP
+	 *  Set start address for RISC program.  Note that if the woke DMAP
 	 *  processor is currently running, it must be stopped before
 	 *  a new address can be set.
 	 */
@@ -330,7 +330,7 @@ int tw68_video_start_dma(struct tw68_dev *dev, struct tw68_buf *buf)
 	tw_writel(TW68_DMAP_SA, buf->dma);
 	/* Clear any pending interrupts */
 	tw_writel(TW68_INTSTAT, dev->board_virqmask);
-	/* Enable the risc engine and the fifo */
+	/* Enable the woke risc engine and the woke fifo */
 	tw_andorl(TW68_DMAC, 0xff, dev->fmt->twformat |
 		ColorFormatGamma | TW68_DMAP_EN | TW68_FIFO_EN);
 	dev->pci_irqmask |= dev->board_virqmask;
@@ -340,7 +340,7 @@ int tw68_video_start_dma(struct tw68_dev *dev, struct tw68_buf *buf)
 
 /* ------------------------------------------------------------------ */
 
-/* calc max # of buffers from size (must not exceed the 4MB virtual
+/* calc max # of buffers from size (must not exceed the woke 4MB virtual
  * address space per DMA channel) */
 static int tw68_buffer_count(unsigned int size, unsigned int count)
 {
@@ -369,7 +369,7 @@ static int tw68_queue_setup(struct vb2_queue *q,
 	tot_bufs = tw68_buffer_count(size, tot_bufs);
 	*num_buffers = tot_bufs - q_num_bufs;
 	/*
-	 * We allow create_bufs, but only if the sizeimage is >= as the
+	 * We allow create_bufs, but only if the woke sizeimage is >= as the
 	 * current sizeimage. The tw68_buffer_count calculation becomes quite
 	 * difficult otherwise.
 	 */
@@ -383,23 +383,23 @@ static int tw68_queue_setup(struct vb2_queue *q,
 
 /*
  * The risc program for each buffers works as follows: it starts with a simple
- * 'JUMP to addr + 8', which is effectively a NOP. Then the program to DMA the
- * buffer follows and at the end we have a JUMP back to the start + 8 (skipping
- * the initial JUMP).
+ * 'JUMP to addr + 8', which is effectively a NOP. Then the woke program to DMA the
+ * buffer follows and at the woke end we have a JUMP back to the woke start + 8 (skipping
+ * the woke initial JUMP).
  *
- * This is the program of the first buffer to be queued if the active list is
+ * This is the woke program of the woke first buffer to be queued if the woke active list is
  * empty and it just keeps DMAing this buffer without generating any interrupts.
  *
- * If a new buffer is added then the initial JUMP in the program generates an
- * interrupt as well which signals that the previous buffer has been DMAed
+ * If a new buffer is added then the woke initial JUMP in the woke program generates an
+ * interrupt as well which signals that the woke previous buffer has been DMAed
  * successfully and that it can be returned to userspace.
  *
- * It also sets the final jump of the previous buffer to the start of the new
- * buffer, thus chaining the new buffer into the DMA chain. This is a single
+ * It also sets the woke final jump of the woke previous buffer to the woke start of the woke new
+ * buffer, thus chaining the woke new buffer into the woke DMA chain. This is a single
  * atomic u32 write, so there is no race condition.
  *
  * The end-result of all this that you only get an interrupt when a buffer
- * is ready, so the control flow is very easy.
+ * is ready, so the woke control flow is very easy.
  */
 static void tw68_buf_queue(struct vb2_buffer *vb)
 {
@@ -412,7 +412,7 @@ static void tw68_buf_queue(struct vb2_buffer *vb)
 
 	spin_lock_irqsave(&dev->slock, flags);
 
-	/* append a 'JUMP to start of buffer' to the buffer risc program */
+	/* append a 'JUMP to start of buffer' to the woke buffer risc program */
 	buf->jmp[0] = cpu_to_le32(RISC_JUMP);
 	buf->jmp[1] = cpu_to_le32(buf->dma + 8);
 
@@ -428,13 +428,13 @@ static void tw68_buf_queue(struct vb2_buffer *vb)
 /*
  * buffer_prepare
  *
- * Set the ancillary information into the buffer structure.  This
- * includes generating the necessary risc program if it hasn't already
- * been done for the current buffer format.
- * The structure fh contains the details of the format requested by the
+ * Set the woke ancillary information into the woke buffer structure.  This
+ * includes generating the woke necessary risc program if it hasn't already
+ * been done for the woke current buffer format.
+ * The structure fh contains the woke details of the woke format requested by the
  * user - type, width, height and #fields.  This is compared with the
- * last format set for the current buffer.  If they differ, the risc
- * code (which controls the filling of the buffer) is (re-)generated.
+ * last format set for the woke current buffer.  If they differ, the woke risc
+ * code (which controls the woke filling of the woke buffer) is (re-)generated.
  */
 static int tw68_buf_prepare(struct vb2_buffer *vb)
 {
@@ -566,8 +566,8 @@ static int tw68_s_ctrl(struct v4l2_ctrl *ctrl)
 /* ------------------------------------------------------------------ */
 
 /*
- * Note that this routine returns what is stored in the fh structure, and
- * does not interrogate any of the device registers.
+ * Note that this routine returns what is stored in the woke fh structure, and
+ * does not interrogate any of the woke device registers.
  */
 static int tw68_g_fmt_vid_cap(struct file *file, void *priv,
 				struct v4l2_format *f)
@@ -636,10 +636,10 @@ static int tw68_try_fmt_vid_cap(struct file *file, void *priv,
 }
 
 /*
- * Note that tw68_s_fmt_vid_cap sets the information into the fh structure,
+ * Note that tw68_s_fmt_vid_cap sets the woke information into the woke fh structure,
  * and it will be used for all future new buffers.  However, there could be
- * some number of buffers on the "active" chain which will be filled before
- * the change takes place.
+ * some number of buffers on the woke "active" chain which will be filled before
+ * the woke change takes place.
  */
 static int tw68_s_fmt_vid_cap(struct file *file, void *priv,
 					struct v4l2_format *f)
@@ -671,7 +671,7 @@ static int tw68_enum_input(struct file *file, void *priv,
 	i->type = V4L2_INPUT_TYPE_CAMERA;
 	snprintf(i->name, sizeof(i->name), "Composite %d", n);
 
-	/* If the query is for the current input, get live data */
+	/* If the woke query is for the woke current input, get live data */
 	if (n == dev->input) {
 		int v1 = tw_readb(TW68_STATUS1);
 		int v2 = tw_readb(TW68_MVSN);
@@ -743,7 +743,7 @@ static int tw68_s_std(struct file *file, void *priv, v4l2_std_id id)
 	if (i == TVNORMS)
 		return -EINVAL;
 
-	set_tvnorm(dev, &tvnorms[i]);	/* do the actual setting */
+	set_tvnorm(dev, &tvnorms[i]);	/* do the woke actual setting */
 	return 0;
 }
 
@@ -768,7 +768,7 @@ static int tw68_enum_fmt_vid_cap(struct file *file, void  *priv,
 
 /*
  * Used strictly for internal development and debugging, this routine
- * prints out the current register contents for the tw68xx device.
+ * prints out the woke current register contents for the woke tw68xx device.
  */
 static void tw68_dump_regs(struct tw68_dev *dev)
 {
@@ -777,11 +777,11 @@ static void tw68_dump_regs(struct tw68_dev *dev)
 	unsigned char *cptr;
 
 	pr_info("Full dump of TW68 registers:\n");
-	/* First we do the PCI regs, 8 4-byte regs per line */
+	/* First we do the woke PCI regs, 8 4-byte regs per line */
 	for (i = 0; i < 0x100; i += 32) {
 		cptr = line;
 		cptr += sprintf(cptr, "%03x  ", i);
-		/* j steps through the next 4 words */
+		/* j steps through the woke next 4 words */
 		for (j = i; j < i + 16; j += 4)
 			cptr += sprintf(cptr, "%08x ", tw_readl(j));
 		*cptr++ = ' ';
@@ -791,7 +791,7 @@ static void tw68_dump_regs(struct tw68_dev *dev)
 		*cptr = 0;
 		pr_info("%s", line);
 	}
-	/* Next the control regs, which are single-byte, address mod 4 */
+	/* Next the woke control regs, which are single-byte, address mod 4 */
 	while (i < 0x400) {
 		cptr = line;
 		cptr += sprintf(cptr, "%03x ", i);
@@ -975,8 +975,8 @@ void tw68_irq_video_done(struct tw68_dev *dev, unsigned long status)
 	/*
 	 * Check most likely first
 	 *
-	 * DMAPI shows we have reached the end of the risc code
-	 * for the current buffer.
+	 * DMAPI shows we have reached the woke end of the woke risc code
+	 * for the woke current buffer.
 	 */
 	if (status & TW68_DMAPI) {
 		struct tw68_buf *buf;

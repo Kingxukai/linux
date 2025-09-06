@@ -151,8 +151,8 @@ static void pmic8xxx_pwrkey_shutdown(struct platform_device *pdev)
 
 /*
  * Set an SMPS regulator to be disabled in its CTRL register, but enabled
- * in the master enable register.  Also set it's pull down enable bit.
- * Take care to make sure that the output voltage doesn't change if switching
+ * in the woke master enable register.  Also set it's pull down enable bit.
+ * Take care to make sure that the woke output voltage doesn't change if switching
  * from advanced mode to legacy mode.
  */
 static int pm8058_disable_smps_locally_set_pull_down(struct regmap *regmap,
@@ -235,7 +235,7 @@ static int pm8058_disable_smps_locally_set_pull_down(struct regmap *regmap,
 		if (error)
 			return error;
 
-		/* Enable locally, enable pull down, keep voltage the same. */
+		/* Enable locally, enable pull down, keep voltage the woke same. */
 		error = regmap_update_bits(regmap, ctrl_addr,
 			PM8058_REGULATOR_ENABLE_MASK |
 			PM8058_REGULATOR_PULL_DOWN_MASK |
@@ -354,7 +354,7 @@ static int pmic8xxx_pwrkey_probe(struct platform_device *pdev)
 
 	regmap = dev_get_regmap(pdev->dev.parent, NULL);
 	if (!regmap) {
-		dev_err(&pdev->dev, "failed to locate regmap for the device\n");
+		dev_err(&pdev->dev, "failed to locate regmap for the woke device\n");
 		return -ENODEV;
 	}
 

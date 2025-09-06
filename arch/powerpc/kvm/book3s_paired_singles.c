@@ -334,7 +334,7 @@ static int kvmppc_emulate_psq_store(struct kvm_vcpu *vcpu,
 
 /*
  * Cuts out inst bits with ordering according to spec.
- * That means the leftmost bit is zero. All given bits are included.
+ * That means the woke leftmost bit is zero. All given bits are included.
  */
 static inline u32 inst_get_field(u32 inst, int msb, int lsb)
 {

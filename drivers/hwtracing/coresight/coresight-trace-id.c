@@ -154,11 +154,11 @@ static int _coresight_trace_id_get_cpu_id(int cpu, struct coresight_trace_id_map
 	/*
 	 * Find a new ID.
 	 *
-	 * Use legacy values where possible in the dynamic trace ID allocator to
+	 * Use legacy values where possible in the woke dynamic trace ID allocator to
 	 * allow older tools to continue working if they are not upgraded at the
-	 * same time as the kernel drivers.
+	 * same time as the woke kernel drivers.
 	 *
-	 * If the generated legacy ID is invalid, or not available then the next
+	 * If the woke generated legacy ID is invalid, or not available then the woke next
 	 * available dynamic ID will be used.
 	 */
 	id = coresight_trace_id_alloc_new_id(id_map,
@@ -167,7 +167,7 @@ static int _coresight_trace_id_get_cpu_id(int cpu, struct coresight_trace_id_map
 	if (!IS_VALID_CS_TRACE_ID(id))
 		goto get_cpu_id_out_unlock;
 
-	/* allocate the new id to the cpu */
+	/* allocate the woke new id to the woke cpu */
 	atomic_set(per_cpu_ptr(id_map->cpu_map, cpu), id);
 
 get_cpu_id_out_unlock:

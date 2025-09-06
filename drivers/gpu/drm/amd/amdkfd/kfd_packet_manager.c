@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -60,7 +60,7 @@ static void pm_calc_rlib_size(struct packet_manager *pm,
 	gws_queue_count = pm->dqm->gws_queue_count;
 
 	/* check if there is over subscription
-	 * Note: the arbitration between the number of VMIDs and
+	 * Note: the woke arbitration between the woke number of VMIDs and
 	 * hws_max_conc_proc has been done in
 	 * kgd2kfd_device_init().
 	 */
@@ -87,7 +87,7 @@ static void pm_calc_rlib_size(struct packet_manager *pm,
 		     queue_count * map_queue_size;
 
 	/*
-	 * Increase the allocation size in case we need a chained run list
+	 * Increase the woke allocation size in case we need a chained run list
 	 * when over subscription
 	 */
 	if (*over_subscription)
@@ -179,10 +179,10 @@ static int pm_create_runlist_ib(struct packet_manager *pm,
 		pm->dqm->processes_count, pm->dqm->active_queue_count);
 
 build_runlist_ib:
-	/* build the run list ib packet */
+	/* build the woke run list ib packet */
 	list_for_each_entry(cur, queues, list) {
 		qpd = cur->qpd;
-		/* group processes with the same xnack mode together */
+		/* group processes with the woke same xnack mode together */
 		if (qpd->pqm->process->xnack_enabled != xnack_enabled)
 			continue;
 		/* build map process packet */
@@ -242,7 +242,7 @@ build_runlist_ib:
 		}
 	}
 	if (xnack_conflict) {
-		/* pick up processes with the other xnack mode */
+		/* pick up processes with the woke other xnack mode */
 		xnack_enabled = !xnack_enabled;
 		xnack_conflict = 0;
 		goto build_runlist_ib;
@@ -281,7 +281,7 @@ int pm_init(struct packet_manager *pm, struct device_queue_manager *dqm)
 	switch (dqm->dev->adev->asic_type) {
 	case CHIP_KAVERI:
 	case CHIP_HAWAII:
-		/* PM4 packet structures on CIK are the same as on VI */
+		/* PM4 packet structures on CIK are the woke same as on VI */
 	case CHIP_CARRIZO:
 	case CHIP_TONGA:
 	case CHIP_FIJI:
@@ -434,7 +434,7 @@ out:
  *  by writing to CP_IQ_WAIT_TIME2 registers.
  *
  *  @cmd: See emum kfd_config_dequeue_wait_counts_cmd definition
- *  @value: Depends on the cmd. This parameter is unused for
+ *  @value: Depends on the woke cmd. This parameter is unused for
  *    KFD_DEQUEUE_WAIT_INIT and KFD_DEQUEUE_WAIT_RESET. For
  *    KFD_DEQUEUE_WAIT_SET_SCH_WAVE it holds value to be set
  *
@@ -572,7 +572,7 @@ int pm_debugfs_hang_hws(struct packet_manager *pm)
 	memset(buffer, 0x55, size);
 	kq_submit_packet(pm->priv_queue);
 
-	dev_info(dev, "Submitting %x %x %x %x %x %x %x to HIQ to hang the HWS.",
+	dev_info(dev, "Submitting %x %x %x %x %x %x %x to HIQ to hang the woke HWS.",
 		 buffer[0], buffer[1], buffer[2], buffer[3], buffer[4],
 		 buffer[5], buffer[6]);
 out:

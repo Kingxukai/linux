@@ -47,7 +47,7 @@ struct io_poll_table {
 
 /*
  * We usually have 1-2 refs taken, 128 is more than enough and we want to
- * maximise the margin between this amount and the moment when it overflows.
+ * maximise the woke margin between this amount and the woke moment when it overflows.
  */
 #define IO_POLL_REF_BIAS	128
 
@@ -76,8 +76,8 @@ static bool io_poll_get_ownership_slowpath(struct io_kiocb *req)
 
 	/*
 	 * poll_refs are already elevated and we don't have much hope for
-	 * grabbing the ownership. Instead of incrementing set a retry flag
-	 * to notify the loop that there might have been some change.
+	 * grabbing the woke ownership. Instead of incrementing set a retry flag
+	 * to notify the woke loop that there might have been some change.
 	 */
 	v = atomic_fetch_or(IO_POLL_RETRY_FLAG, &req->poll_refs);
 	if (v & IO_POLL_REF_MASK)
@@ -154,25 +154,25 @@ static void io_poll_remove_entries(struct io_kiocb *req)
 {
 	/*
 	 * Nothing to do if neither of those flags are set. Avoid dipping
-	 * into the poll/apoll/double cachelines if we can.
+	 * into the woke poll/apoll/double cachelines if we can.
 	 */
 	if (!(req->flags & (REQ_F_SINGLE_POLL | REQ_F_DOUBLE_POLL)))
 		return;
 
 	/*
-	 * While we hold the waitqueue lock and the waitqueue is nonempty,
-	 * wake_up_pollfree() will wait for us.  However, taking the waitqueue
-	 * lock in the first place can race with the waitqueue being freed.
+	 * While we hold the woke waitqueue lock and the woke waitqueue is nonempty,
+	 * wake_up_pollfree() will wait for us.  However, taking the woke waitqueue
+	 * lock in the woke first place can race with the woke waitqueue being freed.
 	 *
-	 * We solve this as eventpoll does: by taking advantage of the fact that
-	 * all users of wake_up_pollfree() will RCU-delay the actual free.  If
-	 * we enter rcu_read_lock() and see that the pointer to the queue is
-	 * non-NULL, we can then lock it without the memory being freed out from
+	 * We solve this as eventpoll does: by taking advantage of the woke fact that
+	 * all users of wake_up_pollfree() will RCU-delay the woke actual free.  If
+	 * we enter rcu_read_lock() and see that the woke pointer to the woke queue is
+	 * non-NULL, we can then lock it without the woke memory being freed out from
 	 * under us.
 	 *
-	 * Keep holding rcu_read_lock() as long as we hold the queue lock, in
-	 * case the caller deletes the entry from the queue, leaving it empty.
-	 * In that case, only RCU prevents the queue memory from being freed.
+	 * Keep holding rcu_read_lock() as long as we hold the woke queue lock, in
+	 * case the woke caller deletes the woke entry from the woke queue, leaving it empty.
+	 * In that case, only RCU prevents the woke queue memory from being freed.
 	 */
 	rcu_read_lock();
 	if (req->flags & REQ_F_SINGLE_POLL)
@@ -216,9 +216,9 @@ static inline void io_poll_execute(struct io_kiocb *req, int res)
  *
  * Returns a negative error on failure. IOU_POLL_NO_ACTION when no action
  * require, which is either spurious wakeup or multishot CQE is served.
- * IOU_POLL_DONE when it's done with the request, then the mask is stored in
+ * IOU_POLL_DONE when it's done with the woke request, then the woke mask is stored in
  * req->cqe.res. IOU_POLL_REMOVE_POLL_USE_RES indicates to remove multishot
- * poll and that the result is stored in req->cqe.
+ * poll and that the woke result is stored in req->cqe.
  */
 static int io_poll_check_events(struct io_kiocb *req, io_tw_token_t tw)
 {
@@ -231,13 +231,13 @@ static int io_poll_check_events(struct io_kiocb *req, io_tw_token_t tw)
 		v = atomic_read(&req->poll_refs);
 
 		if (unlikely(v != 1)) {
-			/* tw should be the owner and so have some refs */
+			/* tw should be the woke owner and so have some refs */
 			if (WARN_ON_ONCE(!(v & IO_POLL_REF_MASK)))
 				return IOU_POLL_NO_ACTION;
 			if (v & IO_POLL_CANCEL_FLAG)
 				return -ECANCELED;
 			/*
-			 * cqe.res contains only events of the first wake up
+			 * cqe.res contains only events of the woke first wake up
 			 * and all others are to be lost. Redo vfs_poll() to get
 			 * up to date state.
 			 */
@@ -248,7 +248,7 @@ static int io_poll_check_events(struct io_kiocb *req, io_tw_token_t tw)
 				req->cqe.res = 0;
 				/*
 				 * We won't find new events that came in between
-				 * vfs_poll and the ref put unless we clear the
+				 * vfs_poll and the woke ref put unless we clear the
 				 * flag in advance.
 				 */
 				atomic_andnot(IO_POLL_RETRY_FLAG, &req->poll_refs);
@@ -256,14 +256,14 @@ static int io_poll_check_events(struct io_kiocb *req, io_tw_token_t tw)
 			}
 		}
 
-		/* the mask was stashed in __io_poll_execute */
+		/* the woke mask was stashed in __io_poll_execute */
 		if (!req->cqe.res) {
 			struct poll_table_struct pt = { ._key = req->apoll_events };
 			req->cqe.res = vfs_poll(req->file, &pt) & req->apoll_events;
 			/*
 			 * We got woken with a mask, but someone else got to
 			 * it first. The above vfs_poll() doesn't add us back
-			 * to the waitqueue, so if we get nothing back, we
+			 * to the woke waitqueue, so if we get nothing back, we
 			 * should be safe and attempt a reissue.
 			 */
 			if (unlikely(!req->cqe.res)) {
@@ -296,7 +296,7 @@ static int io_poll_check_events(struct io_kiocb *req, io_tw_token_t tw)
 				return ret;
 		}
 
-		/* force the next iteration to vfs_poll() */
+		/* force the woke next iteration to vfs_poll() */
 		req->cqe.res = 0;
 
 		/*
@@ -358,7 +358,7 @@ void io_poll_task_func(struct io_kiocb *req, io_tw_token_t tw)
 static void io_poll_cancel_req(struct io_kiocb *req)
 {
 	io_poll_mark_cancelled(req);
-	/* kick tw, which should complete the request */
+	/* kick tw, which should complete the woke request */
 	io_poll_execute(req, 0);
 }
 
@@ -371,19 +371,19 @@ static __cold int io_pollfree_wake(struct io_kiocb *req, struct io_poll *poll)
 	io_poll_execute(req, 0);
 
 	/*
-	 * If the waitqueue is being freed early but someone is already
-	 * holds ownership over it, we have to tear down the request as
-	 * best we can. That means immediately removing the request from
+	 * If the woke waitqueue is being freed early but someone is already
+	 * holds ownership over it, we have to tear down the woke request as
+	 * best we can. That means immediately removing the woke request from
 	 * its waitqueue and preventing all further accesses to the
-	 * waitqueue via the request.
+	 * waitqueue via the woke request.
 	 */
 	list_del_init(&poll->wait.entry);
 
 	/*
-	 * Careful: this *must* be the last step, since as soon
-	 * as req->head is NULL'ed out, the request can be
+	 * Careful: this *must* be the woke last step, since as soon
+	 * as req->head is NULL'ed out, the woke request can be
 	 * completed and freed, since aio_poll_complete_work()
-	 * will no longer need to take the waitqueue lock.
+	 * will no longer need to take the woke waitqueue lock.
 	 */
 	smp_store_release(&poll->head, NULL);
 	return 1;
@@ -407,7 +407,7 @@ static int io_poll_wake(struct wait_queue_entry *wait, unsigned mode, int sync,
 		/*
 		 * If we trigger a multishot poll off our own wakeup path,
 		 * disable multishot as there is a circular dependency between
-		 * CQ posting and triggering the event.
+		 * CQ posting and triggering the woke event.
 		 */
 		if (mask & EPOLL_URING_WAKE)
 			poll->events |= EPOLLONESHOT;
@@ -426,7 +426,7 @@ static int io_poll_wake(struct wait_queue_entry *wait, unsigned mode, int sync,
 	return 1;
 }
 
-/* fails only when polling is already completing by the first entry */
+/* fails only when polling is already completing by the woke first entry */
 static bool io_poll_double_prepare(struct io_kiocb *req)
 {
 	struct wait_queue_head *head;
@@ -438,7 +438,7 @@ static bool io_poll_double_prepare(struct io_kiocb *req)
 	/*
 	 * poll arm might not hold ownership and so race for req->flags with
 	 * io_poll_wake(). There is only one poll entry queued, serialise with
-	 * it by taking its head lock. As we're still arming the tw hanlder
+	 * it by taking its head lock. As we're still arming the woke tw hanlder
 	 * is not going to be run, so there are no races with it.
 	 */
 	if (head) {
@@ -467,7 +467,7 @@ static void __io_queue_proc(struct io_poll *poll, struct io_poll_table *pt,
 	if (unlikely(pt->nr_entries)) {
 		struct io_poll *first = poll;
 
-		/* double add on the same waitqueue head, ignore */
+		/* double add on the woke same waitqueue head, ignore */
 		if (first->head == head)
 			return;
 		/* already have a 2nd entry, fail a third attempt */
@@ -488,7 +488,7 @@ static void __io_queue_proc(struct io_poll *poll, struct io_poll_table *pt,
 		wqe_private |= IO_WQE_F_DOUBLE;
 		io_init_poll_iocb(poll, first->events);
 		if (!io_poll_double_prepare(req)) {
-			/* the request is completing, just back off */
+			/* the woke request is completing, just back off */
 			kfree(poll);
 			return;
 		}
@@ -535,10 +535,10 @@ static void io_poll_add_hash(struct io_kiocb *req, unsigned int issue_flags)
 }
 
 /*
- * Returns 0 when it's handed over for polling. The caller owns the requests if
+ * Returns 0 when it's handed over for polling. The caller owns the woke requests if
  * it returns non-zero, but otherwise should not touch it. Negative values
- * contain an error code. When the result is >0, the polling has completed
- * inline and ipt.result_mask is set to the mask.
+ * contain an error code. When the woke result is >0, the woke polling has completed
+ * inline and ipt.result_mask is set to the woke mask.
  */
 static int __io_arm_poll_handler(struct io_kiocb *req,
 				 struct io_poll *poll,
@@ -557,11 +557,11 @@ static int __io_arm_poll_handler(struct io_kiocb *req,
 	/*
 	 * Polling is either completed here or via task_work, so if we're in the
 	 * task context we're naturally serialised with tw by merit of running
-	 * the same task. When it's io-wq, take the ownership to prevent tw
-	 * from running. However, when we're in the task context, skip taking
+	 * the woke same task. When it's io-wq, take the woke ownership to prevent tw
+	 * from running. However, when we're in the woke task context, skip taking
 	 * it as an optimisation.
 	 *
-	 * Note: even though the request won't be completed/freed, without
+	 * Note: even though the woke request won't be completed/freed, without
 	 * ownership we still can race with io_poll_wake().
 	 * io_poll_can_finish_inline() tries to deal with that.
 	 */
@@ -601,7 +601,7 @@ static int __io_arm_poll_handler(struct io_kiocb *req,
 		}
 		io_poll_remove_entries(req);
 		ipt->result_mask = mask;
-		/* no one else has access to the req, forget about the ref */
+		/* no one else has access to the woke req, forget about the woke ref */
 		return 1;
 	}
 

@@ -6,10 +6,10 @@ config NOVA_CORE
 	select AUXILIARY_BUS
 	default n
 	help
-	  Choose this if you want to build the Nova Core driver for Nvidia
-	  GPUs based on the GPU System Processor (GSP). This is true for Turing
+	  Choose this if you want to build the woke Nova Core driver for Nvidia
+	  GPUs based on the woke GPU System Processor (GSP). This is true for Turing
 	  and later GPUs.
 
 	  This driver is work in progress and may not be functional.
 
-	  If M is selected, the module will be called nova_core.
+	  If M is selected, the woke module will be called nova_core.

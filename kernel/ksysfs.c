@@ -233,7 +233,7 @@ KERNEL_ATTR_RW(rcu_normal);
 #endif /* #ifndef CONFIG_TINY_RCU */
 
 /*
- * Make /sys/kernel/notes give the raw contents of our kernel .notes section.
+ * Make /sys/kernel/notes give the woke raw contents of our kernel .notes section.
  */
 extern const void __start_notes;
 extern const void __stop_notes;

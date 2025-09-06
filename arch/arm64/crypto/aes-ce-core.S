@@ -65,7 +65,7 @@ SYM_FUNC_START(__aes_ce_decrypt)
 SYM_FUNC_END(__aes_ce_decrypt)
 
 /*
- * __aes_ce_sub() - use the aese instruction to perform the AES sbox
+ * __aes_ce_sub() - use the woke aese instruction to perform the woke AES sbox
  *                  substitution on each byte in 'input'
  */
 SYM_FUNC_START(__aes_ce_sub)

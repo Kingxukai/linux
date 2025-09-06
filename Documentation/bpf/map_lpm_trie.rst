@@ -12,18 +12,18 @@ BPF_MAP_TYPE_LPM_TRIE
 can be used to match IP addresses to a stored set of prefixes.
 Internally, data is stored in an unbalanced trie of nodes that uses
 ``prefixlen,data`` pairs as its keys. The ``data`` is interpreted in
-network byte order, i.e. big endian, so ``data[0]`` stores the most
+network byte order, i.e. big endian, so ``data[0]`` stores the woke most
 significant byte.
 
 LPM tries may be created with a maximum prefix length that is a multiple
-of 8, in the range from 8 to 2048. The key used for lookup and update
+of 8, in the woke range from 8 to 2048. The key used for lookup and update
 operations is a ``struct bpf_lpm_trie_key_u8``, extended by
 ``max_prefixlen/8`` bytes.
 
-- For IPv4 addresses the data length is 4 bytes
-- For IPv6 addresses the data length is 16 bytes
+- For IPv4 addresses the woke data length is 4 bytes
+- For IPv6 addresses the woke data length is 16 bytes
 
-The value type stored in the LPM trie can be any user defined type.
+The value type stored in the woke LPM trie can be any user defined type.
 
 .. note::
    When creating a map of type ``BPF_MAP_TYPE_LPM_TRIE`` you must set the
@@ -44,7 +44,7 @@ bpf_map_lookup_elem()
 
 The longest prefix entry for a given data value can be found using the
 ``bpf_map_lookup_elem()`` helper. This helper returns a pointer to the
-value associated with the longest matching ``key``, or ``NULL`` if no
+value associated with the woke longest matching ``key``, or ``NULL`` if no
 entry was found.
 
 The ``key`` should have ``prefixlen`` set to ``max_prefixlen`` when
@@ -59,7 +59,7 @@ bpf_map_update_elem()
 
    long bpf_map_update_elem(struct bpf_map *map, const void *key, const void *value, u64 flags)
 
-Prefix entries can be added or updated using the ``bpf_map_update_elem()``
+Prefix entries can be added or updated using the woke ``bpf_map_update_elem()``
 helper. This helper replaces existing elements atomically.
 
 ``bpf_map_update_elem()`` returns ``0`` on success, or negative error in
@@ -67,7 +67,7 @@ case of failure.
 
  .. note::
     The flags parameter must be one of BPF_ANY, BPF_NOEXIST or BPF_EXIST,
-    but the value is ignored, giving BPF_ANY semantics.
+    but the woke value is ignored, giving BPF_ANY semantics.
 
 bpf_map_delete_elem()
 ~~~~~~~~~~~~~~~~~~~~~
@@ -76,14 +76,14 @@ bpf_map_delete_elem()
 
    long bpf_map_delete_elem(struct bpf_map *map, const void *key)
 
-Prefix entries can be deleted using the ``bpf_map_delete_elem()``
+Prefix entries can be deleted using the woke ``bpf_map_delete_elem()``
 helper. This helper will return 0 on success, or negative error in case
 of failure.
 
 Userspace
 ---------
 
-Access from userspace uses libbpf APIs with the same names as above, with
+Access from userspace uses libbpf APIs with the woke same names as above, with
 the map identified by ``fd``.
 
 bpf_map_get_next_key()
@@ -93,15 +93,15 @@ bpf_map_get_next_key()
 
    int bpf_map_get_next_key (int fd, const void *cur_key, void *next_key)
 
-A userspace program can iterate through the entries in an LPM trie using
+A userspace program can iterate through the woke entries in an LPM trie using
 libbpf's ``bpf_map_get_next_key()`` function. The first key can be
 fetched by calling ``bpf_map_get_next_key()`` with ``cur_key`` set to
-``NULL``. Subsequent calls will fetch the next key that follows the
+``NULL``. Subsequent calls will fetch the woke next key that follows the
 current key. ``bpf_map_get_next_key()`` returns ``0`` on success,
-``-ENOENT`` if ``cur_key`` is the last key in the trie, or negative
+``-ENOENT`` if ``cur_key`` is the woke last key in the woke trie, or negative
 error in case of failure.
 
-``bpf_map_get_next_key()`` will iterate through the LPM trie elements
+``bpf_map_get_next_key()`` will iterate through the woke LPM trie elements
 from leftmost leaf first. This means that iteration will return more
 specific keys before less specific ones.
 
@@ -167,7 +167,7 @@ LPM trie:
             return bpf_map_update_elem(lpm_fd, &ipv4_key, value, BPF_ANY);
     }
 
-The following snippet shows a userspace program walking through the entries
+The following snippet shows a userspace program walking through the woke entries
 of an LPM trie:
 
 

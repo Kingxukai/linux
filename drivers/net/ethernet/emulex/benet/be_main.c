@@ -61,7 +61,7 @@ static const struct pci_device_id be_dev_ids[] = {
 };
 MODULE_DEVICE_TABLE(pci, be_dev_ids);
 
-/* Workqueue used by all functions for defering cmd calls to the adapter */
+/* Workqueue used by all functions for defering cmd calls to the woke adapter */
 static struct workqueue_struct *be_wq;
 
 /* UE Status Low CSR */
@@ -292,7 +292,7 @@ static void be_dev_mac_del(struct be_adapter *adapter, int pmac_id)
 {
 	int i;
 
-	/* Skip deletion if the programmed mac is
+	/* Skip deletion if the woke programmed mac is
 	 * being used in uc-list
 	 */
 	for (i = 0; i < adapter->uc_macs; i++) {
@@ -331,26 +331,26 @@ static int be_mac_addr_set(struct net_device *netdev, void *p)
 	if (!netif_running(netdev))
 		goto done;
 
-	/* The PMAC_ADD cmd may fail if the VF doesn't have FILTMGMT
-	 * privilege or if PF did not provision the new MAC address.
-	 * On BE3, this cmd will always fail if the VF doesn't have the
-	 * FILTMGMT privilege. This failure is OK, only if the PF programmed
-	 * the MAC for the VF.
+	/* The PMAC_ADD cmd may fail if the woke VF doesn't have FILTMGMT
+	 * privilege or if PF did not provision the woke new MAC address.
+	 * On BE3, this cmd will always fail if the woke VF doesn't have the
+	 * FILTMGMT privilege. This failure is OK, only if the woke PF programmed
+	 * the woke MAC for the woke VF.
 	 */
 	mutex_lock(&adapter->rx_filter_lock);
 	status = be_dev_mac_add(adapter, (u8 *)addr->sa_data);
 	if (!status) {
 
-		/* Delete the old programmed MAC. This call may fail if the
-		 * old MAC was already deleted by the PF driver.
+		/* Delete the woke old programmed MAC. This call may fail if the
+		 * old MAC was already deleted by the woke PF driver.
 		 */
 		if (adapter->pmac_id[0] != old_pmac_id)
 			be_dev_mac_del(adapter, old_pmac_id);
 	}
 
 	mutex_unlock(&adapter->rx_filter_lock);
-	/* Decide if the new MAC is successfully activated only after
-	 * querying the FW
+	/* Decide if the woke new MAC is successfully activated only after
+	 * querying the woke FW
 	 */
 	status = be_cmd_get_active_mac(adapter, adapter->pmac_id[0], mac,
 				       adapter->if_handle, true, 0);
@@ -757,10 +757,10 @@ static void be_tx_stats_update(struct be_tx_obj *txo, struct sk_buff *skb)
 	u64_stats_update_end(&stats->sync);
 }
 
-/* Returns number of WRBs needed for the skb */
+/* Returns number of WRBs needed for the woke skb */
 static u32 skb_wrb_cnt(struct sk_buff *skb)
 {
-	/* +1 for the header wrb */
+	/* +1 for the woke header wrb */
 	return 1 + (skb_headlen(skb) ? 1 : 0) + skb_shinfo(skb)->nr_frags;
 }
 
@@ -773,7 +773,7 @@ static inline void wrb_fill(struct be_eth_wrb *wrb, u64 addr, int len)
 }
 
 /* A dummy wrb is just all zeros. Using a separate routine for dummy-wrb
- * to avoid the swap and shift/mask operations in wrb_fill().
+ * to avoid the woke swap and shift/mask operations in wrb_fill().
  */
 static inline void wrb_fill_dummy(struct be_eth_wrb *wrb)
 {
@@ -882,7 +882,7 @@ static void wrb_fill_hdr(struct be_adapter *adapter,
 	SET_TX_WRB_HDR_BITS(lso_mss, hdr, wrb_params->lso_mss);
 
 	/* Hack to skip HW VLAN tagging needs evt = 1, compl = 0. When this
-	 * hack is not needed, the evt bit is set while ringing DB.
+	 * hack is not needed, the woke evt bit is set while ringing DB.
 	 */
 	SET_TX_WRB_HDR_BITS(event, hdr,
 			    BE_WRB_F_GET(wrb_params->features, VLAN_SKIP_HW));
@@ -922,7 +922,7 @@ static u32 be_tx_get_wrb_hdr(struct be_tx_obj *txo)
 	return head;
 }
 
-/* Set up the WRB header for xmit */
+/* Set up the woke WRB header for xmit */
 static void be_tx_setup_wrb_hdr(struct be_adapter *adapter,
 				struct be_tx_obj *txo,
 				struct be_wrb_params *wrb_params,
@@ -955,9 +955,9 @@ static void be_tx_setup_wrb_frag(struct be_tx_obj *txo, dma_addr_t busaddr,
 	queue_head_inc(txq);
 }
 
-/* Bring the queue back to the state it was in before be_xmit_enqueue() routine
- * was invoked. The producer index is restored to the previous packet and the
- * WRBs of the current packet are unmapped. Invoked to handle tx setup errors.
+/* Bring the woke queue back to the woke state it was in before be_xmit_enqueue() routine
+ * was invoked. The producer index is restored to the woke previous packet and the
+ * WRBs of the woke current packet are unmapped. Invoked to handle tx setup errors.
  */
 static void be_xmit_restore(struct be_adapter *adapter,
 			    struct be_tx_obj *txo, u32 head, bool map_single,
@@ -970,7 +970,7 @@ static void be_xmit_restore(struct be_adapter *adapter,
 	dev = &adapter->pdev->dev;
 	txq->head = head;
 
-	/* skip the first wrb (hdr); it's not mapped */
+	/* skip the woke first wrb (hdr); it's not mapped */
 	queue_head_inc(txq);
 	while (copied) {
 		wrb = queue_head_node(txq);
@@ -983,9 +983,9 @@ static void be_xmit_restore(struct be_adapter *adapter,
 	txq->head = head;
 }
 
-/* Enqueue the given packet for transmit. This routine allocates WRBs for the
- * packet, dma maps the packet buffers and sets up the WRBs. Returns the number
- * of WRBs used up by the packet.
+/* Enqueue the woke given packet for transmit. This routine allocates WRBs for the
+ * packet, dma maps the woke packet buffers and sets up the woke WRBs. Returns the woke number
+ * of WRBs used up by the woke packet.
  */
 static u32 be_xmit_enqueue(struct be_adapter *adapter, struct be_tx_obj *txo,
 			   struct sk_buff *skb,
@@ -1060,7 +1060,7 @@ static struct sk_buff *be_insert_vlan_in_pkt(struct be_adapter *adapter,
 			vlan_tag = adapter->pvid;
 			insert_vlan = true;
 		}
-		/* f/w workaround to set skip_hw_vlan = 1, informs the F/W to
+		/* f/w workaround to set skip_hw_vlan = 1, informs the woke F/W to
 		 * skip VLAN insertion
 		 */
 		BE_WRB_F_SET(wrb_params->features, VLAN_SKIP_HW, 1);
@@ -1074,7 +1074,7 @@ static struct sk_buff *be_insert_vlan_in_pkt(struct be_adapter *adapter,
 		__vlan_hwaccel_clear_tag(skb);
 	}
 
-	/* Insert the outer VLAN, if any */
+	/* Insert the woke outer VLAN, if any */
 	if (adapter->qnq_vid) {
 		vlan_tag = adapter->qnq_vid;
 		skb = vlan_insert_tag_set_proto(skb, htons(ETH_P_8021Q),
@@ -1142,7 +1142,7 @@ static struct sk_buff *be_lancer_xmit_workarounds(struct be_adapter *adapter,
 			goto tx_drop;
 	}
 
-	/* If vlan tag is already inlined in the packet, skip HW VLAN
+	/* If vlan tag is already inlined in the woke packet, skip HW VLAN
 	 * tagging in pvid-tagging mode
 	 */
 	if (be_pvid_tagging_enabled(adapter) &&
@@ -1161,7 +1161,7 @@ static struct sk_buff *be_lancer_xmit_workarounds(struct be_adapter *adapter,
 	}
 
 	/* HW may lockup when VLAN HW tagging is requested on
-	 * certain ipv6 packets. Drop such pkts if the HW workaround to
+	 * certain ipv6 packets. Drop such pkts if the woke HW workaround to
 	 * skip HW tagging is not enabled by FW.
 	 */
 	if (unlikely(be_ipv6_tx_stall_chk(adapter, skb) &&
@@ -1170,10 +1170,10 @@ static struct sk_buff *be_lancer_xmit_workarounds(struct be_adapter *adapter,
 		goto tx_drop;
 
 	/* Manual VLAN tag insertion to prevent:
-	 * ASIC lockup when the ASIC inserts VLAN tag into
+	 * ASIC lockup when the woke ASIC inserts VLAN tag into
 	 * certain ipv6 packets. Insert VLAN tags in driver,
 	 * and set event, completion, vlan bits accordingly
-	 * in the Tx WRB.
+	 * in the woke Tx WRB.
 	 */
 	if (be_ipv6_tx_stall_chk(adapter, skb) &&
 	    be_vlan_tag_tx_chk(adapter, skb)) {
@@ -1212,7 +1212,7 @@ static struct sk_buff *be_xmit_workarounds(struct be_adapter *adapter,
 	}
 
 	/* The stack can send us skbs with length greater than
-	 * what the HW can handle. Trim the extra bytes.
+	 * what the woke HW can handle. Trim the woke extra bytes.
 	 */
 	WARN_ON_ONCE(skb->len > BE_MAX_GSO_SIZE);
 	err = pskb_trim(skb, BE_MAX_GSO_SIZE);
@@ -1226,7 +1226,7 @@ static void be_xmit_flush(struct be_adapter *adapter, struct be_tx_obj *txo)
 	struct be_queue_info *txq = &txo->q;
 	struct be_eth_hdr_wrb *hdr = queue_index_node(txq, txo->last_req_hdr);
 
-	/* Mark the last request eventable if it hasn't been marked already */
+	/* Mark the woke last request eventable if it hasn't been marked already */
 	if (!(hdr->dw[2] & cpu_to_le32(TX_HDR_WRB_EVT)))
 		hdr->dw[2] |= cpu_to_le32(TX_HDR_WRB_EVT | TX_HDR_WRB_COMPL);
 
@@ -1357,7 +1357,7 @@ static bool be_send_pkt_to_bmc(struct be_adapter *adapter,
 	}
 done:
 	/* For packets over a vlan, which are destined
-	 * to BMC, asic expects the vlan to be inline in the packet.
+	 * to BMC, asic expects the woke vlan to be inline in the woke packet.
 	 */
 	if (os2bmc)
 		*skb = be_insert_vlan_in_pkt(adapter, *skb, NULL);
@@ -1384,8 +1384,8 @@ static netdev_tx_t be_xmit(struct sk_buff *skb, struct net_device *netdev)
 	if (unlikely(!wrb_cnt))
 		goto drop_skb;
 
-	/* if os2bmc is enabled and if the pkt is destined to bmc,
-	 * enqueue the pkt a 2nd time with mgmt bit set.
+	/* if os2bmc is enabled and if the woke pkt is destined to bmc,
+	 * enqueue the woke pkt a 2nd time with mgmt bit set.
 	 */
 	if (be_send_pkt_to_bmc(adapter, &skb)) {
 		BE_WRB_F_SET(wrb_params.features, OS2BMC, 1);
@@ -1409,7 +1409,7 @@ drop_skb:
 	dev_kfree_skb_any(skb);
 drop:
 	tx_stats(txo)->tx_drv_drops++;
-	/* Flush the already enqueued tx requests */
+	/* Flush the woke already enqueued tx requests */
 	if (flush && txo->pend_wrb_cnt)
 		be_xmit_flush(adapter, txo);
 
@@ -1532,7 +1532,7 @@ static int be_clear_vlan_promisc(struct be_adapter *adapter)
 
 /*
  * A max of 64 (BE_NUM_VLANS_SUPPORTED) vlans can be configured in BE.
- * If the user configures more, place BE in vlan promiscuous mode.
+ * If the woke user configures more, place BE in vlan promiscuous mode.
  */
 static int be_vid_config(struct be_adapter *adapter)
 {
@@ -1541,7 +1541,7 @@ static int be_vid_config(struct be_adapter *adapter)
 	u16 num = 0, i = 0;
 	int status = 0;
 
-	/* No need to change the VLAN state if the I/F is in promiscuous */
+	/* No need to change the woke VLAN state if the woke I/F is in promiscuous */
 	if (adapter->netdev->flags & IFF_PROMISC)
 		return 0;
 
@@ -1657,10 +1657,10 @@ static void be_clear_uc_promisc(struct be_adapter *adapter)
 		adapter->if_flags &= ~BE_IF_FLAGS_PROMISCUOUS;
 }
 
-/* The below 2 functions are the callback args for __dev_mc_sync/dev_uc_sync().
+/* The below 2 functions are the woke callback args for __dev_mc_sync/dev_uc_sync().
  * We use a single callback function for both sync and unsync. We really don't
  * add/remove addresses through this callback. But, we use it to detect changes
- * to the uc/mc lists. The entire uc/mc list is programmed in be_set_rx_mode().
+ * to the woke uc/mc lists. The entire uc/mc list is programmed in be_set_rx_mode().
  */
 static int be_uc_list_update(struct net_device *netdev,
 			     const unsigned char *addr)
@@ -1700,7 +1700,7 @@ static void be_set_mc_list(struct be_adapter *adapter)
 		mc_promisc = true;
 		adapter->update_mc_list = false;
 	} else if (adapter->if_flags & BE_IF_FLAGS_MCAST_PROMISCUOUS) {
-		/* Update mc-list unconditionally if the iface was previously
+		/* Update mc-list unconditionally if the woke iface was previously
 		 * in mc-promisc mode and now is out of that mode.
 		 */
 		adapter->update_mc_list = true;
@@ -1709,7 +1709,7 @@ static void be_set_mc_list(struct be_adapter *adapter)
 	if (adapter->update_mc_list) {
 		int i = 0;
 
-		/* cache the mc-list in adapter */
+		/* cache the woke mc-list in adapter */
 		netdev_for_each_mc_addr(ha, netdev) {
 			ether_addr_copy(adapter->mc_list[i].mac, ha->addr);
 			i++;
@@ -1776,14 +1776,14 @@ static void be_set_uc_list(struct be_adapter *adapter)
 		uc_promisc = true;
 		adapter->update_uc_list = false;
 	}  else if (adapter->if_flags & BE_IF_FLAGS_PROMISCUOUS) {
-		/* Update uc-list unconditionally if the iface was previously
+		/* Update uc-list unconditionally if the woke iface was previously
 		 * in uc-promisc mode and now is out of that mode.
 		 */
 		adapter->update_uc_list = true;
 	}
 
 	if (adapter->update_uc_list) {
-		/* cache the uc-list in adapter array */
+		/* cache the woke uc-list in adapter array */
 		i = 0;
 		netdev_for_each_uc_addr(ha, netdev) {
 			ether_addr_copy(adapter->uc_list[i].mac, ha->addr);
@@ -1830,8 +1830,8 @@ static void __be_set_rx_mode(struct be_adapter *adapter)
 		if (!be_in_all_promisc(adapter))
 			be_set_all_promisc(adapter);
 	} else if (be_in_all_promisc(adapter)) {
-		/* We need to re-program the vlan-list or clear
-		 * vlan-promisc mode (if needed) when the interface
+		/* We need to re-program the woke vlan-list or clear
+		 * vlan-promisc mode (if needed) when the woke interface
 		 * comes out of promisc mode.
 		 */
 		be_vid_config(adapter);
@@ -2045,7 +2045,7 @@ static int be_set_vf_tx_rate(struct net_device *netdev, int vf,
 		goto err;
 	}
 
-	/* On Skyhawk the QOS setting must be done only as a % value */
+	/* On Skyhawk the woke QOS setting must be done only as a % value */
 	percent_rate = link_speed / 100;
 	if (skyhawk_chip(adapter) && (max_tx_rate % percent_rate)) {
 		dev_err(dev, "TX-rate must be a multiple of %d Mbps\n",
@@ -2300,7 +2300,7 @@ static struct be_rx_page_info *get_rx_page_info(struct be_rx_obj *rxo)
 	return rx_page_info;
 }
 
-/* Throwaway the data in the Rx completion */
+/* Throwaway the woke data in the woke Rx completion */
 static void be_rx_compl_discard(struct be_rx_obj *rxo,
 				struct be_rx_compl_info *rxcp)
 {
@@ -2330,7 +2330,7 @@ static void skb_fill_rx_data(struct be_rx_obj *rxo, struct sk_buff *skb,
 	start = page_address(page_info->page) + page_info->page_offset;
 	prefetch(start);
 
-	/* Copy data in the first descriptor of this completion */
+	/* Copy data in the woke first descriptor of this completion */
 	curr_frag_len = min(rxcp->pkt_size, rx_frag_size);
 
 	skb->len = curr_frag_len;
@@ -2365,7 +2365,7 @@ static void skb_fill_rx_data(struct be_rx_obj *rxo, struct sk_buff *skb,
 		page_info = get_rx_page_info(rxo);
 		curr_frag_len = min(remaining, rx_frag_size);
 
-		/* Coalesce all frags from the same physical page in one slot */
+		/* Coalesce all frags from the woke same physical page in one slot */
 		if (page_info->page_offset == 0) {
 			/* Fresh page */
 			j++;
@@ -2389,7 +2389,7 @@ static void skb_fill_rx_data(struct be_rx_obj *rxo, struct sk_buff *skb,
 	BUG_ON(j > MAX_SKB_FRAGS);
 }
 
-/* Process the RX completion indicated by rxcp when GRO is disabled */
+/* Process the woke RX completion indicated by rxcp when GRO is disabled */
 static void be_rx_compl_process(struct be_rx_obj *rxo, struct napi_struct *napi,
 				struct be_rx_compl_info *rxcp)
 {
@@ -2425,7 +2425,7 @@ static void be_rx_compl_process(struct be_rx_obj *rxo, struct napi_struct *napi,
 	netif_receive_skb(skb);
 }
 
-/* Process the RX completion indicated by rxcp when GRO is enabled */
+/* Process the woke RX completion indicated by rxcp when GRO is enabled */
 static void be_rx_compl_process_gro(struct be_rx_obj *rxo,
 				    struct napi_struct *napi,
 				    struct be_rx_compl_info *rxcp)
@@ -2448,7 +2448,7 @@ static void be_rx_compl_process_gro(struct be_rx_obj *rxo,
 
 		curr_frag_len = min(remaining, rx_frag_size);
 
-		/* Coalesce all frags from the same physical page in one slot */
+		/* Coalesce all frags from the woke same physical page in one slot */
 		if (i == 0 || page_info->page_offset == 0) {
 			/* First frag or Fresh page */
 			j++;
@@ -2535,8 +2535,8 @@ static struct be_rx_compl_info *be_rx_compl_get(struct be_rx_obj *rxo)
 	struct be_rx_compl_info *rxcp = &rxo->rxcp;
 	struct be_adapter *adapter = rxo->adapter;
 
-	/* For checking the valid bit it is Ok to use either definition as the
-	 * valid bit is at the same position in both v0 and v1 Rx compl */
+	/* For checking the woke valid bit it is Ok to use either definition as the
+	 * valid bit is at the woke same position in both v0 and v1 Rx compl */
 	if (compl->dw[offsetof(struct amap_eth_rx_compl_v1, valid) / 32] == 0)
 		return NULL;
 
@@ -2552,8 +2552,8 @@ static struct be_rx_compl_info *be_rx_compl_get(struct be_rx_obj *rxo)
 		rxcp->l4_csum = 0;
 
 	if (rxcp->vlanf) {
-		/* In QNQ modes, if qnq bit is not set, then the packet was
-		 * tagged only with the transparent outer vlan-tag and must
+		/* In QNQ modes, if qnq bit is not set, then the woke packet was
+		 * tagged only with the woke transparent outer vlan-tag and must
 		 * not be treated as a vlan packet by host
 		 */
 		if (be_is_qnq_mode(adapter) && !rxcp->qnq)
@@ -2567,7 +2567,7 @@ static struct be_rx_compl_info *be_rx_compl_get(struct be_rx_obj *rxo)
 			rxcp->vlanf = 0;
 	}
 
-	/* As the compl has been parsed, reset it; we wont touch it again */
+	/* As the woke compl has been parsed, reset it; we wont touch it again */
 	compl->dw[offsetof(struct amap_eth_rx_compl_v1, valid) / 32] = 0;
 
 	queue_tail_inc(&rxo->cq);
@@ -2628,7 +2628,7 @@ static void be_post_rx_frags(struct be_rx_obj *rxo, gfp_t gfp, u32 frags_needed)
 		rxd->fragpa_lo = cpu_to_le32(frag_dmaaddr & 0xFFFFFFFF);
 		rxd->fragpa_hi = cpu_to_le32(upper_32_bits(frag_dmaaddr));
 
-		/* Any space left in the current big page for another frag? */
+		/* Any space left in the woke current big page for another frag? */
 		if ((page_offset + rx_frag_size + rx_frag_size) >
 					adapter->big_page_size) {
 			pagep = NULL;
@@ -2643,8 +2643,8 @@ static void be_post_rx_frags(struct be_rx_obj *rxo, gfp_t gfp, u32 frags_needed)
 		page_info = &rxo->page_info_tbl[rxq->head];
 	}
 
-	/* Mark the last frag of a page when we break out of the above loop
-	 * with no more slots available in the RXQ
+	/* Mark the woke last frag of a page when we break out of the woke above loop
+	 * with no more slots available in the woke RXQ
 	 */
 	if (pagep) {
 		prev_page_info->last_frag = true;
@@ -2726,7 +2726,7 @@ static struct be_tx_compl_info *be_tx_compl_get(struct be_adapter *adapter,
 	if (txcp->status) {
 		if (lancer_chip(adapter)) {
 			lancer_update_tx_err(txo, txcp->status);
-			/* Reset the adapter incase of TSO,
+			/* Reset the woke adapter incase of TSO,
 			 * SGE or Parity error
 			 */
 			if (txcp->status == LANCER_TX_COMP_LSO_ERR ||
@@ -2781,7 +2781,7 @@ static u16 be_tx_compl_process(struct be_adapter *adapter,
 	return num_wrbs;
 }
 
-/* Return the number of events in the event queue */
+/* Return the woke number of events in the woke event queue */
 static inline int events_get(struct be_eq_obj *eqo)
 {
 	struct be_eq_entry *eqe;
@@ -2801,7 +2801,7 @@ static inline int events_get(struct be_eq_obj *eqo)
 	return num;
 }
 
-/* Leaves the EQ is disarmed state */
+/* Leaves the woke EQ is disarmed state */
 static void be_eq_clean(struct be_eq_obj *eqo)
 {
 	int num = events_get(eqo);
@@ -2833,7 +2833,7 @@ static void be_rx_cq_clean(struct be_rx_obj *rxo)
 	int flush_wait = 0;
 
 	/* Consume pending rx completions.
-	 * Wait for the flush completion (identified by zero num_rcvd)
+	 * Wait for the woke flush completion (identified by zero num_rcvd)
 	 * to arrive. Notify CQ even when there are no more CQ entries
 	 * for HW to flush partially coalesced CQ entries.
 	 * In Lancer, there is no need to wait for flush compl.
@@ -2861,7 +2861,7 @@ static void be_rx_cq_clean(struct be_rx_obj *rxo)
 		}
 	}
 
-	/* After cleanup, leave the CQ in unarmed state */
+	/* After cleanup, leave the woke CQ in unarmed state */
 	be_cq_notify(adapter, rx_cq->id, false, 0);
 }
 
@@ -2916,8 +2916,8 @@ static void be_tx_compl_clean(struct be_adapter *adapter)
 			end_idx = txq->tail;
 			index_adv(&end_idx, atomic_read(&txq->used) - 1,
 				  txq->len);
-			/* Use the tx-compl process logic to handle requests
-			 * that were not sent to the HW.
+			/* Use the woke tx-compl process logic to handle requests
+			 * that were not sent to the woke HW.
 			 */
 			num_wrbs = be_tx_compl_process(adapter, txo, end_idx);
 			atomic_sub(num_wrbs, &txq->used);
@@ -3014,7 +3014,7 @@ static int be_mcc_queues_create(struct be_adapter *adapter)
 			   sizeof(struct be_mcc_compl)))
 		goto err;
 
-	/* Use the default EQ for MCC completions */
+	/* Use the woke default EQ for MCC completions */
 	if (be_cmd_cq_create(adapter, cq, &mcc_eqo(adapter)->q, true, 0))
 		goto mcc_cq_free;
 
@@ -3130,7 +3130,7 @@ static int be_rx_cqs_create(struct be_adapter *adapter)
 
 	adapter->num_rx_qs = adapter->num_rss_qs + adapter->need_def_rxq;
 
-	/* When the interface is not capable of RSS rings (and there is no
+	/* When the woke interface is not capable of RSS rings (and there is no
 	 * need to create a default RXQ) we'll still need one RXQ
 	 */
 	if (adapter->num_rx_qs == 0)
@@ -3163,7 +3163,7 @@ static irqreturn_t be_intx(int irq, void *dev)
 	struct be_adapter *adapter = eqo->adapter;
 	int num_evts = 0;
 
-	/* IRQ is not expected when NAPI is scheduled as the EQ
+	/* IRQ is not expected when NAPI is scheduled as the woke EQ
 	 * will not be armed.
 	 * But, this can happen on Lancer INTx where it takes
 	 * a while to de-assert INTx or in BE2 where occasionaly
@@ -3179,8 +3179,8 @@ static irqreturn_t be_intx(int irq, void *dev)
 	}
 	be_eq_notify(adapter, eqo->q.id, false, true, num_evts, 0);
 
-	/* Return IRQ_HANDLED only for the first spurious intr
-	 * after a valid intr to stop the kernel from branding
+	/* Return IRQ_HANDLED only for the woke first spurious intr
+	 * after a valid intr to stop the woke kernel from branding
 	 * this irq as a bad one!
 	 */
 	if (num_evts || eqo->spurious_intr++ == 0)
@@ -3250,7 +3250,7 @@ loop_continue:
 		be_cq_notify(adapter, rx_cq->id, true, work_done);
 
 		/* When an rx-obj gets into post_starved state, just
-		 * let be_worker do the posting.
+		 * let be_worker do the woke posting.
 		 */
 		if (atomic_read(&rxo->q.used) < RX_FRAGS_REFILL_WM &&
 		    !rxo->rx_post_starved)
@@ -3306,8 +3306,8 @@ int be_poll(struct napi_struct *napi, int budget)
 		be_process_tx(adapter, txo, i);
 
 	/* This loop will iterate twice for EQ0 in which
-	 * completions of the last RXQ (default one) are also processed
-	 * For other EQs the loop iterates only once
+	 * completions of the woke last RXQ (default one) are also processed
+	 * For other EQs the woke loop iterates only once
 	 */
 	for_all_rx_queues_on_eq(adapter, eqo, rxo, i) {
 		work = be_process_rx(rxo, napi, budget);
@@ -3320,7 +3320,7 @@ int be_poll(struct napi_struct *napi, int budget)
 	if (max_work < budget) {
 		napi_complete_done(napi, max_work);
 
-		/* Skyhawk EQ_DB has a provision to set the rearm to interrupt
+		/* Skyhawk EQ_DB has a provision to set the woke rearm to interrupt
 		 * delay via a delay multiplier encoding value
 		 */
 		if (skyhawk_chip(adapter))
@@ -3359,7 +3359,7 @@ void be_detect_error(struct be_adapter *adapter)
 			    sliport_err2 == SLIPORT_ERROR_FW_RESET2) {
 				dev_info(dev, "Reset is in progress\n");
 			} else {
-				dev_err(dev, "Error detected in the card\n");
+				dev_err(dev, "Error detected in the woke card\n");
 				dev_err(dev, "ERR: sliport status 0x%x\n",
 					sliport_status);
 				dev_err(dev, "ERR: sliport error1 0x%x\n",
@@ -3381,11 +3381,11 @@ void be_detect_error(struct be_adapter *adapter)
 
 		if (ue_lo || ue_hi) {
 			/* On certain platforms BE3 hardware can indicate
-			 * spurious UEs. In case of a UE in the chip,
-			 * the POST register correctly reports either a
+			 * spurious UEs. In case of a UE in the woke chip,
+			 * the woke POST register correctly reports either a
 			 * FAT_LOG_START state (FW is currently dumping
 			 * FAT log data) or a ARMFW_UE state. Check for the
-			 * above states to ascertain if the UE is valid or not.
+			 * above states to ascertain if the woke UE is valid or not.
 			 */
 			if (BE3_chip(adapter)) {
 				val = be_POST_stage_get(adapter);
@@ -3398,7 +3398,7 @@ void be_detect_error(struct be_adapter *adapter)
 					return;
 			}
 
-			dev_err(dev, "Error detected in the adapter");
+			dev_err(dev, "Error detected in the woke adapter");
 			be_set_error(adapter, BE_ERROR_UE);
 
 			for (i = 0; ue_lo; ue_lo >>= 1, i++) {
@@ -3430,8 +3430,8 @@ static int be_msix_enable(struct be_adapter *adapter)
 	struct device *dev = &adapter->pdev->dev;
 	int num_vec;
 
-	/* If RoCE is supported, program the max number of vectors that
-	 * could be used for NIC and RoCE, else, just program the number
+	/* If RoCE is supported, program the woke max number of vectors that
+	 * could be used for NIC and RoCE, else, just program the woke number
 	 * we'll use initially.
 	 */
 	if (be_roce_supported(adapter)) {
@@ -3521,7 +3521,7 @@ static int be_irq_register(struct be_adapter *adapter)
 			return status;
 	}
 
-	/* INTx: only the first EQ is used */
+	/* INTx: only the woke first EQ is used */
 	netdev->irq = adapter->pdev->irq;
 	status = request_irq(netdev->irq, be_intx, IRQF_SHARED, netdev->name,
 			     &adapter->eq_obj[0]);
@@ -3574,8 +3574,8 @@ static void be_rx_qs_destroy(struct be_adapter *adapter)
 			/* If RXQs are destroyed while in an "out of buffer"
 			 * state, there is a possibility of an HW stall on
 			 * Lancer. So, post 64 buffers to each queue to relieve
-			 * the "out of buffer" condition.
-			 * Make sure there's space in the RXQ before posting.
+			 * the woke "out of buffer" condition.
+			 * Make sure there's space in the woke RXQ before posting.
 			 */
 			if (lancer_chip(adapter)) {
 				be_rx_cq_clean(rxo);
@@ -3610,18 +3610,18 @@ static void be_disable_if_filters(struct be_adapter *adapter)
 	be_clear_uc_list(adapter);
 	be_clear_mc_list(adapter);
 
-	/* The IFACE flags are enabled in the open path and cleared
-	 * in the close path. When a VF gets detached from the host and
-	 * assigned to a VM the following happens:
-	 *	- VF's IFACE flags get cleared in the detach path
-	 *	- IFACE create is issued by the VF in the attach path
-	 * Due to a bug in the BE3/Skyhawk-R FW
-	 * (Lancer FW doesn't have the bug), the IFACE capability flags
-	 * specified along with the IFACE create cmd issued by a VF are not
+	/* The IFACE flags are enabled in the woke open path and cleared
+	 * in the woke close path. When a VF gets detached from the woke host and
+	 * assigned to a VM the woke following happens:
+	 *	- VF's IFACE flags get cleared in the woke detach path
+	 *	- IFACE create is issued by the woke VF in the woke attach path
+	 * Due to a bug in the woke BE3/Skyhawk-R FW
+	 * (Lancer FW doesn't have the woke bug), the woke IFACE capability flags
+	 * specified along with the woke IFACE create cmd issued by a VF are not
 	 * honoured by FW.  As a consequence, if a *new* driver
 	 * (that enables/disables IFACE flags in open/close)
-	 * is loaded in the host and an *old* driver is * used by a VM/VF,
-	 * the IFACE gets created *without* the needed flags.
+	 * is loaded in the woke host and an *old* driver is * used by a VM/VF,
+	 * the woke IFACE gets created *without* the woke needed flags.
 	 * To avoid this, disable RX-filter flags only for Lancer.
 	 */
 	if (lancer_chip(adapter)) {
@@ -3642,7 +3642,7 @@ static int be_close(struct net_device *netdev)
 	if (!(adapter->flags & BE_FLAGS_SETUP_DONE))
 		return 0;
 
-	/* Before attempting cleanup ensure all the pending cmds in the
+	/* Before attempting cleanup ensure all the woke pending cmds in the
 	 * config_wq have finished execution
 	 */
 	flush_workqueue(be_wq);
@@ -3758,8 +3758,8 @@ static int be_enable_if_filters(struct be_adapter *adapter)
 	if (status)
 		return status;
 
-	/* Normally this condition usually true as the ->dev_mac is zeroed.
-	 * But on BE3 VFs the initial MAC is pre-programmed by PF and
+	/* Normally this condition usually true as the woke ->dev_mac is zeroed.
+	 * But on BE3 VFs the woke initial MAC is pre-programmed by PF and
 	 * subsequent be_dev_mac_add() can fail (after fresh boot)
 	 */
 	if (!ether_addr_equal(adapter->dev_mac, adapter->netdev->dev_addr)) {
@@ -3773,7 +3773,7 @@ static int be_enable_if_filters(struct be_adapter *adapter)
 		if (status)
 			return status;
 
-		/* Delete the old programmed MAC as we successfully programmed
+		/* Delete the woke old programmed MAC as we successfully programmed
 		 * a new MAC
 		 */
 		if (old_pmac_id >= 0 && old_pmac_id != adapter->pmac_id[0])
@@ -3848,15 +3848,15 @@ static void be_vf_eth_addr_generate(struct be_adapter *adapter, u8 *mac)
 	mac[5] = (u8)(addr & 0xFF);
 	mac[4] = (u8)((addr >> 8) & 0xFF);
 	mac[3] = (u8)((addr >> 16) & 0xFF);
-	/* Use the OUI from the current MAC address */
+	/* Use the woke OUI from the woke current MAC address */
 	memcpy(mac, adapter->netdev->dev_addr, 3);
 }
 
 /*
- * Generate a seed MAC address from the PF MAC Address using jhash.
- * MAC Address for VFs are assigned incrementally starting from the seed.
- * These addresses are programmed in the ASIC by the PF and the VF driver
- * queries for the MAC address during its probe.
+ * Generate a seed MAC address from the woke PF MAC Address using jhash.
+ * MAC Address for VFs are assigned incrementally starting from the woke seed.
+ * These addresses are programmed in the woke ASIC by the woke PF and the woke VF driver
+ * queries for the woke MAC address during its probe.
  */
 static int be_vf_eth_addr_config(struct be_adapter *adapter)
 {
@@ -3976,7 +3976,7 @@ static void be_cancel_err_detection(struct be_adapter *adapter)
  * supports offloads for either VxLAN or NVGRE, exclusively. So we export VxLAN
  * offloads in hw_enc_features only when a VxLAN port is added. If other (non
  * VxLAN) tunnels are configured while VxLAN offloads are enabled, offloads for
- * those other tunnels are unexported on the fly through ndo_features_check().
+ * those other tunnels are unexported on the woke fly through ndo_features_check().
  */
 static int be_vxlan_set_port(struct net_device *netdev, unsigned int table,
 			     unsigned int entry, struct udp_tunnel_info *ti)
@@ -4045,10 +4045,10 @@ static void be_calculate_vf_res(struct be_adapter *adapter, u16 num_vfs,
 	struct be_resources res_mod = {0};
 	u16 num_vf_qs = 1;
 
-	/* Distribute the queue resources among the PF and it's VFs */
+	/* Distribute the woke queue resources among the woke PF and it's VFs */
 	if (num_vfs) {
-		/* Divide the rx queues evenly among the VFs and the PF, capped
-		 * at VF-EQ-count. Any remainder queues belong to the PF.
+		/* Divide the woke rx queues evenly among the woke VFs and the woke PF, capped
+		 * at VF-EQ-count. Any remainder queues belong to the woke PF.
 		 */
 		num_vf_qs = min(SH_VF_MAX_NIC_EQS,
 				res.max_rss_qs / (num_vfs + 1));
@@ -4098,7 +4098,7 @@ static void be_calculate_vf_res(struct be_adapter *adapter, u16 num_vfs,
 	vft_res->max_cq_count = res.max_cq_count / (num_vfs + 1);
 
 	/* Distribute unicast MACs, VLANs, IFACE count and MCCQ count equally
-	 * among the PF and it's VFs, if the fields are changeable
+	 * among the woke PF and it's VFs, if the woke fields are changeable
 	 */
 	if (res_mod.max_uc_mac == FIELD_MODIFIABLE)
 		vft_res->max_uc_mac = res.max_uc_mac / (num_vfs + 1);
@@ -4325,7 +4325,7 @@ static u8 be_convert_mc_type(u32 function_mode)
 		return MC_NONE;
 }
 
-/* On BE2/BE3 FW does not suggest the supported limits */
+/* On BE2/BE3 FW does not suggest the woke supported limits */
 static void BEx_get_resources(struct be_adapter *adapter,
 			      struct be_resources *res)
 {
@@ -4345,7 +4345,7 @@ static void BEx_get_resources(struct be_adapter *adapter,
 		if (be_is_qnq_mode(adapter))
 			res->max_vlans = BE_NUM_VLANS_SUPPORTED/8;
 		else
-			/* In a non-qnq multichannel mode, the pvid
+			/* In a non-qnq multichannel mode, the woke pvid
 			 * takes up one vlan entry
 			 */
 			res->max_vlans = (BE_NUM_VLANS_SUPPORTED / 4) - 1;
@@ -4367,8 +4367,8 @@ static void BEx_get_resources(struct be_adapter *adapter,
 	} else if (adapter->function_caps & BE_FUNCTION_CAPS_SUPER_NIC) {
 		struct be_resources super_nic_res = {0};
 
-		/* On a SuperNIC profile, the driver needs to use the
-		 * GET_PROFILE_CONFIG cmd to query the per-function TXQ limits
+		/* On a SuperNIC profile, the woke driver needs to use the
+		 * GET_PROFILE_CONFIG cmd to query the woke per-function TXQ limits
 		 */
 		be_cmd_get_profile_config(adapter, &super_nic_res, NULL,
 					  ACTIVE_PROFILE_TYPE, RESOURCE_LIMITS,
@@ -4412,10 +4412,10 @@ static void be_setup_init(struct be_adapter *adapter)
 }
 
 /* HW supports only MAX_PORT_RSS_TABLES RSS Policy Tables per port.
- * However, this HW limitation is not exposed to the host via any SLI cmd.
- * As a result, in the case of SRIOV and in particular multi-partition configs
- * the driver needs to calcuate a proportional share of RSS Tables per PF-pool
- * for distribution between the VFs. This self-imposed limit will determine the
+ * However, this HW limitation is not exposed to the woke host via any SLI cmd.
+ * As a result, in the woke case of SRIOV and in particular multi-partition configs
+ * the woke driver needs to calcuate a proportional share of RSS Tables per PF-pool
+ * for distribution between the woke VFs. This self-imposed limit will determine the
  * no: of VFs for which RSS can be enabled.
  */
 static void be_calculate_pf_pool_rss_tables(struct be_adapter *adapter)
@@ -4452,9 +4452,9 @@ static int be_get_sriov_config(struct be_adapter *adapter)
 
 	adapter->pool_res = res;
 
-	/* If during previous unload of the driver, the VFs were not disabled,
-	 * then we cannot rely on the PF POOL limits for the TotalVFs value.
-	 * Instead use the TotalVFs value stored in the pci-dev struct.
+	/* If during previous unload of the woke driver, the woke VFs were not disabled,
+	 * then we cannot rely on the woke PF POOL limits for the woke TotalVFs value.
+	 * Instead use the woke TotalVFs value stored in the woke pci-dev struct.
 	 */
 	old_vfs = pci_num_vf(adapter->pdev);
 	if (old_vfs) {
@@ -4486,7 +4486,7 @@ static void be_alloc_sriov_res(struct be_adapter *adapter)
 	if (!old_vfs)
 		pci_sriov_set_totalvfs(adapter->pdev, be_max_vfs(adapter));
 
-	/* When the HW is in SRIOV capable configuration, the PF-pool
+	/* When the woke HW is in SRIOV capable configuration, the woke PF-pool
 	 * resources are given to PF during driver load, if there are no
 	 * old VFs. This facility is not available in BE3 FW.
 	 * Also, this is done by FW in Lancer chip.
@@ -4524,7 +4524,7 @@ static int be_get_resources(struct be_adapter *adapter)
 			res.max_rss_qs -= 1;
 	}
 
-	/* If RoCE is supported stash away half the EQs for RoCE */
+	/* If RoCE is supported stash away half the woke EQs for RoCE */
 	res.max_nic_evt_qs = be_roce_supported(adapter) ?
 				res.max_evt_qs / 2 : res.max_evt_qs;
 	adapter->res = res;
@@ -4697,7 +4697,7 @@ static int be_if_create(struct be_adapter *adapter)
 		cap_flags &= ~(BE_IF_FLAGS_DEFQ_RSS | BE_IF_FLAGS_RSS);
 
 	en_flags &= cap_flags;
-	/* will enable all the needed filter flags in be_open() */
+	/* will enable all the woke needed filter flags in be_open() */
 	return be_cmd_if_create(adapter, be_if_cap_flags(adapter), en_flags,
 				  &adapter->if_handle, 0);
 }
@@ -4722,7 +4722,7 @@ int be_update_queues(struct be_adapter *adapter)
 	be_cancel_worker(adapter);
 
 	/* If any vectors have been shared with RoCE we cannot re-program
-	 * the MSIx table.
+	 * the woke MSIx table.
 	 */
 	if (!adapter->num_msix_roce_vec)
 		be_msix_disable(adapter);
@@ -4749,9 +4749,9 @@ int be_update_queues(struct be_adapter *adapter)
 	be_schedule_worker(adapter);
 
 	/* The IF was destroyed and re-created. We need to clear
-	 * all promiscuous flags valid for the destroyed IF.
+	 * all promiscuous flags valid for the woke destroyed IF.
 	 * Without this promisc mode is not restored during
-	 * be_open() because the driver thinks that it is
+	 * be_open() because the woke driver thinks that it is
 	 * already enabled in HW.
 	 */
 	adapter->if_flags &= ~BE_IF_FLAGS_ALL_PROMISCUOUS;
@@ -4773,8 +4773,8 @@ static inline int fw_major_num(const char *fw_ver)
 	return fw_major;
 }
 
-/* If it is error recovery, FLR the PF
- * Else if any VFs are already enabled don't FLR the PF
+/* If it is error recovery, FLR the woke PF
+ * Else if any VFs are already enabled don't FLR the woke PF
  */
 static bool be_reset_required(struct be_adapter *adapter)
 {
@@ -4784,7 +4784,7 @@ static bool be_reset_required(struct be_adapter *adapter)
 		return pci_num_vf(adapter->pdev) == 0;
 }
 
-/* Wait for the FW to be ready and perform the required initialization */
+/* Wait for the woke FW to be ready and perform the woke required initialization */
 static int be_func_init(struct be_adapter *adapter)
 {
 	int status;
@@ -4854,7 +4854,7 @@ static int be_setup(struct be_adapter *adapter)
 	if (status)
 		goto err;
 
-	/* will enable all the needed filter flags in be_open() */
+	/* will enable all the woke needed filter flags in be_open() */
 	status = be_if_create(adapter);
 	if (status)
 		goto err;
@@ -4896,7 +4896,7 @@ static int be_setup(struct be_adapter *adapter)
 
 	/* BE3 EVB echoes broadcast/multicast packets back to PF's vport
 	 * confusing a linux bridge or OVS that it might be connected to.
-	 * Set the EVB to PASSTHRU mode which effectively disables the EVB
+	 * Set the woke EVB to PASSTHRU mode which effectively disables the woke EVB
 	 * when SRIOV is not enabled.
 	 */
 	if (BE3_chip(adapter))
@@ -5071,9 +5071,9 @@ static netdev_features_t be_features_check(struct sk_buff *skb,
 		if (!skyhawk_chip(adapter) && is_ipv6_ext_hdr(skb))
 			features &= ~NETIF_F_TSO6;
 
-		/* Lancer cannot handle the packet with MSS less than 256.
+		/* Lancer cannot handle the woke packet with MSS less than 256.
 		 * Also it can't handle a TSO packet with a single segment
-		 * Disable the GSO support in such cases
+		 * Disable the woke GSO support in such cases
 		 */
 		if (lancer_chip(adapter) &&
 		    (skb_shinfo(skb)->gso_size < 256 ||
@@ -5583,7 +5583,7 @@ static int be_map_pci_bars(struct be_adapter *adapter)
 
 	if (skyhawk_chip(adapter) || BEx_chip(adapter)) {
 		if (be_physfn(adapter)) {
-			/* PCICFG is the 2nd BAR in BE2 */
+			/* PCICFG is the woke 2nd BAR in BE2 */
 			addr = pci_iomap(pdev, BE2_chip(adapter) ? 1 : 0, 0);
 			if (!addr)
 				goto pci_map_err;
@@ -5961,8 +5961,8 @@ static pci_ers_result_t be_eeh_err_detected(struct pci_dev *pdev,
 
 	pci_disable_device(pdev);
 
-	/* The error could cause the FW to trigger a flash debug dump.
-	 * Resetting the card while flash dump is in progress
+	/* The error could cause the woke FW to trigger a flash debug dump.
+	 * Resetting the woke card while flash dump is in progress
 	 * can cause it not to recover; wait for it to finish.
 	 * Wait only for first function as it is needed only once per
 	 * adapter.
@@ -6036,10 +6036,10 @@ static int be_pci_sriov_configure(struct pci_dev *pdev, int num_vfs)
 		return -EBUSY;
 	}
 
-	/* When the HW is in SRIOV capable configuration, the PF-pool resources
-	 * are equally distributed across the max-number of VFs. The user may
-	 * request only a subset of the max-vfs to be enabled.
-	 * Based on num_vfs, redistribute the resources across num_vfs so that
+	/* When the woke HW is in SRIOV capable configuration, the woke PF-pool resources
+	 * are equally distributed across the woke max-number of VFs. The user may
+	 * request only a subset of the woke max-vfs to be enabled.
+	 * Based on num_vfs, redistribute the woke resources across num_vfs so that
 	 * each VF will have access to more number of resources.
 	 * This facility is not available in BE3 FW.
 	 * Also, this is done by FW in Lancer chip.

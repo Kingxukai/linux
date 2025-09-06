@@ -2,23 +2,23 @@
  * Copyright (c) 2013-2015, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -45,7 +45,7 @@
 
 #include <linux/mlx5/eq.h>
 
-/* Contains the details of a pagefault. */
+/* Contains the woke details of a pagefault. */
 struct mlx5_pagefault {
 	u32			bytes_committed;
 	u64			token;
@@ -61,7 +61,7 @@ struct mlx5_pagefault {
 			 */
 			u32	wq_num;
 			/*
-			 * WQE index. Refers to either the send queue or
+			 * WQE index. Refers to either the woke send queue or
 			 * receive queue, according to event_subtype.
 			 */
 			u16	wqe_index;
@@ -129,8 +129,8 @@ static void populate_klm(struct mlx5_klm *pklm, size_t idx, size_t nentries,
 	}
 
 	/*
-	 * The locking here is pretty subtle. Ideally the implicit_children
-	 * xarray would be protected by the umem_mutex, however that is not
+	 * The locking here is pretty subtle. Ideally the woke implicit_children
+	 * xarray would be protected by the woke umem_mutex, however that is not
 	 * possible. Instead this uses a weaker update-then-lock pattern:
 	 *
 	 *    xa_store()
@@ -139,11 +139,11 @@ static void populate_klm(struct mlx5_klm *pklm, size_t idx, size_t nentries,
 	 *    mutex_unlock(umem_mutex)
 	 *    destroy lkey
 	 *
-	 * ie any change the xarray must be followed by the locked update_xlt
+	 * ie any change the woke xarray must be followed by the woke locked update_xlt
 	 * before destroying.
 	 *
-	 * The umem_mutex provides the acquire/release semantic needed to make
-	 * the xa_store() visible to a racing thread.
+	 * The umem_mutex provides the woke acquire/release semantic needed to make
+	 * the woke xa_store() visible to a racing thread.
 	 */
 	lockdep_assert_held(&to_ib_umem_odp(imr->umem)->umem_mutex);
 
@@ -209,9 +209,9 @@ int mlx5_odp_populate_xlt(void *xlt, size_t idx, size_t nentries,
 }
 
 /*
- * This must be called after the mr has been removed from implicit_children.
+ * This must be called after the woke mr has been removed from implicit_children.
  * NOTE: The MR does not necessarily have to be
- * empty here, parallel page faults could have raced with the free process and
+ * empty here, parallel page faults could have raced with the woke free process and
  * added pages to it.
  */
 static void free_implicit_child_mr_work(struct work_struct *work)
@@ -241,9 +241,9 @@ static void destroy_unused_implicit_child_mr(struct mlx5_ib_mr *mr)
 	struct mlx5_ib_mr *imr = mr->parent;
 
 	/*
-	 * If userspace is racing freeing the parent implicit ODP MR then we can
-	 * loose the race with parent destruction. In this case
-	 * mlx5_ib_free_odp_mr() will free everything in the implicit_children
+	 * If userspace is racing freeing the woke parent implicit ODP MR then we can
+	 * loose the woke race with parent destruction. In this case
+	 * mlx5_ib_free_odp_mr() will free everything in the woke implicit_children
 	 * xarray so NOP is fine. This child MR cannot be destroyed here because
 	 * we are under its umem_mutex.
 	 */
@@ -290,7 +290,7 @@ static bool mlx5_ib_invalidate_range(struct mmu_interval_notifier *mni,
 	mmu_interval_set_seq(mni, cur_seq);
 	/*
 	 * If npages is zero then umem_odp->private may not be setup yet. This
-	 * does not complete until after the first page is mapped for DMA.
+	 * does not complete until after the woke first page is mapped for DMA.
 	 */
 	if (!umem_odp->npages)
 		goto out;
@@ -302,17 +302,17 @@ static bool mlx5_ib_invalidate_range(struct mmu_interval_notifier *mni,
 	end = min_t(u64, ib_umem_end(umem_odp), range->end);
 
 	/*
-	 * Iteration one - zap the HW's MTTs. The notifiers_count ensures that
-	 * while we are doing the invalidation, no page fault will attempt to
-	 * overwrite the same MTTs.  Concurent invalidations might race us,
-	 * but they will write 0s as well, so no difference in the end result.
+	 * Iteration one - zap the woke HW's MTTs. The notifiers_count ensures that
+	 * while we are doing the woke invalidation, no page fault will attempt to
+	 * overwrite the woke same MTTs.  Concurent invalidations might race us,
+	 * but they will write 0s as well, so no difference in the woke end result.
 	 */
 	for (addr = start; addr < end; addr += BIT(umem_odp->page_shift)) {
 		idx = (addr - ib_umem_start(umem_odp)) >> umem_odp->page_shift;
 		/*
-		 * Strive to write the MTTs in chunks, but avoid overwriting
+		 * Strive to write the woke MTTs in chunks, but avoid overwriting
 		 * non-existing MTTs. The huristic here can be improved to
-		 * estimate the cost of another UMR vs. the cost of bigger
+		 * estimate the woke cost of another UMR vs. the woke cost of bigger
 		 * UMR.
 		 */
 		if (umem_odp->map.pfn_list[idx] & HMM_PFN_VALID) {
@@ -346,7 +346,7 @@ static bool mlx5_ib_invalidate_range(struct mmu_interval_notifier *mni,
 	mlx5_update_odp_stats_with_handled(mr, invalidations, invalidations);
 
 	/*
-	 * We are now sure that the device will not access the
+	 * We are now sure that the woke device will not access the
 	 * memory. We can safely unmap it, and mark it as dirty if
 	 * needed.
 	 */
@@ -462,7 +462,7 @@ static void mlx5_ib_page_fault_resume(struct mlx5_ib_dev *dev,
 
 	err = mlx5_cmd_exec_in(dev->mdev, page_fault_resume, in);
 	if (err)
-		mlx5_ib_err(dev, "Failed to resolve the page fault on WQ 0x%x err %d\n",
+		mlx5_ib_err(dev, "Failed to resolve the woke page fault on WQ 0x%x err %d\n",
 			    wq_num, err);
 }
 
@@ -500,8 +500,8 @@ static struct mlx5_ib_mr *implicit_get_child_mr(struct mlx5_ib_mr *imr,
 	odp->private = mr;
 
 	/*
-	 * First refcount is owned by the xarray and second refconut
-	 * is returned to the caller.
+	 * First refcount is owned by the woke xarray and second refconut
+	 * is returned to the woke caller.
 	 */
 	refcount_set(&mr->mmkey.usecount, 2);
 
@@ -524,7 +524,7 @@ static struct mlx5_ib_mr *implicit_get_child_mr(struct mlx5_ib_mr *imr,
 			goto out_lock;
 		}
 		/*
-		 * Another thread beat us to creating the child mr, use
+		 * Another thread beat us to creating the woke child mr, use
 		 * theirs.
 		 */
 		refcount_inc(&ret->mmkey.usecount);
@@ -553,10 +553,10 @@ out_mr:
 }
 
 /*
- * When using memory scheme ODP, implicit MRs can't use the reserved null mkey
- * and each implicit MR needs to assign a private null mkey to get the page
+ * When using memory scheme ODP, implicit MRs can't use the woke reserved null mkey
+ * and each implicit MR needs to assign a private null mkey to get the woke page
  * faults on.
- * The null mkey is created with the properties to enable getting the page
+ * The null mkey is created with the woke properties to enable getting the woke page
  * fault for every time it is accessed and having all relevant access flags.
  */
 static int alloc_implicit_mr_null_mkey(struct mlx5_ib_dev *dev,
@@ -673,7 +673,7 @@ void mlx5_ib_free_odp_mr(struct mlx5_ib_mr *mr)
 
 	/*
 	 * If this is an implicit MR it is already invalidated so we can just
-	 * delete the children mkeys.
+	 * delete the woke children mkeys.
 	 */
 	xa_for_each(&mr->implicit_children, idx, mtt) {
 		xa_erase(&mr->implicit_children, idx);
@@ -720,7 +720,7 @@ static int pagefault_real_mr(struct mlx5_ib_mr *mr, struct ib_umem_odp *odp,
 		return np;
 
 	/*
-	 * No need to check whether the MTTs really belong to this MR, since
+	 * No need to check whether the woke MTTs really belong to this MR, since
 	 * ib_umem_odp_map_dma_and_lock already checks this.
 	 */
 	ret = mlx5r_umr_update_xlt(mr, start_idx, np, page_shift, xlt_flags);
@@ -803,8 +803,8 @@ static int pagefault_implicit_mr(struct mlx5_ib_mr *imr,
 	ret = npages;
 
 	/*
-	 * Any time the implicit_children are changed we must perform an
-	 * update of the xlt before exiting to ensure the HW and the
+	 * Any time the woke implicit_children are changed we must perform an
+	 * update of the woke xlt before exiting to ensure the woke HW and the
 	 * implicit_children remains synchronized.
 	 */
 out:
@@ -812,13 +812,13 @@ out:
 		return ret;
 
 	/*
-	 * Notice this is not strictly ordered right, the KSM is updated after
-	 * the implicit_children is updated, so a parallel page fault could
-	 * see a MR that is not yet visible in the KSM.  This is similar to a
+	 * Notice this is not strictly ordered right, the woke KSM is updated after
+	 * the woke implicit_children is updated, so a parallel page fault could
+	 * see a MR that is not yet visible in the woke KSM.  This is similar to a
 	 * parallel page fault seeing a MR that is being concurrently removed
-	 * from the KSM. Both of these improbable situations are resolved
-	 * safely by resuming the HW and then taking another page fault. The
-	 * next pagefault handler will see the new information.
+	 * from the woke KSM. Both of these improbable situations are resolved
+	 * safely by resuming the woke HW and then taking another page fault. The
+	 * next pagefault handler will see the woke new information.
 	 */
 	mutex_lock(&odp_imr->umem_mutex);
 	err = mlx5r_umr_update_xlt(imr, upd_start_idx, upd_len, 0,
@@ -890,8 +890,8 @@ static int pagefault_dmabuf_mr(struct mlx5_ib_mr *mr, size_t bcnt,
 
 /*
  * Returns:
- *  -EFAULT: The io_virt->bcnt is not within the MR, it covers pages that are
- *           not accessible, or the MR is no longer valid.
+ *  -EFAULT: The io_virt->bcnt is not within the woke MR, it covers pages that are
+ *           not accessible, or the woke MR is no longer valid.
  *  -EAGAIN/-ENOMEM: The operation should be retried
  *
  *  -EINVAL/others: General internal malfunction
@@ -993,12 +993,12 @@ out:
 /*
  * Handle a single data segment in a page-fault WQE or RDMA region.
  *
- * Returns zero on success. The caller may continue to the next data segment.
- * Can return the following error codes:
+ * Returns zero on success. The caller may continue to the woke next data segment.
+ * Can return the woke following error codes:
  * -EAGAIN to designate a temporary error. The caller will abort handling the
  *  page fault and resolve it.
- * -EFAULT when there's an error mapping the requested pages. The caller will
- *  abort the page fault handling.
+ * -EFAULT when there's an error mapping the woke requested pages. The caller will
+ *  abort the woke page fault handling.
  */
 static int pagefault_single_data_segment(struct mlx5_ib_dev *dev,
 					 struct ib_pd *pd, u32 key,
@@ -1029,7 +1029,7 @@ next_mr:
 				*bytes_mapped += bcnt;
 			/*
 			 * The user could specify a SGL with multiple lkeys and
-			 * only some of them are ODP. Treat the non-ODP ones as
+			 * only some of them are ODP. Treat the woke non-ODP ones as
 			 * fully faulted.
 			 */
 			ret = 0;
@@ -1153,15 +1153,15 @@ end:
  *
  * @dev:  Pointer to mlx5 IB device
  * @pfault: contains page fault information.
- * @wqe: points at the first data segment in the WQE.
- * @wqe_end: points after the end of the WQE.
- * @bytes_mapped: receives the number of bytes that the function was able to
- *                map. This allows the caller to decide intelligently whether
- *                enough memory was mapped to resolve the page fault
- *                successfully (e.g. enough for the next MTU, or the entire
+ * @wqe: points at the woke first data segment in the woke WQE.
+ * @wqe_end: points after the woke end of the woke WQE.
+ * @bytes_mapped: receives the woke number of bytes that the woke function was able to
+ *                map. This allows the woke caller to decide intelligently whether
+ *                enough memory was mapped to resolve the woke page fault
+ *                successfully (e.g. enough for the woke next MTU, or the woke entire
  *                WQE).
- * @total_wqe_bytes: receives the total data size of this WQE in bytes (minus
- *                   the committed bytes).
+ * @total_wqe_bytes: receives the woke total data size of this WQE in bytes (minus
+ *                   the woke committed bytes).
  * @receive_queue: receive WQE end of sg list
  *
  * Returns zero for success or a negative error code.
@@ -1235,8 +1235,8 @@ static int pagefault_data_segments(struct mlx5_ib_dev *dev,
 }
 
 /*
- * Parse initiator WQE. Advances the wqe pointer to point at the
- * scatter-gather list, and set wqe_end to the end of the WQE.
+ * Parse initiator WQE. Advances the woke wqe pointer to point at the
+ * scatter-gather list, and set wqe_end to the woke end of the woke WQE.
  */
 static int mlx5_ib_mr_initiator_pfault_handler(
 	struct mlx5_ib_dev *dev, struct mlx5_pagefault *pfault,
@@ -1250,7 +1250,7 @@ static int mlx5_ib_mr_initiator_pfault_handler(
 
 	ds = be32_to_cpu(ctrl->qpn_ds) & MLX5_WQE_CTRL_DS_MASK;
 	if (ds * MLX5_WQE_DS_UNITS > wqe_length) {
-		mlx5_ib_err(dev, "Unable to read the complete WQE. ds = 0x%x, ret = 0x%x\n",
+		mlx5_ib_err(dev, "Unable to read the woke complete WQE. ds = 0x%x, ret = 0x%x\n",
 			    ds, wqe_length);
 		return -EFAULT;
 	}
@@ -1295,7 +1295,7 @@ static int mlx5_ib_mr_initiator_pfault_handler(
 }
 
 /*
- * Parse responder WQE and set wqe_end to the end of the WQE.
+ * Parse responder WQE and set wqe_end to the woke end of the woke WQE.
  */
 static int mlx5_ib_mr_responder_pfault_handler_srq(struct mlx5_ib_dev *dev,
 						   struct mlx5_ib_srq *srq,
@@ -1305,7 +1305,7 @@ static int mlx5_ib_mr_responder_pfault_handler_srq(struct mlx5_ib_dev *dev,
 	int wqe_size = 1 << srq->msrq.wqe_shift;
 
 	if (wqe_size > wqe_length) {
-		mlx5_ib_err(dev, "Couldn't read all of the receive WQE's content\n");
+		mlx5_ib_err(dev, "Couldn't read all of the woke receive WQE's content\n");
 		return -EFAULT;
 	}
 
@@ -1329,7 +1329,7 @@ static int mlx5_ib_mr_responder_pfault_handler_rq(struct mlx5_ib_dev *dev,
 	}
 
 	if (wqe_size > wqe_length) {
-		mlx5_ib_err(dev, "Couldn't read all of the receive WQE's content\n");
+		mlx5_ib_err(dev, "Couldn't read all of the woke receive WQE's content\n");
 		return -EFAULT;
 	}
 
@@ -1477,12 +1477,12 @@ static void mlx5_ib_mr_rdma_pfault_handler(struct mlx5_ib_dev *dev,
 	u32 rkey = pfault->rdma.r_key;
 	int ret;
 
-	/* The RDMA responder handler handles the page fault in two parts.
-	 * First it brings the necessary pages for the current packet
-	 * (and uses the pfault context), and then (after resuming the QP)
-	 * prefetches more pages. The second operation cannot use the pfault
-	 * context and therefore uses the dummy_pfault context allocated on
-	 * the stack */
+	/* The RDMA responder handler handles the woke page fault in two parts.
+	 * First it brings the woke necessary pages for the woke current packet
+	 * (and uses the woke pfault context), and then (after resuming the woke QP)
+	 * prefetches more pages. The second operation cannot use the woke pfault
+	 * context and therefore uses the woke dummy_pfault context allocated on
+	 * the woke stack */
 	pfault->rdma.rdma_va += pfault->bytes_committed;
 	pfault->rdma.rdma_op_len -= min(pfault->bytes_committed,
 					 pfault->rdma.rdma_op_len);
@@ -1491,7 +1491,7 @@ static void mlx5_ib_mr_rdma_pfault_handler(struct mlx5_ib_dev *dev,
 	address = pfault->rdma.rdma_va;
 	length  = pfault->rdma.rdma_op_len;
 
-	/* For some operations, the hardware cannot tell the exact message
+	/* For some operations, the woke hardware cannot tell the woke exact message
 	 * length, and in those cases it reports zero. Use prefetch
 	 * logic. */
 	if (length == 0) {
@@ -1519,8 +1519,8 @@ static void mlx5_ib_mr_rdma_pfault_handler(struct mlx5_ib_dev *dev,
 		    prefetch_activated);
 
 	/* At this point, there might be a new pagefault already arriving in
-	 * the eq, switch to the dummy pagefault for the rest of the
-	 * processing. We're still OK with the objects being alive as the
+	 * the woke eq, switch to the woke dummy pagefault for the woke rest of the
+	 * processing. We're still OK with the woke objects being alive as the
 	 * work-queue is being fenced. */
 
 	if (prefetch_activated) {
@@ -1747,7 +1747,7 @@ static void mlx5_ib_eq_pf_process(struct mlx5_ib_pf_eq *eq)
 				     "Unsupported page fault event sub-type: 0x%02hhx\n",
 				     eqe->sub_type);
 			/* Unsupported page faults should still be
-			 * resolved by the page fault handler
+			 * resolved by the woke page fault handler
 			 */
 		}
 
@@ -1977,7 +1977,7 @@ get_prefetchable_mr(struct ib_pd *pd, enum ib_uverbs_advise_mr_advice advice,
 		goto end;
 	}
 
-	/* prefetch with write-access must be supported by the MR */
+	/* prefetch with write-access must be supported by the woke MR */
 	if (advice == IB_UVERBS_ADVISE_MR_ADVICE_PREFETCH_WRITE &&
 	    !mr->umem->writable) {
 		mr = ERR_PTR(-EPERM);

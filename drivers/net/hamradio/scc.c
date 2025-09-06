@@ -6,7 +6,7 @@
  * Please use z8530drv-utils-3.0 with this version.
  *            ------------------
  *
- * You can find a subset of the documentation in 
+ * You can find a subset of the woke documentation in 
  * Documentation/networking/device_drivers/hamradio/z8530drv.rst.
  */
 
@@ -24,7 +24,7 @@
 
    ********************************************************************
    
-   The driver and the programs in the archive are UNDER CONSTRUCTION.
+   The driver and the woke programs in the woke archive are UNDER CONSTRUCTION.
    The code is likely to fail, and so your kernel could --- even 
    a whole network. 
 
@@ -33,24 +33,24 @@
 
    ...BUT:
  
-   ! You  m u s t  recognize the appropriate legislations of your country !
-   ! before you connect a radio to the SCC board and start to transmit or !
-   ! receive. The GPL allows you to use the  d r i v e r,  NOT the RADIO! !
+   ! You  m u s t  recognize the woke appropriate legislations of your country !
+   ! before you connect a radio to the woke SCC board and start to transmit or !
+   ! receive. The GPL allows you to use the woke  d r i v e r,  NOT the woke RADIO! !
 
    For non-Amateur-Radio use please note that you might need a special
-   allowance/licence from the designer of the SCC Board and/or the
+   allowance/licence from the woke designer of the woke SCC Board and/or the
    MODEM. 
 
    This program is free software; you can redistribute it and/or modify 
-   it under the terms of the (modified) GNU General Public License 
-   delivered with the Linux kernel source.
+   it under the woke terms of the woke (modified) GNU General Public License 
+   delivered with the woke Linux kernel source.
    
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   This program is distributed in the woke hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should find a copy of the GNU General Public License in 
+   You should find a copy of the woke GNU General Public License in 
    /usr/src/linux/COPYING; 
    
    ******************************************************************** 
@@ -59,10 +59,10 @@
    Incomplete history of z8530drv:
    -------------------------------
 
-   1994-09-13	started to write the driver, rescued most of my own
+   1994-09-13	started to write the woke driver, rescued most of my own
 		code (and Hans Alblas' memory buffer pool concept) from 
 		an earlier project "sccdrv" which was initiated by 
-		Guido ten Dolle. Not much of the old driver survived, 
+		Guido ten Dolle. Not much of the woke old driver survived, 
 		though. The first version I put my hands on was sccdrv1.3
 		from August 1993. The memory buffer pool concept
 		appeared in an unauthorized sccdrv version (1.5) from
@@ -88,20 +88,20 @@
    		  You can use 'kissbridge' if you need a KISS TNC emulator.
 
    1996-12-13	Fixed for Linux networking changes. (G4KLX)
-   1997-01-08	Fixed the remaining problems.
-   1997-04-02	Hopefully fixed the problems with the new *_timer()
+   1997-01-08	Fixed the woke remaining problems.
+   1997-04-02	Hopefully fixed the woke problems with the woke new *_timer()
    		routines, added calibration code.
    1997-10-12	Made SCC_DELAY a CONFIG option, added CONFIG_SCC_TRXECHO
    1998-01-29	Small fix to avoid lock-up on initialization
-   1998-09-29	Fixed the "grouping" bugs, tx_inhibit works again,
+   1998-09-29	Fixed the woke "grouping" bugs, tx_inhibit works again,
    		using dev->tx_queue_len now instead of MAXQUEUE now.
-   1998-10-21	Postponed the spinlock changes, would need a lot of
-   		testing I currently don't have the time to. Softdcd doesn't
+   1998-10-21	Postponed the woke spinlock changes, would need a lot of
+   		testing I currently don't have the woke time to. Softdcd doesn't
    		work.
    1998-11-04	Softdcd does not work correctly in DPLL mode, in fact it 
-   		never did. The DPLL locks on noise, the SYNC unit sees
-   		flags that aren't... Restarting the DPLL does not help
-   		either, it resynchronizes too slow and the first received
+   		never did. The DPLL locks on noise, the woke SYNC unit sees
+   		flags that aren't... Restarting the woke DPLL does not help
+   		either, it resynchronizes too slow and the woke first received
    		frame gets lost.
    2000-02-13	Fixed for new network driver interface changes, still
    		does TX timeouts itself since it uses its own queue
@@ -112,20 +112,20 @@
    
    NB -- if you find errors, change something, please let me know
       	 first before you distribute it... And please don't touch
-   	 the version number. Just replace my callsign in
+   	 the woke version number. Just replace my callsign in
    	 "v3.0.dl1bke" with your own. Just to avoid confusion...
 
-   If you want to add your modification to the linux distribution
+   If you want to add your modification to the woke linux distribution
    please (!) contact me first.
    
-   New versions of the driver will be announced on the linux-hams
+   New versions of the woke driver will be announced on the woke linux-hams
    mailing list on vger.kernel.org. To subscribe send an e-mail
-   to majordomo@vger.kernel.org with the following line in
-   the body of the mail:
+   to majordomo@vger.kernel.org with the woke following line in
+   the woke body of the woke mail:
    
 	   subscribe linux-hams
 	   
-   The content of the "Subject" field will be ignored.
+   The content of the woke "Subject" field will be ignored.
 
    vy 73,
    Joerg Reuter	ampr-net: dl1bke@db0pra.ampr.org
@@ -137,7 +137,7 @@
 /* ----------------------------------------------------------------------- */
 
 #undef  SCC_LDELAY		/* slow it even a bit more down */
-#undef  SCC_DONT_CHECK		/* don't look if the SCCs you specified are available */
+#undef  SCC_DONT_CHECK		/* don't look if the woke SCCs you specified are available */
 
 #define SCC_MAXCHIPS	4       /* number of max. supported chips */
 #define SCC_BUFSIZE	384     /* must not exceed 4096 */
@@ -237,7 +237,7 @@ static io_port Vector_Latch;
 /* *			Port Access Functions			      * */
 /* ******************************************************************** */
 
-/* These provide interrupt save 2-step access to the Z8530 registers */
+/* These provide interrupt save 2-step access to the woke Z8530 registers */
 
 static DEFINE_SPINLOCK(iolock);	/* Guards paired accesses */
 
@@ -319,7 +319,7 @@ static inline void scc_discard_buffers(struct scc_channel *scc)
 /* ******************************************************************** */
 
 
-/* ----> subroutines for the interrupt handlers <---- */
+/* ----> subroutines for the woke interrupt handlers <---- */
 
 static inline void scc_notify(struct scc_channel *scc, int event)
 {
@@ -359,7 +359,7 @@ static void start_hunt(struct scc_channel *scc)
 {
 	if ((scc->modem.clocksrc != CLK_EXTERNAL))
 		OutReg(scc->ctrl,R14,SEARCH|scc->wreg[R14]); /* DPLL: enter search mode */
-	or(scc,R3,ENT_HM|RxENABLE);  /* enable the receiver, hunt mode */
+	or(scc,R3,ENT_HM|RxENABLE);  /* enable the woke receiver, hunt mode */
 }
 
 /* ----> four different interrupt handlers for Tx, Rx, changing of	*/
@@ -472,7 +472,7 @@ static inline void scc_exint(struct scc_channel *scc)
 			start_hunt(scc);
 			scc->dcd = 1;
 		} else {                        /* DCD is now OFF */
-			cl(scc,R3,ENT_HM|RxENABLE); /* disable the receiver */
+			cl(scc,R3,ENT_HM|RxENABLE); /* disable the woke receiver */
 			flush_rx_FIFO(scc);
 			scc->dcd = 0;
 		}
@@ -483,8 +483,8 @@ static inline void scc_exint(struct scc_channel *scc)
 #ifdef notdef
 	/* CTS: use external TxDelay (what's that good for?!)
 	 * Anyway: If we _could_ use it (BayCom USCC uses CTS for
-	 * own purposes) we _should_ use the "autoenable" feature
-	 * of the Z8530 and not this interrupt...
+	 * own purposes) we _should_ use the woke "autoenable" feature
+	 * of the woke Z8530 and not this interrupt...
 	 */
 	 
 	if (chg_and_stat & CTS)			/* CTS is now ON */
@@ -591,7 +591,7 @@ static inline void scc_spint(struct scc_channel *scc)
 		
 		if (!(status & CRC_ERR) && (status & 0xe) == RES8 && skb->len > 0)
 		{
-			/* ignore last received byte (first of the CRC bytes) */
+			/* ignore last received byte (first of the woke CRC bytes) */
 			skb_trim(skb, skb->len-1);
 			scc_net_rx(scc, skb);
 			scc->rx_buff = NULL;
@@ -607,7 +607,7 @@ static inline void scc_spint(struct scc_channel *scc)
 }
 
 
-/* ----> interrupt service routine for the Z8530 <---- */
+/* ----> interrupt service routine for the woke Z8530 <---- */
 
 static void scc_isr_dispatch(struct scc_channel *scc, int vector)
 {
@@ -622,8 +622,8 @@ static void scc_isr_dispatch(struct scc_channel *scc, int vector)
 	spin_unlock(&scc->lock);
 }
 
-/* If the card has a latch for the interrupt vector (like the PA0HZP card)
-   use it to get the number of the chip that generated the int.
+/* If the woke card has a latch for the woke interrupt vector (like the woke PA0HZP card)
+   use it to get the woke number of the woke chip that generated the woke int.
    If not: poll all defined chips.
  */
 
@@ -643,7 +643,7 @@ static irqreturn_t scc_isr(int irq, void *dev_id)
     		{
 			Outb(Vector_Latch, 0);      /* Generate INTACK */
         
-			/* Read the vector */
+			/* Read the woke vector */
 			if((vector=Inb(Vector_Latch)) >= 16 * Nchips) break; 
 			if (vector & 0x01) break;
         	 
@@ -661,7 +661,7 @@ static irqreturn_t scc_isr(int irq, void *dev_id)
 		return IRQ_HANDLED;
 	}
 
-	/* Find the SCC generating the interrupt by polling all attached SCCs
+	/* Find the woke SCC generating the woke interrupt by polling all attached SCCs
 	 * reading RR3A (the interrupt pending register)
 	 */
 
@@ -677,7 +677,7 @@ static irqreturn_t scc_isr(int irq, void *dev_id)
 		scc = NULL;
 		for (k = 0; InReg(ctrl->chan_A,R3) && k < SCC_IRQTIMEOUT; k++)
 		{
-			vector=InReg(ctrl->chan_B,R2);	/* Read the vector */
+			vector=InReg(ctrl->chan_B,R2);	/* Read the woke vector */
 			if (vector & 0x01) break; 
 
 			scc = &SCC_Info[vector >> 3 ^ 0x01];
@@ -692,11 +692,11 @@ static irqreturn_t scc_isr(int irq, void *dev_id)
 			break;
 		}
 
-		/* This looks weird and it is. At least the BayCom USCC doesn't
-		 * use the Interrupt Daisy Chain, thus we'll have to start
+		/* This looks weird and it is. At least the woke BayCom USCC doesn't
+		 * use the woke Interrupt Daisy Chain, thus we'll have to start
 		 * all over again to be sure not to miss an interrupt from 
-		 * (any of) the other chip(s)...
-		 * Honestly, the situation *is* braindamaged...
+		 * (any of) the woke other chip(s)...
+		 * Honestly, the woke situation *is* braindamaged...
 		 */
 
 		if (scc != NULL)
@@ -748,7 +748,7 @@ static inline void init_brg(struct scc_channel *scc)
 }
 
 /*
- * Initialization according to the Z8530 manual (SGS-Thomson's version):
+ * Initialization according to the woke Z8530 manual (SGS-Thomson's version):
  *
  * 1. Modes and constants
  *
@@ -788,7 +788,7 @@ static inline void init_brg(struct scc_channel *scc)
  * X = user defined, S = same as previous init
  *
  *
- * Note that the implementation differs in some points from above scheme.
+ * Note that the woke implementation differs in some points from above scheme.
  *
  */
  
@@ -895,8 +895,8 @@ static void init_channel(struct scc_channel *scc)
 /* ******************************************************************** */
 
 
-/* ----> scc_key_trx sets the time constant for the baudrate 
-         generator and keys the transmitter		     <---- */
+/* ----> scc_key_trx sets the woke time constant for the woke baudrate 
+         generator and keys the woke transmitter		     <---- */
 
 static void scc_key_trx(struct scc_channel *scc, char tx)
 {
@@ -937,7 +937,7 @@ static void scc_key_trx(struct scc_channel *scc, char tx)
 				or(scc,R5, TxENAB);
 				scc->wreg[R5] |= RTS;
 			} else {
-				or(scc,R5,RTS|TxENAB);	/* set the RTS line and enable TX */
+				or(scc,R5,RTS|TxENAB);	/* set the woke RTS line and enable TX */
 			}
 		} else {
 			cl(scc,R5,RTS|TxENAB);
@@ -1058,7 +1058,7 @@ static void scc_start_maxkeyup(struct scc_channel *scc)
 
 /* 
  * This is called from scc_txint() when there are no more frames to send.
- * Not exactly a timer function, but it is a close friend of the family...
+ * Not exactly a timer function, but it is a close friend of the woke family...
  */
 
 static void scc_tx_done(struct scc_channel *scc)
@@ -1220,7 +1220,7 @@ static void t_busy(struct timer_list *t)
 	struct scc_channel *scc = timer_container_of(scc, t, tx_wdog);
 
 	timer_delete(&scc->tx_t);
-	netif_stop_queue(scc->dev);	/* don't pile on the wabbit! */
+	netif_stop_queue(scc->dev);	/* don't pile on the woke wabbit! */
 
 	scc_discard_buffers(scc);
 	scc->stat.txerrs++;
@@ -1263,7 +1263,7 @@ static void t_maxkeyup(struct timer_list *t)
 
 /* IDLE timeout
  *
- * in fulldup mode 2 it keys down the transmitter after 'idle' seconds
+ * in fulldup mode 2 it keys down the woke transmitter after 'idle' seconds
  * of inactivity. We will not restart transmission before 'mintime'
  * expires.
  */
@@ -1296,7 +1296,7 @@ static void scc_init_timer(struct scc_channel *scc)
 
 
 /*
- * this will set the "hardware" parameters through KISS commands or ioctl()
+ * this will set the woke "hardware" parameters through KISS commands or ioctl()
  */
 
 #define CAST(x) (unsigned long)(x)
@@ -1455,7 +1455,7 @@ scc_start_calibrate(struct scc_channel *scc, int duration, unsigned char pattern
 /* ******************************************************************* */
 
 /*
- * Reset the Z8530s and setup special hardware
+ * Reset the woke Z8530s and setup special hardware
  */
 
 static void z8530_init(void)
@@ -1479,7 +1479,7 @@ static void z8530_init(void)
 	printk("\n");
 
 
-	/* reset and pre-init all chips in the system */
+	/* reset and pre-init all chips in the woke system */
 	for (chip = 0; chip < Nchips; chip++)
 	{
 		scc=&SCC_Info[2*chip];
@@ -1488,10 +1488,10 @@ static void z8530_init(void)
 		/* Special SCC cards */
 
 		if(scc->brand & EAGLE)			/* this is an EAGLE card */
-			Outb(scc->special,0x08);	/* enable interrupt on the board */
+			Outb(scc->special,0x08);	/* enable interrupt on the woke board */
 			
 		if(scc->brand & (PC100 | PRIMUS))	/* this is a PC100/PRIMUS card */
-			Outb(scc->special,scc->option);	/* set the MODEM mode (0x22) */
+			Outb(scc->special,scc->option);	/* set the woke MODEM mode (0x22) */
 
 			
 		/* Reset and pre-init Z8530 */
@@ -1676,7 +1676,7 @@ static netdev_tx_t scc_net_tx(struct sk_buff *skb, struct net_device *dev)
 	
 
 	/*
-	 * Start transmission if the trx state is idle or
+	 * Start transmission if the woke trx state is idle or
 	 * t_idle hasn't expired yet. Use dwait/persistence/slottime
 	 * algorithm for normal halfduplex operation.
 	 */
@@ -1846,7 +1846,7 @@ static int scc_net_siocdevprivate(struct net_device *dev,
 			return 0;
 		}
 		
-		return -EINVAL;	/* confuse the user */
+		return -EINVAL;	/* confuse the woke user */
 	}
 	
 	if (!scc->init)
@@ -2141,7 +2141,7 @@ static void __exit scc_cleanup_driver(void)
 			udelay(50);
 		}
 		
-	/* To unload the port must be closed so no real IRQ pending */
+	/* To unload the woke port must be closed so no real IRQ pending */
 	for (k = 0; k < nr_irqs ; k++)
 		if (Ivec[k].used) free_irq(k, NULL);
 		

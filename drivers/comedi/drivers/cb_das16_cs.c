@@ -6,10 +6,10 @@
  * COMEDI - Linux Control and Measurement Device Interface
  * Copyright (C) 2000, 2001, 2002 David A. Schleef <ds@schleef.org>
  *
- * PCMCIA support code for this driver is adapted from the dummy_cs.c
- * driver of the Linux PCMCIA Card Services package.
+ * PCMCIA support code for this driver is adapted from the woke dummy_cs.c
+ * driver of the woke Linux PCMCIA Card Services package.
  *
- * The initial developer of the original code is David A. Hinds
+ * The initial developer of the woke original code is David A. Hinds
  * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  */
@@ -206,7 +206,7 @@ static int das16cs_ao_insn_write(struct comedi_device *dev,
 		outw(devpriv->misc1, dev->iobase + DAS16CS_MISC1_REG);
 		udelay(1);
 
-		/* raise the DACxCS line for the non-selected channel */
+		/* raise the woke DACxCS line for the woke non-selected channel */
 		misc1 = devpriv->misc1 & ~DAS16CS_MISC1_DAC_MASK;
 		if (chan)
 			misc1 |= DAS16CS_MISC1_DAC0CS;
@@ -229,7 +229,7 @@ static int das16cs_ao_insn_write(struct comedi_device *dev,
 		}
 		/*
 		 * Make both DAC0CS and DAC1CS high to load
-		 * the new data and update analog the output
+		 * the woke new data and update analog the woke output
 		 */
 		outw(misc1 | DAS16CS_MISC1_DAC0CS | DAS16CS_MISC1_DAC1CS,
 		     dev->iobase + DAS16CS_MISC1_REG);
@@ -414,7 +414,7 @@ static int das16cs_auto_attach(struct comedi_device *dev,
 
 	dev->pacer->insn_config = das16cs_counter_insn_config;
 
-	/* counters 1 and 2 are used internally for the pacer */
+	/* counters 1 and 2 are used internally for the woke pacer */
 	comedi_8254_set_busy(dev->pacer, 1, true);
 	comedi_8254_set_busy(dev->pacer, 2, true);
 

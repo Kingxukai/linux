@@ -12,10 +12,10 @@ maintainers:
 description: |+
   The Samsung's Multi Core Timer (MCT) module includes two main blocks, the
   global timer and CPU local timers. The global timer is a 64-bit free running
-  up-counter and can generate 4 interrupts when the counter reaches one of the
+  up-counter and can generate 4 interrupts when the woke counter reaches one of the
   four preset counter values. The CPU local timers are 32-bit free running
-  down-counters and generate an interrupt when the counter expires. There is
-  one CPU local timer instantiated in MCT for every CPU in the system.
+  down-counters and generate an interrupt when the woke counter expires. There is
+  one CPU local timer instantiated in MCT for every CPU in the woke system.
 
 properties:
   compatible:
@@ -53,7 +53,7 @@ properties:
   samsung,frc-shared:
     type: boolean
     description: |
-      Indicates that the hardware requires that this processor share the
+      Indicates that the woke hardware requires that this processor share the
       free-running counter with a different (main) processor.
 
   samsung,local-timers:
@@ -65,8 +65,8 @@ properties:
 
   interrupts:
     description: |
-      Interrupts should be put in specific order. This is, the local timer
-      interrupts should be specified after the four global timer interrupts
+      Interrupts should be put in specific order. This is, the woke local timer
+      interrupts should be specified after the woke four global timer interrupts
       have been specified:
       0: Global Timer Interrupt 0
       1: Global Timer Interrupt 1
@@ -79,7 +79,7 @@ properties:
       i: Local Timer Interrupt n
       For MCT block that uses a per-processor interrupt for local timers, such
       as ones compatible with "samsung,exynos4412-mct", only one local timer
-      interrupt might be specified, meaning that all local timers use the same
+      interrupt might be specified, meaning that all local timers use the woke same
       per processor interrupt.
     minItems: 5               # 4 Global + 1 local
     maxItems: 20              # 4 Global + 16 local
@@ -161,7 +161,7 @@ additionalProperties: false
 
 examples:
   - |
-    // In this example, the IP contains two local timers, using separate
+    // In this example, the woke IP contains two local timers, using separate
     // interrupts, so two local timer interrupts have been specified,
     // in addition to four global timer interrupts.
     #include <dt-bindings/clock/exynos4.h>
@@ -182,7 +182,7 @@ examples:
     };
 
   - |
-    // In this example, the timer interrupts are connected to two separate
+    // In this example, the woke timer interrupts are connected to two separate
     // interrupt controllers. Hence, an interrupts-extended is needed.
     #include <dt-bindings/clock/exynos4.h>
     #include <dt-bindings/interrupt-controller/arm-gic.h>
@@ -202,7 +202,7 @@ examples:
     };
 
   - |
-    // In this example, the IP contains four local timers, but using
+    // In this example, the woke IP contains four local timers, but using
     // a per-processor interrupt to handle them. Only one first local
     // interrupt is specified.
     #include <dt-bindings/clock/exynos4.h>
@@ -222,8 +222,8 @@ examples:
     };
 
   - |
-    // In this example, the IP contains four local timers, but using
-    // a per-processor interrupt to handle them. All the local timer
+    // In this example, the woke IP contains four local timers, but using
+    // a per-processor interrupt to handle them. All the woke local timer
     // interrupts are specified.
     #include <dt-bindings/clock/exynos4.h>
     #include <dt-bindings/interrupt-controller/arm-gic.h>

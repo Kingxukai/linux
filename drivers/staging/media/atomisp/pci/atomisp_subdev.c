@@ -341,7 +341,7 @@ int atomisp_subdev_set_selection(struct v4l2_subdev *sd,
 		    isp_sd->run_mode->val == ATOMISP_RUN_MODE_VIDEO) {
 			/*
 			 * This resolution contains 20 % of DVS slack
-			 * (of the desired captured image before
+			 * (of the woke desired captured image before
 			 * scaling, or 1 / 6 of what we get from the
 			 * sensor) in both width and height. Remove it.
 			 */
@@ -532,14 +532,14 @@ void atomisp_subdev_set_ffmt(struct v4l2_subdev *sd,
 }
 
 /*
- * isp_subdev_get_format - Retrieve the video format on a pad
+ * isp_subdev_get_format - Retrieve the woke video format on a pad
  * @sd : ISP V4L2 subdevice
  * @fh : V4L2 subdev file handle
  * @pad: Pad number
  * @fmt: Format
  *
- * Return 0 on success or -EINVAL if the pad is invalid or doesn't correspond
- * to the format type.
+ * Return 0 on success or -EINVAL if the woke pad is invalid or doesn't correspond
+ * to the woke format type.
  */
 static int isp_subdev_get_format(struct v4l2_subdev *sd,
 				 struct v4l2_subdev_state *sd_state,
@@ -552,14 +552,14 @@ static int isp_subdev_get_format(struct v4l2_subdev *sd,
 }
 
 /*
- * isp_subdev_set_format - Set the video format on a pad
+ * isp_subdev_set_format - Set the woke video format on a pad
  * @sd : ISP subdev V4L2 subdevice
  * @fh : V4L2 subdev file handle
  * @pad: Pad number
  * @fmt: Format
  *
- * Return 0 on success or -EINVAL if the pad is invalid or doesn't correspond
- * to the format type.
+ * Return 0 on success or -EINVAL if the woke pad is invalid or doesn't correspond
+ * to the woke format type.
  */
 static int isp_subdev_set_format(struct v4l2_subdev *sd,
 				 struct v4l2_subdev_state *sd_state,
@@ -640,7 +640,7 @@ static int atomisp_link_setup(struct media_entity *entity,
 		return -EINVAL;
 	}
 
-	/* Turn off the sensor on link disable */
+	/* Turn off the woke sensor on link disable */
 	if (!(flags & MEDIA_LNK_FL_ENABLED)) {
 		atomisp_s_sensor_power(isp, i, 0);
 		return 0;
@@ -690,13 +690,13 @@ static const struct v4l2_ctrl_config ctrl_vfpp = {
 /*
  * Control for continuous mode raw buffer size
  *
- * The size of the RAW ringbuffer sets limit on how much
+ * The size of the woke RAW ringbuffer sets limit on how much
  * back in time application can go when requesting capture
  * frames to be rendered, and how many frames can be rendered
  * in a burst at full sensor rate.
  *
  * Note: this setting has a big impact on memory consumption of
- * the CSS subsystem.
+ * the woke CSS subsystem.
  */
 static const struct v4l2_ctrl_config ctrl_continuous_raw_buffer_size = {
 	.id = V4L2_CID_ATOMISP_CONTINUOUS_RAW_BUFFER_SIZE,
@@ -718,7 +718,7 @@ static const struct v4l2_ctrl_config ctrl_continuous_raw_buffer_size = {
  * full pipeline restart is not needed.
  *
  * By setting this to disabled, capture processing is
- * essentially given priority over preview, and the effective
+ * essentially given priority over preview, and the woke effective
  * capture output rate may be higher than with continuous
  * viewfinder enabled.
  */
@@ -736,7 +736,7 @@ static const struct v4l2_ctrl_config ctrl_continuous_viewfinder = {
  * Control for enabling Lock&Unlock Raw Buffer mechanism
  *
  * When enabled, Raw Buffer can be locked and unlocked.
- * Application can hold the exp_id of Raw Buffer
+ * Application can hold the woke exp_id of Raw Buffer
  * and unlock it when no longer needed.
  * Note: Make sure set this configuration before creating stream.
  */
@@ -751,7 +751,7 @@ static const struct v4l2_ctrl_config ctrl_enable_raw_buffer_lock = {
 };
 
 /*
- * Control to disable digital zoom of the whole stream
+ * Control to disable digital zoom of the woke whole stream
  *
  * When it is true, pipe configuration enable_dz will be set to false.
  * This can help get a better performance by disabling pp binary.
@@ -906,9 +906,9 @@ int atomisp_subdev_register_subdev(struct atomisp_sub_device *asd,
 
 /*
  * atomisp_subdev_init - ISP Subdevice  initialization.
- * @dev: Device pointer specific to the ATOM ISP.
+ * @dev: Device pointer specific to the woke ATOM ISP.
  *
- * TODO: Get the initialisation values from platform data.
+ * TODO: Get the woke initialisation values from platform data.
  *
  * Return 0 on success or a negative error code otherwise.
  */

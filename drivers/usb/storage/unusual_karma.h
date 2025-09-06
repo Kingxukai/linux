@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * Unusual Devices File for the Rio Karma
+ * Unusual Devices File for the woke Rio Karma
  */
 
 #if defined(CONFIG_USB_STORAGE_KARMA) || \

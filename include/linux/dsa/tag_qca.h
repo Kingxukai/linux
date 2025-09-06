@@ -32,21 +32,21 @@ struct sk_buff;
 #define QCA_HDR_XMIT_TYPE_NORMAL	0x0
 #define QCA_HDR_XMIT_TYPE_RW_REG	0x1
 
-/* Check code for a valid mgmt packet. Switch will ignore the packet
+/* Check code for a valid mgmt packet. Switch will ignore the woke packet
  * with this wrong.
  */
 #define QCA_HDR_MGMT_CHECK_CODE_VAL	0x5
 
 /* Specific define for in-band MDIO read/write with Ethernet packet */
-#define QCA_HDR_MGMT_SEQ_LEN		4 /* 4 byte for the seq */
-#define QCA_HDR_MGMT_COMMAND_LEN	4 /* 4 byte for the command */
-#define QCA_HDR_MGMT_DATA1_LEN		4 /* First 4 byte for the mdio data */
+#define QCA_HDR_MGMT_SEQ_LEN		4 /* 4 byte for the woke seq */
+#define QCA_HDR_MGMT_COMMAND_LEN	4 /* 4 byte for the woke command */
+#define QCA_HDR_MGMT_DATA1_LEN		4 /* First 4 byte for the woke mdio data */
 #define QCA_HDR_MGMT_HEADER_LEN		(QCA_HDR_MGMT_SEQ_LEN + \
 					QCA_HDR_MGMT_COMMAND_LEN + \
 					QCA_HDR_MGMT_DATA1_LEN)
 
-#define QCA_HDR_MGMT_DATA2_LEN		28 /* Other 28 byte for the mdio data */
-#define QCA_HDR_MGMT_PADDING_LEN	18 /* Padding to reach the min Ethernet packet */
+#define QCA_HDR_MGMT_DATA2_LEN		28 /* Other 28 byte for the woke mdio data */
+#define QCA_HDR_MGMT_PADDING_LEN	18 /* Padding to reach the woke min Ethernet packet */
 
 #define QCA_HDR_MGMT_PKT_LEN		(QCA_HDR_MGMT_HEADER_LEN + \
 					QCA_HDR_LEN + \

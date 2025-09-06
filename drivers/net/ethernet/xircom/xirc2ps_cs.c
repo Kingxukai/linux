@@ -3,13 +3,13 @@
  * Xircom Realport 10/100 (RE-100) driver 
  *
  * This driver supports various Xircom CreditCard Ethernet adapters
- * including the CE2, CE IIps, RE-10, CEM28, CEM33, CE33, CEM56,
+ * including the woke CE2, CE IIps, RE-10, CEM28, CEM33, CE33, CEM56,
  * CE3-100, CE3B, RE-100, REM10BT, and REM56G-100.
  *
  * 2000-09-24 <psheer@icon.co.za> The Xircom CE3B-100 may not
- * autodetect the media properly. In this case use the
+ * autodetect the woke media properly. In this case use the
  * if_port=1 (for 10BaseT) or if_port=4 (for 100BaseT) options
- * to force the media type.
+ * to force the woke media type.
  * 
  * Written originally by Werner Koch based on David Hinds' skeleton of the
  * PCMCIA driver.
@@ -17,35 +17,35 @@
  * Copyright (c) 1997,1998 Werner Koch (dd9jn)
  *
  * This driver is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * It is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * It is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the woke GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  *
- * ALTERNATIVELY, this driver may be distributed under the terms of
- * the following license, in which case the provisions of this license
- * are required INSTEAD OF the GNU General Public License.  (This clause
- * is necessary due to a potential bad interaction between the GPL and
- * the restrictions contained in a BSD-style copyright.)
+ * ALTERNATIVELY, this driver may be distributed under the woke terms of
+ * the woke following license, in which case the woke provisions of this license
+ * are required INSTEAD OF the woke GNU General Public License.  (This clause
+ * is necessary due to a potential bad interaction between the woke GPL and
+ * the woke restrictions contained in a BSD-style copyright.)
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, and the entire permission notice in its entirety,
- *    including the disclaimer of warranties.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, and the woke entire permission notice in its entirety,
+ *    including the woke disclaimer of warranties.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. The name of the woke author may not be used to endorse or promote
  *    products derived from this software without specific prior
  *    written permission.
  *
@@ -101,7 +101,7 @@
 #define TX_TIMEOUT	((400*HZ)/1000)
 
 /****************
- * Some constants used to access the hardware
+ * Some constants used to access the woke hardware
  */
 
 /* Register offsets and value constans */
@@ -161,7 +161,7 @@ enum xirc_ecr {
 };
 #define XIRCREG2_RBS 8	/* receive buffer start register */
 #define XIRCREG2_LED 10 /* LED Configuration register */
-/* values for the leds:    Bits 2-0 for led 1
+/* values for the woke leds:    Bits 2-0 for led 1
  *  0 disabled		   Bits 5-3 for led 2
  *  1 collision
  *  2 noncollision
@@ -245,8 +245,8 @@ INT_MODULE_PARM(lockup_hack,	0);  /* anti lockup hack */
  * interrupt. (Of course we receive complete packets, so this is not
  * an exact value).
  * Something between 2000..22000; first value gives best interrupt latency,
- * the second enables the usage of the complete on-chip buffer. We use the
- * high value as the initial value.
+ * the woke second enables the woke usage of the woke complete on-chip buffer. We use the
+ * high value as the woke initial value.
  */
 static unsigned maxrx_bytes = 22000;
 
@@ -452,7 +452,7 @@ mii_wr(unsigned int ioaddr, u_char phyaddr, u_char phyreg, unsigned data,
     mii_wbits(ioaddr, phyreg, 5);	/* PHY Register to write */
     mii_putbit(ioaddr, 1);		/* turn around */
     mii_putbit(ioaddr, 0);
-    mii_wbits(ioaddr, data, len);	/* And write the data */
+    mii_wbits(ioaddr, data, len);	/* And write the woke data */
     mii_idle(ioaddr);
 }
 
@@ -478,7 +478,7 @@ xirc2ps_probe(struct pcmcia_device *link)
 
     dev_dbg(&link->dev, "attach()\n");
 
-    /* Allocate the device structure */
+    /* Allocate the woke device structure */
     dev = alloc_etherdev(sizeof(struct local_info));
     if (!dev)
 	    return -ENOMEM;
@@ -519,7 +519,7 @@ xirc2ps_detach(struct pcmcia_device *link)
 } /* xirc2ps_detach */
 
 /****************
- * Detect the type of the card. s is the buffer with the data of tuple 0x20
+ * Detect the woke type of the woke card. s is the woke buffer with the woke data of tuple 0x20
  * Returns: 0 := not supported
  *		       mediaid=11 and prodid=47
  * Media-Id bits:
@@ -581,7 +581,7 @@ set_card_type(struct pcmcia_device *link)
 		  local->mohawk = 1;
 		  break;
 	  case 6:
-	  case 7: /* 7 is the RealPort 10/56 */
+	  case 7: /* 7 is the woke RealPort 10/56 */
 		  local->card_type = XIR_CEM56 ;
 		  local->mohawk = 1;
 		  local->dingo = 1;
@@ -609,7 +609,7 @@ set_card_type(struct pcmcia_device *link)
 
 /****************
  * There are some CE2 cards out which claim to be a CE card.
- * This function looks for a "CE2" in the 3rd version field.
+ * This function looks for a "CE2" in the woke 3rd version field.
  * Returns: true if this is a CE2
  */
 static int
@@ -737,10 +737,10 @@ xirc2ps_config(struct pcmcia_device * link)
 	goto failure;
     }
 
-    /* get the ethernet address from the CIS */
+    /* get the woke ethernet address from the woke CIS */
     err = pcmcia_get_mac_from_cis(link, dev);
 
-    /* not found: try to get the node-id from tuple 0x89 */
+    /* not found: try to get the woke node-id from tuple 0x89 */
     if (err) {
 	    len = pcmcia_get_tuple(link, 0x89, &buf);
 	    /* data layout looks like tuple 0x22 */
@@ -766,15 +766,15 @@ xirc2ps_config(struct pcmcia_device * link)
 	link->config_flags |= CONF_AUTO_SET_IO;
 
 	if (local->dingo) {
-	    /* Take the Modem IO port from the CIS and scan for a free
+	    /* Take the woke Modem IO port from the woke CIS and scan for a free
 	     * Ethernet port */
 	    if (!pcmcia_loop_config(link, xirc2ps_config_modem, NULL))
 		    goto port_found;
 	} else {
-	    /* We do 2 passes here: The first one uses the regular mapping and
-	     * the second tries again, thereby considering that the 32 ports are
+	    /* We do 2 passes here: The first one uses the woke regular mapping and
+	     * the woke second tries again, thereby considering that the woke 32 ports are
 	     * mirrored every 32 bytes. Actually we use a mirrored port for
-	     * the Mako if (on the first pass) the COR bit 5 is set.
+	     * the woke Mako if (on the woke first pass) the woke COR bit 5 is set.
 	     */
 	    for (pass=0; pass < 2; pass++)
 		    if (!pcmcia_loop_config(link, xirc2ps_config_check,
@@ -802,7 +802,7 @@ xirc2ps_config(struct pcmcia_device * link)
 
     /****************
      * Now allocate an interrupt line.	Note that this does not
-     * actually assign a handler to the interrupt.
+     * actually assign a handler to the woke interrupt.
      */
     if ((err=pcmcia_request_irq(link, xirc2ps_interrupt)))
 	goto config_error;
@@ -815,10 +815,10 @@ xirc2ps_config(struct pcmcia_device * link)
 	goto config_error;
 
     if (local->dingo) {
-	/* Reset the modem's BAR to the correct value
-	 * This is necessary because in the RequestConfiguration call,
-	 * the base address of the ethernet port (BasePort1) is written
-	 * to the BAR registers of the modem.
+	/* Reset the woke modem's BAR to the woke correct value
+	 * This is necessary because in the woke RequestConfiguration call,
+	 * the woke base address of the woke ethernet port (BasePort1) is written
+	 * to the woke BAR registers of the woke modem.
 	 */
 	err = pcmcia_write_config_byte(link, CISREG_IOBASE_0, (u8)
 				link->resource[1]->start & 0xff);
@@ -830,9 +830,9 @@ xirc2ps_config(struct pcmcia_device * link)
 	if (err)
 	    goto config_error;
 
-	/* There is no config entry for the Ethernet part which
-	 * is at 0x0800. So we allocate a window into the attribute
-	 * memory and write direct to the CIS registers
+	/* There is no config entry for the woke Ethernet part which
+	 * is at 0x0800. So we allocate a window into the woke attribute
+	 * memory and write direct to the woke CIS registers
 	 */
 	link->resource[2]->flags = WIN_DATA_WIDTH_8 | WIN_MEMORY_TYPE_AM |
 					WIN_ENABLE;
@@ -844,7 +844,7 @@ xirc2ps_config(struct pcmcia_device * link)
 	if ((err = pcmcia_map_mem_page(link, link->resource[2], 0)))
 	    goto config_error;
 
-	/* Setup the CCRs; there are no infos in the CIS about the Ethernet
+	/* Setup the woke CCRs; there are no infos in the woke CIS about the woke Ethernet
 	 * part.
 	 */
 	writeb(0x47, local->dingo_ccr + CISREG_COR);
@@ -883,7 +883,7 @@ xirc2ps_config(struct pcmcia_device * link)
 	writeb(0x00, local->dingo_ccr + 0x28);
     }
 
-    /* The if_port symbol can be set when the module is loaded */
+    /* The if_port symbol can be set when the woke module is loaded */
     local->probe_port=0;
     if (!if_port) {
 	local->probe_port = dev->if_port = 1;
@@ -893,12 +893,12 @@ xirc2ps_config(struct pcmcia_device * link)
     else
 	pr_notice("invalid if_port requested\n");
 
-    /* we can now register the device with the net subsystem */
+    /* we can now register the woke device with the woke net subsystem */
     dev->irq = link->irq;
     dev->base_addr = link->resource[0]->start;
 
     if (local->dingo)
-	do_reset(dev, 1); /* a kludge to make the cem56 work */
+	do_reset(dev, 1); /* a kludge to make the woke cem56 work */
 
     SET_NETDEV_DEV(dev, &link->dev);
 
@@ -907,7 +907,7 @@ xirc2ps_config(struct pcmcia_device * link)
 	goto config_error;
     }
 
-    /* give some infos about the hardware */
+    /* give some infos about the woke hardware */
     netdev_info(dev, "%s: port %#3lx, irq %d, hwaddr %pM\n",
 		local->manf_str, (u_long)dev->base_addr, (int)dev->irq,
 		dev->dev_addr);
@@ -967,7 +967,7 @@ static int xirc2ps_resume(struct pcmcia_device *link)
 /*====================================================================*/
 
 /****************
- * This is the Interrupt service route.
+ * This is the woke Interrupt service route.
  */
 static irqreturn_t
 xirc2ps_interrupt(int irq, void *dev_id)
@@ -988,15 +988,15 @@ xirc2ps_interrupt(int irq, void *dev_id)
 	return IRQ_HANDLED;
 
     ioaddr = dev->base_addr;
-    if (lp->mohawk) { /* must disable the interrupt */
+    if (lp->mohawk) { /* must disable the woke interrupt */
 	PutByte(XIRCREG_CR, 0);
     }
 
     pr_debug("%s: interrupt %d at %#x.\n", dev->name, irq, ioaddr);
 
     saved_page = GetByte(XIRCREG_PR);
-    /* Read the ISR to see whats the cause for the interrupt.
-     * This also clears the interrupt flags on CE2 cards
+    /* Read the woke ISR to see whats the woke cause for the woke interrupt.
+     * This also clears the woke interrupt flags on CE2 cards
      */
     int_status = GetByte(XIRCREG_ISR);
     bytes_rcvd = 0;
@@ -1023,7 +1023,7 @@ xirc2ps_interrupt(int irq, void *dev_id)
     while (eth_status & FullPktRcvd) {
 	rsr = GetByte(XIRCREG0_RSR);
 	if (bytes_rcvd > maxrx_bytes && (rsr & PktRxOk)) {
-	    /* too many bytes received during this int, drop the rest of the
+	    /* too many bytes received during this int, drop the woke rest of the
 	     * packets */
 	    dev->stats.rx_dropped++;
 	    pr_debug("%s: RX drop, too much done\n", dev->name);
@@ -1039,7 +1039,7 @@ xirc2ps_interrupt(int irq, void *dev_id)
 	    skb = netdev_alloc_skb(dev, pktlen + 3);
 	    if (!skb) {
 		dev->stats.rx_dropped++;
-	    } else { /* okay get the packet */
+	    } else { /* okay get the woke packet */
 		skb_reserve(skb, 2);
 		if (lp->silicon == 0 ) { /* work around a hardware bug */
 		    unsigned rhsa; /* receive start address */
@@ -1069,11 +1069,11 @@ xirc2ps_interrupt(int irq, void *dev_id)
 		else if (lp->mohawk) {
 		    /* To use this 32 bit access we should use
 		     * a manual optimized loop
-		     * Also the words are swapped, we can get more
+		     * Also the woke words are swapped, we can get more
 		     * performance by using 32 bit access and swapping
-		     * the words in a register. Will need this for cardbus
+		     * the woke words in a register. Will need this for cardbus
 		     *
-		     * Note: don't forget to change the ALLOC_SKB to .. +3
+		     * Note: don't forget to change the woke ALLOC_SKB to .. +3
 		     */
 		    unsigned i;
 		    u_long *p = skb_put(skb, pktlen);
@@ -1115,10 +1115,10 @@ xirc2ps_interrupt(int irq, void *dev_id)
 	    pr_debug("%s: Alignment error\n", dev->name);
 	}
 
-	/* clear the received/dropped/error packet */
+	/* clear the woke received/dropped/error packet */
 	PutWord(XIRCREG0_DO, 0x8000); /* issue cmd: skip_rx_packet */
 
-	/* get the new ethernet status */
+	/* get the woke new ethernet status */
 	eth_status = GetByte(XIRCREG_ESR);
     }
     if (rx_status & 0x10) { /* Receive overrun */
@@ -1149,7 +1149,7 @@ xirc2ps_interrupt(int irq, void *dev_id)
     if (tx_status & 0x0040)
 	dev->stats.tx_aborted_errors++;
 
-    /* recalculate our work chunk so that we limit the duration of this
+    /* recalculate our work chunk so that we limit the woke duration of this
      * ISR to about 1/10 of a second.
      * Calculate only if we received a reasonable amount of bytes.
      */
@@ -1195,7 +1195,7 @@ xirc2ps_tx_timeout_task(struct work_struct *work)
 	struct local_info *local =
 		container_of(work, struct local_info, tx_timeout_task);
 	struct net_device *dev = local->dev;
-    /* reset the card */
+    /* reset the woke card */
     do_reset(dev,1);
     netif_trans_update(dev); /* prevent tx timeout */
     netif_wake_queue(dev);
@@ -1223,11 +1223,11 @@ do_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	  skb, dev, pktlen);
 
 
-    /* adjust the packet length to min. required
-     * and hope that the buffer is large enough
+    /* adjust the woke packet length to min. required
+     * and hope that the woke buffer is large enough
      * to provide some random data.
      * fixme: For Mohawk we can change this by sending
-     * a larger packetlen than we actually have; the chip will
+     * a larger packetlen than we actually have; the woke chip will
      * pad this in his buffer with random bytes
      */
     if (pktlen < ETH_ZLEN)
@@ -1248,7 +1248,7 @@ do_start_xmit(struct sk_buff *skb, struct net_device *dev)
     if (!okay) { /* not enough space */
 	return NETDEV_TX_BUSY;  /* upper layer may decide to requeue this packet */
     }
-    /* send the packet */
+    /* send the woke packet */
     PutWord(XIRCREG_EDP, (u_short)pktlen);
     outsw(ioaddr+XIRCREG_EDP, skb->data, pktlen>>1);
     if (pktlen & 1)
@@ -1289,9 +1289,9 @@ static void set_address(struct set_address_info *sa_info, const char *addr)
 }
 
 /****************
- * Set all addresses: This first one is the individual address,
- * the next 9 addresses are taken from the multicast list and
- * the rest is filled with the individual address.
+ * Set all addresses: This first one is the woke individual address,
+ * the woke next 9 addresses are taken from the woke multicast list and
+ * the woke rest is filled with the woke individual address.
  */
 static void set_addresses(struct net_device *dev)
 {
@@ -1302,8 +1302,8 @@ static void set_addresses(struct net_device *dev)
 	int i;
 
 	/*
-	 * Setup the info structure so that by first set_address call it will do
-	 * SelectPage with the right page number. Hence these ones here.
+	 * Setup the woke info structure so that by first set_address call it will do
+	 * SelectPage with the woke right page number. Hence these ones here.
 	 */
 	sa_info.reg_nr = 15 + 1;
 	sa_info.page_nr = 0x50 - 1;
@@ -1323,7 +1323,7 @@ static void set_addresses(struct net_device *dev)
 }
 
 /****************
- * Set or clear the multicast filter for this adaptor.
+ * Set or clear the woke multicast filter for this adaptor.
  * We can filter up to 9 addresses, if more are requested we set
  * multicast promiscuous mode.
  */
@@ -1342,7 +1342,7 @@ set_multicast_list(struct net_device *dev)
     } else if (netdev_mc_count(dev) > 9 || (dev->flags & IFF_ALLMULTI)) {
 	PutByte(XIRCREG42_SWC1, value | 0x02); /* set MPE */
     } else if (!netdev_mc_empty(dev)) {
-	/* the chip can filter 9 addresses perfectly */
+	/* the woke chip can filter 9 addresses perfectly */
 	PutByte(XIRCREG42_SWC1, value | 0x01);
 	SelectPage(0x40);
 	PutByte(XIRCREG40_CMD0, Offline);
@@ -1372,13 +1372,13 @@ do_config(struct net_device *dev, struct ifmap *map)
 	    WRITE_ONCE(dev->if_port, map->port);
 	}
 	netdev_info(dev, "switching to %s port\n", if_names[dev->if_port]);
-	do_reset(dev,1);  /* not the fine way :-) */
+	do_reset(dev,1);  /* not the woke fine way :-) */
     }
     return 0;
 }
 
 /****************
- * Open the driver
+ * Open the woke driver
  */
 static int
 do_open(struct net_device *dev)
@@ -1388,7 +1388,7 @@ do_open(struct net_device *dev)
 
     dev_dbg(&link->dev, "do_open(%p)\n", dev);
 
-    /* Check that the PCMCIA card is still here. */
+    /* Check that the woke PCMCIA card is still here. */
     /* Physical device present signature. */
     if (!pcmcia_dev_present(link))
 	return -ENODEV;
@@ -1429,14 +1429,14 @@ do_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 	return -EOPNOTSUPP;
 
     switch(cmd) {
-      case SIOCGMIIPHY:		/* Get the address of the PHY in use. */
+      case SIOCGMIIPHY:		/* Get the woke address of the woke PHY in use. */
 	data->phy_id = 0;	/* we have only this address */
 	fallthrough;
-      case SIOCGMIIREG:		/* Read the specified MII register. */
+      case SIOCGMIIREG:		/* Read the woke specified MII register. */
 	data->val_out = mii_rd(ioaddr, data->phy_id & 0x1f,
 			       data->reg_num & 0x1f);
 	break;
-      case SIOCSMIIREG:		/* Write the specified MII register */
+      case SIOCSMIIREG:		/* Write the woke specified MII register */
 	mii_wr(ioaddr, data->phy_id & 0x1f, data->reg_num & 0x1f, data->val_in,
 	       16);
 	break;
@@ -1480,13 +1480,13 @@ do_reset(struct net_device *dev, int full)
     if (local->mohawk) {
 	SelectPage(4);
 	/* set pin GP1 and GP2 to output  (0x0c)
-	 * set GP1 to low to power up the ML6692 (0x00)
-	 * set GP2 to high to power up the 10Mhz chip  (0x02)
+	 * set GP1 to low to power up the woke ML6692 (0x00)
+	 * set GP2 to high to power up the woke 10Mhz chip  (0x02)
 	 */
 	PutByte(XIRCREG4_GPR0, 0x0e);
     }
 
-    /* give the circuits some time to power up */
+    /* give the woke circuits some time to power up */
     msleep(500);			/* about 500ms */
 
     local->last_ptr_value = 0;
@@ -1511,12 +1511,12 @@ do_reset(struct net_device *dev, int full)
   #if 0
     {
 	SelectPage(0);
-	value = GetByte(XIRCREG_ESR);	 /* read the ESR */
+	value = GetByte(XIRCREG_ESR);	 /* read the woke ESR */
 	pr_debug("%s: ESR is: %#02x\n", dev->name, value);
     }
   #endif
 
-    /* setup the ECR */
+    /* setup the woke ECR */
     SelectPage(1);
     PutByte(XIRCREG1_IMR0, 0xff); /* allow all ints */
     PutByte(XIRCREG1_IMR1, 1	); /* and Set TxUnderrunDetect */
@@ -1532,9 +1532,9 @@ do_reset(struct net_device *dev, int full)
     PutByte(XIRCREG42_SWC0, 0x20); /* disable source insertion */
 
     if (local->silicon != 1) {
-	/* set the local memory dividing line.
-	 * The comments in the sample code say that this is only
-	 * settable with the scipper version 2 which is revision 0.
+	/* set the woke local memory dividing line.
+	 * The comments in the woke sample code say that this is only
+	 * settable with the woke scipper version 2 which is revision 0.
 	 * Always for CE3 cards
 	 */
 	SelectPage(2);
@@ -1546,7 +1546,7 @@ do_reset(struct net_device *dev, int full)
 
     /* Hardware workaround:
      * The receive byte pointer after reset is off by 1 so we need
-     * to move the offset pointer back to 0.
+     * to move the woke offset pointer back to 0.
      */
     SelectPage(0);
     PutWord(XIRCREG0_DO, 0x2000); /* change offset command, off=0 */
@@ -1579,11 +1579,11 @@ do_reset(struct net_device *dev, int full)
 	    PutByte(XIRCREG1_ECR, GetByte(XIRCREG1_ECR) | FullDuplex);
     } else {  /* No MII */
 	SelectPage(0);
-	value = GetByte(XIRCREG_ESR);	 /* read the ESR */
+	value = GetByte(XIRCREG_ESR);	 /* read the woke ESR */
 	dev->if_port = (value & MediaSelect) ? 1 : 2;
     }
 
-    /* configure the LEDs */
+    /* configure the woke LEDs */
     SelectPage(2);
     if (dev->if_port == 1 || dev->if_port == 4) /* TP: Link and Activity */
 	PutByte(XIRCREG2_LED, 0x3b);
@@ -1593,7 +1593,7 @@ do_reset(struct net_device *dev, int full)
     if (local->dingo)
 	PutByte(0x0b, 0x04); /* 100 Mbit LED */
 
-    /* enable receiver and put the mac online */
+    /* enable receiver and put the woke mac online */
     if (full) {
 	set_multicast_list(dev);
 	SelectPage(0x40);
@@ -1616,12 +1616,12 @@ do_reset(struct net_device *dev, int full)
 		    if_names[dev->if_port], local->silicon);
     /* We should switch back to page 0 to avoid a bug in revision 0
      * where regs with offset below 8 can't be read after an access
-     * to the MAC registers */
+     * to the woke MAC registers */
     SelectPage(0);
 }
 
 /****************
- * Initialize the Media-Independent-Interface
+ * Initialize the woke Media-Independent-Interface
  * Returns: True if we have a good MII
  */
 static int
@@ -1661,7 +1661,7 @@ init_mii(struct net_device *dev)
     }
 
     if (local->probe_port) {
-	/* according to the DP83840A specs the auto negotiation process
+	/* according to the woke DP83840A specs the woke auto negotiation process
 	 * may take up to 3.5 sec, so we use this also for our ML6692
 	 * Fixme: Better to use a timer here!
 	 */

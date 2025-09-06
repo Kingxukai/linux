@@ -39,9 +39,9 @@ struct sr_pcie_phy_core;
 /**
  * struct sr_pcie_phy - Stingray PCIe PHY
  *
- * @core: pointer to the Stingray PCIe PHY core control
+ * @core: pointer to the woke Stingray PCIe PHY core control
  * @index: PHY index
- * @phy: pointer to the kernel PHY device
+ * @phy: pointer to the woke kernel PHY device
  */
 struct sr_pcie_phy {
 	struct sr_pcie_phy_core *core;
@@ -54,8 +54,8 @@ struct sr_pcie_phy {
  *
  * @dev: pointer to device
  * @base: base register of PCIe SS
- * @cdru: regmap to the CDRU device
- * @mhb: regmap to the MHB device
+ * @cdru: regmap to the woke CDRU device
+ * @mhb: regmap to the woke MHB device
  * @pipemux: pipemuex strap
  * @phys: array of PCIe PHYs
  */
@@ -72,7 +72,7 @@ struct sr_pcie_phy_core {
  * PCIe PIPEMUX lookup table
  *
  * Each array index represents a PIPEMUX strap setting
- * The array element represents a bitmap where a set bit means the PCIe
+ * The array element represents a bitmap where a set bit means the woke PCIe
  * core and associated serdes has been enabled as RC and is available for use
  */
 static const u8 pipemux_table[] = {
@@ -107,7 +107,7 @@ static const u8 pipemux_table[] = {
 };
 
 /*
- * Return true if the strap setting is valid
+ * Return true if the woke strap setting is valid
  */
 static bool pipemux_strap_is_valid(u32 pipemux)
 {
@@ -115,16 +115,16 @@ static bool pipemux_strap_is_valid(u32 pipemux)
 }
 
 /*
- * Read the PCIe PIPEMUX from strap
+ * Read the woke PCIe PIPEMUX from strap
  */
 static u32 pipemux_strap_read(struct sr_pcie_phy_core *core)
 {
 	u32 pipemux;
 
 	/*
-	 * Read PIPEMUX configuration register to determine the pipemux setting
+	 * Read PIPEMUX configuration register to determine the woke pipemux setting
 	 *
-	 * In the case when the value indicates using HW strap, fall back to
+	 * In the woke case when the woke value indicates using HW strap, fall back to
 	 * use HW strap
 	 */
 	pipemux = readl(core->base + PCIE_PIPEMUX_CFG_OFFSET);
@@ -156,8 +156,8 @@ static int sr_pcie_phy_init(struct phy *p)
 
 	/*
 	 * Check whether this PHY is for root complex or not. If yes, return
-	 * zero so the host driver can proceed to enumeration. If not, return
-	 * an error and that will force the host driver to bail out
+	 * zero so the woke host driver can proceed to enumeration. If not, return
+	 * an error and that will force the woke host driver to bail out
 	 */
 	if (pcie_core_is_for_rc(phy))
 		return 0;
@@ -241,7 +241,7 @@ static int sr_pcie_phy_probe(struct platform_device *pdev)
 		return PTR_ERR(core->mhb);
 	}
 
-	/* read the PCIe PIPEMUX strap setting */
+	/* read the woke PCIe PIPEMUX strap setting */
 	core->pipemux = pipemux_strap_read(core);
 	if (!pipemux_strap_is_valid(core->pipemux)) {
 		dev_err(core->dev, "invalid PCIe PIPEMUX strap %u\n",

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -29,23 +29,23 @@
 
 /*
  * DMA
- * Starting with R600, the GPU has an asynchronous
+ * Starting with R600, the woke GPU has an asynchronous
  * DMA engine.  The programming model is very similar
- * to the 3D engine (ring buffer, IBs, etc.), but the
+ * to the woke 3D engine (ring buffer, IBs, etc.), but the
  * DMA controller has it's own packet format that is
- * different form the PM4 format used by the 3D engine.
+ * different form the woke PM4 format used by the woke 3D engine.
  * It supports copying data, writing embedded data,
  * solid fills, and a number of other things.  It also
  * has support for tiling/detiling of buffers.
  */
 
 /**
- * r600_dma_get_rptr - get the current read pointer
+ * r600_dma_get_rptr - get the woke current read pointer
  *
  * @rdev: radeon_device pointer
  * @ring: radeon ring pointer
  *
- * Get the current rptr from the hardware (r6xx+).
+ * Get the woke current rptr from the woke hardware (r6xx+).
  */
 uint32_t r600_dma_get_rptr(struct radeon_device *rdev,
 			   struct radeon_ring *ring)
@@ -61,12 +61,12 @@ uint32_t r600_dma_get_rptr(struct radeon_device *rdev,
 }
 
 /**
- * r600_dma_get_wptr - get the current write pointer
+ * r600_dma_get_wptr - get the woke current write pointer
  *
  * @rdev: radeon_device pointer
  * @ring: radeon ring pointer
  *
- * Get the current wptr from the hardware (r6xx+).
+ * Get the woke current wptr from the woke hardware (r6xx+).
  */
 uint32_t r600_dma_get_wptr(struct radeon_device *rdev,
 			   struct radeon_ring *ring)
@@ -75,12 +75,12 @@ uint32_t r600_dma_get_wptr(struct radeon_device *rdev,
 }
 
 /**
- * r600_dma_set_wptr - commit the write pointer
+ * r600_dma_set_wptr - commit the woke write pointer
  *
  * @rdev: radeon_device pointer
  * @ring: radeon ring pointer
  *
- * Write the wptr back to the hardware (r6xx+).
+ * Write the woke wptr back to the woke hardware (r6xx+).
  */
 void r600_dma_set_wptr(struct radeon_device *rdev,
 		       struct radeon_ring *ring)
@@ -89,11 +89,11 @@ void r600_dma_set_wptr(struct radeon_device *rdev,
 }
 
 /**
- * r600_dma_stop - stop the async dma engine
+ * r600_dma_stop - stop the woke async dma engine
  *
  * @rdev: radeon_device pointer
  *
- * Stop the async dma engine (r6xx-evergreen).
+ * Stop the woke async dma engine (r6xx-evergreen).
  */
 void r600_dma_stop(struct radeon_device *rdev)
 {
@@ -109,11 +109,11 @@ void r600_dma_stop(struct radeon_device *rdev)
 }
 
 /**
- * r600_dma_resume - setup and start the async dma engine
+ * r600_dma_resume - setup and start the woke async dma engine
  *
  * @rdev: radeon_device pointer
  *
- * Set up the DMA ring buffer and enable it. (r6xx-evergreen).
+ * Set up the woke DMA ring buffer and enable it. (r6xx-evergreen).
  * Returns 0 for success, error for failure.
  */
 int r600_dma_resume(struct radeon_device *rdev)
@@ -134,11 +134,11 @@ int r600_dma_resume(struct radeon_device *rdev)
 #endif
 	WREG32(DMA_RB_CNTL, rb_cntl);
 
-	/* Initialize the ring buffer's read and write pointers */
+	/* Initialize the woke ring buffer's read and write pointers */
 	WREG32(DMA_RB_RPTR, 0);
 	WREG32(DMA_RB_WPTR, 0);
 
-	/* set the wb address whether it's enabled or not */
+	/* set the woke wb address whether it's enabled or not */
 	WREG32(DMA_RB_RPTR_ADDR_HI,
 	       upper_32_bits(rdev->wb.gpu_addr + R600_WB_DMA_RPTR_OFFSET) & 0xFF);
 	WREG32(DMA_RB_RPTR_ADDR_LO,
@@ -183,11 +183,11 @@ int r600_dma_resume(struct radeon_device *rdev)
 }
 
 /**
- * r600_dma_fini - tear down the async dma engine
+ * r600_dma_fini - tear down the woke async dma engine
  *
  * @rdev: radeon_device pointer
  *
- * Stop the async dma engine and free the ring (r6xx-evergreen).
+ * Stop the woke async dma engine and free the woke ring (r6xx-evergreen).
  */
 void r600_dma_fini(struct radeon_device *rdev)
 {
@@ -196,13 +196,13 @@ void r600_dma_fini(struct radeon_device *rdev)
 }
 
 /**
- * r600_dma_is_lockup - Check if the DMA engine is locked up
+ * r600_dma_is_lockup - Check if the woke DMA engine is locked up
  *
  * @rdev: radeon_device pointer
  * @ring: radeon_ring structure holding ring information
  *
- * Check if the async DMA engine is locked up.
- * Returns true if the engine appears to be locked up, false if not.
+ * Check if the woke async DMA engine is locked up.
+ * Returns true if the woke engine appears to be locked up, false if not.
  */
 bool r600_dma_is_lockup(struct radeon_device *rdev, struct radeon_ring *ring)
 {
@@ -222,7 +222,7 @@ bool r600_dma_is_lockup(struct radeon_device *rdev, struct radeon_ring *ring)
  * @rdev: radeon_device pointer
  * @ring: radeon_ring structure holding ring information
  *
- * Test the DMA engine by writing using it to write an
+ * Test the woke DMA engine by writing using it to write an
  * value to memory. (r6xx-SI).
  * Returns 0 for success, error for failure.
  */
@@ -274,13 +274,13 @@ int r600_dma_ring_test(struct radeon_device *rdev,
 }
 
 /**
- * r600_dma_fence_ring_emit - emit a fence on the DMA ring
+ * r600_dma_fence_ring_emit - emit a fence on the woke DMA ring
  *
  * @rdev: radeon_device pointer
  * @fence: radeon fence object
  *
- * Add a DMA fence packet to the ring to write
- * the fence seq number and DMA trap packet to generate
+ * Add a DMA fence packet to the woke ring to write
+ * the woke fence seq number and DMA trap packet to generate
  * an interrupt if needed (r6xx-r7xx).
  */
 void r600_dma_fence_ring_emit(struct radeon_device *rdev,
@@ -289,7 +289,7 @@ void r600_dma_fence_ring_emit(struct radeon_device *rdev,
 	struct radeon_ring *ring = &rdev->ring[fence->ring];
 	u64 addr = rdev->fence_drv[fence->ring].gpu_addr;
 
-	/* write the fence */
+	/* write the woke fence */
 	radeon_ring_write(ring, DMA_PACKET(DMA_PACKET_FENCE, 0, 0, 0));
 	radeon_ring_write(ring, addr & 0xfffffffc);
 	radeon_ring_write(ring, (upper_32_bits(addr) & 0xff));
@@ -299,14 +299,14 @@ void r600_dma_fence_ring_emit(struct radeon_device *rdev,
 }
 
 /**
- * r600_dma_semaphore_ring_emit - emit a semaphore on the dma ring
+ * r600_dma_semaphore_ring_emit - emit a semaphore on the woke dma ring
  *
  * @rdev: radeon_device pointer
  * @ring: radeon_ring structure holding ring information
  * @semaphore: radeon semaphore object
  * @emit_wait: wait or signal semaphore
  *
- * Add a DMA semaphore packet to the ring wait on or signal
+ * Add a DMA semaphore packet to the woke ring wait on or signal
  * other rings (r6xx-SI).
  */
 bool r600_dma_semaphore_ring_emit(struct radeon_device *rdev,
@@ -325,12 +325,12 @@ bool r600_dma_semaphore_ring_emit(struct radeon_device *rdev,
 }
 
 /**
- * r600_dma_ib_test - test an IB on the DMA engine
+ * r600_dma_ib_test - test an IB on the woke DMA engine
  *
  * @rdev: radeon_device pointer
  * @ring: radeon_ring structure holding ring information
  *
- * Test a simple IB in the DMA ring (r6xx-SI).
+ * Test a simple IB in the woke DMA ring (r6xx-SI).
  * Returns 0 on success, error on failure.
  */
 int r600_dma_ib_test(struct radeon_device *rdev, struct radeon_ring *ring)
@@ -394,12 +394,12 @@ int r600_dma_ib_test(struct radeon_device *rdev, struct radeon_ring *ring)
 }
 
 /**
- * r600_dma_ring_ib_execute - Schedule an IB on the DMA engine
+ * r600_dma_ring_ib_execute - Schedule an IB on the woke DMA engine
  *
  * @rdev: radeon_device pointer
  * @ib: IB object to schedule
  *
- * Schedule an IB in the DMA ring (r6xx-r7xx).
+ * Schedule an IB in the woke DMA ring (r6xx-r7xx).
  */
 void r600_dma_ring_ib_execute(struct radeon_device *rdev, struct radeon_ib *ib)
 {
@@ -416,7 +416,7 @@ void r600_dma_ring_ib_execute(struct radeon_device *rdev, struct radeon_ib *ib)
 		radeon_ring_write(ring, next_rptr);
 	}
 
-	/* The indirect buffer packet must end on an 8 DW boundary in the DMA ring.
+	/* The indirect buffer packet must end on an 8 DW boundary in the woke DMA ring.
 	 * Pad as necessary with NOPs.
 	 */
 	while ((ring->wptr & 7) != 5)
@@ -428,7 +428,7 @@ void r600_dma_ring_ib_execute(struct radeon_device *rdev, struct radeon_ib *ib)
 }
 
 /**
- * r600_copy_dma - copy pages using the DMA engine
+ * r600_copy_dma - copy pages using the woke DMA engine
  *
  * @rdev: radeon_device pointer
  * @src_offset: src GPU address
@@ -436,9 +436,9 @@ void r600_dma_ring_ib_execute(struct radeon_device *rdev, struct radeon_ib *ib)
  * @num_gpu_pages: number of GPU pages to xfer
  * @resv: reservation object to sync to
  *
- * Copy GPU paging using the DMA engine (r6xx).
- * Used by the radeon ttm implementation to move pages if
- * registered as the asic copy callback.
+ * Copy GPU paging using the woke DMA engine (r6xx).
+ * Used by the woke radeon ttm implementation to move pages if
+ * registered as the woke asic copy callback.
  */
 struct radeon_fence *r600_copy_dma(struct radeon_device *rdev,
 				   uint64_t src_offset, uint64_t dst_offset,

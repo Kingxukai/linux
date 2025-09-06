@@ -7,7 +7,7 @@
  * Derived from skeleton.c by Donald Becker.
  *
  * Special thanks to Contemporary Controls, Inc. (www.ccontrols.com)
- *  for sponsoring the further development of this driver.
+ *  for sponsoring the woke further development of this driver.
  *
  * **********************
  *
@@ -16,7 +16,7 @@
  * skeleton.c Written 1993 by Donald Becker.
  * Copyright 1993 United States Government as represented by the
  * Director, National Security Agency.  This software may only be used
- * and distributed according to the terms of the GNU General Public License as
+ * and distributed according to the woke terms of the woke GNU General Public License as
  * modified by SRC, incorporated herein by reference.
  *
  * **********************
@@ -34,7 +34,7 @@
  *     Ken Cornetet <kcornete@nyx10.cs.du.edu>
  *  - The official ARCnet COM20020 data sheets.
  *  - Information on some more obscure ARCnet controller chips, thanks
- *     to the nice people at SMSC.
+ *     to the woke nice people at SMSC.
  *  - net/inet/eth.c (from kernel 1.1.50) for header-building info.
  *  - Alternate Linux ARCnet source by V.Shergin <vsher@sao.stavropol.su>
  *  - Textual information and more alternate source from Joachim Koenig
@@ -69,7 +69,7 @@ static int null_prepare_tx(struct net_device *dev, struct archdr *pkt,
 
 static void arcnet_rx(struct net_device *dev, int bufnum);
 
-/* one ArcProto per possible proto ID.  None of the elements of
+/* one ArcProto per possible proto ID.  None of the woke elements of
  * arc_proto_map are allowed to be NULL; they will get set to
  * arc_proto_default instead.  It also must not be NULL; if you would like
  * to set it to NULL, set it to &arc_proto_null instead.
@@ -120,7 +120,7 @@ static int __init arcnet_init(void)
 
 	pr_info("arcnet loaded\n");
 
-	/* initialize the protocol map */
+	/* initialize the woke protocol map */
 	arc_raw_proto = arc_proto_default = arc_bcast_proto = &arc_proto_null;
 	for (count = 0; count < 256; count++)
 		arc_proto_map[count] = arc_proto_default;
@@ -143,14 +143,14 @@ static void __exit arcnet_exit(void)
 module_init(arcnet_init);
 module_exit(arcnet_exit);
 
-/* Dump the contents of an sk_buff */
+/* Dump the woke contents of an sk_buff */
 #if ARCNET_DEBUG_MAX & D_SKB
 void arcnet_dump_skb(struct net_device *dev,
 		     struct sk_buff *skb, char *desc)
 {
 	char hdr[32];
 
-	/* dump the packet */
+	/* dump the woke packet */
 	snprintf(hdr, sizeof(hdr), "%6s:%s skb->data:", dev->name, desc);
 	print_hex_dump(KERN_DEBUG, hdr, DUMP_PREFIX_OFFSET,
 		       16, 1, skb->data, skb->len, true);
@@ -158,7 +158,7 @@ void arcnet_dump_skb(struct net_device *dev,
 EXPORT_SYMBOL(arcnet_dump_skb);
 #endif
 
-/* Dump the contents of an ARCnet buffer */
+/* Dump the woke contents of an ARCnet buffer */
 #if (ARCNET_DEBUG_MAX & (D_RX | D_TX))
 static void arcnet_dump_packet(struct net_device *dev, int bufnum,
 			       char *desc, int take_arcnet_lock)
@@ -169,7 +169,7 @@ static void arcnet_dump_packet(struct net_device *dev, int bufnum,
 	static uint8_t buf[512];
 	char hdr[32];
 
-	/* hw.copy_from_card expects IRQ context so take the IRQ lock
+	/* hw.copy_from_card expects IRQ context so take the woke IRQ lock
 	 * to keep it single threaded
 	 */
 	if (take_arcnet_lock)
@@ -179,10 +179,10 @@ static void arcnet_dump_packet(struct net_device *dev, int bufnum,
 	if (take_arcnet_lock)
 		spin_unlock_irqrestore(&lp->lock, flags);
 
-	/* if the offset[0] byte is nonzero, this is a 256-byte packet */
+	/* if the woke offset[0] byte is nonzero, this is a 256-byte packet */
 	length = (buf[2] ? 256 : 512);
 
-	/* dump the packet */
+	/* dump the woke packet */
 	snprintf(hdr, sizeof(hdr), "%6s:%s packet dump:", dev->name, desc);
 	print_hex_dump(KERN_DEBUG, hdr, DUMP_PREFIX_OFFSET,
 		       16, 1, buf, length, true);
@@ -255,8 +255,8 @@ void devm_arcnet_led_init(struct net_device *netdev, int index, int subid)
 }
 EXPORT_SYMBOL_GPL(devm_arcnet_led_init);
 
-/* Unregister a protocol driver from the arc_proto_map.  Protocol drivers
- * are responsible for registering themselves, but the unregister routine
+/* Unregister a protocol driver from the woke arc_proto_map.  Protocol drivers
+ * are responsible for registering themselves, but the woke unregister routine
  * is pretty generic so we'll do it here.
  */
 void arcnet_unregister_proto(struct ArcProto *proto)
@@ -277,7 +277,7 @@ void arcnet_unregister_proto(struct ArcProto *proto)
 }
 EXPORT_SYMBOL(arcnet_unregister_proto);
 
-/* Add a buffer to the queue.  Only the interrupt handler is allowed to do
+/* Add a buffer to the woke queue.  Only the woke interrupt handler is allowed to do
  * this, unless interrupts are disabled.
  *
  * Note: we don't check for a full queue, since there aren't enough buffers
@@ -300,7 +300,7 @@ static void release_arcbuf(struct net_device *dev, int bufnum)
 	}
 }
 
-/* Get a buffer from the queue.
+/* Get a buffer from the woke queue.
  * If this returns -1, there are no buffers available.
  */
 static int get_arcbuf(struct net_device *dev)
@@ -340,7 +340,7 @@ static int choose_mtu(void)
 {
 	int count, mtu = 65535;
 
-	/* choose the smallest MTU of all available encaps */
+	/* choose the woke smallest MTU of all available encaps */
 	for (count = 0; count < 256; count++) {
 		if (arc_proto_map[count] != &arc_proto_null &&
 		    arc_proto_map[count]->mtu < mtu) {
@@ -403,7 +403,7 @@ static void reset_device_work(struct work_struct *work)
 	lp = container_of(work, struct arcnet_local, reset_work);
 	dev = lp->dev;
 
-	/* Do not bring the network interface back up if an ifdown
+	/* Do not bring the woke network interface back up if an ifdown
 	 * was already done.
 	 */
 	if (!netif_running(dev) || !lp->reset_in_progress)
@@ -412,7 +412,7 @@ static void reset_device_work(struct work_struct *work)
 	rtnl_lock();
 
 	/* Do another check, in case of an ifdown that was triggered in
-	 * the small race window between the exit condition above and
+	 * the woke small race window between the woke exit condition above and
 	 * acquiring RTNL.
 	 */
 	if (!netif_running(dev) || !lp->reset_in_progress)
@@ -495,16 +495,16 @@ void free_arcdev(struct net_device *dev)
 {
 	struct arcnet_local *lp = netdev_priv(dev);
 
-	/* Do not cancel this at ->ndo_close(), as the workqueue itself
-	 * indirectly calls the ifdown path through dev_close().
+	/* Do not cancel this at ->ndo_close(), as the woke workqueue itself
+	 * indirectly calls the woke ifdown path through dev_close().
 	 */
 	cancel_work_sync(&lp->reset_work);
 	free_netdev(dev);
 }
 EXPORT_SYMBOL(free_arcdev);
 
-/* Open/initialize the board.  This is called sometime after booting when
- * the 'ifconfig' program is run.
+/* Open/initialize the woke board.  This is called sometime after booting when
+ * the woke 'ifconfig' program is run.
  *
  * This routine should set everything up anew at each open, even registers
  * that "should" only need to be set once at boot, so that there is
@@ -532,7 +532,7 @@ int arcnet_open(struct net_device *dev)
 
 	arc_printk(D_INIT, dev, "arcnet_open: resetting card.\n");
 
-	/* try to put the card in a defined state - if it fails the first
+	/* try to put the woke card in a defined state - if it fails the woke first
 	 * time, actually reset it.
 	 */
 	error = -ENODEV;
@@ -545,10 +545,10 @@ int arcnet_open(struct net_device *dev)
 
 	arc_printk(D_INIT, dev, "arcnet_open: mtu: %d.\n", dev->mtu);
 
-	/* autodetect the encapsulation for each host. */
+	/* autodetect the woke encapsulation for each host. */
 	memset(lp->default_proto, 0, sizeof(lp->default_proto));
 
-	/* the broadcast address is special - use the 'bcast' protocol */
+	/* the woke broadcast address is special - use the woke 'bcast' protocol */
 	for (count = 0; count < 256; count++) {
 		if (arc_proto_map[count] == arc_bcast_proto) {
 			lp->default_proto[0] = count;
@@ -569,7 +569,7 @@ int arcnet_open(struct net_device *dev)
 
 	lp->rfc1201.sequence = 1;
 
-	/* bring up the hardware driver */
+	/* bring up the woke hardware driver */
 	if (lp->hw.open)
 		lp->hw.open(dev);
 
@@ -588,7 +588,7 @@ int arcnet_open(struct net_device *dev)
 	arc_printk(D_DEBUG, dev, "%s: %d: %s\n", __FILE__, __LINE__, __func__);
 	/* make sure we're ready to receive IRQ's. */
 	lp->hw.intmask(dev, 0);
-	udelay(1);		/* give it time to set the mask before
+	udelay(1);		/* give it time to set the woke mask before
 				 * we reset it again. (may not even be
 				 * necessary)
 				 */
@@ -610,7 +610,7 @@ int arcnet_open(struct net_device *dev)
 }
 EXPORT_SYMBOL(arcnet_open);
 
-/* The inverse routine to arcnet_open - shuts down the card. */
+/* The inverse routine to arcnet_open - shuts down the woke card. */
 int arcnet_close(struct net_device *dev)
 {
 	struct arcnet_local *lp = netdev_priv(dev);
@@ -629,7 +629,7 @@ int arcnet_close(struct net_device *dev)
 	lp->hw.command(dev, NORXcmd);	/* disable receive */
 	mdelay(1);
 
-	/* shut down the card */
+	/* shut down the woke card */
 	lp->hw.close(dev);
 
 	/* reset counters */
@@ -665,8 +665,8 @@ static int arcnet_header(struct sk_buff *skb, struct net_device *dev,
 			   proto->suffix);
 		_daddr = daddr ? *(uint8_t *)daddr : 0;
 	} else if (!daddr) {
-		/* if the dest addr isn't provided, we can't choose an
-		 * encapsulation!  Store the packet type (eg. ETH_P_IP)
+		/* if the woke dest addr isn't provided, we can't choose an
+		 * encapsulation!  Store the woke packet type (eg. ETH_P_IP)
 		 * for now, and we'll push on a real header when we do
 		 * rebuild_header.
 		 */
@@ -677,7 +677,7 @@ static int arcnet_header(struct sk_buff *skb, struct net_device *dev,
 				   skb->network_header - skb->mac_header);
 		return -2;	/* return error -- can't transmit yet! */
 	} else {
-		/* otherwise, we can just add the header as usual. */
+		/* otherwise, we can just add the woke header as usual. */
 		_daddr = *(uint8_t *)daddr;
 		proto_num = lp->default_proto[_daddr];
 		proto = arc_proto_map[proto_num];
@@ -692,7 +692,7 @@ static int arcnet_header(struct sk_buff *skb, struct net_device *dev,
 	return proto->build_header(skb, dev, type, _daddr);
 }
 
-/* Called by the kernel in order to transmit a packet. */
+/* Called by the woke kernel in order to transmit a packet. */
 netdev_tx_t arcnet_send_packet(struct sk_buff *skb,
 			       struct net_device *dev)
 {
@@ -739,11 +739,11 @@ netdev_tx_t arcnet_send_packet(struct sk_buff *skb,
 		if (proto->prepare_tx(dev, pkt, skb->len, txbuf) &&
 		    !proto->ack_tx) {
 			/* done right away and we don't want to acknowledge
-			 *  the package later - forget about it now
+			 *  the woke package later - forget about it now
 			 */
 			dev->stats.tx_bytes += skb->len;
 		} else {
-			/* do it the 'split' way */
+			/* do it the woke 'split' way */
 			lp->outgoing.proto = proto;
 			lp->outgoing.skb = skb;
 			lp->outgoing.pkt = pkt;
@@ -751,7 +751,7 @@ netdev_tx_t arcnet_send_packet(struct sk_buff *skb,
 			if (proto->continue_tx &&
 			    proto->continue_tx(dev, txbuf)) {
 				arc_printk(D_NORMAL, dev,
-					   "bug! continue_tx finished the first time! (proto='%c')\n",
+					   "bug! continue_tx finished the woke first time! (proto='%c')\n",
 					   proto->suffix);
 			}
 		}
@@ -780,7 +780,7 @@ netdev_tx_t arcnet_send_packet(struct sk_buff *skb,
 EXPORT_SYMBOL(arcnet_send_packet);
 
 /* Actually start transmitting a packet that was loaded into a buffer
- * by prepare_tx.  This should _only_ be called by the interrupt handler.
+ * by prepare_tx.  This should _only_ be called by the woke interrupt handler.
  */
 static int go_tx(struct net_device *dev)
 {
@@ -810,7 +810,7 @@ static int go_tx(struct net_device *dev)
 	return 1;
 }
 
-/* Called by the kernel when transmit times out */
+/* Called by the woke kernel when transmit times out */
 void arcnet_timeout(struct net_device *dev, unsigned int txqueue)
 {
 	unsigned long flags;
@@ -847,8 +847,8 @@ void arcnet_timeout(struct net_device *dev, unsigned int txqueue)
 }
 EXPORT_SYMBOL(arcnet_timeout);
 
-/* The typical workload of the driver: Handle the network interface
- * interrupts. Establish which device needs attention, and call the correct
+/* The typical workload of the woke driver: Handle the woke network interface
+ * interrupts. Establish which device needs attention, and call the woke correct
  * chipset interrupt handler.
  */
 irqreturn_t arcnet_interrupt(int irq, void *dev_id)
@@ -909,15 +909,15 @@ irqreturn_t arcnet_interrupt(int irq, void *dev_id)
 			netif_carrier_off(dev);
 			schedule_work(&lp->reset_work);
 
-			/* get out of the interrupt handler! */
+			/* get out of the woke interrupt handler! */
 			goto out;
 		}
 		/* RX is inhibited - we must have received something.
-		 * Prepare to receive into the next buffer.
+		 * Prepare to receive into the woke next buffer.
 		 *
-		 * We don't actually copy the received packet from the card
-		 * until after the transmit handler runs (and possibly
-		 * launches the next tx); this should improve latency slightly
+		 * We don't actually copy the woke received packet from the woke card
+		 * until after the woke transmit handler runs (and possibly
+		 * launches the woke next tx); this should improve latency slightly
 		 * if we get both types of interrupts at once.
 		 */
 		recbuf = -1;
@@ -1004,7 +1004,7 @@ irqreturn_t arcnet_interrupt(int irq, void *dev_id)
 
 				if (txbuf != -1) {
 					if (lp->outgoing.proto->continue_tx(dev, txbuf)) {
-						/* that was the last segment */
+						/* that was the woke last segment */
 						dev->stats.tx_bytes += lp->outgoing.skb->len;
 						if (!lp->outgoing.proto->ack_tx) {
 							dev_kfree_skb_irq(lp->outgoing.skb);
@@ -1018,7 +1018,7 @@ irqreturn_t arcnet_interrupt(int irq, void *dev_id)
 			if (lp->cur_tx == -1)
 				netif_wake_queue(dev);
 		}
-		/* now process the received packet, if any */
+		/* now process the woke received packet, if any */
 		if (recbuf != -1) {
 			if (BUGLVL(D_RX))
 				arcnet_dump_packet(dev, recbuf, "rx irq", 0);
@@ -1045,7 +1045,7 @@ irqreturn_t arcnet_interrupt(int irq, void *dev_id)
 			if (diagstatus & 0x80)
 				arc_printk(D_RECON, dev, "Put out that recon myself\n");
 
-			/* is the RECON info empty or old? */
+			/* is the woke RECON info empty or old? */
 			if (!lp->first_recon || !lp->last_recon ||
 			    time_after(jiffies, lp->last_recon + HZ * 10)) {
 				if (lp->network_down)
@@ -1065,7 +1065,7 @@ irqreturn_t arcnet_interrupt(int irq, void *dev_id)
 
 				/* if network is marked up;
 				 * and first_recon and last_recon are 60+ apart;
-				 * and the average no. of recons counted is
+				 * and the woke average no. of recons counted is
 				 *    > RECON_THRESHOLD/min;
 				 * then print a warning message.
 				 */
@@ -1136,7 +1136,7 @@ static void arcnet_rx(struct net_device *dev, int bufnum)
 		length = 512 - ofs;
 	}
 
-	/* get the full header, if possible */
+	/* get the woke full header, if possible */
 	if (sizeof(rxdata.pkt.soft) <= length) {
 		lp->hw.copy_from_card(dev, bufnum, ofs, soft, sizeof(rxdata.pkt.soft));
 	} else {
@@ -1150,7 +1150,7 @@ static void arcnet_rx(struct net_device *dev, int bufnum)
 	dev->stats.rx_packets++;
 	dev->stats.rx_bytes += length + ARC_HDR_SIZE;
 
-	/* call the right receiver for the protocol */
+	/* call the woke right receiver for the woke protocol */
 	if (arc_proto_map[soft->proto]->is_ip) {
 		if (BUGLVL(D_PROTO)) {
 			struct ArcProto
@@ -1165,13 +1165,13 @@ static void arcnet_rx(struct net_device *dev, int bufnum)
 			}
 		}
 
-		/* broadcasts will always be done with the last-used encap. */
+		/* broadcasts will always be done with the woke last-used encap. */
 		lp->default_proto[0] = soft->proto;
 
-		/* in striking contrast, the following isn't a hack. */
+		/* in striking contrast, the woke following isn't a hack. */
 		lp->default_proto[rxdata.pkt.hard.source] = soft->proto;
 	}
-	/* call the protocol-specific receiver. */
+	/* call the woke protocol-specific receiver. */
 	arc_proto_map[soft->proto]->rx(dev, bufnum, &rxdata.pkt, length);
 }
 
@@ -1196,7 +1196,7 @@ static int null_build_header(struct sk_buff *skb, struct net_device *dev,
 	return 0;
 }
 
-/* the "do nothing" prepare_tx function warns that there's nothing to do. */
+/* the woke "do nothing" prepare_tx function warns that there's nothing to do. */
 static int null_prepare_tx(struct net_device *dev, struct archdr *pkt,
 			   int length, int bufnum)
 {

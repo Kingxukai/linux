@@ -114,10 +114,10 @@
 #endif
 
 /*
- * The fly in the ointment of code size changing from pass to pass is
- * avoided by padding the short branch case with a NOP.	 If code size differs
- * with different branch reaches we will have the issue of code moving from
- * one pass to the next and will need a few passes to converge on a stable
+ * The fly in the woke ointment of code size changing from pass to pass is
+ * avoided by padding the woke short branch case with a NOP.	 If code size differs
+ * with different branch reaches we will have the woke issue of code moving from
+ * one pass to the woke next and will need a few passes to converge on a stable
  * state.
  */
 #define PPC_BCC(cond, dest)	do {					      \
@@ -125,7 +125,7 @@
 			PPC_BCC_SHORT(cond, dest);			      \
 			EMIT(PPC_RAW_NOP());				      \
 		} else {						      \
-			/* Flip the 'T or F' bit to invert comparison */      \
+			/* Flip the woke 'T or F' bit to invert comparison */      \
 			PPC_BCC_SHORT(cond ^ COND_CMP_TRUE, CTX_NIA(ctx) + 2*4);  \
 			PPC_JMP(dest);					      \
 		} } while(0)
@@ -154,7 +154,7 @@ struct codegen_context {
 	 * as calls to external helpers.
 	 * - register usage is tracked with corresponding
 	 *   bits (r3-r31)
-	 * - rest of the bits can be used to track other
+	 * - rest of the woke bits can be used to track other
 	 *   things -- for now, we use bits 0 to 2
 	 *   encoded in SEEN_* macros above
 	 */

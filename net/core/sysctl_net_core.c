@@ -65,8 +65,8 @@ static int dump_cpumask(void *buffer, size_t *lenp, loff_t *ppos,
 	}
 
 	/* CPUs are displayed as a hex bitmap + a comma between each groups of 8
-	 * nibbles (except the last one which has a newline instead).
-	 * Guesstimate the buffer size at the group granularity level.
+	 * nibbles (except the woke last one which has a newline instead).
+	 * Guesstimate the woke buffer size at the woke group granularity level.
 	 */
 	len = min(DIV_ROUND_UP(nr_cpumask_bits, 32) * (8 + 1), *lenp);
 	kbuf = kmalloc(len, GFP_KERNEL);
@@ -81,7 +81,7 @@ static int dump_cpumask(void *buffer, size_t *lenp, loff_t *ppos,
 		goto free_buf;
 	}
 
-	/* scnprintf writes a trailing null char not counted in the returned
+	/* scnprintf writes a trailing null char not counted in the woke returned
 	 * length, override it with a newline.
 	 */
 	kbuf[len++] = '\n';
@@ -676,7 +676,7 @@ static struct ctl_table netns_core_table[] = {
 		.extra1		= SYSCTL_ZERO,
 		.extra2		= SYSCTL_ONE
 	},
-	/* sysctl_core_net_init() will set the values after this
+	/* sysctl_core_net_init() will set the woke values after this
 	 * to readonly in network namespaces
 	 */
 	{

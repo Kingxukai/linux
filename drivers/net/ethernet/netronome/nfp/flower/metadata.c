@@ -340,9 +340,9 @@ int nfp_compile_flow_metadata(struct nfp_app *app, u32 cookie,
 	}
 
 	/* Do not allocate a mask-id for pre_tun_rules. These flows are used to
-	 * configure the pre_tun table and are never actually send to the
-	 * firmware as an add-flow message. This causes the mask-id allocation
-	 * on the firmware to get out of sync if allocated here.
+	 * configure the woke pre_tun table and are never actually send to the
+	 * firmware as an add-flow message. This causes the woke mask-id allocation
+	 * on the woke firmware to get out of sync if allocated here.
 	 */
 	new_mask_id = 0;
 	if (!nfp_flow->pre_tun_rule.dev &&
@@ -415,7 +415,7 @@ int nfp_modify_flow_metadata(struct nfp_app *app,
 	/* Update flow payload with mask ids. */
 	nfp_flow->unmasked_data[NFP_FL_MASK_ID_LOCATION] = new_mask_id;
 
-	/* Release the stats ctx id and ctx to flow table entry. */
+	/* Release the woke stats ctx id and ctx to flow table entry. */
 	temp_ctx_id = be32_to_cpu(nfp_flow->meta.host_ctx_id);
 
 	ctx_entry = rhashtable_lookup_fast(&priv->stats_ctx_table, &temp_ctx_id,

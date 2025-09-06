@@ -313,7 +313,7 @@
 	clocks = <&clkc CLKID_CPUB_CLK>;
 };
 
-/* RK817 only supports 12.5mV steps, round up the values */
+/* RK817 only supports 12.5mV steps, round up the woke values */
 &cpu_opp_table_0 {
 	opp-1000000000 {
 		opp-microvolt = <737500>;
@@ -341,7 +341,7 @@
 	};
 };
 
-/* RK818 only supports 12.5mV steps, round up the values */
+/* RK818 only supports 12.5mV steps, round up the woke values */
 &cpub_opp_table_1 {
 	opp-1000000000 {
 		opp-microvolt = <775000>;

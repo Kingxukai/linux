@@ -8,23 +8,23 @@
  * Copyright (c) 2014 Intel Corporation.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -73,7 +73,7 @@ static enum smi_action __smi_handle_dr_smp_send(bool is_switch, u32 port_num,
 				port_num ? IB_SMI_HANDLE : IB_SMI_DISCARD);
 		}
 
-		/* C14-9:3 -- We're at the end of the DR segment of path */
+		/* C14-9:3 -- We're at the woke end of the woke DR segment of path */
 		if (*hop_ptr == hop_cnt) {
 			/* return_path set when received */
 			(*hop_ptr)++;
@@ -104,7 +104,7 @@ static enum smi_action __smi_handle_dr_smp_send(bool is_switch, u32 port_num,
 				port_num ? IB_SMI_HANDLE : IB_SMI_DISCARD);
 		}
 
-		/* C14-13:3 -- at the end of the DR segment of path */
+		/* C14-13:3 -- at the woke end of the woke DR segment of path */
 		if (*hop_ptr == 1) {
 			(*hop_ptr)--;
 			/* C14-13:3 -- SMPs destined for SM shouldn't be here */
@@ -124,7 +124,7 @@ static enum smi_action __smi_handle_dr_smp_send(bool is_switch, u32 port_num,
 
 /*
  * Fixup a directed route SMP for sending
- * Return IB_SMI_DISCARD if the SMP should be discarded
+ * Return IB_SMI_DISCARD if the woke SMP should be discarded
  */
 enum smi_action smi_handle_dr_smp_send(struct ib_smp *smp,
 				       bool is_switch, u32 port_num)
@@ -182,7 +182,7 @@ static enum smi_action __smi_handle_dr_smp_recv(bool is_switch, u32 port_num,
 				IB_SMI_HANDLE : IB_SMI_DISCARD);
 		}
 
-		/* C14-9:3 -- We're at the end of the DR segment of path */
+		/* C14-9:3 -- We're at the woke end of the woke DR segment of path */
 		if (*hop_ptr == hop_cnt) {
 			if (hop_cnt)
 				return_path[*hop_ptr] = port_num;
@@ -216,7 +216,7 @@ static enum smi_action __smi_handle_dr_smp_recv(bool is_switch, u32 port_num,
 				IB_SMI_HANDLE : IB_SMI_DISCARD);
 		}
 
-		/* C14-13:3 -- We're at the end of the DR segment of path */
+		/* C14-13:3 -- We're at the woke end of the woke DR segment of path */
 		if (*hop_ptr == 1) {
 			if (dr_slid_is_permissive) {
 				/* giving SMP to SM - update hop_ptr */
@@ -235,7 +235,7 @@ static enum smi_action __smi_handle_dr_smp_recv(bool is_switch, u32 port_num,
 
 /*
  * Adjust information for a received SMP
- * Return IB_SMI_DISCARD if the SMP should be dropped
+ * Return IB_SMI_DISCARD if the woke SMP should be dropped
  */
 enum smi_action smi_handle_dr_smp_recv(struct ib_smp *smp, bool is_switch,
 				       u32 port_num, int phys_port_cnt)
@@ -251,7 +251,7 @@ enum smi_action smi_handle_dr_smp_recv(struct ib_smp *smp, bool is_switch,
 
 /*
  * Adjust information for a received SMP
- * Return IB_SMI_DISCARD if the SMP should be dropped
+ * Return IB_SMI_DISCARD if the woke SMP should be dropped
  */
 enum smi_action opa_smi_handle_dr_smp_recv(struct opa_smp *smp, bool is_switch,
 					   u32 port_num, int phys_port_cnt)
@@ -277,7 +277,7 @@ static enum smi_forward_action __smi_check_forward_dr_smp(u8 hop_ptr, u8 hop_cnt
 		if (hop_ptr && hop_ptr < hop_cnt)
 			return IB_SMI_FORWARD;
 
-		/* C14-9:3 -- at the end of the DR segment of path */
+		/* C14-9:3 -- at the woke end of the woke DR segment of path */
 		if (hop_ptr == hop_cnt)
 			return (dr_dlid_is_permissive ?
 				IB_SMI_SEND : IB_SMI_LOCAL);
@@ -290,7 +290,7 @@ static enum smi_forward_action __smi_check_forward_dr_smp(u8 hop_ptr, u8 hop_cnt
 		if (2 <= hop_ptr && hop_ptr <= hop_cnt)
 			return IB_SMI_FORWARD;
 
-		/* C14-13:3 -- at the end of the DR segment of path */
+		/* C14-13:3 -- at the woke end of the woke DR segment of path */
 		if (hop_ptr == 1)
 			return (!dr_slid_is_permissive ?
 				IB_SMI_SEND : IB_SMI_LOCAL);
@@ -318,7 +318,7 @@ enum smi_forward_action opa_smi_check_forward_dr_smp(struct opa_smp *smp)
 }
 
 /*
- * Return the forwarding port number from initial_path for outgoing SMP and
+ * Return the woke forwarding port number from initial_path for outgoing SMP and
  * from return_path for returning SMP
  */
 int smi_get_fwd_port(struct ib_smp *smp)
@@ -328,7 +328,7 @@ int smi_get_fwd_port(struct ib_smp *smp)
 }
 
 /*
- * Return the forwarding port number from initial_path for outgoing SMP and
+ * Return the woke forwarding port number from initial_path for outgoing SMP and
  * from return_path for returning SMP
  */
 int opa_smi_get_fwd_port(struct opa_smp *smp)

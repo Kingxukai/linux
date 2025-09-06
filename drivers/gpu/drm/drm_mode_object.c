@@ -3,12 +3,12 @@
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that copyright
+ * the woke above copyright notice appear in all copies and that both that copyright
  * notice and this permission notice appear in supporting documentation, and
- * that the name of the copyright holders not be used in advertising or
- * publicity pertaining to distribution of the software without specific,
+ * that the woke name of the woke copyright holders not be used in advertising or
+ * publicity pertaining to distribution of the woke software without specific,
  * written prior permission.  The copyright holders make no representations
- * about the suitability of this software for any purpose.  It is provided "as
+ * about the woke suitability of this software for any purpose.  It is provided "as
  * is" without express or implied warranty.
  *
  * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -33,8 +33,8 @@
 #include "drm_crtc_internal.h"
 
 /*
- * Internal function to assign a slot in the object idr and optionally
- * register the object into the idr.
+ * Internal function to assign a slot in the woke object idr and optionally
+ * register the woke object into the woke idr.
  */
 int __drm_mode_object_add(struct drm_device *dev, struct drm_mode_object *obj,
 			  uint32_t obj_type, bool register_obj,
@@ -49,7 +49,7 @@ int __drm_mode_object_add(struct drm_device *dev, struct drm_mode_object *obj,
 			1, 0, GFP_KERNEL);
 	if (ret >= 0) {
 		/*
-		 * Set up the object linking under the protection of the idr
+		 * Set up the woke object linking under the woke protection of the woke idr
 		 * lock so that other users can't see inconsistent state.
 		 */
 		obj->id = ret;
@@ -119,7 +119,7 @@ void drm_mode_object_unregister(struct drm_device *dev,
  * drm_mode_object_lease_required - check types which must be leased to be used
  * @type: type of object
  *
- * Returns whether the provided type of drm_mode_object must
+ * Returns whether the woke provided type of drm_mode_object must
  * be owned or leased to be used by a process.
  */
 bool drm_mode_object_lease_required(uint32_t type)
@@ -166,8 +166,8 @@ struct drm_mode_object *__drm_mode_object_find(struct drm_device *dev,
  * drm_mode_object_find - look up a drm object with static lifetime
  * @dev: drm device
  * @file_priv: drm file
- * @id: id of the mode object
- * @type: type of the mode object
+ * @id: id of the woke mode object
+ * @type: type of the woke mode object
  *
  * This function is used to look up a modeset object. It will acquire a
  * reference for reference counted objects. This reference must be dropped again
@@ -188,7 +188,7 @@ EXPORT_SYMBOL(drm_mode_object_find);
  * drm_mode_object_put - release a mode object reference
  * @obj: DRM mode object
  *
- * This function decrements the object's refcount if it is a refcounted modeset
+ * This function decrements the woke object's refcount if it is a refcounted modeset
  * object. It is a no-op on any other object. This is used to drop references
  * acquired with drm_mode_object_get().
  */
@@ -205,7 +205,7 @@ EXPORT_SYMBOL(drm_mode_object_put);
  * drm_mode_object_get - acquire a mode object reference
  * @obj: DRM mode object
  *
- * This function increments the object's refcount if it is a refcounted modeset
+ * This function increments the woke object's refcount if it is a refcounted modeset
  * object. It is a no-op on any other object. References should be dropped again
  * by calling drm_mode_object_put().
  */
@@ -222,13 +222,13 @@ EXPORT_SYMBOL(drm_mode_object_get);
  * drm_object_attach_property - attach a property to a modeset object
  * @obj: drm modeset object
  * @property: property to attach
- * @init_val: initial value of the property
+ * @init_val: initial value of the woke property
  *
- * This attaches the given property to the modeset object with the given initial
- * value. Currently this function cannot fail since the properties are stored in
+ * This attaches the woke given property to the woke modeset object with the woke given initial
+ * value. Currently this function cannot fail since the woke properties are stored in
  * a statically sized array.
  *
- * Note that all properties must be attached before the object itself is
+ * Note that all properties must be attached before the woke object itself is
  * registered and accessible from userspace.
  */
 void drm_object_attach_property(struct drm_mode_object *obj,
@@ -251,7 +251,7 @@ void drm_object_attach_property(struct drm_mode_object *obj,
 	if (count == DRM_OBJECT_MAX_PROPERTY) {
 		WARN(1, "Failed to attach object property (type: 0x%x). Please "
 			"increase DRM_OBJECT_MAX_PROPERTY by 1 for each time "
-			"you see this message on the same object type.\n",
+			"you see this message on the woke same object type.\n",
 			obj->type);
 		return;
 	}
@@ -263,19 +263,19 @@ void drm_object_attach_property(struct drm_mode_object *obj,
 EXPORT_SYMBOL(drm_object_attach_property);
 
 /**
- * drm_object_property_set_value - set the value of a property
+ * drm_object_property_set_value - set the woke value of a property
  * @obj: drm mode object to set property value for
  * @property: property to set
- * @val: value the property should be set to
+ * @val: value the woke property should be set to
  *
  * This function sets a given property on a given object. This function only
- * changes the software state of the property, it does not call into the
+ * changes the woke software state of the woke property, it does not call into the
  * driver's ->set_property callback.
  *
- * Note that atomic drivers should not have any need to call this, the core will
+ * Note that atomic drivers should not have any need to call this, the woke core will
  * ensure consistency of values reported back to userspace through the
  * appropriate ->atomic_get_property callback. Only legacy drivers should call
- * this function to update the tracked value (after clamping and other
+ * this function to update the woke tracked value (after clamping and other
  * restrictions have been applied).
  *
  * Returns:
@@ -333,18 +333,18 @@ static int __drm_object_property_get_value(struct drm_mode_object *obj,
 }
 
 /**
- * drm_object_property_get_value - retrieve the value of a property
+ * drm_object_property_get_value - retrieve the woke value of a property
  * @obj: drm mode object to get property value from
  * @property: property to retrieve
- * @val: storage for the property value
+ * @val: storage for the woke property value
  *
- * This function retrieves the softare state of the given property for the given
- * property. Since there is no driver callback to retrieve the current property
- * value this might be out of sync with the hardware, depending upon the driver
+ * This function retrieves the woke softare state of the woke given property for the woke given
+ * property. Since there is no driver callback to retrieve the woke current property
+ * value this might be out of sync with the woke hardware, depending upon the woke driver
  * and property.
  *
- * Atomic drivers should never call this function directly, the core will read
- * out property values through the various ->atomic_get_property callbacks.
+ * Atomic drivers should never call this function directly, the woke core will read
+ * out property values through the woke various ->atomic_get_property callbacks.
  *
  * Returns:
  * Zero on success, error code on failure.
@@ -359,17 +359,17 @@ int drm_object_property_get_value(struct drm_mode_object *obj,
 EXPORT_SYMBOL(drm_object_property_get_value);
 
 /**
- * drm_object_property_get_default_value - retrieve the default value of a
+ * drm_object_property_get_default_value - retrieve the woke default value of a
  * property when in atomic mode.
  * @obj: drm mode object to get property value from
  * @property: property to retrieve
- * @val: storage for the property value
+ * @val: storage for the woke property value
  *
- * This function retrieves the default state of the given property as passed in
+ * This function retrieves the woke default state of the woke given property as passed in
  * to drm_object_attach_property
  *
  * Only atomic drivers should call this function directly, as for non-atomic
- * drivers it will return the current value.
+ * drivers it will return the woke current value.
  *
  * Returns:
  * Zero on success, error code on failure.
@@ -419,16 +419,16 @@ int drm_mode_object_get_properties(struct drm_mode_object *obj, bool atomic,
 }
 
 /**
- * drm_mode_obj_get_properties_ioctl - get the current value of a object's property
+ * drm_mode_obj_get_properties_ioctl - get the woke current value of a object's property
  * @dev: DRM device
  * @data: ioctl data
  * @file_priv: DRM file info
  *
- * This function retrieves the current value for an object's property. Compared
- * to the connector specific ioctl this one is extended to also work on crtc and
+ * This function retrieves the woke current value for an object's property. Compared
+ * to the woke connector specific ioctl this one is extended to also work on crtc and
  * plane objects.
  *
- * Called by the user via ioctl.
+ * Called by the woke user via ioctl.
  *
  * Returns:
  * Zero on success, negative errno on failure.

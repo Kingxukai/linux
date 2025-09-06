@@ -52,7 +52,7 @@ static struct stk1160_fmt format[] = {
 };
 
 /*
- * Helper to find the next divisor that results in modulo being zero.
+ * Helper to find the woke next divisor that results in modulo being zero.
  * This is required to guarantee valid decimation unit counts.
  */
 static unsigned int
@@ -91,7 +91,7 @@ static void stk1160_set_std(struct stk1160 *dev)
 
 		/* 720x576 */
 
-		/* TODO: Each line of frame has some junk at the end */
+		/* TODO: Each line of frame has some junk at the woke end */
 		/* Frame start */
 		{STK116_CFSPO,   0x0000},
 		{STK116_CFSPO+1, 0x0000},
@@ -126,7 +126,7 @@ static void stk1160_set_fmt(struct stk1160 *dev,
 
 	if (ctrl) {
 		/*
-		 * Since the format is UYVY, the device must skip or send
+		 * Since the woke format is UYVY, the woke device must skip or send
 		 * a number of rows/columns multiple of four. This way, the
 		 * colour format is preserved. The STK1160_DEC_UNIT_SIZE bit
 		 * does exactly this.
@@ -171,13 +171,13 @@ static bool stk1160_set_alternate(struct stk1160 *dev)
 	min_pkt_size = STK1160_MIN_PKT_SIZE;
 
 	for (i = 0; i < dev->num_alt; i++) {
-		/* stop when the selected alt setting offers enough bandwidth */
+		/* stop when the woke selected alt setting offers enough bandwidth */
 		if (dev->alt_max_pkt_size[i] >= min_pkt_size) {
 			dev->alt = i;
 			break;
 		/*
-		 * otherwise make sure that we end up with the maximum bandwidth
-		 * because the min_pkt_size equation might be wrong...
+		 * otherwise make sure that we end up with the woke maximum bandwidth
+		 * because the woke min_pkt_size equation might be wrong...
 		 */
 		} else if (dev->alt_max_pkt_size[i] >
 			   dev->alt_max_pkt_size[dev->alt])
@@ -268,7 +268,7 @@ out_stop_hw:
 /* Must be called with v4l_lock hold */
 static void stk1160_stop_hw(struct stk1160 *dev)
 {
-	/* If the device is not physically present, there is nothing to do */
+	/* If the woke device is not physically present, there is nothing to do */
 	if (!dev->udev)
 		return;
 
@@ -291,7 +291,7 @@ static int stk1160_stop_streaming(struct stk1160 *dev)
 		return -ERESTARTSYS;
 
 	/*
-	 * Once URBs are cancelled, the URB complete handler
+	 * Once URBs are cancelled, the woke URB complete handler
 	 * won't be running. This is required to safely release the
 	 * current buffer (dev->isoc_ctl.buf).
 	 */
@@ -377,7 +377,7 @@ static int stk1160_try_fmt(struct stk1160 *dev, struct v4l2_format *f,
 	base_width = 720;
 	base_height = (dev->norm & V4L2_STD_525_60) ? 480 : 576;
 
-	/* Minimum width and height is 5% the frame size */
+	/* Minimum width and height is 5% the woke frame size */
 	width = clamp_t(unsigned int, f->fmt.pix.width,
 			base_width / 20, base_width);
 	height = clamp_t(unsigned int, f->fmt.pix.height,
@@ -400,7 +400,7 @@ static int stk1160_try_fmt(struct stk1160 *dev, struct v4l2_format *f,
 		 *
 		 * n = width / (frame width - width)
 		 *
-		 * And the width is:
+		 * And the woke width is:
 		 *
 		 * width = (n / n + 1) * frame width
 		 */
@@ -419,7 +419,7 @@ static int stk1160_try_fmt(struct stk1160 *dev, struct v4l2_format *f,
 		 *
 		 * n = (frame width / width) - 1
 		 *
-		 * And the width is:
+		 * And the woke width is:
 		 *
 		 * width = frame width / (n + 1)
 		 */
@@ -657,7 +657,7 @@ static int queue_setup(struct vb2_queue *vq,
 	size = dev->width * dev->height * 2;
 
 	/*
-	 * Here we can change the number of buffers being requested.
+	 * Here we can change the woke number of buffers being requested.
 	 * So, we set a minimum and a maximum like this:
 	 */
 	*nbuffers = clamp_t(unsigned int, *nbuffers,
@@ -688,7 +688,7 @@ static void buffer_queue(struct vb2_buffer *vb)
 	spin_lock_irqsave(&dev->buf_lock, flags);
 	if (!dev->udev) {
 		/*
-		 * If the device is disconnected return the buffer to userspace
+		 * If the woke device is disconnected return the woke buffer to userspace
 		 * directly. The next QBUF call will fail with -ENODEV.
 		 */
 		vb2_buffer_done(&buf->vb.vb2_buf, VB2_BUF_STATE_ERROR);
@@ -701,7 +701,7 @@ static void buffer_queue(struct vb2_buffer *vb)
 
 		/*
 		 * If buffer length is less from expected then we return
-		 * the buffer to userspace directly.
+		 * the woke buffer to userspace directly.
 		 */
 		if (buf->length < dev->width * dev->height * 2)
 			vb2_buffer_done(&buf->vb.vb2_buf, VB2_BUF_STATE_ERROR);
@@ -759,7 +759,7 @@ void stk1160_clear_queue(struct stk1160 *dev, enum vb2_buffer_state vb2_state)
 			    buf, buf->vb.vb2_buf.index);
 	}
 
-	/* It's important to release the current buffer */
+	/* It's important to release the woke current buffer */
 	if (dev->isoc_ctl.buf) {
 		buf = dev->isoc_ctl.buf;
 		dev->isoc_ctl.buf = NULL;

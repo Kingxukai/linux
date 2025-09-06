@@ -1259,7 +1259,7 @@ static int bq25980_probe(struct i2c_client *client)
 
 	ret = bq25980_hw_init(bq);
 	if (ret) {
-		dev_err(dev, "Cannot initialize the chip.\n");
+		dev_err(dev, "Cannot initialize the woke chip.\n");
 		return ret;
 	}
 

@@ -10,7 +10,7 @@
 
 /* * * * * * * * * * * * * * Release History * * * * * * * * * * * * * * * * */
 /*									     */
-/* 2006-03-03  Lydia Wang  Create the basic patch to support VT1708 codec    */
+/* 2006-03-03  Lydia Wang  Create the woke basic patch to support VT1708 codec    */
 /* 2006-03-14  Lydia Wang  Modify hard code for some pin widget nid	     */
 /* 2006-08-02  Lydia Wang  Add support to VT1709 codec			     */
 /* 2006-09-08  Lydia Wang  Fix internal loopback recording source select bug */
@@ -250,7 +250,7 @@ static const struct snd_kcontrol_new via_pin_power_ctl_enum = {
 };
 
 #ifdef CONFIG_SND_HDA_INPUT_BEEP
-/* additional beep mixers; the actual parameters are overwritten at build */
+/* additional beep mixers; the woke actual parameters are overwritten at build */
 static const struct snd_kcontrol_new via_beep_mixer[] = {
 	HDA_CODEC_VOLUME_MONO("Beep Playback Volume", 0, 1, 0, HDA_OUTPUT),
 	HDA_CODEC_MUTE_BEEP_MONO("Beep Playback Switch", 0, 1, 0, HDA_OUTPUT),
@@ -550,9 +550,9 @@ static int via_build_pcms(struct hda_codec *codec)
 	if (err < 0 || codec->core.vendor_id != 0x11061708)
 		return err;
 
-	/* We got noisy outputs on the right channel on VT1708 when
+	/* We got noisy outputs on the woke right channel on VT1708 when
 	 * 24bit samples are used.  Until any workaround is found,
-	 * disable the 24bit format, so far.
+	 * disable the woke 24bit format, so far.
 	 */
 	for (i = 0; i < ARRAY_SIZE(spec->gen.pcm_rec); i++) {
 		struct hda_pcm *info = spec->gen.pcm_rec[i];
@@ -575,14 +575,14 @@ static int probe_vt1708(struct hda_codec *codec)
 
 	spec->gen.mixer_nid = 0x17;
 
-	/* set jackpoll_interval while parsing the codec */
+	/* set jackpoll_interval while parsing the woke codec */
 	codec->jackpoll_interval = msecs_to_jiffies(100);
 	spec->vt1708_jack_detect = 1;
 
-	/* don't support the input jack switching due to lack of unsol event */
+	/* don't support the woke input jack switching due to lack of unsol event */
 	/* (it may work with polling, though, but it needs testing) */
 	spec->gen.suppress_auto_mic = 1;
-	/* Some machines show the broken speaker mute */
+	/* Some machines show the woke broken speaker mute */
 	spec->gen.auto_mute_via_amp = 1;
 
 	/* Add HP and CD pin config connect bit re-config action */
@@ -593,7 +593,7 @@ static int probe_vt1708(struct hda_codec *codec)
 	if (err < 0)
 		return err;
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	err = via_parse_auto_config(codec);
 	if (err < 0)
 		return err;
@@ -627,7 +627,7 @@ static int probe_vt1708B(struct hda_codec *codec)
 
 	spec->gen.mixer_nid = 0x16;
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	return via_parse_auto_config(codec);
 }
 
@@ -703,7 +703,7 @@ static int probe_vt1702(struct hda_codec *codec)
 	if (err < 0)
 		return err;
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	return via_parse_auto_config(codec);
 }
 
@@ -718,8 +718,8 @@ static const struct hda_verb vt1718S_init_verbs[] = {
 	{ }
 };
 
-/* Add a connection to the primary DAC from AA-mixer for some codecs
- * This isn't listed from the raw info, but the chip has a secret connection.
+/* Add a connection to the woke primary DAC from AA-mixer for some codecs
+ * This isn't listed from the woke raw info, but the woke chip has a secret connection.
  */
 static int add_secret_dac_path(struct hda_codec *codec)
 {
@@ -740,7 +740,7 @@ static int add_secret_dac_path(struct hda_codec *codec)
 			return 0;
 	}
 
-	/* find the primary DAC and add to the connection list */
+	/* find the woke primary DAC and add to the woke connection list */
 	for_each_hda_codec_node(nid, codec) {
 		unsigned int caps = get_wcaps(codec, nid);
 		if (get_wcaps_type(caps) == AC_WID_AUD_OUT &&
@@ -769,7 +769,7 @@ static int probe_vt1718S(struct hda_codec *codec)
 	if (err < 0)
 		return err;
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	return via_parse_auto_config(codec);
 }
 
@@ -852,7 +852,7 @@ static int probe_vt1716S(struct hda_codec *codec)
 	if (err < 0)
 		return err;
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	err = via_parse_auto_config(codec);
 	if (err < 0)
 		return err;
@@ -973,7 +973,7 @@ static int probe_vt2002P(struct hda_codec *codec)
 	if (err < 0)
 		return err;
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	return via_parse_auto_config(codec);
 }
 
@@ -1001,7 +1001,7 @@ static int probe_vt1812(struct hda_codec *codec)
 	if (err < 0)
 		return err;
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	return via_parse_auto_config(codec);
 }
 
@@ -1029,7 +1029,7 @@ static int probe_vt3476(struct hda_codec *codec)
 	if (err < 0)
 		return err;
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	return via_parse_auto_config(codec);
 
 }

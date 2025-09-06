@@ -2,7 +2,7 @@
   {
     "EventCode": "0x1C040",
     "EventName": "PM_XFER_FROM_SRC_PMC1",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the source specified in MMCR3[0:12]. If MMCR1[16|17] is 0 (default), this count includes only lines that were reloaded to satisfy a demand miss. If MMCR1[16|17] is 1, this count includes both demand misses and prefetch reloads."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke source specified in MMCR3[0:12]. If MMCR1[16|17] is 0 (default), this count includes only lines that were reloaded to satisfy a demand miss. If MMCR1[16|17] is 1, this count includes both demand misses and prefetch reloads."
   },
   {
     "EventCode": "0x1C056",
@@ -27,17 +27,17 @@
   {
     "EventCode": "0x2001A",
     "EventName": "PM_ITLB_HIT",
-    "BriefDescription": "The PTE required to translate the instruction address was resident in the TLB (instruction TLB access/IERAT reload). Applies to both HPT and RPT. When MMCR1[17]=0 this event counts only for demand misses. When MMCR1[17]=1 this event includes demand misses and prefetches."
+    "BriefDescription": "The PTE required to translate the woke instruction address was resident in the woke TLB (instruction TLB access/IERAT reload). Applies to both HPT and RPT. When MMCR1[17]=0 this event counts only for demand misses. When MMCR1[17]=1 this event includes demand misses and prefetches."
   },
   {
     "EventCode": "0x2003E",
     "EventName": "PM_PTESYNC_FIN",
-    "BriefDescription": "Ptesync instruction finished in the store unit. Only one ptesync can finish at a time."
+    "BriefDescription": "Ptesync instruction finished in the woke store unit. Only one ptesync can finish at a time."
   },
   {
     "EventCode": "0x2C040",
     "EventName": "PM_XFER_FROM_SRC_PMC2",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the source specified in MMCR3[15:27]. If MMCR1[16|17] is 0 (default), this count includes only lines that were reloaded to satisfy a demand miss. If MMCR1[16|17] is 1, this count includes both demand misses and prefetch reloads."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke source specified in MMCR3[15:27]. If MMCR1[16|17] is 0 (default), this count includes only lines that were reloaded to satisfy a demand miss. If MMCR1[16|17] is 1, this count includes both demand misses and prefetch reloads."
   },
   {
     "EventCode": "0x2C054",
@@ -67,7 +67,7 @@
   {
     "EventCode": "0x3C040",
     "EventName": "PM_XFER_FROM_SRC_PMC3",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the source specified in MMCR3[30:42]. If MMCR1[16|17] is 0 (default), this count includes only lines that were reloaded to satisfy a demand miss. If MMCR1[16|17] is 1, this count includes both demand misses and prefetch reloads."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke source specified in MMCR3[30:42]. If MMCR1[16|17] is 0 (default), this count includes only lines that were reloaded to satisfy a demand miss. If MMCR1[16|17] is 1, this count includes both demand misses and prefetch reloads."
   },
   {
     "EventCode": "0x3F04A",
@@ -92,7 +92,7 @@
   {
     "EventCode": "0x300FC",
     "EventName": "PM_DTLB_MISS",
-    "BriefDescription": "The DPTEG required for the load/store instruction in execution was missing from the TLB. This event only counts for demand misses."
+    "BriefDescription": "The DPTEG required for the woke load/store instruction in execution was missing from the woke TLB. This event only counts for demand misses."
   },
   {
     "EventCode": "0x4003E",
@@ -102,7 +102,7 @@
   {
     "EventCode": "0x4C040",
     "EventName": "PM_XFER_FROM_SRC_PMC4",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the source specified in MMCR3[45:57]. If MMCR1[16|17] is 0 (default), this count includes only lines that were reloaded to satisfy a demand miss. If MMCR1[16|17] is 1, this count includes both demand misses and prefetch reloads."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke source specified in MMCR3[45:57]. If MMCR1[16|17] is 0 (default), this count includes only lines that were reloaded to satisfy a demand miss. If MMCR1[16|17] is 1, this count includes both demand misses and prefetch reloads."
   },
   {
     "EventCode": "0x4C056",
@@ -117,12 +117,12 @@
   {
     "EventCode": "0x000000F880",
     "EventName": "PM_SNOOP_TLBIE_CYC",
-    "BriefDescription": "Cycles in which TLBIE snoops are executed in the LSU."
+    "BriefDescription": "Cycles in which TLBIE snoops are executed in the woke LSU."
   },
   {
     "EventCode": "0x000000F084",
     "EventName": "PM_SNOOP_TLBIE_CACHE_WALK_CYC",
-    "BriefDescription": "TLBIE snoop cycles in which the data cache is being walked."
+    "BriefDescription": "TLBIE snoop cycles in which the woke data cache is being walked."
   },
   {
     "EventCode": "0x000000F884",
@@ -137,6 +137,6 @@
   {
     "EventCode": "0x000000F08C",
     "EventName": "PM_SNOOP_TLBIE_WAIT_MMU_CYC",
-    "BriefDescription": "TLBIE snoop cycles in which the Load-Store unit is waiting for the MMU to finish invalidation."
+    "BriefDescription": "TLBIE snoop cycles in which the woke Load-Store unit is waiting for the woke MMU to finish invalidation."
   }
 ]

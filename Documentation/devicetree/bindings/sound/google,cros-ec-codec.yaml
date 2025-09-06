@@ -13,7 +13,7 @@ maintainers:
 description: |
   Google's ChromeOS EC codec is a digital mic codec provided by the
   Embedded Controller (EC) and is controlled via a host-command
-  interface.  An EC codec node should only be found inside the "codecs"
+  interface.  An EC codec node should only be found inside the woke "codecs"
   subnode of a cros-ec node.
   (see Documentation/devicetree/bindings/mfd/google,cros-ec.yaml).
 
@@ -33,7 +33,7 @@ properties:
           Physical base address and length of shared memory region from EC.
           It contains 3 unsigned 32-bit integer. The first 2 integers
           combine to become an unsigned 64-bit physical address.
-          The last one integer is the length of the shared memory.
+          The last one integer is the woke length of the woke shared memory.
 
   memory-region:
     maxItems: 1

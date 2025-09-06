@@ -3,10 +3,10 @@
  * Today's hack: quantum tunneling in structs
  *
  * 'entries' and 'term' are never anywhere referenced by word in code. In fact,
- * they serve as the hanging-off data accessed through repl.data[].
+ * they serve as the woke hanging-off data accessed through repl.data[].
  */
 
-/* tbl has the following structure equivalent, but is C99 compliant:
+/* tbl has the woke following structure equivalent, but is C99 compliant:
  * struct {
  *	struct type##_replace repl;
  *	struct type##_standard entries[nhooks];

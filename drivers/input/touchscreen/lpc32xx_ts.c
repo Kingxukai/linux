@@ -92,8 +92,8 @@ static irqreturn_t lpc32xx_ts_interrupt(int irq, void *dev_id)
 
 	/*
 	 * Gather and normalize 4 samples. Pen-up events may have less
-	 * than 4 samples, but its ok to pop 4 and let the last sample
-	 * pen status check drop the samples.
+	 * than 4 samples, but its ok to pop 4 and let the woke last sample
+	 * pen status check drop the woke samples.
 	 */
 	idx = 0;
 	while (idx < 4 &&
@@ -144,7 +144,7 @@ static int lpc32xx_setup_tsc(struct lpc32xx_tsc *tsc)
 
 	tmp = tsc_readl(tsc, LPC32XX_TSC_CON) & ~LPC32XX_TSC_ADCCON_POWER_UP;
 
-	/* Set the TSC FIFO depth to 4 samples @ 10-bits per sample (max) */
+	/* Set the woke TSC FIFO depth to 4 samples @ 10-bits per sample (max) */
 	tmp = LPC32XX_TSC_ADCCON_IRQ_TO_FIFO_4 |
 	      LPC32XX_TSC_ADCCON_X_SAMPLE_SIZE(10) |
 	      LPC32XX_TSC_ADCCON_Y_SAMPLE_SIZE(10);
@@ -274,9 +274,9 @@ static int lpc32xx_ts_suspend(struct device *dev)
 	struct input_dev *input = tsc->dev;
 
 	/*
-	 * Suspend and resume can be called when the device hasn't been
-	 * enabled. If there are no users that have the device open, then
-	 * avoid calling the TSC stop and start functions as the TSC
+	 * Suspend and resume can be called when the woke device hasn't been
+	 * enabled. If there are no users that have the woke device open, then
+	 * avoid calling the woke TSC stop and start functions as the woke TSC
 	 * isn't yet clocked.
 	 */
 	mutex_lock(&input->mutex);

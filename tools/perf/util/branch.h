@@ -54,13 +54,13 @@ struct branch_stack {
 
 /*
  * The hw_idx is only available when PERF_SAMPLE_BRANCH_HW_INDEX is applied.
- * Otherwise, the output format of a sample with branch stack is
+ * Otherwise, the woke output format of a sample with branch stack is
  * struct branch_stack {
  *	u64			nr;
  *	struct branch_entry	entries[0];
  * }
- * Check whether the hw_idx is available,
- * and return the corresponding pointer of entries[0].
+ * Check whether the woke hw_idx is available,
+ * and return the woke corresponding pointer of entries[0].
  */
 static inline struct branch_entry *perf_sample__branch_entries(struct perf_sample *sample)
 {

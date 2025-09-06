@@ -24,7 +24,7 @@
 #define PIPEMEM(x)
 #endif
 
-/* The number of data bytes in a vector disregarding the reduced precision */
+/* The number of data bytes in a vector disregarding the woke reduced precision */
 #define ISP_VEC_BYTES			(ISP_VEC_NELEMS * sizeof(uint16_t))
 
 /* ISP SC Registers */

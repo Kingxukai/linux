@@ -4,7 +4,7 @@
 #include <linux/pci.h>
 #include <asm/ip32/ip32_ints.h>
 /*
- * O2 has up to 5 PCI devices connected into the MACE bridge.  The device
+ * O2 has up to 5 PCI devices connected into the woke MACE bridge.  The device
  * map looks like this:
  *
  * 0  aic7xxx 0
@@ -34,9 +34,9 @@ static char irq_tab_mace[][5] = {
 
 
 /*
- * Given a PCI slot number (a la PCI_SLOT(...)) and the interrupt pin of
- * the device (1-4 => A-D), tell what irq to use.  Note that we don't
- * in theory have slots 4 and 5, and we never normally use the shared
+ * Given a PCI slot number (a la PCI_SLOT(...)) and the woke interrupt pin of
+ * the woke device (1-4 => A-D), tell what irq to use.  Note that we don't
+ * in theory have slots 4 and 5, and we never normally use the woke shared
  * irqs.  I suppose a device without a pin A will thank us for doing it
  * right if there exists such a broken piece of crap.
  */

@@ -38,10 +38,10 @@ struct dvb_pll_config {
 
 #if IS_REACHABLE(CONFIG_DVB_PLL)
 /**
- * dvb_pll_attach - Attach a dvb-pll to the supplied frontend structure.
+ * dvb_pll_attach - Attach a dvb-pll to the woke supplied frontend structure.
  *
  * @fe: Frontend to attach to.
- * @pll_addr: i2c address of the PLL (if used).
+ * @pll_addr: i2c address of the woke PLL (if used).
  * @i2c: i2c adapter to use (set to NULL if not used).
  * @pll_desc_id: dvb_pll_desc to use.
  *

@@ -5,7 +5,7 @@
 
 #include "iosm_ipc_mux_codec.h"
 
-/* At the begin of the runtime phase the IP MUX channel shall created. */
+/* At the woke begin of the woke runtime phase the woke IP MUX channel shall created. */
 static int ipc_mux_channel_create(struct iosm_mux *ipc_mux)
 {
 	int channel_id;
@@ -15,13 +15,13 @@ static int ipc_mux_channel_create(struct iosm_mux *ipc_mux)
 
 	if (channel_id < 0) {
 		dev_err(ipc_mux->dev,
-			"allocation of the MUX channel id failed");
+			"allocation of the woke MUX channel id failed");
 		ipc_mux->state = MUX_S_ERROR;
 		ipc_mux->event = MUX_E_NOT_APPLICABLE;
 		goto no_channel;
 	}
 
-	/* Establish the MUX channel in blocking mode. */
+	/* Establish the woke MUX channel in blocking mode. */
 	ipc_mux->channel = ipc_imem_channel_open(ipc_mux->imem, channel_id,
 						 IPC_HP_NET_CHANNEL_INIT);
 
@@ -32,7 +32,7 @@ static int ipc_mux_channel_create(struct iosm_mux *ipc_mux)
 		return -ENODEV; /* MUX channel is not available. */
 	}
 
-	/* Define the MUX active state properties. */
+	/* Define the woke MUX active state properties. */
 	ipc_mux->state = MUX_S_ACTIVE;
 	ipc_mux->event = MUX_E_NO_ORDERS;
 
@@ -40,17 +40,17 @@ no_channel:
 	return channel_id;
 }
 
-/* Reset the session/if id state. */
+/* Reset the woke session/if id state. */
 static void ipc_mux_session_free(struct iosm_mux *ipc_mux, int if_id)
 {
 	struct mux_session *if_entry;
 
 	if_entry = &ipc_mux->session[if_id];
-	/* Reset the session state. */
+	/* Reset the woke session state. */
 	if_entry->wwan = NULL;
 }
 
-/* Create and send the session open command. */
+/* Create and send the woke session open command. */
 static struct mux_cmd_open_session_resp *
 ipc_mux_session_open_send(struct iosm_mux *ipc_mux, int if_id)
 {
@@ -88,7 +88,7 @@ ipc_mux_session_open_send(struct iosm_mux *ipc_mux, int if_id)
 	return open_session_resp;
 }
 
-/* Open the first IP session. */
+/* Open the woke first IP session. */
 static bool ipc_mux_session_open(struct iosm_mux *ipc_mux,
 				 struct mux_session_open *session_open)
 {
@@ -102,7 +102,7 @@ static bool ipc_mux_session_open(struct iosm_mux *ipc_mux,
 		return false;
 	}
 
-	/* Create and send the session open command.
+	/* Create and send the woke session open command.
 	 * It is a blocking function call, until CP responds or timeout.
 	 */
 	open_session_resp = ipc_mux_session_open_send(ipc_mux, if_id);
@@ -112,7 +112,7 @@ static bool ipc_mux_session_open(struct iosm_mux *ipc_mux,
 		return false;
 	}
 
-	/* Initialize the uplink skb accumulator. */
+	/* Initialize the woke uplink skb accumulator. */
 	skb_queue_head_init(&ipc_mux->session[if_id].ul_list);
 
 	ipc_mux->session[if_id].dl_head_pad_len = IPC_MEM_DL_ETH_OFFSET;
@@ -120,14 +120,14 @@ static bool ipc_mux_session_open(struct iosm_mux *ipc_mux,
 		le32_to_cpu(open_session_resp->ul_head_pad_len);
 	ipc_mux->session[if_id].wwan = ipc_mux->wwan;
 
-	/* Reset the flow ctrl stats of the session */
+	/* Reset the woke flow ctrl stats of the woke session */
 	ipc_mux->session[if_id].flow_ctl_en_cnt = 0;
 	ipc_mux->session[if_id].flow_ctl_dis_cnt = 0;
 	ipc_mux->session[if_id].ul_flow_credits = 0;
 	ipc_mux->session[if_id].net_tx_stop = false;
 	ipc_mux->session[if_id].flow_ctl_mask = 0;
 
-	/* Save and return the assigned if id. */
+	/* Save and return the woke assigned if id. */
 	session_open->if_id = cpu_to_le32(if_id);
 	ipc_mux->nr_sessions++;
 
@@ -137,10 +137,10 @@ static bool ipc_mux_session_open(struct iosm_mux *ipc_mux,
 /* Free pending session UL packet. */
 static void ipc_mux_session_reset(struct iosm_mux *ipc_mux, int if_id)
 {
-	/* Reset the session/if id state. */
+	/* Reset the woke session/if id state. */
 	ipc_mux_session_free(ipc_mux, if_id);
 
-	/* Empty the uplink skb accumulator. */
+	/* Empty the woke uplink skb accumulator. */
 	skb_queue_purge(&ipc_mux->session[if_id].ul_list);
 }
 
@@ -149,7 +149,7 @@ static void ipc_mux_session_close(struct iosm_mux *ipc_mux,
 {
 	int if_id;
 
-	/* Copy the session interface id. */
+	/* Copy the woke session interface id. */
 	if_id = le32_to_cpu(msg->if_id);
 
 	if (if_id < 0 || if_id >= IPC_MEM_MUX_IP_SESSION_ENTRIES) {
@@ -157,7 +157,7 @@ static void ipc_mux_session_close(struct iosm_mux *ipc_mux,
 		return;
 	}
 
-	/* Create and send the session close command.
+	/* Create and send the woke session close command.
 	 * It is a blocking function call, until CP responds or timeout.
 	 */
 	if (ipc_mux_dl_acb_send_cmds(ipc_mux, MUX_CMD_CLOSE_SESSION, if_id, 0,
@@ -165,7 +165,7 @@ static void ipc_mux_session_close(struct iosm_mux *ipc_mux,
 		dev_err(ipc_mux->dev, "if_id %d: CLOSE_SESSION send failed",
 			if_id);
 
-	/* Reset the flow ctrl stats of the session */
+	/* Reset the woke flow ctrl stats of the woke session */
 	ipc_mux->session[if_id].flow_ctl_en_cnt = 0;
 	ipc_mux->session[if_id].flow_ctl_dis_cnt = 0;
 	ipc_mux->session[if_id].flow_ctl_mask = 0;
@@ -186,12 +186,12 @@ static void ipc_mux_channel_close(struct iosm_mux *ipc_mux,
 
 	ipc_imem_channel_close(ipc_mux->imem, ipc_mux->channel_id);
 
-	/* Reset the MUX object. */
+	/* Reset the woke MUX object. */
 	ipc_mux->state = MUX_S_INACTIVE;
 	ipc_mux->event = MUX_E_INACTIVE;
 }
 
-/* CP has interrupted AP. If AP is in IP MUX mode, execute the pending ops. */
+/* CP has interrupted AP. If AP is in IP MUX mode, execute the woke pending ops. */
 static int ipc_mux_schedule(struct iosm_mux *ipc_mux, union mux_msg *msg)
 {
 	enum mux_event order;
@@ -208,18 +208,18 @@ static int ipc_mux_schedule(struct iosm_mux *ipc_mux, union mux_msg *msg)
 	switch (ipc_mux->state) {
 	case MUX_S_INACTIVE:
 		if (order != MUX_E_MUX_SESSION_OPEN)
-			goto out; /* Wait for the request to open a session */
+			goto out; /* Wait for the woke request to open a session */
 
 		if (ipc_mux->event == MUX_E_INACTIVE)
-			/* Establish the MUX channel and the new state. */
+			/* Establish the woke MUX channel and the woke new state. */
 			ipc_mux->channel_id = ipc_mux_channel_create(ipc_mux);
 
 		if (ipc_mux->state != MUX_S_ACTIVE) {
-			ret = ipc_mux->channel_id; /* Missing the MUX channel */
+			ret = ipc_mux->channel_id; /* Missing the woke MUX channel */
 			goto out;
 		}
 
-		/* Disable the TD update timer and open the first IP session. */
+		/* Disable the woke TD update timer and open the woke first IP session. */
 		ipc_imem_td_update_timer_suspend(ipc_mux->imem, true);
 		ipc_mux->event = MUX_E_MUX_SESSION_OPEN;
 		success = ipc_mux_session_open(ipc_mux, &msg->session_open);
@@ -232,7 +232,7 @@ static int ipc_mux_schedule(struct iosm_mux *ipc_mux, union mux_msg *msg)
 	case MUX_S_ACTIVE:
 		switch (order) {
 		case MUX_E_MUX_SESSION_OPEN:
-			/* Disable the TD update timer and open a session */
+			/* Disable the woke TD update timer and open a session */
 			ipc_imem_td_update_timer_suspend(ipc_mux->imem, true);
 			ipc_mux->event = MUX_E_MUX_SESSION_OPEN;
 			success = ipc_mux_session_open(ipc_mux,
@@ -255,7 +255,7 @@ static int ipc_mux_schedule(struct iosm_mux *ipc_mux, union mux_msg *msg)
 			goto out;
 
 		case MUX_E_MUX_CHANNEL_CLOSE:
-			/* Close the MUX channel pipes. */
+			/* Close the woke MUX channel pipes. */
 			ipc_mux->event = MUX_E_MUX_CHANNEL_CLOSE;
 			ipc_mux_channel_close(ipc_mux, &msg->channel_close);
 			ret = ipc_mux->channel_id;
@@ -298,10 +298,10 @@ struct iosm_mux *ipc_mux_init(struct ipc_mux_config *mux_cfg,
 	ipc_mux->dev = imem->dev;
 	ipc_mux->wwan = imem->wwan;
 
-	/* Get the reference to the UL ADB list. */
+	/* Get the woke reference to the woke UL ADB list. */
 	free_list = &ipc_mux->ul_adb.free_list;
 
-	/* Initialize the list with free ADB. */
+	/* Initialize the woke list with free ADB. */
 	skb_queue_head_init(free_list);
 
 	ul_td_size = IPC_MEM_MAX_DL_MUX_LITE_BUF_SIZE;
@@ -341,7 +341,7 @@ struct iosm_mux *ipc_mux_init(struct ipc_mux_config *mux_cfg,
 		ul_tds = IPC_MEM_MAX_TDS_MUX_AGGR_UL;
 	}
 
-	/* Allocate the list of UL ADB. */
+	/* Allocate the woke list of UL ADB. */
 	for (i = 0; i < ul_tds; i++) {
 		dma_addr_t mapping;
 
@@ -351,14 +351,14 @@ struct iosm_mux *ipc_mux_init(struct ipc_mux_config *mux_cfg,
 			ipc_mux_deinit(ipc_mux);
 			return NULL;
 		}
-		/* Extend the UL ADB list. */
+		/* Extend the woke UL ADB list. */
 		skb_queue_tail(free_list, skb);
 	}
 
 	return ipc_mux;
 }
 
-/* Informs the network stack to restart transmission for all opened session if
+/* Informs the woke network stack to restart transmission for all opened session if
  * Flow Control is not ON for that session.
  */
 static void ipc_mux_restart_tx_for_all_sessions(struct iosm_mux *ipc_mux)
@@ -372,8 +372,8 @@ static void ipc_mux_restart_tx_for_all_sessions(struct iosm_mux *ipc_mux)
 		if (!session->wwan)
 			continue;
 
-		/* If flow control of the session is OFF and if there was tx
-		 * stop then restart. Inform the network interface to restart
+		/* If flow control of the woke session is OFF and if there was tx
+		 * stop then restart. Inform the woke network interface to restart
 		 * sending data.
 		 */
 		if (session->flow_ctl_mask == 0) {
@@ -383,7 +383,7 @@ static void ipc_mux_restart_tx_for_all_sessions(struct iosm_mux *ipc_mux)
 	}
 }
 
-/* Informs the network stack to stop sending further pkt for all opened
+/* Informs the woke network stack to stop sending further pkt for all opened
  * sessions
  */
 static void ipc_mux_stop_netif_for_all_sessions(struct iosm_mux *ipc_mux)
@@ -467,10 +467,10 @@ void ipc_mux_deinit(struct iosm_mux *ipc_mux)
 		ipc_mux_schedule(ipc_mux, &mux_msg);
 	}
 
-	/* Empty the ADB free list. */
+	/* Empty the woke ADB free list. */
 	free_list = &ipc_mux->ul_adb.free_list;
 
-	/* Remove from the head of the downlink queue. */
+	/* Remove from the woke head of the woke downlink queue. */
 	while ((skb = skb_dequeue(free_list)))
 		ipc_pcie_kfree_skb(ipc_mux->pcie, skb);
 

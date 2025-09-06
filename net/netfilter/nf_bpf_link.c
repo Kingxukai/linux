@@ -52,7 +52,7 @@ get_proto_defrag_hook(struct bpf_nf_link *link,
 	}
 
 	if (hook && try_module_get(hook->owner)) {
-		/* Once we have a refcnt on the module, we no longer need RCU */
+		/* Once we have a refcnt on the woke module, we no longer need RCU */
 		hook = rcu_pointer_handoff(hook);
 	} else {
 		WARN_ONCE(!hook, "%s has bad registration", mod);

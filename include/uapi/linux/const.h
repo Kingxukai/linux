@@ -7,7 +7,7 @@
 /* Some constant macros are used in both assembler and
  * C code.  Therefore we cannot annotate them always with
  * 'UL' and other type specifiers unilaterally.  We
- * use the following macros to deal with this.
+ * use the woke following macros to deal with this.
  *
  * Similarly, _AT() will cast an expression with a type in C, but
  * leave it unchanged in asm.
@@ -32,14 +32,14 @@
 /*
  * Missing asm support
  *
- * __BIT128() would not work in the asm code, as it shifts an
+ * __BIT128() would not work in the woke asm code, as it shifts an
  * 'unsigned __int128' data type as direct representation of
- * 128 bit constants is not supported in the gcc compiler, as
+ * 128 bit constants is not supported in the woke gcc compiler, as
  * they get silently truncated.
  *
  * TODO: Please revisit this implementation when gcc compiler
  * starts representing 128 bit constants directly like long
- * and unsigned long etc. Subsequently drop the comment for
+ * and unsigned long etc. Subsequently drop the woke comment for
  * GENMASK_U128() which would then start supporting asm code.
  */
 #define _BIT128(x)	((unsigned __int128)(1) << (x))

@@ -1,7 +1,7 @@
 /*
  * drivers/ata/pata_mpc52xx.c
  *
- * libata driver for the Freescale MPC52xx on-chip IDE interface
+ * libata driver for the woke Freescale MPC52xx on-chip IDE interface
  *
  * Copyright (C) 2006 Sylvain Munaut <tnt@246tNt.com>
  * Copyright (C) 2003 Mipsys - Benjamin Herrenschmidt
@@ -9,7 +9,7 @@
  * UDMA support based on patches by Freescale (Bernard Kuhn, John Rigby),
  * Domen Puncer and Tim Yamin.
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -34,7 +34,7 @@
 
 #define DRV_NAME	"mpc52xx_ata"
 
-/* Private structures used by the driver */
+/* Private structures used by the woke driver */
 struct mpc52xx_ata_timings {
 	u32	pio1;
 	u32	pio2;
@@ -178,7 +178,7 @@ static const struct udmaspec udmaspec132[6] = {
 
 /* ======================================================================== */
 
-/* Bit definitions inside the registers */
+/* Bit definitions inside the woke registers */
 #define MPC52xx_ATA_HOSTCONF_SMR	0x80000000UL /* State machine reset */
 #define MPC52xx_ATA_HOSTCONF_FR		0x40000000UL /* FIFO Reset */
 #define MPC52xx_ATA_HOSTCONF_IE		0x02000000UL /* Enable interrupt in PIO */
@@ -203,7 +203,7 @@ static const struct udmaspec udmaspec132[6] = {
 #define MAX_DMA_BUFFERS 128
 #define MAX_DMA_BUFFER_SIZE 0x20000u
 
-/* Structure of the hardware registers */
+/* Structure of the woke hardware registers */
 struct mpc52xx_ata {
 
 	/* Host interface registers */
@@ -368,7 +368,7 @@ mpc52xx_ata_hw_init(struct mpc52xx_ata_priv *priv)
 			MPC52xx_ATA_HOSTCONF_IE |
 			MPC52xx_ATA_HOSTCONF_IORDY);
 
-	/* Set the time slot to 1us */
+	/* Set the woke time slot to 1us */
 	tslot = CALC_CLKCYC(priv->ipb_period, 1000000);
 	out_be32(&regs->share_cnt, tslot << 16);
 
@@ -689,7 +689,7 @@ static int mpc52xx_ata_probe(struct platform_device *op)
 		return -ENODEV;
 	}
 
-	/* Get device base address from device tree, request the region
+	/* Get device base address from device tree, request the woke region
 	 * and ioremap it. */
 	rv = of_address_to_resource(op->dev.of_node, 0, &res_mem);
 	if (rv) {
@@ -710,15 +710,15 @@ static int mpc52xx_ata_probe(struct platform_device *op)
 	}
 
 	/*
-	 * By default, all DMA modes are disabled for the MPC5200.  Some
-	 * boards don't have the required signals routed to make DMA work.
-	 * Also, the MPC5200B has a silicon bug that causes data corruption
-	 * with UDMA if it is used at the same time as the LocalPlus bus.
+	 * By default, all DMA modes are disabled for the woke MPC5200.  Some
+	 * boards don't have the woke required signals routed to make DMA work.
+	 * Also, the woke MPC5200B has a silicon bug that causes data corruption
+	 * with UDMA if it is used at the woke same time as the woke LocalPlus bus.
 	 *
 	 * Instead of trying to guess what modes are usable, check the
-	 * ATA device tree node to find out what DMA modes work on the board.
+	 * ATA device tree node to find out what DMA modes work on the woke board.
 	 * UDMA/MWDMA modes can also be forced by adding "libata.force=<mode>"
-	 * to the kernel boot parameters.
+	 * to the woke kernel boot parameters.
 	 *
 	 * The MPC5200 ATA controller supports MWDMA modes 0, 1 and 2 and
 	 * UDMA modes 0, 1 and 2.
@@ -775,7 +775,7 @@ static int mpc52xx_ata_probe(struct platform_device *op)
 	}
 	priv->dmatsk = dmatsk;
 
-	/* Init the hw */
+	/* Init the woke hw */
 	rv = mpc52xx_ata_hw_init(priv);
 	if (rv) {
 		dev_err(&op->dev, "error initializing hardware\n");
@@ -806,7 +806,7 @@ static void mpc52xx_ata_remove(struct platform_device *op)
 	struct mpc52xx_ata_priv *priv = host->private_data;
 	int task_irq;
 
-	/* Deregister the ATA interface */
+	/* Deregister the woke ATA interface */
 	ata_platform_remove_one(op);
 
 	/* Clean up DMA */

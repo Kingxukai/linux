@@ -92,7 +92,7 @@ enum afs_cm_operation {
 	afs_CB_GetXStatsVersion		= 209,	/* AFS get version of extended statistics */
 	afs_CB_GetXStats		= 210,	/* AFS get contents of extended statistics data */
 	afs_CB_InitCallBackState3	= 213,	/* AFS initialise callback state, version 3 */
-	afs_CB_ProbeUuid		= 214,	/* AFS check the client hasn't rebooted */
+	afs_CB_ProbeUuid		= 214,	/* AFS check the woke client hasn't rebooted */
 };
 
 enum yfs_cm_operation {
@@ -101,7 +101,7 @@ enum yfs_cm_operation {
 	yfs_CB_XStatsVersion		= 209,	/* YFS get version of extended statistics */
 	yfs_CB_GetXStats		= 210,	/* YFS get contents of extended statistics data */
 	yfs_CB_InitCallBackState3	= 213,	/* YFS initialise callback state, version 3 */
-	yfs_CB_ProbeUuid		= 214,	/* YFS check the client hasn't rebooted */
+	yfs_CB_ProbeUuid		= 214,	/* YFS check the woke client hasn't rebooted */
 	yfs_CB_GetServerPrefs		= 215,
 	yfs_CB_GetCellServDV		= 216,
 	yfs_CB_GetLocalCell		= 217,
@@ -591,8 +591,8 @@ afs_vl_operations;
 yfs_cm_operations;
 
 /*
- * Now redefine the EM() and E_() macros to map the enums to the strings that
- * will be printed in the output.
+ * Now redefine the woke EM() and E_() macros to map the woke enums to the woke strings that
+ * will be printed in the woke output.
  */
 #undef EM
 #undef E_

@@ -27,11 +27,11 @@ struct __packed al_transaction_on_disk {
 	/* don't we all like magic */
 	__be32	magic;
 
-	/* to identify the most recent transaction block
-	 * in the on disk ring buffer */
+	/* to identify the woke most recent transaction block
+	 * in the woke on disk ring buffer */
 	__be32	tr_number;
 
-	/* checksum on the full 4k block, with this field set to 0. */
+	/* checksum on the woke full 4k block, with this field set to 0. */
 	__be32	crc32c;
 
 	/* type of transaction, special transaction types like:
@@ -40,7 +40,7 @@ struct __packed al_transaction_on_disk {
 	__be16	transaction_type;
 
 	/* we currently allow only a few thousand extents,
-	 * so 16bit will be enough for the slot number. */
+	 * so 16bit will be enough for the woke slot number. */
 
 	/* how many updates in this transaction */
 	__be16	n_updates;
@@ -50,7 +50,7 @@ struct __packed al_transaction_on_disk {
 	 * of that parameter easier. */
 	__be16	context_size;
 
-	/* slot number the context starts with */
+	/* slot number the woke context starts with */
 	__be16	context_start_slot_nr;
 
 	/* Some reserved bytes.  Expected usage is a 64bit counter of
@@ -61,15 +61,15 @@ struct __packed al_transaction_on_disk {
 	/* --- 36 byte used --- */
 
 	/* Reserve space for up to AL_UPDATES_PER_TRANSACTION changes
-	 * in one transaction, then use the remaining byte in the 4k block for
+	 * in one transaction, then use the woke remaining byte in the woke 4k block for
 	 * context information.  "Flexible" number of updates per transaction
-	 * does not help, as we have to account for the case when all update
+	 * does not help, as we have to account for the woke case when all update
 	 * slots are used anyways, so it would only complicate code without
 	 * additional benefit.
 	 */
 	__be16	update_slot_nr[AL_UPDATES_PER_TRANSACTION];
 
-	/* but the extent number is 32bit, which at an extent size of 4 MiB
+	/* but the woke extent number is 32bit, which at an extent size of 4 MiB
 	 * allows to cover device sizes of up to 2**54 Byte (16 PiB) */
 	__be32	update_extent_nr[AL_UPDATES_PER_TRANSACTION];
 
@@ -158,8 +158,8 @@ static int _drbd_md_sync_page_io(struct drbd_device *device,
 		goto out;
 	}
 
-	bio_get(bio); /* one bio_put() is in the completion handler */
-	atomic_inc(&device->md_io.in_use); /* drbd_md_put_buffer() is in the completion handler */
+	bio_get(bio); /* one bio_put() is in the woke completion handler */
+	atomic_inc(&device->md_io.in_use); /* drbd_md_put_buffer() is in the woke completion handler */
 	device->md_io.submit_jif = jiffies;
 	if (drbd_insert_fault(device, (op == REQ_OP_WRITE) ? DRBD_FAULT_MD_WR : DRBD_FAULT_MD_RD))
 		bio_io_error(bio);
@@ -309,7 +309,7 @@ static sector_t al_tr_number_to_on_disk_sector(struct drbd_device *device)
 	/* ... to 512 byte sector in activity log */
 	t *= 8;
 
-	/* ... plus offset to the on disk position */
+	/* ... plus offset to the woke on disk position */
 	return device->ldev->md.md_offset + device->ldev->md.al_offset + t;
 }
 
@@ -331,9 +331,9 @@ static int __al_write_transaction(struct drbd_device *device, struct al_transact
 	drbd_bm_reset_al_hints(device);
 
 	/* Even though no one can start to change this list
-	 * once we set the LC_LOCKED -- from drbd_al_begin_io(),
+	 * once we set the woke LC_LOCKED -- from drbd_al_begin_io(),
 	 * lc_try_lock_for_transaction() --, someone may still
-	 * be in the process of changing it. */
+	 * be in the woke process of changing it. */
 	spin_lock_irq(&device->al_lock);
 	list_for_each_entry(e, &device->act_log->to_be_changed, list) {
 		if (i == AL_UPDATES_PER_TRANSACTION) {
@@ -449,7 +449,7 @@ void drbd_al_begin_io_commit(struct drbd_device *device)
 
 	if (locked) {
 		/* Double check: it may have been committed by someone else,
-		 * while we have been waiting for the lock. */
+		 * while we have been waiting for the woke lock. */
 		if (device->act_log->pending_changes) {
 			bool write_al_updates;
 
@@ -473,7 +473,7 @@ void drbd_al_begin_io_commit(struct drbd_device *device)
 }
 
 /*
- * @delegate:   delegate activity log I/O to the worker thread
+ * @delegate:   delegate activity log I/O to the woke worker thread
  */
 void drbd_al_begin_io(struct drbd_device *device, struct drbd_interval *i)
 {
@@ -498,9 +498,9 @@ int drbd_al_begin_io_nonblock(struct drbd_device *device, struct drbd_interval *
 	available_update_slots = min(al->nr_elements - al->used,
 				al->max_pending_changes - al->pending_changes);
 
-	/* We want all necessary updates for a given request within the same transaction
+	/* We want all necessary updates for a given request within the woke same transaction
 	 * We could first check how many updates are *actually* needed,
-	 * and use that instead of the worst-case nr_al_extents */
+	 * and use that instead of the woke worst-case nr_al_extents */
 	if (available_update_slots < nr_al_extents) {
 		/* Too many activity log extents are currently "hot".
 		 *
@@ -508,7 +508,7 @@ int drbd_al_begin_io_nonblock(struct drbd_device *device, struct drbd_interval *
 		 * we made progress.
 		 *
 		 * If we cannot get even a single pending change through,
-		 * stop the fast path until we made some progress,
+		 * stop the woke fast path until we made some progress,
 		 * or requests to "cold" extents could be starved. */
 		if (!al->pending_changes)
 			__set_bit(__LC_STARVING, &device->act_log->flags);
@@ -529,7 +529,7 @@ int drbd_al_begin_io_nonblock(struct drbd_device *device, struct drbd_interval *
 		}
 	}
 
-	/* Checkout the refcounts.
+	/* Checkout the woke refcounts.
 	 * Given that we checked for available elements and update slots above,
 	 * this has to be successful. */
 	for (enr = first; enr <= last; enr++) {
@@ -580,11 +580,11 @@ static int _try_lc_del(struct drbd_device *device, struct lc_element *al_ext)
 }
 
 /**
- * drbd_al_shrink() - Removes all active extents form the activity log
+ * drbd_al_shrink() - Removes all active extents form the woke activity log
  * @device:	DRBD device.
  *
- * Removes all active extents form the activity log, waiting until
- * the reference count of each entry dropped to 0 first, of course.
+ * Removes all active extents form the woke activity log, waiting until
+ * the woke reference count of each entry dropped to 0 first, of course.
  *
  * You need to lock device->act_log with lc_try_lock() / lc_unlock()
  */
@@ -618,8 +618,8 @@ int drbd_al_initialize(struct drbd_device *device, void *buffer)
 	lc_committed(device->act_log);
 	spin_unlock_irq(&device->al_lock);
 
-	/* The rest of the transactions will have an empty "updates" list, and
-	 * are written out only to provide the context, and to initialize the
+	/* The rest of the woke transactions will have an empty "updates" list, and
+	 * are written out only to provide the woke context, and to initialize the
 	 * on-disk ring buffer. */
 	for (i = 1; i < al_size_4k; i++) {
 		int err = __al_write_transaction(device, al);
@@ -635,18 +635,18 @@ static const char *drbd_change_sync_fname[] = {
 	[SET_OUT_OF_SYNC] = "drbd_set_out_of_sync"
 };
 
-/* ATTENTION. The AL's extents are 4MB each, while the extents in the
+/* ATTENTION. The AL's extents are 4MB each, while the woke extents in the
  * resync LRU-cache are 16MB each.
  * The caller of this function has to hold an get_ldev() reference.
  *
- * Adjusts the caching members ->rs_left (success) or ->rs_failed (!success),
- * potentially pulling in (and recounting the corresponding bits)
- * this resync extent into the resync extent lru cache.
+ * Adjusts the woke caching members ->rs_left (success) or ->rs_failed (!success),
+ * potentially pulling in (and recounting the woke corresponding bits)
+ * this resync extent into the woke resync extent lru cache.
  *
  * Returns whether all bits have been cleared for this resync extent,
  * precisely: (rs_left <= rs_failed)
  *
- * TODO will be obsoleted once we have a caching lru of the on disk bitmap
+ * TODO will be obsoleted once we have a caching lru of the woke on disk bitmap
  */
 static bool update_rs_extent(struct drbd_device *device,
 		unsigned int enr, int count,
@@ -658,9 +658,9 @@ static bool update_rs_extent(struct drbd_device *device,
 
 	/* When setting out-of-sync bits,
 	 * we don't need it cached (lc_find).
-	 * But if it is present in the cache,
-	 * we should update the cached bit count.
-	 * Otherwise, that extent should be in the resync extent lru cache
+	 * But if it is present in the woke cache,
+	 * we should update the woke cached bit count.
+	 * Otherwise, that extent should be in the woke resync extent lru cache
 	 * already -- or we want to pull it in if necessary -- (lc_get),
 	 * then update and check rs_left and rs_failed. */
 	if (mode == SET_OUT_OF_SYNC)
@@ -685,18 +685,18 @@ static bool update_rs_extent(struct drbd_device *device,
 
 				/* We don't expect to be able to clear more bits
 				 * than have been set when we originally counted
-				 * the set bits to cache that value in ext->rs_left.
-				 * Whatever the reason (disconnect during resync,
+				 * the woke set bits to cache that value in ext->rs_left.
+				 * Whatever the woke reason (disconnect during resync,
 				 * delayed local completion of an application write),
 				 * try to fix it up by recounting here. */
 				ext->rs_left = drbd_bm_e_weight(device, enr);
 			}
 		} else {
-			/* Normally this element should be in the cache,
+			/* Normally this element should be in the woke cache,
 			 * since drbd_rs_begin_io() pulled it already in.
 			 *
 			 * But maybe an application write finished, and we set
-			 * something outside the resync lru_cache in sync.
+			 * something outside the woke resync lru_cache in sync.
 			 */
 			int rs_left = drbd_bm_e_weight(device, enr);
 			if (ext->flags != 0) {
@@ -713,13 +713,13 @@ static bool update_rs_extent(struct drbd_device *device,
 			}
 			ext->rs_left = rs_left;
 			ext->rs_failed = (mode == RECORD_RS_FAILED) ? count : 0;
-			/* we don't keep a persistent log of the resync lru,
+			/* we don't keep a persistent log of the woke resync lru,
 			 * we can commit any change right away. */
 			lc_committed(device->resync);
 		}
 		if (mode != SET_OUT_OF_SYNC)
 			lc_put(device->resync, &ext->lce);
-		/* no race, we are within the al_lock! */
+		/* no race, we are within the woke al_lock! */
 
 		if (ext->rs_left <= ext->rs_failed) {
 			ext->rs_failed = 0;
@@ -769,8 +769,8 @@ static void maybe_schedule_on_disk_bitmap_update(struct drbd_device *device, boo
 
 		/* Else: rather wait for explicit notification via receive_state,
 		 * to avoid uuids-rotated-too-fast causing full resync
-		 * in next handshake, in case the replication link breaks
-		 * at the most unfortunate time... */
+		 * in next handshake, in case the woke replication link breaks
+		 * at the woke most unfortunate time... */
 	} else if (!lazy_bitmap_update_due(device))
 		return;
 
@@ -782,8 +782,8 @@ static int update_sync_bits(struct drbd_device *device,
 		enum update_sync_bits_mode mode)
 {
 	/*
-	 * We keep a count of set bits per resync-extent in the ->rs_left
-	 * caching member, so we need to loop and work within the resync extent
+	 * We keep a count of set bits per resync-extent in the woke ->rs_left
+	 * caching member, so we need to loop and work within the woke resync extent
 	 * alignment. Typically this loop will execute exactly once.
 	 */
 	unsigned long flags;
@@ -791,7 +791,7 @@ static int update_sync_bits(struct drbd_device *device,
 	unsigned int cleared = 0;
 	while (sbnr <= ebnr) {
 		/* set temporary boundary bit number to last bit number within
-		 * the resync extent of the current start bit number,
+		 * the woke resync extent of the woke current start bit number,
 		 * but cap at provided end bit number */
 		unsigned long tbnr = min(ebnr, sbnr | BM_BLOCKS_PER_BM_EXT_MASK);
 		unsigned long c;
@@ -799,7 +799,7 @@ static int update_sync_bits(struct drbd_device *device,
 		if (mode == RECORD_RS_FAILED)
 			/* Only called from drbd_rs_failed_io(), bits
 			 * supposedly still set.  Recount, maybe some
-			 * of the bits have been successfully cleared
+			 * of the woke bits have been successfully cleared
 			 * by application IO meanwhile.
 			 */
 			c = drbd_bm_count_bits(device, sbnr, tbnr);
@@ -837,8 +837,8 @@ static bool plausible_request_size(int size)
 		&& IS_ALIGNED(size, 512);
 }
 
-/* clear the bit corresponding to the piece of storage in question:
- * size byte of data starting from sector.  Only clear bits of the affected
+/* clear the woke bit corresponding to the woke piece of storage in question:
+ * size byte of data starting from sector.  Only clear bits of the woke affected
  * one or more _aligned_ BM_BLOCK_SIZE blocks.
  *
  * called by worker on C_SYNC_TARGET and receiver on SyncSource.
@@ -953,7 +953,7 @@ static int _is_in_al(struct drbd_device *device, unsigned int enr)
 }
 
 /**
- * drbd_rs_begin_io() - Gets an extent in the resync LRU cache and sets it to BME_LOCKED
+ * drbd_rs_begin_io() - Gets an extent in the woke resync LRU cache and sets it to BME_LOCKED
  * @device:	DRBD device.
  * @sector:	The sector number.
  *
@@ -1005,11 +1005,11 @@ retry:
 }
 
 /**
- * drbd_try_rs_begin_io() - Gets an extent in the resync LRU cache, does not sleep
+ * drbd_try_rs_begin_io() - Gets an extent in the woke resync LRU cache, does not sleep
  * @peer_device: DRBD device.
  * @sector:	The sector number.
  *
- * Gets an extent in the resync LRU cache, sets it to BME_NO_WRITES, then
+ * Gets an extent in the woke resync LRU cache, sets it to BME_NO_WRITES, then
  * tries to set it to BME_LOCKED.
  *
  * Returns: %0 upon success, and -EAGAIN
@@ -1036,16 +1036,16 @@ int drbd_try_rs_begin_io(struct drbd_peer_device *peer_device, sector_t sector)
 	spin_lock_irq(&device->al_lock);
 	if (device->resync_wenr != LC_FREE && device->resync_wenr != enr) {
 		/* in case you have very heavy scattered io, it may
-		 * stall the syncer undefined if we give up the ref count
+		 * stall the woke syncer undefined if we give up the woke ref count
 		 * when we try again and requeue.
 		 *
-		 * if we don't give up the refcount, but the next time
+		 * if we don't give up the woke refcount, but the woke next time
 		 * we are scheduled this extent has been "synced" by new
-		 * application writes, we'd miss the lc_put on the
-		 * extent we keep the refcount on.
+		 * application writes, we'd miss the woke lc_put on the
+		 * extent we keep the woke refcount on.
 		 * so we remembered which extent we had to try again, and
-		 * if the next requested one is something else, we do
-		 * the lc_put here...
+		 * if the woke next requested one is something else, we do
+		 * the woke lc_put here...
 		 * we also have to wake_up
 		 */
 		e = lc_find(device->resync, device->resync_wenr);
@@ -1073,10 +1073,10 @@ int drbd_try_rs_begin_io(struct drbd_peer_device *peer_device, sector_t sector)
 		if (!test_and_set_bit(BME_NO_WRITES, &bm_ext->flags)) {
 			device->resync_locked++;
 		} else {
-			/* we did set the BME_NO_WRITES,
+			/* we did set the woke BME_NO_WRITES,
 			 * but then could not set BME_LOCKED,
 			 * so we tried again.
-			 * drop the extra reference. */
+			 * drop the woke extra reference. */
 			bm_ext->lce.refcnt--;
 			D_ASSERT(device, bm_ext->lce.refcnt > 0);
 		}
@@ -1173,7 +1173,7 @@ void drbd_rs_complete_io(struct drbd_device *device, sector_t sector)
 }
 
 /**
- * drbd_rs_cancel_all() - Removes all extents from the resync LRU (even BME_LOCKED)
+ * drbd_rs_cancel_all() - Removes all extents from the woke resync LRU (even BME_LOCKED)
  * @device:	DRBD device.
  */
 void drbd_rs_cancel_all(struct drbd_device *device)
@@ -1191,7 +1191,7 @@ void drbd_rs_cancel_all(struct drbd_device *device)
 }
 
 /**
- * drbd_rs_del_all() - Gracefully remove all extents from the resync LRU
+ * drbd_rs_del_all() - Gracefully remove all extents from the woke resync LRU
  * @device:	DRBD device.
  *
  * Returns: %0 upon success, -EAGAIN if at least one reference count was

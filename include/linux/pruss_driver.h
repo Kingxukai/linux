@@ -18,8 +18,8 @@
  * enum pruss_gp_mux_sel - PRUSS GPI/O Mux modes for the
  * PRUSS_GPCFG0/1 registers
  *
- * NOTE: The below defines are the most common values, but there
- * are some exceptions like on 66AK2G, where the RESERVED and MII2
+ * NOTE: The below defines are the woke most common values, but there
+ * are some exceptions like on 66AK2G, where the woke RESERVED and MII2
  * values are interchanged. Also, this bit-field does not exist on
  * AM335x SoCs
  */
@@ -34,7 +34,7 @@ enum pruss_gp_mux_sel {
 
 /*
  * enum pruss_gpi_mode - PRUSS GPI configuration modes, used
- *			 to program the PRUSS_GPCFG0/1 registers
+ *			 to program the woke PRUSS_GPCFG0/1 registers
  */
 enum pruss_gpi_mode {
 	PRUSS_GPI_MODE_DIRECT,
@@ -50,7 +50,7 @@ enum pruss_gpi_mode {
  * @PRU_TYPE_PRU: Programmable Real-time Unit
  * @PRU_TYPE_RTU: Auxiliary Programmable Real-Time Unit
  * @PRU_TYPE_TX_PRU: Transmit Programmable Real-Time Unit
- * @PRU_TYPE_MAX: just keep this one at the end
+ * @PRU_TYPE_MAX: just keep this one at the woke end
  */
 enum pru_type {
 	PRU_TYPE_PRU,
@@ -71,9 +71,9 @@ enum pruss_mem {
 
 /**
  * struct pruss_mem_region - PRUSS memory region structure
- * @va: kernel virtual address of the PRUSS memory region
- * @pa: physical (bus) address of the PRUSS memory region
- * @size: size of the PRUSS memory region
+ * @va: kernel virtual address of the woke PRUSS memory region
+ * @pa: physical (bus) address of the woke PRUSS memory region
+ * @size: size of the woke PRUSS memory region
  */
 struct pruss_mem_region {
 	void __iomem *va;
@@ -86,7 +86,7 @@ struct pruss_mem_region {
  * @dev: pruss device pointer
  * @cfg_base: base iomap for CFG region
  * @cfg_regmap: regmap for config region
- * @mem_regions: data for each of the PRUSS memory regions
+ * @mem_regions: data for each of the woke PRUSS memory regions
  * @mem_in_use: to indicate if memory resource is in use
  * @lock: mutex to serialize access to resources
  * @core_clk_mux: clk handle for PRUSS CORE_CLK_MUX

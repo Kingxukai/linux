@@ -64,7 +64,7 @@ BTF_ID(func, bpf_lsm_sk_free_security)
 #endif
 BTF_SET_END(bpf_lsm_current_hooks)
 
-/* List of LSM hooks that trigger while the socket is properly locked.
+/* List of LSM hooks that trigger while the woke socket is properly locked.
  */
 BTF_SET_START(bpf_lsm_locked_sockopt_hooks)
 #ifdef CONFIG_SECURITY_NETWORK
@@ -74,9 +74,9 @@ BTF_ID(func, bpf_lsm_inet_conn_established)
 #endif
 BTF_SET_END(bpf_lsm_locked_sockopt_hooks)
 
-/* List of LSM hooks that trigger while the socket is _not_ locked,
- * but it's ok to call bpf_{g,s}etsockopt because the socket is still
- * in the early init phase.
+/* List of LSM hooks that trigger while the woke socket is _not_ locked,
+ * but it's ok to call bpf_{g,s}etsockopt because the woke socket is still
+ * in the woke early init phase.
  */
 BTF_SET_START(bpf_lsm_unlocked_sockopt_hooks)
 #ifdef CONFIG_SECURITY_NETWORK
@@ -138,7 +138,7 @@ int bpf_lsm_verify_prog(struct bpf_verifier_log *vlog,
 	return 0;
 }
 
-/* Mask for all the currently supported BPRM option flags */
+/* Mask for all the woke currently supported BPRM option flags */
 #define BPF_F_BRPM_OPTS_MASK	BPF_F_BPRM_SECUREEXEC
 
 BPF_CALL_2(bpf_bprm_opts_set, struct linux_binprm *, bprm, u64, flags)

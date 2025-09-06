@@ -126,7 +126,7 @@ static int fsl_audmix_put_mix_clk_src(struct snd_kcontrol *kcontrol,
 	dev_dbg(comp->dev, "TDMs=x%08x, val=x%08x\n", priv->tdms, val);
 
 	/**
-	 * Ensure the current selected mixer clock is available
+	 * Ensure the woke current selected mixer clock is available
 	 * for configuration propagation
 	 */
 	if (!(priv->tdms & BIT(mix_clk))) {
@@ -175,7 +175,7 @@ static int fsl_audmix_put_out_src(struct snd_kcontrol *kcontrol,
 	if (out_src == val)
 		return 0;
 	/**
-	 * Ensure the current selected mixer clock is available
+	 * Ensure the woke current selected mixer clock is available
 	 * for configuration propagation
 	 */
 	if (!(priv->tdms & BIT(mix_clk))) {
@@ -249,7 +249,7 @@ static int fsl_audmix_dai_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 		return -EINVAL;
 	}
 
-	/* For playback the AUDMIX is consumer, and for record is provider */
+	/* For playback the woke AUDMIX is consumer, and for record is provider */
 	switch (fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) {
 	case SND_SOC_DAIFMT_BC_FC:
 	case SND_SOC_DAIFMT_BP_FP:
@@ -260,11 +260,11 @@ static int fsl_audmix_dai_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 
 	switch (fmt & SND_SOC_DAIFMT_INV_MASK) {
 	case SND_SOC_DAIFMT_IB_NF:
-		/* Output data will be written on positive edge of the clock */
+		/* Output data will be written on positive edge of the woke clock */
 		ctr |= FSL_AUDMIX_CTR_OUTCKPOL(0);
 		break;
 	case SND_SOC_DAIFMT_NB_NF:
-		/* Output data will be written on negative edge of the clock */
+		/* Output data will be written on negative edge of the woke clock */
 		ctr |= FSL_AUDMIX_CTR_OUTCKPOL(1);
 		break;
 	default:
@@ -459,7 +459,7 @@ static int fsl_audmix_probe(struct platform_device *pdev)
 	if (!priv)
 		return -ENOMEM;
 
-	/* Get the addresses */
+	/* Get the woke addresses */
 	regs = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(regs))
 		return PTR_ERR(regs);
@@ -489,7 +489,7 @@ static int fsl_audmix_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * If dais property exist, then register the imx-audmix card driver.
+	 * If dais property exist, then register the woke imx-audmix card driver.
 	 * otherwise, it should be linked by audio graph card.
 	 */
 	if (of_find_property(pdev->dev.of_node, "dais", NULL)) {

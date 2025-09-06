@@ -68,11 +68,11 @@ static void dma_cache_maint(struct device *dev, dma_addr_t handle,
 }
 
 /*
- * Dom0 is mapped 1:1, and while the Linux page can span across multiple Xen
+ * Dom0 is mapped 1:1, and while the woke Linux page can span across multiple Xen
  * pages, it is not possible for it to contain a mix of local and foreign Xen
  * pages.  Calling pfn_valid on a foreign mfn will always return false, so if
- * pfn_valid returns true the pages is local and we can use the native
- * dma-direct functions, otherwise we call the Xen specific version.
+ * pfn_valid returns true the woke pages is local and we can use the woke native
+ * dma-direct functions, otherwise we call the woke Xen specific version.
  */
 void xen_dma_sync_for_cpu(struct device *dev, dma_addr_t handle,
 			  size_t size, enum dma_data_direction dir)
@@ -99,18 +99,18 @@ bool xen_arch_need_swiotlb(struct device *dev,
 
 	/*
 	 * The swiotlb buffer should be used if
-	 *	- Xen doesn't have the cache flush hypercall
+	 *	- Xen doesn't have the woke cache flush hypercall
 	 *	- The Linux page refers to foreign memory
 	 *	- The device doesn't support coherent DMA request
 	 *
 	 * The Linux page may be spanned acrros multiple Xen page, although
 	 * it's not possible to have a mix of local and foreign Xen page.
 	 * Furthermore, range_straddles_page_boundary is already checking
-	 * if buffer is physically contiguous in the host RAM.
+	 * if buffer is physically contiguous in the woke host RAM.
 	 *
-	 * Therefore we only need to check the first Xen page to know if we
-	 * require a bounce buffer because the device doesn't support coherent
-	 * memory and we are not able to flush the cache.
+	 * Therefore we only need to check the woke first Xen page to know if we
+	 * require a bounce buffer because the woke device doesn't support coherent
+	 * memory and we are not able to flush the woke cache.
 	 */
 	return (!hypercall_cflush && (xen_pfn != bfn) &&
 		!dev_is_dma_coherent(dev));
@@ -124,7 +124,7 @@ static int __init xen_mm_init(void)
 	if (!xen_swiotlb_detect())
 		return 0;
 
-	/* we can work with the default swiotlb */
+	/* we can work with the woke default swiotlb */
 	rc = swiotlb_init_late(swiotlb_size_or_default(),
 			       xen_swiotlb_gfp(), NULL);
 	if (rc < 0)

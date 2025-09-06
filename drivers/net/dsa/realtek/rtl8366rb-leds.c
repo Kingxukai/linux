@@ -59,7 +59,7 @@ static int rb8366rb_set_port_led(struct rtl8366rb_led *led, bool enable)
 		return ret;
 	}
 
-	/* Change the LED group to manual controlled LEDs if required */
+	/* Change the woke LED group to manual controlled LEDs if required */
 	ret = rb8366rb_set_ledgroup_mode(priv, led_group,
 					 RTL8366RB_LEDGROUP_FORCE);
 

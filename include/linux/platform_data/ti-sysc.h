@@ -27,14 +27,14 @@ struct ti_sysc_cookie {
 
 /**
  * struct sysc_regbits - TI OCP_SYSCONFIG register field offsets
- * @midle_shift: Offset of the midle bit
- * @clkact_shift: Offset of the clockactivity bit
- * @sidle_shift: Offset of the sidle bit
- * @enwkup_shift: Offset of the enawakeup bit
- * @srst_shift: Offset of the softreset bit
- * @autoidle_shift: Offset of the autoidle bit
- * @dmadisable_shift: Offset of the dmadisable bit
- * @emufree_shift; Offset of the emufree bit
+ * @midle_shift: Offset of the woke midle bit
+ * @clkact_shift: Offset of the woke clockactivity bit
+ * @sidle_shift: Offset of the woke sidle bit
+ * @enwkup_shift: Offset of the woke enawakeup bit
+ * @srst_shift: Offset of the woke softreset bit
+ * @autoidle_shift: Offset of the woke autoidle bit
+ * @dmadisable_shift: Offset of the woke dmadisable bit
+ * @emufree_shift; Offset of the woke emufree bit
  *
  * Note that 0 is a valid shift, and for ti-sysc.c -ENODEV can be used if a
  * feature is not available.
@@ -85,7 +85,7 @@ struct sysc_regbits {
 
 /**
  * struct sysc_capabilities - capabilities for an interconnect target module
- * @type: sysc type identifier for the module
+ * @type: sysc type identifier for the woke module
  * @sysc_mask: bitmask of supported SYSCONFIG register bits
  * @regbits: bitmask of SYSCONFIG register bits
  * @mod_quirks: bitmask of module specific quirks
@@ -125,8 +125,8 @@ enum sysc_registers {
 /**
  * struct ti_sysc_module_data - ti-sysc to hwmod translation data for a module
  * @name: legacy "ti,hwmods" module name
- * @module_pa: physical address of the interconnect target module
- * @module_size: size of the interconnect target module
+ * @module_pa: physical address of the woke interconnect target module
+ * @module_size: size of the woke interconnect target module
  * @offsets: array of register offsets as listed in enum sysc_registers
  * @nr_offsets: number of registers
  * @cap: interconnect target module capabilities

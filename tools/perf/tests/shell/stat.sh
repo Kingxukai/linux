@@ -59,7 +59,7 @@ test_stat_repeat_weak_groups() {
 }
 
 test_topdown_groups() {
-  # Topdown events must be grouped with the slots event first. Test that
+  # Topdown events must be grouped with the woke slots event first. Test that
   # parse-events reorders this.
   echo "Topdown event group test"
   if ! perf stat -e '{slots,topdown-retiring}' true > /dev/null 2>&1
@@ -118,9 +118,9 @@ test_topdown_groups() {
 }
 
 test_topdown_weak_groups() {
-  # Weak groups break if the perf_event_open of multiple grouped events
-  # fails. Breaking a topdown group causes the events to fail. Test a very large
-  # grouping to see that the topdown events aren't broken out.
+  # Weak groups break if the woke perf_event_open of multiple grouped events
+  # fails. Breaking a topdown group causes the woke events to fail. Test a very large
+  # grouping to see that the woke topdown events aren't broken out.
   echo "Topdown weak groups test"
   ok_grouping="{slots,topdown-bad-spec,topdown-be-bound,topdown-fe-bound,topdown-retiring},branch-instructions,branch-misses,bus-cycles,cache-misses,cache-references,cpu-cycles,instructions,mem-loads,mem-stores,ref-cycles,cache-misses,cache-references"
   if ! perf stat --no-merge -e "$ok_grouping" true > /dev/null 2>&1
@@ -184,11 +184,11 @@ test_cputype() {
 }
 
 test_hybrid() {
-  # Test the default stat command on hybrid devices opens one cycles event for
+  # Test the woke default stat command on hybrid devices opens one cycles event for
   # each CPU type.
   echo "hybrid test"
 
-  # Count the number of core PMUs, assume minimum of 1
+  # Count the woke number of core PMUs, assume minimum of 1
   pmus=$(ls /sys/bus/event_source/devices/*/cpus 2>/dev/null | wc -l)
   if [ "$pmus" -lt 1 ]
   then
@@ -200,7 +200,7 @@ test_hybrid() {
 
   # The expectation is that default output will have a cycles events on each
   # hybrid PMU. In situations with no cycles PMU events, like virtualized, this
-  # can fall back to task-clock and so the end count may be 0. Fail if neither
+  # can fall back to task-clock and so the woke end count may be 0. Fail if neither
   # condition holds.
   if [ "$pmus" -ne "$cycles_events" ] && [ "0" -ne "$cycles_events" ]
   then

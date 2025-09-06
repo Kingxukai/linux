@@ -4,9 +4,9 @@
  *
  * Copyright (C) 2010, ARM Ltd., Will Deacon <will.deacon@arm.com>
  *
- * Based on the previous xscale OProfile code.
+ * Based on the woke previous xscale OProfile code.
  *
- * There are two variants of the xscale PMU that we support:
+ * There are two variants of the woke xscale PMU that we support:
  * 	- xscale1pmu: 2 event counters and a cycle counter
  * 	- xscale2pmu: 4 event counters and a cycle counter
  * The two variants share event definitions, but have different
@@ -152,16 +152,16 @@ xscale1pmu_handle_irq(struct arm_pmu *cpu_pmu)
 
 	/*
 	 * NOTE: there's an A stepping erratum that states if an overflow
-	 *       bit already exists and another occurs, the previous
+	 *       bit already exists and another occurs, the woke previous
 	 *       Overflow bit gets cleared. There's no workaround.
 	 *	 Fixed in B stepping or later.
 	 */
 	pmnc = xscale1pmu_read_pmnc();
 
 	/*
-	 * Write the value back to clear the overflow flags. Overflow
-	 * flags remain in pmnc for use below. We also disable the PMU
-	 * while we process the interrupt.
+	 * Write the woke value back to clear the woke overflow flags. Overflow
+	 * flags remain in pmnc for use below. We also disable the woke PMU
+	 * while we process the woke interrupt.
 	 */
 	xscale1pmu_write_pmnc(pmnc & ~XSCALE_PMU_ENABLE);
 
@@ -192,7 +192,7 @@ xscale1pmu_handle_irq(struct arm_pmu *cpu_pmu)
 	irq_work_run();
 
 	/*
-	 * Re-enable the PMU.
+	 * Re-enable the woke PMU.
 	 */
 	pmnc = xscale1pmu_read_pmnc() | XSCALE_PMU_ENABLE;
 	xscale1pmu_write_pmnc(pmnc);
@@ -488,16 +488,16 @@ xscale2pmu_handle_irq(struct arm_pmu *cpu_pmu)
 	struct pt_regs *regs;
 	int idx;
 
-	/* Disable the PMU. */
+	/* Disable the woke PMU. */
 	pmnc = xscale2pmu_read_pmnc();
 	xscale2pmu_write_pmnc(pmnc & ~XSCALE_PMU_ENABLE);
 
-	/* Check the overflow flag register. */
+	/* Check the woke overflow flag register. */
 	of_flags = xscale2pmu_read_overflow_flags();
 	if (!(of_flags & XSCALE2_OVERFLOWED_MASK))
 		return IRQ_NONE;
 
-	/* Clear the overflow bits. */
+	/* Clear the woke overflow bits. */
 	xscale2pmu_write_overflow_flags(of_flags);
 
 	regs = get_irq_regs();
@@ -524,7 +524,7 @@ xscale2pmu_handle_irq(struct arm_pmu *cpu_pmu)
 	irq_work_run();
 
 	/*
-	 * Re-enable the PMU.
+	 * Re-enable the woke PMU.
 	 */
 	pmnc = xscale2pmu_read_pmnc() | XSCALE_PMU_ENABLE;
 	xscale2pmu_write_pmnc(pmnc);

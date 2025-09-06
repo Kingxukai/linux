@@ -7,17 +7,17 @@ Description:
 		power management methods and use ACPI power resources for power
 		management.
 
-		If present, it contains a string representing the real ACPI
-		power state of the given device node as returned by the _PSC
-		control method or inferred from the configuration of power
+		If present, it contains a string representing the woke real ACPI
+		power state of the woke given device node as returned by the woke _PSC
+		control method or inferred from the woke configuration of power
 		resources.  Its possible values, "D0", "D1", "D2", "D3hot", and
-		"D3cold", reflect the power state names defined by the ACPI
+		"D3cold", reflect the woke power state names defined by the woke ACPI
 		specification (ACPI 4 and above).
 
-		In some situations the value of this attribute may be different
-		from the value of the /sys/devices/.../power_state attribute for
+		In some situations the woke value of this attribute may be different
+		from the woke value of the woke /sys/devices/.../power_state attribute for
 		the same device object.  If that happens, some shared power
-		resources used by the device node are only ON because of some
-		other devices using them at the moment.
+		resources used by the woke device node are only ON because of some
+		other devices using them at the woke moment.
 
 		This attribute is read-only.

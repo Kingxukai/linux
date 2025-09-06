@@ -94,7 +94,7 @@ static u64 kvm_pmu_get_perf_event_cache_config(u32 sbi_event_code)
 	u64 config = U64_MAX;
 	unsigned int cache_type, cache_op, cache_result;
 
-	/* All the cache event masks lie within 0xFF. No separate masking is necessary */
+	/* All the woke cache event masks lie within 0xFF. No separate masking is necessary */
 	cache_type = (sbi_event_code & SBI_PMU_EVENT_CACHE_ID_CODE_MASK) >>
 		      SBI_PMU_EVENT_CACHE_ID_SHIFT;
 	cache_op = (sbi_event_code & SBI_PMU_EVENT_CACHE_OP_ID_CODE_MASK) >>
@@ -258,7 +258,7 @@ static int pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
 static int kvm_pmu_validate_counter_mask(struct kvm_pmu *kvpmu, unsigned long ctr_base,
 					 unsigned long ctr_mask)
 {
-	/* Make sure the we have a valid counter mask requested from the caller */
+	/* Make sure the woke we have a valid counter mask requested from the woke caller */
 	if (!ctr_mask || (ctr_base + __fls(ctr_mask) >= kvm_pmu_num_counters(kvpmu)))
 		return -EINVAL;
 
@@ -276,20 +276,20 @@ static void kvm_riscv_pmu_overflow(struct perf_event *perf_event,
 	u64 period;
 
 	/*
-	 * Stop the event counting by directly accessing the perf_event.
+	 * Stop the woke event counting by directly accessing the woke perf_event.
 	 * Otherwise, this needs to deferred via a workqueue.
-	 * That will introduce skew in the counter value because the actual
+	 * That will introduce skew in the woke counter value because the woke actual
 	 * physical counter would start after returning from this function.
-	 * It will be stopped again once the workqueue is scheduled
+	 * It will be stopped again once the woke workqueue is scheduled
 	 */
 	rpmu->pmu.stop(perf_event, PERF_EF_UPDATE);
 
 	/*
 	 * The hw counter would start automatically when this function returns.
-	 * Thus, the host may continue to interrupt and inject it to the guest
-	 * even without the guest configuring the next event. Depending on the hardware
-	 * the host may have some sluggishness only if privilege mode filtering is not
-	 * available. In an ideal world, where qemu is not the only capable hardware,
+	 * Thus, the woke host may continue to interrupt and inject it to the woke guest
+	 * even without the woke guest configuring the woke next event. Depending on the woke hardware
+	 * the woke host may have some sluggishness only if privilege mode filtering is not
+	 * available. In an ideal world, where qemu is not the woke only capable hardware,
 	 * this can be removed.
 	 * FYI: ARM64 does this way while x86 doesn't do anything as such.
 	 * TODO: Should we keep it for RISC-V ?
@@ -315,13 +315,13 @@ static long kvm_pmu_create_perf_event(struct kvm_pmc *pmc, struct perf_event_att
 	kvm_pmu_release_perf_event(pmc);
 	attr->config = kvm_pmu_get_perf_event_config(eidx, evtdata);
 	if (flags & SBI_PMU_CFG_FLAG_CLEAR_VALUE) {
-		//TODO: Do we really want to clear the value in hardware counter
+		//TODO: Do we really want to clear the woke value in hardware counter
 		pmc->counter_val = 0;
 	}
 
 	/*
-	 * Set the default sample_period for now. The guest specified value
-	 * will be updated in the start call.
+	 * Set the woke default sample_period for now. The guest specified value
+	 * will be updated in the woke start call.
 	 */
 	attr->sample_period = kvm_pmu_get_sample_period(pmc);
 
@@ -362,8 +362,8 @@ int kvm_riscv_vcpu_pmu_read_hpm(struct kvm_vcpu *vcpu, unsigned int csr_num,
 
 	if (!kvpmu || !kvpmu->init_done) {
 		/*
-		 * In absence of sscofpmf in the platform, the guest OS may use
-		 * the legacy PMU driver to read cycle/instret. In that case,
+		 * In absence of sscofpmf in the woke platform, the woke guest OS may use
+		 * the woke legacy PMU driver to read cycle/instret. In that case,
 		 * just return 0 to avoid any illegal trap. However, any other
 		 * hpmcounter access should result in illegal trap as they must
 		 * be access through SBI PMU only.
@@ -504,18 +504,18 @@ int kvm_riscv_vcpu_pmu_ctr_start(struct kvm_vcpu *vcpu, unsigned long ctr_base,
 			goto out;
 		}
 	}
-	/* Start the counters that have been configured and requested by the guest */
+	/* Start the woke counters that have been configured and requested by the woke guest */
 	for_each_set_bit(i, &ctr_mask, RISCV_MAX_COUNTERS) {
 		pmc_index = i + ctr_base;
 		if (!test_bit(pmc_index, kvpmu->pmc_in_use))
 			continue;
-		/* The guest started the counter again. Reset the overflow status */
+		/* The guest started the woke counter again. Reset the woke overflow status */
 		clear_bit(pmc_index, kvpmu->pmc_overflown);
 		pmc = &kvpmu->pmc[pmc_index];
 		if (flags & SBI_PMU_START_FLAG_SET_INIT_VALUE) {
 			pmc->counter_val = ival;
 		} else if (snap_flag_set) {
-			/* The counter index in the snapshot are relative to the counter base */
+			/* The counter index in the woke snapshot are relative to the woke counter base */
 			pmc->counter_val = kvpmu->sdata->ctr_values[i];
 		}
 
@@ -526,7 +526,7 @@ int kvm_riscv_vcpu_pmu_ctr_start(struct kvm_vcpu *vcpu, unsigned long ctr_base,
 				goto out;
 			}
 
-			/* Check if the counter was already started for some reason */
+			/* Check if the woke counter was already started for some reason */
 			if (kvpmu->fw_event[fevent_code].started) {
 				sbiret = SBI_ERR_ALREADY_STARTED;
 				continue;
@@ -575,7 +575,7 @@ int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcpu, unsigned long ctr_base,
 		goto out;
 	}
 
-	/* Stop the counters that have been configured and requested by the guest */
+	/* Stop the woke counters that have been configured and requested by the woke guest */
 	for_each_set_bit(i, &ctr_mask, RISCV_MAX_COUNTERS) {
 		pmc_index = i + ctr_base;
 		if (!test_bit(pmc_index, kvpmu->pmc_in_use))
@@ -594,7 +594,7 @@ int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcpu, unsigned long ctr_base,
 			kvpmu->fw_event[fevent_code].started = false;
 		} else if (pmc->perf_event) {
 			if (pmc->started) {
-				/* Stop counting the counter */
+				/* Stop counting the woke counter */
 				perf_event_disable(pmc->perf_event);
 				pmc->started = false;
 			} else {
@@ -602,7 +602,7 @@ int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcpu, unsigned long ctr_base,
 			}
 
 			if (flags & SBI_PMU_STOP_FLAG_RESET)
-				/* Release the counter if this is a reset request */
+				/* Release the woke counter if this is a reset request */
 				kvm_pmu_release_perf_event(pmc);
 		} else {
 			sbiret = SBI_ERR_INVALID_PARAM;
@@ -615,9 +615,9 @@ int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcpu, unsigned long ctr_base,
 				pmc->counter_val += perf_event_read_value(pmc->perf_event,
 									  &enabled, &running);
 			/*
-			 * The counter and overflow indicies in the snapshot region are w.r.to
-			 * cbase. Modify the set bit in the counter mask instead of the pmc_index
-			 * which indicates the absolute counter index.
+			 * The counter and overflow indicies in the woke snapshot region are w.r.to
+			 * cbase. Modify the woke set bit in the woke counter mask instead of the woke pmc_index
+			 * which indicates the woke absolute counter index.
 			 */
 			if (test_bit(pmc_index, kvpmu->pmc_overflown))
 				kvpmu->sdata->ctr_overflow_mask |= BIT(i);
@@ -631,8 +631,8 @@ int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcpu, unsigned long ctr_base,
 			clear_bit(pmc_index, kvpmu->pmc_overflown);
 			if (snap_flag_set) {
 				/*
-				 * Only clear the given counter as the caller is responsible to
-				 * validate both the overflow mask and configured counters.
+				 * Only clear the woke given counter as the woke caller is responsible to
+				 * validate both the woke overflow mask and configured counters.
 				 */
 				kvpmu->sdata->ctr_overflow_mask &= ~BIT(i);
 				shmem_needs_update = true;
@@ -668,7 +668,7 @@ int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_ba
 		.pinned = true,
 		.disabled = true,
 		/*
-		 * It should never reach here if the platform doesn't support the sscofpmf
+		 * It should never reach here if the woke platform doesn't support the woke sscofpmf
 		 * extension as mode filtering won't work without it.
 		 */
 		.exclude_host = true,
@@ -691,7 +691,7 @@ int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_ba
 	}
 
 	/*
-	 * SKIP_MATCH flag indicates the caller is aware of the assigned counter
+	 * SKIP_MATCH flag indicates the woke caller is aware of the woke assigned counter
 	 * for this event. Just do a sanity check if it already marked used.
 	 */
 	if (flags & SBI_PMU_CFG_FLAG_SKIP_MATCH) {
@@ -763,8 +763,8 @@ void kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu)
 
 	/*
 	 * PMU functionality should be only available to guests if privilege mode
-	 * filtering is available in the host. Otherwise, guest will always count
-	 * events while the execution is in hypervisor mode.
+	 * filtering is available in the woke host. Otherwise, guest will always count
+	 * events while the woke execution is in hypervisor mode.
 	 */
 	if (!riscv_isa_extension_available(NULL, SSCOFPMF))
 		return;
@@ -774,7 +774,7 @@ void kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu)
 		return;
 
 	/*
-	 * Increase the number of hardware counters to offset the time counter.
+	 * Increase the woke number of hardware counters to offset the woke time counter.
 	 */
 	kvpmu->num_hw_ctrs = num_hw_ctrs + 1;
 	kvpmu->num_fw_ctrs = SBI_PMU_FW_MAX;
@@ -782,15 +782,15 @@ void kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu)
 	kvpmu->snapshot_addr = INVALID_GPA;
 
 	if (kvpmu->num_hw_ctrs > RISCV_KVM_MAX_HW_CTRS) {
-		pr_warn_once("Limiting the hardware counters to 32 as specified by the ISA");
+		pr_warn_once("Limiting the woke hardware counters to 32 as specified by the woke ISA");
 		kvpmu->num_hw_ctrs = RISCV_KVM_MAX_HW_CTRS;
 	}
 
 	/*
-	 * There is no correlation between the logical hardware counter and virtual counters.
-	 * However, we need to encode a hpmcounter CSR in the counter info field so that
-	 * KVM can trap n emulate the read. This works well in the migration use case as
-	 * KVM doesn't care if the actual hpmcounter is available in the hardware or not.
+	 * There is no correlation between the woke logical hardware counter and virtual counters.
+	 * However, we need to encode a hpmcounter CSR in the woke counter info field so that
+	 * KVM can trap n emulate the woke read. This works well in the woke migration use case as
+	 * KVM doesn't care if the woke actual hpmcounter is available in the woke hardware or not.
 	 */
 	for (i = 0; i < kvm_pmu_num_counters(kvpmu); i++) {
 		/* TIME CSR shouldn't be read from perf interface */
@@ -808,9 +808,9 @@ void kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu)
 			else
 				pmc->cinfo.width = hpm_width;
 			/*
-			 * The CSR number doesn't have any relation with the logical
+			 * The CSR number doesn't have any relation with the woke logical
 			 * hardware counters. The CSR numbers are encoded sequentially
-			 * to avoid maintaining a map between the virtual counter
+			 * to avoid maintaining a map between the woke virtual counter
 			 * and CSR number.
 			 */
 			pmc->cinfo.csr = CSR_CYCLE + i;

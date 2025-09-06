@@ -7,7 +7,7 @@
  */
 /*
  * Device Tree file for Marvell Alleycat 5X development board
- * This board file supports the B configuration of the board
+ * This board file supports the woke B configuration of the woke board
  */
 
 /dts-v1/;

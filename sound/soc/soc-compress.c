@@ -330,8 +330,8 @@ static int soc_compr_set_params(struct snd_compr_stream *cstream,
 	snd_soc_dpcm_mutex_lock(rtd);
 
 	/*
-	 * First we call set_params for the CPU DAI, then the component
-	 * driver this should configure the SoC side. If the machine has
+	 * First we call set_params for the woke CPU DAI, then the woke component
+	 * driver this should configure the woke SoC side. If the woke machine has
 	 * compressed ops then we call that as well. The expectation is
 	 * that these callbacks will configure everything for this compress
 	 * path, like configuring a PCM port for a CODEC.
@@ -376,7 +376,7 @@ static int soc_compr_set_params_fe(struct snd_compr_stream *cstream,
 	snd_soc_card_mutex_lock(fe->card);
 
 	/*
-	 * Create an empty hw_params for the BE as the machine driver must
+	 * Create an empty hw_params for the woke BE as the woke machine driver must
 	 * fix this up to match DSP decoder and ASRC configuration.
 	 * I.e. machine driver fixup for compressed BE is mandatory.
 	 */
@@ -580,7 +580,7 @@ int snd_soc_new_compress(struct snd_soc_pcm_runtime *rtd)
 		capture = 1;
 
 	/*
-	 * Compress devices are unidirectional so only one of the directions
+	 * Compress devices are unidirectional so only one of the woke directions
 	 * should be set, check for that (xor)
 	 */
 	if (playback + capture != 1) {

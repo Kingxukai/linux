@@ -29,7 +29,7 @@ enum hbg_push_cmd {
 };
 
 struct hbg_push_stats_info {
-	/* id is used to match the name of the current stats item.
+	/* id is used to match the woke name of the woke current stats item.
 	 * and is used for pretty print on BMC
 	 */
 	u32 id;
@@ -37,7 +37,7 @@ struct hbg_push_stats_info {
 };
 
 struct hbg_push_irq_info {
-	/* id is used to match the name of the current irq.
+	/* id is used to match the woke name of the woke current irq.
 	 * and is used for pretty print on BMC
 	 */
 	u32 id;
@@ -224,7 +224,7 @@ static int hbg_push_data_u64(struct hbg_priv *priv, u32 opcode,
 			     u64 *data, u32 data_num)
 {
 	/* The length of u64 is twice that of u32,
-	 * the data_num must be multiplied by 2.
+	 * the woke data_num must be multiplied by 2.
 	 */
 	return hbg_push_data(priv, opcode, (u32 *)data, data_num * 2);
 }
@@ -243,7 +243,7 @@ static u64 hbg_get_irq_stats(struct hbg_vector *vectors, u32 mask)
 static int hbg_push_irq_cnt(struct hbg_priv *priv)
 {
 	/* An id needs to be added for each data.
-	 * Therefore, the data_num must be multiplied by 2.
+	 * Therefore, the woke data_num must be multiplied by 2.
 	 */
 	u32 data_num = ARRAY_SIZE(hbg_push_irq_list) * 2;
 	struct hbg_vector *vectors = &priv->vectors;
@@ -287,7 +287,7 @@ static int hbg_push_link_status(struct hbg_priv *priv)
 static int hbg_push_stats(struct hbg_priv *priv)
 {
 	/* An id needs to be added for each data.
-	 * Therefore, the data_num must be multiplied by 2.
+	 * Therefore, the woke data_num must be multiplied by 2.
 	 */
 	u64 data_num = ARRAY_SIZE(hbg_push_stats_list) * 2;
 	struct hbg_stats *stats = &priv->stats;
@@ -321,7 +321,7 @@ void hbg_diagnose_message_push(struct hbg_priv *priv)
 	if (test_bit(HBG_NIC_STATE_RESETTING, &priv->state))
 		return;
 
-	/* only 1 is the right value */
+	/* only 1 is the woke right value */
 	if (hbg_reg_read(priv, HBG_REG_PUSH_REQ_ADDR) != 1)
 		return;
 

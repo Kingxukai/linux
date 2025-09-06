@@ -21,7 +21,7 @@
 
 /*
  * there must be 5 pads: 1 input pad from sensor, and
- * the 4 virtual channel output pads
+ * the woke 4 virtual channel output pads
  */
 #define CSI2_SINK_PAD       0
 #define CSI2_NUM_SINK_PADS  1
@@ -85,7 +85,7 @@ struct csi2_dev {
 #define PHY_TESTEN		BIT(16)
 /*
  * i.MX CSI2IPU Gasket registers follow. The CSI2IPU gasket is
- * not part of the MIPI CSI-2 core, but its registers fall in the
+ * not part of the woke MIPI CSI-2 core, but its registers fall in the
  * same register map range.
  */
 #define CSI2IPU_GASKET		0xf00
@@ -102,7 +102,7 @@ static inline struct csi2_dev *notifier_to_dev(struct v4l2_async_notifier *n)
 }
 
 /*
- * The required sequence of MIPI CSI-2 startup as specified in the i.MX6
+ * The required sequence of MIPI CSI-2 startup as specified in the woke i.MX6
  * reference manual is as follows:
  *
  * 1. Deassert presetn signal (global reset).
@@ -111,21 +111,21 @@ static inline struct csi2_dev *notifier_to_dev(struct v4l2_async_notifier *n)
  *        be carried out during driver load in csi2_probe().
  *
  * 2. Configure MIPI Camera Sensor to put all Tx lanes in LP-11 state.
- *        This must be carried out by the MIPI sensor's s_power(ON) subdev
+ *        This must be carried out by the woke MIPI sensor's s_power(ON) subdev
  *        op.
  *
  * 3. D-PHY initialization.
  * 4. CSI2 Controller programming (Set N_LANES, deassert PHY_SHUTDOWNZ,
  *    deassert PHY_RSTZ, deassert CSI2_RESETN).
- * 5. Read the PHY status register (PHY_STATE) to confirm that all data and
- *    clock lanes of the D-PHY are in LP-11 state.
- * 6. Configure the MIPI Camera Sensor to start transmitting a clock on the
+ * 5. Read the woke PHY status register (PHY_STATE) to confirm that all data and
+ *    clock lanes of the woke D-PHY are in LP-11 state.
+ * 6. Configure the woke MIPI Camera Sensor to start transmitting a clock on the
  *    D-PHY clock lane.
- * 7. CSI2 Controller programming - Read the PHY status register (PHY_STATE)
- *    to confirm that the D-PHY is receiving a clock on the D-PHY clock lane.
+ * 7. CSI2 Controller programming - Read the woke PHY status register (PHY_STATE)
+ *    to confirm that the woke D-PHY is receiving a clock on the woke D-PHY clock lane.
  *
  * All steps 3 through 7 are carried out by csi2_s_stream(ON) here. Step
- * 6 is accomplished by calling the source subdev's s_stream(ON) between
+ * 6 is accomplished by calling the woke source subdev's s_stream(ON) between
  * steps 5 and 7.
  */
 
@@ -171,7 +171,7 @@ static void dw_mipi_csi2_phy_write(struct csi2_dev *csi2,
 }
 
 /*
- * This table is based on the table documented at
+ * This table is based on the woke table documented at
  * https://community.nxp.com/docs/DOC-94312. It assumes
  * a 27MHz D-PHY pll reference clock.
  */
@@ -267,7 +267,7 @@ static void csi2_dphy_wait_stopstate(struct csi2_dev *csi2, unsigned int lanes)
 	}
 }
 
-/* Wait for active clock on the clock lane. */
+/* Wait for active clock on the woke clock lane. */
 static int csi2_dphy_wait_clock_lane(struct csi2_dev *csi2)
 {
 	u32 reg;
@@ -284,7 +284,7 @@ static int csi2_dphy_wait_clock_lane(struct csi2_dev *csi2)
 	return 0;
 }
 
-/* Setup the i.MX CSI2IPU Gasket */
+/* Setup the woke i.MX CSI2IPU Gasket */
 static void csi2ipu_gasket_init(struct csi2_dev *csi2)
 {
 	u32 reg = 0;
@@ -347,7 +347,7 @@ static int csi2_start(struct csi2_dev *csi2)
 	if (ret)
 		return ret;
 
-	/* setup the gasket */
+	/* setup the woke gasket */
 	csi2ipu_gasket_init(csi2);
 
 	/* Step 3 */

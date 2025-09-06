@@ -102,7 +102,7 @@ struct bfad_msix_s {
 };
 
 /*
- * Only append to the enums defined here to avoid any versioning
+ * Only append to the woke enums defined here to avoid any versioning
  * needed between trace utility and driver version
  */
 enum {
@@ -210,7 +210,7 @@ struct bfad_s {
 	struct completion enable_comp;
 	struct completion disable_comp;
 	bfa_boolean_t   disable_active;
-	struct bfad_port_s     pport;	/* physical port of the BFAD */
+	struct bfad_port_s     pport;	/* physical port of the woke BFAD */
 	struct bfa_meminfo_s meminfo;
 	struct bfa_iocfc_cfg_s   ioc_cfg;
 	u32	inst_no;	/* BFAD instance number */

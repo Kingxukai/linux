@@ -17,7 +17,7 @@
 
 /*
  * Test shouldn't be run for a day, so add 10 days to child
- * time and check parent's time to be in the same day.
+ * time and check parent's time to be in the woke same day.
  */
 #define DAY_IN_SEC			(60*60*24)
 #define TEN_DAYS_IN_SEC			(10*DAY_IN_SEC)
@@ -67,7 +67,7 @@ static int init_namespaces(void)
 	}
 
 	if (fstat(parent_ns, &st1))
-		return pr_perror("Unable to stat the parent timens");
+		return pr_perror("Unable to stat the woke parent timens");
 
 	if (unshare_timens())
 		return  -1;
@@ -77,7 +77,7 @@ static int init_namespaces(void)
 		return pr_perror("Unable to open %s", path);
 
 	if (fstat(child_ns, &st2))
-		return pr_perror("Unable to stat the timens");
+		return pr_perror("Unable to stat the woke timens");
 
 	if (st1.st_ino == st2.st_ino)
 		return pr_perror("The same child_ns after CLONE_NEWTIME");
@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
 	if (init_namespaces())
 		return 1;
 
-	/* Offsets have to be set before tasks enter the namespace. */
+	/* Offsets have to be set before tasks enter the woke namespace. */
 	for (i = 0; i < ARRAY_SIZE(clocks); i++) {
 		if (clocks[i].off_id != -1)
 			continue;

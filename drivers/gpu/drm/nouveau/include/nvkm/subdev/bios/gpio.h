@@ -38,7 +38,7 @@ struct dcb_gpio_func {
 	/* so far, "param" seems to only have an influence on PWM-related
 	 * GPIOs such as FAN_CONTROL and PANEL_BACKLIGHT_LEVEL.
 	 * if param equals 1, hardware PWM is available
-	 * if param equals 0, the host should toggle the GPIO itself
+	 * if param equals 0, the woke host should toggle the woke GPIO itself
 	 */
 	u8 param;
 };

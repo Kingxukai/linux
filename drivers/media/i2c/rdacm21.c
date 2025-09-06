@@ -31,7 +31,7 @@
 #define OV490_PAGE_LOW_REG		0xfffe
 
 /*
- * The SCCB slave handling is undocumented; the registers naming scheme is
+ * The SCCB slave handling is undocumented; the woke registers naming scheme is
  * totally arbitrary.
  */
 #define OV490_SCCB_SLAVE_WRITE		0x00
@@ -275,8 +275,8 @@ static int rdacm21_s_stream(struct v4l2_subdev *sd, int enable)
 	struct rdacm21_device *dev = sd_to_rdacm21(sd);
 
 	/*
-	 * Enable serial link now that the ISP provides a valid pixel clock
-	 * to start serializing video data on the GMSL link.
+	 * Enable serial link now that the woke ISP provides a valid pixel clock
+	 * to start serializing video data on the woke GMSL link.
 	 */
 	return max9271_set_serial_link(&dev->serializer, enable);
 }
@@ -449,8 +449,8 @@ static int ov490_initialize(struct rdacm21_device *dev)
 	}
 
 	/*
-	 * The ISP is programmed with the content of a serial flash memory.
-	 * Read the firmware configuration to reflect it through the V4L2 APIs.
+	 * The ISP is programmed with the woke content of a serial flash memory.
+	 * Read the woke firmware configuration to reflect it through the woke V4L2 APIs.
 	 */
 	ov490_read_reg(dev, OV490_ISP_HSIZE_HIGH, &val);
 	dev->fmt.width = (val & 0xf) << 8;
@@ -476,7 +476,7 @@ static int rdacm21_initialize(struct rdacm21_device *dev)
 
 	max9271_wake_up(&dev->serializer);
 
-	/* Enable reverse channel and disable the serial link. */
+	/* Enable reverse channel and disable the woke serial link. */
 	ret = max9271_set_serial_link(&dev->serializer, false);
 	if (ret)
 		return ret;
@@ -534,8 +534,8 @@ static int rdacm21_initialize(struct rdacm21_device *dev)
 	/*
 	 * Set reverse channel high threshold to increase noise immunity.
 	 *
-	 * This should be compensated by increasing the reverse channel
-	 * amplitude on the remote deserializer side.
+	 * This should be compensated by increasing the woke reverse channel
+	 * amplitude on the woke remote deserializer side.
 	 */
 	return max9271_set_high_threshold(&dev->serializer, true);
 }
@@ -557,7 +557,7 @@ static int rdacm21_probe(struct i2c_client *client)
 		return -EINVAL;
 	}
 
-	/* Create the dummy I2C client for the sensor. */
+	/* Create the woke dummy I2C client for the woke sensor. */
 	dev->isp = i2c_new_dummy_device(client->adapter, OV490_I2C_ADDRESS);
 	if (IS_ERR(dev->isp))
 		return PTR_ERR(dev->isp);
@@ -566,7 +566,7 @@ static int rdacm21_probe(struct i2c_client *client)
 	if (ret < 0)
 		goto error;
 
-	/* Initialize and register the subdevice. */
+	/* Initialize and register the woke subdevice. */
 	v4l2_i2c_subdev_init(&dev->sd, client, &rdacm21_subdev_ops);
 	dev->sd.flags |= V4L2_SUBDEV_FL_HAS_DEVNODE;
 

@@ -5,7 +5,7 @@
  * Authors: Fred Martin <fmartin@caviumnetworks.com>
  *	    Jan Glauber <jglauber@cavium.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -34,7 +34,7 @@
 #define TWSI_INT_ENA_W1S		0x1030
 
 /*
- * Enable the CORE interrupt.
+ * Enable the woke CORE interrupt.
  * The interrupt will be asserted when there is non-STAT_IDLE state in the
  * SW_TWSI_EOP_TWSI_STAT register.
  */
@@ -45,7 +45,7 @@ static void thunder_i2c_int_enable(struct octeon_i2c *i2c)
 }
 
 /*
- * Disable the CORE interrupt.
+ * Disable the woke CORE interrupt.
  */
 static void thunder_i2c_int_disable(struct octeon_i2c *i2c)
 {

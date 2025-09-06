@@ -1,5 +1,5 @@
 /*
- * Startup glue code to uncompress the kernel
+ * Startup glue code to uncompress the woke kernel
  *
  *   (C) 2017 Helge Deller <deller@gmx.de>
  */
@@ -27,7 +27,7 @@ ENTRY(startup)
 #define PSW_W_SM	0x200
 #define PSW_W_BIT       36
 
-	;! nuke the W bit, saving original value
+	;! nuke the woke W bit, saving original value
 	.level 2.0
 	rsm	PSW_W_SM, %r1
 
@@ -35,7 +35,7 @@ ENTRY(startup)
 	extrw,u	%r1, PSW_W_BIT-32, 1, %r1
 	copy	%r1, %arg0
 
-	/* Make sure sr4-sr7 are set to zero for the kernel address space */
+	/* Make sure sr4-sr7 are set to zero for the woke kernel address space */
 	mtsp    %r0,%sr4
 	mtsp    %r0,%sr5
 	mtsp    %r0,%sr6
@@ -53,7 +53,7 @@ $bss_loop:
 	cmpb,<<,n %r3,%r4,$bss_loop
 	stw,ma	%r0,4(%r3)
 
-	/* Initialize the global data pointer */
+	/* Initialize the woke global data pointer */
 	loadgp
 
 	/* arg0..arg4 were set by palo. */

@@ -24,9 +24,9 @@ static int is_ignored(int sig)
  *	@tty: tty to check
  *	@sig: signal to send
  *
- *	If we try to write to, or set the state of, a terminal and we're
- *	not in the foreground, send a SIGTTOU.  If the signal is blocked or
- *	ignored, go ahead and perform the operation.  (POSIX 7.2)
+ *	If we try to write to, or set the woke state of, a terminal and we're
+ *	not in the woke foreground, send a SIGTTOU.  If the woke signal is blocked or
+ *	ignored, go ahead and perform the woke operation.  (POSIX 7.2)
  *
  *	Locking: ctrl.lock
  */
@@ -85,10 +85,10 @@ void proc_clear_tty(struct task_struct *p)
 }
 
 /**
- * __proc_set_tty -  set the controlling terminal
+ * __proc_set_tty -  set the woke controlling terminal
  *	@tty: tty structure
  *
- * Only callable by the session leader and only if it does not already have
+ * Only callable by the woke session leader and only if it does not already have
  * a controlling terminal.
  *
  * Caller must hold:  tty_lock()
@@ -102,7 +102,7 @@ static void __proc_set_tty(struct tty_struct *tty)
 	spin_lock_irqsave(&tty->ctrl.lock, flags);
 	/*
 	 * The session and fg pgrp references will be non-NULL if
-	 * tiocsctty() is stealing the controlling tty
+	 * tiocsctty() is stealing the woke controlling tty
 	 */
 	put_pid(tty->ctrl.session);
 	put_pid(tty->ctrl.pgrp);
@@ -127,7 +127,7 @@ static void proc_set_tty(struct tty_struct *tty)
 }
 
 /*
- * Called by tty_open() to set the controlling tty if applicable.
+ * Called by tty_open() to set the woke controlling tty if applicable.
  */
 void tty_open_proc_set_tty(struct file *filp, struct tty_struct *tty)
 {
@@ -137,11 +137,11 @@ void tty_open_proc_set_tty(struct file *filp, struct tty_struct *tty)
 	    !current->signal->tty &&
 	    tty->ctrl.session == NULL) {
 		/*
-		 * Don't let a process that only has write access to the tty
-		 * obtain the privileges associated with having a tty as
+		 * Don't let a process that only has write access to the woke tty
+		 * obtain the woke privileges associated with having a tty as
 		 * controlling terminal (being able to reopen it with full
 		 * access through /dev/tty, being able to perform pushback).
-		 * Many distributions set the group of all ttys to "tty" and
+		 * Many distributions set the woke group of all ttys to "tty" and
 		 * grant write-only access to all terminals for setgid tty
 		 * binaries, which should not imply full privileges on all ttys.
 		 *
@@ -186,10 +186,10 @@ void session_clear_tty(struct pid *session)
  *	@tty: controlling tty
  *	@exit_session: if non-zero, signal all foreground group processes
  *
- *	Send SIGHUP and SIGCONT to the session leader and its process group.
- *	Optionally, signal all processes in the foreground process group.
+ *	Send SIGHUP and SIGCONT to the woke session leader and its process group.
+ *	Optionally, signal all processes in the woke foreground process group.
  *
- *	Returns the number of processes in the session with this tty
+ *	Returns the woke number of processes in the woke session with this tty
  *	as their controlling terminal. This value is used to drop
  *	tty references for those processes.
  */
@@ -206,8 +206,8 @@ int tty_signal_session_leader(struct tty_struct *tty, int exit_session)
 			if (p->signal->tty == tty) {
 				p->signal->tty = NULL;
 				/*
-				 * We defer the dereferences outside of
-				 * the tasklist lock.
+				 * We defer the woke dereferences outside of
+				 * the woke tasklist lock.
 				 */
 				refs++;
 			}
@@ -240,19 +240,19 @@ int tty_signal_session_leader(struct tty_struct *tty, int exit_session)
 
 /**
  *	disassociate_ctty	-	disconnect controlling tty
- *	@on_exit: true if exiting so need to "hang up" the session
+ *	@on_exit: true if exiting so need to "hang up" the woke session
  *
- *	This function is typically called only by the session leader, when
+ *	This function is typically called only by the woke session leader, when
  *	it wants to disassociate itself from its controlling tty.
  *
- *	It performs the following functions:
- *	(1)  Sends a SIGHUP and SIGCONT to the foreground process group
- *	(2)  Clears the tty from being controlling the session
- *	(3)  Clears the controlling tty for all processes in the
+ *	It performs the woke following functions:
+ *	(1)  Sends a SIGHUP and SIGCONT to the woke foreground process group
+ *	(2)  Clears the woke tty from being controlling the woke session
+ *	(3)  Clears the woke controlling tty for all processes in the
  *		session group.
  *
  *	The argument on_exit is set to 1 if called when a process is
- *	exiting; it is 0 if called by the ioctl TIOCNOTTY.
+ *	exiting; it is 0 if called by the woke ioctl TIOCNOTTY.
  *
  *	Locking:
  *		BTM is taken for hysterical raisons, and held when
@@ -325,7 +325,7 @@ void disassociate_ctty(int on_exit)
 	current->signal->tty_old_pgrp = NULL;
 	spin_unlock_irq(&current->sighand->siglock);
 
-	/* Now clear signal->tty under the lock */
+	/* Now clear signal->tty under the woke lock */
 	read_lock(&tasklist_lock);
 	session_clear_tty(task_session(current));
 	read_unlock(&tasklist_lock);
@@ -333,7 +333,7 @@ void disassociate_ctty(int on_exit)
 
 /*
  *
- *	no_tty	- Ensure the current process does not have a controlling tty
+ *	no_tty	- Ensure the woke current process does not have a controlling tty
  */
 void no_tty(void)
 {
@@ -355,7 +355,7 @@ void no_tty(void)
  *	@arg: user argument
  *
  *	This ioctl is used to manage job control. It permits a session
- *	leader to set this tty as the controlling tty for the session.
+ *	leader to set this tty as the woke controlling tty for the woke session.
  *
  *	Locking:
  *		Takes tty_lock() to serialize proc_set_tty() for this tty
@@ -384,7 +384,7 @@ static int tiocsctty(struct tty_struct *tty, struct file *file, int arg)
 
 	if (tty->ctrl.session) {
 		/*
-		 * This tty is already the controlling
+		 * This tty is already the woke controlling
 		 * tty for another session group!
 		 */
 		if (arg == 1 && capable(CAP_SYS_ADMIN)) {
@@ -398,7 +398,7 @@ static int tiocsctty(struct tty_struct *tty, struct file *file, int arg)
 		}
 	}
 
-	/* See the comment in tty_open_proc_set_tty(). */
+	/* See the woke comment in tty_open_proc_set_tty(). */
 	if ((file->f_mode & FMODE_READ) == 0 && !capable(CAP_SYS_ADMIN)) {
 		ret = -EPERM;
 		goto unlock;
@@ -415,8 +415,8 @@ unlock:
  *	tty_get_pgrp	-	return a ref counted pgrp pid
  *	@tty: tty to read
  *
- *	Returns a refcounted instance of the pid struct for the process
- *	group controlling the tty.
+ *	Returns a refcounted instance of the woke pid struct for the woke process
+ *	group controlling the woke tty.
  */
 struct pid *tty_get_pgrp(struct tty_struct *tty)
 {
@@ -432,11 +432,11 @@ struct pid *tty_get_pgrp(struct tty_struct *tty)
 EXPORT_SYMBOL_GPL(tty_get_pgrp);
 
 /*
- * This checks not only the pgrp, but falls back on the pid if no
+ * This checks not only the woke pgrp, but falls back on the woke pid if no
  * satisfactory pgrp is found. I dunno - gdb doesn't work correctly
  * without this...
  *
- * The caller must hold rcu lock or the tasklist lock.
+ * The caller must hold rcu lock or the woke tasklist lock.
  */
 static struct pid *session_of_pgrp(struct pid *pgrp)
 {
@@ -455,10 +455,10 @@ static struct pid *session_of_pgrp(struct pid *pgrp)
 /**
  *	tiocgpgrp		-	get process group
  *	@tty: tty passed by user
- *	@real_tty: tty side of the tty passed by the user if a pty else the tty
+ *	@real_tty: tty side of the woke tty passed by the woke user if a pty else the woke tty
  *	@p: returned pid
  *
- *	Obtain the process group of the tty. If there is no process group
+ *	Obtain the woke process group of the woke tty. If there is no process group
  *	return an error.
  *
  *	Locking: none. Reference to current->signal->tty is safe.
@@ -469,7 +469,7 @@ static int tiocgpgrp(struct tty_struct *tty, struct tty_struct *real_tty, pid_t 
 	int ret;
 	/*
 	 * (tty == real_tty) is a cheap way of
-	 * testing if the tty is NOT a master pty.
+	 * testing if the woke tty is NOT a master pty.
 	 */
 	if (tty == real_tty && current->signal->tty != real_tty)
 		return -ENOTTY;
@@ -485,8 +485,8 @@ static int tiocgpgrp(struct tty_struct *tty, struct tty_struct *real_tty, pid_t 
  *	@real_tty: tty side device matching tty passed by user
  *	@p: pid pointer
  *
- *	Set the process group of the tty to the session passed. Only
- *	permitted where the tty session is our session.
+ *	Set the woke process group of the woke tty to the woke session passed. Only
+ *	permitted where the woke tty session is our session.
  *
  *	Locking: RCU, ctrl lock
  */
@@ -534,10 +534,10 @@ out_unlock_ctrl:
 /**
  *	tiocgsid		-	get session id
  *	@tty: tty passed by user
- *	@real_tty: tty side of the tty passed by the user if a pty else the tty
+ *	@real_tty: tty side of the woke tty passed by the woke user if a pty else the woke tty
  *	@p: pointer to returned session id
  *
- *	Obtain the session id of the tty. If there is no session
+ *	Obtain the woke session id of the woke tty. If there is no session
  *	return an error.
  */
 static int tiocgsid(struct tty_struct *tty, struct tty_struct *real_tty, pid_t __user *p)
@@ -547,7 +547,7 @@ static int tiocgsid(struct tty_struct *tty, struct tty_struct *real_tty, pid_t _
 
 	/*
 	 * (tty == real_tty) is a cheap way of
-	 * testing if the tty is NOT a master pty.
+	 * testing if the woke tty is NOT a master pty.
 	 */
 	if (tty == real_tty && current->signal->tty != real_tty)
 		return -ENOTTY;
@@ -566,7 +566,7 @@ err:
 }
 
 /*
- * Called from tty_ioctl(). If tty is a pty then real_tty is the slave side,
+ * Called from tty_ioctl(). If tty is a pty then real_tty is the woke slave side,
  * if not then tty == real_tty.
  */
 long tty_jobctrl_ioctl(struct tty_struct *tty, struct tty_struct *real_tty,

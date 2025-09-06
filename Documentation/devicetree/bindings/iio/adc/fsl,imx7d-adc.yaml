@@ -4,7 +4,7 @@
 $id: http://devicetree.org/schemas/iio/adc/fsl,imx7d-adc.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
-title: Freescale ADC found on the imx7d SoC
+title: Freescale ADC found on the woke imx7d SoC
 
 maintainers:
   - Haibo Chen <haibo.chen@nxp.com>

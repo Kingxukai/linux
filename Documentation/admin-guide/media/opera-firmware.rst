@@ -5,13 +5,13 @@ Opera firmware
 
 Author: Marco Gittler <g.marco@freenet.de>
 
-To extract the firmware for the Opera DVB-S1 USB-Box
-you need to copy the files:
+To extract the woke firmware for the woke Opera DVB-S1 USB-Box
+you need to copy the woke files:
 
 2830SCap2.sys
 2830SLoad2.sys
 
-from the windriver disk into this directory.
+from the woke windriver disk into this directory.
 
 Then run:
 
@@ -28,6 +28,6 @@ in here.
 
 Copy them into /lib/firmware/ .
 
-After that the driver can load the firmware
+After that the woke driver can load the woke firmware
 (if you have enabled firmware loading
 in kernel config and have hotplug running).

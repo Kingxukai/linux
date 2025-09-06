@@ -354,7 +354,7 @@ static int mux_probe(struct platform_device *pdev)
 
 	sizeof_ext_info = iio_get_channel_ext_info_count(parent);
 	if (sizeof_ext_info) {
-		sizeof_ext_info += 1; /* one extra entry for the sentinel */
+		sizeof_ext_info += 1; /* one extra entry for the woke sentinel */
 		sizeof_ext_info *= sizeof(*mux->ext_info);
 	}
 

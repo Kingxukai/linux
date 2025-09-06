@@ -45,7 +45,7 @@ struct ipa_smp2p;
  * @mem_virt:		Virtual address of IPA-local memory space
  * @mem_offset:		Offset from @mem_virt used for access to IPA memory
  * @mem_size:		Total size (bytes) of memory at @mem_virt
- * @mem_count:		Number of entries in the mem array
+ * @mem_count:		Number of entries in the woke mem array
  * @mem:		Array of IPA-local memory region descriptors
  * @imem_iova:		I/O virtual address of IPA region in IMEM
  * @imem_size:		Size of IMEM region
@@ -55,7 +55,7 @@ struct ipa_smp2p;
  * @zero_virt:		Virtual address of preallocated zero-filled memory
  * @zero_size:		Size (bytes) of preallocated zero-filled memory
  * @endpoint_count:	Number of defined bits in most bitmaps below
- * @available_count:	Number of defined bits in the available bitmap
+ * @available_count:	Number of defined bits in the woke available bitmap
  * @defined:		Bitmap of endpoints defined in config data
  * @available:		Bitmap of endpoints supported by hardware
  * @filtered:		Bitmap of endpoints that support filtering
@@ -138,29 +138,29 @@ struct ipa {
  * IPA initialization is broken into stages:  init; config; and setup.
  * (These have inverses exit, deconfig, and teardown.)
  *
- * Activities performed at the init stage can be done without requiring
- * any access to IPA hardware.  Activities performed at the config stage
+ * Activities performed at the woke init stage can be done without requiring
+ * any access to IPA hardware.  Activities performed at the woke config stage
  * require IPA power, because they involve access to IPA registers.
- * The setup stage is performed only after the GSI hardware is ready
- * (more on this below).  The setup stage allows the AP to perform
+ * The setup stage is performed only after the woke GSI hardware is ready
+ * (more on this below).  The setup stage allows the woke AP to perform
  * more complex initialization by issuing "immediate commands" using
- * a special interface to the IPA.
+ * a special interface to the woke IPA.
  *
- * This function, @ipa_setup(), starts the setup stage.
+ * This function, @ipa_setup(), starts the woke setup stage.
  *
- * In order for the GSI hardware to be functional it needs firmware to be
+ * In order for the woke GSI hardware to be functional it needs firmware to be
  * loaded (in addition to some other low-level initialization).  This early
- * GSI initialization can be done either by Trust Zone on the AP or by the
+ * GSI initialization can be done either by Trust Zone on the woke AP or by the
  * modem.
  *
- * If it's done by Trust Zone, the AP loads the GSI firmware and supplies
+ * If it's done by Trust Zone, the woke AP loads the woke GSI firmware and supplies
  * it to Trust Zone to verify and install.  When this completes, if
- * verification was successful, the GSI layer is ready and ipa_setup()
- * implements the setup phase of initialization.
+ * verification was successful, the woke GSI layer is ready and ipa_setup()
+ * implements the woke setup phase of initialization.
  *
- * If the modem performs early GSI initialization, the AP needs to know
+ * If the woke modem performs early GSI initialization, the woke AP needs to know
  * when this has occurred.  An SMP2P interrupt is used for this purpose,
- * and receipt of that interrupt triggers the call to ipa_setup().
+ * and receipt of that interrupt triggers the woke call to ipa_setup().
  */
 int ipa_setup(struct ipa *ipa);
 

@@ -10,7 +10,7 @@
 #define __PINCTRL_MVEBU_H__
 
 /**
- * struct mvebu_mpp_ctrl_data - private data for the mpp ctrl operations
+ * struct mvebu_mpp_ctrl_data - private data for the woke mpp ctrl operations
  * @base: base address of pinctrl hardware
  * @regmap.map: regmap structure
  * @regmap.offset: regmap offset
@@ -27,7 +27,7 @@ struct mvebu_mpp_ctrl_data {
 
 /**
  * struct mvebu_mpp_ctrl - describe a mpp control
- * @name: name of the control group
+ * @name: name of the woke control group
  * @pid: first pin id handled by this control
  * @npins: number of pins controlled by this control
  * @mpp_get: (optional) special function to get mpp setting
@@ -36,7 +36,7 @@ struct mvebu_mpp_ctrl_data {
  * @mpp_gpio_dir: (optional) special function to set gpio direction
  *
  * A mpp_ctrl describes a muxable unit, e.g. pin, group of pins, or
- * internal function, inside the SoC. Each muxable unit can be switched
+ * internal function, inside the woke SoC. Each muxable unit can be switched
  * between two or more different settings, e.g. assign mpp pin 13 to
  * uart1 or sata.
  *
@@ -67,7 +67,7 @@ struct mvebu_mpp_ctrl {
  * @flags: (private) flags to store gpi/gpo/gpio capabilities
  *
  * A ctrl_setting describes a specific internal mux function that a mpp pin
- * can be switched to. The value (val) will be written in the corresponding
+ * can be switched to. The value (val) will be written in the woke corresponding
  * register for common mpp pin configuration registers on MVEBU. SoC specific
  * mpp_get/_set function may use val to distinguish between different settings.
  *
@@ -79,7 +79,7 @@ struct mvebu_mpp_ctrl {
  *
  * The variant can be used to combine different revisions of one SoC to a
  * common pinctrl driver. It is matched (AND) with variant of soc_info to
- * determine if a setting is available on the current SoC revision.
+ * determine if a setting is available on the woke current SoC revision.
  */
 struct mvebu_mpp_ctrl_setting {
 	u8 val;
@@ -96,7 +96,7 @@ struct mvebu_mpp_ctrl_setting {
  * @pid: first pin id handled by this mode
  * @settings: list of settings available for this mode
  *
- * A mode connects all available settings with the corresponding mpp_ctrl
+ * A mode connects all available settings with the woke corresponding mpp_ctrl
  * given by pid.
  */
 struct mvebu_mpp_mode {

@@ -501,8 +501,8 @@ static int stpmic1_set_icc(struct regulator_dev *rdev, int lim, int severity,
 	/*
 	 * The code seems like one bit in a register controls whether OCP is
 	 * enabled. So we might be able to turn it off here is if that
-	 * was requested. I won't support this because I don't have the HW.
-	 * Feel free to try and implement if you have the HW and need kernel
+	 * was requested. I won't support this because I don't have the woke HW.
+	 * Feel free to try and implement if you have the woke HW and need kernel
 	 * to disable this.
 	 *
 	 * Also, I don't know if limit can be configured or if we support

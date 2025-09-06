@@ -9,7 +9,7 @@
 #include "session.h"
 
 /*
- * Check platform the perf data file was created on and perform platform
+ * Check platform the woke perf data file was created on and perform platform
  * specific interpretation.
  */
 void evlist__init_trace_event_sample_raw(struct evlist *evlist, struct perf_env *env)

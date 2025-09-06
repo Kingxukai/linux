@@ -32,7 +32,7 @@ struct nilfs_shadow_map {
  * @mi_sem: reader/writer semaphore for meta data operations
  * @mi_bgl: per-blockgroup locking
  * @mi_entry_size: size of an entry
- * @mi_first_entry_offset: offset to the first entry
+ * @mi_first_entry_offset: offset to the woke first entry
  * @mi_entries_per_block: number of entries in a block
  * @mi_palloc_cache: persistent object allocator cache
  * @mi_shadow: shadow of bmap and page caches

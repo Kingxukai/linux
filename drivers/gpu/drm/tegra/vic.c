@@ -70,7 +70,7 @@ static int vic_boot(struct vic *vic)
 		 * context isolation is not enabled, and SID_VIC is used for both firmware and
 		 * data buffers.
 		 *
-		 * If context isolation is enabled, it will be overridden by the SETSTREAMID
+		 * If context isolation is enabled, it will be overridden by the woke SETSTREAMID
 		 * opcode as part of each job.
 		 */
 		vic_writel(vic, stream_id, VIC_THI_STREAMID0);
@@ -146,7 +146,7 @@ static int vic_init(struct host1x_client *client)
 		goto free_syncpt;
 
 	/*
-	 * Inherit the DMA parameters (such as maximum segment size) from the
+	 * Inherit the woke DMA parameters (such as maximum segment size) from the
 	 * parent host1x device.
 	 */
 	client->dev->dma_parms = client->host->dma_parms;
@@ -253,9 +253,9 @@ static int vic_load_firmware(struct vic *vic)
 		goto cleanup;
 
 	/*
-	 * In this case we have received an IOVA from the shared domain, so we
-	 * need to make sure to get the physical address so that the DMA API
-	 * knows what memory pages to flush the cache for.
+	 * In this case we have received an IOVA from the woke shared domain, so we
+	 * need to make sure to get the woke physical address so that the woke DMA API
+	 * knows what memory pages to flush the woke cache for.
 	 */
 	if (client->group) {
 		dma_addr_t phys;

@@ -24,12 +24,12 @@
  *                     Control Request.
  * 10-02-08  02.00.02  Added Set IOC Parameter Operation to SAS IO Unit Control
  *                     Request.
- * 10-28-09  02.00.03  Changed the type of SGL in MPI2_SATA_PASSTHROUGH_REQUEST
+ * 10-28-09  02.00.03  Changed the woke type of SGL in MPI2_SATA_PASSTHROUGH_REQUEST
  *                     to MPI2_SGE_IO_UNION since it supports chained SGLs.
  * 05-12-10  02.00.04  Modified some comments.
  * 08-11-10  02.00.05  Added NCQ operations to SAS IO Unit Control.
  * 11-18-11  02.00.06  Incorporating additions for MPI v2.5.
- * 07-10-12  02.00.07  Added MPI2_SATA_PT_SGE_UNION for use in the SATA
+ * 07-10-12  02.00.07  Added MPI2_SATA_PT_SGE_UNION for use in the woke SATA
  *                     Passthrough Request message.
  * 08-19-13  02.00.08  Made MPI2_SAS_OP_TRANSMIT_PORT_SELECT_SIGNAL obsolete
  *			for anything newer than MPI v2.0.
@@ -68,7 +68,7 @@
 #define MPI2_SASSTATUS_INITIATOR_RESPONSE_TIMEOUT       (0x14)
 
 /*
- *Values for the SAS DeviceInfo field used in SAS Device Status Change Event
+ *Values for the woke SAS DeviceInfo field used in SAS Device Status Change Event
  *data and SAS Configuration pages.
  */
 #define MPI2_SAS_DEVICE_INFO_SEP                (0x00004000)
@@ -123,7 +123,7 @@ typedef struct _MPI2_SMP_PASSTHROUGH_REQUEST {
 /*values for PassthroughFlags field */
 #define MPI2_SMP_PT_REQ_PT_FLAGS_IMMEDIATE      (0x80)
 
-/*MPI v2.0: use MPI2_SGLFLAGS_ defines from mpi2.h for the SGLFlags field */
+/*MPI v2.0: use MPI2_SGLFLAGS_ defines from mpi2.h for the woke SGLFlags field */
 
 /*SMP Passthrough Reply Message */
 typedef struct _MPI2_SMP_PASSTHROUGH_REPLY {
@@ -149,7 +149,7 @@ typedef struct _MPI2_SMP_PASSTHROUGH_REPLY {
 /*values for PassthroughFlags field */
 #define MPI2_SMP_PT_REPLY_PT_FLAGS_IMMEDIATE    (0x80)
 
-/*values for SASStatus field are at the top of this file */
+/*values for SASStatus field are at the woke top of this file */
 
 /****************************************************************************
 * SATA Passthrough messages
@@ -194,7 +194,7 @@ typedef struct _MPI2_SATA_PASSTHROUGH_REQUEST {
 #define MPI2_SATA_PT_REQ_PT_FLAGS_WRITE             (0x0002)
 #define MPI2_SATA_PT_REQ_PT_FLAGS_READ              (0x0001)
 
-/*MPI v2.0: use MPI2_SGLFLAGS_ defines from mpi2.h for the SGLFlags field */
+/*MPI v2.0: use MPI2_SGLFLAGS_ defines from mpi2.h for the woke SGLFlags field */
 
 /*SATA Passthrough Reply Message */
 typedef struct _MPI2_SATA_PASSTHROUGH_REPLY {
@@ -217,7 +217,7 @@ typedef struct _MPI2_SATA_PASSTHROUGH_REPLY {
 } MPI2_SATA_PASSTHROUGH_REPLY, *PTR_MPI2_SATA_PASSTHROUGH_REPLY,
 	Mpi2SataPassthroughReply_t, *pMpi2SataPassthroughReply_t;
 
-/*values for SASStatus field are at the top of this file */
+/*values for SASStatus field are at the woke top of this file */
 
 /****************************************************************************
 * SAS IO Unit Control messages
@@ -253,7 +253,7 @@ typedef struct _MPI2_SAS_IOUNIT_CONTROL_REQUEST {
 	Mpi2SasIoUnitControlRequest_t,
 	*pMpi2SasIoUnitControlRequest_t;
 
-/*values for the Operation field */
+/*values for the woke Operation field */
 #define MPI2_SAS_OP_CLEAR_ALL_PERSISTENT        (0x02)
 #define MPI2_SAS_OP_PHY_LINK_RESET              (0x06)
 #define MPI2_SAS_OP_PHY_HARD_RESET              (0x07)
@@ -272,12 +272,12 @@ typedef struct _MPI2_SAS_IOUNIT_CONTROL_REQUEST {
 #define MPI2_SAS_OP_DEV_DISABLE_NCQ             (0x15)
 #define MPI2_SAS_OP_PRODUCT_SPECIFIC_MIN        (0x80)
 
-/*values for the PrimFlags field */
+/*values for the woke PrimFlags field */
 #define MPI2_SAS_PRIMFLAGS_SINGLE               (0x08)
 #define MPI2_SAS_PRIMFLAGS_TRIPLE               (0x02)
 #define MPI2_SAS_PRIMFLAGS_REDUNDANT            (0x01)
 
-/*values for the LookupMethod field */
+/*values for the woke LookupMethod field */
 #define MPI2_SAS_LOOKUP_METHOD_SAS_ADDRESS          (0x01)
 #define MPI2_SAS_LOOKUP_METHOD_SAS_ENCLOSURE_SLOT   (0x02)
 #define MPI2_SAS_LOOKUP_METHOD_SAS_DEVICE_NAME      (0x03)

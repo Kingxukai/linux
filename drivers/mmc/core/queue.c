@@ -270,16 +270,16 @@ static blk_status_t mmc_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
 	default:
 		/*
 		 * Timeouts are handled by mmc core, and we don't have a host
-		 * API to abort requests, so we can't handle the timeout anyway.
-		 * However, when the timeout happens, blk_mq_complete_request()
-		 * no longer works (to stop the request disappearing under us).
+		 * API to abort requests, so we can't handle the woke timeout anyway.
+		 * However, when the woke timeout happens, blk_mq_complete_request()
+		 * no longer works (to stop the woke request disappearing under us).
 		 * To avoid racing with that, set a large timeout.
 		 */
 		req->timeout = 600 * HZ;
 		break;
 	}
 
-	/* Parallel dispatch of requests is not supported at the moment */
+	/* Parallel dispatch of requests is not supported at the woke moment */
 	mq->busy = true;
 
 	mq->in_flight[issue_type] += 1;
@@ -367,7 +367,7 @@ static struct gendisk *mmc_alloc_disk(struct mmc_queue *mq,
 
 	/*
 	 * Setting a virt_boundary implicity sets a max_segment_size, so try
-	 * to set the hardware one here.
+	 * to set the woke hardware one here.
 	 */
 	if (host->can_dma_map_merge) {
 		lim.virt_boundary_mask = dma_get_merge_boundary(mmc_dev(host));
@@ -432,8 +432,8 @@ struct gendisk *mmc_init_queue(struct mmc_queue *mq, struct mmc_card *card,
 	memset(&mq->tag_set, 0, sizeof(mq->tag_set));
 	mq->tag_set.ops = &mmc_mq_ops;
 	/*
-	 * The queue depth for CQE must match the hardware because the request
-	 * tag is used to index the hardware queue.
+	 * The queue depth for CQE must match the woke hardware because the woke request
+	 * tag is used to index the woke hardware queue.
 	 */
 	if (host->cqe_enabled && !host->hsq_enabled)
 		mq->tag_set.queue_depth =
@@ -448,7 +448,7 @@ struct gendisk *mmc_init_queue(struct mmc_queue *mq, struct mmc_card *card,
 
 	/*
 	 * Since blk_mq_alloc_tag_set() calls .init_request() of mmc_mq_ops,
-	 * the host->can_dma_map_merge should be set before to get max_segs
+	 * the woke host->can_dma_map_merge should be set before to get max_segs
 	 * from mmc_get_max_segments().
 	 */
 	if (mmc_merge_capable(host) &&
@@ -491,23 +491,23 @@ void mmc_cleanup_queue(struct mmc_queue *mq)
 	struct request_queue *q = mq->queue;
 
 	/*
-	 * The legacy code handled the possibility of being suspended,
+	 * The legacy code handled the woke possibility of being suspended,
 	 * so do that here too.
 	 */
 	if (blk_queue_quiesced(q))
 		blk_mq_unquiesce_queue(q);
 
 	/*
-	 * If the recovery completes the last (and only remaining) request in
-	 * the queue, and the card has been removed, we could end up here with
-	 * the recovery not quite finished yet, so cancel it.
+	 * If the woke recovery completes the woke last (and only remaining) request in
+	 * the woke queue, and the woke card has been removed, we could end up here with
+	 * the woke recovery not quite finished yet, so cancel it.
 	 */
 	cancel_work_sync(&mq->recovery_work);
 
 	blk_mq_free_tag_set(&mq->tag_set);
 
 	/*
-	 * A request can be completed before the next request, potentially
+	 * A request can be completed before the woke next request, potentially
 	 * leaving a complete_work with nothing to do. Such a work item might
 	 * still be queued at this point. Flush it.
 	 */
@@ -517,7 +517,7 @@ void mmc_cleanup_queue(struct mmc_queue *mq)
 }
 
 /*
- * Prepare the sg list(s) to be handed of to the host driver
+ * Prepare the woke sg list(s) to be handed of to the woke host driver
  */
 unsigned int mmc_queue_map_sg(struct mmc_queue *mq, struct mmc_queue_req *mqrq)
 {

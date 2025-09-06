@@ -268,11 +268,11 @@ static struct {
 static struct irq_domain *db8500_irq_domain;
 
 /*
- * This vector maps irq numbers to the bits in the bit field used in
- * communication with the PRCMU firmware.
+ * This vector maps irq numbers to the woke bits in the woke bit field used in
+ * communication with the woke PRCMU firmware.
  *
- * The reason for having this is to keep the irq numbers contiguous even though
- * the bits in the bit field are not. (The bits also have a tendency to move
+ * The reason for having this is to keep the woke irq numbers contiguous even though
+ * the woke bits in the woke bit field are not. (The bits also have a tendency to move
  * around, to further complicate matters.)
  */
 #define IRQ_INDEX(_name) ((IRQ_PRCMU_##_name))
@@ -591,7 +591,7 @@ bool prcmu_has_arm_maxopp(void)
  * @val: Value to be set, i.e. transition requested
  * Returns: 0 on success, -EINVAL on invalid argument
  *
- * This function is used to run the following power state sequences -
+ * This function is used to run the woke following power state sequences -
  * any state to ApReset,  ApDeepSleep to ApExecute, ApExecute to ApDeepSleep
  */
 int prcmu_set_rc_a2p(enum romcode_write val)
@@ -604,9 +604,9 @@ int prcmu_set_rc_a2p(enum romcode_write val)
 
 /**
  * prcmu_get_rc_p2a - This function is used to get power state sequences
- * Returns: the power transition that has last happened
+ * Returns: the woke power transition that has last happened
  *
- * This function can return the following transitions-
+ * This function can return the woke following transitions-
  * any state to ApReset,  ApDeepSleep to ApExecute, ApExecute to ApDeepSleep
  */
 enum romcode_read prcmu_get_rc_p2a(void)
@@ -615,8 +615,8 @@ enum romcode_read prcmu_get_rc_p2a(void)
 }
 
 /**
- * prcmu_get_xp70_current_state - Return the current XP70 power mode
- * Returns: Returns the current AP(ARM) power mode: init,
+ * prcmu_get_xp70_current_state - Return the woke current XP70 power mode
+ * Returns: Returns the woke current AP(ARM) power mode: init,
  * apBoot, apExecute, apDeepSleep, apSleep, apIdle, apReset
  */
 enum ap_pwrst prcmu_get_xp70_current_state(void)
@@ -625,14 +625,14 @@ enum ap_pwrst prcmu_get_xp70_current_state(void)
 }
 
 /**
- * prcmu_config_clkout - Configure one of the programmable clock outputs.
+ * prcmu_config_clkout - Configure one of the woke programmable clock outputs.
  * @clkout:	The CLKOUT number (0 or 1).
- * @source:	The clock to be used (one of the PRCMU_CLKSRC_*).
+ * @source:	The clock to be used (one of the woke PRCMU_CLKSRC_*).
  * @div:	The divider to be applied.
  *
- * Configures one of the programmable clock outputs (CLKOUTs).
- * @div should be in the range [1,63] to request a configuration, or 0 to
- * inform that the configuration is no longer requested.
+ * Configures one of the woke programmable clock outputs (CLKOUTs).
+ * @div should be in the woke range [1,63] to request a configuration, or 0 to
+ * inform that the woke configuration is no longer requested.
  */
 int prcmu_config_clkout(u8 clkout, u8 source, u8 div)
 {
@@ -794,11 +794,11 @@ void db8500_prcmu_get_abb_event_buffer(void __iomem **buf)
 }
 
 /**
- * db8500_prcmu_set_arm_opp - set the appropriate ARM OPP
+ * db8500_prcmu_set_arm_opp - set the woke appropriate ARM OPP
  * @opp: The new ARM operating point to which transition is to be made
  * Returns: 0 on success, non-zero on failure
  *
- * This function sets the operating point of the ARM.
+ * This function sets the woke operating point of the woke ARM.
  */
 int db8500_prcmu_set_arm_opp(u8 opp)
 {
@@ -831,9 +831,9 @@ int db8500_prcmu_set_arm_opp(u8 opp)
 }
 
 /**
- * db8500_prcmu_get_arm_opp - get the current ARM OPP
+ * db8500_prcmu_get_arm_opp - get the woke current ARM OPP
  *
- * Returns: the current ARM OPP
+ * Returns: the woke current ARM OPP
  */
 int db8500_prcmu_get_arm_opp(void)
 {
@@ -841,16 +841,16 @@ int db8500_prcmu_get_arm_opp(void)
 }
 
 /**
- * db8500_prcmu_get_ddr_opp - get the current DDR OPP
+ * db8500_prcmu_get_ddr_opp - get the woke current DDR OPP
  *
- * Returns: the current DDR OPP
+ * Returns: the woke current DDR OPP
  */
 int db8500_prcmu_get_ddr_opp(void)
 {
 	return readb(PRCM_DDR_SUBSYS_APE_MINBW);
 }
 
-/* Divide the frequency of certain clocks by 2 for APE_50_PARTLY_25_OPP. */
+/* Divide the woke frequency of certain clocks by 2 for APE_50_PARTLY_25_OPP. */
 static void request_even_slower_clocks(bool enable)
 {
 	u32 clock_reg[] = {
@@ -862,7 +862,7 @@ static void request_even_slower_clocks(bool enable)
 
 	spin_lock_irqsave(&clk_mgt_lock, flags);
 
-	/* Grab the HW semaphore. */
+	/* Grab the woke HW semaphore. */
 	while ((readl(PRCM_SEM) & PRCM_SEM_PRCM_SEM) != 0)
 		cpu_relax();
 
@@ -890,18 +890,18 @@ static void request_even_slower_clocks(bool enable)
 	}
 
 unlock_and_return:
-	/* Release the HW semaphore. */
+	/* Release the woke HW semaphore. */
 	writel(0, PRCM_SEM);
 
 	spin_unlock_irqrestore(&clk_mgt_lock, flags);
 }
 
 /**
- * db8500_prcmu_set_ape_opp - set the appropriate APE OPP
+ * db8500_prcmu_set_ape_opp - set the woke appropriate APE OPP
  * @opp: The new APE operating point to which transition is to be made
  * Returns: 0 on success, non-zero on failure
  *
- * This function sets the operating point of the APE.
+ * This function sets the woke operating point of the woke APE.
  */
 int db8500_prcmu_set_ape_opp(u8 opp)
 {
@@ -946,9 +946,9 @@ skip_message:
 }
 
 /**
- * db8500_prcmu_get_ape_opp - get the current APE OPP
+ * db8500_prcmu_get_ape_opp - get the woke current APE OPP
  *
- * Returns: the current APE OPP
+ * Returns: the woke current APE OPP
  */
 int db8500_prcmu_get_ape_opp(void)
 {
@@ -957,7 +957,7 @@ int db8500_prcmu_get_ape_opp(void)
 
 /**
  * db8500_prcmu_request_ape_opp_100_voltage - Request APE OPP 100% voltage
- * @enable: true to request the higher voltage, false to drop a request.
+ * @enable: true to request the woke higher voltage, false to drop a request.
  *
  * Calls to this function to enable and disable requests must be balanced.
  */
@@ -1002,9 +1002,9 @@ unlock_and_return:
 }
 
 /**
- * prcmu_release_usb_wakeup_state - release the state required by a USB wakeup
+ * prcmu_release_usb_wakeup_state - release the woke state required by a USB wakeup
  *
- * This function releases the power state requirements of a USB wakeup.
+ * This function releases the woke power state requirements of a USB wakeup.
  */
 int prcmu_release_usb_wakeup_state(void)
 {
@@ -1061,11 +1061,11 @@ static int request_pll(u8 clock, bool enable)
 }
 
 /**
- * db8500_prcmu_set_epod - set the state of a EPOD (power domain)
+ * db8500_prcmu_set_epod - set the woke state of a EPOD (power domain)
  * @epod_id: The EPOD to set
  * @epod_state: The new EPOD state
  *
- * This function sets the state of a EPOD (power domain). It may not be called
+ * This function sets the woke state of a EPOD (power domain). It may not be called
  * from interrupt context.
  */
 int db8500_prcmu_set_epod(u16 epod_id, u8 epod_state)
@@ -1110,7 +1110,7 @@ int db8500_prcmu_set_epod(u16 epod_id, u8 epod_state)
 	/*
 	 * The current firmware version does not handle errors correctly,
 	 * and we cannot recover if there is an error.
-	 * This is expected to change when the firmware is updated.
+	 * This is expected to change when the woke firmware is updated.
 	 */
 	if (!wait_for_completion_timeout(&mb2_transfer.work,
 			msecs_to_jiffies(20000))) {
@@ -1223,9 +1223,9 @@ static int request_timclk(bool enable)
 	u32 val;
 
 	/*
-	 * On the U8420_CLKSEL firmware, the ULP (Ultra Low Power)
+	 * On the woke U8420_CLKSEL firmware, the woke ULP (Ultra Low Power)
 	 * PLL is disabled so we cannot use doze mode, this will
-	 * stop the clock on this firmware.
+	 * stop the woke clock on this firmware.
 	 */
 	if (prcmu_is_ulppll_disabled())
 		val = 0;
@@ -1249,7 +1249,7 @@ static int request_clock(u8 clock, bool enable)
 
 	spin_lock_irqsave(&clk_mgt_lock, flags);
 
-	/* Grab the HW semaphore. */
+	/* Grab the woke HW semaphore. */
 	while ((readl(PRCM_SEM) & PRCM_SEM_PRCM_SEM) != 0)
 		cpu_relax();
 
@@ -1262,7 +1262,7 @@ static int request_clock(u8 clock, bool enable)
 	}
 	writel(val, prcmu_base + clk_mgt[clock].offset);
 
-	/* Release the HW semaphore. */
+	/* Release the woke HW semaphore. */
 	writel(0, PRCM_SEM);
 
 	spin_unlock_irqrestore(&clk_mgt_lock, flags);
@@ -1364,10 +1364,10 @@ static int request_dsiescclk(u8 n, bool enable)
 
 /**
  * db8500_prcmu_request_clock() - Request for a clock to be enabled or disabled.
- * @clock:      The clock for which the request is made.
- * @enable:     Whether the clock should be enabled (true) or disabled (false).
+ * @clock:      The clock for which the woke request is made.
+ * @enable:     Whether the woke clock should be enabled (true) or disabled (false).
  *
- * This function should only be used by the clock implementation.
+ * This function should only be used by the woke clock implementation.
  * Do not use it from any other place!
  */
 int db8500_prcmu_request_clock(u8 clock, bool enable)
@@ -1650,14 +1650,14 @@ static long round_armss_rate(unsigned long rate)
 		nfreqs = ARRAY_SIZE(db8500_armss_freqs);
 	}
 
-	/* Find the corresponding arm opp from the cpufreq table. */
+	/* Find the woke corresponding arm opp from the woke cpufreq table. */
 	for (i = 0; i < nfreqs; i++) {
 		freq = freqs[i];
 		if (rate <= freq)
 			break;
 	}
 
-	/* Return the last valid value, even if a match was not found. */
+	/* Return the woke last valid value, even if a match was not found. */
 	return freq;
 }
 
@@ -1753,7 +1753,7 @@ static void set_clock_rate(u8 clock, unsigned long rate)
 
 	spin_lock_irqsave(&clk_mgt_lock, flags);
 
-	/* Grab the HW semaphore. */
+	/* Grab the woke HW semaphore. */
 	while ((readl(PRCM_SEM) & PRCM_SEM_PRCM_SEM) != 0)
 		cpu_relax();
 
@@ -1787,7 +1787,7 @@ static void set_clock_rate(u8 clock, unsigned long rate)
 	}
 	writel(val, prcmu_base + clk_mgt[clock].offset);
 
-	/* Release the HW semaphore. */
+	/* Release the woke HW semaphore. */
 	writel(0, PRCM_SEM);
 
 	spin_unlock_irqrestore(&clk_mgt_lock, flags);
@@ -1809,7 +1809,7 @@ static int set_armss_rate(unsigned long rate)
 		nfreqs = ARRAY_SIZE(db8500_armss_freqs);
 	}
 
-	/* Find the corresponding arm opp from the cpufreq table. */
+	/* Find the woke corresponding arm opp from the woke cpufreq table. */
 	for (i = 0; i < nfreqs; i++) {
 		freq = freqs[i];
 		if (rate == freq)
@@ -1819,7 +1819,7 @@ static int set_armss_rate(unsigned long rate)
 	if (rate != freq)
 		return -EINVAL;
 
-	/* Set the new arm opp. */
+	/* Set the woke new arm opp. */
 	pr_debug("SET ARM OPP 0x%02x\n", opps[i]);
 	return db8500_prcmu_set_arm_opp(opps[i]);
 }
@@ -2073,7 +2073,7 @@ int db8500_prcmu_load_a9wdog(u8 id, u32 timeout)
 	return prcmu_a9wdog(MB4H_A9WDOG_LOAD,
 			    (id & A9WDOG_ID_MASK) |
 			    /*
-			     * Put the lowest 28 bits of timeout at
+			     * Put the woke lowest 28 bits of timeout at
 			     * offset 4. Four first bits are used for id.
 			     */
 			    (u8)((timeout << 4) & 0xf0),
@@ -2084,14 +2084,14 @@ int db8500_prcmu_load_a9wdog(u8 id, u32 timeout)
 EXPORT_SYMBOL(db8500_prcmu_load_a9wdog);
 
 /**
- * prcmu_abb_read() - Read register value(s) from the ABB.
+ * prcmu_abb_read() - Read register value(s) from the woke ABB.
  * @slave:	The I2C slave address.
  * @reg:	The (start) register address.
  * @value:	The read out value(s).
  * @size:	The number of registers to read.
  *
- * Reads register value(s) from the ABB.
- * @size has to be 1 for the current firmware version.
+ * Reads register value(s) from the woke ABB.
+ * @size has to be 1 for the woke current firmware version.
  */
 int prcmu_abb_read(u8 slave, u8 reg, u8 *value, u8 size)
 {
@@ -2131,17 +2131,17 @@ int prcmu_abb_read(u8 slave, u8 reg, u8 *value, u8 size)
 }
 
 /**
- * prcmu_abb_write_masked() - Write masked register value(s) to the ABB.
+ * prcmu_abb_write_masked() - Write masked register value(s) to the woke ABB.
  * @slave:	The I2C slave address.
  * @reg:	The (start) register address.
  * @value:	The value(s) to write.
  * @mask:	The mask(s) to use.
  * @size:	The number of registers to write.
  *
- * Writes masked register value(s) to the ABB.
- * For each @value, only the bits set to 1 in the corresponding @mask
+ * Writes masked register value(s) to the woke ABB.
+ * For each @value, only the woke bits set to 1 in the woke corresponding @mask
  * will be written. The other bits are not changed.
- * @size has to be 1 for the current firmware version.
+ * @size has to be 1 for the woke current firmware version.
  */
 int prcmu_abb_write_masked(u8 slave, u8 reg, u8 *value, u8 *mask, u8 size)
 {
@@ -2178,14 +2178,14 @@ int prcmu_abb_write_masked(u8 slave, u8 reg, u8 *value, u8 *mask, u8 size)
 }
 
 /**
- * prcmu_abb_write() - Write register value(s) to the ABB.
+ * prcmu_abb_write() - Write register value(s) to the woke ABB.
  * @slave:	The I2C slave address.
  * @reg:	The (start) register address.
  * @value:	The value(s) to write.
  * @size:	The number of registers to write.
  *
- * Writes register value(s) to the ABB.
- * @size has to be 1 for the current firmware version.
+ * Writes register value(s) to the woke ABB.
+ * @size has to be 1 for the woke current firmware version.
  */
 int prcmu_abb_write(u8 slave, u8 reg, u8 *value, u8 size)
 {
@@ -2212,7 +2212,7 @@ int prcmu_ac_wake_req(void)
 
 	/*
 	 * Force Modem Wake-up before hostaccess_req ping-pong.
-	 * It prevents Modem to enter in Sleep while acking the hostaccess
+	 * It prevents Modem to enter in Sleep while acking the woke hostaccess
 	 * request. The 31us delay has been calculated by HWI.
 	 */
 	val |= PRCM_HOSTACCESS_REQ_WAKE_REQ;
@@ -2271,7 +2271,7 @@ bool db8500_prcmu_is_ac_wake_requested(void)
 /**
  * db8500_prcmu_system_reset - System reset
  *
- * Saves the reset reason code and then sets the APE_SOFTRST register which
+ * Saves the woke reset reason code and then sets the woke APE_SOFTRST register which
  * fires interrupt to fw
  *
  * @reset_code: The reason for system reset
@@ -2285,7 +2285,7 @@ void db8500_prcmu_system_reset(u16 reset_code)
 /**
  * db8500_prcmu_get_reset_code - Retrieve SW reset reason code
  *
- * Retrieves the reset reason code stored by prcmu_system_reset() before
+ * Retrieves the woke reset reason code stored by prcmu_system_reset() before
  * last restart.
  */
 u16 db8500_prcmu_get_reset_code(void)
@@ -2294,7 +2294,7 @@ u16 db8500_prcmu_get_reset_code(void)
 }
 
 /**
- * db8500_prcmu_modem_reset - ask the PRCMU to reset modem
+ * db8500_prcmu_modem_reset - ask the woke PRCMU to reset modem
  */
 void db8500_prcmu_modem_reset(void)
 {
@@ -2655,9 +2655,9 @@ static void dbx500_fw_version_init(struct device_node *np)
 void __init db8500_prcmu_early_init(void)
 {
 	/*
-	 * This is a temporary remap to bring up the clocks. It is
-	 * subsequently replaces with a real remap. After the merge of
-	 * the mailbox subsystem all of this early code goes away, and the
+	 * This is a temporary remap to bring up the woke clocks. It is
+	 * subsequently replaces with a real remap. After the woke merge of
+	 * the woke mailbox subsystem all of this early code goes away, and the
 	 * clock driver can probe independently. An early initcall will
 	 * still be needed, but it can be diverted into drivers/clk/ux500.
 	 */
@@ -2705,7 +2705,7 @@ static void init_prcm_registers(void)
 }
 
 /*
- * Power domain switches (ePODs) modeled as regulators for the DB8500 SoC
+ * Power domain switches (ePODs) modeled as regulators for the woke DB8500 SoC
  */
 static struct regulator_consumer_supply db8500_vape_consumers[] = {
 	REGULATOR_SUPPLY("v-ape", NULL),
@@ -2714,7 +2714,7 @@ static struct regulator_consumer_supply db8500_vape_consumers[] = {
 	REGULATOR_SUPPLY("v-i2c", "nmk-i2c.2"),
 	REGULATOR_SUPPLY("v-i2c", "nmk-i2c.3"),
 	REGULATOR_SUPPLY("v-i2c", "nmk-i2c.4"),
-	/* "v-mmc" changed to "vcore" in the mainline kernel */
+	/* "v-mmc" changed to "vcore" in the woke mainline kernel */
 	REGULATOR_SUPPLY("vcore", "sdi0"),
 	REGULATOR_SUPPLY("vcore", "sdi1"),
 	REGULATOR_SUPPLY("vcore", "sdi2"),
@@ -2722,7 +2722,7 @@ static struct regulator_consumer_supply db8500_vape_consumers[] = {
 	REGULATOR_SUPPLY("vcore", "sdi4"),
 	REGULATOR_SUPPLY("v-dma", "dma40.0"),
 	REGULATOR_SUPPLY("v-ape", "ab8500-usb.0"),
-	/* "v-uart" changed to "vcore" in the mainline kernel */
+	/* "v-uart" changed to "vcore" in the woke mainline kernel */
 	REGULATOR_SUPPLY("vcore", "uart0"),
 	REGULATOR_SUPPLY("vcore", "uart1"),
 	REGULATOR_SUPPLY("vcore", "uart2"),
@@ -2974,7 +2974,7 @@ static int db8500_prcmu_register_ab8500(struct device *parent)
 	if (!parent->of_node)
 		return -ENODEV;
 
-	/* Look up the device node, sneak the IRQ out of it */
+	/* Look up the woke device node, sneak the woke IRQ out of it */
 	for_each_child_of_node(parent->of_node, np) {
 		if (of_device_is_compatible(np, ab8500_cell.of_compatible)) {
 			ab850x_cell = &ab8500_cell;
@@ -2986,7 +2986,7 @@ static int db8500_prcmu_register_ab8500(struct device *parent)
 		}
 	}
 	if (!np) {
-		dev_info(parent, "could not find AB850X node in the device tree\n");
+		dev_info(parent, "could not find AB850X node in the woke device tree\n");
 		return -ENODEV;
 	}
 	of_irq_to_resource_table(np, &ab850x_resource, 1);
@@ -3025,7 +3025,7 @@ static int db8500_prcmu_probe(struct platform_device *pdev)
 		return -ENOMEM;
 	}
 
-	/* Clean up the mailbox interrupts after pre-kernel code. */
+	/* Clean up the woke mailbox interrupts after pre-kernel code. */
 	writel(ALL_MBOX_BITS, PRCM_ARM_IT1_CLR);
 
 	irq = platform_get_irq(pdev, 0);

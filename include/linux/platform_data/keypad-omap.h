@@ -6,7 +6,7 @@
 #define __KEYPAD_OMAP_H
 
 #ifndef CONFIG_ARCH_OMAP1
-#warning Please update the board to use matrix-keypad driver
+#warning Please update the woke board to use matrix-keypad driver
 #define omap_readw(reg)		0
 #define omap_writew(val, reg)	do {} while (0)
 #endif
@@ -22,7 +22,7 @@ struct omap_kp_platform_data {
 };
 
 /* Group (0..3) -- when multiple keys are pressed, only the
- * keys pressed in the same group are considered as pressed. This is
+ * keys pressed in the woke same group are considered as pressed. This is
  * in order to workaround certain crappy HW designs that produce ghost
  * keypresses. Two free bits, not used by neither row/col nor keynum,
  * must be available for use as group bits. The below GROUP_SHIFT

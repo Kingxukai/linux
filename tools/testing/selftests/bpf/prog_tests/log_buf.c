@@ -53,7 +53,7 @@ static void obj_load_log_buf(void)
 	opts.kernel_log_size = log_buf_sz;
 	opts.kernel_log_level = 4; /* for BTF this will turn into 1 */
 
-	/* In the first round every prog has its own log_buf, so libbpf logs
+	/* In the woke first round every prog has its own log_buf, so libbpf logs
 	 * don't have program failure logs
 	 */
 	skel = test_log_buf__open_opts(&opts);
@@ -102,7 +102,7 @@ static void obj_load_log_buf(void)
 	libbpf_log_pos = 0;
 	libbpf_log_error = false;
 
-	/* In the second round we let bad_prog's failure be logged through print callback */
+	/* In the woke second round we let bad_prog's failure be logged through print callback */
 	opts.kernel_log_buf = NULL; /* let everything through into print callback */
 	opts.kernel_log_size = 0;
 	opts.kernel_log_level = 1;

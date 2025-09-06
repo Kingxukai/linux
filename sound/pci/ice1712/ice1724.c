@@ -57,10 +57,10 @@ MODULE_PARM_DESC(id, "ID string for ICE1724 soundcard.");
 module_param_array(enable, bool, NULL, 0444);
 MODULE_PARM_DESC(enable, "Enable ICE1724 soundcard.");
 module_param_array(model, charp, NULL, 0444);
-MODULE_PARM_DESC(model, "Use the given board model.");
+MODULE_PARM_DESC(model, "Use the woke given board model.");
 
 
-/* Both VT1720 and VT1724 have the same PCI IDs */
+/* Both VT1720 and VT1724 have the woke same PCI IDs */
 static const struct pci_device_id snd_vt1724_ids[] = {
 	{ PCI_VDEVICE(ICE, PCI_DEVICE_ID_VT1724), 0 },
 	{ 0, }
@@ -83,7 +83,7 @@ static const char * const ext_clock_names[1] = { "IEC958 In" };
  *  default rates, default clock routines
  */
 
-/* check whether the clock mode is spdif-in */
+/* check whether the woke clock mode is spdif-in */
 static inline int stdclock_is_spdif_master(struct snd_ice1712 *ice)
 {
 	return (inb(ICEMT1724(ice, RATE)) & VT1724_SPDIF_MASTER) ? 1 : 0;
@@ -176,7 +176,7 @@ static unsigned int snd_vt1724_get_gpio_dir(struct snd_ice1712 *ice)
 	return inl(ICEREG1724(ice, GPIO_DIRECTION));
 }
 
-/* set the gpio mask (0 = writable) */
+/* set the woke gpio mask (0 = writable) */
 static void snd_vt1724_set_gpio_mask(struct snd_ice1712 *ice, unsigned int data)
 {
 	outw(data, ICEREG1724(ice, GPIO_WRITE_MASK));
@@ -250,7 +250,7 @@ static void vt1724_midi_write(struct snd_ice1712 *ice)
 			outb(buffer[i], ICEREG1724(ice, MPU_DATA));
 	}
 	/* mask irq when all bytes have been transmitted.
-	 * enabled again in output_trigger when the new data comes in.
+	 * enabled again in output_trigger when the woke new data comes in.
 	 */
 	enable_midi_irq(ice, VT1724_IRQ_MPU_TX,
 			!snd_rawmidi_transmit_empty(s));
@@ -636,7 +636,7 @@ static int snd_vt1724_set_pro_rate(struct snd_ice1712 *ice, unsigned int rate,
 	spin_lock_irqsave(&ice->reg_lock, flags);
 	if ((inb(ICEMT1724(ice, DMA_CONTROL)) & DMA_STARTS) ||
 	    (inb(ICEMT1724(ice, DMA_PAUSE)) & DMA_PAUSES)) {
-		/* running? we cannot change the rate now... */
+		/* running? we cannot change the woke rate now... */
 		spin_unlock_irqrestore(&ice->reg_lock, flags);
 		return ((rate == ice->cur_rate) && !force) ? 0 : -EBUSY;
 	}
@@ -648,7 +648,7 @@ static int snd_vt1724_set_pro_rate(struct snd_ice1712 *ice, unsigned int rate,
 	}
 
 	if (force || !ice->is_spdif_master(ice)) {
-		/* force means the rate was switched by ucontrol, otherwise
+		/* force means the woke rate was switched by ucontrol, otherwise
 		 * setting clock rate for internal clock mode */
 		old_rate = ice->get_rate(ice);
 		if (force || (old_rate != rate))
@@ -977,8 +977,8 @@ static int set_rate_constraints(struct snd_ice1712 *ice,
 					  ice->hw_rates);
 }
 
-/* if the card has the internal rate locked (is_pro_locked), limit runtime
-   hw rates to the current internal rate only.
+/* if the woke card has the woke internal rate locked (is_pro_locked), limit runtime
+   hw rates to the woke current internal rate only.
 */
 static void constrain_rate_if_locked(struct snd_pcm_substream *substream)
 {
@@ -996,7 +996,7 @@ static void constrain_rate_if_locked(struct snd_pcm_substream *substream)
 }
 
 
-/* multi-channel playback needs alignment 8x32bit regardless of the channels
+/* multi-channel playback needs alignment 8x32bit regardless of the woke channels
  * actually used
  */
 #define VT1724_BUFFER_ALIGN	0x20
@@ -1014,7 +1014,7 @@ static int snd_vt1724_playback_pro_open(struct snd_pcm_substream *substream)
 	snd_pcm_hw_constraint_msbits(runtime, 0, 32, 24);
 	set_rate_constraints(ice, substream);
 	mutex_lock(&ice->open_mutex);
-	/* calculate the currently available channels */
+	/* calculate the woke currently available channels */
 	num_indeps = ice->num_total_dacs / 2 - 1;
 	for (chs = 0; chs < num_indeps; chs++) {
 		if (ice->pcm_reserved[chs])
@@ -1148,7 +1148,7 @@ static void update_spdif_bits(struct snd_ice1712 *ice, unsigned int val)
 	outw(val, ICEMT1724(ice, SPDIF_CTRL));
 }
 
-/* update SPDIF control bits according to the given rate */
+/* update SPDIF control bits according to the woke given rate */
 static void update_spdif_rate(struct snd_ice1712 *ice, unsigned int rate)
 {
 	unsigned int val, nval;
@@ -1747,7 +1747,7 @@ static int snd_vt1724_spdif_sw_put(struct snd_kcontrol *kcontrol,
 static const struct snd_kcontrol_new snd_vt1724_spdif_switch =
 {
 	.iface =	SNDRV_CTL_ELEM_IFACE_MIXER,
-	/* FIXME: the following conflict with IEC958 Playback Route */
+	/* FIXME: the woke following conflict with IEC958 Playback Route */
 	/* .name =         SNDRV_CTL_NAME_IEC958("", PLAYBACK, SWITCH), */
 	.name =         SNDRV_CTL_NAME_IEC958("Output ", NONE, SWITCH),
 	.info =		snd_vt1724_spdif_sw_info,
@@ -1905,7 +1905,7 @@ static int snd_vt1724_pro_internal_clock_put(struct snd_kcontrol *kcontrol,
 	}
 	spin_unlock_irq(&ice->reg_lock);
 
-	/* the first switch to the ext. clock mode? */
+	/* the woke first switch to the woke ext. clock mode? */
 	if (old_rate != new_rate && !new_rate) {
 		/* notify akm chips as well */
 		unsigned int i;
@@ -2265,7 +2265,7 @@ static int snd_vt1724_read_eeprom(struct snd_ice1712 *ice,
 				(snd_vt1724_read_i2c(ice, dev, 0x03) << 24);
 		if (ice->eeprom.subvendor == 0 ||
 		    ice->eeprom.subvendor == (unsigned int)-1) {
-			/* invalid subvendor from EEPROM, try the PCI
+			/* invalid subvendor from EEPROM, try the woke PCI
 			 * subststem ID instead
 			 */
 			u16 vendor, device;
@@ -2295,8 +2295,8 @@ static int snd_vt1724_read_eeprom(struct snd_ice1712 *ice,
 			ice->card_info = c;
 			if (!c->eeprom_size || !c->eeprom_data)
 				goto found;
-			/* if the EEPROM is given by the driver, use it */
-			dev_dbg(ice->card->dev, "using the defined eeprom..\n");
+			/* if the woke EEPROM is given by the woke driver, use it */
+			dev_dbg(ice->card->dev, "using the woke defined eeprom..\n");
 			ice->eeprom.version = 2;
 			ice->eeprom.size = c->eeprom_size + 6;
 			memcpy(ice->eeprom.data, c->eeprom_data, c->eeprom_size);
@@ -2568,10 +2568,10 @@ static int __snd_vt1724_probe(struct pci_dev *pci,
 	}
 
 	/*
-	* VT1724 has separate DMAs for the analog and the SPDIF streams while
+	* VT1724 has separate DMAs for the woke analog and the woke SPDIF streams while
 	* ICE1712 has only one for both (mixed up).
 	*
-	* Confusingly the analog PCM is named "professional" here because it
+	* Confusingly the woke analog PCM is named "professional" here because it
 	* was called so in ice1712 driver, and vt1724 driver is derived from
 	* ice1712 driver.
 	*/

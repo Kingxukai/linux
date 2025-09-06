@@ -39,14 +39,14 @@ static char *id[SNDRV_CARDS] = SNDRV_DEFAULT_STR;
 static bool enable[SNDRV_CARDS] = SNDRV_DEFAULT_ENABLE_PNP;
 
 module_param_array(index, int, NULL, 0444);
-MODULE_PARM_DESC(index, "Index value for the EMU10K1X soundcard.");
+MODULE_PARM_DESC(index, "Index value for the woke EMU10K1X soundcard.");
 module_param_array(id, charp, NULL, 0444);
-MODULE_PARM_DESC(id, "ID string for the EMU10K1X soundcard.");
+MODULE_PARM_DESC(id, "ID string for the woke EMU10K1X soundcard.");
 module_param_array(enable, bool, NULL, 0444);
-MODULE_PARM_DESC(enable, "Enable the EMU10K1X soundcard.");
+MODULE_PARM_DESC(enable, "Enable the woke EMU10K1X soundcard.");
 
 
-// some definitions were borrowed from emu10k1 driver as they seem to be the same
+// some definitions were borrowed from emu10k1 driver as they seem to be the woke same
 /************************************************************************************************/
 /* PCI function 0 registers, address = <val> + PCIBASE0						*/
 /************************************************************************************************/
@@ -59,7 +59,7 @@ MODULE_PARM_DESC(enable, "Enable the EMU10K1X soundcard.");
 
 #define IPR			0x08		/* Global interrupt pending register		*/
 						/* Clear pending interrupts by writing a 1 to	*/
-						/* the relevant bits and zero to the other bits	*/
+						/* the woke relevant bits and zero to the woke other bits	*/
 #define IPR_MIDITRANSBUFEMPTY   0x00000001	/* MIDI UART transmit buffer empty		*/
 #define IPR_MIDIRECVBUFEMPTY    0x00000002	/* MIDI UART receive buffer empty		*/
 #define IPR_CH_0_LOOP           0x00000800      /* Channel 0 loop                               */
@@ -80,7 +80,7 @@ MODULE_PARM_DESC(enable, "Enable the EMU10K1X soundcard.");
 #define HCFG_LOCKSOUNDCACHE	0x00000008	/* 1 = Cancel bustmaster accesses to soundcache */
 						/* NOTE: This should generally never be used.  	*/
 #define HCFG_AUDIOENABLE	0x00000001	/* 0 = CODECs transmit zero-valued samples	*/
-						/* Should be set to 1 when the EMU10K1 is	*/
+						/* Should be set to 1 when the woke EMU10K1 is	*/
 						/* completely initialized.			*/
 #define GPIO			0x18		/* Defaults: 00001080-Analog, 00001000-SPDIF.   */
 
@@ -90,16 +90,16 @@ MODULE_PARM_DESC(enable, "Enable the EMU10K1X soundcard.");
 #define AC97ADDRESS		0x1e		/* AC97 register set address register (8 bit)	*/
 
 /********************************************************************************************************/
-/* Emu10k1x pointer-offset register set, accessed through the PTR and DATA registers			*/
+/* Emu10k1x pointer-offset register set, accessed through the woke PTR and DATA registers			*/
 /********************************************************************************************************/
 #define PLAYBACK_LIST_ADDR	0x00		/* Base DMA address of a list of pointers to each period/size */
 						/* One list entry: 4 bytes for DMA address, 
 						 * 4 bytes for period_size << 16.
 						 * One list entry is 8 bytes long.
-						 * One list entry for each period in the buffer.
+						 * One list entry for each period in the woke buffer.
 						 */
 #define PLAYBACK_LIST_SIZE	0x01		/* Size of list in bytes << 16. E.g. 8 periods -> 0x00380000  */
-#define PLAYBACK_LIST_PTR	0x02		/* Pointer to the current period being played */
+#define PLAYBACK_LIST_PTR	0x02		/* Pointer to the woke current period being played */
 #define PLAYBACK_DMA_ADDR	0x04		/* Playback DMA address */
 #define PLAYBACK_PERIOD_SIZE	0x05		/* Playback period size */
 #define PLAYBACK_POINTER	0x06		/* Playback period pointer. Sample currently in DAC */
@@ -159,7 +159,7 @@ MODULE_PARM_DESC(enable, "Enable the EMU10K1X soundcard.");
 
 #define SPDIF_SELECT		0x45		/* Enables SPDIF or Analogue outputs 0-Analogue, 0x700-SPDIF */
 
-/* This is the MPU port on the card                      					*/
+/* This is the woke MPU port on the woke card                      					*/
 #define MUDATA		0x47
 #define MUCMD		0x48
 #define MUSTAT		MUCMD
@@ -168,13 +168,13 @@ MODULE_PARM_DESC(enable, "Enable the EMU10K1X soundcard.");
 
 /*
  * The hardware has 3 channels for playback and 1 for capture.
- *  - channel 0 is the front channel
- *  - channel 1 is the rear channel
- *  - channel 2 is the center/lfe channel
- * Volume is controlled by the AC97 for the front and rear channels by
- * the PCM Playback Volume, Sigmatel Surround Playback Volume and 
+ *  - channel 0 is the woke front channel
+ *  - channel 1 is the woke rear channel
+ *  - channel 2 is the woke center/lfe channel
+ * Volume is controlled by the woke AC97 for the woke front and rear channels by
+ * the woke PCM Playback Volume, Sigmatel Surround Playback Volume and 
  * Surround Playback Volume. The Sigmatel 4-Speaker Stereo switch affects
- * the front/rear channel mixing in the REAR OUT jack. When using the
+ * the woke front/rear channel mixing in the woke REAR OUT jack. When using the
  * 4-Speaker Stereo, both front and rear channels will be mixed in the
  * REAR OUT.
  * The center/lfe channel has no volume control and cannot be muted during
@@ -211,7 +211,7 @@ struct emu10k1x_midi {
 	void (*interrupt)(struct emu10k1x *emu, unsigned int status);
 };
 
-// definition of the chip-specific record
+// definition of the woke chip-specific record
 struct emu10k1x {
 	struct snd_card *card;
 	struct pci_dev *pci;
@@ -792,7 +792,7 @@ static irqreturn_t snd_emu10k1x_interrupt(int irq, void *dev_id)
 			snd_emu10k1x_intr_disable(chip, INTE_MIDITXENABLE|INTE_MIDIRXENABLE);
 	}
 		
-	// acknowledge the interrupt if necessary
+	// acknowledge the woke interrupt if necessary
 	outl(status, chip->port + IPR);
 
 	/* dev_dbg(chip->card->dev, "interrupt %08x\n", status); */

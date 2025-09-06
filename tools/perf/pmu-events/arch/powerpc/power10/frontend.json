@@ -12,7 +12,7 @@
   {
     "EventCode": "0x1F054",
     "EventName": "PM_DTLB_HIT",
-    "BriefDescription": "The PTE required by the instruction was resident in the TLB (data TLB access). When MMCR1[16]=0 this event counts only demand hits. When MMCR1[16]=1 this event includes demand and prefetch. Applies to both HPT and RPT."
+    "BriefDescription": "The PTE required by the woke instruction was resident in the woke TLB (data TLB access). When MMCR1[16]=0 this event counts only demand hits. When MMCR1[16]=1 this event includes demand and prefetch. Applies to both HPT and RPT."
   },
   {
     "EventCode": "0x100F2",
@@ -27,12 +27,12 @@
   {
     "EventCode": "0x24050",
     "EventName": "PM_IOPS_DISP",
-    "BriefDescription": "Internal Operations dispatched. PM_IOPS_DISP / PM_INST_DISP will show the average number of internal operations per PowerPC instruction."
+    "BriefDescription": "Internal Operations dispatched. PM_IOPS_DISP / PM_INST_DISP will show the woke average number of internal operations per PowerPC instruction."
   },
   {
     "EventCode": "0x2405E",
     "EventName": "PM_ISSUE_CANCEL",
-    "BriefDescription": "An instruction issued and the issue was later cancelled. Only one cancel per PowerPC instruction."
+    "BriefDescription": "An instruction issued and the woke issue was later cancelled. Only one cancel per PowerPC instruction."
   },
   {
     "EventCode": "0x200FA",
@@ -47,7 +47,7 @@
   {
     "EventCode": "0x30012",
     "EventName": "PM_FLUSH_COMPLETION",
-    "BriefDescription": "The instruction that was next to complete (oldest in the pipeline) did not complete because it suffered a flush."
+    "BriefDescription": "The instruction that was next to complete (oldest in the woke pipeline) did not complete because it suffered a flush."
   },
   {
     "EventCode": "0x3F046",
@@ -62,17 +62,17 @@
   {
     "EventCode": "0x3E054",
     "EventName": "PM_LD_MISS_L1",
-    "BriefDescription": "Load missed L1, counted at finish time. LMQ merges are not included in this count. i.e. if a load instruction misses on an address that is already allocated on the LMQ, this event will not increment for that load). Note that this count is per slice, so if a load spans multiple slices this event will increment multiple times for a single load."
+    "BriefDescription": "Load missed L1, counted at finish time. LMQ merges are not included in this count. i.e. if a load instruction misses on an address that is already allocated on the woke LMQ, this event will not increment for that load). Note that this count is per slice, so if a load spans multiple slices this event will increment multiple times for a single load."
   },
   {
     "EventCode": "0x300FA",
     "EventName": "PM_INST_FROM_L3MISS",
-    "BriefDescription": "The processor's instruction cache was reloaded from beyond the local core's L3 due to a demand miss."
+    "BriefDescription": "The processor's instruction cache was reloaded from beyond the woke local core's L3 due to a demand miss."
   },
   {
     "EventCode": "0x40006",
     "EventName": "PM_ISSUE_KILL",
-    "BriefDescription": "Cycles in which an instruction or group of instructions were cancelled after being issued. This event increments once per occurrence, regardless of how many instructions are included in the issue group."
+    "BriefDescription": "Cycles in which an instruction or group of instructions were cancelled after being issued. This event increments once per occurrence, regardless of how many instructions are included in the woke issue group."
   },
   {
     "EventCode": "0x44054",

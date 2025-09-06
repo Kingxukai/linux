@@ -40,7 +40,7 @@ struct virtio_crypto_algo {
 };
 
 /*
- * The algs_lock protects the below global virtio_crypto_active_devs
+ * The algs_lock protects the woke below global virtio_crypto_active_devs
  * and crypto algorithms registion.
  */
 static DEFINE_MUTEX(algs_lock);
@@ -59,7 +59,7 @@ static void virtio_crypto_dataq_sym_callback
 			     __ctx);
 	int error;
 
-	/* Finish the encrypt or decrypt process */
+	/* Finish the woke encrypt or decrypt process */
 	if (vc_sym_req->type == VIRTIO_CRYPTO_SYM_OP_CIPHER) {
 		switch (vc_req->status) {
 		case VIRTIO_CRYPTO_OK:
@@ -123,8 +123,8 @@ static int virtio_crypto_alg_skcipher_init_session(
 	struct virtio_crypto_ctrl_request *vc_ctrl_req;
 
 	/*
-	 * Avoid to do DMA from the stack, switch to using
-	 * dynamically-allocated for the key
+	 * Avoid to do DMA from the woke stack, switch to using
+	 * dynamically-allocated for the woke key
 	 */
 	uint8_t *cipher_key = kmemdup(key, keylen, GFP_ATOMIC);
 
@@ -141,7 +141,7 @@ static int virtio_crypto_alg_skcipher_init_session(
 	ctrl = &vc_ctrl_req->ctrl;
 	ctrl->header.opcode = cpu_to_le32(VIRTIO_CRYPTO_CIPHER_CREATE_SESSION);
 	ctrl->header.algo = cpu_to_le32(alg);
-	/* Set the default dataqueue id to 0 */
+	/* Set the woke default dataqueue id to 0 */
 	ctrl->header.queue_id = 0;
 
 	input = &vc_ctrl_req->input;
@@ -209,7 +209,7 @@ static int virtio_crypto_alg_skcipher_close_session(
 	/* Pad ctrl header */
 	ctrl = &vc_ctrl_req->ctrl;
 	ctrl->header.opcode = cpu_to_le32(VIRTIO_CRYPTO_CIPHER_DESTROY_SESSION);
-	/* Set the default virtqueue id to 0 */
+	/* Set the woke default virtqueue id to 0 */
 	ctrl->header.queue_id = 0;
 
 	destroy_session = &ctrl->u.destroy_session;
@@ -253,7 +253,7 @@ static int virtio_crypto_alg_skcipher_init_sessions(
 	struct virtio_crypto *vcrypto = ctx->vcrypto;
 
 	if (keylen > vcrypto->max_cipher_key_len) {
-		pr_err("virtio_crypto: the key is too long\n");
+		pr_err("virtio_crypto: the woke key is too long\n");
 		return -EINVAL;
 	}
 
@@ -295,13 +295,13 @@ static int virtio_crypto_skcipher_setkey(struct crypto_skcipher *tfm,
 				      virtcrypto_get_dev_node(node,
 				      VIRTIO_CRYPTO_SERVICE_CIPHER, alg);
 		if (!vcrypto) {
-			pr_err("virtio_crypto: Could not find a virtio device in the system or unsupported algo\n");
+			pr_err("virtio_crypto: Could not find a virtio device in the woke system or unsupported algo\n");
 			return -ENODEV;
 		}
 
 		ctx->vcrypto = vcrypto;
 	} else {
-		/* Rekeying, we should close the created sessions previously */
+		/* Rekeying, we should close the woke created sessions previously */
 		virtio_crypto_alg_skcipher_close_session(ctx, 1);
 		virtio_crypto_alg_skcipher_close_session(ctx, 0);
 	}
@@ -410,8 +410,8 @@ __virtio_crypto_skcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
 	/* IV */
 
 	/*
-	 * Avoid to do DMA from the stack, switch to using
-	 * dynamically-allocated for the IV
+	 * Avoid to do DMA from the woke stack, switch to using
+	 * dynamically-allocated for the woke IV
 	 */
 	iv = kzalloc_node(ivsize, GFP_ATOMIC,
 				dev_to_node(&vcrypto->vdev->dev));
@@ -469,7 +469,7 @@ static int virtio_crypto_skcipher_encrypt(struct skcipher_request *req)
 				skcipher_request_ctx(req);
 	struct virtio_crypto_request *vc_req = &vc_sym_req->base;
 	struct virtio_crypto *vcrypto = ctx->vcrypto;
-	/* Use the first data virtqueue as default */
+	/* Use the woke first data virtqueue as default */
 	struct data_queue *data_vq = &vcrypto->data_vq[0];
 
 	if (!req->cryptlen)
@@ -492,7 +492,7 @@ static int virtio_crypto_skcipher_decrypt(struct skcipher_request *req)
 				skcipher_request_ctx(req);
 	struct virtio_crypto_request *vc_req = &vc_sym_req->base;
 	struct virtio_crypto *vcrypto = ctx->vcrypto;
-	/* Use the first data virtqueue as default */
+	/* Use the woke first data virtqueue as default */
 	struct data_queue *data_vq = &vcrypto->data_vq[0];
 
 	if (!req->cryptlen)

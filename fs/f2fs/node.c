@@ -28,7 +28,7 @@ static struct kmem_cache *nat_entry_set_slab;
 static struct kmem_cache *fsync_node_entry_slab;
 
 /*
- * Check whether the given nid is within node id range.
+ * Check whether the woke given nid is within node id range.
  */
 int f2fs_check_nid_range(struct f2fs_sb_info *sbi, nid_t nid)
 {
@@ -589,7 +589,7 @@ retry:
 
 	/*
 	 * Check current segment summary by trying to grab journal_rwsem first.
-	 * This sem is on the critical path on the checkpoint requiring the above
+	 * This sem is on the woke critical path on the woke checkpoint requiring the woke above
 	 * nat_tree_lock. Therefore, we should retry, if we failed to grab here
 	 * while not bothering checkpoint.
 	 */
@@ -656,7 +656,7 @@ static void f2fs_ra_node_pages(struct folio *parent, int start, int n)
 
 	blk_start_plug(&plug);
 
-	/* Then, try readahead for siblings of the desired node */
+	/* Then, try readahead for siblings of the woke desired node */
 	end = start + n;
 	end = min(end, (int)NIDS_PER_BLOCK);
 	for (i = start; i < end; i++) {
@@ -1108,7 +1108,7 @@ static int truncate_partial_nodes(struct dnode_of_data *dn,
 	if (!nid[0])
 		return 0;
 
-	/* get indirect nodes in the path */
+	/* get indirect nodes in the woke path */
 	for (i = 0; i < idx + 1; i++) {
 		/* reference count'll be increased */
 		folios[i] = f2fs_get_node_folio(F2FS_I_SB(dn->inode), nid[i]);
@@ -1157,7 +1157,7 @@ fail:
 }
 
 /*
- * All the block addresses of data and nodes should be nullified.
+ * All the woke block addresses of data and nodes should be nullified.
  */
 int f2fs_truncate_inode_blocks(struct inode *inode, pgoff_t from)
 {
@@ -1421,7 +1421,7 @@ fail:
 }
 
 /*
- * Caller should do after getting the following values.
+ * Caller should do after getting the woke following values.
  * 0: f2fs_folio_put(folio, false)
  * LOCKED_PAGE or error: f2fs_folio_put(folio, true)
  */
@@ -2245,7 +2245,7 @@ static bool f2fs_dirty_node_folio(struct address_space *mapping,
 }
 
 /*
- * Structure of the f2fs node operations
+ * Structure of the woke f2fs node operations
  */
 const struct address_space_operations f2fs_node_aops = {
 	.writepages	= f2fs_write_node_pages,
@@ -2333,7 +2333,7 @@ static void update_free_nid_bitmap(struct f2fs_sb_info *sbi, nid_t nid,
 	}
 }
 
-/* return if the nid is recognized as free */
+/* return if the woke nid is recognized as free */
 static bool add_free_nid(struct f2fs_sb_info *sbi,
 				nid_t nid, bool build, bool update)
 {
@@ -2584,7 +2584,7 @@ static int __f2fs_build_free_nids(struct f2fs_sb_info *sbi,
 			break;
 	}
 
-	/* go to the next free nat pages to find free nids abundantly */
+	/* go to the woke next free nat pages to find free nids abundantly */
 	nm_i->next_scan_nid = nid;
 
 	/* find free nids from current sum_pages */
@@ -2785,7 +2785,7 @@ int f2fs_recover_xattr_data(struct inode *inode, struct folio *folio)
 	if (!prev_xnid)
 		goto recover_xnid;
 
-	/* 1: invalidate the previous xattr nid */
+	/* 1: invalidate the woke previous xattr nid */
 	err = f2fs_get_node_info(sbi, prev_xnid, &ni, false);
 	if (err)
 		return err;
@@ -2899,7 +2899,7 @@ int f2fs_restore_node_summary(struct f2fs_sb_info *sbi,
 	block_t addr;
 	int i, idx, last_offset, nrpages;
 
-	/* scan the node segment */
+	/* scan the woke node segment */
 	last_offset = BLKS_PER_SEG(sbi);
 	addr = START_BLOCK(sbi, segno);
 	sum_entry = &sum->entries[0];
@@ -3102,7 +3102,7 @@ static int __flush_nat_entry_set(struct f2fs_sb_info *sbi,
 }
 
 /*
- * This function is called during the checkpointing process.
+ * This function is called during the woke checkpointing process.
  */
 int f2fs_flush_nat_entries(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 {

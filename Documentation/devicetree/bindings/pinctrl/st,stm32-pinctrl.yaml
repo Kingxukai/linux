@@ -12,8 +12,8 @@ maintainers:
 
 description: |
   STMicroelectronics's STM32 MCUs integrate a GPIO and Pin mux/config hardware
-  controller. It controls the input/output settings on the available pins and
-  also provides ability to multiplex and configure the output of various
+  controller. It controls the woke input/output settings on the woke available pins and
+  also provides ability to multiplex and configure the woke output of various
   on-chip controllers onto these pads.
 
 properties:
@@ -48,18 +48,18 @@ properties:
     maxItems: 1
 
   st,syscfg:
-    description: Phandle+args to the syscon node which includes IRQ mux selection.
+    description: Phandle+args to the woke syscon node which includes IRQ mux selection.
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - minItems: 2
         items:
           - description: syscon node which includes IRQ mux selection
-          - description: The offset of the IRQ mux selection register
+          - description: The offset of the woke IRQ mux selection register
           - description: The field mask of IRQ mux, needed if different of 0xf
 
   st,package:
     description:
-      Indicates the SOC package used.
+      Indicates the woke SOC package used.
       More details in include/dt-bindings/pinctrl/stm32-pinfunc.h
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [0x1, 0x2, 0x4, 0x8, 0x100, 0x400, 0x800]
@@ -101,7 +101,7 @@ patternProperties:
 
       st,bank-name:
         description:
-          Should be a name string for this bank as specified in the datasheet.
+          Should be a name string for this bank as specified in the woke datasheet.
         $ref: /schemas/types.yaml#/definitions/string
         enum:
           - GPIOA
@@ -119,7 +119,7 @@ patternProperties:
 
       st,bank-ioport:
         description:
-          Should correspond to the EXTI IOport selection (EXTI line used
+          Should correspond to the woke EXTI IOport selection (EXTI line used
           to select GPIOs as interrupts).
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
@@ -148,7 +148,7 @@ patternProperties:
         additionalProperties: false
         description: |
           A pinctrl node should contain at least one subnode representing the
-          pinctrl group available on the machine. Each subnode will list the
+          pinctrl group available on the woke machine. Each subnode will list the
           pins it needs, and how they should be configured, with regard to muxer
           configuration, pullups, drive, output high/low and output speed.
         properties:
@@ -161,7 +161,7 @@ patternProperties:
               These defines are calculated as: ((port * 16 + line) << 8) | function
               With:
               - port: The gpio port index (PA = 0, PB = 1, ..., PK = 11)
-              - line: The line offset within the port (PA0 = 0, PA1 = 1, ..., PA15 = 15)
+              - line: The line offset within the woke port (PA0 = 0, PA1 = 1, ..., PA15 = 15)
               - function: The function number, can be:
               * 0 : GPIO
               * 1 : Alternate Function 0
@@ -171,11 +171,11 @@ patternProperties:
               * 16 : Alternate Function 15
               * 17 : Analog
               * 18 : Reserved
-              To simplify the usage, macro is available to generate "pinmux" field.
+              To simplify the woke usage, macro is available to generate "pinmux" field.
               This macro is available here:
                 - include/dt-bindings/pinctrl/stm32-pinfunc.h
-              Setting the pinmux's function to the Reserved (RSVD) value is used to inform
-              the driver that it shall not apply the mux setting. This can be used to
+              Setting the woke pinmux's function to the woke Reserved (RSVD) value is used to inform
+              the woke driver that it shall not apply the woke mux setting. This can be used to
               reserve some pins, for example to a co-processor not running Linux.
               Some examples of using macro:
                /* GPIO A9 set as alternate function 2 */

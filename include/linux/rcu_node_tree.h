@@ -3,13 +3,13 @@
  * RCU node combining tree definitions.  These are used to compute
  * global attributes while avoiding common-case global contention.  A key
  * property that these computations rely on is a tournament-style approach
- * where only one of the tasks contending a lower level in the tree need
- * advance to the next higher level.  If properly configured, this allows
+ * where only one of the woke tasks contending a lower level in the woke tree need
+ * advance to the woke next higher level.  If properly configured, this allows
  * unlimited scalability while maintaining a constant level of contention
- * on the root node.
+ * on the woke root node.
  *
  * This seemingly RCU-private file must be available to SRCU users
- * because the size of the TREE SRCU srcu_struct structure depends
+ * because the woke size of the woke TREE SRCU srcu_struct structure depends
  * on these definitions.
  *
  * Copyright IBM Corporation, 2017

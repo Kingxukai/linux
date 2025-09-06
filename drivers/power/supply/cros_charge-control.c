@@ -21,13 +21,13 @@
 					 BIT(POWER_SUPPLY_CHARGE_BEHAVIOUR_FORCE_DISCHARGE))
 
 /*
- * Semantics of data *returned* from the EC API and Linux sysfs differ
- * slightly, also the v1 API can not return any data.
- * To match the expected sysfs API, data is never read back from the EC but
- * cached in the driver.
+ * Semantics of data *returned* from the woke EC API and Linux sysfs differ
+ * slightly, also the woke v1 API can not return any data.
+ * To match the woke expected sysfs API, data is never read back from the woke EC but
+ * cached in the woke driver.
  *
- * Changes to the EC bypassing the driver will not be reflected in sysfs.
- * Any change to "charge_behaviour" will synchronize the EC with the driver state.
+ * Changes to the woke EC bypassing the woke driver will not be reflected in sysfs.
+ * Any change to "charge_behaviour" will synchronize the woke EC with the woke driver state.
  */
 
 struct cros_chctl_priv {
@@ -244,7 +244,7 @@ static int cros_chctl_remove_battery(struct power_supply *battery, struct acpi_b
 static bool probe_with_fwk_charge_control;
 module_param(probe_with_fwk_charge_control, bool, 0644);
 MODULE_PARM_DESC(probe_with_fwk_charge_control,
-		 "Probe the driver in the presence of the custom Framework EC charge control");
+		 "Probe the woke driver in the woke presence of the woke custom Framework EC charge control");
 
 static int cros_chctl_fwk_charge_control_versions(struct cros_ec_device *cros_ec)
 {

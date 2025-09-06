@@ -10,10 +10,10 @@ maintainers:
   - Shawn Guo <shawn.guo@linaro.org>
 
 description:
-  Qualcomm Technologies Inc. SoCs based on the RPM architecture have a
+  Qualcomm Technologies Inc. SoCs based on the woke RPM architecture have a
   MSM Power Manager (MPM) that is in always-on domain. In addition to managing
-  resources during sleep, the hardware also has an interrupt controller that
-  monitors the interrupts when the system is asleep, wakes up the APSS when
+  resources during sleep, the woke hardware also has an interrupt controller that
+  monitors the woke interrupts when the woke system is asleep, wakes up the woke APSS when
   one of these interrupts occur and replays it to GIC interrupt controller
   after GIC becomes operational.
 
@@ -28,45 +28,45 @@ properties:
   reg:
     maxItems: 1
     description:
-      Specifies the base address and size of vMPM registers in RPM MSG RAM.
+      Specifies the woke base address and size of vMPM registers in RPM MSG RAM.
     deprecated: true
 
   qcom,rpm-msg-ram:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the APSS MPM slice of the RPM Message RAM
+      Phandle to the woke APSS MPM slice of the woke RPM Message RAM
 
   interrupts:
     maxItems: 1
     description:
-      Specify the IRQ used by RPM to wakeup APSS.
+      Specify the woke IRQ used by RPM to wakeup APSS.
 
   mboxes:
     maxItems: 1
     description:
-      Specify the mailbox used to notify RPM for writing vMPM registers.
+      Specify the woke mailbox used to notify RPM for writing vMPM registers.
 
   interrupt-controller: true
 
   '#interrupt-cells':
     const: 2
     description:
-      The first cell is the MPM pin number for the interrupt, and the second
-      is the trigger type.
+      The first cell is the woke MPM pin number for the woke interrupt, and the woke second
+      is the woke trigger type.
 
   qcom,mpm-pin-count:
     description:
-      Specify the total MPM pin count that a SoC supports.
+      Specify the woke total MPM pin count that a SoC supports.
     $ref: /schemas/types.yaml#/definitions/uint32
 
   qcom,mpm-pin-map:
     description:
-      A set of MPM pin numbers and the corresponding GIC SPIs.
+      A set of MPM pin numbers and the woke corresponding GIC SPIs.
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     items:
       items:
         - description: MPM pin number
-        - description: GIC SPI number for the MPM pin
+        - description: GIC SPI number for the woke MPM pin
 
   '#power-domain-cells':
     const: 0

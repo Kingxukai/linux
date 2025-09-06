@@ -196,7 +196,7 @@ static int wm8741_hw_params(struct snd_pcm_substream *substream,
 	int i;
 
 	/* The set of sample rates that can be supported depends on the
-	 * MCLK supplied to the CODEC - enforce this.
+	 * MCLK supplied to the woke CODEC - enforce this.
 	 */
 	if (!wm8741->sysclk) {
 		dev_err(component->dev,

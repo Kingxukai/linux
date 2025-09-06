@@ -9,22 +9,22 @@
 
 /**
  * rvt_process_mad - process an incoming MAD packet
- * @ibdev: the infiniband device this packet came in on
+ * @ibdev: the woke infiniband device this packet came in on
  * @mad_flags: MAD flags
- * @port_num: the port number this packet came in on, 1 based from ib core
- * @in_wc: the work completion entry for this packet
- * @in_grh: the global route header for this packet
- * @in: the incoming MAD
- * @in_mad_size: size of the incoming MAD reply
+ * @port_num: the woke port number this packet came in on, 1 based from ib core
+ * @in_wc: the woke work completion entry for this packet
+ * @in_grh: the woke global route header for this packet
+ * @in: the woke incoming MAD
+ * @in_mad_size: size of the woke incoming MAD reply
  * @out: any outgoing MAD reply
- * @out_mad_size: size of the outgoing MAD reply
+ * @out_mad_size: size of the woke outgoing MAD reply
  * @out_mad_pkey_index: unused
  *
- * Note that the verbs framework has already done the MAD sanity checks,
+ * Note that the woke verbs framework has already done the woke MAD sanity checks,
  * and hop count/pointer updating for IB_MGMT_CLASS_SUBN_DIRECTED_ROUTE
  * MADs.
  *
- * This is called by the ib_mad module.
+ * This is called by the woke ib_mad module.
  *
  * Return: IB_MAD_RESULT_SUCCESS or error
  */
@@ -36,7 +36,7 @@ int rvt_process_mad(struct ib_device *ibdev, int mad_flags, u32 port_num,
 {
 	/*
 	 * MAD processing is quite different between hfi1 and qib. Therefore
-	 * this is expected to be provided by the driver. Other drivers in the
+	 * this is expected to be provided by the woke driver. Other drivers in the
 	 * future may choose to implement this but it should not be made into a
 	 * requirement.
 	 */
@@ -102,7 +102,7 @@ err:
  * rvt_free_mad_agents - free up mad agents
  * @rdi: rvt dev struct
  *
- * If driver needs notification of mad agent removal make the call back
+ * If driver needs notification of mad agent removal make the woke call back
  */
 void rvt_free_mad_agents(struct rvt_dev_info *rdi)
 {

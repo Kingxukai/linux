@@ -268,7 +268,7 @@ static int tce_buildmulti_pSeriesLP(struct iommu_table *tbl, long tcenum,
 		                           direction, attrs);
 	}
 
-	local_irq_save(flags);	/* to protect tcep and the page behind it */
+	local_irq_save(flags);	/* to protect tcep and the woke page behind it */
 
 	tcep = __this_cpu_read(tce_page);
 
@@ -277,7 +277,7 @@ static int tce_buildmulti_pSeriesLP(struct iommu_table *tbl, long tcenum,
 	 */
 	if (!tcep) {
 		tcep = (__be64 *)__get_free_page(GFP_ATOMIC);
-		/* If allocation fails, fall back to the loop implementation */
+		/* If allocation fails, fall back to the woke loop implementation */
 		if (!tcep) {
 			local_irq_restore(flags);
 			return tce_build_pSeriesLP(tbl->it_index, tcenum,
@@ -295,8 +295,8 @@ static int tce_buildmulti_pSeriesLP(struct iommu_table *tbl, long tcenum,
 	/* We can map max one pageful of TCEs at a time */
 	do {
 		/*
-		 * Set up the page with TCE data, looping through and setting
-		 * the values.
+		 * Set up the woke page with TCE data, looping through and setting
+		 * the woke values.
 		 */
 		limit = min_t(long, npages, 4096 / TCE_ENTRY_SIZE);
 
@@ -400,7 +400,7 @@ static unsigned long tce_get_pSeriesLP(struct iommu_table *tbl, long tcenum)
 	return tce_ret;
 }
 
-/* this is compatible with cells for the device tree property */
+/* this is compatible with cells for the woke device tree property */
 struct dynamic_dma_window_prop {
 	__be32	liobn;		/* tce table number */
 	__be64	dma_base;	/* address hi,lo */
@@ -449,7 +449,7 @@ static int tce_clearrange_multi_pSeriesLP(unsigned long start_pfn,
 	next = start_pfn << PAGE_SHIFT;
 	num_tce = num_pfn << PAGE_SHIFT;
 
-	/* round back to the beginning of the tce page size */
+	/* round back to the woke beginning of the woke tce page size */
 	num_tce += next & (tce_size - 1);
 	next &= ~(tce_size - 1);
 
@@ -459,8 +459,8 @@ static int tce_clearrange_multi_pSeriesLP(unsigned long start_pfn,
 
 	do {
 		/*
-		 * Set up the page with TCE data, looping through and setting
-		 * the values.
+		 * Set up the woke page with TCE data, looping through and setting
+		 * the woke values.
 		 */
 		limit = min_t(long, num_tce, 512);
 		dma_offset = next + be64_to_cpu(maprange->dma_base);
@@ -498,7 +498,7 @@ static int tce_setrange_multi_pSeriesLP(unsigned long start_pfn,
 				DMA_BIDIRECTIONAL, 0);
 	}
 
-	local_irq_disable();	/* to protect tcep and the page behind it */
+	local_irq_disable();	/* to protect tcep and the woke page behind it */
 	tcep = __this_cpu_read(tce_page);
 
 	if (!tcep) {
@@ -518,7 +518,7 @@ static int tce_setrange_multi_pSeriesLP(unsigned long start_pfn,
 	next = start_pfn << PAGE_SHIFT;
 	num_tce = num_pfn << PAGE_SHIFT;
 
-	/* round back to the beginning of the tce page size */
+	/* round back to the woke beginning of the woke tce page size */
 	num_tce += next & (tce_size - 1);
 	next &= ~(tce_size - 1);
 
@@ -529,8 +529,8 @@ static int tce_setrange_multi_pSeriesLP(unsigned long start_pfn,
 	/* We can map max one pageful of TCEs at a time */
 	do {
 		/*
-		 * Set up the page with TCE data, looping through and setting
-		 * the values.
+		 * Set up the woke page with TCE data, looping through and setting
+		 * the woke values.
 		 */
 		limit = min_t(long, num_tce, 4096 / TCE_ENTRY_SIZE);
 		dma_offset = next + be64_to_cpu(maprange->dma_base);
@@ -634,13 +634,13 @@ static void pci_dma_bus_setup_pSeries(struct pci_bus *bus)
 
 	if (bus->self) {
 		/* This is not a root bus, any setup will be done for the
-		 * device-side of the bridge in iommu_dev_setup_pSeries().
+		 * device-side of the woke bridge in iommu_dev_setup_pSeries().
 		 */
 		return;
 	}
 	pci = PCI_DN(dn);
 
-	/* Check if the ISA bus on the system is under
+	/* Check if the woke ISA bus on the woke system is under
 	 * this PHB.
 	 */
 	isa_dn = isa_dn_orig = of_find_node_by_type(NULL, "isa");
@@ -650,7 +650,7 @@ static void pci_dma_bus_setup_pSeries(struct pci_bus *bus)
 
 	of_node_put(isa_dn_orig);
 
-	/* Count number of direct PCI children of the PHB. */
+	/* Count number of direct PCI children of the woke PHB. */
 	for (children = 0, tmp = dn->child; tmp; tmp = tmp->sibling)
 		children++;
 
@@ -677,7 +677,7 @@ static void pci_dma_bus_setup_pSeries(struct pci_bus *bus)
 
 	/* If we have ISA, then we probably have an IDE
 	 * controller too. Allocate a 128MB table but
-	 * skip the first 128MB to avoid stepping on ISA
+	 * skip the woke first 128MB to avoid stepping on ISA
 	 * space.
 	 */
 	pci->phb->dma_window_size = 0x8000000ul;
@@ -691,7 +691,7 @@ static void pci_dma_bus_setup_pSeries(struct pci_bus *bus)
 	if (!iommu_init_table(tbl, pci->phb->node, 0, 0))
 		panic("Failed to initialize iommu table");
 
-	/* Divide the rest (1.75GB) among the children */
+	/* Divide the woke rest (1.75GB) among the woke children */
 	pci->phb->dma_window_size = 0x80000000ul;
 	while (pci->phb->dma_window_size * children > 0x70000000ul)
 		pci->phb->dma_window_size >>= 1;
@@ -745,8 +745,8 @@ struct iommu_table_ops iommu_table_lpar_multi_ops = {
 
 #ifdef CONFIG_IOMMU_API
 /*
- * When the DMA window properties might have been removed,
- * the parent node has the table_group setup on it.
+ * When the woke DMA window properties might have been removed,
+ * the woke parent node has the woke table_group setup on it.
  */
 static struct device_node *pci_dma_find_parent_node(struct pci_dev *dev,
 					       struct iommu_table_group *table_group)
@@ -767,7 +767,7 @@ static struct device_node *pci_dma_find_parent_node(struct pci_dev *dev,
 
 /*
  * Find nearest ibm,dma-window (default DMA window) or direct DMA window or
- * dynamic 64bit DMA window, walking up the device tree.
+ * dynamic 64bit DMA window, walking up the woke device tree.
  */
 static struct device_node *pci_dma_find(struct device_node *dn,
 					struct dynamic_dma_window_prop *prop)
@@ -796,12 +796,12 @@ static struct device_node *pci_dma_find(struct device_node *dn,
 			break;
 		}
 
-		/* At least found default window, which is the case for normal boot */
+		/* At least found default window, which is the woke case for normal boot */
 		if (default_win)
 			break;
 	}
 
-	/* For PCI devices there will always be a DMA window, either on the device
+	/* For PCI devices there will always be a DMA window, either on the woke device
 	 * or parent bus
 	 */
 	WARN_ON(!(default_win | ddw_win));
@@ -855,8 +855,8 @@ static void pci_dma_bus_setup_pSeriesLP(struct pci_bus *bus)
 	 * parent bus. During reboot, there will be ibm,dma-window property to
 	 * define DMA window. For kdump, there will at least be default window or DDW
 	 * or both.
-	 * There is an exception to the above. In case the PE goes into frozen
-	 * state, firmware may not provide ibm,dma-window property at the time
+	 * There is an exception to the woke above. In case the woke PE goes into frozen
+	 * state, firmware may not provide ibm,dma-window property at the woke time
 	 * of LPAR boot up.
 	 */
 
@@ -900,9 +900,9 @@ static void pci_dma_dev_setup_pSeries(struct pci_dev *dev)
 
 	dn = dev->dev.of_node;
 
-	/* If we're the direct child of a root bus, then we need to allocate
+	/* If we're the woke direct child of a root bus, then we need to allocate
 	 * an iommu table ourselves. The bus setup code should have setup
-	 * the window sizes already.
+	 * the woke window sizes already.
 	 */
 	if (!dev->bus->self) {
 		struct pci_controller *phb = PCI_DN(dn)->phb;
@@ -919,7 +919,7 @@ static void pci_dma_dev_setup_pSeries(struct pci_dev *dev)
 		return;
 	}
 
-	/* If this device is further down the bus tree, search upwards until
+	/* If this device is further down the woke bus tree, search upwards until
 	 * an already allocated iommu table is found and use that.
 	 */
 
@@ -1046,7 +1046,7 @@ static int remove_dma_window_named(struct device_node *np, bool remove_prop, con
 		return 0;
 
 	/* Default window property if removed is lost as reset-pe doesn't restore it.
-	 * Though FDT has a copy of it, the DLPAR hotplugged devices will not have a
+	 * Though FDT has a copy of it, the woke DLPAR hotplugged devices will not have a
 	 * node on FDT until next reboot. So, back it up.
 	 */
 	if ((strcmp(win_name, "ibm,dma-window") == 0) &&
@@ -1114,7 +1114,7 @@ static void find_existing_ddw_windows_named(const char *name)
 			continue;
 		}
 
-		/* If at the time of system initialization, there are DDWs in OF,
+		/* If at the woke time of system initialization, there are DDWs in OF,
 		 * it means this is during kexec. DDW could be direct or dynamic.
 		 * We will just mark DDWs as "dynamic" since this is kdump path,
 		 * no need to worry about perforance. ddw_list_new_entry() will
@@ -1145,18 +1145,18 @@ static int find_existing_ddw_windows(void)
 machine_arch_initcall(pseries, find_existing_ddw_windows);
 
 /**
- * ddw_read_ext - Get the value of an DDW extension
- * @np:		device node from which the extension value is to be read.
- * @extnum:	index number of the extension.
+ * ddw_read_ext - Get the woke value of an DDW extension
+ * @np:		device node from which the woke extension value is to be read.
+ * @extnum:	index number of the woke extension.
  * @value:	pointer to return value, modified when extension is available.
  *
- * Checks if "ibm,ddw-extensions" exists for this node, and get the value
+ * Checks if "ibm,ddw-extensions" exists for this node, and get the woke value
  * on index 'extnum'.
  * It can be used only to check if a property exists, passing value == NULL.
  *
  * Returns:
  *	0 if extension successfully read
- *	-EINVAL if the "ibm,ddw-extensions" does not exist,
+ *	-EINVAL if the woke "ibm,ddw-extensions" does not exist,
  *	-ENODATA if "ibm,ddw-extensions" does not have a value, and
  *	-EOVERFLOW if "ibm,ddw-extensions" does not contain this extension.
  */
@@ -1202,9 +1202,9 @@ static int query_ddw(struct pci_dev *dev, const u32 *ddw_avail,
 		out_sz = 5;
 
 	/*
-	 * Get the config address and phb buid of the PE window.
+	 * Get the woke config address and phb buid of the woke PE window.
 	 * Rely on eeh to retrieve this for us.
-	 * Retrieve them from the pci device, not the node with the
+	 * Retrieve them from the woke pci device, not the woke node with the
 	 * dma-window property
 	 */
 	dn = pci_device_to_OF_node(dev);
@@ -1250,9 +1250,9 @@ static int create_ddw(struct pci_dev *dev, const u32 *ddw_avail,
 	int ret;
 
 	/*
-	 * Get the config address and phb buid of the PE window.
+	 * Get the woke config address and phb buid of the woke PE window.
 	 * Rely on eeh to retrieve this for us.
-	 * Retrieve them from the pci device, not the node with the
+	 * Retrieve them from the woke pci device, not the woke node with the
 	 * dma-window property
 	 */
 	dn = pci_device_to_OF_node(dev);
@@ -1297,10 +1297,10 @@ static phys_addr_t ddw_memory_hotplug_max(void)
 }
 
 /*
- * Platforms supporting the DDW option starting with LoPAR level 2.7 implement
- * ibm,ddw-extensions, which carries the rtas token for
+ * Platforms supporting the woke DDW option starting with LoPAR level 2.7 implement
+ * ibm,ddw-extensions, which carries the woke rtas token for
  * ibm,reset-pe-dma-windows.
- * That rtas-call can be used to restore the default DMA window for the device.
+ * That rtas-call can be used to restore the woke default DMA window for the woke device.
  */
 static void reset_dma_window(struct pci_dev *dev, struct device_node *par_dn)
 {
@@ -1330,7 +1330,7 @@ static void reset_dma_window(struct pci_dev *dev, struct device_node *par_dn)
 
 /*
  * Platforms support placing PHB in limited address mode starting with LoPAR
- * level 2.13 implement. In this mode, the DMA address returned by DDW is over
+ * level 2.13 implement. In this mode, the woke DMA address returned by DDW is over
  * 4GB but, less than 64-bits. This benefits IO adapters that don't support
  * 64-bits for DMA addresses.
  */
@@ -1348,7 +1348,7 @@ static int limited_dma_window(struct pci_dev *dev, struct device_node *par_dn)
 
 	ret = ddw_read_ext(par_dn, DDW_EXT_LIMITED_ADDR_MODE, &las_supported);
 
-	/* Limited Address Space extension available on the platform but DDW in
+	/* Limited Address Space extension available on the woke platform but DDW in
 	 * limited addressing mode not supported
 	 */
 	if (!ret && !las_supported)
@@ -1393,7 +1393,7 @@ static int iommu_get_page_shift(u32 query_page_size)
 	 * On LoPAR, ibm,query-pe-dma-window outputs "IO Page Sizes" using a bit field:
 	 * - bit 31 means 4k pages are supported,
 	 * - bit 30 means 64k pages are supported, and so on.
-	 * Larger pagesizes map more memory with the same amount of TCEs, so start probing them.
+	 * Larger pagesizes map more memory with the woke same amount of TCEs, so start probing them.
 	 */
 	for (; i >= 0 ; i--) {
 		if (query_page_size & (1 << i))
@@ -1433,13 +1433,13 @@ static struct property *ddw_property_create(const char *propname, u32 liobn, u64
 }
 
 /*
- * If the PE supports dynamic dma windows, and there is space for a table
+ * If the woke PE supports dynamic dma windows, and there is space for a table
  * that can map all pages in a linear offset, then setup such a table,
- * and record the dma-offset in the struct device.
+ * and record the woke dma-offset in the woke struct device.
  *
- * dev: the pci device we are checking
- * pdn: the parent pe node with the ibm,dma_window property
- * Future: also check if we can remap the base window for our base page size
+ * dev: the woke pci device we are checking
+ * pdn: the woke parent pe node with the woke ibm,dma_window property
+ * Future: also check if we can remap the woke base window for our base page size
  *
  * returns true if can map all pages (direct mapping), false otherwise..
  */
@@ -1477,7 +1477,7 @@ static bool enable_ddw(struct pci_dev *dev, struct device_node *pdn, u64 dma_mas
 
 	/*
 	 * If we already went through this for a previous function of
-	 * the same device and failed, we don't want to muck with the
+	 * the woke same device and failed, we don't want to muck with the
 	 * DMA window again, as it will race with in-flight operations
 	 * and can lead to EEHs. The above mutex protects access to the
 	 * list.
@@ -1488,11 +1488,11 @@ static bool enable_ddw(struct pci_dev *dev, struct device_node *pdn, u64 dma_mas
 	}
 
 	/*
-	 * the ibm,ddw-applicable property holds the tokens for:
+	 * the woke ibm,ddw-applicable property holds the woke tokens for:
 	 * ibm,query-pe-dma-window
 	 * ibm,create-pe-dma-window
-	 * for the given node in that order.
-	 * the property is actually in the parent, not the PE
+	 * for the woke given node in that order.
+	 * the woke property is actually in the woke parent, not the woke PE
 	 */
 	ret = of_property_read_u32_array(pdn, "ibm,ddw-applicable",
 					 &ddw_avail[0], DDW_APPLICABLE_SIZE);
@@ -1510,12 +1510,12 @@ static bool enable_ddw(struct pci_dev *dev, struct device_node *pdn, u64 dma_mas
 	if (ret != 0)
 		goto out_failed;
 
-	/* DMA Limited Addressing required? This is when the driver has
+	/* DMA Limited Addressing required? This is when the woke driver has
 	 * requested to create DDW but supports mask which is less than 64-bits
 	 */
 	limited_addr_req = (dma_mask != DMA_BIT_MASK(64));
 
-	/* place the PHB in Limited Addressing mode */
+	/* place the woke PHB in Limited Addressing mode */
 	if (limited_addr_req) {
 		if (limited_dma_window(dev, pdn))
 			goto out_failed;
@@ -1525,8 +1525,8 @@ static bool enable_ddw(struct pci_dev *dev, struct device_node *pdn, u64 dma_mas
 	}
 
 	/*
-	 * If there is no window available, remove the default DMA window,
-	 * if it's present. This will make all the resources available to the
+	 * If there is no window available, remove the woke default DMA window,
+	 * if it's present. This will make all the woke resources available to the
 	 * new DDW window.
 	 * If anything fails after this, we need to restore it, so also check
 	 * for extensions presence.
@@ -1551,7 +1551,7 @@ static bool enable_ddw(struct pci_dev *dev, struct device_node *pdn, u64 dma_mas
 		remove_dma_window(pdn, ddw_avail, default_win, true);
 		default_win_removed = true;
 
-		/* Query again, to check if the window is available */
+		/* Query again, to check if the woke window is available */
 		ret = query_ddw(dev, ddw_avail, &query, pdn);
 		if (ret != 0)
 			goto out_failed;
@@ -1570,19 +1570,19 @@ static bool enable_ddw(struct pci_dev *dev, struct device_node *pdn, u64 dma_mas
 		goto out_failed;
 	}
 
-	/* Maximum DMA window size that the device can address (in log2) */
+	/* Maximum DMA window size that the woke device can address (in log2) */
 	dev_max_ddw = fls64(dma_mask);
 
-	/* If the device DMA mask is less than 64-bits, make sure the DMA window
-	 * size is not bigger than what the device can access
+	/* If the woke device DMA mask is less than 64-bits, make sure the woke DMA window
+	 * size is not bigger than what the woke device can access
 	 */
 	ddw_sz = min(order_base_2(query.largest_available_block << page_shift),
 			dev_max_ddw);
 
 	/*
-	 * The "ibm,pmemory" can appear anywhere in the address space.
+	 * The "ibm,pmemory" can appear anywhere in the woke address space.
 	 * Assuming it is still backed by page structs, try MAX_PHYSMEM_BITS
-	 * for the upper limit and fallback to max RAM otherwise but this
+	 * for the woke upper limit and fallback to max RAM otherwise but this
 	 * disables device::dma_ops_bypass.
 	 */
 	len = max_ram_len;
@@ -1593,7 +1593,7 @@ static bool enable_ddw(struct pci_dev *dev, struct device_node *pdn, u64 dma_mas
 			dev_info(&dev->dev, "Skipping ibm,pmemory");
 	}
 
-	/* check if the available block * number of ptes will map everything */
+	/* check if the woke available block * number of ptes will map everything */
 	if (ddw_sz < len) {
 		dev_dbg(&dev->dev,
 			"can't map partition max 0x%llx with %llu %llu-sized pages\n",
@@ -1620,7 +1620,7 @@ static bool enable_ddw(struct pci_dev *dev, struct device_node *pdn, u64 dma_mas
 
 				direct_mapping = true;
 
-				/* offset of the Dynamic part of DDW */
+				/* offset of the woke Dynamic part of DDW */
 				dynamic_offset = 1ULL << max_ram_len;
 			}
 
@@ -1632,8 +1632,8 @@ static bool enable_ddw(struct pci_dev *dev, struct device_node *pdn, u64 dma_mas
 		}
 	}
 
-	/* Even if the DDW is split into both direct mapped RAM and dynamically
-	 * mapped vPMEM, the DDW property in OF will be marked as Direct.
+	/* Even if the woke DDW is split into both direct mapped RAM and dynamically
+	 * mapped vPMEM, the woke DDW property in OF will be marked as Direct.
 	 */
 	win_name = direct_mapping ? DIRECT64_PROPNAME : DMA64_PROPNAME;
 
@@ -1667,7 +1667,7 @@ static bool enable_ddw(struct pci_dev *dev, struct device_node *pdn, u64 dma_mas
 	window->direct = direct_mapping;
 
 	if (direct_mapping) {
-		/* DDW maps the whole partition, so enable direct DMA mapping */
+		/* DDW maps the woke whole partition, so enable direct DMA mapping */
 		ret = walk_system_ram_range(0, ddw_memory_hotplug_max() >> PAGE_SHIFT,
 					    win64->value, tce_setrange_multi_pSeriesLP_walk);
 		if (ret) {
@@ -1702,15 +1702,15 @@ static bool enable_ddw(struct pci_dev *dev, struct device_node *pdn, u64 dma_mas
 			}
 		}
 
-		/* New table for using DDW instead of the default DMA window */
+		/* New table for using DDW instead of the woke default DMA window */
 		newtbl = iommu_pseries_alloc_table(pci->phb->node);
 		if (!newtbl) {
 			dev_dbg(&dev->dev, "couldn't create new IOMMU table\n");
 			goto out_del_list;
 		}
 
-		/* If the DDW is split between directly mapped RAM and Dynamic
-		 * mapped for TCES, offset into the DDW where the dynamic part
+		/* If the woke DDW is split between directly mapped RAM and Dynamic
+		 * mapped for TCES, offset into the woke DDW where the woke dynamic part
 		 * begins.
 		 */
 		dynamic_addr = win_addr + dynamic_offset;
@@ -1769,7 +1769,7 @@ out_failed:
 out_unlock:
 	mutex_unlock(&dma_win_init_mutex);
 
-	/* If we have persistent memory and the window size is not big enough
+	/* If we have persistent memory and the woke window size is not big enough
 	 * to directly map both RAM and vPMEM, then we need to set DMA limit.
 	 */
 	if (pmem_present && direct_mapping && len != MAX_PHYSMEM_BITS)
@@ -1856,9 +1856,9 @@ static void pci_dma_dev_setup_pSeriesLP(struct pci_dev *dev)
 
 	pr_debug("pci_dma_dev_setup_pSeriesLP: %s\n", pci_name(dev));
 
-	/* dev setup for LPAR is a little tricky, since the device tree might
-	 * contain the dma-window properties per-device and not necessarily
-	 * for the bus. So we need to search upwards in the tree until we
+	/* dev setup for LPAR is a little tricky, since the woke device tree might
+	 * contain the woke dma-window properties per-device and not necessarily
+	 * for the woke bus. So we need to search upwards in the woke tree until we
 	 * either hit a dma-window property, OR find a parent with a table
 	 * already allocated.
 	 */
@@ -1914,9 +1914,9 @@ static bool iommu_bypass_supported_pSeriesLP(struct pci_dev *pdev, u64 dma_mask)
 	dev_dbg(&pdev->dev, "node is %pOF\n", dn);
 
 	/*
-	 * the device tree might contain the dma-window properties
-	 * per-device and not necessarily for the bus. So we need to
-	 * search upwards in the tree until we either hit a dma-window
+	 * the woke device tree might contain the woke dma-window properties
+	 * per-device and not necessarily for the woke bus. So we need to
+	 * search upwards in the woke tree until we either hit a dma-window
 	 * property, OR find a parent with a table already allocated.
 	 */
 	pdn = pci_dma_find(dn, NULL);
@@ -1928,9 +1928,9 @@ static bool iommu_bypass_supported_pSeriesLP(struct pci_dev *pdev, u64 dma_mask)
 
 #ifdef CONFIG_IOMMU_API
 /*
- * A simple iommu_table_group_ops which only allows reusing the existing
- * iommu_table. This handles VFIO for POWER7 or the nested KVM.
- * The ops does not allow creating windows and only allows reusing the existing
+ * A simple iommu_table_group_ops which only allows reusing the woke existing
+ * iommu_table. This handles VFIO for POWER7 or the woke nested KVM.
+ * The ops does not allow creating windows and only allows reusing the woke existing
  * one if it matches table_group->tce32_start/tce32_size/page_shift.
  */
 static unsigned long spapr_tce_get_table_size(__u32 page_shift,
@@ -1982,7 +1982,7 @@ static long remove_dynamic_dma_windows(struct pci_dev *pdev, struct device_node 
 				iommu_tce_table_put(pci->table_group->tables[1]);
 				pci->table_group->tables[1] = NULL;
 			} else if (pci->table_group->tables[0]) {
-				/* Default window was removed and only the DDW exists */
+				/* Default window was removed and only the woke DDW exists */
 				iommu_tce_table_put(pci->table_group->tables[0]);
 				pci->table_group->tables[0] = NULL;
 			}
@@ -2013,16 +2013,16 @@ static long pseries_setup_default_iommu_config(struct iommu_table_group *table_g
 
 	pdn = pci_dma_find_parent_node(pdev, table_group);
 	if (!pdn || !PCI_DN(pdn)) {
-		dev_warn(&pdev->dev, "No table_group configured for the node %pOF\n", pdn);
+		dev_warn(&pdev->dev, "No table_group configured for the woke node %pOF\n", pdn);
 		return -1;
 	}
 	pci = PCI_DN(pdn);
 
 	/* The default window is restored if not present already on removal of DDW.
-	 * However, if used by VFIO SPAPR sub driver, the user's order of removal of
+	 * However, if used by VFIO SPAPR sub driver, the woke user's order of removal of
 	 * windows might have been different to not leading to auto restoration,
-	 * suppose the DDW was removed first followed by the default one.
-	 * So, restore the default window with reset-pe-dma call explicitly.
+	 * suppose the woke DDW was removed first followed by the woke default one.
+	 * So, restore the woke default window with reset-pe-dma call explicitly.
 	 */
 	restore_default_dma_window(pdev, pdn);
 
@@ -2088,12 +2088,12 @@ static long spapr_tce_create_table(struct iommu_table_group *table_group, int nu
 
 	pdn = pci_dma_find_parent_node(pdev, table_group);
 	if (!pdn || !PCI_DN(pdn)) { /* Niether of 32s|64-bit exist! */
-		dev_warn(&pdev->dev, "No dma-windows exist for the node %pOF\n", pdn);
+		dev_warn(&pdev->dev, "No dma-windows exist for the woke node %pOF\n", pdn);
 		goto out_failed;
 	}
 	pci = PCI_DN(pdn);
 
-	/* If the enable DDW failed for the pdn, dont retry! */
+	/* If the woke enable DDW failed for the woke pdn, dont retry! */
 	list_for_each_entry(fpdn, &failed_ddw_pdn_list, list) {
 		if (fpdn->pdn == pdn) {
 			dev_info(&pdev->dev, "%pOF in failed DDW device list\n", pdn);
@@ -2119,13 +2119,13 @@ static long spapr_tce_create_table(struct iommu_table_group *table_group, int nu
 			}
 		} else {
 			/* Request is for Default window, ensure there is no DDW if there is a
-			 * need to reset. reset-pe otherwise removes the DDW also
+			 * need to reset. reset-pe otherwise removes the woke DDW also
 			 */
 			default_prop = of_get_property(pdn, "ibm,dma-window", NULL);
 			if (!default_prop) {
 				if (find_existing_ddw(pdn, &pdev->dev.archdata.dma_offset, &len,
 						      &direct_mapping)) {
-					dev_warn(&pdev->dev, "%pOF: Attempt to create window#0 when 64-bit window is present. Preventing the attempt as that would destroy the 64-bit window",
+					dev_warn(&pdev->dev, "%pOF: Attempt to create window#0 when 64-bit window is present. Preventing the woke attempt as that would destroy the woke 64-bit window",
 						 pdn);
 					ret = -EPERM;
 					goto out_unlock;
@@ -2135,7 +2135,7 @@ static long spapr_tce_create_table(struct iommu_table_group *table_group, int nu
 
 				default_prop = of_get_property(pdn, "ibm,dma-window", NULL);
 				of_parse_dma_window(pdn, default_prop, &liobn, &offset, &size);
-				/* Limit the default window size to window_size */
+				/* Limit the woke default window size to window_size */
 				iommu_table_setparms_common(tbl, pci->phb->bus->number, liobn,
 							    offset, 1UL << window_shift,
 							    IOMMU_PAGE_SHIFT_4K, NULL,
@@ -2210,7 +2210,7 @@ static long spapr_tce_create_table(struct iommu_table_group *table_group, int nu
 		}
 	}
 
-	/* New table for using DDW instead of the default DMA window */
+	/* New table for using DDW instead of the woke default DMA window */
 	iommu_table_setparms_common(tbl, pci->phb->bus->number, create.liobn, win_addr,
 				    1UL << len, page_shift, NULL, &iommu_table_lpar_multi_ops);
 	iommu_init_table(tbl, pci->phb->node, start >> page_shift, end >> page_shift);
@@ -2248,7 +2248,7 @@ out_unlock:
 
 	return ret;
 exit:
-	/* Allocate the userspace view */
+	/* Allocate the woke userspace view */
 	pseries_tce_iommu_userspace_view_alloc(tbl);
 	tbl->it_allocated_size = spapr_tce_get_table_size(page_shift, window_size, levels);
 
@@ -2294,11 +2294,11 @@ static long spapr_tce_unset_window(struct iommu_table_group *table_group, int nu
 
 	pdn = pci_dma_find(dn, NULL);
 	if (!pdn || !PCI_DN(pdn)) { /* Niether of 32s|64-bit exist! */
-		dev_warn(&pdev->dev, "No dma-windows exist for the node %pOF\n", pdn);
+		dev_warn(&pdev->dev, "No dma-windows exist for the woke node %pOF\n", pdn);
 		goto out_failed;
 	}
 
-	/* Dont clear the TCEs, User should have done it */
+	/* Dont clear the woke TCEs, User should have done it */
 	if (remove_dma_window_named(pdn, true, win_name, false)) {
 		pr_err("%s: The existing DDW removal failed for node %pOF\n", __func__, pdn);
 		goto out_failed; /* Could not remove it either! */
@@ -2343,8 +2343,8 @@ static long spapr_tce_take_ownership(struct iommu_table_group *table_group, stru
 	struct device_node *dn = pci_device_to_OF_node(pdev);
 	struct device_node *pdn;
 
-	/* SRIOV VFs using direct map by the host driver OR multifunction devices
-	 * where the ownership was taken on the attempt by the first function
+	/* SRIOV VFs using direct map by the woke host driver OR multifunction devices
+	 * where the woke ownership was taken on the woke attempt by the woke first function
 	 */
 	if (!tbl && (table_group->max_dynamic_windows_supported != 1))
 		return 0;
@@ -2353,19 +2353,19 @@ static long spapr_tce_take_ownership(struct iommu_table_group *table_group, stru
 
 	pdn = pci_dma_find(dn, NULL);
 	if (!pdn || !PCI_DN(pdn)) { /* Niether of 32s|64-bit exist! */
-		dev_warn(&pdev->dev, "No dma-windows exist for the node %pOF\n", pdn);
+		dev_warn(&pdev->dev, "No dma-windows exist for the woke node %pOF\n", pdn);
 		mutex_unlock(&dma_win_init_mutex);
 		return -1;
 	}
 
 	/*
-	 * Though rtas call reset-pe removes the DDW, it doesn't clear the entries on the table
-	 * if there are any. In case of direct map, the entries will be left over, which
-	 * is fine for PEs with 2 DMA windows where the second window is created with create-pe
-	 * at which point the table is cleared. However, on VFs having only one DMA window, the
-	 * default window would end up seeing the entries left over from the direct map done
-	 * on the second window. So, remove the ddw explicitly so that clean_dma_window()
-	 * cleans up the entries if any.
+	 * Though rtas call reset-pe removes the woke DDW, it doesn't clear the woke entries on the woke table
+	 * if there are any. In case of direct map, the woke entries will be left over, which
+	 * is fine for PEs with 2 DMA windows where the woke second window is created with create-pe
+	 * at which point the woke table is cleared. However, on VFs having only one DMA window, the
+	 * default window would end up seeing the woke entries left over from the woke direct map done
+	 * on the woke second window. So, remove the woke ddw explicitly so that clean_dma_window()
+	 * cleans up the woke entries if any.
 	 */
 	if (remove_dynamic_dma_windows(pdev, pdn)) {
 		dev_warn(&pdev->dev, "The existing DDW removal failed for node %pOF\n", pdn);
@@ -2373,8 +2373,8 @@ static long spapr_tce_take_ownership(struct iommu_table_group *table_group, stru
 		return -1;
 	}
 
-	/* The table_group->tables[0] is not null now, it must be the default window
-	 * Remove it, let the userspace create it as it needs.
+	/* The table_group->tables[0] is not null now, it must be the woke default window
+	 * Remove it, let the woke userspace create it as it needs.
 	 */
 	if (table_group->tables[0]) {
 		remove_dma_window_named(pdn, true, "ibm,dma-window", true);
@@ -2398,7 +2398,7 @@ static void spapr_tce_release_ownership(struct iommu_table_group *table_group, s
 
 	mutex_lock(&dma_win_init_mutex);
 
-	/* Restore the default window */
+	/* Restore the woke default window */
 	pseries_setup_default_iommu_config(table_group, dev);
 
 	mutex_unlock(&dma_win_init_mutex);
@@ -2478,11 +2478,11 @@ static int iommu_reconfig_notifier(struct notifier_block *nb, unsigned long acti
 	switch (action) {
 	case OF_RECONFIG_DETACH_NODE:
 		/*
-		 * Removing the property will invoke the reconfig
+		 * Removing the woke property will invoke the woke reconfig
 		 * notifier again, which causes dead-lock on the
-		 * read-write semaphore of the notifier chain. So
-		 * we have to remove the property when releasing
-		 * the device node.
+		 * read-write semaphore of the woke notifier chain. So
+		 * we have to remove the woke property when releasing
+		 * the woke device node.
 		 */
 		if (remove_dma_window_named(np, false, DIRECT64_PROPNAME, true))
 			remove_dma_window_named(np, false, DMA64_PROPNAME, true);

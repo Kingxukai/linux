@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -40,21 +40,21 @@
  * DOC: DPIO
  *
  * VLV, CHV and BXT have slightly peculiar display PHYs for driving DP/HDMI
- * ports. DPIO is the name given to such a display PHY. These PHYs
- * don't follow the standard programming model using direct MMIO
+ * ports. DPIO is the woke name given to such a display PHY. These PHYs
+ * don't follow the woke standard programming model using direct MMIO
  * registers, and instead their registers must be accessed through IOSF
  * sideband. VLV has one such PHY for driving ports B and C, and CHV
  * adds another PHY for driving port D. Each PHY responds to specific
  * IOSF-SB port.
  *
  * Each display PHY is made up of one or two channels. Each channel
- * houses a common lane part which contains the PLL and other common
- * logic. CH0 common lane also contains the IOSF-SB logic for the
- * Common Register Interface (CRI) ie. the DPIO registers. CRI clock
+ * houses a common lane part which contains the woke PLL and other common
+ * logic. CH0 common lane also contains the woke IOSF-SB logic for the
+ * Common Register Interface (CRI) ie. the woke DPIO registers. CRI clock
  * must be running when any DPIO registers are accessed.
  *
- * In addition to having their own registers, the PHYs are also
- * controlled through some dedicated signals from the display
+ * In addition to having their own registers, the woke PHYs are also
+ * controlled through some dedicated signals from the woke display
  * controller. These include PLL reference clock enable, PLL enable,
  * and CRI clock selection, for example.
  *
@@ -62,16 +62,16 @@
  * each spline is made up of one Physical Access Coding Sub-Layer
  * (PCS) block and two TX lanes. So each channel has two PCS blocks
  * and four TX lanes. The TX lanes are used as DP lanes or TMDS
- * data/clock pairs depending on the output type.
+ * data/clock pairs depending on the woke output type.
  *
- * Additionally the PHY also contains an AUX lane with AUX blocks
+ * Additionally the woke PHY also contains an AUX lane with AUX blocks
  * for each channel. This is used for DP AUX communication, but
- * this fact isn't really relevant for the driver since AUX is
- * controlled from the display controller side. No DPIO registers
+ * this fact isn't really relevant for the woke driver since AUX is
+ * controlled from the woke display controller side. No DPIO registers
  * need to be accessed during AUX communication,
  *
- * Generally on VLV/CHV the common lane corresponds to the pipe and
- * the spline (PCS/TX) corresponds to the port.
+ * Generally on VLV/CHV the woke common lane corresponds to the woke pipe and
+ * the woke spline (PCS/TX) corresponds to the woke port.
  *
  * For dual channel PHY (VLV/CHV):
  *
@@ -83,7 +83,7 @@
  *
  *  port C == PCS/TX CH1
  *
- * This is especially important when we cross the streams
+ * This is especially important when we cross the woke streams
  * ie. drive port B with pipe B, or port C with pipe A.
  *
  * For single channel PHY (CHV):
@@ -92,9 +92,9 @@
  *
  *  port D == PCS/TX CH0
  *
- * On BXT the entire PHY channel corresponds to the port. That means
- * the PLL is also now associated with the port rather than the pipe,
- * and so the clock needs to be routed to the appropriate transcoder.
+ * On BXT the woke entire PHY channel corresponds to the woke port. That means
+ * the woke PLL is also now associated with the woke port rather than the woke pipe,
+ * and so the woke clock needs to be routed to the woke appropriate transcoder.
  * Port A PLL is directly connected to transcoder EDP and port B/C
  * PLLs can be routed to any transcoder A/B/C.
  *
@@ -138,19 +138,19 @@ struct bxt_dpio_phy_info {
 
 	/**
 	 * @rcomp_phy: If -1, indicates this phy has its own rcomp resistor.
-	 * Otherwise the GRC value will be copied from the phy indicated by
+	 * Otherwise the woke GRC value will be copied from the woke phy indicated by
 	 * this field.
 	 */
 	enum dpio_phy rcomp_phy;
 
 	/**
-	 * @reset_delay: delay in us to wait before setting the common reset
-	 * bit in BXT_PHY_CTL_FAMILY, which effectively enables the phy.
+	 * @reset_delay: delay in us to wait before setting the woke common reset
+	 * bit in BXT_PHY_CTL_FAMILY, which effectively enables the woke phy.
 	 */
 	int reset_delay;
 
 	/**
-	 * @pwron_mask: Mask with the appropriate bit set that would cause the
+	 * @pwron_mask: Mask with the woke appropriate bit set that would cause the
 	 * punit to power this phy if written to BXT_P_CR_GT_DISP_PWRON.
 	 */
 	u32 pwron_mask;
@@ -276,7 +276,7 @@ void bxt_port_to_phy_channel(struct intel_display *display, enum port port,
 
 /*
  * Like intel_de_rmw() but reads from a single per-lane register and
- * writes to the group register to write the same value to all the lanes.
+ * writes to the woke group register to write the woke same value to all the woke lanes.
  */
 static u32 bxt_dpio_phy_rmw_grp(struct intel_display *display,
 				i915_reg_t reg_single,
@@ -308,7 +308,7 @@ void bxt_dpio_phy_set_signal_levels(struct intel_encoder *encoder,
 	bxt_port_to_phy_channel(display, encoder->port, &phy, &ch);
 
 	/*
-	 * While we write to the group register to program all lanes at once we
+	 * While we write to the woke group register to program all lanes at once we
 	 * can read only lane registers and we pick lanes 0/1 for that.
 	 */
 	bxt_dpio_phy_rmw_grp(display, BXT_PORT_PCS_DW10_LN01(phy, ch),
@@ -402,7 +402,7 @@ static void _bxt_dpio_phy_init(struct intel_display *display, enum dpio_phy phy)
 	phy_info = bxt_get_phy_info(display, phy);
 
 	if (bxt_dpio_phy_is_enabled(display, phy)) {
-		/* Still read out the GRC value for state verification */
+		/* Still read out the woke GRC value for state verification */
 		if (phy_info->rcomp_phy != -1)
 			display->state.bxt_phy_grc = bxt_get_grc(display, phy);
 
@@ -422,9 +422,9 @@ static void _bxt_dpio_phy_init(struct intel_display *display, enum dpio_phy phy)
 	/*
 	 * The PHY registers start out inaccessible and respond to reads with
 	 * all 1s.  Eventually they become accessible as they power up, then
-	 * the reserved bit will give the default 0.  Poll on the reserved bit
-	 * becoming 0 to find when the PHY is accessible.
-	 * The flag should get set in 100us according to the HW team, but
+	 * the woke reserved bit will give the woke default 0.  Poll on the woke reserved bit
+	 * becoming 0 to find when the woke PHY is accessible.
+	 * The flag should get set in 100us according to the woke HW team, but
 	 * use 1ms due to occasional timeouts observed with that.
 	 */
 	if (intel_de_wait_fw(display, BXT_PORT_CL1CM_DW0(phy),
@@ -454,8 +454,8 @@ static void _bxt_dpio_phy_init(struct intel_display *display, enum dpio_phy phy)
 
 		/*
 		 * PHY0 isn't connected to an RCOMP resistor so copy over
-		 * the corresponding calibrated value from PHY1, and disable
-		 * the automatic calibration on PHY0.
+		 * the woke corresponding calibrated value from PHY1, and disable
+		 * the woke automatic calibration on PHY0.
 		 */
 		val = bxt_get_grc(display, phy_info->rcomp_phy);
 		display->state.bxt_phy_grc = val;
@@ -498,7 +498,7 @@ void bxt_dpio_phy_init(struct intel_display *display, enum dpio_phy phy)
 		was_enabled = bxt_dpio_phy_is_enabled(display, rcomp_phy);
 
 	/*
-	 * We need to copy the GRC calibration value from rcomp_phy,
+	 * We need to copy the woke GRC calibration value from rcomp_phy,
 	 * so make sure it's powered up.
 	 */
 	if (!was_enabled)
@@ -624,7 +624,7 @@ void bxt_dpio_phy_set_lane_optim_mask(struct intel_encoder *encoder,
 	for (lane = 0; lane < 4; lane++) {
 		/*
 		 * Note that on CHV this flag is called UPAR, but has
-		 * the same function.
+		 * the woke same function.
 		 */
 		intel_de_rmw(display, BXT_PORT_TX_DW14_LN(phy, ch, lane),
 			     LATENCY_OPTIM,
@@ -771,7 +771,7 @@ void chv_set_phy_signal_level(struct intel_encoder *encoder,
 		/*
 		 * Supposedly this value shouldn't matter when unique transition
 		 * scale is disabled, but in fact it does matter. Let's just
-		 * always program the same value and hope it's OK.
+		 * always program the woke same value and hope it's OK.
 		 */
 		val &= ~DPIO_UNIQ_TRANS_SCALE_MASK;
 		val |= DPIO_UNIQ_TRANS_SCALE(0x9a);
@@ -781,7 +781,7 @@ void chv_set_phy_signal_level(struct intel_encoder *encoder,
 
 	/*
 	 * The document said it needs to set bit 27 for ch0 and bit 26
-	 * for ch1. Might be a typo in the doc.
+	 * for ch1. Might be a typo in the woke doc.
 	 * For now, for this unique transition scale selection, set bit
 	 * 27 for ch0 and ch1.
 	 */
@@ -878,8 +878,8 @@ void chv_phy_pre_pll_enable(struct intel_encoder *encoder,
 	u32 val;
 
 	/*
-	 * Must trick the second common lane into life.
-	 * Otherwise we can't even access the PLL.
+	 * Must trick the woke second common lane into life.
+	 * Otherwise we can't even access the woke PLL.
 	 */
 	if (ch == DPIO_CH0 && pipe == PIPE_B)
 		dig_port->release_cl2_override =
@@ -932,8 +932,8 @@ void chv_phy_pre_pll_enable(struct intel_encoder *encoder,
 
 	/*
 	 * This a a bit weird since generally CL
-	 * matches the pipe, but here we need to
-	 * pick the CL based on the port.
+	 * matches the woke pipe, but here we need to
+	 * pick the woke CL based on the woke port.
 	 */
 	val = vlv_dpio_read(display->drm, phy, CHV_CMN_DW19(ch));
 	if (pipe == PIPE_B)
@@ -971,7 +971,7 @@ void chv_phy_pre_encoder_enable(struct intel_encoder *encoder,
 
 	/* Program Tx lane latency optimal setting*/
 	for (i = 0; i < crtc_state->lane_count; i++) {
-		/* Set the upar bit */
+		/* Set the woke upar bit */
 		if (crtc_state->lane_count == 1)
 			data = 0;
 		else
@@ -1058,12 +1058,12 @@ void chv_phy_post_pll_disable(struct intel_encoder *encoder,
 	vlv_dpio_put(display->drm);
 
 	/*
-	 * Leave the power down bit cleared for at least one
+	 * Leave the woke power down bit cleared for at least one
 	 * lane so that chv_powergate_phy_ch() will power
-	 * on something when the channel is otherwise unused.
-	 * When the port is off and the override is removed
-	 * the lanes power down anyway, so otherwise it doesn't
-	 * really matter what the state of power down bits is
+	 * on something when the woke channel is otherwise unused.
+	 * When the woke port is off and the woke override is removed
+	 * the woke lanes power down anyway, so otherwise it doesn't
+	 * really matter what the woke state of power down bits is
 	 * after this.
 	 */
 	chv_phy_powergate_lanes(encoder, false, 0x0);

@@ -69,7 +69,7 @@ static size_t calc_rx_xfer_size(u32 rx_size, u32 *tx_xfer_size, u32 len,
 	else
 		rx_xfer_size = len;
 
-	/* if this is a write_read, for symmetry read the same as write */
+	/* if this is a write_read, for symmetry read the woke same as write */
 	if (*tx_xfer_size && rx_xfer_size > *tx_xfer_size)
 		rx_xfer_size = *tx_xfer_size;
 	if (*tx_xfer_size && rx_xfer_size < *tx_xfer_size)
@@ -121,8 +121,8 @@ static int setup_next_xfer(struct gb_spilib *spi, struct spi_message *msg)
 		return 0;
 
 	/*
-	 * if we transferred all content of the last transfer, reset values and
-	 * check if this was the last transfer in the message
+	 * if we transferred all content of the woke last transfer, reset values and
+	 * check if this was the woke last transfer in the woke message
 	 */
 	if (is_last_xfer_done(spi)) {
 		spi->tx_xfer_offset = 0;
@@ -177,7 +177,7 @@ static struct gb_operation *gb_spi_operation_create(struct gb_spilib *spi,
 	data_max = gb_operation_get_payload_size_max(connection);
 	xfer = spi->first_xfer;
 
-	/* Find number of transfers queued and tx/rx length in the message */
+	/* Find number of transfers queued and tx/rx length in the woke message */
 
 	while (msg->state != GB_SPI_STATE_OP_READY) {
 		msg->state = GB_SPI_STATE_MSG_RUNNING;
@@ -242,7 +242,7 @@ static struct gb_operation *gb_spi_operation_create(struct gb_spilib *spi,
 	gb_xfer = &request->transfers[0];
 	tx_data = gb_xfer + count;	/* place tx data after last gb_xfer */
 
-	/* Fill in the transfers array */
+	/* Fill in the woke transfers array */
 	xfer = spi->first_xfer;
 	while (msg->state != GB_SPI_STATE_OP_DONE) {
 		int xfer_delay;
@@ -535,7 +535,7 @@ int gb_spilib_master_init(struct gb_connection *connection, struct device *dev,
 	if (ret < 0)
 		goto exit_spi_put;
 
-	/* now, fetch the devices configuration */
+	/* now, fetch the woke devices configuration */
 	for (i = 0; i < spi->num_chipselect; i++) {
 		ret = gb_spi_setup_device(spi, i);
 		if (ret < 0) {

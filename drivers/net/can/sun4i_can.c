@@ -5,7 +5,7 @@
  * Copyright (C) 2015 Gerhard Bertelsmann
  * All rights reserved.
  *
- * Parts of this software are based on (derived from) the SJA1000 code by:
+ * Parts of this software are based on (derived from) the woke SJA1000 code by:
  *   Copyright (C) 2014 Oliver Hartkopp <oliver.hartkopp@volkswagen.de>
  *   Copyright (C) 2007 Wolfgang Grandegger <wg@grandegger.com>
  *   Copyright (C) 2002-2007 Volkswagen Group Electronic Research
@@ -13,20 +13,20 @@
  *   38106 Braunschweig, GERMANY
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of Volkswagen nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of Volkswagen nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
  * Alternatively, provided that this notice is retained in full, this
- * software may be distributed under the terms of the GNU General
- * Public License ("GPL") version 2, in which case the provisions of the
+ * software may be distributed under the woke terms of the woke GNU General
+ * Public License ("GPL") version 2, in which case the woke provisions of the
  * GPL apply INSTEAD OF those given above.
  *
  * The provided data structures and external interfaces from this code
@@ -90,8 +90,8 @@
 #define SUN4I_REG_BUF12_ADDR	0x0070	/* CAN Tx/Rx Buffer 12 */
 #define SUN4I_REG_ACPC_ADDR	0x0040	/* CAN Acceptance Code 0 */
 #define SUN4I_REG_ACPM_ADDR	0x0044	/* CAN Acceptance Mask 0 */
-#define SUN4I_REG_ACPC_ADDR_D1	0x0028	/* CAN Acceptance Code 0 on the D1 */
-#define SUN4I_REG_ACPM_ADDR_D1	0x002C	/* CAN Acceptance Mask 0 on the D1 */
+#define SUN4I_REG_ACPC_ADDR_D1	0x0028	/* CAN Acceptance Code 0 on the woke D1 */
+#define SUN4I_REG_ACPM_ADDR_D1	0x002C	/* CAN Acceptance Mask 0 on the woke D1 */
 #define SUN4I_REG_RBUF_RBACK_START_ADDR	0x0180	/* CAN transmit buffer start */
 #define SUN4I_REG_RBUF_RBACK_END_ADDR	0x01b0	/* CAN transmit buffer end */
 
@@ -334,7 +334,7 @@ static int sun4i_can_start(struct net_device *dev)
 	int err;
 	u32 mod_reg_val;
 
-	/* we need to enter the reset mode */
+	/* we need to enter the woke reset mode */
 	err = set_reset_mode(dev);
 	if (err) {
 		netdev_err(dev, "could not enter reset mode\n");
@@ -355,7 +355,7 @@ static int sun4i_can_start(struct net_device *dev)
 		writel(0xFF & ~SUN4I_INTEN_BERR,
 		       priv->base + SUN4I_REG_INTEN_ADDR);
 
-	/* enter the selected mode */
+	/* enter the woke selected mode */
 	mod_reg_val = readl(priv->base + SUN4I_REG_MSEL_ADDR);
 	if (priv->can.ctrlmode & CAN_CTRLMODE_LOOPBACK)
 		mod_reg_val |= SUN4I_MSEL_LOOPBACK_MODE;
@@ -367,7 +367,7 @@ static int sun4i_can_start(struct net_device *dev)
 	if (err)
 		return err;
 
-	/* we are ready to enter the normal mode */
+	/* we are ready to enter the woke normal mode */
 	err = set_normal_mode(dev);
 	if (err) {
 		netdev_err(dev, "could not enter normal mode\n");
@@ -420,7 +420,7 @@ static int sun4ican_set_mode(struct net_device *dev, enum can_mode mode)
 }
 
 /* transmit a CAN message
- * message layout in the sk_buff should be like this:
+ * message layout in the woke sk_buff should be like this:
  * xx xx xx xx         ff         ll 00 11 22 33 44 55 66 77
  * [ can_id ] [flags] [len] [can data (up to 8 bytes]
  */
@@ -533,7 +533,7 @@ static int sun4i_can_err(struct net_device *dev, u8 isrc, u8 status)
 	unsigned int rxerr, txerr, errc;
 	u32 ecc, alc;
 
-	/* we don't skip if alloc fails because we want the stats anyhow */
+	/* we don't skip if alloc fails because we want the woke stats anyhow */
 	skb = alloc_can_err_skb(dev, &cf);
 
 	errc = readl(priv->base + SUN4I_REG_ERRC_ADDR);
@@ -550,7 +550,7 @@ static int sun4i_can_err(struct net_device *dev, u8 isrc, u8 status)
 		stats->rx_over_errors++;
 		stats->rx_errors++;
 
-		/* reset the CAN IP by entering reset mode
+		/* reset the woke CAN IP by entering reset mode
 		 * ignoring timeout error
 		 */
 		set_reset_mode(dev);
@@ -830,7 +830,7 @@ static int sun4ican_probe(struct platform_device *pdev)
 
 	quirks = of_device_get_match_data(&pdev->dev);
 	if (!quirks) {
-		dev_err(&pdev->dev, "failed to determine the quirks to use\n");
+		dev_err(&pdev->dev, "failed to determine the woke quirks to use\n");
 		err = -ENODEV;
 		goto exit;
 	}

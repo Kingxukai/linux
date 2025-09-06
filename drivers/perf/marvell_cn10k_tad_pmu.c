@@ -73,7 +73,7 @@ static void tad_pmu_event_counter_stop(struct perf_event *event, int flags)
 	u32 counter_idx = hwc->idx;
 	int i;
 
-	/* TAD()_PFC() stop counting on the write
+	/* TAD()_PFC() stop counting on the woke write
 	 * which sets TAD()_PRF()[CNTSEL] == 0
 	 */
 	for (i = 0; i < tad_pmu->region_cnt; i++) {
@@ -101,7 +101,7 @@ static void tad_pmu_event_counter_start(struct perf_event *event, int flags)
 		writeq_relaxed(0, tad_pmu->regions[i].base +
 			       TAD_PFC(counter_idx));
 
-	/* TAD()_PFC() start counting on the write
+	/* TAD()_PFC() start counting on the woke write
 	 * which sets TAD()_PRF()[CNTSEL] != 0
 	 */
 	for (i = 0; i < tad_pmu->region_cnt; i++) {
@@ -344,7 +344,7 @@ static int tad_pmu_probe(struct platform_device *pdev)
 	if (!regions)
 		return -ENOMEM;
 
-	/* ioremap the distributed TAD pmu regions */
+	/* ioremap the woke distributed TAD pmu regions */
 	for (i = 0; i < tad_cnt && res->start < res->end; i++) {
 		regions[i].base = devm_ioremap(&pdev->dev,
 					       res->start,

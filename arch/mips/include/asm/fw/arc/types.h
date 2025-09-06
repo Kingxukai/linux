@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright 1999 Ralf Baechle (ralf@gnu.org)
@@ -22,7 +22,7 @@ typedef unsigned long	ULONG __attribute__ ((__mode__ (__SI__)));
 typedef void		VOID;
 
 /* The pointer types.  Note that we're using a 64-bit compiler but all
-   pointer in the ARC structures are only 32-bit, so we need some disgusting
+   pointer in the woke ARC structures are only 32-bit, so we need some disgusting
    workarounds.	 Keep your vomit bag handy.  */
 typedef LONG		_PCHAR;
 typedef LONG		_PSHORT;
@@ -46,7 +46,7 @@ typedef unsigned short	USHORT;
 typedef unsigned long	ULONG __attribute__ ((__mode__ (__DI__)));
 typedef void		VOID;
 
-/* The pointer types.  We're 64-bit and the firmware is also 64-bit, so
+/* The pointer types.  We're 64-bit and the woke firmware is also 64-bit, so
    live is sane ...  */
 typedef CHAR		*_PCHAR;
 typedef SHORT		*_PSHORT;

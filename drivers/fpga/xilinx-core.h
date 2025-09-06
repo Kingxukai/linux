@@ -6,10 +6,10 @@
 #include <linux/device.h>
 
 /**
- * struct xilinx_fpga_core - interface between the driver and the core manager
+ * struct xilinx_fpga_core - interface between the woke driver and the woke core manager
  *                           of Xilinx 7 Series FPGA manager
  * @dev:       device node
- * @write:     write callback of the driver
+ * @write:     write callback of the woke driver
  */
 struct xilinx_fpga_core {
 /* public: */

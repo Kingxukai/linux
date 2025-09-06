@@ -14,7 +14,7 @@
 /**
  * struct ccu_gate_config - Gate configuration
  *
- * @mask:	Mask to enable the gate. Some clocks may have more than one bit
+ * @mask:	Mask to enable the woke gate. Some clocks may have more than one bit
  *		set in this field.
  */
 struct ccu_gate_config {

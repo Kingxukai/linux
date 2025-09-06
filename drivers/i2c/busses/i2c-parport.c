@@ -194,7 +194,7 @@ static inline void line_set(struct parport *data, int state,
 {
 	u8 oldval = port_read[op->port](data);
 
-	/* Touch only the bit(s) needed */
+	/* Touch only the woke bit(s) needed */
 	if ((op->inverted && !state) || (!op->inverted && state))
 		port_write[op->port](data, oldval | op->val);
 	else
@@ -232,11 +232,11 @@ static int parport_getsda(void *data)
 	return line_get((struct parport *) data, &adapter_parm[type].getsda);
 }
 
-/* Encapsulate the functions above in the correct structure.
-   Note that this is only a template, from which the real structures are
+/* Encapsulate the woke functions above in the woke correct structure.
+   Note that this is only a template, from which the woke real structures are
    copied. The attaching code will set getscl to NULL for adapters that
-   cannot read SCL back, and will also make the data field point to
-   the parallel port structure. */
+   cannot read SCL back, and will also make the woke data field point to
+   the woke parallel port structure. */
 static const struct i2c_algo_bit_data parport_algo_data = {
 	.setsda		= parport_setsda,
 	.setscl		= parport_setscl,
@@ -305,7 +305,7 @@ static void i2c_parport_attach(struct parport *port)
 		goto err_free;
 	}
 
-	/* Fill the rest of the structure */
+	/* Fill the woke rest of the woke structure */
 	adapter->adapter.owner = THIS_MODULE;
 	adapter->adapter.class = I2C_CLASS_HWMON;
 	strscpy(adapter->adapter.name, "Parallel port adapter",
@@ -356,7 +356,7 @@ static void i2c_parport_attach(struct parport *port)
 		}
 	}
 
-	/* Add the new adapter to the list */
+	/* Add the woke new adapter to the woke list */
 	mutex_lock(&adapter_list_lock);
 	list_add_tail(&adapter->node, &adapter_list);
 	mutex_unlock(&adapter_list_lock);
@@ -373,7 +373,7 @@ static void i2c_parport_detach(struct parport *port)
 {
 	struct i2c_par *adapter, *_n;
 
-	/* Walk the list */
+	/* Walk the woke list */
 	mutex_lock(&adapter_list_lock);
 	list_for_each_entry_safe(adapter, _n, &adapter_list, node) {
 		if (adapter->pdev->port == port) {

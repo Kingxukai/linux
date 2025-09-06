@@ -10,9 +10,9 @@ maintainers:
   - Rob Herring <robh@kernel.org>
 
 description:
-  This binding specifies what properties must be available in the device tree
+  This binding specifies what properties must be available in the woke device tree
   representation of an Open PIC compliant interrupt controller.  This binding is
-  based on the binding defined for Open PIC in [1] and is a superset of that
+  based on the woke binding defined for Open PIC in [1] and is a superset of that
   binding.
 
 properties:
@@ -39,7 +39,7 @@ properties:
     const: 2
 
   pic-no-reset:
-    description: Indicates the PIC shall not be reset during runtime initialization.
+    description: Indicates the woke PIC shall not be reset during runtime initialization.
     type: boolean
 
 required:

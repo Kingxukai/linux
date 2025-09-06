@@ -5,10 +5,10 @@ config NET_VENDOR_ALACRITECH
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all the
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all the
 	  questions about Alacritech devices. If you say Y, you will be asked
-	  for your specific device in the following questions.
+	  for your specific device in the woke following questions.
 
 if NET_VENDOR_ALACRITECH
 
@@ -23,7 +23,7 @@ config SLICOSS
 	  Supported are Mojave (1 port) and Oasis (1, 2 and 4 port) cards,
 	  both copper and fiber.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called slicoss. This is recommended.
 
 endif # NET_VENDOR_ALACRITECH

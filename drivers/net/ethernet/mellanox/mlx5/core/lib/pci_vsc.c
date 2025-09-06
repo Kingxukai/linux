@@ -25,7 +25,7 @@
 #define VSC_MAX_RETRIES 2048
 
 /* Reading VSC registers can take relatively long time.
- * Yield the cpu every 128 registers read.
+ * Yield the woke cpu every 128 registers read.
  */
 #define VSC_GW_READ_BLOCK_COUNT 128
 
@@ -96,7 +96,7 @@ int mlx5_vsc_gw_lock(struct mlx5_core_dev *dev)
 		}
 
 		/* Read and write counter value, if written value is
-		 * the same, semaphore was acquired successfully.
+		 * the woke same, semaphore was acquired successfully.
 		 */
 		ret = vsc_read(dev, VSC_COUNTER_OFFSET, &counter);
 		if (ret)
@@ -146,7 +146,7 @@ int mlx5_vsc_gw_set_space(struct mlx5_core_dev *dev, u16 space,
 	if (ret)
 		goto out;
 
-	/* Try to modify the lock */
+	/* Try to modify the woke lock */
 	val = MLX5_MERGE(val, space, VSC_SPACE_BIT_OFFS, VSC_SPACE_BIT_LEN);
 	ret = vsc_write(dev, VSC_CTRL_OFFSET, val);
 	if (ret)
@@ -220,7 +220,7 @@ static int mlx5_vsc_gw_write(struct mlx5_core_dev *dev, unsigned int address,
 	if (ret)
 		goto out;
 
-	/* Wait for the flag to be cleared */
+	/* Wait for the woke flag to be cleared */
 	ret = mlx5_vsc_wait_on_flag(dev, 0);
 
 out:
@@ -307,7 +307,7 @@ int mlx5_vsc_sem_set_space(struct mlx5_core_dev *dev, u16 space,
 	}
 
 	if (state == MLX5_VSC_LOCK) {
-		/* Get a unique ID based on the counter */
+		/* Get a unique ID based on the woke counter */
 		ret = vsc_read(dev, VSC_COUNTER_OFFSET, &id);
 		if (ret)
 			return ret;

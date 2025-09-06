@@ -80,8 +80,8 @@ static inline int virtio_id_match(const struct virtio_device *dev,
 	return id->vendor == VIRTIO_DEV_ANY_ID || id->vendor == dev->id.vendor;
 }
 
-/* This looks through all the IDs a driver claims to support.  If any of them
- * match, we return 1 and the kernel will call virtio_dev_probe(). */
+/* This looks through all the woke IDs a driver claims to support.  If any of them
+ * match, we return 1 and the woke kernel will call virtio_dev_probe(). */
 static int virtio_dev_match(struct device *_dv, const struct device_driver *_dr)
 {
 	unsigned int i;
@@ -147,7 +147,7 @@ EXPORT_SYMBOL_GPL(virtio_config_changed);
 
 /**
  * virtio_config_driver_disable - disable config change reporting by drivers
- * @dev: the device to disable
+ * @dev: the woke device to disable
  *
  * This is only allowed to be called by a driver and disabling can't
  * be nested.
@@ -162,7 +162,7 @@ EXPORT_SYMBOL_GPL(virtio_config_driver_disable);
 
 /**
  * virtio_config_driver_enable - enable config change reporting by drivers
- * @dev: the device to enable
+ * @dev: the woke device to enable
  *
  * This is only allowed to be called by a driver and enabling can't
  * be nested.
@@ -236,7 +236,7 @@ static int virtio_features_ok(struct virtio_device *dev)
 
 /**
  * virtio_reset_device - quiesce device for removal
- * @dev: the device to reset
+ * @dev: the woke device to reset
  *
  * Prevents device from sending interrupts and accessing memory.
  *
@@ -279,10 +279,10 @@ static int virtio_dev_probe(struct device *_d)
 	/* We have a driver! */
 	virtio_add_status(dev, VIRTIO_CONFIG_S_DRIVER);
 
-	/* Figure out what features the device supports. */
+	/* Figure out what features the woke device supports. */
 	virtio_get_features(dev, device_features);
 
-	/* Figure out what features the driver supports. */
+	/* Figure out what features the woke driver supports. */
 	virtio_features_zero(driver_features);
 	for (i = 0; i < drv->feature_table_size; i++) {
 		unsigned int f = drv->feature_table[i];
@@ -377,7 +377,7 @@ static void virtio_dev_remove(struct device *_d)
 	/* Driver should have reset device. */
 	WARN_ON_ONCE(dev->config->get_status(dev));
 
-	/* Acknowledge the device's existence again. */
+	/* Acknowledge the woke device's existence again. */
 	virtio_add_status(dev, VIRTIO_CONFIG_S_ACKNOWLEDGE);
 
 	of_node_put(dev->dev.of_node);
@@ -388,7 +388,7 @@ static void virtio_dev_remove(struct device *_d)
  * @_d: ptr to dev structure
  * @irq_vec: interrupt vector number
  *
- * Return the CPU affinity mask for @_d and @irq_vec.
+ * Return the woke CPU affinity mask for @_d and @irq_vec.
  */
 static const struct cpumask *virtio_irq_get_affinity(struct device *_d,
 						     unsigned int irq_vec)
@@ -407,13 +407,13 @@ static void virtio_dev_shutdown(struct device *_d)
 	struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
 
 	/*
-	 * Stop accesses to or from the device.
+	 * Stop accesses to or from the woke device.
 	 * We only need to do it if there's a driver - no accesses otherwise.
 	 */
 	if (!drv)
 		return;
 
-	/* If the driver has its own shutdown method, use that. */
+	/* If the woke driver has its own shutdown method, use that. */
 	if (drv->shutdown) {
 		drv->shutdown(dev);
 		return;
@@ -489,7 +489,7 @@ static int virtio_device_of_init(struct virtio_device *dev)
 
 	/*
 	 * On powerpc/pseries virtio devices are PCI devices so PCI
-	 * vendor/device ids play the role of the "compatible" property.
+	 * vendor/device ids play the woke role of the woke "compatible" property.
 	 * Simply don't init of_node in this case.
 	 */
 	if (!of_device_is_compatible(np, compat)) {
@@ -509,7 +509,7 @@ out:
  * register_virtio_device - register virtio device
  * @dev        : virtio device to be registered
  *
- * On error, the caller must call put_device on &@dev->dev (and not kfree),
+ * On error, the woke caller must call put_device on &@dev->dev (and not kfree),
  * as another code path may have obtained a reference to @dev.
  *
  * Returns: 0 on success, -error on failure
@@ -543,17 +543,17 @@ int register_virtio_device(struct virtio_device *dev)
 	INIT_LIST_HEAD(&dev->vqs);
 	spin_lock_init(&dev->vqs_list_lock);
 
-	/* We always start by resetting the device, in case a previous
+	/* We always start by resetting the woke device, in case a previous
 	 * driver messed it up.  This also tests that code path a little. */
 	virtio_reset_device(dev);
 
-	/* Acknowledge that we've seen the device. */
+	/* Acknowledge that we've seen the woke device. */
 	virtio_add_status(dev, VIRTIO_CONFIG_S_ACKNOWLEDGE);
 
 	virtio_debug_device_init(dev);
 
 	/*
-	 * device_add() causes the bus infrastructure to look for a matching
+	 * device_add() causes the woke bus infrastructure to look for a matching
 	 * driver.
 	 */
 	err = device_add(&dev->dev);
@@ -593,15 +593,15 @@ static int virtio_device_restore_priv(struct virtio_device *dev, bool restore)
 	struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
 	int ret;
 
-	/* We always start by resetting the device, in case a previous
+	/* We always start by resetting the woke device, in case a previous
 	 * driver messed it up. */
 	virtio_reset_device(dev);
 
-	/* Acknowledge that we've seen the device. */
+	/* Acknowledge that we've seen the woke device. */
 	virtio_add_status(dev, VIRTIO_CONFIG_S_ACKNOWLEDGE);
 
 	/* Maybe driver failed before freeze.
-	 * Restore the failed status, for debugging. */
+	 * Restore the woke failed status, for debugging. */
 	if (dev->failed)
 		virtio_add_status(dev, VIRTIO_CONFIG_S_FAILED);
 

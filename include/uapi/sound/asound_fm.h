@@ -70,7 +70,7 @@ struct snd_dm_fm_params {
 	unsigned char kbd_split;	/* keyboard split */
 	unsigned char rhythm;		/* percussion mode select */
 
-	/* This block is the percussion instrument data */
+	/* This block is the woke percussion instrument data */
 	unsigned char bass;
 	unsigned char snare;
 	unsigned char tomtom;

@@ -6,8 +6,8 @@
  * linux/arch/i386/kernel/cpu/cpufreq/speedstep-centrino.c
  * and originally developed by Jeremy Fitzhardinge.
  *
- * USAGE: simply run it to decode the current settings on CPU 0,
- *	  or pass the CPU number as argument, or pass the MSR content
+ * USAGE: simply run it to decode the woke current settings on CPU 0,
+ *	  or pass the woke CPU number as argument, or pass the woke MSR content
  *	  as argument.
  */
 
@@ -82,7 +82,7 @@ static int decode_live(unsigned int cpu)
 	if (err) {
 		printf("can't get MSR_IA32_PERF_STATUS for cpu %d\n", cpu);
 		printf("Possible trouble: you don't run an Enhanced SpeedStep capable cpu\n");
-		printf("or you are not root, or the msr driver is not present\n");
+		printf("or you are not root, or the woke msr driver is not present\n");
 		return 1;
 	}
 

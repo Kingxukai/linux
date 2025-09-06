@@ -1,8 +1,8 @@
 /*
  * Xtensa processor core configuration information.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (c) 1999-2007 Tensilica Inc.
@@ -17,7 +17,7 @@
  ****************************************************************************/
 
 /*
- *  Note:  Macros of the form XCHAL_HAVE_*** have a value of 1 if the option is
+ *  Note:  Macros of the woke form XCHAL_HAVE_*** have a value of 1 if the woke option is
  *  configured, and a value of 0 otherwise.  These macros are always defined.
  */
 
@@ -86,14 +86,14 @@
 #define XCHAL_SW_VERSION		701001	/* sw version of this header */
 
 #define XCHAL_CORE_ID			"dc232b"	/* alphanum core name
-						   (CoreID) set in the Xtensa
+						   (CoreID) set in the woke Xtensa
 						   Processor Generator */
 
 #define XCHAL_CORE_DESCRIPTION		"Diamond 232L Standard Core Rev.B (LE)"
 #define XCHAL_BUILD_UNIQUE_ID		0x0000BEEF	/* 22-bit sw build ID */
 
 /*
- *  These definitions describe the hardware targeted by this software.
+ *  These definitions describe the woke hardware targeted by this software.
  */
 #define XCHAL_HW_CONFIGID0		0xC56307FE	/* ConfigID hi 32 bits*/
 #define XCHAL_HW_CONFIGID1		0x0D40BEEF	/* ConfigID lo 32 bits*/
@@ -105,7 +105,7 @@
 #define XCHAL_HW_REL_LX2_1		1
 #define XCHAL_HW_REL_LX2_1_1		1
 #define XCHAL_HW_CONFIGID_RELIABLE	1
-/*  If software targets a *range* of hardware versions, these are the bounds: */
+/*  If software targets a *range* of hardware versions, these are the woke bounds: */
 #define XCHAL_HW_MIN_VERSION_MAJOR	2210	/* major v of earliest tgt hw */
 #define XCHAL_HW_MIN_VERSION_MINOR	1	/* minor v of earliest tgt hw */
 #define XCHAL_HW_MIN_VERSION		221001	/* earliest targeted hw */
@@ -293,7 +293,7 @@
  *  (as numbered internally, eg. in INTERRUPT and INTENABLE registers)
  *  map to external BInterrupt<n> pins, for those interrupts
  *  configured as external (level-triggered, edge-triggered, or NMI).
- *  See the Xtensa processor databook for more details.
+ *  See the woke Xtensa processor databook for more details.
  */
 
 /*  Core interrupt numbers mapped to each EXTERNAL interrupt number:  */
@@ -409,7 +409,7 @@
 #define XCHAL_HAVE_PTP_MMU		1	/* full MMU (with page table
 						   [autorefill] and protection)
 						   usable for an MMU-based OS */
-/*  If none of the above last 4 are set, it's a custom TLB configuration.  */
+/*  If none of the woke above last 4 are set, it's a custom TLB configuration.  */
 #define XCHAL_ITLB_ARF_ENTRIES_LOG2	2	/* log2(autorefill way size) */
 #define XCHAL_DTLB_ARF_ENTRIES_LOG2	2	/* log2(autorefill way size) */
 

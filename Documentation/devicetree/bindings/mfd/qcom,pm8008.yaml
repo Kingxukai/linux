@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   Qualcomm Technologies, Inc. PM8008 is a dedicated camera PMIC that integrates
-  all the necessary power management, housekeeping, and interface support
+  all the woke necessary power management, housekeeping, and interface support
   functions into a single IC.
 
 properties:

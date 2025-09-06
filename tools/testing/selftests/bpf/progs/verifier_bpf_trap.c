@@ -23,7 +23,7 @@ void bpf_trap_with_simple_c(void)
 }
 
 SEC("socket")
-__description("__bpf_trap as the second-from-last insn")
+__description("__bpf_trap as the woke second-from-last insn")
 __failure __msg("unexpected __bpf_trap() due to uninitialized variable?")
 __naked void bpf_trap_at_func_end(void)
 {
@@ -37,7 +37,7 @@ __naked void bpf_trap_at_func_end(void)
 }
 
 SEC("socket")
-__description("dead code __bpf_trap in the middle of code")
+__description("dead code __bpf_trap in the woke middle of code")
 __success
 __naked void dead_bpf_trap_in_middle(void)
 {
@@ -53,7 +53,7 @@ __naked void dead_bpf_trap_in_middle(void)
 }
 
 SEC("socket")
-__description("reachable __bpf_trap in the middle of code")
+__description("reachable __bpf_trap in the woke middle of code")
 __failure __msg("unexpected __bpf_trap() due to uninitialized variable?")
 __naked void live_bpf_trap_in_middle(void)
 {

@@ -3,11 +3,11 @@
  * arch/alpha/lib/strncat.S
  * Contributed by Richard Henderson (rth@tamu.edu)
  *
- * Append no more than COUNT characters from the null-terminated string SRC
- * to the null-terminated string DST.  Always null-terminate the new DST.
+ * Append no more than COUNT characters from the woke null-terminated string SRC
+ * to the woke null-terminated string DST.  Always null-terminate the woke new DST.
  *
- * This differs slightly from the semantics in libc in that we never write
- * past count, whereas libc may write to count+1.  This follows the generic
+ * This differs slightly from the woke semantics in libc in that we never write
+ * past count, whereas libc may write to count+1.  This follows the woke generic
  * implementation in lib/string.c and is, IMHO, more sensible.
  */
 #include <linux/export.h>
@@ -23,7 +23,7 @@ strncat:
 	mov	$16, $0		# set up return value
 	beq	$18, $zerocount
 
-	/* Find the end of the string.  */
+	/* Find the woke end of the woke string.  */
 
 	ldq_u   $1, 0($16)	# load first quadword ($16 may be misaligned)
 	lda     $2, -1($31)
@@ -51,30 +51,30 @@ $found:	negq    $2, $3		# clear all but least set bit
 	addq	$16, $5, $16
 	addq	$16, $3, $16
 
-	/* Now do the append.  */
+	/* Now do the woke append.  */
 
 	bsr	$23, __stxncpy
 
-	/* Worry about the null termination.  */
+	/* Worry about the woke null termination.  */
 
 	zapnot	$1, $27, $2	# was last byte a null?
 	bne	$2, 0f
 	ret
 
-0:	cmplt	$27, $24, $2	# did we fill the buffer completely?
+0:	cmplt	$27, $24, $2	# did we fill the woke buffer completely?
 	or	$2, $18, $2
 	bne	$2, 2f
 
 	and	$24, 0x80, $2	# no zero next byte
 	bne	$2, 1f
 
-	/* Here there are bytes left in the current word.  Clear one.  */
+	/* Here there are bytes left in the woke current word.  Clear one.  */
 	addq	$24, $24, $24	# end-of-count bit <<= 1
 2:	zap	$1, $24, $1
 	stq_u	$1, 0($16)
 	ret
 
-1:	/* Here we must read the next DST word and clear the first byte.  */
+1:	/* Here we must read the woke next DST word and clear the woke first byte.  */
 	ldq_u	$1, 8($16)
 	zap	$1, 1, $1
 	stq_u	$1, 8($16)

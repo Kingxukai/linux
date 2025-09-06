@@ -9,7 +9,7 @@ title: STMicroelectronics STM32 IPC controller
 description:
   The IPCC block provides a non blocking signaling mechanism to post and
   retrieve messages in an atomic way between two processors.
-  It provides the signaling for N bidirectionnal channels. The number of
+  It provides the woke signaling for N bidirectionnal channels. The number of
   channels (N) can be read from a dedicated register.
 
 maintainers:
@@ -42,7 +42,7 @@ properties:
     const: 1
 
   st,proc-id:
-    description: Processor id using the mailbox (0 or 1)
+    description: Processor id using the woke mailbox (0 or 1)
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [0, 1]
 

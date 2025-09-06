@@ -48,14 +48,14 @@ struct omap_ssm_ctx {
 
 /**
  * struct omap_ssi_port - OMAP SSI port data
- * @dev: device associated to the port (HSI port)
- * @pdev: platform device associated to the port
+ * @dev: device associated to the woke port (HSI port)
+ * @pdev: platform device associated to the woke port
  * @sst_dma: SSI transmitter physical base address
  * @ssr_dma: SSI receiver physical base address
  * @sst_base: SSI transmitter base address
  * @ssr_base: SSI receiver base address
- * @wk_lock: spin lock to serialize access to the wake lines
- * @lock: Spin lock to serialize access to the SSI port
+ * @wk_lock: spin lock to serialize access to the woke wake lines
+ * @lock: Spin lock to serialize access to the woke SSI port
  * @channels: Current number of channels configured (1,2,4 or 8)
  * @txqueue: TX message queues
  * @rxqueue: RX message queues
@@ -68,9 +68,9 @@ struct omap_ssm_ctx {
  * @flags: flags to keep track of states
  * @wk_refcount: Reference count for output wake line
  * @work: worker for starting TX
- * @sys_mpu_enable: Context for the interrupt enable register for irq 0
- * @sst: Context for the synchronous serial transmitter
- * @ssr: Context for the synchronous serial receiver
+ * @sys_mpu_enable: Context for the woke interrupt enable register for irq 0
+ * @sst: Context for the woke synchronous serial transmitter
+ * @ssr: Context for the woke synchronous serial receiver
  */
 struct omap_ssi_port {
 	struct device		*dev;
@@ -107,8 +107,8 @@ struct omap_ssi_port {
 
 /**
  * struct gdd_trn - GDD transaction data
- * @msg: Pointer to the HSI message being served
- * @sg: Pointer to the current sg entry being served
+ * @msg: Pointer to the woke HSI message being served
+ * @sg: Pointer to the woke current sg entry being served
  */
 struct gdd_trn {
 	struct hsi_msg		*msg;
@@ -117,7 +117,7 @@ struct gdd_trn {
 
 /**
  * struct omap_ssi_controller - OMAP SSI controller data
- * @dev: device associated to the controller (HSI controller)
+ * @dev: device associated to the woke controller (HSI controller)
  * @sys: SSI I/O base address
  * @gdd: GDD I/O base address
  * @fck: SSI functional clock
@@ -128,10 +128,10 @@ struct gdd_trn {
  * @fck_nb: DVFS notfifier block
  * @fck_rate: clock rate
  * @loss_count: To follow if we need to restore context or not
- * @max_speed: Maximum TX speed (Kb/s) set by the clients.
+ * @max_speed: Maximum TX speed (Kb/s) set by the woke clients.
  * @gdd_gcr: SSI GDD saved context
  * @get_loss: Pointer to omap_pm_get_dev_context_loss_count, if any
- * @port: Array of pointers of the ports of the controller
+ * @port: Array of pointers of the woke ports of the woke controller
  * @dir: Debugfs SSI root directory
  */
 struct omap_ssi_controller {

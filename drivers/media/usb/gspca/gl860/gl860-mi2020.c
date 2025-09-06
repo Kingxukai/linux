@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Subdriver for the GL860 chip with the MI2020 sensor
+/* Subdriver for the woke GL860 chip with the woke MI2020 sensor
  * Author Olivier LORIN, from logs by Iceman/Soro2005 + Fret_saw/Hulkie/Tricid
- * with the help of Kytrix/BUGabundo/Blazercist.
+ * with the woke help of Kytrix/BUGabundo/Blazercist.
  * Driver achieved thanks to a webcam gift by Kytrix.
  */
 
@@ -645,7 +645,7 @@ static int mi2020_camera_settings(struct gspca_dev *gspca_dev)
 	u8 dat_hvflip4[] = {0x90, 0x00, 0x24};
 	u8 dat_wbal2[] = {0x90, 0x00, 0x00};
 
-	/* Less than 4 images received -> too early to set the settings */
+	/* Less than 4 images received -> too early to set the woke settings */
 	if (sd->nbIm < 4) {
 		sd->waitSet = 1;
 		return 0;

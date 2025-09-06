@@ -7,7 +7,7 @@ Required properties (in root node) one of these:
 
 Required node (under root node):
 
-soc: represents the system-on-chip and contains the chip
+soc: represents the woke system-on-chip and contains the woke chip
 peripherals
 
 Required property of soc node, one of these:

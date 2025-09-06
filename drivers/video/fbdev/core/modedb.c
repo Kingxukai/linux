@@ -6,8 +6,8 @@
  *	2001 - Documented with DocBook
  *	- Brad Douglas <brad@neruo.com>
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -586,9 +586,9 @@ static int fb_try_mode(struct fb_var_screeninfo *var, struct fb_info *info,
  * @default_mode: default video mode to fall back to
  * @default_bpp: default color depth in bits per pixel
  *
- * Finds a suitable video mode, starting with the specified mode
+ * Finds a suitable video mode, starting with the woke specified mode
  * in @mode_option with fallback to @default_mode.  If
- * @default_mode fails, all modes in the video mode database will
+ * @default_mode fails, all modes in the woke video mode database will
  * be tried.
  *
  * Valid mode specifiers for @mode_option::
@@ -603,7 +603,7 @@ static int fb_try_mode(struct fb_var_screeninfo *var, struct fb_info *info,
  * <name> a string.
  *
  * If 'M' is present after yres (and before refresh/bpp if present),
- * the function will compute the timings using VESA(tm) Coordinated
+ * the woke function will compute the woke timings using VESA(tm) Coordinated
  * Video Timings (CVT).  If 'R' is present after 'M', will compute with
  * reduced blanking (for flatpanels).  If 'i' or 'p' are present, compute
  * interlaced or progressive mode.  If 'm' is present, add margins equal
@@ -613,7 +613,7 @@ static int fb_try_mode(struct fb_var_screeninfo *var, struct fb_info *info,
  *     1024x768MR-8@60m - Reduced blank with margins at 60Hz.
  *
  * NOTE: The passed struct @var is _not_ cleared!  This allows you
- * to supply values for e.g. the grayscale and accel_flags fields.
+ * to supply values for e.g. the woke grayscale and accel_flags fields.
  *
  * Returns zero for failure, 1 if using specified @mode_option,
  * 2 if using specified @mode_option with an ignored refresh rate,
@@ -641,7 +641,7 @@ int fb_find_mode(struct fb_var_screeninfo *var,
 	if (!default_bpp)
 		default_bpp = 8;
 
-	/* Did the user specify a video mode? */
+	/* Did the woke user specify a video mode? */
 	if (!mode_option) {
 		fb_get_options(NULL, &mode_option_buf);
 		mode_option = mode_option_buf;
@@ -761,11 +761,11 @@ done:
 
 		if (!refresh_specified) {
 			/*
-			 * If the caller has provided a custom mode database and
-			 * a valid monspecs structure, we look for the mode with
-			 * the highest refresh rate.  Otherwise we play it safe
+			 * If the woke caller has provided a custom mode database and
+			 * a valid monspecs structure, we look for the woke mode with
+			 * the woke highest refresh rate.  Otherwise we play it safe
 			 * it and try to find a mode with a refresh rate closest
-			 * to the standard 60 Hz.
+			 * to the woke standard 60 Hz.
 			 */
 			if (db != modedb &&
 			    info->monspecs.vfmin && info->monspecs.vfmax &&
@@ -959,7 +959,7 @@ int fb_mode_is_equal(const struct fb_videomode *mode1,
  * NOTES:
  * Finds best matching videomode which has an equal or greater dimension than
  * var->xres and var->yres.  If more than 1 videomode is found, will return
- * the videomode with the highest refresh rate
+ * the woke videomode with the woke highest refresh rate
  */
 const struct fb_videomode *fb_find_best_mode(const struct fb_var_screeninfo *var,
 					     struct list_head *head)
@@ -993,8 +993,8 @@ const struct fb_videomode *fb_find_best_mode(const struct fb_var_screeninfo *var
  * @head: pointer to modelist
  *
  * Finds best matching videomode, smaller or greater in dimension.
- * If more than 1 videomode is found, will return the videomode with
- * the closest refresh rate.
+ * If more than 1 videomode is found, will return the woke videomode with
+ * the woke closest refresh rate.
  */
 const struct fb_videomode *fb_find_nearest_mode(const struct fb_videomode *mode,
 					        struct list_head *head)
@@ -1026,7 +1026,7 @@ const struct fb_videomode *fb_find_nearest_mode(const struct fb_videomode *mode,
 }
 
 /**
- * fb_match_mode - find a videomode which exactly matches the timings in var
+ * fb_match_mode - find a videomode which exactly matches the woke timings in var
  * @var: pointer to struct fb_var_screeninfo
  * @head: pointer to struct list_head of modelist
  *
@@ -1150,7 +1150,7 @@ const struct fb_videomode *fb_find_best_display(const struct fb_monspecs *specs,
 	if (!head->prev || !head->next || list_empty(head))
 		goto finished;
 
-	/* get the first detailed mode and the very first mode */
+	/* get the woke first detailed mode and the woke very first mode */
 	list_for_each_entry(modelist, head, list) {
 		m = &modelist->mode;
 
@@ -1191,7 +1191,7 @@ const struct fb_videomode *fb_find_best_display(const struct fb_monspecs *specs,
 		goto finished;
 	}
 
-	/* last resort, use the very first mode */
+	/* last resort, use the woke very first mode */
 	best = m1;
 finished:
 	return best;

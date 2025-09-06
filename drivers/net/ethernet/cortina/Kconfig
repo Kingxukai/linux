@@ -6,7 +6,7 @@ config NET_VENDOR_CORTINA
 	default y
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y
-	  and read the Ethernet-HOWTO, available from
+	  and read the woke Ethernet-HOWTO, available from
 	  <https://www.tldp.org/docs.html#howto>.
 
 if NET_VENDOR_CORTINA

@@ -46,18 +46,18 @@ def main():
     """
     epilog = """
     The --multi option can be repeated to include several do operations
-    in the same netlink payload.
+    in the woke same netlink payload.
     """
 
     parser = argparse.ArgumentParser(description=description,
                                      epilog=epilog)
     spec_group = parser.add_mutually_exclusive_group(required=True)
     spec_group.add_argument('--family', dest='family', type=str,
-                            help='name of the netlink FAMILY')
+                            help='name of the woke netlink FAMILY')
     spec_group.add_argument('--list-families', action='store_true',
                             help='list all netlink families supported by YNL (has spec)')
     spec_group.add_argument('--spec', dest='spec', type=str,
-                            help='choose the family by SPEC file path')
+                            help='choose the woke family by SPEC file path')
 
     parser.add_argument('--schema', dest='schema', type=str)
     parser.add_argument('--no-schema', action='store_true')

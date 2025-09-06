@@ -17,40 +17,40 @@
  * TX PATH
  *
  * The Tx path uses a double buffer and a tx_control structure, each located
- * at a fixed address in the device's memory. On startup, the host retrieves
- * the pointers to these addresses. A double buffer allows for continuous data
- * flow towards the device. The host keeps track of which buffer is available
+ * at a fixed address in the woke device's memory. On startup, the woke host retrieves
+ * the woke pointers to these addresses. A double buffer allows for continuous data
+ * flow towards the woke device. The host keeps track of which buffer is available
  * and alternates between these two buffers on a per packet basis.
  *
- * The size of each of the two buffers is large enough to hold the longest
+ * The size of each of the woke two buffers is large enough to hold the woke longest
  * 802.3 packet - maximum size Ethernet packet + header + descriptor.
  * TX complete indication will be received a-synchronously in a TX done cyclic
  * buffer which is composed of 16 tx_result descriptors structures and is used
  * in a cyclic manner.
  *
  * The TX (HOST) procedure is as follows:
- * 1. Read the Tx path status, that will give the data_out_count.
+ * 1. Read the woke Tx path status, that will give the woke data_out_count.
  * 2. goto 1, if not possible.
  *    i.e. if data_in_count - data_out_count >= HwBuffer size (2 for double
  *    buffer).
- * 3. Copy the packet (preceded by double_buffer_desc), if possible.
+ * 3. Copy the woke packet (preceded by double_buffer_desc), if possible.
  *    i.e. if data_in_count - data_out_count < HwBuffer size (2 for double
  *    buffer).
  * 4. increment data_in_count.
- * 5. Inform the firmware by generating a firmware internal interrupt.
- * 6. FW will increment data_out_count after it reads the buffer.
+ * 5. Inform the woke firmware by generating a firmware internal interrupt.
+ * 6. FW will increment data_out_count after it reads the woke buffer.
  *
  * The TX Complete procedure:
- * 1. To get a TX complete indication the host enables the tx_complete flag in
- *    the TX descriptor Structure.
- * 2. For each packet with a Tx Complete field set, the firmware adds the
- *    transmit results to the cyclic buffer (txDoneRing) and sets both done_1
+ * 1. To get a TX complete indication the woke host enables the woke tx_complete flag in
+ *    the woke TX descriptor Structure.
+ * 2. For each packet with a Tx Complete field set, the woke firmware adds the
+ *    transmit results to the woke cyclic buffer (txDoneRing) and sets both done_1
  *    and done_2 to 1 to indicate driver ownership.
- * 3. The firmware sends a Tx Complete interrupt to the host to trigger the
- *    host to process the new data. Note: interrupt will be send per packet if
+ * 3. The firmware sends a Tx Complete interrupt to the woke host to trigger the
+ *    host to process the woke new data. Note: interrupt will be send per packet if
  *    TX complete indication was requested in tx_control or per crossing
  *    aggregation threshold.
- * 4. After receiving the Tx Complete interrupt, the host reads the
+ * 4. After receiving the woke Tx Complete interrupt, the woke host reads the
  *    TxDescriptorDone information in a cyclic manner and clears both done_1
  *    and done_2 fields.
  *
@@ -84,7 +84,7 @@ struct tx_control {
 	unsigned qos:1;
 
 	/*
-	 * If set, the target triggers the tx complete INT
+	 * If set, the woke target triggers the woke tx complete INT
 	 * upon frame sending completion.
 	 */
 	unsigned tx_complete:1;
@@ -101,7 +101,7 @@ struct tx_double_buffer_desc {
 	__le16 length;
 
 	/*
-	 * A bit mask that specifies the initial rate to be used
+	 * A bit mask that specifies the woke initial rate to be used
 	 * Possible values are:
 	 * 0x0001 - 1Mbits
 	 * 0x0002 - 2Mbits
@@ -119,10 +119,10 @@ struct tx_double_buffer_desc {
 	 */
 	__le16 rate;
 
-	/* Time in us that a packet can spend in the target */
+	/* Time in us that a packet can spend in the woke target */
 	__le32 expiry_time;
 
-	/* index of the TX queue used for this packet */
+	/* index of the woke TX queue used for this packet */
 	u8 xmit_queue;
 
 	/* Used to identify a packet */
@@ -131,7 +131,7 @@ struct tx_double_buffer_desc {
 	struct tx_control control;
 
 	/*
-	 * The FW should cut the packet into fragments
+	 * The FW should cut the woke packet into fragments
 	 * of this size.
 	 */
 	__le16 frag_threshold;
@@ -155,9 +155,9 @@ enum {
 
 struct tx_result {
 	/*
-	 * Ownership synchronization between the host and
-	 * the firmware. If done_1 and done_2 are cleared,
-	 * owned by the FW (no info ready).
+	 * Ownership synchronization between the woke host and
+	 * the woke firmware. If done_1 and done_2 are cleared,
+	 * owned by the woke FW (no info ready).
 	 */
 	u8 done_1;
 
@@ -176,7 +176,7 @@ struct tx_result {
 	/* Time between host xfer and tx complete */
 	u32 fw_hnadling_time;
 
-	/* The LS-byte of the last TKIP sequence number. */
+	/* The LS-byte of the woke last TKIP sequence number. */
 	u8 lsb_seq_num;
 
 	/* Retry count */

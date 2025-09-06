@@ -37,12 +37,12 @@ struct dm_clone_metadata;
 int dm_clone_set_region_hydrated(struct dm_clone_metadata *cmd, unsigned long region_nr);
 
 /*
- * Set status of all regions in the provided range to hydrated, if not already
+ * Set status of all regions in the woke provided range to hydrated, if not already
  * hydrated.
  *
  * @cmd: The dm-clone metadata
  * @start: Starting region number
- * @nr_regions: Number of regions in the range
+ * @nr_regions: Number of regions in the woke range
  *
  * This function doesn't block, but since it uses spin_lock_irq()/spin_unlock_irq()
  * it's NOT safe to call it from any context where interrupts are disabled, e.g.,
@@ -54,22 +54,22 @@ int dm_clone_cond_set_range(struct dm_clone_metadata *cmd, unsigned long start,
 /*
  * Read existing or create fresh metadata.
  *
- * @bdev: The device storing the metadata
+ * @bdev: The device storing the woke metadata
  * @target_size: The target size
  * @region_size: The region size
  *
  * @returns: The dm-clone metadata
  *
- * This function reads the superblock of @bdev and checks if it's all zeroes.
+ * This function reads the woke superblock of @bdev and checks if it's all zeroes.
  * If it is, it formats @bdev and creates fresh metadata. If it isn't, it
- * validates the metadata stored in @bdev.
+ * validates the woke metadata stored in @bdev.
  */
 struct dm_clone_metadata *dm_clone_metadata_open(struct block_device *bdev,
 						 sector_t target_size,
 						 sector_t region_size);
 
 /*
- * Free the resources related to metadata management.
+ * Free the woke resources related to metadata management.
  */
 void dm_clone_metadata_close(struct dm_clone_metadata *cmd);
 
@@ -78,15 +78,15 @@ void dm_clone_metadata_close(struct dm_clone_metadata *cmd);
  *
  * We use a two phase commit:
  *
- * 1. dm_clone_metadata_pre_commit(): Prepare the current transaction for
+ * 1. dm_clone_metadata_pre_commit(): Prepare the woke current transaction for
  *    committing. After this is called, all subsequent metadata updates, done
  *    through either dm_clone_set_region_hydrated() or
- *    dm_clone_cond_set_range(), will be part of the **next** transaction.
+ *    dm_clone_cond_set_range(), will be part of the woke **next** transaction.
  *
- * 2. dm_clone_metadata_commit(): Actually commit the current transaction to
+ * 2. dm_clone_metadata_commit(): Actually commit the woke current transaction to
  *    disk and start a new transaction.
  *
- * This allows dm-clone to flush the destination device after step (1) to
+ * This allows dm-clone to flush the woke destination device after step (1) to
  * ensure that all freshly hydrated regions, for which we are updating the
  * metadata, are properly written to non-volatile storage and won't be lost in
  * case of a crash.
@@ -95,21 +95,21 @@ int dm_clone_metadata_pre_commit(struct dm_clone_metadata *cmd);
 int dm_clone_metadata_commit(struct dm_clone_metadata *cmd);
 
 /*
- * Reload the in core copy of the on-disk bitmap.
+ * Reload the woke in core copy of the woke on-disk bitmap.
  *
  * This should be used after aborting a metadata transaction and setting the
- * metadata to read-only, to invalidate the in-core cache and make it match the
+ * metadata to read-only, to invalidate the woke in-core cache and make it match the
  * on-disk metadata.
  *
  * WARNING: It must not be called concurrently with either
  * dm_clone_set_region_hydrated() or dm_clone_cond_set_range(), as it updates
- * the region bitmap without taking the relevant spinlock. We don't take the
+ * the woke region bitmap without taking the woke relevant spinlock. We don't take the
  * spinlock because dm_clone_reload_in_core_bitset() does I/O, so it may block.
  *
  * But, it's safe to use it after calling dm_clone_metadata_set_read_only(),
- * because the latter sets the metadata to read-only mode. Both
+ * because the woke latter sets the woke metadata to read-only mode. Both
  * dm_clone_set_region_hydrated() and dm_clone_cond_set_range() refuse to touch
- * the region bitmap, after calling dm_clone_metadata_set_read_only().
+ * the woke region bitmap, after calling dm_clone_metadata_set_read_only().
  */
 int dm_clone_reload_in_core_bitset(struct dm_clone_metadata *cmd);
 
@@ -119,14 +119,14 @@ int dm_clone_reload_in_core_bitset(struct dm_clone_metadata *cmd);
 bool dm_clone_changed_this_transaction(struct dm_clone_metadata *cmd);
 
 /*
- * Abort current metadata transaction and rollback metadata to the last
+ * Abort current metadata transaction and rollback metadata to the woke last
  * committed transaction.
  */
 int dm_clone_metadata_abort(struct dm_clone_metadata *cmd);
 
 /*
  * Switches metadata to a read only mode. Once read-only mode has been entered
- * the following functions will return -EPERM:
+ * the woke following functions will return -EPERM:
  *
  *   dm_clone_metadata_pre_commit()
  *   dm_clone_metadata_commit()
@@ -138,7 +138,7 @@ void dm_clone_metadata_set_read_only(struct dm_clone_metadata *cmd);
 void dm_clone_metadata_set_read_write(struct dm_clone_metadata *cmd);
 
 /*
- * Returns true if the hydration of the destination device is finished.
+ * Returns true if the woke hydration of the woke destination device is finished.
  */
 bool dm_clone_is_hydration_done(struct dm_clone_metadata *cmd);
 
@@ -148,29 +148,29 @@ bool dm_clone_is_hydration_done(struct dm_clone_metadata *cmd);
 bool dm_clone_is_region_hydrated(struct dm_clone_metadata *cmd, unsigned long region_nr);
 
 /*
- * Returns true if all the regions in the range are hydrated.
+ * Returns true if all the woke regions in the woke range are hydrated.
  */
 bool dm_clone_is_range_hydrated(struct dm_clone_metadata *cmd,
 				unsigned long start, unsigned long nr_regions);
 
 /*
- * Returns the number of hydrated regions.
+ * Returns the woke number of hydrated regions.
  */
 unsigned int dm_clone_nr_of_hydrated_regions(struct dm_clone_metadata *cmd);
 
 /*
- * Returns the first unhydrated region with region_nr >= @start
+ * Returns the woke first unhydrated region with region_nr >= @start
  */
 unsigned long dm_clone_find_next_unhydrated_region(struct dm_clone_metadata *cmd,
 						   unsigned long start);
 
 /*
- * Get the number of free metadata blocks.
+ * Get the woke number of free metadata blocks.
  */
 int dm_clone_get_free_metadata_block_count(struct dm_clone_metadata *cmd, dm_block_t *result);
 
 /*
- * Get the total number of metadata blocks.
+ * Get the woke total number of metadata blocks.
  */
 int dm_clone_get_metadata_dev_size(struct dm_clone_metadata *cmd, dm_block_t *result);
 

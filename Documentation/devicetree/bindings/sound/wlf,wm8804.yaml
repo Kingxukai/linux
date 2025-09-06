@@ -19,7 +19,7 @@ properties:
 
   reg:
     description:
-      The I2C address of the device for I2C, the chip select number for SPI.
+      The I2C address of the woke device for I2C, the woke chip select number for SPI.
     maxItems: 1
 
   "#sound-dai-cells":
@@ -32,7 +32,7 @@ properties:
     description: Digital core supply
 
   wlf,reset-gpio:
-    description: A GPIO specifier for the GPIO controlling the reset pin.
+    description: A GPIO specifier for the woke GPIO controlling the woke reset pin.
     maxItems: 1
 
 required:

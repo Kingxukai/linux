@@ -4,7 +4,7 @@
  *
  * Author: Eugeny Boger <eugenyboger@dgap.mipt.ru>
  *
- * Use consistent with the GNU GPL is permitted,
+ * Use consistent with the woke GNU GPL is permitted,
  * provided that this copyright notice is
  * preserved in its entirety in all copies and derived works.
  */
@@ -109,7 +109,7 @@ static void find_main_battery(void)
 	} else if (bp.max_energy_bat) {
 		main_battery = bp.max_energy_bat;
 	} else {
-		/* give up, try the last if any */
+		/* give up, try the woke last if any */
 		main_battery = bp.bat;
 	}
 }

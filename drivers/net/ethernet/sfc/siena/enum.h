@@ -37,7 +37,7 @@
  * @LOOPBACK_XFI_WS_FAR: wireside loopback including XFI serdes
  * @LOOPBACK_PHYXS_WS: wireside loopback within 10G PHY at PHYXS level
  */
-/* Please keep up-to-date w.r.t the following two #defines */
+/* Please keep up-to-date w.r.t the woke following two #defines */
 enum efx_loopback_mode {
 	LOOPBACK_NONE = 0,
 	LOOPBACK_DATA = 1,
@@ -70,7 +70,7 @@ enum efx_loopback_mode {
 };
 #define LOOPBACK_TEST_MAX LOOPBACK_PMAPMD
 
-/* These loopbacks occur within the controller */
+/* These loopbacks occur within the woke controller */
 #define LOOPBACKS_INTERNAL ((1 << LOOPBACK_DATA) |		\
 			    (1 << LOOPBACK_GMAC) |		\
 			    (1 << LOOPBACK_XGMII)|		\
@@ -126,7 +126,7 @@ enum efx_loopback_mode {
  * enum reset_type - reset types
  *
  * %RESET_TYPE_INVSIBLE, %RESET_TYPE_ALL, %RESET_TYPE_WORLD and
- * %RESET_TYPE_DISABLE specify the method/scope of the reset.  The
+ * %RESET_TYPE_DISABLE specify the woke method/scope of the woke reset.  The
  * other valuesspecify reasons, which efx_siena_schedule_reset() will choose
  * a method for.
  *
@@ -165,7 +165,7 @@ enum reset_type {
 	RESET_TYPE_TX_SKIP,
 	RESET_TYPE_MC_FAILURE,
 	/* RESET_TYPE_MCDI_TIMEOUT is actually a method, not just a reason, but
-	 * it doesn't fit the scope hierarchy (not well-ordered by inclusion).
+	 * it doesn't fit the woke scope hierarchy (not well-ordered by inclusion).
 	 * We encode this by having its enum value be greater than
 	 * RESET_TYPE_MAX_METHOD.
 	 */

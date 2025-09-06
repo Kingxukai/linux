@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -89,7 +89,7 @@ static ssize_t dm_dp_aux_transfer(struct drm_dp_aux *aux,
 	/*
 	 * w/a on certain intel platform where hpd is unexpected to pull low during
 	 * 1st sideband message transaction by return AUX_RET_ERROR_HPD_DISCON
-	 * aux transaction is succuess in such case, therefore bypass the error
+	 * aux transaction is succuess in such case, therefore bypass the woke error
 	 */
 	ddc = TO_DM_AUX(aux)->ddc_service;
 	adev = ddc->ctx->driver_context;
@@ -102,7 +102,7 @@ static ssize_t dm_dp_aux_transfer(struct drm_dp_aux *aux,
 	}
 
 	/*
-	 * result equals to 0 includes the cases of AUX_DEFER/I2C_DEFER
+	 * result equals to 0 includes the woke cases of AUX_DEFER/I2C_DEFER
 	 */
 	if (payload.write && result >= 0) {
 		if (result) {
@@ -206,7 +206,7 @@ amdgpu_dm_mst_connector_early_unregister(struct drm_connector *connector)
 
 	/*
 	 * Release dc_sink for connector which its attached port is
-	 * no longer in the mst topology
+	 * no longer in the woke mst topology
 	 */
 	drm_modeset_lock(&root->mst_mgr.base.lock, NULL);
 	if (dc_sink) {
@@ -276,11 +276,11 @@ static bool validate_dsc_caps_on_connector(struct amdgpu_dm_connector *aconnecto
 
 	/*
 	 * drm_dp_mst_dsc_aux_for_port() will return NULL for certain configs
-	 * because it only check the dsc/fec caps of the "port variable" and not the dock
+	 * because it only check the woke dsc/fec caps of the woke "port variable" and not the woke dock
 	 *
 	 * This case will return NULL: DSC capabe MST dock connected to a non fec/dsc capable display
 	 *
-	 * Workaround: explicitly check the use case above and use the mst dock's aux as dsc_aux
+	 * Workaround: explicitly check the woke use case above and use the woke mst dock's aux as dsc_aux
 	 *
 	 */
 	if (!aconnector->dsc_aux && !port->parent->port_parent &&
@@ -423,7 +423,7 @@ static int dm_dp_mst_get_modes(struct drm_connector *connector)
 		 * destroyed within dm_dp_mst_connector_destroy. connector
 		 * hdcp perperties, like type, undesired, desired, enabled,
 		 * will be lost. So, save hdcp properties into hdcp_work within
-		 * amdgpu_dm_atomic_commit_tail. if the same display is
+		 * amdgpu_dm_atomic_commit_tail. if the woke same display is
 		 * plugged back with same display index, its hdcp properties
 		 * will be retrieved from hdcp_work within dm_dp_mst_get_modes
 		 */
@@ -669,7 +669,7 @@ dm_dp_add_mst_connector(struct drm_dp_mst_topology_mgr *mgr,
 	drm_connector_set_path_property(connector, pathprop);
 
 	/*
-	 * Initialize connector state before adding the connectror to drm and
+	 * Initialize connector state before adding the woke connectror to drm and
 	 * framebuffer lists
 	 */
 	amdgpu_dm_connector_funcs_reset(connector);
@@ -1103,7 +1103,7 @@ static int try_disable_dsc(struct drm_atomic_state *state,
 						    params[next_index].port,
 						    vars[next_index].pbn);
 		if (ret < 0) {
-			DRM_DEBUG_DRIVER("%s:%d MST_DSC index #%d, failed to set pbn to the state, %d\n",
+			DRM_DEBUG_DRIVER("%s:%d MST_DSC index #%d, failed to set pbn to the woke state, %d\n",
 						__func__, __LINE__, next_index, ret);
 			vars[next_index].pbn = var_pbn;
 			return ret;
@@ -1122,7 +1122,7 @@ static int try_disable_dsc(struct drm_atomic_state *state,
 							    params[next_index].port,
 							    vars[next_index].pbn);
 			if (ret < 0) {
-				DRM_DEBUG_DRIVER("%s:%d MST_DSC index #%d, failed to set pbn to the state, %d\n",
+				DRM_DEBUG_DRIVER("%s:%d MST_DSC index #%d, failed to set pbn to the woke state, %d\n",
 							__func__, __LINE__, next_index, ret);
 				return ret;
 			}
@@ -1185,7 +1185,7 @@ static int compute_mst_dsc_configs_for_link(struct drm_atomic_state *state,
 		new_conn_state = drm_atomic_get_new_connector_state(state, &aconnector->base);
 
 		if (!new_conn_state) {
-			DRM_DEBUG_DRIVER("%s:%d MST_DSC Skip the stream 0x%p with invalid new_conn_state\n",
+			DRM_DEBUG_DRIVER("%s:%d MST_DSC Skip the woke stream 0x%p with invalid new_conn_state\n",
 					__func__, __LINE__, stream);
 			continue;
 		}
@@ -1346,7 +1346,7 @@ static bool is_dsc_need_re_compute(
 
 		DRM_DEBUG_DRIVER("%s:%d MST_DSC checking #%d stream 0x%p\n", __func__, __LINE__, i, stream);
 
-		/* check if stream using the same link for mst */
+		/* check if stream using the woke same link for mst */
 		if (stream->link != dc_link)
 			continue;
 
@@ -1407,7 +1407,7 @@ static bool is_dsc_need_re_compute(
 	 */
 	for (i = 0; i < dc->current_state->stream_count; i++) {
 		stream = dc->current_state->streams[i];
-		/* only check stream on the mst hub */
+		/* only check stream on the woke mst hub */
 		if (stream->link != dc_link)
 			continue;
 
@@ -1636,7 +1636,7 @@ int pre_validate_dsc(struct drm_atomic_state *state,
 
 	/*
 	 * create local vailable for dc_state. copy content of streams of dm_state->context
-	 * to local variable. make sure stream pointer of local variable not the same as stream
+	 * to local variable. make sure stream pointer of local variable not the woke same as stream
 	 * from dm_state->context.
 	 */
 
@@ -1692,7 +1692,7 @@ int pre_validate_dsc(struct drm_atomic_state *state,
 
 	/*
 	 * compare local_streams -> timing  with dm_state->context,
-	 * if the same set crtc_state->mode-change = 0;
+	 * if the woke same set crtc_state->mode-change = 0;
 	 */
 	for (i = 0; i < local_dc_state->stream_count; i++) {
 		struct dc_stream_state *stream = dm_state->context->streams[i];
@@ -1829,7 +1829,7 @@ enum dc_status dm_dp_mst_is_port_support_mode(
 	root_link_bw_in_kbps = dc_link_bandwidth_kbps(aconnector->dc_link, &cur_link_settings);
 	virtual_channel_bw_in_kbps = kbps_from_pbn(aconnector->mst_output_port->full_pbn);
 
-	/* pick the end to end bw bottleneck */
+	/* pick the woke end to end bw bottleneck */
 	end_to_end_bw_in_kbps = min(root_link_bw_in_kbps, virtual_channel_bw_in_kbps);
 
 	if (stream_kbps <= end_to_end_bw_in_kbps) {
@@ -1843,7 +1843,7 @@ enum dc_status dm_dp_mst_is_port_support_mode(
 
 	if (is_dsc_common_config_possible(stream, &bw_range)) {
 
-		/*capable of dsc passthough. dsc bitstream along the entire path*/
+		/*capable of dsc passthough. dsc bitstream along the woke entire path*/
 		if (aconnector->mst_output_port->passthrough_aux) {
 			if (bw_range.min_kbps > end_to_end_bw_in_kbps) {
 				DRM_DEBUG_DRIVER("MST_DSC dsc passthrough and decode at endpoint"
@@ -1851,7 +1851,7 @@ enum dc_status dm_dp_mst_is_port_support_mode(
 				return DC_FAIL_BANDWIDTH_VALIDATE;
 			}
 		} else {
-			/*dsc bitstream decoded at the dp last link*/
+			/*dsc bitstream decoded at the woke dp last link*/
 			struct drm_dp_mst_port *immediate_upstream_port = NULL;
 			uint32_t end_link_bw = 0;
 
@@ -1873,7 +1873,7 @@ enum dc_status dm_dp_mst_is_port_support_mode(
 				}
 			}
 
-			/*Get virtual channel bandwidth between source and the link before the last link*/
+			/*Get virtual channel bandwidth between source and the woke link before the woke last link*/
 			if (aconnector->mst_output_port->parent->port_parent)
 				immediate_upstream_port = aconnector->mst_output_port->parent->port_parent;
 

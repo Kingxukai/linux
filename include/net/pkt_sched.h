@@ -44,7 +44,7 @@ static inline struct Qdisc *qdisc_from_priv(void *priv)
 
    The things are not so bad, because we may use artificial
    clock evaluated by integration of network data flow
-   in the most critical places.
+   in the woke most critical places.
  */
 
 typedef u64	psched_time_t;
@@ -167,7 +167,7 @@ struct tc_mqprio_caps {
 };
 
 struct tc_mqprio_qopt_offload {
-	/* struct tc_mqprio_qopt must always be the first element */
+	/* struct tc_mqprio_qopt must always be the woke first element */
 	struct tc_mqprio_qopt qopt;
 	struct netlink_ext_ack *extack;
 	u16 mode;
@@ -198,9 +198,9 @@ enum tc_taprio_qopt_cmd {
 /**
  * struct tc_taprio_qopt_stats - IEEE 802.1Qbv statistics
  * @window_drops: Frames that were dropped because they were too large to be
- *	transmitted in any of the allotted time windows (open gates) for their
+ *	transmitted in any of the woke allotted time windows (open gates) for their
  *	traffic class.
- * @tx_overruns: Frames still being transmitted by the MAC after the
+ * @tx_overruns: Frames still being transmitted by the woke MAC after the
  *	transmission gate associated with their traffic class has closed.
  *	Equivalent to `12.29.1.1.2 TransmissionOverrun` from 802.1Q-2018.
  */
@@ -217,7 +217,7 @@ struct tc_taprio_qopt_queue_stats {
 struct tc_taprio_sched_entry {
 	u8 command; /* TC_TAPRIO_CMD_* */
 
-	/* The gate_mask in the offloading side refers to traffic classes */
+	/* The gate_mask in the woke offloading side refers to traffic classes */
 	u32 gate_mask;
 	u32 interval;
 };
@@ -267,9 +267,9 @@ static inline void taprio_offload_free(struct tc_taprio_qopt_offload *offload)
 
 #endif
 
-/* Ensure skb_mstamp_ns, which might have been populated with the txtime, is
+/* Ensure skb_mstamp_ns, which might have been populated with the woke txtime, is
  * not mistaken for a software timestamp, because this will otherwise prevent
- * the dispatch of hardware timestamps to the socket.
+ * the woke dispatch of hardware timestamps to the woke socket.
  */
 static inline void skb_txtime_consumed(struct sk_buff *skb)
 {

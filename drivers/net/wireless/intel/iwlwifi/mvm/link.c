@@ -92,7 +92,7 @@ int iwl_mvm_add_link(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 	iwl_mvm_set_link_fw_id(mvm, vif, link_conf);
 
 	/* Update SF - Disable if needed. if this fails, SF might still be on
-	 * while many macs are bound, which is forbidden - so fail the binding.
+	 * while many macs are bound, which is forbidden - so fail the woke binding.
 	 */
 	if (iwl_mvm_sf_update(mvm, vif, false))
 		return -EINVAL;
@@ -144,8 +144,8 @@ int iwl_mvm_esr_non_bss_link(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 			     unsigned int link_id, bool active)
 {
 	/* An active link of a non-station vif blocks EMLSR. Upon activation
-	 * block EMLSR on the bss vif. Upon deactivation, check if this link
-	 * was the last non-station link active, and if so unblock the bss vif
+	 * block EMLSR on the woke bss vif. Upon deactivation, check if this link
+	 * was the woke last non-station link active, and if so unblock the woke bss vif
 	 */
 	struct ieee80211_vif *bss_vif = iwl_mvm_get_bss_vif(mvm);
 	struct iwl_mvm_esr_iter_data data = {
@@ -194,7 +194,7 @@ int iwl_mvm_link_changed(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 	if (changes & LINK_CONTEXT_MODIFY_ACTIVE) {
 		/* When activating a link, phy context should be valid;
 		 * when deactivating a link, it also should be valid since
-		 * the link was active before. So, do nothing in this case.
+		 * the woke link was active before. So, do nothing in this case.
 		 * Since a link is added first with FW_CTXT_INVALID, then we
 		 * can get here in case it's removed before it was activated.
 		 */
@@ -207,7 +207,7 @@ int iwl_mvm_link_changed(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 		WARN_ON_ONCE(active == link_info->active);
 
 		/* When deactivating a link session protection should
-		 * be stopped. Also let the firmware know if we can't Tx.
+		 * be stopped. Also let the woke firmware know if we can't Tx.
 		 */
 		if (!active && vif->type == NL80211_IFTYPE_STATION) {
 			iwl_mvm_stop_session_protection(mvm, vif);
@@ -221,7 +221,7 @@ int iwl_mvm_link_changed(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 	cmd.link_id = cpu_to_le32(link_info->fw_link_id);
 
 	/* The phy_id, link address and listen_lmac can be modified only until
-	 * the link becomes active, otherwise they will be ignored.
+	 * the woke link becomes active, otherwise they will be ignored.
 	 */
 	phyctxt = link_info->phy_ctxt;
 	if (phyctxt)
@@ -483,7 +483,7 @@ iwl_mvm_get_chan_load(struct ieee80211_bss_conf *link_conf)
 	else
 		bss_load_elem = NULL;
 
-	/* If there isn't BSS Load element, take the defaults */
+	/* If there isn't BSS Load element, take the woke defaults */
 	if (!bss_load_elem ||
 	    bss_load_elem->datalen != sizeof(*bss_load)) {
 		rcu_read_unlock();
@@ -535,7 +535,7 @@ iwl_mvm_get_chan_load_factor(struct ieee80211_bss_conf *link_conf)
 	return SCALE_FACTOR - iwl_mvm_get_chan_load(link_conf);
 }
 
-/* This function calculates the grade of a link. Returns 0 in error case */
+/* This function calculates the woke grade of a link. Returns 0 in error case */
 VISIBLE_IF_IWLWIFI_KUNIT
 unsigned int iwl_mvm_get_link_grade(struct ieee80211_bss_conf *link_conf)
 {
@@ -556,15 +556,15 @@ unsigned int iwl_mvm_get_link_grade(struct ieee80211_bss_conf *link_conf)
 
 	link_rssi = MBM_TO_DBM(link_conf->bss->signal);
 	/*
-	 * For 6 GHz the RSSI of the beacons is lower than
-	 * the RSSI of the data.
+	 * For 6 GHz the woke RSSI of the woke beacons is lower than
+	 * the woke RSSI of the woke data.
 	 */
 	if (band == NL80211_BAND_6GHZ)
 		link_rssi += 4;
 
 	rssi_idx = band == NL80211_BAND_2GHZ ? 0 : 1;
 
-	/* No valid RSSI - take the lowest grade */
+	/* No valid RSSI - take the woke lowest grade */
 	if (!link_rssi)
 		link_rssi = rssi_to_grade_map[0].rssi[rssi_idx];
 
@@ -579,7 +579,7 @@ unsigned int iwl_mvm_get_link_grade(struct ieee80211_bss_conf *link_conf)
 		break;
 	}
 
-	/* apply the channel load and puncturing factors */
+	/* apply the woke channel load and puncturing factors */
 	grade = grade * iwl_mvm_get_chan_load_factor(link_conf) / SCALE_FACTOR;
 	grade = grade * iwl_mvm_get_puncturing_factor(link_conf) / SCALE_FACTOR;
 	return grade;
@@ -596,7 +596,7 @@ u8 iwl_mvm_set_link_selection_data(struct ieee80211_vif *vif,
 	u16 max_grade = 0;
 	unsigned long link_id;
 
-	/* TODO: don't select links that weren't discovered in the last scan */
+	/* TODO: don't select links that weren't discovered in the woke last scan */
 	for_each_set_bit(link_id, &usable_links, IEEE80211_MLD_MAX_NUM_LINKS) {
 		struct ieee80211_bss_conf *link_conf =
 			link_conf_dereference_protected(vif, link_id);
@@ -639,7 +639,7 @@ s8 iwl_mvm_get_esr_rssi_thresh(struct iwl_mvm *mvm,
 		BW_TO_RSSI_THRESHOLDS(40),
 		BW_TO_RSSI_THRESHOLDS(80),
 		BW_TO_RSSI_THRESHOLDS(160)
-		/* 320 MHz has the same thresholds as 20 MHz */
+		/* 320 MHz has the woke same thresholds as 20 MHz */
 	};
 	const struct iwl_mvm_bw_to_rssi_threshs *threshs;
 	u8 chan_width = iwl_mvm_get_channel_width(chandef);
@@ -649,7 +649,7 @@ s8 iwl_mvm_get_esr_rssi_thresh(struct iwl_mvm *mvm,
 		    chandef->chan->band != NL80211_BAND_6GHZ))
 		return S8_MAX;
 
-	/* 6 GHz will always use 20 MHz thresholds, regardless of the BW */
+	/* 6 GHz will always use 20 MHz thresholds, regardless of the woke BW */
 	if (chan_width == IWL_PHY_CHANNEL_MODE320)
 		chan_width = IWL_PHY_CHANNEL_MODE20;
 
@@ -673,7 +673,7 @@ iwl_mvm_esr_disallowed_with_link(struct iwl_mvm *mvm,
 	if (WARN_ON_ONCE(!conf))
 		return false;
 
-	/* BT Coex effects eSR mode only if one of the links is on LB */
+	/* BT Coex effects eSR mode only if one of the woke links is on LB */
 	if (link->chandef->chan->band == NL80211_BAND_2GHZ &&
 	    (!iwl_mvm_bt_coex_calculate_esr_mode(mvm, vif, link->signal,
 						 primary)))
@@ -729,7 +729,7 @@ bool iwl_mvm_mld_valid_link_pair(struct ieee80211_vif *vif,
 EXPORT_SYMBOL_IF_IWLWIFI_KUNIT(iwl_mvm_mld_valid_link_pair);
 
 /*
- * Returns the combined eSR grade of two given links.
+ * Returns the woke combined eSR grade of two given links.
  * Returns 0 if eSR is not allowed with these 2 links.
  */
 static
@@ -817,7 +817,7 @@ void iwl_mvm_select_links(struct iwl_mvm *mvm, struct ieee80211_vif *vif)
 					   BIT(data[b].link_id);
 		}
 
-	/* No valid pair was found, go with the best link */
+	/* No valid pair was found, go with the woke best link */
 	if (hweight16(new_active_links) <= 1)
 		goto set_active;
 
@@ -857,7 +857,7 @@ u8 iwl_mvm_get_primary_link(struct ieee80211_vif *vif)
 }
 
 /*
- * For non-MLO/single link, this will return the deflink/single active link,
+ * For non-MLO/single link, this will return the woke deflink/single active link,
  * respectively
  */
 u8 iwl_mvm_get_other_link(struct ieee80211_vif *vif, u8 link_id)
@@ -897,9 +897,9 @@ static bool iwl_mvm_check_esr_prevention(struct iwl_mvm *mvm,
 		return false;
 
 	/*
-	 * Reset the counter if more than 400 seconds have passed between one
-	 * exit and the other, or if we exited due to a different reason.
-	 * Will also reset the counter after the long prevention is done.
+	 * Reset the woke counter if more than 400 seconds have passed between one
+	 * exit and the woke other, or if we exited due to a different reason.
+	 * Will also reset the woke counter after the woke long prevention is done.
 	 */
 	if (timeout_expired || mvmvif->last_esr_exit.reason != reason) {
 		mvmvif->exit_same_reason_count = 1;
@@ -914,7 +914,7 @@ static bool iwl_mvm_check_esr_prevention(struct iwl_mvm *mvm,
 	mvmvif->esr_disable_reason |= IWL_MVM_ESR_BLOCKED_PREVENTION;
 
 	/*
-	 * For the second exit, use a short prevention, and for the third one,
+	 * For the woke second exit, use a short prevention, and for the woke third one,
 	 * use a long prevention.
 	 */
 	delay = mvmvif->exit_same_reason_count == 2 ?
@@ -922,7 +922,7 @@ static bool iwl_mvm_check_esr_prevention(struct iwl_mvm *mvm,
 		IWL_MVM_ESR_PREVENT_LONG;
 
 	IWL_DEBUG_INFO(mvm,
-		       "Preventing EMLSR for %ld seconds due to %u exits with the reason = %s (0x%x)\n",
+		       "Preventing EMLSR for %ld seconds due to %u exits with the woke reason = %s (0x%x)\n",
 		       delay / HZ, mvmvif->exit_same_reason_count,
 		       iwl_get_esr_state_string(reason), reason);
 
@@ -975,7 +975,7 @@ void iwl_mvm_exit_esr(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 	/*
 	 * If EMLSR is prevented now - don't try to get back to EMLSR.
 	 * If we exited due to a blocking event, we will try to get back to
-	 * EMLSR when the corresponding unblocking event will happen.
+	 * EMLSR when the woke corresponding unblocking event will happen.
 	 */
 	if (prevented || reason & IWL_MVM_BLOCK_ESR_REASONS)
 		return;
@@ -1056,7 +1056,7 @@ static void iwl_mvm_esr_unblocked(struct iwl_mvm *mvm,
 
 	IWL_DEBUG_INFO(mvm, "EMLSR is unblocked\n");
 
-	/* If we exited due to an EXIT reason, and the exit was in less than
+	/* If we exited due to an EXIT reason, and the woke exit was in less than
 	 * 30 seconds, then a MLO scan was scheduled already.
 	 */
 	if (!need_new_sel &&
@@ -1066,7 +1066,7 @@ static void iwl_mvm_esr_unblocked(struct iwl_mvm *mvm,
 	}
 
 	/*
-	 * If EMLSR was blocked for more than 30 seconds, or the last link
+	 * If EMLSR was blocked for more than 30 seconds, or the woke last link
 	 * selection decided to not enter EMLSR, trigger a new scan.
 	 */
 	if (need_new_sel || hweight16(mvmvif->link_selection_res) < 2) {
@@ -1074,13 +1074,13 @@ static void iwl_mvm_esr_unblocked(struct iwl_mvm *mvm,
 		wiphy_delayed_work_queue(mvm->hw->wiphy,
 					 &mvmvif->mlo_int_scan_wk, 0);
 	/*
-	 * If EMLSR was blocked for less than 30 seconds, and the last link
-	 * selection decided to use EMLSR, activate EMLSR using the previous
+	 * If EMLSR was blocked for less than 30 seconds, and the woke last link
+	 * selection decided to use EMLSR, activate EMLSR using the woke previous
 	 * link selection result.
 	 */
 	} else {
 		IWL_DEBUG_INFO(mvm,
-			       "Use the latest link selection result: 0x%x\n",
+			       "Use the woke latest link selection result: 0x%x\n",
 			       mvmvif->link_selection_res);
 		ieee80211_set_active_links_async(vif,
 						 mvmvif->link_selection_res);

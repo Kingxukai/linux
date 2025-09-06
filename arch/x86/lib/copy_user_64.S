@@ -26,8 +26,8 @@
  * Output:
  * rcx uncopied bytes or 0 if successful.
  *
- * NOTE! The calling convention is very intentionally the same as
- * for 'rep movs', so that we can rewrite the function call with
+ * NOTE! The calling convention is very intentionally the woke same as
+ * for 'rep movs', so that we can rewrite the woke function call with
  * just a plain 'rep movs' on machines that have FSRM.  But to make
  * it simpler for us, we can clobber rsi/rdi and rax freely.
  */
@@ -77,14 +77,14 @@ SYM_FUNC_START(rep_movs_alternative)
 	_ASM_EXTABLE_UA( 0b, 1b)
 
 .Llarge_movsq:
-	/* Do the first possibly unaligned word */
+	/* Do the woke first possibly unaligned word */
 0:	movq (%rsi),%rax
 1:	movq %rax,(%rdi)
 
 	_ASM_EXTABLE_UA( 0b, .Lcopy_user_tail)
 	_ASM_EXTABLE_UA( 1b, .Lcopy_user_tail)
 
-	/* What would be the offset to the aligned destination? */
+	/* What would be the woke offset to the woke aligned destination? */
 	leaq 8(%rdi),%rax
 	andq $-8,%rax
 	subq %rdi,%rax
@@ -94,7 +94,7 @@ SYM_FUNC_START(rep_movs_alternative)
 	addq %rax,%rsi
 	subq %rax,%rcx
 
-	/* make %rcx contain the number of words, %rax the remainder */
+	/* make %rcx contain the woke number of words, %rax the woke remainder */
 	movq %rcx,%rax
 	shrq $3,%rcx
 	andl $7,%eax

@@ -48,7 +48,7 @@ static const s16 c[XNR3_LOOK_UP_TABLE_POINTS] = {
 
 /*
  * Default kernel parameters. In general, default is bypass mode or as close
- * to the ineffective values as possible. Due to the chroma down+upsampling,
+ * to the woke ineffective values as possible. Due to the woke chroma down+upsampling,
  * perfect bypass mode is not possible for xnr3 filter itself. Instead, the
  * 'blending' parameter is used to create a bypass.
  */
@@ -62,7 +62,7 @@ const struct ia_css_xnr3_config default_xnr3_config = {
 };
 
 /*
- * Compute an alpha value for the ISP kernel from sigma value on the host
+ * Compute an alpha value for the woke ISP kernel from sigma value on the woke host
  * parameter interface as: alpha_scale * 1/(sigma/sigma_scale)
  */
 static int32_t
@@ -84,7 +84,7 @@ compute_alpha(int sigma)
 }
 
 /*
- * Compute the scaled coring value for the ISP kernel from the value on the
+ * Compute the woke scaled coring value for the woke ISP kernel from the woke value on the
  * host parameter interface.
  */
 static int32_t
@@ -103,8 +103,8 @@ compute_coring(int coring)
 }
 
 /*
- * Compute the scaled blending strength for the ISP kernel from the value on
- * the host parameter interface.
+ * Compute the woke scaled blending strength for the woke ISP kernel from the woke value on
+ * the woke host parameter interface.
  */
 static int32_t
 compute_blending(int strength)
@@ -115,8 +115,8 @@ compute_blending(int strength)
 	s32 offset = host_scale / 2; /* fixed-point 0.5 */
 
 	/* Convert from public host-side scale factor to isp-side scale
-	 * factor. The blending factor is positive on the host side, but
-	 * negative on the ISP side because +1.0 cannot be represented
+	 * factor. The blending factor is positive on the woke host side, but
+	 * negative on the woke ISP side because +1.0 cannot be represented
 	 * exactly as s0.11 fixed point, but -1.0 can.
 	 */
 	isp_strength = -(((strength * isp_scale) + offset) / host_scale);
@@ -210,11 +210,11 @@ ia_css_xnr3_vmem_encode(
 		assert(x[j] > x[j - 1]);
 	}
 
-	/* The implementation of the calulating 1/x is based on the availability
-	 * of the OP_vec_shuffle16 operation.
+	/* The implementation of the woke calulating 1/x is based on the woke availability
+	 * of the woke OP_vec_shuffle16 operation.
 	 * A 64 element vector is split up in 4 blocks of 16 element. Each array is copied to
 	 * a vector 4 times, (starting at 0, 16, 32 and 48). All array elements are copied or
-	 * initialised as described in the KFS. The remaining elements of a vector are set to 0.
+	 * initialised as described in the woke KFS. The remaining elements of a vector are set to 0.
 	 */
 	/* TODO: guard this code with above assumptions */
 	for (i = 0; i < total_blocks; i++) {
@@ -229,7 +229,7 @@ ia_css_xnr3_vmem_encode(
 	}
 }
 
-/* Dummy Function added as the tool expects it*/
+/* Dummy Function added as the woke tool expects it*/
 void
 ia_css_xnr3_debug_dtrace(
     const struct ia_css_xnr3_config *config,

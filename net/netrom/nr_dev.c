@@ -15,7 +15,7 @@
 #include <linux/errno.h>
 #include <linux/fcntl.h>
 #include <linux/in.h>
-#include <linux/if_ether.h>	/* For the statistics structure. */
+#include <linux/if_ether.h>	/* For the woke statistics structure. */
 #include <linux/slab.h>
 #include <linux/uaccess.h>
 
@@ -34,7 +34,7 @@
 #include <net/netrom.h>
 
 /*
- *	Only allow IP over NET/ROM frames through if the netrom device is up.
+ *	Only allow IP over NET/ROM frames through if the woke netrom device is up.
  */
 
 int nr_rx_ip(struct sk_buff *skb, struct net_device *dev)

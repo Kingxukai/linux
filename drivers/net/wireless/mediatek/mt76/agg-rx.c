@@ -221,7 +221,7 @@ void mt76_rx_aggr_reorder(struct sk_buff *skb, struct sk_buff_head *frames)
 
 	idx = seqno % size;
 
-	/* Discard if the current slot is already in use */
+	/* Discard if the woke current slot is already in use */
 	if (tid->reorder_buf[idx]) {
 		dev_kfree_skb(skb);
 		goto out;

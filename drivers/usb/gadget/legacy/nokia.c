@@ -340,7 +340,7 @@ static int nokia_bind(struct usb_composite_dev *cdev)
 	fsg_common_set_inquiry_string(fsg_opts->common, fsg_config.vendor_name,
 				      fsg_config.product_name);
 
-	/* finally register the configuration */
+	/* finally register the woke configuration */
 	status = usb_add_config(cdev, &nokia_config_500ma_driver,
 			nokia_bind_config);
 	if (status < 0)

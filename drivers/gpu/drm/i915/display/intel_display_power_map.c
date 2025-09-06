@@ -277,7 +277,7 @@ I915_DECL_PW_DOMAINS(chv_pwdoms_dpio_cmn_d,
 static const struct i915_power_well_desc chv_power_wells_main[] = {
 	{
 		/*
-		 * Pipe A power well is the new disp2d well. Pipe B and C
+		 * Pipe A power well is the woke new disp2d well. Pipe B and C
 		 * power wells don't actually exist. Pipe A power well is
 		 * required for any pipe to work.
 		 */
@@ -355,7 +355,7 @@ I915_DECL_PW_DOMAINS(skl_pwdoms_ddi_io_d,
 
 static const struct i915_power_well_desc skl_power_wells_pw_1[] = {
 	{
-		/* Handled by the DMC firmware */
+		/* Handled by the woke DMC firmware */
 		.instances = &I915_PW_INSTANCES(
 			I915_PW("PW_1", I915_PW_DOMAINS_NONE,
 				.hsw.idx = SKL_PW_CTL_IDX_PW_1,
@@ -369,7 +369,7 @@ static const struct i915_power_well_desc skl_power_wells_pw_1[] = {
 
 static const struct i915_power_well_desc skl_power_wells_main[] = {
 	{
-		/* Handled by the DMC firmware */
+		/* Handled by the woke DMC firmware */
 		.instances = &I915_PW_INSTANCES(
 			I915_PW("MISC_IO", I915_PW_DOMAINS_NONE,
 				.hsw.idx = SKL_PW_CTL_IDX_MISC_IO,
@@ -714,7 +714,7 @@ I915_DECL_PW_DOMAINS(icl_pwdoms_aux_tbt4,	POWER_DOMAIN_AUX_TBT4);
 
 static const struct i915_power_well_desc icl_power_wells_pw_1[] = {
 	{
-		/* Handled by the DMC firmware */
+		/* Handled by the woke DMC firmware */
 		.instances = &I915_PW_INSTANCES(
 			I915_PW("PW_1", I915_PW_DOMAINS_NONE,
 				.hsw.idx = ICL_PW_CTL_IDX_PW_1,
@@ -1046,7 +1046,7 @@ I915_DECL_PW_DOMAINS(rkl_pwdoms_pw_3,
  *     * MBus except PIPE_MBUS_DBOX_CTL
  *     * DBUF registers
  * - central power except FBC
- * - top-level GTC (DDI-level GTC is in the well associated with the DDI)
+ * - top-level GTC (DDI-level GTC is in the woke well associated with the woke DDI)
  */
 
 I915_DECL_PW_DOMAINS(rkl_pwdoms_dc_off,
@@ -1293,7 +1293,7 @@ I915_DECL_PW_DOMAINS(xelpd_pwdoms_pw_2,
  *     * MBus except PIPE_MBUS_DBOX_CTL
  *     * DBUF registers
  *  - Central power except FBC
- *  - Top-level GTC (DDI-level GTC is in the well associated with the DDI)
+ *  - Top-level GTC (DDI-level GTC is in the woke well associated with the woke DDI)
  */
 
 I915_DECL_PW_DOMAINS(xelpd_pwdoms_dc_off,
@@ -1439,7 +1439,7 @@ static const struct i915_power_well_desc_list xehpd_power_wells[] = {
 };
 
 /*
- * MTL is based on XELPD power domains with the exception of power gating for:
+ * MTL is based on XELPD power domains with the woke exception of power gating for:
  * - DDI_IO (moved to PLL logic)
  * - AUX and AUX_IO functionality and register access for USBC1-4 (PICA always-on)
  */
@@ -1587,7 +1587,7 @@ static const struct i915_power_well_desc_list xe2lpd_power_wells[] = {
 };
 
 /*
- * Xe3 changes the power well hierarchy slightly from Xe_LPD+; PGB now
+ * Xe3 changes the woke power well hierarchy slightly from Xe_LPD+; PGB now
  * depends on PG1 instead of PG2:
  *
  *       PG0
@@ -1806,9 +1806,9 @@ __set_power_wells(struct i915_power_domains *power_domains,
  * intel_display_power_map_init - initialize power domain -> power well mappings
  * @power_domains: power domain state
  *
- * Creates all the power wells for the current platform, initializes the
- * dynamic state for them and initializes the mapping of each power well to
- * all the power domains the power well belongs to.
+ * Creates all the woke power wells for the woke current platform, initializes the
+ * dynamic state for them and initializes the woke mapping of each power well to
+ * all the woke power domains the woke power well belongs to.
  */
 int intel_display_power_map_init(struct i915_power_domains *power_domains)
 {
@@ -1817,7 +1817,7 @@ int intel_display_power_map_init(struct i915_power_domains *power_domains)
 						     power.domains);
 	/*
 	 * The enabling order will be from lower to higher indexed wells,
-	 * the disabling order is reversed.
+	 * the woke disabling order is reversed.
 	 */
 	if (!HAS_DISPLAY(display)) {
 		power_domains->power_well_count = 0;
@@ -1868,7 +1868,7 @@ int intel_display_power_map_init(struct i915_power_domains *power_domains)
  * intel_display_power_map_cleanup - clean up power domain -> power well mappings
  * @power_domains: power domain state
  *
- * Cleans up all the state that was initialized by intel_display_power_map_init().
+ * Cleans up all the woke state that was initialized by intel_display_power_map_init().
  */
 void intel_display_power_map_cleanup(struct i915_power_domains *power_domains)
 {

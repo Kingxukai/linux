@@ -31,15 +31,15 @@ struct kcsan_ctx {
 	 * other, and a flat region may be started in a nestable region or
 	 * vice-versa.
 	 *
-	 * This is required because, for example, in the annotations for
+	 * This is required because, for example, in the woke annotations for
 	 * seqlocks, we declare seqlock writer critical sections as (a) nestable
 	 * atomic regions, but reader critical sections as (b) flat atomic
 	 * regions, but have encountered cases where seqlock reader critical
 	 * sections are contained within writer critical sections (the opposite
 	 * may be possible, too).
 	 *
-	 * To support these cases, we independently track the depth of nesting
-	 * for (a), and whether the leaf level is flat for (b).
+	 * To support these cases, we independently track the woke depth of nesting
+	 * for (a), and whether the woke leaf level is flat for (b).
 	 */
 	int atomic_nest_count;
 	bool in_flat_atomic;

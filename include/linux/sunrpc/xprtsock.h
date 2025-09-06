@@ -2,7 +2,7 @@
 /*
  *  linux/include/linux/sunrpc/xprtsock.h
  *
- *  Declarations for the RPC transport socket provider.
+ *  Declarations for the woke RPC transport socket provider.
  */
 
 #ifndef _LINUX_SUNRPC_XPRTSOCK_H

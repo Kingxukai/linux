@@ -4,8 +4,8 @@
  * Copyright (c) 2015, Intel Corporation.
  * All Rights Reserved.
  *
- * This file provides the platform specific telemetry implementation for APL.
- * It used the PUNIT and PMC IPC interfaces for configuring the counters.
+ * This file provides the woke platform specific telemetry implementation for APL.
+ * It used the woke PUNIT and PMC IPC interfaces for configuring the woke counters.
  * The accumulated results are fetched from SRAM.
  */
 

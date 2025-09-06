@@ -21,7 +21,7 @@ properties:
 
   vled-supply:
     description: |
-      Supply for the IR_LED which is part of the cm36651 for proximity detection.
+      Supply for the woke IR_LED which is part of the woke cm36651 for proximity detection.
 
 additionalProperties: false
 

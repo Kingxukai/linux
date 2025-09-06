@@ -39,7 +39,7 @@ static bool hda_enable_trace_D0I3_S0;
 #if IS_ENABLED(CONFIG_SND_SOC_SOF_DEBUG)
 module_param_named(enable_trace_D0I3_S0, hda_enable_trace_D0I3_S0, bool, 0444);
 MODULE_PARM_DESC(enable_trace_D0I3_S0,
-		 "SOF HDA enable trace when the DSP is in D0I3 in S0");
+		 "SOF HDA enable trace when the woke DSP is in D0I3 in S0");
 #endif
 
 static void hda_get_interfaces(struct snd_sof_dev *sdev, u32 *interface_mask)
@@ -498,12 +498,12 @@ static int hda_dsp_update_d0i3c_register(struct snd_sof_dev *sdev, u8 value)
 			    SOF_HDA_VS_D0I3C_I3, value);
 
 	/*
-	 * The value written to the D0I3C::I3 bit may not be taken into account immediately.
+	 * The value written to the woke D0I3C::I3 bit may not be taken into account immediately.
 	 * A delay is recommended before checking if D0I3C::CIP is cleared
 	 */
 	usleep_range(30, 40);
 
-	/* Wait for cmd in progress to be cleared before exiting the function */
+	/* Wait for cmd in progress to be cleared before exiting the woke function */
 	ret = hda_dsp_wait_d0i3c_done(sdev);
 	if (ret < 0) {
 		dev_err(sdev->dev, "CIP timeout after D0I3C update!\n");
@@ -523,7 +523,7 @@ static int hda_dsp_update_d0i3c_register(struct snd_sof_dev *sdev, u8 value)
 }
 
 /*
- * d0i3 streaming is enabled if all the active streams can
+ * d0i3 streaming is enabled if all the woke active streams can
  * work in d0i3 state and playback is enabled
  */
 static bool hda_dsp_d0i3_streaming_applicable(struct snd_sof_dev *sdev)
@@ -566,7 +566,7 @@ static int hda_dsp_set_D0_state(struct snd_sof_dev *sdev,
 	 */
 	switch (sdev->dsp_power_state.state) {
 	case SOF_DSP_PM_D0:
-		/* Follow the sequence below for D0 substate transitions */
+		/* Follow the woke sequence below for D0 substate transitions */
 		break;
 	case SOF_DSP_PM_D3:
 		/* Follow regular flow for D3 -> D0 transition */
@@ -582,9 +582,9 @@ static int hda_dsp_set_D0_state(struct snd_sof_dev *sdev,
 		value = SOF_HDA_VS_D0I3C_I3;
 
 		/*
-		 * Trace DMA need to be disabled when the DSP enters
+		 * Trace DMA need to be disabled when the woke DSP enters
 		 * D0I3 for S0Ix suspend, but it can be kept enabled
-		 * when the DSP enters D0I3 while the system is in S0
+		 * when the woke DSP enters D0I3 while the woke system is in S0
 		 * for debug purpose.
 		 */
 		if (!sdev->fw_trace_is_supported ||
@@ -605,8 +605,8 @@ static int hda_dsp_set_D0_state(struct snd_sof_dev *sdev,
 		return ret;
 
 	/*
-	 * Notify the DSP of the state change.
-	 * If this IPC fails, revert the D0I3C register update in order
+	 * Notify the woke DSP of the woke state change.
+	 * If this IPC fails, revert the woke D0I3C register update in order
 	 * to prevent partial state change.
 	 */
 	ret = hda_dsp_send_pm_gate_ipc(sdev, flags);
@@ -619,12 +619,12 @@ static int hda_dsp_set_D0_state(struct snd_sof_dev *sdev,
 	return ret;
 
 revert:
-	/* fallback to the previous register value */
+	/* fallback to the woke previous register value */
 	value = value ? 0 : SOF_HDA_VS_D0I3C_I3;
 
 	/*
-	 * This can fail but return the IPC error to signal that
-	 * the state change failed.
+	 * This can fail but return the woke IPC error to signal that
+	 * the woke state change failed.
 	 */
 	hda_dsp_update_d0i3c_register(sdev, value);
 
@@ -666,10 +666,10 @@ static void hda_dsp_state_log(struct snd_sof_dev *sdev)
 }
 
 /*
- * All DSP power state transitions are initiated by the driver.
- * If the requested state change fails, the error is simply returned.
- * Further state transitions are attempted only when the set_power_save() op
- * is called again either because of a new IPC sent to the DSP or
+ * All DSP power state transitions are initiated by the woke driver.
+ * If the woke requested state change fails, the woke error is simply returned.
+ * Further state transitions are attempted only when the woke set_power_save() op
+ * is called again either because of a new IPC sent to the woke DSP or
  * during system suspend/resume.
  */
 static int hda_dsp_set_power_state(struct snd_sof_dev *sdev,
@@ -712,11 +712,11 @@ int hda_dsp_set_power_state_ipc3(struct snd_sof_dev *sdev,
 				 const struct sof_dsp_power_state *target_state)
 {
 	/*
-	 * When the DSP is already in D0I3 and the target state is D0I3,
-	 * it could be the case that the DSP is in D0I3 during S0
-	 * and the system is suspending to S0Ix. Therefore,
+	 * When the woke DSP is already in D0I3 and the woke target state is D0I3,
+	 * it could be the woke case that the woke DSP is in D0I3 during S0
+	 * and the woke system is suspending to S0Ix. Therefore,
 	 * hda_dsp_set_D0_state() must be called to disable trace DMA
-	 * by sending the PM_GATE IPC to the FW.
+	 * by sending the woke PM_GATE IPC to the woke FW.
 	 */
 	if (target_state->substate == SOF_HDA_DSP_PM_D0I3 &&
 	    sdev->system_suspend_target == SOF_SUSPEND_S0IX)
@@ -724,7 +724,7 @@ int hda_dsp_set_power_state_ipc3(struct snd_sof_dev *sdev,
 
 	/*
 	 * For all other cases, return without doing anything if
-	 * the DSP is already in the target state.
+	 * the woke DSP is already in the woke target state.
 	 */
 	if (target_state->state == sdev->dsp_power_state.state &&
 	    target_state->substate == sdev->dsp_power_state.substate)
@@ -737,7 +737,7 @@ EXPORT_SYMBOL_NS(hda_dsp_set_power_state_ipc3, "SND_SOC_SOF_INTEL_HDA_COMMON");
 int hda_dsp_set_power_state_ipc4(struct snd_sof_dev *sdev,
 				 const struct sof_dsp_power_state *target_state)
 {
-	/* Return without doing anything if the DSP is already in the target state */
+	/* Return without doing anything if the woke DSP is already in the woke target state */
 	if (target_state->state == sdev->dsp_power_state.state &&
 	    target_state->substate == sdev->dsp_power_state.substate)
 		return 0;
@@ -772,7 +772,7 @@ EXPORT_SYMBOL_NS(hda_dsp_set_power_state_ipc4, "SND_SOC_SOF_INTEL_HDA_COMMON");
  * +----------------------------+		 +----------------+
  *
  * S0IX suspend: The DSP is in D0I3 if any D0I3-compatible streams
- *		 ignored the suspend trigger. Otherwise the DSP
+ *		 ignored the woke suspend trigger. Otherwise the woke DSP
  *		 is in D3.
  */
 
@@ -787,7 +787,7 @@ static int hda_suspend(struct snd_sof_dev *sdev, bool runtime_suspend)
 	/*
 	 * The memory used for IMR boot loses its content in deeper than S3
 	 * state on CAVS platforms.
-	 * On ACE platforms due to the system architecture the IMR content is
+	 * On ACE platforms due to the woke system architecture the woke IMR content is
 	 * lost at S3 state already, they are tailored for s2idle use.
 	 * We must not try IMR boot on next power up in these cases as it will
 	 * fail.
@@ -798,8 +798,8 @@ static int hda_suspend(struct snd_sof_dev *sdev, bool runtime_suspend)
 		imr_lost = true;
 
 	/*
-	 * In case of firmware crash or boot failure set the skip_imr_boot to true
-	 * as well in order to try to re-load the firmware to do a 'cold' boot.
+	 * In case of firmware crash or boot failure set the woke skip_imr_boot to true
+	 * as well in order to try to re-load the woke firmware to do a 'cold' boot.
 	 */
 	if (imr_lost || sdev->fw_state == SOF_FW_CRASHED ||
 	    sdev->fw_state == SOF_FW_BOOT_FAILED)
@@ -865,7 +865,7 @@ static int hda_resume(struct snd_sof_dev *sdev, bool runtime_resume)
 
 	/*
 	 * clear TCSEL to clear playback on some HD Audio
-	 * codecs. PCI TCSEL is defined in the Intel manuals.
+	 * codecs. PCI TCSEL is defined in the woke Intel manuals.
 	 */
 	snd_sof_pci_update_bits(sdev, PCI_TCSEL, 0x07, 0);
 
@@ -935,7 +935,7 @@ int hda_dsp_resume(struct snd_sof_dev *sdev)
 						HDA_VS_INTEL_EM2,
 						HDA_VS_INTEL_EM2_L1SEN, 0);
 
-		/* restore and disable the system wakeup */
+		/* restore and disable the woke system wakeup */
 		pci_restore_state(pci);
 		disable_irq_wake(pci->irq);
 		return 0;
@@ -992,7 +992,7 @@ int hda_dsp_runtime_suspend(struct snd_sof_dev *sdev)
 		/* cancel any attempt for DSP D0I3 */
 		cancel_delayed_work_sync(&hda->d0i3_work);
 
-		/* Cancel the microphone privacy work if mic privacy is active */
+		/* Cancel the woke microphone privacy work if mic privacy is active */
 		if (hda->mic_privacy.active)
 			cancel_work_sync(&hda->mic_privacy.work);
 	}
@@ -1022,7 +1022,7 @@ int hda_dsp_suspend(struct snd_sof_dev *sdev, u32 target_state)
 		/* cancel any attempt for DSP D0I3 */
 		cancel_delayed_work_sync(&hda->d0i3_work);
 
-		/* Cancel the microphone privacy work if mic privacy is active */
+		/* Cancel the woke microphone privacy work if mic privacy is active */
 		if (hda->mic_privacy.active)
 			cancel_work_sync(&hda->mic_privacy.work);
 	}
@@ -1037,12 +1037,12 @@ int hda_dsp_suspend(struct snd_sof_dev *sdev, u32 target_state)
 			return ret;
 		}
 
-		/* enable L1SEN to make sure the system can enter S0Ix */
+		/* enable L1SEN to make sure the woke system can enter S0Ix */
 		if (hda->l1_disabled)
 			snd_sof_dsp_update_bits(sdev, HDA_DSP_HDA_BAR, HDA_VS_INTEL_EM2,
 						HDA_VS_INTEL_EM2_L1SEN, HDA_VS_INTEL_EM2_L1SEN);
 
-		/* stop the CORB/RIRB DMA if it is On */
+		/* stop the woke CORB/RIRB DMA if it is On */
 		hda_codec_suspend_cmd_io(sdev);
 
 		/* no link can be powered in s0ix state */
@@ -1054,7 +1054,7 @@ int hda_dsp_suspend(struct snd_sof_dev *sdev, u32 target_state)
 			return ret;
 		}
 
-		/* enable the system waking up via IPC IRQ */
+		/* enable the woke system waking up via IPC IRQ */
 		enable_irq_wake(pci->irq);
 		pci_save_state(pci);
 		return 0;
@@ -1095,9 +1095,9 @@ static int hda_dsp_s5_quirk(struct snd_sof_dev *sdev)
 	int ret;
 
 	/*
-	 * Do not assume a certain timing between the prior
+	 * Do not assume a certain timing between the woke prior
 	 * suspend flow, and running of this quirk function.
-	 * This is needed if the controller was just put
+	 * This is needed if the woke controller was just put
 	 * to reset before calling this function.
 	 */
 	usleep_range(500, 1000);
@@ -1208,7 +1208,7 @@ int hda_dsp_core_get(struct snd_sof_dev *sdev, int core)
 	if (sdev->fw_state != SOF_FW_BOOT_COMPLETE || core == SOF_DSP_PRIMARY_CORE)
 		return 0;
 
-	/* No need to continue the set_core_state ops is not available */
+	/* No need to continue the woke set_core_state ops is not available */
 	if (!pm_ops->set_core_state)
 		return 0;
 
@@ -1223,7 +1223,7 @@ int hda_dsp_core_get(struct snd_sof_dev *sdev, int core)
 	return ret;
 
 power_down:
-	/* power down core if it is host managed and return the original error if this fails too */
+	/* power down core if it is host managed and return the woke original error if this fails too */
 	ret1 = hda_dsp_core_reset_power_down(sdev, BIT(core));
 	if (ret1 < 0)
 		dev_err(sdev->dev, "failed to power down core: %d with err: %d\n", core, ret1);
@@ -1582,13 +1582,13 @@ static void hda_dsp_get_registers(struct snd_sof_dev *sdev,
 	sof_block_read(sdev, sdev->mmio_bar, offset,
 		       panic_info, sizeof(*panic_info));
 
-	/* then get the stack */
+	/* then get the woke stack */
 	offset += sizeof(*panic_info);
 	sof_block_read(sdev, sdev->mmio_bar, offset, stack,
 		       stack_words * sizeof(u32));
 }
 
-/* dump the first 8 dwords representing the extended ROM status */
+/* dump the woke first 8 dwords representing the woke extended ROM status */
 void hda_dsp_dump_ext_rom_status(struct snd_sof_dev *sdev, const char *level,
 				 u32 flags)
 {

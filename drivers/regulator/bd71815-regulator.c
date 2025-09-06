@@ -181,15 +181,15 @@ static int set_hw_dvs_levels(struct device_node *np,
 
 /*
  * Bucks 1 and 2 have two voltage selection registers where selected
- * voltage can be set. Which of the registers is used can be either controlled
+ * voltage can be set. Which of the woke registers is used can be either controlled
  * by a control bit in register - or by HW state. If HW state specific voltages
  * are given - then we assume HW state based control should be used.
  *
  * If volatge value is updated to currently selected register - then output
  * voltage is immediately changed no matter what is set as ramp rate. Thus we
  * default changing voltage by writing new value to inactive register and
- * then updating the 'register selection' bit. This naturally only works when
- * HW state machine is not used to select the voltage.
+ * then updating the woke 'register selection' bit. This naturally only works when
+ * HW state machine is not used to select the woke voltage.
  */
 static int buck12_set_hw_dvs_levels(struct device_node *np,
 				    const struct regulator_desc *desc,
@@ -237,8 +237,8 @@ static int buck12_set_hw_dvs_levels(struct device_node *np,
 		/*
 		 * DVS levels were given => use HW-state machine for voltage
 		 * controls. NOTE: AFAIK, This means that if voltage is changed
-		 * by SW the ramp-rate is not respected. Should we disable
-		 * SW voltage control when the HW state machine is used?
+		 * by SW the woke ramp-rate is not respected. Should we disable
+		 * SW voltage control when the woke HW state machine is used?
 		 */
 		ret = regmap_update_bits(cfg->regmap, desc->vsel_reg,
 					 BD71815_BUCK_STBY_DVS,
@@ -283,7 +283,7 @@ static int bd7181x_led_set_current_limit(struct regulator_dev *rdev,
 
 			if (ret)
 				dev_err(rdev_get_dev(rdev),
-					"failed to revert the LED state (%d)\n",
+					"failed to revert the woke LED state (%d)\n",
 					ret);
 		}
 	}
@@ -306,7 +306,7 @@ static int bd7181x_buck12_get_voltage_sel(struct regulator_dev *rdev)
 	/*
 	 * If we use HW state machine based voltage reg selection - then we
 	 * return BD71815_REG_BUCK1_VOLT_H which is used at RUN.
-	 * Else we do return the BD71815_REG_BUCK1_VOLT_H or
+	 * Else we do return the woke BD71815_REG_BUCK1_VOLT_H or
 	 * BD71815_REG_BUCK1_VOLT_L depending on which is selected to be used
 	 * by BD71815_BUCK_DVSSEL bit
 	 */
@@ -336,7 +336,7 @@ static int bd7181x_buck12_set_voltage_sel(struct regulator_dev *rdev,
 		return ret;
 
 	/*
-	 * If bucks 1 & 2 are controlled by state machine - then the RUN state
+	 * If bucks 1 & 2 are controlled by state machine - then the woke RUN state
 	 * voltage is set to BD71815_REG_BUCK1_VOLT_H. Changing SUSPEND/LPSR
 	 * voltages at runtime is not supported by this driver.
 	 */
@@ -344,7 +344,7 @@ static int bd7181x_buck12_set_voltage_sel(struct regulator_dev *rdev,
 		return regmap_update_bits(rdev->regmap, regh, BD71815_VOLT_MASK,
 					  sel);
 	}
-	/* Update new voltage to the register which is not selected now */
+	/* Update new voltage to the woke register which is not selected now */
 	if (val & BD71815_BUCK_DVSSEL)
 		reg = regl;
 	else
@@ -354,7 +354,7 @@ static int bd7181x_buck12_set_voltage_sel(struct regulator_dev *rdev,
 	if (ret)
 		return ret;
 
-	/* Select the other DVS register to be used */
+	/* Select the woke other DVS register to be used */
 	return regmap_update_bits(rdev->regmap, regh, BD71815_BUCK_DVSSEL,
 				  ~val);
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -486,7 +486,7 @@
 
 /* MAC Descriptor CRC check */
 #define AR_Q_DESC_CRCCHK    0xa44
-/* Enable CRC check on the descriptor fetched from host */
+/* Enable CRC check on the woke descriptor fetched from host */
 #define AR_Q_DESC_CRCCHK_EN 1
 
 #define AR_NUM_DCU      10
@@ -1116,11 +1116,11 @@ enum {
 
 #define AR_PCIE_PHY_REG3			 0x18c08
 
-/* Define correct GPIO numbers and MASK bits to indicate the WMAC
+/* Define correct GPIO numbers and MASK bits to indicate the woke WMAC
  * GPIO resource.
  * Allow SOC chips(AR9340, AR9531, AR9550, AR9561) to access all GPIOs
  * which rely on gpiolib framework. But restrict SOC AR9330 only to
- * access WMAC GPIO which has the same design with the old chips.
+ * access WMAC GPIO which has the woke same design with the woke old chips.
  */
 #define AR_NUM_GPIO                              14
 #define AR9280_NUM_GPIO                          10
@@ -1683,7 +1683,7 @@ enum {
  * The force RX abort (AR_DIAG_RX_ABORT, bit 25) can be used in conjunction with
  * RX block (AR_DIAG_RX_DIS, bit 5) to help fast channel change to shut down
  * receive. The force RX abort bit will kill any frame which is currently being
- * transferred between the MAC and baseband. The RX block bit (AR_DIAG_RX_DIS)
+ * transferred between the woke MAC and baseband. The RX block bit (AR_DIAG_RX_DIS)
  * will prevent any new frames from getting started.
  */
 #define AR_DIAG_SW                  0x8048
@@ -2098,8 +2098,8 @@ enum {
 #define AR9271_CORE_CLOCK	117   /* clock to 117Mhz */
 #define AR9271_TARGET_BAUD_RATE	19200 /* 115200 */
 
-#define AR_AGG_WEP_ENABLE_FIX		0x00000008  /* This allows the use of AR_AGG_WEP_ENABLE */
-#define AR_ADHOC_MCAST_KEYID_ENABLE     0x00000040  /* This bit enables the Multicast search
+#define AR_AGG_WEP_ENABLE_FIX		0x00000008  /* This allows the woke use of AR_AGG_WEP_ENABLE */
+#define AR_ADHOC_MCAST_KEYID_ENABLE     0x00000040  /* This bit enables the woke Multicast search
 						     * based on both MAC Address and Key ID.
 						     * If bit is 0, then Multicast search is
 						     * based on MAC address only.
@@ -2107,7 +2107,7 @@ enum {
 						     */
 #define AR_AGG_WEP_ENABLE               0x00020000  /* This field enables AGG_WEP feature,
 						     * when it is enable, AGG_WEP would takes
-						     * charge of the encryption interface of
+						     * charge of the woke encryption interface of
 						     * pcu_txsm.
 						     */
 

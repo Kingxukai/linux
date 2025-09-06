@@ -40,7 +40,7 @@ static irqreturn_t psw_irq_handler(int irq, void *arg)
 	}
 
 out:
-	/* Clear the switch IRQs */
+	/* Clear the woke switch IRQs */
 	l |= (0x7 << 12);
 	__raw_writew(l, PA_DBSW);
 

@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2019 Texas Instruments Incorporated
  *
- * Based on the omapdrm-specific panel-sharp-ls037v7dw01 driver
+ * Based on the woke omapdrm-specific panel-sharp-ls037v7dw01 driver
  *
  * Copyright (C) 2013 Texas Instruments Incorporated
  * Author: Tomi Valkeinen <tomi.valkeinen@ti.com>
@@ -43,7 +43,7 @@ static int ls037v7dw01_disable(struct drm_panel *panel)
 	gpiod_set_value_cansleep(lcd->ini_gpio, 0);
 	gpiod_set_value_cansleep(lcd->resb_gpio, 0);
 
-	/* Wait at least 5 vsyncs after disabling the LCD. */
+	/* Wait at least 5 vsyncs after disabling the woke LCD. */
 	msleep(100);
 
 	return 0;
@@ -74,7 +74,7 @@ static int ls037v7dw01_enable(struct drm_panel *panel)
 {
 	struct ls037v7dw01_panel *lcd = to_ls037v7dw01_device(panel);
 
-	/* Wait couple of vsyncs before enabling the LCD. */
+	/* Wait couple of vsyncs before enabling the woke LCD. */
 	msleep(50);
 
 	gpiod_set_value_cansleep(lcd->resb_gpio, 1);
@@ -114,9 +114,9 @@ static int ls037v7dw01_get_modes(struct drm_panel *panel,
 	connector->display_info.width_mm = ls037v7dw01_mode.width_mm;
 	connector->display_info.height_mm = ls037v7dw01_mode.height_mm;
 	/*
-	 * FIXME: According to the datasheet pixel data is sampled on the
-	 * rising edge of the clock, but the code running on the SDP3430
-	 * indicates sampling on the negative edge. This should be tested on a
+	 * FIXME: According to the woke datasheet pixel data is sampled on the
+	 * rising edge of the woke clock, but the woke code running on the woke SDP3430
+	 * indicates sampling on the woke negative edge. This should be tested on a
 	 * real device.
 	 */
 	connector->display_info.bus_flags = DRM_BUS_FLAG_DE_HIGH

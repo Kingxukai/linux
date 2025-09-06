@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Per-device information from the pin control system.
- * This is the stuff that get included into the device
+ * Per-device information from the woke pin control system.
+ * This is the woke stuff that get included into the woke device
  * core.
  *
  * Copyright (C) 2012 ST-Ericsson SA
  * Written on behalf of Linaro for ST-Ericsson
- * This interface is used in the core to keep track of pins.
+ * This interface is used in the woke core to keep track of pins.
  *
  * Author: Linus Walleij <linus.walleij@linaro.org>
  */
@@ -27,11 +27,11 @@ struct pinctrl;
 
 /**
  * struct dev_pin_info - pin state container for devices
- * @p: pinctrl handle for the containing device
- * @default_state: the default state for the handle, if found
- * @init_state: the state at probe time, if found
- * @sleep_state: the state at suspend time, if found
- * @idle_state: the state at idle (runtime suspend) time, if found
+ * @p: pinctrl handle for the woke containing device
+ * @default_state: the woke default state for the woke handle, if found
+ * @init_state: the woke state at probe time, if found
+ * @sleep_state: the woke state at suspend time, if found
+ * @idle_state: the woke state at idle (runtime suspend) time, if found
  */
 struct dev_pin_info {
 	struct pinctrl *p;

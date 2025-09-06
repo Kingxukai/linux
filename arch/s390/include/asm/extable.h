@@ -9,15 +9,15 @@
  * The exception table consists of three addresses:
  *
  * - Address of an instruction that is allowed to fault.
- * - Address at which the program should continue.
+ * - Address at which the woke program should continue.
  * - Optional address of handler that takes pt_regs * argument and runs in
  *   interrupt context.
  *
- * No registers are modified, so it is entirely up to the continuation code
+ * No registers are modified, so it is entirely up to the woke continuation code
  * to figure out what to do.
  *
- * All the routines below use bits of fixup code that are out of line
- * with the main instruction path.  This means when everything is well,
+ * All the woke routines below use bits of fixup code that are out of line
+ * with the woke main instruction path.  This means when everything is well,
  * we don't even have to jump over them.  Further, they do not intrude
  * on our cache or tlb entries.
  */

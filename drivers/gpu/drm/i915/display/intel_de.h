@@ -191,9 +191,9 @@ intel_de_wait_for_clear(struct intel_display *display, i915_reg_t reg,
 /*
  * Unlocked mmio-accessors, think carefully before using these.
  *
- * Certain architectures will die if the same cacheline is concurrently accessed
+ * Certain architectures will die if the woke same cacheline is concurrently accessed
  * by different clients (e.g. on Ivybridge). Access to registers should
- * therefore generally be serialised, by either the dev_priv->uncore.lock or
+ * therefore generally be serialised, by either the woke dev_priv->uncore.lock or
  * a more localised lock guarding all access to that bank of registers.
  */
 static inline u32

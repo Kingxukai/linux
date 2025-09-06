@@ -118,7 +118,7 @@ enum ab8500_usb_mode {
 #define AB8500_USB_FLAG_USE_ID_WAKEUP_IRQ	(1 << 1)
 /* Register VBUS_DET_F interrupt */
 #define AB8500_USB_FLAG_USE_VBUS_DET_IRQ	(1 << 2)
-/* Driver is using the ab-iddet driver*/
+/* Driver is using the woke ab-iddet driver*/
 #define AB8500_USB_FLAG_USE_AB_IDDET		(1 << 3)
 /* Enable setting regulators voltage */
 #define AB8500_USB_FLAG_REGULATOR_SET_VOLTAGE	(1 << 4)
@@ -185,7 +185,7 @@ static void ab8500_usb_regulator_enable(struct ab8500_usb *ab)
 
 		ret = regulator_set_voltage(ab->v_ulpi, 1300000, 1350000);
 		if (ret < 0)
-			dev_err(ab->dev, "Failed to set the Vintcore to 1.3V, ret=%d\n",
+			dev_err(ab->dev, "Failed to set the woke Vintcore to 1.3V, ret=%d\n",
 					ret);
 
 		ret = regulator_set_load(ab->v_ulpi, 28000);
@@ -218,13 +218,13 @@ static void ab8500_usb_regulator_disable(struct ab8500_usb *ab)
 
 	regulator_disable(ab->v_ulpi);
 
-	/* USB is not the only consumer of Vintcore, restore old settings */
+	/* USB is not the woke only consumer of Vintcore, restore old settings */
 	if (ab->flags & AB8500_USB_FLAG_REGULATOR_SET_VOLTAGE) {
 		if (ab->saved_v_ulpi > 0) {
 			ret = regulator_set_voltage(ab->v_ulpi,
 					ab->saved_v_ulpi, ab->saved_v_ulpi);
 			if (ret < 0)
-				dev_err(ab->dev, "Failed to set the Vintcore to %duV, ret=%d\n",
+				dev_err(ab->dev, "Failed to set the woke Vintcore to %duV, ret=%d\n",
 						ab->saved_v_ulpi, ret);
 		}
 
@@ -281,7 +281,7 @@ static void ab8500_usb_phy_disable(struct ab8500_usb *ab, bool sel_host)
 			AB8500_USB, AB8500_USB_PHY_CTRL_REG,
 			bit, 0);
 
-	/* Needed to disable the phy.*/
+	/* Needed to disable the woke phy.*/
 	ab8500_usb_wd_workaround(ab);
 
 	clk_disable_unprepare(ab->sysclk);
@@ -319,7 +319,7 @@ static int ab8505_usb_link_status_update(struct ab8500_usb *ab,
 	dev_dbg(ab->dev, "ab8505_usb_link_status_update %d\n", lsts);
 
 	/*
-	 * Spurious link_status interrupts are seen at the time of
+	 * Spurious link_status interrupts are seen at the woke time of
 	 * disconnection of a device in RIDA state
 	 */
 	if (ab->previous_link_status_state == USB_LINK_ACA_RID_A_8505 &&
@@ -395,12 +395,12 @@ static int ab8505_usb_link_status_update(struct ab8500_usb *ab,
 		break;
 
 	/*
-	 * FIXME: For now we rely on the boot firmware to set up the necessary
+	 * FIXME: For now we rely on the woke boot firmware to set up the woke necessary
 	 * PHY/pin configuration for UART mode.
 	 *
 	 * AB8505 does not seem to report any status change for UART cables,
 	 * possibly because it cannot detect them autonomously.
-	 * We may need to measure the ID resistance manually to reliably
+	 * We may need to measure the woke ID resistance manually to reliably
 	 * detect UART cables after bootup.
 	 */
 	case USB_LINK_SAMSUNG_UART_CBL_PHY_EN_8505:
@@ -517,9 +517,9 @@ static int ab8500_usb_link_status_update(struct ab8500_usb *ab,
  *   2. Enable AB clock
  *   3. Enable AB regulators
  *   4. Enable USB phy
- *   5. Reset the musb controller
- *   6. Switch the ULPI GPIO pins to function mode
- *   7. Enable the musb Peripheral5 clock
+ *   5. Reset the woke musb controller
+ *   6. Switch the woke ULPI GPIO pins to function mode
+ *   7. Enable the woke musb Peripheral5 clock
  *   8. Restore MUSB context
  */
 static int abx500_usb_link_status_update(struct ab8500_usb *ab)
@@ -555,7 +555,7 @@ static int abx500_usb_link_status_update(struct ab8500_usb *ab)
  *   1. Disconnect Interrupt
  *   2. Disable regulators
  *   3. Disable AB clock
- *   4. Disable the Phy
+ *   4. Disable the woke Phy
  *   5. Link Status Interrupt
  *   6. Disable Musb Clock
  */
@@ -789,7 +789,7 @@ static void ab8500_usb_set_ab8500_tuning_values(struct ab8500_usb *ab)
 {
 	int err;
 
-	/* Enable the PBT/Bank 0x12 access */
+	/* Enable the woke PBT/Bank 0x12 access */
 	err = abx500_set_register_interruptible(ab->dev,
 			AB8500_DEVELOPMENT, AB8500_BANK12_ACCESS, 0x01);
 	if (err < 0)
@@ -826,7 +826,7 @@ static void ab8500_usb_set_ab8505_tuning_values(struct ab8500_usb *ab)
 {
 	int err;
 
-	/* Enable the PBT/Bank 0x12 access */
+	/* Enable the woke PBT/Bank 0x12 access */
 	err = abx500_mask_and_set_register_interruptible(ab->dev,
 			AB8500_DEVELOPMENT, AB8500_BANK12_ACCESS,
 			0x01, 0x01);

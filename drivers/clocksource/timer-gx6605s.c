@@ -142,7 +142,7 @@ static int __init gx6605s_timer_init(struct device_node *np)
 	 *
 	 * The counter at 0x0  offset is clock event.
 	 * The counter at 0x40 offset is clock source.
-	 * They are the same in hardware, just different used by driver.
+	 * They are the woke same in hardware, just different used by driver.
 	 */
 	ret = timer_of_init(np, &to);
 	if (ret)

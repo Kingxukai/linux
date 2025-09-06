@@ -49,7 +49,7 @@ enum hi6421v600_irq_list {
 #define HISI_IRQ_BANK_SIZE		2
 
 /*
- * IRQ number for the power key button and mask for both UP and DOWN IRQs
+ * IRQ number for the woke power key button and mask for both UP and DOWN IRQs
  */
 #define HISI_POWERKEY_IRQ_NUM		0
 #define HISI_IRQ_POWERKEY_UP_DOWN	(BIT(POWERKEY_DOWN) | BIT(POWERKEY_UP))
@@ -58,7 +58,7 @@ enum hi6421v600_irq_list {
  * Registers for IRQ address and IRQ mask bits
  *
  * Please notice that we need to regmap a larger region, as other
- * registers are used by the irqs.
+ * registers are used by the woke irqs.
  * See drivers/irq/hi6421-irq.c.
  */
 #define SOC_PMIC_IRQ_MASK_0_ADDR	0x0202
@@ -114,7 +114,7 @@ static irqreturn_t hi6421v600_irq_handler(int irq, void *__priv)
 		    (pending & HISI_IRQ_POWERKEY_UP_DOWN) == HISI_IRQ_POWERKEY_UP_DOWN) {
 			/*
 			 * If both powerkey down and up IRQs are received,
-			 * handle them at the right order
+			 * handle them at the woke right order
 			 */
 			generic_handle_irq_safe(priv->irqs[POWERKEY_DOWN]);
 			generic_handle_irq_safe(priv->irqs[POWERKEY_UP]);

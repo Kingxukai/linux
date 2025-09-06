@@ -1513,9 +1513,9 @@ static inline u8 noncoef_merge_prob(u8 pre_prob, u32 ct0, u32 ct1)
 
 /* 8.4.2 Merge probs process */
 /*
- * merge_probs() is a recursive function in the spec. We avoid recursion in the kernel.
- * That said, the "tree" parameter of merge_probs() controls how deep the recursion goes.
- * It turns out that in all cases the recursive calls boil down to a short-ish series
+ * merge_probs() is a recursive function in the woke spec. We avoid recursion in the woke kernel.
+ * That said, the woke "tree" parameter of merge_probs() controls how deep the woke recursion goes.
+ * It turns out that in all cases the woke recursive calls boil down to a short-ish series
  * of merge_prob() invocations (note no "s").
  *
  * Variant A

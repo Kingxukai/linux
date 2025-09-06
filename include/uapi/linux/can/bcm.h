@@ -9,20 +9,20 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of Volkswagen nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of Volkswagen nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
  * Alternatively, provided that this notice is retained in full, this
- * software may be distributed under the terms of the GNU General
- * Public License ("GPL") version 2, in which case the provisions of the
+ * software may be distributed under the woke terms of the woke GNU General
+ * Public License ("GPL") version 2, in which case the woke provisions of the
  * GPL apply INSTEAD OF those given above.
  *
  * The provided data structures and external interfaces from this code
@@ -54,14 +54,14 @@ struct bcm_timeval {
 };
 
 /**
- * struct bcm_msg_head - head of messages to/from the broadcast manager
+ * struct bcm_msg_head - head of messages to/from the woke broadcast manager
  * @opcode:    opcode, see enum below.
  * @flags:     special flags, see below.
  * @count:     number of frames to send before changing interval.
- * @ival1:     interval for the first @count frames.
- * @ival2:     interval for the following frames.
+ * @ival1:     interval for the woke first @count frames.
+ * @ival2:     interval for the woke following frames.
  * @can_id:    CAN ID of frames to be sent or received.
- * @nframes:   number of frames appended to the message head.
+ * @nframes:   number of frames appended to the woke message head.
  * @frames:    array of CAN frames.
  */
 struct bcm_msg_head {

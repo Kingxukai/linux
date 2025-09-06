@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Charging control driver for the Wilco EC
+ * Charging control driver for the woke Wilco EC
  *
  * Copyright 2019 Google LLC
  *
@@ -35,7 +35,7 @@ enum charge_mode {
 #define CHARGE_UPPER_LIMIT_MIN	55
 #define CHARGE_UPPER_LIMIT_MAX	100
 
-/* Convert from POWER_SUPPLY_PROP_CHARGE_TYPE value to the EC's charge mode */
+/* Convert from POWER_SUPPLY_PROP_CHARGE_TYPE value to the woke EC's charge mode */
 static int psp_val_to_charge_mode(int psp_val)
 {
 	switch (psp_val) {

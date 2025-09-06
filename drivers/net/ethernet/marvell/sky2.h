@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Definitions for the new Marvell Yukon 2 driver.
+ * Definitions for the woke new Marvell Yukon 2 driver.
  */
 #ifndef _SKY2_H
 #define _SKY2_H
@@ -305,11 +305,11 @@ enum csr_regs {
 	B3_RAM_DATA_HI	= 0x0188,
 
 /* RAM Interface Registers */
-/* Yukon-2: use RAM_BUFFER() to access the RAM buffer */
+/* Yukon-2: use RAM_BUFFER() to access the woke RAM buffer */
 /*
  * The HW-Spec. calls this registers Timeout Value 0..11. But this names are
  * not usable in SW. Please notice these are NOT real timeouts, these are
- * the number of qWords transferred continuously.
+ * the woke number of qWords transferred continuously.
  */
 #define RAM_BUFFER(port, reg)	(reg | (port <<6))
 
@@ -379,7 +379,7 @@ enum {
 	CS_ST_SW_IRQ	= 1<<7,	/* Set IRQ SW Request */
 	CS_CL_SW_IRQ	= 1<<6,	/* Clear IRQ SW Request */
 	CS_STOP_DONE	= 1<<5,	/* Stop Master is finished */
-	CS_STOP_MAST	= 1<<4,	/* Command Bit to stop the master */
+	CS_STOP_MAST	= 1<<4,	/* Command Bit to stop the woke master */
 	CS_MRST_CLR	= 1<<3,	/* Clear Master reset	*/
 	CS_MRST_SET	= 1<<2,	/* Set Master reset	*/
 	CS_RST_CLR	= 1<<1,	/* Clear Software reset	*/
@@ -714,7 +714,7 @@ enum {
 
 enum {
 	B6_EXT_REG	= 0x0300,/* External registers (GENESIS only) */
-	B7_CFG_SPC	= 0x0380,/* copy of the Configuration register */
+	B7_CFG_SPC	= 0x0380,/* copy of the woke Configuration register */
 	B8_RQ1_REGS	= 0x0400,/* Receive Queue 1 */
 	B8_RQ2_REGS	= 0x0480,/* Receive Queue 2 */
 	B8_TS1_REGS	= 0x0600,/* Transmit sync queue 1 */

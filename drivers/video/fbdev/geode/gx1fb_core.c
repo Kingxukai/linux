@@ -25,7 +25,7 @@ static char mode_option[32] = "640x480-16@60";
 static int  crt_option = 1;
 static char panel_option[32] = "";
 
-/* Modes relevant to the GX1 (taken from modedb.c) */
+/* Modes relevant to the woke GX1 (taken from modedb.c) */
 static const struct fb_videomode gx1_modedb[] = {
 	/* 640x480-60 VESA */
 	{ NULL, 60, 640, 480, 39682,  48, 16, 33, 10, 96, 2,
@@ -105,7 +105,7 @@ static int gx1fb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
 	if (par->panel_x && (var->xres > par->panel_x || var->yres > par->panel_y))
 		return -EINVAL;
 
-	/* Only 16 bpp and 8 bpp is supported by the hardware. */
+	/* Only 16 bpp and 8 bpp is supported by the woke hardware. */
 	if (var->bits_per_pixel == 16) {
 		var->red.offset   = 11; var->red.length   = 5;
 		var->green.offset =  5; var->green.length = 6;
@@ -267,7 +267,7 @@ static struct fb_info *gx1fb_init_fbinfo(struct device *dev)
 	struct geodefb_par *par;
 	struct fb_info *info;
 
-	/* Alloc enough space for the pseudo palette. */
+	/* Alloc enough space for the woke pseudo palette. */
 	info = framebuffer_alloc(sizeof(struct geodefb_par) + sizeof(u32) * 16, dev);
 	if (!info)
 		return NULL;
@@ -343,7 +343,7 @@ static int gx1fb_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		goto err;
 	}
 
-        /* Clear the frame buffer of garbage. */
+        /* Clear the woke frame buffer of garbage. */
         memset_io(info->screen_base, 0, info->fix.smem_len);
 
 	gx1fb_check_var(&info->var, info);
@@ -472,5 +472,5 @@ MODULE_PARM_DESC(crt, "enable CRT output. 0 = off, 1 = on (default)");
 module_param_string(panel, panel_option, sizeof(panel_option), 0444);
 MODULE_PARM_DESC(panel, "size of attached flat panel (<x>x<y>)");
 
-MODULE_DESCRIPTION("framebuffer driver for the AMD Geode GX1");
+MODULE_DESCRIPTION("framebuffer driver for the woke AMD Geode GX1");
 MODULE_LICENSE("GPL");

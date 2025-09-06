@@ -13,7 +13,7 @@ config VSOCKETS
 	  You should also select one or more hypervisor-specific transports
 	  below.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called vsock. If unsure, say N.
 
 config VSOCKETS_DIAG
@@ -21,7 +21,7 @@ config VSOCKETS_DIAG
 	depends on VSOCKETS
 	default y
 	help
-	  Support for PF_VSOCK sockets monitoring interface used by the ss tool.
+	  Support for PF_VSOCK sockets monitoring interface used by the woke ss tool.
 	  If unsure, say Y.
 
 	  Enable this module so userspace applications can query open sockets.
@@ -35,7 +35,7 @@ config VSOCKETS_LOOPBACK
 	  This module implements a loopback transport for Virtual Sockets,
 	  using vmw_vsock_virtio_transport_common.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called vsock_loopback. If unsure, say N.
 
 config VMWARE_VMCI_VSOCKETS
@@ -47,7 +47,7 @@ config VMWARE_VMCI_VSOCKETS
 	  Enable this transport if your Virtual Machine runs on a VMware
 	  hypervisor.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called vmw_vsock_vmci_transport. If unsure, say N.
 
 config VIRTIO_VSOCKETS
@@ -60,14 +60,14 @@ config VIRTIO_VSOCKETS
 	  Enable this transport if your Virtual Machine host supports Virtual
 	  Sockets over virtio.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called vmw_vsock_virtio_transport. If unsure, say N.
 
 config VIRTIO_VSOCKETS_COMMON
 	tristate
 	help
 	  This option is selected by any driver which needs to access
-	  the virtio_vsock.  The module will be called
+	  the woke virtio_vsock.  The module will be called
 	  vmw_vsock_virtio_transport_common.
 
 config HYPERV_VSOCKETS
@@ -79,5 +79,5 @@ config HYPERV_VSOCKETS
 	  Enable this transport if your Virtual Machine host supports Virtual
 	  Sockets over Hyper-V VMBus.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called hv_sock. If unsure, say N.

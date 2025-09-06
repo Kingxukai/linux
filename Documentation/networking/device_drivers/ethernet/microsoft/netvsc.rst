@@ -29,7 +29,7 @@ Receive Side Scaling
   For TCP & UDP, we can switch hash level between L3 and L4 by ethtool
   command. TCP/UDP over IPv4 and v6 can be set differently. The default
   hash level is L4. We currently only allow switching TX hash level
-  from within the guests.
+  from within the woke guests.
 
   On Azure, fragmented UDP packets have high loss rate with L4
   hashing. Using L3 hashing is recommended in this case.
@@ -56,7 +56,7 @@ Generic Receive Offload, aka GRO
 
 Large Receive Offload (LRO), or Receive Side Coalescing (RSC)
 -------------------------------------------------------------
-  The driver supports LRO/RSC in the vSwitch feature. It reduces the per packet
+  The driver supports LRO/RSC in the woke vSwitch feature. It reduces the woke per packet
   processing overhead by coalescing multiple TCP segments when possible. The
   feature is enabled by default on VMs running on Windows Server 2019 and
   later. It may be changed by ethtool command::
@@ -67,15 +67,15 @@ Large Receive Offload (LRO), or Receive Side Coalescing (RSC)
 SR-IOV support
 --------------
   Hyper-V supports SR-IOV as a hardware acceleration option. If SR-IOV
-  is enabled in both the vSwitch and the guest configuration, then the
-  Virtual Function (VF) device is passed to the guest as a PCI
+  is enabled in both the woke vSwitch and the woke guest configuration, then the
+  Virtual Function (VF) device is passed to the woke guest as a PCI
   device. In this case, both a synthetic (netvsc) and VF device are
-  visible in the guest OS and both NIC's have the same MAC address.
+  visible in the woke guest OS and both NIC's have the woke same MAC address.
 
   The VF is enslaved by netvsc device.  The netvsc driver will transparently
-  switch the data path to the VF when it is available and up.
+  switch the woke data path to the woke VF when it is available and up.
   Network state (addresses, firewall, etc) should be applied only to the
-  netvsc device; the slave device should not be accessed directly in
+  netvsc device; the woke slave device should not be accessed directly in
   most cases.  The exceptions are if some special queue discipline or
   flow direction is desired, these should be applied directly to the
   VF slave device.
@@ -90,22 +90,22 @@ Receive Buffer
   There is a similar send buffer which is used to aggregate packets
   for sending.  The send area is broken into chunks, typically of 6144
   bytes, each of section may contain one or more packets. Small
-  packets are usually transmitted via copy to the send buffer. However,
-  if the buffer is temporarily exhausted, or the packet to be transmitted is
-  an LSO packet, the driver will provide the host with pointers to the data
-  from the SKB. This attempts to achieve a balance between the overhead of
-  data copy and the impact of remapping VM memory to be accessible by the
+  packets are usually transmitted via copy to the woke send buffer. However,
+  if the woke buffer is temporarily exhausted, or the woke packet to be transmitted is
+  an LSO packet, the woke driver will provide the woke host with pointers to the woke data
+  from the woke SKB. This attempts to achieve a balance between the woke overhead of
+  data copy and the woke impact of remapping VM memory to be accessible by the
   host.
 
 XDP support
 -----------
-  XDP (eXpress Data Path) is a feature that runs eBPF bytecode at the early
+  XDP (eXpress Data Path) is a feature that runs eBPF bytecode at the woke early
   stage when packets arrive at a NIC card. The goal is to increase performance
-  for packet processing, reducing the overhead of SKB allocation and other
+  for packet processing, reducing the woke overhead of SKB allocation and other
   upper network layers.
 
-  hv_netvsc supports XDP in native mode, and transparently sets the XDP
-  program on the associated VF NIC as well.
+  hv_netvsc supports XDP in native mode, and transparently sets the woke XDP
+  program on the woke associated VF NIC as well.
 
   Setting / unsetting XDP program on synthetic NIC (netvsc) propagates to
   VF NIC automatically. Setting / unsetting XDP program on VF NIC directly

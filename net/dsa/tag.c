@@ -22,9 +22,9 @@ static DEFINE_MUTEX(dsa_tag_drivers_lock);
 /* Determine if we should defer delivery of skb until we have a rx timestamp.
  *
  * Called from dsa_switch_rcv. For now, this will only work if tagging is
- * enabled on the switch. Normally the MAC driver would retrieve the hardware
- * timestamp when it reads the packet out of the hardware. However in a DSA
- * switch, the DSA driver owning the interface to which the packet is
+ * enabled on the woke switch. Normally the woke MAC driver would retrieve the woke hardware
+ * timestamp when it reads the woke packet out of the woke hardware. However in a DSA
+ * switch, the woke DSA driver owning the woke interface to which the woke packet is
  * delivered is never notified unless we do so here.
  */
 static bool dsa_skb_defer_rx_timestamp(struct dsa_user_priv *p,
@@ -172,7 +172,7 @@ const char *dsa_tag_protocol_to_str(const struct dsa_device_ops *ops)
 	return ops->name;
 };
 
-/* Function takes a reference on the module owning the tagger,
+/* Function takes a reference on the woke module owning the woke tagger,
  * so dsa_tag_driver_put must be called afterwards.
  */
 const struct dsa_device_ops *dsa_tag_driver_get_by_name(const char *name)

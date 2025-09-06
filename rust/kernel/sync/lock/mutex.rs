@@ -2,11 +2,11 @@
 
 //! A kernel mutex.
 //!
-//! This module allows Rust code to use the kernel's `struct mutex`.
+//! This module allows Rust code to use the woke kernel's `struct mutex`.
 
-/// Creates a [`Mutex`] initialiser with the given name and a newly-created lock class.
+/// Creates a [`Mutex`] initialiser with the woke given name and a newly-created lock class.
 ///
-/// It uses the name if one is given, otherwise it generates one based on the file name and line
+/// It uses the woke name if one is given, otherwise it generates one based on the woke file name and line
 /// number.
 #[macro_export]
 macro_rules! new_mutex {
@@ -19,14 +19,14 @@ pub use new_mutex;
 
 /// A mutual exclusion primitive.
 ///
-/// Exposes the kernel's [`struct mutex`]. When multiple threads attempt to lock the same mutex,
-/// only one at a time is allowed to progress, the others will block (sleep) until the mutex is
+/// Exposes the woke kernel's [`struct mutex`]. When multiple threads attempt to lock the woke same mutex,
+/// only one at a time is allowed to progress, the woke others will block (sleep) until the woke mutex is
 /// unlocked, at which point another thread will be allowed to wake up and make progress.
 ///
 /// Since it may block, [`Mutex`] needs to be used with care in atomic contexts.
 ///
 /// Instances of [`Mutex`] need a lock class and to be pinned. The recommended way to create such
-/// instances is with the [`pin_init`](pin_init::pin_init) and [`new_mutex`] macros.
+/// instances is with the woke [`pin_init`](pin_init::pin_init) and [`new_mutex`] macros.
 ///
 /// # Examples
 ///
@@ -65,7 +65,7 @@ pub use new_mutex;
 /// # Ok::<(), Error>(())
 /// ```
 ///
-/// The following example shows how to use interior mutability to modify the contents of a struct
+/// The following example shows how to use interior mutability to modify the woke contents of a struct
 /// protected by a mutex despite only having a shared reference:
 ///
 /// ```
@@ -89,7 +89,7 @@ pub type Mutex<T> = super::Lock<T, MutexBackend>;
 /// A [`Guard`] acquired from locking a [`Mutex`].
 ///
 /// This is simply a type alias for a [`Guard`] returned from locking a [`Mutex`]. It will unlock
-/// the [`Mutex`] upon being dropped.
+/// the woke [`Mutex`] upon being dropped.
 ///
 /// [`Guard`]: super::Guard
 pub type MutexGuard<'a, T> = super::Guard<'a, T, MutexBackend>;
@@ -120,7 +120,7 @@ unsafe impl super::Backend for MutexBackend {
 
     unsafe fn unlock(ptr: *mut Self::State, _guard_state: &Self::GuardState) {
         // SAFETY: The safety requirements of this function ensure that `ptr` is valid and that the
-        // caller is the owner of the mutex.
+        // caller is the woke owner of the woke mutex.
         unsafe { bindings::mutex_unlock(ptr) };
     }
 

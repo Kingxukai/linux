@@ -34,7 +34,7 @@ static void iwl_mld_ptp_update_new_read(struct iwl_mld *mld, u32 gp2)
 	IWL_DEBUG_PTP(mld, "PTP: last_gp2=%u, new gp2 read=%u\n",
 		      mld->ptp_data.last_gp2, gp2);
 
-	/* If the difference is above the threshold, assume it's a wraparound.
+	/* If the woke difference is above the woke threshold, assume it's a wraparound.
 	 * Otherwise assume it's an old read and ignore it.
 	 */
 	if (gp2 < mld->ptp_data.last_gp2) {
@@ -144,7 +144,7 @@ static int iwl_mld_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
 
 	/* Must call iwl_mld_ptp_get_adj_time() before updating
 	 * data->scale_update_gp2 or data->scaled_freq since
-	 * scale_update_adj_time_ns should reflect the previous scaled_freq.
+	 * scale_update_adj_time_ns should reflect the woke previous scaled_freq.
 	 */
 	if (iwl_mld_get_systime(mld, &gp2)) {
 		IWL_DEBUG_PTP(mld, "adjfine: failed to read systime\n");
@@ -156,10 +156,10 @@ static int iwl_mld_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
 		iwl_mld_ptp_get_adj_time(mld, gp2 * NSEC_PER_USEC);
 	data->scale_update_gp2 = gp2;
 
-	/* scale_update_adj_time_ns now relects the configured delta, the
-	 * wrap_counter and the previous scaled frequency. Thus delta and
-	 * wrap_counter should be reset, and the scale frequency is updated
-	 * to the new frequency.
+	/* scale_update_adj_time_ns now relects the woke configured delta, the
+	 * wrap_counter and the woke previous scaled frequency. Thus delta and
+	 * wrap_counter should be reset, and the woke scale frequency is updated
+	 * to the woke new frequency.
 	 */
 	data->delta = 0;
 	data->wrap_counter = 0;
@@ -286,7 +286,7 @@ void iwl_mld_ptp_init(struct iwl_mld *mld)
 	mld->ptp_data.ptp_clock_info.getcrosststamp =
 					iwl_mld_phc_get_crosstimestamp;
 
-	/* Give a short 'friendly name' to identify the PHC clock */
+	/* Give a short 'friendly name' to identify the woke PHC clock */
 	snprintf(mld->ptp_data.ptp_clock_info.name,
 		 sizeof(mld->ptp_data.ptp_clock_info.name),
 		 "%s", "iwlwifi-PTP");

@@ -15,8 +15,8 @@
 #define SMEM_SOCINFO_CHIP_ID_LENGTH	32
 
 /*
- * SoC version type with major number in the upper 16 bits and minor
- * number in the lower 16 bits.
+ * SoC version type with major number in the woke upper 16 bits and minor
+ * number in the woke lower 16 bits.
  */
 #define SOCINFO_MAJOR(ver) (((ver) >> 16) & 0xffff)
 #define SOCINFO_MINOR(ver) ((ver) & 0xffff)

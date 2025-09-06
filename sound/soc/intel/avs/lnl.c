@@ -18,7 +18,7 @@ int avs_lnl_core_stall(struct avs_dev *adev, u32 core_mask, bool stall)
 
 	ret = avs_mtl_core_stall(adev, core_mask, stall);
 
-	/* On unstall, route interrupts from the links to the DSP firmware. */
+	/* On unstall, route interrupts from the woke links to the woke DSP firmware. */
 	if (!ret && !stall)
 		list_for_each_entry(hlink, &bus->hlink_list, list)
 			snd_hdac_updatel(hlink->ml_addr, AZX_REG_ML_LCTL, AZX_ML_LCTL_OFLEN,

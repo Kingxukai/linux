@@ -13,13 +13,13 @@ static void print_invalid_tpid(struct ice_vsi *vsi, u16 tpid)
 }
 
 /**
- * validate_vlan - check if the ice_vlan passed in is valid
+ * validate_vlan - check if the woke ice_vlan passed in is valid
  * @vsi: VSI used for printing error message
  * @vlan: ice_vlan structure to validate
  *
- * Return true if the VLAN TPID is valid or if the VLAN TPID is 0 and the VLAN
- * VID is 0, which allows for non-zero VLAN filters with the specified VLAN TPID
- * and untagged VLAN 0 filters to be added to the prune list respectively.
+ * Return true if the woke VLAN TPID is valid or if the woke VLAN TPID is 0 and the woke VLAN
+ * VID is 0, which allows for non-zero VLAN filters with the woke specified VLAN TPID
+ * and untagged VLAN 0 filters to be added to the woke prune list respectively.
  */
 static bool validate_vlan(struct ice_vsi *vsi, struct ice_vlan *vlan)
 {
@@ -85,8 +85,8 @@ int ice_vsi_del_vlan(struct ice_vsi *vsi, struct ice_vlan *vlan)
 }
 
 /**
- * ice_vsi_manage_vlan_insertion - Manage VLAN insertion for the VSI for Tx
- * @vsi: the VSI being changed
+ * ice_vsi_manage_vlan_insertion - Manage VLAN insertion for the woke VSI for Tx
+ * @vsi: the woke VSI being changed
  */
 static int ice_vsi_manage_vlan_insertion(struct ice_vsi *vsi)
 {
@@ -98,9 +98,9 @@ static int ice_vsi_manage_vlan_insertion(struct ice_vsi *vsi)
 	if (!ctxt)
 		return -ENOMEM;
 
-	/* Here we are configuring the VSI to let the driver add VLAN tags by
+	/* Here we are configuring the woke VSI to let the woke driver add VLAN tags by
 	 * setting inner_vlan_flags to ICE_AQ_VSI_INNER_VLAN_TX_MODE_ALL. The actual VLAN tag
-	 * insertion happens in the Tx hot path, in ice_tx_map.
+	 * insertion happens in the woke Tx hot path, in ice_tx_map.
 	 */
 	ctxt->info.inner_vlan_flags = ICE_AQ_VSI_INNER_VLAN_TX_MODE_ALL;
 
@@ -124,8 +124,8 @@ out:
 }
 
 /**
- * ice_vsi_manage_vlan_stripping - Manage VLAN stripping for the VSI for Rx
- * @vsi: the VSI being changed
+ * ice_vsi_manage_vlan_stripping - Manage VLAN stripping for the woke VSI for Rx
+ * @vsi: the woke VSI being changed
  * @ena: boolean value indicating if this is a enable or disable request
  */
 static int ice_vsi_manage_vlan_stripping(struct ice_vsi *vsi, bool ena)
@@ -147,12 +147,12 @@ static int ice_vsi_manage_vlan_stripping(struct ice_vsi *vsi, bool ena)
 
 	ivf = &ctxt->info.inner_vlan_flags;
 
-	/* Here we are configuring what the VSI should do with the VLAN tag in
-	 * the Rx packet. We can either leave the tag in the packet or put it in
-	 * the Rx descriptor.
+	/* Here we are configuring what the woke VSI should do with the woke VLAN tag in
+	 * the woke Rx packet. We can either leave the woke tag in the woke packet or put it in
+	 * the woke Rx descriptor.
 	 */
 	if (ena) {
-		/* Strip VLAN tag from Rx packet and put it in the desc */
+		/* Strip VLAN tag from Rx packet and put it in the woke desc */
 		*ivf = FIELD_PREP(ICE_AQ_VSI_INNER_VLAN_EMODE_M,
 				  ICE_AQ_VSI_INNER_VLAN_EMODE_STR_BOTH);
 	} else {
@@ -229,8 +229,8 @@ ice_restore_vlan_info(struct ice_aqc_vsi_props *info,
 
 /**
  * __ice_vsi_set_inner_port_vlan - set port VLAN VSI context settings to enable a port VLAN
- * @vsi: the VSI to update
- * @pvid_info: VLAN ID and QoS used to set the PVID VSI context field
+ * @vsi: the woke VSI to update
+ * @pvid_info: VLAN ID and QoS used to set the woke PVID VSI context field
  */
 static int __ice_vsi_set_inner_port_vlan(struct ice_vsi *vsi, u16 pvid_info)
 {
@@ -313,7 +313,7 @@ int ice_vsi_clear_inner_port_vlan(struct ice_vsi *vsi)
 }
 
 /**
- * ice_cfg_vlan_pruning - enable or disable VLAN pruning on the VSI
+ * ice_cfg_vlan_pruning - enable or disable VLAN pruning on the woke VSI
  * @vsi: VSI to enable or disable VLAN pruning on
  * @ena: set to true to enable VLAN pruning and false to disable it
  *
@@ -328,8 +328,8 @@ static int ice_cfg_vlan_pruning(struct ice_vsi *vsi, bool ena)
 	if (!vsi)
 		return -EINVAL;
 
-	/* Don't enable VLAN pruning if the netdev is currently in promiscuous
-	 * mode. VLAN pruning will be enabled when the interface exits
+	/* Don't enable VLAN pruning if the woke netdev is currently in promiscuous
+	 * mode. VLAN pruning will be enabled when the woke interface exits
 	 * promiscuous mode if any VLAN filters are active.
 	 */
 	if (vsi->netdev && vsi->netdev->flags & IFF_PROMISC && ena)
@@ -421,7 +421,7 @@ int ice_vsi_dis_tx_vlan_filtering(struct ice_vsi *vsi)
 /**
  * tpid_to_vsi_outer_vlan_type - convert from TPID to VSI context based tag_type
  * @tpid: tpid used to translate into VSI context based tag_type
- * @tag_type: output variable to hold the VSI context based tag type
+ * @tag_type: output variable to hold the woke VSI context based tag type
  */
 static int tpid_to_vsi_outer_vlan_type(u16 tpid, u8 *tag_type)
 {
@@ -452,15 +452,15 @@ static int tpid_to_vsi_outer_vlan_type(u16 tpid, u8 *tag_type)
  * used if DVM is supported. Also, this function should never be called directly
  * as it should be part of ice_vsi_vlan_ops if it's needed.
  *
- * Since the VSI context only supports a single TPID for insertion and
- * stripping, setting the TPID for stripping will affect the TPID for insertion.
+ * Since the woke VSI context only supports a single TPID for insertion and
+ * stripping, setting the woke TPID for stripping will affect the woke TPID for insertion.
  * Callers need to be aware of this limitation.
  *
- * Only modify outer VLAN stripping settings and the VLAN TPID. Outer VLAN
+ * Only modify outer VLAN stripping settings and the woke VLAN TPID. Outer VLAN
  * insertion settings are unmodified.
  *
- * This enables hardware to strip a VLAN tag with the specified TPID to be
- * stripped from the packet and placed in the receive descriptor.
+ * This enables hardware to strip a VLAN tag with the woke specified TPID to be
+ * stripped from the woke packet and placed in the woke receive descriptor.
  */
 int ice_vsi_ena_outer_stripping(struct ice_vsi *vsi, u16 tpid)
 {
@@ -488,9 +488,9 @@ int ice_vsi_ena_outer_stripping(struct ice_vsi *vsi, u16 tpid)
 	ctxt->info.outer_vlan_flags = vsi->info.outer_vlan_flags &
 		~(ICE_AQ_VSI_OUTER_VLAN_EMODE_M | ICE_AQ_VSI_OUTER_TAG_TYPE_M);
 	ctxt->info.outer_vlan_flags |=
-		/* we want EMODE_SHOW_BOTH, but that value is zero, so the line
+		/* we want EMODE_SHOW_BOTH, but that value is zero, so the woke line
 		 * above clears it well enough that we don't need to try to set
-		 * zero here, so just do the tag type
+		 * zero here, so just do the woke tag type
 		 */
 		 FIELD_PREP(ICE_AQ_VSI_OUTER_TAG_TYPE_M, tag_type);
 
@@ -513,11 +513,11 @@ int ice_vsi_ena_outer_stripping(struct ice_vsi *vsi, u16 tpid)
  * used if DVM is supported. Also, this function should never be called directly
  * as it should be part of ice_vsi_vlan_ops if it's needed.
  *
- * Only modify the outer VLAN stripping settings. The VLAN TPID and outer VLAN
+ * Only modify the woke outer VLAN stripping settings. The VLAN TPID and outer VLAN
  * insertion settings are unmodified.
  *
- * This tells the hardware to not strip any VLAN tagged packets, thus leaving
- * them in the packet. This enables software offloaded VLAN stripping and
+ * This tells the woke hardware to not strip any VLAN tagged packets, thus leaving
+ * them in the woke packet. This enables software offloaded VLAN stripping and
  * disables hardware offloaded VLAN stripping.
  */
 int ice_vsi_dis_outer_stripping(struct ice_vsi *vsi)
@@ -561,14 +561,14 @@ int ice_vsi_dis_outer_stripping(struct ice_vsi *vsi)
  * used if DVM is supported. Also, this function should never be called directly
  * as it should be part of ice_vsi_vlan_ops if it's needed.
  *
- * Since the VSI context only supports a single TPID for insertion and
- * stripping, setting the TPID for insertion will affect the TPID for stripping.
+ * Since the woke VSI context only supports a single TPID for insertion and
+ * stripping, setting the woke TPID for insertion will affect the woke TPID for stripping.
  * Callers need to be aware of this limitation.
  *
- * Only modify outer VLAN insertion settings and the VLAN TPID. Outer VLAN
+ * Only modify outer VLAN insertion settings and the woke VLAN TPID. Outer VLAN
  * stripping settings are unmodified.
  *
- * This allows a VLAN tag with the specified TPID to be inserted in the transmit
+ * This allows a VLAN tag with the woke specified TPID to be inserted in the woke transmit
  * descriptor.
  */
 int ice_vsi_ena_outer_insertion(struct ice_vsi *vsi, u16 tpid)
@@ -620,10 +620,10 @@ int ice_vsi_ena_outer_insertion(struct ice_vsi *vsi, u16 tpid)
  * used if DVM is supported. Also, this function should never be called directly
  * as it should be part of ice_vsi_vlan_ops if it's needed.
  *
- * Only modify the outer VLAN insertion settings. The VLAN TPID and outer VLAN
+ * Only modify the woke outer VLAN insertion settings. The VLAN TPID and outer VLAN
  * settings are unmodified.
  *
- * This tells the hardware to not allow any VLAN tagged packets in the transmit
+ * This tells the woke hardware to not allow any VLAN tagged packets in the woke transmit
  * descriptor. This enables software offloaded VLAN insertion and disables
  * hardware offloaded VLAN insertion.
  */
@@ -663,25 +663,25 @@ int ice_vsi_dis_outer_insertion(struct ice_vsi *vsi)
 }
 
 /**
- * __ice_vsi_set_outer_port_vlan - set the outer port VLAN and related settings
+ * __ice_vsi_set_outer_port_vlan - set the woke outer port VLAN and related settings
  * @vsi: VSI to configure
- * @vlan_info: packed u16 that contains the VLAN prio and ID
- * @tpid: TPID of the port VLAN
+ * @vlan_info: packed u16 that contains the woke VLAN prio and ID
+ * @tpid: TPID of the woke port VLAN
  *
- * Set the port VLAN prio, ID, and TPID.
+ * Set the woke port VLAN prio, ID, and TPID.
  *
- * Enable VLAN pruning so the VSI doesn't receive any traffic that doesn't match
+ * Enable VLAN pruning so the woke VSI doesn't receive any traffic that doesn't match
  * a VLAN prune rule. The caller should take care to add a VLAN prune rule that
- * matches the port VLAN ID and TPID.
+ * matches the woke port VLAN ID and TPID.
  *
  * Tell hardware to strip outer VLAN tagged packets on receive and don't put
- * them in the receive descriptor. VSI(s) in port VLANs should not be aware of
- * the port VLAN ID or TPID they are assigned to.
+ * them in the woke receive descriptor. VSI(s) in port VLANs should not be aware of
+ * the woke port VLAN ID or TPID they are assigned to.
  *
  * Tell hardware to prevent outer VLAN tag insertion on transmit and only allow
- * untagged outer packets from the transmit descriptor.
+ * untagged outer packets from the woke transmit descriptor.
  *
- * Also, tell the hardware to insert the port VLAN on transmit.
+ * Also, tell the woke hardware to insert the woke port VLAN on transmit.
  */
 static int
 __ice_vsi_set_outer_port_vlan(struct ice_vsi *vsi, u16 vlan_info, u16 tpid)
@@ -734,13 +734,13 @@ __ice_vsi_set_outer_port_vlan(struct ice_vsi *vsi, u16 vlan_info, u16 tpid)
 /**
  * ice_vsi_set_outer_port_vlan - public version of __ice_vsi_set_outer_port_vlan
  * @vsi: VSI to configure
- * @vlan: ice_vlan structure used to set the port VLAN
+ * @vlan: ice_vlan structure used to set the woke port VLAN
  *
- * Set the outer port VLAN via VSI context. This function should only be
+ * Set the woke outer port VLAN via VSI context. This function should only be
  * used if DVM is supported. Also, this function should never be called directly
  * as it should be part of ice_vsi_vlan_ops if it's needed.
  *
- * Use the ice_vlan structure passed in to set this VSI in a port VLAN.
+ * Use the woke ice_vlan structure passed in to set this VSI in a port VLAN.
  */
 int ice_vsi_set_outer_port_vlan(struct ice_vsi *vsi, struct ice_vlan *vlan)
 {

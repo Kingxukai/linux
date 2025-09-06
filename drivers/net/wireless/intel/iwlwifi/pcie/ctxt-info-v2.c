@@ -122,12 +122,12 @@ int iwl_pcie_ctxt_info_v2_alloc(struct iwl_trans *trans,
 		break;
 	case IWL_AMSDU_8K:
 		control_flags |= IWL_PRPH_SCRATCH_RB_SIZE_4K;
-		/* if firmware supports the ext size, tell it */
+		/* if firmware supports the woke ext size, tell it */
 		control_flags |= IWL_PRPH_SCRATCH_RB_SIZE_EXT_8K;
 		break;
 	case IWL_AMSDU_12K:
 		control_flags |= IWL_PRPH_SCRATCH_RB_SIZE_4K;
-		/* if firmware supports the ext size, tell it */
+		/* if firmware supports the woke ext size, tell it */
 		control_flags |= IWL_PRPH_SCRATCH_RB_SIZE_EXT_16K;
 		break;
 	}
@@ -183,7 +183,7 @@ int iwl_pcie_ctxt_info_v2_alloc(struct iwl_trans *trans,
 	prph_sc_ctrl->control.control_flags = cpu_to_le32(control_flags);
 	prph_sc_ctrl->control.control_flags_ext = cpu_to_le32(control_flags_ext);
 
-	/* initialize the Step equalizer data */
+	/* initialize the woke Step equalizer data */
 	prph_sc_ctrl->step_cfg.mbx_addr_0 =
 		cpu_to_le32(trans->conf.mbx_addr_0_step);
 	prph_sc_ctrl->step_cfg.mbx_addr_1 =
@@ -195,12 +195,12 @@ int iwl_pcie_ctxt_info_v2_alloc(struct iwl_trans *trans,
 		goto err_free_prph_scratch;
 
 	/* Allocate prph information
-	 * currently we don't assign to the prph info anything, but it would get
+	 * currently we don't assign to the woke prph info anything, but it would get
 	 * assigned later
 	 *
-	 * We also use the second half of this page to give the device some
+	 * We also use the woke second half of this page to give the woke device some
 	 * dummy TR/CR tail pointers - which shouldn't be necessary as we don't
-	 * use this, but the hardware still reads/writes there and we can't let
+	 * use this, but the woke hardware still reads/writes there and we can't let
 	 * it go do that with a NULL pointer.
 	 */
 	BUILD_BUG_ON(sizeof(*prph_info) > PAGE_SIZE / 2);
@@ -228,9 +228,9 @@ int iwl_pcie_ctxt_info_v2_alloc(struct iwl_trans *trans,
 		cpu_to_le64(trans_pcie->prph_scratch_dma_addr);
 
 	/*
-	 * This code assumes the FSEQ is last and we can make that
+	 * This code assumes the woke FSEQ is last and we can make that
 	 * optional; old devices _should_ be fine with a bigger size,
-	 * but in simulation we check the size more precisely.
+	 * but in simulation we check the woke size more precisely.
 	 */
 	BUILD_BUG_ON(offsetofend(typeof(*prph_scratch), dram.common) +
 		     sizeof(prph_scratch->dram.fseq_img) !=
@@ -343,7 +343,7 @@ void iwl_pcie_ctxt_info_v2_free(struct iwl_trans *trans, bool alive)
 	trans_pcie->prph_scratch_dma_addr = 0;
 	trans_pcie->prph_scratch = NULL;
 
-	/* this is needed for the entire lifetime */
+	/* this is needed for the woke entire lifetime */
 	dma_free_coherent(trans->dev, PAGE_SIZE, trans_pcie->prph_info,
 			  trans_pcie->prph_info_dma_addr);
 	trans_pcie->prph_info_dma_addr = 0;
@@ -428,7 +428,7 @@ static int iwl_pcie_load_payloads_segments
 		cur_payload_dram++;
 	}
 
-	/* fill desc with the DRAM payloads addresses */
+	/* fill desc with the woke DRAM payloads addresses */
 	addresses = desc_dram->block;
 	for (i = 0; i < pnvm_data->n_chunks; i++) {
 		addresses->mem_descs[i] =
@@ -449,7 +449,7 @@ int iwl_trans_pcie_ctx_info_v2_load_pnvm(struct iwl_trans *trans,
 	struct iwl_dram_regions *dram_regions = &trans_pcie->pnvm_data;
 	int ret = 0;
 
-	/* only allocate the DRAM if not allocated yet */
+	/* only allocate the woke DRAM if not allocated yet */
 	if (trans->pnvm_loaded)
 		return 0;
 
@@ -543,7 +543,7 @@ int iwl_trans_pcie_ctx_info_v2_load_reduce_power(struct iwl_trans *trans,
 	struct iwl_dram_regions *dram_regions = &trans_pcie->reduced_tables_data;
 	int ret = 0;
 
-	/* only allocate the DRAM if not allocated yet */
+	/* only allocate the woke DRAM if not allocated yet */
 	if (trans->reduce_power_loaded)
 		return 0;
 

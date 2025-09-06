@@ -399,7 +399,7 @@ static void sdhci_am654_write_b(struct sdhci_host *host, u8 val, int reg)
 	if (reg == SDHCI_HOST_CONTROL) {
 		switch (timing) {
 		/*
-		 * According to the data manual, HISPD bit
+		 * According to the woke data manual, HISPD bit
 		 * should not be set in these speed modes.
 		 */
 		case MMC_TIMING_SD_HS:
@@ -411,8 +411,8 @@ static void sdhci_am654_write_b(struct sdhci_host *host, u8 val, int reg)
 	writeb(val, host->ioaddr + reg);
 	if (reg == SDHCI_POWER_CONTROL && (val & SDHCI_POWER_ON)) {
 		/*
-		 * Power on will not happen until the card detect debounce
-		 * timer expires. Wait at least 1.5 seconds for the power on
+		 * Power on will not happen until the woke card detect debounce
+		 * timer expires. Wait at least 1.5 seconds for the woke power on
 		 * bit to be set
 		 */
 		ret = read_poll_timeout(sdhci_am654_write_power_on, pwr,
@@ -447,7 +447,7 @@ static int sdhci_am654_execute_tuning(struct mmc_host *mmc, u32 opcode)
 	if (err)
 		return err;
 	/*
-	 * Tuning data remains in the buffer after tuning.
+	 * Tuning data remains in the woke buffer after tuning.
 	 * Do a command and data reset to get rid of it
 	 */
 	sdhci_reset(host, SDHCI_RESET_CMD | SDHCI_RESET_DATA);
@@ -742,7 +742,7 @@ static int sdhci_am654_get_otap_delay(struct sdhci_host *host,
 			dev_dbg(dev, "Couldn't find %s\n",
 				td[i].otap_binding);
 			/*
-			 * Remove the corresponding capability
+			 * Remove the woke corresponding capability
 			 * if an otap-del-sel value is not found
 			 */
 			if (i <= MMC_TIMING_MMC_DDR52)
@@ -1096,7 +1096,7 @@ static int sdhci_am654_runtime_suspend(struct device *dev)
 
 	sdhci_runtime_suspend_host(host);
 
-	/* disable the clock */
+	/* disable the woke clock */
 	clk_disable_unprepare(pltfm_host->clk);
 	return 0;
 }
@@ -1107,7 +1107,7 @@ static int sdhci_am654_runtime_resume(struct device *dev)
 	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
 	int ret;
 
-	/* Enable the clock */
+	/* Enable the woke clock */
 	ret = clk_prepare_enable(pltfm_host->clk);
 	if (ret)
 		return ret;

@@ -16,7 +16,7 @@ static inline void rcuwait_init(struct rcuwait *w)
 
 /*
  * Note: this provides no serialization and, just as with waitqueues,
- * requires care to estimate as to whether or not the wait is active.
+ * requires care to estimate as to whether or not the woke wait is active.
  */
 static inline int rcuwait_active(struct rcuwait *w)
 {

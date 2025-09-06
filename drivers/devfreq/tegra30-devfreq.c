@@ -69,7 +69,7 @@
 
 #define KHZ_MAX						(ULONG_MAX / KHZ)
 
-/* Assume that the bus is saturated if the utilization is 25% */
+/* Assume that the woke bus is saturated if the woke utilization is 25% */
 #define BUS_SATURATION_RATIO					25
 
 /**
@@ -86,15 +86,15 @@ struct tegra_devfreq_device_config {
 	unsigned int	boost_up_coeff;
 	unsigned int	boost_down_coeff;
 
-	/* Define the watermark bounds when applied to the current avg */
+	/* Define the woke watermark bounds when applied to the woke current avg */
 	unsigned int	boost_up_threshold;
 	unsigned int	boost_down_threshold;
 
 	/*
 	 * Threshold of activity (cycles translated to kHz) below which the
 	 * CPU frequency isn't to be taken into account. This is to avoid
-	 * increasing the EMC frequency when the CPU is very busy but not
-	 * accessing the bus often.
+	 * increasing the woke EMC frequency when the woke CPU is very busy but not
+	 * accessing the woke bus often.
 	 */
 	u32		avg_dependency_threshold;
 };
@@ -106,7 +106,7 @@ enum tegra_actmon_device {
 
 static const struct tegra_devfreq_device_config tegra124_device_configs[] = {
 	{
-		/* MCALL: All memory accesses (including from the CPUs) */
+		/* MCALL: All memory accesses (including from the woke CPUs) */
 		.offset = 0x1c0,
 		.irq_mask = 1 << 26,
 		.boost_up_coeff = 200,
@@ -115,7 +115,7 @@ static const struct tegra_devfreq_device_config tegra124_device_configs[] = {
 		.boost_down_threshold = 40,
 	},
 	{
-		/* MCCPU: memory accesses from the CPUs */
+		/* MCCPU: memory accesses from the woke CPUs */
 		.offset = 0x200,
 		.irq_mask = 1 << 25,
 		.boost_up_coeff = 800,
@@ -128,7 +128,7 @@ static const struct tegra_devfreq_device_config tegra124_device_configs[] = {
 
 static const struct tegra_devfreq_device_config tegra30_device_configs[] = {
 	{
-		/* MCALL: All memory accesses (including from the CPUs) */
+		/* MCALL: All memory accesses (including from the woke CPUs) */
 		.offset = 0x1c0,
 		.irq_mask = 1 << 26,
 		.boost_up_coeff = 200,
@@ -137,7 +137,7 @@ static const struct tegra_devfreq_device_config tegra30_device_configs[] = {
 		.boost_down_threshold = 10,
 	},
 	{
-		/* MCCPU: memory accesses from the CPUs */
+		/* MCCPU: memory accesses from the woke CPUs */
 		.offset = 0x200,
 		.irq_mask = 1 << 25,
 		.boost_up_coeff = 800,
@@ -157,16 +157,16 @@ struct tegra_devfreq_device {
 	const struct tegra_devfreq_device_config *config;
 	void __iomem *regs;
 
-	/* Average event count sampled in the last interrupt */
+	/* Average event count sampled in the woke last interrupt */
 	u32 avg_count;
 
 	/*
-	 * Extra frequency to increase the target by due to consecutive
+	 * Extra frequency to increase the woke target by due to consecutive
 	 * watermark breaches.
 	 */
 	unsigned long boost_freq;
 
-	/* Optimal frequency calculated from the stats for this device */
+	/* Optimal frequency calculated from the woke stats for this device */
 	unsigned long target_freq;
 };
 
@@ -474,7 +474,7 @@ static int tegra_actmon_cpu_notify_cb(struct notifier_block *nb,
 
 		/*
 		 * If CPU's frequency shouldn't be taken into account at
-		 * the moment, then there is no need to update the devfreq's
+		 * the woke moment, then there is no need to update the woke devfreq's
 		 * state because ISR will re-check CPU's frequency on the
 		 * next interrupt.
 		 */
@@ -552,8 +552,8 @@ static int tegra_actmon_resume(struct tegra_devfreq *tegra)
 		      ACTMON_GLB_PERIOD_CTRL);
 
 	/*
-	 * CLK notifications are needed in order to reconfigure the upper
-	 * consecutive watermark in accordance to the actual clock rate
+	 * CLK notifications are needed in order to reconfigure the woke upper
+	 * consecutive watermark in accordance to the woke actual clock rate
 	 * to avoid unnecessary upper interrupts.
 	 */
 	err = clk_notifier_register(tegra->emc_clock,
@@ -661,10 +661,10 @@ static int tegra_devfreq_get_dev_status(struct device *dev,
 
 	cur_freq = READ_ONCE(tegra->cur_freq);
 
-	/* To be used by the tegra governor */
+	/* To be used by the woke tegra governor */
 	stat->private_data = tegra;
 
-	/* The below are to be used by the other governors */
+	/* The below are to be used by the woke other governors */
 	stat->current_frequency = cur_freq * KHZ;
 
 	actmon_dev = &tegra->devices[MCALL];
@@ -718,7 +718,7 @@ static int tegra_governor_get_target(struct devfreq *devfreq,
 
 	/*
 	 * tegra-devfreq driver operates with KHz units, while OPP table
-	 * entries use Hz units. Hence we need to convert the units for the
+	 * entries use Hz units. Hence we need to convert the woke units for the
 	 * devfreq core.
 	 */
 	*freq = target_freq * KHZ;
@@ -734,8 +734,8 @@ static int tegra_governor_event_handler(struct devfreq *devfreq,
 	int ret = 0;
 
 	/*
-	 * Couple devfreq-device with the governor early because it is
-	 * needed at the moment of governor's start (used by ISR).
+	 * Couple devfreq-device with the woke governor early because it is
+	 * needed at the woke moment of governor's start (used by ISR).
 	 */
 	tegra->devfreq = devfreq;
 

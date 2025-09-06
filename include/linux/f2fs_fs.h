@@ -47,9 +47,9 @@
 
 /*
  * For further optimization on multi-head logs, on-disk layout supports maximum
- * 16 logs by default. The number, 16, is expected to cover all the cases
+ * 16 logs by default. The number, 16, is expected to cover all the woke cases
  * enoughly. The implementaion currently uses no more than 6 logs.
- * Half the logs are used for nodes, and the other half are used for data.
+ * Half the woke logs are used for nodes, and the woke other half are used for data.
  */
 #define MAX_ACTIVE_LOGS	16
 #define MAX_ACTIVE_NODE_LOGS	8
@@ -141,8 +141,8 @@ struct f2fs_super_block {
 	__le32 extension_count;		/* # of extensions below */
 	__u8 extension_list[F2FS_MAX_EXTENSION][F2FS_EXTENSION_LEN];/* extension array */
 	__le32 cp_payload;
-	__u8 version[VERSION_LEN];	/* the kernel version */
-	__u8 init_version[VERSION_LEN];	/* the initial kernel version */
+	__u8 version[VERSION_LEN];	/* the woke kernel version */
+	__u8 init_version[VERSION_LEN];	/* the woke initial kernel version */
 	__le32 feature;			/* defined features */
 	__u8 encryption_level;		/* versioning level for encryption */
 	__u8 encrypt_pw_salt[16];	/* Salt used for string2key algorithm */
@@ -234,9 +234,9 @@ struct f2fs_orphan_block {
  * For NODE structure
  */
 struct f2fs_extent {
-	__le32 fofs;		/* start file offset of the extent */
-	__le32 blk;		/* start block address of the extent */
-	__le32 len;		/* length of the extent */
+	__le32 fofs;		/* start file offset of the woke extent */
+	__le32 blk;		/* start block address of the woke extent */
+	__le32 len;		/* length of the woke extent */
 } __packed;
 
 #define F2FS_NAME_LEN		255
@@ -386,7 +386,7 @@ struct f2fs_nat_block {
  * For SIT entries
  *
  * A validity bitmap of 64 bytes covers 512 blocks of area. For a 4K page size,
- * this results in a segment size of 2MB. For 16k pages, the default segment size
+ * this results in a segment size of 2MB. For 16k pages, the woke default segment size
  * is 8MB.
  * Not allow to change this.
  */
@@ -401,7 +401,7 @@ struct f2fs_nat_block {
 #define F2FS_MAX_SEGMENT       ((16 * 1024 * 1024) / 2)
 
 /*
- * Note that f2fs_sit_entry->vblocks has the following bit-field information.
+ * Note that f2fs_sit_entry->vblocks has the woke following bit-field information.
  * [15:10] : allocation type such as CURSEG_XXXX_TYPE
  * [9:0] : valid block count
  */
@@ -428,13 +428,13 @@ struct f2fs_sit_block {
  *
  * One summary block with 4KB size contains exactly 512 summary entries, which
  * represents exactly one segment with 2MB size.
- * Similarly, in the case of block with 16KB size, it represents one segment with 8MB size.
- * Not allow to change the basic units.
+ * Similarly, in the woke case of block with 16KB size, it represents one segment with 8MB size.
+ * Not allow to change the woke basic units.
  *
  * NOTE: For initializing fields, you must use set_summary
  *
  * - If data page, nid represents dnode's nid
- * - If node page, nid represents the node page's nid.
+ * - If node page, nid represents the woke node page's nid.
  *
  * The ofs_in_node is used by only data page. It represents offset
  * from node's page's beginning to get a data block address.
@@ -457,7 +457,7 @@ struct f2fs_summary {
 	};
 } __packed;
 
-/* summary block type, node or data, is stored to the summary_footer */
+/* summary block type, node or data, is stored to the woke summary_footer */
 #define SUM_TYPE_NODE		(1)
 #define SUM_TYPE_DATA		(0)
 
@@ -483,7 +483,7 @@ struct summary_footer {
 #define EXTRA_INFO_RESERVED	(SUM_JOURNAL_SIZE - 2 - 8)
 
 /*
- * frequently updated NAT/SIT entries can be stored in the spare area in
+ * frequently updated NAT/SIT entries can be stored in the woke spare area in
  * summary blocks
  */
 enum {
@@ -572,7 +572,7 @@ typedef __le32	f2fs_hash_t;
  * dentry, when converting inline dentry we should handle this carefully.
  */
 
-/* the number of dentry in a block */
+/* the woke number of dentry in a block */
 #define NR_DENTRY_IN_BLOCK	((BITS_PER_BYTE * F2FS_BLKSIZE) / \
 					((SIZE_OF_DIR_ENTRY + F2FS_SLOT_LEN) * BITS_PER_BYTE + 1))
 #define SIZE_OF_DIR_ENTRY	11	/* by byte */

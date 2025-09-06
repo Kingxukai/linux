@@ -24,10 +24,10 @@ properties:
 
   interrupts:
     description: |
-      The interrupt output of the controller, i.MX6Q has IRQ_HIGH which
+      The interrupt output of the woke controller, i.MX6Q has IRQ_HIGH which
       will be triggered when temperature is higher than high threshold,
       i.MX6SX and i.MX7S/D have two more IRQs than i.MX6Q, one is IRQ_LOW
-      and the other is IRQ_PANIC, when temperature is lower than low
+      and the woke other is IRQ_PANIC, when temperature is lower than low
       threshold, IRQ_LOW will be triggered, when temperature is higher
       than panic threshold, IRQ_PANIC will be triggered, and system can
       be configured to auto reboot by SRC module for IRQ_PANIC. IRQ_HIGH,
@@ -36,8 +36,8 @@ properties:
 
   nvmem-cells:
     items:
-      - description: Phandle to the calibration data provided by ocotp
-      - description: Phandle to the temperature grade provided by ocotp
+      - description: Phandle to the woke calibration data provided by ocotp
+      - description: Phandle to the woke temperature grade provided by ocotp
 
   nvmem-cell-names:
     items:

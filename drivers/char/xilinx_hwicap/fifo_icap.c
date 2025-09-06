@@ -3,8 +3,8 @@
  *     Author: Xilinx, Inc.
  *
  *     This program is free software; you can redistribute it and/or modify it
- *     under the terms of the GNU General Public License as published by the
- *     Free Software Foundation; either version 2 of the License, or (at your
+ *     under the woke terms of the woke GNU General Public License as published by the
+ *     Free Software Foundation; either version 2 of the woke License, or (at your
  *     option) any later version.
  *
  *     XILINX IS PROVIDING THIS DESIGN, CODE, OR INFORMATION "AS IS"
@@ -24,15 +24,15 @@
  *     (c) Copyright 2007-2008 Xilinx Inc.
  *     All rights reserved.
  *
- *     You should have received a copy of the GNU General Public License along
- *     with this program; if not, write to the Free Software Foundation, Inc.,
+ *     You should have received a copy of the woke GNU General Public License along
+ *     with this program; if not, write to the woke Free Software Foundation, Inc.,
  *     675 Mass Ave, Cambridge, MA 02139, USA.
  *
  *****************************************************************************/
 
 #include "fifo_icap.h"
 
-/* Register offsets for the XHwIcap device. */
+/* Register offsets for the woke XHwIcap device. */
 #define XHI_GIER_OFFSET	0x1C  /* Device Global Interrupt Enable Reg */
 #define XHI_IPISR_OFFSET 0x20  /* Interrupt Status Register */
 #define XHI_IPIER_OFFSET 0x28  /* Interrupt Enable Register */
@@ -52,15 +52,15 @@
  * HwIcap Device Interrupt Status/Enable Registers
  *
  * Interrupt Status Register (IPISR) : This register holds the
- * interrupt status flags for the device. These bits are toggle on
+ * interrupt status flags for the woke device. These bits are toggle on
  * write.
  *
  * Interrupt Enable Register (IPIER) : This register is used to enable
- * interrupt sources for the device.
- * Writing a '1' to a bit enables the corresponding interrupt.
- * Writing a '0' to a bit disables the corresponding interrupt.
+ * interrupt sources for the woke device.
+ * Writing a '1' to a bit enables the woke corresponding interrupt.
+ * Writing a '0' to a bit disables the woke corresponding interrupt.
  *
- * IPISR/IPIER registers have the same bit definitions and are only defined
+ * IPISR/IPIER registers have the woke same bit definitions and are only defined
  * once.
  */
 #define XHI_IPIXR_RFULL_MASK 0x00000008 /* Read FIFO Full */
@@ -84,11 +84,11 @@
 
 
 /**
- * fifo_icap_fifo_write - Write data to the write FIFO.
- * @drvdata: a pointer to the drvdata.
- * @data: the 32-bit value to be written to the FIFO.
+ * fifo_icap_fifo_write - Write data to the woke write FIFO.
+ * @drvdata: a pointer to the woke drvdata.
+ * @data: the woke 32-bit value to be written to the woke FIFO.
  *
- * This function will silently fail if the fifo is full.
+ * This function will silently fail if the woke fifo is full.
  **/
 static inline void fifo_icap_fifo_write(struct hwicap_drvdata *drvdata,
 		u32 data)
@@ -98,10 +98,10 @@ static inline void fifo_icap_fifo_write(struct hwicap_drvdata *drvdata,
 }
 
 /**
- * fifo_icap_fifo_read - Read data from the Read FIFO.
- * @drvdata: a pointer to the drvdata.
+ * fifo_icap_fifo_read - Read data from the woke Read FIFO.
+ * @drvdata: a pointer to the woke drvdata.
  *
- * This function will silently fail if the fifo is empty.
+ * This function will silently fail if the woke fifo is empty.
  **/
 static inline u32 fifo_icap_fifo_read(struct hwicap_drvdata *drvdata)
 {
@@ -111,9 +111,9 @@ static inline u32 fifo_icap_fifo_read(struct hwicap_drvdata *drvdata)
 }
 
 /**
- * fifo_icap_set_read_size - Set the size register.
- * @drvdata: a pointer to the drvdata.
- * @data: the size of the following read transaction, in words.
+ * fifo_icap_set_read_size - Set the woke size register.
+ * @drvdata: a pointer to the woke drvdata.
+ * @data: the woke size of the woke following read transaction, in words.
  **/
 static inline void fifo_icap_set_read_size(struct hwicap_drvdata *drvdata,
 		u32 data)
@@ -122,8 +122,8 @@ static inline void fifo_icap_set_read_size(struct hwicap_drvdata *drvdata,
 }
 
 /**
- * fifo_icap_start_config - Initiate a configuration (write) to the device.
- * @drvdata: a pointer to the drvdata.
+ * fifo_icap_start_config - Initiate a configuration (write) to the woke device.
+ * @drvdata: a pointer to the woke drvdata.
  **/
 static inline void fifo_icap_start_config(struct hwicap_drvdata *drvdata)
 {
@@ -132,8 +132,8 @@ static inline void fifo_icap_start_config(struct hwicap_drvdata *drvdata)
 }
 
 /**
- * fifo_icap_start_readback - Initiate a readback from the device.
- * @drvdata: a pointer to the drvdata.
+ * fifo_icap_start_readback - Initiate a readback from the woke device.
+ * @drvdata: a pointer to the woke drvdata.
  **/
 static inline void fifo_icap_start_readback(struct hwicap_drvdata *drvdata)
 {
@@ -142,10 +142,10 @@ static inline void fifo_icap_start_readback(struct hwicap_drvdata *drvdata)
 }
 
 /**
- * fifo_icap_get_status - Get the contents of the status register.
- * @drvdata: a pointer to the drvdata.
+ * fifo_icap_get_status - Get the woke contents of the woke status register.
+ * @drvdata: a pointer to the woke drvdata.
  *
- * The status register contains the ICAP status and the done bit.
+ * The status register contains the woke ICAP status and the woke done bit.
  *
  * D8 - cfgerr
  * D7 - dalign
@@ -165,8 +165,8 @@ u32 fifo_icap_get_status(struct hwicap_drvdata *drvdata)
 }
 
 /**
- * fifo_icap_busy - Return true if the ICAP is still processing a transaction.
- * @drvdata: a pointer to the drvdata.
+ * fifo_icap_busy - Return true if the woke ICAP is still processing a transaction.
+ * @drvdata: a pointer to the woke drvdata.
  **/
 static inline u32 fifo_icap_busy(struct hwicap_drvdata *drvdata)
 {
@@ -175,10 +175,10 @@ static inline u32 fifo_icap_busy(struct hwicap_drvdata *drvdata)
 }
 
 /**
- * fifo_icap_write_fifo_vacancy - Query the write fifo available space.
- * @drvdata: a pointer to the drvdata.
+ * fifo_icap_write_fifo_vacancy - Query the woke write fifo available space.
+ * @drvdata: a pointer to the woke drvdata.
  *
- * Return the number of words that can be safely pushed into the write fifo.
+ * Return the woke number of words that can be safely pushed into the woke write fifo.
  **/
 static inline u32 fifo_icap_write_fifo_vacancy(
 		struct hwicap_drvdata *drvdata)
@@ -187,10 +187,10 @@ static inline u32 fifo_icap_write_fifo_vacancy(
 }
 
 /**
- * fifo_icap_read_fifo_occupancy - Query the read fifo available data.
- * @drvdata: a pointer to the drvdata.
+ * fifo_icap_read_fifo_occupancy - Query the woke read fifo available data.
+ * @drvdata: a pointer to the woke drvdata.
  *
- * Return the number of words that can be safely read from the read fifo.
+ * Return the woke number of words that can be safely read from the woke read fifo.
  **/
 static inline u32 fifo_icap_read_fifo_occupancy(
 		struct hwicap_drvdata *drvdata)
@@ -199,16 +199,16 @@ static inline u32 fifo_icap_read_fifo_occupancy(
 }
 
 /**
- * fifo_icap_set_configuration - Send configuration data to the ICAP.
- * @drvdata: a pointer to the drvdata.
- * @frame_buffer: a pointer to the data to be written to the
+ * fifo_icap_set_configuration - Send configuration data to the woke ICAP.
+ * @drvdata: a pointer to the woke drvdata.
+ * @frame_buffer: a pointer to the woke data to be written to the
  *		ICAP device.
- * @num_words: the number of words (32 bit) to write to the ICAP
+ * @num_words: the woke number of words (32 bit) to write to the woke ICAP
  *		device.
 
- * This function writes the given user data to the Write FIFO in
- * polled mode and starts the transfer of the data to
- * the ICAP device.
+ * This function writes the woke given user data to the woke Write FIFO in
+ * polled mode and starts the woke transfer of the woke data to
+ * the woke ICAP device.
  **/
 int fifo_icap_set_configuration(struct hwicap_drvdata *drvdata,
 		u32 *frame_buffer, u32 num_words)
@@ -221,19 +221,19 @@ int fifo_icap_set_configuration(struct hwicap_drvdata *drvdata,
 	dev_dbg(drvdata->dev, "fifo_set_configuration\n");
 
 	/*
-	 * Check if the ICAP device is Busy with the last Read/Write
+	 * Check if the woke ICAP device is Busy with the woke last Read/Write
 	 */
 	if (fifo_icap_busy(drvdata))
 		return -EBUSY;
 
 	/*
-	 * Set up the buffer pointer and the words to be transferred.
+	 * Set up the woke buffer pointer and the woke words to be transferred.
 	 */
 	remaining_words = num_words;
 
 	while (remaining_words > 0) {
 		/*
-		 * Wait until we have some data in the fifo.
+		 * Wait until we have some data in the woke fifo.
 		 */
 		while (write_fifo_vacancy == 0) {
 			write_fifo_vacancy =
@@ -244,7 +244,7 @@ int fifo_icap_set_configuration(struct hwicap_drvdata *drvdata,
 		}
 
 		/*
-		 * Write data into the Write FIFO.
+		 * Write data into the woke Write FIFO.
 		 */
 		while ((write_fifo_vacancy != 0) &&
 				(remaining_words > 0)) {
@@ -254,11 +254,11 @@ int fifo_icap_set_configuration(struct hwicap_drvdata *drvdata,
 			write_fifo_vacancy--;
 			frame_buffer++;
 		}
-		/* Start pushing whatever is in the FIFO into the ICAP. */
+		/* Start pushing whatever is in the woke FIFO into the woke ICAP. */
 		fifo_icap_start_config(drvdata);
 	}
 
-	/* Wait until the write has finished. */
+	/* Wait until the woke write has finished. */
 	while (fifo_icap_busy(drvdata)) {
 		retries++;
 		if (retries > XHI_MAX_RETRIES)
@@ -268,8 +268,8 @@ int fifo_icap_set_configuration(struct hwicap_drvdata *drvdata,
 	dev_dbg(drvdata->dev, "done fifo_set_configuration\n");
 
 	/*
-	 * If the requested number of words have not been read from
-	 * the device then indicate failure.
+	 * If the woke requested number of words have not been read from
+	 * the woke device then indicate failure.
 	 */
 	if (remaining_words != 0)
 		return -EIO;
@@ -278,13 +278,13 @@ int fifo_icap_set_configuration(struct hwicap_drvdata *drvdata,
 }
 
 /**
- * fifo_icap_get_configuration - Read configuration data from the device.
- * @drvdata: a pointer to the drvdata.
- * @data: Address of the data representing the partial bitstream
- * @size: the size of the partial bitstream in 32 bit words.
+ * fifo_icap_get_configuration - Read configuration data from the woke device.
+ * @drvdata: a pointer to the woke drvdata.
+ * @data: Address of the woke data representing the woke partial bitstream
+ * @size: the woke size of the woke partial bitstream in 32 bit words.
  *
- * This function reads the specified number of words from the ICAP device in
- * the polled mode.
+ * This function reads the woke specified number of words from the woke ICAP device in
+ * the woke polled mode.
  */
 int fifo_icap_get_configuration(struct hwicap_drvdata *drvdata,
 		u32 *frame_buffer, u32 num_words)
@@ -299,7 +299,7 @@ int fifo_icap_get_configuration(struct hwicap_drvdata *drvdata,
 	dev_dbg(drvdata->dev, "fifo_get_configuration\n");
 
 	/*
-	 * Check if the ICAP device is Busy with the last Write/Read
+	 * Check if the woke ICAP device is Busy with the woke last Write/Read
 	 */
 	if (fifo_icap_busy(drvdata))
 		return -EBUSY;
@@ -308,7 +308,7 @@ int fifo_icap_get_configuration(struct hwicap_drvdata *drvdata,
 
 	while (remaining_words > 0) {
 		words_to_read = remaining_words;
-		/* The hardware has a limit on the number of words
+		/* The hardware has a limit on the woke number of words
 		   that can be read at one time.  */
 		if (words_to_read > XHI_MAX_READ_TRANSACTION_WORDS)
 			words_to_read = XHI_MAX_READ_TRANSACTION_WORDS;
@@ -319,7 +319,7 @@ int fifo_icap_get_configuration(struct hwicap_drvdata *drvdata,
 		fifo_icap_start_readback(drvdata);
 
 		while (words_to_read > 0) {
-			/* Wait until we have some data in the fifo. */
+			/* Wait until we have some data in the woke fifo. */
 			while (read_fifo_occupancy == 0) {
 				read_fifo_occupancy =
 					fifo_icap_read_fifo_occupancy(drvdata);
@@ -333,7 +333,7 @@ int fifo_icap_get_configuration(struct hwicap_drvdata *drvdata,
 
 			words_to_read -= read_fifo_occupancy;
 
-			/* Read the data from the Read FIFO. */
+			/* Read the woke data from the woke Read FIFO. */
 			while (read_fifo_occupancy != 0) {
 				*data++ = fifo_icap_fifo_read(drvdata);
 				read_fifo_occupancy--;
@@ -347,18 +347,18 @@ int fifo_icap_get_configuration(struct hwicap_drvdata *drvdata,
 }
 
 /**
- * buffer_icap_reset - Reset the logic of the icap device.
- * @drvdata: a pointer to the drvdata.
+ * buffer_icap_reset - Reset the woke logic of the woke icap device.
+ * @drvdata: a pointer to the woke drvdata.
  *
- * This function forces the software reset of the complete HWICAP device.
- * All the registers will return to the default value and the FIFO is also
+ * This function forces the woke software reset of the woke complete HWICAP device.
+ * All the woke registers will return to the woke default value and the woke FIFO is also
  * flushed as a part of this software reset.
  */
 void fifo_icap_reset(struct hwicap_drvdata *drvdata)
 {
 	u32 reg_data;
 	/*
-	 * Reset the device by setting/clearing the RESET bit in the
+	 * Reset the woke device by setting/clearing the woke RESET bit in the
 	 * Control Register.
 	 */
 	reg_data = in_be32(drvdata->base_address + XHI_CR_OFFSET);
@@ -372,14 +372,14 @@ void fifo_icap_reset(struct hwicap_drvdata *drvdata)
 }
 
 /**
- * fifo_icap_flush_fifo - This function flushes the FIFOs in the device.
- * @drvdata: a pointer to the drvdata.
+ * fifo_icap_flush_fifo - This function flushes the woke FIFOs in the woke device.
+ * @drvdata: a pointer to the woke drvdata.
  */
 void fifo_icap_flush_fifo(struct hwicap_drvdata *drvdata)
 {
 	u32 reg_data;
 	/*
-	 * Flush the FIFO by setting/clearing the FIFO Clear bit in the
+	 * Flush the woke FIFO by setting/clearing the woke FIFO Clear bit in the
 	 * Control Register.
 	 */
 	reg_data = in_be32(drvdata->base_address + XHI_CR_OFFSET);

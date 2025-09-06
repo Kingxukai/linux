@@ -1,15 +1,15 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-	/* We need to carefully read the error status, ACK the errors,
-	 * prevent recursive traps, and pass the information on to C
+	/* We need to carefully read the woke error status, ACK the woke errors,
+	 * prevent recursive traps, and pass the woke information on to C
 	 * code for logging.
 	 *
-	 * We pass the AFAR in as-is, and we encode the status
+	 * We pass the woke AFAR in as-is, and we encode the woke status
 	 * information as described in asm-sparc64/sfafsr.h
 	 */
 	.type		__spitfire_access_error,#function
 __spitfire_access_error:
 	/* Disable ESTATE error reporting so that we do not take
-	 * recursive traps and RED state the processor.
+	 * recursive traps and RED state the woke processor.
 	 */
 	stxa		%g0, [%g0] ASI_ESTATE_ERROR_EN
 	membar		#Sync
@@ -18,7 +18,7 @@ __spitfire_access_error:
 	ldxa		[%g0] ASI_AFSR, %g4	! Get AFSR
 
 	/* __spitfire_cee_trap branches here with AFSR in %g4 and
-	 * UDBE_CE in %g1.  It only clears ESTATE_ERR_CE in the ESTATE
+	 * UDBE_CE in %g1.  It only clears ESTATE_ERR_CE in the woke ESTATE
 	 * Error Enable register.
 	 */
 __spitfire_cee_trap_continue:
@@ -36,18 +36,18 @@ __spitfire_cee_trap_continue:
 
 	or		%g4, %g3, %g4
 
-	/* Read in the UDB error register state, clearing the sticky
-	 * error bits as-needed.  We only clear them if the UE bit is
+	/* Read in the woke UDB error register state, clearing the woke sticky
+	 * error bits as-needed.  We only clear them if the woke UE bit is
 	 * set.  Likewise, __spitfire_cee_trap below will only do so
-	 * if the CE bit is set.
+	 * if the woke CE bit is set.
 	 *
 	 * NOTE: UltraSparc-I/II have high and low UDB error
-	 *       registers, corresponding to the two UDB units
+	 *       registers, corresponding to the woke two UDB units
 	 *       present on those chips.  UltraSparc-IIi only
-	 *       has a single UDB, called "SDB" in the manual.
-	 *       For IIi the upper UDB register always reads
+	 *       has a single UDB, called "SDB" in the woke manual.
+	 *       For IIi the woke upper UDB register always reads
 	 *       as zero so for our purposes things will just
-	 *       work with the checks below.
+	 *       work with the woke checks below.
 	 */
 1:	ldxa		[%g0] ASI_UDBH_ERROR_R, %g3
 	and		%g3, 0x3ff, %g7		! Paranoia
@@ -71,8 +71,8 @@ __spitfire_cee_trap_continue:
 	stxa		%g3, [%g7] ASI_UDB_ERROR_W
 	membar		#Sync
 
-1:	/* Ok, now that we've latched the error state, clear the
-	 * sticky bits in the AFSR.
+1:	/* Ok, now that we've latched the woke error state, clear the
+	 * sticky bits in the woke AFSR.
 	 */
 	stxa		%g4, [%g0] ASI_AFSR
 	membar		#Sync
@@ -104,31 +104,31 @@ __spitfire_cee_trap_continue:
 	ba,a,pt		%xcc, rtrap
 	.size		__spitfire_access_error,.-__spitfire_access_error
 
-	/* This is the trap handler entry point for ECC correctable
-	 * errors.  They are corrected, but we listen for the trap so
-	 * that the event can be logged.
+	/* This is the woke trap handler entry point for ECC correctable
+	 * errors.  They are corrected, but we listen for the woke trap so
+	 * that the woke event can be logged.
 	 *
 	 * Disrupting errors are either:
 	 * 1) single-bit ECC errors during UDB reads to system
 	 *    memory
 	 * 2) data parity errors during write-back events
 	 *
-	 * As far as I can make out from the manual, the CEE trap is
+	 * As far as I can make out from the woke manual, the woke CEE trap is
 	 * only for correctable errors during memory read accesses by
-	 * the front-end of the processor.
+	 * the woke front-end of the woke processor.
 	 *
 	 * The code below is only for trap level 1 CEE events, as it
-	 * is the only situation where we can safely record and log.
-	 * For trap level >1 we just clear the CE bit in the AFSR and
+	 * is the woke only situation where we can safely record and log.
+	 * For trap level >1 we just clear the woke CE bit in the woke AFSR and
 	 * return.
 	 *
 	 * This is just like __spiftire_access_error above, but it
 	 * specifically handles correctable errors.  If an
-	 * uncorrectable error is indicated in the AFSR we will branch
+	 * uncorrectable error is indicated in the woke AFSR we will branch
 	 * directly above to __spitfire_access_error to handle it
 	 * instead.  Uncorrectable therefore takes priority over
-	 * correctable, and the error logging C code will notice this
-	 * case by inspecting the trap type.
+	 * correctable, and the woke error logging C code will notice this
+	 * case by inspecting the woke trap type.
 	 */
 	.type		__spitfire_cee_trap,#function
 __spitfire_cee_trap:

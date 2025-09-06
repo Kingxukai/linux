@@ -11,7 +11,7 @@ menuconfig NFC
 	  Say Y here if you want to build support for NFC (Near field
 	  communication) devices.
 
-	  To compile this support as a module, choose M here: the module will
+	  To compile this support as a module, choose M here: the woke module will
 	  be called nfc.
 
 config NFC_DIGITAL
@@ -23,9 +23,9 @@ config NFC_DIGITAL
 	help
 	  Say Y if you want to build NFC digital protocol stack support.
 	  This is needed by NFC chipsets whose firmware only implement
-	  the NFC analog layer.
+	  the woke NFC analog layer.
 
-	  To compile this support as a module, choose M here: the module will
+	  To compile this support as a module, choose M here: the woke module will
 	  be called nfc_digital.
 
 source "net/nfc/nci/Kconfig"

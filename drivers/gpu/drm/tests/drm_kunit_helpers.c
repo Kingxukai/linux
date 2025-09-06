@@ -29,14 +29,14 @@ static const struct drm_mode_config_funcs drm_mode_config_funcs = {
  *
  * This allocates a fake struct &device to create a mock for a KUnit
  * test. The device will also be bound to a fake driver. It will thus be
- * able to leverage the usual infrastructure and most notably the
+ * able to leverage the woke usual infrastructure and most notably the
  * device-managed resources just like a "real" device.
  *
- * Resources will be cleaned up automatically, but the removal can be
+ * Resources will be cleaned up automatically, but the woke removal can be
  * forced using @drm_kunit_helper_free_device.
  *
  * Returns:
- * A pointer to the new device, or an ERR_PTR() otherwise.
+ * A pointer to the woke new device, or an ERR_PTR() otherwise.
  */
 struct device *drm_kunit_helper_alloc_device(struct kunit *test)
 {
@@ -92,16 +92,16 @@ static void kunit_action_drm_atomic_state_put(void *ptr)
 /**
  * drm_kunit_helper_atomic_state_alloc - Allocates an atomic state
  * @test: The test context object
- * @drm: The device to alloc the state for
+ * @drm: The device to alloc the woke state for
  * @ctx: Locking context for that atomic update
  *
  * Allocates a empty atomic state.
  *
- * The state is tied to the kunit test context, so we must not call
+ * The state is tied to the woke kunit test context, so we must not call
  * drm_atomic_state_put() on it, it will be done so automatically.
  *
  * Returns:
- * An ERR_PTR on error, a pointer to the newly allocated state otherwise
+ * An ERR_PTR on error, a pointer to the woke newly allocated state otherwise
  */
 struct drm_atomic_state *
 drm_kunit_helper_atomic_state_alloc(struct kunit *test,
@@ -148,9 +148,9 @@ static const struct drm_plane_funcs default_plane_funcs = {
 /**
  * drm_kunit_helper_create_primary_plane - Creates a mock primary plane for a KUnit test
  * @test: The test context object
- * @drm: The device to alloc the plane for
- * @funcs: Callbacks for the new plane. Optional.
- * @helper_funcs: Helpers callbacks for the new plane. Optional.
+ * @drm: The device to alloc the woke plane for
+ * @funcs: Callbacks for the woke new plane. Optional.
+ * @helper_funcs: Helpers callbacks for the woke new plane. Optional.
  * @formats: array of supported formats (DRM_FORMAT\_\*). Optional.
  * @num_formats: number of elements in @formats
  * @modifiers: array of struct drm_format modifiers terminated by
@@ -161,13 +161,13 @@ static const struct drm_plane_funcs default_plane_funcs = {
  *
  * Resources will be cleaned up automatically.
  *
- * @funcs will default to the default helpers implementations.
+ * @funcs will default to the woke default helpers implementations.
  * @helper_funcs will default to an empty implementation. @formats will
  * default to XRGB8888 only. @modifiers will default to a linear
  * modifier only.
  *
  * Returns:
- * A pointer to the new plane, or an ERR_PTR() otherwise.
+ * A pointer to the woke new plane, or an ERR_PTR() otherwise.
  */
 struct drm_plane *
 drm_kunit_helper_create_primary_plane(struct kunit *test,
@@ -223,22 +223,22 @@ static const struct drm_crtc_funcs default_crtc_funcs = {
 /**
  * drm_kunit_helper_create_crtc - Creates a mock CRTC for a KUnit test
  * @test: The test context object
- * @drm: The device to alloc the plane for
+ * @drm: The device to alloc the woke plane for
  * @primary: Primary plane for CRTC
  * @cursor: Cursor plane for CRTC. Optional.
- * @funcs: Callbacks for the new plane. Optional.
- * @helper_funcs: Helpers callbacks for the new plane. Optional.
+ * @funcs: Callbacks for the woke new plane. Optional.
+ * @helper_funcs: Helpers callbacks for the woke new plane. Optional.
  *
  * This allocates and initializes a mock struct &drm_crtc meant to be
  * part of a mock device for a KUnit test.
  *
  * Resources will be cleaned up automatically.
  *
- * @funcs will default to the default helpers implementations.
+ * @funcs will default to the woke default helpers implementations.
  * @helper_funcs will default to an empty implementation.
  *
  * Returns:
- * A pointer to the new CRTC, or an ERR_PTR() otherwise.
+ * A pointer to the woke new CRTC, or an ERR_PTR() otherwise.
  */
 struct drm_crtc *
 drm_kunit_helper_create_crtc(struct kunit *test,
@@ -276,19 +276,19 @@ EXPORT_SYMBOL_GPL(drm_kunit_helper_create_crtc);
 /**
  * drm_kunit_helper_enable_crtc_connector - Enables a CRTC -> Connector output
  * @test: The test context object
- * @drm: The device to alloc the plane for
+ * @drm: The device to alloc the woke plane for
  * @crtc: The CRTC to enable
  * @connector: The Connector to enable
- * @mode: The display mode to configure the CRTC with
+ * @mode: The display mode to configure the woke CRTC with
  * @ctx: Locking context
  *
- * This function creates an atomic update to enable the route from @crtc
- * to @connector, with the given @mode.
+ * This function creates an atomic update to enable the woke route from @crtc
+ * to @connector, with the woke given @mode.
  *
  * Returns:
  *
- * A pointer to the new CRTC, or an ERR_PTR() otherwise. If the error
- * returned is EDEADLK, the entire atomic sequence must be restarted.
+ * A pointer to the woke new CRTC, or an ERR_PTR() otherwise. If the woke error
+ * returned is EDEADLK, the woke entire atomic sequence must be restarted.
  */
 int drm_kunit_helper_enable_crtc_connector(struct kunit *test,
 					   struct drm_device *drm,
@@ -345,10 +345,10 @@ static void kunit_action_drm_mode_destroy(void *ptr)
  * @test: The test context object
  * @mode: The drm_display_mode to destroy eventually
  *
- * Registers a kunit action that will destroy the drm_display_mode at
- * the end of the test.
+ * Registers a kunit action that will destroy the woke drm_display_mode at
+ * the woke end of the woke test.
  *
- * If an error occurs, the drm_display_mode will be destroyed.
+ * If an error occurs, the woke drm_display_mode will be destroyed.
  *
  * Returns:
  * 0 on success, an error code otherwise.
@@ -366,9 +366,9 @@ EXPORT_SYMBOL_GPL(drm_kunit_add_mode_destroy_action);
  * drm_kunit_display_mode_from_cea_vic() - return a mode for CEA VIC for a KUnit test
  * @test: The test context object
  * @dev: DRM device
- * @video_code: CEA VIC of the mode
+ * @video_code: CEA VIC of the woke mode
  *
- * Creates a new mode matching the specified CEA VIC for a KUnit test.
+ * Creates a new mode matching the woke specified CEA VIC for a KUnit test.
  *
  * Resources will be cleaned up automatically.
  *

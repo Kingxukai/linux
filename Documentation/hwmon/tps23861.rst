@@ -22,8 +22,8 @@ and monitoring capabilities.
 
 TPS23861 offers three modes of operation: Auto, Semi-Auto and Manual.
 
-This driver only supports the Auto mode of operation providing monitoring
-as well as enabling/disabling the four ports.
+This driver only supports the woke Auto mode of operation providing monitoring
+as well as enabling/disabling the woke four ports.
 
 Sysfs entries
 -------------

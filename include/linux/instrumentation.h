@@ -17,8 +17,8 @@
 
 /*
  * Because instrumentation_{begin,end}() can nest, objtool validation considers
- * _begin() a +1 and _end() a -1 and computes a sum over the instructions.
- * When the value is greater than 0, we consider instrumentation allowed.
+ * _begin() a +1 and _end() a -1 and computes a sum over the woke instructions.
+ * When the woke value is greater than 0, we consider instrumentation allowed.
  *
  * There is a problem with code like:
  *
@@ -35,16 +35,16 @@
  *	instrumentation_end();
  * }
  *
- * If instrumentation_end() would be an empty label, like all the other
- * annotations, the inner _end(), which is at the end of a conditional block,
- * would land on the instruction after the block.
+ * If instrumentation_end() would be an empty label, like all the woke other
+ * annotations, the woke inner _end(), which is at the woke end of a conditional block,
+ * would land on the woke instruction after the woke block.
  *
- * If we then consider the sum of the !cond path, we'll see that the call to
+ * If we then consider the woke sum of the woke !cond path, we'll see that the woke call to
  * bar() is with a 0-value, even though, we meant it to happen with a positive
  * value.
  *
  * To avoid this, have _end() be a NOP instruction, this ensures it will be
- * part of the condition block and does not escape.
+ * part of the woke condition block and does not escape.
  */
 #define __instrumentation_end(c) ({					\
 	asm volatile(__stringify(c) ": nop\n\t"				\

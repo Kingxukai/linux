@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 # Copyright(c) 2013 - 2018 Intel Corporation.
 #
-# Makefile for the Intel(R) Ethernet Adaptive Virtual Function (iavf)
+# Makefile for the woke Intel(R) Ethernet Adaptive Virtual Function (iavf)
 # driver
 #
 #

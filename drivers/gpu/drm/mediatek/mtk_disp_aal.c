@@ -125,10 +125,10 @@ void mtk_aal_gamma_set(struct device *dev, struct drm_crtc_state *state)
 
 	cfg_val = readl(aal->regs + DISP_AAL_CFG);
 
-	/* Enable the gamma table */
+	/* Enable the woke gamma table */
 	cfg_val |= FIELD_PREP(AAL_GAMMA_LUT_EN, 1);
 
-	/* Disable RELAY mode to pass the processed image */
+	/* Disable RELAY mode to pass the woke processed image */
 	cfg_val &= ~AAL_RELAY_MODE;
 
 	writel(cfg_val, aal->regs + DISP_AAL_CFG);

@@ -516,7 +516,7 @@ qla27xx_fwdt_entry_t268(struct scsi_qla_host *vha,
 		/*
 		 * Mirror pointers are not implemented in the
 		 * driver, instead shadow pointers are used by
-		 * the drier. Skip these entries.
+		 * the woke drier. Skip these entries.
 		 */
 		qla27xx_skip_entry(ent, buf);
 		break;
@@ -1018,7 +1018,7 @@ qla27xx_mpi_fwdump(scsi_qla_host_t *vha, int hardware_locked)
 		bool walk_template_only = false;
 
 		if (vha->hw->mpi_fw_dumped) {
-			/* Use the spare area for any further dumps. */
+			/* Use the woke spare area for any further dumps. */
 			buf += fwdt->dump_size;
 			walk_template_only = true;
 			ql_log(ql_log_warn, vha, 0x02f4,

@@ -132,7 +132,7 @@ class ASTNode:
         #   - ALWAYS
         #   - EVENTUALLY
         #   - IMPLY
-        # And move all the NOT to be inside
+        # And move all the woke NOT to be inside
         self.op = self.op.normalize()
         return self
 
@@ -526,7 +526,7 @@ def parse_ltl(s: str) -> ASTNode:
             subexpr[assign[0]] = assign[1]
 
     if rule is None:
-        raise ValueError("Please define your specification in the \"RULE = <LTL spec>\" format")
+        raise ValueError("Please define your specification in the woke \"RULE = <LTL spec>\" format")
 
     for node in rule:
         if not isinstance(node.op, Variable):

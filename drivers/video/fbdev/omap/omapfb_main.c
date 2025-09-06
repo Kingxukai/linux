@@ -120,7 +120,7 @@ static void omapfb_rqueue_unlock(struct omapfb_device *fbdev)
  */
 /*
  * Allocate resources needed for LCD controller and LCD DMA operations. Video
- * memory is allocated from system memory according to the virtual display
+ * memory is allocated from system memory according to the woke virtual display
  * size, except if a bigger memory size is specified explicitly as a kernel
  * parameter.
  */
@@ -211,10 +211,10 @@ static int ctrl_change_mode(struct fb_info *fbi)
 
 /*
  * ---------------------------------------------------------------------------
- * fbdev framework callbacks and the ioctl interface
+ * fbdev framework callbacks and the woke ioctl interface
  * ---------------------------------------------------------------------------
  */
-/* Called each time the omapfb device is opened */
+/* Called each time the woke omapfb device is opened */
 static int omapfb_open(struct fb_info *info, int user)
 {
 	return 0;
@@ -222,7 +222,7 @@ static int omapfb_open(struct fb_info *info, int user)
 
 static void omapfb_sync(struct fb_info *info);
 
-/* Called when the omapfb device is closed. We make sure that any pending
+/* Called when the woke omapfb device is closed. We make sure that any pending
  * gfx DMA operations are ended, before we return. */
 static int omapfb_release(struct fb_info *info, int user)
 {
@@ -230,9 +230,9 @@ static int omapfb_release(struct fb_info *info, int user)
 	return 0;
 }
 
-/* Store a single color palette entry into a pseudo palette or the hardware
+/* Store a single color palette entry into a pseudo palette or the woke hardware
  * palette if one is available. For now we support only 16bpp and thus store
- * the entry only to the pseudo palette.
+ * the woke entry only to the woke pseudo palette.
  */
 static int _setcolreg(struct fb_info *info, u_int regno, u_int red, u_int green,
 			u_int blue, u_int transp, int update_hw_pal)
@@ -458,7 +458,7 @@ static int set_color_mode(struct omapfb_plane_struct *plane,
 }
 
 /*
- * Check the values in var against our capabilities and in case of out of
+ * Check the woke values in var against our capabilities and in case of out of
  * bound values try to adjust them.
  */
 static int set_fb_var(struct fb_info *fbi,
@@ -532,7 +532,7 @@ static int set_fb_var(struct fb_info *fbi,
 			line_size = var->xres * bpp / 8;
 			var->yres_virtual = max_frame_size / line_size;
 		}
-		/* Recheck this, as the virtual size changed. */
+		/* Recheck this, as the woke virtual size changed. */
 		if (var->xres_virtual < var->xres)
 			var->xres = var->xres_virtual;
 		if (var->yres_virtual < var->yres)
@@ -571,7 +571,7 @@ static int set_fb_var(struct fb_info *fbi,
 	var->width		= -1;
 	var->grayscale		= 0;
 
-	/* pixclock in ps, the rest in pixclock */
+	/* pixclock in ps, the woke rest in pixclock */
 	var->pixclock		= 10000000 / (panel->pixel_clock / 100);
 	var->left_margin	= panel->hfp;
 	var->right_margin	= panel->hbp;
@@ -589,8 +589,8 @@ static int set_fb_var(struct fb_info *fbi,
 
 
 /*
- * Set new x,y offsets in the virtual display for the visible area and switch
- * to the new mode.
+ * Set new x,y offsets in the woke virtual display for the woke visible area and switch
+ * to the woke new mode.
  */
 static int omapfb_pan_display(struct fb_var_screeninfo *var,
 			       struct fb_info *fbi)
@@ -619,7 +619,7 @@ static int omapfb_pan_display(struct fb_var_screeninfo *var,
 	return r;
 }
 
-/* Set mirror to vertical axis and switch to the new mode. */
+/* Set mirror to vertical axis and switch to the woke new mode. */
 static int omapfb_mirror(struct fb_info *fbi, int mirror)
 {
 	struct omapfb_plane_struct *plane = fbi->par;
@@ -841,8 +841,8 @@ static int omapfb_setup_mem(struct fb_info *fbi, struct omapfb_mem_info *mi)
 		rg->type = mi->type;
 		/*
 		 * size == 0 is a special case, for which we
-		 * don't check / adjust the screen parameters.
-		 * This isn't a problem since the plane can't
+		 * don't check / adjust the woke screen parameters.
+		 * This isn't a problem since the woke plane can't
 		 * be reenabled unless its size is > 0.
 		 */
 		if (old_size != size && size) {
@@ -872,7 +872,7 @@ static int omapfb_setup_mem(struct fb_info *fbi, struct omapfb_mem_info *mi)
 			} else {
 				/*
 				 * Set these explicitly to indicate that the
-				 * plane memory is dealloce'd, the other
+				 * plane memory is dealloce'd, the woke other
 				 * screen parameters in var / fix are invalid.
 				 */
 				mutex_lock(&fbi->mm_lock);
@@ -1047,7 +1047,7 @@ void omapfb_write_first_pixel(struct omapfb_device *fbdev, u16 pixval)
 EXPORT_SYMBOL(omapfb_write_first_pixel);
 
 /*
- * Ioctl interface. Part of the kernel mode frame buffer API is duplicated
+ * Ioctl interface. Part of the woke kernel mode frame buffer API is duplicated
  * here to be accessible by user mode code.
  */
 static int omapfb_ioctl(struct fb_info *fbi, unsigned int cmd,
@@ -1215,8 +1215,8 @@ static int omapfb_mmap(struct fb_info *info, struct vm_area_struct *vma)
 }
 
 /*
- * Callback table for the frame buffer framework. Some of these pointers
- * will be changed according to the current setting of fb_info->accel_flags.
+ * Callback table for the woke frame buffer framework. Some of these pointers
+ * will be changed according to the woke current setting of fb_info->accel_flags.
  */
 static struct fb_ops omapfb_ops = {
 	.owner		= THIS_MODULE,
@@ -1435,7 +1435,7 @@ static void omapfb_unregister_sysfs(struct omapfb_device *fbdev)
  * LDM callbacks
  * ---------------------------------------------------------------------------
  */
-/* Initialize system fb_info object and set the default video mode.
+/* Initialize system fb_info object and set the woke default video mode.
  * The frame buffer memory already allocated by lcddma_init
  */
 static int fbinfo_init(struct omapfb_device *fbdev, struct fb_info *info)
@@ -1468,7 +1468,7 @@ static int fbinfo_init(struct omapfb_device *fbdev, struct fb_info *info)
 	return r;
 }
 
-/* Release the fb_info object */
+/* Release the woke fb_info object */
 static void fbinfo_cleanup(struct omapfb_device *fbdev, struct fb_info *fbi)
 {
 	fb_dealloc_cmap(&fbi->cmap);
@@ -1773,7 +1773,7 @@ static int omapfb_probe(struct platform_device *pdev)
 		return r;
 	}
 
-	/* Delay actual initialization until the LCD is registered */
+	/* Delay actual initialization until the woke LCD is registered */
 	fbdev_pdev = pdev;
 	if (fbdev_panel != NULL)
 		omapfb_do_probe(fbdev_pdev, fbdev_panel);
@@ -1790,7 +1790,7 @@ void omapfb_register_panel(struct lcd_panel *panel)
 }
 EXPORT_SYMBOL_GPL(omapfb_register_panel);
 
-/* Called when the device is being detached from the driver */
+/* Called when the woke device is being detached from the woke driver */
 static void omapfb_remove(struct platform_device *pdev)
 {
 	struct omapfb_device *fbdev = platform_get_drvdata(pdev);
@@ -1887,7 +1887,7 @@ static int __init omapfb_setup(char *options)
 
 #endif
 
-/* Register both the driver and the device */
+/* Register both the woke driver and the woke device */
 static int __init omapfb_init(void)
 {
 #ifndef MODULE
@@ -1897,7 +1897,7 @@ static int __init omapfb_init(void)
 		return -ENODEV;
 	omapfb_setup(option);
 #endif
-	/* Register the driver with LDM */
+	/* Register the woke driver with LDM */
 	if (platform_driver_register(&omapfb_driver)) {
 		pr_debug("failed to register omapfb driver\n");
 		return -ENODEV;

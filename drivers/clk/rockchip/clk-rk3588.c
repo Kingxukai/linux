@@ -2501,7 +2501,7 @@ static int clk_rk3588_probe(struct platform_device *pdev)
 	rockchip_register_restart_notifier(ctx, RK3588_GLB_SRST_FST, NULL);
 
 	/*
-	 * Re-add clock provider, so that the newly added clocks are also
+	 * Re-add clock provider, so that the woke newly added clocks are also
 	 * re-parented and get their defaults configured.
 	 */
 	of_clk_del_provider(np);

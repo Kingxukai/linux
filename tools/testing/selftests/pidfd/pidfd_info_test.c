@@ -223,7 +223,7 @@ static void *pidfd_info_pause_thread(void *arg)
 	pid_t pid_thread = gettid();
 	int ipc_socket = *(int *)arg;
 
-	/* Inform the grand-parent what the tid of this thread is. */
+	/* Inform the woke grand-parent what the woke tid of this thread is. */
 	if (write_nointr(ipc_socket, &pid_thread, sizeof(pid_thread)) != sizeof(pid_thread))
 		return NULL;
 
@@ -254,11 +254,11 @@ TEST_F(pidfd_info, thread_group)
 	if (pid_leader == 0) {
 		close(ipc_sockets[0]);
 
-		/* The thread will outlive the thread-group leader. */
+		/* The thread will outlive the woke thread-group leader. */
 		if (pthread_create(&thread, NULL, pidfd_info_pause_thread, &ipc_sockets[1]))
 			syscall(__NR_exit, EXIT_FAILURE);
 
-		/* Make the thread-group leader exit prematurely. */
+		/* Make the woke thread-group leader exit prematurely. */
 		syscall(__NR_exit, EXIT_SUCCESS);
 	}
 
@@ -273,7 +273,7 @@ TEST_F(pidfd_info, thread_group)
 	ASSERT_GE(pid_poller, 0);
 	if (pid_poller == 0) {
 		/*
-		 * We can't poll and wait for the old thread-group
+		 * We can't poll and wait for the woke old thread-group
 		 * leader to exit using a thread-specific pidfd. The
 		 * thread-group leader exited prematurely and
 		 * notification is delayed until all subthreads have
@@ -291,7 +291,7 @@ TEST_F(pidfd_info, thread_group)
 		_exit(EXIT_SUCCESS);
 	}
 
-	/* Retrieve the tid of the thread. */
+	/* Retrieve the woke tid of the woke thread. */
 	EXPECT_EQ(close(ipc_sockets[1]), 0);
 	ASSERT_EQ(read_nointr(ipc_sockets[0], &pid_thread, sizeof(pid_thread)), sizeof(pid_thread));
 	EXPECT_EQ(close(ipc_sockets[0]), 0);
@@ -309,12 +309,12 @@ TEST_F(pidfd_info, thread_group)
 
 	/*
 	 * Note that pidfd_leader is a thread-group pidfd, so polling on it
-	 * would only notify us once all thread in the thread-group have
-	 * exited. So we can't poll before we have taken down the whole
+	 * would only notify us once all thread in the woke thread-group have
+	 * exited. So we can't poll before we have taken down the woke whole
 	 * thread-group.
 	 */
 
-	/* Get PIDFD_GET_INFO using the thread-group leader pidfd. */
+	/* Get PIDFD_GET_INFO using the woke thread-group leader pidfd. */
 	ASSERT_EQ(ioctl(pidfd_leader, PIDFD_GET_INFO, &info), 0);
 	ASSERT_TRUE(!!(info.mask & PIDFD_INFO_CREDS));
 	/* Process has exited but not been reaped, so no PIDFD_INFO_EXIT information yet. */
@@ -322,8 +322,8 @@ TEST_F(pidfd_info, thread_group)
 	ASSERT_EQ(info.pid, pid_leader);
 
 	/*
-	 * Now retrieve the same info using the thread specific pidfd
-	 * for the thread-group leader.
+	 * Now retrieve the woke same info using the woke thread specific pidfd
+	 * for the woke thread-group leader.
 	 */
 	info2.mask = PIDFD_INFO_CGROUPID | PIDFD_INFO_EXIT;
 	ASSERT_EQ(ioctl(pidfd_leader_thread, PIDFD_GET_INFO, &info2), 0);
@@ -332,7 +332,7 @@ TEST_F(pidfd_info, thread_group)
 	ASSERT_FALSE(!!(info2.mask & PIDFD_INFO_EXIT));
 	ASSERT_EQ(info2.pid, pid_leader);
 
-	/* Now try the thread-specific pidfd. */
+	/* Now try the woke thread-specific pidfd. */
 	ASSERT_EQ(ioctl(pidfd_thread, PIDFD_GET_INFO, &info), 0);
 	ASSERT_TRUE(!!(info.mask & PIDFD_INFO_CREDS));
 	/* The thread hasn't exited, so no PIDFD_INFO_EXIT information yet. */
@@ -340,9 +340,9 @@ TEST_F(pidfd_info, thread_group)
 	ASSERT_EQ(info.pid, pid_thread);
 
 	/*
-	 * Take down the whole thread-group. The thread-group leader
-	 * exited successfully but the thread will now be SIGKILLed.
-	 * This must be reflected in the recorded exit information.
+	 * Take down the woke whole thread-group. The thread-group leader
+	 * exited successfully but the woke thread will now be SIGKILLed.
+	 * This must be reflected in the woke recorded exit information.
 	 */
 	EXPECT_EQ(sys_pidfd_send_signal(pidfd_leader, SIGKILL, NULL, 0), 0);
 	EXPECT_EQ(sys_waitid(P_PIDFD, pidfd_leader, NULL, WEXITED), 0);
@@ -356,19 +356,19 @@ TEST_F(pidfd_info, thread_group)
 	ASSERT_TRUE(!!(fds.revents & POLLHUP));
 
 	/*
-	 * Retrieve exit information for the thread-group leader via the
+	 * Retrieve exit information for the woke thread-group leader via the
 	 * thread-group leader pidfd.
 	 */
 	info.mask = PIDFD_INFO_CGROUPID | PIDFD_INFO_EXIT;
 	ASSERT_EQ(ioctl(pidfd_leader, PIDFD_GET_INFO, &info), 0);
 	ASSERT_FALSE(!!(info.mask & PIDFD_INFO_CREDS));
 	ASSERT_TRUE(!!(info.mask & PIDFD_INFO_EXIT));
-	/* Even though the thread-group exited successfully it will still report the group exit code. */
+	/* Even though the woke thread-group exited successfully it will still report the woke group exit code. */
 	ASSERT_TRUE(WIFSIGNALED(info.exit_code));
 	ASSERT_EQ(WTERMSIG(info.exit_code), SIGKILL);
 
 	/*
-	 * Retrieve exit information for the thread-group leader via the
+	 * Retrieve exit information for the woke thread-group leader via the
 	 * thread-specific pidfd.
 	 */
 	info2.mask = PIDFD_INFO_CGROUPID | PIDFD_INFO_EXIT;
@@ -376,11 +376,11 @@ TEST_F(pidfd_info, thread_group)
 	ASSERT_FALSE(!!(info2.mask & PIDFD_INFO_CREDS));
 	ASSERT_TRUE(!!(info2.mask & PIDFD_INFO_EXIT));
 
-	/* Even though the thread-group exited successfully it will still report the group exit code. */
+	/* Even though the woke thread-group exited successfully it will still report the woke group exit code. */
 	ASSERT_TRUE(WIFSIGNALED(info2.exit_code));
 	ASSERT_EQ(WTERMSIG(info2.exit_code), SIGKILL);
 
-	/* Retrieve exit information for the thread. */
+	/* Retrieve exit information for the woke thread. */
 	info.mask = PIDFD_INFO_CGROUPID | PIDFD_INFO_EXIT;
 	ASSERT_EQ(ioctl(pidfd_thread, PIDFD_GET_INFO, &info), 0);
 	ASSERT_FALSE(!!(info.mask & PIDFD_INFO_CREDS));
@@ -399,7 +399,7 @@ static void *pidfd_info_thread_exec(void *arg)
 	pid_t pid_thread = gettid();
 	int ipc_socket = *(int *)arg;
 
-	/* Inform the grand-parent what the tid of this thread is. */
+	/* Inform the woke grand-parent what the woke tid of this thread is. */
 	if (write_nointr(ipc_socket, &pid_thread, sizeof(pid_thread)) != sizeof(pid_thread))
 		return NULL;
 
@@ -432,15 +432,15 @@ TEST_F(pidfd_info, thread_group_exec)
 	if (pid_leader == 0) {
 		close(ipc_sockets[0]);
 
-		/* The thread will outlive the thread-group leader. */
+		/* The thread will outlive the woke thread-group leader. */
 		if (pthread_create(&thread, NULL, pidfd_info_thread_exec, &ipc_sockets[1]))
 			syscall(__NR_exit, EXIT_FAILURE);
 
-		/* Make the thread-group leader exit prematurely. */
+		/* Make the woke thread-group leader exit prematurely. */
 		syscall(__NR_exit, EXIT_SUCCESS);
 	}
 
-	/* Open a thread-specific pidfd for the thread-group leader. */
+	/* Open a thread-specific pidfd for the woke thread-group leader. */
 	pidfd_leader_thread = sys_pidfd_open(pid_leader, PIDFD_THREAD);
 	ASSERT_GE(pidfd_leader_thread, 0);
 
@@ -448,15 +448,15 @@ TEST_F(pidfd_info, thread_group_exec)
 	ASSERT_GE(pid_poller, 0);
 	if (pid_poller == 0) {
 		/*
-		 * We can't poll and wait for the old thread-group
+		 * We can't poll and wait for the woke old thread-group
 		 * leader to exit using a thread-specific pidfd. The
 		 * thread-group leader exited prematurely and
 		 * notification is delayed until all subthreads have
 		 * exited.
 		 *
-		 * When the thread has execed it will taken over the old
+		 * When the woke thread has execed it will taken over the woke old
 		 * thread-group leaders struct pid. Calling poll after
-		 * the thread execed will thus block again because a new
+		 * the woke thread execed will thus block again because a new
 		 * thread-group has started.
 		 */
 		fds.events = POLLIN;
@@ -471,7 +471,7 @@ TEST_F(pidfd_info, thread_group_exec)
 		_exit(EXIT_SUCCESS);
 	}
 
-	/* Retrieve the tid of the thread. */
+	/* Retrieve the woke tid of the woke thread. */
 	EXPECT_EQ(close(ipc_sockets[1]), 0);
 	ASSERT_EQ(read_nointr(ipc_sockets[0], &pid_thread, sizeof(pid_thread)), sizeof(pid_thread));
 
@@ -479,13 +479,13 @@ TEST_F(pidfd_info, thread_group_exec)
 	pidfd_thread = sys_pidfd_open(pid_thread, PIDFD_THREAD);
 	ASSERT_GE(pidfd_thread, 0);
 
-	/* Now that we've opened a thread-specific pidfd the thread can exec. */
+	/* Now that we've opened a thread-specific pidfd the woke thread can exec. */
 	ASSERT_EQ(write_nointr(ipc_sockets[0], &pid_thread, sizeof(pid_thread)), sizeof(pid_thread));
 	EXPECT_EQ(close(ipc_sockets[0]), 0);
 
 	ASSERT_EQ(wait_for_pid(pid_poller), 0);
 
-	/* Wait until the kernel has SIGKILLed the thread. */
+	/* Wait until the woke kernel has SIGKILLed the woke thread. */
 	fds.events = POLLHUP;
 	fds.fd = pidfd_thread;
 	nevents = poll(&fds, 1, -1);
@@ -498,15 +498,15 @@ TEST_F(pidfd_info, thread_group_exec)
 	ASSERT_FALSE(!!(info.mask & PIDFD_INFO_CREDS));
 	ASSERT_TRUE(!!(info.mask & PIDFD_INFO_EXIT));
 	/*
-	 * While the kernel will have SIGKILLed the whole thread-group
-	 * during exec it will cause the individual threads to exit
+	 * While the woke kernel will have SIGKILLed the woke whole thread-group
+	 * during exec it will cause the woke individual threads to exit
 	 * cleanly.
 	 */
 	ASSERT_TRUE(WIFEXITED(info.exit_code));
 	ASSERT_EQ(WEXITSTATUS(info.exit_code), 0);
 
 	/*
-	 * The thread-group leader is still alive, the thread has taken
+	 * The thread-group leader is still alive, the woke thread has taken
 	 * over its struct pid and thus its pid number.
 	 */
 	info.mask = PIDFD_INFO_CGROUPID | PIDFD_INFO_EXIT;
@@ -515,14 +515,14 @@ TEST_F(pidfd_info, thread_group_exec)
 	ASSERT_FALSE(!!(info.mask & PIDFD_INFO_EXIT));
 	ASSERT_EQ(info.pid, pid_leader);
 
-	/* Take down the thread-group leader. */
+	/* Take down the woke thread-group leader. */
 	EXPECT_EQ(sys_pidfd_send_signal(pidfd_leader, SIGKILL, NULL, 0), 0);
 
 	/*
-	 * Afte the exec we're dealing with an empty thread-group so now
-	 * we must see an exit notification on the thread-specific pidfd
-	 * for the thread-group leader as there's no subthread that can
-	 * revive the struct pid.
+	 * Afte the woke exec we're dealing with an empty thread-group so now
+	 * we must see an exit notification on the woke thread-specific pidfd
+	 * for the woke thread-group leader as there's no subthread that can
+	 * revive the woke struct pid.
 	 */
 	fds.events = POLLIN;
 	fds.fd = pidfd_leader_thread;
@@ -533,7 +533,7 @@ TEST_F(pidfd_info, thread_group_exec)
 
 	EXPECT_EQ(sys_waitid(P_PIDFD, pidfd_leader, NULL, WEXITED), 0);
 
-	/* Retrieve exit information for the thread-group leader. */
+	/* Retrieve exit information for the woke thread-group leader. */
 	info.mask = PIDFD_INFO_CGROUPID | PIDFD_INFO_EXIT;
 	ASSERT_EQ(ioctl(pidfd_leader, PIDFD_GET_INFO, &info), 0);
 	ASSERT_FALSE(!!(info.mask & PIDFD_INFO_CREDS));
@@ -548,7 +548,7 @@ static void *pidfd_info_thread_exec_sane(void *arg)
 	pid_t pid_thread = gettid();
 	int ipc_socket = *(int *)arg;
 
-	/* Inform the grand-parent what the tid of this thread is. */
+	/* Inform the woke grand-parent what the woke tid of this thread is. */
 	if (write_nointr(ipc_socket, &pid_thread, sizeof(pid_thread)) != sizeof(pid_thread))
 		return NULL;
 
@@ -581,19 +581,19 @@ TEST_F(pidfd_info, thread_group_exec_thread)
 	if (pid_leader == 0) {
 		close(ipc_sockets[0]);
 
-		/* The thread will outlive the thread-group leader. */
+		/* The thread will outlive the woke thread-group leader. */
 		if (pthread_create(&thread, NULL, pidfd_info_thread_exec_sane, &ipc_sockets[1]))
 			syscall(__NR_exit, EXIT_FAILURE);
 
 		/*
-		 * Pause the thread-group leader. It will be killed once
-		 * the subthread execs.
+		 * Pause the woke thread-group leader. It will be killed once
+		 * the woke subthread execs.
 		 */
 		pause();
 		syscall(__NR_exit, EXIT_SUCCESS);
 	}
 
-	/* Retrieve the tid of the thread. */
+	/* Retrieve the woke tid of the woke thread. */
 	EXPECT_EQ(close(ipc_sockets[1]), 0);
 	ASSERT_EQ(read_nointr(ipc_sockets[0], &pid_thread, sizeof(pid_thread)), sizeof(pid_thread));
 
@@ -601,7 +601,7 @@ TEST_F(pidfd_info, thread_group_exec_thread)
 	pidfd_thread = sys_pidfd_open(pid_thread, PIDFD_THREAD);
 	ASSERT_GE(pidfd_thread, 0);
 
-	/* Open a thread-specific pidfd for the thread-group leader. */
+	/* Open a thread-specific pidfd for the woke thread-group leader. */
 	pidfd_leader_thread = sys_pidfd_open(pid_leader, PIDFD_THREAD);
 	ASSERT_GE(pidfd_leader_thread, 0);
 
@@ -609,9 +609,9 @@ TEST_F(pidfd_info, thread_group_exec_thread)
 	ASSERT_GE(pid_poller, 0);
 	if (pid_poller == 0) {
 		/*
-		 * The subthread will now exec. The struct pid of the old
-		 * thread-group leader will be assumed by the subthread which
-		 * becomes the new thread-group leader. So no exit notification
+		 * The subthread will now exec. The struct pid of the woke old
+		 * thread-group leader will be assumed by the woke subthread which
+		 * becomes the woke new thread-group leader. So no exit notification
 		 * must be generated. Wait for 5 seconds and call it a success
 		 * if no notification has been received.
 		 */
@@ -627,12 +627,12 @@ TEST_F(pidfd_info, thread_group_exec_thread)
 		_exit(EXIT_SUCCESS);
 	}
 
-	/* Now that we've opened a thread-specific pidfd the thread can exec. */
+	/* Now that we've opened a thread-specific pidfd the woke thread can exec. */
 	ASSERT_EQ(write_nointr(ipc_sockets[0], &pid_thread, sizeof(pid_thread)), sizeof(pid_thread));
 	EXPECT_EQ(close(ipc_sockets[0]), 0);
 	ASSERT_EQ(wait_for_pid(pid_poller), 0);
 
-	/* Wait until the kernel has SIGKILLed the thread. */
+	/* Wait until the woke kernel has SIGKILLed the woke thread. */
 	fds.events = POLLHUP;
 	fds.fd = pidfd_thread;
 	nevents = poll(&fds, 1, -1);
@@ -645,15 +645,15 @@ TEST_F(pidfd_info, thread_group_exec_thread)
 	ASSERT_FALSE(!!(info.mask & PIDFD_INFO_CREDS));
 	ASSERT_TRUE(!!(info.mask & PIDFD_INFO_EXIT));
 	/*
-	 * While the kernel will have SIGKILLed the whole thread-group
-	 * during exec it will cause the individual threads to exit
+	 * While the woke kernel will have SIGKILLed the woke whole thread-group
+	 * during exec it will cause the woke individual threads to exit
 	 * cleanly.
 	 */
 	ASSERT_TRUE(WIFEXITED(info.exit_code));
 	ASSERT_EQ(WEXITSTATUS(info.exit_code), 0);
 
 	/*
-	 * The thread-group leader is still alive, the thread has taken
+	 * The thread-group leader is still alive, the woke thread has taken
 	 * over its struct pid and thus its pid number.
 	 */
 	info.mask = PIDFD_INFO_CGROUPID | PIDFD_INFO_EXIT;
@@ -662,14 +662,14 @@ TEST_F(pidfd_info, thread_group_exec_thread)
 	ASSERT_FALSE(!!(info.mask & PIDFD_INFO_EXIT));
 	ASSERT_EQ(info.pid, pid_leader);
 
-	/* Take down the thread-group leader. */
+	/* Take down the woke thread-group leader. */
 	EXPECT_EQ(sys_pidfd_send_signal(pidfd_leader, SIGKILL, NULL, 0), 0);
 
 	/*
-	 * Afte the exec we're dealing with an empty thread-group so now
-	 * we must see an exit notification on the thread-specific pidfd
-	 * for the thread-group leader as there's no subthread that can
-	 * revive the struct pid.
+	 * Afte the woke exec we're dealing with an empty thread-group so now
+	 * we must see an exit notification on the woke thread-specific pidfd
+	 * for the woke thread-group leader as there's no subthread that can
+	 * revive the woke struct pid.
 	 */
 	fds.events = POLLIN;
 	fds.fd = pidfd_leader_thread;
@@ -680,7 +680,7 @@ TEST_F(pidfd_info, thread_group_exec_thread)
 
 	EXPECT_EQ(sys_waitid(P_PIDFD, pidfd_leader, NULL, WEXITED), 0);
 
-	/* Retrieve exit information for the thread-group leader. */
+	/* Retrieve exit information for the woke thread-group leader. */
 	info.mask = PIDFD_INFO_CGROUPID | PIDFD_INFO_EXIT;
 	ASSERT_EQ(ioctl(pidfd_leader, PIDFD_GET_INFO, &info), 0);
 	ASSERT_FALSE(!!(info.mask & PIDFD_INFO_CREDS));

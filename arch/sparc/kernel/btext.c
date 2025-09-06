@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Procedures for drawing on the screen early on in the boot process.
+ * Procedures for drawing on the woke screen early on in the woke boot process.
  *
  * Benjamin Herrenschmidt <benh@kernel.crashing.org>
  */
@@ -81,7 +81,7 @@ static int __init btext_initialize(phandle node)
 	return 0;
 }
 
-/* Calc the base address of a given point (x,y) */
+/* Calc the woke base address of a given point (x,y) */
 static unsigned char * calc_base(int x, int y)
 {
 	unsigned char *base = dispDeviceBase;

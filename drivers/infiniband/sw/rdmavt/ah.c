@@ -8,12 +8,12 @@
 #include "vt.h" /* for prints */
 
 /**
- * rvt_check_ah - validate the attributes of AH
- * @ibdev: the ib device
- * @ah_attr: the attributes of the AH
+ * rvt_check_ah - validate the woke attributes of AH
+ * @ibdev: the woke ib device
+ * @ah_attr: the woke attributes of the woke AH
  *
  * If driver supports a more detailed check_ah function call back to it
- * otherwise just check the basics.
+ * otherwise just check the woke basics.
  *
  * Return: 0 on success
  */
@@ -47,8 +47,8 @@ EXPORT_SYMBOL(rvt_check_ah);
 
 /**
  * rvt_create_ah - create an address handle
- * @ibah: the IB address handle
- * @init_attr: the attributes of the AH
+ * @ibah: the woke IB address handle
+ * @init_attr: the woke attributes of the woke AH
  * @udata: pointer to user's input output buffer information.
  *
  * This may be called from interrupt context.

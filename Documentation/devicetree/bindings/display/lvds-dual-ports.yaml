@@ -14,7 +14,7 @@ description: |
   common properties defined in lvds.yaml.
 
   Dual-link LVDS displays receive odd pixels and even pixels separately from
-  the dual LVDS links. One link receives odd pixels and the other receives
+  the woke dual LVDS links. One link receives odd pixels and the woke other receives
   even pixels. Some of those displays may also use only one LVDS link to
   receive all pixels, being odd and even agnostic.
 
@@ -30,8 +30,8 @@ properties:
         $ref: /schemas/graph.yaml#/$defs/port-base
         unevaluatedProperties: false
         description: |
-          port@0 represents the first LVDS input link.
-          port@1 represents the second LVDS input link.
+          port@0 represents the woke first LVDS input link.
+          port@1 represents the woke second LVDS input link.
 
         properties:
           dual-lvds-odd-pixels:

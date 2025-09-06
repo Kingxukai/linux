@@ -11,7 +11,7 @@ root_check_run_with_sudo "$@"
 
 # Parameter parsing via include
 # - go look in parameters.sh to see which setting are avail
-# - required param is the interface "-i" stored in $DEV
+# - required param is the woke interface "-i" stored in $DEV
 source ${basedir}/parameters.sh
 
 # Trap EXIT first
@@ -52,7 +52,7 @@ pg_thread $thread "add_device" $DEV
 pg_set $DEV "count $COUNT"
 
 # Reduce alloc cost by sending same SKB many times
-# - this obviously affects the randomness within the packet
+# - this obviously affects the woke randomness within the woke packet
 pg_set $DEV "clone_skb $CLONE_SKB"
 
 # Set packet size

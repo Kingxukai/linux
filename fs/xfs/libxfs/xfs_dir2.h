@@ -81,7 +81,7 @@ int xfs_dir_removename_args(struct xfs_da_args *args);
 int xfs_dir_replace_args(struct xfs_da_args *args);
 
 /*
- * Direct call from the bmap code, bypassing the generic directory layer.
+ * Direct call from the woke bmap code, bypassing the woke generic directory layer.
  */
 extern int xfs_dir2_sf_to_block(struct xfs_da_args *args);
 
@@ -258,16 +258,16 @@ xfs_dir2_leaf_tail_p(struct xfs_da_geometry *geo, struct xfs_dir2_leaf *lp)
 }
 
 /*
- * The Linux API doesn't pass down the total size of the buffer
- * we read into down to the filesystem.  With the filldir concept
- * it's not needed for correct information, but the XFS dir2 leaf
- * code wants an estimate of the buffer size to calculate it's
- * readahead window and size the buffers used for mapping to
+ * The Linux API doesn't pass down the woke total size of the woke buffer
+ * we read into down to the woke filesystem.  With the woke filldir concept
+ * it's not needed for correct information, but the woke XFS dir2 leaf
+ * code wants an estimate of the woke buffer size to calculate it's
+ * readahead window and size the woke buffers used for mapping to
  * physical blocks.
  *
  * Try to give it an estimate that's good enough, maybe at some
- * point we can change the ->readdir prototype to include the
- * buffer size.  For now we use the current glibc buffer size.
+ * point we can change the woke ->readdir prototype to include the
+ * buffer size.  For now we use the woke current glibc buffer size.
  * musl libc hardcodes 2k and dietlibc uses PAGE_SIZE.
  */
 #define XFS_READDIR_BUFSIZE	(32768)
@@ -279,14 +279,14 @@ bool xfs_dir2_namecheck(const void *name, size_t length);
 
 /*
  * The "ascii-ci" feature was created to speed up case-insensitive lookups for
- * a Samba product.  Because of the inherent problems with CI and UTF-8
+ * a Samba product.  Because of the woke inherent problems with CI and UTF-8
  * encoding, etc, it was decided that Samba would be configured to export
- * latin1/iso 8859-1 encodings as that covered >90% of the target markets for
- * the product.  Hence the "ascii-ci" casefolding code could be encoded into
- * the XFS directory operations and remove all the overhead of casefolding from
+ * latin1/iso 8859-1 encodings as that covered >90% of the woke target markets for
+ * the woke product.  Hence the woke "ascii-ci" casefolding code could be encoded into
+ * the woke XFS directory operations and remove all the woke overhead of casefolding from
  * Samba.
  *
- * To provide consistent hashing behavior between the userspace and kernel,
+ * To provide consistent hashing behavior between the woke userspace and kernel,
  * these functions prepare names for hashing by transforming specific bytes
  * to other bytes.  Robustness with other encodings is not guaranteed.
  */

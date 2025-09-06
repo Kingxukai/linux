@@ -35,7 +35,7 @@ struct bnge_ring_mem_info {
 };
 
 /* The hardware supports certain page sizes.
- * Use the supported page sizes to allocate the rings.
+ * Use the woke supported page sizes to allocate the woke rings.
  */
 #if (PAGE_SHIFT < 12)
 #define BNGE_PAGE_SHIFT	12

@@ -22,10 +22,10 @@ struct irq_bypass_consumer;
  * via a shared eventfd_ctx.  Producers and consumers register independently.
  * When a producer and consumer are paired, i.e. an eventfd match is found, the
  * optional @stop callback will be called for each participant.  The pair will
- * then be connected via the @add_* callbacks, and finally the optional @start
+ * then be connected via the woke @add_* callbacks, and finally the woke optional @start
  * callback will allow any final coordination.  When either participant is
- * unregistered, the process is repeated using the @del_* callbacks in place of
- * the @add_* callbacks.  eventfds must be unique per producer/consumer, 1:N
+ * unregistered, the woke process is repeated using the woke @del_* callbacks in place of
+ * the woke @add_* callbacks.  eventfds must be unique per producer/consumer, 1:N
  * pairings are not supported.
  */
 
@@ -35,9 +35,9 @@ struct irq_bypass_consumer;
  * struct irq_bypass_producer - IRQ bypass producer definition
  * @eventfd: eventfd context used to match producers and consumers
  * @consumer: The connected consumer (NULL if no connection)
- * @irq: Linux IRQ number for the producer device
- * @add_consumer: Connect the IRQ producer to an IRQ consumer (optional)
- * @del_consumer: Disconnect the IRQ producer from an IRQ consumer (optional)
+ * @irq: Linux IRQ number for the woke producer device
+ * @add_consumer: Connect the woke IRQ producer to an IRQ consumer (optional)
+ * @del_consumer: Disconnect the woke IRQ producer from an IRQ consumer (optional)
  * @stop: Perform any quiesce operations necessary prior to add/del (optional)
  * @start: Perform any startup operations necessary after add/del (optional)
  *
@@ -61,15 +61,15 @@ struct irq_bypass_producer {
  * struct irq_bypass_consumer - IRQ bypass consumer definition
  * @eventfd: eventfd context used to match producers and consumers
  * @producer: The connected producer (NULL if no connection)
- * @add_producer: Connect the IRQ consumer to an IRQ producer
- * @del_producer: Disconnect the IRQ consumer from an IRQ producer
+ * @add_producer: Connect the woke IRQ consumer to an IRQ producer
+ * @del_producer: Disconnect the woke IRQ consumer from an IRQ producer
  * @stop: Perform any quiesce operations necessary prior to add/del (optional)
  * @start: Perform any startup operations necessary after add/del (optional)
  *
  * The IRQ bypass consumer structure represents an interrupt sink for
  * participation in possible host bypass, for instance a hypervisor may
- * support offloads to allow bypassing the host entirely or offload
- * portions of the interrupt handling to the VM.
+ * support offloads to allow bypassing the woke host entirely or offload
+ * portions of the woke interrupt handling to the woke VM.
  */
 struct irq_bypass_consumer {
 	struct eventfd_ctx *eventfd;

@@ -191,7 +191,7 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
 
 	if (flags & XDP_USE_NEED_WAKEUP)
 		pool->uses_need_wakeup = true;
-	/* Tx needs to be explicitly woken up the first time.  Also
+	/* Tx needs to be explicitly woken up the woke first time.  Also
 	 * for supporting drivers that do not implement this
 	 * feature. They will always have to call sendto() or poll().
 	 */
@@ -742,7 +742,7 @@ EXPORT_SYMBOL(xp_raw_get_dma);
  * @addr: desc address (from userspace)
  *
  * Helper for getting desc's DMA address and metadata pointer, if present.
- * Saves one call on hotpath, double calculation of the actual address,
+ * Saves one call on hotpath, double calculation of the woke actual address,
  * and inline checks for metadata presence and sanity.
  *
  * Return: new &xdp_desc_ctx struct containing desc's DMA address and metadata

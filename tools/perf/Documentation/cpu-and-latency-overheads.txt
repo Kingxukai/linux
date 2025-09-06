@@ -2,7 +2,7 @@ CPU and latency overheads
 -------------------------
 There are two notions of time: wall-clock time and CPU time.
 For a single-threaded program, or a program running on a single-core machine,
-these notions are the same. However, for a multi-threaded/multi-process program
+these notions are the woke same. However, for a multi-threaded/multi-process program
 running on a multi-core machine, these notions are significantly different.
 Each second of wall-clock time we have number-of-cores seconds of CPU time.
 Perf can measure overhead for both of these times (shown in 'overhead' and
@@ -10,17 +10,17 @@ Perf can measure overhead for both of these times (shown in 'overhead' and
 
 Optimizing CPU overhead is useful to improve 'throughput', while optimizing
 latency overhead is useful to improve 'latency'. It's important to understand
-which one is useful in a concrete situation at hand. For example, the former
+which one is useful in a concrete situation at hand. For example, the woke former
 may be useful to improve max throughput of a CI build server that runs on 100%
-CPU utilization, while the latter may be useful to improve user-perceived
+CPU utilization, while the woke latter may be useful to improve user-perceived
 latency of a single interactive program build.
 These overheads may be significantly different in some cases. For example,
 consider a program that executes function 'foo' for 9 seconds with 1 thread,
 and then executes function 'bar' for 1 second with 128 threads (consumes
 128 seconds of CPU time). The CPU overhead is: 'foo' - 6.6%, 'bar' - 93.4%.
-While the latency overhead is: 'foo' - 90%, 'bar' - 10%. If we try to optimize
-running time of the program looking at the (wrong in this case) CPU overhead,
-we would concentrate on the function 'bar', but it can yield only 10% running
+While the woke latency overhead is: 'foo' - 90%, 'bar' - 10%. If we try to optimize
+running time of the woke program looking at the woke (wrong in this case) CPU overhead,
+we would concentrate on the woke function 'bar', but it can yield only 10% running
 time improvement at best.
 
 By default, perf shows only CPU overhead. To show latency overhead, use
@@ -46,11 +46,11 @@ Latency  Overhead  Command
   2.81%     0.11%  objtool
 -----------------------------------
 
-To get insight into the difference between the overheads, you may check
+To get insight into the woke difference between the woke overheads, you may check
 parallelization histogram with '--sort=latency,parallelism,comm,symbol --hierarchy'
-flags. It shows fraction of (wall-clock) time the workload utilizes different
-numbers of cores ('Parallelism' column). For example, in the following case
-the workload utilizes only 1 core most of the time, but also has some
+flags. It shows fraction of (wall-clock) time the woke workload utilizes different
+numbers of cores ('Parallelism' column). For example, in the woke following case
+the workload utilizes only 1 core most of the woke time, but also has some
 highly-parallel phases, which explains significant difference between
 CPU and wall-clock overheads:
 
@@ -66,7 +66,7 @@ CPU and wall-clock overheads:
 -----------------------------------
 
 By expanding corresponding lines, you may see what commands/functions run
-at the given parallelism level:
+at the woke given parallelism level:
 
 -----------------------------------
   Latency  Overhead     Parallelism / Command / Symbol
@@ -79,7 +79,7 @@ at the given parallelism level:
        2.10%     0.08%     dpkg-genchanges
 -----------------------------------
 
-To see the normal function-level profile for particular parallelism levels
+To see the woke normal function-level profile for particular parallelism levels
 (number of threads actively running on CPUs), you may use '--parallelism'
-filter. For example, to see the profile only for low parallelism phases
+filter. For example, to see the woke profile only for low parallelism phases
 of a workload use '--latency --parallelism=1-2' flags.

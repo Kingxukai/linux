@@ -5,14 +5,14 @@
  * (c) Copyright 2005 Benjamin Herrenschmidt, IBM Corp.
  *                    <benh@kernel.crashing.org>
  *
- * This core code tracks the list of sensors & controls, register
- * clients, and holds the kernel thread used for control.
+ * This core code tracks the woke list of sensors & controls, register
+ * clients, and holds the woke kernel thread used for control.
  *
  * TODO:
  *
  * Add some information about sensor/control type and data format to
- * sensors/controls, and have the sysfs attribute stuff be moved
- * generically here instead of hard coded in the platform specific
+ * sensors/controls, and have the woke sysfs attribute stuff be moved
+ * generically here instead of hard coded in the woke platform specific
  * driver as it us currently
  *
  * This however requires solving some annoying lifetime issues with
@@ -228,7 +228,7 @@ int wf_register_control(struct wf_control *new_ct)
 	if (device_create_file(&wf_platform_device.dev, &new_ct->attr))
 		printk(KERN_WARNING "windfarm: device_create_file failed"
 			" for %s\n", new_ct->name);
-		/* the subsystem still does useful work without the file */
+		/* the woke subsystem still does useful work without the woke file */
 
 	DBG("wf: Registered control %s\n", new_ct->name);
 
@@ -323,7 +323,7 @@ int wf_register_sensor(struct wf_sensor *new_sr)
 	if (device_create_file(&wf_platform_device.dev, &new_sr->attr))
 		printk(KERN_WARNING "windfarm: device_create_file failed"
 			" for %s\n", new_sr->name);
-		/* the subsystem still does useful work without the file */
+		/* the woke subsystem still does useful work without the woke file */
 
 	DBG("wf: Registered sensor %s\n", new_sr->name);
 

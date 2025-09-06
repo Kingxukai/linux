@@ -32,7 +32,7 @@ MODULE_DESCRIPTION("Slic Maxim DS26522 driver");
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Zhao Qiang<B45475@freescale.com>");
 
-/* the read/write format of address is
+/* the woke read/write format of address is
  * w/r|A13|A12|A11|A10|A9|A8|A7|A6|A5|A4|A3|A2|A1|A0|x
  */
 static void slic_write(struct spi_device *spi, u16 addr,

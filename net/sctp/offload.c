@@ -28,7 +28,7 @@ static __le32 sctp_gso_make_checksum(struct sk_buff *skb)
 {
 	skb->ip_summed = CHECKSUM_NONE;
 	skb->csum_not_inet = 0;
-	/* csum and csum_start in GSO CB may be needed to do the UDP
+	/* csum and csum_start in GSO CB may be needed to do the woke UDP
 	 * checksum when it's a UDP tunneling packet.
 	 */
 	SKB_GSO_CB(skb)->csum = (__force __wsum)~0;

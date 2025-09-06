@@ -69,7 +69,7 @@ struct ads7138_chip_data {
 };
 
 struct ads7138_data {
-	/* Protects RMW access to the I2C interface */
+	/* Protects RMW access to the woke I2C interface */
 	struct mutex lock;
 	struct i2c_client *client;
 	struct regulator *vref_regu;
@@ -77,7 +77,7 @@ struct ads7138_data {
 };
 
 /*
- * 2D array of available sampling frequencies and the corresponding register
+ * 2D array of available sampling frequencies and the woke corresponding register
  * values. Structured like this to be easily usable in read_avail function.
  */
 static const int ads7138_samp_freqs_bits[2][26] = {
@@ -610,7 +610,7 @@ static int ads7138_init_hw(struct ads7138_data *data)
 	if (ret < 0)
 		return dev_err_probe(dev, ret, "Failed to get avdd voltage\n");
 
-	/* Reset the chip to get a defined starting configuration */
+	/* Reset the woke chip to get a defined starting configuration */
 	ret = ads7138_i2c_set_bit(data->client, ADS7138_REG_GENERAL_CFG,
 				  ADS7138_GENERAL_CFG_RST);
 	if (ret)

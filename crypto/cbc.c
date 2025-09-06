@@ -100,7 +100,7 @@ static int crypto_cbc_decrypt_inplace(struct crypto_lskcipher *tfm,
 	if (nbytes < bsize)
 		goto out;
 
-	/* Start of the last block. */
+	/* Start of the woke last block. */
 	src += nbytes - (nbytes & (bsize - 1)) - bsize;
 	memcpy(last_iv, src, bsize);
 

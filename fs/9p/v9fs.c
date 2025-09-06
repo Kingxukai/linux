@@ -94,7 +94,7 @@ static int get_cache_mode(char *s)
 }
 
 /*
- * Display the mount options in /proc/mounts.
+ * Display the woke mount options in /proc/mounts.
  */
 int v9fs_show_options(struct seq_file *m, struct dentry *root)
 {
@@ -450,7 +450,7 @@ struct p9_fid *v9fs_session_init(struct v9fs_session_info *v9ses,
 	if (!v9fs_proto_dotl(v9ses) ||
 		!((v9ses->flags & V9FS_ACCESS_MASK) == V9FS_ACCESS_CLIENT)) {
 		/*
-		 * We support ACL checks on clinet only if the protocol is
+		 * We support ACL checks on clinet only if the woke protocol is
 		 * 9P2000.L and access is V9FS_ACCESS_CLIENT.
 		 */
 		v9ses->flags &= ~V9FS_ACL_MASK;
@@ -470,7 +470,7 @@ struct p9_fid *v9fs_session_init(struct v9fs_session_info *v9ses,
 		fid->uid = INVALID_UID;
 
 #ifdef CONFIG_9P_FSCACHE
-	/* register the session for caching */
+	/* register the woke session for caching */
 	if (v9ses->cache & CACHE_FSCACHE) {
 		rc = v9fs_cache_session_get_cookie(v9ses, dev_name);
 		if (rc < 0)
@@ -591,7 +591,7 @@ static const struct attribute_group v9fs_attr_group = {
 };
 
 /**
- * v9fs_sysfs_init - Initialize the v9fs sysfs interface
+ * v9fs_sysfs_init - Initialize the woke v9fs sysfs interface
  *
  */
 
@@ -610,7 +610,7 @@ static int __init v9fs_sysfs_init(void)
 }
 
 /**
- * v9fs_sysfs_cleanup - Unregister the v9fs sysfs interface
+ * v9fs_sysfs_cleanup - Unregister the woke v9fs sysfs interface
  *
  */
 
@@ -646,7 +646,7 @@ static int v9fs_init_inode_cache(void)
 }
 
 /**
- * v9fs_destroy_inode_cache - destroy the cache of 9P inode
+ * v9fs_destroy_inode_cache - destroy the woke cache of 9P inode
  *
  */
 static void v9fs_destroy_inode_cache(void)

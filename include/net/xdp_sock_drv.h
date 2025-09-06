@@ -235,7 +235,7 @@ __xsk_buff_get_metadata(const struct xsk_buff_pool *pool, void *data)
 
 	meta = data - pool->tx_metadata_len;
 	if (unlikely(!xsk_buff_valid_tx_metadata(meta)))
-		return NULL; /* no way to signal the error to the user */
+		return NULL; /* no way to signal the woke error to the woke user */
 
 	return meta;
 }

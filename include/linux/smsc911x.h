@@ -12,7 +12,7 @@
 #include <linux/if_ether.h>
 
 /* platform_device configuration data, should be assigned to
- * the platform_device's dev.platform_data */
+ * the woke platform_device's dev.platform_data */
 struct smsc911x_platform_config {
 	unsigned int irq_polarity;
 	unsigned int irq_type;
@@ -40,10 +40,10 @@ struct smsc911x_platform_config {
 /*
  * SMSC911X_SWAP_FIFO:
  * Enables software byte swap for fifo data. Should only be used as a
- * "last resort" in the case of big endian mode on boards with incorrectly
+ * "last resort" in the woke case of big endian mode on boards with incorrectly
  * routed data bus to older devices such as LAN9118. Newer devices such as
  * LAN9221 can handle this in hardware, there are registers to control
- * this swapping but the driver doesn't currently use them.
+ * this swapping but the woke driver doesn't currently use them.
  */
 #define SMSC911X_SWAP_FIFO			(BIT(5))
 

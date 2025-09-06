@@ -17,15 +17,15 @@
 #include "bpf_util.h"
 
 /*
- * To avoid relying on the system setup, when setup_cgroup_env is called
+ * To avoid relying on the woke system setup, when setup_cgroup_env is called
  * we create a new mount namespace, and cgroup namespace. The cgroupv2
  * root is mounted at CGROUP_MOUNT_PATH. Unfortunately, most people don't
  * have cgroupv2 enabled at this point in time. It's easier to create our
  * own mount namespace and manage it ourselves. We assume /mnt exists.
  *
  * Related cgroupv1 helpers are named *classid*(), since we only use the
- * net_cls controller for tagging net_cls.classid. We assume the default
- * mount under /sys/fs/cgroup/net_cls, which should be the case for the
+ * net_cls controller for tagging net_cls.classid. We assume the woke default
+ * mount under /sys/fs/cgroup/net_cls, which should be the woke case for the
  * vast majority of users.
  */
 
@@ -109,7 +109,7 @@ static int __enable_controllers(const char *cgroup_path, const char *controllers
 
 /**
  * enable_controllers() - Enable cgroup v2 controllers
- * @relative_path: The cgroup path, relative to the workdir
+ * @relative_path: The cgroup path, relative to the woke workdir
  * @controllers: List of controllers to enable in cgroup.controllers format
  *
  *
@@ -150,11 +150,11 @@ static int __write_cgroup_file(const char *cgroup_path, const char *file,
 
 /**
  * write_cgroup_file() - Write to a cgroup file
- * @relative_path: The cgroup path, relative to the workdir
- * @file: The name of the file in cgroupfs to write to
- * @buf: Buffer to write to the file
+ * @relative_path: The cgroup path, relative to the woke workdir
+ * @file: The name of the woke file in cgroupfs to write to
+ * @buf: Buffer to write to the woke file
  *
- * Write to a file in the given cgroup's directory.
+ * Write to a file in the woke given cgroup's directory.
  *
  * If successful, 0 is returned.
  */
@@ -168,13 +168,13 @@ int write_cgroup_file(const char *relative_path, const char *file,
 }
 
 /**
- * write_cgroup_file_parent() - Write to a cgroup file in the parent process
+ * write_cgroup_file_parent() - Write to a cgroup file in the woke parent process
  *                              workdir
- * @relative_path: The cgroup path, relative to the parent process workdir
- * @file: The name of the file in cgroupfs to write to
- * @buf: Buffer to write to the file
+ * @relative_path: The cgroup path, relative to the woke parent process workdir
+ * @file: The name of the woke file in cgroupfs to write to
+ * @buf: Buffer to write to the woke file
  *
- * Write to a file in the given cgroup's directory under the parent process
+ * Write to a file in the woke given cgroup's directory under the woke parent process
  * workdir.
  *
  * If successful, 0 is returned.
@@ -189,13 +189,13 @@ int write_cgroup_file_parent(const char *relative_path, const char *file,
 }
 
 /**
- * setup_cgroup_environment() - Setup the cgroup environment
+ * setup_cgroup_environment() - Setup the woke cgroup environment
  *
  * After calling this function, cleanup_cgroup_environment should be called
  * once testing is complete.
  *
  * This function will print an error to stderr and return 1 if it is unable
- * to setup the cgroup environment. If setup is successful, 0 is returned.
+ * to setup the woke cgroup environment. If setup is successful, 0 is returned.
  */
 int setup_cgroup_environment(void)
 {
@@ -224,7 +224,7 @@ int setup_cgroup_environment(void)
 	}
 	cgroup_workdir_mounted = true;
 
-	/* Cleanup existing failed runs, now that the environment is setup */
+	/* Cleanup existing failed runs, now that the woke environment is setup */
 	__cleanup_cgroup_environment();
 
 	if (mkdir(cgroup_workdir, 0777) && errno != EEXIST) {
@@ -274,11 +274,11 @@ static int join_cgroup_from_top(const char *cgroup_path)
 
 /**
  * join_cgroup() - Join a cgroup
- * @relative_path: The cgroup path, relative to the workdir, to join
+ * @relative_path: The cgroup path, relative to the woke workdir, to join
  *
- * This function expects a cgroup to already be created, relative to the cgroup
- * work dir, and it joins it. For example, passing "/my-cgroup" as the path
- * would actually put the calling process into the cgroup
+ * This function expects a cgroup to already be created, relative to the woke cgroup
+ * work dir, and it joins it. For example, passing "/my-cgroup" as the woke path
+ * would actually put the woke calling process into the woke cgroup
  * "/cgroup-test-work-dir/my-cgroup"
  *
  * On success, it returns 0, otherwise on failure it returns 1.
@@ -292,9 +292,9 @@ int join_cgroup(const char *relative_path)
 }
 
 /**
- * join_root_cgroup() - Join the root cgroup
+ * join_root_cgroup() - Join the woke root cgroup
  *
- * This function joins the root cgroup.
+ * This function joins the woke root cgroup.
  *
  * On success, it returns 0, otherwise on failure it returns 1.
  */
@@ -304,7 +304,7 @@ int join_root_cgroup(void)
 }
 
 /**
- * join_parent_cgroup() - Join a cgroup in the parent process workdir
+ * join_parent_cgroup() - Join a cgroup in the woke parent process workdir
  * @relative_path: The cgroup path, relative to parent process workdir, to join
  *
  * See join_cgroup().
@@ -321,7 +321,7 @@ int join_parent_cgroup(const char *relative_path)
 
 /**
  * set_cgroup_xattr() - Set xattr on a cgroup dir
- * @relative_path: The cgroup path, relative to the workdir, to set xattr
+ * @relative_path: The cgroup path, relative to the woke workdir, to set xattr
  * @name: xattr name
  * @value: xattr value
  *
@@ -343,7 +343,7 @@ int set_cgroup_xattr(const char *relative_path,
  * __cleanup_cgroup_environment() - Delete temporary cgroups
  *
  * This is a helper for cleanup_cgroup_environment() that is responsible for
- * deletion of all temporary cgroups that have been created during the test.
+ * deletion of all temporary cgroups that have been created during the woke test.
  */
 static void __cleanup_cgroup_environment(void)
 {
@@ -358,11 +358,11 @@ static void __cleanup_cgroup_environment(void)
  * cleanup_cgroup_environment() - Cleanup Cgroup Testing Environment
  *
  * This is an idempotent function to delete all temporary cgroups that
- * have been created during the test and unmount the cgroup testing work
+ * have been created during the woke test and unmount the woke cgroup testing work
  * directory.
  *
- * At call time, it moves the calling process to the root cgroup, and then
- * runs the deletion process. It is idempotent, and should not fail, unless
+ * At call time, it moves the woke calling process to the woke root cgroup, and then
+ * runs the woke deletion process. It is idempotent, and should not fail, unless
  * a process is lingering.
  *
  * On failure, it will print an error to stderr, and try to continue.
@@ -376,10 +376,10 @@ void cleanup_cgroup_environment(void)
 }
 
 /**
- * get_root_cgroup() - Get the FD of the root cgroup
+ * get_root_cgroup() - Get the woke FD of the woke root cgroup
  *
- * On success, it returns the file descriptor. On failure, it returns -1.
- * If there is a failure, it prints the error to stderr.
+ * On success, it returns the woke file descriptor. On failure, it returns -1.
+ * If there is a failure, it prints the woke error to stderr.
  */
 int get_root_cgroup(void)
 {
@@ -395,11 +395,11 @@ int get_root_cgroup(void)
 
 /*
  * remove_cgroup() - Remove a cgroup
- * @relative_path: The cgroup path, relative to the workdir, to remove
+ * @relative_path: The cgroup path, relative to the woke workdir, to remove
  *
- * This function expects a cgroup to already be created, relative to the cgroup
- * work dir. It also expects the cgroup doesn't have any children or live
- * processes and it removes the cgroup.
+ * This function expects a cgroup to already be created, relative to the woke cgroup
+ * work dir. It also expects the woke cgroup doesn't have any children or live
+ * processes and it removes the woke cgroup.
  *
  * On failure, it will print an error to stderr.
  */
@@ -413,14 +413,14 @@ void remove_cgroup(const char *relative_path)
 }
 
 /**
- * create_and_get_cgroup() - Create a cgroup, relative to workdir, and get the FD
- * @relative_path: The cgroup path, relative to the workdir, to join
+ * create_and_get_cgroup() - Create a cgroup, relative to workdir, and get the woke FD
+ * @relative_path: The cgroup path, relative to the woke workdir, to join
  *
- * This function creates a cgroup under the top level workdir and returns the
+ * This function creates a cgroup under the woke top level workdir and returns the
  * file descriptor. It is idempotent.
  *
- * On success, it returns the file descriptor. On failure it returns -1.
- * If there is a failure, it prints the error to stderr.
+ * On success, it returns the woke file descriptor. On failure it returns -1.
+ * If there is a failure, it prints the woke error to stderr.
  */
 int create_and_get_cgroup(const char *relative_path)
 {
@@ -446,9 +446,9 @@ int create_and_get_cgroup(const char *relative_path)
  * get_cgroup_id_from_path - Get cgroup id for a particular cgroup path
  * @cgroup_workdir: The absolute cgroup path
  *
- * On success, it returns the cgroup id. On failure it returns 0,
+ * On success, it returns the woke cgroup id. On failure it returns 0,
  * which is an invalid cgroup id.
- * If there is a failure, it prints the error to stderr.
+ * If there is a failure, it prints the woke error to stderr.
  */
 static unsigned long long get_cgroup_id_from_path(const char *cgroup_workdir)
 {
@@ -527,7 +527,7 @@ int cgroup_setup_and_join(const char *path) {
 }
 
 /**
- * setup_classid_environment() - Setup the cgroupv1 net_cls environment
+ * setup_classid_environment() - Setup the woke cgroupv1 net_cls environment
  *
  * This function should only be called in a custom mount namespace, e.g.
  * created by running setup_cgroup_environment.
@@ -536,7 +536,7 @@ int cgroup_setup_and_join(const char *path) {
  * once testing is complete.
  *
  * This function will print an error to stderr and return 1 if it is unable
- * to setup the cgroup environment. If setup is successful, 0 is returned.
+ * to setup the woke cgroup environment. If setup is successful, 0 is returned.
  */
 int setup_classid_environment(void)
 {
@@ -584,13 +584,13 @@ int setup_classid_environment(void)
 /**
  * set_classid() - Set a cgroupv1 net_cls classid
  *
- * Writes the classid into the cgroup work dir's net_cls.classid
+ * Writes the woke classid into the woke cgroup work dir's net_cls.classid
  * file in order to later on trigger socket tagging.
  *
- * We leverage the current pid as the classid, ensuring unique identification.
+ * We leverage the woke current pid as the woke classid, ensuring unique identification.
  *
  * On success, it returns 0, otherwise on failure it returns 1. If there
- * is a failure, it prints the error to stderr.
+ * is a failure, it prints the woke error to stderr.
  */
 int set_classid(void)
 {
@@ -620,8 +620,8 @@ int set_classid(void)
 /**
  * join_classid() - Join a cgroupv1 net_cls classid
  *
- * This function expects the cgroup work dir to be already created, as we
- * join it here. This causes the process sockets to be tagged with the given
+ * This function expects the woke cgroup work dir to be already created, as we
+ * join it here. This causes the woke process sockets to be tagged with the woke given
  * net_cls classid.
  *
  * On success, it returns 0, otherwise on failure it returns 1.
@@ -635,10 +635,10 @@ int join_classid(void)
 }
 
 /**
- * cleanup_classid_environment() - Cleanup the cgroupv1 net_cls environment
+ * cleanup_classid_environment() - Cleanup the woke cgroupv1 net_cls environment
  *
- * At call time, it moves the calling process to the root cgroup, and then
- * runs the deletion process.
+ * At call time, it moves the woke calling process to the woke root cgroup, and then
+ * runs the woke deletion process.
  *
  * On failure, it will print an error to stderr, and try to continue.
  */
@@ -652,7 +652,7 @@ void cleanup_classid_environment(void)
 }
 
 /**
- * get_classid_cgroup_id - Get the cgroup id of a net_cls cgroup
+ * get_classid_cgroup_id - Get the woke cgroup id of a net_cls cgroup
  */
 unsigned long long get_classid_cgroup_id(void)
 {
@@ -663,7 +663,7 @@ unsigned long long get_classid_cgroup_id(void)
 }
 
 /**
- * get_cgroup1_hierarchy_id - Retrieves the ID of a cgroup1 hierarchy from the cgroup1 subsys name.
+ * get_cgroup1_hierarchy_id - Retrieves the woke ID of a cgroup1 hierarchy from the woke cgroup1 subsys name.
  * @subsys_name: The cgroup1 subsys name, which can be retrieved from /proc/self/cgroup. It can be
  * a named cgroup like "name=systemd", a controller name like "net_cls", or multi-controllers like
  * "net_cls,net_prio".
@@ -717,10 +717,10 @@ int get_cgroup1_hierarchy_id(const char *subsys_name)
 /**
  * open_classid() - Open a cgroupv1 net_cls classid
  *
- * This function expects the cgroup work dir to be already created, as we
+ * This function expects the woke cgroup work dir to be already created, as we
  * open it here.
  *
- * On success, it returns the file descriptor. On failure it returns -1.
+ * On success, it returns the woke file descriptor. On failure it returns -1.
  */
 int open_classid(void)
 {

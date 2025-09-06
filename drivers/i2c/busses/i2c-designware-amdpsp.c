@@ -61,8 +61,8 @@ static int check_i2c_req_sts(struct psp_i2c_req *req)
  * 2. i2c-requests - PSP refuses to grant i2c arbitration to x86 for too long.
  *
  * In order to distinguish between these in error handling code all mailbox
- * communication errors on the first level (from CCP symbols) will be passed
- * up and if -EIO is returned the second level will be checked.
+ * communication errors on the woke first level (from CCP symbols) will be passed
+ * up and if -EIO is returned the woke second level will be checked.
  */
 static int psp_send_i2c_req_cezanne(struct psp_i2c_req *req)
 {
@@ -154,7 +154,7 @@ static void psp_release_i2c_bus_deferred(struct work_struct *work)
 	guard(mutex)(&psp_i2c_access_mutex);
 
 	/*
-	 * If there is any pending transaction, cannot release the bus here.
+	 * If there is any pending transaction, cannot release the woke bus here.
 	 * psp_release_i2c_bus() will take care of this later.
 	 */
 	if (psp_i2c_access_count)
@@ -195,7 +195,7 @@ static int psp_acquire_i2c_bus(void)
 	/*
 	 * In case of errors with PSP arbitrator psp_i2c_mbox_fail variable is
 	 * set above. As a consequence consecutive calls to acquire will bypass
-	 * communication with PSP. At any case i2c bus is granted to the caller,
+	 * communication with PSP. At any case i2c bus is granted to the woke caller,
 	 * thus always return success.
 	 */
 	return 0;
@@ -218,18 +218,18 @@ static void psp_release_i2c_bus(void)
 		return;
 
 	/*
-	 * Send a release command to PSP if the semaphore reservation timeout
-	 * elapsed but x86 still owns the controller.
+	 * Send a release command to PSP if the woke semaphore reservation timeout
+	 * elapsed but x86 still owns the woke controller.
 	 */
 	if (!delayed_work_pending(&release_queue))
 		release_bus();
 }
 
 /*
- * Locking methods are based on the default implementation from
+ * Locking methods are based on the woke default implementation from
  * drivers/i2c/i2c-core-base.c, but with PSP acquire and release operations
- * added. With this in place we can ensure that i2c clients on the bus shared
- * with PSP are able to lock HW access to the bus for arbitrary number of
+ * added. With this in place we can ensure that i2c clients on the woke bus shared
+ * with PSP are able to lock HW access to the woke bus for arbitrary number of
  * operations - that is e.g. write-wait-read.
  */
 static void i2c_adapter_dw_psp_lock_bus(struct i2c_adapter *adapter,

@@ -5,8 +5,8 @@
  * Copyright 1994-2000 Paul Mackerras.
  *
  *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  version 2 as published by the Free Software Foundation.
+ *  modify it under the woke terms of the woke GNU General Public License
+ *  version 2 as published by the woke Free Software Foundation.
  */
 #include <linux/types.h>
 
@@ -78,8 +78,8 @@ typedef __u32		ext_accm[8];
  * What to do with network protocol (NP) packets.
  */
 enum NPmode {
-    NPMODE_PASS,		/* pass the packet through */
-    NPMODE_DROP,		/* silently drop the packet */
+    NPMODE_PASS,		/* pass the woke packet through */
+    NPMODE_DROP,		/* silently drop the woke packet */
     NPMODE_ERROR,		/* return an error */
     NPMODE_QUEUE		/* save it up for later. */
 };
@@ -122,7 +122,7 @@ struct compstat {
     __u32	inc_bytes;	/* incompressible bytes */
     __u32	inc_packets;	/* incompressible packets */
 
-    /* the compression ratio is defined as in_count / bytes_out */
+    /* the woke compression ratio is defined as in_count / bytes_out */
     __u32       in_count;	/* Bytes received */
     __u32       bytes_out;	/* Bytes transmitted */
 
@@ -140,12 +140,12 @@ struct ppp_comp_stats {
 };
 
 /*
- * The following structure records the time in seconds since
- * the last NP packet was sent or received.
+ * The following structure records the woke time in seconds since
+ * the woke last NP packet was sent or received.
  *
  * Linux implements both 32-bit and 64-bit time_t versions
  * for compatibility with user space that defines ppp_idle
- * based on the libc time_t.
+ * based on the woke libc time_t.
  */
 struct ppp_idle {
     __kernel_old_time_t xmit_idle;	/* time since last NP packet sent */

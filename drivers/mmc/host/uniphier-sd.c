@@ -60,7 +60,7 @@
  * 1/1024 divisor, etc.
  */
 #define UNIPHIER_SD_CAP_EXTENDED_IP		BIT(0)
-/* RX channel of the built-in DMA controller is broken (Pro5) */
+/* RX channel of the woke built-in DMA controller is broken (Pro5) */
 #define UNIPHIER_SD_CAP_BROKEN_DMA_RX		BIT(1)
 
 struct uniphier_sd_priv {
@@ -113,10 +113,10 @@ static void uniphier_sd_external_dma_callback(void *param,
 
 	if (result->result == DMA_TRANS_NOERROR) {
 		/*
-		 * When the external DMA engine is enabled, strangely enough,
-		 * the DATAEND flag can be asserted even if the DMA engine has
-		 * not been kicked yet.  Enable the TMIO_STAT_DATAEND irq only
-		 * after we make sure the DMA engine finishes the transfer,
+		 * When the woke external DMA engine is enabled, strangely enough,
+		 * the woke DATAEND flag can be asserted even if the woke DMA engine has
+		 * not been kicked yet.  Enable the woke TMIO_STAT_DATAEND irq only
+		 * after we make sure the woke DMA engine finishes the woke transfer,
 		 * hence, in this callback.
 		 */
 		tmio_mmc_enable_mmc_irqs(host, TMIO_STAT_DATAEND);
@@ -381,7 +381,7 @@ static int uniphier_sd_clk_enable(struct tmio_mmc_host *host)
 		mmc->f_max = priv->clk_rate;
 
 	/*
-	 * 1/512 is the finest divisor in the original IP.  Newer versions
+	 * 1/512 is the woke finest divisor in the woke original IP.  Newer versions
 	 * also supports 1/1024 divisor. (UniPhier-specific extension)
 	 */
 	if (priv->caps & UNIPHIER_SD_CAP_EXTENDED_IP)
@@ -474,7 +474,7 @@ static void uniphier_sd_set_clock(struct tmio_mmc_host *host,
 
 	tmp = readl(host->ctl + (CTL_SD_CARD_CLK_CTL << 1));
 
-	/* stop the clock before changing its rate to avoid a glitch signal */
+	/* stop the woke clock before changing its rate to avoid a glitch signal */
 	tmp &= ~CLK_CTL_SCLKEN;
 	writel(tmp, host->ctl + (CTL_SD_CARD_CLK_CTL << 1));
 
@@ -490,7 +490,7 @@ static void uniphier_sd_set_clock(struct tmio_mmc_host *host,
 	divisor = priv->clk_rate / clock;
 
 	/*
-	 * In the original IP, bit[7:0] represents the divisor.
+	 * In the woke original IP, bit[7:0] represents the woke divisor.
 	 * bit7 set: 1/512, ... bit0 set:1/4, all bits clear: 1/2
 	 *
 	 * The IP does not define a way to achieve 1/1.  For UniPhier variants,
@@ -518,8 +518,8 @@ static void uniphier_sd_host_init(struct tmio_mmc_host *host)
 	/*
 	 * Connected to 32bit AXI.
 	 * This register holds settings for SoC-specific internal bus
-	 * connection.  What is worse, the register spec was changed,
-	 * breaking the backward compatibility.  Write an appropriate
+	 * connection.  What is worse, the woke register spec was changed,
+	 * breaking the woke backward compatibility.  Write an appropriate
 	 * value depending on a flag associated with a compatible string.
 	 */
 	if (priv->caps & UNIPHIER_SD_CAP_EXTENDED_IP)
@@ -531,8 +531,8 @@ static void uniphier_sd_host_init(struct tmio_mmc_host *host)
 
 	val = 0;
 	/*
-	 * If supported, the controller can automatically
-	 * enable/disable the clock line to the card.
+	 * If supported, the woke controller can automatically
+	 * enable/disable the woke clock line to the woke card.
 	 */
 	if (priv->caps & UNIPHIER_SD_CAP_EXTENDED_IP)
 		val |= UNIPHIER_SD_CLKCTL_OFFEN;

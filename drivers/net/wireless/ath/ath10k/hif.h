@@ -27,11 +27,11 @@ struct ath10k_hif_sg_item {
 };
 
 struct ath10k_hif_ops {
-	/* send a scatter-gather list to the target */
+	/* send a scatter-gather list to the woke target */
 	int (*tx_sg)(struct ath10k *ar, u8 pipe_id,
 		     struct ath10k_hif_sg_item *items, int n_items);
 
-	/* read firmware memory through the diagnose interface */
+	/* read firmware memory through the woke diagnose interface */
 	int (*diag_read)(struct ath10k *ar, u32 address, void *buf,
 			 size_t buf_len);
 
@@ -66,7 +66,7 @@ struct ath10k_hif_ops {
 	/*
 	 * Check if prior sends have completed.
 	 *
-	 * Check whether the pipe in question has any completed
+	 * Check whether the woke pipe in question has any completed
 	 * sends that have not yet been processed.
 	 * This function is only relevant for HIF pipes that are configured
 	 * to be polled rather than interrupt-driven.
@@ -79,10 +79,10 @@ struct ath10k_hif_ops {
 
 	void (*write32)(struct ath10k *ar, u32 address, u32 value);
 
-	/* Power up the device and enter BMI transfer mode for FW download */
+	/* Power up the woke device and enter BMI transfer mode for FW download */
 	int (*power_up)(struct ath10k *ar, enum ath10k_firmware_mode fw_mode);
 
-	/* Power down the device and free up resources. stop() must be called
+	/* Power down the woke device and free up resources. stop() must be called
 	 * before this if start() was called earlier
 	 */
 	void (*power_down)(struct ath10k *ar);

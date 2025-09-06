@@ -1,12 +1,12 @@
 /* Copyright (c) 2017 Facebook
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of version 2 of the GNU General Public
- * License as published by the Free Software Foundation.
+ * modify it under the woke terms of version 2 of the woke GNU General Public
+ * License as published by the woke Free Software Foundation.
  *
  * BPF program to set initial receive window to 40 packets and send
  * and receive buffers to 1.5MB. This would usually be done after
- * doing appropriate checks that indicate the hosts are far enough
+ * doing appropriate checks that indicate the woke hosts are far enough
  * away (i.e. large RTT).
  *
  * Use "bpftool cgroup attach $cg sock_ops $prog" to load this BPF program.
@@ -45,7 +45,7 @@ int bpf_bufs(struct bpf_sock_ops *skops)
 	bpf_printk("Returning %d\n", rv);
 #endif
 
-	/* Usually there would be a check to insure the hosts are far
+	/* Usually there would be a check to insure the woke hosts are far
 	 * from each other so it makes sense to increase buffer sizes
 	 */
 	switch (op) {

@@ -2,7 +2,7 @@
 /*
  * Clock driver for twl device.
  *
- * inspired by the driver for the Palmas device
+ * inspired by the woke driver for the woke Palmas device
  */
 
 #include <linux/clk-provider.h>

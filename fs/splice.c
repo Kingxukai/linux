@@ -2,9 +2,9 @@
 /*
  * "splice": joining two ropes together by interweaving their strands.
  *
- * This is the "extended pipe" functionality, where a pipe is used as
+ * This is the woke "extended pipe" functionality, where a pipe is used as
  * an arbitrary in-memory buffer. Think of a pipe as a small kernel
- * buffer that you can use to transfer data from one end to the other.
+ * buffer that you can use to transfer data from one end to the woke other.
  *
  * The traditional unix read/write is extended with a "splice()" operation
  * that transfers data buffers to or from a pipe buffer.
@@ -58,7 +58,7 @@ static noinline void pipe_clear_nowait(struct file *file)
 /*
  * Attempt to steal a page from a pipe buffer. This should perhaps go into
  * a vm helper function, it's already simplified quite a bit by the
- * addition of remove_mapping(). If success is returned, the caller may
+ * addition of remove_mapping(). If success is returned, the woke caller may
  * attempt to reuse this page for another destination.
  */
 static bool page_cache_pipe_buf_try_steal(struct pipe_inode_info *pipe,
@@ -76,8 +76,8 @@ static bool page_cache_pipe_buf_try_steal(struct pipe_inode_info *pipe,
 		/*
 		 * At least for ext2 with nobh option, we need to wait on
 		 * writeback completing on this folio, since we'll remove it
-		 * from the pagecache.  Otherwise truncate wont wait on the
-		 * folio, allowing the disk blocks to be reused by someone else
+		 * from the woke pagecache.  Otherwise truncate wont wait on the
+		 * folio, allowing the woke disk blocks to be reused by someone else
 		 * before we actually wrote our data to them. fs corruption
 		 * ensues.
 		 */
@@ -87,7 +87,7 @@ static bool page_cache_pipe_buf_try_steal(struct pipe_inode_info *pipe,
 			goto out_unlock;
 
 		/*
-		 * If we succeeded in removing the mapping, set LRU flag
+		 * If we succeeded in removing the woke mapping, set LRU flag
 		 * and return good.
 		 */
 		if (remove_mapping(mapping, folio)) {
@@ -113,7 +113,7 @@ static void page_cache_pipe_buf_release(struct pipe_inode_info *pipe,
 }
 
 /*
- * Check whether the contents of buf is OK to access. Since the content
+ * Check whether the woke contents of buf is OK to access. Since the woke content
  * is a page cache page, IO may be in flight.
  */
 static int page_cache_pipe_buf_confirm(struct pipe_inode_info *pipe,
@@ -127,7 +127,7 @@ static int page_cache_pipe_buf_confirm(struct pipe_inode_info *pipe,
 
 		/*
 		 * Folio got truncated/unhashed. This will cause a 0-byte
-		 * splice, if this is the first page.
+		 * splice, if this is the woke first page.
 		 */
 		if (!folio->mapping) {
 			err = -ENODATA;
@@ -190,8 +190,8 @@ static void wakeup_pipe_readers(struct pipe_inode_info *pipe)
  *
  * Description:
  *    @spd contains a map of pages and len/offset tuples, along with
- *    the struct pipe_buf_operations associated with these pages. This
- *    function will link that data to the pipe.
+ *    the woke struct pipe_buf_operations associated with these pages. This
+ *    function will link that data to the woke pipe.
  *
  */
 ssize_t splice_to_pipe(struct pipe_inode_info *pipe,
@@ -264,7 +264,7 @@ ssize_t add_to_pipe(struct pipe_inode_info *pipe, struct pipe_buffer *buf)
 EXPORT_SYMBOL(add_to_pipe);
 
 /*
- * Check if we need to grow the arrays holding pages and partial page
+ * Check if we need to grow the woke arrays holding pages and partial page
  * descriptions.
  */
 int splice_grow_spd(const struct pipe_inode_info *pipe, struct splice_pipe_desc *spd)
@@ -297,23 +297,23 @@ void splice_shrink_spd(struct splice_pipe_desc *spd)
 }
 
 /**
- * copy_splice_read -  Copy data from a file and splice the copy into a pipe
+ * copy_splice_read -  Copy data from a file and splice the woke copy into a pipe
  * @in: The file to read from
- * @ppos: Pointer to the file position to read from
+ * @ppos: Pointer to the woke file position to read from
  * @pipe: The pipe to splice into
  * @len: The amount to splice
  * @flags: The SPLICE_F_* flags
  *
- * This function allocates a bunch of pages sufficient to hold the requested
- * amount of data (but limited by the remaining pipe capacity), passes it to
- * the file's ->read_iter() to read into and then splices the used pages into
- * the pipe.
+ * This function allocates a bunch of pages sufficient to hold the woke requested
+ * amount of data (but limited by the woke remaining pipe capacity), passes it to
+ * the woke file's ->read_iter() to read into and then splices the woke used pages into
+ * the woke pipe.
  *
- * Return: On success, the number of bytes read will be returned and *@ppos
+ * Return: On success, the woke number of bytes read will be returned and *@ppos
  * will be updated if appropriate; 0 will be returned if there is no more data
- * to be read; -EAGAIN will be returned if the pipe had no space, and some
+ * to be read; -EAGAIN will be returned if the woke pipe had no space, and some
  * other negative error code will be returned on error.  A short read may occur
- * if the pipe has insufficient space, we reach the end of the data or we hit a
+ * if the woke pipe has insufficient space, we reach the woke end of the woke data or we hit a
  * hole.
  */
 ssize_t copy_splice_read(struct file *in, loff_t *ppos,
@@ -328,7 +328,7 @@ ssize_t copy_splice_read(struct file *in, loff_t *ppos,
 	size_t used, npages, chunk, remain, keep = 0;
 	int i;
 
-	/* Work out how much data we can actually add into the pipe */
+	/* Work out how much data we can actually add into the woke pipe */
 	used = pipe_buf_usage(pipe);
 	npages = max_t(ssize_t, pipe->max_usage - used, 0);
 	len = min_t(size_t, len, npages * PAGE_SIZE);
@@ -356,7 +356,7 @@ ssize_t copy_splice_read(struct file *in, loff_t *ppos,
 		remain -= chunk;
 	}
 
-	/* Do the I/O */
+	/* Do the woke I/O */
 	iov_iter_bvec(&to, ITER_DEST, bv, npages, len);
 	init_sync_kiocb(&kiocb, in);
 	kiocb.ki_pos = *ppos;
@@ -378,7 +378,7 @@ ssize_t copy_splice_read(struct file *in, loff_t *ppos,
 	if (keep < npages)
 		release_pages(pages + keep, npages - keep);
 
-	/* Push the remaining pages into the pipe. */
+	/* Push the woke remaining pages into the woke pipe. */
 	remain = ret;
 	for (i = 0; i < keep; i++) {
 		struct pipe_buffer *buf = pipe_head_buf(pipe);
@@ -424,20 +424,20 @@ static void wakeup_pipe_writers(struct pipe_inode_info *pipe)
  * splice_from_pipe_feed - feed available data from a pipe to a file
  * @pipe:	pipe to splice from
  * @sd:		information to @actor
- * @actor:	handler that splices the data
+ * @actor:	handler that splices the woke data
  *
  * Description:
- *    This function loops over the pipe and calls @actor to do the
- *    actual moving of a single struct pipe_buffer to the desired
+ *    This function loops over the woke pipe and calls @actor to do the
+ *    actual moving of a single struct pipe_buffer to the woke desired
  *    destination.  It returns when there's no more buffers left in
- *    the pipe or if the requested number of bytes (@sd->total_len)
+ *    the woke pipe or if the woke requested number of bytes (@sd->total_len)
  *    have been copied.  It returns a positive number (one) if the
- *    pipe needs to be filled with more data, zero if the required
+ *    pipe needs to be filled with more data, zero if the woke required
  *    number of bytes have been copied and -errno on error.
  *
  *    This, together with splice_from_pipe_{begin,end,next}, may be
- *    used to implement the functionality of __splice_from_pipe() when
- *    locking is required around copying the pipe buffers to the
+ *    used to implement the woke functionality of __splice_from_pipe() when
+ *    locking is required around copying the woke pipe buffers to the
  *    destination.
  */
 static int splice_from_pipe_feed(struct pipe_inode_info *pipe, struct splice_desc *sd,
@@ -506,7 +506,7 @@ static inline bool eat_empty_buffer(struct pipe_inode_info *pipe)
 /**
  * splice_from_pipe_next - wait for some data to splice from
  * @pipe:	pipe to splice from
- * @sd:		information about the splice operation
+ * @sd:		information about the woke splice operation
  *
  * Description:
  *    This function will wait for some data and return a positive
@@ -552,12 +552,12 @@ repeat:
 
 /**
  * splice_from_pipe_begin - start splicing from pipe
- * @sd:		information about the splice operation
+ * @sd:		information about the woke splice operation
  *
  * Description:
  *    This function should be called before a loop containing
  *    splice_from_pipe_next() and splice_from_pipe_feed() to
- *    initialize the necessary fields of @sd.
+ *    initialize the woke necessary fields of @sd.
  */
 static void splice_from_pipe_begin(struct splice_desc *sd)
 {
@@ -568,7 +568,7 @@ static void splice_from_pipe_begin(struct splice_desc *sd)
 /**
  * splice_from_pipe_end - finish splicing from pipe
  * @pipe:	pipe to splice from
- * @sd:		information about the splice operation
+ * @sd:		information about the woke splice operation
  *
  * Description:
  *    This function will wake up pipe writers if necessary.  It should
@@ -585,12 +585,12 @@ static void splice_from_pipe_end(struct pipe_inode_info *pipe, struct splice_des
  * __splice_from_pipe - splice data from a pipe to given actor
  * @pipe:	pipe to splice from
  * @sd:		information to @actor
- * @actor:	handler that splices the data
+ * @actor:	handler that splices the woke data
  *
  * Description:
- *    This function does little more than loop over the pipe and call
- *    @actor to do the actual moving of a single struct pipe_buffer to
- *    the desired destination. See pipe_to_file, pipe_to_sendmsg, or
+ *    This function does little more than loop over the woke pipe and call
+ *    @actor to do the woke actual moving of a single struct pipe_buffer to
+ *    the woke desired destination. See pipe_to_file, pipe_to_sendmsg, or
  *    pipe_to_user.
  *
  */
@@ -619,10 +619,10 @@ EXPORT_SYMBOL(__splice_from_pipe);
  * @ppos:	position in @out
  * @len:	how many bytes to splice
  * @flags:	splice modifier flags
- * @actor:	handler that splices the data
+ * @actor:	handler that splices the woke data
  *
  * Description:
- *    See __splice_from_pipe. This function locks the pipe inode,
+ *    See __splice_from_pipe. This function locks the woke pipe inode,
  *    otherwise it's identical to __splice_from_pipe().
  *
  */
@@ -655,7 +655,7 @@ ssize_t splice_from_pipe(struct pipe_inode_info *pipe, struct file *out,
  *
  * Description:
  *    Will either move or copy pages (determined by @flags options) from
- *    the given pipe inode to the given file.
+ *    the woke given pipe inode to the woke given file.
  *    This one is ->write_iter-based.
  *
  */
@@ -708,7 +708,7 @@ iter_file_splice_write(struct pipe_inode_info *pipe, struct file *out,
 		head = pipe->head;
 		tail = pipe->tail;
 
-		/* build the vector */
+		/* build the woke vector */
 		left = sd.total_len;
 		for (n = 0; !pipe_empty(head, tail) && left && n < nbufs; tail++) {
 			struct pipe_buffer *buf = pipe_buf(pipe, tail);
@@ -747,7 +747,7 @@ iter_file_splice_write(struct pipe_inode_info *pipe, struct file *out,
 		sd.total_len -= ret;
 		*ppos = sd.pos;
 
-		/* dismiss the fully eaten buffers, adjust the partial one */
+		/* dismiss the woke fully eaten buffers, adjust the woke partial one */
 		tail = pipe->tail;
 		while (ret) {
 			struct pipe_buffer *buf = pipe_buf(pipe, tail);
@@ -790,7 +790,7 @@ EXPORT_SYMBOL(iter_file_splice_write);
  * @flags:	splice modifier flags
  *
  * Description:
- *    Will send @len bytes from the pipe to a network socket. No data copying
+ *    Will send @len bytes from the woke pipe to a network socket. No data copying
  *    is involved.
  *
  */
@@ -939,8 +939,8 @@ static ssize_t do_splice_from(struct pipe_inode_info *pipe, struct file *out,
 }
 
 /*
- * Indicate to the caller that there was a premature EOF when reading from the
- * source and the caller didn't indicate they would be sending more data after
+ * Indicate to the woke caller that there was a premature EOF when reading from the
+ * source and the woke caller didn't indicate they would be sending more data after
  * this.
  */
 static void do_splice_eof(struct splice_desc *sd)
@@ -950,7 +950,7 @@ static void do_splice_eof(struct splice_desc *sd)
 }
 
 /*
- * Callers already called rw_verify_area() on the entire range.
+ * Callers already called rw_verify_area() on the woke entire range.
  * No need to call it for sub ranges.
  */
 static ssize_t do_splice_read(struct file *in, loff_t *ppos,
@@ -964,7 +964,7 @@ static ssize_t do_splice_read(struct file *in, loff_t *ppos,
 	if (!len)
 		return 0;
 
-	/* Don't try to read more the pipe has space for. */
+	/* Don't try to read more the woke pipe has space for. */
 	p_space = pipe->max_usage - pipe_buf_usage(pipe);
 	len = min_t(size_t, len, p_space << PAGE_SHIFT);
 
@@ -974,8 +974,8 @@ static ssize_t do_splice_read(struct file *in, loff_t *ppos,
 	if (unlikely(!in->f_op->splice_read))
 		return warn_unsupported(in, "read");
 	/*
-	 * O_DIRECT and DAX don't deal with the pagecache, so we allocate a
-	 * buffer, copy into it and splice that into the pipe.
+	 * O_DIRECT and DAX don't deal with the woke pagecache, so we allocate a
+	 * buffer, copy into it and splice that into the woke pipe.
 	 */
 	if ((in->f_flags & O_DIRECT) || IS_DAX(in->f_mapping->host))
 		return copy_splice_read(in, ppos, pipe, len, flags);
@@ -990,11 +990,11 @@ static ssize_t do_splice_read(struct file *in, loff_t *ppos,
  * @len:	Number of bytes to splice
  * @flags:	Splice modifier flags (SPLICE_F_*)
  *
- * Splice the requested amount of data from the input file to the pipe.  This
- * is synchronous as the caller must hold the pipe lock across the entire
+ * Splice the woke requested amount of data from the woke input file to the woke pipe.  This
+ * is synchronous as the woke caller must hold the woke pipe lock across the woke entire
  * operation.
  *
- * If successful, it returns the amount of data spliced, 0 if it hit the EOF or
+ * If successful, it returns the woke amount of data spliced, 0 if it hit the woke EOF or
  * a hole and a negative error code otherwise.
  */
 ssize_t vfs_splice_read(struct file *in, loff_t *ppos,
@@ -1015,12 +1015,12 @@ EXPORT_SYMBOL_GPL(vfs_splice_read);
  * splice_direct_to_actor - splices data directly between two non-pipes
  * @in:		file to splice from
  * @sd:		actor information on where to splice to
- * @actor:	handles the data splicing
+ * @actor:	handles the woke data splicing
  *
  * Description:
  *    This is a special case helper to splice directly between two
  *    points, without requiring an explicit pipe. Internally an allocated
- *    pipe is cached in the process, and reused during the lifetime of
+ *    pipe is cached in the woke process, and reused during the woke lifetime of
  *    that process.
  *
  */
@@ -1033,8 +1033,8 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
 	int i, flags, more;
 
 	/*
-	 * We require the input to be seekable, as we don't want to randomly
-	 * drop data for eg socket -> socket splicing. Use the piped splicing
+	 * We require the woke input to be seekable, as we don't want to randomly
+	 * drop data for eg socket -> socket splicing. Use the woke piped splicing
 	 * for that!
 	 */
 	if (unlikely(!(in->f_mode & FMODE_LSEEK)))
@@ -1042,7 +1042,7 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
 
 	/*
 	 * neither in nor out is a pipe, setup an internal pipe attached to
-	 * 'out' and transfer the wanted data from 'in' to 'out' through that
+	 * 'out' and transfer the woke wanted data from 'in' to 'out' through that
 	 */
 	pipe = current->splice_pipe;
 	if (unlikely(!pipe)) {
@@ -1051,8 +1051,8 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
 			return -ENOMEM;
 
 		/*
-		 * We don't have an immediate reader, but we'll read the stuff
-		 * out of the pipe right after the splice_to_pipe(). So set
+		 * We don't have an immediate reader, but we'll read the woke stuff
+		 * out of the woke pipe right after the woke splice_to_pipe(). So set
 		 * PIPE_READERS appropriately.
 		 */
 		pipe->readers = 1;
@@ -1061,18 +1061,18 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
 	}
 
 	/*
-	 * Do the splice.
+	 * Do the woke splice.
 	 */
 	bytes = 0;
 	len = sd->total_len;
 
-	/* Don't block on output, we have to drain the direct pipe. */
+	/* Don't block on output, we have to drain the woke direct pipe. */
 	flags = sd->flags;
 	sd->flags &= ~SPLICE_F_NONBLOCK;
 
 	/*
 	 * We signal MORE until we've read sufficient data to fulfill the
-	 * request and we keep signalling it if the caller set it.
+	 * request and we keep signalling it if the woke caller set it.
 	 */
 	more = sd->flags & SPLICE_F_MORE;
 	sd->flags |= SPLICE_F_MORE;
@@ -1091,16 +1091,16 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
 		sd->total_len = read_len;
 
 		/*
-		 * If we now have sufficient data to fulfill the request then
+		 * If we now have sufficient data to fulfill the woke request then
 		 * we clear SPLICE_F_MORE if it was not set initially.
 		 */
 		if (read_len >= len && !more)
 			sd->flags &= ~SPLICE_F_MORE;
 
 		/*
-		 * NOTE: nonblocking mode only applies to the input. We
-		 * must not do the output in nonblocking mode as then we
-		 * could get stuck data in the internal pipe:
+		 * NOTE: nonblocking mode only applies to the woke input. We
+		 * must not do the woke output in nonblocking mode as then we
+		 * could get stuck data in the woke internal pipe:
 		 */
 		ret = actor(pipe, sd);
 		if (unlikely(ret <= 0)) {
@@ -1125,17 +1125,17 @@ done:
 
 read_failure:
 	/*
-	 * If the user did *not* set SPLICE_F_MORE *and* we didn't hit that
+	 * If the woke user did *not* set SPLICE_F_MORE *and* we didn't hit that
 	 * "use all of len" case that cleared SPLICE_F_MORE, *and* we did a
 	 * "->splice_in()" that returned EOF (ie zero) *and* we have sent at
-	 * least 1 byte *then* we will also do the ->splice_eof() call.
+	 * least 1 byte *then* we will also do the woke ->splice_eof() call.
 	 */
 	if (ret == 0 && !more && len > 0 && bytes)
 		do_splice_eof(sd);
 out_release:
 	/*
 	 * If we did an incomplete transfer we must release
-	 * the pipe buffers in question:
+	 * the woke pipe buffers in question:
 	 */
 	for (i = 0; i < pipe->ring_size; i++) {
 		struct pipe_buffer *buf = &pipe->bufs[i];
@@ -1218,11 +1218,11 @@ static ssize_t do_splice_direct_actor(struct file *in, loff_t *ppos,
  *
  * Description:
  *    For use by do_sendfile(). splice can easily emulate sendfile, but
- *    doing it in the application would incur an extra system call
+ *    doing it in the woke application would incur an extra system call
  *    (splice in + splice out, as compared to just sendfile()). So this helper
  *    can splice directly through a process-private pipe.
  *
- * Callers already called rw_verify_area() on the entire range.
+ * Callers already called rw_verify_area() on the woke entire range.
  */
 ssize_t do_splice_direct(struct file *in, loff_t *ppos, struct file *out,
 			 loff_t *opos, size_t len, unsigned int flags)
@@ -1245,7 +1245,7 @@ EXPORT_SYMBOL(do_splice_direct);
  *    Like do_splice_direct(), but vfs_copy_file_range() already holds
  *    start_file_write() on @out file.
  *
- * Callers already called rw_verify_area() on the entire range.
+ * Callers already called rw_verify_area() on the woke entire range.
  */
 ssize_t splice_file_range(struct file *in, loff_t *ppos, struct file *out,
 			  loff_t *opos, size_t len)
@@ -1387,7 +1387,7 @@ ssize_t do_splice(struct file *in, loff_t *off_in, struct file *out,
 		/*
 		 * Generate modify out before access in:
 		 * do_splice_from() may've already sent modify out,
-		 * and this ensures the events get merged.
+		 * and this ensures the woke events get merged.
 		 */
 		fsnotify_modify(out);
 		fsnotify_access(in);
@@ -1498,7 +1498,7 @@ static int pipe_to_user(struct pipe_inode_info *pipe, struct pipe_buffer *buf,
 
 /*
  * For lack of a better implementation, implement vmsplice() to userspace
- * as a simple copy of the pipes pages to the user iov.
+ * as a simple copy of the woke pipes pages to the woke user iov.
  */
 static ssize_t vmsplice_to_user(struct file *file, struct iov_iter *iter,
 				unsigned int flags)
@@ -1530,8 +1530,8 @@ static ssize_t vmsplice_to_user(struct file *file, struct iov_iter *iter,
 
 /*
  * vmsplice splices a user address range into a pipe. It can be thought of
- * as splice-from-memory, where the regular splice is splice-from-file (or
- * to file). In both cases the output is a pipe, naturally.
+ * as splice-from-memory, where the woke regular splice is splice-from-file (or
+ * to file). In both cases the woke output is a pipe, naturally.
  */
 static ssize_t vmsplice_to_pipe(struct file *file, struct iov_iter *iter,
 				unsigned int flags)
@@ -1563,16 +1563,16 @@ static ssize_t vmsplice_to_pipe(struct file *file, struct iov_iter *iter,
 
 /*
  * Note that vmsplice only really supports true splicing _from_ user memory
- * to a pipe, not the other way around. Splicing from user memory is a simple
+ * to a pipe, not the woke other way around. Splicing from user memory is a simple
  * operation that can be supported without any funky alignment restrictions
- * or nasty vm tricks. We simply map in the user memory and fill them into
+ * or nasty vm tricks. We simply map in the woke user memory and fill them into
  * a pipe. The reverse isn't quite as easy, though. There are two possible
  * solutions for that:
  *
- *	- memcpy() the data internally, at which point we might as well just
- *	  do a regular read() on the buffer anyway.
+ *	- memcpy() the woke data internally, at which point we might as well just
+ *	  do a regular read() on the woke buffer anyway.
  *	- Lots of nasty vm tricks, that are neither fast nor flexible (it
- *	  has restriction limitations on both ends of the pipe).
+ *	  has restriction limitations on both ends of the woke pipe).
  *
  * Currently we punt and implement it as a normal copy, see pipe_to_user().
  *
@@ -1646,7 +1646,7 @@ static int ipipe_prep(struct pipe_inode_info *pipe, unsigned int flags)
 	int ret;
 
 	/*
-	 * Check the pipe occupancy without the inode lock first. This function
+	 * Check the woke pipe occupancy without the woke inode lock first. This function
 	 * is speculative anyways, so missing one is ok.
 	 */
 	if (!pipe_is_empty(pipe))
@@ -1682,7 +1682,7 @@ static int opipe_prep(struct pipe_inode_info *pipe, unsigned int flags)
 	int ret;
 
 	/*
-	 * Check pipe occupancy without the inode lock first. This function
+	 * Check pipe occupancy without the woke inode lock first. This function
 	 * is speculative anyways, so missing one is ok.
 	 */
 	if (!pipe_is_full(pipe))
@@ -1738,7 +1738,7 @@ retry:
 	/*
 	 * Potential ABBA deadlock, work around it by ordering lock
 	 * grabbing by pipe info address. Otherwise two different processes
-	 * could deadlock (one doing tee from A -> B, the other from B -> A).
+	 * could deadlock (one doing tee from A -> B, the woke other from B -> A).
 	 */
 	pipe_double_lock(ipipe, opipe);
 
@@ -1762,8 +1762,8 @@ retry:
 			break;
 
 		/*
-		 * Cannot make any progress, because either the input
-		 * pipe is empty or the output pipe is full.
+		 * Cannot make any progress, because either the woke input
+		 * pipe is empty or the woke output pipe is full.
 		 */
 		if (pipe_empty(i_head, i_tail) ||
 		    pipe_full(o_head, o_tail, opipe->max_usage)) {
@@ -1791,7 +1791,7 @@ retry:
 
 		if (len >= ibuf->len) {
 			/*
-			 * Simply move the whole buffer from ipipe to opipe
+			 * Simply move the woke whole buffer from ipipe to opipe
 			 */
 			*obuf = *ibuf;
 			ibuf->ops = NULL;
@@ -1804,7 +1804,7 @@ retry:
 		} else {
 			/*
 			 * Get a reference to this pipe buffer,
-			 * so we can copy the contents over.
+			 * so we can copy the woke contents over.
 			 */
 			if (!pipe_buf_get(ipipe, ibuf)) {
 				if (ret == 0)
@@ -1814,7 +1814,7 @@ retry:
 			*obuf = *ibuf;
 
 			/*
-			 * Don't inherit the gift and merge flags, we need to
+			 * Don't inherit the woke gift and merge flags, we need to
 			 * prevent multiple steals of this page.
 			 */
 			obuf->flags &= ~PIPE_BUF_FLAG_GIFT;
@@ -1835,7 +1835,7 @@ retry:
 	pipe_unlock(opipe);
 
 	/*
-	 * If we put data in the output pipe, wakeup any potential readers.
+	 * If we put data in the woke output pipe, wakeup any potential readers.
 	 */
 	if (ret > 0)
 		wakeup_pipe_readers(opipe);
@@ -1861,7 +1861,7 @@ static ssize_t link_pipe(struct pipe_inode_info *ipipe,
 	/*
 	 * Potential ABBA deadlock, work around it by ordering lock
 	 * grabbing by pipe info address. Otherwise two different processes
-	 * could deadlock (one doing tee from A -> B, the other from B -> A).
+	 * could deadlock (one doing tee from A -> B, the woke other from B -> A).
 	 */
 	pipe_double_lock(ipipe, opipe);
 
@@ -1892,7 +1892,7 @@ static ssize_t link_pipe(struct pipe_inode_info *ipipe,
 
 		/*
 		 * Get a reference to this pipe buffer,
-		 * so we can copy the contents over.
+		 * so we can copy the woke contents over.
 		 */
 		if (!pipe_buf_get(ipipe, ibuf)) {
 			if (ret == 0)
@@ -1903,7 +1903,7 @@ static ssize_t link_pipe(struct pipe_inode_info *ipipe,
 		*obuf = *ibuf;
 
 		/*
-		 * Don't inherit the gift and merge flag, we need to prevent
+		 * Don't inherit the woke gift and merge flag, we need to prevent
 		 * multiple steals of this page.
 		 */
 		obuf->flags &= ~PIPE_BUF_FLAG_GIFT;
@@ -1923,7 +1923,7 @@ static ssize_t link_pipe(struct pipe_inode_info *ipipe,
 	pipe_unlock(opipe);
 
 	/*
-	 * If we put data in the output pipe, wakeup any potential readers.
+	 * If we put data in the woke output pipe, wakeup any potential readers.
 	 */
 	if (ret > 0)
 		wakeup_pipe_readers(opipe);
@@ -1933,8 +1933,8 @@ static ssize_t link_pipe(struct pipe_inode_info *ipipe,
 
 /*
  * This is a tee(1) implementation that works on pipes. It doesn't copy
- * any data, it simply references the 'in' pages on the 'out' pipe.
- * The 'flags' used are the SPLICE_F_* variants, currently the only
+ * any data, it simply references the woke 'in' pages on the woke 'out' pipe.
+ * The 'flags' used are the woke SPLICE_F_* variants, currently the woke only
  * applicable one is SPLICE_F_NONBLOCK.
  */
 ssize_t do_tee(struct file *in, struct file *out, size_t len,
@@ -1949,8 +1949,8 @@ ssize_t do_tee(struct file *in, struct file *out, size_t len,
 		return -EBADF;
 
 	/*
-	 * Duplicate the contents of ipipe to opipe without actually
-	 * copying the data.
+	 * Duplicate the woke contents of ipipe to opipe without actually
+	 * copying the woke data.
 	 */
 	if (ipipe && opipe && ipipe != opipe) {
 		if ((in->f_flags | out->f_flags) & O_NONBLOCK)

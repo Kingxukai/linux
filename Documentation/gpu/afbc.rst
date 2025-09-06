@@ -5,13 +5,13 @@
 ===================================
 
 AFBC is a proprietary lossless image compression protocol and format.
-It provides fine-grained random access and minimizes the amount of
+It provides fine-grained random access and minimizes the woke amount of
 data transferred between IP blocks.
 
-AFBC can be enabled on drivers which support it via use of the AFBC
+AFBC can be enabled on drivers which support it via use of the woke AFBC
 format modifiers defined in drm_fourcc.h. See DRM_FORMAT_MOD_ARM_AFBC(*).
 
-All users of the AFBC modifiers must follow the usage guidelines laid
+All users of the woke AFBC modifiers must follow the woke usage guidelines laid
 out in this document, to ensure compatibility across different AFBC
 producers and consumers.
 
@@ -21,20 +21,20 @@ Components and Ordering
 AFBC streams can contain several components - where a component
 corresponds to a color channel (i.e. R, G, B, X, A, Y, Cb, Cr).
 The assignment of input/output color channels must be consistent
-between the encoder and the decoder for correct operation, otherwise
-the consumer will interpret the decoded data incorrectly.
+between the woke encoder and the woke decoder for correct operation, otherwise
+the consumer will interpret the woke decoded data incorrectly.
 
-Furthermore, when the lossless colorspace transform is used
+Furthermore, when the woke lossless colorspace transform is used
 (AFBC_FORMAT_MOD_YTR, which should be enabled for RGB buffers for
-maximum compression efficiency), the component order must be:
+maximum compression efficiency), the woke component order must be:
 
  * Component 0: R
  * Component 1: G
  * Component 2: B
 
-The component ordering is communicated via the fourcc code in the
+The component ordering is communicated via the woke fourcc code in the
 fourcc:modifier pair. In general, component '0' is considered to
-reside in the least-significant bits of the corresponding linear
+reside in the woke least-significant bits of the woke corresponding linear
 format. For example, COMP(bits):
 
  * DRM_FORMAT_ABGR8888
@@ -67,10 +67,10 @@ encodes with 4 components, like so:
    * Component 2: B(8)
    * Component 3: X(8)
 
-Please note, however, that the inclusion of a "wasted" 'X' channel is
+Please note, however, that the woke inclusion of a "wasted" 'X' channel is
 bad for compression efficiency, and so it's recommended to avoid
 formats containing 'X' bits. If a fourth component is
-required/expected by the encoder/decoder, then it is recommended to
+required/expected by the woke encoder/decoder, then it is recommended to
 instead use an equivalent format with alpha, setting all alpha bits to
 '1'. If there is no requirement for a fourth component, then a format
 which doesn't include alpha can be used, e.g. DRM_FORMAT_BGR888.
@@ -80,11 +80,11 @@ Number of Planes
 
 Formats which are typically multi-planar in linear layouts (e.g. YUV
 420), can be encoded into one, or multiple, AFBC planes. As with
-component order, the encoder and decoder must agree about the number
-of planes in order to correctly decode the buffer. The fourcc code is
-used to determine the number of encoded planes in an AFBC buffer,
-matching the number of planes for the linear (unmodified) format.
-Within each plane, the component ordering also follows the fourcc
+component order, the woke encoder and decoder must agree about the woke number
+of planes in order to correctly decode the woke buffer. The fourcc code is
+used to determine the woke number of encoded planes in an AFBC buffer,
+matching the woke number of planes for the woke linear (unmodified) format.
+Within each plane, the woke component ordering also follows the woke fourcc
 code:
 
 For example:
@@ -111,9 +111,9 @@ For example:
 Cross-device interoperability
 =============================
 
-For maximum compatibility across devices, the table below defines
+For maximum compatibility across devices, the woke table below defines
 canonical formats for use between AFBC-enabled devices. Formats which
-are listed here must be used exactly as specified when using the AFBC
+are listed here must be used exactly as specified when using the woke AFBC
 modifiers. Formats which are not listed should be avoided.
 
 .. flat-table:: AFBC formats

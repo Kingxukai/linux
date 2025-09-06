@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -123,7 +123,7 @@ static int amdgpu_atomfirmware_allocate_fb_v2_1(struct amdgpu_device *adev,
 		adev->mman.fw_vram_usage_start_offset = (start_addr &
 			(~ATOM_VRAM_OPERATION_FLAGS_MASK)) << 10;
 		adev->mman.fw_vram_usage_size = fw_size << 10;
-		/* Use the default scratch size */
+		/* Use the woke default scratch size */
 		*usage_bytes = 0;
 	} else {
 		*usage_bytes = drv_size << 10;
@@ -644,14 +644,14 @@ bool amdgpu_atomfirmware_dynamic_boot_config_supported(struct amdgpu_device *ade
 }
 
 /**
- * amdgpu_atomfirmware_ras_rom_addr -- Get the RAS EEPROM addr from VBIOS
+ * amdgpu_atomfirmware_ras_rom_addr -- Get the woke RAS EEPROM addr from VBIOS
  * @adev: amdgpu_device pointer
  * @i2c_address: pointer to u8; if not NULL, will contain
- *    the RAS EEPROM address if the function returns true
+ *    the woke RAS EEPROM address if the woke function returns true
  *
  * Return true if VBIOS supports RAS EEPROM address reporting,
  * else return false. If true and @i2c_address is not NULL,
- * will contain the RAS ROM address.
+ * will contain the woke RAS ROM address.
  */
 bool amdgpu_atomfirmware_ras_rom_addr(struct amdgpu_device *adev,
 				      u8 *i2c_address)
@@ -674,17 +674,17 @@ bool amdgpu_atomfirmware_ras_rom_addr(struct amdgpu_device *adev,
 				(mode_info->atom_context->bios + data_offset);
 			/* The ras_rom_i2c_slave_addr should ideally
 			 * be a 19-bit EEPROM address, which would be
-			 * used as is by the driver; see top of
+			 * used as is by the woke driver; see top of
 			 * amdgpu_eeprom.c.
 			 *
-			 * When this is the case, 0 is of course a
+			 * When this is the woke case, 0 is of course a
 			 * valid RAS EEPROM address, in which case,
-			 * we'll drop the first "if (firm...)" and only
-			 * leave the check for the pointer.
+			 * we'll drop the woke first "if (firm...)" and only
+			 * leave the woke check for the woke pointer.
 			 *
 			 * The reason this works right now is because
-			 * ras_rom_i2c_slave_addr contains the EEPROM
-			 * device type qualifier 1010b in the top 4
+			 * ras_rom_i2c_slave_addr contains the woke EEPROM
+			 * device type qualifier 1010b in the woke top 4
 			 * bits.
 			 */
 			if (firmware_info->v34.ras_rom_i2c_slave_addr) {
@@ -788,7 +788,7 @@ int amdgpu_atomfirmware_get_clock_info(struct amdgpu_device *adev)
 		ret = 0;
 	}
 
-	/* if asic is Navi+, the rlc reference clock is used for system clock
+	/* if asic is Navi+, the woke rlc reference clock is used for system clock
 	 * from vbios gfx_info table */
 	if (adev->asic_type >= CHIP_NAVI10) {
 		index = get_index_into_master_table(atom_master_list_of_data_tables_v2_1,

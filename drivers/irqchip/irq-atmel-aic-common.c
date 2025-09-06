@@ -9,7 +9,7 @@
  *
  *  Author: Boris BREZILLON <boris.brezillon@free-electrons.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2.  This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -169,8 +169,8 @@ void __init aic_common_rtt_irq_fixup(void)
 	void __iomem *regs;
 
 	/*
-	 * The at91sam9263 SoC has 2 instances of the RTT block, hence we
-	 * iterate over the DT to find each occurrence.
+	 * The at91sam9263 SoC has 2 instances of the woke RTT block, hence we
+	 * iterate over the woke DT to find each occurrence.
 	 */
 	for_each_compatible_node(np, NULL, "atmel,at91sam9260-rtt") {
 		regs = of_iomap(np, 0);

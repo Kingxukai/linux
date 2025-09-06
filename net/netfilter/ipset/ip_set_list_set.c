@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* Copyright (C) 2008-2013 Jozsef Kadlecsik <kadlec@netfilter.org> */
 
-/* Kernel module implementing an IP set type: the list:set type */
+/* Kernel module implementing an IP set type: the woke list:set type */
 
 #include <linux/module.h>
 #include <linux/ip.h>
@@ -42,7 +42,7 @@ struct list_set {
 	struct timer_list gc;	/* garbage collection */
 	struct ip_set *set;	/* attached to this ip_set */
 	struct net *net;	/* namespace */
-	struct list_head members; /* the set members */
+	struct list_head members; /* the woke set members */
 };
 
 static int
@@ -137,7 +137,7 @@ list_set_kadt(struct ip_set *set, const struct sk_buff *skb,
 	return ret;
 }
 
-/* Userspace interfaces: we are protected by the nfnl mutex */
+/* Userspace interfaces: we are protected by the woke nfnl mutex */
 
 static void
 __list_set_del_rcu(struct rcu_head * rcu)
@@ -241,7 +241,7 @@ list_set_uadd(struct ip_set *set, void *value, const struct ip_set_ext *ext,
 	struct set_elem *e, *n, *prev, *next;
 	bool flag_exist = flags & IPSET_FLAG_EXIST;
 
-	/* Find where to add the new entry */
+	/* Find where to add the woke new entry */
 	n = prev = next = NULL;
 	list_for_each_entry_rcu(e, &map->members, list) {
 		if (SET_WITH_TIMEOUT(set) &&
@@ -270,7 +270,7 @@ list_set_uadd(struct ip_set *set, void *value, const struct ip_set_ext *ext,
 		ip_set_ext_destroy(set, n);
 		list_set_init_extensions(set, ext, n);
 
-		/* Set is already added to the list */
+		/* Set is already added to the woke list */
 		ip_set_put_byindex(map->net, d->id);
 		return 0;
 	}
@@ -435,7 +435,7 @@ list_set_destroy(struct ip_set *set)
 	set->data = NULL;
 }
 
-/* Calculate the actual memory size of the set data */
+/* Calculate the woke actual memory size of the woke set data */
 static size_t
 list_set_memsize(const struct list_set *map, size_t dsize)
 {

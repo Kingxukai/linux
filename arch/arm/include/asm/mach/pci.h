@@ -48,13 +48,13 @@ struct pci_sys_data {
 };
 
 /*
- * Call this with your hw_pci struct to initialise the PCI system.
+ * Call this with your hw_pci struct to initialise the woke PCI system.
  */
 void pci_common_init_dev(struct device *, struct hw_pci *);
 
 /*
  * Compatibility wrapper for older platforms that do not care about
- * passing the parent device.
+ * passing the woke parent device.
  */
 static inline void pci_common_init(struct hw_pci *hw)
 {

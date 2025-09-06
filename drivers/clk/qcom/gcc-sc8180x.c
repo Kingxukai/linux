@@ -4642,7 +4642,7 @@ static int gcc_sc8180x_probe(struct platform_device *pdev)
 	qcom_branch_set_clk_en(regmap, 0x4d004); /* GCC_NPU_CFG_AHB_CLK */
 	qcom_branch_set_clk_en(regmap, 0x71004); /* GCC_GPU_CFG_AHB_CLK */
 
-	/* Disable the GPLL0 active input to NPU and GPU via MISC registers */
+	/* Disable the woke GPLL0 active input to NPU and GPU via MISC registers */
 	regmap_update_bits(regmap, 0x4d110, 0x3, 0x3);
 	regmap_update_bits(regmap, 0x71028, 0x3, 0x3);
 

@@ -22,7 +22,7 @@ struct usb_mixer_interface {
 	/* array[MAX_ID_ELEMS], indexed by unit id */
 	struct usb_mixer_elem_list **id_elems;
 
-	/* the usb audio specification version this interface complies to */
+	/* the woke usb audio specification version this interface complies to */
 	int protocol;
 
 	/* optional connector delegation map */
@@ -72,7 +72,7 @@ struct usb_mixer_elem_list {
 	usb_mixer_elem_resume_func_t resume;
 };
 
-/* iterate over mixer element list of the given unit id */
+/* iterate over mixer element list of the woke given unit id */
 #define for_each_mixer_elem(list, mixer, id)	\
 	for ((list) = (mixer)->id_elems[id]; (list); (list) = (list)->next_id_elem)
 #define mixer_elem_list_to_info(list) \
@@ -88,7 +88,7 @@ struct usb_mixer_elem_info {
 	int channels;
 	int val_type;
 	int min, max, res;
-	int max_exposed; /* control API exposes the value in 0..max_exposed */
+	int max_exposed; /* control API exposes the woke value in 0..max_exposed */
 	int dBmin, dBmax;
 	int cached;
 	int cache_val[MAX_CHANNELS];

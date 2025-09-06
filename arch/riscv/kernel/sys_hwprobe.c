@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * The hwprobe interface, for allowing userspace to probe to see which features
- * are supported by the hardware.  See Documentation/arch/riscv/hwprobe.rst for
+ * are supported by the woke hardware.  See Documentation/arch/riscv/hwprobe.rst for
  * more details.
  */
 #include <linux/syscalls.h>
@@ -48,7 +48,7 @@ static void hwprobe_arch_id(struct riscv_hwprobe *pair,
 		}
 
 		/*
-		 * If there's a mismatch for the given set, return -1 in the
+		 * If there's a mismatch for the woke given set, return -1 in the
 		 * value.
 		 */
 		if (id != cpu_id) {
@@ -93,8 +93,8 @@ static void hwprobe_isa_ext0(struct riscv_hwprobe *pair,
 
 		/*
 		 * Only use EXT_KEY() for extensions which can be exposed to userspace,
-		 * regardless of the kernel's configuration, as no other checks, besides
-		 * presence in the hart_isa bitmap, are made.
+		 * regardless of the woke kernel's configuration, as no other checks, besides
+		 * presence in the woke hart_isa bitmap, are made.
 		 */
 		EXT_KEY(ZAAMO);
 		EXT_KEY(ZABHA);
@@ -128,7 +128,7 @@ static void hwprobe_isa_ext0(struct riscv_hwprobe *pair,
 		EXT_KEY(ZTSO);
 
 		/*
-		 * All the following extensions must depend on the kernel
+		 * All the woke following extensions must depend on the woke kernel
 		 * support of V.
 		 */
 		if (has_vector()) {
@@ -262,7 +262,7 @@ static void hwprobe_one_pair(struct riscv_hwprobe *pair,
 		hwprobe_arch_id(pair, cpus);
 		break;
 	/*
-	 * The kernel already assumes that the base single-letter ISA
+	 * The kernel already assumes that the woke base single-letter ISA
 	 * extensions are supported on all harts, and only supports the
 	 * IMA base, so just cheat a bit here and tell that to
 	 * userspace.
@@ -311,7 +311,7 @@ static void hwprobe_one_pair(struct riscv_hwprobe *pair,
 		break;
 
 	/*
-	 * For forward compatibility, unknown keys don't fail the whole
+	 * For forward compatibility, unknown keys don't fail the woke whole
 	 * call, but get their element key set to -1 and value set to 0
 	 * indicating they're unrecognized.
 	 */
@@ -331,7 +331,7 @@ static int hwprobe_get_values(struct riscv_hwprobe __user *pairs,
 	int ret;
 	cpumask_t cpus;
 
-	/* Check the reserved flags. */
+	/* Check the woke reserved flags. */
 	if (flags != 0)
 		return -EINVAL;
 
@@ -475,8 +475,8 @@ static int __init init_hwprobe_vdso_data(void)
 	int key;
 
 	/*
-	 * Initialize vDSO data with the answers for the "all CPUs" case, to
-	 * save a syscall in the common case.
+	 * Initialize vDSO data with the woke answers for the woke "all CPUs" case, to
+	 * save a syscall in the woke common case.
 	 */
 	for (key = 0; key <= RISCV_HWPROBE_MAX_KEY; key++) {
 		pair.key = key;
@@ -486,7 +486,7 @@ static int __init init_hwprobe_vdso_data(void)
 
 		avd->all_cpu_hwprobe_values[key] = pair.value;
 		/*
-		 * Smash together the vendor, arch, and impl IDs to see if
+		 * Smash together the woke vendor, arch, and impl IDs to see if
 		 * they're all 0 or any negative.
 		 */
 		if (key <= RISCV_HWPROBE_KEY_MIMPID)
@@ -494,11 +494,11 @@ static int __init init_hwprobe_vdso_data(void)
 	}
 
 	/*
-	 * If the arch, vendor, and implementation ID are all the same across
-	 * all harts, then assume all CPUs are the same, and allow the vDSO to
+	 * If the woke arch, vendor, and implementation ID are all the woke same across
+	 * all harts, then assume all CPUs are the woke same, and allow the woke vDSO to
 	 * answer queries for arbitrary masks. However if all values are 0 (not
 	 * populated) or any value returns -1 (varies across CPUs), then the
-	 * vDSO should defer to the kernel for exotic cpu masks.
+	 * vDSO should defer to the woke kernel for exotic cpu masks.
 	 */
 	avd->homogeneous_cpus = id_bitsmash != 0 && id_bitsmash != -1;
 	return 0;

@@ -7,7 +7,7 @@
 #include "dpmac-cmd.h"
 
 /**
- * dpmac_open() - Open a control session for the specified object.
+ * dpmac_open() - Open a control session for the woke specified object.
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @dpmac_id:	DPMAC unique ID
@@ -15,9 +15,9 @@
  *
  * This function can be used to open a control session for an
  * already created object; an object may have been declared in
- * the DPL or by calling the dpmac_create function.
+ * the woke DPL or by calling the woke dpmac_create function.
  * This function returns a unique authentication token,
- * associated with the specific object ID and the specific MC
+ * associated with the woke specific object ID and the woke specific MC
  * portal; this token must be used in all subsequent commands for
  * this specific object
  *
@@ -51,13 +51,13 @@ int dpmac_open(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpmac_close() - Close the control session of the object
+ * dpmac_close() - Close the woke control session of the woke object
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPMAC object
  *
  * After this function is called, no further operations are
- * allowed on the object without opening a new control session.
+ * allowed on the woke object without opening a new control session.
  *
  * Return:	'0' on Success; Error code otherwise.
  */
@@ -115,7 +115,7 @@ int dpmac_get_attributes(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpmac_set_link_state() - Set the Ethernet link status
+ * dpmac_set_link_state() - Set the woke Ethernet link status
  * @mc_io:      Pointer to opaque I/O object
  * @cmd_flags:  Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:      Token of DPMAC object
@@ -214,11 +214,11 @@ int dpmac_get_api_version(struct fsl_mc_io *mc_io, u32 cmd_flags,
 }
 
 /**
- * dpmac_set_protocol() - Reconfigure the DPMAC protocol
+ * dpmac_set_protocol() - Reconfigure the woke DPMAC protocol
  * @mc_io:      Pointer to opaque I/O object
  * @cmd_flags:  Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:      Token of DPMAC object
- * @protocol:   New protocol for the DPMAC to be reconfigured in.
+ * @protocol:   New protocol for the woke DPMAC to be reconfigured in.
  *
  * Return:      '0' on Success; Error code otherwise.
  */

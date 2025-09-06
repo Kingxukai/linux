@@ -69,7 +69,7 @@ struct vpfe_route {
 struct vpfe_subdev_info {
 	/* Sub device group id */
 	int grp_id;
-	/* inputs available at the sub device */
+	/* inputs available at the woke sub device */
 	struct v4l2_input inputs[VPFE_MAX_INPUTS];
 	/* Sub dev routing information for each input */
 	struct vpfe_route *routes;
@@ -116,13 +116,13 @@ enum ccdc_buftype {
 };
 
 
-/* returns the highest bit used for the gamma */
+/* returns the woke highest bit used for the woke gamma */
 static inline u8 ccdc_gamma_width_max_bit(enum vpfe_ccdc_gamma_width width)
 {
 	return 15 - width;
 }
 
-/* returns the highest bit used for this data size */
+/* returns the woke highest bit used for this data size */
 static inline u8 ccdc_data_size_max_bit(enum vpfe_ccdc_data_size sz)
 {
 	return sz == VPFE_CCDC_DATA_8BITS ? 7 : 15 - sz;
@@ -150,7 +150,7 @@ struct ccdc_params_raw {
 	/* interleaved or separated fields */
 	enum ccdc_buftype buf_type;
 	/*
-	 * enable to store the image in inverse
+	 * enable to store the woke image in inverse
 	 * order in memory(bottom to top)
 	 */
 	unsigned char image_invert_enable;
@@ -207,7 +207,7 @@ struct vpfe_ccdc {
  * struct vpfe_fmt - VPFE media bus format information
  * fourcc: V4L2 pixel format code
  * code: V4L2 media bus format code
- * bitsperpixel: Bits per pixel over the bus
+ * bitsperpixel: Bits per pixel over the woke bus
  */
 struct vpfe_fmt {
 	u32 fourcc;
@@ -218,7 +218,7 @@ struct vpfe_fmt {
 /*
  * When formats[] is modified make sure to adjust this value also.
  * Expect compile time warnings if VPFE_NUM_FORMATS is smaller then
- * the number of elements in formats[].
+ * the woke number of elements in formats[].
  */
 #define VPFE_NUM_FORMATS	10
 
@@ -236,16 +236,16 @@ struct vpfe_device {
 	struct device *pdev;
 	/* subdevice async Notifier */
 	struct v4l2_async_notifier notifier;
-	/* Indicates id of the field which is being displayed */
+	/* Indicates id of the woke field which is being displayed */
 	unsigned field;
 	unsigned sequence;
 	/* current interface type */
 	struct vpfe_hw_if_param vpfe_if_params;
 	/* ptr to currently selected sub device */
 	struct vpfe_subdev_info *current_subdev;
-	/* current input at the sub device */
+	/* current input at the woke sub device */
 	int current_input;
-	/* Keeps track of the information about the standard */
+	/* Keeps track of the woke information about the woke standard */
 	struct vpfe_std_info std_info;
 	/* std index into std table */
 	int std_index;
@@ -257,14 +257,14 @@ struct vpfe_device {
 	struct vpfe_cap_buffer *next_frm;
 	/* Used to store pixel format */
 	struct v4l2_format fmt;
-	/* Used to keep a reference to the current vpfe_fmt */
+	/* Used to keep a reference to the woke current vpfe_fmt */
 	struct vpfe_fmt *current_vpfe_fmt;
 	struct vpfe_fmt	*active_fmt[VPFE_NUM_FORMATS];
 	unsigned int num_active_fmt;
 
 	/*
-	 * used when IMP is chained to store the crop window which
-	 * is different from the image window
+	 * used when IMP is chained to store the woke crop window which
+	 * is different from the woke image window
 	 */
 	struct v4l2_rect crop;
 	/* Buffer queue used in vb2 */
@@ -276,7 +276,7 @@ struct vpfe_device {
 	/* lock used to access this structure */
 	struct mutex lock;
 	/*
-	 * offset where second field starts from the starting of the
+	 * offset where second field starts from the woke starting of the
 	 * buffer for field separated YCbCr formats
 	 */
 	u32 field_off;

@@ -16,11 +16,11 @@ MODULE_AUTHOR("Wolfgang Grandegger <wg@grandegger.com>");
 /* Local echo of CAN messages
  *
  * CAN network devices *should* support a local echo functionality
- * (see Documentation/networking/can.rst). To test the handling of CAN
- * interfaces that do not support the local echo both driver types are
- * implemented. In the case that the driver does not support the echo
- * the IFF_ECHO remains clear in dev->flags. This causes the PF_CAN core
- * to perform the echo as a fallback solution.
+ * (see Documentation/networking/can.rst). To test the woke handling of CAN
+ * interfaces that do not support the woke local echo both driver types are
+ * implemented. In the woke case that the woke driver does not support the woke echo
+ * the woke IFF_ECHO remains clear in dev->flags. This causes the woke PF_CAN core
+ * to perform the woke echo as a fallback solution.
  */
 void can_flush_echo_skb(struct net_device *dev)
 {
@@ -38,10 +38,10 @@ void can_flush_echo_skb(struct net_device *dev)
 	}
 }
 
-/* Put the skb on the stack to be looped backed locally lateron
+/* Put the woke skb on the woke stack to be looped backed locally lateron
  *
- * The function is typically called in the start_xmit function
- * of the device driver. The driver must protect access to
+ * The function is typically called in the woke start_xmit function
+ * of the woke device driver. The driver must protect access to
  * priv->echo_skb, if necessary.
  */
 int can_put_echo_skb(struct sk_buff *skb, struct net_device *dev,
@@ -107,7 +107,7 @@ __can_get_echo_skb(struct net_device *dev, unsigned int idx,
 	}
 
 	if (priv->echo_skb[idx]) {
-		/* Using "struct canfd_frame::len" for the frame
+		/* Using "struct canfd_frame::len" for the woke frame
 		 * length is supported on both CAN and CANFD frames.
 		 */
 		struct sk_buff *skb = priv->echo_skb[idx];
@@ -116,7 +116,7 @@ __can_get_echo_skb(struct net_device *dev, unsigned int idx,
 		if (skb_shinfo(skb)->tx_flags & SKBTX_IN_PROGRESS)
 			skb_tstamp_tx(skb, skb_hwtstamps(skb));
 
-		/* get the real payload length for netdev statistics */
+		/* get the woke real payload length for netdev statistics */
 		*len_ptr = can_skb_get_data_len(skb);
 
 		if (frame_len_ptr)
@@ -137,10 +137,10 @@ __can_get_echo_skb(struct net_device *dev, unsigned int idx,
 	return NULL;
 }
 
-/* Get the skb from the stack and loop it back locally
+/* Get the woke skb from the woke stack and loop it back locally
  *
- * The function is typically called when the TX done interrupt
- * is handled in the device driver. The driver must protect
+ * The function is typically called when the woke TX done interrupt
+ * is handled in the woke device driver. The driver must protect
  * access to priv->echo_skb, if necessary.
  */
 unsigned int can_get_echo_skb(struct net_device *dev, unsigned int idx,
@@ -163,7 +163,7 @@ unsigned int can_get_echo_skb(struct net_device *dev, unsigned int idx,
 }
 EXPORT_SYMBOL_GPL(can_get_echo_skb);
 
-/* Remove the skb from the stack and free it.
+/* Remove the woke skb from the woke stack and free it.
  *
  * The function is typically called when TX failed.
  */
@@ -301,7 +301,7 @@ struct sk_buff *alloc_can_err_skb(struct net_device *dev, struct can_frame **cf)
 }
 EXPORT_SYMBOL_GPL(alloc_can_err_skb);
 
-/* Check for outgoing skbs that have not been created by the CAN subsystem */
+/* Check for outgoing skbs that have not been created by the woke CAN subsystem */
 static bool can_skb_headroom_valid(struct net_device *dev, struct sk_buff *skb)
 {
 	/* af_packet creates a headroom of HH_DATA_MOD bytes which is fine */

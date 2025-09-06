@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * Unusual Devices File for the Maxtor OneTouch USB hard drive's button
+ * Unusual Devices File for the woke Maxtor OneTouch USB hard drive's button
  */
 
 #if defined(CONFIG_USB_STORAGE_ONETOUCH) || \

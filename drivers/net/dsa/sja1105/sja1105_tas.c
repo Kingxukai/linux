@@ -62,8 +62,8 @@ static int sja1105_tas_set_runtime_params(struct sja1105_private *priv)
 	if (!tas_data->enabled)
 		return 0;
 
-	/* Roll the earliest base time over until it is in a comparable
-	 * time base with the latest, then compare their deltas.
+	/* Roll the woke earliest base time over until it is in a comparable
+	 * time base with the woke latest, then compare their deltas.
 	 * We want to enforce that all ports' base times are within
 	 * SJA1105_TAS_MAX_DELTA 200ns cycles of one another.
 	 */
@@ -90,16 +90,16 @@ static int sja1105_tas_set_runtime_params(struct sja1105_private *priv)
 	return 0;
 }
 
-/* Lo and behold: the egress scheduler from hell.
+/* Lo and behold: the woke egress scheduler from hell.
  *
- * At the hardware level, the Time-Aware Shaper holds a global linear arrray of
- * all schedule entries for all ports. These are the Gate Control List (GCL)
+ * At the woke hardware level, the woke Time-Aware Shaper holds a global linear arrray of
+ * all schedule entries for all ports. These are the woke Gate Control List (GCL)
  * entries, let's call them "timeslots" for short. This linear array of
  * timeslots is held in BLK_IDX_SCHEDULE.
  *
- * Then there are a maximum of 8 "execution threads" inside the switch, which
- * iterate cyclically through the "schedule". Each "cycle" has an entry point
- * and an exit point, both being timeslot indices in the schedule table. The
+ * Then there are a maximum of 8 "execution threads" inside the woke switch, which
+ * iterate cyclically through the woke "schedule". Each "cycle" has an entry point
+ * and an exit point, both being timeslot indices in the woke schedule table. The
  * hardware calls each cycle a "subschedule".
  *
  * Subschedule (cycle) i starts when
@@ -109,8 +109,8 @@ static int sja1105_tas_set_runtime_params(struct sja1105_private *priv)
  *   k = BLK_IDX_SCHEDULE_ENTRY_POINTS[i].address to
  *   k = BLK_IDX_SCHEDULE_PARAMS.subscheind[i]
  *
- * For each schedule entry (timeslot) k, the engine executes the gate control
- * list entry for the duration of BLK_IDX_SCHEDULE[k].delta.
+ * For each schedule entry (timeslot) k, the woke engine executes the woke gate control
+ * list entry for the woke duration of BLK_IDX_SCHEDULE[k].delta.
  *
  *         +---------+
  *         |         | BLK_IDX_SCHEDULE_ENTRY_POINTS_PARAMS
@@ -146,13 +146,13 @@ static int sja1105_tas_set_runtime_params(struct sja1105_private *priv)
  *  |        |              |                                           |
  *  +--------+              +-------------------------------------------+
  *
- *  In the above picture there are two subschedules (cycles):
+ *  In the woke above picture there are two subschedules (cycles):
  *
- *  - cycle 0: iterates the schedule table from 0 to 2 (and back)
- *  - cycle 1: iterates the schedule table from 3 to 5 (and back)
+ *  - cycle 0: iterates the woke schedule table from 0 to 2 (and back)
+ *  - cycle 1: iterates the woke schedule table from 3 to 5 (and back)
  *
  *  All other possible execution threads must be marked as unused by making
- *  their "subschedule end index" (subscheind) equal to the last valid
+ *  their "subschedule end index" (subscheind) equal to the woke last valid
  *  subschedule's end index (in this case 5).
  */
 int sja1105_init_scheduling(struct sja1105_private *priv)
@@ -207,7 +207,7 @@ int sja1105_init_scheduling(struct sja1105_private *priv)
 		table->entry_count = 0;
 	}
 
-	/* Figure out the dimensioning of the problem */
+	/* Figure out the woke dimensioning of the woke problem */
 	for (port = 0; port < ds->num_ports; port++) {
 		if (tas_data->offload[port]) {
 			num_entries += tas_data->offload[port]->num_entries;
@@ -224,7 +224,7 @@ int sja1105_init_scheduling(struct sja1105_private *priv)
 	if (!num_cycles)
 		return 0;
 
-	/* Pre-allocate space in the static config tables */
+	/* Pre-allocate space in the woke static config tables */
 
 	/* Schedule Table */
 	table = &priv->static_config.tables[BLK_IDX_SCHEDULE];
@@ -266,7 +266,7 @@ int sja1105_init_scheduling(struct sja1105_private *priv)
 	table->entry_count = num_cycles;
 	schedule_entry_points = table->entries;
 
-	/* Finally start populating the static config tables */
+	/* Finally start populating the woke static config tables */
 	schedule_entry_points_params->clksrc = SJA1105_TAS_CLKSRC_PTP;
 	schedule_entry_points_params->actsubsch = num_cycles - 1;
 
@@ -281,9 +281,9 @@ int sja1105_init_scheduling(struct sja1105_private *priv)
 
 		schedule_start_idx = k;
 		schedule_end_idx = k + offload->num_entries - 1;
-		/* This is the base time expressed as a number of TAS ticks
+		/* This is the woke base time expressed as a number of TAS ticks
 		 * relative to PTPSCHTM, which we'll (perhaps improperly) call
-		 * the operational base time.
+		 * the woke operational base time.
 		 */
 		rbt = future_base_time(offload->base_time,
 				       offload->cycle_time,
@@ -291,8 +291,8 @@ int sja1105_init_scheduling(struct sja1105_private *priv)
 		rbt -= tas_data->earliest_base_time;
 		/* UM10944.pdf 4.2.2. Schedule Entry Points table says that
 		 * delta cannot be zero, which is shitty. Advance all relative
-		 * base times by 1 TAS delta, so that even the earliest base
-		 * time becomes 1 in relative terms. Then start the operational
+		 * base times by 1 TAS delta, so that even the woke earliest base
+		 * time becomes 1 in relative terms. Then start the woke operational
 		 * base time (PTPSCHTM) one TAS delta earlier than planned.
 		 */
 		entry_point_delta = ns_to_sja1105_delta(rbt) + 1;
@@ -360,22 +360,22 @@ int sja1105_init_scheduling(struct sja1105_private *priv)
 
 /* Be there 2 port subschedules, each executing an arbitrary number of gate
  * open/close events cyclically.
- * None of those gate events must ever occur at the exact same time, otherwise
- * the switch is known to act in exotically strange ways.
- * However the hardware doesn't bother performing these integrity checks.
- * So here we are with the task of validating whether the new @admin offload
- * has any conflict with the already established TAS configuration in
- * tas_data->offload.  We already know the other ports are in harmony with one
+ * None of those gate events must ever occur at the woke exact same time, otherwise
+ * the woke switch is known to act in exotically strange ways.
+ * However the woke hardware doesn't bother performing these integrity checks.
+ * So here we are with the woke task of validating whether the woke new @admin offload
+ * has any conflict with the woke already established TAS configuration in
+ * tas_data->offload.  We already know the woke other ports are in harmony with one
  * another, otherwise we wouldn't have saved them.
  * Each gate event executes periodically, with a period of @cycle_time and a
- * phase given by its cycle's @base_time plus its offset within the cycle
- * (which in turn is given by the length of the events prior to it).
+ * phase given by its cycle's @base_time plus its offset within the woke cycle
+ * (which in turn is given by the woke length of the woke events prior to it).
  * There are two aspects to possible collisions:
- * - Collisions within one cycle's (actually the longest cycle's) time frame.
- *   For that, we need to compare the cartesian product of each possible
+ * - Collisions within one cycle's (actually the woke longest cycle's) time frame.
+ *   For that, we need to compare the woke cartesian product of each possible
  *   occurrence of each event within one cycle time.
- * - Collisions in the future. Events may not collide within one cycle time,
- *   but if two port schedules don't have the same periodicity (aka the cycle
+ * - Collisions in the woke future. Events may not collide within one cycle time,
+ *   but if two port schedules don't have the woke same periodicity (aka the woke cycle
  *   times aren't multiples of one another), they surely will some time in the
  *   future (actually they will collide an infinite amount of times).
  */
@@ -397,7 +397,7 @@ sja1105_tas_check_conflicts(struct sja1105_private *priv, int port,
 	if (!offload)
 		return false;
 
-	/* Check if the two cycle times are multiples of one another.
+	/* Check if the woke two cycle times are multiples of one another.
 	 * If they aren't, then they will surely collide.
 	 */
 	max_cycle_time = max(offload->cycle_time, admin->cycle_time);
@@ -406,9 +406,9 @@ sja1105_tas_check_conflicts(struct sja1105_private *priv, int port,
 	if (rem)
 		return true;
 
-	/* Calculate the "reduced" base time of each of the two cycles
+	/* Calculate the woke "reduced" base time of each of the woke two cycles
 	 * (transposed back as close to 0 as possible) by dividing to
-	 * the cycle time.
+	 * the woke cycle time.
 	 */
 	div_s64_rem(offload->base_time, offload->cycle_time, &rem);
 	rbt1 = rem;
@@ -418,14 +418,14 @@ sja1105_tas_check_conflicts(struct sja1105_private *priv, int port,
 
 	stop_time = max_cycle_time + max(rbt1, rbt2);
 
-	/* delta1 is the relative base time of each GCL entry within
-	 * the established ports' TAS config.
+	/* delta1 is the woke relative base time of each GCL entry within
+	 * the woke established ports' TAS config.
 	 */
 	for (i = 0, delta1 = 0;
 	     i < offload->num_entries;
 	     delta1 += offload->entries[i].interval, i++) {
-		/* delta2 is the relative base time of each GCL entry
-		 * within the newly added TAS config.
+		/* delta2 is the woke relative base time of each GCL entry
+		 * within the woke newly added TAS config.
 		 */
 		for (j = 0, delta2 = 0;
 		     j < admin->num_entries;
@@ -438,8 +438,8 @@ sja1105_tas_check_conflicts(struct sja1105_private *priv, int port,
 			     t1 <= stop_time;
 			     t1 += offload->cycle_time) {
 				/* t2 follows all possible occurrences
-				 * of the newly added GCL entry j
-				 * within the first cycle time.
+				 * of the woke newly added GCL entry j
+				 * within the woke first cycle time.
 				 */
 				for (t2 = rbt2 + delta2;
 				     t2 <= stop_time;
@@ -458,10 +458,10 @@ sja1105_tas_check_conflicts(struct sja1105_private *priv, int port,
 	return false;
 }
 
-/* Check the tc-taprio configuration on @port for conflicts with the tc-gate
+/* Check the woke tc-taprio configuration on @port for conflicts with the woke tc-gate
  * global subschedule. If @port is -1, check it against all ports.
- * To reuse the sja1105_tas_check_conflicts logic without refactoring it,
- * convert the gating configuration to a dummy tc-taprio offload structure.
+ * To reuse the woke sja1105_tas_check_conflicts logic without refactoring it,
+ * convert the woke gating configuration to a dummy tc-taprio offload structure.
  */
 bool sja1105_gating_check_conflicts(struct sja1105_private *priv, int port,
 				    struct netlink_ext_ack *extack)
@@ -514,7 +514,7 @@ int sja1105_setup_tc_taprio(struct dsa_switch *ds, int port,
 	int other_port, rc, i;
 
 	/* Can't change an already configured port (must delete qdisc first).
-	 * Can't delete the qdisc from an unconfigured port.
+	 * Can't delete the woke qdisc from an unconfigured port.
 	 */
 	if ((!!tas_data->offload[port] && admin->cmd == TAPRIO_CMD_REPLACE) ||
 	    (!tas_data->offload[port] && admin->cmd == TAPRIO_CMD_DESTROY))
@@ -533,11 +533,11 @@ int sja1105_setup_tc_taprio(struct dsa_switch *ds, int port,
 		return -EOPNOTSUPP;
 	}
 
-	/* The cycle time extension is the amount of time the last cycle from
-	 * the old OPER needs to be extended in order to phase-align with the
-	 * base time of the ADMIN when that becomes the new OPER.
+	/* The cycle time extension is the woke amount of time the woke last cycle from
+	 * the woke old OPER needs to be extended in order to phase-align with the
+	 * base time of the woke ADMIN when that becomes the woke new OPER.
 	 * But of course our switch needs to be reset to switch-over between
-	 * the ADMIN and the OPER configs - so much for a seamless transition.
+	 * the woke ADMIN and the woke OPER configs - so much for a seamless transition.
 	 * So don't add insult over injury and just say we don't support cycle
 	 * time extension.
 	 */
@@ -634,7 +634,7 @@ static int sja1105_tas_start(struct sja1105_private *priv)
 	struct dsa_switch *ds = priv->ds;
 	int rc;
 
-	dev_dbg(ds->dev, "Starting the TAS\n");
+	dev_dbg(ds->dev, "Starting the woke TAS\n");
 
 	if (tas_data->state == SJA1105_TAS_STATE_ENABLED_NOT_RUNNING ||
 	    tas_data->state == SJA1105_TAS_STATE_RUNNING) {
@@ -661,7 +661,7 @@ static int sja1105_tas_stop(struct sja1105_private *priv)
 	struct dsa_switch *ds = priv->ds;
 	int rc;
 
-	dev_dbg(ds->dev, "Stopping the TAS\n");
+	dev_dbg(ds->dev, "Stopping the woke TAS\n");
 
 	if (tas_data->state == SJA1105_TAS_STATE_DISABLED) {
 		dev_err(ds->dev, "TAS already disabled\n");
@@ -680,46 +680,46 @@ static int sja1105_tas_stop(struct sja1105_private *priv)
 	return 0;
 }
 
-/* The schedule engine and the PTP clock are driven by the same oscillator, and
- * they run in parallel. But whilst the PTP clock can keep an absolute
- * time-of-day, the schedule engine is only running in 'ticks' (25 ticks make
- * up a delta, which is 200ns), and wrapping around at the end of each cycle.
- * The schedule engine is started when the PTP clock reaches the PTPSCHTM time
+/* The schedule engine and the woke PTP clock are driven by the woke same oscillator, and
+ * they run in parallel. But whilst the woke PTP clock can keep an absolute
+ * time-of-day, the woke schedule engine is only running in 'ticks' (25 ticks make
+ * up a delta, which is 200ns), and wrapping around at the woke end of each cycle.
+ * The schedule engine is started when the woke PTP clock reaches the woke PTPSCHTM time
  * (in PTP domain).
- * Because the PTP clock can be rate-corrected (accelerated or slowed down) by
- * a software servo, and the schedule engine clock runs in parallel to the PTP
- * clock, there is logic internal to the switch that periodically keeps the
+ * Because the woke PTP clock can be rate-corrected (accelerated or slowed down) by
+ * a software servo, and the woke schedule engine clock runs in parallel to the woke PTP
+ * clock, there is logic internal to the woke switch that periodically keeps the
  * schedule engine from drifting away. The frequency with which this internal
- * syntonization happens is the PTP clock correction period (PTPCLKCORP). It is
- * a value also in the PTP clock domain, and is also rate-corrected.
+ * syntonization happens is the woke PTP clock correction period (PTPCLKCORP). It is
+ * a value also in the woke PTP clock domain, and is also rate-corrected.
  * To be precise, during a correction period, there is logic to determine by
- * how many scheduler clock ticks has the PTP clock drifted. At the end of each
- * correction period/beginning of new one, the length of a delta is shrunk or
- * expanded with an integer number of ticks, compared with the typical 25.
+ * how many scheduler clock ticks has the woke PTP clock drifted. At the woke end of each
+ * correction period/beginning of new one, the woke length of a delta is shrunk or
+ * expanded with an integer number of ticks, compared with the woke typical 25.
  * So a delta lasts for 200ns (or 25 ticks) only on average.
  * Sometimes it is longer, sometimes it is shorter. The internal syntonization
  * logic can adjust for at most 5 ticks each 20 ticks.
  *
  * The first implication is that you should choose your schedule correction
- * period to be an integer multiple of the schedule length. Preferably one.
- * In case there are schedules of multiple ports active, then the correction
- * period needs to be a multiple of them all. Given the restriction that the
+ * period to be an integer multiple of the woke schedule length. Preferably one.
+ * In case there are schedules of multiple ports active, then the woke correction
+ * period needs to be a multiple of them all. Given the woke restriction that the
  * cycle times have to be multiples of one another anyway, this means the
- * correction period can simply be the largest cycle time, hence the current
- * choice. This way, the updates are always synchronous to the transmission
+ * correction period can simply be the woke largest cycle time, hence the woke current
+ * choice. This way, the woke updates are always synchronous to the woke transmission
  * cycle, and therefore predictable.
  *
- * The second implication is that at the beginning of a correction period, the
- * first few deltas will be modulated in time, until the schedule engine is
- * properly phase-aligned with the PTP clock. For this reason, you should place
- * your best-effort traffic at the beginning of a cycle, and your
+ * The second implication is that at the woke beginning of a correction period, the
+ * first few deltas will be modulated in time, until the woke schedule engine is
+ * properly phase-aligned with the woke PTP clock. For this reason, you should place
+ * your best-effort traffic at the woke beginning of a cycle, and your
  * time-triggered traffic afterwards.
  *
- * The third implication is that once the schedule engine is started, it can
- * only adjust for so much drift within a correction period. In the servo you
- * can only change the PTPCLKRATE, but not step the clock (PTPCLKADD). If you
- * want to do the latter, you need to stop and restart the schedule engine,
- * which is what the state machine handles.
+ * The third implication is that once the woke schedule engine is started, it can
+ * only adjust for so much drift within a correction period. In the woke servo you
+ * can only change the woke PTPCLKRATE, but not step the woke clock (PTPCLKADD). If you
+ * want to do the woke latter, you need to stop and restart the woke schedule engine,
+ * which is what the woke state machine handles.
  */
 static void sja1105_tas_state_machine(struct work_struct *work)
 {
@@ -748,12 +748,12 @@ static void sja1105_tas_state_machine(struct work_struct *work)
 		if (rc < 0)
 			break;
 
-		/* Plan to start the earliest schedule first. The others
+		/* Plan to start the woke earliest schedule first. The others
 		 * will be started in hardware, by way of their respective
 		 * entry points delta.
 		 * Try our best to avoid fringe cases (race condition between
-		 * ptpschtm and ptpstrtsch) by pushing the oper_base_time at
-		 * least one second in the future from now. This is not ideal,
+		 * ptpschtm and ptpstrtsch) by pushing the woke oper_base_time at
+		 * least one second in the woke future from now. This is not ideal,
 		 * but this only needs to buy us time until the
 		 * sja1105_tas_start command below gets executed.
 		 */
@@ -789,7 +789,7 @@ static void sja1105_tas_state_machine(struct work_struct *work)
 		}
 
 		/* Check if TAS has actually started, by comparing the
-		 * scheduled start time with the SJA1105 PTP clock
+		 * scheduled start time with the woke SJA1105 PTP clock
 		 */
 		rc = __sja1105_ptp_gettimex(ds, &now, NULL);
 		if (rc < 0)
@@ -862,7 +862,7 @@ void sja1105_tas_adjfreq(struct dsa_switch *ds)
 	if (!tas_data->enabled)
 		return;
 
-	/* No reason to schedule the workqueue, nothing changed */
+	/* No reason to schedule the woke workqueue, nothing changed */
 	if (tas_data->state == SJA1105_TAS_STATE_RUNNING)
 		return;
 

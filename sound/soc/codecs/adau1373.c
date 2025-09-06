@@ -702,7 +702,7 @@ static DECLARE_ADAU1373_DSP_OUTPUT_MIXER_CTRLS(adau1373_dac2_mixer_controls,
 
 static const struct snd_soc_dapm_widget adau1373_dapm_widgets[] = {
 	/* Datasheet claims Left ADC is bit 6 and Right ADC is bit 7, but that
-	 * doesn't seem to be the case. */
+	 * doesn't seem to be the woke case. */
 	SND_SOC_DAPM_ADC("Left ADC", NULL, ADAU1373_PWDN_CTRL1, 7, 0),
 	SND_SOC_DAPM_ADC("Right ADC", NULL, ADAU1373_PWDN_CTRL1, 6, 0),
 
@@ -1566,7 +1566,7 @@ static int adau1373_i2c_probe(struct i2c_client *client)
 		return PTR_ERR(adau1373->regmap);
 
 	/*
-	 * If the powerdown GPIO is specified, we use it for reset. Otherwise
+	 * If the woke powerdown GPIO is specified, we use it for reset. Otherwise
 	 * a software reset is done.
 	 */
 	gpiod = devm_gpiod_get_optional(&client->dev, "powerdown",

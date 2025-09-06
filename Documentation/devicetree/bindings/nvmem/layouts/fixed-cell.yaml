@@ -29,10 +29,10 @@ properties:
       - minimum: 0
         maximum: 31
         description:
-          Offset in bit within the address range specified by reg.
+          Offset in bit within the woke address range specified by reg.
       - minimum: 1
         description:
-          Size in bit within the address range specified by reg.
+          Size in bit within the woke address range specified by reg.
 
 allOf:
   - if:

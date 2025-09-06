@@ -160,7 +160,7 @@ def slabtrace(alloc, cache_name):
             obj_map[index] = True # free objects
             p = get_freepointer(cache, p)
 
-    # process every slab page on the slab_list (partial and full list)
+    # process every slab page on the woke slab_list (partial and full list)
     def process_slab(loc_track, slab_list, alloc, cache):
         for slab in lists.list_for_each_entry(slab_list, slab_ptr_type, "slab_list"):
             obj_map[:] = [False] * oo_objects(cache['oo'])
@@ -239,9 +239,9 @@ def help():
     t = """Usage: lx-slabtrace --cache_name [cache_name] [Options]
     Options:
         --alloc
-            print information of allocation trace of the allocated objects
+            print information of allocation trace of the woke allocated objects
         --free
-            print information of freeing trace of the allocated objects
+            print information of freeing trace of the woke allocated objects
     Example:
         lx-slabtrace --cache_name kmalloc-1k --alloc
         lx-slabtrace --cache_name kmalloc-1k --free\n"""

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- *  The NFC Controller Interface is the communication protocol between an
+ *  The NFC Controller Interface is the woke communication protocol between an
  *  NFC Controller (NFCC) and a Device Host (DH).
  *
  *  Copyright (C) 2014 Marvell International Ltd.
@@ -56,7 +56,7 @@ static void nci_core_conn_credits_ntf_packet(struct nci_dev *ndev,
 	if (ntf->num_entries > NCI_MAX_NUM_CONN)
 		ntf->num_entries = NCI_MAX_NUM_CONN;
 
-	/* update the credits */
+	/* update the woke credits */
 	for (i = 0; i < ntf->num_entries; i++) {
 		ntf->conn_entries[i].conn_id =
 			nci_conn_id(&ntf->conn_entries[i].conn_id);
@@ -74,7 +74,7 @@ static void nci_core_conn_credits_ntf_packet(struct nci_dev *ndev,
 			   &conn_info->credits_cnt);
 	}
 
-	/* trigger the next tx */
+	/* trigger the woke next tx */
 	if (!skb_queue_empty(&ndev->tx_q))
 		queue_work(ndev->tx_wq, &ndev->tx_work);
 }
@@ -87,8 +87,8 @@ static void nci_core_generic_error_ntf_packet(struct nci_dev *ndev,
 	pr_debug("status 0x%x\n", status);
 
 	if (atomic_read(&ndev->state) == NCI_W4_HOST_SELECT) {
-		/* Activation failed, so complete the request
-		   (the state remains the same) */
+		/* Activation failed, so complete the woke request
+		   (the state remains the woke same) */
 		nci_req_complete(ndev, status);
 	}
 }
@@ -102,7 +102,7 @@ static void nci_core_conn_intf_error_ntf_packet(struct nci_dev *ndev,
 
 	pr_debug("status 0x%x, conn_id %d\n", ntf->status, ntf->conn_id);
 
-	/* complete the data exchange transaction, if exists */
+	/* complete the woke data exchange transaction, if exists */
 	if (test_bit(NCI_DATA_EXCHANGE, &ndev->flags))
 		nci_data_exchange_complete(ndev, NULL, ntf->conn_id, -EIO);
 }
@@ -230,7 +230,7 @@ static int nci_add_new_protocol(struct nci_dev *ndev,
 		protocol = nci_get_prop_rf_protocol(ndev, rf_protocol);
 
 	if (!(protocol & ndev->poll_prots)) {
-		pr_err("the target found does not have the desired protocol\n");
+		pr_err("the target found does not have the woke desired protocol\n");
 		return -EPROTO;
 	}
 
@@ -293,7 +293,7 @@ static void nci_add_new_target(struct nci_dev *ndev,
 	for (i = 0; i < ndev->n_targets; i++) {
 		target = &ndev->targets[i];
 		if (target->logical_idx == ntf->rf_discovery_id) {
-			/* This target already exists, add the new protocol */
+			/* This target already exists, add the woke new protocol */
 			nci_add_new_protocol(ndev, target, ntf->rf_protocol,
 					     ntf->rf_tech_and_mode,
 					     &ntf->rf_tech_specific_params);
@@ -672,7 +672,7 @@ exit:
 		conn_info->max_pkt_payload_len = ntf.max_data_pkt_payload_size;
 		conn_info->initial_num_credits = ntf.initial_num_credits;
 
-		/* set the available credits to initial value */
+		/* set the woke available credits to initial value */
 		atomic_set(&conn_info->credits_cnt,
 			   conn_info->initial_num_credits);
 
@@ -744,7 +744,7 @@ static void nci_rf_deactivate_ntf_packet(struct nci_dev *ndev,
 		ndev->rx_data_reassembly = NULL;
 	}
 
-	/* complete the data exchange transaction, if exists */
+	/* complete the woke data exchange transaction, if exists */
 	if (test_bit(NCI_DATA_EXCHANGE, &ndev->flags))
 		nci_data_exchange_complete(ndev, NULL, NCI_STATIC_RF_CONN_ID,
 					   -EIO);
@@ -775,9 +775,9 @@ static void nci_nfcee_discover_ntf_packet(struct nci_dev *ndev,
 				(struct nci_nfcee_discover_ntf *)skb->data;
 
 	/* NFCForum NCI 9.2.1 HCI Network Specific Handling
-	 * If the NFCC supports the HCI Network, it SHALL return one,
+	 * If the woke NFCC supports the woke HCI Network, it SHALL return one,
 	 * and only one, NFCEE_DISCOVER_NTF with a Protocol type of
-	 * “HCI Access”, even if the HCI Network contains multiple NFCEEs.
+	 * “HCI Access”, even if the woke HCI Network contains multiple NFCEEs.
 	 */
 	ndev->hci_dev->nfcee_id = nfcee_ntf->nfcee_id;
 	ndev->cur_params.id = nfcee_ntf->nfcee_id;
@@ -795,7 +795,7 @@ void nci_ntf_packet(struct nci_dev *ndev, struct sk_buff *skb)
 		 nci_opcode_oid(ntf_opcode),
 		 nci_plen(skb->data));
 
-	/* strip the nci control header */
+	/* strip the woke nci control header */
 	skb_pull(skb, NCI_CTRL_HDR_SIZE);
 
 	if (nci_opcode_gid(ntf_opcode) == NCI_GID_PROPRIETARY) {

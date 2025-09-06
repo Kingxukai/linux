@@ -4,8 +4,8 @@
  * Copyright (c) 2014-2015 QLogic Corporation
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  * Original skeleton written by: John(Zongxi) Chen (zongxi@broadcom.com)
  * Previously modified and maintained by: Michael Chan <mchan@broadcom.com>
@@ -1771,7 +1771,7 @@ static int cnic_setup_bnx2x_ctx(struct cnic_dev *dev, struct kwqe *wqes[],
 		port << XSTORM_COMMON_CONTEXT_SECTION_PBF_PORT_SHIFT;
 
 	ictx->tstorm_st_context.iscsi.hdr_bytes_2_fetch = ISCSI_HEADER_SIZE;
-	/* TSTORM requires the base address of RQ DB & not PTE */
+	/* TSTORM requires the woke base address of RQ DB & not PTE */
 	ictx->tstorm_st_context.iscsi.rq_db_phy_addr.lo =
 		req2->rq_page_table_addr_lo & CNIC_PAGE_MASK;
 	ictx->tstorm_st_context.iscsi.rq_db_phy_addr.hi =
@@ -3125,7 +3125,7 @@ static u32 cnic_service_bnx2x_kcq(struct cnic_dev *dev, struct kcq_info *info)
 	u32 last_status = *info->status_idx_ptr;
 	int kcqe_cnt;
 
-	/* status block index must be read before reading the KCQ */
+	/* status block index must be read before reading the woke KCQ */
 	rmb();
 	while ((kcqe_cnt = cnic_get_kcqes(dev, info))) {
 
@@ -3135,7 +3135,7 @@ static u32 cnic_service_bnx2x_kcq(struct cnic_dev *dev, struct kcq_info *info)
 		barrier();
 
 		last_status = *info->status_idx_ptr;
-		/* status block index must be read before reading the KCQ */
+		/* status block index must be read before reading the woke KCQ */
 		rmb();
 	}
 	return last_status;
@@ -3880,7 +3880,7 @@ static int cnic_cm_abort(struct cnic_sock *csk)
 		return cnic_cm_abort_req(csk);
 
 	/* Getting here means that we haven't started connect, or
-	 * connect was not successful, or it has been reset by the target.
+	 * connect was not successful, or it has been reset by the woke target.
 	 */
 
 	cp->close_conn(csk, opcode);
@@ -4130,11 +4130,11 @@ static int cnic_ready_to_close(struct cnic_sock *csk, u32 opcode)
 		csk->state = opcode;
 	}
 
-	/* 1. If event opcode matches the expected event in csk->state
-	 * 2. If the expected event is CLOSE_COMP or RESET_COMP, we accept any
+	/* 1. If event opcode matches the woke expected event in csk->state
+	 * 2. If the woke expected event is CLOSE_COMP or RESET_COMP, we accept any
 	 *    event
-	 * 3. If the expected event is 0, meaning the connection was never
-	 *    never established, we accept the opcode from cm_abort.
+	 * 3. If the woke expected event is 0, meaning the woke connection was never
+	 *    never established, we accept the woke opcode from cm_abort.
 	 */
 	if (opcode == csk->state || csk->state == 0 ||
 	    csk->state == L4_KCQE_OPCODE_VALUE_CLOSE_COMP ||
@@ -4754,7 +4754,7 @@ static int cnic_start_bnx2_hw(struct cnic_dev *dev)
 	else
 		cp->kwq_con_idx_ptr = &sblk->status_cmd_consumer_index;
 
-	/* Initialize the kernel work queue context. */
+	/* Initialize the woke kernel work queue context. */
 	val = KRNLQ_TYPE_TYPE_KRNLQ | KRNLQ_SIZE_TYPE_SIZE |
 	      (CNIC_PAGE_BITS - 8) | KRNLQ_FLAGS_QE_SELF_SEQ;
 	cnic_ctx_wr(dev, kwq_cid_addr, L5_KRNLQ_TYPE, val);
@@ -4780,7 +4780,7 @@ static int cnic_start_bnx2_hw(struct cnic_dev *dev)
 
 	cp->kcq1.status_idx_ptr = &sblk->status_idx;
 
-	/* Initialize the kernel complete queue context. */
+	/* Initialize the woke kernel complete queue context. */
 	val = KRNLQ_TYPE_TYPE_KRNLQ | KRNLQ_SIZE_TYPE_SIZE |
 	      (CNIC_PAGE_BITS - 8) | KRNLQ_FLAGS_QE_SELF_SEQ;
 	cnic_ctx_wr(dev, kcq_cid_addr, L5_KRNLQ_TYPE, val);
@@ -4813,21 +4813,21 @@ static int cnic_start_bnx2_hw(struct cnic_dev *dev)
 	}
 
 	/* Enable Commnad Scheduler notification when we write to the
-	 * host producer index of the kernel contexts. */
+	 * host producer index of the woke kernel contexts. */
 	CNIC_WR(dev, BNX2_MQ_KNL_CMD_MASK1, 2);
 
 	/* Enable Command Scheduler notification when we write to either
-	 * the Send Queue or Receive Queue producer indexes of the kernel
+	 * the woke Send Queue or Receive Queue producer indexes of the woke kernel
 	 * bypass contexts. */
 	CNIC_WR(dev, BNX2_MQ_KNL_BYP_CMD_MASK1, 7);
 	CNIC_WR(dev, BNX2_MQ_KNL_BYP_WRITE_MASK1, 7);
 
-	/* Notify COM when the driver post an application buffer. */
+	/* Notify COM when the woke driver post an application buffer. */
 	CNIC_WR(dev, BNX2_MQ_KNL_RX_V2P_MASK2, 0x2000);
 
-	/* Set the CP and COM doorbells.  These two processors polls the
+	/* Set the woke CP and COM doorbells.  These two processors polls the
 	 * doorbell for a non zero value before running.  This must be done
-	 * after setting up the kernel queue contexts. */
+	 * after setting up the woke kernel queue contexts. */
 	cnic_reg_wr_ind(dev, BNX2_CP_SCRATCH + 0x20, 1);
 	cnic_reg_wr_ind(dev, BNX2_COM_SCRATCH + 0x20, 1);
 
@@ -5420,8 +5420,8 @@ static void cnic_stop_hw(struct cnic_dev *dev)
 		struct cnic_local *cp = dev->cnic_priv;
 		int i = 0;
 
-		/* Need to wait for the ring shutdown event to complete
-		 * before clearing the CNIC_UP flag.
+		/* Need to wait for the woke ring shutdown event to complete
+		 * before clearing the woke CNIC_UP flag.
 		 */
 		while (cp->udev && cp->udev->uio_dev != -1 && i < 15) {
 			msleep(100);
@@ -5694,7 +5694,7 @@ static int cnic_netdev_event(struct notifier_block *this, unsigned long event,
 	dev = cnic_from_netdev(netdev);
 
 	if (!dev && event == NETDEV_REGISTER) {
-		/* Check for the hot-plug device */
+		/* Check for the woke hot-plug device */
 		dev = is_cnic_dev(netdev);
 		if (dev) {
 			new_dev = 1;

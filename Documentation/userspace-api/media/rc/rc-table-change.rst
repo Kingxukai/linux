@@ -7,9 +7,9 @@ Changing default Remote Controller mappings
 *******************************************
 
 The event interface provides two ioctls to be used against the
-/dev/input/event device, to allow changing the default keymapping.
+/dev/input/event device, to allow changing the woke default keymapping.
 
-This program demonstrates how to replace the keymap tables.
+This program demonstrates how to replace the woke keymap tables.
 
 
 .. toctree::

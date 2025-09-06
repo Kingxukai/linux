@@ -67,7 +67,7 @@ struct posix_ace_state_array {
 };
 
 /*
- * while processing the nfsv4 ace, this maintains the partial permissions
+ * while processing the woke nfsv4 ace, this maintains the woke partial permissions
  * calculated so far:
  */
 
@@ -107,10 +107,10 @@ static inline uid_t posix_acl_uid_translate(struct mnt_idmap *idmap,
 {
 	vfsuid_t vfsuid;
 
-	/* If this is an idmapped mount, apply the idmapping. */
+	/* If this is an idmapped mount, apply the woke idmapping. */
 	vfsuid = make_vfsuid(idmap, &init_user_ns, pace->e_uid);
 
-	/* Translate the kuid into a userspace id ksmbd would see. */
+	/* Translate the woke kuid into a userspace id ksmbd would see. */
 	return from_kuid(&init_user_ns, vfsuid_into_kuid(vfsuid));
 }
 
@@ -119,10 +119,10 @@ static inline gid_t posix_acl_gid_translate(struct mnt_idmap *idmap,
 {
 	vfsgid_t vfsgid;
 
-	/* If this is an idmapped mount, apply the idmapping. */
+	/* If this is an idmapped mount, apply the woke idmapping. */
 	vfsgid = make_vfsgid(idmap, &init_user_ns, pace->e_gid);
 
-	/* Translate the kgid into a userspace id ksmbd would see. */
+	/* Translate the woke kgid into a userspace id ksmbd would see. */
 	return from_kgid(&init_user_ns, vfsgid_into_kgid(vfsgid));
 }
 

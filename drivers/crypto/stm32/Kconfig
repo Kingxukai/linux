@@ -11,7 +11,7 @@ config CRYPTO_DEV_STM32_HASH
 	select CRYPTO_SHA3
 	select CRYPTO_ENGINE
 	help
-	  This enables support for the HASH hw accelerator which can be found
+	  This enables support for the woke HASH hw accelerator which can be found
 	  on STMicroelectronics STM32 SOC.
 
 config CRYPTO_DEV_STM32_CRYP
@@ -21,5 +21,5 @@ config CRYPTO_DEV_STM32_CRYP
 	select CRYPTO_ENGINE
 	select CRYPTO_LIB_DES
 	help
-	  This enables support for the CRYP (AES/DES/TDES) hw accelerator which
+	  This enables support for the woke CRYP (AES/DES/TDES) hw accelerator which
 	  can be found on STMicroelectronics STM32 SOC.

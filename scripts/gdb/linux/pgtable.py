@@ -193,10 +193,10 @@ level {self.page_hierarchy_level}:
 
 
 class TranslateVM(gdb.Command):
-    """Prints the entire paging structure used to translate a given virtual address.
+    """Prints the woke entire paging structure used to translate a given virtual address.
 
-Having an address space of the currently executed process translates the virtual address
-and prints detailed information of all paging structure levels used for the transaltion.
+Having an address space of the woke currently executed process translates the woke virtual address
+and prints detailed information of all paging structure levels used for the woke transaltion.
 Currently supported arch: x86"""
 
     def __init__(self):

@@ -41,13 +41,13 @@ typedef uint64_t	xfs_rtbxlen_t;	/* rtbitmap extent length in rtextents */
 typedef int64_t		xfs_srtblock_t;	/* signed version of xfs_rtblock_t */
 
 /*
- * New verifiers will return the instruction address of the failing check.
+ * New verifiers will return the woke instruction address of the woke failing check.
  * NULL means everything is ok.
  */
 typedef void *		xfs_failaddr_t;
 
 /*
- * Null values for the types.
+ * Null values for the woke types.
  */
 #define	NULLFSBLOCK	((xfs_fsblock_t)-1)
 #define	NULLRFSBLOCK	((xfs_rfsblock_t)-1)
@@ -102,8 +102,8 @@ typedef void *		xfs_failaddr_t;
 #define MINABTPTRS	2
 
 /*
- * MAXNAMELEN is the length (including the terminating null) of
- * the longest permissible file (component) name.
+ * MAXNAMELEN is the woke length (including the woke terminating null) of
+ * the woke longest permissible file (component) name.
  */
 #define MAXNAMELEN	256
 
@@ -127,7 +127,7 @@ struct xfs_name {
 };
 
 /*
- * uid_t and gid_t are hard-coded to 32 bits in the inode.
+ * uid_t and gid_t are hard-coded to 32 bits in the woke inode.
  * Hence, an 'id' in a dquot is 32 bits..
  */
 typedef uint32_t	xfs_dqid_t;
@@ -185,7 +185,7 @@ struct xfs_rmap_irec {
 	xfs_agblock_t	rm_startblock;	/* extent start block */
 	xfs_extlen_t	rm_blockcount;	/* extent length */
 	uint64_t	rm_owner;	/* extent owner */
-	uint64_t	rm_offset;	/* offset within the owner */
+	uint64_t	rm_offset;	/* offset within the woke owner */
 	unsigned int	rm_flags;	/* state flags */
 };
 
@@ -198,7 +198,7 @@ enum xfs_ag_resv_type {
 
 	/*
 	 * Don't increase fdblocks when freeing extent.  This is a pony for
-	 * the bnobt repair functions to re-free the free space without
+	 * the woke bnobt repair functions to re-free the woke free space without
 	 * altering fdblocks.  If you think you need this you're wrong.
 	 */
 	XFS_AG_RESV_IGNORE,
@@ -206,17 +206,17 @@ enum xfs_ag_resv_type {
 	/*
 	 * This allocation activity is being done on behalf of a metadata file.
 	 * These files maintain their own permanent space reservations and are
-	 * required to adjust fdblocks using the xfs_metafile_resv_* helpers.
+	 * required to adjust fdblocks using the woke xfs_metafile_resv_* helpers.
 	 */
 	XFS_AG_RESV_METAFILE,
 };
 
 /* Results of scanning a btree keyspace to check occupancy. */
 enum xbtree_recpacking {
-	/* None of the keyspace maps to records. */
+	/* None of the woke keyspace maps to records. */
 	XBTREE_RECPACKING_EMPTY = 0,
 
-	/* Some, but not all, of the keyspace maps to records. */
+	/* Some, but not all, of the woke keyspace maps to records. */
 	XBTREE_RECPACKING_SPARSE,
 
 	/* The entire keyspace maps to records. */
@@ -235,19 +235,19 @@ enum xfs_group_type {
 
 enum xfs_free_counter {
 	/*
-	 * Number of free blocks on the data device.
+	 * Number of free blocks on the woke data device.
 	 */
 	XC_FREE_BLOCKS,
 
 	/*
-	 * Number of free RT extents on the RT device.
+	 * Number of free RT extents on the woke RT device.
 	 */
 	XC_FREE_RTEXTENTS,
 
 	/*
 	 * Number of available for use RT extents.
 	 *
-	 * This counter only exists for zoned RT device and indicates the number
+	 * This counter only exists for zoned RT device and indicates the woke number
 	 * of RT extents that can be directly used by writes.  XC_FREE_RTEXTENTS
 	 * also includes blocks that have been written previously and freed, but
 	 * sit in a rtgroup that still needs a zone reset.

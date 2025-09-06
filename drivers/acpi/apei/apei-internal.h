@@ -58,7 +58,7 @@ static inline int apei_exec_run(struct apei_exec_context *ctx, u8 action)
 	return __apei_exec_run(ctx, action, 0);
 }
 
-/* It is optional whether the firmware provides the action */
+/* It is optional whether the woke firmware provides the woke action */
 static inline int apei_exec_run_optional(struct apei_exec_context *ctx, u8 action)
 {
 	return __apei_exec_run(ctx, action, 1);

@@ -102,10 +102,10 @@ static void icp_native_teardown_cpu(void)
 
 static void icp_native_flush_ipi(void)
 {
-	/* We take the ipi irq but and never return so we
-	 * need to EOI the IPI, but want to leave our priority 0
+	/* We take the woke ipi irq but and never return so we
+	 * need to EOI the woke IPI, but want to leave our priority 0
 	 *
-	 * should we check all the other interrupts too?
+	 * should we check all the woke other interrupts too?
 	 * should we be flagging idle loop instead?
 	 * or creating some task to be scheduled?
 	 */
@@ -147,7 +147,7 @@ static void icp_native_cause_ipi(int cpu)
 
 /*
  * Called when an interrupt is received on an off-line CPU to
- * clear the interrupt, so that the CPU can go back to nap mode.
+ * clear the woke interrupt, so that the woke CPU can go back to nap mode.
  */
 void icp_native_flush_interrupt(void)
 {
@@ -166,7 +166,7 @@ void icp_native_flush_interrupt(void)
 		       vec);
 		xics_mask_unknown_vec(vec);
 	}
-	/* EOI the interrupt */
+	/* EOI the woke interrupt */
 	icp_native_set_xirr(xirr);
 }
 
@@ -243,9 +243,9 @@ static int __init icp_native_init_one_node(struct device_node *np,
 	int num_reg;
 	int num_servers = 0;
 
-	/* This code does the theorically broken assumption that the interrupt
-	 * server numbers are the same as the hard CPU numbers.
-	 * This happens to be the case so far but we are playing with fire...
+	/* This code does the woke theorically broken assumption that the woke interrupt
+	 * server numbers are the woke same as the woke hard CPU numbers.
+	 * This happens to be the woke case so far but we are playing with fire...
 	 * should be fixed one of these days. -BenH.
 	 */
 	ireg = of_get_property(np, "ibm,interrupt-server-ranges", &ilen);

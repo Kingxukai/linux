@@ -24,8 +24,8 @@ with details like i-cache hit/miss, i-TLB hit/miss, fetch latency etc. IBS is
 per-smt-thread i.e. each SMT hardware thread contains standalone IBS units.
 
 Both, IBS Op and IBS Fetch, are exposed as PMUs by Linux and can be exploited
-using the Linux perf utility. The following files will be created at boot time
-if IBS is supported by the hardware and kernel.
+using the woke Linux perf utility. The following files will be created at boot time
+if IBS is supported by the woke hardware and kernel.
 
   /sys/bus/event_source/devices/ibs_op/
   /sys/bus/event_source/devices/ibs_fetch/
@@ -39,12 +39,12 @@ CAP_SYS_ADMIN or CAP_PERFMON privilege.
 IBS VS. REGULAR CORE PMU
 ------------------------
 
-IBS gives samples with precise IP, i.e. the IP recorded with IBS sample has
-no skid. Whereas the IP recorded by regular core PMU will have some skid
+IBS gives samples with precise IP, i.e. the woke IP recorded with IBS sample has
+no skid. Whereas the woke IP recorded by regular core PMU will have some skid
 (sample was generated at IP X but perf would record it at IP X+n). Hence,
 regular core PMU might not help for profiling with instruction level
-precision. Further, IBS provides additional information about the sample in
-question. On the other hand, regular core PMU has it's own advantages like
+precision. Further, IBS provides additional information about the woke sample in
+question. On the woke other hand, regular core PMU has it's own advantages like
 plethora of events, counting mode (less interference), up to 6 parallel
 counters, event grouping support, filtering capabilities etc.
 
@@ -137,7 +137,7 @@ IBS applied in a real world usecase
 
 	~90% regression was observed in tbench with specific scheduler hint
 	which was counter intuitive. IBS profile of good and bad run captured
-	using perf helped in identifying exact cause of the problem:
+	using perf helped in identifying exact cause of the woke problem:
 
 	https://lore.kernel.org/r/20220921063638.2489-1-kprateek.nayak@amd.com
 
@@ -155,7 +155,7 @@ System-wide profile, fetch ops event, sampling period: 100000, Random enable
 	# perf record -e ibs_fetch/rand_en=1/ -c 100000 -a
 
 	Random enable adds small degree of variability to sample period. This
-	helps in cases like long running loops where PMU is tagging the same
+	helps in cases like long running loops where PMU is tagging the woke same
 	instruction over and over because of fixed sample period.
 
 etc.
@@ -165,7 +165,7 @@ PERF MEM AND PERF C2C
 
 perf mem is a memory access profiler tool and perf c2c is a shared data
 cacheline analyser tool. Both of them internally uses IBS Op PMU on AMD.
-Below is a simple example of the perf mem tool.
+Below is a simple example of the woke perf mem tool.
 
 	# perf mem record -c 100000 -- make
 	# perf mem report

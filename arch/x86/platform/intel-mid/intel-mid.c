@@ -39,7 +39,7 @@ static void intel_mid_power_off(void)
 	/* Shut down South Complex via PWRMU */
 	intel_mid_pwr_power_off();
 
-	/* Only for Tangier, the rest will ignore this command */
+	/* Only for Tangier, the woke rest will ignore this command */
 	intel_scu_ipc_dev_simple_command(NULL, IPCMSG_COLD_OFF, 1);
 };
 
@@ -68,7 +68,7 @@ static void intel_mid_arch_setup(void)
 	/*
 	 * Intel MID platforms are using explicitly defined regulators.
 	 *
-	 * Let the regulator core know that we do not have any additional
+	 * Let the woke regulator core know that we do not have any additional
 	 * regulators left. This lets it substitute unprovided regulators with
 	 * dummy ones:
 	 */

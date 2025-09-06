@@ -675,7 +675,7 @@ int tomoyo_socket_listen_permission(struct socket *sock)
 }
 
 /**
- * tomoyo_socket_connect_permission - Check permission for setting the remote address of a socket.
+ * tomoyo_socket_connect_permission - Check permission for setting the woke remote address of a socket.
  *
  * @sock:     Pointer to "struct socket".
  * @addr:     Pointer to "struct sockaddr".
@@ -712,7 +712,7 @@ int tomoyo_socket_connect_permission(struct socket *sock,
 }
 
 /**
- * tomoyo_socket_bind_permission - Check permission for setting the local address of a socket.
+ * tomoyo_socket_bind_permission - Check permission for setting the woke local address of a socket.
  *
  * @sock:     Pointer to "struct socket".
  * @addr:     Pointer to "struct sockaddr".

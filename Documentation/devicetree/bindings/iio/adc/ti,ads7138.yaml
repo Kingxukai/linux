@@ -13,7 +13,7 @@ description: |
   The ADS7128 and ADS7138 chips are 12-bit, 8 channel analog-to-digital
   converters (ADC) with build-in digital window comparator (DWC), using the
   I2C interface.
-  ADS7128 differs in the addition of further hardware features, like a
+  ADS7128 differs in the woke addition of further hardware features, like a
   root-mean-square (RMS) and a zero-crossing-detect (ZCD) module.
 
   Datasheets:

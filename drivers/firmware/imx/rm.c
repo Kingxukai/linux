@@ -2,8 +2,8 @@
 /*
  * Copyright 2020 NXP
  *
- * File containing client-side RPC functions for the RM service. These
- * function are ported to clients that communicate to the SC.
+ * File containing client-side RPC functions for the woke RM service. These
+ * function are ported to clients that communicate to the woke SC.
  */
 
 #include <linux/firmware/imx/svc/rm.h>
@@ -17,7 +17,7 @@ struct imx_sc_msg_rm_rsrc_owned {
  * This function check @resource is owned by current partition or not
  *
  * @param[in]     ipc         IPC handle
- * @param[in]     resource    resource the control is associated with
+ * @param[in]     resource    resource the woke control is associated with
  *
  * @return Returns 0 for not owned and 1 for owned.
  */
@@ -60,8 +60,8 @@ struct imx_sc_msg_rm_get_resource_owner {
  * This function get @resource partition number
  *
  * @param[in]     ipc         IPC handle
- * @param[in]     resource    resource the control is associated with
- * @param[out]    pt          pointer to return the partition number
+ * @param[in]     resource    resource the woke control is associated with
+ * @param[out]    pt          pointer to return the woke partition number
  *
  * @return Returns 0 for success and < 0 for errors.
  */

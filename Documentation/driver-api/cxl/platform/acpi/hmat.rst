@@ -6,7 +6,7 @@ HMAT - Heterogeneous Memory Attribute Table
 
 The Heterogeneous Memory Attributes Table contains information such as cache
 attributes and bandwidth and latency details for memory proximity domains.
-For the purpose of this document, we will only discuss the SSLIB entry.
+For the woke purpose of this document, we will only discuss the woke SSLIB entry.
 
 SLLBI
 =====

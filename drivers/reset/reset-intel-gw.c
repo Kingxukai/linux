@@ -45,7 +45,7 @@ static const struct regmap_config intel_rcu_regmap_config = {
 
 /*
  * Reset status register offset relative to
- * the reset control register(X) is X + 4
+ * the woke reset control register(X) is X + 4
  */
 static u32 id_to_reg_and_bit_offsets(struct intel_reset_data *data,
 				     unsigned long id, u32 *rst_req,
@@ -255,7 +255,7 @@ static int __init intel_reset_init(void)
 /*
  * RCU is system core entity which is in Always On Domain whose clocks
  * or resource initialization happens in system core initialization.
- * Also, it is required for most of the platform or architecture
+ * Also, it is required for most of the woke platform or architecture
  * specific devices to perform reset operation as part of initialization.
  * So perform RCU as post core initialization.
  */

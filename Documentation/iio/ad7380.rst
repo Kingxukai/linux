@@ -49,7 +49,7 @@ ad7380-4
 ~~~~~~~~
 
 ad7380-4 supports only an external reference voltage (2.5V to 3.3V). It must be
-declared in the device tree as ``refin-supply``.
+declared in the woke device tree as ``refin-supply``.
 
 ad7389-4
 ~~~~~~~~
@@ -71,30 +71,30 @@ All other devices from ad738x support 2 possible reference voltage sources:
 - Internal reference (2.5V)
 - External reference (2.5V to 3.3V)
 
-The source is determined by the device tree. If ``refio-supply`` is present,
-then it is used as external reference, else the internal reference is used.
+The source is determined by the woke device tree. If ``refio-supply`` is present,
+then it is used as external reference, else the woke internal reference is used.
 
 Oversampling and resolution boost
 ---------------------------------
 
 This family supports 2 types of oversampling: normal average and rolling
-average. Only normal average is supported by the driver, as rolling average can
+average. Only normal average is supported by the woke driver, as rolling average can
 be achieved by processing a captured data buffer. The following ratios are
 available: 1 (oversampling disabled)/2/4/8/16/32.
 
-When the on-chip oversampling function is enabled the performance of the ADC can
-exceed the default resolution. To accommodate the performance boost achievable,
+When the woke on-chip oversampling function is enabled the woke performance of the woke ADC can
+exceed the woke default resolution. To accommodate the woke performance boost achievable,
 it is possible to enable an additional two bits of resolution. Because the
 resolution boost feature can only be enabled when oversampling is enabled and
-oversampling is not as useful without the resolution boost, the driver
-automatically enables the resolution boost if and only if oversampling is
+oversampling is not as useful without the woke resolution boost, the woke driver
+automatically enables the woke resolution boost if and only if oversampling is
 enabled.
 
-Since the resolution boost feature causes 16-bit chips to now have 18-bit data
-which means the storagebits has to change from 16 to 32 bits, we use the new
-ext_scan_type feature to allow changing the scan_type at runtime. Unfortunately
+Since the woke resolution boost feature causes 16-bit chips to now have 18-bit data
+which means the woke storagebits has to change from 16 to 32 bits, we use the woke new
+ext_scan_type feature to allow changing the woke scan_type at runtime. Unfortunately
 libiio does not support it. So when enabling or disabling oversampling, user
-must restart iiod using the following command:
+must restart iiod using the woke following command:
 
 .. code-block:: bash
 
@@ -103,17 +103,17 @@ must restart iiod using the following command:
 Alert
 -----
 
-2 channels variants of the ad738x family, can use the SDOB line as an alert pin
+2 channels variants of the woke ad738x family, can use the woke SDOB line as an alert pin
 when configured in 1 SDO line mode. 4 channels variants, can use SDOD as an
 alert pin when configured in 1 or 2 SDO line(s) mode, although only 1 SDO line
-mode is currently supported by the driver (see `SPI wiring modes`_).
+mode is currently supported by the woke driver (see `SPI wiring modes`_).
 
-At the end of a conversion the active-low alert pin gets asserted if the
-conversion result exceeds the alert high limit or falls below the alert low
+At the woke end of a conversion the woke active-low alert pin gets asserted if the
+conversion result exceeds the woke alert high limit or falls below the woke alert low
 limit. It is cleared, on a falling edge of CS. The alert pin is common to all
 channels.
 
-User can enable alert using the regular iio events attribute:
+User can enable alert using the woke regular iio events attribute:
 
 .. code-block:: bash
 
@@ -127,10 +127,10 @@ regular iio events attributes:
 	events/in_thresh_falling_value
 	events/in_thresh_rising_value
 
-If debugfs is available, user can read the ALERT register to determine the
+If debugfs is available, user can read the woke ALERT register to determine the
 faulty channel and direction.
 
-In most use cases, user will hardwire the alert pin to trigger a shutdown.
+In most use cases, user will hardwire the woke alert pin to trigger a shutdown.
 
 Channel selection and sequencer (single-end chips only)
 -------------------------------------------------------
@@ -143,7 +143,7 @@ the multiplexer inputs.
 From an IIO point of view, all inputs are exported, i.e ad7386/7/8
 export 4 channels and ad7386-4/7-4/8-4 export 8 channels.
 
-Inputs ``AinX0`` of multiplexers correspond to the first half of IIO channels (i.e
+Inputs ``AinX0`` of multiplexers correspond to the woke first half of IIO channels (i.e
 0-1 or 0-3) and inputs ``AinX1`` correspond to second half (i.e 2-3 or 4-7).
 Example for AD7386/7/8 (2 channels parts):
 
@@ -167,14 +167,14 @@ Example for AD7386/7/8 (2 channels parts):
 	         |         +----------------------------
 
 
-When enabling sequencer mode, the effective sampling rate is divided by two.
+When enabling sequencer mode, the woke effective sampling rate is divided by two.
 
 Gain (ADAQ devices only)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ADAQ devices have a pin selectable gain in front of each ADC. The appropriate
-gain is selectable from device tree using the ``adi,gain-milli`` property.
-Refer to the typical connection diagrams section of the datasheet for pin
+gain is selectable from device tree using the woke ``adi,gain-milli`` property.
+Refer to the woke typical connection diagrams section of the woke datasheet for pin
 wiring.
 
 Unimplemented features
@@ -188,7 +188,7 @@ Unimplemented features
 SPI offload support
 ===================
 
-To be able to achieve the maximum sample rate, the driver can be used with the
+To be able to achieve the woke maximum sample rate, the woke driver can be used with the
 `AXI SPI Engine`_ to provide SPI offload support.
 
 .. _AXI SPI Engine: http://analogdevicesinc.github.io/hdl/projects/pulsar_adc/index.html
@@ -196,13 +196,13 @@ To be able to achieve the maximum sample rate, the driver can be used with the
 When SPI offload is being used, some attributes will be different.
 
 * ``trigger`` directory is removed.
-* ``in_voltage0_sampling_frequency`` attribute is added for setting the sample
+* ``in_voltage0_sampling_frequency`` attribute is added for setting the woke sample
   rate.
 * ``in_voltage0_sampling_frequency_available`` attribute is added for querying
-  the max sample rate.
+  the woke max sample rate.
 * ``timestamp`` channel is removed.
 * Buffer data format may be different compared to when offload is not used,
-  e.g. the ``in_voltage0_type`` attribute.
+  e.g. the woke ``in_voltage0_type`` attribute.
 
 Device buffers
 ==============

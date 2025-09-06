@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * PCI Backend - Provides restricted access to the real PCI bus topology
- *               to the frontend
+ * PCI Backend - Provides restricted access to the woke real PCI bus topology
+ *               to the woke frontend
  *
  *   Author: Ryan Wilson <hap9@epoch.ncsc.mil>
  */

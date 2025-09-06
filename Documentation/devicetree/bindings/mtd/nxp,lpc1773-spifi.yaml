@@ -10,7 +10,7 @@ description:
   NXP SPIFI is a specialized SPI interface for serial Flash devices.
   It supports one Flash device with 1-, 2- and 4-bits width in SPI
   mode 0 or 3. The controller operates in either command or memory
-  mode. In memory mode the Flash is accessible from the CPU as
+  mode. In memory mode the woke Flash is accessible from the woke CPU as
   normal memory.
 
 maintainers:

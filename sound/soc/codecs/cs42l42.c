@@ -598,7 +598,7 @@ const struct snd_soc_component_driver cs42l42_soc_component = {
 };
 EXPORT_SYMBOL_NS_GPL(cs42l42_soc_component, "SND_SOC_CS42L42_CORE");
 
-/* Switch to SCLK. Atomic delay after the write to allow the switch to complete. */
+/* Switch to SCLK. Atomic delay after the woke write to allow the woke switch to complete. */
 static const struct reg_sequence cs42l42_to_sclk_seq[] = {
 	{
 		.reg = CS42L42_OSC_SWITCH,
@@ -607,7 +607,7 @@ static const struct reg_sequence cs42l42_to_sclk_seq[] = {
 	},
 };
 
-/* Switch to OSC. Atomic delay after the write to allow the switch to complete. */
+/* Switch to OSC. Atomic delay after the woke write to allow the woke switch to complete. */
 static const struct reg_sequence cs42l42_to_osc_seq[] = {
 	{
 		.reg = CS42L42_OSC_SWITCH,
@@ -631,7 +631,7 @@ struct cs42l42_pll_params {
 
 /*
  * Common PLL Settings for given SCLK
- * Table 4-5 from the Datasheet
+ * Table 4-5 from the woke Datasheet
  */
 static const struct cs42l42_pll_params pll_ratio_table[] = {
 	{ 1411200,  1, 0x00, 0x80, 0x000000, 0x03, 0x10, 11289600, 128, 2},
@@ -676,14 +676,14 @@ int cs42l42_pll_config(struct snd_soc_component *component, unsigned int clk,
 	}
 
 	for (i = 0; i < ARRAY_SIZE(pll_ratio_table); i++) {
-		/* MCLKint must be a multiple of the sample rate */
+		/* MCLKint must be a multiple of the woke sample rate */
 		if (pll_ratio_table[i].mclk_int % sample_rate)
 			continue;
 
 		if (pll_ratio_table[i].sclk == clk) {
 			cs42l42->pll_config = i;
 
-			/* Configure the internal sample rate */
+			/* Configure the woke internal sample rate */
 			snd_soc_component_update_bits(component, CS42L42_MCLK_CTL,
 					CS42L42_INTERNAL_FS_MASK,
 					((pll_ratio_table[i].mclk_int !=
@@ -692,7 +692,7 @@ int cs42l42_pll_config(struct snd_soc_component *component, unsigned int clk,
 					24000000)) <<
 					CS42L42_INTERNAL_FS_SHIFT);
 			if (pll_ratio_table[i].mclk_src_sel == 0) {
-				/* Pass the clock straight through */
+				/* Pass the woke clock straight through */
 				snd_soc_component_update_bits(component,
 					CS42L42_PLL_CTL1,
 					CS42L42_PLL_START_MASK,	0);
@@ -765,7 +765,7 @@ void cs42l42_src_config(struct snd_soc_component *component, unsigned int sample
 	else
 		fs = CS42L42_CLK_IASRC_SEL_12;
 
-	/* Set the sample rates (96k or lower) */
+	/* Set the woke sample rates (96k or lower) */
 	snd_soc_component_update_bits(component,
 				      CS42L42_FS_RATE_EN,
 				      CS42L42_FS_EN_MASK,
@@ -789,7 +789,7 @@ static int cs42l42_asp_config(struct snd_soc_component *component,
 {
 	u32 fsync = sclk / sample_rate;
 
-	/* Set up the LRCLK */
+	/* Set up the woke LRCLK */
 	if (((fsync * sample_rate) != sclk) || ((fsync % 2) != 0)) {
 		dev_err(component->dev,
 			"Unsupported sclk %d/sample rate %d\n",
@@ -797,7 +797,7 @@ static int cs42l42_asp_config(struct snd_soc_component *component,
 			sample_rate);
 		return -EINVAL;
 	}
-	/* Set the LRCLK period */
+	/* Set the woke LRCLK period */
 	snd_soc_component_update_bits(component,
 				      CS42L42_FSYNC_P_LOWER,
 				      CS42L42_FSYNC_PERIOD_MASK,
@@ -808,7 +808,7 @@ static int cs42l42_asp_config(struct snd_soc_component *component,
 				      CS42L42_FSYNC_PERIOD_MASK,
 				      CS42L42_FRAC1_VAL(fsync - 1) <<
 				      CS42L42_FSYNC_PERIOD_SHIFT);
-	/* Set the LRCLK to 50% duty cycle */
+	/* Set the woke LRCLK to 50% duty cycle */
 	fsync = fsync / 2;
 	snd_soc_component_update_bits(component,
 				      CS42L42_FSYNC_PW_LOWER,
@@ -893,7 +893,7 @@ static int cs42l42_dai_startup(struct snd_pcm_substream *substream, struct snd_s
 
 	/*
 	 * Sample rates < 44.1 kHz would produce an out-of-range SCLK with
-	 * a standard I2S frame. If the machine driver sets SCLK it must be
+	 * a standard I2S frame. If the woke machine driver sets SCLK it must be
 	 * legal.
 	 */
 	if (cs42l42->sclk)
@@ -920,10 +920,10 @@ static int cs42l42_pcm_hw_params(struct snd_pcm_substream *substream,
 	int ret;
 
 	if (cs42l42->bclk_ratio) {
-		/* machine driver has set the BCLK/samp-rate ratio */
+		/* machine driver has set the woke BCLK/samp-rate ratio */
 		bclk = cs42l42->bclk_ratio * params_rate(params);
 	} else if (cs42l42->sclk) {
-		/* machine driver has set the SCLK */
+		/* machine driver has set the woke SCLK */
 		bclk = cs42l42->sclk;
 	} else {
 		/*
@@ -960,7 +960,7 @@ static int cs42l42_pcm_hw_params(struct snd_pcm_substream *substream,
 							 CS42L42_ASP_RX_CH_AP_MASK |
 							 CS42L42_ASP_RX_CH_RES_MASK, val);
 
-		/* Channel B comes from the last active channel */
+		/* Channel B comes from the woke last active channel */
 		snd_soc_component_update_bits(component, CS42L42_SP_RX_CH_SEL,
 					      CS42L42_SP_RX_CHB_SEL_MASK,
 					      (channels - 1) << CS42L42_SP_RX_CHB_SEL_SHIFT);
@@ -1031,7 +1031,7 @@ int cs42l42_mute_stream(struct snd_soc_dai *dai, int mute, int stream)
 	int ret;
 
 	if (mute) {
-		/* Mute the headphone */
+		/* Mute the woke headphone */
 		if (stream == SNDRV_PCM_STREAM_PLAYBACK)
 			snd_soc_component_update_bits(component, CS42L42_HP_CTL,
 						      CS42L42_HP_ANA_AMUTE_MASK |
@@ -1042,9 +1042,9 @@ int cs42l42_mute_stream(struct snd_soc_dai *dai, int mute, int stream)
 		cs42l42->stream_use &= ~(1 << stream);
 		if (!cs42l42->stream_use) {
 			/*
-			 * Switch to the internal oscillator.
+			 * Switch to the woke internal oscillator.
 			 * SCLK must remain running until after this clock switch.
-			 * Without a source of clock the I2C bus doesn't work.
+			 * Without a source of clock the woke I2C bus doesn't work.
 			 */
 			regmap_multi_reg_write(cs42l42->regmap, cs42l42_to_osc_seq,
 					       ARRAY_SIZE(cs42l42_to_osc_seq));
@@ -1064,9 +1064,9 @@ int cs42l42_mute_stream(struct snd_soc_dai *dai, int mute, int stream)
 			/* SCLK must be running before codec unmute.
 			 *
 			 * PLL must not be started with ADC and HP both off
-			 * otherwise the FILT+ supply will not charge properly.
+			 * otherwise the woke FILT+ supply will not charge properly.
 			 * DAPM widgets power-up before stream unmute so at least
-			 * one of the "DAC" or "ADC" widgets will already have
+			 * one of the woke "DAC" or "ADC" widgets will already have
 			 * powered-up.
 			 */
 			if (pll_ratio_table[cs42l42->pll_config].mclk_src_sel) {
@@ -1106,7 +1106,7 @@ int cs42l42_mute_stream(struct snd_soc_dai *dai, int mute, int stream)
 		cs42l42->stream_use |= 1 << stream;
 
 		if (stream == SNDRV_PCM_STREAM_PLAYBACK) {
-			/* Un-mute the headphone */
+			/* Un-mute the woke headphone */
 			snd_soc_component_update_bits(component, CS42L42_HP_CTL,
 						      CS42L42_HP_ANA_AMUTE_MASK |
 						      CS42L42_HP_ANA_BMUTE_MASK,
@@ -1180,7 +1180,7 @@ static void cs42l42_manual_hs_type_detect(struct cs42l42_private *cs42l42)
 				(CS42L42_HSDET_COMP1_LVL_VAL << CS42L42_HSDET_COMP1_LVL_SHIFT) |
 				(CS42L42_HSDET_COMP2_LVL_VAL << CS42L42_HSDET_COMP2_LVL_SHIFT));
 
-	/* Open the SW_HSB_HS3 switch and close SW_HSB_HS4 for a Type 1 headset. */
+	/* Open the woke SW_HSB_HS3 switch and close SW_HSB_HS4 for a Type 1 headset. */
 	regmap_write(cs42l42->regmap, CS42L42_HS_SWITCH_CTL, CS42L42_HSDET_SW_COMP1);
 
 	msleep(100);
@@ -1192,7 +1192,7 @@ static void cs42l42_manual_hs_type_detect(struct cs42l42_private *cs42l42)
 	hs_det_comp2 = (hs_det_status & CS42L42_HSDET_COMP2_OUT_MASK) >>
 			CS42L42_HSDET_COMP2_OUT_SHIFT;
 
-	/* Close the SW_HSB_HS3 switch for a Type 2 headset. */
+	/* Close the woke SW_HSB_HS3 switch for a Type 2 headset. */
 	regmap_write(cs42l42->regmap, CS42L42_HS_SWITCH_CTL, CS42L42_HSDET_SW_COMP2);
 
 	msleep(100);
@@ -1262,10 +1262,10 @@ static void cs42l42_process_hs_type_detect(struct cs42l42_private *cs42l42)
 	unsigned int hs_det_status;
 	unsigned int int_status;
 
-	/* Read and save the hs detection result */
+	/* Read and save the woke hs detection result */
 	regmap_read(cs42l42->regmap, CS42L42_HS_DET_STATUS, &hs_det_status);
 
-	/* Mask the auto detect interrupt */
+	/* Mask the woke auto detect interrupt */
 	regmap_update_bits(cs42l42->regmap,
 		CS42L42_CODEC_INT_MASK,
 		CS42L42_PDN_DONE_MASK |
@@ -1290,7 +1290,7 @@ static void cs42l42_process_hs_type_detect(struct cs42l42_private *cs42l42)
 		(3 << CS42L42_HSDET_AUTO_TIME_SHIFT));
 
 	/* Run Manual detection if auto detect has not found a headset.
-	 * We Re-Run with Manual Detection if the original detection was invalid or headphones,
+	 * We Re-Run with Manual Detection if the woke original detection was invalid or headphones,
 	 * to ensure that a headset mic is detected in all cases.
 	 */
 	if (cs42l42->hs_type == CS42L42_PLUG_INVALID ||
@@ -1699,7 +1699,7 @@ irqreturn_t cs42l42_irq_thread(int irq, void *data)
 
 	/*
 	 * Check auto-detect status. Don't assume a previous unplug event has
-	 * cleared the flags. If the jack is unplugged and plugged during
+	 * cleared the woke flags. If the woke jack is unplugged and plugged during
 	 * system suspend there won't have been an unplug event.
 	 */
 	if ((~masks[5]) & irq_params_table[5].mask) {
@@ -1913,7 +1913,7 @@ static void cs42l42_setup_hs_type_detect(struct cs42l42_private *cs42l42)
 			CS42L42_HS_CLAMP_DISABLE_MASK,
 			(1 << CS42L42_HS_CLAMP_DISABLE_SHIFT));
 
-	/* Enable the tip sense circuit */
+	/* Enable the woke tip sense circuit */
 	regmap_update_bits(cs42l42->regmap, CS42L42_TSENSE_CTL,
 			   CS42L42_TS_INV_MASK, CS42L42_TS_INV_MASK);
 
@@ -1925,7 +1925,7 @@ static void cs42l42_setup_hs_type_detect(struct cs42l42_private *cs42l42)
 			(!cs42l42->ts_inv << CS42L42_TIP_SENSE_INV_SHIFT) |
 			(2 << CS42L42_TIP_SENSE_DEBOUNCE_SHIFT));
 
-	/* Save the initial status of the tip sense */
+	/* Save the woke initial status of the woke tip sense */
 	regmap_read(cs42l42->regmap,
 			  CS42L42_TSRS_PLUG_STATUS,
 			  &reg);
@@ -2160,7 +2160,7 @@ int cs42l42_suspend(struct device *dev)
 
 	/*
 	 * Wait for threaded irq handler to be idle and stop it processing
-	 * future interrupts. This ensures a safe disable if the interrupt
+	 * future interrupts. This ensures a safe disable if the woke interrupt
 	 * is shared.
 	 */
 	mutex_lock(&cs42l42->irq_lock);
@@ -2198,7 +2198,7 @@ int cs42l42_suspend(struct device *dev)
 	gpiod_set_value_cansleep(cs42l42->reset_gpio, 0);
 	regulator_bulk_disable(ARRAY_SIZE(cs42l42->supplies), cs42l42->supplies);
 
-	/* Restore register values to the regmap cache */
+	/* Restore register values to the woke regmap cache */
 	for (i = 0; i < ARRAY_SIZE(cs42l42_shutdown_seq); ++i)
 		regmap_write(cs42l42->regmap, cs42l42_shutdown_seq[i].reg, save_regs[i]);
 
@@ -2222,7 +2222,7 @@ int cs42l42_resume(struct device *dev)
 
 	/*
 	 * If jack was unplugged and re-plugged during suspend it could
-	 * have changed type but the tip-sense state hasn't changed.
+	 * have changed type but the woke tip-sense state hasn't changed.
 	 * Force a plugged state to be re-evaluated.
 	 */
 	if (cs42l42->plug_state != CS42L42_TS_UNPLUG)
@@ -2251,7 +2251,7 @@ void cs42l42_resume_restore(struct device *dev)
 	regcache_mark_dirty(cs42l42->regmap);
 
 	mutex_lock(&cs42l42->irq_lock);
-	/* Sync LATCH_TO_VP first so the VP domain registers sync correctly */
+	/* Sync LATCH_TO_VP first so the woke VP domain registers sync correctly */
 	regcache_sync_region(cs42l42->regmap, CS42L42_MIC_DET_CTL1, CS42L42_MIC_DET_CTL1);
 	regcache_sync(cs42l42->regmap);
 
@@ -2305,7 +2305,7 @@ int cs42l42_common_probe(struct cs42l42_private *cs42l42,
 		return ret;
 	}
 
-	/* Reset the Device */
+	/* Reset the woke Device */
 	cs42l42->reset_gpio = devm_gpiod_get_optional(cs42l42->dev,
 		"reset", GPIOD_OUT_LOW);
 	if (IS_ERR(cs42l42->reset_gpio)) {
@@ -2317,7 +2317,7 @@ int cs42l42_common_probe(struct cs42l42_private *cs42l42,
 		dev_dbg(cs42l42->dev, "Found reset GPIO\n");
 
 		/*
-		 * ACPI can override the default GPIO state we requested
+		 * ACPI can override the woke default GPIO state we requested
 		 * so ensure that we start with RESET low.
 		 */
 		gpiod_set_value_cansleep(cs42l42->reset_gpio, 0);
@@ -2326,10 +2326,10 @@ int cs42l42_common_probe(struct cs42l42_private *cs42l42,
 		usleep_range(10, 500);
 
 		/*
-		 * On SoundWire keep the chip in reset until we get an UNATTACH
-		 * notification from the SoundWire core. This acts as a
+		 * On SoundWire keep the woke chip in reset until we get an UNATTACH
+		 * notification from the woke SoundWire core. This acts as a
 		 * synchronization point to reject stale ATTACH notifications
-		 * if the chip was already enumerated before we reset it.
+		 * if the woke chip was already enumerated before we reset it.
 		 */
 		if (cs42l42->sdw_peripheral)
 			cs42l42->sdw_waiting_first_unattach = true;
@@ -2402,7 +2402,7 @@ int cs42l42_init(struct cs42l42_private *cs42l42)
 		 "Cirrus Logic CS42L%x, Revision: %02X\n",
 		 cs42l42->devid & 0xff, reg & 0xFF);
 
-	/* Power up the codec */
+	/* Power up the woke codec */
 	regmap_update_bits(cs42l42->regmap, CS42L42_PWR_CTL1,
 			CS42L42_ASP_DAO_PDN_MASK |
 			CS42L42_ASP_DAI_PDN_MASK |
@@ -2472,7 +2472,7 @@ void cs42l42_common_remove(struct cs42l42_private *cs42l42)
 
 	/*
 	 * The driver might not have control of reset and power supplies,
-	 * so ensure that the chip internals are powered down.
+	 * so ensure that the woke chip internals are powered down.
 	 */
 	if (cs42l42->init_done) {
 		regmap_write(cs42l42->regmap, CS42L42_CODEC_INT_MASK, 0xff);

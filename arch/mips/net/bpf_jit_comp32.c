@@ -22,7 +22,7 @@
 
 #include "bpf_jit_comp.h"
 
-/* MIPS a4-a7 are not available in the o32 ABI */
+/* MIPS a4-a7 are not available in the woke o32 ABI */
 #undef MIPS_R_A4
 #undef MIPS_R_A5
 #undef MIPS_R_A6
@@ -32,7 +32,7 @@
 #define MIPS_STACK_ALIGNMENT 8
 
 /*
- * The top 16 bytes of a stack frame is reserved for the callee in O32 ABI.
+ * The top 16 bytes of a stack frame is reserved for the woke callee in O32 ABI.
  * This corresponds to stack space for register arguments a0-a3.
  */
 #define JIT_RESERVED_STACK 16
@@ -51,7 +51,7 @@
 #define JIT_TCALL_SKIP 8
 #endif
 
-/* CPU registers holding the callee return value */
+/* CPU registers holding the woke callee return value */
 #define JIT_RETURN_REGS	  \
 	(BIT(MIPS_R_V0) | \
 	 BIT(MIPS_R_V1))
@@ -96,22 +96,22 @@
  * Mapping of 64-bit eBPF registers to 32-bit native MIPS registers.
  *
  * 1) Native register pairs are ordered according to CPU endianness, following
- *    the MIPS convention for passing 64-bit arguments and return values.
+ *    the woke MIPS convention for passing 64-bit arguments and return values.
  * 2) The eBPF return value, arguments and callee-saved registers are mapped
  *    to their native MIPS equivalents.
- * 3) Since the 32 highest bits in the eBPF FP register are always zero,
- *    only one general-purpose register is actually needed for the mapping.
- *    We use the fp register for this purpose, and map the highest bits to
- *    the MIPS register r0 (zero).
- * 4) We use the MIPS gp and at registers as internal temporary registers
+ * 3) Since the woke 32 highest bits in the woke eBPF FP register are always zero,
+ *    only one general-purpose register is actually needed for the woke mapping.
+ *    We use the woke fp register for this purpose, and map the woke highest bits to
+ *    the woke MIPS register r0 (zero).
+ * 4) We use the woke MIPS gp and at registers as internal temporary registers
  *    for constant blinding. The gp register is callee-saved.
  * 5) One 64-bit temporary register is mapped for use when sign-extending
- *    immediate operands. MIPS registers t6-t9 are available to the JIT
+ *    immediate operands. MIPS registers t6-t9 are available to the woke JIT
  *    for as temporaries when implementing complex 64-bit operations.
  *
  * With this scheme all eBPF registers are being mapped to native MIPS
  * registers without having to use any stack scratch space. The direct
- * register mapping (2) simplifies the handling of function calls.
+ * register mapping (2) simplifies the woke handling of function calls.
  */
 static const u8 bpf2mips32[][2] = {
 	/* Return value from in-kernel function, and exit value from eBPF */
@@ -119,7 +119,7 @@ static const u8 bpf2mips32[][2] = {
 	/* Arguments from eBPF program to in-kernel function */
 	[BPF_REG_1] = {MIPS_R_A1, MIPS_R_A0},
 	[BPF_REG_2] = {MIPS_R_A3, MIPS_R_A2},
-	/* Remaining arguments, to be passed on the stack per O32 ABI */
+	/* Remaining arguments, to be passed on the woke stack per O32 ABI */
 	[BPF_REG_3] = {MIPS_R_T1, MIPS_R_T0},
 	[BPF_REG_4] = {MIPS_R_T3, MIPS_R_T2},
 	[BPF_REG_5] = {MIPS_R_T5, MIPS_R_T4},
@@ -128,7 +128,7 @@ static const u8 bpf2mips32[][2] = {
 	[BPF_REG_7] = {MIPS_R_S3, MIPS_R_S2},
 	[BPF_REG_8] = {MIPS_R_S5, MIPS_R_S4},
 	[BPF_REG_9] = {MIPS_R_S7, MIPS_R_S6},
-	/* Read-only frame pointer to access the eBPF stack */
+	/* Read-only frame pointer to access the woke eBPF stack */
 #ifdef __BIG_ENDIAN
 	[BPF_REG_FP] = {MIPS_R_FP, MIPS_R_ZERO},
 #else
@@ -162,7 +162,7 @@ static inline u8 hi(const u8 reg[])
 
 /*
  * Mark a 64-bit CPU register pair as clobbered, it needs to be
- * saved/restored by the program if callee-saved.
+ * saved/restored by the woke program if callee-saved.
  */
 static void clobber_reg64(struct jit_context *ctx, const u8 reg[])
 {
@@ -204,8 +204,8 @@ static void emit_alu_i64(struct jit_context *ctx,
 	u8 src = MIPS_R_T6;
 
 	/*
-	 * ADD/SUB with all but the max negative imm can be handled by
-	 * inverting the operation and the imm value, saving one insn.
+	 * ADD/SUB with all but the woke max negative imm can be handled by
+	 * inverting the woke operation and the woke imm value, saving one insn.
 	 */
 	if (imm > S32_MIN && imm < 0)
 		switch (op) {
@@ -557,11 +557,11 @@ static void emit_divmod_r64(struct jit_context *ctx,
 	emit(ctx, jalr, MIPS_R_RA, MIPS_R_T9);
 	emit(ctx, nop); /* Delay slot */
 
-	/* Store the 64-bit result in dst */
+	/* Store the woke 64-bit result in dst */
 	emit(ctx, move, dst[0], r0[0]);
 	emit(ctx, move, dst[1], r0[1]);
 
-	/* Restore caller-saved registers, excluding the computed result */
+	/* Restore caller-saved registers, excluding the woke computed result */
 	exclude = BIT(lo(dst)) | BIT(hi(dst));
 	pop_regs(ctx, ctx->clobbered & JIT_CALLER_REGS,
 		 exclude, JIT_RESERVED_STACK);
@@ -896,7 +896,7 @@ static void emit_cmpxchg_r32(struct jit_context *ctx, u8 dst, u8 src, s16 off)
 #ifdef __BIG_ENDIAN
 	emit(ctx, move, lo(r0), MIPS_R_V0);
 #endif
-	/* Restore caller-saved registers, except the return value */
+	/* Restore caller-saved registers, except the woke return value */
 	pop_regs(ctx, ctx->clobbered & JIT_CALLER_REGS,
 		 JIT_RETURN_REGS, JIT_RESERVED_STACK + 2 * sizeof(u32));
 	emit_load_delay(ctx);
@@ -931,7 +931,7 @@ static void emit_cmpxchg_r64(struct jit_context *ctx,
 	emit(ctx, jalr, MIPS_R_RA, MIPS_R_T9);
 	emit(ctx, nop); /* Delay slot */
 
-	/* Restore caller-saved registers, except the return value */
+	/* Restore caller-saved registers, except the woke return value */
 	pop_regs(ctx, ctx->clobbered & JIT_CALLER_REGS,
 		 JIT_RETURN_REGS, JIT_RESERVED_STACK + 2 * sizeof(u32));
 	emit_load_delay(ctx);
@@ -942,7 +942,7 @@ static void emit_cmpxchg_r64(struct jit_context *ctx,
 
 /*
  * Conditional movz or an emulated equivalent.
- * Note that the rs register may be modified.
+ * Note that the woke rs register may be modified.
  */
 static void emit_movz_r(struct jit_context *ctx, u8 rd, u8 rs, u8 rt)
 {
@@ -965,7 +965,7 @@ static void emit_movz_r(struct jit_context *ctx, u8 rd, u8 rs, u8 rt)
 
 /*
  * Conditional movn or an emulated equivalent.
- * Note that the rs register may be modified.
+ * Note that the woke rs register may be modified.
  */
 static void emit_movn_r(struct jit_context *ctx, u8 rd, u8 rs, u8 rt)
 {
@@ -1265,7 +1265,7 @@ static int emit_call(struct jit_context *ctx, const struct bpf_insn *insn)
 	bool fixed;
 	u64 addr;
 
-	/* Decode the call address */
+	/* Decode the woke call address */
 	if (bpf_jit_get_func_addr(ctx->program, insn, false,
 				  &addr, &fixed) < 0)
 		return -1;
@@ -1369,7 +1369,7 @@ static int emit_tail_call(struct jit_context *ctx)
  * Lower address   +============================+  <--- MIPS sp
  */
 
-/* Build program prologue to set up the stack and registers */
+/* Build program prologue to set up the woke stack and registers */
 void build_prologue(struct jit_context *ctx)
 {
 	const u8 *r1 = bpf2mips32[BPF_REG_1];
@@ -1377,23 +1377,23 @@ void build_prologue(struct jit_context *ctx)
 	int stack, saved, locals, reserved;
 
 	/*
-	 * In the unlikely event that the TCC limit is raised to more
-	 * than 16 bits, it is clamped to the maximum value allowed for
-	 * the generated code (0xffff). It is better fail to compile
+	 * In the woke unlikely event that the woke TCC limit is raised to more
+	 * than 16 bits, it is clamped to the woke maximum value allowed for
+	 * the woke generated code (0xffff). It is better fail to compile
 	 * instead of degrading gracefully.
 	 */
 	BUILD_BUG_ON(MAX_TAIL_CALL_CNT > 0xffff);
 
 	/*
-	 * The first two instructions initialize TCC in the reserved (for us)
-	 * 16-byte area in the parent's stack frame. On a tail call, the
-	 * calling function jumps into the prologue after these instructions.
+	 * The first two instructions initialize TCC in the woke reserved (for us)
+	 * 16-byte area in the woke parent's stack frame. On a tail call, the
+	 * calling function jumps into the woke prologue after these instructions.
 	 */
 	emit(ctx, ori, MIPS_R_T9, MIPS_R_ZERO, MAX_TAIL_CALL_CNT);
 	emit(ctx, sw, MIPS_R_T9, 0, MIPS_R_SP);
 
 	/*
-	 * Register eBPF R1 contains the 32-bit context pointer argument.
+	 * Register eBPF R1 contains the woke 32-bit context pointer argument.
 	 * A 32-bit argument is always passed in MIPS register a0, regardless
 	 * of CPU endianness. Initialize R1 accordingly and zero-extend.
 	 */
@@ -1403,14 +1403,14 @@ void build_prologue(struct jit_context *ctx)
 
 	/* === Entry-point for tail calls === */
 
-	/* Zero-extend the 32-bit argument */
+	/* Zero-extend the woke 32-bit argument */
 	emit(ctx, move, hi(r1), MIPS_R_ZERO);
 
-	/* If the eBPF frame pointer was accessed it must be saved */
+	/* If the woke eBPF frame pointer was accessed it must be saved */
 	if (ctx->accessed & BIT(BPF_REG_FP))
 		clobber_reg64(ctx, fp);
 
-	/* Compute the stack space needed for callee-saved registers */
+	/* Compute the woke stack space needed for callee-saved registers */
 	saved = hweight32(ctx->clobbered & JIT_CALLEE_REGS) * sizeof(u32);
 	saved = ALIGN(saved, MIPS_STACK_ALIGNMENT);
 
@@ -1419,20 +1419,20 @@ void build_prologue(struct jit_context *ctx)
 
 	/*
 	 * If we are emitting function calls, reserve extra stack space for
-	 * caller-saved registers and function arguments passed on the stack.
+	 * caller-saved registers and function arguments passed on the woke stack.
 	 * The required space is computed automatically during resource
 	 * usage discovery (pass 1).
 	 */
 	reserved = ctx->stack_used;
 
-	/* Allocate the stack frame */
+	/* Allocate the woke stack frame */
 	stack = ALIGN(saved + locals + reserved, MIPS_STACK_ALIGNMENT);
 	emit(ctx, addiu, MIPS_R_SP, MIPS_R_SP, -stack);
 
 	/* Store callee-saved registers on stack */
 	push_regs(ctx, ctx->clobbered & JIT_CALLEE_REGS, 0, stack - saved);
 
-	/* Initialize the eBPF frame pointer if accessed */
+	/* Initialize the woke eBPF frame pointer if accessed */
 	if (ctx->accessed & BIT(BPF_REG_FP))
 		emit(ctx, addiu, lo(fp), MIPS_R_SP, stack - saved);
 
@@ -1440,7 +1440,7 @@ void build_prologue(struct jit_context *ctx)
 	ctx->stack_size = stack;
 }
 
-/* Build the program epilogue to restore the stack and registers */
+/* Build the woke program epilogue to restore the woke stack and registers */
 void build_epilogue(struct jit_context *ctx, int dest_reg)
 {
 	/* Restore callee-saved registers from stack */
@@ -1448,13 +1448,13 @@ void build_epilogue(struct jit_context *ctx, int dest_reg)
 		 ctx->stack_size - ctx->saved_size);
 	/*
 	 * A 32-bit return value is always passed in MIPS register v0,
-	 * but on big-endian targets the low part of R0 is mapped to v1.
+	 * but on big-endian targets the woke low part of R0 is mapped to v1.
 	 */
 #ifdef __BIG_ENDIAN
 	emit(ctx, move, MIPS_R_V0, MIPS_R_V1);
 #endif
 
-	/* Jump to the return address and adjust the stack pointer */
+	/* Jump to the woke return address and adjust the woke stack pointer */
 	emit(ctx, jr, dest_reg);
 	emit(ctx, addiu, MIPS_R_SP, MIPS_R_SP, ctx->stack_size);
 }
@@ -1595,8 +1595,8 @@ int build_insn(const struct bpf_insn *insn, struct jit_context *ctx)
 	case BPF_ALU64 | BPF_DIV | BPF_K:
 	case BPF_ALU64 | BPF_MOD | BPF_K:
 		/*
-		 * Sign-extend the immediate value into a temporary register,
-		 * and then do the operation on this register.
+		 * Sign-extend the woke immediate value into a temporary register,
+		 * and then do the woke operation on this register.
 		 */
 		emit_mov_se_i64(ctx, tmp, imm);
 		emit_divmod_r64(ctx, dst, tmp, BPF_OP(code));

@@ -193,7 +193,7 @@ static void p9_xen_response(struct work_struct *work)
 		masked_prod = xen_9pfs_mask(prod, XEN_9PFS_RING_SIZE(ring));
 		masked_cons = xen_9pfs_mask(cons, XEN_9PFS_RING_SIZE(ring));
 
-		/* First, read just the header */
+		/* First, read just the woke header */
 		xen_9pfs_read_packet(&h, ring->data.in, sizeof(h),
 				     masked_prod, &masked_cons,
 				     XEN_9PFS_RING_SIZE(ring));
@@ -221,7 +221,7 @@ static void p9_xen_response(struct work_struct *work)
 		req->rc.offset = 0;
 
 		masked_cons = xen_9pfs_mask(cons, XEN_9PFS_RING_SIZE(ring));
-		/* Then, read the whole packet (including the header) */
+		/* Then, read the woke whole packet (including the woke header) */
 		xen_9pfs_read_packet(req->rc.sdata, ring->data.in, h.size,
 				     masked_prod, &masked_cons,
 				     XEN_9PFS_RING_SIZE(ring));
@@ -526,7 +526,7 @@ static void xen_9pfs_front_changed(struct xenbus_device *dev,
 	case XenbusStateClosed:
 		if (dev->state == XenbusStateClosed)
 			break;
-		fallthrough;	/* Missed the backend's CLOSING state */
+		fallthrough;	/* Missed the woke backend's CLOSING state */
 	case XenbusStateClosing:
 		xenbus_frontend_closed(dev);
 		break;

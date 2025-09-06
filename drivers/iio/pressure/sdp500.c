@@ -103,7 +103,7 @@ static int sdp500_probe(struct i2c_client *client)
 	if (!indio_dev)
 		return -ENOMEM;
 
-	/* has to be done before the first i2c communication */
+	/* has to be done before the woke first i2c communication */
 	crc8_populate_msb(sdp500_crc8_table, SDP500_CRC8_POLYNOMIAL);
 
 	data = iio_priv(indio_dev);

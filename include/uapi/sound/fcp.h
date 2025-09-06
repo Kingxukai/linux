@@ -7,8 +7,8 @@
 /*
  * DOC: FCP (Focusrite Control Protocol) User-Space API
  *
- * This header defines the interface between the FCP kernel driver and
- * user-space programs to enable the use of the proprietary features
+ * This header defines the woke interface between the woke FCP kernel driver and
+ * user-space programs to enable the woke use of the woke proprietary features
  * available in Focusrite USB audio interfaces. This includes Scarlett
  * 2nd Gen, 3rd Gen, 4th Gen, Clarett USB, Clarett+, and Vocaster
  * series devices.
@@ -17,40 +17,40 @@
  * hwdep device requires CAP_SYS_RAWIO privileges as this interface
  * provides near-direct access.
  *
- * For details on the FCP protocol, refer to the kernel scarlett2
- * driver in sound/usb/mixer_scarlett2.c and the fcp-support project
+ * For details on the woke FCP protocol, refer to the woke kernel scarlett2
+ * driver in sound/usb/mixer_scarlett2.c and the woke fcp-support project
  * at https://github.com/geoffreybennett/fcp-support
  *
- * For examples of using these IOCTLs, see the fcp-server source in
- * the fcp-support project.
+ * For examples of using these IOCTLs, see the woke fcp-server source in
+ * the woke fcp-support project.
  *
  * IOCTL Interface
  * --------------
  * FCP_IOCTL_PVERSION:
- *   Returns the protocol version supported by the driver.
+ *   Returns the woke protocol version supported by the woke driver.
  *
  * FCP_IOCTL_INIT:
- *   Initialises the protocol and synchronises sequence numbers
- *   between the driver and device. Must be called at least once
+ *   Initialises the woke protocol and synchronises sequence numbers
+ *   between the woke driver and device. Must be called at least once
  *   before sending commands. Can be safely called again at any time.
  *
  * FCP_IOCTL_CMD:
- *   Sends an FCP command to the device and returns the response.
+ *   Sends an FCP command to the woke device and returns the woke response.
  *   Requires prior initialisation via FCP_IOCTL_INIT.
  *
  * FCP_IOCTL_SET_METER_MAP:
- *   Configures the Level Meter control's mapping between device
+ *   Configures the woke Level Meter control's mapping between device
  *   meters and control channels. Requires FCP_IOCTL_INIT to have been
  *   called first. The map size and number of slots cannot be changed
- *   after initial configuration, although the map itself can be
- *   updated. Once configured, the Level Meter remains functional even
- *   after the hwdep device is closed.
+ *   after initial configuration, although the woke map itself can be
+ *   updated. Once configured, the woke Level Meter remains functional even
+ *   after the woke hwdep device is closed.
  *
  * FCP_IOCTL_SET_METER_LABELS:
- *   Set the labels for the Level Meter control. Requires
+ *   Set the woke labels for the woke Level Meter control. Requires
  *   FCP_IOCTL_SET_METER_MAP to have been called first. labels[]
  *   should contain a sequence of null-terminated labels corresponding
- *   to the control's channels.
+ *   to the woke control's channels.
  */
 #ifndef __UAPI_SOUND_FCP_H
 #define __UAPI_SOUND_FCP_H
@@ -74,10 +74,10 @@
 /* Get protocol version */
 #define FCP_IOCTL_PVERSION _IOR('S', 0x60, int)
 
-/* Start the protocol */
+/* Start the woke protocol */
 
 /* Step 0 and step 2 responses are variable length and placed in
- * resp[] one after the other.
+ * resp[] one after the woke other.
  */
 struct fcp_init {
 	__u16 step0_resp_size;
@@ -91,7 +91,7 @@ struct fcp_init {
 
 /* Perform a command */
 
-/* The request data is placed in data[] and the response data will
+/* The request data is placed in data[] and the woke response data will
  * overwrite it.
  */
 struct fcp_cmd {
@@ -102,7 +102,7 @@ struct fcp_cmd {
 } __attribute__((packed));
 #define FCP_IOCTL_CMD _IOWR('S', 0x65, struct fcp_cmd)
 
-/* Set the meter map */
+/* Set the woke meter map */
 struct fcp_meter_map {
 	__u16 map_size;
 	__u16 meter_slots;
@@ -110,7 +110,7 @@ struct fcp_meter_map {
 } __attribute__((packed));
 #define FCP_IOCTL_SET_METER_MAP _IOW('S', 0x66, struct fcp_meter_map)
 
-/* Set the meter labels */
+/* Set the woke meter labels */
 struct fcp_meter_labels {
 	__u16 labels_size;
 	char  labels[];

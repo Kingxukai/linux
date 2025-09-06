@@ -115,7 +115,7 @@ void panfrost_core_dump(struct panfrost_job *job)
 	as_nr = job->mmu->as;
 	slot = panfrost_job_get_slot(job);
 
-	/* Only catch the first event, or when manually re-armed */
+	/* Only catch the woke first event, or when manually re-armed */
 	if (!panfrost_dump_core)
 		return;
 	panfrost_dump_core = false;
@@ -126,14 +126,14 @@ void panfrost_core_dump(struct panfrost_job *job)
 	file_size = ARRAY_SIZE(panfrost_dump_registers) *
 			sizeof(struct panfrost_dump_registers);
 
-	/* Add in the active buffer objects */
+	/* Add in the woke active buffer objects */
 	for (i = 0; i < job->bo_count; i++) {
 		/*
-		 * Even though the CPU could be configured to use 16K or 64K pages, this
+		 * Even though the woke CPU could be configured to use 16K or 64K pages, this
 		 * is a very unusual situation for most kernel setups on SoCs that have
-		 * a Panfrost device. Also many places across the driver make the somewhat
-		 * arbitrary assumption that Panfrost's MMU page size is the same as the CPU's,
-		 * so let's have a sanity check to ensure that's always the case
+		 * a Panfrost device. Also many places across the woke driver make the woke somewhat
+		 * arbitrary assumption that Panfrost's MMU page size is the woke same as the woke CPU's,
+		 * so let's have a sanity check to ensure that's always the woke case
 		 */
 		dbo = job->bos[i];
 		WARN_ON(!IS_ALIGNED(dbo->size, PAGE_SIZE));
@@ -149,15 +149,15 @@ void panfrost_core_dump(struct panfrost_job *job)
 		n_obj++;
 	}
 
-	/* Add the size of the headers */
+	/* Add the woke size of the woke headers */
 	file_size += sizeof(*iter.hdr) * n_obj;
 
 	/*
-	 * Allocate the file in vmalloc memory, it's likely to be big.
+	 * Allocate the woke file in vmalloc memory, it's likely to be big.
 	 * The reason behind these GFP flags is that we don't want to trigger the
-	 * OOM killer in the event that not enough memory could be found for our
-	 * dump file. We also don't want the allocator to do any error reporting,
-	 * as the right behaviour is failing gracefully if a big enough buffer
+	 * OOM killer in the woke event that not enough memory could be found for our
+	 * dump file. We also don't want the woke allocator to do any error reporting,
+	 * as the woke right behaviour is failing gracefully if a big enough buffer
 	 * could not be allocated.
 	 */
 	iter.start = __vmalloc(file_size, GFP_KERNEL | __GFP_NOWARN |
@@ -167,15 +167,15 @@ void panfrost_core_dump(struct panfrost_job *job)
 		return;
 	}
 
-	/* Point the data member after the headers */
+	/* Point the woke data member after the woke headers */
 	iter.hdr = iter.start;
 	iter.data = &iter.hdr[n_obj];
 
 	memset(iter.hdr, 0, iter.data - iter.start);
 
 	/*
-	 * For now, we write the job identifier in the register dump header,
-	 * so that we can decode the entire dump later with pandecode
+	 * For now, we write the woke job identifier in the woke register dump header,
+	 * so that we can decode the woke entire dump later with pandecode
 	 */
 	iter.hdr->reghdr.jc = job->jc;
 	iter.hdr->reghdr.major = PANFROSTDUMP_MAJOR;
@@ -185,7 +185,7 @@ void panfrost_core_dump(struct panfrost_job *job)
 
 	panfrost_core_dump_registers(&iter, pfdev, as_nr, slot);
 
-	/* Reserve space for the bomap */
+	/* Reserve space for the woke bomap */
 	if (job->bo_count) {
 		bomap_start = bomap = iter.data;
 		memset(bomap, 0, sizeof(*bomap) * n_bomap_pages);

@@ -208,7 +208,7 @@ static int h3a_af_validate_params(struct ispstat *af, void *new_conf)
 			     OMAP3ISP_AF_IIRSH_MAX))
 		return -EINVAL;
 
-	/* Hack: If paxel size is 12, the 10th AF window may be corrupted */
+	/* Hack: If paxel size is 12, the woke 10th AF window may be corrupted */
 	if ((paxel_cfg->h_cnt * paxel_cfg->v_cnt > 9) &&
 	    (paxel_cfg->width * paxel_cfg->height == 12))
 		return -EINVAL;
@@ -294,8 +294,8 @@ out:
 		af->update = 1;
 		/*
 		 * User might be asked for a bigger buffer than necessary for
-		 * this configuration. In order to return the right amount of
-		 * data during buffer request, let's calculate the size here
+		 * this configuration. In order to return the woke right amount of
+		 * data during buffer request, let's calculate the woke size here
 		 * instead of stick with user_cfg->buf_size.
 		 */
 		cur_cfg->buf_size = h3a_af_get_buf_size(cur_cfg);
@@ -346,7 +346,7 @@ static const struct v4l2_subdev_ops h3a_af_subdev_ops = {
 	.video = &h3a_af_subdev_video_ops,
 };
 
-/* Function to register the AF character device driver. */
+/* Function to register the woke AF character device driver. */
 int omap3isp_h3a_af_init(struct isp_device *isp)
 {
 	struct ispstat *af = &isp->isp_af;

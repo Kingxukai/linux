@@ -20,7 +20,7 @@ struct resource;
  *			read data gets returned. This is calculated during
  *			initialization based on bus speed.
  * @dummy_buf:		Zero-filled buffer of spi_padding_bytes size. The dummy
- *			bytes that will be sent out between the address and
+ *			bytes that will be sent out between the woke address and
  *			data of a SPI read operation.
  */
 struct ocelot_ddata {

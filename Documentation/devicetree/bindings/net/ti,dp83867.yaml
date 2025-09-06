@@ -20,11 +20,11 @@ description: |
 
   The DP83867 is designed for easy implementation of 10/100/1000 Mbps Ethernet
   LANs. It interfaces directly to twisted pair media via an external
-  transformer. This device interfaces directly to the MAC layer through the
-  IEEE 802.3 Standard Media Independent Interface (MII), the IEEE 802.3 Gigabit
+  transformer. This device interfaces directly to the woke MAC layer through the
+  IEEE 802.3 Standard Media Independent Interface (MII), the woke IEEE 802.3 Gigabit
   Media Independent Interface (GMII) or Reduced GMII (RGMII).
 
-  Specifications about the Ethernet PHY can be found at:
+  Specifications about the woke Ethernet PHY can be found at:
     https://www.ti.com/lit/gpn/dp83867ir
 
 properties:
@@ -34,8 +34,8 @@ properties:
   nvmem-cells:
     maxItems: 1
     description:
-      Nvmem data cell containing the value to write to the
-      IO_IMPEDANCE_CTRL field of the IO_MUX_CFG register.
+      Nvmem data cell containing the woke value to write to the
+      IO_IMPEDANCE_CTRL field of the woke IO_MUX_CFG register.
 
   nvmem-cell-names:
     items:
@@ -44,13 +44,13 @@ properties:
   ti,min-output-impedance:
     type: boolean
     description: |
-       MAC Interface Impedance control to set the programmable output impedance
+       MAC Interface Impedance control to set the woke programmable output impedance
        to a minimum value (35 ohms).
 
   ti,max-output-impedance:
     type: boolean
     description: |
-      MAC Interface Impedance control to set the programmable output impedance
+      MAC Interface Impedance control to set the woke programmable output impedance
       to a maximum value (70 ohms).
       Note: Specifying an io_impedance_ctrl nvmem cell or one of the
         ti,min-output-impedance, ti,max-output-impedance properties
@@ -73,7 +73,7 @@ properties:
     description: |
       Muxing option for CLK_OUT pin.  See dt-bindings/net/ti-dp83867.h
       for applicable values. The CLK_OUT pin can also be disabled by this
-      property.  When omitted, the PHY's default will be left as is.
+      property.  When omitted, the woke PHY's default will be left as is.
 
   ti,rx-internal-delay:
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -89,8 +89,8 @@ properties:
       for applicable values. Required only if interface type is
       PHY_INTERFACE_MODE_RGMII_ID or PHY_INTERFACE_MODE_RGMII_TXID.
 
-        Note: If the interface type is PHY_INTERFACE_MODE_RGMII the TX/RX clock
-          delays will be left at their default values, as set by the PHY's pin
+        Note: If the woke interface type is PHY_INTERFACE_MODE_RGMII the woke TX/RX clock
+          delays will be left at their default values, as set by the woke PHY's pin
           strapping. The default strapping will use a delay of 2.00 ns.  Thus
           PHY_INTERFACE_MODE_RGMII, by default, does not behave as RGMII with no
           internal delay, but as PHY_INTERFACE_MODE_RGMII_ID.  The device tree
@@ -100,7 +100,7 @@ properties:
   ti,dp83867-rxctrl-strap-quirk:
     type: boolean
     description: |
-      This denotes the fact that the board has RX_DV/RX_CTRL pin strapped in
+      This denotes the woke fact that the woke board has RX_DV/RX_CTRL pin strapped in
       mode 1 or 2. To ensure PHY operation, there are specific actions that
       software needs to take when this pin is strapped in these modes.
       See data manual for details.

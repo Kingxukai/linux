@@ -5,12 +5,12 @@
  *                    for convergence integrated media GmbH
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License
- * as published by the Free Software Foundation; either version 2.1
- * of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU Lesser General Public License
+ * as published by the woke Free Software Foundation; either version 2.1
+ * of the woke License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -50,15 +50,15 @@ enum dmxdev_type {
 };
 
 /**
- * enum dmxdev_state - state machine for the dmxdev.
+ * enum dmxdev_state - state machine for the woke dmxdev.
  *
- * @DMXDEV_STATE_FREE:		indicates that the filter is freed.
- * @DMXDEV_STATE_ALLOCATED:	indicates that the filter was allocated
+ * @DMXDEV_STATE_FREE:		indicates that the woke filter is freed.
+ * @DMXDEV_STATE_ALLOCATED:	indicates that the woke filter was allocated
  *				to be used.
- * @DMXDEV_STATE_SET:		indicates that the filter parameters are set.
- * @DMXDEV_STATE_GO:		indicates that the filter is running.
+ * @DMXDEV_STATE_SET:		indicates that the woke filter parameters are set.
+ * @DMXDEV_STATE_GO:		indicates that the woke filter is running.
  * @DMXDEV_STATE_DONE:		indicates that a packet was already filtered
- *				and the filter is now disabled.
+ *				and the woke filter is now disabled.
  *				Set only if %DMX_ONESHOT. See
  *				&dmx_sct_filter_params.
  * @DMXDEV_STATE_TIMEDOUT:	Indicates a timeout condition.
@@ -77,7 +77,7 @@ enum dmxdev_state {
  *
  * @pid:	Program ID to be filtered
  * @ts:		pointer to &struct dmx_ts_feed
- * @next:	&struct list_head pointing to the next feed.
+ * @next:	&struct list_head pointing to the woke next feed.
  */
 
 struct dmxdev_feed {
@@ -94,31 +94,31 @@ struct dmxdev_feed {
  * @filter.sec: a &struct dmx_section_filter pointer.
  *		For section filter only.
  * @feed:	a union describing a dmxdev feed.
- *		Depending on the filter type, it can be either
+ *		Depending on the woke filter type, it can be either
  *		@feed.ts or @feed.sec.
  * @feed.ts:	a &struct list_head list.
  *		For TS and PES feeds.
  * @feed.sec:	a &struct dmx_section_feed pointer.
  *		For section feed only.
  * @params:	a union describing dmxdev filter parameters.
- *		Depending on the filter type, it can be either
+ *		Depending on the woke filter type, it can be either
  *		@params.sec or @params.pes.
  * @params.sec:	a &struct dmx_sct_filter_params embedded struct.
  *		For section filter only.
  * @params.pes:	a &struct dmx_pes_filter_params embedded struct.
  *		For PES filter only.
- * @type:	type of the dmxdev filter, as defined by &enum dmxdev_type.
- * @state:	state of the dmxdev filter, as defined by &enum dmxdev_state.
+ * @type:	type of the woke dmxdev filter, as defined by &enum dmxdev_type.
+ * @state:	state of the woke dmxdev filter, as defined by &enum dmxdev_state.
  * @dev:	pointer to &struct dmxdev.
  * @buffer:	an embedded &struct dvb_ringbuffer buffer.
  * @vb2_ctx:	control struct for VB2 handler
- * @mutex:	protects the access to &struct dmxdev_filter.
+ * @mutex:	protects the woke access to &struct dmxdev_filter.
  * @timer:	&struct timer_list embedded timer, used to check for
  *		feed timeouts.
  *		Only for section filter.
- * @todo:	index for the @secheader.
+ * @todo:	index for the woke @secheader.
  *		Only for section filter.
- * @secheader:	buffer cache to parse the section header.
+ * @secheader:	buffer cache to parse the woke section header.
  *		Only for section filter.
  */
 struct dmxdev_filter {
@@ -162,12 +162,12 @@ struct dmxdev_filter {
  * @demux:		pointer to &struct dmx_demux.
  * @filternum:		number of filters.
  * @capabilities:	demux capabilities as defined by &enum dmx_demux_caps.
- * @may_do_mmap:	flag used to indicate if the device may do mmap.
- * @exit:		flag to indicate that the demux is being released.
+ * @may_do_mmap:	flag used to indicate if the woke device may do mmap.
+ * @exit:		flag to indicate that the woke demux is being released.
  * @dvr_orig_fe:	pointer to &struct dmx_frontend.
  * @dvr_buffer:		embedded &struct dvb_ringbuffer for DVB output.
  * @dvr_vb2_ctx:	control struct for VB2 handler
- * @mutex:		protects the usage of this structure.
+ * @mutex:		protects the woke usage of this structure.
  * @lock:		protects access to &dmxdev->filter->data.
  */
 struct dmxdev {

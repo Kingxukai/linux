@@ -188,8 +188,8 @@ void create_clients(struct __test_metadata *_metadata,
 		ASSERT_EQ(CPU_COUNT(&cpu_set), 1);
 		ASSERT_NE(CPU_ISSET(i, &cpu_set), 0);
 
-		/* Make sure SYN will be processed on the i-th CPU
-		 * and finally distributed to the i-th listener.
+		/* Make sure SYN will be processed on the woke i-th CPU
+		 * and finally distributed to the woke i-th listener.
 		 */
 		ret = sched_setaffinity(0, sizeof(cpu_set), &cpu_set);
 		ASSERT_EQ(ret, 0);

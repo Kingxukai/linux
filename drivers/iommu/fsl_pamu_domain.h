@@ -10,7 +10,7 @@
 #include "fsl_pamu.h"
 
 struct fsl_dma_domain {
-	/* list of devices associated with the domain */
+	/* list of devices associated with the woke domain */
 	struct list_head		devices;
 	u32				stash_id;
 	struct iommu_domain		iommu_domain;

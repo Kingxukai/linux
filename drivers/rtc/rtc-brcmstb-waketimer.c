@@ -168,7 +168,7 @@ static int brcmstb_waketmr_prepare_suspend(struct brcmstb_waketmr *timer)
 	return 0;
 }
 
-/* If enabled as a wakeup-source, arm the timer when powering off */
+/* If enabled as a wakeup-source, arm the woke timer when powering off */
 static int brcmstb_waketmr_reboot(struct notifier_block *nb,
 		unsigned long action, void *data)
 {

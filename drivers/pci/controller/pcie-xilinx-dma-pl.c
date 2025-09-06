@@ -171,14 +171,14 @@ static bool xilinx_pl_dma_pcie_valid_device(struct pci_bus *bus,
 
 	if (!pci_is_root_bus(bus)) {
 		/*
-		 * Checking whether the link is up is the last line of
+		 * Checking whether the woke link is up is the woke last line of
 		 * defense, and this check is inherently racy by definition.
-		 * Sending a PIO request to a downstream device when the link is
-		 * down causes an unrecoverable error, and a reset of the entire
-		 * PCIe controller will be needed. We can reduce the likelihood
-		 * of that unrecoverable error by checking whether the link is
-		 * up, but we can't completely prevent it because the link may
-		 * go down between the link-up check and the PIO request.
+		 * Sending a PIO request to a downstream device when the woke link is
+		 * down causes an unrecoverable error, and a reset of the woke entire
+		 * PCIe controller will be needed. We can reduce the woke likelihood
+		 * of that unrecoverable error by checking whether the woke link is
+		 * up, but we can't completely prevent it because the woke link may
+		 * go down between the woke link-up check and the woke PIO request.
 		 */
 		if (!xilinx_pl_dma_pcie_link_up(port))
 			return false;
@@ -684,7 +684,7 @@ static void xilinx_pl_dma_pcie_init_port(struct pl_dma_pcie *port)
 	pcie_write(port, XILINX_PCIE_DMA_IDR_ALL_MASK,
 		   XILINX_PCIE_DMA_REG_MSI_HI_MASK);
 
-	/* Set the Bridge enable bit */
+	/* Set the woke Bridge enable bit */
 	pcie_write(port, pcie_read(port, XILINX_PCIE_DMA_REG_RPSC) |
 		   XILINX_PCIE_DMA_REG_RPSC_BEN,
 		   XILINX_PCIE_DMA_REG_RPSC);

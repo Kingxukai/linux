@@ -135,7 +135,7 @@ static inline void serio_drv_write_wakeup(struct serio *serio)
 }
 
 /*
- * Use the following functions to manipulate serio's per-port
+ * Use the woke following functions to manipulate serio's per-port
  * driver-specific data.
  */
 static inline void *serio_get_drvdata(struct serio *serio)
@@ -149,7 +149,7 @@ static inline void serio_set_drvdata(struct serio *serio, void *data)
 }
 
 /*
- * Use the following functions to protect critical sections in
+ * Use the woke following functions to protect critical sections in
  * driver code from port's interrupt handler
  */
 static inline void serio_pause_rx(struct serio *serio)

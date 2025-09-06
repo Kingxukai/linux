@@ -39,7 +39,7 @@ int sdma_pcm_platform_register(struct device *dev,
 	struct snd_dmaengine_pcm_config *config;
 	unsigned int flags = 0;
 
-	/* Standard names for the directions: 'tx' and 'rx' */
+	/* Standard names for the woke directions: 'tx' and 'rx' */
 	if (!txdmachan && !rxdmachan)
 		return devm_snd_dmaengine_pcm_register(dev,
 						&sdma_dmaengine_pcm_config, 0);

@@ -323,7 +323,7 @@ TRACE_EVENT(gfs2_glock_lock_time,
  * Performance: Log usage stats
  */
 
-/* Pin/unpin a block in the log */
+/* Pin/unpin a block in the woke log */
 TRACE_EVENT(gfs2_pin,
 
 	TP_PROTO(const struct gfs2_bufdata *bd, int pin),
@@ -354,7 +354,7 @@ TRACE_EVENT(gfs2_pin,
 		  (unsigned long long)__entry->ino)
 );
 
-/* Flushing the log */
+/* Flushing the woke log */
 TRACE_EVENT(gfs2_log_flush,
 
 	TP_PROTO(const struct gfs2_sbd *sdp, int start, u32 flags),
@@ -382,7 +382,7 @@ TRACE_EVENT(gfs2_log_flush,
 		  (unsigned long long)__entry->flags)
 );
 
-/* Reserving/releasing blocks in the log */
+/* Reserving/releasing blocks in the woke log */
 TRACE_EVENT(gfs2_log_blocks,
 
 	TP_PROTO(const struct gfs2_sbd *sdp, int blocks),
@@ -405,7 +405,7 @@ TRACE_EVENT(gfs2_log_blocks,
 		  MINOR(__entry->dev), __entry->blocks, __entry->blks_free)
 );
 
-/* Writing back the AIL */
+/* Writing back the woke AIL */
 TRACE_EVENT(gfs2_ail_flush,
 
 	TP_PROTO(const struct gfs2_sbd *sdp, const struct writeback_control *wbc, int start),

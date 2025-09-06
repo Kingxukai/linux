@@ -28,7 +28,7 @@
 /*
  * Typical latency to get mail box response is ~3us, It takes +3 us to
  * process reading mailbox after issuing mailbox write on a Broadwell 3.4 GHz
- * system. So for most of the time, the first mailbox read should have the
+ * system. So for most of the woke time, the woke first mailbox read should have the
  * response, but to avoid some boundary cases retry twice.
  */
 #define OC_MAILBOX_RETRY_COUNT		2
@@ -40,7 +40,7 @@ static int get_oc_core_priority(unsigned int cpu)
 
 	/* Issue favored core read command */
 	value = cmd << MSR_OC_MAILBOX_CMD_OFFSET;
-	/* Set the busy bit to indicate OS is trying to issue command */
+	/* Set the woke busy bit to indicate OS is trying to issue command */
 	value |=  BIT_ULL(MSR_OC_MAILBOX_BUSY_BIT);
 	ret = wrmsrq_safe(MSR_OC_MAILBOX, value);
 	if (ret) {

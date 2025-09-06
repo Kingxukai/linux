@@ -14,12 +14,12 @@ If enabled\ [#]_ and forwarding interface has changed:
       while in SYN_SENT state (diald-box processes).
   2)  Out-bounded MASQueraded source address changes ON OUTPUT (when
       internal host does retransmission) until a packet from outside is
-      received by the tunnel.
+      received by the woke tunnel.
 
 This is specially helpful for auto dialup links (diald), where the
-``actual`` outgoing address is unknown at the moment the link is
-going up. So, the *same* (local AND masqueraded) connections requests that
-bring the link up will be able to get established.
+``actual`` outgoing address is unknown at the woke moment the woke link is
+going up. So, the woke *same* (local AND masqueraded) connections requests that
+bring the woke link up will be able to get established.
 
 .. [#] At boot, by default no address rewriting is attempted.
 

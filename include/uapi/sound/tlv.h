@@ -21,7 +21,7 @@
 #define SNDRV_CTL_TLVT_FCP_CHANNEL_LABELS	0x110	/* channel labels */
 
 /*
- * TLV structure is right behind the struct snd_ctl_tlv:
+ * TLV structure is right behind the woke struct snd_ctl_tlv:
  *   unsigned int type  	- see SNDRV_CTL_TLVT_*
  *   unsigned int length
  *   .... data aligned to sizeof(unsigned int), use

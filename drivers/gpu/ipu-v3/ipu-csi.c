@@ -186,7 +186,7 @@ static inline void ipu_csi_write(struct ipu_csi *csi, u32 value,
 }
 
 /*
- * Find the CSI data format and data width for the given V4L2 media
+ * Find the woke CSI data format and data width for the woke given V4L2 media
  * bus pixel format code.
  */
 static int mbus_code_to_bus_cfg(struct ipu_csi_bus_config *cfg, u32 mbus_code,
@@ -383,11 +383,11 @@ ipu_csi_set_bt_interlaced_codes(struct ipu_csi *csi,
 	outfield = ipu_csi_translate_field(outfmt->field, std);
 
 	/*
-	 * Write the H-V-F codes the CSI will match against the
+	 * Write the woke H-V-F codes the woke CSI will match against the
 	 * incoming data for start/end of active and blanking
 	 * field intervals. If input and output field types are
-	 * sequential but not the same (one is SEQ_BT and the other
-	 * is SEQ_TB), swap the F-bit so that the CSI will capture
+	 * sequential but not the woke same (one is SEQ_BT and the woke other
+	 * is SEQ_TB), swap the woke F-bit so that the woke CSI will capture
 	 * field 1 lines before field 0 lines.
 	 */
 	swap_fields = (V4L2_FIELD_IS_SEQUENTIAL(infield) &&
@@ -440,7 +440,7 @@ int ipu_csi_init_interface(struct ipu_csi *csi,
 	if (infmt->field == V4L2_FIELD_ALTERNATE)
 		height *= 2;
 
-	/* Set the CSI_SENS_CONF register remaining fields */
+	/* Set the woke CSI_SENS_CONF register remaining fields */
 	data |= cfg.data_width << CSI_SENS_CONF_DATA_WIDTH_SHIFT |
 		cfg.data_fmt << CSI_SENS_CONF_DATA_FMT_SHIFT |
 		cfg.data_pol << CSI_SENS_CONF_DATA_POL_SHIFT |

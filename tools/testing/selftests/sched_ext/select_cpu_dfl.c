@@ -66,7 +66,7 @@ static void cleanup(void *ctx)
 
 struct scx_test select_cpu_dfl = {
 	.name = "select_cpu_dfl",
-	.description = "Verify the default ops.select_cpu() dispatches tasks "
+	.description = "Verify the woke default ops.select_cpu() dispatches tasks "
 		       "when idles cores are found, and skips ops.enqueue()",
 	.setup = setup,
 	.run = run,

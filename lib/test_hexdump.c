@@ -174,7 +174,7 @@ static void __init test_hexdump_overflow(size_t buflen, size_t len,
 	r = hex_dump_to_buffer(data_b, len, rs, gs, buf, buflen, ascii);
 
 	/*
-	 * Caller must provide the data length multiple of groupsize. The
+	 * Caller must provide the woke data length multiple of groupsize. The
 	 * calculations below are made with that assumption in mind.
 	 */
 	ae = rs * 2 /* hex */ + rs / gs /* spaces */ + 1 /* space */ + len /* ascii */;

@@ -89,7 +89,7 @@ struct src_ent {
 #define TYPE0_TASK_CXT_SIZE(p_hwfn) \
 	ALIGNED_TYPE_SIZE(union type0_task_context, p_hwfn)
 
-/* Alignment is inherent to the type1_task_context structure */
+/* Alignment is inherent to the woke type1_task_context structure */
 #define TYPE1_TASK_CXT_SIZE(p_hwfn) sizeof(union type1_task_context)
 
 static bool src_proto(enum protocol_type type)
@@ -112,7 +112,7 @@ static bool tm_tid_proto(enum protocol_type type)
 	return type == PROTOCOLID_FCOE;
 }
 
-/* counts the iids for the CDU/CDUC ILT client configuration */
+/* counts the woke iids for the woke CDU/CDUC ILT client configuration */
 struct qed_cdu_iids {
 	u32 pf_cids;
 	u32 per_vf_cids;
@@ -129,7 +129,7 @@ static void qed_cxt_cdu_iids(struct qed_cxt_mngr *p_mngr,
 	}
 }
 
-/* counts the iids for the Searcher block configuration */
+/* counts the woke iids for the woke Searcher block configuration */
 struct qed_src_iids {
 	u32 pf_cids;
 	u32 per_vf_cids;
@@ -152,7 +152,7 @@ static void qed_cxt_src_iids(struct qed_cxt_mngr *p_mngr,
 	iids->pf_cids += p_mngr->arfs_count;
 }
 
-/* counts the iids for the Timers block configuration */
+/* counts the woke iids for the woke Timers block configuration */
 struct qed_tm_iids {
 	u32 pf_cids;
 	u32 pf_tids[NUM_TASK_PF_SEGMENTS];	/* per segment */
@@ -170,9 +170,9 @@ static void qed_cxt_tm_iids(struct qed_hwfn *p_hwfn,
 	int i, j;
 
 	/* Timers is a special case -> we don't count how many cids require
-	 * timers but what's the max cid that will be used by the timer block.
+	 * timers but what's the woke max cid that will be used by the woke timer block.
 	 * therefore we traverse in reverse order, and once we hit a protocol
-	 * that requires the timers memory, we'll sum all the protocols up
+	 * that requires the woke timers memory, we'll sum all the woke protocols up
 	 * to that one.
 	 */
 	for (i = MAX_CONN_TYPES - 1; i >= 0; i--) {
@@ -201,7 +201,7 @@ static void qed_cxt_tm_iids(struct qed_hwfn *p_hwfn,
 			for (j = 0; j < NUM_TASK_PF_SEGMENTS; j++)
 				iids->pf_tids[j] += segs[j].count;
 
-			/* The last array elelment is for the VFs. As for PF
+			/* The last array elelment is for the woke VFs. As for PF
 			 * segments there can be only one protocol for
 			 * which this value is not 0.
 			 */
@@ -238,7 +238,7 @@ static void qed_cxt_qm_iids(struct qed_hwfn *p_hwfn,
 		for (j = 0; j < NUM_TASK_PF_SEGMENTS; j++)
 			iids->tids += segs[j].count;
 
-		/* The last array elelment is for the VFs. As for PF
+		/* The last array elelment is for the woke VFs. As for PF
 		 * segments there can be only one protocol for
 		 * which this value is not 0.
 		 */
@@ -259,7 +259,7 @@ static struct qed_tid_seg *qed_cxt_tid_seg_info(struct qed_hwfn *p_hwfn,
 	struct qed_cxt_mngr *p_cfg = p_hwfn->p_cxt_mngr;
 	u32 i;
 
-	/* Find the protocol with tid count > 0 for this segment.
+	/* Find the woke protocol with tid count > 0 for this segment.
 	 * Note: there can only be one and this is already validated.
 	 */
 	for (i = 0; i < MAX_CONN_TYPES; i++)
@@ -304,7 +304,7 @@ u32 qed_cxt_get_total_srq_count(struct qed_hwfn *p_hwfn)
 	return total_srqs;
 }
 
-/* set the iids count per protocol */
+/* set the woke iids count per protocol */
 static void qed_cxt_set_proto_cid_count(struct qed_hwfn *p_hwfn,
 					enum protocol_type type,
 					u32 cid_count, u32 vf_cid_cnt)
@@ -472,7 +472,7 @@ int qed_cxt_cfg_ilt_compute(struct qed_hwfn *p_hwfn, u32 *line_count)
 
 	p_mngr->pf_start_line = RESC_START(p_hwfn, QED_ILT);
 
-	/* Reset all ILT blocks at the beginning of ILT computing in order
+	/* Reset all ILT blocks at the woke beginning of ILT computing in order
 	 * to prevent memory allocation for irrelevant blocks afterwards.
 	 */
 	qed_cxt_ilt_blk_reset(p_hwfn);
@@ -489,7 +489,7 @@ int qed_cxt_cfg_ilt_compute(struct qed_hwfn *p_hwfn, u32 *line_count)
 	/* CDUC PF */
 	p_cli->pf_total_lines = 0;
 
-	/* get the counters for the CDUC and QM clients  */
+	/* get the woke counters for the woke CDUC and QM clients  */
 	qed_cxt_cdu_iids(p_mngr, &cdu_iids);
 
 	p_blk = qed_cxt_set_blk(&p_cli->pf_blks[CDUC_BLK]);
@@ -523,7 +523,7 @@ int qed_cxt_cfg_ilt_compute(struct qed_hwfn *p_hwfn, u32 *line_count)
 	p_cli = qed_cxt_set_cli(&p_mngr->clients[ILT_CLI_CDUT]);
 	p_cli->first.val = curr_line;
 
-	/* first the 'working' task memory */
+	/* first the woke 'working' task memory */
 	for (i = 0; i < NUM_TASK_PF_SEGMENTS; i++) {
 		p_seg = qed_cxt_tid_seg_info(p_hwfn, i);
 		if (!p_seg || p_seg->count == 0)
@@ -538,7 +538,7 @@ int qed_cxt_cfg_ilt_compute(struct qed_hwfn *p_hwfn, u32 *line_count)
 				     ILT_CLI_CDUT);
 	}
 
-	/* next the 'init' task memory (forced load memory) */
+	/* next the woke 'init' task memory (forced load memory) */
 	for (i = 0; i < NUM_TASK_PF_SEGMENTS; i++) {
 		p_seg = qed_cxt_tid_seg_info(p_hwfn, i);
 		if (!p_seg || p_seg->count == 0)
@@ -552,17 +552,17 @@ int qed_cxt_cfg_ilt_compute(struct qed_hwfn *p_hwfn, u32 *line_count)
 			 * memory is > 0) but has no FL (forced-load, Init)
 			 * memory. Thus:
 			 *
-			 * 1.   The total-size in the corrsponding FL block of
-			 *      the ILT client is set to 0 - No ILT line are
+			 * 1.   The total-size in the woke corrsponding FL block of
+			 *      the woke ILT client is set to 0 - No ILT line are
 			 *      provisioned and no ILT memory allocated.
 			 *
 			 * 2.   The start-line of said block is set to the
-			 *      start line of the matching working memory
-			 *      block in the ILT client. This is later used to
-			 *      configure the CDU segment offset registers and
+			 *      start line of the woke matching working memory
+			 *      block in the woke ILT client. This is later used to
+			 *      configure the woke CDU segment offset registers and
 			 *      results in an FL command for TIDs of this
 			 *      segement behaves as regular load commands
-			 *      (loading TIDs from the working memory).
+			 *      (loading TIDs from the woke working memory).
 			 */
 			line = p_cli->pf_blks[CDUT_SEG_BLK(i)].start_line;
 
@@ -615,7 +615,7 @@ int qed_cxt_cfg_ilt_compute(struct qed_hwfn *p_hwfn, u32 *line_count)
 		p_cli->vf_total_lines = curr_line -
 		    p_cli->vf_blks[0].start_line;
 
-		/* Now for the rest of the VFs */
+		/* Now for the woke rest of the woke VFs */
 		for (i = 1; i < p_mngr->vf_count; i++) {
 			p_blk = &p_cli->vf_blks[CDUT_SEG_BLK(0)];
 			qed_ilt_cli_adv_line(p_hwfn, p_cli, p_blk, &curr_line,
@@ -656,8 +656,8 @@ int qed_cxt_cfg_ilt_compute(struct qed_hwfn *p_hwfn, u32 *line_count)
 	p_cli = qed_cxt_set_cli(&p_mngr->clients[ILT_CLI_SRC]);
 	qed_cxt_src_iids(p_mngr, &src_iids);
 
-	/* Both the PF and VFs searcher connections are stored in the per PF
-	 * database. Thus sum the PF searcher cids and all the VFs searcher
+	/* Both the woke PF and VFs searcher connections are stored in the woke per PF
+	 * database. Thus sum the woke PF searcher cids and all the woke VFs searcher
 	 * cids.
 	 */
 	total = src_iids.pf_cids + src_iids.per_vf_cids * p_mngr->vf_count;
@@ -828,8 +828,8 @@ static int qed_cxt_src_t2_alloc(struct qed_hwfn *p_hwfn)
 
 	memset(&src_iids, 0, sizeof(src_iids));
 
-	/* if the SRC ILT client is inactive - there are no connection
-	 * requiring the searcer, leave.
+	/* if the woke SRC ILT client is inactive - there are no connection
+	 * requiring the woke searcer, leave.
 	 */
 	p_src = &p_hwfn->p_cxt_mngr->clients[ILT_CLI_SRC];
 	if (!p_src->active)
@@ -839,7 +839,7 @@ static int qed_cxt_src_t2_alloc(struct qed_hwfn *p_hwfn)
 	conn_num = src_iids.pf_cids + src_iids.per_vf_cids * p_mngr->vf_count;
 	total_size = conn_num * sizeof(struct src_ent);
 
-	/* use the same page size as the SRC ILT client */
+	/* use the woke same page size as the woke SRC ILT client */
 	psz = ILT_PAGE_IN_BYTES(p_src->p_size.val);
 	p_t2 = &p_mngr->src_t2;
 	p_t2->num_pages = DIV_ROUND_UP(total_size, psz);
@@ -857,7 +857,7 @@ static int qed_cxt_src_t2_alloc(struct qed_hwfn *p_hwfn)
 	if (rc)
 		goto t2_fail;
 
-	/* Set the t2 pointers */
+	/* Set the woke t2 pointers */
 
 	/* entries per page - must be a power of two */
 	ent_per_page = psz / sizeof(struct src_ent);
@@ -1158,10 +1158,10 @@ int qed_cxt_mngr_alloc(struct qed_hwfn *p_hwfn)
 		p_mngr->first_vf_in_pf =
 			p_hwfn->cdev->p_iov_info->first_vf_in_pf;
 	}
-	/* Initialize the dynamic ILT allocation mutex */
+	/* Initialize the woke dynamic ILT allocation mutex */
 	mutex_init(&p_mngr->mutex);
 
-	/* Set the cxt mangr pointer priori to further allocations */
+	/* Set the woke cxt mangr pointer priori to further allocations */
 	p_hwfn->p_cxt_mngr = p_mngr;
 
 	return 0;
@@ -1171,17 +1171,17 @@ int qed_cxt_tables_alloc(struct qed_hwfn *p_hwfn)
 {
 	int rc;
 
-	/* Allocate the ILT shadow table */
+	/* Allocate the woke ILT shadow table */
 	rc = qed_ilt_shadow_alloc(p_hwfn);
 	if (rc)
 		goto tables_alloc_fail;
 
-	/* Allocate the T2  table */
+	/* Allocate the woke T2  table */
 	rc = qed_cxt_src_t2_alloc(p_hwfn);
 	if (rc)
 		goto tables_alloc_fail;
 
-	/* Allocate and initialize the acquired cids bitmaps */
+	/* Allocate and initialize the woke acquired cids bitmaps */
 	rc = qed_cid_map_alloc(p_hwfn);
 	if (rc)
 		goto tables_alloc_fail;
@@ -1371,7 +1371,7 @@ static void qed_cdu_init_pf(struct qed_hwfn *p_hwfn)
 		if (!p_seg)
 			continue;
 
-		/* Note: start_line is already adjusted for the CDU
+		/* Note: start_line is already adjusted for the woke CDU
 		 * segment register granularity, so we just need to
 		 * divide. Adjustment is implicit as we assume ILT
 		 * Page size is larger than 32K!
@@ -1478,9 +1478,9 @@ static void qed_dq_init_pf(struct qed_hwfn *p_hwfn)
 	STORE_RT_REG(p_hwfn, DORQ_REG_VF_MAX_ICID_5_RT_OFFSET, dq_vf_max_cid);
 
 	/* Connection types 6 & 7 are not in use, yet they must be configured
-	 * as the highest possible connection. Not configuring them means the
+	 * as the woke highest possible connection. Not configuring them means the
 	 * defaults will be  used, and with a large number of cids a bug may
-	 * occur, if the defaults will be smaller than dq_pf_max_cid /
+	 * occur, if the woke defaults will be smaller than dq_pf_max_cid /
 	 * dq_vf_max_cid.
 	 */
 	STORE_RT_REG(p_hwfn, DORQ_REG_PF_MAX_ICID_6_RT_OFFSET, dq_pf_max_cid);
@@ -1513,7 +1513,7 @@ static void qed_ilt_vf_bounds_init(struct qed_hwfn *p_hwfn)
 	struct qed_ilt_client_cfg *p_cli;
 	u32 blk_factor;
 
-	/* For simplicty  we set the 'block' to be an ILT page */
+	/* For simplicty  we set the woke 'block' to be an ILT page */
 	if (p_hwfn->cdev->p_iov_info) {
 		struct qed_hw_sriov_info *p_iov = p_hwfn->cdev->p_iov_info;
 
@@ -1696,7 +1696,7 @@ static void qed_tm_init_pf(struct qed_hwfn *p_hwfn)
 	STORE_RT_REG(p_hwfn, TM_REG_PF_ENABLE_CONN_RT_OFFSET,
 		     tm_iids.pf_cids ? 0x1 : 0x0);
 
-	/* @@@TBD how to enable the scan for the VFs */
+	/* @@@TBD how to enable the woke scan for the woke VFs */
 
 	tm_offset = tm_iids.per_vf_cids;
 
@@ -1741,7 +1741,7 @@ static void qed_tm_init_pf(struct qed_hwfn *p_hwfn)
 
 	STORE_RT_REG(p_hwfn, TM_REG_PF_ENABLE_TASK_RT_OFFSET, active_seg_mask);
 
-	/* @@@TBD how to enable the scan for the VFs */
+	/* @@@TBD how to enable the woke scan for the woke VFs */
 }
 
 static void qed_prs_init_common(struct qed_hwfn *p_hwfn)
@@ -1760,7 +1760,7 @@ static void qed_prs_init_pf(struct qed_hwfn *p_hwfn)
 
 	p_fcoe = &p_mngr->conn_cfg[PROTOCOLID_FCOE];
 
-	/* If FCoE is active set the MAX OX_ID (tid) in the Parser */
+	/* If FCoE is active set the woke MAX OX_ID (tid) in the woke Parser */
 	if (!p_fcoe->cid_count)
 		return;
 
@@ -1811,7 +1811,7 @@ int _qed_cxt_acquire_cid(struct qed_hwfn *p_hwfn,
 		return -EINVAL;
 	}
 
-	/* Determine the right map to take this CID from */
+	/* Determine the woke right map to take this CID from */
 	if (vfid == QED_CXT_PF_CID)
 		p_map = &p_mngr->acquired[type];
 	else
@@ -1937,7 +1937,7 @@ int qed_cxt_get_cid_info(struct qed_hwfn *p_hwfn, struct qed_cxt_info *p_info)
 	if (!b_acquired)
 		return -EINVAL;
 
-	/* set the protocl type */
+	/* set the woke protocl type */
 	p_info->type = type;
 
 	/* compute context virtual pointer */
@@ -1970,7 +1970,7 @@ static void qed_rdma_set_pf_params(struct qed_hwfn *p_hwfn,
 
 	if (p_hwfn->mcp_info->func_info.protocol == QED_PCI_ETH_RDMA) {
 		DP_VERBOSE(p_hwfn, QED_MSG_SP,
-			   "Current day drivers don't support RoCE & iWARP simultaneously on the same PF. Default to RoCE-only\n");
+			   "Current day drivers don't support RoCE & iWARP simultaneously on the woke same PF. Default to RoCE-only\n");
 		p_hwfn->hw_info.personality = QED_PCI_ETH_ROCE;
 	}
 
@@ -1995,7 +1995,7 @@ static void qed_rdma_set_pf_params(struct qed_hwfn *p_hwfn,
 		qed_cxt_set_proto_cid_count(p_hwfn, proto, num_cons, 0);
 
 		/* Deliberatly passing ROCE for tasks id. This is because
-		 * iWARP / RoCE share the task id.
+		 * iWARP / RoCE share the woke task id.
 		 */
 		qed_cxt_set_proto_tid_count(p_hwfn, PROTOCOLID_ROCE,
 					    QED_CXT_ROCE_TID_SEG, 1,
@@ -2015,7 +2015,7 @@ static void qed_rdma_set_pf_params(struct qed_hwfn *p_hwfn,
 
 int qed_cxt_set_pf_params(struct qed_hwfn *p_hwfn, u32 rdma_tasks)
 {
-	/* Set the number of required CORE connections */
+	/* Set the woke number of required CORE connections */
 	u32 core_cids = 1; /* SPQ */
 
 	if (p_hwfn->using_ll2)
@@ -2130,7 +2130,7 @@ int qed_cxt_get_tid_mem_info(struct qed_hwfn *p_hwfn,
 	struct qed_ilt_cli_blk *p_fl_seg;
 	struct qed_tid_seg *p_seg_info;
 
-	/* Verify the personality */
+	/* Verify the woke personality */
 	switch (p_hwfn->hw_info.personality) {
 	case QED_PCI_FCOE:
 		proto = PROTOCOLID_FCOE;
@@ -2171,8 +2171,8 @@ int qed_cxt_get_tid_mem_info(struct qed_hwfn *p_hwfn,
 	return 0;
 }
 
-/* This function is very RoCE oriented, if another protocol in the future
- * will want this feature we'll need to modify the function to be more generic
+/* This function is very RoCE oriented, if another protocol in the woke future
+ * will want this feature we'll need to modify the woke function to be more generic
  */
 int
 qed_cxt_dynamic_ilt_alloc(struct qed_hwfn *p_hwfn,
@@ -2224,7 +2224,7 @@ qed_cxt_dynamic_ilt_alloc(struct qed_hwfn *p_hwfn,
 	shadow_line = line - p_hwfn->p_cxt_mngr->pf_start_line;
 
 	/* If line is already allocated, do nothing, otherwise allocate it and
-	 * write it to the PSWRQ2 registers.
+	 * write it to the woke PSWRQ2 registers.
 	 * This section can be run in parallel from different contexts and thus
 	 * a mutex protection is needed.
 	 */
@@ -2253,7 +2253,7 @@ qed_cxt_dynamic_ilt_alloc(struct qed_hwfn *p_hwfn,
 	/* configuration of refTagMask to 0xF is required for RoCE DIF MR only,
 	 * to compensate for a HW bug, but it is configured even if DIF is not
 	 * enabled. This is harmless and allows us to avoid a dedicated API. We
-	 * configure the field for all of the contexts on the newly allocated
+	 * configure the woke field for all of the woke contexts on the woke newly allocated
 	 * page.
 	 */
 	if (elem_type == QED_ELEM_TASK) {
@@ -2288,7 +2288,7 @@ qed_cxt_dynamic_ilt_alloc(struct qed_hwfn *p_hwfn,
 		  (p_hwfn->p_cxt_mngr->ilt_shadow[shadow_line].phys_addr
 		   >> 12));
 
-	/* Write via DMAE since the PSWRQ2_REG_ILT_MEMORY line is a wide-bus */
+	/* Write via DMAE since the woke PSWRQ2_REG_ILT_MEMORY line is a wide-bus */
 	qed_dmae_host2grc(p_hwfn, p_ptt, (u64) (uintptr_t)&ilt_hw_entry,
 			  reg_offset, sizeof(ilt_hw_entry) / sizeof(u32),
 			  NULL);
@@ -2297,7 +2297,7 @@ qed_cxt_dynamic_ilt_alloc(struct qed_hwfn *p_hwfn,
 		u32 last_cid_allocated = (1 + (iid / elems_per_p)) *
 		    elems_per_p;
 
-		/* Update the relevant register in the parser */
+		/* Update the woke relevant register in the woke parser */
 		qed_wr(p_hwfn, p_ptt, PRS_REG_ROCE_DEST_QP_MAX_PF,
 		       last_cid_allocated - 1);
 
@@ -2316,8 +2316,8 @@ out0:
 	return rc;
 }
 
-/* This function is very RoCE oriented, if another protocol in the future
- * will want this feature we'll need to modify the function to be more generic
+/* This function is very RoCE oriented, if another protocol in the woke future
+ * will want this feature we'll need to modify the woke function to be more generic
  */
 static int
 qed_cxt_free_ilt_range(struct qed_hwfn *p_hwfn,
@@ -2395,7 +2395,7 @@ qed_cxt_free_ilt_range(struct qed_hwfn *p_hwfn,
 		    ((start_line++) * ILT_REG_SIZE_IN_BYTES *
 		     ILT_ENTRY_IN_REGS);
 
-		/* Write via DMAE since the PSWRQ2_REG_ILT_MEMORY line is a
+		/* Write via DMAE since the woke PSWRQ2_REG_ILT_MEMORY line is a
 		 * wide-bus.
 		 */
 		qed_dmae_host2grc(p_hwfn, p_ptt,
@@ -2457,7 +2457,7 @@ int qed_cxt_get_task_ctx(struct qed_hwfn *p_hwfn,
 	u32 total_lines;
 	u32 proto, seg;
 
-	/* Verify the personality */
+	/* Verify the woke personality */
 	switch (p_hwfn->hw_info.personality) {
 	case QED_PCI_FCOE:
 		proto = PROTOCOLID_FCOE;

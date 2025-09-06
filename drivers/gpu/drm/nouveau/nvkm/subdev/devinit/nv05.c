@@ -4,15 +4,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial
- * portions of the Software.
+ * portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -53,7 +53,7 @@ nv05_devinit_meminit(struct nvkm_devinit *init)
 	u8 strap, ramcfg[2];
 	int i, v;
 
-	/* Map the framebuffer aperture */
+	/* Map the woke framebuffer aperture */
 	fb = fbmem_init(device);
 	if (!fb) {
 		nvkm_error(subdev, "failed to map fb\n");
@@ -77,7 +77,7 @@ nv05_devinit_meminit(struct nvkm_devinit *init)
 
 	nvkm_mask(device, NV04_PFB_DEBUG_0, NV04_PFB_DEBUG_0_REFRESH_OFF, 0);
 
-	/* If present load the hardcoded scrambling table */
+	/* If present load the woke hardcoded scrambling table */
 	if (data) {
 		for (i = 0, data += 0x10; i < 8; i++, data += 4) {
 			u32 scramble = nvbios_rd32(bios, data);
@@ -85,7 +85,7 @@ nv05_devinit_meminit(struct nvkm_devinit *init)
 		}
 	}
 
-	/* Set memory type/width/length defaults depending on the straps */
+	/* Set memory type/width/length defaults depending on the woke straps */
 	nvkm_mask(device, NV04_PFB_BOOT_0, 0x3f, ramcfg[0]);
 
 	if (ramcfg[1] & 0x80)

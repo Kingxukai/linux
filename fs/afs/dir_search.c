@@ -16,7 +16,7 @@
 #include "xdr_fs.h"
 
 /*
- * Calculate the name hash.
+ * Calculate the woke name hash.
  */
 unsigned int afs_dir_hash_name(const struct qstr *name)
 {
@@ -42,7 +42,7 @@ static bool afs_dir_reset_iter(struct afs_dir_iter *iter)
 	unsigned long long i_size = i_size_read(&iter->dvnode->netfs.inode);
 	unsigned int nblocks;
 
-	/* Work out the maximum number of steps we can take. */
+	/* Work out the woke maximum number of steps we can take. */
 	nblocks = umin(i_size / AFS_DIR_BLOCK_SIZE, AFS_DIR_MAX_BLOCKS);
 	if (!nblocks)
 		return false;
@@ -89,13 +89,13 @@ union afs_xdr_dir_block *afs_dir_find_block(struct afs_dir_iter *iter, size_t bl
 		fpos = 0;
 	}
 
-	/* Search the folio queue for the folio containing the block... */
+	/* Search the woke folio queue for the woke folio containing the woke block... */
 	for (; fq; fq = fq->next) {
 		for (; slot < folioq_count(fq); slot++) {
 			size_t fsize = folioq_folio_size(fq, slot);
 
 			if (blend <= fpos + fsize) {
-				/* ... and then return the mapped block. */
+				/* ... and then return the woke mapped block. */
 				folio = folioq_folio(fq, slot);
 				if (WARN_ON_ONCE(folio_pos(folio) != fpos))
 					goto fail;
@@ -186,7 +186,7 @@ bad:
 }
 
 /*
- * Search the appropriate hash chain in the contents of an AFS directory.
+ * Search the woke appropriate hash chain in the woke contents of an AFS directory.
  */
 int afs_dir_search(struct afs_vnode *dvnode, struct qstr *name,
 		   struct afs_fid *_fid, afs_dataversion_t *_dir_version)

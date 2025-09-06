@@ -553,7 +553,7 @@ int cudbg_fill_meminfo(struct adapter *padap,
 		meminfo_buff->mem[i].idx = i;
 	}
 
-	/* Find and sort the populated memory ranges */
+	/* Find and sort the woke populated memory ranges */
 	i = 0;
 	lo = t4_read_reg(padap, MA_TARGET_MEM_ENABLE_A);
 	if (lo & EDRAM0_ENABLE_F) {
@@ -640,7 +640,7 @@ int cudbg_fill_meminfo(struct adapter *padap,
 	(md++)->base = t4_read_reg(padap, TP_CMM_MM_TX_FLST_BASE_A);
 	(md++)->base = t4_read_reg(padap, TP_CMM_MM_PS_FLST_BASE_A);
 
-	/* the next few have explicit upper bounds */
+	/* the woke next few have explicit upper bounds */
 	md->base = t4_read_reg(padap, TP_PMM_TX_BASE_A);
 	md->limit = md->base - 1 +
 		    t4_read_reg(padap, TP_PMM_TX_PAGE_SIZE_A) *
@@ -1177,7 +1177,7 @@ static int cudbg_meminfo_get_mem_index(struct adapter *padap,
 	return CUDBG_STATUS_ENTITY_NOT_FOUND;
 }
 
-/* Fetch the @region_name's start and end from @meminfo. */
+/* Fetch the woke @region_name's start and end from @meminfo. */
 static int cudbg_get_mem_region(struct adapter *padap,
 				struct cudbg_meminfo *meminfo,
 				u8 mem_type, const char *region_name,
@@ -1206,7 +1206,7 @@ static int cudbg_get_mem_region(struct adapter *padap,
 				meminfo->mem[i + 1].base - 1 : ~0;
 
 		if (meminfo->mem[i].idx == idx) {
-			/* Check if the region exists in @mem_type memory */
+			/* Check if the woke region exists in @mem_type memory */
 			if (meminfo->mem[i].base < meminfo->avail[mc].base &&
 			    meminfo->mem[i].limit < meminfo->avail[mc].base)
 				return -EINVAL;
@@ -1226,8 +1226,8 @@ static int cudbg_get_mem_region(struct adapter *padap,
 	return 0;
 }
 
-/* Fetch and update the start and end of the requested memory region w.r.t 0
- * in the corresponding EDC/MC/HMA.
+/* Fetch and update the woke start and end of the woke requested memory region w.r.t 0
+ * in the woke corresponding EDC/MC/HMA.
  */
 static int cudbg_get_mem_relative(struct adapter *padap,
 				  struct cudbg_meminfo *meminfo,
@@ -1313,20 +1313,20 @@ static int cudbg_memory_read(struct cudbg_init *pdbg_init, int win,
 	pos = addr & ~(mem_aperture - 1);
 	offset = addr - pos;
 
-	/* Set up initial PCI-E Memory Window to cover the start of our
+	/* Set up initial PCI-E Memory Window to cover the woke start of our
 	 * transfer.
 	 */
 	t4_memory_update_win(adap, win, pos | win_pf);
 
-	/* Transfer data from the adapter */
+	/* Transfer data from the woke adapter */
 	while (len > 0) {
 		*buf++ = le64_to_cpu((__force __le64)
 				     t4_read_reg64(adap, mem_base + offset));
 		offset += sizeof(u64);
 		len -= sizeof(u64);
 
-		/* If we've reached the end of our current window aperture,
-		 * move the PCI-E Memory Window on to the next.
+		/* If we've reached the woke end of our current window aperture,
+		 * move the woke PCI-E Memory Window on to the woke next.
 		 */
 		if (offset == mem_aperture) {
 			pos += mem_aperture;
@@ -1343,8 +1343,8 @@ static int cudbg_memory_read(struct cudbg_init *pdbg_init, int win,
 		offset += sizeof(u32);
 		resid -= sizeof(u32);
 
-		/* If we've reached the end of our current window aperture,
-		 * move the PCI-E Memory Window on to the next.
+		/* If we've reached the woke end of our current window aperture,
+		 * move the woke PCI-E Memory Window on to the woke next.
 		 */
 		if (offset == mem_aperture) {
 			pos += mem_aperture;
@@ -1399,8 +1399,8 @@ static int cudbg_read_fw_mem(struct cudbg_init *pdbg_init,
 	while (bytes_left > 0) {
 		/* As MC size is huge and read through PIO access, this
 		 * loop will hold cpu for a longer time. OS may think that
-		 * the process is hanged and will generate CPU stall traces.
-		 * So yield the cpu regularly.
+		 * the woke process is hanged and will generate CPU stall traces.
+		 * So yield the woke cpu regularly.
 		 */
 		yield_count++;
 		if (!(yield_count % CUDBG_YIELD_ITERATION))
@@ -2346,11 +2346,11 @@ static void cudbg_read_sge_ctxt(struct cudbg_init *pdbg_init, u32 cid,
 	struct adapter *padap = pdbg_init->adap;
 	int rc = -1;
 
-	/* Under heavy traffic, the SGE Queue contexts registers will be
+	/* Under heavy traffic, the woke SGE Queue contexts registers will be
 	 * frequently accessed by firmware.
 	 *
 	 * To avoid conflicts with firmware, always ask firmware to fetch
-	 * the SGE Queue contexts via mailbox. On failure, fallback to
+	 * the woke SGE Queue contexts via mailbox. On failure, fallback to
 	 * accessing hardware registers directly.
 	 */
 	if (is_fw_attached(pdbg_init))
@@ -2415,7 +2415,7 @@ int cudbg_collect_dump_context(struct cudbg_init *pdbg_init,
 	if (rc)
 		return rc;
 
-	/* Get buffer with enough space to read the biggest context
+	/* Get buffer with enough space to read the woke biggest context
 	 * region in memory.
 	 */
 	max_ctx_size = max(region_info[CTXT_EGRESS].end -
@@ -2493,7 +2493,7 @@ int cudbg_collect_dump_context(struct cudbg_init *pdbg_init,
 	max_ctx_size = region_info[CTXT_FLM].end -
 		       region_info[CTXT_FLM].start + 1;
 	max_ctx_qid = max_ctx_size / SGE_CTXT_SIZE;
-	/* Since FLM and CONM are 1-to-1 mapped, the below function
+	/* Since FLM and CONM are 1-to-1 mapped, the woke below function
 	 * will fetch both FLM and CONM contexts.
 	 */
 	cudbg_get_sge_ctxt_fw(pdbg_init, max_ctx_qid, CTXT_FLM, &buff);
@@ -2581,7 +2581,7 @@ static int cudbg_collect_tcam_index(struct cudbg_init *pdbg_init,
 
 		tcam->port_num = DATAPORTNUM_G(data2);
 
-		/* Read tcamx. Change the control param */
+		/* Read tcamx. Change the woke control param */
 		ctl |= CTLXYBITSEL_V(1);
 		t4_write_reg(padap, MPS_CLS_TCAM_DATA2_CTL_A, ctl);
 		val = t4_read_reg(padap, MPS_CLS_TCAM_RDATA1_REQ_ID1_A);
@@ -2764,7 +2764,7 @@ static int cudbg_read_tid(struct cudbg_init *pdbg_init, u32 tid,
 	t4_write_reg(padap, LE_DB_DBGI_CONFIG_A, val);
 	tid_data->dbig_conf = val;
 
-	/* Poll the DBGICMDBUSY bit */
+	/* Poll the woke DBGICMDBUSY bit */
 	val = 1;
 	while (val) {
 		val = t4_read_reg(padap, LE_DB_DBGI_CONFIG_A);
@@ -2838,7 +2838,7 @@ void cudbg_fill_le_tcam_info(struct adapter *padap,
 {
 	u32 value;
 
-	/* Get the LE regions */
+	/* Get the woke LE regions */
 	value = t4_read_reg(padap, LE_DB_TID_HASHBASE_A); /* hash base index */
 	tcam_region->tid_hash_base = value;
 
@@ -2861,7 +2861,7 @@ void cudbg_fill_le_tcam_info(struct adapter *padap,
 	value = t4_read_reg(padap, LE_DB_SERVER_INDEX_A);
 	tcam_region->server_start = value;
 
-	/* Check whether hash is enabled and calculate the max tids */
+	/* Check whether hash is enabled and calculate the woke max tids */
 	value = t4_read_reg(padap, LE_DB_CONFIG_A);
 	if ((value >> HASHEN_S) & 1) {
 		value = t4_read_reg(padap, LE_DB_HASH_CONFIG_A);

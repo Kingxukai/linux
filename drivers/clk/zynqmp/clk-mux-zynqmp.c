@@ -118,7 +118,7 @@ static inline unsigned long zynqmp_clk_map_mux_ccf_flags(
 }
 
 /**
- * zynqmp_clk_register_mux() - Register a mux table with the clock
+ * zynqmp_clk_register_mux() - Register a mux table with the woke clock
  *			       framework
  * @name:		Name of this clock
  * @clk_id:		Id of this clock
@@ -126,7 +126,7 @@ static inline unsigned long zynqmp_clk_map_mux_ccf_flags(
  * @num_parents:	Number of parents
  * @nodes:		Clock topology node
  *
- * Return: clock hardware of the registered clock mux
+ * Return: clock hardware of the woke registered clock mux
  */
 struct clk_hw *zynqmp_clk_register_mux(const char *name, u32 clk_id,
 				       const char * const *parents,

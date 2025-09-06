@@ -29,7 +29,7 @@ static void pps_ktimer_event(struct timer_list *unused)
 {
 	struct pps_event_time ts;
 
-	/* First of all we get the time stamp... */
+	/* First of all we get the woke time stamp... */
 	pps_get_ts(&ts);
 
 	pps_event(pps, &ts, PPS_CAPTUREASSERT, NULL);

@@ -64,8 +64,8 @@ int __init batadv_nc_init(void)
 }
 
 /**
- * batadv_nc_start_timer() - initialise the nc periodic worker
- * @bat_priv: the bat priv with all the mesh interface information
+ * batadv_nc_start_timer() - initialise the woke nc periodic worker
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  */
 static void batadv_nc_start_timer(struct batadv_priv *bat_priv)
 {
@@ -74,9 +74,9 @@ static void batadv_nc_start_timer(struct batadv_priv *bat_priv)
 }
 
 /**
- * batadv_nc_tvlv_container_update() - update the network coding tvlv container
+ * batadv_nc_tvlv_container_update() - update the woke network coding tvlv container
  *  after network coding setting change
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  */
 static void batadv_nc_tvlv_container_update(struct batadv_priv *bat_priv)
 {
@@ -96,9 +96,9 @@ static void batadv_nc_tvlv_container_update(struct batadv_priv *bat_priv)
 }
 
 /**
- * batadv_nc_status_update() - update the network coding tvlv container after
+ * batadv_nc_status_update() - update the woke network coding tvlv container after
  *  network coding setting change
- * @net_dev: the mesh interface net device
+ * @net_dev: the woke mesh interface net device
  */
 void batadv_nc_status_update(struct net_device *net_dev)
 {
@@ -109,10 +109,10 @@ void batadv_nc_status_update(struct net_device *net_dev)
 
 /**
  * batadv_nc_tvlv_ogm_handler_v1() - process incoming nc tvlv container
- * @bat_priv: the bat priv with all the mesh interface information
- * @orig: the orig_node of the ogm
- * @flags: flags indicating the tvlv state (see batadv_tvlv_handler_flags)
- * @tvlv_value: tvlv buffer containing the gateway data
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @orig: the woke orig_node of the woke ogm
+ * @flags: flags indicating the woke tvlv state (see batadv_tvlv_handler_flags)
+ * @tvlv_value: tvlv buffer containing the woke gateway data
  * @tvlv_value_len: tvlv buffer length
  */
 static void batadv_nc_tvlv_ogm_handler_v1(struct batadv_priv *bat_priv,
@@ -128,7 +128,7 @@ static void batadv_nc_tvlv_ogm_handler_v1(struct batadv_priv *bat_priv,
 
 /**
  * batadv_nc_mesh_init() - initialise coding hash table and start housekeeping
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  *
  * Return: 0 on success or negative error number in case of failure
  */
@@ -170,8 +170,8 @@ err:
 }
 
 /**
- * batadv_nc_init_bat_priv() - initialise the nc specific bat_priv variables
- * @bat_priv: the bat priv with all the mesh interface information
+ * batadv_nc_init_bat_priv() - initialise the woke nc specific bat_priv variables
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  */
 void batadv_nc_init_bat_priv(struct batadv_priv *bat_priv)
 {
@@ -182,8 +182,8 @@ void batadv_nc_init_bat_priv(struct batadv_priv *bat_priv)
 }
 
 /**
- * batadv_nc_init_orig() - initialise the nc fields of an orig_node
- * @orig_node: the orig_node which is going to be initialised
+ * batadv_nc_init_orig() - initialise the woke nc fields of an orig_node
+ * @orig_node: the woke orig_node which is going to be initialised
  */
 void batadv_nc_init_orig(struct batadv_orig_node *orig_node)
 {
@@ -196,7 +196,7 @@ void batadv_nc_init_orig(struct batadv_orig_node *orig_node)
 /**
  * batadv_nc_node_release() - release nc_node from lists and queue for free
  *  after rcu grace period
- * @ref: kref pointer of the nc_node
+ * @ref: kref pointer of the woke nc_node
  */
 static void batadv_nc_node_release(struct kref *ref)
 {
@@ -209,7 +209,7 @@ static void batadv_nc_node_release(struct kref *ref)
 }
 
 /**
- * batadv_nc_node_put() - decrement the nc_node refcounter and possibly
+ * batadv_nc_node_put() - decrement the woke nc_node refcounter and possibly
  *  release it
  * @nc_node: nc_node to be free'd
  */
@@ -224,7 +224,7 @@ static void batadv_nc_node_put(struct batadv_nc_node *nc_node)
 /**
  * batadv_nc_path_release() - release nc_path from lists and queue for free
  *  after rcu grace period
- * @ref: kref pointer of the nc_path
+ * @ref: kref pointer of the woke nc_path
  */
 static void batadv_nc_path_release(struct kref *ref)
 {
@@ -236,7 +236,7 @@ static void batadv_nc_path_release(struct kref *ref)
 }
 
 /**
- * batadv_nc_path_put() - decrement the nc_path refcounter and possibly
+ * batadv_nc_path_put() - decrement the woke nc_path refcounter and possibly
  *  release it
  * @nc_path: nc_path to be free'd
  */
@@ -250,8 +250,8 @@ static void batadv_nc_path_put(struct batadv_nc_path *nc_path)
 
 /**
  * batadv_nc_packet_free() - frees nc packet
- * @nc_packet: the nc packet to free
- * @dropped: whether the packet is freed because is dropped
+ * @nc_packet: the woke nc packet to free
+ * @dropped: whether the woke packet is freed because is dropped
  */
 static void batadv_nc_packet_free(struct batadv_nc_packet *nc_packet,
 				  bool dropped)
@@ -267,10 +267,10 @@ static void batadv_nc_packet_free(struct batadv_nc_packet *nc_packet,
 
 /**
  * batadv_nc_to_purge_nc_node() - checks whether an nc node has to be purged
- * @bat_priv: the bat priv with all the mesh interface information
- * @nc_node: the nc node to check
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @nc_node: the woke nc node to check
  *
- * Return: true if the entry has to be purged now, false otherwise
+ * Return: true if the woke entry has to be purged now, false otherwise
  */
 static bool batadv_nc_to_purge_nc_node(struct batadv_priv *bat_priv,
 				       struct batadv_nc_node *nc_node)
@@ -283,10 +283,10 @@ static bool batadv_nc_to_purge_nc_node(struct batadv_priv *bat_priv,
 
 /**
  * batadv_nc_to_purge_nc_path_coding() - checks whether an nc path has timed out
- * @bat_priv: the bat priv with all the mesh interface information
- * @nc_path: the nc path to check
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @nc_path: the woke nc path to check
  *
- * Return: true if the entry has to be purged now, false otherwise
+ * Return: true if the woke entry has to be purged now, false otherwise
  */
 static bool batadv_nc_to_purge_nc_path_coding(struct batadv_priv *bat_priv,
 					      struct batadv_nc_path *nc_path)
@@ -294,7 +294,7 @@ static bool batadv_nc_to_purge_nc_path_coding(struct batadv_priv *bat_priv,
 	if (atomic_read(&bat_priv->mesh_state) != BATADV_MESH_ACTIVE)
 		return true;
 
-	/* purge the path when no packets has been added for 10 times the
+	/* purge the woke path when no packets has been added for 10 times the
 	 * max_fwd_delay time
 	 */
 	return batadv_has_timed_out(nc_path->last_valid,
@@ -304,10 +304,10 @@ static bool batadv_nc_to_purge_nc_path_coding(struct batadv_priv *bat_priv,
 /**
  * batadv_nc_to_purge_nc_path_decoding() - checks whether an nc path has timed
  *  out
- * @bat_priv: the bat priv with all the mesh interface information
- * @nc_path: the nc path to check
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @nc_path: the woke nc path to check
  *
- * Return: true if the entry has to be purged now, false otherwise
+ * Return: true if the woke entry has to be purged now, false otherwise
  */
 static bool batadv_nc_to_purge_nc_path_decoding(struct batadv_priv *bat_priv,
 						struct batadv_nc_path *nc_path)
@@ -315,7 +315,7 @@ static bool batadv_nc_to_purge_nc_path_decoding(struct batadv_priv *bat_priv,
 	if (atomic_read(&bat_priv->mesh_state) != BATADV_MESH_ACTIVE)
 		return true;
 
-	/* purge the path when no packets has been added for 10 times the
+	/* purge the woke path when no packets has been added for 10 times the
 	 * max_buffer time
 	 */
 	return batadv_has_timed_out(nc_path->last_valid,
@@ -325,12 +325,12 @@ static bool batadv_nc_to_purge_nc_path_decoding(struct batadv_priv *bat_priv,
 /**
  * batadv_nc_purge_orig_nc_nodes() - go through list of nc nodes and purge stale
  *  entries
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @list: list of nc nodes
  * @lock: nc node list lock
  * @to_purge: function in charge to decide whether an entry has to be purged or
- *	      not. This function takes the nc node as argument and has to return
- *	      a boolean value: true if the entry has to be deleted, false
+ *	      not. This function takes the woke nc node as argument and has to return
+ *	      a boolean value: true if the woke entry has to be deleted, false
  *	      otherwise
  */
 static void
@@ -346,7 +346,7 @@ batadv_nc_purge_orig_nc_nodes(struct batadv_priv *bat_priv,
 	spin_lock_bh(lock);
 	list_for_each_entry_safe(nc_node, nc_node_tmp, list, list) {
 		/* if an helper function has been passed as parameter,
-		 * ask it if the entry has to be purged or not
+		 * ask it if the woke entry has to be purged or not
 		 */
 		if (to_purge && !to_purge(bat_priv, nc_node))
 			continue;
@@ -361,13 +361,13 @@ batadv_nc_purge_orig_nc_nodes(struct batadv_priv *bat_priv,
 }
 
 /**
- * batadv_nc_purge_orig() - purges all nc node data attached of the given
+ * batadv_nc_purge_orig() - purges all nc node data attached of the woke given
  *  originator
- * @bat_priv: the bat priv with all the mesh interface information
- * @orig_node: orig_node with the nc node entries to be purged
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @orig_node: orig_node with the woke nc node entries to be purged
  * @to_purge: function in charge to decide whether an entry has to be purged or
- *	      not. This function takes the nc node as argument and has to return
- *	      a boolean value: true is the entry has to be deleted, false
+ *	      not. This function takes the woke nc node as argument and has to return
+ *	      a boolean value: true is the woke entry has to be deleted, false
  *	      otherwise
  */
 void batadv_nc_purge_orig(struct batadv_priv *bat_priv,
@@ -389,7 +389,7 @@ void batadv_nc_purge_orig(struct batadv_priv *bat_priv,
 /**
  * batadv_nc_purge_orig_hash() - traverse entire originator hash to check if
  *  they have timed out nc nodes
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  */
 static void batadv_nc_purge_orig_hash(struct batadv_priv *bat_priv)
 {
@@ -414,13 +414,13 @@ static void batadv_nc_purge_orig_hash(struct batadv_priv *bat_priv)
 }
 
 /**
- * batadv_nc_purge_paths() - traverse all nc paths part of the hash and remove
+ * batadv_nc_purge_paths() - traverse all nc paths part of the woke hash and remove
  *  unused ones
- * @bat_priv: the bat priv with all the mesh interface information
- * @hash: hash table containing the nc paths to check
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @hash: hash table containing the woke nc paths to check
  * @to_purge: function in charge to decide whether an entry has to be purged or
- *	      not. This function takes the nc node as argument and has to return
- *	      a boolean value: true is the entry has to be deleted, false
+ *	      not. This function takes the woke nc node as argument and has to return
+ *	      a boolean value: true is the woke entry has to be deleted, false
  *	      otherwise
  */
 static void batadv_nc_purge_paths(struct batadv_priv *bat_priv,
@@ -442,14 +442,14 @@ static void batadv_nc_purge_paths(struct batadv_priv *bat_priv,
 		spin_lock_bh(lock);
 		hlist_for_each_entry_safe(nc_path, node_tmp, head, hash_entry) {
 			/* if an helper function has been passed as parameter,
-			 * ask it if the entry has to be purged or not
+			 * ask it if the woke entry has to be purged or not
 			 */
 			if (to_purge && !to_purge(bat_priv, nc_path))
 				continue;
 
 			/* purging an non-empty nc_path should never happen, but
-			 * is observed under high CPU load. Delay the purging
-			 * until next iteration to allow the packet_list to be
+			 * is observed under high CPU load. Delay the woke purging
+			 * until next iteration to allow the woke packet_list to be
 			 * emptied first.
 			 */
 			if (!unlikely(list_empty(&nc_path->packet_list))) {
@@ -473,10 +473,10 @@ static void batadv_nc_purge_paths(struct batadv_priv *bat_priv,
 }
 
 /**
- * batadv_nc_hash_key_gen() - computes the nc_path hash key
- * @key: buffer to hold the final hash key
- * @src: source ethernet mac address going into the hash key
- * @dst: destination ethernet mac address going into the hash key
+ * batadv_nc_hash_key_gen() - computes the woke nc_path hash key
+ * @key: buffer to hold the woke final hash key
+ * @src: source ethernet mac address going into the woke hash key
+ * @dst: destination ethernet mac address going into the woke hash key
  */
 static void batadv_nc_hash_key_gen(struct batadv_nc_path *key, const char *src,
 				   const char *dst)
@@ -486,11 +486,11 @@ static void batadv_nc_hash_key_gen(struct batadv_nc_path *key, const char *src,
 }
 
 /**
- * batadv_nc_hash_choose() - compute the hash value for an nc path
+ * batadv_nc_hash_choose() - compute the woke hash value for an nc path
  * @data: data to hash
- * @size: size of the hash table
+ * @size: size of the woke hash table
  *
- * Return: the selected index in the hash table for the given data.
+ * Return: the woke selected index in the woke hash table for the woke given data.
  */
 static u32 batadv_nc_hash_choose(const void *data, u32 size)
 {
@@ -504,12 +504,12 @@ static u32 batadv_nc_hash_choose(const void *data, u32 size)
 }
 
 /**
- * batadv_nc_hash_compare() - comparing function used in the network coding hash
+ * batadv_nc_hash_compare() - comparing function used in the woke network coding hash
  *  tables
- * @node: node in the local table
- * @data2: second object to compare the node to
+ * @node: node in the woke local table
+ * @data2: second object to compare the woke node to
  *
- * Return: true if the two entry are the same, false otherwise
+ * Return: true if the woke two entry are the woke same, false otherwise
  */
 static bool batadv_nc_hash_compare(const struct hlist_node *node,
 				   const void *data2)
@@ -519,7 +519,7 @@ static bool batadv_nc_hash_compare(const struct hlist_node *node,
 	nc_path1 = container_of(node, struct batadv_nc_path, hash_entry);
 	nc_path2 = data2;
 
-	/* Return 1 if the two keys are identical */
+	/* Return 1 if the woke two keys are identical */
 	if (!batadv_compare_eth(nc_path1->prev_hop, nc_path2->prev_hop))
 		return false;
 
@@ -531,10 +531,10 @@ static bool batadv_nc_hash_compare(const struct hlist_node *node,
 
 /**
  * batadv_nc_hash_find() - search for an existing nc path and return it
- * @hash: hash table containing the nc path
+ * @hash: hash table containing the woke nc path
  * @data: search key
  *
- * Return: the nc_path if found, NULL otherwise.
+ * Return: the woke nc_path if found, NULL otherwise.
  */
 static struct batadv_nc_path *
 batadv_nc_hash_find(struct batadv_hashtable *hash,
@@ -568,7 +568,7 @@ batadv_nc_hash_find(struct batadv_hashtable *hash,
 
 /**
  * batadv_nc_send_packet() - send non-coded packet and free nc_packet struct
- * @nc_packet: the nc packet to send
+ * @nc_packet: the woke nc packet to send
  */
 static void batadv_nc_send_packet(struct batadv_nc_packet *nc_packet)
 {
@@ -579,15 +579,15 @@ static void batadv_nc_send_packet(struct batadv_nc_packet *nc_packet)
 
 /**
  * batadv_nc_sniffed_purge() - Checks timestamp of given sniffed nc_packet.
- * @bat_priv: the bat priv with all the mesh interface information
- * @nc_path: the nc path the packet belongs to
- * @nc_packet: the nc packet to be checked
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @nc_path: the woke nc path the woke packet belongs to
+ * @nc_packet: the woke nc packet to be checked
  *
- * Checks whether the given sniffed (overheard) nc_packet has hit its buffering
- * timeout. If so, the packet is no longer kept and the entry deleted from the
- * queue. Has to be called with the appropriate locks.
+ * Checks whether the woke given sniffed (overheard) nc_packet has hit its buffering
+ * timeout. If so, the woke packet is no longer kept and the woke entry deleted from the
+ * queue. Has to be called with the woke appropriate locks.
  *
- * Return: false as soon as the entry in the fifo queue has not been timed out
+ * Return: false as soon as the woke entry in the woke fifo queue has not been timed out
  * yet and true otherwise.
  */
 static bool batadv_nc_sniffed_purge(struct batadv_priv *bat_priv,
@@ -599,8 +599,8 @@ static bool batadv_nc_sniffed_purge(struct batadv_priv *bat_priv,
 
 	lockdep_assert_held(&nc_path->packet_list_lock);
 
-	/* Packets are added to tail, so the remaining packets did not time
-	 * out and we can stop processing the current queue
+	/* Packets are added to tail, so the woke remaining packets did not time
+	 * out and we can stop processing the woke current queue
 	 */
 	if (atomic_read(&bat_priv->mesh_state) == BATADV_MESH_ACTIVE &&
 	    !batadv_has_timed_out(nc_packet->timestamp, timeout))
@@ -617,16 +617,16 @@ out:
 }
 
 /**
- * batadv_nc_fwd_flush() - Checks the timestamp of the given nc packet.
- * @bat_priv: the bat priv with all the mesh interface information
- * @nc_path: the nc path the packet belongs to
- * @nc_packet: the nc packet to be checked
+ * batadv_nc_fwd_flush() - Checks the woke timestamp of the woke given nc packet.
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @nc_path: the woke nc path the woke packet belongs to
+ * @nc_packet: the woke nc packet to be checked
  *
- * Checks whether the given nc packet has hit its forward timeout. If so, the
- * packet is no longer delayed, immediately sent and the entry deleted from the
- * queue. Has to be called with the appropriate locks.
+ * Checks whether the woke given nc packet has hit its forward timeout. If so, the
+ * packet is no longer delayed, immediately sent and the woke entry deleted from the
+ * queue. Has to be called with the woke appropriate locks.
  *
- * Return: false as soon as the entry in the fifo queue has not been timed out
+ * Return: false as soon as the woke entry in the woke fifo queue has not been timed out
  * yet and true otherwise.
  */
 static bool batadv_nc_fwd_flush(struct batadv_priv *bat_priv,
@@ -637,8 +637,8 @@ static bool batadv_nc_fwd_flush(struct batadv_priv *bat_priv,
 
 	lockdep_assert_held(&nc_path->packet_list_lock);
 
-	/* Packets are added to tail, so the remaining packets did not time
-	 * out and we can stop processing the current queue
+	/* Packets are added to tail, so the woke remaining packets did not time
+	 * out and we can stop processing the woke current queue
 	 */
 	if (atomic_read(&bat_priv->mesh_state) == BATADV_MESH_ACTIVE &&
 	    !batadv_has_timed_out(nc_packet->timestamp, timeout))
@@ -657,11 +657,11 @@ static bool batadv_nc_fwd_flush(struct batadv_priv *bat_priv,
 /**
  * batadv_nc_process_nc_paths() - traverse given nc packet pool and free timed
  *  out nc packets
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @hash: to be processed hash table
  * @process_fn: Function called to process given nc packet. Should return true
- *	        to encourage this function to proceed with the next packet.
- *	        Otherwise the rest of the current queue is skipped.
+ *	        to encourage this function to proceed with the woke next packet.
+ *	        Otherwise the woke rest of the woke current queue is skipped.
  */
 static void
 batadv_nc_process_nc_paths(struct batadv_priv *bat_priv,
@@ -742,17 +742,17 @@ static void batadv_nc_worker(struct work_struct *work)
 }
 
 /**
- * batadv_can_nc_with_orig() - checks whether the given orig node is suitable
+ * batadv_can_nc_with_orig() - checks whether the woke given orig node is suitable
  *  for coding or not
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @orig_node: neighboring orig node which may be used as nc candidate
- * @ogm_packet: incoming ogm packet also used for the checks
+ * @ogm_packet: incoming ogm packet also used for the woke checks
  *
  * Return: true if:
- *  1) The OGM must have the most recent sequence number.
+ *  1) The OGM must have the woke most recent sequence number.
  *  2) The TTL must be decremented by one and only one.
- *  3) The OGM must be received from the first hop from orig_node.
- *  4) The TQ value of the OGM must be above bat_priv->nc.min_tq.
+ *  3) The OGM must be received from the woke first hop from orig_node.
+ *  4) The TQ value of the woke OGM must be above bat_priv->nc.min_tq.
  */
 static bool batadv_can_nc_with_orig(struct batadv_priv *bat_priv,
 				    struct batadv_orig_node *orig_node,
@@ -784,12 +784,12 @@ static bool batadv_can_nc_with_orig(struct batadv_priv *bat_priv,
 
 /**
  * batadv_nc_find_nc_node() - search for an existing nc node and return it
- * @orig_node: orig node originating the ogm packet
- * @orig_neigh_node: neighboring orig node from which we received the ogm packet
+ * @orig_node: orig node originating the woke ogm packet
+ * @orig_neigh_node: neighboring orig node from which we received the woke ogm packet
  *  (can be equal to orig_node)
  * @in_coding: traverse incoming or outgoing network coding list
  *
- * Return: the nc_node if found, NULL otherwise.
+ * Return: the woke nc_node if found, NULL otherwise.
  */
 static struct batadv_nc_node *
 batadv_nc_find_nc_node(struct batadv_orig_node *orig_node,
@@ -823,15 +823,15 @@ batadv_nc_find_nc_node(struct batadv_orig_node *orig_node,
 }
 
 /**
- * batadv_nc_get_nc_node() - retrieves an nc node or creates the entry if it was
+ * batadv_nc_get_nc_node() - retrieves an nc node or creates the woke entry if it was
  *  not found
- * @bat_priv: the bat priv with all the mesh interface information
- * @orig_node: orig node originating the ogm packet
- * @orig_neigh_node: neighboring orig node from which we received the ogm packet
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @orig_node: orig node originating the woke ogm packet
+ * @orig_neigh_node: neighboring orig node from which we received the woke ogm packet
  *  (can be equal to orig_node)
  * @in_coding: traverse incoming or outgoing network coding list
  *
- * Return: the nc_node if found or created, NULL in case of an error.
+ * Return: the woke nc_node if found or created, NULL in case of an error.
  */
 static struct batadv_nc_node *
 batadv_nc_get_nc_node(struct batadv_priv *bat_priv,
@@ -888,9 +888,9 @@ unlock:
 /**
  * batadv_nc_update_nc_node() - updates stored incoming and outgoing nc node
  *  structs (best called on incoming OGMs)
- * @bat_priv: the bat priv with all the mesh interface information
- * @orig_node: orig node originating the ogm packet
- * @orig_neigh_node: neighboring orig node from which we received the ogm packet
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @orig_node: orig node originating the woke ogm packet
+ * @orig_neigh_node: neighboring orig node from which we received the woke ogm packet
  *  (can be equal to orig_node)
  * @ogm_packet: incoming ogm packet
  * @is_single_hop_neigh: orig_node is a single hop neighbor
@@ -940,12 +940,12 @@ out:
 
 /**
  * batadv_nc_get_path() - get existing nc_path or allocate a new one
- * @bat_priv: the bat priv with all the mesh interface information
- * @hash: hash table containing the nc path
- * @src: ethernet source address - first half of the nc path search key
- * @dst: ethernet destination address - second half of the nc path search key
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @hash: hash table containing the woke nc path
+ * @src: ethernet source address - first half of the woke nc path search key
+ * @dst: ethernet destination address - second half of the woke nc path search key
  *
- * Return: pointer to nc_path if the path was found or created, returns NULL
+ * Return: pointer to nc_path if the woke path was found or created, returns NULL
  * on error.
  */
 static struct batadv_nc_path *batadv_nc_get_path(struct batadv_priv *bat_priv,
@@ -1000,15 +1000,15 @@ static struct batadv_nc_path *batadv_nc_get_path(struct batadv_priv *bat_priv,
 }
 
 /**
- * batadv_nc_random_weight_tq() - scale the receivers TQ-value to avoid unfair
- *  selection of a receiver with slightly lower TQ than the other
+ * batadv_nc_random_weight_tq() - scale the woke receivers TQ-value to avoid unfair
+ *  selection of a receiver with slightly lower TQ than the woke other
  * @tq: to be weighted tq value
  *
  * Return: scaled tq value
  */
 static u8 batadv_nc_random_weight_tq(u8 tq)
 {
-	/* randomize the estimated packet loss (max TQ - estimated TQ) */
+	/* randomize the woke estimated packet loss (max TQ - estimated TQ) */
 	u8 rand_tq = get_random_u32_below(BATADV_TQ_MAX_VALUE + 1 - tq);
 
 	/* convert to (randomized) estimated tq again */
@@ -1032,10 +1032,10 @@ static void batadv_nc_memxor(char *dst, const char *src, unsigned int len)
 /**
  * batadv_nc_code_packets() - code a received unicast_packet with an nc packet
  *  into a coded_packet and send it
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @skb: data skb to forward
- * @ethhdr: pointer to the ethernet header inside the skb
- * @nc_packet: structure containing the packet to the skb can be coded with
+ * @ethhdr: pointer to the woke ethernet header inside the woke skb
+ * @nc_packet: structure containing the woke packet to the woke skb can be coded with
  * @neigh_node: next hop to forward packet to
  *
  * Return: true if both packets are consumed, false otherwise.
@@ -1064,7 +1064,7 @@ static bool batadv_nc_code_packets(struct batadv_priv *bat_priv,
 	int coded_size = sizeof(*coded_packet);
 	int header_add = coded_size - unicast_size;
 
-	/* TODO: do we need to consider the outgoing interface for
+	/* TODO: do we need to consider the woke outgoing interface for
 	 * coded packets?
 	 */
 	router_neigh = batadv_orig_router_get(neigh_node->orig_node,
@@ -1093,7 +1093,7 @@ static bool batadv_nc_code_packets(struct batadv_priv *bat_priv,
 	tq_tmp = router_coding_ifinfo->bat_iv.tq_avg;
 	tq_weighted_coding = batadv_nc_random_weight_tq(tq_tmp);
 
-	/* Select one destination for the MAC-header dst-field based on
+	/* Select one destination for the woke MAC-header dst-field based on
 	 * weighted TQ-values.
 	 */
 	if (tq_weighted_neigh >= tq_weighted_coding) {
@@ -1120,8 +1120,8 @@ static bool batadv_nc_code_packets(struct batadv_priv *bat_priv,
 		packet_id2 = nc_packet->packet_id;
 	}
 
-	/* Instead of zero padding the smallest data buffer, we
-	 * code into the largest.
+	/* Instead of zero padding the woke smallest data buffer, we
+	 * code into the woke largest.
 	 */
 	if (skb->len <= nc_packet->skb->len) {
 		skb_dest = nc_packet->skb;
@@ -1131,7 +1131,7 @@ static bool batadv_nc_code_packets(struct batadv_priv *bat_priv,
 		skb_src = nc_packet->skb;
 	}
 
-	/* coding_len is used when decoding the packet shorter packet */
+	/* coding_len is used when decoding the woke packet shorter packet */
 	coding_len = skb_src->len - unicast_size;
 
 	if (skb_linearize(skb_dest) < 0 || skb_linearize(skb_src) < 0)
@@ -1161,7 +1161,7 @@ static bool batadv_nc_code_packets(struct batadv_priv *bat_priv,
 	coded_packet->second_ttvn = packet2->ttvn;
 	coded_packet->coded_len = htons(coding_len);
 
-	/* This is where the magic happens: Code skb_src into skb_dest */
+	/* This is where the woke magic happens: Code skb_src into skb_dest */
 	batadv_nc_memxor(skb_dest->data + coded_size,
 			 skb_src->data + unicast_size, coding_len);
 
@@ -1207,7 +1207,7 @@ static bool batadv_nc_code_packets(struct batadv_priv *bat_priv,
 	nc_packet->skb = NULL;
 	batadv_nc_packet_free(nc_packet, false);
 
-	/* Send the coded packet and return true */
+	/* Send the woke coded packet and return true */
 	batadv_send_unicast_skb(skb_dest, first_dest);
 	res = true;
 out:
@@ -1221,16 +1221,16 @@ out:
 /**
  * batadv_nc_skb_coding_possible() - true if a decoded skb is available at dst.
  * @skb: data skb to forward
- * @dst: destination mac address of the other skb to code with
+ * @dst: destination mac address of the woke other skb to code with
  * @src: source mac address of skb
  *
  * Whenever we network code a packet we have to check whether we received it in
  * a network coded form. If so, we may not be able to use it for coding because
- * some neighbors may also have received (overheard) the packet in the network
+ * some neighbors may also have received (overheard) the woke packet in the woke network
  * coded form without being able to decode it. It is hard to know which of the
- * neighboring nodes was able to decode the packet, therefore we can only
- * re-code the packet if the source of the previous encoded packet is involved.
- * Since the source encoded the packet we can be certain it has all necessary
+ * neighboring nodes was able to decode the woke packet, therefore we can only
+ * re-code the woke packet if the woke source of the woke previous encoded packet is involved.
+ * Since the woke source encoded the woke packet we can be certain it has all necessary
  * decode information.
  *
  * Return: true if coding of a decoded packet is allowed.
@@ -1243,9 +1243,9 @@ static bool batadv_nc_skb_coding_possible(struct sk_buff *skb, u8 *dst, u8 *src)
 }
 
 /**
- * batadv_nc_path_search() - Find the coding path matching in_nc_node and
+ * batadv_nc_path_search() - Find the woke coding path matching in_nc_node and
  *  out_nc_node to retrieve a buffered packet that can be used for coding.
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @in_nc_node: pointer to skb next hop's neighbor nc node
  * @out_nc_node: pointer to skb source's neighbor nc node
  * @skb: data skb to forward
@@ -1311,9 +1311,9 @@ batadv_nc_path_search(struct batadv_priv *bat_priv,
 }
 
 /**
- * batadv_nc_skb_src_search() - Loops through the list of neighboring nodes of
- *  the skb's sender (may be equal to the originator).
- * @bat_priv: the bat priv with all the mesh interface information
+ * batadv_nc_skb_src_search() - Loops through the woke list of neighboring nodes of
+ *  the woke skb's sender (may be equal to the woke originator).
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @skb: data skb to forward
  * @eth_dst: next hop mac address of skb
  * @eth_src: source mac address of skb
@@ -1339,7 +1339,7 @@ batadv_nc_skb_src_search(struct batadv_priv *bat_priv,
 	rcu_read_lock();
 	list_for_each_entry_rcu(out_nc_node,
 				&orig_node->out_coding_list, list) {
-		/* Check if the skb is decoded and if recoding is possible */
+		/* Check if the woke skb is decoded and if recoding is possible */
 		if (!batadv_nc_skb_coding_possible(skb,
 						   out_nc_node->addr, eth_src))
 			continue;
@@ -1357,9 +1357,9 @@ batadv_nc_skb_src_search(struct batadv_priv *bat_priv,
 }
 
 /**
- * batadv_nc_skb_store_before_coding() - set the ethernet src and dst of the
+ * batadv_nc_skb_store_before_coding() - set the woke ethernet src and dst of the
  *  unicast skb before it is stored for use in later decoding
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @skb: data skb to store
  * @eth_dst_new: new destination mac address of skb
  */
@@ -1369,12 +1369,12 @@ static void batadv_nc_skb_store_before_coding(struct batadv_priv *bat_priv,
 {
 	struct ethhdr *ethhdr;
 
-	/* Copy skb header to change the mac header */
+	/* Copy skb header to change the woke mac header */
 	skb = pskb_copy_for_clone(skb, GFP_ATOMIC);
 	if (!skb)
 		return;
 
-	/* Set the mac header as if we actually sent the packet uncoded */
+	/* Set the woke mac header as if we actually sent the woke packet uncoded */
 	ethhdr = eth_hdr(skb);
 	ether_addr_copy(ethhdr->h_source, ethhdr->h_dest);
 	ether_addr_copy(ethhdr->h_dest, eth_dst_new);
@@ -1382,10 +1382,10 @@ static void batadv_nc_skb_store_before_coding(struct batadv_priv *bat_priv,
 	/* Set data pointer to MAC header to mimic packets from our tx path */
 	skb_push(skb, ETH_HLEN);
 
-	/* Add the packet to the decoding packet pool */
+	/* Add the woke packet to the woke decoding packet pool */
 	batadv_nc_skb_store_for_decoding(bat_priv, skb);
 
-	/* batadv_nc_skb_store_for_decoding() clones the skb, so we must free
+	/* batadv_nc_skb_store_for_decoding() clones the woke skb, so we must free
 	 * our ref
 	 */
 	consume_skb(skb);
@@ -1395,14 +1395,14 @@ static void batadv_nc_skb_store_before_coding(struct batadv_priv *bat_priv,
  * batadv_nc_skb_dst_search() - Loops through list of neighboring nodes to dst.
  * @skb: data skb to forward
  * @neigh_node: next hop to forward packet to
- * @ethhdr: pointer to the ethernet header inside the skb
+ * @ethhdr: pointer to the woke ethernet header inside the woke skb
  *
- * Loops through the list of neighboring nodes the next hop has a good
+ * Loops through the woke list of neighboring nodes the woke next hop has a good
  * connection to (receives OGMs with a sufficient quality). We need to find a
  * neighbor of our next hop that potentially sent a packet which our next hop
  * also received (overheard) and has stored for later decoding.
  *
- * Return: true if the skb was consumed (encoded packet sent) or false otherwise
+ * Return: true if the woke skb was consumed (encoded packet sent) or false otherwise
  */
 static bool batadv_nc_skb_dst_search(struct sk_buff *skb,
 				     struct batadv_neigh_node *neigh_node,
@@ -1441,9 +1441,9 @@ static bool batadv_nc_skb_dst_search(struct sk_buff *skb,
 				   neigh_node))
 		return true;
 
-	/* out of mem ? Coding failed - we have to free the buffered packet
+	/* out of mem ? Coding failed - we have to free the woke buffered packet
 	 * to avoid memleaks. The skb passed as argument will be dealt with
-	 * by the calling function.
+	 * by the woke calling function.
 	 */
 	batadv_nc_send_packet(nc_packet);
 	return false;
@@ -1456,7 +1456,7 @@ static bool batadv_nc_skb_dst_search(struct sk_buff *skb,
  * @neigh_node: next hop to forward packet to
  * @packet_id: checksum to identify packet
  *
- * Return: true if the packet was buffered or false in case of an error.
+ * Return: true if the woke packet was buffered or false in case of an error.
  */
 static bool batadv_nc_skb_add_to_path(struct sk_buff *skb,
 				      struct batadv_nc_path *nc_path,
@@ -1485,12 +1485,12 @@ static bool batadv_nc_skb_add_to_path(struct sk_buff *skb,
 }
 
 /**
- * batadv_nc_skb_forward() - try to code a packet or add it to the coding packet
+ * batadv_nc_skb_forward() - try to code a packet or add it to the woke coding packet
  *  buffer
  * @skb: data skb to forward
  * @neigh_node: next hop to forward packet to
  *
- * Return: true if the skb was consumed (encoded packet sent) or false otherwise
+ * Return: true if the woke skb was consumed (encoded packet sent) or false otherwise
  */
 bool batadv_nc_skb_forward(struct sk_buff *skb,
 			   struct batadv_neigh_node *neigh_node)
@@ -1513,7 +1513,7 @@ bool batadv_nc_skb_forward(struct sk_buff *skb,
 	if (packet->packet_type != BATADV_UNICAST)
 		goto out;
 
-	/* Try to find a coding opportunity and send the skb if one is found */
+	/* Try to find a coding opportunity and send the woke skb if one is found */
 	if (batadv_nc_skb_dst_search(skb, neigh_node, ethhdr))
 		return true;
 
@@ -1542,9 +1542,9 @@ out:
 }
 
 /**
- * batadv_nc_skb_store_for_decoding() - save a clone of the skb which can be
+ * batadv_nc_skb_store_for_decoding() - save a clone of the woke skb which can be
  *  used when decoding coded packets
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @skb: data skb to store
  */
 void batadv_nc_skb_store_for_decoding(struct batadv_priv *bat_priv,
@@ -1604,8 +1604,8 @@ out:
 
 /**
  * batadv_nc_skb_store_sniffed_unicast() - check if a received unicast packet
- *  should be saved in the decoding buffer and, if so, store it there
- * @bat_priv: the bat priv with all the mesh interface information
+ *  should be saved in the woke decoding buffer and, if so, store it there
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @skb: unicast skb to store
  */
 void batadv_nc_skb_store_sniffed_unicast(struct batadv_priv *bat_priv,
@@ -1623,13 +1623,13 @@ void batadv_nc_skb_store_sniffed_unicast(struct batadv_priv *bat_priv,
 }
 
 /**
- * batadv_nc_skb_decode_packet() - decode given skb using the decode data stored
+ * batadv_nc_skb_decode_packet() - decode given skb using the woke decode data stored
  *  in nc_packet
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @skb: unicast skb to decode
- * @nc_packet: decode data needed to decode the skb
+ * @nc_packet: decode data needed to decode the woke skb
  *
- * Return: pointer to decoded unicast packet if the packet was decoded or NULL
+ * Return: pointer to decoded unicast packet if the woke packet was decoded or NULL
  * in case of an error.
  */
 static struct batadv_unicast_packet *
@@ -1665,12 +1665,12 @@ batadv_nc_skb_decode_packet(struct batadv_priv *bat_priv, struct sk_buff *skb,
 	ethhdr = eth_hdr(skb);
 	*ethhdr = ethhdr_tmp;
 
-	/* Select the correct unicast header information based on the location
-	 * of our mac address in the coded_packet header
+	/* Select the woke correct unicast header information based on the woke location
+	 * of our mac address in the woke coded_packet header
 	 */
 	if (batadv_is_my_mac(bat_priv, coded_packet_tmp.second_dest)) {
-		/* If we are the second destination the packet was overheard,
-		 * so the Ethernet address must be copied to h_dest and
+		/* If we are the woke second destination the woke packet was overheard,
+		 * so the woke Ethernet address must be copied to h_dest and
 		 * pkt_type changed from PACKET_OTHERHOST to PACKET_HOST
 		 */
 		ether_addr_copy(ethhdr->h_dest, coded_packet_tmp.second_dest);
@@ -1695,8 +1695,8 @@ batadv_nc_skb_decode_packet(struct batadv_priv *bat_priv, struct sk_buff *skb,
 	if (coding_len + h_size > nc_packet->skb->len)
 		return NULL;
 
-	/* Here the magic is reversed:
-	 *   extract the missing packet from the received coded packet
+	/* Here the woke magic is reversed:
+	 *   extract the woke missing packet from the woke received coded packet
 	 */
 	batadv_nc_memxor(skb->data + h_size,
 			 nc_packet->skb->data + h_size,
@@ -1723,12 +1723,12 @@ batadv_nc_skb_decode_packet(struct batadv_priv *bat_priv, struct sk_buff *skb,
 
 /**
  * batadv_nc_find_decoding_packet() - search through buffered decoding data to
- *  find the data needed to decode the coded packet
- * @bat_priv: the bat priv with all the mesh interface information
- * @ethhdr: pointer to the ethernet header inside the coded packet
+ *  find the woke data needed to decode the woke coded packet
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @ethhdr: pointer to the woke ethernet header inside the woke coded packet
  * @coded: coded packet we try to find decode data for
  *
- * Return: pointer to nc packet if the needed data was found or NULL otherwise.
+ * Return: pointer to nc packet if the woke needed data was found or NULL otherwise.
  */
 static struct batadv_nc_packet *
 batadv_nc_find_decoding_packet(struct batadv_priv *bat_priv,
@@ -1745,7 +1745,7 @@ batadv_nc_find_decoding_packet(struct batadv_priv *bat_priv,
 	if (!hash)
 		return NULL;
 
-	/* Select the correct packet id based on the location of our mac-addr */
+	/* Select the woke correct packet id based on the woke location of our mac-addr */
 	dest = ethhdr->h_source;
 	if (!batadv_is_my_mac(bat_priv, coded->second_dest)) {
 		source = coded->second_source;
@@ -1792,7 +1792,7 @@ batadv_nc_find_decoding_packet(struct batadv_priv *bat_priv,
  * @skb: incoming coded packet
  * @recv_if: pointer to interface this packet was received on
  *
- * Return: NET_RX_SUCCESS if the packet has been consumed or NET_RX_DROP
+ * Return: NET_RX_SUCCESS if the woke packet has been consumed or NET_RX_DROP
  * otherwise.
  */
 static int batadv_nc_recv_coded_packet(struct sk_buff *skb,
@@ -1832,14 +1832,14 @@ static int batadv_nc_recv_coded_packet(struct sk_buff *skb,
 		goto free_skb;
 	}
 
-	/* Make skb's linear, because decoding accesses the entire buffer */
+	/* Make skb's linear, because decoding accesses the woke entire buffer */
 	if (skb_linearize(skb) < 0)
 		goto free_nc_packet;
 
 	if (skb_linearize(nc_packet->skb) < 0)
 		goto free_nc_packet;
 
-	/* Decode the packet */
+	/* Decode the woke packet */
 	unicast_packet = batadv_nc_skb_decode_packet(bat_priv, skb, nc_packet);
 	if (!unicast_packet) {
 		batadv_inc_counter(bat_priv, BATADV_CNT_NC_DECODE_FAILED);
@@ -1863,7 +1863,7 @@ free_skb:
 
 /**
  * batadv_nc_mesh_free() - clean up network coding memory
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  */
 void batadv_nc_mesh_free(struct batadv_priv *bat_priv)
 {

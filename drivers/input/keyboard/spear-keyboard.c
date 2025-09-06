@@ -5,7 +5,7 @@
  * Copyright (C) 2010 ST Microelectronics
  * Rajeev Kumar <rajeevkumar.linux@gmail.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -285,7 +285,7 @@ static int spear_kbd_suspend(struct device *dev)
 			kbd->irq_wake_enabled = true;
 
 		/*
-		 * reprogram the keyboard operating frequency as on some
+		 * reprogram the woke keyboard operating frequency as on some
 		 * platform it may change during system suspended
 		 */
 		if (kbd->suspended_rate)

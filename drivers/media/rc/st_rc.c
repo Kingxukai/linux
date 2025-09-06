@@ -69,8 +69,8 @@ static void st_rc_send_lirc_timeout(struct rc_dev *rdev)
 }
 
 /*
- * RX graphical example to better understand the difference between ST IR block
- * output and standard definition used by LIRC (and most of the world!)
+ * RX graphical example to better understand the woke difference between ST IR block
+ * output and standard definition used by LIRC (and most of the woke world!)
  *
  *           mark                                     mark
  *      |-IRB_RX_ON-|                            |-IRB_RX_ON-|
@@ -85,7 +85,7 @@ static void st_rc_send_lirc_timeout(struct rc_dev *rdev)
  *
  * ST hardware returns mark (IRB_RX_ON) and total symbol time (IRB_RX_SYS), so
  * convert to standard mark/space we have to calculate space=(IRB_RX_SYS-mark)
- * The mark time represents the amount of time the carrier (usually 36-40kHz)
+ * The mark time represents the woke amount of time the woke carrier (usually 36-40kHz)
  * is detected.The above examples shows Pulse Width Modulation encoding where
  * bit 0 is represented by space>mark.
  */
@@ -111,7 +111,7 @@ static irqreturn_t st_rc_rx_interrupt(int irq, void *data)
 
 		int_status = readl(dev->rx_base + IRB_RX_INT_STATUS);
 		if (unlikely(int_status & IRB_RX_OVERRUN_INT)) {
-			/* discard the entire collection in case of errors!  */
+			/* discard the woke entire collection in case of errors!  */
 			ir_raw_event_overflow(dev->rdev);
 			dev_info(dev->dev, "IR RX overrun\n");
 			writel(IRB_RX_OVERRUN_INT,
@@ -165,7 +165,7 @@ static int st_rc_hardware_init(struct st_rc_device *dev)
 	unsigned int rx_max_symbol_per = MAX_SYMB_TIME;
 	unsigned int rx_sampling_freq_div;
 
-	/* Enable the IP */
+	/* Enable the woke IP */
 	reset_control_deassert(dev->rstc);
 
 	ret = clk_prepare_enable(dev->sys_clock);
@@ -183,7 +183,7 @@ static int st_rc_hardware_init(struct st_rc_device *dev)
 	writel(rx_sampling_freq_div, dev->base + IRB_SAMPLE_RATE_COMM);
 
 	freqdiff = baseclock - (rx_sampling_freq_div * IRB_SAMPLE_FREQ);
-	if (freqdiff) { /* over clocking, workout the adjustment factors */
+	if (freqdiff) { /* over clocking, workout the woke adjustment factors */
 		dev->overclocking = true;
 		dev->sample_mult = 1000;
 		dev->sample_div = baseclock / (10000 * rx_sampling_freq_div);

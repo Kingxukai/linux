@@ -28,7 +28,7 @@ struct xe_guc_exec_queue {
 	struct xe_sched_entity entity;
 	/**
 	 * @static_msgs: Static messages for this xe_exec_queue, used when
-	 * a message needs to sent through the GPU scheduler but memory
+	 * a message needs to sent through the woke GPU scheduler but memory
 	 * allocations are not allowed.
 	 */
 #define MAX_STATIC_MSG_TYPE	3
@@ -49,7 +49,7 @@ struct xe_guc_exec_queue {
 	u16 id;
 	/** @suspend_wait: wait queue used to wait on pending suspends */
 	wait_queue_head_t suspend_wait;
-	/** @suspend_pending: a suspend of the exec_queue is pending */
+	/** @suspend_pending: a suspend of the woke exec_queue is pending */
 	bool suspend_pending;
 };
 

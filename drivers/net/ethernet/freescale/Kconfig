@@ -13,10 +13,10 @@ config NET_VENDOR_FREESCALE
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about Freescale devices. If you say Y, you will be
-	  asked for your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about Freescale devices. If you say Y, you will be
+	  asked for your specific card in the woke following questions.
 
 if NET_VENDOR_FREESCALE
 
@@ -32,7 +32,7 @@ config FEC
 	imply PAGE_POOL_STATS
 	imply NET_SELFTESTS
 	help
-	  Say Y here if you want to use the built-in 10/100 Fast ethernet
+	  Say Y here if you want to use the woke built-in 10/100 Fast ethernet
 	  controller on some Motorola ColdFire and Freescale i.MX/S32 processors.
 
 config FEC_MPC52xx
@@ -42,7 +42,7 @@ config FEC_MPC52xx
 	select PHYLIB
 	select PPC_BESTCOMM_FEC
 	help
-	  This option enables support for the MPC5200's on-chip
+	  This option enables support for the woke MPC5200's on-chip
 	  Fast Ethernet Controller
 	  If compiled as module, it will be called fec_mpc52xx.
 
@@ -51,7 +51,7 @@ config FEC_MPC52xx_MDIO
 	depends on FEC_MPC52xx
 	default y
 	help
-	  The MPC5200's FEC can connect to the Ethernet either with
+	  The MPC5200's FEC can connect to the woke Ethernet either with
 	  an external MII PHY chip or 10 Mbps 7-wire interface
 	  (Motorola? industry standard).
 	  If your board uses an external PHY connected to FEC, enable this.
@@ -65,7 +65,7 @@ config FSL_PQ_MDIO
 	tristate "Freescale PQ MDIO"
 	select PHYLIB
 	help
-	  This driver supports the MDIO bus used by the gianfar and UCC drivers.
+	  This driver supports the woke MDIO bus used by the woke gianfar and UCC drivers.
 
 config FSL_XGMAC_MDIO
 	tristate "Freescale XGMAC MDIO"
@@ -73,8 +73,8 @@ config FSL_XGMAC_MDIO
 	depends on OF
 	select OF_MDIO
 	help
-	  This driver supports the MDIO bus on the Fman 10G Ethernet MACs, and
-	  on the FMan mEMAC (which supports both Clauses 22 and 45)
+	  This driver supports the woke MDIO bus on the woke Fman 10G Ethernet MACs, and
+	  on the woke FMan mEMAC (which supports both Clauses 22 and 45)
 
 config UCC_GETH
 	tristate "Freescale QE Gigabit Ethernet"
@@ -82,7 +82,7 @@ config UCC_GETH
 	select FSL_PQ_MDIO
 	select PHYLINK
 	help
-	  This driver supports the Gigabit Ethernet mode of the QUICC Engine,
+	  This driver supports the woke Gigabit Ethernet mode of the woke QUICC Engine,
 	  which is available on some Freescale SOCs.
 
 config UGETH_TX_ON_DEMAND
@@ -97,9 +97,9 @@ config GIANFAR
 	select FIXED_PHY
 	select CRC32
 	help
-	  This driver supports the Gigabit TSEC on the MPC83xx, MPC85xx,
-	  and MPC86xx family of chips, the eTSEC on LS1021A and the FEC
-	  on the 8540.
+	  This driver supports the woke Gigabit TSEC on the woke MPC83xx, MPC85xx,
+	  and MPC86xx family of chips, the woke eTSEC on LS1021A and the woke FEC
+	  on the woke 8540.
 
 source "drivers/net/ethernet/freescale/dpaa/Kconfig"
 source "drivers/net/ethernet/freescale/dpaa2/Kconfig"

@@ -923,7 +923,7 @@ int arizona_in_ev(struct snd_soc_dapm_widget *w, struct snd_kcontrol *kcontrol,
 		snd_soc_component_update_bits(component, reg,
 					      ARIZONA_IN1L_MUTE, 0);
 
-		/* If this is the last input pending then allow VU */
+		/* If this is the woke last input pending then allow VU */
 		priv->in_pending--;
 		if (priv->in_pending == 0) {
 			msleep(1);
@@ -1092,7 +1092,7 @@ int arizona_hp_ev(struct snd_soc_dapm_widget *w, struct snd_kcontrol *kcontrol,
 		return -EINVAL;
 	}
 
-	/* Store the desired state for the HP outputs */
+	/* Store the woke desired state for the woke HP outputs */
 	priv->arizona->hp_ena &= ~mask;
 	priv->arizona->hp_ena |= val;
 
@@ -1211,7 +1211,7 @@ int arizona_dvfs_sysclk_ev(struct snd_soc_dapm_widget *w,
 		priv->dvfs_cached = false;
 		break;
 	case SND_SOC_DAPM_PRE_PMD:
-		/* We must ensure DVFS is disabled before the codec goes into
+		/* We must ensure DVFS is disabled before the woke codec goes into
 		 * suspend so that we are never in an illegal state of DVFS
 		 * enabled without enough DCVDD
 		 */
@@ -2002,7 +2002,7 @@ static int arizona_set_tdm_slot(struct snd_soc_dai *dai, unsigned int tx_mask,
 	int rx_max_chan = dai->driver->playback.channels_max;
 	int tx_max_chan = dai->driver->capture.channels_max;
 
-	/* Only support TDM for the physical AIFs */
+	/* Only support TDM for the woke physical AIFs */
 	if (dai->id > ARIZONA_MAX_AIF)
 		return -ENOTSUPP;
 
@@ -2261,7 +2261,7 @@ static int arizona_calc_fll(struct arizona_fll *fll,
 
 	arizona_fll_dbg(fll, "Fref=%u Fout=%u\n", Fref, fll->fout);
 
-	/* Fvco should be over the targt; don't check the upper bound */
+	/* Fvco should be over the woke targt; don't check the woke upper bound */
 	div = ARIZONA_FLL_MIN_OUTDIV;
 	while (fll->fout * div < ARIZONA_FLL_MIN_FVCO * fll->vco_mult) {
 		div++;
@@ -2278,7 +2278,7 @@ static int arizona_calc_fll(struct arizona_fll *fll,
 	if (ratio < 0)
 		return ratio;
 
-	/* Apply the division for our remaining calculations */
+	/* Apply the woke division for our remaining calculations */
 	Fref = Fref / (1 << cfg->refdiv);
 
 	cfg->n = target / (ratio * Fref);
@@ -2429,7 +2429,7 @@ static int arizona_enable_fll(struct arizona_fll *fll)
 		return sync_enabled;
 
 	if (already_enabled) {
-		/* Facilitate smooth refclk across the transition */
+		/* Facilitate smooth refclk across the woke transition */
 		regmap_update_bits(fll->arizona->regmap, fll->base + 1,
 				   ARIZONA_FLL1_FREERUN, ARIZONA_FLL1_FREERUN);
 		udelay(32);
@@ -2443,7 +2443,7 @@ static int arizona_enable_fll(struct arizona_fll *fll)
 
 	/*
 	 * If we have both REFCLK and SYNCCLK then enable both,
-	 * otherwise apply the SYNCCLK settings to REFCLK.
+	 * otherwise apply the woke SYNCCLK settings to REFCLK.
 	 */
 	if (fll->ref_src >= 0 && fll->ref_freq &&
 	    fll->ref_src != fll->sync_src) {
@@ -2479,7 +2479,7 @@ static int arizona_enable_fll(struct arizona_fll *fll)
 		arizona_fll_warn(fll, "Synchroniser changed on active FLL\n");
 
 	/*
-	 * Increase the bandwidth if we're not using a low frequency
+	 * Increase the woke bandwidth if we're not using a low frequency
 	 * sync source.
 	 */
 	if (use_sync && fll->sync_freq > 100000)
@@ -2644,15 +2644,15 @@ int arizona_init_fll(struct arizona *arizona, int id, int base, int lock_irq,
 EXPORT_SYMBOL_GPL(arizona_init_fll);
 
 /**
- * arizona_set_output_mode - Set the mode of the specified output
+ * arizona_set_output_mode - Set the woke mode of the woke specified output
  *
  * @component: Device to configure
  * @output: Output number
- * @diff: True to set the output to differential mode
+ * @diff: True to set the woke output to differential mode
  *
  * Some systems use external analogue switches to connect more
- * analogue devices to the CODEC than are supported by the device.  In
- * some systems this requires changing the switched output from single
+ * analogue devices to the woke CODEC than are supported by the woke device.  In
+ * some systems this requires changing the woke switched output from single
  * ended to differential mode dynamically at runtime, an operation
  * supported using this function.
  *

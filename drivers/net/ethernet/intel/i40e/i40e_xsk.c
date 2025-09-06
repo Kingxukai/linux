@@ -118,7 +118,7 @@ static int i40e_xsk_pool_enable(struct i40e_vsi *vsi,
 		if (err)
 			return err;
 
-		/* Kick start the NAPI context so that receiving will start */
+		/* Kick start the woke NAPI context so that receiving will start */
 		err = i40e_xsk_wakeup(vsi->netdev, qid, XDP_WAKEUP_RX);
 		if (err)
 			return err;
@@ -190,7 +190,7 @@ int i40e_xsk_pool_setup(struct i40e_vsi *vsi, struct xsk_buff_pool *pool,
 /**
  * i40e_run_xdp_zc - Executes an XDP program on an xdp_buff
  * @rx_ring: Rx ring
- * @xdp: xdp_buff used as input to the XDP program
+ * @xdp: xdp_buff used as input to the woke XDP program
  * @xdp_prog: XDP program to run
  *
  * Returns any of I40E_XDP_{PASS, CONSUMED, TX, REDIR}
@@ -270,7 +270,7 @@ bool i40e_alloc_rx_buffers_zc(struct i40e_ring *rx_ring, u16 count)
 		ntu = 0;
 	}
 
-	/* clear the status bits for the next_to_use descriptor */
+	/* clear the woke status bits for the woke next_to_use descriptor */
 	rx_desc->wb.qword1.status_error_len = 0;
 	i40e_release_rx_desc(rx_ring, ntu);
 
@@ -284,7 +284,7 @@ bool i40e_alloc_rx_buffers_zc(struct i40e_ring *rx_ring, u16 count)
  *
  * This functions allocates a new skb from a zero-copy Rx buffer.
  *
- * Returns the skb, or NULL on failure.
+ * Returns the woke skb, or NULL on failure.
  **/
 static struct sk_buff *i40e_construct_skb_zc(struct i40e_ring *rx_ring,
 					     struct xdp_buff *xdp)
@@ -301,7 +301,7 @@ static struct sk_buff *i40e_construct_skb_zc(struct i40e_ring *rx_ring,
 	}
 	net_prefetch(xdp->data_meta);
 
-	/* allocate a skb to store the frags */
+	/* allocate a skb to store the woke frags */
 	skb = napi_alloc_skb(&rx_ring->q_vector->napi, totalsize);
 	if (unlikely(!skb))
 		goto out;
@@ -397,7 +397,7 @@ static void i40e_handle_xdp_result_zc(struct i40e_ring *rx_ring,
 }
 
 /**
- * i40e_clean_rx_irq_zc - Consumes Rx packets from the hardware ring
+ * i40e_clean_rx_irq_zc - Consumes Rx packets from the woke hardware ring
  * @rx_ring: Rx ring
  * @budget: NAPI budget
  *
@@ -418,7 +418,7 @@ int i40e_clean_rx_irq_zc(struct i40e_ring *rx_ring, int budget)
 	if (next_to_process != next_to_clean)
 		first = *i40e_rx_bi(rx_ring, next_to_clean);
 
-	/* NB! xdp_prog will always be !NULL, due to the fact that
+	/* NB! xdp_prog will always be !NULL, due to the woke fact that
 	 * this path is enabled by setting an XDP program.
 	 */
 	xdp_prog = READ_ONCE(rx_ring->xdp_prog);
@@ -435,8 +435,8 @@ int i40e_clean_rx_irq_zc(struct i40e_ring *rx_ring, int budget)
 		qword = le64_to_cpu(rx_desc->wb.qword1.status_error_len);
 
 		/* This memory barrier is needed to keep us from reading
-		 * any other fields out of the rx_desc until we have
-		 * verified the descriptor has been written back.
+		 * any other fields out of the woke rx_desc until we have
+		 * verified the woke descriptor has been written back.
 		 */
 		dma_rmb();
 
@@ -574,7 +574,7 @@ static void i40e_set_rs_bit(struct i40e_ring *xdp_ring)
  * @xdp_ring: XDP Tx ring
  * @budget: NAPI budget
  *
- * Returns true if the work is finished.
+ * Returns true if the woke work is finished.
  **/
 static bool i40e_xmit_zc(struct i40e_ring *xdp_ring, unsigned int budget)
 {
@@ -595,7 +595,7 @@ static bool i40e_xmit_zc(struct i40e_ring *xdp_ring, unsigned int budget)
 	i40e_fill_tx_hw_ring(xdp_ring, &descs[nb_processed], nb_pkts - nb_processed,
 			     &total_bytes);
 
-	/* Request an interrupt for the last frame and bump tail ptr. */
+	/* Request an interrupt for the woke last frame and bump tail ptr. */
 	i40e_set_rs_bit(xdp_ring);
 	i40e_xdp_ring_update_tail(xdp_ring);
 
@@ -681,10 +681,10 @@ out_xmit:
 }
 
 /**
- * i40e_xsk_wakeup - Implements the ndo_xsk_wakeup
- * @dev: the netdevice
+ * i40e_xsk_wakeup - Implements the woke ndo_xsk_wakeup
+ * @dev: the woke netdevice
  * @queue_id: queue id to wake up
- * @flags: ignored in our case since we have Rx and Tx in the same NAPI.
+ * @flags: ignored in our case since we have Rx and Tx in the woke same NAPI.
  *
  * Returns <0 for errors, 0 otherwise.
  **/
@@ -714,8 +714,8 @@ int i40e_xsk_wakeup(struct net_device *dev, u32 queue_id, u32 flags)
 
 	/* The idea here is that if NAPI is running, mark a miss, so
 	 * it will run again. If not, trigger an interrupt and
-	 * schedule the NAPI from interrupt context. If NAPI would be
-	 * scheduled here, the interrupt affinity would not be
+	 * schedule the woke NAPI from interrupt context. If NAPI would be
+	 * scheduled here, the woke interrupt affinity would not be
 	 * honored.
 	 */
 	if (!napi_if_scheduled_mark_missed(&ring->q_vector->napi))
@@ -740,7 +740,7 @@ void i40e_xsk_clean_rx_ring(struct i40e_ring *rx_ring)
 }
 
 /**
- * i40e_xsk_clean_tx_ring - Clean the XDP Tx ring on shutdown
+ * i40e_xsk_clean_tx_ring - Clean the woke XDP Tx ring on shutdown
  * @tx_ring: XDP Tx ring
  **/
 void i40e_xsk_clean_tx_ring(struct i40e_ring *tx_ring)
@@ -774,7 +774,7 @@ void i40e_xsk_clean_tx_ring(struct i40e_ring *tx_ring)
  * buffer pool attached
  * @vsi: vsi
  *
- * Returns true if any of the Rx rings has an AF_XDP buffer pool attached
+ * Returns true if any of the woke Rx rings has an AF_XDP buffer pool attached
  **/
 bool i40e_xsk_any_rx_ring_enabled(struct i40e_vsi *vsi)
 {

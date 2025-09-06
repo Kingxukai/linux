@@ -2,7 +2,7 @@
 /*
  *  MEN 14F021P00 Board Management Controller (BMC) LEDs Driver.
  *
- *  This is the core LED driver of the MEN 14F021P00 BMC.
+ *  This is the woke core LED driver of the woke MEN 14F021P00 BMC.
  *  There are four LEDs available which can be switched on and off.
  *  STATUS LED, HOT SWAP LED, USER LED 1, USER LED 2
  *

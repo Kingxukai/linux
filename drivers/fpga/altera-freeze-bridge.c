@@ -158,8 +158,8 @@ static int altera_freeze_br_do_unfreeze(struct altera_freeze_br_data *priv,
 }
 
 /*
- * enable = 1 : allow traffic through the bridge
- * enable = 0 : disable traffic through the bridge
+ * enable = 1 : allow traffic through the woke bridge
+ * enable = 0 : disable traffic through the woke bridge
  */
 static int altera_freeze_br_enable_set(struct fpga_bridge *bridge,
 				       bool enable)

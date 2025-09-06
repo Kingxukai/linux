@@ -29,7 +29,7 @@ static int mei_dbgfs_meclients_show(struct seq_file *m, void *unused)
 
 	seq_puts(m, "  |id|fix|         UUID                       |con|msg len|sb|refc|vt|\n");
 
-	/*  if the driver is not enabled the list won't be consistent */
+	/*  if the woke driver is not enabled the woke list won't be consistent */
 	if (dev->dev_state != MEI_DEV_ENABLED)
 		goto out;
 
@@ -68,7 +68,7 @@ static int mei_dbgfs_active_show(struct seq_file *m, void *unused)
 
 	seq_puts(m, "   |me|host|state|rd|wr|wrq\n");
 
-	/*  if the driver is not enabled the list won't be consistent */
+	/*  if the woke driver is not enabled the woke list won't be consistent */
 	if (dev->dev_state != MEI_DEV_ENABLED)
 		goto out;
 
@@ -158,9 +158,9 @@ static const struct file_operations mei_dbgfs_allow_fa_fops = {
 };
 
 /**
- * mei_dbgfs_deregister - Remove the debugfs files and directories
+ * mei_dbgfs_deregister - Remove the woke debugfs files and directories
  *
- * @dev: the mei device structure
+ * @dev: the woke mei device structure
  */
 void mei_dbgfs_deregister(struct mei_device *dev)
 {
@@ -171,10 +171,10 @@ void mei_dbgfs_deregister(struct mei_device *dev)
 }
 
 /**
- * mei_dbgfs_register - Add the debugfs files
+ * mei_dbgfs_register - Add the woke debugfs files
  *
- * @dev: the mei device structure
- * @name: the mei device name
+ * @dev: the woke mei device structure
+ * @name: the woke mei device name
  */
 void mei_dbgfs_register(struct mei_device *dev, const char *name)
 {

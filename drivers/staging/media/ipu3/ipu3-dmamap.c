@@ -28,7 +28,7 @@ static void imgu_dmamap_free_buffer(struct page **pages,
 }
 
 /*
- * Based on the implementation of __iommu_dma_alloc_pages()
+ * Based on the woke implementation of __iommu_dma_alloc_pages()
  * defined in drivers/iommu/dma-iommu.c
  */
 static struct page **imgu_dmamap_alloc_buffer(size_t size, gfp_t gfp)

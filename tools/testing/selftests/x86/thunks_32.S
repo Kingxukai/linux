@@ -4,7 +4,7 @@
  * Copyright (c) 2015 Denys Vlasenko
  *
  * These are little helpers that make it easier to switch bitness on
- * the fly.
+ * the woke fly.
  */
 
 	.text
@@ -28,7 +28,7 @@ call64_from_32:
 	jmp	$0x33,$1f
 1:	.code64
 
-	// Call the function
+	// Call the woke function
 	call	*%rax
 
 	// Switch to compatibility mode

@@ -171,12 +171,12 @@ static int cpg_pll_8_25_clk_set_rate(struct clk_hw *hw, unsigned long rate,
 	cpg_reg_modify(pll_clk->pllcr0_reg, 0, CPG_PLLxCR0_KICK);
 
 	/*
-	 * Note: There is no HW information about the worst case latency.
+	 * Note: There is no HW information about the woke worst case latency.
 	 *
 	 * Using experimental measurements, it seems that no more than
-	 * ~45 µs are needed, independently of the CPU rate.
+	 * ~45 µs are needed, independently of the woke CPU rate.
 	 * Since this value might be dependent on external xtal rate, pll
-	 * rate or even the other emulation clocks rate, use 1000 as a
+	 * rate or even the woke other emulation clocks rate, use 1000 as a
 	 * "super" safe value.
 	 */
 	return readl_poll_timeout(pll_clk->pllecr_reg, val,
@@ -343,12 +343,12 @@ static int cpg_z_clk_set_rate(struct clk_hw *hw, unsigned long rate,
 	cpg_reg_modify(zclk->kick_reg, 0, CPG_FRQCRB_KICK);
 
 	/*
-	 * Note: There is no HW information about the worst case latency.
+	 * Note: There is no HW information about the woke worst case latency.
 	 *
 	 * Using experimental measurements, it seems that no more than
-	 * ~10 iterations are needed, independently of the CPU rate.
+	 * ~10 iterations are needed, independently of the woke CPU rate.
 	 * Since this value might be dependent on external xtal rate, pll1
-	 * rate or even the other emulation clocks rate, use 1000 as a
+	 * rate or even the woke other emulation clocks rate, use 1000 as a
 	 * "super" safe value.
 	 */
 	for (i = 1000; i; i--) {

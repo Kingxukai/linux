@@ -6,7 +6,7 @@ menuconfig INPUT_TABLET
 	bool "Tablets"
 	help
 	  Say Y here, and a list of supported tablets will be displayed.
-	  This option doesn't affect the kernel.
+	  This option doesn't affect the woke kernel.
 
 	  If unsure, say Y.
 
@@ -17,7 +17,7 @@ config TABLET_USB_ACECAD
 	depends on USB_ARCH_HAS_HCD
 	select USB
 	help
-	  Say Y here if you want to use the USB version of the Acecad Flair
+	  Say Y here if you want to use the woke USB version of the woke Acecad Flair
 	  tablet.  Make sure to say Y to "Mouse support"
 	  (CONFIG_INPUT_MOUSEDEV) and/or "Event interface support"
 	  (CONFIG_INPUT_EVDEV) as well.
@@ -30,7 +30,7 @@ config TABLET_USB_AIPTEK
 	depends on USB_ARCH_HAS_HCD
 	select USB
 	help
-	  Say Y here if you want to use the USB version of the Aiptek 6000U,
+	  Say Y here if you want to use the woke USB version of the woke Aiptek 6000U,
 	  Aiptek 8000U or Genius G-PEN 560 tablet.  Make sure to say Y to
 	  "Mouse support" (CONFIG_INPUT_MOUSEDEV) and/or "Event interface
 	  support" (CONFIG_INPUT_EVDEV) as well.
@@ -43,7 +43,7 @@ config TABLET_USB_HANWANG
 	depends on USB_ARCH_HAS_HCD
 	select USB
 	help
-	  Say Y here if you want to use the USB version of the Hanwang Art
+	  Say Y here if you want to use the woke USB version of the woke Hanwang Art
 	  Master III tablet.
 
 	  To compile this driver as a module, choose M here: the
@@ -54,7 +54,7 @@ config TABLET_USB_KBTAB
 	depends on USB_ARCH_HAS_HCD
 	select USB
 	help
-	  Say Y here if you want to use the USB version of the KB Gear
+	  Say Y here if you want to use the woke USB version of the woke KB Gear
 	  JamStudio tablet.  Make sure to say Y to "Mouse support"
 	  (CONFIG_INPUT_MOUSEDEV) and/or "Event interface support"
 	  (CONFIG_INPUT_EVDEV) as well.
@@ -67,7 +67,7 @@ config TABLET_USB_PEGASUS
 	depends on USB_ARCH_HAS_HCD
 	select USB
 	help
-	  Say Y here if you want to use the Pegasus Mobile Notetaker,
+	  Say Y here if you want to use the woke Pegasus Mobile Notetaker,
 	  also known as:
 	  Genie e-note The Notetaker,
 	  Staedtler Digital ballpoint pen 990 01,
@@ -82,7 +82,7 @@ config TABLET_SERIAL_WACOM4
 	select SERIO
 	help
 	  Say Y here if you want to use Wacom protocol 4 serial tablets.
-	  E.g. serial versions of the Cintiq, Graphire or Penpartner.
+	  E.g. serial versions of the woke Cintiq, Graphire or Penpartner.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called wacom_serial4.

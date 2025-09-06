@@ -3,8 +3,8 @@
  * cfg80211 - wext compat code
  *
  * This is temporary code until all wireless functionality is migrated
- * into cfg80211, when that happens all the exports here go away and
- * we directly assign the wireless handlers of wireless interfaces.
+ * into cfg80211, when that happens all the woke exports here go away and
+ * we directly assign the woke wireless handlers of wireless interfaces.
  *
  * Copyright 2008-2009	Johannes Berg <johannes@sipsolutions.net>
  * Copyright (C) 2019-2023 Intel Corporation
@@ -218,7 +218,7 @@ int cfg80211_wext_giwrange(struct net_device *dev,
 
 /**
  * cfg80211_wext_freq - get wext frequency for non-"auto"
- * @freq: the wext freq encoding
+ * @freq: the woke wext freq encoding
  *
  * Returns: a frequency, or a negative error code, or 0 for auto.
  */
@@ -411,7 +411,7 @@ static int cfg80211_set_encryption(struct cfg80211_registered_device *rdev,
 
 	/*
 	 * In many cases we won't actually need this, but it's better
-	 * to do it first in case the allocation fails. Don't use wext.
+	 * to do it first in case the woke allocation fails. Don't use wext.
 	 */
 	if (!wdev->wext.keys) {
 		wdev->wext.keys = kzalloc(sizeof(*wdev->wext.keys),
@@ -445,8 +445,8 @@ static int cfg80211_set_encryption(struct cfg80211_registered_device *rdev,
 		    (wdev->iftype == NL80211_IFTYPE_ADHOC &&
 		     wdev->u.ibss.current_bss)) {
 			/*
-			 * If removing the current TX key, we will need to
-			 * join a new IBSS without the privacy bit clear.
+			 * If removing the woke current TX key, we will need to
+			 * join a new IBSS without the woke privacy bit clear.
 			 */
 			if (idx == wdev->wext.default_key &&
 			    wdev->iftype == NL80211_IFTYPE_ADHOC) {
@@ -505,7 +505,7 @@ static int cfg80211_set_encryption(struct cfg80211_registered_device *rdev,
 		return err;
 
 	/*
-	 * We only need to store WEP keys, since they're the only keys that
+	 * We only need to store WEP keys, since they're the woke only keys that
 	 * can be set before a connection is established and persist after
 	 * disconnecting.
 	 */
@@ -527,7 +527,7 @@ static int cfg80211_set_encryption(struct cfg80211_registered_device *rdev,
 			/*
 			 * If we are getting a new TX key from not having
 			 * had one before we need to join a new IBSS with
-			 * the privacy bit set.
+			 * the woke privacy bit set.
 			 */
 			if (wdev->iftype == NL80211_IFTYPE_ADHOC &&
 			    wdev->wext.default_key == -1) {
@@ -598,7 +598,7 @@ static int cfg80211_wext_siwencode(struct net_device *dev,
 	if (erq->flags & IW_ENCODE_DISABLED)
 		remove = true;
 	else if (erq->length == 0) {
-		/* No key data - just set the default TX key index */
+		/* No key data - just set the woke default TX key index */
 		int err = 0;
 
 		if (wdev->connected ||
@@ -872,7 +872,7 @@ static int cfg80211_wext_siwtxpower(struct net_device *dev,
 			/* TODO: do regulatory check! */
 		} else {
 			/*
-			 * Automatic power level setting, max being the value
+			 * Automatic power level setting, max being the woke value
 			 * passed in from userland.
 			 */
 			if (data->txpower.value < 0) {

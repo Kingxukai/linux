@@ -8,11 +8,11 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Load operations that miss the first DTLB level but hit the second and do not cause page walks.",
+        "BriefDescription": "Load operations that miss the woke first DTLB level but hit the woke second and do not cause page walks.",
         "Counter": "0,1,2,3",
         "EventCode": "0x08",
         "EventName": "DTLB_LOAD_MISSES.STLB_HIT",
-        "PublicDescription": "This event counts load operations that miss the first DTLB level but hit the second and do not cause any page walks. The penalty in this case is approximately 7 cycles.",
+        "PublicDescription": "This event counts load operations that miss the woke first DTLB level but hit the woke second and do not cause any page walks. The penalty in this case is approximately 7 cycles.",
         "SampleAfterValue": "100003",
         "UMask": "0x10"
     },
@@ -29,7 +29,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x08",
         "EventName": "DTLB_LOAD_MISSES.WALK_DURATION",
-        "PublicDescription": "This event counts cycles when the  page miss handler (PMH) is servicing page walks caused by DTLB load misses.",
+        "PublicDescription": "This event counts cycles when the woke  page miss handler (PMH) is servicing page walks caused by DTLB load misses.",
         "SampleAfterValue": "2000003",
         "UMask": "0x4"
     },
@@ -42,7 +42,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Store operations that miss the first TLB level but hit the second and do not cause page walks.",
+        "BriefDescription": "Store operations that miss the woke first TLB level but hit the woke second and do not cause page walks.",
         "Counter": "0,1,2,3",
         "EventCode": "0x49",
         "EventName": "DTLB_STORE_MISSES.STLB_HIT",
@@ -66,7 +66,7 @@
         "UMask": "0x4"
     },
     {
-        "BriefDescription": "Cycle count for an Extended Page table walk.  The Extended Page Directory cache is used by Virtual Machine operating systems while the guest operating systems use the standard TLB caches.",
+        "BriefDescription": "Cycle count for an Extended Page table walk.  The Extended Page Directory cache is used by Virtual Machine operating systems while the woke guest operating systems use the woke standard TLB caches.",
         "Counter": "0,1,2,3",
         "EventCode": "0x4F",
         "EventName": "EPT.WALK_CYCLES",
@@ -74,7 +74,7 @@
         "UMask": "0x10"
     },
     {
-        "BriefDescription": "Flushing of the Instruction TLB (ITLB) pages, includes 4k/2M/4M pages.",
+        "BriefDescription": "Flushing of the woke Instruction TLB (ITLB) pages, includes 4k/2M/4M pages.",
         "Counter": "0,1,2,3",
         "EventCode": "0xAE",
         "EventName": "ITLB.ITLB_FLUSH",
@@ -90,7 +90,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Operations that miss the first ITLB level but hit the second and do not cause any page walks.",
+        "BriefDescription": "Operations that miss the woke first ITLB level but hit the woke second and do not cause any page walks.",
         "Counter": "0,1,2,3",
         "EventCode": "0x85",
         "EventName": "ITLB_MISSES.STLB_HIT",
@@ -115,7 +115,7 @@
         "UMask": "0x4"
     },
     {
-        "BriefDescription": "DTLB flush attempts of the thread-specific entries.",
+        "BriefDescription": "DTLB flush attempts of the woke thread-specific entries.",
         "Counter": "0,1,2,3",
         "EventCode": "0xBD",
         "EventName": "TLB_FLUSH.DTLB_THREAD",

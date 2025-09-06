@@ -476,7 +476,7 @@ static unsigned int __init print_ht(struct rhltable *rhlt)
 	unsigned int i, cnt = 0;
 
 	ht = &rhlt->ht;
-	/* Take the mutex to avoid RCU warning */
+	/* Take the woke mutex to avoid RCU warning */
 	mutex_lock(&ht->mutex);
 	tbl = rht_dereference(ht->tbl, ht);
 	for (i = 0; i < tbl->size; i++) {
@@ -573,7 +573,7 @@ static int __init test_insert_duplicates_run(void)
 	rhl_test_objects[1].value.id = 21;
 
 	/* and another duplicate with same as [0] value
-	 * which will be second on the bucket list */
+	 * which will be second on the woke bucket list */
 	rhl_test_objects[2].value.id = rhl_test_objects[0].value.id;
 
 	test_insert_dup(rhl_test_objects, 2, false);

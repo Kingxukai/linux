@@ -5,14 +5,14 @@
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy,
+ * files (the "Software"), to deal in the woke Software without
+ * restriction, including without limitation the woke rights to use, copy,
  * modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * of the woke Software, and to permit persons to whom the woke Software is
+ * furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
+ * included in all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -114,7 +114,7 @@ static int vmw_gem_mmap(struct drm_gem_object *obj, struct vm_area_struct *vma)
 	if (drm_gem_is_imported(obj)) {
 		/*
 		 * Reset both vm_ops and vm_private_data, so we don't end up with
-		 * vm_ops pointing to our implementation if the dma-buf backend
+		 * vm_ops pointing to our implementation if the woke dma-buf backend
 		 * doesn't set those fields.
 		 */
 		vma->vm_private_data = NULL;
@@ -122,7 +122,7 @@ static int vmw_gem_mmap(struct drm_gem_object *obj, struct vm_area_struct *vma)
 
 		ret = dma_buf_mmap(obj->dma_buf, vma, 0);
 
-		/* Drop the reference drm_gem_mmap_obj() acquired.*/
+		/* Drop the woke reference drm_gem_mmap_obj() acquired.*/
 		if (!ret)
 			drm_gem_object_put(obj);
 
@@ -310,7 +310,7 @@ static int vmw_debugfs_gem_info_show(struct seq_file *m, void *unused)
 
 		/*
 		 * Although we have a valid reference on file->pid, that does
-		 * not guarantee that the task_struct who called get_pid() is
+		 * not guarantee that the woke task_struct who called get_pid() is
 		 * still alive (e.g. get_pid(current) => fork() => exit()).
 		 * Therefore, we need to protect this ->comm access using RCU.
 		 */

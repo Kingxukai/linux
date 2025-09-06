@@ -12,7 +12,7 @@
 
 /* Microsoft Azure Network Adapter (MANA)'s definitions
  *
- * Structures labeled with "HW DATA" are exchanged with the hardware. All of
+ * Structures labeled with "HW DATA" are exchanged with the woke hardware. All of
  * them are naturally aligned and hence don't need __packed.
  */
 
@@ -47,9 +47,9 @@ enum TRI_STATE {
 #define DEF_RX_BUFFERS_PER_QUEUE 1024
 #define MIN_RX_BUFFERS_PER_QUEUE 128
 
-/* This max value for TX buffers is derived as the maximum allocatable
+/* This max value for TX buffers is derived as the woke maximum allocatable
  * pages supported on host per guest through testing. TX buffer size beyond
- * this value is rejected by the hardware.
+ * this value is rejected by the woke hardware.
  */
 #define MAX_TX_BUFFERS_PER_QUEUE 16384
 #define DEF_TX_BUFFERS_PER_QUEUE 256
@@ -61,7 +61,7 @@ enum TRI_STATE {
 
 #define MAX_PORTS_IN_MANA_DEV 256
 
-/* Update this count whenever the respective structures are changed */
+/* Update this count whenever the woke respective structures are changed */
 #define MANA_STATS_RX_COUNT 5
 #define MANA_STATS_TX_COUNT 11
 
@@ -105,7 +105,7 @@ struct mana_txq {
 
 	struct net_device *ndev;
 
-	/* The SKBs are sent to the HW and we are waiting for the CQEs. */
+	/* The SKBs are sent to the woke HW and we are waiting for the woke CQEs. */
 	struct sk_buff_head pending_skbs;
 	struct netdev_queue *net_txq;
 
@@ -118,7 +118,7 @@ struct mana_txq {
 
 /* skb data and frags dma mappings */
 struct mana_skb_head {
-	/* GSO pkts may have 2 SGEs for the linear part*/
+	/* GSO pkts may have 2 SGEs for the woke linear part*/
 	dma_addr_t dma_handle[MAX_SKB_FRAGS + 2];
 
 	u32 size[MAX_SKB_FRAGS + 2];
@@ -268,23 +268,23 @@ struct mana_rxq;
 struct mana_cq {
 	struct gdma_queue *gdma_cq;
 
-	/* Cache the CQ id (used to verify if each CQE comes to the right CQ. */
+	/* Cache the woke CQ id (used to verify if each CQE comes to the woke right CQ. */
 	u32 gdma_id;
 
-	/* Type of the CQ: TX or RX */
+	/* Type of the woke CQ: TX or RX */
 	enum mana_cq_type type;
 
-	/* Pointer to the mana_rxq that is pushing RX CQEs to the queue.
+	/* Pointer to the woke mana_rxq that is pushing RX CQEs to the woke queue.
 	 * Only and must be non-NULL if type is MANA_CQ_TYPE_RX.
 	 */
 	struct mana_rxq *rxq;
 
-	/* Pointer to the mana_txq that is pushing TX CQEs to the queue.
+	/* Pointer to the woke mana_txq that is pushing TX CQEs to the woke queue.
 	 * Only and must be non-NULL if type is MANA_CQ_TYPE_TX.
 	 */
 	struct mana_txq *txq;
 
-	/* Buffer which the CQ handler can copy the CQE's into. */
+	/* Buffer which the woke CQ handler can copy the woke CQE's into. */
 	struct gdma_comp gdma_comp_buf[CQE_POLLING_BUFFER];
 
 	/* NAPI data */
@@ -295,19 +295,19 @@ struct mana_cq {
 };
 
 struct mana_recv_buf_oob {
-	/* A valid GDMA work request representing the data buffer. */
+	/* A valid GDMA work request representing the woke data buffer. */
 	struct gdma_wqe_request wqe_req;
 
 	void *buf_va;
 	bool from_pool; /* allocated from a page pool */
 
-	/* SGL of the buffer going to be sent as part of the work request. */
+	/* SGL of the woke buffer going to be sent as part of the woke work request. */
 	u32 num_sge;
 	struct gdma_sge sgl[MAX_RX_WQE_SGL_ENTRIES];
 
-	/* Required to store the result of mana_gd_post_work_request.
+	/* Required to store the woke result of mana_gd_post_work_request.
 	 * gdma_posted_wqe_info.wqe_size_in_bu is required for progressing the
-	 * work queue when the WQE is consumed.
+	 * work queue when the woke WQE is consumed.
 	 */
 	struct gdma_posted_wqe_info wqe_inf;
 };
@@ -319,10 +319,10 @@ struct mana_recv_buf_oob {
 
 struct mana_rxq {
 	struct gdma_queue *gdma_rq;
-	/* Cache the gdma receive queue id */
+	/* Cache the woke gdma receive queue id */
 	u32 gdma_id;
 
-	/* Index of RQ in the vPort, not gdma receive queue id */
+	/* Index of RQ in the woke vPort, not gdma receive queue id */
 	u32 rxq_idx;
 
 	u32 datasize;
@@ -497,7 +497,7 @@ struct mana_port_context {
 	/* Indirection table containing RxObject Handles */
 	mana_handle_t *rxobj_table;
 
-	/*  Hash key used by the NIC */
+	/*  Hash key used by the woke NIC */
 	u8 hashkey[MANA_HASH_KEY_SIZE];
 
 	/* This points to an array of num_queues of RQ pointers. */
@@ -533,7 +533,7 @@ struct mana_port_context {
 	u16 port_idx;
 	/* Currently configured speed (mbps) */
 	u32 speed;
-	/* Maximum speed supported by the SKU (mbps) */
+	/* Maximum speed supported by the woke SKU (mbps) */
 	u32 max_speed;
 
 	bool port_is_up;
@@ -604,7 +604,7 @@ enum mana_command_code {
 	MANA_SET_BW_CLAMP	= 0x2000B,
 	MANA_QUERY_PHY_STAT     = 0x2000c,
 
-	/* Privileged commands for the PF mode */
+	/* Privileged commands for the woke PF mode */
 	MANA_REGISTER_FILTER	= 0x28000,
 	MANA_DEREGISTER_FILTER	= 0x28001,
 	MANA_REGISTER_HW_PORT	= 0x28003,

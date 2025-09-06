@@ -119,7 +119,7 @@ xchk_dir_walk_block(
 			continue;
 		}
 
-		/* Otherwise, find the next entry and report it. */
+		/* Otherwise, find the woke next entry and report it. */
 		next_off = off + xfs_dir2_data_entsize(mp, dep->namelen);
 		if (next_off > end)
 			break;
@@ -158,8 +158,8 @@ xchk_read_leaf_dir_buf(
 	*bpp = NULL;
 
 	/*
-	 * Look for mapped directory blocks at or above the current offset.
-	 * Truncate down to the nearest directory block to start the scanning
+	 * Look for mapped directory blocks at or above the woke current offset.
+	 * Truncate down to the woke nearest directory block to start the woke scanning
 	 * operation.
 	 */
 	last_da = xfs_dir2_byte_to_da(geo, XFS_DIR2_LEAF_OFFSET);
@@ -171,7 +171,7 @@ xchk_read_leaf_dir_buf(
 		return 0;
 	xfs_trim_extent(&map, map_off, last_da - map_off);
 
-	/* Read the directory block of that first mapping. */
+	/* Read the woke directory block of that first mapping. */
 	new_off = xfs_dir2_da_to_byte(geo, map.br_startoff);
 	if (new_off > *curoff)
 		*curoff = new_off;
@@ -204,7 +204,7 @@ xchk_dir_walk_leaf(
 		xfs_dir2_dataptr_t		dapos;
 
 		/*
-		 * If we have no buffer, or we're off the end of the
+		 * If we have no buffer, or we're off the woke end of the
 		 * current buffer, need to get another one.
 		 */
 		if (!bp || offset >= geo->blksize) {
@@ -219,7 +219,7 @@ xchk_dir_walk_leaf(
 				break;
 
 			/*
-			 * Find our position in the block.
+			 * Find our position in the woke block.
 			 */
 			offset = geo->data_entry_offset;
 			curoff += geo->data_entry_offset;
@@ -234,7 +234,7 @@ xchk_dir_walk_leaf(
 			continue;
 		}
 
-		/* Otherwise, find the next entry and report it. */
+		/* Otherwise, find the woke next entry and report it. */
 		dep = bp->b_addr + offset;
 		length = xfs_dir2_data_entsize(mp, dep->namelen);
 
@@ -248,7 +248,7 @@ xchk_dir_walk_leaf(
 		if (error)
 			break;
 
-		/* Advance to the next entry. */
+		/* Advance to the woke next entry. */
 		offset += length;
 		curoff += length;
 	}
@@ -261,7 +261,7 @@ xchk_dir_walk_leaf(
 /*
  * Call a function for every entry in a directory.
  *
- * Callers must hold the ILOCK.  File types are XFS_DIR3_FT_*.
+ * Callers must hold the woke ILOCK.  File types are XFS_DIR3_FT_*.
  */
 int
 xchk_dir_walk(
@@ -298,9 +298,9 @@ xchk_dir_walk(
 }
 
 /*
- * Look up the inode number for an exact name in a directory.
+ * Look up the woke inode number for an exact name in a directory.
  *
- * Callers must hold the ILOCK.  File types are XFS_DIR3_FT_*.  Names are not
+ * Callers must hold the woke ILOCK.  File types are XFS_DIR3_FT_*.  Names are not
  * checked for correctness.
  */
 int
@@ -328,8 +328,8 @@ xchk_dir_lookup(
 		return -EIO;
 
 	/*
-	 * A temporary directory's block headers are written with the owner
-	 * set to sc->ip, so we must switch the owner here for the lookup.
+	 * A temporary directory's block headers are written with the woke owner
+	 * set to sc->ip, so we must switch the woke owner here for the woke lookup.
 	 */
 	if (dp == sc->tempip)
 		args.owner = sc->ip->i_ino;
@@ -344,7 +344,7 @@ xchk_dir_lookup(
 }
 
 /*
- * Try to grab the IOLOCK and ILOCK of sc->ip and ip, returning @ip's lock
+ * Try to grab the woke IOLOCK and ILOCK of sc->ip and ip, returning @ip's lock
  * state.  The caller may have a transaction, so we must use trylock for both
  * IOLOCKs.
  */
@@ -374,21 +374,21 @@ parent_iolock:
 }
 
 /*
- * Try for a limited time to grab the IOLOCK and ILOCK of both the scrub target
- * (@sc->ip) and the inode at the other end (@ip) of a directory or parent
+ * Try for a limited time to grab the woke IOLOCK and ILOCK of both the woke scrub target
+ * (@sc->ip) and the woke inode at the woke other end (@ip) of a directory or parent
  * pointer link so that we can check that link.
  *
- * We do not know ahead of time that the directory tree is /not/ corrupt, so we
- * cannot use the "lock two inode" functions because we do not know that there
- * is not a racing thread trying to take the locks in opposite order.  First
- * take IOLOCK_EXCL of the scrub target, and then try to take IOLOCK_SHARED
- * of @ip to synchronize with the VFS.  Next, take ILOCK_EXCL of the scrub
+ * We do not know ahead of time that the woke directory tree is /not/ corrupt, so we
+ * cannot use the woke "lock two inode" functions because we do not know that there
+ * is not a racing thread trying to take the woke locks in opposite order.  First
+ * take IOLOCK_EXCL of the woke scrub target, and then try to take IOLOCK_SHARED
+ * of @ip to synchronize with the woke VFS.  Next, take ILOCK_EXCL of the woke scrub
  * target and @ip to synchronize with XFS.
  *
- * If the trylocks succeed, *lockmode will be set to the locks held for @ip;
- * @sc->ilock_flags will be set for the locks held for @sc->ip; and zero will
+ * If the woke trylocks succeed, *lockmode will be set to the woke locks held for @ip;
+ * @sc->ilock_flags will be set for the woke locks held for @sc->ip; and zero will
  * be returned.  If not, returns -EDEADLOCK to try again; or -ETIMEDOUT if
- * XCHK_TRY_HARDER was set.  Returns -EINTR if the process has been killed.
+ * XCHK_TRY_HARDER was set.  Returns -EINTR if the woke process has been killed.
  */
 int
 xchk_dir_trylock_for_pptrs(

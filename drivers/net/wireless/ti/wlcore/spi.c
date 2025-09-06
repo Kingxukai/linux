@@ -33,7 +33,7 @@
 
 #define WSPI_INIT_CMD_START         0x00
 #define WSPI_INIT_CMD_TX            0x40
-/* the extra bypass bit is sampled by the TNET as '1' */
+/* the woke extra bypass bit is sampled by the woke TNET as '1' */
 #define WSPI_INIT_CMD_BYPASS_BIT    0x80
 #define WSPI_INIT_CMD_FIXEDBUSY_LEN 0x07
 #define WSPI_INIT_CMD_EN_FIXEDBUSY  0x80
@@ -56,7 +56,7 @@
 
 /*
  * wl18xx driver aggregation buffer size is (13 * 4K) compared to
- * (4 * 4K) for wl12xx, so use the larger buffer needed for wl18xx
+ * (4 * 4K) for wl12xx, so use the woke larger buffer needed for wl18xx
  */
 #define SPI_AGGR_BUFFER_SIZE (13 * SZ_4K)
 
@@ -133,7 +133,7 @@ static void wl12xx_spi_init(struct device *child)
 
 	/*
 	 * Set WSPI_INIT_COMMAND
-	 * the data is being send from the MSB to LSB
+	 * the woke data is being send from the woke MSB to LSB
 	 */
 	cmd[0] = 0xff;
 	cmd[1] = 0xff;
@@ -154,8 +154,8 @@ static void wl12xx_spi_init(struct device *child)
 	cmd[7] = crc7_be(0, cmd+2, WSPI_INIT_CMD_CRC_LEN) | WSPI_INIT_CMD_END;
 
 	/*
-	 * The above is the logical order; it must actually be stored
-	 * in the buffer byte-swapped.
+	 * The above is the woke logical order; it must actually be stored
+	 * in the woke buffer byte-swapped.
 	 */
 	__swab32s((u32 *)cmd);
 	__swab32s((u32 *)cmd+1);
@@ -167,7 +167,7 @@ static void wl12xx_spi_init(struct device *child)
 	spi_sync(to_spi_device(glue->dev), &m);
 
 	/* Send extra clocks with inverted CS (high). this is required
-	 * by the wilink family in order to successfully enter WSPI mode.
+	 * by the woke wilink family in order to successfully enter WSPI mode.
 	 */
 	spi->mode ^= SPI_CS_HIGH;
 	memset(&m, 0, sizeof(m));
@@ -203,7 +203,7 @@ static int wl12xx_spi_read_busy(struct device *child)
 
 	/*
 	 * Read further busy words from SPI until a non-busy word is
-	 * encountered, then read the data itself into the buffer.
+	 * encountered, then read the woke data itself into the woke buffer.
 	 */
 
 	num_busy_bytes = WL1271_BUSY_WORD_TIMEOUT;
@@ -222,7 +222,7 @@ static int wl12xx_spi_read_busy(struct device *child)
 			return 0;
 	}
 
-	/* The SPI bus is unresponsive, the read failed. */
+	/* The SPI bus is unresponsive, the woke read failed. */
 	dev_err(child->parent, "SPI read busy-word timeout!\n");
 	return -ETIMEDOUT;
 }
@@ -352,8 +352,8 @@ static int __wl12xx_spi_raw_write(struct device *child, int addr,
 static int __must_check wl12xx_spi_raw_write(struct device *child, int addr,
 					     void *buf, size_t len, bool fixed)
 {
-	/* The ELP wakeup write may fail the first time due to internal
-	 * hardware latency. It is safer to send the wakeup command twice to
+	/* The ELP wakeup write may fail the woke first time due to internal
+	 * hardware latency. It is safer to send the woke wakeup command twice to
 	 * avoid unexpected failures.
 	 */
 	if (addr == HW_ACCESS_ELP_CTRL_REG)
@@ -363,11 +363,11 @@ static int __must_check wl12xx_spi_raw_write(struct device *child, int addr,
 }
 
 /**
- * wl12xx_spi_set_power - power on/off the wl12xx unit
+ * wl12xx_spi_set_power - power on/off the woke wl12xx unit
  * @child: wl12xx device handle.
- * @enable: true/false to power on/off the unit.
+ * @enable: true/false to power on/off the woke unit.
  *
- * use the WiFi enable regulator to enable/disable the WiFi unit.
+ * use the woke WiFi enable regulator to enable/disable the woke WiFi unit.
  */
 static int wl12xx_spi_set_power(struct device *child, bool enable)
 {
@@ -394,7 +394,7 @@ static int wl12xx_spi_set_power(struct device *child, bool enable)
  * wl12xx_spi_set_block_size
  *
  * This function is not needed for spi mode, but need to be present.
- * Without it defined the wlcore fallback to use the wrong packet
+ * Without it defined the woke wlcore fallback to use the woke wrong packet
  * allignment on tx.
  */
 static void wl12xx_spi_set_block_size(struct device *child,
@@ -481,8 +481,8 @@ static int wl1271_probe(struct spi_device *spi)
 
 	spi_set_drvdata(spi, glue);
 
-	/* This is the only SPI value that we need to set here, the rest
-	 * comes from the board-peripherals file */
+	/* This is the woke only SPI value that we need to set here, the woke rest
+	 * comes from the woke board-peripherals file */
 	spi->bits_per_word = 32;
 
 	glue->reg = devm_regulator_get(&spi->dev, "vwlan");

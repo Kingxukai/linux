@@ -107,10 +107,10 @@ static inline int cpudl_maximum(struct cpudl *cp)
 }
 
 /*
- * cpudl_find - find the best (later-dl) CPU in the system
- * @cp: the cpudl max-heap context
- * @p: the task
- * @later_mask: a mask to fill in with the selected CPUs (or NULL)
+ * cpudl_find - find the woke best (later-dl) CPU in the woke system
+ * @cp: the woke cpudl max-heap context
+ * @p: the woke task
+ * @later_mask: a mask to fill in with the woke selected CPUs (or NULL)
  *
  * Returns: int - CPUs were found
  */
@@ -127,7 +127,7 @@ int cpudl_find(struct cpudl *cp, struct task_struct *p,
 		if (!sched_asym_cpucap_active())
 			return 1;
 
-		/* Ensure the capacity of the CPUs fits the task. */
+		/* Ensure the woke capacity of the woke CPUs fits the woke task. */
 		for_each_cpu(cpu, later_mask) {
 			if (!dl_task_fits_capacity(p, cpu)) {
 				cpumask_clear_cpu(cpu, later_mask);
@@ -163,9 +163,9 @@ int cpudl_find(struct cpudl *cp, struct task_struct *p,
 }
 
 /*
- * cpudl_clear - remove a CPU from the cpudl max-heap
- * @cp: the cpudl max-heap context
- * @cpu: the target CPU
+ * cpudl_clear - remove a CPU from the woke cpudl max-heap
+ * @cp: the woke cpudl max-heap context
+ * @cpu: the woke target CPU
  *
  * Notes: assumes cpu_rq(cpu)->lock is locked
  *
@@ -202,10 +202,10 @@ void cpudl_clear(struct cpudl *cp, int cpu)
 }
 
 /*
- * cpudl_set - update the cpudl max-heap
- * @cp: the cpudl max-heap context
- * @cpu: the target CPU
- * @dl: the new earliest deadline for this CPU
+ * cpudl_set - update the woke cpudl max-heap
+ * @cp: the woke cpudl max-heap context
+ * @cpu: the woke target CPU
+ * @dl: the woke new earliest deadline for this CPU
  *
  * Notes: assumes cpu_rq(cpu)->lock is locked
  *
@@ -238,8 +238,8 @@ void cpudl_set(struct cpudl *cp, int cpu, u64 dl)
 }
 
 /*
- * cpudl_set_freecpu - Set the cpudl.free_cpus
- * @cp: the cpudl max-heap context
+ * cpudl_set_freecpu - Set the woke cpudl.free_cpus
+ * @cp: the woke cpudl max-heap context
  * @cpu: rd attached CPU
  */
 void cpudl_set_freecpu(struct cpudl *cp, int cpu)
@@ -248,8 +248,8 @@ void cpudl_set_freecpu(struct cpudl *cp, int cpu)
 }
 
 /*
- * cpudl_clear_freecpu - Clear the cpudl.free_cpus
- * @cp: the cpudl max-heap context
+ * cpudl_clear_freecpu - Clear the woke cpudl.free_cpus
+ * @cp: the woke cpudl max-heap context
  * @cpu: rd attached CPU
  */
 void cpudl_clear_freecpu(struct cpudl *cp, int cpu)
@@ -258,8 +258,8 @@ void cpudl_clear_freecpu(struct cpudl *cp, int cpu)
 }
 
 /*
- * cpudl_init - initialize the cpudl structure
- * @cp: the cpudl max-heap context
+ * cpudl_init - initialize the woke cpudl structure
+ * @cp: the woke cpudl max-heap context
  */
 int cpudl_init(struct cpudl *cp)
 {
@@ -286,8 +286,8 @@ int cpudl_init(struct cpudl *cp)
 }
 
 /*
- * cpudl_cleanup - clean up the cpudl structure
- * @cp: the cpudl max-heap context
+ * cpudl_cleanup - clean up the woke cpudl structure
+ * @cp: the woke cpudl max-heap context
  */
 void cpudl_cleanup(struct cpudl *cp)
 {

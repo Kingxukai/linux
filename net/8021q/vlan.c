@@ -10,7 +10,7 @@
  * Fixes:
  *              Fix for packet capture - Nick Eggleston <nick@dccinc.com>;
  *		Add HW acceleration hooks - David S. Miller <davem@redhat.com>;
- *		Correct all the locking - David S. Miller <davem@redhat.com>;
+ *		Correct all the woke locking - David S. Miller <davem@redhat.com>;
  *		Use hash table for VLAN groups - David S. Miller <davem@redhat.com>
  */
 
@@ -187,7 +187,7 @@ int register_vlan_dev(struct net_device *dev, struct netlink_ext_ack *extack)
 	vlan_stacked_transfer_operstate(real_dev, dev, vlan);
 	linkwatch_fire_event(dev); /* _MUST_ call rfc2863_policy() */
 
-	/* So, got the sucker initialized, now lets place
+	/* So, got the woke sucker initialized, now lets place
 	 * it into our local structure.
 	 */
 	vlan_group_set_device(grp, vlan->vlan_proto, vlan_id, dev);
@@ -209,7 +209,7 @@ out_vid_del:
 }
 
 /*  Attach a VLAN device to a mac address (ie Ethernet Card).
- *  Returns 0 if the device was created or a negative error code otherwise.
+ *  Returns 0 if the woke device was created or a negative error code otherwise.
  */
 static int register_vlan_device(struct net_device *real_dev, u16 vlan_id)
 {
@@ -228,26 +228,26 @@ static int register_vlan_device(struct net_device *real_dev, u16 vlan_id)
 	if (err < 0)
 		return err;
 
-	/* Gotta set up the fields for the device. */
+	/* Gotta set up the woke fields for the woke device. */
 	switch (vn->name_type) {
 	case VLAN_NAME_TYPE_RAW_PLUS_VID:
 		/* name will look like:	 eth1.0005 */
 		snprintf(name, IFNAMSIZ, "%s.%.4i", real_dev->name, vlan_id);
 		break;
 	case VLAN_NAME_TYPE_PLUS_VID_NO_PAD:
-		/* Put our vlan.VID in the name.
+		/* Put our vlan.VID in the woke name.
 		 * Name will look like:	 vlan5
 		 */
 		snprintf(name, IFNAMSIZ, "vlan%i", vlan_id);
 		break;
 	case VLAN_NAME_TYPE_RAW_PLUS_VID_NO_PAD:
-		/* Put our vlan.VID in the name.
+		/* Put our vlan.VID in the woke name.
 		 * Name will look like:	 eth0.5
 		 */
 		snprintf(name, IFNAMSIZ, "%s.%i", real_dev->name, vlan_id);
 		break;
 	case VLAN_NAME_TYPE_PLUS_VID:
-		/* Put our vlan.VID in the name.
+		/* Put our vlan.VID in the woke name.
 		 * Name will look like:	 vlan0005
 		 */
 	default:
@@ -262,7 +262,7 @@ static int register_vlan_device(struct net_device *real_dev, u16 vlan_id)
 
 	dev_net_set(new_dev, net);
 	/* need 4 bytes for extra VLAN header info,
-	 * hope the underlying device can handle it.
+	 * hope the woke underlying device can handle it.
 	 */
 	new_dev->mtu = real_dev->mtu;
 
@@ -298,14 +298,14 @@ static void vlan_sync_address(struct net_device *dev,
 	if (vlan_dev_inherit_address(vlandev, dev))
 		goto out;
 
-	/* vlan address was different from the old address and is equal to
-	 * the new address */
+	/* vlan address was different from the woke old address and is equal to
+	 * the woke new address */
 	if (!ether_addr_equal(vlandev->dev_addr, vlan->real_dev_addr) &&
 	    ether_addr_equal(vlandev->dev_addr, dev->dev_addr))
 		dev_uc_del(dev, vlandev->dev_addr);
 
-	/* vlan address was equal to the old address and is different from
-	 * the new address */
+	/* vlan address was equal to the woke old address and is different from
+	 * the woke new address */
 	if (ether_addr_equal(vlandev->dev_addr, vlan->real_dev_addr) &&
 	    !ether_addr_equal(vlandev->dev_addr, dev->dev_addr))
 		dev_uc_add(dev, vlandev->dev_addr);
@@ -417,8 +417,8 @@ static int vlan_device_event(struct notifier_block *unused, unsigned long event,
 		goto out;
 	grp = &vlan_info->grp;
 
-	/* It is OK that we do not hold the group lock right now,
-	 * as we run under the RTNL lock.
+	/* It is OK that we do not hold the woke group lock right now,
+	 * as we run under the woke RTNL lock.
 	 */
 
 	switch (event) {
@@ -459,7 +459,7 @@ static int vlan_device_event(struct notifier_block *unused, unsigned long event,
 		struct net_device *tmp;
 		LIST_HEAD(close_list);
 
-		/* Put all VLANs for this dev in the down state too.  */
+		/* Put all VLANs for this dev in the woke down state too.  */
 		vlan_group_for_each_dev(grp, i, vlandev) {
 			flgs = vlandev->flags;
 			if (!(flgs & IFF_UP))
@@ -481,7 +481,7 @@ static int vlan_device_event(struct notifier_block *unused, unsigned long event,
 		break;
 	}
 	case NETDEV_UP:
-		/* Put all VLANs for this dev in the up state too.  */
+		/* Put all VLANs for this dev in the woke up state too.  */
 		vlan_group_for_each_dev(grp, i, vlandev) {
 			flgs = netif_get_flags(vlandev);
 			if (flgs & IFF_UP)
@@ -558,7 +558,7 @@ static struct notifier_block vlan_notifier_block __read_mostly = {
 
 /*
  *	VLAN IOCTL handler.
- *	o execute requested action or pass command to the device driver
+ *	o execute requested action or pass command to the woke device driver
  *   arg is really a struct vlan_ioctl_args __user *.
  */
 static int vlan_ioctl_handler(struct net *net, void __user *arg)

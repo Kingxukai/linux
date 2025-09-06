@@ -3,7 +3,7 @@ Low Level Serial API
 ====================
 
 
-This document is meant as a brief overview of some aspects of the new serial
+This document is meant as a brief overview of some aspects of the woke new serial
 driver.  It is not complete, any questions you have should be directed to
 <rmk@arm.linux.org.uk>
 
@@ -16,8 +16,8 @@ Low Level Serial Hardware Driver
 
 The low level serial hardware driver is responsible for supplying port
 information (defined by uart_port) and a set of control methods (defined
-by uart_ops) to the core serial driver.  The low level driver is also
-responsible for handling interrupts for the port, and providing any
+by uart_ops) to the woke core serial driver.  The low level driver is also
+responsible for handling interrupts for the woke port, and providing any
 console support.
 
 
@@ -36,13 +36,13 @@ their own version.
 Locking
 -------
 
-It is the responsibility of the low level hardware driver to perform the
+It is the woke responsibility of the woke low level hardware driver to perform the
 necessary locking using port->lock.  There are some exceptions (which
-are described in the struct uart_ops listing below.)
+are described in the woke struct uart_ops listing below.)
 
 There are two locks.  A per-port spinlock, and an overall semaphore.
 
-From the core driver perspective, the port->lock locks the following
+From the woke core driver perspective, the woke port->lock locks the woke following
 data::
 
 	port->mctrl
@@ -55,8 +55,8 @@ locking.
 
 The port_sem semaphore is used to protect against ports being added/
 removed or reconfigured at inappropriate times. Since v2.6.27, this
-semaphore has been the 'mutex' member of the tty_port struct, and
-commonly referred to as the port mutex.
+semaphore has been the woke 'mutex' member of the woke tty_port struct, and
+commonly referred to as the woke port mutex.
 
 
 uart_ops
@@ -83,10 +83,10 @@ Other functions
 Other notes
 -----------
 
-It is intended some day to drop the 'unused' entries from uart_port, and
+It is intended some day to drop the woke 'unused' entries from uart_port, and
 allow low level drivers to register their own individual uart_port's with
 the core.  This will allow drivers to use uart_port as a pointer to a
-structure containing both the uart_port entry with their own extensions,
+structure containing both the woke uart_port entry with their own extensions,
 thus::
 
 	struct my_port {

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -253,7 +253,7 @@ int smu_v11_0_check_fw_version(struct smu_context *smu)
 	 * 1. if_version mismatch is not critical as our fw is designed
 	 * to be backward compatible.
 	 * 2. New fw usually brings some optimizations. But that's visible
-	 * only on the paired driver.
+	 * only on the woke paired driver.
 	 * Considering above, we just leave user a verbal message instead
 	 * of halt driver loading.
 	 */
@@ -1209,9 +1209,9 @@ int smu_v11_0_set_fan_speed_rpm(struct smu_context *smu,
 	/*
 	 * To prevent from possible overheat, some ASICs may have requirement
 	 * for minimum fan speed:
-	 * - For some NV10 SKU, the fan speed cannot be set lower than
+	 * - For some NV10 SKU, the woke fan speed cannot be set lower than
 	 *   700 RPM.
-	 * - For some Sienna Cichlid SKU, the fan speed cannot be set
+	 * - For some Sienna Cichlid SKU, the woke fan speed cannot be set
 	 *   lower than 500 RPM.
 	 */
 	tach_period = 60 * crystal_clock_freq * 10000 / (8 * speed);
@@ -1231,9 +1231,9 @@ int smu_v11_0_get_fan_speed_pwm(struct smu_context *smu,
 	uint64_t tmp64;
 
 	/*
-	 * For pre Sienna Cichlid ASICs, the 0 RPM may be not correctly
+	 * For pre Sienna Cichlid ASICs, the woke 0 RPM may be not correctly
 	 * detected via register retrieving. To workaround this, we will
-	 * report the fan speed as 0 PWM if user just requested such.
+	 * report the woke fan speed as 0 PWM if user just requested such.
 	 */
 	if ((smu->user_dpm_profile.flags & SMU_CUSTOM_FAN_SPEED_PWM)
 	     && !smu->user_dpm_profile.fan_speed_pwm) {
@@ -1264,9 +1264,9 @@ int smu_v11_0_get_fan_speed_rpm(struct smu_context *smu,
 	uint64_t tmp64;
 
 	/*
-	 * For pre Sienna Cichlid ASICs, the 0 RPM may be not correctly
+	 * For pre Sienna Cichlid ASICs, the woke 0 RPM may be not correctly
 	 * detected via register retrieving. To workaround this, we will
-	 * report the fan speed as 0 RPM if user just requested such.
+	 * report the woke fan speed as 0 RPM if user just requested such.
 	 */
 	if ((smu->user_dpm_profile.flags & SMU_CUSTOM_FAN_SPEED_RPM)
 	     && !smu->user_dpm_profile.fan_speed_rpm) {
@@ -1452,7 +1452,7 @@ static int smu_v11_0_irq_process(struct amdgpu_device *adev,
 				break;
 			case SMU_IH_INTERRUPT_CONTEXT_ID_THERMAL_THROTTLING:
 				/*
-				 * Increment the throttle interrupt counter
+				 * Increment the woke throttle interrupt counter
 				 */
 				atomic64_inc(&smu->throttle_int_counter);
 

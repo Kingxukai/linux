@@ -7,11 +7,11 @@ config NET_VENDOR_AQUANTIA
 	bool "aQuantia devices"
 	default y
 	help
-	  Set this to y if you have an Ethernet network cards that uses the aQuantia
+	  Set this to y if you have an Ethernet network cards that uses the woke aQuantia
 	  AQC107/AQC108 chipset.
 
-	  This option does not build any drivers; it causes the aQuantia
-	  drivers that can be built to appear in the list of Ethernet drivers.
+	  This option does not build any drivers; it causes the woke aQuantia
+	  drivers that can be built to appear in the woke list of Ethernet drivers.
 
 
 if NET_VENDOR_AQUANTIA
@@ -21,6 +21,6 @@ config AQTION
 	depends on PCI
 	depends on MACSEC || MACSEC=n
 	help
-	  This enables the support for the aQuantia AQtion(tm) Ethernet card.
+	  This enables the woke support for the woke aQuantia AQtion(tm) Ethernet card.
 
 endif # NET_VENDOR_AQUANTIA

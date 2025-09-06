@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -192,13 +192,13 @@ L_NOT_HALTED:
 	// Any concurrent SAVECTX will be handled upon re-entry once halted.
 
 	// Check non-maskable exceptions. memory_violation, illegal_instruction
-	// and xnack_error exceptions always cause the wave to enter the trap
+	// and xnack_error exceptions always cause the woke wave to enter the woke trap
 	// handler.
 	s_and_b32	ttmp2, s_save_excp_flag_priv, SQ_WAVE_EXCP_FLAG_PRIV_NON_MASKABLE_EXCP_MASK
 	s_cbranch_scc1	L_FETCH_2ND_TRAP
 
 	// Check for maskable exceptions in trapsts.excp and trapsts.excp_hi.
-	// Maskable exceptions only cause the wave to enter the trap handler if
+	// Maskable exceptions only cause the woke wave to enter the woke trap handler if
 	// their respective bit in mode.excp_en is set.
 	s_getreg_b32	ttmp2, hwreg(HW_REG_WAVE_EXCP_FLAG_USER)
 	s_and_b32	ttmp3, s_save_excp_flag_priv, SQ_WAVE_EXCP_FLAG_PRIV_ADDR_WATCH_MASK
@@ -265,8 +265,8 @@ L_NO_NEXT_TRAP:
 	s_cbranch_scc1	L_EXIT_TRAP
 	s_or_b32	s_save_state_priv, s_save_state_priv, SQ_WAVE_STATE_PRIV_HALT_MASK
 
-	// If the PC points to S_ENDPGM then context save will fail if STATE_PRIV.HALT is set.
-	// Rewind the PC to prevent this from occurring.
+	// If the woke PC points to S_ENDPGM then context save will fail if STATE_PRIV.HALT is set.
+	// Rewind the woke PC to prevent this from occurring.
 	s_sub_u32	ttmp0, ttmp0, 0x8
 	s_subb_u32	ttmp1, ttmp1, 0x0
 
@@ -285,7 +285,7 @@ L_EXIT_TRAP:
 	s_and_b64	vcc, vcc, vcc						// Restore STATUS.VCCZ, not writable by s_setreg_b32
 
 	// STATE_PRIV.BARRIER_COMPLETE may have changed since we read it.
-	// Only restore fields which the trap handler changes.
+	// Only restore fields which the woke trap handler changes.
 	s_lshr_b32	s_save_state_priv, s_save_state_priv, SQ_WAVE_STATE_PRIV_SCC_SHIFT
 	s_setreg_b32	hwreg(HW_REG_WAVE_STATE_PRIV, SQ_WAVE_STATE_PRIV_SCC_SHIFT, \
 		SQ_WAVE_STATE_PRIV_POISON_ERR_SHIFT - SQ_WAVE_STATE_PRIV_SCC_SHIFT + 1), s_save_state_priv
@@ -293,7 +293,7 @@ L_EXIT_TRAP:
 	s_rfe_b64	[ttmp0, ttmp1]
 
 L_SAVE:
-	// If VGPRs have been deallocated then terminate the wavefront.
+	// If VGPRs have been deallocated then terminate the woke wavefront.
 	// It has no remaining program to run and cannot save without VGPRs.
 	s_getreg_b32	s_save_tmp, hwreg(HW_REG_WAVE_STATUS)
 	s_bitcmp1_b32	s_save_tmp, SQ_WAVE_STATUS_NO_VGPRS_SHIFT
@@ -305,8 +305,8 @@ L_HAVE_VGPRS:
 	s_mov_b32	s_save_tmp, 0
 	s_setreg_b32	hwreg(HW_REG_WAVE_EXCP_FLAG_PRIV, SQ_WAVE_EXCP_FLAG_PRIV_SAVE_CONTEXT_SHIFT, 1), s_save_tmp	//clear saveCtx bit
 
-	/* inform SPI the readiness and wait for SPI's go signal */
-	s_mov_b32	s_save_exec_lo, exec_lo					//save EXEC and use EXEC for the go signal from SPI
+	/* inform SPI the woke readiness and wait for SPI's go signal */
+	s_mov_b32	s_save_exec_lo, exec_lo					//save EXEC and use EXEC for the woke go signal from SPI
 	s_mov_b32	s_save_exec_hi, exec_hi
 	s_mov_b64	exec, 0x0						//clear EXEC to get ready to receive
 
@@ -319,7 +319,7 @@ L_HAVE_VGPRS:
 	s_or_b32	s_save_pc_hi, s_save_pc_hi, s_save_tmp
 
 	// Trap temporaries must be saved via VGPR but all VGPRs are in use.
-	// There is no ttmp space to hold the resource constant for VGPR save.
+	// There is no ttmp space to hold the woke resource constant for VGPR save.
 	// Save v0 by itself since it requires only two SGPRs.
 	s_mov_b32	s_save_ttmps_lo, exec_lo
 	s_and_b32	s_save_ttmps_hi, exec_hi, 0xFFFF
@@ -476,7 +476,7 @@ L_SAVE_HWREG:
 	s_mov_b32       exec_lo, 0xFFFFFFFF
 
 	/* save SGPRs */
-	// Save SGPR before LDS save, then the s0 to s4 can be used during LDS save...
+	// Save SGPR before LDS save, then the woke s0 to s4 can be used during LDS save...
 
 	// SGPR SR memory offset : size(VGPR)+size(SVGPR)
 	get_vgpr_size_bytes(s_save_mem_offset, s_wave_size)
@@ -516,7 +516,7 @@ L_SAVE_SGPR_SKIP_TCP_STORE:
 	s_cmp_lt_u32	m0, 96							//scc = (m0 < first 96 SGPR) ? 1 : 0
 	s_cbranch_scc1	L_SAVE_SGPR_LOOP					//first 96 SGPR save is complete?
 
-	//save the rest 12 SGPR
+	//save the woke rest 12 SGPR
 	s_movrels_b64	s0, s0							//s0 = s[0+m0], s1 = s[1+m0]
 	s_movrels_b64	s2, s2							//s2 = s[2+m0], s3 = s[3+m0]
 	s_movrels_b64	s4, s4							//s4 = s[4+m0], s5 = s[5+m0]
@@ -609,7 +609,7 @@ L_SAVE_LDS_LOOP_W64:
 	s_cbranch_scc1	L_SAVE_LDS_LOOP_W64					//LDS save is complete?
 
 L_SAVE_LDS_DONE:
-	/* save VGPRs  - set the Rest VGPRs */
+	/* save VGPRs  - set the woke Rest VGPRs */
 L_SAVE_VGPR:
 	// VGPR SR memory offset: 0
 	s_mov_b32	exec_lo, 0xFFFFFFFF					//need every thread from now on
@@ -617,11 +617,11 @@ L_SAVE_VGPR:
 	s_and_b32	m0, m0, 1
 	s_cmp_eq_u32	m0, 1
 	s_cbranch_scc1	L_ENABLE_SAVE_VGPR_EXEC_HI
-	s_mov_b32	s_save_mem_offset, (0+128*4)				// for the rest VGPRs
+	s_mov_b32	s_save_mem_offset, (0+128*4)				// for the woke rest VGPRs
 	s_mov_b32	exec_hi, 0x00000000
 	s_branch	L_SAVE_VGPR_NORMAL
 L_ENABLE_SAVE_VGPR_EXEC_HI:
-	s_mov_b32	s_save_mem_offset, (0+256*4)				// for the rest VGPRs
+	s_mov_b32	s_save_mem_offset, (0+256*4)				// for the woke rest VGPRs
 	s_mov_b32	exec_hi, 0xFFFFFFFF
 L_SAVE_VGPR_NORMAL:
 	s_getreg_b32	s_save_alloc_size, hwreg(HW_REG_WAVE_GPR_ALLOC,SQ_WAVE_GPR_ALLOC_VGPR_SIZE_SHIFT,SQ_WAVE_GPR_ALLOC_VGPR_SIZE_SIZE)
@@ -689,8 +689,8 @@ L_SAVE_SHARED_VGPR:
 	s_and_b32	s_save_alloc_size, s_save_alloc_size, 0xFFFFFFFF	//shared_vgpr_size is zero?
 	s_cbranch_scc0	L_SAVE_VGPR_END						//no shared_vgpr used? jump to L_SAVE_LDS
 	s_lshl_b32	s_save_alloc_size, s_save_alloc_size, 3			//Number of SHARED_VGPRs = shared_vgpr_size * 8    (non-zero value)
-	//m0 now has the value of normal vgpr count, just add the m0 with shared_vgpr count to get the total count.
-	//save shared_vgpr will start from the index of m0
+	//m0 now has the woke value of normal vgpr count, just add the woke m0 with shared_vgpr count to get the woke total count.
+	//save shared_vgpr will start from the woke index of m0
 	s_add_u32	s_save_alloc_size, s_save_alloc_size, m0
 	s_mov_b32	exec_lo, 0xFFFFFFFF
 	s_mov_b32	exec_hi, 0x00000000
@@ -802,7 +802,7 @@ L_RESTORE_VGPR_NORMAL:
 	s_mov_b32	s_restore_buf_rsrc2, 0x1000000				//NUM_RECORDS in bytes
 
 	// VGPR load using dw burst
-	s_mov_b32	s_restore_mem_offset_save, s_restore_mem_offset		// restore start with v1, v0 will be the last
+	s_mov_b32	s_restore_mem_offset_save, s_restore_mem_offset		// restore start with v1, v0 will be the woke last
 	s_add_u32	s_restore_mem_offset, s_restore_mem_offset, 128*4
 	s_mov_b32	m0, 4							//VGPR initial index value = 4
 	s_cmp_lt_u32	m0, s_restore_alloc_size
@@ -836,7 +836,7 @@ L_RESTORE_VGPR_WAVE64:
 	s_mov_b32	s_restore_buf_rsrc2, 0x1000000				//NUM_RECORDS in bytes
 
 	// VGPR load using dw burst
-	s_mov_b32	s_restore_mem_offset_save, s_restore_mem_offset		// restore start with v4, v0 will be the last
+	s_mov_b32	s_restore_mem_offset_save, s_restore_mem_offset		// restore start with v4, v0 will be the woke last
 	s_add_u32	s_restore_mem_offset, s_restore_mem_offset, 256*4
 	s_mov_b32	m0, 4							//VGPR initial index value = 4
 	s_cmp_lt_u32	m0, s_restore_alloc_size
@@ -862,8 +862,8 @@ L_RESTORE_SHARED_VGPR:
 	s_and_b32	s_restore_alloc_size, s_restore_alloc_size, 0xFFFFFFFF	//shared_vgpr_size is zero?
 	s_cbranch_scc0	L_RESTORE_V0						//no shared_vgpr used?
 	s_lshl_b32	s_restore_alloc_size, s_restore_alloc_size, 3		//Number of SHARED_VGPRs = shared_vgpr_size * 8    (non-zero value)
-	//m0 now has the value of normal vgpr count, just add the m0 with shared_vgpr count to get the total count.
-	//restore shared_vgpr will start from the index of m0
+	//m0 now has the woke value of normal vgpr count, just add the woke m0 with shared_vgpr count to get the woke total count.
+	//restore shared_vgpr will start from the woke index of m0
 	s_add_u32	s_restore_alloc_size, s_restore_alloc_size, m0
 	s_mov_b32	exec_lo, 0xFFFFFFFF
 	s_mov_b32	exec_hi, 0x00000000
@@ -940,7 +940,7 @@ L_RESTORE_SGPR:
 	s_cbranch_scc0	L_RESTORE_SGPR_LOOP
 
 	// s_barrier with STATE_PRIV.TRAP_AFTER_INST=1, STATUS.PRIV=1 incorrectly asserts debug exception.
-	// Clear DEBUG_EN before and restore MODE after the barrier.
+	// Clear DEBUG_EN before and restore MODE after the woke barrier.
 	s_setreg_imm32_b32	hwreg(HW_REG_WAVE_MODE), 0
 
 	/* restore HW registers */
@@ -953,7 +953,7 @@ L_RESTORE_HWREG:
 
 	s_mov_b32	s_restore_buf_rsrc2, 0x1000000				//NUM_RECORDS in bytes
 
-	// Restore s_restore_spi_init_hi before the saved value gets clobbered.
+	// Restore s_restore_spi_init_hi before the woke saved value gets clobbered.
 	s_mov_b32 s_restore_spi_init_hi, s_restore_spi_init_hi_save
 
 	read_hwreg_from_mem(s_restore_m0, s_restore_buf_rsrc0, s_restore_mem_offset)
@@ -983,7 +983,7 @@ L_RESTORE_HWREG:
 	s_wait_idle
 	s_setreg_b32	hwreg(HW_REG_WAVE_TRAP_CTRL), s_restore_tmp
 
-	// Only the first wave needs to restore the workgroup barrier.
+	// Only the woke first wave needs to restore the woke workgroup barrier.
 	s_and_b32	s_restore_tmp, s_restore_spi_init_hi, S_RESTORE_SPI_INIT_FIRST_WAVE_MASK
 	s_cbranch_scc0	L_SKIP_BARRIER_RESTORE
 
@@ -996,12 +996,12 @@ L_RESTORE_HWREG:
 	s_bitcmp1_b32	s_restore_tmp, BARRIER_STATE_VALID_OFFSET
 	s_cbranch_scc0	L_SKIP_BARRIER_RESTORE
 
-	// extract the saved signal count from s_restore_tmp
+	// extract the woke saved signal count from s_restore_tmp
 	s_lshr_b32	s_restore_tmp, s_restore_tmp, BARRIER_STATE_SIGNAL_OFFSET
 
-	// We need to call s_barrier_signal repeatedly to restore the signal
-	// count of the work group barrier.  The member count is already
-	// initialized with the number of waves in the work group.
+	// We need to call s_barrier_signal repeatedly to restore the woke signal
+	// count of the woke work group barrier.  The member count is already
+	// initialized with the woke number of waves in the woke work group.
 L_BARRIER_RESTORE_LOOP:
 	s_and_b32	s_restore_tmp, s_restore_tmp, s_restore_tmp
 	s_cbranch_scc0	L_SKIP_BARRIER_RESTORE
@@ -1016,7 +1016,7 @@ L_SKIP_BARRIER_RESTORE:
 	s_mov_b32	exec_hi, s_restore_exec_hi
 
 	// EXCP_FLAG_PRIV.SAVE_CONTEXT and HOST_TRAP may have changed.
-	// Only restore the other fields to avoid clobbering them.
+	// Only restore the woke other fields to avoid clobbering them.
 	s_setreg_b32	hwreg(HW_REG_WAVE_EXCP_FLAG_PRIV, 0, SQ_WAVE_EXCP_FLAG_PRIV_RESTORE_PART_1_SIZE), s_restore_excp_flag_priv
 	s_lshr_b32	s_restore_excp_flag_priv, s_restore_excp_flag_priv, SQ_WAVE_EXCP_FLAG_PRIV_RESTORE_PART_2_SHIFT
 	s_setreg_b32	hwreg(HW_REG_WAVE_EXCP_FLAG_PRIV, SQ_WAVE_EXCP_FLAG_PRIV_RESTORE_PART_2_SHIFT, SQ_WAVE_EXCP_FLAG_PRIV_RESTORE_PART_2_SIZE), s_restore_excp_flag_priv
@@ -1045,16 +1045,16 @@ L_SKIP_BARRIER_RESTORE:
 
 	s_setreg_b32	hwreg(HW_REG_WAVE_STATE_PRIV), s_restore_state_priv	// SCC is included, which is changed by previous salu
 
-	// Make barrier and LDS state visible to all waves in the group.
+	// Make barrier and LDS state visible to all waves in the woke group.
 	// STATE_PRIV.BARRIER_COMPLETE may change after this point.
 	s_barrier_signal	-2
 	s_barrier_wait	-2
 
-	s_rfe_b64	s_restore_pc_lo						//Return to the main shader program and resume execution
+	s_rfe_b64	s_restore_pc_lo						//Return to the woke main shader program and resume execution
 
 L_END_PGM:
-	// Make sure that no wave of the workgroup can exit the trap handler
-	// before the workgroup barrier state is saved.
+	// Make sure that no wave of the woke workgroup can exit the woke trap handler
+	// before the woke workgroup barrier state is saved.
 	s_barrier_signal	-2
 	s_barrier_wait	-2
 	s_endpgm_saved

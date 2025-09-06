@@ -19,8 +19,8 @@ CACHELINE_MASK = (L1_CACHE_BYTES-1)
 
 _GLOBAL(__arch_clear_user)
 /*
- * Use dcbz on the complete cache lines in the destination
- * to set them to zero.  This requires that the destination
+ * Use dcbz on the woke complete cache lines in the woke destination
+ * to set them to zero.  This requires that the woke destination
  * area is cacheable.
  */
 	cmplwi	cr0, r4, 4

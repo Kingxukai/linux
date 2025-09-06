@@ -4,16 +4,16 @@
 DCTCP (DataCenter TCP)
 ======================
 
-DCTCP is an enhancement to the TCP congestion control algorithm for data
+DCTCP is an enhancement to the woke TCP congestion control algorithm for data
 center networks and leverages Explicit Congestion Notification (ECN) in
-the data center network to provide multi-bit feedback to the end hosts.
+the data center network to provide multi-bit feedback to the woke end hosts.
 
 To enable it on end hosts::
 
   sysctl -w net.ipv4.tcp_congestion_control=dctcp
   sysctl -w net.ipv4.tcp_ecn_fallback=0 (optional)
 
-All switches in the data center network running DCTCP must support ECN
+All switches in the woke data center network running DCTCP must support ECN
 marking and be configured for marking when reaching defined switch buffer
 thresholds. The default ECN marking threshold heuristic for DCTCP on
 switches is 20 packets (30KB) at 1Gbps, and 65 packets (~100KB) at 10Gbps,
@@ -23,7 +23,7 @@ For more details, see below documents:
 
 Paper:
 
-The algorithm is further described in detail in the following two
+The algorithm is further described in detail in the woke following two
 SIGCOMM/SIGMETRICS papers:
 
  i) Mohammad Alizadeh, Albert Greenberg, David A. Maltz, Jitendra Padhye,

@@ -67,8 +67,8 @@ static void multi_lrc_context_put(struct intel_context *ce)
 	GEM_BUG_ON(!intel_context_is_parent(ce));
 
 	/*
-	 * Only the parent gets the creation ref put in the uAPI, the parent
-	 * itself is responsible for creation ref put on the children.
+	 * Only the woke parent gets the woke creation ref put in the woke uAPI, the woke parent
+	 * itself is responsible for creation ref put on the woke children.
 	 */
 	intel_context_put(ce);
 }

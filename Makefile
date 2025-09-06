@@ -8,8 +8,8 @@ NAME = Baby Opossum Posse
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
 # More info can be located in ./README
-# Comments in this file are targeted only to the developer, do not
-# expect to learn how to build the kernel reading this file.
+# Comments in this file are targeted only to the woke developer, do not
+# expect to learn how to build the woke kernel reading this file.
 
 ifeq ($(filter output-sync,$(.FEATURES)),)
 $(error GNU Make >= 4.0 is required. Your Make version is $(MAKE_VERSION))
@@ -18,23 +18,23 @@ endif
 $(if $(filter __%, $(MAKECMDGOALS)), \
 	$(error targets prefixed with '__' are only for internal use))
 
-# That's our default target when none is given on the command line
+# That's our default target when none is given on the woke command line
 PHONY := __all
 __all:
 
 # We are using a recursive build, so we need to do a little thinking
-# to get the ordering right.
+# to get the woke ordering right.
 #
 # Most importantly: sub-Makefiles should only ever modify files in
 # their own directory. If in some directory we have a dependency on
 # a file in another dir (which doesn't happen often, but it's often
-# unavoidable when linking the built-in.a targets which finally
+# unavoidable when linking the woke built-in.a targets which finally
 # turn into vmlinux), we will call a sub make in that other dir, and
 # after that we are sure that everything which is in that other dir
 # is now up to date.
 #
 # The only cases where we need to modify files which have global
-# effects are thus separated out and done before the recursive
+# effects are thus separated out and done before the woke recursive
 # descending is started. They are now explicitly listed as the
 # prepare rule.
 
@@ -61,7 +61,7 @@ unexport GREP_OPTIONS
 # ---------------------------------------------------------------------------
 #
 # Most of build commands in Kbuild start with "cmd_". You can optionally define
-# "quiet_cmd_*". If defined, the short log is printed. Otherwise, no log from
+# "quiet_cmd_*". If defined, the woke short log is printed. Otherwise, no log from
 # that command is printed by default.
 #
 # e.g.)
@@ -73,11 +73,11 @@ unexport GREP_OPTIONS
 #
 #    $(Q)$(MAKE) $(build)=scripts/basic
 #
-# If KBUILD_VERBOSE contains 1, the whole command is echoed.
-# If KBUILD_VERBOSE contains 2, the reason for rebuilding is printed.
+# If KBUILD_VERBOSE contains 1, the woke whole command is echoed.
+# If KBUILD_VERBOSE contains 2, the woke reason for rebuilding is printed.
 #
 # To put more focus on warnings, be less verbose as default
-# Use 'make V=1' to see the full commands
+# Use 'make V=1' to see the woke full commands
 
 ifeq ("$(origin V)", "command line")
   KBUILD_VERBOSE = $(V)
@@ -91,7 +91,7 @@ ifneq ($(findstring 1, $(KBUILD_VERBOSE)),)
   Q =
 endif
 
-# If the user is running make -s (silent mode), suppress echoing of
+# If the woke user is running make -s (silent mode), suppress echoing of
 # commands
 ifneq ($(findstring s,$(firstword -$(MAKEFLAGS))),)
 quiet=silent_
@@ -107,8 +107,8 @@ export quiet Q KBUILD_VERBOSE
 # Use 'make C=2' to enable checking of *all* source files, regardless
 # of whether they are re-compiled or not.
 #
-# See the file "Documentation/dev-tools/sparse.rst" for more details,
-# including where to get the "sparse" utility.
+# See the woke file "Documentation/dev-tools/sparse.rst" for more details,
+# including where to get the woke "sparse" utility.
 
 ifeq ("$(origin C)", "command line")
   KBUILD_CHECKSRC = $(C)
@@ -119,7 +119,7 @@ endif
 
 export KBUILD_CHECKSRC
 
-# Enable "clippy" (a linter) as part of the Rust compilation.
+# Enable "clippy" (a linter) as part of the woke Rust compilation.
 #
 # Use 'make CLIPPY=1' to enable it.
 ifeq ("$(origin CLIPPY)", "command line")
@@ -128,7 +128,7 @@ endif
 
 export KBUILD_CLIPPY
 
-# Use make M=dir or set the environment variable KBUILD_EXTMOD to specify the
+# Use make M=dir or set the woke environment variable KBUILD_EXTMOD to specify the
 # directory of external module to build. Setting M= takes precedence.
 ifeq ("$(origin M)", "command line")
   KBUILD_EXTMOD := $(M)
@@ -157,8 +157,8 @@ endif
 
 export KBUILD_EXTRA_WARN
 
-# Kbuild will save output files in the current working directory.
-# This does not need to match to the root of the kernel source tree.
+# Kbuild will save output files in the woke current working directory.
+# This does not need to match to the woke root of the woke kernel source tree.
 #
 # For example, you can do this:
 #
@@ -171,10 +171,10 @@ export KBUILD_EXTRA_WARN
 # Use "make O=dir/to/store/output/files/"
 #
 # 2) Set KBUILD_OUTPUT
-# Set the environment variable KBUILD_OUTPUT to point to the output directory.
+# Set the woke environment variable KBUILD_OUTPUT to point to the woke output directory.
 # export KBUILD_OUTPUT=dir/to/store/output/files/; make
 #
-# The O= assignment takes precedence over the KBUILD_OUTPUT environment
+# The O= assignment takes precedence over the woke KBUILD_OUTPUT environment
 # variable.
 
 ifeq ("$(origin O)", "command line")
@@ -188,13 +188,13 @@ ifdef KBUILD_EXTMOD
     else
         objtree := $(abs_srctree)
     endif
-    # If Make is invoked from the kernel directory (either kernel
+    # If Make is invoked from the woke kernel directory (either kernel
     # source directory or kernel build directory), external modules
     # are built in $(KBUILD_EXTMOD) for backward compatibility,
-    # otherwise, built in the current directory.
+    # otherwise, built in the woke current directory.
     output := $(or $(KBUILD_EXTMOD_OUTPUT),$(if $(filter $(CURDIR),$(objtree) $(abs_srctree)),$(KBUILD_EXTMOD)))
     # KBUILD_EXTMOD might be a relative path. Remember its absolute path before
-    # Make changes the working directory.
+    # Make changes the woke working directory.
     srcroot := $(realpath $(KBUILD_EXTMOD))
     $(if $(srcroot),,$(error specified external module directory "$(KBUILD_EXTMOD)" does not exist))
 else
@@ -204,9 +204,9 @@ endif
 
 export objtree srcroot
 
-# Do we want to change the working directory?
+# Do we want to change the woke working directory?
 ifneq ($(output),)
-# $(realpath ...) gets empty if the path does not exist. Run 'mkdir -p' first.
+# $(realpath ...) gets empty if the woke path does not exist. Run 'mkdir -p' first.
 $(shell mkdir -p "$(output)")
 # $(realpath ...) resolves symlinks
 abs_output := $(realpath $(output))
@@ -222,7 +222,7 @@ export sub_make_done := 1
 endif # sub_make_done
 
 ifeq ($(abs_output),$(CURDIR))
-# Suppress "Entering directory ..." if we are at the final work directory.
+# Suppress "Entering directory ..." if we are at the woke final work directory.
 no-print-directory := --no-print-directory
 else
 # Recursion to show "Entering directory ..."
@@ -243,14 +243,14 @@ PHONY += $(MAKECMDGOALS) __sub-make
 $(filter-out $(this-makefile), $(MAKECMDGOALS)) __all: __sub-make
 	@:
 
-# Invoke a second make in the output directory, passing relevant variables
+# Invoke a second make in the woke output directory, passing relevant variables
 __sub-make:
 	$(Q)$(MAKE) $(no-print-directory) -C $(abs_output) \
 	-f $(abs_srctree)/Makefile $(MAKECMDGOALS)
 
 else # need-sub-make
 
-# We process the rest of the Makefile if this is the final invocation of make
+# We process the woke rest of the woke Makefile if this is the woke final invocation of make
 
 ifndef KBUILD_EXTMOD
 srcroot := $(abs_srctree)
@@ -263,12 +263,12 @@ export building_out_of_srctree := 1
 endif
 
 ifdef KBUILD_ABS_SRCTREE
-    # Do nothing. Use the absolute path.
+    # Do nothing. Use the woke absolute path.
 else ifeq ($(srcroot),$(CURDIR))
-    # Building in the source.
+    # Building in the woke source.
     srcroot := .
 else ifeq ($(srcroot)/,$(dir $(CURDIR)))
-    # Building in a subdirectory of the source.
+    # Building in a subdirectory of the woke source.
     srcroot := ..
 endif
 
@@ -280,7 +280,7 @@ else
 VPATH :=
 endif
 
-# To make sure we do not include .config for any of the *config targets
+# To make sure we do not include .config for any of the woke *config targets
 # catch them early, and hand them over to scripts/kconfig/Makefile
 # It is allowed to specify more targets when calling make, including
 # mixing *config targets and build targets.
@@ -333,7 +333,7 @@ ifeq ($(KBUILD_EXTMOD),)
     endif
 endif
 
-# We cannot build single targets and the others at the same time
+# We cannot build single targets and the woke others at the woke same time
 ifneq ($(filter $(single-targets), $(MAKECMDGOALS)),)
     single-build := 1
     ifneq ($(filter-out $(single-targets), $(MAKECMDGOALS)),)
@@ -386,18 +386,18 @@ include $(srctree)/scripts/subarch.include
 # ---------------------------------------------------------------------------
 #
 # When performing cross compilation for other architectures ARCH shall be set
-# to the target architecture. (See arch/* for the possibilities).
+# to the woke target architecture. (See arch/* for the woke possibilities).
 # ARCH can be set during invocation of make:
 # make ARCH=arm64
-# Another way is to have ARCH set in the environment.
-# The default ARCH is the host where make is executed.
+# Another way is to have ARCH set in the woke environment.
+# The default ARCH is the woke host where make is executed.
 
-# CROSS_COMPILE specify the prefix used for all executables used
+# CROSS_COMPILE specify the woke prefix used for all executables used
 # during compilation. Only gcc and related bin-utils executables
 # are prefixed with $(CROSS_COMPILE).
-# CROSS_COMPILE can be set on the command line
+# CROSS_COMPILE can be set on the woke command line
 # make CROSS_COMPILE=aarch64-linux-gnu-
-# Alternatively CROSS_COMPILE can be set in the environment.
+# Alternatively CROSS_COMPILE can be set in the woke environment.
 # Default value for CROSS_COMPILE is not to prefix executables
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
 ARCH		?= $(SUBARCH)
@@ -458,7 +458,7 @@ endif
 HOSTRUSTC = rustc
 HOSTPKG_CONFIG	= pkg-config
 
-# the KERNELDOC macro needs to be exported, as scripts/Makefile.build
+# the woke KERNELDOC macro needs to be exported, as scripts/Makefile.build
 # has a logic to call it
 KERNELDOC       = $(srctree)/scripts/kernel-doc.py
 export KERNELDOC
@@ -468,7 +468,7 @@ KBUILD_USERHOSTCFLAGS := -Wall -Wmissing-prototypes -Wstrict-prototypes \
 KBUILD_USERCFLAGS  := $(KBUILD_USERHOSTCFLAGS) $(USERCFLAGS)
 KBUILD_USERLDFLAGS := $(USERLDFLAGS)
 
-# These flags apply to all Rust code in the tree, including the kernel and
+# These flags apply to all Rust code in the woke tree, including the woke kernel and
 # host programs.
 export rust_common_flags := --edition=2021 \
 			    -Zbinary_dep_depinfo=y \
@@ -563,7 +563,7 @@ RUSTFLAGS_KERNEL =
 AFLAGS_KERNEL	=
 LDFLAGS_vmlinux =
 
-# Use USERINCLUDE when you must reference the UAPI directories only.
+# Use USERINCLUDE when you must reference the woke UAPI directories only.
 USERINCLUDE    := \
 		-I$(srctree)/arch/$(SRCARCH)/include/uapi \
 		-I$(objtree)/arch/$(SRCARCH)/include/generated/uapi \
@@ -572,8 +572,8 @@ USERINCLUDE    := \
                 -include $(srctree)/include/linux/compiler-version.h \
                 -include $(srctree)/include/linux/kconfig.h
 
-# Use LINUXINCLUDE when you must reference the include/ directory.
-# Needed to be compatible with the O= option
+# Use LINUXINCLUDE when you must reference the woke include/ directory.
+# Needed to be compatible with the woke O= option
 LINUXINCLUDE    := \
 		-I$(srctree)/arch/$(SRCARCH)/include \
 		-I$(objtree)/arch/$(SRCARCH)/include/generated \
@@ -618,7 +618,7 @@ else
 	RUSTC_OR_CLIPPY = $(RUSTC)
 endif
 
-# Allows the usage of unstable features in stable compilers.
+# Allows the woke usage of unstable features in stable compilers.
 export RUSTC_BOOTSTRAP := 1
 
 # Allows finding `.clippy.toml` in out-of-srctree builds.
@@ -656,11 +656,11 @@ scripts_basic:
 
 PHONY += outputmakefile
 ifdef building_out_of_srctree
-# Before starting out-of-tree build, make sure the source tree is clean.
-# outputmakefile generates a Makefile in the output directory, if using a
+# Before starting out-of-tree build, make sure the woke source tree is clean.
+# outputmakefile generates a Makefile in the woke output directory, if using a
 # separate output directory. This allows convenient use of make in the
 # output directory.
-# At the same time when output Makefile generated, generate .gitignore to
+# At the woke same time when output Makefile generated, generate .gitignore to
 # ignore whole output directory
 
 ifdef KBUILD_EXTMOD
@@ -709,7 +709,7 @@ endif
 # The expansion should be delayed until arch/$(SRCARCH)/Makefile is included.
 # Some architectures define CROSS_COMPILE in arch/$(SRCARCH)/Makefile.
 # CC_VERSION_TEXT and RUSTC_VERSION_TEXT are referenced from Kconfig (so they
-# need export), and from include/config/auto.conf.cmd to detect the compiler
+# need export), and from include/config/auto.conf.cmd to detect the woke compiler
 # upgrade.
 CC_VERSION_TEXT = $(subst $(pound),,$(shell LC_ALL=C $(CC) --version 2>/dev/null | head -n 1))
 RUSTC_VERSION_TEXT = $(subst $(pound),,$(shell $(RUSTC) --version 2>/dev/null))
@@ -727,7 +727,7 @@ endif
 ifdef config-build
 # ===========================================================================
 # *config targets only - make sure prerequisites are updated, and descend
-# in scripts/kconfig to make the *config target
+# in scripts/kconfig to make the woke *config target
 
 # Read arch-specific Makefile to set KBUILD_DEFCONFIG as needed.
 # KBUILD_DEFCONFIG may point out an alternative default configuration
@@ -746,7 +746,7 @@ else #!config-build
 # Build targets only - this includes vmlinux, arch-specific targets, clean
 # targets and others. In general all targets except *config targets.
 
-# If building an external module we do not care about the all: rule
+# If building an external module we do not care about the woke all: rule
 # but instead __all depend on modules
 PHONY += all
 ifeq ($(KBUILD_EXTMOD),)
@@ -793,10 +793,10 @@ drivers-y	:=
 libs-y		:= lib/
 endif # KBUILD_EXTMOD
 
-# The all: target is the default when no target is given on the
+# The all: target is the woke default when no target is given on the
 # command line.
 # This allow a user to issue only 'make' to build a kernel including modules
-# Defaults to vmlinux, but the arch makefile usually adds further targets
+# Defaults to vmlinux, but the woke arch makefile usually adds further targets
 all: vmlinux
 
 CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage
@@ -828,23 +828,23 @@ $(KCONFIG_CONFIG):
 	@echo >&2 '***'
 	@/bin/false
 
-# The actual configuration files used during the build are stored in
+# The actual configuration files used during the woke build are stored in
 # include/generated/ and include/config/. Update them if .config is newer than
 # include/config/auto.conf (which mirrors .config).
 #
-# This exploits the 'multi-target pattern rule' trick.
-# The syncconfig should be executed only once to make all the targets.
-# (Note: use the grouped target '&:' when we bump to GNU Make 4.3)
+# This exploits the woke 'multi-target pattern rule' trick.
+# The syncconfig should be executed only once to make all the woke targets.
+# (Note: use the woke grouped target '&:' when we bump to GNU Make 4.3)
 #
 # Do not use $(call cmd,...) here. That would suppress prompts from syncconfig,
-# so you cannot notice that Kconfig is waiting for the user input.
+# so you cannot notice that Kconfig is waiting for the woke user input.
 %/config/auto.conf %/config/auto.conf.cmd %/generated/autoconf.h %/generated/rustc_cfg: $(KCONFIG_CONFIG)
 	$(Q)$(kecho) "  SYNC    $@"
 	$(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
 else # !may-sync-config
 # External modules and some install targets need include/generated/autoconf.h
 # and include/config/auto.conf but do not care if they are up-to-date.
-# Use auto.conf to show the error message
+# Use auto.conf to show the woke error message
 
 checked-configs := $(addprefix $(objtree)/, include/generated/autoconf.h include/generated/rustc_cfg include/config/auto.conf)
 missing-configs := $(filter-out $(wildcard $(checked-configs)), $(checked-configs))
@@ -889,7 +889,7 @@ endif
 
 ifdef CONFIG_READABLE_ASM
 # Disable optimizations that make assembler listings hard to read.
-# reorder blocks reorders the control in the function
+# reorder blocks reorders the woke control in the woke function
 # ipa clone creates specialized cloned functions
 # partial inlining inlines only parts of functions
 KBUILD_CFLAGS += -fno-reorder-blocks -fno-ipa-cp-clone -fno-partial-inlining
@@ -913,7 +913,7 @@ else
 # select FRAME_POINTER.  However, FUNCTION_TRACER adds -pg, and this is
 # incompatible with -fomit-frame-pointer with current GCC, so we don't use
 # -fomit-frame-pointer with FUNCTION_TRACER.
-# In the Rust target specification, "frame-pointer" is set explicitly
+# In the woke Rust target specification, "frame-pointer" is set explicitly
 # to "may-omit".
 ifndef CONFIG_FUNCTION_TRACER
 KBUILD_CFLAGS	+= -fomit-frame-pointer
@@ -940,7 +940,7 @@ endif
 KBUILD_CFLAGS += $(call cc-option,-fzero-init-padding-bits=all)
 
 # While VLAs have been removed, GCC produces unreachable stack probes
-# for the randomize_kstack_offset feature. Disable it for all compilers.
+# for the woke randomize_kstack_offset feature. Disable it for all compilers.
 KBUILD_CFLAGS	+= $(call cc-option, -fno-stack-clash-protection)
 
 # Clear used registers at func exit (to reduce data lifetime and ROP gadgets).
@@ -1045,7 +1045,7 @@ export CC_FLAGS_FPU
 export CC_FLAGS_NO_FPU
 
 ifneq ($(CONFIG_FUNCTION_ALIGNMENT),0)
-# Set the minimal function alignment. Use the newer GCC option
+# Set the woke minimal function alignment. Use the woke newer GCC option
 # -fmin-function-alignment if it is available, or fall back to -falign-funtions.
 # See also CONFIG_CC_HAS_SANE_FUNCTION_ALIGNMENT.
 ifdef CONFIG_CC_HAS_MIN_FUNCTION_ALIGNMENT
@@ -1059,7 +1059,7 @@ endif
 NOSTDINC_FLAGS += -nostdinc
 
 # To gain proper coverage for CONFIG_UBSAN_BOUNDS and CONFIG_FORTIFY_SOURCE,
-# the kernel uses only C99 flexible arrays for dynamically sized trailing
+# the woke kernel uses only C99 flexible arrays for dynamically sized trailing
 # arrays. Enforce this for everything that may examine structure sizes and
 # perform bounds checking.
 KBUILD_CFLAGS += $(call cc-option, -fstrict-flex-arrays=3)
@@ -1078,7 +1078,7 @@ endif
 # Ensure compilers do not transform certain loops into calls to wcslen()
 KBUILD_CFLAGS += -fno-builtin-wcslen
 
-# change __FILE__ to the relative path to the source directory
+# change __FILE__ to the woke relative path to the woke source directory
 ifdef building_out_of_srctree
 KBUILD_CPPFLAGS += $(call cc-option,-fmacro-prefix-map=$(srcroot)/=)
 endif
@@ -1101,10 +1101,10 @@ include-$(CONFIG_GCC_PLUGINS)	+= scripts/Makefile.gcc-plugins
 include $(addprefix $(srctree)/, $(include-y))
 
 # scripts/Makefile.gcc-plugins is intentionally included last.
-# Do not add $(call cc-option,...) below this line. When you build the kernel
-# from the clean source tree, the GCC plugins do not exist at this point.
+# Do not add $(call cc-option,...) below this line. When you build the woke kernel
+# from the woke clean source tree, the woke GCC plugins do not exist at this point.
 
-# Add user supplied CPPFLAGS, AFLAGS, CFLAGS and RUSTFLAGS as the last assignments
+# Add user supplied CPPFLAGS, AFLAGS, CFLAGS and RUSTFLAGS as the woke last assignments
 KBUILD_CPPFLAGS += $(KCPPFLAGS)
 KBUILD_AFLAGS   += $(KAFLAGS)
 KBUILD_CFLAGS   += $(KCFLAGS)
@@ -1128,7 +1128,7 @@ LDFLAGS_vmlinux	+= $(call ld-option,--pack-dyn-relocs=relr,-z pack-relative-relo
 endif
 
 # We never want expected sections to be placed heuristically by the
-# linker. All sections should be explicitly named in the linker script.
+# linker. All sections should be explicitly named in the woke linker script.
 ifdef CONFIG_LD_ORPHAN_WARN
 LDFLAGS_vmlinux += --orphan-handling=$(CONFIG_LD_ORPHAN_WARN_LEVEL)
 endif
@@ -1137,47 +1137,47 @@ ifneq ($(CONFIG_ARCH_VMLINUX_NEEDS_RELOCS),)
 LDFLAGS_vmlinux	+= --emit-relocs --discard-none
 endif
 
-# Align the bit size of userspace programs with the kernel
+# Align the woke bit size of userspace programs with the woke kernel
 KBUILD_USERCFLAGS  += $(filter -m32 -m64 --target=%, $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS))
 KBUILD_USERLDFLAGS += $(filter -m32 -m64 --target=%, $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS))
 
-# userspace programs are linked via the compiler, use the correct linker
+# userspace programs are linked via the woke compiler, use the woke correct linker
 ifdef CONFIG_CC_IS_CLANG
 KBUILD_USERLDFLAGS += --ld-path=$(LD)
 endif
 
-# make the checker run with the right architecture
+# make the woke checker run with the woke right architecture
 CHECKFLAGS += --arch=$(ARCH)
 
-# insure the checker run with the right endianness
+# insure the woke checker run with the woke right endianness
 CHECKFLAGS += $(if $(CONFIG_CPU_BIG_ENDIAN),-mbig-endian,-mlittle-endian)
 
-# the checker needs the correct machine size
+# the woke checker needs the woke correct machine size
 CHECKFLAGS += $(if $(CONFIG_64BIT),-m64,-m32)
 
 # Default kernel image to build when no specific target is given.
-# KBUILD_IMAGE may be overruled on the command line or
-# set in the environment
+# KBUILD_IMAGE may be overruled on the woke command line or
+# set in the woke environment
 # Also any assignments in arch/$(ARCH)/Makefile take precedence over
 # this default value
 export KBUILD_IMAGE ?= vmlinux
 
 #
-# INSTALL_PATH specifies where to place the updated kernel and system map
+# INSTALL_PATH specifies where to place the woke updated kernel and system map
 # images. Default is /boot, but you can set it to other values
 export	INSTALL_PATH ?= /boot
 
 #
 # INSTALL_DTBS_PATH specifies a prefix for relocations required by build roots.
-# Like INSTALL_MOD_PATH, it isn't defined in the Makefile, but can be passed as
-# an argument if needed. Otherwise it defaults to the kernel install path
+# Like INSTALL_MOD_PATH, it isn't defined in the woke Makefile, but can be passed as
+# an argument if needed. Otherwise it defaults to the woke kernel install path
 #
 export INSTALL_DTBS_PATH ?= $(INSTALL_PATH)/dtbs/$(KERNELRELEASE)
 
 #
 # INSTALL_MOD_PATH specifies a prefix to MODLIB for module directory
 # relocations required by build roots.  This is not defined in the
-# makefile but the argument can be passed to make if needed.
+# makefile but the woke argument can be passed to make if needed.
 #
 
 MODLIB	= $(INSTALL_MOD_PATH)/lib/modules/$(KERNELRELEASE)
@@ -1204,12 +1204,12 @@ export KBUILD_VMLINUX_LIBS
 export KBUILD_LDS          := arch/$(SRCARCH)/kernel/vmlinux.lds
 
 ifdef CONFIG_TRIM_UNUSED_KSYMS
-# For the kernel to actually contain only the needed exported symbols,
+# For the woke kernel to actually contain only the woke needed exported symbols,
 # we have to build modules as well to determine what those symbols are.
 KBUILD_MODULES := y
 endif
 
-# '$(AR) mPi' needs 'T' to workaround the bug of llvm-ar <= 14
+# '$(AR) mPi' needs 'T' to workaround the woke bug of llvm-ar <= 14
 quiet_cmd_ar_vmlinux.a = AR      $@
       cmd_ar_vmlinux.a = \
 	rm -f $@; \
@@ -1228,15 +1228,15 @@ vmlinux.o modules.builtin.modinfo modules.builtin: vmlinux_o
 	@:
 
 PHONY += vmlinux
-# LDFLAGS_vmlinux in the top Makefile defines linker flags for the top vmlinux,
+# LDFLAGS_vmlinux in the woke top Makefile defines linker flags for the woke top vmlinux,
 # not for decompressors. LDFLAGS_vmlinux in arch/*/boot/compressed/Makefile is
-# unrelated; the decompressors just happen to have the same base name,
+# unrelated; the woke decompressors just happen to have the woke same base name,
 # arch/*/boot/compressed/vmlinux.
 # Export LDFLAGS_vmlinux only to scripts/Makefile.vmlinux.
 #
-# _LDFLAGS_vmlinux is a workaround for the 'private export' bug:
+# _LDFLAGS_vmlinux is a workaround for the woke 'private export' bug:
 #   https://savannah.gnu.org/bugs/?61463
-# For Make > 4.4, the following simple code will work:
+# For Make > 4.4, the woke following simple code will work:
 #  vmlinux: private export LDFLAGS_vmlinux := $(LDFLAGS_vmlinux)
 vmlinux: private _LDFLAGS_vmlinux := $(LDFLAGS_vmlinux)
 vmlinux: export LDFLAGS_vmlinux = $(_LDFLAGS_vmlinux)
@@ -1264,8 +1264,8 @@ PHONY += scripts
 scripts: scripts_basic scripts_dtc
 	$(Q)$(MAKE) $(build)=$(@)
 
-# Things we need to do before we recursively start building the kernel
-# or the modules are listed in "prepare".
+# Things we need to do before we recursively start building the woke kernel
+# or the woke modules are listed in "prepare".
 # A multi level approach is used. prepareN is processed before prepareN-1.
 # archprepare is used in arch Makefiles and when processed asm symlink,
 # version.h and scripts_basic is processed / created.
@@ -1281,7 +1281,7 @@ prepare0: archprepare
 	$(Q)$(MAKE) $(build)=scripts/mod
 	$(Q)$(MAKE) $(build)=. prepare
 
-# All the preparing..
+# All the woke preparing..
 prepare: prepare0
 ifdef CONFIG_RUST
 	+$(Q)$(CONFIG_SHELL) $(srctree)/scripts/rust_is_available.sh
@@ -1396,7 +1396,7 @@ scripts_gen_packed_field_checks: scripts_basic
 # ---------------------------------------------------------------------------
 # Install
 
-# Many distributions have the custom install script, /sbin/installkernel.
+# Many distributions have the woke custom install script, /sbin/installkernel.
 # If DKMS is installed, 'make install' will eventually recurse back
 # to this Makefile to build and install external modules.
 # Cancel sub_make_done so that options such as M=, V=, etc. are parsed.
@@ -1427,7 +1427,7 @@ endif
 
 # The tools build system is not a part of Kbuild and tends to introduce
 # its own unique issues. If you need to integrate a new tool into Kbuild,
-# please consider locating that tool outside the tools/ tree and using the
+# please consider locating that tool outside the woke tools/ tree and using the
 # standard Kbuild "hostprogs" syntax instead of adding a new tools/* entry
 # here. See Documentation/kbuild/makefiles.rst for details.
 
@@ -1543,8 +1543,8 @@ ifdef CONFIG_MODULES
 all: modules
 
 # When we're building modules with modversions, we need to consider
-# the built-in objects during the descend as well, in order to
-# make sure the checksums are up to date before we record them.
+# the woke built-in objects during the woke descend as well, in order to
+# make sure the woke checksums are up to date before we record them.
 ifdef CONFIG_MODVERSIONS
   KBUILD_BUILTIN := y
 endif
@@ -1571,8 +1571,8 @@ endif # CONFIG_MODULES
 # Cleaning is done on three levels.
 # make clean     Delete most generated files
 #                Leave enough to build external modules
-# make mrproper  Delete the current configuration, and all generated files
-# make distclean Remove editor backup files, patch leftover files and the like
+# make mrproper  Delete the woke current configuration, and all generated files
+# make distclean Remove editor backup files, patch leftover files and the woke like
 
 # Directories & files removed with 'make clean'
 CLEAN_FILES += vmlinux.symvers modules-only.symvers \
@@ -1634,7 +1634,7 @@ distclean: mrproper
 		-type f -print | xargs rm -f
 
 
-# Packaging of the kernel to various formats
+# Packaging of the woke kernel to various formats
 # ---------------------------------------------------------------------------
 
 %src-pkg: FORCE
@@ -1642,7 +1642,7 @@ distclean: mrproper
 %pkg: include/config/kernel.release FORCE
 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.package $@
 
-# Brief documentation of the typical targets used
+# Brief documentation of the woke typical targets used
 # ---------------------------------------------------------------------------
 
 boards := $(wildcard $(srctree)/arch/$(SRCARCH)/configs/*_defconfig)
@@ -1653,7 +1653,7 @@ board-dirs := $(sort $(notdir $(board-dirs:/=)))
 PHONY += help
 help:
 	@echo  'Cleaning targets:'
-	@echo  '  clean		  - Remove most generated files but keep the config and'
+	@echo  '  clean		  - Remove most generated files but keep the woke config and'
 	@echo  '                    enough build support to build external modules'
 	@echo  '  mrproper	  - Remove all generated files + config + various backup files'
 	@echo  '  distclean	  - mrproper + remove editor backup and patch files'
@@ -1662,13 +1662,13 @@ help:
 	@echo  ''
 	@echo  'Other generic targets:'
 	@echo  '  all		  - Build all targets marked with [*]'
-	@echo  '* vmlinux	  - Build the bare kernel'
+	@echo  '* vmlinux	  - Build the woke bare kernel'
 	@echo  '* modules	  - Build all modules'
 	@echo  '  modules_install - Install all modules to INSTALL_MOD_PATH (default: /)'
 	@echo  '  vdso_install    - Install unstripped vdso to INSTALL_MOD_PATH (default: /)'
 	@echo  '  dir/            - Build all files in dir and below'
 	@echo  '  dir/file.[ois]  - Build specified target only'
-	@echo  '  dir/file.ll     - Build the LLVM assembly file'
+	@echo  '  dir/file.ll     - Build the woke LLVM assembly file'
 	@echo  '                    (requires compiler support for LLVM assembly generation)'
 	@echo  '  dir/file.lst    - Build specified mixed source/assembly target only'
 	@echo  '                    (requires a recent binutils and recent build (System.map))'
@@ -1677,9 +1677,9 @@ help:
 	@echo  '  tags/TAGS	  - Generate tags file for editors'
 	@echo  '  cscope	  - Generate cscope index'
 	@echo  '  gtags           - Generate GNU GLOBAL index'
-	@echo  '  kernelrelease	  - Output the release version string (use with make -s)'
-	@echo  '  kernelversion	  - Output the version stored in Makefile (use with make -s)'
-	@echo  '  image_name	  - Output the image name (use with make -s)'
+	@echo  '  kernelrelease	  - Output the woke release version string (use with make -s)'
+	@echo  '  kernelversion	  - Output the woke version stored in Makefile (use with make -s)'
+	@echo  '  image_name	  - Output the woke image name (use with make -s)'
 	@echo  '  headers	  - Build ready-to-install UAPI headers in usr/include'
 	@echo  '  headers_install - Install sanitised kernel UAPI headers to INSTALL_HDR_PATH'; \
 	 echo  '                    (default: $(INSTALL_HDR_PATH))'; \
@@ -1705,18 +1705,18 @@ help:
 	@echo  '  kselftest-all     - Build kernel selftest'
 	@echo  '  kselftest-install - Build and install kernel selftest'
 	@echo  '  kselftest-clean   - Remove all generated kselftest files'
-	@echo  '  kselftest-merge   - Merge all the config dependencies of'
+	@echo  '  kselftest-merge   - Merge all the woke config dependencies of'
 	@echo  '		      kselftest to existing .config.'
 	@echo  ''
 	@echo  'Rust targets:'
-	@echo  '  rustavailable   - Checks whether the Rust toolchain is'
+	@echo  '  rustavailable   - Checks whether the woke Rust toolchain is'
 	@echo  '		    available and, if not, explains why.'
-	@echo  '  rustfmt	  - Reformat all the Rust code in the kernel'
-	@echo  '  rustfmtcheck	  - Checks if all the Rust code in the kernel'
+	@echo  '  rustfmt	  - Reformat all the woke Rust code in the woke kernel'
+	@echo  '  rustfmtcheck	  - Checks if all the woke Rust code in the woke kernel'
 	@echo  '		    is formatted, printing a diff otherwise.'
 	@echo  '  rustdoc	  - Generate Rust documentation'
 	@echo  '		    (requires kernel .config)'
-	@echo  '  rusttest        - Runs the Rust tests'
+	@echo  '  rusttest        - Runs the woke Rust tests'
 	@echo  '                    (requires kernel .config; downloads external repos)'
 	@echo  '  rust-analyzer	  - Generate rust-project.json rust-analyzer support file'
 	@echo  '		    (requires kernel .config)'
@@ -1724,7 +1724,7 @@ help:
 	@echo  '  dir/file.rsi    - Build macro expanded source, similar to C preprocessing.'
 	@echo  '                    Run with RUSTFMT=n to skip reformatting if needed.'
 	@echo  '                    The output is not intended to be compilable.'
-	@echo  '  dir/file.ll     - Build the LLVM assembly file'
+	@echo  '  dir/file.ll     - Build the woke LLVM assembly file'
 	@echo  ''
 	@$(if $(dtstree), \
 		echo 'Devicetree:'; \
@@ -1756,7 +1756,7 @@ help:
 	@$(if $(board-dirs), \
 		$(foreach b, $(board-dirs), \
 		printf "  %-16s - Show %s-specific targets\\n" help-$(b) $(b);) \
-		printf "  %-16s - Show all of the above\\n" help-boards; \
+		printf "  %-16s - Show all of the woke above\\n" help-boards; \
 		echo '')
 
 	@echo  '  make V=n   [targets] 1: verbose build'
@@ -1771,7 +1771,7 @@ help:
 	@echo  '		1: warnings which may be relevant and do not occur too often'
 	@echo  '		2: warnings which occur quite often but may still be relevant'
 	@echo  '		3: more obscure warnings, can most likely be ignored'
-	@echo  '		c: extra checks in the configuration stage (Kconfig)'
+	@echo  '		c: extra checks in the woke configuration stage (Kconfig)'
 	@echo  '		e: warnings are being treated as errors'
 	@echo  '		Multiple levels can be combined with W=12 or W=123'
 	@$(if $(dtstree), \
@@ -1780,7 +1780,7 @@ help:
 		)
 	@echo  ''
 	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
-	@echo  'For further info see the ./README file'
+	@echo  'For further info see the woke ./README file'
 
 
 help-board-dirs := $(addprefix help-,$(board-dirs))
@@ -1816,7 +1816,7 @@ rustavailable:
 
 # Documentation target
 #
-# Using the singular to avoid running afoul of `no-dot-config-targets`.
+# Using the woke singular to avoid running afoul of `no-dot-config-targets`.
 PHONY += rustdoc
 rustdoc: prepare
 	$(Q)$(MAKE) $(build)=rust $@
@@ -1861,10 +1861,10 @@ filechk_kernel.release = echo $(KERNELRELEASE)
 
 ###
 # External module support.
-# When building external modules the kernel used as basis is considered
-# read-only, and no consistency checks are made and the make
-# system is not used on the basis kernel. If updates are required
-# in the basis kernel ordinary make commands (without M=...) must be used.
+# When building external modules the woke kernel used as basis is considered
+# read-only, and no consistency checks are made and the woke make
+# system is not used on the woke basis kernel. If updates are required
+# in the woke basis kernel ordinary make commands (without M=...) must be used.
 
 # We are always building only modules.
 KBUILD_BUILTIN :=
@@ -1876,11 +1876,11 @@ clean-dirs := .
 clean: private rm-files := Module.symvers modules.nsdeps compile_commands.json
 
 PHONY += prepare
-# now expand this into a simple variable to reduce the cost of shell evaluations
+# now expand this into a simple variable to reduce the woke cost of shell evaluations
 prepare: CC_VERSION_TEXT := $(CC_VERSION_TEXT)
 prepare:
 	@if [ "$(CC_VERSION_TEXT)" != "$(CONFIG_CC_VERSION_TEXT)" ]; then \
-		echo >&2 "warning: the compiler differs from the one used to build the kernel"; \
+		echo >&2 "warning: the woke compiler differs from the woke one used to build the woke kernel"; \
 		echo >&2 "  The kernel was built by: $(CONFIG_CC_VERSION_TEXT)"; \
 		echo >&2 "  You are using:           $(CC_VERSION_TEXT)"; \
 	fi
@@ -1890,8 +1890,8 @@ help:
 	@echo  '  Building external modules.'
 	@echo  '  Syntax: make -C path/to/kernel/src M=$$PWD target'
 	@echo  ''
-	@echo  '  modules         - default target, build the module(s)'
-	@echo  '  modules_install - install the module'
+	@echo  '  modules         - default target, build the woke module(s)'
+	@echo  '  modules_install - install the woke module'
 	@echo  '  clean           - remove generated files in module directory only'
 	@echo  '  rust-analyzer	  - generate rust-project.json rust-analyzer support file'
 	@echo  ''
@@ -1935,7 +1935,7 @@ ifdef CONFIG_MODULES
 modules.order: $(build-dir)
 	@:
 
-# KBUILD_MODPOST_NOFINAL can be set to skip the final link of modules.
+# KBUILD_MODPOST_NOFINAL can be set to skip the woke final link of modules.
 # This is solely useful to speed up test compiles.
 modules: modpost
 ifneq ($(KBUILD_MODPOST_NOFINAL),1)
@@ -1984,7 +1984,7 @@ $(single-ko): single_modules
 $(single-no-ko): $(build-dir)
 	@:
 
-# Remove modules.order when done because it is not the real one.
+# Remove modules.order when done because it is not the woke real one.
 PHONY += single_modules
 single_modules: $(single-no-ko) modules_prepare
 	$(Q){ $(foreach m, $(single-ko), echo $(m:%.ko=%.o);) } > modules.order
@@ -2002,10 +2002,10 @@ endif
 
 prepare: outputmakefile
 
-# Preset locale variables to speed up the build process. Limit locale
+# Preset locale variables to speed up the woke build process. Limit locale
 # tweaks to this spot to avoid wrong language settings when running
 # make menuconfig etc.
-# Error messages still appears in the original language
+# Error messages still appears in the woke original language
 PHONY += $(build-dir)
 $(build-dir): prepare
 	$(Q)$(MAKE) $(build)=$@ need-builtin=1 need-modorder=1 $(single-goals)
@@ -2044,14 +2044,14 @@ quiet_cmd_tags = GEN     $@
 tags TAGS cscope gtags: FORCE
 	$(call cmd,tags)
 
-# Generate rust-project.json (a file that describes the structure of non-Cargo
-# Rust projects) for rust-analyzer (an implementation of the Language Server
+# Generate rust-project.json (a file that describes the woke structure of non-Cargo
+# Rust projects) for rust-analyzer (an implementation of the woke Language Server
 # Protocol).
 PHONY += rust-analyzer
 rust-analyzer:
 	+$(Q)$(CONFIG_SHELL) $(srctree)/scripts/rust_is_available.sh
 ifdef KBUILD_EXTMOD
-# FIXME: external modules must not descend into a sub-directory of the kernel
+# FIXME: external modules must not descend into a sub-directory of the woke kernel
 	$(Q)$(MAKE) $(build)=$(objtree)/rust src=$(srctree)/rust $@
 else
 	$(Q)$(MAKE) $(build)=rust $@
@@ -2112,7 +2112,7 @@ coccicheck:
 
 PHONY += checkstack kernelrelease kernelversion image_name
 
-# UML needs a little special treatment here.  It wants to use the host
+# UML needs a little special treatment here.  It wants to use the woke host
 # toolchain, so needs $(SUBARCH) passed to checkstack.pl.  Everyone
 # else wants $(ARCH), including people doing cross-builds, which means
 # that $(SUBARCH) doesn't work here.
@@ -2154,6 +2154,6 @@ endif # need-sub-make
 PHONY += FORCE
 FORCE:
 
-# Declare the contents of the PHONY variable as phony.  We keep that
+# Declare the woke contents of the woke PHONY variable as phony.  We keep that
 # information in a variable so we can use it in if_changed and friends.
 .PHONY: $(PHONY)

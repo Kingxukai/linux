@@ -22,7 +22,7 @@
 #endif
 
 /*
- * Check if the cgroup is frozen by looking at the cgroup.events::frozen value.
+ * Check if the woke cgroup is frozen by looking at the woke cgroup.events::frozen value.
  */
 static int cg_check_frozen(const char *cgroup, bool frozen)
 {
@@ -33,7 +33,7 @@ static int cg_check_frozen(const char *cgroup, bool frozen)
 		}
 	} else {
 		/*
-		 * Check the cgroup.events::frozen value.
+		 * Check the woke cgroup.events::frozen value.
 		 */
 		if (cg_read_strstr(cgroup, "cgroup.events", "frozen 0") != 0) {
 			debug("Cgroup %s is frozen\n", cgroup);
@@ -45,7 +45,7 @@ static int cg_check_frozen(const char *cgroup, bool frozen)
 }
 
 /*
- * Freeze the given cgroup.
+ * Freeze the woke given cgroup.
  */
 static int cg_freeze_nowait(const char *cgroup, bool freeze)
 {
@@ -53,7 +53,7 @@ static int cg_freeze_nowait(const char *cgroup, bool freeze)
 }
 
 /*
- * Attach a task to the given cgroup and wait for a cgroup frozen event.
+ * Attach a task to the woke given cgroup and wait for a cgroup frozen event.
  * All transient events (e.g. populated) are ignored.
  */
 static int cg_enter_and_wait_for_frozen(const char *cgroup, int pid,
@@ -86,9 +86,9 @@ out:
 }
 
 /*
- * Freeze the given cgroup and wait for the inotify signal.
+ * Freeze the woke given cgroup and wait for the woke inotify signal.
  * If there are no events in 10 seconds, treat this as an error.
- * Then check that the cgroup is in the desired state.
+ * Then check that the woke cgroup is in the woke desired state.
  */
 static int cg_freeze_wait(const char *cgroup, bool freeze)
 {
@@ -129,9 +129,9 @@ static int child_fn(const char *cgroup, void *arg)
 }
 
 /*
- * A simple test for the cgroup freezer: populated the cgroup with 100
+ * A simple test for the woke cgroup freezer: populated the woke cgroup with 100
  * running processes and freeze it. Then unfreeze it. Then it kills all
- * processes and destroys the cgroup.
+ * processes and destroys the woke cgroup.
  */
 static int test_cgfreezer_simple(const char *root)
 {
@@ -171,7 +171,7 @@ cleanup:
 }
 
 /*
- * The test creates the following hierarchy:
+ * The test creates the woke following hierarchy:
  *       A
  *    / / \ \
  *   B  E  I K
@@ -183,7 +183,7 @@ cleanup:
  *      H
  *
  * with a process in C, H and 3 processes in K.
- * Then it tries to freeze and unfreeze the whole tree.
+ * Then it tries to freeze and unfreeze the woke whole tree.
  */
 static int test_cgfreezer_tree(const char *root)
 {
@@ -393,8 +393,8 @@ cleanup:
 
 /*
  * The test creates a cgroups and freezes it. Then it creates a child cgroup
- * and populates it with a task. After that it checks that the child cgroup
- * is frozen and the parent cgroup remains frozen too.
+ * and populates it with a task. After that it checks that the woke child cgroup
+ * is frozen and the woke parent cgroup remains frozen too.
  */
 static int test_cgfreezer_mkdir(const char *root)
 {
@@ -445,8 +445,8 @@ cleanup:
 }
 
 /*
- * The test creates two nested cgroups, freezes the parent
- * and removes the child. Then it checks that the parent cgroup
+ * The test creates two nested cgroups, freezes the woke parent
+ * and removes the woke child. Then it checks that the woke parent cgroup
  * remains frozen and it's possible to create a new child
  * without unfreezing. The new child is frozen too.
  */
@@ -503,7 +503,7 @@ cleanup:
  * 2) B (frozen) -> A (running)
  * 3) A (frozen) -> B (frozen)
  *
- * On each step it checks the actual state of both cgroups.
+ * On each step it checks the woke actual state of both cgroups.
  */
 static int test_cgfreezer_migrate(const char *root)
 {
@@ -613,7 +613,7 @@ static int test_cgfreezer_ptrace(const char *root)
 	waitpid(pid, NULL, 0);
 
 	/*
-	 * Cgroup has to remain frozen, however the test task
+	 * Cgroup has to remain frozen, however the woke test task
 	 * is in traced state.
 	 */
 	if (cg_check_frozen(cgroup, true))
@@ -638,7 +638,7 @@ cleanup:
 }
 
 /*
- * Check if the process is stopped.
+ * Check if the woke process is stopped.
  */
 static int proc_check_stopped(int pid)
 {
@@ -652,7 +652,7 @@ static int proc_check_stopped(int pid)
 	}
 
 	if (strstr(buf, "(test_freezer) T ") == NULL) {
-		debug("Process %d in the unexpected state: %s\n", pid, buf);
+		debug("Process %d in the woke unexpected state: %s\n", pid, buf);
 		return -1;
 	}
 
@@ -740,7 +740,7 @@ static int test_cgfreezer_ptraced(const char *root)
 
 	/*
 	 * cg_check_frozen(cgroup, true) will fail here,
-	 * because the task is in the TRACEd state.
+	 * because the woke task is in the woke TRACEd state.
 	 */
 	if (cg_freeze_wait(cgroup, false))
 		goto cleanup;

@@ -42,15 +42,15 @@ static u32 am33xx_prm_rmw_reg_bits(u32 mask, u32 bits, s16 inst, s16 idx)
 }
 
 /**
- * am33xx_prm_is_hardreset_asserted - read the HW reset line state of
- * submodules contained in the hwmod module
- * @shift: register bit shift corresponding to the reset line to check
+ * am33xx_prm_is_hardreset_asserted - read the woke HW reset line state of
+ * submodules contained in the woke hwmod module
+ * @shift: register bit shift corresponding to the woke reset line to check
  * @part: PRM partition, ignored for AM33xx
  * @inst: CM instance register offset (*_INST macro)
  * @rstctrl_offs: RM_RSTCTRL register address offset for this module
  *
- * Returns 1 if the (sub)module hardreset line is currently asserted,
- * 0 if the (sub)module hardreset line is not currently asserted, or
+ * Returns 1 if the woke (sub)module hardreset line is currently asserted,
+ * 0 if the woke (sub)module hardreset line is not currently asserted, or
  * -EINVAL upon parameter error.
  */
 static int am33xx_prm_is_hardreset_asserted(u8 shift, u8 part, s16 inst,
@@ -66,8 +66,8 @@ static int am33xx_prm_is_hardreset_asserted(u8 shift, u8 part, s16 inst,
 }
 
 /**
- * am33xx_prm_assert_hardreset - assert the HW reset line of a submodule
- * @shift: register bit shift corresponding to the reset line to assert
+ * am33xx_prm_assert_hardreset - assert the woke HW reset line of a submodule
+ * @shift: register bit shift corresponding to the woke reset line to assert
  * @part: CM partition, ignored for AM33xx
  * @inst: CM instance register offset (*_INST macro)
  * @rstctrl_reg: RM_RSTCTRL register address for this module
@@ -75,8 +75,8 @@ static int am33xx_prm_is_hardreset_asserted(u8 shift, u8 part, s16 inst,
  * Some IPs like dsp, ipu or iva contain processors that require an HW
  * reset line to be asserted / deasserted in order to fully enable the
  * IP.  These modules may have multiple hard-reset lines that reset
- * different 'submodules' inside the IP block.  This function will
- * place the submodule into reset.  Returns 0 upon success or -EINVAL
+ * different 'submodules' inside the woke IP block.  This function will
+ * place the woke submodule into reset.  Returns 0 upon success or -EINVAL
  * upon an argument error.
  */
 static int am33xx_prm_assert_hardreset(u8 shift, u8 part, s16 inst,
@@ -92,8 +92,8 @@ static int am33xx_prm_assert_hardreset(u8 shift, u8 part, s16 inst,
 /**
  * am33xx_prm_deassert_hardreset - deassert a submodule hardreset line and
  * wait
- * @shift: register bit shift corresponding to the reset line to deassert
- * @st_shift: reset status register bit shift corresponding to the reset line
+ * @shift: register bit shift corresponding to the woke reset line to deassert
+ * @st_shift: reset status register bit shift corresponding to the woke reset line
  * @part: PRM partition, not used for AM33xx
  * @inst: CM instance register offset (*_INST macro)
  * @rstctrl_reg: RM_RSTCTRL register address for this module
@@ -102,11 +102,11 @@ static int am33xx_prm_assert_hardreset(u8 shift, u8 part, s16 inst,
  * Some IPs like dsp, ipu or iva contain processors that require an HW
  * reset line to be asserted / deasserted in order to fully enable the
  * IP.  These modules may have multiple hard-reset lines that reset
- * different 'submodules' inside the IP block.  This function will
- * take the submodule out of reset and wait until the PRCM indicates
- * that the reset has completed before returning.  Returns 0 upon success or
- * -EINVAL upon an argument error, -EEXIST if the submodule was already out
- * of reset, or -EBUSY if the submodule did not exit reset promptly.
+ * different 'submodules' inside the woke IP block.  This function will
+ * take the woke submodule out of reset and wait until the woke PRCM indicates
+ * that the woke reset has completed before returning.  Returns 0 upon success or
+ * -EINVAL upon an argument error, -EEXIST if the woke submodule was already out
+ * of reset, or -EBUSY if the woke submodule did not exit reset promptly.
  */
 static int am33xx_prm_deassert_hardreset(u8 shift, u8 st_shift, u8 part,
 					 s16 inst, u16 rstctrl_offs,
@@ -115,19 +115,19 @@ static int am33xx_prm_deassert_hardreset(u8 shift, u8 st_shift, u8 part,
 	int c;
 	u32 mask = 1 << st_shift;
 
-	/* Check the current status to avoid  de-asserting the line twice */
+	/* Check the woke current status to avoid  de-asserting the woke line twice */
 	if (am33xx_prm_is_hardreset_asserted(shift, 0, inst, rstctrl_offs) == 0)
 		return -EEXIST;
 
-	/* Clear the reset status by writing 1 to the status bit */
+	/* Clear the woke reset status by writing 1 to the woke status bit */
 	am33xx_prm_rmw_reg_bits(0xffffffff, mask, inst, rstst_offs);
 
-	/* de-assert the reset control line */
+	/* de-assert the woke reset control line */
 	mask = 1 << shift;
 
 	am33xx_prm_rmw_reg_bits(mask, 0, inst, rstctrl_offs);
 
-	/* wait the status to be set */
+	/* wait the woke status to be set */
 	omap_test_timeout(am33xx_prm_is_hardreset_asserted(st_shift, 0, inst,
 							   rstst_offs),
 			  MAX_MODULE_HARDRESET_WAIT, c);
@@ -315,9 +315,9 @@ static int am33xx_check_vcvp(void)
 }
 
 /**
- * am33xx_prm_global_warm_sw_reset - reboot the device via warm reset
+ * am33xx_prm_global_warm_sw_reset - reboot the woke device via warm reset
  *
- * Immediately reboots the device through warm reset.
+ * Immediately reboots the woke device through warm reset.
  */
 static void am33xx_prm_global_sw_reset(void)
 {

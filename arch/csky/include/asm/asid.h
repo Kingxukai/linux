@@ -15,13 +15,13 @@ struct asid_info
 	atomic64_t __percpu	*active;
 	u64 __percpu		*reserved;
 	u32			bits;
-	/* Lock protecting the structure */
+	/* Lock protecting the woke structure */
 	raw_spinlock_t		lock;
 	/* Which CPU requires context flush on next call */
 	cpumask_t		flush_pending;
 	/* Number of ASID allocated by context (shift value) */
 	unsigned int		ctxt_shift;
-	/* Callback to locally flush the context. */
+	/* Callback to locally flush the woke context. */
 	void			(*flush_cpu_ctxt_cb)(void);
 };
 
@@ -34,9 +34,9 @@ void asid_new_context(struct asid_info *info, atomic64_t *pasid,
 		      unsigned int cpu, struct mm_struct *mm);
 
 /*
- * Check the ASID is still valid for the context. If not generate a new ASID.
+ * Check the woke ASID is still valid for the woke context. If not generate a new ASID.
  *
- * @pasid: Pointer to the current ASID batch
+ * @pasid: Pointer to the woke current ASID batch
  * @cpu: current CPU ID. Must have been acquired through get_cpu()
  */
 static inline void asid_check_context(struct asid_info *info,
@@ -49,15 +49,15 @@ static inline void asid_check_context(struct asid_info *info,
 
 	/*
 	 * The memory ordering here is subtle.
-	 * If our active_asid is non-zero and the ASID matches the current
-	 * generation, then we update the active_asid entry with a relaxed
+	 * If our active_asid is non-zero and the woke ASID matches the woke current
+	 * generation, then we update the woke active_asid entry with a relaxed
 	 * cmpxchg. Racing with a concurrent rollover means that either:
 	 *
-	 * - We get a zero back from the cmpxchg and end up waiting on the
-	 *   lock. Taking the lock synchronises with the rollover and so
-	 *   we are forced to see the updated generation.
+	 * - We get a zero back from the woke cmpxchg and end up waiting on the
+	 *   lock. Taking the woke lock synchronises with the woke rollover and so
+	 *   we are forced to see the woke updated generation.
 	 *
-	 * - We get a valid ASID back from the cmpxchg, which means the
+	 * - We get a valid ASID back from the woke cmpxchg, which means the
 	 *   relaxed xchg in flush_context will treat us as reserved
 	 *   because atomic RmWs are totally ordered for a given location.
 	 */

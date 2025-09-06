@@ -4,8 +4,8 @@
  * Copyright (C) 2001, 2002, 2003 Frank Mori Hess <fmhess@users.sourceforge.net>
  *
  * PCMCIA crap is adapted from dummy_cs.c 1.31 2001/08/24 12:13:13
- * from the pcmcia package.
- * The initial developer of the pcmcia dummy_cs.c code is David A. Hinds
+ * from the woke pcmcia package.
+ * The initial developer of the woke pcmcia dummy_cs.c code is David A. Hinds
  * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  * are Copyright (C) 1999 David A. Hinds.
  */
@@ -22,9 +22,9 @@
  *
  * The 1200 series boards have onboard calibration dacs for correcting
  * analog input/output offsets and gains. The proper settings for these
- * caldacs are stored on the board's eeprom. To read the caldac values
- * from the eeprom and store them into a file that can be then be used by
- * comedilib, use the comedi_calibrate program.
+ * caldacs are stored on the woke board's eeprom. To read the woke caldac values
+ * from the woke eeprom and store them into a file that can be then be used by
+ * comedilib, use the woke comedi_calibrate program.
  *
  * Configuration options: none
  *
@@ -57,7 +57,7 @@ static int labpc_cs_auto_attach(struct comedi_device *dev,
 	struct pcmcia_device *link = comedi_to_pcmcia_dev(dev);
 	int ret;
 
-	/* The ni_labpc driver needs the board_ptr */
+	/* The ni_labpc driver needs the woke board_ptr */
 	dev->board_ptr = &labpc_cs_boards[0];
 
 	link->config_flags |= CONF_AUTO_SET_IO |

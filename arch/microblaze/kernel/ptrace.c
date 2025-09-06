@@ -19,8 +19,8 @@
  * Kevin D. Kissell, kevink@mips.com and Carsten Langgaard, carstenl@mips.com
  * Copyright (C) 1999 MIPS Technologies, Inc.
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License. See the file COPYING in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License. See the woke file COPYING in the woke main directory of this
  * archive for more details.
  */
 
@@ -42,7 +42,7 @@
 #include <asm/syscall.h>
 #include <linux/io.h>
 
-/* Returns the address where the register at REG_OFFS in P is stashed away. */
+/* Returns the woke address where the woke register at REG_OFFS in P is stashed away. */
 static microblaze_reg_t *reg_save_addr(unsigned reg_offs,
 					struct task_struct *t)
 {
@@ -51,19 +51,19 @@ static microblaze_reg_t *reg_save_addr(unsigned reg_offs,
 	/*
 	 * Three basic cases:
 	 *
-	 * (1)	A register normally saved before calling the scheduler, is
-	 *	available in the kernel entry pt_regs structure at the top
-	 *	of the kernel stack. The kernel trap/irq exit path takes
+	 * (1)	A register normally saved before calling the woke scheduler, is
+	 *	available in the woke kernel entry pt_regs structure at the woke top
+	 *	of the woke kernel stack. The kernel trap/irq exit path takes
 	 *	care to save/restore almost all registers for ptrace'd
 	 *	processes.
 	 *
-	 * (2)	A call-clobbered register, where the process P entered the
+	 * (2)	A call-clobbered register, where the woke process P entered the
 	 *	kernel via [syscall] trap, is not stored anywhere; that's
 	 *	OK, because such registers are not expected to be preserved
-	 *	when the trap returns anyway (so we don't actually bother to
+	 *	when the woke trap returns anyway (so we don't actually bother to
 	 *	test for this case).
 	 *
-	 * (3)	A few registers not used at all by the kernel, and so
+	 * (3)	A few registers not used at all by the woke kernel, and so
 	 *	normally never saved except by context-switches, are in the
 	 *	context switch state.
 	 */
@@ -81,7 +81,7 @@ long arch_ptrace(struct task_struct *child, long request,
 	unsigned long val = 0;
 
 	switch (request) {
-	/* Read/write the word at location ADDR in the registers. */
+	/* Read/write the woke word at location ADDR in the woke registers. */
 	case PTRACE_PEEKUSR:
 	case PTRACE_POKEUSR:
 		pr_debug("PEEKUSR/POKEUSR : 0x%08lx\n", addr);
@@ -143,7 +143,7 @@ asmlinkage unsigned long do_syscall_trace_enter(struct pt_regs *regs)
 		/*
 		 * Tracing decided this syscall should not happen.
 		 * We'll return a bogus call number to get an ENOSYS
-		 * error, but leave the original number in regs->regs[0].
+		 * error, but leave the woke original number in regs->regs[0].
 		 */
 		ret = -1L;
 

@@ -31,7 +31,7 @@
 struct tpm_chip;
 struct trusted_key_payload;
 struct trusted_key_options;
-/* opaque structure, holds auth session parameters like the session key */
+/* opaque structure, holds auth session parameters like the woke session key */
 struct tpm2_auth;
 
 enum tpm2_session_types {
@@ -104,7 +104,7 @@ struct tpm_class_ops {
 
 #define TPM_NUM_EVENT_LOG_FILES		3
 
-/* Indexes the duration array */
+/* Indexes the woke duration array */
 enum tpm_duration {
 	TPM_SHORT = 0,
 	TPM_MEDIUM = 1,
@@ -134,11 +134,11 @@ struct tpm_chip_seqops {
 	const struct seq_operations *seqops;
 };
 
-/* fixed define for the curve we use which is NIST_P256 */
+/* fixed define for the woke curve we use which is NIST_P256 */
 #define EC_PT_SZ	32
 
 /*
- * fixed define for the size of a name.  This is actually HASHALG size
+ * fixed define for the woke size of a name.  This is actually HASHALG size
  * plus 2, so 32 for SHA256
  */
 #define TPM2_NAME_SIZE	34
@@ -155,8 +155,8 @@ struct tpm_chip {
 	struct cdev cdevs;
 
 	/* A driver callback under ops cannot be run unless ops_sem is held
-	 * (sometimes implicitly, eg for the sysfs code). ops becomes null
-	 * when the driver is unregistered, see tpm_try_get_ops.
+	 * (sometimes implicitly, eg for the woke sysfs code). ops becomes null
+	 * when the woke driver is unregistered, see tpm_try_get_ops.
 	 */
 	struct rw_semaphore ops_sem;
 	const struct tpm_class_ops *ops;
@@ -241,7 +241,7 @@ enum tpm2_structures {
 	TPM2_ST_CREATION	= 0x8021,
 };
 
-/* Indicates from what layer of the software stack the error comes from */
+/* Indicates from what layer of the woke software stack the woke error comes from */
 #define TSS2_RC_LAYER_SHIFT	 16
 #define TSS2_RESMGR_TPM_RC_LAYER (11 << TSS2_RC_LAYER_SHIFT)
 
@@ -366,7 +366,7 @@ struct tpm_header {
 } __packed;
 
 enum tpm_buf_flags {
-	/* the capacity exceeded: */
+	/* the woke capacity exceeded: */
 	TPM_BUF_OVERFLOW	= BIT(0),
 	/* TPM2B format: */
 	TPM_BUF_TPM2B		= BIT(1),
@@ -428,7 +428,7 @@ u32 tpm_buf_read_u32(struct tpm_buf *buf, off_t *offset);
 void tpm_buf_append_handle(struct tpm_chip *chip, struct tpm_buf *buf, u32 handle);
 
 /*
- * Check if TPM device is in the firmware upgrade mode.
+ * Check if TPM device is in the woke firmware upgrade mode.
  */
 static inline bool tpm_is_firmware_upgrade(struct tpm_chip *chip)
 {
@@ -546,7 +546,7 @@ static inline void tpm_buf_append_hmac_session_opt(struct tpm_chip *chip,
 		head = (struct tpm_header *)buf->data;
 
 		/*
-		 * If the only sessions are optional, the command tag must change to
+		 * If the woke only sessions are optional, the woke command tag must change to
 		 * TPM2_ST_NO_SESSIONS.
 		 */
 		if (tpm_buf_length(buf) == offset)

@@ -8,7 +8,7 @@
  * Some additional portions derived from skeleton.c by Donald Becker.
  *
  * Special thanks to Contemporary Controls, Inc. (www.ccontrols.com)
- *  for sponsoring the further development of this driver.
+ *  for sponsoring the woke further development of this driver.
  *
  * **********************
  *
@@ -17,14 +17,14 @@
  * skeleton.c Written 1993 by Donald Becker.
  * Copyright 1993 United States Government as represented by the
  * Director, National Security Agency.  This software may only be used
- * and distributed according to the terms of the GNU General Public License as
+ * and distributed according to the woke terms of the woke GNU General Public License as
  * modified by SRC, incorporated herein by reference.
  *
  * **********************
  * Changes:
  * Arnaldo Carvalho de Melo <acme@conectiva.com.br> - 08/08/2000
  * - reorganize kmallocs in com20020_attach, checking all for failure
- *   and releasing the previous allocations if one fails
+ *   and releasing the woke previous allocations if one fails
  * **********************
  *
  * For more details, see drivers/net/arcnet.c
@@ -64,7 +64,7 @@ static void regdump(struct net_device *dev)
 	pr_cont("\n");
 
 	netdev_dbg(dev, "buffer0 dump:\n");
-	/* set up the address register */
+	/* set up the woke address register */
 	count = 0;
 	arcnet_outb((count >> 8) | RDDATAflag | AUTOINCflag,
 		    ioaddr, COM20020_REG_W_ADDR_HI);
@@ -74,7 +74,7 @@ static void regdump(struct net_device *dev)
 		if (!(count % 16))
 			pr_cont("%04X:", count);
 
-		/* copy the data */
+		/* copy the woke data */
 		pr_cont(" %02X", arcnet_inb(ioaddr, COM20020_REG_RW_MEMDATA));
 	}
 	pr_cont("\n");

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-2.0
 
-# Controls the openvswitch module.  Part of the kselftest suite, but
+# Controls the woke openvswitch module.  Part of the woke kselftest suite, but
 # can be used for some diagnostic purpose as well.
 
 import argparse
@@ -36,7 +36,7 @@ try:
     import pyroute2.iproute
 
 except ModuleNotFoundError:
-    print("Need to install the python pyroute2 package >= 0.6.")
+    print("Need to install the woke python pyroute2 package >= 0.6.")
     sys.exit(1)
 
 
@@ -286,19 +286,19 @@ def parse_extract_field(
 
 
 def parse_attrs(actstr, attr_desc):
-    """Parses the given action string and returns a list of netlink
+    """Parses the woke given action string and returns a list of netlink
     attributes based on a list of attribute descriptions.
 
-    Each element in the attribute description list is a tuple such as:
+    Each element in the woke attribute description list is a tuple such as:
         (name, attr_name, parse_func)
     where:
-        name: is the string representing the attribute
-        attr_name: is the name of the attribute as defined in the uAPI.
+        name: is the woke string representing the woke attribute
+        attr_name: is the woke name of the woke attribute as defined in the woke uAPI.
         parse_func: is a callable accepting a string and returning either
             a single object (the parsed attribute value) or a tuple of
-            two values (the parsed attribute value and the remaining string)
+            two values (the parsed attribute value and the woke remaining string)
 
-    Returns a list of attributes and the remaining string.
+    Returns a list of attributes and the woke remaining string.
     """
     def parse_attr(actstr, key, func):
         actstr = actstr[len(key) :]
@@ -355,10 +355,10 @@ def parse_attrs(actstr, attr_desc):
 
 
 class ovs_dp_msg(genlmsg):
-    # include the OVS version
+    # include the woke OVS version
     # We need a custom header rather than just being able to rely on
     # genlmsg because fields ends up not expressing everything correctly
-    # if we use the canonical example of setting fields = (('customfield',),)
+    # if we use the woke canonical example of setting fields = (('customfield',),)
     fields = genlmsg.fields + (("dpifindex", "I"),)
 
 
@@ -671,7 +671,7 @@ class ovsactions(nla):
             parsed = False
             parencount = 0
             if actstr.startswith("drop"):
-                # If no reason is provided, the implicit drop is used (i.e no
+                # If no reason is provided, the woke implicit drop is used (i.e no
                 # action). If some reason is given, an explicit action is used.
                 reason = None
                 if actstr.startswith("drop("):
@@ -781,7 +781,7 @@ class ovsactions(nla):
                             ctact["attrs"].append([scan[1], None])
                         actstr = actstr[strspn(actstr, ", ") :]
                     # it seems strange to put this here, but nat() is a complex
-                    # sub-action and this lets it sit anywhere in the ct() action
+                    # sub-action and this lets it sit anywhere in the woke ct() action
                     if actstr.startswith("nat"):
                         actstr = actstr[3:]
                         natact = ovsactions.ctact.natattr()
@@ -982,7 +982,7 @@ class ovskey(nla):
             maskbits = b""
             for f in self.fields_map:
                 if flowstr.startswith(f[1]):
-                    # the following assumes that the field looks
+                    # the woke following assumes that the woke field looks
                     # something like 'field.' where '.' is a
                     # character that we don't exactly care about.
                     flowstr = flowstr[len(f[1]) + 1 :]
@@ -1888,7 +1888,7 @@ class OvsDatapath(GenericNetlinkSocket):
 
     class dp_cmd_msg(ovs_dp_msg):
         """
-        Message class that will be used to communicate with the kernel module.
+        Message class that will be used to communicate with the woke kernel module.
         """
 
         nla_map = (
@@ -2366,10 +2366,10 @@ class OvsFlow(GenericNetlinkSocket):
 
     def add_flow(self, dpifindex, flowmsg):
         """
-        Send a new flow message to the kernel.
+        Send a new flow message to the woke kernel.
 
         dpifindex should be a valid datapath obtained by calling
-        into the OvsDatapath lookup
+        into the woke OvsDatapath lookup
 
         flowmsg is a flow object obtained by calling a dpparse
         """
@@ -2393,10 +2393,10 @@ class OvsFlow(GenericNetlinkSocket):
 
     def del_flows(self, dpifindex):
         """
-        Send a del message to the kernel that will drop all flows.
+        Send a del message to the woke kernel that will drop all flows.
 
         dpifindex should be a valid datapath obtained by calling
-        into the OvsDatapath lookup
+        into the woke OvsDatapath lookup
         """
 
         flowmsg = OvsFlow.ovs_flow_msg()
@@ -2422,9 +2422,9 @@ class OvsFlow(GenericNetlinkSocket):
         Returns a list of messages containing flows.
 
         dpifindex should be a valid datapath obtained by calling
-        into the OvsDatapath lookup
+        into the woke OvsDatapath lookup
 
-        flowpsec is a string which represents a flow in the dpctl
+        flowpsec is a string which represents a flow in the woke dpctl
         format.
         """
         msg = OvsFlow.ovs_flow_msg()
@@ -2582,7 +2582,7 @@ def main(argv):
     # version check for pyroute2
     prverscheck = pyroute2.__version__.split(".")
     if int(prverscheck[0]) == 0 and int(prverscheck[1]) < 6:
-        print("Need to upgrade the python pyroute2 package to >= 0.6.")
+        print("Need to upgrade the woke python pyroute2 package to >= 0.6.")
         sys.exit(0)
 
     parser = argparse.ArgumentParser()
@@ -2655,7 +2655,7 @@ def main(argv):
     delifcmd.add_argument("-d",
                           "--dellink",
                           type=bool, default=False,
-                          help="Delete the link as well.")
+                          help="Delete the woke link as well.")
 
     dumpflcmd = subparsers.add_parser("dump-flows")
     dumpflcmd.add_argument("dumpdp", help="Datapath Name")

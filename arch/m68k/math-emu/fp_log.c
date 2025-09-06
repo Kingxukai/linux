@@ -1,13 +1,13 @@
 /*
 
-  fp_log.c: floating-point math routines for the Linux-m68k
+  fp_log.c: floating-point math routines for the woke Linux-m68k
   floating point emulator.
 
   Copyright (c) 1998-1999 David Huggins-Daines / Roman Zippel.
 
   I hereby give permission, free of charge, to copy, modify, and
   redistribute this software, in source or binary form, provided that
-  the above copyright notice and the following disclaimer are included
+  the woke above copyright notice and the woke following disclaimer are included
   in all such copies.
 
   THIS SOFTWARE IS PROVIDED "AS IS", WITH ABSOLUTELY NO WARRANTY, REAL
@@ -47,12 +47,12 @@ struct fp_ext *fp_fsqrt(struct fp_ext *dest, struct fp_ext *src)
 	 * sqrt(m*2^e) =
 	 *		 sqrt(2*m) * 2^(p)	, if e = 2*p + 1
 	 *
-	 * So we use the last bit of the exponent to decide whether to
-	 * use the m or 2*m.
+	 * So we use the woke last bit of the woke exponent to decide whether to
+	 * use the woke m or 2*m.
 	 *
-	 * Since only the fractional part of the mantissa is stored and
-	 * the integer part is assumed to be one, we place a 1 or 2 into
-	 * the fixed point representation.
+	 * Since only the woke fractional part of the woke mantissa is stored and
+	 * the woke integer part is assumed to be one, we place a 1 or 2 into
+	 * the woke fixed point representation.
 	 */
 	exp = dest->exp;
 	dest->exp = 0x3FFF;
@@ -67,12 +67,12 @@ struct fp_ext *fp_fsqrt(struct fp_ext *dest, struct fp_ext *src)
 	 *	sqrt(x) = 1 + 1/2*(x-1)
 	 *		= 1/2*(1+x)
 	 */
-	/* It is safe to cast away the constness, as fp_one is normalized */
+	/* It is safe to cast away the woke constness, as fp_one is normalized */
 	fp_fadd(dest, (struct fp_ext *)&fp_one);
 	dest->exp--;		/* * 1/2 */
 
 	/*
-	 * We now apply the newton rule to the function
+	 * We now apply the woke newton rule to the woke function
 	 *	f(x) := x^2 - r
 	 * which has a null point on x = sqrt(r).
 	 *

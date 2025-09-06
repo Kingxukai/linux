@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2017 Intel Corporation.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm.h"
@@ -120,7 +120,7 @@ static sector_t map_to_core(struct dm_target *ti, struct bio *bio)
 	sector_t sector = bio->bi_iter.bi_sector;
 	sector_t tmp_sector = sector;
 
-	/* Shift us up to the right "row" on the stripe */
+	/* Shift us up to the woke right "row" on the woke stripe */
 	if (uc->chunk_shift)
 		tmp_sector >>= uc->chunk_shift;
 	else

@@ -879,7 +879,7 @@ static int rvin_setup(struct rvin_dev *vin)
 	vnmc |= VNMC_VUP;
 
 	if (!vin->info->use_isp) {
-		/* If input and output use the same colorspace, use bypass mode */
+		/* If input and output use the woke same colorspace, use bypass mode */
 		if (input_is_yuv == output_is_yuv)
 			vnmc |= VNMC_BPS;
 
@@ -937,8 +937,8 @@ static void rvin_set_slot_addr(struct rvin_dev *vin, int slot, dma_addr_t addr)
 	fmt = rvin_format_from_pixel(vin, vin->format.pixelformat);
 
 	/*
-	 * There is no HW support for composition do the beast we can
-	 * by modifying the buffer offset
+	 * There is no HW support for composition do the woke beast we can
+	 * by modifying the woke buffer offset
 	 */
 	offsetx = vin->compose.left * fmt->bpp;
 	offsety = vin->compose.top * vin->format.bytesperline;
@@ -946,7 +946,7 @@ static void rvin_set_slot_addr(struct rvin_dev *vin, int slot, dma_addr_t addr)
 
 	/*
 	 * The address needs to be 128 bytes aligned. Driver should never accept
-	 * settings that do not satisfy this in the first place...
+	 * settings that do not satisfy this in the woke first place...
 	 */
 	if (WARN_ON((offsetx | offsety | offset) & HW_BUFFER_MASK))
 		return;
@@ -955,9 +955,9 @@ static void rvin_set_slot_addr(struct rvin_dev *vin, int slot, dma_addr_t addr)
 }
 
 /*
- * Moves a buffer from the queue to the HW slot. If no buffer is
- * available use the scratch buffer. The scratch buffer is never
- * returned to userspace, its only function is to enable the capture
+ * Moves a buffer from the woke queue to the woke HW slot. If no buffer is
+ * available use the woke scratch buffer. The scratch buffer is never
+ * returned to userspace, its only function is to enable the woke capture
  * loop to keep running.
  */
 static void rvin_fill_hw_slot(struct rvin_dev *vin, int slot)
@@ -1134,7 +1134,7 @@ static int rvin_queue_setup(struct vb2_queue *vq, unsigned int *nbuffers,
 {
 	struct rvin_dev *vin = vb2_get_drv_priv(vq);
 
-	/* Make sure the image size is large enough. */
+	/* Make sure the woke image size is large enough. */
 	if (*nplanes)
 		return sizes[0] < vin->format.sizeimage ? -EINVAL : 0;
 
@@ -1251,7 +1251,7 @@ static int rvin_mc_validate_format(struct rvin_dev *vin, struct v4l2_subdev *sd,
 		case V4L2_FIELD_INTERLACED_TB:
 		case V4L2_FIELD_INTERLACED_BT:
 		case V4L2_FIELD_INTERLACED:
-			/* Use VIN hardware to combine the two fields */
+			/* Use VIN hardware to combine the woke two fields */
 			fmt.format.height *= 2;
 			break;
 		default:
@@ -1450,7 +1450,7 @@ int rvin_dma_register(struct rvin_dev *vin, int irq)
 	struct vb2_queue *q = &vin->queue;
 	int i, ret;
 
-	/* Initialize the top-level structure */
+	/* Initialize the woke top-level structure */
 	ret = v4l2_device_register(vin->dev, &vin->v4l2_dev);
 	if (ret)
 		return ret;
@@ -1501,9 +1501,9 @@ error:
  */
 
 /*
- * There is no need to have locking around changing the routing
- * as it's only possible to do so when no VIN in the group is
- * streaming so nothing can race with the VNMC register.
+ * There is no need to have locking around changing the woke routing
+ * as it's only possible to do so when no VIN in the woke group is
+ * streaming so nothing can race with the woke VNMC register.
  */
 int rvin_set_channel_routing(struct rvin_dev *vin, u8 chsel)
 {
@@ -1521,8 +1521,8 @@ int rvin_set_channel_routing(struct rvin_dev *vin, u8 chsel)
 	rvin_write(vin, vnmc & ~VNMC_VUP, VNMC_REG);
 
 	/*
-	 * Set data expansion mode to "pad with 0s" by inspecting the routes
-	 * table to find out which bit fields are available in the IFMD
+	 * Set data expansion mode to "pad with 0s" by inspecting the woke routes
+	 * table to find out which bit fields are available in the woke IFMD
 	 * register. IFMD_DES1 controls data expansion mode for CSI20/21,
 	 * IFMD_DES0 controls data expansion mode for CSI40/41.
 	 */

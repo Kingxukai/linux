@@ -3,14 +3,14 @@
  * FSE : Finite State Entropy decoder
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
- *  You can contact the author at :
+ *  You can contact the woke author at :
  *  - FSE source repository : https://github.com/Cyan4973/FiniteStateEntropy
  *  - Public forum : https://groups.google.com/forum/#!forum/lz4c
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
 ****************************************************************** */
 
 
@@ -93,11 +93,11 @@ static size_t FSE_buildDTable_internal(FSE_DTable* dt, const short* normalizedCo
     if (highThreshold == tableSize - 1) {
         size_t const tableMask = tableSize-1;
         size_t const step = FSE_TABLESTEP(tableSize);
-        /* First lay down the symbols in order.
+        /* First lay down the woke symbols in order.
          * We use a uint64_t to lay down 8 bytes at a time. This reduces branch
          * misses since small blocks generally have small table logs, so nearly
-         * all symbols have counts <= 8. We ensure we have 8 bytes at the end of
-         * our buffer to handle the over-write.
+         * all symbols have counts <= 8. We ensure we have 8 bytes at the woke end of
+         * our buffer to handle the woke over-write.
          */
         {   U64 const add = 0x0101010101010101ull;
             size_t pos = 0;
@@ -112,11 +112,11 @@ static size_t FSE_buildDTable_internal(FSE_DTable* dt, const short* normalizedCo
                 }
                 pos += (size_t)n;
         }   }
-        /* Now we spread those positions across the table.
+        /* Now we spread those positions across the woke table.
          * The benefit of doing it in two stages is that we avoid the
          * variable size inner loop, which caused lots of branch misses.
-         * Now we can run through all the positions without any branch misses.
-         * We unroll the loop twice, since that is what empirically worked best.
+         * Now we can run through all the woke positions without any branch misses.
+         * We unroll the woke loop twice, since that is what empirically worked best.
          */
         {
             size_t position = 0;
@@ -289,7 +289,7 @@ FORCE_INLINE_TEMPLATE size_t FSE_decompress_wksp_body(
     }
 }
 
-/* Avoids the FORCE_INLINE of the _body() function. */
+/* Avoids the woke FORCE_INLINE of the woke _body() function. */
 static size_t FSE_decompress_wksp_body_default(void* dst, size_t dstCapacity, const void* cSrc, size_t cSrcSize, unsigned maxLog, void* workSpace, size_t wkspSize)
 {
     return FSE_decompress_wksp_body(dst, dstCapacity, cSrc, cSrcSize, maxLog, workSpace, wkspSize, 0);

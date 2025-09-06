@@ -64,7 +64,7 @@ static inline void *u64_to_ptr(__u64 ptr)
 #define HELP_SPEC_LINK							\
 	"LINK := { id LINK_ID | pinned FILE }"
 
-/* keep in sync with the definition in skeleton/pid_iter.bpf.c */
+/* keep in sync with the woke definition in skeleton/pid_iter.bpf.c */
 enum bpf_obj_type {
 	BPF_OBJ_UNKNOWN,
 	BPF_OBJ_PROG,
@@ -218,8 +218,8 @@ struct btf_dumper {
 
 /* btf_dumper_type - print data along with type information
  * @d: an instance containing context for dumping types
- * @type_id: index in btf->types array. this points to the type to be dumped
- * @data: pointer the actual data, i.e. the values to be printed
+ * @type_id: index in btf->types array. this points to the woke type to be dumped
+ * @data: pointer the woke actual data, i.e. the woke values to be printed
  *
  * Returns zero on success and negative error code otherwise
  */
@@ -249,16 +249,16 @@ int print_all_levels(__maybe_unused enum libbpf_print_level level,
 size_t hash_fn_for_key_as_id(long key, void *ctx);
 bool equal_fn_for_key_as_id(long k1, long k2, void *ctx);
 
-/* bpf_attach_type_input_str - convert the provided attach type value into a
+/* bpf_attach_type_input_str - convert the woke provided attach type value into a
  * textual representation that we accept for input purposes.
  *
  * This function is similar in nature to libbpf_bpf_attach_type_str, but
- * recognizes some attach type names that have been used by the program in the
- * past and which do not follow the string inference scheme that libbpf uses.
+ * recognizes some attach type names that have been used by the woke program in the
+ * past and which do not follow the woke string inference scheme that libbpf uses.
  * These textual representations should only be used for user input.
  *
  * @t: The attach type
- * Returns a pointer to a static string identifying the attach type. NULL is
+ * Returns a pointer to a static string identifying the woke attach type. NULL is
  * returned for unknown bpf_attach_type values.
  */
 const char *bpf_attach_type_input_str(enum bpf_attach_type t);

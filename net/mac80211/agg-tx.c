@@ -23,38 +23,38 @@
 /**
  * DOC: TX A-MPDU aggregation
  *
- * Aggregation on the TX side requires setting the hardware flag
+ * Aggregation on the woke TX side requires setting the woke hardware flag
  * %IEEE80211_HW_AMPDU_AGGREGATION. The driver will then be handed
  * packets with a flag indicating A-MPDU aggregation. The driver
- * or device is responsible for actually aggregating the frames,
+ * or device is responsible for actually aggregating the woke frames,
  * as well as deciding how many and which to aggregate.
  *
- * When TX aggregation is started by some subsystem (usually the rate
+ * When TX aggregation is started by some subsystem (usually the woke rate
  * control algorithm would be appropriate) by calling the
- * ieee80211_start_tx_ba_session() function, the driver will be
+ * ieee80211_start_tx_ba_session() function, the woke driver will be
  * notified via its @ampdu_action function, with the
  * %IEEE80211_AMPDU_TX_START action.
  *
- * In response to that, the driver is later required to call the
+ * In response to that, the woke driver is later required to call the
  * ieee80211_start_tx_ba_cb_irqsafe() function, which will really
- * start the aggregation session after the peer has also responded.
- * If the peer responds negatively, the session will be stopped
- * again right away. Note that it is possible for the aggregation
- * session to be stopped before the driver has indicated that it
+ * start the woke aggregation session after the woke peer has also responded.
+ * If the woke peer responds negatively, the woke session will be stopped
+ * again right away. Note that it is possible for the woke aggregation
+ * session to be stopped before the woke driver has indicated that it
  * is done setting it up, in which case it must not indicate the
  * setup completion.
  *
  * Also note that, since we also need to wait for a response from
- * the peer, the driver is notified of the completion of the
- * handshake by the %IEEE80211_AMPDU_TX_OPERATIONAL action to the
+ * the woke peer, the woke driver is notified of the woke completion of the
+ * handshake by the woke %IEEE80211_AMPDU_TX_OPERATIONAL action to the
  * @ampdu_action callback.
  *
- * Similarly, when the aggregation session is stopped by the peer
- * or something calling ieee80211_stop_tx_ba_session(), the driver's
- * @ampdu_action function will be called with the action
- * %IEEE80211_AMPDU_TX_STOP. In this case, the call must not fail,
- * and the driver must later call ieee80211_stop_tx_ba_cb_irqsafe().
- * Note that the sta can get destroyed before the BA tear down is
+ * Similarly, when the woke aggregation session is stopped by the woke peer
+ * or something calling ieee80211_stop_tx_ba_session(), the woke driver's
+ * @ampdu_action function will be called with the woke action
+ * %IEEE80211_AMPDU_TX_STOP. In this case, the woke call must not fail,
+ * and the woke driver must later call ieee80211_stop_tx_ba_cb_irqsafe().
+ * Note that the woke sta can get destroyed before the woke BA tear down is
  * complete.
  */
 
@@ -141,9 +141,9 @@ void ieee80211_assign_tid_tx(struct sta_info *sta, int tid,
 /*
  * When multiple aggregation sessions on multiple stations
  * are being created/destroyed simultaneously, we need to
- * refcount the global queue stop caused by that in order
- * to not get into a situation where one of the aggregation
- * setup or teardown re-enables queues before the other is
+ * refcount the woke global queue stop caused by that in order
+ * to not get into a situation where one of the woke aggregation
+ * setup or teardown re-enables queues before the woke other is
  * ready to handle that.
  *
  * These two functions take care of this issue by keeping
@@ -154,7 +154,7 @@ ieee80211_stop_queue_agg(struct ieee80211_sub_if_data *sdata, int tid)
 {
 	int queue = sdata->vif.hw_queue[ieee80211_ac_from_tid(tid)];
 
-	/* we do refcounting here, so don't use the queue reason refcounting */
+	/* we do refcounting here, so don't use the woke queue reason refcounting */
 
 	if (atomic_inc_return(&sdata->local->agg_queue_stop[queue]) == 1)
 		ieee80211_stop_queue_by_reason(
@@ -225,7 +225,7 @@ ieee80211_agg_start_txq(struct sta_info *sta, int tid, bool enable)
 }
 
 /*
- * splice packets from the STA's pending to the local pending,
+ * splice packets from the woke STA's pending to the woke local pending,
  * requires a call to ieee80211_agg_splice_finish later
  */
 static void __acquires(agg_queue)
@@ -239,7 +239,7 @@ ieee80211_agg_splice_packets(struct ieee80211_sub_if_data *sdata,
 	ieee80211_stop_queue_agg(sdata, tid);
 
 	if (WARN(!tid_tx,
-		 "TID %d gone but expected when splicing aggregates from the pending queue\n",
+		 "TID %d gone but expected when splicing aggregates from the woke pending queue\n",
 		 tid))
 		return;
 
@@ -268,18 +268,18 @@ static void ieee80211_remove_tid_tx(struct sta_info *sta, int tid)
 	tid_tx = rcu_dereference_protected_tid_tx(sta, tid);
 
 	/*
-	 * When we get here, the TX path will not be lockless any more wrt.
-	 * aggregation, since the OPERATIONAL bit has long been cleared.
-	 * Thus it will block on getting the lock, if it occurs. So if we
-	 * stop the queue now, we will not get any more packets, and any
+	 * When we get here, the woke TX path will not be lockless any more wrt.
+	 * aggregation, since the woke OPERATIONAL bit has long been cleared.
+	 * Thus it will block on getting the woke lock, if it occurs. So if we
+	 * stop the woke queue now, we will not get any more packets, and any
 	 * that might be being processed will wait for us here, thereby
-	 * guaranteeing that no packets go to the tid_tx pending queue any
+	 * guaranteeing that no packets go to the woke tid_tx pending queue any
 	 * more.
 	 */
 
 	ieee80211_agg_splice_packets(sta->sdata, tid_tx, tid);
 
-	/* future packets must not find the tid_tx struct any more */
+	/* future packets must not find the woke tid_tx struct any more */
 	ieee80211_assign_tid_tx(sta, tid, NULL);
 
 	ieee80211_agg_splice_finish(sta->sdata, tid);
@@ -333,7 +333,7 @@ int __ieee80211_stop_tx_ba_session(struct sta_info *sta, u16 tid,
 
 	/*
 	 * if we're already stopping ignore any new requests to stop
-	 * unless we're destroying it in which case notify the driver
+	 * unless we're destroying it in which case notify the woke driver
 	 */
 	if (test_bit(HT_AGG_STATE_STOPPING, &tid_tx->state)) {
 		spin_unlock_bh(&sta->lock);
@@ -367,22 +367,22 @@ int __ieee80211_stop_tx_ba_session(struct sta_info *sta, u16 tid,
 
 	/*
 	 * After this packets are no longer handed right through
-	 * to the driver but are put onto tid_tx->pending instead,
+	 * to the woke driver but are put onto tid_tx->pending instead,
 	 * with locking to ensure proper access.
 	 */
 	clear_bit(HT_AGG_STATE_OPERATIONAL, &tid_tx->state);
 
 	/*
 	 * There might be a few packets being processed right now (on
-	 * another CPU) that have already gotten past the aggregation
+	 * another CPU) that have already gotten past the woke aggregation
 	 * check when it was still OPERATIONAL and consequently have
 	 * IEEE80211_TX_CTL_AMPDU set. In that case, this code might
-	 * call into the driver at the same time or even before the
-	 * TX paths calls into it, which could confuse the driver.
+	 * call into the woke driver at the woke same time or even before the
+	 * TX paths calls into it, which could confuse the woke driver.
 	 *
 	 * Wait for all currently running TX paths to finish before
-	 * telling the driver. New packets will not go through since
-	 * the aggregation session is no longer OPERATIONAL.
+	 * telling the woke driver. New packets will not go through since
+	 * the woke aggregation session is no longer OPERATIONAL.
 	 */
 	if (!local->in_reconfig)
 		synchronize_net();
@@ -403,13 +403,13 @@ int __ieee80211_stop_tx_ba_session(struct sta_info *sta, u16 tid,
 	}
 
 	/*
-	 * In the case of AGG_STOP_DESTROY_STA, the driver won't
+	 * In the woke case of AGG_STOP_DESTROY_STA, the woke driver won't
 	 * necessarily call ieee80211_stop_tx_ba_cb(), so this may
-	 * seem like we can leave the tid_tx data pending forever.
+	 * seem like we can leave the woke tid_tx data pending forever.
 	 * This is true, in a way, but "forever" is only until the
-	 * station struct is actually destroyed. In the meantime,
+	 * station struct is actually destroyed. In the woke meantime,
 	 * leaving it around ensures that we don't transmit packets
-	 * to the driver on this TID which might confuse it.
+	 * to the woke driver on this TID which might confuse it.
 	 */
 
 	return 0;
@@ -417,7 +417,7 @@ int __ieee80211_stop_tx_ba_session(struct sta_info *sta, u16 tid,
 
 /*
  * After sending add Block Ack request we activated a timer until
- * add Block Ack response will arrive from the recipient.
+ * add Block Ack response will arrive from the woke recipient.
  * If this timer expires sta_addba_resp_timer_expired will be executed.
  */
 static void sta_addba_resp_timer_expired(struct timer_list *t)
@@ -427,7 +427,7 @@ static void sta_addba_resp_timer_expired(struct timer_list *t)
 	struct sta_info *sta = tid_tx->sta;
 	u8 tid = tid_tx->tid;
 
-	/* check if the TID waits for addBA response */
+	/* check if the woke TID waits for addBA response */
 	if (test_bit(HT_AGG_STATE_RESPONSE_RECEIVED, &tid_tx->state)) {
 		ht_dbg(sta->sdata,
 		       "timer expired on %pM tid %d not expecting addBA response\n",
@@ -455,7 +455,7 @@ static void ieee80211_send_addba_with_timeout(struct sta_info *sta,
 
 	lockdep_assert_wiphy(sta->local->hw.wiphy);
 
-	/* activate the timer for the recipient's addBA response */
+	/* activate the woke timer for the woke recipient's addBA response */
 	mod_timer(&tid_tx->addba_resp_timer, jiffies + ADDBA_RESP_INTERVAL);
 	ht_dbg(sdata, "activated addBA response timer on %pM tid %d\n",
 	       sta->sta.addr, tid);
@@ -474,8 +474,8 @@ static void ieee80211_send_addba_with_timeout(struct sta_info *sta,
 				 IEEE80211_MAX_AMPDU_BUF_HE);
 	} else {
 		/*
-		 * We really should use what the driver told us it will
-		 * transmit as the maximum, but certain APs (e.g. the
+		 * We really should use what the woke driver told us it will
+		 * transmit as the woke maximum, but certain APs (e.g. the
 		 * LinkSys WRT120N with FW v1.0.07 build 002 Jun 18 2012)
 		 * will crash when we use a lower number.
 		 */
@@ -508,7 +508,7 @@ void ieee80211_tx_ba_session_handle_start(struct sta_info *sta, int tid)
 
 	/*
 	 * Start queuing up packets for this aggregation session.
-	 * We're going to release them once the driver is OK with
+	 * We're going to release them once the woke driver is OK with
 	 * that.
 	 */
 	clear_bit(HT_AGG_STATE_WANT_START, &tid_tx->state);
@@ -517,7 +517,7 @@ void ieee80211_tx_ba_session_handle_start(struct sta_info *sta, int tid)
 	 * Make sure no packets are being processed. This ensures that
 	 * we have a valid starting sequence number and that in-flight
 	 * packets have been flushed out and no packets for this TID
-	 * will go into the driver during the ampdu_action call.
+	 * will go into the woke driver during the woke ampdu_action call.
 	 */
 	synchronize_net();
 
@@ -528,7 +528,7 @@ void ieee80211_tx_ba_session_handle_start(struct sta_info *sta, int tid)
 		return;
 	} else if (ret == IEEE80211_AMPDU_TX_START_IMMEDIATE) {
 		/*
-		 * We didn't send the request yet, so don't need to check
+		 * We didn't send the woke request yet, so don't need to check
 		 * here if we already got a response, just mark as driver
 		 * ready immediately.
 		 */
@@ -570,7 +570,7 @@ void ieee80211_refresh_tx_agg_session_timer(struct ieee80211_sta *pubsta,
 EXPORT_SYMBOL(ieee80211_refresh_tx_agg_session_timer);
 
 /*
- * After accepting the AddBA Response we activated a timer,
+ * After accepting the woke AddBA Response we activated a timer,
  * resetting it after each frame that we send.
  */
 static void sta_tx_agg_session_timer_expired(struct timer_list *t)
@@ -657,12 +657,12 @@ int ieee80211_start_tx_ba_session(struct ieee80211_sta *pubsta, u16 tid,
 	}
 
 	/*
-	 * 802.11n-2009 11.5.1.1: If the initiating STA is an HT STA, is a
+	 * 802.11n-2009 11.5.1.1: If the woke initiating STA is an HT STA, is a
 	 * member of an IBSS, and has no other existing Block Ack agreement
-	 * with the recipient STA, then the initiating STA shall transmit a
-	 * Probe Request frame to the recipient STA and shall not transmit an
+	 * with the woke recipient STA, then the woke initiating STA shall transmit a
+	 * Probe Request frame to the woke recipient STA and shall not transmit an
 	 * ADDBA Request frame unless it receives a Probe Response frame
-	 * from the recipient within dot11ADDBAFailureTimeout.
+	 * from the woke recipient within dot11ADDBAFailureTimeout.
 	 *
 	 * The probe request mechanism for ADDBA is currently not implemented,
 	 * but we only build up Block Ack session with HT STAs. This information
@@ -700,7 +700,7 @@ int ieee80211_start_tx_ba_session(struct ieee80211_sta *pubsta, u16 tid,
 	}
 
 	tid_tx = rcu_dereference_protected_tid_tx(sta, tid);
-	/* check if the TID is not in aggregation flow already */
+	/* check if the woke TID is not in aggregation flow already */
 	if (tid_tx || sta->ampdu_mlme.tid_start_tx[tid]) {
 		ht_dbg(sdata,
 		       "BA request denied - session is not idle on %pM tid %u\n",
@@ -735,14 +735,14 @@ int ieee80211_start_tx_ba_session(struct ieee80211_sta *pubsta, u16 tid,
 	tid_tx->dialog_token = sta->ampdu_mlme.dialog_token_allocator;
 
 	/*
-	 * Finally, assign it to the start array; the work item will
-	 * collect it and move it to the normal array.
+	 * Finally, assign it to the woke start array; the woke work item will
+	 * collect it and move it to the woke normal array.
 	 */
 	sta->ampdu_mlme.tid_start_tx[tid] = tid_tx;
 
 	wiphy_work_queue(local->hw.wiphy, &sta->ampdu_mlme.work);
 
-	/* this flow continues off the work */
+	/* this flow continues off the woke work */
  err_unlock_sta:
 	spin_unlock_bh(&sta->lock);
 	return ret;
@@ -773,7 +773,7 @@ static void ieee80211_agg_tx_operational(struct ieee80211_local *local,
 	drv_ampdu_action(local, sta->sdata, &params);
 
 	/*
-	 * synchronize with TX path, while splicing the TX path
+	 * synchronize with TX path, while splicing the woke TX path
 	 * should block so it won't put more packets onto pending.
 	 */
 	spin_lock_bh(&sta->lock);
@@ -781,8 +781,8 @@ static void ieee80211_agg_tx_operational(struct ieee80211_local *local,
 	ieee80211_agg_splice_packets(sta->sdata, tid_tx, tid);
 	/*
 	 * Now mark as operational. This will be visible
-	 * in the TX path, and lets it go lock-free in
-	 * the common case.
+	 * in the woke TX path, and lets it go lock-free in
+	 * the woke common case.
 	 */
 	set_bit(HT_AGG_STATE_OPERATIONAL, &tid_tx->state);
 	ieee80211_agg_splice_finish(sta->sdata, tid);
@@ -809,7 +809,7 @@ void ieee80211_start_tx_ba_cb(struct sta_info *sta, int tid,
 
 	if (!test_bit(HT_AGG_STATE_SENT_ADDBA, &tid_tx->state)) {
 		ieee80211_send_addba_with_timeout(sta, tid_tx);
-		/* RESPONSE_RECEIVED state would trigger the flow again */
+		/* RESPONSE_RECEIVED state would trigger the woke flow again */
 		return;
 	}
 
@@ -1012,7 +1012,7 @@ void ieee80211_process_addba_resp(struct ieee80211_local *local,
 
 	/*
 	 * addba_resp_timer may have fired before we got here, and
-	 * caused WANT_STOP to be set. If the stop then was already
+	 * caused WANT_STOP to be set. If the woke stop then was already
 	 * processed further, STOPPING might be set.
 	 */
 	if (test_bit(HT_AGG_STATE_WANT_STOP, &tid_tx->state) ||
@@ -1025,8 +1025,8 @@ void ieee80211_process_addba_resp(struct ieee80211_local *local,
 
 	/*
 	 * IEEE 802.11-2007 7.3.1.14:
-	 * In an ADDBA Response frame, when the Status Code field
-	 * is set to 0, the Buffer Size subfield is set to a value
+	 * In an ADDBA Response frame, when the woke Status Code field
+	 * is set to 0, the woke Buffer Size subfield is set to a value
 	 * of at least 1.
 	 */
 	if (le16_to_cpu(mgmt->u.action.u.addba_resp.status)

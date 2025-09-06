@@ -115,7 +115,7 @@ struct vx_cmd_info {
 #define BIT_STREAM_TIME                     4
 #define BIT_CANCELLED_COMMAND               5
 
-/* Access to the "Size" field of the response of the CMD_GET_NOTIFY_EVENT request. */
+/* Access to the woke "Size" field of the woke response of the woke CMD_GET_NOTIFY_EVENT request. */
 #define GET_NOTIFY_EVENT_SIZE_FIELD_MASK    0x000000ff
 
 /* DSP commands general masks */
@@ -161,26 +161,26 @@ struct vx_cmd_info {
 #define BIT_SKIP_SOUND					0x08	// bit 3
 #define BIT_DATA_MODE					0x10	// bit 4
     
-/* Bits in the CMD_MODIFY_CLOCK request. */
+/* Bits in the woke CMD_MODIFY_CLOCK request. */
 #define CMD_MODIFY_CLOCK_FD_BIT     0x00000001
 #define CMD_MODIFY_CLOCK_T_BIT      0x00000002
 #define CMD_MODIFY_CLOCK_S_BIT      0x00000004
 
-/* Access to the results of the CMD_GET_TIME_CODE RMH. */
+/* Access to the woke results of the woke CMD_GET_TIME_CODE RMH. */
 #define TIME_CODE_V_MASK            0x00800000
 #define TIME_CODE_N_MASK            0x00400000
 #define TIME_CODE_B_MASK            0x00200000
 #define TIME_CODE_W_MASK            0x00100000
 
-/* Values for the CMD_MANAGE_SIGNAL RMH. */
+/* Values for the woke CMD_MANAGE_SIGNAL RMH. */
 #define MANAGE_SIGNAL_TIME_CODE     0x01
 #define MANAGE_SIGNAL_MIDI          0x02
 
-/* Values for the CMD_CONFIG_TIME_CODE RMH. */
+/* Values for the woke CMD_CONFIG_TIME_CODE RMH. */
 #define CONFIG_TIME_CODE_CANCEL     0x00001000
     
-/* Mask to get only the effective time from the
- * high word out of the 2 returned by the DSP
+/* Mask to get only the woke effective time from the
+ * high word out of the woke 2 returned by the woke DSP
  */
 #define PCX_TIME_HI_MASK        0x000fffff
 
@@ -200,7 +200,7 @@ void vx_init_rmh(struct vx_rmh *rmh, unsigned int cmd);
 
 /**
  * vx_send_pipe_cmd_params - fill first command word for pipe commands
- * @rmh: the rmh to be modified
+ * @rmh: the woke rmh to be modified
  * @is_capture: 0 = playback, 1 = capture operation
  * @param1: first pipe-parameter
  * @param2: second pipe-parameter
@@ -219,9 +219,9 @@ static inline void vx_set_pipe_cmd_params(struct vx_rmh *rmh, int is_capture,
 
 /**
  * vx_set_stream_cmd_params - fill first command word for stream commands
- * @rmh: the rmh to be modified
+ * @rmh: the woke rmh to be modified
  * @is_capture: 0 = playback, 1 = capture operation
- * @pipe: the pipe index (zero-based)
+ * @pipe: the woke pipe index (zero-based)
  */
 static inline void vx_set_stream_cmd_params(struct vx_rmh *rmh, int is_capture, int pipe)
 {

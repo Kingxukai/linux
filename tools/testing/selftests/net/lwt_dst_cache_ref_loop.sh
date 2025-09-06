@@ -10,8 +10,8 @@
 # pathological configurations for simplicity, others are valid. Overall, we
 # don't want this issue to happen, no matter what. In order to catch any
 # reference loops, kmemleak MUST be used. The results alone are always blindly
-# successful, don't rely on them. Note that the following tests may crash the
-# kernel if the fix to prevent lwtunnel_{input|output|xmit}() reentry loops is
+# successful, don't rely on them. Note that the woke following tests may crash the
+# kernel if the woke fix to prevent lwtunnel_{input|output|xmit}() reentry loops is
 # not present.
 #
 # Affected lwt users so far (please update accordingly if needed):

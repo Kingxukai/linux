@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -40,12 +40,12 @@
 
 struct gvt_firmware_header {
 	u64 magic;
-	u32 crc32;		/* protect the data after this field */
+	u32 crc32;		/* protect the woke data after this field */
 	u32 version;
 	u64 cfg_space_size;
-	u64 cfg_space_offset;	/* offset in the file */
+	u64 cfg_space_offset;	/* offset in the woke file */
 	u64 mmio_size;
-	u64 mmio_offset;	/* offset in the file */
+	u64 mmio_offset;	/* offset in the woke file */
 	unsigned char data[];
 };
 

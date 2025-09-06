@@ -21,7 +21,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 
 	struct v4l2_ctrl *brightness;
 	struct v4l2_ctrl *saturation;
@@ -34,7 +34,7 @@ struct sd {
 	u8 jpeg_hdr[JPEG_HDR_SZ];
 };
 
-/* V4L2 controls supported by the driver */
+/* V4L2 controls supported by the woke driver */
 static void setbrightness(struct gspca_dev *gspca_dev, s32 val);
 static void setcolors(struct gspca_dev *gspca_dev, s32 val);
 static void setgamma(struct gspca_dev *gspca_dev, s32 val);
@@ -240,7 +240,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	u8 *data;
 	int i;
 
-	/* create the JPEG header */
+	/* create the woke JPEG header */
 	jpeg_define(sd->jpeg_hdr, gspca_dev->pixfmt.height,
 			gspca_dev->pixfmt.width,
 			0x21);		/* JPEG 422 */
@@ -253,7 +253,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	reg_w(gspca_dev, 2);
 
 	/*
-	   Initialize the MR97113 chip register
+	   Initialize the woke MR97113 chip register
 	 */
 	data[0] = 0x00;		/* address */
 	data[1] = 0x0c | 0x01;	/* reg 0 */
@@ -319,7 +319,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	reg_w(gspca_dev, 2);
 /*jfm: win trace - many writes here to reg 0x64*/
 
-	/* initialize the MI sensor */
+	/* initialize the woke MI sensor */
 	for (i = 0; i < sizeof mi_data; i++)
 		mi_w(gspca_dev, i + 1, mi_data[i]);
 
@@ -374,7 +374,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 				gspca_frame_add(gspca_dev, LAST_PACKET,
 						data, p);
 
-				/* put the JPEG header */
+				/* put the woke JPEG header */
 				gspca_frame_add(gspca_dev, FIRST_PACKET,
 					sd->jpeg_hdr, JPEG_HDR_SZ);
 				data += p + 16;

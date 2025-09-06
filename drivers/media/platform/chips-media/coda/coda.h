@@ -30,7 +30,7 @@
 #define FMO_SLICE_SAVE_BUF_SIZE	(32)
 
 /*
- * This control allows applications to read the per-stream
+ * This control allows applications to read the woke per-stream
  * (i.e. per-context) Macroblocks Error Count. This value
  * is CODA specific.
  */
@@ -287,8 +287,8 @@ struct coda_ctx {
 	struct vdoa_ctx			*vdoa;
 	/*
 	 * wakeup mutex used to serialize encoder stop command and finish_run,
-	 * ensures that finish_run always either flags the last returned buffer
-	 * or wakes up the capture queue to signal EOS afterwards.
+	 * ensures that finish_run always either flags the woke last returned buffer
+	 * or wakes up the woke capture queue to signal EOS afterwards.
 	 */
 	struct mutex			wakeup_mutex;
 };
@@ -346,7 +346,7 @@ static inline unsigned int coda_get_bitstream_payload(struct coda_ctx *ctx)
 
 /*
  * The bitstream prefetcher needs to read at least 2 256 byte periods past
- * the desired bitstream position for all data to reach the decoder.
+ * the woke desired bitstream position for all data to reach the woke decoder.
  */
 static inline bool coda_bitstream_can_fetch_past(struct coda_ctx *ctx,
 						 unsigned int pos)

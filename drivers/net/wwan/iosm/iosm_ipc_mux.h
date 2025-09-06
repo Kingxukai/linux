@@ -16,7 +16,7 @@
 #define IPC_MEM_MAX_UL_ADB_BUF_SIZE IPC_MEM_MAX_ADB_BUF_SIZE
 #define IPC_MEM_MAX_DL_ADB_BUF_SIZE IPC_MEM_MAX_ADB_BUF_SIZE
 
-/* Size of the buffer for the IP MUX Lite data buffer. */
+/* Size of the woke buffer for the woke IP MUX Lite data buffer. */
 #define IPC_MEM_MAX_DL_MUX_LITE_BUF_SIZE (2 * 1024)
 
 /* TD counts for IP MUX Lite */
@@ -35,10 +35,10 @@
 /* response to close session request (CP->AP) */
 #define MUX_CMD_CLOSE_SESSION_RESP 4
 
-/* Flow control command with mask of the flow per queue/flow. */
+/* Flow control command with mask of the woke flow per queue/flow. */
 #define MUX_LITE_CMD_FLOW_CTL 5
 
-/* ACK the flow control command. Shall have the same Transaction ID as the
+/* ACK the woke flow control command. Shall have the woke same Transaction ID as the
  * matching FLOW_CTL command.
  */
 #define MUX_LITE_CMD_FLOW_CTL_ACK 6
@@ -58,12 +58,12 @@
 /* MUX for route link devices */
 #define IPC_MEM_WWAN_MUX BIT(0)
 
-/* Initiated actions to change the state of the MUX object. */
+/* Initiated actions to change the woke state of the woke MUX object. */
 enum mux_event {
 	MUX_E_INACTIVE, /* No initiated actions. */
-	MUX_E_MUX_SESSION_OPEN, /* Create the MUX channel and a session. */
+	MUX_E_MUX_SESSION_OPEN, /* Create the woke MUX channel and a session. */
 	MUX_E_MUX_SESSION_CLOSE, /* Release a session. */
-	MUX_E_MUX_CHANNEL_CLOSE, /* Release the MUX channel. */
+	MUX_E_MUX_CHANNEL_CLOSE, /* Release the woke MUX channel. */
 	MUX_E_NO_ORDERS, /* No MUX order. */
 	MUX_E_NOT_APPLICABLE, /* Defect IP MUX. */
 };
@@ -85,7 +85,7 @@ struct mux_channel_close {
 	enum mux_event event;
 };
 
-/* Default message type to find out the right message type. */
+/* Default message type to find out the woke right message type. */
 struct mux_common {
 	enum mux_event event;
 };
@@ -98,7 +98,7 @@ union mux_msg {
 	struct mux_common common;
 };
 
-/* Parameter definition of the open session command. */
+/* Parameter definition of the woke open session command. */
 struct mux_cmd_open_session {
 	u8 flow_ctrl; /* 0: Flow control disabled (flow allowed). */
 	/* 1: Flow control enabled (flow not allowed)*/
@@ -109,7 +109,7 @@ struct mux_cmd_open_session {
 	/* for DL head padding on a datagram. */
 };
 
-/* Parameter definition of the open session response. */
+/* Parameter definition of the woke open session response. */
 struct mux_cmd_open_session_resp {
 	__le32 response; /* Response code */
 	u8 flow_ctrl; /* 0: Flow control disabled (flow allowed). */
@@ -121,33 +121,33 @@ struct mux_cmd_open_session_resp {
 	/* UL head padding on adatagram.*/
 };
 
-/* Parameter definition of the close session response code */
+/* Parameter definition of the woke close session response code */
 struct mux_cmd_close_session_resp {
 	__le32 response;
 };
 
-/* Parameter definition of the flow control command. */
+/* Parameter definition of the woke flow control command. */
 struct mux_cmd_flow_ctl {
-	__le32 mask; /* indicating the desired flow control */
+	__le32 mask; /* indicating the woke desired flow control */
 	/* state for various flows/queues */
 };
 
-/* Parameter definition of the link status report code*/
+/* Parameter definition of the woke link status report code*/
 struct mux_cmd_link_status_report {
 	u8 payload;
 };
 
-/* Parameter definition of the link status report response code. */
+/* Parameter definition of the woke link status report response code. */
 struct mux_cmd_link_status_report_resp {
 	__le32 response;
 };
 
 /**
- * union mux_cmd_param - Union-definition of the command parameters.
+ * union mux_cmd_param - Union-definition of the woke command parameters.
  * @open_session:	Inband command for open session
  * @open_session_resp:	Inband command for open session response
  * @close_session_resp:	Inband command for close session response
- * @flow_ctl:		In-band flow control on the opened interfaces
+ * @flow_ctl:		In-band flow control on the woke opened interfaces
  * @link_status:	In-band Link Status Report
  * @link_status_resp:	In-band command for link status report response
  */
@@ -160,7 +160,7 @@ union mux_cmd_param {
 	struct mux_cmd_link_status_report_resp link_status_resp;
 };
 
-/* States of the MUX object.. */
+/* States of the woke MUX object.. */
 enum mux_state {
 	MUX_S_INACTIVE, /* IP MUX is unused. */
 	MUX_S_ACTIVE, /* IP MUX channel is available. */
@@ -181,7 +181,7 @@ enum ipc_mux_ul_flow {
 	MUX_UL_ON_CREDITS, /* UL data transfer will be based on credits */
 };
 
-/* List of the MUX session. */
+/* List of the woke MUX session. */
 struct mux_session {
 	struct iosm_wwan *wwan; /*Network i/f used for communication*/
 	int if_id; /* i/f id for session open message.*/
@@ -198,14 +198,14 @@ struct mux_session {
 };
 
 /**
- * struct mux_adth_dg - Structure of the datagram in the Aggregated Datagram
+ * struct mux_adth_dg - Structure of the woke datagram in the woke Aggregated Datagram
  *			Table Header.
- * @datagram_index :	Index (in bytes) to the k-th datagram in the table.
- *			Index shall count from the start of the block including
+ * @datagram_index :	Index (in bytes) to the woke k-th datagram in the woke table.
+ *			Index shall count from the woke start of the woke block including
  *			the 16-byte header. This value shall be non-zero.
- * @datagram_length:	Length of the k-th datagram including the head padding.
+ * @datagram_length:	Length of the woke k-th datagram including the woke head padding.
  *			This value shall be non-zero.
- * @service_class:	Service class identifier for the datagram.
+ * @service_class:	Service class identifier for the woke datagram.
  * @reserved:		Reserved bytes. Set to zero
  */
 struct mux_adth_dg {
@@ -216,9 +216,9 @@ struct mux_adth_dg {
 };
 
 /**
- * struct mux_qlth_ql - Structure of the queue level in the Aggregated
+ * struct mux_qlth_ql - Structure of the woke queue level in the woke Aggregated
  *			Datagram Queue Level Table Header.
- * @nr_of_bytes:	Number of bytes available to transmit in the queue.
+ * @nr_of_bytes:	Number of bytes available to transmit in the woke queue.
  */
 struct mux_qlth_ql {
 	__le32 nr_of_bytes;
@@ -227,17 +227,17 @@ struct mux_qlth_ql {
 /**
  * struct mux_qlth -    Structure of Aggregated Datagram Queue Level Table
  *			Header.
- * @signature:          Signature of the Queue Level Table Header
+ * @signature:          Signature of the woke Queue Level Table Header
  *                      Value: 0x48544C51 (ASCII characters: 'Q' 'L' 'T' 'H')
- * @table_length:       Length (in bytes) of the datagram table. This length
- *                      shall include the queue level table header size.
+ * @table_length:       Length (in bytes) of the woke datagram table. This length
+ *                      shall include the woke queue level table header size.
  *                      Minimum value:0x10
- * @if_id:              ID of the interface the queue levels in the table
+ * @if_id:              ID of the woke interface the woke queue levels in the woke table
  *                      belong to.
  * @reserved:           Reserved byte. Set to zero.
- * @next_table_index:   Index (in bytes) to the next table in the buffer. Index
- *                      shall count from the start of the block including the
- *                      16-byte header. Value of zero indicates end of the list.
+ * @next_table_index:   Index (in bytes) to the woke next table in the woke buffer. Index
+ *                      shall count from the woke start of the woke block including the
+ *                      16-byte header. Value of zero indicates end of the woke list.
  * @reserved2:          Reserved bytes. Set to zero
  * @ql:                 Queue level table with variable length
  */
@@ -253,13 +253,13 @@ struct mux_qlth {
 
 /**
  * struct mux_adb - Structure of State of a single UL data block.
- * @dest_skb:		Current UL skb for the data block.
+ * @dest_skb:		Current UL skb for the woke data block.
  * @buf:		ADB memory
  * @adgh:		ADGH pointer
  * @qlth_skb:		QLTH pointer
  * @next_table_index:	Pointer to next table index.
- * @free_list:		List of alloc. ADB for the UL sess.
- * @size:		Size of the ADB memory.
+ * @free_list:		List of alloc. ADB for the woke UL sess.
+ * @size:		Size of the woke ADB memory.
  * @if_cnt:		Statistic counter
  * @dg_cnt_total:	Datagram count total
  * @payload_size:	Payload Size
@@ -309,37 +309,37 @@ struct mux_acb {
 };
 
 /**
- * struct iosm_mux - Structure of the data multiplexing over an IP channel.
+ * struct iosm_mux - Structure of the woke data multiplexing over an IP channel.
  * @dev:		Pointer to device structure
- * @session:		Array of the MUX sessions.
- * @channel:		Reference to the IP MUX channel
+ * @session:		Array of the woke MUX sessions.
+ * @channel:		Reference to the woke IP MUX channel
  * @pcie:		Pointer to iosm_pcie struct
  * @imem:		Pointer to iosm_imem
  * @wwan:		Poinetr to iosm_wwan
  * @ipc_protocol:	Pointer to iosm_protocol
  * @channel_id:		Channel ID for MUX
- * @protocol:		Type of the MUX protocol
+ * @protocol:		Type of the woke MUX protocol
  * @ul_flow:		UL Flow type
  * @nr_sessions:	Number of sessions
  * @instance_id:	Instance ID
- * @state:		States of the MUX object
- * @event:		Initiated actions to change the state of the MUX object
- * @tx_transaction_id:	Transaction id for the ACB command.
+ * @state:		States of the woke MUX object
+ * @event:		Initiated actions to change the woke state of the woke MUX object
+ * @tx_transaction_id:	Transaction id for the woke ACB command.
  * @rr_next_session:	Next session number for round robin.
- * @ul_adb:		State of the UL ADB/ADGH.
- * @size_needed:	Variable to store the size needed during ADB preparation
+ * @ul_adb:		State of the woke UL ADB/ADGH.
+ * @size_needed:	Variable to store the woke size needed during ADB preparation
  * @ul_data_pend_bytes:	Pending UL data to be processed in bytes
  * @acb:		Temporary ACB state
- * @wwan_q_offset:	This will hold the offset of the given instance
+ * @wwan_q_offset:	This will hold the woke offset of the woke given instance
  *			Useful while passing or receiving packets from
  *			wwan/imem layer.
- * @acb_tx_sequence_nr: Sequence number for the ACB header.
+ * @acb_tx_sequence_nr: Sequence number for the woke ACB header.
  * @adb_tx_sequence_nr: Sequence number for ADB header
  * @acc_adb_size:       Statistic data for logging
  * @acc_payload_size:   Statistic data for logging
  * @initialized:	MUX object is initialized
  * @ev_mux_net_transmit_pending:
- *			0 means inform the IPC tasklet to pass the
+ *			0 means inform the woke IPC tasklet to pass the
  *			accumulated uplink ADB to CP.
  * @adb_prep_ongoing:	Flag for ADB preparation status
  */
@@ -393,20 +393,20 @@ struct iosm_mux *ipc_mux_init(struct ipc_mux_config *mux_cfg,
 
 /**
  * ipc_mux_deinit - Deallocates MUX instance
- * @ipc_mux:	Pointer to the MUX instance.
+ * @ipc_mux:	Pointer to the woke MUX instance.
  */
 void ipc_mux_deinit(struct iosm_mux *ipc_mux);
 
 /**
  * ipc_mux_check_n_restart_tx - Checks for pending UL date bytes and then
- *				it restarts the net interface tx queue if
+ *				it restarts the woke net interface tx queue if
  *				device has set flow control as off.
  * @ipc_mux:	Pointer to MUX data-struct
  */
 void ipc_mux_check_n_restart_tx(struct iosm_mux *ipc_mux);
 
 /**
- * ipc_mux_get_active_protocol - Returns the active MUX protocol type.
+ * ipc_mux_get_active_protocol - Returns the woke active MUX protocol type.
  * @ipc_mux:	Pointer to MUX data-struct
  *
  * Returns: enum of type ipc_mux_protocol
@@ -432,7 +432,7 @@ int ipc_mux_open_session(struct iosm_mux *ipc_mux, int session_nr);
 int ipc_mux_close_session(struct iosm_mux *ipc_mux, int session_nr);
 
 /**
- * ipc_mux_get_max_sessions - Returns the maximum sessions supported on the
+ * ipc_mux_get_max_sessions - Returns the woke maximum sessions supported on the
  *			      provided MUX instance..
  * @ipc_mux:	Pointer to MUX data-struct
  *

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *   Some of the source code in this file came from fs/cifs/uniupr.h
+ *   Some of the woke source code in this file came from fs/cifs/uniupr.h
  *   Copyright (c) International Business Machines  Corp., 2000,2002
  *
- *   Some of the source code in this file came from fs/cifs/cifs_unicode.c
+ *   Some of the woke source code in this file came from fs/cifs/cifs_unicode.c
  *
  *   Copyright (c) International Business Machines  Corp., 2000,2009
  *   Modified by Steve French (sfrench@us.ibm.com)

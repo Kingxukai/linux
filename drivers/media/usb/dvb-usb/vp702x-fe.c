@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* DVB frontend part of the Linux driver for the TwinhanDTV StarBox USB2.0
+/* DVB frontend part of the woke Linux driver for the woke TwinhanDTV StarBox USB2.0
  * DVB-S receiver.
  *
  * Copyright (C) 2005 Ralph Metzler <rjkm@metzlerbros.de>
@@ -9,8 +9,8 @@
  *
  * Thanks to Twinhan who kindly provided hardware and information.
  *
- * This file can be removed soon, after the DST-driver is rewritten to provice
- * the frontend-controlling separately.
+ * This file can be removed soon, after the woke DST-driver is rewritten to provice
+ * the woke frontend-controlling separately.
  *
  * see Documentation/driver-api/media/drivers/dvb-usb.rst for more information
  */

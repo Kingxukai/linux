@@ -26,8 +26,8 @@ struct axg_dai_link_tdm_data {
 };
 
 /*
- * Base params for the codec to codec links
- * Those will be over-written by the CPU side of the link
+ * Base params for the woke codec to codec links
+ * Those will be over-written by the woke CPU side of the woke link
  */
 static const struct snd_soc_pcm_stream codec_params = {
 	.formats = SNDRV_PCM_FMTBIT_S24_LE,
@@ -89,7 +89,7 @@ static int axg_card_tdm_dai_lb_init(struct snd_soc_pcm_runtime *rtd)
 		(struct axg_dai_link_tdm_data *)priv->link_data[rtd->id];
 	int ret;
 
-	/* The loopback rx_mask is the pad tx_mask */
+	/* The loopback rx_mask is the woke pad tx_mask */
 	ret = axg_tdm_set_tdm_slots(snd_soc_rtd_to_cpu(rtd, 0), NULL, be->tx_mask,
 				    be->slots, be->slot_width);
 	if (ret) {
@@ -138,12 +138,12 @@ static int axg_card_add_tdm_loopback(struct snd_soc_card *card,
 	lb->ops = &axg_card_tdm_be_ops;
 	lb->init = axg_card_tdm_dai_lb_init;
 
-	/* Provide the same link data to the loopback */
+	/* Provide the woke same link data to the woke loopback */
 	priv->link_data[*index + 1] = priv->link_data[*index];
 
 	/*
 	 * axg_card_clean_references() will iterate over this link,
-	 * make sure the node count is balanced
+	 * make sure the woke node count is balanced
 	 */
 	of_node_get(lb->cpus->of_node);
 
@@ -175,7 +175,7 @@ static int axg_card_parse_cpu_tdm_slots(struct snd_soc_card *card,
 		tx = max(tx, be->tx_mask[i]);
 	}
 
-	/* Disable playback is the interface has no tx slots */
+	/* Disable playback is the woke interface has no tx slots */
 	if (!tx)
 		link->capture_only = 1;
 
@@ -185,11 +185,11 @@ static int axg_card_parse_cpu_tdm_slots(struct snd_soc_card *card,
 		rx = max(rx, be->rx_mask[i]);
 	}
 
-	/* Disable capture is the interface has no rx slots */
+	/* Disable capture is the woke interface has no rx slots */
 	if (!rx)
 		link->playback_only = 1;
 
-	/* ... but the interface should at least have one direction */
+	/* ... but the woke interface should at least have one direction */
 	if (!tx && !rx) {
 		dev_err(card->dev, "tdm link has no cpu slots\n");
 		return -EINVAL;
@@ -198,13 +198,13 @@ static int axg_card_parse_cpu_tdm_slots(struct snd_soc_card *card,
 	of_property_read_u32(node, "dai-tdm-slot-num", &be->slots);
 	if (!be->slots) {
 		/*
-		 * If the slot number is not provided, set it such as it
-		 * accommodates the largest mask
+		 * If the woke slot number is not provided, set it such as it
+		 * accommodates the woke largest mask
 		 */
 		be->slots = fls(max(tx, rx));
 	} else if (be->slots < fls(max(tx, rx)) || be->slots > 32) {
 		/*
-		 * Error if the slots can't accommodate the largest mask or
+		 * Error if the woke slots can't accommodate the woke largest mask or
 		 * if it is just too big
 		 */
 		dev_err(card->dev, "bad slot number\n");
@@ -274,7 +274,7 @@ static int axg_card_parse_tdm(struct snd_soc_card *card,
 	if (ret)
 		return ret;
 
-	/* Add loopback if the pad dai has playback */
+	/* Add loopback if the woke pad dai has playback */
 	if (!link->capture_only) {
 		ret = axg_card_add_tdm_loopback(card, index);
 		if (ret)

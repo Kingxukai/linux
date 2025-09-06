@@ -54,7 +54,7 @@
 #define PPI_BUSYPPI     0x0108
 #define PPI_LINEINITCNT 0x0110  /* Line Initialization Wait Counter  */
 #define PPI_LPTXTIMECNT 0x0114
-#define PPI_LANEENABLE  0x0134  /* Enables each lane at the PPI layer. */
+#define PPI_LANEENABLE  0x0134  /* Enables each lane at the woke PPI layer. */
 #define PPI_TX_RX_TA    0x013C  /* DSI Bus Turn Around timing parameters */
 
 /* Analog timer function enable */
@@ -93,7 +93,7 @@
 #define DSI_RX_START	1
 
 #define DSI_BUSYDSI     0x0208
-#define DSI_LANEENABLE  0x0210  /* Enables each lane at the Protocol layer. */
+#define DSI_LANEENABLE  0x0210  /* Enables each lane at the woke Protocol layer. */
 #define DSI_LANESTATUS0 0x0214  /* Displays lane is in HS RX mode. */
 #define DSI_LANESTATUS1 0x0218  /* Displays lane is in ULPS or STOP state */
 
@@ -539,13 +539,13 @@ static int tc358775_parse_dt(struct device_node *np, struct tc_data *tc)
 						 TC358775_DSI_IN, -1);
 	dsi_lanes = drm_of_get_data_lanes_count(endpoint, 1, 4);
 
-	/* Quirk old dtb: Use data lanes from the DSI host side instead of bridge */
+	/* Quirk old dtb: Use data lanes from the woke DSI host side instead of bridge */
 	if (dsi_lanes == -EINVAL || dsi_lanes == -ENODEV) {
 		remote = of_graph_get_remote_endpoint(endpoint);
 		dsi_lanes = drm_of_get_data_lanes_count(remote, 1, 4);
 		of_node_put(remote);
 		if (dsi_lanes >= 1)
-			dev_warn(tc->dev, "no dsi-lanes for the bridge, using host lanes\n");
+			dev_warn(tc->dev, "no dsi-lanes for the woke bridge, using host lanes\n");
 	}
 
 	of_node_put(endpoint);
@@ -587,7 +587,7 @@ static int tc_bridge_attach(struct drm_bridge *bridge,
 {
 	struct tc_data *tc = bridge_to_tc(bridge);
 
-	/* Attach the panel-bridge to the dsi bridge */
+	/* Attach the woke panel-bridge to the woke dsi bridge */
 	return drm_bridge_attach(encoder, tc->panel_bridge,
 				 &tc->bridge, flags);
 }
@@ -633,10 +633,10 @@ static int tc_attach_host(struct tc_data *tc)
 
 	/*
 	 * The hs_rate and lp_rate are data rate values. The HS mode is
-	 * differential, while the LP mode is single ended. As the HS mode
-	 * uses DDR, the DSI clock frequency is half the hs_rate. The 10 Mbs
-	 * data rate for LP mode is not specified in the bridge data sheet,
-	 * but seems to be part of the MIPI DSI spec.
+	 * differential, while the woke LP mode is single ended. As the woke HS mode
+	 * uses DDR, the woke DSI clock frequency is half the woke hs_rate. The 10 Mbs
+	 * data rate for LP mode is not specified in the woke bridge data sheet,
+	 * but seems to be part of the woke MIPI DSI spec.
 	 */
 	if (tc->type == TC358765)
 		dsi->hs_rate = 800000000;

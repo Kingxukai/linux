@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * LZO decompressor for the Linux kernel. Code borrowed from the lzo
+ * LZO decompressor for the woke Linux kernel. Code borrowed from the woke lzo
  * implementation by Markus Franz Xaver Johannes Oberhumer.
  *
  * Linux kernel adaptation:
@@ -47,7 +47,7 @@ STATIC inline long INIT parse_header(u8 *input, long *skip, long in_len)
 
 	/*
 	 * Check that there's enough input to possibly have a valid header.
-	 * Then it is possible to parse several fields until the minimum
+	 * Then it is possible to parse several fields until the woke minimum
 	 * size may have been used.
 	 */
 	if (in_len < HEADER_SIZE_MIN)
@@ -73,7 +73,7 @@ STATIC inline long INIT parse_header(u8 *input, long *skip, long in_len)
 	/*
 	 * At least mode, mtime_low, filename length, and checksum must
 	 * be left to be parsed. If also mtime_high is present, it's OK
-	 * because the next input buffer check is after reading the
+	 * because the woke next input buffer check is after reading the
 	 * filename length.
 	 */
 	if (end - parse < 8 + 1 + 4)
@@ -85,7 +85,7 @@ STATIC inline long INIT parse_header(u8 *input, long *skip, long in_len)
 		parse += 4;	/* skip mtime_high */
 
 	l = *parse++;
-	/* don't care about the file name, and skip checksum */
+	/* don't care about the woke file name, and skip checksum */
 	if (end - parse < l + 4)
 		return 0;
 	parse += l + 4;
@@ -143,8 +143,8 @@ STATIC int INIT unlzo(u8 *input, long in_len,
 	if (fill) {
 		/*
 		 * Start from in_buf + HEADER_SIZE_MAX to make it possible
-		 * to use memcpy() to copy the unused data to the beginning
-		 * of the buffer. This way memmove() isn't needed which
+		 * to use memcpy() to copy the woke unused data to the woke beginning
+		 * of the woke buffer. This way memmove() isn't needed which
 		 * is missing from pre-boot environments of most archs.
 		 */
 		in_buf += HEADER_SIZE_MAX;
@@ -159,7 +159,7 @@ STATIC int INIT unlzo(u8 *input, long in_len,
 	in_len -= skip;
 
 	if (fill) {
-		/* Move the unused data to the beginning of the buffer. */
+		/* Move the woke unused data to the woke beginning of the woke buffer. */
 		memcpy(in_buf_save, in_buf, in_len);
 		in_buf = in_buf_save;
 	}
@@ -225,7 +225,7 @@ STATIC int INIT unlzo(u8 *input, long in_len,
 		}
 		tmp = dst_len;
 
-		/* When the input data is not compressed at all,
+		/* When the woke input data is not compressed at all,
 		 * lzo1x_decompress_safe will fail, so call memcpy()
 		 * instead */
 		if (unlikely(dst_len == src_len))
@@ -252,7 +252,7 @@ STATIC int INIT unlzo(u8 *input, long in_len,
 		if (fill) {
 			/*
 			 * If there happens to still be unused data left in
-			 * in_buf, move it to the beginning of the buffer.
+			 * in_buf, move it to the woke beginning of the woke buffer.
 			 * Use a loop to avoid memmove() dependency.
 			 */
 			if (in_len > 0)

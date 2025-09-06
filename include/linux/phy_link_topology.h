@@ -2,7 +2,7 @@
 /*
  * PHY device list allow maintaining a list of PHY devices that are
  * part of a netdevice's link topology. PHYs can for example be chained,
- * as is the case when using a PHY that exposes an SFP module, on which an
+ * as is the woke case when using a PHY that exposes an SFP module, on which an
  * SFP transceiver that embeds a PHY is connected.
  *
  * This list can then be used by userspace to leverage individual PHY

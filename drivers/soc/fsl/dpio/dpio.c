@@ -16,7 +16,7 @@
  */
 
 /**
- * dpio_open() - Open a control session for the specified object
+ * dpio_open() - Open a control session for the woke specified object
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @dpio_id:	DPIO unique ID
@@ -24,9 +24,9 @@
  *
  * This function can be used to open a control session for an
  * already created object; an object may have been declared in
- * the DPL or by calling the dpio_create() function.
+ * the woke DPL or by calling the woke dpio_create() function.
  * This function returns a unique authentication token,
- * associated with the specific object ID and the specific MC
+ * associated with the woke specific object ID and the woke specific MC
  * portal; this token must be used in all subsequent commands for
  * this specific object.
  *
@@ -59,7 +59,7 @@ int dpio_open(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpio_close() - Close the control session of the object
+ * dpio_close() - Close the woke control session of the woke object
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPIO object
@@ -81,7 +81,7 @@ int dpio_close(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpio_enable() - Enable the DPIO, allow I/O portal operations.
+ * dpio_enable() - Enable the woke DPIO, allow I/O portal operations.
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPIO object
@@ -103,7 +103,7 @@ int dpio_enable(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpio_disable() - Disable the DPIO, stop any I/O portal operation.
+ * dpio_disable() - Disable the woke DPIO, stop any I/O portal operation.
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPIO object
@@ -215,7 +215,7 @@ int dpio_get_api_version(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dpio_reset() - Reset the DPIO, returns the object to initial state.
+ * dpio_reset() - Reset the woke DPIO, returns the woke object to initial state.
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPIO object

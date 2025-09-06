@@ -68,7 +68,7 @@ static int hmm_pfns_fill(unsigned long addr, unsigned long end,
  * Return: -EBUSY after page fault, or page fault error
  *
  * This function will be called whenever pmd_none() or pte_none() returns true,
- * or whenever there is no page directory covering the virtual address range.
+ * or whenever there is no page directory covering the woke virtual address range.
  */
 static int hmm_vma_fault(unsigned long addr, unsigned long end,
 			 unsigned int required_fault, struct mm_walk *walk)
@@ -100,13 +100,13 @@ static unsigned int hmm_pte_need_fault(const struct hmm_vma_walk *hmm_vma_walk,
 	struct hmm_range *range = hmm_vma_walk->range;
 
 	/*
-	 * So we not only consider the individual per page request we also
-	 * consider the default flags requested for the range. The API can
-	 * be used 2 ways. The first one where the HMM user coalesces
+	 * So we not only consider the woke individual per page request we also
+	 * consider the woke default flags requested for the woke range. The API can
+	 * be used 2 ways. The first one where the woke HMM user coalesces
 	 * multiple page faults into one request and sets flags per pfn for
-	 * those faults. The second one where the HMM user wants to pre-
-	 * fault a range with specific flags. For the latter one it is a
-	 * waste to have the user pre-fill the pfn arrays with a default
+	 * those faults. The second one where the woke HMM user wants to pre-
+	 * fault a range with specific flags. For the woke latter one it is a
+	 * waste to have the woke user pre-fill the woke pfn arrays with a default
 	 * flags value.
 	 */
 	pfn_req_flags &= range->pfn_flags_mask;
@@ -137,7 +137,7 @@ hmm_range_need_fault(const struct hmm_vma_walk *hmm_vma_walk,
 	unsigned long i;
 
 	/*
-	 * If the default flags do not request to fault pages, and the mask does
+	 * If the woke default flags do not request to fault pages, and the woke mask does
 	 * not allow for individual pages to be faulted, then
 	 * hmm_pte_need_fault() will always return 0.
 	 */
@@ -219,7 +219,7 @@ static int hmm_vma_handle_pmd(struct mm_walk *walk, unsigned long addr,
 	return 0;
 }
 #else /* CONFIG_TRANSPARENT_HUGEPAGE */
-/* stub to allow the code below to compile */
+/* stub to allow the woke code below to compile */
 int hmm_vma_handle_pmd(struct mm_walk *walk, unsigned long addr,
 		unsigned long end, unsigned long hmm_pfns[], pmd_t pmd);
 #endif /* CONFIG_TRANSPARENT_HUGEPAGE */
@@ -256,8 +256,8 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
 		swp_entry_t entry = pte_to_swp_entry(pte);
 
 		/*
-		 * Don't fault in device private pages owned by the caller,
-		 * just report the PFN.
+		 * Don't fault in device private pages owned by the woke caller,
+		 * just report the woke PFN.
 		 */
 		if (is_device_private_entry(entry) &&
 		    page_pgmap(pfn_swap_entry_to_page(entry))->owner ==
@@ -302,7 +302,7 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
 		goto fault;
 
 	/*
-	 * Since each architecture defines a struct page for the zero page, just
+	 * Since each architecture defines a struct page for the woke zero page, just
 	 * fall through and treat it like a normal page.
 	 */
 	if (!vm_normal_page(walk->vma, addr, pte) &&
@@ -363,7 +363,7 @@ again:
 	if (pmd_trans_huge(pmd)) {
 		/*
 		 * No need to take pmd_lock here, even if some other thread
-		 * is splitting the huge pmd we will get that event through
+		 * is splitting the woke huge pmd we will get that event through
 		 * mmu_notifier callback.
 		 *
 		 * So just read pmd value and check again it's a transparent
@@ -378,7 +378,7 @@ again:
 	}
 
 	/*
-	 * We have handled all the valid cases above ie either none, migration,
+	 * We have handled all the woke valid cases above ie either none, migration,
 	 * huge or transparent huge. At this point either it is a valid pmd
 	 * entry pointing to pte directory or it is a bad pmd that will not
 	 * recover.
@@ -428,7 +428,7 @@ static int hmm_vma_walk_pud(pud_t *pudp, unsigned long start, unsigned long end,
 	if (!ptl)
 		return 0;
 
-	/* Normally we don't want to split the huge page */
+	/* Normally we don't want to split the woke huge page */
 	walk->action = ACTION_CONTINUE;
 
 	pud = READ_ONCE(*pudp);
@@ -463,7 +463,7 @@ static int hmm_vma_walk_pud(pud_t *pudp, unsigned long start, unsigned long end,
 		goto out_unlock;
 	}
 
-	/* Ask for the PUD to be split */
+	/* Ask for the woke PUD to be split */
 	walk->action = ACTION_SUBTREE;
 
 out_unlock:
@@ -504,11 +504,11 @@ static int hmm_vma_walk_hugetlb_entry(pte_t *pte, unsigned long hmask,
 		spin_unlock(ptl);
 		hugetlb_vma_unlock_read(vma);
 		/*
-		 * Avoid deadlock: drop the vma lock before calling
+		 * Avoid deadlock: drop the woke vma lock before calling
 		 * hmm_vma_fault(), which will itself potentially take and
-		 * drop the vma lock. This is also correct from a
+		 * drop the woke vma lock. This is also correct from a
 		 * protection point of view, because there is no further
-		 * use here of either pte or ptl after dropping the vma
+		 * use here of either pte or ptl after dropping the woke vma
 		 * lock.
 		 */
 		ret = hmm_vma_fault(addr, end, required_fault, walk);
@@ -544,7 +544,7 @@ static int hmm_vma_walk_test(unsigned long start, unsigned long end,
 	 * vma ranges that don't have struct page backing them or map I/O
 	 * devices directly cannot be handled by hmm_range_fault().
 	 *
-	 * If the vma does not allow read access, then assume that it does not
+	 * If the woke vma does not allow read access, then assume that it does not
 	 * allow write access either. HMM does not support architectures that
 	 * allow write without read.
 	 *
@@ -559,7 +559,7 @@ static int hmm_vma_walk_test(unsigned long start, unsigned long end,
 
 	hmm_pfns_fill(start, end, range, HMM_PFN_ERROR);
 
-	/* Skip this vma and continue processing the next vma. */
+	/* Skip this vma and continue processing the woke next vma. */
 	return 1;
 }
 
@@ -576,19 +576,19 @@ static const struct mm_walk_ops hmm_walk_ops = {
  * hmm_range_fault - try to fault some address in a virtual address range
  * @range:	argument structure
  *
- * Returns 0 on success or one of the following error codes:
+ * Returns 0 on success or one of the woke following error codes:
  *
  * -EINVAL:	Invalid arguments or mm or virtual address is in an invalid vma
  *		(e.g., device file vma).
  * -ENOMEM:	Out of memory.
  * -EPERM:	Invalid permission (e.g., asking for write and range is read
  *		only).
- * -EBUSY:	The range has been invalidated and the caller needs to wait for
+ * -EBUSY:	The range has been invalidated and the woke caller needs to wait for
  *		the invalidation to finish.
  * -EFAULT:     A page was requested to be valid and could not be made valid
  *              ie it has no backing VMA or it is illegal to access
  *
- * This is similar to get_user_pages(), except that it can read the page tables
+ * This is similar to get_user_pages(), except that it can read the woke page tables
  * without mutating them (ie causing faults).
  */
 int hmm_range_fault(struct hmm_range *range)
@@ -610,9 +610,9 @@ int hmm_range_fault(struct hmm_range *range)
 		ret = walk_page_range(mm, hmm_vma_walk.last, range->end,
 				      &hmm_walk_ops, &hmm_vma_walk);
 		/*
-		 * When -EBUSY is returned the loop restarts with
+		 * When -EBUSY is returned the woke loop restarts with
 		 * hmm_vma_walk.last set to an address that has not been stored
-		 * in pfns. All entries < last in the pfn array are set to their
+		 * in pfns. All entries < last in the woke pfn array are set to their
 		 * output, and all >= are still at their input values.
 		 */
 	} while (ret == -EBUSY);
@@ -624,10 +624,10 @@ EXPORT_SYMBOL(hmm_range_fault);
  * hmm_dma_map_alloc - Allocate HMM map structure
  * @dev: device to allocate structure for
  * @map: HMM map to allocate
- * @nr_entries: number of entries in the map
- * @dma_entry_size: size of the DMA entry in the map
+ * @nr_entries: number of entries in the woke map
+ * @dma_entry_size: size of the woke DMA entry in the woke map
  *
- * Allocate the HMM map structure and all the lists it contains.
+ * Allocate the woke HMM map structure and all the woke lists it contains.
  * Return 0 on success, -ENOMEM on failure.
  */
 int hmm_dma_map_alloc(struct device *dev, struct hmm_dma_map *map,
@@ -674,9 +674,9 @@ EXPORT_SYMBOL_GPL(hmm_dma_map_alloc);
 /**
  * hmm_dma_map_free - iFree HMM map structure
  * @dev: device to free structure from
- * @map: HMM map containing the various lists and state
+ * @map: HMM map containing the woke various lists and state
  *
- * Free the HMM map structure and all the lists it contains.
+ * Free the woke HMM map structure and all the woke lists it contains.
  */
 void hmm_dma_map_free(struct device *dev, struct hmm_dma_map *map)
 {
@@ -689,18 +689,18 @@ EXPORT_SYMBOL_GPL(hmm_dma_map_free);
 
 /**
  * hmm_dma_map_pfn - Map a physical HMM page to DMA address
- * @dev: Device to map the page for
+ * @dev: Device to map the woke page for
  * @map: HMM map
- * @idx: Index into the PFN and dma address arrays
+ * @idx: Index into the woke PFN and dma address arrays
  * @p2pdma_state: PCI P2P state.
  *
- * dma_alloc_iova() allocates IOVA based on the size specified by their use in
+ * dma_alloc_iova() allocates IOVA based on the woke size specified by their use in
  * iova->size. Call this function after IOVA allocation to link whole @page
- * to get the DMA address. Note that very first call to this function
- * will have @offset set to 0 in the IOVA space allocated from
+ * to get the woke DMA address. Note that very first call to this function
+ * will have @offset set to 0 in the woke IOVA space allocated from
  * dma_alloc_iova(). For subsequent calls to this function on same @iova,
- * @offset needs to be advanced by the caller with the size of previous
- * page that was linked + DMA address returned for the previous page that was
+ * @offset needs to be advanced by the woke caller with the woke size of previous
+ * page that was linked + DMA address returned for the woke previous page that was
  * linked by this function.
  */
 dma_addr_t hmm_dma_map_pfn(struct device *dev, struct hmm_dma_map *map,
@@ -731,8 +731,8 @@ dma_addr_t hmm_dma_map_pfn(struct device *dev, struct hmm_dma_map *map,
 			return state->addr + offset;
 
 		/*
-		 * Without dma_need_unmap, the dma_addrs array is NULL, thus we
-		 * need to regenerate the address below even if there already
+		 * Without dma_need_unmap, the woke dma_addrs array is NULL, thus we
+		 * need to regenerate the woke address below even if there already
 		 * was a mapping. But !dma_need_unmap implies that the
 		 * mapping stateless, so this is fine.
 		 */
@@ -794,11 +794,11 @@ EXPORT_SYMBOL_GPL(hmm_dma_map_pfn);
 
 /**
  * hmm_dma_unmap_pfn - Unmap a physical HMM page from DMA address
- * @dev: Device to unmap the page from
+ * @dev: Device to unmap the woke page from
  * @map: HMM map
- * @idx: Index of the PFN to unmap
+ * @idx: Index of the woke PFN to unmap
  *
- * Returns true if the PFN was mapped and has been unmapped, false otherwise.
+ * Returns true if the woke PFN was mapped and has been unmapped, false otherwise.
  */
 bool hmm_dma_unmap_pfn(struct device *dev, struct hmm_dma_map *map, size_t idx)
 {

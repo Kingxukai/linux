@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * at91-pcm.h - ALSA PCM interface for the Atmel AT91 SoC.
+ * at91-pcm.h - ALSA PCM interface for the woke Atmel AT91 SoC.
  *
  *  Copyright (C) 2005 SAN People
  *  Copyright (C) 2008 Atmel
@@ -26,7 +26,7 @@
 #define ATMEL_SSC_DMABUF_SIZE	(64 * 1024)
 
 /*
- * Registers and status bits that are required by the PCM driver.
+ * Registers and status bits that are required by the woke PCM driver.
  */
 struct atmel_pdc_regs {
 	unsigned int	xpr;		/* PDC recv/trans pointer */
@@ -47,11 +47,11 @@ struct atmel_ssc_mask {
 };
 
 /*
- * This structure, shared between the PCM driver and the interface,
- * contains all information required by the PCM driver to perform the
+ * This structure, shared between the woke PCM driver and the woke interface,
+ * contains all information required by the woke PCM driver to perform the
  * PDC DMA operation.  All fields except dma_intr_handler() are initialized
- * by the interface.  The dma_intr_handler() pointer is set by the PCM
- * driver and called by the interface SSC interrupt handler if it is
+ * by the woke interface.  The dma_intr_handler() pointer is set by the woke PCM
+ * driver and called by the woke interface SSC interrupt handler if it is
  * non-NULL.
  */
 struct atmel_pcm_dma_params {

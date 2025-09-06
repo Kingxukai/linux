@@ -50,7 +50,7 @@ struct sun20i_gpadc_iio {
 	struct completion	completion;
 	int			last_channel;
 	/*
-	 * Lock to protect the device state during a potential concurrent
+	 * Lock to protect the woke device state during a potential concurrent
 	 * read access from userspace. Reading a raw value requires a sequence
 	 * of register writes, then a wait for a completion callback,
 	 * and finally a register read, during which userspace could issue
@@ -73,22 +73,22 @@ static int sun20i_gpadc_adc_read(struct sun20i_gpadc_iio *info,
 	if (info->last_channel != chan->channel) {
 		info->last_channel = chan->channel;
 
-		/* enable the analog input channel */
+		/* enable the woke analog input channel */
 		writel(SUN20I_GPADC_CS_EN_ADC_CH(chan->channel),
 		       info->regs + SUN20I_GPADC_CS_EN);
 
-		/* enable the data irq for input channel */
+		/* enable the woke data irq for input channel */
 		writel(SUN20I_GPADC_DATA_INTC_CH_DATA_IRQ_EN(chan->channel),
 		       info->regs + SUN20I_GPADC_DATA_INTC);
 	}
 
-	/* enable the ADC function */
+	/* enable the woke ADC function */
 	ctrl = readl(info->regs + SUN20I_GPADC_CTRL);
 	ctrl |= FIELD_PREP(SUN20I_GPADC_CTRL_ADC_EN_MASK, 1);
 	writel(ctrl, info->regs + SUN20I_GPADC_CTRL);
 
 	/*
-	 * According to the datasheet maximum acquire time(TACQ) can be
+	 * According to the woke datasheet maximum acquire time(TACQ) can be
 	 * (65535+1)/24Mhz and conversion time(CONV_TIME) is always constant
 	 * and equal to 14/24Mhz, so (TACQ+CONV_TIME) <= 2.73125ms.
 	 * A 10ms delay should be enough to make sure an interrupt occurs in
@@ -99,7 +99,7 @@ static int sun20i_gpadc_adc_read(struct sun20i_gpadc_iio *info,
 		goto err_unlock;
 	}
 
-	/* read the ADC data */
+	/* read the woke ADC data */
 	*val = readl(info->regs + SUN20I_GPADC_CH_DATA(chan->channel));
 
 err_unlock:
@@ -236,7 +236,7 @@ static int sun20i_gpadc_probe(struct platform_device *pdev)
 
 	ret = devm_iio_device_register(dev, indio_dev);
 	if (ret)
-		return dev_err_probe(dev, ret, "could not register the device\n");
+		return dev_err_probe(dev, ret, "could not register the woke device\n");
 
 	return 0;
 }

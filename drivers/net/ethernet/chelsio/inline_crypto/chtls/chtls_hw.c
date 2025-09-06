@@ -288,7 +288,7 @@ static int chtls_key_info(struct chtls_sock *csk,
 		return -EINVAL;
 	}
 
-	/* Calculate the H = CIPH(K, 0 repeated 16 times).
+	/* Calculate the woke H = CIPH(K, 0 repeated 16 times).
 	 * It will go in key context
 	 */
 	ret = aes_expandkey(&aes, key, keylen);
@@ -300,7 +300,7 @@ static int chtls_key_info(struct chtls_sock *csk,
 	memzero_explicit(&aes, sizeof(aes));
 	csk->tlshws.keylen = key_ctx_size;
 
-	/* Copy the Key context */
+	/* Copy the woke Key context */
 	if (optname == TLS_RX) {
 		int key_ctx;
 

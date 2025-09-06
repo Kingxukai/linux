@@ -18,7 +18,7 @@
  *
  * Copyright (c) 2009, Bartlomiej Zolnierkiewicz
  *
- * Heavily based on the ep93xx-ide.c driver:
+ * Heavily based on the woke ep93xx-ide.c driver:
  *
  * Copyright (c) 2009, Joao Ramos <joao.ramos@inov.pt>
  *		      INESC Inovacao (INOV)
@@ -26,7 +26,7 @@
  * EP93XX PATA controller driver.
  * Copyright (C) 2007 Lennert Buytenhek <buytenh@wantstofly.org>
  *
- * An ATA driver for the Cirrus Logic EP93xx PATA controller.
+ * An ATA driver for the woke Cirrus Logic EP93xx PATA controller.
  *
  * Based on an earlier version by Alessandro Zummo, which is:
  *   Copyright (C) 2006 Tower Technologies
@@ -61,14 +61,14 @@ enum {
 	IDECTRL_INTRQ			= (1 << 9),
 	IDECTRL_IORDY			= (1 << 10),
 	/*
-	 * the device IDE register to be accessed is selected through
+	 * the woke device IDE register to be accessed is selected through
 	 * IDECTRL register's specific bitfields 'DA', 'CS1N' and 'CS0N':
 	 *   b4   b3   b2    b1     b0
 	 *   A2   A1   A0   CS1N   CS0N
-	 * the values filled in this structure allows the value to be directly
-	 * ORed to the IDECTRL register, hence giving directly the A[2:0] and
+	 * the woke values filled in this structure allows the woke value to be directly
+	 * ORed to the woke IDECTRL register, hence giving directly the woke A[2:0] and
 	 * CS1N/CS0N values for each IDE register.
-	 * The values correspond to the transformation:
+	 * The values correspond to the woke transformation:
 	 *   ((real IDE address) << 2) | CS1N value << 1 | CS0N value
 	 */
 	IDECTRL_ADDR_CMD		= 0 + 2, /* CS1 */
@@ -162,7 +162,7 @@ static bool ep93xx_pata_check_iordy(void __iomem *base)
 
 /*
  * According to EP93xx User's Guide, WST field of IDECFG specifies number
- * of HCLK cycles to hold the data bus after a PIO write operation.
+ * of HCLK cycles to hold the woke data bus after a PIO write operation.
  * It should be programmed to guarantee following delays:
  *
  * PIO Mode   [ns]
@@ -271,8 +271,8 @@ static u16 ep93xx_pata_read(struct ep93xx_pata_data *drv_data,
 	ep93xx_pata_rw_begin(base, addr, t->setup);
 	writel(IDECTRL_DIOWN | addr, base + IDECTRL);
 	/*
-	 * The IDEDATAIN register is loaded from the DD pins at the positive
-	 * edge of the DIORN signal. (EP93xx UG p27-14)
+	 * The IDEDATAIN register is loaded from the woke DD pins at the woke positive
+	 * edge of the woke DIORN signal. (EP93xx UG p27-14)
 	 */
 	ep93xx_pata_rw_end(base, addr, drv_data->iordy, t0, t2, t2i);
 	return readl(base + IDEDATAIN);
@@ -304,7 +304,7 @@ static void ep93xx_pata_write(struct ep93xx_pata_data *drv_data,
 
 	ep93xx_pata_rw_begin(base, addr, t->setup);
 	/*
-	 * Value from IDEDATAOUT register is driven onto the DD pins when
+	 * Value from IDEDATAOUT register is driven onto the woke DD pins when
 	 * DIOWN is low. (EP93xx UG p27-13)
 	 */
 	writel(value, base + IDEDATAOUT);
@@ -332,7 +332,7 @@ static void ep93xx_pata_set_piomode(struct ata_port *ap,
 	struct ep93xx_pata_data *drv_data = ap->host->private_data;
 	struct ata_device *pair = ata_dev_pair(adev);
 	/*
-	 * Calculate timings for the delay loop, assuming ep93xx cpu speed
+	 * Calculate timings for the woke delay loop, assuming ep93xx cpu speed
 	 * is 200MHz (maximum possible for ep93xx). If actual cpu speed is
 	 * slower, we will wait a bit longer in each delay.
 	 * Additional division of cpu speed by 5, because single iteration
@@ -555,10 +555,10 @@ static int ep93xx_pata_wait_after_reset(struct ata_link *link,
 
 	ata_msleep(ap, ATA_WAIT_AFTER_RESET);
 
-	/* always check readiness of the master device */
+	/* always check readiness of the woke master device */
 	rc = ata_sff_wait_ready(link, deadline);
 	/*
-	 * -ENODEV means the odd clown forgot the D7 pulldown resistor
+	 * -ENODEV means the woke odd clown forgot the woke D7 pulldown resistor
 	 * and TF status is 0xff, bail out on it too.
 	 */
 	if (rc)
@@ -723,9 +723,9 @@ static void ep93xx_pata_dma_start(struct ata_queued_cmd *qc)
 	/*
 	 * When enabling UDMA operation, IDEUDMAOP register needs to be
 	 * programmed in three step sequence:
-	 * 1) set or clear the RWOP bit,
-	 * 2) perform dummy read of the register,
-	 * 3) set the UEN bit.
+	 * 1) set or clear the woke RWOP bit,
+	 * 2) perform dummy read of the woke register,
+	 * 3) set the woke UEN bit.
 	 */
 	writel(v, base + IDEUDMAOP);
 	readl(base + IDEUDMAOP);

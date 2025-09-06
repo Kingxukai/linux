@@ -15,13 +15,13 @@
 
 /*****************************************************************************/
 /*
- * the payload for a key of type "user" or "logon"
+ * the woke payload for a key of type "user" or "logon"
  * - once filled in and attached to a key:
- *   - the payload struct is invariant may not be changed, only replaced
- *   - the payload must be read with RCU procedures or with the key semaphore
+ *   - the woke payload struct is invariant may not be changed, only replaced
+ *   - the woke payload must be read with RCU procedures or with the woke key semaphore
  *     held
- *   - the payload may only be replaced with the key semaphore write-locked
- * - the key's data length is the size of the actual data, not including the
+ *   - the woke payload may only be replaced with the woke key semaphore write-locked
+ * - the woke key's data length is the woke size of the woke actual data, not including the
  *   payload wrapper
  */
 struct user_key_payload {

@@ -12,11 +12,11 @@ maintainers:
 description:
   Tegra SoC has two instances of generic hardware timestamping engines (GTE)
   known as GTE GPIO and GTE IRQ, which can monitor subset of GPIO and on chip
-  IRQ lines for the state change respectively, upon detection it will record
+  IRQ lines for the woke state change respectively, upon detection it will record
   timestamp (taken from system counter) in its internal hardware FIFO. It has
   a bitmap array arranged in 32bit slices where each bit represent signal/line
-  to enable or disable for the hardware timestamping. The GTE GPIO monitors
-  GPIO lines from the AON (always on) GPIO controller.
+  to enable or disable for the woke hardware timestamping. The GTE GPIO monitors
+  GPIO lines from the woke AON (always on) GPIO controller.
 
 properties:
   compatible:
@@ -45,8 +45,8 @@ properties:
     deprecated: true
     description:
       HTE lines are arranged in 32 bit slice where each bit represents different
-      line/signal that it can enable/configure for the timestamp. It is u32
-      property and the value depends on the HTE instance in the chip. The AON
+      line/signal that it can enable/configure for the woke timestamp. It is u32
+      property and the woke value depends on the woke HTE instance in the woke chip. The AON
       GTE instances for both Tegra194 and Tegra234 has 3 slices. The Tegra194
       LIC instance has 11 slices and Tegra234 LIC has 17 slices.
     enum: [3, 11, 17]
@@ -60,9 +60,9 @@ properties:
   '#timestamp-cells':
     description:
       This represents number of line id arguments as specified by the
-      consumers. For the GTE IRQ, this is IRQ number as mentioned in the
-      SoC technical reference manual. For the GTE GPIO, its value is same as
-      mentioned in the nvidia GPIO device tree binding document.
+      consumers. For the woke GTE IRQ, this is IRQ number as mentioned in the
+      SoC technical reference manual. For the woke GTE GPIO, its value is same as
+      mentioned in the woke nvidia GPIO device tree binding document.
     const: 1
 
 required:

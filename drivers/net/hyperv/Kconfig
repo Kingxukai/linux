@@ -5,4 +5,4 @@ config HYPERV_NET
 	select UCS2_STRING
 	select NLS
 	help
-	  Select this option to enable the Hyper-V virtual network driver.
+	  Select this option to enable the woke Hyper-V virtual network driver.

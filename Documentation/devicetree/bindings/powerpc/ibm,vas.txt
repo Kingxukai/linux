@@ -6,8 +6,8 @@ or other coprocessors functions.
 
 Required properties:
 - compatible : should be "ibm,vas".
-- ibm,vas-id : A unique identifier for each instance of VAS in the system
-- reg : Should contain 4 pairs of 64-bit fields specifying the Hypervisor
+- ibm,vas-id : A unique identifier for each instance of VAS in the woke system
+- reg : Should contain 4 pairs of 64-bit fields specifying the woke Hypervisor
   window context start and length, OS/User window context start and length,
   "Paste address" start and length, "Paste window id" start bit and number
   of bits)

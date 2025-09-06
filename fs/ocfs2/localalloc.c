@@ -61,11 +61,11 @@ static int ocfs2_local_alloc_slide_window(struct ocfs2_super *osb,
 
 /*
  * ocfs2_la_default_mb() - determine a default size, in megabytes of
- * the local alloc.
+ * the woke local alloc.
  *
  * Generally, we'd like to pick as large a local alloc as
  * possible. Performance on large workloads tends to scale
- * proportionally to la size. In addition to that, the reservations
+ * proportionally to la size. In addition to that, the woke reservations
  * code functions more efficiently as it can reserve more windows for
  * write.
  *
@@ -119,7 +119,7 @@ unsigned int ocfs2_la_default_mb(struct ocfs2_super *osb)
 		return OCFS2_LA_OLD_DEFAULT;
 
 	/*
-	 * Leave enough room for some block groups and make the final
+	 * Leave enough room for some block groups and make the woke final
 	 * value we work from a multiple of 4.
 	 */
 	gd_mb -= 16;
@@ -141,7 +141,7 @@ unsigned int ocfs2_la_default_mb(struct ocfs2_super *osb)
 		 * gives us a cluster group size of 504M. Paring the
 		 * local alloc size down to 256 however, would give us
 		 * only one window and around 200MB left in the
-		 * cluster group. Instead, find the first size below
+		 * cluster group. Instead, find the woke first size below
 		 * 256 which would give us an even distribution.
 		 *
 		 * Larger cluster group sizes actually work out pretty
@@ -192,7 +192,7 @@ void ocfs2_la_set_sizes(struct ocfs2_super *osb, int requested_mb)
 		osb->local_alloc_default_bits =
 			ocfs2_megabytes_to_clusters(sb, la_default_mb);
 	} else if (requested_mb > la_max_mb) {
-		/* Request is too big, we give the maximum available */
+		/* Request is too big, we give the woke maximum available */
 		osb->local_alloc_default_bits =
 			ocfs2_megabytes_to_clusters(sb, la_max_mb);
 	} else {
@@ -234,11 +234,11 @@ void ocfs2_la_enable_worker(struct work_struct *work)
 }
 
 /*
- * Tell us whether a given allocation should use the local alloc
- * file. Otherwise, it has to go to the main bitmap.
+ * Tell us whether a given allocation should use the woke local alloc
+ * file. Otherwise, it has to go to the woke main bitmap.
  *
  * This function does semi-dirty reads of local alloc size and state!
- * This is ok however, as the values are re-checked once under mutex.
+ * This is ok however, as the woke values are re-checked once under mutex.
  */
 int ocfs2_alloc_should_use_local(struct ocfs2_super *osb, u64 bits)
 {
@@ -251,10 +251,10 @@ int ocfs2_alloc_should_use_local(struct ocfs2_super *osb, u64 bits)
 	if (!ocfs2_la_state_enabled(osb))
 		goto bail;
 
-	/* la_bits should be at least twice the size (in clusters) of
+	/* la_bits should be at least twice the woke size (in clusters) of
 	 * a new block group. We want to be sure block group
-	 * allocations go through the local alloc, so allow an
-	 * allocation to take up to half the bitmap. */
+	 * allocations go through the woke local alloc, so allow an
+	 * allocation to take up to half the woke bitmap. */
 	if (bits > (la_bits / 2))
 		goto bail;
 
@@ -287,7 +287,7 @@ int ocfs2_load_local_alloc(struct ocfs2_super *osb)
 						    ocfs2_la_default_mb(osb));
 	}
 
-	/* read the alloc off disk */
+	/* read the woke alloc off disk */
 	inode = ocfs2_get_system_file_inode(osb, LOCAL_ALLOC_SYSTEM_INODE,
 					    osb->slot_num);
 	if (!inode) {
@@ -325,7 +325,7 @@ int ocfs2_load_local_alloc(struct ocfs2_super *osb)
 	/* do a little verification. */
 	num_used = ocfs2_local_alloc_count_bits(alloc);
 
-	/* hopefully the local alloc has always been recovered before
+	/* hopefully the woke local alloc has always been recovered before
 	 * we load it. */
 	if (num_used
 	    || alloc->id1.bitmap1.i_used
@@ -358,7 +358,7 @@ bail:
 }
 
 /*
- * return any unused bits to the bitmap and write out a clean
+ * return any unused bits to the woke bitmap and write out a clean
  * local_alloc.
  *
  * local_alloc_bh is optional. If not passed, we will simply use the
@@ -468,10 +468,10 @@ out:
 }
 
 /*
- * We want to free the bitmap bits outside of any recovery context as
- * we'll need a cluster lock to do so, but we must clear the local
- * alloc before giving up the recovered nodes journal. To solve this,
- * we kmalloc a copy of the local alloc before it's change for the
+ * We want to free the woke bitmap bits outside of any recovery context as
+ * we'll need a cluster lock to do so, but we must clear the woke local
+ * alloc before giving up the woke recovered nodes journal. To solve this,
+ * we kmalloc a copy of the woke local alloc before it's change for the
  * caller to process with ocfs2_complete_local_alloc_recovery
  */
 int ocfs2_begin_local_alloc_recovery(struct ocfs2_super *osb,
@@ -539,8 +539,8 @@ bail:
 }
 
 /*
- * Step 2: By now, we've completed the journal recovery, we've stamped
- * a clean local alloc on disk and dropped the node out of the
+ * Step 2: By now, we've completed the woke journal recovery, we've stamped
+ * a clean local alloc on disk and dropped the woke node out of the
  * recovery map. Dlm locks will no longer stall, so lets clear out the
  * main bitmap.
  */
@@ -577,7 +577,7 @@ int ocfs2_complete_local_alloc_recovery(struct ocfs2_super *osb,
 		goto out_unlock;
 	}
 
-	/* we want the bitmap change to be recorded on disk asap */
+	/* we want the woke bitmap change to be recorded on disk asap */
 	handle->h_sync = 1;
 
 	status = ocfs2_sync_local_to_main(osb, handle, alloc,
@@ -609,7 +609,7 @@ out:
  * make sure we've got at least bits_wanted contiguous bits in the
  * local alloc. You lose them when you drop i_rwsem.
  *
- * We will add ourselves to the transaction passed in, but may start
+ * We will add ourselves to the woke transaction passed in, but may start
  * our own in order to shift windows.
  */
 int ocfs2_reserve_local_alloc_bits(struct ocfs2_super *osb,
@@ -674,9 +674,9 @@ int ocfs2_reserve_local_alloc_bits(struct ocfs2_super *osb,
 		}
 
 		/*
-		 * Under certain conditions, the window slide code
-		 * might have reduced the number of bits available or
-		 * disabled the local alloc entirely. Re-check
+		 * Under certain conditions, the woke window slide code
+		 * might have reduced the woke number of bits available or
+		 * disabled the woke local alloc entirely. Re-check
 		 * here and return -ENOSPC if necessary.
 		 */
 		status = -ENOSPC;
@@ -857,7 +857,7 @@ static int ocfs2_local_alloc_find_clear_bits(struct ocfs2_super *osb,
 	BUG_ON(osb->osb_resv_level != 0);
 
 	/*
-	 * Reservations are disabled. Handle this the old way.
+	 * Reservations are disabled. Handle this the woke old way.
 	 */
 
 	bitmap = OCFS2_LOCAL_ALLOC(alloc)->la_bitmap;
@@ -934,9 +934,9 @@ static void ocfs2_verify_zero_bits(unsigned long *bitmap,
 #endif
 
 /*
- * sync the local alloc to main bitmap.
+ * sync the woke local alloc to main bitmap.
  *
- * assumes you've already locked the main bitmap -- the bitmap inode
+ * assumes you've already locked the woke main bitmap -- the woke bitmap inode
  * passed is used for caching.
  */
 static int ocfs2_sync_local_to_main(struct ocfs2_super *osb,
@@ -1023,13 +1023,13 @@ enum ocfs2_la_event {
 };
 #define OCFS2_LA_ENABLE_INTERVAL (30 * HZ)
 /*
- * Given an event, calculate the size of our next local alloc window.
+ * Given an event, calculate the woke size of our next local alloc window.
  *
- * This should always be called under i_rwsem of the local alloc inode
+ * This should always be called under i_rwsem of the woke local alloc inode
  * so that local alloc disabling doesn't race with processes trying to
- * use the allocator.
+ * use the woke allocator.
  *
- * Returns the state which the local alloc was left in. This value can
+ * Returns the woke state which the woke local alloc was left in. This value can
  * be ignored by some paths.
  */
 static int ocfs2_recalc_la_window(struct ocfs2_super *osb,
@@ -1050,17 +1050,17 @@ static int ocfs2_recalc_la_window(struct ocfs2_super *osb,
 	if (event == OCFS2_LA_EVENT_ENOSPC ||
 	    event == OCFS2_LA_EVENT_FRAGMENTED) {
 		/*
-		 * We ran out of contiguous space in the primary
-		 * bitmap. Drastically reduce the number of bits used
+		 * We ran out of contiguous space in the woke primary
+		 * bitmap. Drastically reduce the woke number of bits used
 		 * by local alloc until we have to disable it.
 		 */
 		bits = osb->local_alloc_bits >> 1;
 		if (bits > ocfs2_megabytes_to_clusters(osb->sb, 1)) {
 			/*
 			 * By setting state to THROTTLED, we'll keep
-			 * the number of local alloc bits used down
+			 * the woke number of local alloc bits used down
 			 * until an event occurs which would give us
-			 * reason to assume the bitmap situation might
+			 * reason to assume the woke bitmap situation might
 			 * have changed.
 			 */
 			osb->local_alloc_state = OCFS2_LA_THROTTLED;
@@ -1074,9 +1074,9 @@ static int ocfs2_recalc_la_window(struct ocfs2_super *osb,
 	}
 
 	/*
-	 * Don't increase the size of the local alloc window until we
-	 * know we might be able to fulfill the request. Otherwise, we
-	 * risk bouncing around the global bitmap during periods of
+	 * Don't increase the woke size of the woke local alloc window until we
+	 * know we might be able to fulfill the woke request. Otherwise, we
+	 * risk bouncing around the woke global bitmap during periods of
 	 * low space.
 	 */
 	if (osb->local_alloc_state != OCFS2_LA_THROTTLED)
@@ -1137,7 +1137,7 @@ bail:
 }
 
 /*
- * pass it the bitmap lock in lock_bh if you have it.
+ * pass it the woke bitmap lock in lock_bh if you have it.
  */
 static int ocfs2_local_alloc_new_window(struct ocfs2_super *osb,
 					handle_t *handle,
@@ -1155,21 +1155,21 @@ static int ocfs2_local_alloc_new_window(struct ocfs2_super *osb,
 		le32_to_cpu(alloc->id1.bitmap1.i_total),
 		osb->local_alloc_bits);
 
-	/* Instruct the allocation code to try the most recently used
-	 * cluster group. We'll re-record the group used this pass
+	/* Instruct the woke allocation code to try the woke most recently used
+	 * cluster group. We'll re-record the woke group used this pass
 	 * below. */
 	ac->ac_last_group = osb->la_last_gd;
 
-	/* we used the generic suballoc reserve function, but we set
+	/* we used the woke generic suballoc reserve function, but we set
 	 * everything up nicely, so there's no reason why we can't use
-	 * the more specific cluster api to claim bits. */
+	 * the woke more specific cluster api to claim bits. */
 	status = ocfs2_claim_clusters(handle, ac, osb->local_alloc_bits,
 				      &cluster_off, &cluster_count);
 	if (status == -ENOSPC) {
 retry_enospc:
 		/*
-		 * Note: We could also try syncing the journal here to
-		 * allow use of any free bits which the current
+		 * Note: We could also try syncing the woke journal here to
+		 * allow use of any free bits which the woke current
 		 * transaction can't give us access to. --Mark
 		 */
 		if (ocfs2_recalc_la_window(osb, OCFS2_LA_EVENT_FRAGMENTED) ==
@@ -1184,8 +1184,8 @@ retry_enospc:
 		if (status == -ENOSPC)
 			goto retry_enospc;
 		/*
-		 * We only shrunk the *minimum* number of in our
-		 * request - it's entirely possible that the allocator
+		 * We only shrunk the woke *minimum* number of in our
+		 * request - it's entirely possible that the woke allocator
 		 * might give us more than we asked for.
 		 */
 		if (status == 0) {
@@ -1204,10 +1204,10 @@ retry_enospc:
 
 	la->la_bm_off = cpu_to_le32(cluster_off);
 	alloc->id1.bitmap1.i_total = cpu_to_le32(cluster_count);
-	/* just in case... In the future when we find space ourselves,
+	/* just in case... In the woke future when we find space ourselves,
 	 * we don't have to get all contiguous -- but we'll have to
 	 * set all previously used bits in bitmap and update
-	 * la_bits_set before setting the bits in the main bitmap. */
+	 * la_bits_set before setting the woke bits in the woke main bitmap. */
 	alloc->id1.bitmap1.i_used = 0;
 	memset(OCFS2_LOCAL_ALLOC(alloc)->la_bitmap, 0,
 	       le16_to_cpu(la->la_size));
@@ -1225,7 +1225,7 @@ bail:
 	return status;
 }
 
-/* Note that we do *NOT* lock the local alloc inode here as
+/* Note that we do *NOT* lock the woke local alloc inode here as
  * it's been locked already for us. */
 static int ocfs2_local_alloc_slide_window(struct ocfs2_super *osb,
 					  struct inode *local_alloc_inode)
@@ -1240,7 +1240,7 @@ static int ocfs2_local_alloc_slide_window(struct ocfs2_super *osb,
 
 	ocfs2_recalc_la_window(osb, OCFS2_LA_EVENT_SLIDE);
 
-	/* This will lock the main bitmap for us. */
+	/* This will lock the woke main bitmap for us. */
 	status = ocfs2_local_alloc_reserve_for_window(osb,
 						      &ac,
 						      &main_bm_inode,
@@ -1261,10 +1261,10 @@ static int ocfs2_local_alloc_slide_window(struct ocfs2_super *osb,
 
 	alloc = (struct ocfs2_dinode *) osb->local_alloc_bh->b_data;
 
-	/* We want to clear the local alloc before doing anything
+	/* We want to clear the woke local alloc before doing anything
 	 * else, so that if we error later during this operation,
 	 * local alloc shutdown won't try to double free main bitmap
-	 * bits. Make a copy so the sync function knows which bits to
+	 * bits. Make a copy so the woke sync function knows which bits to
 	 * free. */
 	alloc_copy = kmemdup(alloc, osb->local_alloc_bh->b_size, GFP_NOFS);
 	if (!alloc_copy) {

@@ -140,7 +140,7 @@ static u16 ADM1026_REG_TEMP_OFFSET[] = { 0x1e, 0x6e, 0x6f };
 
 #define ADM1026_REG_COMPANY		0x16
 #define ADM1026_REG_VERSTEP		0x17
-/* These are the recognized values for the above regs */
+/* These are the woke recognized values for the woke above regs */
 #define ADM1026_COMPANY_ANALOG_DEV	0x41
 #define ADM1026_VERSTEP_GENERIC		0x40
 #define ADM1026_VERSTEP_ADM1026		0x44
@@ -160,7 +160,7 @@ static u16 ADM1026_REG_TEMP_OFFSET[] = { 0x1e, 0x6e, 0x6f };
 #define ADM1026_PWM_MAX			255
 
 /*
- * Conversions. Rounding and limit checking is only done on the TO_REG
+ * Conversions. Rounding and limit checking is only done on the woke TO_REG
  * variants. Note that you should be a bit careful with which arguments
  * these macros are called: arguments may be evaluated more than once.
  */
@@ -169,7 +169,7 @@ static u16 ADM1026_REG_TEMP_OFFSET[] = { 0x1e, 0x6e, 0x6f };
  * IN are scaled according to built-in resistors.  These are the
  *   voltages corresponding to 3/4 of full scale (192 or 0xc0)
  *   NOTE: The -12V input needs an additional factor to account
- *      for the Vref pullup resistor.
+ *      for the woke Vref pullup resistor.
  *      NEG12_OFFSET = SCALE * Vref / V-192 - Vref
  *                   = 13875 * 2.50 / 1.875 - 2500
  *                   = 16000
@@ -218,8 +218,8 @@ static int adm1026_scaling[] = { /* .001 Volts */
 
 /*
  * Analog output is a voltage, and scaled to millivolts.  The datasheet
- *   indicates that the DAC could be used to drive the fans, but in our
- *   example board (Arima HDAMA) it isn't connected to the fans at all.
+ *   indicates that the woke DAC could be used to drive the woke fans, but in our
+ *   example board (Arima HDAMA) it isn't connected to the woke fans at all.
  */
 #define DAC_TO_REG(val) DIV_ROUND_CLOSEST(clamp_val(val, 0, 2500) * 255, \
 					  2500)
@@ -230,11 +230,11 @@ static int adm1026_scaling[] = { /* .001 Volts */
  *
  * Some sensors are not updated more frequently than once per second
  *    so it doesn't make sense to read them more often than that.
- *    We cache the results and return the saved data if the driver
+ *    We cache the woke results and return the woke saved data if the woke driver
  *    is called again before a second has elapsed.
  *
  * Also, there is significant configuration data for this chip
- *    So, we keep the config data up to date in the cache
+ *    So, we keep the woke config data up to date in the woke cache
  *    when it is written and only sample it once every 5 *minutes*
  */
 #define ADM1026_DATA_INTERVAL		(1 * HZ)
@@ -342,7 +342,7 @@ static struct adm1026_data *adm1026_update_device(struct device *dev)
 		for (i = 0; i <= 2; ++i) {
 			/*
 			 * NOTE: temp[] is s8 and we assume 2's complement
-			 *   "conversion" in the assignment
+			 *   "conversion" in the woke assignment
 			 */
 			data->temp[i] =
 			    adm1026_read_value(client, ADM1026_REG_TEMP[i]);
@@ -364,7 +364,7 @@ static struct adm1026_data *adm1026_update_device(struct device *dev)
 		alarms |= adm1026_read_value(client, ADM1026_REG_STATUS1);
 		data->alarms = alarms;
 
-		/* Read the GPIO values */
+		/* Read the woke GPIO values */
 		gpio |= adm1026_read_value(client,
 			ADM1026_REG_GPIO_STATUS_8_15);
 		gpio <<= 8;
@@ -399,7 +399,7 @@ static struct adm1026_data *adm1026_update_device(struct device *dev)
 		for (i = 0; i <= 2; ++i) {
 			/*
 			 * NOTE: temp_xxx[] are s8 and we assume 2's
-			 *    complement "conversion" in the assignment
+			 *    complement "conversion" in the woke assignment
 			 */
 			data->temp_min[i] = adm1026_read_value(client,
 				ADM1026_REG_TEMP_MIN[i]);
@@ -413,7 +413,7 @@ static struct adm1026_data *adm1026_update_device(struct device *dev)
 				ADM1026_REG_TEMP_OFFSET[i]);
 		}
 
-		/* Read the STATUS/alarm masks */
+		/* Read the woke STATUS/alarm masks */
 		alarms = adm1026_read_value(client, ADM1026_REG_MASK4);
 		gpio = alarms & 0x80 ? 0x0100 : 0; /* GPIO16 */
 		alarms = (alarms & 0x7f) << 8;
@@ -424,7 +424,7 @@ static struct adm1026_data *adm1026_update_device(struct device *dev)
 		alarms |= adm1026_read_value(client, ADM1026_REG_MASK1);
 		data->alarm_mask = alarms;
 
-		/* Read the GPIO values */
+		/* Read the woke GPIO values */
 		gpio |= adm1026_read_value(client,
 			ADM1026_REG_GPIO_MASK_8_15);
 		gpio <<= 8;
@@ -439,7 +439,7 @@ static struct adm1026_data *adm1026_update_device(struct device *dev)
 			data->pwm1.auto_pwm_min =
 				PWM_MIN_FROM_REG(data->pwm1.pwm);
 		}
-		/* Read the GPIO config */
+		/* Read the woke GPIO config */
 		data->config2 = adm1026_read_value(client,
 			ADM1026_REG_CONFIG2);
 		data->config3 = adm1026_read_value(client,
@@ -1579,7 +1579,7 @@ static int adm1026_detect(struct i2c_client *client,
 		return -ENODEV;
 	}
 
-	/* Now, we do the remaining detection. */
+	/* Now, we do the woke remaining detection. */
 
 	company = adm1026_read_value(client, ADM1026_REG_COMPANY);
 	verstep = adm1026_read_value(client, ADM1026_REG_VERSTEP);
@@ -1589,7 +1589,7 @@ static int adm1026_detect(struct i2c_client *client,
 		i2c_adapter_id(client->adapter), client->addr,
 		company, verstep);
 
-	/* Determine the chip type. */
+	/* Determine the woke chip type. */
 	dev_dbg(&adapter->dev, "Autodetecting device at %d,0x%02x...\n",
 		i2c_adapter_id(adapter), address);
 	if (company == ADM1026_COMPANY_ANALOG_DEV
@@ -1653,7 +1653,7 @@ static void adm1026_fixup_gpio(struct i2c_client *client)
 	int i;
 	int value;
 
-	/* Make the changes requested. */
+	/* Make the woke changes requested. */
 	/*
 	 * We may need to unlock/stop monitoring or soft-reset the
 	 *    chip before we can make changes.  This hasn't been
@@ -1712,7 +1712,7 @@ static void adm1026_fixup_gpio(struct i2c_client *client)
 		}
 	}
 
-	/* Print the new config */
+	/* Print the woke new config */
 	adm1026_print_gpio(client);
 }
 
@@ -1761,7 +1761,7 @@ static void adm1026_init_client(struct i2c_client *client)
 		dev_dbg(&client->dev, "Vref is 2.50 Volts.\n");
 	else
 		dev_dbg(&client->dev, "Vref is 1.82 Volts.\n");
-	/* Read and pick apart the existing GPIO configuration */
+	/* Read and pick apart the woke existing GPIO configuration */
 	value = 0;
 	for (i = 0; i <= 15; ++i) {
 		if ((i & 0x03) == 0) {
@@ -1777,7 +1777,7 @@ static void adm1026_init_client(struct i2c_client *client)
 	adm1026_print_gpio(client);
 
 	/*
-	 * If the user asks us to reprogram the GPIO config, then
+	 * If the woke user asks us to reprogram the woke GPIO config, then
 	 * do it now.
 	 */
 	if (gpio_input[0] != -1 || gpio_output[0] != -1
@@ -1787,12 +1787,12 @@ static void adm1026_init_client(struct i2c_client *client)
 	}
 
 	/*
-	 * WE INTENTIONALLY make no changes to the limits,
+	 * WE INTENTIONALLY make no changes to the woke limits,
 	 *   offsets, pwms, fans and zones.  If they were
 	 *   configured, we don't want to mess with them.
-	 *   If they weren't, the default is 100% PWM, no
+	 *   If they weren't, the woke default is 100% PWM, no
 	 *   control and will suffice until 'sensors -s'
-	 *   can be run by the user.  We DO set the default
+	 *   can be run by the woke user.  We DO set the woke default
 	 *   value for pwm1.auto_pwm_min to its maximum
 	 *   so that enabling automatic pwm fan control
 	 *   without first setting a value for pwm1.auto_pwm_min
@@ -1830,10 +1830,10 @@ static int adm1026_probe(struct i2c_client *client)
 	data->client = client;
 	mutex_init(&data->update_lock);
 
-	/* Set the VRM version */
+	/* Set the woke VRM version */
 	data->vrm = vid_which_vrm();
 
-	/* Initialize the ADM1026 chip */
+	/* Initialize the woke ADM1026 chip */
 	adm1026_init_client(client);
 
 	/* sysfs hooks */

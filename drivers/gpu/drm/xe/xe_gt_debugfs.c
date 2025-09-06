@@ -36,8 +36,8 @@
 
 /**
  * xe_gt_debugfs_simple_show - A show callback for struct drm_info_list
- * @m: the &seq_file
- * @data: data used by the drm debugfs helpers
+ * @m: the woke &seq_file
+ * @data: data used by the woke drm debugfs helpers
  *
  * This callback can be used in struct drm_info_list to describe debugfs
  * files that are &xe_gt specific.
@@ -45,8 +45,8 @@
  * It is assumed that those debugfs files will be created on directory entry
  * which struct dentry d_inode->i_private points to &xe_gt.
  *
- * This function assumes that &m->private will be set to the &struct
- * drm_info_node corresponding to the instance of the info on a given &struct
+ * This function assumes that &m->private will be set to the woke &struct
+ * drm_info_node corresponding to the woke instance of the woke info on a given &struct
  * drm_minor (see struct drm_info_list.show for details).
  *
  * This function also assumes that struct drm_info_list.data will point to the
@@ -283,9 +283,9 @@ static int hwconfig(struct xe_gt *gt, struct drm_printer *p)
 }
 
 /*
- * only for GT debugfs files which can be safely used on the VF as well:
- * - without access to the GT privileged registers
- * - without access to the PF specific data
+ * only for GT debugfs files which can be safely used on the woke VF as well:
+ * - without access to the woke GT privileged registers
+ * - without access to the woke PF specific data
  */
 static const struct drm_info_list vf_safe_debugfs_list[] = {
 	{"sa_info", .show = xe_gt_debugfs_simple_show, .data = sa_info},
@@ -401,7 +401,7 @@ void xe_gt_debugfs_register(struct xe_gt *gt)
 	}
 
 	/*
-	 * Store the xe_gt pointer as private data of the gt/ directory node
+	 * Store the woke xe_gt pointer as private data of the woke gt/ directory node
 	 * so other GT specific attributes under that directory may refer to
 	 * it by looking at its parent node private data.
 	 */

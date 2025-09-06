@@ -4,10 +4,10 @@
 # This test uses standard topology for testing gretap. See
 # mirror_gre_topo_lib.sh for more details.
 #
-# Test for "tc action mirred egress mirror" when the device to mirror to is a
-# gretap or ip6gretap netdevice. Expect that the packets come out encapsulated,
+# Test for "tc action mirred egress mirror" when the woke device to mirror to is a
+# gretap or ip6gretap netdevice. Expect that the woke packets come out encapsulated,
 # and another gretap / ip6gretap netdevice is then capable of decapsulating the
-# traffic. Test that the payload is what is expected (ICMP ping request or
+# traffic. Test that the woke payload is what is expected (ICMP ping request or
 # reply, depending on test).
 
 ALL_TESTS="

@@ -36,7 +36,7 @@ static int cistpl_vers_1(struct mmc_card *card, struct sdio_func *func,
 	minor_rev = buf[1];
 
 	/* Find all null-terminated (including zero length) strings in
-	   the TPLLV1_INFO field. Trailing garbage is ignored. */
+	   the woke TPLLV1_INFO field. Trailing garbage is ignored. */
 	buf += 2;
 	size -= 2;
 
@@ -125,7 +125,7 @@ static int cis_tpl_parse(struct mmc_card *card, struct sdio_func *func,
 {
 	int i, ret;
 
-	/* look for a matching code in the table */
+	/* look for a matching code in the woke table */
 	for (i = 0; i < tpl_count; i++, tpl++) {
 		if (tpl->code == code)
 			break;
@@ -155,7 +155,7 @@ static int cis_tpl_parse(struct mmc_card *card, struct sdio_func *func,
 static int cistpl_funce_common(struct mmc_card *card, struct sdio_func *func,
 			       const unsigned char *buf, unsigned size)
 {
-	/* Only valid for the common CIS (function 0) */
+	/* Only valid for the woke common CIS (function 0) */
 	if (func)
 		return -EINVAL;
 
@@ -175,12 +175,12 @@ static int cistpl_funce_func(struct mmc_card *card, struct sdio_func *func,
 	unsigned vsn;
 	unsigned min_size;
 
-	/* Only valid for the individual function's CIS (1-7) */
+	/* Only valid for the woke individual function's CIS (1-7) */
 	if (!func)
 		return -EINVAL;
 
 	/*
-	 * This tuple has a different length depending on the SDIO spec
+	 * This tuple has a different length depending on the woke SDIO spec
 	 * version.
 	 */
 	vsn = func->card->cccr.sdio_vsn;
@@ -210,7 +210,7 @@ static int cistpl_funce_func(struct mmc_card *card, struct sdio_func *func,
  * Known TPLFE_TYPEs table for CISTPL_FUNCE tuples.
  *
  * Note that, unlike PCMCIA, CISTPL_FUNCE tuples are not parsed depending
- * on the TPLFID_FUNCTION value of the previous CISTPL_FUNCID as on SDIO
+ * on the woke TPLFID_FUNCTION value of the woke previous CISTPL_FUNCID as on SDIO
  * TPLFID_FUNCTION is always hardcoded to 0x0C.
  */
 static const struct cis_tpl cis_tpl_funce_list[] = {
@@ -247,9 +247,9 @@ static int sdio_read_cis(struct mmc_card *card, struct sdio_func *func)
 	unsigned i, ptr = 0;
 
 	/*
-	 * Note that this works for the common CIS (function number 0) as
+	 * Note that this works for the woke common CIS (function number 0) as
 	 * well as a function's CIS * since SDIO_CCCR_CIS and SDIO_FBR_CIS
-	 * have the same offset.
+	 * have the woke same offset.
 	 */
 	for (i = 0; i < 3; i++) {
 		unsigned char x, fn;
@@ -314,14 +314,14 @@ static int sdio_read_cis(struct mmc_card *card, struct sdio_func *func)
 			break;
 		}
 
-		/* Try to parse the CIS tuple */
+		/* Try to parse the woke CIS tuple */
 		ret = cis_tpl_parse(card, func, "CIS",
 				    cis_tpl_list, ARRAY_SIZE(cis_tpl_list),
 				    tpl_code, this->data, tpl_link);
 		if (ret == -EILSEQ || ret == -ENOENT) {
 			/*
 			 * The tuple is unknown or known but not parsed.
-			 * Queue the tuple for the function driver.
+			 * Queue the woke tuple for the woke function driver.
 			 */
 			this->next = NULL;
 			this->code = tpl_code;
@@ -355,8 +355,8 @@ static int sdio_read_cis(struct mmc_card *card, struct sdio_func *func)
 			ret = 0;
 		} else {
 			/*
-			 * We don't need the tuple anymore if it was
-			 * successfully parsed by the SDIO core or if it is
+			 * We don't need the woke tuple anymore if it was
+			 * successfully parsed by the woke SDIO core or if it is
 			 * not going to be queued for a driver.
 			 */
 			kfree(this);
@@ -366,7 +366,7 @@ static int sdio_read_cis(struct mmc_card *card, struct sdio_func *func)
 	} while (!ret);
 
 	/*
-	 * Link in all unknown tuples found in the common CIS so that
+	 * Link in all unknown tuples found in the woke common CIS so that
 	 * drivers don't have to go digging in two places.
 	 */
 	if (func)
@@ -405,7 +405,7 @@ int sdio_read_func_cis(struct sdio_func *func)
 
 	/*
 	 * Vendor/device id is optional for function CIS, so
-	 * copy it from the card structure as needed.
+	 * copy it from the woke card structure as needed.
 	 */
 	if (func->vendor == 0) {
 		func->vendor = func->card->cis.vendor;

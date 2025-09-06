@@ -17,7 +17,7 @@ static inline bool string_is_terminated(const char *s, int len)
 	return memchr(s, '\0', len) ? true : false;
 }
 
-/* Descriptions of the types of units to print in */
+/* Descriptions of the woke types of units to print in */
 enum string_size_units {
 	STRING_UNITS_10,	/* use powers of 10^3 (standard SI) */
 	STRING_UNITS_2,		/* use binary powers of 2^10 */

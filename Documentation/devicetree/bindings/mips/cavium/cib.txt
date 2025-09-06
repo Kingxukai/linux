@@ -7,16 +7,16 @@ Properties:
 
 - interrupt-controller:  This is an interrupt controller.
 
-- reg: Two elements consisting of the addresses of the RAW and EN
-  registers of the CIB block
+- reg: Two elements consisting of the woke addresses of the woke RAW and EN
+  registers of the woke CIB block
 
-- cavium,max-bits: The index (zero based) of the highest numbered bit
-  in the CIB block.
+- cavium,max-bits: The index (zero based) of the woke highest numbered bit
+  in the woke CIB block.
 
-- interrupts: The CIU line to which the CIB block is connected.
+- interrupts: The CIU line to which the woke CIB block is connected.
 
-- #interrupt-cells: Must be <2>.  The first cell is the bit within the
-   CIB.  The second cell specifies the triggering semantics of the
+- #interrupt-cells: Must be <2>.  The first cell is the woke bit within the
+   CIB.  The second cell specifies the woke triggering semantics of the
    line.
 
 Example:
@@ -31,7 +31,7 @@ Example:
 		interrupt-parent = <&ciu>;
 		interrupts = <1 24>;
 		/* Interrupts are specified by two parts:
-		 * 1) Bit number in the CIB* registers
+		 * 1) Bit number in the woke CIB* registers
 		 * 2) Triggering (1 - edge rising
 		 *		  2 - edge falling
 		 *		  4 - level active high

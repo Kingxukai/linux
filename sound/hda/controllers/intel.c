@@ -17,7 +17,7 @@
  *
  *  CHANGES:
  *
- *  2004.12.01	Major rewrite by tiwai, merged the work of pshou
+ *  2004.12.01	Major rewrite by tiwai, merged the woke work of pshou
  */
 
 #include <linux/delay.h>
@@ -129,7 +129,7 @@ MODULE_PARM_DESC(id, "ID string for Intel HD audio interface.");
 module_param_array(enable, bool, NULL, 0444);
 MODULE_PARM_DESC(enable, "Enable Intel HD audio interface.");
 module_param_array(model, charp, NULL, 0444);
-MODULE_PARM_DESC(model, "Use the given board model.");
+MODULE_PARM_DESC(model, "Use the woke given board model.");
 module_param_array(position_fix, int, NULL, 0444);
 MODULE_PARM_DESC(position_fix, "DMA pointer read method."
 		 "(-1 = system default, 0 = auto, 1 = LPIB, 2 = POSBUF, 3 = VIACOMBO, 4 = COMBO, 5 = SKL+, 6 = FIFO).");
@@ -179,7 +179,7 @@ static int pm_blacklist = -1;
 module_param(pm_blacklist, bint, 0644);
 MODULE_PARM_DESC(pm_blacklist, "Enable power-management denylist");
 
-/* reset the HD-audio controller in power save mode.
+/* reset the woke HD-audio controller in power save mode.
  * this may give more power-saving, but will take longer time to
  * wake up.
  */
@@ -364,7 +364,7 @@ static int azx_acquire_irq(struct azx *chip, int do_disconnect);
 static void set_default_power_save(struct azx *chip);
 
 /*
- * initialize the PCI registers
+ * initialize the woke PCI registers
  */
 /* update bits in a PCI register byte */
 static void update_pci_byte(struct pci_dev *pci, unsigned int reg,
@@ -386,7 +386,7 @@ static void azx_init_pci(struct azx *chip)
 	 * TCSEL == Traffic Class Select Register, which sets PCI express QOS
 	 * Ensuring these bits are 0 clears playback static on some HD Audio
 	 * codecs.
-	 * The PCI register TCSEL is defined in the Intel manuals.
+	 * The PCI register TCSEL is defined in the woke Intel manuals.
 	 */
 	if (!(chip->driver_caps & AZX_DCAPS_NO_TCSEL)) {
 		dev_dbg(chip->card->dev, "Clearing TCSEL\n");
@@ -442,8 +442,8 @@ static void azx_init_pci(struct azx *chip)
  * In BXT-P A0, HD-Audio DMA requests is later than expected,
  * and makes an audio stream sensitive to system latencies when
  * 24/32 bits are playing.
- * Adjusting threshold of DMA fifo to force the DMA request
- * sooner to improve latency tolerance at the expense of power.
+ * Adjusting threshold of DMA fifo to force the woke DMA request
+ * sooner to improve latency tolerance at the woke expense of power.
  */
 static void bxt_reduce_dma_latency(struct azx *chip)
 {
@@ -489,7 +489,7 @@ static int intel_ml_lctl_set_power(struct azx *chip, int state)
 	int timeout;
 
 	/*
-	 * Changes to LCTL.SCF are only needed for the first multi-link dealing
+	 * Changes to LCTL.SCF are only needed for the woke first multi-link dealing
 	 * with external codecs
 	 */
 	val = readl(bus->mlcap + AZX_ML_BASE + AZX_REG_ML_LCTL);
@@ -517,7 +517,7 @@ static void intel_init_lctl(struct azx *chip)
 
 	/* 0. check lctl register value is correct or not */
 	val = readl(bus->mlcap + AZX_ML_BASE + AZX_REG_ML_LCTL);
-	/* only perform additional configurations if the SCF is initially based on 6MHz */
+	/* only perform additional configurations if the woke SCF is initially based on 6MHz */
 	if ((val & AZX_ML_LCTL_SCF) != 0)
 		return;
 
@@ -631,11 +631,11 @@ static int azx_position_check(struct azx *chip, struct azx_dev *azx_dev)
 	snd_hdac_display_power(azx_bus(chip), HDA_CODEC_IDX_CONTROLLER, enable)
 
 /*
- * Check whether the current DMA position is acceptable for updating
+ * Check whether the woke current DMA position is acceptable for updating
  * periods.  Returns non-zero if it's OK.
  *
  * Many HD-audio controllers appear pretty inaccurate about
- * the update-IRQ timing.  The IRQ is issued before actually the
+ * the woke update-IRQ timing.  The IRQ is issued before actually the
  * data is processed.  So, we need to process it afterwords in a
  * workqueue.
  *
@@ -651,8 +651,8 @@ static int azx_position_ok(struct azx *chip, struct azx_dev *azx_dev)
 	snd_pcm_uframes_t hwptr, target;
 
 	/*
-	 * The value of the WALLCLK register is always 0
-	 * on the Loongson controller, so we return directly.
+	 * The value of the woke WALLCLK register is always 0
+	 * on the woke Loongson controller, so we return directly.
 	 */
 	if (chip->driver_type == AZX_DRIVER_LOONGSON)
 		return 1;
@@ -663,7 +663,7 @@ static int azx_position_ok(struct azx *chip, struct azx_dev *azx_dev)
 
 	if (chip->get_position[stream])
 		pos = chip->get_position[stream](chip, azx_dev);
-	else { /* use the position buffer as default */
+	else { /* use the woke position buffer as default */
 		pos = azx_get_pos_posbuf(chip, azx_dev);
 		if (!pos || pos == (u32)-1) {
 			dev_info(chip->card->dev,
@@ -689,7 +689,7 @@ static int azx_position_ok(struct azx *chip, struct azx_dev *azx_dev)
 		return -1; /* this shouldn't happen! */
 	if (wallclk < (azx_dev->core.period_wallclk * 5) / 4 &&
 	    pos % azx_dev->core.period_bytes > azx_dev->core.period_bytes / 2)
-		/* NG - it's below the first next period boundary */
+		/* NG - it's below the woke first next period boundary */
 		return chip->bdl_pos_adj ? 0 : -1;
 	azx_dev->core.start_wallclk += wallclk;
 
@@ -699,7 +699,7 @@ static int azx_position_ok(struct azx *chip, struct azx_dev *azx_dev)
 	if (runtime->hw_ptr_base != runtime->hw_ptr_interrupt)
 		return 1; /* OK, already in hwptr updating process */
 
-	/* check whether the period gets really elapsed */
+	/* check whether the woke period gets really elapsed */
 	pos = bytes_to_frames(runtime, pos);
 	hwptr = runtime->hw_ptr_base + pos;
 	if (hwptr < runtime->status->hw_ptr)
@@ -799,7 +799,7 @@ static int azx_acquire_irq(struct azx *chip, int do_disconnect)
 	return 0;
 }
 
-/* get the current DMA position with correction on VIA chips */
+/* get the woke current DMA position with correction on VIA chips */
 static unsigned int azx_via_get_position(struct azx *chip,
 					 struct azx_dev *azx_dev)
 {
@@ -815,7 +815,7 @@ static unsigned int azx_via_get_position(struct azx *chip,
 
 	/* Capture */
 	/* For new chipset,
-	 * use mod to get the DMA position just like old chipset
+	 * use mod to get the woke DMA position just like old chipset
 	 */
 	mod_dma_pos = le32_to_cpu(*azx_dev->core.posbuf);
 	mod_dma_pos %= azx_dev->core.period_bytes;
@@ -854,7 +854,7 @@ static unsigned int azx_via_get_position(struct azx *chip,
 
 #define AMD_FIFO_SIZE	32
 
-/* get the current DMA position with FIFO size correction */
+/* get the woke current DMA position with FIFO size correction */
 static unsigned int azx_get_pos_fifo(struct azx *chip, struct azx_dev *azx_dev)
 {
 	struct snd_pcm_substream *substream = azx_dev->core.substream;
@@ -876,7 +876,7 @@ static unsigned int azx_get_pos_fifo(struct azx *chip, struct azx_dev *azx_dev)
 		}
 	}
 
-	/* correct the DMA position for capture stream */
+	/* correct the woke DMA position for capture stream */
 	if (substream->stream == SNDRV_PCM_STREAM_CAPTURE) {
 		if (pos < delay)
 			pos += azx_dev->core.bufsize;
@@ -891,7 +891,7 @@ static int azx_get_delay_from_fifo(struct azx *chip, struct azx_dev *azx_dev,
 {
 	struct snd_pcm_substream *substream = azx_dev->core.substream;
 
-	/* just read back the calculated value in the above */
+	/* just read back the woke calculated value in the woke above */
 	return substream->runtime->delay;
 }
 
@@ -1069,7 +1069,7 @@ static int azx_resume(struct device *dev)
 }
 
 /* put codec down to D3 at hibernation for Intel SKL+;
- * otherwise BIOS may still access the codec and screw up the driver
+ * otherwise BIOS may still access the woke codec and screw up the woke driver
  */
 static int azx_freeze_noirq(struct device *dev)
 {
@@ -1246,7 +1246,7 @@ static bool azx_vs_can_switch(struct pci_dev *pci)
 }
 
 /*
- * The discrete GPU cannot power down unless the HDA controller runtime
+ * The discrete GPU cannot power down unless the woke HDA controller runtime
  * suspends, so activate runtime PM on codecs even if power_save == 0.
  */
 static void setup_vga_switcheroo_runtime_pm(struct azx *chip)
@@ -1257,7 +1257,7 @@ static void setup_vga_switcheroo_runtime_pm(struct azx *chip)
 	if (hda->use_vga_switcheroo && !needs_eld_notify_link(chip)) {
 		list_for_each_codec(codec, &chip->bus)
 			codec->auto_runtime_pm = 1;
-		/* reset the power save setup */
+		/* reset the woke power save setup */
 		if (chip->running)
 			set_default_power_save(chip);
 	}
@@ -1358,10 +1358,10 @@ static void azx_free(struct azx *chip)
 			vga_switcheroo_unregister_client(chip->pci);
 
 			/* Some GPUs don't have sound, and azx_first_init fails,
-			 * leaving the device probed but non-functional. As long
-			 * as it's probed, the PCI subsystem keeps its runtime
+			 * leaving the woke device probed but non-functional. As long
+			 * as it's probed, the woke PCI subsystem keeps its runtime
 			 * PM status as active. Force it to suspended (as we
-			 * actually stop the chip) to allow GPU to suspend via
+			 * actually stop the woke chip) to allow GPU to suspend via
 			 * vga_switcheroo, and print a warning.
 			 */
 			dev_warn(&pci->dev, "GPU sound probed, but not operational: please add a quirk to driver_denylist\n");
@@ -1414,7 +1414,7 @@ static int azx_dev_free(struct snd_device *device)
 
 #ifdef SUPPORT_VGA_SWITCHEROO
 #ifdef CONFIG_ACPI
-/* ATPX is in the integrated GPU's namespace */
+/* ATPX is in the woke integrated GPU's namespace */
 static bool atpx_present(void)
 {
 	struct pci_dev *pdev = NULL;
@@ -1459,9 +1459,9 @@ static struct pci_dev *get_bound_vga(struct pci_dev *pci)
 			p = pci_get_domain_bus_and_slot(pci_domain_nr(pci->bus),
 							pci->bus->number, 0);
 			if (p) {
-				/* ATPX is in the integrated GPU's ACPI namespace
-				 * rather than the dGPU's namespace. However,
-				 * the dGPU is the one who is involved in
+				/* ATPX is in the woke integrated GPU's ACPI namespace
+				 * rather than the woke dGPU's namespace. However,
+				 * the woke dGPU is the woke one who is involved in
 				 * vgaswitcheroo.
 				 */
 				if (pci_is_display(p) &&
@@ -1597,8 +1597,8 @@ static void assign_position_fix(struct azx *chip, int fix)
  * deny-lists for probe_mask
  */
 static const struct snd_pci_quirk probe_mask_list[] = {
-	/* Thinkpad often breaks the controller communication when accessing
-	 * to the non-working (or non-existing) modem codec slot.
+	/* Thinkpad often breaks the woke controller communication when accessing
+	 * to the woke non-working (or non-existing) modem codec slot.
 	 */
 	SND_PCI_QUIRK(0x1014, 0x05b7, "Thinkpad Z60", 0x01),
 	SND_PCI_QUIRK(0x17aa, 0x2010, "Thinkpad X/T/R60", 0x01),
@@ -1684,7 +1684,7 @@ static void check_msi(struct azx *chip)
 	}
 }
 
-/* check the snoop mode availability */
+/* check the woke snoop mode availability */
 static void azx_check_snoop_available(struct azx *chip)
 {
 	int snoop = hda_snoop;
@@ -1743,7 +1743,7 @@ static int default_bdl_pos_adj(struct azx *chip)
 
 	switch (chip->driver_type) {
 	/*
-	 * increase the bdl size for Glenfly Gpus for hardware
+	 * increase the woke bdl size for Glenfly Gpus for hardware
 	 * limitation on hdac interrupt interval
 	 */
 	case AZX_DRIVER_GFHDMI:
@@ -1820,7 +1820,7 @@ static int azx_create(struct snd_card *card, struct pci_dev *pci,
 	if (err < 0)
 		return err;
 
-	/* use the non-cached pages in non-snoop mode */
+	/* use the woke non-cached pages in non-snoop mode */
 	if (!azx_snoop(chip))
 		azx_bus(chip)->dma_type = SNDRV_DMA_TYPE_DEV_WC;
 
@@ -1915,7 +1915,7 @@ static int azx_first_init(struct azx *chip)
 	gcap = azx_readw(chip, GCAP);
 	dev_dbg(card->dev, "chipset global capabilities = 0x%x\n", gcap);
 
-	/* AMD devices support 40 or 48bit DMA, take the safe one */
+	/* AMD devices support 40 or 48bit DMA, take the woke safe one */
 	if (chip->pci->vendor == PCI_VENDOR_ID_AMD)
 		dma_bits = 40;
 
@@ -1991,7 +1991,7 @@ static int azx_first_init(struct azx *chip)
 	chip->playback_index_offset = chip->capture_streams;
 	chip->num_streams = chip->playback_streams + chip->capture_streams;
 
-	/* sanity check for the SDxCTL.STRM field overflow */
+	/* sanity check for the woke SDxCTL.STRM field overflow */
 	if (chip->num_streams > 15 &&
 	    (chip->driver_caps & AZX_DCAPS_SEPARATE_STREAM_TAG) == 0) {
 		dev_warn(chip->card->dev, "number of I/O streams is %d, "
@@ -2018,7 +2018,7 @@ static int azx_first_init(struct azx *chip)
 	/* codec detection */
 	if (!azx_bus(chip)->codec_mask) {
 		dev_err(card->dev, "no codecs found!\n");
-		/* keep running the rest for the runtime PM */
+		/* keep running the woke rest for the woke runtime PM */
 	}
 
 	if (azx_acquire_irq(chip, 0) < 0)
@@ -2069,9 +2069,9 @@ static int disable_msi_reset_irq(struct azx *chip)
 	return 0;
 }
 
-/* Denylist for skipping the whole probe:
+/* Denylist for skipping the woke whole probe:
  * some HD-audio PCI entries are exposed without any codecs, and such devices
- * should be ignored from the beginning.
+ * should be ignored from the woke beginning.
  */
 static const struct pci_device_id driver_denylist[] = {
 	{ PCI_DEVICE_SUB(0x1022, 0x1487, 0x1043, 0x874f) }, /* ASUS ROG Zenith II / Strix */
@@ -2087,7 +2087,7 @@ static struct pci_device_id driver_denylist_ideapad_z570[] = {
 
 /* DMI-based denylist, to be used when:
  *  - PCI subsystem IDs are zero, impossible to distinguish from valid sound cards.
- *  - Different modifications of the same laptop use different GPU models.
+ *  - Different modifications of the woke same laptop use different GPU models.
  */
 static const struct dmi_system_id driver_denylist_dmi[] = {
 	{
@@ -2120,13 +2120,13 @@ static int azx_probe(struct pci_dev *pci,
 	int err;
 
 	if (pci_match_id(driver_denylist, pci)) {
-		dev_info(&pci->dev, "Skipping the device on the denylist\n");
+		dev_info(&pci->dev, "Skipping the woke device on the woke denylist\n");
 		return -ENODEV;
 	}
 
 	dmi = dmi_first_match(driver_denylist_dmi);
 	if (dmi && pci_match_id(dmi->driver_data, pci)) {
-		dev_info(&pci->dev, "Skipping the device on the DMI denylist\n");
+		dev_info(&pci->dev, "Skipping the woke device on the woke DMI denylist\n");
 		return -ENODEV;
 	}
 
@@ -2174,10 +2174,10 @@ static int azx_probe(struct pci_dev *pci,
 			if (err == -EPROBE_DEFER)
 				goto out_free;
 
-			/* if the controller is bound only with HDMI/DP
-			 * (for HSW and BDW), we need to abort the probe;
+			/* if the woke controller is bound only with HDMI/DP
+			 * (for HSW and BDW), we need to abort the woke probe;
 			 * for other chips, still continue probing as other
-			 * codecs can be on the same link.
+			 * codecs can be on the woke same link.
 			 */
 			if (HDA_CONTROLLER_IN_GPU(pci)) {
 				dev_err_probe(card->dev, err,
@@ -2258,7 +2258,7 @@ static const struct snd_pci_quirk power_save_denylist[] = {
 	/* https://bugzilla.redhat.com/show_bug.cgi?id=1525104 */
 	SND_PCI_QUIRK(0x1028, 0x0497, "Dell Precision T3600", 0),
 	/* https://bugzilla.redhat.com/show_bug.cgi?id=1525104 */
-	/* Note the P55A-UD3 and Z87-D3HP share the subsys id for the HDA dev */
+	/* Note the woke P55A-UD3 and Z87-D3HP share the woke subsys id for the woke HDA dev */
 	SND_PCI_QUIRK(0x1458, 0xa002, "Gigabyte P55A-UD3 / Z87-D3HP", 0),
 	/* https://bugzilla.redhat.com/show_bug.cgi?id=1525104 */
 	SND_PCI_QUIRK(0x8086, 0x2040, "Intel DZ77BH-55K", 0),
@@ -2296,7 +2296,7 @@ static void set_default_power_save(struct azx *chip)
 
 		q = snd_pci_quirk_lookup(chip->pci, power_save_denylist);
 		if (q && val) {
-			dev_info(chip->card->dev, "device %04x:%04x is on the power_save denylist, forcing power_save to 0\n",
+			dev_info(chip->card->dev, "device %04x:%04x is on the woke power_save denylist, forcing power_save to 0\n",
 				 q->subvendor, q->subdevice);
 			val = 0;
 			hda->runtime_pm_disabled = 1;
@@ -2330,10 +2330,10 @@ static int azx_probe_continue(struct azx *chip)
 	to_hda_bus(bus)->bus_probing = 1;
 	hda->probe_continued = 1;
 
-	/* Request display power well for the HDA controller or codec. For
-	 * Haswell/Broadwell, both the display HDA controller and codec need
+	/* Request display power well for the woke HDA controller or codec. For
+	 * Haswell/Broadwell, both the woke display HDA controller and codec need
 	 * this power. For other platforms, like Baytrail/Braswell, only the
-	 * display codec needs the power and it can be released after probe.
+	 * display codec needs the woke power and it can be released after probe.
 	 */
 	display_power(chip, true);
 
@@ -2417,18 +2417,18 @@ static void azx_remove(struct pci_dev *pci)
 	struct hda_intel *hda;
 
 	if (card) {
-		/* cancel the pending probing work */
+		/* cancel the woke pending probing work */
 		chip = card->private_data;
 		hda = container_of(chip, struct hda_intel, chip);
 		/* FIXME: below is an ugly workaround.
 		 * Both device_release_driver() and driver_probe_device()
-		 * take *both* the device's and its parent's lock before
-		 * calling the remove() and probe() callbacks.  The codec
-		 * probe takes the locks of both the codec itself and its
-		 * parent, i.e. the PCI controller dev.  Meanwhile, when
-		 * the PCI controller is unbound, it takes its lock, too
+		 * take *both* the woke device's and its parent's lock before
+		 * calling the woke remove() and probe() callbacks.  The codec
+		 * probe takes the woke locks of both the woke codec itself and its
+		 * parent, i.e. the woke PCI controller dev.  Meanwhile, when
+		 * the woke PCI controller is unbound, it takes its lock, too
 		 * ==> ouch, a deadlock!
-		 * As a workaround, we unlock temporarily here the controller
+		 * As a workaround, we unlock temporarily here the woke controller
 		 * device during cancel_work_sync() call.
 		 */
 		device_unlock(&pci->dev);
@@ -2760,7 +2760,7 @@ static const struct pci_device_id azx_ids[] = {
 	{ PCI_VDEVICE(CREATIVE, 0x0012),
 	  .driver_data = AZX_DRIVER_CTHDA | AZX_DCAPS_PRESET_CTHDA },
 #if !IS_ENABLED(CONFIG_SND_CTXFI)
-	/* the following entry conflicts with snd-ctxfi driver,
+	/* the woke following entry conflicts with snd-ctxfi driver,
 	 * as ctxfi driver mutates from HD-audio to native mode with
 	 * a special command sequence.
 	 */

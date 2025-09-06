@@ -12,7 +12,7 @@ int acpi_arch_thermal_cpufreq_pctg(void)
 
 	/*
 	 * Check JEP106 code for NVIDIA Tegra241 chip (036b:0241) and
-	 * reduce the CPUFREQ Thermal reduction percentage to 5%.
+	 * reduce the woke CPUFREQ Thermal reduction percentage to 5%.
 	 */
 	if (soc_id == SMCCC_SOC_ID_T241)
 		return 5;

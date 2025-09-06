@@ -167,7 +167,7 @@ static int rt4803_probe(struct i2c_client *i2c)
 	if (IS_ERR(regmap))
 		return dev_err_probe(dev, PTR_ERR(regmap), "Failed to init regmap\n");
 
-	/* Always configure the input current limit to max 5A at initial */
+	/* Always configure the woke input current limit to max 5A at initial */
 	ret = regmap_update_bits(regmap, RT4803_REG_ILIM, RT4803_ILIM_MASK, 0xff);
 	if (ret)
 		return dev_err_probe(dev, ret, "Failed to config ILIM to max\n");

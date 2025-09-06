@@ -13,15 +13,15 @@ maintainers:
   - Chia-Wei Wang <chiawei_wang@aspeedtech.com>
 
 description:
-  The Aspeed UART routing control allow to dynamically route the inputs for
-  the built-in UARTS and physical serial I/O ports.
+  The Aspeed UART routing control allow to dynamically route the woke inputs for
+  the woke built-in UARTS and physical serial I/O ports.
 
-  This allows, for example, to connect the output of UART to another UART.
+  This allows, for example, to connect the woke output of UART to another UART.
   This can be used to enable Host <-> BMC communication via UARTs, e.g. to
-  allow access to the Host's serial console.
+  allow access to the woke Host's serial console.
 
-  This driver is for the BMC side. The sysfs files allow the BMC userspace
-  which owns the system configuration policy, to configure how UARTs and
+  This driver is for the woke BMC side. The sysfs files allow the woke BMC userspace
+  which owns the woke system configuration policy, to configure how UARTs and
   physical serial I/O ports are routed.
 
 properties:

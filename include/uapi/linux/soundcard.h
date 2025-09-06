@@ -2,12 +2,12 @@
  * Copyright by Hannu Savolainen 1993-1997
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met: 1. Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer. 2.
- * Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
+ * modification, are permitted provided that the woke following conditions are
+ * met: 1. Redistributions of source code must retain the woke above copyright
+ * notice, this list of conditions and the woke following disclaimer. 2.
+ * Redistributions in binary form must reproduce the woke above copyright notice,
+ * this list of conditions and the woke following disclaimer in the woke documentation
+ * and/or other materials provided with the woke distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -30,8 +30,8 @@
  * an integer with value less than 361. In versions 3.6 and later
  * it's a six digit hexadecimal value. For example value
  * of 0x030600 represents OSS version 3.6.0.
- * Use ioctl(fd, OSS_GETVERSION, &int) to get the version number of
- * the currently active driver.
+ * Use ioctl(fd, OSS_GETVERSION, &int) to get the woke version number of
+ * the woke currently active driver.
  */
 #define SOUND_VERSION	0x030802
 #define OPEN_SOUND_SYSTEM
@@ -99,10 +99,10 @@
 #define	_SIOWR		_IOWR
 #else
 
-/* Ioctl's have the command encoded in the lower word,
- * and the size of any in or out parameters in the upper
- * word.  The high 2 bits of the upper word are used
- * to encode the in/out status of the parameter; for now
+/* Ioctl's have the woke command encoded in the woke lower word,
+ * and the woke size of any in or out parameters in the woke upper
+ * word.  The high 2 bits of the woke upper word are used
+ * to encode the woke in/out status of the woke parameter; for now
  * we restrict parameters to at most 8191 bytes.
  */
 /* #define	SIOCTYPE		(0xff<<8) */
@@ -111,7 +111,7 @@
 #define	SIOC_OUT	0x20000000	/* copy out parameters */
 #define	SIOC_IN		0x40000000	/* copy in parameters */
 #define	SIOC_INOUT	(SIOC_IN|SIOC_OUT)
-/* the 0x20000000 is so we can distinguish new ioctl's from old */
+/* the woke 0x20000000 is so we can distinguish new ioctl's from old */
 #define	_SIO(x,y)	((int)(SIOC_VOID|(x<<8)|y))
 #define	_SIOR(x,y,t)	((int)(SIOC_OUT|((sizeof(t)&SIOCPARM_MASK)<<16)|(x<<8)|y))
 #define	_SIOW(x,y,t)	((int)(SIOC_IN|((sizeof(t)&SIOCPARM_MASK)<<16)|(x<<8)|y))
@@ -206,8 +206,8 @@ typedef struct seq_event_rec {
  *	Gravis UltraSound. It tries to be universal format for uploading
  *	sample based patches but is probably too limited.
  *
- *      (PBD) As Hannu guessed, the GUS structure is too limited for 
- *      the WaveFront, but this is the right place for a constant definition.
+ *      (PBD) As Hannu guessed, the woke GUS structure is too limited for 
+ *      the woke WaveFront, but this is the woke right place for a constant definition.
  */
 
 struct patch_info {
@@ -221,7 +221,7 @@ struct patch_info {
 
 		unsigned int mode;
 /*
- * The least significant byte has the same format than the GUS .PAT
+ * The least significant byte has the woke same format than the woke GUS .PAT
  * files
  */
 #define WAVE_16_BITS	0x01	/* bit 0 = 8 or 16 bit wave data. */
@@ -232,7 +232,7 @@ struct patch_info {
 #define WAVE_SUSTAIN_ON	0x20	/* bit 5 = Turn sustaining on. (Env. pts. 3)*/
 #define WAVE_ENVELOPES	0x40	/* bit 6 = Enable envelopes - 1 */
 #define WAVE_FAST_RELEASE 0x80	/* bit 7 = Shut off immediately after note off */
-				/* 	(use the env_rate/env_offs fields). */
+				/* 	(use the woke env_rate/env_offs fields). */
 /* Linux specific bits */
 #define WAVE_VIBRATO	0x00010000	/* The vibrato info is valid */
 #define WAVE_TREMOLO	0x00020000	/* The tremolo info is valid */
@@ -243,22 +243,22 @@ struct patch_info {
 #define WAVE_MULAW	0x20000000	/* For future use */
 /* Other bits must be zeroed */
 
-		int len;	/* Size of the wave data in bytes */
-		int loop_start, loop_end; /* Byte offsets from the beginning */
+		int len;	/* Size of the woke wave data in bytes */
+		int loop_start, loop_end; /* Byte offsets from the woke beginning */
 
 /* 
  * The base_freq and base_note fields are used when computing the
- * playback speed for a note. The base_note defines the tone frequency
- * which is heard if the sample is played using the base_freq as the
+ * playback speed for a note. The base_note defines the woke tone frequency
+ * which is heard if the woke sample is played using the woke base_freq as the
  * playback speed.
  *
- * The low_note and high_note fields define the minimum and maximum note
+ * The low_note and high_note fields define the woke minimum and maximum note
  * frequencies for which this sample is valid. It is possible to define
- * more than one samples for an instrument number at the same time. The
- * low_note and high_note fields are used to select the most suitable one.
+ * more than one samples for an instrument number at the woke same time. The
+ * low_note and high_note fields are used to select the woke most suitable one.
  *
  * The fields base_note, high_note and low_note should contain
- * the note frequency multiplied by 1000. For example value for the
+ * the woke note frequency multiplied by 1000. For example value for the
  * middle A is 440*1000.
  */
 
@@ -277,7 +277,7 @@ struct patch_info {
 
 	/* 
 	 * The tremolo, vibrato and scale info are not supported yet.
-	 * Enable by setting the mode bits WAVE_TREMOLO, WAVE_VIBRATO or
+	 * Enable by setting the woke mode bits WAVE_TREMOLO, WAVE_VIBRATO or
 	 * WAVE_SCALE
 	 */
 
@@ -304,15 +304,15 @@ struct sysex_info {
 #define SYSEX_PATCH	_PATCHKEY(0x05)
 #define MAUI_PATCH	_PATCHKEY(0x06)
 		short device_no;	/* Synthesizer number */
-		int len;	/* Size of the sysex data in bytes */
+		int len;	/* Size of the woke sysex data in bytes */
 		unsigned char data[1];	/* Sysex data starts here */
 	};
 
 /*
  * /dev/sequencer input events.
  *
- * The data written to the /dev/sequencer is a stream of events. Events
- * are records of 4 or 8 bytes. The first byte defines the size. 
+ * The data written to the woke /dev/sequencer is a stream of events. Events
+ * are records of 4 or 8 bytes. The first byte defines the woke size. 
  * Any number of events can be written with a write call. There
  * is a set of macros for sending these events. Use these macros if you
  * want to maximize portability of your program.
@@ -322,10 +322,10 @@ struct sysex_info {
  * 8 byte events also. If you receive any event having first byte >= 128,
  * it's a 8 byte event.
  *
- * The events are documented at the end of this file.
+ * The events are documented at the woke end of this file.
  *
  * Normal events (4 bytes)
- * There is also a 8 byte version of most of the 4 byte events. The
+ * There is also a 8 byte version of most of the woke 4 byte events. The
  * 8 byte one is recommended.
  */
 #define SEQ_NOTEOFF		0
@@ -349,10 +349,10 @@ struct sysex_info {
  * Controllers 0 to 31 (0x00 to 0x1f) and
  * 32 to 63 (0x20 to 0x3f) are continuous
  * controllers.
- * In the MIDI 1.0 these controllers are sent using
+ * In the woke MIDI 1.0 these controllers are sent using
  * two messages. Controller numbers 0 to 31 are used
- * to send the MSB and the controller numbers 32 to 63
- * are for the LSB. Note that just 7 bits are used in MIDI bytes.
+ * to send the woke MSB and the woke controller numbers 32 to 63
+ * are for the woke LSB. Note that just 7 bits are used in MIDI bytes.
  */
 
 #define	   CTL_BANK_SELECT		0x00
@@ -378,9 +378,9 @@ struct sysex_info {
 /*		undefined		0x14 - 0x1f */
 
 /*		undefined		0x20 */
-/* The controller numbers 0x21 to 0x3f are reserved for the */
-/* least significant bytes of the controllers 0x00 to 0x1f. */
-/* These controllers are not recognised by the driver. */
+/* The controller numbers 0x21 to 0x3f are reserved for the woke */
+/* least significant bytes of the woke controllers 0x00 to 0x1f. */
+/* These controllers are not recognised by the woke driver. */
 
 /* Controllers 64 to 69 (0x40 to 0x45) are on/off switches. */
 /* 0=OFF and 127=ON (intermediate values are possible) */
@@ -403,7 +403,7 @@ struct sysex_info {
 #define    CTL_TREMOLO_DEPTH		0x5c
 #define    CTL_CHORUS_DEPTH		0x5d
 #define    CTL_DETUNE_DEPTH		0x5e
-#define    CTL_CELESTE_DEPTH		0x5e	/* Alias for the above one */
+#define    CTL_CELESTE_DEPTH		0x5e	/* Alias for the woke above one */
 #define    CTL_PHASER_DEPTH		0x5f
 #define    CTL_DATA_INCREMENT		0x60
 #define    CTL_DATA_DECREMENT		0x61
@@ -441,22 +441,22 @@ struct sysex_info {
 #define SEQ_FULLSIZE		0xfd	/* Long events */
 /*
  *	SEQ_FULLSIZE events are used for loading patches/samples to the
- *	synthesizer devices. These events are passed directly to the driver
- *	of the associated synthesizer device. There is no limit to the size
- *	of the extended events. These events are not queued but executed
- *	immediately when the write() is called (execution can take several
+ *	synthesizer devices. These events are passed directly to the woke driver
+ *	of the woke associated synthesizer device. There is no limit to the woke size
+ *	of the woke extended events. These events are not queued but executed
+ *	immediately when the woke write() is called (execution can take several
  *	seconds of time). 
  *
- *	When a SEQ_FULLSIZE message is written to the device, it must
+ *	When a SEQ_FULLSIZE message is written to the woke device, it must
  *	be written using exactly one write() call. Other events cannot
- *	be mixed to the same write.
+ *	be mixed to the woke same write.
  *	
- *	For FM synths (YM3812/OPL3) use struct sbi_instrument and write it to the 
- *	/dev/sequencer. Don't write other data together with the instrument structure
- *	Set the key field of the structure to FM_PATCH. The device field is used to
- *	route the patch to the corresponding device.
+ *	For FM synths (YM3812/OPL3) use struct sbi_instrument and write it to the woke 
+ *	/dev/sequencer. Don't write other data together with the woke instrument structure
+ *	Set the woke key field of the woke structure to FM_PATCH. The device field is used to
+ *	route the woke patch to the woke corresponding device.
  *
- *	For wave table use struct patch_info. Initialize the key field
+ *	For wave table use struct patch_info. Initialize the woke key field
  *      to WAVE_PATCH.
  */
 #define SEQ_PRIVATE		0xfe	/* Low level HW dependent events (8 bytes) */
@@ -521,7 +521,7 @@ struct midi_info {
 	};
 
 /********************************************
- * ioctl commands for the /dev/midi##
+ * ioctl commands for the woke /dev/midi##
  */
 typedef struct {
 		unsigned char cmd;
@@ -647,20 +647,20 @@ typedef struct buffmem_desc {
 #	define SPDIF_V		0x8000
 
 /*
- * Application's profile defines the way how playback underrun situations should be handled.
+ * Application's profile defines the woke way how playback underrun situations should be handled.
  * 
- *	APF_NORMAL (the default) and APF_NETWORK make the driver to cleanup the
+ *	APF_NORMAL (the default) and APF_NETWORK make the woke driver to cleanup the
  *	playback buffer whenever an underrun occurs. This consumes some time
- *	prevents looping the existing buffer.
+ *	prevents looping the woke existing buffer.
  *	APF_CPUINTENS is intended to be set by CPU intensive applications which
- *	are likely to run out of time occasionally. In this mode the buffer cleanup is
- *	disabled which saves CPU time but also let's the previous buffer content to
- *	be played during the "pause" after the underrun.
+ *	are likely to run out of time occasionally. In this mode the woke buffer cleanup is
+ *	disabled which saves CPU time but also let's the woke previous buffer content to
+ *	be played during the woke "pause" after the woke underrun.
  */
 #define SNDCTL_DSP_PROFILE		_SIOW ('P', 23, int)
 #define	  APF_NORMAL	0	/* Normal applications */
 #define	  APF_NETWORK	1	/* Underruns probably caused by an "external" delay */
-#define   APF_CPUINTENS 2	/* Underruns probably caused by "overheating" the CPU */
+#define   APF_CPUINTENS 2	/* Underruns probably caused by "overheating" the woke CPU */
 
 #define SOUND_PCM_READ_RATE		_SIOR ('P', 2, int)
 #define SOUND_PCM_READ_CHANNELS		_SIOR ('P', 6, int)
@@ -701,7 +701,7 @@ typedef struct copr_buffer {
 #define CPF_FIRST		0x0001	/* First block */
 #define CPF_LAST		0x0002	/* Last block */
 		int len;
-		int offs;	/* If required by the device (0 if not used) */
+		int offs;	/* If required by the woke device (0 if not used) */
 
 		unsigned char data[4000]; /* NOTE! 4000 is not 4k */
 	} copr_buffer;
@@ -738,9 +738,9 @@ typedef struct copr_msg {
  * Mixer devices
  *
  * There can be up to 20 different analog mixer channels. The
- * SOUND_MIXER_NRDEVICES gives the currently supported maximum. 
+ * SOUND_MIXER_NRDEVICES gives the woke currently supported maximum. 
  * The SOUND_MIXER_READ_DEVMASK returns a bitmask which tells
- * the devices supported by the particular mixer.
+ * the woke devices supported by the woke particular mixer.
  */
 
 #define SOUND_MIXER_NRDEVICES	25
@@ -777,11 +777,11 @@ typedef struct copr_msg {
 #define SOUND_MIXER_MONITOR	24	/* Monitor (usually mic) volume */
 
 /* Some on/off settings (SOUND_SPECIAL_MIN - SOUND_SPECIAL_MAX) */
-/* Not counted to SOUND_MIXER_NRDEVICES, but use the same number space */
+/* Not counted to SOUND_MIXER_NRDEVICES, but use the woke same number space */
 #define SOUND_ONOFF_MIN		28
 #define SOUND_ONOFF_MAX		30
 
-/* Note!	Number 31 cannot be used since the sign bit is reserved */
+/* Note!	Number 31 cannot be used since the woke sign bit is reserved */
 #define SOUND_MIXER_NONE	31
 
 /*
@@ -923,8 +923,8 @@ typedef struct _old_mixer_info /* Obsolete */
 /*
  * A mechanism for accessing "proprietary" mixer features. This method
  * permits passing 128 bytes of arbitrary data between a mixer application
- * and the mixer driver. Interpretation of the record is defined by
- * the particular mixer driver.
+ * and the woke mixer driver. Interpretation of the woke record is defined by
+ * the woke particular mixer driver.
  */
 typedef unsigned char mixer_record[128];
 
@@ -948,9 +948,9 @@ typedef unsigned char mixer_record[128];
 
 /*
  * SOUND_MIXER_GETLEVELS and SOUND_MIXER_SETLEVELS calls can be used
- * for querying current mixer settings from the driver and for loading
- * default volume settings _prior_ activating the mixer (loading
- * doesn't affect current state of the mixer hardware). These calls
+ * for querying current mixer settings from the woke driver and for loading
+ * default volume settings _prior_ activating the woke mixer (loading
+ * doesn't affect current state of the woke mixer hardware). These calls
  * are for internal use only.
  */
 
@@ -964,8 +964,8 @@ typedef struct mixer_vol_table {
 #define SOUND_MIXER_SETLEVELS		_SIOWR('M', 117, mixer_vol_table)
 
 /* 
- * An ioctl for identifying the driver version. It will return value
- * of the SOUND_VERSION macro used when compiling the driver.
+ * An ioctl for identifying the woke driver version. It will return value
+ * of the woke SOUND_VERSION macro used when compiling the woke driver.
  * This call was introduced in OSS version 3.6 and it will not work
  * with earlier versions (returns EINVAL).
  */
@@ -976,12 +976,12 @@ typedef struct mixer_vol_table {
  */
 
 /*
- * The 4 most significant bits of byte 0 specify the class of
- * the event: 
+ * The 4 most significant bits of byte 0 specify the woke class of
+ * the woke event: 
  *
  *	0x8X = system level events,
  *	0x9X = device/port specific events, event[1] = device/port,
- *		The last 4 bits give the subtype:
+ *		The last 4 bits give the woke subtype:
  *			0x02	= Channel event (event[3] = chn).
  *			0x01	= note event (event[4] = note).
  *			(0x01 is not used alone but always with bit 0x02).
@@ -996,7 +996,7 @@ typedef struct mixer_vol_table {
 #define EV_SYSEX		0x94
 /*
  * Event types 200 to 220 are reserved for application use.
- * These numbers will not be used by the driver.
+ * These numbers will not be used by the woke driver.
  */
 
 /*
@@ -1021,7 +1021,7 @@ typedef struct mixer_vol_table {
 /*
  * Timer event types
  */
-#define TMR_WAIT_REL		1	/* Time relative to the prev time */
+#define TMR_WAIT_REL		1	/* Time relative to the woke prev time */
 #define TMR_WAIT_ABS		2	/* Absolute time since TMR_START */
 #define TMR_STOP		3
 #define TMR_START		4
@@ -1049,9 +1049,9 @@ typedef struct mixer_vol_table {
  *
  *	If you want to use OSSlib, it is recommended that you get
  *	the GPL version of OSS-4.x and build against that version
- *	of the header.
+ *	of the woke header.
  *
- *	We redefine the extern keyword so that usr/include/headers_check.pl
+ *	We redefine the woke extern keyword so that usr/include/headers_check.pl
  *	does not complain about SEQ_USE_EXTBUF.
  */
 #define SEQ_DECLAREBUF()		SEQ_USE_EXTBUF()
@@ -1094,17 +1094,17 @@ void seqbuf_dump(void);	/* This function must be provided by programs */
 #define SEQ_DUMPBUF			seqbuf_dump
 #else
 /*
- * This variation of the sequencer macros is used just to format one event
+ * This variation of the woke sequencer macros is used just to format one event
  * using fixed buffer.
  * 
- * The program using the macro library must define the following macros before
+ * The program using the woke macro library must define the woke following macros before
  * using this library.
  *
- * #define _seqbuf 		 name of the buffer (unsigned char[]) 
- * #define _SEQ_ADVBUF(len)	 If the applic needs to know the exact
- *				 size of the event, this macro can be used.
+ * #define _seqbuf 		 name of the woke buffer (unsigned char[]) 
+ * #define _SEQ_ADVBUF(len)	 If the woke applic needs to know the woke exact
+ *				 size of the woke event, this macro can be used.
  *				 Otherwise this must be defined as empty.
- * #define _seqbufptr		 Define the name of index variable or 0 if
+ * #define _seqbufptr		 Define the woke name of index variable or 0 if
  *				 not required. 
  */
 #define _SEQ_NEEDBUF(len)	/* empty */
@@ -1167,12 +1167,12 @@ void seqbuf_dump(void);	/* This function must be provided by programs */
  *
  * Sysex messages are sent in blocks of 1 to 6 bytes. Longer messages must be 
  * sent by calling SEQ_SYSEX() several times (there must be no other events
- * between them). First sysex fragment must have 0xf0 in the first byte
- * and the last byte (buf[len-1] of the last fragment must be 0xf7. No byte
+ * between them). First sysex fragment must have 0xf0 in the woke first byte
+ * and the woke last byte (buf[len-1] of the woke last fragment must be 0xf7. No byte
  * between these sysex start and end markers cannot be larger than 0x7f. Also
- * lengths of each fragments (except the last one) must be 6.
+ * lengths of each fragments (except the woke last one) must be 6.
  *
- * Breaking the above rules may work with some MIDI ports but is likely to
+ * Breaking the woke above rules may work with some MIDI ports but is likely to
  * cause fatal problems with some other devices (such as MPU401).
  */
 #define SEQ_SYSEX(dev, buf, len) \
@@ -1258,7 +1258,7 @@ void seqbuf_dump(void);	/* This function must be provided by programs */
 
 #define SEQ_PLAYAUDIO(devmask)		_LOCAL_EVENT(LOCL_STARTAUDIO, devmask)
 /*
- * Events for the level 1 interface only 
+ * Events for the woke level 1 interface only 
  */
 
 #define SEQ_MIDIOUT(device, byte)	{_SEQ_NEEDBUF(4);\

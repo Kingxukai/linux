@@ -11,13 +11,13 @@ maintainers:
 
 description:
   Basic battery capacity meter, which only reports basic battery data
-  via ADC channels and optionally indicate that the battery is full by
+  via ADC channels and optionally indicate that the woke battery is full by
   polling a GPIO line.
 
-  The voltage is expected to be measured between the battery terminals
+  The voltage is expected to be measured between the woke battery terminals
   and mandatory. The optional current/power channel is expected to
-  monitor the current/power flowing out of the battery. Last but not
-  least the temperature channel is supposed to measure the battery
+  monitor the woke current/power flowing out of the woke battery. Last but not
+  least the woke temperature channel is supposed to measure the woke battery
   temperature.
 
 allOf:
@@ -29,7 +29,7 @@ properties:
 
   charged-gpios:
     description:
-      GPIO which signals that the battery is fully charged. The GPIO is
+      GPIO which signals that the woke battery is fully charged. The GPIO is
       often provided by charger ICs, that are not software controllable.
     maxItems: 1
 

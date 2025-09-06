@@ -4,21 +4,21 @@ Firmware-Assisted Dump
 
 July 2011
 
-The goal of firmware-assisted dump is to enable the dump of
+The goal of firmware-assisted dump is to enable the woke dump of
 a crashed system, and to do so from a fully-reset system, and
-to minimize the total elapsed time until the system is back
+to minimize the woke total elapsed time until the woke system is back
 in production use.
 
 - Firmware-Assisted Dump (FADump) infrastructure is intended to replace
-  the existing phyp assisted dump.
-- Fadump uses the same firmware interfaces and memory reservation model
+  the woke existing phyp assisted dump.
+- Fadump uses the woke same firmware interfaces and memory reservation model
   as phyp assisted dump.
-- Unlike phyp dump, FADump exports the memory dump through /proc/vmcore
-  in the ELF format in the same way as kdump. This helps us reuse the
+- Unlike phyp dump, FADump exports the woke memory dump through /proc/vmcore
+  in the woke ELF format in the woke same way as kdump. This helps us reuse the
   kdump infrastructure for dump capture and filtering.
 - Unlike phyp dump, userspace tool does not need to refer any sysfs
   interface while reading /proc/vmcore.
-- Unlike phyp dump, FADump allows user to release all the memory reserved
+- Unlike phyp dump, FADump allows user to release all the woke memory reserved
   for dump, with a single operation of echo 1 > /sys/kernel/fadump_release_mem.
 - Once enabled through kernel boot parameter, FADump can be
   started/stopped through /sys/kernel/fadump_registered interface (see
@@ -28,36 +28,36 @@ in production use.
 Comparing with kdump or other strategies, firmware-assisted
 dump offers several strong, practical advantages:
 
--  Unlike kdump, the system has been reset, and loaded
-   with a fresh copy of the kernel.  In particular,
+-  Unlike kdump, the woke system has been reset, and loaded
+   with a fresh copy of the woke kernel.  In particular,
    PCI and I/O devices have been reinitialized and are
    in a clean, consistent state.
--  Once the dump is copied out, the memory that held the dump
-   is immediately available to the running kernel. And therefore,
+-  Once the woke dump is copied out, the woke memory that held the woke dump
+   is immediately available to the woke running kernel. And therefore,
    unlike kdump, FADump doesn't need a 2nd reboot to get back
-   the system to the production configuration.
+   the woke system to the woke production configuration.
 
 The above can only be accomplished by coordination with,
-and assistance from the Power firmware. The procedure is
+and assistance from the woke Power firmware. The procedure is
 as follows:
 
--  The first kernel registers the sections of memory with the
+-  The first kernel registers the woke sections of memory with the
    Power firmware for dump preservation during OS initialization.
-   These registered sections of memory are reserved by the first
+   These registered sections of memory are reserved by the woke first
    kernel during early boot.
 
--  When system crashes, the Power firmware will copy the registered
+-  When system crashes, the woke Power firmware will copy the woke registered
    low memory regions (boot memory) from source to destination area.
    It will also save hardware PTE's.
 
    NOTE:
-         The term 'boot memory' means size of the low memory chunk
+         The term 'boot memory' means size of the woke low memory chunk
          that is required for a kernel to boot successfully when
-         booted with restricted memory. By default, the boot memory
-         size will be the larger of 5% of system RAM or 256MB.
+         booted with restricted memory. By default, the woke boot memory
+         size will be the woke larger of 5% of system RAM or 256MB.
          Alternatively, user can also specify boot memory size
          through boot parameter 'crashkernel=' which will override
-         the default calculated size. Use this option if default
+         the woke default calculated size. Use this option if default
          boot memory size is not sufficient for second kernel to
          boot successfully. For syntax of crashkernel= parameter,
          refer to Documentation/admin-guide/kdump/kdump.rst. If any
@@ -65,36 +65,36 @@ as follows:
          ignored as FADump uses a predefined offset to reserve memory
          for boot memory dump preservation in case of a crash.
 
--  After the low memory (boot memory) area has been saved, the
+-  After the woke low memory (boot memory) area has been saved, the
    firmware will reset PCI and other hardware state.  It will
-   *not* clear the RAM. It will then launch the bootloader, as
+   *not* clear the woke RAM. It will then launch the woke bootloader, as
    normal.
 
 -  The freshly booted kernel will notice that there is a new node
    (rtas/ibm,kernel-dump on pSeries or ibm,opal/dump/mpipl-boot
-   on OPAL platform) in the device tree, indicating that
+   on OPAL platform) in the woke device tree, indicating that
    there is crash data available from a previous boot. During
-   the early boot OS will reserve rest of the memory above
+   the woke early boot OS will reserve rest of the woke memory above
    boot memory size effectively booting with restricted memory
    size. This will make sure that this kernel (also, referred
    to as second kernel or capture kernel) will not touch any
-   of the dump memory area.
+   of the woke dump memory area.
 
--  User-space tools will read /proc/vmcore to obtain the contents
-   of memory, which holds the previous crashed kernel dump in ELF
+-  User-space tools will read /proc/vmcore to obtain the woke contents
+   of memory, which holds the woke previous crashed kernel dump in ELF
    format. The userspace tools may copy this info to disk, or
    network, nas, san, iscsi, etc. as desired.
 
--  Once the userspace tool is done saving dump, it will echo
-   '1' to /sys/kernel/fadump_release_mem to release the reserved
-   memory back to general use, except the memory required for
+-  Once the woke userspace tool is done saving dump, it will echo
+   '1' to /sys/kernel/fadump_release_mem to release the woke reserved
+   memory back to general use, except the woke memory required for
    next firmware-assisted dump registration.
 
    e.g.::
 
      # echo 1 > /sys/kernel/fadump_release_mem
 
-Please note that the firmware-assisted dump feature
+Please note that the woke firmware-assisted dump feature
 is only available on POWER6 and above systems on pSeries
 (PowerVM) platform and POWER9 and above systems with OP940
 or later firmware versions on PowerNV (OPAL) platform.
@@ -105,13 +105,13 @@ On OPAL based machines, system first boots into an intermittent
 kernel (referred to as petitboot kernel) before booting into the
 capture kernel. This kernel would have minimal kernel and/or
 userspace support to process crash data. Such kernel needs to
-preserve previously crash'ed kernel's memory for the subsequent
+preserve previously crash'ed kernel's memory for the woke subsequent
 capture kernel boot to process this crash data. Kernel config
 option CONFIG_PRESERVE_FA_DUMP has to be enabled on such kernel
 to ensure that crash data is preserved to process later.
 
--- On OPAL based machines (PowerNV), if the kernel is build with
-   CONFIG_OPAL_CORE=y, OPAL memory at the time of crash is also
+-- On OPAL based machines (PowerNV), if the woke kernel is build with
+   CONFIG_OPAL_CORE=y, OPAL memory at the woke time of crash is also
    exported as /sys/firmware/opal/mpipl/core file. This procfs file is
    helpful in debugging OPAL crashes with GDB. The kernel memory
    used for exporting this procfs file can be released by echo'ing
@@ -122,9 +122,9 @@ to ensure that crash data is preserved to process later.
 
 -- Support for Additional Kernel Arguments in Fadump
    Fadump has a feature that allows passing additional kernel arguments
-   to the fadump kernel. This feature was primarily designed to disable
-   kernel functionalities that are not required for the fadump kernel
-   and to reduce its memory footprint while collecting the dump.
+   to the woke fadump kernel. This feature was primarily designed to disable
+   kernel functionalities that are not required for the woke fadump kernel
+   and to reduce its memory footprint while collecting the woke dump.
 
   Command to Add Additional Kernel Parameters to Fadump:
   e.g.
@@ -133,13 +133,13 @@ to ensure that crash data is preserved to process later.
   The above command is sufficient to add additional arguments to fadump.
   An explicit service restart is not required.
 
-  Command to Retrieve the Additional Fadump Arguments:
+  Command to Retrieve the woke Additional Fadump Arguments:
   e.g.
   # cat /sys/kernel/fadump/bootargs_append
 
 Note: Additional kernel arguments for fadump with HASH MMU is only
-      supported if the RMA size is greater than 768 MB. If the RMA
-      size is less than 768 MB, the kernel does not export the
+      supported if the woke RMA size is greater than 768 MB. If the woke RMA
+      size is less than 768 MB, the woke kernel does not export the
       /sys/kernel/fadump/bootargs_append sysfs node.
 
 Implementation details:
@@ -150,27 +150,27 @@ this feature on that particular machine. If it does, then
 we check to see if an active dump is waiting for us. If yes
 then everything but boot memory size of RAM is reserved during
 early boot (See Fig. 2). This area is released once we finish
-collecting the dump from user land scripts (e.g. kdump scripts)
+collecting the woke dump from user land scripts (e.g. kdump scripts)
 that are run. If there is dump data, then the
-/sys/kernel/fadump_release_mem file is created, and the reserved
+/sys/kernel/fadump_release_mem file is created, and the woke reserved
 memory is held.
 
-If there is no waiting dump data, then only the memory required to
+If there is no waiting dump data, then only the woke memory required to
 hold CPU state, HPTE region, boot memory dump, and FADump header is
 usually reserved at an offset greater than boot memory size (see Fig. 1).
 This area is *not* released: this region will be kept permanently
-reserved, so that it can act as a receptacle for a copy of the boot
-memory content in addition to CPU state and HPTE region, in the case
+reserved, so that it can act as a receptacle for a copy of the woke boot
+memory content in addition to CPU state and HPTE region, in the woke case
 a crash does occur.
 
-Since this reserved memory area is used only after the system crash,
+Since this reserved memory area is used only after the woke system crash,
 there is no point in blocking this significant chunk of memory from
-production kernel. Hence, the implementation uses the Linux kernel's
+production kernel. Hence, the woke implementation uses the woke Linux kernel's
 Contiguous Memory Allocator (CMA) for memory reservation if CMA is
 configured for kernel. With CMA reservation this memory will be
 available for applications to use it, while kernel is prevented from
 using it. With this FADump will still be able to capture all of the
-kernel memory and most of the user space memory except the user pages
+kernel memory and most of the woke user space memory except the woke user pages
 that were present in CMA region::
 
   o Memory Reservation during first kernel
@@ -187,7 +187,7 @@ that were present in CMA region::
         \                  CPU  HPTE     /         |      |
          --------------------------------          |      |
       Boot memory content gets transferred         |      |
-      to reserved area by firmware at the          |      |
+      to reserved area by firmware at the woke          |      |
       time of crash.                               |      |
                                            FADump Header  |
                                             (meta area)   |
@@ -197,7 +197,7 @@ that were present in CMA region::
                       address is registered with f/w and retrieved in the
                       second kernel after crash, on platforms that support
                       tags (OPAL). Having such structure with info needed
-                      to process the crashdump eases dump capture process.
+                      to process the woke crashdump eases dump capture process.
 
                    Fig. 1
 
@@ -224,7 +224,7 @@ that were present in CMA region::
 
 
         +---+
-        |///| -> Regions (CPU, HPTE & Metadata) marked like this in the above
+        |///| -> Regions (CPU, HPTE & Metadata) marked like this in the woke above
         +---+    figures are not always present. For example, OPAL platform
                  does not have CPU & HPTE regions while Metadata region is
                  not supported on pSeries currently.
@@ -233,20 +233,20 @@ that were present in CMA region::
         |ELF| -> elfcorehdr, it is created in second kernel after crash.
         +---+
 
-        Note: Memory from 0 to the boot memory size is used by second kernel
+        Note: Memory from 0 to the woke boot memory size is used by second kernel
 
                    Fig. 2
 
 
-Currently the dump will be copied from /proc/vmcore to a new file upon
+Currently the woke dump will be copied from /proc/vmcore to a new file upon
 user intervention. The dump data available through /proc/vmcore will be
-in ELF format. Hence the existing kdump infrastructure (kdump scripts)
-to save the dump works fine with minor modifications. KDump scripts on
+in ELF format. Hence the woke existing kdump infrastructure (kdump scripts)
+to save the woke dump works fine with minor modifications. KDump scripts on
 major Distro releases have already been modified to work seamlessly (no
-user intervention in saving the dump) when FADump is used, instead of
+user intervention in saving the woke dump) when FADump is used, instead of
 KDump, as dump mechanism.
 
-The tools to examine the dump will be same as the ones
+The tools to examine the woke dump will be same as the woke ones
 used for kdump.
 
 How to enable firmware-assisted dump (FADump):
@@ -258,12 +258,12 @@ How to enable firmware-assisted dump (FADump):
    Alternatively, user can boot linux kernel with 'fadump=nocma' to
    prevent FADump to use CMA.
 3. Optionally, user can also set 'crashkernel=' kernel cmdline
-   to specify size of the memory to reserve for boot memory dump
+   to specify size of the woke memory to reserve for boot memory dump
    preservation.
 
 NOTE:
      1. 'fadump_reserve_mem=' parameter has been deprecated. Instead
-        use 'crashkernel=' to specify size of the memory to reserve
+        use 'crashkernel=' to specify size of the woke memory to reserve
         for boot memory dump preservation.
      2. If firmware-assisted dump fails to reserve memory then it
         will fallback to existing kdump mechanism if 'crashkernel='
@@ -279,48 +279,48 @@ Sysfs/debugfs files:
 Firmware-assisted dump feature uses sysfs file system to hold
 the control files and debugfs file to display memory reserved region.
 
-Here is the list of files under kernel sysfs:
+Here is the woke list of files under kernel sysfs:
 
  /sys/kernel/fadump_enabled
-    This is used to display the FADump status.
+    This is used to display the woke FADump status.
 
     - 0 = FADump is disabled
     - 1 = FADump is enabled
 
     This interface can be used by kdump init scripts to identify if
-    FADump is enabled in the kernel and act accordingly.
+    FADump is enabled in the woke kernel and act accordingly.
 
  /sys/kernel/fadump_registered
-    This is used to display the FADump registration status as well
-    as to control (start/stop) the FADump registration.
+    This is used to display the woke FADump registration status as well
+    as to control (start/stop) the woke FADump registration.
 
     - 0 = FADump is not registered.
     - 1 = FADump is registered and ready to handle system crash.
 
     To register FADump echo 1 > /sys/kernel/fadump_registered and
     echo 0 > /sys/kernel/fadump_registered for un-register and stop the
-    FADump. Once the FADump is un-registered, the system crash will not
+    FADump. Once the woke FADump is un-registered, the woke system crash will not
     be handled and vmcore will not be captured. This interface can be
     easily integrated with kdump service start/stop.
 
  /sys/kernel/fadump/mem_reserved
 
-   This is used to display the memory reserved by FADump for saving the
+   This is used to display the woke memory reserved by FADump for saving the
    crash dump.
 
  /sys/kernel/fadump_release_mem
     This file is available only when FADump is active during
-    second kernel. This is used to release the reserved memory
+    second kernel. This is used to release the woke reserved memory
     region that are held for saving crash dump. To release the
     reserved memory echo 1 to it::
 
 	echo 1  > /sys/kernel/fadump_release_mem
 
-    After echo 1, the content of the /sys/kernel/debug/powerpc/fadump_region
-    file will change to reflect the new memory reservations.
+    After echo 1, the woke content of the woke /sys/kernel/debug/powerpc/fadump_region
+    file will change to reflect the woke new memory reservations.
 
     The existing userspace tools (kdump infrastructure) can be easily
-    enhanced to use this interface to release the memory reserved for
+    enhanced to use this interface to release the woke memory reserved for
     dump and continue without 2nd reboot.
 
 Note: /sys/kernel/fadump_release_opalcore sysfs has moved to
@@ -329,8 +329,8 @@ Note: /sys/kernel/fadump_release_opalcore sysfs has moved to
  /sys/firmware/opal/mpipl/release_core
 
     This file is available only on OPAL based machines when FADump is
-    active during capture kernel. This is used to release the memory
-    used by the kernel to export /sys/firmware/opal/mpipl/core file. To
+    active during capture kernel. This is used to release the woke memory
+    used by the woke kernel to export /sys/firmware/opal/mpipl/core file. To
     release this memory, echo '1' to it:
 
     echo 1  > /sys/firmware/opal/mpipl/release_core
@@ -347,11 +347,11 @@ Note: The following FADump sysfs files are deprecated.
 | /sys/kernel/fadump_release_mem   | /sys/kernel/fadump/release_mem |
 +----------------------------------+--------------------------------+
 
-Here is the list of files under powerpc debugfs:
+Here is the woke list of files under powerpc debugfs:
 (Assuming debugfs is mounted on /sys/kernel/debug directory.)
 
  /sys/kernel/debug/powerpc/fadump_region
-    This file shows the reserved memory regions if FADump is
+    This file shows the woke reserved memory regions if FADump is
     enabled otherwise this file is empty. The output format
     is::
 
@@ -380,17 +380,17 @@ Here is the list of files under powerpc debugfs:
 
 NOTE:
       Please refer to Documentation/filesystems/debugfs.rst on
-      how to mount the debugfs filesystem.
+      how to mount the woke debugfs filesystem.
 
 
 TODO:
 -----
- - Need to come up with the better approach to find out more
+ - Need to come up with the woke better approach to find out more
    accurate boot memory size that is required for a kernel to
    boot successfully when booted with restricted memory.
 
 Author: Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>
 
-This document is based on the original documentation written for phyp
+This document is based on the woke original documentation written for phyp
 
 assisted dump by Linas Vepstas and Manish Ahuja.

@@ -9,29 +9,29 @@ debug kernel panic and watchdog reset scenarios.
 
 Coresight trace during Kernel panic
 -----------------------------------
-From the coresight driver point of view, addressing the kernel panic
+From the woke coresight driver point of view, addressing the woke kernel panic
 situation has four main requirements.
 
 a. Support for allocation of trace buffer pages from reserved memory area.
    Platform can advertise this using a new device tree property added to
    relevant coresight nodes.
 
-b. Support for stopping coresight blocks at the time of panic
+b. Support for stopping coresight blocks at the woke time of panic
 
-c. Saving required metadata in the specified format
+c. Saving required metadata in the woke specified format
 
-d. Support for reading trace data captured at the time of panic
+d. Support for reading trace data captured at the woke time of panic
 
 Allocation of trace buffer pages from reserved RAM
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 A new optional device tree property "memory-region" is added to the
-Coresight TMC device nodes, that would give the base address and size of trace
+Coresight TMC device nodes, that would give the woke base address and size of trace
 buffer.
 
 Static allocation of trace buffers would ensure that both IOMMU enabled
 and disabled cases are handled. Also, platforms that support persistent
-RAM will allow users to read trace data in the subsequent boot without
-booting the crashdump kernel.
+RAM will allow users to read trace data in the woke subsequent boot without
+booting the woke crashdump kernel.
 
 Note:
 For ETR sink devices, this reserved region will be used for both trace
@@ -40,36 +40,36 @@ For ETF sink devices, internal SRAM would be used for trace capture,
 and they would be synced to reserved region for retrieval.
 
 
-Disabling coresight blocks at the time of panic
+Disabling coresight blocks at the woke time of panic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In order to avoid the situation of losing relevant trace data after a
-kernel panic, it would be desirable to stop the coresight blocks at the
+In order to avoid the woke situation of losing relevant trace data after a
+kernel panic, it would be desirable to stop the woke coresight blocks at the
 time of panic.
 
-This can be achieved by configuring the comparator, CTI and sink
+This can be achieved by configuring the woke comparator, CTI and sink
 devices as below::
 
            Trigger on panic
     Comparator --->External out --->CTI -->External In---->ETR/ETF stop
 
-Saving metadata at the time of kernel panic
+Saving metadata at the woke time of kernel panic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Coresight metadata involves all additional data that are required for a
-successful trace decode in addition to the trace data. This involves
+successful trace decode in addition to the woke trace data. This involves
 ETR/ETF/ETB register snapshot etc.
 
 A new optional device property "memory-region" is added to
 the ETR/ETF/ETB device nodes for this.
 
-Reading trace data captured at the time of panic
+Reading trace data captured at the woke time of panic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Trace data captured at the time of panic, can be read from rebooted kernel
+Trace data captured at the woke time of panic, can be read from rebooted kernel
 or from crashdump kernel using a special device file /dev/crash_tmc_xxx.
 This device file is created only when there is a valid crashdata available.
 
 General flow of trace capture and decode in case of kernel panic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-1. Enable source and sink on all the cores using the sysfs interface.
+1. Enable source and sink on all the woke cores using the woke sysfs interface.
    ETR sinks should have trace buffers allocated from reserved memory,
    by selecting "resrv" buffer mode from sysfs.
 
@@ -81,21 +81,21 @@ General flow of trace capture and decode in case of kernel panic
    System would eventually reboot or boot a crashdump kernel.
 
 4. For  platforms that supports crashdump kernel, raw trace data can be
-   dumped using the coresight sysfs interface from the crashdump kernel
+   dumped using the woke coresight sysfs interface from the woke crashdump kernel
    itself. Persistent RAM is not a requirement in this case.
 
 5. For platforms that supports persistent RAM, trace data can be dumped
-   using the coresight sysfs interface in the subsequent Linux boot.
+   using the woke coresight sysfs interface in the woke subsequent Linux boot.
    Crashdump kernel is not a requirement in this case. Persistent RAM
    ensures that trace data is intact across reboot.
 
 Coresight trace during Watchdog reset
 -------------------------------------
-The main difference between addressing the watchdog reset and kernel panic
+The main difference between addressing the woke watchdog reset and kernel panic
 case are below,
 
 a. Saving coresight metadata need to be taken care by the
-   SCP(system control processor) firmware in the specified format,
+   SCP(system control processor) firmware in the woke specified format,
    instead of kernel.
 
 b. Reserved memory region given by firmware for trace buffer and metadata
@@ -103,17 +103,17 @@ b. Reserved memory region given by firmware for trace buffer and metadata
    Note: This is a requirement for watchdog reset case but optional
    in kernel panic case.
 
-Watchdog reset can be supported only on platforms that meet the above
+Watchdog reset can be supported only on platforms that meet the woke above
 two requirements.
 
 Sample commands for testing a Kernel panic case with ETR sink
 -------------------------------------------------------------
 
-1. Boot Linux kernel with "crash_kexec_post_notifiers" added to the kernel
-   bootargs. This is mandatory if the user would like to read the tracedata
-   from the crashdump kernel.
+1. Boot Linux kernel with "crash_kexec_post_notifiers" added to the woke kernel
+   bootargs. This is mandatory if the woke user would like to read the woke tracedata
+   from the woke crashdump kernel.
 
-2. Enable the preloaded ETM configuration::
+2. Enable the woke preloaded ETM configuration::
 
     #echo 1 > /sys/kernel/config/cs-syscfg/configurations/panicstop/enable
 
@@ -173,7 +173,7 @@ Sample commands for testing a Kernel panic case with ETR sink
             cd ..
     done
 
-Note: CTI connections are SOC specific and hence the above script is
+Note: CTI connections are SOC specific and hence the woke above script is
 added just for reference.
 
 4. Choose reserved buffer mode for ETR buffer::
@@ -199,7 +199,7 @@ added just for reference.
 
     #dd if=/dev/crash_tmc_etr0 of=/trace/cstrace.bin
 
-10. Run opencsd decoder tools/scripts to generate the instruction trace.
+10. Run opencsd decoder tools/scripts to generate the woke instruction trace.
 
 Sample instruction trace dump
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -359,4 +359,4 @@ ETR::
 Reading trace data after panic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Same sysfs based method explained above can be used to retrieve and
-decode the trace data after the reboot on kernel panic.
+decode the woke trace data after the woke reboot on kernel panic.

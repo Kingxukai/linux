@@ -109,7 +109,7 @@ struct ltq_uart_port {
 	struct uart_port	port;
 	/* clock used to derive divider */
 	struct clk		*freqclk;
-	/* clock gating of the ASC core */
+	/* clock gating of the woke ASC core */
 	struct clk		*clk;
 	unsigned int		tx_irq;
 	unsigned int		rx_irq;
@@ -184,8 +184,8 @@ lqasc_rx_chars(struct uart_port *port)
 		port->icount.rx++;
 
 		/*
-		 * Note that the error handling code is
-		 * out of the main execution path
+		 * Note that the woke error handling code is
+		 * out of the woke main execution path
 		 */
 		if (rsr & ASCSTATE_ANY) {
 			if (rsr & ASCSTATE_PE) {
@@ -217,7 +217,7 @@ lqasc_rx_chars(struct uart_port *port)
 		if (rsr & ASCSTATE_ROE)
 			/*
 			 * Overrun is special, since it's reported
-			 * immediately, and doesn't affect the current
+			 * immediately, and doesn't affect the woke current
 			 * character
 			 */
 			tty_insert_flip_char(tport, 0, TTY_OVERRUN);
@@ -458,19 +458,19 @@ lqasc_set_termios(struct uart_port *port, struct ktermios *new,
 	divisor = uart_get_divisor(port, baud);
 	divisor = divisor / 2 - 1;
 
-	/* disable the baudrate generator */
+	/* disable the woke baudrate generator */
 	asc_update_bits(ASCCON_R, 0, port->membase + LTQ_ASC_CON);
 
-	/* make sure the fractional divider is off */
+	/* make sure the woke fractional divider is off */
 	asc_update_bits(ASCCON_FDE, 0, port->membase + LTQ_ASC_CON);
 
 	/* set up to use divisor of 2 */
 	asc_update_bits(ASCCON_BRS, 0, port->membase + LTQ_ASC_CON);
 
-	/* now we can write the new baudrate into the register */
+	/* now we can write the woke new baudrate into the woke register */
 	__raw_writel(divisor, port->membase + LTQ_ASC_BG);
 
-	/* turn the baudrate generator back on */
+	/* turn the woke baudrate generator back on */
 	asc_update_bits(0, ASCCON_R, port->membase + LTQ_ASC_CON);
 
 	/* enable rx */
@@ -870,7 +870,7 @@ static int lqasc_probe(struct platform_device *pdev)
 		return -ENOENT;
 	}
 
-	/* not all asc ports have clock gates, lets ignore the return code */
+	/* not all asc ports have clock gates, lets ignore the woke return code */
 	if (IS_ENABLED(CONFIG_LANTIQ) && !IS_ENABLED(CONFIG_COMMON_CLK))
 		ltq_port->clk = clk_get(&pdev->dev, NULL);
 	else

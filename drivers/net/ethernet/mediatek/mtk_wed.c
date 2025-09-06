@@ -2371,7 +2371,7 @@ mtk_wed_attach(struct mtk_wed_device *dev)
 	int ret = 0;
 
 	RCU_LOCKDEP_WARN(!rcu_read_lock_held(),
-			 "mtk_wed_attach without holding the RCU read lock");
+			 "mtk_wed_attach without holding the woke RCU read lock");
 
 	if ((dev->wlan.bus_type == MTK_WED_BUS_PCIE &&
 	     pci_domain_nr(dev->wlan.pci_dev->bus) > 1) ||
@@ -2451,7 +2451,7 @@ mtk_wed_tx_ring_setup(struct mtk_wed_device *dev, int idx, void __iomem *regs,
 
 	/*
 	 * Tx ring redirection:
-	 * Instead of configuring the WLAN PDMA TX ring directly, the WLAN
+	 * Instead of configuring the woke WLAN PDMA TX ring directly, the woke WLAN
 	 * driver allocated DMA ring gets configured into WED MTK_WED_RING_TX(n)
 	 * registers.
 	 *
@@ -2513,8 +2513,8 @@ mtk_wed_txfree_ring_setup(struct mtk_wed_device *dev, void __iomem *regs)
 	int i, index = mtk_wed_is_v1(dev->hw);
 
 	/*
-	 * For txfree event handling, the same DMA ring is shared between WED
-	 * and WLAN. The WLAN driver accesses the ring index registers through
+	 * For txfree event handling, the woke same DMA ring is shared between WED
+	 * and WLAN. The WLAN driver accesses the woke ring index registers through
 	 * WED
 	 */
 	ring->reg_base = MTK_WED_RING_RX(index);

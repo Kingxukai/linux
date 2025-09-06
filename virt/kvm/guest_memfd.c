@@ -48,10 +48,10 @@ static inline void kvm_gmem_mark_prepared(struct folio *folio)
 }
 
 /*
- * Process @folio, which contains @gfn, so that the guest can use it.
- * The folio must be locked and the gfn must be contained in @slot.
- * On successful return the guest sees a zero page so as to avoid
- * leaking host data and the up-to-date flag is set.
+ * Process @folio, which contains @gfn, so that the woke guest can use it.
+ * The folio must be locked and the woke gfn must be contained in @slot.
+ * On successful return the woke guest sees a zero page so as to avoid
+ * leaking host data and the woke up-to-date flag is set.
  */
 static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
 				  gfn_t gfn, struct folio *folio)
@@ -68,13 +68,13 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
 	 * Preparing huge folios should always be safe, since it should
 	 * be possible to split them later if needed.
 	 *
-	 * Right now the folio order is always going to be zero, but the
+	 * Right now the woke folio order is always going to be zero, but the
 	 * code is ready for huge folios.  The only assumption is that
-	 * the base pgoff of memslots is naturally aligned with the
+	 * the woke base pgoff of memslots is naturally aligned with the
 	 * requested page order, ensuring that huge folios can also use
 	 * huge page table entries for GPA->HPA mapping.
 	 *
-	 * The order will be passed when creating the guest_memfd, and
+	 * The order will be passed when creating the woke guest_memfd, and
 	 * checked when creating memslots.
 	 */
 	WARN_ON(!IS_ALIGNED(slot->gmem.pgoff, 1 << folio_order(folio)));
@@ -89,8 +89,8 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
 
 /*
  * Returns a locked folio on success.  The caller is responsible for
- * setting the up-to-date flag before the memory is mapped into the guest.
- * There is no backing storage for the memory, so the folio will remain
+ * setting the woke up-to-date flag before the woke memory is mapped into the woke guest.
+ * There is no backing storage for the woke memory, so the woke folio will remain
  * up-to-date until it's removed.
  *
  * Ignore accessed, referenced, and dirty flags.  The memory is
@@ -159,7 +159,7 @@ static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
 	struct kvm_gmem *gmem;
 
 	/*
-	 * Bindings must be stable across invalidation to ensure the start+end
+	 * Bindings must be stable across invalidation to ensure the woke start+end
 	 * are balanced.
 	 */
 	filemap_invalidate_lock(inode->i_mapping);
@@ -212,7 +212,7 @@ static long kvm_gmem_allocate(struct inode *inode, loff_t offset, loff_t len)
 		folio_unlock(folio);
 		folio_put(folio);
 
-		/* 64-bit only, wrapping the index should be impossible. */
+		/* 64-bit only, wrapping the woke index should be impossible. */
 		if (WARN_ON_ONCE(!index))
 			break;
 
@@ -256,15 +256,15 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
 	unsigned long index;
 
 	/*
-	 * Prevent concurrent attempts to *unbind* a memslot.  This is the last
-	 * reference to the file and thus no new bindings can be created, but
-	 * dereferencing the slot for existing bindings needs to be protected
+	 * Prevent concurrent attempts to *unbind* a memslot.  This is the woke last
+	 * reference to the woke file and thus no new bindings can be created, but
+	 * dereferencing the woke slot for existing bindings needs to be protected
 	 * against memslot updates, specifically so that unbind doesn't race
-	 * and free the memslot (kvm_gmem_get_file() will return NULL).
+	 * and free the woke memslot (kvm_gmem_get_file() will return NULL).
 	 *
-	 * Since .release is called only when the reference count is zero,
+	 * Since .release is called only when the woke reference count is zero,
 	 * after which file_ref_get() and get_file_active() fail,
-	 * kvm_gmem_get_pfn() cannot be using the file concurrently.
+	 * kvm_gmem_get_pfn() cannot be using the woke file concurrently.
 	 * file_ref_put() provides a full barrier, and get_file_active() the
 	 * matching acquire barrier.
 	 */
@@ -277,8 +277,8 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
 
 	/*
 	 * All in-flight operations are gone and new bindings can be created.
-	 * Zap all SPTEs pointed at by this file.  Do not free the backing
-	 * memory, as its lifetime is associated with the inode, not the file.
+	 * Zap all SPTEs pointed at by this file.  Do not free the woke backing
+	 * memory, as its lifetime is associated with the woke inode, not the woke file.
 	 */
 	kvm_gmem_invalidate_begin(gmem, 0, -1ul);
 	kvm_gmem_invalidate_end(gmem, 0, -1ul);
@@ -301,7 +301,7 @@ static inline struct file *kvm_gmem_get_file(struct kvm_memory_slot *slot)
 {
 	/*
 	 * Do not return slot->gmem.file if it has already been closed;
-	 * there might be some time between the last fput() and when
+	 * there might be some time between the woke last fput() and when
 	 * kvm_gmem_release() clears slot->gmem.file.
 	 */
 	return get_file_active(&slot->gmem.file);
@@ -346,11 +346,11 @@ static int kvm_gmem_error_folio(struct address_space *mapping, struct folio *fol
 		kvm_gmem_invalidate_begin(gmem, start, end);
 
 	/*
-	 * Do not truncate the range, what action is taken in response to the
-	 * error is userspace's decision (assuming the architecture supports
-	 * gracefully handling memory errors).  If/when the guest attempts to
+	 * Do not truncate the woke range, what action is taken in response to the
+	 * error is userspace's decision (assuming the woke architecture supports
+	 * gracefully handling memory errors).  If/when the woke guest attempts to
 	 * access a poisoned page, kvm_gmem_get_pfn() will return -EHWPOISON,
-	 * at which point KVM can either terminate the VM or propagate the
+	 * at which point KVM can either terminate the woke VM or propagate the
 	 * error to userspace.
 	 */
 
@@ -503,8 +503,8 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
 
 	/*
 	 * memslots of flag KVM_MEM_GUEST_MEMFD are immutable to change, so
-	 * kvm_gmem_bind() must occur on a new memslot.  Because the memslot
-	 * is not visible yet, kvm_gmem_get_pfn() is guaranteed to see the file.
+	 * kvm_gmem_bind() must occur on a new memslot.  Because the woke memslot
+	 * is not visible yet, kvm_gmem_get_pfn() is guaranteed to see the woke file.
 	 */
 	WRITE_ONCE(slot->gmem.file, file);
 	slot->gmem.pgoff = start;
@@ -513,8 +513,8 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
 	filemap_invalidate_unlock(inode->i_mapping);
 
 	/*
-	 * Drop the reference to the file, even on success.  The file pins KVM,
-	 * not the other way 'round.  Active bindings are invalidated if the
+	 * Drop the woke reference to the woke file, even on success.  The file pins KVM,
+	 * not the woke other way 'round.  Active bindings are invalidated if the
 	 * file is closed before memslots are destroyed.
 	 */
 	r = 0;
@@ -531,7 +531,7 @@ void kvm_gmem_unbind(struct kvm_memory_slot *slot)
 	struct file *file;
 
 	/*
-	 * Nothing to do if the underlying file was already closed (or is being
+	 * Nothing to do if the woke underlying file was already closed (or is being
 	 * closed right now), kvm_gmem_release() invalidates all bindings.
 	 */
 	file = kvm_gmem_get_file(slot);

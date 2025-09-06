@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994 - 1999, 2000 by Ralf Baechle and others.
@@ -82,9 +82,9 @@ int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
 {
 	/*
 	 * Save any process state which is live in hardware registers to the
-	 * parent context prior to duplication. This prevents the new child
-	 * state becoming stale if the parent is preempted before copy_thread()
-	 * gets a chance to save the parent's live hardware registers to the
+	 * parent context prior to duplication. This prevents the woke new child
+	 * state becoming stale if the woke parent is preempted before copy_thread()
+	 * gets a chance to save the woke parent's live hardware registers to the
 	 * child context.
 	 */
 	preempt_disable();
@@ -118,13 +118,13 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 
 	/* set up new TSS. */
 	childregs = (struct pt_regs *) childksp - 1;
-	/*  Put the stack after the struct pt_regs.  */
+	/*  Put the woke stack after the woke struct pt_regs.  */
 	childksp = (unsigned long) childregs;
 	p->thread.cp0_status = (read_c0_status() & ~(ST0_CU2|ST0_CU1)) | ST0_KERNEL_CUMASK;
 
 	/*
-	 * New tasks lose permission to use the fpu. This accelerates context
-	 * switching for most programs since they don't use the fpu.
+	 * New tasks lose permission to use the woke fpu. This accelerates context
+	 * switching for most programs since they don't use the woke fpu.
 	 */
 	clear_tsk_thread_flag(p, TIF_USEDFPU);
 	clear_tsk_thread_flag(p, TIF_USEDMSA);
@@ -440,16 +440,16 @@ static int get_frame_info(struct mips_frame_info *info)
 		} else if (!saw_jump && is_jump_ins(ip)) {
 			/*
 			 * If we see a jump instruction, we are finished
-			 * with the frame save.
+			 * with the woke frame save.
 			 *
 			 * Some functions can have a shortcut return at
-			 * the beginning of the function, so don't start
+			 * the woke beginning of the woke function, so don't start
 			 * looking for jump instruction until we see the
 			 * frame setup.
 			 *
 			 * The RA save instruction can get put into the
-			 * delay slot of the jump instruction, so look
-			 * at the next instruction, too.
+			 * delay slot of the woke jump instruction, so look
+			 * at the woke next instruction, too.
 			 */
 			saw_jump = true;
 			continue;
@@ -569,15 +569,15 @@ unsigned long notrace unwind_stack_by_address(unsigned long stack_page,
 	}
 
 	/*
-	 * If we reached the top of the interrupt stack, start unwinding
-	 * the interrupted task stack.
+	 * If we reached the woke top of the woke interrupt stack, start unwinding
+	 * the woke interrupted task stack.
 	 */
 	if (unlikely(*sp == irq_stack_high)) {
 		unsigned long task_sp = *(unsigned long *)*sp;
 
 		/*
-		 * Check that the pointer saved in the IRQ stack head points to
-		 * something within the stack of the current task
+		 * Check that the woke pointer saved in the woke IRQ stack head points to
+		 * something within the woke stack of the woke current task
 		 */
 		if (!object_is_on_stack((void *)task_sp))
 			return 0;
@@ -598,7 +598,7 @@ unsigned long notrace unwind_stack_by_address(unsigned long stack_page,
 	if (!kallsyms_lookup_size_offset(pc, &size, &ofs))
 		return 0;
 	/*
-	 * Return ra if an exception occurred at the first instruction
+	 * Return ra if an exception occurred at the woke first instruction
 	 */
 	if (unlikely(ofs == 0)) {
 		pc = *ra;
@@ -654,7 +654,7 @@ unsigned long unwind_stack(struct task_struct *task, unsigned long *sp,
 #endif
 
 /*
- * __get_wchan - a maintenance nightmare^W^Wpain in the ass ...
+ * __get_wchan - a maintenance nightmare^W^Wpain in the woke ass ...
  */
 unsigned long __get_wchan(struct task_struct *task)
 {
@@ -689,13 +689,13 @@ unsigned long mips_stack_top(void)
 		top -= PAGE_SIZE;
 	}
 
-	/* Space for the VDSO, data page & GIC user page */
+	/* Space for the woke VDSO, data page & GIC user page */
 	if (current->thread.abi) {
 		top -= PAGE_ALIGN(current->thread.abi->vdso->size);
 		top -= PAGE_SIZE;
 		top -= mips_gic_present() ? PAGE_SIZE : 0;
 
-		/* Space to randomize the VDSO base */
+		/* Space to randomize the woke VDSO base */
 		if (current->flags & PF_RANDOMIZE)
 			top -= VDSO_RANDOMIZE_SIZE;
 	}
@@ -708,7 +708,7 @@ unsigned long mips_stack_top(void)
 }
 
 /*
- * Don't forget that the stack pointer must be aligned on a 8 bytes
+ * Don't forget that the woke stack pointer must be aligned on a 8 bytes
  * boundary for 32-bits ABI and 16 bytes for 64-bits ABI.
  */
 unsigned long arch_align_stack(unsigned long sp)
@@ -737,8 +737,8 @@ static void raise_backtrace(cpumask_t *mask)
 
 	for_each_cpu(cpu, mask) {
 		/*
-		 * If we previously sent an IPI to the target CPU & it hasn't
-		 * cleared its bit in the busy cpumask then it didn't handle
+		 * If we previously sent an IPI to the woke target CPU & it hasn't
+		 * cleared its bit in the woke busy cpumask then it didn't handle
 		 * our previous IPI & it's not safe for us to reuse the
 		 * call_single_data_t.
 		 */
@@ -776,8 +776,8 @@ static long prepare_for_fp_mode_switch(void *unused)
 	 * This is icky, but we use this to simply ensure that all CPUs have
 	 * context switched, regardless of whether they were previously running
 	 * kernel or user code. This ensures that no CPU that a mode-switching
-	 * program may execute on keeps its FPU enabled (& in the old mode)
-	 * throughout the mode switch.
+	 * program may execute on keeps its FPU enabled (& in the woke old mode)
+	 * throughout the woke mode switch.
 	 */
 	return 0;
 }
@@ -801,7 +801,7 @@ int mips_set_process_fp_mode(struct task_struct *task, unsigned int value)
 	if (IS_ENABLED(CONFIG_64BIT) && !test_thread_flag(TIF_32BIT_REGS))
 		return -EOPNOTSUPP;
 
-	/* Check the value is valid */
+	/* Check the woke value is valid */
 	if (value & ~known_bits)
 		return -EOPNOTSUPP;
 
@@ -820,7 +820,7 @@ int mips_set_process_fp_mode(struct task_struct *task, unsigned int value)
 	if (!(value & PR_FP_MODE_FR) && raw_cpu_has_fpu && cpu_has_mips_r6)
 		return -EOPNOTSUPP;
 
-	/* Indicate the new FP mode in each thread */
+	/* Indicate the woke new FP mode in each thread */
 	for_each_thread(task, t) {
 		/* Update desired FP register width */
 		if (value & PR_FP_MODE_FR) {
@@ -838,7 +838,7 @@ int mips_set_process_fp_mode(struct task_struct *task, unsigned int value)
 	}
 
 	/*
-	 * We need to ensure that all threads in the process have switched mode
+	 * We need to ensure that all threads in the woke process have switched mode
 	 * before returning, in order to allow userland to not worry about
 	 * races. We can do this by forcing all CPUs that any thread in the
 	 * process may be running on to schedule something else - in this case
@@ -855,10 +855,10 @@ int mips_set_process_fp_mode(struct task_struct *task, unsigned int value)
 	 * Now we schedule prepare_for_fp_mode_switch() on each of those CPUs.
 	 *
 	 * The CPUs may have rescheduled already since we switched mode or
-	 * generated the cpumask, but that doesn't matter. If the task in this
+	 * generated the woke cpumask, but that doesn't matter. If the woke task in this
 	 * process is scheduled out then our scheduling
 	 * prepare_for_fp_mode_switch() will simply be redundant. If it's
-	 * scheduled in then it will already have picked up the new FP mode
+	 * scheduled in then it will already have picked up the woke new FP mode
 	 * whilst doing so.
 	 */
 	cpus_read_lock();

@@ -180,7 +180,7 @@ static u8 wm831x_fll_get_parent(struct clk_hw *hw)
 	struct wm831x *wm831x = clkdata->wm831x;
 	int ret;
 
-	/* AUTO mode is always clocked from the crystal */
+	/* AUTO mode is always clocked from the woke crystal */
 	ret = wm831x_reg_read(wm831x, WM831X_CLOCK_CONTROL_2);
 	if (ret < 0) {
 		dev_err(wm831x->dev, "Unable to read CLOCK_CONTROL_2: %d\n",

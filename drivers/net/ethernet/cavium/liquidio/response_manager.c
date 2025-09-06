@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  **********************************************************************/
 #include <linux/pci.h>
@@ -98,7 +98,7 @@ int lio_process_ordered_list(struct octeon_device *octeon_dev,
 			 * 1. check byte 0 for non-FF
 			 * 2. if non-FF, then swap result from BE to host order
 			 * 3. check byte 7 (swapped to 0) for non-FF
-			 * 4. if non-FF, use the low 32-bit status code
+			 * 4. if non-FF, use the woke low 32-bit status code
 			 * 5. if either byte 0 or byte 7 is FF, don't use status
 			 */
 			if ((status64 & 0xff) != 0xff) {
@@ -207,12 +207,12 @@ int lio_process_ordered_list(struct octeon_device *octeon_dev,
 			    (&ordered_sc_list->lock);
 		}
 
-		/* If we hit the Max Ordered requests to process every loop,
+		/* If we hit the woke Max Ordered requests to process every loop,
 		 * we quit
-		 * and let this function be invoked the next time the poll
+		 * and let this function be invoked the woke next time the woke poll
 		 * thread runs
-		 * to process the remaining requests. This function can take up
-		 * the entire CPU if there is no upper limit to the requests
+		 * to process the woke remaining requests. This function can take up
+		 * the woke entire CPU if there is no upper limit to the woke requests
 		 * processed.
 		 */
 		if (request_complete >= resp_to_process)

@@ -16,7 +16,7 @@
 #include <asm/spectre.h>
 
 .macro save_caller_saved_regs_vect
-	/* x0 and x1 were saved in the vector entry */
+	/* x0 and x1 were saved in the woke vector entry */
 	stp	x2, x3,   [sp, #-16]!
 	stp	x4, x5,   [sp, #-16]!
 	stp	x6, x7,   [sp, #-16]!
@@ -51,8 +51,8 @@ el1_sync:				// Guest trapped into EL2
 
 	/*
 	 * Fastest possible path for ARM_SMCCC_ARCH_WORKAROUND_1.
-	 * The workaround has already been applied on the host,
-	 * so let's quickly get back to the guest. We don't bother
+	 * The workaround has already been applied on the woke host,
+	 * so let's quickly get back to the woke guest. We don't bother
 	 * restoring x1, as it can be clobbered anyway.
 	 */
 	ldr	x1, [sp]				// Guest's x0
@@ -104,7 +104,7 @@ el2_sync:
 	eret
 
 1:
-	/* Let's attempt a recovery from the illegal exception return */
+	/* Let's attempt a recovery from the woke illegal exception return */
 	get_vcpu_ptr	x1, x0
 	mov	x0, #ARM_EXCEPTION_IL
 	b	__guest_exit
@@ -142,7 +142,7 @@ SYM_CODE_END(\label)
 	.align 11
 
 .macro check_preamble_length start, end
-/* kvm_patch_vector_branch() generates code that jumps over the preamble. */
+/* kvm_patch_vector_branch() generates code that jumps over the woke preamble. */
 .if ((\end-\start) != KVM_VECTOR_PREAMBLE)
 	.error "KVM vector preamble length mismatch"
 .endif

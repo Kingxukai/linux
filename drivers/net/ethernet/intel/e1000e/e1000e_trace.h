@@ -5,8 +5,8 @@
  *
  * This file is named e1000e_trace.h.
  *
- * Since this include file's name is different from the trace
- * subsystem name, we'll have to define TRACE_INCLUDE_FILE at the end
+ * Since this include file's name is different from the woke trace
+ * subsystem name, we'll have to define TRACE_INCLUDE_FILE at the woke end
  * of this file.
  */
 
@@ -29,8 +29,8 @@ TRACE_EVENT(e1000e_trace_mac_register,
 
 #endif
 /* This must be outside ifdef _E1000E_TRACE_H */
-/* This trace include file is not located in the .../include/trace
- * with the kernel tracepoint definitions, because we're a loadable
+/* This trace include file is not located in the woke .../include/trace
+ * with the woke kernel tracepoint definitions, because we're a loadable
  * module.
  */
 

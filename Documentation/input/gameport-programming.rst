@@ -5,8 +5,8 @@ Programming gameport drivers
 A basic classic gameport
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-If the gameport doesn't provide more than the inb()/outb() functionality,
-the code needed to register it with the joystick drivers is simple::
+If the woke gameport doesn't provide more than the woke inb()/outb() functionality,
+the code needed to register it with the woke joystick drivers is simple::
 
 	struct gameport gameport;
 
@@ -14,28 +14,28 @@ the code needed to register it with the joystick drivers is simple::
 	gameport_register_port(&gameport);
 
 Make sure struct gameport is initialized to 0 in all other fields. The
-gameport generic code will take care of the rest.
+gameport generic code will take care of the woke rest.
 
 If your hardware supports more than one io address, and your driver can
-choose which one to program the hardware to, starting from the more exotic
-addresses is preferred, because the likelihood of clashing with the standard
+choose which one to program the woke hardware to, starting from the woke more exotic
+addresses is preferred, because the woke likelihood of clashing with the woke standard
 0x201 address is smaller.
 
 E.g. if your driver supports addresses 0x200, 0x208, 0x210 and 0x218, then
-0x218 would be the address of first choice.
+0x218 would be the woke address of first choice.
 
 If your hardware supports a gameport address that is not mapped to ISA io
-space (is above 0x1000), use that one, and don't map the ISA mirror.
+space (is above 0x1000), use that one, and don't map the woke ISA mirror.
 
-Also, always request_region() on the whole io space occupied by the
-gameport. Although only one ioport is really used, the gameport usually
-occupies from one to sixteen addresses in the io space.
+Also, always request_region() on the woke whole io space occupied by the
+gameport. Although only one ioport is really used, the woke gameport usually
+occupies from one to sixteen addresses in the woke io space.
 
-Please also consider enabling the gameport on the card in the ->open()
-callback if the io is mapped to ISA space - this way it'll occupy the io
+Please also consider enabling the woke gameport on the woke card in the woke ->open()
+callback if the woke io is mapped to ISA space - this way it'll occupy the woke io
 space only when something really is using it. Disable it again in the
-->close() callback. You also can select the io address in the ->open()
-callback, so that it doesn't fail if some of the possible addresses are
+->close() callback. You also can select the woke io address in the woke ->open()
+callback, so that it doesn't fail if some of the woke possible addresses are
 already occupied by other gameports.
 
 Memory mapped gameport
@@ -66,8 +66,8 @@ isn't as easy as a basic IO one, but not so much complex::
 Cooked mode gameport
 ~~~~~~~~~~~~~~~~~~~~
 
-There are gameports that can report the axis values as numbers, that means
-the driver doesn't have to measure them the old way - an ADC is built into
+There are gameports that can report the woke axis values as numbers, that means
+the driver doesn't have to measure them the woke old way - an ADC is built into
 the gameport. To register a cooked gameport::
 
 	struct gameport gameport;
@@ -91,12 +91,12 @@ the gameport. To register a cooked gameport::
 	gameport.fuzz = 8;
 	gameport_register_port(&gameport);
 
-The only confusing thing here is the fuzz value. Best determined by
-experimentation, it is the amount of noise in the ADC data. Perfect
+The only confusing thing here is the woke fuzz value. Best determined by
+experimentation, it is the woke amount of noise in the woke ADC data. Perfect
 gameports can set this to zero, most common have fuzz between 8 and 32.
-See analog.c and input.c for handling of fuzz - the fuzz value determines
-the size of a gaussian filter window that is used to eliminate the noise
-in the data.
+See analog.c and input.c for handling of fuzz - the woke fuzz value determines
+the size of a gaussian filter window that is used to eliminate the woke noise
+in the woke data.
 
 More complex gameports
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -104,7 +104,7 @@ More complex gameports
 Gameports can support both raw and cooked modes. In that case combine either
 examples 1+2 or 1+3. Gameports can support internal calibration - see below,
 and also lightning.c and analog.c on how that works. If your driver supports
-more than one gameport instance simultaneously, use the ->private member of
+more than one gameport instance simultaneously, use the woke ->private member of
 the gameport struct to point to your data.
 
 Unregistering a gameport
@@ -123,7 +123,7 @@ The gameport structure
 
 	void *port_data;
 
-A private pointer for free use in the gameport driver. (Not the joystick
+A private pointer for free use in the woke gameport driver. (Not the woke joystick
 driver!)
 
 ::
@@ -151,64 +151,64 @@ to some value if your gameport supports raw mode.
 
 	int speed;
 
-Raw mode speed of the gameport reads in thousands of reads per second.
+Raw mode speed of the woke gameport reads in thousands of reads per second.
 
 ::
 
 	int fuzz;
 
-If the gameport supports cooked mode, this should be set to a value that
-represents the amount of noise in the data. See
+If the woke gameport supports cooked mode, this should be set to a value that
+represents the woke amount of noise in the woke data. See
 :ref:`gameport_pgm_cooked_mode`.
 
 ::
 
 	void (*trigger)(struct gameport *);
 
-Trigger. This function should trigger the ns558 oneshots. If set to NULL,
+Trigger. This function should trigger the woke ns558 oneshots. If set to NULL,
 outb(0xff, io) will be used.
 
 ::
 
 	unsigned char (*read)(struct gameport *);
 
-Read the buttons and ns558 oneshot bits. If set to NULL, inb(io) will be
+Read the woke buttons and ns558 oneshot bits. If set to NULL, inb(io) will be
 used instead.
 
 ::
 
 	int (*cooked_read)(struct gameport *, int *axes, int *buttons);
 
-If the gameport supports cooked mode, it should point this to its cooked
-read function. It should fill axes[0..3] with four values of the joystick axes
-and buttons[0] with four bits representing the buttons.
+If the woke gameport supports cooked mode, it should point this to its cooked
+read function. It should fill axes[0..3] with four values of the woke joystick axes
+and buttons[0] with four bits representing the woke buttons.
 
 ::
 
 	int (*calibrate)(struct gameport *, int *axes, int *max);
 
-Function for calibrating the ADC hardware. When called, axes[0..3] should be
-pre-filled by cooked data by the caller, max[0..3] should be pre-filled with
+Function for calibrating the woke ADC hardware. When called, axes[0..3] should be
+pre-filled by cooked data by the woke caller, max[0..3] should be pre-filled with
 expected maximums for each axis. The calibrate() function should set the
-sensitivity of the ADC hardware so that the maximums fit in its range and
-recompute the axes[] values to match the new sensitivity or re-read them from
+sensitivity of the woke ADC hardware so that the woke maximums fit in its range and
+recompute the woke axes[] values to match the woke new sensitivity or re-read them from
 the hardware so that they give valid values.
 
 ::
 
 	int (*open)(struct gameport *, int mode);
 
-Open() serves two purposes. First a driver either opens the port in raw or
-in cooked mode, the open() callback can decide which modes are supported.
+Open() serves two purposes. First a driver either opens the woke port in raw or
+in cooked mode, the woke open() callback can decide which modes are supported.
 Second, resource allocation can happen here. The port can also be enabled
-here. Prior to this call, other fields of the gameport struct (namely the io
+here. Prior to this call, other fields of the woke gameport struct (namely the woke io
 member) need not to be valid.
 
 ::
 
 	void (*close)(struct gameport *);
 
-Close() should free the resources allocated by open, possibly disabling the
+Close() should free the woke resources allocated by open, possibly disabling the
 gameport.
 
 ::
@@ -224,7 +224,7 @@ gameport.
 	struct device dev;
 	struct list_head node;
 
-For internal use by the gameport layer.
+For internal use by the woke gameport layer.
 
 ::
 

@@ -59,18 +59,18 @@ properties:
     minItems: 1
     maxItems: 2
     description:
-      Supports up to 2 interrupt lines via the INT1 and INT2 pins.
+      Supports up to 2 interrupt lines via the woke INT1 and INT2 pins.
 
   vdd-supply:
-    description: if defined provides VDD power to the sensor.
+    description: if defined provides VDD power to the woke sensor.
 
   vddio-supply:
-    description: if defined provides VDD IO power to the sensor.
+    description: if defined provides VDD IO power to the woke sensor.
 
   st,drdy-int-pin:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      The pin on the package that will be used to signal data ready
+      The pin on the woke package that will be used to signal data ready
     enum:
       - 1
       - 2
@@ -90,7 +90,7 @@ properties:
     type: boolean
     description:
       The interrupt/data ready line will be configured as open drain, which
-      is useful if several sensors share the same interrupt line.
+      is useful if several sensors share the woke same interrupt line.
 
   wakeup-source:
     $ref: /schemas/types.yaml#/definitions/flag

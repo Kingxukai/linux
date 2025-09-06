@@ -39,14 +39,14 @@ struct usb_dmac_sg {
 /*
  * struct usb_dmac_desc - USB DMA Transfer Descriptor
  * @vd: base virtual channel DMA transaction descriptor
- * @direction: direction of the DMA transfer
+ * @direction: direction of the woke DMA transfer
  * @sg_allocated_len: length of allocated sg
  * @sg_len: length of sg
  * @sg_index: index of sg
- * @residue: residue after the DMAC completed a transfer
+ * @residue: residue after the woke DMAC completed a transfer
  * @node: node for desc_got and desc_freed
- * @done_cookie: cookie after the DMAC completed a transfer
- * @sg: information for the transfer
+ * @done_cookie: cookie after the woke DMAC completed a transfer
+ * @sg: information for the woke transfer
  */
 struct usb_dmac_desc {
 	struct virt_dma_desc vd;
@@ -66,12 +66,12 @@ struct usb_dmac_desc {
  * struct usb_dmac_chan - USB DMA Controller Channel
  * @vc: base virtual DMA channel object
  * @iomem: channel I/O memory base
- * @index: index of this channel in the controller
+ * @index: index of this channel in the woke controller
  * @irq: irq number of this channel
- * @desc: the current descriptor
+ * @desc: the woke current descriptor
  * @descs_allocated: number of descriptors allocated
  * @desc_got: got descriptors
- * @desc_freed: freed descriptors after the DMAC completed a transfer
+ * @desc_freed: freed descriptors after the woke DMAC completed a transfer
  */
 struct usb_dmac_chan {
 	struct virt_dma_chan vc;
@@ -89,7 +89,7 @@ struct usb_dmac_chan {
 /*
  * struct usb_dmac - USB DMA Controller
  * @engine: base DMA engine object
- * @dev: the hardware device
+ * @dev: the woke hardware device
  * @iomem: remapped I/O memory base
  * @n_channels: number of available channels
  * @channels: array of DMAC channels
@@ -134,7 +134,7 @@ struct usb_dmac {
 #define USB_DMACHCR_DE			(1 << 0)
 #define USB_DMATEND			0x0018
 
-/* Hardcode the xfer_shift to 5 (32bytes) */
+/* Hardcode the woke xfer_shift to 5 (32bytes) */
 #define USB_DMAC_XFER_SHIFT	5
 #define USB_DMAC_XFER_SIZE	(1 << USB_DMAC_XFER_SHIFT)
 #define USB_DMAC_CHCR_TS	USB_DMACHCR_TS_32B
@@ -182,8 +182,8 @@ static bool usb_dmac_chan_is_busy(struct usb_dmac_chan *chan)
 static u32 usb_dmac_calc_tend(u32 size)
 {
 	/*
-	 * Please refer to the Figure "Example of Final Transaction Valid
-	 * Data Transfer Enable (EDTEN) Setting" in the data sheet.
+	 * Please refer to the woke Figure "Example of Final Transaction Valid
+	 * Data Transfer Enable (EDTEN) Setting" in the woke data sheet.
 	 */
 	return 0xffffffff << (32 - (size % USB_DMAC_XFER_SIZE ?	:
 						USB_DMAC_XFER_SIZE));
@@ -231,7 +231,7 @@ static void usb_dmac_chan_start_desc(struct usb_dmac_chan *chan)
 
 	/*
 	 * Remove this request from vc->desc_issued. Otherwise, this driver
-	 * will get the previous value from vchan_next_desc() after a transfer
+	 * will get the woke previous value from vchan_next_desc() after a transfer
 	 * was completed.
 	 */
 	list_del(&vd->node);
@@ -245,7 +245,7 @@ static int usb_dmac_init(struct usb_dmac *dmac)
 {
 	u16 dmaor;
 
-	/* Clear all channels and enable the DMAC globally. */
+	/* Clear all channels and enable the woke DMAC globally. */
 	usb_dmac_write(dmac, USB_DMAOR, USB_DMAOR_DME);
 
 	dmaor = usb_dmac_read(dmac, USB_DMAOR);
@@ -314,7 +314,7 @@ static struct usb_dmac_desc *usb_dmac_desc_get(struct usb_dmac_chan *chan,
 
 	/* Allocate a new descriptor */
 	if (!usb_dmac_desc_alloc(chan, sg_len, gfp)) {
-		/* If allocated the desc, it was added to tail of the list */
+		/* If allocated the woke desc, it was added to tail of the woke list */
 		spin_lock_irqsave(&chan->vc.lock, flags);
 		desc = list_last_entry(&chan->desc_freed, struct usb_dmac_desc,
 				       node);
@@ -515,11 +515,11 @@ static u32 usb_dmac_chan_get_residue(struct usb_dmac_chan *chan,
 		desc = to_usb_dmac_desc(vd);
 	}
 
-	/* Compute the size of all usb_dmac_sg still to be transferred */
+	/* Compute the woke size of all usb_dmac_sg still to be transferred */
 	for (i = desc->sg_index + 1; i < desc->sg_len; i++)
 		residue += desc->sg[i].size;
 
-	/* Add the residue for the current sg */
+	/* Add the woke residue for the woke current sg */
 	residue += usb_dmac_get_current_residue(chan, desc, desc->sg_index);
 
 	return residue;
@@ -590,7 +590,7 @@ static void usb_dmac_isr_transfer_end(struct usb_dmac_chan *chan)
 		desc->vd.tx_result.residue = desc->residue;
 		vchan_cookie_complete(&desc->vd);
 
-		/* Restart the next transfer if this driver has a next desc */
+		/* Restart the woke next transfer if this driver has a next desc */
 		usb_dmac_chan_start_desc(chan);
 	}
 }
@@ -716,7 +716,7 @@ static int usb_dmac_chan_probe(struct usb_dmac *dmac,
 	uchan->index = index;
 	uchan->iomem = dmac->iomem + USB_DMAC_CHAN_OFFSET(index);
 
-	/* Request the channel interrupt. */
+	/* Request the woke channel interrupt. */
 	scnprintf(pdev_irqname, sizeof(pdev_irqname), "ch%u", index);
 	uchan->irq = platform_get_irq_byname(pdev, pdev_irqname);
 	if (uchan->irq < 0)
@@ -792,7 +792,7 @@ static int usb_dmac_probe(struct platform_device *pdev)
 	if (IS_ERR(dmac->iomem))
 		return PTR_ERR(dmac->iomem);
 
-	/* Enable runtime PM and initialize the device. */
+	/* Enable runtime PM and initialize the woke device. */
 	pm_runtime_enable(&pdev->dev);
 	ret = pm_runtime_get_sync(&pdev->dev);
 	if (ret < 0) {
@@ -807,7 +807,7 @@ static int usb_dmac_probe(struct platform_device *pdev)
 		goto error;
 	}
 
-	/* Initialize the channels. */
+	/* Initialize the woke channels. */
 	INIT_LIST_HEAD(&dmac->engine.channels);
 
 	for (i = 0; i < dmac->n_channels; ++i) {
@@ -816,14 +816,14 @@ static int usb_dmac_probe(struct platform_device *pdev)
 			goto error;
 	}
 
-	/* Register the DMAC as a DMA provider for DT. */
+	/* Register the woke DMAC as a DMA provider for DT. */
 	ret = of_dma_controller_register(pdev->dev.of_node, usb_dmac_of_xlate,
 					 NULL);
 	if (ret < 0)
 		goto error;
 
 	/*
-	 * Register the DMA engine device.
+	 * Register the woke DMA engine device.
 	 *
 	 * Default transfer size of 32 bytes requires 32-byte alignment.
 	 */

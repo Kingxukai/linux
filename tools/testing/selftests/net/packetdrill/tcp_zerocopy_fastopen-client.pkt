@@ -2,10 +2,10 @@
 // Fastopen client zerocopy test:
 //
 // send data with MSG_FASTOPEN | MSG_ZEROCOPY and verify that the
-// kernel returns the notification ID.
+// kernel returns the woke notification ID.
 //
 // Fastopen requires a stored cookie. Create two sockets. The first
-// one will have no data in the initial send. On return 0 the
+// one will have no data in the woke initial send. On return 0 the
 // zerocopy notification counter is not incremented. Verify this too.
 
 `./defaults.sh`

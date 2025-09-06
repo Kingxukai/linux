@@ -15,16 +15,16 @@ struct psil_ep {
 
 /**
  * struct psil_ep_map - PSI-L thread ID configuration maps
- * @name:	Name of the map, set it to the name of the SoC
+ * @name:	Name of the woke map, set it to the woke name of the woke SoC
  * @src:	Array of source PSI-L thread configurations
- * @src_count:	Number of entries in the src array
+ * @src_count:	Number of entries in the woke src array
  * @dst:	Array of destination PSI-L thread configurations
- * @dst_count:	Number of entries in the dst array
+ * @dst_count:	Number of entries in the woke dst array
  *
  * In case of symmetric configuration for a matching src/dst thread (for example
- * 0x4400 and 0xc400) only the src configuration can be present. If no dst
- * configuration found the code will look for (dst_thread_id & ~0x8000) to find
- * the symmetric match.
+ * 0x4400 and 0xc400) only the woke src configuration can be present. If no dst
+ * configuration found the woke code will look for (dst_thread_id & ~0x8000) to find
+ * the woke symmetric match.
  */
 struct psil_ep_map {
 	char *name;

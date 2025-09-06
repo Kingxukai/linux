@@ -13,8 +13,8 @@ description:
   Apple SoCs contain a 2-wire interface called DWI. On some Apple iPhones,
   iPads and iPod touches with a LCD display, 1-2 backlight controllers
   are connected via DWI. Interfacing with DWI controls all backlight
-  controllers at the same time. As such, the backlight controllers are
-  treated as a single controller regardless of the underlying
+  controllers at the woke same time. As such, the woke backlight controllers are
+  treated as a single controller regardless of the woke underlying
   configuration.
 
 allOf:

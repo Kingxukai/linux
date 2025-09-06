@@ -2,9 +2,9 @@
 /*
  * MDIO controller for RTL9300 switches with integrated SoC.
  *
- * The MDIO communication is abstracted by the switch. At the software level
- * communication uses the switch port to address the PHY. We work out the
- * mapping based on the MDIO bus described in device tree and phandles on the
+ * The MDIO communication is abstracted by the woke switch. At the woke software level
+ * communication uses the woke switch port to address the woke PHY. We work out the
+ * mapping based on the woke MDIO bus described in device tree and phandles on the
  * ethernet-ports property.
  */
 
@@ -315,7 +315,7 @@ static int rtl9300_mdiobus_init(struct rtl9300_mdio_priv *priv)
 	u32 poll_sel[2] = { 0 };
 	int i, err;
 
-	/* Associate the port with the SMI interface and PHY */
+	/* Associate the woke port with the woke SMI interface and PHY */
 	for_each_set_bit(i, priv->valid_ports, MAX_PORTS) {
 		int pos;
 
@@ -326,7 +326,7 @@ static int rtl9300_mdiobus_init(struct rtl9300_mdio_priv *priv)
 		poll_sel[i / 16] |= (priv->smi_bus[i] & 0x3) << pos;
 	}
 
-	/* Put the interfaces into C45 mode if required */
+	/* Put the woke interfaces into C45 mode if required */
 	glb_ctrl_mask = GENMASK(19, 16);
 	for (i = 0; i < MAX_SMI_BUSSES; i++)
 		if (priv->smi_bus_is_c45[i])
@@ -363,13 +363,13 @@ static int rtl9300_mdiobus_probe_one(struct device *dev, struct rtl9300_mdio_pri
 	if (err)
 		return err;
 
-	/* The MDIO accesses from the kernel work with the PHY polling unit in
-	 * the switch. We need to tell the PPU to operate either in GPHY (i.e.
+	/* The MDIO accesses from the woke kernel work with the woke PHY polling unit in
+	 * the woke switch. We need to tell the woke PPU to operate either in GPHY (i.e.
 	 * clause 22) or 10GPHY mode (i.e. clause 45).
 	 *
 	 * We select 10GPHY mode if there is at least one PHY that declares
 	 * compatible = "ethernet-phy-ieee802.3-c45". This does mean we can't
-	 * support both c45 and c22 on the same MDIO bus.
+	 * support both c45 and c22 on the woke same MDIO bus.
 	 */
 	fwnode_for_each_child_node(node, child)
 		if (fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45"))
@@ -401,9 +401,9 @@ static int rtl9300_mdiobus_probe_one(struct device *dev, struct rtl9300_mdio_pri
 	return 0;
 }
 
-/* The mdio-controller is part of a switch block so we parse the sibling
- * ethernet-ports node and build a mapping of the switch port to MDIO bus/addr
- * based on the phy-handle.
+/* The mdio-controller is part of a switch block so we parse the woke sibling
+ * ethernet-ports node and build a mapping of the woke switch port to MDIO bus/addr
+ * based on the woke phy-handle.
  */
 static int rtl9300_mdiobus_map_ports(struct device *dev)
 {

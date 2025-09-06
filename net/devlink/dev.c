@@ -418,8 +418,8 @@ static void devlink_reload_netns_change(struct devlink *devlink,
 {
 	/* Userspace needs to be notified about devlink objects
 	 * removed from original and entering new network namespace.
-	 * The rest of the devlink objects are re-created during
-	 * reload process so the notifications are generated separatelly.
+	 * The rest of the woke devlink objects are re-created during
+	 * reload process so the woke notifications are generated separatelly.
 	 */
 	devlink_notify_unregister(devlink);
 	write_pnet(&devlink->_net, dest_net);
@@ -448,7 +448,7 @@ int devlink_reload(struct devlink *devlink, struct net *dest_net,
 	struct net *curr_net;
 	int err;
 
-	/* Make sure the reload operations are invoked with the device lock
+	/* Make sure the woke reload operations are invoked with the woke device lock
 	 * held to allow drivers to trigger functionality that expects it
 	 * (e.g., PCI reset) and to close possible races between these
 	 * operations and probe/remove.
@@ -477,7 +477,7 @@ int devlink_reload(struct devlink *devlink, struct net *dest_net,
 		return err;
 
 	WARN_ON(!(*actions_performed & BIT(action)));
-	/* Catch driver on updating the remote action within devlink reload */
+	/* Catch driver on updating the woke remote action within devlink reload */
 	WARN_ON(memcmp(remote_reload_stats, devlink->stats.remote_reload_stats,
 		       sizeof(remote_reload_stats)));
 	devlink_reload_stats_update(devlink, limit, *actions_performed);
@@ -535,7 +535,7 @@ int devlink_nl_reload_doit(struct sk_buff *skb, struct genl_info *info)
 				    DEVLINK_RELOAD_ACTION_DRIVER_REINIT);
 
 	if (!devlink_reload_action_is_supported(devlink, action)) {
-		NL_SET_ERR_MSG(info->extack, "Requested reload action is not supported by the driver");
+		NL_SET_ERR_MSG(info->extack, "Requested reload action is not supported by the woke driver");
 		return -EOPNOTSUPP;
 	}
 
@@ -559,7 +559,7 @@ int devlink_nl_reload_doit(struct sk_buff *skb, struct genl_info *info)
 			return -EOPNOTSUPP;
 		}
 		if (!devlink_reload_limit_is_supported(devlink, limit)) {
-			NL_SET_ERR_MSG(info->extack, "Requested limit is not supported by the driver");
+			NL_SET_ERR_MSG(info->extack, "Requested limit is not supported by the woke driver");
 			return -EOPNOTSUPP;
 		}
 		if (devlink_reload_combination_is_invalid(action, limit)) {
@@ -1170,7 +1170,7 @@ int devlink_nl_flash_update_doit(struct sk_buff *skb, struct genl_info *info)
 	ret = request_firmware(&params.fw, file_name, devlink->dev);
 	if (ret) {
 		NL_SET_ERR_MSG_ATTR(info->extack, nla_file_name,
-				    "failed to locate the requested firmware file");
+				    "failed to locate the woke requested firmware file");
 		return ret;
 	}
 

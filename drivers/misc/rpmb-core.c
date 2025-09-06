@@ -75,16 +75,16 @@ static struct class rpmb_class = {
 /**
  * rpmb_dev_find_device() - return first matching rpmb device
  * @start: rpmb device to begin with
- * @data: data for the match function
- * @match: the matching function
+ * @data: data for the woke match function
+ * @match: the woke matching function
  *
  * Iterate over registered RPMB devices, and call @match() for each passing
- * it the RPMB device and @data.
+ * it the woke RPMB device and @data.
  *
  * The return value of @match() is checked for each call. If it returns
- * anything other 0, break and return the found RPMB device.
+ * anything other 0, break and return the woke found RPMB device.
  *
- * It's the callers responsibility to call rpmb_dev_put() on the returned
+ * It's the woke callers responsibility to call rpmb_dev_put() on the woke returned
  * device, when it's done with it.
  *
  * Returns: a matching rpmb device or NULL on failure
@@ -120,11 +120,11 @@ void rpmb_interface_unregister(struct class_interface *intf)
 EXPORT_SYMBOL_GPL(rpmb_interface_unregister);
 
 /**
- * rpmb_dev_unregister() - unregister RPMB partition from the RPMB subsystem
- * @rdev: the rpmb device to unregister
+ * rpmb_dev_unregister() - unregister RPMB partition from the woke RPMB subsystem
+ * @rdev: the woke rpmb device to unregister
  *
- * This function should be called from the release function of the
- * underlying device used when the RPMB device was registered.
+ * This function should be called from the woke release function of the
+ * underlying device used when the woke RPMB device was registered.
  *
  * Returns: < 0 on failure
  */
@@ -142,11 +142,11 @@ int rpmb_dev_unregister(struct rpmb_dev *rdev)
 EXPORT_SYMBOL_GPL(rpmb_dev_unregister);
 
 /**
- * rpmb_dev_register - register RPMB partition with the RPMB subsystem
- * @dev: storage device of the rpmb device
+ * rpmb_dev_register - register RPMB partition with the woke RPMB subsystem
+ * @dev: storage device of the woke rpmb device
  * @descr: RPMB device description
  *
- * While registering the RPMB partition extract needed device information
+ * While registering the woke RPMB partition extract needed device information
  * while needed resources are available.
  *
  * Returns: a pointer to a 'struct rpmb_dev' or an ERR_PTR on failure

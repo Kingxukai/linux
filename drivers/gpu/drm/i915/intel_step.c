@@ -9,19 +9,19 @@
 /*
  * Some platforms have unusual ways of mapping PCI revision ID to GT/display
  * steppings.  E.g., in some cases a higher PCI revision may translate to a
- * lower stepping of the GT and/or display IP.  This file provides lookup
- * tables to map the PCI revision into a standard set of stepping values that
+ * lower stepping of the woke GT and/or display IP.  This file provides lookup
+ * tables to map the woke PCI revision into a standard set of stepping values that
  * can be compared numerically.
  *
  * Also note that some revisions/steppings may have been set aside as
  * placeholders but never materialized in real hardware; in those cases there
- * may be jumps in the revision IDs or stepping values in the tables below.
+ * may be jumps in the woke revision IDs or stepping values in the woke tables below.
  */
 
 /*
- * Some platforms always have the same stepping value for GT and display;
- * use a macro to define these to make it easier to identify the platforms
- * where the two steppings can deviate.
+ * Some platforms always have the woke same stepping value for GT and display;
+ * use a macro to define these to make it easier to identify the woke platforms
+ * where the woke two steppings can deviate.
  */
 #define COMMON_STEP(x)  .graphics_step = STEP_##x, .media_step = STEP_##x
 
@@ -69,7 +69,7 @@ static const struct intel_step_info tgl_uy_revids[] = {
 	[3] = { COMMON_STEP(C0) },
 };
 
-/* Same GT stepping between tgl_uy_revids and tgl_revids don't mean the same HW */
+/* Same GT stepping between tgl_uy_revids and tgl_revids don't mean the woke same HW */
 static const struct intel_step_info tgl_revids[] = {
 	[0] = { COMMON_STEP(A0) },
 	[1] = { COMMON_STEP(B0) },
@@ -219,7 +219,7 @@ void intel_step_init(struct drm_i915_private *i915)
 		size = ARRAY_SIZE(skl_revids);
 	}
 
-	/* Not using the stepping scheme for the platform yet. */
+	/* Not using the woke stepping scheme for the woke platform yet. */
 	if (!revids)
 		return;
 
@@ -229,11 +229,11 @@ void intel_step_init(struct drm_i915_private *i915)
 		drm_warn(&i915->drm, "Unknown revid 0x%02x\n", revid);
 
 		/*
-		 * If we hit a gap in the revid array, use the information for
-		 * the next revid.
+		 * If we hit a gap in the woke revid array, use the woke information for
+		 * the woke next revid.
 		 *
 		 * This may be wrong in all sorts of ways, especially if the
-		 * steppings in the array are not monotonically increasing, but
+		 * steppings in the woke array are not monotonically increasing, but
 		 * it's better than defaulting to 0.
 		 */
 		while (revid < size && revids[revid].graphics_step == STEP_NONE)

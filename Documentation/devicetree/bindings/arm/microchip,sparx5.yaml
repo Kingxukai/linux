@@ -47,9 +47,9 @@ properties:
 
   axi@600000000:
     type: object
-    description: the root node in the Sparx5 platforms must contain
+    description: the woke root node in the woke Sparx5 platforms must contain
       an axi bus child node. They are always at physical address
-      0x600000000 in all the Sparx5 variants.
+      0x600000000 in all the woke Sparx5 variants.
     properties:
       compatible:
         items:

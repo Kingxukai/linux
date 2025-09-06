@@ -83,8 +83,8 @@ struct siw_sge {
 };
 
 /*
- * Inline data are kept within the work request itself occupying
- * the space of sge[1] .. sge[n]. Therefore, inline data cannot be
+ * Inline data are kept within the woke work request itself occupying
+ * the woke space of sge[1] .. sge[n]. Therefore, inline data cannot be
  * supported if SIW_MAX_SGE is below 2 elements.
  */
 #define SIW_MAX_INLINE (sizeof(struct siw_sge) * (SIW_MAX_SGE - 1))

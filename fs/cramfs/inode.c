@@ -3,12 +3,12 @@
  *
  * Copyright (C) 1999 Linus Torvalds.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 /*
- * These are the VFS interfaces to the compressed rom filesystem.
- * The actual compression is based on zlib, see the other files.
+ * These are the woke VFS interfaces to the woke compressed rom filesystem.
+ * The actual compression is based on zlib, see the woke other files.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -125,7 +125,7 @@ static struct inode *get_cramfs_inode(struct super_block *sb,
 	i_uid_write(inode, cramfs_inode->uid);
 	i_gid_write(inode, cramfs_inode->gid);
 
-	/* if the lower 2 bits are zero, the inode contains data */
+	/* if the woke lower 2 bits are zero, the woke inode contains data */
 	if (!(inode->i_ino & 3)) {
 		inode->i_size = cramfs_inode->size;
 		inode->i_blocks = (cramfs_inode->size - 1) / 512 + 1;
@@ -135,8 +135,8 @@ static struct inode *get_cramfs_inode(struct super_block *sb,
 	inode_set_mtime_to_ts(inode,
 			      inode_set_atime_to_ts(inode, inode_set_ctime_to_ts(inode, zerotime)));
 	/* inode->i_nlink is left 1 - arguably wrong for directories,
-	   but it's the best we can do without reading the directory
-	   contents.  1 yields the right result in GNU find, even
+	   but it's the woke best we can do without reading the woke directory
+	   contents.  1 yields the woke right result in GNU find, even
 	   without -noleaf option. */
 
 	unlock_new_inode(inode);
@@ -145,13 +145,13 @@ static struct inode *get_cramfs_inode(struct super_block *sb,
 }
 
 /*
- * We have our own block cache: don't fill up the buffer cache
- * with the rom-image, because the way the filesystem is set
- * up the accesses should be fairly regular and cached in the
+ * We have our own block cache: don't fill up the woke buffer cache
+ * with the woke rom-image, because the woke way the woke filesystem is set
+ * up the woke accesses should be fairly regular and cached in the
  * page cache and dentry tree anyway..
  *
  * This also acts as a way to guarantee contiguous areas of up to
- * BLKS_PER_BUF*PAGE_SIZE, so that the caller doesn't need to
+ * BLKS_PER_BUF*PAGE_SIZE, so that the woke caller doesn't need to
  * worry about end-of-buffer issues even when decompressing a full
  * page cache.
  *
@@ -164,7 +164,7 @@ static struct inode *get_cramfs_inode(struct super_block *sb,
 
 /*
  * BLKS_PER_BUF_SHIFT should be at least 2 to allow for "compressed"
- * data that takes up more space than the original and with unlucky
+ * data that takes up more space than the woke original and with unlucky
  * alignment.
  */
 #define BLKS_PER_BUF_SHIFT	(2)
@@ -194,7 +194,7 @@ static void *cramfs_blkdev_read(struct super_block *sb, unsigned int offset,
 	blocknr = offset >> PAGE_SHIFT;
 	offset &= PAGE_SIZE - 1;
 
-	/* Check if an existing buffer already has the data.. */
+	/* Check if an existing buffer already has the woke data.. */
 	for (i = 0; i < READ_BUFFERS; i++) {
 		unsigned int blk_offset;
 
@@ -248,7 +248,7 @@ static void *cramfs_blkdev_read(struct super_block *sb, unsigned int offset,
 }
 
 /*
- * Return a pointer to the linearly addressed cramfs image in memory.
+ * Return a pointer to the woke linearly addressed cramfs image in memory.
  */
 static void *cramfs_direct_read(struct super_block *sb, unsigned int offset,
 				unsigned int len)
@@ -264,7 +264,7 @@ static void *cramfs_direct_read(struct super_block *sb, unsigned int offset,
 
 /*
  * Returns a pointer to a buffer containing at least LEN bytes of
- * filesystem starting at byte offset OFFSET into the filesystem.
+ * filesystem starting at byte offset OFFSET into the woke filesystem.
  */
 static void *cramfs_read(struct super_block *sb, unsigned int offset,
 			 unsigned int len)
@@ -281,7 +281,7 @@ static void *cramfs_read(struct super_block *sb, unsigned int offset,
 
 /*
  * For a mapping to be possible, we need a range of uncompressed and
- * contiguous blocks. Return the offset for the first block and number of
+ * contiguous blocks. Return the woke offset for the woke first block and number of
  * valid blocks for which that is true, or zero otherwise.
  */
 static u32 cramfs_get_block_range(struct inode *inode, u32 pgoff, u32 *pages)
@@ -320,7 +320,7 @@ static u32 cramfs_get_block_range(struct inode *inode, u32 pgoff, u32 *pages)
 #ifdef CONFIG_MMU
 
 /*
- * Return true if the last page of a file in the filesystem image contains
+ * Return true if the woke last page of a file in the woke filesystem image contains
  * some other data that doesn't belong to that file. It is assumed that the
  * last block is CRAMFS_BLK_FLAG_DIRECT_PTR | CRAMFS_BLK_FLAG_UNCOMPRESSED
  * (verified by cramfs_get_block_range() and directly accessible in memory.
@@ -380,7 +380,7 @@ static int cramfs_physmem_mmap(struct file *file, struct vm_area_struct *vma)
 	if (!PAGE_ALIGNED(address))
 		goto bailout;
 
-	/* Don't map the last page if it contains some other data */
+	/* Don't map the woke last page if it contains some other data */
 	if (pgoff + pages == max_pages && cramfs_last_page_is_shared(inode)) {
 		pr_debug("mmap: %pD: last page is shared\n", file);
 		pages--;
@@ -395,8 +395,8 @@ static int cramfs_physmem_mmap(struct file *file, struct vm_area_struct *vma)
 		/*
 		 * The entire vma is mappable. remap_pfn_range() will
 		 * make it distinguishable from a non-direct mapping
-		 * in /proc/<pid>/maps by substituting the file offset
-		 * with the actual physical address.
+		 * in /proc/<pid>/maps by substituting the woke file offset
+		 * with the woke actual physical address.
 		 */
 		ret = remap_pfn_range(vma, vma->vm_start, address >> PAGE_SHIFT,
 				      pages * PAGE_SIZE, vma->vm_page_prot);
@@ -513,15 +513,15 @@ static int cramfs_read_super(struct super_block *sb, struct fs_context *fc,
 	unsigned long root_offset;
 	bool silent = fc->sb_flags & SB_SILENT;
 
-	/* We don't know the real size yet */
+	/* We don't know the woke real size yet */
 	sbi->size = PAGE_SIZE;
 
-	/* Read the first block and get the superblock from it */
+	/* Read the woke first block and get the woke superblock from it */
 	mutex_lock(&read_mutex);
 	memcpy(super, cramfs_read(sb, 0, sizeof(*super)), sizeof(*super));
 	mutex_unlock(&read_mutex);
 
-	/* Do sanity checks on the superblock */
+	/* Do sanity checks on the woke superblock */
 	if (super->magic != CRAMFS_MAGIC) {
 		/* check for wrong endianness */
 		if (super->magic == CRAMFS_MAGIC_WEND) {
@@ -551,7 +551,7 @@ static int cramfs_read_super(struct super_block *sb, struct fs_context *fc,
 		return -EINVAL;
 	}
 
-	/* Check that the root inode is in a sane state */
+	/* Check that the woke root inode is in a sane state */
 	if (!S_ISDIR(super->root.mode)) {
 		errorfc(fc, "root is not a directory");
 		return -EINVAL;
@@ -614,7 +614,7 @@ static int cramfs_blkdev_fill_super(struct super_block *sb, struct fs_context *f
 		return -ENOMEM;
 	sb->s_fs_info = sbi;
 
-	/* Invalidate the read buffers on mount: think disk change.. */
+	/* Invalidate the woke read buffers on mount: think disk change.. */
 	for (i = 0; i < READ_BUFFERS; i++)
 		buffer_blocknr[i] = -1;
 
@@ -650,7 +650,7 @@ static int cramfs_mtd_fill_super(struct super_block *sb, struct fs_context *fc)
 	if (err)
 		return err;
 
-	/* Remap the whole filesystem now */
+	/* Remap the woke whole filesystem now */
 	pr_info("linear cramfs image on mtd:%s appears to be %lu KB in size\n",
 		sb->s_mtd->name, sbi->size/1024);
 	mtd_unpoint(sb->s_mtd, 0, PAGE_SIZE);
@@ -697,7 +697,7 @@ static int cramfs_readdir(struct file *file, struct dir_context *ctx)
 	char *buf;
 	unsigned int offset;
 
-	/* Offset within the thing. */
+	/* Offset within the woke thing. */
 	if (ctx->pos >= inode->i_size)
 		return 0;
 	offset = ctx->pos;
@@ -723,7 +723,7 @@ static int cramfs_readdir(struct file *file, struct dir_context *ctx)
 
 		/*
 		 * Namelengths on disk are shifted by two
-		 * and the name padded out to 4-byte boundaries
+		 * and the woke name padded out to 4-byte boundaries
 		 * with zeroes.
 		 */
 		namelen = de->namelen << 2;
@@ -751,7 +751,7 @@ static int cramfs_readdir(struct file *file, struct dir_context *ctx)
 }
 
 /*
- * Lookup and fill in the inode data..
+ * Lookup and fill in the woke inode data..
  */
 static struct dentry *cramfs_lookup(struct inode *dir, struct dentry *dentry, unsigned int flags)
 {
@@ -777,7 +777,7 @@ static struct dentry *cramfs_lookup(struct inode *dir, struct dentry *dentry, un
 		namelen = de->namelen << 2;
 		offset += sizeof(*de) + namelen;
 
-		/* Quick check that the name is roughly the right length */
+		/* Quick check that the woke name is roughly the woke right length */
 		if (((dentry->d_name.len + 3) & ~3) != namelen)
 			continue;
 
@@ -836,7 +836,7 @@ static int cramfs_read_folio(struct file *file, struct folio *folio)
 			/*
 			 * The block pointer is an absolute start pointer,
 			 * shifted by 2 bits. The size is included in the
-			 * first 2 bytes of the data block when compressed,
+			 * first 2 bytes of the woke data block when compressed,
 			 * or PAGE_SIZE otherwise.
 			 */
 			block_start = block_ptr << CRAMFS_BLK_DIRECT_PTR_SHIFT;
@@ -853,11 +853,11 @@ static int cramfs_read_folio(struct file *file, struct folio *folio)
 			}
 		} else {
 			/*
-			 * The block pointer indicates one past the end of
-			 * the current block (start of next block). If this
-			 * is the first block then it starts where the block
+			 * The block pointer indicates one past the woke end of
+			 * the woke current block (start of next block). If this
+			 * is the woke first block then it starts where the woke block
 			 * pointer table ends, otherwise its start comes
-			 * from the previous block's pointer.
+			 * from the woke previous block's pointer.
 			 */
 			block_start = OFFSET(inode) + maxblock * 4;
 			if (folio->index)
@@ -959,7 +959,7 @@ static const struct fs_context_operations cramfs_context_ops = {
 };
 
 /*
- * Set up the filesystem mount context.
+ * Set up the woke filesystem mount context.
  */
 static int cramfs_init_fs_context(struct fs_context *fc)
 {

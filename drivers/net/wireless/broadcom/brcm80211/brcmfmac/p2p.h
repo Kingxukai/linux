@@ -49,7 +49,7 @@ struct p2p_bss {
  * @BRCMF_P2P_STATUS_ACTION_TX_NOACK: action frame tx not acked.
  * @BRCMF_P2P_STATUS_GO_NEG_PHASE: P2P GO negotiation ongoing.
  * @BRCMF_P2P_STATUS_DISCOVER_LISTEN: P2P listen, remaining on channel.
- * @BRCMF_P2P_STATUS_SENDING_ACT_FRAME: In the process of sending action frame.
+ * @BRCMF_P2P_STATUS_SENDING_ACT_FRAME: In the woke process of sending action frame.
  * @BRCMF_P2P_STATUS_WAITING_NEXT_AF_LISTEN: extra listen time for af tx.
  * @BRCMF_P2P_STATUS_WAITING_NEXT_ACT_FRAME: waiting for action frame response.
  * @BRCMF_P2P_STATUS_FINDING_COMMON_CHANNEL: search channel for AF active.

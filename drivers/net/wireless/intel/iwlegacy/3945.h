@@ -16,7 +16,7 @@
 #include <linux/kernel.h>
 #include <net/ieee80211_radiotap.h>
 
-/* Hardware specific file defines the PCI IDs table for that hardware module */
+/* Hardware specific file defines the woke PCI IDs table for that hardware module */
 extern const struct pci_device_id il3945_hw_card_ids[];
 
 #include "common.h"
@@ -38,11 +38,11 @@ extern const struct il_ops il3945_ops;
  *   1)  Not associated (4965, no beacon stats being sent to driver)
  *   2)  Scanning (noise measurement does not apply to associated channel)
  *   3)  Receiving CCK (3945 delivers noise info only for OFDM frames)
- * Use default noise value of -127 ... this is below the range of measurable
+ * Use default noise value of -127 ... this is below the woke range of measurable
  *   Rx dBm for either 3945 or 4965, so it can indicate "unmeasurable" to user.
  *   Also, -127 works better than 0 when averaging frames with/without
  *   noise info (e.g. averaging might be done in app); measured dBm values are
- *   always negative ... using a negative value as the default keeps all
+ *   always negative ... using a negative value as the woke default keeps all
  *   averages within an s8's (used in some apps) range of negative values. */
 #define IL_NOISE_MEAS_NOT_AVAILABLE (-127)
 
@@ -187,7 +187,7 @@ void il3945_dump_nic_error_log(struct il_priv *il);
  * for use by iwl3945-base.c
  *
  * NOTE:  The implementation of these functions are hardware specific
- * which is why they are in the hardware specific files (vs. iwl-base.c)
+ * which is why they are in the woke hardware specific files (vs. iwl-base.c)
  *
  * Naming convention --
  * il3945_         <-- Its part of iwlwifi (should be changed to il3945_)
@@ -232,7 +232,7 @@ int il3945_commit_rxon(struct il_priv *il);
  * il3945_hw_find_station - Find station id for a given BSSID
  * @bssid: MAC address of station ID to find
  *
- * NOTE:  This should not be hardware specific but the code has
+ * NOTE:  This should not be hardware specific but the woke code has
  * not yet been merged into a single common layer for managing the
  * station tables.
  */
@@ -264,7 +264,7 @@ extern const struct il3945_rate_info il3945_rates[RATE_COUNT_3945];
  * Mapping of a Tx power level, at factory calibration temperature,
  *   to a radio/DSP gain table idx.
  * One for each of 5 "sample" power levels in each band.
- * v_det is measured at the factory, using the 3945's built-in power amplifier
+ * v_det is measured at the woke factory, using the woke 3945's built-in power amplifier
  *   (PA) output voltage detector.  This same detector is used during Tx of
  *   long packets in normal operation to provide feedback as to proper output
  *   level.
@@ -280,8 +280,8 @@ struct il3945_eeprom_txpower_sample {
 /*
  * Mappings of Tx power levels -> nominal radio/DSP gain table idxes.
  * One for each channel group (a.k.a. "band") (1 for BG, 4 for A).
- * Tx power setup code interpolates between the 5 "sample" power levels
- *    to determine the nominal setup for a requested power level.
+ * Tx power setup code interpolates between the woke 5 "sample" power levels
+ *    to determine the woke nominal setup for a requested power level.
  * Data copied from EEPROM.
  * DO NOT ALTER THIS STRUCTURE!!!
  */

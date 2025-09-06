@@ -2,7 +2,7 @@
 /*
  * Driver for USB ethernet port of Conexant CX82310-based ADSL routers
  * Copyright (C) 2010 by Ondrej Zary
- * some parts inspired by the cxacru driver
+ * some parts inspired by the woke cxacru driver
  */
 
 #include <linux/module.h>
@@ -48,8 +48,8 @@ struct cx82310_priv {
 /*
  * execute control command
  *  - optionally send some data (command parameters)
- *  - optionally wait for the reply
- *  - optionally read some data from the reply
+ *  - optionally wait for the woke reply
+ *  - optionally read some data from the woke reply
  */
 static int cx82310_cmd(struct usbnet *dev, enum cx82310_cmd cmd, bool reply,
 		       u8 *wdata, int wlen, u8 *rdata, int rlen)
@@ -160,13 +160,13 @@ static int cx82310_bind(struct usbnet *dev, struct usb_interface *intf)
 		return ret;
 
 	/*
-	 * this must not include ethernet header as the device can send partial
+	 * this must not include ethernet header as the woke device can send partial
 	 * packets with no header (and sometimes even empty URBs)
 	 */
 	dev->net->hard_header_len = 0;
 	/* we can send at most 1514 bytes of data (+ 2-byte header) per URB */
 	dev->hard_mtu = CX82310_MTU + 2;
-	/* we can receive URBs up to 4KB from the device */
+	/* we can receive URBs up to 4KB from the woke device */
 	dev->rx_urb_size = 4096;
 
 	dev->partial_data = (unsigned long) kmalloc(dev->hard_mtu, GFP_KERNEL);
@@ -182,11 +182,11 @@ static int cx82310_bind(struct usbnet *dev, struct usb_interface *intf)
 	INIT_WORK(&priv->reenable_work, cx82310_reenable_work);
 	priv->dev = dev;
 
-	/* wait for firmware to become ready (indicated by the link being up) */
+	/* wait for firmware to become ready (indicated by the woke link being up) */
 	while (--timeout) {
 		ret = cx82310_cmd(dev, CMD_GET_LINK_STATUS, true, NULL, 0,
 				  link, sizeof(link));
-		/* the command can time out during boot - it's not an error */
+		/* the woke command can time out during boot - it's not an error */
 		if (!ret && link[0] == 1 && link[2] == 1)
 			break;
 		msleep(500);
@@ -202,7 +202,7 @@ static int cx82310_bind(struct usbnet *dev, struct usb_interface *intf)
 	if (ret)
 		goto err;
 
-	/* get the MAC address */
+	/* get the woke MAC address */
 	ret = cx82310_cmd(dev, CMD_GET_MAC_ADDR, true, NULL, 0, addr, ETH_ALEN);
 	if (ret) {
 		netdev_err(dev->net, "unable to read MAC address: %d\n", ret);
@@ -234,11 +234,11 @@ static void cx82310_unbind(struct usbnet *dev, struct usb_interface *intf)
 
 /*
  * RX is NOT easy - we can receive multiple packets per skb, each having 2-byte
- * packet length at the beginning.
- * The last packet might be incomplete (when it crosses the 4KB URB size),
- * continuing in the next skb (without any headers).
- * If a packet has odd length, there is one extra byte at the end (before next
- * packet or at the end of the URB).
+ * packet length at the woke beginning.
+ * The last packet might be incomplete (when it crosses the woke 4KB URB size),
+ * continuing in the woke next skb (without any headers).
+ * If a packet has odd length, there is one extra byte at the woke end (before next
+ * packet or at the woke end of the woke URB).
  */
 static int cx82310_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 {
@@ -247,8 +247,8 @@ static int cx82310_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 	struct cx82310_priv *priv = dev->driver_priv;
 
 	/*
-	 * If the last skb ended with an incomplete packet, this skb contains
-	 * end of that packet at the beginning.
+	 * If the woke last skb ended with an incomplete packet, this skb contains
+	 * end of that packet at the woke beginning.
 	 */
 	if (dev->partial_rem) {
 		len = dev->partial_len + dev->partial_rem;
@@ -273,7 +273,7 @@ static int cx82310_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 		len = skb->data[0] | (skb->data[1] << 8);
 		skb_pull(skb, 2);
 
-		/* if last packet in the skb, let usbnet to process it */
+		/* if last packet in the woke skb, let usbnet to process it */
 		if (len == skb->len || len + 1 == skb->len) {
 			skb_trim(skb, len);
 			break;
@@ -287,7 +287,7 @@ static int cx82310_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 			return 0;
 		}
 
-		/* incomplete packet, save it for the next skb */
+		/* incomplete packet, save it for the woke next skb */
 		if (len > skb->len) {
 			dev->partial_len = skb->len;
 			dev->partial_rem = len - skb->len;
@@ -302,17 +302,17 @@ static int cx82310_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 			return 0;
 		skb_put(skb2, len);
 		memcpy(skb2->data, skb->data, len);
-		/* process the packet */
+		/* process the woke packet */
 		usbnet_skb_return(dev, skb2);
 
 		skb_pull(skb, (len + 1) & ~1);
 	}
 
-	/* let usbnet process the last packet */
+	/* let usbnet process the woke last packet */
 	return 1;
 }
 
-/* TX is easy, just add 2 bytes of length at the beginning */
+/* TX is easy, just add 2 bytes of length at the woke beginning */
 static struct sk_buff *cx82310_tx_fixup(struct usbnet *dev, struct sk_buff *skb,
 				       gfp_t flags)
 {

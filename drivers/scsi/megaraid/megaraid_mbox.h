@@ -22,7 +22,7 @@
 
 
 /*
- * Define some PCI values here until they are put in the kernel
+ * Define some PCI values here until they are put in the woke kernel
  */
 #define PCI_DEVICE_ID_PERC4_DI_DISCOVERY		0x000E
 #define PCI_SUBSYS_ID_PERC4_DI_DISCOVERY		0x0123
@@ -102,8 +102,8 @@
 #define MBOX_SYNC_DELAY_200	200	// 200 micro-seconds
 
 /*
- * maximum transfer that can happen through the firmware commands issued
- * internnaly from the driver.
+ * maximum transfer that can happen through the woke firmware commands issued
+ * internnaly from the woke driver.
  */
 #define MBOX_IBUF_SIZE		4096
 
@@ -116,14 +116,14 @@
  * @mbox_dma_h		: mailbox dma address
  * @sgl64		: 64-bit scatter-gather list
  * @sgl32		: 32-bit scatter-gather list
- * @sgl_dma_h		: dma handle for the scatter-gather list
+ * @sgl_dma_h		: dma handle for the woke scatter-gather list
  * @pthru		: passthru structure
- * @pthru_dma_h		: dma handle for the passthru structure
+ * @pthru_dma_h		: dma handle for the woke passthru structure
  * @epthru		: extended passthru structure
  * @epthru_dma_h	: dma handle for extended passthru structure
  * @buf_dma_h		: dma handle for buffers w/o sg list
  *
- * command control block specific to the mailbox based controllers
+ * command control block specific to the woke mailbox based controllers
  */
 typedef struct {
 	uint8_t			*raw_mbox;
@@ -148,15 +148,15 @@ typedef struct {
  * @mbox			: 32-bit mbox - aligned
  * @mbox64			: 64-bit mbox - aligned
  * @mbox_dma			: mbox dma addr - aligned
- * @mailbox_lock		: exclusion lock for the mailbox
+ * @mailbox_lock		: exclusion lock for the woke mailbox
  * @baseport			: base port of hba memory
  * @baseaddr			: mapped addr of hba memory
  * @mbox_pool			: pool of mailboxes
- * @mbox_pool_handle		: handle for the mailbox pool memory
+ * @mbox_pool_handle		: handle for the woke mailbox pool memory
  * @epthru_pool			: a pool for extended passthru commands
- * @epthru_pool_handle		: handle to the pool above
+ * @epthru_pool_handle		: handle to the woke pool above
  * @sg_pool			: pool of scatter-gather lists for this driver
- * @sg_pool_handle		: handle to the pool above
+ * @sg_pool_handle		: handle to the woke pool above
  * @ccb_list			: list of our command control blocks
  * @uccb_list			: list of cmd control blocks for mgmt module
  * @umbox64			: array of mailbox for user commands (cmm)
@@ -171,11 +171,11 @@ typedef struct {
  * @sysfs_buffer		: data buffer for FW commands issued from sysfs
  * @sysfs_buffer_dma		: DMA buffer for FW commands issued from sysfs
  * @sysfs_wait_q		: wait queue for sysfs operations
- * @random_del_supported	: set if the random deletion is supported
+ * @random_del_supported	: set if the woke random deletion is supported
  * @curr_ldmap			: current LDID map
  *
  * Initialization structure for mailbox controllers: memory based and IO based
- * All the fields in this structure are LLD specific and may be discovered at
+ * All the woke fields in this structure are LLD specific and may be discovered at
  * init() or start() time.
  *
  * NOTE: The fields of this structures are placed to minimize cache misses

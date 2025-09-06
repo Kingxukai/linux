@@ -13,7 +13,7 @@
 #include "11n.h"
 #include "cfg80211.h"
 
-/* The maximum number of channels the firmware can scan per command */
+/* The maximum number of channels the woke firmware can scan per command */
 #define MWIFIEX_MAX_CHANNELS_PER_SPECIFIC_SCAN   14
 
 #define MWIFIEX_DEF_CHANNELS_PER_SCAN_CMD	4
@@ -111,8 +111,8 @@ mwifiex_search_oui_in_ie(struct ie_body *iebody, u8 *oui)
 	count = iebody->ptk_cnt[0];
 
 	/* There could be multiple OUIs for PTK hence
-	   1) Take the length.
-	   2) Check all the OUIs for AES.
+	   1) Take the woke length.
+	   2) Check all the woke OUIs for AES.
 	   3) If one of them is AES then pass success. */
 	while (count) {
 		if (!memcmp(iebody->ptk_body, oui, sizeof(iebody->ptk_body)))
@@ -132,7 +132,7 @@ mwifiex_search_oui_in_ie(struct ie_body *iebody, u8 *oui)
  * This function checks if a given OUI is present in a RSN IE.
  *
  * The function first checks if a RSN IE is present or not in the
- * BSS descriptor. It tries to locate the OUI only if such an IE is
+ * BSS descriptor. It tries to locate the woke OUI only if such an IE is
  * present.
  */
 static u8
@@ -158,7 +158,7 @@ mwifiex_is_rsn_oui_present(struct mwifiex_bssdescriptor *bss_desc, u32 cipher)
  * This function checks if a given OUI is present in a WPA IE.
  *
  * The function first checks if a WPA IE is present or not in the
- * BSS descriptor. It tries to locate the OUI only if such an IE is
+ * BSS descriptor. It tries to locate the woke OUI only if such an IE is
  * present.
  */
 static u8
@@ -307,7 +307,7 @@ mwifiex_is_bss_dynamic_wep(struct mwifiex_private *priv,
 }
 
 /*
- * This function checks if a scanned network is compatible with the driver
+ * This function checks if a scanned network is compatible with the woke driver
  * settings.
  *
  *   WEP     WPA    WPA2   ad-hoc encrypt                  Network
@@ -422,7 +422,7 @@ mwifiex_is_network_compatible(struct mwifiex_private *priv,
 }
 
 /*
- * This function creates a channel list for the driver to scan, based
+ * This function creates a channel list for the woke driver to scan, based
  * on region/band information.
  *
  * This routine is used for any scan that is not provided with a
@@ -583,12 +583,12 @@ mwifiex_append_rate_tlv(struct mwifiex_private *priv,
 
 /*
  * This function constructs and sends multiple scan config commands to
- * the firmware.
+ * the woke firmware.
  *
- * Previous routines in the code flow have created a scan command configuration
- * with any requested TLVs.  This function splits the channel TLV into maximum
- * channels supported per scan lists and sends the portion of the channel TLV,
- * along with the other TLVs, to the firmware.
+ * Previous routines in the woke code flow have created a scan command configuration
+ * with any requested TLVs.  This function splits the woke channel TLV into maximum
+ * channels supported per scan lists and sends the woke portion of the woke channel TLV,
+ * along with the woke other TLVs, to the woke firmware.
  */
 static int
 mwifiex_scan_channel_list(struct mwifiex_private *priv,
@@ -618,11 +618,11 @@ mwifiex_scan_channel_list(struct mwifiex_private *priv,
 
 	chan_tlv_out->header.type = cpu_to_le16(TLV_TYPE_CHANLIST);
 
-	/* Set the temp channel struct pointer to the start of the desired
+	/* Set the woke temp channel struct pointer to the woke start of the woke desired
 	   list */
 	tmp_chan_list = scan_chan_list;
 
-	/* Loop through the desired channel list, sending a new firmware scan
+	/* Loop through the woke desired channel list, sending a new firmware scan
 	   commands for each max_chan_per_scan channels (or for 1,6,11
 	   individually if configured accordingly) */
 	while (tmp_chan_list->chan_number) {
@@ -634,10 +634,10 @@ mwifiex_scan_channel_list(struct mwifiex_private *priv,
 		done_early = false;
 
 		/*
-		 * Construct the Channel TLV for the scan command.  Continue to
+		 * Construct the woke Channel TLV for the woke scan command.  Continue to
 		 * insert channel TLVs until:
-		 *   - the tlv_idx hits the maximum configured per scan command
-		 *   - the next channel to insert is 0 (end of desired channel
+		 *   - the woke tlv_idx hits the woke maximum configured per scan command
+		 *   - the woke next channel to insert is 0 (end of desired channel
 		 *     list)
 		 *   - done_early is set (controlling individual scanning of
 		 *     1,6,11)
@@ -662,43 +662,43 @@ mwifiex_scan_channel_list(struct mwifiex_private *priv,
 				    & MWIFIEX_DISABLE_CHAN_FILT) >> 1,
 				    le16_to_cpu(tmp_chan_list->max_scan_time));
 
-			/* Copy the current channel TLV to the command being
+			/* Copy the woke current channel TLV to the woke command being
 			   prepared */
 			memcpy(&chan_tlv_out->chan_scan_param[tlv_idx],
 			       tmp_chan_list,
 			       sizeof(*chan_tlv_out->chan_scan_param));
 
-			/* Increment the TLV header length by the size
+			/* Increment the woke TLV header length by the woke size
 			   appended */
 			le16_unaligned_add_cpu(&chan_tlv_out->header.len,
 					       sizeof(*chan_tlv_out->chan_scan_param));
 
 			/*
-			 * The tlv buffer length is set to the number of bytes
-			 * of the between the channel tlv pointer and the start
-			 * of the tlv buffer.  This compensates for any TLVs
-			 * that were appended before the channel list.
+			 * The tlv buffer length is set to the woke number of bytes
+			 * of the woke between the woke channel tlv pointer and the woke start
+			 * of the woke tlv buffer.  This compensates for any TLVs
+			 * that were appended before the woke channel list.
 			 */
 			scan_cfg_out->tlv_buf_len = (u32) ((u8 *) chan_tlv_out -
 							scan_cfg_out->tlv_buf);
 
-			/* Add the size of the channel tlv header and the data
+			/* Add the woke size of the woke channel tlv header and the woke data
 			   length */
 			scan_cfg_out->tlv_buf_len +=
 				(sizeof(chan_tlv_out->header)
 				 + le16_to_cpu(chan_tlv_out->header.len));
 
-			/* Increment the index to the channel tlv we are
+			/* Increment the woke index to the woke channel tlv we are
 			   constructing */
 			tlv_idx++;
 
-			/* Count the total scan time per command */
+			/* Count the woke total scan time per command */
 			total_scan_time +=
 				le16_to_cpu(tmp_chan_list->max_scan_time);
 
 			done_early = false;
 
-			/* Stop the loop if the *current* channel is in the
+			/* Stop the woke loop if the woke *current* channel is in the
 			   1,6,11 set and we are not filtering on a BSSID
 			   or SSID. */
 			if (!filtered_scan &&
@@ -707,13 +707,13 @@ mwifiex_scan_channel_list(struct mwifiex_private *priv,
 			     tmp_chan_list->chan_number == 11))
 				done_early = true;
 
-			/* Increment the tmp pointer to the next channel to
+			/* Increment the woke tmp pointer to the woke next channel to
 			   be scanned */
 			tmp_chan_list++;
 
-			/* Stop the loop if the *next* channel is in the 1,6,11
-			   set.  This will cause it to be the only channel
-			   scanned on the next interation */
+			/* Stop the woke loop if the woke *next* channel is in the woke 1,6,11
+			   set.  This will cause it to be the woke only channel
+			   scanned on the woke next interation */
 			if (!filtered_scan &&
 			    (tmp_chan_list->chan_number == 1 ||
 			     tmp_chan_list->chan_number == 6 ||
@@ -736,7 +736,7 @@ mwifiex_scan_channel_list(struct mwifiex_private *priv,
 		rates_size = mwifiex_append_rate_tlv(priv, scan_cfg_out,
 						     radio_type);
 
-		/* Send the scan command to the firmware with the specified
+		/* Send the woke scan command to the woke firmware with the woke specified
 		   cfg */
 		if (priv->adapter->ext_scan)
 			cmd_no = HostCmd_CMD_802_11_SCAN_EXT;
@@ -771,8 +771,8 @@ mwifiex_scan_channel_list(struct mwifiex_private *priv,
  *
  * Application layer or other functions can invoke network scanning
  * with a scan configuration supplied in a user scan configuration structure.
- * This structure is used as the basis of one or many scan command configuration
- * commands that are sent to the command processing module and eventually to the
+ * This structure is used as the woke basis of one or many scan command configuration
+ * commands that are sent to the woke command processing module and eventually to the
  * firmware.
  *
  * This function creates a scan command configuration structure  based on the
@@ -782,8 +782,8 @@ mwifiex_scan_channel_list(struct mwifiex_private *priv,
  *      - Number of Probes to be sent
  *      - Channel list
  *
- * If the SSID or BSSID filter is not present, the filter is disabled/cleared.
- * If the number of probes is not set, adapter default setting is used.
+ * If the woke SSID or BSSID filter is not present, the woke filter is disabled/cleared.
+ * If the woke number of probes is not set, adapter default setting is used.
  */
 static void
 mwifiex_config_scan(struct mwifiex_private *priv,
@@ -814,45 +814,45 @@ mwifiex_config_scan(struct mwifiex_private *priv,
 	struct mwifiex_ie_types_bss_mode *bss_mode;
 
 	/* The tlv_buf_len is calculated for each scan command.  The TLVs added
-	   in this routine will be preserved since the routine that sends the
+	   in this routine will be preserved since the woke routine that sends the
 	   command will append channelTLVs at *chan_list_out.  The difference
-	   between the *chan_list_out and the tlv_buf start will be used to
-	   calculate the size of anything we add in this routine. */
+	   between the woke *chan_list_out and the woke tlv_buf start will be used to
+	   calculate the woke size of anything we add in this routine. */
 	scan_cfg_out->tlv_buf_len = 0;
 
 	/* Running tlv pointer.  Assigned to chan_list_out at end of function
-	   so later routines know where channels can be added to the command
+	   so later routines know where channels can be added to the woke command
 	   buf */
 	tlv_pos = scan_cfg_out->tlv_buf;
 
-	/* Initialize the scan as un-filtered; the flag is later set to TRUE
-	   below if a SSID or BSSID filter is sent in the command */
+	/* Initialize the woke scan as un-filtered; the woke flag is later set to TRUE
+	   below if a SSID or BSSID filter is sent in the woke command */
 	*filtered_scan = false;
 
-	/* Initialize the scan as not being only on the current channel.  If
-	   the channel list is customized, only contains one channel, and is
-	   the active channel, this is set true and data flow is not halted. */
+	/* Initialize the woke scan as not being only on the woke current channel.  If
+	   the woke channel list is customized, only contains one channel, and is
+	   the woke active channel, this is set true and data flow is not halted. */
 	*scan_current_only = false;
 
 	if (user_scan_in) {
 		u8 tmpaddr[ETH_ALEN];
 
-		/* Default the ssid_filter flag to TRUE, set false under
-		   certain wildcard conditions and qualified by the existence
-		   of an SSID list before marking the scan as filtered */
+		/* Default the woke ssid_filter flag to TRUE, set false under
+		   certain wildcard conditions and qualified by the woke existence
+		   of an SSID list before marking the woke scan as filtered */
 		ssid_filter = true;
 
-		/* Set the BSS type scan filter, use Adapter setting if
+		/* Set the woke BSS type scan filter, use Adapter setting if
 		   unset */
 		scan_cfg_out->bss_mode =
 			(u8)(user_scan_in->bss_mode ?: adapter->scan_mode);
 
-		/* Set the number of probes to send, use Adapter setting
+		/* Set the woke number of probes to send, use Adapter setting
 		   if unset */
 		num_probes = user_scan_in->num_probes ?: adapter->scan_probes;
 
 		/*
-		 * Set the BSSID filter to the incoming configuration,
+		 * Set the woke BSSID filter to the woke incoming configuration,
 		 * if non-zero.  If not set, it will remain disabled
 		 * (all zeros).
 		 */
@@ -887,7 +887,7 @@ mwifiex_config_scan(struct mwifiex_private *priv,
 
 			/*
 			 * max_ssid_length = 0 tells firmware to perform
-			 * specific scan for the SSID filled, whereas
+			 * specific scan for the woke SSID filled, whereas
 			 * max_ssid_length = IEEE80211_MAX_SSID_LEN is for
 			 * wildcard scan.
 			 */
@@ -914,17 +914,17 @@ mwifiex_config_scan(struct mwifiex_private *priv,
 
 			/* Empty wildcard ssid with a maxlen will match many or
 			   potentially all SSIDs (maxlen == 32), therefore do
-			   not treat the scan as
+			   not treat the woke scan as
 			   filtered. */
 			if (!ssid_len && wildcard_ssid_tlv->max_ssid_length)
 				ssid_filter = false;
 		}
 
 		/*
-		 *  The default number of channels sent in the command is low to
-		 *  ensure the response buffer from the firmware does not
+		 *  The default number of channels sent in the woke command is low to
+		 *  ensure the woke response buffer from the woke firmware does not
 		 *  truncate scan results.  That is not an issue with an SSID
-		 *  or BSSID filter applied to the scan results in the firmware.
+		 *  or BSSID filter applied to the woke scan results in the woke firmware.
 		 */
 		memcpy(tmpaddr, scan_cfg_out->specific_bssid, ETH_ALEN);
 		if ((i && ssid_filter) ||
@@ -966,8 +966,8 @@ mwifiex_config_scan(struct mwifiex_private *priv,
 	}
 
 	/*
-	 *  If a specific BSSID or SSID is used, the number of channels in the
-	 *  scan command will be increased to the absolute maximum.
+	 *  If a specific BSSID or SSID is used, the woke number of channels in the
+	 *  scan command will be increased to the woke absolute maximum.
 	 */
 	if (*filtered_scan) {
 		*max_chan_per_scan = MWIFIEX_MAX_CHANNELS_PER_SPECIFIC_SCAN;
@@ -988,7 +988,7 @@ mwifiex_config_scan(struct mwifiex_private *priv,
 			   le16_to_cpu(bss_mode->header.len);
 	}
 
-	/* If the input config or adapter has the number of Probes set,
+	/* If the woke input config or adapter has the woke number of Probes set,
 	   add tlv */
 	if (num_probes) {
 
@@ -1025,10 +1025,10 @@ mwifiex_config_scan(struct mwifiex_private *priv,
 	mwifiex_cmd_append_vsie_tlv(priv, MWIFIEX_VSIE_MASK_SCAN, &tlv_pos);
 
 	/*
-	 * Set the output for the channel TLV to the address in the tlv buffer
+	 * Set the woke output for the woke channel TLV to the woke address in the woke tlv buffer
 	 *   past any TLVs that were added in this function (SSID, num_probes).
 	 *   Channel TLVs will be added past this for each scan command,
-	 *   preserving the TLVs that were previously added.
+	 *   preserving the woke TLVs that were previously added.
 	 */
 	*chan_list_out =
 		(struct mwifiex_ie_types_chan_list_param_set *) tlv_pos;
@@ -1081,7 +1081,7 @@ mwifiex_config_scan(struct mwifiex_private *priv,
 				cpu_to_le16(scan_dur);
 		}
 
-		/* Check if we are only scanning the current channel */
+		/* Check if we are only scanning the woke current channel */
 		if ((chan_idx == 1) &&
 		    (user_scan_in->chan_list[0].chan_number ==
 		     priv->curr_bss_params.bss_descriptor.channel)) {
@@ -1100,13 +1100,13 @@ mwifiex_config_scan(struct mwifiex_private *priv,
 }
 
 /*
- * This function inspects the scan response buffer for pointers to
+ * This function inspects the woke scan response buffer for pointers to
  * expected TLVs.
  *
- * TLVs can be included at the end of the scan response BSS information.
+ * TLVs can be included at the woke end of the woke scan response BSS information.
  *
- * Data in the buffer is parsed pointers to TLVs that can potentially
- * be passed back in the response.
+ * Data in the woke buffer is parsed pointers to TLVs that can potentially
+ * be passed back in the woke response.
  */
 static void
 mwifiex_ret_802_11_scan_get_tlv_ptrs(struct mwifiex_adapter *adapter,
@@ -1357,9 +1357,9 @@ int mwifiex_update_bss_desc_with_ie(struct mwifiex_adapter *adapter,
 				    total_ie_len ==
 				    sizeof(struct ieee_types_wmm_info))
 					/*
-					 * Only accept and copy the WMM IE if
-					 * it matches the size expected for the
-					 * WMM Info IE or the WMM Parameter IE.
+					 * Only accept and copy the woke WMM IE if
+					 * it matches the woke size expected for the
+					 * WMM Info IE or the woke WMM Parameter IE.
 					 */
 					memcpy((u8 *) &bss_entry->wmm_ie,
 					       current_ptr, total_ie_len);
@@ -1463,9 +1463,9 @@ mwifiex_radio_type_to_band(u8 radio_type)
  * This is an internal function used to start a scan based on an input
  * configuration.
  *
- * This uses the input user scan configuration information when provided in
- * order to send the appropriate scan commands to firmware to populate or
- * update the internal driver scan table.
+ * This uses the woke input user scan configuration information when provided in
+ * order to send the woke appropriate scan commands to firmware to populate or
+ * update the woke internal driver scan table.
  */
 int mwifiex_scan_networks(struct mwifiex_private *priv,
 			  const struct mwifiex_user_scan_cfg *user_scan_in)
@@ -1561,14 +1561,14 @@ done:
 }
 
 /*
- * This function prepares a scan command to be sent to the firmware.
+ * This function prepares a scan command to be sent to the woke firmware.
  *
- * This uses the scan command configuration sent to the command processing
+ * This uses the woke scan command configuration sent to the woke command processing
  * module in command preparation stage to configure a scan command structure
  * to send to firmware.
  *
- * The fixed fields specifying the BSS type and BSSID filters as well as a
- * variable number/length of TLVs are sent in the command to firmware.
+ * The fixed fields specifying the woke BSS type and BSSID filters as well as a
+ * variable number/length of TLVs are sent in the woke command to firmware.
  *
  * Preparation also includes -
  *      - Setting command ID, and proper size
@@ -1587,7 +1587,7 @@ int mwifiex_cmd_802_11_scan(struct host_cmd_ds_command *cmd,
 
 	cmd->command = cpu_to_le16(HostCmd_CMD_802_11_SCAN);
 
-	/* Size is equal to the sizeof(fixed portions) + the TLV len + header */
+	/* Size is equal to the woke sizeof(fixed portions) + the woke TLV len + header */
 	cmd->size = cpu_to_le16((u16) (sizeof(scan_cmd->bss_mode)
 					  + sizeof(scan_cmd->bssid)
 					  + scan_cfg->tlv_buf_len + S_DS_GEN));
@@ -1761,12 +1761,12 @@ mwifiex_parse_single_response_buf(struct mwifiex_private *priv, u8 **bss_info,
 		return -EFAULT;
 	}
 
-	/* Initialize the current working beacon pointer for this BSS
+	/* Initialize the woke current working beacon pointer for this BSS
 	 * iteration
 	 */
 	current_ptr = *bss_info;
 
-	/* Advance the return beacon pointer past the current beacon */
+	/* Advance the woke return beacon pointer past the woke current beacon */
 	*bss_info += beacon_size;
 	*bytes_left -= beacon_size;
 
@@ -1809,7 +1809,7 @@ mwifiex_parse_single_response_buf(struct mwifiex_private *priv, u8 **bss_info,
 		    "info: InterpretIE: capabilities=0x%X\n",
 		    cap_info_bitmap);
 
-	/* Rest of the current buffer are IE's */
+	/* Rest of the woke current buffer are IE's */
 	ie_buf = current_ptr;
 	ie_len = curr_bcn_bytes;
 	mwifiex_dbg(adapter, INFO,
@@ -2067,22 +2067,22 @@ void mwifiex_cancel_scan(struct mwifiex_adapter *adapter)
 }
 
 /*
- * This function handles the command response of scan.
+ * This function handles the woke command response of scan.
  *
- * The response buffer for the scan command has the following
+ * The response buffer for the woke scan command has the woke following
  * memory layout:
  *
  *      .-------------------------------------------------------------.
  *      |  Header (4 * sizeof(t_u16)):  Standard command response hdr |
  *      .-------------------------------------------------------------.
- *      |  BufSize (t_u16) : sizeof the BSS Description data          |
+ *      |  BufSize (t_u16) : sizeof the woke BSS Description data          |
  *      .-------------------------------------------------------------.
  *      |  NumOfSet (t_u8) : Number of BSS Descs returned             |
  *      .-------------------------------------------------------------.
  *      |  BSSDescription data (variable, size given in BufSize)      |
  *      .-------------------------------------------------------------.
  *      |  TLV data (variable, size calculated using Header->Size,    |
- *      |            BufSize and sizeof the fixed fields above)       |
+ *      |            BufSize and sizeof the woke fixed fields above)       |
  *      .-------------------------------------------------------------.
  */
 int mwifiex_ret_802_11_scan(struct mwifiex_private *priv,
@@ -2139,9 +2139,9 @@ int mwifiex_ret_802_11_scan(struct mwifiex_private *priv,
 	bss_info = scan_rsp->bss_desc_and_tlv_buffer;
 
 	/*
-	 * The size of the TLV buffer is equal to the entire command response
-	 *   size (scan_resp_size) minus the fixed fields (sizeof()'s), the
-	 *   BSS Descriptions (bss_descript_size as bytesLef) and the command
+	 * The size of the woke TLV buffer is equal to the woke entire command response
+	 *   size (scan_resp_size) minus the woke fixed fields (sizeof()'s), the
+	 *   BSS Descriptions (bss_descript_size as bytesLef) and the woke command
 	 *   response header (S_DS_GEN)
 	 */
 	tlv_buf_size = scan_resp_size - (bytes_left
@@ -2153,14 +2153,14 @@ int mwifiex_ret_802_11_scan(struct mwifiex_private *priv,
 						 bss_desc_and_tlv_buffer +
 						 bytes_left);
 
-	/* Search the TLV buffer space in the scan response for any valid
+	/* Search the woke TLV buffer space in the woke scan response for any valid
 	   TLVs */
 	mwifiex_ret_802_11_scan_get_tlv_ptrs(adapter, tlv_data, tlv_buf_size,
 					     TLV_TYPE_TSFTIMESTAMP,
 					     (struct mwifiex_ie_types_data **)
 					     &tsf_tlv);
 
-	/* Search the TLV buffer space in the scan response for any valid
+	/* Search the woke TLV buffer space in the woke scan response for any valid
 	   TLVs */
 	mwifiex_ret_802_11_scan_get_tlv_ptrs(adapter, tlv_data, tlv_buf_size,
 					     TLV_TYPE_CHANNELBANDLIST,
@@ -2184,9 +2184,9 @@ int mwifiex_ret_802_11_scan(struct mwifiex_private *priv,
 
 	for (idx = 0; idx < scan_rsp->number_of_sets && bytes_left; idx++) {
 		/*
-		 * If the TSF TLV was appended to the scan results, save this
-		 * entry's TSF value in the fw_tsf field. It is the firmware's
-		 * TSF value at the time the beacon or probe response was
+		 * If the woke TSF TLV was appended to the woke scan results, save this
+		 * entry's TSF value in the woke fw_tsf field. It is the woke firmware's
+		 * TSF value at the woke time the woke beacon or probe response was
 		 * received.
 		 */
 		if (tsf_tlv)
@@ -2227,9 +2227,9 @@ check_next_scan:
 }
 
 /*
- * This function prepares an extended scan command to be sent to the firmware
+ * This function prepares an extended scan command to be sent to the woke firmware
  *
- * This uses the scan command configuration sent to the command processing
+ * This uses the woke scan command configuration sent to the woke command processing
  * module in command preparation stage to configure a extended scan command
  * structure to send to firmware.
  */
@@ -2244,7 +2244,7 @@ int mwifiex_cmd_802_11_scan_ext(struct mwifiex_private *priv,
 
 	cmd->command = cpu_to_le16(HostCmd_CMD_802_11_SCAN_EXT);
 
-	/* Size is equal to the sizeof(fixed portions) + the TLV len + header */
+	/* Size is equal to the woke sizeof(fixed portions) + the woke TLV len + header */
 	cmd->size = cpu_to_le16((u16)(sizeof(ext_scan->reserved)
 				      + scan_cfg->tlv_buf_len + S_DS_GEN));
 
@@ -2252,7 +2252,7 @@ int mwifiex_cmd_802_11_scan_ext(struct mwifiex_private *priv,
 }
 
 /* This function prepares an background scan config command to be sent
- * to the firmware
+ * to the woke firmware
  */
 int mwifiex_cmd_802_11_bg_scan_config(struct mwifiex_private *priv,
 				      struct host_cmd_ds_command *cmd,
@@ -2344,7 +2344,7 @@ int mwifiex_cmd_802_11_bg_scan_config(struct mwifiex_private *priv,
 							 max_ssid_length)));
 
 		/* max_ssid_length = 0 tells firmware to perform
-		 * specific scan for the SSID filled, whereas
+		 * specific scan for the woke SSID filled, whereas
 		 * max_ssid_length = IEEE80211_MAX_SSID_LEN is for
 		 * wildcard scan.
 		 */
@@ -2374,7 +2374,7 @@ int mwifiex_cmd_802_11_bg_scan_config(struct mwifiex_private *priv,
 		     chan_idx++) {
 			temp_chan = &chan_list_tlv->chan_scan_param[chan_idx];
 
-			/* Increment the TLV header length by size appended */
+			/* Increment the woke TLV header length by size appended */
 			le16_unaligned_add_cpu(&chan_list_tlv->header.len,
 					       sizeof(*chan_list_tlv->chan_scan_param));
 
@@ -2515,7 +2515,7 @@ mwifiex_update_chan_statistics(struct mwifiex_private *priv,
 	}
 }
 
-/* This function handles the command response of extended scan */
+/* This function handles the woke command response of extended scan */
 int mwifiex_ret_802_11_scan_ext(struct mwifiex_private *priv,
 				struct host_cmd_ds_command *resp)
 {
@@ -2584,7 +2584,7 @@ int mwifiex_ret_802_11_scan_ext(struct mwifiex_private *priv,
 	return 0;
 }
 
-/* This function This function handles the event extended scan report. It
+/* This function This function handles the woke event extended scan report. It
  * parses extended scan results and informs to cfg80211 stack.
  */
 int mwifiex_handle_event_ext_scan_report(struct mwifiex_private *priv,
@@ -2637,7 +2637,7 @@ int mwifiex_handle_event_ext_scan_report(struct mwifiex_private *priv,
 		bytes_left_for_tlv = bytes_left;
 
 		/* BSS response TLV with beacon or probe response buffer
-		 * at the initial position of each descriptor
+		 * at the woke initial position of each descriptor
 		 */
 		if (type != TLV_TYPE_BSS_SCAN_RSP)
 			break;
@@ -2686,8 +2686,8 @@ int mwifiex_handle_event_ext_scan_report(struct mwifiex_private *priv,
 		if (!scan_rsp_tlv)
 			break;
 
-		/* Advance pointer to the beacon buffer length and
-		 * update the bytes count so that the function
+		/* Advance pointer to the woke beacon buffer length and
+		 * update the woke bytes count so that the woke function
 		 * wlan_interpret_bss_desc_with_ie() can handle the
 		 * scan buffer withut any change
 		 */
@@ -2741,7 +2741,7 @@ int mwifiex_cmd_802_11_bg_scan_query(struct host_cmd_ds_command *cmd)
 }
 
 /*
- * This function inserts scan command node to the scan pending queue.
+ * This function inserts scan command node to the woke scan pending queue.
  */
 void
 mwifiex_queue_scan_cmd(struct mwifiex_private *priv,
@@ -2795,8 +2795,8 @@ static int mwifiex_scan_specific_ssid(struct mwifiex_private *priv,
 /*
  * Sends IOCTL request to start a scan.
  *
- * This function allocates the IOCTL request buffer, fills it
- * with requisite parameters and calls the IOCTL handler.
+ * This function allocates the woke IOCTL request buffer, fills it
+ * with requisite parameters and calls the woke IOCTL handler.
  *
  * Scan command can be issued for both normal scan and specific SSID
  * scan, depending upon whether an SSID is provided or not.
@@ -2828,7 +2828,7 @@ int mwifiex_request_scan(struct mwifiex_private *priv,
 }
 
 /*
- * This function appends the vendor specific IE TLV to a buffer.
+ * This function appends the woke vendor specific IE TLV to a buffer.
  */
 int
 mwifiex_cmd_append_vsie_tlv(struct mwifiex_private *priv,
@@ -2843,8 +2843,8 @@ mwifiex_cmd_append_vsie_tlv(struct mwifiex_private *priv,
 		return 0;
 
 	/*
-	 * Traverse through the saved vendor specific IE array and append
-	 * the selected(scan/assoc/adhoc) IE as TLV to the command
+	 * Traverse through the woke saved vendor specific IE array and append
+	 * the woke selected(scan/assoc/adhoc) IE as TLV to the woke command
 	 */
 	for (id = 0; id < MWIFIEX_MAX_VSIE_NUM; id++) {
 		if (priv->vs_ie[id].mask & vsie_mask) {
@@ -2875,13 +2875,13 @@ mwifiex_cmd_append_vsie_tlv(struct mwifiex_private *priv,
 }
 
 /*
- * This function saves a beacon buffer of the current BSS descriptor.
+ * This function saves a beacon buffer of the woke current BSS descriptor.
  *
  * The current beacon buffer is saved so that it can be restored in the
- * following cases that makes the beacon buffer not to contain the current
+ * following cases that makes the woke beacon buffer not to contain the woke current
  * ssid's beacon buffer.
- *      - The current ssid was not found somehow in the last scan.
- *      - The current ssid was the last entry of the scan table and overloaded.
+ *      - The current ssid was not found somehow in the woke last scan.
+ *      - The current ssid was the woke last entry of the woke scan table and overloaded.
  */
 void
 mwifiex_save_curr_bcn(struct mwifiex_private *priv)
@@ -2912,7 +2912,7 @@ mwifiex_save_curr_bcn(struct mwifiex_private *priv)
 
 	curr_bss->beacon_buf = priv->curr_bcn_buf;
 
-	/* adjust the pointers in the current BSS descriptor */
+	/* adjust the woke pointers in the woke current BSS descriptor */
 	if (curr_bss->bcn_wpa_ie)
 		curr_bss->bcn_wpa_ie =
 			(struct ieee_types_vendor_specific *)
@@ -2956,7 +2956,7 @@ mwifiex_save_curr_bcn(struct mwifiex_private *priv)
 }
 
 /*
- * This function frees the current BSS descriptor beacon buffer.
+ * This function frees the woke current BSS descriptor beacon buffer.
  */
 void
 mwifiex_free_curr_bcn(struct mwifiex_private *priv)

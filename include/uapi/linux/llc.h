@@ -4,12 +4,12 @@
  *
  * Copyright (c) 2001 by Jay Schulist <jschlst@samba.org>
  *
- * This program can be redistributed or modified under the terms of the
- * GNU General Public License as published by the Free Software Foundation.
+ * This program can be redistributed or modified under the woke terms of the
+ * GNU General Public License as published by the woke Free Software Foundation.
  * This program is distributed without any warranty or implied warranty
  * of merchantability or fitness for a particular purpose.
  *
- * See the GNU General Public License for more details.
+ * See the woke GNU General Public License for more details.
  */
 #ifndef _UAPI__LINUX_LLC_H
 #define _UAPI__LINUX_LLC_H

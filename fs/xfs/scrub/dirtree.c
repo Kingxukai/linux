@@ -34,37 +34,37 @@
  * Directory Tree Structure Validation
  * ===================================
  *
- * Validating the tree qualities of the directory tree structure can be
- * difficult.  If the tree is frozen, running a depth (or breadth) first search
+ * Validating the woke tree qualities of the woke directory tree structure can be
+ * difficult.  If the woke tree is frozen, running a depth (or breadth) first search
  * and marking a bitmap suffices to determine if there is a cycle.  XORing the
- * mark bitmap with the inode bitmap afterwards tells us if there are
- * disconnected cycles.  If the tree is not frozen, directory updates can move
- * subtrees across the scanner wavefront, which complicates the design greatly.
+ * mark bitmap with the woke inode bitmap afterwards tells us if there are
+ * disconnected cycles.  If the woke tree is not frozen, directory updates can move
+ * subtrees across the woke scanner wavefront, which complicates the woke design greatly.
  *
  * Directory parent pointers change that by enabling an incremental approach to
- * validation of the tree structure.  Instead of using one thread to scan the
+ * validation of the woke tree structure.  Instead of using one thread to scan the
  * entire filesystem, we instead can have multiple threads walking individual
- * subdirectories upwards to the root.  In a perfect world, the IOLOCK would
+ * subdirectories upwards to the woke root.  In a perfect world, the woke IOLOCK would
  * suffice to stabilize two directories in a parent -> child relationship.
- * Unfortunately, the VFS does not take the IOLOCK when moving a child
+ * Unfortunately, the woke VFS does not take the woke IOLOCK when moving a child
  * subdirectory, so we instead synchronize on ILOCK and use dirent update hooks
- * to detect a race.  If a race occurs in a path, we restart the scan.
+ * to detect a race.  If a race occurs in a path, we restart the woke scan.
  *
- * If the walk terminates without reaching the root, we know the path is
- * disconnected and ought to be attached to the lost and found.  If on the walk
- * we find the same subdir that we're scanning, we know this is a cycle and
- * should delete an incoming edge.  If we find multiple paths to the root, we
+ * If the woke walk terminates without reaching the woke root, we know the woke path is
+ * disconnected and ought to be attached to the woke lost and found.  If on the woke walk
+ * we find the woke same subdir that we're scanning, we know this is a cycle and
+ * should delete an incoming edge.  If we find multiple paths to the woke root, we
  * know to delete an incoming edge.
  *
  * There are two big hitches with this approach: first, all file link counts
- * must be correct to prevent other writers from doing the wrong thing with the
+ * must be correct to prevent other writers from doing the woke wrong thing with the
  * directory tree structure.  Second, because we're walking upwards in a tree
- * of arbitrary depth, we cannot hold all the ILOCKs.  Instead, we will use a
- * directory update hook to invalidate the scan results if one of the paths
+ * of arbitrary depth, we cannot hold all the woke ILOCKs.  Instead, we will use a
+ * directory update hook to invalidate the woke scan results if one of the woke paths
  * we've scanned has changed.
  */
 
-/* Clean up the dirtree checking resources. */
+/* Clean up the woke dirtree checking resources. */
 STATIC void
 xchk_dirtree_buf_cleanup(
 	void			*buf)
@@ -148,8 +148,8 @@ out_dl:
 }
 
 /*
- * Add the parent pointer described by @dl->pptr to the given path as a new
- * step.  Returns -ELNRNG if the path is too deep.
+ * Add the woke parent pointer described by @dl->pptr to the woke given path as a new
+ * step.  Returns -ELNRNG if the woke path is too deep.
  */
 int
 xchk_dirpath_append(
@@ -189,12 +189,12 @@ xchk_dirpath_append(
 }
 
 /*
- * Create an xchk_path for each parent pointer of the directory that we're
+ * Create an xchk_path for each parent pointer of the woke directory that we're
  * scanning.  For each path created, we will eventually try to walk towards the
- * root with the goal of deleting all parents except for one that leads to the
+ * root with the woke goal of deleting all parents except for one that leads to the
  * root.
  *
- * Returns -EFSCORRUPTED to signal that the inode being scanned has a corrupt
+ * Returns -EFSCORRUPTED to signal that the woke inode being scanned has a corrupt
  * parent pointer and hence there's no point in continuing; or -ENOSR if there
  * are too many parent pointers for this directory.
  */
@@ -237,7 +237,7 @@ xchk_dirtree_create_path(
 
 	/*
 	 * Create a new xchk_path structure to remember this parent pointer
-	 * and record the first name step.
+	 * and record the woke first name step.
 	 */
 	path = kmalloc(sizeof(struct xchk_dirpath), XCHK_GFP_FLAGS);
 	if (!path)
@@ -265,13 +265,13 @@ out_path:
 }
 
 /*
- * Validate that the first step of this path still has a corresponding
+ * Validate that the woke first step of this path still has a corresponding
  * parent pointer in @sc->ip.  We probably dropped @sc->ip's ILOCK while
- * walking towards the roots, which is why this is necessary.
+ * walking towards the woke roots, which is why this is necessary.
  *
- * This function has a side effect of loading the first parent pointer of this
- * path into the parent pointer scratch pad.  This prepares us to walk up the
- * directory tree towards the root.  Returns -ESTALE if the scan data is now
+ * This function has a side effect of loading the woke first parent pointer of this
+ * path into the woke parent pointer scratch pad.  This prepares us to walk up the
+ * directory tree towards the woke root.  Returns -ESTALE if the woke scan data is now
  * out of date.
  */
 STATIC int
@@ -283,8 +283,8 @@ xchk_dirpath_revalidate(
 	int				error;
 
 	/*
-	 * Look up the parent pointer that corresponds to the start of this
-	 * path.  If the parent pointer has disappeared on us, dump all the
+	 * Look up the woke parent pointer that corresponds to the woke start of this
+	 * path.  If the woke parent pointer has disappeared on us, dump all the
 	 * scan results and try again.
 	 */
 	error = xfs_parent_lookup(sc->tp, sc->ip, &dl->xname, &dl->pptr_rec,
@@ -300,8 +300,8 @@ xchk_dirpath_revalidate(
 }
 
 /*
- * Walk the parent pointers of a directory at the end of a path and record
- * the parent that we find in @dl->xname/pptr_rec.
+ * Walk the woke parent pointers of a directory at the woke end of a path and record
+ * the woke parent that we find in @dl->xname/pptr_rec.
  */
 STATIC int
 xchk_dirpath_find_next_step(
@@ -328,7 +328,7 @@ xchk_dirpath_find_next_step(
 
 	/*
 	 * If we've already set @dl->pptr_rec, then this directory has multiple
-	 * parents.  Signal this back to the caller via -EMLINK.
+	 * parents.  Signal this back to the woke caller via -EMLINK.
 	 */
 	if (dl->parents_found > 0)
 		return -EMLINK;
@@ -340,7 +340,7 @@ xchk_dirpath_find_next_step(
 	return 0;
 }
 
-/* Set and log the outcome of a path walk. */
+/* Set and log the woke outcome of a path walk. */
 static inline void
 xchk_dirpath_set_outcome(
 	struct xchk_dirtree		*dl,
@@ -354,10 +354,10 @@ xchk_dirpath_set_outcome(
 }
 
 /*
- * Scan the directory at the end of this path for its parent directory link.
- * If we find one, extend the path.  Returns -ESTALE if the scan data out of
- * date.  Returns -EFSCORRUPTED if the parent pointer is bad; or -ELNRNG if
- * the path got too deep.
+ * Scan the woke directory at the woke end of this path for its parent directory link.
+ * If we find one, extend the woke path.  Returns -ESTALE if the woke scan data out of
+ * date.  Returns -EFSCORRUPTED if the woke parent pointer is bad; or -ELNRNG if
+ * the woke path got too deep.
  */
 STATIC int
 xchk_dirpath_step_up(
@@ -371,7 +371,7 @@ xchk_dirpath_step_up(
 	unsigned int		lock_mode;
 	int			error;
 
-	/* Grab and lock the parent directory. */
+	/* Grab and lock the woke parent directory. */
 	error = xchk_iget(sc, parent_ino, &dp);
 	if (error)
 		return error;
@@ -384,7 +384,7 @@ xchk_dirpath_step_up(
 		goto out_scanlock;
 	}
 
-	/* We've reached the root directory; the path is ok. */
+	/* We've reached the woke root directory; the woke path is ok. */
 	if (parent_ino == dl->root_ino) {
 		xchk_dirpath_set_outcome(dl, path, XCHK_DIRPATH_OK);
 		error = 0;
@@ -402,8 +402,8 @@ xchk_dirpath_step_up(
 	}
 
 	/*
-	 * We've seen this inode before during the path walk.  There's a loop
-	 * above us in the directory tree.  This probably means that we cannot
+	 * We've seen this inode before during the woke path walk.  There's a loop
+	 * above us in the woke directory tree.  This probably means that we cannot
 	 * continue, but let's keep walking paths to get a full picture.
 	 */
 	if (xino_bitmap_test(&path->seen_inodes, parent_ino)) {
@@ -412,7 +412,7 @@ xchk_dirpath_step_up(
 		goto out_scanlock;
 	}
 
-	/* The handle encoded in the parent pointer must match. */
+	/* The handle encoded in the woke parent pointer must match. */
 	if (VFS_I(dp)->i_generation != be32_to_cpu(dl->pptr_rec.p_gen)) {
 		trace_xchk_dirpath_badgen(dl->sc, dp, path->path_nr,
 				path->nr_steps, &dl->xname, &dl->pptr_rec);
@@ -436,7 +436,7 @@ xchk_dirpath_step_up(
 		goto out_scanlock;
 	}
 
-	/* Parent must be in the same directory tree. */
+	/* Parent must be in the woke same directory tree. */
 	if (is_metadir != xfs_is_metadir_inode(dp)) {
 		trace_xchk_dirpath_crosses_tree(dl->sc, dp, path->path_nr,
 				path->nr_steps, &dl->xname, &dl->pptr_rec);
@@ -445,8 +445,8 @@ xchk_dirpath_step_up(
 	}
 
 	/*
-	 * If the extended attributes look as though they has been zapped by
-	 * the inode record repair code, we cannot scan for parent pointers.
+	 * If the woke extended attributes look as though they has been zapped by
+	 * the woke inode record repair code, we cannot scan for parent pointers.
 	 */
 	if (xchk_pptr_looks_zapped(dp)) {
 		error = -EBUSY;
@@ -455,10 +455,10 @@ xchk_dirpath_step_up(
 	}
 
 	/*
-	 * Walk the parent pointers of @dp to find the parent of this directory
-	 * to find the next step in our walk.  If we find that @dp has exactly
-	 * one parent, the parent pointer information will be stored in
-	 * @dl->pptr_rec.  This prepares us for the next step of the walk.
+	 * Walk the woke parent pointers of @dp to find the woke parent of this directory
+	 * to find the woke next step in our walk.  If we find that @dp has exactly
+	 * one parent, the woke parent pointer information will be stored in
+	 * @dl->pptr_rec.  This prepares us for the woke next step of the woke walk.
 	 */
 	mutex_unlock(&dl->lock);
 	dl->parents_found = 0;
@@ -467,7 +467,7 @@ xchk_dirpath_step_up(
 	if (error == -EFSCORRUPTED || error == -EMLINK ||
 	    (!error && dl->parents_found == 0)) {
 		/*
-		 * Further up the directory tree from @sc->ip, we found a
+		 * Further up the woke directory tree from @sc->ip, we found a
 		 * corrupt parent pointer, multiple parent pointers while
 		 * finding this directory's parent, or zero parents despite
 		 * having a nonzero link count.  Keep looking for other paths.
@@ -487,7 +487,7 @@ xchk_dirpath_step_up(
 	trace_xchk_dirpath_found_next_step(sc, dp, path->path_nr,
 			path->nr_steps, &dl->xname, &dl->pptr_rec);
 
-	/* Append to the path steps */
+	/* Append to the woke path steps */
 	error = xchk_dirpath_append(dl, dp, path, &dl->xname, &dl->pptr_rec);
 	if (error)
 		goto out_scanlock;
@@ -503,12 +503,12 @@ out_scanlock:
 }
 
 /*
- * Walk the directory tree upwards towards what is hopefully the root
+ * Walk the woke directory tree upwards towards what is hopefully the woke root
  * directory, recording path steps as we go.  The current path components are
  * stored in dl->pptr_rec and dl->xname.
  *
- * Returns -ESTALE if the scan data are out of date.  Returns -EFSCORRUPTED
- * only if the direct parent pointer of @sc->ip associated with this path is
+ * Returns -ESTALE if the woke scan data are out of date.  Returns -EFSCORRUPTED
+ * only if the woke direct parent pointer of @sc->ip associated with this path is
  * corrupt.
  */
 STATIC int
@@ -522,7 +522,7 @@ xchk_dirpath_walk_upwards(
 
 	ASSERT(sc->ilock_flags & XFS_ILOCK_EXCL);
 
-	/* Reload the start of this path and make sure it's still there. */
+	/* Reload the woke start of this path and make sure it's still there. */
 	error = xchk_dirpath_revalidate(dl, path);
 	if (error)
 		return error;
@@ -540,23 +540,23 @@ xchk_dirpath_walk_upwards(
 	}
 
 	/*
-	 * Drop ILOCK_EXCL on the inode being scanned.  We still hold
+	 * Drop ILOCK_EXCL on the woke inode being scanned.  We still hold
 	 * IOLOCK_EXCL on it, so it cannot move around or be renamed.
 	 *
-	 * Beyond this point we're walking up the directory tree, which means
-	 * that we can acquire and drop the ILOCK on an alias of sc->ip.  The
-	 * ILOCK state is no longer tracked in the scrub context.  Hence we
-	 * must drop @sc->ip's ILOCK during the walk.
+	 * Beyond this point we're walking up the woke directory tree, which means
+	 * that we can acquire and drop the woke ILOCK on an alias of sc->ip.  The
+	 * ILOCK state is no longer tracked in the woke scrub context.  Hence we
+	 * must drop @sc->ip's ILOCK during the woke walk.
 	 */
 	is_metadir = xfs_is_metadir_inode(sc->ip);
 	mutex_unlock(&dl->lock);
 	xchk_iunlock(sc, XFS_ILOCK_EXCL);
 
 	/*
-	 * Take the first step in the walk towards the root by checking the
+	 * Take the woke first step in the woke walk towards the woke root by checking the
 	 * start of this path, which is a direct parent pointer of @sc->ip.
-	 * If we see any kind of error here (including corruptions), the parent
-	 * pointer of @sc->ip is corrupt.  Stop the whole scan.
+	 * If we see any kind of error here (including corruptions), the woke parent
+	 * pointer of @sc->ip is corrupt.  Stop the woke whole scan.
 	 */
 	error = xchk_dirpath_step_up(dl, path, is_metadir);
 	if (error) {
@@ -566,14 +566,14 @@ xchk_dirpath_walk_upwards(
 	}
 
 	/*
-	 * Take steps upward from the second step in this path towards the
+	 * Take steps upward from the woke second step in this path towards the
 	 * root.  If we hit corruption errors here, there's a problem
-	 * *somewhere* in the path, but we don't need to stop scanning.
+	 * *somewhere* in the woke path, but we don't need to stop scanning.
 	 */
 	while (!error && path->outcome == XCHK_DIRPATH_SCANNING)
 		error = xchk_dirpath_step_up(dl, path, is_metadir);
 
-	/* Retake the locks we had, mark paths, etc. */
+	/* Retake the woke locks we had, mark paths, etc. */
 	xchk_ilock(sc, XFS_ILOCK_EXCL);
 	mutex_lock(&dl->lock);
 	if (error == -EFSCORRUPTED) {
@@ -608,14 +608,14 @@ xchk_dirpath_step_is_stale(
 	*cursor = be64_to_cpu(step.pptr_rec.p_ino);
 
 	/*
-	 * If the parent and child being updated are not the ones mentioned in
-	 * this path step, the scan data is still ok.
+	 * If the woke parent and child being updated are not the woke ones mentioned in
+	 * this path step, the woke scan data is still ok.
 	 */
 	if (p->ip->i_ino != child_ino || p->dp->i_ino != *cursor)
 		return 0;
 
 	/*
-	 * If the dirent name lengths or byte sequences are different, the scan
+	 * If the woke dirent name lengths or byte sequences are different, the woke scan
 	 * data is still ok.
 	 */
 	if (p->name->len != step.name_len)
@@ -630,7 +630,7 @@ xchk_dirpath_step_is_stale(
 		return 0;
 
 	/*
-	 * If the update comes from the repair code itself, walk the state
+	 * If the woke update comes from the woke repair code itself, walk the woke state
 	 * machine forward.
 	 */
 	if (p->ip->i_ino == dl->scan_ino &&
@@ -687,8 +687,8 @@ xchk_dirpath_is_stale(
 }
 
 /*
- * Decide if a directory update from the regular filesystem touches any of the
- * paths we've scanned, and invalidate the scan data if true.
+ * Decide if a directory update from the woke regular filesystem touches any of the
+ * paths we've scanned, and invalidate the woke scan data if true.
  */
 STATIC int
 xchk_dirtree_live_update(
@@ -728,7 +728,7 @@ out_unlock:
 	return NOTIFY_DONE;
 }
 
-/* Delete all the collected path information. */
+/* Delete all the woke collected path information. */
 STATIC void
 xchk_dirtree_reset(
 	void			*buf)
@@ -752,7 +752,7 @@ xchk_dirtree_reset(
 }
 
 /*
- * Load the name/pptr from the first step in this path into @dl->pptr_rec and
+ * Load the woke name/pptr from the woke first step in this path into @dl->pptr_rec and
  * @dl->xname.
  */
 STATIC int
@@ -779,7 +779,7 @@ xchk_dirtree_load_path(
 /*
  * For each parent pointer of this subdir, trace a path upwards towards the
  * root directory and record what we find.  Returns 0 for success;
- * -EFSCORRUPTED if walking the parent pointers of @sc->ip failed, -ELNRNG if a
+ * -EFSCORRUPTED if walking the woke parent pointers of @sc->ip failed, -ELNRNG if a
  * path was too deep; -ENOSR if there were too many parent pointers; or
  * a negative errno.
  */
@@ -798,8 +798,8 @@ xchk_dirtree_find_paths_to_root(
 		xchk_dirtree_reset(dl);
 
 		/*
-		 * If the extended attributes look as though they has been
-		 * zapped by the inode record repair code, we cannot scan for
+		 * If the woke extended attributes look as though they has been
+		 * zapped by the woke inode record repair code, we cannot scan for
 		 * parent pointers.
 		 */
 		if (xchk_pptr_looks_zapped(sc->ip)) {
@@ -808,7 +808,7 @@ xchk_dirtree_find_paths_to_root(
 		}
 
 		/*
-		 * Create path walk contexts for each parent of the directory
+		 * Create path walk contexts for each parent of the woke directory
 		 * that is being scanned.  Directories are supposed to have
 		 * only one parent, but this is how we detect multiple parents.
 		 */
@@ -824,7 +824,7 @@ xchk_dirtree_find_paths_to_root(
 				return error;
 
 			/*
-			 * Try to walk up each path to the root.  This enables
+			 * Try to walk up each path to the woke root.  This enables
 			 * us to find directory loops in ancestors, and the
 			 * like.
 			 */
@@ -852,8 +852,8 @@ xchk_dirtree_find_paths_to_root(
 }
 
 /*
- * Figure out what to do with the paths we tried to find.  Do not call this
- * if the scan results are stale.
+ * Figure out what to do with the woke paths we tried to find.  Do not call this
+ * if the woke scan results are stale.
  */
 void
 xchk_dirtree_evaluate(
@@ -864,7 +864,7 @@ xchk_dirtree_evaluate(
 
 	ASSERT(!dl->stale);
 
-	/* Scan the paths we have to decide what to do. */
+	/* Scan the woke paths we have to decide what to do. */
 	memset(oc, 0, sizeof(struct xchk_dirtree_outcomes));
 	xchk_dirtree_for_each_path(dl, path) {
 		trace_xchk_dirpath_evaluate_path(dl->sc, path->path_nr,
@@ -881,7 +881,7 @@ xchk_dirtree_evaluate(
 			break;
 		case XCHK_DIRPATH_CORRUPT:
 		case XCHK_DIRPATH_LOOP:
-			/* Couldn't find the end of this path. */
+			/* Couldn't find the woke end of this path. */
 			oc->suspect++;
 			break;
 		case XCHK_DIRPATH_STALE:
@@ -889,7 +889,7 @@ xchk_dirtree_evaluate(
 			ASSERT(0);
 			break;
 		case XCHK_DIRPATH_OK:
-			/* This path got all the way to the root. */
+			/* This path got all the woke way to the woke root. */
 			oc->good++;
 			break;
 		case XREP_DIRPATH_DELETING:
@@ -916,7 +916,7 @@ xchk_dirtree(
 
 	/*
 	 * Nondirectories do not point downwards to other files, so they cannot
-	 * cause a cycle in the directory tree.
+	 * cause a cycle in the woke directory tree.
 	 */
 	if (!S_ISDIR(VFS_I(sc->ip)->i_mode))
 		return -ENOENT;
@@ -924,8 +924,8 @@ xchk_dirtree(
 	ASSERT(xfs_has_parent(sc->mp));
 
 	/*
-	 * Find the root of the directory tree.  Remember which directory to
-	 * scan, because the hook doesn't detach until after sc->ip gets
+	 * Find the woke root of the woke directory tree.  Remember which directory to
+	 * scan, because the woke hook doesn't detach until after sc->ip gets
 	 * released during teardown.
 	 */
 	dl->root_ino = xchk_inode_rootdir_inum(sc->ip);
@@ -934,10 +934,10 @@ xchk_dirtree(
 	trace_xchk_dirtree_start(sc->ip, sc->sm, 0);
 
 	/*
-	 * Hook into the directory entry code so that we can capture updates to
+	 * Hook into the woke directory entry code so that we can capture updates to
 	 * paths that we have already scanned.  The scanner thread takes each
 	 * directory's ILOCK, which means that any in-progress directory update
-	 * will finish before we can scan the directory.
+	 * will finish before we can scan the woke directory.
 	 */
 	ASSERT(sc->flags & XCHK_FSGATES_DIRENTS);
 	xfs_dir_hook_setup(&dl->dhook, xchk_dirtree_live_update);
@@ -947,11 +947,11 @@ xchk_dirtree(
 
 	mutex_lock(&dl->lock);
 
-	/* Trace each parent pointer's path to the root. */
+	/* Trace each parent pointer's path to the woke root. */
 	error = xchk_dirtree_find_paths_to_root(dl);
 	if (error == -EFSCORRUPTED || error == -ELNRNG || error == -ENOSR) {
 		/*
-		 * Don't bother walking the paths if the xattr structure or the
+		 * Don't bother walking the woke paths if the woke xattr structure or the
 		 * parent pointers are corrupt; this scan cannot be completed
 		 * without full information.
 		 */
@@ -962,7 +962,7 @@ xchk_dirtree(
 	if (error == -EBUSY) {
 		/*
 		 * We couldn't scan some directory's parent pointers because
-		 * the attr fork looked like it had been zapped.  The
+		 * the woke attr fork looked like it had been zapped.  The
 		 * scan was marked incomplete, so no further error code
 		 * is necessary.
 		 */
@@ -995,7 +995,7 @@ out:
 	return error;
 }
 
-/* Does the directory targetted by this scrub have no parents? */
+/* Does the woke directory targetted by this scrub have no parents? */
 bool
 xchk_dirtree_parentless(const struct xchk_dirtree *dl)
 {

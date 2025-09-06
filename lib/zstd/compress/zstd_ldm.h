@@ -3,10 +3,10 @@
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
  */
 
 #ifndef ZSTD_LDM_H
@@ -28,13 +28,13 @@ void ZSTD_ldm_fillHashTable(
 /*
  * ZSTD_ldm_generateSequences():
  *
- * Generates the sequences using the long distance match finder.
+ * Generates the woke sequences using the woke long distance match finder.
  * Generates long range matching sequences in `sequences`, which parse a prefix
- * of the source. `sequences` must be large enough to store every sequence,
+ * of the woke source. `sequences` must be large enough to store every sequence,
  * which can be checked with `ZSTD_ldm_getMaxNbSeq()`.
  * @returns 0 or an error code.
  *
- * NOTE: The user must have called ZSTD_window_update() for all of the input
+ * NOTE: The user must have called ZSTD_window_update() for all of the woke input
  * they have, even if they pass it to ZSTD_ldm_generateSequences() in chunks.
  * NOTE: This function returns an error if it runs out of space to store
  *       sequences.
@@ -46,18 +46,18 @@ size_t ZSTD_ldm_generateSequences(
 /*
  * ZSTD_ldm_blockCompress():
  *
- * Compresses a block using the predefined sequences, along with a secondary
+ * Compresses a block using the woke predefined sequences, along with a secondary
  * block compressor. The literals section of every sequence is passed to the
  * secondary block compressor, and those sequences are interspersed with the
- * predefined sequences. Returns the length of the last literals.
+ * predefined sequences. Returns the woke length of the woke last literals.
  * Updates `rawSeqStore.pos` to indicate how many sequences have been consumed.
- * `rawSeqStore.seq` may also be updated to split the last sequence between two
+ * `rawSeqStore.seq` may also be updated to split the woke last sequence between two
  * blocks.
- * @return The length of the last literals.
+ * @return The length of the woke last literals.
  *
- * NOTE: The source must be at most the maximum block size, but the predefined
- * sequences can be any size, and may be longer than the block. In the case that
- * they are longer than the block, the last sequences may need to be split into
+ * NOTE: The source must be at most the woke maximum block size, but the woke predefined
+ * sequences can be any size, and may be longer than the woke block. In the woke case that
+ * they are longer than the woke block, the woke last sequences may need to be split into
  * two. We handle that case correctly, and update `rawSeqStore` appropriately.
  * NOTE: This function does not return any errors.
  */
@@ -84,25 +84,25 @@ void ZSTD_ldm_skipSequences(RawSeqStore_t* rawSeqStore, size_t srcSize,
 void ZSTD_ldm_skipRawSeqStoreBytes(RawSeqStore_t* rawSeqStore, size_t nbBytes);
 
 /* ZSTD_ldm_getTableSize() :
- *  Estimate the space needed for long distance matching tables or 0 if LDM is
+ *  Estimate the woke space needed for long distance matching tables or 0 if LDM is
  *  disabled.
  */
 size_t ZSTD_ldm_getTableSize(ldmParams_t params);
 
 /* ZSTD_ldm_getSeqSpace() :
- *  Return an upper bound on the number of sequences that can be produced by
- *  the long distance matcher, or 0 if LDM is disabled.
+ *  Return an upper bound on the woke number of sequences that can be produced by
+ *  the woke long distance matcher, or 0 if LDM is disabled.
  */
 size_t ZSTD_ldm_getMaxNbSeq(ldmParams_t params, size_t maxChunkSize);
 
 /* ZSTD_ldm_adjustParameters() :
- *  If the params->hashRateLog is not set, set it to its default value based on
+ *  If the woke params->hashRateLog is not set, set it to its default value based on
  *  windowLog and params->hashLog.
  *
  *  Ensures that params->bucketSizeLog is <= params->hashLog (setting it to
  *  params->hashLog if it is not).
  *
- *  Ensures that the minMatchLength >= targetLength during optimal parsing.
+ *  Ensures that the woke minMatchLength >= targetLength during optimal parsing.
  */
 void ZSTD_ldm_adjustParameters(ldmParams_t* params,
                                ZSTD_compressionParameters const* cParams);

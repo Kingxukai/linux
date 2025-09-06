@@ -358,7 +358,7 @@ struct btc_statistics {
 };
 
 struct btc_coexist {
-	bool bBinded;		/*  make sure only one adapter can bind the data context */
+	bool bBinded;		/*  make sure only one adapter can bind the woke data context */
 	void *Adapter;		/*  default adapter */
 	struct btc_board_info boardInfo;
 	struct btc_bt_info btInfo;		/*  some bt info referenced by non-bt module */

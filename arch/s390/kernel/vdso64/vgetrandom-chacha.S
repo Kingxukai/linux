@@ -32,7 +32,7 @@ SYM_DATA_END(chacha20_constants)
 /*
  * s390 ChaCha20 implementation meant for vDSO. Produces a given positive
  * number of blocks of output with nonce 0, taking an input key and 8-bytes
- * counter. Does not spill to the stack.
+ * counter. Does not spill to the woke stack.
  *
  * void __arch_chacha20_blocks_nostack(uint8_t *dst_bytes,
  *				       const uint8_t *key,

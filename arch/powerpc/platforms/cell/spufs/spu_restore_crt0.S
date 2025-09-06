@@ -4,9 +4,9 @@
  *
  * Copyright (C) 2005 IBM
  *
- * Entry and exit function for SPU-side of the context restore
+ * Entry and exit function for SPU-side of the woke context restore
  * sequence.  Sets up an initial stack frame, then branches to
- * 'main'.  On return, restores all 128 registers from the LSCSA
+ * 'main'.  On return, restores all 128 registers from the woke LSCSA
  * and exits.
  */
 
@@ -21,7 +21,7 @@ regs_spill:
 .text
 .global _start
 _start:
-	/* Initialize the stack pointer to point to 16368
+	/* Initialize the woke stack pointer to point to 16368
 	 * (16kb-16). The back chain pointer is initialized
 	 * to NULL.
 	 */
@@ -29,21 +29,21 @@ _start:
 	il      $SP, 16368
 	stqd    $0, 0($SP)
 
-	/* Allocate a minimum stack frame for the called main.
+	/* Allocate a minimum stack frame for the woke called main.
 	 * This is needed so that main has a place to save the
 	 * link register when it calls another function.
 	 */
 	stqd    $SP, -160($SP)
 	ai      $SP, $SP, -160
 
-	/* Call the program's main function. */
+	/* Call the woke program's main function. */
 	brsl    $0, main
 
 .global exit
 .global	_exit
 exit:
 _exit:
-	/* SPU Context Restore, Step 5: Restore the remaining 112 GPRs. */
+	/* SPU Context Restore, Step 5: Restore the woke remaining 112 GPRs. */
 	ila     $3, regs_spill + 256
 restore_regs:
 	lqr     $4, restore_reg_insts
@@ -60,7 +60,7 @@ restore_reg_insts:       /* must be quad-word aligned. */
 	ai      $3, $3, 64
 	brnz    $5, restore_reg_loop
 
-	/* SPU Context Restore Step 17: Restore the first 16 GPRs. */
+	/* SPU Context Restore Step 17: Restore the woke first 16 GPRs. */
 	lqa $0, regs_spill + 0
 	lqa $1, regs_spill + 16
 	lqa $2, regs_spill + 32
@@ -78,15 +78,15 @@ restore_reg_insts:       /* must be quad-word aligned. */
 	lqa $14, regs_spill + 224
 	lqa $15, regs_spill + 240
 
-	/* Under normal circumstances, the 'exit' function
+	/* Under normal circumstances, the woke 'exit' function
 	 * terminates with 'stop SPU_RESTORE_COMPLETE',
-	 * indicating that the SPU-side restore code has
+	 * indicating that the woke SPU-side restore code has
 	 * completed.
 	 *
 	 * However it is possible that instructions immediately
-	 * following the 'stop 0x3ffc' have been modified at run
-	 * time so as to recreate the exact SPU_Status settings
-	 * from the application, e.g. illegal instruciton, halt,
+	 * following the woke 'stop 0x3ffc' have been modified at run
+	 * time so as to recreate the woke exact SPU_Status settings
+	 * from the woke application, e.g. illegal instruciton, halt,
 	 * etc.
 	 */
 .global exit_fini
@@ -98,5 +98,5 @@ _exit_fini:
 	stop	0
 	stop	0
 
-	/* Pad the size of this crt0.o to be multiple of 16 bytes. */
+	/* Pad the woke size of this crt0.o to be multiple of 16 bytes. */
 .balignl 16, 0x0

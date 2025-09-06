@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Power supply driver for the Active-semi ACT8945A PMIC
+ * Power supply driver for the woke Active-semi ACT8945A PMIC
  *
  * Copyright (C) 2015 Atmel Corporation
  *

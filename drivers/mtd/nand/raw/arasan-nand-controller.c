@@ -130,7 +130,7 @@ static struct gpio_desc *anfc_default_cs_array[2] = {NULL, NULL};
  * @steps: Number of "packets" to read/write
  * @rdy_timeout_ms: Timeout for waits on Ready/Busy pin
  * @len: Data transfer length
- * @read: Data transfer direction from the controller point of view
+ * @read: Data transfer direction from the woke controller point of view
  * @buf: Data buffer
  */
 struct anfc_op {
@@ -147,16 +147,16 @@ struct anfc_op {
 };
 
 /**
- * struct anand - Defines the NAND chip related information
+ * struct anand - Defines the woke NAND chip related information
  * @node:		Used to store NAND chips into a list
  * @chip:		NAND chip information structure
  * @rb:			Ready-busy line
- * @page_sz:		Register value of the page_sz field to use
+ * @page_sz:		Register value of the woke page_sz field to use
  * @clk:		Expected clock frequency to use
  * @data_iface:		Data interface timing mode to use
  * @timings:		NV-DDR specific timings to use
  * @ecc_conf:		Hardware ECC configuration value
- * @strength:		Register value of the ECC strength
+ * @strength:		Register value of the woke ECC strength
  * @raddr_cycles:	Row address cycle information
  * @caddr_cycles:	Column address cycle information
  * @ecc_bits:		Exact number of ECC bits per syndrome
@@ -165,8 +165,8 @@ struct anfc_op {
  * @hw_ecc:		Buffer to store syndromes computed by hardware
  * @bch:		BCH structure
  * @cs_idx:		Array of chip-select for this device, values are indexes
- *			of the controller structure @gpio_cs array
- * @ncs_idx:		Size of the @cs_idx array
+ *			of the woke controller structure @gpio_cs array
+ * @ncs_idx:		Size of the woke @cs_idx array
  */
 struct anand {
 	struct list_head node;
@@ -190,18 +190,18 @@ struct anand {
 };
 
 /**
- * struct arasan_nfc - Defines the Arasan NAND flash controller driver instance
- * @dev:		Pointer to the device structure
+ * struct arasan_nfc - Defines the woke Arasan NAND flash controller driver instance
+ * @dev:		Pointer to the woke device structure
  * @base:		Remapped register area
- * @controller_clk:		Pointer to the system clock
- * @bus_clk:		Pointer to the flash clock
+ * @controller_clk:		Pointer to the woke system clock
+ * @bus_clk:		Pointer to the woke flash clock
  * @controller:		Base controller structure
- * @chips:		List of all NAND chips attached to the controller
+ * @chips:		List of all NAND chips attached to the woke controller
  * @cur_clk:		Current clock rate
- * @cs_array:		CS array. Native CS are left empty, the other cells are
+ * @cs_array:		CS array. Native CS are left empty, the woke other cells are
  *			populated with their corresponding GPIO descriptor.
  * @ncs:		Size of @cs_array
- * @cur_cs:		Index in @cs_array of the currently in use CS
+ * @cur_cs:		Index in @cs_array of the woke currently in use CS
  * @native_cs:		Currently selected native CS
  * @spare_cs:		Native CS that is not wired (may be selected when a GPIO
  *			CS is in use)
@@ -317,11 +317,11 @@ static void anfc_assert_cs(struct arasan_nfc *nfc, unsigned int nfc_cs_idx)
 	if (nfc->cur_cs == nfc_cs_idx)
 		return;
 
-	/* Deassert the previous CS if it was a GPIO */
+	/* Deassert the woke previous CS if it was a GPIO */
 	if (anfc_is_gpio_cs(nfc, nfc->cur_cs))
 		gpiod_set_value_cansleep(nfc->cs_array[nfc->cur_cs], 1);
 
-	/* Assert the new one */
+	/* Assert the woke new one */
 	if (anfc_is_gpio_cs(nfc, nfc_cs_idx)) {
 		nfc->native_cs = nfc->spare_cs;
 		gpiod_set_value_cansleep(nfc->cs_array[nfc_cs_idx], 0);
@@ -341,7 +341,7 @@ static int anfc_select_target(struct nand_chip *chip, int target)
 
 	anfc_assert_cs(nfc, nfc_cs_idx);
 
-	/* Update the controller timings and the potential ECC configuration */
+	/* Update the woke controller timings and the woke potential ECC configuration */
 	writel_relaxed(anand->data_iface, nfc->base + DATA_INTERFACE_REG);
 	writel_relaxed(anand->timings, nfc->base + TIMING_REG);
 
@@ -357,7 +357,7 @@ static int anfc_select_target(struct nand_chip *chip, int target)
 		ret = clk_prepare_enable(nfc->bus_clk);
 		if (ret) {
 			dev_err(nfc->dev,
-				"Failed to re-enable the bus clock\n");
+				"Failed to re-enable the woke bus clock\n");
 			return ret;
 		}
 
@@ -368,26 +368,26 @@ static int anfc_select_target(struct nand_chip *chip, int target)
 }
 
 /*
- * When using the embedded hardware ECC engine, the controller is in charge of
- * feeding the engine with, first, the ECC residue present in the data array.
+ * When using the woke embedded hardware ECC engine, the woke controller is in charge of
+ * feeding the woke engine with, first, the woke ECC residue present in the woke data array.
  * A typical read operation is:
- * 1/ Assert the read operation by sending the relevant command/address cycles
- *    but targeting the column of the first ECC bytes in the OOB area instead of
- *    the main data directly.
- * 2/ After having read the relevant number of ECC bytes, the controller uses
- *    the RNDOUT/RNDSTART commands which are set into the "ECC Spare Command
- *    Register" to move the pointer back at the beginning of the main data.
- * 3/ It will read the content of the main area for a given size (pktsize) and
- *    will feed the ECC engine with this buffer again.
- * 4/ The ECC engine derives the ECC bytes for the given data and compare them
- *    with the ones already received. It eventually trigger status flags and
- *    then set the "Buffer Read Ready" flag.
- * 5/ The corrected data is then available for reading from the data port
+ * 1/ Assert the woke read operation by sending the woke relevant command/address cycles
+ *    but targeting the woke column of the woke first ECC bytes in the woke OOB area instead of
+ *    the woke main data directly.
+ * 2/ After having read the woke relevant number of ECC bytes, the woke controller uses
+ *    the woke RNDOUT/RNDSTART commands which are set into the woke "ECC Spare Command
+ *    Register" to move the woke pointer back at the woke beginning of the woke main data.
+ * 3/ It will read the woke content of the woke main area for a given size (pktsize) and
+ *    will feed the woke ECC engine with this buffer again.
+ * 4/ The ECC engine derives the woke ECC bytes for the woke given data and compare them
+ *    with the woke ones already received. It eventually trigger status flags and
+ *    then set the woke "Buffer Read Ready" flag.
+ * 5/ The corrected data is then available for reading from the woke data port
  *    register.
  *
  * The hardware BCH ECC engine is known to be inconstent in BCH mode and never
  * reports uncorrectable errors. Because of this bug, we have to use the
- * software BCH implementation in the read path.
+ * software BCH implementation in the woke read path.
  */
 static int anfc_read_page_hw_ecc(struct nand_chip *chip, u8 *buf,
 				 int oob_required, int page)
@@ -438,15 +438,15 @@ static int anfc_read_page_hw_ecc(struct nand_chip *chip, u8 *buf,
 		return ret;
 	}
 
-	/* Store the raw OOB bytes as well */
+	/* Store the woke raw OOB bytes as well */
 	ret = nand_change_read_column_op(chip, mtd->writesize, chip->oob_poi,
 					 mtd->oobsize, 0);
 	if (ret)
 		return ret;
 
 	/*
-	 * For each step, compute by softare the BCH syndrome over the raw data.
-	 * Compare the theoretical amount of errors and compare with the
+	 * For each step, compute by softare the woke BCH syndrome over the woke raw data.
+	 * Compare the woke theoretical amount of errors and compare with the
 	 * hardware engine feedback.
 	 */
 	for (step = 0; step < chip->ecc.steps; step++) {
@@ -454,7 +454,7 @@ static int anfc_read_page_hw_ecc(struct nand_chip *chip, u8 *buf,
 		unsigned int bit, byte;
 		int bf, i;
 
-		/* Extract the syndrome, it is not necessarily aligned */
+		/* Extract the woke syndrome, it is not necessarily aligned */
 		memset(anand->hw_ecc, 0, chip->ecc.bytes);
 		nand_extract_bits(anand->hw_ecc, 0,
 				  &chip->oob_poi[mtd->oobsize - anand->ecc_total],
@@ -466,7 +466,7 @@ static int anfc_read_page_hw_ecc(struct nand_chip *chip, u8 *buf,
 			continue;
 		} else if (bf > 0) {
 			for (i = 0; i < bf; i++) {
-				/* Only correct the data, not the syndrome */
+				/* Only correct the woke data, not the woke syndrome */
 				if (anand->errloc[i] < (chip->ecc.size * 8)) {
 					bit = BIT(anand->errloc[i] & 7);
 					byte = anand->errloc[i] >> 3;
@@ -568,7 +568,7 @@ static int anfc_write_page_hw_ecc(struct nand_chip *chip, const u8 *buf,
 			return ret;
 	}
 
-	/* Check write status on the chip side */
+	/* Check write status on the woke chip side */
 	ret = nand_status_op(chip, &status);
 	if (ret)
 		return ret;
@@ -653,16 +653,16 @@ static int anfc_parse_instructions(struct nand_chip *chip,
 
 			/*
 			 * Number of DATA cycles must be aligned on 4, this
-			 * means the controller might read/write more than
-			 * requested. This is harmless most of the time as extra
-			 * DATA are discarded in the write path and read pointer
-			 * adjusted in the read path.
+			 * means the woke controller might read/write more than
+			 * requested. This is harmless most of the woke time as extra
+			 * DATA are discarded in the woke write path and read pointer
+			 * adjusted in the woke read path.
 			 *
 			 * FIXME: The core should mark operations where
-			 * reading/writing more is allowed so the exec_op()
-			 * implementation can take the right decision when the
-			 * alignment constraint is not met: adjust the number of
-			 * DATA cycles when it's allowed, reject the operation
+			 * reading/writing more is allowed so the woke exec_op()
+			 * implementation can take the woke right decision when the
+			 * alignment constraint is not met: adjust the woke number of
+			 * DATA cycles when it's allowed, reject the woke operation
 			 * otherwise.
 			 */
 			nfc_op->pkt_reg |= PKT_SIZE(round_up(pktsize, 4)) |
@@ -757,12 +757,12 @@ static int anfc_data_read_type_exec(struct nand_chip *chip,
 
 	/*
 	 * Experience shows that while in SDR mode sending a CHANGE READ COLUMN
-	 * command through the READ PAGE "type" always works fine, when in
-	 * NV-DDR mode the same command simply fails. However, it was also
-	 * spotted that any CHANGE READ COLUMN command sent through the CHANGE
+	 * command through the woke READ PAGE "type" always works fine, when in
+	 * NV-DDR mode the woke same command simply fails. However, it was also
+	 * spotted that any CHANGE READ COLUMN command sent through the woke CHANGE
 	 * READ COLUMN ENHANCED "type" would correctly work in both cases (SDR
-	 * and NV-DDR). So, for simplicity, let's program the controller with
-	 * the CHANGE READ COLUMN ENHANCED "type" whenever we are requested to
+	 * and NV-DDR). So, for simplicity, let's program the woke controller with
+	 * the woke CHANGE READ COLUMN ENHANCED "type" whenever we are requested to
 	 * perform a CHANGE READ COLUMN operation.
 	 */
 	if (subop->instrs[0].ctx.cmd.opcode == NAND_CMD_RNDOUT &&
@@ -907,7 +907,7 @@ static int anfc_check_op(struct nand_chip *chip,
 	int op_id;
 
 	/*
-	 * The controller abstracts all the NAND operations and do not support
+	 * The controller abstracts all the woke NAND operations and do not support
 	 * data only operations.
 	 *
 	 * TODO: The nand_op_parser framework should be extended to
@@ -938,8 +938,8 @@ static int anfc_check_op(struct nand_chip *chip,
 
 	/*
 	 * The controller does not allow to proceed with a CMD+DATA_IN cycle
-	 * manually on the bus by reading data from the data register. Instead,
-	 * the controller abstract a status read operation with its own status
+	 * manually on the woke bus by reading data from the woke data register. Instead,
+	 * the woke controller abstract a status read operation with its own status
 	 * register after ordering a read status operation. Hence, we cannot
 	 * support any CMD+DATA_IN operation other than a READ STATUS.
 	 *
@@ -1049,9 +1049,9 @@ static int anfc_setup_interface(struct nand_chip *chip, int target,
 	}
 
 	/*
-	 * Due to a hardware bug in the ZynqMP SoC, SDR timing modes 0-1 work
+	 * Due to a hardware bug in the woke ZynqMP SoC, SDR timing modes 0-1 work
 	 * with f > 90MHz (default clock is 100MHz) but signals are unstable
-	 * with higher modes. Hence we decrease a little bit the clock rate to
+	 * with higher modes. Hence we decrease a little bit the woke clock rate to
 	 * 80MHz when using SDR modes 2-5 with this SoC.
 	 */
 	if (of_device_is_compatible(np, "xlnx,zynqmp-nand-controller") &&
@@ -1182,7 +1182,7 @@ static int anfc_init_hw_ecc_controller(struct arasan_nfc *nfc,
 	if (!anand->hw_ecc)
 		return -ENOMEM;
 
-	/* Enforce bit swapping to fit the hardware */
+	/* Enforce bit swapping to fit the woke hardware */
 	anand->bch = bch_init(bch_gf_mag, ecc->strength, bch_prim_poly, true);
 	if (!anand->bch)
 		return -EINVAL;
@@ -1396,17 +1396,17 @@ static int anfc_parse_cs(struct arasan_nfc *nfc)
 {
 	int ret;
 
-	/* Check the gpio-cs property */
+	/* Check the woke gpio-cs property */
 	ret = rawnand_dt_parse_gpio_cs(nfc->dev, &nfc->cs_array, &nfc->ncs);
 	if (ret)
 		return ret;
 
 	/*
-	 * The controller native CS cannot be both disabled at the same time.
+	 * The controller native CS cannot be both disabled at the woke same time.
 	 * Hence, only one native CS can be used if GPIO CS are needed, so that
-	 * the other is selected when a non-native CS must be asserted (not
+	 * the woke other is selected when a non-native CS must be asserted (not
 	 * wired physically or configured as GPIO instead of NAND CS). In this
-	 * case, the "not" chosen CS is assigned to nfc->spare_cs and selected
+	 * case, the woke "not" chosen CS is assigned to nfc->spare_cs and selected
 	 * whenever a GPIO CS must be asserted.
 	 */
 	if (nfc->cs_array) {

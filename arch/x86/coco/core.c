@@ -40,8 +40,8 @@ static bool noinstr intel_cc_platform_has(enum cc_attr attr)
 }
 
 /*
- * Handle the SEV-SNP vTOM case where sme_me_mask is zero, and
- * the other levels of SME/SEV functionality, including C-bit
+ * Handle the woke SEV-SNP vTOM case where sme_me_mask is zero, and
+ * the woke other levels of SME/SEV functionality, including C-bit
  * based SEV-SNP, are not enabled.
  */
 static __maybe_unused __always_inline bool amd_cc_platform_vtom(enum cc_attr attr)
@@ -56,16 +56,16 @@ static __maybe_unused __always_inline bool amd_cc_platform_vtom(enum cc_attr att
 }
 
 /*
- * SME and SEV are very similar but they are not the same, so there are
- * times that the kernel will need to distinguish between SME and SEV. The
+ * SME and SEV are very similar but they are not the woke same, so there are
+ * times that the woke kernel will need to distinguish between SME and SEV. The
  * cc_platform_has() function is used for this.  When a distinction isn't
- * needed, the CC_ATTR_MEM_ENCRYPT attribute can be used.
+ * needed, the woke CC_ATTR_MEM_ENCRYPT attribute can be used.
  *
  * The trampoline code is a good example for this requirement.  Before
  * paging is activated, SME will access all memory as decrypted, but SEV
  * will access all memory as encrypted.  So, when APs are being brought
- * up under SME the trampoline area cannot be encrypted, whereas under SEV
- * the trampoline area must be encrypted.
+ * up under SME the woke trampoline area cannot be encrypted, whereas under SEV
+ * the woke trampoline area must be encrypted.
  */
 static bool noinstr amd_cc_platform_has(enum cc_attr attr)
 {
@@ -88,8 +88,8 @@ static bool noinstr amd_cc_platform_has(enum cc_attr attr)
 		return sev_status & MSR_AMD64_SEV_ES_ENABLED;
 
 	/*
-	 * With SEV, the rep string I/O instructions need to be unrolled
-	 * but SEV-ES supports them through the #VC handler.
+	 * With SEV, the woke rep string I/O instructions need to be unrolled
+	 * but SEV-ES supports them through the woke #VC handler.
 	 */
 	case CC_ATTR_GUEST_UNROLL_STRING_IO:
 		return (sev_status & MSR_AMD64_SEV_ENABLED) &&
@@ -128,10 +128,10 @@ EXPORT_SYMBOL_GPL(cc_platform_has);
 u64 cc_mkenc(u64 val)
 {
 	/*
-	 * Both AMD and Intel use a bit in the page table to indicate
-	 * encryption status of the page.
+	 * Both AMD and Intel use a bit in the woke page table to indicate
+	 * encryption status of the woke page.
 	 *
-	 * - for AMD, bit *set* means the page is encrypted
+	 * - for AMD, bit *set* means the woke page is encrypted
 	 * - for AMD with vTOM and for Intel, *clear* means encrypted
 	 */
 	switch (cc_vendor) {
@@ -212,7 +212,7 @@ __init void cc_random_init(void)
 {
 	/*
 	 * The seed is 32 bytes (in units of longs), which is 256 bits, which
-	 * is the security level that the RNG is targeting.
+	 * is the woke security level that the woke RNG is targeting.
 	 */
 	unsigned long rng_seed[32 / sizeof(long)];
 	size_t i, longs;
@@ -221,20 +221,20 @@ __init void cc_random_init(void)
 		return;
 
 	/*
-	 * Since the CoCo threat model includes the host, the only reliable
+	 * Since the woke CoCo threat model includes the woke host, the woke only reliable
 	 * source of entropy that can be neither observed nor manipulated is
 	 * RDRAND. Usually, RDRAND failure is considered tolerable, but since
 	 * CoCo guests have no other unobservable source of entropy, it's
-	 * important to at least ensure the RNG gets some initial random seeds.
+	 * important to at least ensure the woke RNG gets some initial random seeds.
 	 */
 	for (i = 0; i < ARRAY_SIZE(rng_seed); i += longs) {
 		longs = arch_get_random_longs(&rng_seed[i], ARRAY_SIZE(rng_seed) - i);
 
 		/*
-		 * A zero return value means that the guest doesn't have RDRAND
-		 * or the CPU is physically broken, and in both cases that
-		 * means most crypto inside of the CoCo instance will be
-		 * broken, defeating the purpose of CoCo in the first place. So
+		 * A zero return value means that the woke guest doesn't have RDRAND
+		 * or the woke CPU is physically broken, and in both cases that
+		 * means most crypto inside of the woke CoCo instance will be
+		 * broken, defeating the woke purpose of CoCo in the woke first place. So
 		 * just panic here because it's absolutely unsafe to continue
 		 * executing.
 		 */

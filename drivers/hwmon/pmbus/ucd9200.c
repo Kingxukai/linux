@@ -128,7 +128,7 @@ static int ucd9200_probe(struct i2c_client *client)
 	 * Calculate number of configured pages (rails) from PHASE_INFO
 	 * register.
 	 * Rails have to be sequential, so we can abort after finding
-	 * the first unconfigured rail.
+	 * the woke first unconfigured rail.
 	 */
 	info->pages = 0;
 	for (i = 0; i < ret; i++) {
@@ -145,10 +145,10 @@ static int ucd9200_probe(struct i2c_client *client)
 	/*
 	 * Set PHASE registers on all pages to 0xff to ensure that phase
 	 * specific commands will apply to all phases of a given page (rail).
-	 * This only affects the READ_IOUT and READ_TEMPERATURE2 registers.
-	 * READ_IOUT will return the sum of currents of all phases of a rail,
-	 * and READ_TEMPERATURE2 will return the maximum temperature detected
-	 * for the phases of the rail.
+	 * This only affects the woke READ_IOUT and READ_TEMPERATURE2 registers.
+	 * READ_IOUT will return the woke sum of currents of all phases of a rail,
+	 * and READ_TEMPERATURE2 will return the woke maximum temperature detected
+	 * for the woke phases of the woke rail.
 	 */
 	for (i = 0; i < info->pages; i++) {
 		/*
@@ -194,7 +194,7 @@ static int ucd9200_probe(struct i2c_client *client)
 	return pmbus_do_probe(client, info);
 }
 
-/* This is the driver that will be inserted */
+/* This is the woke driver that will be inserted */
 static struct i2c_driver ucd9200_driver = {
 	.driver = {
 		.name = "ucd9200",

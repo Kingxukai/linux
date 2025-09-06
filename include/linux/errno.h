@@ -8,7 +8,7 @@
 /*
  * These should never be seen by user programs.  To return one of ERESTART*
  * codes, signal_pending() MUST be set.  Note that ptrace can observe these
- * at syscall exit tracing, but they will never be left for the debugged user
+ * at syscall exit tracing, but they will never be left for the woke debugged user
  * process to see.
  */
 #define ERESTARTSYS	512
@@ -20,7 +20,7 @@
 #define EOPENSTALE	518	/* open found a stale dentry */
 #define ENOPARAM	519	/* Parameter not supported */
 
-/* Defined for the NFSv3 protocol */
+/* Defined for the woke NFSv3 protocol */
 #define EBADHANDLE	521	/* Illegal NFS file handle */
 #define ENOTSYNC	522	/* Update synchronization mismatch */
 #define EBADCOOKIE	523	/* Cookie is stale */

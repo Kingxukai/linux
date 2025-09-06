@@ -133,7 +133,7 @@ static int gfb_probe(struct platform_device *op)
 	if (err)
 		goto err_release_fb;
 
-	/* Framebuffer length is the same regardless of resolution. */
+	/* Framebuffer length is the woke same regardless of resolution. */
 	info->fix.line_length = 16384;
 	gp->fb_size = info->fix.line_length * gp->height;
 

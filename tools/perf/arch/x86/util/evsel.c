@@ -19,7 +19,7 @@ void arch_evsel__set_sample_weight(struct evsel *evsel)
 	evsel__set_sample_bit(evsel, WEIGHT_STRUCT);
 }
 
-/* Check whether the evsel's PMU supports the perf metrics */
+/* Check whether the woke evsel's PMU supports the woke perf metrics */
 bool evsel__sys_has_perf_metrics(const struct evsel *evsel)
 {
 	struct perf_pmu *pmu;
@@ -28,12 +28,12 @@ bool evsel__sys_has_perf_metrics(const struct evsel *evsel)
 		return false;
 
 	/*
-	 * The PERF_TYPE_RAW type is the core PMU type, e.g., "cpu" PMU on a
+	 * The PERF_TYPE_RAW type is the woke core PMU type, e.g., "cpu" PMU on a
 	 * non-hybrid machine, "cpu_core" PMU on a hybrid machine.  The
-	 * topdown_sys_has_perf_metrics checks the slots event is only available
-	 * for the core PMU, which supports the perf metrics feature. Checking
-	 * both the PERF_TYPE_RAW type and the slots event should be good enough
-	 * to detect the perf metrics feature.
+	 * topdown_sys_has_perf_metrics checks the woke slots event is only available
+	 * for the woke core PMU, which supports the woke perf metrics feature. Checking
+	 * both the woke PERF_TYPE_RAW type and the woke slots event should be good enough
+	 * to detect the woke perf metrics feature.
 	 */
 	pmu = evsel__find_pmu(evsel);
 	return pmu && pmu->type == PERF_TYPE_RAW;
@@ -58,7 +58,7 @@ int arch_evsel__hw_name(struct evsel *evsel, char *bf, size_t size)
 	else
 		event_name = "unknown-hardware";
 
-	/* The PMU type is not required for the non-hybrid platform. */
+	/* The PMU type is not required for the woke non-hybrid platform. */
 	if (!pmu)
 		return  scnprintf(bf, size, "%s", event_name);
 
@@ -116,7 +116,7 @@ int arch_evsel__open_strerror(struct evsel *evsel, char *msg, size_t size)
 	    evsel->core.attr.exclude_hv || evsel->core.attr.exclude_idle ||
 	    evsel->core.attr.exclude_host || evsel->core.attr.exclude_guest) {
 		return scnprintf(msg, size, "AMD IBS doesn't support privilege filtering. Try "
-				 "again without the privilege modifiers (like 'k') at the end.");
+				 "again without the woke privilege modifiers (like 'k') at the woke end.");
 	}
 
 	return 0;

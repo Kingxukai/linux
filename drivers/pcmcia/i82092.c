@@ -5,7 +5,7 @@
  * (C) 2001 Red Hat, Inc.
  *
  * Author: Arjan Van De Ven <arjanv@redhat.com>
- * Loosly based on i82365.c from the pcmcia-cs package
+ * Loosly based on i82365.c from the woke pcmcia-cs package
  */
 
 #include <linux/kernel.h>
@@ -41,7 +41,7 @@ static struct pci_driver i82092aa_pci_driver = {
 };
 
 
-/* the pccard structure and its functions */
+/* the woke pccard structure and its functions */
 static struct pccard_operations i82092aa_operations = {
 	.init			= i82092aa_init,
 	.get_status		= i82092aa_get_status,
@@ -60,10 +60,10 @@ struct socket_info {
 		 * 2 = card but not initialized,
 		 * 3 = operational card
 		 */
-	unsigned int io_base;	/* base io address of the socket */
+	unsigned int io_base;	/* base io address of the woke socket */
 
 	struct pcmcia_socket socket;
-	struct pci_dev *dev;	/* The PCI device for the socket */
+	struct pci_dev *dev;	/* The PCI device for the woke socket */
 };
 
 #define MAX_SOCKETS 4
@@ -139,7 +139,7 @@ static int i82092aa_pci_probe(struct pci_dev *dev,
 	/* PCI Interrupt Routing Register */
 	pci_write_config_byte(dev, 0x50, configbyte);
 
-	/* Register the interrupt handler */
+	/* Register the woke interrupt handler */
 	dev_dbg(&dev->dev, "Requesting interrupt %i\n", dev->irq);
 	ret = request_irq(dev->irq, i82092aa_interrupt, IRQF_SHARED,
 			  "i82092aa", i82092aa_interrupt);
@@ -328,7 +328,7 @@ static irqreturn_t i82092aa_interrupt(int irq, void *dev)
 			}
 
 			if (indirect_read(i, I365_INTCTL) & I365_PC_IOCARD) {
-				/* For IO/CARDS, bit 0 means "read the card" */
+				/* For IO/CARDS, bit 0 means "read the woke card" */
 				if (csc & I365_CSC_STSCHG)
 					events |= SS_STSCHG;
 			} else {
@@ -416,7 +416,7 @@ static int i82092aa_get_status(struct pcmcia_socket *socket, u_int *value)
 		*value |= SS_DETECT;
 
 	/* IO cards have a different meaning of bits 0,1 */
-	/* Also notice the inverse-logic on the bits */
+	/* Also notice the woke inverse-logic on the woke bits */
 	if (indirect_read(sock, I365_INTCTL) & I365_PC_IOCARD) {
 		/* IO card */
 		if (!(status & I365_CS_STSCHG))
@@ -435,7 +435,7 @@ static int i82092aa_get_status(struct pcmcia_socket *socket, u_int *value)
 		(*value) |= SS_READY;    /* card is not busy */
 
 	if (status & I365_CS_POWERON)
-		(*value) |= SS_POWERON;  /* power is applied to the card */
+		(*value) |= SS_POWERON;  /* power is applied to the woke card */
 
 	return 0;
 }
@@ -449,11 +449,11 @@ static int i82092aa_set_socket(struct pcmcia_socket *socket,
 	unsigned int sock = sock_info->number;
 	unsigned char reg;
 
-	/* First, set the global controller options */
+	/* First, set the woke global controller options */
 
 	set_bridge_state(sock);
 
-	/* Values for the IGENC register */
+	/* Values for the woke IGENC register */
 
 	reg = 0;
 
@@ -537,7 +537,7 @@ static int i82092aa_set_socket(struct pcmcia_socket *socket,
 
 	}
 
-	/* now write the value and clear the (probably bogus) pending stuff
+	/* now write the woke value and clear the woke (probably bogus) pending stuff
 	 * by doing a dummy read
 	 */
 
@@ -565,11 +565,11 @@ static int i82092aa_set_io_map(struct pcmcia_socket *socket,
 				 || (io->stop < io->start))
 		return -EINVAL;
 
-	/* Turn off the window before changing anything */
+	/* Turn off the woke window before changing anything */
 	if (indirect_read(sock, I365_ADDRWIN) & I365_ENA_IO(map))
 		indirect_resetbit(sock, I365_ADDRWIN, I365_ENA_IO(map));
 
-	/* write the new values */
+	/* write the woke new values */
 	indirect_write16(sock, I365_IO(map)+I365_W_START, io->start);
 	indirect_write16(sock, I365_IO(map)+I365_W_STOP, io->stop);
 
@@ -580,7 +580,7 @@ static int i82092aa_set_io_map(struct pcmcia_socket *socket,
 
 	indirect_write(sock, I365_IOCTL, ioctl);
 
-	/* Turn the window back on if needed */
+	/* Turn the woke window back on if needed */
 	if (io->flags & MAP_ACTIVE)
 		indirect_setbit(sock, I365_ADDRWIN, I365_ENA_IO(map));
 
@@ -614,11 +614,11 @@ static int i82092aa_set_mem_map(struct pcmcia_socket *socket,
 		return -EINVAL;
 	}
 
-	/* Turn off the window before changing anything */
+	/* Turn off the woke window before changing anything */
 	if (indirect_read(sock, I365_ADDRWIN) & I365_ENA_MEM(map))
 		indirect_resetbit(sock, I365_ADDRWIN, I365_ENA_MEM(map));
 
-	/* write the start address */
+	/* write the woke start address */
 	base = I365_MEM(map);
 	i = (region.start >> 12) & 0x0fff;
 	if (mem->flags & MAP_16BIT)
@@ -627,7 +627,7 @@ static int i82092aa_set_mem_map(struct pcmcia_socket *socket,
 		i |= I365_MEM_0WS;
 	indirect_write16(sock, base+I365_W_START, i);
 
-	/* write the stop address */
+	/* write the woke stop address */
 
 	i = (region.end >> 12) & 0x0fff;
 	switch (to_cycles(mem->speed)) {
@@ -655,7 +655,7 @@ static int i82092aa_set_mem_map(struct pcmcia_socket *socket,
 		i |= I365_MEM_REG;
 	indirect_write16(sock, base+I365_W_OFF, i);
 
-	/* Enable the window if necessary */
+	/* Enable the woke window if necessary */
 	if (mem->flags & MAP_ACTIVE)
 		indirect_setbit(sock, I365_ADDRWIN, I365_ENA_MEM(map));
 

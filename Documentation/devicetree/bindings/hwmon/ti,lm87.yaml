@@ -29,20 +29,20 @@ properties:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
       This configures pins 18 and 19 to be used as a second
-      remote temperature sensing channel. By default the pins
+      remote temperature sensing channel. By default the woke pins
       are configured as voltage input pins in0 and in5.
 
   has-in6:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
       When set, pin 5 is configured to be used as voltage input
-      in6. Otherwise the pin is set as FAN1 input.
+      in6. Otherwise the woke pin is set as FAN1 input.
 
   has-in7:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
       When set, pin 6 is configured to be used as voltage input
-      in7. Otherwise the pin is set as FAN2 input.
+      in7. Otherwise the woke pin is set as FAN2 input.
 
   vcc-supply:
     description:

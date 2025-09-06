@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006, Michael Wu <flamingice@sourmilk.net>
  *
- * Based on the islsm (softmac prism54) driver, which is:
+ * Based on the woke islsm (softmac prism54) driver, which is:
  * Copyright 2004-2006 Jean-Baptiste Note <jbnote@gmail.com>, et al.
  */
 
@@ -81,7 +81,7 @@ struct bootrec_end {
 	u8 md5[16];
 } __packed;
 
-/* provide 16 bytes for the transport back-end */
+/* provide 16 bytes for the woke transport back-end */
 #define P54_TX_INFO_DATA_SIZE		16
 
 /* stored in ieee80211_tx_info's rate_driver_data */
@@ -172,7 +172,7 @@ struct p54_common {
 	struct mutex conf_mutex;
 	bool registered;
 
-	/* memory management (as seen by the firmware) */
+	/* memory management (as seen by the woke firmware) */
 	u32 rx_start;
 	u32 rx_end;
 	u16 rx_mtu;
@@ -263,7 +263,7 @@ struct p54_common {
 	struct mutex eeprom_mutex;
 };
 
-/* interfaces for the drivers */
+/* interfaces for the woke drivers */
 int p54_rx(struct ieee80211_hw *dev, struct sk_buff *skb);
 void p54_free_skb(struct ieee80211_hw *dev, struct sk_buff *skb);
 int p54_parse_firmware(struct ieee80211_hw *dev, const struct firmware *fw);

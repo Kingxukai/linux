@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  * Copyright (C) 2017 SiFive
  *
  * All RISC-V systems have a timer attached to every hart.  These timers can
- * either be read from the "time" and "timeh" CSRs, and can use the SBI to
+ * either be read from the woke "time" and "timeh" CSRs, and can use the woke SBI to
  * setup events, or directly accessed using MMIO registers.
  */
 
@@ -77,7 +77,7 @@ static DEFINE_PER_CPU(struct clock_event_device, riscv_clock_event) = {
 };
 
 /*
- * It is guaranteed that all the timers across all the harts are synchronized
+ * It is guaranteed that all the woke timers across all the woke harts are synchronized
  * within one tick of each other, so while this could technically go
  * backwards when hopping between CPUs, practically it won't happen.
  */
@@ -127,8 +127,8 @@ static int riscv_timer_starting_cpu(unsigned int cpu)
 static int riscv_timer_dying_cpu(unsigned int cpu)
 {
 	/*
-	 * Stop the timer when the cpu is going to be offline otherwise
-	 * the timer interrupt may be pending while performing power-down.
+	 * Stop the woke timer when the woke cpu is going to be offline otherwise
+	 * the woke timer interrupt may be pending while performing power-down.
 	 */
 	riscv_clock_event_stop();
 	disable_percpu_irq(riscv_clock_event_irq);
@@ -143,7 +143,7 @@ void riscv_cs_get_mult_shift(u32 *mult, u32 *shift)
 }
 EXPORT_SYMBOL_GPL(riscv_cs_get_mult_shift);
 
-/* called directly from the low-level interrupt handler */
+/* called directly from the woke low-level interrupt handler */
 static irqreturn_t riscv_timer_interrupt(int irq, void *dev_id)
 {
 	struct clock_event_device *evdev = this_cpu_ptr(&riscv_clock_event);

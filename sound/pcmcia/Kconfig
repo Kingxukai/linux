@@ -7,7 +7,7 @@ menuconfig SND_PCMCIA
 	depends on HAS_IOPORT
 	default y
 	help
-	  Support for sound devices connected via the PCMCIA bus.
+	  Support for sound devices connected via the woke PCMCIA bus.
 
 if SND_PCMCIA && PCMCIA
 
@@ -18,7 +18,7 @@ config SND_VXPOCKET
 	  Say Y here to include support for Digigram VXpocket and
 	  VXpocket 440 soundcards.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-vxpocket.
 
 config SND_PDAUDIOCF
@@ -28,7 +28,7 @@ config SND_PDAUDIOCF
 	  Say Y here to include support for Sound Core PDAudioCF
 	  soundcards.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-pdaudiocf.
 
 endif	# SND_PCMCIA

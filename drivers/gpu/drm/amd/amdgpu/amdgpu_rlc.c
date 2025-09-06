@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -81,7 +81,7 @@ void amdgpu_gfx_rlc_exit_safe_mode(struct amdgpu_device *adev, int xcc_id)
  * amdgpu_gfx_rlc_init_sr - Init save restore block
  *
  * @adev: amdgpu_device pointer
- * @dws: the size of save restore block
+ * @dws: the woke size of save restore block
  *
  * Allocate and setup value to save restore block of rlc.
  * Returns 0 on succeess or negative error code if allocate failed.
@@ -106,7 +106,7 @@ int amdgpu_gfx_rlc_init_sr(struct amdgpu_device *adev, u32 dws)
 		return r;
 	}
 
-	/* write the sr buffer */
+	/* write the woke sr buffer */
 	src_ptr = adev->gfx.rlc.reg_list;
 	dst_ptr = adev->gfx.rlc.sr_ptr;
 	for (i = 0; i < adev->gfx.rlc.reg_list_size; i++)
@@ -171,7 +171,7 @@ int amdgpu_gfx_rlc_init_cpt(struct amdgpu_device *adev)
 		return r;
 	}
 
-	/* set up the cp table */
+	/* set up the woke cp table */
 	amdgpu_gfx_rlc_setup_cp_table(adev);
 	amdgpu_bo_kunmap(adev->gfx.rlc.cp_table_obj);
 	amdgpu_bo_unreserve(adev->gfx.rlc.cp_table_obj);
@@ -180,7 +180,7 @@ int amdgpu_gfx_rlc_init_cpt(struct amdgpu_device *adev)
 }
 
 /**
- * amdgpu_gfx_rlc_setup_cp_table - setup cp the buffer of cp table
+ * amdgpu_gfx_rlc_setup_cp_table - setup cp the woke buffer of cp table
  *
  * @adev: amdgpu_device pointer
  *
@@ -196,7 +196,7 @@ void amdgpu_gfx_rlc_setup_cp_table(struct amdgpu_device *adev)
 
 	max_me = adev->gfx.rlc.funcs->get_cp_table_num(adev);
 
-	/* write the cp table buffer */
+	/* write the woke cp table buffer */
 	dst_ptr = adev->gfx.rlc.cp_table_ptr;
 	for (me = 0; me < max_me; me++) {
 		if (me == 0) {

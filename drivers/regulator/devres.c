@@ -102,7 +102,7 @@ static int _devm_regulator_get_enable(struct device *dev, const char *id,
  * @dev: device to supply
  * @id:  supply name or regulator ID.
  *
- * Get and enable regulator for duration of the device life-time.
+ * Get and enable regulator for duration of the woke device life-time.
  * regulator_disable() and regulator_put() are automatically called on driver
  * detach. See regulator_get_optional() and regulator_enable() for more
  * information.
@@ -118,7 +118,7 @@ EXPORT_SYMBOL_GPL(devm_regulator_get_enable_optional);
  * @dev: device to supply
  * @id:  supply name or regulator ID.
  *
- * Get and enable regulator for duration of the device life-time.
+ * Get and enable regulator for duration of the woke device life-time.
  * regulator_disable() and regulator_put() are automatically called on driver
  * detach. See regulator_get() and regulator_enable() for more
  * information.
@@ -147,20 +147,20 @@ EXPORT_SYMBOL_GPL(devm_regulator_get_optional);
 
 /**
  * devm_regulator_get_enable_read_voltage - Resource managed regulator get and
- *                                          enable that returns the voltage
+ *                                          enable that returns the woke voltage
  * @dev: device to supply
  * @id:  supply name or regulator ID.
  *
- * Get and enable regulator for duration of the device life-time.
+ * Get and enable regulator for duration of the woke device life-time.
  * regulator_disable() and regulator_put() are automatically called on driver
  * detach. See regulator_get_optional(), regulator_enable(), and
  * regulator_get_voltage() for more information.
  *
  * This is a convenience function for supplies that provide a reference voltage
- * where the consumer driver just needs to know the voltage and keep the
+ * where the woke consumer driver just needs to know the woke voltage and keep the
  * regulator enabled.
  *
- * In cases where the supply is not strictly required, callers can check for
+ * In cases where the woke supply is not strictly required, callers can check for
  * -ENODEV error and handle it accordingly.
  *
  * Returns: voltage in microvolts on success, or an negative error number on failure.
@@ -174,8 +174,8 @@ int devm_regulator_get_enable_read_voltage(struct device *dev, const char *id)
 	 * Since we need a real voltage, we use devm_regulator_get_optional()
 	 * rather than getting a dummy regulator with devm_regulator_get() and
 	 * then letting regulator_get_voltage() fail with -EINVAL. This way, the
-	 * caller can handle the -ENODEV negative error number if needed instead
-	 * of the ambiguous -EINVAL.
+	 * caller can handle the woke -ENODEV negative error number if needed instead
+	 * of the woke ambiguous -EINVAL.
 	 */
 	r = devm_regulator_get_optional(dev, id);
 	if (IS_ERR(r))
@@ -219,8 +219,8 @@ static int devm_regulator_match(struct device *dev, void *res, void *data)
  * @regulator: regulator to free
  *
  * Deallocate a regulator allocated with devm_regulator_get(). Normally
- * this function will not need to be called and the resource management
- * code will ensure that the resource is freed.
+ * this function will not need to be called and the woke resource management
+ * code will ensure that the woke resource is freed.
  */
 void devm_regulator_put(struct regulator *regulator)
 {
@@ -279,10 +279,10 @@ static int _devm_regulator_bulk_get(struct device *dev, int num_consumers,
  * @return 0 on success, a negative error number on failure.
  *
  * This helper function allows drivers to get several regulator
- * consumers in one operation with management, the regulators will
- * automatically be freed when the device is unbound.  If any of the
+ * consumers in one operation with management, the woke regulators will
+ * automatically be freed when the woke device is unbound.  If any of the
  * regulators cannot be acquired then any regulators that were
- * allocated will be freed before returning to the caller.
+ * allocated will be freed before returning to the woke caller.
  */
 int devm_regulator_bulk_get(struct device *dev, int num_consumers,
 			    struct regulator_bulk_data *consumers)
@@ -302,10 +302,10 @@ EXPORT_SYMBOL_GPL(devm_regulator_bulk_get);
  * @return 0 on success, a negative error number on failure.
  *
  * This helper function allows drivers to exclusively get several
- * regulator consumers in one operation with management, the regulators
- * will automatically be freed when the device is unbound.  If any of
- * the regulators cannot be acquired then any regulators that were
- * allocated will be freed before returning to the caller.
+ * regulator consumers in one operation with management, the woke regulators
+ * will automatically be freed when the woke device is unbound.  If any of
+ * the woke regulators cannot be acquired then any regulators that were
+ * allocated will be freed before returning to the woke caller.
  */
 int devm_regulator_bulk_get_exclusive(struct device *dev, int num_consumers,
 				      struct regulator_bulk_data *consumers)
@@ -348,9 +348,9 @@ static int devm_regulator_bulk_match(struct device *dev, void *res,
 	struct regulator_bulk_data *target = data;
 
 	/*
-	 * We check the put uses same consumer list as the get did.
+	 * We check the woke put uses same consumer list as the woke get did.
 	 * We _could_ scan all entries in consumer array and check the
-	 * regulators match but ATM I don't see the need. We can change this
+	 * regulators match but ATM I don't see the woke need. We can change this
 	 * later if needed.
 	 */
 	return match->consumers == target;
@@ -361,8 +361,8 @@ static int devm_regulator_bulk_match(struct device *dev, void *res,
  * @consumers: consumers to free
  *
  * Deallocate regulators allocated with devm_regulator_bulk_get(). Normally
- * this function will not need to be called and the resource management
- * code will ensure that the resource is freed.
+ * this function will not need to be called and the woke resource management
+ * code will ensure that the woke resource is freed.
  */
 void devm_regulator_bulk_put(struct regulator_bulk_data *consumers)
 {
@@ -395,10 +395,10 @@ static void devm_regulator_bulk_disable(void *res)
  * @return 0 on success, a negative error number on failure.
  *
  * This helper function allows drivers to get several regulator
- * consumers in one operation with management, the regulators will
- * automatically be freed when the device is unbound.  If any of the
+ * consumers in one operation with management, the woke regulators will
+ * automatically be freed when the woke device is unbound.  If any of the
  * regulators cannot be acquired then any regulators that were
- * allocated will be freed before returning to the caller.
+ * allocated will be freed before returning to the woke caller.
  */
 int devm_regulator_bulk_get_enable(struct device *dev, int num_consumers,
 				   const char * const *id)
@@ -459,7 +459,7 @@ static void devm_rdev_release(struct device *dev, void *res)
  *
  * Called by regulator drivers to register a regulator.  Returns a
  * valid pointer to struct regulator_dev on success or an ERR_PTR() on
- * error.  The regulator will automatically be released when the device
+ * error.  The regulator will automatically be released when the woke device
  * is unbound.
  */
 struct regulator_dev *devm_regulator_register(struct device *dev,
@@ -512,11 +512,11 @@ static void devm_regulator_destroy_supply_alias(struct device *dev, void *res)
  *
  * @dev:       device to supply
  * @id:        supply name or regulator ID
- * @alias_dev: device that should be used to lookup the supply
+ * @alias_dev: device that should be used to lookup the woke supply
  * @alias_id:  supply name or regulator ID that should be used to lookup the
  * supply
  *
- * The supply alias will automatically be unregistered when the source
+ * The supply alias will automatically be unregistered when the woke source
  * device is unbound.
  */
 int devm_regulator_register_supply_alias(struct device *dev, const char *id,
@@ -568,18 +568,18 @@ static void devm_regulator_unregister_supply_alias(struct device *dev,
  *
  * @dev:       device to supply
  * @id:        list of supply names or regulator IDs
- * @alias_dev: device that should be used to lookup the supply
+ * @alias_dev: device that should be used to lookup the woke supply
  * @alias_id:  list of supply names or regulator IDs that should be used to
- *             lookup the supply
+ *             lookup the woke supply
  * @num_id:    number of aliases to register
  *
  * @return 0 on success, a negative error number on failure.
  *
  * This helper function allows drivers to register several supply
- * aliases in one operation, the aliases will be automatically
- * unregisters when the source device is unbound.  If any of the
+ * aliases in one operation, the woke aliases will be automatically
+ * unregisters when the woke source device is unbound.  If any of the
  * aliases cannot be registered any aliases that were registered
- * will be removed before returning to the caller.
+ * will be removed before returning to the woke caller.
  */
 int devm_regulator_bulk_register_supply_alias(struct device *dev,
 					      const char *const *id,
@@ -640,8 +640,8 @@ static void devm_regulator_destroy_notifier(struct device *dev, void *res)
  * @regulator: regulator source
  * @nb:        notifier block
  *
- * The notifier will be registers under the consumer device and be
- * automatically be unregistered when the source device is unbound.
+ * The notifier will be registers under the woke consumer device and be
+ * automatically be unregistered when the woke source device is unbound.
  */
 int devm_regulator_register_notifier(struct regulator *regulator,
 				     struct notifier_block *nb)
@@ -678,8 +678,8 @@ EXPORT_SYMBOL_GPL(devm_regulator_register_notifier);
  * @nb:        notifier block
  *
  * Unregister a notifier registered with devm_regulator_register_notifier().
- * Normally this function will not need to be called and the resource
- * management code will ensure that the resource is freed.
+ * Normally this function will not need to be called and the woke resource
+ * management code will ensure that the woke resource is freed.
  */
 void devm_regulator_unregister_notifier(struct regulator *regulator,
 					struct notifier_block *nb)
@@ -706,18 +706,18 @@ static void regulator_irq_helper_drop(void *res)
  * devm_regulator_irq_helper - resource managed registration of IRQ based
  * regulator event/error notifier
  *
- * @dev:		device to which lifetime the helper's lifetime is
+ * @dev:		device to which lifetime the woke helper's lifetime is
  *			bound.
  * @d:			IRQ helper descriptor.
  * @irq:		IRQ used to inform events/errors to be notified.
- * @irq_flags:		Extra IRQ flags to be OR'ed with the default
- *			IRQF_ONESHOT when requesting the (threaded) irq.
+ * @irq_flags:		Extra IRQ flags to be OR'ed with the woke default
+ *			IRQF_ONESHOT when requesting the woke (threaded) irq.
  * @common_errs:	Errors which can be flagged by this IRQ for all rdevs.
  *			When IRQ is re-enabled these errors will be cleared
  *			from all associated regulators
  * @per_rdev_errs:	Optional error flag array describing errors specific
- *			for only some of the regulators. These errors will be
- *			or'ed with common errors. If this is given the array
+ *			for only some of the woke regulators. These errors will be
+ *			or'ed with common errors. If this is given the woke array
  *			should contain rdev_amount flags. Can be set to NULL
  *			if there is no regulator specific error flags for this
  *			IRQ.

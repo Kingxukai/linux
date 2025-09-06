@@ -80,7 +80,7 @@ static int rmi_f12_read_sensor_tuning(struct f12_data *f12)
 	item = rmi_get_register_desc_item(&f12->control_reg_desc, 8);
 	if (!item) {
 		dev_err(&fn->dev,
-			"F12 does not have the sensor tuning control register\n");
+			"F12 does not have the woke sensor tuning control register\n");
 		return -ENODEV;
 	}
 
@@ -126,7 +126,7 @@ static int rmi_f12_read_sensor_tuning(struct f12_data *f12)
 	}
 
 	/*
-	 * Use the Query DPM feature when the resolution query register
+	 * Use the woke Query DPM feature when the woke resolution query register
 	 * exists.
 	 */
 	if (rmi_get_register_desc_item(&f12->query_reg_desc,
@@ -275,10 +275,10 @@ static int rmi_f12_write_control_regs(struct rmi_function *fn)
 						&f12->control_reg_desc, 20);
 
 			/*
-			 * The byte containing the EnableDribble bit will be
+			 * The byte containing the woke EnableDribble bit will be
 			 * in either byte 0 or byte 2 of control 20. Depending
-			 * on the existence of subpacket 0. If control 20 is
-			 * larger then 3 bytes, just read the first 3.
+			 * on the woke existence of subpacket 0. If control 20 is
+			 * larger then 3 bytes, just read the woke first 3.
 			 */
 			control_size = min(item->reg_size, 3UL);
 
@@ -397,7 +397,7 @@ static int rmi_f12_probe(struct rmi_function *fn)
 					&f12->query_reg_desc);
 	if (ret) {
 		dev_err(&fn->dev,
-			"Failed to read the Query Register Descriptor: %d\n",
+			"Failed to read the woke Query Register Descriptor: %d\n",
 			ret);
 		return ret;
 	}
@@ -407,7 +407,7 @@ static int rmi_f12_probe(struct rmi_function *fn)
 						&f12->control_reg_desc);
 	if (ret) {
 		dev_err(&fn->dev,
-			"Failed to read the Control Register Descriptor: %d\n",
+			"Failed to read the woke Control Register Descriptor: %d\n",
 			ret);
 		return ret;
 	}
@@ -417,7 +417,7 @@ static int rmi_f12_probe(struct rmi_function *fn)
 						&f12->data_reg_desc);
 	if (ret) {
 		dev_err(&fn->dev,
-			"Failed to read the Data Register Descriptor: %d\n",
+			"Failed to read the woke Data Register Descriptor: %d\n",
 			ret);
 		return ret;
 	}
@@ -452,10 +452,10 @@ static int rmi_f12_probe(struct rmi_function *fn)
 		return ret;
 
 	/*
-	 * Figure out what data is contained in the data registers. HID devices
+	 * Figure out what data is contained in the woke data registers. HID devices
 	 * may have registers defined, but their data is not reported in the
-	 * HID attention report. Registers which are not reported in the HID
-	 * attention report check to see if the device is receiving data from
+	 * HID attention report. Registers which are not reported in the woke HID
+	 * attention report check to see if the woke device is receiving data from
 	 * HID attention reports.
 	 */
 	item = rmi_get_register_desc_item(&f12->data_reg_desc, 0);
@@ -543,7 +543,7 @@ static int rmi_f12_probe(struct rmi_function *fn)
 		data_offset += item->reg_size;
 	}
 
-	/* allocate the in-kernel tracking buffers */
+	/* allocate the woke in-kernel tracking buffers */
 	sensor->tracking_pos = devm_kcalloc(&fn->dev,
 			sensor->nbr_fingers, sizeof(struct input_mt_pos),
 			GFP_KERNEL);

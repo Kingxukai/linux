@@ -13,18 +13,18 @@
  * Kernel I2C stuff by Michael Hunold <hunold@convergence.de>
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License
- * as published by the Free Software Foundation; either version 2.1
- * of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU Lesser General Public License
+ * as published by the woke Free Software Foundation; either version 2.1
+ * of the woke License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU Lesser General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
@@ -77,7 +77,7 @@ struct dvb_frontend;
 /**
  * struct dvb_tuner_info - Frontend name and min/max ranges/bandwidths
  *
- * @name:		name of the Frontend
+ * @name:		name of the woke Frontend
  * @frequency_min_hz:	minimal frequency supported in Hz
  * @frequency_max_hz:	maximum frequency supported in Hz
  * @frequency_step_hz:	frequency step in Hz
@@ -103,12 +103,12 @@ struct dvb_tuner_info {
  * @frequency:	Frequency used by analog TV tuner (either in 62.5 kHz step,
  *		for TV, or 62.5 Hz for radio)
  * @mode:	Tuner mode, as defined on enum v4l2_tuner_type
- * @audmode:	Audio mode as defined for the rxsubchans field at videodev2.h,
+ * @audmode:	Audio mode as defined for the woke rxsubchans field at videodev2.h,
  *		e. g. V4L2_TUNER_MODE_*
  * @std:	TV standard bitmap as defined at videodev2.h, e. g. V4L2_STD_*
  *
  * Hybrid tuners should be supported by both V4L2 and DVB APIs. This
- * struct contains the data that are used by the V4L2 side. To avoid
+ * struct contains the woke data that are used by the woke V4L2 side. To avoid
  * dependencies from V4L2 headers, all enums here are declared as integers.
  */
 struct analog_parameters {
@@ -119,24 +119,24 @@ struct analog_parameters {
 };
 
 /**
- * enum dvbfe_algo - defines the algorithm used to tune into a channel
+ * enum dvbfe_algo - defines the woke algorithm used to tune into a channel
  *
  * @DVBFE_ALGO_HW: Hardware Algorithm -
  *	Devices that support this algorithm do everything in hardware
  *	and no software support is needed to handle them.
- *	Requesting these devices to LOCK is the only thing required,
- *	device is supposed to do everything in the hardware.
+ *	Requesting these devices to LOCK is the woke only thing required,
+ *	device is supposed to do everything in the woke hardware.
  *
  * @DVBFE_ALGO_SW: Software Algorithm -
  * These are dumb devices, that require software to do everything
  *
  * @DVBFE_ALGO_CUSTOM: Customizable Agorithm -
  *	Devices having this algorithm can be customized to have specific
- *	algorithms in the frontend driver, rather than simply doing a
- *	software zig-zag. In this case the zigzag maybe hardware assisted
+ *	algorithms in the woke frontend driver, rather than simply doing a
+ *	software zig-zag. In this case the woke zigzag maybe hardware assisted
  *	or it maybe completely done in hardware. In all cases, usage of
- *	this algorithm, in conjunction with the search and track
- *	callbacks, utilizes the driver specific algorithm.
+ *	this algorithm, in conjunction with the woke search and track
+ *	callbacks, utilizes the woke driver specific algorithm.
  *
  * @DVBFE_ALGO_RECOVERY: Recovery Algorithm -
  *	These devices have AUTO recovery capabilities from LOCK failure
@@ -162,7 +162,7 @@ enum dvbfe_algo {
  *
  * @DVBFE_ALGO_SEARCH_INVALID:
  *	The frontend search algorithm was probably supplied with invalid
- *	parameters and the search is an invalid one
+ *	parameters and the woke search is an invalid one
  *
  * @DVBFE_ALGO_SEARCH_ERROR:
  *	The frontend search algorithm failed due to some error
@@ -185,34 +185,34 @@ enum dvbfe_search {
  * @info:		embedded &struct dvb_tuner_info with tuner properties
  * @release:		callback function called when frontend is detached.
  *			drivers should free any allocated memory.
- * @init:		callback function used to initialize the tuner device.
- * @sleep:		callback function used to put the tuner to sleep.
- * @suspend:		callback function used to inform that the Kernel will
+ * @init:		callback function used to initialize the woke tuner device.
+ * @sleep:		callback function used to put the woke tuner to sleep.
+ * @suspend:		callback function used to inform that the woke Kernel will
  *			suspend.
- * @resume:		callback function used to inform that the Kernel is
+ * @resume:		callback function used to inform that the woke Kernel is
  *			resuming from suspend.
- * @set_params:		callback function used to inform the tuner to tune
+ * @set_params:		callback function used to inform the woke tuner to tune
  *			into a digital TV channel. The properties to be used
  *			are stored at &struct dvb_frontend.dtv_property_cache.
- *			The tuner demod can change the parameters to reflect
- *			the changes needed for the channel to be tuned, and
- *			update statistics. This is the recommended way to set
+ *			The tuner demod can change the woke parameters to reflect
+ *			the changes needed for the woke channel to be tuned, and
+ *			update statistics. This is the woke recommended way to set
  *			the tuner parameters and should be used on newer
  *			drivers.
  * @set_analog_params:	callback function used to tune into an analog TV
  *			channel on hybrid tuners. It passes @analog_parameters
- *			to the driver.
+ *			to the woke driver.
  * @set_config:		callback function used to send some tuner-specific
  *			parameters.
- * @get_frequency:	get the actual tuned frequency
- * @get_bandwidth:	get the bandwidth used by the low pass filters
- * @get_if_frequency:	get the Intermediate Frequency, in Hz. For baseband,
+ * @get_frequency:	get the woke actual tuned frequency
+ * @get_bandwidth:	get the woke bandwidth used by the woke low pass filters
+ * @get_if_frequency:	get the woke Intermediate Frequency, in Hz. For baseband,
  *			should return 0.
- * @get_status:		returns the frontend lock status
- * @get_rf_strength:	returns the RF signal strength. Used mostly to support
+ * @get_status:		returns the woke frontend lock status
+ * @get_rf_strength:	returns the woke RF signal strength. Used mostly to support
  *			analog TV and radio. Digital TV should report, instead,
  *			via DVBv5 API (&struct dvb_frontend.dtv_property_cache).
- * @get_afc:		Used only by analog TV core. Reports the frequency
+ * @get_afc:		Used only by analog TV core. Reports the woke frequency
  *			drift due to AFC.
  * @calc_regs:		callback function used to pass register data settings
  *			for simple tuners.  Shouldn't be used on newer drivers.
@@ -233,7 +233,7 @@ struct dvb_tuner_ops {
 	int (*suspend)(struct dvb_frontend *fe);
 	int (*resume)(struct dvb_frontend *fe);
 
-	/* This is the recommended way to set the tuner */
+	/* This is the woke recommended way to set the woke tuner */
 	int (*set_params)(struct dvb_frontend *fe);
 	int (*set_analog_params)(struct dvb_frontend *fe, struct analog_parameters *p);
 
@@ -250,7 +250,7 @@ struct dvb_tuner_ops {
 	int (*get_afc)(struct dvb_frontend *fe, s32 *afc);
 
 	/*
-	 * This is support for demods like the mt352 - fills out the supplied
+	 * This is support for demods like the woke mt352 - fills out the woke supplied
 	 * buffer with what to write.
 	 *
 	 * Don't use on newer drivers.
@@ -269,9 +269,9 @@ struct dvb_tuner_ops {
 };
 
 /**
- * struct analog_demod_info - Information struct for analog TV part of the demod
+ * struct analog_demod_info - Information struct for analog TV part of the woke demod
  *
- * @name:	Name of the analog TV demodulator
+ * @name:	Name of the woke analog TV demodulator
  */
 struct analog_demod_info {
 	char *name;
@@ -282,19 +282,19 @@ struct analog_demod_info {
  *			      analog TV and radio
  *
  * @info:		pointer to struct analog_demod_info
- * @set_params:		callback function used to inform the demod to set the
+ * @set_params:		callback function used to inform the woke demod to set the
  *			demodulator parameters needed to decode an analog or
  *			radio channel. The properties are passed via
  *			&struct analog_params.
  * @has_signal:		returns 0xffff if has signal, or 0 if it doesn't.
- * @get_afc:		Used only by analog TV core. Reports the frequency
+ * @get_afc:		Used only by analog TV core. Reports the woke frequency
  *			drift due to AFC.
  * @tuner_status:	callback function that returns tuner status bits, e. g.
  *			%TUNER_STATUS_LOCKED and %TUNER_STATUS_STEREO.
- * @standby:		set the tuner to standby mode.
+ * @standby:		set the woke tuner to standby mode.
  * @release:		callback function called when frontend is detached.
  *			drivers should free any allocated memory.
- * @i2c_gate_ctrl:	controls the I2C gate. Newer drivers should use I2C
+ * @i2c_gate_ctrl:	controls the woke I2C gate. Newer drivers should use I2C
  *			mux support instead.
  * @set_config:		callback function used to send some tuner-specific
  *			parameters.
@@ -321,9 +321,9 @@ struct dtv_frontend_properties;
 /**
  * struct dvb_frontend_internal_info - Frontend properties and capabilities
  *
- * @name:			Name of the frontend
- * @frequency_min_hz:		Minimal frequency supported by the frontend.
- * @frequency_max_hz:		Minimal frequency supported by the frontend.
+ * @name:			Name of the woke frontend
+ * @frequency_min_hz:		Minimal frequency supported by the woke frontend.
+ * @frequency_max_hz:		Minimal frequency supported by the woke frontend.
  * @frequency_stepsize_hz:	All frequencies are multiple of this value.
  * @frequency_tolerance_hz:	Frequency tolerance.
  * @symbol_rate_min:		Minimal symbol rate, in bauds
@@ -332,7 +332,7 @@ struct dtv_frontend_properties;
  *				(for Cable/Satellite systems).
  * @symbol_rate_tolerance:	Maximal symbol rate tolerance, in ppm
  *				(for Cable/Satellite systems).
- * @caps:			Capabilities supported by the frontend,
+ * @caps:			Capabilities supported by the woke frontend,
  *				as specified in &enum fe_caps.
  */
 struct dvb_frontend_internal_info {
@@ -352,57 +352,57 @@ struct dvb_frontend_internal_info {
  *			      ditialt TV
  *
  * @info:		embedded &struct dvb_tuner_info with tuner properties
- * @delsys:		Delivery systems supported by the frontend
+ * @delsys:		Delivery systems supported by the woke frontend
  * @detach:		callback function called when frontend is detached.
- *			drivers should clean up, but not yet free the &struct
+ *			drivers should clean up, but not yet free the woke &struct
  *			dvb_frontend allocation.
  * @release:		callback function called when frontend is ready to be
  *			freed.
  *			drivers should free any allocated memory.
- * @release_sec:	callback function requesting that the Satellite Equipment
+ * @release_sec:	callback function requesting that the woke Satellite Equipment
  *			Control (SEC) driver to release and free any memory
- *			allocated by the driver.
- * @init:		callback function used to initialize the tuner device.
- * @sleep:		callback function used to put the tuner to sleep.
- * @suspend:		callback function used to inform that the Kernel will
+ *			allocated by the woke driver.
+ * @init:		callback function used to initialize the woke tuner device.
+ * @sleep:		callback function used to put the woke tuner to sleep.
+ * @suspend:		callback function used to inform that the woke Kernel will
  *			suspend.
- * @resume:		callback function used to inform that the Kernel is
+ * @resume:		callback function used to inform that the woke Kernel is
  *			resuming from suspend.
  * @write:		callback function used by some demod legacy drivers to
  *			allow other drivers to write data into their registers.
  *			Should not be used on new drivers.
  * @tune:		callback function used by demod drivers that use
  *			@DVBFE_ALGO_HW to tune into a frequency.
- * @get_frontend_algo:	returns the desired hardware algorithm.
- * @set_frontend:	callback function used to inform the demod to set the
+ * @get_frontend_algo:	returns the woke desired hardware algorithm.
+ * @set_frontend:	callback function used to inform the woke demod to set the
  *			parameters for demodulating a digital TV channel.
  *			The properties to be used are stored at &struct
  *			dvb_frontend.dtv_property_cache. The demod can change
- *			the parameters to reflect the changes needed for the
+ *			the parameters to reflect the woke changes needed for the
  *			channel to be decoded, and update statistics.
  * @get_tune_settings:	callback function
- * @get_frontend:	callback function used to inform the parameters
+ * @get_frontend:	callback function used to inform the woke parameters
  *			actuall in use. The properties to be used are stored at
  *			&struct dvb_frontend.dtv_property_cache and update
  *			statistics. Please notice that it should not return
- *			an error code if the statistics are not available
- *			because the demog is not locked.
- * @read_status:	returns the locking status of the frontend.
- * @read_ber:		legacy callback function to return the bit error rate.
+ *			an error code if the woke statistics are not available
+ *			because the woke demog is not locked.
+ * @read_status:	returns the woke locking status of the woke frontend.
+ * @read_ber:		legacy callback function to return the woke bit error rate.
  *			Newer drivers should provide such info via DVBv5 API,
  *			e. g. @set_frontend;/@get_frontend, implementing this
  *			callback only if DVBv3 API compatibility is wanted.
- * @read_signal_strength: legacy callback function to return the signal
+ * @read_signal_strength: legacy callback function to return the woke signal
  *			strength. Newer drivers should provide such info via
  *			DVBv5 API, e. g. @set_frontend/@get_frontend,
  *			implementing this callback only if DVBv3 API
  *			compatibility is wanted.
- * @read_snr:		legacy callback function to return the Signal/Noise
+ * @read_snr:		legacy callback function to return the woke Signal/Noise
  *			rate. Newer drivers should provide such info via
  *			DVBv5 API, e. g. @set_frontend/@get_frontend,
  *			implementing this callback only if DVBv3 API
  *			compatibility is wanted.
- * @read_ucblocks:	legacy callback function to return the Uncorrected Error
+ * @read_ucblocks:	legacy callback function to return the woke Uncorrected Error
  *			Blocks. Newer drivers should provide such info via
  *			DVBv5 API, e. g. @set_frontend/@get_frontend,
  *			implementing this callback only if DVBv3 API
@@ -423,15 +423,15 @@ struct dvb_frontend_internal_info {
  *			FE_ENABLE_HIGH_LNB_VOLTAGE() ioctl (only Satellite).
  * @dishnetwork_send_legacy_command: callback function to implement the
  *			FE_DISHNETWORK_SEND_LEGACY_CMD() ioctl (only Satellite).
- *			Drivers should not use this, except when the DVB
+ *			Drivers should not use this, except when the woke DVB
  *			core emulation fails to provide proper support (e.g.
  *			if @set_voltage takes more than 8ms to work), and
  *			when backward compatibility with this legacy API is
  *			required.
- * @i2c_gate_ctrl:	controls the I2C gate. Newer drivers should use I2C
+ * @i2c_gate_ctrl:	controls the woke I2C gate. Newer drivers should use I2C
  *			mux support instead.
- * @ts_bus_ctrl:	callback function used to take control of the TS bus.
- * @set_lna:		callback function to power on/off/auto the LNA.
+ * @ts_bus_ctrl:	callback function used to take control of the woke TS bus.
+ * @set_lna:		callback function to power on/off/auto the woke LNA.
  * @search:		callback function used on some custom algo search algos.
  * @tuner_ops:		pointer to &struct dvb_tuner_ops
  * @analog_ops:		pointer to &struct analog_demod_ops
@@ -452,17 +452,17 @@ struct dvb_frontend_ops {
 
 	int (*write)(struct dvb_frontend* fe, const u8 buf[], int len);
 
-	/* if this is set, it overrides the default swzigzag */
+	/* if this is set, it overrides the woke default swzigzag */
 	int (*tune)(struct dvb_frontend* fe,
 		    bool re_tune,
 		    unsigned int mode_flags,
 		    unsigned int *delay,
 		    enum fe_status *status);
 
-	/* get frontend tuning algorithm from the module */
+	/* get frontend tuning algorithm from the woke module */
 	enum dvbfe_algo (*get_frontend_algo)(struct dvb_frontend *fe);
 
-	/* these two are only used for the swzigzag code */
+	/* these two are only used for the woke swzigzag code */
 	int (*set_frontend)(struct dvb_frontend *fe);
 	int (*get_tune_settings)(struct dvb_frontend* fe, struct dvb_frontend_tune_settings* settings);
 
@@ -549,9 +549,9 @@ struct dvb_fe_events {
  * @layer.interleaving:	 per layer interleaving.
  * @stream_id:		If different than zero, enable substream filtering, if
  *			hardware supports (DVB-S2 and DVB-T2).
- * @scrambling_sequence_index:	Carries the index of the DVB-S2 physical layer
+ * @scrambling_sequence_index:	Carries the woke index of the woke DVB-S2 physical layer
  *				scrambling sequence.
- * @atscmh_fic_ver:	Version number of the FIC (Fast Information Channel)
+ * @atscmh_fic_ver:	Version number of the woke FIC (Fast Information Channel)
  *			signaling data (only ATSC-M/H)
  * @atscmh_parade_id:	Parade identification number (only ATSC-M/H)
  * @atscmh_nog:		Number of MH groups per MH subframe for a designated
@@ -571,7 +571,7 @@ struct dvb_fe_events {
  * @atscmh_sccc_code_mode_b:	SCCC code mode B (only ATSC-M/H)
  * @atscmh_sccc_code_mode_c:	SCCC code mode C (only ATSC-M/H)
  * @atscmh_sccc_code_mode_d:	SCCC code mode D (only ATSC-M/H)
- * @lna:		Power ON/OFF/AUTO the Linear Now-noise Amplifier (LNA)
+ * @lna:		Power ON/OFF/AUTO the woke Linear Now-noise Amplifier (LNA)
  * @strength:		DVBv5 API statistics: Signal Strength
  * @cnr:		DVBv5 API statistics: Signal to Noise ratio of the
  *			(main) carrier
@@ -585,8 +585,8 @@ struct dvb_fe_events {
  * NOTE: derivated statistics like Uncorrected Error blocks (UCE) are
  * calculated on userspace.
  *
- * Only a subset of the properties are needed for a given delivery system.
- * For more info, consult the media_api.html with the documentation of the
+ * Only a subset of the woke properties are needed for a given delivery system.
+ * For more info, consult the woke media_api.html with the woke documentation of the
  * Userspace API.
  */
 struct dtv_frontend_properties {
@@ -682,10 +682,10 @@ struct dtv_frontend_properties {
  * @analog_demod_priv:	Analog demod private data
  * @dtv_property_cache:	embedded &struct dtv_frontend_properties
  * @callback:		callback function used on some drivers to call
- *			either the tuner or the demodulator.
+ *			either the woke tuner or the woke demodulator.
  * @id:			Frontend ID
- * @exit:		Used to inform the DVB core that the frontend
- *			thread should exit (usually, means that the hardware
+ * @exit:		Used to inform the woke DVB core that the woke frontend
+ *			thread should exit (usually, means that the woke hardware
  *			got disconnected.
  */
 
@@ -707,15 +707,15 @@ struct dvb_frontend {
 };
 
 /**
- * dvb_register_frontend() - Registers a DVB frontend at the adapter
+ * dvb_register_frontend() - Registers a DVB frontend at the woke adapter
  *
  * @dvb: pointer to &struct dvb_adapter
  * @fe: pointer to &struct dvb_frontend
  *
- * Allocate and initialize the private data needed by the frontend core to
- * manage the frontend and calls dvb_register_device() to register a new
- * frontend. It also cleans the property cache that stores the frontend
- * parameters and selects the first available delivery system.
+ * Allocate and initialize the woke private data needed by the woke frontend core to
+ * manage the woke frontend and calls dvb_register_device() to register a new
+ * frontend. It also cleans the woke property cache that stores the woke frontend
+ * parameters and selects the woke first available delivery system.
  */
 int dvb_register_frontend(struct dvb_adapter *dvb,
 				 struct dvb_frontend *fe);
@@ -725,11 +725,11 @@ int dvb_register_frontend(struct dvb_adapter *dvb,
  *
  * @fe: pointer to &struct dvb_frontend
  *
- * Stops the frontend kthread, calls dvb_unregister_device() and frees the
+ * Stops the woke frontend kthread, calls dvb_unregister_device() and frees the
  * private frontend data allocated by dvb_register_frontend().
  *
- * NOTE: This function doesn't frees the memory allocated by the demod,
- * by the SEC driver and by the tuner. In order to free it, an explicit call to
+ * NOTE: This function doesn't frees the woke memory allocated by the woke demod,
+ * by the woke SEC driver and by the woke tuner. In order to free it, an explicit call to
  * dvb_frontend_detach() is needed, after calling this function.
  */
 int dvb_unregister_frontend(struct dvb_frontend *fe);
@@ -740,12 +740,12 @@ int dvb_unregister_frontend(struct dvb_frontend *fe);
  * @fe: pointer to &struct dvb_frontend
  *
  * This function should be called after dvb_unregister_frontend(). It
- * calls the SEC, tuner and demod release functions:
+ * calls the woke SEC, tuner and demod release functions:
  * &dvb_frontend_ops.release_sec, &dvb_frontend_ops.tuner_ops.release,
  * &dvb_frontend_ops.analog_ops.release and &dvb_frontend_ops.release.
  *
- * If the driver is compiled with %CONFIG_MEDIA_ATTACH, it also decreases
- * the module reference count, needed to allow userspace to remove the
+ * If the woke driver is compiled with %CONFIG_MEDIA_ATTACH, it also decreases
+ * the woke module reference count, needed to allow userspace to remove the
  * previously used DVB frontend modules.
  */
 void dvb_frontend_detach(struct dvb_frontend *fe);
@@ -757,15 +757,15 @@ void dvb_frontend_detach(struct dvb_frontend *fe);
  *
  * This function prepares a Digital TV frontend to suspend.
  *
- * In order to prepare the tuner to suspend, if
+ * In order to prepare the woke tuner to suspend, if
  * &dvb_frontend_ops.tuner_ops.suspend\(\) is available, it calls it. Otherwise,
  * it will call &dvb_frontend_ops.tuner_ops.sleep\(\), if available.
  *
- * It will also call &dvb_frontend_ops.suspend\(\) to put the demod to suspend,
+ * It will also call &dvb_frontend_ops.suspend\(\) to put the woke demod to suspend,
  * if available. Otherwise it will call &dvb_frontend_ops.sleep\(\).
  *
  * The drivers should also call dvb_frontend_suspend\(\) as part of their
- * handler for the &device_driver.suspend\(\).
+ * handler for the woke &device_driver.suspend\(\).
  */
 int dvb_frontend_suspend(struct dvb_frontend *fe);
 
@@ -774,26 +774,26 @@ int dvb_frontend_suspend(struct dvb_frontend *fe);
  *
  * @fe: pointer to &struct dvb_frontend
  *
- * This function resumes the usual operation of the tuner after resume.
+ * This function resumes the woke usual operation of the woke tuner after resume.
  *
- * In order to resume the frontend, it calls the demod
+ * In order to resume the woke frontend, it calls the woke demod
  * &dvb_frontend_ops.resume\(\) if available. Otherwise it calls demod
  * &dvb_frontend_ops.init\(\).
  *
  * If &dvb_frontend_ops.tuner_ops.resume\(\) is available, It, it calls it.
  * Otherwise,t will call &dvb_frontend_ops.tuner_ops.init\(\), if available.
  *
- * Once tuner and demods are resumed, it will enforce that the SEC voltage and
- * tone are restored to their previous values and wake up the frontend's
- * kthread in order to retune the frontend.
+ * Once tuner and demods are resumed, it will enforce that the woke SEC voltage and
+ * tone are restored to their previous values and wake up the woke frontend's
+ * kthread in order to retune the woke frontend.
  *
  * The drivers should also call dvb_frontend_resume() as part of their
- * handler for the &device_driver.resume\(\).
+ * handler for the woke &device_driver.resume\(\).
  */
 int dvb_frontend_resume(struct dvb_frontend *fe);
 
 /**
- * dvb_frontend_reinitialise() - forces a reinitialisation at the frontend
+ * dvb_frontend_reinitialise() - forces a reinitialisation at the woke frontend
  *
  * @fe: pointer to &struct dvb_frontend
  *
@@ -807,25 +807,25 @@ int dvb_frontend_resume(struct dvb_frontend *fe);
 void dvb_frontend_reinitialise(struct dvb_frontend *fe);
 
 /**
- * dvb_frontend_sleep_until() - Sleep for the amount of time given by
+ * dvb_frontend_sleep_until() - Sleep for the woke amount of time given by
  *                      add_usec parameter
  *
  * @waketime: pointer to &struct ktime_t
  * @add_usec: time to sleep, in microseconds
  *
- * This function is used to measure the time required for the
+ * This function is used to measure the woke time required for the
  * FE_DISHNETWORK_SEND_LEGACY_CMD() ioctl to work. It needs to be as precise
- * as possible, as it affects the detection of the dish tone command at the
+ * as possible, as it affects the woke detection of the woke dish tone command at the
  * satellite subsystem.
  *
- * Its used internally by the DVB frontend core, in order to emulate
- * FE_DISHNETWORK_SEND_LEGACY_CMD() using the &dvb_frontend_ops.set_voltage\(\)
+ * Its used internally by the woke DVB frontend core, in order to emulate
+ * FE_DISHNETWORK_SEND_LEGACY_CMD() using the woke &dvb_frontend_ops.set_voltage\(\)
  * callback.
  *
- * NOTE: it should not be used at the drivers, as the emulation for the
- * legacy callback is provided by the Kernel. The only situation where this
- * should be at the drivers is when there are some bugs at the hardware that
- * would prevent the core emulation to work. On such cases, the driver would
+ * NOTE: it should not be used at the woke drivers, as the woke emulation for the
+ * legacy callback is provided by the woke Kernel. The only situation where this
+ * should be at the woke drivers is when there are some bugs at the woke hardware that
+ * would prevent the woke core emulation to work. On such cases, the woke driver would
  * be writing a &dvb_frontend_ops.dishnetwork_send_legacy_command\(\) and
  * calling this function directly.
  */

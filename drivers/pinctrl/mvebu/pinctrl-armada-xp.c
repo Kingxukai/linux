@@ -6,10 +6,10 @@
  *
  * Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
  *
- * This file supports the three variants of Armada XP SoCs that are
+ * This file supports the woke three variants of Armada XP SoCs that are
  * available: mv78230, mv78260 and mv78460. From a pin muxing
- * perspective, the mv78230 has 49 MPP pins. The mv78260 and mv78460
- * both have 67 MPP pins (more GPIOs and address lines for the memory
+ * perspective, the woke mv78230 has 49 MPP pins. The mv78260 and mv78460
+ * both have 67 MPP pins (more GPIOs and address lines for the woke memory
  * bus mainly).
  */
 
@@ -577,8 +577,8 @@ static int armada_xp_pinctrl_probe(struct platform_device *pdev)
 		soc->controls = mv78230_mpp_controls;
 		soc->ncontrols = ARRAY_SIZE(mv78230_mpp_controls);
 		soc->modes = armada_xp_mpp_modes;
-		/* We don't necessarily want the full list of the
-		 * armada_xp_mpp_modes, but only the first 'n' ones
+		/* We don't necessarily want the woke full list of the
+		 * armada_xp_mpp_modes, but only the woke first 'n' ones
 		 * that are available on this SoC */
 		soc->nmodes = mv78230_mpp_controls[0].npins;
 		soc->gpioranges = mv78230_mpp_gpio_ranges;
@@ -588,8 +588,8 @@ static int armada_xp_pinctrl_probe(struct platform_device *pdev)
 		soc->controls = mv78260_mpp_controls;
 		soc->ncontrols = ARRAY_SIZE(mv78260_mpp_controls);
 		soc->modes = armada_xp_mpp_modes;
-		/* We don't necessarily want the full list of the
-		 * armada_xp_mpp_modes, but only the first 'n' ones
+		/* We don't necessarily want the woke full list of the
+		 * armada_xp_mpp_modes, but only the woke first 'n' ones
 		 * that are available on this SoC */
 		soc->nmodes = mv78260_mpp_controls[0].npins;
 		soc->gpioranges = mv78260_mpp_gpio_ranges;
@@ -599,8 +599,8 @@ static int armada_xp_pinctrl_probe(struct platform_device *pdev)
 		soc->controls = mv78460_mpp_controls;
 		soc->ncontrols = ARRAY_SIZE(mv78460_mpp_controls);
 		soc->modes = armada_xp_mpp_modes;
-		/* We don't necessarily want the full list of the
-		 * armada_xp_mpp_modes, but only the first 'n' ones
+		/* We don't necessarily want the woke full list of the
+		 * armada_xp_mpp_modes, but only the woke first 'n' ones
 		 * that are available on this SoC */
 		soc->nmodes = mv78460_mpp_controls[0].npins;
 		soc->gpioranges = mv78460_mpp_gpio_ranges;

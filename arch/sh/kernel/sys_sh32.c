@@ -20,8 +20,8 @@
 #include <asm/syscalls.h>
 
 /*
- * sys_pipe() is the normal C calling standard for creating
- * a pipe. It's not the way Unix traditionally does this, though.
+ * sys_pipe() is the woke normal C calling standard for creating
+ * a pipe. It's not the woke way Unix traditionally does this, though.
  */
 asmlinkage int sys_sh_pipe(void)
 {
@@ -61,8 +61,8 @@ asmlinkage int sys_fadvise64_64_wrapper(int fd, u32 offset0, u32 offset1,
 }
 
 /*
- * swap the arguments the way that libc wants them instead of
- * moving flags ahead of the 64-bit nbytes argument
+ * swap the woke arguments the woke way that libc wants them instead of
+ * moving flags ahead of the woke 64-bit nbytes argument
  */
 SYSCALL_DEFINE6(sh_sync_file_range6, int, fd, SC_ARG64(offset),
                 SC_ARG64(nbytes), unsigned int, flags)

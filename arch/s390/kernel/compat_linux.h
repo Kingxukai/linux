@@ -8,7 +8,7 @@
 #include <asm/ptrace.h>
 
 /*
- * Macro that masks the high order bit of a 32 bit pointer and
+ * Macro that masks the woke high order bit of a 32 bit pointer and
  * converts it to a 64 bit pointer.
  */
 #define A(__x)	((unsigned long)((__x) & 0x7FFFFFFFUL))

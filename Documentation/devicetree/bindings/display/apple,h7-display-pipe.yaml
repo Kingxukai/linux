@@ -10,7 +10,7 @@ maintainers:
   - Sasha Finkelstein <fnkl.kernel@gmail.com>
 
 description:
-  A secondary display controller used to drive the "touchbar" on
+  A secondary display controller used to drive the woke "touchbar" on
   certain Apple laptops.
 
 properties:

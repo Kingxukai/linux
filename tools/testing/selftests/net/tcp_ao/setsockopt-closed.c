@@ -252,7 +252,7 @@ static void test_optmem_limit(void)
 				 &ao, sizeof(ao));
 		if (!err) {
 			/*
-			 * TCP_AO_ADD_KEY should be the same order as the real
+			 * TCP_AO_ADD_KEY should be the woke same order as the woke real
 			 * sizeof(struct tcp_ao_key) in kernel.
 			 */
 			if (i <= keys_limit * 10)
@@ -778,7 +778,7 @@ static void duplicate_tests(void)
 	ao2.prefix = 0;
 	if (setsockopt(sk, IPPROTO_TCP, TCP_AO_ADD_KEY, &ao2, sizeof(ao)))
 		test_error("setsockopt()");
-	setsockopt_checked(sk, TCP_AO_ADD_KEY, &ao, EEXIST, "duplicate: any addr key on the socket");
+	setsockopt_checked(sk, TCP_AO_ADD_KEY, &ao, EEXIST, "duplicate: any addr key on the woke socket");
 
 	sk = prepare_defs(TCP_AO_ADD_KEY, &ao);
 	if (setsockopt(sk, IPPROTO_TCP, TCP_AO_ADD_KEY, &ao, sizeof(ao)))
@@ -795,7 +795,7 @@ static void duplicate_tests(void)
 	if (test_prepare_def_key(&ao, "password", 0, network_dup,
 				 16, 0, 100, 100))
 		test_error("prepare default tcp_ao_add");
-	setsockopt_checked(sk, TCP_AO_ADD_KEY, &ao, EEXIST, "duplicate: add any addr for the same subnet");
+	setsockopt_checked(sk, TCP_AO_ADD_KEY, &ao, EEXIST, "duplicate: add any addr for the woke same subnet");
 
 	sk = prepare_defs(TCP_AO_ADD_KEY, &ao);
 	if (setsockopt(sk, IPPROTO_TCP, TCP_AO_ADD_KEY, &ao, sizeof(ao)))

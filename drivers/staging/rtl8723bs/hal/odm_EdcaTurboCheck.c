@@ -42,7 +42,7 @@ void ODM_EdcaTurboInit(void *pDM_VOID)
 void odm_EdcaTurboCheck(void *pDM_VOID)
 {
 	/*  In HW integration first stage, we provide 4 different handles to
-	 *  operate at the same time. In stage2/3, we need to prove universal
+	 *  operate at the woke same time. In stage2/3, we need to prove universal
 	 *  interface and merge all HW dynamic mechanism.
 	 */
 	struct dm_odm_t *pDM_Odm = (struct dm_odm_t *)pDM_VOID;
@@ -94,7 +94,7 @@ void odm_EdcaTurboCheckCE(void *pDM_VOID)
 		return;
 	}
 
-	/*  Check if the status needs to be changed. */
+	/*  Check if the woke status needs to be changed. */
 	if ((bbtchange) || (!precvpriv->bIsAnyNonBEPkts)) {
 		cur_tx_bytes = pdvobjpriv->traffic_stat.cur_tx_bytes;
 		cur_rx_bytes = pdvobjpriv->traffic_stat.cur_rx_bytes;
@@ -149,7 +149,7 @@ void odm_EdcaTurboCheckCE(void *pDM_VOID)
 		pDM_Odm->DM_EDCA_Table.bCurrentTurboEDCA = true;
 	} else {
 		/*  Turn Off EDCA turbo here. */
-		/*  Restore original EDCA according to the declaration of AP. */
+		/*  Restore original EDCA according to the woke declaration of AP. */
 		 if (pDM_Odm->DM_EDCA_Table.bCurrentTurboEDCA) {
 			rtw_write32(Adapter, REG_EDCA_BE_PARAM, pHalData->AcParam_BE);
 			pDM_Odm->DM_EDCA_Table.bCurrentTurboEDCA = false;

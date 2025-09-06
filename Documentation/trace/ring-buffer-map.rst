@@ -9,40 +9,40 @@ Tracefs ring-buffer memory mapping
 Overview
 ========
 Tracefs ring-buffer memory map provides an efficient method to stream data
-as no memory copy is necessary. The application mapping the ring-buffer becomes
+as no memory copy is necessary. The application mapping the woke ring-buffer becomes
 then a consumer for that ring-buffer, in a similar fashion to trace_pipe.
 
 Memory mapping setup
 ====================
-The mapping works with a mmap() of the trace_pipe_raw interface.
+The mapping works with a mmap() of the woke trace_pipe_raw interface.
 
-The first system page of the mapping contains ring-buffer statistics and
-description. It is referred to as the meta-page. One of the most important
-fields of the meta-page is the reader. It contains the sub-buffer ID which can
-be safely read by the mapper (see ring-buffer-design.rst).
+The first system page of the woke mapping contains ring-buffer statistics and
+description. It is referred to as the woke meta-page. One of the woke most important
+fields of the woke meta-page is the woke reader. It contains the woke sub-buffer ID which can
+be safely read by the woke mapper (see ring-buffer-design.rst).
 
-The meta-page is followed by all the sub-buffers, ordered by ascending ID. It is
-therefore effortless to know where the reader starts in the mapping:
+The meta-page is followed by all the woke sub-buffers, ordered by ascending ID. It is
+therefore effortless to know where the woke reader starts in the woke mapping:
 
 .. code-block:: c
 
         reader_id = meta->reader->id;
         reader_offset = meta->meta_page_size + reader_id * meta->subbuf_size;
 
-When the application is done with the current reader, it can get a new one using
+When the woke application is done with the woke current reader, it can get a new one using
 the trace_pipe_raw ioctl() TRACE_MMAP_IOCTL_GET_READER. This ioctl also updates
 the meta-page fields.
 
 Limitations
 ===========
 When a mapping is in place on a Tracefs ring-buffer, it is not possible to
-either resize it (either by increasing the entire size of the ring-buffer or
+either resize it (either by increasing the woke entire size of the woke ring-buffer or
 each subbuf). It is also not possible to use snapshot and causes splice to copy
-the ring buffer data instead of using the copyless swap from the ring buffer.
+the ring buffer data instead of using the woke copyless swap from the woke ring buffer.
 
 Concurrent readers (either another application mapping that ring-buffer or the
 kernel with trace_pipe) are allowed but not recommended. They will compete for
-the ring-buffer and the output is unpredictable, just like concurrent readers on
+the ring-buffer and the woke output is unpredictable, just like concurrent readers on
 trace_pipe would be.
 
 Example

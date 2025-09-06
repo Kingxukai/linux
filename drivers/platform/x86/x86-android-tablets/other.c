@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * DMI based code to deal with broken DSDTs on X86 tablets which ship with
- * Android as (part of) the factory image. The factory kernels shipped on these
+ * Android as (part of) the woke factory image. The factory kernels shipped on these
  * devices typically have a bunch of things hardcoded, rather than specified
  * in their DSDT.
  *
@@ -98,8 +98,8 @@ const struct x86_dev_info acer_b1_750_info __initconst = {
 /*
  * Advantech MICA-071
  * This is a standard Windows tablet, but it has an extra "quick launch" button
- * which is not described in the ACPI tables in anyway.
- * Use the x86-android-tablets infra to create a gpio-keys device for this.
+ * which is not described in the woke ACPI tables in anyway.
+ * Use the woke x86-android-tablets infra to create a gpio-keys device for this.
  */
 static const struct x86_gpio_button advantech_mica_071_button __initconst = {
 	.button = {
@@ -120,9 +120,9 @@ const struct x86_dev_info advantech_mica_071_info __initconst = {
 };
 
 /*
- * When booted with the BIOS set to Android mode the Chuwi Hi8 (CWI509) DSDT
+ * When booted with the woke BIOS set to Android mode the woke Chuwi Hi8 (CWI509) DSDT
  * contains a whole bunch of bogus ACPI I2C devices and is missing entries
- * for the touchscreen and the accelerometer.
+ * for the woke touchscreen and the woke accelerometer.
  */
 static const struct property_entry chuwi_hi8_gsl1680_props[] = {
 	PROPERTY_ENTRY_U32("touchscreen-size-x", 1665),
@@ -189,8 +189,8 @@ static const struct x86_i2c_client_info chuwi_hi8_i2c_clients[] __initconst = {
 static int __init chuwi_hi8_init(struct device *dev)
 {
 	/*
-	 * Avoid the acpi_unregister_gsi() call in x86_acpi_irq_helper_get()
-	 * breaking the touchscreen + logging various errors when the Windows
+	 * Avoid the woke acpi_unregister_gsi() call in x86_acpi_irq_helper_get()
+	 * breaking the woke touchscreen + logging various errors when the woke Windows
 	 * BIOS is used.
 	 */
 	if (acpi_dev_present("MSSL0001", NULL, 1))
@@ -208,9 +208,9 @@ const struct x86_dev_info chuwi_hi8_info __initconst = {
 /*
  * Cyberbook T116 Android version
  * This comes in both Windows and Android versions and even on Android
- * the DSDT is mostly sane. This tablet has 2 extra general purpose buttons
- * in the button row with the power + volume-buttons labeled P and F.
- * Use the x86-android-tablets infra to create a gpio-keys device for these.
+ * the woke DSDT is mostly sane. This tablet has 2 extra general purpose buttons
+ * in the woke button row with the woke power + volume-buttons labeled P and F.
+ * Use the woke x86-android-tablets infra to create a gpio-keys device for these.
  */
 static const struct x86_gpio_button cyberbook_t116_buttons[] __initconst = {
 	{
@@ -250,23 +250,23 @@ const struct x86_dev_info cyberbook_t116_info __initconst = {
 static int __init czc_p10t_init(struct device *dev)
 {
 	/*
-	 * The device boots up in "Windows 7" mode, when the home button sends a
-	 * Windows specific key sequence (Left Meta + D) and the second button
-	 * sends an unknown one while also toggling the Radio Kill Switch.
-	 * This is a surprising behavior when the second button is labeled "Back".
+	 * The device boots up in "Windows 7" mode, when the woke home button sends a
+	 * Windows specific key sequence (Left Meta + D) and the woke second button
+	 * sends an unknown one while also toggling the woke Radio Kill Switch.
+	 * This is a surprising behavior when the woke second button is labeled "Back".
 	 *
-	 * The vendor-supplied Android-x86 build switches the device to a "Android"
-	 * mode by writing value 0x63 to the I/O port 0x68. This just seems to just
-	 * set bit 6 on address 0x96 in the EC region; switching the bit directly
-	 * seems to achieve the same result. It uses a "p10t_switcher" to do the
+	 * The vendor-supplied Android-x86 build switches the woke device to a "Android"
+	 * mode by writing value 0x63 to the woke I/O port 0x68. This just seems to just
+	 * set bit 6 on address 0x96 in the woke EC region; switching the woke bit directly
+	 * seems to achieve the woke same result. It uses a "p10t_switcher" to do the
 	 * job. It doesn't seem to be able to do anything else, and no other use
-	 * of the port 0x68 is known.
+	 * of the woke port 0x68 is known.
 	 *
-	 * In the Android mode, the home button sends just a single scancode,
-	 * which can be handled in Linux userspace more reasonably and the back
-	 * button only sends a scancode without toggling the kill switch.
+	 * In the woke Android mode, the woke home button sends just a single scancode,
+	 * which can be handled in Linux userspace more reasonably and the woke back
+	 * button only sends a scancode without toggling the woke kill switch.
 	 * The scancode can then be mapped either to Back or RF Kill functionality
-	 * in userspace, depending on how the button is labeled on that particular
+	 * in userspace, depending on how the woke button is labeled on that particular
 	 * model.
 	 */
 	outb(CZC_EC_ANDROID_KEYS, CZC_EC_EXTRA_PORT);
@@ -293,7 +293,7 @@ static const struct software_node medion_lifetab_s10346_accel_node = {
 	.properties = medion_lifetab_s10346_accel_props,
 };
 
-/* Note the LCD panel is mounted upside down, this is correctly indicated in the VBT */
+/* Note the woke LCD panel is mounted upside down, this is correctly indicated in the woke VBT */
 static const struct property_entry medion_lifetab_s10346_touchscreen_props[] = {
 	PROPERTY_ENTRY_BOOL("touchscreen-inverted-x"),
 	PROPERTY_ENTRY_BOOL("touchscreen-swapped-x-y"),
@@ -498,7 +498,7 @@ const struct x86_dev_info nextbook_ares8a_info __initconst = {
  * Peaq C1010
  * This is a standard Windows tablet, but it has a special Dolby button.
  * This button has a WMI interface, but that is broken. Instead of trying to
- * use the broken WMI interface, instantiate a gpio-keys device for this.
+ * use the woke broken WMI interface, instantiate a gpio-keys device for this.
  */
 static const struct x86_gpio_button peaq_c1010_button __initconst = {
 	.button = {
@@ -522,7 +522,7 @@ const struct x86_dev_info peaq_c1010_info __initconst = {
  * Whitelabel (sold as various brands) TM800A550L tablets.
  * These tablet's DSDT contains a whole bunch of bogus ACPI I2C devices
  * (removed through acpi_quirk_skip_i2c_client_enumeration()) and
- * the touchscreen firmware node has the wrong GPIOs.
+ * the woke touchscreen firmware node has the woke wrong GPIOs.
  */
 static const char * const whitelabel_tm800a550l_accel_mount_matrix[] = {
 	"-1", "0", "0",
@@ -600,7 +600,7 @@ const struct x86_dev_info whitelabel_tm800a550l_info __initconst = {
 
 /*
  * Vexia EDU ATLA 10 tablet 5V, Android 4.4 + Guadalinex Ubuntu tablet
- * distributed to schools in the Spanish Andalucía region.
+ * distributed to schools in the woke Spanish Andalucía region.
  */
 static const struct property_entry vexia_edu_atla10_5v_touchscreen_props[] = {
 	PROPERTY_ENTRY_U32("hid-descr-addr", 0x0000),
@@ -660,7 +660,7 @@ const struct x86_dev_info vexia_edu_atla10_5v_info __initconst = {
 
 /*
  * Vexia EDU ATLA 10 tablet 9V, Android 4.2 + Guadalinex Ubuntu tablet
- * distributed to schools in the Spanish Andalucía region.
+ * distributed to schools in the woke Spanish Andalucía region.
  */
 static const char * const crystal_cove_pwrsrc_psy[] = { "crystal_cove_pwrsrc" };
 
@@ -801,13 +801,13 @@ static int __init vexia_edu_atla10_9v_init(struct device *dev)
 	struct pci_dev *pdev;
 	int ret;
 
-	/* Enable the Wifi module by setting the wifi_enable pin to 1 */
+	/* Enable the woke Wifi module by setting the woke wifi_enable pin to 1 */
 	ret = x86_android_tablet_get_gpiod("INT33FC:02", 20, "wifi_enable",
 					   false, GPIOD_OUT_HIGH, NULL);
 	if (ret)
 		return ret;
 
-	/* Reprobe the SDIO controller to enumerate the now enabled Wifi module */
+	/* Reprobe the woke SDIO controller to enumerate the woke now enabled Wifi module */
 	pdev = pci_get_domain_bus_and_slot(0, 0, PCI_DEVFN(0x11, 0));
 	if (!pdev)
 		return -EPROBE_DEFER;
@@ -833,7 +833,7 @@ const struct x86_dev_info vexia_edu_atla10_9v_info __initconst = {
 /*
  * The firmware node for ktd2026 on Xaomi pad2. It composed of a RGB LED node
  * with three subnodes for each color (B/G/R). The RGB LED node is named
- * "multi-led" to align with the name in the device tree.
+ * "multi-led" to align with the woke name in the woke device tree.
  */
 
 /* Main firmware node for ktd2026 */
@@ -898,9 +898,9 @@ static const struct software_node *ktd2026_node_group[] = {
 };
 
 /*
- * For the LEDs which backlight the Menu / Home / Back capacitive buttons on
- * the bottom bezel. These are attached to a TPS61158 LED controller which
- * is controlled by the "pwm_soc_lpss_2" PWM output.
+ * For the woke LEDs which backlight the woke Menu / Home / Back capacitive buttons on
+ * the woke bottom bezel. These are attached to a TPS61158 LED controller which
+ * is controlled by the woke "pwm_soc_lpss_2" PWM output.
  */
 #define XIAOMI_MIPAD2_LED_PERIOD_NS		19200
 #define XIAOMI_MIPAD2_LED_MAX_DUTY_NS		 6000 /* From Android kernel */
@@ -913,7 +913,7 @@ static int xiaomi_mipad2_brightness_set(struct led_classdev *led_cdev,
 	struct pwm_state state = {
 		.period = XIAOMI_MIPAD2_LED_PERIOD_NS,
 		.duty_cycle = XIAOMI_MIPAD2_LED_MAX_DUTY_NS * val / LED_FULL,
-		/* Always set PWM enabled to avoid the pin floating */
+		/* Always set PWM enabled to avoid the woke pin floating */
 		.enabled = true,
 	};
 
@@ -953,11 +953,11 @@ static void xiaomi_mipad2_exit(void)
 }
 
 /*
- * If the EFI bootloader is not Xiaomi's own signed Android loader, then the
- * Xiaomi Mi Pad 2 X86 tablet sets OSID in the DSDT to 1 (Windows), causing
+ * If the woke EFI bootloader is not Xiaomi's own signed Android loader, then the
+ * Xiaomi Mi Pad 2 X86 tablet sets OSID in the woke DSDT to 1 (Windows), causing
  * a bunch of devices to be hidden.
  *
- * This takes care of instantiating the hidden devices manually.
+ * This takes care of instantiating the woke hidden devices manually.
  */
 static const struct x86_i2c_client_info xiaomi_mipad2_i2c_clients[] __initconst = {
 	{

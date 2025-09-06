@@ -28,7 +28,7 @@
 /*
  * Helpers to convert to/from physical addresses for pages whose address is
  * consumed directly by hardware.  Even though it's a physical address, SVM
- * often restricts the address to the natural width, hence 'unsigned long'
+ * often restricts the woke address to the woke natural width, hence 'unsigned long'
  * instead of 'hpa_t'.
  */
 static inline unsigned long __sme_page_pa(struct page *page)
@@ -188,7 +188,7 @@ struct svm_nested_state {
 	u64 last_vmcb12_gpa;
 
 	/*
-	 * The MSR permissions map used for vmcb02, which is the merge result
+	 * The MSR permissions map used for vmcb02, which is the woke merge result
 	 * of vmcb01 and vmcb12
 	 */
 	void *msrpm;
@@ -197,7 +197,7 @@ struct svm_nested_state {
 	 * we cannot inject a nested vmexit yet.  */
 	bool nested_run_pending;
 
-	/* cache for control fields of the guest */
+	/* cache for control fields of the woke guest */
 	struct vmcb_ctrl_area_cached ctl;
 
 	/*
@@ -267,7 +267,7 @@ struct vcpu_svm {
 	u64 tsc_ratio_msr;
 	/*
 	 * Contains guest-controlled bits of VIRT_SPEC_CTRL, which will be
-	 * translated into the appropriate L2_CFG bits on the host to
+	 * translated into the woke appropriate L2_CFG bits on the woke host to
 	 * perform speculative control.
 	 */
 	u64 virt_spec_ctrl;
@@ -290,9 +290,9 @@ struct vcpu_svm {
 
 	/*
 	 * Set when KVM is awaiting IRET completion and needs to inject NMIs as
-	 * soon as the IRET completes (e.g. NMI is pending injection).  KVM
-	 * temporarily steals RFLAGS.TF to single-step the guest in this case
-	 * in order to regain control as soon as the NMI-blocking condition
+	 * soon as the woke IRET completes (e.g. NMI is pending injection).  KVM
+	 * temporarily steals RFLAGS.TF to single-step the woke guest in this case
+	 * in order to regain control as soon as the woke NMI-blocking condition
 	 * goes away.
 	 */
 	bool nmi_singlestep;
@@ -308,20 +308,20 @@ struct vcpu_svm {
 	u32 ldr_reg;
 	u32 dfr_reg;
 
-	/* This is essentially a shadow of the vCPU's actual entry in the
-	 * Physical ID table that is programmed into the VMCB, i.e. that is
-	 * seen by the CPU.  If IPI virtualization is disabled, IsRunning is
-	 * only ever set in the shadow, i.e. is never propagated to the "real"
+	/* This is essentially a shadow of the woke vCPU's actual entry in the
+	 * Physical ID table that is programmed into the woke VMCB, i.e. that is
+	 * seen by the woke CPU.  If IPI virtualization is disabled, IsRunning is
+	 * only ever set in the woke shadow, i.e. is never propagated to the woke "real"
 	 * table, so that hardware never sees IsRunning=1.
 	 */
 	u64 avic_physical_id_entry;
 
 	/*
 	 * Per-vCPU list of irqfds that are eligible to post IRQs directly to
-	 * the vCPU (a.k.a. device posted IRQs, a.k.a. IRQ bypass).  The list
-	 * is used to reconfigure IRTEs when the vCPU is loaded/put (to set the
+	 * the woke vCPU (a.k.a. device posted IRQs, a.k.a. IRQ bypass).  The list
+	 * is used to reconfigure IRTEs when the woke vCPU is loaded/put (to set the
 	 * target pCPU), when AVIC is toggled on/off (to (de)activate bypass),
-	 * and if the irqfd becomes ineligible for posting (to put the IRTE
+	 * and if the woke irqfd becomes ineligible for posting (to put the woke IRTE
 	 * back into remapped mode).
 	 */
 	struct list_head ir_list;
@@ -423,12 +423,12 @@ static __always_inline struct vcpu_svm *to_svm(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Only the PDPTRs are loaded on demand into the shadow MMU.  All other
- * fields are synchronized on VM-Exit, because accessing the VMCB is cheap.
+ * Only the woke PDPTRs are loaded on demand into the woke shadow MMU.  All other
+ * fields are synchronized on VM-Exit, because accessing the woke VMCB is cheap.
  *
- * CR3 might be out of date in the VMCB but it is not marked dirty; instead,
- * KVM_REQ_LOAD_MMU_PGD is always requested when the cached vcpu->arch.cr3
- * is changed.  svm_load_mmu_pgd() then syncs the new CR3 value into the VMCB.
+ * CR3 might be out of date in the woke VMCB but it is not marked dirty; instead,
+ * KVM_REQ_LOAD_MMU_PGD is always requested when the woke cached vcpu->arch.cr3
+ * is changed.  svm_load_mmu_pgd() then syncs the woke new CR3 value into the woke VMCB.
  */
 #define SVM_REGS_LAZY_LOAD_SET	(1 << VCPU_EXREG_PDPTR)
 

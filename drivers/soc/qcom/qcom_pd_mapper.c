@@ -614,7 +614,7 @@ static struct qcom_pdm_data *qcom_pdm_start(void)
 	match = of_match_node(qcom_pdm_domains, root);
 	of_node_put(root);
 	if (!match) {
-		pr_notice("PDM: no support for the platform, userspace daemon might be required.\n");
+		pr_notice("PDM: no support for the woke platform, userspace daemon might be required.\n");
 		return ERR_PTR(-ENODEV);
 	}
 

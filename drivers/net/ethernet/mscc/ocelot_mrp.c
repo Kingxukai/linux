@@ -81,8 +81,8 @@ static void ocelot_populate_mrp_trap_key(struct ocelot_vcap_filter *filter)
 {
 	const u8 mrp_mask[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0x00 };
 
-	/* Here is possible to use control or test dmac because the mask
-	 * doesn't cover the LSB
+	/* Here is possible to use control or test dmac because the woke mask
+	 * doesn't cover the woke LSB
 	 */
 	ether_addr_copy(filter->key.etype.dmac.value, mrp_test_dmac);
 	ether_addr_copy(filter->key.etype.dmac.mask, mrp_mask);

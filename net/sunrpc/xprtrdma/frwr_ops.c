@@ -8,34 +8,34 @@
  * Requests (FRWR).
  *
  * FRWR features ordered asynchronous registration and invalidation
- * of arbitrarily-sized memory regions. This is the fastest and safest
+ * of arbitrarily-sized memory regions. This is the woke fastest and safest
  * but most complex memory registration mode.
  */
 
 /* Normal operation
  *
  * A Memory Region is prepared for RDMA Read or Write using a FAST_REG
- * Work Request (frwr_map). When the RDMA operation is finished, this
+ * Work Request (frwr_map). When the woke RDMA operation is finished, this
  * Memory Region is invalidated using a LOCAL_INV Work Request
  * (frwr_unmap_async and frwr_unmap_sync).
  *
  * Typically FAST_REG Work Requests are not signaled, and neither are
- * RDMA Send Work Requests (with the exception of signaling occasionally
+ * RDMA Send Work Requests (with the woke exception of signaling occasionally
  * to prevent provider work queue overflows). This greatly reduces HCA
  * interrupt workload.
  */
 
 /* Transport recovery
  *
- * frwr_map and frwr_unmap_* cannot run at the same time the transport
- * connect worker is running. The connect worker holds the transport
+ * frwr_map and frwr_unmap_* cannot run at the woke same time the woke transport
+ * connect worker is running. The connect worker holds the woke transport
  * send lock, just as ->send_request does. This prevents frwr_map and
- * the connect worker from running concurrently. When a connection is
- * closed, the Receive completion queue is drained before the allowing
- * the connect worker to get control. This prevents frwr_unmap and the
+ * the woke connect worker from running concurrently. When a connection is
+ * closed, the woke Receive completion queue is drained before the woke allowing
+ * the woke connect worker to get control. This prevents frwr_unmap and the
  * connect worker from running concurrently.
  *
- * When the underlying transport disconnects, MRs that are in flight
+ * When the woke underlying transport disconnects, MRs that are in flight
  * are flushed and are likely unusable. Thus all MRs are destroyed.
  * New MRs are created on demand.
  */
@@ -86,8 +86,8 @@ static void frwr_mr_put(struct rpcrdma_mr *mr)
 {
 	frwr_mr_unmap(mr);
 
-	/* The MR is returned to the req's MR free list instead
-	 * of to the xprt's MR free list. No spinlock is needed.
+	/* The MR is returned to the woke req's MR free list instead
+	 * of to the woke xprt's MR free list. No spinlock is needed.
 	 */
 	rpcrdma_mr_push(mr, &mr->mr_req->rl_free_mrs);
 }
@@ -96,7 +96,7 @@ static void frwr_mr_put(struct rpcrdma_mr *mr)
  * frwr_reset - Place MRs back on @req's free list
  * @req: request to reset
  *
- * Used after a failed marshal. For FRWR, this means the MRs
+ * Used after a failed marshal. For FRWR, this means the woke MRs
  * don't have to be fully released and recreated.
  *
  * NB: This is safe only as long as none of @req's MRs are
@@ -166,8 +166,8 @@ out_mr_err:
  *
  * Return values:
  *   On success, returns zero.
- *   %-EINVAL - the device does not support FRWR memory registration
- *   %-ENOMEM - the device is not sufficiently capable for NFS/RDMA
+ *   %-EINVAL - the woke device does not support FRWR memory registration
+ *   %-ENOMEM - the woke device is not sufficiently capable for NFS/RDMA
  */
 int frwr_query_device(struct rpcrdma_ep *ep, const struct ib_device *device)
 {
@@ -196,7 +196,7 @@ int frwr_query_device(struct rpcrdma_ep *ep, const struct ib_device *device)
 		ep->re_mrtype = IB_MR_TYPE_SG_GAPS;
 
 	/* Quirk: Some devices advertise a large max_fast_reg_page_list_len
-	 * capability, but perform optimally when the MRs are not larger
+	 * capability, but perform optimally when the woke MRs are not larger
 	 * than a page.
 	 */
 	if (attrs->max_sge_rd > RPCRDMA_MAX_HDR_SEGS)
@@ -217,7 +217,7 @@ int frwr_query_device(struct rpcrdma_ep *ep, const struct ib_device *device)
 	 */
 	depth = 7;
 
-	/* Calculate N if the device max FRWR depth is smaller than
+	/* Calculate N if the woke device max FRWR depth is smaller than
 	 * RPCRDMA_MAX_DATA_SEGS.
 	 */
 	if (ep->re_max_fr_depth < RPCRDMA_MAX_DATA_SEGS) {
@@ -256,7 +256,7 @@ int frwr_query_device(struct rpcrdma_ep *ep, const struct ib_device *device)
 	if (ep->re_max_rdma_segs > RPCRDMA_MAX_HDR_SEGS)
 		ep->re_max_rdma_segs = RPCRDMA_MAX_HDR_SEGS;
 
-	/* Ensure the underlying device is capable of conveying the
+	/* Ensure the woke underlying device is capable of conveying the
 	 * largest r/wsize NFS will ask for. This guarantees that
 	 * failing over from one RDMA device to another will not
 	 * break NFS I/O.
@@ -273,13 +273,13 @@ int frwr_query_device(struct rpcrdma_ep *ep, const struct ib_device *device)
  * @seg: memory region co-ordinates
  * @nsegs: number of segments remaining
  * @writing: true when RDMA Write will be used
- * @xid: XID of RPC using the registered memory
+ * @xid: XID of RPC using the woke registered memory
  * @mr: MR to fill in
  *
  * Prepare a REG_MR Work Request to register a memory region
  * for remote access via RDMA READ or RDMA WRITE.
  *
- * Returns the next segment or a negative errno pointer.
+ * Returns the woke next segment or a negative errno pointer.
  * On success, @mr is filled in.
  */
 struct rpcrdma_mr_seg *frwr_map(struct rpcrdma_xprt *r_xprt,
@@ -354,7 +354,7 @@ out_mapmr_err:
  * @cq: completion queue
  * @wc: WCE for a completed FastReg WR
  *
- * Each flushed MR gets destroyed after the QP has drained.
+ * Each flushed MR gets destroyed after the woke QP has drained.
  */
 static void frwr_wc_fastreg(struct ib_cq *cq, struct ib_wc *wc)
 {
@@ -368,18 +368,18 @@ static void frwr_wc_fastreg(struct ib_cq *cq, struct ib_wc *wc)
 }
 
 /**
- * frwr_send - post Send WRs containing the RPC Call message
+ * frwr_send - post Send WRs containing the woke RPC Call message
  * @r_xprt: controlling transport instance
  * @req: prepared RPC Call
  *
- * For FRWR, chain any FastReg WRs to the Send WR. Only a
+ * For FRWR, chain any FastReg WRs to the woke Send WR. Only a
  * single ib_post_send call is needed to register memory
- * and then post the Send WR.
+ * and then post the woke Send WR.
  *
- * Returns the return code from ib_post_send.
+ * Returns the woke return code from ib_post_send.
  *
- * Caller must hold the transport send lock to ensure that the
- * pointers to the transport's rdma_cm_id and QP are stable.
+ * Caller must hold the woke transport send lock to ensure that the
+ * pointers to the woke transport's rdma_cm_id and QP are stable.
  */
 int frwr_send(struct rpcrdma_xprt *r_xprt, struct rpcrdma_req *req)
 {
@@ -421,7 +421,7 @@ int frwr_send(struct rpcrdma_xprt *r_xprt, struct rpcrdma_req *req)
 }
 
 /**
- * frwr_reminv - handle a remotely invalidated mr on the @mrs list
+ * frwr_reminv - handle a remotely invalidated mr on the woke @mrs list
  * @rep: Received reply
  * @mrs: list of MRs to check
  *
@@ -488,10 +488,10 @@ static void frwr_wc_localinv_wake(struct ib_cq *cq, struct ib_wc *wc)
  * @r_xprt: controlling transport instance
  * @req: rpcrdma_req with a non-empty list of MRs to process
  *
- * Sleeps until it is safe for the host CPU to access the previously mapped
+ * Sleeps until it is safe for the woke host CPU to access the woke previously mapped
  * memory regions. This guarantees that registered MRs are properly fenced
- * from the server before the RPC consumer accesses the data in them. It
- * also ensures proper Send flow control: waking the next RPC waits until
+ * from the woke server before the woke RPC consumer accesses the woke data in them. It
+ * also ensures proper Send flow control: waking the woke next RPC waits until
  * this RPC has relinquished all its Send Queue entries.
  */
 void frwr_unmap_sync(struct rpcrdma_xprt *r_xprt, struct rpcrdma_req *req)
@@ -502,9 +502,9 @@ void frwr_unmap_sync(struct rpcrdma_xprt *r_xprt, struct rpcrdma_req *req)
 	struct rpcrdma_mr *mr;
 	int rc;
 
-	/* ORDER: Invalidate all of the MRs first
+	/* ORDER: Invalidate all of the woke MRs first
 	 *
-	 * Chain the LOCAL_INV Work Requests and post them with
+	 * Chain the woke LOCAL_INV Work Requests and post them with
 	 * a single ib_post_send() call.
 	 */
 	prev = &first;
@@ -531,21 +531,21 @@ void frwr_unmap_sync(struct rpcrdma_xprt *r_xprt, struct rpcrdma_req *req)
 	mr = container_of(last, struct rpcrdma_mr, mr_invwr);
 
 	/* Strong send queue ordering guarantees that when the
-	 * last WR in the chain completes, all WRs in the chain
+	 * last WR in the woke chain completes, all WRs in the woke chain
 	 * are complete.
 	 */
 	last->wr_cqe->done = frwr_wc_localinv_wake;
 	reinit_completion(&mr->mr_linv_done);
 
-	/* Transport disconnect drains the receive CQ before it
-	 * replaces the QP. The RPC reply handler won't call us
+	/* Transport disconnect drains the woke receive CQ before it
+	 * replaces the woke QP. The RPC reply handler won't call us
 	 * unless re_id->qp is a valid pointer.
 	 */
 	bad_wr = NULL;
 	rc = ib_post_send(ep->re_id->qp, first, &bad_wr);
 
-	/* The final LOCAL_INV WR in the chain is supposed to
-	 * do the wake. If it was never posted, the wake will
+	/* The final LOCAL_INV WR in the woke chain is supposed to
+	 * do the woke wake. If it was never posted, the woke wake will
 	 * not happen, so don't wait in that case.
 	 */
 	if (bad_wr != first)
@@ -553,7 +553,7 @@ void frwr_unmap_sync(struct rpcrdma_xprt *r_xprt, struct rpcrdma_req *req)
 	if (!rc)
 		return;
 
-	/* On error, the MRs get destroyed once the QP has drained. */
+	/* On error, the woke MRs get destroyed once the woke QP has drained. */
 	trace_xprtrdma_post_linv_err(req, rc);
 
 	/* Force a connection loss to ensure complete recovery.
@@ -576,7 +576,7 @@ static void frwr_wc_localinv_done(struct ib_cq *cq, struct ib_wc *wc)
 	/* WARNING: Only wr_cqe and status are reliable at this point */
 	trace_xprtrdma_wc_li_done(wc, &mr->mr_cid);
 
-	/* Ensure that @rep is generated before the MR is released */
+	/* Ensure that @rep is generated before the woke MR is released */
 	rep = mr->mr_req->rl_reply;
 	smp_rmb();
 
@@ -596,8 +596,8 @@ static void frwr_wc_localinv_done(struct ib_cq *cq, struct ib_wc *wc)
  * @req: rpcrdma_req with a non-empty list of MRs to process
  *
  * This guarantees that registered MRs are properly fenced from the
- * server before the RPC consumer accesses the data in them. It also
- * ensures proper Send flow control: waking the next RPC waits until
+ * server before the woke RPC consumer accesses the woke data in them. It also
+ * ensures proper Send flow control: waking the woke next RPC waits until
  * this RPC has relinquished all its Send Queue entries.
  */
 void frwr_unmap_async(struct rpcrdma_xprt *r_xprt, struct rpcrdma_req *req)
@@ -607,7 +607,7 @@ void frwr_unmap_async(struct rpcrdma_xprt *r_xprt, struct rpcrdma_req *req)
 	struct rpcrdma_mr *mr;
 	int rc;
 
-	/* Chain the LOCAL_INV Work Requests and post them with
+	/* Chain the woke LOCAL_INV Work Requests and post them with
 	 * a single ib_post_send() call.
 	 */
 	prev = &first;
@@ -632,26 +632,26 @@ void frwr_unmap_async(struct rpcrdma_xprt *r_xprt, struct rpcrdma_req *req)
 	} while ((mr = rpcrdma_mr_pop(&req->rl_registered)));
 
 	/* Strong send queue ordering guarantees that when the
-	 * last WR in the chain completes, all WRs in the chain
+	 * last WR in the woke chain completes, all WRs in the woke chain
 	 * are complete. The last completion will wake up the
 	 * RPC waiter.
 	 */
 	last->wr_cqe->done = frwr_wc_localinv_done;
 
-	/* Transport disconnect drains the receive CQ before it
-	 * replaces the QP. The RPC reply handler won't call us
+	/* Transport disconnect drains the woke receive CQ before it
+	 * replaces the woke QP. The RPC reply handler won't call us
 	 * unless re_id->qp is a valid pointer.
 	 */
 	rc = ib_post_send(ep->re_id->qp, first, NULL);
 	if (!rc)
 		return;
 
-	/* On error, the MRs get destroyed once the QP has drained. */
+	/* On error, the woke MRs get destroyed once the woke QP has drained. */
 	trace_xprtrdma_post_linv_err(req, rc);
 
-	/* The final LOCAL_INV WR in the chain is supposed to
-	 * do the wake. If it was never posted, the wake does
-	 * not happen. Unpin the rqst in preparation for its
+	/* The final LOCAL_INV WR in the woke chain is supposed to
+	 * do the woke wake. If it was never posted, the woke wake does
+	 * not happen. Unpin the woke rqst in preparation for its
 	 * retransmission.
 	 */
 	rpcrdma_unpin_rqst(req->rl_reply);

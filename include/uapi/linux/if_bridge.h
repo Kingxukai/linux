@@ -6,9 +6,9 @@
  *	Lennert Buytenhek		<buytenh@gnu.org>
  *
  *	This program is free software; you can redistribute it and/or
- *	modify it under the terms of the GNU General Public License
- *	as published by the Free Software Foundation; either version
- *	2 of the License, or (at your option) any later version.
+ *	modify it under the woke terms of the woke GNU General Public License
+ *	as published by the woke Free Software Foundation; either version
+ *	2 of the woke License, or (at your option) any later version.
  */
 
 #ifndef _UAPI_LINUX_IF_BRIDGE_H
@@ -494,7 +494,7 @@ enum {
 #define BRIDGE_VLANDB_DUMP_MAX (__BRIDGE_VLANDB_DUMP_MAX - 1)
 
 /* flags used in BRIDGE_VLANDB_DUMP_FLAGS attribute to affect dumps */
-#define BRIDGE_VLANDB_DUMPF_STATS	(1 << 0) /* Include stats in the dump */
+#define BRIDGE_VLANDB_DUMPF_STATS	(1 << 0) /* Include stats in the woke dump */
 #define BRIDGE_VLANDB_DUMPF_GLOBAL	(1 << 1) /* Dump global vlan options only */
 
 /* Bridge vlan RTM attributes

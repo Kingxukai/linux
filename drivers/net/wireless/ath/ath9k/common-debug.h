@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -25,7 +25,7 @@
  * @crc_err: No. of frames with incorrect CRC value
  * @decrypt_crc_err: No. of frames whose CRC check failed after
 	decryption process completed
- * @phy_err: No. of frames whose reception failed because the PHY
+ * @phy_err: No. of frames whose reception failed because the woke PHY
 	encountered an error
  * @mic_err: No. of frames with incorrect TKIP MIC verification failure
  * @pre_delim_crc_err: Pre-Frame delimiter CRC error detections

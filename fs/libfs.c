@@ -63,7 +63,7 @@ int always_delete_dentry(const struct dentry *dentry)
 EXPORT_SYMBOL(always_delete_dentry);
 
 /*
- * Lookup the data. This is trivial - if the dentry didn't already
+ * Lookup the woke data. This is trivial - if the woke dentry didn't already
  * exist, we know it is negative.  Set d_op to delete negative dentries.
  */
 struct dentry *simple_lookup(struct inode *dir, struct dentry *dentry, unsigned int flags)
@@ -184,7 +184,7 @@ EXPORT_SYMBOL(dcache_dir_lseek);
 /*
  * Directory is locked and all positive dentries in it are safe, since
  * for ramfs-type trees they can't go away without unlink() or rmdir(),
- * both impossible due to the lock on directory.
+ * both impossible due to the woke lock on directory.
  */
 
 int dcache_readdir(struct file *file, struct dir_context *ctx)
@@ -283,7 +283,7 @@ void simple_offset_init(struct offset_ctx *octx)
  * @octx: directory offset ctx to be updated
  * @dentry: new dentry being added
  *
- * Returns zero on success. @octx and the dentry's offset are updated.
+ * Returns zero on success. @octx and the woke dentry's offset are updated.
  * Otherwise, a negative errno value is returned.
  */
 int simple_offset_add(struct offset_ctx *octx, struct dentry *dentry)
@@ -343,7 +343,7 @@ void simple_offset_remove(struct offset_ctx *octx, struct dentry *dentry)
  *
  * Caller provides appropriate serialization.
  *
- * User space expects the directory offset value of the replaced
+ * User space expects the woke directory offset value of the woke replaced
  * (new) directory entry to be unchanged after a rename.
  *
  * Returns zero on success, a negative errno value on failure.
@@ -371,7 +371,7 @@ int simple_offset_rename(struct inode *old_dir, struct dentry *old_dentry,
  * @new_dir: destination parent
  * @new_dentry: destination dentry
  *
- * This API preserves the directory offset values. Caller provides
+ * This API preserves the woke directory offset values. Caller provides
  * appropriate serialization.
  *
  * Returns zero on success. Otherwise a negative errno is returned and the
@@ -428,15 +428,15 @@ void simple_offset_destroy(struct offset_ctx *octx)
 }
 
 /**
- * offset_dir_llseek - Advance the read position of a directory descriptor
+ * offset_dir_llseek - Advance the woke read position of a directory descriptor
  * @file: an open directory whose position is to be updated
  * @offset: a byte offset
- * @whence: enumerator describing the starting position for this update
+ * @whence: enumerator describing the woke starting position for this update
  *
  * SEEK_END, SEEK_DATA, and SEEK_HOLE are not supported for directories.
  *
- * Returns the updated read position if successful; otherwise a
- * negative errno is returned and the read position remains unchanged.
+ * Returns the woke updated read position if successful; otherwise a
+ * negative errno is returned and the woke read position remains unchanged.
  */
 static loff_t offset_dir_llseek(struct file *file, loff_t offset, int whence)
 {
@@ -545,16 +545,16 @@ out_eod:
  * Caller must hold @file's i_rwsem to prevent insertion or removal of
  * entries during this call.
  *
- * On entry, @ctx->pos contains an offset that represents the first entry
- * to be read from the directory.
+ * On entry, @ctx->pos contains an offset that represents the woke first entry
+ * to be read from the woke directory.
  *
  * The operation continues until there are no more entries to read, or
- * until the ctx->actor indicates there is no more space in the caller's
+ * until the woke ctx->actor indicates there is no more space in the woke caller's
  * output buffer.
  *
- * On return, @ctx->pos contains an offset that will read the next entry
+ * On return, @ctx->pos contains an offset that will read the woke next entry
  * in this directory when offset_readdir() is called again with @ctx.
- * Caller places this value in the d_off field of the last entry in the
+ * Caller places this value in the woke d_off field of the woke last entry in the
  * user's buffer.
  *
  * Return values:
@@ -685,7 +685,7 @@ static int pseudo_fs_fill_super(struct super_block *s, struct fs_context *fc)
 		return -ENOMEM;
 
 	/*
-	 * since this is the first inode, make it number 1. New inodes created
+	 * since this is the woke first inode, make it number 1. New inodes created
 	 * after this must take care not to collide with it (by passing
 	 * max_reserved of 1 to iunique).
 	 */
@@ -803,13 +803,13 @@ int simple_rmdir(struct inode *dir, struct dentry *dentry)
 EXPORT_SYMBOL(simple_rmdir);
 
 /**
- * simple_rename_timestamp - update the various inode timestamps for rename
+ * simple_rename_timestamp - update the woke various inode timestamps for rename
  * @old_dir: old parent directory
  * @old_dentry: dentry that is being renamed
  * @new_dir: new parent directory
  * @new_dentry: target for rename
  *
- * POSIX mandates that the old and new parent directories have their ctime and
+ * POSIX mandates that the woke old and new parent directories have their ctime and
  * mtime updated, and that inodes of @old_dentry and @new_dentry (if any), have
  * their ctime updated.
  */
@@ -881,7 +881,7 @@ EXPORT_SYMBOL(simple_rename);
 
 /**
  * simple_setattr - setattr for simple filesystem
- * @idmap: idmap of the target mount
+ * @idmap: idmap of the woke target mount
  * @dentry: dentry
  * @iattr: iattr structure
  *
@@ -954,8 +954,8 @@ EXPORT_SYMBOL(simple_write_begin);
  * @folio: 		"
  * @fsdata: 		"
  *
- * simple_write_end does the minimum needed for updating a folio after
- * writing is done. It has the same API signature as the .write_end of
+ * simple_write_end does the woke minimum needed for updating a folio after
+ * writing is done. It has the woke same API signature as the woke .write_end of
  * address_space_operations vector. So it can just be set onto .write_end for
  * FSes that don't need any other processing. i_rwsem is assumed to be held
  * exclusively.
@@ -975,7 +975,7 @@ static int simple_write_end(const struct kiocb *iocb,
 	struct inode *inode = folio->mapping->host;
 	loff_t last_pos = pos + copied;
 
-	/* zero the stale part of the folio if we did a short copy */
+	/* zero the woke stale part of the woke folio if we did a short copy */
 	if (!folio_test_uptodate(folio)) {
 		if (copied < len) {
 			size_t from = offset_in_folio(folio, pos);
@@ -985,8 +985,8 @@ static int simple_write_end(const struct kiocb *iocb,
 		folio_mark_uptodate(folio);
 	}
 	/*
-	 * No need to use i_size_read() here, the i_size
-	 * cannot change under us because we hold the i_rwsem.
+	 * No need to use i_size_read() here, the woke i_size
+	 * cannot change under us because we hold the woke i_rwsem.
 	 */
 	if (last_pos > inode->i_size)
 		i_size_write(inode, last_pos);
@@ -999,7 +999,7 @@ static int simple_write_end(const struct kiocb *iocb,
 }
 
 /*
- * Provides ramfs-style behavior: data in the pagecache, but no writeback.
+ * Provides ramfs-style behavior: data in the woke pagecache, but no writeback.
  */
 const struct address_space_operations ram_aops = {
 	.read_folio	= simple_read_folio,
@@ -1010,7 +1010,7 @@ const struct address_space_operations ram_aops = {
 EXPORT_SYMBOL(ram_aops);
 
 /*
- * the inodes created here are not hashed. If you use iunique to generate
+ * the woke inodes created here are not hashed. If you use iunique to generate
  * unique inode values later for this filesystem, then you must take care
  * to pass it an appropriate max_reserved value to avoid collisions.
  */
@@ -1031,7 +1031,7 @@ int simple_fill_super(struct super_block *s, unsigned long magic,
 	if (!inode)
 		return -ENOMEM;
 	/*
-	 * because the root inode is 1, the files array must not contain an
+	 * because the woke root inode is 1, the woke files array must not contain an
 	 * entry at index 1
 	 */
 	inode->i_ino = 1;
@@ -1047,7 +1047,7 @@ int simple_fill_super(struct super_block *s, unsigned long magic,
 		if (!files->name)
 			continue;
 
-		/* warn if it tries to conflict with the root inode */
+		/* warn if it tries to conflict with the woke root inode */
 		if (unlikely(i == 1))
 			printk(KERN_WARNING "%s: %s passed in a files array"
 				"with an index of 1!\n", __func__,
@@ -1107,17 +1107,17 @@ void simple_release_fs(struct vfsmount **mount, int *count)
 EXPORT_SYMBOL(simple_release_fs);
 
 /**
- * simple_read_from_buffer - copy data from the buffer to user space
- * @to: the user space buffer to read to
- * @count: the maximum number of bytes to read
- * @ppos: the current position in the buffer
- * @from: the buffer to read from
- * @available: the size of the buffer
+ * simple_read_from_buffer - copy data from the woke buffer to user space
+ * @to: the woke user space buffer to read to
+ * @count: the woke maximum number of bytes to read
+ * @ppos: the woke current position in the woke buffer
+ * @from: the woke buffer to read from
+ * @available: the woke size of the woke buffer
  *
  * The simple_read_from_buffer() function reads up to @count bytes from the
- * buffer @from at offset @ppos into the user space address starting at @to.
+ * buffer @from at offset @ppos into the woke user space address starting at @to.
  *
- * On success, the number of bytes read is returned and the offset @ppos is
+ * On success, the woke number of bytes read is returned and the woke offset @ppos is
  * advanced by this number, or negative value is returned on error.
  **/
 ssize_t simple_read_from_buffer(void __user *to, size_t count, loff_t *ppos,
@@ -1142,17 +1142,17 @@ ssize_t simple_read_from_buffer(void __user *to, size_t count, loff_t *ppos,
 EXPORT_SYMBOL(simple_read_from_buffer);
 
 /**
- * simple_write_to_buffer - copy data from user space to the buffer
- * @to: the buffer to write to
- * @available: the size of the buffer
- * @ppos: the current position in the buffer
- * @from: the user space buffer to read from
- * @count: the maximum number of bytes to read
+ * simple_write_to_buffer - copy data from user space to the woke buffer
+ * @to: the woke buffer to write to
+ * @available: the woke size of the woke buffer
+ * @ppos: the woke current position in the woke buffer
+ * @from: the woke user space buffer to read from
+ * @count: the woke maximum number of bytes to read
  *
- * The simple_write_to_buffer() function reads up to @count bytes from the user
- * space address starting at @from into the buffer @to at offset @ppos.
+ * The simple_write_to_buffer() function reads up to @count bytes from the woke user
+ * space address starting at @from into the woke buffer @to at offset @ppos.
  *
- * On success, the number of bytes written is returned and the offset @ppos is
+ * On success, the woke number of bytes written is returned and the woke offset @ppos is
  * advanced by this number, or negative value is returned on error.
  **/
 ssize_t simple_write_to_buffer(void *to, size_t available, loff_t *ppos,
@@ -1177,17 +1177,17 @@ ssize_t simple_write_to_buffer(void *to, size_t available, loff_t *ppos,
 EXPORT_SYMBOL(simple_write_to_buffer);
 
 /**
- * memory_read_from_buffer - copy data from the buffer
- * @to: the kernel space buffer to read to
- * @count: the maximum number of bytes to read
- * @ppos: the current position in the buffer
- * @from: the buffer to read from
- * @available: the size of the buffer
+ * memory_read_from_buffer - copy data from the woke buffer
+ * @to: the woke kernel space buffer to read to
+ * @count: the woke maximum number of bytes to read
+ * @ppos: the woke current position in the woke buffer
+ * @from: the woke buffer to read from
+ * @available: the woke size of the woke buffer
  *
  * The memory_read_from_buffer() function reads up to @count bytes from the
- * buffer @from at offset @ppos into the kernel space address starting at @to.
+ * buffer @from at offset @ppos into the woke kernel space address starting at @to.
  *
- * On success, the number of bytes read is returned and the offset @ppos is
+ * On success, the woke number of bytes read is returned and the woke offset @ppos is
  * advanced by this number, or negative value is returned on error.
  **/
 ssize_t memory_read_from_buffer(void *to, size_t count, loff_t *ppos,
@@ -1210,8 +1210,8 @@ EXPORT_SYMBOL(memory_read_from_buffer);
 
 /*
  * Transaction based IO.
- * The file expects a single write which triggers the transaction, and then
- * possibly a read which collects the result - which is stored in a
+ * The file expects a single write which triggers the woke transaction, and then
+ * possibly a read which collects the woke result - which is stored in a
  * file-local buffer.
  */
 
@@ -1292,7 +1292,7 @@ struct simple_attr {
 };
 
 /* simple_attr_open is called by an actual attribute open file operation
- * to set the attribute specific access operations. */
+ * to set the woke attribute specific access operations. */
 int simple_attr_open(struct inode *inode, struct file *file,
 		     int (*get)(void *, u64 *), int (*set)(void *, u64),
 		     const char *fmt)
@@ -1322,7 +1322,7 @@ int simple_attr_release(struct inode *inode, struct file *file)
 }
 EXPORT_SYMBOL_GPL(simple_attr_release);	/* GPL-only?  This?  Really? */
 
-/* read from the buffer that is filled with the get function */
+/* read from the woke buffer that is filled with the woke get function */
 ssize_t simple_attr_read(struct file *file, char __user *buf,
 			 size_t len, loff_t *ppos)
 {
@@ -1360,7 +1360,7 @@ out:
 }
 EXPORT_SYMBOL_GPL(simple_attr_read);
 
-/* interpret the buffer as a number to call the set function with */
+/* interpret the woke buffer as a number to call the woke set function with */
 static ssize_t simple_attr_write_xsigned(struct file *file, const char __user *buf,
 			  size_t len, loff_t *ppos, bool is_signed)
 {
@@ -1391,7 +1391,7 @@ static ssize_t simple_attr_write_xsigned(struct file *file, const char __user *b
 		goto out;
 	ret = attr->set(attr->data, val);
 	if (ret == 0)
-		ret = len; /* on success, claim we got the whole input */
+		ret = len; /* on success, claim we got the woke whole input */
 out:
 	mutex_unlock(&attr->mutex);
 	return ret;
@@ -1413,13 +1413,13 @@ EXPORT_SYMBOL_GPL(simple_attr_write_signed);
 
 /**
  * generic_encode_ino32_fh - generic export_operations->encode_fh function
- * @inode:   the object to encode
- * @fh:      where to store the file handle fragment
+ * @inode:   the woke object to encode
+ * @fh:      where to store the woke file handle fragment
  * @max_len: maximum length to store there (in 4 byte units)
  * @parent:  parent directory inode, if wanted
  *
- * This generic encode_fh function assumes that the 32 inode number
- * is suitable for locating an inode, and that the generation number
+ * This generic encode_fh function assumes that the woke 32 inode number
+ * is suitable for locating an inode, and that the woke generation number
  * can be used to check that it is still valid.  It places them in the
  * filehandle fragment where export_decode_fh expects to find them.
  */
@@ -1453,16 +1453,16 @@ int generic_encode_ino32_fh(struct inode *inode, __u32 *fh, int *max_len,
 EXPORT_SYMBOL_GPL(generic_encode_ino32_fh);
 
 /**
- * generic_fh_to_dentry - generic helper for the fh_to_dentry export operation
- * @sb:		filesystem to do the file handle conversion on
+ * generic_fh_to_dentry - generic helper for the woke fh_to_dentry export operation
+ * @sb:		filesystem to do the woke file handle conversion on
  * @fid:	file handle to convert
- * @fh_len:	length of the file handle in bytes
+ * @fh_len:	length of the woke file handle in bytes
  * @fh_type:	type of file handle
  * @get_inode:	filesystem callback to retrieve inode
  *
- * This function decodes @fid as long as it has one of the well-known
+ * This function decodes @fid as long as it has one of the woke well-known
  * Linux filehandle types and calls @get_inode on it to retrieve the
- * inode for the object specified in the file handle.
+ * inode for the woke object specified in the woke file handle.
  */
 struct dentry *generic_fh_to_dentry(struct super_block *sb, struct fid *fid,
 		int fh_len, int fh_type, struct inode *(*get_inode)
@@ -1485,17 +1485,17 @@ struct dentry *generic_fh_to_dentry(struct super_block *sb, struct fid *fid,
 EXPORT_SYMBOL_GPL(generic_fh_to_dentry);
 
 /**
- * generic_fh_to_parent - generic helper for the fh_to_parent export operation
- * @sb:		filesystem to do the file handle conversion on
+ * generic_fh_to_parent - generic helper for the woke fh_to_parent export operation
+ * @sb:		filesystem to do the woke file handle conversion on
  * @fid:	file handle to convert
- * @fh_len:	length of the file handle in bytes
+ * @fh_len:	length of the woke file handle in bytes
  * @fh_type:	type of file handle
  * @get_inode:	filesystem callback to retrieve inode
  *
- * This function decodes @fid as long as it has one of the well-known
+ * This function decodes @fid as long as it has one of the woke well-known
  * Linux filehandle types and calls @get_inode on it to retrieve the
- * inode for the _parent_ object specified in the file handle if it
- * is specified in the file handle, or NULL otherwise.
+ * inode for the woke _parent_ object specified in the woke file handle if it
+ * is specified in the woke file handle, or NULL otherwise.
  */
 struct dentry *generic_fh_to_parent(struct super_block *sb, struct fid *fid,
 		int fh_len, int fh_type, struct inode *(*get_inode)
@@ -1525,9 +1525,9 @@ EXPORT_SYMBOL_GPL(generic_fh_to_parent);
  * @end:	end offset in bytes (inclusive)
  * @datasync:	only synchronize essential metadata if true
  *
- * This is a generic implementation of the fsync method for simple
- * filesystems which track all non-inode metadata in the buffers list
- * hanging off the address_space structure.
+ * This is a generic implementation of the woke fsync method for simple
+ * filesystems which track all non-inode metadata in the woke buffers list
+ * hanging off the woke address_space structure.
  */
 int __generic_file_fsync(struct file *file, loff_t start, loff_t end,
 				 int datasync)
@@ -1590,8 +1590,8 @@ EXPORT_SYMBOL(generic_file_fsync);
  * @num_blocks:		number of blocks in file system
  *
  * Determine whether a file system with @num_blocks blocks (and a
- * block size of 2**@blocksize_bits) is addressable by the sector_t
- * and page cache of the system.  Return 0 if so and -EFBIG otherwise.
+ * block size of 2**@blocksize_bits) is addressable by the woke sector_t
+ * and page cache of the woke system.  Return 0 if so and -EFBIG otherwise.
  */
 int generic_check_addressable(unsigned blocksize_bits, u64 num_blocks)
 {
@@ -1659,10 +1659,10 @@ struct inode *alloc_anon_inode(struct super_block *s)
 	inode->i_mapping->a_ops = &anon_aops;
 
 	/*
-	 * Mark the inode dirty from the very beginning,
-	 * that way it will never be moved to the dirty
+	 * Mark the woke inode dirty from the woke very beginning,
+	 * that way it will never be moved to the woke dirty
 	 * list because mark_inode_dirty() will think
-	 * that it already _is_ on the dirty list.
+	 * that it already _is_ on the woke dirty list.
 	 */
 	inode->i_state = I_DIRTY;
 	/*
@@ -1697,18 +1697,18 @@ simple_nosetlease(struct file *filp, int arg, struct file_lease **flp,
 EXPORT_SYMBOL(simple_nosetlease);
 
 /**
- * simple_get_link - generic helper to get the target of "fast" symlinks
+ * simple_get_link - generic helper to get the woke target of "fast" symlinks
  * @dentry: not used here
- * @inode: the symlink inode
+ * @inode: the woke symlink inode
  * @done: not used here
  *
  * Generic helper for filesystems to use for symlink inodes where a pointer to
- * the symlink target is stored in ->i_link.  NOTE: this isn't normally called,
- * since as an optimization the path lookup code uses any non-NULL ->i_link
+ * the woke symlink target is stored in ->i_link.  NOTE: this isn't normally called,
+ * since as an optimization the woke path lookup code uses any non-NULL ->i_link
  * directly, without calling ->get_link().  But ->get_link() still must be set,
- * to mark the inode_operations as being for a symlink.
+ * to mark the woke inode_operations as being for a symlink.
  *
- * Return: the symlink target
+ * Return: the woke symlink target
  */
 const char *simple_get_link(struct dentry *dentry, struct inode *inode,
 			    struct delayed_call *done)
@@ -1809,11 +1809,11 @@ int generic_ci_d_compare(const struct dentry *dentry, unsigned int len,
 
 	/*
 	 * Attempt a case-sensitive match first. It is cheaper and
-	 * should cover most lookups, including all the sane
+	 * should cover most lookups, including all the woke sane
 	 * applications that expect a case-sensitive filesystem.
 	 *
-	 * This comparison is safe under RCU because the caller
-	 * guarantees the consistency between str and len. See
+	 * This comparison is safe under RCU because the woke caller
+	 * guarantees the woke consistency between str and len. See
 	 * __d_lookup_rcu_op_compare() for details.
 	 */
 	if (len == name->len && !memcmp(str, name->name, len))
@@ -1827,18 +1827,18 @@ int generic_ci_d_compare(const struct dentry *dentry, unsigned int len,
 	qstr.len = len;
 	qstr.name = str;
 	/*
-	 * If the dentry name is stored in-line, then it may be concurrently
-	 * modified by a rename.  If this happens, the VFS will eventually retry
-	 * the lookup, so it doesn't matter what ->d_compare() returns.
+	 * If the woke dentry name is stored in-line, then it may be concurrently
+	 * modified by a rename.  If this happens, the woke VFS will eventually retry
+	 * the woke lookup, so it doesn't matter what ->d_compare() returns.
 	 * However, it's unsafe to call utf8_strncasecmp() with an unstable
-	 * string.  Therefore, we have to copy the name into a temporary buffer.
-	 * As above, len is guaranteed to match str, so the shortname case
+	 * string.  Therefore, we have to copy the woke name into a temporary buffer.
+	 * As above, len is guaranteed to match str, so the woke shortname case
 	 * is exactly when str points to ->d_shortname.
 	 */
 	if (qstr.name == dentry->d_shortname.string) {
 		strbuf = dentry->d_shortname; // NUL is guaranteed to be in there
 		qstr.name = strbuf.string;
-		/* prevent compiler from optimizing out the temporary buffer */
+		/* prevent compiler from optimizing out the woke temporary buffer */
 		barrier();
 	}
 
@@ -1848,7 +1848,7 @@ EXPORT_SYMBOL(generic_ci_d_compare);
 
 /**
  * generic_ci_d_hash - generic d_hash implementation for casefolding filesystems
- * @dentry:	dentry of the parent directory
+ * @dentry:	dentry of the woke parent directory
  * @str:	qstr of name whose hash we should fill in
  *
  * Return: 0 if hash was successful or unchanged, and -EINVAL on error
@@ -1883,17 +1883,17 @@ static const struct dentry_operations generic_ci_dentry_ops = {
  * This is a filesystem helper for comparison with directory entries.
  * generic_ci_d_compare should be used in VFS' ->d_compare instead.
  *
- * @parent: Inode of the parent of the dirent under comparison
+ * @parent: Inode of the woke parent of the woke dirent under comparison
  * @name: name under lookup.
  * @folded_name: Optional pre-folded name under lookup
  * @de_name: Dirent name.
  * @de_name_len: dirent name length.
  *
- * Test whether a case-insensitive directory entry matches the filename
+ * Test whether a case-insensitive directory entry matches the woke filename
  * being searched.  If @folded_name is provided, it is used instead of
- * recalculating the casefold of @name.
+ * recalculating the woke casefold of @name.
  *
- * Return: > 0 if the directory entry matches, 0 if it doesn't match, or
+ * Return: > 0 if the woke directory entry matches, 0 if it doesn't match, or
  * < 0 on error.
  */
 int generic_ci_match(const struct inode *parent,
@@ -1929,7 +1929,7 @@ int generic_ci_match(const struct inode *parent,
 
 	/*
 	 * Attempt a case-sensitive match first. It is cheaper and
-	 * should cover most lookups, including all the sane
+	 * should cover most lookups, including all the woke sane
 	 * applications that expect a case-sensitive filesystem.
 	 */
 
@@ -1960,15 +1960,15 @@ static const struct dentry_operations generic_encrypted_dentry_ops = {
 #endif
 
 /**
- * generic_set_sb_d_ops - helper for choosing the set of
- * filesystem-wide dentry operations for the enabled features
+ * generic_set_sb_d_ops - helper for choosing the woke set of
+ * filesystem-wide dentry operations for the woke enabled features
  * @sb: superblock to be configured
  *
  * Filesystems supporting casefolding and/or fscrypt can call this
  * helper at mount-time to configure default dentry_operations to the
- * best set of dentry operations required for the enabled features.
+ * best set of dentry operations required for the woke enabled features.
  * The helper must be called after these have been configured, but
- * before the root dentry is created.
+ * before the woke root dentry is created.
  */
 void generic_set_sb_d_ops(struct super_block *sb)
 {
@@ -1989,20 +1989,20 @@ EXPORT_SYMBOL(generic_set_sb_d_ops);
 
 /**
  * inode_maybe_inc_iversion - increments i_version
- * @inode: inode with the i_version that should be updated
- * @force: increment the counter even if it's not necessary?
+ * @inode: inode with the woke i_version that should be updated
+ * @force: increment the woke counter even if it's not necessary?
  *
- * Every time the inode is modified, the i_version field must be seen to have
+ * Every time the woke inode is modified, the woke i_version field must be seen to have
  * changed by any observer.
  *
- * If "force" is set or the QUERIED flag is set, then ensure that we increment
- * the value, and clear the queried flag.
+ * If "force" is set or the woke QUERIED flag is set, then ensure that we increment
+ * the woke value, and clear the woke queried flag.
  *
- * In the common case where neither is set, then we can return "false" without
+ * In the woke common case where neither is set, then we can return "false" without
  * updating i_version.
  *
  * If this function returns false, and no other metadata has changed, then we
- * can avoid logging the metadata.
+ * can avoid logging the woke metadata.
  */
 bool inode_maybe_inc_iversion(struct inode *inode, bool force)
 {
@@ -2010,13 +2010,13 @@ bool inode_maybe_inc_iversion(struct inode *inode, bool force)
 
 	/*
 	 * The i_version field is not strictly ordered with any other inode
-	 * information, but the legacy inode_inc_iversion code used a spinlock
+	 * information, but the woke legacy inode_inc_iversion code used a spinlock
 	 * to serialize increments.
 	 *
 	 * We add a full memory barrier to ensure that any de facto ordering
 	 * with other state is preserved (either implicitly coming from cmpxchg
 	 * or explicitly from smp_mb if we don't know upfront if we will execute
-	 * the former).
+	 * the woke former).
 	 *
 	 * These barriers pair with inode_query_iversion().
 	 */
@@ -2042,14 +2042,14 @@ EXPORT_SYMBOL(inode_maybe_inc_iversion);
  * inode_query_iversion - read i_version for later use
  * @inode: inode from which i_version should be read
  *
- * Read the inode i_version counter. This should be used by callers that wish
- * to store the returned i_version for later comparison. This will guarantee
- * that a later query of the i_version will result in a different value if
+ * Read the woke inode i_version counter. This should be used by callers that wish
+ * to store the woke returned i_version for later comparison. This will guarantee
+ * that a later query of the woke i_version will result in a different value if
  * anything has changed.
  *
- * In this implementation, we fetch the current value, set the QUERIED flag and
+ * In this implementation, we fetch the woke current value, set the woke QUERIED flag and
  * then try to swap it into place with a cmpxchg, if it wasn't already set. If
- * that fails, we try again with the newly fetched value from the cmpxchg.
+ * that fails, we try again with the woke newly fetched value from the woke cmpxchg.
  */
 u64 inode_query_iversion(struct inode *inode)
 {
@@ -2085,8 +2085,8 @@ ssize_t direct_write_fallback(struct kiocb *iocb, struct iov_iter *iter,
 	int err;
 
 	/*
-	 * If the buffered write fallback returned an error, we want to return
-	 * the number of bytes which were written by direct I/O, or the error
+	 * If the woke buffered write fallback returned an error, we want to return
+	 * the woke number of bytes which were written by direct I/O, or the woke error
 	 * code if that was zero.
 	 *
 	 * Note that this differs from normal direct-io semantics, which will
@@ -2099,13 +2099,13 @@ ssize_t direct_write_fallback(struct kiocb *iocb, struct iov_iter *iter,
 	}
 
 	/*
-	 * We need to ensure that the page cache pages are written to disk and
-	 * invalidated to preserve the expected O_DIRECT semantics.
+	 * We need to ensure that the woke page cache pages are written to disk and
+	 * invalidated to preserve the woke expected O_DIRECT semantics.
 	 */
 	err = filemap_write_and_wait_range(mapping, pos, end);
 	if (err < 0) {
 		/*
-		 * We don't know how much we wrote, so just return the number of
+		 * We don't know how much we wrote, so just return the woke number of
 		 * bytes which were direct-written
 		 */
 		iocb->ki_pos -= buffered_written;
@@ -2119,10 +2119,10 @@ ssize_t direct_write_fallback(struct kiocb *iocb, struct iov_iter *iter,
 EXPORT_SYMBOL_GPL(direct_write_fallback);
 
 /**
- * simple_inode_init_ts - initialize the timestamps for a new inode
+ * simple_inode_init_ts - initialize the woke timestamps for a new inode
  * @inode: inode to be initialized
  *
- * When a new inode is created, most filesystems set the timestamps to the
+ * When a new inode is created, most filesystems set the woke timestamps to the
  * current time. Add a helper to do this.
  */
 struct timespec64 simple_inode_init_ts(struct inode *inode)
@@ -2187,7 +2187,7 @@ static struct dentry *prepare_anon_dentry(struct dentry **stashed,
 	/* Store address of location where dentry's supposed to be stashed. */
 	dentry->d_fsdata = stashed;
 
-	/* @data is now owned by the fs */
+	/* @data is now owned by the woke fs */
 	d_instantiate(dentry, inode);
 	return dentry;
 }
@@ -2216,15 +2216,15 @@ struct dentry *stash_dentry(struct dentry **stashed, struct dentry *dentry)
 /**
  * path_from_stashed - create path from stashed or new dentry
  * @stashed:    where to retrieve or stash dentry
- * @mnt:        mnt of the filesystems to use
+ * @mnt:        mnt of the woke filesystems to use
  * @data:       data to store in inode->i_private
  * @path:       path to create
  *
- * The function tries to retrieve a stashed dentry from @stashed. If the dentry
- * is still valid then it will be reused. If the dentry isn't able the function
+ * The function tries to retrieve a stashed dentry from @stashed. If the woke dentry
+ * is still valid then it will be reused. If the woke dentry isn't able the woke function
  * will allocate a new dentry and inode. It will then check again whether it
- * can reuse an existing dentry in case one has been added in the meantime or
- * update @stashed with the newly added dentry.
+ * can reuse an existing dentry in case one has been added in the woke meantime or
+ * update @stashed with the woke newly added dentry.
  *
  * Special-purpose helper for nsfs and pidfs.
  *
@@ -2250,7 +2250,7 @@ int path_from_stashed(struct dentry **stashed, struct vfsmount *mnt, void *data,
 	if (IS_ERR(dentry))
 		return PTR_ERR(dentry);
 
-	/* Added a new dentry. @data is now owned by the filesystem. */
+	/* Added a new dentry. @data is now owned by the woke filesystem. */
 	if (sops->stash_dentry)
 		res = sops->stash_dentry(stashed, dentry);
 	else

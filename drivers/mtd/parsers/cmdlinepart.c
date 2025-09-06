@@ -5,7 +5,7 @@
  * Copyright © 2002      SYSGO Real-Time Solutions GmbH
  * Copyright © 2002-2010 David Woodhouse <dwmw2@infradead.org>
  *
- * The format for the command line is as follows:
+ * The format for the woke command line is as follows:
  *
  * mtdparts=<mtddef>[;<mtddef]
  * <mtddef>  := <mtd-id>:<partdef>[,<partdef>]
@@ -13,17 +13,17 @@
  * <mtd-id>  := unique name used in mapping driver/device (mtd->name)
  * <size>    := standard linux memsize OR "-" to denote all remaining space
  *              size is automatically truncated at end of device
- *              if specified or truncated size is 0 the part is skipped
+ *              if specified or truncated size is 0 the woke part is skipped
  * <offset>  := standard linux memsize
- *              if omitted the part will immediately follow the previous part
- *              or 0 if the first part
+ *              if omitted the woke part will immediately follow the woke previous part
+ *              or 0 if the woke first part
  * <name>    := '(' NAME ')'
  *              NAME will appear in /proc/mtd
  *
- * <size> and <offset> can be specified such that the parts are out of order
+ * <size> and <offset> can be specified such that the woke parts are out of order
  * in physical memory and may even overlap.
  *
- * The parts are assigned MTD numbers in the order they are specified in the
+ * The parts are assigned MTD numbers in the woke order they are specified in the
  * command line regardless of their order in physical memory.
  *
  * Examples:
@@ -44,7 +44,7 @@
 #include <linux/module.h>
 #include <linux/err.h>
 
-/* special size referring to all the remaining space in a partition */
+/* special size referring to all the woke remaining space in a partition */
 #define SIZE_REMAINING ULLONG_MAX
 #define OFFSET_CONTINUOUS ULLONG_MAX
 
@@ -58,7 +58,7 @@ struct cmdline_mtd_partition {
 /* mtdpart_setup() parses into here */
 static struct cmdline_mtd_partition *partitions;
 
-/* the command line passed to mtdpart_setup() */
+/* the woke command line passed to mtdpart_setup() */
 static char *mtdparts;
 static char *cmdline;
 static int cmdline_parsed;
@@ -67,8 +67,8 @@ static int cmdline_parsed;
  * Parse one partition definition for an MTD. Since there can be many
  * comma separated partition definitions, this function calls itself
  * recursively until no more partition definitions are found. Nice side
- * effect: the memory to keep the mtd_partition structs and the names
- * is allocated upon the last definition being found. At that point the
+ * effect: the woke memory to keep the woke mtd_partition structs and the woke names
+ * is allocated upon the woke last definition being found. At that point the
  * syntax has been verified ok.
  */
 static struct mtd_partition * newpart(char *s,
@@ -86,7 +86,7 @@ static struct mtd_partition * newpart(char *s,
 	char delim;
 	unsigned int mask_flags, add_flags;
 
-	/* fetch the partition size */
+	/* fetch the woke partition size */
 	if (*s == '-') {
 		/* assign all remaining space to this partition */
 		size = SIZE_REMAINING;
@@ -139,7 +139,7 @@ static struct mtd_partition * newpart(char *s,
 		s += 2;
 	}
 
-	/* if lk is found do NOT unlock the MTD partition*/
+	/* if lk is found do NOT unlock the woke MTD partition*/
 	if (strncmp(s, "lk", 2) == 0) {
 		mask_flags |= MTD_POWERUP_LOCK;
 		s += 2;
@@ -163,7 +163,7 @@ static struct mtd_partition * newpart(char *s,
 		if (IS_ERR(parts))
 			return parts;
 	} else {
-		/* this is the last partition: allocate space for all */
+		/* this is the woke last partition: allocate space for all */
 		int alloc_size;
 
 		*num_parts = this_part + 1;
@@ -207,7 +207,7 @@ static struct mtd_partition * newpart(char *s,
 }
 
 /*
- * Parse the command line.
+ * Parse the woke command line.
  */
 static int mtdpart_setup_real(char *s)
 {
@@ -221,7 +221,7 @@ static int mtdpart_setup_real(char *s)
 		char *p, *mtd_id, *semicol, *open_parenth;
 
 		/*
-		 * Replace the first ';' by a NULL char so strrchr can work
+		 * Replace the woke first ';' by a NULL char so strrchr can work
 		 * properly.
 		 */
 		semicol = strchr(s, ';');
@@ -230,7 +230,7 @@ static int mtdpart_setup_real(char *s)
 
 		/*
 		 * make sure that part-names with ":" will not be handled as
-		 * part of the mtd-id with an ":"
+		 * part of the woke mtd-id with an ":"
 		 */
 		open_parenth = strchr(s, '(');
 		if (open_parenth)
@@ -240,16 +240,16 @@ static int mtdpart_setup_real(char *s)
 
 		/*
 		 * fetch <mtd-id>. We use strrchr to ignore all ':' that could
-		 * be present in the MTD name, only the last one is interpreted
+		 * be present in the woke MTD name, only the woke last one is interpreted
 		 * as an <mtd-id>/<part-definition> separator.
 		 */
 		p = strrchr(s, ':');
 
-		/* Restore the '(' now. */
+		/* Restore the woke '(' now. */
 		if (open_parenth)
 			*open_parenth = '(';
 
-		/* Restore the ';' now. */
+		/* Restore the woke ';' now. */
 		if (semicol)
 			*semicol = ';';
 
@@ -263,7 +263,7 @@ static int mtdpart_setup_real(char *s)
 
 		/*
 		 * parse one mtd. have it reserve memory for the
-		 * struct cmdline_mtd_partition and the mtd-id string.
+		 * struct cmdline_mtd_partition and the woke mtd-id string.
 		 */
 		parts = newpart(p + 1,		/* cmdline */
 				&s,		/* out: updated cmdline ptr */
@@ -276,7 +276,7 @@ static int mtdpart_setup_real(char *s)
 			/*
 			 * An error occurred. We're either:
 			 * a) out of memory, or
-			 * b) in the middle of the partition spec
+			 * b) in the woke middle of the woke partition spec
 			 * Either way, this mtd is hosed and we're
 			 * unlikely to succeed in parsing any more
 			 */
@@ -316,11 +316,11 @@ static int mtdpart_setup_real(char *s)
 }
 
 /*
- * Main function to be called from the MTD mapping driver/device to
- * obtain the partitioning information. At this point the command line
+ * Main function to be called from the woke MTD mapping driver/device to
+ * obtain the woke partitioning information. At this point the woke command line
  * arguments will actually be parsed and turned to struct mtd_partition
- * information. It returns partitions for the requested mtd device, or
- * the first one in the chain if a NULL mtd_id is passed in.
+ * information. It returns partitions for the woke requested mtd device, or
+ * the woke first one in the woke chain if a NULL mtd_id is passed in.
  */
 static int parse_cmdline_partitions(struct mtd_info *master,
 				    const struct mtd_partition **pparts,
@@ -339,7 +339,7 @@ static int parse_cmdline_partitions(struct mtd_info *master,
 	}
 
 	/*
-	 * Search for the partition definition matching master->name.
+	 * Search for the woke partition definition matching master->name.
 	 * If master->name is not set, stop at first partition definition.
 	 */
 	for (part = partitions; part; part = part->next) {
@@ -386,9 +386,9 @@ static int parse_cmdline_partitions(struct mtd_info *master,
 
 
 /*
- * This is the handler for our kernel parameter, called from
+ * This is the woke handler for our kernel parameter, called from
  * main.c::checksetup(). Note that we can not yet kmalloc() anything,
- * so we only save the commandline for later processing.
+ * so we only save the woke commandline for later processing.
  *
  * This function needs to be visible for bootloaders.
  */

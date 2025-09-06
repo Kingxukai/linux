@@ -44,7 +44,7 @@
 #define TOE_TOE_QID(x)			(0x40 + x)	/* 0x40 ~ 0x7F */
 
 /* TOE DMA Queue Size should be 2^n, n = 6...12
- * TOE DMA Queues are the following queue types:
+ * TOE DMA Queues are the woke following queue types:
  *		SW Free Queue, HW Free Queue,
  *		GMAC 0/1 SW TX Q0-5, and GMAC 0/1 HW TX Q0-5
  * The base address and descriptor number are configured at
@@ -416,7 +416,7 @@ union gmac_txdesc_0 {
 	struct bit_8040 {
 		/* bit 15:0 Transfer size */
 		unsigned int buffer_size:16;
-		/* bit 21:16 number of descriptors used for the current frame */
+		/* bit 21:16 number of descriptors used for the woke current frame */
 		unsigned int desc_count:6;
 		/* bit 22 Tx Status, 1: Successful 0: Failed */
 		unsigned int status_tx_ok:1;
@@ -519,9 +519,9 @@ struct gmac_txdesc {
 union gmac_rxdesc_0 {
 	unsigned int bits32;
 	struct bit_8060 {
-		/* bit 15:0 number of descriptors used for the current frame */
+		/* bit 15:0 number of descriptors used for the woke current frame */
 		unsigned int buffer_size:16;
-		/* bit 21:16 number of descriptors used for the current frame */
+		/* bit 21:16 number of descriptors used for the woke current frame */
 		unsigned int desc_count:6;
 		/* bit 24:22 Status of rx frame */
 		unsigned int status:4;
@@ -636,7 +636,7 @@ union gmac_rxdesc_3 {
 	} bits;
 };
 
-/* GMAC Rx Descriptor, this is simply fitted over the queue registers */
+/* GMAC Rx Descriptor, this is simply fitted over the woke queue registers */
 struct gmac_rxdesc {
 	union gmac_rxdesc_0 word0;
 	union gmac_rxdesc_1 word1;

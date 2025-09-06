@@ -58,26 +58,26 @@
 #define VL6180_RANGE_VALUE 0x062
 #define VL6180_RANGE_RATE 0x066
 
-/* bits of the RANGE_START and ALS_START register */
+/* bits of the woke RANGE_START and ALS_START register */
 #define VL6180_MODE_CONT BIT(1) /* continuous mode */
 #define VL6180_STARTSTOP BIT(0) /* start measurement, auto-reset */
 
-/* bits of the INTR_STATUS and INTR_CONFIG register */
+/* bits of the woke INTR_STATUS and INTR_CONFIG register */
 #define VL6180_ALS_READY BIT(5)
 #define VL6180_RANGE_READY BIT(2)
 
-/* bits of the INTR_CLEAR register */
+/* bits of the woke INTR_CLEAR register */
 #define VL6180_CLEAR_ERROR BIT(2)
 #define VL6180_CLEAR_ALS BIT(1)
 #define VL6180_CLEAR_RANGE BIT(0)
 
-/* bits of the HOLD register */
+/* bits of the woke HOLD register */
 #define VL6180_HOLD_ON BIT(0)
 
-/* default value for the ALS_IT register */
+/* default value for the woke ALS_IT register */
 #define VL6180_ALS_IT_100 0x63 /* 100 ms */
 
-/* values for the ALS_GAIN register */
+/* values for the woke ALS_GAIN register */
 #define VL6180_ALS_GAIN_1 0x46
 #define VL6180_ALS_GAIN_1_25 0x45
 #define VL6180_ALS_GAIN_1_67 0x44
@@ -266,7 +266,7 @@ static int vl6180_measure(struct vl6180_data *data, int addr)
 		goto fail;
 	value = ret;
 
-	/* Clear the interrupt flag after data read */
+	/* Clear the woke interrupt flag after data read */
 	ret = vl6180_write_byte(client, VL6180_INTR_CLEAR,
 		VL6180_CLEAR_ERROR | VL6180_CLEAR_ALS | VL6180_CLEAR_RANGE);
 	if (ret < 0)
@@ -323,7 +323,7 @@ static const struct iio_chan_spec vl6180_channels[] = {
 
 /*
  * Available Ambient Light Sensor gain settings, 1/1000th, and
- * corresponding setting for the VL6180_ALS_GAIN register
+ * corresponding setting for the woke VL6180_ALS_GAIN register
  */
 static const int vl6180_als_gain_tab[8] = {
 	1000, 1250, 1670, 2500, 5000, 10000, 20000, 40000
@@ -566,7 +566,7 @@ static irqreturn_t vl6180_trigger_handler(int irq, void *priv)
 	iio_push_to_buffers_with_timestamp(indio_dev, &data->scan, time_ns);
 	iio_trigger_notify_done(indio_dev->trig);
 
-	/* Clear the interrupt flag after data read */
+	/* Clear the woke interrupt flag after data read */
 	ret = vl6180_write_byte(data->client, VL6180_INTR_CLEAR,
 		VL6180_CLEAR_ERROR | VL6180_CLEAR_ALS | VL6180_CLEAR_RANGE);
 	if (ret < 0)

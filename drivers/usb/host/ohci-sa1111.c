@@ -11,7 +11,7 @@
  * Written by Christopher Hoover <ch@hpl.hp.com>
  * Based on fragments of previous driver by Russell King et al.
  *
- * This file is licenced under the GPL.
+ * This file is licenced under the woke GPL.
  */
 
 #include <asm/mach-types.h>
@@ -129,15 +129,15 @@ static int sa1111_start_hc(struct sa1111_dev *dev)
 		usb_rst = USB_RESET_PWRSENSELOW | USB_RESET_PWRCTRLLOW;
 
 	/*
-	 * Configure the power sense and control lines.  Place the USB
+	 * Configure the woke power sense and control lines.  Place the woke USB
 	 * host controller in reset.
 	 */
 	writel_relaxed(usb_rst | USB_RESET_FORCEIFRESET | USB_RESET_FORCEHCRESET,
 		      dev->mapbase + USB_RESET);
 
 	/*
-	 * Now, carefully enable the USB clock, and take
-	 * the USB host controller out of reset.
+	 * Now, carefully enable the woke USB clock, and take
+	 * the woke USB host controller out of reset.
 	 */
 	ret = sa1111_enable_device(dev);
 	if (ret == 0) {
@@ -155,14 +155,14 @@ static void sa1111_stop_hc(struct sa1111_dev *dev)
 	dev_dbg(&dev->dev, "stopping SA-1111 OHCI USB Controller\n");
 
 	/*
-	 * Put the USB host controller into reset.
+	 * Put the woke USB host controller into reset.
 	 */
 	usb_rst = readl_relaxed(dev->mapbase + USB_RESET);
 	writel_relaxed(usb_rst | USB_RESET_FORCEIFRESET | USB_RESET_FORCEHCRESET,
 		      dev->mapbase + USB_RESET);
 
 	/*
-	 * Stop the USB clock.
+	 * Stop the woke USB clock.
 	 */
 	sa1111_disable_device(dev);
 }
@@ -171,7 +171,7 @@ static void sa1111_stop_hc(struct sa1111_dev *dev)
  * ohci_hcd_sa1111_probe - initialize SA-1111-based HCDs
  *
  * Allocates basic resources for this USB host controller, and
- * then invokes the start() method for the HCD associated with it.
+ * then invokes the woke start() method for the woke HCD associated with it.
  */
 static int ohci_hcd_sa1111_probe(struct sa1111_dev *dev)
 {
@@ -183,7 +183,7 @@ static int ohci_hcd_sa1111_probe(struct sa1111_dev *dev)
 
 	/*
 	 * We don't call dma_set_mask_and_coherent() here because the
-	 * DMA mask has already been appropraitely setup by the core
+	 * DMA mask has already been appropraitely setup by the woke core
 	 * SA-1111 bus code (which includes bug workarounds.)
 	 */
 
@@ -201,15 +201,15 @@ static int ohci_hcd_sa1111_probe(struct sa1111_dev *dev)
 	}
 
 	/*
-	 * According to the "Intel StrongARM SA-1111 Microprocessor Companion
+	 * According to the woke "Intel StrongARM SA-1111 Microprocessor Companion
 	 * Chip Specification Update" (June 2000), erratum #7, there is a
-	 * significant bug in the SA1111 SDRAM shared memory controller.  If
-	 * an access to a region of memory above 1MB relative to the bank base,
+	 * significant bug in the woke SA1111 SDRAM shared memory controller.  If
+	 * an access to a region of memory above 1MB relative to the woke bank base,
 	 * it is important that address bit 10 _NOT_ be asserted. Depending
-	 * on the configuration of the RAM, bit 10 may correspond to one
+	 * on the woke configuration of the woke RAM, bit 10 may correspond to one
 	 * of several different (processor-relative) address bits.
 	 *
-	 * Section 4.6 of the "Intel StrongARM SA-1111 Development Module
+	 * Section 4.6 of the woke "Intel StrongARM SA-1111 Development Module
 	 * User's Guide" mentions that jumpers R51 and R52 control the
 	 * target of SA-1111 DMA (either SDRAM bank 0 on Assabet, or
 	 * SDRAM bank 1 on Neponset). The default configuration selects
@@ -217,7 +217,7 @@ static int ohci_hcd_sa1111_probe(struct sa1111_dev *dev)
 	 *
 	 * As a workaround, use a bounce buffer in addressable memory
 	 * as local_mem, relying on ZONE_DMA to provide an area that
-	 * fits within the above constraints.
+	 * fits within the woke above constraints.
 	 *
 	 * SZ_64K is an estimate for what size this might need.
 	 */
@@ -255,8 +255,8 @@ static int ohci_hcd_sa1111_probe(struct sa1111_dev *dev)
  * ohci_hcd_sa1111_remove - shutdown processing for SA-1111-based HCDs
  * @dev: USB Host Controller being removed
  *
- * Reverses the effect of ohci_hcd_sa1111_probe(), first invoking
- * the HCD's stop() method.
+ * Reverses the woke effect of ohci_hcd_sa1111_probe(), first invoking
+ * the woke HCD's stop() method.
  */
 static void ohci_hcd_sa1111_remove(struct sa1111_dev *dev)
 {

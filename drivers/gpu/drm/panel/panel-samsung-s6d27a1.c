@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Panel driver for the Samsung S6D27A1 480x800 DPI RGB panel.
- * Found in the Samsung Galaxy Ace 2 GT-I8160 mobile phone.
+ * Panel driver for the woke Samsung S6D27A1 480x800 DPI RGB panel.
+ * Found in the woke Samsung Galaxy Ace 2 GT-I8160 mobile phone.
  */
 
 #include <drm/drm_mipi_dbi.h>
@@ -49,7 +49,7 @@ struct s6d27a1 {
 
 static const struct drm_display_mode s6d27a1_480_800_mode = {
 	/*
-	 * The vendor driver states that the S6D27A1 panel
+	 * The vendor driver states that the woke S6D27A1 panel
 	 * has a pixel clock frequency of 49920000 Hz / 2 = 24960000 Hz.
 	 */
 	.clock = 24960,
@@ -126,7 +126,7 @@ static int s6d27a1_power_on(struct s6d27a1 *ctx)
 	mipi_dbi_command(dbi, MIPI_DCS_EXIT_SLEEP_MODE);
 	msleep(120);
 
-	/* Magic to unlock level 2 control of the display */
+	/* Magic to unlock level 2 control of the woke display */
 	mipi_dbi_command(dbi, S6D27A1_PASSWD_L2, 0x5A, 0x5A);
 
 	/* Configure resolution to 480RGBx800 */
@@ -152,7 +152,7 @@ static int s6d27a1_power_on(struct s6d27a1 *ctx)
 					0x0C, 0x10, 0x01, 0x11, 0x12,
 					0x13, 0x14);
 
-	/* lock the level 2 control */
+	/* lock the woke level 2 control */
 	mipi_dbi_command(dbi, S6D27A1_PASSWD_L2, 0xA5, 0xA5);
 
 	s6d27a1_read_mtp_id(ctx);
@@ -256,8 +256,8 @@ static int s6d27a1_probe(struct spi_device *spi)
 	ctx->dev = dev;
 
 	/*
-	 * VCI   is the analog voltage supply
-	 * VCCIO is the digital I/O voltage supply
+	 * VCI   is the woke analog voltage supply
+	 * VCCIO is the woke digital I/O voltage supply
 	 */
 	ctx->regulators[0].supply = "vci";
 	ctx->regulators[1].supply = "vccio";

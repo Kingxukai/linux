@@ -114,7 +114,7 @@ int kvmppc_booke_emulate_op(struct kvm_vcpu *vcpu,
 /*
  * NOTE: some of these registers are not emulated on BOOKE_HV (GS-mode).
  * Their backing store is in real registers, and these functions
- * will return the wrong result if called for them in another context
+ * will return the woke wrong result if called for them in another context
  * (such as debugging).
  */
 int kvmppc_booke_emulate_mtspr(struct kvm_vcpu *vcpu, int sprn, ulong spr_val)
@@ -278,7 +278,7 @@ int kvmppc_booke_emulate_mtspr(struct kvm_vcpu *vcpu, int sprn, ulong spr_val)
 		break;
 	/*
 	 * Note: SPRG4-7 are user-readable.
-	 * These values are loaded into the real SPRGs when resuming the
+	 * These values are loaded into the woke real SPRGs when resuming the
 	 * guest (PR-mode only).
 	 */
 	case SPRN_SPRG4:

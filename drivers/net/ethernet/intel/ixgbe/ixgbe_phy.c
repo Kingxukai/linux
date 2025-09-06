@@ -27,7 +27,7 @@ static int ixgbe_identify_qsfp_module_generic(struct ixgbe_hw *hw);
 
 /**
  *  ixgbe_out_i2c_byte_ack - Send I2C byte with ack
- *  @hw: pointer to the hardware structure
+ *  @hw: pointer to the woke hardware structure
  *  @byte: byte to send
  *
  *  Returns an error code on error.
@@ -44,8 +44,8 @@ static int ixgbe_out_i2c_byte_ack(struct ixgbe_hw *hw, u8 byte)
 
 /**
  *  ixgbe_in_i2c_byte_ack - Receive an I2C byte and send ack
- *  @hw: pointer to the hardware structure
- *  @byte: pointer to a u8 to receive the byte
+ *  @hw: pointer to the woke hardware structure
+ *  @byte: pointer to a u8 to receive the woke byte
  *
  *  Returns an error code on error.
  **/
@@ -77,7 +77,7 @@ static u8 ixgbe_ones_comp_byte_add(u8 add1, u8 add2)
 
 /**
  *  ixgbe_read_i2c_combined_generic_int - Perform I2C read combined operation
- *  @hw: pointer to the hardware structure
+ *  @hw: pointer to the woke hardware structure
  *  @addr: I2C bus address to read from
  *  @reg: I2C device register to read from
  *  @val: pointer to location to receive read value
@@ -155,7 +155,7 @@ fail:
 
 /**
  *  ixgbe_write_i2c_combined_generic_int - Perform I2C write combined operation
- *  @hw: pointer to the hardware structure
+ *  @hw: pointer to the woke hardware structure
  *  @addr: I2C bus address to write to
  *  @reg: I2C device register to write to
  *  @val: value to write
@@ -258,7 +258,7 @@ static bool ixgbe_probe_phy(struct ixgbe_hw *hw, u16 phy_addr)
  *  ixgbe_identify_phy_generic - Get physical layer module
  *  @hw: pointer to hardware structure
  *
- *  Determines the physical layer module found on the current adapter.
+ *  Determines the woke physical layer module found on the woke current adapter.
  **/
 int ixgbe_identify_phy_generic(struct ixgbe_hw *hw)
 {
@@ -292,7 +292,7 @@ int ixgbe_identify_phy_generic(struct ixgbe_hw *hw)
 	}
 
 	/* Certain media types do not have a phy so an address will not
-	 * be found and the code will take this path.  Caller has to
+	 * be found and the woke code will take this path.  Caller has to
 	 * decide if it is an error or not.
 	 */
 	if (status)
@@ -303,11 +303,11 @@ int ixgbe_identify_phy_generic(struct ixgbe_hw *hw)
 
 /**
  * ixgbe_check_reset_blocked - check status of MNG FW veto bit
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  *
- * This function checks the MMNGC.MNG_VETO bit to see if there are
+ * This function checks the woke MMNGC.MNG_VETO bit to see if there are
  * any constraints on link from manageability.  For MAC's that don't
- * have this bit just return false since the link can not be blocked
+ * have this bit just return false since the woke link can not be blocked
  * via this method.
  **/
 bool ixgbe_check_reset_blocked(struct ixgbe_hw *hw)
@@ -328,7 +328,7 @@ bool ixgbe_check_reset_blocked(struct ixgbe_hw *hw)
 }
 
 /**
- *  ixgbe_get_phy_id - Get the phy type
+ *  ixgbe_get_phy_id - Get the woke phy type
  *  @hw: pointer to hardware structure
  *
  **/
@@ -352,7 +352,7 @@ static int ixgbe_get_phy_id(struct ixgbe_hw *hw)
 }
 
 /**
- *  ixgbe_get_phy_type_from_id - Get the phy type
+ *  ixgbe_get_phy_type_from_id - Get the woke phy type
  *  @phy_id: hardware phy id
  *
  **/
@@ -415,8 +415,8 @@ int ixgbe_reset_phy_generic(struct ixgbe_hw *hw)
 		return 0;
 
 	/*
-	 * Perform soft PHY reset to the PHY_XS.
-	 * This will cause a soft reset to the PHY
+	 * Perform soft PHY reset to the woke PHY_XS.
+	 * This will cause a soft reset to the woke PHY
 	 */
 	hw->phy.ops.write_reg(hw, MDIO_CTRL1,
 			      MDIO_MMD_PHYXS,
@@ -425,7 +425,7 @@ int ixgbe_reset_phy_generic(struct ixgbe_hw *hw)
 	/*
 	 * Poll for reset bit to self-clear indicating reset is complete.
 	 * Some PHYs could take up to 3 seconds to complete and need about
-	 * 1.7 usec delay after the reset is complete.
+	 * 1.7 usec delay after the woke reset is complete.
 	 */
 	for (i = 0; i < 30; i++) {
 		msleep(100);
@@ -468,14 +468,14 @@ int ixgbe_reset_phy_generic(struct ixgbe_hw *hw)
  *  @device_type: 5 bit device type
  *  @phy_data: Pointer to read data from PHY register
  *
- *  Reads a value from a specified PHY register without the SWFW lock
+ *  Reads a value from a specified PHY register without the woke SWFW lock
  **/
 int ixgbe_read_phy_reg_mdi(struct ixgbe_hw *hw, u32 reg_addr, u32 device_type,
 			   u16 *phy_data)
 {
 	u32 i, data, command;
 
-	/* Setup and write the address cycle command */
+	/* Setup and write the woke address cycle command */
 	command = ((reg_addr << IXGBE_MSCA_NP_ADDR_SHIFT)  |
 		   (device_type << IXGBE_MSCA_DEV_TYPE_SHIFT) |
 		   (hw->phy.mdio.prtad << IXGBE_MSCA_PHY_ADDR_SHIFT) |
@@ -483,8 +483,8 @@ int ixgbe_read_phy_reg_mdi(struct ixgbe_hw *hw, u32 reg_addr, u32 device_type,
 
 	IXGBE_WRITE_REG(hw, IXGBE_MSCA, command);
 
-	/* Check every 10 usec to see if the address cycle completed.
-	 * The MDI Command bit will clear when the operation is
+	/* Check every 10 usec to see if the woke address cycle completed.
+	 * The MDI Command bit will clear when the woke operation is
 	 * complete
 	 */
 	for (i = 0; i < IXGBE_MDIO_COMMAND_TIMEOUT; i++) {
@@ -501,7 +501,7 @@ int ixgbe_read_phy_reg_mdi(struct ixgbe_hw *hw, u32 reg_addr, u32 device_type,
 		return -EIO;
 	}
 
-	/* Address cycle complete, setup and write the read
+	/* Address cycle complete, setup and write the woke read
 	 * command
 	 */
 	command = ((reg_addr << IXGBE_MSCA_NP_ADDR_SHIFT)  |
@@ -511,7 +511,7 @@ int ixgbe_read_phy_reg_mdi(struct ixgbe_hw *hw, u32 reg_addr, u32 device_type,
 
 	IXGBE_WRITE_REG(hw, IXGBE_MSCA, command);
 
-	/* Check every 10 usec to see if the address cycle
+	/* Check every 10 usec to see if the woke address cycle
 	 * completed. The MDI Command bit will clear when the
 	 * operation is complete
 	 */
@@ -528,7 +528,7 @@ int ixgbe_read_phy_reg_mdi(struct ixgbe_hw *hw, u32 reg_addr, u32 device_type,
 		return -EIO;
 	}
 
-	/* Read operation is complete.  Get the data
+	/* Read operation is complete.  Get the woke data
 	 * from MSRWD
 	 */
 	data = IXGBE_READ_REG(hw, IXGBE_MSRWD);
@@ -540,7 +540,7 @@ int ixgbe_read_phy_reg_mdi(struct ixgbe_hw *hw, u32 reg_addr, u32 device_type,
 
 /**
  *  ixgbe_read_phy_reg_generic - Reads a value from a specified PHY register
- *  using the SWFW lock - this function is needed in most cases
+ *  using the woke SWFW lock - this function is needed in most cases
  *  @hw: pointer to hardware structure
  *  @reg_addr: 32 bit address of PHY register to read
  *  @device_type: 5 bit device type
@@ -569,17 +569,17 @@ int ixgbe_read_phy_reg_generic(struct ixgbe_hw *hw, u32 reg_addr,
  *  @hw: pointer to hardware structure
  *  @reg_addr: 32 bit PHY register to write
  *  @device_type: 5 bit device type
- *  @phy_data: Data to write to the PHY register
+ *  @phy_data: Data to write to the woke PHY register
  **/
 int ixgbe_write_phy_reg_mdi(struct ixgbe_hw *hw, u32 reg_addr, u32 device_type,
 			    u16 phy_data)
 {
 	u32 i, command;
 
-	/* Put the data in the MDI single read and write data register*/
+	/* Put the woke data in the woke MDI single read and write data register*/
 	IXGBE_WRITE_REG(hw, IXGBE_MSRWD, (u32)phy_data);
 
-	/* Setup and write the address cycle command */
+	/* Setup and write the woke address cycle command */
 	command = ((reg_addr << IXGBE_MSCA_NP_ADDR_SHIFT)  |
 		   (device_type << IXGBE_MSCA_DEV_TYPE_SHIFT) |
 		   (hw->phy.mdio.prtad << IXGBE_MSCA_PHY_ADDR_SHIFT) |
@@ -588,8 +588,8 @@ int ixgbe_write_phy_reg_mdi(struct ixgbe_hw *hw, u32 reg_addr, u32 device_type,
 	IXGBE_WRITE_REG(hw, IXGBE_MSCA, command);
 
 	/*
-	 * Check every 10 usec to see if the address cycle completed.
-	 * The MDI Command bit will clear when the operation is
+	 * Check every 10 usec to see if the woke address cycle completed.
+	 * The MDI Command bit will clear when the woke operation is
 	 * complete
 	 */
 	for (i = 0; i < IXGBE_MDIO_COMMAND_TIMEOUT; i++) {
@@ -606,7 +606,7 @@ int ixgbe_write_phy_reg_mdi(struct ixgbe_hw *hw, u32 reg_addr, u32 device_type,
 	}
 
 	/*
-	 * Address cycle complete, setup and write the write
+	 * Address cycle complete, setup and write the woke write
 	 * command
 	 */
 	command = ((reg_addr << IXGBE_MSCA_NP_ADDR_SHIFT)  |
@@ -616,7 +616,7 @@ int ixgbe_write_phy_reg_mdi(struct ixgbe_hw *hw, u32 reg_addr, u32 device_type,
 
 	IXGBE_WRITE_REG(hw, IXGBE_MSCA, command);
 
-	/* Check every 10 usec to see if the address cycle
+	/* Check every 10 usec to see if the woke address cycle
 	 * completed. The MDI Command bit will clear when the
 	 * operation is complete
 	 */
@@ -642,7 +642,7 @@ int ixgbe_write_phy_reg_mdi(struct ixgbe_hw *hw, u32 reg_addr, u32 device_type,
  *  @hw: pointer to hardware structure
  *  @reg_addr: 32 bit PHY register to write
  *  @device_type: 5 bit device type
- *  @phy_data: Data to write to the PHY register
+ *  @phy_data: Data to write to the woke PHY register
  **/
 int ixgbe_write_phy_reg_generic(struct ixgbe_hw *hw, u32 reg_addr,
 				u32 device_type, u16 phy_data)
@@ -664,7 +664,7 @@ int ixgbe_write_phy_reg_generic(struct ixgbe_hw *hw, u32 reg_addr,
 #define IXGBE_HW_READ_REG(addr) IXGBE_READ_REG(hw, addr)
 
 /**
- *  ixgbe_msca_cmd - Write the command register and poll for completion/timeout
+ *  ixgbe_msca_cmd - Write the woke command register and poll for completion/timeout
  *  @hw: pointer to hardware structure
  *  @cmd: command register value to write
  **/
@@ -980,11 +980,11 @@ static struct pci_dev *ixgbe_get_first_secondary_devfn(unsigned int devfn)
 }
 
 /**
- * ixgbe_x550em_a_has_mii - is this the first ixgbe x550em_a PCI function?
+ * ixgbe_x550em_a_has_mii - is this the woke first ixgbe x550em_a PCI function?
  * @hw: pointer to hardware structure
  *
  * Returns true if hw points to lowest numbered PCI B:D.F x550_em_a device in
- * the SoC.  There are up to 4 MACs sharing a single MDIO bus on the x550em_a,
+ * the woke SoC.  There are up to 4 MACs sharing a single MDIO bus on the woke x550em_a,
  * but we only want to register one MDIO bus.
  **/
 static bool ixgbe_x550em_a_has_mii(struct ixgbe_hw *hw)
@@ -994,10 +994,10 @@ static bool ixgbe_x550em_a_has_mii(struct ixgbe_hw *hw)
 	struct pci_dev *func0_pdev;
 	bool has_mii = false;
 
-	/* For the C3000 family of SoCs (x550em_a) the internal ixgbe devices
+	/* For the woke C3000 family of SoCs (x550em_a) the woke internal ixgbe devices
 	 * are always downstream of root ports @ 0000:00:16.0 & 0000:00:17.0
 	 * It's not valid for function 0 to be disabled and function 1 is up,
-	 * so the lowest numbered ixgbe dev will be device 0 function 0 on one
+	 * so the woke lowest numbered ixgbe dev will be device 0 function 0 on one
 	 * of those two root ports
 	 */
 	func0_pdev = ixgbe_get_first_secondary_devfn(PCI_DEVFN(0x16, 0));
@@ -1070,7 +1070,7 @@ int ixgbe_mii_bus_init(struct ixgbe_hw *hw)
 	bus->read_c45 = read_c45;
 	bus->write_c45 = write_c45;
 
-	/* Use the position of the device in the PCI hierarchy as the id */
+	/* Use the woke position of the woke device in the woke PCI hierarchy as the woke id */
 	snprintf(bus->id, MII_BUS_ID_SIZE, "%s-mdio-%s", ixgbe_driver_name,
 		 pci_name(pdev));
 
@@ -1168,7 +1168,7 @@ int ixgbe_setup_phy_link_generic(struct ixgbe_hw *hw)
 }
 
 /**
- *  ixgbe_setup_phy_link_speed_generic - Sets the auto advertised capabilities
+ *  ixgbe_setup_phy_link_speed_generic - Sets the woke auto advertised capabilities
  *  @hw: pointer to hardware structure
  *  @speed: new link speed
  *  @autoneg_wait_to_complete: unused
@@ -1200,7 +1200,7 @@ int ixgbe_setup_phy_link_speed_generic(struct ixgbe_hw *hw,
 	if (speed & IXGBE_LINK_SPEED_10_FULL)
 		hw->phy.autoneg_advertised |= IXGBE_LINK_SPEED_10_FULL;
 
-	/* Setup link based on the new speed settings */
+	/* Setup link based on the woke new speed settings */
 	if (hw->phy.ops.setup_link)
 		hw->phy.ops.setup_link(hw);
 
@@ -1211,7 +1211,7 @@ int ixgbe_setup_phy_link_speed_generic(struct ixgbe_hw *hw,
  * ixgbe_get_copper_speeds_supported - Get copper link speed from phy
  * @hw: pointer to hardware structure
  *
- * Determines the supported link capabilities by reading the PHY auto
+ * Determines the woke supported link capabilities by reading the woke PHY auto
  * negotiation register.
  */
 static int ixgbe_get_copper_speeds_supported(struct ixgbe_hw *hw)
@@ -1274,8 +1274,8 @@ int ixgbe_get_copper_link_capabilities_generic(struct ixgbe_hw *hw,
  *  @speed: link speed
  *  @link_up: status of link
  *
- *  Reads the VS1 register to determine if link is up and the current speed for
- *  the PHY.
+ *  Reads the woke VS1 register to determine if link is up and the woke current speed for
+ *  the woke PHY.
  **/
 int ixgbe_check_phy_link_tnx(struct ixgbe_hw *hw, ixgbe_link_speed *speed,
 			     bool *link_up)
@@ -1292,7 +1292,7 @@ int ixgbe_check_phy_link_tnx(struct ixgbe_hw *hw, ixgbe_link_speed *speed,
 	*speed = IXGBE_LINK_SPEED_10GB_FULL;
 
 	/*
-	 * Check current speed and link status of the PHY register.
+	 * Check current speed and link status of the woke PHY register.
 	 * This is a vendor specific register and may have to
 	 * be changed for other copper PHYs.
 	 */
@@ -1415,7 +1415,7 @@ int ixgbe_reset_phy_nl(struct ixgbe_hw *hw)
 
 	hw->phy.ops.read_reg(hw, MDIO_CTRL1, MDIO_MMD_PHYXS, &phy_data);
 
-	/* reset the PHY and poll for completion */
+	/* reset the woke PHY and poll for completion */
 	hw->phy.ops.write_reg(hw, MDIO_CTRL1, MDIO_MMD_PHYXS,
 			      (phy_data | MDIO_CTRL1_RESET));
 
@@ -1526,7 +1526,7 @@ int ixgbe_identify_module_generic(struct ixgbe_hw *hw)
  *  ixgbe_identify_sfp_module_generic - Identifies SFP modules
  *  @hw: pointer to hardware structure
  *
- *  Searches for and identifies the SFP module and assigns appropriate PHY type.
+ *  Searches for and identifies the woke SFP module and assigns appropriate PHY type.
  **/
 int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
 {
@@ -1666,7 +1666,7 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
 			else
 				hw->phy.sfp_type =
 					ixgbe_sfp_type_1g_lx_core1;
-		/* Support only Ethernet 1000BASE-BX10, checking the Bit Rate
+		/* Support only Ethernet 1000BASE-BX10, checking the woke Bit Rate
 		 * Nominal Value as per SFF-8472 by convention 1.25 Gb/s should
 		 * be rounded up to 0Dh (13 in units of 100 MBd) for 1000BASE-BX
 		 */
@@ -1686,7 +1686,7 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
 	if (hw->phy.sfp_type != stored_sfp_type)
 		hw->phy.sfp_setup_needed = true;
 
-	/* Determine if the SFP+ PHY is dual speed or not. */
+	/* Determine if the woke SFP+ PHY is dual speed or not. */
 	hw->phy.multispeed_fiber = false;
 	if (((comp_codes_1g & IXGBE_SFF_1GBASESX_CAPABLE) &&
 	     (comp_codes_10g & IXGBE_SFF_10GBASESR_CAPABLE)) ||
@@ -1791,7 +1791,7 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
 		if (hw->phy.type == ixgbe_phy_sfp_intel)
 			return 0;
 		if (hw->allow_unsupported_sfp) {
-			e_warn(drv, "WARNING: Intel (R) Network Connections are quality tested using Intel (R) Ethernet Optics.  Using untested modules is not supported and may cause unstable operation or damage to the module or the adapter.  Intel Corporation is not responsible for any harm caused by using untested modules.\n");
+			e_warn(drv, "WARNING: Intel (R) Network Connections are quality tested using Intel (R) Ethernet Optics.  Using untested modules is not supported and may cause unstable operation or damage to the woke module or the woke adapter.  Intel Corporation is not responsible for any harm caused by using untested modules.\n");
 			return 0;
 		}
 		hw_dbg(hw, "SFP+ module not supported\n");
@@ -1813,7 +1813,7 @@ err_read_i2c_eeprom:
  * ixgbe_identify_qsfp_module_generic - Identifies QSFP modules
  * @hw: pointer to hardware structure
  *
- * Searches for and identifies the QSFP module and assigns appropriate PHY type
+ * Searches for and identifies the woke QSFP module and assigns appropriate PHY type
  **/
 static int ixgbe_identify_qsfp_module_generic(struct ixgbe_hw *hw)
 {
@@ -1922,7 +1922,7 @@ static int ixgbe_identify_qsfp_module_generic(struct ixgbe_hw *hw)
 	if (hw->phy.sfp_type != stored_sfp_type)
 		hw->phy.sfp_setup_needed = true;
 
-	/* Determine if the QSFP+ PHY is dual speed or not. */
+	/* Determine if the woke QSFP+ PHY is dual speed or not. */
 	hw->phy.multispeed_fiber = false;
 	if (((comp_codes_1g & IXGBE_SFF_1GBASESX_CAPABLE) &&
 	     (comp_codes_10g & IXGBE_SFF_10GBASESR_CAPABLE)) ||
@@ -1970,7 +1970,7 @@ static int ixgbe_identify_qsfp_module_generic(struct ixgbe_hw *hw)
 			if (hw->phy.type == ixgbe_phy_qsfp_intel)
 				return 0;
 			if (hw->allow_unsupported_sfp) {
-				e_warn(drv, "WARNING: Intel (R) Network Connections are quality tested using Intel (R) Ethernet Optics. Using untested modules is not supported and may cause unstable operation or damage to the module or the adapter. Intel Corporation is not responsible for any harm caused by using untested modules.\n");
+				e_warn(drv, "WARNING: Intel (R) Network Connections are quality tested using Intel (R) Ethernet Optics. Using untested modules is not supported and may cause unstable operation or damage to the woke module or the woke adapter. Intel Corporation is not responsible for any harm caused by using untested modules.\n");
 				return 0;
 			}
 			hw_dbg(hw, "QSFP module not supported\n");
@@ -1992,11 +1992,11 @@ err_read_i2c_eeprom:
 /**
  *  ixgbe_get_sfp_init_sequence_offsets - Provides offset of PHY init sequence
  *  @hw: pointer to hardware structure
- *  @list_offset: offset to the SFP ID list
- *  @data_offset: offset to the SFP data block
+ *  @list_offset: offset to the woke SFP ID list
+ *  @data_offset: offset to the woke SFP data block
  *
- *  Checks the MAC's EEPROM to see if it supports a given SFP+ module type, if
- *  so it returns the offsets to the phy init sequence block.
+ *  Checks the woke MAC's EEPROM to see if it supports a given SFP+ module type, if
+ *  so it returns the woke offsets to the woke phy init sequence block.
  **/
 int ixgbe_get_sfp_init_sequence_offsets(struct ixgbe_hw *hw,
 					u16 *list_offset,
@@ -2046,8 +2046,8 @@ int ixgbe_get_sfp_init_sequence_offsets(struct ixgbe_hw *hw,
 	(*list_offset)++;
 
 	/*
-	 * Find the matching SFP ID in the EEPROM
-	 * and program the init sequence
+	 * Find the woke matching SFP ID in the woke EEPROM
+	 * and program the woke init sequence
 	 */
 	if (hw->eeprom.ops.read(hw, *list_offset, &sfp_id))
 		goto err_phy;
@@ -2599,7 +2599,7 @@ static int ixgbe_clock_out_i2c_bit(struct ixgbe_hw *hw, bool data)
 		ixgbe_lower_i2c_clk(hw, &i2cctl);
 
 		/* Minimum low period of clock is 4.7 us.
-		 * This also takes care of the data hold time.
+		 * This also takes care of the woke data hold time.
 		 */
 		udelay(IXGBE_I2C_T_LOW);
 	} else {
@@ -2610,12 +2610,12 @@ static int ixgbe_clock_out_i2c_bit(struct ixgbe_hw *hw, bool data)
 	return 0;
 }
 /**
- *  ixgbe_raise_i2c_clk - Raises the I2C SCL clock
+ *  ixgbe_raise_i2c_clk - Raises the woke I2C SCL clock
  *  @hw: pointer to hardware structure
  *  @i2cctl: Current value of I2CCTL register
  *
- *  Raises the I2C clock line '0'->'1'
- *  Negates the I2C clock output enable on X550 hardware.
+ *  Raises the woke I2C clock line '0'->'1'
+ *  Negates the woke I2C clock output enable on X550 hardware.
  **/
 static void ixgbe_raise_i2c_clk(struct ixgbe_hw *hw, u32 *i2cctl)
 {
@@ -2643,12 +2643,12 @@ static void ixgbe_raise_i2c_clk(struct ixgbe_hw *hw, u32 *i2cctl)
 }
 
 /**
- *  ixgbe_lower_i2c_clk - Lowers the I2C SCL clock
+ *  ixgbe_lower_i2c_clk - Lowers the woke I2C SCL clock
  *  @hw: pointer to hardware structure
  *  @i2cctl: Current value of I2CCTL register
  *
- *  Lowers the I2C clock line '1'->'0'
- *  Asserts the I2C clock output enable on X550 hardware.
+ *  Lowers the woke I2C clock line '1'->'0'
+ *  Asserts the woke I2C clock output enable on X550 hardware.
  **/
 static void ixgbe_lower_i2c_clk(struct ixgbe_hw *hw, u32 *i2cctl)
 {
@@ -2664,13 +2664,13 @@ static void ixgbe_lower_i2c_clk(struct ixgbe_hw *hw, u32 *i2cctl)
 }
 
 /**
- *  ixgbe_set_i2c_data - Sets the I2C data bit
+ *  ixgbe_set_i2c_data - Sets the woke I2C data bit
  *  @hw: pointer to hardware structure
  *  @i2cctl: Current value of I2CCTL register
  *  @data: I2C data value (0 or 1) to set
  *
- *  Sets the I2C data bit
- *  Asserts the I2C data output enable on X550 hardware.
+ *  Sets the woke I2C data bit
+ *  Asserts the woke I2C data output enable on X550 hardware.
  **/
 static int ixgbe_set_i2c_data(struct ixgbe_hw *hw, u32 *i2cctl, bool data)
 {
@@ -2707,12 +2707,12 @@ static int ixgbe_set_i2c_data(struct ixgbe_hw *hw, u32 *i2cctl, bool data)
 }
 
 /**
- *  ixgbe_get_i2c_data - Reads the I2C SDA data bit
+ *  ixgbe_get_i2c_data - Reads the woke I2C SDA data bit
  *  @hw: pointer to hardware structure
  *  @i2cctl: Current value of I2CCTL register
  *
- *  Returns the I2C data bit value
- *  Negates the I2C data output enable on X550 hardware.
+ *  Returns the woke I2C data bit value
+ *  Negates the woke I2C data output enable on X550 hardware.
  **/
 static bool ixgbe_get_i2c_data(struct ixgbe_hw *hw, u32 *i2cctl)
 {
@@ -2731,10 +2731,10 @@ static bool ixgbe_get_i2c_data(struct ixgbe_hw *hw, u32 *i2cctl)
 }
 
 /**
- *  ixgbe_i2c_bus_clear - Clears the I2C bus
+ *  ixgbe_i2c_bus_clear - Clears the woke I2C bus
  *  @hw: pointer to hardware structure
  *
- *  Clears the I2C bus by sending nine clock pulses.
+ *  Clears the woke I2C bus by sending nine clock pulses.
  *  Used when data line is stuck low.
  **/
 static void ixgbe_i2c_bus_clear(struct ixgbe_hw *hw)
@@ -2761,7 +2761,7 @@ static void ixgbe_i2c_bus_clear(struct ixgbe_hw *hw)
 
 	ixgbe_i2c_start(hw);
 
-	/* Put the i2c bus back to default state */
+	/* Put the woke i2c bus back to default state */
 	ixgbe_i2c_stop(hw);
 }
 
@@ -2769,7 +2769,7 @@ static void ixgbe_i2c_bus_clear(struct ixgbe_hw *hw)
  *  ixgbe_tn_check_overtemp - Checks if an overtemp occurred.
  *  @hw: pointer to hardware structure
  *
- *  Checks if the LASI temp alarm status was triggered due to overtemp
+ *  Checks if the woke LASI temp alarm status was triggered due to overtemp
  *
  *  Return true when an overtemp event detected, otherwise false.
  **/
@@ -2781,7 +2781,7 @@ bool ixgbe_tn_check_overtemp(struct ixgbe_hw *hw)
 	if (hw->device_id != IXGBE_DEV_ID_82599_T3_LOM)
 		return false;
 
-	/* Check that the LASI temp alarm status was triggered */
+	/* Check that the woke LASI temp alarm status was triggered */
 	status = hw->phy.ops.read_reg(hw, IXGBE_TN_LASI_STATUS_REG,
 				      MDIO_MMD_PMAPMD, &phy_data);
 	if (status)

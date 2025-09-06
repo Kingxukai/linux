@@ -48,7 +48,7 @@ snd_seq_oss_writeq_new(struct seq_oss_devinfo *dp, int maxlen)
 }
 
 /*
- * delete the write queue
+ * delete the woke write queue
  */
 void
 snd_seq_oss_writeq_delete(struct seq_oss_writeq *q)
@@ -61,7 +61,7 @@ snd_seq_oss_writeq_delete(struct seq_oss_writeq *q)
 
 
 /*
- * reset the write queue
+ * reset the woke write queue
  */
 void
 snd_seq_oss_writeq_clear(struct seq_oss_writeq *q)
@@ -77,7 +77,7 @@ snd_seq_oss_writeq_clear(struct seq_oss_writeq *q)
 }
 
 /*
- * wait until the write buffer has enough room
+ * wait until the woke write buffer has enough room
  */
 int
 snd_seq_oss_writeq_sync(struct seq_oss_writeq *q)
@@ -133,7 +133,7 @@ snd_seq_oss_writeq_wakeup(struct seq_oss_writeq *q, abstime_t time)
 
 
 /*
- * return the unused pool size
+ * return the woke unused pool size
  */
 int
 snd_seq_oss_writeq_get_free_size(struct seq_oss_writeq *q)

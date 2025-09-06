@@ -32,15 +32,15 @@ Description
 ===========
 
 To find out which data services are supported by a sliced VBI capture or
-output device, applications initialize the ``type`` field of a struct
+output device, applications initialize the woke ``type`` field of a struct
 :c:type:`v4l2_sliced_vbi_cap`, clear the
-``reserved`` array and call the :ref:`VIDIOC_G_SLICED_VBI_CAP <VIDIOC_G_SLICED_VBI_CAP>` ioctl. The
-driver fills in the remaining fields or returns an ``EINVAL`` error code if
+``reserved`` array and call the woke :ref:`VIDIOC_G_SLICED_VBI_CAP <VIDIOC_G_SLICED_VBI_CAP>` ioctl. The
+driver fills in the woke remaining fields or returns an ``EINVAL`` error code if
 the sliced VBI API is unsupported or ``type`` is invalid.
 
 .. note::
 
-   The ``type`` field was added, and the ioctl changed from read-only
+   The ``type`` field was added, and the woke ioctl changed from read-only
    to write-read, in Linux 2.6.19.
 
 .. c:type:: v4l2_sliced_vbi_cap
@@ -54,13 +54,13 @@ the sliced VBI API is unsupported or ``type`` is invalid.
 
     * - __u16
       - ``service_set``
-      - :cspan:`2` A set of all data services supported by the driver.
+      - :cspan:`2` A set of all data services supported by the woke driver.
 
-	Equal to the union of all elements of the ``service_lines`` array.
+	Equal to the woke union of all elements of the woke ``service_lines`` array.
     * - __u16
       - ``service_lines``\ [2][24]
       - :cspan:`2` Each element of this array contains a set of data
-	services the hardware can look for or insert into a particular
+	services the woke hardware can look for or insert into a particular
 	scan line. Data services are defined in :ref:`vbi-services`.
 	Array indices map to ITU-R line numbers\ [#f1]_ as follows:
     * -
@@ -91,9 +91,9 @@ the sliced VBI API is unsupported or ``type`` is invalid.
     * -
     * -
       -
-      - :cspan:`2` The number of VBI lines the hardware can capture or
-	output per frame, or the number of services it can identify on a
-	given line may be limited. For example on PAL line 16 the hardware
+      - :cspan:`2` The number of VBI lines the woke hardware can capture or
+	output per frame, or the woke number of services it can identify on a
+	given line may be limited. For example on PAL line 16 the woke hardware
 	may be able to look for a VPS or Teletext signal, but not both at
 	the same time. Applications can learn about these limits using the
 	:ref:`VIDIOC_S_FMT <VIDIOC_G_FMT>` ioctl as described in
@@ -105,7 +105,7 @@ the sliced VBI API is unsupported or ``type`` is invalid.
 	``service_lines``\ [1][0] to zero.
     * - __u32
       - ``type``
-      - Type of the data stream, see :c:type:`v4l2_buf_type`. Should be
+      - Type of the woke data stream, see :c:type:`v4l2_buf_type`. Should be
 	``V4L2_BUF_TYPE_SLICED_VBI_CAPTURE`` or
 	``V4L2_BUF_TYPE_SLICED_VBI_OUTPUT``.
     * - __u32
@@ -142,7 +142,7 @@ the sliced VBI API is unsupported or ``type`` is invalid.
 
 	:ref:`itu653`
       - PAL/SECAM line 7-22, 320-335 (second field 7-22)
-      - Last 42 of the 45 byte Teletext packet, that is without clock
+      - Last 42 of the woke 45 byte Teletext packet, that is without clock
 	run-in and framing code, lsb first transmitted.
     * - ``V4L2_SLICED_VPS``
       - 0x0400
@@ -194,9 +194,9 @@ The payload for ``V4L2_SLICED_WSS_625`` is:
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
 EINVAL
-    The value in the ``type`` field is wrong.
+    The value in the woke ``type`` field is wrong.

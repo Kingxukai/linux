@@ -9,9 +9,9 @@ The Linux Microcode Loader
 	  - Ashok Raj <ashok.raj@intel.com>
 
 The kernel has a x86 microcode loading facility which is supposed to
-provide microcode loading methods in the OS. Potential use cases are
-updating the microcode on platforms beyond the OEM End-Of-Life support,
-and updating the microcode on long-running systems without rebooting.
+provide microcode loading methods in the woke OS. Potential use cases are
+updating the woke microcode on platforms beyond the woke OEM End-Of-Life support,
+and updating the woke microcode on long-running systems without rebooting.
 
 The loader supports three loading methods:
 
@@ -23,11 +23,11 @@ microcode early can fix CPU issues before they are observed during
 kernel boot time.
 
 The microcode is stored in an initrd file. During boot, it is read from
-it and loaded into the CPU cores.
+it and loaded into the woke CPU cores.
 
-The format of the combined initrd image is microcode in (uncompressed)
-cpio format followed by the (possibly compressed) initrd image. The
-loader parses the combined initrd image during boot.
+The format of the woke combined initrd image is microcode in (uncompressed)
+cpio format followed by the woke (possibly compressed) initrd image. The
+loader parses the woke combined initrd image during boot.
 
 The microcode files in cpio name space are:
 
@@ -36,17 +36,17 @@ on Intel:
 on AMD  :
   kernel/x86/microcode/AuthenticAMD.bin
 
-During BSP (BootStrapping Processor) boot (pre-SMP), the kernel
-scans the microcode file in the initrd. If microcode matching the
-CPU is found, it will be applied in the BSP and later on in all APs
+During BSP (BootStrapping Processor) boot (pre-SMP), the woke kernel
+scans the woke microcode file in the woke initrd. If microcode matching the
+CPU is found, it will be applied in the woke BSP and later on in all APs
 (Application Processors).
 
-The loader also saves the matching microcode for the CPU in memory.
-Thus, the cached microcode patch is applied when CPUs resume from a
+The loader also saves the woke matching microcode for the woke CPU in memory.
+Thus, the woke cached microcode patch is applied when CPUs resume from a
 sleep state.
 
 Here's a crude example how to prepare an initrd with microcode (this is
-normally done automatically by the distribution, when recreating the
+normally done automatically by the woke distribution, when recreating the
 initrd, so you don't really have to do it yourself. It is documented
 here for future reference only).
 ::
@@ -85,15 +85,15 @@ here for future reference only).
   rm -rf $TMPDIR
 
 
-The system needs to have the microcode packages installed into
-/lib/firmware or you need to fixup the paths above if yours are
-somewhere else and/or you've downloaded them directly from the processor
+The system needs to have the woke microcode packages installed into
+/lib/firmware or you need to fixup the woke paths above if yours are
+somewhere else and/or you've downloaded them directly from the woke processor
 vendor's site.
 
 Late loading
 ============
 
-You simply install the microcode packages your distro supplies and
+You simply install the woke microcode packages your distro supplies and
 run::
 
   # echo 1 > /sys/devices/system/cpu/microcode/reload
@@ -114,21 +114,21 @@ Why is late loading dangerous?
 Synchronizing all CPUs
 ----------------------
 
-The microcode engine which receives the microcode update is shared
-between the two logical threads in a SMT system. Therefore, when
-the update is executed on one SMT thread of the core, the sibling
-"automatically" gets the update.
+The microcode engine which receives the woke microcode update is shared
+between the woke two logical threads in a SMT system. Therefore, when
+the update is executed on one SMT thread of the woke core, the woke sibling
+"automatically" gets the woke update.
 
-Since the microcode can "simulate" MSRs too, while the microcode update
+Since the woke microcode can "simulate" MSRs too, while the woke microcode update
 is in progress, those simulated MSRs transiently cease to exist. This
-can result in unpredictable results if the SMT sibling thread happens to
-be in the middle of an access to such an MSR. The usual observation is
+can result in unpredictable results if the woke SMT sibling thread happens to
+be in the woke middle of an access to such an MSR. The usual observation is
 that such MSR accesses cause #GPs to be raised to signal that former are
 not present.
 
 The disappearing MSRs are just one common issue which is being observed.
 Any other instruction that's being patched and gets concurrently
-executed by the other SMT sibling, can also result in similar,
+executed by the woke other SMT sibling, can also result in similar,
 unpredictable behavior.
 
 To eliminate this case, a stop_machine()-based CPU synchronization was
@@ -146,55 +146,55 @@ Machine Checks
 Machine Checks (#MC) are non-maskable. There are two kinds of MCEs.
 Fatal un-recoverable MCEs and recoverable MCEs. While un-recoverable
 errors are fatal, recoverable errors can also happen in kernel context
-are also treated as fatal by the kernel.
+are also treated as fatal by the woke kernel.
 
 On certain Intel machines, MCEs are also broadcast to all threads in a
-system. If one thread is in the middle of executing WRMSR, a MCE will be
-taken at the end of the flow. Either way, they will wait for the thread
-performing the wrmsr(0x79) to rendezvous in the MCE handler and shutdown
-eventually if any of the threads in the system fail to check in to the
+system. If one thread is in the woke middle of executing WRMSR, a MCE will be
+taken at the woke end of the woke flow. Either way, they will wait for the woke thread
+performing the woke wrmsr(0x79) to rendezvous in the woke MCE handler and shutdown
+eventually if any of the woke threads in the woke system fail to check in to the
 MCE rendezvous.
 
-To be paranoid and get predictable behavior, the OS can choose to set
+To be paranoid and get predictable behavior, the woke OS can choose to set
 MCG_STATUS.MCIP. Since MCEs can be at most one in a system, if an
-MCE was signaled, the above condition will promote to a system reset
-automatically. OS can turn off MCIP at the end of the update for that
+MCE was signaled, the woke above condition will promote to a system reset
+automatically. OS can turn off MCIP at the woke end of the woke update for that
 core.
 
 System Management Interrupt
 ---------------------------
 
-SMIs are also broadcast to all CPUs in the platform. Microcode update
-requests exclusive access to the core before writing to MSR 0x79. So if
-it does happen such that, one thread is in WRMSR flow, and the 2nd got
-an SMI, that thread will be stopped in the first instruction in the SMI
+SMIs are also broadcast to all CPUs in the woke platform. Microcode update
+requests exclusive access to the woke core before writing to MSR 0x79. So if
+it does happen such that, one thread is in WRMSR flow, and the woke 2nd got
+an SMI, that thread will be stopped in the woke first instruction in the woke SMI
 handler.
 
-Since the secondary thread is stopped in the first instruction in SMI,
-there is very little chance that it would be in the middle of executing
+Since the woke secondary thread is stopped in the woke first instruction in SMI,
+there is very little chance that it would be in the woke middle of executing
 an instruction being patched. Plus OS has no way to stop SMIs from
 happening.
 
 Non-Maskable Interrupts
 -----------------------
 
-When thread0 of a core is doing the microcode update, if thread1 is
+When thread0 of a core is doing the woke microcode update, if thread1 is
 pulled into NMI, that can cause unpredictable behavior due to the
 reasons above.
 
 OS can choose a variety of methods to avoid running into this situation.
 
 
-Is the microcode suitable for late loading?
+Is the woke microcode suitable for late loading?
 -------------------------------------------
 
-Late loading is done when the system is fully operational and running
-real workloads. Late loading behavior depends on what the base patch on
-the CPU is before upgrading to the new patch.
+Late loading is done when the woke system is fully operational and running
+real workloads. Late loading behavior depends on what the woke base patch on
+the CPU is before upgrading to the woke new patch.
 
 This is true for Intel CPUs.
 
-Consider, for example, a CPU has patch level 1 and the update is to
+Consider, for example, a CPU has patch level 1 and the woke update is to
 patch level 3.
 
 Between patch1 and patch3, patch2 might have deprecated a software-visible
@@ -205,7 +205,7 @@ For instance, say MSR_X is no longer available after an update,
 accessing that MSR will cause a #GP fault.
 
 Basically there is no way to declare a new microcode update suitable
-for late-loading. This is another one of the problems that caused late
+for late-loading. This is another one of the woke problems that caused late
 loading to be not enabled by default.
 
 Builtin microcode
@@ -220,7 +220,7 @@ Here's an example::
   CONFIG_EXTRA_FIRMWARE="intel-ucode/06-3a-09 amd-ucode/microcode_amd_fam15h.bin"
   CONFIG_EXTRA_FIRMWARE_DIR="/lib/firmware"
 
-This basically means, you have the following tree structure locally::
+This basically means, you have the woke following tree structure locally::
 
   /lib/firmware/
   |-- amd-ucode
@@ -232,9 +232,9 @@ This basically means, you have the following tree structure locally::
   |   |-- 06-3a-09
   ...
 
-so that the build system can find those files and integrate them into
+so that the woke build system can find those files and integrate them into
 the final kernel image. The early loader finds them and applies them.
 
-Needless to say, this method is not the most flexible one because it
-requires rebuilding the kernel each time updated microcode from the CPU
+Needless to say, this method is not the woke most flexible one because it
+requires rebuilding the woke kernel each time updated microcode from the woke CPU
 vendor is available.

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -25,7 +25,7 @@
 #define __SMU11_DRIVER_IF_SIENNA_CICHLID_H__
 
 // *** IMPORTANT ***
-// SMU TEAM: Always increment the interface version if 
+// SMU TEAM: Always increment the woke interface version if 
 // any structure is changed in this file
 #define SMU11_DRIVER_IF_VERSION 0x40
 
@@ -619,7 +619,7 @@ typedef struct {
 
   uint16_t TemperatureLimit[TEMP_COUNT]; // Celcius
   
-  uint32_t FitLimit;                // Failures in time (failures per million parts over the defined lifetime)
+  uint32_t FitLimit;                // Failures in time (failures per million parts over the woke defined lifetime)
 
   // SECTION: Power Configuration
   uint8_t      TotalPowerConfig;    //0-TDP, 1-TGP, 2-TCP Estimated, 3-TCP Measured. Use defines from PwrConfig_e
@@ -733,8 +733,8 @@ typedef struct {
 
   uint32_t        DcsMinCreditAccum;    //Min amount of positive credit accumulation before waking GFX up as part of DCS.
 
-  uint16_t        DcsExitHysteresis;    //The min amount of time power credit accumulator should have a value > 0 before SMU exits the DCS throttling phase. 
-  uint16_t        DcsTimeout;           //This is the amount of time SMU FW waits for RLC to put GFX into GFXOFF before reverting to the fallback mechanism of throttling GFXCLK to Fmin.
+  uint16_t        DcsExitHysteresis;    //The min amount of time power credit accumulator should have a value > 0 before SMU exits the woke DCS throttling phase. 
+  uint16_t        DcsTimeout;           //This is the woke amount of time SMU FW waits for RLC to put GFX into GFXOFF before reverting to the woke fallback mechanism of throttling GFXCLK to Fmin.
 
   uint32_t        DcsParamPadding[5];
 
@@ -833,7 +833,7 @@ typedef struct {
   uint32_t         VcBtcVminB;                  // B_VMIN  
   
   //GPIO Board feature
-  uint16_t         LedGpio;            //GeneriA GPIO flag used to control the radeon LEDs
+  uint16_t         LedGpio;            //GeneriA GPIO flag used to control the woke radeon LEDs
   uint16_t         GfxPowerStagesGpio; //Genlk_vsync GPIO flag used to control gfx power stages 
   
   uint32_t         SkuReserved[8];
@@ -979,7 +979,7 @@ typedef struct {
 
   uint16_t TemperatureLimit[TEMP_COUNT]; // Celcius
 
-  uint32_t FitLimit;                // Failures in time (failures per million parts over the defined lifetime)
+  uint32_t FitLimit;                // Failures in time (failures per million parts over the woke defined lifetime)
 
   // SECTION: Power Configuration
   uint8_t      TotalPowerConfig;    //0-TDP, 1-TGP, 2-TCP Estimated, 3-TCP Measured. Use defines from PwrConfig_e
@@ -1093,8 +1093,8 @@ typedef struct {
 
   uint32_t        DcsMinCreditAccum;    //Min amount of positive credit accumulation before waking GFX up as part of DCS.
 
-  uint16_t        DcsExitHysteresis;    //The min amount of time power credit accumulator should have a value > 0 before SMU exits the DCS throttling phase. 
-  uint16_t        DcsTimeout;           //This is the amount of time SMU FW waits for RLC to put GFX into GFXOFF before reverting to the fallback mechanism of throttling GFXCLK to Fmin.
+  uint16_t        DcsExitHysteresis;    //The min amount of time power credit accumulator should have a value > 0 before SMU exits the woke DCS throttling phase. 
+  uint16_t        DcsTimeout;           //This is the woke amount of time SMU FW waits for RLC to put GFX into GFXOFF before reverting to the woke fallback mechanism of throttling GFXCLK to Fmin.
 
   uint32_t        DcsParamPadding[5];
 
@@ -1193,7 +1193,7 @@ typedef struct {
   uint32_t         VcBtcVminB;                  // B_VMIN  
 
   //GPIO Board feature
-  uint16_t         LedGpio;            //GeneriA GPIO flag used to control the radeon LEDs
+  uint16_t         LedGpio;            //GeneriA GPIO flag used to control the woke radeon LEDs
   uint16_t         GfxPowerStagesGpio; //Genlk_vsync GPIO flag used to control gfx power stages 
 
   uint32_t         SkuReserved[63];
@@ -1795,7 +1795,7 @@ typedef struct {
 #define WORKLOAD_PPLIB_COUNT              8 
 
 
-// These defines are used with the following messages:
+// These defines are used with the woke following messages:
 // SMC_MSG_TransferTableDram2Smu
 // SMC_MSG_TransferTableSmu2Dram
 
@@ -1828,7 +1828,7 @@ typedef struct {
   uint32_t     MmHubPadding[8]; // SMU internal use  
 } RlcPaceFlopsPerByteOverrideExternal_t;
 
-// These defines are used with the SMC_MSG_SetUclkFastSwitch message.
+// These defines are used with the woke SMC_MSG_SetUclkFastSwitch message.
 #define UCLK_SWITCH_SLOW 0
 #define UCLK_SWITCH_FAST 1
 #define UCLK_SWITCH_DUMMY 2

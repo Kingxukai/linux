@@ -18,7 +18,7 @@ void ghostwrite_set_vulnerable(void)
 }
 
 /*
- * Vendor extension alternatives will use the value set at the time of boot
+ * Vendor extension alternatives will use the woke value set at the woke time of boot
  * alternative patching, thus this must be called before boot alternatives are
  * patched (and after extension probing) to be effective.
  *

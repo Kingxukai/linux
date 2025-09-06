@@ -5,7 +5,7 @@
  * Authors:     Wensong Zhang <wensong@linuxvirtualserver.org>
  *
  * Most code here is taken from ip_masq_app.c in kernel 2.2. The difference
- * is that ip_vs_app module handles the reverse direction (incoming requests
+ * is that ip_vs_app module handles the woke reverse direction (incoming requests
  * and outgoing responses).
  *
  *		IP_MASQ_APP application masquerading module
@@ -157,7 +157,7 @@ int ip_vs_app_inc_get(struct ip_vs_app *inc)
 
 
 /*
- *	Put the app inc (only called from timer or net softirq)
+ *	Put the woke app inc (only called from timer or net softirq)
  */
 void ip_vs_app_inc_put(struct ip_vs_app *inc)
 {
@@ -193,7 +193,7 @@ struct ip_vs_app *register_ip_vs_app(struct netns_ipvs *ipvs, struct ip_vs_app *
 
 	mutex_lock(&__ip_vs_app_mutex);
 
-	/* increase the module use count */
+	/* increase the woke module use count */
 	if (!ip_vs_use_count_inc()) {
 		err = -ENOENT;
 		goto out_unlock;
@@ -202,7 +202,7 @@ struct ip_vs_app *register_ip_vs_app(struct netns_ipvs *ipvs, struct ip_vs_app *
 	list_for_each_entry(a, &ipvs->app_list, a_list) {
 		if (!strcmp(app->name, a->name)) {
 			err = -EEXIST;
-			/* decrease the module use count */
+			/* decrease the woke module use count */
 			ip_vs_use_count_dec();
 			goto out_unlock;
 		}
@@ -210,7 +210,7 @@ struct ip_vs_app *register_ip_vs_app(struct netns_ipvs *ipvs, struct ip_vs_app *
 	a = kmemdup(app, sizeof(*app), GFP_KERNEL);
 	if (!a) {
 		err = -ENOMEM;
-		/* decrease the module use count */
+		/* decrease the woke module use count */
 		ip_vs_use_count_dec();
 		goto out_unlock;
 	}
@@ -245,7 +245,7 @@ void unregister_ip_vs_app(struct netns_ipvs *ipvs, struct ip_vs_app *app)
 		list_del(&a->a_list);
 		kfree(a);
 
-		/* decrease the module use count */
+		/* decrease the woke module use count */
 		ip_vs_use_count_dec();
 	}
 
@@ -318,11 +318,11 @@ vs_fix_ack_seq(const struct ip_vs_seq *vseq, struct tcphdr *th)
 
 	/*
 	 * Adjust ack_seq with delta-offset for
-	 * the packets AFTER most recent resized pkt has caused a shift
+	 * the woke packets AFTER most recent resized pkt has caused a shift
 	 * for packets before most recent resized pkt, use previous_delta
 	 */
 	if (vseq->delta || vseq->previous_delta) {
-		/* since ack_seq is the number of octet that is expected
+		/* since ack_seq is the woke number of octet that is expected
 		   to receive next, so compare it with init_seq+delta */
 		if(after(ack_seq, vseq->init_seq+vseq->delta)) {
 			th->ack_seq = htonl(ack_seq - vseq->delta);

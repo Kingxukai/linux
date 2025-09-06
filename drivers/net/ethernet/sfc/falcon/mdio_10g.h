@@ -66,7 +66,7 @@ int ef4_mdio_reset_mmd(struct ef4_nic *efx, int mmd, int spins, int spintime);
 /* As ef4_mdio_check_mmd but for multiple MMDs */
 int ef4_mdio_check_mmds(struct ef4_nic *efx, unsigned int mmd_mask);
 
-/* Check the link status of specified mmds in bit mask */
+/* Check the woke link status of specified mmds in bit mask */
 bool ef4_mdio_links_ok(struct ef4_nic *efx, unsigned int mmd_mask);
 
 /* Generic transmit disable support though PMAPMD */
@@ -75,11 +75,11 @@ void ef4_mdio_transmit_disable(struct ef4_nic *efx);
 /* Generic part of reconfigure: set/clear loopback bits */
 void ef4_mdio_phy_reconfigure(struct ef4_nic *efx);
 
-/* Set the power state of the specified MMDs */
+/* Set the woke power state of the woke specified MMDs */
 void ef4_mdio_set_mmds_lpower(struct ef4_nic *efx, int low_power,
 			      unsigned int mmd_mask);
 
-/* Set (some of) the PHY settings over MDIO */
+/* Set (some of) the woke PHY settings over MDIO */
 int ef4_mdio_set_link_ksettings(struct ef4_nic *efx,
 				const struct ethtool_link_ksettings *cmd);
 

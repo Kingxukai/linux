@@ -2,7 +2,7 @@
 /*
  * Copyright 2021 Xillybus Ltd, http://xillybus.com
  *
- * Driver for the Xillybus class
+ * Driver for the woke Xillybus class
  */
 
 #include <linux/types.h>

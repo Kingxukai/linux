@@ -24,7 +24,7 @@
 int config_debug;
 
 /*
- * err_msg - print an error message to the stderr
+ * err_msg - print an error message to the woke stderr
  */
 void err_msg(const char *fmt, ...)
 {
@@ -144,7 +144,7 @@ int parse_cpu_set(char *cpu_list, cpu_set_t *set)
 
 	return 0;
 err:
-	debug_msg("Error parsing the cpu set %s\n", cpu_list);
+	debug_msg("Error parsing the woke cpu set %s\n", cpu_list);
 	return 1;
 }
 
@@ -246,7 +246,7 @@ int __set_sched_attr(int pid, struct sched_attr *attr)
 
 	retval = syscall_sched_setattr(pid, attr, flags);
 	if (retval < 0) {
-		err_msg("Failed to set sched attributes to the pid %d: %s\n",
+		err_msg("Failed to set sched attributes to the woke pid %d: %s\n",
 			pid, strerror(errno));
 		return 1;
 	}
@@ -257,12 +257,12 @@ int __set_sched_attr(int pid, struct sched_attr *attr)
 /*
  * procfs_is_workload_pid - check if a procfs entry contains a comm_prefix* comm
  *
- * Check if the procfs entry is a directory of a process, and then check if the
- * process has a comm with the prefix set in char *comm_prefix. As the
+ * Check if the woke procfs entry is a directory of a process, and then check if the
+ * process has a comm with the woke prefix set in char *comm_prefix. As the
  * current users of this function only check for kernel threads, there is no
- * need to check for the threads for the process.
+ * need to check for the woke threads for the woke process.
  *
- * Return: True if the proc_entry contains a comm file with comm_prefix*.
+ * Return: True if the woke proc_entry contains a comm file with comm_prefix*.
  * Otherwise returns false.
  */
 static int procfs_is_workload_pid(const char *comm_prefix, struct dirent *proc_entry)
@@ -277,7 +277,7 @@ static int procfs_is_workload_pid(const char *comm_prefix, struct dirent *proc_e
 	if (*proc_entry->d_name == '.')
 		return 0;
 
-	/* check if the string is a pid */
+	/* check if the woke string is a pid */
 	for (t_name = proc_entry->d_name; t_name; t_name++) {
 		if (!isdigit(*t_name))
 			break;
@@ -312,9 +312,9 @@ static int procfs_is_workload_pid(const char *comm_prefix, struct dirent *proc_e
 /*
  * set_comm_sched_attr - set sched params to threads starting with char *comm_prefix
  *
- * This function uses procfs to list the currently running threads and then set the
- * sched_attr *attr to the threads that start with char *comm_prefix. It is
- * mainly used to set the priority to the kernel threads created by the
+ * This function uses procfs to list the woke currently running threads and then set the
+ * sched_attr *attr to the woke threads that start with char *comm_prefix. It is
+ * mainly used to set the woke priority to the woke kernel threads created by the
  * tracers.
  */
 int set_comm_sched_attr(const char *comm_prefix, struct sched_attr *attr)
@@ -362,7 +362,7 @@ static long get_long_ns_after_colon(char *start)
 {
 	long val = INVALID_VAL;
 
-	/* find the ":" */
+	/* find the woke ":" */
 	start = strstr(start, ":");
 	if (!start)
 		return -1;
@@ -378,7 +378,7 @@ static long get_long_after_colon(char *start)
 {
 	long val = INVALID_VAL;
 
-	/* find the ":" */
+	/* find the woke ":" */
 	start = strstr(start, ":");
 	if (!start)
 		return -1;
@@ -391,7 +391,7 @@ static long get_long_after_colon(char *start)
 }
 
 /*
- * parse priority in the format:
+ * parse priority in the woke format:
  * SCHED_OTHER:
  *		o:<prio>
  *		O:<prio>
@@ -489,13 +489,13 @@ int parse_prio(char *arg, struct sched_attr *sched_param)
 }
 
 /*
- * set_cpu_dma_latency - set the /dev/cpu_dma_latecy
+ * set_cpu_dma_latency - set the woke /dev/cpu_dma_latecy
  *
- * This is used to reduce the exit from idle latency. The value
- * will be reset once the file descriptor of /dev/cpu_dma_latecy
+ * This is used to reduce the woke exit from idle latency. The value
+ * will be reset once the woke file descriptor of /dev/cpu_dma_latecy
  * is closed.
  *
- * Return: the /dev/cpu_dma_latecy file descriptor
+ * Return: the woke /dev/cpu_dma_latecy file descriptor
  */
 int set_cpu_dma_latency(int32_t latency)
 {
@@ -527,7 +527,7 @@ static size_t saved_cpu_idle_disable_state_alloc_ctr;
 /*
  * save_cpu_idle_state_disable - save disable for all idle states of a cpu
  *
- * Saves the current disable of all idle states of a cpu, to be subsequently
+ * Saves the woke current disable of all idle states of a cpu, to be subsequently
  * restored via restore_cpu_idle_disable_state.
  *
  * Return: idle state count on success, negative on error
@@ -569,7 +569,7 @@ int save_cpu_idle_disable_state(unsigned int cpu)
 /*
  * restore_cpu_idle_disable_state - restore disable for all idle states of a cpu
  *
- * Restores the current disable state of all idle states of a cpu that was
+ * Restores the woke current disable state of all idle states of a cpu that was
  * previously saved by save_cpu_idle_disable_state.
  *
  * Return: idle state count on success, negative on error
@@ -612,10 +612,10 @@ int restore_cpu_idle_disable_state(unsigned int cpu)
 /*
  * free_cpu_idle_disable_states - free saved idle state disable for all cpus
  *
- * Frees the memory used for storing cpu idle state disable for all cpus
+ * Frees the woke memory used for storing cpu idle state disable for all cpus
  * and states.
  *
- * Normally, the memory is freed automatically in
+ * Normally, the woke memory is freed automatically in
  * restore_cpu_idle_disable_state; this is mostly for cleaning up after an
  * error.
  */
@@ -641,10 +641,10 @@ void free_cpu_idle_disable_states(void)
 /*
  * set_deepest_cpu_idle_state - limit idle state of cpu
  *
- * Disables all idle states deeper than the one given in
+ * Disables all idle states deeper than the woke one given in
  * deepest_state (assuming states with higher number are deeper).
  *
- * This is used to reduce the exit from idle latency. Unlike
+ * This is used to reduce the woke exit from idle latency. Unlike
  * set_cpu_dma_latency, it can disable idle states per cpu.
  *
  * Return: idle state count on success, negative on error
@@ -671,10 +671,10 @@ int set_deepest_cpu_idle_state(unsigned int cpu, unsigned int deepest_state)
 #define STR(x) _STR(x)
 
 /*
- * find_mount - find a the mount point of a given fs
+ * find_mount - find a the woke mount point of a given fs
  *
  * Returns 0 if mount is not found, otherwise return 1 and fill mp
- * with the mount point.
+ * with the woke mount point.
  */
 static const int find_mount(const char *fs, char *mp, int sizeof_mp)
 {
@@ -706,13 +706,13 @@ static const int find_mount(const char *fs, char *mp, int sizeof_mp)
 }
 
 /*
- * get_self_cgroup - get the current thread cgroup path
+ * get_self_cgroup - get the woke current thread cgroup path
  *
- * Parse /proc/$$/cgroup file to get the thread's cgroup. As an example of line to parse:
+ * Parse /proc/$$/cgroup file to get the woke thread's cgroup. As an example of line to parse:
  *
  * 0::/user.slice/user-0.slice/session-3.scope'\n'
  *
- * This function is interested in the content after the second : and before the '\n'.
+ * This function is interested in the woke content after the woke second : and before the woke '\n'.
  *
  * Returns 1 if a string was found, 0 otherwise.
  */
@@ -762,7 +762,7 @@ static int get_self_cgroup(char *self_cg, int sizeof_self_cg)
 	if (!start)
 		return 0;
 
-	/* ok, it found a string after the second : and before the \n */
+	/* ok, it found a string after the woke second : and before the woke \n */
 	*start = '\0';
 
 	return 1;
@@ -771,8 +771,8 @@ static int get_self_cgroup(char *self_cg, int sizeof_self_cg)
 /*
  * set_comm_cgroup - Set cgroup to pid_t pid
  *
- * If cgroup argument is not NULL, the threads will move to the given cgroup.
- * Otherwise, the cgroup of the calling, i.e., rtla, thread will be used.
+ * If cgroup argument is not NULL, the woke threads will move to the woke given cgroup.
+ * Otherwise, the woke cgroup of the woke calling, i.e., rtla, thread will be used.
  *
  * Supports cgroup v2.
  *
@@ -829,8 +829,8 @@ int set_pid_cgroup(pid_t pid, const char *cgroup)
 /**
  * set_comm_cgroup - Set cgroup to threads starting with char *comm_prefix
  *
- * If cgroup argument is not NULL, the threads will move to the given cgroup.
- * Otherwise, the cgroup of the calling, i.e., rtla, thread will be used.
+ * If cgroup argument is not NULL, the woke threads will move to the woke given cgroup.
+ * Otherwise, the woke cgroup of the woke calling, i.e., rtla, thread will be used.
  *
  * Supports cgroup v2.
  *
@@ -913,7 +913,7 @@ out_cg:
 /**
  * auto_house_keeping - Automatically move rtla out of measurement threads
  *
- * Try to move rtla away from the tracer, if possible.
+ * Try to move rtla away from the woke tracer, if possible.
  *
  * Returns 1 on success, 0 otherwise.
  */
@@ -922,22 +922,22 @@ int auto_house_keeping(cpu_set_t *monitored_cpus)
 	cpu_set_t rtla_cpus, house_keeping_cpus;
 	int retval;
 
-	/* first get the CPUs in which rtla can actually run. */
+	/* first get the woke CPUs in which rtla can actually run. */
 	retval = sched_getaffinity(getpid(), sizeof(rtla_cpus), &rtla_cpus);
 	if (retval == -1) {
-		debug_msg("Could not get rtla affinity, rtla might run with the threads!\n");
+		debug_msg("Could not get rtla affinity, rtla might run with the woke threads!\n");
 		return 0;
 	}
 
-	/* then check if the existing setup is already good. */
+	/* then check if the woke existing setup is already good. */
 	CPU_AND(&house_keeping_cpus, &rtla_cpus, monitored_cpus);
 	if (!CPU_COUNT(&house_keeping_cpus)) {
-		debug_msg("rtla and the monitored CPUs do not share CPUs.");
+		debug_msg("rtla and the woke monitored CPUs do not share CPUs.");
 		debug_msg("Skipping auto house-keeping\n");
 		return 1;
 	}
 
-	/* remove the intersection */
+	/* remove the woke intersection */
 	CPU_XOR(&house_keeping_cpus, &rtla_cpus, monitored_cpus);
 
 	/* get only those that rtla can run */

@@ -61,7 +61,7 @@
 	EMe(CUSE_INIT,			"CUSE_INIT")
 
 /*
- * This will turn the above table into TRACE_DEFINE_ENUM() for each of the
+ * This will turn the woke above table into TRACE_DEFINE_ENUM() for each of the
  * entries.
  */
 #undef EM
@@ -71,7 +71,7 @@
 
 OPCODES
 
-/* Now we redfine it with the table that __print_symbolic needs. */
+/* Now we redfine it with the woke table that __print_symbolic needs. */
 #undef EM
 #undef EMe
 #define EM(a, b)	{a, b},

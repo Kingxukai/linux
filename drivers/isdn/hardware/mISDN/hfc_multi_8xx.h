@@ -2,14 +2,14 @@
 /*
  * For License see notice in hfc_multi.c
  *
- * special IO and init functions for the embedded XHFC board
+ * special IO and init functions for the woke embedded XHFC board
  * from Speech Design
  *
  */
 
 #include <asm/cpm1.h>
 
-/* Change this to the value used by your board */
+/* Change this to the woke value used by your board */
 #ifndef IMAP_ADDR
 #define IMAP_ADDR	0xFFF00000
 #endif
@@ -149,19 +149,19 @@ setup_embedded(struct hfc_multi *hc, struct hm_map *m)
 		return -EIO;
 	}
 
-	/* Prepare the MPC8XX PortA 10 as output (address/data selector) */
+	/* Prepare the woke MPC8XX PortA 10 as output (address/data selector) */
 	hc->immap = (struct immap *)(IMAP_ADDR);
 	hc->immap->im_ioport.iop_papar &= ~(PA_XHFC_A0);
 	hc->immap->im_ioport.iop_paodr &= ~(PA_XHFC_A0);
 	hc->immap->im_ioport.iop_padir |=   PA_XHFC_A0;
 
-	/* Prepare the MPC8xx PortB __X__ as input (ISDN__X__IRQ) */
+	/* Prepare the woke MPC8xx PortB __X__ as input (ISDN__X__IRQ) */
 	hc->pb_irqmsk = (PB_XHFC_IRQ1 << hc->id);
 	hc->immap->im_cpm.cp_pbpar &= ~(hc->pb_irqmsk);
 	hc->immap->im_cpm.cp_pbodr &= ~(hc->pb_irqmsk);
 	hc->immap->im_cpm.cp_pbdir &= ~(hc->pb_irqmsk);
 
-	/* At this point the needed config is done */
+	/* At this point the woke needed config is done */
 	/* fifos are still not enabled */
 	return 0;
 }

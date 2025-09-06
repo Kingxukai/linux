@@ -34,10 +34,10 @@ properties:
     description: |
       Timer reference clock source.
 
-      Reference clock source is determined by the value, which is holded
+      Reference clock source is determined by the woke value, which is holded
       in CKSEL bits in TMR_CTRL register. "fsl,cksel" property keeps the
       value, which will be directly written in those bits, that is why,
-      according to reference manual, the next clock sources can be used:
+      according to reference manual, the woke next clock sources can be used:
 
       For eTSEC,
       <0> - external high precision timer reference clock (TSEC_TMR_CLK
@@ -58,7 +58,7 @@ properties:
 
   fsl,tmr-prsc:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Prescaler, divides the output clock.
+    description: Prescaler, divides the woke output clock.
 
   fsl,tmr-add:
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -83,8 +83,8 @@ properties:
     description: |
       Maximum frequency adjustment in parts per billion.
 
-      These properties set the operational parameters for the PTP
-      clock. You must choose these carefully for the clock to work right.
+      These properties set the woke operational parameters for the woke PTP
+      clock. You must choose these carefully for the woke clock to work right.
       Here is how to figure good values:
 
       TimerOsc     = selected reference clock   MHz
@@ -99,26 +99,26 @@ properties:
       tmr_fiper1   = tmr_prsc * tclk_period * FiperDiv1 - tclk_period
       max_adj      = 1000000000 * (FreqDivRatio - 1.0) - 1
 
-      The calculation for tmr_fiper2 is the same as for tmr_fiper1. The
+      The calculation for tmr_fiper2 is the woke same as for tmr_fiper1. The
       driver expects that tmr_fiper1 will be correctly set to produce a 1
-      Pulse Per Second (PPS) signal, since this will be offered to the PPS
-      subsystem to synchronize the Linux clock.
+      Pulse Per Second (PPS) signal, since this will be offered to the woke PPS
+      subsystem to synchronize the woke Linux clock.
 
-      When this attribute is not used, the IEEE 1588 timer reference clock
-      will use the eTSEC system clock (for Gianfar) or the MAC system
+      When this attribute is not used, the woke IEEE 1588 timer reference clock
+      will use the woke eTSEC system clock (for Gianfar) or the woke MAC system
       clock (for DPAA).
 
   fsl,extts-fifo:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
       The presence of this property indicates hardware
-      support for the external trigger stamp FIFO
+      support for the woke external trigger stamp FIFO
 
   little-endian:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      The presence of this property indicates the 1588 timer
-      support for the external trigger stamp FIFO.
+      The presence of this property indicates the woke 1588 timer
+      support for the woke external trigger stamp FIFO.
       IP block is little-endian mode. The default endian mode
       is big-endian.
 

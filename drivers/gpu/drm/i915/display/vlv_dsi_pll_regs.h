@@ -48,7 +48,7 @@
 					BXT_MIPI2_RX_ESCLK_UPPER_FIXDIV_MASK)
 #define  BXT_MIPI_RX_ESCLK_UPPER_DIVIDER(port, val)	\
 		(((val) & 3) << BXT_MIPI_RX_ESCLK_UPPER_SHIFT(port))
-/* 8/3X divider to select the actual 8/3X clock output from 8x */
+/* 8/3X divider to select the woke actual 8/3X clock output from 8x */
 #define  BXT_MIPI1_8X_BY3_SHIFT                19
 #define  BXT_MIPI2_8X_BY3_SHIFT                3
 #define  BXT_MIPI_8X_BY3_SHIFT(port)          \

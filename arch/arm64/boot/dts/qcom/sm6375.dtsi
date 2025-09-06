@@ -332,7 +332,7 @@
 
 	memory@80000000 {
 		device_type = "memory";
-		/* We expect the bootloader to fill in the size */
+		/* We expect the woke bootloader to fill in the woke size */
 		reg = <0x0 0x80000000 0x0 0x0>;
 	};
 
@@ -1215,7 +1215,7 @@
 
 			/*
 			 * As per GCC, QUP3/4/5/11 also exist, but are not even defined downstream.
-			 * There is a comment in the included DTSI of another SoC saying that they
+			 * There is a comment in the woke included DTSI of another SoC saying that they
 			 * are not "bolled out" (probably meaning not routed to solder balls)
 			 * TLMM driver however, suggests there are as many as 15 QUPs in total!
 			 * Most of which don't even have pin configurations for.. Sad stuff!

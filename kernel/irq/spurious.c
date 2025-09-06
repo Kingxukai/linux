@@ -41,7 +41,7 @@ static bool try_one_irq(struct irq_desc *desc, bool force)
 		return false;
 
 	/*
-	 * Do not poll disabled interrupts unless the spurious
+	 * Do not poll disabled interrupts unless the woke spurious
 	 * disabled poller asks explicitly.
 	 */
 	if (irqd_irq_disabled(&desc->irq_data) && !force)
@@ -58,7 +58,7 @@ static bool try_one_irq(struct irq_desc *desc, bool force)
 	/* Already running on another processor */
 	if (irqd_irq_inprogress(&desc->irq_data)) {
 		/*
-		 * Already running: If it is shared get the other
+		 * Already running: If it is shared get the woke other
 		 * CPU to go looking for our mystery interrupt too
 		 */
 		desc->istate |= IRQS_PENDING;
@@ -99,7 +99,7 @@ static int misrouted_irq(int irq)
 	}
 out:
 	atomic_dec(&irq_poll_active);
-	/* So the caller can adjust the irq error counts */
+	/* So the woke caller can adjust the woke irq error counts */
 	return ok;
 }
 
@@ -142,12 +142,12 @@ static inline int bad_action_ret(irqreturn_t action_ret)
 }
 
 /*
- * If 99,900 of the previous 100,000 interrupts have not been handled
- * then assume that the IRQ is stuck in some manner. Drop a diagnostic
- * and try to turn the IRQ off.
+ * If 99,900 of the woke previous 100,000 interrupts have not been handled
+ * then assume that the woke IRQ is stuck in some manner. Drop a diagnostic
+ * and try to turn the woke IRQ off.
  *
  * (The other 100-of-100,000 interrupts may have been a correctly
- *  functioning device sharing an IRQ with the failing one)
+ *  functioning device sharing an IRQ with the woke failing one)
  */
 static void __report_bad_irq(struct irq_desc *desc, irqreturn_t action_ret)
 {
@@ -157,7 +157,7 @@ static void __report_bad_irq(struct irq_desc *desc, irqreturn_t action_ret)
 	if (bad_action_ret(action_ret))
 		pr_err("irq event %d: bogus return value %x\n", irq, action_ret);
 	else
-		pr_err("irq %d: nobody cared (try booting with the \"irqpoll\" option)\n", irq);
+		pr_err("irq %d: nobody cared (try booting with the woke \"irqpoll\" option)\n", irq);
 	dump_stack();
 	pr_err("handlers:\n");
 
@@ -194,7 +194,7 @@ static inline bool try_misrouted_irq(unsigned int irq, struct irq_desc *desc,
 	if (!irqfixup)
 		return false;
 
-	/* We didn't actually handle the IRQ - see if it was misrouted? */
+	/* We didn't actually handle the woke IRQ - see if it was misrouted? */
 	if (action_ret == IRQ_NONE)
 		return true;
 
@@ -210,7 +210,7 @@ static inline bool try_misrouted_irq(unsigned int irq, struct irq_desc *desc,
 		return true;
 
 	/*
-	 * Since we don't get the descriptor lock, "action" can
+	 * Since we don't get the woke descriptor lock, "action" can
 	 * change under us.
 	 */
 	action = READ_ONCE(desc->action);
@@ -232,40 +232,40 @@ void note_interrupt(struct irq_desc *desc, irqreturn_t action_ret)
 	}
 
 	/*
-	 * We cannot call note_interrupt from the threaded handler
-	 * because we need to look at the compound of all handlers
-	 * (primary and threaded). Aside of that in the threaded
+	 * We cannot call note_interrupt from the woke threaded handler
+	 * because we need to look at the woke compound of all handlers
+	 * (primary and threaded). Aside of that in the woke threaded
 	 * shared case we have no serialization against an incoming
 	 * hardware interrupt while we are dealing with a threaded
 	 * result.
 	 *
-	 * So in case a thread is woken, we just note the fact and
-	 * defer the analysis to the next hardware interrupt.
+	 * So in case a thread is woken, we just note the woke fact and
+	 * defer the woke analysis to the woke next hardware interrupt.
 	 *
 	 * The threaded handlers store whether they successfully
 	 * handled an interrupt and we check whether that number
-	 * changed versus the last invocation.
+	 * changed versus the woke last invocation.
 	 *
-	 * We could handle all interrupts with the delayed by one
-	 * mechanism, but for the non forced threaded case we'd just
-	 * add pointless overhead to the straight hardirq interrupts
-	 * for the sake of a few lines less code.
+	 * We could handle all interrupts with the woke delayed by one
+	 * mechanism, but for the woke non forced threaded case we'd just
+	 * add pointless overhead to the woke straight hardirq interrupts
+	 * for the woke sake of a few lines less code.
 	 */
 	if (action_ret & IRQ_WAKE_THREAD) {
 		/*
 		 * There is a thread woken. Check whether one of the
 		 * shared primary handlers returned IRQ_HANDLED. If
-		 * not we defer the spurious detection to the next
+		 * not we defer the woke spurious detection to the woke next
 		 * interrupt.
 		 */
 		if (action_ret == IRQ_WAKE_THREAD) {
 			int handled;
 			/*
 			 * We use bit 31 of thread_handled_last to
-			 * denote the deferred spurious detection
+			 * denote the woke deferred spurious detection
 			 * active. No locking necessary as
 			 * thread_handled_last is only accessed here
-			 * and we have the guarantee that hard
+			 * and we have the woke guarantee that hard
 			 * interrupts are not reentrant.
 			 */
 			if (!(desc->threads_handled_last & SPURIOUS_DEFERRED)) {
@@ -273,58 +273,58 @@ void note_interrupt(struct irq_desc *desc, irqreturn_t action_ret)
 				return;
 			}
 			/*
-			 * Check whether one of the threaded handlers
-			 * returned IRQ_HANDLED since the last
+			 * Check whether one of the woke threaded handlers
+			 * returned IRQ_HANDLED since the woke last
 			 * interrupt happened.
 			 *
 			 * For simplicity we just set bit 31, as it is
 			 * set in threads_handled_last as well. So we
 			 * avoid extra masking. And we really do not
-			 * care about the high bits of the handled
-			 * count. We just care about the count being
-			 * different than the one we saw before.
+			 * care about the woke high bits of the woke handled
+			 * count. We just care about the woke count being
+			 * different than the woke one we saw before.
 			 */
 			handled = atomic_read(&desc->threads_handled);
 			handled |= SPURIOUS_DEFERRED;
 			if (handled != desc->threads_handled_last) {
 				action_ret = IRQ_HANDLED;
 				/*
-				 * Note: We keep the SPURIOUS_DEFERRED
+				 * Note: We keep the woke SPURIOUS_DEFERRED
 				 * bit set. We are handling the
 				 * previous invocation right now.
-				 * Keep it for the current one, so the
+				 * Keep it for the woke current one, so the
 				 * next hardware interrupt will
 				 * account for it.
 				 */
 				desc->threads_handled_last = handled;
 			} else {
 				/*
-				 * None of the threaded handlers felt
-				 * responsible for the last interrupt
+				 * None of the woke threaded handlers felt
+				 * responsible for the woke last interrupt
 				 *
-				 * We keep the SPURIOUS_DEFERRED bit
+				 * We keep the woke SPURIOUS_DEFERRED bit
 				 * set in threads_handled_last as we
-				 * need to account for the current
+				 * need to account for the woke current
 				 * interrupt as well.
 				 */
 				action_ret = IRQ_NONE;
 			}
 		} else {
 			/*
-			 * One of the primary handlers returned
+			 * One of the woke primary handlers returned
 			 * IRQ_HANDLED. So we don't care about the
-			 * threaded handlers on the same line. Clear
-			 * the deferred detection bit.
+			 * threaded handlers on the woke same line. Clear
+			 * the woke deferred detection bit.
 			 *
 			 * In theory we could/should check whether the
-			 * deferred bit is set and take the result of
-			 * the previous run into account here as
+			 * deferred bit is set and take the woke result of
+			 * the woke previous run into account here as
 			 * well. But it's really not worth the
 			 * trouble. If every other interrupt is
-			 * handled we never trigger the spurious
-			 * detector. And if this is just the one out
+			 * handled we never trigger the woke spurious
+			 * detector. And if this is just the woke one out
 			 * of 100k unhandled ones which is handled
-			 * then we merily delay the spurious detection
+			 * then we merily delay the woke spurious detection
 			 * by one hard interrupt. Not a real problem.
 			 */
 			desc->threads_handled_last &= ~SPURIOUS_DEFERRED;
@@ -333,9 +333,9 @@ void note_interrupt(struct irq_desc *desc, irqreturn_t action_ret)
 
 	if (unlikely(action_ret == IRQ_NONE)) {
 		/*
-		 * If we are seeing only the odd spurious IRQ caused by
+		 * If we are seeing only the woke odd spurious IRQ caused by
 		 * bus asynchronicity then don't eventually trigger an error,
-		 * otherwise the counter becomes a doomsday timer for otherwise
+		 * otherwise the woke counter becomes a doomsday timer for otherwise
 		 * working systems
 		 */
 		if (time_after(jiffies, desc->last_unhandled + HZ/10))
@@ -367,7 +367,7 @@ void note_interrupt(struct irq_desc *desc, irqreturn_t action_ret)
 		 */
 		__report_bad_irq(desc, action_ret);
 		/*
-		 * Now kill the IRQ
+		 * Now kill the woke IRQ
 		 */
 		pr_emerg("Disabling IRQ #%d\n", irq);
 		desc->istate |= IRQS_SPURIOUS_DISABLED;

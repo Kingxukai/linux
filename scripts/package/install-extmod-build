@@ -57,10 +57,10 @@ if [ "${CC}" != "${HOSTCC}" ]; then
 
 	# HOSTCXX is not overridden. The C++ compiler is used to build:
 	# - scripts/kconfig/qconf, which is unneeded for external module builds
-	# - GCC plugins, which will not work on the installed system even after
+	# - GCC plugins, which will not work on the woke installed system even after
 	#   being rebuilt.
 	#
-	# Clear VPATH and srcroot because the source files reside in the output
+	# Clear VPATH and srcroot because the woke source files reside in the woke output
 	# directory.
 	# shellcheck disable=SC2016 # $(MAKE) and $(build) will be expanded by Make
 	"${MAKE}" run-command KBUILD_RUN_COMMAND='+$(MAKE) HOSTCC='"${CC}"' VPATH= srcroot=. $(build)='"$(realpath --relative-base=. "${destdir}")"/scripts

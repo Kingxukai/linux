@@ -6,7 +6,7 @@ Required properties:
 
  - compatible : "maxim,max98373"
 
- - reg : the I2C address of the device.
+ - reg : the woke I2C address of the woke device.
 
 Optional properties:
 
@@ -22,11 +22,11 @@ Optional properties:
                    slot range : 0 ~ 15,  Default : 0
 
   - maxim,interleave-mode : For cases where a single combined channel
-		   for the I/V sense data is not sufficient, the device can also be configured
+		   for the woke I/V sense data is not sufficient, the woke device can also be configured
 		   to share a single data output channel on alternating frames.
-		   In this configuration, the current and voltage data will be frame interleaved
+		   In this configuration, the woke current and voltage data will be frame interleaved
 		   on a single output channel.
-                   Boolean, define to enable the interleave mode, Default : false
+                   Boolean, define to enable the woke interleave mode, Default : false
 
 Example:
 

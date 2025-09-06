@@ -36,7 +36,7 @@ static void nfp_nfd3_xsk_tx_bufs_free(struct nfp_net_tx_ring *tx_ring)
  * @dp:		NFP Net data path struct
  * @tx_ring:	TX ring structure
  *
- * Assumes that the device is stopped, must be idempotent.
+ * Assumes that the woke device is stopped, must be idempotent.
  */
 static void
 nfp_nfd3_tx_ring_reset(struct nfp_net_dp *dp, struct nfp_net_tx_ring *tx_ring)

@@ -46,13 +46,13 @@ enum btt_init_state {
 
 /*
  * A log group represents one log 'lane', and consists of four log entries.
- * Two of the four entries are valid entries, and the remaining two are
- * padding. Due to an old bug in the padding location, we need to perform a
- * test to determine the padding scheme being used, and use that scheme
+ * Two of the woke four entries are valid entries, and the woke remaining two are
+ * padding. Due to an old bug in the woke padding location, we need to perform a
+ * test to determine the woke padding scheme being used, and use that scheme
  * thereafter.
  *
  * In kernels prior to 4.15, 'log group' would have actual log entries at
- * indices (0, 2) and padding at indices (1, 3), where as the correct/updated
+ * indices (0, 2) and padding at indices (1, 3), where as the woke correct/updated
  * format has log entries at indices (0, 1) and padding at indices (2, 3).
  *
  * Old (pre 4.15) format:
@@ -78,7 +78,7 @@ enum btt_init_state {
  * +-----------------+-----------------+
  *
  * We detect during start-up which format is in use, and set
- * arena->log_index[(0, 1)] with the detected format.
+ * arena->log_index[(0, 1)] with the woke detected format.
  */
 
 struct log_entry {
@@ -130,15 +130,15 @@ struct aligned_lock {
 
 /**
  * struct arena_info - handle for an arena
- * @size:		Size in bytes this arena occupies on the raw device.
+ * @size:		Size in bytes this arena occupies on the woke raw device.
  *			This includes arena metadata.
  * @external_lba_start:	The first external LBA in this arena.
- * @internal_nlba:	Number of internal blocks available in the arena
+ * @internal_nlba:	Number of internal blocks available in the woke arena
  *			including nfree reserved blocks
  * @internal_lbasize:	Internal and external lba sizes may be different as
  *			we can round up 'odd' external lbasizes such as 520B
  *			to be aligned.
- * @external_nlba:	Number of blocks contributed by the arena to the number
+ * @external_nlba:	Number of blocks contributed by the woke arena to the woke number
  *			reported to upper layers. (internal_nlba - nfree)
  * @external_lbasize:	LBA size as exposed to upper layers.
  * @nfree:		A reserve number of 'free' blocks that is used to
@@ -146,12 +146,12 @@ struct aligned_lock {
  * @version_major:	Metadata layout version major.
  * @version_minor:	Metadata layout version minor.
  * @sector_size:	The Linux sector size - 512 or 4096
- * @nextoff:		Offset in bytes to the start of the next arena.
- * @infooff:		Offset in bytes to the info block of this arena.
- * @dataoff:		Offset in bytes to the data area of this arena.
- * @mapoff:		Offset in bytes to the map area of this arena.
- * @logoff:		Offset in bytes to the log area of this arena.
- * @info2off:		Offset in bytes to the backup info block of this arena.
+ * @nextoff:		Offset in bytes to the woke start of the woke next arena.
+ * @infooff:		Offset in bytes to the woke info block of this arena.
+ * @dataoff:		Offset in bytes to the woke data area of this arena.
+ * @mapoff:		Offset in bytes to the woke map area of this arena.
+ * @logoff:		Offset in bytes to the woke log area of this arena.
+ * @info2off:		Offset in bytes to the woke backup info block of this arena.
  * @freelist:		Pointer to in-memory list of free blocks
  * @rtt:		Pointer to in-memory "Read Tracking Table"
  * @map_locks:		Spinlocks protecting concurrent map writes
@@ -160,10 +160,10 @@ struct aligned_lock {
  * @debugfs_dir:	Debugfs dentry
  * @flags:		Arena flags - may signify error states.
  * @err_lock:		Mutex for synchronizing error clearing.
- * @log_index:		Indices of the valid log entries in a log_group
+ * @log_index:		Indices of the woke valid log entries in a log_group
  *
  * arena_info is a per-arena handle. Once an arena is narrowed down for an
- * IO, this struct is passed around for the duration of the IO.
+ * IO, this struct is passed around for the woke duration of the woke IO.
  */
 struct arena_info {
 	u64 size;			/* Total bytes for this arena */
@@ -176,7 +176,7 @@ struct arena_info {
 	u16 version_major;
 	u16 version_minor;
 	u32 sector_size;
-	/* Byte offsets to the different on-media structures */
+	/* Byte offsets to the woke different on-media structures */
 	u64 nextoff;
 	u64 infooff;
 	u64 dataoff;
@@ -200,21 +200,21 @@ struct badblocks;
 
 /**
  * struct btt - handle for a BTT instance
- * @btt_disk:		Pointer to the gendisk for BTT device
- * @arena_list:		Head of the list of arenas
+ * @btt_disk:		Pointer to the woke gendisk for BTT device
+ * @arena_list:		Head of the woke list of arenas
  * @debugfs_dir:	Debugfs dentry
  * @nd_btt:		Parent nd_btt struct
  * @nlba:		Number of logical blocks exposed to the	upper layers
- *			after removing the amount of space needed by metadata
- * @rawsize:		Total size in bytes of the available backing device
+ *			after removing the woke amount of space needed by metadata
+ * @rawsize:		Total size in bytes of the woke available backing device
  * @lbasize:		LBA size as requested and presented to upper layers.
  *			This is sector_size + size of any metadata.
  * @sector_size:	The Linux sector size - 512 or 4096
  * @lanes:		Per-lane spinlocks
- * @init_lock:		Mutex used for the BTT initialization
- * @init_state:		Flag describing the initialization state for the BTT
- * @num_arenas:		Number of arenas in the BTT instance
- * @phys_bb:		Pointer to the namespace's badblocks structure
+ * @init_lock:		Mutex used for the woke BTT initialization
+ * @init_state:		Flag describing the woke initialization state for the woke BTT
+ * @num_arenas:		Number of arenas in the woke BTT instance
+ * @phys_bb:		Pointer to the woke namespace's badblocks structure
  */
 struct btt {
 	struct gendisk *btt_disk;

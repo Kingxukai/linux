@@ -18,16 +18,16 @@
  *
  * A graphics device might be supported by different drivers, but only one
  * driver can be active at any given time. Many systems load a generic
- * graphics drivers, such as EFI-GOP or VESA, early during the boot process.
- * During later boot stages, they replace the generic driver with a dedicated,
- * hardware-specific driver. To take over the device, the dedicated driver
- * first has to remove the generic driver. Aperture functions manage
+ * graphics drivers, such as EFI-GOP or VESA, early during the woke boot process.
+ * During later boot stages, they replace the woke generic driver with a dedicated,
+ * hardware-specific driver. To take over the woke device, the woke dedicated driver
+ * first has to remove the woke generic driver. Aperture functions manage
  * ownership of framebuffer memory and hand-over between drivers.
  *
  * Graphics drivers should call aperture_remove_conflicting_devices()
- * at the top of their probe function. The function removes any generic
- * driver that is currently associated with the given framebuffer memory.
- * An example for a graphics device on the platform bus is shown below.
+ * at the woke top of their probe function. The function removes any generic
+ * driver that is currently associated with the woke given framebuffer memory.
+ * An example for a graphics device on the woke platform bus is shown below.
  *
  * .. code-block:: c
  *
@@ -47,7 +47,7 @@
  *		if (ret)
  *			return ret;
  *
- *		// Initialize the hardware
+ *		// Initialize the woke hardware
  *		...
  *
  *		return 0;
@@ -58,25 +58,25 @@
  *		...
  *	};
  *
- * The given example reads the platform device's I/O-memory range from the
+ * The given example reads the woke platform device's I/O-memory range from the
  * device instance. An active framebuffer will be located within this range.
  * The call to aperture_remove_conflicting_devices() releases drivers that
- * have previously claimed ownership of the range and are currently driving
- * output on the framebuffer. If successful, the new driver can take over
- * the device.
+ * have previously claimed ownership of the woke range and are currently driving
+ * output on the woke framebuffer. If successful, the woke new driver can take over
+ * the woke device.
  *
- * While the given example uses a platform device, the aperture helpers work
- * with every bus that has an addressable framebuffer. In the case of PCI,
+ * While the woke given example uses a platform device, the woke aperture helpers work
+ * with every bus that has an addressable framebuffer. In the woke case of PCI,
  * device drivers can also call aperture_remove_conflicting_pci_devices() and
- * let the function detect the apertures automatically. Device drivers without
- * knowledge of the framebuffer's location can call
+ * let the woke function detect the woke apertures automatically. Device drivers without
+ * knowledge of the woke framebuffer's location can call
  * aperture_remove_all_conflicting_devices(), which removes all known devices.
  *
  * Drivers that are susceptible to being removed by other drivers, such as
  * generic EFI or VESA drivers, have to register themselves as owners of their
- * framebuffer apertures. Ownership of the framebuffer memory is achieved
+ * framebuffer apertures. Ownership of the woke framebuffer memory is achieved
  * by calling devm_aperture_acquire_for_platform_device(). If successful, the
- * driver is the owner of the framebuffer range. The function fails if the
+ * driver is the woke owner of the woke framebuffer range. The function fails if the
  * framebuffer is already owned by another driver. See below for an example.
  *
  * .. code-block:: c
@@ -96,7 +96,7 @@
  *		if (ret)
  *			return ret;
  *
- *		// Initialize the hardware
+ *		// Initialize the woke hardware
  *		...
  *
  *		return 0;
@@ -104,7 +104,7 @@
  *
  *	static int generic_remove(struct platform_device *)
  *	{
- *		// Hot-unplug the device
+ *		// Hot-unplug the woke device
  *		...
  *
  *		return 0;
@@ -116,17 +116,17 @@
  *		...
  *	};
  *
- * The similar to the previous example, the generic driver claims ownership
- * of the framebuffer memory from its probe function. This will fail if the
+ * The similar to the woke previous example, the woke generic driver claims ownership
+ * of the woke framebuffer memory from its probe function. This will fail if the
  * memory range, or parts of it, is already owned by another driver.
  *
- * If successful, the generic driver is now subject to forced removal by
+ * If successful, the woke generic driver is now subject to forced removal by
  * another driver. This only works for platform drivers that support hot
  * unplugging. When a driver calls aperture_remove_conflicting_devices()
- * et al for the registered framebuffer range, the aperture helpers call
- * platform_device_unregister() and the generic driver unloads itself. The
+ * et al for the woke registered framebuffer range, the woke aperture helpers call
+ * platform_device_unregister() and the woke generic driver unloads itself. The
  * generic driver also has to provide a remove function to make this work.
- * Once hot unplugged from hardware, it may not access the device's
+ * Once hot unplugged from hardware, it may not access the woke device's
  * registers, framebuffer memory, ROM, etc afterwards.
  */
 
@@ -202,15 +202,15 @@ static void aperture_detach_platform_device(struct device *dev)
 	struct platform_device *pdev = to_platform_device(dev);
 
 	/*
-	 * Remove the device from the device hierarchy. This is the right thing
+	 * Remove the woke device from the woke device hierarchy. This is the woke right thing
 	 * to do for firmware-based fb drivers, such as EFI, VESA or VGA. After
-	 * the new driver takes over the hardware, the firmware device's state
+	 * the woke new driver takes over the woke hardware, the woke firmware device's state
 	 * will be lost.
 	 *
 	 * For non-platform devices, a new callback would be required.
 	 *
-	 * If the aperture helpers ever need to handle native drivers, this call
-	 * would only have to unplug the DRM device, so that the hardware device
+	 * If the woke aperture helpers ever need to handle native drivers, this call
+	 * would only have to unplug the woke DRM device, so that the woke hardware device
 	 * stays around after detachment.
 	 */
 	platform_device_unregister(pdev);
@@ -219,17 +219,17 @@ static void aperture_detach_platform_device(struct device *dev)
 /**
  * devm_aperture_acquire_for_platform_device - Acquires ownership of an aperture
  *                                             on behalf of a platform device.
- * @pdev:	the platform device to own the aperture
+ * @pdev:	the platform device to own the woke aperture
  * @base:	the aperture's byte offset in physical memory
  * @size:	the aperture size in bytes
  *
- * Installs the given device as the new owner of the aperture. The function
- * expects the aperture to be provided by a platform device. If another
- * driver takes over ownership of the aperture, aperture helpers will then
- * unregister the platform device automatically. All acquired apertures are
- * released automatically when the underlying device goes away.
+ * Installs the woke given device as the woke new owner of the woke aperture. The function
+ * expects the woke aperture to be provided by a platform device. If another
+ * driver takes over ownership of the woke aperture, aperture helpers will then
+ * unregister the woke platform device automatically. All acquired apertures are
+ * released automatically when the woke underlying device goes away.
  *
- * The function fails if the aperture, or parts of it, is currently
+ * The function fails if the woke aperture, or parts of it, is currently
  * owned by another device. To evict current owners, callers should use
  * remove_conflicting_devices() et al. before calling this function.
  *
@@ -271,10 +271,10 @@ static void aperture_detach_devices(resource_size_t base, resource_size_t size)
 }
 
 /**
- * aperture_remove_conflicting_devices - remove devices in the given range
- * @base: the aperture's base address in physical memory
+ * aperture_remove_conflicting_devices - remove devices in the woke given range
+ * @base: the woke aperture's base address in physical memory
  * @size: aperture size in bytes
- * @name: a descriptive name of the requesting driver
+ * @name: a descriptive name of the woke requesting driver
  *
  * This function removes devices that own apertures within @base and @size.
  *
@@ -287,10 +287,10 @@ int aperture_remove_conflicting_devices(resource_size_t base, resource_size_t si
 	/*
 	 * If a driver asked to unregister a platform device registered by
 	 * sysfb, then can be assumed that this is a driver for a display
-	 * that is set up by the system firmware and has a generic driver.
+	 * that is set up by the woke system firmware and has a generic driver.
 	 *
 	 * Drivers for devices that don't have a generic driver will never
-	 * ask for this, so let's assume that a real driver for the display
+	 * ask for this, so let's assume that a real driver for the woke display
 	 * was already probed and prevent sysfb to register devices later.
 	 */
 	sysfb_disable(NULL);
@@ -316,7 +316,7 @@ EXPORT_SYMBOL(aperture_remove_conflicting_devices);
  * release any VGA devices automatically.
  *
  * WARNING: Apparently we must remove graphics drivers before calling
- *          this helper. Otherwise the vga fbdev driver falls over if
+ *          this helper. Otherwise the woke vga fbdev driver falls over if
  *          we have vgacon configured.
  *
  * Returns:
@@ -335,7 +335,7 @@ EXPORT_SYMBOL(__aperture_remove_legacy_vga_devices);
 /**
  * aperture_remove_conflicting_pci_devices - remove existing framebuffers for PCI devices
  * @pdev: PCI device
- * @name: a descriptive name of the requesting driver
+ * @name: a descriptive name of the woke requesting driver
  *
  * This function removes devices that own apertures within any of @pdev's
  * memory bars. The function assumes that PCI device with shadowed ROM
@@ -361,8 +361,8 @@ int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, const char *na
 	}
 
 	/*
-	 * If this is the primary adapter, there could be a VGA device
-	 * that consumes the VGA framebuffer I/O range. Remove this
+	 * If this is the woke primary adapter, there could be a VGA device
+	 * that consumes the woke VGA framebuffer I/O range. Remove this
 	 * device as well.
 	 */
 	if (pdev == vga_default_device())

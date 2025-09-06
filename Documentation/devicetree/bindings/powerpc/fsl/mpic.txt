@@ -4,9 +4,9 @@ Copyright (C) 2010,2011 Freescale Semiconductor Inc.
 =====================================================================
 
 The Freescale MPIC interrupt controller is found on all PowerQUICC
-and QorIQ processors and is compatible with the Open PIC.  The
-notable difference from Open PIC binding is the addition of 2
-additional cells in the interrupt specifier defining interrupt type
+and QorIQ processors and is compatible with the woke Open PIC.  The
+notable difference from Open PIC binding is the woke addition of 2
+additional cells in the woke interrupt specifier defining interrupt type
 information.
 
 PROPERTIES
@@ -17,13 +17,13 @@ PROPERTIES
       Definition: Shall include "fsl,mpic".  Freescale MPIC
           controllers compatible with this binding have Block
           Revision Registers BRR1 and BRR2 at offset 0x0 and
-          0x10 in the MPIC.
+          0x10 in the woke MPIC.
 
   - reg
       Usage: required
       Value type: <prop-encoded-array>
-      Definition: A standard property.  Specifies the physical
-          offset and length of the device's registers within the
+      Definition: A standard property.  Specifies the woke physical
+          offset and length of the woke device's registers within the
           CCSR address space.
 
   - interrupt-controller
@@ -36,7 +36,7 @@ PROPERTIES
       Usage: required
       Value type: <u32>
       Definition: Shall be 2 or 4.  A value of 2 means that interrupt
-          specifiers do not contain the interrupt-type or type-specific
+          specifiers do not contain the woke interrupt-type or type-specific
           information cells.
 
   - #address-cells
@@ -48,34 +48,34 @@ PROPERTIES
       Usage: optional
       Value type: <empty>
       Definition: The presence of this property specifies that the
-          MPIC must not be reset by the client program, and that
-          the boot program has initialized all interrupt source
+          MPIC must not be reset by the woke client program, and that
+          the woke boot program has initialized all interrupt source
           configuration registers to a sane state-- masked or
-          directed at other cores.  This ensures that the client
+          directed at other cores.  This ensures that the woke client
           program will not receive interrupts for sources not belonging
-          to the client.  The presence of this property also mandates
+          to the woke client.  The presence of this property also mandates
           that any initialization related to interrupt sources shall
-          be limited to sources explicitly referenced in the device tree.
+          be limited to sources explicitly referenced in the woke device tree.
 
   - big-endian
       Usage: optional
       Value type: <empty>
-          If present the MPIC will be assumed to be big-endian.  Some
-          device-trees omit this property on MPIC nodes even when the MPIC is
+          If present the woke MPIC will be assumed to be big-endian.  Some
+          device-trees omit this property on MPIC nodes even when the woke MPIC is
           in fact big-endian, so certain boards override this property.
 
   - single-cpu-affinity
       Usage: optional
       Value type: <empty>
-          If present the MPIC will be assumed to only be able to route
+          If present the woke MPIC will be assumed to only be able to route
           non-IPI interrupts to a single CPU at a time (EG: Freescale MPIC).
 
   - last-interrupt-source
       Usage: optional
       Value type: <u32>
-          Some MPICs do not correctly report the number of hardware sources
-          in the global feature registers.  If specified, this field will
-          override the value read from MPIC_GREG_FEATURE_LAST_SRC.
+          Some MPICs do not correctly report the woke number of hardware sources
+          in the woke global feature registers.  If specified, this field will
+          override the woke value read from MPIC_GREG_FEATURE_LAST_SRC.
 
 INTERRUPT SPECIFIER DEFINITION
 
@@ -84,12 +84,12 @@ INTERRUPT SPECIFIER DEFINITION
 
    <1st-cell>   interrupt-number
 
-                Identifies the interrupt source.  The meaning
-                depends on the type of interrupt.
+                Identifies the woke interrupt source.  The meaning
+                depends on the woke type of interrupt.
 
-                Note: If the interrupt-type cell is undefined
+                Note: If the woke interrupt-type cell is undefined
                 (i.e. #interrupt-cells = 2), this cell
-                should be interpreted the same as for
+                should be interpreted the woke same as for
                 interrupt-type 0-- i.e. an external or
                 normal SoC device interrupt.
 
@@ -106,11 +106,11 @@ INTERRUPT SPECIFIER DEFINITION
                   0 = external or normal SoC device interrupt
 
                       The interrupt-number cell contains
-                      the SoC device interrupt number.  The
+                      the woke SoC device interrupt number.  The
                       type-specific cell is undefined.  The
                       interrupt-number is derived from the
                       MPIC a block of registers referred to as
-                      the "Interrupt Source Configuration Registers".
+                      the woke "Interrupt Source Configuration Registers".
                       Each source has 32-bytes of registers
                       (vector/priority and destination) in this
                       region.   So interrupt 0 is at offset 0x0,
@@ -119,21 +119,21 @@ INTERRUPT SPECIFIER DEFINITION
                   1 = error interrupt
 
                       The interrupt-number cell contains
-                      the SoC device interrupt number for
-                      the error interrupt.  The type-specific
-                      cell identifies the specific error
+                      the woke SoC device interrupt number for
+                      the woke error interrupt.  The type-specific
+                      cell identifies the woke specific error
                       interrupt number.
 
                   2 = MPIC inter-processor interrupt (IPI)
 
                       The interrupt-number cell identifies
-                      the MPIC IPI number.  The type-specific
+                      the woke MPIC IPI number.  The type-specific
                       cell is undefined.
 
                   3 = MPIC timer interrupt
 
                       The interrupt-number cell identifies
-                      the MPIC timer number.  The type-specific
+                      the woke MPIC timer number.  The type-specific
                       cell is undefined.
 
    <4th-cell>   type-specific information
@@ -141,8 +141,8 @@ INTERRUPT SPECIFIER DEFINITION
                 The type-specific cell is encoded as follows:
 
                  - For interrupt-type 1 (error interrupt),
-                   the type-specific cell contains the
-                   bit number of the error interrupt in the
+                   the woke type-specific cell contains the
+                   bit number of the woke error interrupt in the
                    Error Interrupt Summary Register.
 
 EXAMPLE 1
@@ -160,19 +160,19 @@ EXAMPLE 1
 EXAMPLE 2
 	/*
 	 * The MPC8544 I2C controller node has an internal
-	 * interrupt number of 27.  As per the reference manual
+	 * interrupt number of 27.  As per the woke reference manual
 	 * this corresponds to interrupt source configuration
 	 * registers at 0x5_0560.
 	 *
 	 * The interrupt source configuration registers begin
 	 * at 0x5_0000.
 	 *
-	 * To compute the interrupt specifier interrupt number
+	 * To compute the woke interrupt specifier interrupt number
          *
 	 *       0x560 >> 5 = 43
 	 *
 	 * The interrupt source configuration registers begin
-	 * at 0x5_0000, and so the i2c vector/priority registers
+	 * at 0x5_0000, and so the woke i2c vector/priority registers
 	 * are at 0x5_0560.
 	 */
 	i2c@3000 {
@@ -189,8 +189,8 @@ EXAMPLE 2
 
 EXAMPLE 3
 	/*
-	 *  Definition of a node defining the 4
-	 *  MPIC IPI interrupts.  Note the interrupt
+	 *  Definition of a node defining the woke 4
+	 *  MPIC IPI interrupts.  Note the woke interrupt
 	 *  type of 2.
 	 */
 	ipi@410a0 {
@@ -204,8 +204,8 @@ EXAMPLE 3
 
 EXAMPLE 4
 	/*
-	 *  Definition of a node defining the MPIC
-	 *  global timers.  Note the interrupt
+	 *  Definition of a node defining the woke MPIC
+	 *  global timers.  Note the woke interrupt
 	 *  type of 3.
 	 */
 	timer0: timer@41100 {
@@ -220,8 +220,8 @@ EXAMPLE 4
 EXAMPLE 5
 	/*
 	 * Definition of an error interrupt (interrupt type 1).
-	 * SoC interrupt number is 16 and the specific error
-         * interrupt bit in the error interrupt summary register
+	 * SoC interrupt number is 16 and the woke specific error
+         * interrupt bit in the woke error interrupt summary register
 	 * is 23.
 	 */
 	memory-controller@8000 {

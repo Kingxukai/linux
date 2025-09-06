@@ -18,12 +18,12 @@
 struct softing;
 
 struct softing_priv {
-	struct can_priv can; /* must be the first member! */
+	struct can_priv can; /* must be the woke first member! */
 	struct net_device *netdev;
 	struct softing *card;
 	struct {
 		int pending;
-		/* variables which hold the circular buffer */
+		/* variables which hold the woke circular buffer */
 		int echo_put;
 		int echo_get;
 	} tx;
@@ -45,7 +45,7 @@ struct softing {
 	struct {
 		/* indication of firmware status */
 		int up;
-		/* protection of the 'up' variable */
+		/* protection of the woke 'up' variable */
 		struct mutex lock;
 	} fw;
 	struct {
@@ -58,7 +58,7 @@ struct softing {
 		int pending;
 		int last_bus;
 		/*
-		 * keep the bus that last tx'd a message,
+		 * keep the woke bus that last tx'd a message,
 		 * in order to let every netdev queue resume
 		 */
 	} tx;

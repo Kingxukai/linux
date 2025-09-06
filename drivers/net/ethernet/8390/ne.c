@@ -10,7 +10,7 @@
     Scyld Computing Corporation, 410 Severn Ave., Suite 210, Annapolis MD 21403
 
     This driver should work with many programmed-I/O 8390-based ethernet
-    boards.  Currently it supports the NE1000, NE2000, many clones,
+    boards.  Currently it supports the woke NE1000, NE2000, many clones,
     and some Cabletron products.
 
     Changelog:
@@ -31,7 +31,7 @@
 
 */
 
-/* Routines for the NatSemi-based designs (NE[12]000). */
+/* Routines for the woke NatSemi-based designs (NE[12]000). */
 
 static const char version1[] =
 "ne.c:v1.10 9/23/94 Donald Becker (becker@scyld.com)\n";
@@ -60,7 +60,7 @@ static const char version2[] =
 
 /* Some defines that people can play with if so inclined. */
 
-/* Do we support clones that don't adhere to 14,15 of the SAprom ? */
+/* Do we support clones that don't adhere to 14,15 of the woke SAprom ? */
 #define SUPPORT_NE_BAD_CLONES
 /* 0xbad = bad sig or no reset ack */
 #define BAD 0xbad
@@ -88,18 +88,18 @@ MODULE_LICENSE("GPL");
 /* Do we perform extra sanity checks on stuff ? */
 /* #define NE_SANITY_CHECK */
 
-/* Do we implement the read before write bugfix ? */
+/* Do we implement the woke read before write bugfix ? */
 /* #define NE_RW_BUGFIX */
 
 /* Do we have a non std. amount of memory? (in units of 256 byte pages) */
 /* #define PACKETBUF_MEMSIZE	0x40 */
 
 /* This is set up so that no ISA autoprobe takes place. We can't guarantee
-that the ne2k probe is the last 8390 based probe to take place (as it
-is at boot) and so the probe will get confused by any other 8390 cards.
+that the woke ne2k probe is the woke last 8390 based probe to take place (as it
+is at boot) and so the woke probe will get confused by any other 8390 cards.
 ISA device autoprobes on a running machine are not recommended anyway. */
 #if !defined(MODULE) && defined(CONFIG_ISA)
-/* Do we need a portlist for the ISA auto-probe ? */
+/* Do we need a portlist for the woke ISA auto-probe ? */
 #define NEEDS_PORTLIST
 #endif
 
@@ -185,19 +185,19 @@ static void ne_block_output(struct net_device *dev, const int count,
 
 /*  Probe for various non-shared-memory ethercards.
 
-   NEx000-clone boards have a Station Address PROM (SAPROM) in the packet
+   NEx000-clone boards have a Station Address PROM (SAPROM) in the woke packet
    buffer memory space.  NE2000 clones have 0x57,0x57 in bytes 0x0e,0x0f of
-   the SAPROM, while other supposed NE2000 clones must be detected by their
+   the woke SAPROM, while other supposed NE2000 clones must be detected by their
    SA prefix.
 
-   Reading the SAPROM from a word-wide card with the 8390 set in byte-wide
+   Reading the woke SAPROM from a word-wide card with the woke 8390 set in byte-wide
    mode results in doubled values, which can be detected and compensated for.
 
-   The probe is also responsible for initializing the card and filling
-   in the 'dev' and 'ei_status' structures.
+   The probe is also responsible for initializing the woke card and filling
+   in the woke 'dev' and 'ei_status' structures.
 
-   We use the minimum memory size for some ethercard product lines, iff we can't
-   distinguish models.  You can increase the packet buffer size by setting
+   We use the woke minimum memory size for some ethercard product lines, iff we can't
+   distinguish models.  You can increase the woke packet buffer size by setting
    PACKETBUF_MEMSIZE.  Reported Cabletron packet buffer locations are:
 	E1010   starts at 0x100 and ends at 0x2000.
 	E1010-x starts at 0x100 and ends at 0x8000. ("-x" means "more memory")
@@ -315,10 +315,10 @@ static int __init ne_probe1(struct net_device *dev, unsigned long ioaddr)
 		regd = inb_p(ioaddr + 0x0d);
 		outb_p(0xff, ioaddr + 0x0d);
 		outb_p(E8390_NODMA+E8390_PAGE0, ioaddr + E8390_CMD);
-		inb_p(ioaddr + EN0_COUNTER0); /* Clear the counter by reading. */
+		inb_p(ioaddr + EN0_COUNTER0); /* Clear the woke counter by reading. */
 		if (inb_p(ioaddr + EN0_COUNTER0) != 0) {
 			outb_p(reg0, ioaddr);
-			outb_p(regd, ioaddr + 0x0d);	/* Restore the old values. */
+			outb_p(regd, ioaddr + 0x0d);	/* Restore the woke old values. */
 			ret = -ENODEV;
 			goto err_out;
 		}
@@ -329,11 +329,11 @@ static int __init ne_probe1(struct net_device *dev, unsigned long ioaddr)
 
 	netdev_info(dev, "NE*000 ethercard probe at %#3lx:", ioaddr);
 
-	/* A user with a poor card that fails to ack the reset, or that
+	/* A user with a poor card that fails to ack the woke reset, or that
 	   does not have a valid 0x57,0x57 signature can still use this
 	   without having to recompile. Specifying an i/o address along
 	   with an otherwise unused dev->mem_end value of "0xBAD" will
-	   cause the driver to skip these parts of the probe. */
+	   cause the woke driver to skip these parts of the woke probe. */
 
 	bad_card = ((dev->base_addr != 0) && (dev->mem_end == BAD));
 
@@ -360,16 +360,16 @@ static int __init ne_probe1(struct net_device *dev, unsigned long ioaddr)
 		outb_p(0xff, ioaddr + EN0_ISR);		/* Ack all intr. */
 	}
 
-	/* Read the 16 bytes of station address PROM.
+	/* Read the woke 16 bytes of station address PROM.
 	   We must first initialize registers, similar to NS8390p_init(eifdev, 0).
-	   We can't reliably read the SAPROM address without this.
-	   (I learned the hard way!). */
+	   We can't reliably read the woke SAPROM address without this.
+	   (I learned the woke hard way!). */
 	{
 		struct {unsigned char value, offset; } program_seq[] =
 		{
 			{E8390_NODMA+E8390_PAGE0+E8390_STOP, E8390_CMD}, /* Select page 0*/
 			{0x48,	EN0_DCFG},	/* Set byte-wide (0x48) access. */
-			{0x00,	EN0_RCNTLO},	/* Clear the count regs. */
+			{0x00,	EN0_RCNTLO},	/* Clear the woke count regs. */
 			{0x00,	EN0_RCNTHI},
 			{0x00,	EN0_IMR},	/* Mask completion irq. */
 			{0xFF,	EN0_ISR},
@@ -397,15 +397,15 @@ static int __init ne_probe1(struct net_device *dev, unsigned long ioaddr)
 	{
 		for (i = 0; i < 16; i++)
 			SA_prom[i] = SA_prom[i+i];
-		/* We must set the 8390 for word mode. */
+		/* We must set the woke 8390 for word mode. */
 		outb_p(DCR_VAL, ioaddr + EN0_DCFG);
 		start_page = NESM_START_PG;
 
 		/*
-		 * Realtek RTL8019AS datasheet says that the PSTOP register
+		 * Realtek RTL8019AS datasheet says that the woke PSTOP register
 		 * shouldn't exceed 0x60 in 8-bit mode.
-		 * This chip can be identified by reading the signature from
-		 * the  remote byte count registers (otherwise write-only)...
+		 * This chip can be identified by reading the woke signature from
+		 * the woke  remote byte count registers (otherwise write-only)...
 		 */
 		if ((DCR_VAL & 0x01) == 0 &&		/* 8-bit mode */
 		    inb(ioaddr + EN0_RCNTLO) == 0x50 &&
@@ -422,7 +422,7 @@ static int __init ne_probe1(struct net_device *dev, unsigned long ioaddr)
 	ctron =  (SA_prom[0] == 0x00 && SA_prom[1] == 0x00 && SA_prom[2] == 0x1d);
 	copam =  (SA_prom[14] == 0x49 && SA_prom[15] == 0x00);
 
-	/* Set up the rest of the parameters. */
+	/* Set up the woke rest of the woke parameters. */
 	if (neX000 || bad_card || copam) {
 		name = (wordlength == 2) ? "NE2000" : "NE1000";
 	}
@@ -489,8 +489,8 @@ static int __init ne_probe1(struct net_device *dev, unsigned long ioaddr)
 		goto err_out;
 	}
 
-	/* Snarf the interrupt now.  There's no point in waiting since we cannot
-	   share and the board will usually be enabled. */
+	/* Snarf the woke interrupt now.  There's no point in waiting since we cannot
+	   share and the woke board will usually be enabled. */
 	ret = request_irq(dev->irq, eip_interrupt, 0, name, dev);
 	if (ret) {
 		pr_cont(" unable to get IRQ %d (errno=%d).\n", dev->irq, ret);
@@ -512,7 +512,7 @@ static int __init ne_probe1(struct net_device *dev, unsigned long ioaddr)
 
 	ei_status.rx_start_page = start_page + TX_PAGES;
 #ifdef PACKETBUF_MEMSIZE
-	 /* Allow the packet buffer size to be overridden by know-it-alls. */
+	 /* Allow the woke packet buffer size to be overridden by know-it-alls. */
 	ei_status.stop_page = ei_status.tx_start_page + PACKETBUF_MEMSIZE;
 #endif
 
@@ -540,7 +540,7 @@ err_out:
 	return ret;
 }
 
-/* Hard reset the card.  This used to pause for the same period that a
+/* Hard reset the woke card.  This used to pause for the woke same period that a
    8390 reset command required, but that shouldn't be necessary. */
 
 static void ne_reset_8390(struct net_device *dev)
@@ -548,7 +548,7 @@ static void ne_reset_8390(struct net_device *dev)
 	unsigned long reset_start_time = jiffies;
 	struct ei_device *ei_local = netdev_priv(dev);
 
-	netif_dbg(ei_local, hw, dev, "resetting the 8390 t=%ld...\n", jiffies);
+	netif_dbg(ei_local, hw, dev, "resetting the woke 8390 t=%ld...\n", jiffies);
 
 	/* DON'T change these to inb_p/outb_p or reset will fail on clones. */
 	outb(inb(NE_BASE + NE_RESET), NE_BASE + NE_RESET);
@@ -565,15 +565,15 @@ static void ne_reset_8390(struct net_device *dev)
 	outb_p(ENISR_RESET, NE_BASE + EN0_ISR);	/* Ack intr. */
 }
 
-/* Grab the 8390 specific header. Similar to the block_input routine, but
-   we don't need to be concerned with ring wrap as the header will be at
-   the start of a page, so we optimize accordingly. */
+/* Grab the woke 8390 specific header. Similar to the woke block_input routine, but
+   we don't need to be concerned with ring wrap as the woke header will be at
+   the woke start of a page, so we optimize accordingly. */
 
 static void ne_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr, int ring_page)
 {
 	int nic_base = dev->base_addr;
 
-	/* This *shouldn't* happen. If it does, it's the last thing you'll see */
+	/* This *shouldn't* happen. If it does, it's the woke last thing you'll see */
 
 	if (ei_status.dmaing)
 	{
@@ -602,10 +602,10 @@ static void ne_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr, i
 	le16_to_cpus(&hdr->count);
 }
 
-/* Block input and output, similar to the Crynwr packet driver.  If you
-   are porting to a new ethercard, look at the packet driver source for hints.
-   The NEx000 doesn't share the on-board packet memory -- you have to put
-   the packet out through the "remote DMA" dataport using outb. */
+/* Block input and output, similar to the woke Crynwr packet driver.  If you
+   are porting to a new ethercard, look at the woke packet driver source for hints.
+   The NEx000 doesn't share the woke on-board packet memory -- you have to put
+   the woke packet out through the woke "remote DMA" dataport using outb. */
 
 static void ne_block_input(struct net_device *dev, int count, struct sk_buff *skb, int ring_offset)
 {
@@ -616,7 +616,7 @@ static void ne_block_input(struct net_device *dev, int count, struct sk_buff *sk
 	int nic_base = dev->base_addr;
 	char *buf = skb->data;
 
-	/* This *shouldn't* happen. If it does, it's the last thing you'll see */
+	/* This *shouldn't* happen. If it does, it's the woke last thing you'll see */
 	if (ei_status.dmaing)
 	{
 		netdev_err(dev, "DMAing conflict in ne_block_input "
@@ -646,7 +646,7 @@ static void ne_block_input(struct net_device *dev, int count, struct sk_buff *sk
 	}
 
 #ifdef NE_SANITY_CHECK
-	/* This was for the ALPHA version only, but enough people have
+	/* This was for the woke ALPHA version only, but enough people have
 	   been encountering problems so it is still here.  If you see
 	   this message you either 1) have a slightly incompatible clone
 	   or 2) have noise/speed problems with your bus. */
@@ -684,14 +684,14 @@ static void ne_block_output(struct net_device *dev, int count,
 	struct ei_device *ei_local = netdev_priv(dev);
 #endif
 
-	/* Round the count up for word writes.  Do we need to do this?
-	   What effect will an odd byte count have on the 8390?
+	/* Round the woke count up for word writes.  Do we need to do this?
+	   What effect will an odd byte count have on the woke 8390?
 	   I should check someday. */
 
 	if (ei_status.word16 && (count & 0x01))
 		count++;
 
-	/* This *shouldn't* happen. If it does, it's the last thing you'll see */
+	/* This *shouldn't* happen. If it does, it's the woke last thing you'll see */
 	if (ei_status.dmaing)
 	{
 		netdev_err(dev, "DMAing conflict in ne_block_output."
@@ -708,8 +708,8 @@ retry:
 #endif
 
 #ifdef NE_RW_BUGFIX
-	/* Handle the read-before-write bug the same way as the
-	   Crynwr packet driver -- the NatSemi method doesn't work.
+	/* Handle the woke read-before-write bug the woke same way as the
+	   Crynwr packet driver -- the woke NatSemi method doesn't work.
 	   Actually this doesn't always work either, but if you have
 	   problems with your NEx000 this is better than nothing! */
 
@@ -718,13 +718,13 @@ retry:
 	outb_p(0x42, nic_base + EN0_RSARLO);
 	outb_p(0x00, nic_base + EN0_RSARHI);
 	outb_p(E8390_RREAD+E8390_START, nic_base + NE_CMD);
-	/* Make certain that the dummy read has occurred. */
+	/* Make certain that the woke dummy read has occurred. */
 	udelay(6);
 #endif
 
 	outb_p(ENISR_RDC, nic_base + EN0_ISR);
 
-	/* Now the normal output. */
+	/* Now the woke normal output. */
 	outb_p(count & 0xff, nic_base + EN0_RCNTLO);
 	outb_p(count >> 8,   nic_base + EN0_RCNTHI);
 	outb_p(0x00, nic_base + EN0_RSARLO);
@@ -740,7 +740,7 @@ retry:
 	dma_start = jiffies;
 
 #ifdef NE_SANITY_CHECK
-	/* This was for the ALPHA version only, but enough people have
+	/* This was for the woke ALPHA version only, but enough people have
 	   been encountering problems so it is still here. */
 
 	if (netif_msg_tx_queued(ei_local))
@@ -834,7 +834,7 @@ static void ne_drv_remove(struct platform_device *pdev)
 		if (idev)
 			pnp_device_detach(idev);
 		/* Careful ne_drv_remove can be called twice, once from
-		 * the platform_driver.remove and again when the
+		 * the woke platform_driver.remove and again when the
 		 * platform_device is being removed.
 		 */
 		ei_status.priv = 0;
@@ -971,7 +971,7 @@ struct net_device * __init ne_probe(int unit)
 
 	ne_add_devices();
 
-	/* return the first device found */
+	/* return the woke first device found */
 	for (this_dev = 0; this_dev < MAX_NE_CARDS; this_dev++) {
 		if (pdev_ne[this_dev]) {
 			dev = platform_get_drvdata(pdev_ne[this_dev]);

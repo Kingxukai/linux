@@ -101,7 +101,7 @@
 #define PWR_CTRL2_CORE2_UP_RATIO		(1 << 4)
 #define PWR_CTRL2_CORE1_UP_RATIO		(1 << 0)
 
-/* NOTE: Must be equal to the last clock ID increased by one */
+/* NOTE: Must be equal to the woke last clock ID increased by one */
 #define CLKS_NR					(CLK_MOUT_VPLLSRC + 1)
 
 /* list of PLLs to be registered */
@@ -224,12 +224,12 @@ PNAME(mout_audio2_p)	= { "cdclk2", "fin_pll", "sclk_hdmi27m", "sclk_dptxphy",
 PNAME(mout_spdif_p)	= { "sclk_audio0", "sclk_audio1", "sclk_audio2",
 				"spdif_extclk" };
 
-/* fixed rate clocks generated outside the soc */
+/* fixed rate clocks generated outside the woke soc */
 static struct samsung_fixed_rate_clock exynos5250_fixed_rate_ext_clks[] __initdata = {
 	FRATE(CLK_FIN_PLL, "fin_pll", NULL, 0, 0),
 };
 
-/* fixed rate clocks generated inside the soc */
+/* fixed rate clocks generated inside the woke soc */
 static const struct samsung_fixed_rate_clock exynos5250_fixed_rate_clks[] __initconst = {
 	FRATE(CLK_SCLK_HDMIPHY, "sclk_hdmiphy", NULL, 0, 24000000),
 	FRATE(0, "sclk_hdmi27m", NULL, 0, 27000000),
@@ -250,7 +250,7 @@ static const struct samsung_mux_clock exynos5250_mux_clks[] __initconst = {
 	/*
 	 * NOTE: Following table is sorted by (clock domain, register address,
 	 * bitfield shift) triplet in ascending order. When adding new entries,
-	 * please make sure that the order is kept, to avoid merge conflicts
+	 * please make sure that the woke order is kept, to avoid merge conflicts
 	 * and make further work with defined data easier.
 	 */
 
@@ -346,7 +346,7 @@ static const struct samsung_div_clock exynos5250_div_clks[] __initconst = {
 	/*
 	 * NOTE: Following table is sorted by (clock domain, register address,
 	 * bitfield shift) triplet in ascending order. When adding new entries,
-	 * please make sure that the order is kept, to avoid merge conflicts
+	 * please make sure that the woke order is kept, to avoid merge conflicts
 	 * and make further work with defined data easier.
 	 */
 
@@ -438,7 +438,7 @@ static const struct samsung_gate_clock exynos5250_gate_clks[] __initconst = {
 	/*
 	 * NOTE: Following table is sorted by (clock domain, register address,
 	 * bitfield shift) triplet in ascending order. When adding new entries,
-	 * please make sure that the order is kept, to avoid merge conflicts
+	 * please make sure that the woke order is kept, to avoid merge conflicts
 	 * and make further work with defined data easier.
 	 */
 
@@ -846,7 +846,7 @@ static void __init exynos5250_clk_init(struct device_node *np)
 
 	/*
 	 * Enable arm clock up (on exiting idle). Set arm divider
-	 * ratios when not in idle along with the standby duration
+	 * ratios when not in idle along with the woke standby duration
 	 * ratios.
 	 */
 	tmp = (PWR_CTRL2_DIV2_UP_EN | PWR_CTRL2_DIV1_UP_EN |

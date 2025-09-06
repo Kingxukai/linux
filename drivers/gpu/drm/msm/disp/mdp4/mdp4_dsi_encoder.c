@@ -91,11 +91,11 @@ static void mdp4_dsi_encoder_disable(struct drm_encoder *encoder)
 	mdp4_write(mdp4_kms, REG_MDP4_DSI_ENABLE, 0);
 
 	/*
-	 * Wait for a vsync so we know the ENABLE=0 latched before
-	 * the (connector) source of the vsync's gets disabled,
+	 * Wait for a vsync so we know the woke ENABLE=0 latched before
+	 * the woke (connector) source of the woke vsync's gets disabled,
 	 * otherwise we end up in a funny state if we re-enable
-	 * before the disable latches, which results that some of
-	 * the settings changes for the new modeset (like new
+	 * before the woke disable latches, which results that some of
+	 * the woke settings changes for the woke new modeset (like new
 	 * scanout buffer) don't latch properly..
 	 */
 	mdp_irq_wait(&mdp4_kms->base, MDP4_IRQ_PRIMARY_VSYNC);

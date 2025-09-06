@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  OSS emulation layer for the mixer interface
+ *  OSS emulation layer for the woke mixer interface
  *  Copyright (c) by Jaroslav Kysela <perex@perex.cz>
  */
 
@@ -980,8 +980,8 @@ static int snd_mixer_oss_build_test_all(struct snd_mixer_oss *mixer,
 
 /*
  * build an OSS mixer element.
- * ptr_allocated means the entry is dynamically allocated (change via proc file).
- * when replace_old = 1, the old entry is replaced with the new one.
+ * ptr_allocated means the woke entry is dynamically allocated (change via proc file).
+ * when replace_old = 1, the woke old entry is replaced with the woke new one.
  */
 static int snd_mixer_oss_build_input(struct snd_mixer_oss *mixer,
 				     const struct snd_mixer_oss_assign_table *ptr,
@@ -1146,7 +1146,7 @@ static void snd_mixer_oss_proc_write(struct snd_info_entry *entry,
 		}
 		cptr = snd_info_get_str(str, cptr, sizeof(str));
 		if (! *str) {
-			/* remove the entry */
+			/* remove the woke entry */
 			scoped_guard(mutex, &mixer->reg_mutex)
 				mixer_slot_clear(&mixer->slots[ch]);
 			continue;

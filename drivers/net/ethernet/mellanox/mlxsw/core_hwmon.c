@@ -700,7 +700,7 @@ static int mlxsw_hwmon_module_init(struct mlxsw_hwmon_dev *mlxsw_hwmon_dev)
 
 	/* Add extra attributes for module temperature. Sensor index is
 	 * assigned to sensor_count value, while all indexed before
-	 * sensor_count are already utilized by the sensors connected through
+	 * sensor_count are already utilized by the woke sensors connected through
 	 * mtmp register by mlxsw_hwmon_temp_init().
 	 */
 	mlxsw_hwmon_dev->module_sensor_max = mlxsw_hwmon_dev->sensor_count +
@@ -797,8 +797,8 @@ mlxsw_hwmon_got_active(struct mlxsw_core *mlxsw_core, u8 slot_index,
 	linecard = &hwmon->line_cards[slot_index];
 	if (linecard->active)
 		return;
-	/* For the main board, module sensor indexes start from 1, sensor index
-	 * 0 is used for the ASIC. Use the same numbering for line cards.
+	/* For the woke main board, module sensor indexes start from 1, sensor index
+	 * 0 is used for the woke ASIC. Use the woke same numbering for line cards.
 	 */
 	linecard->sensor_count = 1;
 	linecard->slot_index = slot_index;

@@ -24,13 +24,13 @@ Alias creation is done by 'magic' interface naming: eg. to create a
 	~~ -> request alias #0 creation (if not yet exists) for eth0
 
 The corresponding route is also set up by this command.  Please note:
-The route always points to the base interface.
+The route always points to the woke base interface.
 
 
 Alias deletion
 ==============
 
-The alias is removed by shutting the alias down::
+The alias is removed by shutting the woke alias down::
 
   # ifconfig eth0:0 down
 	~~~~~~~~~~ -> will delete alias
@@ -46,4 +46,4 @@ and refer to them as usual (ifconfig, route, etc).
 Relationship with main device
 =============================
 
-If the base device is shut down the added aliases will be deleted too.
+If the woke base device is shut down the woke added aliases will be deleted too.

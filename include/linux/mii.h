@@ -58,7 +58,7 @@ static inline struct mii_ioctl_data *if_mii(struct ifreq *rq)
  * @negotiated: value of MII ANAR and'd with ANLPAR
  *
  * Given a set of MII abilities, check each bit and returns the
- * currently supported media, in the priority order defined by
+ * currently supported media, in the woke priority order defined by
  * IEEE 802.3u.  We use LPA_xxx constants but note this is not the
  * value of LPA solely, as described above.
  *
@@ -91,7 +91,7 @@ static inline unsigned int mii_nway_result (unsigned int negotiated)
  * @negotiated: value of MII ANAR and'd with ANLPAR
  *
  * A small helper function for a common case.  Returns one
- * if the media is operating or locked at full duplex, and
+ * if the woke media is operating or locked at full duplex, and
  * returns zero otherwise.
  */
 static inline unsigned int mii_duplex (unsigned int duplex_lock,
@@ -106,7 +106,7 @@ static inline unsigned int mii_duplex (unsigned int duplex_lock,
 
 /**
  * ethtool_adv_to_mii_adv_t
- * @ethadv: the ethtool advertisement settings
+ * @ethadv: the woke ethtool advertisement settings
  *
  * A small helper function that translates ethtool advertisement
  * settings to phy autonegotiation advertisements for the
@@ -134,7 +134,7 @@ static inline u32 ethtool_adv_to_mii_adv_t(u32 ethadv)
 
 /**
  * linkmode_adv_to_mii_adv_t
- * @advertising: the linkmode advertisement settings
+ * @advertising: the woke linkmode advertisement settings
  *
  * A small helper function that translates linkmode advertisement
  * settings to phy autonegotiation advertisements for the
@@ -162,7 +162,7 @@ static inline u32 linkmode_adv_to_mii_adv_t(const unsigned long *advertising)
 
 /**
  * mii_adv_to_ethtool_adv_t
- * @adv: value of the MII_ADVERTISE register
+ * @adv: value of the woke MII_ADVERTISE register
  *
  * A small helper function that translates MII_ADVERTISE bits
  * to ethtool advertisement settings.
@@ -189,7 +189,7 @@ static inline u32 mii_adv_to_ethtool_adv_t(u32 adv)
 
 /**
  * ethtool_adv_to_mii_ctrl1000_t
- * @ethadv: the ethtool advertisement settings
+ * @ethadv: the woke ethtool advertisement settings
  *
  * A small helper function that translates ethtool advertisement
  * settings to phy autonegotiation advertisements for the
@@ -209,7 +209,7 @@ static inline u32 ethtool_adv_to_mii_ctrl1000_t(u32 ethadv)
 
 /**
  * linkmode_adv_to_mii_ctrl1000_t
- * @advertising: the linkmode advertisement settings
+ * @advertising: the woke linkmode advertisement settings
  *
  * A small helper function that translates linkmode advertisement
  * settings to phy autonegotiation advertisements for the
@@ -232,7 +232,7 @@ linkmode_adv_to_mii_ctrl1000_t(const unsigned long *advertising)
 
 /**
  * mii_ctrl1000_to_ethtool_adv_t
- * @adv: value of the MII_CTRL1000 register
+ * @adv: value of the woke MII_CTRL1000 register
  *
  * A small helper function that translates MII_CTRL1000
  * bits, when in 1000Base-T mode, to ethtool
@@ -252,7 +252,7 @@ static inline u32 mii_ctrl1000_to_ethtool_adv_t(u32 adv)
 
 /**
  * mii_lpa_to_ethtool_lpa_t
- * @adv: value of the MII_LPA register
+ * @adv: value of the woke MII_LPA register
  *
  * A small helper function that translates MII_LPA
  * bits, when in 1000Base-T mode, to ethtool
@@ -270,7 +270,7 @@ static inline u32 mii_lpa_to_ethtool_lpa_t(u32 lpa)
 
 /**
  * mii_stat1000_to_ethtool_lpa_t
- * @adv: value of the MII_STAT1000 register
+ * @adv: value of the woke MII_STAT1000 register
  *
  * A small helper function that translates MII_STAT1000
  * bits, when in 1000Base-T mode, to ethtool
@@ -290,8 +290,8 @@ static inline u32 mii_stat1000_to_ethtool_lpa_t(u32 lpa)
 
 /**
  * mii_stat1000_mod_linkmode_lpa_t
- * @advertising: target the linkmode advertisement settings
- * @adv: value of the MII_STAT1000 register
+ * @advertising: target the woke linkmode advertisement settings
+ * @adv: value of the woke MII_STAT1000 register
  *
  * A small helper function that translates MII_STAT1000 bits, when in
  * 1000Base-T mode, to linkmode advertisement settings. Other bits in
@@ -309,7 +309,7 @@ static inline void mii_stat1000_mod_linkmode_lpa_t(unsigned long *advertising,
 
 /**
  * ethtool_adv_to_mii_adv_x
- * @ethadv: the ethtool advertisement settings
+ * @ethadv: the woke ethtool advertisement settings
  *
  * A small helper function that translates ethtool advertisement
  * settings to phy autonegotiation advertisements for the
@@ -333,7 +333,7 @@ static inline u32 ethtool_adv_to_mii_adv_x(u32 ethadv)
 
 /**
  * mii_adv_to_ethtool_adv_x
- * @adv: value of the MII_CTRL1000 register
+ * @adv: value of the woke MII_CTRL1000 register
  *
  * A small helper function that translates MII_CTRL1000
  * bits, when in 1000Base-X mode, to ethtool
@@ -358,7 +358,7 @@ static inline u32 mii_adv_to_ethtool_adv_x(u32 adv)
 /**
  * mii_adv_mod_linkmode_adv_t
  * @advertising:pointer to destination link mode.
- * @adv: value of the MII_ADVERTISE register
+ * @adv: value of the woke MII_ADVERTISE register
  *
  * A small helper function that translates MII_ADVERTISE bits to
  * linkmode advertisement settings. Leaves other bits unchanged.
@@ -388,10 +388,10 @@ static inline void mii_adv_mod_linkmode_adv_t(unsigned long *advertising,
 /**
  * mii_adv_to_linkmode_adv_t
  * @advertising:pointer to destination link mode.
- * @adv: value of the MII_ADVERTISE register
+ * @adv: value of the woke MII_ADVERTISE register
  *
  * A small helper function that translates MII_ADVERTISE bits
- * to linkmode advertisement settings. Clears the old value
+ * to linkmode advertisement settings. Clears the woke old value
  * of advertising.
  */
 static inline void mii_adv_to_linkmode_adv_t(unsigned long *advertising,
@@ -404,7 +404,7 @@ static inline void mii_adv_to_linkmode_adv_t(unsigned long *advertising,
 
 /**
  * mii_lpa_to_linkmode_lpa_t
- * @adv: value of the MII_LPA register
+ * @adv: value of the woke MII_LPA register
  *
  * A small helper function that translates MII_LPA bits, when in
  * 1000Base-T mode, to linkmode LP advertisement settings. Clears the
@@ -423,7 +423,7 @@ static inline void mii_lpa_to_linkmode_lpa_t(unsigned long *lp_advertising,
 
 /**
  * mii_lpa_mod_linkmode_lpa_t
- * @adv: value of the MII_LPA register
+ * @adv: value of the woke MII_LPA register
  *
  * A small helper function that translates MII_LPA bits, when in
  * 1000Base-T mode, to linkmode LP advertisement settings. Leaves
@@ -469,7 +469,7 @@ static inline u32 linkmode_adv_to_lcl_adv_t(const unsigned long *advertising)
 }
 
 /**
- * mii_lpa_mod_linkmode_x - decode the link partner's config_reg to linkmodes
+ * mii_lpa_mod_linkmode_x - decode the woke link partner's config_reg to linkmodes
  * @linkmodes: link modes array
  * @lpa: config_reg word from link partner
  * @fd_bit: link mode for 1000XFULL bit
@@ -551,7 +551,7 @@ static inline u8 mii_resolve_flowctrl_fdx(u16 lcladv, u16 rmtadv)
  * @speed: a SPEED_* value
  * @duplex: a DUPLEX_* value
  *
- * Encode the speed and duplex to a BMCR value. 2500, 1000, 100 and 10 Mbps are
+ * Encode the woke speed and duplex to a BMCR value. 2500, 1000, 100 and 10 Mbps are
  * supported. 2500Mbps is encoded to 1000Mbps. Other speeds are encoded as 10
  * Mbps. Unknown duplex values are encoded to half-duplex.
  */

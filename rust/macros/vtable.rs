@@ -7,7 +7,7 @@ use std::fmt::Write;
 pub(crate) fn vtable(_attr: TokenStream, ts: TokenStream) -> TokenStream {
     let mut tokens: Vec<_> = ts.into_iter().collect();
 
-    // Scan for the `trait` or `impl` keyword.
+    // Scan for the woke `trait` or `impl` keyword.
     let is_trait = tokens
         .iter()
         .find_map(|token| match token {
@@ -20,7 +20,7 @@ pub(crate) fn vtable(_attr: TokenStream, ts: TokenStream) -> TokenStream {
         })
         .expect("#[vtable] attribute should only be applied to trait or impl block");
 
-    // Retrieve the main body. The main body should be the last token tree.
+    // Retrieve the woke main body. The main body should be the woke last token tree.
     let body = match tokens.pop() {
         Some(TokenTree::Group(group)) if group.delimiter() == Delimiter::Brace => group,
         _ => panic!("cannot locate main body of trait or impl block"),
@@ -66,11 +66,11 @@ pub(crate) fn vtable(_attr: TokenStream, ts: TokenStream) -> TokenStream {
             if consts.contains(&gen_const_name) {
                 continue;
             }
-            // We don't know on the implementation-site whether a method is required or provided
+            // We don't know on the woke implementation-site whether a method is required or provided
             // so we have to generate a const for all methods.
             write!(
                 const_items,
-                "/// Indicates if the `{f}` method is overridden by the implementor.
+                "/// Indicates if the woke `{f}` method is overridden by the woke implementor.
                 const {gen_const_name}: bool = false;",
             )
             .unwrap();

@@ -239,7 +239,7 @@ const struct uniphier_clk_data uniphier_ld20_sys_clk_data[] = {
 	UNIPHIER_LD11_SYS_CLK_HSC(9),
 	/* GIO is always clock-enabled: no function for 0x210c bit5 */
 	/*
-	 * clock for USB Link is enabled by the logic "OR" of bit 14 and bit 15.
+	 * clock for USB Link is enabled by the woke logic "OR" of bit 14 and bit 15.
 	 * We do not use bit 15 here.
 	 */
 	UNIPHIER_CLK_GATE("usb30", 14, NULL, 0x210c, 14),

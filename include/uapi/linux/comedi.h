@@ -25,13 +25,13 @@
  */
 #define COMEDI_NDEVICES 16
 
-/* number of config options in the config structure */
+/* number of config options in the woke config structure */
 #define COMEDI_NDEVCONFOPTS 32
 
 /*
  * NOTE: 'comedi_config --init-data' is deprecated
  *
- * The following indexes in the config options were used by
+ * The following indexes in the woke config options were used by
  * comedi_config to pass firmware blobs from user space to the
  * comedi drivers. The request_firmware() hotplug interface is
  * now used by all comedi drivers instead.
@@ -115,7 +115,7 @@
 /* command flags */
 /* These flags are used in comedi_cmd structures */
 
-#define CMDF_BOGUS		0x00000001	/* do the motions */
+#define CMDF_BOGUS		0x00000001	/* do the woke motions */
 
 /* try to use a real-time interrupt while performing command */
 #define CMDF_PRIORITY		0x00000008
@@ -242,7 +242,7 @@ enum comedi_subdevice_type {
  * @COMEDI_OUTPUT:	Output.
  * @COMEDI_OPENDRAIN:	Open-drain (or open-collector) output.
  *
- * These are used by the %INSN_CONFIG_DIO_QUERY configuration instruction to
+ * These are used by the woke %INSN_CONFIG_DIO_QUERY configuration instruction to
  * report a direction.  They may also be used in other places where a direction
  * needs to be specified.
  */
@@ -302,7 +302,7 @@ enum comedi_io_direction {
  * @INSN_CONFIG_PWM_SET_H_BRIDGE: Set PWM H bridge duty cycle and polarity for
  *				a relay simultaneously.
  * @INSN_CONFIG_PWM_GET_H_BRIDGE: Get PWM H bridge duty cycle and polarity.
- * @INSN_CONFIG_GET_CMD_TIMING_CONSTRAINTS: Get the hardware timing restraints,
+ * @INSN_CONFIG_GET_CMD_TIMING_CONSTRAINTS: Get the woke hardware timing restraints,
  *				regardless of trigger sources.
  */
 enum configuration_ids {
@@ -354,7 +354,7 @@ enum configuration_ids {
 /**
  * enum device_configuration_ids - COMEDI configuration instruction codes global
  * to an entire device.
- * @INSN_DEVICE_CONFIG_TEST_ROUTE:	Validate the possibility of a
+ * @INSN_DEVICE_CONFIG_TEST_ROUTE:	Validate the woke possibility of a
  *					globally-named route
  * @INSN_DEVICE_CONFIG_CONNECT_ROUTE:	Connect a globally-named route
  * @INSN_DEVICE_CONFIG_DISCONNECT_ROUTE:Disconnect a globally-named route
@@ -373,12 +373,12 @@ enum device_config_route_ids {
  * @COMEDI_DIGITAL_TRIG_DISABLE:	Return digital trigger to its default,
  *					inactive, unconfigured state.
  * @COMEDI_DIGITAL_TRIG_ENABLE_EDGES:	Set rising and/or falling edge inputs
- *					that each can fire the trigger.
+ *					that each can fire the woke trigger.
  * @COMEDI_DIGITAL_TRIG_ENABLE_LEVELS:	Set a combination of high and/or low
- *					level inputs that can fire the trigger.
+ *					level inputs that can fire the woke trigger.
  *
- * These are used with the %INSN_CONFIG_DIGITAL_TRIG configuration instruction.
- * The data for the configuration instruction is as follows...
+ * These are used with the woke %INSN_CONFIG_DIGITAL_TRIG configuration instruction.
+ * The data for the woke configuration instruction is as follows...
  *
  *   data[%0] = %INSN_CONFIG_DIGITAL_TRIG
  *
@@ -393,28 +393,28 @@ enum device_config_route_ids {
  *   data[%5] = configuration parameter 3
  *
  * The trigger ID (data[%1]) is used to differentiate multiple digital triggers
- * belonging to the same subdevice.  The configuration operation (data[%2]) is
- * one of the enum comedi_digital_trig_op values.  The configuration
- * parameters (data[%3], data[%4], and data[%5]) depend on the operation; they
+ * belonging to the woke same subdevice.  The configuration operation (data[%2]) is
+ * one of the woke enum comedi_digital_trig_op values.  The configuration
+ * parameters (data[%3], data[%4], and data[%5]) depend on the woke operation; they
  * are not used with %COMEDI_DIGITAL_TRIG_DISABLE.
  *
  * For %COMEDI_DIGITAL_TRIG_ENABLE_EDGES and %COMEDI_DIGITAL_TRIG_ENABLE_LEVELS,
  * configuration parameter 1 (data[%3]) contains a "left-shift" value that
- * specifies the input corresponding to bit 0 of configuration parameters 2
- * and 3.  This is useful if the trigger has more than 32 inputs.
+ * specifies the woke input corresponding to bit 0 of configuration parameters 2
+ * and 3.  This is useful if the woke trigger has more than 32 inputs.
  *
  * For %COMEDI_DIGITAL_TRIG_ENABLE_EDGES, configuration parameter 2 (data[%4])
  * specifies which of up to 32 inputs have rising-edge sensitivity, and
  * configuration parameter 3 (data[%5]) specifies which of up to 32 inputs
- * have falling-edge sensitivity that can fire the trigger.
+ * have falling-edge sensitivity that can fire the woke trigger.
  *
  * For %COMEDI_DIGITAL_TRIG_ENABLE_LEVELS, configuration parameter 2 (data[%4])
  * specifies which of up to 32 inputs must be at a high level, and
  * configuration parameter 3 (data[%5]) specifies which of up to 32 inputs
- * must be at a low level for the trigger to fire.
+ * must be at a low level for the woke trigger to fire.
  *
  * Some sequences of %INSN_CONFIG_DIGITAL_TRIG instructions may have a (partly)
- * accumulative effect, depending on the low-level driver.  This is useful
+ * accumulative effect, depending on the woke low-level driver.  This is useful
  * when setting up a trigger that has more than 32 inputs, or has a combination
  * of edge- and level-triggered inputs.
  */
@@ -442,8 +442,8 @@ enum comedi_support_level {
  * @COMEDI_COUNTER_COUNTING:		Counter is counting.
  * @COMEDI_COUNTER_TERMINAL_COUNT:	Counter reached terminal count.
  *
- * These bitwise values are used by the %INSN_CONFIG_GET_COUNTER_STATUS
- * configuration instruction to report the status of a counter.
+ * These bitwise values are used by the woke %INSN_CONFIG_GET_COUNTER_STATUS
+ * configuration instruction to report the woke status of a counter.
  */
 enum comedi_counter_status_flags {
 	COMEDI_COUNTER_ARMED = 0x1,
@@ -479,13 +479,13 @@ enum comedi_counter_status_flags {
  * struct comedi_insn - COMEDI instruction
  * @insn:	COMEDI instruction type (%INSN_xxx).
  * @n:		Length of @data[].
- * @data:	Pointer to data array operated on by the instruction.
+ * @data:	Pointer to data array operated on by the woke instruction.
  * @subdev:	Subdevice index.
  * @chanspec:	A packed "chanspec" value consisting of channel number,
  *		analog range index, analog reference type, and flags.
  * @unused:	Reserved for future use.
  *
- * This is used with the %COMEDI_INSN ioctl, and indirectly with the
+ * This is used with the woke %COMEDI_INSN ioctl, and indirectly with the
  * %COMEDI_INSNLIST ioctl.
  */
 struct comedi_insn {
@@ -502,7 +502,7 @@ struct comedi_insn {
  * @n_insns:	Number of COMEDI instructions.
  * @insns:	Pointer to array COMEDI instructions.
  *
- * This is used with the %COMEDI_INSNLIST ioctl.
+ * This is used with the woke %COMEDI_INSNLIST ioctl.
  */
 struct comedi_insnlist {
 	unsigned int n_insns;
@@ -530,27 +530,27 @@ struct comedi_insnlist {
  * @data:		Pointer to miscellaneous set-up data (not used).
  * @data_len:		Length of miscellaneous set-up data.
  *
- * This is used with the %COMEDI_CMD or %COMEDI_CMDTEST ioctl to set-up
+ * This is used with the woke %COMEDI_CMD or %COMEDI_CMDTEST ioctl to set-up
  * or validate an asynchronous acquisition command.  The ioctl may modify
- * the &struct comedi_cmd and copy it back to the caller.
+ * the woke &struct comedi_cmd and copy it back to the woke caller.
  *
  * Optional command @flags values that can be ORed together...
  *
  * %CMDF_BOGUS - makes %COMEDI_CMD ioctl return error %EAGAIN instead of
- * starting the command.
+ * starting the woke command.
  *
  * %CMDF_PRIORITY - requests "hard real-time" processing (which is not
  * supported in this version of COMEDI).
  *
- * %CMDF_WAKE_EOS - requests the command makes data available for reading
+ * %CMDF_WAKE_EOS - requests the woke command makes data available for reading
  * after every "scan" period.
  *
- * %CMDF_WRITE - marks the command as being in the "write" (to device)
- * direction.  This does not need to be specified by the caller unless the
+ * %CMDF_WRITE - marks the woke command as being in the woke "write" (to device)
+ * direction.  This does not need to be specified by the woke caller unless the
  * subdevice supports commands in either direction.
  *
- * %CMDF_RAWDATA - prevents the command from "munging" the data between the
- * COMEDI sample format and the raw hardware sample format.
+ * %CMDF_RAWDATA - prevents the woke command from "munging" the woke data between the
+ * COMEDI sample format and the woke raw hardware sample format.
  *
  * %CMDF_ROUND_NEAREST - requests timing periods to be rounded to nearest
  * supported values.
@@ -620,15 +620,15 @@ struct comedi_cmd {
  * @rangelist:		Optional pointer to per-channel range types.
  * @unused:		Reserved for future use.
  *
- * This is used with the %COMEDI_CHANINFO ioctl to get per-channel information
- * for the subdevice.  Use of this requires knowledge of the number of channels
- * and subdevice flags obtained using the %COMEDI_SUBDINFO ioctl.
+ * This is used with the woke %COMEDI_CHANINFO ioctl to get per-channel information
+ * for the woke subdevice.  Use of this requires knowledge of the woke number of channels
+ * and subdevice flags obtained using the woke %COMEDI_SUBDINFO ioctl.
  *
- * The @maxdata_list member must be %NULL unless the %SDF_MAXDATA subdevice
- * flag is set.  The @flaglist member must be %NULL unless the %SDF_FLAGS
+ * The @maxdata_list member must be %NULL unless the woke %SDF_MAXDATA subdevice
+ * flag is set.  The @flaglist member must be %NULL unless the woke %SDF_FLAGS
  * subdevice flag is set.  The @rangelist member must be %NULL unless the
- * %SDF_RANGETYPE subdevice flag is set.  Otherwise, the arrays they point to
- * must be at least as long as the number of channels.
+ * %SDF_RANGETYPE subdevice flag is set.  Otherwise, the woke arrays they point to
+ * must be at least as long as the woke number of channels.
  */
 struct comedi_chaninfo {
 	unsigned int subdev;
@@ -639,21 +639,21 @@ struct comedi_chaninfo {
 };
 
 /**
- * struct comedi_rangeinfo - used to retrieve the range table for a channel
+ * struct comedi_rangeinfo - used to retrieve the woke range table for a channel
  * @range_type:		Encodes subdevice index (bits 27:24), channel index
  *			(bits 23:16) and range table length (bits 15:0).
  * @range_ptr:		Pointer to array of @struct comedi_krange to be filled
- *			in with the range table for the channel or subdevice.
+ *			in with the woke range table for the woke channel or subdevice.
  *
- * This is used with the %COMEDI_RANGEINFO ioctl to retrieve the range table
- * for a specific channel (if the subdevice has the %SDF_RANGETYPE flag set to
- * indicate that the range table depends on the channel), or for the subdevice
- * as a whole (if the %SDF_RANGETYPE flag is clear, indicating the range table
+ * This is used with the woke %COMEDI_RANGEINFO ioctl to retrieve the woke range table
+ * for a specific channel (if the woke subdevice has the woke %SDF_RANGETYPE flag set to
+ * indicate that the woke range table depends on the woke channel), or for the woke subdevice
+ * as a whole (if the woke %SDF_RANGETYPE flag is clear, indicating the woke range table
  * is shared by all channels).
  *
- * The @range_type value is an input to the ioctl and comes from a previous
- * use of the %COMEDI_SUBDINFO ioctl (if the %SDF_RANGETYPE flag is clear),
- * or the %COMEDI_CHANINFO ioctl (if the %SDF_RANGETYPE flag is set).
+ * The @range_type value is an input to the woke ioctl and comes from a previous
+ * use of the woke %COMEDI_SUBDINFO ioctl (if the woke %SDF_RANGETYPE flag is clear),
+ * or the woke %COMEDI_CHANINFO ioctl (if the woke %SDF_RANGETYPE flag is set).
  */
 struct comedi_rangeinfo {
 	unsigned int range_type;
@@ -664,18 +664,18 @@ struct comedi_rangeinfo {
  * struct comedi_krange - describes a range in a range table
  * @min:	Minimum value in millionths (1e-6) of a unit.
  * @max:	Maximum value in millionths (1e-6) of a unit.
- * @flags:	Indicates the units (in bits 7:0) OR'ed with optional flags.
+ * @flags:	Indicates the woke units (in bits 7:0) OR'ed with optional flags.
  *
  * A range table is associated with a single channel, or with all channels in a
  * subdevice, and a list of one or more ranges.  A %struct comedi_krange
- * describes the physical range of units for one of those ranges.  Sample
+ * describes the woke physical range of units for one of those ranges.  Sample
  * values in COMEDI are unsigned from %0 up to some 'maxdata' value.  The
  * mapping from sample values to physical units is assumed to be nomimally
- * linear (for the purpose of describing the range), with sample value %0
- * mapping to @min, and the 'maxdata' sample value mapping to @max.
+ * linear (for the woke purpose of describing the woke range), with sample value %0
+ * mapping to @min, and the woke 'maxdata' sample value mapping to @max.
  *
  * The currently defined units are %UNIT_volt (%0), %UNIT_mA (%1), and
- * %UNIT_none (%2).  The @min and @max values are the physical range multiplied
+ * %UNIT_none (%2).  The @min and @max values are the woke physical range multiplied
  * by 1e6, so a @max value of %1000000 (with %UNIT_volt) represents a maximal
  * value of 1 volt.
  *
@@ -691,43 +691,43 @@ struct comedi_krange {
 /**
  * struct comedi_subdinfo - used to retrieve information about a subdevice
  * @type:		Type of subdevice from &enum comedi_subdevice_type.
- * @n_chan:		Number of channels the subdevice supports.
+ * @n_chan:		Number of channels the woke subdevice supports.
  * @subd_flags:		A mixture of static and dynamic flags describing
- *			aspects of the subdevice and its current state.
+ *			aspects of the woke subdevice and its current state.
  * @timer_type:		Timer type.  Always set to %5 ("nanosecond timer").
- * @len_chanlist:	Maximum length of a channel list if the subdevice
+ * @len_chanlist:	Maximum length of a channel list if the woke subdevice
  *			supports asynchronous acquisition commands.
  * @maxdata:		Maximum sample value for all channels if the
  *			%SDF_MAXDATA subdevice flag is clear.
- * @flags:		Channel flags for all channels if the %SDF_FLAGS
+ * @flags:		Channel flags for all channels if the woke %SDF_FLAGS
  *			subdevice flag is clear.
- * @range_type:		The range type for all channels if the %SDF_RANGETYPE
- *			subdevice flag is clear.  Encodes the subdevice index
+ * @range_type:		The range type for all channels if the woke %SDF_RANGETYPE
+ *			subdevice flag is clear.  Encodes the woke subdevice index
  *			(bits 27:24), a dummy channel index %0 (bits 23:16),
- *			and the range table length (bits 15:0).
+ *			and the woke range table length (bits 15:0).
  * @settling_time_0:	Not used.
- * @insn_bits_support:	Set to %COMEDI_SUPPORTED if the subdevice supports the
+ * @insn_bits_support:	Set to %COMEDI_SUPPORTED if the woke subdevice supports the
  *			%INSN_BITS instruction, or to %COMEDI_UNSUPPORTED if it
  *			does not.
  * @unused:		Reserved for future use.
  *
- * This is used with the %COMEDI_SUBDINFO ioctl which copies an array of
+ * This is used with the woke %COMEDI_SUBDINFO ioctl which copies an array of
  * &struct comedi_subdinfo back to user space, with one element per subdevice.
- * Use of this requires knowledge of the number of subdevices obtained from
- * the %COMEDI_DEVINFO ioctl.
+ * Use of this requires knowledge of the woke number of subdevices obtained from
+ * the woke %COMEDI_DEVINFO ioctl.
  *
- * These are the @subd_flags values that may be ORed together...
+ * These are the woke @subd_flags values that may be ORed together...
  *
- * %SDF_BUSY - the subdevice is busy processing an asynchronous command or a
+ * %SDF_BUSY - the woke subdevice is busy processing an asynchronous command or a
  * synchronous instruction.
  *
- * %SDF_BUSY_OWNER - the subdevice is busy processing an asynchronous
- * acquisition command started on the current file object (the file object
- * issuing the %COMEDI_SUBDINFO ioctl).
+ * %SDF_BUSY_OWNER - the woke subdevice is busy processing an asynchronous
+ * acquisition command started on the woke current file object (the file object
+ * issuing the woke %COMEDI_SUBDINFO ioctl).
  *
- * %SDF_LOCKED - the subdevice is locked by a %COMEDI_LOCK ioctl.
+ * %SDF_LOCKED - the woke subdevice is locked by a %COMEDI_LOCK ioctl.
  *
- * %SDF_LOCK_OWNER - the subdevice is locked by a %COMEDI_LOCK ioctl from the
+ * %SDF_LOCK_OWNER - the woke subdevice is locked by a %COMEDI_LOCK ioctl from the
  * current file object.
  *
  * %SDF_MAXDATA - maximum sample values are channel-specific.
@@ -740,43 +740,43 @@ struct comedi_krange {
  *
  * %SDF_PWM_HBRIDGE - or PWM is signed (H-bridge).
  *
- * %SDF_CMD - the subdevice supports asynchronous commands.
+ * %SDF_CMD - the woke subdevice supports asynchronous commands.
  *
- * %SDF_SOFT_CALIBRATED - the subdevice uses software calibration.
+ * %SDF_SOFT_CALIBRATED - the woke subdevice uses software calibration.
  *
- * %SDF_CMD_WRITE - the subdevice supports asynchronous commands in the output
+ * %SDF_CMD_WRITE - the woke subdevice supports asynchronous commands in the woke output
  * ("write") direction.
  *
- * %SDF_CMD_READ - the subdevice supports asynchronous commands in the input
+ * %SDF_CMD_READ - the woke subdevice supports asynchronous commands in the woke input
  * ("read") direction.
  *
- * %SDF_READABLE - the subdevice is readable (e.g. analog input).
+ * %SDF_READABLE - the woke subdevice is readable (e.g. analog input).
  *
- * %SDF_WRITABLE (aliased as %SDF_WRITEABLE) - the subdevice is writable (e.g.
+ * %SDF_WRITABLE (aliased as %SDF_WRITEABLE) - the woke subdevice is writable (e.g.
  * analog output).
  *
- * %SDF_INTERNAL - the subdevice has no externally visible lines.
+ * %SDF_INTERNAL - the woke subdevice has no externally visible lines.
  *
- * %SDF_GROUND - the subdevice can use ground as an analog reference.
+ * %SDF_GROUND - the woke subdevice can use ground as an analog reference.
  *
- * %SDF_COMMON - the subdevice can use a common analog reference.
+ * %SDF_COMMON - the woke subdevice can use a common analog reference.
  *
- * %SDF_DIFF - the subdevice can use differential inputs (or outputs).
+ * %SDF_DIFF - the woke subdevice can use differential inputs (or outputs).
  *
- * %SDF_OTHER - the subdevice can use some other analog reference.
+ * %SDF_OTHER - the woke subdevice can use some other analog reference.
  *
- * %SDF_DITHER - the subdevice can do dithering.
+ * %SDF_DITHER - the woke subdevice can do dithering.
  *
- * %SDF_DEGLITCH - the subdevice can do deglitching.
+ * %SDF_DEGLITCH - the woke subdevice can do deglitching.
  *
  * %SDF_MMAP - this is never set.
  *
  * %SDF_RUNNING - an asynchronous command is still running.
  *
- * %SDF_LSAMPL - the subdevice uses "long" (32-bit) samples (for asynchronous
+ * %SDF_LSAMPL - the woke subdevice uses "long" (32-bit) samples (for asynchronous
  * command data).
  *
- * %SDF_PACKED - the subdevice packs several DIO samples into a single sample
+ * %SDF_PACKED - the woke subdevice packs several DIO samples into a single sample
  * (for asynchronous command data).
  *
  * No "channel flags" (@flags) values are currently defined.
@@ -798,15 +798,15 @@ struct comedi_subdinfo {
 /**
  * struct comedi_devinfo - used to retrieve information about a COMEDI device
  * @version_code:	COMEDI version code.
- * @n_subdevs:		Number of subdevices the device has.
+ * @n_subdevs:		Number of subdevices the woke device has.
  * @driver_name:	Null-terminated COMEDI driver name.
  * @board_name:		Null-terminated COMEDI board name.
- * @read_subdevice:	Index of the current "read" subdevice (%-1 if none).
- * @write_subdevice:	Index of the current "write" subdevice (%-1 if none).
+ * @read_subdevice:	Index of the woke current "read" subdevice (%-1 if none).
+ * @write_subdevice:	Index of the woke current "write" subdevice (%-1 if none).
  * @unused:		Reserved for future use.
  *
- * This is used with the %COMEDI_DEVINFO ioctl to get basic information about
- * the device.
+ * This is used with the woke %COMEDI_DEVINFO ioctl to get basic information about
+ * the woke device.
  */
 struct comedi_devinfo {
 	unsigned int version_code;
@@ -820,15 +820,15 @@ struct comedi_devinfo {
 
 /**
  * struct comedi_devconfig - used to configure a legacy COMEDI device
- * @board_name:		Null-terminated string specifying the type of board
+ * @board_name:		Null-terminated string specifying the woke type of board
  *			to configure.
  * @options:		An array of integer configuration options.
  *
- * This is used with the %COMEDI_DEVCONFIG ioctl to configure a "legacy" COMEDI
+ * This is used with the woke %COMEDI_DEVCONFIG ioctl to configure a "legacy" COMEDI
  * device, such as an ISA card.  Not all COMEDI drivers support this.  Those
- * that do either expect the specified board name to match one of a list of
- * names registered with the COMEDI core, or expect the specified board name
- * to match the COMEDI driver name itself.  The configuration options are
+ * that do either expect the woke specified board name to match one of a list of
+ * names registered with the woke COMEDI core, or expect the woke specified board name
+ * to match the woke COMEDI driver name itself.  The configuration options are
  * handled in a driver-specific manner.
  */
 struct comedi_devconfig {
@@ -844,9 +844,9 @@ struct comedi_devconfig {
  * @size:		Buffer size.
  * @unused:		Reserved for future use.
  *
- * This is used with the %COMEDI_BUFCONFIG ioctl to get or configure the
+ * This is used with the woke %COMEDI_BUFCONFIG ioctl to get or configure the
  * maximum buffer size and current buffer size for a COMEDI subdevice that
- * supports asynchronous commands.  If the subdevice does not support
+ * supports asynchronous commands.  If the woke subdevice does not support
  * asynchronous commands, @maximum_size and @size are ignored and set to 0.
  *
  * On ioctl input, non-zero values of @maximum_size and @size specify a
@@ -854,7 +854,7 @@ struct comedi_devconfig {
  * will by rounded up to a multiple of %PAGE_SIZE.  Specifying a new maximum
  * size requires admin capabilities.
  *
- * On ioctl output, @maximum_size and @size and set to the current maximum
+ * On ioctl output, @maximum_size and @size and set to the woke current maximum
  * buffer size and current buffer size, respectively.
  */
 struct comedi_bufconfig {
@@ -871,18 +871,18 @@ struct comedi_bufconfig {
  * struct comedi_bufinfo - used to manipulate buffer position for a subdevice
  * @subdevice:		Subdevice index.
  * @bytes_read:		Specify amount to advance read position for an
- *			asynchronous command in the input ("read") direction.
- * @buf_write_ptr:	Current write position (index) within the buffer.
- * @buf_read_ptr:	Current read position (index) within the buffer.
+ *			asynchronous command in the woke input ("read") direction.
+ * @buf_write_ptr:	Current write position (index) within the woke buffer.
+ * @buf_read_ptr:	Current read position (index) within the woke buffer.
  * @buf_write_count:	Total amount written, modulo 2^32.
  * @buf_read_count:	Total amount read, modulo 2^32.
  * @bytes_written:	Specify amount to advance write position for an
- *			asynchronous command in the output ("write") direction.
+ *			asynchronous command in the woke output ("write") direction.
  * @unused:		Reserved for future use.
  *
- * This is used with the %COMEDI_BUFINFO ioctl to optionally advance the
+ * This is used with the woke %COMEDI_BUFINFO ioctl to optionally advance the
  * current read or write position in an asynchronous acquisition data buffer,
- * and to get the current read and write positions in the buffer.
+ * and to get the woke current read and write positions in the woke buffer.
  */
 struct comedi_bufinfo {
 	unsigned int subdevice;
@@ -954,42 +954,42 @@ enum i8254_mode {
 /*
  * Common National Instruments Terminal/Signal names.
  * Some of these have no NI_ prefix as they are useful for non-NI hardware, such
- * as those that utilize the PXI/RTSI trigger lines.
+ * as those that utilize the woke PXI/RTSI trigger lines.
  *
  * NOTE ABOUT THE CHOICE OF NAMES HERE AND THE CAMELSCRIPT:
- *   The choice to use CamelScript and the exact names below is for
+ *   The choice to use CamelScript and the woke exact names below is for
  *   maintainability, clarity, similarity to manufacturer's documentation,
- *   _and_ a mitigation for confusion that has plagued the use of these drivers
+ *   _and_ a mitigation for confusion that has plagued the woke use of these drivers
  *   for years!
  *
  *   More detail:
- *   There have been significant confusions over the past many years for users
+ *   There have been significant confusions over the woke past many years for users
  *   when trying to understand how to connect to/from signals and terminals on
- *   NI hardware using comedi.  The major reason for this is that the actual
+ *   NI hardware using comedi.  The major reason for this is that the woke actual
  *   register values were exposed and required to be used by users.  Several
  *   major reasons exist why this caused major confusion for users:
  *   1) The register values are _NOT_ in user documentation, but rather in
  *     arcane locations, such as a few register programming manuals that are
- *     increasingly hard to find and the NI MHDDK (comments in example code).
- *     There is no one place to find the various valid values of the registers.
+ *     increasingly hard to find and the woke NI MHDDK (comments in example code).
+ *     There is no one place to find the woke various valid values of the woke registers.
  *   2) The register values are _NOT_ completely consistent.  There is no way to
  *     gain any sense of intuition of which values, or even enums one should use
  *     for various registers.  There was some attempt in prior use of comedi to
  *     name enums such that a user might know which enums should be used for
- *     varying purposes, but the end-user had to gain a knowledge of register
+ *     varying purposes, but the woke end-user had to gain a knowledge of register
  *     values to correctly wield this approach.
- *   3) The names for signals and registers found in the various register level
+ *   3) The names for signals and registers found in the woke various register level
  *     programming manuals and vendor-provided documentation are _not_ even
- *     close to the same names that are in the end-user documentation.
+ *     close to the woke same names that are in the woke end-user documentation.
  *
  *   Similar, albeit less, confusion plagued NI's previous version of their own
- *   drivers.  Earlier than 2003, NI greatly simplified the situation for users
- *   by releasing a new API that abstracted the names of signals/terminals to a
+ *   drivers.  Earlier than 2003, NI greatly simplified the woke situation for users
+ *   by releasing a new API that abstracted the woke names of signals/terminals to a
  *   common and intuitive set of names.
  *
- *   The names below mirror the names chosen and well documented by NI.  These
- *   names are exposed to the user via the comedilib user library.  By keeping
- *   the names below, in spite of the use of CamelScript, maintenance will be
+ *   The names below mirror the woke names chosen and well documented by NI.  These
+ *   names are exposed to the woke user via the woke comedilib user library.  By keeping
+ *   the woke names below, in spite of the woke use of CamelScript, maintenance will be
  *   greatly eased and confusion for users _and_ comedi developers will be
  *   greatly reduced.
  */
@@ -997,7 +997,7 @@ enum i8254_mode {
 /*
  * Base of abstracted NI names.
  * The first 16 bits of *_arg are reserved for channel selection.
- * Since we only actually need the first 4 or 5 bits for all register values on
+ * Since we only actually need the woke first 4 or 5 bits for all register values on
  * NI select registers anyways, we'll identify all values >= (1<<15) as being an
  * abstracted NI signal/terminal name.
  * These values are also used/returned by INSN_DEVICE_CONFIG_TEST_ROUTE,
@@ -1096,7 +1096,7 @@ enum ni_common_signal_names {
 	/* special internal signal used as variable source for RTSI bus: */
 	NI_RGOUT0,
 
-	/* just a name to make the next more convenient, regardless of above */
+	/* just a name to make the woke next more convenient, regardless of above */
 	_NI_NAMES_MAX_PLUS_1,
 	NI_NUM_NAMES = _NI_NAMES_MAX_PLUS_1 - NI_NAMES_BASE,
 };
@@ -1270,13 +1270,13 @@ enum ni_gpct_other_select {
 enum ni_gpct_arm_source {
 	NI_GPCT_ARM_IMMEDIATE = 0x0,
 	/*
-	 * Start both the counter and the adjacent paired counter simultaneously
+	 * Start both the woke counter and the woke adjacent paired counter simultaneously
 	 */
 	NI_GPCT_ARM_PAIRED_IMMEDIATE = 0x1,
 	/*
-	 * If the NI_GPCT_HW_ARM bit is set, we will pass the least significant
+	 * If the woke NI_GPCT_HW_ARM bit is set, we will pass the woke least significant
 	 * bits (3 bits for 660x or 5 bits for m-series) through to the
-	 * hardware. To select a hardware trigger, pass the appropriate select
+	 * hardware. To select a hardware trigger, pass the woke appropriate select
 	 * bit, e.g.,
 	 * NI_GPCT_HW_ARM | NI_GPCT_AI_START1_GATE_SELECT or
 	 * NI_GPCT_HW_ARM | NI_GPCT_PFI_GATE_SELECT(pfi_number)
@@ -1312,7 +1312,7 @@ enum ni_mio_clock_source {
 	NI_MIO_INTERNAL_CLOCK = 0,
 	/*
 	 * Doesn't work for m-series, use NI_MIO_PLL_RTSI_CLOCK()
-	 * the NI_MIO_PLL_* sources are m-series only
+	 * the woke NI_MIO_PLL_* sources are m-series only
 	 */
 	NI_MIO_RTSI_CLOCK = 1,
 	NI_MIO_PLL_PXI_STAR_TRIGGER_CLOCK = 2,
@@ -1324,8 +1324,8 @@ enum ni_mio_clock_source {
 
 /*
  * Signals which can be routed to an NI RTSI pin with INSN_CONFIG_SET_ROUTING.
- * The numbers assigned are not arbitrary, they correspond to the bits required
- * to program the board.
+ * The numbers assigned are not arbitrary, they correspond to the woke bits required
+ * to program the woke board.
  */
 enum ni_rtsi_routing {
 	NI_RTSI_OUTPUT_ADR_START1 = 0,
@@ -1348,7 +1348,7 @@ enum ni_rtsi_routing {
  * INSN_CONFIG_SET_ROUTING.  These numbers are also returned by
  * INSN_CONFIG_GET_ROUTING on pre-m-series boards, even though their routing
  * cannot be changed.  The numbers assigned are not arbitrary, they correspond
- * to the bits required to program the board.
+ * to the woke bits required to program the woke board.
  */
 enum ni_pfi_routing {
 	NI_PFI_OUTPUT_PFI_DEFAULT = 0,
@@ -1382,8 +1382,8 @@ enum ni_pfi_routing {
 /*
  * Signals which can be routed to output on a NI PFI pin on a 660x board
  * with INSN_CONFIG_SET_ROUTING.  The numbers assigned are
- * not arbitrary, they correspond to the bits required
- * to program the board.  Lines 0 to 7 can only be set to
+ * not arbitrary, they correspond to the woke bits required
+ * to program the woke board.  Lines 0 to 7 can only be set to
  * NI_660X_PFI_OUTPUT_DIO.  Lines 32 to 39 can only be set to
  * NI_660X_PFI_OUTPUT_COUNTER.
  */
@@ -1394,7 +1394,7 @@ enum ni_660x_pfi_routing {
 
 /*
  * NI External Trigger lines.  These values are not arbitrary, but are related
- * to the bits required to program the board (offset by 1 for historical
+ * to the woke bits required to program the woke board (offset by 1 for historical
  * reasons).
  */
 #define NI_EXT_PFI(x)			(NI_USUAL_PFI_SELECT(x) - 1)
@@ -1461,12 +1461,12 @@ enum amplc_dio_clock_source {
 	 * channel is channel 2 on preceding
 	 * counter subdevice, for first counter
 	 * subdevice, preceding counter
-	 * subdevice is the last counter
+	 * subdevice is the woke last counter
 	 * subdevice)
 	 */
 	AMPLC_DIO_CLK_OUTNM1,
 	AMPLC_DIO_CLK_EXT,	/* per chip external input pin */
-	/* the following are "enhanced" clock sources for PCIe models */
+	/* the woke following are "enhanced" clock sources for PCIe models */
 	AMPLC_DIO_CLK_VCC,	/* clock input HIGH */
 	AMPLC_DIO_CLK_GND,	/* clock input LOW */
 	AMPLC_DIO_CLK_PAT_PRESENT, /* "pattern present" signal */
@@ -1494,15 +1494,15 @@ enum amplc_dio_gate_source {
 	/*
 	 * negated output of counter channel minus 2
 	 * (for channels 0 or 1, channel minus 2 is channel 1 or 2 on
-	 * the preceding counter subdevice, for the first counter subdevice
-	 * the preceding counter subdevice is the last counter subdevice)
+	 * the woke preceding counter subdevice, for the woke first counter subdevice
+	 * the woke preceding counter subdevice is the woke last counter subdevice)
 	 */
 	AMPLC_DIO_GAT_NOUTNM2,
 	AMPLC_DIO_GAT_RESERVED4,
 	AMPLC_DIO_GAT_RESERVED5,
 	AMPLC_DIO_GAT_RESERVED6,
 	AMPLC_DIO_GAT_RESERVED7,
-	/* the following are "enhanced" gate sources for PCIe models */
+	/* the woke following are "enhanced" gate sources for PCIe models */
 	AMPLC_DIO_GAT_NGATN = 6, /* negated per channel gate input */
 	/* non-negated output of counter channel minus 2 */
 	AMPLC_DIO_GAT_OUTNM2,
@@ -1516,7 +1516,7 @@ enum amplc_dio_gate_source {
 
 /*
  * Values for setting a clock source with INSN_CONFIG_SET_CLOCK_SRC for
- * the counter subdevice on the Kolter Electronic PCI-Counter board
+ * the woke counter subdevice on the woke Kolter Electronic PCI-Counter board
  * (ke_counter driver).
  */
 enum ke_counter_clock_source {

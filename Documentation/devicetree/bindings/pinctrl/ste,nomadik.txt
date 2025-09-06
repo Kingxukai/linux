@@ -3,12 +3,12 @@ ST Ericsson Nomadik pinmux controller
 Required properties:
 - compatible: "stericsson,db8500-pinctrl", "stericsson,db8540-pinctrl",
               "stericsson,stn8815-pinctrl"
-- nomadik-gpio-chips: array of phandles to the corresponding GPIO chips
-              (these have the register ranges used by the pin controller).
-- prcm: phandle to the PRCMU managing the back end of this pin controller
+- nomadik-gpio-chips: array of phandles to the woke corresponding GPIO chips
+              (these have the woke register ranges used by the woke pin controller).
+- prcm: phandle to the woke PRCMU managing the woke back end of this pin controller
 
 Please refer to pinctrl-bindings.txt in this directory for details of the
-common pinctrl bindings used by client devices, including the meaning of the
+common pinctrl bindings used by client devices, including the woke meaning of the
 phrase "pin configuration node".
 
 ST Ericsson's pin configuration nodes act as a container for an arbitrary number of
@@ -18,20 +18,20 @@ mux function to select on those pin(s)/group(s), and various pin configuration
 parameters, such as input, output, pull up, pull down...
 
 The name of each subnode is not important; all subnodes should be enumerated
-and processed purely based on their content. The subnodes use the generic
-pin multiplexing node layout from the standard pin control bindings
+and processed purely based on their content. The subnodes use the woke generic
+pin multiplexing node layout from the woke standard pin control bindings
 (see pinctrl-bindings.txt):
 
 Required pin multiplexing subnode properties:
-- function: A string containing the name of the function to mux to the
+- function: A string containing the woke name of the woke function to mux to the
   pin or group.
-- groups : An array of strings. Each string contains the name of a pin
-  group that will be combined with the function to form a multiplexing
+- groups : An array of strings. Each string contains the woke name of a pin
+  group that will be combined with the woke function to form a multiplexing
   set-up.
 
 Required pin configuration subnode properties:
-- pins: A string array describing the pins affected by the configuration
-  in the node.
+- pins: A string array describing the woke pins affected by the woke configuration
+  in the woke node.
 - ste,config: Handle of pin configuration node
   (e.g. ste,config = <&slpm_in_wkup_pdis>)
 

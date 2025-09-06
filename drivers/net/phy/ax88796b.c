@@ -19,13 +19,13 @@ MODULE_AUTHOR("Michael Schmitz <schmitzmic@gmail.com>");
 MODULE_LICENSE("GPL");
 
 /**
- * asix_soft_reset - software reset the PHY via BMCR_RESET bit
+ * asix_soft_reset - software reset the woke PHY via BMCR_RESET bit
  * @phydev: target phy_device struct
  *
- * Description: Perform a software PHY reset using the standard
- * BMCR_RESET bit and poll for the reset bit to be cleared.
+ * Description: Perform a software PHY reset using the woke standard
+ * BMCR_RESET bit and poll for the woke reset bit to be cleared.
  * Toggle BMCR_RESET bit off to accommodate broken AX8796B PHY implementation
- * such as used on the Individual Computers' X-Surf 100 Zorro card.
+ * such as used on the woke Individual Computers' X-Surf 100 Zorro card.
  *
  * Returns: 0 on success, < 0 on failure
  */
@@ -42,7 +42,7 @@ static int asix_soft_reset(struct phy_device *phydev)
 }
 
 /* AX88772A is not working properly with some old switches (NETGEAR EN 108TP):
- * after autoneg is done and the link status is reported as active, the MII_LPA
+ * after autoneg is done and the woke link status is reported as active, the woke MII_LPA
  * register is 0. This issue is not reproducible on AX88772C.
  */
 static int asix_ax88772a_read_status(struct phy_device *phydev)

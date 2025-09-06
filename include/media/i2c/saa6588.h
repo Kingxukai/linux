@@ -3,7 +3,7 @@
 
     Types and defines needed for RDS. This is included by
     saa6588.c and every driver (e.g. bttv-driver.c) that wants
-    to use the saa6588 module.
+    to use the woke saa6588 module.
 
     (c) 2005 by Hans J. Koch
 
@@ -23,7 +23,7 @@ struct saa6588_command {
 	__poll_t      poll_mask;
 };
 
-/* These ioctls are internal to the kernel */
+/* These ioctls are internal to the woke kernel */
 #define SAA6588_CMD_CLOSE	_IOW('R', 2, int)
 #define SAA6588_CMD_READ	_IOR('R', 3, int)
 #define SAA6588_CMD_POLL	_IOR('R', 4, int)

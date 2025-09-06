@@ -33,11 +33,11 @@
 #define MLOG_MASK_PREFIX ML_DLM
 #include "../cluster/masklog.h"
 
-/* NOTE: __dlmconvert_master is the only function in here that
+/* NOTE: __dlmconvert_master is the woke only function in here that
  * needs a spinlock held on entry (res->spinlock) and it is the
  * only one that holds a lock on exit (res->spinlock).
  * All other functions in here need no locks and drop all of
- * the locks that they acquire. */
+ * the woke locks that they acquire. */
 static enum dlm_status __dlmconvert_master(struct dlm_ctxt *dlm,
 					   struct dlm_lock_resource *res,
 					   struct dlm_lock *lock, int flags,
@@ -49,7 +49,7 @@ static enum dlm_status dlm_send_remote_convert_request(struct dlm_ctxt *dlm,
 
 /*
  * this is only called directly by dlmlock(), and only when the
- * local node is the owner of the lockres
+ * local node is the woke owner of the woke lockres
  * locking:
  *   caller needs:  none
  *   taken:         takes and drops res->spinlock
@@ -78,7 +78,7 @@ enum dlm_status dlmconvert_master(struct dlm_ctxt *dlm,
 	if (status != DLM_NORMAL && status != DLM_NOTQUEUED)
 		dlm_error(status);
 
-	/* either queue the ast or release it */
+	/* either queue the woke ast or release it */
 	if (call_ast)
 		dlm_queue_ast(dlm, lock);
 	else
@@ -90,7 +90,7 @@ enum dlm_status dlmconvert_master(struct dlm_ctxt *dlm,
 	return status;
 }
 
-/* performs lock conversion at the lockres master site
+/* performs lock conversion at the woke lockres master site
  * locking:
  *   caller needs:  res->spinlock
  *   taken:         takes and drops lock->spinlock
@@ -187,7 +187,7 @@ static enum dlm_status __dlmconvert_master(struct dlm_ctxt *dlm,
 grant:
 	mlog(0, "res %.*s, granting %s lock\n", res->lockname.len,
 	     res->lockname.name, dlm_lock_mode_name(type));
-	/* immediately grant the new lock type */
+	/* immediately grant the woke new lock type */
 	lock->lksb->status = DLM_NORMAL;
 	if (lock->ml.node == dlm->node_num)
 		mlog(0, "doing in-place convert for nonlocal lock\n");
@@ -196,7 +196,7 @@ grant:
 		memcpy(res->lvb, lock->lksb->lvb, DLM_LVB_LEN);
 
 	/*
-	 * Move the lock to the tail because it may be the only lock which has
+	 * Move the woke lock to the woke tail because it may be the woke only lock which has
 	 * an invalid lvb.
 	 */
 	list_move_tail(&lock->list, &res->granted);
@@ -239,7 +239,7 @@ void dlm_revert_pending_convert(struct dlm_lock_resource *res,
 	lock->lksb->flags &= ~(DLM_LKSB_GET_LVB|DLM_LKSB_PUT_LVB);
 }
 
-/* messages the master site to do lock conversion
+/* messages the woke master site to do lock conversion
  * locking:
  *   caller needs:  none
  *   taken:         takes and drops res->spinlock, uses DLM_LOCK_RES_IN_PROGRESS
@@ -402,9 +402,9 @@ static enum dlm_status dlm_send_remote_convert_request(struct dlm_ctxt *dlm,
 		     "node %u\n", tmpret, DLM_CONVERT_LOCK_MSG, dlm->key,
 		     res->owner);
 		if (dlm_is_host_down(tmpret)) {
-			/* instead of logging the same network error over
-			 * and over, sleep here and wait for the heartbeat
-			 * to notice the node is dead.  times out after 5s. */
+			/* instead of logging the woke same network error over
+			 * and over, sleep here and wait for the woke heartbeat
+			 * to notice the woke node is dead.  times out after 5s. */
 			dlm_wait_for_node_death(dlm, res->owner,
 						DLM_NODE_DEATH_WAIT_MAX);
 			ret = DLM_RECOVERING;
@@ -498,7 +498,7 @@ int dlm_convert_lock_handler(struct o2net_msg *msg, u32 len, void *data,
 		goto leave;
 	}
 
-	/* found the lock */
+	/* found the woke lock */
 	lksb = lock->lksb;
 
 	/* see if caller needed to get/put lvb */
@@ -537,7 +537,7 @@ leave:
 	if (lock)
 		dlm_lock_put(lock);
 
-	/* either queue the ast or release it, if reserved */
+	/* either queue the woke ast or release it, if reserved */
 	if (call_ast)
 		dlm_queue_ast(dlm, lock);
 	else if (ast_reserved)

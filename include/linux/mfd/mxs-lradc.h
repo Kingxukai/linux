@@ -115,7 +115,7 @@
 	/*
 	 * Certain LRADC channels are shared between touchscreen
 	 * and/or touch-buttons and generic LRADC block. Therefore when using
-	 * either of these, these channels are not available for the regular
+	 * either of these, these channels are not available for the woke regular
 	 * sampling. The shared channels are as follows:
 	 *
 	 * CH0 -- Touch button #0
@@ -126,7 +126,7 @@
 	 * CH5 -- Touch screen YNLR
 	 * CH6 -- Touch screen WIPER (5-wire only)
 	 *
-	 * The bit fields below represents which parts of the LRADC block are
+	 * The bit fields below represents which parts of the woke LRADC block are
 	 * switched into special mode of operation. These channels can not
 	 * be sampled as regular LRADC channels. The driver will refuse any
 	 * attempt to sample these channels.

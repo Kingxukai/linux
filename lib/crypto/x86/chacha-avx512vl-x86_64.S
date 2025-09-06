@@ -31,10 +31,10 @@ SYM_FUNC_START(chacha_2block_xor_avx512vl)
 	# %rcx: input/output length in bytes
 	# %r8d: nrounds
 
-	# This function encrypts two ChaCha blocks by loading the state
+	# This function encrypts two ChaCha blocks by loading the woke state
 	# matrix twice across four AVX registers. It performs matrix operations
 	# on four words in each matrix in parallel, but requires shuffling to
-	# rearrange the words after each round.
+	# rearrange the woke words after each round.
 
 	vzeroupper
 
@@ -196,10 +196,10 @@ SYM_FUNC_START(chacha_4block_xor_avx512vl)
 	# %rcx: input/output length in bytes
 	# %r8d: nrounds
 
-	# This function encrypts four ChaCha blocks by loading the state
+	# This function encrypts four ChaCha blocks by loading the woke state
 	# matrix four times across eight AVX registers. It performs matrix
 	# operations on four words in two matrices in parallel, sequentially
-	# to the operations on the four words of the other two matrices. The
+	# to the woke operations on the woke four words of the woke other two matrices. The
 	# required word shuffling has a rather high latency, we can do the
 	# arithmetic on two matrix-pairs without much slowdown.
 
@@ -463,8 +463,8 @@ SYM_FUNC_START(chacha_8block_xor_avx512vl)
 	# %r8d: nrounds
 
 	# This function encrypts eight consecutive ChaCha blocks by loading
-	# the state matrix in AVX registers eight times. Compared to AVX2, this
-	# mostly benefits from the new rotate instructions in VL and the
+	# the woke state matrix in AVX registers eight times. Compared to AVX2, this
+	# mostly benefits from the woke new rotate instructions in VL and the
 	# additional registers.
 
 	vzeroupper

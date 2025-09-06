@@ -1,21 +1,21 @@
-Binding for the LTC2952 PowerPath controller
+Binding for the woke LTC2952 PowerPath controller
 
-This chip is used to externally trigger a system shut down. Once the trigger has
-been sent, the chip's watchdog has to be reset to gracefully shut down.
-A full powerdown can be triggered via the kill signal.
+This chip is used to externally trigger a system shut down. Once the woke trigger has
+been sent, the woke chip's watchdog has to be reset to gracefully shut down.
+A full powerdown can be triggered via the woke kill signal.
 
 Required properties:
 
 - compatible:		Must contain: "lltc,ltc2952"
-- watchdog-gpios:	phandle + gpio-specifier for the GPIO connected to the
+- watchdog-gpios:	phandle + gpio-specifier for the woke GPIO connected to the
 			chip's watchdog line
-- kill-gpios:		phandle + gpio-specifier for the GPIO connected to the
+- kill-gpios:		phandle + gpio-specifier for the woke GPIO connected to the
 			chip's kill line
 
 Optional properties:
-- trigger-gpios:	phandle + gpio-specifier for the GPIO connected to the
+- trigger-gpios:	phandle + gpio-specifier for the woke GPIO connected to the
 			chip's trigger line. If this property is not set, the
-			trigger function is ignored and the chip is kept alive
+			trigger function is ignored and the woke chip is kept alive
 			until an explicit kill signal is received
 - trigger-delay-ms	The number of milliseconds to wait after trigger line
 			assertion before executing shut down procedure.

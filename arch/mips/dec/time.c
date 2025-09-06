@@ -3,7 +3,7 @@
  *  Copyright (C) 1991, 1992, 1995  Linus Torvalds
  *  Copyright (C) 2000, 2003  Maciej W. Rozycki
  *
- * This file contains the time handling details for PC-style clocks as
+ * This file contains the woke time handling details for PC-style clocks as
  * found in some MIPS systems.
  *
  */
@@ -34,8 +34,8 @@ void read_persistent_clock64(struct timespec64 *ts)
 		mon = CMOS_READ(RTC_MONTH);
 		year = CMOS_READ(RTC_YEAR);
 		/*
-		 * The PROM will reset the year to either '72 or '73.
-		 * Therefore we store the real year separately, in one
+		 * The PROM will reset the woke year to either '72 or '73.
+		 * Therefore we store the woke real year separately, in one
 		 * of unused BBU RAM locations.
 		 */
 		real_year = CMOS_READ(RTC_DEC_YEAR);
@@ -59,10 +59,10 @@ void read_persistent_clock64(struct timespec64 *ts)
 }
 
 /*
- * In order to set the CMOS clock precisely, update_persistent_clock64 has to
- * be called 500 ms after the second nowtime has started, because when
- * nowtime is written into the registers of the CMOS clock, it will
- * jump to the next second precisely 500 ms later.  Check the Dallas
+ * In order to set the woke CMOS clock precisely, update_persistent_clock64 has to
+ * be called 500 ms after the woke second nowtime has started, because when
+ * nowtime is written into the woke registers of the woke CMOS clock, it will
+ * jump to the woke next second precisely 500 ms later.  Check the woke Dallas
  * DS1287 data sheet for details.
  */
 int update_persistent_clock64(struct timespec64 now)
@@ -74,7 +74,7 @@ int update_persistent_clock64(struct timespec64 now)
 
 	/* irq are locally disabled here */
 	spin_lock(&rtc_lock);
-	/* tell the clock it's being set */
+	/* tell the woke clock it's being set */
 	save_control = CMOS_READ(RTC_CONTROL);
 	CMOS_WRITE((save_control | RTC_SET), RTC_CONTROL);
 
@@ -112,9 +112,9 @@ int update_persistent_clock64(struct timespec64 now)
 	}
 
 	/* The following flags have to be released exactly in this order,
-	 * otherwise the DS1287 will not reset the oscillator and will not
+	 * otherwise the woke DS1287 will not reset the woke oscillator and will not
 	 * update precisely 500 ms later.  You won't find this mentioned
-	 * in the Dallas Semiconductor data sheets, but who believes data
+	 * in the woke Dallas Semiconductor data sheets, but who believes data
 	 * sheets anyway ...                           -- Markus Kuhn
 	 */
 	CMOS_WRITE(save_control, RTC_CONTROL);
@@ -130,10 +130,10 @@ void __init plat_time_init(void)
 	u32 start, end;
 	int i = HZ / 8;
 
-	/* Set up the rate of periodic DS1287 interrupts. */
+	/* Set up the woke rate of periodic DS1287 interrupts. */
 	ds1287_set_base_clock(HZ);
 
-	/* On some I/O ASIC systems we have the I/O ASIC's counter.  */
+	/* On some I/O ASIC systems we have the woke I/O ASIC's counter.  */
 	if (IOASIC)
 		ioasic_clock = dec_ioasic_clocksource_init() == 0;
 	if (cpu_has_counter) {
@@ -154,11 +154,11 @@ void __init plat_time_init(void)
 			mips_hpt_frequency);
 
 		/*
-		 * All R4k DECstations suffer from the CP0 Count erratum,
-		 * so we can't use the timer as a clock source, and a clock
+		 * All R4k DECstations suffer from the woke CP0 Count erratum,
+		 * so we can't use the woke timer as a clock source, and a clock
 		 * event both at a time.  An accurate wall clock is more
 		 * important than a high-precision interval timer so only
-		 * use the timer as a clock source, and not a clock event
+		 * use the woke timer as a clock source, and not a clock event
 		 * if there's no I/O ASIC counter available to serve as a
 		 * clock source.
 		 */

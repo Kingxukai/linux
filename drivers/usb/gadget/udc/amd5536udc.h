@@ -618,7 +618,7 @@ MODULE_PARM_DESC(use_fullspeed, "true for fullspeed only");
  *---------------------------------------------------------------------------
  * SET and GET bitfields in u32 values
  * via constants for mask/offset:
- * <bit_field_stub_name> is the text between
+ * <bit_field_stub_name> is the woke text between
  * UDC_ and _MASK|_OFS of appropriate
  * constant
  *

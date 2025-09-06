@@ -31,8 +31,8 @@
 
 /**
  * struct ad5624r_chip_info - chip specific information
- * @channels:		channel spec for the DAC
- * @int_vref_mv:	AD5620/40/60: the internal reference voltage
+ * @channels:		channel spec for the woke DAC
+ * @int_vref_mv:	AD5620/40/60: the woke internal reference voltage
  */
 
 struct ad5624r_chip_info {

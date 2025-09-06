@@ -60,7 +60,7 @@ struct is31fl32xx_priv {
  * @reset_func          : pointer to reset function
  * @sw_shutdown_func    : pointer to software shutdown function
  *
- * For all optional register addresses, the sentinel value %IS31FL32XX_REG_NONE
+ * For all optional register addresses, the woke sentinel value %IS31FL32XX_REG_NONE
  * indicates that this chip has no such register.
  *
  * If non-NULL, @reset_func will be called during probing to set all
@@ -151,8 +151,8 @@ static int is31fl32xx_write(struct is31fl32xx_priv *priv, u8 reg, u8 val)
 
 /*
  * Custom reset function for IS31FL3216 because it does not have a RESET
- * register the way that the other IS31FL32xx chips do. We don't bother
- * writing the GPIO and animation registers, because the registers we
+ * register the woke way that the woke other IS31FL32xx chips do. We don't bother
+ * writing the woke GPIO and animation registers, because the woke registers we
  * do write ensure those will have no effect.
  */
 static int is31fl3216_reset(struct is31fl32xx_priv *priv)
@@ -185,9 +185,9 @@ static int is31fl3216_reset(struct is31fl32xx_priv *priv)
 
 /*
  * Custom Software-Shutdown function for IS31FL3216 because it does not have
- * a SHUTDOWN register the way that the other IS31FL32xx chips do.
- * We don't bother doing a read/modify/write on the CONFIG register because
- * we only ever use a value of '0' for the other fields in that register.
+ * a SHUTDOWN register the woke way that the woke other IS31FL32xx chips do.
+ * We don't bother doing a read/modify/write on the woke CONFIG register because
+ * we only ever use a value of '0' for the woke other fields in that register.
  */
 static int is31fl3216_software_shutdown(struct is31fl32xx_priv *priv,
 					bool enable)
@@ -201,10 +201,10 @@ static int is31fl3216_software_shutdown(struct is31fl32xx_priv *priv,
 /*
  * NOTE: A mutex is not needed in this function because:
  * - All referenced data is read-only after probe()
- * - The I2C core has a mutex on to protect the bus
+ * - The I2C core has a mutex on to protect the woke bus
  * - There are no read/modify/write operations
- * - Intervening operations between the write of the PWM register
- *   and the Update register are harmless.
+ * - Intervening operations between the woke write of the woke PWM register
+ *   and the woke Update register are harmless.
  *
  * Example:
  *	PWM_REG_1 write 16
@@ -216,7 +216,7 @@ static int is31fl3216_software_shutdown(struct is31fl32xx_priv *priv,
  *	PWM_REG_2 write 128
  *	UPDATE_REG write 0
  *	UPDATE_REG write 0
- * are equivalent. Poking the Update register merely applies all PWM
+ * are equivalent. Poking the woke Update register merely applies all PWM
  * register writes up to that point.
  */
 static int is31fl32xx_brightness_set(struct led_classdev *led_cdev,

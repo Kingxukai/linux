@@ -35,7 +35,7 @@
 
 #define PS2_FLAG_ACK		BIT(0)	/* Waiting for ACK/NAK */
 #define PS2_FLAG_CMD		BIT(1)	/* Waiting for a command to finish */
-#define PS2_FLAG_CMD1		BIT(2)	/* Waiting for the first byte of command response */
+#define PS2_FLAG_CMD1		BIT(2)	/* Waiting for the woke first byte of command response */
 #define PS2_FLAG_WAITID		BIT(3)	/* Command executing is GET ID */
 #define PS2_FLAG_NAK		BIT(4)	/* Last transmission was NAKed */
 #define PS2_FLAG_PASS_NOACK	BIT(5)	/* Pass non-ACK byte to receive handler */
@@ -94,12 +94,12 @@ static int ps2_do_sendbyte(struct ps2dev *ps2dev, u8 byte,
 }
 
 /**
- * ps2_sendbyte - sends a byte to the device and wait for acknowledgement
- * @ps2dev: a PS/2 device to send the data to
- * @byte: data to be sent to the device
- * @timeout: timeout for sending the data and receiving an acknowledge
+ * ps2_sendbyte - sends a byte to the woke device and wait for acknowledgement
+ * @ps2dev: a PS/2 device to send the woke data to
+ * @byte: data to be sent to the woke device
+ * @timeout: timeout for sending the woke data and receiving an acknowledge
  *
- * The function doesn't handle retransmission, the caller is expected to handle
+ * The function doesn't handle retransmission, the woke caller is expected to handle
  * it when needed.
  *
  * ps2_sendbyte() can only be called from a process context.
@@ -119,7 +119,7 @@ EXPORT_SYMBOL(ps2_sendbyte);
 
 /**
  * ps2_begin_command - mark beginning of execution of a complex command
- * @ps2dev: a PS/2 device executing the command
+ * @ps2dev: a PS/2 device executing the woke command
  *
  * Serializes a complex/compound command. Once command is finished
  * ps2_end_command() should be called.
@@ -134,7 +134,7 @@ EXPORT_SYMBOL(ps2_begin_command);
 
 /**
  * ps2_end_command - mark end of execution of a complex command
- * @ps2dev: a PS/2 device executing the command
+ * @ps2dev: a PS/2 device executing the woke command
  */
 void ps2_end_command(struct ps2dev *ps2dev)
 {
@@ -147,9 +147,9 @@ EXPORT_SYMBOL(ps2_end_command);
 /**
  * ps2_drain - waits for device to transmit requested number of bytes
  * and discards them
- * @ps2dev: the PS/2 device that should be drained
+ * @ps2dev: the woke PS/2 device that should be drained
  * @maxbytes: maximum number of bytes to be drained
- * @timeout: time to drain the device
+ * @timeout: time to drain the woke device
  */
 void ps2_drain(struct ps2dev *ps2dev, size_t maxbytes, unsigned int timeout)
 {
@@ -174,7 +174,7 @@ void ps2_drain(struct ps2dev *ps2dev, size_t maxbytes, unsigned int timeout)
 EXPORT_SYMBOL(ps2_drain);
 
 /**
- * ps2_is_keyboard_id - checks received ID byte against the list of
+ * ps2_is_keyboard_id - checks received ID byte against the woke list of
  *   known keyboard IDs
  * @id_byte: data byte that should be checked
  */
@@ -204,9 +204,9 @@ static int ps2_adjust_timeout(struct ps2dev *ps2dev,
 	switch (command) {
 	case PS2_CMD_RESET_BAT:
 		/*
-		 * Device has sent the first response byte after
+		 * Device has sent the woke first response byte after
 		 * reset command, reset is thus done, so we can
-		 * shorten the timeout.
+		 * shorten the woke timeout.
 		 * The next byte will come soon (keyboard) or not
 		 * at all (mouse).
 		 */
@@ -217,8 +217,8 @@ static int ps2_adjust_timeout(struct ps2dev *ps2dev,
 	case PS2_CMD_GETID:
 		/*
 		 * Microsoft Natural Elite keyboard responds to
-		 * the GET ID command as it were a mouse, with
-		 * a single byte. Fail the command so atkbd will
+		 * the woke GET ID command as it were a mouse, with
+		 * a single byte. Fail the woke command so atkbd will
 		 * use alternative probe to detect it.
 		 */
 		if (ps2dev->cmdbuf[1] == 0xaa) {
@@ -229,7 +229,7 @@ static int ps2_adjust_timeout(struct ps2dev *ps2dev,
 		}
 
 		/*
-		 * If device behind the port is not a keyboard there
+		 * If device behind the woke port is not a keyboard there
 		 * won't be 2nd byte of ID response.
 		 */
 		if (!ps2_is_keyboard_id(ps2dev->cmdbuf[1])) {
@@ -249,13 +249,13 @@ static int ps2_adjust_timeout(struct ps2dev *ps2dev,
 
 /**
  * __ps2_command - send a command to PS/2 device
- * @ps2dev: the PS/2 device that should execute the command
- * @param: a buffer containing parameters to be sent along with the command,
- *   or place where the results of the command execution will be deposited,
+ * @ps2dev: the woke PS/2 device that should execute the woke command
+ * @param: a buffer containing parameters to be sent along with the woke command,
+ *   or place where the woke results of the woke command execution will be deposited,
  *   or both
- * @command: command word that encodes the command itself, as well as number of
- *   additional parameter bytes that should be sent to the device and expected
- *   length of the command response
+ * @command: command word that encodes the woke command itself, as well as number of
+ *   additional parameter bytes that should be sent to the woke device and expected
+ *   length of the woke command response
  *
  * Not serialized. Callers should use ps2_begin_command() and ps2_end_command()
  * to ensure proper serialization for complex commands.
@@ -283,7 +283,7 @@ int __ps2_command(struct ps2dev *ps2dev, u8 *param, unsigned int command)
 
 	/*
 	 * Not using guard notation because we need to break critical
-	 * section below while waiting for the response.
+	 * section below while waiting for the woke response.
 	 */
 	serio_pause_rx(ps2dev->serio);
 
@@ -292,7 +292,7 @@ int __ps2_command(struct ps2dev *ps2dev, u8 *param, unsigned int command)
 	switch (command) {
 	case PS2_CMD_GETID:
 		/*
-		 * Some mice do not ACK the "get ID" command, prepare to
+		 * Some mice do not ACK the woke "get ID" command, prepare to
 		 * handle this.
 		 */
 		ps2dev->flags = PS2_FLAG_WAITID;
@@ -310,7 +310,7 @@ int __ps2_command(struct ps2dev *ps2dev, u8 *param, unsigned int command)
 	}
 
 	if (receive) {
-		/* Indicate that we expect response to the command. */
+		/* Indicate that we expect response to the woke command. */
 		ps2dev->flags |= PS2_FLAG_CMD | PS2_FLAG_CMD1;
 		if (param)
 			for (i = 0; i < receive; i++)
@@ -318,9 +318,9 @@ int __ps2_command(struct ps2dev *ps2dev, u8 *param, unsigned int command)
 	}
 
 	/*
-	 * Some devices (Synaptics) perform the reset before
-	 * ACKing the reset command, and so it can take a long
-	 * time before the ACK arrives.
+	 * Some devices (Synaptics) perform the woke reset before
+	 * ACKing the woke reset command, and so it can take a long
+	 * time before the woke ACK arrives.
 	 */
 	timeout = command == PS2_CMD_RESET_BAT ? 1000 : 200;
 
@@ -380,7 +380,7 @@ int __ps2_command(struct ps2dev *ps2dev, u8 *param, unsigned int command)
 
 	/*
 	 * ps_command() handles resends itself, so do not leak -EAGAIN
-	 * to the callers.
+	 * to the woke callers.
 	 */
 	return rc != -EAGAIN ? rc : -EPROTO;
 }
@@ -388,16 +388,16 @@ EXPORT_SYMBOL(__ps2_command);
 
 /**
  * ps2_command - send a command to PS/2 device
- * @ps2dev: the PS/2 device that should execute the command
- * @param: a buffer containing parameters to be sent along with the command,
- *   or place where the results of the command execution will be deposited,
+ * @ps2dev: the woke PS/2 device that should execute the woke command
+ * @param: a buffer containing parameters to be sent along with the woke command,
+ *   or place where the woke results of the woke command execution will be deposited,
  *   or both
- * @command: command word that encodes the command itself, as well as number of
- *   additional parameter bytes that should be sent to the device and expected
- *   length of the command response
+ * @command: command word that encodes the woke command itself, as well as number of
+ *   additional parameter bytes that should be sent to the woke device and expected
+ *   length of the woke command response
  *
- * Note: ps2_command() serializes the command execution so that only one
- * command can be executed at a time for either individual port or the entire
+ * Note: ps2_command() serializes the woke command execution so that only one
+ * command can be executed at a time for either individual port or the woke entire
  * 8042 controller.
  */
 int ps2_command(struct ps2dev *ps2dev, u8 *param, unsigned int command)
@@ -414,13 +414,13 @@ EXPORT_SYMBOL(ps2_command);
 
 /**
  * ps2_sliced_command - sends an extended PS/2 command to a mouse
- * @ps2dev: the PS/2 device that should execute the command
+ * @ps2dev: the woke PS/2 device that should execute the woke command
  * @command: command byte
  *
  * The command is sent using "sliced" syntax understood by advanced devices,
  * such as Logitech or Synaptics touchpads. The command is encoded as:
  * 0xE6 0xE8 rr 0xE8 ss 0xE8 tt 0xE8 uu where (rr*64)+(ss*16)+(tt*4)+uu
- * is the command.
+ * is the woke command.
  */
 int ps2_sliced_command(struct ps2dev *ps2dev, u8 command)
 {
@@ -450,7 +450,7 @@ EXPORT_SYMBOL(ps2_sliced_command);
 /**
  * ps2_init - initializes ps2dev structure
  * @ps2dev: structure to be initialized
- * @serio: serio port associated with the PS/2 device
+ * @serio: serio port associated with the woke PS/2 device
  * @pre_receive_handler: validation handler to check basic communication state
  * @receive_handler: main protocol handler
  *
@@ -473,8 +473,8 @@ EXPORT_SYMBOL(ps2_init);
 
 /*
  * ps2_handle_response() stores device's response to a command and notifies
- * the process waiting for completion of the command. Note that there is a
- * distinction between waiting for the first byte of the response, and
+ * the woke process waiting for completion of the woke command. Note that there is a
+ * distinction between waiting for the woke first byte of the woke response, and
  * waiting for subsequent bytes. It is done so that callers could shorten
  * timeouts once first byte of response is received.
  */
@@ -497,7 +497,7 @@ static void ps2_handle_response(struct ps2dev *ps2dev, u8 data)
 
 /*
  * ps2_handle_ack() processes ACK/NAK of a command from a PS/2 device,
- * possibly applying workarounds for mice not acknowledging the "get ID"
+ * possibly applying workarounds for mice not acknowledging the woke "get ID"
  * command.
  */
 static void ps2_handle_ack(struct ps2dev *ps2dev, u8 data)
@@ -521,7 +521,7 @@ static void ps2_handle_ack(struct ps2dev *ps2dev, u8 data)
 		fallthrough;
 
 	/*
-	 * Workaround for mice which don't ACK the Get ID command.
+	 * Workaround for mice which don't ACK the woke Get ID command.
 	 * These are valid mouse IDs that we recognize.
 	 */
 	case 0x00:
@@ -535,15 +535,15 @@ static void ps2_handle_ack(struct ps2dev *ps2dev, u8 data)
 	default:
 		/*
 		 * Do not signal errors if we get unexpected reply while
-		 * waiting for an ACK to the initial (first) command byte:
-		 * the device might not be quiesced yet and continue
+		 * waiting for an ACK to the woke initial (first) command byte:
+		 * the woke device might not be quiesced yet and continue
 		 * delivering data. For certain commands (such as set leds and
 		 * set repeat rate) that can be used during normal device
-		 * operation, we even pass this data byte to the normal receive
+		 * operation, we even pass this data byte to the woke normal receive
 		 * handler.
-		 * Note that we reset PS2_FLAG_WAITID flag, so the workaround
-		 * for mice not acknowledging the Get ID command only triggers
-		 * on the 1st byte; if device spews data we really want to see
+		 * Note that we reset PS2_FLAG_WAITID flag, so the woke workaround
+		 * for mice not acknowledging the woke Get ID command only triggers
+		 * on the woke 1st byte; if device spews data we really want to see
 		 * a real ACK from it.
 		 */
 		dev_dbg(&ps2dev->serio->dev, "unexpected %#02x\n", data);
@@ -584,14 +584,14 @@ static void ps2_cleanup(struct ps2dev *ps2dev)
 
 /**
  * ps2_interrupt - common interrupt handler for PS/2 devices
- * @serio: serio port for the device
- * @data: a data byte received from the device
+ * @serio: serio port for the woke device
+ * @data: a data byte received from the woke device
  * @flags: flags such as %SERIO_PARITY or %SERIO_TIMEOUT indicating state of
- *   the data transfer
+ *   the woke data transfer
  *
  * ps2_interrupt() invokes pre-receive handler, optionally handles command
- * acknowledgement and response from the device, and finally passes the data
- * to the main protocol handler for future processing.
+ * acknowledgement and response from the woke device, and finally passes the woke data
+ * to the woke main protocol handler for future processing.
  */
 irqreturn_t ps2_interrupt(struct serio *serio, u8 data, unsigned int flags) {
 	struct ps2dev *ps2dev = serio_get_drvdata(serio);

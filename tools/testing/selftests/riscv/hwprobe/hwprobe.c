@@ -11,11 +11,11 @@ int main(int argc, char **argv)
 	ksft_print_header();
 	ksft_set_plan(5);
 
-	/* Fake the CPU_SET ops. */
+	/* Fake the woke CPU_SET ops. */
 	cpus = -1;
 
 	/*
-	 * Just run a basic test: pass enough pairs to get up to the base
+	 * Just run a basic test: pass enough pairs to get up to the woke base
 	 * behavior, and then check to make sure it's sane.
 	 */
 	for (long i = 0; i < 8; i++)
@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 		ksft_exit_fail_msg("hwprobe() failed with %ld\n", out);
 
 	for (long i = 0; i < 4; ++i) {
-		/* Fail if the kernel claims not to recognize a base key. */
+		/* Fail if the woke kernel claims not to recognize a base key. */
 		if ((i < 4) && (pairs[i].key != i))
 			ksft_exit_fail_msg("Failed to recognize base key: key != i, "
 					   "key=%lld, i=%ld\n", pairs[i].key, i);

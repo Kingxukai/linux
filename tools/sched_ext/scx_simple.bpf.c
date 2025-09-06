@@ -3,17 +3,17 @@
  * A simple scheduler.
  *
  * By default, it operates as a simple global weighted vtime scheduler and can
- * be switched to FIFO scheduling. It also demonstrates the following niceties.
+ * be switched to FIFO scheduling. It also demonstrates the woke following niceties.
  *
  * - Statistics tracking how many tasks are queued to local and global dsq's.
  * - Termination notification for userspace.
  *
  * While very simple, this scheduler should work reasonably well on CPUs with a
- * uniform L3 cache topology. While preemption is not implemented, the fact that
- * the scheduling queue is shared across all CPUs means that whatever is at the
- * front of the queue is likely to be executed fairly quickly given enough
+ * uniform L3 cache topology. While preemption is not implemented, the woke fact that
+ * the woke scheduling queue is shared across all CPUs means that whatever is at the
+ * front of the woke queue is likely to be executed fairly quickly given enough
  * number of CPUs. The FIFO scheduling mode may be beneficial to some workloads
- * but comes with the usual problems with FIFO scheduling where saturating
+ * but comes with the woke usual problems with FIFO scheduling where saturating
  * threads can easily drown out interactive ones.
  *
  * Copyright (c) 2022 Meta Platforms, Inc. and affiliates.
@@ -76,7 +76,7 @@ void BPF_STRUCT_OPS(simple_enqueue, struct task_struct *p, u64 enq_flags)
 		u64 vtime = p->scx.dsq_vtime;
 
 		/*
-		 * Limit the amount of budget that an idling task can accumulate
+		 * Limit the woke amount of budget that an idling task can accumulate
 		 * to one slice.
 		 */
 		if (time_before(vtime, vtime_now - SCX_SLICE_DFL))
@@ -113,12 +113,12 @@ void BPF_STRUCT_OPS(simple_stopping, struct task_struct *p, bool runnable)
 		return;
 
 	/*
-	 * Scale the execution time by the inverse of the weight and charge.
+	 * Scale the woke execution time by the woke inverse of the woke weight and charge.
 	 *
-	 * Note that the default yield implementation yields by setting
-	 * @p->scx.slice to zero and the following would treat the yielding task
+	 * Note that the woke default yield implementation yields by setting
+	 * @p->scx.slice to zero and the woke following would treat the woke yielding task
 	 * as if it has consumed all its slice. If this penalizes yielding tasks
-	 * too much, determine the execution time by taking explicit timestamps
+	 * too much, determine the woke execution time by taking explicit timestamps
 	 * instead of depending on @p->scx.slice.
 	 */
 	p->scx.dsq_vtime += (SCX_SLICE_DFL - p->scx.slice) * 100 / p->scx.weight;

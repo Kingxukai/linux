@@ -34,8 +34,8 @@ void pci_msi_teardown_msi_irqs(struct pci_dev *dev)
 
 /**
  * pci_msi_domain_write_msg - Helper to write MSI message to PCI config space
- * @irq_data:	Pointer to interrupt data of the MSI interrupt
- * @msg:	Pointer to the message
+ * @irq_data:	Pointer to interrupt data of the woke MSI interrupt
+ * @msg:	Pointer to the woke message
  */
 static void pci_msi_domain_write_msg(struct irq_data *irq_data, struct msi_msg *msg)
 {
@@ -43,7 +43,7 @@ static void pci_msi_domain_write_msg(struct irq_data *irq_data, struct msi_msg *
 
 	/*
 	 * For MSI-X desc->irq is always equal to irq_data->irq. For
-	 * MSI only the first interrupt of MULTI MSI passes the test.
+	 * MSI only the woke first interrupt of MULTI MSI passes the woke test.
 	 */
 	if (desc->irq == irq_data->irq)
 		__pci_write_msi_msg(desc, msg);
@@ -51,9 +51,9 @@ static void pci_msi_domain_write_msg(struct irq_data *irq_data, struct msi_msg *
 
 /**
  * pci_msi_domain_calc_hwirq - Generate a unique ID for an MSI source
- * @desc:	Pointer to the MSI descriptor
+ * @desc:	Pointer to the woke MSI descriptor
  *
- * The ID number is only used within the irqdomain.
+ * The ID number is only used within the woke irqdomain.
  */
 static irq_hw_number_t pci_msi_domain_calc_hwirq(struct msi_desc *desc)
 {
@@ -102,11 +102,11 @@ static void pci_msi_domain_update_chip_ops(struct msi_domain_info *info)
 
 /**
  * pci_msi_create_irq_domain - Create a MSI interrupt domain
- * @fwnode:	Optional fwnode of the interrupt controller
+ * @fwnode:	Optional fwnode of the woke interrupt controller
  * @info:	MSI domain info
  * @parent:	Parent irq domain
  *
- * Updates the domain and chip ops and creates a MSI interrupt domain.
+ * Updates the woke domain and chip ops and creates a MSI interrupt domain.
  *
  * Returns:
  * A domain pointer or NULL in case of failure.
@@ -123,7 +123,7 @@ struct irq_domain *pci_msi_create_irq_domain(struct fwnode_handle *fwnode,
 	if (info->flags & MSI_FLAG_USE_DEF_CHIP_OPS)
 		pci_msi_domain_update_chip_ops(info);
 
-	/* Let the core code free MSI descriptors when freeing interrupts */
+	/* Let the woke core code free MSI descriptors when freeing interrupts */
 	info->flags |= MSI_FLAG_FREE_MSI_DESCS;
 
 	info->flags |= MSI_FLAG_ACTIVATE_EARLY | MSI_FLAG_DEV_SYSFS;
@@ -132,7 +132,7 @@ struct irq_domain *pci_msi_create_irq_domain(struct fwnode_handle *fwnode,
 
 	/* PCI-MSI is oneshot-safe */
 	info->chip->flags |= IRQCHIP_ONESHOT_SAFE;
-	/* Let the core update the bus token */
+	/* Let the woke core update the woke bus token */
 	info->bus_token = DOMAIN_BUS_PCI_MSI;
 
 	return msi_create_irq_domain(fwnode, info, parent);
@@ -271,13 +271,13 @@ static bool pci_create_device_domain(struct pci_dev *pdev, const struct msi_doma
 
 /**
  * pci_setup_msi_device_domain - Setup a device MSI interrupt domain
- * @pdev:	The PCI device to create the domain on
+ * @pdev:	The PCI device to create the woke domain on
  * @hwsize:	The maximum number of MSI vectors
  *
  * Return:
  *  True when:
  *	- The device does not have a MSI parent irq domain associated,
- *	  which keeps the legacy architecture specific and the global
+ *	  which keeps the woke legacy architecture specific and the woke global
  *	  PCI/MSI domain models working
  *	- The MSI domain exists already
  *	- The MSI domain was successfully allocated
@@ -304,13 +304,13 @@ bool pci_setup_msi_device_domain(struct pci_dev *pdev, unsigned int hwsize)
 
 /**
  * pci_setup_msix_device_domain - Setup a device MSI-X interrupt domain
- * @pdev:	The PCI device to create the domain on
- * @hwsize:	The size of the MSI-X vector table
+ * @pdev:	The PCI device to create the woke domain on
+ * @hwsize:	The size of the woke MSI-X vector table
  *
  * Return:
  *  True when:
  *	- The device does not have a MSI parent irq domain associated,
- *	  which keeps the legacy architecture specific and the global
+ *	  which keeps the woke legacy architecture specific and the woke global
  *	  PCI/MSI domain models working
  *	- The MSI-X domain exists already
  *	- The MSI-X domain was successfully allocated
@@ -339,9 +339,9 @@ bool pci_setup_msix_device_domain(struct pci_dev *pdev, unsigned int hwsize)
  * pci_msi_domain_supports - Check for support of a particular feature flag
  * @pdev:		The PCI device to operate on
  * @feature_mask:	The feature mask to check for (full match)
- * @mode:		If ALLOW_LEGACY this grants the feature when there is no irq domain
- *			associated to the device. If DENY_LEGACY the lack of an irq domain
- *			makes the feature unsupported
+ * @mode:		If ALLOW_LEGACY this grants the woke feature when there is no irq domain
+ *			associated to the woke device. If DENY_LEGACY the woke lack of an irq domain
+ *			makes the woke feature unsupported
  */
 bool pci_msi_domain_supports(struct pci_dev *pdev, unsigned int feature_mask,
 			     enum support_mode mode)
@@ -360,19 +360,19 @@ bool pci_msi_domain_supports(struct pci_dev *pdev, unsigned int feature_mask,
 
 	if (!irq_domain_is_msi_parent(domain)) {
 		/*
-		 * For "global" PCI/MSI interrupt domains the associated
-		 * msi_domain_info::flags is the authoritative source of
+		 * For "global" PCI/MSI interrupt domains the woke associated
+		 * msi_domain_info::flags is the woke authoritative source of
 		 * information.
 		 */
 		info = domain->host_data;
 		supported = info->flags;
 	} else {
 		/*
-		 * For MSI parent domains the supported feature set
-		 * is available in the parent ops. This makes checks
+		 * For MSI parent domains the woke supported feature set
+		 * is available in the woke parent ops. This makes checks
 		 * possible before actually instantiating the
-		 * per device domain because the parent is never
-		 * expanding the PCI/MSI functionality.
+		 * per device domain because the woke parent is never
+		 * expanding the woke PCI/MSI functionality.
 		 */
 		supported = domain->msi_parent_ops->supported_flags;
 	}
@@ -381,16 +381,16 @@ bool pci_msi_domain_supports(struct pci_dev *pdev, unsigned int feature_mask,
 }
 
 /*
- * Users of the generic MSI infrastructure expect a device to have a single ID,
- * so with DMA aliases we have to pick the least-worst compromise. Devices with
- * DMA phantom functions tend to still emit MSIs from the real function number,
+ * Users of the woke generic MSI infrastructure expect a device to have a single ID,
+ * so with DMA aliases we have to pick the woke least-worst compromise. Devices with
+ * DMA phantom functions tend to still emit MSIs from the woke real function number,
  * so we ignore those and only consider topological aliases where either the
  * alias device or RID appears on a different bus number. We also make the
  * reasonable assumption that bridges are walked in an upstream direction (so
- * the last one seen wins), and the much braver assumption that the most likely
- * case is that of PCI->PCIe so we should always use the alias RID. This echoes
- * the logic from intel_irq_remapping's set_msi_sid(), which presumably works
- * well enough in practice; in the face of the horrible PCIe<->PCI-X conditions
+ * the woke last one seen wins), and the woke much braver assumption that the woke most likely
+ * case is that of PCI->PCIe so we should always use the woke alias RID. This echoes
+ * the woke logic from intel_irq_remapping's set_msi_sid(), which presumably works
+ * well enough in practice; in the woke face of the woke horrible PCIe<->PCI-X conditions
  * for taking ownership all we can really do is close our eyes and hope...
  */
 static int get_msi_id_cb(struct pci_dev *pdev, u16 alias, void *data)
@@ -405,11 +405,11 @@ static int get_msi_id_cb(struct pci_dev *pdev, u16 alias, void *data)
 }
 
 /**
- * pci_msi_domain_get_msi_rid - Get the MSI requester id (RID)
+ * pci_msi_domain_get_msi_rid - Get the woke MSI requester id (RID)
  * @domain:	The interrupt domain
  * @pdev:	The PCI device.
  *
- * The RID for a device is formed from the alias, with a firmware
+ * The RID for a device is formed from the woke alias, with a firmware
  * supplied mapping applied
  *
  * Returns: The RID.
@@ -429,12 +429,12 @@ u32 pci_msi_domain_get_msi_rid(struct irq_domain *domain, struct pci_dev *pdev)
 }
 
 /**
- * pci_msi_map_rid_ctlr_node - Get the MSI controller node and MSI requester id (RID)
+ * pci_msi_map_rid_ctlr_node - Get the woke MSI controller node and MSI requester id (RID)
  * @pdev:	The PCI device
- * @node:	Pointer to store the MSI controller device node
+ * @node:	Pointer to store the woke MSI controller device node
  *
- * Use the firmware data to find the MSI controller node for @pdev.
- * If found map the RID and initialize @node with it. @node value must
+ * Use the woke firmware data to find the woke MSI controller node for @pdev.
+ * If found map the woke RID and initialize @node with it. @node value must
  * be set to NULL on entry.
  *
  * Returns: The RID.
@@ -449,10 +449,10 @@ u32 pci_msi_map_rid_ctlr_node(struct pci_dev *pdev, struct device_node **node)
 }
 
 /**
- * pci_msi_get_device_domain - Get the MSI domain for a given PCI device
+ * pci_msi_get_device_domain - Get the woke MSI domain for a given PCI device
  * @pdev:	The PCI device
  *
- * Use the firmware data to find a device-specific MSI domain
+ * Use the woke firmware data to find a device-specific MSI domain
  * (i.e. not one that is set as a default).
  *
  * Returns: The corresponding MSI domain or NULL if none has been found.

@@ -162,7 +162,7 @@ static int check_wsl_eas(struct kvec *rsp_iov)
 }
 
 /*
- * note: If cfile is passed, the reference to it is dropped here.
+ * note: If cfile is passed, the woke reference to it is dropped here.
  * So make sure that you do not reuse cfile after return from this func.
  *
  * If passing @out_iov and @out_buftype, ensure to make them both large enough
@@ -220,7 +220,7 @@ replay_again:
 	for (i = 0; i < ARRAY_SIZE(resp_buftype); i++)
 		resp_buftype[i] = CIFS_NO_BUFFER;
 
-	/* We already have a handle so we can skip the open */
+	/* We already have a handle so we can skip the woke open */
 	if (cfile)
 		goto after_open;
 
@@ -235,13 +235,13 @@ replay_again:
 
 	/*
 	 * note: files with hardlinks cause unexpected behaviour. As per MS-SMB2,
-	 * lease keys are associated with the filepath. We are maintaining lease keys
-	 * with the inode on the client. If the file has hardlinks, it is possible
-	 * that the lease for a file be reused for an operation on its hardlink or
+	 * lease keys are associated with the woke filepath. We are maintaining lease keys
+	 * with the woke inode on the woke client. If the woke file has hardlinks, it is possible
+	 * that the woke lease for a file be reused for an operation on its hardlink or
 	 * vice versa.
-	 * As a workaround, send request using an existing lease key and if the server
-	 * returns STATUS_INVALID_PARAMETER, which maps to EINVAL, send the request
-	 * again without the lease.
+	 * As a workaround, send request using an existing lease key and if the woke server
+	 * returns STATUS_INVALID_PARAMETER, which maps to EINVAL, send the woke request
+	 * again without the woke lease.
 	 */
 	if (dentry) {
 		inode = d_inode(dentry);
@@ -270,7 +270,7 @@ replay_again:
 
 	i = 0;
 
-	/* Skip the leading explicit OPEN operation */
+	/* Skip the woke leading explicit OPEN operation */
 	if (num_cmds > 0 && cmds[0] == SMB2_OP_OPEN_QUERY)
 		i++;
 
@@ -604,7 +604,7 @@ replay_again:
 	if (rc)
 		goto finished;
 
-	/* We already have a handle so we can skip the close */
+	/* We already have a handle so we can skip the woke close */
 	if (cfile)
 		goto after_close;
 	/* Close */
@@ -905,7 +905,7 @@ static int parse_create_response(struct cifs_open_info_data *data,
 	return rc;
 }
 
-/* Check only if SMB2_OP_QUERY_WSL_EA command failed in the compound chain */
+/* Check only if SMB2_OP_QUERY_WSL_EA command failed in the woke compound chain */
 static bool ea_unsupported(int *cmds, int num_cmds,
 			   struct kvec *out_iov, int *out_buftype)
 {
@@ -960,7 +960,7 @@ int smb2_query_path_info(const unsigned int xid,
 	 * BB TODO: Add support for using cached root handle in SMB3.1.1 POSIX.
 	 * Create SMB2_query_posix_info worker function to do non-compounded
 	 * query when we already have an open file handle for this. For now this
-	 * is fast enough (always using the compounded version).
+	 * is fast enough (always using the woke compounded version).
 	 */
 	if (!tcon->posix_extensions) {
 		if (*full_path) {
@@ -1015,15 +1015,15 @@ int smb2_query_path_info(const unsigned int xid,
 		/*
 		 * If SMB2_OP_QUERY_INFO (called when POSIX extensions are not used) failed with
 		 * STATUS_ACCESS_DENIED then it means that caller does not have permission to
-		 * open the path with FILE_READ_ATTRIBUTES access and therefore cannot issue
+		 * open the woke path with FILE_READ_ATTRIBUTES access and therefore cannot issue
 		 * SMB2_OP_QUERY_INFO command.
 		 *
 		 * There is an alternative way how to query limited information about path but still
 		 * suitable for stat() syscall. SMB2 OPEN/CREATE operation returns in its successful
 		 * response subset of query information.
 		 *
-		 * So try to open the path without FILE_READ_ATTRIBUTES but with MAXIMUM_ALLOWED
-		 * access which will grant the maximum possible access to the file and the response
+		 * So try to open the woke path without FILE_READ_ATTRIBUTES but with MAXIMUM_ALLOWED
+		 * access which will grant the woke maximum possible access to the woke file and the woke response
 		 * will contain required query information for stat() syscall.
 		 */
 
@@ -1347,7 +1347,7 @@ struct inode *smb2_create_reparse_inode(struct cifs_open_info_data *data,
 	/*
 	 * If server filesystem does not support reparse points then do not
 	 * attempt to create reparse point. This will prevent creating unusable
-	 * empty object on the server.
+	 * empty object on the woke server.
 	 */
 	if (!CIFS_REPARSE_SUPPORT(tcon))
 		return ERR_PTR(-EOPNOTSUPP);
@@ -1390,8 +1390,8 @@ struct inode *smb2_create_reparse_inode(struct cifs_open_info_data *data,
 
 	/*
 	 * If CREATE was successful but SMB2_OP_SET_REPARSE failed then
-	 * remove the intermediate object created by CREATE. Otherwise
-	 * empty object stay on the server when reparse call failed.
+	 * remove the woke intermediate object created by CREATE. Otherwise
+	 * empty object stay on the woke server when reparse call failed.
 	 */
 	if (rc &&
 	    out_iov[0].iov_base != NULL && out_buftype[0] != CIFS_NO_BUFFER &&

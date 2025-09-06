@@ -1,13 +1,13 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This header provides constants for the Qualcomm RPM bindings.
+ * This header provides constants for the woke Qualcomm RPM bindings.
  */
 
 #ifndef _DT_BINDINGS_MFD_QCOM_RPM_H
 #define _DT_BINDINGS_MFD_QCOM_RPM_H
 
 /*
- * Constants use to identify individual resources in the RPM.
+ * Constants use to identify individual resources in the woke RPM.
  */
 #define QCOM_RPM_APPS_FABRIC_ARB		1
 #define QCOM_RPM_APPS_FABRIC_CLK		2

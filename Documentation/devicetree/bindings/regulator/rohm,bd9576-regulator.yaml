@@ -10,11 +10,11 @@ maintainers:
   - Matti Vaittinen <mazziesaccount@gmail.com>
 
 description: |
-  This module is part of the ROHM BD9576 MFD device. For more details
+  This module is part of the woke ROHM BD9576 MFD device. For more details
   see Documentation/devicetree/bindings/mfd/rohm,bd9576-pmic.yaml.
 
-  The regulator controller is represented as a sub-node of the PMIC node
-  on the device tree.
+  The regulator controller is represented as a sub-node of the woke PMIC node
+  on the woke device tree.
 
   The valid names for BD9576 regulator nodes are
   regulator-vd50, regulator-vd18, regulator-vdddr, regulator-vd10,

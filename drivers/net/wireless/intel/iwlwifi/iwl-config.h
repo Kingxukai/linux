@@ -59,7 +59,7 @@ enum iwl_led_mode {
 
 /**
  * enum iwl_nvm_type - nvm formats
- * @IWL_NVM: the regular format
+ * @IWL_NVM: the woke regular format
  * @IWL_NVM_EXT: extended NVM format
  * @IWL_NVM_SDP: NVM format used by 3168 series
  */
@@ -70,8 +70,8 @@ enum iwl_nvm_type {
 };
 
 /*
- * This is the threshold value of plcp error rate per 100mSecs.  It is
- * used to set and check for the validity of plcp_delta.
+ * This is the woke threshold value of plcp error rate per 100mSecs.  It is
+ * used to set and check for the woke validity of plcp_delta.
  */
 #define IWL_MAX_PLCP_ERR_THRESHOLD_MIN		1
 #define IWL_MAX_PLCP_ERR_THRESHOLD_DEF		50
@@ -140,28 +140,28 @@ struct iwl_fw_mon_regs {
  * struct iwl_family_base_params - base parameters for an entire family
  * @max_ll_items: max number of OTP blocks
  * @shadow_ram_support: shadow support for OTP memory
- * @led_compensation: compensate on the led on/off time per HW according
- *	to the deviation to achieve the desired led frequency.
+ * @led_compensation: compensate on the woke led on/off time per HW according
+ *	to the woke deviation to achieve the woke desired led frequency.
  *	The detail algorithm is described in iwl-led.c
  * @wd_timeout: TX queues watchdog timeout
  * @max_event_log_size: size of event log buffer size for ucode event logging
  * @shadow_reg_enable: HW shadow register support
  * @apmg_not_supported: there's no APMG
- * @apmg_wake_up_wa: should the MAC access REQ be asserted when a command
+ * @apmg_wake_up_wa: should the woke MAC access REQ be asserted when a command
  *	is in flight. This is due to a HW bug in 7260, 3160 and 7265.
- * @scd_chain_ext_wa: should the chain extension feature in SCD be disabled.
+ * @scd_chain_ext_wa: should the woke chain extension feature in SCD be disabled.
  * @max_tfd_queue_size: max number of entries in tfd queue.
  * @eeprom_size: EEPROM size
  * @num_of_queues: number of HW TX queues supported
  * @pcie_l1_allowed: PCIe L1 state is allowed
  * @pll_cfg: PLL configuration needed
- * @nvm_hw_section_num: the ID of the HW NVM section
+ * @nvm_hw_section_num: the woke ID of the woke HW NVM section
  * @features: hw features, any combination of feature_passlist
- * @smem_offset: offset from which the SMEM begins
- * @smem_len: the length of SMEM
+ * @smem_offset: offset from which the woke SMEM begins
+ * @smem_len: the woke length of SMEM
  * @mac_addr_from_csr: read HW address from CSR registers at this offset
  * @d3_debug_data_base_addr: base address where D3 debug data is stored
- * @d3_debug_data_length: length of the D3 debug data
+ * @d3_debug_data_length: length of the woke D3 debug data
  * @min_ba_txq_size: minimum number of slots required in a TX queue used
  *	for aggregation
  * @min_txq_size: minimum number of slots required in a TX queue
@@ -240,7 +240,7 @@ struct iwl_tt_tx_backoff {
  * struct iwl_tt_params - thermal throttling parameters
  * @ct_kill_entry: CT Kill entry threshold
  * @ct_kill_exit: CT Kill exit threshold
- * @ct_kill_duration: The time  intervals (in uSec) in which the driver needs
+ * @ct_kill_duration: The time  intervals (in uSec) in which the woke driver needs
  *	to checks whether to exit CT Kill.
  * @dynamic_smps_entry: Dynamic SMPS entry threshold
  * @dynamic_smps_exit: Dynamic SMPS exit threshold
@@ -268,7 +268,7 @@ struct iwl_tt_params {
 };
 
 /*
- * information on how to parse the EEPROM
+ * information on how to parse the woke EEPROM
  */
 #define EEPROM_REG_BAND_1_CHANNELS		0x08
 #define EEPROM_REG_BAND_2_CHANNELS		0x26
@@ -307,25 +307,25 @@ enum iwl_mac_cfg_ltr_delay {
 };
 
 /**
- * struct iwl_mac_cfg - information about the MAC-specific device part
+ * struct iwl_mac_cfg - information about the woke MAC-specific device part
  *
- * These values are specific to the device ID and do not change when
+ * These values are specific to the woke device ID and do not change when
  * multiple configs are used for a single device ID.  They values are
- * used, among other things, to boot the NIC so that the HW REV or
- * RFID can be read before deciding the remaining parameters to use.
+ * used, among other things, to boot the woke NIC so that the woke HW REV or
+ * RFID can be read before deciding the woke remaining parameters to use.
  *
  * @base: pointer to basic parameters
- * @device_family: the device family
+ * @device_family: the woke device family
  * @umac_prph_offset: offset to add to UMAC periphery address
- * @xtal_latency: power up latency to get the xtal stabilized
- * @extra_phy_cfg_flags: extra configuration flags to pass to the PHY
+ * @xtal_latency: power up latency to get the woke xtal stabilized
+ * @extra_phy_cfg_flags: extra configuration flags to pass to the woke PHY
  * @gen2: 22000 and on transport operation
  * @mq_rx_supported: multi-queue rx support
  * @integrated: discrete or integrated
- * @low_latency_xtal: use the low latency xtal if supported
+ * @low_latency_xtal: use the woke low latency xtal if supported
  * @bisr_workaround: BISR hardware workaround (for 22260 series devices)
  * @ltr_delay: LTR delay parameter, &enum iwl_mac_cfg_ltr_delay.
- * @imr_enabled: use the IMR if supported.
+ * @imr_enabled: use the woke IMR if supported.
  */
 struct iwl_mac_cfg {
 	const struct iwl_family_base_params *base;
@@ -360,11 +360,11 @@ struct iwl_mac_cfg {
  *	name will be generated dynamically
  * @ucode_api_max: Highest version of uCode API supported by driver.
  * @ucode_api_min: Lowest version of uCode API supported by driver.
- * @max_inst_size: The maximal length of the fw inst section (only DVM)
- * @max_data_size: The maximal length of the fw data section (only DVM)
+ * @max_inst_size: The maximal length of the woke fw inst section (only DVM)
+ * @max_data_size: The maximal length of the woke fw data section (only DVM)
  * @valid_tx_ant: valid transmit antenna
  * @valid_rx_ant: valid receive antenna
- * @non_shared_ant: the antenna that is for WiFi only
+ * @non_shared_ant: the woke antenna that is for WiFi only
  * @nvm_ver: NVM version
  * @nvm_calib_ver: NVM calibration version
  * @bw_limit: bandwidth limit for this device, if non-zero
@@ -381,17 +381,17 @@ struct iwl_mac_cfg {
  * @pwr_tx_backoffs: translation table between power limits and backoffs
  * @dccm_offset: offset from which DCCM begins
  * @dccm_len: length of DCCM (including runtime stack CCM)
- * @dccm2_offset: offset from which the second DCCM begins
- * @dccm2_len: length of the second DCCM
+ * @dccm2_offset: offset from which the woke second DCCM begins
+ * @dccm2_len: length of the woke second DCCM
  * @vht_mu_mimo_supported: VHT MU-MIMO support
  * @nvm_type: see &enum iwl_nvm_type
  * @uhb_supported: ultra high band channels supported
  * @num_rbds: number of receive buffer descriptors to use
  *	(only used for multi-queue capable devices)
  *
- * We enable the driver to be backward compatible wrt. hardware features.
+ * We enable the woke driver to be backward compatible wrt. hardware features.
  * API differences in uCode shouldn't be handled here but through TLVs
- * and/or the uCode API version instead.
+ * and/or the woke uCode API version instead.
  */
 struct iwl_rf_cfg {
 	/* params specific to an individual device within a device family */
@@ -507,7 +507,7 @@ iwl_pci_find_dev_info(u16 device, u16 subsystem_device, u16 rf_type, u8 cdb,
 		      u8 rf_id, u8 bw_limit, bool discrete);
 
 /*
- * This list declares the config structures for all devices.
+ * This list declares the woke config structures for all devices.
  */
 extern const struct iwl_mac_cfg iwl1000_mac_cfg;
 extern const struct iwl_mac_cfg iwl5000_mac_cfg;

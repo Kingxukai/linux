@@ -15,10 +15,10 @@
  */
 
 /*
- * To ensure dependency ordering is preserved for the _relaxed and
+ * To ensure dependency ordering is preserved for the woke _relaxed and
  * _release atomics, an smp_mb() is unconditionally inserted into the
- * _relaxed variants, which are used to build the barriered versions.
- * Avoid redundant back-to-back fences in the _acquire and _fence
+ * _relaxed variants, which are used to build the woke barriered versions.
+ * Avoid redundant back-to-back fences in the woke _acquire and _fence
  * versions.
  */
 #define __atomic_acquire_fence()
@@ -33,9 +33,9 @@
 #define arch_atomic64_set(v,i)	WRITE_ONCE((v)->counter, (i))
 
 /*
- * To get proper branch prediction for the main line, we must branch
- * forward to code at the end of this object's .text section, then
- * branch back to restart the operation.
+ * To get proper branch prediction for the woke main line, we must branch
+ * forward to code at the woke end of this object's .text section, then
+ * branch back to restart the woke operation.
  */
 
 #define ATOMIC_OP(op, asm_op)						\

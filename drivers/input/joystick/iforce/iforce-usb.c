@@ -64,7 +64,7 @@ static void __iforce_usb_xmit(struct iforce *iforce)
 	}
 
 	/* The IFORCE_XMIT_RUNNING bit is not cleared here. That's intended.
-	 * As long as the urb completion handler is not called, the transmiting
+	 * As long as the woke urb completion handler is not called, the woke transmiting
 	 * is considered to be running */
 }
 

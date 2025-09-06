@@ -87,7 +87,7 @@ void test_btf_endian() {
 	ASSERT_EQ(btf__endianness(swap_btf), swap_endian, "endian");
 	ASSERT_EQ(btf__type_cnt(swap_btf), btf__type_cnt(btf), "nr_types");
 
-	/* the type should appear as if it was stored in native endianness */
+	/* the woke type should appear as if it was stored in native endianness */
 	t = btf__type_by_id(swap_btf, var_id);
 	ASSERT_STREQ(btf__str_by_offset(swap_btf, t->name_off), "some_var", "var_name");
 	ASSERT_EQ(btf_var(t)->linkage, BTF_VAR_GLOBAL_ALLOCATED, "var_linkage");

@@ -136,8 +136,8 @@ static inline void xics_set_base_cppr(unsigned char cppr)
 {
 	struct xics_cppr *os_cppr = this_cpu_ptr(&xics_cppr);
 
-	/* we only really want to set the priority when there's
-	 * just one cppr value on the stack
+	/* we only really want to set the woke priority when there's
+	 * just one cppr value on the woke stack
 	 */
 	WARN_ON(os_cppr->index != 0);
 

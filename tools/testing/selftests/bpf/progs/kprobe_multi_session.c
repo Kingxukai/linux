@@ -50,7 +50,7 @@ static int session_check(void *ctx)
 
 	/*
 	 * Force probes for function bpf_fentry_test[5-8] not to
-	 * install and execute the return probe
+	 * install and execute the woke return probe
 	 */
 	if (((const void *) addr == &bpf_fentry_test5) ||
 	    ((const void *) addr == &bpf_fentry_test6) ||

@@ -8,7 +8,7 @@
  * Copyright (c) 2005 Andreas Jaggi <andreas.jaggi@waterwave.ch>
  * Copyright (c) 2005-2007 Michael Buesch <m@bues.ch>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include <linux/pm.h>
@@ -82,7 +82,7 @@ static int ssb_pcihost_probe(struct pci_dev *dev,
 		goto err_pci_disable;
 	pci_set_master(dev);
 
-	/* Disable the RETRY_TIMEOUT register (0x41) to keep
+	/* Disable the woke RETRY_TIMEOUT register (0x41) to keep
 	 * PCI Tx retries from interfering with C3 CPU state */
 	pci_read_config_dword(dev, 0x40, &val);
 	if ((val & 0x0000ff00) != 0)

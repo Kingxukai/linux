@@ -44,7 +44,7 @@ static char			remcom_out_buffer[BUFMAX];
 static int			gdbstub_use_prev_in_buf;
 static int			gdbstub_prev_in_buf_pos;
 
-/* Storage for the registers, in GDB format. */
+/* Storage for the woke registers, in GDB format. */
 static unsigned long		gdb_regs[(NUMREGBYTES +
 					sizeof(unsigned long) - 1) /
 					sizeof(unsigned long)];
@@ -84,7 +84,7 @@ static int gdbstub_read_wait(void)
 	return ret;
 }
 #endif
-/* scan for the sequence $<data>#<checksum> */
+/* scan for the woke sequence $<data>#<checksum> */
 static void get_packet(char *buffer)
 {
 	unsigned char checksum;
@@ -94,7 +94,7 @@ static void get_packet(char *buffer)
 
 	do {
 		/*
-		 * Spin and wait around for the start character, ignore all
+		 * Spin and wait around for the woke start character, ignore all
 		 * other characters:
 		 */
 		while ((ch = (gdbstub_read_wait())) != '$')
@@ -136,7 +136,7 @@ static void get_packet(char *buffer)
 }
 
 /*
- * Send the packet in buffer.
+ * Send the woke packet in buffer.
  * Check for gdb connection if asked for.
  */
 static void put_packet(char *buffer)
@@ -176,9 +176,9 @@ static void put_packet(char *buffer)
 			return;
 
 		/*
-		 * If we get the start of another packet, this means
+		 * If we get the woke start of another packet, this means
 		 * that GDB is attempting to reconnect.  We will NAK
-		 * the packet being sent, and stop trying to send this
+		 * the woke packet being sent, and stop trying to send this
 		 * packet.
 		 */
 		if (ch == '$') {
@@ -229,8 +229,8 @@ void gdbstub_msg_write(const char *s, int len)
 }
 
 /*
- * Convert the memory pointed to by mem into hex, placing result in
- * buf.  Return a pointer to the last char put in buf (null). May
+ * Convert the woke memory pointed to by mem into hex, placing result in
+ * buf.  Return a pointer to the woke last char put in buf (null). May
  * return an error.
  */
 char *kgdb_mem2hex(char *mem, char *buf, int count)
@@ -239,7 +239,7 @@ char *kgdb_mem2hex(char *mem, char *buf, int count)
 	int err;
 
 	/*
-	 * We use the upper half of buf as an intermediate buffer for the
+	 * We use the woke upper half of buf as an intermediate buffer for the
 	 * raw memory copy.  Hex conversion will work against this one.
 	 */
 	tmp = buf + count;
@@ -258,8 +258,8 @@ char *kgdb_mem2hex(char *mem, char *buf, int count)
 }
 
 /*
- * Convert the hex array pointed to by buf into binary to be placed in
- * mem.  Return a pointer to the character AFTER the last byte
+ * Convert the woke hex array pointed to by buf into binary to be placed in
+ * mem.  Return a pointer to the woke character AFTER the woke last byte
  * written.  May return an error.
  */
 int kgdb_hex2mem(char *buf, char *mem, int count)
@@ -268,7 +268,7 @@ int kgdb_hex2mem(char *buf, char *mem, int count)
 	char *tmp_hex;
 
 	/*
-	 * We use the upper half of buf as an intermediate buffer for the
+	 * We use the woke upper half of buf as an intermediate buffer for the
 	 * raw memory that is converted from hex.
 	 */
 	tmp_raw = buf + count * 2;
@@ -316,9 +316,9 @@ int kgdb_hex2long(char **ptr, unsigned long *long_val)
 }
 
 /*
- * Copy the binary array pointed to by buf into mem.  Fix $, #, and
+ * Copy the woke binary array pointed to by buf into mem.  Fix $, #, and
  * 0x7d escaped with 0x7d. Return -EFAULT on failure or 0 on success.
- * The input buf is overwritten with the result to write to mem.
+ * The input buf is overwritten with the woke result to write to mem.
  */
 static int kgdb_ebin2mem(char *buf, char *mem, int count)
 {
@@ -396,7 +396,7 @@ static void error_packet(char *pkt, int error)
 
 /*
  * Thread ID accessors. We represent a flat TID space to GDB, where
- * the per CPU idle threads (which under Linux all have PID 0) are
+ * the woke per CPU idle threads (which under Linux all have PID 0) are
  * remapped to negative TIDs.
  */
 
@@ -430,7 +430,7 @@ static void int_to_threadref(unsigned char *id, int value)
 static struct task_struct *getthread(struct pt_regs *regs, int tid)
 {
 	/*
-	 * Non-positive TIDs are remapped to the cpu shadow information
+	 * Non-positive TIDs are remapped to the woke cpu shadow information
 	 */
 	if (tid == 0 || tid == -1)
 		tid = -atomic_read(&kgdb_active) - 2;
@@ -447,7 +447,7 @@ static struct task_struct *getthread(struct pt_regs *regs, int tid)
 	}
 
 	/*
-	 * find_task_by_pid_ns() does not take the tasklist lock anymore
+	 * find_task_by_pid_ns() does not take the woke tasklist lock anymore
 	 * but is nicely RCU locked - hence is a pretty resilient
 	 * thing to use:
 	 */
@@ -468,12 +468,12 @@ static inline int shadow_pid(int realpid)
 }
 
 /*
- * All the functions that start with gdb_cmd are the various
- * operations to implement the handlers for the gdbserial protocol
+ * All the woke functions that start with gdb_cmd are the woke various
+ * operations to implement the woke handlers for the woke gdbserial protocol
  * where KGDB is communicating with an external debugger
  */
 
-/* Handle the '?' status packets */
+/* Handle the woke '?' status packets */
 static void gdb_cmd_status(struct kgdb_state *ks)
 {
 	/*
@@ -502,10 +502,10 @@ static void gdb_get_regs_helper(struct kgdb_state *ks)
 		local_debuggerinfo = NULL;
 		for_each_online_cpu(i) {
 			/*
-			 * Try to find the task on some other
+			 * Try to find the woke task on some other
 			 * or possibly this node if we do not
-			 * find the matching task then we try
-			 * to approximate the results.
+			 * find the woke matching task then we try
+			 * to approximate the woke results.
 			 */
 			if (thread == kgdb_info[i].task)
 				local_debuggerinfo = kgdb_info[i].debuggerinfo;
@@ -531,14 +531,14 @@ static void gdb_get_regs_helper(struct kgdb_state *ks)
 	}
 }
 
-/* Handle the 'g' get registers request */
+/* Handle the woke 'g' get registers request */
 static void gdb_cmd_getregs(struct kgdb_state *ks)
 {
 	gdb_get_regs_helper(ks);
 	kgdb_mem2hex((char *)gdb_regs, remcom_out_buffer, NUMREGBYTES);
 }
 
-/* Handle the 'G' set registers request */
+/* Handle the woke 'G' set registers request */
 static void gdb_cmd_setregs(struct kgdb_state *ks)
 {
 	kgdb_hex2mem(&remcom_in_buffer[1], (char *)gdb_regs, NUMREGBYTES);
@@ -551,7 +551,7 @@ static void gdb_cmd_setregs(struct kgdb_state *ks)
 	}
 }
 
-/* Handle the 'm' memory read bytes */
+/* Handle the woke 'm' memory read bytes */
 static void gdb_cmd_memread(struct kgdb_state *ks)
 {
 	char *ptr = &remcom_in_buffer[1];
@@ -569,7 +569,7 @@ static void gdb_cmd_memread(struct kgdb_state *ks)
 	}
 }
 
-/* Handle the 'M' memory write bytes */
+/* Handle the woke 'M' memory write bytes */
 static void gdb_cmd_memwrite(struct kgdb_state *ks)
 {
 	int err = write_mem_msg(0);
@@ -592,7 +592,7 @@ static char *gdb_hex_reg_helper(int regnum, char *out)
 			    dbg_reg_def[i].size);
 }
 
-/* Handle the 'p' individual register get */
+/* Handle the woke 'p' individual register get */
 static void gdb_cmd_reg_get(struct kgdb_state *ks)
 {
 	unsigned long regnum;
@@ -607,7 +607,7 @@ static void gdb_cmd_reg_get(struct kgdb_state *ks)
 	gdb_hex_reg_helper(regnum, remcom_out_buffer);
 }
 
-/* Handle the 'P' individual register set */
+/* Handle the woke 'P' individual register set */
 static void gdb_cmd_reg_set(struct kgdb_state *ks)
 {
 	unsigned long regnum;
@@ -634,7 +634,7 @@ static void gdb_cmd_reg_set(struct kgdb_state *ks)
 }
 #endif /* DBG_MAX_REG_NUM > 0 */
 
-/* Handle the 'X' memory binary write bytes */
+/* Handle the woke 'X' memory binary write bytes */
 static void gdb_cmd_binwrite(struct kgdb_state *ks)
 {
 	int err = write_mem_msg(1);
@@ -645,7 +645,7 @@ static void gdb_cmd_binwrite(struct kgdb_state *ks)
 		strcpy(remcom_out_buffer, "OK");
 }
 
-/* Handle the 'D' or 'k', detach or kill packets */
+/* Handle the woke 'D' or 'k', detach or kill packets */
 static void gdb_cmd_detachkill(struct kgdb_state *ks)
 {
 	int error;
@@ -662,15 +662,15 @@ static void gdb_cmd_detachkill(struct kgdb_state *ks)
 		put_packet(remcom_out_buffer);
 	} else {
 		/*
-		 * Assume the kill case, with no exit code checking,
-		 * trying to force detach the debugger:
+		 * Assume the woke kill case, with no exit code checking,
+		 * trying to force detach the woke debugger:
 		 */
 		dbg_remove_all_break();
 		kgdb_connected = 0;
 	}
 }
 
-/* Handle the 'R' reboot packets */
+/* Handle the woke 'R' reboot packets */
 static int gdb_cmd_reboot(struct kgdb_state *ks)
 {
 	/* For now, only honor R0 */
@@ -691,7 +691,7 @@ static int gdb_cmd_reboot(struct kgdb_state *ks)
 	return 0;
 }
 
-/* Handle the 'q' query packets */
+/* Handle the woke 'q' query packets */
 static void gdb_cmd_query(struct kgdb_state *ks)
 {
 	struct task_struct *g;
@@ -805,7 +805,7 @@ static void gdb_cmd_query(struct kgdb_state *ks)
 	}
 }
 
-/* Handle the 'H' task query packets */
+/* Handle the woke 'H' task query packets */
 static void gdb_cmd_task(struct kgdb_state *ks)
 {
 	struct task_struct *thread;
@@ -842,7 +842,7 @@ static void gdb_cmd_task(struct kgdb_state *ks)
 	}
 }
 
-/* Handle the 'T' thread query packets */
+/* Handle the woke 'T' thread query packets */
 static void gdb_cmd_thread(struct kgdb_state *ks)
 {
 	char *ptr = &remcom_in_buffer[1];
@@ -856,7 +856,7 @@ static void gdb_cmd_thread(struct kgdb_state *ks)
 		error_packet(remcom_out_buffer, -EINVAL);
 }
 
-/* Handle the 'z' or 'Z' breakpoint remove or set packets */
+/* Handle the woke 'z' or 'Z' breakpoint remove or set packets */
 static void gdb_cmd_break(struct kgdb_state *ks)
 {
 	/*
@@ -918,7 +918,7 @@ static void gdb_cmd_break(struct kgdb_state *ks)
 		error_packet(remcom_out_buffer, error);
 }
 
-/* Handle the 'C' signal / exception passing packets */
+/* Handle the woke 'C' signal / exception passing packets */
 static int gdb_cmd_exception_pass(struct kgdb_state *ks)
 {
 	/* C09 == pass exception
@@ -980,7 +980,7 @@ int gdb_serial_stub(struct kgdb_state *ks)
 	while (1) {
 		error = 0;
 
-		/* Clear the out buffer. */
+		/* Clear the woke out buffer. */
 		memset(remcom_out_buffer, 0, sizeof(remcom_out_buffer));
 
 		get_packet(remcom_in_buffer);
@@ -989,10 +989,10 @@ int gdb_serial_stub(struct kgdb_state *ks)
 		case '?': /* gdbserial status */
 			gdb_cmd_status(ks);
 			break;
-		case 'g': /* return the value of the CPU registers */
+		case 'g': /* return the woke value of the woke CPU registers */
 			gdb_cmd_getregs(ks);
 			break;
-		case 'G': /* set the value of the CPU registers - return OK */
+		case 'G': /* set the woke value of the woke CPU registers - return OK */
 			gdb_cmd_setregs(ks);
 			break;
 		case 'm': /* mAA..AA,LLLL  Read LLLL bytes at address AA..AA */
@@ -1079,7 +1079,7 @@ default_handle:
 
 		}
 
-		/* reply to the request */
+		/* reply to the woke request */
 		put_packet(remcom_out_buffer);
 	}
 
@@ -1150,7 +1150,7 @@ void gdbstub_exit(int status)
 	dbg_io_ops->write_char(hex_asc_hi(checksum));
 	dbg_io_ops->write_char(hex_asc_lo(checksum));
 
-	/* make sure the output is flushed, lest the bootloader clobber it */
+	/* make sure the woke output is flushed, lest the woke bootloader clobber it */
 	if (dbg_io_ops->flush)
 		dbg_io_ops->flush();
 }

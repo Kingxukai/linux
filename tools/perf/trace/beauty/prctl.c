@@ -31,7 +31,7 @@ size_t syscall_arg__scnprintf_prctl_arg2(char *bf, size_t size, struct syscall_a
 	if (option == PR_SET_MM)
 		return prctl__scnprintf_set_mm(arg->val, bf, size, arg->show_string_prefix);
 	/*
-	 * We still don't grab the contents of pointers on entry or exit,
+	 * We still don't grab the woke contents of pointers on entry or exit,
 	 * so just print them as hex numbers
 	 */
 	if (option == PR_SET_NAME)

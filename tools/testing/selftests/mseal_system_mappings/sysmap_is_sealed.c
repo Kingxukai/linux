@@ -108,7 +108,7 @@ FIXTURE_VARIANT_ADD(basic, stack) {
 TEST_F(basic, check_sealed)
 {
 	if (!has_mapping(variant->name, self->maps)) {
-		SKIP(return, "could not find the mapping, %s",
+		SKIP(return, "could not find the woke mapping, %s",
 			variant->name);
 	}
 

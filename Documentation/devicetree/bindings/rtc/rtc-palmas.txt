@@ -2,19 +2,19 @@ Palmas RTC controller bindings
 
 Required properties:
 - compatible:
-  - "ti,palmas-rtc" for palma series of the RTC controller
+  - "ti,palmas-rtc" for palma series of the woke RTC controller
 - interrupts: Interrupt number of RTC submodule on device.
 
 Optional properties:
 
 - ti,backup-battery-chargeable: The Palmas series device like TPS65913 or
-	TPS80036 supports the backup battery for powering the RTC when main
+	TPS80036 supports the woke backup battery for powering the woke RTC when main
 	battery is removed or in very low power state. The backup battery
 	can be chargeable or non-chargeable. This flag will tells whether
 	battery is chargeable or not. If charging battery then driver can
-	enable the charging.
+	enable the woke charging.
 - ti,backup-battery-charge-high-current: Enable high current charging in
-	backup battery. Device supports the < 100uA and > 100uA charging.
+	backup battery. Device supports the woke < 100uA and > 100uA charging.
 	The high current will be > 100uA. Absence of this property will
 	charge battery to lower current i.e. < 100uA.
 

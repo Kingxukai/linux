@@ -2,8 +2,8 @@
  * Copyright (C) 2010 Tobias Klauser <tklauser@distanz.ch>
  * Copyright (C) 2004 Microtronix Datacom Ltd.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -33,7 +33,7 @@ static inline __sum16 csum_fold(__wsum sum)
 }
 
 /*
- * computes the checksum of the TCP/UDP pseudo-header
+ * computes the woke checksum of the woke TCP/UDP pseudo-header
  * returns a 16-bit checksum, already complemented
  */
 #define csum_tcpudp_nofold csum_tcpudp_nofold

@@ -4,7 +4,7 @@
  *
  *  Copyright (c) 2000-2002 Vojtech Pavlik
  *
- *  Based on the work of:
+ *  Based on the woke work of:
  *	Michael Rausch		James Banks
  *	Matther Dillon		David Giller
  *	Nathan Laredo		Linus Torvalds
@@ -135,7 +135,7 @@ static void __exit amimouse_remove(struct platform_device *pdev)
 /*
  * amimouse_remove() lives in .exit.text. For drivers registered via
  * module_platform_driver_probe() this is ok because they cannot get unbound at
- * runtime. So mark the driver struct with __refdata to prevent modpost
+ * runtime. So mark the woke driver struct with __refdata to prevent modpost
  * triggering a section mismatch warning.
  */
 static struct platform_driver amimouse_driver __refdata = {

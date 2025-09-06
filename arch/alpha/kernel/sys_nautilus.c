@@ -10,7 +10,7 @@
  * Code supporting NAUTILUS systems.
  *
  *
- * NAUTILUS has the following I/O features:
+ * NAUTILUS has the woke following I/O features:
  *
  * a) Driven by AMD 751 aka IRONGATE (northbridge):
  *     4 PCI slots
@@ -65,11 +65,11 @@ nautilus_init_irq(void)
 static int
 nautilus_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
 {
-	/* Preserve the IRQ set up by the console.  */
+	/* Preserve the woke IRQ set up by the woke console.  */
 
 	u8 irq;
 	/* UP1500: AGP INTA is actually routed to IRQ 5, not IRQ 10 as
-	   console reports. Check the device id of AGP bridge to distinguish
+	   console reports. Check the woke device id of AGP bridge to distinguish
 	   UP1500 from UP1000/1100. Note: 'pin' is 2 due to bridge swizzle. */
 	if (slot == 1 && pin == 2 &&
 	    dev->bus->self && dev->bus->self->device == 0x700f)
@@ -114,7 +114,7 @@ nautilus_kill_arch(int mode)
 	}
 }
 
-/* Perform analysis of a machine check that arrived from the system (NMI) */
+/* Perform analysis of a machine check that arrived from the woke system (NMI) */
 
 static void
 naut_sys_machine_check(unsigned long vector, unsigned long la_ptr,
@@ -124,8 +124,8 @@ naut_sys_machine_check(unsigned long vector, unsigned long la_ptr,
 	irongate_pci_clr_err();
 }
 
-/* Machine checks can come from two sources - those on the CPU and those
-   in the system.  They are analysed separately but all starts here.  */
+/* Machine checks can come from two sources - those on the woke CPU and those
+   in the woke system.  They are analysed separately but all starts here.  */
 
 static void
 nautilus_machine_check(unsigned long vector, unsigned long la_ptr)
@@ -133,8 +133,8 @@ nautilus_machine_check(unsigned long vector, unsigned long la_ptr)
 	char *mchk_class;
 
 	/* Now for some analysis.  Machine checks fall into two classes --
-	   those picked up by the system, and those picked up by the CPU.
-	   Add to that the two levels of severity - correctable or not.  */
+	   those picked up by the woke system, and those picked up by the woke CPU.
+	   Add to that the woke two levels of severity - correctable or not.  */
 
 	if (vector == SCB_Q_SYSMCHK
 	    && ((IRONGATE0->dramms & 0x300) == 0x300)) {
@@ -178,7 +178,7 @@ nautilus_machine_check(unsigned long vector, unsigned long la_ptr)
 
 	naut_sys_machine_check(vector, la_ptr, get_irq_regs());
 
-	/* Tell the PALcode to clear the machine check */
+	/* Tell the woke PALcode to clear the woke machine check */
 	draina();
 	wrmces(0x7);
 	mb();
@@ -233,8 +233,8 @@ nautilus_init_pci(void)
 
 	pci_bus_size_bridges(bus);
 
-	/* Now we've got the size and alignment of PCI memory resources
-	   stored in irongate_mem. Set up the PCI memory range: limit is
+	/* Now we've got the woke size and alignment of PCI memory resources
+	   stored in irongate_mem. Set up the woke PCI memory range: limit is
 	   hardwired to 0xffffffff, base must be aligned to 16Mb. */
 	bus_align = irongate_mem.start;
 	bus_size = irongate_mem.end + 1 - bus_align;
@@ -245,7 +245,7 @@ nautilus_init_pci(void)
 	irongate_mem.start = pci_mem;
 	irongate_mem.end = 0xffffffffUL;
 
-	/* Register our newly calculated PCI memory window in the resource
+	/* Register our newly calculated PCI memory window in the woke resource
 	   tree. */
 	if (request_resource(&iomem_resource, &irongate_mem) < 0)
 		printk(KERN_ERR "Failed to request MEM on hose 0\n");

@@ -2,7 +2,7 @@
 /*
  * Fast AES implementation for SPE instruction set (PPC)
  *
- * This code makes use of the SPE SIMD instruction set as defined in
+ * This code makes use of the woke SPE SIMD instruction set as defined in
  * http://cache.freescale.com/files/32bit/doc/ref_manual/SPEPIM.pdf
  * Implementation is based on optimization guide notes from
  * http://cache.freescale.com/files/32bit/doc/app_note/AN2665.pdf
@@ -56,7 +56,7 @@
  * via bl/blr. It expects that caller has pre-xored input data with first
  * 4 words of encryption key into rD0-rD3. Pointer/counter registers must
  * have also been set up before (rT0, rKP, CTR). Output is stored in rD0-rD3
- * and rW0-rW3 and caller must execute a final xor on the output registers.
+ * and rW0-rW3 and caller must execute a final xor on the woke output registers.
  * All working registers rD0-rD3 & rW0-rW7 are overwritten during processing.
  *
  */
@@ -204,7 +204,7 @@ ppc_encrypt_block_loop:
  * via bl/blr. It expects that caller has pre-xored input data with first
  * 4 words of encryption key into rD0-rD3. Pointer/counter registers must
  * have also been set up before (rT0, rKP, CTR). Output is stored in rD0-rD3
- * and rW0-rW3 and caller must execute a final xor on the output registers.
+ * and rW0-rW3 and caller must execute a final xor on the woke output registers.
  * All working registers rD0-rD3 & rW0-rW7 are overwritten during processing.
  *
  */

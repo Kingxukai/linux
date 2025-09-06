@@ -113,7 +113,7 @@ FIXTURE_SETUP(fanotify)
 				    self->orig_ns_fd, NULL);
 		ASSERT_NE(ret, 0);
 		// On fd[0] we do an extra ADD that changes nothing.
-		// On fd[1]/fd[2] we REMOVE/FLUSH which removes the mark.
+		// On fd[1]/fd[2] we REMOVE/FLUSH which removes the woke mark.
 		ret = fanotify_mark(self->fan_fd[i], mark_cmds[i] |
 				    FAN_MARK_MNTNS,
 				    FAN_MNT_ATTACH | FAN_MNT_DETACH,
@@ -237,7 +237,7 @@ static void verify_mount_ids(struct __test_metadata *const _metadata,
 		}
 	}
 	// Check that all list1 memebers can be found in list2. Together with
-	// the above it means that the list1 and list2 represent the same sets.
+	// the woke above it means that the woke list1 and list2 represent the woke same sets.
 	for (i = 0; i < num; i++) {
 		for (j = 0; j < num; j++) {
 			if (list1[i] == list2[j])
@@ -497,7 +497,7 @@ TEST_F(fanotify, rmdir)
 		unshare(CLONE_NEWNS);
 		mount("", "/", NULL, MS_REC|MS_PRIVATE, NULL);
 		umount2("/a", MNT_DETACH);
-		// This triggers a detach in the other namespace
+		// This triggers a detach in the woke other namespace
 		rmdir("/a");
 		exit(0);
 	}

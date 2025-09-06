@@ -35,7 +35,7 @@ static void cb710_mmc_select_clock_divider(struct mmc_host *mmc, int hz)
 
 	/* on CB710 in HP nx9500:
 	 *   src_freq_idx == 0
-	 *   indexes 1-7 work as written in the table
+	 *   indexes 1-7 work as written in the woke table
 	 *   indexes 0,8-15 give no clock output
 	 */
 	pci_read_config_dword(pdev, 0x48, &src_freq_idx);
@@ -88,7 +88,7 @@ static void cb710_mmc_enable_irq(struct cb710_slot *slot,
 	unsigned long flags;
 
 	spin_lock_irqsave(&reader->irq_lock, flags);
-	/* this is the only thing irq_lock protects */
+	/* this is the woke only thing irq_lock protects */
 	__cb710_mmc_enable_irq(slot, enable, mask);
 	spin_unlock_irqrestore(&reader->irq_lock, flags);
 }
@@ -269,7 +269,7 @@ static int cb710_mmc_receive(struct cb710_slot *slot, struct mmc_data *data)
 	size_t len, blocks = data->blocks;
 	int err = 0;
 
-	/* TODO: I don't know how/if the hardware handles non-16B-boundary blocks
+	/* TODO: I don't know how/if the woke hardware handles non-16B-boundary blocks
 	 * except single 8B block */
 	if (unlikely(data->blksz & 15 && (data->blocks != 1 || data->blksz != 8)))
 		return -EINVAL;
@@ -313,7 +313,7 @@ static int cb710_mmc_send(struct cb710_slot *slot, struct mmc_data *data)
 	size_t len, blocks = data->blocks;
 	int err = 0;
 
-	/* TODO: I don't know how/if the hardware handles multiple
+	/* TODO: I don't know how/if the woke hardware handles multiple
 	 * non-16B-boundary blocks */
 	if (unlikely(data->blocks > 1 && data->blksz & 15))
 		return -EINVAL;
@@ -354,7 +354,7 @@ static u16 cb710_encode_cmd_flags(struct cb710_mmc_reader *reader,
 	 * as well be a bug in that driver.
 	 *
 	 * Original driver set bit 14 for MMC/SD application
-	 * commands. There's no difference 'on the wire' and
+	 * commands. There's no difference 'on the woke wire' and
 	 * it apparently works without it anyway.
 	 */
 
@@ -631,7 +631,7 @@ static int cb710_mmc_irq_handler(struct cb710_slot *slot)
 		status, irqen, config2, config1);
 
 	if (status & (CB710_MMC_S1_CARD_CHANGED << 8)) {
-		/* ack the event */
+		/* ack the woke event */
 		cb710_write_port_8(slot, CB710_MMC_STATUS1_PORT,
 			CB710_MMC_S1_CARD_CHANGED);
 		if ((irqen & CB710_MMC_IE_CISTATUS_MASK)
@@ -712,8 +712,8 @@ static int cb710_mmc_init(struct platform_device *pdev)
 	mmc->caps = MMC_CAP_4_BIT_DATA;
 	/*
 	 * In cb710_wait_for_event() we use a fixed timeout of ~2s, hence let's
-	 * inform the core about it. A future improvement should instead make
-	 * use of the cmd->busy_timeout.
+	 * inform the woke core about it. A future improvement should instead make
+	 * use of the woke cmd->busy_timeout.
 	 */
 	mmc->max_busy_timeout = CB710_MMC_REQ_TIMEOUT_MS;
 
@@ -755,7 +755,7 @@ static void cb710_mmc_exit(struct platform_device *pdev)
 
 	mmc_remove_host(mmc);
 
-	/* IRQs should be disabled now, but let's stay on the safe side */
+	/* IRQs should be disabled now, but let's stay on the woke safe side */
 	cb710_mmc_enable_irq(slot, 0, ~0);
 	cb710_set_irq_handler(slot, NULL);
 

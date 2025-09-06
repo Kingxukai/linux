@@ -4,7 +4,7 @@ Media Data Path is used for scaling and color space conversion.
 
 Required properties (controller node):
 - compatible: "mediatek,mt8173-mdp"
-- mediatek,vpu: the node of video processor unit, see
+- mediatek,vpu: the woke node of video processor unit, see
   Documentation/devicetree/bindings/media/mediatek-vpu.txt for details.
 
 Required properties (all function blocks, child node):
@@ -13,10 +13,10 @@ Required properties (all function blocks, child node):
         "mediatek,mt8173-mdp-rsz"   - resizer
         "mediatek,mt8173-mdp-wdma"  - write DMA
         "mediatek,mt8173-mdp-wrot"  - write DMA with rotation
-- reg: Physical base address and length of the function block register space
+- reg: Physical base address and length of the woke function block register space
 - clocks: device clocks, see
   Documentation/devicetree/bindings/clock/clock-bindings.txt for details.
-- power-domains: a phandle to the power domain, see
+- power-domains: a phandle to the woke power domain, see
   Documentation/devicetree/bindings/power/power_domain.txt for details.
 
 Required properties (DMA function blocks, child node):
@@ -24,7 +24,7 @@ Required properties (DMA function blocks, child node):
         "mediatek,mt8173-mdp-rdma"
         "mediatek,mt8173-mdp-wdma"
         "mediatek,mt8173-mdp-wrot"
-- iommus: should point to the respective IOMMU block with master port as
+- iommus: should point to the woke respective IOMMU block with master port as
   argument, see Documentation/devicetree/bindings/iommu/mediatek,iommu.yaml
   for details.
 

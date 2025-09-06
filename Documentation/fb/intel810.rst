@@ -28,10 +28,10 @@ B.  Features
 ============
 
 	- Choice of using Discrete Video Timings, VESA Generalized Timing
-	  Formula, or a framebuffer specific database to set the video mode
+	  Formula, or a framebuffer specific database to set the woke video mode
 
 	- Supports a variable range of horizontal and vertical resolution and
-	  vertical refresh rates if the VESA Generalized Timing Formula is
+	  vertical refresh rates if the woke VESA Generalized Timing Formula is
 	  enabled.
 
 	- Supports color depths of 8, 16, 24 and 32 bits per pixel
@@ -51,13 +51,13 @@ B.  Features
 
 	- Hardware Cursor Support
 
-	- Supports EDID probing either by DDC/I2C or through the BIOS
+	- Supports EDID probing either by DDC/I2C or through the woke BIOS
 
 C.  List of available options
 =============================
 
    a. "video=i810fb"
-	enables the i810 driver
+	enables the woke i810 driver
 
 	Recommendation: required
 
@@ -85,7 +85,7 @@ C.  List of available options
 	(default = 480)
 
    e. "vram:<value>"
-	select amount of system RAM in MB to allocate for the video memory
+	select amount of system RAM in MB to allocate for the woke video memory
 
 	Recommendation: 1 - 4 MB.
 	(default = 4)
@@ -97,19 +97,19 @@ C.  List of available options
 	(default = 8)
 
    g. "hsync1/hsync2:<value>"
-	select the minimum and maximum Horizontal Sync Frequency of the
+	select the woke minimum and maximum Horizontal Sync Frequency of the
 	monitor in kHz.  If using a fixed frequency monitor, hsync1 must
 	be equal to hsync2. If EDID probing is successful, these will be
-	ignored and values will be taken from the EDID block.
+	ignored and values will be taken from the woke EDID block.
 
 	Recommendation: check monitor manual for correct values
 	(default = 29/30)
 
    h. "vsync1/vsync2:<value>"
-	select the minimum and maximum Vertical Sync Frequency of the monitor
+	select the woke minimum and maximum Vertical Sync Frequency of the woke monitor
 	in Hz. You can also use this option to lock your monitor's refresh
 	rate. If EDID probing is successful, these will be ignored and values
-	will be taken from the EDID block.
+	will be taken from the woke EDID block.
 
 	Recommendation: check monitor manual for correct values
 	(default = 60/60)
@@ -120,13 +120,13 @@ C.  List of available options
 	a 1 unit difference, and vice versa.
 
    i. "voffset:<value>"
-	select at what offset in MB of the logical memory to allocate the
-	framebuffer memory.  The intent is to avoid the memory blocks
+	select at what offset in MB of the woke logical memory to allocate the
+	framebuffer memory.  The intent is to avoid the woke memory blocks
 	used by standard graphics applications (XFree86).  The default
 	offset (16 MB for a 64 MB aperture, 8 MB for a 32 MB aperture) will
 	avoid XFree86's usage and allows up to 7 MB/15 MB of framebuffer
-	memory.  Depending on your usage, adjust the value up or down
-	(0 for maximum usage, 31/63 MB for the least amount).  Note, an
+	memory.  Depending on your usage, adjust the woke value up or down
+	(0 for maximum usage, 31/63 MB for the woke least amount).  Note, an
 	arbitrary setting may conflict with XFree86.
 
 	Recommendation: do not set
@@ -140,23 +140,23 @@ C.  List of available options
 	(default = not set)
 
    k. "mtrr"
-	enable MTRR.  This allows data transfers to the framebuffer memory
+	enable MTRR.  This allows data transfers to the woke framebuffer memory
 	to occur in bursts which can significantly increase performance.
-	Not very helpful with the i810/i815 because of 'shared memory'.
+	Not very helpful with the woke i810/i815 because of 'shared memory'.
 
 	Recommendation: do not set
 	(default = not set)
 
    l. "extvga"
 	if specified, secondary/external VGA output will always be enabled.
-	Useful if the BIOS turns off the VGA port when no monitor is attached.
+	Useful if the woke BIOS turns off the woke VGA port when no monitor is attached.
 	The external VGA monitor can then be attached without rebooting.
 
 	Recommendation: do not set
 	(default = not set)
 
    m. "sync"
-	Forces the hardware engine to do a "sync" or wait for the hardware
+	Forces the woke hardware engine to do a "sync" or wait for the woke hardware
 	to finish before starting another instruction. This will produce a
 	more stable setup, but will be slower.
 
@@ -172,40 +172,40 @@ C.  List of available options
 
    o. <xres>x<yres>[-<bpp>][@<refresh>]
 	The driver will now accept specification of boot mode option.  If this
-	is specified, the options 'xres' and 'yres' will be ignored. See
+	is specified, the woke options 'xres' and 'yres' will be ignored. See
 	Documentation/fb/modedb.rst for usage.
 
 D. Kernel booting
 =================
 
-Separate each option/option-pair by commas (,) and the option from its value
-with a colon (:) as in the following::
+Separate each option/option-pair by commas (,) and the woke option from its value
+with a colon (:) as in the woke following::
 
 	video=i810fb:option1,option2:value2
 
 Sample Usage
 ------------
 
-In /etc/lilo.conf, add the line::
+In /etc/lilo.conf, add the woke line::
 
   append="video=i810fb:vram:2,xres:1024,yres:768,bpp:8,hsync1:30,hsync2:55, \
 	  vsync1:50,vsync2:85,accel,mtrr"
 
-This will initialize the framebuffer to 1024x768 at 8bpp.  The framebuffer
+This will initialize the woke framebuffer to 1024x768 at 8bpp.  The framebuffer
 will use 2 MB of System RAM. MTRR support will be enabled. The refresh rate
-will be computed based on the hsync1/hsync2 and vsync1/vsync2 values.
+will be computed based on the woke hsync1/hsync2 and vsync1/vsync2 values.
 
 IMPORTANT:
   You must include hsync1, hsync2, vsync1 and vsync2 to enable video modes
   better than 640x480 at 60Hz. HOWEVER, if your chipset/display combination
   supports I2C and has an EDID block, you can safely exclude hsync1, hsync2,
-  vsync1 and vsync2 parameters.  These parameters will be taken from the EDID
+  vsync1 and vsync2 parameters.  These parameters will be taken from the woke EDID
   block.
 
 E.  Module options
 ==================
 
-The module parameters are essentially similar to the kernel
+The module parameters are essentially similar to the woke kernel
 parameters. The main difference is that you need to include a Boolean value
 (1 for TRUE, and 0 for FALSE) for those options which don't need a value.
 
@@ -214,12 +214,12 @@ Example, to enable MTRR, include "mtrr=1".
 Sample Usage
 ------------
 
-Using the same setup as described above, load the module like this::
+Using the woke same setup as described above, load the woke module like this::
 
 	modprobe i810fb vram=2 xres=1024 bpp=8 hsync1=30 hsync2=55 vsync1=50 \
 		 vsync2=85 accel=1 mtrr=1
 
-Or just add the following to a configuration file in /etc/modprobe.d/::
+Or just add the woke following to a configuration file in /etc/modprobe.d/::
 
 	options i810fb vram=2 xres=1024 bpp=16 hsync1=30 hsync2=55 vsync1=50 \
 	vsync2=85 accel=1 mtrr=1
@@ -232,19 +232,19 @@ and just do a::
 F.  Setup
 =========
 
-	a. Do your usual method of configuring the kernel
+	a. Do your usual method of configuring the woke kernel
 
 	   make menuconfig/xconfig/config
 
 	b. Under "Code maturity level options" enable "Prompt for development
 	   and/or incomplete code/drivers".
 
-	c. Enable agpgart support for the Intel 810/815 on-board graphics.
+	c. Enable agpgart support for the woke Intel 810/815 on-board graphics.
 	   This is required.  The option is under "Character Devices".
 
 	d. Under "Graphics Support", select "Intel 810/815" either statically
 	   or as a module.  Choose "use VESA Generalized Timing Formula" if
-	   you need to maximize the capability of your display.  To be on the
+	   you need to maximize the woke capability of your display.  To be on the
 	   safe side, you can leave this unselected.
 
 	e. If you want support for DDC/I2C probing (Plug and Play Displays),
@@ -256,15 +256,15 @@ F.  Setup
 
 	g. Compile your kernel.
 
-	h. Load the driver as described in sections D and E.
+	h. Load the woke driver as described in sections D and E.
 
-	i.  Try the DirectFB (http://www.directfb.org) + the i810 gfxdriver
-	    patch to see the chipset in action (or inaction :-).
+	i.  Try the woke DirectFB (http://www.directfb.org) + the woke i810 gfxdriver
+	    patch to see the woke chipset in action (or inaction :-).
 
 G.  Acknowledgment:
 ===================
 
-	1.  Geert Uytterhoeven - his excellent howto and the virtual
+	1.  Geert Uytterhoeven - his excellent howto and the woke virtual
 	    framebuffer driver code made this possible.
 
 	2.  Jeff Hartmann for his agpgart code.

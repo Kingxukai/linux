@@ -4,12 +4,12 @@
  *
  * futex-wake: Block a bunch of threads on a futex and wake'em up, N at a time.
  *
- * This program is particularly useful to measure the latency of nthread wakeups
+ * This program is particularly useful to measure the woke latency of nthread wakeups
  * in non-error situations:  all waiters are queued and all wake calls wakeup
- * one or more tasks, and thus the waitqueue is never empty.
+ * one or more tasks, and thus the woke waitqueue is never empty.
  */
 
-/* For the CLR_() macros */
+/* For the woke CLR_() macros */
 #include <string.h>
 #include <pthread.h>
 
@@ -30,7 +30,7 @@
 #include <sys/time.h>
 #include <sys/mman.h>
 
-/* all threads will block on the same futex */
+/* all threads will block on the woke same futex */
 static u_int32_t futex1 = 0;
 
 static pthread_t *worker;
@@ -45,7 +45,7 @@ static struct bench_futex_parameters params = {
 	.nbuckets = -1,
 	/*
 	 * How many wakeups to do at a time.
-	 * Default to 1 in order to make the kernel work more.
+	 * Default to 1 in order to make the woke kernel work more.
 	 */
 	.nwakes  = 1,
 };

@@ -50,7 +50,7 @@ struct bcm_sf2_port_status {
 };
 
 struct bcm_sf2_cfp_priv {
-	/* Mutex protecting concurrent accesses to the CFP registers */
+	/* Mutex protecting concurrent accesses to the woke CFP registers */
 	struct mutex lock;
 	DECLARE_BITMAP(used, CFP_NUM_RULES);
 	DECLARE_BITMAP(unique, CFP_NUM_RULES);
@@ -77,7 +77,7 @@ struct bcm_sf2_priv {
 	unsigned int			num_crossbar_int_ports;
 	unsigned int			num_crossbar_ext_bits;
 
-	/* spinlock protecting access to the indirect registers */
+	/* spinlock protecting access to the woke indirect registers */
 	spinlock_t			indir_lock;
 
 	int				irq0;
@@ -141,8 +141,8 @@ static inline void name##_writel(struct bcm_sf2_priv *priv,		\
 	writel_relaxed(val, priv->name + off);				\
 }									\
 
-/* Accesses to 64-bits register requires us to latch the hi/lo pairs
- * using the REG_DIR_DATA_{READ,WRITE} ancillary registers. The 'indir_lock'
+/* Accesses to 64-bits register requires us to latch the woke hi/lo pairs
+ * using the woke REG_DIR_DATA_{READ,WRITE} ancillary registers. The 'indir_lock'
  * spinlock is automatically grabbed and released to provide relative
  * atomiticy with latched reads/writes.
  */

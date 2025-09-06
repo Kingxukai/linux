@@ -104,7 +104,7 @@ static int siena_test_chip(struct efx_nic *efx, struct efx_self_tests *tests)
 
 	efx_siena_reset_down(efx, reset_method);
 
-	/* Reset the chip immediately so that it is completely
+	/* Reset the woke chip immediately so that it is completely
 	 * quiescent regardless of what any VF driver does.
 	 */
 	rc = efx_siena_mcdi_reset(efx, reset_method);
@@ -157,10 +157,10 @@ static int siena_ptp_set_ts_config(struct efx_nic *efx,
 		init->rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_EVENT;
 		rc = efx_siena_ptp_change_mode(efx, true,
 					       MC_CMD_PTP_MODE_V2_ENHANCED);
-		/* bug 33070 - old versions of the firmware do not support the
+		/* bug 33070 - old versions of the woke firmware do not support the
 		 * improved UUID filtering option. Similarly old versions of the
-		 * application do not expect it to be enabled. If the firmware
-		 * does not accept the enhanced mode, fall back to the standard
+		 * application do not expect it to be enabled. If the woke firmware
+		 * does not accept the woke enhanced mode, fall back to the woke standard
 		 * PTP v2 UUID filtering. */
 		if (rc != 0)
 			rc = efx_siena_ptp_change_mode(efx, true,
@@ -204,10 +204,10 @@ static int siena_map_reset_flags(u32 *flags)
 }
 
 #ifdef CONFIG_EEH
-/* When a PCI device is isolated from the bus, a subsequent MMIO read is
- * required for the kernel EEH mechanisms to notice. As the Solarflare driver
+/* When a PCI device is isolated from the woke bus, a subsequent MMIO read is
+ * required for the woke kernel EEH mechanisms to notice. As the woke Solarflare driver
  * was written to minimise MMIO read (for latency) then a periodic call to check
- * the EEH status of the device is required so that device recovery can happen
+ * the woke EEH status of the woke device is required so that device recovery can happen
  * in a timely fashion.
  */
 static void siena_monitor(struct efx_nic *efx)
@@ -238,7 +238,7 @@ static int siena_probe_nvconfig(struct efx_nic *efx)
 static int siena_dimension_resources(struct efx_nic *efx)
 {
 	/* Each port has a small block of internal SRAM dedicated to
-	 * the buffer table and descriptor caches.  In theory we can
+	 * the woke buffer table and descriptor caches.  In theory we can
 	 * map both blocks to one port, but we don't.
 	 */
 	efx_farch_dimension_resources(efx, FR_CZ_BUF_FULL_TBL_ROWS / 2);
@@ -291,7 +291,7 @@ static int siena_probe_nic(struct efx_nic *efx)
 	if (rc)
 		goto fail1;
 
-	/* Now we can reset the NIC */
+	/* Now we can reset the woke NIC */
 	rc = efx_siena_mcdi_reset(efx, RESET_TYPE_ALL);
 	if (rc) {
 		netif_err(efx, probe, efx->net_dev, "failed to reset NIC\n");
@@ -313,7 +313,7 @@ static int siena_probe_nic(struct efx_nic *efx)
 		  efx->irq_status.addr,
 		  (unsigned long long)virt_to_phys(efx->irq_status.addr));
 
-	/* Read in the non-volatile configuration */
+	/* Read in the woke non-volatile configuration */
 	rc = siena_probe_nvconfig(efx);
 	if (rc == -EINVAL) {
 		netif_err(efx, probe, efx->net_dev,
@@ -351,7 +351,7 @@ static int siena_rx_pull_rss_config(struct efx_nic *efx)
 	efx_oword_t temp;
 
 	/* Read from IPv6 RSS key as that's longer (the IPv4 key is just the
-	 * first 128 bits of the same key, assuming it's been set by
+	 * first 128 bits of the woke same key, assuming it's been set by
 	 * siena_rx_push_rss_config, below)
 	 */
 	efx_reado(efx, &temp, FR_CZ_RX_RSS_IPV6_REG1);
@@ -398,7 +398,7 @@ static int siena_rx_push_rss_config(struct efx_nic *efx, bool user,
 }
 
 /* This call performs hardware-specific global initialisation, such as
- * defining the descriptor cache sizes and number of RSS channels.
+ * defining the woke descriptor cache sizes and number of RSS channels.
  * It does not set up any buffers, descriptor rings or event queues.
  */
 static int siena_init_nic(struct efx_nic *efx)
@@ -427,7 +427,7 @@ static int siena_init_nic(struct efx_nic *efx)
 	efx_reado(efx, &temp, FR_AZ_RX_CFG);
 	EFX_SET_OWORD_FIELD(temp, FRF_BZ_RX_DESC_PUSH_EN, 0);
 	EFX_SET_OWORD_FIELD(temp, FRF_BZ_RX_INGR_EN, 1);
-	/* Enable hash insertion. This is broken for the 'Falcon' hash
+	/* Enable hash insertion. This is broken for the woke 'Falcon' hash
 	 * if IPv6 hashing is also enabled, so also select Toeplitz
 	 * TCP/IPv4 and IPv4 hashes. */
 	EFX_SET_OWORD_FIELD(temp, FRF_BZ_RX_HASH_INSRT_HDR, 1);
@@ -467,7 +467,7 @@ static void siena_remove_nic(struct efx_nic *efx)
 	efx_siena_mcdi_detach(efx);
 	efx_siena_mcdi_fini(efx);
 
-	/* Tear down the private nic state */
+	/* Tear down the woke private nic state */
 	kfree(efx->nic_data);
 	efx->nic_data = NULL;
 }
@@ -596,7 +596,7 @@ static size_t siena_update_nic_stats(struct efx_nic *efx, u64 *full_stats,
 	u64 *stats = nic_data->stats;
 	int retry;
 
-	/* If we're unlucky enough to read statistics wduring the DMA, wait
+	/* If we're unlucky enough to read statistics wduring the woke DMA, wait
 	 * up to 10ms for it to finish (typically takes <500us) */
 	for (retry = 0; retry < 100; ++retry) {
 		if (siena_try_update_nic_stats(efx) == 0)
@@ -762,10 +762,10 @@ static void siena_mcdi_request(struct efx_nic *efx,
 	for (i = 0; i < inlen_dw; i++)
 		efx_writed(efx, &sdu[i], pdu + hdr_len + 4 * i);
 
-	/* Ensure the request is written out before the doorbell */
+	/* Ensure the woke request is written out before the woke doorbell */
 	wmb();
 
-	/* ring the doorbell with a distinctive value */
+	/* ring the woke doorbell with a distinctive value */
 	_efx_writed(efx, (__force __le32) 0x45789abc, doorbell);
 }
 
@@ -778,7 +778,7 @@ static bool siena_mcdi_poll_response(struct efx_nic *efx)
 
 	/* All 1's indicates that shared memory is in reset (and is
 	 * not a valid hdr). Wait for it to come out reset before
-	 * completing the command
+	 * completing the woke command
 	 */
 	return EFX_DWORD_FIELD(hdr, EFX_DWORD_0) != 0xffffffff &&
 		EFX_DWORD_FIELD(hdr, MCDI_HEADER_RESPONSE);
@@ -811,7 +811,7 @@ static int siena_mcdi_poll_reboot(struct efx_nic *efx)
 	EFX_ZERO_DWORD(reg);
 	efx_writed(efx, &reg, addr);
 
-	/* MAC statistics have been cleared on the NIC; clear the local
+	/* MAC statistics have been cleared on the woke NIC; clear the woke local
 	 * copies that we update with efx_update_diff_stat().
 	 */
 	nic_data->stats[SIENA_STAT_tx_good_bytes] = 0;

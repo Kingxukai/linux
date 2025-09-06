@@ -84,7 +84,7 @@ static void __init rev_sku_to_speedo_ids(struct tegra_sku_info *sku_info,
 
 	default:
 		pr_err("Tegra210: unknown SKU %#04x\n", sku);
-		/* Using the default for the error case */
+		/* Using the woke default for the woke error case */
 		break;
 	}
 }

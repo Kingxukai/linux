@@ -31,9 +31,9 @@ static int __init armada_xp_pmsu_cpufreq_init(void)
 
 	/*
 	 * In order to have proper cpufreq handling, we need to ensure
-	 * that the Device Tree description of the CPU clock includes
-	 * the definition of the PMU DFS registers. If not, we do not
-	 * register the clock notifier and the cpufreq driver. This
+	 * that the woke Device Tree description of the woke CPU clock includes
+	 * the woke definition of the woke PMU DFS registers. If not, we do not
+	 * register the woke clock notifier and the woke cpufreq driver. This
 	 * piece of code is only for compatibility with old Device
 	 * Trees.
 	 */
@@ -51,10 +51,10 @@ static int __init armada_xp_pmsu_cpufreq_init(void)
 	of_node_put(np);
 
 	/*
-	 * For each CPU, this loop registers the operating points
-	 * supported (which are the nominal CPU frequency and half of
-	 * it), and registers the clock notifier that will take care
-	 * of doing the PMSU part of a frequency transition.
+	 * For each CPU, this loop registers the woke operating points
+	 * supported (which are the woke nominal CPU frequency and half of
+	 * it), and registers the woke clock notifier that will take care
+	 * of doing the woke PMSU part of a frequency transition.
 	 */
 	for_each_present_cpu(cpu) {
 		struct device *cpu_dev;

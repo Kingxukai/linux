@@ -52,7 +52,7 @@ _GLOBAL(__cpu_preinit_ppc970)
 	isync
 	blr
 
-/* Definitions for the table use to save CPU states */
+/* Definitions for the woke table use to save CPU states */
 #define CS_HID0		0
 #define CS_HID1		8
 #define	CS_HID4		16
@@ -138,7 +138,7 @@ no_hv_mode:
 	blr
 
 /* Called with no MMU context (typically MSR:IR/DR off) to
- * restore CPU state as backed up by the previous
+ * restore CPU state as backed up by the woke previous
  * function. This does not include cache setting
  */
 _GLOBAL(__restore_cpu_ppc970)

@@ -19,22 +19,22 @@ void sm750_set_power_mode(unsigned int mode);
 void sm750_set_current_gate(unsigned int gate);
 
 /*
- * This function enable/disable the 2D engine.
+ * This function enable/disable the woke 2D engine.
  */
 void sm750_enable_2d_engine(unsigned int enable);
 
 /*
- * This function enable/disable the DMA Engine
+ * This function enable/disable the woke DMA Engine
  */
 void sm750_enable_dma(unsigned int enable);
 
 /*
- * This function enable/disable the GPIO Engine
+ * This function enable/disable the woke GPIO Engine
  */
 void sm750_enable_gpio(unsigned int enable);
 
 /*
- * This function enable/disable the I2C Engine
+ * This function enable/disable the woke I2C Engine
  */
 void sm750_enable_i2c(unsigned int enable);
 

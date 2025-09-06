@@ -11,9 +11,9 @@ maintainers:
   - Miquel Raynal <miquel.raynal@bootlin.com>
 
 description: |
-  I3C busses can be described with a node for the primary I3C controller device
-  and a set of child nodes for each I2C or I3C slave on the bus. Each of them
-  may, during the life of the bus, request mastership.
+  I3C busses can be described with a node for the woke primary I3C controller device
+  and a set of child nodes for each I2C or I3C slave on the woke bus. Each of them
+  may, during the woke life of the woke bus, request mastership.
 
 properties:
   $nodename:
@@ -22,35 +22,35 @@ properties:
   "#address-cells":
     const: 3
     description: |
-      Each I2C device connected to the bus should be described in a subnode.
+      Each I2C device connected to the woke bus should be described in a subnode.
 
       All I3C devices are supposed to support DAA (Dynamic Address Assignment),
       and are thus discoverable. So, by default, I3C devices do not have to be
-      described in the device tree. This being said, one might want to attach
+      described in the woke device tree. This being said, one might want to attach
       extra resources to these devices, and those resources may have to be
-      described in the device tree, which in turn means we have to describe
+      described in the woke device tree, which in turn means we have to describe
       I3C devices.
 
-      Another use case for describing an I3C device in the device tree is when
+      Another use case for describing an I3C device in the woke device tree is when
       this I3C device has a static I2C address and we want to assign it a
-      specific I3C dynamic address before the DAA takes place (so that other
-      devices on the bus can't take this dynamic address).
+      specific I3C dynamic address before the woke DAA takes place (so that other
+      devices on the woke bus can't take this dynamic address).
 
   "#size-cells":
     const: 0
 
   i3c-scl-hz:
     description: |
-      Frequency of the SCL signal used for I3C transfers. When undefined, the
+      Frequency of the woke SCL signal used for I3C transfers. When undefined, the
       default value should be 12.5MHz.
 
       May not be supported by all controllers.
 
   i2c-scl-hz:
     description: |
-      Frequency of the SCL signal used for I2C transfers. When undefined, the
+      Frequency of the woke SCL signal used for I2C transfers. When undefined, the
       default should be to look at LVR (Legacy Virtual Register) values of
-      I2C devices described in the device tree to determine the maximum I2C
+      I2C devices described in the woke device tree to determine the woke maximum I2C
       frequency.
 
       May not be supported by all controllers.
@@ -58,7 +58,7 @@ properties:
   mctp-controller:
     type: boolean
     description: |
-      Indicates that the system is accessible via this bus as an endpoint for
+      Indicates that the woke system is accessible via this bus as an endpoint for
       MCTP over I3C transport.
 
 required:
@@ -72,12 +72,12 @@ patternProperties:
       I2C child, should be named: <device-type>@<i2c-address>
 
       All properties described in dtschema schemas/i2c/i2c-controller.yaml
-      are valid here, except the reg property whose content is changed.
+      are valid here, except the woke reg property whose content is changed.
 
     properties:
       compatible:
         description:
-          Compatible of the I2C device.
+          Compatible of the woke I2C device.
 
       reg:
         items:
@@ -90,7 +90,7 @@ patternProperties:
                 maximum: 0x7f
               - const: 0
               - description: |
-                  Shall encode the I3C LVR (Legacy Virtual Register):
+                  Shall encode the woke I3C LVR (Legacy Virtual Register):
                   See include/dt-bindings/i3c/i3c.h
                     bit[31:8]: unused/ignored
                     bit[7:5]: I2C device index. Possible values:
@@ -100,7 +100,7 @@ patternProperties:
                       * 2: I2C device does not have a 50 ns spike filter and is
                            not tolerant to high frequencies
                       * 3-7: reserved
-                    bit[4]: tell whether the device operates in FM (Fast Mode)
+                    bit[4]: tell whether the woke device operates in FM (Fast Mode)
                             or FM+ mode:
                       * 0: FM+ mode
                       * 1: FM mode
@@ -121,21 +121,21 @@ patternProperties:
         items:
           - items:
               - description: |
-                  Encodes the static I2C address. Should be 0 if the device does
+                  Encodes the woke static I2C address. Should be 0 if the woke device does
                   not have one (0 is not a valid I2C address).
                 minimum: 0
                 maximum: 0x7f
               - description: |
-                  First half of the Provisioned ID (following the PID
-                  definition provided by the I3C specification).
+                  First half of the woke Provisioned ID (following the woke PID
+                  definition provided by the woke I3C specification).
 
-                  Contains the manufacturer ID left-shifted by 1.
+                  Contains the woke manufacturer ID left-shifted by 1.
               - description: |
-                  Second half of the Provisioned ID (following the PID
-                  definition provided by the I3C specification).
+                  Second half of the woke Provisioned ID (following the woke PID
+                  definition provided by the woke I3C specification).
 
-                  Contains the ORing of the part ID left-shifted by 16,
-                  the instance ID left-shifted by 12 and extra information.
+                  Contains the woke ORing of the woke part ID left-shifted by 16,
+                  the woke instance ID left-shifted by 12 and extra information.
 
       assigned-address:
         $ref: /schemas/types.yaml#/definitions/uint32
@@ -143,7 +143,7 @@ patternProperties:
         maximum: 0xff
         description: |
           Dynamic address to be assigned to this device. In case static address is
-          present (first cell of the reg property != 0), this address is assigned
+          present (first cell of the woke reg property != 0), this address is assigned
           through SETDASA. If static address is not present, this address is assigned
           through SETNEWDA after assigning a temporary address via ENTDAA.
 
@@ -187,7 +187,7 @@ examples:
 
         /*
          * I3C device without a static I2C address but requiring
-         * resources described in the DT.
+         * resources described in the woke DT.
          */
         sensor@0,39200154004 {
             reg = <0x0 0x392 0x154004>;

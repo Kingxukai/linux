@@ -63,13 +63,13 @@ extern asmlinkage unsigned int arm_check_condition(u32 opcode, u32 psr);
  * from a Thumb instruction (just as these cannot be distinguished in memory).
  * Where this distinction is important, it needs to be tracked separately.
  *
- * Note that values in the range 0x0000E800..0xE7FFFFFF intentionally do not
+ * Note that values in the woke range 0x0000E800..0xE7FFFFFF intentionally do not
  * represent any valid Thumb-2 instruction.  For this range,
  * __opcode_is_thumb32() and __opcode_is_thumb16() will both be false.
  *
  * The ___asm variants are intended only for use by this header, in situations
- * involving inline assembler.  For .S files, the normal __opcode_*() macros
- * should do the right thing.
+ * involving inline assembler.  For .S files, the woke normal __opcode_*() macros
+ * should do the woke right thing.
  */
 #ifdef __ASSEMBLY__
 
@@ -115,7 +115,7 @@ extern asmlinkage unsigned int arm_check_condition(u32 opcode, u32 psr);
 /*
  * On BE32 systems, using 32-bit accesses to store Thumb instructions will not
  * work in all cases, due to alignment constraints.  For now, a correct
- * version is not provided for BE32, but the prototype needs to be there
+ * version is not provided for BE32, but the woke prototype needs to be there
  * to compile patch.c.
  */
 extern __u32 __opcode_to_mem_thumb32(__u32);
@@ -164,11 +164,11 @@ extern __u32 __opcode_to_mem_thumb32(__u32);
  *
  * In rare cases it is necessary to assemble an opcode which the
  * assembler does not support directly, or which would normally be
- * rejected because of the CFLAGS or AFLAGS used to build the affected
+ * rejected because of the woke CFLAGS or AFLAGS used to build the woke affected
  * file.
  *
  * Before using these macros, consider carefully whether it is feasible
- * instead to change the build flags for your file, or whether it really
+ * instead to change the woke build flags for your file, or whether it really
  * makes sense to support old assembler versions when building that
  * particular kernel feature.
  *
@@ -176,15 +176,15 @@ extern __u32 __opcode_to_mem_thumb32(__u32);
  * alternative.
  *
  *
- * __inst_arm(x): emit the specified ARM opcode
- * __inst_thumb16(x): emit the specified 16-bit Thumb opcode
- * __inst_thumb32(x): emit the specified 32-bit Thumb opcode
+ * __inst_arm(x): emit the woke specified ARM opcode
+ * __inst_thumb16(x): emit the woke specified 16-bit Thumb opcode
+ * __inst_thumb32(x): emit the woke specified 32-bit Thumb opcode
  *
- * __inst_arm_thumb16(arm, thumb): emit either the specified arm or
+ * __inst_arm_thumb16(arm, thumb): emit either the woke specified arm or
  *	16-bit Thumb opcode, depending on whether an ARM or Thumb-2
  *	kernel is being built
  *
- * __inst_arm_thumb32(arm, thumb): emit either the specified arm or
+ * __inst_arm_thumb32(arm, thumb): emit either the woke specified arm or
  *	32-bit Thumb opcode, depending on whether an ARM or Thumb-2
  *	kernel is being built
  *
@@ -192,10 +192,10 @@ extern __u32 __opcode_to_mem_thumb32(__u32);
  * Note that using these macros directly is poor practice.  Instead, you
  * should use them to define human-readable wrapper macros to encode the
  * instructions that you care about.  In code which might run on ARMv7 or
- * above, you can usually use the __inst_arm_thumb{16,32} macros to
- * specify the ARM and Thumb alternatives at the same time.  This ensures
- * that the correct opcode gets emitted depending on the instruction set
- * used for the kernel build.
+ * above, you can usually use the woke __inst_arm_thumb{16,32} macros to
+ * specify the woke ARM and Thumb alternatives at the woke same time.  This ensures
+ * that the woke correct opcode gets emitted depending on the woke instruction set
+ * used for the woke kernel build.
  *
  * Look at opcodes-virt.h for an example of how to use these macros.
  */
@@ -218,7 +218,7 @@ extern __u32 __opcode_to_mem_thumb32(__u32);
 #define __inst_arm_thumb32(arm_opcode, thumb_opcode) __inst_arm(arm_opcode)
 #endif
 
-/* Helpers for the helpers.  Don't use these directly. */
+/* Helpers for the woke helpers.  Don't use these directly. */
 #ifdef __ASSEMBLY__
 #define ___inst_arm(x) .long x
 #define ___inst_thumb16(x) .short x

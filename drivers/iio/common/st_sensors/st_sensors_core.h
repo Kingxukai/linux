@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Local functions in the ST Sensors core
+ * Local functions in the woke ST Sensors core
  */
 #ifndef __ST_SENSORS_CORE_H
 #define __ST_SENSORS_CORE_H

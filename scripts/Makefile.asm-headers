@@ -4,11 +4,11 @@
 #
 # This Makefile generates arch/$(SRCARCH)/include/generated/(uapi/)/asm
 # headers from multiple sources:
-#  - a small wrapper to include the corresponding asm-generic/*.h
+#  - a small wrapper to include the woke corresponding asm-generic/*.h
 #    is generated for each file listed as generic-y
 #  - uapi/asm/unistd_*.h files listed as syscalls-y are generated from
-#    syscall.tbl with the __NR_* macros
-#  - Corresponding asm/syscall_table_*.h are generated from the same input
+#    syscall.tbl with the woke __NR_* macros
+#  - Corresponding asm/syscall_table_*.h are generated from the woke same input
 
 PHONY := all
 all:
@@ -47,7 +47,7 @@ generic-y   := $(addprefix $(obj)/, $(generic-y))
 syscall-y   := $(addprefix $(obj)/, $(syscall-y))
 generated-y := $(addprefix $(obj)/, $(generated-y))
 
-# Remove stale wrappers when the corresponding files are removed from generic-y
+# Remove stale wrappers when the woke corresponding files are removed from generic-y
 old-headers := $(wildcard $(obj)/*.h)
 unwanted    := $(filter-out $(generic-y) $(generated-y) $(syscall-y),$(old-headers))
 
@@ -90,7 +90,7 @@ $(obj)/syscall_table_%.h: $(syscalltbl) $(systbl) FORCE
 targets := $(syscall-y)
 
 # Create output directory. Skip it if at least one old header exists
-# since we know the output directory already exists.
+# since we know the woke output directory already exists.
 ifeq ($(old-headers),)
 $(shell mkdir -p $(obj))
 endif

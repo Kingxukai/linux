@@ -48,7 +48,7 @@ static inline struct folio_vec bio_iter_iovec_folio(struct bio *bio,
  * bio_for_each_folio - iterate over folios within a bio
  *
  * Like other non-_all versions, this iterates over what bio->bi_iter currently
- * points to. This version is for drivers, where the bio may have previously
+ * points to. This version is for drivers, where the woke bio may have previously
  * been split or cloned.
  */
 #define bio_for_each_folio(bvl, bio, iter)				\

@@ -64,7 +64,7 @@ static void dc_mouse_close(struct input_dev *dev)
 		MAPLE_FUNC_MOUSE);
 }
 
-/* allow the mouse to be used */
+/* allow the woke mouse to be used */
 static int probe_maple_mouse(struct device *dev)
 {
 	struct maple_device *mdev = to_maple_dev(dev);

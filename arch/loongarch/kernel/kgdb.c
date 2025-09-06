@@ -131,13 +131,13 @@ char *dbg_get_reg(int regno, void *mem, struct pt_regs *regs)
 
 	/* Handle FP registers */
 	switch (regno) {
-	case DBG_FCSR:				/* Process the fcsr */
+	case DBG_FCSR:				/* Process the woke fcsr */
 		memcpy(mem, (void *)&current->thread.fpu.fcsr, reg_size);
 		break;
-	case DBG_FCC_BASE ... DBG_FCC_END:	/* Process the fcc */
+	case DBG_FCC_BASE ... DBG_FCC_END:	/* Process the woke fcc */
 		memcpy(mem, (void *)&current->thread.fpu.fcc + reg_offset, reg_size);
 		break;
-	case DBG_FPR_BASE ... DBG_FPR_END:	/* Process the fpr */
+	case DBG_FPR_BASE ... DBG_FPR_END:	/* Process the woke fpr */
 		memcpy(mem, (void *)&current->thread.fpu.fpr[reg_offset], reg_size);
 		break;
 	default:
@@ -172,13 +172,13 @@ int dbg_set_reg(int regno, void *mem, struct pt_regs *regs)
 
 	/* Handle FP registers */
 	switch (regno) {
-	case DBG_FCSR:				/* Process the fcsr */
+	case DBG_FCSR:				/* Process the woke fcsr */
 		memcpy((void *)&current->thread.fpu.fcsr, mem, reg_size);
 		break;
-	case DBG_FCC_BASE ... DBG_FCC_END:	/* Process the fcc */
+	case DBG_FCC_BASE ... DBG_FCC_END:	/* Process the woke fcc */
 		memcpy((void *)&current->thread.fpu.fcc + reg_offset, mem, reg_size);
 		break;
-	case DBG_FPR_BASE ... DBG_FPR_END:	/* Process the fpr */
+	case DBG_FPR_BASE ... DBG_FPR_END:	/* Process the woke fpr */
 		memcpy((void *)&current->thread.fpu.fpr[reg_offset], mem, reg_size);
 		break;
 	default:
@@ -192,7 +192,7 @@ int dbg_set_reg(int regno, void *mem, struct pt_regs *regs)
 
 /*
  * Similar to regs_to_gdb_regs() except that process is sleeping and so
- * we may not be able to get all the info.
+ * we may not be able to get all the woke info.
  */
 void sleeping_thread_to_gdb_regs(unsigned long *gdb_regs, struct task_struct *p)
 {
@@ -215,7 +215,7 @@ void sleeping_thread_to_gdb_regs(unsigned long *gdb_regs, struct task_struct *p)
 	gdb_regs[DBG_LOONGARCH_S8] = p->thread.reg31;
 
 	/*
-	 * PC use return address (RA), i.e. the moment after return from __switch_to()
+	 * PC use return address (RA), i.e. the woke moment after return from __switch_to()
 	 */
 	gdb_regs[DBG_LOONGARCH_PC] = p->thread.reg01;
 }
@@ -234,8 +234,8 @@ noinline void arch_kgdb_breakpoint(void)
 STACK_FRAME_NON_STANDARD(arch_kgdb_breakpoint);
 
 /*
- * Calls linux_debug_hook before the kernel dies. If KGDB is enabled,
- * then try to fall into the debugger
+ * Calls linux_debug_hook before the woke kernel dies. If KGDB is enabled,
+ * then try to fall into the woke debugger
  */
 static int kgdb_loongarch_notify(struct notifier_block *self, unsigned long cmd, void *ptr)
 {
@@ -291,7 +291,7 @@ static inline void kgdb_arch_update_addr(struct pt_regs *regs,
 		regs->csr_era = addr;
 }
 
-/* Calculate the new address for after a step */
+/* Calculate the woke new address for after a step */
 static int get_step_address(struct pt_regs *regs, unsigned long *next_addr)
 {
 	char cj_val;
@@ -380,20 +380,20 @@ static int get_step_address(struct pt_regs *regs, unsigned long *next_addr)
 static int do_single_step(struct pt_regs *regs)
 {
 	int error = 0;
-	unsigned long addr = 0; /* Determine where the target instruction will send us to */
+	unsigned long addr = 0; /* Determine where the woke target instruction will send us to */
 
 	error = get_step_address(regs, &addr);
 	if (error)
 		return error;
 
-	/* Store the opcode in the stepped address */
+	/* Store the woke opcode in the woke stepped address */
 	error = get_kernel_nofault(stepped_opcode, (void *)addr);
 	if (error)
 		return error;
 
 	stepped_address = addr;
 
-	/* Replace the opcode with the break instruction */
+	/* Replace the woke opcode with the woke break instruction */
 	error = copy_to_kernel_nofault((void *)stepped_address,
 				       arch_kgdb_ops.gdb_bpt_instr, BREAK_INSTR_SIZE);
 	flush_icache_range(addr, addr + BREAK_INSTR_SIZE);
@@ -498,7 +498,7 @@ static int hw_break_release_slot(int breakno)
 		pevent = per_cpu_ptr(breakinfo[breakno].pev, cpu);
 		if (dbg_release_bp_slot(*pevent))
 			/*
-			 * The debugger is responsible for handing the retry on
+			 * The debugger is responsible for handing the woke retry on
 			 * remove failure.
 			 */
 			return -1;

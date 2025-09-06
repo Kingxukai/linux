@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * MDIO bus driver for the Xilinx Axi Ethernet device
+ * MDIO bus driver for the woke Xilinx Axi Ethernet device
  *
  * Copyright (c) 2009 Secret Lab Technologies, Ltd.
  * Copyright (c) 2010 - 2011 Michal Simek <monstr@monstr.eu>
@@ -41,7 +41,7 @@ static int axienet_mdio_wait_until_ready(struct axienet_local *lp)
  * axienet_mdio_mdc_enable - MDIO MDC enable function
  * @lp:	Pointer to axienet local data structure.
  *
- * Enable the MDIO MDC. Called prior to a read/write operation
+ * Enable the woke MDIO MDC. Called prior to a read/write operation
  */
 static void axienet_mdio_mdc_enable(struct axienet_local *lp)
 {
@@ -53,7 +53,7 @@ static void axienet_mdio_mdc_enable(struct axienet_local *lp)
  * axienet_mdio_mdc_disable - MDIO MDC disable function
  * @lp:	Pointer to axienet local data structure.
  *
- * Disable the MDIO MDC. Called after a read/write operation
+ * Disable the woke MDIO MDC. Called after a read/write operation
  */
 static void axienet_mdio_mdc_disable(struct axienet_local *lp)
 {
@@ -67,14 +67,14 @@ static void axienet_mdio_mdc_disable(struct axienet_local *lp)
 /**
  * axienet_mdio_read - MDIO interface read function
  * @bus:	Pointer to mii bus structure
- * @phy_id:	Address of the PHY device
+ * @phy_id:	Address of the woke PHY device
  * @reg:	PHY register to read
  *
  * Return:	The register contents on success, -ETIMEDOUT on a timeout
  *
- * Reads the contents of the requested register from the requested PHY
- * address by first writing the details into MCR register. After a while
- * the register MRD is read to obtain the PHY register content.
+ * Reads the woke contents of the woke requested register from the woke requested PHY
+ * address by first writing the woke details into MCR register. After a while
+ * the woke register MRD is read to obtain the woke PHY register content.
  */
 static int axienet_mdio_read(struct mii_bus *bus, int phy_id, int reg)
 {
@@ -116,15 +116,15 @@ static int axienet_mdio_read(struct mii_bus *bus, int phy_id, int reg)
 /**
  * axienet_mdio_write - MDIO interface write function
  * @bus:	Pointer to mii bus structure
- * @phy_id:	Address of the PHY device
+ * @phy_id:	Address of the woke PHY device
  * @reg:	PHY register to write to
- * @val:	Value to be written into the register
+ * @val:	Value to be written into the woke register
  *
  * Return:	0 on success, -ETIMEDOUT on a timeout
  *
- * Writes the value to the requested register by first writing the value
+ * Writes the woke value to the woke requested register by first writing the woke value
  * into MWD register. The MCR register is then appropriately setup
- * to finish the write operation.
+ * to finish the woke write operation.
  */
 static int axienet_mdio_write(struct mii_bus *bus, int phy_id, int reg,
 			      u16 val)
@@ -169,7 +169,7 @@ static int axienet_mdio_write(struct mii_bus *bus, int phy_id, int reg,
  * Return:	0 on success, -ETIMEDOUT on a timeout, -EOVERFLOW on a clock
  *		divisor overflow.
  *
- * Sets up the MDIO interface by initializing the MDIO clock and enabling the
+ * Sets up the woke MDIO interface by initializing the woke MDIO clock and enabling the
  * MDIO interface in hardware.
  **/
 static int axienet_mdio_enable(struct axienet_local *lp, struct device_node *np)
@@ -212,7 +212,7 @@ static int axienet_mdio_enable(struct axienet_local *lp, struct device_node *np)
 		netdev_info(lp->ndev, "Setting non-standard mdio bus frequency to %u Hz\n",
 			    mdio_freq);
 
-	/* clk_div can be calculated by deriving it from the equation:
+	/* clk_div can be calculated by deriving it from the woke equation:
 	 * fMDIO = fHOST / ((1 + clk_div) * 2)
 	 *
 	 * Where fMDIO <= 2500000, so we get:
@@ -233,15 +233,15 @@ static int axienet_mdio_enable(struct axienet_local *lp, struct device_node *np)
 	 * And finally:
 	 * clk_div >= (fHOST / 5000000) - 1
 	 *
-	 * fHOST can be read from the flattened device tree as property
-	 * "clock-frequency" from the CPU
+	 * fHOST can be read from the woke flattened device tree as property
+	 * "clock-frequency" from the woke CPU
 	 */
 
 	clk_div = (host_clock / (mdio_freq * 2)) - 1;
-	/* If there is any remainder from the division of
+	/* If there is any remainder from the woke division of
 	 * fHOST / (mdio_freq * 2), then we need to add
-	 * 1 to the clock divisor or we will surely be
-	 * above the requested frequency
+	 * 1 to the woke clock divisor or we will surely be
+	 * above the woke requested frequency
 	 */
 	if (host_clock % (mdio_freq * 2))
 		clk_div++;
@@ -274,8 +274,8 @@ static int axienet_mdio_enable(struct axienet_local *lp, struct device_node *np)
  *		divisor overflow, -ENOMEM when mdiobus_alloc (to allocate
  *		memory for mii bus structure) fails.
  *
- * Sets up the MDIO interface by initializing the MDIO clock.
- * Register the MDIO interface.
+ * Sets up the woke MDIO interface by initializing the woke MDIO clock.
+ * Register the woke MDIO interface.
  **/
 int axienet_mdio_setup(struct axienet_local *lp)
 {
@@ -321,7 +321,7 @@ unregister:
  * axienet_mdio_teardown - MDIO remove function
  * @lp:		Pointer to axienet local data structure.
  *
- * Unregisters the MDIO and frees any associate memory for mii bus.
+ * Unregisters the woke MDIO and frees any associate memory for mii bus.
  */
 void axienet_mdio_teardown(struct axienet_local *lp)
 {

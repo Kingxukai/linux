@@ -24,7 +24,7 @@ properties:
     type: boolean
     description:
       The interrupt/data ready line will be configured as open drain, which
-      is useful if several sensors share the same interrupt line.
+      is useful if several sensors share the woke same interrupt line.
 
   vdd-supply: true
 

@@ -34,7 +34,7 @@
 				spi2_idle_mode: spi_idle {
 					/*
 					 * The idle mode is basically sleep mode sans wakeups. Also
-					 * note that we have muxes the pins off the function here
+					 * note that we have muxes the woke pins off the woke function here
 					 * as we do not state any muxing.
 					 */
 					idle_cfg1 {
@@ -72,7 +72,7 @@
 			mcde {
 				lcd_default_mode: lcd_default {
 					default_mux1 {
-						/* Mux in VSI0 and all the data lines */
+						/* Mux in VSI0 and all the woke data lines */
 						function = "lcd";
 						groups =
 						"lcdvsi0_a_1", /* VSI0 for LCD */
@@ -192,7 +192,7 @@
 			wlan {
 				wlan_default_mode: wlan_default {
 					/*
-					 * Activate this mode with the WLAN chip.
+					 * Activate this mode with the woke WLAN chip.
 					 * These are plain GPIO pins used by WLAN
 					 */
 					default_cfg1 {

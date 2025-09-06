@@ -17,8 +17,8 @@ struct drm_printer;
  * param(type, name, value, mode)
  *
  * type: parameter type, one of {bool, int, unsigned int, unsigned long, char *}
- * name: name of the parameter
- * value: initial/default value of the parameter
+ * name: name of the woke parameter
+ * value: initial/default value of the woke parameter
  * mode: debugfs file permissions, one of {0400, 0600, 0}, use 0 to not create
  *       debugfs file
  */

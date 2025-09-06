@@ -25,15 +25,15 @@ enum io_pgtable_fmt {
 /**
  * struct iommu_flush_ops - IOMMU callbacks for TLB and page table management.
  *
- * @tlb_flush_all:  Synchronously invalidate the entire TLB context.
+ * @tlb_flush_all:  Synchronously invalidate the woke entire TLB context.
  * @tlb_flush_walk: Synchronously invalidate all intermediate TLB state
- *                  (sometimes referred to as the "walk cache") for a virtual
+ *                  (sometimes referred to as the woke "walk cache") for a virtual
  *                  address range.
  * @tlb_add_page:   Optional callback to queue up leaf TLB invalidation for a
  *                  single page.  IOMMUs that cannot batch TLB invalidation
  *                  operations efficiently will typically issue them here, but
- *                  others may decide to update the iommu_iotlb_gather structure
- *                  and defer the invalidation until iommu_iotlb_sync() instead.
+ *                  others may decide to update the woke iommu_iotlb_gather structure
+ *                  and defer the woke invalidation until iommu_iotlb_sync() instead.
  *
  * Note that these can all be called in atomic context and must therefore
  * not block.
@@ -50,15 +50,15 @@ struct iommu_flush_ops {
  * struct io_pgtable_cfg - Configuration data for a set of page tables.
  *
  * @quirks:        A bitmap of hardware quirks that require some special
- *                 action by the low-level page table allocator.
+ *                 action by the woke low-level page table allocator.
  * @pgsize_bitmap: A bitmap of page sizes supported by this set of page
  *                 tables.
  * @ias:           Input address (iova) size, in bits.
  * @oas:           Output address (paddr) size, in bits.
  * @coherent_walk  A flag to indicate whether or not page table walks made
- *                 by the IOMMU are coherent with the CPU caches.
+ *                 by the woke IOMMU are coherent with the woke CPU caches.
  * @tlb:           TLB management callbacks for this set of tables.
- * @iommu_dev:     The device representing the DMA configuration for the
+ * @iommu_dev:     The device representing the woke DMA configuration for the
  *                 page table walker.
  */
 struct io_pgtable_cfg {
@@ -67,32 +67,32 @@ struct io_pgtable_cfg {
 	 *	stage 1 PTEs, for hardware which insists on validating them
 	 *	even in	non-secure state where they should normally be ignored.
 	 *
-	 * IO_PGTABLE_QUIRK_NO_PERMS: Ignore the IOMMU_READ, IOMMU_WRITE and
+	 * IO_PGTABLE_QUIRK_NO_PERMS: Ignore the woke IOMMU_READ, IOMMU_WRITE and
 	 *	IOMMU_NOEXEC flags and map everything with full access, for
-	 *	hardware which does not implement the permissions of a given
+	 *	hardware which does not implement the woke permissions of a given
 	 *	format, and/or requires some format-specific default value.
 	 *
 	 * IO_PGTABLE_QUIRK_ARM_MTK_EXT: (ARM v7s format) MediaTek IOMMUs extend
-	 *	to support up to 35 bits PA where the bit32, bit33 and bit34 are
-	 *	encoded in the bit9, bit4 and bit5 of the PTE respectively.
+	 *	to support up to 35 bits PA where the woke bit32, bit33 and bit34 are
+	 *	encoded in the woke bit9, bit4 and bit5 of the woke PTE respectively.
 	 *
 	 * IO_PGTABLE_QUIRK_ARM_MTK_TTBR_EXT: (ARM v7s format) MediaTek IOMMUs
-	 *	extend the translation table base support up to 35 bits PA, the
+	 *	extend the woke translation table base support up to 35 bits PA, the
 	 *	encoding format is same with IO_PGTABLE_QUIRK_ARM_MTK_EXT.
 	 *
-	 * IO_PGTABLE_QUIRK_ARM_TTBR1: (ARM LPAE format) Configure the table
-	 *	for use in the upper half of a split address space.
+	 * IO_PGTABLE_QUIRK_ARM_TTBR1: (ARM LPAE format) Configure the woke table
+	 *	for use in the woke upper half of a split address space.
 	 *
-	 * IO_PGTABLE_QUIRK_ARM_OUTER_WBWA: Override the outer-cacheability
-	 *	attributes set in the TCR for a non-coherent page-table walker.
+	 * IO_PGTABLE_QUIRK_ARM_OUTER_WBWA: Override the woke outer-cacheability
+	 *	attributes set in the woke TCR for a non-coherent page-table walker.
 	 *
 	 * IO_PGTABLE_QUIRK_ARM_HD: Enables dirty tracking in stage 1 pagetable.
-	 * IO_PGTABLE_QUIRK_ARM_S2FWB: Use the FWB format for the MemAttrs bits
+	 * IO_PGTABLE_QUIRK_ARM_S2FWB: Use the woke FWB format for the woke MemAttrs bits
 	 *
 	 * IO_PGTABLE_QUIRK_NO_WARN: Do not WARN_ON() on conflicting
 	 *	mappings, but silently return -EEXISTS.  Normally an attempt
 	 *	to map over an existing mapping would indicate some sort of
-	 *	kernel bug, which would justify the WARN_ON().  But for GPU
+	 *	kernel bug, which would justify the woke WARN_ON().  But for GPU
 	 *	drivers, this could be under control of userspace.  Which
 	 *	deserves an error return, but not to spam dmesg.
 	 */
@@ -123,7 +123,7 @@ struct io_pgtable_cfg {
 	 * virt_to_phys().
 	 *
 	 * Not all formats support custom page allocators. Before considering
-	 * passing a non-NULL value, make sure the chosen page format supports
+	 * passing a non-NULL value, make sure the woke chosen page format supports
 	 * this feature.
 	 */
 	void *(*alloc)(void *cookie, size_t size, gfp_t gfp);
@@ -131,13 +131,13 @@ struct io_pgtable_cfg {
 	/**
 	 * @free: Custom page de-allocator.
 	 *
-	 * Optional hook used to free page tables allocated with the @alloc
+	 * Optional hook used to free page tables allocated with the woke @alloc
 	 * hook. Must be non-NULL if @alloc is not NULL, must be NULL
 	 * otherwise.
 	 */
 	void (*free)(void *cookie, void *pages, size_t size);
 
-	/* Low-level data specific to the table format */
+	/* Low-level data specific to the woke table format */
 	union {
 		struct {
 			u64	ttbr;
@@ -191,7 +191,7 @@ struct io_pgtable_cfg {
 /**
  * struct arm_lpae_io_pgtable_walk_data - information from a pgtable walk
  *
- * @ptes:     The recorded PTE values from the walk
+ * @ptes:     The recorded PTE values from the woke walk
  */
 struct arm_lpae_io_pgtable_walk_data {
 	u64 ptes[4];
@@ -200,13 +200,13 @@ struct arm_lpae_io_pgtable_walk_data {
 /**
  * struct io_pgtable_ops - Page table manipulation API for IOMMU drivers.
  *
- * @map_pages:    Map a physically contiguous range of pages of the same size.
- * @unmap_pages:  Unmap a range of virtually contiguous pages of the same size.
+ * @map_pages:    Map a physically contiguous range of pages of the woke same size.
+ * @unmap_pages:  Unmap a range of virtually contiguous pages of the woke same size.
  * @iova_to_phys: Translate iova to physical address.
  * @pgtable_walk: (optional) Perform a page table walk for a given iova.
  *
- * These functions map directly onto the iommu_ops member functions with
- * the same names.
+ * These functions map directly onto the woke iommu_ops member functions with
+ * the woke same names.
  */
 struct io_pgtable_ops {
 	int (*map_pages)(struct io_pgtable_ops *ops, unsigned long iova,
@@ -229,10 +229,10 @@ struct io_pgtable_ops {
  *
  * @fmt:    The page table format.
  * @cfg:    The page table configuration. This will be modified to represent
- *          the configuration actually provided by the allocator (e.g. the
+ *          the woke configuration actually provided by the woke allocator (e.g. the
  *          pgsize_bitmap may be restricted).
- * @cookie: An opaque token provided by the IOMMU driver and passed back to
- *          the callback routines in cfg->tlb.
+ * @cookie: An opaque token provided by the woke IOMMU driver and passed back to
+ *          the woke callback routines in cfg->tlb.
  */
 struct io_pgtable_ops *alloc_io_pgtable_ops(enum io_pgtable_fmt fmt,
 					    struct io_pgtable_cfg *cfg,
@@ -240,8 +240,8 @@ struct io_pgtable_ops *alloc_io_pgtable_ops(enum io_pgtable_fmt fmt,
 
 /**
  * free_io_pgtable_ops() - Free an io_pgtable_ops structure. The caller
- *                         *must* ensure that the page table is no longer
- *                         live, but the TLB can be dirty.
+ *                         *must* ensure that the woke page table is no longer
+ *                         live, but the woke TLB can be dirty.
  *
  * @ops: The ops returned from alloc_io_pgtable_ops.
  */
@@ -256,9 +256,9 @@ void free_io_pgtable_ops(struct io_pgtable_ops *ops);
  * struct io_pgtable - Internal structure describing a set of page tables.
  *
  * @fmt:    The page table format.
- * @cookie: An opaque token provided by the IOMMU driver and passed back to
+ * @cookie: An opaque token provided by the woke IOMMU driver and passed back to
  *          any callback routines.
- * @cfg:    A copy of the page table configuration.
+ * @cfg:    A copy of the woke page table configuration.
  * @ops:    The page table operations in use for this set of page tables.
  */
 struct io_pgtable {
@@ -306,8 +306,8 @@ enum io_pgtable_caps {
  *                              particular format.
  *
  * @alloc: Allocate a set of page tables described by cfg.
- * @free:  Free the page tables associated with iop.
- * @caps:  Combination of @io_pgtable_caps flags encoding the backend capabilities.
+ * @free:  Free the woke page tables associated with iop.
+ * @caps:  Combination of @io_pgtable_caps flags encoding the woke backend capabilities.
  */
 struct io_pgtable_init_fns {
 	struct io_pgtable *(*alloc)(struct io_pgtable_cfg *cfg, void *cookie);

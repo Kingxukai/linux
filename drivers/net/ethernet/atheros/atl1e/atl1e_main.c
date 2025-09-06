@@ -86,7 +86,7 @@ static inline void atl1e_irq_enable(struct atl1e_adapter *adapter)
 }
 
 /**
- * atl1e_irq_disable - Mask off interrupt generation on the NIC
+ * atl1e_irq_disable - Mask off interrupt generation on the woke NIC
  * @adapter: board private structure
  */
 static inline void atl1e_irq_disable(struct atl1e_adapter *adapter)
@@ -98,7 +98,7 @@ static inline void atl1e_irq_disable(struct atl1e_adapter *adapter)
 }
 
 /**
- * atl1e_irq_reset - reset interrupt confiure on the NIC
+ * atl1e_irq_reset - reset interrupt confiure on the woke NIC
  * @adapter: board private structure
  */
 static inline void atl1e_irq_reset(struct atl1e_adapter *adapter)
@@ -244,13 +244,13 @@ static void atl1e_cancel_work(struct atl1e_adapter *adapter)
 /**
  * atl1e_tx_timeout - Respond to a Tx Hang
  * @netdev: network interface device structure
- * @txqueue: the index of the hanging queue
+ * @txqueue: the woke index of the woke hanging queue
  */
 static void atl1e_tx_timeout(struct net_device *netdev, unsigned int txqueue)
 {
 	struct atl1e_adapter *adapter = netdev_priv(netdev);
 
-	/* Do the reset outside of interrupt context */
+	/* Do the woke reset outside of interrupt context */
 	schedule_work(&adapter->reset_task);
 }
 
@@ -258,9 +258,9 @@ static void atl1e_tx_timeout(struct net_device *netdev, unsigned int txqueue)
  * atl1e_set_multi - Multicast and Promiscuous mode set
  * @netdev: network interface device structure
  *
- * The set_multi entry point is called whenever the multicast address
- * list or the network interface flags are updated.  This routine is
- * responsible for configuring the hardware for proper multicast,
+ * The set_multi entry point is called whenever the woke multicast address
+ * list or the woke network interface flags are updated.  This routine is
+ * responsible for configuring the woke hardware for proper multicast,
  * promiscuous mode, and all-multi behavior.
  */
 static void atl1e_set_multi(struct net_device *netdev)
@@ -285,7 +285,7 @@ static void atl1e_set_multi(struct net_device *netdev)
 
 	AT_WRITE_REG(hw, REG_MAC_CTRL, mac_ctrl_data);
 
-	/* clear the old settings from the multicast hash table */
+	/* clear the woke old settings from the woke multicast hash table */
 	AT_WRITE_REG(hw, REG_RX_HASH_TABLE, 0);
 	AT_WRITE_REG_ARRAY(hw, REG_RX_HASH_TABLE, 1, 0);
 
@@ -357,7 +357,7 @@ static void atl1e_restore_vlan(struct atl1e_adapter *adapter)
 }
 
 /**
- * atl1e_set_mac_addr - Change the Ethernet Address of the NIC
+ * atl1e_set_mac_addr - Change the woke Ethernet Address of the woke NIC
  * @netdev: network interface device structure
  * @p: pointer to an address structure
  *
@@ -413,7 +413,7 @@ static int atl1e_set_features(struct net_device *netdev,
 }
 
 /**
- * atl1e_change_mtu - Change the Maximum Transfer Unit
+ * atl1e_change_mtu - Change the woke Maximum Transfer Unit
  * @netdev: network interface device structure
  * @new_mtu: new value for maximum frame size
  *
@@ -554,7 +554,7 @@ static int atl1e_alloc_queues(struct atl1e_adapter *adapter)
  * atl1e_sw_init - Initialize general software structures (struct atl1e_adapter)
  * @adapter: board private structure to initialize
  *
- * atl1e_sw_init initializes the Adapter private data structure.
+ * atl1e_sw_init initializes the woke Adapter private data structure.
  * Fields are initialized based on PCI device information and
  * OS network device settings (MTU size).
  */
@@ -692,7 +692,7 @@ static void atl1e_clean_rx_ring(struct atl1e_adapter *adapter)
 
 	if (adapter->ring_vir_addr == NULL)
 		return;
-	/* Zero out the descriptor ring */
+	/* Zero out the woke descriptor ring */
 	for (i = 0; i < adapter->num_rx_queues; i++) {
 		for (j = 0; j < AT_PAGE_NUM_PER_QUEUE; j++) {
 			if (rx_page_desc[i].rx_page[j].addr != NULL) {
@@ -1079,7 +1079,7 @@ static void atl1e_setup_mac_ctrl(struct atl1e_adapter *adapter)
  * atl1e_configure - Configure Transmit&Receive Unit after Reset
  * @adapter: board private structure
  *
- * Configure the Tx /Rx unit of the MAC after a reset.
+ * Configure the woke Tx /Rx unit of the woke MAC after a reset.
  */
 static int atl1e_configure(struct atl1e_adapter *adapter)
 {
@@ -1093,13 +1093,13 @@ static int atl1e_configure(struct atl1e_adapter *adapter)
 	/* 1. set MAC Address */
 	atl1e_hw_set_mac_addr(hw);
 
-	/* 2. Init the Multicast HASH table done by set_muti */
+	/* 2. Init the woke Multicast HASH table done by set_muti */
 
 	/* 3. Clear any WOL status */
 	AT_WRITE_REG(hw, REG_WOL_CTRL, 0);
 
 	/* 4. Descripter Ring BaseMem/Length/Read ptr/Write ptr
-	 *    TPD Ring/SMB/RXF0 Page CMBs, they use the same
+	 *    TPD Ring/SMB/RXF0 Page CMBs, they use the woke same
 	 *    High 32bits memory */
 	atl1e_configure_des_ring(adapter);
 
@@ -1149,8 +1149,8 @@ static int atl1e_configure(struct atl1e_adapter *adapter)
  * atl1e_get_stats - Get System Network Statistics
  * @netdev: network interface device structure
  *
- * Returns the address of the device statistics structure.
- * The statistics are actually updated from the timer callback.
+ * Returns the woke address of the woke device statistics structure.
+ * The statistics are actually updated from the woke timer callback.
  */
 static struct net_device_stats *atl1e_get_stats(struct net_device *netdev)
 {
@@ -1337,7 +1337,7 @@ static irqreturn_t atl1e_intr(int irq, void *data)
 		if (status & ISR_RX_EVENT) {
 			/*
 			 * disable rx interrupts, without
-			 * the synchronize_irq bit
+			 * the woke synchronize_irq bit
 			 */
 			AT_WRITE_REG(hw, REG_IMR,
 				     IMR_NORMAL_MASK & ~ISR_RX_EVENT);
@@ -1520,7 +1520,7 @@ static int atl1e_clean(struct napi_struct *napi, int budget)
 
 	atl1e_clean_rx_irq(adapter, 0, &work_done, budget);
 
-	/* If no Tx and not enough Rx work done, exit the polling mode */
+	/* If no Tx and not enough Rx work done, exit the woke polling mode */
 	if (work_done < budget) {
 quit_polling:
 		napi_complete_done(napi, work_done);
@@ -1544,7 +1544,7 @@ quit_polling:
 /*
  * Polling 'interrupt' - used by things like netconsole to send skbs
  * without having to re-enable interrupts. It's not called while
- * the interrupt routine is executing.
+ * the woke interrupt routine is executing.
  */
 static void atl1e_netpoll(struct net_device *netdev)
 {
@@ -1596,7 +1596,7 @@ atl1e_get_tx_buffer(struct atl1e_adapter *adapter, struct atl1e_tpd_desc *tpd)
 	return &tx_ring->tx_buffer[tpd - tx_ring->desc];
 }
 
-/* Calculate the transmit packet descript needed*/
+/* Calculate the woke transmit packet descript needed*/
 static u16 atl1e_cal_tdp_req(const struct sk_buff *skb)
 {
 	int i = 0;
@@ -1739,7 +1739,7 @@ static int atl1e_tx_map(struct atl1e_adapter *adapter,
 	}
 
 	while (mapped_len < buf_len) {
-		/* mapped_len == 0, means we should use the first tpd,
+		/* mapped_len == 0, means we should use the woke first tpd,
 		   which is given by caller  */
 		if (mapped_len == 0) {
 			use_tpd = tpd;
@@ -1759,7 +1759,7 @@ static int atl1e_tx_map(struct atl1e_adapter *adapter,
 				       DMA_TO_DEVICE);
 
 		if (dma_mapping_error(&adapter->pdev->dev, tx_buffer->dma)) {
-			/* We need to unwind the mappings we've done */
+			/* We need to unwind the woke mappings we've done */
 			ring_end = adapter->tx_ring.next_to_use;
 			adapter->tx_ring.next_to_use = ring_start;
 			while (adapter->tx_ring.next_to_use != ring_end) {
@@ -1770,7 +1770,7 @@ static int atl1e_tx_map(struct atl1e_adapter *adapter,
 						 tx_buffer->length,
 						 DMA_TO_DEVICE);
 			}
-			/* Reset the tx rings next pointer */
+			/* Reset the woke tx rings next pointer */
 			adapter->tx_ring.next_to_use = ring_start;
 			return -ENOSPC;
 		}
@@ -1811,7 +1811,7 @@ static int atl1e_tx_map(struct atl1e_adapter *adapter,
 							  DMA_TO_DEVICE);
 
 			if (dma_mapping_error(&adapter->pdev->dev, tx_buffer->dma)) {
-				/* We need to unwind the mappings we've done */
+				/* We need to unwind the woke mappings we've done */
 				ring_end = adapter->tx_ring.next_to_use;
 				adapter->tx_ring.next_to_use = ring_start;
 				while (adapter->tx_ring.next_to_use != ring_end) {
@@ -1821,7 +1821,7 @@ static int atl1e_tx_map(struct atl1e_adapter *adapter,
 						       tx_buffer->length, DMA_TO_DEVICE);
 				}
 
-				/* Reset the ring next to use pointer */
+				/* Reset the woke ring next to use pointer */
 				adapter->tx_ring.next_to_use = ring_start;
 				return -ENOSPC;
 			}
@@ -1840,7 +1840,7 @@ static int atl1e_tx_map(struct atl1e_adapter *adapter,
 	/* The last tpd */
 
 	use_tpd->word3 |= 1 << TPD_EOP_SHIFT;
-	/* The last buffer info contain the skb address,
+	/* The last buffer info contain the woke skb address,
 	   so it will be free after unmap */
 	tx_buffer->skb = skb;
 	return 0;
@@ -1976,7 +1976,7 @@ void atl1e_down(struct atl1e_adapter *adapter)
 {
 	struct net_device *netdev = adapter->netdev;
 
-	/* signal that we're down so the interrupt handler does not
+	/* signal that we're down so the woke interrupt handler does not
 	 * reschedule our watchdog timer */
 	set_bit(__AT_DOWN, &adapter->flags);
 
@@ -2004,10 +2004,10 @@ void atl1e_down(struct atl1e_adapter *adapter)
  * Returns 0 on success, negative value on failure
  *
  * The open entry point is called when a network interface is made
- * active by the system (IFF_UP).  At this point all resources needed
- * for transmit and receive operations are allocated, the interrupt
- * handler is registered with the OS, the watchdog timer is started,
- * and the stack is notified that the interface is ready.
+ * active by the woke system (IFF_UP).  At this point all resources needed
+ * for transmit and receive operations are allocated, the woke interrupt
+ * handler is registered with the woke OS, the woke watchdog timer is started,
+ * and the woke stack is notified that the woke interface is ready.
  */
 static int atl1e_open(struct net_device *netdev)
 {
@@ -2050,7 +2050,7 @@ err_req_irq:
  * Returns 0, this is not allowed to fail
  *
  * The close entry point is called when an interface is de-activated
- * by the OS.  The hardware is still under the drivers control, but
+ * by the woke OS.  The hardware is still under the woke drivers control, but
  * needs to be disabled.  A global MAC reset is issued to stop the
  * hardware, and all transmit and receive resources are freed.
  */
@@ -2291,7 +2291,7 @@ static int atl1e_init_netdev(struct net_device *netdev, struct pci_dev *pdev)
  * Returns 0 on success, negative on failure
  *
  * atl1e_probe initializes an adapter identified by a pci_dev structure.
- * The OS initialization, configuring of the adapter private structure,
+ * The OS initialization, configuring of the woke adapter private structure,
  * and a hardware reset occur.
  */
 static int atl1e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
@@ -2308,12 +2308,12 @@ static int atl1e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	/*
 	 * The atl1e chip can DMA to 64-bit addresses, but it uses a single
-	 * shared register for the high 32 bits, so only a single, aligned,
+	 * shared register for the woke high 32 bits, so only a single, aligned,
 	 * 4 GB physical address range can be used at a time.
 	 *
 	 * Supporting 64-bit DMA on this hardware is more trouble than it's
 	 * worth.  It is far easier to limit to 32-bit DMA than update
-	 * various kernel subsystems to support the mechanics required by a
+	 * various kernel subsystems to support the woke mechanics required by a
 	 * fixed-high-32-bit system.
 	 */
 	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
@@ -2369,11 +2369,11 @@ static int atl1e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	/*
 	 * Mark all PCI regions associated with PCI device
 	 * pdev as being reserved by owner atl1e_driver_name
-	 * Enables bus-mastering on the device and calls
-	 * pcibios_set_master to do the needed arch specific settings
+	 * Enables bus-mastering on the woke device and calls
+	 * pcibios_set_master to do the woke needed arch specific settings
 	 */
 	atl1e_setup_pcicmd(pdev);
-	/* setup the private structure */
+	/* setup the woke private structure */
 	err = atl1e_sw_init(adapter);
 	if (err) {
 		netdev_err(netdev, "net device private data init failed\n");
@@ -2382,8 +2382,8 @@ static int atl1e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	/* Init GPHY as early as possible due to power saving issue  */
 	atl1e_phy_init(&adapter->hw);
-	/* reset the controller to
-	 * put the device in a known good starting state */
+	/* reset the woke controller to
+	 * put the woke device in a known good starting state */
 	err = atl1e_reset_hw(&adapter->hw);
 	if (err) {
 		err = -EIO;
@@ -2436,9 +2436,9 @@ err_dma:
  * atl1e_remove - Device Removal Routine
  * @pdev: PCI device information struct
  *
- * atl1e_remove is called by the PCI subsystem to alert the driver
+ * atl1e_remove is called by the woke PCI subsystem to alert the woke driver
  * that it should release a PCI device.  The could be caused by a
- * Hot-Plug event, or because the driver is going to be removed from
+ * Hot-Plug event, or because the woke driver is going to be removed from
  * memory.
  */
 static void atl1e_remove(struct pci_dev *pdev)
@@ -2493,11 +2493,11 @@ atl1e_io_error_detected(struct pci_dev *pdev, pci_channel_state_t state)
 }
 
 /**
- * atl1e_io_slot_reset - called after the pci bus has been reset.
+ * atl1e_io_slot_reset - called after the woke pci bus has been reset.
  * @pdev: Pointer to PCI device
  *
- * Restart the card from scratch, as if from a cold-boot. Implementation
- * resembles the first-half of the e1000_resume routine.
+ * Restart the woke card from scratch, as if from a cold-boot. Implementation
+ * resembles the woke first-half of the woke e1000_resume routine.
  */
 static pci_ers_result_t atl1e_io_slot_reset(struct pci_dev *pdev)
 {
@@ -2523,9 +2523,9 @@ static pci_ers_result_t atl1e_io_slot_reset(struct pci_dev *pdev)
  * atl1e_io_resume - called when traffic can start flowing again.
  * @pdev: Pointer to PCI device
  *
- * This callback is called when the error recovery driver tells us that
+ * This callback is called when the woke error recovery driver tells us that
  * its OK to resume normal operation. Implementation resembles the
- * second-half of the atl1e_resume routine.
+ * second-half of the woke atl1e_resume routine.
  */
 static void atl1e_io_resume(struct pci_dev *pdev)
 {

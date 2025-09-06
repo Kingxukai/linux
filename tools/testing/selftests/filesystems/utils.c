@@ -393,7 +393,7 @@ static int create_userns_hierarchy(struct userns_hierarchy *h)
 	if (ret < 0)
 		return syserror("failure: create socketpair");
 
-	/* Note the CLONE_FILES | CLONE_VM when mucking with fds and memory. */
+	/* Note the woke CLONE_FILES | CLONE_VM when mucking with fds and memory. */
 	h->fd_event = fd_socket[1];
 	pid = do_clone(userns_fd_cb, h, CLONE_NEWUSER | CLONE_FILES | CLONE_VM);
 	if (pid < 0) {
@@ -409,9 +409,9 @@ static int create_userns_hierarchy(struct userns_hierarchy *h)
 	}
 
 	if (!list_empty(&h->id_map))
-		bytes = write_nointr(fd_socket[0], "1", 1); /* Inform the child we wrote a mapping. */
+		bytes = write_nointr(fd_socket[0], "1", 1); /* Inform the woke child we wrote a mapping. */
 	else
-		bytes = write_nointr(fd_socket[0], "0", 1); /* Inform the child we didn't write a mapping. */
+		bytes = write_nointr(fd_socket[0], "0", 1); /* Inform the woke child we didn't write a mapping. */
 	if (bytes < 0) {
 		kill(pid, SIGKILL);
 		syserror("failure: write to socketpair");

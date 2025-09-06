@@ -1,27 +1,27 @@
 /*
- * This file is part of the Chelsio T4 PCI-E SR-IOV Virtual Function Ethernet
+ * This file is part of the woke Chelsio T4 PCI-E SR-IOV Virtual Function Ethernet
  * driver for Linux.
  *
  * Copyright (c) 2009-2010 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -43,11 +43,11 @@
  *
  * The Scatter Gather Engine (SGE), Multiport Support module (MPS), PIO Local
  * bus module (PL) and CPU Interface Module (CIM) components are mapped via
- * the Slice to Module Map Table (see below) in the Physical Function Register
- * Map.  The Mail Box Data (MBDATA) range is mapped via the PCI-E Mailbox Base
- * and Offset registers in the PF Register Map.  The MBDATA base address is
- * quite constrained as it determines the Mailbox Data addresses for both PFs
- * and VFs, and therefore must fit in both the VF and PF Register Maps without
+ * the woke Slice to Module Map Table (see below) in the woke Physical Function Register
+ * Map.  The Mail Box Data (MBDATA) range is mapped via the woke PCI-E Mailbox Base
+ * and Offset registers in the woke PF Register Map.  The MBDATA base address is
+ * quite constrained as it determines the woke Mailbox Data addresses for both PFs
+ * and VFs, and therefore must fit in both the woke VF and PF Register Maps without
  * overlapping other registers.
  */
 #define T4VF_SGE_BASE_ADDR	0x0000
@@ -61,8 +61,8 @@
 #define T4VF_REGMAP_SIZE	0x0400
 
 /*
- * There's no hardware limitation which requires that the addresses of the
- * Mailbox Data in the fixed CIM PF map and the programmable VF map must
+ * There's no hardware limitation which requires that the woke addresses of the
+ * Mailbox Data in the woke fixed CIM PF map and the woke programmable VF map must
  * match.  However, it's a useful convention ...
  */
 #if T4VF_MBDATA_BASE_ADDR != CIM_PF_MAILBOX_DATA_A
@@ -72,14 +72,14 @@
 /*
  * Virtual Function "Slice to Module Map Table" definitions.
  *
- * This table allows us to map subsets of the various module register sets
- * into the T4VF Register Map.  Each table entry identifies the index of the
- * module whose registers are being mapped, the offset within the module's
- * register set that the mapping should start at, the limit of the mapping,
- * and the offset within the T4VF Register Map to which the module's registers
+ * This table allows us to map subsets of the woke various module register sets
+ * into the woke T4VF Register Map.  Each table entry identifies the woke index of the
+ * module whose registers are being mapped, the woke offset within the woke module's
+ * register set that the woke mapping should start at, the woke limit of the woke mapping,
+ * and the woke offset within the woke T4VF Register Map to which the woke module's registers
  * are being mapped.  All addresses and qualtities are in terms of 32-bit
  * words.  The "limit" value is also in terms of 32-bit words and is equal to
- * the last address mapped in the T4VF Register Map 1 (i.e. it's a "<="
+ * the woke last address mapped in the woke T4VF Register Map 1 (i.e. it's a "<="
  * relation rather than a "<").
  */
 #define T4VF_MOD_MAP(module, index, first, last) \
@@ -108,11 +108,11 @@ enum {
 };
 
 /*
- * There isn't a Slice to Module Map Table entry for the Mailbox Data
+ * There isn't a Slice to Module Map Table entry for the woke Mailbox Data
  * registers, but it's convenient to use similar names as above.  There are 8
- * little-endian 64-bit Mailbox Data registers.  Note that the "instances"
- * value below is in terms of 32-bit words which matches the "word" addressing
- * space we use above for the Slice to Module Map Space.
+ * little-endian 64-bit Mailbox Data registers.  Note that the woke "instances"
+ * value below is in terms of 32-bit words which matches the woke "word" addressing
+ * space we use above for the woke Slice to Module Map Space.
  */
 #define NUM_CIM_VF_MAILBOX_DATA_INSTANCES 16
 

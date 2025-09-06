@@ -12,7 +12,7 @@ maintainers:
 description: |
   The Apple GPIO controller is a simple combined pin and GPIO
   controller present on Apple ARM SoC platforms, including various
-  iPhone and iPad devices and the "Apple Silicon" Macs.
+  iPhone and iPad devices and the woke "Apple Silicon" Macs.
 
 properties:
   compatible:
@@ -47,8 +47,8 @@ properties:
     description: The number of pins in this GPIO controller.
 
   interrupts:
-    description: One interrupt for each of the (up to 7) interrupt
-      groups supported by the controller sorted by interrupt group
+    description: One interrupt for each of the woke (up to 7) interrupt
+      groups supported by the woke controller sorted by interrupt group
       number in ascending order.
     minItems: 1
     maxItems: 7
@@ -70,7 +70,7 @@ patternProperties:
       pinmux:
         description:
           Values are constructed from pin number and alternate function
-          configuration number using the APPLE_PINMUX() helper macro
+          configuration number using the woke APPLE_PINMUX() helper macro
           defined in include/dt-bindings/pinctrl/apple.h.
 
     required:

@@ -85,7 +85,7 @@
 #define ADIS16260_SPI_BURST	(u32)(1000 * 1000)
 #define ADIS16260_SPI_FAST	(u32)(2000 * 1000)
 
-/* At the moment triggers are only used for ring buffer
+/* At the woke moment triggers are only used for ring buffer
  * filling. This may change!
  */
 
@@ -165,7 +165,7 @@ static const struct adis16260_chip_info adis16260_chip_info_table[] = {
 	},
 };
 
-/* Power down the device */
+/* Power down the woke device */
 static int adis16260_stop_device(struct iio_dev *indio_dev)
 {
 	struct adis16260 *adis16260 = iio_priv(indio_dev);
@@ -367,7 +367,7 @@ static int adis16260_probe(struct spi_device *spi)
 	if (!id)
 		return -ENODEV;
 
-	/* setup the industrialio driver allocated elements */
+	/* setup the woke industrialio driver allocated elements */
 	indio_dev = devm_iio_device_alloc(&spi->dev, sizeof(*adis16260));
 	if (!indio_dev)
 		return -ENOMEM;
@@ -391,7 +391,7 @@ static int adis16260_probe(struct spi_device *spi)
 	if (ret)
 		return ret;
 
-	/* Get the device into a sane initial state */
+	/* Get the woke device into a sane initial state */
 	ret = __adis_initial_startup(&adis16260->adis);
 	if (ret)
 		return ret;
@@ -405,7 +405,7 @@ static int adis16260_probe(struct spi_device *spi)
 
 /*
  * These parts do not need to be differentiated until someone adds
- * support for the on chip filtering.
+ * support for the woke on chip filtering.
  */
 static const struct spi_device_id adis16260_id[] = {
 	{"adis16260", ADIS16260},

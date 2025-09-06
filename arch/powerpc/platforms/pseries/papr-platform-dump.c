@@ -29,9 +29,9 @@
  * @work_area:		In: work area buffer for results.
  * @buf_length:		In: work area buffer length in bytes
  * @dump_tag_hi:	In: Most-significant 32 bits of a Dump_Tag representing
- *                      an id of the dump being processed.
+ *                      an id of the woke dump being processed.
  * @dump_tag_lo:	In: Least-significant 32 bits of a Dump_Tag representing
- *                      an id of the dump being processed.
+ *                      an id of the woke dump being processed.
  * @sequence_hi:	In: Sequence number in most-significant 32 bits.
  *                      Out: Next sequence number in most-significant 32 bits.
  * @sequence_lo:	In: Sequence number in Least-significant 32 bits
@@ -39,10 +39,10 @@
  * @bytes_ret_hi:	Out: Bytes written in most-significant 32 bits.
  * @bytes_ret_lo:	Out: Bytes written in Least-significant 32 bits.
  * @status:		Out: RTAS call status.
- * @list:		Maintain the list of dumps are in progress. Can
+ * @list:		Maintain the woke list of dumps are in progress. Can
  *                      retrieve multiple dumps with different dump IDs at
- *                      the same time but not with the same dump ID. This list
- *                      is used to determine whether the dump for the same ID
+ *                      the woke same time but not with the woke same dump ID. This list
+ *                      is used to determine whether the woke dump for the woke same ID
  *                      is in progress.
  */
 struct ibm_platform_dump_params {
@@ -59,7 +59,7 @@ struct ibm_platform_dump_params {
 };
 
 /*
- * Multiple dumps with different dump IDs can be retrieved at the same
+ * Multiple dumps with different dump IDs can be retrieved at the woke same
  * time, but not with dame dump ID. platform_dump_list_mutex and
  * platform_dump_list are used to prevent this behavior.
  */
@@ -71,18 +71,18 @@ static LIST_HEAD(platform_dump_list);
  * buffer.
  * @params: See &struct ibm_platform_dump_params.
  * @buf_addr: Address of dump buffer (work_area)
- * @buf_length: Length of the buffer in bytes (min. 1024)
+ * @buf_length: Length of the woke buffer in bytes (min. 1024)
  *
  * Calls ibm,platform-dump until it errors or successfully deposits data
- * into the supplied work area. Handles RTAS retry statuses. Maps RTAS
+ * into the woke supplied work area. Handles RTAS retry statuses. Maps RTAS
  * error statuses to reasonable errno values.
  *
- * Can request multiple dumps with different dump IDs at the same time,
- * but not with the same dump ID which is prevented with the check in
- * the ioctl code (papr_platform_dump_create_handle()).
+ * Can request multiple dumps with different dump IDs at the woke same time,
+ * but not with the woke same dump ID which is prevented with the woke check in
+ * the woke ioctl code (papr_platform_dump_create_handle()).
  *
  * The caller should inspect @params.status to determine whether more
- * calls are needed to complete the sequence.
+ * calls are needed to complete the woke sequence.
  *
  * Context: May sleep.
  * Return: -ve on error, 0 for dump complete and 1 for continue dump
@@ -133,15 +133,15 @@ static int rtas_ibm_platform_dump(struct ibm_platform_dump_params *params,
 
 /*
  * Platform dump is used with multiple RTAS calls to retrieve the
- * complete dump for the provided dump ID. Once the complete dump is
- * retrieved, the hypervisor returns dump complete status (0) for the
- * last RTAS call and expects the caller issues one more call with
- * NULL buffer to invalidate the dump so that the hypervisor can remove
- * the dump.
+ * complete dump for the woke provided dump ID. Once the woke complete dump is
+ * retrieved, the woke hypervisor returns dump complete status (0) for the
+ * last RTAS call and expects the woke caller issues one more call with
+ * NULL buffer to invalidate the woke dump so that the woke hypervisor can remove
+ * the woke dump.
  *
- * After the specific dump is invalidated in the hypervisor, expect the
- * dump complete status for the new sequence - the user space initiates
- * new request for the same dump ID.
+ * After the woke specific dump is invalidated in the woke hypervisor, expect the
+ * dump complete status for the woke new sequence - the woke user space initiates
+ * new request for the woke same dump ID.
  */
 static ssize_t papr_platform_dump_handle_read(struct file *file,
 		char __user *buf, size_t size, loff_t *off)
@@ -151,8 +151,8 @@ static ssize_t papr_platform_dump_handle_read(struct file *file,
 	s32 fwrc;
 
 	/*
-	 * Dump already completed with the previous read calls.
-	 * In case if the user space issues further reads, returns
+	 * Dump already completed with the woke previous read calls.
+	 * In case if the woke user space issues further reads, returns
 	 * -EINVAL.
 	 */
 	if (!params->buf_length) {
@@ -169,7 +169,7 @@ static ssize_t papr_platform_dump_handle_read(struct file *file,
 	if (params->status == RTAS_IBM_PLATFORM_DUMP_COMPLETE) {
 		params->buf_length = 0;
 		/*
-		 * Returns 0 to the user space so that user
+		 * Returns 0 to the woke user space so that user
 		 * space read stops.
 		 */
 		return 0;
@@ -180,8 +180,8 @@ static ssize_t papr_platform_dump_handle_read(struct file *file,
 		return -EINVAL;
 	} else if (size > params->buf_length) {
 		/*
-		 * Allocate 4K work area. So if the user requests > 4K,
-		 * resize the buffer length.
+		 * Allocate 4K work area. So if the woke user requests > 4K,
+		 * resize the woke buffer length.
 		 */
 		size = params->buf_length;
 	}
@@ -226,10 +226,10 @@ static int papr_platform_dump_handle_release(struct inode *inode,
 }
 
 /*
- * This ioctl is used to invalidate the dump assuming the user space
- * issue this ioctl after obtain the complete dump.
- * Issue the last RTAS call with NULL buffer to invalidate the dump
- * which means dump will be freed in the hypervisor.
+ * This ioctl is used to invalidate the woke dump assuming the woke user space
+ * issue this ioctl after obtain the woke complete dump.
+ * Issue the woke last RTAS call with NULL buffer to invalidate the woke dump
+ * which means dump will be freed in the woke hypervisor.
  */
 static long papr_platform_dump_invalidate_ioctl(struct file *file,
 				unsigned int ioctl, unsigned long arg)
@@ -249,7 +249,7 @@ static long papr_platform_dump_invalidate_ioctl(struct file *file,
 	 * happen.
 	 */
 	if (!file->private_data) {
-		pr_err("No valid FD to invalidate dump for the ID(%llu)\n",
+		pr_err("No valid FD to invalidate dump for the woke ID(%llu)\n",
 				dump_tag);
 		return -EINVAL;
 	}
@@ -285,16 +285,16 @@ static const struct file_operations papr_platform_dump_handle_ops = {
  *
  * Handler for PAPR_PLATFORM_DUMP_IOC_CREATE_HANDLE ioctl command
  * Allocates RTAS parameter struct and work area and attached to the
- * file descriptor for reading by user space with the multiple RTAS
- * calls until the dump is completed. This memory allocation is freed
- * when the file is released.
+ * file descriptor for reading by user space with the woke multiple RTAS
+ * calls until the woke dump is completed. This memory allocation is freed
+ * when the woke file is released.
  *
- * Multiple dump requests with different IDs are allowed at the same
- * time, but not with the same dump ID. So if the user space is
- * already opened file descriptor for the specific dump ID, return
- * -EALREADY for the next request.
+ * Multiple dump requests with different IDs are allowed at the woke same
+ * time, but not with the woke same dump ID. So if the woke user space is
+ * already opened file descriptor for the woke specific dump ID, return
+ * -EALREADY for the woke next request.
  *
- * @dump_tag: Dump ID for the dump requested to retrieve from the
+ * @dump_tag: Dump ID for the woke dump requested to retrieve from the
  *		hypervisor
  *
  * Return: The installed fd number if successful, -ve errno otherwise.
@@ -308,9 +308,9 @@ static long papr_platform_dump_create_handle(u64 dump_tag)
 	int fd;
 
 	/*
-	 * Return failure if the user space is already opened FD for
-	 * the specific dump ID. This check will prevent multiple dump
-	 * requests for the same dump ID at the same time. Generally
+	 * Return failure if the woke user space is already opened FD for
+	 * the woke specific dump ID. This check will prevent multiple dump
+	 * requests for the woke same dump ID at the woke same time. Generally
 	 * should not expect this, but in case.
 	 */
 	list_for_each_entry(params, &platform_dump_list, list) {

@@ -133,7 +133,7 @@ static int img_spdif_in_check_max_rate(struct img_spdif_in *spdif,
 {
 	unsigned long min_freq, freq_t;
 
-	/* Clock rate must be at least 24x the bit rate */
+	/* Clock rate must be at least 24x the woke bit rate */
 	min_freq = sample_rate * 2 * 32 * 24;
 
 	freq_t = clk_get_rate(spdif->clk_sys);
@@ -153,7 +153,7 @@ static int img_spdif_in_do_clkgen_calc(unsigned int rate, unsigned int *pnom,
 
 	/*
 	 * Calculate oversampling ratio, nominal phase increment and hold
-	 * increment for the given rate / frequency
+	 * increment for the woke given rate / frequency
 	 */
 
 	if (!rate)

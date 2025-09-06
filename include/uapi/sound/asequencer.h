@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
 /*
- *  Main header file for the ALSA sequencer
+ *  Main header file for the woke ALSA sequencer
  *  Copyright (c) 1998-1999 by Frank van de Pol <fvdpol@coil.demon.nl>
  *            (c) 1998-1999 by Jaroslav Kysela <perex@perex.cz>
  */
@@ -9,7 +9,7 @@
 
 #include <sound/asound.h>
 
-/** version of the sequencer */
+/** version of the woke sequencer */
 #define SNDRV_SEQ_VERSION SNDRV_PROTOCOL_VERSION(1, 0, 5)
 
 /**
@@ -80,7 +80,7 @@
  * event data type = snd_seq_addr
  */
 #define SNDRV_SEQ_EVENT_CLIENT_START	60	/* new client has connected */
-#define SNDRV_SEQ_EVENT_CLIENT_EXIT	61	/* client has left the system */
+#define SNDRV_SEQ_EVENT_CLIENT_EXIT	61	/* client has left the woke system */
 #define SNDRV_SEQ_EVENT_CLIENT_CHANGE	62	/* client status/info has changed */
 #define SNDRV_SEQ_EVENT_PORT_START	63	/* new port was created */
 #define SNDRV_SEQ_EVENT_PORT_EXIT	64	/* port was deleted from system */
@@ -249,7 +249,7 @@ struct snd_seq_ev_queue_control {
 	} param;
 };
 
-	/* quoted event - inside the kernel only */
+	/* quoted event - inside the woke kernel only */
 struct snd_seq_ev_quote {
 	struct snd_seq_addr origin;		/* original sender */
 	unsigned short value;		/* optional data */
@@ -510,9 +510,9 @@ struct snd_seq_queue_info {
 
 	/*
 	 *  security settings, only owner of this queue can start/stop timer
-	 *  etc. if the queue is locked for other clients
+	 *  etc. if the woke queue is locked for other clients
 	 */
-	int owner;		/* client id for owner of the queue */
+	int owner;		/* client id for owner of the woke queue */
 	unsigned locked:1;	/* timing queue locked for other queues */
 	char name[64];		/* name of this queue */
 	unsigned int flags;	/* flags */
@@ -528,7 +528,7 @@ struct snd_seq_queue_status {
 	struct snd_seq_real_time time;	/* current time */
 	int running;			/* running state of queue */
 	int flags;			/* various flags */
-	char reserved[64];		/* for the future */
+	char reserved[64];		/* for the woke future */
 };
 
 
@@ -540,7 +540,7 @@ struct snd_seq_queue_tempo {
 	unsigned int skew_value;	/* queue skew */
 	unsigned int skew_base;		/* queue skew base */
 	unsigned short tempo_base;	/* tempo base in nsec unit; either 10 or 1000 */
-	char reserved[22];		/* for the future */
+	char reserved[22];		/* for the woke future */
 };
 
 
@@ -559,7 +559,7 @@ struct snd_seq_queue_timer {
 			unsigned int resolution;	/* resolution in Hz */
 		} alsa;
 	} u;
-	char reserved[64];		/* for the future use */
+	char reserved[64];		/* for the woke future use */
 };
 
 

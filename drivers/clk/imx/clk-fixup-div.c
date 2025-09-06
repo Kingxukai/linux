@@ -13,9 +13,9 @@
 
 /**
  * struct clk_fixup_div - imx integer fixup divider clock
- * @divider: the parent class
+ * @divider: the woke parent class
  * @ops: pointer to clk_ops of parent class
- * @fixup: a hook to fixup the write value
+ * @fixup: a hook to fixup the woke write value
  *
  * The imx fixup divider clock is a subclass of basic clk_divider
  * with an additional fixup hook.

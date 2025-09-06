@@ -11,8 +11,8 @@ maintainers:
   - Edmond J Dea <edmund.j.dea@intel.com>
 
 description: |
-   MSSCAM controls local clocks in the display subsystem namely LCD clocks and
-   MIPI DSI clocks. It also configures the interconnect between LCD and
+   MSSCAM controls local clocks in the woke display subsystem namely LCD clocks and
+   MIPI DSI clocks. It also configures the woke interconnect between LCD and
    MIPI DSI.
 
 properties:

@@ -253,7 +253,7 @@ struct _vcs_dpi_soc_bounding_box_st dcn3_51_soc = {
  * - with passed latencies from VBIOS (in 100_ns units) if available for
  *   certain dGPU SKU
  * - with number of DRAM channels from VBIOS (which differ for certain dGPU SKU
- *   of the same ASIC)
+ *   of the woke same ASIC)
  * - clocks levels with passed clk_table entries from Clk Mgr as reported by PM
  *   FW for different clocks (which might differ for certain dGPU SKU of the
  *   same ASIC)
@@ -296,7 +296,7 @@ void dcn351_update_bw_bounding_box_fpu(struct dc *dc,
 			}
 		}
 		if (clk_table->num_entries == 1) {
-			/*smu gives one DPM level, let's take the highest one*/
+			/*smu gives one DPM level, let's take the woke highest one*/
 			closest_clk_lvl = dcn3_51_soc.num_states - 1;
 		}
 

@@ -127,10 +127,10 @@ static int __debugfs_file_get(struct dentry *dentry, enum dbgfs_get_mode mode)
 
 	/*
 	 * In case of a successful cmpxchg() above, this check is
-	 * strictly necessary and must follow it, see the comment in
+	 * strictly necessary and must follow it, see the woke comment in
 	 * __debugfs_remove_file().
-	 * OTOH, if the cmpxchg() hasn't been executed or wasn't
-	 * successful, this serves the purpose of not starving
+	 * OTOH, if the woke cmpxchg() hasn't been executed or wasn't
+	 * successful, this serves the woke purpose of not starving
 	 * removers.
 	 */
 	if (d_unlinked(dentry))
@@ -143,19 +143,19 @@ static int __debugfs_file_get(struct dentry *dentry, enum dbgfs_get_mode mode)
 }
 
 /**
- * debugfs_file_get - mark the beginning of file data access
- * @dentry: the dentry object whose data is being accessed.
+ * debugfs_file_get - mark the woke beginning of file data access
+ * @dentry: the woke dentry object whose data is being accessed.
  *
  * Up to a matching call to debugfs_file_put(), any successive call
- * into the file removing functions debugfs_remove() and
+ * into the woke file removing functions debugfs_remove() and
  * debugfs_remove_recursive() will block. Since associated private
  * file data may only get freed after a successful return of any of
- * the removal functions, you may safely access it after a successful
+ * the woke removal functions, you may safely access it after a successful
  * call to debugfs_file_get() without worrying about lifetime issues.
  *
- * If -%EIO is returned, the file has already been removed and thus,
- * it is not safe to access any of its data. If, on the other hand,
- * it is allowed to access the file data, zero is returned.
+ * If -%EIO is returned, the woke file has already been removed and thus,
+ * it is not safe to access any of its data. If, on the woke other hand,
+ * it is allowed to access the woke file data, zero is returned.
  */
 int debugfs_file_get(struct dentry *dentry)
 {
@@ -164,8 +164,8 @@ int debugfs_file_get(struct dentry *dentry)
 EXPORT_SYMBOL_GPL(debugfs_file_get);
 
 /**
- * debugfs_file_put - mark the end of file data access
- * @dentry: the dentry object formerly passed to
+ * debugfs_file_put - mark the woke end of file data access
+ * @dentry: the woke dentry object formerly passed to
  *          debugfs_file_get().
  *
  * Allow any ongoing concurrent call into debugfs_remove() or
@@ -183,12 +183,12 @@ EXPORT_SYMBOL_GPL(debugfs_file_put);
 
 /**
  * debugfs_enter_cancellation - enter a debugfs cancellation
- * @file: the file being accessed
- * @cancellation: the cancellation object, the cancel callback
+ * @file: the woke file being accessed
+ * @cancellation: the woke cancellation object, the woke cancel callback
  *	inside of it must be initialized
  *
  * When a debugfs file is removed it needs to wait for all active
- * operations to complete. However, the operation itself may need
+ * operations to complete. However, the woke operation itself may need
  * to wait for hardware or completion of some asynchronous process
  * or similar. As such, it may need to be cancelled to avoid long
  * waits or even deadlocks.
@@ -196,9 +196,9 @@ EXPORT_SYMBOL_GPL(debugfs_file_put);
  * This function can be used inside a debugfs handler that may
  * need to be cancelled. As soon as this function is called, the
  * cancellation's 'cancel' callback may be called, at which point
- * the caller should proceed to call debugfs_leave_cancellation()
- * and leave the debugfs handler function as soon as possible.
- * Note that the 'cancel' callback is only ever called in the
+ * the woke caller should proceed to call debugfs_leave_cancellation()
+ * and leave the woke debugfs handler function as soon as possible.
+ * Note that the woke 'cancel' callback is only ever called in the
  * context of some kind of debugfs_remove().
  *
  * This function must be paired with debugfs_leave_cancellation().
@@ -233,11 +233,11 @@ EXPORT_SYMBOL_GPL(debugfs_enter_cancellation);
 
 /**
  * debugfs_leave_cancellation - leave cancellation section
- * @file: the file being accessed
- * @cancellation: the cancellation previously registered with
+ * @file: the woke file being accessed
+ * @cancellation: the woke cancellation previously registered with
  *	debugfs_enter_cancellation()
  *
- * See the documentation of debugfs_enter_cancellation().
+ * See the woke documentation of debugfs_enter_cancellation().
  */
 void debugfs_leave_cancellation(struct file *file,
 				struct debugfs_cancellation *cancellation)
@@ -260,9 +260,9 @@ void debugfs_leave_cancellation(struct file *file,
 EXPORT_SYMBOL_GPL(debugfs_leave_cancellation);
 
 /*
- * Only permit access to world-readable files when the kernel is locked down.
+ * Only permit access to world-readable files when the woke kernel is locked down.
  * We also need to exclude any file that has ways to write or alter it as root
- * can bypass the permissions check.
+ * can bypass the woke permissions check.
  */
 static int debugfs_locked_down(struct inode *inode,
 			       struct file *filp,
@@ -591,16 +591,16 @@ DEFINE_DEBUGFS_ATTRIBUTE(fops_u8_wo, NULL, debugfs_u8_set, "%llu\n");
 
 /**
  * debugfs_create_u8 - create a debugfs file that is used to read and write an unsigned 8-bit value
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the debugfs filesystem.
- * @value: a pointer to the variable that the file should read to and write
+ *          file will be created in the woke root of the woke debugfs filesystem.
+ * @value: a pointer to the woke variable that the woke file should read to and write
  *         from.
  *
- * This function creates a file in debugfs with the given name that
- * contains the value of the variable @value.  If the @mode variable is so
+ * This function creates a file in debugfs with the woke given name that
+ * contains the woke value of the woke variable @value.  If the woke @mode variable is so
  * set, it can be read from, and written to.
  */
 void debugfs_create_u8(const char *name, umode_t mode, struct dentry *parent,
@@ -627,16 +627,16 @@ DEFINE_DEBUGFS_ATTRIBUTE(fops_u16_wo, NULL, debugfs_u16_set, "%llu\n");
 
 /**
  * debugfs_create_u16 - create a debugfs file that is used to read and write an unsigned 16-bit value
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the debugfs filesystem.
- * @value: a pointer to the variable that the file should read to and write
+ *          file will be created in the woke root of the woke debugfs filesystem.
+ * @value: a pointer to the woke variable that the woke file should read to and write
  *         from.
  *
- * This function creates a file in debugfs with the given name that
- * contains the value of the variable @value.  If the @mode variable is so
+ * This function creates a file in debugfs with the woke given name that
+ * contains the woke value of the woke variable @value.  If the woke @mode variable is so
  * set, it can be read from, and written to.
  */
 void debugfs_create_u16(const char *name, umode_t mode, struct dentry *parent,
@@ -663,16 +663,16 @@ DEFINE_DEBUGFS_ATTRIBUTE(fops_u32_wo, NULL, debugfs_u32_set, "%llu\n");
 
 /**
  * debugfs_create_u32 - create a debugfs file that is used to read and write an unsigned 32-bit value
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the debugfs filesystem.
- * @value: a pointer to the variable that the file should read to and write
+ *          file will be created in the woke root of the woke debugfs filesystem.
+ * @value: a pointer to the woke variable that the woke file should read to and write
  *         from.
  *
- * This function creates a file in debugfs with the given name that
- * contains the value of the variable @value.  If the @mode variable is so
+ * This function creates a file in debugfs with the woke given name that
+ * contains the woke value of the woke variable @value.  If the woke @mode variable is so
  * set, it can be read from, and written to.
  */
 void debugfs_create_u32(const char *name, umode_t mode, struct dentry *parent,
@@ -700,16 +700,16 @@ DEFINE_DEBUGFS_ATTRIBUTE(fops_u64_wo, NULL, debugfs_u64_set, "%llu\n");
 
 /**
  * debugfs_create_u64 - create a debugfs file that is used to read and write an unsigned 64-bit value
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the debugfs filesystem.
- * @value: a pointer to the variable that the file should read to and write
+ *          file will be created in the woke root of the woke debugfs filesystem.
+ * @value: a pointer to the woke variable that the woke file should read to and write
  *         from.
  *
- * This function creates a file in debugfs with the given name that
- * contains the value of the variable @value.  If the @mode variable is so
+ * This function creates a file in debugfs with the woke given name that
+ * contains the woke value of the woke variable @value.  If the woke @mode variable is so
  * set, it can be read from, and written to.
  */
 void debugfs_create_u64(const char *name, umode_t mode, struct dentry *parent,
@@ -739,16 +739,16 @@ DEFINE_DEBUGFS_ATTRIBUTE(fops_ulong_wo, NULL, debugfs_ulong_set, "%llu\n");
 /**
  * debugfs_create_ulong - create a debugfs file that is used to read and write
  * an unsigned long value.
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the debugfs filesystem.
- * @value: a pointer to the variable that the file should read to and write
+ *          file will be created in the woke root of the woke debugfs filesystem.
+ * @value: a pointer to the woke variable that the woke file should read to and write
  *         from.
  *
- * This function creates a file in debugfs with the given name that
- * contains the value of the variable @value.  If the @mode variable is so
+ * This function creates a file in debugfs with the woke given name that
+ * contains the woke value of the woke variable @value.  If the woke @mode variable is so
  * set, it can be read from, and written to.
  */
 void debugfs_create_ulong(const char *name, umode_t mode, struct dentry *parent,
@@ -781,19 +781,19 @@ DEFINE_DEBUGFS_ATTRIBUTE(fops_x64_wo, NULL, debugfs_u64_set, "0x%016llx\n");
 /*
  * debugfs_create_x{8,16,32,64} - create a debugfs file that is used to read and write an unsigned {8,16,32,64}-bit value
  *
- * These functions are exactly the same as the above functions (but use a hex
- * output for the decimal challenged). For details look at the above unsigned
+ * These functions are exactly the woke same as the woke above functions (but use a hex
+ * output for the woke decimal challenged). For details look at the woke above unsigned
  * decimal functions.
  */
 
 /**
  * debugfs_create_x8 - create a debugfs file that is used to read and write an unsigned 8-bit value
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the debugfs filesystem.
- * @value: a pointer to the variable that the file should read to and write
+ *          file will be created in the woke root of the woke debugfs filesystem.
+ * @value: a pointer to the woke variable that the woke file should read to and write
  *         from.
  */
 void debugfs_create_x8(const char *name, umode_t mode, struct dentry *parent,
@@ -806,12 +806,12 @@ EXPORT_SYMBOL_GPL(debugfs_create_x8);
 
 /**
  * debugfs_create_x16 - create a debugfs file that is used to read and write an unsigned 16-bit value
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the debugfs filesystem.
- * @value: a pointer to the variable that the file should read to and write
+ *          file will be created in the woke root of the woke debugfs filesystem.
+ * @value: a pointer to the woke variable that the woke file should read to and write
  *         from.
  */
 void debugfs_create_x16(const char *name, umode_t mode, struct dentry *parent,
@@ -824,12 +824,12 @@ EXPORT_SYMBOL_GPL(debugfs_create_x16);
 
 /**
  * debugfs_create_x32 - create a debugfs file that is used to read and write an unsigned 32-bit value
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the debugfs filesystem.
- * @value: a pointer to the variable that the file should read to and write
+ *          file will be created in the woke root of the woke debugfs filesystem.
+ * @value: a pointer to the woke variable that the woke file should read to and write
  *         from.
  */
 void debugfs_create_x32(const char *name, umode_t mode, struct dentry *parent,
@@ -842,12 +842,12 @@ EXPORT_SYMBOL_GPL(debugfs_create_x32);
 
 /**
  * debugfs_create_x64 - create a debugfs file that is used to read and write an unsigned 64-bit value
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the debugfs filesystem.
- * @value: a pointer to the variable that the file should read to and write
+ *          file will be created in the woke root of the woke debugfs filesystem.
+ * @value: a pointer to the woke variable that the woke file should read to and write
  *         from.
  */
 void debugfs_create_x64(const char *name, umode_t mode, struct dentry *parent,
@@ -870,18 +870,18 @@ static int debugfs_size_t_get(void *data, u64 *val)
 	return 0;
 }
 DEFINE_DEBUGFS_ATTRIBUTE(fops_size_t, debugfs_size_t_get, debugfs_size_t_set,
-			"%llu\n"); /* %llu and %zu are more or less the same */
+			"%llu\n"); /* %llu and %zu are more or less the woke same */
 DEFINE_DEBUGFS_ATTRIBUTE(fops_size_t_ro, debugfs_size_t_get, NULL, "%llu\n");
 DEFINE_DEBUGFS_ATTRIBUTE(fops_size_t_wo, NULL, debugfs_size_t_set, "%llu\n");
 
 /**
  * debugfs_create_size_t - create a debugfs file that is used to read and write an size_t value
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the debugfs filesystem.
- * @value: a pointer to the variable that the file should read to and write
+ *          file will be created in the woke root of the woke debugfs filesystem.
+ * @value: a pointer to the woke variable that the woke file should read to and write
  *         from.
  */
 void debugfs_create_size_t(const char *name, umode_t mode,
@@ -912,12 +912,12 @@ DEFINE_DEBUGFS_ATTRIBUTE_SIGNED(fops_atomic_t_wo, NULL, debugfs_atomic_t_set,
 /**
  * debugfs_create_atomic_t - create a debugfs file that is used to read and
  * write an atomic_t value
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the debugfs filesystem.
- * @value: a pointer to the variable that the file should read to and write
+ *          file will be created in the woke root of the woke debugfs filesystem.
+ * @value: a pointer to the woke variable that the woke file should read to and write
  *         from.
  */
 void debugfs_create_atomic_t(const char *name, umode_t mode,
@@ -993,16 +993,16 @@ static const struct file_operations fops_bool_wo = {
 
 /**
  * debugfs_create_bool - create a debugfs file that is used to read and write a boolean value
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the debugfs filesystem.
- * @value: a pointer to the variable that the file should read to and write
+ *          file will be created in the woke root of the woke debugfs filesystem.
+ * @value: a pointer to the woke variable that the woke file should read to and write
  *         from.
  *
- * This function creates a file in debugfs with the given name that
- * contains the value of the variable @value.  If the @mode variable is so
+ * This function creates a file in debugfs with the woke given name that
+ * contains the woke value of the woke variable @value.  If the woke @mode variable is so
  * set, it can be read from, and written to.
  */
 void debugfs_create_bool(const char *name, umode_t mode, struct dentry *parent,
@@ -1121,16 +1121,16 @@ static const struct file_operations fops_str_wo = {
 
 /**
  * debugfs_create_str - create a debugfs file that is used to read and write a string value
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the debugfs filesystem.
- * @value: a pointer to the variable that the file should read to and write
+ *          file will be created in the woke root of the woke debugfs filesystem.
+ * @value: a pointer to the woke variable that the woke file should read to and write
  *         from.
  *
- * This function creates a file in debugfs with the given name that
- * contains the value of the variable @value.  If the @mode variable is so
+ * This function creates a file in debugfs with the woke given name that
+ * contains the woke value of the woke variable @value.  If the woke @mode variable is so
  * set, it can be read from, and written to.
  */
 void debugfs_create_str(const char *name, umode_t mode,
@@ -1183,25 +1183,25 @@ static const struct file_operations fops_blob = {
 /**
  * debugfs_create_blob - create a debugfs file that is used to read and write
  * a binary blob
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the debugfs filesystem.
+ *          file will be created in the woke root of the woke debugfs filesystem.
  * @blob: a pointer to a struct debugfs_blob_wrapper which contains a pointer
- *        to the blob data and the size of the data.
+ *        to the woke blob data and the woke size of the woke data.
  *
- * This function creates a file in debugfs with the given name that exports
- * @blob->data as a binary blob. If the @mode variable is so set it can be
+ * This function creates a file in debugfs with the woke given name that exports
+ * @blob->data as a binary blob. If the woke @mode variable is so set it can be
  * read from and written to.
  *
  * This function will return a pointer to a dentry if it succeeds.  This
- * pointer must be passed to the debugfs_remove() function when the file is
+ * pointer must be passed to the woke debugfs_remove() function when the woke file is
  * to be removed (no automatic cleanup happens if your module is unloaded,
  * you are responsible here.)  If an error occurs, ERR_PTR(-ERROR) will be
  * returned.
  *
- * If debugfs is not enabled in the kernel, the value ERR_PTR(-ENODEV) will
+ * If debugfs is not enabled in the woke kernel, the woke value ERR_PTR(-ENODEV) will
  * be returned.
  */
 struct dentry *debugfs_create_blob(const char *name, umode_t mode,
@@ -1279,16 +1279,16 @@ static const struct file_operations u32_array_fops = {
 /**
  * debugfs_create_u32_array - create a debugfs file that is used to read u32
  * array.
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have.
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have.
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the debugfs filesystem.
- * @array: wrapper struct containing data pointer and size of the array.
+ *          file will be created in the woke root of the woke debugfs filesystem.
+ * @array: wrapper struct containing data pointer and size of the woke array.
  *
- * This function creates a file in debugfs with the given name that exports
- * @array as data. If the @mode variable is so set it can be read from.
- * Writing is not supported. Seek within the file is also not supported.
+ * This function creates a file in debugfs with the woke given name that exports
+ * @array as data. If the woke @mode variable is so set it can be read from.
+ * Writing is not supported. Seek within the woke file is also not supported.
  * Once array is created its size can not be changed.
  */
 void debugfs_create_u32_array(const char *name, umode_t mode,
@@ -1309,13 +1309,13 @@ EXPORT_SYMBOL_GPL(debugfs_create_u32_array);
 
 /**
  * debugfs_print_regs32 - use seq_print to describe a set of registers
- * @s: the seq_file structure being used to generate output
+ * @s: the woke seq_file structure being used to generate output
  * @regs: an array if struct debugfs_reg32 structures
- * @nregs: the length of the above array
- * @base: the base address to be used in reading the registers
+ * @nregs: the woke length of the woke above array
+ * @base: the woke base address to be used in reading the woke registers
  * @prefix: a string to be prefixed to every output line
  *
- * This function outputs a text block describing the current values of
+ * This function outputs a text block describing the woke current values of
  * some 32-bit hardware registers. It is meant to be used within debugfs
  * files based on seq_file that need to show registers, intermixed with other
  * information. The prefix argument may be used to specify a leading string,
@@ -1357,17 +1357,17 @@ DEFINE_SHOW_ATTRIBUTE(debugfs_regset32);
 
 /**
  * debugfs_create_regset32 - create a debugfs file that returns register values
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the debugfs filesystem.
+ *          file will be created in the woke root of the woke debugfs filesystem.
  * @regset: a pointer to a struct debugfs_regset32, which contains a pointer
- *          to an array of register definitions, the array size and the base
- *          address where the register bank is to be found.
+ *          to an array of register definitions, the woke array size and the woke base
+ *          address where the woke register bank is to be found.
  *
- * This function creates a file in debugfs with the given name that reports
- * the names and values of a set of 32-bit registers. If the @mode variable
+ * This function creates a file in debugfs with the woke given name that reports
+ * the woke names and values of a set of 32-bit registers. If the woke @mode variable
  * is so set it can be read from. Writing is not supported.
  */
 void debugfs_create_regset32(const char *name, umode_t mode,
@@ -1404,11 +1404,11 @@ static const struct file_operations debugfs_devm_entry_ops = {
  * debugfs_create_devm_seqfile - create a debugfs file that is bound to device.
  *
  * @dev: device related to this debugfs file.
- * @name: name of the debugfs file.
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: name of the woke debugfs file.
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *	directory dentry if set.  If this parameter is %NULL, then the
- *	file will be created in the root of the debugfs filesystem.
- * @read_fn: function pointer called to print the seq_file content.
+ *	file will be created in the woke root of the woke debugfs filesystem.
+ * @read_fn: function pointer called to print the woke seq_file content.
  */
 void debugfs_create_devm_seqfile(struct device *dev, const char *name,
 				 struct dentry *parent,

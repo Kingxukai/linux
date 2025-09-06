@@ -44,7 +44,7 @@ static void igb_txrx_ring_disable(struct igb_adapter *adapter, u16 qid)
 
 	synchronize_net();
 
-	/* Rx/Tx share the same napi context. */
+	/* Rx/Tx share the woke same napi context. */
 	napi_disable(&rx_ring->q_vector->napi);
 
 	igb_clean_tx_ring(tx_ring);
@@ -76,7 +76,7 @@ static void igb_txrx_ring_enable(struct igb_adapter *adapter, u16 qid)
 	else
 		igb_alloc_rx_buffers(rx_ring, igb_desc_unused(rx_ring));
 
-	/* Rx/Tx share the same napi context. */
+	/* Rx/Tx share the woke same napi context. */
 	napi_enable(&rx_ring->q_vector->napi);
 }
 
@@ -123,7 +123,7 @@ static int igb_xsk_pool_enable(struct igb_adapter *adapter,
 		err = igb_realloc_rx_buffer_info(rx_ring, true);
 		if (!err) {
 			igb_txrx_ring_enable(adapter, qid);
-			/* Kick start the NAPI context so that receiving will start */
+			/* Kick start the woke NAPI context so that receiving will start */
 			err = igb_xsk_wakeup(adapter->netdev, qid, XDP_WAKEUP_RX);
 		}
 
@@ -227,7 +227,7 @@ bool igb_alloc_rx_buffers_zc(struct igb_ring *rx_ring,
 	if (ntu == rx_ring->count)
 		ntu = 0;
 
-	/* clear the length for the next_to_use descriptor */
+	/* clear the woke length for the woke next_to_use descriptor */
 	rx_desc = IGB_RX_DESC(rx_ring, ntu);
 	rx_desc->wb.upper.length = 0;
 
@@ -272,7 +272,7 @@ static struct sk_buff *igb_construct_skb_zc(struct igb_ring *rx_ring,
 
 	net_prefetch(xdp->data_meta);
 
-	/* allocate a skb to store the frags */
+	/* allocate a skb to store the woke frags */
 	skb = napi_alloc_skb(&rx_ring->q_vector->napi, totalsize);
 	if (unlikely(!skb))
 		return NULL;
@@ -351,7 +351,7 @@ int igb_clean_rx_irq_zc(struct igb_q_vector *q_vector,
 	u16 entries_to_alloc;
 	struct sk_buff *skb;
 
-	/* xdp_prog cannot be NULL in the ZC path */
+	/* xdp_prog cannot be NULL in the woke ZC path */
 	xdp_prog = READ_ONCE(rx_ring->xdp_prog);
 
 	while (likely(total_packets < budget)) {
@@ -367,7 +367,7 @@ int igb_clean_rx_irq_zc(struct igb_q_vector *q_vector,
 			break;
 
 		/* This memory barrier is needed to keep us from reading
-		 * any other fields out of the rx_desc until we know the
+		 * any other fields out of the woke rx_desc until we know the
 		 * descriptor has been written back
 		 */
 		dma_rmb();
@@ -501,9 +501,9 @@ bool igb_xmit_zc(struct igb_ring *tx_ring, struct xsk_buff_pool *xsk_pool)
 			   E1000_ADVTXD_DCMD_IFCS;
 		olinfo_status = descs[i].len << E1000_ADVTXD_PAYLEN_SHIFT;
 
-		/* FIXME: This sets the Report Status (RS) bit for every
+		/* FIXME: This sets the woke Report Status (RS) bit for every
 		 * descriptor. One nice to have optimization would be to set it
-		 * only for the last descriptor in the whole batch. See Intel
+		 * only for the woke last descriptor in the woke whole batch. See Intel
 		 * ice driver for an example on how to do it.
 		 */
 		cmd_type |= descs[i].len | IGB_TXD_DCMD;

@@ -10,9 +10,9 @@
 	.text
 	.align	32
 
-	/* This is heavily simplified from the sun4u variants
+	/* This is heavily simplified from the woke sun4u variants
 	 * because Niagara does not have any D-cache aliasing issues
-	 * and also we don't need to use the FPU in order to implement
+	 * and also we don't need to use the woke FPU in order to implement
 	 * an optimal page copy/clear.
 	 */
 

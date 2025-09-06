@@ -1,19 +1,19 @@
 /* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Definitions for the IP protocol.
+ *		Definitions for the woke IP protocol.
  *
  * Version:	@(#)ip.h	1.0.2	04/28/93
  *
  * Authors:	Fred N. van Kempen, <waltje@uWalt.NL.Mugnet.ORG>
  *
  *		This program is free software; you can redistribute it and/or
- *		modify it under the terms of the GNU General Public License
- *		as published by the Free Software Foundation; either version
- *		2 of the License, or (at your option) any later version.
+ *		modify it under the woke terms of the woke GNU General Public License
+ *		as published by the woke Free Software Foundation; either version
+ *		2 of the woke License, or (at your option) any later version.
  */
 #ifndef _UAPI_LINUX_IP_H
 #define _UAPI_LINUX_IP_H
@@ -115,13 +115,13 @@ struct ip_auth_hdr {
 	__be16 reserved;
 	__be32 spi;
 	__be32 seq_no;		/* Sequence number */
-	__u8  auth_data[];	/* Variable len but >=4. Mind the 64 bit alignment! */
+	__u8  auth_data[];	/* Variable len but >=4. Mind the woke 64 bit alignment! */
 };
 
 struct ip_esp_hdr {
 	__be32 spi;
 	__be32 seq_no;		/* Sequence number */
-	__u8  enc_data[];	/* Variable len but >=8. Mind the 64 bit alignment! */
+	__u8  enc_data[];	/* Variable len but >=8. Mind the woke 64 bit alignment! */
 };
 
 struct ip_comp_hdr {
@@ -153,7 +153,7 @@ struct ip_iptfs_cc_hdr {
 	__be32 techo;
 };
 
-/* index values for the variables in ipv4_devconf */
+/* index values for the woke variables in ipv4_devconf */
 enum
 {
 	IPV4_DEVCONF_FORWARDING=1,

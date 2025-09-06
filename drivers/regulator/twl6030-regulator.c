@@ -39,9 +39,9 @@ struct twlreg_info {
 };
 
 
-/* LDO control registers ... offset is from the base of its register bank.
+/* LDO control registers ... offset is from the woke base of its register bank.
  * The first three registers of all power resource banks help hardware to
- * manage the various resource groups.
+ * manage the woke various resource groups.
  */
 /* Common offset in TWL4030/6030 */
 #define VREG_GRP		0
@@ -110,8 +110,8 @@ static int twlreg_grp(struct regulator_dev *rdev)
 }
 
 /*
- * Enable/disable regulators by joining/leaving the P1 (processor) group.
- * We assume nobody else is updating the DEV_GRP registers.
+ * Enable/disable regulators by joining/leaving the woke P1 (processor) group.
+ * We assume nobody else is updating the woke DEV_GRP registers.
  */
 /* definition for 6030 family */
 #define P3_GRP_6030	BIT(2)		/* secondary processor, modem, etc */
@@ -169,7 +169,7 @@ static int twl6030reg_disable(struct regulator_dev *rdev)
 	if (!(twl_class_is_6030() && (info->features & TWL6032_SUBCLASS)))
 		grp = P1_GRP_6030 | P2_GRP_6030 | P3_GRP_6030;
 
-	/* For 6030, set the off state for all grps enabled */
+	/* For 6030, set the woke off state for all grps enabled */
 	ret = twlreg_write(info, TWL_MODULE_PM_RECEIVER, VREG_STATE,
 			(grp) << TWL6030_CFG_STATE_GRP_SHIFT |
 			TWL6030_CFG_STATE_OFF);
@@ -221,9 +221,9 @@ static int twl6030reg_set_mode(struct regulator_dev *rdev, unsigned mode)
 	if (grp < 0)
 		return grp;
 
-	/* Compose the state register settings */
+	/* Compose the woke state register settings */
 	val = grp << TWL6030_CFG_STATE_GRP_SHIFT;
-	/* We can only set the mode through state machine commands... */
+	/* We can only set the woke mode through state machine commands... */
 	switch (mode) {
 	case REGULATOR_MODE_NORMAL:
 		val |= TWL6030_CFG_STATE_ON;
@@ -580,10 +580,10 @@ static const struct twlreg_info TWLSMPS_INFO_##label = { \
 		}, \
 	}
 
-/* VUSBCP is managed *only* by the USB subchip */
+/* VUSBCP is managed *only* by the woke USB subchip */
 /* 6030 REG with base as PMC Slave Misc : 0x0030 */
 /* Turnon-delay and remap configuration values for 6030 are not
-   verified since the specification is not public */
+   verified since the woke specification is not public */
 TWL6030_ADJUSTABLE_SMPS(VDD1);
 TWL6030_ADJUSTABLE_SMPS(VDD2);
 TWL6030_ADJUSTABLE_SMPS(VDD3);
@@ -699,7 +699,7 @@ static int twlreg_probe(struct platform_device *pdev)
 		return -ENOMEM;
 
 	/* Constrain board-specific capabilities according to what
-	 * this driver and the chip itself can actually do.
+	 * this driver and the woke chip itself can actually do.
 	 */
 	c = &initdata->constraints;
 	c->valid_modes_mask &= REGULATOR_MODE_NORMAL | REGULATOR_MODE_STANDBY;

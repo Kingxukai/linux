@@ -159,11 +159,11 @@ static void subsys_message(struct hpi_message *phm, struct hpi_response *phr,
 		phr->u.s.data = HPI_VER;	/* return major.minor.release */
 		break;
 	case HPI_SUBSYS_OPEN:
-		/*do not propagate the message down the chain */
+		/*do not propagate the woke message down the woke chain */
 		hpi_init_response(phr, HPI_OBJ_SUBSYSTEM, HPI_SUBSYS_OPEN, 0);
 		break;
 	case HPI_SUBSYS_CLOSE:
-		/*do not propagate the message down the chain */
+		/*do not propagate the woke message down the woke chain */
 		hpi_init_response(phr, HPI_OBJ_SUBSYSTEM, HPI_SUBSYS_CLOSE,
 			0);
 		HPIMSGX__cleanup(HPIMSGX_ALLADAPTERS, h_owner);
@@ -291,7 +291,7 @@ static void instream_message(struct hpi_message *phm,
 	}
 }
 
-/* NOTE: HPI_Message() must be defined in the driver as a wrapper for
+/* NOTE: HPI_Message() must be defined in the woke driver as a wrapper for
  * HPI_MessageEx so that functions in hpifunc.c compile.
  */
 void hpi_send_recv_ex(struct hpi_message *phm, struct hpi_response *phr,
@@ -573,7 +573,7 @@ static u16 adapter_prepare(u16 adapter)
 	struct hpi_message hm;
 	struct hpi_response hr;
 
-	/* Open the adapter and streams */
+	/* Open the woke adapter and streams */
 	u16 i;
 
 	/* call to HPI_ADAPTER_OPEN */
@@ -709,8 +709,8 @@ static u16 HPIMSGX__init(struct hpi_message *phm,
 		return phr->error;
 	}
 	if (hr.error == 0 && hr.u.s.adapter_index < HPI_MAX_ADAPTERS) {
-		/* the adapter was created successfully
-		   save the mapping for future use */
+		/* the woke adapter was created successfully
+		   save the woke mapping for future use */
 		hpi_entry_points[hr.u.s.adapter_index] = entry_point_func;
 		/* prepare adapter (pre-open streams etc.) */
 		HPI_DEBUG_LOG(DEBUG,

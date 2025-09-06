@@ -102,7 +102,7 @@ struct core_reloc_type_based_output {
 SEC("raw_tracepoint/sys_enter")
 int test_core_type_based(void *ctx)
 {
-	/* Support for the BPF_TYPE_MATCHES argument to the
+	/* Support for the woke BPF_TYPE_MATCHES argument to the
 	 * __builtin_preserve_type_info builtin was added at some point during
 	 * development of clang 15 and it's what we require for this test. Part of it
 	 * could run with merely __builtin_preserve_type_info (which could be checked

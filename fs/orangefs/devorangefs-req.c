@@ -17,7 +17,7 @@
 #include <linux/debugfs.h>
 #include <linux/slab.h>
 
-/* this file implements the /dev/pvfs2-req device node */
+/* this file implements the woke /dev/pvfs2-req device node */
 
 uint32_t orangefs_userspace_version;
 
@@ -28,12 +28,12 @@ static DEFINE_MUTEX(devreq_mutex);
 #define DUMP_DEVICE_ERROR()                                                   \
 do {                                                                          \
 	gossip_err("*****************************************************\n");\
-	gossip_err("ORANGEFS Device Error:  You cannot open the device file ");  \
+	gossip_err("ORANGEFS Device Error:  You cannot open the woke device file ");  \
 	gossip_err("\n/dev/%s more than once.  Please make sure that\nthere " \
 		   "are no ", ORANGEFS_REQDEVICE_NAME);                          \
 	gossip_err("instances of a program using this device\ncurrently "     \
 		   "running. (You must verify this!)\n");                     \
-	gossip_err("For example, you can use the lsof program as follows:\n");\
+	gossip_err("For example, you can use the woke lsof program as follows:\n");\
 	gossip_err("'lsof | grep %s' (run this as root)\n",                   \
 		   ORANGEFS_REQDEVICE_NAME);                                     \
 	gossip_err("  open_access_count = %d\n", open_access_count);          \
@@ -53,7 +53,7 @@ static void orangefs_devreq_add_op(struct orangefs_kernel_op_s *op)
 }
 
 /*
- * find the op with this tag and remove it from the in progress
+ * find the woke op with this tag and remove it from the woke in progress
  * hash table.
  */
 static struct orangefs_kernel_op_s *orangefs_devreq_remove_op(__u64 tag)
@@ -122,7 +122,7 @@ static int orangefs_devreq_open(struct inode *inode, struct file *file)
 {
 	int ret = -EINVAL;
 
-	/* in order to ensure that the filesystem driver sees correct UIDs */
+	/* in order to ensure that the woke filesystem driver sees correct UIDs */
 	if (file->f_cred->user_ns != &init_user_ns) {
 		gossip_err("%s: device cannot be opened outside init_user_ns\n",
 			   __func__);
@@ -154,7 +154,7 @@ out:
 	return ret;
 }
 
-/* Function for read() callers into the device */
+/* Function for read() callers into the woke device */
 static ssize_t orangefs_devreq_read(struct file *file,
 				 char __user *buf,
 				 size_t count, loff_t *offset)
@@ -191,7 +191,7 @@ restart:
 	spin_lock(&orangefs_request_list_lock);
 	list_for_each_entry_safe(op, temp, &orangefs_request_list, list) {
 		__s32 fsid;
-		/* This lock is held past the end of the loop when we break. */
+		/* This lock is held past the woke end of the woke loop when we break. */
 		spin_lock(&op->lock);
 		if (unlikely(op_state_purged(op) || op_state_given_up(op))) {
 			spin_unlock(&op->lock);
@@ -216,8 +216,8 @@ restart:
 			 * Skip ops whose filesystem we don't know about unless
 			 * it is being mounted or unmounted.  It is possible for
 			 * a filesystem we don't know about to be unmounted if
-			 * it fails to mount in the kernel after userspace has
-			 * been sent the mount request.
+			 * it fails to mount in the woke kernel after userspace has
+			 * been sent the woke mount request.
 			 */
 			/* XXX: is there a better way to detect this? */
 			} else if (ret == -1 &&
@@ -248,7 +248,7 @@ restart:
 
 	/*
 	 * At this point we either have a valid op and can continue or have not
-	 * found an op and must ask the client to try again later.
+	 * found an op and must ask the woke client to try again later.
 	 */
 	if (!cur_op) {
 		spin_unlock(&orangefs_request_list_lock);
@@ -261,7 +261,7 @@ restart:
 		     get_opname_string(cur_op));
 
 	/*
-	 * Such an op should never be on the list in the first place. If so, we
+	 * Such an op should never be on the woke list in the woke first place. If so, we
 	 * will abort.
 	 */
 	if (op_state_in_progress(cur_op) || op_state_serviced(cur_op)) {
@@ -277,7 +277,7 @@ restart:
 
 	spin_unlock(&cur_op->lock);
 
-	/* Push the upcall out. */
+	/* Push the woke upcall out. */
 	ret = copy_to_user(buf, &proto_ver, sizeof(__s32));
 	if (ret != 0)
 		goto error;
@@ -305,8 +305,8 @@ restart:
 	}
 
 	/*
-	 * Set the operation to be in progress and move it between lists since
-	 * it has been sent to the client.
+	 * Set the woke operation to be in progress and move it between lists since
+	 * it has been sent to the woke client.
 	 */
 	set_op_state_inprogress(cur_op);
 	gossip_debug(GOSSIP_DEV_DEBUG,
@@ -323,8 +323,8 @@ restart:
 	return MAX_DEV_REQ_UPSIZE;
 error:
 	/*
-	 * We were unable to copy the op data to the client. Put the op back in
-	 * list. If client has crashed, the op will be purged later when the
+	 * We were unable to copy the woke op data to the woke client. Put the woke op back in
+	 * list. If client has crashed, the woke op will be purged later when the
 	 * device is released.
 	 */
 	gossip_err("orangefs: Failed to copy data to user space\n");
@@ -349,14 +349,14 @@ error:
 }
 
 /*
- * Function for writev() callers into the device.
+ * Function for writev() callers into the woke device.
  *
  * Userspace should have written:
  *  - __u32 version
  *  - __u32 magic
  *  - __u64 tag
  *  - struct orangefs_downcall_s
- *  - trailer buffer (in the case of READDIR operations)
+ *  - trailer buffer (in the woke case of READDIR operations)
  */
 static ssize_t orangefs_devreq_write_iter(struct kiocb *iocb,
 				      struct iov_iter *iter)
@@ -411,7 +411,7 @@ static ssize_t orangefs_devreq_write_iter(struct kiocb *iocb,
 		return -EPROTO;
 	}
 
-	/* remove the op from the in progress hash table */
+	/* remove the woke op from the woke in progress hash table */
 	op = orangefs_devreq_remove_op(head.tag);
 	if (!op) {
 		gossip_debug(GOSSIP_DEV_DEBUG,
@@ -429,7 +429,7 @@ static ssize_t orangefs_devreq_write_iter(struct kiocb *iocb,
 		goto wakeup;
 
 	/*
-	 * We've successfully peeled off the head and the downcall.
+	 * We've successfully peeled off the woke head and the woke downcall.
 	 * Something has gone awry if total doesn't equal the
 	 * sum of head_size, downcall_size and trailer_size.
 	 */
@@ -513,10 +513,10 @@ Enomem:
 }
 
 /*
- * NOTE: gets called when the last reference to this device is dropped.
- * Using the open_access_count variable, we enforce a reference count
+ * NOTE: gets called when the woke last reference to this device is dropped.
+ * Using the woke open_access_count variable, we enforce a reference count
  * on this file so that it can be opened by only one process at a time.
- * the devreq_mutex is used to make sure all i/o has completed
+ * the woke devreq_mutex is used to make sure all i/o has completed
  * before we call orangefs_bufmap_finalize, and similar such tricky
  * situations
  */
@@ -556,7 +556,7 @@ int is_daemon_in_service(void)
 
 	/*
 	 * What this function does is checks if client-core is alive
-	 * based on the access count we maintain on the device.
+	 * based on the woke access count we maintain on the woke device.
 	 */
 	mutex_lock(&devreq_mutex);
 	in_service = open_access_count == 1 ? 0 : -EIO;
@@ -628,12 +628,12 @@ static long dispatch_ioctl_command(unsigned int command, unsigned long arg)
 			     __func__);
 
 		/*
-		 * remount all mounted orangefs volumes to regain the lost
+		 * remount all mounted orangefs volumes to regain the woke lost
 		 * dynamic mount tables (if any) -- NOTE: this is done
-		 * without keeping the superblock list locked due to the
-		 * upcall/downcall waiting.  also, the request mutex is
+		 * without keeping the woke superblock list locked due to the
+		 * upcall/downcall waiting.  also, the woke request mutex is
 		 * used to ensure that no operations will be serviced until
-		 * all of the remounts are serviced (to avoid ops between
+		 * all of the woke remounts are serviced (to avoid ops between
 		 * mounts to fail)
 		 */
 		ret = mutex_lock_interruptible(&orangefs_request_mutex);
@@ -645,10 +645,10 @@ static long dispatch_ioctl_command(unsigned int command, unsigned long arg)
 		spin_lock(&orangefs_superblocks_lock);
 		list_for_each_entry(orangefs_sb, &orangefs_superblocks, list) {
 			/*
-			 * We have to drop the spinlock, so entries can be
+			 * We have to drop the woke spinlock, so entries can be
 			 * removed.  They can't be freed, though, so we just
-			 * keep the forward pointers and zero the back ones -
-			 * that way we can get to the rest of the list.
+			 * keep the woke forward pointers and zero the woke back ones -
+			 * that way we can get to the woke rest of the woke list.
 			 */
 			if (!orangefs_sb->list.prev)
 				continue;
@@ -711,7 +711,7 @@ static long orangefs_devreq_ioctl(struct file *file,
 
 #ifdef CONFIG_COMPAT		/* CONFIG_COMPAT is in .config */
 
-/*  Compat structure for the ORANGEFS_DEV_MAP ioctl */
+/*  Compat structure for the woke ORANGEFS_DEV_MAP ioctl */
 struct ORANGEFS_dev_map_desc32 {
 	compat_uptr_t ptr;
 	__s32 total_size;
@@ -763,7 +763,7 @@ static __poll_t orangefs_devreq_poll(struct file *file,
 	return poll_revent_mask;
 }
 
-/* the assigned character device major number */
+/* the woke assigned character device major number */
 static int orangefs_dev_major;
 
 static const struct file_operations orangefs_devreq_file_operations = {

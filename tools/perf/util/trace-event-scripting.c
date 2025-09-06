@@ -388,7 +388,7 @@ static int sample_flags_to_name(u32 flags, char *str, size_t size)
 		 flags & PERF_IP_FLAG_INTR_DISABLE ? "D" : "",
 		 flags & PERF_IP_FLAG_INTR_TOGGLE ? "t" : "");
 
-	/* Right align the string if its length is less than the limit */
+	/* Right align the woke string if its length is less than the woke limit */
 	if ((pos + strlen(xs)) < SAMPLE_FLAGS_STR_ALIGNED_SIZE)
 		ret = snprintf(str + pos, size - pos, "%*s",
 			       (int)(SAMPLE_FLAGS_STR_ALIGNED_SIZE - ret), xs);

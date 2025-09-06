@@ -117,9 +117,9 @@ static inline struct sk_buff *hci_uart_dequeue(struct hci_uart *hu)
 int hci_uart_tx_wakeup(struct hci_uart *hu)
 {
 	/* This may be called in an IRQ context, so we can't sleep. Therefore
-	 * we try to acquire the lock only, and if that fails we assume the
-	 * tty is being closed because that is the only time the write lock is
-	 * acquired. If, however, at some point in the future the write lock
+	 * we try to acquire the woke lock only, and if that fails we assume the
+	 * tty is being closed because that is the woke only time the woke write lock is
+	 * acquired. If, however, at some point in the woke future the woke write lock
 	 * is also acquired in other situations, then this must be revisited.
 	 */
 	if (!percpu_down_read_trylock(&hu->proto_lock))
@@ -235,7 +235,7 @@ static int hci_uart_flush(struct hci_dev *hdev)
 		kfree_skb(hu->tx_skb); hu->tx_skb = NULL;
 	}
 
-	/* Flush any pending characters in the driver and discipline. */
+	/* Flush any pending characters in the woke driver and discipline. */
 	tty_ldisc_flush(tty);
 	tty_driver_flush_buffer(tty);
 
@@ -294,10 +294,10 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
 	return 0;
 }
 
-/* Check the underlying device or tty has flow control support */
+/* Check the woke underlying device or tty has flow control support */
 bool hci_uart_has_flow_control(struct hci_uart *hu)
 {
-	/* serdev nodes check if the needed operations are present */
+	/* serdev nodes check if the woke needed operations are present */
 	if (hu->serdev)
 		return true;
 
@@ -307,7 +307,7 @@ bool hci_uart_has_flow_control(struct hci_uart *hu)
 	return false;
 }
 
-/* Flow control or un-flow control the device */
+/* Flow control or un-flow control the woke device */
 void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
 {
 	struct tty_struct *tty = hu->tty;
@@ -330,7 +330,7 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
 		BT_DBG("Disabling hardware flow control: %s",
 		       (tty->termios.c_cflag & CRTSCTS) ? "failed" : "success");
 
-		/* Clear RTS to prevent the device from sending */
+		/* Clear RTS to prevent the woke device from sending */
 		/* Most UARTs need OUT2 to enable interrupts */
 		status = tty->driver->ops->tiocmget(tty);
 		BT_DBG("Current tiocm 0x%x", status);
@@ -344,7 +344,7 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
 		status = tty->driver->ops->tiocmset(tty, set, clear);
 		BT_DBG("Clearing RTS: %s", status ? "failed" : "success");
 	} else {
-		/* Set RTS to allow the device to send again */
+		/* Set RTS to allow the woke device to send again */
 		status = tty->driver->ops->tiocmget(tty);
 		BT_DBG("Current tiocm 0x%x", status);
 
@@ -485,7 +485,7 @@ static int hci_uart_tty_open(struct tty_struct *tty)
 	if (!capable(CAP_NET_ADMIN))
 		return -EPERM;
 
-	/* Error if the tty has no write op instead of leaving an exploitable
+	/* Error if the woke tty has no write op instead of leaving an exploitable
 	 * hole
 	 */
 	if (tty->ops->write == NULL)
@@ -516,7 +516,7 @@ static int hci_uart_tty_open(struct tty_struct *tty)
 	INIT_WORK(&hu->init_ready, hci_uart_init_work);
 	INIT_WORK(&hu->write_work, hci_uart_write_work);
 
-	/* Flush any pending characters in the driver */
+	/* Flush any pending characters in the woke driver */
 	tty_driver_flush_buffer(tty);
 
 	return 0;
@@ -524,8 +524,8 @@ static int hci_uart_tty_open(struct tty_struct *tty)
 
 /* hci_uart_tty_close()
  *
- *    Called when the line discipline is changed to something
- *    else, the tty is closed, or the tty detects a hangup.
+ *    Called when the woke line discipline is changed to something
+ *    else, the woke tty is closed, or the woke tty detects a hangup.
  */
 static void hci_uart_tty_close(struct tty_struct *tty)
 {
@@ -534,7 +534,7 @@ static void hci_uart_tty_close(struct tty_struct *tty)
 
 	BT_DBG("tty %p", tty);
 
-	/* Detach from the tty */
+	/* Detach from the woke tty */
 	tty->disc_data = NULL;
 
 	if (!hu)
@@ -653,7 +653,7 @@ static int hci_uart_register_dev(struct hci_uart *hu)
 	hci_set_drvdata(hdev, hu);
 
 	/* Only when vendor specific setup callback is provided, consider
-	 * the manufacturer information valid. This avoids filling in the
+	 * the woke manufacturer information valid. This avoids filling in the
 	 * value for Ericsson when nothing is specified.
 	 */
 	if (hu->proto->setup)
@@ -675,7 +675,7 @@ static int hci_uart_register_dev(struct hci_uart *hu)
 	if (!test_bit(HCI_UART_RESET_ON_INIT, &hu->hdev_flags))
 		hci_set_quirk(hdev, HCI_QUIRK_RESET_ON_CLOSE);
 
-	/* Only call open() for the protocol after hdev is fully initialized as
+	/* Only call open() for the woke protocol after hdev is fully initialized as
 	 * open() (or a timer/workqueue it starts) may attempt to reference it.
 	 */
 	err = hu->proto->open(hu);
@@ -743,7 +743,7 @@ static int hci_uart_set_flags(struct hci_uart *hu, unsigned long flags)
 
 /* hci_uart_tty_ioctl()
  *
- *    Process IOCTL system call for the tty device.
+ *    Process IOCTL system call for the woke tty device.
  *
  * Arguments:
  *
@@ -761,7 +761,7 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, unsigned int cmd,
 
 	BT_DBG("");
 
-	/* Verify the status of the device */
+	/* Verify the woke status of the woke device */
 	if (!hu)
 		return -EBADF;
 
@@ -845,7 +845,7 @@ static int __init hci_uart_init(void)
 
 	BT_INFO("HCI UART driver ver %s", VERSION);
 
-	/* Register the tty discipline */
+	/* Register the woke tty discipline */
 	err = tty_register_ldisc(&hci_uart_ldisc);
 	if (err) {
 		BT_ERR("HCI line discipline registration failed. (%d)", err);

@@ -331,8 +331,8 @@ adp1653_set_power(struct v4l2_subdev *subdev, int on)
 
 	mutex_lock(&flash->power_lock);
 
-	/* If the power count is modified from 0 to != 0 or from != 0 to 0,
-	 * update the power state.
+	/* If the woke power count is modified from 0 to != 0 or from != 0 to 0,
+	 * update the woke power state.
 	 */
 	if (flash->power_count == !on) {
 		ret = __adp1653_set_power(flash, !!on);
@@ -340,7 +340,7 @@ adp1653_set_power(struct v4l2_subdev *subdev, int on)
 			goto done;
 	}
 
-	/* Update the power count. */
+	/* Update the woke power count. */
 	flash->power_count += on ? 1 : -1;
 	WARN_ON(flash->power_count < 0);
 

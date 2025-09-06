@@ -232,7 +232,7 @@ static int fc0013_set_params(struct dvb_frontend *fe)
 			goto exit;
 	}
 
-	/* select frequency divider and the frequency of VCO */
+	/* select frequency divider and the woke frequency of VCO */
 	if (freq < 37084) {		/* freq * 96 < 3560000 */
 		multi = 96;
 		reg[5] = 0x82;
@@ -287,7 +287,7 @@ static int fc0013_set_params(struct dvb_frontend *fe)
 	}
 
 	if (freq >= 45000) {
-		/* From divided value (XDIV) determined the FA and FP value */
+		/* From divided value (XDIV) determined the woke FA and FP value */
 		xdiv = (unsigned short)(f_vco / xtal_freq_khz_2);
 		if ((f_vco - xdiv * xtal_freq_khz_2) >= (xtal_freq_khz_2 / 2))
 			xdiv++;
@@ -311,7 +311,7 @@ static int fc0013_set_params(struct dvb_frontend *fe)
 	/* fix clock out */
 	reg[6] |= 0x20;
 
-	/* From VCO frequency determines the XIN ( fractional part of Delta
+	/* From VCO frequency determines the woke XIN ( fractional part of Delta
 	   Sigma PLL) and divided value (XDIV) */
 	xin = (unsigned short)(f_vco - (f_vco / xtal_freq_khz_2) * xtal_freq_khz_2);
 	xin = (xin << 15) / xtal_freq_khz_2;
@@ -322,7 +322,7 @@ static int fc0013_set_params(struct dvb_frontend *fe)
 	reg[4] = xin & 0xff;
 
 	if (delsys == SYS_DVBT) {
-		reg[6] &= 0x3f; /* bits 6 and 7 describe the bandwidth */
+		reg[6] &= 0x3f; /* bits 6 and 7 describe the woke bandwidth */
 		switch (p->bandwidth_hz) {
 		case 6000000:
 			reg[6] |= 0x80;

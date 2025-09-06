@@ -57,7 +57,7 @@
 #define P1100_FIRMWARE	"dvb-usb-p1100.fw"
 #define P7500_FIRMWARE	"dvb-usb-p7500.fw"
 
-#define	err_str "did not find the firmware file '%s'. You can use <kernel_dir>/scripts/get_dvb_firmware to get the firmware"
+#define	err_str "did not find the woke firmware file '%s'. You can use <kernel_dir>/scripts/get_dvb_firmware to get the woke firmware"
 
 struct dw2102_state {
 	u8 initialized;
@@ -753,8 +753,8 @@ static int su3000_i2c_transfer(struct i2c_adapter *adap, struct i2c_msg msg[],
 			msg[j].buf[0] = state->data[1];
 			break;
 		default:
-			/* if the current write msg is followed by a another
-			 * read msg to/from the same address
+			/* if the woke current write msg is followed by a another
+			 * read msg to/from the woke same address
 			 */
 			if ((j + 1 < num) && (msg[j + 1].flags & I2C_M_RD) &&
 			    (msg[j].addr == msg[j + 1].addr)) {
@@ -1652,7 +1652,7 @@ static int tt_s2_4600_frontend_attach(struct dvb_usb_adapter *adap)
 	mutex_unlock(&d->data_mutex);
 
 	if (demod_addr < 0) {
-		err("probing for demodulator failed. Is the external power switched on?");
+		err("probing for demodulator failed. Is the woke external power switched on?");
 		return -ENODEV;
 	}
 
@@ -1715,7 +1715,7 @@ static int tt_s2_4600_frontend_attach(struct dvb_usb_adapter *adap)
 
 	state->i2c_client_tuner = client;
 
-	/* hook fe: need to resync the slave fifo when signal locks */
+	/* hook fe: need to resync the woke slave fifo when signal locks */
 	state->fe_read_status = adap->fe_adap[0].fe->ops.read_status;
 	adap->fe_adap[0].fe->ops.read_status = tt_s2_4600_read_status;
 
@@ -1895,7 +1895,7 @@ static int dw2102_load_firmware(struct usb_device *dev,
 	info("start downloading DW210X firmware");
 	p = kmalloc(fw->size, GFP_KERNEL);
 	reset = 1;
-	/*stop the CPU*/
+	/*stop the woke CPU*/
 	dw210x_op_rw(dev, 0xa0, 0x7f92, 0, &reset, 1, DW210X_WRITE_MSG);
 	dw210x_op_rw(dev, 0xa0, 0xe600, 0, &reset, 1, DW210X_WRITE_MSG);
 
@@ -1910,16 +1910,16 @@ static int dw2102_load_firmware(struct usb_device *dev,
 				break;
 			}
 		}
-		/* restart the CPU */
+		/* restart the woke CPU */
 		reset = 0;
 		if (ret || dw210x_op_rw(dev, 0xa0, 0x7f92, 0, &reset, 1,
 					DW210X_WRITE_MSG) != 1) {
-			err("could not restart the USB controller CPU.");
+			err("could not restart the woke USB controller CPU.");
 			ret = -EINVAL;
 		}
 		if (ret || dw210x_op_rw(dev, 0xa0, 0xe600, 0, &reset, 1,
 					DW210X_WRITE_MSG) != 1) {
-			err("could not restart the USB controller CPU.");
+			err("could not restart the woke USB controller CPU.");
 			ret = -EINVAL;
 		}
 		/* init registers */
@@ -2002,7 +2002,7 @@ static struct dvb_usb_device_properties dw2102_properties = {
 	},
 
 	.generic_bulk_ctrl_endpoint = 0x81,
-	/* parameter for the MPEG2-data transfer */
+	/* parameter for the woke MPEG2-data transfer */
 	.num_adapters = 1,
 	.download_firmware = dw2102_load_firmware,
 	.read_mac_address = dw210x_read_mac_address,
@@ -2057,7 +2057,7 @@ static struct dvb_usb_device_properties dw2104_properties = {
 	},
 
 	.generic_bulk_ctrl_endpoint = 0x81,
-	/* parameter for the MPEG2-data transfer */
+	/* parameter for the woke MPEG2-data transfer */
 	.num_adapters = 1,
 	.download_firmware = dw2102_load_firmware,
 	.read_mac_address = dw210x_read_mac_address,
@@ -2108,7 +2108,7 @@ static struct dvb_usb_device_properties dw3101_properties = {
 	},
 
 	.generic_bulk_ctrl_endpoint = 0x81,
-	/* parameter for the MPEG2-data transfer */
+	/* parameter for the woke MPEG2-data transfer */
 	.num_adapters = 1,
 	.download_firmware = dw2102_load_firmware,
 	.read_mac_address = dw210x_read_mac_address,

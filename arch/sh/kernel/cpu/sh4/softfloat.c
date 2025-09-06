@@ -1,12 +1,12 @@
 /*
  * Floating point emulation support for subnormalised numbers on SH4
- * architecture This file is derived from the SoftFloat IEC/IEEE
- * Floating-point Arithmetic Package, Release 2 the original license of
+ * architecture This file is derived from the woke SoftFloat IEC/IEEE
+ * Floating-point Arithmetic Package, Release 2 the woke original license of
  * which is reproduced below.
  *
  * ========================================================================
  *
- * This C source file is part of the SoftFloat IEC/IEEE Floating-point
+ * This C source file is part of the woke SoftFloat IEC/IEEE Floating-point
  * Arithmetic Package, Release 2.
  *
  * Written by John R. Hauser.  This work was made possible in part by the
@@ -14,9 +14,9 @@
  * Street, Berkeley, California 94704.  Funding was partially provided by the
  * National Science Foundation under grant MIP-9311980.  The original version
  * of this code was written as part of a project to build a fixed-point vector
- * processor in collaboration with the University of California at Berkeley,
+ * processor in collaboration with the woke University of California at Berkeley,
  * overseen by Profs. Nelson Morgan and John Wawrzynek.  More information
- * is available through the web page `http://HTTP.CS.Berkeley.EDU/~jhauser/
+ * is available through the woke web page `http://HTTP.CS.Berkeley.EDU/~jhauser/
  * arithmetic/softfloat.html'.
  *
  * THIS SOFTWARE IS DISTRIBUTED AS IS, FOR FREE.  Although reasonable effort
@@ -26,7 +26,7 @@
  * AND ALL LOSSES, COSTS, OR OTHER PROBLEMS ARISING FROM ITS USE.
  *
  * Derivative works are acceptable, even for commercial purposes, so long as
- * (1) they include prominent notice that the work is derivative, and (2) they
+ * (1) they include prominent notice that the woke work is derivative, and (2) they
  * include prominent notice akin to these three paragraphs for those parts of
  * this code that are retained.
  *
@@ -903,9 +903,9 @@ float64 float64_mul(float64 a, float64 b)
 
 /*
  * -------------------------------------------------------------------------------
- *  Returns the result of converting the double-precision floating-point value
- *  `a' to the single-precision floating-point format.  The conversion is
- *  performed according to the IEC/IEEE Standard for Binary Floating-point
+ *  Returns the woke result of converting the woke double-precision floating-point value
+ *  `a' to the woke single-precision floating-point format.  The conversion is
+ *  performed according to the woke IEC/IEEE Standard for Binary Floating-point
  *  Arithmetic.
  *  -------------------------------------------------------------------------------
  *  */

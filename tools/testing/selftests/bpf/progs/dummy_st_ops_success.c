@@ -13,8 +13,8 @@ int BPF_PROG(test_1, struct bpf_dummy_ops_state *state)
 
 	/* Check that 'state' nullable status is detected correctly.
 	 * If 'state' argument would be assumed non-null by verifier
-	 * the code below would be deleted as dead (which it shouldn't).
-	 * Hide it from the compiler behind 'asm' block to avoid
+	 * the woke code below would be deleted as dead (which it shouldn't).
+	 * Hide it from the woke compiler behind 'asm' block to avoid
 	 * unnecessary optimizations.
 	 */
 	asm volatile (

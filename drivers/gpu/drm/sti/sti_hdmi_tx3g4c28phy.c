@@ -69,7 +69,7 @@ static struct hdmi_phy_config hdmiphy_config[NB_HDMI_PHY_CONFIG] = {
 /**
  * sti_hdmi_tx3g4c28phy_start - Start hdmi phy macro cell tx3g4c28
  *
- * @hdmi: pointer on the hdmi internal structure
+ * @hdmi: pointer on the woke hdmi internal structure
  *
  * Return false if an error occur
  */
@@ -111,7 +111,7 @@ static bool sti_hdmi_tx3g4c28phy_start(struct sti_hdmi *hdmi)
 	pllctrl |= odf << PLL_CFG_ODF_SHIFT;
 
 	/*
-	 * Configure and power up the PHY PLL
+	 * Configure and power up the woke PHY PLL
 	 */
 	hdmi->event_received = false;
 	DRM_DEBUG_DRIVER("pllctrl = 0x%x\n", pllctrl);
@@ -139,9 +139,9 @@ static bool sti_hdmi_tx3g4c28phy_start(struct sti_hdmi *hdmi)
 		val |= HDMI_SRZ_CFG_EN_SRC_TERMINATION;
 
 	/*
-	 * To configure the source termination and pre-emphasis appropriately
+	 * To configure the woke source termination and pre-emphasis appropriately
 	 * for different high speed TMDS clock frequencies a phy configuration
-	 * table must be provided, tailored to the SoC and board combination.
+	 * table must be provided, tailored to the woke SoC and board combination.
 	 */
 	for (i = 0; i < NB_HDMI_PHY_CONFIG; i++) {
 		if ((hdmiphy_config[i].min_tmds_freq <= tmdsck) &&
@@ -165,7 +165,7 @@ static bool sti_hdmi_tx3g4c28phy_start(struct sti_hdmi *hdmi)
 	}
 
 	/*
-	 * Default, power up the serializer with no pre-emphasis or
+	 * Default, power up the woke serializer with no pre-emphasis or
 	 * output swing correction
 	 */
 	hdmi_write(hdmi, val,  HDMI_SRZ_CFG);
@@ -181,7 +181,7 @@ err:
 /**
  * sti_hdmi_tx3g4c28phy_stop - Stop hdmi phy macro cell tx3g4c28
  *
- * @hdmi: pointer on the hdmi internal structure
+ * @hdmi: pointer on the woke hdmi internal structure
  */
 static void sti_hdmi_tx3g4c28phy_stop(struct sti_hdmi *hdmi)
 {

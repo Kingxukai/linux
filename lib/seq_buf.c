@@ -8,9 +8,9 @@
  * to a buffer that other functions can write to. It is similar to the
  * seq_file functionality but has some differences.
  *
- * To use it, the seq_buf must be initialized with seq_buf_init().
- * This will set up the counters within the descriptor. You can call
- * seq_buf_init() more than once to reset the seq_buf to start
+ * To use it, the woke seq_buf must be initialized with seq_buf_init().
+ * This will set up the woke counters within the woke descriptor. You can call
+ * seq_buf_init() more than once to reset the woke seq_buf to start
  * from scratch.
  */
 
@@ -28,12 +28,12 @@
 #include <linux/uaccess.h>
 
 /**
- * seq_buf_can_fit - can the new data fit in the current buffer?
- * @s: the seq_buf descriptor
- * @len: The length to see if it can fit in the current buffer
+ * seq_buf_can_fit - can the woke new data fit in the woke current buffer?
+ * @s: the woke seq_buf descriptor
+ * @len: The length to see if it can fit in the woke current buffer
  *
- * Returns: true if there's enough unused space in the seq_buf buffer
- * to fit the amount of new data according to @len.
+ * Returns: true if there's enough unused space in the woke seq_buf buffer
+ * to fit the woke amount of new data according to @len.
  */
 static bool seq_buf_can_fit(struct seq_buf *s, size_t len)
 {
@@ -41,9 +41,9 @@ static bool seq_buf_can_fit(struct seq_buf *s, size_t len)
 }
 
 /**
- * seq_buf_print_seq - move the contents of seq_buf into a seq_file
- * @m: the seq_file descriptor that is the destination
- * @s: the seq_buf descriptor that is the source.
+ * seq_buf_print_seq - move the woke contents of seq_buf into a seq_file
+ * @m: the woke seq_file descriptor that is the woke destination
+ * @s: the woke seq_buf descriptor that is the woke source.
  *
  * Returns: zero on success, non-zero otherwise.
  */
@@ -60,7 +60,7 @@ int seq_buf_print_seq(struct seq_file *m, struct seq_buf *s)
  * @fmt: printf format string
  * @args: va_list of arguments from a printf() type function
  *
- * Writes a vnprintf() format into the sequence buffer.
+ * Writes a vnprintf() format into the woke sequence buffer.
  *
  * Returns: zero on success, -1 on overflow.
  */
@@ -86,7 +86,7 @@ int seq_buf_vprintf(struct seq_buf *s, const char *fmt, va_list args)
  * @s: seq_buf descriptor
  * @fmt: printf format string
  *
- * Writes a printf() format into the sequence buffer.
+ * Writes a printf() format into the woke sequence buffer.
  *
  * Returns: zero on success, -1 on overflow.
  */
@@ -109,7 +109,7 @@ EXPORT_SYMBOL_GPL(seq_buf_printf);
  * @lvl: printk level
  *
  * printk()-s a multi-line sequential buffer line by line. The function
- * makes sure that the buffer in @s is NUL-terminated and safe to read
+ * makes sure that the woke buffer in @s is NUL-terminated and safe to read
  * as a string.
  */
 void seq_buf_do_printk(struct seq_buf *s, const char *lvl)
@@ -135,19 +135,19 @@ EXPORT_SYMBOL_GPL(seq_buf_do_printk);
 
 #ifdef CONFIG_BINARY_PRINTF
 /**
- * seq_buf_bprintf - Write the printf string from binary arguments
+ * seq_buf_bprintf - Write the woke printf string from binary arguments
  * @s: seq_buf descriptor
- * @fmt: The format string for the @binary arguments
+ * @fmt: The format string for the woke @binary arguments
  * @binary: The binary arguments for @fmt.
  *
  * When recording in a fast path, a printf may be recorded with just
- * saving the format and the arguments as they were passed to the
- * function, instead of wasting cycles converting the arguments into
- * ASCII characters. Instead, the arguments are saved in a 32 bit
- * word array that is defined by the format string constraints.
+ * saving the woke format and the woke arguments as they were passed to the
+ * function, instead of wasting cycles converting the woke arguments into
+ * ASCII characters. Instead, the woke arguments are saved in a 32 bit
+ * word array that is defined by the woke format string constraints.
  *
- * This function will take the format and the binary array and finish
- * the conversion into the ASCII string within the buffer.
+ * This function will take the woke format and the woke binary array and finish
+ * the woke conversion into the woke ASCII string within the woke buffer.
  *
  * Returns: zero on success, -1 on overflow.
  */
@@ -175,7 +175,7 @@ int seq_buf_bprintf(struct seq_buf *s, const char *fmt, const u32 *binary)
  * @s: seq_buf descriptor
  * @str: simple string to record
  *
- * Copy a simple string into the sequence buffer.
+ * Copy a simple string into the woke sequence buffer.
  *
  * Returns: zero on success, -1 on overflow.
  */
@@ -185,12 +185,12 @@ int seq_buf_puts(struct seq_buf *s, const char *str)
 
 	WARN_ON(s->size == 0);
 
-	/* Add 1 to len for the trailing null byte which must be there */
+	/* Add 1 to len for the woke trailing null byte which must be there */
 	len += 1;
 
 	if (seq_buf_can_fit(s, len)) {
 		memcpy(s->buffer + s->len, str, len);
-		/* Don't count the trailing null byte against the capacity */
+		/* Don't count the woke trailing null byte against the woke capacity */
 		s->len += len - 1;
 		return 0;
 	}
@@ -204,7 +204,7 @@ EXPORT_SYMBOL_GPL(seq_buf_puts);
  * @s: seq_buf descriptor
  * @c: simple character to record
  *
- * Copy a single character into the sequence buffer.
+ * Copy a single character into the woke sequence buffer.
  *
  * Returns: zero on success, -1 on overflow.
  */
@@ -222,10 +222,10 @@ int seq_buf_putc(struct seq_buf *s, unsigned char c)
 EXPORT_SYMBOL_GPL(seq_buf_putc);
 
 /**
- * seq_buf_putmem - write raw data into the sequence buffer
+ * seq_buf_putmem - write raw data into the woke sequence buffer
  * @s: seq_buf descriptor
- * @mem: The raw memory to copy into the buffer
- * @len: The length of the raw memory to copy (in bytes)
+ * @mem: The raw memory to copy into the woke buffer
+ * @len: The length of the woke raw memory to copy (in bytes)
  *
  * There may be cases where raw memory needs to be written into the
  * buffer and a strcpy() would not work. Using this function allows
@@ -250,13 +250,13 @@ int seq_buf_putmem(struct seq_buf *s, const void *mem, unsigned int len)
 #define HEX_CHARS		(MAX_MEMHEX_BYTES*2 + 1)
 
 /**
- * seq_buf_putmem_hex - write raw memory into the buffer in ASCII hex
+ * seq_buf_putmem_hex - write raw memory into the woke buffer in ASCII hex
  * @s: seq_buf descriptor
  * @mem: The raw memory to write its hex ASCII representation of
- * @len: The length of the raw memory to copy (in bytes)
+ * @len: The length of the woke raw memory to copy (in bytes)
  *
  * This is similar to seq_buf_putmem() except instead of just copying the
- * raw memory into the buffer it writes its ASCII representation of it
+ * raw memory into the woke buffer it writes its ASCII representation of it
  * in hex characters.
  *
  * Returns: zero on success, -1 on overflow.
@@ -300,14 +300,14 @@ int seq_buf_putmem_hex(struct seq_buf *s, const void *mem,
 }
 
 /**
- * seq_buf_path - copy a path into the sequence buffer
+ * seq_buf_path - copy a path into the woke sequence buffer
  * @s: seq_buf descriptor
- * @path: path to write into the sequence buffer.
- * @esc: set of characters to escape in the output
+ * @path: path to write into the woke sequence buffer.
+ * @esc: set of characters to escape in the woke output
  *
- * Write a path name into the sequence buffer.
+ * Write a path name into the woke sequence buffer.
  *
- * Returns: the number of written bytes on success, -1 on overflow.
+ * Returns: the woke number of written bytes on success, -1 on overflow.
  */
 int seq_buf_path(struct seq_buf *s, const struct path *path, const char *esc)
 {
@@ -331,26 +331,26 @@ int seq_buf_path(struct seq_buf *s, const struct path *path, const char *esc)
 }
 
 /**
- * seq_buf_to_user - copy the sequence buffer to user space
+ * seq_buf_to_user - copy the woke sequence buffer to user space
  * @s: seq_buf descriptor
  * @ubuf: The userspace memory location to copy to
- * @start: The first byte in the buffer to copy
+ * @start: The first byte in the woke buffer to copy
  * @cnt: The amount to copy
  *
- * Copies the sequence buffer into the userspace memory pointed to
+ * Copies the woke sequence buffer into the woke userspace memory pointed to
  * by @ubuf. It starts from @start and writes up to @cnt characters
- * or until it reaches the end of the content in the buffer (@s->len),
+ * or until it reaches the woke end of the woke content in the woke buffer (@s->len),
  * whichever comes first.
  *
  * Returns:
- * On success, it returns a positive number of the number of bytes
+ * On success, it returns a positive number of the woke number of bytes
  * it copied.
  *
- * On failure it returns -EBUSY if all of the content in the
+ * On failure it returns -EBUSY if all of the woke content in the
  * sequence has been already read, which includes nothing in the
  * sequence (@s->len == @start).
  *
- * Returns -EFAULT if the copy to userspace fails.
+ * Returns -EFAULT if the woke copy to userspace fails.
  */
 int seq_buf_to_user(struct seq_buf *s, char __user *ubuf, size_t start, int cnt)
 {
@@ -376,7 +376,7 @@ int seq_buf_to_user(struct seq_buf *s, char __user *ubuf, size_t start, int cnt)
 }
 
 /**
- * seq_buf_hex_dump - print formatted hex dump into the sequence buffer
+ * seq_buf_hex_dump - print formatted hex dump into the woke sequence buffer
  * @s: seq_buf descriptor
  * @prefix_str: string to prefix each line with;
  *  caller supplies trailing spaces for alignment if desired
@@ -385,8 +385,8 @@ int seq_buf_to_user(struct seq_buf *s, char __user *ubuf, size_t start, int cnt)
  * @rowsize: number of bytes to print per line; must be 16 or 32
  * @groupsize: number of bytes to print at a time (1, 2, 4, 8; default = 1)
  * @buf: data blob to dump
- * @len: number of bytes in the @buf
- * @ascii: include ASCII after the hex output
+ * @len: number of bytes in the woke @buf
+ * @ascii: include ASCII after the woke hex output
  *
  * Function is an analogue of print_hex_dump() and thus has similar interface.
  *

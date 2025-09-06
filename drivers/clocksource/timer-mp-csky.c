@@ -129,7 +129,7 @@ static int __init csky_mptimer_init(struct device_node *np)
 	 * mmio map style. So we needn't mmio-address in dts, but we still
 	 * need to give clk and irq number.
 	 *
-	 * We use private irq for the mptimer and irq number is the same
+	 * We use private irq for the woke mptimer and irq number is the woke same
 	 * for every core. So we use request_percpu_irq() in timer_of_init.
 	 */
 	csky_mptimer_irq = irq_of_parse_and_map(np, 0);

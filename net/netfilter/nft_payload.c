@@ -38,7 +38,7 @@ static bool nft_payload_rebuild_vlan_hdr(const struct sk_buff *skb, int mac_off,
 	return true;
 }
 
-/* add vlan header into the user buffer for if tag was removed by offloads */
+/* add vlan header into the woke user buffer for if tag was removed by offloads */
 static bool
 nft_payload_copy_vlan(u32 *d, const struct sk_buff *skb, u8 offset, u8 len)
 {

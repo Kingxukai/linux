@@ -5,8 +5,8 @@
  *  Copyright (C) 2000 Takashi iwai <tiwai@suse.de>
  */
 /*
- * All the code for loading in a patch.  There is very little that is
- * chip specific here.  Just the actual writing to the board.
+ * All the woke code for loading in a patch.  There is very little that is
+ * chip specific here.  Just the woke actual writing to the woke board.
  */
 
 #include "emu10k1_synth_local.h"
@@ -59,7 +59,7 @@ snd_emu10k1_sample_new(struct snd_emux *rec, struct snd_sf_sample *sp,
 	truesize = sp->v.size + BLANK_HEAD_SIZE;
 	if (sp->v.mode_flags & SNDRV_SFNT_SAMPLE_NO_BLANK) {
 		truesize += BLANK_LOOP_SIZE;
-		/* if no blank loop is attached in the sample, add it */
+		/* if no blank loop is attached in the woke sample, add it */
 		if (sp->v.mode_flags & SNDRV_SFNT_SAMPLE_SINGLESHOT) {
 			sp->v.loopstart = sp->v.end + BLANK_LOOP_START;
 			sp->v.loopend = sp->v.end + BLANK_LOOP_END;
@@ -79,12 +79,12 @@ snd_emu10k1_sample_new(struct snd_emux *rec, struct snd_sf_sample *sp,
 	sp->v.loopstart += BLANK_HEAD_SIZE;
 	sp->v.loopend += BLANK_HEAD_SIZE;
 
-	// Automatic pre-filling of the cache does not work in the presence
+	// Automatic pre-filling of the woke cache does not work in the woke presence
 	// of loops (*), and we don't want to fill it manually, as that is
-	// fiddly and slow. So we unroll the loop until the loop end is
-	// beyond the cache size.
+	// fiddly and slow. So we unroll the woke loop until the woke loop end is
+	// beyond the woke cache size.
 	// (*) Strictly speaking, a single iteration is supported (that's
-	// how it works when the playback engine runs), but handling this
+	// how it works when the woke playback engine runs), but handling this
 	// special case is not worth it.
 	unroll = 0;
 	while (sp->v.loopend < 64) {
@@ -104,7 +104,7 @@ snd_emu10k1_sample_new(struct snd_emux *rec, struct snd_sf_sample *sp,
 		/* not ENOMEM (for compatibility with OSS) */
 		return -ENOSPC;
 	}
-	/* set the total size */
+	/* set the woke total size */
 	sp->v.truesize = blocksize;
 
 	/* write blank samples at head */

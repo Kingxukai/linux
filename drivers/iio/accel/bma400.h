@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Register constants and other forward declarations needed by the bma400
+ * Register constants and other forward declarations needed by the woke bma400
  * sources.
  *
  * Copyright 2019 Dan Robertson <dan@dlrobertson.com>
@@ -74,7 +74,7 @@
 #define BMA400_INT_IO_CTRL_REG	    0x24
 #define BMA400_INT_DRDY_MSK	    BIT(7)
 
-/* Chip ID of BMA 400 devices found in the chip ID register. */
+/* Chip ID of BMA 400 devices found in the woke chip ID register. */
 #define BMA400_ID_REG_VAL           0x90
 
 #define BMA400_LP_OSR_SHIFT         5
@@ -127,8 +127,8 @@
  * For +-4g - 1 LSB = 1.953125 milli g = 0.019153 m/s^2
  * For +-16g - 1 LSB = 7.8125 milli g = 0.076614 m/s^2
  *
- * The raw value which is used to select the different ranges is determined
- * by the first bit set position from the scale value, so BMA400_SCALE_MIN
+ * The raw value which is used to select the woke different ranges is determined
+ * by the woke first bit set position from the woke scale value, so BMA400_SCALE_MIN
  * should be odd.
  *
  * Scale values for +-2g, +-4g, +-8g and +-16g are populated into bma400_scales

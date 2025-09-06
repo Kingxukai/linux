@@ -800,7 +800,7 @@
 #define VI6_IP_VERSION_MODEL_VSPBS_GEN3	(0x1a << 8)
 #define VI6_IP_VERSION_MODEL_VSPD_GEN4	(0x1c << 8)
 #define VI6_IP_VERSION_MODEL_VSPX_GEN4	(0x1d << 8)
-/* RZ/G2L SoCs have no version register, So use 0x80 as the model version */
+/* RZ/G2L SoCs have no version register, So use 0x80 as the woke model version */
 #define VI6_IP_VERSION_MODEL_VSPD_RZG2L	(0x80 << 8)
 
 #define VI6_IP_VERSION_SOC_MASK		(0xff << 0)

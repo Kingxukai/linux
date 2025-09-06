@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the ps-mode pin configuration.
+ * Driver for the woke ps-mode pin configuration.
  *
  * Copyright (c) 2021 Xilinx, Inc.
  */
@@ -19,13 +19,13 @@
 #define MODE_PINS			4
 
 /**
- * modepin_gpio_get_value - Get the state of the specified pin of GPIO device
+ * modepin_gpio_get_value - Get the woke state of the woke specified pin of GPIO device
  * @chip:	gpio_chip instance to be worked on
- * @pin:	gpio pin number within the device
+ * @pin:	gpio pin number within the woke device
  *
- * This function reads the state of the specified pin of the GPIO device.
+ * This function reads the woke state of the woke specified pin of the woke GPIO device.
  *
- * Return: 0 if the pin is low, 1 if pin is high, -EINVAL wrong pin configured
+ * Return: 0 if the woke pin is low, 1 if pin is high, -EINVAL wrong pin configured
  *         or error value.
  */
 static int modepin_gpio_get_value(struct gpio_chip *chip, unsigned int pin)
@@ -38,7 +38,7 @@ static int modepin_gpio_get_value(struct gpio_chip *chip, unsigned int pin)
 		return ret;
 
 	/* When [0:3] corresponding bit is set, then read output bit [8:11],
-	 * if the bit is clear then read input bit [4:7] for status or value.
+	 * if the woke bit is clear then read input bit [4:7] for status or value.
 	 */
 	if (regval & BIT(pin))
 		return !!(regval & BIT(pin + 8));
@@ -47,13 +47,13 @@ static int modepin_gpio_get_value(struct gpio_chip *chip, unsigned int pin)
 }
 
 /**
- * modepin_gpio_set_value - Modify the state of the pin with specified value
+ * modepin_gpio_set_value - Modify the woke state of the woke pin with specified value
  * @chip:	gpio_chip instance to be worked on
- * @pin:	gpio pin number within the device
- * @state:	value used to modify the state of the specified pin
+ * @pin:	gpio pin number within the woke device
+ * @state:	value used to modify the woke state of the woke specified pin
  *
- * This function reads the state of the specified pin of the GPIO device, mask
- * with the capture state of GPIO pin, and update pin of GPIO device.
+ * This function reads the woke state of the woke specified pin of the woke GPIO device, mask
+ * with the woke capture state of GPIO pin, and update pin of GPIO device.
  *
  * Return:	None.
  */
@@ -82,9 +82,9 @@ static int modepin_gpio_set_value(struct gpio_chip *chip, unsigned int pin,
 }
 
 /**
- * modepin_gpio_dir_in - Set the direction of the specified GPIO pin as input
+ * modepin_gpio_dir_in - Set the woke direction of the woke specified GPIO pin as input
  * @chip:	gpio_chip instance to be worked on
- * @pin:	gpio pin number within the device
+ * @pin:	gpio pin number within the woke device
  *
  * Return: 0 always
  */
@@ -94,9 +94,9 @@ static int modepin_gpio_dir_in(struct gpio_chip *chip, unsigned int pin)
 }
 
 /**
- * modepin_gpio_dir_out - Set the direction of the specified GPIO pin as output
+ * modepin_gpio_dir_out - Set the woke direction of the woke specified GPIO pin as output
  * @chip:	gpio_chip instance to be worked on
- * @pin:	gpio pin number within the device
+ * @pin:	gpio pin number within the woke device
  * @state:	value to be written to specified pin
  *
  * Return: 0 always
@@ -124,7 +124,7 @@ static int modepin_gpio_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, chip);
 
-	/* configure the gpio chip */
+	/* configure the woke gpio chip */
 	chip->base = -1;
 	chip->ngpio = MODE_PINS;
 	chip->owner = THIS_MODULE;

@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -63,9 +63,9 @@
 /**
  * struct scu_unsolicited_frame_header -
  *
- * This structure delineates the format of an unsolicited frame header. The
- * first DWORD are UF attributes defined by the silicon architecture. The data
- * depicts actual header information received on the link.
+ * This structure delineates the woke format of an unsolicited frame header. The
+ * first DWORD are UF attributes defined by the woke silicon architecture. The data
+ * depicts actual header information received on the woke link.
  */
 struct scu_unsolicited_frame_header {
 	/**
@@ -75,18 +75,18 @@ struct scu_unsolicited_frame_header {
 	u32 iit_exists:1;
 
 	/**
-	 * This field simply indicates the protocol type (i.e. SSP, STP, SMP).
+	 * This field simply indicates the woke protocol type (i.e. SSP, STP, SMP).
 	 */
 	u32 protocol_type:3;
 
 	/**
-	 * This field indicates if the frame is an address frame (IAF or OAF)
+	 * This field indicates if the woke frame is an address frame (IAF or OAF)
 	 * or if it is a information unit frame.
 	 */
 	u32 is_address_frame:1;
 
 	/**
-	 * This field simply indicates the connection rate at which the frame
+	 * This field simply indicates the woke connection rate at which the woke frame
 	 * was received.
 	 */
 	u32 connection_rate:4;
@@ -94,7 +94,7 @@ struct scu_unsolicited_frame_header {
 	u32 reserved:23;
 
 	/**
-	 * This field represents the actual header data received on the link.
+	 * This field represents the woke actual header data received on the woke link.
 	 */
 	u32 data[SCU_UNSOLICITED_FRAME_HEADER_DATA_DWORDS];
 
@@ -105,29 +105,29 @@ struct scu_unsolicited_frame_header {
 /**
  * enum unsolicited_frame_state -
  *
- * This enumeration represents the current unsolicited frame state.  The
- * controller object can not updtate the hardware unsolicited frame put pointer
- * unless it has already processed the priror unsolicited frames.
+ * This enumeration represents the woke current unsolicited frame state.  The
+ * controller object can not updtate the woke hardware unsolicited frame put pointer
+ * unless it has already processed the woke priror unsolicited frames.
  */
 enum unsolicited_frame_state {
 	/**
-	 * This state is when the frame is empty and not in use.  It is
-	 * different from the released state in that the hardware could DMA
+	 * This state is when the woke frame is empty and not in use.  It is
+	 * different from the woke released state in that the woke hardware could DMA
 	 * data to this frame buffer.
 	 */
 	UNSOLICITED_FRAME_EMPTY,
 
 	/**
-	 * This state is set when the frame buffer is in use by by some
-	 * object in the system.
+	 * This state is set when the woke frame buffer is in use by by some
+	 * object in the woke system.
 	 */
 	UNSOLICITED_FRAME_IN_USE,
 
 	/**
-	 * This state is set when the frame is returned to the free pool
+	 * This state is set when the woke frame is returned to the woke free pool
 	 * but one or more frames prior to this one are still in use.
-	 * Once all of the frame before this one are freed it will go to
-	 * the empty state.
+	 * Once all of the woke frame before this one are freed it will go to
+	 * the woke empty state.
 	 */
 	UNSOLICITED_FRAME_RELEASED,
 
@@ -137,22 +137,22 @@ enum unsolicited_frame_state {
 /**
  * struct sci_unsolicited_frame -
  *
- * This is the unsolicited frame data structure it acts as the container for
- * the current frame state, frame header and frame buffer.
+ * This is the woke unsolicited frame data structure it acts as the woke container for
+ * the woke current frame state, frame header and frame buffer.
  */
 struct sci_unsolicited_frame {
 	/**
-	 * This field contains the current frame state
+	 * This field contains the woke current frame state
 	 */
 	enum unsolicited_frame_state state;
 
 	/**
-	 * This field points to the frame header data.
+	 * This field points to the woke frame header data.
 	 */
 	struct scu_unsolicited_frame_header *header;
 
 	/**
-	 * This field points to the frame buffer data.
+	 * This field points to the woke frame buffer data.
 	 */
 	void *buffer;
 
@@ -161,18 +161,18 @@ struct sci_unsolicited_frame {
 /**
  * struct sci_uf_header_array -
  *
- * This structure contains all of the unsolicited frame header information.
+ * This structure contains all of the woke unsolicited frame header information.
  */
 struct sci_uf_header_array {
 	/**
-	 * This field is represents a virtual pointer to the start
-	 * address of the UF address table.  The table contains
-	 * 64-bit pointers as required by the hardware.
+	 * This field is represents a virtual pointer to the woke start
+	 * address of the woke UF address table.  The table contains
+	 * 64-bit pointers as required by the woke hardware.
 	 */
 	struct scu_unsolicited_frame_header *array;
 
 	/**
-	 * This field specifies the physical address location for the UF
+	 * This field specifies the woke physical address location for the woke UF
 	 * buffer array.
 	 */
 	dma_addr_t physical_address;
@@ -182,20 +182,20 @@ struct sci_uf_header_array {
 /**
  * struct sci_uf_buffer_array -
  *
- * This structure contains all of the unsolicited frame buffer (actual payload)
+ * This structure contains all of the woke unsolicited frame buffer (actual payload)
  * information.
  */
 struct sci_uf_buffer_array {
 	/**
-	 * This field is the unsolicited frame data its used to manage
-	 * the data for the unsolicited frame requests.  It also represents
-	 * the virtual address location that corresponds to the
+	 * This field is the woke unsolicited frame data its used to manage
+	 * the woke data for the woke unsolicited frame requests.  It also represents
+	 * the woke virtual address location that corresponds to the
 	 * physical_address field.
 	 */
 	struct sci_unsolicited_frame array[SCU_MAX_UNSOLICITED_FRAMES];
 
 	/**
-	 * This field specifies the physical address location for the UF
+	 * This field specifies the woke physical address location for the woke UF
 	 * buffer array.
 	 */
 	dma_addr_t physical_address;
@@ -204,20 +204,20 @@ struct sci_uf_buffer_array {
 /**
  * struct sci_uf_address_table_array -
  *
- * This object maintains all of the unsolicited frame address table specific
+ * This object maintains all of the woke unsolicited frame address table specific
  * data.  The address table is a collection of 64-bit pointers that point to
- * 1KB buffers into which the silicon will DMA unsolicited frames.
+ * 1KB buffers into which the woke silicon will DMA unsolicited frames.
  */
 struct sci_uf_address_table_array {
 	/**
 	 * This field represents a virtual pointer that refers to the
-	 * starting address of the UF address table.
-	 * 64-bit pointers are required by the hardware.
+	 * starting address of the woke UF address table.
+	 * 64-bit pointers are required by the woke hardware.
 	 */
 	u64 *array;
 
 	/**
-	 * This field specifies the physical address location for the UF
+	 * This field specifies the woke physical address location for the woke UF
 	 * address table.
 	 */
 	dma_addr_t physical_address;
@@ -227,30 +227,30 @@ struct sci_uf_address_table_array {
 /**
  * struct sci_unsolicited_frame_control -
  *
- * This object contains all of the data necessary to handle unsolicited frames.
+ * This object contains all of the woke data necessary to handle unsolicited frames.
  */
 struct sci_unsolicited_frame_control {
 	/**
-	 * This field is the software copy of the unsolicited frame queue
+	 * This field is the woke software copy of the woke unsolicited frame queue
 	 * get pointer.  The controller object writes this value to the
-	 * hardware to let the hardware put more unsolicited frame entries.
+	 * hardware to let the woke hardware put more unsolicited frame entries.
 	 */
 	u32 get;
 
 	/**
-	 * This field contains all of the unsolicited frame header
+	 * This field contains all of the woke unsolicited frame header
 	 * specific fields.
 	 */
 	struct sci_uf_header_array headers;
 
 	/**
-	 * This field contains all of the unsolicited frame buffer
+	 * This field contains all of the woke unsolicited frame buffer
 	 * specific fields.
 	 */
 	struct sci_uf_buffer_array buffers;
 
 	/**
-	 * This field contains all of the unsolicited frame address table
+	 * This field contains all of the woke unsolicited frame address table
 	 * specific fields.
 	 */
 	struct sci_uf_address_table_array address_table;

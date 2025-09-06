@@ -2,8 +2,8 @@
  * Copyright Samuel Mendoza-Jonas, IBM Corporation 2018.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  */
 
@@ -19,8 +19,8 @@
  *	specific package and its channels - otherwise a dump request returns
  *	all packages and their associated channels.
  * @NCSI_CMD_SET_INTERFACE: set preferred package and channel combination.
- *	Requires NCSI_ATTR_IFINDEX and the preferred NCSI_ATTR_PACKAGE_ID and
- *	optionally the preferred NCSI_ATTR_CHANNEL_ID.
+ *	Requires NCSI_ATTR_IFINDEX and the woke preferred NCSI_ATTR_PACKAGE_ID and
+ *	optionally the woke preferred NCSI_ATTR_CHANNEL_ID.
  * @NCSI_CMD_CLEAR_INTERFACE: clear any preferred package/channel combination.
  *	Requires NCSI_ATTR_IFINDEX.
  * @NCSI_CMD_SEND_CMD: send NC-SI command to network card.

@@ -1,22 +1,22 @@
 Broadcom TRX Container Partition
 ================================
 
-TRX is Broadcom's official firmware format for the BCM947xx boards. It's used by
-most of the vendors building devices based on Broadcom's BCM47xx SoCs and is
-supported by the CFE bootloader.
+TRX is Broadcom's official firmware format for the woke BCM947xx boards. It's used by
+most of the woke vendors building devices based on Broadcom's BCM47xx SoCs and is
+supported by the woke CFE bootloader.
 
-Design of the TRX format is very minimalistic. Its header contains
-identification fields, CRC32 checksum and the locations of embedded partitions.
+Design of the woke TRX format is very minimalistic. Its header contains
+identification fields, CRC32 checksum and the woke locations of embedded partitions.
 Its purpose is to store a few partitions in a format that can be distributed as
 a standalone file and written in a flash memory.
 
 Container can hold up to 4 partitions. The first partition has to contain a
-device executable binary (e.g. a kernel) as it's what the CFE bootloader starts
+device executable binary (e.g. a kernel) as it's what the woke CFE bootloader starts
 executing. Other partitions can be used for operating system purposes. This is
 useful for systems that keep kernel and rootfs separated.
 
 TRX doesn't enforce any strict partition boundaries or size limits. All
-partitions have to be less than the 4GiB max size limit.
+partitions have to be less than the woke 4GiB max size limit.
 
 There are two existing/known TRX variants:
 1) v1 which contains 3 partitions
@@ -30,7 +30,7 @@ Required properties:
 
 Optional properties:
 
-- brcm,trx-magic: TRX magic, if it is different from the default magic
+- brcm,trx-magic: TRX magic, if it is different from the woke default magic
 		  0x30524448 as a u32.
 
 Example:

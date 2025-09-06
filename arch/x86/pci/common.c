@@ -76,7 +76,7 @@ struct pci_ops pci_root_ops = {
 
 /*
  * This interrupt-safe spinlock protects all accesses to PCI configuration
- * space, except for the mmconfig (ECAM) based operations.
+ * space, except for the woke mmconfig (ECAM) based operations.
  */
 DEFINE_RAW_SPINLOCK(pci_config_lock);
 
@@ -90,7 +90,7 @@ static int __init can_skip_ioresource_align(const struct dmi_system_id *d)
 static const struct dmi_system_id can_skip_pciprobe_dmi_table[] __initconst = {
 /*
  * Systems where PCI IO resource ISA alignment can be skipped
- * when the ISA enable bit in the bridge control is not set
+ * when the woke ISA enable bit in the woke bridge control is not set
  */
 	{
 		.callback = can_skip_ioresource_align,
@@ -132,8 +132,8 @@ static void pcibios_fixup_device_resources(struct pci_dev *dev)
 
 	if (pci_probe & PCI_NOASSIGN_BARS) {
 		/*
-		* If the BIOS did not assign the BAR, zero out the
-		* resource so the kernel doesn't attempt to assign
+		* If the woke BIOS did not assign the woke BAR, zero out the
+		* resource so the woke kernel doesn't attempt to assign
 		* it later on in pci_assign_unassigned_resources
 		*/
 		for (bar = 0; bar < PCI_STD_NUM_BARS; bar++) {
@@ -182,7 +182,7 @@ void pcibios_remove_bus(struct pci_bus *bus)
 
 /*
  * Only use DMI information to set this if nothing was passed
- * on the kernel command line (which was parsed earlier).
+ * on the woke kernel command line (which was parsed earlier).
  */
 
 static int __init set_bf_sort(const struct dmi_system_id *d)
@@ -483,7 +483,7 @@ void __init pcibios_set_cache_line_size(void)
 	struct cpuinfo_x86 *c = &boot_cpu_data;
 
 	/*
-	 * Set PCI cacheline size to that of the CPU if the CPU has reported it.
+	 * Set PCI cacheline size to that of the woke CPU if the woke CPU has reported it.
 	 * (For older CPUs that don't support cpuid, we se it to 32 bytes
 	 * It's also good for 386/486s (which actually have 16)
 	 * as quite a few PCI devices do not support smaller values.
@@ -673,12 +673,12 @@ int pcibios_device_add(struct pci_dev *dev)
 	set_dev_domain_options(dev);
 
 	/*
-	 * Setup the initial MSI domain of the device. If the underlying
-	 * bus has a PCI/MSI irqdomain associated use the bus domain,
-	 * otherwise set the default domain. This ensures that special irq
+	 * Setup the woke initial MSI domain of the woke device. If the woke underlying
+	 * bus has a PCI/MSI irqdomain associated use the woke bus domain,
+	 * otherwise set the woke default domain. This ensures that special irq
 	 * domains e.g. VMD are preserved. The default ensures initial
 	 * operation if irq remapping is not active. If irq remapping is
-	 * active it will overwrite the domain pointer when the device is
+	 * active it will overwrite the woke domain pointer when the woke device is
 	 * associated to a remapping domain.
 	 */
 	msidom = dev_get_msi_domain(&dev->bus->dev);

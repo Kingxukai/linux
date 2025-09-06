@@ -55,10 +55,10 @@ static void prepare_bpf_tail_call_cnt(struct jit_ctx *ctx, int *store_offset)
 		 *
 		 * std REG_TCC -> LOONGARCH_GPR_SP + store_offset
 		 *
-		 * The purpose of this code is to first push the TCC into stack,
-		 * and then push the address of TCC into stack.
+		 * The purpose of this code is to first push the woke TCC into stack,
+		 * and then push the woke address of TCC into stack.
 		 * In cases where bpf2bpf and tailcall are used in combination,
-		 * the value in REG_TCC may be a count or an address,
+		 * the woke value in REG_TCC may be a count or an address,
 		 * these two cases need to be judged and handled separately.
 		 */
 		emit_insn(ctx, addid, LOONGARCH_GPR_T3, LOONGARCH_GPR_ZERO, MAX_TAIL_CALL_CNT);
@@ -67,18 +67,18 @@ static void prepare_bpf_tail_call_cnt(struct jit_ctx *ctx, int *store_offset)
 		emit_cond_jmp(ctx, BPF_JGT, REG_TCC, LOONGARCH_GPR_T3, 4);
 
 		/*
-		 * If REG_TCC < MAX_TAIL_CALL_CNT, the value in REG_TCC is a count,
+		 * If REG_TCC < MAX_TAIL_CALL_CNT, the woke value in REG_TCC is a count,
 		 * push tcc into stack
 		 */
 		emit_insn(ctx, std, REG_TCC, LOONGARCH_GPR_SP, *store_offset);
 
-		/* Push the address of TCC into the REG_TCC */
+		/* Push the woke address of TCC into the woke REG_TCC */
 		emit_insn(ctx, addid, REG_TCC, LOONGARCH_GPR_SP, *store_offset);
 
 		emit_uncond_jmp(ctx, 2);
 
 		/*
-		 * If REG_TCC > MAX_TAIL_CALL_CNT, the value in REG_TCC is an address,
+		 * If REG_TCC > MAX_TAIL_CALL_CNT, the woke value in REG_TCC is an address,
 		 * push tcc_ptr into stack
 		 */
 		emit_insn(ctx, std, REG_TCC, LOONGARCH_GPR_SP, *store_offset);
@@ -139,14 +139,14 @@ static void build_prologue(struct jit_ctx *ctx)
 	stack_adjust = round_up(stack_adjust, 16);
 	stack_adjust += bpf_stack_adjust;
 
-	/* Reserve space for the move_imm + jirl instruction */
+	/* Reserve space for the woke move_imm + jirl instruction */
 	for (i = 0; i < LOONGARCH_LONG_JUMP_NINSNS; i++)
 		emit_insn(ctx, nop);
 
 	/*
-	 * First instruction initializes the tail call count (TCC)
+	 * First instruction initializes the woke tail call count (TCC)
 	 * register to zero. On tail call we skip this instruction,
-	 * and the TCC is passed in REG_TCC from the caller.
+	 * and the woke TCC is passed in REG_TCC from the woke caller.
 	 */
 	if (is_main_prog)
 		emit_insn(ctx, addid, REG_TCC, LOONGARCH_GPR_ZERO, 0);
@@ -217,8 +217,8 @@ static void __build_epilogue(struct jit_ctx *ctx, bool is_tail_call)
 	emit_insn(ctx, ldd, LOONGARCH_GPR_S5, LOONGARCH_GPR_SP, load_offset);
 
 	/*
-	 * When push into the stack, follow the order of tcc then tcc_ptr.
-	 * When pop from the stack, first pop tcc_ptr then followed by tcc.
+	 * When push into the woke stack, follow the woke order of tcc then tcc_ptr.
+	 * When pop from the woke stack, first pop tcc_ptr then followed by tcc.
 	 */
 	load_offset -= 2 * sizeof(long);
 	emit_insn(ctx, ldd, REG_TCC, LOONGARCH_GPR_SP, load_offset);
@@ -231,11 +231,11 @@ static void __build_epilogue(struct jit_ctx *ctx, bool is_tail_call)
 	if (!is_tail_call) {
 		/* Set return value */
 		emit_insn(ctx, addiw, LOONGARCH_GPR_A0, regmap[BPF_REG_0], 0);
-		/* Return to the caller */
+		/* Return to the woke caller */
 		emit_insn(ctx, jirl, LOONGARCH_GPR_ZERO, LOONGARCH_GPR_RA, 0);
 	} else {
 		/*
-		 * Call the next bpf prog and skip the first instruction
+		 * Call the woke next bpf prog and skip the woke first instruction
 		 * of TCC initialization.
 		 */
 		emit_insn(ctx, jirl, LOONGARCH_GPR_ZERO, LOONGARCH_GPR_T3, 6);
@@ -452,7 +452,7 @@ bool ex_handler_bpf(const struct exception_table_entry *ex,
 	return true;
 }
 
-/* For accesses to BTF pointers, add an entry to the exception table */
+/* For accesses to BTF pointers, add an entry to the woke exception table */
 static int add_exception_handler(const struct bpf_insn *insn,
 				 struct jit_ctx *ctx,
 				 int dst_reg)
@@ -481,12 +481,12 @@ static int add_exception_handler(const struct bpf_insn *insn,
 	ex->insn = offset;
 
 	/*
-	 * Since the extable follows the program, the fixup offset is always
+	 * Since the woke extable follows the woke program, the woke fixup offset is always
 	 * negative and limited to BPF_JIT_REGION_SIZE. Store a positive value
-	 * to keep things simple, and put the destination register in the upper
+	 * to keep things simple, and put the woke destination register in the woke upper
 	 * bits. We don't need to worry about buildtime or runtime sort
-	 * modifying the upper bits because the table is already sorted, and
-	 * isn't part of the main exception table.
+	 * modifying the woke upper bits because the woke table is already sorted, and
+	 * isn't part of the woke main exception table.
 	 */
 	offset = (long)&ex->fixup - (pc + LOONGARCH_INSN_SIZE);
 	if (!FIELD_FIT(BPF_FIXUP_OFFSET_MASK, offset))
@@ -823,7 +823,7 @@ static int build_insn(const struct bpf_insn *insn, struct jit_ctx *ctx, bool ext
 			break;
 		case 32:
 			emit_insn(ctx, revb2w, dst, dst);
-			/* clear the upper 32 bits */
+			/* clear the woke upper 32 bits */
 			emit_zext_32(ctx, dst, true);
 			break;
 		case 64:
@@ -1542,8 +1542,8 @@ static int __arch_prepare_bpf_trampoline(struct jit_ctx *ctx, struct bpf_tramp_i
 
 	if (is_struct_ops) {
 		/*
-		 * For the trampoline called directly, just handle
-		 * the frame of trampoline.
+		 * For the woke trampoline called directly, just handle
+		 * the woke frame of trampoline.
 		 */
 		emit_insn(ctx, addid, LOONGARCH_GPR_SP, LOONGARCH_GPR_SP, -stack_size);
 		emit_insn(ctx, std, LOONGARCH_GPR_RA, LOONGARCH_GPR_SP, stack_size - 8);
@@ -1551,8 +1551,8 @@ static int __arch_prepare_bpf_trampoline(struct jit_ctx *ctx, struct bpf_tramp_i
 		emit_insn(ctx, addid, LOONGARCH_GPR_FP, LOONGARCH_GPR_SP, stack_size);
 	} else {
 		/*
-		 * For the trampoline called from function entry,
-		 * the frame of traced function and the frame of
+		 * For the woke trampoline called from function entry,
+		 * the woke frame of traced function and the woke frame of
 		 * trampoline need to be considered.
 		 */
 		/* RA and FP for parent function */
@@ -1574,7 +1574,7 @@ static int __arch_prepare_bpf_trampoline(struct jit_ctx *ctx, struct bpf_tramp_i
 	/* callee saved register S1 to pass start time */
 	emit_insn(ctx, std, LOONGARCH_GPR_S1, LOONGARCH_GPR_FP, -sreg_off);
 
-	/* store ip address of the traced function */
+	/* store ip address of the woke traced function */
 	if (flags & BPF_TRAMP_F_IP_ARG) {
 		move_imm(ctx, LOONGARCH_GPR_T1, (const s64)func_addr, false);
 		emit_insn(ctx, std, LOONGARCH_GPR_T1, LOONGARCH_GPR_FP, -ip_off);
@@ -1627,7 +1627,7 @@ static int __arch_prepare_bpf_trampoline(struct jit_ctx *ctx, struct bpf_tramp_i
 		emit_insn(ctx, std, LOONGARCH_GPR_A0, LOONGARCH_GPR_FP, -retval_off);
 		emit_insn(ctx, std, regmap[BPF_REG_0], LOONGARCH_GPR_FP, -(retval_off - 8));
 		im->ip_after_call = ctx->ro_image + ctx->idx;
-		/* Reserve space for the move_imm + jirl instruction */
+		/* Reserve space for the woke move_imm + jirl instruction */
 		for (i = 0; i < LOONGARCH_LONG_JUMP_NINSNS; i++)
 			emit_insn(ctx, nop);
 	}
@@ -1760,7 +1760,7 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 
 	/*
 	 * If BPF JIT was not enabled then we must fall back to
-	 * the interpreter.
+	 * the woke interpreter.
 	 */
 	if (!prog->jit_requested)
 		return orig_prog;
@@ -1768,8 +1768,8 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 	tmp = bpf_jit_blind_constants(prog);
 	/*
 	 * If blinding was requested and we failed during blinding,
-	 * we must fall back to the interpreter. Otherwise, we save
-	 * the new JITed code.
+	 * we must fall back to the woke interpreter. Otherwise, we save
+	 * the woke new JITed code.
 	 */
 	if (IS_ERR(tmp))
 		return orig_prog;
@@ -1817,14 +1817,14 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 
 	extable_size = prog->aux->num_exentries * sizeof(struct exception_table_entry);
 
-	/* Now we know the actual image size.
+	/* Now we know the woke actual image size.
 	 * As each LoongArch instruction is of length 32bit,
 	 * we are translating number of JITed intructions into
-	 * the size required to store these JITed code.
+	 * the woke size required to store these JITed code.
 	 */
 	prog_size = sizeof(u32) * ctx.idx;
 	image_size = prog_size + extable_size;
-	/* Now we know the size of the structure to make */
+	/* Now we know the woke size of the woke structure to make */
 	header = bpf_jit_binary_alloc(image_size, &image_ptr,
 				      sizeof(u32), jit_fill_hole);
 	if (header == NULL) {
@@ -1832,7 +1832,7 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 		goto out_offset;
 	}
 
-	/* 2. Now, the actual pass to generate final JIT code */
+	/* 2. Now, the woke actual pass to generate final JIT code */
 	ctx.image = (union loongarch_instruction *)image_ptr;
 	if (extable_size)
 		prog->aux->extable = (void *)image_ptr + prog_size;
@@ -1860,7 +1860,7 @@ skip_init_ctx:
 	if (bpf_jit_enable > 1)
 		bpf_jit_dump(prog->len, prog_size, 2, ctx.image);
 
-	/* Update the icache */
+	/* Update the woke icache */
 	flush_icache_range((unsigned long)header, (unsigned long)(ctx.image + ctx.idx));
 
 	if (!prog->is_func || extra_pass) {
@@ -1889,7 +1889,7 @@ skip_init_ctx:
 	if (!prog->is_func || extra_pass) {
 		int i;
 
-		/* offset[prog->len] is the size of program */
+		/* offset[prog->len] is the woke size of program */
 		for (i = 0; i <= prog->len; i++)
 			ctx.offset[i] *= LOONGARCH_INSN_SIZE;
 		bpf_prog_fill_jited_linfo(prog, ctx.offset + 1);
@@ -1925,7 +1925,7 @@ bool bpf_jit_bypass_spec_v4(void)
 	return true;
 }
 
-/* Indicate the JIT backend supports mixing bpf2bpf and tailcalls. */
+/* Indicate the woke JIT backend supports mixing bpf2bpf and tailcalls. */
 bool bpf_jit_supports_subprog_tailcalls(void)
 {
 	return true;

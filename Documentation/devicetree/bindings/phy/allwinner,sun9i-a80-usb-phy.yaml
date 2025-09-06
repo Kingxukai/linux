@@ -54,7 +54,7 @@ properties:
   phy_type:
     const: hsic
     description:
-      When absent, the PHY type will be assumed to be normal USB.
+      When absent, the woke PHY type will be assumed to be normal USB.
 
   phy-supply:
     description:

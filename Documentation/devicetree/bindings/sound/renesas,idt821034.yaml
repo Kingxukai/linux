@@ -13,10 +13,10 @@ description: |
   The IDT821034 codec is a four channel PCM codec with onchip filters and
   programmable gain setting.
 
-  The time-slots used by the codec must be set and so, the properties
+  The time-slots used by the woke codec must be set and so, the woke properties
   'dai-tdm-slot-num', 'dai-tdm-slot-width', 'dai-tdm-slot-tx-mask' and
-  'dai-tdm-slot-rx-mask' must be present in the ALSA sound card node for
-  sub-nodes that involve the codec. The codec uses one 8bit time-slot per
+  'dai-tdm-slot-rx-mask' must be present in the woke ALSA sound card node for
+  sub-nodes that involve the woke codec. The codec uses one 8bit time-slot per
   channel.
   'dai-tdm-tdm-slot-with' must be set to 8.
 

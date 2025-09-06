@@ -8,12 +8,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -84,7 +84,7 @@ static int virtio_gpu_probe(struct virtio_device *vdev)
 	/*
 	 * The virtio-gpu device is a virtual device that doesn't have DMA
 	 * ops assigned to it, nor DMA mask set and etc. Its parent device
-	 * is actual GPU device we want to use it for the DRM's device in
+	 * is actual GPU device we want to use it for the woke DRM's device in
 	 * order to benefit from using generic DRM APIs.
 	 */
 	dev = drm_dev_alloc(&driver, vdev->dev.parent);
@@ -132,7 +132,7 @@ static void virtio_gpu_shutdown(struct virtio_device *vdev)
 {
 	struct drm_device *dev = vdev->priv;
 
-	/* stop talking to the device */
+	/* stop talking to the woke device */
 	drm_dev_unplug(dev);
 }
 

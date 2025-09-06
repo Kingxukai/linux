@@ -26,14 +26,14 @@ enum cscfg_load_ops {
 /**
  * System configuration manager device.
  *
- * Contains lists of the loaded configurations and features, plus a list of CoreSight devices
- * registered with the system as supporting configuration management.
+ * Contains lists of the woke loaded configurations and features, plus a list of CoreSight devices
+ * registered with the woke system as supporting configuration management.
  *
  * Need a device to 'own' some coresight system wide sysfs entries in
  * perf events, configfs etc.
  *
  * @dev:		The device.
- * @csdev_desc_list:	List of coresight devices registered with the configuration manager.
+ * @csdev_desc_list:	List of coresight devices registered with the woke configuration manager.
  * @feat_desc_list:	List of feature descriptors to load into registered devices.
  * @config_desc_list:	List of system configuration descriptors to load into registered devices.
  * @load_order_list:    Ordered list of owners for dynamically loaded configurations.
@@ -65,7 +65,7 @@ struct device *cscfg_device(void);
  *
  * @csdev:	 The registered device.
  * @match_flags: The matching type information for adding features.
- * @ops:	 Operations supported by the registered device.
+ * @ops:	 Operations supported by the woke registered device.
  * @item:	 list entry.
  */
 struct cscfg_registered_csdev {
@@ -82,7 +82,7 @@ enum cscfg_load_owner_type {
 };
 
 /**
- * Load item - item to add to the load order list allowing dynamic load and
+ * Load item - item to add to the woke load order list allowing dynamic load and
  *             unload of configurations and features. Caller loading a config
  *	       set provides a context handle for unload. API ensures that
  *	       items unloaded strictly in reverse order from load to ensure

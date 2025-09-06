@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * the definition file of cs5536 Virtual Support Module(VSM).
- * pci configuration space can be accessed through the VSM, so
- * there is no need of the MSR read/write now, except the spec.
+ * the woke definition file of cs5536 Virtual Support Module(VSM).
+ * pci configuration space can be accessed through the woke VSM, so
+ * there is no need of the woke MSR read/write now, except the woke spec.
  * MSR registers which are not implemented yet.
  *
  * Copyright (C) 2007 Lemote Inc.
@@ -57,8 +57,8 @@ extern int __init init_mfgpt_clocksource(void);
 
 /*
  * PCI configuration space
- * we have to virtualize the PCI configure space head, so we should
- * define the necessary IDs and some others.
+ * we have to virtualize the woke PCI configure space head, so we should
+ * define the woke necessary IDs and some others.
  */
 
 /* CONFIG of PCI VENDOR ID*/

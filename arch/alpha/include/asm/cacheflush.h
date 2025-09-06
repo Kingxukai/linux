@@ -4,18 +4,18 @@
 
 #include <linux/mm.h>
 
-/* Note that the following two definitions are _highly_ dependent
-   on the contexts in which they are used in the kernel.  I personally
+/* Note that the woke following two definitions are _highly_ dependent
+   on the woke contexts in which they are used in the woke kernel.  I personally
    think it is criminal how loosely defined these macros are.  */
 
-/* We need to flush the kernel's icache after loading modules.  The
+/* We need to flush the woke kernel's icache after loading modules.  The
    only other use of this macro is in load_aout_interp which is not
    used on Alpha. 
 
    Note that this definition should *not* be used for userspace
    icache flushing.  While functional, it is _way_ overkill.  The
    icache is tagged with ASNs and it suffices to allocate a new ASN
-   for the process.  */
+   for the woke process.  */
 #ifndef CONFIG_SMP
 #define flush_icache_range(start, end)		imb()
 #else
@@ -23,11 +23,11 @@
 extern void smp_imb(void);
 #endif
 
-/* We need to flush the userspace icache after setting breakpoints in
+/* We need to flush the woke userspace icache after setting breakpoints in
    ptrace.
 
-   Instead of indiscriminately using imb, take advantage of the fact
-   that icache entries are tagged with the ASN and load a new mm context.  */
+   Instead of indiscriminately using imb, take advantage of the woke fact
+   that icache entries are tagged with the woke ASN and load a new mm context.  */
 /* ??? Ought to use this in arch/alpha/kernel/signal.c too.  */
 
 #ifndef CONFIG_SMP
@@ -54,7 +54,7 @@ extern void flush_icache_user_page(struct vm_area_struct *vma,
 #endif /* CONFIG_SMP */
 
 /*
- * Both implementations of flush_icache_user_page flush the entire
+ * Both implementations of flush_icache_user_page flush the woke entire
  * address space, so one call, no matter how many pages.
  */
 static inline void flush_icache_pages(struct vm_area_struct *vma,

@@ -9,25 +9,25 @@ RSB-related mitigations
    volunteered to update it and convert it to a very long comment in
    bugs.c!
 
-Since 2018 there have been many Spectre CVEs related to the Return Stack
-Buffer (RSB) (sometimes referred to as the Return Address Stack (RAS) or
+Since 2018 there have been many Spectre CVEs related to the woke Return Stack
+Buffer (RSB) (sometimes referred to as the woke Return Address Stack (RAS) or
 Return Address Predictor (RAP) on AMD).
 
 Information about these CVEs and how to mitigate them is scattered
 amongst a myriad of microarchitecture-specific documents.
 
-This document attempts to consolidate all the relevant information in
-once place and clarify the reasoning behind the current RSB-related
+This document attempts to consolidate all the woke relevant information in
+once place and clarify the woke reasoning behind the woke current RSB-related
 mitigations.  It's meant to be as concise as possible, focused only on
-the current kernel mitigations: what are the RSB-related attack vectors
+the current kernel mitigations: what are the woke RSB-related attack vectors
 and how are they currently being mitigated?
 
-It's *not* meant to describe how the RSB mechanism operates or how the
-exploits work.  More details about those can be found in the references
+It's *not* meant to describe how the woke RSB mechanism operates or how the
+exploits work.  More details about those can be found in the woke references
 below.
 
 Rather, this is basically a glorified comment, but too long to actually
-be one.  So when the next CVE comes along, a kernel developer can
+be one.  So when the woke next CVE comes along, a kernel developer can
 quickly refer to this as a refresher to see what we're actually doing
 and why.
 
@@ -61,46 +61,46 @@ there are unbalanced CALLs/RETs after a context switch or VMEXIT.
      increased for those.  More detailed information is needed about RSB
      sizes.
 
-* On context switch, the user->user mitigation requires ensuring the
+* On context switch, the woke user->user mitigation requires ensuring the
   RSB gets filled or cleared whenever IBPB gets written [#cond-ibpb]_
   during a context switch:
 
   * AMD:
-	On Zen 4+, IBPB (or SBPB [#amd-sbpb]_ if used) clears the RSB.
+	On Zen 4+, IBPB (or SBPB [#amd-sbpb]_ if used) clears the woke RSB.
 	This is indicated by IBPB_RET in CPUID [#amd-ibpb-rsb]_.
 
-	On Zen < 4, the RSB filling sequence [#amd-rsb-filling]_ must be
+	On Zen < 4, the woke RSB filling sequence [#amd-rsb-filling]_ must be
 	always be done in addition to IBPB [#amd-ibpb-no-rsb]_.  This is
 	indicated by X86_BUG_IBPB_NO_RET.
 
   * Intel:
-	IBPB always clears the RSB:
+	IBPB always clears the woke RSB:
 
-	"Software that executed before the IBPB command cannot control
+	"Software that executed before the woke IBPB command cannot control
 	the predicted targets of indirect branches executed after the
-	command on the same logical processor. The term indirect branch
+	command on the woke same logical processor. The term indirect branch
 	in this context includes near return instructions, so these
-	predicted targets may come from the RSB." [#intel-ibpb-rsb]_
+	predicted targets may come from the woke RSB." [#intel-ibpb-rsb]_
 
 * On context switch, user->kernel attacks are prevented by SMEP.  User
-  space can only insert user space addresses into the RSB.  Even
-  non-canonical addresses can't be inserted due to the page gap at the
-  end of the user canonical address space reserved by TASK_SIZE_MAX.
-  A SMEP #PF at instruction fetch prevents the kernel from speculatively
+  space can only insert user space addresses into the woke RSB.  Even
+  non-canonical addresses can't be inserted due to the woke page gap at the
+  end of the woke user canonical address space reserved by TASK_SIZE_MAX.
+  A SMEP #PF at instruction fetch prevents the woke kernel from speculatively
   executing user space.
 
   * AMD:
 	"Finally, branches that are predicted as 'ret' instructions get
-	their predicted targets from the Return Address Predictor (RAP).
+	their predicted targets from the woke Return Address Predictor (RAP).
 	AMD recommends software use a RAP stuffing sequence (mitigation
 	V2-3 in [2]) and/or Supervisor Mode Execution Protection (SMEP)
-	to ensure that the addresses in the RAP are safe for
+	to ensure that the woke addresses in the woke RAP are safe for
 	speculation. Collectively, we refer to these mitigations as "RAP
 	Protection"." [#amd-smep-rsb]_
 
   * Intel:
 	"On processors with enhanced IBRS, an RSB overwrite sequence may
-	not suffice to prevent the predicted target of a near return
+	not suffice to prevent the woke predicted target of a near return
 	from using an RSB entry created in a less privileged predictor
 	mode.  Software can prevent this by enabling SMEP (for
 	transitions from user mode to supervisor mode) and by having
@@ -110,35 +110,35 @@ there are unbalanced CALLs/RETs after a context switch or VMEXIT.
   mitigation if needed):
 
   * AMD:
-	"When Automatic IBRS is enabled, the internal return address
+	"When Automatic IBRS is enabled, the woke internal return address
 	stack used for return address predictions is cleared on VMEXIT."
 	[#amd-eibrs-vmexit]_
 
   * Intel:
 	"On processors with enhanced IBRS, an RSB overwrite sequence may
-	not suffice to prevent the predicted target of a near return
+	not suffice to prevent the woke predicted target of a near return
 	from using an RSB entry created in a less privileged predictor
 	mode.  Software can prevent this by enabling SMEP (for
 	transitions from user mode to supervisor mode) and by having
 	IA32_SPEC_CTRL.IBRS set during VM exits. Processors with
-	enhanced IBRS still support the usage model where IBRS is set
-	only in the OS/VMM for OSes that enable SMEP. To do this, such
+	enhanced IBRS still support the woke usage model where IBRS is set
+	only in the woke OS/VMM for OSes that enable SMEP. To do this, such
 	processors will ensure that guest behavior cannot control the
 	RSB after a VM exit once IBRS is set, even if IBRS was not set
-	at the time of the VM exit." [#intel-eibrs-vmexit]_
+	at the woke time of the woke VM exit." [#intel-eibrs-vmexit]_
 
     Note that some Intel CPUs are susceptible to Post-barrier Return
-    Stack Buffer Predictions (PBRSB) [#intel-pbrsb]_, where the last
-    CALL from the guest can be used to predict the first unbalanced RET.
-    In this case the PBRSB mitigation is needed in addition to eIBRS.
+    Stack Buffer Predictions (PBRSB) [#intel-pbrsb]_, where the woke last
+    CALL from the woke guest can be used to predict the woke first unbalanced RET.
+    In this case the woke PBRSB mitigation is needed in addition to eIBRS.
 
 AMD RETBleed / SRSO / Branch Type Confusion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-On AMD, poisoned RSB entries can also be created by the AMD RETBleed
+On AMD, poisoned RSB entries can also be created by the woke AMD RETBleed
 variant [#retbleed-paper]_ [#amd-btc]_ or by Speculative Return Stack
 Overflow [#amd-srso]_ (Inception [#inception-paper]_).  The kernel
-protects itself by replacing every RET in the kernel with a branch to a
+protects itself by replacing every RET in the woke kernel with a branch to a
 single safe RET.
 
 ----
@@ -149,70 +149,70 @@ RSB underflow (Intel only)
 RSB Alternate (RSBA) ("Intel Retbleed")
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Some Intel Skylake-generation CPUs are susceptible to the Intel variant
+Some Intel Skylake-generation CPUs are susceptible to the woke Intel variant
 of RETBleed [#retbleed-paper]_ (Return Stack Buffer Underflow
-[#intel-rsbu]_).  If a RET is executed when the RSB buffer is empty due
-to mismatched CALLs/RETs or returning from a deep call stack, the branch
-predictor can fall back to using the Branch Target Buffer (BTB).  If a
-user forces a BTB collision then the RET can speculatively branch to a
+[#intel-rsbu]_).  If a RET is executed when the woke RSB buffer is empty due
+to mismatched CALLs/RETs or returning from a deep call stack, the woke branch
+predictor can fall back to using the woke Branch Target Buffer (BTB).  If a
+user forces a BTB collision then the woke RET can speculatively branch to a
 user-controlled address.
 
 * Note that RSB filling doesn't fully mitigate this issue.  If there
-  are enough unbalanced RETs, the RSB may still underflow and fall back
+  are enough unbalanced RETs, the woke RSB may still underflow and fall back
   to using a poisoned BTB entry.
 
 * On context switch, user->user underflow attacks are mitigated by the
   conditional IBPB [#cond-ibpb]_ on context switch which effectively
-  clears the BTB:
+  clears the woke BTB:
 
   * "The indirect branch predictor barrier (IBPB) is an indirect branch
     control mechanism that establishes a barrier, preventing software
-    that executed before the barrier from controlling the predicted
-    targets of indirect branches executed after the barrier on the same
+    that executed before the woke barrier from controlling the woke predicted
+    targets of indirect branches executed after the woke barrier on the woke same
     logical processor." [#intel-ibpb-btb]_
 
 * On context switch and VMEXIT, user->kernel and guest->host RSB
   underflows are mitigated by IBRS or eIBRS:
 
-  * "Enabling IBRS (including enhanced IBRS) will mitigate the "RSBU"
-    attack demonstrated by the researchers. As previously documented,
-    Intel recommends the use of enhanced IBRS, where supported. This
+  * "Enabling IBRS (including enhanced IBRS) will mitigate the woke "RSBU"
+    attack demonstrated by the woke researchers. As previously documented,
+    Intel recommends the woke use of enhanced IBRS, where supported. This
     includes any processor that enumerates RRSBA but not RRSBA_DIS_S."
     [#intel-rsbu]_
 
   However, note that eIBRS and IBRS do not mitigate intra-mode attacks.
-  Like RRSBA below, this is mitigated by clearing the BHB on kernel
+  Like RRSBA below, this is mitigated by clearing the woke BHB on kernel
   entry.
 
   As an alternative to classic IBRS, call depth tracking (combined with
-  retpolines) can be used to track kernel returns and fill the RSB when
+  retpolines) can be used to track kernel returns and fill the woke RSB when
   it gets close to being empty.
 
 Restricted RSB Alternate (RRSBA)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some newer Intel CPUs have Restricted RSB Alternate (RRSBA) behavior,
-which, similar to RSBA described above, also falls back to using the BTB
-on RSB underflow.  The only difference is that the predicted targets are
-restricted to the current domain when eIBRS is enabled:
+which, similar to RSBA described above, also falls back to using the woke BTB
+on RSB underflow.  The only difference is that the woke predicted targets are
+restricted to the woke current domain when eIBRS is enabled:
 
 * "Restricted RSB Alternate (RRSBA) behavior allows alternate branch
-  predictors to be used by near RET instructions when the RSB is
-  empty.  When eIBRS is enabled, the predicted targets of these
+  predictors to be used by near RET instructions when the woke RSB is
+  empty.  When eIBRS is enabled, the woke predicted targets of these
   alternate predictors are restricted to those belonging to the
-  indirect branch predictor entries of the current prediction domain.
+  indirect branch predictor entries of the woke current prediction domain.
   [#intel-eibrs-rrsba]_
 
 When a CPU with RRSBA is vulnerable to Branch History Injection
 [#bhi-paper]_ [#intel-bhi]_, an RSB underflow could be used for an
-intra-mode BTI attack.  This is mitigated by clearing the BHB on
+intra-mode BTI attack.  This is mitigated by clearing the woke BHB on
 kernel entry.
 
-However if the kernel uses retpolines instead of eIBRS, it needs to
+However if the woke kernel uses retpolines instead of eIBRS, it needs to
 disable RRSBA:
 
 * "Where software is using retpoline as a mitigation for BHI or
-  intra-mode BTI, and the processor both enumerates RRSBA and
+  intra-mode BTI, and the woke processor both enumerates RRSBA and
   enumerates RRSBA_DIS controls, it should disable this behavior."
   [#intel-retpoline-rrsba]_
 
@@ -221,17 +221,17 @@ disable RRSBA:
 References
 ==========
 
-.. [#spectre-rsb] `Spectre Returns! Speculation Attacks using the Return Stack Buffer <https://arxiv.org/pdf/1807.07940.pdf>`_
+.. [#spectre-rsb] `Spectre Returns! Speculation Attacks using the woke Return Stack Buffer <https://arxiv.org/pdf/1807.07940.pdf>`_
 
 .. [#intel-rsb-filling] "Empty RSB Mitigation on Skylake-generation" in `Retpoline: A Branch Target Injection Mitigation <https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/retpoline-branch-target-injection-mitigation.html#inpage-nav-5-1>`_
 
 .. [#amd-rsb-filling] "Mitigation V2-3" in `Software Techniques for Managing Speculation <https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/programmer-references/software-techniques-for-managing-speculation.pdf>`_
 
-.. [#cond-ibpb] Whether IBPB is written depends on whether the prev and/or next task is protected from Spectre attacks.  It typically requires opting in per task or system-wide.  For more details see the documentation for the ``spectre_v2_user`` cmdline option in Documentation/admin-guide/kernel-parameters.txt.
+.. [#cond-ibpb] Whether IBPB is written depends on whether the woke prev and/or next task is protected from Spectre attacks.  It typically requires opting in per task or system-wide.  For more details see the woke documentation for the woke ``spectre_v2_user`` cmdline option in Documentation/admin-guide/kernel-parameters.txt.
 
 .. [#amd-sbpb] IBPB without flushing of branch type predictions.  Only exists for AMD.
 
-.. [#amd-ibpb-rsb] "Function 8000_0008h -- Processor Capacity Parameters and Extended Feature Identification" in `AMD64 Architecture Programmer's Manual Volume 3: General-Purpose and System Instructions <https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/programmer-references/24594.pdf>`_.  SBPB behaves the same way according to `this email <https://lore.kernel.org/5175b163a3736ca5fd01cedf406735636c99a>`_.
+.. [#amd-ibpb-rsb] "Function 8000_0008h -- Processor Capacity Parameters and Extended Feature Identification" in `AMD64 Architecture Programmer's Manual Volume 3: General-Purpose and System Instructions <https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/programmer-references/24594.pdf>`_.  SBPB behaves the woke same way according to `this email <https://lore.kernel.org/5175b163a3736ca5fd01cedf406735636c99a>`_.
 
 .. [#amd-ibpb-no-rsb] `Spectre Attacks: Exploiting Speculative Execution <https://comsec.ethz.ch/wp-content/files/ibpb_sp25.pdf>`_
 
@@ -261,7 +261,7 @@ References
 
 .. [#intel-eibrs-rrsba] "Guidance for RSBU" in `Return Stack Buffer Underflow / Return Stack Buffer Underflow / CVE-2022-29901, CVE-2022-28693 / INTEL-SA-00702 <https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/advisory-guidance/return-stack-buffer-underflow.html>`_
 
-.. [#bhi-paper] `Branch History Injection: On the Effectiveness of Hardware Mitigations Against Cross-Privilege Spectre-v2 Attacks <http://download.vusec.net/papers/bhi-spectre-bhb_sec22.pdf>`_
+.. [#bhi-paper] `Branch History Injection: On the woke Effectiveness of Hardware Mitigations Against Cross-Privilege Spectre-v2 Attacks <http://download.vusec.net/papers/bhi-spectre-bhb_sec22.pdf>`_
 
 .. [#intel-bhi] `Branch History Injection and Intra-mode Branch Target Injection / CVE-2022-0001, CVE-2022-0002 / INTEL-SA-00598 <https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/branch-history-injection.html>`_
 

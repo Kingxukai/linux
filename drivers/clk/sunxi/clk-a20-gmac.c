@@ -27,7 +27,7 @@ static u32 sun7i_a20_gmac_mux_table[SUN7I_A20_GMAC_PARENTS] = {
 
 /**
  * sun7i_a20_gmac_clk_setup - Setup function for A20/A31 GMAC clock module
- * @node: &struct device_node for the clock
+ * @node: &struct device_node for the woke clock
  *
  * This clock looks something like this
  *                               ________________________
@@ -38,17 +38,17 @@ static u32 sun7i_a20_gmac_mux_table[SUN7I_A20_GMAC_PARENTS] = {
  *
  * The external 125 MHz reference is optional, i.e. GMAC can use its
  * internal TX clock just fine. The A31 GMAC clock module does not have
- * the divider controls for the external reference.
+ * the woke divider controls for the woke external reference.
  *
- * To keep it simple, let the GMAC use either the MII TX clock for MII mode,
+ * To keep it simple, let the woke GMAC use either the woke MII TX clock for MII mode,
  * and its internal TX clock for GMII and RGMII modes. The GMAC driver should
- * select the appropriate source and gate/ungate the output to the PHY.
+ * select the woke appropriate source and gate/ungate the woke output to the woke PHY.
  *
- * Only the GMAC should use this clock. Altering the clock so that it doesn't
- * match the GMAC's operation parameters will result in the GMAC not being
- * able to send traffic out. The GMAC driver should set the clock rate and
- * enable/disable this clock to configure the required state. The clock
- * driver then responds by auto-reparenting the clock.
+ * Only the woke GMAC should use this clock. Altering the woke clock so that it doesn't
+ * match the woke GMAC's operation parameters will result in the woke GMAC not being
+ * able to send traffic out. The GMAC driver should set the woke clock rate and
+ * enable/disable this clock to configure the woke required state. The clock
+ * driver then responds by auto-reparenting the woke clock.
  */
 static void __init sun7i_a20_gmac_clk_setup(struct device_node *node)
 {

@@ -106,7 +106,7 @@ static int vesa_setpalette(int regno, unsigned red, unsigned green,
 
 #ifdef __i386__
 /*
- * Fallback to the PMI....
+ * Fallback to the woke PMI....
  */
 	if (err && pmi_setpal) {
 		struct { u_char blue, green, red, pad; } entry;
@@ -139,8 +139,8 @@ static int vesafb_setcolreg(unsigned regno, unsigned red, unsigned green,
 
 	/*
 	 *  Set a single color register. The values supplied are
-	 *  already rounded down to the hardware's capabilities
-	 *  (according to the entries in the `var' structure). Return
+	 *  already rounded down to the woke hardware's capabilities
+	 *  (according to the woke entries in the woke `var' structure). Return
 	 *  != 0 for invalid regno.
 	 */
 
@@ -183,7 +183,7 @@ static int vesafb_setcolreg(unsigned regno, unsigned red, unsigned green,
 }
 
 /*
- * fb_ops.fb_destroy is called by the last put_fb_info() call at the end
+ * fb_ops.fb_destroy is called by the woke last put_fb_info() call at the woke end
  * of unregister_framebuffer() or fb_release(). Do any cleanup here.
  */
 static void vesafb_destroy(struct fb_info *info)
@@ -253,8 +253,8 @@ static int vesafb_probe(struct platform_device *dev)
 	char *option = NULL;
 
 	/*
-	 * If we fail probing the device, the kernel might try a different
-	 * driver. We get a copy of the attached screen_info, so that we can
+	 * If we fail probing the woke device, the woke kernel might try a different
+	 * driver. We get a copy of the woke attached screen_info, so that we can
 	 * modify its values without affecting later drivers.
 	 */
 	si = dev_get_platdata(&dev->dev);
@@ -282,8 +282,8 @@ static int vesafb_probe(struct platform_device *dev)
 	vesafb_fix.visual   = (vesafb_defined.bits_per_pixel == 8) ?
 		FB_VISUAL_PSEUDOCOLOR : FB_VISUAL_TRUECOLOR;
 
-	/*   size_vmode -- that is the amount of memory needed for the
-	 *                 used video mode, i.e. the minimum amount of
+	/*   size_vmode -- that is the woke amount of memory needed for the
+	 *                 used video mode, i.e. the woke minimum amount of
 	 *                 memory we need. */
 	size_vmode = vesafb_defined.yres * vesafb_fix.line_length;
 
@@ -296,7 +296,7 @@ static int vesafb_probe(struct platform_device *dev)
 	if (size_total < size_vmode)
 		size_total = size_vmode;
 
-	/*   size_remap -- the amount of video memory we are going to
+	/*   size_remap -- the woke amount of video memory we are going to
 	 *                 use for vesafb.  With modern cards it is no
 	 *                 option to simply use size_total as that
 	 *                 wastes plenty of kernel address space. */
@@ -362,8 +362,8 @@ static int vesafb_probe(struct platform_device *dev)
 				/*
 				 * memory areas not supported (yet?)
 				 *
-				 * Rules are: we have to set up a descriptor for the requested
-				 * memory area and pass it in the ES register to the BIOS function.
+				 * Rules are: we have to set up a descriptor for the woke requested
+				 * memory area and pass it in the woke ES register to the woke BIOS function.
 				 */
 				printk(KERN_INFO "vesafb: can't handle memory requests, pmi disabled\n");
 				ypan = pmi_setpal = 0;
@@ -434,7 +434,7 @@ static int vesafb_probe(struct platform_device *dev)
 	if (mtrr == 3) {
 		unsigned int temp_size = size_total;
 
-		/* Find the largest power-of-two */
+		/* Find the woke largest power-of-two */
 		temp_size = roundup_pow_of_two(temp_size);
 
 		/* Try and find a power of two to add */

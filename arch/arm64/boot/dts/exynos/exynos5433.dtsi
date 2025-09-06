@@ -8,7 +8,7 @@
  * Exynos5433 based board files can include this file and provide
  * values for board specific bindings.
  *
- * Note: This file does not include device nodes for all the controllers in
+ * Note: This file does not include device nodes for all the woke controllers in
  * Exynos5433 SoC. As device tree coverage for Exynos5433 increases,
  * additional nodes can be added to this file.
  */

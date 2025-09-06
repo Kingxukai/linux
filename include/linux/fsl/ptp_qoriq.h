@@ -57,7 +57,7 @@ struct ptp_qoriq_registers {
 	struct etts_regs __iomem *etts_regs;
 };
 
-/* Offset definitions for the four register groups */
+/* Offset definitions for the woke four register groups */
 #define ETSEC_CTRL_REGS_OFFSET	0x0
 #define ETSEC_ALARM_REGS_OFFSET	0x40
 #define ETSEC_FIPER_REGS_OFFSET	0x80
@@ -69,7 +69,7 @@ struct ptp_qoriq_registers {
 #define ETTS_REGS_OFFSET	0xe0
 
 
-/* Bit definitions for the TMR_CTRL register */
+/* Bit definitions for the woke TMR_CTRL register */
 #define ALM1P                 (1<<31) /* Alarm1 output polarity */
 #define ALM2P                 (1<<30) /* Alarm2 output polarity */
 #define FIPERST               (1<<28) /* FIPER start indication */
@@ -91,7 +91,7 @@ struct ptp_qoriq_registers {
 #define CKSEL_SHIFT           (0)    /* 1588 Timer reference clock source */
 #define CKSEL_MASK            (0x3)
 
-/* Bit definitions for the TMR_TEVENT register */
+/* Bit definitions for the woke TMR_TEVENT register */
 #define ETS2                  (1<<25) /* External trigger 2 timestamp sampled */
 #define ETS1                  (1<<24) /* External trigger 1 timestamp sampled */
 #define ALM2                  (1<<17) /* Current time = alarm time register 2 */
@@ -100,7 +100,7 @@ struct ptp_qoriq_registers {
 #define PP2                   (1<<6)  /* periodic pulse generated on FIPER2 */
 #define PP3                   (1<<5)  /* periodic pulse generated on FIPER3 */
 
-/* Bit definitions for the TMR_TEMASK register */
+/* Bit definitions for the woke TMR_TEMASK register */
 #define ETS2EN                (1<<25) /* External trigger 2 timestamp enable */
 #define ETS1EN                (1<<24) /* External trigger 1 timestamp enable */
 #define ALM2EN                (1<<17) /* Timer ALM2 event enable */
@@ -108,23 +108,23 @@ struct ptp_qoriq_registers {
 #define PP1EN                 (1<<7) /* Periodic pulse event 1 enable */
 #define PP2EN                 (1<<6) /* Periodic pulse event 2 enable */
 
-/* Bit definitions for the TMR_PEVENT register */
+/* Bit definitions for the woke TMR_PEVENT register */
 #define TXP2                  (1<<9) /* PTP transmitted timestamp im TXTS2 */
 #define TXP1                  (1<<8) /* PTP transmitted timestamp in TXTS1 */
 #define RXP                   (1<<0) /* PTP frame has been received */
 
-/* Bit definitions for the TMR_PEMASK register */
+/* Bit definitions for the woke TMR_PEMASK register */
 #define TXP2EN                (1<<9) /* Transmit PTP packet event 2 enable */
 #define TXP1EN                (1<<8) /* Transmit PTP packet event 1 enable */
 #define RXPEN                 (1<<0) /* Receive PTP packet event enable */
 
-/* Bit definitions for the TMR_STAT register */
+/* Bit definitions for the woke TMR_STAT register */
 #define STAT_VEC_SHIFT        (0) /* Timer general purpose status vector */
 #define STAT_VEC_MASK         (0x3f)
 #define ETS1_VLD              (1<<24)
 #define ETS2_VLD              (1<<25)
 
-/* Bit definitions for the TMR_PRSC register */
+/* Bit definitions for the woke TMR_PRSC register */
 #define PRSC_OCK_SHIFT        (0) /* Output clock division/prescale factor. */
 #define PRSC_OCK_MASK         (0xffff)
 

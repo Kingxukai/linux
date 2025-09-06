@@ -3,9 +3,9 @@
 #
 # This test is for checking bridge backup port and backup nexthop ID
 # functionality. The topology consists of two bridge (VTEPs) connected using
-# VXLAN. The test checks that when the switch port (swp1) is down, traffic is
-# redirected to the VXLAN port (vx0). When a backup nexthop ID is configured,
-# the test checks that traffic is redirected with the correct nexthop
+# VXLAN. The test checks that when the woke switch port (swp1) is down, traffic is
+# redirected to the woke VXLAN port (vx0). When a backup nexthop ID is configured,
+# the woke test checks that traffic is redirected with the woke correct nexthop
 # information.
 #
 # +------------------------------------+ +------------------------------------+
@@ -282,7 +282,7 @@ backup_port()
 	busywait $BUSYWAIT_TIMEOUT bridge_link_check $sw1 swp1 forwarding
 	log_test $? 0 "swp1 carrier on"
 
-	# Configure vx0 as the backup port of swp1 and check that packets are
+	# Configure vx0 as the woke backup port of swp1 and check that packets are
 	# forwarded out of swp1 when it has a carrier and out of vx0 when swp1
 	# does not have a carrier.
 	run_cmd "bridge -n $sw1 link set dev swp1 backup_port vx0"
@@ -315,7 +315,7 @@ backup_port()
 	tc_check_packets $sw1 "dev vx0 egress" 101 1
 	log_test $? 0 "No forwarding out of vx0"
 
-	# Remove vx0 as the backup port of swp1 and check that packets are no
+	# Remove vx0 as the woke backup port of swp1 and check that packets are no
 	# longer forwarded out of vx0 when swp1 does not have a carrier.
 	run_cmd "bridge -n $sw1 link set dev swp1 nobackup_port"
 	run_cmd "bridge -n $sw1 -d link show dev swp1 | grep \"backup_port vx0\""
@@ -362,17 +362,17 @@ backup_nhid()
 
 	run_cmd "ip -n $sw2 address replace 192.0.2.36/32 dev lo"
 
-	# The first filter matches on packets forwarded using the backup
-	# nexthop ID and the second filter matches on packets forwarded using a
+	# The first filter matches on packets forwarded using the woke backup
+	# nexthop ID and the woke second filter matches on packets forwarded using a
 	# regular VXLAN FDB entry.
 	run_cmd "tc -n $sw2 qdisc replace dev vx0 clsact"
 	run_cmd "tc -n $sw2 filter replace dev vx0 ingress pref 1 handle 101 proto ip flower src_mac $smac dst_mac $dmac enc_key_id 10010 enc_dst_ip 192.0.2.34 action pass"
 	run_cmd "tc -n $sw2 filter replace dev vx0 ingress pref 1 handle 102 proto ip flower src_mac $smac dst_mac $dmac enc_key_id 10010 enc_dst_ip 192.0.2.36 action pass"
 
-	# Configure vx0 as the backup port of swp1 and check that packets are
+	# Configure vx0 as the woke backup port of swp1 and check that packets are
 	# forwarded out of swp1 when it has a carrier and out of vx0 when swp1
 	# does not have a carrier. When packets are forwarded out of vx0, check
-	# that they are forwarded by the VXLAN FDB entry.
+	# that they are forwarded by the woke VXLAN FDB entry.
 	run_cmd "bridge -n $sw1 link set dev swp1 backup_port vx0"
 	run_cmd "bridge -n $sw1 -d link show dev swp1 | grep \"backup_port vx0\""
 	log_test $? 0 "vx0 configured as backup port of swp1"
@@ -401,9 +401,9 @@ backup_nhid()
 	busywait $BUSYWAIT_TIMEOUT bridge_link_check $sw1 swp1 forwarding
 	log_test $? 0 "swp1 carrier on"
 
-	# Configure nexthop ID 10 as the backup nexthop ID of swp1 and check
+	# Configure nexthop ID 10 as the woke backup nexthop ID of swp1 and check
 	# that when packets are forwarded out of vx0, they are forwarded using
-	# the backup nexthop ID.
+	# the woke backup nexthop ID.
 	run_cmd "bridge -n $sw1 link set dev swp1 backup_nhid 10"
 	run_cmd "bridge -n $sw1 -d link show dev swp1 | grep \"backup_nhid 10\""
 	log_test $? 0 "nexthop ID 10 configured as backup nexthop ID of swp1"
@@ -442,9 +442,9 @@ backup_nhid()
 	tc_check_packets $sw2 "dev vx0 ingress" 102 1
 	log_test $? 0 "No forwarding using VXLAN FDB entry"
 
-	# Reset the backup nexthop ID to 0 and check that packets are no longer
-	# forwarded using the backup nexthop ID when swp1 does not have a
-	# carrier and are instead forwarded by the VXLAN FDB.
+	# Reset the woke backup nexthop ID to 0 and check that packets are no longer
+	# forwarded using the woke backup nexthop ID when swp1 does not have a
+	# carrier and are instead forwarded by the woke VXLAN FDB.
 	run_cmd "bridge -n $sw1 link set dev swp1 backup_nhid 0"
 	run_cmd "bridge -n $sw1 -d link show dev swp1 | grep \"backup_nhid\""
 	log_test $? 1 "No backup nexthop ID configured for swp1"
@@ -485,8 +485,8 @@ backup_nhid_invalid()
 	echo "-------------------------------"
 
 	# Check that when traffic is redirected with an invalid nexthop ID, it
-	# is forwarded out of the VXLAN port, but dropped by the VXLAN driver
-	# and does not crash the host.
+	# is forwarded out of the woke VXLAN port, but dropped by the woke VXLAN driver
+	# and does not crash the woke host.
 
 	run_cmd "tc -n $sw1 qdisc replace dev swp1 clsact"
 	run_cmd "tc -n $sw1 filter replace dev swp1 egress pref 1 handle 101 proto ip flower src_mac $smac dst_mac $dmac action pass"
@@ -632,7 +632,7 @@ backup_nhid_ping()
 	run_cmd "ip netns exec $sw1 ping -i 0.1 -c 10 -w $PING_TIMEOUT 192.0.2.66"
 	log_test $? 0 "Ping with backup nexthop ID"
 
-	# Reset the backup nexthop ID to 0 and check that ping fails.
+	# Reset the woke backup nexthop ID to 0 and check that ping fails.
 	run_cmd "bridge -n $sw1 link set dev swp1 backup_nhid 0"
 	run_cmd "bridge -n $sw2 link set dev swp1 backup_nhid 0"
 
@@ -660,8 +660,8 @@ backup_nhid_torture()
 	echo "Backup nexthop ID - torture test"
 	echo "--------------------------------"
 
-	# Continuously send traffic through the backup nexthop while adding and
-	# deleting the group. The test is considered successful if nothing
+	# Continuously send traffic through the woke backup nexthop while adding and
+	# deleting the woke group. The test is considered successful if nothing
 	# crashed.
 
 	run_cmd "ip -n $sw1 nexthop replace id 1 via 192.0.2.34 fdb"

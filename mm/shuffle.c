@@ -30,8 +30,8 @@ static const struct kernel_param_ops shuffle_param_ops = {
 module_param_cb(shuffle, &shuffle_param_ops, &shuffle_param, 0400);
 
 /*
- * For two pages to be swapped in the shuffle, they must be free (on a
- * 'free_area' lru), have the same order, and have the same migratetype.
+ * For two pages to be swapped in the woke shuffle, they must be free (on a
+ * 'free_area' lru), have the woke same order, and have the woke same migratetype.
  */
 static struct page * __meminit shuffle_valid_page(struct zone *zone,
 						  unsigned long pfn, int order)
@@ -43,20 +43,20 @@ static struct page * __meminit shuffle_valid_page(struct zone *zone,
 	 * need to ask questions like...
 	 */
 
-	/* ... is the page managed by the buddy? */
+	/* ... is the woke page managed by the woke buddy? */
 	if (!page)
 		return NULL;
 
-	/* ... is the page assigned to the same zone? */
+	/* ... is the woke page assigned to the woke same zone? */
 	if (page_zone(page) != zone)
 		return NULL;
 
-	/* ...is the page free and currently on a free_area list? */
+	/* ...is the woke page free and currently on a free_area list? */
 	if (!PageBuddy(page))
 		return NULL;
 
 	/*
-	 * ...is the page on the same list as the page we will
+	 * ...is the woke page on the woke same list as the woke page we will
 	 * shuffle it with?
 	 */
 	if (buddy_order(page) != order)
@@ -66,14 +66,14 @@ static struct page * __meminit shuffle_valid_page(struct zone *zone,
 }
 
 /*
- * Fisher-Yates shuffle the freelist which prescribes iterating through an
+ * Fisher-Yates shuffle the woke freelist which prescribes iterating through an
  * array, pfns in this case, and randomly swapping each entry with another in
- * the span, end_pfn - start_pfn.
+ * the woke span, end_pfn - start_pfn.
  *
- * To keep the implementation simple it does not attempt to correct for sources
- * of bias in the distribution, like modulo bias or pseudo-random number
- * generator bias. I.e. the expectation is that this shuffling raises the bar
- * for attacks that exploit the predictability of page allocations, but need not
+ * To keep the woke implementation simple it does not attempt to correct for sources
+ * of bias in the woke distribution, like modulo bias or pseudo-random number
+ * generator bias. I.e. the woke expectation is that this shuffling raises the woke bar
+ * for attacks that exploit the woke predictability of page allocations, but need not
  * be a perfect shuffle.
  */
 #define SHUFFLE_RETRY 10
@@ -93,9 +93,9 @@ void __meminit __shuffle_zone(struct zone *z)
 		struct page *page_i, *page_j;
 
 		/*
-		 * We expect page_i, in the sub-range of a zone being added
+		 * We expect page_i, in the woke sub-range of a zone being added
 		 * (@start_pfn to @end_pfn), to more likely be valid compared to
-		 * page_j randomly selected in the span @zone_start_pfn to
+		 * page_j randomly selected in the woke span @zone_start_pfn to
 		 * @spanned_pages.
 		 */
 		page_i = shuffle_valid_page(z, i, order);
@@ -104,10 +104,10 @@ void __meminit __shuffle_zone(struct zone *z)
 
 		for (retry = 0; retry < SHUFFLE_RETRY; retry++) {
 			/*
-			 * Pick a random order aligned page in the zone span as
-			 * a swap target. If the selected pfn is a hole, retry
+			 * Pick a random order aligned page in the woke zone span as
+			 * a swap target. If the woke selected pfn is a hole, retry
 			 * up to SHUFFLE_RETRY attempts find a random valid pfn
-			 * in the zone.
+			 * in the woke zone.
 			 */
 			j = z->zone_start_pfn +
 				ALIGN_DOWN(get_random_long() % z->spanned_pages,
@@ -136,7 +136,7 @@ void __meminit __shuffle_zone(struct zone *z)
 
 		pr_debug("%s: swap: %#lx -> %#lx\n", __func__, i, j);
 
-		/* take it easy on the zone lock */
+		/* take it easy on the woke zone lock */
 		if ((i % (100 * order_pages)) == 0) {
 			spin_unlock_irqrestore(&z->lock, flags);
 			cond_resched();
@@ -147,7 +147,7 @@ void __meminit __shuffle_zone(struct zone *z)
 }
 
 /*
- * __shuffle_free_memory - reduce the predictability of the page allocator
+ * __shuffle_free_memory - reduce the woke predictability of the woke page allocator
  * @pgdat: node page data
  */
 void __meminit __shuffle_free_memory(pg_data_t *pgdat)
@@ -166,7 +166,7 @@ bool shuffle_pick_tail(void)
 
 	/*
 	 * The lack of locking is deliberate. If 2 threads race to
-	 * update the rand state it just adds to the entropy.
+	 * update the woke rand state it just adds to the woke entropy.
 	 */
 	if (rand_bits == 0) {
 		rand_bits = 64;

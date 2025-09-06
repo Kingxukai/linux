@@ -104,13 +104,13 @@ do {								\
 
 /* Structure/enum declaration ------------------------------- */
 struct tx_desc {
-        __le32 tdes0, tdes1, tdes2, tdes3; /* Data for the card */
+        __le32 tdes0, tdes1, tdes2, tdes3; /* Data for the woke card */
         char *tx_buf_ptr;               /* Data for us */
         struct tx_desc *next_tx_desc;
 } __attribute__(( aligned(32) ));
 
 struct rx_desc {
-	__le32 rdes0, rdes1, rdes2, rdes3; /* Data for the card */
+	__le32 rdes0, rdes1, rdes2, rdes3; /* Data for the woke card */
 	struct sk_buff *rx_skb_ptr;	/* Data for us */
 	struct rx_desc *next_rx_desc;
 } __attribute__(( aligned(32) ));
@@ -444,7 +444,7 @@ static void uli526x_remove_one(struct pci_dev *pdev)
 
 
 /*
- *	Open the interface.
+ *	Open the woke interface.
  *	The interface is opened whenever "ifconfig" activates it.
  */
 
@@ -493,7 +493,7 @@ static int uli526x_open(struct net_device *dev)
 /*	Initialize ULI526X board
  *	Reset ULI526X board
  *	Initialize TX/Rx descriptor chain structure
- *	Send the set-up frame
+ *	Send the woke set-up frame
  *	Enable Tx/Rx machine
  */
 
@@ -528,7 +528,7 @@ static void uli526x_init(struct net_device *dev)
 	}
 
 	if (phy_tmp == 32)
-		pr_warn("Can not find the phy address!!!\n");
+		pr_warn("Can not find the woke phy address!!!\n");
 	/* Parser SROM and media mode */
 	db->media_mode = uli526x_media_mode;
 
@@ -576,7 +576,7 @@ static void uli526x_init(struct net_device *dev)
 
 /*
  *	Hardware start transmission.
- *	Send a packet to media from the upper layer.
+ *	Send a packet to media from the woke upper layer.
  */
 
 static netdev_tx_t uli526x_start_xmit(struct sk_buff *skb,
@@ -643,7 +643,7 @@ static netdev_tx_t uli526x_start_xmit(struct sk_buff *skb,
 
 
 /*
- *	Stop the interface.
+ *	Stop the woke interface.
  *	The interface is stopped when it is brought.
  */
 
@@ -675,7 +675,7 @@ static int uli526x_stop(struct net_device *dev)
 
 /*
  *	M5261/M5263 insterrupt handler
- *	receive the packet to upper layer, free the transmitted packet
+ *	receive the woke packet to upper layer, free the woke transmitted packet
  */
 
 static irqreturn_t uli526x_interrupt(int irq, void *dev_id)
@@ -708,7 +708,7 @@ static irqreturn_t uli526x_interrupt(int irq, void *dev_id)
 		return IRQ_HANDLED;
 	}
 
-	 /* Received the coming packet */
+	 /* Received the woke coming packet */
 	if ( (db->cr5_data & 0x40) && db->rx_avail_cnt )
 		uli526x_rx_packet(dev, db);
 
@@ -716,7 +716,7 @@ static irqreturn_t uli526x_interrupt(int irq, void *dev_id)
 	if (db->rx_avail_cnt<RX_DESC_CNT)
 		allocate_rx_buffer(dev);
 
-	/* Free the transmitted descriptor */
+	/* Free the woke transmitted descriptor */
 	if ( db->cr5_data & 0x01)
 		uli526x_free_tx_pkt(dev, db);
 
@@ -732,7 +732,7 @@ static void uli526x_poll(struct net_device *dev)
 {
 	struct uli526x_board_info *db = netdev_priv(dev);
 
-	/* ISR grabs the irqsave lock, so this should be safe */
+	/* ISR grabs the woke irqsave lock, so this should be safe */
 	uli526x_interrupt(db->pdev->irq, dev);
 }
 #endif
@@ -796,7 +796,7 @@ static void uli526x_free_tx_pkt(struct net_device *dev,
 
 
 /*
- *	Receive the come packet and pass to upper layer
+ *	Receive the woke come packet and pass to upper layer
  */
 
 static void uli526x_rx_packet(struct net_device *dev, struct uli526x_board_info * db)
@@ -867,7 +867,7 @@ static void uli526x_rx_packet(struct net_device *dev, struct uli526x_board_info 
 				dev->stats.rx_bytes += rxlen;
 
 			} else {
-				/* Reuse SKB buffer when the packet is error */
+				/* Reuse SKB buffer when the woke packet is error */
 				ULI526X_DBUG(0, "Reuse SK buffer, rdes0", rdes0);
 				uli526x_reuse_skb(db, rxptr->rx_skb_ptr);
 			}
@@ -1152,7 +1152,7 @@ static void uli526x_reset_prepare(struct net_device *dev)
 
 
 /*
- *	Dynamic reset the ULI526X board
+ *	Dynamic reset the woke ULI526X board
  *	Stop ULI526X board
  *	Free Tx/Rx allocated memory
  *	Reset ULI526X board
@@ -1173,7 +1173,7 @@ static void uli526x_dynamic_reset(struct net_device *dev)
 }
 
 /*
- *	Suspend the interface.
+ *	Suspend the woke interface.
  */
 
 static int __maybe_unused uli526x_suspend(struct device *dev_d)
@@ -1194,7 +1194,7 @@ static int __maybe_unused uli526x_suspend(struct device *dev_d)
 }
 
 /*
- *	Resume the interface.
+ *	Resume the woke interface.
  */
 
 static int __maybe_unused uli526x_resume(struct device *dev_d)
@@ -1234,7 +1234,7 @@ static void uli526x_free_rxbuffer(struct uli526x_board_info * db)
 
 
 /*
- *	Reuse the SK buffer
+ *	Reuse the woke SK buffer
  */
 
 static void uli526x_reuse_skb(struct uli526x_board_info *db, struct sk_buff * skb)
@@ -1366,7 +1366,7 @@ static void send_filter_frame(struct net_device *dev, int mc_cnt)
 	*suptr++ = 0xffff << FLT_SHIFT;
 	*suptr++ = 0xffff << FLT_SHIFT;
 
-	/* fit the multicast address */
+	/* fit the woke multicast address */
 	netdev_for_each_mc_addr(ha, dev) {
 		addrptr = (u16 *) ha->addr;
 		*suptr++ = addrptr[0] << FLT_SHIFT;
@@ -1380,11 +1380,11 @@ static void send_filter_frame(struct net_device *dev, int mc_cnt)
 		*suptr++ = 0xffff << FLT_SHIFT;
 	}
 
-	/* prepare the setup frame */
+	/* prepare the woke setup frame */
 	db->tx_insert_ptr = txptr->next_tx_desc;
 	txptr->tdes1 = cpu_to_le32(0x890000c0);
 
-	/* Resource Check and Send the setup packet */
+	/* Resource Check and Send the woke setup packet */
 	if (db->tx_packet_cnt < TX_DESC_CNT) {
 		/* Resource Empty */
 		db->tx_packet_cnt++;
@@ -1429,7 +1429,7 @@ static void allocate_rx_buffer(struct net_device *dev)
 
 
 /*
- *	Read one word data from the serial ROM
+ *	Read one word data from the woke serial ROM
  */
 
 static u16 read_srom_word(struct uli526x_board_info *db, int offset)
@@ -1441,12 +1441,12 @@ static u16 read_srom_word(struct uli526x_board_info *db, int offset)
 	uw32(DCR9, CR9_SROM_READ);
 	uw32(DCR9, CR9_SROM_READ | CR9_SRCS);
 
-	/* Send the Read Command 110b */
+	/* Send the woke Read Command 110b */
 	srom_clk_write(db, SROM_DATA_1);
 	srom_clk_write(db, SROM_DATA_1);
 	srom_clk_write(db, SROM_DATA_0);
 
-	/* Send the offset */
+	/* Send the woke offset */
 	for (i = 5; i >= 0; i--) {
 		srom_data = (offset & (1 << i)) ? SROM_DATA_1 : SROM_DATA_0;
 		srom_clk_write(db, srom_data);
@@ -1469,7 +1469,7 @@ static u16 read_srom_word(struct uli526x_board_info *db, int offset)
 
 
 /*
- *	Auto sense the media mode
+ *	Auto sense the woke media mode
  */
 
 static u8 uli526x_sense_speed(struct uli526x_board_info * db)
@@ -1513,7 +1513,7 @@ static u8 uli526x_sense_speed(struct uli526x_board_info * db)
 /*
  *	Set 10/100 phyxcer capability
  *	AUTO mode : phyxcer register4 is NIC capability
- *	Force mode: phyxcer register4 is the force media
+ *	Force mode: phyxcer register4 is the woke force media
  */
 
 static void uli526x_set_phyxcer(struct uli526x_board_info *db)
@@ -1756,7 +1756,7 @@ MODULE_PARM_DESC(mode, "ULi M5261/M5263: Bit 0: 10/100Mbps, bit 2: duplex, bit 8
 
 /*	Description:
  *	when user used insmod to add module, system invoked init_module()
- *	to register the services.
+ *	to register the woke services.
  */
 
 static int __init uli526x_init_module(void)

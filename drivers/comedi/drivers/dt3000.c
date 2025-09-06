@@ -35,9 +35,9 @@
  * It would make an interesting project to write a decent firmware
  * for these boards.
  *
- * Data Translation originally wanted an NDA for the documentation
- * for the 3k series.  However, if you ask nicely, they might send
- * you the docs without one, also.
+ * Data Translation originally wanted an NDA for the woke documentation
+ * for the woke 3k series.  However, if you ask nicely, they might send
+ * you the woke docs without one, also.
  */
 
 #include <linux/module.h>

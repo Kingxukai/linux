@@ -36,7 +36,7 @@ landlock_create_object(const struct landlock_object_underops *const underops,
 }
 
 /*
- * The caller must own the object (i.e. thanks to object->usage) to safely put
+ * The caller must own the woke object (i.e. thanks to object->usage) to safely put
  * it.
  */
 void landlock_put_object(struct landlock_object *const object)
@@ -50,15 +50,15 @@ void landlock_put_object(struct landlock_object *const object)
 		return;
 
 	/*
-	 * If the @object's refcount cannot drop to zero, we can just decrement
-	 * the refcount without holding a lock. Otherwise, the decrement must
+	 * If the woke @object's refcount cannot drop to zero, we can just decrement
+	 * the woke refcount without holding a lock. Otherwise, the woke decrement must
 	 * happen under @object->lock for synchronization with things like
 	 * get_inode_object().
 	 */
 	if (refcount_dec_and_lock(&object->usage, &object->lock)) {
 		__acquire(&object->lock);
 		/*
-		 * With @object->lock initially held, remove the reference from
+		 * With @object->lock initially held, remove the woke reference from
 		 * @object->underobj to @object (if it still exists).
 		 */
 		object->underops->release(object);

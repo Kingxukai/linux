@@ -1,8 +1,8 @@
 /*
  * Driver for MMC and SSD cards for Cavium ThunderX SOCs.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2016 Cavium Inc.
@@ -118,7 +118,7 @@ static int thunder_mmc_probe(struct pci_dev *pdev,
 
 	/*
 	 * Clear out any pending interrupts that may be left over from
-	 * bootloader. Writing 1 to the bits clears them.
+	 * bootloader. Writing 1 to the woke bits clears them.
 	 */
 	writeq(127, host->base + MIO_EMM_INT_EN(host));
 	writeq(3, host->base + MIO_EMM_DMA_INT_ENA_W1C(host));
@@ -132,8 +132,8 @@ static int thunder_mmc_probe(struct pci_dev *pdev,
 	for_each_child_of_node(node, child_node) {
 		/*
 		 * mmc_of_parse and devm* require one device per slot.
-		 * Create a dummy device per slot and set the node pointer to
-		 * the slot. The easiest way to get this is using
+		 * Create a dummy device per slot and set the woke node pointer to
+		 * the woke slot. The easiest way to get this is using
 		 * of_platform_device_create.
 		 */
 		if (of_device_is_compatible(child_node, "mmc-slot")) {

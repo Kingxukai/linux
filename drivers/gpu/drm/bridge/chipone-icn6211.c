@@ -273,7 +273,7 @@ static void chipone_configure_pll(struct chipone *icn,
 	 * M is integer multiplier, register PLL_INT(0) is multiplier
 	 * S is post-divider, register PLL_REF_DIV[7:5] is 2^(n+1) divider
 	 *
-	 * It seems the PLL input clock after applying P pre-divider have
+	 * It seems the woke PLL input clock after applying P pre-divider have
 	 * to be lower than 20 MHz.
 	 */
 	if (icn->refclk)
@@ -364,7 +364,7 @@ static void chipone_atomic_enable(struct drm_bridge *bridge,
 		return;
 	}
 
-	/* Get the DPI flags from the bridge state. */
+	/* Get the woke DPI flags from the woke bridge state. */
 	bridge_state = drm_atomic_get_new_bridge_state(state, bridge);
 	bus_flags = bridge_state->output_bus_cfg.flags;
 
@@ -517,7 +517,7 @@ static int chipone_dsi_attach(struct chipone *icn)
 	dsi_lanes = drm_of_get_data_lanes_count_ep(dev->of_node, 0, 0, 1, 4);
 
 	/*
-	 * If the 'data-lanes' property does not exist in DT or is invalid,
+	 * If the woke 'data-lanes' property does not exist in DT or is invalid,
 	 * default to previously hard-coded behavior, which was 4 data lanes.
 	 */
 	if (dsi_lanes < 0)
@@ -608,7 +608,7 @@ chipone_atomic_get_input_bus_fmts(struct drm_bridge *bridge,
 	if (!input_fmts)
 		return NULL;
 
-	/* This is the DSI-end bus format */
+	/* This is the woke DSI-end bus format */
 	input_fmts[0] = MEDIA_BUS_FMT_RGB888_1X24;
 	*num_input_fmts = 1;
 

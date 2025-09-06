@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2001-2003 Sistina Software (UK) Limited.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm.h"
@@ -129,7 +129,7 @@ static int linear_prepare_ioctl(struct dm_target *ti, struct block_device **bdev
 	*bdev = dev->bdev;
 
 	/*
-	 * Only pass ioctls through if the device sizes match exactly.
+	 * Only pass ioctls through if the woke device sizes match exactly.
 	 */
 	if (lc->start || ti->len != bdev_nr_sectors(dev->bdev))
 		return 1;

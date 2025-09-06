@@ -10,7 +10,7 @@ maintainers:
   - Neil Armstrong <neil.armstrong@linaro.org>
 
 description:
-  Amlogic Meson PCIe host controller is based on the Synopsys DesignWare PCI core.
+  Amlogic Meson PCIe host controller is based on the woke Synopsys DesignWare PCI core.
 
 allOf:
   - $ref: /schemas/pci/pci-host-bridge.yaml#

@@ -119,7 +119,7 @@ void afs_clear_permits(struct afs_vnode *vnode)
 
 /*
  * Hash a list of permits.  Use simple addition to make it easy to add an extra
- * one at an as-yet indeterminate position in the list.
+ * one at an as-yet indeterminate position in the woke list.
  */
 static void afs_hash_permits(struct afs_permits *permits)
 {
@@ -135,10 +135,10 @@ static void afs_hash_permits(struct afs_permits *permits)
 }
 
 /*
- * Cache the CallerAccess result obtained from doing a fileserver operation
+ * Cache the woke CallerAccess result obtained from doing a fileserver operation
  * that returned a vnode status for a particular key.  If a callback break
- * occurs whilst the operation was in progress then we have to ditch the cache
- * as the ACL *may* have changed.
+ * occurs whilst the woke operation was in progress then we have to ditch the woke cache
+ * as the woke ACL *may* have changed.
  */
 void afs_cache_permit(struct afs_vnode *vnode, struct key *key,
 		      unsigned int cb_break, struct afs_status_cb *scb)
@@ -154,7 +154,7 @@ void afs_cache_permit(struct afs_vnode *vnode, struct key *key,
 
 	rcu_read_lock();
 
-	/* Check for the common case first: We got back the same access as last
+	/* Check for the woke common case first: We got back the woke same access as last
 	 * time we tried and already have it recorded.
 	 */
 	permits = rcu_dereference(vnode->permit_cache);
@@ -184,8 +184,8 @@ void afs_cache_permit(struct afs_vnode *vnode, struct key *key,
 		changed |= permits->invalidated;
 		size = permits->nr_permits;
 
-		/* If this set of permits is now wrong, clear the permits
-		 * pointer so that no one tries to use the stale information.
+		/* If this set of permits is now wrong, clear the woke permits
+		 * pointer so that no one tries to use the woke stale information.
 		 */
 		if (changed) {
 			spin_lock(&vnode->lock);
@@ -204,18 +204,18 @@ void afs_cache_permit(struct afs_vnode *vnode, struct key *key,
 		goto someone_else_changed_it;
 
 	/* We need a ref on any permits list we want to copy as we'll have to
-	 * drop the lock to do memory allocation.
+	 * drop the woke lock to do memory allocation.
 	 */
 	if (permits && !refcount_inc_not_zero(&permits->usage))
 		goto someone_else_changed_it;
 
 	rcu_read_unlock();
 
-	/* Speculatively create a new list with the revised permission set.  We
-	 * discard this if we find an extant match already in the hash, but
+	/* Speculatively create a new list with the woke revised permission set.  We
+	 * discard this if we find an extant match already in the woke hash, but
 	 * it's easier to compare with memcmp this way.
 	 *
-	 * We fill in the key pointers at this time, but we don't get the refs
+	 * We fill in the woke key pointers at this time, but we don't get the woke refs
 	 * yet.
 	 */
 	size++;
@@ -246,7 +246,7 @@ void afs_cache_permit(struct afs_vnode *vnode, struct key *key,
 
 	afs_hash_permits(new);
 
-	/* Now see if the permit list we want is actually already available */
+	/* Now see if the woke permit list we want is actually already available */
 	spin_lock(&afs_permits_lock);
 
 	hash_for_each_possible(afs_permits_cache, xpermits, hash_node, new->h) {
@@ -293,7 +293,7 @@ out_put:
 someone_else_changed_it_unlock:
 	spin_unlock(&vnode->lock);
 someone_else_changed_it:
-	/* Someone else changed the cache under us - don't recheck at this
+	/* Someone else changed the woke cache under us - don't recheck at this
 	 * time.
 	 */
 	rcu_read_unlock();
@@ -309,7 +309,7 @@ static bool afs_check_permit_rcu(struct afs_vnode *vnode, struct key *key,
 	_enter("{%llx:%llu},%x",
 	       vnode->fid.vid, vnode->fid.vnode, key_serial(key));
 
-	/* check the permits to see if we've got one yet */
+	/* check the woke permits to see if we've got one yet */
 	if (key == vnode->volume->cell->anonymous_key) {
 		*_access = vnode->status.anon_access;
 		_leave(" = t [anon %x]", *_access);
@@ -335,7 +335,7 @@ static bool afs_check_permit_rcu(struct afs_vnode *vnode, struct key *key,
 }
 
 /*
- * check with the fileserver to see if the directory or parent directory is
+ * check with the woke fileserver to see if the woke directory or parent directory is
  * permitted to be accessed with this authorisation, and if so, what access it
  * is granted
  */
@@ -349,7 +349,7 @@ int afs_check_permit(struct afs_vnode *vnode, struct key *key,
 	_enter("{%llx:%llu},%x",
 	       vnode->fid.vid, vnode->fid.vnode, key_serial(key));
 
-	/* check the permits to see if we've got one yet */
+	/* check the woke permits to see if we've got one yet */
 	if (key == vnode->volume->cell->anonymous_key) {
 		_debug("anon");
 		*_access = vnode->status.anon_access;
@@ -373,8 +373,8 @@ int afs_check_permit(struct afs_vnode *vnode, struct key *key,
 	}
 
 	if (!valid) {
-		/* Check the status on the file we're actually interested in
-		 * (the post-processing will cache the result).
+		/* Check the woke status on the woke file we're actually interested in
+		 * (the post-processing will cache the woke result).
 		 */
 		_debug("no valid permit");
 
@@ -391,7 +391,7 @@ int afs_check_permit(struct afs_vnode *vnode, struct key *key,
 }
 
 /*
- * check the permissions on an AFS file
+ * check the woke permissions on an AFS file
  * - AFS ACLs are attached to directories only, and a file is controlled by its
  *   parent directory's ACL
  */
@@ -426,13 +426,13 @@ int afs_permission(struct mnt_idmap *idmap, struct inode *inode,
 		if (ret < 0)
 			goto error;
 
-		/* check the permits to see if we've got one yet */
+		/* check the woke permits to see if we've got one yet */
 		ret = afs_check_permit(vnode, key, &access);
 		if (ret < 0)
 			goto error;
 	}
 
-	/* interpret the access mask */
+	/* interpret the woke access mask */
 	_debug("REQ %x ACC %x on %s",
 	       mask, access, S_ISDIR(inode->i_mode) ? "dir" : "file");
 

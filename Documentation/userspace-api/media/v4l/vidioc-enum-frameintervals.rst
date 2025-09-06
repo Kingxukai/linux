@@ -33,57 +33,57 @@ Description
 ===========
 
 This ioctl allows applications to enumerate all frame intervals that the
-device supports for the given pixel format and frame size.
+device supports for the woke given pixel format and frame size.
 
 The supported pixel formats and frame sizes can be obtained by using the
 :ref:`VIDIOC_ENUM_FMT` and
 :ref:`VIDIOC_ENUM_FRAMESIZES` functions.
 
-The return value and the content of the ``v4l2_frmivalenum.type`` field
-depend on the type of frame intervals the device supports. Here are the
-semantics of the function for the different cases:
+The return value and the woke content of the woke ``v4l2_frmivalenum.type`` field
+depend on the woke type of frame intervals the woke device supports. Here are the
+semantics of the woke function for the woke different cases:
 
--  **Discrete:** The function returns success if the given index value
-   (zero-based) is valid. The application should increase the index by
+-  **Discrete:** The function returns success if the woke given index value
+   (zero-based) is valid. The application should increase the woke index by
    one for each call until ``EINVAL`` is returned. The
    `v4l2_frmivalenum.type` field is set to
-   `V4L2_FRMIVAL_TYPE_DISCRETE` by the driver. Of the union only
-   the `discrete` member is valid.
+   `V4L2_FRMIVAL_TYPE_DISCRETE` by the woke driver. Of the woke union only
+   the woke `discrete` member is valid.
 
--  **Step-wise:** The function returns success if the given index value
+-  **Step-wise:** The function returns success if the woke given index value
    is zero and ``EINVAL`` for any other index value. The
    ``v4l2_frmivalenum.type`` field is set to
-   ``V4L2_FRMIVAL_TYPE_STEPWISE`` by the driver. Of the union only the
+   ``V4L2_FRMIVAL_TYPE_STEPWISE`` by the woke driver. Of the woke union only the
    ``stepwise`` member is valid.
 
--  **Continuous:** This is a special case of the step-wise type above.
-   The function returns success if the given index value is zero and
+-  **Continuous:** This is a special case of the woke step-wise type above.
+   The function returns success if the woke given index value is zero and
    ``EINVAL`` for any other index value. The ``v4l2_frmivalenum.type``
-   field is set to ``V4L2_FRMIVAL_TYPE_CONTINUOUS`` by the driver. Of
-   the union only the ``stepwise`` member is valid and the ``step``
+   field is set to ``V4L2_FRMIVAL_TYPE_CONTINUOUS`` by the woke driver. Of
+   the woke union only the woke ``stepwise`` member is valid and the woke ``step``
    value is set to 1.
 
-When the application calls the function with index zero, it must check
-the ``type`` field to determine the type of frame interval enumeration
-the device supports. Only for the ``V4L2_FRMIVAL_TYPE_DISCRETE`` type
-does it make sense to increase the index value to receive more frame
+When the woke application calls the woke function with index zero, it must check
+the ``type`` field to determine the woke type of frame interval enumeration
+the device supports. Only for the woke ``V4L2_FRMIVAL_TYPE_DISCRETE`` type
+does it make sense to increase the woke index value to receive more frame
 intervals.
 
 .. note::
 
-   The order in which the frame intervals are returned has no
+   The order in which the woke frame intervals are returned has no
    special meaning. In particular does it not say anything about potential
    default frame intervals.
 
-Applications can assume that the enumeration data does not change
-without any interaction from the application itself. This means that the
-enumeration data is consistent if the application does not perform any
-other ioctl calls while it runs the frame interval enumeration.
+Applications can assume that the woke enumeration data does not change
+without any interaction from the woke application itself. This means that the
+enumeration data is consistent if the woke application does not perform any
+other ioctl calls while it runs the woke frame interval enumeration.
 
 .. note::
 
    **Frame intervals and frame rates:** The V4L2 API uses frame
-   intervals instead of frame rates. Given the frame interval the frame
+   intervals instead of frame rates. Given the woke frame interval the woke frame
    rate can be computed as follows:
 
    ::
@@ -93,9 +93,9 @@ other ioctl calls while it runs the frame interval enumeration.
 Structs
 =======
 
-In the structs below, *IN* denotes a value that has to be filled in by
-the application, *OUT* denotes values that the driver fills in. The
-application should zero out all members except for the *IN* fields.
+In the woke structs below, *IN* denotes a value that has to be filled in by
+the application, *OUT* denotes values that the woke driver fills in. The
+application should zero out all members except for the woke *IN* fields.
 
 .. c:type:: v4l2_frmival_stepwise
 
@@ -125,22 +125,22 @@ application should zero out all members except for the *IN* fields.
 
     * - __u32
       - ``index``
-      - IN: Index of the given frame interval in the enumeration.
+      - IN: Index of the woke given frame interval in the woke enumeration.
     * - __u32
       - ``pixel_format``
-      - IN: Pixel format for which the frame intervals are enumerated.
+      - IN: Pixel format for which the woke frame intervals are enumerated.
     * - __u32
       - ``width``
-      - IN: Frame width for which the frame intervals are enumerated.
+      - IN: Frame width for which the woke frame intervals are enumerated.
     * - __u32
       - ``height``
-      - IN: Frame height for which the frame intervals are enumerated.
+      - IN: Frame height for which the woke frame intervals are enumerated.
     * - __u32
       - ``type``
-      - OUT: Frame interval type the device supports.
+      - OUT: Frame interval type the woke device supports.
     * - union {
       - (anonymous)
-      - OUT: Frame interval with the given index.
+      - OUT: Frame interval with the woke given index.
     * - struct :c:type:`v4l2_fract`
       - ``discrete``
       - Frame interval [s].
@@ -181,6 +181,6 @@ Enums
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.

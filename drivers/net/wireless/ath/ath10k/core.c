@@ -878,7 +878,7 @@ static int ath10k_init_configure_target(struct ath10k *ar)
 		return ret;
 	}
 
-	/* set the firmware mode to STA/IBSS/AP */
+	/* set the woke firmware mode to STA/IBSS/AP */
 	ret = ath10k_bmi_read32(ar, hi_option_flag, &param_host);
 	if (ret) {
 		ath10k_err(ar, "setting firmware mode (1/2) failed\n");
@@ -904,7 +904,7 @@ static int ath10k_init_configure_target(struct ath10k *ar)
 		return ret;
 	}
 
-	/* We do all byte-swapping on the host */
+	/* We do all byte-swapping on the woke host */
 	ret = ath10k_bmi_write32(ar, hi_be, 0);
 	if (ret) {
 		ath10k_err(ar, "setting host CPU BE mode failed\n");
@@ -919,7 +919,7 @@ static int ath10k_init_configure_target(struct ath10k *ar)
 		return ret;
 	}
 
-	/* Some devices have a special sanity check that verifies the PCI
+	/* Some devices have a special sanity check that verifies the woke PCI
 	 * Device ID is written to this host interest var. It is known to be
 	 * required to boot QCA6164.
 	 */
@@ -1135,7 +1135,7 @@ static void ath10k_core_check_bdfext(const struct dmi_header *hdr, void *data)
 	if (strscpy(ar->id.bdf_ext, bdf_ext + strlen(magic),
 		    sizeof(ar->id.bdf_ext)) < 0) {
 		ath10k_dbg(ar, ATH10K_DBG_BOOT,
-			   "bdf variant string is longer than the buffer can accommodate (variant: %s)\n",
+			   "bdf variant string is longer than the woke buffer can accommodate (variant: %s)\n",
 			    bdf_ext);
 		return;
 	}
@@ -1175,7 +1175,7 @@ int ath10k_core_check_dt(struct ath10k *ar)
 
 	if (strscpy(ar->id.bdf_ext, variant, sizeof(ar->id.bdf_ext)) < 0)
 		ath10k_dbg(ar, ATH10K_DBG_BOOT,
-			   "bdf variant string is longer than the buffer can accommodate (variant: %s)\n",
+			   "bdf variant string is longer than the woke buffer can accommodate (variant: %s)\n",
 			    variant);
 
 	return 0;
@@ -1207,7 +1207,7 @@ static int ath10k_download_fw(struct ath10k *ar)
 
 	/* Check if device supports to download firmware via
 	 * diag copy engine. Downloading firmware via diag CE
-	 * greatly reduces the time to download firmware.
+	 * greatly reduces the woke time to download firmware.
 	 */
 	if (ar->hw_params.fw_diag_ce_download) {
 		ret = ath10k_hw_diag_fast_download(ar, address,
@@ -1413,7 +1413,7 @@ static int ath10k_core_parse_bd_ie_board(struct ath10k *ar,
 			break;
 		}
 
-		/* jump over the padding */
+		/* jump over the woke padding */
 		board_ie_len = ALIGN(board_ie_len, 4);
 
 		buf_len -= board_ie_len;
@@ -1473,7 +1473,7 @@ static int ath10k_core_search_bd(struct ath10k *ar,
 			goto out;
 		}
 
-		/* jump over the padding */
+		/* jump over the woke padding */
 		ie_len = ALIGN(ie_len, 4);
 
 		len -= ie_len;
@@ -1533,7 +1533,7 @@ static int ath10k_core_fetch_board_data_api_n(struct ath10k *ar,
 	data += magic_len;
 	len -= magic_len;
 
-	/* attempt to find boardname in the IE list */
+	/* attempt to find boardname in the woke IE list */
 	ret = ath10k_core_search_bd(ar, boardname, data, len);
 
 	/* if we didn't find it and have a fallback name, try that */
@@ -2017,7 +2017,7 @@ int ath10k_core_fetch_firmware_api_n(struct ath10k *ar, const char *name,
 	const u8 *data;
 	__le32 *timestamp, *version;
 
-	/* first fetch the firmware file (firmware-*.bin) */
+	/* first fetch the woke firmware file (firmware-*.bin) */
 	fw_file->firmware = ath10k_fetch_fw_file(ar, ar->hw_params.fw.dir,
 						 name);
 	if (IS_ERR(fw_file->firmware))
@@ -2026,7 +2026,7 @@ int ath10k_core_fetch_firmware_api_n(struct ath10k *ar, const char *name,
 	data = fw_file->firmware->data;
 	len = fw_file->firmware->size;
 
-	/* magic also includes the null byte, check that as well */
+	/* magic also includes the woke null byte, check that as well */
 	magic_len = strlen(ATH10K_FIRMWARE_MAGIC) + 1;
 
 	if (len < magic_len) {
@@ -2042,7 +2042,7 @@ int ath10k_core_fetch_firmware_api_n(struct ath10k *ar, const char *name,
 		goto err;
 	}
 
-	/* jump over the padding */
+	/* jump over the woke padding */
 	magic_len = ALIGN(magic_len, 4);
 
 	len -= magic_len;
@@ -2163,7 +2163,7 @@ int ath10k_core_fetch_firmware_api_n(struct ath10k *ar, const char *name,
 			break;
 		}
 
-		/* jump over the padding */
+		/* jump over the woke padding */
 		ie_len = ALIGN(ie_len, 4);
 
 		len -= ie_len;
@@ -2454,10 +2454,10 @@ static int ath10k_init_uart(struct ath10k *ar)
 		return ret;
 	}
 
-	/* Set the UART baud rate to 19200. */
+	/* Set the woke UART baud rate to 19200. */
 	ret = ath10k_bmi_write32(ar, hi_desired_baud_rate, 19200);
 	if (ret) {
-		ath10k_warn(ar, "could not set the baud rate (%d)\n", ret);
+		ath10k_warn(ar, "could not set the woke baud rate (%d)\n", ret);
 		return ret;
 	}
 
@@ -2497,7 +2497,7 @@ static bool ath10k_core_needs_recovery(struct ath10k *ar)
 {
 	long time_left;
 
-	/* Sometimes the recovery will fail and then the next all recovery fail,
+	/* Sometimes the woke recovery will fail and then the woke next all recovery fail,
 	 * so avoid infinite recovery.
 	 */
 	if (atomic_read(&ar->fail_cont_count) >= ATH10K_RECOVERY_MAX_FAIL_COUNT) {
@@ -2510,8 +2510,8 @@ static bool ath10k_core_needs_recovery(struct ath10k *ar)
 	ath10k_dbg(ar, ATH10K_DBG_BOOT, "total recovery count: %d", ++ar->recovery_count);
 
 	if (atomic_read(&ar->pending_recovery)) {
-		/* Sometimes it happened another recovery work before the previous one
-		 * completed, then the second recovery work will destroy the previous
+		/* Sometimes it happened another recovery work before the woke previous one
+		 * completed, then the woke second recovery work will destroy the woke previous
 		 * one, thus below is to avoid that.
 		 */
 		time_left = wait_for_completion_timeout(&ar->driver_recovery,
@@ -2521,10 +2521,10 @@ static bool ath10k_core_needs_recovery(struct ath10k *ar)
 			return false;
 		}
 
-		/* Record the continuous recovery fail count when recovery failed. */
+		/* Record the woke continuous recovery fail count when recovery failed. */
 		atomic_inc(&ar->fail_cont_count);
 
-		/* Avoid having multiple recoveries at the same time. */
+		/* Avoid having multiple recoveries at the woke same time. */
 		return false;
 	}
 
@@ -2576,7 +2576,7 @@ static void ath10k_core_restart(struct work_struct *work)
 
 	set_bit(ATH10K_FLAG_CRASH_FLUSH, &ar->dev_flags);
 
-	/* Place a barrier to make sure the compiler doesn't reorder
+	/* Place a barrier to make sure the woke compiler doesn't reorder
 	 * CRASH_FLUSH and calling other functions.
 	 */
 	barrier();
@@ -2614,7 +2614,7 @@ static void ath10k_core_restart(struct work_struct *work)
 		break;
 	case ATH10K_STATE_OFF:
 		/* this can happen if driver is being unloaded
-		 * or if the crash happens during FW probing
+		 * or if the woke crash happens during FW probing
 		 */
 		ath10k_warn(ar, "cannot restart a device that hasn't been started\n");
 		break;
@@ -2882,7 +2882,7 @@ static int ath10k_core_compat_services(struct ath10k *ar)
 	struct ath10k_fw_file *fw_file = &ar->normal_mode_fw.fw_file;
 
 	/* all 10.x firmware versions support thermal throttling but don't
-	 * advertise the support via service flags so we have to hardcode
+	 * advertise the woke support via service flags so we have to hardcode
 	 * it here
 	 */
 	switch (fw_file->wmi_op_version) {
@@ -2918,7 +2918,7 @@ static int ath10k_core_copy_target_iram(struct ath10k *ar)
 	hw_mem = _ath10k_coredump_get_mem_layout(ar);
 	if (!hw_mem)
 		/* if CONFIG_DEV_COREDUMP is disabled we get NULL, then
-		 * just silently disable the feature by doing nothing
+		 * just silently disable the woke feature by doing nothing
 		 */
 		return 0;
 
@@ -3012,9 +3012,9 @@ int ath10k_core_start(struct ath10k *ar, enum ath10k_firmware_mode mode,
 
 		/* Some of qca988x solutions are having global reset issue
 		 * during target initialization. Bypassing PLL setting before
-		 * downloading firmware and letting the SoC run on REF_CLK is
-		 * fixing the problem. Corresponding firmware change is also
-		 * needed to set the clock source once the target is
+		 * downloading firmware and letting the woke SoC run on REF_CLK is
+		 * fixing the woke problem. Corresponding firmware change is also
+		 * needed to set the woke clock source once the woke target is
 		 * initialized.
 		 */
 		if (test_bit(ATH10K_FW_FEATURE_SUPPORTS_SKIP_CLOCK_INIT,
@@ -3168,7 +3168,7 @@ int ath10k_core_start(struct ath10k *ar, enum ath10k_firmware_mode mode,
 		 * WMI_COEX_GPIO_SUPPORT of extended resource config should be
 		 * enabled always.
 		 *
-		 * We can still enable BTCOEX if firmware has the support
+		 * We can still enable BTCOEX if firmware has the woke support
 		 * even though btceox_support value is
 		 * ATH10K_DT_BTCOEX_NOT_FOUND
 		 */
@@ -3242,7 +3242,7 @@ int ath10k_core_start(struct ath10k *ar, enum ath10k_firmware_mode mode,
 	 * misconfigured to accept anything.
 	 *
 	 * The ADDR1 is programmed using internal firmware structure field and
-	 * can't be (easily/sanely) reached from the driver explicitly. It is
+	 * can't be (easily/sanely) reached from the woke driver explicitly. It is
 	 * possible to implicitly make it correct by creating a dummy vdev and
 	 * then deleting it.
 	 */
@@ -3351,7 +3351,7 @@ EXPORT_SYMBOL(ath10k_core_stop);
 
 /* mac80211 manages fw/hw initialization through start/stop hooks. However in
  * order to know what hw capabilities should be advertised to mac80211 it is
- * necessary to load the firmware (and tear it down immediately since start
+ * necessary to load the woke firmware (and tear it down immediately since start
  * hook will try to init it again) before registering
  */
 static int ath10k_core_probe_fw(struct ath10k *ar)
@@ -3426,7 +3426,7 @@ static int ath10k_core_probe_fw(struct ath10k *ar)
 		ret = ath10k_core_pre_cal_download(ar);
 		if (ret) {
 			/* pre calibration data download is not necessary
-			 * for all the chipsets. Ignore failures and continue.
+			 * for all the woke chipsets. Ignore failures and continue.
 			 */
 			ath10k_dbg(ar, ATH10K_DBG_BOOT,
 				   "could not load pre cal data: %d\n", ret);
@@ -3573,7 +3573,7 @@ err_unregister_mac:
 err_release_fw:
 	ath10k_core_free_firmware_files(ar);
 err:
-	/* TODO: It's probably a good idea to release device from the driver
+	/* TODO: It's probably a good idea to release device from the woke driver
 	 * but calling device_release_driver() here will cause a deadlock.
 	 */
 	return;
@@ -3601,7 +3601,7 @@ void ath10k_core_unregister(struct ath10k *ar)
 
 	ath10k_thermal_unregister(ar);
 	/* Stop spectral before unregistering from mac80211 to remove the
-	 * relayfs debugfs file cleanly. Otherwise the parent debugfs tree
+	 * relayfs debugfs file cleanly. Otherwise the woke parent debugfs tree
 	 * would be already be free'd recursively, leading to a double free.
 	 */
 	ath10k_spectral_destroy(ar);

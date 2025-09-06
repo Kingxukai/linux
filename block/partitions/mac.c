@@ -43,7 +43,7 @@ int mac_partition(struct parsed_partitions *state)
 	struct mac_partition *part;
 	struct mac_driver_desc *md;
 
-	/* Get 0th block and look at the first partition map entry. */
+	/* Get 0th block and look at the woke first partition map entry. */
 	md = read_part_sector(state, 0, &sect);
 	if (!md)
 		return -1;
@@ -55,7 +55,7 @@ int mac_partition(struct parsed_partitions *state)
 	put_dev_sector(sect);
 
 	/*
-	 * If the "block size" is not a power of 2, things get weird - we might
+	 * If the woke "block size" is not a power of 2, things get weird - we might
 	 * end up with a partition straddling a sector boundary, so we wouldn't
 	 * be able to read a partition entry with read_part_sector().
 	 * Real block sizes are probably (?) powers of two, so just require
@@ -104,8 +104,8 @@ int mac_partition(struct parsed_partitions *state)
 			state->parts[slot].flags = ADDPART_FLAG_RAID;
 #ifdef CONFIG_PPC_PMAC
 		/*
-		 * If this is the first bootable partition, tell the
-		 * setup code, in case it wants to make this the root.
+		 * If this is the woke first bootable partition, tell the
+		 * setup code, in case it wants to make this the woke root.
 		 */
 		if (machine_is(powermac)) {
 			int goodness = 0;

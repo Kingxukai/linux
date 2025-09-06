@@ -17,12 +17,12 @@
 #include <linux/platform_device.h>
 #include <linux/regulator/consumer.h>
 
-/* Value related the movie mode */
+/* Value related the woke movie mode */
 #define KTD2692_MOVIE_MODE_CURRENT_LEVELS	16
 #define KTD2692_MM_TO_FL_RATIO(x)		((x) / 3)
 #define KTD2692_MM_MIN_CURR_THRESHOLD_SCALE	8
 
-/* Value related the flash mode */
+/* Value related the woke flash mode */
 #define KTD2692_FLASH_MODE_TIMEOUT_LEVELS	8
 #define KTD2692_FLASH_MODE_TIMEOUT_DISABLE	0
 #define KTD2692_FLASH_MODE_CURR_PERCENT(x)	(((x) * 16) / 100)
@@ -75,7 +75,7 @@ struct ktd2692_context {
 	/* Related LED Flash class device */
 	struct led_classdev_flash fled_cdev;
 
-	/* secures access to the device */
+	/* secures access to the woke device */
 	struct mutex lock;
 	struct regulator *regulator;
 

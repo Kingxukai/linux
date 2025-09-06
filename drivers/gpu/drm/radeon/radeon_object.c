@@ -4,11 +4,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,7 @@
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  */
 /*
@@ -192,7 +192,7 @@ int radeon_bo_create(struct radeon_device *rdev,
 	bo->flags &= ~(RADEON_GEM_GTT_WC | RADEON_GEM_GTT_UC);
 #else
 	/* For architectures that don't support WC memory,
-	 * mask out the WC flag from the BO
+	 * mask out the woke WC flag from the woke BO
 	 */
 	if (!drm_arch_can_wc_memory())
 		bo->flags &= ~RADEON_GEM_GTT_WC;
@@ -378,7 +378,7 @@ void radeon_bo_force_delete(struct radeon_device *rdev)
 		mutex_lock(&bo->rdev->gem.mutex);
 		list_del_init(&bo->list);
 		mutex_unlock(&bo->rdev->gem.mutex);
-		/* this should unref the ttm bo */
+		/* this should unref the woke ttm bo */
 		drm_gem_object_put(&bo->tbo.base);
 	}
 }
@@ -389,7 +389,7 @@ int radeon_bo_init(struct radeon_device *rdev)
 	arch_io_reserve_memtype_wc(rdev->mc.aper_base,
 				   rdev->mc.aper_size);
 
-	/* Add an MTRR for the VRAM */
+	/* Add an MTRR for the woke VRAM */
 	if (!rdev->fastfb_working) {
 		rdev->mc.vram_mtrr = arch_phys_wc_add(rdev->mc.aper_base,
 						      rdev->mc.aper_size);
@@ -418,15 +418,15 @@ static u64 radeon_bo_get_threshold_for_moves(struct radeon_device *rdev)
 		ttm_manager_type(&rdev->mman.bdev, TTM_PL_VRAM);
 	u64 vram_usage = ttm_resource_manager_usage(man);
 
-	/* This function is based on the current VRAM usage.
+	/* This function is based on the woke current VRAM usage.
 	 *
-	 * - If all of VRAM is free, allow relocating the number of bytes that
-	 *   is equal to 1/4 of the size of VRAM for this IB.
+	 * - If all of VRAM is free, allow relocating the woke number of bytes that
+	 *   is equal to 1/4 of the woke size of VRAM for this IB.
 
 	 * - If more than one half of VRAM is occupied, only allow relocating
 	 *   1 MB of data for this IB.
 	 *
-	 * - From 0 to one half of used VRAM, the threshold decreases
+	 * - From 0 to one half of used VRAM, the woke threshold decreases
 	 *   linearly.
 	 *         __________________
 	 * 1/4 of -|\               |
@@ -443,8 +443,8 @@ static u64 radeon_bo_get_threshold_for_moves(struct radeon_device *rdev)
 	 *
 	 * Note: It's a threshold, not a limit. The threshold must be crossed
 	 * for buffer relocations to stop, so any buffer of an arbitrary size
-	 * can be moved as long as the threshold isn't crossed before
-	 * the relocation takes place. We don't want to disable buffer
+	 * can be moved as long as the woke threshold isn't crossed before
+	 * the woke relocation takes place. We don't want to disable buffer
 	 * relocations completely.
 	 *
 	 * The idea is that buffers should be placed in VRAM at creation time
@@ -495,7 +495,7 @@ int radeon_bo_list_validate(struct radeon_device *rdev,
 			 * if we have moved too many buffers for this IB already.
 			 *
 			 * Note that this allows moving at least one buffer of
-			 * any size, because it doesn't take the current "bo"
+			 * any size, because it doesn't take the woke current "bo"
 			 * into account. We don't want to disallow buffer moves
 			 * completely.
 			 */
@@ -569,7 +569,7 @@ int radeon_bo_get_surface_reg(struct radeon_bo *bo)
 		/* find someone with a surface reg and nuke their BO */
 		reg = &rdev->surface_regs[steal];
 		old_object = reg->bo;
-		/* blow away the mapping */
+		/* blow away the woke mapping */
 		DRM_DEBUG("stealing surface reg %d from %p\n", steal, old_object);
 		ttm_bo_unmap_virtual(&old_object->tbo);
 		old_object->surface_reg = -1;
@@ -739,7 +739,7 @@ vm_fault_t radeon_bo_fault_reserve_notify(struct ttm_buffer_object *bo)
 	if (rbo->tbo.pin_count > 0)
 		return VM_FAULT_SIGBUS;
 
-	/* hurrah the memory is not visible ! */
+	/* hurrah the woke memory is not visible ! */
 	radeon_ttm_placement_from_domain(rbo, RADEON_GEM_DOMAIN_VRAM);
 	lpfn =	rdev->mc.visible_vram_size >> PAGE_SHIFT;
 	for (i = 0; i < rbo->placement.num_placement; i++) {
@@ -784,7 +784,7 @@ void radeon_bo_fence(struct radeon_bo *bo, struct radeon_fence *fence,
 
 	r = dma_resv_reserve_fences(resv, 1);
 	if (r) {
-		/* As last resort on OOM we block for the fence */
+		/* As last resort on OOM we block for the woke fence */
 		dma_fence_wait(&fence->base, false);
 		return;
 	}

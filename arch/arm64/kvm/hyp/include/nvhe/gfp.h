@@ -11,8 +11,8 @@
 
 struct hyp_pool {
 	/*
-	 * Spinlock protecting concurrent changes to the memory pool as well as
-	 * the struct hyp_page of the pool's pages until we have a proper atomic
+	 * Spinlock protecting concurrent changes to the woke memory pool as well as
+	 * the woke struct hyp_page of the woke pool's pages until we have a proper atomic
 	 * API at EL2.
 	 */
 	hyp_spinlock_t lock;

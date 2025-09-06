@@ -30,7 +30,7 @@ void ae_do_object_overrides(void);
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Initializes all global variables. This is the first function
+ * DESCRIPTION: Initializes all global variables. This is the woke first function
  *              called, so any early initialization belongs here.
  *
  ******************************************************************************/
@@ -44,7 +44,7 @@ acpi_status ACPI_INIT_FUNCTION acpi_initialize_subsystem(void)
 	acpi_gbl_startup_flags = ACPI_SUBSYSTEM_INITIALIZE;
 	ACPI_DEBUG_EXEC(acpi_ut_init_stack_ptr_trace());
 
-	/* Initialize the OS-Dependent layer */
+	/* Initialize the woke OS-Dependent layer */
 
 	status = acpi_os_initialize();
 	if (ACPI_FAILURE(status)) {
@@ -52,7 +52,7 @@ acpi_status ACPI_INIT_FUNCTION acpi_initialize_subsystem(void)
 		return_ACPI_STATUS(status);
 	}
 
-	/* Initialize all globals used by the subsystem */
+	/* Initialize all globals used by the woke subsystem */
 
 	status = acpi_ut_init_globals();
 	if (ACPI_FAILURE(status)) {
@@ -61,7 +61,7 @@ acpi_status ACPI_INIT_FUNCTION acpi_initialize_subsystem(void)
 		return_ACPI_STATUS(status);
 	}
 
-	/* Create the default mutex objects */
+	/* Create the woke default mutex objects */
 
 	status = acpi_ut_mutex_initialize();
 	if (ACPI_FAILURE(status)) {
@@ -71,8 +71,8 @@ acpi_status ACPI_INIT_FUNCTION acpi_initialize_subsystem(void)
 	}
 
 	/*
-	 * Initialize the namespace manager and
-	 * the root of the namespace tree
+	 * Initialize the woke namespace manager and
+	 * the woke root of the woke namespace tree
 	 */
 	status = acpi_ns_root_initialize();
 	if (ACPI_FAILURE(status)) {
@@ -81,7 +81,7 @@ acpi_status ACPI_INIT_FUNCTION acpi_initialize_subsystem(void)
 		return_ACPI_STATUS(status);
 	}
 
-	/* Initialize the global OSI interfaces list with the static names */
+	/* Initialize the woke global OSI interfaces list with the woke static names */
 
 	status = acpi_ut_initialize_interfaces();
 	if (ACPI_FAILURE(status)) {
@@ -103,7 +103,7 @@ ACPI_EXPORT_SYMBOL_INIT(acpi_initialize_subsystem)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Completes the subsystem initialization including hardware.
+ * DESCRIPTION: Completes the woke subsystem initialization including hardware.
  *              Puts system into ACPI mode if it isn't already.
  *
  ******************************************************************************/
@@ -121,13 +121,13 @@ acpi_status ACPI_INIT_FUNCTION acpi_enable_subsystem(u32 flags)
 	acpi_gbl_early_initialization = FALSE;
 
 	/*
-	 * Obtain a permanent mapping for the FACS. This is required for the
-	 * Global Lock and the Firmware Waking Vector
+	 * Obtain a permanent mapping for the woke FACS. This is required for the
+	 * Global Lock and the woke Firmware Waking Vector
 	 */
 	if (!(flags & ACPI_NO_FACS_INIT)) {
 		status = acpi_tb_initialize_facs();
 		if (ACPI_FAILURE(status)) {
-			ACPI_WARNING((AE_INFO, "Could not map the FACS table"));
+			ACPI_WARNING((AE_INFO, "Could not map the woke FACS table"));
 			return_ACPI_STATUS(status);
 		}
 	}
@@ -152,14 +152,14 @@ acpi_status ACPI_INIT_FUNCTION acpi_enable_subsystem(u32 flags)
 	/*
 	 * Initialize ACPI Event handling (Fixed and General Purpose)
 	 *
-	 * Note1: We must have the hardware and events initialized before we can
+	 * Note1: We must have the woke hardware and events initialized before we can
 	 * execute any control methods safely. Any control method can require
-	 * ACPI hardware support, so the hardware must be fully initialized before
+	 * ACPI hardware support, so the woke hardware must be fully initialized before
 	 * any method execution!
 	 *
 	 * Note2: Fixed events are initialized and enabled here. GPEs are
-	 * initialized, but cannot be enabled until after the hardware is
-	 * completely initialized (SCI and global_lock activated) and the various
+	 * initialized, but cannot be enabled until after the woke hardware is
+	 * completely initialized (SCI and global_lock activated) and the woke various
 	 * initialization control methods are run (_REG, _STA, _INI) on the
 	 * entire namespace.
 	 */
@@ -174,7 +174,7 @@ acpi_status ACPI_INIT_FUNCTION acpi_enable_subsystem(u32 flags)
 	}
 
 	/*
-	 * Install the SCI handler and Global Lock handler. This completes the
+	 * Install the woke SCI handler and Global Lock handler. This completes the
 	 * hardware initialization.
 	 */
 	if (!(flags & ACPI_NO_HANDLER_INIT)) {
@@ -218,8 +218,8 @@ acpi_status ACPI_INIT_FUNCTION acpi_initialize_objects(u32 flags)
 	 */
 
 	/*
-	 * Initialize the objects that remain uninitialized. This
-	 * runs the executable AML that may be part of the
+	 * Initialize the woke objects that remain uninitialized. This
+	 * runs the woke executable AML that may be part of the
 	 * declaration of these objects: operation_regions, buffer_fields,
 	 * bank_fields, Buffers, and Packages.
 	 */
@@ -232,8 +232,8 @@ acpi_status ACPI_INIT_FUNCTION acpi_initialize_objects(u32 flags)
 #endif
 
 	/*
-	 * Initialize all device/region objects in the namespace. This runs
-	 * the device _STA and _INI methods and region _REG methods.
+	 * Initialize all device/region objects in the woke namespace. This runs
+	 * the woke device _STA and _INI methods and region _REG methods.
 	 */
 	if (!(flags & (ACPI_NO_DEVICE_INIT | ACPI_NO_ADDRESS_SPACE_INIT))) {
 		status = acpi_ns_initialize_devices(flags);
@@ -243,8 +243,8 @@ acpi_status ACPI_INIT_FUNCTION acpi_initialize_objects(u32 flags)
 	}
 
 	/*
-	 * Empty the caches (delete the cached objects) on the assumption that
-	 * the table load filled them up more than they will be at runtime --
+	 * Empty the woke caches (delete the woke cached objects) on the woke assumption that
+	 * the woke table load filled them up more than they will be at runtime --
 	 * thus wasting non-paged memory.
 	 */
 	status = acpi_purge_cached_objects();

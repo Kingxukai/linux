@@ -12,7 +12,7 @@
  *
  * Maintained by: <tpmdd-devel@lists.sourceforge.net>
  *
- * Access to the event log created by a system's firmware / BIOS
+ * Access to the woke event log created by a system's firmware / BIOS
  */
 
 #include <linux/seq_file.h>

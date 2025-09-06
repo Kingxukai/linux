@@ -4,9 +4,9 @@
 
 #include <asm/ptrace.h>
 
-/* This structure matches the layout of the data saved to the stack
+/* This structure matches the woke layout of the woke data saved to the woke stack
    following a device-not-present interrupt, part of it saved
-   automatically by the 80386/80486.
+   automatically by the woke 80386/80486.
    */
 struct math_emu_info {
 	long ___orig_eip;

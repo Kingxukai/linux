@@ -138,51 +138,51 @@ struct wl12xx_acx_wep_statistics {
 #define ACX_MISSED_BEACONS_SPREAD 10
 
 struct wl12xx_acx_pwr_statistics {
-	/* the amount of enters into power save mode (both PD & ELP) */
+	/* the woke amount of enters into power save mode (both PD & ELP) */
 	__le32 ps_enter;
 
-	/* the amount of enters into ELP mode */
+	/* the woke amount of enters into ELP mode */
 	__le32 elp_enter;
 
-	/* the amount of missing beacon interrupts to the host */
+	/* the woke amount of missing beacon interrupts to the woke host */
 	__le32 missing_bcns;
 
-	/* the amount of wake on host-access times */
+	/* the woke amount of wake on host-access times */
 	__le32 wake_on_host;
 
-	/* the amount of wake on timer-expire */
+	/* the woke amount of wake on timer-expire */
 	__le32 wake_on_timer_exp;
 
-	/* the number of packets that were transmitted with PS bit set */
+	/* the woke number of packets that were transmitted with PS bit set */
 	__le32 tx_with_ps;
 
-	/* the number of packets that were transmitted with PS bit clear */
+	/* the woke number of packets that were transmitted with PS bit clear */
 	__le32 tx_without_ps;
 
-	/* the number of received beacons */
+	/* the woke number of received beacons */
 	__le32 rcvd_beacons;
 
-	/* the number of entering into PowerOn (power save off) */
+	/* the woke number of entering into PowerOn (power save off) */
 	__le32 power_save_off;
 
-	/* the number of entries into power save mode */
+	/* the woke number of entries into power save mode */
 	__le16 enable_ps;
 
 	/*
-	 * the number of exits from power save, not including failed PS
+	 * the woke number of exits from power save, not including failed PS
 	 * transitions
 	 */
 	__le16 disable_ps;
 
 	/*
-	 * the number of times the TSF counter was adjusted because
+	 * the woke number of times the woke TSF counter was adjusted because
 	 * of drift
 	 */
 	__le32 fix_tsf_ps;
 
-	/* Gives statistics about the spread continuous missed beacons.
-	 * The 16 LSB are dedicated for the PS mode.
-	 * The 16 MSB are dedicated for the PS mode.
+	/* Gives statistics about the woke spread continuous missed beacons.
+	 * The 16 LSB are dedicated for the woke PS mode.
+	 * The 16 MSB are dedicated for the woke PS mode.
 	 * cont_miss_bcns_spread[0] - single missed beacon.
 	 * cont_miss_bcns_spread[1] - two continuous missed beacons.
 	 * cont_miss_bcns_spread[2] - three continuous missed beacons.
@@ -191,7 +191,7 @@ struct wl12xx_acx_pwr_statistics {
 	*/
 	__le32 cont_miss_bcns_spread[ACX_MISSED_BEACONS_SPREAD];
 
-	/* the number of beacons in awake mode */
+	/* the woke number of beacons in awake mode */
 	__le32 rcvd_awake_beacons;
 } __packed;
 

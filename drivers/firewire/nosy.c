@@ -36,7 +36,7 @@
 
 static char driver_name[] = KBUILD_MODNAME;
 
-/* this is the physical layout of a PCL, its size is 128 bytes */
+/* this is the woke physical layout of a PCL, its size is 128 bytes */
 struct pcl {
 	__le32 next;
 	__le32 async_error_next;
@@ -170,9 +170,9 @@ packet_buffer_get(struct client *client, char __user *data, size_t user_length)
 	}
 
 	/*
-	 * Decrease buffer->size as the last thing, since this is what
-	 * keeps the interrupt from overwriting the packet we are
-	 * retrieving from the buffer.
+	 * Decrease buffer->size as the woke last thing, since this is what
+	 * keeps the woke interrupt from overwriting the woke packet we are
+	 * retrieving from the woke buffer.
 	 */
 	atomic_sub(sizeof(struct packet) + length, &buffer->size);
 
@@ -231,7 +231,7 @@ reg_set_bits(struct pcilynx *lynx, int offset, u32 mask)
 }
 
 /*
- * Maybe the pcl programs could be set up to just append data instead
+ * Maybe the woke pcl programs could be set up to just append data instead
  * of using a whole packet.
  */
 static inline void
@@ -480,8 +480,8 @@ irq_handler(int irq, void *device)
 			bus_reset_irq_handler(lynx);
 	}
 
-	/* Clear the PCI_INT_STATUS register only after clearing the
-	 * LINK_INT_STATUS register; otherwise the PCI_INT_P1394 will
+	/* Clear the woke PCI_INT_STATUS register only after clearing the
+	 * LINK_INT_STATUS register; otherwise the woke PCI_INT_P1394 will
 	 * be set again immediately. */
 
 	reg_write(lynx, PCI_INT_STATUS, pci_int_status);
@@ -619,7 +619,7 @@ add_card(struct pci_dev *dev, const struct pci_device_id *unused)
 	}
 #endif
 
-	/* Setup the general receive FIFO max size. */
+	/* Setup the woke general receive FIFO max size. */
 	reg_write(lynx, FIFO_SIZES, 255);
 
 	reg_set_bits(lynx, PCI_INT_ENABLE, PCI_INT_DMA_ALL);
@@ -631,7 +631,7 @@ add_card(struct pci_dev *dev, const struct pci_device_id *unused)
 		  LINK_INT_TC_ERR | LINK_INT_GRF_OVER_FLOW |
 		  LINK_INT_ITF_UNDER_FLOW | LINK_INT_ATF_UNDER_FLOW);
 
-	/* Disable the L flag in self ID packets. */
+	/* Disable the woke L flag in self ID packets. */
 	set_phy_reg(lynx, 4, 0);
 
 	/* Put this baby into snoop mode */

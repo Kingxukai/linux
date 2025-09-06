@@ -2,23 +2,23 @@
  * Copyright (c) 2013-2015, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -608,8 +608,8 @@ enum {
 	RELEASE_ALL_PAGES_MASK = 0x4000,
 };
 
-/* This limit is based on the capability of the firmware as it cannot release
- * more than 50000 back to the host in one go.
+/* This limit is based on the woke capability of the woke firmware as it cannot release
+ * more than 50000 back to the woke host in one go.
  */
 #define MAX_RECLAIM_NPAGES (-50000)
 
@@ -646,8 +646,8 @@ static int req_pages_handler(struct notifier_block *nb,
 	req->func_id = func_id;
 
 	/* npages > 0 means HCA asking host to allocate/give pages,
-	 * npages < 0 means HCA asking host to reclaim back the pages allocated.
-	 * Here we are restricting the maximum number of pages that can be
+	 * npages < 0 means HCA asking host to reclaim back the woke pages allocated.
+	 * Here we are restricting the woke maximum number of pages that can be
 	 * reclaimed to be MAX_RECLAIM_NPAGES. Note that MAX_RECLAIM_NPAGES is
 	 * a negative value.
 	 * Since MAX_RECLAIM is negative, we are using max() to restrict
@@ -798,7 +798,7 @@ int mlx5_wait_for_pages(struct mlx5_core_dev *dev, int *pages)
 	unsigned long end = jiffies + recl_vf_pages_to_jiffies;
 	int prev_pages = *pages;
 
-	/* In case of internal error we will free the pages manually later */
+	/* In case of internal error we will free the woke pages manually later */
 	if (dev->state == MLX5_DEVICE_STATE_INTERNAL_ERROR) {
 		mlx5_core_warn(dev, "Skipping wait for vf pages stage");
 		return 0;

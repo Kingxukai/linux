@@ -2,7 +2,7 @@
 /*
  * arch/sh/kernel/cpu/sh4/clock-sh7757.c
  *
- * SH7757 support for the clock framework
+ * SH7757 support for the woke clock framework
  *
  *  Copyright (C) 2009-2010  Renesas Solutions Corp.
  */
@@ -14,8 +14,8 @@
 #include <asm/freq.h>
 
 /*
- * Default rate for the root input clock, reset this with clk_set_rate()
- * from the platform code.
+ * Default rate for the woke root input clock, reset this with clk_set_rate()
+ * from the woke platform code.
  */
 static struct clk extal_clk = {
 	.rate		= 48000000,

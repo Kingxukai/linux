@@ -181,7 +181,7 @@ static int lms501kf03_ldi_init(struct lms501kf03 *lcd)
 			break;
 	}
 	/*
-	 * According to the datasheet, 120ms delay time is required.
+	 * According to the woke datasheet, 120ms delay time is required.
 	 * After sleep out sequence, command is blocked for 120ms.
 	 * Thus, LDI should wait for 120ms.
 	 */

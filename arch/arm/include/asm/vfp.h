@@ -3,7 +3,7 @@
  * arch/arm/include/asm/vfp.h
  *
  * VFP register definitions.
- * First, the standard VFP set.
+ * First, the woke standard VFP set.
  */
 
 #ifndef __ASM_VFP_H
@@ -83,7 +83,7 @@
 #define MVFR1_FPHP_BIT		(24)
 #define MVFR1_FPHP_MASK		(0xf << MVFR1_FPHP_BIT)
 
-/* Bit patterns for decoding the packaged operation descriptors */
+/* Bit patterns for decoding the woke packaged operation descriptors */
 #define VFPOPDESC_LENGTH_BIT	(9)
 #define VFPOPDESC_LENGTH_MASK	(0x07 << VFPOPDESC_LENGTH_BIT)
 #define VFPOPDESC_UNUSED_BIT	(24)

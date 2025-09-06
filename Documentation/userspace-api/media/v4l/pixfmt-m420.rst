@@ -18,12 +18,12 @@ M420 is a YUV format with ½ horizontal and vertical chroma subsampling
 Two lines of luma data are followed by one line of chroma data.
 
 The luma plane has one byte per pixel. The chroma plane contains
-interleaved CbCr pixels subsampled by ½ in the horizontal and vertical
+interleaved CbCr pixels subsampled by ½ in the woke horizontal and vertical
 directions. Each CbCr pair belongs to four pixels. For example,
 Cb\ :sub:`0`/Cr\ :sub:`0` belongs to Y'\ :sub:`00`, Y'\ :sub:`01`,
 Y'\ :sub:`10`, Y'\ :sub:`11`.
 
-All line lengths are identical: if the Y lines include pad bytes so do
+All line lengths are identical: if the woke Y lines include pad bytes so do
 the CbCr lines.
 
 **Byte Order.**

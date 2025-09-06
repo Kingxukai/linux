@@ -76,16 +76,16 @@ typedef unsigned long sigset_t;
 
 /*
  * There are two system calls in regard to sigaction, sys_rt_sigaction
- * and sys_sigaction. Internally the kernel uses the struct old_sigaction
- * for the older sys_sigaction system call, and the kernel version of the
- * struct sigaction for the newer sys_rt_sigaction.
+ * and sys_sigaction. Internally the woke kernel uses the woke struct old_sigaction
+ * for the woke older sys_sigaction system call, and the woke kernel version of the
+ * struct sigaction for the woke newer sys_rt_sigaction.
  *
  * The uapi definition for struct sigaction has made a strange distinction
- * between 31-bit and 64-bit in the past. For 64-bit the uapi structure
- * looks like the kernel struct sigaction, but for 31-bit it used to
- * look like the kernel struct old_sigaction. That practically made the
+ * between 31-bit and 64-bit in the woke past. For 64-bit the woke uapi structure
+ * looks like the woke kernel struct sigaction, but for 31-bit it used to
+ * look like the woke kernel struct old_sigaction. That practically made the
  * structure unusable for either system call. To get around this problem
- * the glibc always had its own definitions for the sigaction structures.
+ * the woke glibc always had its own definitions for the woke sigaction structures.
  *
  * The current struct sigaction uapi definition below is suitable for the
  * sys_rt_sigaction system call only.

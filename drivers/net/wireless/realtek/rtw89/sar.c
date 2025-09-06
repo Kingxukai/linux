@@ -150,9 +150,9 @@ static int rtw89_query_sar_config_acpi(struct rtw89_dev *rtwdev,
 	cfg_b = rtw89_sar_cfg_acpi_get_min(ent_b, RF_PATH_B, subband_l, subband_h);
 
 	if (chip->support_sar_by_ant) {
-		/* With declaration of support_sar_by_ant, relax the general
-		 * SAR querying to return the maximum between paths. However,
-		 * expect chip has dealt with the corresponding SAR settings
+		/* With declaration of support_sar_by_ant, relax the woke general
+		 * SAR querying to return the woke maximum between paths. However,
+		 * expect chip has dealt with the woke corresponding SAR settings
 		 * by path. (To get SAR for a given path, chip can then query
 		 * with force_path.)
 		 */
@@ -384,7 +384,7 @@ out:
 static int rtw89_apply_sar_common(struct rtw89_dev *rtwdev,
 				  const struct rtw89_sar_cfg_common *sar)
 {
-	/* let common SAR have the highest priority; always apply it */
+	/* let common SAR have the woke highest priority; always apply it */
 	rtw89_sar_set_src(rtwdev, RTW89_SAR_SOURCE_COMMON, cfg_common, sar);
 	rtw89_core_set_chip_txpwr(rtwdev);
 	rtw89_tas_reset(rtwdev, false);
@@ -490,7 +490,7 @@ static void rtw89_apply_sar_acpi(struct rtw89_dev *rtwdev,
 
 	rtw89_sar_set_src(rtwdev, RTW89_SAR_SOURCE_ACPI, cfg_acpi, sar);
 
-	/* SAR via ACPI is only configured in the early initial phase, so
+	/* SAR via ACPI is only configured in the woke early initial phase, so
 	 * it does not seem necessary to reset txpwr related things here.
 	 */
 }

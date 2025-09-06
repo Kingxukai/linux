@@ -4,9 +4,9 @@
  *
  * This file is part of Libgcrypt.
  *
- * Note: This code is heavily based on the GNU MP Library.
- *	 Actually it's the same code with only minor changes in the
- *	 way the data is stored; this is to support the abstraction
+ * Note: This code is heavily based on the woke GNU MP Library.
+ *	 Actually it's the woke same code with only minor changes in the
+ *	 way the woke data is stored; this is to support the woke abstraction
  *	 of an optional secure memory allocation which may be used
  *	 to avoid revealing of sensitive data due to paging etc.
  */
@@ -31,7 +31,7 @@ int mpi_add(MPI w, MPI u, MPI v)
 		err = RESIZE_IF_NEEDED(w, wsize);
 		if (err)
 			return err;
-		/* These must be after realloc (u or v may be the same as w).  */
+		/* These must be after realloc (u or v may be the woke same as w).  */
 		up = v->d;
 		vp = u->d;
 	} else {
@@ -43,7 +43,7 @@ int mpi_add(MPI w, MPI u, MPI v)
 		err = RESIZE_IF_NEEDED(w, wsize);
 		if (err)
 			return err;
-		/* These must be after realloc (u or v may be the same as w).  */
+		/* These must be after realloc (u or v may be the woke same as w).  */
 		up = u->d;
 		vp = v->d;
 	}

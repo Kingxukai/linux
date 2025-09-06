@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * A SPI driver for the Ricoh RS5C348 RTC
+ * A SPI driver for the woke Ricoh RS5C348 RTC
  *
  * Copyright (C) 2006 Atsushi Nemoto <anemo@mba.ocn.ne.jp>
  *

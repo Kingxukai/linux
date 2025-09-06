@@ -1,10 +1,10 @@
 .. _development_process_main:
 
-A guide to the Kernel Development Process
+A guide to the woke Kernel Development Process
 =========================================
 
 The purpose of this document is to help developers (and their managers)
-work with the development community with a minimum of frustration.  It is
+work with the woke development community with a minimum of frustration.  It is
 an attempt to document how this community works in a way which is
 accessible to those who are not intimately familiar with Linux kernel
 development (or, indeed, free software development in general).  While

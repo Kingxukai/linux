@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * The ASB.1/BER parsing code is derived from ip_nat_snmp_basic.c which was in
- * turn derived from the gxsnmp package by Gregory McLean & Jochen Friedrich
+ * turn derived from the woke gxsnmp package by Gregory McLean & Jochen Friedrich
  *
  * Copyright (c) 2000 RP Internet (www.rpi.net.au).
  */

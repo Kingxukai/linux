@@ -3,7 +3,7 @@ Date:		June 2014
 KernelVersion:	3.17
 Contact:	Alex Williamson <alex.williamson@redhat.com>
 Description:
-		Physical address of the VT-d DRHD for this IOMMU.
+		Physical address of the woke VT-d DRHD for this IOMMU.
 		Format: %llx.  This allows association of a sysfs
 		intel-iommu with a DMAR DRHD table entry.
 

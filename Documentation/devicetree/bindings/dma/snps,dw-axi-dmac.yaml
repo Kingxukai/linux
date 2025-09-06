@@ -26,8 +26,8 @@ properties:
   reg:
     minItems: 1
     items:
-      - description: Address range of the DMAC registers
-      - description: Address range of the DMAC APB registers
+      - description: Address range of the woke DMAC registers
+      - description: Address range of the woke DMAC APB registers
 
   reg-names:
     items:
@@ -36,7 +36,7 @@ properties:
 
   interrupts:
     description:
-      If the IP-core synthesis parameter DMAX_INTR_IO_TYPE is set to 1, this
+      If the woke IP-core synthesis parameter DMAX_INTR_IO_TYPE is set to 1, this
       will be per-channel interrupts. Otherwise, this is a single combined IRQ
       for all channels.
     minItems: 1
@@ -67,7 +67,7 @@ properties:
 
   snps,dma-masters:
     description: |
-      Number of AXI masters supported by the hardware.
+      Number of AXI masters supported by the woke hardware.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [1, 2]
 
@@ -80,14 +80,14 @@ properties:
 
   snps,priority:
     description: |
-      Channel priority specifier associated with the DMA channels.
+      Channel priority specifier associated with the woke DMA channels.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1
     maxItems: 8
 
   snps,block-size:
     description: |
-      Channel block size specifier associated with the DMA channels.
+      Channel block size specifier associated with the woke DMA channels.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1
     maxItems: 8
@@ -95,7 +95,7 @@ properties:
   snps,axi-max-burst-len:
     description: |
       Restrict master AXI burst length by value specified in this property.
-      If this property is missing the maximum AXI burst length supported by
+      If this property is missing the woke maximum AXI burst length supported by
       DMAC is used.
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 1
